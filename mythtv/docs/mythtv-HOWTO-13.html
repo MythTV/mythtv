@@ -19,8 +19,8 @@ the tarball, untar it and run the <B>configure</B> script:</P>
 <P>
 <BLOCKQUOTE><CODE>
 <PRE>
-$ tar -xjf mythplugins-0.19.tar.bz2
-$ cd mythplugins-0.19
+$ tar -xjf mythplugins-0.20.tar.bz2
+$ cd mythplugins-0.20
 $ ./configure --help
 
 Usage:   configure [options]
@@ -69,7 +69,7 @@ MythWeather related options:
 </CODE></BLOCKQUOTE>
 </P>
 <P>The sections detailing configuration of the plugins assume that you are
-already in the <CODE>~/mythplugins-0.19/</CODE> directory.</P>
+already in the <CODE>~/mythplugins-0.20/</CODE> directory.</P>
 <P>Note that a single <B>configure</B> script now does configuration for all
 modules.  By default, it will compile all modules.  If you do not wish to
 compile a module, either because it is of no use to you, or you do not have
@@ -84,7 +84,7 @@ line would look like:</P>
 <P>
 <BLOCKQUOTE><CODE>
 <PRE>
-$ cd ~/mythplugins-0.19 
+$ cd ~/mythplugins-0.20 
 $ ./configure --disable-all --enable-opengl --enable-mythgallery --enable-exif --enable-mythmusic --enable-fft
 $ qmake mythplugins.pro
 $ make

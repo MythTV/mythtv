@@ -177,6 +177,17 @@ when the highlight is on the (New Capture Card) row to define another card. </P>
 pressing the 'D' key, or you can highlight it and press the RETURN or 'E'
 key to edit it.</P>
 <P>Once you have no additional cards to setup, press ESC.</P>
+<P>
+<FIGURE>
+<EPS FILE="stop.eps">
+<IMG SRC="stop.png">
+<CAPTION><B>NOTE</B>: If you have a dual digital/analog card, such as the pcHDTV
+cards and some DViCO cards, then you should not configure this as two
+separate cards. Configure the digital portion as a DVB card, then click
+on the "Analog Options" button within the DVB configuration panel for
+the card and configure the analog portion of the card there.</CAPTION>
+</FIGURE>
+</P>
 
 <H3><A NAME="VideoSources"></A> Video Sources </H3>
 
@@ -197,7 +208,8 @@ using the external XMLTV script to get their guide data.</P>
 <P>If you wish to continue using the XMLTV grabber, then move to the Zip/postal
 code field and put in the appropriate value.</P>
 <P>If you're outside of North America, then some manual interaction will be
-required with XMLTV.</P>
+required with XMLTV. You may need to switch from the MythTV setup program
+to the console it was run on to interact with XMLTV.</P>
 <P>Once you have chosen your provider, press RETURN to continue.  XMLTV will
 now begin collecting the initial data for your location.  The screen may
 blank for a few seconds to several minutes, depending on the load of the
@@ -225,11 +237,22 @@ with an "Antenna" source you defined in Video Sources, you would move to the
 Using the left and right arrow keys will show you the various choices you
 have already created for video source.  In our case, you would use the
 left/right cursor keys until "Antenna" was shown in the Video Source field. 
-Press down to move to the next setting, all of which should be
-self-explanatory.</P>
-<P>If you have multiple input connection types (Such as Tuner 0 and Tuner 1),
-it's very, very likely that it is the lowest numbered input that is actually
-available on the device.</P>
+Press down to move to the next setting.</P>
+<P>On the connection pane there is a "Scan for channels" button, if you are
+configuring a digital source such as a DVB card, you need scan for channels
+and you must do this before pressing the "Fetch channels from listings
+source" button. You may scan for analog channels on an analog input, but
+this is not needed.</P>
+
+<P>The other button is called "Fetch channels from listings source". As long as
+you have a real listings source you should fetch channels from them for
+analog channels. You can do this for digital sources as well (unless the
+listing source is transmitted EIT data). If you are using XMLTV, you may need
+to switch from the MythTV setup program to the console it was run on to
+interact with XMLTV after pressing this button. It is possible to fetch the
+channels on the command line using mythfilldatabase. But if you need to do
+this, you will probably need to re-enter the MythTV setup program to
+configure the "Starting channel" setting for this source->input connection.</P>
 <P>
 <FIGURE>
 <EPS FILE="stop.eps">
@@ -260,9 +283,9 @@ further items to configure, thereby returning you to the command line.</P>
 
 <P>The channel editor is used to globally alter channel information,
 including items like hue, contrast, fine tuning and others.  Users in North
-America shouldn't run the channel editor until after completing initial
-mythtv-setup and running <B>mythfilldatabase</B> at least once to populate
-the database.</P>
+America shouldn't run the channel editor until you've completed the initial
+mythtv-setup and ran <B>mythfilldatabase</B> at least once to populate the
+database.</P>
 
 <H2><A NAME="ss9.2">9.2</A> <A HREF="mythtv-HOWTO.html#toc9.2">Post-configuration</A>
 </H2>
@@ -310,7 +333,7 @@ $ mythbackend
 <P>mythbackend will print information about connections and what it's doing to
 the console.  If you'd like to see the options that are available for
 mythbackend, type <CODE>mythbackend -h</CODE> for help.</P>
-<P>As of MythTV v0.19, the available options are:
+<P>As of MythTV v0.20, the available options are:
 <BLOCKQUOTE><CODE>
 <PRE>
 $ mythbackend --help
@@ -332,10 +355,10 @@ Valid options are:
 </CODE></BLOCKQUOTE>
 </P>
 <P>Running mythbackend as a daemon and using the logfile option will allow you
-to have mythbackend automatically start up during the boot process.  For
-example, you may add this to your <CODE>rc.local</CODE> file, or you can follow
-the steps outlined in the section called 
-<A HREF="mythtv-HOWTO-23.html#mythbackend_autostart">Automatically starting mythbackend at system boot time</A>.</P>
+to have mythbackend automatically start up during boot.  You can follow the
+steps outlined in the section called 
+<A HREF="mythtv-HOWTO-23.html#mythbackend_autostart">Automatically starting mythbackend at system boot time</A> for
+configuration steps.</P>
 
 <H2><A NAME="nonmaster_backend"></A> <A NAME="ss9.3">9.3</A> <A HREF="mythtv-HOWTO.html#toc9.3">Configuring a non-master backend </A>
 </H2>
@@ -389,8 +412,7 @@ best to just let the program run to completion.</CAPTION>
 available.  </P>
 <P><B>mythfilldatabase --manual</B> is another option; the manual option will
 allow you to fine tune channel frequencies and specify which channels will
-be added to the database.  If you are not using the tv_grab_na grabber, you
-must use the <B>--manual</B> option.</P>
+be added to the database.  </P>
 <P><B>mythfilldatabase --file</B> is an option if there isn't an XMLTV grabber
 for your country, but you <B>do</B> have an XML formatted listings file
 created by some other program.</P>
@@ -406,7 +428,7 @@ today (in case of late-breaking changes to the schedule).</P>
 <P>In order to keep your database filled, <B>mythfilldatabase</B> should be
 run once a day.</P>
 <P>To use MythTV's built-in capability, you'll need to run the
-<B>mythfrontend</B> Setup option.  From the MythFrontend, enter the
+<B>mythfrontend</B> Setup option.  From the mythfrontend, enter the
 Setup>General screen and advance to "Mythfilldatabase", the fourth screen.
 Select the checkbox, then complete the options as you see fit.  The
 <B>mythbackend</B> program will now run <B>mythfilldatabase</B> for you.</P>

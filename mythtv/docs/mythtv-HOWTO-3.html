@@ -93,6 +93,11 @@ WinTV-PVR-150/250/350/500.  In this mode, because the video encoding is
 being done by a dedicated video processor, the host CPU requirements are
 quite low.  See the 
 <A HREF="#video_capture_device">Video Capture Device</A> section for details.</P>
+<P>The price differential between a frame grabber and a card that implements
+hardware MPEG-2 encoding, such as the Hauppauge PVR-x50 series, is now less
+than $30 US.  Primary development in MythTV has transitioned to supporting
+MPEG-2 capture devices and HDTV, so if given the option, go with the
+hardware MPEG-2 encoder.</P>
 <P>If you have a Via M10000 series or a Hauppauge PVR-350, MythTV can use the
 hardware-based video decoder for playback, which further reduces CPU
 requirements.</P>
@@ -138,8 +143,15 @@ but requires great care in how you format and mount the volume.</P>
 <P>Because MythTV creates very large files, a filesystem that does well at
 deleting large files is important.  Numerous benchmarks show that XFS and
 JFS do very well at this task.  You are <EM>strongly</EM> encouraged to
-consider one of these for your MythTV filesystem.  JFS is the absolute
-best at deletion, so you may want to try it if XFS gives you problems.</P>
+consider one of these for your MythTV filesystem.  JFS is the absolute best
+at deletion, so you may want to try it if XFS gives you problems.  MythTV
+.20 also incorporates a "slow delete" feature, which progressively shrinks
+the file rather than attempting to delete it all at once, so if you're more
+comfortable with a filesystem such as ext3 (whose delete performance for
+large files isn't that good) you may use it rather than one of the
+known-good high-performance file systems.  There are other ramifications to
+using XFS and JFS - neither offer the opportunity to shrink a filesystem;
+they may only be expanded.</P>
 <P>
 <FIGURE>
 <EPS FILE="stop.eps">
@@ -173,9 +185,9 @@ is actually using a standard reference design and placing their own name on
 it.  See the video4linux mailing list (
 <A HREF="https://listman.redhat.com/mailman/listinfo/video4linux-list">https://listman.redhat.com/mailman/listinfo/video4linux-list</A>) for
 more information and for specific hardware questions.</P>
-<P>The most common inexpensive cards available use the Bt848 or Bt878 video
-capture chip; examples are the "Hauppauge WinTV Go" card and the "AverTV
-Desktop PVR" card, both of which use the bttv kernel module.</P>
+<P>The most common inexpensive cards available use the Bt848, Bt878 or CX2388x
+series of video capture chips; examples are the "Hauppauge WinTV Go" card and
+the "AverTV Desktop PVR" card, both of which use the bttv kernel module.</P>
 <P>
 <HR>
 <PRE>
@@ -200,8 +212,6 @@ as a MythTV capture device because the GATOS
 drivers that are available provide only a limited subset of the V4L API. The TV Wonder series of cards are supported by the Bt8x8 Video4Linux driver.</CAPTION>
 </FIGURE>
 </P>
-<P>Newer cards may use the CX23881 series of chips; a driver is available at
-<A HREF="http://bytesex.org/cx88/">http://bytesex.org/cx88/</A>.</P>
 <P>After you have installed a suitable capture device, you can check that 
 the kernel sees it with <CODE>lspci</CODE>. Look for an entry labeled "Multimedia 
 video controller". To get more detailed information about the card, use 
@@ -254,20 +264,18 @@ for Live TV at 416x480.</LI>
 <P>DVB is a video standard primarily found in Europe (where it comes in
 DVB-C, DVB-T and DVB-S varieties for Cable, Terrestrial and Satellite) and
 is also used as the programming interface for HDTV capture cards in Linux. 
-MythTV supports DVB; see the pages maintained by Martin Smith 
-<A HREF="mailto:martin@ethics-gradient.net">martin@ethics-gradient.net</A>
-at 
-<A HREF="http://www.ethics-gradient.net/myth/mythdvb.html">http://www.ethics-gradient.net/myth/mythdvb.html</A> for more
-information.  To see if your DVB card is supported, see the list of cards in
-the "Supported Hardware" section of the DVB Wiki at 
+To see if your DVB card is supported, see the list of cards in the
+"Supported Hardware" section of the DVB Wiki at 
 <A HREF="http://www.linuxtv.org/wiki/index.php/Main_Page">http://www.linuxtv.org/wiki/index.php/Main_Page</A> for more
 information.</P>
 <P>In the United States, you may use a card such as the TwinHan to obtain
-unencrypted Free-To-Air satellite channels.</P>
+unencrypted Free-To-Air satellite channels.  See 
+<A HREF="http://www.lyngsat.com/">http://www.lyngsat.com/</A> for the types
+of content which is available.</P>
 
 <H3>HDTV.</H3>
 
-<P>There are a number of HDTV card with Linux drivers which are known to
+<P>There are a number of HDTV cards with Linux drivers which are known to
 operate in the United States; a complete list of cards with DVB drivers can
 be found at 
 <A HREF="http://www.linuxtv.org/wiki/index.php/ATSC_cards">http://www.linuxtv.org/wiki/index.php/ATSC_cards</A> Some cards support
@@ -275,18 +283,35 @@ capture of unencrypted digital cable TV (utilizing QAM256), others will only
 work with Over The Air signals captured with an antenna (with 8VSB).</P>
 <P>Cards that have been reported to work include:
 <UL>
-<LI>Air2PC PCI (8VSB)</LI>
-<LI>pcHDTV-2000 (8VSB)</LI>
-<LI>Air2PC HD5000 (8VSB, QAM256)</LI>
-<LI>pcHDTV-3000 (8VSB, QAM256)</LI>
-<LI>dvico Fusion HDTV Lite 5 (8VSB, QAM256)</LI>
+<LI>pcHDTV HD-2000, Air2PC PCI rev 1-3, SiliconDust HDHomeRun (8VSB only)</LI>
+<LI>pcHDTV HD-3000/5500             (8VSB, QAM256)</LI>
+<LI>Air2PC HD-5000                  (8VSB, QAM256)</LI>
+<LI>DViCO Fusion HDTV Lite/Gold 5   (8VSB, QAM256)</LI>
 </UL>
 </P>
+<P><B>NOTE</B>: There are no known consumer-level capture devices which will
+allow you to capture the HDTV output (DVI, HDMI, VGA, YPbPr / Component)
+from a set-top box commonly found with digital cable systems or satellite
+systems. <EM>None</EM> of the capture devices listed above
+perform any encoding; they merely allow your computer to save a copy of a
+HDTV stream which has already been converted to MPEG-2 at the broadcast
+facility.</P>
+<P><B>NOTE:</B>: All of the cards listed above (except for the HD-2000 and
+HDHomeRun) should be configured as DVB cards. The HD-2000 can be configured
+as a pcHDTV card if you use the V4L drivers from 
+<A HREF="http://www.pchdtv.com">http://www.pchdtv.com</A> and use Linux
+kernel 2.6.9 or earlier.  With kernel 2.6.10 and higher it must be
+configured as a DVB card, but you lose access to the second antenna input in
+ATSC mode. The HDHomeRun should be configured as two HDHomeRun cards, one
+for each tuner.</P>
 <P>To playback HDTV content, plan on a powerful CPU.  "How powerful?" depends
 on a number of factors, such as the capture resolution, whether the video is
 progressive or interlaced, and whether your display card has hardware-assist
-support for Linux. For 720p content (1280x720), a 2.4GHz P4 should be
-sufficient.</P>
+support for Linux.</P>
+<P>The Simple Answer: Once you are in the 3.2 Ghz P4-class of CPU you should have
+no issues with viewing HDTV.</P>
+<P>The Complicated Answer:</P>
+<P>For 720p content (1280x720), a 2.4GHz P4 should be sufficient.</P>
 <P>For 1920x1080i->1920x1080p with the better deinterlacing methods
 done in real time a 2.4GHz CPU is taxed, but should work if you use "Bob and
 Weave" deinterlacing, or if you have an NVIDIA card with MPEG-2 hardware
@@ -310,6 +335,24 @@ MPEG2. Your set top box has to be running the Neutrino GUI. </P>
 available from 
 <A HREF="http://www.plextor.com/english/support/LinuxSDK.htm">http://www.plextor.com/english/support/LinuxSDK.htm</A>. MythTV uses the
 Plextor to capture hardware encoded MPEG-4, so the host CPU requirements are low.</P>
+<P>Hauppauge WinTV-PVR-USB2 (driver available at 
+<A HREF="http://www.isely.net/pvrusb2/">http://www.isely.net/pvrusb2/</A>) emulates a PVR-x50
+card.</P>
+
+<H3>IP Recorders (RTSP, UDP)</H3>
+
+<P>RTSP MPEG-2 TS recording is supported using the Freebox recorder in
+MythTV, which expects the channels to be supplied as a m3u playlist. If your
+DSL/Fiber provider supplies television service, but does not provide a m3u
+playlist for the channels, you can construct one for your own use (you do
+not need to download it from the same server as the streams themselves).</P>
+<P>UDP MPEG-2 TS and MPEG-4 TS recording is supported by the CRC IP Network
+recorder, but this recorder only supports recording of a single channel per
+recorder.</P>
+<P><B>NOTE</B>: Some DSL providers only allow you to use one recorder at a
+time, so you may need to limit yourself to one recorder in MythTV and turn
+off any set top box the cable provider sold or rented to you with your
+service. This limitation is independent of the bandwidth you have purchased.</P>
 
 <H3>Hardware known NOT to work and other issues</H3>
 
@@ -319,15 +362,10 @@ Plextor to capture hardware encoded MPEG-4, so the host CPU requirements are low
 <LI>Hauppauge WinTV-USB series</LI>
 <LI>Hauppauge WinTV-PVR-usb (model 602), or WinTV-PVR-PCI (model 880) cards (no driver - this is not the PVR-250/350
 series of cards supported by the IvyTV driver)</LI>
-<LI>Hauppauge WinTV-PVR-USB2 (driver available at http://www.isely.net - no MythTV support.  May work if setup thinks it's a PVR-x50 card.)</LI>
 <LI>ATI All-in-Wonder series</LI>
 </UL>
 </P>
-<P>There are no known consumer-level capture devices which will allow you to
-capture the HDTV output (either DVI or HDMI) from a set-top box commonly
-found with digital cable systems or satellite systems.</P>
-<P>There are no known consumer-level capture devices which will allow you to
-capture component output from a set-top box.</P>
+
 <H3>Sound card</H3>
 
 <P>The system needs a sound card or an on-board equivalent on the motherboard
@@ -350,8 +388,9 @@ recorded in this way will be mono only.  See the
 <FIGURE>
 <EPS FILE="warning">
 <IMG SRC="warning.png">
-<CAPTION><B>NOTE</B>:  The MPEG-2 cards supported by the IVTV driver do not require
-a sound card for audio capture.</CAPTION>
+<CAPTION><B>NOTE</B>:  Analog video capture cards are the only ones which
+require a soundcard for capturing audio.  DVB, HDTV, and other hardware encoder cards all provide a
+combined audio / video stream.</CAPTION>
 </FIGURE>
 </P>
 <P>
@@ -362,8 +401,7 @@ a sound card for audio capture.</CAPTION>
 not recommended.  Line-level devices have higher voltages and can damage the
 sound card.  In addition, even if it doesn't break your card, you will be
 getting Mono sound.  See the Linux MP3 HOWTO at 
-<A HREF="http://www.ibiblio.org/pub/Linux/docs/HOWTO/other-formats/html_single/MP3-HOWTO.html#toc8">http://www.ibiblio.org/pub/Linux/docs/HOWTO/other-formats/html_single/MP3-HOWTO.html#toc8</A>
-for additional information.</CAPTION>
+<A HREF="http://www.tldp.org/HOWTO/MP3-HOWTO.html">http://www.tldp.org/HOWTO/MP3-HOWTO.html</A> for additional information.</CAPTION>
 </FIGURE>
 </P>
 
@@ -383,12 +421,12 @@ of the adapters.</P>
 physical connection from your video card to your TV set, which can either be
 a TV-out port on the card itself or an external adapter that converts the
 VGA signal to an appropriate video signal. "Appropriate" depends on a number
-of factors, such as video standard (NTSC vs. PAL) type of input connection
-(Composite vs. SVideo), etc.</P>
+of factors, such as video standard (NTSC vs. PAL), the type of input
+connection (Composite vs. SVideo), etc.</P>
 <P>Note that with some video cards and X drivers, XVideo extensions are
 only supported on the VGA output, and not on the TV output.</P>
 
-<H3>Cards with TV out</H3>
+<H3>Cards with TV-out</H3>
 
 <P>The next section deals with a number of cards that are known to have
 TV-out ports.  The list is unlikely to be complete, so if you know of
@@ -421,32 +459,6 @@ regular cards with TV-out." See the "Adventurous Setup" section of
 <A HREF="http://gatos.sourceforge.net/watching_tv.php">http://gatos.sourceforge.net/watching_tv.php</A> for details. Also see
 <A HREF="http://www.retinalburn.net/linux/tvout.html">http://www.retinalburn.net/linux/tvout.html</A> for more information.</P>
 
-<H3>Matrox</H3>
-
-<P><B>NOTE</B>: If updated information for the Matrox cards is not
-provided prior to MythTV v0.20 I will assume that there is no interest and
-will remove this section.</P>
-
-<P>The standard Matrox driver included with XFree86 does not support TV-out.</P>
-<P>Older Matrox cards can be used with a proprietary X driver provided by 
-Matrox, and it does simultaneously support TV out and XVideo on some cards. 
-See 
-<A HREF="http://www.matrox.com/mga/support/drivers/files/lnx_21.cfm">http://www.matrox.com/mga/support/drivers/files/lnx_21.cfm</A> for details.</P>
-<P>Newer Matrox cards can be run with a set of kernel patches (for kernel 
-2.4.19) and a customized X driver, but this arrangement does not support 
-XVideo on TV-out. See 
-<A HREF="http://www.bglug.ca/matrox_tvout/g450_tvout_howto.html">http://www.bglug.ca/matrox_tvout/g450_tvout_howto.html</A> for details.</P>
-<P>Specific cards:
-<UL>
-<LI>Matrox G400 AGP. Uses external adapter to provide Composite and
-SVideo ports. Reported to work with the proprietary Matrox X driver.</LI>
-<LI>Matrox Millennium 450GX AGP. Uses external adapter to provide
-Composite and SVideo ports. TV-out implementation does <EM>NOT</EM> support XVideo.</LI>
-<LI>Matrox Millennium 550GX AGP. Uses external adapter to provide
-Composite and S-Video ports. TV-out implementation does <EM>NOT</EM> support XVideo.</LI>
-</UL>
-</P>
-
 <H3>NVIDIA</H3>
 
 <P>Some NVIDIA cards with TV-out can be run using the standard nv driver in 
@@ -463,19 +475,6 @@ available by NVIDIA. See
 NVIDIA drivers; they have excellent support for XvMC and ship with a good
 configuration utility.  XvMC provides MPEG-2 hardware acceleration, which is
 important if you want to display HDTV.</P>
-
-<H3>Savage</H3>
-
-<P>The standard savage X driver supports TV out on some Savage cards. 
-Unfortunately, XVideo support for the Savage 2000 card (a very common and 
-inexpensive Savage card with TV out) is broken. See 
-<A HREF="http://www.probo.com/timr/savage40.html">http://www.probo.com/timr/savage40.html</A> for details.</P>
-<P>Specific cards:
-<UL>
-<LI>Savage 2000 AGP. Has Composite and SVideo ports. Does not support XVideo.</LI>
-<LI>S3 Savage IX 8MB AGP. Has SVideo output. Reported to work.</LI>
-</UL>
-</P>
 
 <H3><A NAME="PVR-350"></A> Hauppauge PVR-350 </H3>
 
@@ -615,7 +614,7 @@ And finally:
 These steps however, do NOT perform the installation of any drivers required
 for <B>ALSA</B>, capture cards, <B>lirc kernel modules</B>, etc., nor do
 they set up your MythTV database. Check 
-<A HREF="http://ATrpms.net/topic/multimedia/">ATrpms</A> for the drivers you
+<A HREF="http://ATrpms.net/topic/multimedia/">http://ATrpms.net/topic/multimedia/</A> for the drivers you
 need.</P>
 
 <H3>Mandriva</H3>
@@ -630,14 +629,14 @@ send him email directly at
 <P>Debian packages for MythTV and most of its add-on modules are maintained
 by Christian Marillat 
 <A HREF="mailto:marillat@free.fr">mailto:marillat@free.fr</A> and are available at 
-<A HREF="http://debian.video.free.fr/">http://debian.video.free.fr/</A>. 
+<A HREF="http://www.debian-multimedia.org/">http://www.debian-multimedia.org/</A>. 
 Installation instructions can be found on those pages as well. All of the
 prerequisites for MythTV are available as Debian packages, most of them from
 the official Debian archive.</P>
 <P>If you have followed the instructions on the above page you should have added
 <BLOCKQUOTE><CODE>
 <PRE>
-deb-src ftp://ftp.nerim.net/debian-marillat/ sid main
+deb-src http://www.debian-multimedia.org sid main
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
@@ -669,73 +668,25 @@ information, including copies of the MythTV documentation.  The
 can use command-line utilities.  Either system will get the job done, and it
 all depends on your comfort level with Linux.</P>
 <P>In order to compile MythTV, we need to make sure that the software it needs
-is installed.  As of 2006-01-17, this list includes <B>mysql</B>,
-<B>gcc</B>, <B>freetype2-devel</B>, <B>xorg-xserver-devel</B>,
-<B>qt-devel</B> and <B>lame</B>.  If you're going to use a remote
-control with MythTV, you're going to need the <B>cdialog</B> package in
-order to compile <B>lircd</B> if your distribution doesn't have a
-pre-packaged <B>lirc</B>.  If you are using <B>XMLTV</B> as a grabber,
-you will need <B>perl</B>.</P>
+is installed.  This list includes <B>mysql</B>, <B>gcc</B>,
+<B>freetype2-devel</B>, <B>xorg-xserver-devel</B>, <B>qt-devel</B> and
+<B>lame</B>.  If you're going to use a remote control with MythTV, you're
+going to need the <B>cdialog</B> package in order to compile
+<B>lircd</B> if your distribution doesn't have a pre-packaged
+<B>lirc</B>.  If you are using <B>XMLTV</B> as a grabber, you will need
+<B>perl</B>.</P>
 <P>
 <HR>
 <PRE>
-NOTE:  Qt v3.2 or higher, but less than Qt v4.0, is required.
+NOTE:  Qt v3.2 or higher is required.
 
 NOTE:  If you are going to be using RPMs to install various
 components, you should be aware that not all packages include the necessary
-headers for compiling packages.  If you're having trouble compiling, ensure
+headers for compiling.  If you're having trouble compiling, ensure
 that you've installed the -devel version of a prerequisite.
 </PRE>
 <HR>
 </P>
-
-<H3><A NAME="graphicinstalltools_"></A> Graphical installation tools </H3>
-
-<H3>Mandriva</H3>
-
-<P><B>NOTE</B>:  As of 2006-01-17 the following section should be
-considered out of date.  If no updates are submitted prior to the release of
-v0.20, they will be considered abandoned and removed from the HOWTO.</P>
-<P>On systems running KDE, a tool which will allow you to see what packages
-are available and if they're installed on your system can be accessed by
-clicking K->Configuration->Packaging->KPackage</P>
-<P>While the graphical tools are nice, the command line tool is actually easier
-to use.  It's strongly recommended that you use the command line tool.</P>
-<P>There are many inter-related modules, so make sure that you've got the
-main package for each one, and not a sub package for an unrelated item.  For
-example, there are many modules that have "perl" in them; some are a part of
-the apache web server, others are a part of the perl distribution.  In each
-case, we're looking to make sure that the primary module is getting
-installed.</P>
-<P>Click the magnifying glass or press <B>CTRL-F</B> and enter "perl" as your
-search term.  You should find it under the "Perl" folder.  You need at least
-the perl 5.80 base package installed.  If not, click on the "Mark" button.</P>
-<P>If you are going to be installing MySQL on this system, search for mysql -
-it should be under "Databases".  Make sure that mysql and mysql-clients are
-installed.  If not, click on "Mark".</P>
-<P>Search for gcc.  You're going to need gcc and gcc-c++ installed.</P>
-<P>Search for freetype2.  Make sure that you've got freetype2 and
-freetype2-devel installed.</P>
-<P>Search for XFree86-devel.</P>
-<P>Finally, check for qt.  You'll need libqt3-devel (under folder "KDE and
-Qt") and libqt3 ("Libraries").</P>
-<P>
-<FIGURE>
-<EPS FILE="warning.eps">
-<IMG SRC="warning.png">
-<CAPTION>NOTE for Mandriva users:  In versions after Mandriva 9.1, Mandriva
-removed the MySQL modules from the default installation.  Ensure that you
-install libqt3-mysql.</CAPTION>
-</FIGURE>
-</P>
-<P>Make sure that cdialog is installed if you want to use MythTV with a remote
-control if you need to compile <B>lirc</B> from source.</P>
-<P>alsa-utils is needed for setting the volume.  MythTV now has native volume
-support, but you may have a special configuration that necessitates an
-external program to adjust your volume settings.  If this is the case, then
-you can disable native volume support.</P>
-<P>If you marked anything to install, click on Install Marked.  Click "Yes" or
-OK if you get a message about satisfying dependencies.</P>
 
 <H3><A NAME="CLIinstalltools_"></A> Command-line installation </H3>
 
@@ -744,10 +695,13 @@ from the command line.</P>
 
 <H3>Mandriva</H3>
 
+<P><B>NOTE</B>:  The following instructions should be considered out of
+date as of 2006-09-10.  If updated instructions are not submitted by the
+release of v0.21 of MythTV they will be removed.</P>
 <P><B>urpmi</B> is the simplest tool for installation of packages from the
 command line, but properly configuring it can be difficult.  The
 following website 
-<A HREF="http://addmedia.linuxfornewbies.org/">http://addmedia.linuxfornewbies.org/</A> will allow you to choose
+<A HREF="http://easyurpmi.zarb.org/">http://easyurpmi.zarb.org/</A> will allow you to choose
 a mirror site and then present the command-line configuration text for that
 mirror.  You will most likely need to add a "Contrib" mirror to your setup. 
 If you add a site from the "Penguin Liberation Front", you will be able to
@@ -784,6 +738,7 @@ everything already installed
 <A HREF="mythtv-HOWTO-4.html#Setting_up_paths">section</A>.  Once you have completed installing the pre-requisites,
 exit out of the shell and start a new one to ensure that any environment
 variables setup by the installation have a chance to take effect.</P>
+
 <H3>Gentoo. </H3>
 
 <P>If Qt has not been installed on your system: Edit
@@ -823,8 +778,8 @@ your <CODE>/etc/apt/sources.list</CODE>
 <BLOCKQUOTE><CODE>
 <PRE>
 # Christian Marillat's packages (mplayer, lame)
-deb ftp://ftp.nerim.net/debian-marillat/ sid main
-deb-src ftp://ftp.nerim.net/debian-marillat/ sid main
+deb http://www.debian-multimedia.org sid main
+deb-src http://www.debian-multimedia.org sid main
 </PRE>
 </CODE></BLOCKQUOTE>
 

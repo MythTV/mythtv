@@ -515,7 +515,7 @@ Cards that have been reported to work include:
 <bf>NOTE</bf>: There are no known consumer-level capture devices which will
 allow you to capture the HDTV output (DVI, HDMI, VGA, YPbPr / Component)
 from a set-top box commonly found with digital cable systems or satellite
-systems. <emphasis>None</emphasis> of the capture devices listed above
+systems. <em>None</em> of the capture devices listed above
 perform any encoding; they merely allow your computer to save a copy of a
 HDTV stream which has already been converted to MPEG-2 at the broadcast
 facility.
@@ -2599,20 +2599,20 @@ $ mythfilldatabase --import-icon-map iconmap.xml --update-icon-map
 <p>Once you have completed configuration of your backend systems, the next
 step is to configure the frontend client.  
 
-When you start mythfrontend for the first time, it will attempt to
-connect to a configuration database on the local machine.  If there is none,
-a "Database Configuration" screen will appear, and you will need to
-fill in some details.  The "Host name" field needs the backend or
-database server's IP address or DNS name, and the User or password fields
-may need to be set to match your database user accounts.  After editing those
-fields, press Enter twice to write these configurations on your local machine,
-and attempt to connect to the database.  If you make any mistakes, the screens
-will pop up again.
+When you start mythfrontend for the first time, it will attempt to connect
+to a configuration database on the local machine.  If there is none, a
+"Database Configuration" screen will appear, and you will need to fill in
+some details.  The "Host name" field needs the backend or database server's
+IP address or DNS name, and the User or password fields may need to be set
+to match your database user accounts.  After editing those fields, press
+Enter twice to write these configurations on your local machine, and attempt
+to connect to the database.  If you make any mistakes, the screens will pop
+up again.
 
 Now that mythfrontend has started up, you should have a number of
 buttons/choices.  Before doing anything, go to TV, then to Setup and
 configure the frontend client.
-
+<!-- XXXXXXXXXX -->
 <figure loc="here">
 <eps file="stop.eps" height="1cm">
 <img src="stop.png">
@@ -4340,12 +4340,7 @@ and if you have PHP support.
 
 <sect2>Mandriva
 <p>Mandriva has <bf>apache</bf> and <bf>PHP</bf> pre-packaged, so
-installation is quite simple.  Once you have installed the two programs,
-either with the graphical installer (see instructions in <ref
-id="graphicinstalltools_" name="Graphic Install Tools">) or through the
-command line (section <ref id="CLIinstalltools_" name="Command Line">), and
-you've ensured that the <bf>apache</bf> server will start at boot using the
-Mandriva Control Center.
+installation is quite simple.  
 
 <figure loc="here">
 <eps file="stop.eps" height="1cm">

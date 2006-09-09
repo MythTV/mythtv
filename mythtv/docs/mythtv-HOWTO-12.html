@@ -483,15 +483,14 @@ box should now show:
 
 As you have probably guessed, this says that we want to search for all
 programs with the title "Nova" regardless of the time, day, channel, etc.</P>
-<P>If you do not receive a PBS station that carries "Nova" or would like to
-use another title, edit the title by pressing the down arrow to highlight
-the text box and right arrow over the the word "Nova". If you are using a
+<P>If you do not receive a PBS station that carries "Nova" or would like to use
+another title, edit the title by pressing the down arrow to highlight the
+text box and right arrow over the the word "Nova". If you are using a
 keyboard you can simply delete the four letters and type a different title
 between the quotes. With a remote control, you can do 'cell phone' style
 text entry with the number pad. The delete key is the "X" in the grouping
-for "1", zero is grouped with "9" and "0" acts as the "Caps Lock" key.
-With MythTV version 0.19 or later, you can press ENTER in the text box
-to popup a virtual keyboard.</P>
+for "1", zero is grouped with "9" and "0" acts as the "Caps Lock" key. You
+can press ENTER in the text box to popup a virtual keyboard.</P>
 <P>Note: the text box honors many familiar Emacs control keys. It is also
 possible to cut and paste text into the text box so you can edit with a
 favorite editor or insert a rule sent in email or from other sources.</P>
@@ -644,6 +643,22 @@ determine if a showing is more than 14 days after its original air date or
 if the show was marked as a repeat and did not have a date for the first
 airing. If this is "0" it usually means that this is a brand new show or a
 rebroadcast within the first two weeks.
+</LI>
+<LI>"program.generic" is a field created by MythTV to try mark
+showings for a series where the specific episode information is not
+included. When these generic showings appear, it is impossible for the
+system to determine if they are repeats of the same episode(s) or if
+they are all different episodes.
+</LI>
+<LI>"program.first" is a field created by MythTV to mark the first
+showing in the current listings for each episode, movie or special.
+Choosing to match only the "first" showing can be useful for sports
+that are brodcast live then repeated.
+</LI>
+<LI>"program.last" is a field created by MythTV to mark the last
+showing in the current listings for each episode, movie or special.
+If a showing is marked both "first" and "last" then it is the only
+showing of that program in the current TV listings.
 </LI>
 <LI>"program.programid" is the Tribune Media Service database record
 identifier for each program description. In general, these start with a two

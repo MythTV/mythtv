@@ -14,18 +14,19 @@
 <HR>
 <H2><A NAME="s7">7.</A> <A HREF="mythtv-HOWTO.html#toc7">Configuring Sound.</A></H2>
 
-<P>If your video doesn't appear to be in-sync with your audio, it could be
-because you are listening to the real-time audio from your video card rather
-than after it's been processed and synchronized to the video by MythTV. 
-Because MythTV is a personal video recorder, "Live TV" isn't really live -
-to let you pause live TV, MythTV is actually encoding the video, saving to
-disk, and then playing it back.  This procedure puts your MythTV "live" TV
-about 2 seconds behind real-time, so it's important that you're not
-listening to the live audio.  However, if you're having an issue where the
-audio and video aren't synchronized by small but varying amount, it's most
-likely because the sound driver that you're using doesn't have the
+<P>If your video doesn't appear to be in-sync with your audio and you're
+using an analog video capture card and a soundcard to capture audio, it
+could be because you are listening to the real-time audio from your video
+card rather than after it's been processed and synchronized to the video by
+MythTV.  Because MythTV is a personal video recorder, "Live TV" isn't really
+live - to let you pause live TV, MythTV is actually encoding the video,
+saving to disk, and then playing it back.  This procedure puts your MythTV
+"live" TV about 2 seconds behind real-time, so it's important that you're
+not listening to the live audio.  However, if you're having an issue where
+the audio and video aren't synchronized by small but varying amount, it's
+most likely because the sound driver that you're using doesn't have the
 DSP_CAP_REALTIME capability.  This was the case with ALSA (0.5), but not
-with newer versions (0.9).  See the 
+with newer versions.  See the 
 <A HREF="mythtv-HOWTO-22.html#Troubleshooting_Audio">Troubleshooting Audio</A> section for more information if you're having
 issues with sound.  Also, ensure that no other programs are grabbing the
 audio output, like <B>arts</B> or <B>esd</B>.</P>
@@ -53,33 +54,10 @@ dark green, meaning that it's "off".  You also want to click on the red LED
 so that it turns bright red, indicating that it's "ON"; this insures that
 the Line-in is used as the source.  Click OK, and make sure that you save
 the settings so that this is your default.</P>
-<H3>Using OSS drivers.</H3>
 
-<P><B>NOTE</B>: This section will be removed in 0.20.  ALSA is the kernel
-sound driver now.</P>
-<P>Red Hat Linux and Fedora Core 1 ship with OSS sound drivers rather than
-the ALSA drivers recommended by the MythTV team. The OSS drivers do work for
-many people, and for many cards. We recommend that you give OSS a try since
-it is already included in the vendor distribution. However, some people
-report problems (sync and jitter) with OSS, and in addition it does not
-support full-duplex on some cards.  Full duplex is required if you want to
-record and play sound using just one sound card. ALSA has good full-duplex
-support, and also has drivers for some built-in (motherboard) sound cards
-that OSS does not. Installing ALSA is less painful than you might think, so
-if OSS does not work for you, installing ALSA is not too difficult. For
-those of you who do not wish to install ALSA you must do this:</P>
-<P>To configure sound to work with MythTV, select 
-<PRE>
-RedHat Menu>Sound &amp;
-Video>Volume Control
-</PRE>
- to open up a mixer. Make sure your global volume
-(on the far left) is up. Also make sure that the "line in" section has
-"mute" and "record" checked and that the gain is turned up. You may have to
-experiment with volume/gain levels to get the best sound.  </P>
 <H3>Using ALSA.</H3>
 
-<P>If you'd like to use ALSA, you'll need to correctly setup your
+<P>To use ALSA, you'll need to correctly setup your
 <CODE>asoundrc</CODE> file. Configuring this file is beyond the scope of this
 HOWTO.  Once ALSA is working correctly, change the output sound device in
 mythfrontend->setup->Audio from <CODE>/dev/dsp</CODE> to <CODE>ALSA:default</CODE>.
@@ -93,8 +71,9 @@ program can be used to setup the mixer.  The "Master" volume setting is only
 required on a frontend machine to ensure that the sound channels are unmuted
 and configured for outputting sound.  The "Line" and "Capture" controls are
 required for your sound card to actually capture audio from the external
-Line-in.  Not all sound cards have a "Capture" control, but if yours does
-and you don't set it then MythTV will not capture audio.</P>
+Line-in if it's connected to an analog frame grabber.  Not all sound cards
+have a "Capture" control, but if yours does and you don't set it then MythTV
+will not capture audio.</P>
 <P>
 <HR>
 <PRE>

@@ -60,6 +60,10 @@ Click Save, then close the window.</P>
 
 <P>After installing MySQL you need to initialize the database by running
 mysql_install_db as root. </P>
+<P>If you install MySQL 4.x, rather than 3.x, you will also want to comment
+out "log-bin" in your /etc/mysql/my.cnf configuration file. This option will
+quickly fill your "/var" disk partition with many gigabytes of data,
+unless you are doing database replication and deleting these files regularly.</P>
 
 <H2><A NAME="ss6.2">6.2</A> <A HREF="mythtv-HOWTO.html#toc6.2">Setting up the initial database</A>
 </H2>

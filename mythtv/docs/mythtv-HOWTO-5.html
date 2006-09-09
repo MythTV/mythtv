@@ -15,12 +15,11 @@
 <H2><A NAME="DownloadAndCompile"></A> <A NAME="s5">5.</A> <A HREF="mythtv-HOWTO.html#toc5">Downloading and compiling. </A></H2>
 
 <P>Get MythTV from the 
-<A HREF="http://www.mythtv.org">mythtv.org</A>
-web site.  There are two installation methods you may choose from.  The
-first is to download the latest release in tarball format and compile.  The
-tarball release of MythTV should work on a wide variety of systems and
-should be the preferred method for new users.  If you wish to use the
-<B>subversion</B> copy of MythTV you may obtain it from 
+<A HREF="http://www.mythtv.org">http://www.mythtv.org</A> web site.  There are two installation methods
+you may choose from.  The first is to download the latest release in tarball
+format and compile.  The tarball release of MythTV should work on a wide
+variety of systems and should be the preferred method for new users.  If you
+wish to use the <B>subversion</B> copy of MythTV you may obtain it from
 <A HREF="http://svn.mythtv.org">http://svn.mythtv.org</A></P>
 <P>
 <FIGURE>
@@ -40,7 +39,7 @@ built-in to MythTV.  You <EM>do not</EM> need to install XMLTV (so you may
 skip XMLTV-related instructions), but you need <B>wget</B> version 1.9.1
 or higher.</P>
 <P>Get XMLTV from 
-<A HREF="http://xmltv.sourceforge.net">http://xmltv.sourceforge.net</A>.  Download the latest version (0.5.42).</P>
+<A HREF="http://xmltv.sourceforge.net">http://xmltv.sourceforge.net</A>.  Download the latest version (0.5.44).</P>
 <P>
 <HR>
 <PRE>
@@ -136,7 +135,7 @@ does not have <B>XMLTV</B>, so you may install the XMLTV prerequisites by typing
 <A NAME="untarring_xmltv"></A> Untar the xmltv file:
 <BLOCKQUOTE><CODE>
 <PRE>
-$ tar -xjf xmltv-0.5.42.tar.bz2
+$ tar -xjf xmltv-0.5.44.tar.bz2
 </PRE>
 </CODE></BLOCKQUOTE>
 
@@ -160,7 +159,7 @@ cpan> exit
 <P>Change to the XMLTV directory and compile it:
 <BLOCKQUOTE><CODE>
 <PRE>
-$ cd xmltv-0.5.42
+$ cd xmltv-0.5.44
 $ perl Makefile.PL
 </PRE>
 </CODE></BLOCKQUOTE>
@@ -239,8 +238,8 @@ $ cd mythtv
 <P>If you are using the tarball, then unpack it:
 <BLOCKQUOTE><CODE>
 <PRE>
-$ tar -xjf mythtv-0.19.tar.bz2
-$ cd mythtv-0.19
+$ tar -xjf mythtv-0.20.tar.bz2
+$ cd mythtv-0.20
 $ ./configure
 </PRE>
 </CODE></BLOCKQUOTE>
@@ -379,7 +378,7 @@ on the <B>mythfrontend</B> executable. This <B>opens a security hole</B>,
 but is the only option on systems that do not support either
 rlimits or the realtime module. This does not work on modern
 distributions either, and is <B><EM>not recommended</EM></B>
-on any system connected to the internet. This may also make it
+on any system connected to the Internet. This may also make it
 impossible to debug MythTV without running <B>gdb</B> as root. If you
 would still like to do this, you just need to run this as root:
 <BLOCKQUOTE><CODE>

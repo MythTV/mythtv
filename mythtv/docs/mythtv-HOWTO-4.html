@@ -30,7 +30,7 @@ help if the packager skipped a step in their packaging.</P>
 
 <P>MythTV is written in C++ and requires a fairly complete, but standard, 
 compilation environment, including a recent g++ compiler, <CODE>make</CODE>, and 
-appropriate headers files for shared libraries. Any standard Linux 
+appropriate header files for shared libraries. Any standard Linux 
 distribution should be able to install a suitable compilation environment 
 from its packaging system. Section 3.2 of this HOWTO provides some details 
 of how to install the required environment for many distributions.</P>
@@ -147,16 +147,6 @@ $ exit
 The last two commands are to exit out of the shell. This way, when you next 
 open a shell your new commands
 will take effect.</P>
-<H3>Red Hat Linux 9</H3>
-
-<P><B>NOTE</B>: This section will be considered abandoned as of v0.20.</P>
-<P>Red Hat Linux 9 use a default locale with UTF-8 encoding.
-Date::Manip, a perl module used by XMLTV, is not UTF-8 safe. As a result,
-whenever you run mythtv-setup or mythfilldatabase you will get a lot of 
-UTF-8 warnings. There is an 
-<A HREF="http://membled.com/work/patches/DateManip/">http://membled.com/work/patches/DateManip/</A> updated version of
-Date::Manip at the XMLTV site fixing this and other XMLTV related
-bugs.</P>
 
 <H3><A NAME="devperms"></A> Device Permissions </H3>
 
