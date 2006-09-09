@@ -505,10 +505,21 @@ if ( $ENV{'DISTCC_HOSTS'} )
 {
   my @hosts = split m/\s+/, $ENV{'DISTCC_HOSTS'};
   my $numhosts = $#hosts + 1;
-  &Verbose("Using $numhosts build hosts:", join ', ', @hosts);
+  &Verbose("Using ", $numhosts * 2, " DistCC jobs on $numhosts build hosts:",
+           join ', ', @hosts);
   $parallel_make .= ' -j' . $numhosts * 2;
 }
 
+# Ditto for multi-cpu setups:
+my $cmd = "/usr/bin/hostinfo | grep 'processors\$'";
+&Verbose($cmd);
+my $cpus = `$cmd`; chomp $cpus;
+$cpus =~ s/.*, (\d+) processors$/$1/;
+if ( $cpus gt 1 )
+{
+  &Verbose("Using $cpus parallel CPUs");
+  $parallel_make .= " -j$cpus";
+}
 
 ### Distclean?
 if ($OPT{'distclean'})
@@ -648,6 +659,8 @@ foreach my $sw (@build_depends)
     &Verbose("Making $sw");
     my (@make);
     
+    # I would like to use $parallel_make here, but several
+    # of the packages don't compile correctly then.
     push(@make, $standard_make);
     if ($pkg->{'make'})
     {
@@ -800,7 +813,7 @@ foreach my $comp (@comps)
   # configure and make
   if ( $makecleanopt{$comp} && -e 'Makefile' )
   {
-    my @makecleancom= $standard_make;
+    my @makecleancom = $parallel_make;
     push(@makecleancom, @{ $makecleanopt{$comp} }) if $makecleanopt{$comp};
     &Syscall([ @makecleancom ]) or die;
   }
