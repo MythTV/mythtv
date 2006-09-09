@@ -80,6 +80,7 @@ StatusBox::StatusBox(MythMainWindow *parent, const char *name)
 
     max_icons = item_count;
     inContent = false;
+    doScroll = false;
     contentPos = 0;
     contentTotalLines = 0;
     contentSize = 0;
@@ -414,7 +415,8 @@ void StatusBox::keyPressEvent(QKeyEvent *e)
         }
         else if ((action == "RIGHT") &&
                  (!inContent) &&
-                 ((contentTotalLines > contentSize) ||
+                 (((contentSize > 0) &&
+                   (contentTotalLines > contentSize)) ||
                   (doScroll)))
         {
             clicked();
