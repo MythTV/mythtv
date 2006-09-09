@@ -98,7 +98,7 @@ uLong crcinfo(QString romname, QString GameType, QString *key, RomDBMap *romDB)
         if (f.open(IO_ReadOnly))
         {
             offset = calcOffset(GameType, f.size());
-cerr << "Offset Size : " << f.size() << "   offset : " << offset << endl;
+
             if (offset > 0)
                 f.readBlock(block, offset);
 
