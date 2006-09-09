@@ -1751,6 +1751,7 @@ bool MythThemedMenuPrivate::keyHandler(QStringList &actions,
 {
     ThemedButton *lastbutton = activebutton;
     int oldrow = currentrow;
+    int oldcolumn = currentcolumn;
     bool handled = false;
 
     for (unsigned int i = 0; i < actions.size() && !handled; i++)
@@ -1768,17 +1769,15 @@ bool MythThemedMenuPrivate::keyHandler(QStringList &actions,
 
         if (action == "UP")
         {
-            if (maxrows > 1)
-            {
-                if (currentrow > 0)
-                   currentrow--;
-                else if (columns == 1)
-                    currentrow = buttonRows.size() - 1;
+            if (currentrow > 0)
+                currentrow--;
+            else if (columns == 1)
+                currentrow = buttonRows.size() - 1;
 
-                if (currentcolumn >= buttonRows[currentrow].numitems)
-                    currentcolumn = buttonRows[currentrow].numitems - 1;
-            }
-            else
+            if (currentcolumn >= buttonRows[currentrow].numitems)
+                currentcolumn = buttonRows[currentrow].numitems - 1;
+            
+            if (currentrow == oldrow && currentcolumn == oldcolumn)
             {
                 handled = false;
             }
@@ -1799,17 +1798,15 @@ bool MythThemedMenuPrivate::keyHandler(QStringList &actions,
         }
         else if (action == "DOWN")
         {
-            if (maxrows > 1)
-            {
-                if (currentrow < (int)buttonRows.size() - 1)
-                    currentrow++;
-                else if (columns == 1)
-                    currentrow = 0;
+            if (currentrow < (int)buttonRows.size() - 1)
+                currentrow++;
+            else if (columns == 1)
+                currentrow = 0;
 
-                if (currentcolumn >= buttonRows[currentrow].numitems)
-                    currentcolumn = buttonRows[currentrow].numitems - 1;
-            }
-            else
+            if (currentcolumn >= buttonRows[currentrow].numitems)
+                currentcolumn = buttonRows[currentrow].numitems - 1;
+
+            if (currentrow == oldrow && currentcolumn == oldcolumn)
             {
                 handled = false;
             }
