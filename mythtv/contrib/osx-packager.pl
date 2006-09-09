@@ -813,7 +813,7 @@ foreach my $comp (@comps)
   # configure and make
   if ( $makecleanopt{$comp} && -e 'Makefile' )
   {
-    my @makecleancom = $parallel_make;
+    my @makecleancom = $standard_make;
     push(@makecleancom, @{ $makecleanopt{$comp} }) if $makecleanopt{$comp};
     &Syscall([ @makecleancom ]) or die;
   }
