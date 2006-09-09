@@ -296,14 +296,17 @@ void OSD::UpdateTeletext(void)
 
 void OSD::SetTextSubtitles(const QStringList &lines)
 {
-    const uint SUBTITLE_FONT_SIZE     = 18;
-    const uint SUBTITLE_LINE_HEIGHT   = 22;
-    const uint MAX_CHARACTERS_PER_ROW = 50;
+    const uint SUBTITLE_FONT_SIZE     = 20;
+    const float SUBTITLE_LINE_SPACING = 1.1;
+    const uint MAX_CHARACTERS_PER_ROW = 50;    
+    // how many pixels of empty space at the bottom
+    const uint BOTTOM_PAD = SUBTITLE_FONT_SIZE;
 
     OSDSet *subtitleSet = GetSet("subtitles");
     if (!subtitleSet)
         return;
 
+    // wrap long lines to multiple lines
     QString subText = "";
     int subLines = 0;
     QStringList::const_iterator it = lines.begin();
@@ -349,7 +352,17 @@ void OSD::SetTextSubtitles(const QStringList &lines)
 
     QString name = "text_subtitles";
 
-    QRect area(0, displayheight - subLines * SUBTITLE_LINE_HEIGHT,
+
+    // I couldn't get the space using the LineSpacing accurately 
+    // (getting it through (SUBTITLE_LINE_SPACING - 1)*H resulted
+    // in too small space. Just hard code it, it should work as
+    // the variance in the count of subtitle lines is so low.
+    const int totalSpaceBetweenLines = (subLines - 1) * 5;
+    const int subtitleTotalHeight = 
+        subLines * SUBTITLE_FONT_SIZE + totalSpaceBetweenLines;
+
+    // put the subtitles to the bottom of the screen
+    QRect area(0, displayheight - (int)((subtitleTotalHeight + BOTTOM_PAD)*hmult),
                displaywidth, displayheight);
 
     QString fontname = "text_subtitle_font";
@@ -375,11 +388,10 @@ void OSD::SetTextSubtitles(const QStringList &lines)
   
     text->SetCentered(true);
     text->SetMultiLine(true);
-    text->SetSelected(false);
     text->SetText(subText);
     text->SetSelected(false);
+    text->SetLineSpacing(SUBTITLE_LINE_SPACING);
     subtitleSet->AddType(text);
-
     SetVisible(subtitleSet, 0);
 }   
 
