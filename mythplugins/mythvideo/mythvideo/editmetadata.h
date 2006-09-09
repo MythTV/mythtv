@@ -2,10 +2,10 @@
 #define EDITMETADATA_H_
 
 /*
-	editmetadata.h
+    editmetadata.h
 
-	(c) 2003, 2004 Thor Sigvaldason, Isaac Richards, and ?? ??
-	Part of the mythTV project
+    (c) 2003, 2004 Thor Sigvaldason, Isaac Richards, and ?? ??
+    Part of the mythTV project
 
     Class to let user edit the metadata associated with
     a given video

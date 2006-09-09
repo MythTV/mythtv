@@ -95,13 +95,13 @@ class ImageCacheImp
     {
         cache_entry(const QString &file) :
             filename(file), scale_mode(QImage::ScaleFree),
-				scale_width(0), scale_height(0)
+                scale_width(0), scale_height(0)
         {
         }
 
         cache_entry(const QString &file, QPixmap *img) :
             filename(file), scale_mode(QImage::ScaleFree),
-				scale_width(0), scale_height(0)
+                scale_width(0), scale_height(0)
         {
             if (img)
             {
@@ -113,8 +113,8 @@ class ImageCacheImp
         QPixmap image;
         QPixmap scale_image;
         QImage::ScaleMode scale_mode;
-		int scale_width;
-		int scale_height;
+        int scale_width;
+        int scale_height;
     };
 
     typedef simple_ref_ptr<cache_entry> cache_entry_ptr;
@@ -162,7 +162,7 @@ class ImageCacheImp
         if (ret && !ret->image.isNull())
         {
             if (ret->scale_image.isNull() || ret->scale_mode != scale ||
-					ret->scale_width != width || ret->scale_height != height)
+                    ret->scale_width != width || ret->scale_height != height)
             {
                 VERBOSE(VB_GENERAL,
                         QString("ImageCache miss for scale image: %1")

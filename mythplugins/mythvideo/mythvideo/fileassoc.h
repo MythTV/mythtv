@@ -2,10 +2,10 @@
 #define FILEASSOC_H_
 
 /*
-	fileassoc.h
+    fileassoc.h
 
-	(c) 2003 Thor Sigvaldason, Isaac Richards, and ?? ??
-	Part of the mythTV project
+    (c) 2003 Thor Sigvaldason, Isaac Richards, and ?? ??
+    Part of the mythTV project
 
     Classes to manipulate the file associations stored
     in the videotypes table (in the mythconverg database)
