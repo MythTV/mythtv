@@ -2370,27 +2370,23 @@ have already created for video source.  In our case, you would use the
 left/right cursor keys until "Antenna" was shown in the Video Source field. 
 Press down to move to the next setting.
 
-If you have multiple input connection types (Such as Tuner 0 and Tuner 1),
-it's very, very likely that it is the lowest numbered input that is actually
-available on the device.
+On the connection pane there is a "Scan for channels" button, if you are
+configuring a digital source such as a DVB card, you need scan for channels
+and you must do this before pressing the "Fetch channels from listings
+source" button. You may scan for analog channels on an analog input, but
+this is not needed.
 
-On the connection pane there is a "Scan for channels" button,
-if you are configuring a digital source such as a DVB card, you
-need scan for channels and you must do this before pressing the
-"Fetch channels from listins source" button. You may scan for
-analog channels on an analog input, but this is not needed.
+<!-- Ugh!  Who's been editing the HOWTO?  This next section needs some cleanup -->
 
-The other button is called "Fetch channels from listins source".
-As long as you have a real listings source you should fetch channels
-from this listings source for analog channels, and it is recommended
-that you do this for digital sources as well (unless the listing 
-source is tranmitted EIT data). If you are using XMLTV, you may
-need to switch from the MythTV setup program to the console it was
-run on to interact with XMLTV after pressing this button. It is possible
-to fetch the channels on the command line using mythfilldatabase. But
-if you need to do this, you will probably need to re-enter the MythTV
-setup program to configure the "Starting channel" setting for this
-source->input connection.
+The other button is called "Fetch channels from listings source". As long as
+you have a real listings source you should fetch channels from them for
+analog channels. You can do this for digital sources as well (unless the
+listing source is transmitted EIT data). If you are using XMLTV, you may need
+to switch from the MythTV setup program to the console it was run on to
+interact with XMLTV after pressing this button. It is possible to fetch the
+channels on the command line using mythfilldatabase. But if you need to do
+this, you will probably need to re-enter the MythTV setup program to
+configure the "Starting channel" setting for this source->input connection.
 
 <figure loc="here">
 <eps file="stop.eps" height="1cm">
@@ -2419,11 +2415,12 @@ Press ESC to return to the main menu, and press ESC again if you have no
 further items to configure, thereby returning you to the command line.
 
 <sect2>Channel Editor
+
 <p>The channel editor is used to globally alter channel information,
 including items like hue, contrast, fine tuning and others.  Users in North
-America shouldn't run the channel editor until after completing initial
-mythtv-setup and running <bf>mythfilldatabase</bf> at least once to populate
-the database.
+America shouldn't run the channel editor until you've completed the initial
+mythtv-setup and ran <bf>mythfilldatabase</bf> at least once to populate the
+database.
 
 <sect1>Post-configuration
 <p>Run the <tt>mythfilldatabase</tt> program as directed.  The master
@@ -2487,10 +2484,10 @@ Valid options are:
 </verb></tscreen>
 
 Running mythbackend as a daemon and using the logfile option will allow you
-to have mythbackend automatically start up during the boot process.  For
-example, you may add this to your <tt>rc.local</tt> file, or you can follow
-the steps outlined in the section called <ref id="mythbackend_autostart"
-name="Automatically starting mythbackend at system boot time">.
+to have mythbackend automatically start up during boot.  You can follow the
+steps outlined in the section called <ref id="mythbackend_autostart"
+name="Automatically starting mythbackend at system boot time"> for
+configuration steps.
 
 <sect1>Configuring a non-master backend <label id="nonmaster_backend">
 <p>Ensure that you've granted access to the master MySQL database for remote
@@ -2542,8 +2539,7 @@ available.
 
 <bf>mythfilldatabase --manual</bf> is another option; the manual option will
 allow you to fine tune channel frequencies and specify which channels will
-be added to the database.  If you are not using the tv_grab_na grabber, you
-must use the <bf>--manual</bf> option.
+be added to the database.  
 
 <bf>mythfilldatabase --file</bf> is an option if there isn't an XMLTV grabber
 for your country, but you <bf>do</bf> have an XML formatted listings file
@@ -2563,7 +2559,7 @@ today (in case of late-breaking changes to the schedule).
 run once a day.
 
 To use MythTV's built-in capability, you'll need to run the
-<bf>mythfrontend</bf> Setup option.  From the MythFrontend, enter the
+<bf>mythfrontend</bf> Setup option.  From the mythfrontend, enter the
 Setup>General screen and advance to "Mythfilldatabase", the fourth screen.
 Select the checkbox, then complete the options as you see fit.  The
 <bf>mythbackend</bf> program will now run <bf>mythfilldatabase</bf> for you.
