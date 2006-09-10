@@ -185,10 +185,6 @@
         <translation>Detta är antalet sekunder som varje bild visas i ett bildspel.</translation>
     </message>
     <message>
-        <source>MythGallery Settings</source>
-        <translation>Inställningar för Galleriet</translation>
-    </message>
-    <message>
         <source>Slideshow Delay</source>
         <translation>Visningstid vid bildspel</translation>
     </message>
@@ -255,6 +251,14 @@
     <message>
         <source>Duration of OpenGL Transition (milliseconds)</source>
         <translation>Längd på OpenGL-övergång (millisekunder)</translation>
+    </message>
+    <message>
+        <source>MythGallery Settings (Slideshow)</source>
+        <translation>Inställningar för Galleriet (Bildspel)</translation>
+    </message>
+    <message>
+        <source>MythGallery Settings (General)</source>
+        <translation>Inställningar för Galleriet (Generellt)</translation>
     </message>
 </context>
 </TS>
