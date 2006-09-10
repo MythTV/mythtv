@@ -169,12 +169,12 @@
         <key name="key_p" type="char" draworder="1">
           <position>349,42</position>
           <char normal="p" shift="P" alt="*" altshift=""></char>
-          <move left="key_o" right="key_å" up="key_9" down="key_ö"></move>
+          <move left="key_o" right="key_å" up="key_9" down="key_æ"></move>
         </key>
         <key name="key_å" type="char" draworder="1">
           <position>386,42</position>
           <char normal="å" shift="Å" alt="'" altshift=""></char>
-          <move left="key_p" right="key_del" up="key_0" down="key_ä"></move>
+          <move left="key_p" right="key_del" up="key_0" down="key_ø"></move>
         </key>
         <key name="key_del" type="del" draworder="1">
           <fcnfont name="normal" function="focused"></fcnfont>
@@ -303,7 +303,7 @@
         <key name="key_-" type="char" draworder="1">
           <position>375,116</position>
           <char normal="-" shift="_" alt="" altshift=""></char>
-          <move left="key_." right="key_z" up="key_ö" down="key_right"></move>
+          <move left="key_." right="key_z" up="key_ø" down="key_right"></move>
         </key>
 
         <!-- row 5 -->

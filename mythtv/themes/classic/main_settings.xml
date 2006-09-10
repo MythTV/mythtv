@@ -363,6 +363,7 @@
      <text lang="ET">Arhiveerimise sätted</text>
      <text lang="SV">Filarkivering</text>
      <text lang="RU">Настройка архива</text>
+     <text lang="DK">Fil arkivering</text>
      <action>CONFIGPLUGIN mytharchive</action>
      <depends>mytharchive</depends>
    </button>

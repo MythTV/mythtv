@@ -263,6 +263,7 @@
        <text lang="SV">Arkivera filer</text>
        <text lang="NL">Bestanden Archiveren</text>
        <text lang="RU">Архив файлов</text>
+       <text lang="DK">Arkivere filer</text>
        <action>PLUGIN mytharchive</action>
        <depends>mytharchive</depends>
    </button>

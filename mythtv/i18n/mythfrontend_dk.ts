@@ -70,7 +70,7 @@
     </message>
     <message>
         <source>Analog Options for</source>
-        <translation type="unfinished"></translation>
+        <translation>Analog opsætning for</translation>
     </message>
 </context>
 <context>
@@ -113,15 +113,15 @@
     </message>
     <message>
         <source>Are you sure you want to delete ALL capture cards on %1?</source>
-        <translation type="unfinished"></translation>
+        <translation>Er du sikker på du vil slette ALLE optage kort?</translation>
     </message>
     <message>
         <source>Error getting list of cards for this host</source>
-        <translation type="unfinished"></translation>
+        <translation>Fejl ved hentning af kortliste for denne host</translation>
     </message>
     <message>
         <source>Unable to delete capturecards for %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Det var ikke muligt at slette optagekort på %1</translation>
     </message>
 </context>
 <context>
@@ -144,15 +144,15 @@
     </message>
     <message>
         <source>This uses the listings data source to provide the channels for this input.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>DVB-S</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>DVB-S</source>
+        <translation>DVB-S</translation>
+    </message>
+    <message>
         <source>Input and satellite settings.</source>
-        <translation type="unfinished">Indgang og satellit opsætninger.</translation>
+        <translation>Indgang og satellit opsætninger.</translation>
     </message>
 </context>
 <context>
@@ -217,27 +217,27 @@
     <name>CustomEdit</name>
     <message>
         <source>stored example</source>
-        <translation type="unfinished"></translation>
+        <translation>gemt eksempel</translation>
     </message>
     <message>
         <source>Edit Rule</source>
-        <translation type="unfinished">Ændre regel</translation>
+        <translation>Ændre regel</translation>
     </message>
     <message>
         <source>&lt;New rule&gt;</source>
-        <translation type="unfinished">&lt;Ny regel&gt;</translation>
+        <translation>&lt;Ny regel&gt;</translation>
     </message>
     <message>
         <source>Rule Name</source>
-        <translation type="unfinished">Regel navn</translation>
+        <translation>Regel navn</translation>
     </message>
     <message>
         <source>Match an exact title</source>
-        <translation type="unfinished">finde en bestemt titel</translation>
+        <translation>finde en bestemt titel</translation>
     </message>
     <message>
         <source>Match words in the title</source>
-        <translation type="unfinished">Finde ord i titlen</translation>
+        <translation>Finde ord i titlen</translation>
     </message>
     <message>
         <source>Match this episode</source>
@@ -245,79 +245,79 @@
     </message>
     <message>
         <source>Match an exact episode</source>
-        <translation type="unfinished">finde en bestemt episode</translation>
+        <translation>finde en bestemt episode</translation>
     </message>
     <message>
         <source>Match in any descriptive field</source>
-        <translation type="unfinished">Finde i beskrivelses felt</translation>
+        <translation>Finde i beskrivelses felt</translation>
     </message>
     <message>
         <source>New episodes only</source>
-        <translation type="unfinished">Kun nye episoder</translation>
+        <translation>Kun nye episoder</translation>
     </message>
     <message>
         <source>Exclude unidentified episodes</source>
-        <translation type="unfinished">Undlad uidentificerede episoder</translation>
+        <translation>Undlad uidentificerede episoder</translation>
     </message>
     <message>
         <source>First showing of each episode</source>
-        <translation type="unfinished"></translation>
+        <translation>Første udsendelse af hver episode</translation>
     </message>
     <message>
         <source>Last showing of each episode</source>
-        <translation type="unfinished"></translation>
+        <translation>Sidste udsendelse af hver episode</translation>
     </message>
     <message>
         <source>Anytime on a specific day of the week</source>
-        <translation type="unfinished">Hvilket som helst tidspunkt på en bestemt dag i ugen</translation>
+        <translation>Hvilket som helst tidspunkt på en bestemt dag i ugen</translation>
     </message>
     <message>
         <source>Only on weekdays (Monday through Friday)</source>
-        <translation type="unfinished">Kun hverdage (mandage til fredage)</translation>
+        <translation>Kun hverdage (mandage til fredage)</translation>
     </message>
     <message>
         <source>Only on weekends</source>
-        <translation type="unfinished">Kun i weekenden</translation>
+        <translation>Kun i weekenden</translation>
     </message>
     <message>
         <source>Only in primetime</source>
-        <translation type="unfinished">Kun i den bedste sendetid</translation>
+        <translation>Kun i den bedste sendetid</translation>
     </message>
     <message>
         <source>Not in primetime</source>
-        <translation type="unfinished">Udenfor den bedste sendetid</translation>
+        <translation>Udenfor den bedste sendetid</translation>
     </message>
     <message>
         <source>Only on a specific station</source>
-        <translation type="unfinished">Kun på en bestem kanal</translation>
+        <translation>Kun på en bestem kanal</translation>
     </message>
     <message>
         <source>Exclude one station</source>
-        <translation type="unfinished">Undlad en station</translation>
+        <translation>Undlad en station</translation>
     </message>
     <message>
         <source>Match related callsigns</source>
-        <translation type="unfinished">Matche kaldenavn(callsigns)</translation>
+        <translation>Matche kaldenavn(callsigns)</translation>
     </message>
     <message>
         <source>Only on channels marked as favorites</source>
-        <translation type="unfinished">Kun på favorit kanaler</translation>
+        <translation>Kun på favorit kanaler</translation>
     </message>
     <message>
         <source>Only channels from a specific video source</source>
-        <translation type="unfinished">Kun kanaler fra en bestemt videokilde&gt;</translation>
+        <translation>Kun kanaler fra en bestemt videokilde&gt;</translation>
     </message>
     <message>
         <source>Only channels marked as commercial free</source>
-        <translation type="unfinished">Kun reklamefri kanaler</translation>
+        <translation>Kun reklamefri kanaler</translation>
     </message>
     <message>
         <source>Only shows marked as HDTV</source>
-        <translation type="unfinished">Kun HDTV programmer</translation>
+        <translation>Kun HDTV programmer</translation>
     </message>
     <message>
         <source>Limit by category</source>
-        <translation type="unfinished">Begrænse på kategori</translation>
+        <translation>Begrænse på kategori</translation>
     </message>
     <message>
         <source>All matches for a genre (Data Direct)</source>
@@ -325,79 +325,79 @@
     </message>
     <message>
         <source>Limit by MPAA or VCHIP rating (Data Direct)</source>
-        <translation type="unfinished">Begræns af MPAA eller VCHIP rating (Data Direct)</translation>
+        <translation>Begræns af MPAA eller VCHIP rating (Data Direct)</translation>
     </message>
     <message>
         <source>Category type</source>
-        <translation type="unfinished">Kategori type</translation>
+        <translation>Kategori type</translation>
     </message>
     <message>
         <source>or</source>
-        <translation type="unfinished">eller</translation>
+        <translation>eller</translation>
     </message>
     <message>
         <source>Limit movies by the year of release</source>
-        <translation type="unfinished">Begræns film af udgivelses år</translation>
+        <translation>Begræns film af udgivelses år</translation>
     </message>
     <message>
         <source>Minimum star rating (0.0 to 1.0 for movies only)</source>
-        <translation type="unfinished">Minimun antal stjerner (0.0 to 1.0 kun for film)</translation>
+        <translation>Minimun antal stjerner (0.0 to 1.0 kun for film)</translation>
     </message>
     <message>
         <source>Person named in the credits (Data Direct)</source>
-        <translation type="unfinished"></translation>
+        <translation>Person nævnt i rulleteksterne (Data Direct)</translation>
     </message>
     <message>
         <source>Multiple sports teams (complete example)</source>
-        <translation type="unfinished">Flere sports teams (komplet eksempel)</translation>
+        <translation>Flere sports teams (komplet eksempel)</translation>
     </message>
     <message>
         <source>Sci-fi B-movies (complete example)</source>
-        <translation type="unfinished">Sci-fi B-film (fuldt eksempel)</translation>
+        <translation>Sci-fi B-film (fuldt eksempel)</translation>
     </message>
     <message>
         <source>SportsCenter Overnight (complete example - use FindDaily)</source>
-        <translation type="unfinished">SportsCenter Nat (komplet eksempel - brug FindDaglig)</translation>
+        <translation>SportsCenter Nat (komplet eksempel - brug FindDaglig)</translation>
     </message>
     <message>
         <source>Movie of the Week (complete example - use FindWeekly)</source>
-        <translation type="unfinished">Ugens film (fuldt eksempel - brug FindUgentlig)</translation>
+        <translation>Ugens film (fuldt eksempel - brug FindUgentlig)</translation>
     </message>
     <message>
         <source>First Episodes (complete example for Data Direct)</source>
-        <translation type="unfinished">Første episoder (komplet eksempel fra Data Direct)</translation>
+        <translation>Første episoder (komplet eksempel fra Data Direct)</translation>
     </message>
     <message>
         <source>Add this example clause</source>
-        <translation type="unfinished">Tilføj dette eksempel</translation>
+        <translation>Tilføj dette eksempel</translation>
     </message>
     <message>
         <source>Additional Tables</source>
-        <translation type="unfinished">Yderligere felter</translation>
+        <translation>Yderligere felter</translation>
     </message>
     <message>
         <source>Test</source>
-        <translation type="unfinished">Test</translation>
+        <translation>Test</translation>
     </message>
     <message>
         <source>Record</source>
-        <translation type="unfinished">Optag</translation>
+        <translation>Optag</translation>
     </message>
     <message>
         <source>Store</source>
-        <translation type="unfinished"></translation>
+        <translation>Gem</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished">Afbryd</translation>
+        <translation>Afbryd</translation>
     </message>
     <message>
         <source>An error was found when checking</source>
-        <translation type="unfinished">Der blevet fundet en fejl</translation>
+        <translation>Der blevet fundet en fejl</translation>
     </message>
     <message>
         <source>The database error was</source>
-        <translation type="unfinished">Database fejlen var</translation>
+        <translation>Database fejlen var</translation>
     </message>
 </context>
 <context>
@@ -603,11 +603,11 @@ WARNING: Do not press button if you are using an Air2PC HD-5000 card!!!! This ca
     </message>
     <message>
         <source>Could not open card #%1</source>
-        <translation type="unfinished"></translation>
+        <translation>Kunne ikke åbne kort #%1</translation>
     </message>
     <message>
         <source>Could not get card info for card #%1</source>
-        <translation type="unfinished"></translation>
+        <translation>Kunne ikke hente info for kort #%1</translation>
     </message>
 </context>
 <context>
@@ -672,7 +672,7 @@ WARNING: Do not press button if you are using an Air2PC HD-5000 card!!!! This ca
     </message>
     <message>
         <source>Fetching lineups from %1...</source>
-        <translation type="unfinished"></translation>
+        <translation>Henter lineups fra %1...</translation>
     </message>
 </context>
 <context>
@@ -691,7 +691,7 @@ WARNING: Do not press button if you are using an Air2PC HD-5000 card!!!! This ca
     </message>
     <message>
         <source>Device Type</source>
-        <translation type="unfinished"></translation>
+        <translation>Enheds type</translation>
     </message>
     <message>
         <source>Switch</source>
@@ -707,7 +707,7 @@ WARNING: Do not press button if you are using an Air2PC HD-5000 card!!!! This ca
     </message>
     <message>
         <source>Description</source>
-        <translation type="unfinished">Beskrivelse</translation>
+        <translation>Beskrivelse</translation>
     </message>
     <message>
         <source>Optional descriptive name for this device, to make it easier to configure settings later.</source>
@@ -727,7 +727,7 @@ WARNING: Do not press button if you are using an Air2PC HD-5000 card!!!! This ca
     </message>
     <message>
         <source>DiSEqC</source>
-        <translation type="unfinished">DiSEqC</translation>
+        <translation>DiSEqC</translation>
     </message>
     <message>
         <source>DiSEqC (Uncommitted)</source>
@@ -747,7 +747,7 @@ WARNING: Do not press button if you are using an Air2PC HD-5000 card!!!! This ca
     </message>
     <message>
         <source>Number of ports</source>
-        <translation type="unfinished"></translation>
+        <translation>Antal porte</translation>
     </message>
     <message>
         <source>The number of ports this switch has.</source>
@@ -792,12 +792,12 @@ WARNING: Do not press button if you are using an Air2PC HD-5000 card!!!! This ca
     <message>
         <source>E</source>
         <comment>Eastern Hemisphere</comment>
-        <translation type="unfinished">E</translation>
+        <translation>Ø</translation>
     </message>
     <message>
         <source>W</source>
         <comment>Western Hemisphere</comment>
-        <translation type="unfinished">W</translation>
+        <translation>V</translation>
     </message>
     <message>
         <source>Position Index %1</source>
@@ -809,7 +809,7 @@ WARNING: Do not press button if you are using an Air2PC HD-5000 card!!!! This ca
     </message>
     <message>
         <source>None</source>
-        <translation type="unfinished">Intet</translation>
+        <translation>Intet</translation>
     </message>
     <message>
         <source>Position #%1 (%2)</source>
@@ -833,11 +833,11 @@ WARNING: Do not press button if you are using an Air2PC HD-5000 card!!!! This ca
     </message>
     <message>
         <source>Single (Europe)</source>
-        <translation type="unfinished"></translation>
+        <translation>Enkelt (Europa)</translation>
     </message>
     <message>
         <source>Universal (Europe)</source>
-        <translation type="unfinished"></translation>
+        <translation>Universal (Europa)</translation>
     </message>
     <message>
         <source>Circular (N. America)</source>
@@ -933,11 +933,11 @@ WARNING: Do not press button if you are using an Air2PC HD-5000 card!!!! This ca
     </message>
     <message>
         <source>Port %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Port %1</translation>
     </message>
     <message>
         <source>Choose a satellite position.</source>
-        <translation type="unfinished"></translation>
+        <translation>Vælg satelit position.</translation>
     </message>
     <message>
         <source>The longitude of the satellite you are aiming at, in degrees. In the Western hemisphere use &apos;W&apos; as the suffix. In the Eastern hemisphere use &apos;E&apos; as the suffix. </source>
@@ -1026,11 +1026,11 @@ WARNING: Do not press button if you are using an Air2PC HD-5000 card!!!! This ca
     </message>
     <message>
         <source>Failed to open</source>
-        <translation type="unfinished"></translation>
+        <translation>Kunne ikke åbnes</translation>
     </message>
     <message>
         <source>Failed to probe</source>
-        <translation type="unfinished"></translation>
+        <translation>Kunne ikke testes</translation>
     </message>
 </context>
 <context>
@@ -1652,19 +1652,19 @@ Returning to the previous menu.</source>
     </message>
     <message>
         <source>Autodetect</source>
-        <translation type="unfinished">Autodetekt</translation>
+        <translation>Autodetekt</translation>
     </message>
     <message>
         <source>High Quality</source>
-        <translation type="unfinished"></translation>
+        <translation>Høj Kvalitet</translation>
     </message>
     <message>
         <source>Medium Quality</source>
-        <translation type="unfinished"></translation>
+        <translation>Mellem Kvalitet</translation>
     </message>
     <message>
         <source>Low Quality</source>
-        <translation type="unfinished"></translation>
+        <translation>Lav Kvalitet</translation>
     </message>
 </context>
 <context>
@@ -1920,11 +1920,11 @@ Returning to the previous menu.</source>
     </message>
     <message>
         <source>Rule Search</source>
-        <translation type="unfinished"></translation>
+        <translation>Regel søgning</translation>
     </message>
     <message>
         <source>(Any Genre)</source>
-        <translation type="unfinished"></translation>
+        <translation>(Enhver genre)</translation>
     </message>
 </context>
 <context>
@@ -2474,15 +2474,15 @@ Returning to the previous menu.</source>
     </message>
     <message>
         <source>&quot;Big&quot; font</source>
-        <translation>&quot;Stor&quot; skrifttype</translation>
+        <translation>&quot;Stor&quot; skriftstørrelse</translation>
     </message>
     <message>
         <source>&quot;Medium&quot; font</source>
-        <translation>&quot;Mellem&quot; skrifttype</translation>
+        <translation>&quot;Mellem&quot; skriftstørrelse</translation>
     </message>
     <message>
         <source>&quot;Small&quot; font</source>
-        <translation>&quot;Lille&quot; skrifttype</translation>
+        <translation>&quot;Lille&quot; skriftstørrelse</translation>
     </message>
     <message>
         <source>Guide Shading Method</source>
@@ -3196,7 +3196,7 @@ Returning to the previous menu.</source>
     </message>
     <message>
         <source>Finetune</source>
-        <translation>Fininstilning</translation>
+        <translation>Finindstil</translation>
     </message>
     <message>
         <source>Contrast</source>
@@ -3667,7 +3667,7 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>Block shutdown before client connected</source>
-        <translation>Forhindrer nedlukning hvis der ikke er klienter forbundet</translation>
+        <translation>Blokér nedlukning før klienter er forbundet</translation>
     </message>
     <message>
         <source>If set, the automatic shutdown routine will be disabled until a client connects.</source>
@@ -4470,7 +4470,7 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>Use Arrow Key Accelerators</source>
-        <translation type="unfinished"></translation>
+        <translation>Brug accelleration på piletasterne</translation>
     </message>
     <message>
         <source>If enabled, Arrow key accelerators will be used, with LEFT performing an exit action and RIGHT selecting the current item.</source>
@@ -4890,7 +4890,7 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>Post Recording Processing</source>
-        <translation type="unfinished"></translation>
+        <translation>Job efter optagelse</translation>
     </message>
     <message>
         <source>Black background for Closed Captioning</source>
@@ -5532,7 +5532,7 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>If set, only free to air channels will be used.</source>
-        <translation type="unfinished"></translation>
+        <translation>Hvis aktiv, bruges kun ledige kanaler.</translation>
     </message>
     <message>
         <source>All</source>
@@ -6254,7 +6254,7 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     </message>
     <message>
         <source>Category of shows to be extended</source>
-        <translation type="unfinished"></translation>
+        <translation>Kategorier som altid skal forlænges</translation>
     </message>
     <message>
         <source>category name</source>
@@ -6912,7 +6912,7 @@ Myth will now exit.</source>
     </message>
     <message>
         <source>VIA XvMC will use the VIA VLD XvMC extension.</source>
-        <translation type="unfinished"></translation>
+        <translation>VIA XvMC vil bruge VIA VLD XvMC udvidelsen.</translation>
     </message>
     <message>
         <source>Cable HRC</source>
@@ -7228,7 +7228,7 @@ Myth will now exit.</source>
     </message>
     <message>
         <source>Writer</source>
-        <translation type="unfinished"></translation>
+        <translation>Forfatter</translation>
     </message>
     <message>
         <source>Host</source>
@@ -7256,7 +7256,7 @@ Myth will now exit.</source>
     </message>
     <message>
         <source>Search Phrase</source>
-        <translation type="unfinished"></translation>
+        <translation>Søge ord</translation>
     </message>
     <message>
         <source>Recorded File Size</source>
@@ -7480,7 +7480,7 @@ Myth will now exit.</source>
     </message>
     <message>
         <source>Auto Expire Priority Weight</source>
-        <translation type="unfinished"></translation>
+        <translation>Auto udløbs prioritets vægtning</translation>
     </message>
     <message>
         <source>The number of days bonus a program gets for each priority point. This is only used when the Weighted Time/Priority Auto Expire Method is selected.</source>
@@ -7550,27 +7550,27 @@ Myth will now exit.</source>
     </message>
     <message>
         <source>Education</source>
-        <translation type="unfinished"></translation>
+        <translation>Undervisning</translation>
     </message>
     <message>
         <source>Entertainment</source>
-        <translation type="unfinished"></translation>
+        <translation>Underholdning</translation>
     </message>
     <message>
         <source>Movie</source>
-        <translation type="unfinished"></translation>
+        <translation>Film</translation>
     </message>
     <message>
         <source>News</source>
-        <translation type="unfinished"></translation>
+        <translation>Nyheder</translation>
     </message>
     <message>
         <source>Religious</source>
-        <translation type="unfinished"></translation>
+        <translation>Religion</translation>
     </message>
     <message>
         <source>Sports</source>
-        <translation type="unfinished">Sport</translation>
+        <translation>Sport</translation>
     </message>
     <message>
         <source>Action</source>
@@ -7582,7 +7582,7 @@ Myth will now exit.</source>
     </message>
     <message>
         <source>Animated</source>
-        <translation type="unfinished"></translation>
+        <translation>Tegnefilm</translation>
     </message>
     <message>
         <source>Anthology</source>
@@ -7590,7 +7590,7 @@ Myth will now exit.</source>
     </message>
     <message>
         <source>Automobile</source>
-        <translation type="unfinished"></translation>
+        <translation>BIler</translation>
     </message>
     <message>
         <source>Awards</source>
@@ -7598,11 +7598,11 @@ Myth will now exit.</source>
     </message>
     <message>
         <source>Baseball</source>
-        <translation type="unfinished"></translation>
+        <translation>Baseball</translation>
     </message>
     <message>
         <source>Basketball</source>
-        <translation type="unfinished"></translation>
+        <translation>Basketball</translation>
     </message>
     <message>
         <source>Bulletin</source>
@@ -7634,11 +7634,11 @@ Myth will now exit.</source>
     </message>
     <message>
         <source>Concert</source>
-        <translation type="unfinished"></translation>
+        <translation>Koncert</translation>
     </message>
     <message>
         <source>Consumer</source>
-        <translation type="unfinished"></translation>
+        <translation>Forbruger</translation>
     </message>
     <message>
         <source>Contemporary</source>
@@ -7646,7 +7646,7 @@ Myth will now exit.</source>
     </message>
     <message>
         <source>Crime</source>
-        <translation type="unfinished"></translation>
+        <translation>Krimi</translation>
     </message>
     <message>
         <source>Dance</source>
@@ -7674,7 +7674,7 @@ Myth will now exit.</source>
     </message>
     <message>
         <source>Fantasy</source>
-        <translation type="unfinished"></translation>
+        <translation>Fantasi</translation>
     </message>
     <message>
         <source>Farm</source>
@@ -7710,11 +7710,11 @@ Myth will now exit.</source>
     </message>
     <message>
         <source>Garden</source>
-        <translation type="unfinished"></translation>
+        <translation>Have</translation>
     </message>
     <message>
         <source>Golf</source>
-        <translation type="unfinished"></translation>
+        <translation>Golf</translation>
     </message>
     <message>
         <source>Government</source>
@@ -7770,11 +7770,11 @@ Myth will now exit.</source>
     </message>
     <message>
         <source>Live</source>
-        <translation type="unfinished"></translation>
+        <translation>Direkte</translation>
     </message>
     <message>
         <source>Local</source>
-        <translation type="unfinished"></translation>
+        <translation>Lokalt</translation>
     </message>
     <message>
         <source>Math</source>
@@ -7794,11 +7794,11 @@ Myth will now exit.</source>
     </message>
     <message>
         <source>Miniseries</source>
-        <translation type="unfinished"></translation>
+        <translation>Miniserie</translation>
     </message>
     <message>
         <source>Music</source>
-        <translation type="unfinished"></translation>
+        <translation>Musik</translation>
     </message>
     <message>
         <source>Mystery</source>
@@ -7810,7 +7810,7 @@ Myth will now exit.</source>
     </message>
     <message>
         <source>Nature</source>
-        <translation type="unfinished"></translation>
+        <translation>Natur</translation>
     </message>
     <message>
         <source>Police</source>
@@ -7818,7 +7818,7 @@ Myth will now exit.</source>
     </message>
     <message>
         <source>Politics</source>
-        <translation type="unfinished"></translation>
+        <translation>Politik</translation>
     </message>
     <message>
         <source>Premiere</source>
@@ -7838,7 +7838,7 @@ Myth will now exit.</source>
     </message>
     <message>
         <source>Public</source>
-        <translation type="unfinished"></translation>
+        <translation>Offentlig</translation>
     </message>
     <message>
         <source>Racing</source>
@@ -7866,7 +7866,7 @@ Myth will now exit.</source>
     </message>
     <message>
         <source>Series</source>
-        <translation type="unfinished">Serier</translation>
+        <translation>Serier</translation>
     </message>
     <message>
         <source>Service</source>
@@ -7898,7 +7898,7 @@ Myth will now exit.</source>
     </message>
     <message>
         <source>Tennis</source>
-        <translation type="unfinished"></translation>
+        <translation>Tennis</translation>
     </message>
     <message>
         <source>Travel</source>
@@ -7914,7 +7914,7 @@ Myth will now exit.</source>
     </message>
     <message>
         <source>Weather</source>
-        <translation type="unfinished"></translation>
+        <translation>Vejret</translation>
     </message>
     <message>
         <source>Western</source>
@@ -7926,7 +7926,7 @@ Myth will now exit.</source>
     </message>
     <message>
         <source>Time Offset</source>
-        <translation type="unfinished"></translation>
+        <translation>Tids offset</translation>
     </message>
     <message>
         <source>Offset (in minutes) to apply to the program guide data during import.  This can be used when the listings for a particular channel are in a different time zone.</source>
@@ -7938,7 +7938,7 @@ Myth will now exit.</source>
     </message>
     <message>
         <source>Priority</source>
-        <translation type="unfinished">Prioriter</translation>
+        <translation>Prioriter</translation>
     </message>
     <message>
         <source>Number of priority points to be added to any recording on this channel during scheduling.</source>
@@ -7954,33 +7954,33 @@ Myth will now exit.</source>
     </message>
     <message>
         <source>Store</source>
-        <translation type="unfinished"></translation>
+        <translation>Gem</translation>
     </message>
     <message>
         <source>Replace</source>
-        <translation type="unfinished"></translation>
+        <translation>Erstat</translation>
     </message>
     <message>
         <source>Track</source>
-        <translation type="unfinished"></translation>
+        <translation>Spor</translation>
     </message>
     <message>
         <source>Audio track</source>
-        <translation type="unfinished">Lyd Spor</translation>
+        <translation>Lyd Spor</translation>
     </message>
     <message>
         <source>Subtitle track</source>
-        <translation type="unfinished">Undertekst nr</translation>
+        <translation>Undertekst nr</translation>
     </message>
     <message>
         <source>CC</source>
         <comment>EIA-608 closed captions</comment>
-        <translation type="unfinished">CC</translation>
+        <translation>CC</translation>
     </message>
     <message>
         <source>ATSC CC</source>
         <comment>EIA-708 closed captions</comment>
-        <translation type="unfinished">ATSC CC</translation>
+        <translation>ATSC CC</translation>
     </message>
     <message>
         <source>TT CC</source>
@@ -8011,7 +8011,7 @@ Myth will now exit.</source>
     </message>
     <message>
         <source>Position</source>
-        <translation type="unfinished">Position</translation>
+        <translation>Position</translation>
     </message>
     <message>
         <source>No Seektable</source>
@@ -8056,32 +8056,32 @@ Myth will now exit.</source>
     </message>
     <message>
         <source>Upcoming episodes for this title</source>
-        <translation type="unfinished"></translation>
+        <translation>Fremtidige episoder for denne titel</translation>
     </message>
     <message>
         <source>Upcoming episodes for this rule</source>
-        <translation type="unfinished"></translation>
+        <translation>Fremtidige episoder for denne regel</translation>
     </message>
     <message>
         <source>Previously scheduled episodes</source>
-        <translation type="unfinished"></translation>
+        <translation>Tidligere optagede episoder</translation>
     </message>
     <message>
         <source>Use any available input</source>
-        <translation type="unfinished"></translation>
+        <translation>Brug alle tilgængelige indgange</translation>
     </message>
     <message>
         <source>Prefer input %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Fortræk indgang: %1</translation>
     </message>
     <message>
         <source>Select Preferred Input</source>
-        <translation type="unfinished"></translation>
+        <translation>Vælg foretrukne indgang</translation>
     </message>
     <message>
         <source>UNKNOWN%1</source>
         <comment>Synthesized callsign</comment>
-        <translation type="unfinished"></translation>
+        <translation>UKENDT%1</translation>
     </message>
     <message>
         <source>DVB Tuning Delay (msec)</source>
@@ -8120,7 +8120,7 @@ Myth will now exit.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>URL of the incoming stream (ex.: udp://?localport=1234)</source>
+        <source>URL of the incomming stream (ex.: udp://?localport=1234)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -8149,7 +8149,7 @@ Myth will now exit.</source>
     </message>
     <message>
         <source>(Delete all capture cards on %1)</source>
-        <translation type="unfinished"></translation>
+        <translation>(Slet alle optagekort på %1)</translation>
     </message>
     <message>
         <source>Passthrough output device</source>
@@ -8201,11 +8201,11 @@ Myth will now exit.</source>
     </message>
     <message>
         <source>Cursive</source>
-        <translation type="unfinished"></translation>
+        <translation>Kursiv</translation>
     </message>
     <message>
         <source>Capitals</source>
-        <translation type="unfinished"></translation>
+        <translation>Store bogstaver</translation>
     </message>
     <message>
         <source>ATSC caption settings</source>
@@ -8221,7 +8221,7 @@ Myth will now exit.</source>
     </message>
     <message>
         <source>channel number</source>
-        <translation type="unfinished"></translation>
+        <translation>kanal nummer</translation>
     </message>
     <message>
         <source>Black background for analog closed captioning</source>
@@ -8249,11 +8249,11 @@ Myth will now exit.</source>
     </message>
     <message>
         <source>Qt</source>
-        <translation type="unfinished"></translation>
+        <translation>Qt</translation>
     </message>
     <message>
         <source>OpenGL</source>
-        <translation type="unfinished"></translation>
+        <translation>OpenGL</translation>
     </message>
     <message>
         <source>This selects what Myth uses to draw.  If you have decent hardware, select OpenGL. Changing this requires a restart.</source>
@@ -8317,19 +8317,19 @@ Myth will now exit.</source>
     </message>
     <message>
         <source>Sort Titles</source>
-        <translation type="unfinished"></translation>
+        <translation>Sortér Titler</translation>
     </message>
     <message>
         <source>Alphabetically</source>
-        <translation type="unfinished"></translation>
+        <translation>Alfabetisk</translation>
     </message>
     <message>
         <source>By Recording Priority</source>
-        <translation type="unfinished"></translation>
+        <translation>Optagelses prioritet</translation>
     </message>
     <message>
         <source>Display Large Clock</source>
-        <translation type="unfinished"></translation>
+        <translation>Vis stort ur</translation>
     </message>
     <message>
         <source>On multiline displays try and display the time as large as possible.</source>
@@ -8355,7 +8355,7 @@ Check if the video exists</source>
     </message>
     <message>
         <source>Delete Now</source>
-        <translation type="unfinished"></translation>
+        <translation>Slet nu</translation>
     </message>
     <message>
         <source>Disable AutoExpire</source>
@@ -8367,7 +8367,7 @@ Check if the video exists</source>
     </message>
     <message>
         <source>Time offset for EIT listings</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Tids offset for EIT listinger</translation>
     </message>
     <message>
         <source>Adjust the relative timezone of the EIT EPG data.  &apos;Auto&apos; converts the EIT time to local time using your computer&apos;s timezone.  &apos;None&apos; ignores the EIT timezone, interpreting times as local.</source>
@@ -8468,7 +8468,7 @@ Check if the video exists</source>
     </message>
     <message>
         <source>M3U Import</source>
-        <translation type="unfinished"></translation>
+        <translation>M3U Import</translation>
     </message>
 </context>
 <context>
@@ -8571,7 +8571,7 @@ Ikke flere oplysninger</translation>
     </message>
     <message>
         <source>is unavailable</source>
-        <translation type="unfinished"></translation>
+        <translation>er ikke tilgængelig</translation>
     </message>
 </context>
 <context>
@@ -9184,67 +9184,67 @@ Ikke flere oplysninger</translation>
     </message>
     <message>
         <source>Skip Back Not Allowed</source>
-        <translation type="unfinished"></translation>
+        <translation>Skip fremad er ikke tilladt</translation>
     </message>
     <message>
         <source>Rotor %1%</source>
-        <translation type="unfinished"></translation>
+        <translation>Rotor %1%</translation>
     </message>
     <message>
         <source>Channel Editor</source>
-        <translation type="unfinished"></translation>
+        <translation>Kanal editor</translation>
     </message>
     <message>
         <source>Callsign</source>
-        <translation type="unfinished">Kaldenavn</translation>
+        <translation>Kaldenavn</translation>
     </message>
     <message>
         <source>Channel #</source>
-        <translation type="unfinished"></translation>
+        <translation>Kanal #</translation>
     </message>
     <message>
         <source>Channel Name</source>
-        <translation type="unfinished">Kanal navn</translation>
+        <translation>Kanal navn</translation>
     </message>
     <message>
         <source>XMLTV ID</source>
-        <translation type="unfinished">XMLTV ID</translation>
+        <translation>XMLTV ID</translation>
     </message>
     <message>
         <source>[P]robe</source>
-        <translation type="unfinished"></translation>
+        <translation>[P]røve</translation>
     </message>
     <message>
         <source>[O]k</source>
-        <translation type="unfinished"></translation>
+        <translation>[O]k</translation>
     </message>
     <message>
         <source>Jump to Program</source>
-        <translation type="unfinished"></translation>
+        <translation>Hop til program</translation>
     </message>
     <message>
         <source>Recorded Program</source>
-        <translation type="unfinished"></translation>
+        <translation>Optaget program</translation>
     </message>
     <message>
         <source>Default</source>
-        <translation type="unfinished">Standard</translation>
+        <translation>Standard</translation>
     </message>
     <message>
         <source>Autodetect</source>
-        <translation type="unfinished">Autodetekt</translation>
+        <translation>Autodetekt</translation>
     </message>
     <message>
         <source>High Quality</source>
-        <translation type="unfinished"></translation>
+        <translation>Høj Kvalitet</translation>
     </message>
     <message>
         <source>Medium Quality</source>
-        <translation type="unfinished"></translation>
+        <translation>Mellem Kvalitet</translation>
     </message>
     <message>
         <source>Low Quality</source>
-        <translation type="unfinished"></translation>
+        <translation>Lav Kvalitet</translation>
     </message>
     <message>
         <source>Toggle Teletext Captions</source>
@@ -9261,57 +9261,57 @@ Ikke flere oplysninger</translation>
     <message>
         <source>(I)</source>
         <comment>Interlaced (Normal)</comment>
-        <translation type="unfinished"></translation>
+        <translation>(I)</translation>
     </message>
     <message>
         <source>(i)</source>
         <comment>Interlaced (Reversed)</comment>
-        <translation type="unfinished"></translation>
+        <translation>(i)</translation>
     </message>
     <message>
         <source>(P)</source>
         <comment>Progressive</comment>
-        <translation type="unfinished"></translation>
+        <translation>(P)</translation>
     </message>
     <message>
         <source>Video Scan</source>
-        <translation type="unfinished"></translation>
+        <translation>Skan video</translation>
     </message>
     <message>
         <source>Detect</source>
-        <translation type="unfinished"></translation>
+        <translation>Detektér</translation>
     </message>
     <message>
         <source>Progressive</source>
-        <translation type="unfinished"></translation>
+        <translation>Progressive</translation>
     </message>
     <message>
         <source>Interlaced (Normal)</source>
-        <translation type="unfinished"></translation>
+        <translation>Interlaced (Normal)</translation>
     </message>
     <message>
         <source>Interlaced (Reversed)</source>
-        <translation type="unfinished"></translation>
+        <translation>Interlaced (Reversed)</translation>
     </message>
     <message>
         <source>Select Subtitle</source>
-        <translation type="unfinished"></translation>
+        <translation>Vælg undertekst</translation>
     </message>
     <message>
         <source>Select VBI CC</source>
-        <translation type="unfinished"></translation>
+        <translation>Vælg VBI tekst</translation>
     </message>
     <message>
         <source>Select ATSC CC</source>
-        <translation type="unfinished"></translation>
+        <translation>Vælg ATSC tekst</translation>
     </message>
     <message>
         <source>Select DVB CC</source>
-        <translation type="unfinished"></translation>
+        <translation>Vælg DVB tekst</translation>
     </message>
     <message>
         <source>Toggle On/Off</source>
-        <translation type="unfinished"></translation>
+        <translation>Til/Fra</translation>
     </message>
 </context>
 <context>
@@ -9540,11 +9540,11 @@ Ikke flere oplysninger</translation>
     </message>
     <message>
         <source>Failed to open</source>
-        <translation type="unfinished"></translation>
+        <translation>Kunne ikke åbnes</translation>
     </message>
     <message>
         <source>Failed to probe</source>
-        <translation type="unfinished"></translation>
+        <translation>Kunne ikke testes</translation>
     </message>
 </context>
 <context>
@@ -9737,11 +9737,11 @@ Ikke flere oplysninger</translation>
     <name>pcHDTVConfigurationGroup</name>
     <message>
         <source>Failed to open</source>
-        <translation type="unfinished"></translation>
+        <translation>Kunne ikke åbnes</translation>
     </message>
     <message>
         <source>Failed to probe</source>
-        <translation type="unfinished"></translation>
+        <translation>Kunne ikke testes</translation>
     </message>
 </context>
 </TS>
