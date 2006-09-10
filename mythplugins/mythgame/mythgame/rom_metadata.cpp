@@ -38,17 +38,28 @@ int calcOffset(QString GameType, uLong filesize) {
     return result;
 }
 
+QString crcStr(uLong crc) {
+    QString tmpcrc("");
+
+    tmpcrc = QString("%1").arg( crc, 0, 16 );
+    if (tmpcrc == "0")
+        tmpcrc = "";
+    else
+        tmpcrc = tmpcrc.rightJustify( 8,'0');
+
+    return tmpcrc;
+}
+
 // Return the crc32 info for this rom. (ripped mostly from the old neshandler.cpp source)
-uLong crcinfo(QString romname, QString GameType, QString *key, RomDBMap *romDB)
+QString crcinfo(QString romname, QString GameType, QString *key, RomDBMap *romDB)
 {
     // Get CRC of file
     char block[32768];
     uLong crc = crc32(0, Z_NULL, 0);
-
+    QString crcRes;
     char filename_inzip[256];
     unz_file_info file_info;    
     int err;
-
     int offset;
     unzFile zf;
     int blocksize;
@@ -76,9 +87,9 @@ uLong crcinfo(QString romname, QString GameType, QString *key, RomDBMap *romDB)
                 {
                     crc = crc32(crc, (Bytef *)block, (uInt)count);
                 }   
-
+                crcRes = crcStr(crc);
                 *key = QString("%1:%2")
-                             .arg(crc, 0, 16)
+                             .arg(crcRes)
                              .arg(filename_inzip);
 
                 if (romDB->contains(*key)) 
@@ -95,6 +106,7 @@ uLong crcinfo(QString romname, QString GameType, QString *key, RomDBMap *romDB)
     else
     {
         QFile f(romname);
+
         if (f.open(IO_ReadOnly))
         {
             offset = calcOffset(GameType, f.size());
@@ -108,11 +120,13 @@ uLong crcinfo(QString romname, QString GameType, QString *key, RomDBMap *romDB)
             {
                 crc = crc32(crc, (Bytef *)block, (uInt)count);
             }   
-            *key = QString("%1:").arg(crc, 0, 16);
+
+            crcRes = crcStr(crc);
+            *key = QString("%1:").arg(crcRes);
             f.close();
         }   
     }   
 
-    return crc;
+    return crcRes;
 }
 
