@@ -1086,6 +1086,14 @@ WARNING: Do not press button if you are using an Air2PC HD-5000 card!!!! This ca
         <source>Manual Record</source>
         <translation>Enregistrement manuel</translation>
     </message>
+    <message>
+        <source>5 weekdays if daily</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>7 days per week if daily</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>MythContext</name>
@@ -1399,7 +1407,7 @@ Je reviens au menu précédent.</translation>
     </message>
     <message>
         <source>A preserved episode is ignored in calculations for deleting episodes above the limit.  Auto-expiration is used to remove eligable programs when disk space is low.</source>
-        <translation>Une émission préservée est ignorée dans les calculs des émissions à effacer au delà de cette limite. L&apos;auto-expiration est utilisée pour supprimer les programmes choisis lorsque l&apos;espace disque est faible.</translation>
+        <translation type="obsolete">Une émission préservée est ignorée dans les calculs des émissions à effacer au delà de cette limite. L&apos;auto-expiration est utilisée pour supprimer les programmes choisis lorsque l&apos;espace disque est faible.</translation>
     </message>
     <message>
         <source>Do not preserve this episode</source>
@@ -2569,7 +2577,7 @@ Je reviens au menu précédent.</translation>
     </message>
     <message>
         <source>Use Xv picture controls</source>
-        <translation type="obsolete">Utiliser les contrôles d&apos;image de Xv</translation>
+        <translation type="unfinished">Utiliser les contrôles d&apos;image de Xv</translation>
     </message>
     <message>
         <source>Use the PVR-350&apos;s TV out / MPEG decoder</source>
@@ -3735,7 +3743,7 @@ Votre carte d&apos;acquisition n&apos;a pas fourni de canaux. Vous devez les sai
     </message>
     <message>
         <source>This option makes the backend dvb-recorder only open the card when it is actually in-use leaving it free for other programs at other times.</source>
-        <translation>Cette option ne donne l&apos;accès à la carte DVB au BackEnd que lorsqu&apos;il en a besoin afin de la laisser accessible aux autres programmes le reste du temps.</translation>
+        <translation type="obsolete">Cette option ne donne l&apos;accès à la carte DVB au BackEnd que lorsqu&apos;il en a besoin afin de la laisser accessible aux autres programmes le reste du temps.</translation>
     </message>
     <message>
         <source>Capture Card Setup</source>
@@ -3983,7 +3991,7 @@ Votre carte d&apos;acquisition n&apos;a pas fourni de canaux. Vous devez les sai
     </message>
     <message>
         <source>If enabled, Xv picture controls (brightness, contrast, etc.) are used during playback. These are independent of the Video4Linux controls used for recording. The Xv controls may not work properly on some systems.</source>
-        <translation type="obsolete">Si activé, les contrôles d&apos;images Xv (luminosité, contraste, etc.) seront utilisés durant la lecture. Cela est indépendant des contrôles Video4Linux utilisés pour l&apos;enregistrement. Les contrôles Xv ne marchent pas sur tous les systèmes.</translation>
+        <translation type="unfinished">Si activé, les contrôles d&apos;images Xv (luminosité, contraste, etc.) seront utilisés durant la lecture. Cela est indépendant des contrôles Video4Linux utilisés pour l&apos;enregistrement. Les contrôles Xv ne marchent pas sur tous les systèmes.</translation>
     </message>
     <message>
         <source>During playback, MythTV will listen for connections from the &quot;mythtvosd&quot; or &quot;mythudprelay&quot; programs on this port.  See the README in contrib/mythnotify/ for additional information.</source>
@@ -4907,11 +4915,11 @@ Votre carte d&apos;acquisition n&apos;a pas fourni de canaux. Vous devez les sai
     </message>
     <message>
         <source>If set, the MPEG4 encoder will use interlaced DCT encoding.  You probably want this when encoding interlaced video.</source>
-        <translation>Si coché, l&apos;encodeur MPEG4 utilisera un encodage DCT interlacé. Cela s&apos;applique très bien pour l&apos;encodage des vidéos interlacé.</translation>
+        <translation type="obsolete">Si coché, l&apos;encodeur MPEG4 utilisera un encodage DCT interlacé. Cela s&apos;applique très bien pour l&apos;encodage des vidéos interlacé.</translation>
     </message>
     <message>
         <source>If set, the MPEG4 encoder will use interlaced motion estimation.  You probably want this when encoding interlaced video.</source>
-        <translation>Si coché, l&apos;encodeur MPEG4 utilisera l&apos;estimateur de bougé d&apos;entrelacé. Vous avez surement besoin de cela si vous encodez des vidéos</translation>
+        <translation type="obsolete">Si coché, l&apos;encodeur MPEG4 utilisera l&apos;estimateur de bougé d&apos;entrelacé. Vous avez surement besoin de cela si vous encodez des vidéos</translation>
     </message>
     <message>
         <source>Start recording %1 minute late</source>
@@ -5235,7 +5243,7 @@ Votre carte d&apos;acquisition n&apos;a pas fourni de canaux. Vous devez les sai
     </message>
     <message>
         <source>Check this option for budget BT878 based DVB-T cards such as the AverTV DVB-T that require the audio volume left alone.</source>
-        <translation>Vérifier cette option pour les cartes DVB-T basé sur un chip BT878 telle que la AverTV DVB-T qui nécessite un contrôle de volume son gauche isolé.</translation>
+        <translation type="obsolete">Vérifier cette option pour les cartes DVB-T basé sur un chip BT878 telle que la AverTV DVB-T qui nécessite un contrôle de volume son gauche isolé.</translation>
     </message>
     <message>
         <source>Video source</source>
@@ -5319,11 +5327,11 @@ Votre carte d&apos;acquisition n&apos;a pas fourni de canaux. Vous devez les sai
     </message>
     <message>
         <source>Use Altivec-enhanced color space conversion</source>
-        <translation>Utiliser la conversion de couleurAltivec-enhanced</translation>
+        <translation type="obsolete">Utiliser la conversion de couleurAltivec-enhanced</translation>
     </message>
     <message>
         <source>If checked, YUV 4:2:0 will be converted to UYVY 4:2:2 in an Altivec-enabled routine.  If unchecked, QuickTime will handle the conversion instead.</source>
-        <translation>Si activé, les YUV 4:2:0 seront convertit en UYVY 4:2:2 compatible Altivec. Si désactivé, QuickTime effectuera la conversion à la place.</translation>
+        <translation type="obsolete">Si activé, les YUV 4:2:0 seront convertit en UYVY 4:2:2 compatible Altivec. Si désactivé, QuickTime effectuera la conversion à la place.</translation>
     </message>
     <message>
         <source>Video displayed in fullscreen or non-windowed mode will skip this many frames for each frame drawn. Set to 0 to show every frame. Only valid when either &quot;Use GUI size for TV playback&quot; or &quot;Run the frontend in a window&quot; is not checked.</source>
@@ -5596,7 +5604,7 @@ Votre carte d&apos;acquisition n&apos;a pas fourni de canaux. Vous devez les sai
     </message>
     <message>
         <source>Scanning</source>
-        <translation type="obsolete">Analyse</translation>
+        <translation type="unfinished">Analyse</translation>
     </message>
     <message>
         <source>Record one showing of this title</source>
@@ -5849,7 +5857,7 @@ La plupart des cartes peuvent autodétecter cela maintenant. Laisser Auto sauf s
     </message>
     <message>
         <source>Absolutely don&apos;t record</source>
-        <translation>Ne pas enregistrer du tout</translation>
+        <translation type="obsolete">Ne pas enregistrer du tout</translation>
     </message>
     <message>
         <source>Point to Point</source>
@@ -6536,7 +6544,7 @@ Myth va maintenant s&apos;interrompre.</translation>
     </message>
     <message>
         <source>Normally the dvb-recording will drop packets from the card until a sequence start header is seen. This option turns off this feature.</source>
-        <translation>L&apos;enregistrement DVB va normalement ignorer les paquets de la carte tant qu&apos;un en-tête de démarrage de séquence n&apos;a pas été reçu. Cette option désactive ce comportement.</translation>
+        <translation type="obsolete">L&apos;enregistrement DVB va normalement ignorer les paquets de la carte tant qu&apos;un en-tête de démarrage de séquence n&apos;a pas été reçu. Cette option désactive ce comportement.</translation>
     </message>
     <message>
         <source>DBOX2 Streaming Port</source>
@@ -8157,10 +8165,6 @@ Myth va maintenant s&apos;interrompre.</translation>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Device ID from the back of the HDHomeRun unit.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Tuner</source>
         <translation type="unfinished"></translation>
     </message>
@@ -8479,6 +8483,82 @@ Myth va maintenant s&apos;interrompre.</translation>
 Check if the video exists</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>If set, the MPEG4 encoder will use interlaced DCT encoding. You may want this when encoding interlaced video, however, this is experimental and may cause damaged video.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If set, the MPEG4 encoder will use interlaced motion estimation. You may want this when encoding interlaced video, however, this is experimental and may cause damaged video.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>(CH)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>(REC)</source>
+        <translation type="unfinished">(ENR)</translation>
+    </message>
+    <message>
+        <source>Adjust Playback</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Adjust Recorder</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Colour</source>
+        <translation type="unfinished">Couleur</translation>
+    </message>
+    <message>
+        <source>Volume</source>
+        <translation type="unfinished">Volume</translation>
+    </message>
+    <message>
+        <source>MAX</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enable this option for budget BT878 based DVB-T cards such as the AverTV DVB-T which require the audio volume to be left alone.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Make the dvb-recording drop packets from the card until a sequence start header is seen.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This option makes the backend dvb-recorder only open the card when it is actually in-use, leaving it free for other programs at other times.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Device ID from the back of the HDHomeRun unit.  You may use &apos;FFFFFFFF&apos; if there is only one unit on your your network.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Experimental</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use Vector-enhanced color space conversion</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If checked, YUV 4:2:0 will be converted to UYVY 4:2:2 in an Altivec/MMX enabled routine.  If unchecked, QuickTime will handle the conversion instead.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>General (AutoExpire)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Delete files slowly</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Some filesystems use a lot of resources when deleting large recording files.  This option makes Myth delete the file slowly to lessen the impact.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ScanCountry</name>
@@ -8564,23 +8644,23 @@ Check if the video exists</source>
     <name>ScanWizardScanner</name>
     <message>
         <source>Scanning</source>
-        <translation type="obsolete">recherche</translation>
+        <translation type="unfinished">recherche</translation>
     </message>
     <message>
         <source>ScanWizard</source>
-        <translation type="obsolete">Assistant de Scan</translation>
+        <translation type="unfinished">Assistant de Scan</translation>
     </message>
     <message>
         <source>Error tuning to transport</source>
-        <translation type="obsolete">Erreur d&apos;ajustement de transport</translation>
+        <translation type="unfinished">Erreur d&apos;ajustement de transport</translation>
     </message>
     <message>
         <source>Error parsing parameters</source>
-        <translation type="obsolete">Erreur d&apos;analyse de paramètres</translation>
+        <translation type="unfinished">Erreur d&apos;analyse de paramètres</translation>
     </message>
     <message>
         <source>Error starting scan</source>
-        <translation type="obsolete">Erreur au démarrage du balayage</translation>
+        <translation type="unfinished">Erreur au démarrage du balayage</translation>
     </message>
     <message>
         <source>Failed to open : </source>
@@ -8589,6 +8669,14 @@ Check if the video exists</source>
     <message>
         <source>Failed to parse : </source>
         <translation type="obsolete">Impossible d&apos;interpréter: </translation>
+    </message>
+    <message>
+        <source>Failed to open &apos;%1&apos;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failed to parse &apos;%1&apos;</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

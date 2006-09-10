@@ -1063,6 +1063,14 @@ WARNING: Do not press button if you are using an Air2PC HD-5000 card!!!! This ca
         <source>Manual Record</source>
         <translation>手動録画</translation>
     </message>
+    <message>
+        <source>5 weekdays if daily</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>7 days per week if daily</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>MythContext</name>
@@ -1372,7 +1380,7 @@ Returning to the previous menu.</source>
     </message>
     <message>
         <source>A preserved episode is ignored in calculations for deleting episodes above the limit.  Auto-expiration is used to remove eligable programs when disk space is low.</source>
-        <translation>保存されたエピソードは制限を超えたエピソードを削除するための計算で無視されます。
+        <translation type="obsolete">保存されたエピソードは制限を超えたエピソードを削除するための計算で無視されます。
 自動満了はディスクスペースが低いときに適任の番組を削除すのに使用されます。
 </translation>
     </message>
@@ -2760,7 +2768,7 @@ Returning to the previous menu.</source>
     </message>
     <message>
         <source>Use Xv picture controls</source>
-        <translation type="obsolete">Xv画像制御を使用する</translation>
+        <translation type="unfinished">Xv画像制御を使用する</translation>
     </message>
     <message>
         <source>Use the PVR-350&apos;s TV out / MPEG decoder</source>
@@ -3632,7 +3640,7 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>Check this option for budget BT878 based DVB-T cards such as the AverTV DVB-T that require the audio volume left alone.</source>
-        <translation>音量を固定しておく必要のあるカード(安価なBT878ベースのカード等)を使用する場合は指定してください。</translation>
+        <translation type="obsolete">音量を固定しておく必要のあるカード(安価なBT878ベースのカード等)を使用する場合は指定してください。</translation>
     </message>
     <message>
         <source>Open DVB card on demand</source>
@@ -3640,7 +3648,7 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>This option makes the backend dvb-recorder only open the card when it is actually in-use leaving it free for other programs at other times.</source>
-        <translation>このオプションをセットするとバックエンドdvbレコーダーは本当に使用している時しかオープンしません。その他の時間は他のプログラムで使用できます。</translation>
+        <translation type="obsolete">このオプションをセットするとバックエンドdvbレコーダーは本当に使用している時しかオープンしません。その他の時間は他のプログラムで使用できます。</translation>
     </message>
     <message>
         <source>Password required to view all recordings</source>
@@ -3932,7 +3940,7 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>If set, the MPEG4 encoder will use interlaced DCT encoding.  You probably want this when encoding interlaced video.</source>
-        <translation>これをセットすると、MPEG4エンコーダーはインターレースドDCTエンコーディングを使用します。多分インターレースビデオには必要でしょう。</translation>
+        <translation type="obsolete">これをセットすると、MPEG4エンコーダーはインターレースドDCTエンコーディングを使用します。多分インターレースビデオには必要でしょう。</translation>
     </message>
     <message>
         <source>Enable interlaced motion estimation</source>
@@ -3940,7 +3948,7 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>If set, the MPEG4 encoder will use interlaced motion estimation.  You probably want this when encoding interlaced video.</source>
-        <translation>これをセットすると、MPEG4エンコーダーはインターレースドモーションエスティメーションを使用します。多分インターレースビデオには必要でしょう。</translation>
+        <translation type="obsolete">これをセットすると、MPEG4エンコーダーはインターレースドモーションエスティメーションを使用します。多分インターレースビデオには必要でしょう。</translation>
     </message>
     <message>
         <source>Keypress Application</source>
@@ -4395,7 +4403,7 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>If enabled, Xv picture controls (brightness, contrast, etc.) are used during playback. These are independent of the Video4Linux controls used for recording. The Xv controls may not work properly on some systems.</source>
-        <translation type="obsolete">Xv画像制御(明るさ、コントラスト等)を有効にします。録画時のVideo4Linux制御とは独立しています。Xv制御はシステムによっては正しく動作しません。</translation>
+        <translation type="unfinished">Xv画像制御(明るさ、コントラスト等)を有効にします。録画時のVideo4Linux制御とは独立しています。Xv制御はシステムによっては正しく動作しません。</translation>
     </message>
     <message>
         <source>During playback, MythTV will listen for connections from the &quot;mythtvosd&quot; or &quot;mythudprelay&quot; programs on this port.  See the README in contrib/mythnotify/ for additional information.</source>
@@ -5365,11 +5373,11 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>Use Altivec-enhanced color space conversion</source>
-        <translation>Altivec-enhancedカラースペース変換を使用</translation>
+        <translation type="obsolete">Altivec-enhancedカラースペース変換を使用</translation>
     </message>
     <message>
         <source>If checked, YUV 4:2:0 will be converted to UYVY 4:2:2 in an Altivec-enabled routine.  If unchecked, QuickTime will handle the conversion instead.</source>
-        <translation>Altivecを利用したカラースペース変換(YUV4:2:0からUYVY4:2:2)を有効にします。無効の場合はQuickTimeにより変換が行われます。</translation>
+        <translation type="obsolete">Altivecを利用したカラースペース変換(YUV4:2:0からUYVY4:2:2)を有効にします。無効の場合はQuickTimeにより変換が行われます。</translation>
     </message>
     <message>
         <source>Recording Host</source>
@@ -5469,7 +5477,7 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>Scanning</source>
-        <translation type="obsolete">スキャニング</translation>
+        <translation type="unfinished">スキャニング</translation>
     </message>
     <message>
         <source>Record one showing of this title</source>
@@ -5828,7 +5836,7 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     </message>
     <message>
         <source>Absolutely don&apos;t record</source>
-        <translation>まったく録画しない</translation>
+        <translation type="obsolete">まったく録画しない</translation>
     </message>
     <message>
         <source>Point to Point</source>
@@ -6504,10 +6512,6 @@ Myth will now exit.</source>
     </message>
     <message>
         <source>What to use to separate ATSC major and minor channels.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Normally the dvb-recording will drop packets from the card until a sequence start header is seen. This option turns off this feature.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -7920,7 +7924,7 @@ Myth will now exit.</source>
     </message>
     <message>
         <source>Store</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">保存</translation>
     </message>
     <message>
         <source>Replace</source>
@@ -8038,10 +8042,6 @@ Myth will now exit.</source>
     </message>
     <message>
         <source>Device ID</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Device ID from the back of the HDHomeRun unit.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -8363,6 +8363,82 @@ Myth will now exit.</source>
 Check if the video exists</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>If set, the MPEG4 encoder will use interlaced DCT encoding. You may want this when encoding interlaced video, however, this is experimental and may cause damaged video.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If set, the MPEG4 encoder will use interlaced motion estimation. You may want this when encoding interlaced video, however, this is experimental and may cause damaged video.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>(CH)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>(REC)</source>
+        <translation type="unfinished">(録画)</translation>
+    </message>
+    <message>
+        <source>Adjust Playback</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Adjust Recorder</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Colour</source>
+        <translation type="unfinished">カラー</translation>
+    </message>
+    <message>
+        <source>Volume</source>
+        <translation type="unfinished">ボリューム</translation>
+    </message>
+    <message>
+        <source>MAX</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enable this option for budget BT878 based DVB-T cards such as the AverTV DVB-T which require the audio volume to be left alone.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Make the dvb-recording drop packets from the card until a sequence start header is seen.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This option makes the backend dvb-recorder only open the card when it is actually in-use, leaving it free for other programs at other times.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Device ID from the back of the HDHomeRun unit.  You may use &apos;FFFFFFFF&apos; if there is only one unit on your your network.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Experimental</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use Vector-enhanced color space conversion</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If checked, YUV 4:2:0 will be converted to UYVY 4:2:2 in an Altivec/MMX enabled routine.  If unchecked, QuickTime will handle the conversion instead.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>General (AutoExpire)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Delete files slowly</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Some filesystems use a lot of resources when deleting large recording files.  This option makes Myth delete the file slowly to lessen the impact.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ScanCountry</name>
@@ -8448,19 +8524,31 @@ Check if the video exists</source>
     <name>ScanWizardScanner</name>
     <message>
         <source>Scanning</source>
-        <translation type="obsolete">スキャニング</translation>
+        <translation type="unfinished">スキャニング</translation>
     </message>
     <message>
         <source>ScanWizard</source>
-        <translation type="obsolete">スキャンウィザード</translation>
+        <translation type="unfinished">スキャンウィザード</translation>
     </message>
     <message>
         <source>Error tuning to transport</source>
-        <translation type="obsolete">トランスポートチューニングエラー</translation>
+        <translation type="unfinished">トランスポートチューニングエラー</translation>
     </message>
     <message>
         <source>Error parsing parameters</source>
-        <translation type="obsolete">パラメータエラー</translation>
+        <translation type="unfinished">パラメータエラー</translation>
+    </message>
+    <message>
+        <source>Failed to open &apos;%1&apos;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failed to parse &apos;%1&apos;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Error starting scan</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

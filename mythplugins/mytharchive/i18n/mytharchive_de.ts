@@ -489,187 +489,187 @@ OK klicken</translation>
     <name>ThemeUI</name>
     <message>
         <source>Select Recordings</source>
-        <translation>Aufnahmen auswählen</translation>
+        <translation type="obsolete">Aufnahmen auswählen</translation>
     </message>
     <message>
         <source>Show Recordings</source>
-        <translation>Aufnahmen ansehen</translation>
+        <translation type="obsolete">Aufnahmen ansehen</translation>
     </message>
     <message>
         <source>x.xx Gb</source>
-        <translation>x.xx Gb</translation>
+        <translation type="obsolete">x.xx Gb</translation>
     </message>
     <message>
         <source>File Finder</source>
-        <translation>Dateienfinder</translation>
+        <translation type="obsolete">Dateienfinder</translation>
     </message>
     <message>
         <source>Location:</source>
-        <translation>Pfad:</translation>
+        <translation type="obsolete">Pfad:</translation>
     </message>
     <message>
         <source>Select Video&apos;s</source>
-        <translation>Videos auswählen</translation>
+        <translation type="obsolete">Videos auswählen</translation>
     </message>
     <message>
         <source>Video Category</source>
-        <translation>Videokategorie</translation>
+        <translation type="obsolete">Videokategorie</translation>
     </message>
     <message>
         <source>PL:</source>
-        <translation>PL:</translation>
+        <translation type="obsolete">PL:</translation>
     </message>
     <message>
         <source>1</source>
-        <translation>1</translation>
+        <translation type="obsolete">1</translation>
     </message>
     <message>
         <source>No videos available</source>
-        <translation>Keine Videos vorhanden</translation>
+        <translation type="obsolete">Keine Videos vorhanden</translation>
     </message>
     <message>
         <source>Select Destination</source>
-        <translation>Ziel auswählen</translation>
+        <translation type="obsolete">Ziel auswählen</translation>
     </message>
     <message>
         <source>Free Space:</source>
-        <translation>Freier Platz:</translation>
+        <translation type="obsolete">Freier Platz:</translation>
     </message>
     <message>
         <source>0.00Gb</source>
-        <translation>0.00Gb</translation>
+        <translation type="obsolete">0.00Gb</translation>
     </message>
     <message>
         <source>Make ISO Image</source>
-        <translation>ISO Abbild erstellen</translation>
+        <translation type="obsolete">ISO Abbild erstellen</translation>
     </message>
     <message>
         <source>Burn to DVD</source>
-        <translation>Auf DVD brennen</translation>
+        <translation type="obsolete">Auf DVD brennen</translation>
     </message>
     <message>
         <source>Force Overwrite of DVD-RW Media</source>
-        <translation>Überschreiben des DVD-RW Mediums erzwingen</translation>
+        <translation type="obsolete">Überschreiben des DVD-RW Mediums erzwingen</translation>
     </message>
     <message>
         <source>Select Archive Items</source>
-        <translation>Archivobjekte auswählen</translation>
+        <translation type="obsolete">Archivobjekte auswählen</translation>
     </message>
     <message>
         <source>Show Items</source>
-        <translation>Objekte anzeigen</translation>
+        <translation type="obsolete">Objekte anzeigen</translation>
     </message>
     <message>
         <source>Use Cut List</source>
-        <translation>Schnittliste benutzen</translation>
+        <translation type="obsolete">Schnittliste benutzen</translation>
     </message>
     <message>
         <source>No Cutlist Available</source>
-        <translation>Keine Schnittliste vorhanden</translation>
+        <translation type="obsolete">Keine Schnittliste vorhanden</translation>
     </message>
     <message>
         <source>xxxxx mb</source>
-        <translation>xxxxx mb</translation>
+        <translation type="obsolete">xxxxx mb</translation>
     </message>
     <message>
         <source>0 mb</source>
-        <translation>0 mb</translation>
+        <translation type="obsolete">0 mb</translation>
     </message>
     <message>
         <source>DVD Menu Theme</source>
-        <translation>DVD Menüthema</translation>
+        <translation type="obsolete">DVD Menüthema</translation>
     </message>
     <message>
         <source>Select a theme</source>
-        <translation>Thema auswählen</translation>
+        <translation type="obsolete">Thema auswählen</translation>
     </message>
     <message>
         <source>Intro</source>
-        <translation>Einleitung</translation>
+        <translation type="obsolete">Einleitung</translation>
     </message>
     <message>
         <source>Main Menu</source>
-        <translation>Hauptmenü</translation>
+        <translation type="obsolete">Hauptmenü</translation>
     </message>
     <message>
         <source>Chapter Menu</source>
-        <translation>Kapitelmenü</translation>
+        <translation type="obsolete">Kapitelmenü</translation>
     </message>
     <message>
         <source>Details</source>
-        <translation>Details</translation>
+        <translation type="obsolete">Details</translation>
     </message>
     <message>
         <source>Items Selected for Archive</source>
-        <translation>Zum Archivieren ausgewählte Objekte</translation>
+        <translation type="obsolete">Zum Archivieren ausgewählte Objekte</translation>
     </message>
     <message>
         <source>Selected Items</source>
-        <translation>Ausgewählte Objekte</translation>
+        <translation type="obsolete">Ausgewählte Objekte</translation>
     </message>
     <message>
         <source>Encoder Profile</source>
-        <translation>Kodierungsprofil</translation>
+        <translation type="obsolete">Kodierungsprofil</translation>
     </message>
     <message>
         <source>Archive Item Details</source>
-        <translation>Archivobjekteigenschaften</translation>
+        <translation type="obsolete">Archivobjekteigenschaften</translation>
     </message>
     <message>
         <source>Title:</source>
-        <translation>Titel:</translation>
+        <translation type="obsolete">Titel:</translation>
     </message>
     <message>
         <source>Subtitle:</source>
-        <translation>Untertitel:</translation>
+        <translation type="obsolete">Untertitel:</translation>
     </message>
     <message>
         <source>Start Date:</source>
-        <translation>Startzeit:</translation>
+        <translation type="obsolete">Startzeit:</translation>
     </message>
     <message>
         <source>Time:</source>
-        <translation>Zeit:</translation>
+        <translation type="obsolete">Zeit:</translation>
     </message>
     <message>
         <source>Description:</source>
-        <translation>Beschreibung:</translation>
+        <translation type="obsolete">Beschreibung:</translation>
     </message>
     <message>
         <source>Find Archived File</source>
-        <translation>Archivierte Dateien finden</translation>
+        <translation type="obsolete">Archivierte Dateien finden</translation>
     </message>
     <message>
         <source>Start Time:</source>
-        <translation>Startzeit:</translation>
+        <translation type="obsolete">Startzeit:</translation>
     </message>
     <message>
         <source>Select Associated Channel</source>
-        <translation>Zugeordneten Kanal auswählen</translation>
+        <translation type="obsolete">Zugeordneten Kanal auswählen</translation>
     </message>
     <message>
         <source>Archived Channel</source>
-        <translation>Archivierter Kanal</translation>
+        <translation type="obsolete">Archivierter Kanal</translation>
     </message>
     <message>
         <source>Chan. ID:</source>
-        <translation>Kanal ID:</translation>
+        <translation type="obsolete">Kanal ID:</translation>
     </message>
     <message>
         <source>Chan. No:</source>
-        <translation>Kanal Nr:</translation>
+        <translation type="obsolete">Kanal Nr:</translation>
     </message>
     <message>
         <source>Callsign:</source>
-        <translation>Rufzeichen:</translation>
+        <translation type="obsolete">Rufzeichen:</translation>
     </message>
     <message>
         <source>Name:</source>
-        <translation>Name:</translation>
+        <translation type="obsolete">Name:</translation>
     </message>
     <message>
         <source>Local Channel</source>
-        <translation>Lokaler Kanal</translation>
+        <translation type="obsolete">Lokaler Kanal</translation>
     </message>
 </context>
 <context>

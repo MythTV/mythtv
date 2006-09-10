@@ -153,7 +153,7 @@ Bitte wählen.</translation>
     </message>
     <message>
         <source>List of all file extensions to be used for this emulator. Blank means any file under ROM PATH is considered to be used with this emulator</source>
-        <translation>Liste aller Dateinamenserweiterungen, die für diesen Emulator benutzt werden sollen. Leer bedeutet, dass jede Datei im ROM-Pfad mit diesem Emulator benutzt werden kann.</translation>
+        <translation type="obsolete">Liste aller Dateinamenserweiterungen, die für diesen Emulator benutzt werden sollen. Leer bedeutet, dass jede Datei im ROM-Pfad mit diesem Emulator benutzt werden kann.</translation>
     </message>
     <message>
         <source>ScreenShots</source>
@@ -268,6 +268,14 @@ dass sie dies tun möchten?</translation>
     <message>
         <source>SEGA/MASTER SYSYTEM</source>
         <translation>SEGA/MASTER SYSTEM</translation>
+    </message>
+    <message>
+        <source>A Comma seperated list of all file extensions for this emulator. Blank means any file under ROM PATH is considered to be used with this emulator</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>GAMEGEAR</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

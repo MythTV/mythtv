@@ -217,7 +217,7 @@
     </message>
     <message>
         <source>MythGallery Settings</source>
-        <translation>Configurações do MythGallery</translation>
+        <translation type="obsolete">Configurações do MythGallery</translation>
     </message>
     <message>
         <source>Slideshow Delay</source>
@@ -297,6 +297,14 @@
     </message>
     <message>
         <source>Duration of OpenGL Transition (milliseconds)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>MythGallery Settings (Slideshow)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>MythGallery Settings (General)</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

@@ -11,7 +11,7 @@
     </message>
     <message>
         <source>No Cover</source>
-        <translation>カバー無し</translation>
+        <translation type="obsolete">カバー無し</translation>
     </message>
     <message>
         <source>Done</source>
@@ -101,11 +101,11 @@
     </message>
     <message>
         <source>Parental Pin:</source>
-        <translation>再生制限ピン:</translation>
+        <translation type="obsolete">再生制限ピン:</translation>
     </message>
     <message>
         <source>No Cover</source>
-        <translation>カバー無し</translation>
+        <translation type="obsolete">カバー無し</translation>
     </message>
     <message>
         <source>Unknown</source>
@@ -117,7 +117,7 @@
     </message>
     <message>
         <source>Unknown Rating</source>
-        <translation>不明なレイティング</translation>
+        <translation type="obsolete">不明なレイティング</translation>
     </message>
     <message>
         <source>Default Player</source>
@@ -263,6 +263,70 @@
     </message>
     <message>
         <source>If set along with Browse Files, this will cause the Video List to load any known video metadata from the database. Turning this off can greatly  speed up how long it takes to load the Video List tree</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sorting ignores case</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If set, case is ignored when sorting entries in a view.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show folders for database views</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If set, sub folders of your video directory will be shown in supported views.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Image cache size</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This setting determines the number of images MythVideo will cache for views.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>^(The |A |An )</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>All</source>
+        <translation type="unfinished">全て</translation>
+    </message>
+    <message>
+        <source>Yes</source>
+        <translation type="unfinished">はい</translation>
+    </message>
+    <message>
+        <source>No</source>
+        <translation type="unfinished">いいえ</translation>
+    </message>
+    <message>
+        <source>Title</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Year</source>
+        <translation type="unfinished">年</translation>
+    </message>
+    <message>
+        <source>User Rating</source>
+        <translation type="unfinished">ユーザー格付け</translation>
+    </message>
+    <message>
+        <source>Runtime</source>
+        <translation type="unfinished">所用時間</translation>
+    </message>
+    <message>
+        <source>Filename</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Video ID</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -497,11 +561,11 @@
     </message>
     <message>
         <source>No rating available.</source>
-        <translation>レイティングは使用できません.</translation>
+        <translation type="obsolete">レイティングは使用できません.</translation>
     </message>
     <message>
         <source>minutes</source>
-        <translation>分</translation>
+        <translation type="obsolete">分</translation>
     </message>
     <message>
         <source>Watch This Video</source>
@@ -544,7 +608,7 @@
     </message>
     <message>
         <source>Parental Pin:</source>
-        <translation>再生制限ピン:</translation>
+        <translation type="obsolete">再生制限ピン:</translation>
     </message>
 </context>
 <context>
@@ -559,7 +623,7 @@
     </message>
     <message>
         <source>Unknown</source>
-        <translation>不明</translation>
+        <translation type="obsolete">不明</translation>
     </message>
     <message>
         <source>minutes</source>
@@ -567,7 +631,7 @@
     </message>
     <message>
         <source>All</source>
-        <translation>全て</translation>
+        <translation type="obsolete">全て</translation>
     </message>
     <message>
         <source>Save as default</source>
@@ -613,31 +677,27 @@
     </message>
     <message>
         <source>minutes</source>
-        <translation>分</translation>
+        <translation type="obsolete">分</translation>
     </message>
     <message>
         <source>Yes</source>
-        <translation>はい</translation>
+        <translation type="obsolete">はい</translation>
     </message>
     <message>
         <source>No</source>
-        <translation>いいえ</translation>
+        <translation type="obsolete">いいえ</translation>
     </message>
     <message>
         <source>No Cover</source>
-        <translation>カバー無し</translation>
+        <translation type="obsolete">カバー無し</translation>
     </message>
     <message>
         <source>Unknown</source>
-        <translation>不明</translation>
+        <translation type="obsolete">不明</translation>
     </message>
     <message>
         <source>None</source>
-        <translation>無し</translation>
-    </message>
-    <message>
-        <source>NR</source>
-        <translation></translation>
+        <translation type="obsolete">無し</translation>
     </message>
     <message>
         <source>delete failed</source>
@@ -680,18 +740,18 @@
     <name>VideoSelected</name>
     <message>
         <source>No rating available.</source>
-        <translation>レイティングは使用できません.</translation>
+        <translation type="obsolete">レイティングは使用できません.</translation>
     </message>
     <message>
         <source>minutes</source>
-        <translation>分</translation>
+        <translation type="obsolete">分</translation>
     </message>
 </context>
 <context>
     <name>VideoTree</name>
     <message>
         <source>Parental Pin:</source>
-        <translation>再生制限ピン:</translation>
+        <translation type="obsolete">再生制限ピン:</translation>
     </message>
     <message>
         <source>Select action</source>

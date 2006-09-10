@@ -962,10 +962,6 @@ Prosim vnesite pravilno pot in poizkusite ponovno.</translation>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>List of all file extensions to be used for this emulator. Blank means any file under ROM PATH is considered to be used with this emulator</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>ScreenShots</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1074,6 +1070,14 @@ want to do this?</source>
     </message>
     <message>
         <source>SEGA/MASTER SYSYTEM</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>A Comma seperated list of all file extensions for this emulator. Blank means any file under ROM PATH is considered to be used with this emulator</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>GAMEGEAR</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

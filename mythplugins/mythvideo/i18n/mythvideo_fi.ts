@@ -11,7 +11,7 @@
     </message>
     <message>
         <source>No Cover</source>
-        <translation>Ei Kantta</translation>
+        <translation type="obsolete">Ei Kantta</translation>
     </message>
     <message>
         <source>Done</source>
@@ -105,11 +105,11 @@
     </message>
     <message>
         <source>Parental Pin:</source>
-        <translation>PIN-koodi (Ikäluokitus):</translation>
+        <translation type="obsolete">PIN-koodi (Ikäluokitus):</translation>
     </message>
     <message>
         <source>No Cover</source>
-        <translation>Ei Kantta</translation>
+        <translation type="obsolete">Ei Kantta</translation>
     </message>
     <message>
         <source>Unknown</source>
@@ -121,7 +121,7 @@
     </message>
     <message>
         <source>Unknown Rating</source>
-        <translation>Tuntematon Arvostelu</translation>
+        <translation type="obsolete">Tuntematon Arvostelu</translation>
     </message>
     <message>
         <source>Newly scanned files are browsable by default</source>
@@ -262,6 +262,70 @@
     </message>
     <message>
         <source>If set along with Browse Files, this will cause the Video List to load any known video metadata from the database. Turning this off can greatly  speed up how long it takes to load the Video List tree</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sorting ignores case</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If set, case is ignored when sorting entries in a view.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show folders for database views</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If set, sub folders of your video directory will be shown in supported views.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Image cache size</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This setting determines the number of images MythVideo will cache for views.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>^(The |A |An )</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>All</source>
+        <translation type="unfinished">Kaikki</translation>
+    </message>
+    <message>
+        <source>Yes</source>
+        <translation type="unfinished">Kyllä</translation>
+    </message>
+    <message>
+        <source>No</source>
+        <translation type="unfinished">Ei</translation>
+    </message>
+    <message>
+        <source>Title</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Year</source>
+        <translation type="unfinished">Vuosi</translation>
+    </message>
+    <message>
+        <source>User Rating</source>
+        <translation type="unfinished">Arvostelu</translation>
+    </message>
+    <message>
+        <source>Runtime</source>
+        <translation type="unfinished">Pituus</translation>
+    </message>
+    <message>
+        <source>Filename</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Video ID</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -496,11 +560,11 @@
     </message>
     <message>
         <source>No rating available.</source>
-        <translation>Arvostelua ei saatavilla.</translation>
+        <translation type="obsolete">Arvostelua ei saatavilla.</translation>
     </message>
     <message>
         <source>minutes</source>
-        <translation>minuuttia</translation>
+        <translation type="obsolete">minuuttia</translation>
     </message>
     <message>
         <source>Watch This Video</source>
@@ -543,7 +607,7 @@
     </message>
     <message>
         <source>Parental Pin:</source>
-        <translation>PIN-koodi (Ikäluokitus):</translation>
+        <translation type="obsolete">PIN-koodi (Ikäluokitus):</translation>
     </message>
 </context>
 <context>
@@ -558,7 +622,7 @@
     </message>
     <message>
         <source>Unknown</source>
-        <translation>Tuntematon</translation>
+        <translation type="obsolete">Tuntematon</translation>
     </message>
     <message>
         <source>minutes</source>
@@ -566,7 +630,7 @@
     </message>
     <message>
         <source>All</source>
-        <translation>Kaikki</translation>
+        <translation type="obsolete">Kaikki</translation>
     </message>
     <message>
         <source>Save as default</source>
@@ -612,31 +676,31 @@
     </message>
     <message>
         <source>minutes</source>
-        <translation>minuuttia</translation>
+        <translation type="obsolete">minuuttia</translation>
     </message>
     <message>
         <source>Yes</source>
-        <translation>Kyllä</translation>
+        <translation type="obsolete">Kyllä</translation>
     </message>
     <message>
         <source>No</source>
-        <translation>Ei</translation>
+        <translation type="obsolete">Ei</translation>
     </message>
     <message>
         <source>No Cover</source>
-        <translation>Ei Kantta</translation>
+        <translation type="obsolete">Ei Kantta</translation>
     </message>
     <message>
         <source>Unknown</source>
-        <translation>Tuntematon</translation>
+        <translation type="obsolete">Tuntematon</translation>
     </message>
     <message>
         <source>None</source>
-        <translation>Ei Mikään</translation>
+        <translation type="obsolete">Ei Mikään</translation>
     </message>
     <message>
         <source>NR</source>
-        <translation>Ei Arvostelua</translation>
+        <translation type="obsolete">Ei Arvostelua</translation>
     </message>
     <message>
         <source>delete failed</source>
@@ -679,18 +743,18 @@
     <name>VideoSelected</name>
     <message>
         <source>No rating available.</source>
-        <translation>Arvostelua ei saatavilla.</translation>
+        <translation type="obsolete">Arvostelua ei saatavilla.</translation>
     </message>
     <message>
         <source>minutes</source>
-        <translation>minuuttia</translation>
+        <translation type="obsolete">minuuttia</translation>
     </message>
 </context>
 <context>
     <name>VideoTree</name>
     <message>
         <source>Parental Pin:</source>
-        <translation>PIN-koodi (Ikäluokitus):</translation>
+        <translation type="obsolete">PIN-koodi (Ikäluokitus):</translation>
     </message>
     <message>
         <source>Select action</source>

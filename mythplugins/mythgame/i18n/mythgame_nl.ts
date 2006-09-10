@@ -153,7 +153,7 @@
     </message>
     <message>
         <source>List of all file extensions to be used for this emulator. Blank means any file under ROM PATH is considered to be used with this emulator</source>
-        <translation>Lijst van alle extensies waarvoor deze emulator gebruikt kan worden. Leeg laten betekent dat elk bestand in deze map uitgevoerd kan worden door deze emulator.</translation>
+        <translation type="obsolete">Lijst van alle extensies waarvoor deze emulator gebruikt kan worden. Leeg laten betekent dat elk bestand in deze map uitgevoerd kan worden door deze emulator.</translation>
     </message>
     <message>
         <source>ScreenShots</source>
@@ -268,6 +268,14 @@ zeker dat u dit wil?</translation>
     <message>
         <source>SEGA/MASTER SYSYTEM</source>
         <translation>SEGA/MASTER SYSTEM</translation>
+    </message>
+    <message>
+        <source>A Comma seperated list of all file extensions for this emulator. Blank means any file under ROM PATH is considered to be used with this emulator</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>GAMEGEAR</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

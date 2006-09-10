@@ -174,7 +174,7 @@
     </message>
     <message>
         <source>MythGallery Settings</source>
-        <translation>Foto instellingen</translation>
+        <translation type="obsolete">Foto instellingen</translation>
     </message>
     <message>
         <source>This is a colon separated list of paths. If the path in the list is a directory, its contents will be copied. If it is an executable, it will be run.</source>
@@ -255,6 +255,14 @@
     <message>
         <source>Duration of OpenGL Transition (milliseconds)</source>
         <translation>Duur van de OpenGL overgangen (in milisecondes)</translation>
+    </message>
+    <message>
+        <source>MythGallery Settings (Slideshow)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>MythGallery Settings (General)</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>

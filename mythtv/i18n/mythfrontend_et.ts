@@ -1444,7 +1444,7 @@ Tagasipöördumine eelmisesse menüüsse.</translation>
     </message>
     <message>
         <source>A preserved episode is ignored in calculations for deleting episodes above the limit.  Auto-expiration is used to remove eligable programs when disk space is low.</source>
-        <translation>Limiiti ületanud episoodide kustutamisel säilitatud episoode ei arvestata.  Sobimatud programmid kustutatakse kõvaketta täitumisel automaatset aegumist kasutades.</translation>
+        <translation type="obsolete">Limiiti ületanud episoodide kustutamisel säilitatud episoode ei arvestata.  Sobimatud programmid kustutatakse kõvaketta täitumisel automaatset aegumist kasutades.</translation>
     </message>
     <message>
         <source>Do not preserve this episode</source>

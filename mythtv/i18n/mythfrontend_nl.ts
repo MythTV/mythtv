@@ -736,7 +736,7 @@ WAARSCHUWING: Druk nu geen toets als u een Air2PC HD-5000 kaart gebruikt!!!! Dez
     </message>
     <message>
         <source>This defines the offset the frequency coming from the LNB will be in high setting. For bandstacked LNBs this is the horizontal/left polarization band.</source>
-        <translation>>Dit geeft vanaf welke frequentie het signaal dat komt van de LNB gezien wordt in de hoge instelling. Voor bandstacked LNBs is dit de horizontale/linkse polarisatie band.</translation>
+        <translation>&gt;Dit geeft vanaf welke frequentie het signaal dat komt van de LNB gezien wordt in de hoge instelling. Voor bandstacked LNBs is dit de horizontale/linkse polarisatie band.</translation>
     </message>
     <message>
         <source>LNB Configuration</source>
@@ -932,6 +932,14 @@ WAARSCHUWING: Druk nu geen toets als u een Air2PC HD-5000 kaart gebruikt!!!! Dez
     <message>
         <source>Manual Record</source>
         <translation>Handmatig opnemen</translation>
+    </message>
+    <message>
+        <source>5 weekdays if daily</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>7 days per week if daily</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1242,7 +1250,7 @@ Terug naar het vorige menu.</translation>
     </message>
     <message>
         <source>A preserved episode is ignored in calculations for deleting episodes above the limit.  Auto-expiration is used to remove eligable programs when disk space is low.</source>
-        <translation>Met een gevrijwaarde aflevering wordt geen rekening gehouden bij de bepaling van maximaal te bewaren afleveringen. Automatisch vervallen zal het bestand verwijderen als uw schijf vol raakt.</translation>
+        <translation type="obsolete">Met een gevrijwaarde aflevering wordt geen rekening gehouden bij de bepaling van maximaal te bewaren afleveringen. Automatisch vervallen zal het bestand verwijderen als uw schijf vol raakt.</translation>
     </message>
     <message>
         <source>Do not preserve this episode</source>
@@ -3429,7 +3437,7 @@ Als er een opname start binnen deze tijdsperiode, zal de backend niet uitschakel
     </message>
     <message>
         <source>Check this option for budget BT878 based DVB-T cards such as the AverTV DVB-T that require the audio volume left alone.</source>
-        <translation>Selecteer voor budget DVB-T kaarten op bt878 gebaseerd, zoals de AverTV DVB-T, die vereisen dat het audio-volume niet veranderd wordt.</translation>
+        <translation type="obsolete">Selecteer voor budget DVB-T kaarten op bt878 gebaseerd, zoals de AverTV DVB-T, die vereisen dat het audio-volume niet veranderd wordt.</translation>
     </message>
     <message>
         <source>Time offset for thumbnail preview images</source>
@@ -3473,7 +3481,7 @@ Als er een opname start binnen deze tijdsperiode, zal de backend niet uitschakel
     </message>
     <message>
         <source>This option makes the backend dvb-recorder only open the card when it is actually in-use leaving it free for other programs at other times.</source>
-        <translation>Dit maakt dat de backend dvb-recorder de kaart enkel opent wanneer die echt in gebruik is, waardoor de kaart vrij blijft voor andere programma&apos;s.</translation>
+        <translation type="obsolete">Dit maakt dat de backend dvb-recorder de kaart enkel opent wanneer die echt in gebruik is, waardoor de kaart vrij blijft voor andere programma&apos;s.</translation>
     </message>
     <message>
         <source>Password required to view all recordings</source>
@@ -3726,7 +3734,7 @@ Voer 0 in om uit te schakelen.</translation>
     </message>
     <message>
         <source>If set, the MPEG4 encoder will use interlaced DCT encoding.  You probably want this when encoding interlaced video.</source>
-        <translation>Indien geselecteerd zal de MPEG4-encoder &quot;Interlaced DCT encoding&quot; gebruiken.
+        <translation type="obsolete">Indien geselecteerd zal de MPEG4-encoder &quot;Interlaced DCT encoding&quot; gebruiken.
 Best in te schakelen wanneer u interlaced video wil encoderen.</translation>
     </message>
     <message>
@@ -3735,7 +3743,7 @@ Best in te schakelen wanneer u interlaced video wil encoderen.</translation>
     </message>
     <message>
         <source>If set, the MPEG4 encoder will use interlaced motion estimation.  You probably want this when encoding interlaced video.</source>
-        <translation>Indien geselecteerd zal de MPEG4-encoder &quot;Interlaced motion estimation&quot; gebruiken.
+        <translation type="obsolete">Indien geselecteerd zal de MPEG4-encoder &quot;Interlaced motion estimation&quot; gebruiken.
 Best in te schakelen wanneer u interlaced video wil encoderen.</translation>
     </message>
     <message>
@@ -5146,11 +5154,11 @@ Werkt mogelijk alleen wanneer uitgevoerd in een venster.</translation>
     </message>
     <message>
         <source>Use Altivec-enhanced color space conversion</source>
-        <translation>Altivec-verbeterde kleuromgeving conversie gebruiken</translation>
+        <translation type="obsolete">Altivec-verbeterde kleuromgeving conversie gebruiken</translation>
     </message>
     <message>
         <source>If checked, YUV 4:2:0 will be converted to UYVY 4:2:2 in an Altivec-enabled routine.  If unchecked, QuickTime will handle the conversion instead.</source>
-        <translation>Indien geselecteerd zal YUV 4:2:0 omgezet worden naar UYVY 4:2:2 in een Altivec-routine. Indien uitgeschakeld zal QuickTime de omzetting doen.</translation>
+        <translation type="obsolete">Indien geselecteerd zal YUV 4:2:0 omgezet worden naar UYVY 4:2:2 in een Altivec-routine. Indien uitgeschakeld zal QuickTime de omzetting doen.</translation>
     </message>
     <message>
         <source>Recording Host</source>
@@ -5573,7 +5581,7 @@ De meeste kaarten kunnen dit automatisch detecteren, dus laat op auto staan, ten
     </message>
     <message>
         <source>Absolutely don&apos;t record</source>
-        <translation>Zeker niet opnemen</translation>
+        <translation type="obsolete">Zeker niet opnemen</translation>
     </message>
     <message>
         <source>Point to Point</source>
@@ -6250,7 +6258,7 @@ Myth zal nu afsluiten.</translation>
     </message>
     <message>
         <source>Normally the dvb-recording will drop packets from the card until a sequence start header is seen. This option turns off this feature.</source>
-        <translation>Normaal gesproken zal een dvb-opname paketten laten vallen tot er een &apos;sequence start header&apos; gezien wordt. Deze optie zet dit uit.</translation>
+        <translation type="obsolete">Normaal gesproken zal een dvb-opname paketten laten vallen tot er een &apos;sequence start header&apos; gezien wordt. Deze optie zet dit uit.</translation>
     </message>
     <message>
         <source>DBOX2 Streaming Port</source>
@@ -7789,7 +7797,7 @@ Myth zal nu afsluiten.</translation>
     </message>
     <message>
         <source>Device ID from the back of the HDHomeRun unit.</source>
-        <translation>ID aan de achterkant van het HDHomeRun apparaat.</translation>
+        <translation type="obsolete">ID aan de achterkant van het HDHomeRun apparaat.</translation>
     </message>
     <message>
         <source>Tuner</source>
@@ -8112,6 +8120,94 @@ Check if the video exists</source>
  &apos;%1&apos; in %2 mislukt.
 Controleer of de video bestaat</translation>
     </message>
+    <message>
+        <source>If set, the MPEG4 encoder will use interlaced DCT encoding. You may want this when encoding interlaced video, however, this is experimental and may cause damaged video.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If set, the MPEG4 encoder will use interlaced motion estimation. You may want this when encoding interlaced video, however, this is experimental and may cause damaged video.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Scanning</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>(CH)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>(REC)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Adjust Playback</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Adjust Recorder</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Colour</source>
+        <translation type="unfinished">Kleur</translation>
+    </message>
+    <message>
+        <source>Volume</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>MAX</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enable this option for budget BT878 based DVB-T cards such as the AverTV DVB-T which require the audio volume to be left alone.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Make the dvb-recording drop packets from the card until a sequence start header is seen.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This option makes the backend dvb-recorder only open the card when it is actually in-use, leaving it free for other programs at other times.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Device ID from the back of the HDHomeRun unit.  You may use &apos;FFFFFFFF&apos; if there is only one unit on your your network.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Experimental</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use Xv picture controls</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If enabled, Xv picture controls (brightness, contrast, etc.) are used during playback. These are independent of the Video4Linux controls used for recording. The Xv controls may not work properly on some systems.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use Vector-enhanced color space conversion</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If checked, YUV 4:2:0 will be converted to UYVY 4:2:2 in an Altivec/MMX enabled routine.  If unchecked, QuickTime will handle the conversion instead.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>General (AutoExpire)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Delete files slowly</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Some filesystems use a lot of resources when deleting large recording files.  This option makes Myth delete the file slowly to lessen the impact.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ScanCountry</name>
@@ -8191,6 +8287,37 @@ Controleer of de video bestaat</translation>
     <message>
         <source>Scan Type</source>
         <translation>Scan type</translation>
+    </message>
+</context>
+<context>
+    <name>ScanWizardScanner</name>
+    <message>
+        <source>ScanWizard</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Error tuning to transport</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Scanning</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Error parsing parameters</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failed to open &apos;%1&apos;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failed to parse &apos;%1&apos;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Error starting scan</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

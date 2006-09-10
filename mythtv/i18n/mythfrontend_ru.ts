@@ -1273,7 +1273,7 @@ Returning to the previous menu.</translation>
     </message>
     <message>
         <source>A preserved episode is ignored in calculations for deleting episodes above the limit.  Auto-expiration is used to remove eligable programs when disk space is low.</source>
-        <translation>Сохраненная серия игнорируется в подсчете серий для удаления сверх лимита. АвтоУстаревание используется для удаления программ, когда дисковое пространство заканчивается.</translation>
+        <translation type="obsolete">Сохраненная серия игнорируется в подсчете серий для удаления сверх лимита. АвтоУстаревание используется для удаления программ, когда дисковое пространство заканчивается.</translation>
     </message>
     <message>
         <source>Disable Auto Expire</source>
@@ -3115,7 +3115,7 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     </message>
     <message>
         <source>Absolutely don&apos;t record</source>
-        <translation>Абсолютно не записывать</translation>
+        <translation type="obsolete">Абсолютно не записывать</translation>
     </message>
     <message>
         <source>Codec</source>
@@ -3227,7 +3227,7 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     </message>
     <message>
         <source>If set, the MPEG4 encoder will use interlaced DCT encoding.  You probably want this when encoding interlaced video.</source>
-        <translation>Если установлено, кодер MPEG4 будет использовать чересстрочное DCT кодирование. Вы вероятно захотите использовать это при кодировании чересстрочного видео.</translation>
+        <translation type="obsolete">Если установлено, кодер MPEG4 будет использовать чересстрочное DCT кодирование. Вы вероятно захотите использовать это при кодировании чересстрочного видео.</translation>
     </message>
     <message>
         <source>Enable interlaced motion estimation</source>
@@ -3235,7 +3235,7 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     </message>
     <message>
         <source>If set, the MPEG4 encoder will use interlaced motion estimation.  You probably want this when encoding interlaced video.</source>
-        <translation>Если установлено, кодер MPEG4 будет использовать оценку чересстрочного видео. Вы вероятно захотите использовать это при кодировании чересстрочного видео.</translation>
+        <translation type="obsolete">Если установлено, кодер MPEG4 будет использовать оценку чересстрочного видео. Вы вероятно захотите использовать это при кодировании чересстрочного видео.</translation>
     </message>
     <message>
         <source>Enable high-quality encoding</source>
@@ -3957,7 +3957,7 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>Check this option for budget BT878 based DVB-T cards such as the AverTV DVB-T that require the audio volume left alone.</source>
-        <translation>Отметьте эту опцию для бюджетных DVB-T карт, базирующихся на BT878, таких как AverTV DVB-T, что требуется не трогать громкость.</translation>
+        <translation type="obsolete">Отметьте эту опцию для бюджетных DVB-T карт, базирующихся на BT878, таких как AverTV DVB-T, что требуется не трогать громкость.</translation>
     </message>
     <message>
         <source>DVB Card Number</source>
@@ -3981,7 +3981,7 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>Normally the dvb-recording will drop packets from the card until a sequence start header is seen. This option turns off this feature.</source>
-        <translation>Обычно, dvb-рекордеры будут отбрасывать пакеты от карты, пока не получат пакет начала последовательности. Эта опция отключает данное поведение.</translation>
+        <translation type="obsolete">Обычно, dvb-рекордеры будут отбрасывать пакеты от карты, пока не получат пакет начала последовательности. Эта опция отключает данное поведение.</translation>
     </message>
     <message>
         <source>Open DVB card on demand</source>
@@ -3989,7 +3989,7 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>This option makes the backend dvb-recorder only open the card when it is actually in-use leaving it free for other programs at other times.</source>
-        <translation>Эта опция заставляет сервер с dvb-рекордером открывать карту только когда она действительно используется оставляя ее свободной для других программ в остальное время.</translation>
+        <translation type="obsolete">Эта опция заставляет сервер с dvb-рекордером открывать карту только когда она действительно используется оставляя ее свободной для других программ в остальное время.</translation>
     </message>
     <message>
         <source>Cable box model</source>
@@ -6023,11 +6023,11 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>Use Altivec-enhanced color space conversion</source>
-        <translation>Использовать Altivec-ускорение для преобразования цветовых пространств</translation>
+        <translation type="obsolete">Использовать Altivec-ускорение для преобразования цветовых пространств</translation>
     </message>
     <message>
         <source>If checked, YUV 4:2:0 will be converted to UYVY 4:2:2 in an Altivec-enabled routine.  If unchecked, QuickTime will handle the conversion instead.</source>
-        <translation>Если разрешено, YUV 4:2:0 будет преобразовано в YUV 4:2:2 в режиме Altivec-ускорения. Если отключено, QuickTime будет использован для этого преобразования.</translation>
+        <translation type="obsolete">Если разрешено, YUV 4:2:0 будет преобразовано в YUV 4:2:2 в режиме Altivec-ускорения. Если отключено, QuickTime будет использован для этого преобразования.</translation>
     </message>
     <message>
         <source>Scale video as necessary</source>
@@ -7710,7 +7710,7 @@ MythTV сейчас завершает работу.</translation>
     </message>
     <message>
         <source>Device ID from the back of the HDHomeRun unit.</source>
-        <translation>Идентификатор устройства с задней стороны вашего HDHomeRun.</translation>
+        <translation type="obsolete">Идентификатор устройства с задней стороны вашего HDHomeRun.</translation>
     </message>
     <message>
         <source>Freebox MRL</source>
@@ -8123,6 +8123,70 @@ Check if the video exists</source>
     <message>
         <source>Some filesystems use a lot of resources when deleting large recording files.  This option makes Myth delete the file slowly to lessen the impact.</source>
         <translation>Некоторые файловые системы используют много ресурсов при удалении файлов. Эта опция заставляет MythTV удалять файлы медленно для уменьшения загрузки.</translation>
+    </message>
+    <message>
+        <source>If set, the MPEG4 encoder will use interlaced DCT encoding. You may want this when encoding interlaced video, however, this is experimental and may cause damaged video.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If set, the MPEG4 encoder will use interlaced motion estimation. You may want this when encoding interlaced video, however, this is experimental and may cause damaged video.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>(CH)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>(REC)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Adjust Playback</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Adjust Recorder</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Colour</source>
+        <translation type="unfinished">Цвет</translation>
+    </message>
+    <message>
+        <source>Volume</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>MAX</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enable this option for budget BT878 based DVB-T cards such as the AverTV DVB-T which require the audio volume to be left alone.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Make the dvb-recording drop packets from the card until a sequence start header is seen.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This option makes the backend dvb-recorder only open the card when it is actually in-use, leaving it free for other programs at other times.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Device ID from the back of the HDHomeRun unit.  You may use &apos;FFFFFFFF&apos; if there is only one unit on your your network.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use Vector-enhanced color space conversion</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If checked, YUV 4:2:0 will be converted to UYVY 4:2:2 in an Altivec/MMX enabled routine.  If unchecked, QuickTime will handle the conversion instead.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>General (AutoExpire)</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

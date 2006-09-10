@@ -1,8 +1,5 @@
 <!DOCTYPE TS><TS>
 <context>
-    <name>GLSingleView</name>
-</context>
-<context>
     <name>IconView</name>
     <message>
         <source>Import pictures?</source>
@@ -176,10 +173,6 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>MythGallery Settings</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>This is a colon separated list of paths. If the path in the list is a directory, its contents will be copied. If it is an executable, it will be run.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -259,8 +252,13 @@
         <source>Duration of OpenGL Transition (milliseconds)</source>
         <translation type="unfinished"></translation>
     </message>
-</context>
-<context>
-    <name>SingleView</name>
+    <message>
+        <source>MythGallery Settings (Slideshow)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>MythGallery Settings (General)</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 </TS>

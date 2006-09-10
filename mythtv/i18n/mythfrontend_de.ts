@@ -1106,6 +1106,14 @@ WARNING: Do not press button if you are using an Air2PC HD-5000 card!!!! This ca
         <source>Manual Record</source>
         <translation>Manuelle Aufnahme</translation>
     </message>
+    <message>
+        <source>5 weekdays if daily</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>7 days per week if daily</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>MythContext</name>
@@ -1419,7 +1427,7 @@ Kehre nun ins vorherige Menü zurück.</translation>
     </message>
     <message>
         <source>A preserved episode is ignored in calculations for deleting episodes above the limit.  Auto-expiration is used to remove eligable programs when disk space is low.</source>
-        <translation>Eine behaltene Folge wird vom autom. Löschen ausgenommen.  Bei knappem Speicherplatz werden dafür freigegebene Aufnahmen durch die &apos;Autom. Löschen&apos; Funktion gelöscht.</translation>
+        <translation type="obsolete">Eine behaltene Folge wird vom autom. Löschen ausgenommen.  Bei knappem Speicherplatz werden dafür freigegebene Aufnahmen durch die &apos;Autom. Löschen&apos; Funktion gelöscht.</translation>
     </message>
     <message>
         <source>Do not preserve this episode</source>
@@ -2805,7 +2813,7 @@ Kehre nun ins vorherige Menü zurück.</translation>
     </message>
     <message>
         <source>Use Xv picture controls</source>
-        <translation type="obsolete">Nutze Xv Bildregler</translation>
+        <translation type="unfinished">Nutze Xv Bildregler</translation>
     </message>
     <message>
         <source>Use the PVR-350&apos;s TV out / MPEG decoder</source>
@@ -3428,18 +3436,6 @@ Ihr XMLTV Grabber liefert keine Kanalnummern, Sie müssen sie deshalb manuell ei
         <translation>Status</translation>
     </message>
     <message>
-        <source>LNB LOF Switch</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>LNB LOF High</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>LNB LOF Low</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Recorder Options</source>
         <translation>Aufnahmeeinstellungen</translation>
     </message>
@@ -3657,7 +3653,7 @@ Ihr XMLTV Grabber liefert keine Kanalnummern, Sie müssen sie deshalb manuell ei
     </message>
     <message>
         <source>Check this option for budget BT878 based DVB-T cards such as the AverTV DVB-T that require the audio volume left alone.</source>
-        <translation>Wählen Sie diese Option für preiswerte, auf dem BT878 basierende, DVB-T Karten (z.B. AverTV DVB-T). Bei diesen Karten darf die Lautstärke nicht verändert werden.</translation>
+        <translation type="obsolete">Wählen Sie diese Option für preiswerte, auf dem BT878 basierende, DVB-T Karten (z.B. AverTV DVB-T). Bei diesen Karten darf die Lautstärke nicht verändert werden.</translation>
     </message>
     <message>
         <source>Time offset for thumbnail preview images</source>
@@ -3701,7 +3697,7 @@ Ihr XMLTV Grabber liefert keine Kanalnummern, Sie müssen sie deshalb manuell ei
     </message>
     <message>
         <source>This option makes the backend dvb-recorder only open the card when it is actually in-use leaving it free for other programs at other times.</source>
-        <translation>Falls gesetzt, wird das Backend die DVB-Karte nur bei Bedarf ansprechen. Ansonsten kann die Karte von anderen Programmen genutzt werden.</translation>
+        <translation type="obsolete">Falls gesetzt, wird das Backend die DVB-Karte nur bei Bedarf ansprechen. Ansonsten kann die Karte von anderen Programmen genutzt werden.</translation>
     </message>
     <message>
         <source>Password required to view all recordings</source>
@@ -3973,7 +3969,7 @@ Ihr XMLTV Grabber liefert keine Kanalnummern, Sie müssen sie deshalb manuell ei
     </message>
     <message>
         <source>If set, the MPEG4 encoder will use interlaced DCT encoding.  You probably want this when encoding interlaced video.</source>
-        <translation>Falls gesetzt, nutzt der MPEG4 Kodierer interlaced DCT Kodierung. Sie sollten diese Option für die Kodierung von interlaced Videomaterial nutzen.</translation>
+        <translation type="obsolete">Falls gesetzt, nutzt der MPEG4 Kodierer interlaced DCT Kodierung. Sie sollten diese Option für die Kodierung von interlaced Videomaterial nutzen.</translation>
     </message>
     <message>
         <source>Enable interlaced motion estimation</source>
@@ -3981,7 +3977,7 @@ Ihr XMLTV Grabber liefert keine Kanalnummern, Sie müssen sie deshalb manuell ei
     </message>
     <message>
         <source>If set, the MPEG4 encoder will use interlaced motion estimation.  You probably want this when encoding interlaced video.</source>
-        <translation>Falls gesetzt, nutzt der MPEG4 Kodierer interlaced Motion Estimation. Sie sollten diese Option für die Kodierung von interlaced Videomaterial nutzen.</translation>
+        <translation type="obsolete">Falls gesetzt, nutzt der MPEG4 Kodierer interlaced Motion Estimation. Sie sollten diese Option für die Kodierung von interlaced Videomaterial nutzen.</translation>
     </message>
     <message>
         <source>Keypress Application</source>
@@ -4440,7 +4436,7 @@ Ihr XMLTV Grabber liefert keine Kanalnummern, Sie müssen sie deshalb manuell ei
     </message>
     <message>
         <source>If enabled, Xv picture controls (brightness, contrast, etc.) are used during playback. These are independent of the Video4Linux controls used for recording. The Xv controls may not work properly on some systems.</source>
-        <translation type="obsolete">Falls gesetzt, können während der Wiedergabe die Xv Bildregler genutzt werden. Diese sind unabhängig von den für die Aufnahme verwendeten V4L Einstellungen. In manchen Rechnern könnten die Xv Regler nicht funktionieren.</translation>
+        <translation type="unfinished">Falls gesetzt, können während der Wiedergabe die Xv Bildregler genutzt werden. Diese sind unabhängig von den für die Aufnahme verwendeten V4L Einstellungen. In manchen Rechnern könnten die Xv Regler nicht funktionieren.</translation>
     </message>
     <message>
         <source>During playback, MythTV will listen for connections from the &quot;mythtvosd&quot; or &quot;mythudprelay&quot; programs on this port.  See the README in contrib/mythnotify/ for additional information.</source>
@@ -4792,7 +4788,7 @@ Ihr XMLTV Grabber liefert keine Kanalnummern, Sie müssen sie deshalb manuell ei
     </message>
     <message>
         <source>List upcoming episodes</source>
-        <translation>Zeige kommende Folgen</translation>
+        <translation type="obsolete">Zeige kommende Folgen</translation>
     </message>
     <message>
         <source>Show the program guide when starting Live TV</source>
@@ -5410,11 +5406,11 @@ Ihr XMLTV Grabber liefert keine Kanalnummern, Sie müssen sie deshalb manuell ei
     </message>
     <message>
         <source>Use Altivec-enhanced color space conversion</source>
-        <translation>Nutze für Altivec optimierte Farbraumumwandlung</translation>
+        <translation type="obsolete">Nutze für Altivec optimierte Farbraumumwandlung</translation>
     </message>
     <message>
         <source>If checked, YUV 4:2:0 will be converted to UYVY 4:2:2 in an Altivec-enabled routine.  If unchecked, QuickTime will handle the conversion instead.</source>
-        <translation>Falls gesetzt, werden Videodaten vom YUV 4:2:0 ins UYVY 4:2:2 Format über eine für Altivec optimierte Routine umgewandelt. Ansonsten wird QuickTime für die Umwandlung verwendet.</translation>
+        <translation type="obsolete">Falls gesetzt, werden Videodaten vom YUV 4:2:0 ins UYVY 4:2:2 Format über eine für Altivec optimierte Routine umgewandelt. Ansonsten wird QuickTime für die Umwandlung verwendet.</translation>
     </message>
     <message>
         <source>Recording Host</source>
@@ -5514,7 +5510,7 @@ Ihr XMLTV Grabber liefert keine Kanalnummern, Sie müssen sie deshalb manuell ei
     </message>
     <message>
         <source>Scanning</source>
-        <translation type="obsolete">Scannen</translation>
+        <translation type="unfinished">Scannen</translation>
     </message>
     <message>
         <source>This recording schedule is inactive</source>
@@ -5526,23 +5522,19 @@ Ihr XMLTV Grabber liefert keine Kanalnummern, Sie müssen sie deshalb manuell ei
     </message>
     <message>
         <source>DiSEqC Input Type: (DVB-S)</source>
-        <translation>DiSEqC Eingangsart: (DVB-S)</translation>
+        <translation type="obsolete">DiSEqC Eingangsart: (DVB-S)</translation>
     </message>
     <message>
         <source>Select the input type for DVB-S cards. Leave as Single LNB/Input for DVB-C or DVB-T. The inputs are mapped from Input Connections option on the main menu</source>
-        <translation>Wählen Sie den EIngangstyp für DVB-S Karten. Bei DVB-C und DVB-T bitte &apos;Einzelner LNB/Eingang&apos; wählen. Die Eingänge werden im &apos;Verknüpfungen&apos;-Menü zugeordnet.</translation>
-    </message>
-    <message>
-        <source>This defines at what frequency (in Hz) the LNB will do a switch from high to low setting, and vice versa.</source>
-        <translation type="unfinished"></translation>
+        <translation type="obsolete">Wählen Sie den EIngangstyp für DVB-S Karten. Bei DVB-C und DVB-T bitte &apos;Einzelner LNB/Eingang&apos; wählen. Die Eingänge werden im &apos;Verknüpfungen&apos;-Menü zugeordnet.</translation>
     </message>
     <message>
         <source>DiSEqC Satellite Location</source>
-        <translation>DiSEqC Satelliten-Position</translation>
+        <translation type="obsolete">DiSEqC Satelliten-Position</translation>
     </message>
     <message>
         <source>The longitude of the satellite you are aiming at.  For western hemisphere use a negative value.  Value is in decimal.</source>
-        <translation>Der Längengrad (dezimal) des anvisierten Satelliten.  Für die westliche Hemisspäre geben Sie negative Werte ein.</translation>
+        <translation type="obsolete">Der Längengrad (dezimal) des anvisierten Satelliten.  Für die westliche Hemisspäre geben Sie negative Werte ein.</translation>
     </message>
     <message>
         <source>Free to air channels only.</source>
@@ -5862,7 +5854,7 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     </message>
     <message>
         <source>Absolutely don&apos;t record</source>
-        <translation>Nicht aufnehmen</translation>
+        <translation type="obsolete">Nicht aufnehmen</translation>
     </message>
     <message>
         <source>Point to Point</source>
@@ -6549,7 +6541,7 @@ Myth wird nun beendet.</translation>
     </message>
     <message>
         <source>Normally the dvb-recording will drop packets from the card until a sequence start header is seen. This option turns off this feature.</source>
-        <translation>Bei DVB Aufnahmen werden normalerweise Datenpakete verworfen solange kein Sequence Startheader empfangen wurde. Diese Option schaltet dieses Merkmal ab.</translation>
+        <translation type="obsolete">Bei DVB Aufnahmen werden normalerweise Datenpakete verworfen solange kein Sequence Startheader empfangen wurde. Diese Option schaltet dieses Merkmal ab.</translation>
     </message>
     <message>
         <source>DBOX2 Streaming Port</source>
@@ -6911,11 +6903,11 @@ Myth wird nun beendet.</translation>
     </message>
     <message>
         <source>Select the LNB Settings for DVB-S cards.</source>
-        <translation>Wählen Sie die LNB Einstellungen (für DVB-S Karten).</translation>
+        <translation type="obsolete">Wählen Sie die LNB Einstellungen (für DVB-S Karten).</translation>
     </message>
     <message>
         <source>For DVB-C and DVB-T you don&apos;t need to set these values.</source>
-        <translation>Bei DVB-C und DVB-T müssen Sie diese Werte nicht angeben.</translation>
+        <translation type="obsolete">Bei DVB-C und DVB-T müssen Sie diese Werte nicht angeben.</translation>
     </message>
     <message>
         <source>Starting LiveTV channel.</source>
@@ -6991,7 +6983,7 @@ Myth wird nun beendet.</translation>
     </message>
     <message>
         <source>The option of scanning only at channel 78 and above is provided because most digital channels are in that range.</source>
-        <translation>Die Option nur ab Kanal 78 an aufwärts zu suchen existiert, da die meisten digitalen Sender in diesem Bereich liegen.</translation>
+        <translation type="obsolete">Die Option nur ab Kanal 78 an aufwärts zu suchen existiert, da die meisten digitalen Sender in diesem Bereich liegen.</translation>
     </message>
     <message>
         <source>ATSC Modulation</source>
@@ -7198,20 +7190,8 @@ Myth wird nun beendet.</translation>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>The Cartesian latitude for your location.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Use negative numbers for southern and western coordinates.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>The Cartesian longitude for your location.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>DiSEqC Options</source>
-        <translation>DiSEqC Optionen</translation>
+        <translation type="obsolete">DiSEqC Optionen</translation>
     </message>
     <message>
         <source>Period</source>
@@ -7251,7 +7231,7 @@ Myth wird nun beendet.</translation>
     </message>
     <message>
         <source>List previous episodes</source>
-        <translation>Zeige vorige Folgen</translation>
+        <translation type="obsolete">Zeige vorige Folgen</translation>
     </message>
     <message>
         <source>Preview schedule changes</source>
@@ -7641,50 +7621,6 @@ Myth wird nun beendet.</translation>
     </message>
     <message>
         <source>Command to run if your bios requires you to reboot to allow nvram-wakeup settings to take effect. Leave blank if your bios does not require a reboot. See the README file for more examples.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Single LNB / Input</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Tone Switch aka Mini DiSEqC (2-Way)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>DiSEqC v1.0 Switch (2-Way)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>DiSEqC v1.1 Switch (2-Way)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>DiSEqC v1.0 Switch (4-Way)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>DiSEqC v1.1 Switch (4-Way)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>DiSEqC v1.2 Positioner</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>DiSEqC v1.3 Positioner (Goto X)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>DiSEqC v1.1 or 2.1 (10-way method2)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>SW21 Switch (2-Way)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>SW64 Switch (3-Way)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -8214,10 +8150,6 @@ Myth wird nun beendet.</translation>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Device ID from the back of the HDHomeRun unit.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Tuner</source>
         <translation type="unfinished"></translation>
     </message>
@@ -8226,23 +8158,11 @@ Myth wird nun beendet.</translation>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>URL of the incomming stream (ex.: udp://?localport=1234)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>HDHomeRun DTV tuner box</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>CRC IP Network Recorder</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>This defines the offset (in Hz) the frequency coming from the LNB will be in high setting.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>This defines the offset (in Hz) the frequency coming from the LNB will be in low setting.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -8518,6 +8438,112 @@ Myth wird nun beendet.</translation>
         <source>On multiline displays try and display the time as large as possible.</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>If set, the MPEG4 encoder will use interlaced DCT encoding. You may want this when encoding interlaced video, however, this is experimental and may cause damaged video.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If set, the MPEG4 encoder will use interlaced motion estimation. You may want this when encoding interlaced video, however, this is experimental and may cause damaged video.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The option of scanning only &quot;High&quot; frequency channels is useful because most digital channels are on the higher frequencies.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Upcoming episodes for this title</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Upcoming episodes for this rule</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Previously scheduled episodes</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>(CH)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>(REC)</source>
+        <translation type="unfinished">(REC)</translation>
+    </message>
+    <message>
+        <source>Adjust Playback</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Adjust Recorder</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Colour</source>
+        <translation type="unfinished">Farbe</translation>
+    </message>
+    <message>
+        <source>Volume</source>
+        <translation type="unfinished">Lautstärke</translation>
+    </message>
+    <message>
+        <source>MAX</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enable this option for budget BT878 based DVB-T cards such as the AverTV DVB-T which require the audio volume to be left alone.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Make the dvb-recording drop packets from the card until a sequence start header is seen.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This option makes the backend dvb-recorder only open the card when it is actually in-use, leaving it free for other programs at other times.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Device ID from the back of the HDHomeRun unit.  You may use &apos;FFFFFFFF&apos; if there is only one unit on your your network.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>URL of the incoming stream (ex.: udp://?localport=1234)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>DVB options</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Experimental</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use Vector-enhanced color space conversion</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If checked, YUV 4:2:0 will be converted to UYVY 4:2:2 in an Altivec/MMX enabled routine.  If unchecked, QuickTime will handle the conversion instead.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>General (AutoExpire)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failed to open 
+ &apos;%1&apos; in %2 
+Check if the video exists</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Delete files slowly</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Some filesystems use a lot of resources when deleting large recording files.  This option makes Myth delete the file slowly to lessen the impact.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ScanCountry</name>
@@ -8603,23 +8629,23 @@ Myth wird nun beendet.</translation>
     <name>ScanWizardScanner</name>
     <message>
         <source>Scanning</source>
-        <translation type="obsolete">Scannen</translation>
+        <translation type="unfinished">Scannen</translation>
     </message>
     <message>
         <source>ScanWizard</source>
-        <translation type="obsolete">Scan-Assistent</translation>
+        <translation type="unfinished">Scan-Assistent</translation>
     </message>
     <message>
         <source>Error tuning to transport</source>
-        <translation type="obsolete">Fehler beim Einstellen der Transponderfrequenz</translation>
+        <translation type="unfinished">Fehler beim Einstellen der Transponderfrequenz</translation>
     </message>
     <message>
         <source>Error parsing parameters</source>
-        <translation type="obsolete">Fehler beim Analysieren der Parameter</translation>
+        <translation type="unfinished">Fehler beim Analysieren der Parameter</translation>
     </message>
     <message>
         <source>Error starting scan</source>
-        <translation type="obsolete">Fehler beim Starten des Scans</translation>
+        <translation type="unfinished">Fehler beim Starten des Scans</translation>
     </message>
     <message>
         <source>Failed to open : </source>
@@ -8628,6 +8654,14 @@ Myth wird nun beendet.</translation>
     <message>
         <source>Failed to parse : </source>
         <translation type="obsolete">Fehler beim analysieren: </translation>
+    </message>
+    <message>
+        <source>Failed to open &apos;%1&apos;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failed to parse &apos;%1&apos;</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -9438,6 +9472,10 @@ Keine weiteren Informationen</translation>
         <source>Toggle On/Off</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Rotor %1%</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ThemeUI</name>
@@ -9665,7 +9703,7 @@ Keine weiteren Informationen</translation>
     </message>
     <message>
         <source>Failed to open</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Öffnen fehlgeschlagen</translation>
     </message>
     <message>
         <source>Failed to probe</source>
@@ -9862,7 +9900,7 @@ Keine weiteren Informationen</translation>
     <name>pcHDTVConfigurationGroup</name>
     <message>
         <source>Failed to open</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Öffnen fehlgeschlagen</translation>
     </message>
     <message>
         <source>Failed to probe</source>

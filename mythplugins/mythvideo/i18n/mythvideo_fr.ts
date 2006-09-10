@@ -11,7 +11,7 @@
     </message>
     <message>
         <source>No Cover</source>
-        <translation>Pas d&apos;affiche</translation>
+        <translation type="obsolete">Pas d&apos;affiche</translation>
     </message>
     <message>
         <source>Done</source>
@@ -101,11 +101,11 @@
     </message>
     <message>
         <source>Parental Pin:</source>
-        <translation>Code parental:</translation>
+        <translation type="obsolete">Code parental:</translation>
     </message>
     <message>
         <source>No Cover</source>
-        <translation>Pas d&apos;affiche</translation>
+        <translation type="obsolete">Pas d&apos;affiche</translation>
     </message>
     <message>
         <source>Unknown</source>
@@ -117,7 +117,7 @@
     </message>
     <message>
         <source>Unknown Rating</source>
-        <translation>Tout public</translation>
+        <translation type="obsolete">Tout public</translation>
     </message>
     <message>
         <source>Default Player</source>
@@ -262,6 +262,70 @@
     </message>
     <message>
         <source>If set along with Browse Files, this will cause the Video List to load any known video metadata from the database. Turning this off can greatly  speed up how long it takes to load the Video List tree</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sorting ignores case</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If set, case is ignored when sorting entries in a view.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show folders for database views</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If set, sub folders of your video directory will be shown in supported views.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Image cache size</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This setting determines the number of images MythVideo will cache for views.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>^(The |A |An )</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>All</source>
+        <translation type="unfinished">tous</translation>
+    </message>
+    <message>
+        <source>Yes</source>
+        <translation type="unfinished">Oui</translation>
+    </message>
+    <message>
+        <source>No</source>
+        <translation type="unfinished">Non</translation>
+    </message>
+    <message>
+        <source>Title</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Year</source>
+        <translation type="unfinished">Année</translation>
+    </message>
+    <message>
+        <source>User Rating</source>
+        <translation type="unfinished">Notation</translation>
+    </message>
+    <message>
+        <source>Runtime</source>
+        <translation type="unfinished">Durée</translation>
+    </message>
+    <message>
+        <source>Filename</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Video ID</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -496,11 +560,11 @@
     </message>
     <message>
         <source>No rating available.</source>
-        <translation>Pas de note disponible.</translation>
+        <translation type="obsolete">Pas de note disponible.</translation>
     </message>
     <message>
         <source>minutes</source>
-        <translation>minutes</translation>
+        <translation type="obsolete">minutes</translation>
     </message>
     <message>
         <source>Watch This Video</source>
@@ -543,7 +607,7 @@
     </message>
     <message>
         <source>Parental Pin:</source>
-        <translation>Code parental:</translation>
+        <translation type="obsolete">Code parental:</translation>
     </message>
 </context>
 <context>
@@ -558,7 +622,7 @@
     </message>
     <message>
         <source>Unknown</source>
-        <translation>Inconnu</translation>
+        <translation type="obsolete">Inconnu</translation>
     </message>
     <message>
         <source>minutes</source>
@@ -566,7 +630,7 @@
     </message>
     <message>
         <source>All</source>
-        <translation>tous</translation>
+        <translation type="obsolete">tous</translation>
     </message>
     <message>
         <source>Save as default</source>
@@ -612,31 +676,31 @@
     </message>
     <message>
         <source>minutes</source>
-        <translation>minutes</translation>
+        <translation type="obsolete">minutes</translation>
     </message>
     <message>
         <source>Yes</source>
-        <translation>Oui</translation>
+        <translation type="obsolete">Oui</translation>
     </message>
     <message>
         <source>No</source>
-        <translation>Non</translation>
+        <translation type="obsolete">Non</translation>
     </message>
     <message>
         <source>No Cover</source>
-        <translation>Pas d&apos;affiche</translation>
+        <translation type="obsolete">Pas d&apos;affiche</translation>
     </message>
     <message>
         <source>Unknown</source>
-        <translation>Inconnu</translation>
+        <translation type="obsolete">Inconnu</translation>
     </message>
     <message>
         <source>None</source>
-        <translation>Aucun</translation>
+        <translation type="obsolete">Aucun</translation>
     </message>
     <message>
         <source>NR</source>
-        <translation>NR</translation>
+        <translation type="obsolete">NR</translation>
     </message>
     <message>
         <source>delete failed</source>
@@ -679,18 +743,18 @@
     <name>VideoSelected</name>
     <message>
         <source>No rating available.</source>
-        <translation>Pas de note disponible.</translation>
+        <translation type="obsolete">Pas de note disponible.</translation>
     </message>
     <message>
         <source>minutes</source>
-        <translation>minutes</translation>
+        <translation type="obsolete">minutes</translation>
     </message>
 </context>
 <context>
     <name>VideoTree</name>
     <message>
         <source>Parental Pin:</source>
-        <translation>Code parental:</translation>
+        <translation type="obsolete">Code parental:</translation>
     </message>
     <message>
         <source>Select action</source>

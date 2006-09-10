@@ -1094,6 +1094,14 @@ WARNING: Do not press button if you are using an Air2PC HD-5000 card!!!! This ca
         <source>Manual Record</source>
         <translation>Manuaalinen Nauhoitus</translation>
     </message>
+    <message>
+        <source>5 weekdays if daily</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>7 days per week if daily</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>MythContext</name>
@@ -1407,7 +1415,7 @@ Palaa edelliseen valikkoon.</translation>
     </message>
     <message>
         <source>A preserved episode is ignored in calculations for deleting episodes above the limit.  Auto-expiration is used to remove eligable programs when disk space is low.</source>
-        <translation>Säilytetty jakso jätetään laskuista,
+        <translation type="obsolete">Säilytetty jakso jätetään laskuista,
 kun jaksojen lukumäärän rajoitus on päällä.</translation>
     </message>
     <message>
@@ -2794,7 +2802,7 @@ kun jaksojen lukumäärän rajoitus on päällä.</translation>
     </message>
     <message>
         <source>Use Xv picture controls</source>
-        <translation type="obsolete">Käytä Xv kuvansäätöjä</translation>
+        <translation type="unfinished">Käytä Xv kuvansäätöjä</translation>
     </message>
     <message>
         <source>Use the PVR-350&apos;s TV out / MPEG decoder</source>
@@ -3644,7 +3652,7 @@ Käyttämäsi ohjelmahaku ei tue kanavanumeroita, joten ne on asetettava manuaal
     </message>
     <message>
         <source>Check this option for budget BT878 based DVB-T cards such as the AverTV DVB-T that require the audio volume left alone.</source>
-        <translation>Tämä valinta on halvoille BT878-perustaisille DVB-T-korteille kuten AverTV DVB-T, jotka vaativat, että äänenvoimakkuuteen jätetään koskematta.</translation>
+        <translation type="obsolete">Tämä valinta on halvoille BT878-perustaisille DVB-T-korteille kuten AverTV DVB-T, jotka vaativat, että äänenvoimakkuuteen jätetään koskematta.</translation>
     </message>
     <message>
         <source>Time offset for thumbnail preview images</source>
@@ -3688,7 +3696,7 @@ Käyttämäsi ohjelmahaku ei tue kanavanumeroita, joten ne on asetettava manuaal
     </message>
     <message>
         <source>This option makes the backend dvb-recorder only open the card when it is actually in-use leaving it free for other programs at other times.</source>
-        <translation>Valinnalla backend avaa DVB-kortin vain kun sitä tarvitaan, jättäen sen vapaaksi muiden ohjelmien käyttöön muuksi ajaksi.</translation>
+        <translation type="obsolete">Valinnalla backend avaa DVB-kortin vain kun sitä tarvitaan, jättäen sen vapaaksi muiden ohjelmien käyttöön muuksi ajaksi.</translation>
     </message>
     <message>
         <source>Password required to view all recordings</source>
@@ -3960,7 +3968,7 @@ Käyttämäsi ohjelmahaku ei tue kanavanumeroita, joten ne on asetettava manuaal
     </message>
     <message>
         <source>If set, the MPEG4 encoder will use interlaced DCT encoding.  You probably want this when encoding interlaced video.</source>
-        <translation>Asetettuna MPEG4 pakkaaja käyttää lomitettua koodausta. Aseta jos käytät lomitettua videota.</translation>
+        <translation type="obsolete">Asetettuna MPEG4 pakkaaja käyttää lomitettua koodausta. Aseta jos käytät lomitettua videota.</translation>
     </message>
     <message>
         <source>Enable interlaced motion estimation</source>
@@ -3968,7 +3976,7 @@ Käyttämäsi ohjelmahaku ei tue kanavanumeroita, joten ne on asetettava manuaal
     </message>
     <message>
         <source>If set, the MPEG4 encoder will use interlaced motion estimation.  You probably want this when encoding interlaced video.</source>
-        <translation>Asetettuna MPEG4 pakkaaja käyttää lomitettua liikkeen ennakointia. Aseta jos käytät lomitettua videota.</translation>
+        <translation type="obsolete">Asetettuna MPEG4 pakkaaja käyttää lomitettua liikkeen ennakointia. Aseta jos käytät lomitettua videota.</translation>
     </message>
     <message>
         <source>Keypress Application</source>
@@ -4427,7 +4435,7 @@ Käyttämäsi ohjelmahaku ei tue kanavanumeroita, joten ne on asetettava manuaal
     </message>
     <message>
         <source>If enabled, Xv picture controls (brightness, contrast, etc.) are used during playback. These are independent of the Video4Linux controls used for recording. The Xv controls may not work properly on some systems.</source>
-        <translation type="obsolete">Valittuna Xv kuvansäädöt (kirkkaus, kontrasti jne.) ovat käytössä toiston aikana. Eivät toimi kaikissa ympäristöissä.</translation>
+        <translation type="unfinished">Valittuna Xv kuvansäädöt (kirkkaus, kontrasti jne.) ovat käytössä toiston aikana. Eivät toimi kaikissa ympäristöissä.</translation>
     </message>
     <message>
         <source>During playback, MythTV will listen for connections from the &quot;mythtvosd&quot; or &quot;mythudprelay&quot; programs on this port.  See the README in contrib/mythnotify/ for additional information.</source>
@@ -5397,11 +5405,7 @@ Käyttämäsi ohjelmahaku ei tue kanavanumeroita, joten ne on asetettava manuaal
     </message>
     <message>
         <source>Use Altivec-enhanced color space conversion</source>
-        <translation>Käytä Altivec-värikonversaatiota</translation>
-    </message>
-    <message>
-        <source>If checked, YUV 4:2:0 will be converted to UYVY 4:2:2 in an Altivec-enabled routine.  If unchecked, QuickTime will handle the conversion instead.</source>
-        <translation type="unfinished"></translation>
+        <translation type="obsolete">Käytä Altivec-värikonversaatiota</translation>
     </message>
     <message>
         <source>Recording Host</source>
@@ -5501,7 +5505,7 @@ Käyttämäsi ohjelmahaku ei tue kanavanumeroita, joten ne on asetettava manuaal
     </message>
     <message>
         <source>Scanning</source>
-        <translation type="obsolete">Selataan</translation>
+        <translation type="unfinished">Selataan</translation>
     </message>
     <message>
         <source>Record one showing of this title</source>
@@ -5840,7 +5844,7 @@ Useimmat tv-kortit havaitsevat tämän automaattisesti.</translation>
     </message>
     <message>
         <source>Absolutely don&apos;t record</source>
-        <translation>Ei nauhoitusta, missään nimessä</translation>
+        <translation type="obsolete">Ei nauhoitusta, missään nimessä</translation>
     </message>
     <message>
         <source>Point to Point</source>
@@ -6523,10 +6527,6 @@ Myth lopetetaan.</translation>
     </message>
     <message>
         <source>What to use to separate ATSC major and minor channels.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Normally the dvb-recording will drop packets from the card until a sequence start header is seen. This option turns off this feature.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -8117,10 +8117,6 @@ Myth lopetetaan.</translation>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Device ID from the back of the HDHomeRun unit.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Tuner</source>
         <translation type="unfinished"></translation>
     </message>
@@ -8439,6 +8435,82 @@ Myth lopetetaan.</translation>
 Check if the video exists</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>If set, the MPEG4 encoder will use interlaced DCT encoding. You may want this when encoding interlaced video, however, this is experimental and may cause damaged video.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If set, the MPEG4 encoder will use interlaced motion estimation. You may want this when encoding interlaced video, however, this is experimental and may cause damaged video.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>(CH)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>(REC)</source>
+        <translation type="unfinished">(Nauhoitus)</translation>
+    </message>
+    <message>
+        <source>Adjust Playback</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Adjust Recorder</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Colour</source>
+        <translation type="unfinished">Väri</translation>
+    </message>
+    <message>
+        <source>Volume</source>
+        <translation type="unfinished">Äänenvoimakkuus</translation>
+    </message>
+    <message>
+        <source>MAX</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enable this option for budget BT878 based DVB-T cards such as the AverTV DVB-T which require the audio volume to be left alone.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Make the dvb-recording drop packets from the card until a sequence start header is seen.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This option makes the backend dvb-recorder only open the card when it is actually in-use, leaving it free for other programs at other times.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Device ID from the back of the HDHomeRun unit.  You may use &apos;FFFFFFFF&apos; if there is only one unit on your your network.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Experimental</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use Vector-enhanced color space conversion</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If checked, YUV 4:2:0 will be converted to UYVY 4:2:2 in an Altivec/MMX enabled routine.  If unchecked, QuickTime will handle the conversion instead.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>General (AutoExpire)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Delete files slowly</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Some filesystems use a lot of resources when deleting large recording files.  This option makes Myth delete the file slowly to lessen the impact.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ScanCountry</name>
@@ -8524,23 +8596,23 @@ Check if the video exists</source>
     <name>ScanWizardScanner</name>
     <message>
         <source>Scanning</source>
-        <translation type="obsolete">Selataan</translation>
+        <translation type="unfinished">Selataan</translation>
     </message>
     <message>
         <source>ScanWizard</source>
-        <translation type="obsolete">Viritysvelho</translation>
+        <translation type="unfinished">Viritysvelho</translation>
     </message>
     <message>
         <source>Error tuning to transport</source>
-        <translation type="obsolete">Virhe lähetysvirran virittämisessä</translation>
+        <translation type="unfinished">Virhe lähetysvirran virittämisessä</translation>
     </message>
     <message>
         <source>Error parsing parameters</source>
-        <translation type="obsolete">Virhe parametreissa</translation>
+        <translation type="unfinished">Virhe parametreissa</translation>
     </message>
     <message>
         <source>Error starting scan</source>
-        <translation type="obsolete">Virhe Etsinnässä</translation>
+        <translation type="unfinished">Virhe Etsinnässä</translation>
     </message>
     <message>
         <source>Failed to open : </source>
@@ -8549,6 +8621,14 @@ Check if the video exists</source>
     <message>
         <source>Failed to parse : </source>
         <translation type="obsolete">Ei saatu jäsennettyä : </translation>
+    </message>
+    <message>
+        <source>Failed to open &apos;%1&apos;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failed to parse &apos;%1&apos;</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

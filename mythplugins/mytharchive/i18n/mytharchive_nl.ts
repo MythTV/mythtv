@@ -325,7 +325,7 @@ Klik OK</translation>
     </message>
     <message>
         <source>Command to run tcrequant (Part of transcode package). Optional - leave blank if you don&apos;t have the transcode package installed.</source>
-        <translation>Het commando om tcrequant (onderdeel van transcode) te starten. Optioneel - laat dit leeg als u transcode niet geïnstalleerd heeft.</translation>
+        <translation>Het commando om tcrequant (onderdeel van transcode) te starten. Optioneel - laat dit leeg als u transcode niet geï¿½stalleerd heeft.</translation>
     </message>
     <message>
         <source>png2yuv command</source>

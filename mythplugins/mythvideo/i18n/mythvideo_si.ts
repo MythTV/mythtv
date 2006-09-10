@@ -11,7 +11,7 @@
     </message>
     <message>
         <source>No Cover</source>
-        <translation>Brez ovitka</translation>
+        <translation type="obsolete">Brez ovitka</translation>
     </message>
     <message>
         <source>Done</source>
@@ -201,11 +201,11 @@
     </message>
     <message>
         <source>Parental Pin:</source>
-        <translation>Originalni PIN:</translation>
+        <translation type="obsolete">Originalni PIN:</translation>
     </message>
     <message>
         <source>No Cover</source>
-        <translation>Ni ovitka</translation>
+        <translation type="obsolete">Ni ovitka</translation>
     </message>
     <message>
         <source>Unknown</source>
@@ -217,7 +217,7 @@
     </message>
     <message>
         <source>Unknown Rating</source>
-        <translation>Neznana ocena</translation>
+        <translation type="obsolete">Neznana ocena</translation>
     </message>
     <message>
         <source>Could not retrieve poster</source>
@@ -263,6 +263,70 @@
     </message>
     <message>
         <source>If set along with Browse Files, this will cause the Video List to load any known video metadata from the database. Turning this off can greatly  speed up how long it takes to load the Video List tree</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sorting ignores case</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If set, case is ignored when sorting entries in a view.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show folders for database views</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If set, sub folders of your video directory will be shown in supported views.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Image cache size</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This setting determines the number of images MythVideo will cache for views.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>^(The |A |An )</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>All</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Yes</source>
+        <translation type="unfinished">Da</translation>
+    </message>
+    <message>
+        <source>No</source>
+        <translation type="unfinished">Ne</translation>
+    </message>
+    <message>
+        <source>Title</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Year</source>
+        <translation type="unfinished">Leto</translation>
+    </message>
+    <message>
+        <source>User Rating</source>
+        <translation type="unfinished">Uporabnikova ocena</translation>
+    </message>
+    <message>
+        <source>Runtime</source>
+        <translation type="unfinished">Čas tečenja</translation>
+    </message>
+    <message>
+        <source>Filename</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Video ID</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -513,11 +577,11 @@
     </message>
     <message>
         <source>No rating available.</source>
-        <translation>Na voljo ni ocenjevanja.</translation>
+        <translation type="obsolete">Na voljo ni ocenjevanja.</translation>
     </message>
     <message>
         <source>minutes</source>
-        <translation>minute</translation>
+        <translation type="obsolete">minute</translation>
     </message>
 </context>
 <context>
@@ -544,7 +608,7 @@
     </message>
     <message>
         <source>Parental Pin:</source>
-        <translation type="unfinished">Originalni PIN:</translation>
+        <translation type="obsolete">Originalni PIN:</translation>
     </message>
 </context>
 <context>
@@ -559,15 +623,11 @@
     </message>
     <message>
         <source>Unknown</source>
-        <translation type="unfinished">Nezano</translation>
+        <translation type="obsolete">Nezano</translation>
     </message>
     <message>
         <source>minutes</source>
         <translation type="unfinished">minute</translation>
-    </message>
-    <message>
-        <source>All</source>
-        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Save as default</source>
@@ -605,15 +665,15 @@
     <name>VideoManager</name>
     <message>
         <source>minutes</source>
-        <translation>minute</translation>
+        <translation type="obsolete">minute</translation>
     </message>
     <message>
         <source>Yes</source>
-        <translation>Da</translation>
+        <translation type="obsolete">Da</translation>
     </message>
     <message>
         <source>No</source>
-        <translation>Ne</translation>
+        <translation type="obsolete">Ne</translation>
     </message>
     <message>
         <source>Select action:</source>
@@ -653,19 +713,19 @@
     </message>
     <message>
         <source>No Cover</source>
-        <translation>Ni ovitka</translation>
+        <translation type="obsolete">Ni ovitka</translation>
     </message>
     <message>
         <source>Unknown</source>
-        <translation>Nezano</translation>
+        <translation type="obsolete">Nezano</translation>
     </message>
     <message>
         <source>None</source>
-        <translation>Nobeden</translation>
+        <translation type="obsolete">Nobeden</translation>
     </message>
     <message>
         <source>NR</source>
-        <translation>NR</translation>
+        <translation type="obsolete">NR</translation>
     </message>
     <message>
         <source>Delete this file?</source>
@@ -680,18 +740,18 @@
     <name>VideoSelected</name>
     <message>
         <source>No rating available.</source>
-        <translation type="unfinished">Na voljo ni ocenjevanja.</translation>
+        <translation type="obsolete">Na voljo ni ocenjevanja.</translation>
     </message>
     <message>
         <source>minutes</source>
-        <translation type="unfinished">minute</translation>
+        <translation type="obsolete">minute</translation>
     </message>
 </context>
 <context>
     <name>VideoTree</name>
     <message>
         <source>Parental Pin:</source>
-        <translation>Originalni PIN:</translation>
+        <translation type="obsolete">Originalni PIN:</translation>
     </message>
     <message>
         <source>Select action</source>

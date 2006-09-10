@@ -11,7 +11,7 @@
     </message>
     <message>
         <source>No Cover</source>
-        <translation>Kein Cover</translation>
+        <translation type="obsolete">Kein Cover</translation>
     </message>
     <message>
         <source>Done</source>
@@ -101,11 +101,11 @@
     </message>
     <message>
         <source>Parental Pin:</source>
-        <translation>Kindersicherungs-PIN:</translation>
+        <translation type="obsolete">Kindersicherungs-PIN:</translation>
     </message>
     <message>
         <source>No Cover</source>
-        <translation>Kein Cover</translation>
+        <translation type="obsolete">Kein Cover</translation>
     </message>
     <message>
         <source>Unknown</source>
@@ -117,7 +117,7 @@
     </message>
     <message>
         <source>Unknown Rating</source>
-        <translation>Unbekannte Altersfreigabe</translation>
+        <translation type="obsolete">Unbekannte Altersfreigabe</translation>
     </message>
     <message>
         <source>Default Player</source>
@@ -264,6 +264,70 @@
     <message>
         <source>If set along with Browse Files, this will cause the Video List to load any known video metadata from the database. Turning this off can greatly  speed up how long it takes to load the Video List tree</source>
         <translation>Bei gleichzeitiger Benutzung mit &apos;Dateien anzeigen&apos; werden sämtliche bekannten Video-Metadaten aus der Datenbank geladen. Abschalten führt zu kürzeren Ladezeiten des Videolistenbaums</translation>
+    </message>
+    <message>
+        <source>Sorting ignores case</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If set, case is ignored when sorting entries in a view.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show folders for database views</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If set, sub folders of your video directory will be shown in supported views.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Image cache size</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This setting determines the number of images MythVideo will cache for views.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>^(The |A |An )</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>All</source>
+        <translation type="unfinished">Alle</translation>
+    </message>
+    <message>
+        <source>Yes</source>
+        <translation type="unfinished">Ja</translation>
+    </message>
+    <message>
+        <source>No</source>
+        <translation type="unfinished">Nein</translation>
+    </message>
+    <message>
+        <source>Title</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Year</source>
+        <translation type="unfinished">Jahr</translation>
+    </message>
+    <message>
+        <source>User Rating</source>
+        <translation type="unfinished">Bewertung</translation>
+    </message>
+    <message>
+        <source>Runtime</source>
+        <translation type="unfinished">Laufzeit</translation>
+    </message>
+    <message>
+        <source>Filename</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Video ID</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -497,11 +561,11 @@
     </message>
     <message>
         <source>No rating available.</source>
-        <translation>Keine Altersfreigabe vorhanden.</translation>
+        <translation type="obsolete">Keine Altersfreigabe vorhanden.</translation>
     </message>
     <message>
         <source>minutes</source>
-        <translation>Minuten</translation>
+        <translation type="obsolete">Minuten</translation>
     </message>
     <message>
         <source>Watch This Video</source>
@@ -544,7 +608,7 @@
     </message>
     <message>
         <source>Parental Pin:</source>
-        <translation>Kindersicherungs-PIN:</translation>
+        <translation type="obsolete">Kindersicherungs-PIN:</translation>
     </message>
 </context>
 <context>
@@ -559,7 +623,7 @@
     </message>
     <message>
         <source>Unknown</source>
-        <translation>Unbekannt</translation>
+        <translation type="obsolete">Unbekannt</translation>
     </message>
     <message>
         <source>minutes</source>
@@ -567,7 +631,7 @@
     </message>
     <message>
         <source>All</source>
-        <translation>Alle</translation>
+        <translation type="obsolete">Alle</translation>
     </message>
     <message>
         <source>Save as default</source>
@@ -613,31 +677,31 @@
     </message>
     <message>
         <source>minutes</source>
-        <translation>Minuten</translation>
+        <translation type="obsolete">Minuten</translation>
     </message>
     <message>
         <source>Yes</source>
-        <translation>Ja</translation>
+        <translation type="obsolete">Ja</translation>
     </message>
     <message>
         <source>No</source>
-        <translation>Nein</translation>
+        <translation type="obsolete">Nein</translation>
     </message>
     <message>
         <source>No Cover</source>
-        <translation>Kein Cover</translation>
+        <translation type="obsolete">Kein Cover</translation>
     </message>
     <message>
         <source>Unknown</source>
-        <translation>Unbekannt</translation>
+        <translation type="obsolete">Unbekannt</translation>
     </message>
     <message>
         <source>None</source>
-        <translation>Nicht vorhanden</translation>
+        <translation type="obsolete">Nicht vorhanden</translation>
     </message>
     <message>
         <source>NR</source>
-        <translation>Unbewertet</translation>
+        <translation type="obsolete">Unbewertet</translation>
     </message>
     <message>
         <source>delete failed</source>
@@ -680,18 +744,18 @@
     <name>VideoSelected</name>
     <message>
         <source>No rating available.</source>
-        <translation>Keine Altersfreigabe vorhanden.</translation>
+        <translation type="obsolete">Keine Altersfreigabe vorhanden.</translation>
     </message>
     <message>
         <source>minutes</source>
-        <translation>Minuten</translation>
+        <translation type="obsolete">Minuten</translation>
     </message>
 </context>
 <context>
     <name>VideoTree</name>
     <message>
         <source>Parental Pin:</source>
-        <translation>Kindersicherungs-PIN:</translation>
+        <translation type="obsolete">Kindersicherungs-PIN:</translation>
     </message>
     <message>
         <source>Select action</source>

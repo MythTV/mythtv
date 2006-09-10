@@ -134,10 +134,6 @@
         <translation>Tiedostojen Päätteet</translation>
     </message>
     <message>
-        <source>List of all file extensions to be used for this emulator. Blank means any file under ROM PATH is considered to be used with this emulator</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>ScreenShots</source>
         <translation>Kuvakaappaukset</translation>
     </message>
@@ -271,6 +267,14 @@ Pelitietokannasta. Oletko Varma?</translation>
     <message>
         <source>SEGA/MASTER SYSYTEM</source>
         <translation>SEGA/MASTER Systeemi</translation>
+    </message>
+    <message>
+        <source>A Comma seperated list of all file extensions for this emulator. Blank means any file under ROM PATH is considered to be used with this emulator</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>GAMEGEAR</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

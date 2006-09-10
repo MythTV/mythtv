@@ -285,6 +285,10 @@ Oled sa ikka kindel, et soovid seda?</translation>
         <source>SEGA/MASTER SYSYTEM</source>
         <translation>SEGA/MASTER SYSYTEM</translation>
     </message>
+    <message>
+        <source>GAMEGEAR</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ThemeUI</name>

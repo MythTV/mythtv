@@ -269,6 +269,10 @@ att du vill göra detta?</translation>
         <source>A Comma seperated list of all file extensions for this emulator. Blank means any file under ROM PATH is considered to be used with this emulator</source>
         <translation>Kommaseparerad lista över alla filändelser som används av denna emulator. Tomt betyder att alla filer under Rom-sökvägen anses användas av denna emulator</translation>
     </message>
+    <message>
+        <source>GAMEGEAR</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ThemeUI</name>

@@ -506,11 +506,11 @@
     </message>
     <message>
         <source>Speed Dials</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Hurtigkald</translation>
     </message>
     <message>
         <source>Voicemail</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Voicemail</translation>
     </message>
     <message>
         <source>Placed Calls</source>

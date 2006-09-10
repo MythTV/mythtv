@@ -153,7 +153,7 @@
     </message>
     <message>
         <source>List of all file extensions to be used for this emulator. Blank means any file under ROM PATH is considered to be used with this emulator</source>
-        <translation>Liste med alle fil endelser som bruges til denne emulator. Blank gør at alle filer under denne sti kan bruges til denne emulator</translation>
+        <translation type="obsolete">Liste med alle fil endelser som bruges til denne emulator. Blank gør at alle filer under denne sti kan bruges til denne emulator</translation>
     </message>
     <message>
         <source>ScreenShots</source>
@@ -273,6 +273,14 @@ at du vil gøre det?</translation>
     <message>
         <source>SEGA/MASTER SYSYTEM</source>
         <translation>SEGA/MASTER SYSYTEM</translation>
+    </message>
+    <message>
+        <source>A Comma seperated list of all file extensions for this emulator. Blank means any file under ROM PATH is considered to be used with this emulator</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>GAMEGEAR</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

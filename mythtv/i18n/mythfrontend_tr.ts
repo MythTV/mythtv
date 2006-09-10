@@ -1106,6 +1106,14 @@ WARNING: Do not press button if you are using an Air2PC HD-5000 card!!!! This ca
         <source>Manual Record</source>
         <translation>Manüel Kayıt</translation>
     </message>
+    <message>
+        <source>5 weekdays if daily</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>7 days per week if daily</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>MythContext</name>
@@ -1449,7 +1457,7 @@ Returning to the previous menu.</source>
     </message>
     <message>
         <source>A preserved episode is ignored in calculations for deleting episodes above the limit.  Auto-expiration is used to remove eligable programs when disk space is low.</source>
-        <translation>Sınırın üstündeki bölümleri silmek için yapılan hesaplamalarda saklı bir bölüm göz ardı edilir.  Otomatik zamanaşımı, diskteki alan azaldığında seçilebilir programları silmek için kullanılır.</translation>
+        <translation type="obsolete">Sınırın üstündeki bölümleri silmek için yapılan hesaplamalarda saklı bir bölüm göz ardı edilir.  Otomatik zamanaşımı, diskteki alan azaldığında seçilebilir programları silmek için kullanılır.</translation>
     </message>
     <message>
         <source>Disable Auto Expire</source>
@@ -3279,7 +3287,7 @@ Returning to the previous menu.</source>
     </message>
     <message>
         <source>Absolutely don&apos;t record</source>
-        <translation>Kesinlikle kaydetme</translation>
+        <translation type="obsolete">Kesinlikle kaydetme</translation>
     </message>
     <message>
         <source>Codec</source>
@@ -3387,7 +3395,7 @@ Returning to the previous menu.</source>
     </message>
     <message>
         <source>If set, the MPEG4 encoder will use interlaced DCT encoding.  You probably want this when encoding interlaced video.</source>
-        <translation>Bu ayarlandığında, MPEG4 kod çözücüsü iç içe DCT kodlamasını kullanır.  Bunu büyük ihtimal iç içe video kodlaması yaparken istersiniz.</translation>
+        <translation type="obsolete">Bu ayarlandığında, MPEG4 kod çözücüsü iç içe DCT kodlamasını kullanır.  Bunu büyük ihtimal iç içe video kodlaması yaparken istersiniz.</translation>
     </message>
     <message>
         <source>Enable interlaced motion estimation</source>
@@ -3395,7 +3403,7 @@ Returning to the previous menu.</source>
     </message>
     <message>
         <source>If set, the MPEG4 encoder will use interlaced motion estimation.  You probably want this when encoding interlaced video.</source>
-        <translation>Bu ayarlandığında, MPEG4 kod çözücüsü iç içe hareket tahminini kullanır.  Bunu büyük ihtimal iç içe video kodlaması yaparken istersiniz.</translation>
+        <translation type="obsolete">Bu ayarlandığında, MPEG4 kod çözücüsü iç içe hareket tahminini kullanır.  Bunu büyük ihtimal iç içe video kodlaması yaparken istersiniz.</translation>
     </message>
     <message>
         <source>Enable high-quality encoding</source>
@@ -3539,7 +3547,7 @@ Returning to the previous menu.</source>
     </message>
     <message>
         <source>Scanning</source>
-        <translation type="obsolete">Tarıyor</translation>
+        <translation type="unfinished">Tarıyor</translation>
     </message>
     <message>
         <source>ATSC Channel %1</source>
@@ -4123,7 +4131,7 @@ Returning to the previous menu.</source>
     </message>
     <message>
         <source>Check this option for budget BT878 based DVB-T cards such as the AverTV DVB-T that require the audio volume left alone.</source>
-        <translation>Ses düzeyine dokunmamanızı gerektiren AverTV DVB-T gibi BT878 tabanlı DVB-T kartları için bu seçeneği işaretleyin.</translation>
+        <translation type="obsolete">Ses düzeyine dokunmamanızı gerektiren AverTV DVB-T gibi BT878 tabanlı DVB-T kartları için bu seçeneği işaretleyin.</translation>
     </message>
     <message>
         <source>DVB Card Number</source>
@@ -4171,7 +4179,7 @@ Returning to the previous menu.</source>
     </message>
     <message>
         <source>Normally the dvb-recording will drop packets from the card until a sequence start header is seen. This option turns off this feature.</source>
-        <translation>Normalde dvb kaydı, bir sıra başlangıç başlığı görünene kadar karttan gelen paketleri bırakır. Bu seçenek, bu özelliği kapatır.</translation>
+        <translation type="obsolete">Normalde dvb kaydı, bir sıra başlangıç başlığı görünene kadar karttan gelen paketleri bırakır. Bu seçenek, bu özelliği kapatır.</translation>
     </message>
     <message>
         <source>Open DVB card on demand</source>
@@ -4179,7 +4187,7 @@ Returning to the previous menu.</source>
     </message>
     <message>
         <source>This option makes the backend dvb-recorder only open the card when it is actually in-use leaving it free for other programs at other times.</source>
-        <translation>Bu seçenek, arka uç dvb kaydedicisinin kartı sadece gerçekten kullanımdayken açmasını sağlar ve diğer zamanlarda diğer kullanımlar için onu serbest bırakır.</translation>
+        <translation type="obsolete">Bu seçenek, arka uç dvb kaydedicisinin kartı sadece gerçekten kullanımdayken açmasını sağlar ve diğer zamanlarda diğer kullanımlar için onu serbest bırakır.</translation>
     </message>
     <message>
         <source>DiSEqC Input Type: (DVB-S)</source>
@@ -5207,11 +5215,11 @@ Returning to the previous menu.</source>
     </message>
     <message>
         <source>Use Xv picture controls</source>
-        <translation type="obsolete">Xv görüntü kumandalarını kullanın</translation>
+        <translation type="unfinished">Xv görüntü kumandalarını kullanın</translation>
     </message>
     <message>
         <source>If enabled, Xv picture controls (brightness, contrast, etc.) are used during playback. These are independent of the Video4Linux controls used for recording. The Xv controls may not work properly on some systems.</source>
-        <translation type="obsolete">Bu etkinse, Xv görüntü kumandaları (parlaklık, karşıtlık, vs.), kayıttan çalma sırasında kullanılır. Bunlar, kayıt için kullanılan Video4Linux kumandalarından bağımsızdır. Xv kumandaları bazı sistemlerde düzgün bir biçimde çalışmayabilir.</translation>
+        <translation type="unfinished">Bu etkinse, Xv görüntü kumandaları (parlaklık, karşıtlık, vs.), kayıttan çalma sırasında kullanılır. Bunlar, kayıt için kullanılan Video4Linux kumandalarından bağımsızdır. Xv kumandaları bazı sistemlerde düzgün bir biçimde çalışmayabilir.</translation>
     </message>
     <message>
         <source>Enable warning about missing audio output</source>
@@ -6343,11 +6351,11 @@ Returning to the previous menu.</source>
     </message>
     <message>
         <source>Use Altivec-enhanced color space conversion</source>
-        <translation>Altivec-geliştirilmiş renk alanı dönüştürmesini kullanın</translation>
+        <translation type="obsolete">Altivec-geliştirilmiş renk alanı dönüştürmesini kullanın</translation>
     </message>
     <message>
         <source>If checked, YUV 4:2:0 will be converted to UYVY 4:2:2 in an Altivec-enabled routine.  If unchecked, QuickTime will handle the conversion instead.</source>
-        <translation>Bu işaretlendiğinde, YUV 4:2:0, Altivec-etkinleştirilmiş bir rutinde UYVY 4:2:2&apos;ye dönüştürülür.  İşaretlenmediğinde, onun yerine QuickTime dönüştürmeyi halleder.</translation>
+        <translation type="obsolete">Bu işaretlendiğinde, YUV 4:2:0, Altivec-etkinleştirilmiş bir rutinde UYVY 4:2:2&apos;ye dönüştürülür.  İşaretlenmediğinde, onun yerine QuickTime dönüştürmeyi halleder.</translation>
     </message>
     <message>
         <source>Scale video as necessary</source>
@@ -8217,10 +8225,6 @@ Your grabber does not provide channel numbers, so you have to set them manually.
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Device ID from the back of the HDHomeRun unit.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Tuner</source>
         <translation type="unfinished"></translation>
     </message>
@@ -8627,6 +8631,82 @@ Myth will now exit.</source>
 Check if the video exists</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>If set, the MPEG4 encoder will use interlaced DCT encoding. You may want this when encoding interlaced video, however, this is experimental and may cause damaged video.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If set, the MPEG4 encoder will use interlaced motion estimation. You may want this when encoding interlaced video, however, this is experimental and may cause damaged video.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>(CH)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>(REC)</source>
+        <translation type="unfinished">(REC)</translation>
+    </message>
+    <message>
+        <source>Adjust Playback</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Adjust Recorder</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Colour</source>
+        <translation type="unfinished">Renk</translation>
+    </message>
+    <message>
+        <source>Volume</source>
+        <translation type="unfinished">Ses</translation>
+    </message>
+    <message>
+        <source>MAX</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enable this option for budget BT878 based DVB-T cards such as the AverTV DVB-T which require the audio volume to be left alone.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Make the dvb-recording drop packets from the card until a sequence start header is seen.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This option makes the backend dvb-recorder only open the card when it is actually in-use, leaving it free for other programs at other times.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Device ID from the back of the HDHomeRun unit.  You may use &apos;FFFFFFFF&apos; if there is only one unit on your your network.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Experimental</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use Vector-enhanced color space conversion</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If checked, YUV 4:2:0 will be converted to UYVY 4:2:2 in an Altivec/MMX enabled routine.  If unchecked, QuickTime will handle the conversion instead.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>General (AutoExpire)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Delete files slowly</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Some filesystems use a lot of resources when deleting large recording files.  This option makes Myth delete the file slowly to lessen the impact.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ScanCountry</name>
@@ -8712,19 +8792,19 @@ Check if the video exists</source>
     <name>ScanWizardScanner</name>
     <message>
         <source>ScanWizard</source>
-        <translation type="obsolete">Tarama Sihirbası</translation>
+        <translation type="unfinished">Tarama Sihirbası</translation>
     </message>
     <message>
         <source>Error tuning to transport</source>
-        <translation type="obsolete">Aktarmaya ayarlama hatası</translation>
+        <translation type="unfinished">Aktarmaya ayarlama hatası</translation>
     </message>
     <message>
         <source>Scanning</source>
-        <translation type="obsolete">Tarıyor</translation>
+        <translation type="unfinished">Tarıyor</translation>
     </message>
     <message>
         <source>Error starting scan</source>
-        <translation type="obsolete">Taramayı başlatma hatası</translation>
+        <translation type="unfinished">Taramayı başlatma hatası</translation>
     </message>
     <message>
         <source>Failed to open : </source>
@@ -8736,7 +8816,15 @@ Check if the video exists</source>
     </message>
     <message>
         <source>Error parsing parameters</source>
-        <translation type="obsolete">Parametreleri ayrıştırma hatası</translation>
+        <translation type="unfinished">Parametreleri ayrıştırma hatası</translation>
+    </message>
+    <message>
+        <source>Failed to open &apos;%1&apos;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failed to parse &apos;%1&apos;</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

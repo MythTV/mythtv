@@ -1062,6 +1062,14 @@ WARNING: Do not press button if you are using an Air2PC HD-5000 card!!!! This ca
         <source>Manual Record</source>
         <translation>Ročno snemanje</translation>
     </message>
+    <message>
+        <source>5 weekdays if daily</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>7 days per week if daily</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>MythContext</name>
@@ -1369,7 +1377,7 @@ Returning to the previous menu.</source>
     </message>
     <message>
         <source>A preserved episode is ignored in calculations for deleting episodes above the limit.  Auto-expiration is used to remove eligable programs when disk space is low.</source>
-        <translation>Zaradi preračunavanj nad mejo bo serija ignorirana.  Kadar je premalo prostora na disku bo Avto-brisanje uporabljeno za odstranitev takšnih programov.</translation>
+        <translation type="obsolete">Zaradi preračunavanj nad mejo bo serija ignorirana.  Kadar je premalo prostora na disku bo Avto-brisanje uporabljeno za odstranitev takšnih programov.</translation>
     </message>
     <message>
         <source>Do not preserve this episode</source>
@@ -2714,7 +2722,7 @@ Returning to the previous menu.</source>
     </message>
     <message>
         <source>If set, the MPEG4 encoder will use interlaced DCT encoding.  You probably want this when encoding interlaced video.</source>
-        <translation>Če nastavljeno, bo MPEG4 kodirnik uporabljal prepleten način DTC kodiranja. Verjetno želite to opcijo kadar kodirate prepleteni video.</translation>
+        <translation type="obsolete">Če nastavljeno, bo MPEG4 kodirnik uporabljal prepleten način DTC kodiranja. Verjetno želite to opcijo kadar kodirate prepleteni video.</translation>
     </message>
     <message>
         <source>Enable interlaced motion estimation</source>
@@ -2722,7 +2730,7 @@ Returning to the previous menu.</source>
     </message>
     <message>
         <source>If set, the MPEG4 encoder will use interlaced motion estimation.  You probably want this when encoding interlaced video.</source>
-        <translation>Če nastavljeno, bo MPEG4 kodirnik uporabljal oceno prepletanja. Verjetno želite uporabljati to opcijo kadar kodirate prepleteni video.</translation>
+        <translation type="obsolete">Če nastavljeno, bo MPEG4 kodirnik uporabljal oceno prepletanja. Verjetno želite uporabljati to opcijo kadar kodirate prepleteni video.</translation>
     </message>
     <message>
         <source>Enable high-quality encoding</source>
@@ -3096,7 +3104,7 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>Check this option for budget BT878 based DVB-T cards such as the AverTV DVB-T that require the audio volume left alone.</source>
-        <translation>Označi to opcijo za DVB-T kartice z BT878 čipovjem, kot je AverTV DVB-T, za katero se glasnost zvoka ne sme spreminjati</translation>
+        <translation type="obsolete">Označi to opcijo za DVB-T kartice z BT878 čipovjem, kot je AverTV DVB-T, za katero se glasnost zvoka ne sme spreminjati</translation>
     </message>
     <message>
         <source>DVB Card Number</source>
@@ -3116,7 +3124,7 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>This option makes the backend dvb-recorder only open the card when it is actually in-use leaving it free for other programs at other times.</source>
-        <translation>Ta možnost omogoči dvb-snemalniku, da uporablja kartico za zajem samo v primeru, ko je v pravzaprav uporabi in jo hkrati pusti na voljo drugim programom.</translation>
+        <translation type="obsolete">Ta možnost omogoči dvb-snemalniku, da uporablja kartico za zajem samo v primeru, ko je v pravzaprav uporabi in jo hkrati pusti na voljo drugim programom.</translation>
     </message>
     <message>
         <source>Capture Card Setup</source>
@@ -3670,11 +3678,11 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>Use Xv picture controls</source>
-        <translation type="obsolete">Uporabi Xv kontrolo slike</translation>
+        <translation type="unfinished">Uporabi Xv kontrolo slike</translation>
     </message>
     <message>
         <source>If enabled, Xv picture controls (brightness, contrast, etc.) are used during playback. These are independent of the Video4Linux controls used for recording. The Xv controls may not work properly on some systems.</source>
-        <translation type="obsolete">Če omogočeno, bodo med predvajanjem uporabljene Xv kontrole slike (svetlost, kontrast, ipd.) Za zajem so uporabljene neodvisne V4L kontrole. Na nekaterih sistemih Xv kontrole ne bodo delovale pravilno.</translation>
+        <translation type="unfinished">Če omogočeno, bodo med predvajanjem uporabljene Xv kontrole slike (svetlost, kontrast, ipd.) Za zajem so uporabljene neodvisne V4L kontrole. Na nekaterih sistemih Xv kontrole ne bodo delovale pravilno.</translation>
     </message>
     <message>
         <source>UDP Notify Port</source>
@@ -5352,11 +5360,11 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>Use Altivec-enhanced color space conversion</source>
-        <translation>uporabi Altivec-napredno barvno pretvorbo</translation>
+        <translation type="obsolete">uporabi Altivec-napredno barvno pretvorbo</translation>
     </message>
     <message>
         <source>If checked, YUV 4:2:0 will be converted to UYVY 4:2:2 in an Altivec-enabled routine.  If unchecked, QuickTime will handle the conversion instead.</source>
-        <translation>Če omogočeno, bo YUV 4:2:0 pretvorjen v UYVY 4:2:2.  Če neomogočeno, bo pretvorbo napravil QuickTime.</translation>
+        <translation type="obsolete">Če omogočeno, bo YUV 4:2:0 pretvorjen v UYVY 4:2:2.  Če neomogočeno, bo pretvorbo napravil QuickTime.</translation>
     </message>
     <message>
         <source>Recording Host</source>
@@ -5456,7 +5464,7 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>Scanning</source>
-        <translation type="obsolete">Iskanje</translation>
+        <translation type="unfinished">Iskanje</translation>
     </message>
     <message>
         <source>Record one showing of this title</source>
@@ -5815,7 +5823,7 @@ Večina kartic samo zazna te nastavitve, pustite na Avto drugače ne bo delovalo
     </message>
     <message>
         <source>Absolutely don&apos;t record</source>
-        <translation>Absolutno ne snemaj</translation>
+        <translation type="obsolete">Absolutno ne snemaj</translation>
     </message>
     <message>
         <source>Point to Point</source>
@@ -6491,10 +6499,6 @@ Myth will now exit.</source>
     </message>
     <message>
         <source>What to use to separate ATSC major and minor channels.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Normally the dvb-recording will drop packets from the card until a sequence start header is seen. This option turns off this feature.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -8028,10 +8032,6 @@ Myth will now exit.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Device ID from the back of the HDHomeRun unit.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Tuner</source>
         <translation type="unfinished"></translation>
     </message>
@@ -8350,6 +8350,82 @@ Myth will now exit.</source>
 Check if the video exists</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>If set, the MPEG4 encoder will use interlaced DCT encoding. You may want this when encoding interlaced video, however, this is experimental and may cause damaged video.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If set, the MPEG4 encoder will use interlaced motion estimation. You may want this when encoding interlaced video, however, this is experimental and may cause damaged video.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>(CH)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>(REC)</source>
+        <translation type="unfinished">(REC)</translation>
+    </message>
+    <message>
+        <source>Adjust Playback</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Adjust Recorder</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Colour</source>
+        <translation type="unfinished">Barva</translation>
+    </message>
+    <message>
+        <source>Volume</source>
+        <translation type="unfinished">Glasnost</translation>
+    </message>
+    <message>
+        <source>MAX</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enable this option for budget BT878 based DVB-T cards such as the AverTV DVB-T which require the audio volume to be left alone.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Make the dvb-recording drop packets from the card until a sequence start header is seen.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This option makes the backend dvb-recorder only open the card when it is actually in-use, leaving it free for other programs at other times.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Device ID from the back of the HDHomeRun unit.  You may use &apos;FFFFFFFF&apos; if there is only one unit on your your network.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Experimental</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use Vector-enhanced color space conversion</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If checked, YUV 4:2:0 will be converted to UYVY 4:2:2 in an Altivec/MMX enabled routine.  If unchecked, QuickTime will handle the conversion instead.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>General (AutoExpire)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Delete files slowly</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Some filesystems use a lot of resources when deleting large recording files.  This option makes Myth delete the file slowly to lessen the impact.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ScanCountry</name>
@@ -8435,19 +8511,31 @@ Check if the video exists</source>
     <name>ScanWizardScanner</name>
     <message>
         <source>Scanning</source>
-        <translation type="obsolete">Iskanje</translation>
+        <translation type="unfinished">Iskanje</translation>
     </message>
     <message>
         <source>ScanWizard</source>
-        <translation type="obsolete">Čarovnik iskanja</translation>
+        <translation type="unfinished">Čarovnik iskanja</translation>
     </message>
     <message>
         <source>Error tuning to transport</source>
-        <translation type="obsolete">Napaka prometa</translation>
+        <translation type="unfinished">Napaka prometa</translation>
     </message>
     <message>
         <source>Error parsing parameters</source>
-        <translation type="obsolete">Napaka pri predelavi podatkov</translation>
+        <translation type="unfinished">Napaka pri predelavi podatkov</translation>
+    </message>
+    <message>
+        <source>Failed to open &apos;%1&apos;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failed to parse &apos;%1&apos;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Error starting scan</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

@@ -11,7 +11,7 @@
     </message>
     <message>
         <source>No Cover</source>
-        <translation>Geen Cover</translation>
+        <translation type="obsolete">Geen Cover</translation>
     </message>
     <message>
         <source>Done</source>
@@ -101,11 +101,11 @@
     </message>
     <message>
         <source>Parental Pin:</source>
-        <translation>&apos;Parental PIN&apos;:</translation>
+        <translation type="obsolete">&apos;Parental PIN&apos;:</translation>
     </message>
     <message>
         <source>No Cover</source>
-        <translation>Geen cover</translation>
+        <translation type="obsolete">Geen cover</translation>
     </message>
     <message>
         <source>Unknown</source>
@@ -117,7 +117,7 @@
     </message>
     <message>
         <source>Unknown Rating</source>
-        <translation>Onbekende beoordeling</translation>
+        <translation type="obsolete">Onbekende beoordeling</translation>
     </message>
     <message>
         <source>Default Player</source>
@@ -265,6 +265,70 @@
     <message>
         <source>If set along with Browse Files, this will cause the Video List to load any known video metadata from the database. Turning this off can greatly  speed up how long it takes to load the Video List tree</source>
         <translation>Als dit is ingeschakeld samen met Blader Bestanden, zal de Video Lijst bekende metadata uit de database halen. Dit uitschakelen kan het maken van de Video Lijst enorm versnellen.</translation>
+    </message>
+    <message>
+        <source>Sorting ignores case</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If set, case is ignored when sorting entries in a view.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show folders for database views</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If set, sub folders of your video directory will be shown in supported views.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Image cache size</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This setting determines the number of images MythVideo will cache for views.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>^(The |A |An )</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>All</source>
+        <translation type="unfinished">Alle</translation>
+    </message>
+    <message>
+        <source>Yes</source>
+        <translation type="unfinished">Ja</translation>
+    </message>
+    <message>
+        <source>No</source>
+        <translation type="unfinished">Neen</translation>
+    </message>
+    <message>
+        <source>Title</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Year</source>
+        <translation type="unfinished">Jaar</translation>
+    </message>
+    <message>
+        <source>User Rating</source>
+        <translation type="unfinished">Gebruikersbeoordeling</translation>
+    </message>
+    <message>
+        <source>Runtime</source>
+        <translation type="unfinished">Speeltijd</translation>
+    </message>
+    <message>
+        <source>Filename</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Video ID</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -498,11 +562,11 @@
     </message>
     <message>
         <source>No rating available.</source>
-        <translation>Geen beoordeling beschikbaar.</translation>
+        <translation type="obsolete">Geen beoordeling beschikbaar.</translation>
     </message>
     <message>
         <source>minutes</source>
-        <translation>minuten</translation>
+        <translation type="obsolete">minuten</translation>
     </message>
     <message>
         <source>Watch This Video</source>
@@ -545,7 +609,7 @@
     </message>
     <message>
         <source>Parental Pin:</source>
-        <translation>Ouderlijk toezicht Pincode:</translation>
+        <translation type="obsolete">Ouderlijk toezicht Pincode:</translation>
     </message>
 </context>
 <context>
@@ -560,7 +624,7 @@
     </message>
     <message>
         <source>Unknown</source>
-        <translation>Onbekend</translation>
+        <translation type="obsolete">Onbekend</translation>
     </message>
     <message>
         <source>minutes</source>
@@ -568,7 +632,7 @@
     </message>
     <message>
         <source>All</source>
-        <translation>Alle</translation>
+        <translation type="obsolete">Alle</translation>
     </message>
     <message>
         <source>Save as default</source>
@@ -606,31 +670,31 @@
     <name>VideoManager</name>
     <message>
         <source>minutes</source>
-        <translation>minuten</translation>
+        <translation type="obsolete">minuten</translation>
     </message>
     <message>
         <source>Yes</source>
-        <translation>Ja</translation>
+        <translation type="obsolete">Ja</translation>
     </message>
     <message>
         <source>No</source>
-        <translation>Neen</translation>
+        <translation type="obsolete">Neen</translation>
     </message>
     <message>
         <source>No Cover</source>
-        <translation>Geen Cover</translation>
+        <translation type="obsolete">Geen Cover</translation>
     </message>
     <message>
         <source>Unknown</source>
-        <translation>Onbekend</translation>
+        <translation type="obsolete">Onbekend</translation>
     </message>
     <message>
         <source>None</source>
-        <translation>Geen</translation>
+        <translation type="obsolete">Geen</translation>
     </message>
     <message>
         <source>NR</source>
-        <translation>Niet Beoordeeld</translation>
+        <translation type="obsolete">Niet Beoordeeld</translation>
     </message>
     <message>
         <source>delete failed</source>
@@ -681,18 +745,18 @@
     <name>VideoSelected</name>
     <message>
         <source>No rating available.</source>
-        <translation>Geen beoordeling beschikbaar.</translation>
+        <translation type="obsolete">Geen beoordeling beschikbaar.</translation>
     </message>
     <message>
         <source>minutes</source>
-        <translation>minuten</translation>
+        <translation type="obsolete">minuten</translation>
     </message>
 </context>
 <context>
     <name>VideoTree</name>
     <message>
         <source>Parental Pin:</source>
-        <translation>&apos;Parental Control&apos; PIN:</translation>
+        <translation type="obsolete">&apos;Parental Control&apos; PIN:</translation>
     </message>
     <message>
         <source>Select action</source>

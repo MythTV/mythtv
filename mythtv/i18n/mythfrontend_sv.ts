@@ -1249,7 +1249,7 @@ Returning to the previous menu.</source>
     </message>
     <message>
         <source>A preserved episode is ignored in calculations for deleting episodes above the limit.  Auto-expiration is used to remove eligable programs when disk space is low.</source>
-        <translation>Ett bevarat avsnitt ignoreras i beräkningar för borttagning av avsnitt över gränsen. Autoradering används för att ta bort möjliga program vid otillräckligt diskutrymme.</translation>
+        <translation type="obsolete">Ett bevarat avsnitt ignoreras i beräkningar för borttagning av avsnitt över gränsen. Autoradering används för att ta bort möjliga program vid otillräckligt diskutrymme.</translation>
     </message>
     <message>
         <source>Do not preserve this episode</source>
@@ -3416,7 +3416,7 @@ så du måste ställa in dessa manuellt.</translation>
     </message>
     <message>
         <source>Check this option for budget BT878 based DVB-T cards such as the AverTV DVB-T that require the audio volume left alone.</source>
-        <translation>Aktivera detta för DVB-T budgetkort baserade på BT878 som t.ex. AverTV DVT-T som kräver att ljudvolymen lämnas ifred.</translation>
+        <translation type="obsolete">Aktivera detta för DVB-T budgetkort baserade på BT878 som t.ex. AverTV DVT-T som kräver att ljudvolymen lämnas ifred.</translation>
     </message>
     <message>
         <source>Time offset for thumbnail preview images</source>
@@ -3476,7 +3476,7 @@ så du måste ställa in dessa manuellt.</translation>
     </message>
     <message>
         <source>This option makes the backend dvb-recorder only open the card when it is actually in-use leaving it free for other programs at other times.</source>
-        <translation>Öppna endast DVB-kortet när det behövs och lämna det ledigt för andra program vid andra tider.</translation>
+        <translation type="obsolete">Öppna endast DVB-kortet när det behövs och lämna det ledigt för andra program vid andra tider.</translation>
     </message>
     <message>
         <source>Logo Detection</source>
@@ -3716,7 +3716,7 @@ så du måste ställa in dessa manuellt.</translation>
     </message>
     <message>
         <source>If set, the MPEG4 encoder will use interlaced DCT encoding.  You probably want this when encoding interlaced video.</source>
-        <translation>Använd &apos;Interlaced DCT&apos;-kodning med MPEG4. Du vill troligen använda detta när interlaced video kodas.</translation>
+        <translation type="obsolete">Använd &apos;Interlaced DCT&apos;-kodning med MPEG4. Du vill troligen använda detta när interlaced video kodas.</translation>
     </message>
     <message>
         <source>Enable interlaced motion estimation</source>
@@ -3724,7 +3724,7 @@ så du måste ställa in dessa manuellt.</translation>
     </message>
     <message>
         <source>If set, the MPEG4 encoder will use interlaced motion estimation.  You probably want this when encoding interlaced video.</source>
-        <translation>Använd interlaced rörelseuppskattning. Du vill troligen använda detta när interlaced video kodas.</translation>
+        <translation type="obsolete">Använd interlaced rörelseuppskattning. Du vill troligen använda detta när interlaced video kodas.</translation>
     </message>
     <message>
         <source>Keypress Application</source>
@@ -5551,7 +5551,7 @@ De flesta kort känner av detta automatiskt, ändra endast om det ej fungerar.</
     </message>
     <message>
         <source>Absolutely don&apos;t record</source>
-        <translation>Spela absolut inte in</translation>
+        <translation type="obsolete">Spela absolut inte in</translation>
     </message>
     <message>
         <source>Point to Point</source>
@@ -6242,7 +6242,7 @@ Myth kommer nu att avslutas.</translation>
     </message>
     <message>
         <source>Normally the dvb-recording will drop packets from the card until a sequence start header is seen. This option turns off this feature.</source>
-        <translation>Normalt slänger dvb-inspelningen bort paket från kortet tills en sekvensstartsrubrik ses. Detta val stänger av denna finess.</translation>
+        <translation type="obsolete">Normalt slänger dvb-inspelningen bort paket från kortet tills en sekvensstartsrubrik ses. Detta val stänger av denna finess.</translation>
     </message>
     <message>
         <source>DBOX2 Streaming Port</source>
@@ -7776,7 +7776,7 @@ Myth kommer nu att avslutas.</translation>
     </message>
     <message>
         <source>Device ID from the back of the HDHomeRun unit.</source>
-        <translation>Enhets-ID från baksidan av HDHomeRun-enheten.</translation>
+        <translation type="obsolete">Enhets-ID från baksidan av HDHomeRun-enheten.</translation>
     </message>
     <message>
         <source>Tuner</source>
@@ -8126,6 +8126,62 @@ Kontrollera om videon existerar</translation>
     <message>
         <source>If checked, YUV 4:2:0 will be converted to UYVY 4:2:2 in an Altivec/MMX enabled routine.  If unchecked, QuickTime will handle the conversion instead.</source>
         <translation>Konvertera YUV 4:2:0 till UYVY 4:2:2 i en Altivec/MMX-optimerad rutin. Annars hanterar QuickTime konverteringen i stället.</translation>
+    </message>
+    <message>
+        <source>If set, the MPEG4 encoder will use interlaced DCT encoding. You may want this when encoding interlaced video, however, this is experimental and may cause damaged video.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If set, the MPEG4 encoder will use interlaced motion estimation. You may want this when encoding interlaced video, however, this is experimental and may cause damaged video.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>(CH)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>(REC)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Adjust Playback</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Adjust Recorder</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Colour</source>
+        <translation type="unfinished">Färg</translation>
+    </message>
+    <message>
+        <source>Volume</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>MAX</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enable this option for budget BT878 based DVB-T cards such as the AverTV DVB-T which require the audio volume to be left alone.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Make the dvb-recording drop packets from the card until a sequence start header is seen.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This option makes the backend dvb-recorder only open the card when it is actually in-use, leaving it free for other programs at other times.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Device ID from the back of the HDHomeRun unit.  You may use &apos;FFFFFFFF&apos; if there is only one unit on your your network.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>General (AutoExpire)</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

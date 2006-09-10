@@ -1,140 +1,139 @@
-<!DOCTYPE TS>
-<TS>
-  <context>
+<!DOCTYPE TS><TS>
+<context>
     <name>Bookmarks</name>
     <message>
-      <source>MythBrowser: Select group or single site to view</source>
-      <translation>MythBrowser: velg gruppe eller enslig side å vise</translation>
+        <source>MythBrowser: Select group or single site to view</source>
+        <translation>MythBrowser: velg gruppe eller enslig side å vise</translation>
     </message>
-  </context>
-  <context>
+</context>
+<context>
     <name>BookmarksConfig</name>
     <message>
-      <source>MythBrowser Bookmarks Settings</source>
-      <translation>Bokmerkeinnstillinger for MythBrowser</translation>
+        <source>MythBrowser Bookmarks Settings</source>
+        <translation>Bokmerkeinnstillinger for MythBrowser</translation>
     </message>
     <message>
-      <source>Press the 'New Bookmark' button to add a new site/group.
+        <source>Press the &apos;New Bookmark&apos; button to add a new site/group.
 Pressing SPACE/Enter on a selected entry removes it from the listview.</source>
-      <translation>Trykk på 'Nytt bokmerke'-knappen for å legge til en side/gruppe. Trykk mellomrom/enter får å fjerne den valgte oppføringen fra listevisningen.</translation>
+        <translation>Trykk på &apos;Nytt bokmerke&apos;-knappen for å legge til en side/gruppe. Trykk mellomrom/enter får å fjerne den valgte oppføringen fra listevisningen.</translation>
     </message>
     <message>
-      <source>Zoom [%]:</source>
-      <translation>Forstørr (%):</translation>
+        <source>Zoom [%]:</source>
+        <translation>Forstørr (%):</translation>
     </message>
     <message>
-      <source>Browser:</source>
-      <translation>Nettleser:</translation>
+        <source>Browser:</source>
+        <translation>Nettleser:</translation>
     </message>
     <message>
-      <source>Hide Scrollbars</source>
-      <translation>Skjul rullefelt</translation>
+        <source>Hide Scrollbars</source>
+        <translation>Skjul rullefelt</translation>
     </message>
     <message>
-      <source>Scroll Page</source>
-      <translation>Rull side</translation>
+        <source>Scroll Page</source>
+        <translation>Rull side</translation>
     </message>
     <message>
-      <source>Scroll Speed:</source>
-      <translation>Rullefart:</translation>
+        <source>Scroll Speed:</source>
+        <translation>Rullefart:</translation>
     </message>
     <message>
-      <source>&amp;New Bookmark</source>
-      <translation>&amp;Nytt bokmerke</translation>
+        <source>&amp;New Bookmark</source>
+        <translation>&amp;Nytt bokmerke</translation>
     </message>
     <message>
-      <source>Add a new Website</source>
-      <translation>Legg til en internettside</translation>
+        <source>Add a new Website</source>
+        <translation>Legg til en internettside</translation>
     </message>
     <message>
-      <source>&amp;Finish</source>
-      <translation>&amp;Ferdig</translation>
+        <source>&amp;Finish</source>
+        <translation>&amp;Ferdig</translation>
     </message>
-  </context>
-  <context>
+</context>
+<context>
     <name>PopupBox</name>
     <message>
-      <source>Add New Website</source>
-      <translation>Legg til internettside</translation>
+        <source>Add New Website</source>
+        <translation>Legg til internettside</translation>
     </message>
     <message>
-      <source>Group:</source>
-      <translation>Gruppe:</translation>
+        <source>Group:</source>
+        <translation>Gruppe:</translation>
     </message>
     <message>
-      <source>Description:</source>
-      <translation>Beskrivelse:</translation>
+        <source>Description:</source>
+        <translation>Beskrivelse:</translation>
     </message>
     <message>
-      <source>URL:</source>
-      <translation>URL:</translation>
+        <source>URL:</source>
+        <translation>URL:</translation>
     </message>
     <message>
-      <source>&amp;Ok</source>
-      <translation>&amp;OK</translation>
+        <source>&amp;Ok</source>
+        <translation>&amp;OK</translation>
     </message>
-  </context>
-  <context>
+</context>
+<context>
     <name>TabView</name>
     <message>
-      <source>MythBrowser Menu</source>
-      <translation>MythBrowser-meny</translation>
+        <source>MythBrowser Menu</source>
+        <translation>MythBrowser-meny</translation>
     </message>
     <message>
-      <source>Save Link in Bookmarks</source>
-      <translation>Lagre kobling som bokmerke</translation>
+        <source>Save Link in Bookmarks</source>
+        <translation>Lagre kobling som bokmerke</translation>
     </message>
     <message>
-      <source>Enter URL</source>
-      <translation>Skriv inn URL</translation>
+        <source>Enter URL</source>
+        <translation>Skriv inn URL</translation>
     </message>
     <message>
-      <source>OK</source>
-      <translation>OK</translation>
+        <source>OK</source>
+        <translation>OK</translation>
     </message>
     <message>
-      <source>Cancel</source>
-      <translation>Avbryt</translation>
+        <source>Cancel</source>
+        <translation>Avbryt</translation>
     </message>
     <message>
-      <source>Back</source>
-      <translation>Tilbake</translation>
+        <source>Back</source>
+        <translation>Tilbake</translation>
     </message>
     <message>
-      <source>Next Tab</source>
-      <translation>Neste fane</translation>
+        <source>Next Tab</source>
+        <translation>Neste fane</translation>
     </message>
     <message>
-      <source>Prev Tab</source>
-      <translation>Forrige fane</translation>
+        <source>Prev Tab</source>
+        <translation>Forrige fane</translation>
     </message>
     <message>
-      <source>Remove Tab</source>
-      <translation>Fjern fane</translation>
+        <source>Remove Tab</source>
+        <translation>Fjern fane</translation>
     </message>
     <message>
-      <source>Zoom Out</source>
-      <translation>Reduser størrelse</translation>
+        <source>Zoom Out</source>
+        <translation>Reduser størrelse</translation>
     </message>
     <message>
-      <source>Zoom In</source>
-      <translation>Øk størrelse</translation>
+        <source>Zoom In</source>
+        <translation>Øk størrelse</translation>
     </message>
     <message>
-      <source>Add New Bookmark</source>
-      <translation>Legg til bokmerke</translation>
+        <source>Add New Bookmark</source>
+        <translation>Legg til bokmerke</translation>
     </message>
     <message>
-      <source>Group:</source>
-      <translation>Gruppe:</translation>
+        <source>Group:</source>
+        <translation>Gruppe:</translation>
     </message>
     <message>
-      <source>Description:</source>
-      <translation>Beskrivelse:</translation>
+        <source>Description:</source>
+        <translation>Beskrivelse:</translation>
     </message>
     <message>
-      <source>URL:</source>
-      <translation>URL:</translation>
+        <source>URL:</source>
+        <translation>URL:</translation>
     </message>
-  </context>
+</context>
 </TS>

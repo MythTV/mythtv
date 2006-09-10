@@ -285,7 +285,7 @@
     </message>
     <message>
         <source>MythGallery Settings</source>
-        <translation>MythGallery sätted</translation>
+        <translation type="obsolete">MythGallery sätted</translation>
     </message>
     <message>
         <source>Gallery Directory does not exist or is unreadable.</source>
@@ -306,6 +306,14 @@
     <message>
         <source>Duration of OpenGL Transition (milliseconds)</source>
         <translation>OpenGL üleminekute viide (ms)</translation>
+    </message>
+    <message>
+        <source>MythGallery Settings (Slideshow)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>MythGallery Settings (General)</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
