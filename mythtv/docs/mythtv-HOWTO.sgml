@@ -2716,14 +2716,14 @@ This implements special behavior needed for the "bobdeint" filter but can
 also be used to choose any of the deinterlace filters. If you prefer, you
 may leave this unchecked and include any of the deinterlace filters, other
 than "bobdeint", in your custom filter chain.
-<!-- XXXXXXXX -->
-<p>o  The "invert" filter
+
+o The "invert" filter
 
 Invert ignores any parameters and inverts the pixel values of the video
 frames.  In other words, a negative image. This would rarely be useful but
 may be a good example to verify that your filter strings take effect.
 
-o  The "linearblend" filter
+o The "linearblend" filter
 
 It is a simple deinterlacing filter that ignores parameters and works by
 blending adjacent lines.  It replaces combing in interlaced video with a
@@ -2748,7 +2748,7 @@ Do not include this in your filter chain.
 </caption>
 </figure>
 
-o  The "kerneldeint" filter
+o The "kerneldeint" filter
 
 Kerneldeint is a more complex deinterlacing filter which applies a filter
 kernel using input from several lines.  It generally removes combing without
@@ -2798,7 +2798,7 @@ luma, 16-240 chroma).
 <bf>NOTE</bf>: If it is not already specified in the filter chain, this
 filter will be automatically applied when recording with the "bttv" driver.
 
-o  The "quickdnr" filter
+o The "quickdnr" filter
 
 A fast temporal denoiser. This can take 1, 2 or 4 parameters, each being a
 value from "0" for the least filtering to "255" for the greatest filtering.
@@ -2807,7 +2807,7 @@ of its variables. Two parameters will set the filter strength for luma and
 chroma independently. If you are interested in how the algorithm works, you
 may examine the source code to see how four parameter are used.
 
-o  The "denoise3d" filter
+o The "denoise3d" filter
 
 A slower denoiser that applies a spatial and temporal low-pass filter. The
 spatial filter can remove some noise that quickdnr can't, but a more
@@ -2822,7 +2822,7 @@ powerful CPU is needed.  This filter accepts 3 float parameters:
 Reasonable defaults will be selected for omitted parameters.  The chroma
 temporal filter strength is calculated from the other filter strengths.
 
-o  The "crop" filter
+o The "crop" filter
 
 Covers edges of video with black bars.  This helps improve video quality
 when the edges of the frame are distorted. By default, this removes 16
@@ -2830,7 +2830,7 @@ pixels from each edge. This can optionally take four parameters representing
 top:left:bottom:right. The number times 16 is the number of pixels to remove
 so, for example, the default is "=1:1:1:1".
 
-o  The "forceyv12" and "forceyuv422p" filters
+o The "forceyv12" and "forceyuv422p" filters
 
 These force the filter manager to use the given format.  You can use one of
 these at the head of a filter chain to change the capture format. The most
@@ -2840,18 +2840,18 @@ chroma interlacing problems with YV12.
 There are some filters included in the MythTV source code that should 
 not be used:
 
-o  The "forcergb24" and "forceargb32" filters
+o The "forcergb24" and "forceargb32" filters
 
 The two RGB formats should not be used because there is no conversion filter
 for them yet.
 
-o  The "convert" filter
+o The "convert" filter
 
 It exists but don't use it.  The filter manager uses this filter
 automatically when it is unable to match the input/output formats of two
 adjacent filters.
 
-o  The "postprocess" filter
+o The "postprocess" filter
 
 While this exists in MythTV source code, it is currently not recommended for
 use.

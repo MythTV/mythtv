@@ -3296,13 +3296,13 @@
 
 
         [1mNOTE[22m:  You should go through the various setup screens in
-  mythfrontend before using any other modules such as MythMusic, etc. to
-  correctly initialize the database.
+  mythfrontend before using any other modules to ensure that the the
+  database is correctly initialized.
 
   [1m10.1.  General[0m
 
   The General screen has configuration items that don't really fit
-  anywhere else.  The first few configuration items asks you to indicate
+  anywhere else.  The first few configuration items ask you to indicate
   the number of seconds to record before or after a program, which is
   useful if the broadcast network or your system clock are out of sync
   and will help prevent you missing the beginning or end of a program.
@@ -3316,8 +3316,8 @@
   information.  Move the focus to Next and press the space bar to
   continue.
 
-  The final General page sets up some final configuration items.  See
-  the help text for more information.
+  The last General page sets up some final configuration items.  See the
+  help text for more information.
 
 
   [1m10.2.  Appearance[0m
@@ -3343,7 +3343,7 @@
   your screen.  Deinterlacing requires that your processor support SSE.
   (Streaming SIMD Extensions, aka "MMX2").  Early Intel Celeron (those
   that don't use the Coppermine 0.18um core and are usually <600MHz),
-  Pentium Pro and Pentium II CPUs do not have SSE, so make sure that you
+  Pentium Pro and Pentium II CPUs do not have SSE, so make sure you
   haven't enabled deinterlacing if your processor doesn't support it. If
   you enable it, and your processor doesn't support SSE, you will get
   "Illegal Instruction" errors.
@@ -3367,11 +3367,11 @@
 
   [1m10.4.1.  Video Filters[0m
 
-  MythTV provides a facility to include video filters while recording
-  and during playback. These filters can be used to improve or modify
-  the video image, including hiding the effects of an interlaced image
-  or reducing the effects of noise in a poor video signal. The following
-  is a brief introduction to introduce you to the filters that are
+  MythTV provides a means of employing video filters while recording and
+  during playback. These filters can be used to improve or modify the
+  video image, including hiding the effects of an interlaced image or
+  reducing the impact of noise in a poor video signal. The following is
+  a brief introduction to introduce you to the filters that are
   available in MythTV version 0.20
 
   [1m10.4.2.  Applying filters[0m
@@ -3415,15 +3415,14 @@
   deinterlace filters, other than "bobdeint", in your custom filter
   chain.
 
-
-  o  The "invert" filter
+  o The "invert" filter
 
   Invert ignores any parameters and inverts the pixel values of the
   video frames.  In other words, a negative image. This would rarely be
   useful but may be a good example to verify that your filter strings
   take effect.
 
-  o  The "linearblend" filter
+  o The "linearblend" filter
 
   It is a simple deinterlacing filter that ignores parameters and works
   by blending adjacent lines.  It replaces combing in interlaced video
@@ -3438,14 +3437,11 @@
   new position with no jagged edges. However, if the display is not
   synchronous, it will cause flickering or the appearance of the picture
   moving up and down by one line.
-
-
-
          [1mNOTE[22m: This filter requires the frame rate to be doubled
   and therefore can only be used with the "Deinterlace Playback"
   checkbox.  Do not include this in your filter chain.
 
-  o  The "kerneldeint" filter
+  o The "kerneldeint" filter
 
   Kerneldeint is a more complex deinterlacing filter which applies a
   filter kernel using input from several lines.  It generally removes
@@ -3493,7 +3489,7 @@
   [1mNOTE[22m: If it is not already specified in the filter chain, this filter
   will be automatically applied when recording with the "bttv" driver.
 
-  o  The "quickdnr" filter
+  o The "quickdnr" filter
 
   A fast temporal denoiser. This can take 1, 2 or 4 parameters, each
   being a value from "0" for the least filtering to "255" for the
@@ -3503,7 +3499,7 @@
   interested in how the algorithm works, you may examine the source code
   to see how four parameter are used.
 
-  o  The "denoise3d" filter
+  o The "denoise3d" filter
 
   A slower denoiser that applies a spatial and temporal low-pass filter.
   The spatial filter can remove some noise that quickdnr can't, but a
@@ -3520,7 +3516,7 @@
   chroma temporal filter strength is calculated from the other filter
   strengths.
 
-  o  The "crop" filter
+  o The "crop" filter
 
   Covers edges of video with black bars.  This helps improve video
   quality when the edges of the frame are distorted. By default, this
@@ -3529,7 +3525,7 @@
   the number of pixels to remove so, for example, the default is
   "=1:1:1:1".
 
-  o  The "forceyv12" and "forceyuv422p" filters
+  o The "forceyv12" and "forceyuv422p" filters
 
   These force the filter manager to use the given format.  You can use
   one of these at the head of a filter chain to change the capture
@@ -3539,18 +3535,18 @@
   There are some filters included in the MythTV source code that should
   not be used:
 
-  o  The "forcergb24" and "forceargb32" filters
+  o The "forcergb24" and "forceargb32" filters
 
   The two RGB formats should not be used because there is no conversion
   filter for them yet.
 
-  o  The "convert" filter
+  o The "convert" filter
 
   It exists but don't use it.  The filter manager uses this filter
   automatically when it is unable to match the input/output formats of
   two adjacent filters.
 
-  o  The "postprocess" filter
+  o The "postprocess" filter
 
   While this exists in MythTV source code, it is currently not
   recommended for use.
@@ -3692,9 +3688,8 @@
   root capability.  This is done by typing the command:
 
 
-
-  $ su
-  # chmod u+s /path/to/blink
+       $ su
+       # chmod u+s /path/to/blink
 
 
 
@@ -3755,6 +3750,12 @@
   Y           switch between multiple capture cards.  [1mNOTE[22m: you will lose your LiveTV buffer on your current card. Useful for different-sourced cards (such as Dish Network on one, HDTV over-the-air on another card.)
 
 
+  [1m11.1.4.  LiveTV Browse Mode[0m
+
+
+  [1m11.1.5.  Playback Recording Zoom Mode[0m
+
+
 
   Up or down          keys change the channel
           num pad     Type a number to enter a channel number or jump amount (HHMM format)
@@ -3812,10 +3813,12 @@
             Right     advance 1 frame
                 >     advance 1 second
 
-  [1m11.1.4.  LiveTV Browse Mode[0m
+  [1m11.1.6.  If you have two or more tuner cards[0m
 
 
-  [1m11.1.5.  Playback Recording Zoom Mode[0m
+  V           toggle Picture-in-picture on or off
+  B           toggles the window focus (lets you change channels on the PiP window)
+  N           swaps the two channels by changing channels on both cards
 
 
 
@@ -3838,14 +3841,6 @@
   PageDown            Zoom Out
   Space/Enter         Exit Zoom mode leaving picture at current size and position
               ESC     Exit Zoom mode and return to original size
-
-  [1m11.1.6.  If you have two or more tuner cards[0m
-
-
-  V           toggle Picture-in-picture on or off
-  B           toggles the window focus (lets you change channels on the PiP window)
-  N           swaps the two channels by changing channels on both cards
-
 
   [1m11.1.7.  Watching a recording only[0m
 
@@ -3871,19 +3866,6 @@
   [1m11.1.8.  EPG[0m
 
 
-  [1m11.1.9.  Setting Program or Channel Recording Priorities[0m
-
-
-                   Right     increases priority value
-                    Left     decreases priority value
-                       1     sorts by title
-                       2     sorts by priority
-         Home/End            toggle sort priority
-                       I     edit recording options
-                     ESC     commits changes and exits
-
-
-
            Arrows     are used to move the highlighted program point around
        A, D, S, W     perform the same as left, right, down and up
   PageUp/PageDown     move the channel list up or down a page
@@ -3899,6 +3881,19 @@
                 X     change the channel to the currently selected channel without leaving the EPG (Most useful in the alternate EPG)
                 ?     mark/unmark the current channel as a "favorite"
            / or 4     toggle the guide listing between all channels and filtered "favorites"
+
+
+  [1m11.1.9.  Setting Program or Channel Recording Priorities[0m
+
+
+
+                   Right     increases priority value
+                    Left     decreases priority value
+                       1     sorts by title
+                       2     sorts by priority
+         Home/End            toggle sort priority
+                       I     edit recording options
+                     ESC     commits changes and exits
 
   [1m11.1.10.  Viewing Scheduled Recordings/Resolving Conflicts[0m
 
@@ -4088,8 +4083,6 @@
   first and will wakeup the Slave backends using the "Wake command for
   slaves". At this time, there is no support for starting only the
   required Slave backend, so all Slave backends will startup.
-
-
   [1m11.5.2.  Setting up the MythTV side of this extension.[0m
 
   There are a number of options that are used to control the Shutdown /
@@ -4145,7 +4138,6 @@
   The "WakeOnLan settings": These settings have nothing to do with using
   BIOS or WOL wakeup, they are the same for both.
 
-
   +o  "Master backend" This setting defines timings for the frontends to
      wakeup the Master backend using WOL. Useful if your frontend can
      emit a WOL packet so you don't need to physically go to the Master
@@ -4157,7 +4149,6 @@
      backend needs for bootup.  Set to "0" to disable. The frontends
      will retry to connect for "Count of reconnect tries" times before
      giving up.
-
   +o  "Wake command for slaves" is the [4mone[24m command executed to wake your
      Slave backends. This should be a script that contains the calls to
      wakeup all Slave backend systems.
@@ -4220,17 +4211,17 @@
   Finally, /usr/local/bin/mythwake looks like:
 
 
-       #! /bin/bash
-       #this should be a command to wake your server
-       WAKECMD="#!/bin/sh\n /usr/local/bin/wakeMBE"
-       #first we need to delete all wake jobs in queue
-       for JOB in atq | cut -f 1 ; do
-           atrm $JOB;
-       done
-       #now we read the date from 'nc'
-       read date;
-       #now set the atjob
-       echo -e "$WAKECMD" | at $date ;
+  #! /bin/bash
+  #this should be a command to wake your server
+  WAKECMD="#!/bin/sh\n /usr/local/bin/wakeMBE"
+  #first we need to delete all wake jobs in queue
+  for JOB in atq | cut -f 1 ; do
+      atrm $JOB;
+  done
+  #now we read the date from 'nc'
+  read date;
+  #now set the atjob
+  echo -e "$WAKECMD" | at $date ;
 
 
 
@@ -4273,43 +4264,42 @@
   To use this feature you must first enable it in
   Settings>General>General
 
-
   The network control listens on port 6546, as demonstrated below:
 
 
 
-       $ telnet basement 6546
-       Connected to basement.
-       Escape character is '^]'.
-       MythFrontend Network Control
-       Type 'help' for usage information
-       ---------------------------------
-       # help
-       Valid Commands:
-       ---------------
-       jump               - Jump to a specified location in Myth
-       key                - Send a keypress to the program
-       play               - Playback related commands
-       query              - Queries
-       exit               - Exit Network Control
+  $ telnet basement 6546
+  Connected to basement.
+  Escape character is '^]'.
+  MythFrontend Network Control
+  Type 'help' for usage information
+  ---------------------------------
+  # help
+  Valid Commands:
+  ---------------
+  jump               - Jump to a specified location in Myth
+  key                - Send a keypress to the program
+  play               - Playback related commands
+  query              - Queries
+  exit               - Exit Network Control
 
-       Type 'help COMMANDNAME' for help on any specific command.
+  Type 'help COMMANDNAME' for help on any specific command.
 
-       # help jump
-       Usage: jump JUMPPOINT
+  # help jump
+  Usage: jump JUMPPOINT
 
-       Where JUMPPOINT is one of the following:
-       channelpriorities    - Channel Recording Priorities
-       channelrecpriority   - Channel Recording Priorities
-       deletebox            - TV Recording Deletion
-       deleterecordings     - TV Recording Deletion
-       guidegrid            - Program Guide
-       livetv               - Live TV
-       livetvinguide        - Live TV In Guide
-       mainmenu             - Main Menu
-       ...snip...
-       # exit
-       $
+  Where JUMPPOINT is one of the following:
+  channelpriorities    - Channel Recording Priorities
+  channelrecpriority   - Channel Recording Priorities
+  deletebox            - TV Recording Deletion
+  deleterecordings     - TV Recording Deletion
+  guidegrid            - Program Guide
+  livetv               - Live TV
+  livetvinguide        - Live TV In Guide
+  mainmenu             - Main Menu
+  ...snip...
+  # exit
+  $
 
 
 
@@ -4336,7 +4326,6 @@
   When you choose a show that you would like to record from the Options
   Page, there are eight different types of rules to help the scheduler
   find which showings you would like to record.
-
 
 
   +o  Single Record -- record only this title at this specific time and
@@ -4600,13 +4589,13 @@
   would prefer to record the first showing by clicking "Record anyway".
 
 
-
   [1m12.2.6.  Controlling Your Schedule[0m
 
   The Manage Recordings->Upcoming Recordings page is your control center
   for the MythTV scheduler. Unlike other DVR systems, this one page
   gives you all of the information and tools you need to see all of your
   alternatives and make whatever adjustments you desire.
+
 
   The upper half of the screen has a scrollable box listing items that
   match your record rules sorted by time. The lower half shows the
@@ -4674,7 +4663,6 @@
   set, you will also see a "Clear Override" to undo your changes. This
   option makes it very easy to try out some "what if" attempts when
   deciding on your best strategy in a difficult situation.
-
   For a recording in progress, there will be a "Change Ending Time"
   button.  This will take you to the options page for a Single or
   Override or create an Override if it is a recurring rule. Here you can
@@ -4731,7 +4719,6 @@
   chooses to expire the lowest-priority recordings first.
 
 
-
   [1m12.3.5.  Episode Limit[0m
 
   An episode limit can also be configured to limit the maximum number of
@@ -4739,6 +4726,7 @@
   usage. If this is set, you can further decide what to do when this
   limit is reached; either stop recording that series, or to delete the
   oldest episodes in favor of the new ones.
+
 
 
   [1m12.4.  Post Recording Processing[0m
@@ -4797,7 +4785,6 @@
   +o  %PROGSTART% - the recording's start time (from guide data;
      YYYYMMDDhhmmss)
 
-
   +o  %PROGEND% - the recording's end time (from guide data)
 
   +o  %PROGSTARTISO%, %PROGENDISO% - the recording's start and end time
@@ -4805,6 +4792,8 @@
 
 
   [1m12.5.  Advanced Recording Options[0m
+
+
 
   [1m12.5.1.  Creating Power Search rules with Custom Record[0m
 
@@ -4871,9 +4860,9 @@
   primetime". Click "Add this example clause". You should now see:
 
 
-                   program.title = 'Nova'
-                   AND HOUR(program.starttime) >= 19
-                   AND HOUR(program.starttime) < 23
+              program.title = 'Nova'
+              AND HOUR(program.starttime) >= 19
+              AND HOUR(program.starttime) < 23
 
 
 
@@ -4926,7 +4915,6 @@
   possibilities are limitless.
 
 
-
   [1m12.5.4.  Common Tricks and Tips[0m
 
   The example clauses marked "complete example" are actual rules that
@@ -4935,6 +4923,7 @@
   show off how powerful custom rules can be but there are also several
   simple idioms that you may find useful for many of the shows you would
   like to record.
+
 
   Wait for a known title -- If there is a movie that you anticipate will
   be televised in the coming months but is not yet in the listings, you
@@ -5000,8 +4989,6 @@
   While the example clauses demonstrate how to use many of the data
   fields, you can get a more complete list of all the fields that are
   available by using a MySQL client program:
-
-
        $ mysql -u mythtv -pmythtv mythconverg
        mysql> describe program;
        mysql> describe channel;
@@ -5122,6 +5109,7 @@
          --enable-mythweather     build the mythweather plugin [default=yes]
 
 
+
   The sections detailing configuration of the plugins assume that you
   are already in the ~/mythplugins-0.20/ directory.
 
@@ -5131,7 +5119,6 @@
   not have the prerequisites, the simplest course of action is to go
   through the various sections below, satisfying the prerequisites, and
   then compile all modules at once.
-
   For example, you would only like to compile and install MythGallery
   and MythMusic.  For MythGallery, you would like to use the EXIF data
   in the .JPG file to present additional information onscreen.  For
@@ -5184,16 +5171,18 @@
        # chkconfig --level 345 httpd on
        # /etc/rc.d/init.d/httpd restart
 
+
+
   [1m14.2.  Completing the installation[0m
 
 
 
-       $ cd ~/mythplugins-0.20/mythweb
-       $ su
-       # mkdir /var/www/html/mythweb
-       # cp -r . /var/www/html/mythweb
-       # exit
-       $
+  $ cd ~/mythplugins-0.20/mythweb
+  $ su
+  # mkdir /var/www/html/mythweb
+  # cp -r . /var/www/html/mythweb
+  # exit
+  $
 
 
 
@@ -5241,13 +5230,12 @@
   web browser and go to site:
   http://mythweb_name_or_ip_address/mythweb/settings.php?RESET_THEME=yes
 
-
-
   [1m15.  MythGallery.[0m
 
   MythGallery is a photo and slideshow application.  MythGallery is a
   separate application, but it's dependent on MythTV being installed and
   operational.
+
 
   [1m15.1.  Installation and prerequisites[0m
 
@@ -5429,12 +5417,11 @@
   Then make and install xmame
 
 
-
-  $ make
-  $ su
-  (enter password)
-  # make install
-  # exit
+       $ make
+       $ su
+       (enter password)
+       # make install
+       # exit
 
 
 
@@ -5492,19 +5479,21 @@
        $ xmame gauntlet
 
 
+
   Some basic [1mmame [22mkeyboard commands:
 
 
-       5 = Insert coin
-       1 = Player 1 start
-       arrow keys = movement
-       left control = button 1
-       left alt = button 2
-       SPACE = button 3
-       ESC = exit
-       TAB - menu
-       ~ to adjust Volume
-            < and >
+
+  5 = Insert coin
+  1 = Player 1 start
+  arrow keys = movement
+  left control = button 1
+  left alt = button 2
+  SPACE = button 3
+  ESC = exit
+  TAB - menu
+  ~ to adjust Volume
+       < and >
 
 
 
@@ -5555,6 +5544,8 @@
 
 
        $ cd ~/mythplugins-0.20
+
+
 
   Compile and install mythgame:
 

@@ -3052,15 +3052,15 @@ configure the frontend client.
 <EPS FILE="stop.eps">
 <IMG SRC="stop.png">
 <CAPTION><B>NOTE</B>:  You should go through the various setup screens in
-mythfrontend before using any other modules such as MythMusic, etc. to
-correctly initialize the database.</CAPTION>
+mythfrontend before using any other modules to ensure that the the database
+is correctly initialized.</CAPTION>
 </FIGURE>
 </P>
 <H2><A NAME="ss10.1">10.1</A> <A HREF="#toc10.1">General</A>
 </H2>
 
 <P>The General screen has configuration items that don't really fit anywhere
-else.  The first few configuration items asks you to indicate the number of
+else.  The first few configuration items ask you to indicate the number of
 seconds to record before or after a program, which is useful if the
 broadcast network or your system clock are out of sync and will help prevent
 you missing the beginning or end of a program.  </P>
@@ -3071,7 +3071,7 @@ continue to the next page.</P>
 <P>The next page has a number of options to do with how channels are displayed
 on your system.  The help text will give you more information.  Move the
 focus to Next and press the space bar to continue.</P>
-<P>The final General page sets up some final configuration items.  See the help
+<P>The last General page sets up some final configuration items.  See the help
 text for more information.</P>
 
 <H2><A NAME="ss10.2">10.2</A> <A HREF="#toc10.2">Appearance</A>
@@ -3098,7 +3098,7 @@ deinterlacing, which will improve how the image looks on your screen.
 Deinterlacing requires that your processor support SSE. (Streaming SIMD
 Extensions, aka "MMX2").  Early Intel Celeron (those that don't use the
 Coppermine 0.18um core and are usually &lt;600MHz), Pentium Pro and Pentium II
-CPUs do not have SSE, so make sure that you haven't enabled deinterlacing if
+CPUs do not have SSE, so make sure you haven't enabled deinterlacing if
 your processor doesn't support it. If you enable it, and your processor
 doesn't support SSE, you will get "Illegal Instruction" errors.</P>
 <P>To determine if you've got SSE on an Intel processor, you can:
@@ -3118,10 +3118,10 @@ implementation of SSE instructions, so if your processor has 3dnow you
 shouldn't have any issues with deinterlacing.</P>
 <H3>Video Filters</H3>
 
-<P>MythTV provides a facility to include video filters while recording and
+<P>MythTV provides a means of employing video filters while recording and
 during playback. These filters can be used to improve or modify the video
 image, including hiding the effects of an interlaced image or reducing the
-effects of noise in a poor video signal. The following is a brief
+impact of noise in a poor video signal. The following is a brief
 introduction to introduce you to the filters that are available in MythTV
 version 0.20</P>
 <H3>Applying filters</H3>
@@ -3154,12 +3154,11 @@ Enter your filter string in the box titled "Custom Filters".</P>
 also be used to choose any of the deinterlace filters. If you prefer, you
 may leave this unchecked and include any of the deinterlace filters, other
 than "bobdeint", in your custom filter chain.</P>
-
-<P>o  The "invert" filter</P>
+<P>o The "invert" filter</P>
 <P>Invert ignores any parameters and inverts the pixel values of the video
 frames.  In other words, a negative image. This would rarely be useful but
 may be a good example to verify that your filter strings take effect.</P>
-<P>o  The "linearblend" filter</P>
+<P>o The "linearblend" filter</P>
 <P>It is a simple deinterlacing filter that ignores parameters and works by
 blending adjacent lines.  It replaces combing in interlaced video with a
 less distracting "ghost" image.</P>
@@ -3180,7 +3179,7 @@ and therefore can only be used with the "Deinterlace Playback" checkbox.
 Do not include this in your filter chain.</CAPTION>
 </FIGURE>
 </P>
-<P>o  The "kerneldeint" filter</P>
+<P>o The "kerneldeint" filter</P>
 <P>Kerneldeint is a more complex deinterlacing filter which applies a filter
 kernel using input from several lines.  It generally removes combing without
 a "ghost" image, sometimes leaving a faint outline of the image from the
@@ -3219,14 +3218,14 @@ disable the filter.</P>
 luma, 16-240 chroma).</P>
 <P><B>NOTE</B>: If it is not already specified in the filter chain, this
 filter will be automatically applied when recording with the "bttv" driver.</P>
-<P>o  The "quickdnr" filter</P>
+<P>o The "quickdnr" filter</P>
 <P>A fast temporal denoiser. This can take 1, 2 or 4 parameters, each being a
 value from "0" for the least filtering to "255" for the greatest filtering.
 With one parameter, the filter will compute the values it should use for all
 of its variables. Two parameters will set the filter strength for luma and
 chroma independently. If you are interested in how the algorithm works, you
 may examine the source code to see how four parameter are used.</P>
-<P>o  The "denoise3d" filter</P>
+<P>o The "denoise3d" filter</P>
 <P>A slower denoiser that applies a spatial and temporal low-pass filter. The
 spatial filter can remove some noise that quickdnr can't, but a more
 powerful CPU is needed.  This filter accepts 3 float parameters:</P>
@@ -3239,27 +3238,27 @@ powerful CPU is needed.  This filter accepts 3 float parameters:</P>
 </P>
 <P>Reasonable defaults will be selected for omitted parameters.  The chroma
 temporal filter strength is calculated from the other filter strengths.</P>
-<P>o  The "crop" filter</P>
+<P>o The "crop" filter</P>
 <P>Covers edges of video with black bars.  This helps improve video quality
 when the edges of the frame are distorted. By default, this removes 16
 pixels from each edge. This can optionally take four parameters representing
 top:left:bottom:right. The number times 16 is the number of pixels to remove
 so, for example, the default is "=1:1:1:1".</P>
-<P>o  The "forceyv12" and "forceyuv422p" filters</P>
+<P>o The "forceyv12" and "forceyuv422p" filters</P>
 <P>These force the filter manager to use the given format.  You can use one of
 these at the head of a filter chain to change the capture format. The most
 likely use would be forceyuv422p to use YUV422P capture on cards with known
 chroma interlacing problems with YV12.</P>
 <P>There are some filters included in the MythTV source code that should 
 not be used:</P>
-<P>o  The "forcergb24" and "forceargb32" filters</P>
+<P>o The "forcergb24" and "forceargb32" filters</P>
 <P>The two RGB formats should not be used because there is no conversion filter
 for them yet.</P>
-<P>o  The "convert" filter</P>
+<P>o The "convert" filter</P>
 <P>It exists but don't use it.  The filter manager uses this filter
 automatically when it is unable to match the input/output formats of two
 adjacent filters.</P>
-<P>o  The "postprocess" filter</P>
+<P>o The "postprocess" filter</P>
 <P>While this exists in MythTV source code, it is currently not recommended for
 use.</P>
 
