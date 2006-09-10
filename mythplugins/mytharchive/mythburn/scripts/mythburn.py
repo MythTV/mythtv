@@ -31,7 +31,7 @@
 #******************************************************************************
 
 # version of script - change after each update
-VERSION="0.1.20060907-1"
+VERSION="0.1.20060910-1"
 
 
 ##You can use this debug flag when testing out new themes
@@ -1296,6 +1296,11 @@ def encodeVideoToMPEG2(source, destvideofile, video, audio1, audio2, aspectratio
 def encodeNuvToMPEG2(chanid, starttime, destvideofile, folder, profile, usecutlist):
     """Encodes a nuv video source file to MPEG2 video and AC3 audio, using mythtranscode & ffmpeg"""
 
+    # make sure mythtranscode hasn't left some stale fifos hanging around
+    if ((doesFileExist(os.path.join(folder, "audout")) or doesFileExist(os.path.join(folder, "vidout")))):
+        fatalError("Something is wrong! Found one or more stale fifo's from mythtranscode\n"
+                   "Delete the fifos in '%s' and start again" % folder)
+
     profileNode = findEncodingProfile(profile)
     parameters = profileNode.getElementsByTagName("parameter")
 
@@ -1304,7 +1309,7 @@ def encodeNuvToMPEG2(chanid, starttime, destvideofile, folder, profile, usecutli
     if videomode == "ntsc":
         outvideores = "720x480"
     else:
-        outvideores = "720,576"
+        outvideores = "720x576"
 
     outaudiochannels = 2
     outaudiobitrate = 384
@@ -1359,7 +1364,17 @@ def encodeNuvToMPEG2(chanid, starttime, destvideofile, folder, profile, usecutli
     command += "-ab %s -ar %s -acodec %s " % (outaudiobitrate, outaudiosamplerate, outaudiocodec)
     command += "-f dvd %s" % quoteFilename(destvideofile)
 
-    time.sleep(2)
+    #wait for mythtranscode to create the fifos
+    tries = 30
+    while (tries and not(doesFileExist(os.path.join(folder, "audout")) and
+                         doesFileExist(os.path.join(folder, "vidout")))):
+        tries -= 1
+        write("Waiting for mythtranscode to create the fifos")
+        time.sleep(1)
+
+    if (not(doesFileExist(os.path.join(folder, "audout")) and doesFileExist(os.path.join(folder, "vidout")))):
+        fatalError("Waited too long for mythtranscode to create the fifos - giving up!!")
+
     write("Running ffmpeg")
     result = runCommand(command)
     if result != 0:
