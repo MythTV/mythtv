@@ -579,11 +579,11 @@
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>HALMRK</callsign>
-        <network>ODYSSEY</network>
+        <network>HALMRK</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>HALMRKP</callsign>
-        <network>ODYSSEY</network>
+        <network>HALMRK</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>HB2W</callsign>
@@ -1330,6 +1330,10 @@
         <network>CBS</network>
     </callsigntonetwork>
     <callsigntonetwork>
+        <callsign>KIRO</callsign>
+        <network>CBS</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
         <callsign>KITV</callsign>
         <network>ABC</network>
     </callsigntonetwork>
@@ -1568,6 +1572,10 @@
     <callsigntonetwork>
         <callsign>KMWB2</callsign>
         <network>WB</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>KMYQ</callsign>
+        <network>MNTV</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>KNAZ</callsign>
@@ -2504,6 +2512,10 @@
     <callsigntonetwork>
         <callsign>KWNB</callsign>
         <network>ABC</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>KWPX</callsign>
+        <network>PAX</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>KWQC</callsign>
@@ -3596,6 +3608,10 @@
     <callsigntonetwork>
         <callsign>WDWB</callsign>
         <network>WB</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>WE</callsign>
+        <network>WE</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>WEAO</callsign>
@@ -5694,6 +5710,10 @@
         <url>[zap2it]/lifetime_30.jpg</url>
     </networktourl>
     <networktourl>
+        <network>MNTV</network>
+        <url>[zap2it]/mynetworktv_affiliate.gif</url>
+    </networktourl>
+    <networktourl>
         <network>MSNBC</network>
         <url>[zap2it]/msnbc.jpg</url>
     </networktourl>
@@ -5714,8 +5734,8 @@
         <url>[zap2it]/nickelodeon.jpg</url>
     </networktourl>
     <networktourl>
-        <network>ODYSSEY</network>
-        <url>[zap2it]/odyssey.jpg</url>
+        <network>HALMRK</network>
+        <url>[zap2it]/halmrk.gif</url>
     </networktourl>
     <networktourl>
         <network>PAX</network>
@@ -6552,6 +6572,10 @@
     <networktourl>
         <network>WB</network>
         <url>[zap2it]/wb_30.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>WE</network>
+        <url>[zap2it]/we.jpg</url>
     </networktourl>
     <networktourl>
         <network>WEATHERCHANNEL</network>
