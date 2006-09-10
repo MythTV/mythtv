@@ -451,7 +451,7 @@
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>G1-06</callsign>
-        <network>TNN</network>
+        <network>SPIKE</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>G1-07</callsign>
@@ -535,7 +535,7 @@
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>G5-18</callsign>
-        <network>TNN</network>
+        <network>SPIKE</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>G5-19</callsign>
@@ -2839,11 +2839,11 @@
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>SPIKEP</callsign>
-        <network>TNN</network>
+        <network>SPIKE</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>SPIKETV</callsign>
-        <network>TNN</network>
+        <network>SPIKE</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>STARZ</callsign>
@@ -5507,15 +5507,15 @@
     </callsigntonetwork>
     <networktourl>
         <network>ABC</network>
-        <url>[zap2it]/abc_30.jpg</url>
+        <url>[zap2it]/abc.jpg</url>
     </networktourl>
     <networktourl>
         <network>AE</network>
-        <url>[zap2it]/ae.jpg</url>
+        <url>[zap2it]/aetv.jpg</url>
     </networktourl>
     <networktourl>
         <network>AMC</network>
-        <url>[zap2it]/amc_30.jpg</url>
+        <url>[zap2it]/amc.gif</url>
     </networktourl>
     <networktourl>
         <network>ANGEL1</network>
@@ -5539,11 +5539,11 @@
     </networktourl>
     <networktourl>
         <network>BRAVO</network>
-        <url>[zap2it]/bravo_30.jpg</url>
+        <url>[zap2it]/bravo.jpg</url>
     </networktourl>
     <networktourl>
         <network>CARTOONNETWORK</network>
-        <url>[zap2it]/cartoonnetwork_30.jpg</url>
+        <url>[zap2it]/toon.gif</url>
     </networktourl>
     <networktourl>
         <network>CBC</network>
@@ -5551,7 +5551,7 @@
     </networktourl>
     <networktourl>
         <network>CBS</network>
-        <url>[zap2it]/cbs_30.jpg</url>
+        <url>[zap2it]/cbs.jpg</url>
     </networktourl>
     <networktourl>
         <network>CINEMAX</network>
@@ -5559,7 +5559,7 @@
     </networktourl>
     <networktourl>
         <network>CNBC</network>
-        <url>[zap2it]/cnbc_30.jpg</url>
+        <url>[zap2it]/cnbc.jpg</url>
     </networktourl>
     <networktourl>
         <network>CNN</network>
@@ -5567,11 +5567,11 @@
     </networktourl>
     <networktourl>
         <network>CNNHEADLINENEWS</network>
-        <url>[zap2it]/headlinenews_30.jpg</url>
+        <url>[zap2it]/cnnh.jpg</url>
     </networktourl>
     <networktourl>
         <network>COMEDYCENTRAL</network>
-        <url>[zap2it]/comedycentral_30.jpg</url>
+        <url>[zap2it]/comedy.jpg</url>
     </networktourl>
     <networktourl>
         <network>COURT</network>
@@ -5579,15 +5579,15 @@
     </networktourl>
     <networktourl>
         <network>CSPAN</network>
-        <url>[zap2it]/cspan_30.jpg</url>
+        <url>[zap2it]/cspan.jpg</url>
     </networktourl>
     <networktourl>
         <network>CSPAN2</network>
-        <url>[zap2it]/cspan2_30.jpg</url>
+        <url>[zap2it]/cspan2.jpg</url>
     </networktourl>
     <networktourl>
         <network>DISCOVERY</network>
-        <url>[zap2it]/discoverychannel_30.jpg</url>
+        <url>[zap2it]/dsc.jpg</url>
     </networktourl>
     <networktourl>
         <network>DISNEY</network>
@@ -5599,15 +5599,15 @@
     </networktourl>
     <networktourl>
         <network>ESPN</network>
-        <url>[zap2it]/espn_30.jpg</url>
+        <url>[zap2it]/espn.jpg</url>
     </networktourl>
     <networktourl>
         <network>ESPN2</network>
-        <url>[zap2it]/espn2_30.jpg</url>
+        <url>[zap2it]/espn2.jpg</url>
     </networktourl>
     <networktourl>
         <network>ESPNCL</network>
-        <url>[zap2it]/espnclassic.jpg</url>
+        <url>[zap2it]/espncl.jpg</url>
     </networktourl>
     <networktourl>
         <network>ESPND</network>
@@ -5615,7 +5615,7 @@
     </networktourl>
     <networktourl>
         <network>ESPNEWS</network>
-        <url>[zap2it]/espnews_30.jpg</url>
+        <url>[zap2it]/espnews.jpg</url>
     </networktourl>
     <networktourl>
         <network>ETV</network>
@@ -5635,7 +5635,7 @@
     </networktourl>
     <networktourl>
         <network>FOX</network>
-        <url>[zap2it]/fox_30.jpg</url>
+        <url>[zap2it]/fox.jpg</url>
     </networktourl>
     <networktourl>
         <network>FOXFAMILY</network>
@@ -5699,7 +5699,7 @@
     </networktourl>
     <networktourl>
         <network>HOMESHOPPINGNETWORK</network>
-        <url>[zap2it]/homeshoppingnetwork_30.jpg</url>
+        <url>[zap2it]/hsn.jpg</url>
     </networktourl>
     <networktourl>
         <network>KMEX</network>
@@ -5707,7 +5707,7 @@
     </networktourl>
     <networktourl>
         <network>LIFETIME</network>
-        <url>[zap2it]/lifetime_30.jpg</url>
+        <url>[zap2it]/life.jpg</url>
     </networktourl>
     <networktourl>
         <network>MNTV</network>
@@ -5719,11 +5719,11 @@
     </networktourl>
     <networktourl>
         <network>MTV</network>
-        <url>[zap2it]/mtv_30.jpg</url>
+        <url>[zap2it]/mtv.jpg</url>
     </networktourl>
     <networktourl>
         <network>NBC</network>
-        <url>[zap2it]/nbc_30.jpg</url>
+        <url>[zap2it]/nbc.jpg</url>
     </networktourl>
     <networktourl>
         <network>NEWSENG</network>
@@ -5731,7 +5731,7 @@
     </networktourl>
     <networktourl>
         <network>NICKELODEON</network>
-        <url>[zap2it]/nickelodeon.jpg</url>
+        <url>[zap2it]/nik.jpg</url>
     </networktourl>
     <networktourl>
         <network>HALMRK</network>
@@ -5739,15 +5739,15 @@
     </networktourl>
     <networktourl>
         <network>PAX</network>
-        <url>[zap2it]/pax_30.jpg</url>
+        <url>[zap2it]/pax.jpg</url>
     </networktourl>
     <networktourl>
         <network>PAXSAT</network>
-        <url>[zap2it]/paxtv.jpg</url>
+        <url>[zap2it]/pax.jpg</url>
     </networktourl>
     <networktourl>
         <network>PBS</network>
-        <url>[zap2it]/pbs_30.jpg</url>
+        <url>[zap2it]/pbs.jpg</url>
     </networktourl>
     <networktourl>
         <network>PBS-KAET</network>
@@ -6487,11 +6487,11 @@
     </networktourl>
     <networktourl>
         <network>QVC</network>
-        <url>[zap2it]/qvc_30.jpg</url>
+        <url>[zap2it]/qvc.jpg</url>
     </networktourl>
     <networktourl>
         <network>SCIFI</network>
-        <url>[zap2it]/scifi_30.jpg</url>
+        <url>[zap2it]/scifi.jpg</url>
     </networktourl>
     <networktourl>
         <network>SHOWTIME</network>
@@ -6523,7 +6523,7 @@
     </networktourl>
     <networktourl>
         <network>TBS</network>
-        <url>[zap2it]/tbs_30.jpg</url>
+        <url>[zap2it]/tbs.jpg</url>
     </networktourl>
     <networktourl>
         <network>TCM</network>
@@ -6542,12 +6542,8 @@
         <url>[zap2it]/tmc.jpg</url>
     </networktourl>
     <networktourl>
-        <network>TNN</network>
-        <url>[zap2it]/tnn_30.jpg</url>
-    </networktourl>
-    <networktourl>
         <network>TNT</network>
-        <url>[zap2it]/tnt_30.jpg</url>
+        <url>[zap2it]/tnt.jpg</url>
     </networktourl>
     <networktourl>
         <network>TV5</network>
@@ -6559,7 +6555,7 @@
     </networktourl>
     <networktourl>
         <network>UPN</network>
-        <url>[zap2it]/upn_30.jpg</url>
+        <url>[zap2it]/upn.jpg</url>
     </networktourl>
     <networktourl>
         <network>USA</network>
@@ -6571,7 +6567,7 @@
     </networktourl>
     <networktourl>
         <network>WB</network>
-        <url>[zap2it]/wb_30.jpg</url>
+        <url>[zap2it]/wb.jpg</url>
     </networktourl>
     <networktourl>
         <network>WE</network>
@@ -6579,7 +6575,7 @@
     </networktourl>
     <networktourl>
         <network>WEATHERCHANNEL</network>
-        <url>[zap2it]/weatherchannel_30.jpg</url>
+        <url>[zap2it]/twc.gif</url>
     </networktourl>
     <networktourl>
         <network>WRNN</network>
