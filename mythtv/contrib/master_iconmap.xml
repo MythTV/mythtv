@@ -150,6 +150,10 @@
         <network>CNBC</network>
     </callsigntonetwork>
     <callsigntonetwork>
+        <callsign>CBUT</callsign>
+        <network>CBC</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
         <callsign>CNN</callsign>
         <network>CNN</network>
     </callsigntonetwork>
@@ -5524,6 +5528,10 @@
     <networktourl>
         <network>CARTOONNETWORK</network>
         <url>[zap2it]/cartoonnetwork_30.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>CBC</network>
+        <url>[zap2it]/CBC.gif</url>
     </networktourl>
     <networktourl>
         <network>CBS</network>
