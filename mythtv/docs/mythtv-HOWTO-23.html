@@ -17,15 +17,16 @@
 <H2><A NAME="ss23.1">23.1</A> <A HREF="mythtv-HOWTO.html#toc23.1">I'd like to watch the files without using MythTV / I'd like to convert the files to some other format</A>
 </H2>
 
+<P>First, check if the <B>mytharchive</B> plugin does what you want.  If not, then
+read on:</P>
 <P>MythTV comes with a utility called <B>mythtranscode</B> which can
 decode nuv files into raw format for use with other applications.  This
 command-line utility was not designed to be used by the end-user, but
 instead to be called by other applications or scripts.  Programs like
-<B>mkmovie</B> (
-<A HREF="http://www.icelus.org/">http://www.icelus.org/</A>) and <B>nuvexport</B> (
-<A HREF="http://forevermore.net/myth/">http://forevermore.net/myth/</A>) are
-better suited for the end user.  However, since <B>mythtranscode</B> can
-be a useful tool, directions on using it follow.</P>
+<B>nuvexport</B> (
+<A HREF="http://forevermore.net/myth/">http://forevermore.net/myth/</A>) are better suited for the end user. 
+However, since <B>mythtranscode</B> can be a useful tool, directions on
+using it follow.</P>
 <P><B>mythtranscode</B> creates raw streams, which means that they do not
 contain any container information such as resolution, frame-rate, or audio
 sampling rate.  In order to process the output, you must supply this

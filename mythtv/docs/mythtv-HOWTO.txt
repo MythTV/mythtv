@@ -404,31 +404,35 @@
 
   +o  MythArchive, a tool to create DVDs
 
-  +o  MythGallery, a picture-viewing application
+  +o  MythBrowser, a web browser
 
 
-  +o  MythVideo, a media-viewer for content not created within MythTV
+  +o  MythControls, an application to configure your remote control
 
   +o  MythDVD, a DVD viewer / ripper
+
+  +o  MythFlix, a Netflix module
+
+  +o  MythGallery, a picture-viewing application
+
+  +o  MythGame
 
   +o  MythMusic, a music playing / ripping application which supports MP3
      and FLAC
 
-  +o  MythGame
-
-  +o  MythWeather
-
   +o  MythNews, a RSS news grabber
 
-  +o  MythBrowser, a web browser
+  +o  MythPhone, phone and videophone using SIP.
+
+  +o  MythVideo, a media-viewer for content not created within MythTV
+
+  +o  MythWeather
 
   +o  MythWeb, which allows you to control your MythTV system using a web
      browser.  With MythWeb, you can schedule and delete recordings,
      change keybindings and more.  With proper security, you may even
      schedule a program over the Internet and have it immediately acted
      on by the scheduler.
-
-  +o  MythPhone, phone and videophone using SIP.
 
   [1m1.2.  QuickStart[0m
 
@@ -469,7 +473,6 @@
   This HOWTO document is maintained at the primary MythTV website:
   http://www.mythtv.org <http://www.mythtv.org> by Robert Kulagowski
   <mailto:rkulagow@rocketmail.com>.
-
   This document is available as a single-page HTML document at
   http://www.mythtv.org/docs/mythtv-HOWTO-singlehtml.html
   <http://www.mythtv.org/docs/mythtv-HOWTO-singlehtml.html> or as a PDF
@@ -526,8 +529,6 @@
 
   Really.  Even if there's no one in the mythtv-users IRC group or everyone
   seems to be ignoring you.
-
-
 
   [1m1.8.  Bug database[0m
 
@@ -6776,14 +6777,17 @@
   [1m23.1.  I'd like to watch the files without using MythTV / I'd like to[0m
   [1mconvert the files to some other format[0m
 
+  First, check if the [1mmytharchive [22mplugin does what you want.  If not,
+  then read on:
+
   MythTV comes with a utility called [1mmythtranscode [22mwhich can decode nuv
   files into raw format for use with other applications.  This command-
   line utility was not designed to be used by the end-user, but instead
-  to be called by other applications or scripts.  Programs like [1mmkmovie[0m
-  (http://www.icelus.org/ <http://www.icelus.org/>) and [1mnuvexport[0m
-  (http://forevermore.net/myth/ <http://forevermore.net/myth/>) are
-  better suited for the end user.  However, since [1mmythtranscode [22mcan be a
-  useful tool, directions on using it follow.
+  to be called by other applications or scripts.  Programs like
+  [1mnuvexport [22m(http://forevermore.net/myth/
+  <http://forevermore.net/myth/>) are better suited for the end user.
+  However, since [1mmythtranscode [22mcan be a useful tool, directions on using
+  it follow.
 
   [1mmythtranscode [22mcreates raw streams, which means that they do not
   contain any container information such as resolution, frame-rate, or
@@ -6800,7 +6804,6 @@
   independently, and there is no rate control between them which means
   that the two programs don't coordinate their efforts to maintain
   synchronization.
-
 
 
   [1m23.1.1.  mythtranscode example[0m

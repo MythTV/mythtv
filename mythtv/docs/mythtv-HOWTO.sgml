@@ -62,20 +62,22 @@ see content from your MythTV system.
 Other modules in MythTV include:
 <itemize>
 <item>MythArchive, a tool to create DVDs
-<item>MythGallery, a picture-viewing application
-<item>MythVideo, a media-viewer for content not created within MythTV
+<item>MythBrowser, a web browser
+<item>MythControls, an application to configure your remote control
 <item>MythDVD, a DVD viewer / ripper
+<item>MythFlix, a Netflix module
+<item>MythGallery, a picture-viewing application
+<item>MythGame
 <item>MythMusic, a music playing / ripping application which supports MP3
 and FLAC
-<item>MythGame
-<item>MythWeather
 <item>MythNews, a RSS news grabber
-<item>MythBrowser, a web browser
+<item>MythPhone, phone and videophone using SIP.
+<item>MythVideo, a media-viewer for content not created within MythTV
+<item>MythWeather
 <item>MythWeb, which allows you to control your MythTV system using a web
 browser.  With MythWeb, you can schedule and delete recordings, change
 keybindings and more.  With proper security, you may even schedule a program
 over the Internet and have it immediately acted on by the scheduler.
-<item>MythPhone, phone and videophone using SIP.
 </itemize>
 <sect1>QuickStart
 <p>Custom mini-distributions are available to make it easier to install
@@ -5699,15 +5701,17 @@ $ rm ~/.kde/Autostart/Autorun.desktop
 </verb></tscreen>
 <sect>Miscellaneous. 
 <sect1>I'd like to watch the files without using MythTV / I'd like to convert the files to some other format
-<p>MythTV comes with a utility called <bf>mythtranscode</bf> which can
+<p>First, check if the <bf>mytharchive</bf> plugin does what you want.  If not, then
+read on:
+
+MythTV comes with a utility called <bf>mythtranscode</bf> which can
 decode nuv files into raw format for use with other applications.  This
 command-line utility was not designed to be used by the end-user, but
 instead to be called by other applications or scripts.  Programs like
-<bf>mkmovie</bf> (<url url="http://www.icelus.org/"
-name="http://www.icelus.org/">) and <bf>nuvexport</bf> (<url
-url="http://forevermore.net/myth/" name="http://forevermore.net/myth/">) are
-better suited for the end user.  However, since <bf>mythtranscode</bf> can
-be a useful tool, directions on using it follow.
+<bf>nuvexport</bf> (<url url="http://forevermore.net/myth/"
+name="http://forevermore.net/myth/">) are better suited for the end user. 
+However, since <bf>mythtranscode</bf> can be a useful tool, directions on
+using it follow.
 
 <bf>mythtranscode</bf> creates raw streams, which means that they do not
 contain any container information such as resolution, frame-rate, or audio
