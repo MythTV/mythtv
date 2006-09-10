@@ -10,25 +10,32 @@
 # Author: Xavier Hervy (maxpower44 AT tiscali DOT fr)
 #
 
+# changes:
+# 9-10-2006: Anduin Withers
+#   Changed output to utf8
+#   Made -u option a dummy for this release, it is deprecated and will be
+#   removed
+
 use LWP::Simple;      # libwww-perl providing simple HTML get actions
 use HTML::Entities;
 use URI::Escape;
 
 
-use vars qw($opt_h $opt_r $opt_d $opt_i $opt_v $opt_D $opt_M $opt_P $opt_u $opt_originaltitle $opt_casting);
+use vars qw($opt_h $opt_r $opt_d $opt_i $opt_v $opt_D $opt_M $opt_P $opt_originaltitle $opt_casting $opt_u_dummy);
 use Getopt::Long;
 
 $title = "Allocine Query"; 
 $version = "v2.00";
 $author = "Xavier Hervy";
 
+binmode(STDOUT, ":utf8");
+
 # display usage
 sub usage {
-   print "usage: $0 -hviuocMPD [parameters]\n";
+   print "usage: $0 -hviocMPD [parameters]\n";
    print "       -h, --help                       help\n";
    print "       -v, --version                    display version\n";
    print "       -i, --info                       display info\n";
-   print "       -u, --utf8                       output in utf8\n";
    print "       -o, --originaltitle              concatenate title and original title\n";
    print "       -c, --casting                    with -D option, grap the complete actor list (much slower)\n";
    print "\n";
@@ -141,8 +148,7 @@ sub getMovieData {
    my $plot = parseBetween($response,"<td valign=\"top\" style=\"padding:10 0 0 0\"><div align=\"justify\"><h4>","</h4></div></td>");
    #$plot.replace("<BR>","\n");
    $plot = removeTag($plot);
-   
-
+  
    # parse user rating
    my $userrating;
    my $rating = parseBetween($response,"Presse</a> <img ", " border=\"0\" /></h4></td>");
@@ -220,20 +226,6 @@ sub getMovieData {
    my $countries = parseBetween($response,"<h4>Film ",".</h4>&nbsp;");
    $countries = removeTag($countries);
 
-   if (defined $opt_u) { 
-   utf8::encode($title);
-   utf8::encode($year);
-   utf8::encode($director);
-   utf8::encode($plot);
-   utf8::encode($userrating);
-   utf8::encode($movierating);
-   utf8::encode($runtime);
-   utf8::encode($writer);
-   utf8::encode($cast);
-   utf8::encode($genres);
-   utf8::encode($countries);
-   }
-      
    # output fields (these field names must match what MythVideo is looking for)
    print "Title:$title\n";
    if (!(defined $opt_originaltitle)){
@@ -420,16 +412,11 @@ sub getMovieList {
 	         $finish = index($data, $end, $start + 1); 
 	      
 	         # add to array
-#                 my $movienameutf8 = 
-                 utf8::encode($moviename);
 	         $movies[$count++] = $movienum . ":" . $moviename;
 	      }
 	      
 	      # display array of values
 	      for $movie (@movies) { 
-	        if (defined $opt_u) { 
-            utf8::encode($movie);
-          }
 	        print "$movie\n"; 
 	      }
 	   }
@@ -442,7 +429,7 @@ sub getMovieList {
 
 # parse command line arguments 
 
-    GetOptions( "utf8"  => \$opt_u,        # --utf8
+    GetOptions( "utf8" => \$opt_u_dummy,
                 "version" => \$opt_v,
                 "info" => \$opt_i,
                 "originaltitle" => \$opt_originaltitle,

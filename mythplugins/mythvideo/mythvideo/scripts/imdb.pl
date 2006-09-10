@@ -23,10 +23,13 @@
 #     - added nexbase poster search
 #     - removed amazon.com searching for now
 
+# changes:
+# 9-10-2006: Anduin Withers
+#   Changed output to utf8
+
 use LWP::Simple;      # libwww-perl providing simple HTML get actions
 use HTML::Entities;
 use URI::Escape;
-#use XML::Simple;
 
 
 use vars qw($opt_h $opt_r $opt_d $opt_i $opt_v $opt_D $opt_M $opt_P);
@@ -35,6 +38,8 @@ use Getopt::Std;
 $title = "IMDB Query"; 
 $version = "v1.3";
 $author = "Tim Harvey, Andrei Rjeousski";
+
+binmode(STDOUT, ":utf8");
 
 # display usage
 sub usage {

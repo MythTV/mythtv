@@ -641,9 +641,12 @@ void VideoManager::GetMovieData(const QString &movieNum)
 
         for (QStringList::iterator p = genres.begin(); p != genres.end(); ++p)
         {
-            movie_genres.push_back(
-                    Metadata::genre_list::value_type(-1,
-                                                     (*p).stripWhiteSpace()));
+            QString genre_name = (*p).stripWhiteSpace();
+            if (genre_name.length())
+            {
+                movie_genres.push_back(
+                        Metadata::genre_list::value_type(-1, genre_name));
+            }
         }
 
         curitem->setGenres(movie_genres);
@@ -654,9 +657,12 @@ void VideoManager::GetMovieData(const QString &movieNum)
         for (QStringList::iterator p = countries.begin();
              p != countries.end(); ++p)
         {
-            movie_countries.push_back(
-                    Metadata::country_list::value_type(-1,
-                                                       (*p).stripWhiteSpace()));
+            QString country_name = (*p).stripWhiteSpace();
+            if (country_name.length())
+            {
+                movie_countries.push_back(
+                        Metadata::country_list::value_type(-1, country_name));
+            }
         }
 
         curitem->setCountries(movie_countries);
@@ -707,8 +713,8 @@ namespace
                 {
                     if (proc.canReadLineStdout())
                     {
-                        ret += QString::fromLocal8Bit(proc.readLineStdout(),
-                                -1) + "\n";
+                        ret +=
+                            QString::fromUtf8(proc.readLineStdout(), -1) + "\n";
                     }
 
                     if (proc.canReadLineStderr())
@@ -718,8 +724,8 @@ namespace
                             err = cmd + ": ";
                         }
 
-                        err += QString::fromLocal8Bit(proc.readLineStderr(),
-                                -1) + "\n";
+                        err +=
+                            QString::fromUtf8(proc.readLineStderr(), -1) + "\n";
                     }
                 }
 
@@ -750,7 +756,7 @@ namespace
         {
             if (proc.canReadLineStdout())
             {
-                ret += QString::fromLocal8Bit(proc.readLineStdout(),-1) + "\n";
+                ret += QString::fromUtf8(proc.readLineStdout(),-1) + "\n";
             }
 
             if (proc.canReadLineStderr())
@@ -760,7 +766,7 @@ namespace
                     err = cmd + ": ";
                 }
 
-                err += QString::fromLocal8Bit(proc.readLineStderr(), -1) + "\n";
+                err += QString::fromUtf8(proc.readLineStderr(), -1) + "\n";
             }
         }
 

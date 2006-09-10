@@ -10,10 +10,14 @@
 # Author: Xavier Hervy (maxpower44 AT tiscali DOT fr)
 #
 
+# changes:
+# 9-10-2006: Anduin Withers
+#   Updated to work with new " instead of ' in pages
+#   Changed output to utf8
+
 use LWP::Simple;      # libwww-perl providing simple HTML get actions
 use HTML::Entities;
 use URI::Escape;
-#use utf8;
 
 use vars qw($opt_h $opt_r $opt_d $opt_i $opt_v $opt_D $opt_M $opt_P);
 use Getopt::Std; 
@@ -21,6 +25,8 @@ use Getopt::Std;
 $title = "Ofdb Query"; 
 $version = "v1.00";
 $author = "Xavier Hervy";
+
+binmode(STDOUT, ":utf8");
 
 # display usage
 sub usage {
@@ -68,10 +74,10 @@ sub parseBetween {
        
    #print "$start $finish\n";
    if ($start != (length($beg) -1) && $finish != -1) {
-    	my $result = substr($data, $start, $finish - $start);
-    	# dont use decode entities &npsp; => sp�ial characters bug in html::entities ?
-    	#decode_entities($result);
-     	return  removenbsp($result);
+        my $result = substr($data, $start, $finish - $start);
+        # dont use decode entities &npsp; => sp�ial characters bug in html::entities ?
+        #decode_entities($result);
+        return  removenbsp($result);
    }
    return "";
 }
@@ -318,61 +324,61 @@ sub getMovieList {
  #  my $typerecherche = 3;
    
  #  while (($typerecherche <=5) && ($count ==0)){
-	   # get the search results  page
-	   my $request = "http://www.ofdb.de/view.php?page=suchergebnis&Kat=DTitel&SText=$query";
-	   if (defined $opt_d) { printf("# request: '%s'\n", $request); }
-	   my $response = get $request;
-	   if (defined $opt_r) {
-	      print $response;
-	      exit(0);
-	   }
-	
-	
-	   # extract possible matches
-	   #    possible matches are grouped in several catagories:  
-	   #        exact, partial, and approximate
-	   my $exact_matches = parseBetween($response, "</b><br><br>1.",
-	   						"<br><br><br></font></p>");
-	   #print "$exact_matches\n";
-	   # parse movie list from matches
-	   my $beg = "<a href='view.php?page=film&";
-	   my $end = "</a>";
-	   
-	   my @movies;
-	
-	
-	   my $data = $exact_matches;
-#	   if ($data eq "") {
-#	      if (defined $opt_d) { printf("# no results\n"); }
-#	   	$typerecherche = $typerecherche +2 ;
-#	   }else{
-	      my $start = index($data, $beg);
-	      my $finish = index($data, $end, $start);
-	      
-	      my $title;
-	      while ($start != -1) {
-	         $start += length($beg);
-	         my $sub = substr($data, $start, $finish - $start);
-                 my $movienum =  parseBetween($sub,"fid=","'>");
-                 $title =  parseBetween($sub,">","<font size='1'>");
-	         $title = removeTag($title);
-	         $moviename = removeTag($sub);
-	         my ($movieyear)= $moviename =~/\((\d+)\)/;
-	         if ($movieyear){$title = $title." (".$movieyear.")"; }
-	         $moviename=$title ;
-	      
-	         # advance data to next movie
-	         $data = substr($data, - (length($data) - $finish));
-	         $start = index($data, $beg);
-	         $finish = index($data, $end, $start + 1); 
-	      
-	         # add to array
-	         $movies[$count++] = $movienum . ":" . $moviename;
-	      }
-	      
-	      # display array of values
-	      for $movie (@movies) { print "$movie\n"; }
-#	   }
+       # get the search results  page
+       my $request = "http://www.ofdb.de/view.php?page=suchergebnis&Kat=DTitel&SText=$query";
+       if (defined $opt_d) { printf("# request: '%s'\n", $request); }
+       my $response = get $request;
+       if (defined $opt_r) {
+          print $response;
+          exit(0);
+       }
+    
+    
+       # extract possible matches
+       #    possible matches are grouped in several catagories:  
+       #        exact, partial, and approximate
+       my $exact_matches = parseBetween($response, "</b><br><br>1.",
+                            "<br><br><br></font></p>");
+       # print "$exact_matches\n";
+       # parse movie list from matches
+       my $beg = "<a href=\"view.php?page=film&";
+       my $end = "</a>";
+       
+       my @movies;
+    
+    
+       my $data = $exact_matches;
+#      if ($data eq "") {
+#         if (defined $opt_d) { printf("# no results\n"); }
+#       $typerecherche = $typerecherche +2 ;
+#      }else{
+          my $start = index($data, $beg);
+          my $finish = index($data, $end, $start);
+         
+          my $title;
+          while ($start != -1) {
+             $start += length($beg);
+             my $sub = substr($data, $start, $finish - $start);
+             my $movienum =  parseBetween($sub,"fid=","\">");
+             $title =  parseBetween($sub,">","<font size=\"1\">");
+             $title = removeTag($title);
+             $moviename = removeTag($sub);
+             my ($movieyear)= $moviename =~/\((\d+)\)/;
+             if ($movieyear){$title = $title." (".$movieyear.")"; }
+             $moviename=$title ;
+          
+             # advance data to next movie
+             $data = substr($data, - (length($data) - $finish));
+             $start = index($data, $beg);
+             $finish = index($data, $end, $start + 1); 
+          
+             # add to array
+             $movies[$count++] = $movienum . ":" . $moviename;
+          }
+          
+          # display array of values
+          for $movie (@movies) { print "$movie\n"; }
+#      }
 #      }
 }
 
