@@ -2612,18 +2612,17 @@ up again.
 Now that mythfrontend has started up, you should have a number of
 buttons/choices.  Before doing anything, go to TV, then to Setup and
 configure the frontend client.
-<!-- XXXXXXXXXX -->
 <figure loc="here">
 <eps file="stop.eps" height="1cm">
 <img src="stop.png">
 <caption><bf>NOTE</bf>:  You should go through the various setup screens in
-mythfrontend before using any other modules such as MythMusic, etc. to
-correctly initialize the database.
+mythfrontend before using any other modules to ensure that the the database
+is correctly initialized.
 </caption>
 </figure>
 <sect1>General
 <p>The General screen has configuration items that don't really fit anywhere
-else.  The first few configuration items asks you to indicate the number of
+else.  The first few configuration items ask you to indicate the number of
 seconds to record before or after a program, which is useful if the
 broadcast network or your system clock are out of sync and will help prevent
 you missing the beginning or end of a program.  
@@ -2637,7 +2636,7 @@ The next page has a number of options to do with how channels are displayed
 on your system.  The help text will give you more information.  Move the
 focus to Next and press the space bar to continue.
 
-The final General page sets up some final configuration items.  See the help
+The last General page sets up some final configuration items.  See the help
 text for more information.
 
 <sect1>Appearance
@@ -2658,7 +2657,7 @@ deinterlacing, which will improve how the image looks on your screen.
 Deinterlacing requires that your processor support SSE. (Streaming SIMD
 Extensions, aka "MMX2").  Early Intel Celeron (those that don't use the
 Coppermine 0.18um core and are usually <600MHz), Pentium Pro and Pentium II
-CPUs do not have SSE, so make sure that you haven't enabled deinterlacing if
+CPUs do not have SSE, so make sure you haven't enabled deinterlacing if
 your processor doesn't support it. If you enable it, and your processor
 doesn't support SSE, you will get "Illegal Instruction" errors.
 
@@ -2678,10 +2677,10 @@ implementation of SSE instructions, so if your processor has 3dnow you
 shouldn't have any issues with deinterlacing.
 <sect2>Video Filters
 <!-- Submitted by Bruce Markey -->
-<p>MythTV provides a facility to include video filters while recording and
+<p>MythTV provides a means of employing video filters while recording and
 during playback. These filters can be used to improve or modify the video
 image, including hiding the effects of an interlaced image or reducing the
-effects of noise in a poor video signal. The following is a brief
+impact of noise in a poor video signal. The following is a brief
 introduction to introduce you to the filters that are available in MythTV
 version 0.20
 <sect2>Applying filters
@@ -2717,7 +2716,7 @@ This implements special behavior needed for the "bobdeint" filter but can
 also be used to choose any of the deinterlace filters. If you prefer, you
 may leave this unchecked and include any of the deinterlace filters, other
 than "bobdeint", in your custom filter chain.
-
+<!-- XXXXXXXX -->
 <p>o  The "invert" filter
 
 Invert ignores any parameters and inverts the pixel values of the video
