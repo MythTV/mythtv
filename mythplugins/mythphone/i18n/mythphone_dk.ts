@@ -11,7 +11,7 @@
     </message>
     <message>
         <source>Remove from Speed Dials</source>
-        <translation type="unfinished"></translation>
+        <translation>Fjern fra Hurtigkald</translation>
     </message>
     <message>
         <source>Save this in the Directory</source>
@@ -31,15 +31,15 @@
     </message>
     <message>
         <source>Delete this Voicemail</source>
-        <translation type="unfinished"></translation>
+        <translation>Slet denne Voicemail</translation>
     </message>
     <message>
         <source>Delete all Voicemails</source>
-        <translation type="unfinished"></translation>
+        <translation>Slet alle Voicemails</translation>
     </message>
     <message>
         <source>Place Videocall Now</source>
-        <translation type="unfinished"></translation>
+        <translation>Lav Video opkald nu</translation>
     </message>
     <message>
         <source>Place Voice-Only Call Now</source>
@@ -47,11 +47,11 @@
     </message>
     <message>
         <source>Switch from digits to URL input</source>
-        <translation type="unfinished"></translation>
+        <translation>Skift fra numre til URL indtastning</translation>
     </message>
     <message>
         <source>Switch from URL to Digits input</source>
-        <translation type="unfinished"></translation>
+        <translation>Skift fra URL til nummer indtastning</translation>
     </message>
     <message>
         <source>Send IM</source>
@@ -59,19 +59,19 @@
     </message>
     <message>
         <source>Save Changes</source>
-        <translation type="unfinished"></translation>
+        <translation>Gem ændringer</translation>
     </message>
     <message>
         <source>ADD</source>
-        <translation type="unfinished"></translation>
+        <translation>Tilføj</translation>
     </message>
     <message>
         <source>ADD DIRECTORY</source>
-        <translation type="unfinished"></translation>
+        <translation>Tilføj mappe</translation>
     </message>
     <message>
         <source>Registered to </source>
-        <translation type="unfinished"></translation>
+        <translation>Registreret til</translation>
     </message>
     <message>
         <source> as </source>
@@ -79,7 +79,7 @@
     </message>
     <message>
         <source>Not Registered</source>
-        <translation type="unfinished"></translation>
+        <translation>Ikke registreret</translation>
     </message>
     <message>
         <source>Audio and Video Looped to </source>
@@ -87,7 +87,7 @@
     </message>
     <message>
         <source>No Active Calls</source>
-        <translation type="unfinished"></translation>
+        <translation>Ingen aktive opkald</translation>
     </message>
     <message>
         <source>Caller is Leaving Voicemail</source>
@@ -111,19 +111,19 @@
     </message>
     <message>
         <source>Directory</source>
-        <translation type="unfinished"></translation>
+        <translation>Mappe</translation>
     </message>
     <message>
         <source>Speed Dials</source>
-        <translation type="unfinished"></translation>
+        <translation>Hurtigkald</translation>
     </message>
     <message>
         <source>Call History</source>
-        <translation type="unfinished"></translation>
+        <translation>Opkalds historie</translation>
     </message>
     <message>
         <source>Voicemail</source>
-        <translation type="unfinished"></translation>
+        <translation>Voicemail</translation>
     </message>
     <message>
         <source>Nickname</source>
@@ -143,7 +143,7 @@
     </message>
     <message>
         <source>Speed Dial</source>
-        <translation type="unfinished"></translation>
+        <translation>Hurtigkald</translation>
     </message>
     <message>
         <source>Client is on My Home LAN</source>
@@ -179,7 +179,7 @@
     </message>
     <message>
         <source>You Called </source>
-        <translation type="unfinished"></translation>
+        <translation>Du har ringet til</translation>
     </message>
     <message>
         <source>They Called </source>
@@ -191,11 +191,11 @@
     </message>
     <message>
         <source>Today </source>
-        <translation type="unfinished"></translation>
+        <translation>i dag</translation>
     </message>
     <message>
         <source>Yesterday </source>
-        <translation type="unfinished"></translation>
+        <translation>i går</translation>
     </message>
     <message>
         <source>at</source>
@@ -215,7 +215,7 @@
     </message>
     <message>
         <source>Video</source>
-        <translation type="unfinished"></translation>
+        <translation>Video</translation>
     </message>
     <message>
         <source>Resolution In/Out: </source>
@@ -259,15 +259,15 @@
     </message>
     <message>
         <source>Brightness</source>
-        <translation type="unfinished"></translation>
+        <translation>Lys</translation>
     </message>
     <message>
         <source>Contrast</source>
-        <translation type="unfinished"></translation>
+        <translation>Kontrast</translation>
     </message>
     <message>
         <source>Colour</source>
-        <translation type="unfinished"></translation>
+        <translation>Farve</translation>
     </message>
     <message>
         <source>Transmit Video Size</source>
@@ -283,7 +283,7 @@
     </message>
     <message>
         <source>Dial</source>
-        <translation type="unfinished"></translation>
+        <translation>Ring</translation>
     </message>
     <message>
         <source>Playout Delay Min/Avg/Max:            </source>
@@ -306,7 +306,7 @@
     <name>QObject</name>
     <message>
         <source>OK</source>
-        <translation type="unfinished"></translation>
+        <translation>Ok</translation>
     </message>
     <message>
         <source>Webcam device</source>

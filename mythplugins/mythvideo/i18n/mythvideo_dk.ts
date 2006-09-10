@@ -226,11 +226,11 @@
     </message>
     <message>
         <source>Maintain aspect ratio of thumbnails</source>
-        <translation>Behold aspektet på mini billederne</translation>
+        <translation>Behold aspektet på miniature billederne</translation>
     </message>
     <message>
         <source>If set, the scaled thumbnails will maintain their original aspect ratio. If not set, they are scaled to match the size of the background icon.</source>
-        <translation type="unfinished"></translation>
+        <translation>Hvis aktiv, beholder miniature billederne deres oprindelige aspekt. Hvis ikke aktiv, scaléres de til at passe til bagrundsikonerne.</translation>
     </message>
     <message>
         <source>Video Gallery</source>
@@ -456,10 +456,6 @@
         <translation>SELECT: Ændre</translation>
     </message>
     <message>
-        <source></source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Parental</source>
         <translation>Voksen</translation>
     </message>
@@ -531,7 +527,7 @@
     <name>VideoDialog</name>
     <message>
         <source>Switch to Browse View</source>
-        <translation type="unfinished">Skift til Browse visning</translation>
+        <translation>Skift til Browse visning</translation>
     </message>
     <message>
         <source>Switch to Gallery View</source>
@@ -687,7 +683,7 @@
     <name>VideoSelected</name>
     <message>
         <source>No rating available.</source>
-        <translation type="unfinished">Ingen ratings tilgængelig</translation>
+        <translation>Ingen ratings tilgængelig.</translation>
     </message>
     <message>
         <source>minutes</source>
