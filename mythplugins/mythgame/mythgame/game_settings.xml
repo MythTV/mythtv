@@ -15,6 +15,7 @@
       <text lang="FI">Yleiset Asetukset</text>
       <text lang="ET">Üldised sätted</text>
       <text lang="NB">Generelle innstillinger</text>
+      <text lang="RU">Настройки игр</text>
       <action>GAME_SETTINGS</action>
    </button>
 
@@ -33,6 +34,7 @@
       <text lang="FI">Pelaajat</text>
       <text lang="ET">Mängijad</text>
       <text lang="NB">Spillere</text>
+      <text lang="RU">Игроки</text>
       <action>GAME_PLAYERS</action>
    </button>
 
@@ -48,6 +50,7 @@
       <text lang="ES">Buscar Juegos</text>
       <text lang="ET">Mängude skaneerimine</text>
       <text lang="NB">Leit etter spill</text>
+      <text lang="RU">Искать игры</text>
       <action>SEARCH_FOR_GAMES</action>
    </button>
 
@@ -66,6 +69,7 @@
       <text lang="FI">Tyhjennä Tietueet</text>
       <text lang="ET">Mänguandmete puhastamine</text>
       <text lang="NB">Tøm spilldata</text>
+      <text lang="RU">Очистить данные игр</text>
       <action>CLEAR_GAME_DATA</action>
    </button>
 

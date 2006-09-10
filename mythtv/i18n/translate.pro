@@ -41,6 +41,7 @@ SOURCES += ../libs/libmythtv/sr_items.cpp
 SOURCES += ../libs/libmythtv/sr_items.h
 SOURCES += ../libs/libmythtv/sr_root.cpp
 SOURCES += ../libs/libmythtv/sr_root.h
+SOURCES += ../libs/libmythtv/tv.cpp
 SOURCES += ../libs/libmythtv/tv_play.cpp
 SOURCES += ../libs/libmythtv/videosource.cpp
 SOURCES += ../libs/libmythtv/videosource.h

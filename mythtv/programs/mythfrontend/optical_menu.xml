@@ -98,6 +98,7 @@
       <text lang="ES">Archivar Ficheros</text>
       <text lang="RU">Архивировать файлы</text>
       <text lang="ET">Arhiveerimine</text>
+      <text lang="DE">Dateien archivieren</text>
       <action>PLUGIN mytharchive</action>
       <depends>mytharchive</depends>
    </button>

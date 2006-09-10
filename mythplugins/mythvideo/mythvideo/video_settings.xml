@@ -16,6 +16,7 @@
       <text lang="SI">Splošne nastavitve</text>
       <text lang="FI">Yleiset Asetukset</text>
       <text lang="ET">Üldised sätted</text>
+      <text lang="RU">Общие настройки</text>
       <action>SETTINGS_GENERAL</action>
    </button>
 
@@ -35,6 +36,7 @@
       <text lang="SI">Nastavitve predvajalnika</text>
       <text lang="FI">Toistoasetukset</text>
       <text lang="ET">Mängija sätted</text>
+      <text lang="RU">Настройки проигрывателя</text>
       <action>SETTINGS_PLAYER</action>
    </button>
 
@@ -54,6 +56,7 @@
       <text lang="FI">Tiedostotyypit</text>
       <text lang="DK">Filtyper</text>
       <text lang="ET">Failitüübid</text>
+      <text lang="RU">Типы файлов</text>
       <action>SETTINGS_ASSOCIATIONS</action>
    </button>
 

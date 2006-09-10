@@ -15,6 +15,7 @@
       <text lang="NB">Spill av DVD</text>
       <text lang="FI">Toista DVD</text>
       <text lang="ET">DVD mängimine</text>
+      <text lang="RU">Смотреть DVD</text>
       <action>DVD_PLAY</action>
    </button>
 
@@ -29,6 +30,7 @@
       <text lang="JA">VCD再生</text>
       <text lang="FI">Toista VCD</text>
       <text lang="ET">VCD mängimine</text>
+      <text lang="RU">Смотреть VCD</text>
       <action>VCD_PLAY</action>
    </button>
 
@@ -48,6 +50,7 @@
       <text lang="JA">DVDリッピング</text>
       <text lang="FI">Kopioi DVD</text>
       <text lang="ET">DVD rippimine</text>
+      <text lang="RU">Импортировать DVD</text>
       <action>DVD_RIP</action>
    </button>
 
@@ -55,6 +58,7 @@
       <type>EJECT</type>
       <text>Eject media</text>
       <text lang="ET">Meedia väljastamine</text>
+      <text lang="RU">Достать диск</text>
       <action>EJECT</action>
    </button>
 

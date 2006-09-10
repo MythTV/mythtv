@@ -7,6 +7,8 @@
       <text lang="et">Failide otsimine arhiveerimiseks</text>
       <text lang="nl">Zoek bestanden om te archiveren</text>
       <text lang="nb">Finn filer å arkivere</text>
+      <text lang="de">Dateien zum Archivieren finden</text>
+      <text lang="RU">Найти файлы для архивирования</text>
       <action>ARCHIVE_FINDER</action>
    </button>
 
@@ -16,7 +18,9 @@
       <text lang="es">Exportar Ficheros Video</text>
       <text lang="et">Videofailide eksportimine</text>
       <text lang="nl">Exporteer Video Bestanden</text>
+      <text lang="de">Videodateien exportieren</text>
       <text lang="nb">Eksporter videofiler</text>
+      <text lang="RU">Экспортировать видео</text>
       <action>ARCHIVE_EXPORT_VIDEO</action>
    </button>
 
@@ -25,8 +29,10 @@
        <text>Import Video Files</text>
        <text lang="es">Importar Ficheros Video</text>
        <text lang="et">Videofailide importimine</text>
+       <text lang="de">Videodateien importieren</text>
        <text lang="nl">Importeer Video Bestanden</text>
        <text lang="nb">Importer videofiler</text>
+       <text lang="RU">Импортировать видео</text>
        <action>ARCHIVE_IMPORT_VIDEO</action>
    </button>
 

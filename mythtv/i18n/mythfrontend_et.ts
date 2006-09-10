@@ -2434,7 +2434,7 @@ Tagasipöördumine eelmisesse menüüsse.</translation>
     </message>
     <message>
         <source>If set, the MPEG4 encoder will use interlaced DCT encoding.  You probably want this when encoding interlaced video.</source>
-        <translation>Märkimisel kasutab MPEG4 DCT ülekattega kodeerimist.  Sa tõenäoliselt vajad seda, kui kodeerid ülekattega (interlaced) videot.</translation>
+        <translation type="obsolete">Märkimisel kasutab MPEG4 DCT ülekattega kodeerimist.  Sa tõenäoliselt vajad seda, kui kodeerid ülekattega (interlaced) videot.</translation>
     </message>
     <message>
         <source>Enable interlaced motion estimation</source>
@@ -2442,7 +2442,7 @@ Tagasipöördumine eelmisesse menüüsse.</translation>
     </message>
     <message>
         <source>If set, the MPEG4 encoder will use interlaced motion estimation.  You probably want this when encoding interlaced video.</source>
-        <translation>Märkimisel kasutab MPEG4 kodeerija ülekattega liikumise hindamist.  Seda on tõenäoliselt vaja, kui kodeerid ülekattega (interlaced) videot.</translation>
+        <translation type="obsolete">Märkimisel kasutab MPEG4 kodeerija ülekattega liikumise hindamist.  Seda on tõenäoliselt vaja, kui kodeerid ülekattega (interlaced) videot.</translation>
     </message>
     <message>
         <source>Enable high-quality encoding</source>
@@ -2916,7 +2916,7 @@ Sinu tõmbaja ei sisalda kanalite numbreid, pead need käsitsi panema.</translat
     </message>
     <message>
         <source>Check this option for budget BT878 based DVB-T cards such as the AverTV DVB-T that require the audio volume left alone.</source>
-        <translation>Vali see, kui kasutad odavat BT878- baseeruvat DVB-T kaarti nagu näiteks AverTV DVB-T, millel ei tohi helitugevust muuta.</translation>
+        <translation type="obsolete">Vali see, kui kasutad odavat BT878- baseeruvat DVB-T kaarti nagu näiteks AverTV DVB-T, millel ei tohi helitugevust muuta.</translation>
     </message>
     <message>
         <source>DVB Card Number</source>
@@ -2936,7 +2936,7 @@ Sinu tõmbaja ei sisalda kanalite numbreid, pead need käsitsi panema.</translat
     </message>
     <message>
         <source>This option makes the backend dvb-recorder only open the card when it is actually in-use leaving it free for other programs at other times.</source>
-        <translation>See valik paneb DigiTV taustaserveri kaarti avama vaid juhul, kui seda tõesti kasutatakse ning jätab muul ajal kaardi vabaks teistele rakendustele.</translation>
+        <translation type="obsolete">See valik paneb DigiTV taustaserveri kaarti avama vaid juhul, kui seda tõesti kasutatakse ning jätab muul ajal kaardi vabaks teistele rakendustele.</translation>
     </message>
     <message>
         <source>DiSEqC Input Type: (DVB-S)</source>
@@ -3542,7 +3542,7 @@ Sinu tõmbaja ei sisalda kanalite numbreid, pead need käsitsi panema.</translat
     </message>
     <message>
         <source>Absolutely don&apos;t record</source>
-        <translation>Mitte mingil juhul ära salvesta</translation>
+        <translation type="obsolete">Mitte mingil juhul ära salvesta</translation>
     </message>
     <message>
         <source>Program details</source>
@@ -6373,7 +6373,7 @@ Sinu tõmbaja ei sisalda kanalite numbreid, pead need käsitsi panema.</translat
     </message>
     <message>
         <source>Normally the dvb-recording will drop packets from the card until a sequence start header is seen. This option turns off this feature.</source>
-        <translation>Tavaliselt DigiTV salvestamise alguses oodatakse järjekorra alguse päist ning alles siis hakatakse salvestama. Antud valik võimaldab kohest salvestamist.</translation>
+        <translation type="obsolete">Tavaliselt DigiTV salvestamise alguses oodatakse järjekorra alguse päist ning alles siis hakatakse salvestama. Antud valik võimaldab kohest salvestamist.</translation>
     </message>
     <message>
         <source>DBOX2 Streaming Port</source>
@@ -8131,7 +8131,7 @@ MythTV lõpetab töö.</translation>
     </message>
     <message>
         <source>Device ID from the back of the HDHomeRun unit.</source>
-        <translation>HDHomeRun seadme taga kirjas olev ID.</translation>
+        <translation type="obsolete">HDHomeRun seadme taga kirjas olev ID.</translation>
     </message>
     <message>
         <source>Tuner</source>
@@ -8554,6 +8554,74 @@ Kontrolli, kas video on olemas</translation>
         <source>Some filesystems use a lot of resources when deleting large recording files.  This option makes Myth delete the file slowly to lessen the impact.</source>
         <translation>Suurte failide kustutamine võib mõne failisüsteemi puhul nõuda palju ressursse.  Aeglaselt kustutamine vähendab sellest koormusest tingitud negatiivset mõju.</translation>
     </message>
+    <message>
+        <source>Make the dvb-recording will drop packets from the card until a sequence start header is seen.</source>
+        <translation type="obsolete">Oota DigiTV salvestamise alustamisel järjekorra alguspäist.</translation>
+    </message>
+    <message>
+        <source>General (AutoExpire)</source>
+        <translation>Üldine (automaatne aegumine)</translation>
+    </message>
+    <message>
+        <source>(CH)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>(REC)</source>
+        <translation>(salvestamine)</translation>
+    </message>
+    <message>
+        <source>Adjust Playback</source>
+        <translation>Mahamängimise kohandamine</translation>
+    </message>
+    <message>
+        <source>Adjust Recorder</source>
+        <translation>Salvestamise kohandamine</translation>
+    </message>
+    <message>
+        <source>Colour</source>
+        <translation>Värvitugevus</translation>
+    </message>
+    <message>
+        <source>Volume</source>
+        <translation>Helitugevus</translation>
+    </message>
+    <message>
+        <source>MAX</source>
+        <translation>Maks</translation>
+    </message>
+    <message>
+        <source>If set, the MPEG4 encoder will use interlaced DCT encoding.  You probably want this when encoding interlaced video. NOTE: Very high CPU usage.</source>
+        <translation type="obsolete">Märkimisel kasutab MPEG4 DCT ülekattega kodeerimist.  Sa tõenäoliselt vajad seda, kui kodeerid ülekattega (interlaced) videot. VÄGA SUUR protsessori koormus!</translation>
+    </message>
+    <message>
+        <source>If set, the MPEG4 encoder will use interlaced motion estimation.  You probably want this when encoding interlaced video. NOTE: Very high CPU usage.</source>
+        <translation type="obsolete">Märkimisel kasutab MPEG4 kodeerija ülekattega liikumise hindamist.  Seda on tõenäoliselt vaja, kui kodeerid ülekattega (interlaced) videot.  VÄGA SUUR protsessori koormus!</translation>
+    </message>
+    <message>
+        <source>If set, the MPEG4 encoder will use interlaced DCT encoding. You may want this when encoding interlaced video, however, this is experimental and may cause damaged video.</source>
+        <translation>Märkimisel kasutab MPEG4 ülekattega (interlaced) DCT kodeerimist.  Tõenäoliselt vajad sa seda, kui kodeerid ülekattega videot. See on alles eksperimentaalne ning võib rikkuda su video täiesti.</translation>
+    </message>
+    <message>
+        <source>If set, the MPEG4 encoder will use interlaced motion estimation. You may want this when encoding interlaced video, however, this is experimental and may cause damaged video.</source>
+        <translation>Märkimisel kasutab MPEG4 kodeerija ülekattega (interlaced) liikumise hindamist.  Seda on tõenäoliselt vaja, kui kodeerid ülekattega videot. See on alles eksperimentaalne ning võib rikkuda su video täiesti.</translation>
+    </message>
+    <message>
+        <source>Enable this option for budget BT878 based DVB-T cards such as the AverTV DVB-T which require the audio volume to be left alone.</source>
+        <translation>Märgi see juhul, kui kasutad odavat BT878  kiviga DVB-T kaarti nagu näiteks AverTV DVB-T, mis ei luba helitugevust puutuda.</translation>
+    </message>
+    <message>
+        <source>Make the dvb-recording drop packets from the card until a sequence start header is seen.</source>
+        <translation>Ignoreeri DigiTV kaardilt tulevaid pakette kuni pole saabunud alguse päist.</translation>
+    </message>
+    <message>
+        <source>This option makes the backend dvb-recorder only open the card when it is actually in-use, leaving it free for other programs at other times.</source>
+        <translation>See valik paneb DigiTV taustaserveri kaarti avama vaid juhul, kui seda tõesti kasutatakse ning jätab muul ajal kaardi vabaks teistele rakendustele.</translation>
+    </message>
+    <message>
+        <source>Device ID from the back of the HDHomeRun unit.  You may use &apos;FFFFFFFF&apos; if there is only one unit on your your network.</source>
+        <translation>HDHomeRun seadme taga kirjas olev ID.  Kui see võrgus ainuke seade, on lubatud kasutada ka &quot;FFFFFFFF&quot;.</translation>
+    </message>
 </context>
 <context>
     <name>RecordingType</name>
@@ -8930,7 +8998,7 @@ Rohkem andmeid pole</translation>
     </message>
     <message>
         <source>Adjust Picture</source>
-        <translation>Kohanda pilti</translation>
+        <translation>Pildi kohandamine</translation>
     </message>
     <message>
         <source>Contrast (REC) %1 %</source>
@@ -8962,7 +9030,7 @@ Rohkem andmeid pole</translation>
     </message>
     <message>
         <source>Adjust Volume</source>
-        <translation>Muuda helitugevust</translation>
+        <translation>Helitugevuse muutmine</translation>
     </message>
     <message>
         <source>Time Stretch %1X</source>
@@ -8970,7 +9038,7 @@ Rohkem andmeid pole</translation>
     </message>
     <message>
         <source>Adjust Time Stretch</source>
-        <translation>Muuda aja skaleerimist</translation>
+        <translation>Aja skaleerimine</translation>
     </message>
     <message>
         <source>Mute Off</source>
@@ -9630,7 +9698,7 @@ Rohkem andmeid pole</translation>
     </message>
     <message>
         <source>Select the title of the program you wish to find. When finished return with the left arrow key. Press SELECT to schedule a recording.</source>
-        <translation>Vali selle programmi pealkiri, mida soovid otsida. Lõpetamisel saad tagasi vasaku nooleklahviga. Vajuta SELECT salvestamise planeerimiseks.</translation>
+        <translation>Vali selle programmi pealkiri, mida soovid otsida. Tagasi saad vasaku nooleklahviga. Vajuta SELECT salvestamise planeerimiseks.</translation>
     </message>
     <message>
         <source>No Programs</source>

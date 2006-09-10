@@ -11,6 +11,7 @@
      <text lang="FI">Pelaa</text>
      <text lang="ET">Mängud</text>
      <text lang="NB">Spill</text>
+     <text lang="RU">Игры</text>
      <action>GAME_PLAY</action>
   </button>
 

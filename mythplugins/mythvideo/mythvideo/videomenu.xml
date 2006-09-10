@@ -15,6 +15,7 @@
      <text lang="SI">Iskanje filmov</text>
      <text lang="FI">Selaa Videoita</text>
      <text lang="ET">Filmide brausimine</text>
+     <text lang="RU">Браузер фильмов</text>
      <action>BROWSER</action>
    </button>
 
@@ -33,6 +34,7 @@
      <text lang="SI">Seznam filmov</text>
      <text lang="FI">Videolistaus</text>
      <text lang="ET">Filmide nimekiri</text>
+     <text lang="RU">Список фильмов</text>
      <action>LISTING</action>
    </button>
 
@@ -48,6 +50,7 @@
      <text lang="PT">Galeria de Filmes</text>
      <text lang="ES">Galería</text>
      <text lang="ET">Filmide galerii</text>
+     <text lang="RU">Галерея фильмов</text>
      <action>GALLERY</action>
    </button>
 
@@ -66,6 +69,7 @@
      <text lang="SI">Upravitelj filmov</text>
      <text lang="FI">Videohallinta</text>
      <text lang="ET">Filmihaldus</text>
+     <text lang="RU">Менеджер фильмов</text>
      <action>MANAGER</action>
    </button>
 

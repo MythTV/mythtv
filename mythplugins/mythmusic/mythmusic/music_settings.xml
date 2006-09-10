@@ -16,6 +16,7 @@
       <text lang="FI">Yleiset Asetukset</text>
       <text lang="SI">Splošne nastavitve</text>
       <text lang="ET">Üldised sätted</text>
+      <text lang="RU">Общие настройки</text>
       <action>MUSIC_SET_GENERAL</action>
    </button>
 
@@ -35,6 +36,7 @@
       <text lang="FI">Soittoasetukset</text>
       <text lang="SI">Nastavitve predvajanja</text>
       <text lang="ET">Mängija sätted</text>
+      <text lang="RU">Настройки проигрывателя</text>
       <action>MUSIC_SET_PLAYER</action>
    </button>
 
@@ -52,6 +54,7 @@
       <text lang="FI">Tuontiasetukset</text>
       <text lang="SI">Nastavitve ripanja</text>
       <text lang="ET">Rippija sätted</text>
+      <text lang="RU">Настройки импорта</text>
       <action>MUSIC_SET_RIPPER</action>
    </button>
 

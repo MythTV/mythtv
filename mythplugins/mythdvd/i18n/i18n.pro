@@ -9,7 +9,7 @@ trans.files  = mythdvd_it.qm mythdvd_es.qm mythdvd_ca.qm
 trans.files += mythdvd_nl.qm mythdvd_de.qm mythdvd_dk.qm
 trans.files += mythdvd_pt.qm mythdvd_sv.qm mythdvd_ja.qm
 trans.files += mythdvd_fr.qm mythdvd_si.qm mythdvd_nb.qm
-trans.files += mythdvd_fi.qm mythdvd_et.qm
+trans.files += mythdvd_fi.qm mythdvd_et.qm mythdvd_ru.qm
 
 INSTALLS += trans
 
