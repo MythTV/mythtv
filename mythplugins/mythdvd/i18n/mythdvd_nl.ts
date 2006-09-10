@@ -345,10 +345,6 @@ Er is geen DVD-apparaat ingesteld.
 <context>
     <name>TitleDialog</name>
     <message>
-        <source>Unkown</source>
-        <translation type="obsolete">Onbekend</translation>
-    </message>
-    <message>
         <source>%1 - Title %2</source>
         <translation>%1 - Titel %2</translation>
     </message>
@@ -378,7 +374,7 @@ Er is geen DVD-apparaat ingesteld.
     </message>
     <message>
         <source>Unknown</source>
-        <translation type="unfinished">Onbekend</translation>
+        <translation>Onbekend</translation>
     </message>
 </context>
 </TS>

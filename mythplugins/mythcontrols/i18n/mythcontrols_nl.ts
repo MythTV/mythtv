@@ -94,35 +94,23 @@
     <name>UnsavedMenu</name>
     <message>
         <source>Unsaved Changes</source>
-        <translation>Niet opgeslagen aanpassingen</translation>
-    </message>
-    <message>
-        <source>Would you like to save now?</source>
-        <translation type="obsolete">Wilt u nu opslaan?</translation>
-    </message>
-    <message>
-        <source>Save</source>
-        <translation type="obsolete">Opslaan</translation>
-    </message>
-    <message>
-        <source>Exit</source>
-        <translation type="obsolete">Afsluiten</translation>
+        <translation>Niet opgeslagen wijzigingen</translation>
     </message>
     <message>
         <source>Exiting...</source>
-        <translation type="unfinished"></translation>
+        <translation>Bezig met afsluiten...</translation>
     </message>
     <message>
         <source>Save Changes?</source>
-        <translation type="unfinished"></translation>
+        <translation>Wijzigingen Opslaan?</translation>
     </message>
     <message>
         <source>Yes</source>
-        <translation type="unfinished"></translation>
+        <translation>Ja</translation>
     </message>
     <message>
         <source>No</source>
-        <translation type="unfinished"></translation>
+        <translation>Nee</translation>
     </message>
 </context>
 </TS>

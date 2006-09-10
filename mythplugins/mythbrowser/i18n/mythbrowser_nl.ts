@@ -126,11 +126,11 @@ De &apos;OK&apos; toets verwijdert het item uit de lijst.</translation>
     </message>
     <message>
         <source>Group:</source>
-        <translation type="unfinished">Groep:</translation>
+        <translation>Groep:</translation>
     </message>
     <message>
         <source>Description:</source>
-        <translation type="unfinished">Beschrijving:</translation>
+        <translation>Beschrijving:</translation>
     </message>
     <message>
         <source>URL:</source>

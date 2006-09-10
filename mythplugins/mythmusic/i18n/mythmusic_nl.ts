@@ -86,48 +86,28 @@
         <translation>Het thema dat u gebruikt bevat geen informatie in het music element. Neem contact op met de maker van dit thema en vraag of ze het thema willen aanpassen.&lt;br&gt;&lt;br&gt;Het volgende scherm zal leeg zijn. Ga eruit om terug te gaan naar het menu.</translation>
     </message>
     <message>
-        <source>Artist:</source>
-        <translation type="obsolete">Artiest:</translation>
-    </message>
-    <message>
-        <source>Album:</source>
-        <translation type="obsolete">Album:</translation>
-    </message>
-    <message>
-        <source>Title:</source>
-        <translation type="obsolete">Titel:</translation>
-    </message>
-    <message>
-        <source>Length:</source>
-        <translation type="obsolete">Lengte:</translation>
-    </message>
-    <message>
         <source>Genre: </source>
         <translation>Genre: </translation>
     </message>
     <message>
-        <source>Compilation Artist:</source>
-        <translation type="obsolete">Compilatie Artiest:</translation>
-    </message>
-    <message>
         <source>Compilation Artist:<byte value="x9"/></source>
-        <translation type="unfinished"></translation>
+        <translation>Compilatie Artiest:<byte value="x9"/></translation>
     </message>
     <message>
         <source>Artist:<byte value="x9"/></source>
-        <translation type="unfinished"></translation>
+        <translation>Artiest:<byte value="x9"/></translation>
     </message>
     <message>
         <source>Album:<byte value="x9"/></source>
-        <translation type="unfinished"></translation>
+        <translation>Album:<byte value="x9"/></translation>
     </message>
     <message>
         <source>Title:<byte value="x9"/></source>
-        <translation type="unfinished"></translation>
+        <translation>Titel:<byte value="x9"/></translation>
     </message>
     <message>
         <source>Length:<byte value="x9"/></source>
-        <translation type="unfinished"></translation>
+        <translation>Duur:<byte value="x9"/></translation>
     </message>
 </context>
 <context>
@@ -369,11 +349,11 @@
     </message>
     <message>
         <source>1 Shuffle: Album</source>
-        <translation type="unfinished"></translation>
+        <translation>1 Schuffle: Album</translation>
     </message>
     <message>
         <source>Shuffle: Album</source>
-        <translation type="unfinished"></translation>
+        <translation>Shuffle: Album</translation>
     </message>
 </context>
 <context>
@@ -417,10 +397,6 @@
     <message>
         <source>Audio device</source>
         <translation>Audioapparaat</translation>
-    </message>
-    <message>
-        <source>Audio Device used for playback.</source>
-        <translation type="obsolete">Audioapparaat voor afspelen.</translation>
     </message>
     <message>
         <source>CD device</source>
@@ -872,10 +848,6 @@ Kan Normaal, Willekeurig of Intelligent (willekeurig) zijn.</translation>
         <translation>Instellingen voor CD branden</translation>
     </message>
     <message>
-        <source>Artists</source>
-        <translation type="obsolete">Artiesten</translation>
-    </message>
-    <message>
         <source>Creating CD File System</source>
         <translation>Bezig met maken van CD-bestandssysteem</translation>
     </message>
@@ -929,15 +901,15 @@ Kan Normaal, Willekeurig of Intelligent (willekeurig) zijn.</translation>
     </message>
     <message>
         <source>default</source>
-        <translation type="unfinished"></translation>
+        <translation>standaard</translation>
     </message>
     <message>
         <source>Audio Device used for playback. &apos;default&apos; will use the device specified in MythTV</source>
-        <translation type="unfinished"></translation>
+        <translation>Geluids apparaat dat gebruikt wordt voor afspelen. &apos;standaard&apos; gebruikt het apparaat zoals opgegeven in MythTV</translation>
     </message>
     <message>
         <source>Unknown Title</source>
-        <translation type="unfinished"></translation>
+        <translation>Onbekende Titel</translation>
     </message>
 </context>
 <context>

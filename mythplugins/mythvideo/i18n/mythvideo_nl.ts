@@ -240,31 +240,31 @@
     </message>
     <message>
         <source>If set, this will cause the Video Browser screen to show all relevant files below the MythVideo starting directory whether they have been scanned or not.</source>
-        <translation type="unfinished"></translation>
+        <translation>Als dit is ingeschakeld, zal het Video Blader scherm alle relevante bestanden in de MythVideo map laten zien, zelfs als ze niet gescanned zijn.</translation>
     </message>
     <message>
         <source>Video Gallery browses files</source>
-        <translation type="unfinished"></translation>
+        <translation>Video Gallerij bladert in bestanden</translation>
     </message>
     <message>
         <source>If set, this will cause the Video Gallery screen to show all relevant files below the MythVideo starting directory whether they have been scanned or not.</source>
-        <translation type="unfinished"></translation>
+        <translation>Als dit is ingeschakeld, zal het Video Gallerij scherm alle relevante bestanden in de MythVideo map laten zien, zelfs als ze niet gescanned zijn.</translation>
     </message>
     <message>
         <source>General Settings (1/2)</source>
-        <translation type="unfinished"></translation>
+        <translation>Globale Instellingen (1/2)</translation>
     </message>
     <message>
         <source>General Settings (2/2)</source>
-        <translation type="unfinished"></translation>
+        <translation>Globale Instellingen (2/2)</translation>
     </message>
     <message>
         <source>Video List Loads Video Meta Data</source>
-        <translation type="unfinished"></translation>
+        <translation>Video Lijst Laadt Video Meta Data</translation>
     </message>
     <message>
         <source>If set along with Browse Files, this will cause the Video List to load any known video metadata from the database. Turning this off can greatly  speed up how long it takes to load the Video List tree</source>
-        <translation type="unfinished"></translation>
+        <translation>Als dit is ingeschakeld samen met Blader Bestanden, zal de Video Lijst bekende metadata uit de database halen. Dit uitschakelen kan het maken van de Video Lijst enorm versnellen.</translation>
     </message>
 </context>
 <context>
@@ -451,7 +451,7 @@
     </message>
     <message>
         <source></source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Parental</source>
@@ -545,7 +545,7 @@
     </message>
     <message>
         <source>Parental Pin:</source>
-        <translation type="unfinished"></translation>
+        <translation>Ouderlijk toezicht Pincode:</translation>
     </message>
 </context>
 <context>

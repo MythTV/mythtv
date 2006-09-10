@@ -1,52 +1,5 @@
 <!DOCTYPE TS><TS>
 <context>
-    <name>GLSingleView</name>
-    <message>
-        <source>Folder: </source>
-        <translation type="obsolete">Map: </translation>
-    </message>
-    <message>
-        <source>Created: </source>
-        <translation type="obsolete">Gemaakt: </translation>
-    </message>
-    <message>
-        <source>Modified: </source>
-        <translation type="obsolete">Aangepast: </translation>
-    </message>
-    <message>
-        <source>Bytes</source>
-        <translation type="obsolete">Bytes</translation>
-    </message>
-    <message>
-        <source>Width</source>
-        <translation type="obsolete">Breedte</translation>
-    </message>
-    <message>
-        <source>pixels</source>
-        <translation type="obsolete">punten</translation>
-    </message>
-    <message>
-        <source>Height</source>
-        <translation type="obsolete">Hoogte</translation>
-    </message>
-    <message>
-        <source>Pixel Count</source>
-        <translation type="obsolete">Aantal pixels</translation>
-    </message>
-    <message>
-        <source>megapixels</source>
-        <translation type="obsolete">megapixels</translation>
-    </message>
-    <message>
-        <source>Rotation Angle</source>
-        <translation type="obsolete">Draaihoek</translation>
-    </message>
-    <message>
-        <source>degrees</source>
-        <translation type="obsolete">graden</translation>
-    </message>
-</context>
-<context>
     <name>IconView</name>
     <message>
         <source>Import pictures?</source>
@@ -106,91 +59,91 @@
     </message>
     <message>
         <source>MythGallery Directory &apos;%1&apos; does not exist or is unreadable.</source>
-        <translation type="unfinished"></translation>
+        <translation>De MythGallery map &apos;%1&apos; bestaat niet, of kan niet worden gelezen.</translation>
     </message>
     <message>
         <source>MythGallery failed to load theme, see console for details.</source>
-        <translation type="unfinished"></translation>
+        <translation>MythGallery kon het thema niet laden, zie de console voor meer informatie.</translation>
     </message>
     <message>
         <source>The selected device is no longer available</source>
-        <translation type="unfinished"></translation>
+        <translation>Het geselecteerde apparaat niet langer beschikbaar</translation>
     </message>
     <message>
         <source>Meta Data...</source>
-        <translation type="unfinished"></translation>
+        <translation>Meta Data...</translation>
     </message>
     <message>
         <source>Marking...</source>
-        <translation type="unfinished"></translation>
+        <translation>Markeren...</translation>
     </message>
     <message>
         <source>File...</source>
-        <translation type="unfinished"></translation>
+        <translation>Bestand...</translation>
     </message>
     <message>
         <source>Return</source>
-        <translation type="unfinished"></translation>
+        <translation>Terug</translation>
     </message>
     <message>
         <source>Clear Marked</source>
-        <translation type="unfinished"></translation>
+        <translation>Deselecteer Alles</translation>
     </message>
     <message>
         <source>Select All</source>
-        <translation type="unfinished"></translation>
+        <translation>Selecteer Alles</translation>
     </message>
     <message>
         <source>Show Devices</source>
-        <translation type="unfinished"></translation>
+        <translation>Toon Apparaten</translation>
     </message>
     <message>
         <source>Copy here</source>
-        <translation type="unfinished"></translation>
+        <translation>Kopieer naar hier</translation>
     </message>
     <message>
         <source>Move here</source>
-        <translation type="unfinished"></translation>
+        <translation>Verplaats naar hier</translation>
     </message>
     <message>
         <source>Create Dir</source>
-        <translation type="unfinished"></translation>
+        <translation>Maak Map</translation>
     </message>
     <message>
         <source>Delete Current File or Folder</source>
-        <translation type="unfinished"></translation>
+        <translation>Verwijder huidige bestand of map</translation>
     </message>
     <message>
         <source>Deleting 1 folder, including any subfolders and files.</source>
-        <translation type="unfinished"></translation>
+        <translation>Bezig met verwijderen van 1 map, inclusief alle sub-mappen en bestanden.</translation>
     </message>
     <message>
         <source>Deleting 1 image.</source>
-        <translation type="unfinished"></translation>
+        <translation>Bezig met verwijderen van 1 afbeelding.</translation>
     </message>
     <message>
         <source>Delete Marked Files</source>
-        <translation type="unfinished"></translation>
+        <translation>Verwijder gemarkeerde bestanden</translation>
     </message>
     <message>
         <source>Deleting %1 images and folders, including any subfolders and files.</source>
-        <translation type="unfinished"></translation>
+        <translation>Bezig met verwijderen van %1 afbeeldingen en mappen, inclusief alle sub-mappen en bestanden.</translation>
     </message>
     <message>
         <source>New Folder</source>
-        <translation type="unfinished"></translation>
+        <translation>Nieuwe Map</translation>
     </message>
     <message>
         <source>Create New Folder</source>
-        <translation type="unfinished"></translation>
+        <translation>Maak een Nieuwe Map</translation>
     </message>
     <message>
         <source>Moving marked images...</source>
-        <translation type="unfinished"></translation>
+        <translation>Bezig met verplaatsen van de gemarkeerde afbeeldingen</translation>
     </message>
     <message>
         <source>Copying marked images...</source>
-        <translation type="unfinished"></translation>
+        <translation>Bezig met kopieren van de gemarkeerde afbeeldingen</translation>
     </message>
 </context>
 <context>
@@ -256,10 +209,6 @@
         <translation>Type OpenGL-overgang gebruikt in diashow modus.</translation>
     </message>
     <message>
-        <source>Gallery Directory does not exist or is unreadable.</source>
-        <translation type="obsolete">Fotomap bestaat niet of is onleesbaar.</translation>
-    </message>
-    <message>
         <source>Ok</source>
         <translation>OK</translation>
     </message>
@@ -297,62 +246,15 @@
     </message>
     <message>
         <source>Sort order when browsing</source>
-        <translation type="unfinished"></translation>
+        <translation>Sorteer volgorde tijdens het bladeren</translation>
     </message>
     <message>
         <source>This is the sort order for the displayed picture thumbnails.</source>
-        <translation type="unfinished"></translation>
+        <translation>Dit is de sorteer volgorde van de getoonde miniaturen.</translation>
     </message>
     <message>
         <source>Duration of OpenGL Transition (milliseconds)</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>SingleView</name>
-    <message>
-        <source>Bytes</source>
-        <translation type="obsolete">Bytes</translation>
-    </message>
-    <message>
-        <source>Width</source>
-        <translation type="obsolete">Breedte</translation>
-    </message>
-    <message>
-        <source>Height</source>
-        <translation type="obsolete">Hoogte</translation>
-    </message>
-    <message>
-        <source>Pixel Count</source>
-        <translation type="obsolete">Pixels</translation>
-    </message>
-    <message>
-        <source>Rotation Angle</source>
-        <translation type="obsolete">Draaihoek</translation>
-    </message>
-    <message>
-        <source>pixels</source>
-        <translation type="obsolete">punten</translation>
-    </message>
-    <message>
-        <source>megapixels</source>
-        <translation type="obsolete">megapixels</translation>
-    </message>
-    <message>
-        <source>degrees</source>
-        <translation type="obsolete">graden</translation>
-    </message>
-    <message>
-        <source>Created: </source>
-        <translation type="obsolete">Gemaakt: </translation>
-    </message>
-    <message>
-        <source>Modified: </source>
-        <translation type="obsolete">Aangepast: </translation>
-    </message>
-    <message>
-        <source>Folder: </source>
-        <translation type="obsolete">Map: </translation>
+        <translation>Duur van de OpenGL overgangen (in milisecondes)</translation>
     </message>
 </context>
 </TS>

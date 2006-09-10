@@ -11,43 +11,43 @@
     </message>
     <message>
         <source>Edit Site Details</source>
-        <translation type="unfinished"></translation>
+        <translation>Bewerk Site Details</translation>
     </message>
     <message>
         <source>Enter Site Details</source>
-        <translation type="unfinished"></translation>
+        <translation>Geef Site Details</translation>
     </message>
     <message>
         <source>Name:</source>
-        <translation type="unfinished"></translation>
+        <translation>Naam:</translation>
     </message>
     <message>
         <source>URL:</source>
-        <translation type="unfinished"></translation>
+        <translation>URL:</translation>
     </message>
     <message>
         <source>Icon:</source>
-        <translation type="unfinished"></translation>
+        <translation>Icoon:</translation>
     </message>
     <message>
         <source>OK</source>
-        <translation type="unfinished"></translation>
+        <translation>OK</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished"></translation>
+        <translation>Annuleer</translation>
     </message>
     <message>
         <source>Edit News Site</source>
-        <translation type="unfinished"></translation>
+        <translation>Bewerk Nieuws Site</translation>
     </message>
     <message>
         <source>Add News Site</source>
-        <translation type="unfinished"></translation>
+        <translation>Voeg Nieuws Site Toe</translation>
     </message>
     <message>
         <source>Delete News Site</source>
-        <translation type="unfinished"></translation>
+        <translation>Verwijder Nieuws Site</translation>
     </message>
 </context>
 <context>
@@ -94,13 +94,15 @@ De minimumwaarde is 30 minuten.</translation>
     <name>QObject</name>
     <message>
         <source>MythNews</source>
-        <translation type="unfinished"></translation>
+        <translation>MythNieuws</translation>
     </message>
     <message>
         <source>Are you sure you want to delete this news site
 
 %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Weet u zeker dat u onderstaande nieuws site wilt verwijderen?
+
+%1</translation>
     </message>
 </context>
 <context>
