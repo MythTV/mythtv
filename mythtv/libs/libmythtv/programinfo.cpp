@@ -1662,17 +1662,28 @@ static bool insert_program(const ProgramInfo        *pg,
     query.bindValue(":PROFILE",     schd->getProfileName());
 
     bool ok = query.exec() && (query.numRowsAffected() > 0);
-    if (!ok && !query.isActive())
+    bool active = query.isActive();
+
+    query.prepare("UNLOCK TABLES");
+    query.exec();
+
+    if (!ok && !active)
         MythContext::DBError("insert_program -- insert", query);
     else
     {
         query.prepare("UPDATE record SET last_record = NOW() "
                       "WHERE recordid = :RECORDID");
-        query.bindValue(":RECORDID",    pg->recordid);
+        query.bindValue(":RECORDID", pg->recordid);
         query.exec();
+
+        if (pg->rectype == kOverrideRecord && pg->parentid > 0)
+        {
+            query.prepare("UPDATE record SET last_record = NOW() "
+                          "WHERE recordid = :PARENTID");
+            query.bindValue(":PARENTID", pg->parentid);
+            query.exec();
+        }
     }
-    query.prepare("UNLOCK TABLES");
-    query.exec();
 
     return ok;
 }
