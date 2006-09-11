@@ -904,7 +904,7 @@ int main(int argc, char **argv)
                 QString tmpArg = a.argv()[argpos+1];
                 if (tmpArg.startsWith("-"))
                 {
-                    cerr << "Invalid or missing argument to -O/--override-setting option\n";
+                    cerr << "Invalid or missing argument to -G/--get-setting option\n";
                     return FRONTEND_EXIT_INVALID_CMDLINE;
                 } 
  
