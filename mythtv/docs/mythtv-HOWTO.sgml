@@ -1301,11 +1301,6 @@ account for your particular location and the channels that you have.  This
 configuration will be imported into MythTV when you first run the
 <bf>mythtv-setup</bf> program.
 
-See the section called <ref id="MigratingtoDD" name="Migrating from XMLTV
-to DataDirect"> for instructions on moving to DataDirect if you are
-currently using XMLTV.  If you are starting from a fresh installation, the
-simplest thing is to immediately start using DataDirect.
-
 <label id="manually_building_mythtv">
 <sect1>Manually building MythTV
 <p>If you are going to use <bf>subversion</bf>, execute the following
@@ -6619,16 +6614,17 @@ You may leave the Setup now and proceed as usual.
 to tune to a channel.
 
 Lower case = seen
+
 Upper Case = seen & good
-
-l/L = Lock  : This could be seen by PVR-250/BTTV users
-a/A = PAT   : Any recording transmitted in MPEG 
-m/M = PMT   : Any recording transmitted in MPEG 
-g/G = MGT   : ATSC only
-v/V = VCT   : ATSC only
-n/N = NIT   : DVB only
-s/S = SDT   : DVB only
-
+<itemize>
+<item>l/L = Lock  : This could be seen by PVR-250/BTTV users
+<item>a/A = PAT   : Any recording transmitted in MPEG 
+<item>m/M = PMT   : Any recording transmitted in MPEG 
+<item>g/G = MGT   : ATSC only
+<item>v/V = VCT   : ATSC only
+<item>n/N = NIT   : DVB only
+<item>s/S = SDT   : DVB only
+</itemize>
 <sect1>What is the difference between the various Hauppauge PVR models?
 <p>This is covered in the hardware section, and extensively covered on the
 Hauppauge website.  (<url
@@ -6726,15 +6722,20 @@ Restart <bf>mythbackend</bf> since it only reads this setting when it starts up.
 
 On the faster machine:
 
-Start the mythtv-setup program.  Advance through the pages until you get to
-the Job Queue page.  Ensure that "Allow Commercial Detection jobs" is turned
-ON for this machine.
+Start the <bf>mythtv-setup</bf> program.  Advance through the pages until
+you get to the Job Queue page.  Ensure that "Allow Commercial Detection
+jobs" is turned ON for this machine.
 
 Run <bf>mythjobqueue</bf>.  <bf>mythjobqueue</bf> will examine the JobQueue
 and run any jobs it finds.  <bf>mythjobqueue</bf> should be left running so
 that it will pick up any new commercial flagging jobs that are added to the
 queue, otherwise new jobs will be added to the queue and your programs won't
 be flagged until you run manually run <bf>mythjobqueue</bf>.
+
+Using this technique it's possible to add commercial flagging machines as
+needed, even on systems that aren't running a backend.  It's also possible
+to run the commercial flagger in a virtual machine environment such as
+VMWare.
 
 <sect>Example Configurations.
 <sect1>Logical Volume Manager (LVM) <label id="LVM">
@@ -7016,7 +7017,9 @@ v0.20.00, 2006-09-10.  Start prepping for 0.20.  Add HDHomeRun as a capture devi
 Update URLs.  Move around some of the HDTV stuff.  Add a part about HDTV and
 capturing it in raw format (you can't, so stop asking).  Update information
 on filesystems and the slow delete feature.
-v0.20.01, 2006-09-11.  Get rid of stuff that's been deprecated.
+
+v0.20.01, 2006-09-11.  Get rid of stuff that's been deprecated.  Add other
+updates, like the blurb about using a VM for commercial flagging.
 
 -->
 
