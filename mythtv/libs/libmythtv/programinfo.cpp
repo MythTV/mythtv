@@ -1632,6 +1632,11 @@ static bool insert_program(const ProgramInfo        *pg,
         "   0) "
         );
 
+    if (pg->rectype == kOverrideRecord)
+        query.bindValue(":RECORDID",    pg->parentid);
+    else
+        query.bindValue(":RECORDID",    pg->recordid);
+
     query.bindValue(":CHANID",      pg->chanid);
     query.bindValue(":STARTS",      pg->recstartts);
     query.bindValue(":ENDS",        pg->recendts);
@@ -1642,7 +1647,6 @@ static bool insert_program(const ProgramInfo        *pg,
     query.bindValue(":CATEGORY",    pg->category.utf8());
     query.bindValue(":RECGROUP",    pg->recgroup.utf8());
     query.bindValue(":AUTOEXP",     schd->GetAutoExpire());
-    query.bindValue(":RECORDID",    pg->recordid);
     query.bindValue(":SERIESID",    pg->seriesid.utf8());
     query.bindValue(":PROGRAMID",   pg->programid.utf8());
     query.bindValue(":FINDID",      pg->findid);
@@ -1660,7 +1664,13 @@ static bool insert_program(const ProgramInfo        *pg,
     bool ok = query.exec() && (query.numRowsAffected() > 0);
     if (!ok && !query.isActive())
         MythContext::DBError("insert_program -- insert", query);
-
+    else
+    {
+        query.prepare("UPDATE record SET last_record = NOW() "
+                      "WHERE recordid = :RECORDID");
+        query.bindValue(":RECORDID",    pg->recordid);
+        query.exec();
+    }
     query.prepare("UNLOCK TABLES");
     query.exec();
 
