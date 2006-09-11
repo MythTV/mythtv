@@ -18,6 +18,7 @@
 #include <qfile.h>
 #include <qmap.h>
 #include <qdir.h>
+#include <qprocess.h>
 
 // MythTV headers
 #include "mythconfig.h"
@@ -103,7 +104,7 @@ class XMLTVGrabber: public ComboBoxSetting, public VSSetting
     XMLTVGrabber(const VideoSource& parent)
       : VSSetting(parent, "xmltvgrabber")
     {
-        setLabel(QObject::tr("XMLTV listings grabber"));
+        setLabel(QObject::tr("Listings grabber"));
     };
 };
 
@@ -295,15 +296,8 @@ void XMLTV_generic_config::save()
         "instead of just 'mythfilldatabase'.\nYour grabber does not provide "
         "channel numbers, so you have to set them manually.");
 
-    if (grabber == "tv_grab_de_tvtoday" || grabber == "tv_grab_se_swedb" || 
-        grabber == "tv_grab_fi" || grabber == "tv_grab_es" ||
-        grabber == "tv_grab_es_laguiatv" ||
-        grabber == "tv_grab_nl" || grabber == "tv_grab_jp" ||
-        grabber == "tv_grab_no" || grabber == "tv_grab_pt" ||
-        grabber == "tv_grab_ee" || grabber == "tv_grab_be_tvb" ||
-        grabber == "tv_grab_be_tlm" || grabber == "tv_grab_is" ||
-        grabber == "tv_grab_br" || grabber == "tv_grab_cz" ||
-        grabber == "tv_grab_il" || grabber == "tv_grab_ru")
+    if (grabber != "datadirect" && grabber != "eitonly" && 
+        grabber != "/bin/true")
     {
         VERBOSE(VB_IMPORTANT, "\n" << err_msg);
         MythPopupBox::showOkPopup(
@@ -370,75 +364,36 @@ XMLTVConfig::XMLTVConfig(const VideoSource& parent) :
 
     // only save settings for the selected grabber
     setSaveAll(false);
- 
+
     addTarget("datadirect", new DataDirect_config(parent));
-    grabber->addSelection("North America (DataDirect)", "datadirect");
-    
+    grabber->addSelection("North America (DataDirect) (Internal)", "datadirect");
+
     addTarget("eitonly", new EITOnly_config(parent));
     grabber->addSelection("Transmitted guide only (EIT)", "eitonly");
 
-    addTarget("tv_grab_de_tvtoday", new XMLTV_generic_config(parent, "tv_grab_de_tvtoday"));
-    grabber->addSelection("Germany (tvtoday)", "tv_grab_de_tvtoday");
+    QProcess find_grabber_proc( this );
+    find_grabber_proc.addArgument("tv_find_grabbers");
+    if ( !find_grabber_proc.start() ) {
+        VERBOSE(VB_IMPORTANT, "Failed to run tv_find_grabbers");
+    }
 
-    addTarget("tv_grab_se_swedb", new XMLTV_generic_config(parent, "tv_grab_se_swedb"));
-    grabber->addSelection("Sweden (tv.swedb.se)","tv_grab_se_swedb");
+    while (find_grabber_proc.isRunning())
+    {
+        usleep(100000);
+    }
 
-    addTarget("tv_grab_no", new XMLTV_generic_config(parent, "tv_grab_no"));
-    grabber->addSelection("Norway","tv_grab_no");
-
-    addTarget("tv_grab_uk_rt", new XMLTV_generic_config(parent, "tv_grab_uk_rt"));
-    grabber->addSelection("United Kingdom (alternative)","tv_grab_uk_rt");
-
-    addTarget("tv_grab_au", new XMLTV_generic_config(parent, "tv_grab_au"));
-    grabber->addSelection("Australia", "tv_grab_au");
-
-    addTarget("tv_grab_fi", new XMLTV_generic_config(parent, "tv_grab_fi"));
-    grabber->addSelection("Finland", "tv_grab_fi");
-
-    addTarget("tv_grab_es", new XMLTV_generic_config(parent, "tv_grab_es"));
-    grabber->addSelection("Spain", "tv_grab_es");
-
-    addTarget("tv_grab_es_laguiatv", new XMLTV_generic_config(parent, "tv_grab_es_laguiatv"));
-    grabber->addSelection("Spain (Alt)", "tv_grab_es_laguiatv");
-
-    addTarget("tv_grab_nl", new XMLTV_generic_config(parent, "tv_grab_nl"));
-    grabber->addSelection("Holland", "tv_grab_nl");
-
-    addTarget("tv_grab_dk", new XMLTV_generic_config(parent, "tv_grab_dk"));
-    grabber->addSelection("Denmark", "tv_grab_dk");
-
-    addTarget("tv_grab_fr", new XMLTV_generic_config(parent, "tv_grab_fr"));
-    grabber->addSelection("France", "tv_grab_fr");
-
-    addTarget("tv_grab_jp", new XMLTV_generic_config(parent, "tv_grab_jp"));
-    grabber->addSelection("Japan", "tv_grab_jp");
-
-    addTarget("tv_grab_pt", new XMLTV_generic_config(parent, "tv_grab_pt"));
-    grabber->addSelection("Portugal", "tv_grab_pt");
-
-    addTarget("tv_grab_ee", new XMLTV_generic_config(parent, "tv_grab_ee"));
-    grabber->addSelection("Estonia", "tv_grab_ee");
-
-    addTarget("tv_grab_be_tvb", new XMLTV_generic_config(parent, "tv_grab_be_tvb"));
-    grabber->addSelection("Belgium (Dutch)", "tv_grab_be_tvb");
-
-    addTarget("tv_grab_be_tlm", new XMLTV_generic_config(parent, "tv_grab_be_tlm"));
-    grabber->addSelection("Belgium (French)", "tv_grab_be_tlm");
-
-    addTarget("tv_grab_is", new XMLTV_generic_config(parent, "tv_grab_is"));
-    grabber->addSelection("Iceland", "tv_grab_is");
-
-    addTarget("tv_grab_br", new XMLTV_generic_config(parent, "tv_grab_br"));
-    grabber->addSelection("Brazil", "tv_grab_br");
-
-    addTarget("tv_grab_cz", new XMLTV_generic_config(parent, "tv_grab_cz"));
-    grabber->addSelection("Czech Republic", "tv_grab_cz");
-
-    addTarget("tv_grab_il", new XMLTV_generic_config(parent, "tv_grab_il"));
-    grabber->addSelection("Israel", "tv_grab_il");
-
-    addTarget("tv_grab_ru", new XMLTV_generic_config(parent, "tv_grab_ru"));
-    grabber->addSelection("Russia", "tv_grab_ru");
+    if (find_grabber_proc.normalExit())
+    {
+        while (find_grabber_proc.canReadLineStdout())
+        {
+            QString grabber_list = find_grabber_proc.readLineStdout();
+            QStringList grabber_split = QStringList::split("|", grabber_list);
+            QString grabber_name = grabber_split[1] + " (xmltv)";
+            QFileInfo grabber_file(grabber_split[0]);
+            addTarget(grabber_file.fileName(), new XMLTV_generic_config(parent, grabber_file.fileName()));
+            grabber->addSelection(grabber_name, grabber_file.fileName());
+        }
+    }
 
     addTarget("/bin/true", new NoGrabber_config(parent));
     grabber->addSelection("No grabber", "/bin/true");
