@@ -242,6 +242,14 @@
         <network>ESPN2</network>
     </callsigntonetwork>
     <callsigntonetwork>
+        <callsign>ESPN2HD</callsign>
+        <network>ESPN2</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>ESPNHD</callsign>
+        <network>ESPN</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
         <callsign>ESPNCL</callsign>
         <network>ESPNCL</network>
     </callsigntonetwork>
@@ -1337,11 +1345,19 @@
         <network>NBC</network>
     </callsigntonetwork>
     <callsigntonetwork>
+        <callsign>KINGDT</callsign>
+        <network>NBC</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
         <callsign>KION</callsign>
         <network>CBS</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>KIRO</callsign>
+        <network>CBS</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>KIRODT</callsign>
         <network>CBS</network>
     </callsigntonetwork>
     <callsigntonetwork>
@@ -1589,6 +1605,10 @@
         <network>MNTV</network>
     </callsigntonetwork>
     <callsigntonetwork>
+        <callsign>KMYQDT</callsign>
+        <network>MNTV</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
         <callsign>KNAZ</callsign>
         <network>NBC</network>
     </callsigntonetwork>
@@ -1718,6 +1738,10 @@
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>KONG</callsign>
+        <network>KONG</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>KONGDT</callsign>
         <network>KONG</network>
     </callsigntonetwork>
     <callsigntonetwork>
@@ -2739,6 +2763,10 @@
     <callsigntonetwork>
         <callsign>MTV</callsign>
         <network>MTV</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>MTV2P</callsign>
+        <network>MTV2</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>MTVL</callsign>
@@ -5771,6 +5799,10 @@
     <networktourl>
         <network>MTV</network>
         <url>[zap2it]/mtv.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>MTV2</network>
+        <url>[zap2it]/mtv2.gif</url>
     </networktourl>
     <networktourl>
         <network>NBC</network>
