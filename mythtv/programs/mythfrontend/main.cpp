@@ -1112,7 +1112,7 @@ int main(int argc, char **argv)
 
     WriteDefaults();
 
-    QString themename = gContext->GetSetting("Theme", "blue");
+    QString themename = gContext->GetSetting("Theme", "G.A.N.T.");
     bool randomtheme = gContext->GetNumSetting("RandomTheme", 0);
 
     if (randomtheme)
