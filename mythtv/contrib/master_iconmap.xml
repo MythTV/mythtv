@@ -6573,6 +6573,10 @@
         <url>[zap2it]/speed.gif</url>
     </networktourl>
     <networktourl>
+        <network>SPIKE</network>
+        <url>[lyngsat]/ss/spike_tv.gif</url>
+    </networktourl>
+    <networktourl>
         <network>STARZ</network>
         <url>[zap2it2]/starz.jpg</url>
     </networktourl>
