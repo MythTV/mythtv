@@ -26,6 +26,10 @@
         <network>ANIMALPLANET</network>
     </callsigntonetwork>
     <callsigntonetwork>
+        <callsign>ANIMALP</callsign>
+        <network>ANIMALPLANET</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
         <callsign>ARTS</callsign>
         <network>AE</network>
     </callsigntonetwork>
@@ -214,6 +218,10 @@
         <network>DISNEY</network>
     </callsigntonetwork>
     <callsigntonetwork>
+        <callsign>DIY</callsign>
+        <network>DIY</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
         <callsign>DSC</callsign>
         <network>DISCOVERY</network>
     </callsigntonetwork>
@@ -284,6 +292,10 @@
     <callsigntonetwork>
         <callsign>FITV</callsign>
         <network>FITV</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>FLIVING</callsign>
+        <network>FLIVING</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>FLIX</callsign>
@@ -668,6 +680,7 @@
     <callsigntonetwork>
         <callsign>HISTORY</callsign>
         <network>HISTORY</network>
+    </callsigntonetwork>
     <callsigntonetwork>
         <callsign>HISTP</callsign>
         <network>HISTORY</network>
@@ -675,6 +688,10 @@
     <callsigntonetwork>
         <callsign>HSN</callsign>
         <network>HOMESHOPPINGNETWORK</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>IFC</callsign>
+        <network>IFC</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>KAAL</callsign>
@@ -2793,6 +2810,14 @@
         <network>NEWSENG</network>
     </callsigntonetwork>
     <callsigntonetwork>
+        <callsign>NFL</callsign>
+        <network>NFL</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>NFLHD</callsign>
+        <network>NFL</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
         <callsign>NIK</callsign>
         <network>NICKELODEON</network>
     </callsigntonetwork>
@@ -2807,6 +2832,14 @@
     <callsigntonetwork>
         <callsign>OLN</callsign>
         <network>OLN</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>OXYGEN</callsign>
+        <network>OXYGEN</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>OXYGENP</callsign>
+        <network>OXYGEN</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>PAXSAT</callsign>
@@ -5657,6 +5690,10 @@
         <url>[zap2it]/cspan2.jpg</url>
     </networktourl>
     <networktourl>
+        <network>DIY</network>
+        <url>[lyngsat]/dd/diy_net_us.gif</url>
+    </networktourl>
+    <networktourl>
         <network>DISCOVERY</network>
         <url>[zap2it]/dsc.jpg</url>
     </networktourl>
@@ -5695,6 +5732,10 @@
     <networktourl>
         <network>FITV</network>
         <url>[zap2it]/thn.gif</url>
+    </networktourl>
+    <networktourl>
+        <network>FLIVING</network>
+        <url>[lyngsat]/ff/fineliving.gif</url>
     </networktourl>
     <networktourl>
         <network>FLIX</network>
@@ -5777,6 +5818,10 @@
         <url>[zap2it]/hsn.jpg</url>
     </networktourl>
     <networktourl>
+        <network>IFC</network>
+        <url>[lyngsat]/ii/ifc_us.gif</url>
+    </networktourl>
+    <networktourl>
         <network>KMEX</network>
         <url>[zap2it]/uni.gif</url>
     </networktourl>
@@ -5813,6 +5858,10 @@
         <url>[zap2it]/necn.gif</url>
     </networktourl>
     <networktourl>
+        <network>NFL</network>
+        <url>[lyngsat]/nn/nfl.gif</url>
+    </networktourl>
+    <networktourl>
         <network>NICKELODEON</network>
         <url>[zap2it]/nik.jpg</url>
     </networktourl>
@@ -5823,6 +5872,10 @@
     <networktourl>
         <network>OLN</network>
         <url>[zap2it]/oln.gif</url>
+    </networktourl>
+    <networktourl>
+        <network>OXYGEN</network>
+        <url>[lyngsat]/oo/oxygen.gif</url>
     </networktourl>
     <networktourl>
         <network>PAX</network>
