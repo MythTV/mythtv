@@ -1571,6 +1571,9 @@ void IconView::CopyMarkedFiles(bool move)
 
 void IconView::ClearMenu(UIListBtnType *menu)
 {
+    if (!menu)
+        return;
+
     UIListBtnTypeItem *item = menu->GetItemFirst();
     while (item)
     {
