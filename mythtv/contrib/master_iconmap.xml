@@ -990,6 +990,10 @@
         <network>PBS-KCTS</network>
     </callsigntonetwork>
     <callsigntonetwork>
+        <callsign>KCTSCAB</callsign>
+        <network>PBS-KCTS</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
         <callsign>KCTSDT</callsign>
         <network>PBS-KCTS</network>
     </callsigntonetwork>
@@ -3108,6 +3112,14 @@
     <callsigntonetwork>
         <callsign>USAP</callsign>
         <network>USA</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>UW2TV</callsign>
+        <network>UWTV</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>UWTV</callsign>
+        <network>UWTV</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>VH1</callsign>
@@ -6760,6 +6772,10 @@
     <networktourl>
         <network>USA</network>
         <url>[zap2it]/usa.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>UWTV</network>
+        <url>[lyngsat]/uu/uwtv_washington.gif</url>
     </networktourl>
     <networktourl>
         <network>VH1</network>
