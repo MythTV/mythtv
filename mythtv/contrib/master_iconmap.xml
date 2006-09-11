@@ -62,6 +62,10 @@
         <network>BET</network>
     </callsigntonetwork>
     <callsigntonetwork>
+        <callsign>BIO</callsign>
+        <network>BIO</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
         <callsign>BLKSTZ</callsign>
         <network>STARZ</network>
     </callsigntonetwork>
@@ -5748,6 +5752,10 @@
     <networktourl>
         <network>BET</network>
         <url>[zap2it]/bet.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>BIO</network>
+        <url>[lyngsat]/bb/biography.gif</url>
     </networktourl>
     <networktourl>
         <network>BLOOM</network>
