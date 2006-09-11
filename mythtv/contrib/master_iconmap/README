@@ -1,0 +1,7 @@
+This script and data are intended to replace the older master_iconmap.xml file
+that used to reside in the contrib/ directory.  As the file grew, it became a
+tremendous pain to update it, so its sections were split out into three files,
+and build_map.pl was created to stitch things together into the xml format
+required by `mythfilldatabase --import-icon-map`
+
+Simply run ./build_map.pl and it will create master_iconmap.xml.
