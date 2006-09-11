@@ -42,6 +42,10 @@
         <network>AE</network>
     </callsigntonetwork>
     <callsigntonetwork>
+        <callsign>AZNNW</callsign>
+        <network>AZN</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
         <callsign>BBCA</callsign>
         <network>BBCA</network>
     </callsigntonetwork>
@@ -214,6 +218,10 @@
         <network>DISCOVERY</network>
     </callsigntonetwork>
     <callsigntonetwork>
+        <callsign>DHD</callsign>
+        <network>DISCOVERYHD</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
         <callsign>DISN</callsign>
         <network>DISNEY</network>
     </callsigntonetwork>
@@ -236,6 +244,22 @@
     <callsigntonetwork>
         <callsign>DTIMES</callsign>
         <network>DISCOVERY</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>EACT</callsign>
+        <network>ENCORE</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>EDRA</callsign>
+        <network>ENCORE</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>ELOVE</callsign>
+        <network>ENCORE</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>EMYST</callsign>
+        <network>ENCORE</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>ENCORE</callsign>
@@ -282,6 +306,14 @@
         <network>ETV</network>
     </callsigntonetwork>
     <callsigntonetwork>
+        <callsign>EWAM</callsign>
+        <network>ENCORE</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>EWST</callsign>
+        <network>ENCORE</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
         <callsign>F4-01</callsign>
         <network>AMC</network>
     </callsigntonetwork>
@@ -308,6 +340,10 @@
     <callsigntonetwork>
         <callsign>FLIXP</callsign>
         <network>FLIX</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>FMC</callsign>
+        <network>FOXMOVIE</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>FNC</callsign>
@@ -622,6 +658,10 @@
         <network>HALMRK</network>
     </callsigntonetwork>
     <callsigntonetwork>
+        <callsign>HB2P</callsign>
+        <network>HBOPLUS</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
         <callsign>HB2W</callsign>
         <network>HBOPLUS</network>
     </callsigntonetwork>
@@ -700,6 +740,18 @@
     <callsigntonetwork>
         <callsign>IFC</callsign>
         <network>IFC</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>INHD</callsign>
+        <network>INHD</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>INHD2</callsign>
+        <network>INHD</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>IPLEX</callsign>
+        <network>IPLEX</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>KAAL</callsign>
@@ -2762,6 +2814,10 @@
         <network>LIFETIME</network>
     </callsigntonetwork>
     <callsigntonetwork>
+        <callsign>LMN</callsign>
+        <network>LIFETIMEMOVIE</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
         <callsign>LOVE</callsign>
         <network>ENCORE</network>
     </callsigntonetwork>
@@ -2892,6 +2948,10 @@
     <callsigntonetwork>
         <callsign>QVC</callsign>
         <network>QVC</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>RPLEX</callsign>
+        <network>RPLEX</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>SCIENCE</callsign>
@@ -3051,6 +3111,10 @@
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>TNT</callsign>
+        <network>TNT</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>TNTHD</callsign>
         <network>TNT</network>
     </callsigntonetwork>
     <callsigntonetwork>
@@ -5674,6 +5738,10 @@
         <url>[zap2it]/animal.jpg</url>
     </networktourl>
     <networktourl>
+        <network>AZN</network>
+        <url>[lyngsat]/aa/azn_tv.gif</url>
+    </networktourl>
+    <networktourl>
         <network>BBCA</network>
         <url>[zap2it]/bbca.jpg</url>
     </networktourl>
@@ -5746,6 +5814,10 @@
         <url>[zap2it]/dsc.jpg</url>
     </networktourl>
     <networktourl>
+        <network>DISCOVERYHD</network>
+        <url>[lyngsat]/dd/discovery_hd.gif</url>
+    </networktourl>
+    <networktourl>
         <network>DISNEY</network>
         <url>[zap2it]/disn.jpg</url>
     </networktourl>
@@ -5798,6 +5870,10 @@
         <url>[zap2it]/fox.jpg</url>
     </networktourl>
     <networktourl>
+        <network>FOXMOVIE</network>
+        <url>[lyngsat]/ff/fox_moviechannel.gif</url>
+    </networktourl>
+    <networktourl>
         <network>FOXNEWS</network>
         <url>[zap2it]/fnc.gif</url>
     </networktourl>
@@ -5847,7 +5923,7 @@
     </networktourl>
     <networktourl>
         <network>HBOPLUS</network>
-        <url>[zap2it]/hboplus.jpg</url>
+        <url>[zap2it]/hbo2.jpg</url>
     </networktourl>
     <networktourl>
         <network>HBOSIGNATURE</network>
@@ -5874,6 +5950,14 @@
         <url>[lyngsat]/ii/ifc_us.gif</url>
     </networktourl>
     <networktourl>
+        <network>INHD</network>
+        <url>[lyngsat]/ii/inhd.gif</url>
+    </networktourl>
+    <networktourl>
+        <network>IPLEX</network>
+        <url>[lyngsat]/ee/encore_indieplex.gif</url>
+    </networktourl>
+    <networktourl>
         <network>KMEX</network>
         <url>[zap2it]/uni.gif</url>
     </networktourl>
@@ -5884,6 +5968,10 @@
     <networktourl>
         <network>LIFETIME</network>
         <url>[zap2it]/life.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LIFETIMEMOVIE</network>
+        <url>[lyngsat]/ll/lifetime_movie.gif</url>
     </networktourl>
     <networktourl>
         <network>MNTV</network>
@@ -6684,6 +6772,10 @@
     <networktourl>
         <network>QVC</network>
         <url>[zap2it]/qvc.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>RPLEX</network>
+        <url>[lyngsat]/ee/encore_retroplex.gif</url>
     </networktourl>
     <networktourl>
         <network>SCIFI</network>
