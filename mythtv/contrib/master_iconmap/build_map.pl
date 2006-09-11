@@ -9,6 +9,85 @@
 # @license   GPL
 #
 
+# Includes
+    use Getopt::Long;
+
+# Variables
+    my $help;   # Name of a new xml file to input
+    my $input;  # Name of a new xml file to input
+
+# Load the cli options
+    GetOptions('input:s'      => \$input,
+               'help|h|usage' => sub { print_help(); }
+              );
+
+# Load the callsigns
+    my %callsigns;
+    open(DATA, 'data/callsigntonetwork.txt') or die "Can't open data/callsigntonetwork.txt:  $!\n";
+    while (<DATA>) {
+        chomp;
+        next if (/^\s*#/ || /^\s*$/);
+        my ($callsign, $network) = split(/\s+/, $_, 2);
+        $callsigns{$callsign} = $network;
+    }
+    close DATA;
+
+# Load the networks
+    my %networks;
+    open(DATA, 'data/networktourl.txt') or die "Can't open data/networktourl.txt:  $!\n";
+    while (<DATA>) {
+        chomp;
+        next if (/^\s*#/ || /^\s*$/);
+        my ($network, $url) = split(/\s+/, $_, 2);
+        $networks{$network} = $url;
+    }
+    close DATA;
+
+# Load the URL stubs
+    my %urls;
+    open(DATA, 'data/baseurl.txt') or die "Can't open data/baseurl.txt:  $!\n";
+    while (<DATA>) {
+        chomp;
+        next if (/^\s*#/ || /^\s*$/);
+        my ($stub, $url) = split(/\s+/, $_, 2);
+        $urls{$stub} = $url;
+    }
+    close DATA;
+
+# Import a new file?
+    if ($input) {
+        die "input file '$input' does not exist" unless (-e $input);
+    # Slurp in the data
+        my $text = '';
+        open(DATA, $input) or die "Can't read $input:  $!\n";
+        $text .= $_ while (<DATA>);
+        close DATA;
+    # Parse and count changes
+        my %changes;
+        while ($text =~ /<callsigntonetwork>\s*<callsign>\s*([^<>]+?)\s*<\/callsign>\s*<network>\s*([^<>]+?)\s*<\/network>\s*<\/callsigntonetwork>/sg) {
+            $changes{'cs'}++ unless ($callsigns{$1});
+            $callsigns{$1} = $2;
+        }
+        while ($text =~ /<networktourl>\s*<network>\s*([^<>]+?)\s*<\/network>\s*<url>\s*([^<>]+?)\s*<\/url>\s*<\/networktourl>/sg) {
+            $changes{'n'}++ unless ($networks{$1});
+            $networks{$1} = $2;
+        }
+        while ($text =~ /<baseurl>\s*<stub>\s*([^<>]+?)\s*<\/stub>\s*<url>\s*([^<>]+?)\s*<\/url>\s*<\/baseurl>/sg) {
+            $changes{'u'}++ unless ($urls{$1});
+            $urls{$1} = $2;
+        }
+    # If there are changes, rewrite the appropriate files
+        if ($changes{'cs'}) {
+            write_file('data/callsigntonetwork.txt', \%callsigns);
+        }
+        if ($changes{'n'}) {
+            write_file('data/networktourl.txt', \%networks);
+        }
+        if ($changes{'u'}) {
+            write_file('data/baseurl.txt', \%urls);
+        }
+    }
+
 # Print the header
     open(OUT, '>master_iconmap.xml') or die "Can't create master_iconmap.xml:  $!\n";
     print OUT <<EOF;
@@ -17,45 +96,36 @@
 EOF
 
 # Print the callsigns
-    open(DATA, 'data/callsigntonetwork.txt') or die "Can't open data/callsigntonetwork.txt:  $!\n";
-    while (<DATA>) {
-        chomp;
-        next if (/^\s*#/ || /^\s*$/);
-        my ($callsign, $network) = split(/\s+/, $_, 2);
+    foreach my $callsign (sort keys %callsigns) {
         print OUT <<EOF;
     <callsigntonetwork>
         <callsign>$callsign</callsign>
-        <network>$network</network>
+        <network>$callsigns{$callsign}</network>
     </callsigntonetwork>
 EOF
+    # Warn about missing networks
+        unless ($networks{$callsigns{$callsign}}) {
+            print STDERR "Callsign $callsign specifies unknown network:  $callsigns{$callsign}\n";
+        }
     }
-    close DATA;
 
 # Next, the network URL's
-    open(DATA, 'data/networktourl.txt') or die "Can't open data/networktourl.txt:  $!\n";
-    while (<DATA>) {
-        chomp;
-        next if (/^\s*#/ || /^\s*$/);
-        my ($network, $url) = split(/\s+/, $_, 2);
+    foreach my $network (sort keys %networks) {
         print OUT <<EOF;
     <networktourl>
         <network>$network</network>
-        <url>$url</url>
+        <url>$networks{$network}</url>
     </networktourl>
 EOF
     }
     close DATA;
 
 # Load the base URL's
-    open(DATA, 'data/baseurl.txt') or die "Can't open data/baseurl.txt:  $!\n";
-    while (<DATA>) {
-        chomp;
-        next if (/^\s*#/ || /^\s*$/);
-        my ($stub, $url) = split(/\s+/, $_, 2);
+    foreach my $stub (sort keys %urls) {
         print OUT <<EOF;
     <baseurl>
         <stub>$stub</stub>
-        <url>$url</url>
+        <url>$urls{$stub}</url>
     </baseurl>
 EOF
     }
@@ -64,3 +134,28 @@ EOF
 # Close the XML tab
     print OUT "</iconmappings>\n";
     close OUT;
+
+
+# Function
+    sub print_help {
+        print "no help here yet\n";
+        exit;
+    }
+
+    sub write_file {
+        my $file = shift;
+        my $hash = shift;
+    # First, get the longest hash key, and round up to the nearest tabstop
+        my $length = 0;
+        foreach my $key (keys %$hash) {
+            my $l = length($key);
+            $length = $l if ($l > $length);
+        }
+        $length = 4 + int(($length + 2) / 4) * 4;
+    # Next, write the file
+        open(TXTOUT, ">$file") or die "Can't write to $file:  $!\n";
+        foreach my $key (sort keys %$hash) {
+            print TXTOUT $key, ' ' x ($length - length($key)), $hash->{$key}, "\n";
+        }
+        close TXTOUT;
+    }
