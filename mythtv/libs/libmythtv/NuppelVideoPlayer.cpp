@@ -3631,6 +3631,36 @@ void NuppelVideoPlayer::AddAudioData(short int *lbuffer, short int *rbuffer,
                 "Audio buffer overflow, audio data lost!");
 }
 
+void NuppelVideoPlayer::SetWatched(bool forceWatched)
+{
+    if (!m_playbackinfo)
+        return;
+
+    int numFrames = totalFrames;
+
+    if (m_playbackinfo->GetTranscodedStatus() != TRANSCODING_COMPLETE)
+        numFrames = (m_playbackinfo->endts.toTime_t() -
+                    m_playbackinfo->recstartts.toTime_t()) * video_frame_rate;
+
+    int offset = (int) round(0.2 * (numFrames / video_frame_rate));
+
+    if (offset < 300)
+        offset = 300; // 5 Minutes Min
+    else if (offset > 720)
+        offset = 720; // 12 Minutes Max
+
+    if (forceWatched || framesPlayed > numFrames - (offset * video_frame_rate))
+    {
+        m_playbackinfo->SetWatchedFlag(true);
+        VERBOSE(VB_GENERAL, QString("Marking recording as watched using offset %1 minutes").arg(offset/60));
+    }
+    else
+    {
+        m_playbackinfo->SetWatchedFlag(false);
+        VERBOSE(VB_GENERAL, "Marking recording as unwatched");
+    }
+}
+
 void NuppelVideoPlayer::SetBookmark(void)
 {
     if (!m_playbackinfo || !osd)
@@ -6688,6 +6718,10 @@ void NuppelVideoPlayer::SetOSDFontName(const QString osdfonts[22],
 void NuppelVideoPlayer::SetOSDThemeName(const QString themename)
 {
     osdtheme = QDeepCopy<QString>(themename);
+}
+
+NuppelVideoPlayer SetLiveTVChain( LiveTVChain * tvchain )
+{
 }
 // EIA-708 caption support -- end
 

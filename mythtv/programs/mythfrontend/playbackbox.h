@@ -161,6 +161,9 @@ class PlaybackBox : public MythDialog
     void doForceDelete();
     void noDelete();
 
+    void setWatched();
+    void setUnwatched();
+
     void doAutoExpire();
     void noAutoExpire();
     void doPreserveEpisode();

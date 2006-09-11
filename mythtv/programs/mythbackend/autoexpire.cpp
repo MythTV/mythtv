@@ -762,15 +762,21 @@ void AutoExpire::FillDBOrdered(int expMethod, bool allHosts)
         default:
         case emOldestFirst:
             where = "autoexpire > 0";
-            orderby = "starttime ASC";
+            if (gContext->GetNumSetting("AutoExpireWatchedPriority", 0))
+                orderby = "recorded.watched DESC, ";
+            orderby += "starttime ASC";
             break;
         case emLowestPriorityFirst:
             where = "autoexpire > 0";
-            orderby = "recorded.recpriority ASC, starttime ASC";
+            if (gContext->GetNumSetting("AutoExpireWatchedPriority", 0))
+                orderby = "recorded.watched DESC, ";
+            orderby += "recorded.recpriority ASC, starttime ASC";
             break;
         case emWeightedTimePriority:
             where = "autoexpire > 0";
-            orderby = QString("DATE_ADD(starttime, INTERVAL '%1' * "
+            if (gContext->GetNumSetting("AutoExpireWatchedPriority", 0))
+                orderby = "recorded.watched DESC, ";
+            orderby += QString("DATE_ADD(starttime, INTERVAL '%1' * "
                                         "recorded.recpriority DAY) ASC")
                       .arg(gContext->GetNumSetting("AutoExpireDayPriority", 3));
             break;

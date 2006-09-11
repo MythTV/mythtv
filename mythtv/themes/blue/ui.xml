@@ -883,6 +883,10 @@
         <filename>type/hd.png</filename>
         <position>257,106</position>
       </image>
+      <image name="watched" draworder="6">
+          <filename>type/watched.png</filename>
+          <position>302,106</position>
+      </image>
 
       <image name="processing" draworder="6">
         <filename>processing.png</filename>

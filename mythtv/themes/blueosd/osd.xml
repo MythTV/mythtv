@@ -310,6 +310,11 @@
       <font>infofont</font>
       <altfont>infofontgray</altfont>
     </textarea>
+    <textarea name="option5">
+      <area>85,420,470,30</area>
+      <font>infofont</font>
+      <altfont>infofontgray</altfont>
+    </textarea>
     <positionrects name="selector">
       <area>80,296,480,30</area>
       <area>80,326,480,30</area>

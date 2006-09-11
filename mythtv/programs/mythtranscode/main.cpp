@@ -662,11 +662,12 @@ void CompleteJob(int jobID, ProgramInfo *pginfo, bool useCutlist, int &resultCod
                 MythContext::DBError("Error in mythtranscode", query);
 
             query.prepare("UPDATE recorded "
-                          "SET cutlist = :CUTLIST, bookmark = :BOOKMARK "
-                          "WHERE chanid = :CHANID "
+                          "SET cutlist = :CUTLIST, bookmark = :BOOKMARK, "
+                          "watched = :WATCHED WHERE chanid = :CHANID "
                           "AND starttime = :STARTTIME ;");
             query.bindValue(":CUTLIST", "0");
             query.bindValue(":BOOKMARK", "0");
+            query.bindValue(":WATCHED", "0");
             query.bindValue(":CHANID", pginfo->chanid);
             query.bindValue(":STARTTIME", pginfo->recstartts);
             query.exec();

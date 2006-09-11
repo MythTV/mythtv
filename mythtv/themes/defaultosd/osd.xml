@@ -273,6 +273,11 @@
       <font>infofont</font>
       <altfont>infofontgray</altfont>
     </textarea>
+    <textarea name="option5">
+      <area>85,420,470,30</area>
+      <font>infofont</font>
+      <altfont>infofontgray</altfont>
+    </textarea>
     <positionrects name="selector"> <!-- draws a white rectangle at these 
                                          coords indicating the current 
                                          selection -->

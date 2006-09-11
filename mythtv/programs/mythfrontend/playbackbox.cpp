@@ -786,6 +786,7 @@ void PlaybackBox::updateProgramInfo(QPainter *p, QRect& pr, QPixmap& pix)
         iconMap["stereo"]      = FL_STEREO;
         iconMap["cc"]          = FL_CC;
         iconMap["hdtv"]        = FL_HDTV;
+        iconMap["watched"]     = FL_WATCHED;
 
         UIImageType *itype;
         for (it = iconMap.begin(); it != iconMap.end(); ++it)
@@ -2760,14 +2761,10 @@ void PlaybackBox::showActionPopup(ProgramInfo *program)
     QButton *playButton;
 
     if (curitem->programflags & FL_BOOKMARK)
-    {
         playButton = popup->addButton(tr("Play from..."), this,
                                       SLOT(showPlayFromPopup()));
-    }
     else
-    {
         playButton = popup->addButton(tr("Play"), this, SLOT(doPlay()));
-    }
 
     if (playList.grep(curitem->MakeUniqueKey()).count())
         popup->addButton(tr("Remove from Playlist"), this,
@@ -2778,6 +2775,13 @@ void PlaybackBox::showActionPopup(ProgramInfo *program)
 
     if (program->recstatus == rsRecording)
         popup->addButton(tr("Stop Recording"), this, SLOT(askStop()));
+
+    if (curitem->programflags & FL_WATCHED)
+        popup->addButton(tr("Mark as Unwatched"), this,
+                                    SLOT(setUnwatched()));
+    else
+        popup->addButton(tr("Mark as Watched"), this,
+                                    SLOT(setWatched()));
 
     popup->addButton(tr("Storage Options"), this, SLOT(showStoragePopup()));
     popup->addButton(tr("Recording Options"), this, SLOT(showRecordingPopup()));
@@ -3289,6 +3293,48 @@ ProgramInfo *PlaybackBox::findMatchingProg(QString chanid, QString recstartts)
     }
 
     return NULL;
+}
+
+void PlaybackBox::setUnwatched(void)
+{
+    if (!expectingPopup && delitem)
+        return;
+
+    cancelPopup();
+
+    delitem->SetWatchedFlag(0);
+
+    ProgramInfo *tmpItem = findMatchingProg(delitem);
+    if (tmpItem)
+        tmpItem->programflags &= ~FL_WATCHED;
+
+    delete delitem;
+    delitem = NULL;
+
+    previewVideoState = kChanging;
+
+    update(drawListBounds);
+}
+
+void PlaybackBox::setWatched(void)
+{
+    if (!expectingPopup)
+        return;
+
+    cancelPopup();
+
+    delitem->SetWatchedFlag(1);
+
+    ProgramInfo *tmpItem = findMatchingProg(delitem);
+    if (tmpItem)
+        tmpItem->programflags |= FL_WATCHED;
+
+    delete delitem;
+    delitem = NULL;
+
+    previewVideoState = kChanging;
+
+    update(drawListBounds);
 }
 
 void PlaybackBox::noAutoExpire(void)

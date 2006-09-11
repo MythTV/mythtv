@@ -1828,6 +1828,30 @@ long long ProgramInfo::GetBookmark(void) const
     return pos;
 }
 
+/** \fn ProgramInfo::SetWatchedFlag(bool) const
+ *  \brief Set "watched" field in "recorded" table to "watchedFlag".
+ *  \param watchedFlag value to set watched field to.
+ */
+void ProgramInfo::SetWatchedFlag(bool watchedFlag) const
+{
+    MSqlQuery query(MSqlQuery::InitCon());
+
+    query.prepare("UPDATE recorded"
+                  " SET watched = :WATCHEDFLAG"
+                  " WHERE chanid = :CHANID"
+                  " AND starttime = :STARTTIME ;");
+    query.bindValue(":CHANID", chanid);
+    query.bindValue(":STARTTIME", recstartts);
+
+    if (watchedFlag)
+        query.bindValue(":WATCHEDFLAG", 1);
+    else
+        query.bindValue(":WATCHEDFLAG", 0);
+
+    if (!query.exec() || !query.isActive())
+        MythContext::DBError("Set watched flag", query);
+}
+
 /** \fn ProgramInfo::IsEditing(void) const
  *  \brief Queries "recorded" table for its "editing" field
  *         and returns true if it is set to true.
@@ -1965,6 +1989,28 @@ bool ProgramInfo::IsInUse(QString &byWho) const
         }
 
         return true;
+    }
+
+    return false;
+}
+
+/** \fn ProgramInfo::GetTranscodedStatus(void) const
+ *  \brief Returns the "transcoded" field in "recorded" table.
+ */
+int ProgramInfo::GetTranscodedStatus(void) const
+{
+    MSqlQuery query(MSqlQuery::InitCon());
+
+    query.prepare("SELECT transcoded FROM recorded"
+                 " WHERE chanid = :CHANID"
+                 " AND starttime = :STARTTIME ;");
+    query.bindValue(":CHANID", chanid);
+    query.bindValue(":STARTTIME", recstartts);
+
+    if (query.exec() && query.isActive() && query.size() > 0)
+    {
+        query.next();
+        return query.value(0).toInt();
     }
 
     return false;
@@ -3533,7 +3579,7 @@ int ProgramInfo::getProgramFlags(void) const
     MSqlQuery query(MSqlQuery::InitCon());
 
     query.prepare("SELECT commflagged, cutlist, autoexpire, "
-                  "editing, bookmark, stereo, closecaptioned, hdtv "
+                  "editing, bookmark, stereo, closecaptioned, hdtv, watched "
                   "FROM recorded LEFT JOIN recordedprogram ON "
                   "(recorded.chanid = recordedprogram.chanid AND "
                   "recorded.starttime = recordedprogram.starttime) "
@@ -3555,6 +3601,7 @@ int ProgramInfo::getProgramFlags(void) const
         flags |= (query.value(5).toInt() == 1) ? FL_STEREO : 0;
         flags |= (query.value(6).toInt() == 1) ? FL_CC : 0;
         flags |= (query.value(7).toInt() == 1) ? FL_HDTV : 0;
+        flags |= (query.value(8).toInt() == 1) ? FL_WATCHED : 0;
     }
 
     return flags;
@@ -4201,7 +4248,7 @@ bool ProgramList::FromRecorded( bool bDescending, ProgramList *pSchedList )
         "recorded.basename, recorded.progstart, "
         "recorded.progend, recorded.stars, "
         "recordedprogram.stereo, recordedprogram.hdtv, "
-        "recordedprogram.closecaptioned "
+        "recordedprogram.closecaptioned, recorded.watched "
         "FROM recorded "
         "LEFT JOIN record ON recorded.recordid = record.recordid "
         "LEFT JOIN channel ON recorded.chanid = channel.chanid "
@@ -4294,6 +4341,7 @@ bool ProgramList::FromRecorded( bool bDescending, ProgramList *pSchedList )
             flags |= (query.value(32).toInt() == 1)           ? FL_STEREO   : 0;
             flags |= (query.value(34).toInt() == 1)           ? FL_CC       : 0;
             flags |= (query.value(33).toInt() == 1)           ? FL_HDTV     : 0;
+            flags |= (query.value(35).toInt() == 1)           ? FL_WATCHED  : 0;
 
             inUseKey = query.value(0).toString() + " " +
                        query.value(1).toDateTime().toString(Qt::ISODate);

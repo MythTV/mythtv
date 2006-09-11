@@ -145,6 +145,7 @@ class NuppelVideoPlayer : public CC608Reader, public CC708Reader
 
     void SetTranscoding(bool value);
     void SetWatchingRecording(bool mode);
+    void SetWatched(bool forceWatched = false);
     void SetBookmark(void);
     void SetKeyframeDistance(int keyframedistance);
     void SetVideoParams(int w, int h, double fps, int keydist,

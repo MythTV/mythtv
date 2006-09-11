@@ -55,7 +55,8 @@ enum FlagMask {
     FL_STEREO         = 0x080,
     FL_CC             = 0x100,
     FL_HDTV           = 0x200,
-    FL_TRANSCODED     = 0x400
+    FL_TRANSCODED     = 0x400,
+    FL_WATCHED        = 0x800
 };
 
 enum RecStatusType {
@@ -183,6 +184,7 @@ class ProgramInfo
     bool IsCommFlagged(void) const;
     bool IsInUse(QString &byWho) const;
     int GetAutoExpireFromRecorded(void) const;
+    int GetTranscodedStatus(void) const;
     bool GetPreserveEpisodeFromRecorded(void) const;
     bool UsesMaxEpisodes(void) const;
     int getProgramFlags(void) const;
@@ -195,6 +197,7 @@ class ProgramInfo
     void SetBookmark(long long pos) const;
     void SetEditing(bool edit) const;
     void SetTranscoded(int transFlag) const;
+    void SetWatchedFlag(bool watchedFlag) const;
     void SetDeleteFlag(bool deleteFlag) const;
     void SetCommFlagged(int flag) const; // 1 = flagged, 2 = processing
     void SetAutoExpire(int autoExpire) const;

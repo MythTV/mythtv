@@ -1216,7 +1216,7 @@ void TV::StopStuff(bool stopRingBuffers, bool stopPlayers, bool stopRecorders)
     {
         VERBOSE(VB_PLAYBACK,LOC + " StopStuff() -- get dvd player out of still frame or wait status");
         prbuffer->DVD()->IgnoreStillOrWait(true);
-    } 
+    }
 
     if (stopRingBuffers)
     {
@@ -2116,11 +2116,16 @@ void TV::ProcessKeypress(QKeyEvent *e)
                             wantsToQuit = true;
                             exitPlayer = true;
                             break;
-                        case 3: case 0:
+                        case 3:
+                            nvp->SetWatched(true);
+                            wantsToQuit = true;
+                            exitPlayer = true;
+                            break;
+                        case 4: case 0:
                             paused = !paused;
                             DoPause();
                             break;
-                        case 4:
+                        case 5:
                             wantsToQuit = true;
                             exitPlayer = true;
                             requestDelete = true;
@@ -2486,6 +2491,7 @@ void TV::ProcessKeypress(QKeyEvent *e)
                 QStringList options;
                 options += tr("Save this position and go to the menu");
                 options += tr("Do not save, just exit to the menu");
+                options += tr("Mark as watched and go to the menu");
                 options += tr("Keep watching");
                 options += tr("Delete this recording");
 
@@ -2520,6 +2526,8 @@ void TV::ProcessKeypress(QKeyEvent *e)
             {
                 if (nvp && gContext->GetNumSetting("PlaybackExitPrompt") == 2)
                     nvp->SetBookmark();
+                if (nvp && gContext->GetNumSetting("AutomaticSetWatched", 0))
+                    nvp->SetWatched();
                 exitPlayer = true;
                 wantsToQuit = true;
             }

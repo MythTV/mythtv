@@ -570,6 +570,16 @@ static GlobalComboBox *AutoExpireMethod()
     return bc;
 }
 
+static GlobalCheckBox *AutoExpireWatchedPriority() 
+{
+    GlobalCheckBox *bc = new GlobalCheckBox("AutoExpireWatchedPriority"); 
+    bc->setLabel(QObject::tr("Auto Expire watched programs before unwatched")); 
+    bc->setValue(false); 
+    bc->setHelpText(QObject::tr("If set, programs that have been marked as "
+                    "watched will be expired first"));
+    return bc;
+}
+
 static GlobalSpinBox *AutoExpireDayPriority()
 {
     GlobalSpinBox *bs = new GlobalSpinBox("AutoExpireDayPriority", 1, 400, 1);
@@ -619,6 +629,17 @@ static GlobalSpinBox *MinRecordDiskThreshold()
     return bs;
 }
 #endif
+
+static GlobalCheckBox *RerecordWatched() 
+{
+    GlobalCheckBox *bc = new GlobalCheckBox("RerecordWatched"); 
+    bc->setLabel(QObject::tr("Re-record watched programs")); 
+    bc->setValue(true); 
+    bc->setHelpText(QObject::tr("If set, programs that have been marked as "
+                    "watched and are auto-expired will be re-recorded if "
+                    "they are shown again."));
+    return bc;
+}
 
 static GlobalSpinBox *RecordPreRoll()
 {
@@ -1223,6 +1244,19 @@ static HostCheckBox *EndOfRecordingExitPrompt()
     gc->setHelpText(QObject::tr("If set, a menu will be displayed allowing "
                     "you to delete the recording when it has finished "
                     "playing."));
+    return gc;
+}
+
+static HostCheckBox *AutomaticSetWatched()
+{
+    HostCheckBox *gc = new HostCheckBox("AutomaticSetWatched");
+    gc->setLabel(QObject::tr("Automatically mark a record watched"));
+    gc->setValue(false);
+    gc->setHelpText(QObject::tr("If set, when you exit near the end of a "
+                    "recording it will be marked as watched. The automatic "
+                    "detection is not foolproof, so do not enable this "
+                    "setting if you don't want an unwatched recording marked "
+                    "as watched."));
     return gc;
 }
 
@@ -3416,6 +3450,7 @@ PlaybackSettings::PlaybackSettings()
     gen2->setLabel(QObject::tr("General playback (part 2)"));
     gen2->addChild(PlaybackExitPrompt());
     gen2->addChild(EndOfRecordingExitPrompt());
+    gen2->addChild(AutomaticSetWatched());
     gen2->addChild(ClearSavedPosition());
     gen2->addChild(AltClearSavedPosition());
 #ifdef USING_XV
@@ -3540,9 +3575,11 @@ GeneralSettings::GeneralSettings()
     VerticalConfigurationGroup* autoexp = new VerticalConfigurationGroup(false);
     autoexp->setLabel(QObject::tr("General (AutoExpire)"));
     autoexp->addChild(AutoExpireMethod());
+    autoexp->addChild(AutoExpireWatchedPriority());
     autoexp->addChild(AutoExpireDayPriority());
     autoexp->addChild(AutoExpireDefault());
     autoexp->addChild(AutoExpireLiveTVMaxAge());
+    autoexp->addChild(RerecordWatched());
     autoexp->addChild(AutoExpireExtraSpace());
     addChild(autoexp);
 

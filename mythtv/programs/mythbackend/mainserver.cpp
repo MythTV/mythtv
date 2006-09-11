@@ -661,8 +661,11 @@ void MainServer::customEvent(QCustomEvent *e)
             if (pinfo)
             {
                 // allow re-record if auto expired but not expired live buffers
-                if (pinfo->recgroup != "LiveTV")
+                if (pinfo->recgroup != "LiveTV" &&
+                    (gContext->GetNumSetting("RerecordWatched", 0) ||
+                    (!pinfo->getProgramFlags() & FL_WATCHED)))
                     pinfo->ForgetHistory();
+
                 DoHandleDeleteRecording(pinfo, NULL, false);
             }
             else
@@ -1028,7 +1031,7 @@ void MainServer::HandleQueryRecordings(QString type, PlaybackSock *pbs)
         "recorded.progend, recorded.stars, "
         "recordedprogram.stereo, recordedprogram.hdtv, "
         "recordedprogram.closecaptioned, transcoded, "
-        "recorded.recpriority "
+        "recorded.recpriority, watched "
         "FROM recorded "
         "LEFT JOIN record ON recorded.recordid = record.recordid "
         "LEFT JOIN channel ON recorded.chanid = channel.chanid "
@@ -1132,6 +1135,7 @@ void MainServer::HandleQueryRecordings(QString type, PlaybackSock *pbs)
             flags |= (query.value(34).toInt() == 1) ? FL_CC : 0;
             flags |= (query.value(35).toInt() == TRANSCODING_COMPLETE) ?
                       FL_TRANSCODED : 0;
+            flags |= (query.value(37).toInt() == 1) ? FL_WATCHED : 0;
 
             inUseKey = query.value(0).toString() + " " +
                        query.value(1).toDateTime().toString(Qt::ISODate);
