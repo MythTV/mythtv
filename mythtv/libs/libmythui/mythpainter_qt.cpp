@@ -3,6 +3,7 @@
 #include <qpixmap.h>
 #include "mythpainter_qt.h"
 #include "mythfontproperties.h"
+#include "mythmainwindow.h"
 
 class MythQtImage : public MythImage
 {
@@ -136,6 +137,9 @@ void MythQtPainter::DrawText(const QRect &r, const QString &msg,
         int outlineSize, outlineAlpha;
 
         font.GetOutline(outlineColor, outlineSize, outlineAlpha);
+
+        if (GetMythMainWindow()->GetUIScreenRect().height() > 700)
+            outlineSize = 1;
 
         painter->setPen(outlineColor);
 
