@@ -10,6 +10,10 @@
         <network>ENCORE</network>
     </callsigntonetwork>
     <callsigntonetwork>
+        <callsign>AETVP</callsign>
+        <network>AE</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
         <callsign>AMC</callsign>
         <network>AMC</network>
     </callsigntonetwork>
@@ -506,6 +510,10 @@
         <network>USA</network>
     </callsigntonetwork>
     <callsigntonetwork>
+        <callsign>G4</callsign>
+        <network>G4</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
         <callsign>G5-01</callsign>
         <network>DISNEY</network>
     </callsigntonetwork>
@@ -954,6 +962,10 @@
         <network>FOX</network>
     </callsigntonetwork>
     <callsigntonetwork>
+        <callsign>KCPQDT</callsign>
+        <network>FOX</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
         <callsign>KCPT</callsign>
         <network>PBS-KCPT</network>
     </callsigntonetwork>
@@ -975,6 +987,22 @@
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>KCTS</callsign>
+        <network>PBS-KCTS</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>KCTSDT</callsign>
+        <network>PBS-KCTS</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>KCTSDT2</callsign>
+        <network>PBS-KCTS</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>KCTSDT3</callsign>
+        <network>PBS-KCTS</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>KCTSDT5</callsign>
         <network>PBS-KCTS</network>
     </callsigntonetwork>
     <callsigntonetwork>
@@ -1747,6 +1775,10 @@
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>KOMO</callsign>
+        <network>ABC</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>KOMODT</callsign>
         <network>ABC</network>
     </callsigntonetwork>
     <callsigntonetwork>
@@ -2804,6 +2836,10 @@
     <callsigntonetwork>
         <callsign>MYSTERYP</callsign>
         <network>ENCORE</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>NASA</callsign>
+        <network>NASA</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>NEWSENG</callsign>
@@ -5770,6 +5806,10 @@
         <url>[zap2it]/fx.jpg</url>
     </networktourl>
     <networktourl>
+        <network>G4</network>
+        <url>[lyngsat]/gg/g4_video_game_tv.gif</url>
+    </networktourl>
+    <networktourl>
         <network>GAMESHOWNETWORK</network>
         <url>[zap2it]/gameshownetwork.jpg</url>
     </networktourl>
@@ -5852,6 +5892,10 @@
     <networktourl>
         <network>NBC</network>
         <url>[zap2it]/nbc.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>NASA</network>
+        <url>[lyngsat]/nn/nasatv_us.gif</url>
     </networktourl>
     <networktourl>
         <network>NEWSENG</network>
