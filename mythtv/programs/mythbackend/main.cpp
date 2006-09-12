@@ -593,9 +593,12 @@ int main(int argc, char **argv)
     if (fatal_error)
         return BACKEND_EXIT_CAP_CARD_SETUP_ERROR;
 
-    if (ismaster && runsched && !nosched)
+    if (ismaster && runsched)
     {
         sched = new Scheduler(true, &tvList);
+
+        if (nosched)
+            sched->DisableScheduling();
     }
 
     if (noexpirer)

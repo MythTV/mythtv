@@ -42,6 +42,7 @@ Scheduler::Scheduler(bool runthread, QMap<int, EncoderLink *> *tvList,
     hasconflicts = false;
     m_tvList = tvList;
     specsched = false;
+    schedulingEnabled = true;
 
     if (master_sched)
     {
@@ -1430,8 +1431,17 @@ void Scheduler::RunScheduler(void)
                 .arg(nextRecording->cardid)
                 .arg(nextRecording->sourceid);
 
-            nextRecording->recstatus = nexttv->StartRecording(nextRecording);
-            nextRecording->AddHistory(false);
+            if (schedulingEnabled)
+            {
+                nextRecording->recstatus =
+                    nexttv->StartRecording(nextRecording);
+                nextRecording->AddHistory(false);
+            }
+            else
+            {
+                nextRecording->recstatus = rsOffLine;
+            }
+
             statuschanged = true;
 
             bool is_rec = (nextRecording->recstatus == rsRecording);

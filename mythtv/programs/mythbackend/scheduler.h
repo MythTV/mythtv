@@ -58,6 +58,9 @@ class Scheduler : public QObject
     void SlaveConnected(ProgramList &slavelist);
     void SlaveDisconnected(int cardid);
 
+    void DisableScheduling(void) { schedulingEnabled = false; }
+    void EnableScheduling(void) { schedulingEnabled = true; }
+
   protected:
     void RunScheduler(void);
     static void *SchedulerThread(void *param);
@@ -114,6 +117,7 @@ class Scheduler : public QObject
     bool specsched;
     bool hasconflicts;
     bool schedMoveHigher;
+    bool schedulingEnabled;
 
     QMap<int, EncoderLink *> *m_tvList;   
 
