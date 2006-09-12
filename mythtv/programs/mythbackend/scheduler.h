@@ -87,6 +87,7 @@ class Scheduler : public QObject
     void SchedNewRecords(void);
     void MoveHigherRecords(void);
     void PruneRedundants(void);
+    void UpdateNextRecord(void);
 
     bool ChangeRecordingEnd(ProgramInfo *oldp, ProgramInfo *newp);
 

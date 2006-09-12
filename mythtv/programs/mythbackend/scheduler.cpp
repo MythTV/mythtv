@@ -296,6 +296,9 @@ bool Scheduler::FillRecordList(void)
     VERBOSE(VB_SCHEDULE, "Sort by time...");
     reclist.sort(comp_recstart);
 
+    VERBOSE(VB_SCHEDULE, "UpdateNextRecord...");
+    UpdateNextRecord();
+
     return hasconflicts;
 }
 
@@ -945,6 +948,59 @@ void Scheduler::PruneRedundants(void)
         {
             delete p;
             i = reclist.erase(i);
+        }
+    }
+}
+
+void Scheduler::UpdateNextRecord(void)
+{
+    QMap<int, QDateTime> nextRecMap;
+
+    RecIter i = reclist.begin();
+    while (i != reclist.end())
+    {
+        ProgramInfo *p = *i;
+        if (p->recstatus == rsWillRecord && nextRecMap[p->recordid].isNull())
+            nextRecMap[p->recordid] = p->recstartts;
+        i++;
+    }
+
+    MSqlQuery query(dbConn);
+    query.prepare("SELECT recordid, next_record FROM record;");
+
+    if (query.exec() && query.isActive())
+    {
+        MSqlQuery subquery(dbConn);
+        QDateTime tmpdt;
+
+        while (query.next())
+        {
+            int recid = query.value(0).toInt();
+            QDateTime next_record = query.value(1).toDateTime();
+
+            if (next_record == nextRecMap[recid])
+                continue;
+
+            if (nextRecMap[recid].isNull() && next_record.isValid())
+            {
+                subquery.prepare("UPDATE record "
+                                 "SET next_record = '0000-00-00T00:00:00' "
+                                 "WHERE recordid = :RECORDID;");
+                subquery.bindValue(":RECORDID", recid);
+            }
+            else
+            {
+                subquery.prepare("UPDATE record SET next_record = :NEXTREC "
+                                 "WHERE recordid = :RECORDID;");
+                subquery.bindValue(":RECORDID", recid);
+                subquery.bindValue(":NEXTREC", nextRecMap[recid]);
+            }
+            subquery.exec();
+            if (!subquery.isActive())
+                MythContext::DBError("Update next_record", subquery);
+            else
+                VERBOSE(VB_SCHEDULE, LOC + 
+                        QString("Update next_record for %1").arg(recid));
         }
     }
 }
