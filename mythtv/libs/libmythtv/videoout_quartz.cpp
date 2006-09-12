@@ -117,9 +117,11 @@ struct QuartzData
     VideoOutputQuartzView * embeddedView;    // special embedded widget
 };
 
-/*
- * This abstract class is used for implementing output viewports.
- * See the subclasses below.
+/**
+ * An abstract class for implementing QuickTime output viewports.
+ *
+ * This class is further sub-classed for different Mac OS X UI output types.
+ * e.g. Main Window, Full Screen, Dock Icon, Finder/Desktop background
  */
 class VideoOutputQuartzView
 {
@@ -194,8 +196,8 @@ VideoOutputQuartzView::~VideoOutputQuartzView()
     End();
 }
 
-// Set up the port and the QuickTime decompressor.
-// We assume that the parent has set up the pixel storage.
+/// Set up the port and the QuickTime decompressor.
+/// We assume that the parent has set up the pixel storage.
 bool VideoOutputQuartzView::Begin(void)
 {
     viewLock.lock();
@@ -264,7 +266,7 @@ bool VideoOutputQuartzView::Begin(void)
     return true;
 }
 
-// Clean up the codec.  
+/// Clean up the codec.  
 void VideoOutputQuartzView::End(void)
 {
     viewLock.lock();
@@ -282,7 +284,7 @@ void VideoOutputQuartzView::End(void)
     viewLock.unlock();
 }
 
-// Build the transformation matrix to scale the video appropriately.
+/// Build the transformation matrix to scale the video appropriately.
 void VideoOutputQuartzView::Transform(void)
 {
     MatrixRecord matrix;
@@ -587,15 +589,15 @@ void VideoOutputQuartzView::Zoom(int direction)
     Transform();
 }
 
-// Subclasses that block the main window should suspend
-// playback, hide windows, etc. by overriding this method.
+/// Subclasses that block the main window should suspend
+/// playback, hide windows, etc by overriding this method.
 void VideoOutputQuartzView::EmbedChanged(bool embedded)
 {
     // do nothing in default version
     (void)embedded;
 }
 
-/*
+/**
  * This view subclass implements full-size video display in the main window.
  */
 class VoqvMainWindow : public VideoOutputQuartzView
@@ -674,7 +676,7 @@ class VoqvMainWindow : public VideoOutputQuartzView
     };
 };
 
-/*
+/**
  * This view subclass implements embedded display in the main window.
  */
 class VoqvEmbedded : public VideoOutputQuartzView
@@ -726,7 +728,7 @@ class VoqvEmbedded : public VideoOutputQuartzView
     };
  };
 
-/*
+/**
  * This view subclass implements fullscreen video display.
  */
 class VoqvFullscreen : public VideoOutputQuartzView
@@ -820,7 +822,7 @@ class VoqvFullscreen : public VideoOutputQuartzView
     };
 };
 
-/*
+/**
  * This view subclass implements drawing to the dock tile.
  */
 class VoqvDock : public VideoOutputQuartzView
@@ -860,7 +862,7 @@ class VoqvDock : public VideoOutputQuartzView
     };
 };
 
-/*
+/**
  * This view subclass implements drawing to a floating
  * translucent window.
  */
@@ -1083,7 +1085,7 @@ OSStatus VoqvFloater_Callback(EventHandlerCallRef inHandlerCallRef,
 }
 
 
-/*
+/**
  * This view subclass implements drawing to the desktop.
  */
 class VoqvDesktop : public VideoOutputQuartzView
@@ -1163,8 +1165,8 @@ class VoqvDesktop : public VideoOutputQuartzView
     };
 };
 
-/*
- * VideoOutputQuartz implementation
+/** \class VideoOutputQuartz
+ *  \brief Implementation of Quartz (Mac OS X windowing system) video output
  */
 VideoOutputQuartz::VideoOutputQuartz(void)
                  : VideoOutput()
@@ -1420,6 +1422,10 @@ bool VideoOutputQuartz::Init(int width, int height, float aspect,
     return true;
 }
 
+/** \brief
+ * Allocate buffers for parent to decode into. Also creates a new pause frame,
+ * and sets up some QuickTime headers for fast munging in ProcessFrame()
+ */
 bool VideoOutputQuartz::CreateQuartzBuffers(void)
 {
     vbuffers.CreateBuffers(video_dim.width(), video_dim.height());
@@ -1628,6 +1634,10 @@ void VideoOutputQuartz::StopEmbedding(void)
     data->pixelLock.unlock();
 }
 
+/**
+ * If we are using DVDV hardware acceleration, decodes the frame.
+ * Otherwise, just makes sure we have a valid frame to show.
+ */
 void VideoOutputQuartz::PrepareFrame(VideoFrame *buffer, FrameScanType t)
 {
     (void)t;
@@ -1644,6 +1654,10 @@ void VideoOutputQuartz::PrepareFrame(VideoFrame *buffer, FrameScanType t)
     framesPlayed = buffer->frameNumber + 1;
 }
 
+/** \brief
+ * Display the frame, using either DVDV hardware acceleration,
+ * or possibly several UI output types. \sa VideoOutputQuartzView
+ */
 void VideoOutputQuartz::Show(FrameScanType t)
 {
     (void)t;
@@ -1687,6 +1701,10 @@ void VideoOutputQuartz::UpdatePauseFrame(void)
         memcpy(pauseFrame.buf, pauseb->buf, pauseb->size);
 }
 
+/**
+ * Draw OSD, apply filters and deinterlacing,
+ * copy frame buffer if using QuickTime to decode.
+ */
 void VideoOutputQuartz::ProcessFrame(VideoFrame *frame, OSD *osd,
                                      FilterChain *filterList,
                                      NuppelVideoPlayer *pipPlayer)
