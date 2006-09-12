@@ -23,6 +23,7 @@ class ProgramRecPriorityInfo : public ProgramInfo
     RecordingType recType;
     int matchCount;
     int recCount;
+    QDateTime last_record;
 };
 
 class ProgramRecPriority : public MythDialog
@@ -35,7 +36,8 @@ class ProgramRecPriority : public MythDialog
         byRecPriority,
         byRecType,
         byCount,
-        byRecCount
+        byRecCount,
+        byLastRecord
     };
 
     ProgramRecPriority(MythMainWindow *parent, const char *name = 0);

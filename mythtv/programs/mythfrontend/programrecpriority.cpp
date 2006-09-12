@@ -266,6 +266,20 @@ void ProgramRecPriority::keyPressEvent(QKeyEvent *e)
                 SortList();
                 update(fullRect);
             }
+            else if (action == "7")
+            {
+                if (sortType != byLastRecord)
+                {
+                    sortType = byLastRecord;
+                    reverseSort = false;
+                }
+                else
+                {
+                    reverseSort = !reverseSort;
+                }
+                SortList();
+                update(fullRect);
+            }
             else if (action == "PREVVIEW" || action == "NEXTVIEW")
             {
                 reverseSort = false;
@@ -769,9 +783,8 @@ void ProgramRecPriority::FillList(void)
     // it all at once than once per program)
 
     MSqlQuery result(MSqlQuery::InitCon());
-    result.prepare("SELECT recordid, record.title, record.chanid, "
-                   "record.starttime, record.startdate, "
-                   "record.type, record.inactive "
+    result.prepare("SELECT recordid, title, chanid, starttime, startdate, "
+                   "type, inactive, last_record "
                    "FROM record;");
    
     if (result.exec() && result.isActive() && result.size() > 0)
@@ -788,6 +801,7 @@ void ProgramRecPriority::FillList(void)
             RecordingType recType = (RecordingType)result.value(5).toInt();
             int recTypeRecPriority = rtRecPriors[recType];
             int inactive = result.value(6).toInt();
+            QDateTime lastrec = result.value(7).toDateTime();
 
             // find matching program in programData and set
             // recTypeRecPriority and recType
@@ -806,6 +820,7 @@ void ProgramRecPriority::FillList(void)
                     progInfo->recstatus = inactive ? rsInactive : rsWillRecord;
                     progInfo->matchCount = listMatch[progInfo->recordid];
                     progInfo->recCount = recMatch[progInfo->recordid];
+                    progInfo->last_record = lastrec;
                     break;
                 }
             }
@@ -1038,6 +1053,31 @@ class programRecCountSort
         bool m_reverse;
 };
 
+class programLastRecordSort 
+{
+    public:
+        programLastRecordSort(bool reverseSort=false) 
+            {m_reverse = reverseSort;}
+
+        bool operator()(const RecPriorityInfo a, const RecPriorityInfo b) 
+        {
+            QDateTime lastRecA = a.prog->last_record;
+            QDateTime lastRecB = b.prog->last_record;
+
+            if (lastRecA != lastRecB)
+            {
+                if (m_reverse)
+                    return lastRecA > lastRecB;
+                else
+                    return lastRecA < lastRecB;
+            }
+            return (a.prog->sortTitle > b.prog->sortTitle);
+        }
+
+    private:
+        bool m_reverse;
+};
+
 void ProgramRecPriority::SortList() 
 {
     int i, j;
@@ -1100,6 +1140,14 @@ void ProgramRecPriority::SortList()
                  else
                      sort(sortedList.begin(), sortedList.end(), 
                           programRecCountSort());
+                 break;
+        case byLastRecord :
+                 if (reverseSort)
+                     sort(sortedList.begin(), sortedList.end(), 
+                          programLastRecordSort(true));
+                 else
+                     sort(sortedList.begin(), sortedList.end(), 
+                          programLastRecordSort());
                  break;
     }
 
