@@ -10,11 +10,11 @@
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>ACTON</callsign>
-        <network>ENCORE</network>
+        <network>Encore_Action</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>ACTONP</callsign>
-        <network>ENCORE</network>
+        <network>Encore_Action</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>AETVP</callsign>
@@ -134,7 +134,7 @@
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>C4-03</callsign>
-        <network>NICKELODEON</network>
+        <network>Nickelodeon</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>C4-07</callsign>
@@ -266,27 +266,27 @@
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>EACT</callsign>
-        <network>ENCORE</network>
+        <network>Encore_Action</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>EDRA</callsign>
-        <network>ENCORE</network>
+        <network>Encore_Drama</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>ELOVE</callsign>
-        <network>ENCORE</network>
+        <network>Encore_Love</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>EMYST</callsign>
-        <network>ENCORE</network>
+        <network>Encore_Mystery</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>ENCORE</callsign>
-        <network>ENCORE</network>
+        <network>Encore</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>ENCOREP</callsign>
-        <network>ENCORE</network>
+        <network>Encore</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>ESPN</callsign>
@@ -326,11 +326,11 @@
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>EWAM</callsign>
-        <network>ENCORE</network>
+        <network>Encore_WAM</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>EWST</callsign>
-        <network>ENCORE</network>
+        <network>Encore_WAM</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>F4-01</callsign>
@@ -718,7 +718,7 @@
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>HBOHDP</callsign>
-        <network>HBO</network>
+        <network>HBO_HD</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>HBOP</callsign>
@@ -2846,11 +2846,11 @@
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>LOVE</callsign>
-        <network>ENCORE</network>
+        <network>Encore_Love</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>LOVEP</callsign>
-        <network>ENCORE</network>
+        <network>Encore_Love</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>MAX</callsign>
@@ -2861,12 +2861,16 @@
         <network>CINEMAX</network>
     </callsigntonetwork>
     <callsigntonetwork>
+        <callsign>MILI</callsign>
+        <network>Military</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
         <callsign>MOMAXP</callsign>
         <network>CINEMAX</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>MPLEX</callsign>
-        <network>ENCORE</network>
+        <network>Encore</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>MSNBC</callsign>
@@ -2894,11 +2898,11 @@
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>MYSTERY</callsign>
-        <network>ENCORE</network>
+        <network>Encore_Mystery</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>MYSTERYP</callsign>
-        <network>ENCORE</network>
+        <network>Encore_Mystery</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>NASA</callsign>
@@ -2921,12 +2925,24 @@
         <network>NFL</network>
     </callsigntonetwork>
     <callsigntonetwork>
+        <callsign>NGC</callsign>
+        <network>National_Geographic</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
         <callsign>NIK</callsign>
-        <network>NICKELODEON</network>
+        <network>Nickelodeon</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>NIKP</callsign>
-        <network>NICKELODEON</network>
+        <network>Nickelodeon</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>NIKTON</callsign>
+        <network>Nick_Toons</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>NOGN</callsign>
+        <network>Noggin</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>NWCN</callsign>
@@ -3031,6 +3047,10 @@
     <callsigntonetwork>
         <callsign>SPIKETV</callsign>
         <network>SPIKE</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>SPROUT</callsign>
+        <network>PBS_Sprout</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>STARZ</callsign>
@@ -3150,11 +3170,11 @@
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>TRUE</callsign>
-        <network>ENCORE</network>
+        <network>Encore</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>TRUEP</callsign>
-        <network>ENCORE</network>
+        <network>Encore</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>TV5</callsign>
@@ -3199,6 +3219,10 @@
     <callsigntonetwork>
         <callsign>VH1</callsign>
         <network>VH1</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>VH1CL</callsign>
+        <network>VH1_Classic</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>VH1CNTRY</callsign>
@@ -3326,11 +3350,11 @@
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>WAM</callsign>
-        <network>ENCORE</network>
+        <network>Encore_WAM</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>WAMP</callsign>
-        <network>ENCORE</network>
+        <network>Encore_WAM</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>WAND</callsign>
@@ -3882,11 +3906,11 @@
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>WESTERN</callsign>
-        <network>ENCORE</network>
+        <network>Encore_Westerns</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>WESTERNP</callsign>
-        <network>ENCORE</network>
+        <network>Encore_Westerns</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>WETA</callsign>
@@ -5849,10 +5873,6 @@
         <url>[ls-icon]/dd/diy_net_us.gif</url>
     </networktourl>
     <networktourl>
-        <network>ENCORE</network>
-        <url>[zap2it]/encore.jpg</url>
-    </networktourl>
-    <networktourl>
         <network>ESPN</network>
         <url>[zap2it]/espn.jpg</url>
     </networktourl>
@@ -5875,6 +5895,42 @@
     <networktourl>
         <network>ETV</network>
         <url>[zap2it]/etv.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>Encore</network>
+        <url>[ls-logo]/ee/encore_us.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>Encore_Action</network>
+        <url>[ls-logo]/ee/encore_action.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>Encore_Avenue</network>
+        <url>[ls-logo]/ee/encore_avenue.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>Encore_Drama</network>
+        <url>[ls-logo]/ee/encore_drama.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>Encore_HDTV</network>
+        <url>[ls-logo]/ee/encore_hd.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>Encore_Love</network>
+        <url>[ls-logo]/ee/encore_love.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>Encore_Mystery</network>
+        <url>[ls-logo]/ee/encore_mystery.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>Encore_WAM</network>
+        <url>[ls-logo]/ee/encore_wam.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>Encore_Westerns</network>
+        <url>[ls-logo]/ee/encore_westerns.jpg</url>
     </networktourl>
     <networktourl>
         <network>FITV</network>
@@ -5938,31 +5994,35 @@
     </networktourl>
     <networktourl>
         <network>HBO</network>
-        <url>[zap2it]/hbo.jpg</url>
+        <url>[ls-logo]/hh/hbo.jpg</url>
     </networktourl>
     <networktourl>
         <network>HBOCOMEDY</network>
-        <url>[zap2it]/hbocomedy.jpg</url>
+        <url>[ls-logo]/hh/hbo_comedy.jpg</url>
     </networktourl>
     <networktourl>
         <network>HBOFAMILY</network>
-        <url>[zap2it]/hbof.jpg</url>
+        <url>[ls-logo]/hh/hbo_family.jpg</url>
     </networktourl>
     <networktourl>
         <network>HBOPLUS</network>
-        <url>[zap2it]/hbo2.jpg</url>
+        <url>[ls-logo]/hh/hbo_plus.jpg</url>
     </networktourl>
     <networktourl>
         <network>HBOSIGNATURE</network>
-        <url>[zap2it]/hbosig.jpg</url>
+        <url>[ls-logo]/hh/hbo_signature.jpg</url>
     </networktourl>
     <networktourl>
         <network>HBOZONE</network>
-        <url>[zap2it]/hbozone.jpg</url>
+        <url>[ls-logo]/hh/hbo_zone.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>HBO_HD</network>
+        <url>[ls-logo]/hh/hbo_hdtv.jpg</url>
     </networktourl>
     <networktourl>
         <network>HGTV</network>
-        <url>[zap2it]/hgtv.jpg</url>
+        <url>[ls-logo]/hh/hgtv.jpg</url>
     </networktourl>
     <networktourl>
         <network>HISTORY</network>
@@ -6021,6 +6081,10 @@
         <url>[zap2it]/mtv2.gif</url>
     </networktourl>
     <networktourl>
+        <network>Military</network>
+        <url>[ls-logo]/mm/military_channel_discovery.jpg</url>
+    </networktourl>
+    <networktourl>
         <network>NASA</network>
         <url>[ls-icon]/nn/nasatv_us.gif</url>
     </networktourl>
@@ -6037,12 +6101,24 @@
         <url>[ls-icon]/nn/nfl.gif</url>
     </networktourl>
     <networktourl>
-        <network>NICKELODEON</network>
-        <url>[zap2it]/nik.jpg</url>
-    </networktourl>
-    <networktourl>
         <network>NWCN</network>
         <url>[ls-icon]/nn/nw_cablenews_can.gif</url>
+    </networktourl>
+    <networktourl>
+        <network>National_Geographic</network>
+        <url>[ls-logo]/nn/natgeochannel.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>Nick_Toons</network>
+        <url>[ls-logo]/nn/nicktoons_us.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>Nickelodeon</network>
+        <url>[ls-logo]/nn/nickelodeon.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>Noggin</network>
+        <url>[ls-logo]/nn/noggin.jpg</url>
     </networktourl>
     <networktourl>
         <network>OLN</network>
@@ -6797,6 +6873,10 @@
         <url>[pbs]/WYIN.gif</url>
     </networktourl>
     <networktourl>
+        <network>PBS_Sprout</network>
+        <url>[ls-logo]/pp/pbs_kids_sprout.jpg</url>
+    </networktourl>
+    <networktourl>
         <network>PLAYBOY</network>
         <url>[zap2it2]/playboy.gif</url>
     </networktourl>
@@ -6910,7 +6990,11 @@
     </networktourl>
     <networktourl>
         <network>VH1</network>
-        <url>[zap2it]/vh1.jpg</url>
+        <url>[ls-logo]/vv/vh1.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>VH1_Classic</network>
+        <url>[ls-logo]/vv/vh1_classic.jpg</url>
     </networktourl>
     <networktourl>
         <network>WB</network>

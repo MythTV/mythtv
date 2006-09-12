@@ -88,7 +88,7 @@
 24M (Musica 24)
     [ls-icon]/num/24m_musica24.gif
     [ls-logo]/num/24m_musica24.jpg
-2KY 
+2KY
     [ls-icon]/num/2ky.gif
     [ls-logo]/num/2ky.jpg
 2M
@@ -1639,7 +1639,7 @@ Atlantic TV - Halifax
 Atlas TV
     [ls-icon]/aa/atlas_tv_cz.gif
     [ls-logo]/aa/atlas_tv_cz.jpg
-Atomic TV 
+Atomic TV
     [ls-icon]/aa/atomic_ro.gif
     [ls-logo]/aa/atomic_ro.jpg
 Auburn Sports Net.
@@ -2026,7 +2026,7 @@ Baghdad Sat .Channel
 Bahn TV
     [ls-icon]/bb/bahn_tv.gif
     [ls-logo]/bb/bahn_tv.jpg
-Bahninform 
+Bahninform
     [ls-icon]/bb/bahn_inform.gif
     [ls-logo]/bb/bahn_inform.jpg
 Bahrain TV
@@ -4072,7 +4072,7 @@ Catch On
 Catch On - Plus
     [ls-icon]/cc/catch_on_plus.gif
     [ls-logo]/cc/catch_on_plus.jpg
-Catholic Familyland TV 
+Catholic Familyland TV
     [ls-icon]/ff/familyland.gif
     [ls-logo]/ff/familyland.jpg
 Catolica TV
@@ -6139,7 +6139,7 @@ Educacion Superior Lab...
 Educating Everyone
     [ls-icon]/ee/educating_us.gif
     [ls-logo]/ee/educating_us.jpg
-Educational TV 
+Educational TV
     [ls-icon]/ee/educational_tv_nl.gif
     [ls-logo]/ee/educational_tv_nl.jpg
 Edusat (pl)
@@ -7570,7 +7570,7 @@ Golf Channel
 Golf Channel (cn)
     [ls-icon]/gg/golf_channel_cn.gif
     [ls-logo]/gg/golf_channel_cn.jpg
-Golf Network  
+Golf Network
     [ls-icon]/gg/golfnetwork.gif
     [ls-logo]/gg/golfnetwork.jpg
 Golf Plus
@@ -7772,8 +7772,8 @@ HBO Plus
     [ls-icon]/hh/hbo_plus.gif
     [ls-logo]/hh/hbo_plus.jpg
 HBO Signature
-    [ls-icon]/hh/hbo_signature_asia.gif
-    [ls-logo]/hh/hbo_signature_asia.jpg
+    [ls-icon]/hh/hbo_signature.gif
+    [ls-logo]/hh/hbo_signature.jpg
 HBO The Works
     [ls-icon]/hh/hbo_theworks.gif
     [ls-logo]/hh/hbo_theworks.jpg
@@ -9046,10 +9046,10 @@ Jedi Movie Channel
 Jeevan TV
     [ls-icon]/jj/jeevan_tv.gif
     [ls-logo]/jj/jeevan_tv.jpg
-Jei English TV 
+Jei English TV
     [ls-icon]/jj/jei_english_tv.gif
     [ls-logo]/jj/jei_english_tv.jpg
-Jei TV 
+Jei TV
     [ls-icon]/jj/jei_tv.gif
     [ls-logo]/jj/jei_tv.jpg
 Jesus Broadc. Netw. TV
@@ -9058,7 +9058,7 @@ Jesus Broadc. Netw. TV
 Jesus Satellite TV
     [ls-icon]/jj/jstv_us.gif
     [ls-logo]/jj/jstv_us.jpg
-Jesus TV 
+Jesus TV
     [ls-icon]/jj/jesus_tv.gif
     [ls-logo]/jj/jesus_tv.jpg
 Jet TV
@@ -12334,7 +12334,7 @@ Macau Satellite TV
 Mach 6
     [ls-icon]/mm/mach6_nl.gif
     [ls-logo]/mm/mach6_nl.jpg
-Macroview TV 
+Macroview TV
     [ls-icon]/mm/mactv_tw.gif
     [ls-logo]/mm/mactv_tw.jpg
 Mad Music
@@ -12379,7 +12379,7 @@ Magic TV (it)
 Magic TV (kr)
     [ls-icon]/mm/magic_tv_kr.gif
     [ls-logo]/mm/magic_tv_kr.jpg
-MagicStar 
+MagicStar
     [ls-icon]/mm/magicstar.gif
     [ls-logo]/mm/magicstar.jpg
 Magna TV
@@ -12898,10 +12898,10 @@ Montagne
 Montana PBS
     [ls-icon]/mm/montana_pbs.gif
     [ls-logo]/mm/montana_pbs.jpg
-Monte Carlo TV 
+Monte Carlo TV
     [ls-icon]/mm/montecarlotv.gif
     [ls-logo]/mm/montecarlotv.jpg
-Monte Maria TV 
+Monte Maria TV
     [ls-icon]/mm/monte_maria_tv.gif
     [ls-logo]/mm/monte_maria_tv.jpg
 Moooby TV
@@ -13510,7 +13510,7 @@ NTN
 NTU TV1
     [ls-icon]/nn/ntu_tv1.gif
     [ls-logo]/nn/ntu_tv1.jpg
-NTV 
+NTV
     [ls-icon]/nn/ntv_ru.gif
     [ls-logo]/nn/ntv_ru.jpg
 NTV  (ca)
@@ -14695,7 +14695,7 @@ Partener TV
 Pase NFL
     [ls-icon]/pp/pasenfl.gif
     [ls-logo]/pp/pasenfl.jpg
-Pasocon TV 
+Pasocon TV
     [ls-icon]/pp/pasocontv_japan.gif
     [ls-logo]/pp/pasocontv_japan.jpg
 Passion TV
@@ -14938,7 +14938,7 @@ Playboy One
 Playboy TV
     [ls-icon]/pp/playboy.gif
     [ls-logo]/pp/playboy.jpg
-Playboy TV 
+Playboy TV
     [ls-icon]/pp/playboy_tv_uk.gif
     [ls-logo]/pp/playboy_tv_uk.jpg
 Playboy TV +
@@ -15829,7 +15829,7 @@ RTRS
 RTS
     [ls-icon]/rr/rts1_sn.gif
     [ls-logo]/rr/rts1_sn.jpg
-RTS  
+RTS
     [ls-icon]/rr/rts.gif
     [ls-logo]/rr/rts.jpg
 RTS Sat
@@ -15985,7 +15985,7 @@ Rainbow Channel (jp)
 Rainbow Channel (tw)
     [ls-icon]/rr/rainbow_channel_tw.gif
     [ls-logo]/rr/rainbow_channel_tw.jpg
-Rainbow Channel TV 
+Rainbow Channel TV
     [ls-icon]/rr/rct_it.gif
     [ls-logo]/rr/rct_it.jpg
 Rainbow Entertainment
@@ -16690,7 +16690,7 @@ SF Info
 SF Zwei
     [ls-icon]/ss/sf2.gif
     [ls-logo]/ss/sf2.jpg
-SF1 
+SF1
     [ls-icon]/ss/sf1.gif
     [ls-logo]/ss/sf1.jpg
 SFR
@@ -16831,7 +16831,7 @@ Sachsen Fernsehen
 Sadhna TV
     [ls-icon]/ss/sadhna_tv.gif
     [ls-logo]/ss/sadhna_tv.jpg
-Safe TV 
+Safe TV
     [ls-icon]/ss/safetv.gif
     [ls-logo]/ss/safetv.jpg
 Safety Net Shopping Ch.
@@ -17173,7 +17173,7 @@ SexView TV
 SexView gay
     [ls-icon]/ss/sexview_gay.gif
     [ls-logo]/ss/sexview_gay.jpg
-SexcineTV 
+SexcineTV
     [ls-icon]/ss/sexcine_tv.gif
     [ls-logo]/ss/sexcine_tv.jpg
 Sexy Channel
@@ -17329,7 +17329,7 @@ Shoptime
 Show Max
     [ls-icon]/ss/show_max.gif
     [ls-logo]/ss/show_max.jpg
-Show Net 
+Show Net
     [ls-icon]/ss/shownet.gif
     [ls-logo]/ss/shownet.jpg
 Show Plus
@@ -18121,7 +18121,7 @@ Spicy TV
 Spicy Zone
     [ls-icon]/ss/spicy_zone.gif
     [ls-logo]/ss/spicy_zone.jpg
-Spiegel TV 
+Spiegel TV
     [ls-icon]/ss/spiegel_tv.gif
     [ls-logo]/ss/spiegel_tv.jpg
 Spike TV
@@ -18466,10 +18466,10 @@ Style Network
 Style UK
     [ls-icon]/ss/style_uk.gif
     [ls-logo]/ss/style_uk.jpg
-Stöd 2 
+Stöd 2
     [ls-icon]/ss/stod2.gif
     [ls-logo]/ss/stod2.jpg
-Stöd 3 
+Stöd 3
     [ls-icon]/ss/stod3.gif
     [ls-logo]/ss/stod3.jpg
 Su TV (tr)
@@ -20329,7 +20329,7 @@ Tapesh TV
 Tapesh TV 2
     [ls-icon]/tt/tapesh_tv2.gif
     [ls-logo]/tt/tapesh_tv2.jpg
-Taquilla  
+Taquilla
     [ls-icon]/tt/taquilla.gif
     [ls-logo]/tt/taquilla.jpg
 Taquilla  16:9
@@ -21289,7 +21289,7 @@ Travel & Leisure TV
 Travel Channel
     [ls-icon]/tt/topv_travel_channel.gif
     [ls-logo]/tt/topv_travel_channel.jpg
-Travel Channel 
+Travel Channel
     [ls-icon]/tt/travelchannel.gif
     [ls-logo]/tt/travelchannel.jpg
 Travel Channel (cn)
@@ -24625,7 +24625,7 @@ WWTV 9 Cadillac
 WWUP 10 Cadillac
     [ls-icon]/ww/wwup_cbs10_cadillac.gif
     [ls-logo]/ww/wwup_cbs10_cadillac.jpg
-WWW Travel 
+WWW Travel
     [ls-icon]/ww/wwwtravel.gif
     [ls-logo]/ww/wwwtravel.jpg
 WXEL 42 Palm Beach
@@ -25468,7 +25468,7 @@ Zik
 Zip TV
     [ls-icon]/zz/zip_tv.gif
     [ls-logo]/zz/zip_tv.jpg
-Zoe TV 
+Zoe TV
     [ls-icon]/zz/zoe_tv.gif
     [ls-logo]/zz/zoe_tv.jpg
 Zona Latina
