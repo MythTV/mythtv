@@ -31,7 +31,7 @@
 #******************************************************************************
 
 # version of script - change after each update
-VERSION="0.1.20060910-1"
+VERSION="0.1.20060912-1"
 
 
 ##You can use this debug flag when testing out new themes
@@ -139,6 +139,9 @@ themeName = ''
 #Maximum of 10 theme fonts
 themeFonts = [0,0,0,0,0,0,0,0,0,0]
 
+# no. of processors we have access to
+cpuCount = 1
+
 def write(text, progress=True):
     """Simple place to channel all text output through"""
     sys.stdout.write(text + "\n")
@@ -163,6 +166,26 @@ def getTempPath():
 def getIntroPath():
     """This is the folder where all intro files are located."""
     return os.path.join(sharepath, "mytharchive", "intro")
+
+def getCPUCount():
+    """return the number of CPU's"""
+    cpustat = open("/proc/cpuinfo")
+    cpudata = cpustat.readlines()
+    cpustat.close()
+
+    cpucount = 0
+    for line in cpudata:
+        tokens = line.split()
+        if len(tokens) > 0:
+            if tokens[0] == "processor":
+                cpucount += 1
+
+    if cpucount == 0:
+        cpucount = 1
+
+    write("Found %d CPUs" % cpucount)
+ 
+    return cpucount
 
 def getEncodingProfilePath():
     """This is the folder where all encoder profile files are located."""
@@ -1066,11 +1089,16 @@ def preProcessFile(file, folder):
 
 def encodeAudio(format, sourcefile, destinationfile, deletesourceafterencode):
     write( "Encoding audio to "+format)
-    if format=="ac3":
-        cmd=path_ffmpeg[0] + " -v 0 -y -i '%s' -f ac3 -ab 192 -ar 48000 '%s'" % (sourcefile, destinationfile)
-        result=runCommand(cmd)
+    if format == "ac3":
+        cmd = path_ffmpeg[0] + " -v 0 -y "
 
-        if result!=0:
+        if cpuCount > 1:
+            cmd += "-threads %d " % cpuCount
+
+        cmd += "-i '%s' -f ac3 -ab 192 -ar 48000 '%s'" % (sourcefile, destinationfile)
+        result = runCommand(cmd)
+
+        if result != 0:
             fatalError("Failed while running ffmpeg to re-encode the audio to ac3\n"
                        "Command was %s" % cmd)
     else:
@@ -1224,6 +1252,9 @@ def encodeVideoToMPEG2(source, destvideofile, video, audio1, audio2, aspectratio
 
     command = path_ffmpeg[0]
 
+    if cpuCount > 1:
+        command += " -threads %d" % cpuCount
+
     parameters = profileNode.getElementsByTagName("parameter")
 
     for param in parameters:
@@ -1356,6 +1387,10 @@ def encodeNuvToMPEG2(chanid, starttime, destvideofile, folder, profile, usecutli
     videores, fps, aspectratio = getVideoParams(folder)
 
     command =  path_ffmpeg[0] + " -y "
+
+    if cpuCount > 1:
+        command += "-threads %d " % cpuCount
+
     command += "-f s16le -ar %s -ac %s -i %s " % (samplerate, channels, os.path.join(folder, "audout")) 
     command += "-f rawvideo -pix_fmt yuv420p -s %s -aspect %s -r %s " % (videores, aspectratio, fps)
     command += "-i %s " % os.path.join(folder, "vidout")
@@ -3312,6 +3347,7 @@ if progresslog != "":
     progressfile = open(progresslog, 'w')
     write( "mythburn.py (%s) starting up..." % VERSION)
 
+cpuCount = getCPUCount()
 
 #Get mysql database parameters
 getMysqlDBParameters();
