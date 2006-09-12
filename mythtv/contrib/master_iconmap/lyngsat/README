@@ -1,0 +1,4 @@
+This script downloads the complete station icon list from lyngsat-logo.com and
+outputs lyngsat_stations.txt, which contains each station name, followed by
+two indented lines containing the small and large logo URL's in a format ready
+to be inserted into networktourl.txt for build_map.pl
