@@ -103,6 +103,11 @@ class AudioOutputBase : public AudioOutput
     
     void SetStretchFactorLocked(float factor);
 
+    int GetBaseAudioTime()                    const { return audiotime;       }
+    int GetBaseAudBufTimeCode()               const { return audbuf_timecode; }
+    soundtouch::SoundTouch *GetSoundStretch() const { return pSoundStretch;   }
+    void SetBaseAudioTime(const int inAudioTime) { audiotime = inAudioTime; }
+
     int effdsp; // from the recorded stream
     int effdspstretched; // from the recorded stream
 

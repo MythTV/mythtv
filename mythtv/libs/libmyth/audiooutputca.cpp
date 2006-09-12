@@ -37,6 +37,10 @@ OSStatus AuCA_AURender(void *inRefCon,
                        AudioBufferList *ioData);
 
 
+/** \class AudioOutputCA
+ *  \brief Implements Core Audio (Mac OS X Hardware Abstraction Layer) output.
+ */
+
 AudioOutputCA::AudioOutputCA(
     QString laudio_main_device, QString           laudio_passthru_device,
     int     laudio_bits,        int               laudio_channels,
@@ -173,7 +177,7 @@ void AudioOutputCA::CloseDevice()
     }
 }
     
-/* Object-oriented part of callback */
+/** Object-oriented part of callback */
 bool AudioOutputCA::RenderAudio(unsigned char *aubuf,
                                 int size,
                                 unsigned long long timestamp)
@@ -224,6 +228,60 @@ int AudioOutputCA::getSpaceOnSoundcard(void)
 int AudioOutputCA::getBufferedOnSoundcard(void)
 {
     return bufferedBytes;
+}
+
+/** Reimplement the base class's version of GetAudiotime()
+ *  so that we don't use gettimeofday or pthread mutexes.
+ */
+int AudioOutputCA::GetAudiotime(void)
+{
+    int ret;
+
+    if (GetBaseAudioTime() == 0)
+        return 0;
+
+    UInt64 hostNanos = AudioConvertHostTimeToNanos(AudioGetCurrentHostTime());
+    ret = (hostNanos / 1000000) - CA_audiotime_updated;
+	
+    ret += GetBaseAudioTime();
+
+    return ret;
+}
+
+/** Reimplement base's SetAudiotime()
+ *  without gettimeofday() or pthread mutexes.
+ */
+void AudioOutputCA::SetAudiotime(void)
+{
+    if (GetBaseAudBufTimeCode() == 0)
+        return;
+
+    int soundcard_buffer = 0;
+    int totalbuffer;
+
+
+    soundcard_buffer = getBufferedOnSoundcard();
+    totalbuffer = audiolen(false) + soundcard_buffer;
+ 
+    if (GetSoundStretch())
+        totalbuffer += (int)((GetSoundStretch()->numUnprocessedSamples() *
+                              audio_bytes_per_sample) / audio_stretchfactor);
+ 
+    SetBaseAudioTime(GetBaseAudBufTimeCode() - (int)(totalbuffer * 100000.0 /
+                                   (audio_bytes_per_sample * effdspstretched)));
+ 
+    // We also store here the host time stamp of when the update occurred.
+    // That way when asked later for the audio time we can use
+    // the sum of the output time code info calculated here,
+    // and the delta since when it was calculated and when we asked.
+
+    // Note that since we're using a single 32bit variable here
+    // there is no need to use a lock or similar, since the 32 bit
+    // accesses are atomic. Also we use AudioHost time here
+    // so that we're all referring to the same clock.
+
+    UInt64 hostNanos = AudioConvertHostTimeToNanos(AudioGetCurrentHostTime());
+    CA_audiotime_updated = hostNanos / 1000000;
 }
 
 void AudioOutputCA::StartOutputThread(void)

@@ -26,6 +26,9 @@ public:
                   bool lset_initial_vol, bool laudio_passthru);
     virtual ~AudioOutputCA();
     
+    virtual int GetAudiotime(void);
+    void        SetAudiotime(void);
+
     // callback for delivering audio to output device
     bool RenderAudio(unsigned char *aubuf, int size,
                      unsigned long long timestamp);
@@ -50,7 +53,8 @@ protected:
 private:
 
     CoreAudioData * coreaudio_data;
-    int bufferedBytes;
+    int             bufferedBytes;
+    long            CA_audiotime_updated;
 };
 
 #endif
