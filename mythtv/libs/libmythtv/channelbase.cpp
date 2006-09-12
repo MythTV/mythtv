@@ -481,7 +481,7 @@ int ChannelBase::GetChanID() const
     return query.value(0).toInt();
 }
 
-/** \fn DVBChannel::InitializeInputs(void)
+/** \fn ChannelBase::InitializeInputs(void)
  *  \brief Fills in input map from DB
  */
 bool ChannelBase::InitializeInputs(void)

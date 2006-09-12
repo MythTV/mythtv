@@ -23,7 +23,7 @@
 #define LOC_ERR QString("Preview Error: ")
 #define LOC_WARN QString("Preview Warning: ")
 
-/** \class Preview Generator
+/** \class PreviewGenerator
  *  \brief This class creates a preview image of a recording.
  *
  *   The usage is simple: First, pass a ProgramInfo whose pathname points
