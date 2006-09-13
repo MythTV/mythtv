@@ -281,7 +281,7 @@ void XMLParse::parseFont(QDomElement &element)
     if (baseFont && !haveSize)
         size = baseFont->face.pointSize();
     else    
-        size = (int)ceil(size * hmult);
+        size = GetMythMainWindow()->NormalizeFontSize(size);
     
     // If we don't have to, don't load the font.
     if (!haveFace && baseFont)

@@ -519,7 +519,7 @@ void MythContextPrivate::StoreGUIsettings()
     if (!font.exactMatch())
         font = QFont();
     font.setStyleHint(QFont::SansSerif, QFont::PreferAntialias);
-    font.setPointSize((int)(14.0 * m_hmult));
+    font.setPointSize(GetMythMainWindow()->NormalizeFontSize(14));
 
     QApplication::setFont(font);
     
@@ -2540,7 +2540,7 @@ void MythContext::connectionClosed(MythSocket *sock)
 QFont MythContext::GetBigFont(void)
 {
     QFont font = QApplication::font();
-    font.setPointSize((int)floor(d->bigfontsize * d->m_hmult));
+    font.setPointSize(GetMythMainWindow()->NormalizeFontSize(d->bigfontsize));
     font.setWeight(QFont::Bold);
 
     return font;
@@ -2549,7 +2549,7 @@ QFont MythContext::GetBigFont(void)
 QFont MythContext::GetMediumFont(void)
 {
     QFont font = QApplication::font();
-    font.setPointSize((int)floor(d->mediumfontsize * d->m_hmult));
+    font.setPointSize(GetMythMainWindow()->NormalizeFontSize(d->mediumfontsize));
     font.setWeight(QFont::Bold);
 
     return font;
@@ -2558,7 +2558,7 @@ QFont MythContext::GetMediumFont(void)
 QFont MythContext::GetSmallFont(void)
 {
     QFont font = QApplication::font();
-    font.setPointSize((int)floor(d->smallfontsize * d->m_hmult));
+    font.setPointSize(GetMythMainWindow()->NormalizeFontSize(d->smallfontsize));
     font.setWeight(QFont::Bold);
 
     return font;
