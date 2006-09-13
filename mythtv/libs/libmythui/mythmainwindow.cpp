@@ -208,13 +208,17 @@ int MythMainWindowPrivate::TranslateKeyNum(QKeyEvent* e)
 }
 
 static MythMainWindow *mainWin = NULL;
+static QMutex mainLock;
 
 MythMainWindow *MythMainWindow::getMainWindow(void)
 {
+    if (mainWin)
+        return mainWin;
+
+    QMutexLocker lock(&mainLock);
+
     if (!mainWin)
-    {
         mainWin = new MythMainWindow();
-    }
 
     return mainWin;
 }
@@ -269,7 +273,7 @@ MythMainWindow::MythMainWindow()
         d->painter = new MythQtPainter();
     }
 
-    Init();
+    //Init();
 
     d->ignore_lirc_keys = false;
     d->ignore_joystick_keys = false;

@@ -35,9 +35,7 @@ int main(int argc, char *argv[])
     gContext->LoadQtConfig();
 
     MythMainWindow *mainWindow = GetMythMainWindow();
-
     mainWindow->Init();
-    mainWindow->Show();
 
     new MythThemeBase();
 

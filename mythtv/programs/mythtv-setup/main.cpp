@@ -236,7 +236,7 @@ int main(int argc, char *argv[])
         dir.mkdir(fileprefix);
 
     MythMainWindow *mainWindow = GetMythMainWindow();
-    mainWindow->Show();
+    mainWindow->Init();
     gContext->SetMainWindow(mainWindow);
 
     MythThemeBase *themeBase = new MythThemeBase();

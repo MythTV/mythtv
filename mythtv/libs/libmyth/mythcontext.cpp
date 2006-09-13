@@ -519,7 +519,7 @@ void MythContextPrivate::StoreGUIsettings()
     if (!font.exactMatch())
         font = QFont();
     font.setStyleHint(QFont::SansSerif, QFont::PreferAntialias);
-    font.setPointSize(GetMythMainWindow()->NormalizeFontSize(14));
+    font.setPointSize(floor(14 * m_hmult));
 
     QApplication::setFont(font);
     

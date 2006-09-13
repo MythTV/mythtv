@@ -108,7 +108,6 @@ int main(int argc, char **argv)
 
     MythMainWindow *mainWindow = GetMythMainWindow();
     mainWindow->Init();
-    mainWindow->Show();
     gContext->SetMainWindow(mainWindow);
 
     // Obtain width/height and x/y offset from context

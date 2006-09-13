@@ -1128,6 +1128,7 @@ int main(int argc, char **argv)
     gContext->LoadQtConfig();
 
     MythMainWindow *mainWindow = GetMythMainWindow();
+    mainWindow->Init();
     gContext->SetMainWindow(mainWindow);
 
     themeBase = new MythThemeBase();
