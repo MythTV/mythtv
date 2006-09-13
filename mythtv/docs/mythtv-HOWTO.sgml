@@ -3,7 +3,7 @@
 <title>Installing and using MythTV
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com"
 name="mailto:rkulagow@rocketmail.com">
-<date>2006-09-11, v0.20.01
+<date>2006-09-11, v0.20.02
 <abstract>
 Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -4361,8 +4361,6 @@ $ su
 $ 
 </verb></tscreen>
 
-Edit the <tt>/var/www/html/mythweb/config/conf.php</tt> file if required.
-
 By default, MythWeb uses an Apache <tt>.htaccess</tt> file to restrict
 access to the website and to configure some variables.
 
@@ -7020,7 +7018,7 @@ on filesystems and the slow delete feature.
 
 v0.20.01, 2006-09-11.  Get rid of stuff that's been deprecated.  Add other
 updates, like the blurb about using a VM for commercial flagging.
-
+v0.20.02, 2006-09-13.  Update install instructions for mythweb.
 -->
 
 <!--

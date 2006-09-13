@@ -8,7 +8,7 @@
 <H1>Installing and using MythTV</H1>
 
 <H2>Robert Kulagowski, 
-<A HREF="mailto:rkulagow@rocketmail.com">mailto:rkulagow@rocketmail.com</A></H2>2006-09-10, v0.20
+<A HREF="mailto:rkulagow@rocketmail.com">mailto:rkulagow@rocketmail.com</A></H2>2006-09-11, v0.20.02
 <HR>
 <EM>Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -218,15 +218,12 @@ necessary.</EM>
 <LI><A NAME="toc23.17">23.17</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss23.17">Can I run MythTV on my ReplayTV?</A>
 <LI><A NAME="toc23.18">23.18</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss23.18">Can a wireless connection be used between the frontend and the backend?</A>
 <LI><A NAME="toc23.19">23.19</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss23.19">How can I burn shows that I have recorded to a DVD?</A>
-<LI><A NAME="toc23.20">23.20</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss23.20">Burning a MythTV recording to a DVD (alternate version)</A>
-<LI><A NAME="toc23.21">23.21</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss23.21">Creating a DVD with Menus</A>
-<LI><A NAME="toc23.22">23.22</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss23.22">Using the DBoxII within MythTV</A>
-<LI><A NAME="toc23.23">23.23</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss23.23">Migrating from XMLTV to DataDirect </A>
-<LI><A NAME="toc23.24">23.24</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss23.24">What do the icons on the Watch Recordings screen mean?</A>
-<LI><A NAME="toc23.25">23.25</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss23.25">What do the letters mean when I change channels?</A>
-<LI><A NAME="toc23.26">23.26</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss23.26">What is the difference between the various Hauppauge PVR models?</A>
-<LI><A NAME="toc23.27">23.27</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss23.27">Changing channels on an external Set Top Box</A>
-<LI><A NAME="toc23.28">23.28</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss23.28">Configuring one machine to flag all commercials</A>
+<LI><A NAME="toc23.20">23.20</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss23.20">Using the DBoxII within MythTV</A>
+<LI><A NAME="toc23.21">23.21</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss23.21">What do the icons on the Watch Recordings screen mean?</A>
+<LI><A NAME="toc23.22">23.22</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss23.22">What do the letters mean when I change channels?</A>
+<LI><A NAME="toc23.23">23.23</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss23.23">What is the difference between the various Hauppauge PVR models?</A>
+<LI><A NAME="toc23.24">23.24</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss23.24">Changing channels on an external Set Top Box</A>
+<LI><A NAME="toc23.25">23.25</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss23.25">Configuring one machine to flag all commercials</A>
 </UL>
 <P>
 <H2><A NAME="toc24">24.</A> <A HREF="mythtv-HOWTO-singlehtml.html#s24">Example Configurations.</A></H2>
@@ -234,8 +231,6 @@ necessary.</EM>
 <UL>
 <LI><A NAME="toc24.1">24.1</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss24.1">Logical Volume Manager (LVM) </A>
 <LI><A NAME="toc24.2">24.2</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss24.2">Advanced Partition Formatting </A>
-<LI><A NAME="toc24.3">24.3</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss24.3">HDTV with the Air2PC-ATSC-PCI card</A>
-<LI><A NAME="toc24.4">24.4</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss24.4">Diskless Ubuntu</A>
 </UL>
 
 <HR>
@@ -1608,10 +1603,6 @@ enter <B>ZIYN-DQZO-SBUT</B>.</P>
 account for your particular location and the channels that you have.  This
 configuration will be imported into MythTV when you first run the
 <B>mythtv-setup</B> program.</P>
-<P>See the section called 
-<A HREF="#MigratingtoDD">Migrating from XMLTV to DataDirect</A> for instructions on moving to DataDirect if you are
-currently using XMLTV.  If you are starting from a fresh installation, the
-simplest thing is to immediately start using DataDirect.</P>
 <P>
 <A NAME="manually_building_mythtv"></A> </P>
 <H2><A NAME="ss5.4">5.4</A> <A HREF="#toc5.4">Manually building MythTV</A>
@@ -4804,7 +4795,6 @@ $
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
-<P>Edit the <CODE>/var/www/html/mythweb/config/conf.php</CODE> file if required.</P>
 <P>By default, MythWeb uses an Apache <CODE>.htaccess</CODE> file to restrict
 access to the website and to configure some variables.</P>
 <P>To create the password file for Apache (if your system doesn't already have
@@ -7220,321 +7210,9 @@ impact the viewing experience on the frontend.</P>
 <H2><A NAME="ss23.19">23.19</A> <A HREF="#toc23.19">How can I burn shows that I have recorded to a DVD?</A>
 </H2>
 
-<P>There are two answers to this question.  The easiest thing to do is to
-simply burn the MythTV files onto the DVD and treat the DVD as if it were a
-hard drive.  This will allow you to save the programs, but it's likely that
-they will <EM>not</EM> be playable in a DVD player because the disc will
-simply contain files and not any DVD structure.  If you'd like to create a
-DVD that will play in a standard DVD player and your files have been
-recorded as MPEG-2 from a device supported by the IVTV driver, the first
-step you'll need to perform is to remux the file to make it DVD compliant. 
-Next, you'll use <B>dvdauthor</B>, <B>mkisofs</B> to create the ISO
-image, and finally <B>dvdrecord</B> to burn that to a blank DVD-R.</P>
-<P>The requirements for this procedure are <B>mjpegtools</B> (provides
-<B>mplex</B>) and <B>dvdauthor</B> (provides <B>mpeg2desc</B> and
-<B>dvdauthor</B>).</P>
-<P>This script will perform the necessary steps. You'll need to pass it the
-.nuv file and a name for the new DVD project.  You should end up with a
-directory which you can <B>mkisofs</B> into a ISO file then burn it.</P>
-<P>
-<BLOCKQUOTE><CODE>
-<PRE>
-#!/bin/sh
+<P>Use the mytharchive plugin.</P>
 
-mkfifo aud0
-mkfifo vid0
-mkfifo dvdmpg
-
-mpeg2desc -a0 &lt; $1 > aud0 &amp;
-mpeg2desc -v0 &lt; $1 > vid0 &amp;
-mplex -f 8 -V -o dvdmpg aud0 vid0 &amp;
-dvdauthor -o $2 -f dvdmpg
-dvdauthor -o $2 -T
-
-rm aud0
-rm vid0
-rm dvdmpg
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
-<P>It's also possible to pipe the output of <B>mkisofs</B> directly to
-<B>cdrecord</B> without any intermediate files being written to your hard
-drive.  For example:
-<BLOCKQUOTE><CODE>
-<PRE>
-#!/bin/sh
-TSIZE=`mkisofs -dvd-video -udf -q -print-size .`
-mkisofs -dvd-video -udf -V "$1" . | nice -10 cdrecord speed=1 dev=1,1,0 \
-driveropts=burnfree -dao -v tsize="$TSIZE"s -
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
-
-<H2><A NAME="ss23.20">23.20</A> <A HREF="#toc23.20">Burning a MythTV recording to a DVD (alternate version)</A>
-</H2>
-
-
-<P>This is specific to MPEG-2 .nuv files created by Hauppauge PVR-X50 video 
-capture cards.</P>
-<P>The software packages you will want are:
-<UL>
-<LI>dvd+rw-tools</LI>
-<LI>dvdauthor</LI>
-<LI>mjpegtools</LI>
-<LI>avidemux2</LI>
-<LI>transcode - not necessary for this, but useful for working with video</LI>
-<LI>k3b - a GUI for burning DVD's and CD's.  Not necessary, but useful.</LI>
-</UL>
-</P>
-<P>1. Find the file you want.</P>
-<P>2. Run <B>avidemux2</B> and open the .nuv file which corresponds with the
-program you wish to burn to DVD.</P>
-<P>3. Remove the segments you don't need.  Click twice on "A" when you are at
-the beginning of the segment you want to save, find the end of the segment,
-and click "B".</P>
-<P>4. Save the raw video stream and audio: <CODE>File-> Save -> Save Raw Video
-Stream</CODE>.  Save the file as <CODE>1.m2v</CODE>.  When that's done, go to
-<CODE>Audio -> Save Audio</CODE>.  Save the file as <CODE>1.mp2</CODE></P>
-<P>5. Repeat steps 2 &amp; 3 until you have saved all the segments you wish to keep.</P>
-<P>6.  Mplex the video and audio for each segment together in DVD-MPEG2 format.
-Do that by running</P>
-<P><CODE>mplex -f 8 -o 1.mpg 1.m2v 1.mp2</CODE></P>
-<P>7.  Create a DVD file system by running</P>
-<P><CODE>dvdauthor -o DVD 1.mpg 2.mpg ... n.mpg</CODE></P>
-<P><CODE>dvdauthor -T -o DVD</CODE></P>
-<P>8.  Put a blank DVD in your drive and write the video by running</P>
-<P><CODE>growisofs -Z /dev/scd0 -dvd-video DVD</CODE></P>
-<P>9.  Be sure and check the DVD in a player and then delete all the files you 
-created in this process.</P>
-<P>Notes:</P>
-<P>You can reduce the size of your files and fit more video on a DVD by using 
-<B>tcrequant</B>, which is part of <B>transcode</B>.  </P>
-<P>The steps above create a DVD that starts playing the video automatically. If
-you want to burn a DVD with menus and multiple video titles, see the next
-section.</P>
-
-<H2><A NAME="ss23.21">23.21</A> <A HREF="#toc23.21">Creating a DVD with Menus</A>
-</H2>
-
-<P>This assumes that you have already formatted the videos in a 
-DVD-compliant format that works with <B>dvdauthor</B>. </P>
-
-<H3>CREATING A MENU</H3>
-
-<P>This is potentially the most difficult step in creating a DVD with a menu.
-You must capture or create a background image with the appropriate
-resolution and <B>mplex</B> it together with an audio file (typically
-silence, although though you may use sound) and then create overlay images
-that show</P>
-<P>
-<OL>
-<LI>the menu text</LI>
-<LI>the highlighted buttons</LI>
-<LI>the selected buttons  </LI>
-</OL>
-</P>
-<P>You would then use <B>spumux</B> to combine the background video with the
-overlay menus.</P>
-<P>The background image must be saved as a JPG and the overlay images must be
-PNG with a maximum of three colors.  Four colors are allowed, but the
-transparent background counts as one of the available colors.  In these
-examples, the background file is called <CODE>menu.jpg</CODE>, the menu text is called
-<CODE>menu1.png</CODE> and the highlighted and selected buttons are the same and called
-<CODE>menu2.png</CODE>.</P>
-
-
-<H3>Create a Background </H3>
-
-<P>To get a background image, use <B>avidemux2</B> and find the frame you
-wish to use as a background image.  Save the frame as
-<CODE>menu.jpg</CODE> by executing <CODE>File -> Save -> Save JPG Image</CODE>.  </P>
-<P>You may also create your own background image in the GIMP.  Use the following
-settings:</P>
-<P>For NTSC Video:
-<BLOCKQUOTE><CODE>
-<PRE>
-width: 720
-height: 480
-x-axis: 81dpi
-y-axis: 72dpi
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
-
-<H3>Convert the background JPG file into a M2V video file</H3>
-
-<P><CODE>jpeg2yuv -n 50 -I p -f 29.97 -j menu.jpg | mpeg2enc -n n -f 8 -o menu.m2v</CODE></P>
-<P>For PAL Video 
-<BLOCKQUOTE><CODE>
-<PRE>
-width: 720
-height: 576
-x-axis: 75dpi
-y-axis: 80dpi
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
-
-<H3>Convert the background JPG file into a M2V video file</H3>
-
-<P><CODE>jpeg2yuv -n 50 -I p -f 25 -j menu.jpg | mpeg2enc -n p -f 8 -o menu.m2v</CODE></P>
-
-<H3>Merge the background you just created with audio </H3>
-
-<P>You will need some sort of audio to <B>mplex</B> with the M2V file you
-just created, so either capture some audio using <B>avidemux2</B> or
-another program, or to create empty audio to <B>mplex</B>, use this
-command</P>
-<P><CODE>dd if=/dev/zero bs=4 count=2000 | toolame -b 128 -s 48 /dev/stdin menu.mp2</CODE></P>
-
-<H3>Merge the M2V video with the MP2 audio</H3>
-
-<P><CODE>mplex -f 8 -o menu.mpg menu.m2v menu.mp2</CODE></P>
-
-<H3>Create the menu buttons</H3>
-
-
-<P>Open the background <CODE>menu.jpg</CODE> file in the GIMP.  Add a transparent layer
-over the background and mark where you will want the different buttons to be
-located.  This layer will later be deleted, so it doesn't have to be clean. 
-When creating this layer, use all the colors you want to use in your
-buttons.  Remember, no more than three colors.</P>
-<P>Delete the Background layer.</P>
-<P>Change the image to an indexed color mode.  Do this by right-clicking on
-the image and selecting <CODE>Image -> Mode -> Indexed</CODE>.  Enter "4" in the
-number of colors.</P>
-<P>Create two new layers.</P>
-<P>In the top layer, you will enter the text for your buttons.  Select the
-color you want for your text either in the color palette or by using the
-Color Picker Tool.  To use the Color Picker, you must make sure you have
-that bottom layer selected.  Enter the text for all the buttons on the top
-layer according to whatever layout you decided on.</P>
-<P>Now you will create the actual buttons by drawing boxes around the text
-and filling that area with the Color Fill Tool.  Be sure and select the
-color you want (contrasting to the text) and to create your boxes in the
-second from the top layer.</P>
-<P>Delete that bottom layer which we stated earlier would be deleted.</P>
-<P>Save the current image as <CODE>menu2.png</CODE>.  Do that by right-clicking
-and selecting <CODE>File -> Save as</CODE>, and make the name <CODE>menu.png</CODE>. 
-Click "Export" and make sure that "Save Background Color" and "Save
-Resolution" are selected.</P>
-<P>Select the bottom layer and change the Opacity to 0%.  Now save the image 
-as <CODE>menu1.png</CODE>.</P>
-
-<H3>Create the final menu video </H3>
-
-<P> To create the DVD menu, an XML file is used.  An example
-<CODE>menu.xml</CODE> file is shown below.  The autoorder line is used to decide
-what takes precedent for ordering.  If your buttons are ordered primarily by
-rows, then select "rows".  If your ordering is by column, then choose
-"columns".</P>
-<P>
-<BLOCKQUOTE><CODE>
-<PRE>
-###begin menu.xml###
-&lt;subpictures>
-  &lt;stream>
-    &lt;spu
-     force="yes"
-     start="00:00:00.00"
-     image="menu1.png"
-     select="menu2.png"
-     highlight="menu2.png"
-     autooutline="infer"
-     outlinewidth="6"
-     autoorder="rows"
-    >
-    &lt;/spu>
-  &lt;/stream>
-&lt;/subpictures>
-###end menu.xml###
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
-<P>Then create the final menu with</P>
-<P><CODE>spumux menu.xml &lt; menu.mpg &gt; menu_final.mpg</CODE></P>
-<P>You should see some lines in the output to the console that show</P>
-<P>INFO:  Autodetect ...</P>
-<P>The number of these lines that you see should be the same number of buttons 
-you created.  If there are, then good job!</P>
-
-
-<H3>Authoring the DVD</H3>
-
-<P>To create the DVD structure, an XML file is used.  The below file is an
-example <CODE>dvd.xml</CODE> file.  This example file allows for the 4 buttons in the
-menu created earlier and has three video segments making up each of the 4
-video titles.  Each of the separate video segments will be treated as
-separate chapters of one consistent video title.</P>
-<P>
-<BLOCKQUOTE><CODE>
-<PRE>
-### begin dvd.xml ###
-&lt;dvdauthor dest="DVD"&gt;
-  &lt;vmgm&gt;
-    &lt;menus&gt;
-      &lt;pgc&gt;
-        &lt;button&gt;jump title 1;&lt;/button&gt; 
-        &lt;button&gt;jump title 2;&lt;/button&gt; 
-        &lt;button&gt;jump title 3;&lt;/button&gt; 
-        &lt;button&gt;jump title 4;&lt;/button&gt; 
-        &lt;vob file="menu_final.mpg" pause="inf" /&gt; 
-      &lt;/pgc&gt;
-    &lt;/menus&gt;
-  &lt;/vmgm&gt;
-  &lt;titleset&gt;
-    &lt;titles&gt;
-      &lt;pgc&gt;
-        &lt;post&gt;call vmgm menu 1;&lt;/post&gt; 
-        &lt;vob file="1a.mpg" /&gt; 
-        &lt;vob file="1b.mpg" /&gt; 
-        &lt;vob file="1c.mpg" /&gt; 
-      &lt;/pgc&gt;
-    &lt;/titles&gt;
-  &lt;/titleset&gt;
-  &lt;titleset&gt;
-    &lt;titles&gt;
-      &lt;pgc&gt;
-        &lt;post&gt;call vmgm menu 1;&lt;/post&gt; 
-        &lt;vob file="2a.mpg" /&gt; 
-        &lt;vob file="2b.mpg" /&gt; 
-        &lt;vob file="2c.mpg" /&gt; 
-      &lt;/pgc&gt;
-    &lt;/titles&gt;
-  &lt;/titleset&gt;
-  &lt;titleset&gt;
-    &lt;titles&gt;
-      &lt;pgc&gt;
-        &lt;post&gt;call vmgm menu 1;&lt;/post&gt; 
-        &lt;vob file="3a.mpg" /&gt; 
-        &lt;vob file="3b.mpg" /&gt; 
-        &lt;vob file="3c.mpg" /&gt; 
-      &lt;/pgc&gt;
-    &lt;/titles&gt;
-  &lt;/titleset&gt;
-  &lt;titleset&gt;
-    &lt;titles&gt;
-      &lt;pgc&gt;
-        &lt;post&gt;call vmgm menu 1;&lt;/post&gt; 
-        &lt;vob file="4a.mpg" /&gt; 
-        &lt;vob file="4b.mpg" /&gt; 
-        &lt;vob file="4c.mpg" /&gt; 
-      &lt;/pgc&gt;
-    &lt;/titles&gt;
-  &lt;/titleset&gt;
-&lt;/dvdauthor&gt;
-### end dvd.xml ###
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
-<P>Create the DVD file structure with</P>
-<P><CODE>dvdauthor -x dvd.xml</CODE></P>
-<P>Test the created DVD file structure with</P>
-<P><CODE>xine dvd:/full/path/to/DVD/VIDEO_TS/</CODE></P>
-<P>Then burn the DVD file structure to a DVD with</P>
-<P><CODE>growisofs -Z /dev/scd0 -dvd-video DVD</CODE></P>
-
-<H2><A NAME="ss23.22">23.22</A> <A HREF="#toc23.22">Using the DBoxII within MythTV</A>
+<H2><A NAME="ss23.20">23.20</A> <A HREF="#toc23.20">Using the DBoxII within MythTV</A>
 </H2>
 
 <P>The configuration of the DBoxII for use within MythTV is tricky 
@@ -7556,111 +7234,28 @@ channels from the web interface of Neutrino at http://ip-of-your-box:80/.
 Associate the channel with your new video source and repeat when needed.</P>
 <P>You may leave the Setup now and proceed as usual.</P>
 
-<H2><A NAME="MigratingtoDD"></A> <A NAME="ss23.23">23.23</A> <A HREF="#toc23.23">Migrating from XMLTV to DataDirect </A>
-</H2>
-
-<P><B>NOTE</B>:  This section will be deprecated and will be removed in
-v0.20.  DataDirect has been the default for a number of revisions, so it is
-unlikely that there are North American users that will need to migrate.</P>
-
-<P>DataDirect will use different information for your video sources and
-channels than was used by XMLTV. The following will clear your old
-information in a way that will allow your EPG and existing recording rules
-to continue to work as you'd expect.</P>
-<P>The first step is to create a backup of your database using the
-instructions found in 
-<A HREF="#backupdb">Saving or restoring the database</A></P>
-<P><B>NOTE</B>: Examine the contents of the backup file to be sure that the
-backup succeeded before modifying your database.</P>
-<P><B>NOTE</B>: The MythTV DataDirect grabber requires <B>wget</B> version
-1.9.1 or later. Verify that this is installed before modifying your
-database.</P>
-<P>Next, start <B>mysql</B> and perform the following commands:
-<BLOCKQUOTE><CODE>
-<PRE>
-$ mysql -u root mythconverg
-mysql>CREATE TABLE channel_copy SELECT * FROM channel;
-mysql>exit
-$
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
-<P>Run the mythtv-setup program.  When the setup program prompts "Would you
-like to clear all program/channel settings before starting configuration
-[no]" type "yes".</P>
-<P>Complete the configuration as detailed in the section called 
-<A HREF="#ConfigureDD">Configuring the Zap2It.com DataDirect service</A> and
-in 
-<A HREF="#VideoSources">Video Sources</A>.</P>
-<P>
-<FIGURE>
-<EPS FILE="stop.eps">
-<IMG SRC="stop.png">
-<CAPTION>You <EM>must</EM> associate your DataDirect information with the inputs on
-your capture device.  If you created "Cable-DD", then don't forget to bind
-<CODE>/dev/video0</CODE> to Cable-DD in the 
-<A HREF="#VideoSources">Video Sources</A> portion of mythtv-setup.</CAPTION>
-</FIGURE>
-</P>
-<P>Once you're done running mythtv-setup, run <B>mythfilldatabase</B> to
-populate the database with new data.</P>
-<P>To restore the channel icons, you will need to perform one of two steps. 
-Both are dependant on the channel_copy table you created above.</P>
-<P>If you're running MySQL v3, execute the following.  Note that the
-select command is very long.  You can press ENTER at the end of each line;
-the command won't be evaluated until you end the statement with a semicolon.
-<BLOCKQUOTE><CODE>
-<PRE>
-$ mysql -u root mythconverg
-mysql>create table channel_temp
-select c.chanid, c.channum, c.sourceid, c.callsign, c.name, cb.icon,
-c.finetune, c.videofilters, c.xmltvid, c.contrast, c.brightness,
-c.colour, c.freqid, c.recpriority, c.hue, c.tvformat,
-c.commfree, c.visible, c.outputfilters
-from channel c
-left join channel_copy cb on (c.callsign = cb.callsign);
-mysql>truncate channel;
-mysql>insert channel select * from channel_temp;
-mysql>drop table channel_temp;
-mysql>drop table channel_copy;
-mysql>exit
-$
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
-<P>If you are running MySQL v4, it's a little simpler. The next command is
-one long string:
-<BLOCKQUOTE><CODE>
-<PRE>
-$ mysql -u root mythconverg
-mysql>UPDATE channel,channel_copy SET channel.icon = channel_copy.icon 
-WHERE channel.callsign = channel_copy.callsign;
-mysql>drop table channel_copy;
-mysql>exit
-$
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
-<H2><A NAME="ss23.24">23.24</A> <A HREF="#toc23.24">What do the icons on the Watch Recordings screen mean?</A>
+<H2><A NAME="ss23.21">23.21</A> <A HREF="#toc23.21">What do the icons on the Watch Recordings screen mean?</A>
 </H2>
 
 <P>Press "1" or F1 to get a popup.</P>
-<H2><A NAME="ss23.25">23.25</A> <A HREF="#toc23.25">What do the letters mean when I change channels?</A>
+<H2><A NAME="ss23.22">23.22</A> <A HREF="#toc23.22">What do the letters mean when I change channels?</A>
 </H2>
 
 <P>These letters let you know what's going on with the backend as it tries
 to tune to a channel.</P>
-<P>Lower case = seen
-Upper Case = seen &amp; good</P>
-<P>l/L = Lock  : This could be seen by PVR-250/BTTV users
-a/A = PAT   : Any recording transmitted in MPEG 
-m/M = PMT   : Any recording transmitted in MPEG 
-g/G = MGT   : ATSC only
-v/V = VCT   : ATSC only
-n/N = NIT   : DVB only
-s/S = SDT   : DVB only</P>
-
-<H2><A NAME="ss23.26">23.26</A> <A HREF="#toc23.26">What is the difference between the various Hauppauge PVR models?</A>
+<P>Lower case = seen</P>
+<P>Upper Case = seen &amp; good
+<UL>
+<LI>l/L = Lock  : This could be seen by PVR-250/BTTV users</LI>
+<LI>a/A = PAT   : Any recording transmitted in MPEG </LI>
+<LI>m/M = PMT   : Any recording transmitted in MPEG </LI>
+<LI>g/G = MGT   : ATSC only</LI>
+<LI>v/V = VCT   : ATSC only</LI>
+<LI>n/N = NIT   : DVB only</LI>
+<LI>s/S = SDT   : DVB only</LI>
+</UL>
+</P>
+<H2><A NAME="ss23.23">23.23</A> <A HREF="#toc23.23">What is the difference between the various Hauppauge PVR models?</A>
 </H2>
 
 <P>This is covered in the hardware section, and extensively covered on the
@@ -7700,7 +7295,7 @@ than 720x480, so it cannot be used with HDTV.  Make a conscious decision
 (and ask for advice on the mailing list) that you want to tradeoff potential
 HDTV use in the future compared to video quality.</P>
 <P>The X-driver for the PVR-350 support playback using Xv efficiently but does
-not support any other 2d or 3d acceleration. For some application this may
+not support any other 2D or 3D acceleration. For some application this may
 place a large load on the host CPU, some will run without any problem and
 others (mplayer, xine, xmame etc.) should be configured to utilize the Xv
 interface.</P>
@@ -7715,7 +7310,7 @@ Current versions of the PVR-500 should come with an adapter to allow you to
 connect a second S-Video or composite input.  Early adopters may need to
 purchase this item separately.</P>
 
-<H2><A NAME="ss23.27">23.27</A> <A HREF="#toc23.27">Changing channels on an external Set Top Box</A>
+<H2><A NAME="ss23.24">23.24</A> <A HREF="#toc23.24">Changing channels on an external Set Top Box</A>
 </H2>
 
 <P>If you need to use an external Set Top Box (STB), such as for satellite
@@ -7736,7 +7331,7 @@ the Tivo has a direct-connect capability.</LI>
 contrib directory which may work for you.</LI>
 </OL>
 </P>
-<H2><A NAME="ss23.28">23.28</A> <A HREF="#toc23.28">Configuring one machine to flag all commercials</A>
+<H2><A NAME="ss23.25">23.25</A> <A HREF="#toc23.25">Configuring one machine to flag all commercials</A>
 </H2>
 
 <P>Commercial flagging can be CPU intensive.  By default, the backend that
@@ -7751,14 +7346,18 @@ running on this machine.</P>
 OFF so that new jobs are allowed to run anywhere.</P>
 <P>Restart <B>mythbackend</B> since it only reads this setting when it starts up.</P>
 <P>On the faster machine:</P>
-<P>Start the mythtv-setup program.  Advance through the pages until you get to
-the Job Queue page.  Ensure that "Allow Commercial Detection jobs" is turned
-ON for this machine.</P>
+<P>Start the <B>mythtv-setup</B> program.  Advance through the pages until
+you get to the Job Queue page.  Ensure that "Allow Commercial Detection
+jobs" is turned ON for this machine.</P>
 <P>Run <B>mythjobqueue</B>.  <B>mythjobqueue</B> will examine the JobQueue
 and run any jobs it finds.  <B>mythjobqueue</B> should be left running so
 that it will pick up any new commercial flagging jobs that are added to the
 queue, otherwise new jobs will be added to the queue and your programs won't
 be flagged until you run manually run <B>mythjobqueue</B>.</P>
+<P>Using this technique it's possible to add commercial flagging machines as
+needed, even on systems that aren't running a backend.  It's also possible
+to run the commercial flagger in a virtual machine environment such as
+VMWare.</P>
 
 <H2><A NAME="s24">24.</A> <A HREF="#toc24">Example Configurations.</A></H2>
 
@@ -8040,397 +7639,6 @@ results shown at (
 higher I/O rates than JFS, albeit at a higher CPU loading.  This may cause
 issues if you do not have the spare CPU capacity to handle XFS, potentially
 leading to dropped frames.</P>
-
-<H2><A NAME="ss24.3">24.3</A> <A HREF="#toc24.3">HDTV with the Air2PC-ATSC-PCI card</A>
-</H2>
-
-<P>The Air2PC card has the capability to capture over-the-air HDTV signals
-(8VSB).  The Air2PC card is installed as a DVB device and is supported
-within MythTV.</P>
-<P>First, you must compile a version of the Linux kernel to support the new
-tuner device.  </P>
-<P>
-<BLOCKQUOTE><CODE>
-<PRE>
-$ su
-# cd /usr/src
-# wget http://www.kernel.org/pub/linux/kernel/v2.6/linux-2.6.15.tar.bz2
-# tar -xjf linux-2.6.15.tar.bz2
-# pushd .
-</PRE>
-</CODE></BLOCKQUOTE>
-
-If you already have a 2.6 kernel running, copy the <CODE>.config</CODE> file and
-use it as your starting point.  If not, then go straight to the <CODE>make
-menuconfig</CODE> portion below.</P>
-<P>On Debian with a 2.6.10 kernel:</P>
-<P>
-<BLOCKQUOTE><CODE>
-<PRE>
-# cp /lib/modules/`uname -r`/build/.config .
-# make oldconfig
-</PRE>
-</CODE></BLOCKQUOTE>
-
-Read the prompts that come up; for the most part you should be able to
-answer "No".
-<BLOCKQUOTE><CODE>
-<PRE>
-# make menuconfig
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
-<P>For Gentoo:
-<BLOCKQUOTE><CODE>
-<PRE>
-# emerge genkernel udev hotplug coldplug
-# genkernel --menuconfig --udev --save-config all
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
-<P>Go to the Device Drivers->Multimedia->Digital Video Broadcasting Devices</P>
-<P>Enable DVB for Linux and select B2C2/Technisat Air/Sky/CableStar 2 PCI.</P>
-<P>Exit menuconfig, then compile modules and the kernel.  (Gentoo will do this
-automatically as a part of the <B>genkernel</B> step.
-<BLOCKQUOTE><CODE>
-<PRE>
-# make modules
-# make
-# make install modules_install
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
-<P>Make any modifications necessary to your boot configuration files (lilo or
-grub) as required to boot your new kernel.</P>
-<P>Download and compile the dvb applications you'll need to configure the card. 
-At the password prompt, press ENTER.
-<BLOCKQUOTE><CODE>
-<PRE>
-$ cvs -d :pserver:anonymous@linuxtv.org:/cvs/linuxtv login
-$ cvs -d :pserver:anonymous@linuxtv.org:/cvs/linuxtv co dvb-apps dvb-kernel
-$ cd dvb-apps
-$ make
-</PRE>
-</CODE></BLOCKQUOTE>
-
-<B>NOTE</B>: As of 2005-02-16, the compile aborts with an error, however
-not before the <B>azap</B> is compiled, so you should be able to continue.
-<BLOCKQUOTE><CODE>
-<PRE>
-$ su
-# cp utils/szap/azap /usr/local/bin
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
-<P>Download the firmware for the card.  Go to 
-<A HREF="http://www.linuxtv.org/download/dvb/firmware/">http://www.linuxtv.org/download/dvb/firmware/</A> and download what is
-appropriate for your hardware.</P>
-<P>On Gentoo, execute the following:
-<BLOCKQUOTE><CODE>
-<PRE>
-# mkdir /lib/firmware
-# cp ~/dvb-fe-nxt2002.fw /lib/firmware
-# echo skystar2 >> /etc/modules.autoload.d/kernel-2.6
-# exit
-</PRE>
-</CODE></BLOCKQUOTE>
-
-On Debian:
-<BLOCKQUOTE><CODE>
-<PRE>
-# cp ~/dvb-fe-nxt2002.fw /usr/lib/hotplug/firmware
-# exit
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
-<P>Shutdown your machine, install the card and restart.  Ensure that you're
-using your newly compiled kernel.</P>
-<P>Once you've rebooted, confirm that the card is detected.  If you type
-<B>dmesg</B>, you should see something like this:
-<BLOCKQUOTE><CODE>
-<PRE>
-drivers/media/dvb/b2c2/skystar2.c: FlexCopIIB(rev.195) chip found
-drivers/media/dvb/b2c2/skystar2.c: the chip has 38 hardware filters
-DVB: registering new adapter (SkyStar2).
-DVB: registering frontend 0 (Nextwave nxt2002 VSB/QAM frontend)...
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
-<P>If you are using 8VSB (Over-the-Air HDTV), run the <B>azap</B> program. 
-Replace ZIPCODE with your zip code.  The perl script will connect to 
-<A HREF="http://www.antennaweb.org">http://www.antennaweb.org</A> to obtain
-your HDTV channels.
-<BLOCKQUOTE><CODE>
-<PRE>
-$ cd /usr/src/dvb-apps/util/szap/channels-conf/atsc
-$ test ~/.azap || mkdir ~/.azap
-$ perl ./make_atsc_chanconf.pl ZIPCODE >~/.azap/channels.conf
-</PRE>
-</CODE></BLOCKQUOTE>
-
-<BLOCKQUOTE><CODE>
-<PRE>
-$ /usr/local/bin/azap wsvn
-using '/dev/dvb/adapter0/frontend0' and '/dev/dvb/adapter0/demux0'
-tuning to 183000000 Hz
-video pid 0x0000, audio pid 0x0000
-status 00 | signal fff0 | snr ea60 | ber 00000000 | unc 00000000 |
-status 1f | signal f840 | snr ce6e | ber 00000068 | unc 00000000 | FE_HAS_LOCK
-status 1f | signal f600 | snr d2d8 | ber 00000018 | unc 00000000 | FE_HAS_LOCK
-status 1f | signal f290 | snr cd54 | ber 00000008 | unc 00000000 | FE_HAS_LOCK
-status 1f | signal f340 | snr c658 | ber 00000030 | unc 00000000 | FE_HAS_LOCK
-CTRL-C
-$
-</PRE>
-</CODE></BLOCKQUOTE>
-
-<B>NOTE</B>: if you have anything in the unc column ("uncorrectable
-errors") you will probably have problems with HDTV.  Check your antenna,
-cables, etc.</P>
-<P>Once you have confirmed that your card is able to lock onto a HDTV signal it
-is time to configure MythTV. Start the mythtv-setup program, and in the
-Capture Cards section change the card type to "Digital Video Broadcast".</P>
-<P>For HDTV you do not need to use the Advanced configuration. </P>
-<H2><A NAME="ss24.4">24.4</A> <A HREF="#toc24.4">Diskless Ubuntu</A>
-</H2>
-
-<P>(This information is a work in progress - 2005-07-15.)</P>
-<P>In the following examples, we are going to create an environment which can
-be used to boot a diskless workstation using PXE.</P>
-<P>There are two machines in this scenario:  the backend, a Debian Sarge system
-which has the disks and which will run the necessary support software, and
-the "basement" machine, an Intel D865PERL motherboard with 512MB of DRAM, a
-NVidia 440MX video card, a Microsoft MCE USB remote and a HD44780 16x2
-Vacuum Fluorescent Display.</P>
-
-<H3>Backend Configuration</H3>
-
-<P>The backend machine needs to provide the support software for the
-services needed to boot a diskless workstation.</P>
-<P>
-<BLOCKQUOTE><CODE>
-<PRE>
-$ su
-# apt-get install dhcpd3-server atftpd syslinux
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
-<P>Much of the information in this section comes from 
-<A HREF="http://archive.ubuntulinux.org/ubuntu/dists/warty/main/installer-i386/current/doc/manual/en/apcs03.html">http://archive.ubuntulinux.org/ubuntu/dists/warty/main/installer-i386/current/doc/manual/en/apcs03.html</A></P>
-<P>Download <B>debootstrap</B> so that your system knows how to locate the
-files required to build an image.  Find the latest version of the
-debootstrap program and download it.  At this time, the latest is
-<B>debootstrap_0.3.3.0ubuntu1_all.deb</B></P>
-<P>
-<BLOCKQUOTE><CODE>
-<PRE>
-$ lynx http://archive.ubuntulinux.org/ubuntu/pool/main/d/debootstrap/
-</PRE>
-</CODE></BLOCKQUOTE>
-
-Cursor down to the latest file, then press "D".</P>
-<P>Install it:
-<BLOCKQUOTE><CODE>
-<PRE>
-$ mkdir temp1
-$ mv debootstrap_0.3.3.0ubuntu1_all.deb temp1
-$ cd temp1
-$ ar -xf debootstrap_0.3.3.0ubuntu1_all.deb
-$ su
-# tar -xzf data.tar.gz
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
-<P>
-<BLOCKQUOTE><CODE>
-<PRE>
-# mkdir -p /nfsroot/basement
-# debootstrap --arch i386 breezy /nfsroot/basement/ http://archive.ubuntulinux.org/ubuntu
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
-<P>Once that's done, we'll need to <B>chroot</B> into the newly created
-directory structure for some initial setup.
-<BLOCKQUOTE><CODE>
-<PRE>
-$ su 
-# chroot /nfsroot/basement
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
-<P>Set the hostname that you'd like this machine to display at login and at the
-shell:
-<BLOCKQUOTE><CODE>
-<PRE>
-# echo "basement" > /etc/hostname
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
-<P>Add the IP address of this host to <CODE>/etc/hosts</CODE>
-<BLOCKQUOTE><CODE>
-<PRE>
-# echo "127.0.0.1 localhost" >> /etc/hosts
-# echo "192.168.10.51 basement" >> /etc/hosts
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
-<P>Put something into the <CODE>/etc/fstab</CODE> file.  The <CODE>^D</CODE> indicates
-that you should press CTRL-D.
-<BLOCKQUOTE><CODE>
-<PRE>
-# cat >> /etc/fstab
-proc /proc proc defaults 0 0
-sys /sys sysfs defaults 0 0
-^D
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
-<P>Configure your keyboard:
-<BLOCKQUOTE><CODE>
-<PRE>
-# dpkg-reconfigure console-data
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
-<P>Setup <CODE>resolv.conf</CODE>.  These values need to be appropriate for your configuration.
-<BLOCKQUOTE><CODE>
-<PRE>
-# cat >> /etc/resolv.conf
-search .local
-nameserver 68.87.66.196
-nameserver 68.87.64.196
-nameserver 63.240.76.4
-^D
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
-<P>Create the initial configuration:
-<BLOCKQUOTE><CODE>
-<PRE>
-/usr/sbin/base-config new
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
-<P>Create a <CODE>xorg.conf</CODE> file:
-<BLOCKQUOTE><CODE>
-<PRE>
-# xorgconfig
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
-<P>Edit your <CODE>/etc/apt/sources.list</CODE> and look at the bottom of the file. 
-It should end up looking like this:</P>
-<P>
-<BLOCKQUOTE><CODE>
-<PRE>
-deb http://us.archive.ubuntu.com/ubuntu/ hoary main restricted
-deb-src http://us.archive.ubuntu.com/ubuntu/ hoary main restricted
-
-## Uncomment the following two lines to add software from the 'universe'
-## repository.
-## N.B. software from this repository is ENTIRELY UNSUPPORTED by the Ubuntu
-## team, and may not be under a free licence. Please satisfy yourself as to
-## your rights to use the software. Also, please note that software in
-## universe WILL NOT receive any review or updates from the Ubuntu security
-## team.
-deb http://us.archive.ubuntu.com/ubuntu/ hoary universe
-deb-src http://us.archive.ubuntu.com/ubuntu/ hoary universe
-
-deb http://security.ubuntu.com/ubuntu hoary-security main restricted
-deb-src http://security.ubuntu.com/ubuntu hoary-security main restricted
-
-deb http://security.ubuntu.com/ubuntu hoary-security universe
-deb-src http://security.ubuntu.com/ubuntu hoary-security universe
-
-deb http://archive.ubuntu.com/ubuntu hoary multiverse
-deb-src http://archive.ubuntu.com/ubuntu hoary multiverse
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
-<P>Finally, exit out of the <B>chroot</B>:
-<BLOCKQUOTE><CODE>
-<PRE>
-# exit
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
-<P>
-<BLOCKQUOTE><CODE>
-<PRE>
-sudo apt-get install subversion distcc bind9 bind9-doc
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
-<P>edit /etc/default/distcc to start it and allow other hosts</P>
-
-
-<H3>Configuring DHCP</H3>
-
-<P>edit /etc/default/dhcp3-server.  add interface</P>
-<P>
-<BLOCKQUOTE><CODE>
-<PRE>
-option domain-name              "local";
-option subnet-mask              255.255.255.0;
-option domain-name-servers 192.168.10.50, 68.87.66.196, 68.87.64.196, 63.240.76.4
-
-# Turn on Dynamic DNS:
-ddns-update-style interim;
-ddns-updates on;
-
-# Don't allow clients to update DNS, make the server do it
-# based on the hostname passed by the DHCP client:
-deny client-updates;
-allow unknown-clients;
-
-allow bootp;
-allow booting;
-
-#option ip-forwarding    false;  # No IP forwarding
-#option mask-supplier    false;  # Don't respond to ICMP Mask req
-
-subnet 192.168.10.0 netmask 255.255.255.0 {
-  option routers        192.168.10.1;
-#  range 192.168.10.100 192.168.10.250;
-}
-
-group {
-  next-server 192.168.10.50;          # IP address of your TFTP server
-  default-lease-time 864000;
-  max-lease-time 864000;
-
-  host basement {
-        hardware ethernet 00:13:20:11:a3:ea;
-        fixed-address 192.168.10.51;
-        filename "/tftpboot/pxelinux.0";
-        option root-path "/nfsroot/basement/";
-        option host-name "basement" ;
-  }
-}
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
-
-<H3>Compiling a kernel</H3>
-
-<H3>Preparing the frontend</H3>
-
-<P>sudo apt-get build-dep mythtv</P>
-<P>sudo apt-get install libqt3c102-mysql</P>
-
-<H3>Installing MythTV</H3>
-
-<P>svn co http://svn.mythtv.org/svn/trunk/mythtv
-svn co http://svn.mythtv.org/svn/trunk/mythplugins
-svn co http://svn.mythtv.org/svn/trunk/myththemes</P>
-<P>First time in, it will create .mythtv/mysql.txt, but it's pointing at the wrong
-server (ie, there is none on the frontend).</P>
-<P>Exit out at this point (should be the language selection screen), and edit .mythtv/mysql.txt</P>
-<P>Then restart</P>
-<P>Disable xscreensaver: System->Preferences->ScreenSaver.  Mode: Disable Screen Saver
-Advanced: Power Management Enabled: uncheck</P>
-<P>System->Preferences->Sound uncheck Enable sound server startup</P>
-
 
 </BODY>
 </HTML>

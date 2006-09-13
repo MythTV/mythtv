@@ -970,321 +970,9 @@ impact the viewing experience on the frontend.</P>
 <H2><A NAME="ss23.19">23.19</A> <A HREF="mythtv-HOWTO.html#toc23.19">How can I burn shows that I have recorded to a DVD?</A>
 </H2>
 
-<P>There are two answers to this question.  The easiest thing to do is to
-simply burn the MythTV files onto the DVD and treat the DVD as if it were a
-hard drive.  This will allow you to save the programs, but it's likely that
-they will <EM>not</EM> be playable in a DVD player because the disc will
-simply contain files and not any DVD structure.  If you'd like to create a
-DVD that will play in a standard DVD player and your files have been
-recorded as MPEG-2 from a device supported by the IVTV driver, the first
-step you'll need to perform is to remux the file to make it DVD compliant. 
-Next, you'll use <B>dvdauthor</B>, <B>mkisofs</B> to create the ISO
-image, and finally <B>dvdrecord</B> to burn that to a blank DVD-R.</P>
-<P>The requirements for this procedure are <B>mjpegtools</B> (provides
-<B>mplex</B>) and <B>dvdauthor</B> (provides <B>mpeg2desc</B> and
-<B>dvdauthor</B>).</P>
-<P>This script will perform the necessary steps. You'll need to pass it the
-.nuv file and a name for the new DVD project.  You should end up with a
-directory which you can <B>mkisofs</B> into a ISO file then burn it.</P>
-<P>
-<BLOCKQUOTE><CODE>
-<PRE>
-#!/bin/sh
+<P>Use the mytharchive plugin.</P>
 
-mkfifo aud0
-mkfifo vid0
-mkfifo dvdmpg
-
-mpeg2desc -a0 &lt; $1 > aud0 &amp;
-mpeg2desc -v0 &lt; $1 > vid0 &amp;
-mplex -f 8 -V -o dvdmpg aud0 vid0 &amp;
-dvdauthor -o $2 -f dvdmpg
-dvdauthor -o $2 -T
-
-rm aud0
-rm vid0
-rm dvdmpg
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
-<P>It's also possible to pipe the output of <B>mkisofs</B> directly to
-<B>cdrecord</B> without any intermediate files being written to your hard
-drive.  For example:
-<BLOCKQUOTE><CODE>
-<PRE>
-#!/bin/sh
-TSIZE=`mkisofs -dvd-video -udf -q -print-size .`
-mkisofs -dvd-video -udf -V "$1" . | nice -10 cdrecord speed=1 dev=1,1,0 \
-driveropts=burnfree -dao -v tsize="$TSIZE"s -
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
-
-<H2><A NAME="ss23.20">23.20</A> <A HREF="mythtv-HOWTO.html#toc23.20">Burning a MythTV recording to a DVD (alternate version)</A>
-</H2>
-
-
-<P>This is specific to MPEG-2 .nuv files created by Hauppauge PVR-X50 video 
-capture cards.</P>
-<P>The software packages you will want are:
-<UL>
-<LI>dvd+rw-tools</LI>
-<LI>dvdauthor</LI>
-<LI>mjpegtools</LI>
-<LI>avidemux2</LI>
-<LI>transcode - not necessary for this, but useful for working with video</LI>
-<LI>k3b - a GUI for burning DVD's and CD's.  Not necessary, but useful.</LI>
-</UL>
-</P>
-<P>1. Find the file you want.</P>
-<P>2. Run <B>avidemux2</B> and open the .nuv file which corresponds with the
-program you wish to burn to DVD.</P>
-<P>3. Remove the segments you don't need.  Click twice on "A" when you are at
-the beginning of the segment you want to save, find the end of the segment,
-and click "B".</P>
-<P>4. Save the raw video stream and audio: <CODE>File-> Save -> Save Raw Video
-Stream</CODE>.  Save the file as <CODE>1.m2v</CODE>.  When that's done, go to
-<CODE>Audio -> Save Audio</CODE>.  Save the file as <CODE>1.mp2</CODE></P>
-<P>5. Repeat steps 2 &amp; 3 until you have saved all the segments you wish to keep.</P>
-<P>6.  Mplex the video and audio for each segment together in DVD-MPEG2 format.
-Do that by running</P>
-<P><CODE>mplex -f 8 -o 1.mpg 1.m2v 1.mp2</CODE></P>
-<P>7.  Create a DVD file system by running</P>
-<P><CODE>dvdauthor -o DVD 1.mpg 2.mpg ... n.mpg</CODE></P>
-<P><CODE>dvdauthor -T -o DVD</CODE></P>
-<P>8.  Put a blank DVD in your drive and write the video by running</P>
-<P><CODE>growisofs -Z /dev/scd0 -dvd-video DVD</CODE></P>
-<P>9.  Be sure and check the DVD in a player and then delete all the files you 
-created in this process.</P>
-<P>Notes:</P>
-<P>You can reduce the size of your files and fit more video on a DVD by using 
-<B>tcrequant</B>, which is part of <B>transcode</B>.  </P>
-<P>The steps above create a DVD that starts playing the video automatically. If
-you want to burn a DVD with menus and multiple video titles, see the next
-section.</P>
-
-<H2><A NAME="ss23.21">23.21</A> <A HREF="mythtv-HOWTO.html#toc23.21">Creating a DVD with Menus</A>
-</H2>
-
-<P>This assumes that you have already formatted the videos in a 
-DVD-compliant format that works with <B>dvdauthor</B>. </P>
-
-<H3>CREATING A MENU</H3>
-
-<P>This is potentially the most difficult step in creating a DVD with a menu.
-You must capture or create a background image with the appropriate
-resolution and <B>mplex</B> it together with an audio file (typically
-silence, although though you may use sound) and then create overlay images
-that show</P>
-<P>
-<OL>
-<LI>the menu text</LI>
-<LI>the highlighted buttons</LI>
-<LI>the selected buttons  </LI>
-</OL>
-</P>
-<P>You would then use <B>spumux</B> to combine the background video with the
-overlay menus.</P>
-<P>The background image must be saved as a JPG and the overlay images must be
-PNG with a maximum of three colors.  Four colors are allowed, but the
-transparent background counts as one of the available colors.  In these
-examples, the background file is called <CODE>menu.jpg</CODE>, the menu text is called
-<CODE>menu1.png</CODE> and the highlighted and selected buttons are the same and called
-<CODE>menu2.png</CODE>.</P>
-
-
-<H3>Create a Background </H3>
-
-<P>To get a background image, use <B>avidemux2</B> and find the frame you
-wish to use as a background image.  Save the frame as
-<CODE>menu.jpg</CODE> by executing <CODE>File -> Save -> Save JPG Image</CODE>.  </P>
-<P>You may also create your own background image in the GIMP.  Use the following
-settings:</P>
-<P>For NTSC Video:
-<BLOCKQUOTE><CODE>
-<PRE>
-width: 720
-height: 480
-x-axis: 81dpi
-y-axis: 72dpi
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
-
-<H3>Convert the background JPG file into a M2V video file</H3>
-
-<P><CODE>jpeg2yuv -n 50 -I p -f 29.97 -j menu.jpg | mpeg2enc -n n -f 8 -o menu.m2v</CODE></P>
-<P>For PAL Video 
-<BLOCKQUOTE><CODE>
-<PRE>
-width: 720
-height: 576
-x-axis: 75dpi
-y-axis: 80dpi
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
-
-<H3>Convert the background JPG file into a M2V video file</H3>
-
-<P><CODE>jpeg2yuv -n 50 -I p -f 25 -j menu.jpg | mpeg2enc -n p -f 8 -o menu.m2v</CODE></P>
-
-<H3>Merge the background you just created with audio </H3>
-
-<P>You will need some sort of audio to <B>mplex</B> with the M2V file you
-just created, so either capture some audio using <B>avidemux2</B> or
-another program, or to create empty audio to <B>mplex</B>, use this
-command</P>
-<P><CODE>dd if=/dev/zero bs=4 count=2000 | toolame -b 128 -s 48 /dev/stdin menu.mp2</CODE></P>
-
-<H3>Merge the M2V video with the MP2 audio</H3>
-
-<P><CODE>mplex -f 8 -o menu.mpg menu.m2v menu.mp2</CODE></P>
-
-<H3>Create the menu buttons</H3>
-
-
-<P>Open the background <CODE>menu.jpg</CODE> file in the GIMP.  Add a transparent layer
-over the background and mark where you will want the different buttons to be
-located.  This layer will later be deleted, so it doesn't have to be clean. 
-When creating this layer, use all the colors you want to use in your
-buttons.  Remember, no more than three colors.</P>
-<P>Delete the Background layer.</P>
-<P>Change the image to an indexed color mode.  Do this by right-clicking on
-the image and selecting <CODE>Image -> Mode -> Indexed</CODE>.  Enter "4" in the
-number of colors.</P>
-<P>Create two new layers.</P>
-<P>In the top layer, you will enter the text for your buttons.  Select the
-color you want for your text either in the color palette or by using the
-Color Picker Tool.  To use the Color Picker, you must make sure you have
-that bottom layer selected.  Enter the text for all the buttons on the top
-layer according to whatever layout you decided on.</P>
-<P>Now you will create the actual buttons by drawing boxes around the text
-and filling that area with the Color Fill Tool.  Be sure and select the
-color you want (contrasting to the text) and to create your boxes in the
-second from the top layer.</P>
-<P>Delete that bottom layer which we stated earlier would be deleted.</P>
-<P>Save the current image as <CODE>menu2.png</CODE>.  Do that by right-clicking
-and selecting <CODE>File -> Save as</CODE>, and make the name <CODE>menu.png</CODE>. 
-Click "Export" and make sure that "Save Background Color" and "Save
-Resolution" are selected.</P>
-<P>Select the bottom layer and change the Opacity to 0%.  Now save the image 
-as <CODE>menu1.png</CODE>.</P>
-
-<H3>Create the final menu video </H3>
-
-<P> To create the DVD menu, an XML file is used.  An example
-<CODE>menu.xml</CODE> file is shown below.  The autoorder line is used to decide
-what takes precedent for ordering.  If your buttons are ordered primarily by
-rows, then select "rows".  If your ordering is by column, then choose
-"columns".</P>
-<P>
-<BLOCKQUOTE><CODE>
-<PRE>
-###begin menu.xml###
-&lt;subpictures>
-  &lt;stream>
-    &lt;spu
-     force="yes"
-     start="00:00:00.00"
-     image="menu1.png"
-     select="menu2.png"
-     highlight="menu2.png"
-     autooutline="infer"
-     outlinewidth="6"
-     autoorder="rows"
-    >
-    &lt;/spu>
-  &lt;/stream>
-&lt;/subpictures>
-###end menu.xml###
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
-<P>Then create the final menu with</P>
-<P><CODE>spumux menu.xml &lt; menu.mpg &gt; menu_final.mpg</CODE></P>
-<P>You should see some lines in the output to the console that show</P>
-<P>INFO:  Autodetect ...</P>
-<P>The number of these lines that you see should be the same number of buttons 
-you created.  If there are, then good job!</P>
-
-
-<H3>Authoring the DVD</H3>
-
-<P>To create the DVD structure, an XML file is used.  The below file is an
-example <CODE>dvd.xml</CODE> file.  This example file allows for the 4 buttons in the
-menu created earlier and has three video segments making up each of the 4
-video titles.  Each of the separate video segments will be treated as
-separate chapters of one consistent video title.</P>
-<P>
-<BLOCKQUOTE><CODE>
-<PRE>
-### begin dvd.xml ###
-&lt;dvdauthor dest="DVD"&gt;
-  &lt;vmgm&gt;
-    &lt;menus&gt;
-      &lt;pgc&gt;
-        &lt;button&gt;jump title 1;&lt;/button&gt; 
-        &lt;button&gt;jump title 2;&lt;/button&gt; 
-        &lt;button&gt;jump title 3;&lt;/button&gt; 
-        &lt;button&gt;jump title 4;&lt;/button&gt; 
-        &lt;vob file="menu_final.mpg" pause="inf" /&gt; 
-      &lt;/pgc&gt;
-    &lt;/menus&gt;
-  &lt;/vmgm&gt;
-  &lt;titleset&gt;
-    &lt;titles&gt;
-      &lt;pgc&gt;
-        &lt;post&gt;call vmgm menu 1;&lt;/post&gt; 
-        &lt;vob file="1a.mpg" /&gt; 
-        &lt;vob file="1b.mpg" /&gt; 
-        &lt;vob file="1c.mpg" /&gt; 
-      &lt;/pgc&gt;
-    &lt;/titles&gt;
-  &lt;/titleset&gt;
-  &lt;titleset&gt;
-    &lt;titles&gt;
-      &lt;pgc&gt;
-        &lt;post&gt;call vmgm menu 1;&lt;/post&gt; 
-        &lt;vob file="2a.mpg" /&gt; 
-        &lt;vob file="2b.mpg" /&gt; 
-        &lt;vob file="2c.mpg" /&gt; 
-      &lt;/pgc&gt;
-    &lt;/titles&gt;
-  &lt;/titleset&gt;
-  &lt;titleset&gt;
-    &lt;titles&gt;
-      &lt;pgc&gt;
-        &lt;post&gt;call vmgm menu 1;&lt;/post&gt; 
-        &lt;vob file="3a.mpg" /&gt; 
-        &lt;vob file="3b.mpg" /&gt; 
-        &lt;vob file="3c.mpg" /&gt; 
-      &lt;/pgc&gt;
-    &lt;/titles&gt;
-  &lt;/titleset&gt;
-  &lt;titleset&gt;
-    &lt;titles&gt;
-      &lt;pgc&gt;
-        &lt;post&gt;call vmgm menu 1;&lt;/post&gt; 
-        &lt;vob file="4a.mpg" /&gt; 
-        &lt;vob file="4b.mpg" /&gt; 
-        &lt;vob file="4c.mpg" /&gt; 
-      &lt;/pgc&gt;
-    &lt;/titles&gt;
-  &lt;/titleset&gt;
-&lt;/dvdauthor&gt;
-### end dvd.xml ###
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
-<P>Create the DVD file structure with</P>
-<P><CODE>dvdauthor -x dvd.xml</CODE></P>
-<P>Test the created DVD file structure with</P>
-<P><CODE>xine dvd:/full/path/to/DVD/VIDEO_TS/</CODE></P>
-<P>Then burn the DVD file structure to a DVD with</P>
-<P><CODE>growisofs -Z /dev/scd0 -dvd-video DVD</CODE></P>
-
-<H2><A NAME="ss23.22">23.22</A> <A HREF="mythtv-HOWTO.html#toc23.22">Using the DBoxII within MythTV</A>
+<H2><A NAME="ss23.20">23.20</A> <A HREF="mythtv-HOWTO.html#toc23.20">Using the DBoxII within MythTV</A>
 </H2>
 
 <P>The configuration of the DBoxII for use within MythTV is tricky 
@@ -1306,111 +994,28 @@ channels from the web interface of Neutrino at http://ip-of-your-box:80/.
 Associate the channel with your new video source and repeat when needed.</P>
 <P>You may leave the Setup now and proceed as usual.</P>
 
-<H2><A NAME="MigratingtoDD"></A> <A NAME="ss23.23">23.23</A> <A HREF="mythtv-HOWTO.html#toc23.23">Migrating from XMLTV to DataDirect </A>
-</H2>
-
-<P><B>NOTE</B>:  This section will be deprecated and will be removed in
-v0.20.  DataDirect has been the default for a number of revisions, so it is
-unlikely that there are North American users that will need to migrate.</P>
-
-<P>DataDirect will use different information for your video sources and
-channels than was used by XMLTV. The following will clear your old
-information in a way that will allow your EPG and existing recording rules
-to continue to work as you'd expect.</P>
-<P>The first step is to create a backup of your database using the
-instructions found in 
-<A HREF="#backupdb">Saving or restoring the database</A></P>
-<P><B>NOTE</B>: Examine the contents of the backup file to be sure that the
-backup succeeded before modifying your database.</P>
-<P><B>NOTE</B>: The MythTV DataDirect grabber requires <B>wget</B> version
-1.9.1 or later. Verify that this is installed before modifying your
-database.</P>
-<P>Next, start <B>mysql</B> and perform the following commands:
-<BLOCKQUOTE><CODE>
-<PRE>
-$ mysql -u root mythconverg
-mysql>CREATE TABLE channel_copy SELECT * FROM channel;
-mysql>exit
-$
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
-<P>Run the mythtv-setup program.  When the setup program prompts "Would you
-like to clear all program/channel settings before starting configuration
-[no]" type "yes".</P>
-<P>Complete the configuration as detailed in the section called 
-<A HREF="mythtv-HOWTO-5.html#ConfigureDD">Configuring the Zap2It.com DataDirect service</A> and
-in 
-<A HREF="mythtv-HOWTO-9.html#VideoSources">Video Sources</A>.</P>
-<P>
-<FIGURE>
-<EPS FILE="stop.eps">
-<IMG SRC="stop.png">
-<CAPTION>You <EM>must</EM> associate your DataDirect information with the inputs on
-your capture device.  If you created "Cable-DD", then don't forget to bind
-<CODE>/dev/video0</CODE> to Cable-DD in the 
-<A HREF="mythtv-HOWTO-9.html#VideoSources">Video Sources</A> portion of mythtv-setup.</CAPTION>
-</FIGURE>
-</P>
-<P>Once you're done running mythtv-setup, run <B>mythfilldatabase</B> to
-populate the database with new data.</P>
-<P>To restore the channel icons, you will need to perform one of two steps. 
-Both are dependant on the channel_copy table you created above.</P>
-<P>If you're running MySQL v3, execute the following.  Note that the
-select command is very long.  You can press ENTER at the end of each line;
-the command won't be evaluated until you end the statement with a semicolon.
-<BLOCKQUOTE><CODE>
-<PRE>
-$ mysql -u root mythconverg
-mysql>create table channel_temp
-select c.chanid, c.channum, c.sourceid, c.callsign, c.name, cb.icon,
-c.finetune, c.videofilters, c.xmltvid, c.contrast, c.brightness,
-c.colour, c.freqid, c.recpriority, c.hue, c.tvformat,
-c.commfree, c.visible, c.outputfilters
-from channel c
-left join channel_copy cb on (c.callsign = cb.callsign);
-mysql>truncate channel;
-mysql>insert channel select * from channel_temp;
-mysql>drop table channel_temp;
-mysql>drop table channel_copy;
-mysql>exit
-$
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
-<P>If you are running MySQL v4, it's a little simpler. The next command is
-one long string:
-<BLOCKQUOTE><CODE>
-<PRE>
-$ mysql -u root mythconverg
-mysql>UPDATE channel,channel_copy SET channel.icon = channel_copy.icon 
-WHERE channel.callsign = channel_copy.callsign;
-mysql>drop table channel_copy;
-mysql>exit
-$
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
-<H2><A NAME="ss23.24">23.24</A> <A HREF="mythtv-HOWTO.html#toc23.24">What do the icons on the Watch Recordings screen mean?</A>
+<H2><A NAME="ss23.21">23.21</A> <A HREF="mythtv-HOWTO.html#toc23.21">What do the icons on the Watch Recordings screen mean?</A>
 </H2>
 
 <P>Press "1" or F1 to get a popup.</P>
-<H2><A NAME="ss23.25">23.25</A> <A HREF="mythtv-HOWTO.html#toc23.25">What do the letters mean when I change channels?</A>
+<H2><A NAME="ss23.22">23.22</A> <A HREF="mythtv-HOWTO.html#toc23.22">What do the letters mean when I change channels?</A>
 </H2>
 
 <P>These letters let you know what's going on with the backend as it tries
 to tune to a channel.</P>
-<P>Lower case = seen
-Upper Case = seen &amp; good</P>
-<P>l/L = Lock  : This could be seen by PVR-250/BTTV users
-a/A = PAT   : Any recording transmitted in MPEG 
-m/M = PMT   : Any recording transmitted in MPEG 
-g/G = MGT   : ATSC only
-v/V = VCT   : ATSC only
-n/N = NIT   : DVB only
-s/S = SDT   : DVB only</P>
-
-<H2><A NAME="ss23.26">23.26</A> <A HREF="mythtv-HOWTO.html#toc23.26">What is the difference between the various Hauppauge PVR models?</A>
+<P>Lower case = seen</P>
+<P>Upper Case = seen &amp; good
+<UL>
+<LI>l/L = Lock  : This could be seen by PVR-250/BTTV users</LI>
+<LI>a/A = PAT   : Any recording transmitted in MPEG </LI>
+<LI>m/M = PMT   : Any recording transmitted in MPEG </LI>
+<LI>g/G = MGT   : ATSC only</LI>
+<LI>v/V = VCT   : ATSC only</LI>
+<LI>n/N = NIT   : DVB only</LI>
+<LI>s/S = SDT   : DVB only</LI>
+</UL>
+</P>
+<H2><A NAME="ss23.23">23.23</A> <A HREF="mythtv-HOWTO.html#toc23.23">What is the difference between the various Hauppauge PVR models?</A>
 </H2>
 
 <P>This is covered in the hardware section, and extensively covered on the
@@ -1450,7 +1055,7 @@ than 720x480, so it cannot be used with HDTV.  Make a conscious decision
 (and ask for advice on the mailing list) that you want to tradeoff potential
 HDTV use in the future compared to video quality.</P>
 <P>The X-driver for the PVR-350 support playback using Xv efficiently but does
-not support any other 2d or 3d acceleration. For some application this may
+not support any other 2D or 3D acceleration. For some application this may
 place a large load on the host CPU, some will run without any problem and
 others (mplayer, xine, xmame etc.) should be configured to utilize the Xv
 interface.</P>
@@ -1465,7 +1070,7 @@ Current versions of the PVR-500 should come with an adapter to allow you to
 connect a second S-Video or composite input.  Early adopters may need to
 purchase this item separately.</P>
 
-<H2><A NAME="ss23.27">23.27</A> <A HREF="mythtv-HOWTO.html#toc23.27">Changing channels on an external Set Top Box</A>
+<H2><A NAME="ss23.24">23.24</A> <A HREF="mythtv-HOWTO.html#toc23.24">Changing channels on an external Set Top Box</A>
 </H2>
 
 <P>If you need to use an external Set Top Box (STB), such as for satellite
@@ -1486,7 +1091,7 @@ the Tivo has a direct-connect capability.</LI>
 contrib directory which may work for you.</LI>
 </OL>
 </P>
-<H2><A NAME="ss23.28">23.28</A> <A HREF="mythtv-HOWTO.html#toc23.28">Configuring one machine to flag all commercials</A>
+<H2><A NAME="ss23.25">23.25</A> <A HREF="mythtv-HOWTO.html#toc23.25">Configuring one machine to flag all commercials</A>
 </H2>
 
 <P>Commercial flagging can be CPU intensive.  By default, the backend that
@@ -1501,14 +1106,18 @@ running on this machine.</P>
 OFF so that new jobs are allowed to run anywhere.</P>
 <P>Restart <B>mythbackend</B> since it only reads this setting when it starts up.</P>
 <P>On the faster machine:</P>
-<P>Start the mythtv-setup program.  Advance through the pages until you get to
-the Job Queue page.  Ensure that "Allow Commercial Detection jobs" is turned
-ON for this machine.</P>
+<P>Start the <B>mythtv-setup</B> program.  Advance through the pages until
+you get to the Job Queue page.  Ensure that "Allow Commercial Detection
+jobs" is turned ON for this machine.</P>
 <P>Run <B>mythjobqueue</B>.  <B>mythjobqueue</B> will examine the JobQueue
 and run any jobs it finds.  <B>mythjobqueue</B> should be left running so
 that it will pick up any new commercial flagging jobs that are added to the
 queue, otherwise new jobs will be added to the queue and your programs won't
 be flagged until you run manually run <B>mythjobqueue</B>.</P>
+<P>Using this technique it's possible to add commercial flagging machines as
+needed, even on systems that aren't running a backend.  It's also possible
+to run the commercial flagger in a virtual machine environment such as
+VMWare.</P>
 
 <HR>
 <A HREF="mythtv-HOWTO-24.html">Next</A>
