@@ -1472,6 +1472,8 @@ void MythburnWizard::filenameEditLostFocus()
     ArchiveDestinations[AD_FILE].freeSpace = 
             getDiskSpace(filename_edit->getText(), dummy, dummy);
 
+    saveFilename = filename_edit->getText();
+
     // if we don't get a valid freespace value it probably means the file doesn't
     // exist yet so try looking up the freespace for the parent directory 
     if (ArchiveDestinations[AD_FILE].freeSpace == -1)
