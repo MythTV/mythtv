@@ -297,7 +297,7 @@ int NativeArchive::doNativeArchive(const QString &jobFile)
         burnISOImage(mediaType, bEraseDVDRW);
 
     // make sure the files we created are read/writable by all 
-    system("chmod -R a+rw-x+X " + saveDirectory);
+    //system("chmod -R a+rw-x+X " + saveDirectory);
 
     VERBOSE(VB_JOBQUEUE, "Native archive job completed OK");
 
