@@ -3827,7 +3827,7 @@ int main(int argc, char *argv[])
                            "WHERE value='mythfilldatabaseLastRunStatus'")
                            .arg(status));
 
-        query.exec(QString("SELECT MAX(endtime) FROM program;"));
+        query.exec("SELECT MAX(endtime) FROM program WHERE manualid = 0;");
         if (query.isActive() && query.size() > 0)
         {
             query.next();
@@ -3846,7 +3846,7 @@ int main(int argc, char *argv[])
                            "WHERE value='mythfilldatabaseLastRunEnd'")
                           .arg(QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm")));
 
-        query.exec(QString("SELECT MAX(endtime) FROM program;"));
+        query.exec("SELECT MAX(endtime) FROM program WHERE manualid = 0;");
         if (query.isActive() && query.size() > 0)
         {
             query.next();

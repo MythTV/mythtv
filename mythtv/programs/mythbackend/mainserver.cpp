@@ -2100,7 +2100,7 @@ void MainServer::HandleQueryCheckFile(QStringList &slist, PlaybackSock *pbs)
 void MainServer::getGuideDataThrough(QDateTime &GuideDataThrough)
 {
     MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare("SELECT max(endtime) FROM program;");
+    query.prepare("SELECT MAX(endtime) FROM program WHERE manualid = 0;");
 
     if (query.exec() && query.isActive() && query.size())
     {
