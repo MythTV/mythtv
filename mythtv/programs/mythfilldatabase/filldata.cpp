@@ -2852,6 +2852,7 @@ bool fillData(QValueList<Source> &sourcelist)
     int failures = 0;
     int externally_handled = 0;
     int total_sources = sourcelist.size();
+    int source_channels = 0;
 
     query.exec(QString("SELECT MAX(endtime) FROM program WHERE manualid=0;"));
     if (query.isActive() && query.size() > 0)
@@ -2873,6 +2874,23 @@ bool fillData(QValueList<Source> &sourcelist)
         VERBOSE(VB_GENERAL, sidStr.arg((*it).id)
                                   .arg((*it).name)
                                   .arg((*it).xmltvgrabber));
+
+        query.prepare(
+            "SELECT COUNT(chanid) FROM channel WHERE sourceid = :SRCID");
+        query.bindValue(":SRCID", (*it).id);
+        query.exec();
+
+        if (query.isActive() && query.numRowsAffected() > 0) {
+            query.next();
+            source_channels = query.value(0).toInt();
+            VERBOSE(VB_GENERAL, QString("Found %1 channels for source %2")
+                                        .arg(source_channels).arg((*it).id));
+        } else {
+            source_channels = 0;
+            VERBOSE(VB_GENERAL,
+                    QString("Can't get a channel count for source id %1")
+                            .arg((*it).id));
+        }
 
         QString xmltv_grabber = (*it).xmltvgrabber;
         need_post_grab_proc |= (xmltv_grabber != "datadirect");
@@ -2993,7 +3011,8 @@ bool fillData(QValueList<Source> &sourcelist)
                 else
                 {
                     // Check to see if we already downloaded data for this date.
-                    int chanCount = 0;         // Channels with data only
+                    int prevChanCount = 0;
+                    int currentChanCount = 0;
                     int previousDayCount = 0;
                     int currentDayCount = 0;
 
@@ -3017,10 +3036,9 @@ bool fillData(QValueList<Source> &sourcelist)
                         while (query.next())
                         {
                             if (query.value(1).toInt() > 0)
-                            {
-                                chanCount++;
-                                previousDayCount += query.value(1).toInt();
-                            }
+                                prevChanCount++;
+                            previousDayCount += query.value(1).toInt();
+
                             VERBOSE(VB_CHANNEL,
                                     QString("    chanid %1 -> %2 programs")
                                             .arg(query.value(0).toString())
@@ -3034,7 +3052,10 @@ bool fillData(QValueList<Source> &sourcelist)
                                                 "counts for day %1").arg(i));
                             while (query.next())
                             {
+                                if (query.value(1).toInt() > 0)
+                                    currentChanCount++;
                                 currentDayCount += query.value(1).toInt();
+
                                 VERBOSE(VB_CHANNEL,
                                         QString("    chanid %1 -> %2 programs")
                                                 .arg(query.value(0).toString())
@@ -3050,7 +3071,18 @@ bool fillData(QValueList<Source> &sourcelist)
                             download_needed = true;
                         }
 
-                        if (currentDayCount == 0)
+                        if (currentChanCount < (prevChanCount * 0.90)) {
+                            VERBOSE(VB_GENERAL, QString(
+                                    "Data refresh needed because only %1 out "
+                                    "of %2 channels have at least one "
+                                    "program listed for day @ offset %3 from "
+                                    "6PM - midnight.  Previous day had %4 "
+                                    "channels with data in that time period.")
+                                    .arg(currentChanCount).arg(source_channels)
+                                    .arg(i).arg(prevChanCount));
+                            download_needed = true;
+                        }
+                        else if (currentDayCount == 0)
                         {
                             VERBOSE(VB_GENERAL, QString(
                                     "Data refresh needed because no data "
@@ -3068,7 +3100,7 @@ bool fillData(QValueList<Source> &sourcelist)
                                     "a refresh is being forced.").arg(i-1)); 
                             download_needed = true;
                         }
-                        else if (currentDayCount < (chanCount * 4))
+                        else if (currentDayCount < (currentChanCount * 4))
                         {
                             VERBOSE(VB_GENERAL, QString(
                                     "Data Refresh needed because offset day %1 "
@@ -3077,8 +3109,8 @@ bool fillData(QValueList<Source> &sourcelist)
                                     "time window for channels that "
                                     "normally have data. "
                                     "We want at least %2 programs, but only "
-                                    "found %3").arg(i)
-                                    .arg(chanCount * 4).arg(currentDayCount));
+                                    "found %3").arg(i).arg(currentChanCount * 4)
+                                    .arg(currentDayCount));
                             download_needed = true;
                         }
                         else if (currentDayCount < (previousDayCount / 2))
