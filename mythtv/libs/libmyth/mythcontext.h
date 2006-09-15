@@ -55,54 +55,31 @@ class MythContextPrivate;
 /// "-v help" is used.
 
 #define VERBOSE_MAP(F) \
-    F(VB_ALL,       0xffffffff, "all",       0,  \
-      "ALL available debug output")              \
-    F(VB_IMPORTANT, 0x00000001, "important", 0,  \
-      "Errors or other very important messages") \
-    F(VB_GENERAL,   0x00000002, "general",   1,  \
-      "General info")                            \
-    F(VB_RECORD,    0x00000004, "record",    1,  \
-      "Recording related messages")              \
-    F(VB_PLAYBACK,  0x00000008, "playback",  1,  \
-      "Playback related messages")               \
-    F(VB_CHANNEL,   0x00000010, "channel",   1,  \
-      "Channel related messages")                \
-    F(VB_OSD,       0x00000020, "osd",       1,  \
-      "On-Screen Display related messages")      \
-    F(VB_FILE,      0x00000040, "file",      1,  \
-      "File and AutoExpire related messages")    \
-    F(VB_SCHEDULE,  0x00000080, "schedule",  1,  \
-      "Scheduling related messages")             \
-    F(VB_NETWORK,   0x00000100, "network",   1,  \
-      "Network protocol related messages")       \
-    F(VB_COMMFLAG,  0x00000200, "commflag",  1,  \
-      "Commercial Flagging related messages")    \
-    F(VB_AUDIO,     0x00000400, "audio",     1,  \
-      "Audio related messages")                  \
-    F(VB_LIBAV,     0x00000800, "libav",     1,  \
-      "Enables libav debugging")                 \
-    F(VB_JOBQUEUE,  0x00001000, "jobqueue",  1,  \
-      "JobQueue related messages")               \
-    F(VB_SIPARSER,  0x00002000, "siparser",  1,  \
-      "Siparser related messages")               \
-    F(VB_EIT,       0x00004000, "eit",       1,  \
-      "EIT related messages")                    \
-    F(VB_VBI,       0x00008000, "vbi",       1,  \
-      "VBI related messages")                    \
-    F(VB_DATABASE,  0x00010000, "database",  1,  \
-      "Display all SQL commands executed")       \
-    F(VB_DSMCC,     0x00020000, "dsmcc",     1,  \
-      "DSMCC carousel related messages")         \
-    F(VB_MHEG,      0x00040000, "mheg",      1,  \
-      "MHEG debugging messages")                 \
-    F(VB_UPNP,      0x00080000, "upnp",      1,  \
-      "upnp debugging messages")                 \
-    F(VB_SOCKET,    0x00100000, "socket",    1,  \
-      "socket debugging messages")               \
-    F(VB_TIMESTAMP, 0x80000000, "timestamp", 1,  \
-      "Conditional data driven messages")        \
-    F(VB_NONE,      0x00000000, "none",      0,  \
-      "NO debug output")
+    F(VB_ALL,       0xffffffff, "all",       0, "ALL available debug output")              \
+    F(VB_MOST,      0x7ffeffff, "most",      0, "Most debug (nodatabase,notimestamp)")     \
+    F(VB_IMPORTANT, 0x00000001, "important", 0, "Errors or other very important messages") \
+    F(VB_GENERAL,   0x00000002, "general",   1, "General info")                            \
+    F(VB_RECORD,    0x00000004, "record",    1, "Recording related messages")              \
+    F(VB_PLAYBACK,  0x00000008, "playback",  1, "Playback related messages")               \
+    F(VB_CHANNEL,   0x00000010, "channel",   1, "Channel related messages")                \
+    F(VB_OSD,       0x00000020, "osd",       1, "On-Screen Display related messages")      \
+    F(VB_FILE,      0x00000040, "file",      1, "File and AutoExpire related messages")    \
+    F(VB_SCHEDULE,  0x00000080, "schedule",  1, "Scheduling related messages")             \
+    F(VB_NETWORK,   0x00000100, "network",   1, "Network protocol related messages")       \
+    F(VB_COMMFLAG,  0x00000200, "commflag",  1, "Commercial Flagging related messages")    \
+    F(VB_AUDIO,     0x00000400, "audio",     1, "Audio related messages")                  \
+    F(VB_LIBAV,     0x00000800, "libav",     1, "Enables libav debugging")                 \
+    F(VB_JOBQUEUE,  0x00001000, "jobqueue",  1, "JobQueue related messages")               \
+    F(VB_SIPARSER,  0x00002000, "siparser",  1, "Siparser related messages")               \
+    F(VB_EIT,       0x00004000, "eit",       1, "EIT related messages")                    \
+    F(VB_VBI,       0x00008000, "vbi",       1, "VBI related messages")                    \
+    F(VB_DATABASE,  0x00010000, "database",  1, "Display all SQL commands executed")       \
+    F(VB_DSMCC,     0x00020000, "dsmcc",     1, "DSMCC carousel related messages")         \
+    F(VB_MHEG,      0x00040000, "mheg",      1, "MHEG debugging messages")                 \
+    F(VB_UPNP,      0x00080000, "upnp",      1, "upnp debugging messages")                 \
+    F(VB_SOCKET,    0x00100000, "socket",    1, "socket debugging messages")               \
+    F(VB_TIMESTAMP, 0x80000000, "timestamp", 1, "Conditional data driven messages")        \
+    F(VB_NONE,      0x00000000, "none",      0, "NO debug output")
 
 enum VerboseMask
 {
