@@ -3443,6 +3443,9 @@ void TVRec::TuningFrequency(const TuningRequest &request)
     {
         if (!(request.flags & kFlagLiveTV))
         {
+            if (curRecording)
+                curRecording->ForgetHistory();
+
             VERBOSE(VB_IMPORTANT, LOC_ERR +
                     QString("Failed to set channel to %1. "
                             "Reverting to kState_None")
