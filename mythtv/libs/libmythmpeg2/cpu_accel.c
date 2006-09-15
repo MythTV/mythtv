@@ -149,7 +149,7 @@ static RETSIGTYPE sigill_handler (int sig)
 #ifdef ARCH_PPC
 static uint32_t arch_accel (uint32_t accel)
 {
-#ifdef ACCEL_DETECT
+#if defined(ACCEL_DETECT) && defined(HAVE_ALTIVEC)
     if ((accel & (MPEG2_ACCEL_PPC_ALTIVEC | MPEG2_ACCEL_DETECT)) ==
 	MPEG2_ACCEL_DETECT) {
 	static RETSIGTYPE (* oldsig) (int);
