@@ -1023,7 +1023,7 @@ void MainServer::HandleQueryRecordings(QString type, PlaybackSock *pbs)
         "recorded.hostname,channum,name,callsign,commflagged,cutlist,"
         "recorded.autoexpire,editing,bookmark,recorded.category,"
         "recorded.recgroup,record.dupin,record.dupmethod,"
-        "record.recordid,outputfilters,"
+        "recorded.recordid,channel.outputfilters,"
         "recorded.seriesid,recorded.programid,recorded.filesize, "
         "recorded.lastmodified, recorded.findid, "
         "recorded.originalairdate, recorded.playgroup, "
