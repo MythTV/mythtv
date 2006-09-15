@@ -283,7 +283,7 @@
 
   <container name="basedialog" priority="0"> <!-- must be named this -->
     <box name="background">
-      <area>80,60,480,360</area>
+      <area>80,60,480,420</area>
     </box>
     <textarea name="message">
       <area>85,65,470,220</area>
@@ -320,6 +320,7 @@
       <area>80,326,480,30</area>
       <area>80,356,480,30</area>
       <area>80,386,480,30</area>
+      <area>80,416,480,30</area>
     </positionrects>
   </container>
 
