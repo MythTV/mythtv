@@ -1846,16 +1846,6 @@ void PlaybackBox::deleteSelected()
         showAvailablePopup(curitem);
 }
 
-void PlaybackBox::expireSelected()
-{
-    previewVideoState = kStopping;
-
-    if (!curitem)
-        return;
-
-    expire(curitem);
-}
-
 void PlaybackBox::upcoming()
 {
     previewVideoState = kStopping;
@@ -2154,17 +2144,6 @@ void PlaybackBox::remove(ProgramInfo *toDel)
     showDeletePopup(delitem, DeleteRecording);
 }
 
-void PlaybackBox::expire(ProgramInfo *toExp)
-{
-    previewVideoState = kStopping;
-
-    if (delitem)
-        delete delitem;
-    delitem = new ProgramInfo(*toExp);
-
-    showDeletePopup(delitem, AutoExpireRecording);
-}
-
 void PlaybackBox::showActions(ProgramInfo *toExp)
 {
     killPlayer();
@@ -2213,8 +2192,6 @@ void PlaybackBox::showDeletePopup(ProgramInfo *program, deletePopupType types)
              message1 = tr("ERROR: Recorded file does not exist.");
              message2 = tr("Are you sure you want to delete:");
              break;
-        case AutoExpireRecording:
-             message1 = tr("Allow this program to AutoExpire?"); break;
         case StopRecording:
              message1 = tr("Are you sure you want to stop:"); break;
     }
@@ -2250,10 +2227,6 @@ void PlaybackBox::showDeletePopup(ProgramInfo *program, deletePopupType types)
              tmpmessage = tr("Yes, delete it"); 
              tmpslot = SLOT(doForceDelete());
              break;
-        case AutoExpireRecording:
-             tmpmessage = tr("Yes, AutoExpire"); 
-             tmpslot = SLOT(doAutoExpire());
-             break;
         case StopRecording:
              tmpmessage = tr("Yes, stop recording it"); 
              tmpslot = SLOT(doStop());
@@ -2272,10 +2245,6 @@ void PlaybackBox::showDeletePopup(ProgramInfo *program, deletePopupType types)
         case ForceDeleteRecording:
              tmpmessage = tr("No, keep it, I changed my mind"); 
              tmpslot = SLOT(noDelete());
-             break;
-        case AutoExpireRecording:
-             tmpmessage = tr("No, do not AutoExpire"); 
-             tmpslot = SLOT(noAutoExpire());
              break;
         case StopRecording:
              tmpmessage = tr("No, continue recording it"); 

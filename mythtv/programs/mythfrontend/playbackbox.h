@@ -74,7 +74,6 @@ class PlaybackBox : public MythDialog
     {
         EndOfRecording,
         DeleteRecording,
-        AutoExpireRecording,
         StopRecording,
         ForceDeleteRecording,
     } deletePopupType;
@@ -119,7 +118,6 @@ class PlaybackBox : public MythDialog
     void playSelected();
     void stopSelected();
     void deleteSelected();
-    void expireSelected();
     void showMenu();
     void showActionsSelected();
     void showRecGroupChanger();
@@ -243,7 +241,6 @@ class PlaybackBox : public MythDialog
     bool play(ProgramInfo *rec, bool inPlaylist = false);
     void stop(ProgramInfo *);
     void remove(ProgramInfo *);
-    void expire(ProgramInfo *);
     void showActions(ProgramInfo *);
 
     void togglePlayListItem(ProgramInfo *pginfo);
