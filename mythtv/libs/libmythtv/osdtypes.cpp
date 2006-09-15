@@ -2146,7 +2146,7 @@ void OSDTypePositionImage::AddPosition(QPoint pos, float wmult, float hmult)
         QPoint((int)round(pos.x() / wmult),
                (int)round(pos.y() / hmult)));
 
-    VERBOSE(VB_IMPORTANT,
+    VERBOSE(VB_OSD,
             "OSDTypePositionImage::AddPosition["<<m_numpositions<<"]("
             <<pos.x()<<"x"<<pos.y()
             <<"  "<<wmult<<", "<<hmult<<")");
@@ -2157,7 +2157,7 @@ void OSDTypePositionImage::AddPosition(QPoint pos, float wmult, float hmult)
 void OSDTypePositionImage::Draw(OSDSurface *surface, int fade, int maxfade,
                                 int xoff, int yoff)
 {
-    VERBOSE(VB_IMPORTANT,
+    VERBOSE(VB_OSD,
             "OSDTypePositionImage::Draw["<<m_curposition<<"]("
             <<m_wmult<<", "<<m_hmult<<")");
 
