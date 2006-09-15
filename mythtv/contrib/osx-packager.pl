@@ -145,7 +145,7 @@ our %depend = (
   =>
   {
     'url'
-    =>  'ftp://ftp.fu-berlin.de/unix/linux/mirrors/gentoo/distfiles/libdvdcss-1.2.8.tar.bz2',
+    =>  'ftp://ftp.fu-berlin.de/unix/linux/mirrors/gentoo/distfiles/libdvdcss-1.2.9.tar.bz2',
   },
 
   'dvdread'
@@ -463,6 +463,9 @@ our %conf = (
   =>  [
 #        '--compile-type=debug',
         '--prefix=' . $PREFIX,
+        # To "cross compile" something for a lesser Mac:
+        #'--tune=G3',
+        #'--disable-altivec',
       ],
 );
 
