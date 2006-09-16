@@ -31,7 +31,7 @@
 #******************************************************************************
 
 # version of script - change after each update
-VERSION="0.1.20060916-1"
+VERSION="0.1.20060916-2"
 
 
 ##You can use this debug flag when testing out new themes
@@ -815,9 +815,57 @@ def getFileInformation(file, outputfile):
         node.appendChild(infoDOM.createTextNode(""))
         top_element.appendChild(node)
 
-    #recorded table contains
-    #progstart, stars, cutlist, category, description, subtitle, title, chanid
-    #2005-12-20 00:00:00, 0.0, 
+        #if this a myth recording we still need to find the chanid, starttime and hascutlist
+        if file.attributes["type"].value=="recording":
+            sqlstatement  = """SELECT starttime, chanid FROM recorded 
+                               WHERE basename = '%s'""" % file.attributes["filename"].value.replace("'", "\\'")
+
+            db = getDatabaseConnection()
+            cursor = db.cursor()
+            cursor.execute(sqlstatement)
+            result = cursor.fetchall()
+            numrows = int(cursor.rowcount)
+
+            #We must have exactly 1 row returned for this recording
+            if numrows!=1:
+                fatalError("Failed to get recording details from the DB for %s" % file.attributes["filename"].value)
+
+            # iterate through resultset
+            for record in result:
+                node = infoDOM.createElement("chanid")
+                node.appendChild(infoDOM.createTextNode("%s" % record[0]))
+                top_element.appendChild(node)
+
+                #date time is returned as 2005-12-19 00:15:00 
+                recdate=time.strptime( "%s" % record[1],"%Y-%m-%d %H:%M:%S")
+
+                node = infoDOM.createElement("starttime")
+                node.appendChild(infoDOM.createTextNode( time.strftime("%Y-%m-%dT%H:%M:%S", recdate)))
+                top_element.appendChild(node)
+
+                starttime = record[0]
+                chanid = record[1]
+
+                # find the cutlist if available
+                sqlstatement  = """SELECT mark, type FROM recordedmarkup 
+                                WHERE chanid = '%s' AND starttime = '%s' 
+                                AND type IN (0,1) ORDER BY mark""" % (chanid, starttime)
+                cursor = db.cursor()
+                # execute SQL statement
+                cursor.execute(sqlstatement)
+                if cursor.rowcount > 0:
+                    node = infoDOM.createElement("hascutlist")
+                    node.appendChild(infoDOM.createTextNode("yes"))
+                    top_element.appendChild(node)
+                else:
+                    node = infoDOM.createElement("hascutlist")
+                    node.appendChild(infoDOM.createTextNode("no"))
+                    top_element.appendChild(node)
+
+                db.close()
+                del db
+                del cursor
+
     elif file.attributes["type"].value=="recording":
         sqlstatement  = """SELECT progstart, stars, cutlist, category, description, subtitle, 
                            title, starttime, chanid
