@@ -554,6 +554,10 @@ RecStatusType TVRec::StartRecording(const ProgramInfo *rcinfo)
 
     WaitForEventThreadSleep();
 
+    if ((curRecording) && (curRecording->recstatus == rsFailed) &&
+        (retval == rsRecording))
+        retval = rsFailed;
+
     return retval;
 }
 
@@ -675,19 +679,20 @@ void TVRec::FinishedRecording(ProgramInfo *curRec)
     VERBOSE(VB_RECORD, LOC + QString("FinishedRecording(%1) in recgroup: %2")
                                      .arg(curRec->title).arg(pigrp));
 
-    curRec->recstatus = rsRecorded;
+    if (curRec->recstatus != rsFailed)
+        curRec->recstatus = rsRecorded;
     curRec->recendts = mythCurrentDateTime();
 
     if (tvchain)
         tvchain->FinishedRecording(curRec);
 
+    // Make sure really short recordings have positive run time.
+    if (curRec->recendts <= curRec->recstartts)
+        curRec->recendts = curRec->recstartts.addSecs(60);
+
     curRec->recendts.setTime(QTime(
         curRec->recendts.addSecs(30).time().hour(),
         curRec->recendts.addSecs(30).time().minute()));
-
-    // Make sure really short recordings have positive run time.
-    if (curRec->recendts <= curRec->recstartts)
-        curRec->recendts = mythCurrentDateTime().addSecs(1);
 
     if (pigrp != "LiveTV")
     {
@@ -699,7 +704,8 @@ void TVRec::FinishedRecording(ProgramInfo *curRec)
                      .arg(curRec->recendts.toString(Qt::ISODate)));
         gContext->dispatch(me);
     }
-    curRec->FinishedRecording(false);
+
+    curRec->FinishedRecording(curRec->recstatus != rsRecorded);
 }
 
 #define TRANSITION(ASTATE,BSTATE) \
@@ -3444,7 +3450,7 @@ void TVRec::TuningFrequency(const TuningRequest &request)
         if (!(request.flags & kFlagLiveTV))
         {
             if (curRecording)
-                curRecording->ForgetHistory();
+                curRecording->recstatus = rsFailed;
 
             VERBOSE(VB_IMPORTANT, LOC_ERR +
                     QString("Failed to set channel to %1. "

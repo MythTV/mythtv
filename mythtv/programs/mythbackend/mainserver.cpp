@@ -677,6 +677,36 @@ void MainServer::customEvent(QCustomEvent *e)
             return;
         }
 
+        if ((me->Message().left(16) == "DELETE_RECORDING") ||
+            (me->Message().left(22) == "FORCE_DELETE_RECORDING"))
+        {
+            QStringList tokens = QStringList::split(" ", me->Message());
+            if (tokens.size() != 3)
+            {
+                VERBOSE(VB_IMPORTANT, QString("Bad %1 message").arg(tokens[0]));
+                return;
+            }
+
+            QDateTime startts = QDateTime::fromString(tokens[2], Qt::ISODate);
+            ProgramInfo *pinfo = ProgramInfo::GetProgramFromRecorded(tokens[1],
+                                                                     startts);
+            if (pinfo)
+            {
+                if (tokens[0] == "FORCE_DELETE_RECORDING")
+                    DoHandleDeleteRecording(pinfo, NULL, true);
+                else
+                    DoHandleDeleteRecording(pinfo, NULL, false);
+            }
+            else
+            {
+                VERBOSE(VB_IMPORTANT,
+                    QString("Cannot find program info for '%1' while "
+                            "attempting to delete.").arg(me->Message()));
+            }
+
+            return;
+        }
+
         if (me->Message().left(21) == "RESCHEDULE_RECORDINGS" && m_sched)
         {
             QStringList tokens = QStringList::split(" ", me->Message());

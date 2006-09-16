@@ -1450,6 +1450,14 @@ void Scheduler::RunScheduler(void)
 
             VERBOSE(VB_GENERAL, msg << ": " << details);
             gContext->LogEntry("scheduler", LP_NOTICE, msg, details);
+
+            if (nextRecording->recstatus == rsFailed)
+            {
+                MythEvent me(QString("FORCE_DELETE_RECORDING %1 %2")
+                         .arg(nextRecording->chanid)
+                         .arg(nextRecording->recstartts.toString(Qt::ISODate)));
+                gContext->dispatch(me);
+            }
         }
 
         if (statuschanged)
