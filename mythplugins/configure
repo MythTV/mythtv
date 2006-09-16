@@ -70,7 +70,7 @@ MythBrowser related options:
   --enable-mythbrowser     build the mythbrowser plugin [$browser]
 
 MythControls related options:
-  --enable-mythcontrols     build the mythcontrols plugin [$controls]
+  --enable-mythcontrols    build the mythcontrols plugin [$controls]
 
 MythDVD related options:
   --enable-mythdvd         build the mythdvd plugin [$dvd]
@@ -458,6 +458,14 @@ if test "$gallery" != "no" ; then
     fi
 fi
 
+if test "$archive" != "no" ; then
+    if test "$createdvd" = "no" -a "$createarchive" = "no" -a "$encodevideo" = "no" ; then
+        echo "Disabling MythArchive. You need to enable at least one archive format."
+        archive="no"
+    fi 
+
+fi
+
 if test "$browser" != "no" ; then
     hasit="no"
     if has_library libkhtml ; then
@@ -534,80 +542,80 @@ else
 fi
 
 if test "$browser" = "yes" ; then
-  echo "        MythBrowser   plugin will be built"
+  echo "        MythBrowser    plugin will be built"
   echo "SUBDIRS += mythbrowser" >> ./config.pro
 else
-  echo "        MythBrowser   plugin will not be built"
+  echo "        MythBrowser    plugin will not be built"
 fi
 
 if test "$controls" = "yes" ; then
-  echo "        MythControls  plugin will be built"
+  echo "        MythControls   plugin will be built"
   echo "SUBDIRS += mythcontrols" >> ./config.pro
 else
-  echo "        MythControls  plugin will not be built"
+  echo "        MythControls   plugin will not be built"
 fi
 
 if test "$flix" = "yes" ; then
-  echo "        MythFlix      plugin will be built"
+  echo "        MythFlix       plugin will be built"
   echo "SUBDIRS += mythflix" >> ./config.pro
 else
-  echo "        MythFlix      plugin will not be built"
+  echo "        MythFlix       plugin will not be built"
 fi
 
 if test "$dvd" = "yes" ; then
-  echo "        MythDVD       plugin will be built"
+  echo "        MythDVD        plugin will be built"
   echo "SUBDIRS += mythdvd" >> ./config.pro
 else
-  echo "        MythDVD       plugin will not be built"
+  echo "        MythDVD        plugin will not be built"
 fi
 
 if test "$gallery" = "yes" ; then
-  echo "        MythGallery   plugin will be built"
+  echo "        MythGallery    plugin will be built"
   echo "SUBDIRS += mythgallery" >> ./config.pro
 else
-  echo "        MythGallery   plugin will not be built"
+  echo "        MythGallery    plugin will not be built"
 fi
 
 if test "$game" = "yes" ; then
-  echo "        MythGame      plugin will be built"
+  echo "        MythGame       plugin will be built"
   echo "SUBDIRS += mythgame" >> ./config.pro
 else
-  echo "        MythGame      plugin will not be built"
+  echo "        MythGame       plugin will not be built"
 fi
 
 if test "$music" = "yes" ; then
-  echo "        MythMusic     plugin will be built"
+  echo "        MythMusic      plugin will be built"
   echo "SUBDIRS += mythmusic" >> ./config.pro
 else
-  echo "        MythMusic     plugin will not be built"
+  echo "        MythMusic      plugin will not be built"
 fi
 
 if test "$news" = "yes" ; then
-  echo "        MythNews      plugin will be built"
+  echo "        MythNews       plugin will be built"
   echo "SUBDIRS += mythnews" >> ./config.pro
 else
-  echo "        MythNews      plugin will not be built"
+  echo "        MythNews       plugin will not be built"
 fi
 
 if test "$phone" = "yes" ; then
-  echo "        MythPhone     plugin will be built"
+  echo "        MythPhone      plugin will be built"
   echo "SUBDIRS += mythphone" >> ./config.pro
 else
-  echo "        MythPhone     plugin will not be built"
+  echo "        MythPhone      plugin will not be built"
 fi
 
 if test "$video" = "yes" ; then
-  echo "        MythVideo     plugin will be built"
+  echo "        MythVideo      plugin will be built"
   echo "SUBDIRS += mythvideo" >> ./config.pro
 else
-  echo "        MythVideo     plugin will not be built"
+  echo "        MythVideo      plugin will not be built"
 fi
 
 if test "$weather" = "yes" ; then
-  echo "        MythWeather   plugin will be built"
+  echo "        MythWeather    plugin will be built"
   echo "SUBDIRS += mythweather" >> ./config.pro
 else
-  echo "        MythWeather   plugin will not be built"
+  echo "        MythWeather    plugin will not be built"
 fi
 
 ###########################################################
@@ -676,7 +684,7 @@ if test "$gallery" = "yes" ; then
     echo "#" >> ./mythgallery/mythgallery/config.pro
 
     if test "$opengl" = "yes" ; then
-        echo "        OpenGL        support will be included in MythGallery"
+        echo "        OpenGL         support will be included in MythGallery"
         echo "#define OPENGL_SUPPORT 1" >> ./mythgallery/mythgallery/config.h
         echo "CONFIG += opengl" >> ./mythgallery/mythgallery/config.pro
         echo "HEADERS += glsingleview.h" >> ./mythgallery/mythgallery/config.pro
@@ -684,11 +692,11 @@ if test "$gallery" = "yes" ; then
     fi
 
     if test "$opengl" = "no" ; then
-        echo "        OpenGL        support will not be included in MythGallery"
+        echo "        OpenGL         support will not be included in MythGallery"
     fi
 
     if test "$exif" = "yes" ; then
-        echo "        EXIF          support will be included in MythGallery"
+        echo "        EXIF           support will be included in MythGallery"
         echo "#define EXIF_SUPPORT 1" >> ./mythgallery/mythgallery/config.h
         echo "LIBS += -lexif" >> ./mythgallery/mythgallery/config.pro
 
@@ -712,7 +720,7 @@ if test "$gallery" = "yes" ; then
     fi
 
     if test "$exif" = "no" ; then
-        echo "        EXIF          support will not be included in MythGallery"
+        echo "        EXIF           support will not be included in MythGallery"
     fi
 fi
 
@@ -739,43 +747,43 @@ if test "$music" = "yes" ; then
     fi
 
     if test "$opengl" = "yes" ; then
-        echo "        OpenGL        support will be included in MythMusic"
+        echo "        OpenGL         support will be included in MythMusic"
         echo "#define OPENGL_SUPPORT 1" >> ./mythmusic/mythmusic/config.h
         echo "CONFIG += opengl" >> ./mythmusic/mythmusic/config.pro
     fi
 
     if test "$opengl" = "no" ; then
-        echo "        OpenGL        support will not be included in MythMusic"
+        echo "        OpenGL         support will not be included in MythMusic"
     fi
 
     if test "$fftw_lib3" = "yes" ; then
-        echo "        FFTW v.3      support will be included in MythMusic"
+        echo "        FFTW v.3       support will be included in MythMusic"
         echo "#define FFTW3_SUPPORT 1" >> ./mythmusic/mythmusic/config.h
         echo "LIBS += -lfftw3 -lm" >> \
              ./mythmusic/mythmusic/config.pro
     elif test "$fftw_lib" = "yes" ; then
-        echo "        FFTW v.2      support will be included in MythMusic"
+        echo "        FFTW v.2       support will be included in MythMusic"
         echo "#define FFTW2_SUPPORT 1" >> ./mythmusic/mythmusic/config.h
         echo "LIBS += -lrfftw -lfftw" >> ./mythmusic/mythmusic/config.pro
     fi
 
     if test "$fftw_lib" = "no" -a "$fftw_lib3" = "no" ; then
-        echo "        FFTW          support will not be included in MythMusic"
+        echo "        FFTW           support will not be included in MythMusic"
     fi
 
     if test "$sdl" = "yes" ; then
-        echo "        SDL           support will be included in MythMusic"
+        echo "        SDL            support will be included in MythMusic"
         echo "#define SDL_SUPPORT 1" >> ./mythmusic/mythmusic/config.h
         echo "LIBS += `sdl-config --libs`" >> ./mythmusic/mythmusic/config.pro
         echo "QMAKE_CXXFLAGS_RELEASE += `sdl-config --cflags`" >> ./mythmusic/mythmusic/config.pro
         echo "QMAKE_CXXFLAGS_DEBUG += `sdl-config --cflags`" >> ./mythmusic/mythmusic/config.pro
     fi
     if test "$sdl" = "no" ; then
-        echo "        SDL           support will not be included in MythMusic"
+        echo "        SDL            support will not be included in MythMusic"
     fi
 
     if test "$aac" = "yes" ; then
-        echo "        AAC           support will be included in MythMusic"
+        echo "        AAC            support will be included in MythMusic"
         echo "#define AAC_SUPPORT 1" >> ./mythmusic/mythmusic/config.h
         echo "LIBS += -lfaad -lmp4ff" >> ./mythmusic/mythmusic/config.pro
         echo "HEADERS += metaiomp4.h aacdecoder.h" >> ./mythmusic/mythmusic/config.pro
@@ -783,7 +791,7 @@ if test "$music" = "yes" ; then
     fi
 
     if test "$aac" = "no" ; then
-        echo "        AAC           support will not be included in MythMusic"
+        echo "        AAC            support will not be included in MythMusic"
     fi
 fi
 
@@ -804,7 +812,7 @@ if test "$phone" = "yes" ; then
     echo "#" >> ./mythphone/mythphone/config.pro
 
     if test "$festival" = "yes" ; then
-        echo "        FESTIVAL      support will be included in MythPhone"
+        echo "        FESTIVAL       support will be included in MythPhone"
         echo "#define FESTIVAL_SUPPORT 1" >> ./mythphone/mythphone/config.h
         echo "FESTIVALDIR = /home/paul/Build/festival/festival/" >> ./mythphone/mythphone/config.pro
         echo "DEFINES += FESTIVAL_HOME=\\\"\$\${FESTIVALDIR}\\\"" >> ./mythphone/mythphone/config.pro
@@ -814,7 +822,7 @@ if test "$phone" = "yes" ; then
     fi
 
     if test "$festival" = "no" ; then
-        echo "        FESTIVAL      support will not be included in MythPhone"
+        echo "        FESTIVAL       support will not be included in MythPhone"
     fi
 fi
 
