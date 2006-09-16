@@ -25,7 +25,7 @@ using namespace std;
 const int FirewireRecorder::kBroadcastChannel    = 63;
 const int FirewireRecorder::kConnectionP2P       = 0;
 const int FirewireRecorder::kConnectionBroadcast = 1;
-const uint FirewireRecorder::kMaxBufferedPackets = 8000;
+const uint FirewireRecorder::kMaxBufferedPackets = 2000;
 
 // callback function for libiec61883
 int fw_tspacket_handler(unsigned char *tspacket, int /*len*/,
