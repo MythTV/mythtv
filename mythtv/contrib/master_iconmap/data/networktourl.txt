@@ -23,6 +23,7 @@ COMEDYCENTRAL           [zap2it]/comedy.jpg
 COURT                   [zap2it]/court.jpg
 CSPAN                   [zap2it]/cspan.jpg
 CSPAN2                  [zap2it]/cspan2.jpg
+CW                      [zap2it2]/cw.gif
 DISCOVERY               [zap2it]/dsc.jpg
 DISCOVERYHD             [ls-icon]/dd/discovery_hd.gif
 DISNEY                  [zap2it]/disn.jpg

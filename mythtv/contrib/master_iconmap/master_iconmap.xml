@@ -57,6 +57,10 @@
         <network>AZN</network>
     </callsigntonetwork>
     <callsigntonetwork>
+        <callsign>AZNTV</callsign>
+        <network>AZN</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
         <callsign>BBCA</callsign>
         <network>BBCA</network>
     </callsigntonetwork>
@@ -919,6 +923,10 @@
     <callsigntonetwork>
         <callsign>KAYU</callsign>
         <network>FOX</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>KBCW</callsign>
+        <network>CW</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>KBDI</callsign>
@@ -2881,6 +2889,10 @@
         <network>MTV</network>
     </callsigntonetwork>
     <callsigntonetwork>
+        <callsign>MTV2</callsign>
+        <network>MTV2</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
         <callsign>MTV2P</callsign>
         <network>MTV2</network>
     </callsigntonetwork>
@@ -3163,6 +3175,10 @@
     <callsigntonetwork>
         <callsign>TOONP</callsign>
         <network>CARTOONNETWORK</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>TRAV</callsign>
+        <network>TRAV</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>TRAVP</callsign>
@@ -5855,6 +5871,10 @@
     <networktourl>
         <network>CSPAN2</network>
         <url>[zap2it]/cspan2.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>CW</network>
+        <url>[zap2it2]/cw.gif</url>
     </networktourl>
     <networktourl>
         <network>DISCOVERY</network>

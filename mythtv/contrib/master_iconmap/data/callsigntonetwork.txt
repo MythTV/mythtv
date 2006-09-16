@@ -12,6 +12,7 @@ ARTS        AE
 ARTSP       AE
 ATMAX       CINEMAX
 AZNNW       AZN
+AZNTV       AZN
 BBCA        BBCA
 BET         BET
 BETJAZZ     BET
@@ -228,6 +229,7 @@ KAUT        UPN
 KAVU        ABC
 KAWE        PBS-KAWE
 KAYU        FOX
+KBCW        CW
 KBDI        PBS-KBDI
 KBEH        UPN
 KBEJ        UPN
@@ -718,6 +720,7 @@ MOMAXP      CINEMAX
 MPLEX       Encore
 MSNBC       MSNBC
 MTV         MTV
+MTV2        MTV2
 MTV2P       MTV2
 MTVL        MTV
 MTVP        MTV
@@ -789,6 +792,7 @@ TOON        CARTOONNETWORK
 TOOND       DISNEY
 TOONDP      DISNEY
 TOONP       CARTOONNETWORK
+TRAV        TRAV
 TRAVP       TRAV
 TRUE        Encore
 TRUEP       Encore
