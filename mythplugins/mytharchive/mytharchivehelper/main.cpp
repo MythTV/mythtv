@@ -1917,8 +1917,10 @@ int getFileInfo(QString inFile, QString outFile, int lenMethod)
 
                 if (st->codec->sample_aspect_ratio.den && st->codec->sample_aspect_ratio.num)
                 {
-                    float sample_aspect_ratio = av_q2d(st->codec->sample_aspect_ratio);
-                    float aspect_ratio = ((float)st->codec->width / st->codec->height) * sample_aspect_ratio;
+                    float aspect_ratio = av_q2d(st->codec->sample_aspect_ratio);
+                    if (QString(inputFC->iformat->name) != "nuv")
+                        aspect_ratio = ((float)st->codec->width / st->codec->height) * aspect_ratio;
+
                     stream.setAttribute("aspectratio", aspect_ratio);
                 }
                 else
