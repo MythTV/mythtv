@@ -2917,4 +2917,20 @@ QString MythContext::GetX11Display(void) const
     return QDeepCopy<QString>(d->m_x11_display);
 }
 
+void MythContext::dispatch(MythEvent &event)
+{
+    if (print_verbose_messages & VB_NETWORK)
+        VERBOSE(VB_NETWORK, QString("MythEvent: %1").arg(event.Message()));
+
+    MythObservable::dispatch(event);
+}
+
+void MythContext::dispatchNow(MythEvent &event)
+{
+    if (print_verbose_messages & VB_NETWORK)
+        VERBOSE(VB_NETWORK, QString("MythEvent: %1").arg(event.Message()));
+
+    MythObservable::dispatchNow(event);
+}
+
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
