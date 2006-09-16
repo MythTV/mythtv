@@ -84,7 +84,11 @@ bool FirewireChannel::SetChannelByNumber(int channel)
         for (uint i = 0; i < 3 ;i++)
         {
             quadlet_t cmd[2] =  { DCT6200_CMD0 | dig[i], 0x0, };
-            avc1394_transaction_block(fwhandle, fw_opts.node, cmd, 2, 1);
+            if (!avc1394_transaction_block(fwhandle, fw_opts.node, cmd, 2, 1))
+            {
+                VERBOSE(VB_IMPORTANT, "AVC transaction failed.");
+                return false;
+            }
             usleep(500000);
         }
     }
@@ -108,7 +112,11 @@ bool FirewireChannel::SetChannelByNumber(int channel)
                 .arg(cmd[0], 0, 16).arg(cmd[1], 0, 16)
                 .arg(cmd[2], 0, 16));
 
-        avc1394_transaction_block(fwhandle, fw_opts.node, cmd, 3, 1);
+        if(!avc1394_transaction_block(fwhandle, fw_opts.node, cmd, 3, 1))
+        {
+            VERBOSE(VB_IMPORTANT, "AVC transaction failed.");
+            return false;
+        }
 
         cmd[0] = SA3250_CMD0 | AVC1394_SA3250_OPERAND_KEY_RELEASE;
         cmd[1] = SA3250_CMD1 | (dig[0] << 16) | (dig[1] << 8) | dig[2];
@@ -121,7 +129,11 @@ bool FirewireChannel::SetChannelByNumber(int channel)
                 .arg(cmd[0], 0, 16).arg(cmd[1], 0, 16)
                 .arg(cmd[2], 0, 16));
 
-        avc1394_transaction_block(fwhandle, fw_opts.node, cmd, 3, 1);
+        if (!avc1394_transaction_block(fwhandle, fw_opts.node, cmd, 3, 1))
+        {
+            VERBOSE(VB_IMPORTANT, "AVC transaction failed.");
+            return false;
+        }
     }
     else if (fw_opts.model == "SA4200HD")
     {
@@ -138,7 +150,11 @@ bool FirewireChannel::SetChannelByNumber(int channel)
                 .arg(cmd[1], 0, 16)
                 .arg(cmd[2], 0, 16));
 
-        avc1394_transaction_block(fwhandle, fw_opts.node, cmd, 3, 1);
+        if (!avc1394_transaction_block(fwhandle, fw_opts.node, cmd, 3, 1))
+        {
+            VERBOSE(VB_IMPORTANT, "AVC transaction failed.");
+            return false;
+        }
     }
 
     return true;
@@ -166,6 +182,24 @@ bool FirewireChannel::OpenFirewire(void)
     VERBOSE(VB_CHANNEL, LOC + "Allocated raw1394 handle " +
             QString("for port %1").arg(fw_opts.port));
 
+    // verify node looks like a stb
+    if (!avc1394_check_subunit_type(fwhandle, fw_opts.node,
+                                    AVC1394_SUBUNIT_TYPE_TUNER))
+    {
+        VERBOSE(VB_IMPORTANT, LOC_ERR + QString("node %1 is not subunit "
+                "type tuner.").arg(fw_opts.node));
+        CloseFirewire();
+        return false;
+    }
+
+    if (!avc1394_check_subunit_type(fwhandle, fw_opts.node, 
+                                    AVC1394_SUBUNIT_TYPE_PANEL))
+    {
+        VERBOSE(VB_IMPORTANT, LOC_ERR + QString("node %1 is not subunit "
+                "type panel.").arg(fw_opts.node));
+        CloseFirewire();
+        return false;
+    }
     return true;
 }
 
