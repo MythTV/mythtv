@@ -31,7 +31,7 @@
 #******************************************************************************
 
 # version of script - change after each update
-VERSION="0.1.20060912-1"
+VERSION="0.1.20060916-1"
 
 
 ##You can use this debug flag when testing out new themes
@@ -1157,6 +1157,10 @@ def getStreamInformation(filename, xmlFilename, lenMethod):
 
     if result <> 0:
         fatalError("Failed while running mytharchivehelper to get stream information from %s" % filename)
+
+    # print out the streaminfo.xml file to the log
+    infoDOM = xml.dom.minidom.parse(xmlFilename)
+    write("streaminfo.xml :-\n" + infoDOM.toprettyxml("    ", ""))
 
 def getVideoSize(xmlFilename):
     """Get video width and height from stream.xml file"""
