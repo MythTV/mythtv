@@ -31,7 +31,7 @@
 #******************************************************************************
 
 # version of script - change after each update
-VERSION="0.1.20060916-2"
+VERSION="0.1.20060916-3"
 
 
 ##You can use this debug flag when testing out new themes
@@ -77,6 +77,9 @@ dvdrsize=(4482,8964)
 
 frameratePAL=25
 framerateNTSC=29.97
+
+#any aspect ratio above this value is assumed to be 16:9
+aspectRatioThreshold = 1.4
 
 #Just blank globals at startup
 temppath=""
@@ -1831,7 +1834,7 @@ def createDVDAuthorXML(screensize, numberofitems):
                 video.setAttribute("widescreen", "nopanscan")
             else: 
                 # use same aspect ratio as the video
-                if getAspectRatioOfVideo(itemnum) > 1.4:
+                if getAspectRatioOfVideo(itemnum) > aspectRatioThreshold:
                     video.setAttribute("aspect", "16:9")
                     video.setAttribute("widescreen", "nopanscan")
                 else:
@@ -1888,7 +1891,7 @@ def createDVDAuthorXML(screensize, numberofitems):
                 title_video.setAttribute("widescreen", "nopanscan")
             else: 
                 # use same aspect ratio as the video
-                if getAspectRatioOfVideo(itemnum) > 1.4:
+                if getAspectRatioOfVideo(itemnum) > aspectRatioThreshold:
                     title_video.setAttribute("aspect", "16:9")
                     title_video.setAttribute("widescreen", "nopanscan")
                 else:
@@ -2520,7 +2523,7 @@ def createChapterMenu(screensize, screendpi, numberofitems):
         elif chaptermenuAspectRatio == "16:9":
             aspect_ratio = '3'
         else: 
-            if getAspectRatioOfVideo(page) > 1.4:
+            if getAspectRatioOfVideo(page) > aspectRatioThreshold:
                 aspect_ratio = '3'
             else:
                 aspect_ratio = '2'
@@ -2600,7 +2603,7 @@ def createDetailsPage(screensize, screendpi, numberofitems):
 
         # always use the same aspect ratio as the video
         aspect_ratio='2'
-        if getAspectRatioOfVideo(itemnum) > 1.4:
+        if getAspectRatioOfVideo(itemnum) > aspectRatioThreshold:
             aspect_ratio='3'
 
         #write( spumuxdom.toprettyxml())
