@@ -19,6 +19,12 @@ using namespace std;
 class FirewireChannel : public FirewireChannelBase
 {
   public:
+    enum PowerState {
+        On,
+        Off,
+        Failed
+    };
+
     FirewireChannel(FireWireDBOptions firewire_opts, TVRec *parent);
     ~FirewireChannel(void);
 
@@ -33,6 +39,7 @@ class FirewireChannel : public FirewireChannelBase
     bool IsOpen(void) const { return isopen; }
     QString GetDevice(void) const
         { return QString("%1:%2").arg(fw_opts.port).arg(fw_opts.node); }
+    PowerState GetPowerState(void);
 
   private:
     FireWireDBOptions  fw_opts;

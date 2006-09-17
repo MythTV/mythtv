@@ -24,7 +24,7 @@ class TVRec;
                        AVC1394_PANEL_OPERATION_0)
 
 // SA3250HD defines
-#define AVC1394_SA3250_OPERAND_KEY_PRESS	0xe7
+#define AVC1394_SA3250_OPERAND_KEY_PRESS	0xE7
 #define AVC1394_SA3250_OPERAND_KEY_RELEASE	0x67
 
 #define SA3250_CMD0   (AVC1394_CTYPE_CONTROL | \
@@ -33,6 +33,20 @@ class TVRec;
                        AVC1394_PANEL_COMMAND_PASS_THROUGH)
 #define SA3250_CMD1   (0x04 << 24)
 #define SA3250_CMD2    0xff000000
+
+// power defines
+#define AVC1394_CMD_OPERAND_POWER_STATE        0x7F
+#define STB_POWER_STATE   (AVC1394_CTYPE_STATUS | \
+                           AVC1394_SUBUNIT_TYPE_UNIT | \
+                           AVC1394_SUBUNIT_ID_IGNORE | \
+                           AVC1394_COMMAND_POWER | \
+                           AVC1394_CMD_OPERAND_POWER_STATE)
+
+#define STB_POWER_ON      (AVC1394_CTYPE_CONTROL | \
+                           AVC1394_SUBUNIT_TYPE_UNIT | \
+                           AVC1394_SUBUNIT_ID_IGNORE | \
+                           AVC1394_COMMAND_POWER | \
+                           AVC1394_CMD_OPERAND_POWER_ON)
 
 static bool is_supported(const QString &model)
 {
@@ -197,6 +211,44 @@ bool FirewireChannel::OpenFirewire(void)
         CloseFirewire();
         return false;
     }
+
+    // check power, power on if off
+    if (GetPowerState() == Off)
+    {
+        quadlet_t *response, cmd = STB_POWER_ON;
+        VERBOSE(VB_IMPORTANT, LOC + QString("Powering on (cmd: 0x%1)")
+                                            .arg(cmd, 0, 16));
+        response = avc1394_transaction_block(fwhandle, fw_opts.node, 
+                                             &cmd, 1, 1);
+        if (response)
+        {
+            if (AVC1394_MASK_RESPONSE(response[0]) == AVC1394_RESPONSE_ACCEPTED)
+            {
+                VERBOSE(VB_IMPORTANT, LOC + QString("Power on cmd successful "
+                                                    "(0x%1)")
+                                                    .arg(response[0], 0, 16));
+                sleep(1);
+                if (GetPowerState() == Off)
+                {
+                    VERBOSE(VB_IMPORTANT, LOC + "STB is still off!?");
+                    return false;
+                }
+                return true;
+            }
+            else
+            {
+                VERBOSE(VB_IMPORTANT, LOC + QString("Power on cmd failed "
+                                                    "(0x%1)")
+                                                    .arg(response[0], 0, 16));
+                return false;
+            }
+        }
+        else
+        {
+            VERBOSE(VB_IMPORTANT, LOC + "Power on cmd failed (no response)");
+            return false;
+        }
+    }
     return true;
 }
 
@@ -204,4 +256,48 @@ void FirewireChannel::CloseFirewire(void)
 {
     VERBOSE(VB_CHANNEL, LOC + "Releasing raw1394 handle");
     raw1394_destroy_handle(fwhandle);
+}
+
+FirewireChannel::PowerState FirewireChannel::GetPowerState(void)
+{
+    quadlet_t *response, cmd = STB_POWER_STATE;
+
+    VERBOSE(VB_CHANNEL, LOC + QString("Requesting STB Power State (cmd: 0x%1)")
+                                      .arg(STB_POWER_STATE, 0, 16));
+    response = avc1394_transaction_block(fwhandle, fw_opts.node, &cmd, 1, 1);
+    if (response)
+    {
+        if (AVC1394_MASK_RESPONSE(response[0]) == AVC1394_RESPONSE_IMPLEMENTED)
+        {
+            if ((response[0] & 0xFF) == AVC1394_CMD_OPERAND_POWER_ON)
+            {
+                VERBOSE(VB_CHANNEL, LOC + QString("STB Power State: ON (0x%1)")
+                                                  .arg(response[0], 0, 16));
+                return On;
+            }
+            else if ((response[0] & 0xFF) == AVC1394_CMD_OPERAND_POWER_OFF)
+            {
+                VERBOSE(VB_IMPORTANT, LOC + QString("STB Power State: OFF " 
+                                                    "(0x%1)")
+                                                    .arg(response[0], 0, 16));
+                return Off;
+            }
+            else
+            {
+                VERBOSE(VB_CHANNEL, LOC + QString("STB Power State: "
+                                                  "Unknown Response (0x%1)")
+                                                  .arg(response[0], 0, 16));
+                return Failed;
+            }
+        }
+        else
+        {
+            VERBOSE(VB_CHANNEL, LOC + QString("STB Power State: Failed (0x%1)")
+                                              .arg(response[0], 0, 16));
+            return Failed;
+        }
+    }
+        
+    VERBOSE(VB_CHANNEL, LOC + "Failed to get STB Power State");
+    return Failed;
 }
