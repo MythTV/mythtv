@@ -31,7 +31,7 @@
 #******************************************************************************
 
 # version of script - change after each update
-VERSION="0.1.20060916-3"
+VERSION="0.1.20060917-1"
 
 
 ##You can use this debug flag when testing out new themes
@@ -522,6 +522,8 @@ def getDefaultParametersFromMythTVDB():
                         'MythArchiveUseFIFO',
                         'MythArchiveMainMenuAR',
                         'MythArchiveChapterMenuAR',
+                        'MythArchiveDateFormat',
+                        'MythArchiveTimeFormat',
                         'ISO639Language0',
                         'ISO639Language1'
                         )) order by value"""
@@ -570,59 +572,6 @@ def getOptions(options):
     write("Options - mediatype = %d, doburn = %d, createiso = %d, erasedvdrw = %d" \
            % (mediatype, doburn, docreateiso, erasedvdrw))
     write("          savefilename = '%s'" % savefilename)
-
-def getTimeDateFormats():
-    """Reads date and time settings from MythTV database and converts them into python date time formats"""
-
-    global dateformat
-    global timeformat
-
-    #DateFormat = 	ddd MMM d
-    #ShortDateFormat = M/d
-    #TimeFormat = h:mm AP
-
-
-    write( "Obtaining date and time settings from MySQL database for hostname "+ configHostname)
-
-    #TVFormat is not dependant upon the hostname.
-    sqlstatement = """select value,data from settings where (hostname='"""  + configHostname \
-                        + """' and value in (
-                        'DateFormat',
-                        'ShortDateFormat',
-                        'TimeFormat'
-                        )) order by value"""
-
-    # connect
-    db = getDatabaseConnection()
-    # create a cursor
-    cursor = db.cursor()
-    # execute SQL statement
-    cursor.execute(sqlstatement)
-    # get the resultset as a tuple
-    result = cursor.fetchall()
-    #We must have exactly 3 rows returned or else we have some MythTV settings missing
-    if int(cursor.rowcount)!=3:
-        fatalError("Failed to get time formats from the DB")
-    db.close()
-    del db
-    del cursor
-
-    #Copy the results into a dictionary for easier use
-    mydict = {}
-    for i in range(len(result)):
-        mydict[result[i][0]] = result[i][1]
-
-    del result
-
-    #At present we ignore the date time formats from MythTV and default to these
-    #basically we need to convert the MythTV formats into Python formats
-    #spit2k1 - TO BE COMPLETED!!
-
-    #Date and time formats used to show recording times see full list at
-    #http://www.python.org/doc/current/lib/module-time.html
-    dateformat="%a %d %b %Y"    #Mon 15 Dec 2005
-    timeformat="%I:%M %p"       #8:15 pm
-
 
 def expandItemText(infoDOM, text, itemnumber, pagenumber, keynumber,chapternumber, chapterlist ):
     """Replaces keywords in a string with variables from the XML and filesystem"""
@@ -3434,6 +3383,8 @@ alwaysRunMythtranscode = (defaultsettings["MythArchiveAlwaysUseMythTranscode"] =
 copyremoteFiles = (defaultsettings["MythArchiveCopyRemoteFiles"] == '1')
 mainmenuAspectRatio = defaultsettings["MythArchiveMainMenuAR"]
 chaptermenuAspectRatio = defaultsettings["MythArchiveChapterMenuAR"]
+dateformat = defaultsettings.get("MythArchiveDateFormat", "%a %d %b %Y")
+timeformat = defaultsettings.get("MythArchiveTimeFormat", "%I:%M %p")
 
 # external commands
 path_mplex = [defaultsettings["MythArchiveMplexCmd"], os.path.split(defaultsettings["MythArchiveMplexCmd"])[1]]
@@ -3456,11 +3407,6 @@ try:
         file = open(os.path.join(logpath, "mythburn.lck"), 'w')
         file.write("lock")
         file.close()
-
-        #debug use 
-        #videomode="ntsc"
-
-        getTimeDateFormats()
 
         #Load XML input file from disk
         jobDOM = xml.dom.minidom.parse(jobfile)
