@@ -969,9 +969,10 @@ def getFileInformation(file, outputfile):
         del cursor
 
     elif file.attributes["type"].value=="video":
+        filename = os.path.join(videopath, file.attributes["filename"].value.replace("'", "\\'"))
         sqlstatement="""select title, director, plot, rating, inetref, year, 
                         userrating, length, coverfile from videometadata 
-                        where filename='%s'""" % os.path.join(videopath, file.attributes["filename"].value)
+                        where filename='%s'""" % filename
 
         # connect
         db = getDatabaseConnection()
