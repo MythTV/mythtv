@@ -590,8 +590,9 @@ bool MythburnWizard::getFileDetails(ArchiveItem *a)
     QString outFile = tempDir + "/work/file.xml";
 
     // call mytharchivehelper to get files stream info etc.
-    QString command = QString("mytharchivehelper -i '%1' '%2' %3 > /dev/null 2>&1")
+    QString command = QString("mytharchivehelper -i \"%1\" \"%2\" %3 > /dev/null 2>&1")
             .arg(inFile).arg(outFile).arg(lenMethod);
+
     int res = system(command);
     if (WIFEXITED(res))
         res = WEXITSTATUS(res);
