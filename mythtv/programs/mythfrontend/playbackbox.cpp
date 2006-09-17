@@ -2130,6 +2130,15 @@ bool PlaybackBox::doRemove(ProgramInfo *rec, bool forgetHistory,
     if (playList.grep(rec->MakeUniqueKey()).count())
         togglePlayListItem(rec);
 
+    if (!forceMetadataDelete)
+    {
+        MSqlQuery query(MSqlQuery::InitCon());
+        query.prepare("UPDATE record SET last_delete = NOW() "
+                      "WHERE recordid = :RECORDID");
+        query.bindValue(":RECORDID", rec->recordid);
+        query.exec();
+    }
+
     return RemoteDeleteRecording(rec, forgetHistory, forceMetadataDelete);
 }
 

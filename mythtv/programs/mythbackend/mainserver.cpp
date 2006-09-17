@@ -1505,11 +1505,6 @@ void MainServer::DoDeleteInDB(const DeleteStruct *ds,
                                    .arg(logInfo));
     }
 
-    query.prepare("UPDATE record SET last_delete = NOW() "
-                  "WHERE recordid = :RECORDID");
-    query.bindValue(":RECORDID", pginfo->recordid);
-    query.exec();
-
     sleep(1);
 
     // Notify the frontend so it can requery for Free Space
