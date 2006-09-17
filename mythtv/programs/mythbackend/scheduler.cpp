@@ -956,12 +956,14 @@ void Scheduler::PruneRedundants(void)
 void Scheduler::UpdateNextRecord(void)
 {
     QMap<int, QDateTime> nextRecMap;
+    QDateTime now = QDateTime::currentDateTime();
 
     RecIter i = reclist.begin();
     while (i != reclist.end())
     {
         ProgramInfo *p = *i;
-        if (p->recstatus == rsWillRecord && nextRecMap[p->recordid].isNull())
+        if (p->recstartts > now && p->recstatus == rsWillRecord && 
+            nextRecMap[p->recordid].isNull())
             nextRecMap[p->recordid] = p->recstartts;
         i++;
     }
