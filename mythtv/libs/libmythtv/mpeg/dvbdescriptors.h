@@ -618,7 +618,7 @@ class SatelliteDeliverySystemDescriptor : public MPEGDescriptor
     uint Modulation() const { return _data[8]&0x1f; }
     QString ModulationString() const
     {
-        static QString ms[] = { "qpsk", "qpsk", "qpsk_8", "qam_16" };
+        static QString ms[] = { "qpsk", "qpsk", "8psk", "qam_16" };
         return (Modulation() <= kModulationQAM16) ? ms[Modulation()] : "auto";
     }
     // symbol_rate             28   9.0
