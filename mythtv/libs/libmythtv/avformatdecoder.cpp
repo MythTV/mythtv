@@ -76,6 +76,9 @@ static void align_dimensions(AVCodecContext *avctx, uint &width, uint &height)
 
 typedef MythDeque<AVFrame*> avframe_q;
 
+/**
+ * Management of libmpeg2 decoding
+ */
 class AvFormatDecoderPrivate
 {
   public:
@@ -730,7 +733,7 @@ extern "C" void HandleStreamChange(void* data) {
     decoder->ScanStreams(false);
 }
 
-/** \fn AvFormatDecoder::OpenFile(RingBuffer*, bool, char[kDecoderProbeBufferSize])
+/**
  *  OpenFile opens a ringbuffer for playback.
  *
  *  OpenFile deletes any existing context then use testbuf to
@@ -738,9 +741,9 @@ extern "C" void HandleStreamChange(void* data) {
  *  any valid streams to decode. If possible a position map is
  *  also built for quick skipping.
  *
- *  /param rbuffer pointer to a valid ringuffer.
- *  /param novideo if true then no video is sought in ScanSreams.
- *  /param _testbuf this paramater is not used by AvFormatDecoder.
+ *  \param rbuffer pointer to a valid ringuffer.
+ *  \param novideo if true then no video is sought in ScanSreams.
+ *  \param testbuf this paramater is not used by AvFormatDecoder.
  */
 int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo, 
                               char testbuf[kDecoderProbeBufferSize],
