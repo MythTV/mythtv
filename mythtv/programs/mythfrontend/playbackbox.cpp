@@ -2148,8 +2148,6 @@ bool PlaybackBox::doRemove(ProgramInfo *rec, bool forgetHistory,
         query.exec();
     }
 
-    clearProgramCache();
-
     return RemoteDeleteRecording(rec, forgetHistory, forceMetadataDelete);
 }
 
