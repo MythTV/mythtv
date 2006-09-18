@@ -3002,6 +3002,8 @@ void PlaybackBox::doEditScheduled()
         ScheduledRecording record;
         record.loadByProgram(curitem);
         record.exec();
+
+        connected = FillList();
     }
 }    
 
