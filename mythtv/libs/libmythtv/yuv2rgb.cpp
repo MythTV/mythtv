@@ -46,7 +46,7 @@ extern "C" int has_altivec(void);    // in libavcodec/ppc/dsputil_altivec.c
 #include "yuv2rgb.h"
 
 /** \file yuv2rgb.cpp
- *  \brief Contains various YUV, VUY and RGBA colorspace conversion rutines.
+ *  \brief Contains various YUV, VUY and RGBA colorspace conversion routines.
  *
  */
 
@@ -467,7 +467,10 @@ static void yuv420_argb32_non_mmx(unsigned char *image, unsigned char *py,
 #define ONE_HALF  (1 << (SCALEBITS - 1)) 
 #define FIX(x)          ((int) ((x) * (1L<<SCALEBITS) + 0.5))
 
-// actually does to i420
+/**
+ * \brief Convert planar RGB to YUV420.
+ *        Despite the name, this actually converts to i420
+ */
 void rgb32_to_yuv420p(unsigned char *lum, unsigned char *cb, unsigned char *cr,
                       unsigned char *alpha, unsigned char *src, 
                       int width, int height, int srcwidth)
@@ -697,8 +700,9 @@ void rgb32_to_yuv420p(unsigned char *lum, unsigned char *cb, unsigned char *cr,
  */
 
 // Plain C function which is used for non-Vector-compatible dimensions
-static void non_vec_yuv420_2vuy (uint8_t *, uint8_t *, uint8_t *,
-                                 uint8_t *, int, int, int, int, int);
+static void non_vec_yuv420_2vuy (uint8_t * image, uint8_t * py, uint8_t * pu,
+                                 uint8_t * pv, int h_size, int v_size,
+                                 int vuy_stride, int y_stride, int uv_stride);
 
 #ifdef MMX
 static void mmx_yuv420_2vuy (uint8_t * image, uint8_t * py,
@@ -926,6 +930,7 @@ static void altivec_yuv420_2vuy (uint8_t * image, uint8_t * py,
 
 
 /** \fn     get_vuy2yuv_conv(void)
+ *  \brief  Select a function to help speed up QuickTime YUV rendering
  *  \return A pointer to a YUV to VUY conversion function,
  *          which uses Altivec on appropriate machines,
  *          or MMX if it was compiled in.

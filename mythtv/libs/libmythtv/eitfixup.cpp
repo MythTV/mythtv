@@ -82,9 +82,10 @@ void EITFixUp::Fix(DBEvent &event) const
     }
 }
 
-/** \fn EITFixUp::FixBellExpressVu(Event&) const
+/**
  *  \brief Use this for the Canadian BellExpressVu to standardize DVB-S guide.
- *  \TODO deal with events that don't have eventype at the begining?
+ *  \todo  deal with events that don't have eventype at the begining?
+ *  \TODO
  */
 void EITFixUp::FixBellExpressVu(DBEvent &event) const
 {
@@ -378,7 +379,7 @@ void EITFixUp::FixPBS(DBEvent &event) const
     }
 }
 
-/** \fn EITFixUp::FixComHem(DBEvent&) const
+/**
  *  \brief Use this to standardize ComHem DVB-C service in Sweden.
  */
 void EITFixUp::FixComHem(DBEvent &event, bool process_subtitle) const

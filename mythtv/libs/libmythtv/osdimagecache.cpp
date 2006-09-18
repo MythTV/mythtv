@@ -95,7 +95,7 @@ OSDImageCache::~OSDImageCache()
     Reset();
 }
 
-/** \fn OSDImageCache::Contains(const QString&,bool)
+/**
  *  \brief Returns true if cached OSD image was found in the cache.
  *
  *  \param key The key for this image.

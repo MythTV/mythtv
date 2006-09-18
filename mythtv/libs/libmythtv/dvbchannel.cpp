@@ -566,12 +566,12 @@ void DVBChannel::SetPMT(const ProgramMapTable *pmt)
            Tuning functions for each of the four types of cards.
  *****************************************************************************/
 
-/** \fn DVBChannel::Tune(const DVBTuning&, bool)
+/**
  *  \brief Tunes the card to a frequency but does not deal with PIDs.
  *
  *   This is used by DVB Channel Scanner, the EIT Parser, and by TVRec.
  *
- *  \param channel     Info on transport to tune to
+ *  \param tuning      Info on transport to tune to
  *  \param force_reset If true, frequency tuning is done
  *                     even if it should not be needed.
  *  \param sourceid    Optional, forces specific sourceid (for diseqc setup).

@@ -1023,8 +1023,6 @@ void SIScan::UpdatePMTinDB(
     }
 }
 
-/** \fn SIScan::UpdatePATinDB(int,int,const ProgramAssociationTable*,const pmt_map_t&,bool)
- */
 void SIScan::UpdatePATinDB(
     int db_mplexid, const QString &friendlyName, int freqid,
     const ProgramAssociationTable *pat, const pmt_map_t &pmt_map,

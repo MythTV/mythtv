@@ -270,7 +270,7 @@ void RemoteEncoder::SpawnLiveTV(QString chainId, bool pip)
     SendReceiveStringList(strlist);
 }
 
-/** \fn EncoderLink::StopLiveTV(void)
+/**
  *  \brief Tells TVRec to stop a "Live TV" recorder.
  *         <b>This only works on local recorders.</b>
  *  \sa TVRec::StopLiveTV(void), EncoderLink::StopLiveTV(void)
@@ -473,7 +473,7 @@ int RemoteEncoder::GetPictureAttribute(int attr)
     return retval;
 }
 
-/** \fn RemoteEncoder::ChangeContrast(int, int, bool)
+/**
  *  \brief Changes brightness/contrast/colour/hue of a recording.
  *
  *  Note: In practice this only works with frame grabbing recorders.

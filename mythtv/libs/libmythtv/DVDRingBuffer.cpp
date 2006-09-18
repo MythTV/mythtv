@@ -1024,7 +1024,7 @@ bool DVDRingBufferPriv::IsSameChapter(int tmpcellid, int tmpvobid)
     return false;
 }
 
-/** \fn DVDRingBufferPriv::guess_palette(uint32_t, uint8_t, uint8_t)
+/**
  * \brief converts palette values from YUV to RGB
  */
 void DVDRingBufferPriv::guess_palette(uint32_t *rgba_palette,uint8_t *palette,
@@ -1055,8 +1055,8 @@ void DVDRingBufferPriv::guess_palette(uint32_t *rgba_palette,uint8_t *palette,
     }
 }
 
-/** \fn DVDRingBufferPriv::decode_rle(uint8_t, int, int, int, int, const uint8_t, int, int)
- * \brief copied from ffmpeg's dvdsub.c. decodes the bitmap from the subtitle packet.
+/** \brief decodes the bitmap from the subtitle packet.
+ *         copied from ffmpeg's dvdsub.c.
  */
 int DVDRingBufferPriv::decode_rle(uint8_t *bitmap, int linesize, int w, int h, 
                                   const uint8_t *buf, int nibble_offset, int buf_size)
@@ -1104,8 +1104,7 @@ int DVDRingBufferPriv::decode_rle(uint8_t *bitmap, int linesize, int w, int h,
     return 0;
 }
 
-/** \fn DVDRingBufferPriv::get_nibble(const uint8_t , int)
- * \brief copied from ffmpeg's dvdsub.c
+/** copied from ffmpeg's dvdsub.c
  */
 int DVDRingBufferPriv::get_nibble(const uint8_t *buf, int nibble_offset)
 {

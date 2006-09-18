@@ -361,7 +361,7 @@ void LiveTVChain::ClearSwitch(void)
     m_jumppos = 0;
 }
 
-/** \fn LiveTVChain::GetSwitchProgram(bool&,bool&)
+/**
  *  \brief Returns the recording we should switch to
  *
  *   This returns a ProgramInfo* and tells us if this is a discontiuous

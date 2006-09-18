@@ -635,7 +635,7 @@ int ProgramInfo::SecsTillStart(void) const
     return QDateTime::currentDateTime().secsTo(startts);
 }
 
-/** \fn ProgramInfo::GetProgramAtDateTime(const QString&,const QDateTime&,bool)
+/**
  *  \brief Returns a new ProgramInfo for the program that air at
  *         "dtime" on "channel".
  *  \param channel %Channel ID on which to search for program.

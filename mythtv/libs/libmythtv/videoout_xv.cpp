@@ -72,6 +72,8 @@ static void SetFromHW(Display *d, bool &useXvMC, bool &useXV, bool& useShm);
 static int calc_hue_base(const QString &adaptor_name);
 
 /** \class  VideoOutputXv
+ *  \brief  Implementation of Unix X Window System video output
+ *
  * Supports common video output methods used with %X11 Servers.
  *
  * This class suppurts XVideo with VLD acceleration (XvMC-VLD), XVideo with
@@ -469,7 +471,6 @@ void VideoOutputXv::InitDisplayMeasurements(uint width, uint height)
 }
 
 /**
- * \fn VideoOutputXv::GrabSuitableXvPort(Display*,Window,MythCodecID,uint,uint,int,XvMCSurfaceInfo*)
  * Internal function used to grab a XVideo port with the desired properties.
  *
  * \return port number if it succeeds, else -1.

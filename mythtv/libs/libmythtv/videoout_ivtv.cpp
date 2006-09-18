@@ -47,6 +47,10 @@ extern "C" {
 #define LOC QString("IVD: ")
 #define LOC_ERR QString("IVD Error: ")
 
+/** \class  VideoOutputIvtv
+ *  \brief  Implementation of video output for the Hauppage PVR 350 cards.
+ */
+
 VideoOutputIvtv::VideoOutputIvtv(void) :
     videofd(-1),              fbfd(-1),
     fps(30000.0f/1001.0f),    videoDevice("/dev/video16"),

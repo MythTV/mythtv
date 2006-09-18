@@ -892,7 +892,7 @@ int RingBuffer::Peek(void *buf, int count)
     return ReadFromBuf(buf, count, true);
 }
 
-/** \fn RingBuffer::ReadFromBuf(void*, int)
+/**
  *  \brief Reads from the read-ahead buffer, this is called by
  *         Read(void*, int) when the read-ahead thread is running.
  *  \param buf   Pointer to where data will be written
