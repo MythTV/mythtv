@@ -3624,6 +3624,8 @@ void PlaybackBox::keyPressEvent(QKeyEvent *e)
             paintSkipUpdate = false;
             update(drawTotalBounds);
         }
+        else if (action == "CHANGERECGROUP")
+            showRecGroupChooser();
         else if (titleList.count() > 1)
         {
             if (action == "DELETE")
