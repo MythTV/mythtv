@@ -1160,6 +1160,20 @@ class ServiceDescriptor : public MPEGDescriptor
         kServiceTypeRCS_FLS                  = 0x0F,
         kServiceTypeDVB_MHP                  = 0x10,
         kServiceTypeHDTV                     = 0x19,
+        kServiceTypeEchoStarTV1              = 0x91,
+        kServiceTypeEchoStarTV2              = 0x9a,
+        kServiceTypeEchoStarTV3              = 0xa4,
+        kServiceTypeEchoStarTV4              = 0xa6,
+        kServiceTypeNimiqTV1                 = 0x81,
+        kServiceTypeNimiqTV2                 = 0x85,
+        kServiceTypeNimiqTV3                 = 0x86,
+        kServiceTypeNimiqTV4                 = 0x89,
+        kServiceTypeNimiqTV5                 = 0x8a,
+        kServiceTypeNimiqTV6                 = 0x8d, 
+        kServiceTypeNimiqTV7                 = 0x8f,
+        kServiceTypeNimiqTV8                 = 0x90,
+        kServiceTypeNimiqTV9                 = 0x96,
+
     };
     // service_type             8   2.0
     uint ServiceType(void) const { return _data[2]; }
@@ -1178,7 +1192,20 @@ class ServiceDescriptor : public MPEGDescriptor
                                ServiceNameLength());
     }
     bool IsDTV(void) const
-        { return ServiceType() ==  kServiceTypeDigitalTelevision; }
+        { return ((ServiceType() ==  kServiceTypeDigitalTelevision) ||
+                  (ServiceType() ==  kServiceTypeEchoStarTV1) ||
+                  (ServiceType() ==  kServiceTypeEchoStarTV2) ||
+                  (ServiceType() ==  kServiceTypeEchoStarTV3) ||
+                  (ServiceType() ==  kServiceTypeEchoStarTV4) ||
+                  (ServiceType() ==  kServiceTypeNimiqTV1) ||
+                  (ServiceType() ==  kServiceTypeNimiqTV2) ||
+                  (ServiceType() ==  kServiceTypeNimiqTV3) ||
+                  (ServiceType() ==  kServiceTypeNimiqTV4) ||
+                  (ServiceType() ==  kServiceTypeNimiqTV5) ||
+                  (ServiceType() ==  kServiceTypeNimiqTV6) ||
+                  (ServiceType() ==  kServiceTypeNimiqTV7) ||
+                  (ServiceType() ==  kServiceTypeNimiqTV8) ||
+                  (ServiceType() ==  kServiceTypeNimiqTV9)); }
     bool IsDigitalAudio(void) const
         { return ServiceType() ==  kServiceTypeDigitalRadioSound; }
     bool IsHDTV(void) const
