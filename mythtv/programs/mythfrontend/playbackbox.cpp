@@ -1303,7 +1303,7 @@ void PlaybackBox::updateShowTitles(QPainter *p)
         {
             if (progCache && !progCache->empty())
                 ttype->SetText(tr(
-                    "There are no recordings available in your current view"));
+                    "There are no recordings in your current view"));
             else
                 ttype->SetText(tr(
                     "There are no recordings available"));
