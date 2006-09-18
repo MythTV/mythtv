@@ -1476,7 +1476,7 @@ bool PlaybackBox::FillList(bool useCachedData)
 
     bool LiveTVInAllPrograms = gContext->GetNumSetting("LiveTVInAllPrograms",0);
 
-    if (!useCachedData || !progCache)
+    if (!useCachedData || !progCache || progCache->empty())
     {
         clearProgramCache();
 
