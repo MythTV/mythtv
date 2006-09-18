@@ -19,6 +19,21 @@ using namespace std;
 const int kNetworkControlDataReadyEvent = 35671;
 const int kNetworkControlCloseEvent     = 35672;
 
+/** Is @p test an abbreviation of @p command ?
+ * The @p test substring must be at least @p minchars long.
+ * @param command the full command name
+ * @param test the string to test against the command name
+ * @param minchars the minimum length of test in order to declare a match
+ * @return true if @p test is the initial substring of @p command
+ */
+static bool is_abbrev(QString const& command, QString const& test, unsigned minchars = 1)
+{
+    if (test.length() < minchars)
+        return command == test;
+    else
+        return test == command.left(test.length());
+}
+
 NetworkControl::NetworkControl(int port)
           : QServerSocket(port, 1),
             prompt("# "),
@@ -172,20 +187,20 @@ void NetworkControl::processNetworkControlCommand(QString command)
 
     tokens[0] = tokens[0].lower();
 
-    if (tokens[0] == "jump")
+    if (is_abbrev("jump", tokens[0]))
         result = processJump(tokens);
-    else if (tokens[0] == "key")
+    else if (is_abbrev("key", tokens[0]))
         result = processKey(tokens);
-    else if (tokens[0] == "play")
+    else if (is_abbrev("play", tokens[0]))
         result = processPlay(tokens);
-    else if (tokens[0] == "query")
+    else if (is_abbrev("query", tokens[0]))
         result = processQuery(tokens);
-    else if (tokens[0] == "help")
+    else if (is_abbrev("help", tokens[0]))
         result = processHelp(tokens);
     else if ((tokens[0] == "exit") || (tokens[0] == "quit"))
         QApplication::postEvent(this,
                                 new QCustomEvent(kNetworkControlCloseEvent));
-    else
+    else if (! tokens[0].isEmpty())
         result = QString("INVALID command '%1', try 'help' for more info")
                          .arg(tokens[0]);
 
@@ -264,7 +279,7 @@ void NetworkControl::readClient(void)
         lineIn.replace(QRegExp("^\\s"), "");
 
         tokens = QStringList::split(" ", lineIn);
-        if (tokens[0].lower() != "key")
+        if (! is_abbrev("key", tokens[0].lower()))
             lineIn = lineIn.lower();
 
         ncLock.lock();
@@ -387,7 +402,7 @@ QString NetworkControl::processPlay(QStringList tokens)
                        .arg(tokens[0]);
 
     if ((tokens.size() >= 4) &&
-        (tokens[1] == "program") &&
+        (is_abbrev("program", tokens[1])) &&
         (tokens[2].contains(QRegExp("^\\d+$"))) &&
         (tokens[3].contains(QRegExp(
                          "^\\d\\d\\d\\d-\\d\\d-\\d\\dt\\d\\d:\\d\\d:\\d\\d$"))))
@@ -445,7 +460,7 @@ QString NetworkControl::processPlay(QStringList tokens)
                        "for playback mode")
                        .arg(gContext->getCurrentLocation());
     }
-    else if (tokens[1] == "chanid")
+    else if (is_abbrev("chanid", tokens[1], 5))
     {
         if (tokens[2].contains(QRegExp("^\\d+$")))
             message = QString("NETWORK_CONTROL CHANID %1").arg(tokens[2]);
@@ -453,14 +468,14 @@ QString NetworkControl::processPlay(QStringList tokens)
             return QString("ERROR: See 'help %1' for usage information")
                            .arg(tokens[0]);
     }
-    else if (tokens[1] == "channel")
+    else if (is_abbrev("channel", tokens[1], 5))
     {
         if (tokens.size() < 3)
             return "ERROR: See 'help play' for usage information";
 
-        if (tokens[2] == "up")
+        if (is_abbrev("up", tokens[2]))
             message = "NETWORK_CONTROL CHANNEL UP";
-        else if (tokens[2] == "down")
+        else if (is_abbrev("down", tokens[2]))
             message = "NETWORK_CONTROL CHANNEL DOWN";
         else if (tokens[2].contains(QRegExp("^[-\\.\\d_#]+$")))
             message = QString("NETWORK_CONTROL CHANNEL %1").arg(tokens[2]);
@@ -468,17 +483,17 @@ QString NetworkControl::processPlay(QStringList tokens)
             return QString("ERROR: See 'help %1' for usage information")
                            .arg(tokens[0]);
     }
-    else if (tokens[1] == "seek")
+    else if (is_abbrev("seek", tokens[1], 2))
     {
         if (tokens.size() < 3)
             return QString("ERROR: See 'help %1' for usage information")
                            .arg(tokens[0]);
 
-        if (tokens[2] == "beginning")
+        if (is_abbrev("beginning", tokens[2]))
             message = "NETWORK_CONTROL SEEK BEGINNING";
-        else if (tokens[2] == "forward")
+        else if (is_abbrev("forward", tokens[2]))
             message = "NETWORK_CONTROL SEEK FORWARD";
-        else if (tokens[2] == "rewind")
+        else if (is_abbrev("rewind", tokens[2]))
             message = "NETWORK_CONTROL SEEK BACKWARD";
         else if (tokens[2].contains(QRegExp("^\\d\\d:\\d\\d:\\d\\d$")))
         {
@@ -492,7 +507,7 @@ QString NetworkControl::processPlay(QStringList tokens)
             return QString("ERROR: See 'help %1' for usage information")
                            .arg(tokens[0]);
     }
-    else if (tokens[1] == "speed")
+    else if (is_abbrev("speed", tokens[1], 2))
     {
         if (tokens.size() < 3)
             return QString("ERROR: See 'help %1' for usage information")
@@ -502,15 +517,15 @@ QString NetworkControl::processPlay(QStringList tokens)
             (tokens[2].contains(QRegExp("^\\-*\\d+\\/\\d+x$"))) ||
             (tokens[2].contains(QRegExp("^\\d*\\.\\d+x$"))))
             message = QString("NETWORK_CONTROL SPEED %1").arg(tokens[2]);
-        else if (tokens[2] == "normal")
+        else if (is_abbrev("normal", tokens[2]))
             message = QString("NETWORK_CONTROL SPEED 1x");
-        else if (tokens[2] == "pause")
+        else if (is_abbrev("pause", tokens[2]))
             message = QString("NETWORK_CONTROL SPEED 0x");
         else
             return QString("ERROR: See 'help %1' for usage information")
                            .arg(tokens[0]);
     }
-    else if (tokens[1] == "stop")
+    else if (is_abbrev("stop", tokens[1], 2))
         message = QString("NETWORK_CONTROL STOP");
     else
         return QString("ERROR: See 'help %1' for usage information")
@@ -533,7 +548,7 @@ QString NetworkControl::processQuery(QStringList tokens)
         return QString("ERROR: See 'help %1' for usage information")
                        .arg(tokens[0]);
 
-    if (tokens[1] == "location")
+    if (is_abbrev("location", tokens[1]))
     {
         QString location = gContext->getCurrentLocation();
         result = location;
@@ -558,14 +573,14 @@ QString NetworkControl::processQuery(QStringList tokens)
                 result += "ERROR: Timed out waiting for reply from player";
         }
     }
-    else if (tokens[1] == "recordings")
-        return listRecordings();
     else if ((tokens.size() == 4) &&
-             (tokens[1] == "recording") &&
+             is_abbrev("recording", tokens[1]) &&
              (tokens[2].contains(QRegExp("^\\d+$"))) &&
              (tokens[3].contains(QRegExp(
                          "^\\d\\d\\d\\d-\\d\\d-\\d\\dt\\d\\d:\\d\\d:\\d\\d$"))))
         return listRecordings(tokens[2], tokens[3]);
+    else if (is_abbrev("recordings", tokens[1]))
+        return listRecordings();
     else
         return QString("ERROR: See 'help %1' for usage information")
                        .arg(tokens[0]);
@@ -580,7 +595,7 @@ QString NetworkControl::processHelp(QStringList tokens)
 
     if (tokens.size() >= 1)
     {
-        if (tokens[0] == "help")
+        if (is_abbrev("help", tokens[0]))
         {
             if (tokens.size() >= 2)
                 command = tokens[1];
@@ -593,7 +608,7 @@ QString NetworkControl::processHelp(QStringList tokens)
         }
     }
         
-    if (command == "jump")
+    if (is_abbrev("jump", command))
     {
         QMap<QString, QString>::Iterator it;
         helpText +=
@@ -607,7 +622,7 @@ QString NetworkControl::processHelp(QStringList tokens)
                         it.data() + "\r\n";
         }
     }
-    else if (command == "key")
+    else if (is_abbrev("key", command))
     {
         helpText +=
             "key LETTER           - Send the letter key specified\r\n"
@@ -628,7 +643,7 @@ QString NetworkControl::processHelp(QStringList tokens)
         }
         helpText += "\r\n";
     }
-    else if (command == "play")
+    else if (is_abbrev("play", command))
     {
         helpText +=
             "play channel up       - Change channel Up\r\n"
@@ -657,7 +672,7 @@ QString NetworkControl::processHelp(QStringList tokens)
             "play speed 16x        - Playback at 16x speed\r\n"
             "play stop             - Stop playback\r\n";
     }
-    else if (command == "query")
+    else if (is_abbrev("query", command))
     {
         helpText +=
             "query location        - Query current screen or location\r\n"
