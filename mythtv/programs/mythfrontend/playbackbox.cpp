@@ -1298,6 +1298,17 @@ void PlaybackBox::updateShowTitles(QPainter *p)
     if (titleList.count() <= 1)
     {
         LayerSet *norec = theme->GetSet("norecordings_list");
+        UITextType *ttype = (UITextType *)norec->GetType("msg");
+        if (ttype)
+        {
+            if (progCache && !progCache->empty())
+                ttype->SetText(tr(
+                    "There are no recordings available in your current view"));
+            else
+                ttype->SetText(tr(
+                    "There are no recordings available"));
+        }
+
         if (type != Delete && norec)
             norec->Draw(&tmp, 8, 0);
         else if (norec)
