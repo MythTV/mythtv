@@ -76,6 +76,9 @@ int delete_file_immediately(const QString &filename,
         if (finfo.isSymLink())
         {
             QString linktext = finfo.readLink();
+            if (linktext.left(1) != "/")
+                linktext = finfo.dirPath(true) + "/" + finfo.readLink();
+
             QFile target(linktext);
             if (!(success1 = target.remove()))
             {
@@ -1465,7 +1468,7 @@ void MainServer::DoDeleteThread(const DeleteStruct *ds)
     }
 
     /* Delete preview thumbnail. */
-    delete_file_immediately(ds->filename + ".png", followLinks, true);
+    delete_file_immediately(ds->filename + ".png", followLinks, false);
 
     DoDeleteInDB(ds, pginfo);
 
@@ -1558,18 +1561,24 @@ int MainServer::DeleteFile(const QString &filename, bool followLinks)
 {
     QFileInfo finfo(filename);
     int fd = -1, err = 0;
+    QString linktext = "";
 
     VERBOSE(VB_FILE, QString("About to unlink/delete file: '%1'")
             .arg(filename));
 
     QString errmsg = QString("Delete Error '%1'").arg(filename.local8Bit());
     if (finfo.isSymLink())
-        errmsg += QString(" -> '%2'").arg(finfo.readLink().local8Bit());
+    {
+        linktext = finfo.readLink();
+        if (linktext.left(1) != "/")
+            linktext = finfo.dirPath(true) + "/" + finfo.readLink();
+
+        errmsg += QString(" -> '%2'").arg(linktext.local8Bit());
+    }
 
     if (followLinks && finfo.isSymLink())
     {
-        if (followLinks)
-            fd = OpenAndUnlink(finfo.readLink());
+        fd = OpenAndUnlink(linktext);
         if (fd >= 0)
             err = unlink(filename.local8Bit());
     }
