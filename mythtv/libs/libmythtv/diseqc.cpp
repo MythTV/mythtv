@@ -192,7 +192,7 @@ bool DiSEqCDevSettings::Store(uint card_input_id) const
     return true;
 }
 
-/** \fn DiSEqCDevSettings::GetValue(uint)
+/**
  *  \brief Retrieves a value from this configuration chain by device id.
  *  \param devid Device id.
  *  \return Device scalar value.
@@ -207,7 +207,7 @@ double DiSEqCDevSettings::GetValue(uint devid) const
     return 0.0;
 }
 
-/** \fn DiSEqCDevSettings::SetValue(uint devid)
+/**
  *  \brief Sets a value for this configuration chain by device id.
  *  \param devid Device id.
  *  \param value Device scalar value.
@@ -740,7 +740,7 @@ const DiSEqCDevDevice::TypeTable DiSEqCDevDevice::dvbdev_lookup[4] =
 };
 
 
-/** \fn DiSEqCDevDevice::DiSEqCDevDevice(DiSEqCDevTree&,int)
+/**
  *  \param tree Parent reference to tree object.
  *  \param devid Device ID of this node.
  */
@@ -879,7 +879,7 @@ DiSEqCDevDevice *DiSEqCDevDevice::CreateByType(DiSEqCDevTree &tree,
  *  \return Child node object, or NULL if none.
  */
 
-/** \fn DiSEqCDevDevice::GetChildCount(void)
+/** \fn DiSEqCDevDevice::GetChildCount(void) const
  *  \brief Retrieves the proper number of children for this node.
  *  \return Number of children
  */
@@ -1443,7 +1443,7 @@ DiSEqCDevRotor::DiSEqCDevRotor(DiSEqCDevTree &tree, uint devid)
     Reset();
 }
 
-DiSEqCDevRotor::DiSEqCDevRotor::~DiSEqCDevRotor()
+DiSEqCDevRotor::~DiSEqCDevRotor()
 {
     if (m_child)
         delete m_child;
