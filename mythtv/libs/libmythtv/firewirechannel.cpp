@@ -16,6 +16,13 @@ class TVRec;
 #define LOC QString("FireChan: ")
 #define LOC_ERR QString("FireChan, Error: ")
 
+#ifndef AVC1394_PANEL_COMMAND_PASS_THROUGH
+#define AVC1394_PANEL_COMMAND_PASS_THROUGH     0x000007C00
+#endif
+
+#ifndef AVC1394_PANEL_OPERATION_0
+#define AVC1394_PANEL_OPERATION_0              0x000000020
+#endif
 
 #define DCT6200_CMD0  (AVC1394_CTYPE_CONTROL | \
                        AVC1394_SUBUNIT_TYPE_PANEL | \
