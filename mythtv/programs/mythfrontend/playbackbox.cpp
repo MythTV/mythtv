@@ -201,7 +201,7 @@ PlaybackBox::PlaybackBox(BoxType ltype, MythMainWindow *parent,
       progsInDB(0),
       // Other state
       curitem(NULL),                    delitem(NULL),
-      lastProgram(NULL),
+      lastProgram(NULL),                progCache(NULL),
       playingSomething(false),
       // Selection state variables
       haveGroupInfoSet(false),          inTitle(false),
@@ -387,6 +387,8 @@ PlaybackBox::~PlaybackBox(void)
         delete lastProgram;
         lastProgram = NULL;
     }
+
+    clearProgramCache();
 
     // disconnect preview generators
     QMutexLocker locker(&previewGeneratorLock);
@@ -1416,7 +1418,7 @@ void PlaybackBox::listChanged(void)
         UpdateProgressBar();
 }
 
-bool PlaybackBox::FillList()
+bool PlaybackBox::FillList(bool useCachedData)
 {
     ProgramInfo *p;
 
@@ -1463,13 +1465,18 @@ bool PlaybackBox::FillList()
 
     bool LiveTVInAllPrograms = gContext->GetNumSetting("LiveTVInAllPrograms",0);
 
-    vector<ProgramInfo *> *infoList;
-    infoList = RemoteGetRecordedList(listOrder == 0 || type == Delete);
-    if (infoList)
+    if (!useCachedData || !progCache)
+    {
+        clearProgramCache();
+
+        progCache = RemoteGetRecordedList(listOrder == 0 || type == Delete);
+    }
+
+    if (progCache)
     {
         sortedList[""] = "";
-        vector<ProgramInfo *>::iterator i = infoList->begin();
-        for ( ; i != infoList->end(); i++)
+        vector<ProgramInfo *>::iterator i = progCache->begin();
+        for ( ; i != progCache->end(); i++)
         {
             progsInDB++;
             p = *i;
@@ -1499,35 +1506,26 @@ bool PlaybackBox::FillList()
                     if (!sortedList.contains(sTitle))
                         sortedList[sTitle] = p->title;
                     progLists[sortedList[sTitle]].prepend(p);
+                    progLists[sortedList[sTitle]].setAutoDelete(false);
                 } 
 
                 if ((viewMask & VIEW_RECGROUPS) &&
                     p->recgroup != "") // Show recording groups                 
                 { 
-                    progLists[p->recgroup].prepend(p);
                     sortedList[p->recgroup.lower()] = p->recgroup;
-
-                    // If another view is also used, unset autodelete as
-                    // another group will do it.
-                    if ((viewMask & ~VIEW_RECGROUPS))
-                        progLists[p->recgroup].setAutoDelete(false);
+                    progLists[p->recgroup].prepend(p);
+                    progLists[p->recgroup].setAutoDelete(false);
                 }
 
                 if ((viewMask & VIEW_CATEGORIES) &&
                     p->category != "") // Show categories
                 {
-                    progLists[p->category].prepend(p);
                     sortedList[p->category.lower()] = p->category;
-                    // If another view is also used, unset autodelete as
-                    // another group will do it
-                    if ((viewMask & ~VIEW_CATEGORIES))
-                        progLists[p->category].setAutoDelete(false);
+                    progLists[p->category].prepend(p);
+                    progLists[p->category].setAutoDelete(false);
                 }
             }
-            else
-                delete p;
         }
-        delete infoList;
     }
 
     if (sortedList.count() == 0)
@@ -1657,7 +1655,7 @@ bool PlaybackBox::FillList()
         }
     }
 
-    return (infoList != NULL);
+    return (progCache != NULL);
 }
 
 static void *SpawnPreviewVideoThread(void *param)
@@ -2138,6 +2136,8 @@ bool PlaybackBox::doRemove(ProgramInfo *rec, bool forgetHistory,
         query.bindValue(":RECORDID", rec->recordid);
         query.exec();
     }
+
+    clearProgramCache();
 
     return RemoteDeleteRecording(rec, forgetHistory, forceMetadataDelete);
 }
@@ -3373,7 +3373,7 @@ void PlaybackBox::toggleTitleView(void)
     viewMask = viewMaskToggle(viewMask, VIEW_TITLES);
 
     playList.clear();
-    connected = FillList();      
+    connected = FillList(true);      
 }
 
 void PlaybackBox::promptEndOfRecording(ProgramInfo *rec)
@@ -3613,14 +3613,14 @@ void PlaybackBox::keyPressEvent(QKeyEvent *e)
         else if (action == "TOGGLEFAV")
         {
             playList.clear();
-            connected = FillList();      
+            connected = FillList(true);      
             paintSkipUpdate = false;
             update(drawTotalBounds);
         }
         else if (action == "TOGGLERECORD")
         {
             viewMask = viewMaskToggle(viewMask, VIEW_TITLES);
-            connected = FillList();
+            connected = FillList(true);
             paintSkipUpdate = false;
             update(drawTotalBounds);
         }
@@ -4125,7 +4125,7 @@ void PlaybackBox::closeRecGroupPopup(bool refreshList)
     recGroupOkButton = NULL;
 
     if (refreshList)
-        connected = FillList();
+        connected = FillList(true);
 
     paintSkipUpdate = false;
     paintSkipCount = 2;
@@ -4616,6 +4616,7 @@ void PlaybackBox::showRecTitleChanger()
 void PlaybackBox::setRecGroup(void)
 {
     QString newRecGroup = recGroupLineEdit->text();
+    ProgramInfo *tmpItem;
 
     if (newRecGroup != "" )
     {
@@ -4634,10 +4635,12 @@ void PlaybackBox::setRecGroup(void)
                      (newRecGroup == "LiveTV"))
                 delitem->SetAutoExpire(kLiveTVAutoExpire);
 
-            delitem->ApplyRecordRecGroupChange(newRecGroup);
+
+            tmpItem = findMatchingProg(delitem);
+            if (tmpItem)
+                tmpItem->ApplyRecordRecGroupChange(newRecGroup);
         } else if (playList.count() > 0) {
             QStringList::Iterator it;
-            ProgramInfo *tmpItem;
 
             for (it = playList.begin(); it != playList.end(); ++it )
             {
@@ -4663,18 +4666,20 @@ void PlaybackBox::setRecGroup(void)
 void PlaybackBox::setPlayGroup(void)
 {
     QString newPlayGroup = recGroupListBox->currentText();
+    ProgramInfo *tmpItem;
 
     if (newPlayGroup == tr("Default"))
         newPlayGroup = "Default";
 
     if (delitem)
     {
-        delitem->ApplyRecordPlayGroupChange(newPlayGroup);
+        tmpItem = findMatchingProg(delitem);
+        if (tmpItem)
+            tmpItem->ApplyRecordPlayGroupChange(newPlayGroup);
     } 
     else if (playList.count() > 0) 
     {
         QStringList::Iterator it;
-        ProgramInfo *tmpItem;
 
         for (it = playList.begin(); it != playList.end(); ++it )
         {
@@ -4690,17 +4695,20 @@ void PlaybackBox::setRecTitle()
 {
     QString newRecTitle = recGroupLineEdit->text();
     QString newRecSubtitle = recGroupLineEdit1->text();
+    ProgramInfo *tmpItem;
 
     if (newRecTitle == "")
         return;
 
-    delitem->ApplyRecordRecTitleChange(newRecTitle, newRecSubtitle);
+    tmpItem = findMatchingProg(delitem);
+    if (tmpItem)
+        tmpItem->ApplyRecordRecTitleChange(newRecTitle, newRecSubtitle);
 
     inTitle = gContext->GetNumSetting("PlaybackBoxStartInTitle", 0);
     titleIndex = 0;
     progIndex = 0;
 
-    connected = FillList();
+    connected = FillList(true);
     paintSkipUpdate = false;
     update(drawTotalBounds);
 }
@@ -4833,6 +4841,18 @@ void PlaybackBox::recGroupOldPasswordChanged(const QString &newText)
         recGroupOkButton->setEnabled(true);
     else
         recGroupOkButton->setEnabled(false);
+}
+
+void PlaybackBox::clearProgramCache(void)
+{
+    if (!progCache)
+        return;
+
+    vector<ProgramInfo *>::iterator i = progCache->begin();
+    for ( ; i != progCache->end(); i++)
+        delete *i;
+    delete progCache;
+    progCache = NULL;
 }
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

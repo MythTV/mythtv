@@ -231,7 +231,7 @@ class PlaybackBox : public MythDialog
     uint IncPreviewGeneratorAttempts(const QString &fn);
 
   private:
-    bool FillList(void);
+    bool FillList(bool useCachedData = false);
     void UpdateProgressBar(void);
 
     QString cutDown(QString, QFont *, int);
@@ -291,6 +291,8 @@ class PlaybackBox : public MythDialog
     void updateGroupInfo(QPainter *p, QRect& pr, QPixmap& pix,
                          QString cont_name = "group_info");
     void setDefaultView(ViewType defaultView);
+
+    void clearProgramCache(void);
 
     // Settings ///////////////////////////////////////////////////////////////
     /// If "Play"  this is a recording playback selection UI,
@@ -380,6 +382,8 @@ class PlaybackBox : public MythDialog
     ProgramInfo        *delitem;
     /// Last Program played by play(ProgramInfo*,bool)
     ProgramInfo        *lastProgram;
+    /// ProgramInfo cache for FillList()
+    vector<ProgramInfo *> *progCache;
     /// playingSomething is set to true iff a full screen recording is playing
     bool                playingSomething;
 
