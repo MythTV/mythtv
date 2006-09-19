@@ -68,6 +68,7 @@ class DBEvent
         credits(NULL),
         chanid(_chanid),
         partnumber(0),           parttotal(0),
+        syndicatedepisodenumber(QString::null),
         fixup(_fixup),           flags(0),
         category_type(_category_type)
     {
@@ -90,6 +91,7 @@ class DBEvent
         credits(NULL),
         chanid(_chanid),
         partnumber(0),           parttotal(0),
+        syndicatedepisodenumber(QString::null),
         fixup(_fixup),           flags(0),
         category_type(0/*kCategoryNone*/)
     {
@@ -130,6 +132,7 @@ class DBEvent
     uint32_t      chanid;
     uint16_t      partnumber;
     uint16_t      parttotal;
+    QString       syndicatedepisodenumber;
     unsigned char fixup;
     unsigned char flags;
     unsigned char category_type;

@@ -134,6 +134,7 @@ uint DBEvent::GetOverlappingPrograms(MSqlQuery &query,
         "       starttime,      endtime, "
         "       closecaptioned, subtitled,     stereo,      hdtv, "
         "       partnumber,     parttotal, "
+        "       syndicatedepisodenumber, "
         "       airdate,        originalairdate "
         "FROM program "
         "WHERE chanid   = :CHANID AND "
@@ -170,8 +171,10 @@ uint DBEvent::GetOverlappingPrograms(MSqlQuery &query,
 
         prog.partnumber = query.value(11).toUInt();
         prog.parttotal  = query.value(12).toUInt();
-        prog.airdate    = query.value(13).toString();
-        prog.originalairdate = query.value(14).toDate();
+        prog.syndicatedepisodenumber = 
+                          QString::fromUtf8(query.value(13).toString());
+        prog.airdate    = query.value(14).toString();
+        prog.originalairdate = query.value(15).toDate();
 
         programs.push_back(prog);
         count++;
@@ -319,6 +322,11 @@ uint DBEvent::UpdateDB(MSqlQuery &query, const DBEvent &match) const
     uint lparttotal =
         (!parttotal  && match.parttotal ) ? match.parttotal  : parttotal;
 
+    QString lsyndicatedepisodenumber = syndicatedepisodenumber;
+    if (lsyndicatedepisodenumber.isEmpty() && 
+        !match.syndicatedepisodenumber.isEmpty())
+        lsyndicatedepisodenumber = match.syndicatedepisodenumber;
+
     query.prepare(
         "UPDATE program "
         "SET title          = :TITLE,     subtitle      = :SUBTITLE, "
@@ -328,6 +336,7 @@ uint DBEvent::UpdateDB(MSqlQuery &query, const DBEvent &match) const
         "    closecaptioned = :CC,        subtitled     = :SUBTITLED, "
         "    stereo         = :STEREO,    hdtv          = :HDTV, "
         "    partnumber     = :PARTNO,    parttotal     = :PARTTOTAL, "
+        "    syndicatedepisodenumber = :SYNDICATENO, "
         "    airdate        = :AIRDATE,   originalairdate=:ORIGAIRDATE, "
         "    listingsource  = :LSOURCE "
         "WHERE chanid    = :CHANID AND "
@@ -348,6 +357,7 @@ uint DBEvent::UpdateDB(MSqlQuery &query, const DBEvent &match) const
     query.bindValue(":HDTV",        lhdtv);
     query.bindValue(":PARTNO",      lpartnumber);
     query.bindValue(":PARTTOTAL",   lparttotal);
+    query.bindValue(":SYNDICATENO", lsyndicatedepisodenumber.utf8());
     query.bindValue(":AIRDATE",     lairdate.isEmpty() ? "0000" : lairdate);
     query.bindValue(":ORIGAIRDATE", loriginalairdate);
     query.bindValue(":LSOURCE",     1);
@@ -472,6 +482,7 @@ uint DBEvent::InsertDB(MSqlQuery &query) const
         "  starttime,      endtime, "
         "  closecaptioned, subtitled,      stereo,          hdtv, "
         "  partnumber,     parttotal, "
+        "  syndicatedepisodenumber, "
         "  airdate,        originalairdate,listingsource ) "
         "VALUES ("
         " :CHANID,        :TITLE,         :SUBTITLE,       :DESCRIPTION, "
@@ -479,6 +490,7 @@ uint DBEvent::InsertDB(MSqlQuery &query) const
         " :STARTTIME,     :ENDTIME, "
         " :CC,            :SUBTITLED,     :STEREO,         :HDTV, "
         " :PARTNUMBER,    :PARTTOTAL, "
+        " :SYNDICATENO, "
         " :AIRDATE,       :ORIGAIRDATE,   :LSOURCE ) ");
 
     QString cattype = myth_category_type_to_string(category_type);
@@ -497,6 +509,7 @@ uint DBEvent::InsertDB(MSqlQuery &query) const
     query.bindValue(":HDTV",        IsHDTV());
     query.bindValue(":PARTNUMBER",  partnumber);
     query.bindValue(":PARTTOTAL",   parttotal);
+    query.bindValue(":SYNDICATENO", syndicatedepisodenumber.utf8());
     query.bindValue(":AIRDATE",     airdate.isEmpty() ? "0000" : airdate);
     query.bindValue(":ORIGAIRDATE", originalairdate);
     query.bindValue(":LSOURCE",     1);
