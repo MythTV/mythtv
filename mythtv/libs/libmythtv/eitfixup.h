@@ -27,6 +27,7 @@ class EITFixUp
         kFixComHem     = 0x0010,
         kFixSubtitle   = 0x0020,
         kFixAUStar     = 0x0040,
+        kFixMCA        = 0x0080,
 
         // Early fixups
         kEFixPro7Sat   = 0x0100,
@@ -51,6 +52,7 @@ class EITFixUp
     void FixPBS(DBEvent &event) const;           // USA ATSC
     void FixComHem(DBEvent &event, bool parse_subtitle) const; // Sweden DVB-C
     void FixAUStar(DBEvent &event) const;        // Australia DVB-S
+    void FixMCA(DBEvent &event) const;        // MultiChoice Africa DVB-S
 
     const QRegExp m_bellYear;
     const QRegExp m_bellActors;
@@ -80,6 +82,14 @@ class EITFixUp
     const QRegExp m_comHemSeries1;
     const QRegExp m_comHemSeries2;
     const QRegExp m_comHemTSub;
+    const QRegExp m_mcaIncompleteTitle;
+    const QRegExp m_mcaSubtitle;
+    const QRegExp m_mcaSeries;
+    const QRegExp m_mcaCredits;
+    const QRegExp m_mcaActors;
+    const QRegExp m_mcaActorsSeparator;
+    const QRegExp m_mcaYear;
+    const QRegExp m_mcaCC;
 };
 
 #endif // EITFIXUP_H

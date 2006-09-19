@@ -518,6 +518,8 @@ static void init_fixup(QMap<uint64_t,uint> &fix)
     fix[ 769LL << 32 | 8468 << 16] = EITFixUp::kEFixPro7Sat; // DVB-T Berlin
     fix[3075LL << 32 | 8468 << 16] = EITFixUp::kEFixPro7Sat; // DVB-T Bremen
     fix[                133 << 16] = EITFixUp::kEFixPro7Sat; // Premiere and pro7/Sat.1 
+
+    fix[               6144 << 16] = EITFixUp::kFixMCA;      // MultiChoice Africa
 }
 
 static int calc_eit_utc_offset(void)
