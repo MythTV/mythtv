@@ -415,6 +415,7 @@ xvmc_pro="no"
 xvmc_opengl="no"
 xvmc_lib=""
 mac_accel="no"
+mac_corevideo="no"
 opengl_vsync="no"
 direct_fb="no"
 direct_x="no"
@@ -2497,6 +2498,19 @@ if test x"$mac_accel" = x"yes" ; then
     fi
 fi
 
+# CoreVideo in only available on Mac OS 10.4, or on 10.3 with QuickTime 7.
+# This checks for it, and some other calls that the module needs
+if test $targetos = Darwin; then
+    cat > $TMPC << EOF
+#include <QuartzCore/CVDisplayLink.h>
+#include <AGL/agl.h>
+int main( void ) { return aglGetCGLContext(0,0L); }
+EOF
+    if $cc -o $TMPE $TMPC -framework AGL > /dev/null 2>&1; then
+        mac_corevideo="yes"
+    fi
+fi
+
 # Ubuntu Dapper installs NVIDIA GL headers to a weird location in order
 # not to overwrite the headers installed from Mesa, etc. We need to
 # add that path to include paths if that's the case. 
@@ -3093,6 +3107,10 @@ if test "$mac_accel" = "yes" ; then
   echo "#define HAVE_DVDV 1" >> $TMPH
   echo "#define CONFIG_MAC_ACCEL 1" >> $TMPH
   echo "CONFIG_MAC_ACCEL=yes" >> $MYTH_CONFIG_MAK
+fi
+
+if test "$mac_corevideo" = "yes"; then
+  CCONFIG="$CCONFIG using_corevideo"
 fi
 
 if test "$x264" = "yes" ; then
