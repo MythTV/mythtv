@@ -5200,6 +5200,9 @@ bool NuppelVideoPlayer::TranscodeGetNextFrame(QMap<long long, int>::Iterator &dm
         long long lastDecodedFrameNumber =
             videoOutput->GetLastDecodedFrame()->frameNumber;
 
+        if (totalFrames && lastDecodedFrameNumber >= totalFrames)
+            return false;
+
         if ((lastDecodedFrameNumber >= dm_iter.key()) ||
             (lastDecodedFrameNumber == -1 && dm_iter.key() == 0))
         {
@@ -5211,7 +5214,7 @@ bool NuppelVideoPlayer::TranscodeGetNextFrame(QMap<long long, int>::Iterator &dm
                 msg += QString(" to %1").arg((int)dm_iter.key());
                 VERBOSE(VB_GENERAL, msg);
 
-                if(dm_iter.key() == totalFrames)
+                if(dm_iter.key() >= totalFrames)
                    return false;
 
                 GetDecoder()->DoFastForward(dm_iter.key());
