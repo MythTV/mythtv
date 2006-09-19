@@ -1,5 +1,5 @@
 /**
-\mainpage %MythTV Architecture
+\mainpage MythTV Architecture
 
 \section intro Introduction
 
@@ -44,21 +44,22 @@ to documentation on the code itself.
 
 \section libs Libraries
 
-%MythTV is divided up into eight libraries:
+%MythTV is divided up into eleven libraries:
 <dl>
-  <dt>libmyth                <dd>%MythTV Plugin library.
+  <dt>libmyth                <dd>Core %MythTV library. Used by the Plugins.
       The \ref database_subsystem "database",
       \ref audio_subsystem "audio",
       \ref lcd_subsystem "LCD",
       \ref osd_subsystem "OSD",
-      \ref lirc_subsystem "lirc", and the
+      \ref lirc_subsystem "LIRC", and the
       \ref myth_network_protocol "myth network protocol" are supported by libmyth.
-  <dt>libmythtv              <dd>Core %MythTV library.
+  <dt>libmythtv              <dd>%MythTV %TV functionality library.
       The 
-      \ref recorder_subsystem "recorders" and 
+      \ref recorder_subsystem "recorders", \ref video_subsystem "video" and 
       \ref av_player_subsystem "A/V players" are supported by libmythtv.
   <dt>libmythui              <dd>Main user interface rendering library
-  <dt>libavcodec/libavformat <dd>This is the ffmpeg A/V decoding library (aka avlib).
+  <dt>libavcodec/libavformat/libavutil
+      <dd>This is the ffmpeg A/V decoding library (aka avlib).
       <a href="http://ffmpeg.sourceforge.net/documentation.php">Documented Externally</a>.
   <dt>libmythmpeg2           <dd>Alternate MPEG-1/2 A/V decoding library.
       <a href="http://libmpeg2.sourceforge.net/">External Website</a>.
@@ -69,6 +70,11 @@ to documentation on the code itself.
   <dt>libmythsoundtouch      <dd>Pitch preserving audio resampling library.
       <a href="http://sky.prohosting.com/oparviai/soundtouch/">External Website</a>.
       We use this for the time-stretch feature.
+  <dt>libmythdvdnav
+      <dd>Used for navigating DVD menus when using the internal player
+  <dt>libmythfreemheg        <dd>UK interactive %TV viewer
+  <dt>libmythlivemedia       <dd>Support for the FreeBox recorder device
+  <dt>libmythupnp            <dd>Initial uPnP (universal Plug and Play) support
 </dl>
 Two libraries libmythmpeg2 and libmythsamplerate appear redundant, but
 libmpeg2 decodes MPEG-2 more quickly than ffmpeg on some systems, and
@@ -79,15 +85,18 @@ to match the hardware sample rate to the A/V streams audio sample rate.
 The database schema is documented here \ref db_schema.
 
 \section apps Applications
-%MythTV contains 12 applications:
+%MythTV contains 14 applications:
 
 <dl>
   <dt>mythbackend      <dd>This is the backend which runs the recorders.
   <dt>mythfrontend     <dd>This is the frontend which is the main application for viewing
                            programs and using the %MythTV plugins.
-  <dt>mythtv           <dd>This is the "External Player" used to play videos from
-                           within mythfrontend that are not proper programs,
-                           such as your home movies.
+  <dt>mythtv-setup     <dd>This is the program which sets up the database
+                           to use a machine as a backend server.
+  <dt>mythtv           <dd>This was an "External Player" used to play videos
+                           from within mythfrontend. Setting the player command
+                           to "internal" does the same thing now. This is handy
+                           for testing the audio and videoout code, though.
   <dt>mythtvosd        <dd>This is used externally by programs that want to pop-up
                             an <i>on screen display</i> in %MythTV while one is watching a
                            recording.
@@ -117,7 +126,10 @@ The database schema is documented here \ref db_schema.
                            programs to record based on the first letter of
                            the program name.
   <dt>mythuitest       <dd>This is a test program for libmythui development.
-  <dt>mythlcd          <dd>This is a test program for %MythTV %LCD support.
+  <dt>mythlcdserver    <dd>This is an interface between a number of Myth
+                           clients and a small text display (LCDProc server).
+  <dt>mythwelcome/mythshutdown
+      <dd>These programs manage Power Saving (shutdown/wakeup) on your Myth PCs.
 </dl>
 
 \section fe_plugins Frontend Plugins
@@ -166,6 +178,10 @@ from the database automagically when used in %MythTV's window classes.
 
 /** \defgroup lirc_subsystem        LIRC Subsystem
     \todo No one is working on documenting the LIRC Subsystem
+ */
+
+/** \defgroup video_subsystem       Video Subsystem
+    \todo No one is working on documenting the video subsystem
  */
 
 /** \defgroup myth_network_protocol Myth Network Protocol
