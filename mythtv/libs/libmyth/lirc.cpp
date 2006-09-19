@@ -9,9 +9,6 @@
 
 #include "mythcontext.h"
 
-#include <iostream>
-using namespace std;
-
 #include "lirc.h"
 #include "lircevent.h"
 #include "util.h"
@@ -25,7 +22,7 @@ LircClient::LircClient(QObject *main_window)
     mainWindow = main_window;
 }
 
-int LircClient::Init(QString &config_file, QString &program)
+int LircClient::Init(const QString &config_file, const QString &program)
 {
     int fd;
 
@@ -33,21 +30,27 @@ int LircClient::Init(QString &config_file, QString &program)
     fd = lirc_init((char *)program.latin1(), 1);
     if (fd == -1)
     {
-        cerr << "lirc_init failed for " << program
-             << ", see preceding messages\n";
+        VERBOSE(VB_IMPORTANT,
+                QString("lirc_init failed for %1, see preceding messages")
+                .arg(program));
         return -1;
     }
 
     /* parse the config file */
     if (lirc_readconfig((char *)config_file.latin1(), &lircConfig, NULL))
     {
-         cerr << "Failed to read lirc config " << config_file << " for " 
-              << program << endl;
+        VERBOSE(VB_IMPORTANT,
+                QString("Failed to read lirc config %1 for %2")
+                .arg(config_file).arg(program));
         lirc_deinit();
         return -1;
     }
 
     external_app = gContext->GetSetting("LircKeyPressedApp") + " &";
+
+    VERBOSE(VB_GENERAL,
+            QString("lirc init success using configuration file: %1")
+            .arg(config_file));
 
     return 0;
 }
@@ -69,7 +72,7 @@ void LircClient::Process(void)
     {
         if (!ir)
             continue;
-        while ((ret = lirc_code2char(lircConfig, ir, &code)) == 0 && 
+        while ((ret = lirc_code2char(lircConfig, ir, &code)) == 0 &&
                code != NULL)
         {
             QKeySequence a(code);
@@ -113,8 +116,9 @@ void LircClient::SpawnApp(void)
 
     if (status > 0)
     {
-        cerr << "External key pressed command exited with status "
-             << status << endl;
+        VERBOSE(VB_IMPORTANT,
+                QString("External key pressed command exited with status %1")
+                .arg(status));
     }
 }
 

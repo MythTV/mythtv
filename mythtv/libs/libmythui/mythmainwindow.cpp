@@ -6,6 +6,8 @@
 #include <qpixmap.h>
 #include <qkeysequence.h>
 #include <qpaintdevicemetrics.h>
+#include <qdir.h>
+#include <qfile.h>
 #ifdef QWS
 #include <qwindowsystem_qws.h>
 #endif
@@ -51,11 +53,12 @@
 #ifdef USE_LIRC
 static void *SpawnLirc(void *param)
 {
-    MythMainWindow *main_window = (MythMainWindow *)param;
     QString config_file = MythContext::GetConfDir() + "/lircrc";
-    QString program("mythtv");
-    LircClient *cl = new LircClient(main_window);
-    if (!cl->Init(config_file, program))
+    if (!QFile::exists(config_file))
+        config_file = QDir::homeDirPath() + "/.lircrc";
+
+    LircClient *cl = new LircClient((MythMainWindow *)param);
+    if (!cl->Init(config_file, "mythtv"))
         cl->Process();
 
     return NULL;
