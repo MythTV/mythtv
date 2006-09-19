@@ -2117,16 +2117,11 @@ void TV::ProcessKeypress(QKeyEvent *e)
                             wantsToQuit = true;
                             exitPlayer = true;
                             break;
-                        case 3:
-                            nvp->SetWatched(true);
-                            wantsToQuit = true;
-                            exitPlayer = true;
-                            break;
-                        case 4: case 0:
+                        case 3: case 0:
                             paused = !paused;
                             DoPause();
                             break;
-                        case 5:
+                        case 4:
                             wantsToQuit = true;
                             exitPlayer = true;
                             requestDelete = true;
@@ -2492,7 +2487,6 @@ void TV::ProcessKeypress(QKeyEvent *e)
                 QStringList options;
                 options += tr("Save this position and go to the menu");
                 options += tr("Do not save, just exit to the menu");
-                options += tr("Mark as watched and go to the menu");
                 options += tr("Keep watching");
                 options += tr("Delete this recording");
 
