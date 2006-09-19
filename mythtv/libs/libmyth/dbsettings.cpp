@@ -48,6 +48,7 @@ public:
 protected:
     TransientLabel    *info;
     TransientLineEdit *dbHostName;
+    TransientLineEdit *dbPort;
     TransientLineEdit *dbName;
     TransientLineEdit *dbUserName;
     TransientLineEdit *dbPassword;
@@ -133,6 +134,13 @@ MythDbSettings1::MythDbSettings1() :
                                         "the machine hosting the database. "
                                         "This information is required."));
     addChild(dbHostName);
+
+    dbPort = new TransientLineEdit(true);
+    dbPort->setLabel(QObject::tr("Host Port"));
+    dbPort->setHelpText(QObject::tr("The port number the database is running "
+                                    "on, if it's not the default database "
+                                    "port."));
+    addChild(dbPort);
     
     dbName = new TransientLineEdit(true);
     dbName->setLabel(QObject::tr("Database"));
@@ -249,6 +257,10 @@ void MythDbSettings1::load()
     dbHostName->setValue(params.dbHostName);
     if (params.dbHostName.isEmpty())
         dbHostName->setLabel("* " + dbHostName->getLabel());
+
+    if (params.dbPort)
+        dbPort->setValue(QString::number(params.dbPort));
+
     dbUserName->setValue(params.dbUserName);
     if (params.dbUserName.isEmpty())
         dbUserName->setLabel("* " + dbUserName->getLabel());
@@ -283,6 +295,7 @@ void MythDbSettings1::save()
     DatabaseParams params = gContext->GetDatabaseParams();
     
     params.dbHostName    = dbHostName->getValue();
+    params.dbPort        = dbPort->getValue().toInt();
     params.dbUserName    = dbUserName->getValue();
     params.dbPassword    = dbPassword->getValue();
     params.dbName        = dbName->getValue();

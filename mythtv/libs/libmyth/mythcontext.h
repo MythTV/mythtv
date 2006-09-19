@@ -113,6 +113,7 @@ enum LogPriorities
 struct DatabaseParams
 {
     QString dbHostName;         ///< database server
+    int     dbPort;             ///< database port
     QString dbUserName;         ///< DB user name 
     QString dbPassword;         ///< DB password
     QString dbName;             ///< database name

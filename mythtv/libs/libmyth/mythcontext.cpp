@@ -611,8 +611,12 @@ bool MythContextPrivate::WriteSettingsFile(const DatabaseParams &params,
     
     VERBOSE(VB_IMPORTANT, QString("Writing settings file %1").arg(path));
     QTextStream s(f);
-    s << "DBHostName=" << params.dbHostName << endl
-      << "DBUserName=" << params.dbUserName << endl
+    s << "DBHostName=" << params.dbHostName << endl;
+
+    if (params.dbPort)
+        s << "DBPort=" << params.dbPort << endl;
+
+    s << "DBUserName=" << params.dbUserName << endl
       << "DBPassword=" << params.dbPassword << endl
       << "DBName="     << params.dbName     << endl
       << "DBType="     << params.dbType     << endl
@@ -773,6 +777,8 @@ bool MythContextPrivate::PromptForDatabaseParams(void)
         
         params.dbHostName = getResponse("Database host name:",
                                         params.dbHostName);
+        params.dbPort     = intResponse("Database non-default port:",
+                                        params.dbPort);
         params.dbName     = getResponse("Database name:",
                                         params.dbName);
         params.dbUserName = getResponse("Database user name:",
@@ -2815,6 +2821,7 @@ DatabaseParams MythContext::GetDatabaseParams(void)
     DatabaseParams params;
     
     params.dbHostName = d->m_settings->GetSetting("DBHostName", "localhost");
+    params.dbPort     = d->m_settings->GetNumSetting("DBPort", 0);
     params.dbUserName = d->m_settings->GetSetting("DBUserName", "mythtv");
     params.dbPassword = d->m_settings->GetSetting("DBPassword", "mythtv");
     params.dbName     = d->m_settings->GetSetting("DBName",     "mythconverg");
@@ -2851,6 +2858,7 @@ bool MythContext::SaveDatabaseParams(const DatabaseParams &params)
     
     // only rewrite file if it has changed
     if (params.dbHostName   != cur_params.dbHostName          ||
+        params.dbPort       != cur_params.dbPort              ||
         params.dbUserName   != cur_params.dbUserName          ||
         params.dbPassword   != cur_params.dbPassword          ||
         params.dbName       != cur_params.dbName              ||

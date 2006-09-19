@@ -55,6 +55,13 @@ bool MSqlDatabase::OpenDatabase()
         m_db->setUserName(dbparms.dbUserName);
         m_db->setPassword(dbparms.dbPassword);
         m_db->setHostName(dbparms.dbHostName);
+
+        if (dbparms.dbPort)
+            m_db->setPort(dbparms.dbPort);
+
+        if (dbparms.dbPort && dbparms.dbHostName == "localhost")
+            m_db->setHostName("127.0.0.1");
+
         connected = m_db->open();
 
         if (!connected && dbparms.wolEnabled)
