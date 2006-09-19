@@ -1,6 +1,7 @@
 #include <unistd.h>
 #include <inttypes.h>
 #include <iostream>
+#include <map>
 using namespace std;
 #include "playlist.h"
 #include "qdatetime.h"

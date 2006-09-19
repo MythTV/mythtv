@@ -1,6 +1,5 @@
 #include <qdir.h>
 #include <iostream>
-#include <map>
 using namespace std;
 
 #include <qapplication.h>
