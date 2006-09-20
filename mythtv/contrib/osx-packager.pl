@@ -937,6 +937,7 @@ foreach my $target ( @targets )
      {
        &Verbose("Installing $mtd into $target");
        &Syscall([ 'cp', $mtd, "$finalTarget/Contents/MacOS" ]) or die;
+       &PackagedExecutable($finalTarget, 'mtd');
        &AddFakeBinDir($finalTarget);
      }
   }
@@ -952,6 +953,7 @@ if ( $backend )
     my $SRC  = "$PREFIX/bin/$binary.app/Contents/MacOS/$binary";
     if ( -e $SRC )
     {
+      &Verbose("Installing $SRC into $BE");
       &Syscall([ '/bin/cp', $SRC, "$BE/Contents/MacOS" ]) or die;
       &PackagedExecutable($BE, $binary);
       &AddFakeBinDir($BE);
@@ -972,6 +974,7 @@ if ( $jobtools )
   $SRC  = "$PREFIX/bin/mythtranscode.app/Contents/MacOS/mythtranscode";
   if ( -e $SRC )
   {
+      &Verbose("Installing $SRC into $JQ");
       &Syscall([ '/bin/cp', $SRC, $DEST ]) or die;
       &PackagedExecutable($JQ, 'mythtranscode');
       &AddFakeBinDir($JQ);
