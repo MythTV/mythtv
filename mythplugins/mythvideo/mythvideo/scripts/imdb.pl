@@ -109,10 +109,17 @@ sub getMovieData {
    if (defined $opt_r) { printf("%s", $response); }
 
    # parse title and year
+   my $year = "";
    my $title = parseBetween($response, "<title>", "</title>");
-   $title =~ m#(.+) \((\d+).*\)#;  # Note some years have a /II after them?
-   $title = $1;
-   my $year = $2;
+   if ($title =~ m#(.+) \((\d+).*\)#) # Note some years have a /II after them?
+   {
+      $title = $1;
+      $year = $2;
+   }
+   elsif ($title =~ m#(.+) \(\?\?\?\?\)#)
+   {
+      $title = $1;
+   }
 
    # parse director 
    my $director = parseBetween($response, ">Directed by</b>", "/a><br>");
