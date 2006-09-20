@@ -119,7 +119,11 @@ static HostLineEdit *SetRipDirectory()
 {
     HostLineEdit *gc = new HostLineEdit("DVDRipLocation");
     gc->setLabel(QObject::tr("Directory to hold temporary files"));
+#ifdef Q_WS_MACX
+    gc->setValue(QDir::homeDirPath() + "/Library/Application Support");
+#else
     gc->setValue("/var/lib/mythdvd/temp");
+#endif
     gc->setHelpText(QObject::tr("This directory must exist, and the user "
                     "running MythDVD needs to have write permission "
                     "to the directory."));
