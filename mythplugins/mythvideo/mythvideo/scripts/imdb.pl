@@ -253,6 +253,8 @@ sub getMoviePoster {
    my $response = get $request;
    if (defined $opt_r) { printf("%s", $response); }
 
+   if (!defined $response) {return;}
+
    my $uri = "";
 
    # look for references to impawards.com posters - they are high quality
