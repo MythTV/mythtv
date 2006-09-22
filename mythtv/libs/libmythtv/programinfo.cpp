@@ -1566,9 +1566,11 @@ void ProgramInfo::StartedRecording(QString prefix, QString ext)
 
     query.prepare("REPLACE INTO recordedprogram"
                  " SELECT * from program"
-                 " WHERE chanid = :CHANID AND starttime = :START;");
+                 " WHERE chanid = :CHANID AND starttime = :START"
+                 " AND title = :TITLE;");
     query.bindValue(":CHANID", chanid);
     query.bindValue(":START", startts);
+    query.bindValue(":TITLE", title);
     if (!query.exec() || !query.isActive())
         MythContext::DBError("Copy program data on record", query);
 
