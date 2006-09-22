@@ -1039,7 +1039,11 @@ void ProgramInfo::ApplyRecordRecID(void)
     query.prepare("UPDATE recorded "
                   "SET recordid = :RECID "
                   "WHERE chanid = :CHANID AND starttime = :START");
-    query.bindValue(":RECID",  getRecordID());
+
+    if (rectype == kOverrideRecord && parentid > 0)
+        query.bindValue(":RECID", parentid);
+    else
+        query.bindValue(":RECID",  getRecordID());
     query.bindValue(":CHANID", chanid);
     query.bindValue(":START",  recstartts);
 
@@ -1728,7 +1732,12 @@ void ProgramInfo::UpdateRecordingEnd(void)
                   "WHERE chanid = :CHANID AND "
                   "    starttime = :STARTTIME ");
     query.bindValue(":ENDTIME", recendts);
-    query.bindValue(":RECORDID", recordid);
+
+    if (rectype == kOverrideRecord && parentid > 0)
+        query.bindValue(":RECORDID", parentid);
+    else
+        query.bindValue(":RECORDID", recordid);
+
     query.bindValue(":CHANID", chanid);
     query.bindValue(":STARTTIME", recstartts);
 
