@@ -36,12 +36,6 @@ compiler is telling you that you don't have XFree86-devel installed, or that
 your distribution hasn't set it up correctly.  This needs to be fixed before
 MythTV will compile.</P>
 
-<H3>error: can't find a register in class 'BREG' while reloading 'asm'</H3>
-
-<P>This is due to the broken Qt that is being distributed by Suse.  To work
-around this, edit <CODE>libs/libavcodec/Makefile</CODE> and remove any
-"-fPIC" you find there and then recompile.</P>
-
 <H3><A NAME="mkspecs_error"></A> make: *** No rule to make target /usr/lib/qt3/mkspecs/default/qmake.conf', needed by Makefile'.  Stop.</H3>
 
 <P>This error happens when there's a missing link in the

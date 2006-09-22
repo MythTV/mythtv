@@ -8,7 +8,7 @@
 <H1>Installing and using MythTV</H1>
 
 <H2>Robert Kulagowski, 
-<A HREF="mailto:rkulagow@rocketmail.com">mailto:rkulagow@rocketmail.com</A></H2>2006-09-11, v0.20.02
+<A HREF="mailto:rkulagow@rocketmail.com">mailto:rkulagow@rocketmail.com</A></H2>2006-09-22, v0.20.03
 <HR>
 <EM>Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -1130,6 +1130,8 @@ going to need the <B>cdialog</B> package in order to compile
 <PRE>
 NOTE:  Qt v3.2 or higher is required.
 
+NOTE:  MythTV DOES NOT WORK with Qt4.
+
 NOTE:  If you are going to be using RPMs to install various
 components, you should be aware that not all packages include the necessary
 headers for compiling.  If you're having trouble compiling, ensure
@@ -1191,7 +1193,8 @@ variables setup by the installation have a chance to take effect.</P>
 
 <H3>Gentoo. </H3>
 
-<P>If Qt has not been installed on your system: Edit
+<P><B>NOTE</B>:  MythTV does <EM>not</EM> run on Qt4.
+If Qt has not been installed on your system: Edit
 <CODE>/etc/make.conf</CODE> and locate the "USE" variable. If the line is
 commented out, remove the comment. The line should have at least:
 <BLOCKQUOTE><CODE>
@@ -5691,12 +5694,6 @@ then it shouldn't be a problem.</P>
 compiler is telling you that you don't have XFree86-devel installed, or that
 your distribution hasn't set it up correctly.  This needs to be fixed before
 MythTV will compile.</P>
-
-<H3>error: can't find a register in class 'BREG' while reloading 'asm'</H3>
-
-<P>This is due to the broken Qt that is being distributed by Suse.  To work
-around this, edit <CODE>libs/libavcodec/Makefile</CODE> and remove any
-"-fPIC" you find there and then recompile.</P>
 
 <H3><A NAME="mkspecs_error"></A> make: *** No rule to make target /usr/lib/qt3/mkspecs/default/qmake.conf', needed by Makefile'.  Stop.</H3>
 

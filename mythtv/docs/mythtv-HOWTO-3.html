@@ -680,6 +680,8 @@ going to need the <B>cdialog</B> package in order to compile
 <PRE>
 NOTE:  Qt v3.2 or higher is required.
 
+NOTE:  MythTV DOES NOT WORK with Qt4.
+
 NOTE:  If you are going to be using RPMs to install various
 components, you should be aware that not all packages include the necessary
 headers for compiling.  If you're having trouble compiling, ensure
@@ -741,7 +743,8 @@ variables setup by the installation have a chance to take effect.</P>
 
 <H3>Gentoo. </H3>
 
-<P>If Qt has not been installed on your system: Edit
+<P><B>NOTE</B>:  MythTV does <EM>not</EM> run on Qt4.
+If Qt has not been installed on your system: Edit
 <CODE>/etc/make.conf</CODE> and locate the "USE" variable. If the line is
 commented out, remove the comment. The line should have at least:
 <BLOCKQUOTE><CODE>

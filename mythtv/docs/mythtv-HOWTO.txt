@@ -1,7 +1,7 @@
   Installing and using MythTV
   Robert Kulagowski, mailto:rkulagow@rocketmail.com
   <mailto:rkulagow@rocketmail.com>
-  2006-09-11, v0.20.02
+  2006-09-22, v0.20.03
 
   Initially, installation of MythTV seems like a huge task.  There are
   lots of dependencies, and various distributions seem to do the same
@@ -236,10 +236,9 @@
   22. Troubleshooting.
      22.1 Compiling
         22.1.1 Compile errors
-        22.1.2 error: can't find a register in class 'BREG' while reloading 'asm'
-        22.1.3 make: *** No rule to make target /usr/lib/qt3/mkspecs/default/qmake.conf', needed by Makefile'.  Stop.
-        22.1.4 make: *** No rule to make target /mkspecs/default/qmake.conf', needed by Makefile'.  Stop.
-        22.1.5 Internal Segmentation Fault.
+        22.1.2 make: *** No rule to make target /usr/lib/qt3/mkspecs/default/qmake.conf', needed by Makefile'.  Stop.
+        22.1.3 make: *** No rule to make target /mkspecs/default/qmake.conf', needed by Makefile'.  Stop.
+        22.1.4 Internal Segmentation Fault.
      22.2 Debugging
         22.2.1 MythTV segfaults
         22.2.2 MythTV isn't doing anything
@@ -337,8 +336,6 @@
   installing MythTV you should examine the archives, or post your
   question to the MythTV-users mailing list.  If you send me "Does
   MythTV work with 'X'"?  messages - I will simply delete your mail.
-
-
 
   [1m1.1.  What is MythTV?[0m
 
@@ -471,6 +468,8 @@
   [1mboldface [22m- used for program names.
   typewriter - used for program paths.
   [4memphasis[24m - Pay attention here.
+
+
 
                            Pay more attention.
 
@@ -1308,6 +1307,8 @@
   ______________________________________________________________________
   NOTE:  Qt v3.2 or higher is required.
 
+  NOTE:  MythTV DOES NOT WORK with Qt4.
+
   NOTE:  If you are going to be using RPMs to install various
   components, you should be aware that not all packages include the necessary
   headers for compiling.  If you're having trouble compiling, ensure
@@ -1361,7 +1362,6 @@
        everything already installed
 
 
-
   In that case, you're ready to move to the next ``section''.  Once you
   have completed installing the pre-requisites, exit out of the shell
   and start a new one to ensure that any environment variables setup by
@@ -1370,9 +1370,10 @@
 
   [1m3.2.3.2.  Gentoo.[0m
 
-  If Qt has not been installed on your system: Edit /etc/make.conf and
-  locate the "USE" variable. If the line is commented out, remove the
-  comment. The line should have at least:
+  [1mNOTE[22m:  MythTV does [4mnot[24m run on Qt4.  If Qt has not been installed on
+  your system: Edit /etc/make.conf and locate the "USE" variable. If the
+  line is commented out, remove the comment. The line should have at
+  least:
 
 
        USE="mysql alsa"
@@ -6127,15 +6128,7 @@
   before MythTV will compile.
 
 
-  [1m22.1.2.  error: can't find a register in class 'BREG' while reloading[0m
-  [1m'asm'[0m
-
-  This is due to the broken Qt that is being distributed by Suse.  To
-  work around this, edit libs/libavcodec/Makefile and remove any "-fPIC"
-  you find there and then recompile.
-
-
-  [1m22.1.3.  make: *** No rule to make target[0m
+  [1m22.1.2.  make: *** No rule to make target[0m
   [1m/usr/lib/qt3/mkspecs/default/qmake.conf', needed by Makefile'.  Stop.[0m
 
   This error happens when there's a missing link in the
@@ -6154,7 +6147,6 @@
 
   or
 
-
   2.  Run [1mqmake mythtv.pro [22min the mythtv directory.  Rerunning [1mqmake[0m
   will create a new Makefile for you, however this still doesn't fix the
   root cause of the issue, which is that your distribution didn't create
@@ -6162,14 +6154,15 @@
   choice is the better solution.
 
 
-  [1m22.1.4.  make: *** No rule to make target[0m
+
+  [1m22.1.3.  make: *** No rule to make target[0m
   [1m/mkspecs/default/qmake.conf', needed by Makefile'.  Stop.[0m
 
   You didn't set your QTDIR.  Re-read the section on ``Setting up
   paths''.
 
 
-  [1m22.1.5.  Internal Segmentation Fault.[0m
+  [1m22.1.4.  Internal Segmentation Fault.[0m
 
   This is most likely to be caused by an overheating processor rather
   than an actual programming fault within gcc.
@@ -6214,14 +6207,14 @@
 
 
 
-  handle SIGPIPE nostop noprint
-  handle SIG33 nostop noprint
-  set logging on
-  set pagination off
-  set args -l myth.log -v record,channel,siparser
-  run
-  thread apply all bt full
-  set logging off
+       handle SIGPIPE nostop noprint
+       handle SIG33 nostop noprint
+       set logging on
+       set pagination off
+       set args -l myth.log -v record,channel,siparser
+       run
+       thread apply all bt full
+       set logging off
 
 
 
@@ -6342,6 +6335,8 @@
   remove it.  Also verify that bind-address is set to your IP address
   instead of 127.0.0.1.  If you change either of these items, restart
   [1mMySQL[22m.
+
+
   [1m22.4.3.  MySQL database is corrupt[0m
 
   If you have reason to believe that your MySQL database is corrupt,
@@ -6350,6 +6345,7 @@
   [1mNOTE[22m: Ensure that there are no programs accessing the database while
   you attempt to repair it.  Make sure that all backend and frontend
   programs have exited.
+
 
   mysqlcheck -r -umythtv -p<password> mythconverg
 
@@ -6405,14 +6401,13 @@
   Also, look for:
 
 
-
-  Section "Device"
-      Identifier "device1"
-      VendorName "nVidia Corporation"
-      BoardName "NVIDIA GeForce 256 (generic)"
-      Driver "nv"
-      Option "DPMS"
-  EndSection
+       Section "Device"
+           Identifier "device1"
+           VendorName "nVidia Corporation"
+           BoardName "NVIDIA GeForce 256 (generic)"
+           Driver "nv"
+           Option "DPMS"
+       EndSection
 
 
 
@@ -6468,6 +6463,7 @@
        $ xset -dpms s off
 
 
+
   Finally, depending on your distribution, you may be able to turn it
   off from within the control panel.
 
@@ -6477,7 +6473,6 @@
 
   If mythfilldatabase suddenly appears to be failing, there are at least
   two things to check.
-
   First, if you are in North America, ensure that your DataDirect
   subscription is still valid, otherwise, check to see what version of
   XMLTV you're running and that it's the latest version.
@@ -6540,8 +6535,6 @@
 
   This may occur when MythTV doesn't have an accurate seek table.  Run
   [1mmythcommflag --rebuild[0m
-
-
   [1m22.5.5.  Troubleshooting audio[0m
 
 
@@ -6603,6 +6596,7 @@
   being used, hasn't already been grabbed by another process, like [1mesd[0m
   or [1martsd[22m.  If the device file isn't available, then MythTV won't work.
   You may wish to run [1mconfigure [22mand enable support for these.
+
 
   If you wish to see what application is grabbing a resource, you can
   use the fuser command:
@@ -6666,6 +6660,7 @@
   working correctly, then it's highly likely that your window manager is
   not giving focus correctly to the various Myth programs as they run.
   The following window managers are known to work correctly:
+
 
 
   +o  fvwm
@@ -6733,6 +6728,7 @@
   log file.
 
 
+
   [1m22.5.16.  Poor performance with NVidia cards and XvMC[0m
 
   XvMC is a NVidia driver feature which is supposed to help with
@@ -6798,8 +6794,6 @@
        $ mythtranscode --chanid 1036 --starttime 2003-10-20T15:30:00 --profile \
        autodetect --fifodir . &
 
-
-
   When [1mmythtranscode [22mbegins executing, it will create two FIFOs
   ("audout" and "vidout") in the directory specified (in this case ".",
   meaning the current directory) and will print out information about
@@ -6851,6 +6845,7 @@
   MythTV is not dependent on any particular window manager.  If you wish
   to run a lightweight window manager, the configfiles/ directory has an
   example of a .twmrc and .fvwmrc file you may use.
+
 
 
   [1m23.3.  What capture resolution should I use?  How does video work?[0m
@@ -6912,9 +6907,11 @@
   recording.  If the CPU average usage is consistently exceeding 90%,
   frames will need to be dropped during peak times when more than 100%
   of the available CPU would be needed to process all of the frames.
+
   If you'd like to read more on this, go to the vcdhelp website at
   http://www.vcdhelp.com/forum/userguides/94382.php
   <http://www.vcdhelp.com/forum/userguides/94382.php>.
+
 
 
   [1m23.4.  MythTV GUI and X Display Sizes[0m
@@ -6973,7 +6970,6 @@
   to correct differences between 16:9 and 4:3.
 
 
-
   [1m23.4.3.  Overscan Dimensions[0m
 
   Because picture edges can be ragged and screen edges aren't straight,
@@ -6981,7 +6977,6 @@
   screen.  This is called "overscan". Underscan is fitting the entire
   image inside the screen. Underscan is useful for computer monitors so
   that toolbars and scrollbars at the edges can be seen.
-
   For best results, match the X display area as close as possible to the
   edges of the physical screen. This can only be adjusted by your tv-out
   device or by the settings for the television set. Many sets have these
@@ -7033,6 +7028,7 @@
        $ mysql -u root
        mysql> drop database mythconverg;
        mysql> quit
+
 
 
   [1m23.7.  Moving your data to new hardware[0m
@@ -7103,7 +7099,6 @@
   that will allow you to use the btaudio module is the MSP34xx.
   However, having a MSP34xx is no guarantee that you will be able to use
   the btaudio module.
-
   As of 2003-03-31, this is the current list of cards and their status:
   Works with btaudio:
 
@@ -7160,18 +7155,15 @@
   MySQL:
 
 
-
-  $ mysql -u root mythconverg
-  mysql> select chanid from channel where channum=15;
-  +--------+
-  | chanid |
-  +--------+
-  |   1015 |
-  +--------+
-  1 row in set (0.00 sec)
-  mysql> delete from channel where chanid = 1015;
-
-
+       $ mysql -u root mythconverg
+       mysql> select chanid from channel where channum=15;
+       +--------+
+       | chanid |
+       +--------+
+       |   1015 |
+       +--------+
+       1 row in set (0.00 sec)
+       mysql> delete from channel where chanid = 1015;
 
   Old program data will be removed over the course of a week. However,
   you may want to immediately delete any current program listings for
@@ -7220,7 +7212,6 @@
   additional information regarding performance optimization.
 
 
-
   [1m23.11.  Automatically starting mythfrontend at system boot time[0m
 
   Here's an example submitted to the mythtv-dev list by Pat Pflaum
@@ -7235,8 +7226,6 @@
        Style myth* NoTitle, NoHandles, Sticky, WindowListSkip, SloppyFocus, GrabFocus, BorderWidth 0
        ^D
        $
-
-
 
   The following also works with blackbox:
 
@@ -7301,10 +7290,10 @@
   runlevels 3, 4 or 5:
 
 
-       $ su
-       # chkconfig --level 345 mythbackend on
-       # exit
-       $
+  $ su
+  # chkconfig --level 345 mythbackend on
+  # exit
+  $
 
 
 
@@ -7345,12 +7334,13 @@
   to edit the /etc/security/msec/perm.local file to include the
   following:
 
-  # /etc/security/msec/perm.local
-  # Local overrides to the msec program
-  #
-  # Full file path                user.group              permissions
-  /var/log/mythtv/                root.mythtv             775
-  /var/log/mythtv/*               root.mythtv             664
+
+       # /etc/security/msec/perm.local
+       # Local overrides to the msec program
+       #
+       # Full file path                user.group              permissions
+       /var/log/mythtv/                root.mythtv             775
+       /var/log/mythtv/*               root.mythtv             664
 
 
 
@@ -7358,10 +7348,11 @@
   may add it by typing:
 
 
-       $ cd contrib
-       $ su
-       # cat etc.security.msec.perm.local >> /etc/security/msec/perm.local
-       # exit
+
+  $ cd contrib
+  $ su
+  # cat etc.security.msec.perm.local >> /etc/security/msec/perm.local
+  # exit
 
 
 
@@ -7401,7 +7392,8 @@
 
   To obtain a list of options:
 
-  # /etc/init.d/mythbackend
+
+       # /etc/init.d/mythbackend
 
 
 
@@ -7412,7 +7404,6 @@
   backend [4mmust[24m have a capture device defined, but shouldn't imply that
   the capture device in the Master backend must be the first capture
   card defined in the database.
-
   One example of an advanced configuration is the round-robin scheme.
   Rather than defining all of the cards on the master, you could first
   go into mythtv-setup on the master to define globals such as the
@@ -7530,7 +7521,6 @@
   of the others (High, Medium, Low) it will use the settings in that
   profile regardless of the codec of the original recording.
 
-
   There are a number of options for transcoding but the simplest is to
   enable lossless transcoding (the first option) which subsequently
   removes all other options. Enabling lossless encoding simply removes
@@ -7610,19 +7600,19 @@
 
 
 
-       mysql> select r.* from recordingprofiles r,profilegroups p where p.name='Transcoders' and p.id=r.profilegroup;
-       +----+----------------+------------+------------+--------------+
-       | id | name           | videocodec | audiocodec | profilegroup |
-       +----+----------------+------------+------------+--------------+
-       | 21 | RTjpeg/MPEG4   | MPEG-4     | MP3        |            6 |
-       | 22 | MPEG2          | MPEG-4     | MP3        |            6 |
-       | 27 | High Quality   | MPEG-4     | MP3        |            6 |
-       | 28 | Medium Quality | MPEG-4     | MP3        |            6 |
-       | 29 | Low Quality    | MPEG-4     | MP3        |            6 |
-       +----+----------------+------------+------------+--------------+
-       5 rows in set (0.01 sec)
+  mysql> select r.* from recordingprofiles r,profilegroups p where p.name='Transcoders' and p.id=r.profilegroup;
+  +----+----------------+------------+------------+--------------+
+  | id | name           | videocodec | audiocodec | profilegroup |
+  +----+----------------+------------+------------+--------------+
+  | 21 | RTjpeg/MPEG4   | MPEG-4     | MP3        |            6 |
+  | 22 | MPEG2          | MPEG-4     | MP3        |            6 |
+  | 27 | High Quality   | MPEG-4     | MP3        |            6 |
+  | 28 | Medium Quality | MPEG-4     | MP3        |            6 |
+  | 29 | Low Quality    | MPEG-4     | MP3        |            6 |
+  +----+----------------+------------+------------+--------------+
+  5 rows in set (0.01 sec)
 
-       mysql>
+  mysql>
 
 
 
@@ -7670,8 +7660,7 @@
 
   To alter the hostname in the current session, run:
 
-
-       # hostname kidsroom
+  # hostname kidsroom
 
 
 
@@ -7716,8 +7705,7 @@
   6.  Restore the database using your edited version.
 
 
-
-  $ mysql -u mythtv -pmythtv mythconverg < mythtv_restore.sql
+       $ mysql -u mythtv -pmythtv mythconverg < mythtv_restore.sql
 
 
 
@@ -7730,7 +7718,6 @@
 
 
        # /etc/init.d/mythbackend start
-
 
 
   8.  Quit and restart all frontends.  Delete the mythtv_backup.sql and
@@ -7795,6 +7782,7 @@
   source and repeat when needed.
 
   You may leave the Setup now and proceed as usual.
+
 
 
   [1m23.21.  What do the icons on the Watch Recordings screen mean?[0m
@@ -7863,7 +7851,6 @@
   was not connected to any output jacks, and there doesn't appear to be
   any way to pull decoded video from the card, so it's a fairly useless
   feature.
-
   The PVR-350 (model 990) has the features of the PVR-250 as well as
   being able to decode MPEG-2.  The encode and decode functions may be
   used simultaneously.  The MPEG-2 decoder function gives superior video
@@ -7912,7 +7899,6 @@
      it on.  Stating that you have a Tivo may help; the Tivo has a
      direct-connect capability.
 
-
   3. Use a firewire connection.  There is a 6200ch.c in the MythTV
      contrib directory which may work for you.
 
@@ -7931,7 +7917,6 @@
 
   Next, make sure that "Run Jobs only on original recording host" is
   turned OFF so that new jobs are allowed to run anywhere.
-
   Restart [1mmythbackend [22msince it only reads this setting when it starts
   up.
 
@@ -8015,44 +8000,44 @@
 
 
 
-  # fdisk /dev/hda
+       # fdisk /dev/hda
 
-  The number of cylinders for this disk is set to 1823.
-  There is nothing wrong with that, but this is larger than 1024,
-  and could in certain setups cause problems with:
-  1) software that runs at boot time (e.g., old versions of LILO)
-  2) booting and partitioning software from other OSs
-     (e.g., DOS FDISK, OS/2 FDISK)
+       The number of cylinders for this disk is set to 1823.
+       There is nothing wrong with that, but this is larger than 1024,
+       and could in certain setups cause problems with:
+       1) software that runs at boot time (e.g., old versions of LILO)
+       2) booting and partitioning software from other OSs
+          (e.g., DOS FDISK, OS/2 FDISK)
 
-  Command (m for help): p
+       Command (m for help): p
 
-  Disk /dev/hda: 15.0 GB, 15000330240 bytes
-  255 heads, 63 sectors/track, 1823 cylinders
-  Units = cylinders of 16065 * 512 = 8225280 bytes
+       Disk /dev/hda: 15.0 GB, 15000330240 bytes
+       255 heads, 63 sectors/track, 1823 cylinders
+       Units = cylinders of 16065 * 512 = 8225280 bytes
 
-     Device Boot    Start       End    Blocks   Id  System
-  /dev/hda1   *         1       764   6136798+  83  Linux
-  /dev/hda2           765      1823   8506417+   5  Extended
-  /dev/hda5           765      1823   8506417   83  Linux
+          Device Boot    Start       End    Blocks   Id  System
+       /dev/hda1   *         1       764   6136798+  83  Linux
+       /dev/hda2           765      1823   8506417+   5  Extended
+       /dev/hda5           765      1823   8506417   83  Linux
 
-  Command (m for help): t
-  Partition number (1-6): 5
-  Hex code (type L to list codes): 8e
+       Command (m for help): t
+       Partition number (1-6): 5
+       Hex code (type L to list codes): 8e
 
-  Command (m for help): p
+       Command (m for help): p
 
-  Disk /dev/hda: 15.0 GB, 15000330240 bytes
-  255 heads, 63 sectors/track, 1823 cylinders
-  Units = cylinders of 16065 * 512 = 8225280 bytes
+       Disk /dev/hda: 15.0 GB, 15000330240 bytes
+       255 heads, 63 sectors/track, 1823 cylinders
+       Units = cylinders of 16065 * 512 = 8225280 bytes
 
-     Device Boot    Start       End    Blocks   Id  System
-  /dev/hda1   *         1       764   6136798+  83  Linux
-  /dev/hda2           765      1823   8506417+   5  Extended
-  /dev/hda5           765      1823   8506417   8e  Linux LVM
+          Device Boot    Start       End    Blocks   Id  System
+       /dev/hda1   *         1       764   6136798+  83  Linux
+       /dev/hda2           765      1823   8506417+   5  Extended
+       /dev/hda5           765      1823   8506417   8e  Linux LVM
 
-  Command (m for help): w
+       Command (m for help): w
 
-  #
+       #
 
 
 
@@ -8060,7 +8045,7 @@
   multiple partitions to use):
 
 
-       # pvcreate /dev/hda5
+  # pvcreate /dev/hda5
 
 
 
@@ -8076,10 +8061,9 @@
   reiserfs filesystem and mount it:
 
 
-
-  # lvcreate --name video --size 5G VGforMyth
-  # mkreiserfs /dev/VGforMyth/video
-  # mount /dev/VGforMyth/video /var/video
+       # lvcreate --name video --size 5G VGforMyth
+       # mkreiserfs /dev/VGforMyth/video
+       # mount /dev/VGforMyth/video /var/video
 
 
 
@@ -8119,7 +8103,6 @@
   volume in the /dev/ide/host/bus/target/lun/etc format.  Once you've
   completed one of the following two procedures, use [1mdf [22mto check that
   you've got more space.
-
 
   [1m24.1.1.  ReiserFS[0m
 

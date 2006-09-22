@@ -3,7 +3,7 @@
 <title>Installing and using MythTV
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com"
 name="mailto:rkulagow@rocketmail.com">
-<date>2006-09-11, v0.20.02
+<date>2006-09-22, v0.20.03
 <abstract>
 Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -898,6 +898,8 @@ going to need the <bf>cdialog</bf> package in order to compile
 <code>
 NOTE:  Qt v3.2 or higher is required.
 
+NOTE:  MythTV DOES NOT WORK with Qt4.
+
 NOTE:  If you are going to be using RPMs to install various
 components, you should be aware that not all packages include the necessary
 headers for compiling.  If you're having trouble compiling, ensure
@@ -948,7 +950,8 @@ exit out of the shell and start a new one to ensure that any environment
 variables setup by the installation have a chance to take effect.
 
 <sect3>Gentoo. 
-<p>If Qt has not been installed on your system: Edit
+<p><bf>NOTE</bf>:  MythTV does <em>not</em> run on Qt4.
+If Qt has not been installed on your system: Edit
 <tt>/etc/make.conf</tt> and locate the "USE" variable. If the line is
 commented out, remove the comment. The line should have at least:
 <tscreen><verb>
@@ -959,7 +962,8 @@ described in the Gentoo section then you also need to install lame.
 <tscreen><verb>
 # emerge lame mysql qt
 </verb></tscreen>
-<p>If you have already installed Qt: you will need to rebuild because the
+
+If you have already installed Qt: you will need to rebuild because the
 default installation doesn't include MySQL support, a requirement for MythTV.  
 To enable SQL support, add "mysql" to your USE variable in 
 <tt>/etc/make.conf</tt> and rebuild Qt by running
@@ -5161,11 +5165,6 @@ compiler is telling you that you don't have XFree86-devel installed, or that
 your distribution hasn't set it up correctly.  This needs to be fixed before
 MythTV will compile.
 
-<sect2>error: can't find a register in class 'BREG' while reloading 'asm'
-<p>This is due to the broken Qt that is being distributed by Suse.  To work
-around this, edit <tt>libs/libavcodec/Makefile</tt> and remove any
-"-fPIC" you find there and then recompile.
-
 <sect2>make: *** No rule to make target /usr/lib/qt3/mkspecs/default/qmake.conf', needed by Makefile'.  Stop.
 <label id="mkspecs_error">
 <p>This error happens when there's a missing link in the
@@ -7019,6 +7018,7 @@ on filesystems and the slow delete feature.
 v0.20.01, 2006-09-11.  Get rid of stuff that's been deprecated.  Add other
 updates, like the blurb about using a VM for commercial flagging.
 v0.20.02, 2006-09-13.  Update install instructions for mythweb.
+v0.20.03, 2006-09-22.  Does MythTV work with QT4?  No.
 -->
 
 <!--
