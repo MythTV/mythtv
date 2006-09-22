@@ -1041,7 +1041,7 @@ void ProgramInfo::ApplyRecordRecID(void)
                   "WHERE chanid = :CHANID AND starttime = :START");
 
     if (rectype == kOverrideRecord && parentid > 0)
-        query.bindValue(":RECORDID", parentid);
+        query.bindValue(":RECID", parentid);
     else
         query.bindValue(":RECID",  getRecordID());
     query.bindValue(":CHANID", chanid);
