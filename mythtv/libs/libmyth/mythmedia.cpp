@@ -36,19 +36,6 @@ const char* MythMediaDevice::MediaStatusStrings[] =
     "MEDIASTAT_MOUNTED"
 };
 
-const char* MythMediaDevice::MediaTypeStrings[] =
-{
-    "MEDIATYPE_UNKNOWN",
-    "MEDIATYPE_DATA",
-    "MEDIATYPE_MIXED",
-    "MEDIATYPE_AUDIO",
-    "MEDIATYPE_DVD",
-    "MEDIATYPE_VCD",
-    "MEDIATYPE_MMUSIC",
-    "MEDIATYPE_MVIDEO",
-    "MEDIATYPE_MGALLERY",
-};
-
 const char* MythMediaDevice::MediaErrorStrings[] =
 {
     "MEDIAERR_OK",
@@ -127,7 +114,8 @@ bool MythMediaDevice::performMountCmd(bool DoMount)
                 isMounted(true);
                 m_Status = MEDIASTAT_MOUNTED;
                 onDeviceMounted();
-                VERBOSE(VB_IMPORTANT, "m_MediaType: "<<m_MediaType);
+                VERBOSE(VB_IMPORTANT,
+                        QString("Detected MediaType ") + MediaTypeString());
             }
             else
                 onDeviceUnmounted();
@@ -148,7 +136,8 @@ bool MythMediaDevice::performMountCmd(bool DoMount)
         if (DoMount)
         {
             onDeviceMounted();
-            VERBOSE(VB_IMPORTANT, "m_MediaType: "<<m_MediaType);
+            VERBOSE(VB_IMPORTANT,
+                    QString("Detected MediaType ") + MediaTypeString());
         }
         else
             onDeviceUnmounted();
@@ -387,3 +376,34 @@ void MythMediaDevice::clearData()
     m_KeyID = QString::null;
     m_MediaType = MEDIATYPE_UNKNOWN;
 }
+
+const char* MythMediaDevice::MediaTypeString()
+{
+    return MediaTypeString(m_MediaType);
+}
+
+const char* MythMediaDevice::MediaTypeString(MediaType type)
+{
+    // MediaType is currently a bitmask. If it is ever used as such,
+    // this code will only output the main type.
+
+    if (type == MEDIATYPE_UNKNOWN)
+        return "MEDIATYPE_UNKNOWN";
+    if (type && MEDIATYPE_DATA)
+        return "MEDIATYPE_DATA";
+    if (type && MEDIATYPE_MIXED)
+        return "MEDIATYPE_MIXED";
+    if (type && MEDIATYPE_AUDIO)
+        return "MEDIATYPE_AUDIO";
+    if (type && MEDIATYPE_DVD)
+        return "MEDIATYPE_DVD";
+    if (type && MEDIATYPE_VCD)
+        return "MEDIATYPE_VCD";
+    if (type && MEDIATYPE_MMUSIC)
+        return "MEDIATYPE_MMUSIC";
+    if (type && MEDIATYPE_MVIDEO)
+        return "MEDIATYPE_MVIDEO";
+    if (type && MEDIATYPE_MGALLERY)
+        return "MEDIATYPE_MGALLERY";
+};
+

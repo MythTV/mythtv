@@ -90,10 +90,12 @@ class MythMediaDevice : public QObject
 
     
     static const char* MediaStatusStrings[];
-    static const char* MediaTypeStrings[];
     static const char* MediaErrorStrings[];
 
     void clearData();
+
+    const char* MediaTypeString();
+    const char* MediaTypeString(MediaType type);
 
  signals:
     void statusChanged(MediaStatus oldStatus, MythMediaDevice* pMedia);
