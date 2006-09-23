@@ -136,6 +136,7 @@ bool MythMediaDevice::performMountCmd(bool DoMount)
         if (DoMount)
         {
             onDeviceMounted();
+printf("Type = %d\n", m_MediaType);
             VERBOSE(VB_IMPORTANT,
                     QString("Detected MediaType ") + MediaTypeString());
         }
@@ -389,21 +390,21 @@ const char* MythMediaDevice::MediaTypeString(MediaType type)
 
     if (type == MEDIATYPE_UNKNOWN)
         return "MEDIATYPE_UNKNOWN";
-    if (type && MEDIATYPE_DATA)
+    if (type & MEDIATYPE_DATA)
         return "MEDIATYPE_DATA";
-    if (type && MEDIATYPE_MIXED)
+    if (type & MEDIATYPE_MIXED)
         return "MEDIATYPE_MIXED";
-    if (type && MEDIATYPE_AUDIO)
+    if (type & MEDIATYPE_AUDIO)
         return "MEDIATYPE_AUDIO";
-    if (type && MEDIATYPE_DVD)
+    if (type & MEDIATYPE_DVD)
         return "MEDIATYPE_DVD";
-    if (type && MEDIATYPE_VCD)
+    if (type & MEDIATYPE_VCD)
         return "MEDIATYPE_VCD";
-    if (type && MEDIATYPE_MMUSIC)
+    if (type & MEDIATYPE_MMUSIC)
         return "MEDIATYPE_MMUSIC";
-    if (type && MEDIATYPE_MVIDEO)
+    if (type & MEDIATYPE_MVIDEO)
         return "MEDIATYPE_MVIDEO";
-    if (type && MEDIATYPE_MGALLERY)
+    if (type & MEDIATYPE_MGALLERY)
         return "MEDIATYPE_MGALLERY";
 };
 
