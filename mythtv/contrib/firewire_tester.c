@@ -9,6 +9,7 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <errno.h>
 #include <sys/select.h>
 #include <libraw1394/raw1394.h>
 #include <libiec61883/iec61883.h>
@@ -17,6 +18,7 @@
 #define ACTION_TEST_BCAST   0
 #define ACTION_TEST_P2P     1
 #define ACTION_FIX_BCAST    2
+#define ACTION_RESET_BUS    3
 
 #define SYNC_BYTE           0x47
 #define MIN_PACKETS         25
@@ -209,6 +211,7 @@ void usage(void) {
     printf("    -b          - test broadcast connection\n");
     printf("    -p          - test p2p connection\n");
     printf("    -B          - attempt to fix/stabilize broadcast connection\n");
+    printf("    -R          - reset the firewire bus\n");
     printf(" Options\n");
     printf("    -n <node>   - firewire node, required\n");
     printf("    -P <port>   - firewire port, default 0\n");
@@ -226,7 +229,7 @@ int main(int argc, char **argv) {
     int action = ACTION_NONE;
 
     opterr = 0;
-    while ((c = getopt(argc, argv, "Bbn:pP:r:v")) != -1)
+    while ((c = getopt(argc, argv, "Bbn:pP:r:Rv")) != -1)
     {
         switch (c) 
         {
@@ -280,6 +283,10 @@ int main(int argc, char **argv) {
                 action = ACTION_TEST_P2P;
                 break;
 
+            case 'R':
+                action = ACTION_RESET_BUS;
+                break;
+
             // number of runs
             case 'r':
                 runs = atoi(optarg);
@@ -308,7 +315,7 @@ int main(int argc, char **argv) {
         usage();
     }
 
-    if (node == -1)
+    if (action != ACTION_RESET_BUS && node == -1)
     {
         printf("-n <node> is a required option\n");
         usage();
@@ -342,6 +349,19 @@ int main(int argc, char **argv) {
                    runs, node);
             for (i = 0;i < runs;i++)
                 success += fix_broadcast(handle, node);
+            break;
+        case ACTION_RESET_BUS:
+            runs = 1;
+            printf("Action: Resetting the firewire bus\n");
+            if (raw1394_reset_bus_new(handle, RAW1394_LONG_RESET) == 0)
+            {
+                printf("Bus reset succeeded\n");
+                success = 1;
+            }
+            else
+            {
+                printf("Bus reset failed: %d\n", errno);
+            }
             break;
     }
 

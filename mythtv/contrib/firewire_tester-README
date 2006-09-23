@@ -10,6 +10,7 @@ firewire_tester <action> -n <node> [-P <port>] [-r <n>] [-v]
     -b          - test broadcast connection
     -p          - test p2p connection
     -B          - attempt to fix/stabilize broadcast connection
+    -R          - reset the firewire bus
  Options
     -n <node>   - firewire node, required
     -P <port>   - firewire port, default 0
