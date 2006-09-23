@@ -31,7 +31,7 @@
 #******************************************************************************
 
 # version of script - change after each update
-VERSION="0.1.20060917-1"
+VERSION="0.1.20060923-1"
 
 
 ##You can use this debug flag when testing out new themes
@@ -166,10 +166,6 @@ def getTempPath():
     """This is the folder where all temporary files will be created."""
     return temppath
 
-def getIntroPath():
-    """This is the folder where all intro files are located."""
-    return os.path.join(sharepath, "mytharchive", "intro")
-
 def getCPUCount():
     """return the number of CPU's"""
     cpustat = open("/proc/cpuinfo")
@@ -249,6 +245,9 @@ def getThemeFile(theme,file):
 
     if os.path.exists(os.path.join(sharepath, "mytharchive", "images", file)):
         return os.path.join(sharepath, "mytharchive", "images", file)
+
+    if os.path.exists(os.path.join(sharepath, "mytharchive", "intro", file)):
+        return os.path.join(sharepath, "mytharchive", "intro", file)
 
     if os.path.exists(os.path.join(sharepath, "mytharchive", "music", file)):
         return os.path.join(sharepath, "mytharchive", "music", file)
@@ -1701,7 +1700,7 @@ def createDVDAuthorXML(screensize, numberofitems):
         #Pick the correct intro movie based on video format ntsc/pal
         vob = dvddom.createElement("vob")
         vob.setAttribute("pause","")
-        vob.setAttribute("file",os.path.join(getIntroPath(), videomode + '_' + introFile))
+        vob.setAttribute("file",os.path.join(getThemeFile(themeName, videomode + '_' + introFile)))
         pgc.appendChild(vob)
         del vob
 
@@ -1973,7 +1972,7 @@ def createDVDAuthorXMLNoMenus(screensize, numberofitems):
         titles.appendChild(dvddom.createComment("Intro movie"))
         pgc = dvddom.createElement("pgc")
         vob = dvddom.createElement("vob")
-        vob.setAttribute("file",os.path.join(getIntroPath(), videomode + '_' + introFile))
+        vob.setAttribute("file",os.path.join(getThemFile(themeName, videomode + '_' + introFile)))
         pgc.appendChild(vob)
         titles.appendChild(pgc)
         post = dvddom.createElement("post")
