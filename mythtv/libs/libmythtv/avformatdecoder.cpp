@@ -467,9 +467,13 @@ bool AvFormatDecoder::DoFastForward(long long desiredFrame, bool discardFrames)
 void AvFormatDecoder::SeekReset(long long newKey, uint skipFrames,
                                 bool doflush, bool discardFrames)
 {
-    if (ringBuffer->InDVDMenuOrStillFrame())
-        return;
-
+    if (ringBuffer->isDVD())
+    {
+        if (ringBuffer->InDVDMenuOrStillFrame() ||
+            newKey == 0) 
+            return;
+    }
+            
     VERBOSE(VB_PLAYBACK, LOC +
             QString("SeekReset(%1, %2, %3 flush, %4 discard)")
             .arg(newKey).arg(skipFrames)
