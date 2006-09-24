@@ -33,6 +33,10 @@ using namespace std;
 #include "mythcdrom.h"
 #include "mythhdd.h"
 
+#ifdef USING_DARWIN_DA
+#include "mediamonitor-darwin.h" 
+#endif
+
 #ifndef MNTTYPE_ISO9660
 #ifdef linux
 #define MNTTYPE_ISO9660 "iso9660"
@@ -87,7 +91,11 @@ MediaMonitor* MediaMonitor::GetMediaMonitor(void)
 
     if (gContext->GetNumSetting("MonitorDrives"))
     {
+#ifdef USING_DARWIN_DA
+        c_monitor = new MediaMonitorDarwin(NULL, 500, true); 
+#else
         c_monitor = new MediaMonitor(NULL, 500, true);
+#endif
         c_monitor->CheckFileSystemTable();
         c_monitor->CheckMountable();
     }
@@ -182,13 +190,15 @@ void MediaMonitor::ChooseAndEjectMedia(void)
     {
         selected->unlock();
 
-        if (selected->eject() == MEDIAERR_UNSUPPORTED)
+        MediaError err = selected->eject();
+
+        if (err == MEDIAERR_UNSUPPORTED)
         {
             MythPopupBox::showOkPopup(gContext->GetMainWindow(),
                                       "eject success",
                                       tr("You may safely remove %1").arg(dev));
         }
-        else if (selected->eject() == MEDIAERR_FAILED)
+        else if (err == MEDIAERR_FAILED)
         {
             MythPopupBox::showOkPopup(gContext->GetMainWindow(),
                                       "eject fail",
@@ -199,13 +209,20 @@ void MediaMonitor::ChooseAndEjectMedia(void)
 
 MediaMonitor::MediaMonitor(QObject* par, unsigned long interval, 
                            bool allowEject) 
-    : QObject(par), m_Active(false), m_Thread(this, interval),
+    : QObject(par), m_Active(false), m_Thread(NULL),
+      m_MonitorPollingInterval(interval),
       m_AllowEject(allowEject), m_fifo(-1)
 {
 }
 
 MediaMonitor::~MediaMonitor()
 {
+    if (m_Thread) 
+    { 
+        delete m_Thread; 
+        m_Thread = NULL; 
+    } 
+    
     if (m_fifo > 0)
     {
         close(m_fifo);
@@ -742,8 +759,11 @@ void MediaMonitor::StartMonitoring(void)
     if (m_Active)
         return;
 
+    if (!m_Thread) 
+        m_Thread = new MonitorThread(this, m_MonitorPollingInterval);
+
     m_Active = true;
-    m_Thread.start();
+    m_Thread->start();
 }
 
 /** \fn MediaMonitor::StopMonitoring(void)
@@ -756,7 +776,7 @@ void MediaMonitor::StopMonitoring(void)
         return;
 
     m_Active = false;
-    m_Thread.wait();
+    m_Thread->wait();
 }
 
 /** \fn MediaMonitor::ValidateAndLock(MythMediaDevice *pMedia)

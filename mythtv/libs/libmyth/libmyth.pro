@@ -77,6 +77,12 @@ macx {
     HEADERS += util-osx.h
     SOURCES += util-osx.cpp
 
+    darwin_da {
+        HEADERS += mediamonitor-darwin.h
+        SOURCES += mediamonitor-darwin.cpp
+        DEFINES += USING_DARWIN_DA
+    }
+
     using_appleremote {
         HEADERS += AppleRemote.h   AppleRemoteListener.h   lircevent.h
         SOURCES += AppleRemote.cpp AppleRemoteListener.cpp lircevent.cpp

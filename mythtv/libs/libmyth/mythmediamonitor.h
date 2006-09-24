@@ -47,6 +47,7 @@ class MediaMonitor : public QObject
 {
     Q_OBJECT
     friend class MonitorThread;
+    friend class MonitorThreadDarwin;
 
   protected:
     MediaMonitor(QObject* par, unsigned long interval, bool allowEject);
@@ -56,7 +57,7 @@ class MediaMonitor : public QObject
 
     bool IsActive(void) const { return m_Active; }
 
-    void StartMonitoring(void);
+    virtual void StartMonitoring(void);
     void StopMonitoring(void);
     void ChooseAndEjectMedia(void);
 
@@ -82,7 +83,7 @@ class MediaMonitor : public QObject
     bool CheckMountable(void);
     bool FindPartitions(const QString &dev, bool checkPartitions);
 
-    bool AddDevice(MythMediaDevice* pDevice);
+    virtual bool AddDevice(MythMediaDevice* pDevice);
     bool AddDevice(const char* dev);
     bool AddDevice(struct fstab* mep);
     bool RemoveDevice(const QString &dev);
@@ -98,7 +99,8 @@ class MediaMonitor : public QObject
     QMap<MythMediaDevice*, int>  m_UseCount;
 
     bool                         m_Active;
-    MonitorThread                m_Thread;
+    MonitorThread               *m_Thread;
+    unsigned long                m_MonitorPollingInterval;
     bool                         m_AllowEject;
     int                          m_fifo;
 
