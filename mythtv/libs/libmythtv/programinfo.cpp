@@ -309,6 +309,7 @@ void ProgramInfo::ToStringList(QStringList &list) const
     INT_TO_LIST(hasAirDate)     
     STR_TO_LIST((playgroup != "") ? playgroup : "Default")
     INT_TO_LIST(recpriority2)
+    INT_TO_LIST(parentid)
 }
 
 /** \fn ProgramInfo::FromStringList(QStringList&,int)
@@ -407,6 +408,7 @@ bool ProgramInfo::FromStringList(QStringList &list, QStringList::iterator &it)
     INT_FROM_LIST(hasAirDate);
     STR_FROM_LIST(playgroup)
     INT_FROM_LIST(recpriority2)
+    INT_FROM_LIST(parentid)
 
     return true;
 }
