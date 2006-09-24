@@ -31,7 +31,7 @@
 #******************************************************************************
 
 # version of script - change after each update
-VERSION="0.1.20060923-1"
+VERSION="0.1.20060924-1"
 
 
 ##You can use this debug flag when testing out new themes
@@ -1972,7 +1972,7 @@ def createDVDAuthorXMLNoMenus(screensize, numberofitems):
         titles.appendChild(dvddom.createComment("Intro movie"))
         pgc = dvddom.createElement("pgc")
         vob = dvddom.createElement("vob")
-        vob.setAttribute("file",os.path.join(getThemFile(themeName, videomode + '_' + introFile)))
+        vob.setAttribute("file",os.path.join(getThemeFile(themeName, videomode + '_' + introFile)))
         pgc.appendChild(vob)
         titles.appendChild(pgc)
         post = dvddom.createElement("post")
