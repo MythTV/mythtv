@@ -136,7 +136,6 @@ bool MythMediaDevice::performMountCmd(bool DoMount)
         if (DoMount)
         {
             onDeviceMounted();
-printf("Type = %d\n", m_MediaType);
             VERBOSE(VB_IMPORTANT,
                     QString("Detected MediaType ") + MediaTypeString());
         }
