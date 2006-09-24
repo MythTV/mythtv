@@ -1,5 +1,5 @@
 /**
- * \file     mythmediamon-darwin.cpp
+ * \file     mediamonitor-darwin.cpp
  * \brief    MythMediaMonitor for Darwin/Mac OS X.
  *
  * \bug      I am using VB_UPNP for some VERBOSE messages.
