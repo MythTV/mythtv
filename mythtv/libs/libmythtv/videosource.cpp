@@ -806,25 +806,25 @@ class FirewireConnection: public ComboBoxSetting, public CCSetting
         }
 };
 
-class FirewirePort: public LineEditSetting, public CCSetting
+class FirewirePort: public SpinBoxSetting, public CCSetting
 {
   public:
     FirewirePort(const CaptureCard& parent)
-      : CCSetting(parent, "firewire_port")
+      : SpinBoxSetting(0,63,1), CCSetting(parent, "firewire_port")
     {
-        setValue("0");
+        setValue(0);
         setLabel(QObject::tr("IEEE-1394 Port"));
         setHelpText(QObject::tr("Firewire port on your firewire card."));
     }
 };
 
-class FirewireNode: public LineEditSetting, public CCSetting
+class FirewireNode: public SpinBoxSetting, public CCSetting
 {
   public:
     FirewireNode(const CaptureCard& parent)
-      : CCSetting(parent, "firewire_node")
+      : SpinBoxSetting(0,63,1), CCSetting(parent, "firewire_node")
     {
-        setValue("2");
+        setValue(2);
         setLabel(QObject::tr("Node"));
         setHelpText(QObject::tr("Firewire node is the remote device."));
     }
