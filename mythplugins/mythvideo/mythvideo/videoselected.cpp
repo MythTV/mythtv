@@ -196,7 +196,8 @@ void VideoSelected::updatePlayWait(QPainter *p)
 
         gContext->GetMainWindow()->raise();
         gContext->GetMainWindow()->setActiveWindow();
-        gContext->GetMainWindow()->currentWidget()->setFocus();
+        if (gContext->GetMainWindow()->currentWidget())
+            gContext->GetMainWindow()->currentWidget()->setFocus();
 
         m_state = 0;
         update(fullRect);
