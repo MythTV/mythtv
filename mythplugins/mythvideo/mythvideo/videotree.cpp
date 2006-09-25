@@ -541,7 +541,8 @@ void VideoTree::playVideo(Metadata *someItem)
     m_imp->video_tree_list->deactivate();
     gContext->GetMainWindow()->raise();
     gContext->GetMainWindow()->setActiveWindow();
-    gContext->GetMainWindow()->currentWidget()->setFocus();
+    if (gContext->GetMainWindow()->currentWidget())
+        gContext->GetMainWindow()->currentWidget()->setFocus();
 
     updateForeground();
 }

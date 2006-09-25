@@ -191,7 +191,8 @@ void VideoDialog::playVideo(Metadata *someItem)
 
     gContext->GetMainWindow()->raise();
     gContext->GetMainWindow()->setActiveWindow();
-    gContext->GetMainWindow()->currentWidget()->setFocus();
+    if (gContext->GetMainWindow()->currentWidget())
+        gContext->GetMainWindow()->currentWidget()->setFocus();
 
     allowPaint = true;
 
