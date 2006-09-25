@@ -6347,11 +6347,10 @@ void NuppelVideoPlayer::DisplayDVDButton(void)
     int numbuttons = ringBuffer->DVD()->NumMenuButtons();
     bool osdshown = osd->IsSetDisplaying("subtitles");
     long long menupktpts = ringBuffer->DVD()->GetMenuPktPts();
-    bool instillframe = ringBuffer->DVD()->InStillFrame();
 
     if ((numbuttons == 0) || 
         (osdshown) ||
-        (instillframe && buffer->timecode > 0) ||
+        (indvdstillframe && buffer->timecode > 0) ||
         ((!osdshown) && 
             (!indvdstillframe) &&
             (hidedvdbutton) &&
