@@ -102,7 +102,8 @@ void playVCD()
         myth_system(command_string);
         gContext->GetMainWindow()->raise();
         gContext->GetMainWindow()->setActiveWindow();
-        gContext->GetMainWindow()->currentWidget()->setFocus();
+        if (gContext->GetMainWindow()->currentWidget())
+            gContext->GetMainWindow()->currentWidget()->setFocus();
     }
     gContext->removeCurrentLocation();
 }
