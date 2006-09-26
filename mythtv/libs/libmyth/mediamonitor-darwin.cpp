@@ -28,6 +28,8 @@
 // The 'extern "C"' forces them in the C namespace, not the C++
 extern "C" static void diskAppearedCallback(DADiskRef disk, void *context);
 extern "C" static void diskDisappearedCallback(DADiskRef disk, void *context);
+extern "C" static void diskChangedCallback(DADiskRef disk,
+                                           CFArrayRef keys, void *context);
 extern "C" static MediaType MediaTypeForBSDName(const char *bsdName);
 
 static mach_port_t sMasterPort;
@@ -165,9 +167,41 @@ MediaType MediaTypeForBSDName(const char *bsdName)
 }
 
 
+/**
+ * Given a description of a disk, copy and return the volume name
+ */
+static char * getVolName(CFDictionaryRef diskDetails)
+{
+    CFStringRef name;
+    CFIndex     size;
+    char       *volName;
+
+    name = (CFStringRef)
+           CFDictionaryGetValue(diskDetails, kDADiskDescriptionVolumeNameKey);
+    if (name)
+        size = CFStringGetLength(name) + 1;
+    else
+        size = 9;  // 'Untitled\0'
+
+    volName = (char *) malloc(size);
+    if (!volName)
+    {
+        VERBOSE(VB_IMPORTANT,
+                QString("getVolName() - Error. Can't malloc(%1)?").arg(size));
+        return NULL;
+    }
+
+    if (!name || !CFStringGetCString(name, volName, size,
+                                     kCFStringEncodingUTF8))
+        strcpy(volName, "Untitled");
+
+    return volName;
+}
+
+
 /*
  * Callbacks which the Disk Arbitration session invokes
- * whenever a disk is mounted/unmounted/attached/detatched
+ * whenever a disk comes or goes, or is renamed
  */
 
 void diskAppearedCallback(DADiskRef disk, void *context)
@@ -178,8 +212,6 @@ void diskAppearedCallback(DADiskRef disk, void *context)
     MediaType            mediaType;
     MonitorThreadDarwin *mtd;
     QString              msg = "diskAppearedCallback() - ";
-    CFStringRef          name;
-    CFIndex              size;
     char                *volName;
 
 
@@ -213,27 +245,7 @@ void diskAppearedCallback(DADiskRef disk, void *context)
     }
 
     // Get the volume name for more user-friendly interaction
-    name = (CFStringRef)
-           CFDictionaryGetValue(details, kDADiskDescriptionVolumeNameKey);
-    if (name)
-        size = CFStringGetLength(name) + 1;
-    else
-        size = 9;  // 'Untitled\0'
-
-    volName = (char *) malloc(size);
-    if (!volName)
-    {
-        QString  err = QString("Error. Couldn't malloc(%1)?").arg(size);
-
-        VERBOSE(VB_IMPORTANT, msg + err);
-        CFRelease(details);
-        return;
-    }
-
-    if (!name || !CFStringGetCString(name, volName, size,
-                                     kCFStringEncodingUTF8))
-        strcpy(volName, "Untitled");
-
+    volName = getVolName(details);
 
     mediaType = MediaTypeForBSDName(BSDname);
     isCDorDVD = (mediaType == MEDIATYPE_DVD) || (mediaType == MEDIATYPE_AUDIO);
@@ -259,17 +271,39 @@ void diskDisappearedCallback(DADiskRef disk, void *context)
         reinterpret_cast<MonitorThreadDarwin *>(context)->diskRemove(BSDname);
 }
 
+void diskChangedCallback(DADiskRef disk, CFArrayRef keys, void *context)
+{
+    if (CFArrayContainsValue(keys, CFRangeMake(0, CFArrayGetCount(keys)),
+                             kDADiskDescriptionVolumeNameKey))
+    {
+        const char     *BSDname = DADiskGetBSDName(disk);
+        CFDictionaryRef details = DADiskCopyDescription(disk);
+        char           *volName = getVolName(details);
 
+        reinterpret_cast<MonitorThreadDarwin *>(context)
+            ->diskRename(BSDname, volName);
+        CFRelease(details);
+        free(volName);
+    }
+}
+
+
+/**
+ * Use the DiskArbitration Daemon to inform us of media changes
+ */
 void MonitorThreadDarwin::run(void)
 {
-    DASessionRef daSession = DASessionCreate(kCFAllocatorDefault);
+    CFDictionaryRef match     = kDADiskDescriptionMatchVolumeMountable;
+    DASessionRef    daSession = DASessionCreate(kCFAllocatorDefault);
 
-    DARegisterDiskAppearedCallback(daSession,
-                                   kDADiskDescriptionMatchVolumeMountable,
+
+    DARegisterDiskAppearedCallback(daSession, match,
                                    diskAppearedCallback, this);
-    DARegisterDiskDisappearedCallback(daSession,
-                                      kDADiskDescriptionMatchVolumeMountable,
+    DARegisterDiskDisappearedCallback(daSession, match,
                                       diskDisappearedCallback, this);
+    DARegisterDiskDescriptionChangedCallback(daSession, match,
+                                             kDADiskDescriptionWatchVolumeName,
+                                             diskChangedCallback, this);
 
     DASessionScheduleWithRunLoop(daSession,
                                  CFRunLoopGetCurrent(), kCFRunLoopDefaultMode);
@@ -285,6 +319,9 @@ void MonitorThreadDarwin::run(void)
                            (float) m_Interval / 1000.0f, false );
     }
 
+    DAUnregisterCallback(daSession, (void(*))diskChangedCallback,     this);
+    DAUnregisterCallback(daSession, (void(*))diskDisappearedCallback, this);
+    DAUnregisterCallback(daSession, (void(*))diskAppearedCallback,    this);
     CFRelease(daSession);
 }
 
@@ -335,6 +372,32 @@ void MonitorThreadDarwin::diskRemove(QString devName)
             QString("MonitorThreadDarwin::diskRemove(%1)").arg(devName));
 
     m_Monitor->RemoveDevice(devName);
+}
+
+/**
+ * \brief Deal with the user, or another program, renaming a volume
+ *
+ * iTunes has a habit of renaming the disk volumes and track files
+ * after it looks up a disk on the GraceNote CDDB.
+ */
+void MonitorThreadDarwin::diskRename(const char *devName, const char *volName)
+{
+    QValueList<MythMediaDevice*>::Iterator i;
+
+    for (i = m_Monitor->m_Devices.begin(); i != m_Monitor->m_Devices.end(); ++i)
+    {
+        if (m_Monitor->ValidateAndLock(*i))
+            if ((*i)->getDevicePath() == devName)
+            {
+                VERBOSE(VB_UPNP,
+                        QString("MonitorThreadDarwin::diskRename(%1,%2)")
+                        .arg(devName).arg(volName));
+
+                (*i)->setVolumeID(volName);
+                (*i)->setMountPath(QString("/Volumes/") + volName);
+            }
+        m_Monitor->Unlock(*i);
+    }
 }
 
 /**
