@@ -40,7 +40,7 @@ The following is a list of some of the prerequisites you will need installed:
            If you are in North America, you do not need XMLTV.  MythTV has
            a built-in grabber which uses Zap2It as a data source.  See the
            HOWTO for complete instructions on configuring an account.
-          
+
 See the mythtv-HOWTO.html, .pdf or .txt file in the docs/ subdirectory or on
 http://www.mythtv.org/docs/ for in-depth instructions on installing and
 compiling MythTV and all of the pre-requisites.  It has instructions for
