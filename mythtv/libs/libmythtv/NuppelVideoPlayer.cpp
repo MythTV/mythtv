@@ -573,7 +573,7 @@ bool NuppelVideoPlayer::InitVideo(void)
 
 void NuppelVideoPlayer::ReinitOSD(void)
 {
-    if (videoOutput)
+    if (videoOutput && !using_null_videoout)
     {
         QRect visible, total;
         float aspect, scaling;
