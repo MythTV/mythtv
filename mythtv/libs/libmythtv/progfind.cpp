@@ -131,6 +131,7 @@ void ProgFinder::Initialize(void)
     searchData = new QString[searchCount];
 
     fillSearchData();
+    schedList.FromScheduler();
 
     update_Timer = new QTimer(this);
     connect(update_Timer, SIGNAL(timeout()), SLOT(update_timeout()) );
@@ -848,6 +849,7 @@ void ProgFinder::showSearchList()
                 for (int i = (int)(tempSearch * showsPerListing);
                      i < (int)((tempSearch + 1) * showsPerListing); i++)
                 {
+                    ltype->EnableForcedFont(curLabel, "inactive");
                     if (initData[i] != NULL)
                     {
                         if (curLabel == (int)(showsPerListing / 2))
@@ -856,6 +858,18 @@ void ProgFinder::showSearchList()
                         else
                             ltype->SetItemText(curLabel, " " + initData[i] +
                                                " ");
+
+                        ProgramInfo *s; 
+                        for (s = schedList.first(); s; s = schedList.next())
+                            if ((s->title == initData[i]) &&
+                                ((s->recstatus == rsRecording) ||
+                                 (s->recstatus == rsWillRecord)))
+                                break;
+
+                        if (s && s->recstatus == rsRecording)
+                            ltype->EnableForcedFont(curLabel, "recording");
+                        else if (s && s->recstatus == rsWillRecord)
+                            ltype->EnableForcedFont(curLabel, "record");
                      }
                      else
                          ltype->SetItemText(curLabel, "");
@@ -895,6 +909,11 @@ void ProgFinder::showProgramList()
                     if (i >= listCount)
                         t = i - listCount;
 
+                    if (inSearch == 1)
+                        ltype->EnableForcedFont(curLabel, "active");
+                    else
+                        ltype->EnableForcedFont(curLabel, "inactive");
+
                     if (progData[t] != NULL)
                     {
                         if (progData[t] != "**!0")
@@ -905,6 +924,18 @@ void ProgFinder::showProgramList()
                             else
                                 ltype->SetItemText(curLabel, " " + progData[t]
                                                    + " ");
+
+                            ProgramInfo *s; 
+                            for (s = schedList.first(); s; s = schedList.next())
+                                if ((s->title == progData[t]) &&
+                                    ((s->recstatus == rsRecording) ||
+                                     (s->recstatus == rsWillRecord)))
+                                    break;
+
+                            if (s && s->recstatus == rsRecording)
+                                ltype->EnableForcedFont(curLabel, "recording");
+                            else if (s && s->recstatus == rsWillRecord)
+                                ltype->EnableForcedFont(curLabel, "record");
                         }
                         else
                             ltype->SetItemText(curLabel, "");
@@ -1390,6 +1421,7 @@ void ProgFinder::customEvent(QCustomEvent *e)
                     ProgramInfo *curPick = showData[curShow];
                     if (curPick)
                         selectShowData(curPick->title, curShow);
+                    showProgramList();
                 } while (needFill);
 
                 allowkeypress = true;
@@ -1510,3 +1542,5 @@ void JaProgFinder::getAllProgramData()
         getSearchData(charNum);
     }
 }
+
+/* vim: set expandtab tabstop=4 shiftwidth=4: */

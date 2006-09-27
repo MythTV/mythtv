@@ -1011,6 +1011,8 @@
         <fcnfont name="list-active" function="active"></fcnfont>
         <fcnfont name="list-selected" function="selected"></fcnfont>
         <fcnfont name="list-inactive" function="inactive"></fcnfont>
+        <fcnfont name="list-record" function="record"></fcnfont>
+        <fcnfont name="list-recording" function="recording"></fcnfont>
         <column number="1" width="380" context="-1"></column>
         <items>9</items>
         <image function="selectionbar" filename="progfind_sel2.png" location="-14,-5"></image>

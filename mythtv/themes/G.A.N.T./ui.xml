@@ -1493,6 +1493,8 @@
         <fcnfont name="active" function="active"></fcnfont>
         <fcnfont name="active" function="selected"></fcnfont>
         <fcnfont name="inactive" function="inactive"></fcnfont>
+        <fcnfont name="record_font" function="record"></fcnfont>
+        <fcnfont name="recording_font" function="recording"></fcnfont>
         <column number="1" width="380" context="-1"></column>
         <items>9</items>
         <image function="selectionbar" filename="pf-sel2.png" location="-14,-7"></image>
