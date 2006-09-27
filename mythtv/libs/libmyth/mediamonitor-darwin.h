@@ -12,6 +12,7 @@ class MonitorThreadDarwin : public MonitorThread
     void  diskInsert(const char *devName,
                      const char *volName, bool isCDorDVD = 1);
     void  diskRemove(QString devName);
+    void  diskRename(const char *devName, const char *volName);
 };
 
 class MediaMonitorDarwin : public MediaMonitor
