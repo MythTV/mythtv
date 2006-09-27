@@ -1,3 +1,21 @@
+/*
+ * copyright (c) 2006 Michael Niedermayer <michaelni@gmx.at>
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
+ */
+
 /**
  * @file common.h
  * common internal and external api header.
@@ -217,7 +235,21 @@ static inline int av_log2_16bit(unsigned int v)
 /* median of 3 */
 static inline int mid_pred(int a, int b, int c)
 {
-#if 0
+#if (defined(ARCH_X86) && __CPU__ >= 686 || defined(ARCH_X86_64)) && !defined(RUNTIME_CPUDETECT)
+    int i=b;
+    asm volatile(
+        "cmp    %2, %1 \n\t"
+        "cmovg  %1, %0 \n\t"
+        "cmovg  %2, %1 \n\t"
+        "cmp    %3, %1 \n\t"
+        "cmovl  %3, %1 \n\t"
+        "cmp    %1, %0 \n\t"
+        "cmovg  %1, %0 \n\t"
+        :"+&r"(i), "+&r"(a)
+        :"r"(b), "r"(c)
+    );
+    return i;
+#elif 0
     int t= (a-b)&((a-b)>>31);
     a-=t;
     b+=t;
@@ -354,7 +386,7 @@ tend= read_time();\
       tcount++;\
   }else\
       tskip_count++;\
-  if(256*256*256*64%(tcount+tskip_count)==0){\
+  if(((tcount+tskip_count)&(tcount+tskip_count-1))==0){\
       av_log(NULL, AV_LOG_DEBUG, "%"PRIu64" dezicycles in %s, %d runs, %d skips\n", tsum*10/tcount, id, tcount, tskip_count);\
   }\
 }
@@ -364,8 +396,20 @@ tend= read_time();\
 #endif
 
 /* memory */
+
+#ifdef __GNUC__
+  #define DECLARE_ALIGNED(n,t,v)       t v __attribute__ ((aligned (n)))
+#else
+  #define DECLARE_ALIGNED(n,t,v)      __declspec(align(n)) t v
+#endif
+
+/* memory */
 void *av_malloc(unsigned int size);
 void *av_realloc(void *ptr, unsigned int size);
 void av_free(void *ptr);
+
+void *av_mallocz(unsigned int size);
+char *av_strdup(const char *s);
+void av_freep(void *ptr);
 
 #endif /* COMMON_H */

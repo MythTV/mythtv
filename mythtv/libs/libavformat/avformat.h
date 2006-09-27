@@ -1,3 +1,21 @@
+/*
+ * copyright (c) 2001 Fabrice Bellard
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
+ */
+
 #ifndef AVFORMAT_H
 #define AVFORMAT_H
 
@@ -93,7 +111,7 @@ typedef struct AVProbeData {
     int buf_size;
 } AVProbeData;
 
-#define AVPROBE_SCORE_MAX 100
+#define AVPROBE_SCORE_MAX 100               ///< max score, half of that is used for file extension based detection
 
 typedef struct AVFormatParameters {
     AVRational time_base;
@@ -112,6 +130,7 @@ typedef struct AVFormatParameters {
                                   mpeg2ts_raw is TRUE */
     int initial_pause:1;       /* do not begin to play the stream
                                   immediately (RTSP only) */
+    int prealloced_context:1;
     enum CodecID video_codec_id;
     enum CodecID audio_codec_id;
 } AVFormatParameters;
@@ -266,6 +285,9 @@ typedef struct AVStream {
 
     int64_t nb_frames;                 ///< number of frames in this stream if known or 0
 
+#define MAX_REORDER_DELAY 4
+    int64_t pts_buffer[MAX_REORDER_DELAY+1];
+
     int got_frame;
     int64_t cur_frame_startpos;
 
@@ -351,8 +373,11 @@ typedef struct AVFormatContext {
 
     int flags;
 #define AVFMT_FLAG_GENPTS       0x0001 ///< generate pts if missing even if it requires parsing future frames
+#define AVFMT_FLAG_IGNIDX       0x0002 ///< ignore index
 
     int loop_input;
+    /* decoding: size of data to probe; encoding unused */
+    unsigned int probesize;
 } AVFormatContext;
 
 typedef struct AVPacketList {
@@ -414,9 +439,6 @@ extern AVImageFormat *first_image_format attribute_deprecated;
 
 #include "rtsp.h"
 
-/* yuv4mpeg.c */
-extern AVOutputFormat yuv4mpegpipe_muxer;
-
 /* utils.c */
 void av_register_input_format(AVInputFormat *format);
 void av_register_output_format(AVOutputFormat *format);
@@ -431,19 +453,6 @@ void av_hex_dump(FILE *f, uint8_t *buf, int size);
 void av_pkt_dump(FILE *f, AVPacket *pkt, int dump_payload);
 
 void av_register_all(void);
-
-typedef struct FifoBuffer {
-    uint8_t *buffer;
-    uint8_t *rptr, *wptr, *end;
-} FifoBuffer;
-
-int fifo_init(FifoBuffer *f, int size);
-void fifo_free(FifoBuffer *f);
-int fifo_size(FifoBuffer *f, uint8_t *rptr);
-int fifo_read(FifoBuffer *f, uint8_t *buf, int buf_size, uint8_t **rptr_ptr);
-void fifo_write(FifoBuffer *f, const uint8_t *buf, int size, uint8_t **wptr_ptr);
-int put_fifo(ByteIOContext *pb, FifoBuffer *f, int buf_size, uint8_t **rptr_ptr);
-void fifo_realloc(FifoBuffer *f, unsigned int size);
 
 /* media file input */
 AVInputFormat *av_find_input_format(const char *short_name);
@@ -520,9 +529,9 @@ void ffm_set_write_index(AVFormatContext *s, offset_t pos, offset_t file_size);
 
 int find_info_tag(char *arg, int arg_size, const char *tag1, const char *info);
 
-int get_frame_filename(char *buf, int buf_size,
-                       const char *path, int number);
-int filename_number_test(const char *filename);
+int av_get_frame_filename(char *buf, int buf_size,
+                          const char *path, int number);
+int av_filename_number_test(const char *filename);
 
 /* grab specific */
 int video_grab_init(void);

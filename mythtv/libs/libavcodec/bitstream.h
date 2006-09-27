@@ -1,3 +1,21 @@
+/*
+ * copyright (c) 2004 Michael Niedermayer <michaelni@gmx.at>
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
+ */
+
 /**
  * @file bitstream.h
  * bitstream api header.
@@ -6,12 +24,23 @@
 #ifndef BITSTREAM_H
 #define BITSTREAM_H
 
+#include "log.h"
+
+#if defined(ALT_BITSTREAM_READER_LE) && !defined(ALT_BITSTREAM_READER)
+#define ALT_BITSTREAM_READER
+#endif
+
 //#define ALT_BITSTREAM_WRITER
 //#define ALIGNED_BITSTREAM_WRITER
-
+#if !defined(LIBMPEG2_BITSTREAM_READER) && !defined(A32_BITSTREAM_READER) && !defined(ALT_BITSTREAM_READER)
+#   ifdef ARCH_ARMV4L
+#       define A32_BITSTREAM_READER
+#   else
 #define ALT_BITSTREAM_READER
 //#define LIBMPEG2_BITSTREAM_READER
 //#define A32_BITSTREAM_READER
+#   endif
+#endif
 #define LIBMPEG2_BITSTREAM_READER_HACK //add BERO
 
 extern const uint8_t ff_reverse[256];
@@ -443,6 +472,11 @@ static inline int unaligned32_le(const void *v)
 static inline int get_bits_count(GetBitContext *s){
     return s->index;
 }
+
+static inline void skip_bits_long(GetBitContext *s, int n){
+    s->index += n;
+}
+
 #elif defined LIBMPEG2_BITSTREAM_READER
 //libmpeg2 like reader
 
@@ -506,6 +540,16 @@ static inline int get_bits_count(GetBitContext *s){
     return (s->buffer_ptr - s->buffer)*8 - 16 + s->bit_count;
 }
 
+static inline void skip_bits_long(GetBitContext *s, int n){
+    OPEN_READER(re, s)
+    re_bit_count += n;
+    re_buffer_ptr += 2*(re_bit_count>>4);
+    re_bit_count &= 15;
+    re_cache = ((re_buffer_ptr[-2]<<8) + re_buffer_ptr[-1]) << (16+re_bit_count);
+    UPDATE_CACHE(re, s)
+    CLOSE_READER(re, s)
+}
+
 #elif defined A32_BITSTREAM_READER
 
 #   define MIN_CACHE_BITS 32
@@ -537,7 +581,7 @@ static inline int get_bits_count(GetBitContext *s){
             "shldl %2, %1, %0          \n\t"\
             "shll %2, %1               \n\t"\
             : "+r" (name##_cache0), "+r" (name##_cache1)\
-            : "Ic" ((uint8_t)num)\
+            : "Ic" ((uint8_t)(num))\
            );
 #else
 #   define SKIP_CACHE(name, gb, num)\
@@ -569,6 +613,17 @@ static inline int get_bits_count(GetBitContext *s){
 
 static inline int get_bits_count(GetBitContext *s){
     return ((uint8_t*)s->buffer_ptr - s->buffer)*8 - 32 + s->bit_count;
+}
+
+static inline void skip_bits_long(GetBitContext *s, int n){
+    OPEN_READER(re, s)
+    re_bit_count += n;
+    re_buffer_ptr += re_bit_count>>5;
+    re_bit_count &= 31;
+    re_cache0 = be2me_32( re_buffer_ptr[-1] ) << re_bit_count;
+    re_cache1 = 0;
+    UPDATE_CACHE(re, s)
+    CLOSE_READER(re, s)
 }
 
 #endif
@@ -615,8 +670,6 @@ static inline unsigned int get_bits(GetBitContext *s, int n){
     return tmp;
 }
 
-unsigned int get_bits_long(GetBitContext *s, int n);
-
 /**
  * shows 0-17 bits.
  * Note, the alt bitstream reader can read up to 25 bits, but the libmpeg2 reader can't
@@ -629,8 +682,6 @@ static inline unsigned int show_bits(GetBitContext *s, int n){
 //    CLOSE_READER(re, s)
     return tmp;
 }
-
-unsigned int show_bits_long(GetBitContext *s, int n);
 
 static inline void skip_bits(GetBitContext *s, int n){
  //Note gcc seems to optimize this to s->index+=n for the ALT_READER :))
@@ -669,6 +720,44 @@ static inline void skip_bits1(GetBitContext *s){
 }
 
 /**
+ * reads 0-32 bits.
+ */
+static inline unsigned int get_bits_long(GetBitContext *s, int n){
+    if(n<=17) return get_bits(s, n);
+    else{
+#ifdef ALT_BITSTREAM_READER_LE
+        int ret= get_bits(s, 16);
+        return ret | (get_bits(s, n-16) << 16);
+#else
+        int ret= get_bits(s, 16) << (n-16);
+        return ret | get_bits(s, n-16);
+#endif
+    }
+}
+
+/**
+ * shows 0-32 bits.
+ */
+static inline unsigned int show_bits_long(GetBitContext *s, int n){
+    if(n<=17) return show_bits(s, n);
+    else{
+        GetBitContext gb= *s;
+        int ret= get_bits_long(s, n);
+        *s= gb;
+        return ret;
+    }
+}
+
+static inline int check_marker(GetBitContext *s, const char *msg)
+{
+    int bit= get_bits1(s);
+    if(!bit)
+        av_log(NULL, AV_LOG_INFO, "Marker bit missing %s\n", msg);
+
+    return bit;
+}
+
+/**
  * init GetBitContext.
  * @param buffer bitstream buffer, must be FF_INPUT_BUFFER_PADDING_SIZE bytes larger then the actual read bits
  * because some optimized bitstream readers read 32 or 64 bit at once and could read over the end
@@ -689,38 +778,22 @@ static inline void init_get_bits(GetBitContext *s,
 #ifdef ALT_BITSTREAM_READER
     s->index=0;
 #elif defined LIBMPEG2_BITSTREAM_READER
-#ifdef LIBMPEG2_BITSTREAM_READER_HACK
-  if ((int)buffer&1) {
-     /* word alignment */
-    s->cache = (*buffer++)<<24;
-    s->buffer_ptr = buffer;
-    s->bit_count = 16-8;
-  } else
-#endif
-  {
-    s->buffer_ptr = buffer;
-    s->bit_count = 16;
-    s->cache = 0;
-  }
+    s->buffer_ptr = (uint8_t*)((intptr_t)buffer&(~1));
+    s->bit_count = 16 + 8*((intptr_t)buffer&1);
+    skip_bits_long(s, 0);
 #elif defined A32_BITSTREAM_READER
-    s->buffer_ptr = (uint32_t*)buffer;
-    s->bit_count = 32;
-    s->cache0 = 0;
-    s->cache1 = 0;
-#endif
-    {
-        OPEN_READER(re, s)
-        UPDATE_CACHE(re, s)
-        UPDATE_CACHE(re, s)
-        CLOSE_READER(re, s)
-    }
-#ifdef A32_BITSTREAM_READER
-    s->cache1 = 0;
+    s->buffer_ptr = (uint32_t*)((intptr_t)buffer&(~3));
+    s->bit_count = 32 + 8*((intptr_t)buffer&3);
+    skip_bits_long(s, 0);
 #endif
 }
 
-int check_marker(GetBitContext *s, const char *msg);
-void align_get_bits(GetBitContext *s);
+static inline void align_get_bits(GetBitContext *s)
+{
+    int n= (-get_bits_count(s)) & 7;
+    if(n) skip_bits(s, n);
+}
+
 int init_vlc(VLC *vlc, int nb_bits, int nb_codes,
              const void *bits, int bits_wrap, int bits_size,
              const void *codes, int codes_wrap, int codes_size,
@@ -816,7 +889,6 @@ static always_inline int get_vlc2(GetBitContext *s, VLC_TYPE (*table)[2],
 //#define TRACE
 
 #ifdef TRACE
-#include "avcodec.h"
 static inline void print_bin(int bits, int n){
     int i;
 

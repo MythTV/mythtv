@@ -270,6 +270,8 @@ typedef struct DSPContext {
      * h264 Chram MC
      */
     h264_chroma_mc_func put_h264_chroma_pixels_tab[3];
+    /* This is really one func used in VC-1 decoding */
+    h264_chroma_mc_func put_no_rnd_h264_chroma_pixels_tab[3];
     h264_chroma_mc_func avg_h264_chroma_pixels_tab[3];
 
     qpel_mc_func put_h264_qpel_pixels_tab[4][16];
@@ -305,6 +307,9 @@ typedef struct DSPContext {
     void (*h264_h_loop_filter_chroma)(uint8_t *pix, int stride, int alpha, int beta, int8_t *tc0);
     void (*h264_v_loop_filter_chroma_intra)(uint8_t *pix, int stride, int alpha, int beta);
     void (*h264_h_loop_filter_chroma_intra)(uint8_t *pix, int stride, int alpha, int beta);
+    // h264_loop_filter_strength: simd only. the C version is inlined in h264.c
+    void (*h264_loop_filter_strength)(int16_t bS[2][4][4], uint8_t nnz[40], int8_t ref[2][40], int16_t mv[2][40][2],
+                                      int bidir, int edges, int step, int mask_mv0, int mask_mv1);
 
     void (*h263_v_loop_filter)(uint8_t *src, int stride, int qscale);
     void (*h263_h_loop_filter)(uint8_t *src, int stride, int qscale);
@@ -320,7 +325,7 @@ typedef struct DSPContext {
     void (*vector_fmul_add_add)(float *dst, const float *src0, const float *src1, const float *src2, int src3, int len, int step);
 
     /* C version: convert floats from the range [384.0,386.0] to ints in [-32768,32767]
-     * asm versions: convert floats from [-32768.0,32767.0] without rescaling */
+     * simd versions: convert floats from [-32768.0,32767.0] without rescaling and arrays are 16byte aligned */
     void (*float_to_int16)(int16_t *dst, const float *src, int len);
 
     /* (I)DCT */
@@ -566,6 +571,13 @@ void dsputil_init_mmi(DSPContext* c, AVCodecContext *avctx);
 
 void dsputil_init_sh4(DSPContext* c, AVCodecContext *avctx);
 
+#elif defined(ARCH_BFIN)
+
+#define DECLARE_ALIGNED_8(t,v)    t v __attribute__ ((aligned (8)))
+#define STRIDE_ALIGN 8
+
+void dsputil_init_bfin(DSPContext* c, AVCodecContext *avctx);
+
 #else
 
 #define DECLARE_ALIGNED_8(t,v)    t v __attribute__ ((aligned (8)))
@@ -655,6 +667,8 @@ void ff_imdct_calc(MDCTContext *s, FFTSample *output,
                 const FFTSample *input, FFTSample *tmp);
 void ff_imdct_calc_3dn2(MDCTContext *s, FFTSample *output,
                         const FFTSample *input, FFTSample *tmp);
+void ff_imdct_calc_sse(MDCTContext *s, FFTSample *output,
+                       const FFTSample *input, FFTSample *tmp);
 void ff_mdct_calc(MDCTContext *s, FFTSample *out,
                const FFTSample *input, FFTSample *tmp);
 void ff_mdct_end(MDCTContext *s);

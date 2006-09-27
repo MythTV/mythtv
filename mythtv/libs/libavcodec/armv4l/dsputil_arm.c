@@ -27,6 +27,12 @@ extern void dsputil_init_iwmmxt(DSPContext* c, AVCodecContext *avctx);
 extern void j_rev_dct_ARM(DCTELEM *data);
 extern void simple_idct_ARM(DCTELEM *data);
 
+extern void simple_idct_armv5te(DCTELEM *data);
+extern void simple_idct_put_armv5te(uint8_t *dest, int line_size,
+                                    DCTELEM *data);
+extern void simple_idct_add_armv5te(uint8_t *dest, int line_size,
+                                    DCTELEM *data);
+
 /* XXX: local hack */
 static void (*ff_put_pixels_clamped)(const DCTELEM *block, uint8_t *pixels, int line_size);
 static void (*ff_add_pixels_clamped)(const DCTELEM *block, uint8_t *pixels, int line_size);
@@ -164,45 +170,48 @@ static void simple_idct_ARM_add(uint8_t *dest, int line_size, DCTELEM *block)
     simple_idct_ARM (block);
     ff_add_pixels_clamped(block, dest, line_size);
 }
+
+#ifdef HAVE_IPP
 static void simple_idct_ipp(DCTELEM *block)
 {
-#ifdef HAVE_IPP
     ippiDCT8x8Inv_Video_16s_C1I(block);
-#endif
 }
 static void simple_idct_ipp_put(uint8_t *dest, int line_size, DCTELEM *block)
 {
-#ifdef HAVE_IPP
     ippiDCT8x8Inv_Video_16s8u_C1R(block, dest, line_size);
-#endif
 }
 
 void add_pixels_clamped_iwmmxt(const DCTELEM *block, uint8_t *pixels, int line_size);
 
 static void simple_idct_ipp_add(uint8_t *dest, int line_size, DCTELEM *block)
 {
-#ifdef HAVE_IPP
     ippiDCT8x8Inv_Video_16s_C1I(block);
 #ifdef HAVE_IWMMXT
     add_pixels_clamped_iwmmxt(block, dest, line_size);
 #else
     add_pixels_clamped_ARM(block, dest, line_size);
 #endif
-#endif
 }
+#endif
 
 void dsputil_init_armv4l(DSPContext* c, AVCodecContext *avctx)
 {
-    const int idct_algo= avctx->idct_algo;
+    int idct_algo= avctx->idct_algo;
 
     ff_put_pixels_clamped = c->put_pixels_clamped;
     ff_add_pixels_clamped = c->add_pixels_clamped;
 
-#ifdef HAVE_IPP
-    if(idct_algo==FF_IDCT_ARM){
+    if(idct_algo == FF_IDCT_AUTO){
+#if defined(HAVE_IPP)
+        idct_algo = FF_IDCT_IPP;
+#elif defined(HAVE_ARMV5TE)
+        idct_algo = FF_IDCT_SIMPLEARMV5TE;
 #else
-    if(idct_algo==FF_IDCT_AUTO || idct_algo==FF_IDCT_ARM){
+        idct_algo = FF_IDCT_ARM;
 #endif
+    }
+
+    if(idct_algo==FF_IDCT_ARM){
         c->idct_put= j_rev_dct_ARM_put;
         c->idct_add= j_rev_dct_ARM_add;
         c->idct    = j_rev_dct_ARM;
@@ -212,22 +221,27 @@ void dsputil_init_armv4l(DSPContext* c, AVCodecContext *avctx)
         c->idct_add= simple_idct_ARM_add;
         c->idct    = simple_idct_ARM;
         c->idct_permutation_type= FF_NO_IDCT_PERM;
-#ifdef HAVE_IPP
-    } else if (idct_algo==FF_IDCT_AUTO || idct_algo==FF_IDCT_IPP){
-#else
-    } else if (idct_algo==FF_IDCT_IPP){
+#ifdef HAVE_ARMV5TE
+    } else if (idct_algo==FF_IDCT_SIMPLEARMV5TE){
+        c->idct_put= simple_idct_put_armv5te;
+        c->idct_add= simple_idct_add_armv5te;
+        c->idct    = simple_idct_armv5te;
+        c->idct_permutation_type = FF_NO_IDCT_PERM;
 #endif
+#ifdef HAVE_IPP
+    } else if (idct_algo==FF_IDCT_IPP){
         c->idct_put= simple_idct_ipp_put;
         c->idct_add= simple_idct_ipp_add;
         c->idct    = simple_idct_ipp;
         c->idct_permutation_type= FF_NO_IDCT_PERM;
+#endif
     }
 
 /*     c->put_pixels_tab[0][0] = put_pixels16_arm; */ // NG!
     c->put_pixels_tab[0][1] = put_pixels16_x2_arm; //OK!
     c->put_pixels_tab[0][2] = put_pixels16_y2_arm; //OK!
 /*     c->put_pixels_tab[0][3] = put_pixels16_xy2_arm; /\* NG *\/ */
-/*     c->put_no_rnd_pixels_tab[0][0] = put_pixels16_arm; // ?(使われない) */
+/*     c->put_no_rnd_pixels_tab[0][0] = put_pixels16_arm; */
     c->put_no_rnd_pixels_tab[0][1] = put_no_rnd_pixels16_x2_arm; // OK
     c->put_no_rnd_pixels_tab[0][2] = put_no_rnd_pixels16_y2_arm; //OK
 /*     c->put_no_rnd_pixels_tab[0][3] = put_no_rnd_pixels16_xy2_arm; //NG */

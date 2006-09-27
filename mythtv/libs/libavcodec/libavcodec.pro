@@ -290,6 +290,10 @@ contains( DO_VMDAV, yes ) {
     SOURCES += vmdav.c
 }
 
+contains( CONFIG_VMNC_DECODER, yes ) {
+    SOURCES += vmnc.c
+}
+
 contains( CONFIG_VORBIS_DECODER, yes ) {
     SOURCES += vorbis.c
 }
@@ -299,8 +303,23 @@ contains( DO_VP3, yes ) {
     SOURCES += vp3.c
 }
 
+DO_VP56 = $$CONFIG_VP5_DECODER $$CONFIG_VP6_DECODER
+contains( DO_VP56, yes ) {
+    contains( CONFIG_VP5_DECODER, yes ) {
+        SOURCES += vp5.c
+    }
+    contains( CONFIG_VP6_DECODER, yes ) {
+        SOURCES += vp6.c
+    }
+    SOURCES += vp56.c vp56data.c
+}
+
 contains( CONFIG_VQA_DECODER, yes ) {
     SOURCES += vqavideo.c
+}
+
+contains( CONFIG_WAVPACK_DECODER, yes ) {
+    SOURCES += wavpack.c
 }
 
 DO_WMA = $$CONFIG_WMAV1_DECODER $$CONFIG_WMAV2_DECODER
@@ -359,7 +378,7 @@ contains( CONFIG_AC3, yes ) {
 
 contains( CONFIG_DTS, yes ) {
     SOURCES += dtsdec.c
-    LIBS += -ldts
+    LIBS += $$CONFIG_DTSLIB
 }
 
 using_xvmc {

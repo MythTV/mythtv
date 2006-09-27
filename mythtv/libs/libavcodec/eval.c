@@ -35,7 +35,7 @@
 #include <math.h>
 
 #ifndef NAN
-  #define NAN 0
+  #define NAN 0.0/0.0
 #endif
 
 #ifndef M_PI
@@ -52,7 +52,10 @@ typedef struct Parser{
     double (**func2)(void *, double a, double b); // NULL terminated
     char **func2_name;          // NULL terminated
     void *opaque;
+    char **error;
 } Parser;
+
+extern double av_strtod(const char *name, char **tail);
 
 static double evalExpression(Parser *p);
 
@@ -70,7 +73,7 @@ static double evalPrimary(Parser *p){
     int i;
 
     /* number */
-    d= strtod(p->s, &next);
+    d= av_strtod(p->s, &next);
     if(next != p->s){
         p->s= next;
         return d;
@@ -86,7 +89,8 @@ static double evalPrimary(Parser *p){
 
     p->s= strchr(p->s, '(');
     if(p->s==NULL){
-        av_log(NULL, AV_LOG_ERROR, "Parser: missing ( in \"%s\"\n", next);
+        *p->error = "missing (";
+        p->s= next;
         return NAN;
     }
     p->s++; // "("
@@ -96,7 +100,7 @@ static double evalPrimary(Parser *p){
         d2= evalExpression(p);
     }
     if(p->s[0] != ')'){
-        av_log(NULL, AV_LOG_ERROR, "Parser: missing ) in \"%s\"\n", next);
+        *p->error = "missing )";
         return NAN;
     }
     p->s++; // ")"
@@ -112,12 +116,12 @@ static double evalPrimary(Parser *p){
     else if( strmatch(next, "squish") ) d= 1/(1+exp(4*d));
     else if( strmatch(next, "gauss" ) ) d= exp(-d*d/2)/sqrt(2*M_PI);
     else if( strmatch(next, "abs"   ) ) d= fabs(d);
-    else if( strmatch(next, "max"   ) ) d= d > d2 ? d : d2;
-    else if( strmatch(next, "min"   ) ) d= d < d2 ? d : d2;
-    else if( strmatch(next, "gt"    ) ) d= d > d2 ? 1.0 : 0.0;
-    else if( strmatch(next, "gte"    ) ) d= d >= d2 ? 1.0 : 0.0;
-    else if( strmatch(next, "lt"    ) ) d= d > d2 ? 0.0 : 1.0;
-    else if( strmatch(next, "lte"    ) ) d= d >= d2 ? 0.0 : 1.0;
+    else if( strmatch(next, "max"   ) ) d= d >  d2 ?   d : d2;
+    else if( strmatch(next, "min"   ) ) d= d <  d2 ?   d : d2;
+    else if( strmatch(next, "gt"    ) ) d= d >  d2 ? 1.0 : 0.0;
+    else if( strmatch(next, "gte"   ) ) d= d >= d2 ? 1.0 : 0.0;
+    else if( strmatch(next, "lt"    ) ) d= d >  d2 ? 0.0 : 1.0;
+    else if( strmatch(next, "lte"   ) ) d= d >= d2 ? 0.0 : 1.0;
     else if( strmatch(next, "eq"    ) ) d= d == d2 ? 1.0 : 0.0;
     else if( strmatch(next, "("     ) ) d= d;
 //    else if( strmatch(next, "l1"    ) ) d= 1 + d2*(d - 1);
@@ -135,7 +139,7 @@ static double evalPrimary(Parser *p){
             }
         }
 
-        av_log(NULL, AV_LOG_ERROR, "Parser: unknown function in \"%s\"\n", next);
+        *p->error = "unknown function";
         return NAN;
     }
 
@@ -182,10 +186,10 @@ static double evalExpression(Parser *p){
     return ret;
 }
 
-double ff_eval(char *s, double *const_value, const char **const_name,
+double ff_eval2(char *s, double *const_value, const char **const_name,
                double (**func1)(void *, double), const char **func1_name,
                double (**func2)(void *, double, double), char **func2_name,
-               void *opaque){
+               void *opaque, char **error){
     Parser p;
 
     p.stack_index=100;
@@ -197,9 +201,24 @@ double ff_eval(char *s, double *const_value, const char **const_name,
     p.func2      = func2;
     p.func2_name = func2_name;
     p.opaque     = opaque;
+    p.error= error;
 
     return evalExpression(&p);
 }
+
+#if LIBAVCODEC_VERSION_INT < ((51<<16)+(17<<8)+0)
+attribute_deprecated double ff_eval(char *s, double *const_value, const char **const_name,
+               double (**func1)(void *, double), const char **func1_name,
+               double (**func2)(void *, double, double), char **func2_name,
+               void *opaque){
+    char *error=NULL;
+    double ret;
+    ret = ff_eval2(s, const_value, const_name, func1, func1_name, func2, func2_name, opaque, &error);
+    if (error)
+        av_log(NULL, AV_LOG_ERROR, "Error evaluating \"%s\": %s\n", s, error);
+    return ret;
+}
+#endif
 
 #ifdef TEST
 #undef printf
@@ -216,6 +235,7 @@ static const char *const_names[]={
 main(){
     int i;
     printf("%f == 12.7\n", ff_eval("1+(5-2)^(3-1)+1/2+sin(PI)-max(-2.2,-3.1)", const_values, const_names, NULL, NULL, NULL, NULL, NULL));
+    printf("%f == 0.931322575\n", ff_eval("80G/80Gi", const_values, const_names, NULL, NULL, NULL, NULL, NULL));
 
     for(i=0; i<1050; i++){
         START_TIMER

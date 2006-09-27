@@ -18,6 +18,7 @@
  */
 #include "avformat.h"
 #include "allformats.h"
+#include "opt.h"
 #include "mpegts.h"
 
 #undef NDEBUG
@@ -110,14 +111,14 @@ AVOutputFormat *guess_format(const char *short_name, const char *filename,
     /* specific test for image sequences */
 #ifdef CONFIG_IMAGE2_MUXER 
     if (!short_name && filename &&
-        filename_number_test(filename) >= 0 &&
+        av_filename_number_test(filename) &&
         av_guess_image2_codec(filename) != CODEC_ID_NONE) {
         return guess_format("image2", NULL, NULL);
     }
 #endif
 
     if (!short_name && filename &&
-        filename_number_test(filename) >= 0 &&
+        av_filename_number_test(filename) &&
         guess_image_format(filename)) {
         return guess_format("image", NULL, NULL);
     }
@@ -291,182 +292,16 @@ int av_dup_packet(AVPacket *pkt)
     return 0;
 }
 
-/* fifo handling */
-
 /**
- * @brief Allocate and initialize a FIFO buffer.
+ * Allocate the payload of a packet and intialized its fields to default values.
  *
- * @param f FifoBuffer we should initialize.
- * @param size Number of pointer to allow in FIFO.
+ * @param filename possible numbered sequence string
+ * @return 1 if a valid numbered sequence string, 0 otherwise.
  */
-int fifo_init(FifoBuffer *f, int size)
-{
-    f->buffer = av_malloc(size);
-    if (!f->buffer)
-        return -1;
-    f->end = f->buffer + size;
-    f->wptr = f->rptr = f->buffer;
-    return 0;
-}
-
-/**
- * @brief Frees FIFO buffer alloced in fifo_init(FifoBuffer*,int).
- * @param f FifoBuffer whose buffer we should free.
- */ 
-void fifo_free(FifoBuffer *f)
-{
-    av_free(f->buffer);
-}
-
-/**
- * @brief Returns number of elements following rptr, or the number of
- *         elements in the list if rptr is NULL.
- *
- * @param f FifoBuffer whose buffer we should check.
- * @param rptr If this is NULL we check the size of the whole buffer,
- *              otherwise we only check the elements following rptr.
- * @return Number of elements in FifoBuffer, or number following rptr
- */
-int fifo_size(FifoBuffer *f, uint8_t *rptr)
-{
-    int size;
-
-    if(!rptr)
-        rptr= f->rptr;
-
-    if (f->wptr >= rptr) {
-        size = f->wptr - rptr;
-    } else {
-        size = (f->end - rptr) + (f->wptr - f->buffer);
-    }
-    return size;
-}
-
-/** 
- * @brief Get data from the fifo (returns -1 if not enough data).
- */
-int fifo_read(FifoBuffer *f, uint8_t *buf, int buf_size, uint8_t **rptr_ptr)
-{
-    uint8_t *rptr;
-    int size, len;
-
-    if(!rptr_ptr)
-        rptr_ptr= &f->rptr;
-    rptr = *rptr_ptr;
-
-    if (f->wptr >= rptr) {
-        size = f->wptr - rptr;
-    } else {
-        size = (f->end - rptr) + (f->wptr - f->buffer);
-    }
-    
-    if (size < buf_size)
-        return -1;
-    while (buf_size > 0) {
-        len = f->end - rptr;
-        if (len > buf_size)
-            len = buf_size;
-        memcpy(buf, rptr, len);
-        buf += len;
-        rptr += len;
-        if (rptr >= f->end)
-            rptr = f->buffer;
-        buf_size -= len;
-    }
-    *rptr_ptr = rptr;
-    return 0;
-}
-
-/**
- * @brief Resizes a FIFO.
- */
-void fifo_realloc(FifoBuffer *f, unsigned int new_size){
-    unsigned int old_size= f->end - f->buffer;
-
-    if(old_size < new_size){
-        uint8_t *old= f->buffer;
-
-        f->buffer= av_realloc(f->buffer, new_size);
-
-        f->rptr += f->buffer - old;
-        f->wptr += f->buffer - old;
-
-        if(f->wptr < f->rptr){
-            memmove(f->rptr + new_size - old_size, f->rptr, f->buffer + old_size - f->rptr);
-            f->rptr += new_size - old_size;
-        }
-        f->end= f->buffer + new_size;
-    }
-}
-
-/**
- * @brief Copies buffers referenced by the FifoBuffer to wptr_ptr's.
- */
-void fifo_write(FifoBuffer *f, const uint8_t *buf, int size, uint8_t **wptr_ptr)
-{
-    int len;
-    uint8_t *wptr;
-
-    if(!wptr_ptr)
-        wptr_ptr= &f->wptr;
-    wptr = *wptr_ptr;
-
-    while (size > 0) {
-        len = f->end - wptr;
-        if (len > size)
-            len = size;
-        memcpy(wptr, buf, len);
-        wptr += len;
-        if (wptr >= f->end)
-            wptr = f->buffer;
-        buf += len;
-        size -= len;
-    }
-    *wptr_ptr = wptr;
-}
-
-/**
- * @brief Add data to the fifo (return -1 if too much data)
- */
-int put_fifo(ByteIOContext *pb, FifoBuffer *f, int buf_size, uint8_t **rptr_ptr)
-{
-    uint8_t *rptr = *rptr_ptr;
-    int size, len;
-
-    if (f->wptr >= rptr) {
-        size = f->wptr - rptr;
-    } else {
-        size = (f->end - rptr) + (f->wptr - f->buffer);
-    }
-
-    if (size < buf_size)
-        return -1;
-    while (buf_size > 0) {
-        len = f->end - rptr;
-        if (len > buf_size)
-            len = buf_size;
-        put_buffer(pb, rptr, len);
-        rptr += len;
-        if (rptr >= f->end)
-            rptr = f->buffer;
-        buf_size -= len;
-    }
-    *rptr_ptr = rptr;
-    return 0;
-}
-
-/**
- * @brief Returns TRUE if the filename needs to be appended with a number.
- *
- * Used to detect image sequences encoded with one image per file.
- *
- */
-int filename_number_test(const char *filename)
+int av_filename_number_test(const char *filename)
 {
     char buf[1024];
-    if(!filename)
-        return -1;
-    return get_frame_filename(buf, sizeof(buf), filename, 1);
+    return filename && (av_get_frame_filename(buf, sizeof(buf), filename, 1)>=0);
 }
 
 /**
@@ -512,7 +347,40 @@ static const char* format_to_name(void* ptr)
     else return "NULL";
 }
 
-static const AVClass av_format_context_class = { "AVFormatContext", format_to_name };
+#define OFFSET(x) offsetof(AVFormatContext,x)
+#define DEFAULT 0 //should be NAN but it doesnt work as its not a constant in glibc as required by ANSI/ISO C
+//these names are too long to be readable
+#define E AV_OPT_FLAG_ENCODING_PARAM
+#define D AV_OPT_FLAG_DECODING_PARAM
+
+static const AVOption options[]={
+{"probesize", NULL, OFFSET(probesize), FF_OPT_TYPE_INT, 32000, 32, INT_MAX, D}, /* 32000 from mpegts.c: 1.0 second at 24Mbit/s */
+{"muxrate", "set mux rate", OFFSET(mux_rate), FF_OPT_TYPE_INT, DEFAULT, 0, INT_MAX, E},
+{"packetsize", "set packet size", OFFSET(packet_size), FF_OPT_TYPE_INT, DEFAULT, 0, INT_MAX, E},
+{"fflags", NULL, OFFSET(flags), FF_OPT_TYPE_FLAGS, DEFAULT, INT_MIN, INT_MAX, D, "fflags"},
+{"ignidx", "ignore index", 0, FF_OPT_TYPE_CONST, AVFMT_FLAG_IGNIDX, INT_MIN, INT_MAX, D, "fflags"},
+{"genpts", "generate pts", 0, FF_OPT_TYPE_CONST, AVFMT_FLAG_GENPTS, INT_MIN, INT_MAX, D, "fflags"},
+{"track", " set the track number", OFFSET(track), FF_OPT_TYPE_INT, DEFAULT, 0, INT_MAX, E},
+{"year", "set the year", OFFSET(year), FF_OPT_TYPE_INT, DEFAULT, INT_MIN, INT_MAX, E},
+{NULL},
+};
+
+#undef E
+#undef D
+#undef DEFAULT
+
+static const AVClass av_format_context_class = { "AVFormatContext", format_to_name, options };
+
+#if LIBAVCODEC_VERSION_INT > ((52<<16)+(0<<8)+0)
+static
+#endif
+void avformat_get_context_defaults(AVFormatContext *s){
+    memset(s, 0, sizeof(AVFormatContext));
+
+    s->av_class = &av_format_context_class;
+
+    av_opt_set_defaults(s);
+}
 
 /**
  * @brief Allocates an AVFormatContext.
@@ -520,8 +388,9 @@ static const AVClass av_format_context_class = { "AVFormatContext", format_to_na
 AVFormatContext *av_alloc_format_context(void)
 {
     AVFormatContext *ic;
-    ic = av_mallocz(sizeof(AVFormatContext));
+    ic = av_malloc(sizeof(AVFormatContext));
     if (!ic) return ic;
+    avformat_get_context_defaults(ic);
     ic->av_class = &av_format_context_class;
     return ic;
 }
@@ -681,7 +550,7 @@ int av_open_input_file(AVFormatContext **ic_ptr, const char *filename,
 
     /* check filename in case of an image number is expected */
     if (fmt->flags & AVFMT_NEEDNUMBER) {
-        if (filename_number_test(filename) < 0) { 
+        if (!av_filename_number_test(filename)) { 
             err = AVERROR_NUMEXPECTED;
             goto fail;
         }
@@ -2073,12 +1942,11 @@ int av_find_stream_info(AVFormatContext *ic)
                 ret = count;
                 break;
             }
-        } else {
-            /* we did not get all the codec info, but we read too much data */
-            if (read_size >= MAX_READ_SIZE) {
-                ret = count;
-                break;
-            }
+        }
+        /* we did not get all the codec info, but we read too much data */
+        if (read_size >= MAX_READ_SIZE) {
+            ret = count;
+            break;
         }
 
         /* NOTE: a new stream can be added there if no header in file
@@ -2141,7 +2009,10 @@ int av_find_stream_info(AVFormatContext *ic)
                     duration_sum[index]= duration;
                     duration_count[index]=1;
                 }else{
-                    int factor= av_rescale(duration, duration_count[index], duration_sum[index]);
+                    int factor= av_rescale(2*duration, duration_count[index], duration_sum[index]);
+                    if(factor==3)
+                         duration_count[index] *= 2;
+                    factor= av_rescale(duration, duration_count[index], duration_sum[index]);
                     duration_sum[index] += duration;
                     duration_count[index]+= factor;
                 }
@@ -2199,7 +2070,9 @@ int av_find_stream_info(AVFormatContext *ic)
             if(st->codec->codec_id == CODEC_ID_RAWVIDEO && !st->codec->codec_tag && !st->codec->bits_per_sample)
                 st->codec->codec_tag= avcodec_pix_fmt_to_codec_tag(st->codec->pix_fmt);
 
-            if(duration_count[i] && st->codec->time_base.num*101LL <= st->codec->time_base.den &&
+            if(duration_count[i]
+               && (st->codec->time_base.num*101LL <= st->codec->time_base.den || st->codec->codec_id == CODEC_ID_MPEG2VIDEO) &&
+               //FIXME we should not special case mpeg2, but this needs testing with non mpeg2 ...
                st->time_base.num*duration_sum[i]/duration_count[i]*101LL > st->time_base.den){
                 int64_t num, den, error, best_error;
 
@@ -2214,40 +2087,16 @@ int av_find_stream_info(AVFormatContext *ic)
                         av_reduce(&st->r_frame_rate.num, &st->r_frame_rate.den, j, 12, INT_MAX);
                     }
                 }
-                for(j=24; j<=30; j+=6){
-                    error= ABS(1001*12*num - 1000*12*j*den);
+                for(j=0; j<3; j++){
+                    static const int ticks[]= {24,30,60};
+                    error= ABS(1001*12*num - 1000*12*den * ticks[j]);
                     if(error < best_error){
                         best_error= error;
-                        av_reduce(&st->r_frame_rate.num, &st->r_frame_rate.den, j*1000, 1001, INT_MAX);
+                        av_reduce(&st->r_frame_rate.num, &st->r_frame_rate.den, ticks[j]*1000, 1001, INT_MAX);
                     }
                 }
             }
 
-            /* set real frame rate info */
-            /* compute the real frame rate for telecine */
-            if ((st->codec->codec_id == CODEC_ID_MPEG1VIDEO ||
-                 st->codec->codec_id == CODEC_ID_MPEG2VIDEO ||
-                 st->codec->codec_id == CODEC_ID_MPEG2VIDEO_XVMC ||
-                 st->codec->codec_id == CODEC_ID_MPEG2VIDEO_XVMC_VLD) &&
-                st->codec->sub_id == 2) {
-                if (st->codec_info_nb_frames >= 20) {
-                    float coded_frame_rate, est_frame_rate;
-                    est_frame_rate = ((double)st->codec_info_nb_frames * AV_TIME_BASE) / 
-                        (double)st->codec_info_duration ;
-                    coded_frame_rate = 1.0/av_q2d(st->codec->time_base);
-#if 0
-                    printf("telecine: coded_frame_rate=%0.3f est_frame_rate=%0.3f\n", 
-                           coded_frame_rate, est_frame_rate);
-#endif
-                    /* if we detect that it could be a telecine, we
-                       signal it. It would be better to do it at a
-                       higher level as it can change in a film */
-                    if (coded_frame_rate >= 24.97 && 
-                        (est_frame_rate >= 23.5 && est_frame_rate < 24.5)) {
-                        st->r_frame_rate = (AVRational){24000, 1001};
-                    }
-                }
-            }
             /* if no real frame rate, use the codec one */
             if (!st->r_frame_rate.num){
                 st->r_frame_rate.num = st->codec->time_base.den;
@@ -2386,6 +2235,8 @@ AVStream *av_new_stream(AVFormatContext *s, int id)
  */
 AVStream *av_add_stream(AVFormatContext *s, AVStream *st, int id)
 {
+    int i;
+
     if (!st)
     {
         av_log(s, AV_LOG_ERROR, "av_add_stream: Error, AVStream is NULL");
@@ -2413,6 +2264,8 @@ AVStream *av_add_stream(AVFormatContext *s, AVStream *st, int id)
     /* default pts settings is MPEG like */
     av_set_pts_info(st, 33, 1, 90000);
     st->last_IP_pts = AV_NOPTS_VALUE;
+    for(i=0; i<MAX_REORDER_DELAY+1; i++)
+        st->pts_buffer[i]= AV_NOPTS_VALUE;
 
     s->streams[s->nb_streams++] = st;
     return st;
@@ -2578,11 +2431,11 @@ int av_write_header(AVFormatContext *s)
 
 //FIXME merge with compute_pkt_fields
 static int compute_pkt_fields2(AVStream *st, AVPacket *pkt){
-    int b_frames = FFMAX(st->codec->has_b_frames, st->codec->max_b_frames);
-    int num, den, frame_size;
+    int delay = FFMAX(st->codec->has_b_frames, !!st->codec->max_b_frames);
+    int num, den, frame_size, i;
 
-//    av_log(NULL, AV_LOG_DEBUG, "av_write_frame: pts:%lld dts:%lld cur_dts:%lld b:%d size:%d st:%d\n", pkt->pts, pkt->dts, st->cur_dts, b_frames, pkt->size, pkt->stream_index);
-    
+//    av_log(NULL, AV_LOG_DEBUG, "av_write_frame: pts:%lld dts:%lld cur_dts:%lld b:%d size:%d st:%d\n", pkt->pts, pkt->dts, st->cur_dts, delay, pkt->size, pkt->stream_index);
+ 
 /*    if(pkt->pts == AV_NOPTS_VALUE && pkt->dts == AV_NOPTS_VALUE)
         return -1;*/
             
@@ -2595,7 +2448,7 @@ static int compute_pkt_fields2(AVStream *st, AVPacket *pkt){
     }
 
     //XXX/FIXME this is a temporary hack until all encoders output pts
-    if((pkt->pts == 0 || pkt->pts == AV_NOPTS_VALUE) && pkt->dts == AV_NOPTS_VALUE && !b_frames){
+    if((pkt->pts == 0 || pkt->pts == AV_NOPTS_VALUE) && pkt->dts == AV_NOPTS_VALUE && !delay){
         pkt->dts=
 //        pkt->pts= st->cur_dts;
         pkt->pts= st->pts.val;
@@ -2603,17 +2456,13 @@ static int compute_pkt_fields2(AVStream *st, AVPacket *pkt){
 
     //calculate dts from pts    
     if(pkt->pts != AV_NOPTS_VALUE && pkt->dts == AV_NOPTS_VALUE){
-        if(b_frames){
-            if(st->last_IP_pts == AV_NOPTS_VALUE){
-                st->last_IP_pts= -pkt->duration;
-            }
-            if(st->last_IP_pts < pkt->pts){
-                pkt->dts= st->last_IP_pts;
-                st->last_IP_pts= pkt->pts;
-            }else
-                pkt->dts= pkt->pts;
-        }else
-            pkt->dts= pkt->pts;
+        st->pts_buffer[0]= pkt->pts;
+        for(i=1; i<delay+1 && st->pts_buffer[i] == AV_NOPTS_VALUE; i++)
+            st->pts_buffer[i]= (i-delay-1) * pkt->duration;
+        for(i=0; i<delay && st->pts_buffer[i] > st->pts_buffer[i+1]; i++)
+            SWAP(int64_t, st->pts_buffer[i], st->pts_buffer[i+1]);
+
+        pkt->dts= st->pts_buffer[0];
     }
 
     if(st->cur_dts && st->cur_dts != AV_NOPTS_VALUE && st->cur_dts >= pkt->dts){
@@ -3204,13 +3053,19 @@ int find_info_tag(char *arg, int arg_size, const char *tag1, const char *info)
 }
 
 /**
- * @brief Returns in 'buf' the path with '%d' replaced by number.
- *
+ * Returns in 'buf' the path with '%d' replaced by number.
+
  * Also handles the '%0nd' format where 'n' is the total number
- * of digits and '%%'. Return 0 if OK, and -1 if format error.
+ * of digits and '%%'.
+ *
+ * @param buf destination buffer
+ * @param buf_size destination buffer size
+ * @param path numbered sequence string
+ * @number frame number
+ * @return 0 if OK, -1 if format error.
  */
-int get_frame_filename(char *buf, int buf_size,
-                       const char *path, int number)
+int av_get_frame_filename(char *buf, int buf_size,
+                          const char *path, int number)
 {
     const char *p;
     char *q, buf1[20], c;

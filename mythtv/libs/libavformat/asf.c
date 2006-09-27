@@ -187,7 +187,8 @@ static int asf_read_header(AVFormatContext *s, AVFormatParameters *ap)
             asf->packet_size = asf->hdr.max_pktsize;
             asf->nb_packets = asf->hdr.packets_count;
         } else if (!memcmp(&g, &stream_header, sizeof(GUID))) {
-            int type, total_size, type_specific_size, sizeX;
+            int type, type_specific_size, sizeX;
+            uint64_t total_size;
             unsigned int tag1;
             int64_t pos1, pos2;
             int test_for_ext_stream_audio;
@@ -353,7 +354,8 @@ static int asf_read_header(AVFormatContext *s, AVFormatParameters *ap)
                 desc_count = get_le16(pb);
                 for(i=0;i<desc_count;i++)
                 {
-                        int name_len,value_type,value_len,value_num = 0;
+                        int name_len,value_type,value_len;
+                        uint64_t value_num = 0;
                         char *name, *value;
 
                         name_len = get_le16(pb);
@@ -821,7 +823,7 @@ static int64_t asf_read_pts(AVFormatContext *s, int stream_index, int64_t *ppos,
             assert((asf_st->packet_pos - s->data_offset) % asf->packet_size == 0);
             pos= asf_st->packet_pos;
 
-            av_add_index_entry(s->streams[i], pos, pkt->size, pts, pos - start_pos[i] + 1, AVINDEX_KEYFRAME);
+            av_add_index_entry(s->streams[i], pos, pts, pkt->size, pos - start_pos[i] + 1, AVINDEX_KEYFRAME);
             start_pos[i]= asf_st->packet_pos + 1;
 
             if(pkt->stream_index == stream_index)
@@ -835,16 +837,92 @@ static int64_t asf_read_pts(AVFormatContext *s, int stream_index, int64_t *ppos,
     return pts;
 }
 
+static void asf_build_simple_index(AVFormatContext *s, int stream_index)
+{
+    GUID g;
+    ASFContext *asf = s->priv_data;
+    int64_t gsize, itime;
+    int64_t pos, current_pos, index_pts;
+    int i;
+    int pct,ict;
+
+    current_pos = url_ftell(&s->pb);
+
+    url_fseek(&s->pb, asf->data_object_offset + asf->data_object_size, SEEK_SET);
+    get_guid(&s->pb, &g);
+    if (!memcmp(&g, &index_guid, sizeof(GUID))) {
+        gsize = get_le64(&s->pb);
+        get_guid(&s->pb, &g);
+        itime=get_le64(&s->pb);
+        pct=get_le32(&s->pb);
+        ict=get_le32(&s->pb);
+        av_log(NULL, AV_LOG_DEBUG, "itime:0x%Lx, pct:%d, ict:%d\n",itime,pct,ict);
+
+        for (i=0;i<ict;i++){
+            int pktnum=get_le32(&s->pb);
+            int pktct =get_le16(&s->pb);
+            av_log(NULL, AV_LOG_DEBUG, "pktnum:%d, pktct:%d\n", pktnum, pktct);
+
+            pos=s->data_offset + asf->packet_size*(int64_t)pktnum;
+            index_pts=av_rescale(itime, i, 10000);
+
+            av_add_index_entry(s->streams[stream_index], pos, index_pts, asf->packet_size, 0, AVINDEX_KEYFRAME);
+        }
+        asf->index_read= 1;
+    }
+    url_fseek(&s->pb, current_pos, SEEK_SET);
+}
+
 static int asf_read_seek(AVFormatContext *s, int stream_index, int64_t pts, int flags)
 {
     ASFContext *asf = s->priv_data;
+    AVStream *st = s->streams[stream_index];
+    int64_t pos;
+    int index;
 
     if (asf->packet_size <= 0)
         return -1;
 
-    if(av_seek_frame_binary(s, stream_index, pts, flags)<0)
-        return -1;
+    if (!asf->index_read)
+        asf_build_simple_index(s, stream_index);
 
+    if(!(asf->index_read && st->index_entries)){
+        if(av_seek_frame_binary(s, stream_index, pts, flags)<0)
+            return -1;
+    }else{
+        index= av_index_search_timestamp(st, pts, flags);
+        if(index<0)
+            return -1;
+
+        /* find the position */
+        pos = st->index_entries[index].pos;
+        pts = st->index_entries[index].timestamp;
+
+    // various attempts to find key frame have failed so far
+    //    asf_reset_header(s);
+    //    url_fseek(&s->pb, pos, SEEK_SET);
+    //    key_pos = pos;
+    //     for(i=0;i<16;i++){
+    //         pos = url_ftell(&s->pb);
+    //         if (av_read_frame(s, &pkt) < 0){
+    //             av_log(s, AV_LOG_INFO, "seek failed\n");
+    //             return -1;
+    //         }
+    //         asf_st = s->streams[stream_index]->priv_data;
+    //         pos += st->parser->frame_offset;
+    //
+    //         if (pkt.size > b) {
+    //             b = pkt.size;
+    //             key_pos = pos;
+    //         }
+    //
+    //         av_free_packet(&pkt);
+    //     }
+
+        /* do the seek */
+        av_log(NULL, AV_LOG_DEBUG, "SEEKTO: %Ld\n", pos);
+        url_fseek(&s->pb, pos, SEEK_SET);
+    }
     asf_reset_header(s);
     return 0;
 }

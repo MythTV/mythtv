@@ -373,8 +373,6 @@ static VLC h261_mtype_vlc;
 static VLC h261_mv_vlc;
 static VLC h261_cbp_vlc;
 
-void init_vlc_rl(RLTable *rl, int use_static);
-
 static void h261_decode_init_vlc(H261Context *h){
     static int done = 0;
 
@@ -1028,6 +1026,7 @@ AVCodec h261_encoder = {
     MPV_encode_init,
     MPV_encode_picture,
     MPV_encode_end,
+    .pix_fmts= (enum PixelFormat[]){PIX_FMT_YUV420P, -1},
 };
 #endif
 

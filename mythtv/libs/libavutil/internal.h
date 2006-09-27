@@ -1,3 +1,21 @@
+/*
+ * copyright (c) 2006 Michael Niedermayer <michaelni@gmx.at>
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
+ */
+
 /**
  * @file internal.h
  * common internal api header.
@@ -20,21 +38,6 @@
 #ifndef offsetof
 # define offsetof(T,F) ((unsigned int)((char *)&((T *)0)->F))
 #endif
-
-#define AVOPTION_CODEC_BOOL(name, help, field) \
-    { name, help, offsetof(AVCodecContext, field), FF_OPT_TYPE_BOOL }
-#define AVOPTION_CODEC_DOUBLE(name, help, field, minv, maxv, defval) \
-    { name, help, offsetof(AVCodecContext, field), FF_OPT_TYPE_DOUBLE, minv, maxv, defval }
-#define AVOPTION_CODEC_FLAG(name, help, field, flag, defval) \
-    { name, help, offsetof(AVCodecContext, field), FF_OPT_TYPE_FLAG, flag, 0, defval }
-#define AVOPTION_CODEC_INT(name, help, field, minv, maxv, defval) \
-    { name, help, offsetof(AVCodecContext, field), FF_OPT_TYPE_INT, minv, maxv, defval }
-#define AVOPTION_CODEC_STRING(name, help, field, str, val) \
-    { name, help, offsetof(AVCodecContext, field), FF_OPT_TYPE_STRING, .defval = val, .defstr = str }
-#define AVOPTION_CODEC_RCOVERRIDE(name, help, field) \
-    { name, help, offsetof(AVCodecContext, field), FF_OPT_TYPE_RCOVERRIDE, .defval = 0, .defstr = NULL }
-#define AVOPTION_SUB(ptr) { .name = NULL, .help = (const char*)ptr }
-#define AVOPTION_END() AVOPTION_SUB(NULL)
 
 #ifdef __MINGW32__
 #    ifdef _DEBUG

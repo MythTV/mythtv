@@ -24,6 +24,7 @@
 #include "avformat.h"
 #include "riff.h"
 #include "isom.h"
+#include "dv.h"
 
 #ifdef CONFIG_ZLIB
 #include <zlib.h>
@@ -144,6 +145,8 @@ static const CodecTag mov_audio_tags[] = {
     { CODEC_ID_AC3, MKTAG('m', 's', 0x20, 0x00) }, /* Dolby AC-3 */
     { CODEC_ID_ALAC,MKTAG('a', 'l', 'a', 'c') }, /* Apple Lossless */
     { CODEC_ID_QDM2,MKTAG('Q', 'D', 'M', '2') }, /* QDM2 */
+    { CODEC_ID_DVAUDIO, MKTAG('v', 'd', 'v', 'a') },
+    { CODEC_ID_DVAUDIO, MKTAG('d', 'v', 'c', 'a') },
     { CODEC_ID_NONE, 0 },
 };
 
@@ -250,6 +253,7 @@ typedef struct MOVStreamContext {
     long current_sample;
     MOV_esds_t esds;
     AVRational sample_size_v1;
+    int dv_audio_container;
 } MOVStreamContext;
 
 typedef struct MOVContext {
@@ -275,6 +279,8 @@ typedef struct MOVContext {
     AVPaletteControl palette_control;
     MOV_mdat_atom_t *mdat_list;
     int mdat_count;
+    DVDemuxContext *dv_demux;
+    AVFormatContext *dv_fctx;
 } MOVContext;
 
 
@@ -972,14 +978,6 @@ static int mov_read_stsd(MOVContext *c, ByteIOContext *pb, MOV_atom_t atom)
                 if (st->codec->bits_per_sample == 8)
                     st->codec->codec_id = CODEC_ID_PCM_S8;
                 break;
-            case CODEC_ID_AMR_WB:
-                st->codec->sample_rate = 16000; /* should really we ? */
-                st->codec->channels=1; /* really needed */
-                break;
-            case CODEC_ID_AMR_NB:
-                st->codec->sample_rate = 8000; /* should really we ? */
-                st->codec->channels=1; /* really needed */
-                break;
             default:
                 break;
             }
@@ -1023,7 +1021,20 @@ static int mov_read_stsd(MOVContext *c, ByteIOContext *pb, MOV_atom_t atom)
         st->codec->sample_rate= sc->time_scale;
     }
 
+    /* special codec parameters handling */
     switch (st->codec->codec_id) {
+#ifdef CONFIG_H261_DECODER
+    case CODEC_ID_H261:
+#endif
+#ifdef CONFIG_H263_DECODER
+    case CODEC_ID_H263:
+#endif
+#ifdef CONFIG_MPEG4_DECODER
+    case CODEC_ID_MPEG4:
+#endif
+        st->codec->width= 0; /* let decoder init width/height */
+        st->codec->height= 0;
+        break;
 #ifdef CONFIG_FAAD
     case CODEC_ID_AAC:
 #endif
@@ -1032,6 +1043,30 @@ static int mov_read_stsd(MOVContext *c, ByteIOContext *pb, MOV_atom_t atom)
 #endif
     case CODEC_ID_MP3ON4:
         st->codec->sample_rate= 0; /* let decoder init parameters properly */
+        break;
+#ifdef CONFIG_DV_DEMUXER
+    case CODEC_ID_DVAUDIO:
+        c->dv_fctx = av_alloc_format_context();
+        c->dv_demux = dv_init_demux(c->dv_fctx);
+        if (!c->dv_demux) {
+            av_log(c->fc, AV_LOG_ERROR, "dv demux context init error\n");
+            return -1;
+        }
+        sc->dv_audio_container = 1;
+        st->codec->codec_id = CODEC_ID_PCM_S16LE;
+        break;
+#endif
+    /* no ifdef since parameters are always those */
+    case CODEC_ID_AMR_WB:
+        st->codec->sample_rate= 16000;
+        st->codec->channels= 1; /* really needed */
+        break;
+    case CODEC_ID_AMR_NB:
+        st->codec->sample_rate= 8000;
+        st->codec->channels= 1; /* really needed */
+        break;
+    case CODEC_ID_MP2:
+        st->need_parsing = 1;
         break;
     default:
         break;
@@ -1522,7 +1557,7 @@ static void mov_build_index(MOVContext *mov, AVStream *st)
     int stss_index = 0;
     int i, j, k;
 
-    if (sc->sample_sizes || st->codec->codec_type == CODEC_TYPE_VIDEO) {
+    if (sc->sample_sizes || st->codec->codec_type == CODEC_TYPE_VIDEO || sc->dv_audio_container) {
         int keyframe, sample_size;
         int current_sample = 0;
         int stts_sample = 0;
@@ -1566,7 +1601,7 @@ static void mov_build_index(MOVContext *mov, AVStream *st)
                 stsc_index++;
             chunk_samples = sc->sample_to_chunk[stsc_index].count;
             /* get chunk size */
-            if (sc->sample_size > 1 || st->codec->bits_per_sample == 8)
+            if (sc->sample_size > 1 || st->codec->codec_id == CODEC_ID_PCM_U8 || st->codec->codec_id == CODEC_ID_PCM_S8)
                 chunk_size = chunk_samples * sc->sample_size;
             else if (sc->sample_size_v1.den > 0 && (chunk_samples * sc->sample_size_v1.num % sc->sample_size_v1.den == 0))
                 chunk_size = chunk_samples * sc->sample_size_v1.num / sc->sample_size_v1.den;
@@ -1712,8 +1747,22 @@ static int mov_read_packet(AVFormatContext *s, AVPacket *pkt)
         av_log(mov->fc, AV_LOG_ERROR, "stream %d, offset 0x%llx: partial file\n", sc->ffindex, sample->pos);
         return -1;
     }
-    url_fseek(&s->pb, sample->pos, SEEK_SET);
-    av_get_packet(&s->pb, pkt, sample->size);
+#ifdef CONFIG_DV_DEMUXER
+    if (sc->dv_audio_container) {
+        dv_get_packet(mov->dv_demux, pkt);
+        dprintf("dv audio pkt size %d\n", pkt->size);
+    } else {
+#endif
+        url_fseek(&s->pb, sample->pos, SEEK_SET);
+        av_get_packet(&s->pb, pkt, sample->size);
+#ifdef CONFIG_DV_DEMUXER
+        if (mov->dv_demux) {
+            void *pkt_destruct_func = pkt->destruct;
+            dv_produce_packet(mov->dv_demux, pkt, pkt->data, pkt->size);
+            pkt->destruct = pkt_destruct_func;
+        }
+    }
+#endif
     pkt->stream_index = sc->ffindex;
     pkt->dts = sample->timestamp;
     if (sc->ctts_data) {
@@ -1799,6 +1848,14 @@ static int mov_read_close(AVFormatContext *s)
     /* free color tabs */
     for(i=0; i<mov->ctab_size; i++)
         av_freep(&mov->ctab[i]);
+    if(mov->dv_demux){
+        for(i=0; i<mov->dv_fctx->nb_streams; i++){
+            av_freep(&mov->dv_fctx->streams[i]->codec);
+            av_freep(&mov->dv_fctx->streams[i]);
+        }
+        av_freep(&mov->dv_fctx);
+        av_freep(&mov->dv_demux);
+    }
     av_freep(&mov->ctab);
     return 0;
 }

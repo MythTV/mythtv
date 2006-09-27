@@ -1,3 +1,22 @@
+/*
+ * Register all the formats and protocols.
+ * copyright (c) 2000, 2001, 2002 Fabrice Bellard
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
+ */
+
 #ifndef ALLFORMATS_H
 #define ALLFORMATS_H
 
@@ -16,6 +35,7 @@ extern AVInputFormat audio_demuxer;
 extern AVOutputFormat audio_muxer;
 extern AVInputFormat avi_demuxer;
 extern AVOutputFormat avi_muxer;
+extern AVInputFormat avisynth_demuxer;
 extern AVInputFormat avs_demuxer;
 extern AVOutputFormat crc_muxer;
 extern AVOutputFormat framecrc_muxer;
@@ -32,7 +52,6 @@ extern AVInputFormat flv_demuxer;
 extern AVOutputFormat flv_muxer;
 extern AVOutputFormat gif_muxer;
 extern AVInputFormat gif_demuxer;
-extern AVInputFormat video_grab_device_demuxer;
 extern AVInputFormat video_grab_device_demuxer;
 extern AVInputFormat gxf_demuxer;
 extern AVOutputFormat gxf_muxer;
@@ -119,8 +138,6 @@ extern AVOutputFormat rawvideo_muxer;
 extern AVOutputFormat null_muxer;
 extern AVInputFormat rm_demuxer;
 extern AVOutputFormat rm_muxer;
-extern AVOutputFormat rtp_muxer;
-extern AVInputFormat rtsp_demuxer;
 extern AVInputFormat sdp_demuxer;
 extern AVInputFormat redir_demuxer;
 extern AVInputFormat segafilm_demuxer;
@@ -138,6 +155,7 @@ extern AVOutputFormat wav_muxer;
 extern AVInputFormat wc3_demuxer;
 extern AVInputFormat wsaud_demuxer;
 extern AVInputFormat wsvqa_demuxer;
+extern AVInputFormat wv_demuxer;
 extern AVOutputFormat yuv4mpegpipe_muxer;
 extern AVInputFormat yuv4mpegpipe_demuxer;
 

@@ -1,3 +1,22 @@
+/*
+ * AVOptions
+ * copyright (c) 2005 Michael Niedermayer <michaelni@gmx.at>
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
+ */
+
 #ifndef AVOPT_H
 #define AVOPT_H
 
@@ -57,5 +76,6 @@ int64_t av_get_int(void *obj, const char *name, AVOption **o_out);
 const char *av_get_string(void *obj, const char *name, AVOption **o_out, char *buf, int buf_len);
 AVOption *av_next_option(void *obj, AVOption *last);
 int av_opt_show(void *obj, void *av_log_obj);
+void av_opt_set_defaults(void *s);
 
 #endif

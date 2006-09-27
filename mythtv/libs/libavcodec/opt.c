@@ -27,11 +27,71 @@
 #include "avcodec.h"
 #include "opt.h"
 
+static int8_t si_prefixes['z' - 'E' + 1]={
+    ['y'-'E']= -24,
+    ['z'-'E']= -21,
+    ['a'-'E']= -18,
+    ['f'-'E']= -15,
+    ['p'-'E']= -12,
+    ['n'-'E']= - 9,
+    ['u'-'E']= - 6,
+    ['m'-'E']= - 3,
+    ['c'-'E']= - 2,
+    ['d'-'E']= - 1,
+    ['h'-'E']=   2,
+    ['k'-'E']=   3,
+    ['K'-'E']=   3,
+    ['M'-'E']=   6,
+    ['G'-'E']=   9,
+    ['T'-'E']=  12,
+    ['P'-'E']=  15,
+    ['E'-'E']=  18,
+    ['Z'-'E']=  21,
+    ['Y'-'E']=  24,
+};
+
+/** strtod() function extended with 'k', 'M', 'G', 'ki', 'Mi', 'Gi' and 'B'
+ * postfixes.  This allows using f.e. kB, MiB, G and B as a postfix. This
+ * function assumes that the unit of numbers is bits not bytes.
+ */
+double av_strtod(const char *name, char **tail) {
+    double d;
+    int p = 0;
+    char *next;
+    d = strtod(name, &next);
+    /* if parsing succeeded, check for and interpret postfixes */
+    if (next!=name) {
+
+        if(*next >= 'E' && *next <= 'z'){
+            int e= si_prefixes[*next - 'E'];
+            if(e){
+                if(next[1] == 'i'){
+                    d*= pow( 2, e/0.3);
+                    next+=2;
+                }else{
+                    d*= pow(10, e);
+                    next++;
+                }
+            }
+        }
+
+        if(*next=='B') {
+            d*=8;
+            *next++;
+        }
+    }
+    /* if requested, fill in tail with the position after the last parsed
+       character */
+    if (tail)
+        *tail = next;
+    return d;
+}
+
 static double av_parse_num(const char *name, char **tail){
     double d;
-    d= strtod(name, tail);
+    d= av_strtod(name, tail);
     if(*tail>name && (**tail=='/' || **tail==':'))
-        d/=strtod((*tail)+1, tail);
+        d/=av_strtod((*tail)+1, tail);
     return d;
 }
 
@@ -59,8 +119,10 @@ static AVOption *av_set_number(void *obj, const char *name, double num, int den,
     if(!o || o->offset<=0)
         return NULL;
 
-    if(o->max*den < num*intnum || o->min*den > num*intnum)
+    if(o->max*den < num*intnum || o->min*den > num*intnum) {
+        av_log(NULL, AV_LOG_ERROR, "Value %lf for parameter '%s' out of range.\n", num, name);
         return NULL;
+    }
 
     dst= ((uint8_t*)obj) + o->offset;
 
@@ -299,3 +361,46 @@ int av_opt_show(void *obj, void *av_log_obj){
     }
     return 0;
 }
+
+/** Set the values of the AVCodecContext or AVFormatContext structure.
+ * They are set to the defaults specified in the according AVOption options
+ * array default_val field.
+ *
+ * @param s AVCodecContext or AVFormatContext for which the defaults will be set
+ */
+void av_opt_set_defaults(void *s)
+{
+    AVOption *opt = NULL;
+    while ((opt = av_next_option(s, opt)) != NULL) {
+        switch(opt->type) {
+            case FF_OPT_TYPE_CONST:
+                /* Nothing to be done here */
+            break;
+            case FF_OPT_TYPE_FLAGS:
+            case FF_OPT_TYPE_INT: {
+                int val;
+                val = opt->default_val;
+                av_set_int(s, opt->name, val);
+            }
+            break;
+            case FF_OPT_TYPE_FLOAT: {
+                double val;
+                val = opt->default_val;
+                av_set_double(s, opt->name, val);
+            }
+            break;
+            case FF_OPT_TYPE_RATIONAL: {
+                AVRational val;
+                val = av_d2q(opt->default_val, INT_MAX);
+                av_set_q(s, opt->name, val);
+            }
+            break;
+            case FF_OPT_TYPE_STRING:
+                /* Cannot set default for string as default_val is of type * double */
+            break;
+            default:
+                av_log(s, AV_LOG_DEBUG, "AVOption type %d of option %s not implemented yet\n", opt->type, opt->name);
+        }
+    }
+}
+

@@ -29,7 +29,6 @@
 //#undef NDEBUG
 //#include <assert.h>
 
-extern const uint8_t ff_h263_loop_filter_strength[32];
 extern void ff_idct_xvid_mmx(short *block);
 extern void ff_idct_xvid_mmx2(short *block);
 
@@ -53,6 +52,9 @@ static const uint64_t ff_pw_32 attribute_used __attribute__ ((aligned(8))) = 0x0
 static const uint64_t ff_pw_64 attribute_used __attribute__ ((aligned(8))) = 0x0040004000400040ULL;
 static const uint64_t ff_pw_15 attribute_used __attribute__ ((aligned(8))) = 0x000F000F000F000FULL;
 
+static const uint64_t ff_pb_1  attribute_used __attribute__ ((aligned(8))) = 0x0101010101010101ULL;
+static const uint64_t ff_pb_3  attribute_used __attribute__ ((aligned(8))) = 0x0303030303030303ULL;
+static const uint64_t ff_pb_7  attribute_used __attribute__ ((aligned(8))) = 0x0707070707070707ULL;
 static const uint64_t ff_pb_3F attribute_used __attribute__ ((aligned(8))) = 0x3F3F3F3F3F3F3F3FULL;
 static const uint64_t ff_pb_FC attribute_used __attribute__ ((aligned(8))) = 0xFCFCFCFCFCFCFCFCULL;
 
@@ -3049,6 +3051,7 @@ void dsputil_init_mmx(DSPContext* c, AVCodecContext *avctx)
                 c->idct_add= ff_simple_idct_add_mmx;
                 c->idct    = ff_simple_idct_mmx;
                 c->idct_permutation_type= FF_SIMPLE_IDCT_PERM;
+#ifdef CONFIG_GPL
             }else if(idct_algo==FF_IDCT_LIBMPEG2MMX){
                 if(mm_flags & MM_MMXEXT){
                     c->idct_put= ff_libmpeg2mmx2_idct_put;
@@ -3060,8 +3063,11 @@ void dsputil_init_mmx(DSPContext* c, AVCodecContext *avctx)
                     c->idct    = ff_mmx_idct;
                 }
                 c->idct_permutation_type= FF_LIBMPEG2_IDCT_PERM;
+#endif
 #if 0
-            }else if(idct_algo==FF_IDCT_VP3){
+            }else if(idct_algo==FF_IDCT_VP3 &&
+                     avctx->codec->id!=CODEC_ID_THEORA &&
+                     !(avctx->flags & CODEC_FLAG_BITEXACT)){
                 if(mm_flags & MM_SSE2){
                     c->idct_put= ff_vp3_idct_put_sse2;
                     c->idct_add= ff_vp3_idct_add_sse2;
@@ -3291,6 +3297,7 @@ void dsputil_init_mmx(DSPContext* c, AVCodecContext *avctx)
             c->h264_h_loop_filter_chroma= h264_h_loop_filter_chroma_mmx2;
             c->h264_v_loop_filter_chroma_intra= h264_v_loop_filter_chroma_intra_mmx2;
             c->h264_h_loop_filter_chroma_intra= h264_h_loop_filter_chroma_intra_mmx2;
+            c->h264_loop_filter_strength= h264_loop_filter_strength_mmx2;
 
             c->weight_h264_pixels_tab[0]= ff_h264_weight_16x16_mmx2;
             c->weight_h264_pixels_tab[1]= ff_h264_weight_16x8_mmx2;

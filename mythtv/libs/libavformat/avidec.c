@@ -100,9 +100,12 @@ static int read_braindead_odml_indx(AVFormatContext *s, int frame_num){
     AVIStream *ast;
     int i;
     int64_t last_pos= -1;
+    int64_t filesize= url_fsize(&s->pb);
 
-//    av_log(s, AV_LOG_ERROR, "longs_pre_entry:%d index_type:%d entries_in_use:%d chunk_id:%X base:%Ld\n",
-//        longs_pre_entry,index_type, entries_in_use, chunk_id, base);
+#ifdef DEBUG_SEEK
+    av_log(s, AV_LOG_ERROR, "longs_pre_entry:%d index_type:%d entries_in_use:%d chunk_id:%X base:%16LX\n",
+        longs_pre_entry,index_type, entries_in_use, chunk_id, base);
+#endif
 
     if(stream_id > s->nb_streams || stream_id < 0)
         return -1;
@@ -119,6 +122,14 @@ static int read_braindead_odml_indx(AVFormatContext *s, int frame_num){
     if(index_type>1)
         return -1;
 
+    if(filesize > 0 && base >= filesize){
+        av_log(s, AV_LOG_ERROR, "ODML index invalid\n");
+        if(base>>32 == (base & 0xFFFFFFFF) && (base & 0xFFFFFFFF) < filesize && filesize <= 0xFFFFFFFF)
+            base &= 0xFFFFFFFF;
+        else
+            return -1;
+    }
+
     for(i=0; i<entries_in_use; i++){
         if(index_type){
             int64_t pos= get_le32(pb) + base - 8;
@@ -126,7 +137,9 @@ static int read_braindead_odml_indx(AVFormatContext *s, int frame_num){
             int key= len >= 0;
             len &= 0x7FFFFFFF;
 
-//av_log(s, AV_LOG_ERROR, "pos:%Ld, len:%X\n", pos, len);
+#ifdef DEBUG_SEEK
+            av_log(s, AV_LOG_ERROR, "pos:%Ld, len:%X\n", pos, len);
+#endif
             if(last_pos == pos || pos == base - 8)
                 avi->non_interleaved= 1;
             else
@@ -152,11 +165,13 @@ static int read_braindead_odml_indx(AVFormatContext *s, int frame_num){
             url_fseek(pb, pos, SEEK_SET);
         }
     }
+    avi->index_loaded=1;
     return 0;
 }
 
 static void clean_index(AVFormatContext *s){
-    int i, j;
+    int i;
+    int64_t j;
 
     for(i=0; i<s->nb_streams; i++){
         AVStream *st = s->streams[i];
@@ -200,6 +215,7 @@ static int avi_read_header(AVFormatContext *s, AVFormatParameters *ap)
     AVStream *st;
     AVIStream *ast = NULL;
     int xan_video = 0;  /* hack to support Xan A/V */
+    char str_track[4];
 
     avi->stream_index= -1;
 
@@ -228,7 +244,7 @@ static int avi_read_header(AVFormatContext *s, AVFormatParameters *ap)
 #endif
             if (tag1 == MKTAG('m', 'o', 'v', 'i')) {
                 avi->movi_list = url_ftell(pb) - 4;
-                if(size) avi->movi_end = avi->movi_list + size;
+                if(size) avi->movi_end = avi->movi_list + size + (size & 1);
                 else     avi->movi_end = url_fsize(pb);
 #ifdef DEBUG
                 printf("movi end=%Lx\n", avi->movi_end);
@@ -441,9 +457,8 @@ static int avi_read_header(AVFormatContext *s, AVFormatParameters *ap)
             break;
         case MKTAG('i', 'n', 'd', 'x'):
             i= url_ftell(pb);
-            if(!url_is_streamed(pb)){
+            if(!url_is_streamed(pb) && !(s->flags & AVFMT_FLAG_IGNIDX)){
                 read_braindead_odml_indx(s, 0);
-                avi->index_loaded=1;
             }
             url_fseek(pb, i+size, SEEK_SET);
             break;
@@ -461,6 +476,13 @@ static int avi_read_header(AVFormatContext *s, AVFormatParameters *ap)
             break;
         case MKTAG('I', 'G', 'N', 'R'):
             avi_read_tag(pb, s->genre, sizeof(s->genre), size);
+            break;
+        case MKTAG('I', 'P', 'R', 'D'):
+            avi_read_tag(pb, s->album, sizeof(s->album), size);
+            break;
+        case MKTAG('I', 'P', 'R', 'T'):
+            avi_read_tag(pb, str_track, sizeof(str_track), size);
+            sscanf(str_track, "%d", &s->track);
             break;
         default:
             /* skip tag */
@@ -771,7 +793,7 @@ static int avi_read_idx1(AVFormatContext *s, int size)
         ast = st->priv_data;
 
 #if defined(DEBUG_SEEK)
-        av_log(NULL, AV_LOG_DEBUG, "%d cum_len=%d\n", len, ast->cum_len);
+        av_log(NULL, AV_LOG_DEBUG, "%d cum_len=%Ld\n", len, ast->cum_len);
 #endif
         if(last_pos == pos)
             avi->non_interleaved= 1;

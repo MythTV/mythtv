@@ -1,3 +1,21 @@
+/*
+ * copyright (c) 2001 Fabrice Bellard
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+ */
+
 #ifndef AVCODEC_H
 #define AVCODEC_H
 
@@ -17,8 +35,8 @@ extern "C" {
 #define AV_STRINGIFY(s)         AV_TOSTRING(s)
 #define AV_TOSTRING(s) #s
 
-#define LIBAVCODEC_VERSION_INT  ((51<<16)+(11<<8)+0)
-#define LIBAVCODEC_VERSION      51.11.0
+#define LIBAVCODEC_VERSION_INT  ((51<<16)+(16<<8)+0)
+#define LIBAVCODEC_VERSION      51.16.0
 #define LIBAVCODEC_BUILD        LIBAVCODEC_VERSION_INT
 
 #define LIBAVCODEC_IDENT        "Lavc" AV_STRINGIFY(LIBAVCODEC_VERSION)
@@ -120,6 +138,11 @@ enum CodecID {
     CODEC_ID_KMVC,
     CODEC_ID_FLASHSV,
     CODEC_ID_CAVS,
+    CODEC_ID_JPEG2000,
+    CODEC_ID_VMNC,
+    CODEC_ID_VP5,
+    CODEC_ID_VP6,
+    CODEC_ID_VP6F,
 
     /* various pcm "codecs" */
     CODEC_ID_PCM_S16LE= 0x10000,
@@ -202,6 +225,7 @@ enum CodecID {
     CODEC_ID_TTA,
     CODEC_ID_SMACKAUDIO,
     CODEC_ID_QCELP,
+    CODEC_ID_WAVPACK,
 
     /* subtitle codecs */
     CODEC_ID_DVD_SUBTITLE= 0x17000,
@@ -1210,6 +1234,7 @@ typedef struct AVCodecContext {
 #define FF_IDCT_IPP          13
 #define FF_IDCT_XVIDMMX      14
 #define FF_IDCT_CAVS         15
+#define FF_IDCT_SIMPLEARMV5TE 16
 
     /**
      * slice count.
@@ -2221,6 +2246,9 @@ extern AVCodec h264_decoder;
 extern AVCodec indeo3_decoder;
 extern AVCodec vp3_decoder;
 extern AVCodec theora_decoder;
+extern AVCodec vp5_decoder;
+extern AVCodec vp6_decoder;
+extern AVCodec vp6f_decoder;
 extern AVCodec amr_nb_decoder;
 extern AVCodec amr_nb_encoder;
 extern AVCodec amr_wb_encoder;
@@ -2289,6 +2317,8 @@ extern AVCodec smackaud_decoder;
 extern AVCodec kmvc_decoder;
 extern AVCodec flashsv_decoder;
 extern AVCodec cavs_decoder;
+extern AVCodec vmnc_decoder;
+extern AVCodec wavpack_decoder;
 
 /* pcm codecs */
 #define PCM_CODEC(id, name) \
@@ -2481,6 +2511,17 @@ int avcodec_default_execute(AVCodecContext *c, int (*func)(AVCodecContext *c2, v
  */
 int avcodec_open(AVCodecContext *avctx, AVCodec *codec);
 
+/**
+ * Decode an audio frame.
+ *
+ * @param avctx the codec context.
+ * @param samples output buffer, 16 byte aligned
+ * @param frame_size_ptr the output buffer size in bytes, zero if no frame could be compressed
+ * @param buf input buffer, 16 byte aligned
+ * @param buf_size the input buffer size
+ * @return 0 if successful, -1 if not.
+ */
+
 int avcodec_decode_audio(AVCodecContext *avctx, int16_t *samples,
                          int *frame_size_ptr,
                          uint8_t *buf, int buf_size);
@@ -2626,9 +2667,6 @@ extern AVBitStreamFilter noise_bsf;
 
 
 /* memory */
-void *av_mallocz(unsigned int size);
-char *av_strdup(const char *s);
-void av_freep(void *ptr);
 void *av_fast_realloc(void *ptr, unsigned int *size, unsigned int min_size);
 /* for static data only */
 /* call av_free_static to release all staticaly allocated tables */

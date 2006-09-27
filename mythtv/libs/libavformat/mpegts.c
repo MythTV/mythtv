@@ -1994,7 +1994,7 @@ static int mpegts_read_header(AVFormatContext *s,
             ts->pat_filter = mpegts_open_section_filter(
                 ts, PAT_PID, pat_cb, ts, 1);
             url_fseek(pb, pos, SEEK_SET);
-            handle_packets(ts, MAX_SCAN_PACKETS);
+            handle_packets(ts, s->probesize);
             ts->scanning = 0;
 
             if (ts->nb_services <= 0) {
@@ -2021,7 +2021,7 @@ static int mpegts_read_header(AVFormatContext *s,
             
                 url_fseek(pb, pos, SEEK_SET);
                 ts->req_sid = sid = service->sid;
-                handle_packets(ts, MAX_SCAN_PACKETS);
+                handle_packets(ts, s->probesize);
 
                 /* fallback code to deal with broken streams from
                  * DBOX2/Firewire cable boxes. */
@@ -2037,7 +2037,7 @@ static int mpegts_read_header(AVFormatContext *s,
                     /* try again */
                     url_fseek(pb, pos, SEEK_SET);
                     ts->req_sid = sid = service->sid;
-                    handle_packets(ts, MAX_SCAN_PACKETS);
+                    handle_packets(ts, s->probesize);
                 }
             }
             ts->scanning = 0;

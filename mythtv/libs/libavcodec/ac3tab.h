@@ -1,3 +1,22 @@
+/*
+ * AC3 tables
+ * copyright (c) 2001 Fabrice Bellard
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
+ */
+
 /**
  * @file ac3tab.h
  * tables taken directly from AC3 spec.
@@ -160,7 +179,7 @@ static const uint16_t dbkneetab[4]= {
     0x000, 0x700, 0x900, 0xb00,
 };
 
-static const uint16_t floortab[8]= {
+static const int16_t floortab[8]= {
     0x2f0, 0x2b0, 0x270, 0x230, 0x1f0, 0x170, 0x0f0, 0xf800,
 };
 
