@@ -1810,7 +1810,7 @@ void MainServer::DoHandleDeleteRecording(ProgramInfo *pginfo, PlaybackSock *pbs,
         pbssock = pbs->getSocket();
 
     QString fileprefix = gContext->GetFilePrefix();
-    QString filename = pginfo->GetRecordFilename(fileprefix);
+    QString filename = pginfo->GetRecordFilename(fileprefix, true);
 
     // If this recording was made by a another recorder, and that
     // recorder is available, tell it to do the deletion.

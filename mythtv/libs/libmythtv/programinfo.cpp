@@ -1425,15 +1425,15 @@ bool ProgramInfo::SetRecordBasename(QString basename)
     return true;
 }               
 
-/** \fn ProgramInfo::GetRecordBasename(void) const
+/** \fn ProgramInfo::GetRecordBasename() const
  *  \brief Returns a filename for a recording based on the
  *         recording channel and date.
  */
-QString ProgramInfo::GetRecordBasename(void) const
+QString ProgramInfo::GetRecordBasename(bool fromDB) const
 {
     QString retval = "";
 
-    if (!pathname.isEmpty())
+    if (!fromDB && !pathname.isEmpty())
         retval = pathname.section('/', -1);
     else
     {
@@ -1458,13 +1458,13 @@ QString ProgramInfo::GetRecordBasename(void) const
     return retval;
 }               
 
-/** \fn ProgramInfo::GetRecordFilename(const QString&) const
+/** \fn ProgramInfo::GetRecordFilename() const
  *  \brief Returns prefix+"/"+GetRecordBasename()
  *  \param prefix Prefix to apply to GetRecordBasename().
  */
-QString ProgramInfo::GetRecordFilename(const QString &prefix) const
+QString ProgramInfo::GetRecordFilename(const QString &prefix, bool fromDB) const
 {
-    return QString("%1/%2").arg(prefix).arg(GetRecordBasename());
+    return QString("%1/%2").arg(prefix).arg(GetRecordBasename(fromDB));
 }               
 
 /** \fn ProgramInfo::GetPlaybackURL(QString) const
