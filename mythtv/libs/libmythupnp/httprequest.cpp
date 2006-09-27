@@ -257,12 +257,16 @@ long HTTPRequest::SendResponseFile( QString sFileName )
     else
         m_nResponseStatus = 404;
 
+    QString sDate = QDateTime::currentDateTime().toString( "d MMM yyyy hh:mm:ss" );  
+
     sHeader   = QString("HTTP/%1.%2 %3\r\n"
-                        "Content-Type: %4\r\n"
-                        "Content-Length: %5\r\n" )
+                        "Date: %4\r\n"
+                        "Content-Type: %5\r\n"
+                        "Content-Length: %6\r\n" )
                         .arg( m_nMajor )
                         .arg( m_nMinor )
                         .arg( GetResponseStatus())
+                        .arg( sDate )
                         .arg( sContentType )
                         .arg( llSize       ).utf8();
 
@@ -281,7 +285,19 @@ long HTTPRequest::SendResponseFile( QString sFileName )
     {
         __off64_t offset = llStart;
         int       file   = open( sFileName.ascii(), O_RDONLY | O_LARGEFILE );
-        sendfile64( getSocketHandle(), file, &offset, llSize );
+        ssize_t   sent   = 0;  
+
+        do 
+        {  
+            // SSIZE_MAX should work in kernels 2.6.16 and later.  
+            // The loop is needed in any case.  
+
+            sent = sendfile64( getSocketHandle(), file, &offset, 
+                               (size_t)(llSize > INT_MAX ? INT_MAX : llSize));  
+
+            llSize -= sent;  
+        } 
+        while (( sent >= 0 ) && ( llSize > 0 ));  
 
         close( file );
     }
