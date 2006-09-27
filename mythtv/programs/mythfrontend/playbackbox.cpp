@@ -106,6 +106,22 @@ static int comp_originalAirDate_rev(ProgramInfo *a, ProgramInfo *b)
         return (dt1 > dt2 ? 1 : -1);
 }
 
+static int comp_recpriority2(ProgramInfo *a, ProgramInfo *b)
+{
+    if (a->recpriority2 == b->recpriority2)
+        return (a->recstartts < b->recstartts ? 1 : -1);
+    else
+        return (a->recpriority2 < b->recpriority2 ? 1 : -1);
+}
+
+static int comp_recpriority2_rev(ProgramInfo *a, ProgramInfo *b)
+{
+    if (a->recpriority2 == b->recpriority2)
+        return (a->recstartts > b->recstartts ? 1 : -1);
+    else
+        return (a->recpriority2 > b->recpriority2 ? 1 : -1);
+}
+
 static PlaybackBox::ViewMask viewMaskToggle(PlaybackBox::ViewMask mask,
         PlaybackBox::ViewMask toggle)
 {
@@ -170,12 +186,15 @@ PlaybackBox::PlaybackBox(BoxType ltype, MythMainWindow *parent,
       formatTime("h:mm AP"),
       titleView(true),                  useCategories(false),
       useRecGroups(false),              groupnameAsAllProg(false),
+      watchList(false),                 watchListAutoExpire(false),
+      watchListMaxAge(60),              watchListBlackOut(2),
       arrowAccel(true),                 ignoreKeyPressEvents(false),
       listOrder(1),                     listsize(0),
       // Recording Group settings
       groupDisplayName(tr("All Programs")),
       recGroup("All Programs"),
       recGroupPassword(""),             curGroupPassword(""),
+      watchGroup(" " + tr("Watch List")),
       viewMask(VIEW_TITLES),
       // Theme parsing
       theme(new XMLParse()),
@@ -230,6 +249,10 @@ PlaybackBox::PlaybackBox(BoxType ltype, MythMainWindow *parent,
     recGroup           = gContext->GetSetting("DisplayRecGroup","All Programs");
     listOrder          = gContext->GetNumSetting("PlayBoxOrdering", 1);
     groupnameAsAllProg = gContext->GetNumSetting("DispRecGroupAsAllProg", 0);
+    watchList          = gContext->GetNumSetting("PlaybackWatchList", 1);
+    watchListAutoExpire= gContext->GetNumSetting("PlaybackWLAutoExpire", 0);
+    watchListMaxAge    = gContext->GetNumSetting("PlaybackWLMaxAge", 60);
+    watchListBlackOut  = gContext->GetNumSetting("PlaybackWLBlackOut", 2);
     arrowAccel         = gContext->GetNumSetting("UseArrowAccels", 1);
     inTitle            = gContext->GetNumSetting("PlaybackBoxStartInTitle", 0);
     previewVideoEnabled =gContext->GetNumSetting("PlaybackPreview");
@@ -437,6 +460,9 @@ void PlaybackBox::setDefaultView(ViewType defaultView)
             mask =                                      VIEW_RECGROUPS;
             break;
     }
+    if (watchList)
+        mask = mask | VIEW_WATCHLIST;
+
     viewMask = (PlaybackBox::ViewMask)mask;
 }
 
@@ -1110,6 +1136,7 @@ void PlaybackBox::updateShowTitles(QPainter *p)
                 else
                     tstring = titleList[h];
 
+                tstring.remove(QRegExp("^ "));
                 ltype->SetItemText(cnt, tstring);
                 if (lcddev && inTitle)
                     lcdItems.append(new LCDMenuItem(0, NOTCHECKABLE, tstring));
@@ -1131,6 +1158,7 @@ void PlaybackBox::updateShowTitles(QPainter *p)
             else
                 tstring = titleList[titleIndex];
 
+            tstring.remove(QRegExp("^ "));
             typeText->SetText(tstring);
             if (lcddev) 
             {
@@ -1164,6 +1192,7 @@ void PlaybackBox::updateShowTitles(QPainter *p)
                 else
                     tstring = titleList[h];
 
+                tstring.remove(QRegExp("^ "));
                 ltype->SetItemText(cnt, tstring);
                 if (lcddev && inTitle)
                     lcdItems.append(new LCDMenuItem(0, NOTCHECKABLE, tstring));
@@ -1203,6 +1232,7 @@ void PlaybackBox::updateShowTitles(QPainter *p)
                 tempInfo = plist->at(skip+cnt);
 
                 if ((titleList[titleIndex] == "") ||
+                    (titleList[titleIndex] == watchGroup) ||
                     ((titleList[titleIndex] != tempInfo->title) &&
                      ((titleList[titleIndex] == tempInfo->recgroup) ||
                       (titleList[titleIndex] == tempInfo->category))) ||
@@ -1214,6 +1244,7 @@ void PlaybackBox::updateShowTitles(QPainter *p)
                     tempSubTitle = tempInfo->title;
                 if ((tempInfo->subtitle).stripWhiteSpace().length() > 0 
                     && ((titleList[titleIndex] == "") ||
+                        (titleList[titleIndex] == watchGroup) ||
                         ((titleList[titleIndex] != tempInfo->title) &&
                          ((titleList[titleIndex] == tempInfo->recgroup) ||
                           (titleList[titleIndex] == tempInfo->category))) ||
@@ -1440,12 +1471,15 @@ bool PlaybackBox::FillList(bool useCachedData)
     QDate oldoriginalAirDate;
     QDateTime oldstartts;
     int oldrecpriority = 0;
+    int oldrecordid = 0;
+
     p = progLists[oldtitle].at(progIndex);
     if (p)
     {
         oldchanid = p->chanid;
         oldstartts = p->recstartts;
         oldprogramid = p->programid;
+        oldrecordid = p->recordid;
         oldoriginalAirDate = p->originalAirDate;
         oldrecpriority = p->recpriority;
     }
@@ -1472,6 +1506,7 @@ bool PlaybackBox::FillList(bool useCachedData)
             "DisplayGroupTitleSort", TitleSortAlphabetical);
 
     QMap<QString, QString> sortedList;
+    QMap<int, int> recidEpisodes;
     QString sTitle = "";
 
     bool LiveTVInAllPrograms = gContext->GetNumSetting("LiveTVInAllPrograms",0);
@@ -1535,6 +1570,30 @@ bool PlaybackBox::FillList(bool useCachedData)
                     progLists[p->category].prepend(p);
                     progLists[p->category].setAutoDelete(false);
                 }
+                if ((viewMask & VIEW_WATCHLIST))
+                {
+                    if (watchListAutoExpire && !p->GetAutoExpireFromRecorded())
+                        VERBOSE(VB_FILE, QString("Auto-expire off:  %1")
+                                                 .arg(p->title));
+                    else if (p->programflags & FL_WATCHED)
+                        VERBOSE(VB_FILE, QString("Marked as 'watched':  %1")
+                                                 .arg(p->title));
+                    else
+                    {
+                        if (p->recordid > 0)
+                            recidEpisodes[p->recordid] += 1;
+                        if (recidEpisodes[p->recordid] == 1 ||
+                            p->recordid == 0 )
+                        {
+                            sortedList[watchGroup] = watchGroup;
+                            progLists[watchGroup].prepend(p);
+                            progLists[watchGroup].setAutoDelete(false);
+                        }
+                        else
+                            VERBOSE(VB_FILE, QString("Not the earliest:  %1")
+                                                     .arg(p->title));
+                    }
+                }
             }
         }
     }
@@ -1580,7 +1639,168 @@ bool PlaybackBox::FillList(bool useCachedData)
             }
         }
     }
-    
+    if (progLists[watchGroup].count() > 1)
+    {
+        QDateTime now = QDateTime::currentDateTime();
+        int maxAge = watchListMaxAge;
+
+        QMap<int, int> recType;
+        QMap<int, int> maxEpisodes;
+        QMap<int, int> spanHours;
+        QMap<int, int> delHours;
+        QMap<int, int> nextHours;
+
+        MSqlQuery query(MSqlQuery::InitCon());
+        query.prepare("SELECT recordid, type, maxepisodes, "
+                      "next_record, last_record, last_delete FROM record;");
+
+        if (query.exec() && query.isActive())
+        {
+            while (query.next())
+            {
+                int recid = query.value(0).toInt();
+                recType[recid] = query.value(1).toInt();
+                maxEpisodes[recid] = query.value(2).toInt();
+
+                QDateTime next_record = query.value(3).toDateTime();
+                QDateTime last_record = query.value(4).toDateTime();
+                QDateTime last_delete = query.value(5).toDateTime();
+
+                // Time between the last and next recordings
+                spanHours[recid] = 1000;
+                if (last_record.isValid() && next_record.isValid())
+                    spanHours[recid] = last_record.secsTo(next_record) / 3600;
+
+                // Time since the last episode was deleted
+                delHours[recid] = 1000;
+                if (last_delete.isValid())
+                    delHours[recid] = last_delete.secsTo(now) / 3600;
+
+                // Time until the next recording if any
+                if (next_record.isValid())
+                    nextHours[recid] = now.secsTo(next_record) / 3600 + 1;
+            }
+        }
+
+        ProgramInfo *p;
+        p = progLists[watchGroup].first(); 
+        while (p)
+        {
+            int recid = p->recordid;
+
+            // Set the intervals beyond range if there is no record entry
+            if (spanHours[recid] == 0)
+            {
+                spanHours[recid] = 1000;
+                delHours[recid] = 1000;
+            }
+
+            // add point equal to maxAge for each additional episode
+            if (p->recordid == 0 || maxEpisodes[recid] > 0)
+                p->recpriority2 = 0;
+            else
+                p->recpriority2 = (recidEpisodes[p->recordid] - 1) * maxAge;
+
+            // add a point every 2hr leading up to the next recording
+            if (nextHours[recid] > 0 && nextHours[recid] < maxAge * 2)
+                p->recpriority2 += (maxAge * 2 - nextHours[recid]) / 2;
+
+            int hrs = p->startts.secsTo(now) / 3600;
+
+            // add points for a new recording that decrease each hour
+            if (hrs < 24)
+                p->recpriority2 += 24 - hrs;
+
+            // Single
+            if (recType[recid] == kSingleRecord || 
+                recType[recid] == kFindOneRecord)
+            {
+                // add points for a new Singles that decrease over 2 days
+                if (hrs < 48)
+                    p->recpriority2 += maxAge * (48 - hrs) / 48;
+            }
+            // Daily 
+            else if (spanHours[recid] < 36 ||
+                     recType[recid] == kTimeslotRecord ||
+                     recType[recid] == kFindDailyRecord)
+            {
+                if (delHours[recid] < watchListBlackOut * 4)
+                {
+                    VERBOSE(VB_FILE, QString("Recently deleted daily:  %1")
+                                             .arg(p->title));
+                    progLists[watchGroup].remove();
+                    p = progLists[watchGroup].current();
+                    continue;
+                }
+                else
+                {
+                    VERBOSE(VB_FILE, QString("Daily interval:  %1")
+                                             .arg(p->title));
+
+                    if (maxEpisodes[recid] > 0)
+                        p->recpriority2 += maxAge / 2 + p->startts.daysTo(now);
+                    else
+                        p->recpriority2 += maxAge / 3 + 
+                                          (p->startts.secsTo(now) / 1800);
+                }
+            }
+            // Weekly
+            else if (nextHours[recid] ||
+                     recType[recid] == kWeekslotRecord || 
+                     recType[recid] == kFindWeeklyRecord)
+                     
+            {
+                if (delHours[recid] < (watchListBlackOut * 24) - 4)
+                {
+                    VERBOSE(VB_FILE, QString("Recently deleted weekly:  %1")
+                                             .arg(p->title));
+                    progLists[watchGroup].remove();
+                    p = progLists[watchGroup].current();
+                    continue;
+                }
+                else
+                {
+                    VERBOSE(VB_FILE, QString("Weekly interval: %1")
+                                             .arg(p->title));
+
+                    if (maxEpisodes[recid] > 0)
+                        p->recpriority2 += maxAge / 2 + p->startts.daysTo(now);
+                    else
+                        p->recpriority2 += 
+                            maxAge / 3 + (p->startts.daysTo(now) * maxAge / 4);
+                }
+            }
+            // Not recurring
+            else
+            {
+                if (delHours[recid] < (watchListBlackOut * 48) - 4)
+                {
+                    progLists[watchGroup].remove();
+                    p = progLists[watchGroup].current();
+                    continue;
+                }
+                else
+                {
+                    if (p->startts.daysTo(now) < maxAge)
+                        p->recpriority2 += p->startts.daysTo(now);
+                    else
+                        p->recpriority2 += maxAge;
+                }
+            }
+
+            VERBOSE(VB_FILE, QString(" %1  %2  %3")
+                    .arg(p->startts.toString(formatShortDate))
+                    .arg(p->recpriority2).arg(p->title));
+
+            p = progLists[watchGroup].next();
+        }
+
+        if (listOrder == 0 || type == Delete)
+            progLists[watchGroup].Sort(comp_recpriority2_rev);
+        else
+            progLists[watchGroup].Sort(comp_recpriority2);
+    }
+
     // Try to find our old place in the title list.  Scan the new
     // titles backwards until we find where we were or go past.  This
     // is somewhat inefficient, but it works.
@@ -1621,43 +1841,45 @@ bool PlaybackBox::FillList(bool useCachedData)
         {
             p = l->at(i);
 
-            if (listOrder == 0 || type == Delete)
+            if (oldtitle != watchGroup)
             {
-                if (episodeSort == "OrigAirDate" && titleIndex > 0)
+                if (listOrder == 0 || type == Delete)
                 {
-                    if (oldoriginalAirDate > p->originalAirDate)
-                        break;
-                }
-                else if (episodeSort == "Id" && titleIndex > 0)
-                {
-                    if (oldprogramid > p->programid)
-                        break;
-                }
-                else 
-                {
-                    if (oldstartts > p->recstartts)
-                        break;
-                }
-            }
-            else
-            {
-                if (episodeSort == "OrigAirDate" && titleIndex > 0)
-                {
-                    if (oldoriginalAirDate < p->originalAirDate)
-                        break;
-                }
-                else if (episodeSort == "Id" && titleIndex > 0)
-                {
-                    if (oldprogramid < p->programid)
-                        break;
+                    if (episodeSort == "OrigAirDate" && titleIndex > 0)
+                    {
+                        if (oldoriginalAirDate > p->originalAirDate)
+                            break;
+                    }
+                    else if (episodeSort == "Id" && titleIndex > 0)
+                    {
+                        if (oldprogramid > p->programid)
+                            break;
+                    }
+                    else 
+                    {
+                        if (oldstartts > p->recstartts)
+                            break;
+                    }
                 }
                 else
                 {
-                    if (oldstartts < p->recstartts)
-                        break;
+                    if (episodeSort == "OrigAirDate" && titleIndex > 0)
+                    {
+                        if (oldoriginalAirDate < p->originalAirDate)
+                            break;
+                    }
+                    else if (episodeSort == "Id" && titleIndex > 0)
+                    {
+                        if (oldprogramid < p->programid)
+                            break;
+                    }
+                    else
+                    {
+                        if (oldstartts < p->recstartts)
+                            break;
+                    }
                 }
             }
-
             progIndex = i;
 
             if (oldchanid == p->chanid &&
@@ -3300,6 +3522,7 @@ void PlaybackBox::setUnwatched(void)
 
     previewVideoState = kChanging;
 
+    connected = FillList();      
     update(drawListBounds);
 }
 
@@ -3321,6 +3544,7 @@ void PlaybackBox::setWatched(void)
 
     previewVideoState = kChanging;
 
+    connected = FillList();      
     update(drawListBounds);
 }
 

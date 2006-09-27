@@ -67,6 +67,7 @@ class PlaybackBox : public MythDialog
         VIEW_TITLES     =  0x01,
         VIEW_CATEGORIES =  0x02,
         VIEW_RECGROUPS  =  0x04,
+        VIEW_WATCHLIST  =  0x08,
         VIEW_ALL        = ~0x00,
     } ViewMask;
 
@@ -310,6 +311,14 @@ class PlaybackBox : public MythDialog
     bool                useRecGroups;
     /// contains "DispRecGroupAsAllProg" setting
     bool                groupnameAsAllProg;
+    /// include the Watch List feature
+    bool                watchList;
+    /// exclude recording not marked for auto-expire from the Watch List
+    bool                watchListAutoExpire;
+    /// add 1 to the Watch List scord up to this many days 
+    int                 watchListMaxAge;
+    /// adjust exclusion of a title from the Watch List after a delete
+    int                 watchListBlackOut;
     /// if true we allow arrow keys to replace SELECT and ESCAPE as appropiate
     bool                arrowAccel;
     /// if true keypress events are ignored  
@@ -324,6 +333,7 @@ class PlaybackBox : public MythDialog
     QString             recGroup;
     QString             recGroupPassword;
     QString             curGroupPassword;
+    QString             watchGroup;
     ViewMask            viewMask;
 
     // Theme parsing variables

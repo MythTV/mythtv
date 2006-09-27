@@ -2643,6 +2643,79 @@ public:
     }
 };
 
+static HostCheckBox *PlaybackWatchList()
+{
+    HostCheckBox *gc = new HostCheckBox("PlaybackWatchList");
+    gc->setLabel(QObject::tr("Include the 'Watch List' group"));
+    gc->setValue(true);
+    gc->setHelpText(QObject::tr("The 'Watch List' is an abbreviated list of "
+                                "recordings sorted to highlight series and "
+                                "shows that need attention in order to "
+                                "keep up to date."));
+    return gc;
+}
+
+static HostCheckBox *PlaybackWLAutoExpire()
+{
+    HostCheckBox *gc = new HostCheckBox("PlaybackWLAutoExpire");
+    gc->setLabel(QObject::tr("Exclude recordings not set for Auto-Expire"));
+    gc->setValue(false);
+    gc->setHelpText(QObject::tr("Set this if you turn off auto-expire only "
+                                "for recordings that you've seen and intend "
+                                "to keep. This option will exclude these "
+                                "recordings from the 'Watch List'."));
+    return gc;
+}
+
+static HostSpinBox *PlaybackWLMaxAge()
+{
+    HostSpinBox *gs = new HostSpinBox("PlaybackWLMaxAge", 30, 180, 10);
+    gs->setLabel(QObject::tr("Maximum days counted in the score"));
+    gs->setValue(60);
+    gs->setHelpText(QObject::tr("The 'Watch List' scores are based on 1 point "
+                                "equals one day since recording. This option "
+                                "limits the maximum score due to age and "
+                                "affects other weighting factors."));
+    return gs;
+}
+
+static HostSpinBox *PlaybackWLBlackOut()
+{
+    HostSpinBox *gs = new HostSpinBox("PlaybackWLBlackOut", 1, 3, 1);
+    gs->setLabel(QObject::tr("Days to exclude weekly episodes after delete"));
+    gs->setValue(2);
+    gs->setHelpText(QObject::tr("When an episode is deleted or marked as "
+                                "watched, other episodes of the series are "
+                                "excluded from the 'Watch List' for this "
+                                "interval of time. Daily shows also have a "
+                                "smaller interval based on this setting."));
+    return gs;
+}
+
+class WatchListSettings: public  VerticalConfigurationGroup,
+                     public TriggeredConfigurationGroup {
+public:
+     WatchListSettings():
+         ConfigurationGroup(false, true, false, false),
+         VerticalConfigurationGroup(false, true, false, false),
+         TriggeredConfigurationGroup(false) {
+         setLabel(QObject::tr("View Recordings (Watch List)"));
+         setUseLabel(false);
+
+         Setting* watchList = PlaybackWatchList();
+         addChild(watchList);
+         setTrigger(watchList);
+
+         ConfigurationGroup* settings = new VerticalConfigurationGroup(false);
+         settings->addChild(PlaybackWLAutoExpire());
+         settings->addChild(PlaybackWLMaxAge());
+         settings->addChild(PlaybackWLBlackOut());
+         addTarget("1", settings);
+
+         addTarget("0", new VerticalConfigurationGroup(true));
+    };
+};
+
 static HostCheckBox *PVR350OutputEnable()
 {
     HostCheckBox *gc = new HostCheckBox("PVR350OutputEnable");
@@ -3483,6 +3556,8 @@ PlaybackSettings::PlaybackSettings()
     pbox2->addChild(LiveTVInAllPrograms());
     pbox2->addChild(new DefaultViewSettings());
     addChild(pbox2);
+
+    addChild(new WatchListSettings());
 
     addChild(new HwDecSettings());
 

@@ -1874,6 +1874,18 @@ void ProgramInfo::SetWatchedFlag(bool watchedFlag) const
 
     if (!query.exec() || !query.isActive())
         MythContext::DBError("Set watched flag", query);
+
+    query.prepare("UPDATE record SET last_delete = :TIME "
+                  "WHERE recordid = :RECORDID");
+    query.bindValue(":RECORDID", recordid);
+
+    if (watchedFlag)
+        query.bindValue(":TIME", QDateTime::currentDateTime());
+    else
+        query.bindValue(":TIME", "0000-00-00T00:00:00");
+
+    if (!query.exec() || !query.isActive())
+        MythContext::DBError("Update last_delete", query);
 }
 
 /** \fn ProgramInfo::IsEditing(void) const
@@ -3582,12 +3594,15 @@ void ProgramInfo::showDetails(void) const
     }
     if (recorded)
     {
-        QString tmpSize;
-
-        tmpSize.sprintf("%0.2f ", filesize / 1024.0 / 1024.0 / 1024.0);
-        tmpSize += QObject::tr("GB", "GigaBytes");
+        if (recpriority2)
+            ADD_PAR(QObject::tr("Watch List Score"),
+                    QString("%1").arg(recpriority2), msg)
 
         ADD_PAR(QObject::tr("Recording Host"), hostname, msg)
+
+        QString tmpSize;
+        tmpSize.sprintf("%0.2f ", filesize / 1024.0 / 1024.0 / 1024.0);
+        tmpSize += QObject::tr("GB", "GigaBytes");
         ADD_PAR(QObject::tr("Recorded File Size"), tmpSize, msg)
 
         query.prepare("SELECT profile FROM recorded"
