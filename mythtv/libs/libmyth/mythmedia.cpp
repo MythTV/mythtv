@@ -405,5 +405,7 @@ const char* MythMediaDevice::MediaTypeString(MediaType type)
         return "MEDIATYPE_MVIDEO";
     if (type & MEDIATYPE_MGALLERY)
         return "MEDIATYPE_MGALLERY";
+
+    return "MEDIATYPE_UNKNOWN";
 };
 
