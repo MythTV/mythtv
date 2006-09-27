@@ -1,4 +1,5 @@
 #include <qobject.h>
+#include <qdir.h>
 
 #include "globals.h"
 
@@ -24,4 +25,8 @@ const QString JUMP_VIDEO_DEFAULT = "MythVideo";
 
 const int SCREEN_EXIT_VIA_JUMP = 5;
 
+#ifdef Q_WS_MACX
+const QString DEFAULT_VIDEOSTARTUP_DIR = QDir::homeDirPath() + "/Movies";
+#else
 const QString DEFAULT_VIDEOSTARTUP_DIR = "/share/Movies/dvd";
+#endif

@@ -1,5 +1,5 @@
                              MythDVD
-                           Release 0.17
+                           Release 0.20
 
 GENERAL INFO
 ------------
@@ -7,8 +7,9 @@ GENERAL INFO
 MythDVD is a MythTV module (see http://www.mythtv.org) that allows you to
 play DVDs and (optionally) VCDs. It can also be configured to let you rip
 DVDs and transcode their video and audio content to other (generally
-smaller) formats. The playing features are simply myth-style wrappers for
-your favorite DVD/XVCD playing software (mplayer, ogle, xine, etc). The
+smaller) formats. The player can either use the MythTV internal software
+(which now supports DVD menus), or simply to invoke your favorite DVD/XVCD
+playing software (mplayer, ogle, xine, etc) as an external command. The
 transcoding is based on and derived from the excellent transcode package
 (see below).
 
@@ -78,7 +79,7 @@ installed as well:
                 http://developers.videolan.org/pub/videolan/libdvdcss/   
 
 
-To simply play DVD's (independent of transcoding), you will need a player.
+If the internal player can't play your DVDs, you will need a player.
 These have their own dependencies, none of which are listed here. Depending
 on your distribution, there may be pre-packaged versions of these
 applications available. You'll want one or more of:
@@ -233,6 +234,6 @@ FOR MORE INFO
 Feel free to subscribe to the development mailing list at:
 http://www.mythtv.org/mailman/listinfo/mythtv-dev
 
-A list that's restricted to the CVS commit messages is available at:
+A list that's restricted to the SVN commit messages is available at:
 http://www.mythtv.org/mailman/listinfo/mythtv-commits
 

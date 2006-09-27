@@ -15,7 +15,11 @@ static HostLineEdit *MythGalleryDir()
 {
     HostLineEdit *gc = new HostLineEdit("GalleryDir");
     gc->setLabel(QObject::tr("Directory that holds images"));
+#ifdef Q_WS_MACX
+    gc->setValue(QDir::homeDirPath() + "/Pictures");
+#else
     gc->setValue("/var/lib/pictures");
+#endif
     gc->setHelpText(QObject::tr("This directory must exist and "
                        "MythGallery needs to have read permission."));
     return gc;
