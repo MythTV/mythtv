@@ -304,7 +304,7 @@ QString XvMCSurfaceTypes::toString(Display *pdisp, XvPortID p) const
     if (size())
         os<<endl;
 
-    return QString(os.str());
+    return QString(os.str().c_str());
 }
 
 QString XvMCSurfaceTypes::XvMCDescription(Display *pdisp)
@@ -376,7 +376,7 @@ QString XvMCSurfaceTypes::XvMCDescription(Display *pdisp)
         XCloseDisplay(disp);
     X11U;
 
-    return QString(os.str());
+    return QString(os.str().c_str());
 }
 
 #endif // USING_XVMC
