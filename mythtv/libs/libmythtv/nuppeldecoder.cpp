@@ -1173,29 +1173,46 @@ bool NuppelDecoder::GetFrame(int avignore)
 
         if (frameheader.frametype == 'S' && frameheader.comptype == 'M')
         {
-            struct rtfileheader *fh = &fileheader;
-            memcpy(fh, strm, frameheader.packetlength);
+            unsigned char *eop = strm + frameheader.packetlength;
+            unsigned char *cur = strm;
 
+            struct rtfileheader tmphead;
+            struct rtfileheader *fh = &tmphead;
+
+            memcpy(fh, cur, frameheader.packetlength);
+
+            while (QString(fileheader.finfo) != "MythTVVideo" &&
+                   cur + frameheader.packetlength <= eop)
+            {
+                cur++;
+                memcpy(fh, cur, frameheader.packetlength);
+            }
+
+            if (QString(fileheader.finfo) == "MythTVVideo")
+            {
 #ifdef WORDS_BIGENDIAN
-            fh->width         = bswap_32(fh->width);
-            fh->height        = bswap_32(fh->height);
-            fh->desiredwidth  = bswap_32(fh->desiredwidth);
-            fh->desiredheight = bswap_32(fh->desiredheight);
-            fh->aspect        = bswap_dbl(fh->aspect);
-            fh->fps           = bswap_dbl(fh->fps);
-            fh->videoblocks   = bswap_32(fh->videoblocks);
-            fh->audioblocks   = bswap_32(fh->audioblocks);
-            fh->textsblocks   = bswap_32(fh->textsblocks);
-            fh->keyframedist  = bswap_32(fh->keyframedist);
+                fh->width         = bswap_32(fh->width);
+                fh->height        = bswap_32(fh->height);
+                fh->desiredwidth  = bswap_32(fh->desiredwidth);
+                fh->desiredheight = bswap_32(fh->desiredheight);
+                fh->aspect        = bswap_dbl(fh->aspect);
+                fh->fps           = bswap_dbl(fh->fps);
+                fh->videoblocks   = bswap_32(fh->videoblocks);
+                fh->audioblocks   = bswap_32(fh->audioblocks);
+                fh->textsblocks   = bswap_32(fh->textsblocks);
+                fh->keyframedist  = bswap_32(fh->keyframedist);
 #endif
 
-            if (fileheader.aspect > .999 && fileheader.aspect < 1.001)
-                fileheader.aspect = 4.0 / 3;
-            current_aspect = fileheader.aspect;
+                memcpy(&fileheader, fh, FRAMEHEADERSIZE);
 
-            GetNVP()->SetVideoParams(fileheader.width, fileheader.height,
-                                     fileheader.fps, fileheader.keyframedist,
-                                     fileheader.aspect);
+                if (fileheader.aspect > .999 && fileheader.aspect < 1.001)
+                    fileheader.aspect = 4.0 / 3;
+                current_aspect = fileheader.aspect;
+
+                GetNVP()->SetVideoParams(fileheader.width, fileheader.height,
+                                         fileheader.fps, fileheader.keyframedist,
+                                         fileheader.aspect);
+            }
         }
     }
 
