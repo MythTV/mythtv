@@ -1430,11 +1430,17 @@ void MainServer::DoDeleteThread(const DeleteStruct *ds)
     bool followLinks = gContext->GetNumSetting("DeletesFollowLinks", 0);
     bool slowDeletes = gContext->GetNumSetting("TruncateDeletesSlowly", 0);
     int fd = -1;
+    off_t size = 0;
     bool errmsg = false;
 
     /* Delete recording. */
     if (slowDeletes)
     {
+        // Since stat fails after unlinking on some filesystems,
+        // get the filesize first
+        struct stat st;
+        if (stat(ds->filename.ascii(), &st) == 0)
+            size = st.st_size;
         fd = DeleteFile(ds->filename, followLinks);
 
         if ((fd < 0) && checkFile.exists())
@@ -1482,7 +1488,7 @@ void MainServer::DoDeleteThread(const DeleteStruct *ds)
     if (slowDeletes && fd != -1)
     {
         m_expirer->TruncatePending();
-        TruncateAndClose(m_expirer, fd, ds->filename);
+        TruncateAndClose(m_expirer, fd, ds->filename, size);
         m_expirer->TruncateFinished();
     }
 }
@@ -1638,7 +1644,8 @@ int MainServer::OpenAndUnlink(const QString &filename)
  *         is running at a time.
  */
 bool MainServer::TruncateAndClose(const AutoExpire *expirer,
-                                  int fd, const QString &filename)
+                                  int fd, const QString &filename,
+                                  off_t fsize)
 {
     QMutexLocker locker(&truncate_and_close_lock);
 
@@ -1658,17 +1665,6 @@ bool MainServer::TruncateAndClose(const AutoExpire *expirer,
             .arg(filename)
             .arg(increment / (1024.0 * 1024.0), 0, 'f', 2)
             .arg(sleep_time));
-
-    // Get the on disk file size and preferred I/O block size.
-    struct stat buf;
-    fstat(fd, &buf);
-    // Estimate the file size.  Don't use buf.st_blksize * buf.st_blocks
-    // The unit for st_blocks is undefined.  See section "RATIONALE" at
-    // http://www.opengroup.org/onlinepubs/000095399/basedefs/sys/stat.h.html
-    off_t fsize = ((buf.st_size / buf.st_blksize) + 1) * buf.st_blksize;
-
-    // Round truncate increment up to a blocksize, w/min of 1 block.
-    increment = ((increment / buf.st_blksize) + 1) * buf.st_blksize;
 
     while (fsize > 0)
     {
