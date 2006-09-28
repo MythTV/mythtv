@@ -357,16 +357,15 @@ foreach my $show (@files) {
         $newsubtitle = GetAnswer("... subtitle", $newsubtitle);
         $newdescription = GetAnswer("Description", $newdescription);
         $starttime = GetAnswer("... start time (YYYY-MM-DD HH:MM:SS)", $starttime);
-
-        if ($endtime) {
-            $duration = (str2time($endtime) - str2time($starttime)) / 60;
-        } else {
-            $duration = "60";
-        }
-        $duration = GetAnswer("... duration (in minutes)", $duration);
-        $endtime = time_format("yyyy-mm{on}-dd hh:mm{in}:ss", str2time($starttime) + $duration * 60);
-
     }
+
+    if ($endtime) {
+        $duration = (str2time($endtime) - str2time($starttime)) / 60;
+    } else {
+        $duration = "60";
+    }
+    $duration = GetAnswer("... duration (in minutes)", $duration);
+    $endtime = time_format("yyyy-mm{on}-dd hh:mm{in}:ss", str2time($starttime) + $duration * 60);
 
     if ($norename) {
         $mythfile = $showBase;
