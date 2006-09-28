@@ -19,7 +19,11 @@ static HostLineEdit *SetMusicDirectory()
 {
     HostLineEdit *gc = new HostLineEdit("MusicLocation");
     gc->setLabel(QObject::tr("Directory to hold music"));
+#ifdef Q_WS_MACX
+    gc->setValue(QDir::homeDirPath() + "/Music");
+#else
     gc->setValue("/mnt/store/music/");
+#endif
     gc->setHelpText(QObject::tr("This directory must exist, and the user "
                     "running MythMusic needs to have write permission "
                     "to the directory."));
