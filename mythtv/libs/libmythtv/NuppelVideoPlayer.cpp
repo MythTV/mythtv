@@ -3464,6 +3464,8 @@ void NuppelVideoPlayer::WrapTimecode(long long &timecode, TCTypes tc_type)
 
     timecode += tc_wrap[tc_type];
 
+#define DOTCWRAP 0
+#if DOTCWRAP
     // wrapped
     if (timecode < tc_lastval[tc_type] - 10000)
     {
@@ -3500,6 +3502,7 @@ void NuppelVideoPlayer::WrapTimecode(long long &timecode, TCTypes tc_type)
             tc_avcheck_framecounter = 0;
         }
     }
+#endif
 }
 
 /** \fn NuppelVideoPlayer::AddAudioData(char*,int,long long)
