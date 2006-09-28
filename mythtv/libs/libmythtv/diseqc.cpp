@@ -1103,7 +1103,7 @@ bool DiSEqCDevSwitch::Load(void)
     // populate switch parameters from db
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare(
-        "SELECT subtype, switch_ports "
+        "SELECT subtype, switch_ports, cmd_repeat "
         "FROM diseqc_tree "
         "WHERE diseqcid = :DEVID");
     query.bindValue(":DEVID", GetDeviceID());
@@ -1117,6 +1117,7 @@ bool DiSEqCDevSwitch::Load(void)
     {
         m_type = SwitchTypeFromString(query.value(0).toString());
         m_num_ports = query.value(1).toUInt();
+        m_repeat = query.value(2).toUInt();
         m_children.resize(m_num_ports);
         for (uint i = 0; i < m_num_ports; i++)
             m_children[i] = NULL;
@@ -1166,7 +1167,8 @@ bool DiSEqCDevSwitch::Store(void) const
             "    type         = 'switch', "
             "    description  = :DESC, "
             "    subtype      = :TYPE, "
-            "    switch_ports = :PORTS "
+            "    switch_ports = :PORTS, "
+            "    cmd_repeat   = :REPEAT "
             "WHERE diseqcid = :DEVID");
     }
     else
@@ -1174,10 +1176,12 @@ bool DiSEqCDevSwitch::Store(void) const
         query.prepare(
             "INSERT INTO diseqc_tree"
             " ( parentid,      ordinal,         type, "
-            "   description,   subtype,         switch_ports) "
+            "   description,   subtype,         switch_ports, "
+            "   cmd_repeat )"
             "VALUES "
             " (:PARENT,       :ORDINAL,         'switch', "
-            "  :DESC,         :TYPE,            :PORTS)");
+            "  :DESC,         :TYPE,            :PORTS, "
+            "  :REPEAT )");
     }
 
     if (m_parent)
@@ -1187,6 +1191,7 @@ bool DiSEqCDevSwitch::Store(void) const
     query.bindValue(":DESC",    GetDescription());
     query.bindValue(":TYPE",    type);
     query.bindValue(":PORTS",   m_num_ports);
+    query.bindValue(":REPEAT",  m_repeat);
     query.bindValue(":DEVID",   GetDeviceID());
 
     if (!query.exec())
@@ -1592,7 +1597,8 @@ bool DiSEqCDevRotor::Load(void)
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare(
         "SELECT subtype,         rotor_positions, "
-        "       rotor_hi_speed,  rotor_lo_speed "
+        "       rotor_hi_speed,  rotor_lo_speed, "
+        "       cmd_repeat "
         "FROM diseqc_tree "
         "WHERE diseqcid = :DEVID");
     query.bindValue(":DEVID", GetDeviceID());
@@ -1607,6 +1613,7 @@ bool DiSEqCDevRotor::Load(void)
         m_type     = RotorTypeFromString(query.value(0).toString());
         m_speed_hi = query.value(2).toDouble();
         m_speed_lo = query.value(3).toDouble();
+        m_repeat   = query.value(4).toUInt();
 
         // form of "angle1=index1:angle2=index2:..."
         QString positions = query.value(1).toString();
@@ -1676,7 +1683,8 @@ bool DiSEqCDevRotor::Store(void) const
             "    subtype         = :TYPE,    "
             "    rotor_hi_speed  = :HISPEED, "
             "    rotor_lo_speed  = :LOSPEED, "
-            "    rotor_positions = :POSMAP   "
+            "    rotor_positions = :POSMAP,  "
+            "    cmd_repeat      = :REPEAT   "
             "WHERE diseqcid = :DEVID");
     }
     else
@@ -1685,11 +1693,11 @@ bool DiSEqCDevRotor::Store(void) const
             "INSERT INTO diseqc_tree "
             " ( parentid,       ordinal,         type,   "
             "   description,    subtype,         rotor_hi_speed, "
-            "   rotor_lo_speed, rotor_positions ) "
+            "   rotor_lo_speed, rotor_positions, cmd_repeat ) "
             "VALUES "
             " (:PARENT,         :ORDINAL,        'rotor',  "
             "  :DESC,           :TYPE,           :HISPEED, "
-            "  :LOSPEED,        :POSMAP )");
+            "  :LOSPEED,        :POSMAP,         :REPEAT )");
     }
 
     if (m_parent)
@@ -1701,6 +1709,7 @@ bool DiSEqCDevRotor::Store(void) const
     query.bindValue(":HISPEED", m_speed_hi);
     query.bindValue(":LOSPEED", m_speed_lo);
     query.bindValue(":POSMAP",  posmap);
+    query.bindValue(":REPEAT",  m_repeat);
     query.bindValue(":DEVID",   GetDeviceID());
 
     if (!query.exec())
@@ -1920,7 +1929,8 @@ bool DiSEqCDevLNB::Load(void)
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare(
         "SELECT subtype,         lnb_lof_switch, "
-        "       lnb_lof_hi,      lnb_lof_lo "
+        "       lnb_lof_hi,      lnb_lof_lo, "
+        "       cmd_repeat "
         "FROM diseqc_tree "
         "WHERE diseqcid = :DEVID");
     query.bindValue(":DEVID", GetDeviceID());
@@ -1936,6 +1946,7 @@ bool DiSEqCDevLNB::Load(void)
         m_lof_switch = query.value(1).toInt();
         m_lof_hi     = query.value(2).toInt();
         m_lof_lo     = query.value(3).toInt();
+        m_repeat     = query.value(4).toUInt();
     }
 
     return true;
@@ -1958,7 +1969,8 @@ bool DiSEqCDevLNB::Store(void) const
             "    subtype         = :TYPE,    "
             "    lnb_lof_switch  = :LOFSW,   "
             "    lnb_lof_lo      = :LOFLO,   "
-            "    lnb_lof_hi      = :LOFHI    "
+            "    lnb_lof_hi      = :LOFHI,   "
+            "    cmd_repeat      = :REPEAT   "
             "WHERE diseqcid = :DEVID");
     }
     else
@@ -1967,11 +1979,11 @@ bool DiSEqCDevLNB::Store(void) const
             "INSERT INTO diseqc_tree"
             " ( parentid,      ordinal,         type, "
             "   description,   subtype,         lnb_lof_switch, "
-            "   lnb_lof_lo,    lnb_lof_hi ) "
+            "   lnb_lof_lo,    lnb_lof_hi,      cmd_repeat ) "
             "VALUES "
             " (:PARENT,       :ORDINAL,         'lnb', "
             "  :DESC,         :TYPE,            :LOFSW, "
-            "  :LOFLO,        :LOFHI ) ");
+            "  :LOFLO,        :LOFHI,           :REPEAT ) ");
     }
 
     if (m_parent)
@@ -1983,6 +1995,7 @@ bool DiSEqCDevLNB::Store(void) const
     query.bindValue(":LOFSW",   m_lof_switch);
     query.bindValue(":LOFLO",   m_lof_lo);
     query.bindValue(":LOFHI",   m_lof_hi);
+    query.bindValue(":REPEAT",  m_repeat);
     query.bindValue(":DEVID",   GetDeviceID());
 
     // update dev_id

@@ -147,6 +147,7 @@ class DiSEqCDevDevice
     void SetParent(DiSEqCDevDevice* parent)  { m_parent   = parent;  }
     void SetOrdinal(uint ordinal)            { m_ordinal  = ordinal; }
     void SetDescription(const QString &desc) { m_desc     = desc;    }
+    void SetRepeatCount(uint repeat)         { m_repeat   = repeat;  }
     virtual bool SetChild(uint, DiSEqCDevDevice*){return false;      }
 
     // Gets
@@ -157,6 +158,7 @@ class DiSEqCDevDevice
     DiSEqCDevDevice *GetParent(void)   const { return m_parent;      }
     uint          GetOrdinal(void)     const { return m_ordinal;     }
     QString       GetDescription(void) const { return m_desc;        }
+    uint          GetRepeatCount(void) const { return m_repeat;      }
     virtual uint  GetChildCount(void)  const { return 0;             }
     virtual bool  IsCommandNeeded(
         const DiSEqCDevSettings&, const DVBTuning&)

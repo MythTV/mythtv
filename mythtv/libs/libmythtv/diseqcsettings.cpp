@@ -96,6 +96,36 @@ class DeviceDescrSetting : public LineEditSetting
     DiSEqCDevDevice &m_device;
 };
 
+
+//////////////////////////////////////// DeviceRepeatSetting
+
+class DeviceRepeatSetting : public SpinBoxSetting
+{
+  public:
+    DeviceRepeatSetting(DiSEqCDevDevice &device) :
+        SpinBoxSetting(1, 5, 1), m_device(device)
+    {
+        setLabel(DeviceTree::tr("Repeat Count"));
+        QString help = DeviceTree::tr(
+            "Number of times to repeat DiSEqC commands sent to this device. "
+            "Larger values may help with less reliable devices.");
+        setHelpText(help);
+    }
+
+    virtual void load(void)
+    {
+        setValue(m_device.GetRepeatCount());
+    }
+
+    virtual void save(void)
+    {
+        m_device.SetRepeatCount(getValue().toUInt());
+    }
+
+  private:
+    DiSEqCDevDevice &m_device;
+};
+
 //////////////////////////////////////// SwitchTypeSetting
 
 class SwitchTypeSetting : public ComboBoxSetting
@@ -171,6 +201,7 @@ SwitchConfig::SwitchConfig(DiSEqCDevSwitch &switch_dev)
     group->setLabel(DeviceTree::tr("Switch Configuration"));
 
     group->addChild(new DeviceDescrSetting(switch_dev));
+    group->addChild(new DeviceRepeatSetting(switch_dev));
     m_type = new SwitchTypeSetting(switch_dev);
     group->addChild(m_type);
     m_ports = new SwitchPortsSetting(switch_dev);
@@ -408,6 +439,7 @@ RotorConfig::RotorConfig(DiSEqCDevRotor &rotor) : m_rotor(rotor)
     group->setLabel(DeviceTree::tr("Rotor Configuration"));
 
     group->addChild(new DeviceDescrSetting(rotor));
+    group->addChild(new DeviceRepeatSetting(rotor));
 
     ConfigurationGroup *tgroup =
         new HorizontalConfigurationGroup(false, false, true, true);
