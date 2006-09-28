@@ -757,11 +757,11 @@ int vm_get_subp_active_stream(vm_t *vm, int mode) {
     }
   }
 
-  if((vm->state).domain == VTS_DOMAIN && !((vm->state).SPST_REG & 0x40))
+  if((vm->state).SPST_REG & 0x40)
     /* Bit 7 set means hide, and only let Forced display show */
-    return (streamN | 0x80);
+    return (streamN & 0x1F);
   else
-    return streamN;
+    return -1;
 }
 
 void vm_get_angle_info(vm_t *vm, int *current, int *num_avail) {

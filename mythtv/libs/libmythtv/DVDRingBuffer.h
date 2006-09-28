@@ -147,7 +147,7 @@ class DVDRingBufferPriv
     /// menu pkt pts is not reliable
     long long      menupktpts;
     int            curAudioTrack;
-    int            curSubtitleTrack;
+    int8_t         curSubtitleTrack;
     bool           autoselectaudio;
     bool           autoselectsubtitle;
     const char     *dvdname;

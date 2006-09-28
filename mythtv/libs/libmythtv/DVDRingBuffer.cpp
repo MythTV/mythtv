@@ -315,7 +315,7 @@ int DVDRingBufferPriv::safe_read(void *data, unsigned sz)
                 ClearSubtitlesOSD();
 
                 if (autoselectsubtitle)
-                    curSubtitleTrack = dvdnav_get_active_spu_stream(dvdnav) & 0x1F;
+                    curSubtitleTrack = dvdnav_get_active_spu_stream(dvdnav);
 
                 if (parent)
                 {
