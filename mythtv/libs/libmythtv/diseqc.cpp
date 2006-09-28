@@ -450,7 +450,7 @@ bool DiSEqCDevTree::Execute(const DiSEqCDevSettings &settings,
     ApplyVoltage(settings, tuning);
 
     // turn off tone burst first if commands need to be sent
-    if (m_root->IsCommandNeeded(settings))
+    if (m_root->IsCommandNeeded(settings, tuning))
     {
         SetTone(false);
         usleep(DISEQC_SHORT_WAIT);
@@ -969,41 +969,40 @@ bool DiSEqCDevSwitch::Execute(const DiSEqCDevSettings &settings,
     if (pos < 0)
         return false;
 
-    // determine if switch command needs to be sent based on last pos
-    if ((m_last_pos == (uint)pos) && m_children[pos])
-        return m_children[pos]->Execute(settings, tuning);
-
     // perform switching
-    switch (m_type)
+    if (ShouldSwitch(settings, tuning))
     {
-        case kTypeTone:
-            success = ExecuteTone(settings, tuning, pos);
-            break;
-        case kTypeDiSEqCCommitted:
-        case kTypeDiSEqCUncommitted:
-            success = ExecuteDiseqc(settings, tuning, pos);
-            break;
-        case kTypeLegacySW21:
-        case kTypeLegacySW42:
-        case kTypeLegacySW64:
-            success = ExecuteLegacy(settings, tuning, pos);
-            break;
-        default:
-            success = false;
-            VERBOSE(VB_IMPORTANT, LOC_ERR +
-                    QString("Unknown switch type (%1)")
-                    .arg((uint)m_type));
-            break;
-    }
+        switch (m_type)
+        {
+            case kTypeTone:
+                success = ExecuteTone(settings, tuning, pos);
+                break;
+            case kTypeDiSEqCCommitted:
+            case kTypeDiSEqCUncommitted:
+                success = ExecuteDiseqc(settings, tuning, pos);
+                break;
+            case kTypeLegacySW21:
+            case kTypeLegacySW42:
+            case kTypeLegacySW64:
+                success = ExecuteLegacy(settings, tuning, pos);
+                break;
+            default:
+                success = false;
+                VERBOSE(VB_IMPORTANT, LOC_ERR +
+                        QString("Unknown switch type (%1)")
+                        .arg((uint)m_type));
+                break;
+        }
 
-    // if a child device will be sending a diseqc command, wait 100ms
-    if (m_children[pos]->IsCommandNeeded(settings))
-    {
-        VERBOSE(VB_CHANNEL, LOC + "Waiting for switch");
-        usleep(DISEQC_LONG_WAIT);
-    }
+        // if a child device will be sending a diseqc command, wait 100ms
+        if (m_children[pos]->IsCommandNeeded(settings, tuning))
+        {
+            VERBOSE(VB_CHANNEL, LOC + "Waiting for switch");
+            usleep(DISEQC_LONG_WAIT);
+        }
 
-    m_last_pos = pos;
+        m_last_pos = pos;
+    }
 
     // chain to child if the switch was successful
     if (success)
@@ -1015,6 +1014,8 @@ bool DiSEqCDevSwitch::Execute(const DiSEqCDevSettings &settings,
 void DiSEqCDevSwitch::Reset(void)
 {
     m_last_pos = (uint) -1;
+    m_last_high_band = (uint) -1;
+    m_last_horizontal = (uint) -1;
     dvbdev_vec_t::iterator it = m_children.begin();
     for (; it != m_children.end(); ++it)
     {
@@ -1023,19 +1024,15 @@ void DiSEqCDevSwitch::Reset(void)
     }
 }
 
-bool DiSEqCDevSwitch::IsCommandNeeded(const DiSEqCDevSettings &settings) const
+bool DiSEqCDevSwitch::IsCommandNeeded(const DiSEqCDevSettings &settings,
+                                      const DVBTuning         &tuning) const
 {
-    // sanity check switch position
     int pos = GetPosition(settings);
     if (pos < 0)
         return false;
 
-    // if position is changing, a command is definitely needed
-    if ((uint)pos != m_last_pos)
-        return true;
-
-    // otherwise, the child that will be selected may need a command
-    return m_children[pos]->IsCommandNeeded(settings);
+    return (ShouldSwitch(settings, tuning) ||
+            m_children[pos]->IsCommandNeeded(settings, tuning));
 }
 
 DiSEqCDevDevice *DiSEqCDevSwitch::GetSelectedChild(const DiSEqCDevSettings &settings) const
@@ -1348,6 +1345,34 @@ bool DiSEqCDevSwitch::ExecuteTone(const DiSEqCDevSettings &/*settings*/,
     return false;
 }
 
+bool DiSEqCDevSwitch::ShouldSwitch(const DiSEqCDevSettings &settings,
+                                   const DVBTuning &tuning) const
+{
+    int pos = GetPosition(settings);
+    if (pos < 0)
+        return false;
+
+    // committed switch should change for band and polarity as well
+    if (kTypeDiSEqCCommitted == m_type)
+    {
+        // retrieve LNB info
+        bool high_band  = false;
+        bool horizontal = false;
+        DiSEqCDevLNB *lnb  = m_tree.FindLNB(settings);
+        if (lnb)
+        {
+            high_band   = lnb->IsHighBand(tuning);
+            horizontal  = lnb->IsHorizontal(tuning);
+        }
+
+        if(high_band != m_last_high_band ||
+           horizontal != m_last_horizontal)
+            return true;
+    }
+
+    return m_last_pos != (uint)pos;
+}
+
 bool DiSEqCDevSwitch::ExecuteDiseqc(const DiSEqCDevSettings &settings,
                                     const DVBTuning &tuning,
                                     uint pos)
@@ -1385,7 +1410,13 @@ bool DiSEqCDevSwitch::ExecuteDiseqc(const DiSEqCDevSettings &settings,
     VERBOSE(VB_CHANNEL, LOC + "Changing to DiSEqC switch port " +
             QString("%1/%2").arg(pos + 1).arg(m_num_ports));
 
-    return m_tree.SendCommand(DISEQC_ADR_SW_ALL, cmd, m_repeat, 1, &data);
+    bool ret = m_tree.SendCommand(DISEQC_ADR_SW_ALL, cmd, m_repeat, 1, &data);
+    if(ret)
+    {
+        m_last_high_band = high_band;
+        m_last_horizontal = horizontal;
+    }
+    return ret;
 }
 
 int DiSEqCDevSwitch::GetPosition(const DiSEqCDevSettings &settings) const
@@ -1490,7 +1521,8 @@ void DiSEqCDevRotor::Reset(void)
         m_child->Reset();
 }
 
-bool DiSEqCDevRotor::IsCommandNeeded(const DiSEqCDevSettings &settings) const
+bool DiSEqCDevRotor::IsCommandNeeded(const DiSEqCDevSettings &settings,
+                                     const DVBTuning         &tuning) const
 {
     double position = settings.GetValue(GetDeviceID());
 
@@ -1498,7 +1530,7 @@ bool DiSEqCDevRotor::IsCommandNeeded(const DiSEqCDevSettings &settings) const
         return true;
 
     if (m_child)
-        return m_child->IsCommandNeeded(settings);
+        return m_child->IsCommandNeeded(settings, tuning);
 
     return false;
 }
@@ -1528,15 +1560,20 @@ bool DiSEqCDevRotor::SetChild(uint ordinal, DiSEqCDevDevice *device)
     return true;
 }
 
-uint DiSEqCDevRotor::GetVoltage(const DiSEqCDevSettings &settings,
-                                const DVBTuning         &tuning) const
+bool DiSEqCDevRotor::IsMoving(const DiSEqCDevSettings &settings) const
 {
     double position = settings.GetValue(GetDeviceID());
     double completed = GetProgress();
     bool   moving   = (completed < 1.0) || (position != m_last_position);
 
+    return (m_last_pos_known && moving);
+}
+
+uint DiSEqCDevRotor::GetVoltage(const DiSEqCDevSettings &settings,
+                                const DVBTuning         &tuning) const
+{
     // override voltage if the last position is known and the rotor is moving
-    if (m_last_pos_known && moving)
+    if (IsMoving(settings))
     {
         VERBOSE(VB_CHANNEL, LOC +
                 "Overriding voltage to 18V for faster rotor movement");

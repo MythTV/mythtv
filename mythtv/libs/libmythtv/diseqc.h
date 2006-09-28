@@ -159,7 +159,8 @@ class DiSEqCDevDevice
     QString       GetDescription(void) const { return m_desc;        }
     virtual uint  GetChildCount(void)  const { return 0;             }
     virtual bool  IsCommandNeeded(
-        const DiSEqCDevSettings&)      const { return false;         }
+        const DiSEqCDevSettings&, const DVBTuning&)
+                                       const { return false;         }
     virtual uint  GetVoltage(
         const DiSEqCDevSettings&, const DVBTuning&) const = 0;
 
@@ -230,8 +231,11 @@ class DiSEqCDevSwitch : public DiSEqCDevDevice
     // Gets
     dvbdev_switch_t GetType(void)       const { return m_type;      }
     uint            GetNumPorts(void)   const { return m_num_ports; }
+    bool            ShouldSwitch(const DiSEqCDevSettings &settings,
+                                 const DVBTuning &tuning) const;
     virtual uint    GetChildCount(void) const;
-    virtual bool    IsCommandNeeded(const DiSEqCDevSettings&) const;
+    virtual bool    IsCommandNeeded(const DiSEqCDevSettings&,
+                                    const DVBTuning&) const;
     virtual uint    GetVoltage(const DiSEqCDevSettings&,
                                const DVBTuning&) const;
 
@@ -257,6 +261,8 @@ class DiSEqCDevSwitch : public DiSEqCDevDevice
     dvbdev_switch_t m_type;
     uint            m_num_ports;
     uint            m_last_pos;
+    uint            m_last_high_band;
+    uint            m_last_horizontal;
     dvbdev_vec_t    m_children;
 
     static const TypeTable SwitchTypeTable[7];
@@ -291,7 +297,9 @@ class DiSEqCDevRotor : public DiSEqCDevDevice
     double         GetProgress(void)     const;
     bool           IsPositionKnown(void) const;
     virtual uint   GetChildCount(void)   const { return 1;           }
-    virtual bool   IsCommandNeeded(const DiSEqCDevSettings&) const;
+    virtual bool   IsCommandNeeded(const DiSEqCDevSettings&,
+                                   const DVBTuning&) const;
+    bool           IsMoving(const DiSEqCDevSettings&) const;
     virtual uint   GetVoltage(const DiSEqCDevSettings&,
                               const DVBTuning&) const;
 
