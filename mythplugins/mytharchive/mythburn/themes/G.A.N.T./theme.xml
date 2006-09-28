@@ -111,7 +111,7 @@
         </chapter>
 	</submenu>
 
-    <detailspage background="GANT-Background.png" music="silence.mp2" length="5">
+    <detailspage background="GANT-Background.png" music="silence.ac3" length="5">
         <graphic filename="%thumbnail" x="40" y="40" w="290" h="220" static="False"/>
         <text x="350" y="50" w="450" h="28" value="%title" font="0" colour="yellow" static="False" align="left"/>
         <text x="350" y="80" w="450" h="25" value="%subtitle" font="1" colour="white" static="False" align="left"/>

@@ -31,7 +31,7 @@
 #******************************************************************************
 
 # version of script - change after each update
-VERSION="0.1.20060924-1"
+VERSION="0.1.20060928-1"
 
 
 ##You can use this debug flag when testing out new themes
@@ -2277,7 +2277,7 @@ def createMenu(screensize, screendpi, numberofitems):
         highlightcolor = menunode.attributes["highlightcolor"].value
 
     #Get menu music
-    menumusic = "menumusic.mp2"
+    menumusic = "menumusic.ac3"
     if menunode.hasAttribute("music"):
         menumusic = menunode.attributes["music"].value
 
@@ -2401,7 +2401,7 @@ def createChapterMenu(screensize, screendpi, numberofitems):
         highlightcolor = menunode.attributes["highlightcolor"].value
 
     #Get menu music
-    menumusic = "menumusic.mp2"
+    menumusic = "menumusic.ac3"
     if menunode.hasAttribute("music"):
         menumusic = menunode.attributes["music"].value
 
@@ -2516,7 +2516,7 @@ def createDetailsPage(screensize, screendpi, numberofitems):
         fatalError("Background image not found (%s)" % backgroundfilename)
 
     #Get menu music
-    menumusic = "menumusic.mp2"
+    menumusic = "menumusic.ac3"
     if detailnode.hasAttribute("music"):
         menumusic = detailnode.attributes["music"].value
 

@@ -48,7 +48,7 @@ createdvd {
     introfiles.files = ../mythburn/intro/*.mpg
 
     musicfiles.path = $${PREFIX}/share/mythtv/mytharchive/music
-    musicfiles.files = ../mythburn/music/*.mp2
+    musicfiles.files = ../mythburn/music/*.ac3
 
     imagefiles.path = $${PREFIX}/share/mythtv/mytharchive/images
     imagefiles.files = ../mythburn/images/*.png

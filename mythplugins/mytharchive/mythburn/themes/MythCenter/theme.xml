@@ -9,7 +9,7 @@
 
     <intro filename="mythlogo_intro.mpg"/>
 
-    <menu background="MythCenter-Background.png" highlightcolor="yellow" music="menumusic.mp2" length="15" >
+    <menu background="MythCenter-Background.png" highlightcolor="yellow" music="menumusic.ac3" length="15" >
 		<!-- item holds the position of a menu item ie. recording -->
 		<item>
 			<text x="60" y="25" w="200" h="25" value="Page %page" font="2" colour="white" static="True" align="left"/>
@@ -37,7 +37,7 @@
 		</item>
 	</menu>
 
-    <submenu background="MythCenter-Background.png" highlightcolor="yellow" music="menumusic.mp2" length="15" >
+    <submenu background="MythCenter-Background.png" highlightcolor="yellow" music="menumusic.ac3" length="15" >
 		<!-- Describes a menu or short video that will appear after the recording has been selected -->
 		<chapter>
 			<graphic filename="%chapterthumbnail" x="55" y="45" w="145" h="110" static="False"/>
