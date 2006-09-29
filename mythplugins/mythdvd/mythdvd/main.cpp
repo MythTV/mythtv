@@ -20,6 +20,7 @@ using namespace std;
 #include <qmutex.h>
 #include <qregexp.h>
 #include <mythtv/mythcontext.h>
+#include <mythtv/mythconfig.h>  // for VERBOSE
 #include <mythtv/mythplugin.h>
 #include <mythtv/dialogbox.h>
 #include <mythtv/util.h>
@@ -30,6 +31,9 @@ using namespace std;
 #include "settings.h"
 #include "dvdripbox.h"
 #include "dbcheck.h"
+
+// This stores the last MythMediaDevice that was detected:
+static QString gDVDdevice;
 
 //
 //  Transcode stuff only if we were ./configure'd for it
@@ -116,14 +120,33 @@ void playDVD(void)
 
     QString command_string = gContext->GetSetting("mythdvd.DVDPlayerCommand");
 //    , "Internal");
+    QString dvd_device = gDVDdevice;
+
+    if (dvd_device.isNull())
+        dvd_device = gContext->GetSetting("DVDDeviceLocation");
+
+    if(dvd_device.length() < 1)
+    {
+        //
+        //  RTF README
+        //
+        DialogBox *no_device_dialog = new DialogBox(gContext->GetMainWindow(),
+                           QObject::tr("\n\nYou have no DVD Device defined."));
+        no_device_dialog->AddButton(QObject::tr("OK, I'll go run Setup"));
+        no_device_dialog->exec();
+ 
+        delete no_device_dialog;
+        gContext->removeCurrentLocation();
+        return;
+    }
 
     gContext->addCurrentLocation("playdvd");
 
     if ( (command_string.find("internal", 0, false) > -1)||
          (command_string.length() < 1))
     {
-        QString filename = QString("dvd:/%1" )
-                .arg(gContext->GetSetting("DVDDeviceLocation"));
+        QString filename = QString("dvd:/") + dvd_device;
+
         command_string = "Internal";
         gContext->GetMainWindow()->HandleMedia(command_string, filename);
         gContext->removeCurrentLocation();
@@ -136,25 +159,7 @@ void playDVD(void)
             //
             //  Need to do device substitution
             //
-            QString dvd_device = gContext->GetSetting("DVDDeviceLocation");
-            if(dvd_device.length() < 1)
-            {
-                //
-                //  RTF README
-                //
-                DialogBox *no_device_dialog = new DialogBox(gContext->GetMainWindow(),
-                           QObject::tr("\n\nYou have no DVD Device defined."));
-                no_device_dialog->AddButton(QObject::tr("OK, I'll go run Setup"));
-                no_device_dialog->exec();
-        
-                delete no_device_dialog;
-                gContext->removeCurrentLocation();
-                return;
-            }
-            else
-            {
-                command_string = command_string.replace( QRegExp("%d"), dvd_device );
-            }
+            command_string = command_string.replace(QRegExp("%d"), dvd_device);
         }
         myth_system(command_string);
         if (gContext->GetMainWindow())
@@ -234,8 +239,17 @@ int mythplugin_run(void);
 int mythplugin_config(void);
 }
 
-void handleDVDMedia(MythMediaDevice *) 
+void handleDVDMedia(MythMediaDevice *dvd)
 {
+    if (dvd)
+    {
+        gDVDdevice = dvd->getDevicePath();
+#ifdef Q_OS_MAC
+        gDVDdevice.prepend("/dev/r");
+#endif
+        VERBOSE(VB_UPNP, QString("Storing DVD device ") + gDVDdevice);
+    }
+
     switch (gContext->GetNumSetting("DVDOnInsertDVD", 1))
     {
         case 0 : // Do nothing
