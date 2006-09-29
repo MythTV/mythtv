@@ -114,14 +114,6 @@ static int comp_recpriority2(ProgramInfo *a, ProgramInfo *b)
         return (a->recpriority2 < b->recpriority2 ? 1 : -1);
 }
 
-static int comp_recpriority2_rev(ProgramInfo *a, ProgramInfo *b)
-{
-    if (a->recpriority2 == b->recpriority2)
-        return (a->recstartts > b->recstartts ? 1 : -1);
-    else
-        return (a->recpriority2 > b->recpriority2 ? 1 : -1);
-}
-
 static PlaybackBox::ViewMask viewMaskToggle(PlaybackBox::ViewMask mask,
         PlaybackBox::ViewMask toggle)
 {
@@ -1573,11 +1565,17 @@ bool PlaybackBox::FillList(bool useCachedData)
                 if ((viewMask & VIEW_WATCHLIST))
                 {
                     if (watchListAutoExpire && !p->GetAutoExpireFromRecorded())
+                    {
+                        p->recpriority2 = wlExpireOff;
                         VERBOSE(VB_FILE, QString("Auto-expire off:  %1")
                                                  .arg(p->title));
+                    }
                     else if (p->programflags & FL_WATCHED)
+                    {
+                        p->recpriority2 = wlWatched;
                         VERBOSE(VB_FILE, QString("Marked as 'watched':  %1")
                                                  .arg(p->title));
+                    }
                     else
                     {
                         if (p->recordid > 0)
@@ -1590,8 +1588,11 @@ bool PlaybackBox::FillList(bool useCachedData)
                             progLists[watchGroup].setAutoDelete(false);
                         }
                         else
+                        {
+                            p->recpriority2 = wlEarlier;
                             VERBOSE(VB_FILE, QString("Not the earliest:  %1")
                                                      .arg(p->title));
+                        }
                     }
                 }
             }
@@ -1726,6 +1727,7 @@ bool PlaybackBox::FillList(bool useCachedData)
             {
                 if (delHours[recid] < watchListBlackOut * 4)
                 {
+                    p->recpriority2 = wlDeleted;
                     VERBOSE(VB_FILE, QString("Recently deleted daily:  %1")
                                              .arg(p->title));
                     progLists[watchGroup].remove();
@@ -1752,6 +1754,7 @@ bool PlaybackBox::FillList(bool useCachedData)
             {
                 if (delHours[recid] < (watchListBlackOut * 24) - 4)
                 {
+                    p->recpriority2 = wlDeleted;
                     VERBOSE(VB_FILE, QString("Recently deleted weekly:  %1")
                                              .arg(p->title));
                     progLists[watchGroup].remove();
@@ -1775,6 +1778,7 @@ bool PlaybackBox::FillList(bool useCachedData)
             {
                 if (delHours[recid] < (watchListBlackOut * 48) - 4)
                 {
+                    p->recpriority2 = wlDeleted;
                     progLists[watchGroup].remove();
                     p = progLists[watchGroup].current();
                     continue;
@@ -1794,11 +1798,7 @@ bool PlaybackBox::FillList(bool useCachedData)
 
             p = progLists[watchGroup].next();
         }
-
-        if (listOrder == 0 || type == Delete)
-            progLists[watchGroup].Sort(comp_recpriority2_rev);
-        else
-            progLists[watchGroup].Sort(comp_recpriority2);
+        progLists[watchGroup].Sort(comp_recpriority2);
     }
 
     // Try to find our old place in the title list.  Scan the new

@@ -90,6 +90,13 @@ enum AvailableStatusType {
     asFileNotFound
 };
 
+enum WatchListStatus {
+    wlDeleted = -4,
+    wlEarlier = -3,
+    wlWatched = -2,
+    wlExpireOff = -1
+};
+
 class ScheduledRecording;
 class QGridLayout;
 

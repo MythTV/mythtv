@@ -3594,10 +3594,31 @@ void ProgramInfo::showDetails(void) const
     }
     if (recorded)
     {
-        if (recpriority2)
+        if (recpriority2 > 0)
             ADD_PAR(QObject::tr("Watch List Score"),
                     QString("%1").arg(recpriority2), msg)
 
+        if (recpriority2 < 0)
+        {
+            QString st = "";
+
+            switch(recpriority2)
+            {
+            case wlExpireOff:
+                st = QObject::tr("Auto-expire off");
+                break;
+            case wlWatched:
+                st = QObject::tr("Marked as 'watched'");
+                break;
+            case wlEarlier:
+                st = QObject::tr("Not the earliest episode");
+                break;
+            case wlDeleted:
+                st = QObject::tr("Recently deleted episode");
+                break;
+            }
+            ADD_PAR(QObject::tr("Watch List Status"), st, msg)
+        }
         ADD_PAR(QObject::tr("Recording Host"), hostname, msg)
 
         QString tmpSize;
