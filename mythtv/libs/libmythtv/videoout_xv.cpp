@@ -2860,7 +2860,7 @@ void VideoOutputXv::ProcessFrameXvMC(VideoFrame *frame, OSD *osd)
         VideoFrame *osdframe = NULL;
         int ret = DisplayOSD(xvmc_osd->OSDFrame(), osd, -1,
                              xvmc_osd->GetRevision());
-        OSDSurface *osdsurf = osd->Display();
+        OSDSurface *osdsurf = osd->GetDisplaySurface();
         if (osdsurf)
             xvmc_osd->SetRevision(osdsurf->GetRevision());
         if (ret >= 0 && xvmc_osd->NeedFrame())

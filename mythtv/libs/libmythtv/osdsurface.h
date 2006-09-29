@@ -24,6 +24,7 @@ class OSDSurface
 
     void Clear(void);
     void ClearUsed(void);
+    bool IsClear();
 
     bool IntersectsDrawn(QRect &newrect);
     void AddRect(QRect &newrect);

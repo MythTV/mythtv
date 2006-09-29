@@ -2474,6 +2474,12 @@ void NuppelVideoPlayer::DisplayNormalFrame(void)
             }
         }
     }
+    else 
+    {
+        OSD *osd = GetOSD();
+        if (osd)
+            osd->HideSet("interactive");
+    }
 
     // handle EIA-608 and Teletext
     if (textDisplayMode & kDisplayNUVCaptions)
@@ -5871,7 +5877,7 @@ void NuppelVideoPlayer::ITVRestart(uint chanid, uint cardid, bool isLiveTV)
         if (GetInteractiveTV())
             interactiveTV->Restart(chanid, cardid, isLiveTV);
     }
-       
+    
     osd->ClearAll("interactive");
     itvosd->Display();
     osd->SetVisible(itvosd, 0);
@@ -6725,9 +6731,6 @@ void NuppelVideoPlayer::SetOSDThemeName(const QString themename)
     osdtheme = QDeepCopy<QString>(themename);
 }
 
-NuppelVideoPlayer SetLiveTVChain( LiveTVChain * tvchain )
-{
-}
 // EIA-708 caption support -- end
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

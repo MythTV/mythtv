@@ -135,6 +135,11 @@ void OSDSurface::ClearUsed(void)
     usedRegions = QRegion();
 }
 
+bool OSDSurface::IsClear(void)
+{
+    return (usedRegions == QRegion());
+}
+
 bool OSDSurface::IntersectsDrawn(QRect &newrect)
 {
     QMutexLocker lock(&usedRegionsLock);
@@ -799,7 +804,7 @@ void OSDSurface::DitherToI44(unsigned char *outbuf, bool ifirst,
 
         if (startline < 0) startline = 0;
         if (endline >= height) endline = height - 1;
-        if (startcol < 0) endcol = 0;
+        if (startcol < 0) startcol = 0;
         if (endcol >= width) endcol = width - 1;
 
         unsigned char *src;
