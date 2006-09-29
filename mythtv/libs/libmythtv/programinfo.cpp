@@ -2847,6 +2847,8 @@ QString ProgramInfo::RecStatusChar(void) const
         return QObject::tr("K", "RecStatusChar rsLowDiskSpace");
     case rsTunerBusy:
         return QObject::tr("B", "RecStatusChar rsTunerBusy");
+    case rsFailed:
+        return QObject::tr("f", "RecStatusChar rsFailed");
     case rsNotListed:
         return QObject::tr("N", "RecStatusChar rsNotListed");
     case rsNeverRecord:
@@ -2903,6 +2905,8 @@ QString ProgramInfo::RecStatusText(void) const
             return QObject::tr("Low Disk Space");
         case rsTunerBusy:
             return QObject::tr("Tuner Busy");
+        case rsFailed:
+            return QObject::tr("Recorder Failed");
         case rsNotListed:
             return QObject::tr("Not Listed");
         case rsNeverRecord:
@@ -2955,6 +2959,9 @@ QString ProgramInfo::RecStatusDesc(void) const
             break;
         case rsTunerBusy:
             message += QObject::tr("the tuner card was already being used.");
+            break;
+        case rsFailed:
+            message += QObject::tr("the recording failed.");
             break;
         default:
             message = QObject::tr("The status of this showing is unknown.");

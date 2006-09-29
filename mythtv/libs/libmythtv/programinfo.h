@@ -59,6 +59,7 @@ enum FlagMask {
 };
 
 enum RecStatusType {
+    rsFailed = -9,
     rsTunerBusy = -8,
     rsLowDiskSpace = -7,
     rsCancelled = -6,
