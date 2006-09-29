@@ -938,23 +938,28 @@ static float normalized_fps(AVStream *stream, AVCodecContext *enc)
     return fps;
 }
 
-void AvFormatDecoder::InitVideoCodec(AVStream *stream, AVCodecContext *enc)
+void AvFormatDecoder::InitVideoCodec(AVStream *stream, AVCodecContext *enc,
+                                     bool selectedStream)
 {
-    fps = normalized_fps(stream, enc);
-
     float aspect_ratio;
-    if (enc->sample_aspect_ratio.num == 0)
-        aspect_ratio = 0.0f;
-    else
-        aspect_ratio = av_q2d(enc->sample_aspect_ratio) *
-            enc->width / enc->height;
 
-    if (aspect_ratio <= 0.0f || aspect_ratio > 6.0f)
-        aspect_ratio = (float)enc->width / (float)enc->height;
+    if (selectedStream)
+    {
+        fps = normalized_fps(stream, enc);
 
-    current_width = enc->width;
-    current_height = enc->height;
-    current_aspect = aspect_ratio;
+        if (enc->sample_aspect_ratio.num == 0)
+            aspect_ratio = 0.0f;
+        else
+            aspect_ratio = av_q2d(enc->sample_aspect_ratio) *
+                enc->width / enc->height;
+
+        if (aspect_ratio <= 0.0f || aspect_ratio > 6.0f)
+            aspect_ratio = (float)enc->width / (float)enc->height;
+
+        current_width = enc->width;
+        current_height = enc->height;
+        current_aspect = aspect_ratio;
+    }
 
     enc->opaque = (void *)this;
     enc->get_buffer = avcodec_default_get_buffer;
@@ -972,7 +977,8 @@ void AvFormatDecoder::InitVideoCodec(AVStream *stream, AVCodecContext *enc)
 
     AVCodec *codec = avcodec_find_decoder(enc->codec_id);    
 
-    if (!gContext->GetNumSetting("DecodeExtraAudio", 0) &&
+    if (selectedStream &&
+        !gContext->GetNumSetting("DecodeExtraAudio", 0) &&
         codec->id != CODEC_ID_MPEG2VIDEO_XVMC           &&
         codec->id != CODEC_ID_MPEG2VIDEO_XVMC_VLD)
     {
@@ -988,7 +994,8 @@ void AvFormatDecoder::InitVideoCodec(AVStream *stream, AVCodecContext *enc)
         enc->draw_horiz_band = render_slice_xvmc;
         enc->slice_flags = SLICE_FLAG_CODED_ORDER |
             SLICE_FLAG_ALLOW_FIELD;
-        directrendering = true;
+        if (selectedStream)
+            directrendering = true;
     }
     else if (codec && codec->capabilities & CODEC_CAP_DR1 &&
              !(enc->width % 16))
@@ -997,26 +1004,30 @@ void AvFormatDecoder::InitVideoCodec(AVStream *stream, AVCodecContext *enc)
         enc->get_buffer = get_avf_buffer;
         enc->release_buffer = release_avf_buffer;
         enc->draw_horiz_band = NULL;
-        directrendering = true;
+        if (selectedStream)
+            directrendering = true;
     }
 
-    uint align_width  = enc->width;
-    uint align_height = enc->height;
-
-    align_dimensions(enc, align_width, align_height);
-
-    if (align_width == 0 && align_height == 0)
+    if (selectedStream)
     {
-        VERBOSE(VB_PLAYBACK, LOC + "InitVideoCodec "
-                "failed to align dimensions, resetting decoder.");
-        align_width = 640;
-        align_height = 480;
-        fps = 29.97;
-        aspect_ratio = 4.0 / 3;
-    }
+        uint align_width  = enc->width;
+        uint align_height = enc->height;
 
-    GetNVP()->SetVideoParams(align_width, align_height, fps,
-                             keyframedist, aspect_ratio, kScan_Detect);
+        align_dimensions(enc, align_width, align_height);
+
+        if (align_width == 0 && align_height == 0)
+        {
+            VERBOSE(VB_PLAYBACK, LOC + "InitVideoCodec "
+                    "failed to align dimensions, resetting decoder.");
+            align_width = 640;
+            align_height = 480;
+            fps = 29.97;
+            aspect_ratio = 4.0 / 3;
+        }
+
+        GetNVP()->SetVideoParams(align_width, align_height, fps,
+                                 keyframedist, aspect_ratio, kScan_Detect);
+    }
 }
 
 #ifdef USING_XVMC
@@ -1332,7 +1343,7 @@ int AvFormatDecoder::ScanStreams(bool novideo)
                             <<") type ("<<codec_type_string(enc->codec_type)
                             <<") already open.");
                 }
-                InitVideoCodec(ic->streams[i], enc);
+
                 // Only use libmpeg2 when not using XvMC
                 if (CODEC_ID_MPEG1VIDEO == enc->codec_id ||
                     CODEC_ID_MPEG2VIDEO == enc->codec_id)
@@ -1350,6 +1361,8 @@ int AvFormatDecoder::ScanStreams(bool novideo)
                 {
                     selectedVideoIndex = i;
                 }
+
+                InitVideoCodec(ic->streams[i], enc, selectedVideoIndex == i);
 
                 ScanATSCCaptionStreams(i);
 
@@ -3415,3 +3428,5 @@ static int dts_decode_header(uint8_t *indata_ptr, int *rate,
 
     return fsize;
 }
+
+/* vim: set expandtab tabstop=4 shiftwidth=4: */
