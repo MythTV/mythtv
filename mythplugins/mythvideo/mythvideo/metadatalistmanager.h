@@ -1,6 +1,8 @@
 #ifndef METADATALISTMANAGER_H_
 #define METADATALISTMANAGER_H_
 
+#include <list>
+
 #include "quicksp.h"
 
 class MetadataListManager
