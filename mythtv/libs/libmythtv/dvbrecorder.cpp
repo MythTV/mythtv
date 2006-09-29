@@ -1021,6 +1021,7 @@ bool DVBRecorder::ProcessTSPacket(const TSPacket& tspacket)
             VERBOSE(VB_RECORD, LOC +
                     QString("PID 0x%1 discontinuity detected").arg(pid,0,16));
             _continuity_error_count++;
+            return false;
         }
     }
 
