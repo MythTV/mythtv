@@ -106,16 +106,19 @@ protected:
 class OnAirGuide;
 class XmltvID;
 
-class ChannelOptionsCommon: public VerticalConfigurationGroup {
+class ChannelOptionsCommon: public VerticalConfigurationGroup
+{
     Q_OBJECT
-public:
-    ChannelOptionsCommon(const ChannelID& id);
-    void load();
-public slots:
+
+  public:
+    ChannelOptionsCommon(const ChannelID &id, uint default_sourceid);
+    void load(void);
+
+  public slots:
     void onAirGuideChanged(bool);
     void sourceChanged(const QString&);
 
-protected:
+  protected:
     OnAirGuide *onairguide;
     XmltvID    *xmltvID;
 };

@@ -19,15 +19,16 @@
 
 #include "scanwizard.h"
 
-ChannelWizard::ChannelWizard(int id)
+ChannelWizard::ChannelWizard(int id, int default_sourceid)
              : ConfigurationWizard() {
     setLabel(QObject::tr("Channel Options"));
 
     // Must be first.
     addChild(cid = new ChannelID());
     cid->setValue(id);
-        
-    ChannelOptionsCommon* common = new ChannelOptionsCommon(*cid);
+
+    ChannelOptionsCommon *common =
+        new ChannelOptionsCommon(*cid, default_sourceid);
     addChild(common);
 
     int cardtypes = countCardtypes();
@@ -336,7 +337,7 @@ int ChannelEditor::exec()
 void ChannelEditor::edit()
 {
     id = list->getValue().toInt();
-    ChannelWizard cw(id);
+    ChannelWizard cw(id, source->getValue().toUInt());
     cw.exec();
 
     list->fillSelections();

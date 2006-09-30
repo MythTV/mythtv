@@ -42,30 +42,58 @@ public:
     };
 };
 
-class Source: public ComboBoxSetting, public CSetting {
-public:
-    Source(const ChannelID& id):
-        ComboBoxSetting(), CSetting(id, "sourceid") {
+class Source: public ComboBoxSetting, public CSetting
+{
+  public:
+    Source(const ChannelID &id, uint _default_sourceid) :
+        ComboBoxSetting(), CSetting(id, "sourceid"),
+        default_sourceid(_default_sourceid)
+    {
         setLabel(QObject::tr("Video Source"));
     };
 
-    void load() {
+    void load(void)
+    {
         fillSelections();
         CSetting::load();
+
+        if (default_sourceid && !getValue().toUInt())
+        {
+            uint which = sourceid_to_index[default_sourceid];
+            if (which)
+                setValue(which);
+        }
     };
 
-    void fillSelections() 
+    void fillSelections(void)
     {
         addSelection(QObject::tr("[Not Selected]"), "0");
 
         MSqlQuery query(MSqlQuery::InitCon());
-        query.prepare("SELECT name, sourceid FROM videosource");
+        query.prepare("SELECT name, sourceid "
+                      "FROM videosource "
+                      "ORDER BY sourceid");
         
-        if (query.exec() && query.isActive() && query.size() > 0)
-            while(query.next())
+        if (!query.exec() || !query.isActive())
+        {
+            MythContext::DBError("Source::fillSelections", query);
+        }
+        else
+        {
+            for (uint i = 1; query.next(); i++)
+            {
+                sourceid_to_index[query.value(1).toUInt()] = i;
                 addSelection(query.value(0).toString(),
                              query.value(1).toString());
+            }
+        }
+
+        sourceid_to_index[0] = 0; // Not selected entry.
     };
+
+  private:
+    uint            default_sourceid;
+    QMap<uint,uint> sourceid_to_index;
 };
 
 class Callsign: public LineEditSetting, public CSetting {
@@ -265,8 +293,9 @@ public:
     };
 };
 
-ChannelOptionsCommon::ChannelOptionsCommon(const ChannelID& id) :
-    ConfigurationGroup(false, true, false, false),
+ChannelOptionsCommon::ChannelOptionsCommon(const ChannelID &id,
+                                           uint default_sourceid) :
+    ConfigurationGroup(        false, true, false, false),
     VerticalConfigurationGroup(false, true, false, false)
 {
     setLabel(QObject::tr("Channel Options - Common"));
@@ -274,39 +303,41 @@ ChannelOptionsCommon::ChannelOptionsCommon(const ChannelID& id) :
 
     addChild(new Name(id));
 
-    Source *source;
-
-    HorizontalConfigurationGroup* group1 = new HorizontalConfigurationGroup(false,false,true,true);
-
-    VerticalConfigurationGroup* left = new VerticalConfigurationGroup(false,true);
-    left->addChild(new Channum(id));
-    left->addChild(new Callsign(id));
-
-    HorizontalConfigurationGroup *lefthoz = new HorizontalConfigurationGroup(false,false,true,true);
-
-    lefthoz->addChild(new Visible(id));
-    lefthoz->addChild(new CommFree(id));
-    left->addChild(lefthoz);
-    group1->addChild(left);
-
-    VerticalConfigurationGroup* right = new VerticalConfigurationGroup(false, true);
-    right->addChild(source = new Source(id));
-    right->addChild(new ChannelTVFormat(id));
-    right->addChild(new Priority(id));
-    group1->addChild(right);
-
-    addChild(group1);
-
-    addChild(new Icon(id));
-    addChild(new VideoFilters(id));
-    addChild(new OutputFilters(id));
-
+    Source *source = new Source(id, default_sourceid);
+  
+    HorizontalConfigurationGroup *group1 =
+        new HorizontalConfigurationGroup(false,false,true,true);
+    HorizontalConfigurationGroup *lefthoz =
+        new HorizontalConfigurationGroup(false,false,true,true);
     HorizontalConfigurationGroup *bottomhoz =
         new HorizontalConfigurationGroup(false, true);
+    VerticalConfigurationGroup *left =
+        new VerticalConfigurationGroup(false, true);
+    VerticalConfigurationGroup *right =
+        new VerticalConfigurationGroup(false, true);
+  
+    lefthoz->addChild(new Visible(id));
+    lefthoz->addChild(new CommFree(id));
 
+    left->addChild(new Channum(id));
+    left->addChild(new Callsign(id));
+    left->addChild(lefthoz);
+  
+    right->addChild(source);
+    right->addChild(new ChannelTVFormat(id));
+    right->addChild(new Priority(id));
+
+    group1->addChild(left);
+    group1->addChild(right);
+  
     bottomhoz->addChild(onairguide = new OnAirGuide(id));
     bottomhoz->addChild(xmltvID = new XmltvID(id));
     bottomhoz->addChild(new TimeOffset(id));
+
+    addChild(group1);
+    addChild(new Icon(id));
+    addChild(new VideoFilters(id));
+    addChild(new OutputFilters(id));
     addChild(bottomhoz);
 
     connect(onairguide, SIGNAL(valueChanged(     bool)),
