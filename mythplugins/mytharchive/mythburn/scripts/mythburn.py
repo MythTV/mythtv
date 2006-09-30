@@ -31,7 +31,7 @@
 #******************************************************************************
 
 # version of script - change after each update
-VERSION="0.1.20060930-2"
+VERSION="0.1.20060930-3"
 
 
 ##You can use this debug flag when testing out new themes
@@ -101,6 +101,8 @@ useFIFO = True
 encodetoac3 = False
 alwaysRunMythtranscode = False
 copyremoteFiles = False
+thumboffset = 10
+usebookmark = True
 
 #main menu aspect ratio (4:3 or 16:9)
 mainmenuAspectRatio = "16:9"
@@ -461,7 +463,13 @@ def createVideoChapters(itemnum, numofchapters, lengthofvideo, getthumbnails):
     while count<=numofchapters:
         chapters+=time.strftime("%H:%M:%S",time.gmtime(starttime))
 
-        thumbList+="%s," % starttime
+        if starttime==0:
+            if thumboffset < segment:
+                thumbList+="%s," % thumboffset
+            else:
+                thumbList+="%s," % starttime
+        else:
+            thumbList+="%s," % starttime
 
         if numofchapters>1:
             chapters+="," 
@@ -2987,6 +2995,8 @@ def isFileOkayForDVD(file, folder):
     return True
 
 def processFile(file, folder):
+    from shutil import copy
+
     """Process a single video/recording file ready for burning."""
 
     write( "*************************************************************")
@@ -3164,7 +3174,15 @@ def processFile(file, folder):
     # check if we need to convert any of the audio streams to ac3
     processAudio(folder)
 
-    extractVideoFrame(os.path.join(folder,"stream.mv2"), os.path.join(folder,"thumbnail.jpg"), 0)
+    # if the file is a recording try to use its preview image for the thumb
+    if file.attributes["type"].value == "recording":
+        previewImage = os.path.join(recordingpath, file.attributes["filename"].value + ".png")
+        if usebookmark == True and os.path.exists(previewImage):
+            copy(previewImage, os.path.join(folder, "thumbnail.jpg"))
+        else:
+            extractVideoFrame(os.path.join(folder, "stream.mv2"), os.path.join(folder,"thumbnail.jpg"), thumboffset)
+    else:
+        extractVideoFrame(os.path.join(folder, "stream.mv2"), os.path.join(folder, "thumbnail.jpg"), thumboffset)
 
     write( "*************************************************************")
     write( "Finished processing file " + file.attributes["filename"].value)
