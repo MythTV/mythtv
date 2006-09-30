@@ -2290,7 +2290,7 @@
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>KTLA</callsign>
-        <network>WB</network>
+        <network>CW-KTLA</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>KTMF</callsign>
@@ -2674,7 +2674,7 @@
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>KWGN</callsign>
-        <network>WB</network>
+        <network>CW-KWGN</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>KWIB</callsign>
@@ -3337,6 +3337,10 @@
         <network>FOX</network>
     </callsigntonetwork>
     <callsigntonetwork>
+        <callsign>WACX</callsign>
+        <network>IND-WACX</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
         <callsign>WACY</callsign>
         <network>UPN</network>
     </callsigntonetwork>
@@ -3918,7 +3922,7 @@
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>WESH</callsign>
-        <network>NBC</network>
+        <network>NBC-WESH</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>WESTERN</callsign>
@@ -4022,7 +4026,7 @@
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>WFTV</callsign>
-        <network>ABC</network>
+        <network>ABC-WFTV</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>WFTX</callsign>
@@ -4138,7 +4142,7 @@
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>WGN</callsign>
-        <network>WB</network>
+        <network>CW-WGN</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>WGNM</callsign>
@@ -4418,7 +4422,7 @@
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>WKCF</callsign>
-        <network>WB</network>
+        <network>CW-WKCF</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>WKDH</callsign>
@@ -4435,6 +4439,10 @@
     <callsigntonetwork>
         <callsign>WKJG</callsign>
         <network>NBC</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>WKMG</callsign>
+        <network>CBS-WKMG</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>WKNO</callsign>
@@ -4491,6 +4499,10 @@
     <callsigntonetwork>
         <callsign>WLBZ</callsign>
         <network>NBC</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>WLCB</callsign>
+        <network>IND-WLCB</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>WLCW</callsign>
@@ -4822,7 +4834,7 @@
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>WOFL</callsign>
-        <network>FOX</network>
+        <network>FOX-WOFL</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>WOGX</callsign>
@@ -4867,6 +4879,10 @@
     <callsigntonetwork>
         <callsign>WOOD</callsign>
         <network>NBC</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>WOPX</callsign>
+        <network>PAX-WOPX</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>WOSU</callsign>
@@ -4930,7 +4946,7 @@
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>WPIX</callsign>
-        <network>WB</network>
+        <network>CW-WPIX</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>WPLG</callsign>
@@ -5054,7 +5070,7 @@
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>WRBW</callsign>
-        <network>UPN</network>
+        <network>MYTV-WRBW</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>WRC</callsign>
@@ -5067,6 +5083,10 @@
     <callsigntonetwork>
         <callsign>WRDC</callsign>
         <network>UPN</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>WRDQ</callsign>
+        <network>IND-WRDQ</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>WREX</callsign>
@@ -5126,7 +5146,7 @@
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>WSBK</callsign>
-        <network>UPN</network>
+        <network>IND-WSBK</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>WSEC</callsign>
@@ -5259,6 +5279,10 @@
     <callsigntonetwork>
         <callsign>WTEN</callsign>
         <network>ABC</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>WTGL</callsign>
+        <network>IND-WTGL</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>WTGS</callsign>
@@ -5634,7 +5658,7 @@
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>WWOR</callsign>
-        <network>UPN</network>
+        <network>MYTV-WWOR</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>WWSB</callsign>
@@ -5777,6 +5801,10 @@
         <url>[zap2it]/abc.jpg</url>
     </networktourl>
     <networktourl>
+        <network>ABC-WFTV</network>
+        <url>[ls-logo]/ww/wftv.jpg</url>
+    </networktourl>
+    <networktourl>
         <network>ABCFAMILY</network>
         <url>[zap2it]/fam.jpg</url>
     </networktourl>
@@ -5837,6 +5865,10 @@
         <url>[zap2it]/cbs.jpg</url>
     </networktourl>
     <networktourl>
+        <network>CBS-WKMG</network>
+        <url>[ls-logo]/ww/wkmg_orlando.jpg</url>
+    </networktourl>
+    <networktourl>
         <network>CINEMAX</network>
         <url>[zap2it]/max.jpg</url>
     </networktourl>
@@ -5875,6 +5907,26 @@
     <networktourl>
         <network>CW</network>
         <url>[zap2it2]/cw.gif</url>
+    </networktourl>
+    <networktourl>
+        <network>CW-KTLA</network>
+        <url>[ls-logo]/kk/ktla.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>CW-KWGN</network>
+        <url>[ls-logo]/kk/kwgn_cw2_denver.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>CW-WGN</network>
+        <url>[ls-logo]/ww/wgn_cw9_chicago.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>CW-WKCF</network>
+        <url>[ls-logo]/ww/wkcf_cw18_clermont.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>CW-WPIX</network>
+        <url>[ls-logo]/ww/wpix_cw11_new_york.jpg</url>
     </networktourl>
     <networktourl>
         <network>DISCOVERY</network>
@@ -5973,6 +6025,10 @@
         <url>[zap2it]/fox.jpg</url>
     </networktourl>
     <networktourl>
+        <network>FOX-WOFL</network>
+        <url>[ls-logo]/ww/wofl_fox35_orlando.jpg</url>
+    </networktourl>
+    <networktourl>
         <network>FOXMOVIE</network>
         <url>[ls-icon]/ff/fox_moviechannel.gif</url>
     </networktourl>
@@ -6061,6 +6117,26 @@
         <url>[ls-icon]/ii/ifc_us.gif</url>
     </networktourl>
     <networktourl>
+        <network>IND-WACX</network>
+        <url>[ls-logo]/ww/wacx_tv55_orlando.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>IND-WLCB</network>
+        <url>[ls-logo]/ww/wlcb_45_leesburg.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>IND-WRDQ</network>
+        <url>[ls-logo]/ww/wrdq_action27_orlando.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>IND-WSBK</network>
+        <url>[ls-logo]/ww/wsbk_tv38_boston.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>IND-WTGL</network>
+        <url>[ls-logo]/ww/wtgl_52_cocoa.jpg</url>
+    </networktourl>
+    <networktourl>
         <network>INHD</network>
         <url>[ls-icon]/ii/inhd.gif</url>
     </networktourl>
@@ -6101,6 +6177,14 @@
         <url>[zap2it]/mtv2.gif</url>
     </networktourl>
     <networktourl>
+        <network>MYTV-WRBW</network>
+        <url>[ls-logo]/ww/wrbw_my65_orlando.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>MYTV-WWOR</network>
+        <url>[ls-logo]/ww/wwor_my9_secaucus.jpg</url>
+    </networktourl>
+    <networktourl>
         <network>Military</network>
         <url>[ls-logo]/mm/military_channel_discovery.jpg</url>
     </networktourl>
@@ -6111,6 +6195,10 @@
     <networktourl>
         <network>NBC</network>
         <url>[zap2it]/nbc.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>NBC-WESH</network>
+        <url>[ls-logo]/ww/wesh_nbc2_daytona_beach.jpg</url>
     </networktourl>
     <networktourl>
         <network>NEWSENG</network>
@@ -6151,6 +6239,10 @@
     <networktourl>
         <network>PAX</network>
         <url>[zap2it]/pax.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>PAX-WOPX</network>
+        <url>[ls-logo]/ww/wopx_pax56_orlando.jpg</url>
     </networktourl>
     <networktourl>
         <network>PAXSAT</network>
@@ -7034,11 +7126,11 @@
     </networktourl>
     <baseurl>
         <stub>ls-icon</stub>
-        <url>http://lyngsat-logo.com/icon/tv/</url>
+        <url>http://lyngsat-logo.com/icon/tv</url>
     </baseurl>
     <baseurl>
         <stub>ls-logo</stub>
-        <url>http://lyngsat-logo.com/logo/tv/</url>
+        <url>http://lyngsat-logo.com/logo/tv</url>
     </baseurl>
     <baseurl>
         <stub>pbs</stub>
@@ -7050,6 +7142,6 @@
     </baseurl>
     <baseurl>
         <stub>zap2it2</stub>
-        <url>http://tvlistings2.zap2it.com/tms_network_logos/</url>
+        <url>http://tvlistings2.zap2it.com/tms_network_logos</url>
     </baseurl>
 </iconmappings>
