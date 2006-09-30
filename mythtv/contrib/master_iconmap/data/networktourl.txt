@@ -1,4 +1,5 @@
 ABC                     [zap2it]/abc.jpg
+ABC-WFTV                [ls-logo]/ww/wftv.jpg
 ABCFAMILY               [zap2it]/fam.jpg
 AE                      [zap2it]/aetv.jpg
 AMC                     [zap2it]/amc.gif
@@ -14,6 +15,7 @@ BRAVO                   [zap2it]/bravo.jpg
 CARTOONNETWORK          [zap2it]/toon.gif
 CBC                     [zap2it2]/cbc.gif
 CBS                     [zap2it]/cbs.jpg
+CBS-WKMG                [ls-logo]/ww/wkmg_orlando.jpg
 CINEMAX                 [zap2it]/max.jpg
 CMTV                    [zap2it]/cmtv.gif
 CNBC                    [zap2it]/cnbc.jpg
@@ -24,6 +26,11 @@ COURT                   [zap2it]/court.jpg
 CSPAN                   [zap2it]/cspan.jpg
 CSPAN2                  [zap2it]/cspan2.jpg
 CW                      [zap2it2]/cw.gif
+CW-KTLA                 [ls-logo]/kk/ktla.jpg
+CW-KWGN                 [ls-logo]/kk/kwgn_cw2_denver.jpg
+CW-WGN                  [ls-logo]/ww/wgn_cw9_chicago.jpg
+CW-WKCF                 [ls-logo]/ww/wkcf_cw18_clermont.jpg
+CW-WPIX                 [ls-logo]/ww/wpix_cw11_new_york.jpg
 DISCOVERY               [zap2it]/dsc.jpg
 DISCOVERYHD             [ls-icon]/dd/discovery_hd.gif
 DISNEY                  [zap2it]/disn.jpg
@@ -48,6 +55,7 @@ FLIVING                 [ls-icon]/ff/fineliving.gif
 FLIX                    [zap2it2]/flix.jpg
 FOOD                    [zap2it]/food.jpg
 FOX                     [zap2it]/fox.jpg
+FOX-WOFL                [ls-logo]/ww/wofl_fox35_orlando.jpg
 FOXMOVIE                [ls-icon]/ff/fox_moviechannel.gif
 FOXNEWS                 [zap2it]/fnc.gif
 FOXSPORTS               [zap2it]/foxsports.jpg
@@ -71,6 +79,11 @@ HISTORY_INT             [ls-logo]/hh/history_int.jpg
 HOMESHOPPINGNETWORK     [zap2it]/hsn.jpg
 IFC                     [ls-icon]/ii/ifc_us.gif
 INHD                    [ls-icon]/ii/inhd.gif
+IND-WACX                [ls-logo]/ww/wacx_tv55_orlando.jpg
+IND-WLCB                [ls-logo]/ww/wlcb_45_leesburg.jpg
+IND-WRDQ                [ls-logo]/ww/wrdq_action27_orlando.jpg
+IND-WSBK                [ls-logo]/ww/wsbk_tv38_boston.jpg
+IND-WTGL                [ls-logo]/ww/wtgl_52_cocoa.jpg
 IPLEX                   [ls-icon]/ee/encore_indieplex.gif
 KMEX                    [zap2it]/uni.gif
 KONG                    [ls-icon]/kk/kong6_16_seattle.gif
@@ -80,9 +93,12 @@ MNTV                    [zap2it]/mynetworktv_affiliate.gif
 MSNBC                   [zap2it]/msnbc.jpg
 MTV                     [zap2it]/mtv.jpg
 MTV2                    [zap2it]/mtv2.gif
+MYTV-WRBW               [ls-logo]/ww/wrbw_my65_orlando.jpg
+MYTV-WWOR               [ls-logo]/ww/wwor_my9_secaucus.jpg
 Military                [ls-logo]/mm/military_channel_discovery.jpg
 NASA                    [ls-icon]/nn/nasatv_us.gif
 NBC                     [zap2it]/nbc.jpg
+NBC-WESH                [ls-logo]/ww/wesh_nbc2_daytona_beach.jpg
 NEWSENG                 [zap2it]/necn.gif
 NFL                     [ls-icon]/nn/nfl.gif
 NWCN                    [ls-icon]/nn/nw_cablenews_can.gif
@@ -93,6 +109,7 @@ Noggin                  [ls-logo]/nn/noggin.jpg
 OLN                     [zap2it]/oln.gif
 OXYGEN                  [ls-icon]/oo/oxygen.gif
 PAX                     [zap2it]/pax.jpg
+PAX-WOPX                [ls-logo]/ww/wopx_pax56_orlando.jpg
 PAXSAT                  [zap2it]/pax.jpg
 PBS                     [zap2it]/pbs.jpg
 PBS-KAET                [pbs]/KAET.gif

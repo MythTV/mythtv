@@ -1,5 +1,5 @@
-ls-icon     http://lyngsat-logo.com/icon/tv/
-ls-logo     http://lyngsat-logo.com/logo/tv/
+ls-icon     http://lyngsat-logo.com/icon/tv
+ls-logo     http://lyngsat-logo.com/logo/tv
 pbs         http://www.pbs.org/images/stations/standard
 zap2it      http://images.zap2it.com/station_logo
-zap2it2     http://tvlistings2.zap2it.com/tms_network_logos/
+zap2it2     http://tvlistings2.zap2it.com/tms_network_logos

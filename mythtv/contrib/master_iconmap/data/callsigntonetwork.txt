@@ -570,7 +570,7 @@ KTGF        NBC
 KTGM        ABC
 KTIV        UPN
 KTKA        ABC
-KTLA        WB
+KTLA        CW-KTLA
 KTMF        ABC
 KTMJ        FOX
 KTNE        PBS-KTNE
@@ -666,7 +666,7 @@ KWCM        PBS-KWCM
 KWCV        WB
 KWES        NBC
 KWFT        WB
-KWGN        WB
+KWGN        CW-KWGN
 KWIB        WB
 KWKB        WB
 KWKT        FOX
@@ -832,6 +832,7 @@ WABCDT      ABC
 WABG        ABC
 WABM        UPN
 WACH        FOX
+WACX        IND-WACX
 WACY        UPN
 WAFF        NBC
 WAGA        FOX
@@ -977,7 +978,7 @@ WEIU        PBS-WEIU
 WEMT        FOX
 WENH        PBS-WENH
 WENY        ABC
-WESH        NBC
+WESH        NBC-WESH
 WESTERN     Encore_Westerns
 WESTERNP    Encore_Westerns
 WETA        PBS-WETA
@@ -1003,7 +1004,7 @@ WFSU        PBS-WFSU
 WFTC        UPN
 WFTE        UPN
 WFTS        ABC
-WFTV        ABC
+WFTV        ABC-WFTV
 WFTX        FOX
 WFUM        PBS-WFUM
 WFWA        PBS-WFWA
@@ -1032,7 +1033,7 @@ WGFL        UPN
 WGGB        ABC
 WGHP        FOX
 WGMB        FOX
-WGN         WB
+WGN         CW-WGN
 WGNM        UPN
 WGNO        ABC
 WGNSAT      WB
@@ -1102,11 +1103,12 @@ WJZY        UPN
 WKAR        PBS-WKAR
 WKBD        UPN
 WKBW        ABC
-WKCF        WB
+WKCF        CW-WKCF
 WKDH        ABC
 WKEF        ABC
 WKGB        PBS-WKGB
 WKJG        NBC
+WKMG        CBS-WKMG
 WKNO        PBS-WKNO
 WKOP        PBS-WKOP
 WKOW        ABC
@@ -1121,6 +1123,7 @@ WLAJ        ABC
 WLAX        FOX
 WLBT        NBC
 WLBZ        NBC
+WLCB        IND-WLCB
 WLCW        UPN
 WLEX        NBC
 WLFL        WB
@@ -1203,7 +1206,7 @@ WNYW        FOX
 WOAI        NBC
 WOAY        ABC
 WOCO        ABC
-WOFL        FOX
+WOFL        FOX-WOFL
 WOGX        FOX
 WOHB        UPN
 WOHL        FOX
@@ -1215,6 +1218,7 @@ WOLO        ABC
 WOMAX       CINEMAX
 WOMENP      SHOWTIME
 WOOD        NBC
+WOPX        PAX-WOPX
 WOSU        PBS-WOSU
 WOTV        ABC
 WOUB        PBS-WOUB
@@ -1230,7 +1234,7 @@ WPGA        ABC
 WPGH        FOX
 WPGX        FOX
 WPHL        WB
-WPIX        WB
+WPIX        CW-WPIX
 WPLG        ABC
 WPME        UPN
 WPMI        NBC
@@ -1261,10 +1265,11 @@ WQRF        FOX
 WQWQ        UPN
 WRAZ        FOX
 WRBU        UPN
-WRBW        UPN
+WRBW        MYTV-WRBW
 WRC         NBC
 WRCB        NBC
 WRDC        UPN
+WRDQ        IND-WRDQ
 WREX        NBC
 WRGT        FOX
 WRIC        ABC
@@ -1279,7 +1284,7 @@ WSAV        NBC
 WSAZ        NBC
 WSB         ABC
 WSBE        PBS-WSBE
-WSBK        UPN
+WSBK        IND-WSBK
 WSEC        PBS-WSEC
 WSEE        CBS
 WSET        ABC
@@ -1313,6 +1318,7 @@ WTAT        FOX
 WTCI        PBS-WTCI
 WTCN        WB
 WTEN        ABC
+WTGL        IND-WTGL
 WTGS        FOX
 WTHI        UPN
 WTHR        NBC
@@ -1406,7 +1412,7 @@ WWHO        WB
 WWJ         CBS
 WWLP        NBC
 WWMB        UPN
-WWOR        UPN
+WWOR        MYTV-WWOR
 WWSB        ABC
 WWTI        ABC
 WWWB        WB
