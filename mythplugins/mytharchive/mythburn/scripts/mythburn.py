@@ -31,7 +31,7 @@
 #******************************************************************************
 
 # version of script - change after each update
-VERSION="0.1.20060928-1"
+VERSION="0.1.20060930-1"
 
 
 ##You can use this debug flag when testing out new themes
@@ -144,6 +144,7 @@ themeFonts = [0,0,0,0,0,0,0,0,0,0]
 
 # no. of processors we have access to
 cpuCount = 1
+
 
 def write(text, progress=True):
     """Simple place to channel all text output through"""
@@ -391,7 +392,7 @@ def getAudioParams(folder):
 
     #error out if its the wrong XML
     if infoDOM.documentElement.tagName != "file":
-        fatalError("Stream info file doesn't look right (%s)" % os.path.join(getItemTempPath(index), 'streaminfo.xml'))
+        fatalError("Stream info file doesn't look right (%s)" % os.path.join(folder, 'streaminfo.xml'))
     audio = infoDOM.getElementsByTagName("file")[0].getElementsByTagName("streams")[0].getElementsByTagName("audio")[0]
 
     samplerate = audio.attributes["samplerate"].value
@@ -1115,6 +1116,19 @@ def multiplexMPEGStream(video, audio1, audio2, destination):
     if doesFileExist(destination)==True:
         os.remove(destination)
 
+    # figure out what audio files to use
+    if doesFileExist(audio1 + ".ac3"):
+        audio1 = audio1 + ".ac3"
+    elif doesFileExist(audio1 + ".mp2"):
+        audio1 = audio1 + ".mp2"
+    else:
+        fatalError("No audio stream available!")
+
+    if doesFileExist(audio2 + ".ac3"):
+        audio2 = audio2 + ".ac3"
+    elif doesFileExist(audio2 + ".mp2"):
+        audio2 = audio2 + ".mp2"
+
     if useFIFO==True:
         os.mkfifo(destination)
         mode=os.P_NOWAIT
@@ -1548,13 +1562,26 @@ def calculateFileSizes(files):
         file=os.path.join(folder,"stream.mv2")
         #Get size of video in MBytes
         totalvideosize+=os.path.getsize(file) / 1024 / 1024
+
         #Get size of audio track 1
-        totalaudiosize+=os.path.getsize(os.path.join(folder,"stream0.ac3")) / 1024 / 1024
+        if doesFileExist(os.path.join(folder,"stream0.ac3")):
+            totalaudiosize+=os.path.getsize(os.path.join(folder,"stream0.ac3")) / 1024 / 1024
+        if doesFileExist(os.path.join(folder,"stream0.mp2")):
+            totalaudiosize+=os.path.getsize(os.path.join(folder,"stream0.mp2")) / 1024 / 1024
+
         #Get size of audio track 2 if available 
         if doesFileExist(os.path.join(folder,"stream1.ac3")):
             totalaudiosize+=os.path.getsize(os.path.join(folder,"stream1.ac3")) / 1024 / 1024
+        if doesFileExist(os.path.join(folder,"stream1.mp2")):
+            totalaudiosize+=os.path.getsize(os.path.join(folder,"stream1.mp2")) / 1024 / 1024
+
+        # add chapter menu if available
         if doesFileExist(os.path.join(getTempPath(),"chaptermenu-%s.mpg" % filecount)):
             totalmenusize+=os.path.getsize(os.path.join(getTempPath(),"chaptermenu-%s.mpg" % filecount)) / 1024 / 1024
+
+        # add details page if available
+        if doesFileExist(os.path.join(getTempPath(),"details-%s.mpg" % filecount)):
+            totalmenusize+=os.path.getsize(os.path.join(getTempPath(),"details-%s.mpg" % filecount)) / 1024 / 1024
 
     filecount=1
     while doesFileExist(os.path.join(getTempPath(),"menu-%s.mpg" % filecount)):
@@ -1847,6 +1874,16 @@ def createDVDAuthorXML(screensize, numberofitems):
                     title_video.setAttribute("aspect", "4:3")
 
             titles.appendChild(title_video)
+
+            #set right audio format
+            if doesFileExist(os.path.join(getItemTempPath(itemnum), "stream0.mp2")):
+                title_audio = dvddom.createElement("audio")
+                title_audio.setAttribute("format", "mp2")
+            else:
+                title_audio = dvddom.createElement("audio")
+                title_audio.setAttribute("format", "ac3")
+
+            titles.appendChild(title_audio)
 
             pgc = dvddom.createElement("pgc")
             titles.appendChild(pgc)
@@ -2583,7 +2620,7 @@ def processAudio(folder):
     # process track 1
     if not encodetoac3 and doesFileExist(os.path.join(folder,'stream0.mp2')):
         #don't re-encode to ac3 if the user doesn't want it
-        os.rename(os.path.join(folder,'stream0.mp2'), os.path.join(folder,'stream0.ac3'))
+        write( "Audio track 1 is in mp2 format - NOT re-encoding to ac3")
     elif doesFileExist(os.path.join(folder,'stream0.mp2'))==True:
         write( "Audio track 1 is in mp2 format - re-encoding to ac3")
         encodeAudio("ac3",os.path.join(folder,'stream0.mp2'), os.path.join(folder,'stream0.ac3'),True)
@@ -2592,23 +2629,19 @@ def processAudio(folder):
         encodeAudio("ac3",os.path.join(folder,'stream0.mpa'), os.path.join(folder,'stream0.ac3'),True)
     elif doesFileExist(os.path.join(folder,'stream0.ac3'))==True:
         write( "Audio is already in ac3 format")
-    elif doesFileExist(os.path.join(folder,'stream0.ac3'))==True:
-        write( "Audio is already in ac3 format")
     else:
         fatalError("Track 1 - Unknown audio format or de-multiplex failed!")
 
     # process track 2
     if not encodetoac3 and doesFileExist(os.path.join(folder,'stream1.mp2')):
         #don't re-encode to ac3 if the user doesn't want it
-        os.rename(os.path.join(folder,'stream1.mp2'), os.path.join(folder,'stream1.ac3'))
+        write( "Audio track 1 is in mp2 format - NOT re-encoding to ac3")
     elif doesFileExist(os.path.join(folder,'stream1.mp2'))==True:
         write( "Audio track 2 is in mp2 format - re-encoding to ac3")
         encodeAudio("ac3",os.path.join(folder,'stream1.mp2'), os.path.join(folder,'stream1.ac3'),True)
     elif doesFileExist(os.path.join(folder,'stream1.mpa'))==True:
         write( "Audio track 2 is in mpa format - re-encoding to ac3")
         encodeAudio("ac3",os.path.join(folder,'stream1.mpa'), os.path.join(folder,'stream1.ac3'),True)
-    elif doesFileExist(os.path.join(folder,'stream1.ac3'))==True:
-        write( "Audio is already in ac3 format")
     elif doesFileExist(os.path.join(folder,'stream1.ac3'))==True:
         write( "Audio is already in ac3 format")
 
@@ -3050,11 +3083,6 @@ def processFile(file, folder):
     # check if we need to convert any of the audio streams to ac3
     processAudio(folder)
 
-    #do a quick sense check before we continue...
-    assert doesFileExist(os.path.join(folder,'stream.mv2'))
-    assert doesFileExist(os.path.join(folder,'stream0.ac3'))
-    #assert doesFileExist(os.path.join(folder,'stream1.ac3'))
-
     extractVideoFrame(os.path.join(folder,"stream.mv2"), os.path.join(folder,"thumbnail.jpg"), 0)
 
     write( "*************************************************************")
@@ -3255,8 +3283,8 @@ def processJob(job):
                 #(This also removes non-required audio feeds inside mpeg streams 
                 #(through re-multiplexing) we only take 1 video and 1 or 2 audio streams)
                 pid=multiplexMPEGStream(os.path.join(folder,'stream.mv2'),
-                        os.path.join(folder,'stream0.ac3'),
-                        os.path.join(folder,'stream1.ac3'),
+                        os.path.join(folder,'stream0'),
+                        os.path.join(folder,'stream1'),
                         os.path.join(folder,'final.mpg'))
 
             #Now all the files are completed and ready to be burnt
