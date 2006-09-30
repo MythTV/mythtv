@@ -2969,6 +2969,27 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
                         DecodeDTVCC(mpa_pic.atsc_cc_buf + i);
                     }
 
+                    // Decode DVB captions from MPEG user data
+                    if (mpa_pic.dvb_cc_len > 0)
+                    {
+                        unsigned long long utc = lastccptsu;
+
+                        for (uint i = 0; i < (uint)mpa_pic.dvb_cc_len; i += 2)
+                        {
+                            uint8_t cc_lo = mpa_pic.dvb_cc_buf[i];
+                            uint8_t cc_hi = mpa_pic.dvb_cc_buf[i+1];
+
+                            uint16_t cc_dt = (cc_hi << 8) | cc_lo;
+
+                            if (cc608_good_parity(cc608_parity_table, cc_dt))
+                            {
+                                ccd608->FormatCCField(utc/1000, 0, cc_dt);
+                                utc += 33367;
+                            }
+                        }
+                        lastccptsu = utc;
+                    }
+
                     VideoFrame *picframe = (VideoFrame *)(mpa_pic.opaque);
 
                     if (!directrendering)

@@ -1548,6 +1548,11 @@ alloc:
         pic->atsc_cc_len = s->tmp_atsc_cc_len;
         s->tmp_atsc_cc_len = 0;
 
+        /* Put DVB captions cached from parse_user_data into the correct frame */
+        memcpy(pic->dvb_cc_buf, s->tmp_dvb_cc_buf, s->tmp_dvb_cc_len);
+        pic->dvb_cc_len = s->tmp_dvb_cc_len;
+        s->tmp_dvb_cc_len = 0;
+
         pic->reference= (s->pict_type != B_TYPE || s->codec_id == CODEC_ID_H264)
                         && !s->dropable ? 3 : 0;
 

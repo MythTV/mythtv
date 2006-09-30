@@ -667,6 +667,13 @@ typedef struct AVPanScan{
     uint8_t atsc_cc_buf[1024];\
     int atsc_cc_len;\
 \
+    /** DVB CC data\
+     * - encoding: unused\
+     * - decoding: set by lavc\
+     */\
+    uint8_t dvb_cc_buf[128];\
+    int dvb_cc_len;\
+\
 
 #define FF_QSCALE_TYPE_MPEG1 0
 #define FF_QSCALE_TYPE_MPEG2 1

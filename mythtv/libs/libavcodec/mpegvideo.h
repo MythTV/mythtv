@@ -707,6 +707,12 @@ typedef struct MpegEncContext {
     uint8_t tmp_atsc_cc_buf[ATSC_CC_BUF_SIZE];
     int     tmp_atsc_cc_len;
 
+#define DVB_CC_BUF_SIZE 128
+    /// Used to hold cached user_data about EIA-608 captions in DVB before
+    /// the frame for these packets has been created in MPV_frame_start().
+    uint8_t tmp_dvb_cc_buf[DVB_CC_BUF_SIZE];
+    int     tmp_dvb_cc_len;
+
     int (*decode_mb)(struct MpegEncContext *s, DCTELEM block[6][64]); // used by some codecs to avoid a switch()
 #define SLICE_OK         0
 #define SLICE_ERROR     -1

@@ -3014,6 +3014,64 @@ static void mpeg_decode_user_data(AVCodecContext *avctx,
         else if (user_data_type_code == 0x06) {
             // bar data (letterboxing info)
         }
+    } else if (len >= 11 &&
+               p[0] == 0x05 && p[1] == 0x02) {
+        /* parse EIA-608 captions embedded in a DVB stream. */
+        p += 2;
+        len -= 2;
+
+        Mpeg1Context   *s1 = avctx->priv_data;
+        MpegEncContext *s  = &s1->mpeg_enc_ctx;
+
+        uint8_t dvb_cc_type = p[5];
+        p += 6;
+        len -= 6;
+
+        /* Predictive frame tag, but MythTV reorders predictive
+         * frames for us along with the CC data, so we ignore it.
+         */
+        if (dvb_cc_type == 0x05) {
+            dvb_cc_type = p[6];
+            p += 7;
+            len -= 7;
+        }
+
+        if (dvb_cc_type == 0x02) { /* 2-byte caption, can be repeated */
+            uint8_t hi = p[1] & 0xFF;
+            uint8_t lo = p[2] & 0xFF;
+
+            dvb_cc_type = p[3];
+
+            if ((2 <= len) && ((2 + s->tmp_dvb_cc_len) < DVB_CC_BUF_SIZE)) {
+                s->tmp_dvb_cc_buf[s->tmp_dvb_cc_len++] = hi;
+                s->tmp_dvb_cc_buf[s->tmp_dvb_cc_len++] = lo;
+
+                /* Only repeat characters when the next type flag
+                 * is 0x04 and the characters are repeatable (i.e., less than
+                 * 32 with the parity stripped).
+                 */
+                if (dvb_cc_type == 0x04 && (hi & 0x7f) < 32) {
+                    if ((4 <= len) &&
+                        ((4 + s->tmp_dvb_cc_len) < DVB_CC_BUF_SIZE)) {
+                        s->tmp_dvb_cc_buf[s->tmp_dvb_cc_len++] = hi;
+                        s->tmp_dvb_cc_buf[s->tmp_dvb_cc_len++] = lo;
+                    }
+                }
+            }
+
+            p += 6;
+            len -= 6;
+        } else if (dvb_cc_type == 0x04) { /* 4-byte caption, not repeated */
+            if ((4 <= len) && ((4 + s->tmp_dvb_cc_len) < DVB_CC_BUF_SIZE)) {
+                s->tmp_dvb_cc_buf[s->tmp_dvb_cc_len++] = p[1] & 0xFF;
+                s->tmp_dvb_cc_buf[s->tmp_dvb_cc_len++] = p[2] & 0xFF;
+                s->tmp_dvb_cc_buf[s->tmp_dvb_cc_len++] = p[3] & 0xFF;
+                s->tmp_dvb_cc_buf[s->tmp_dvb_cc_len++] = p[4] & 0xFF;
+            }
+
+            p += 9;
+            len -= 9;
+        }
     }
 }
 
