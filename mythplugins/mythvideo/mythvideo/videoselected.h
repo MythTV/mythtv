@@ -14,6 +14,8 @@ FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 #ifndef VIDEOSELECTED_H_
 #define VIDEOSELECTED_H_
 
+#include <memory>
+
 #include <mythtv/uitypes.h>
 
 class Metadata;

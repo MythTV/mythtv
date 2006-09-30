@@ -1,6 +1,8 @@
 #ifndef VIDEOTREE_H_
 #define VIDEOTREE_H_
 
+#include <memory>
+
 #include <mythtv/mythdialogs.h>
 
 class Metadata;
