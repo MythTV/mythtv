@@ -5448,6 +5448,7 @@ void TV::BrowseChannel(const QString &chan)
         return;
 
     browsechannum = chan;
+    browsechanid = QString::null;
     BrowseDispInfo(BROWSE_SAME);
 }
 

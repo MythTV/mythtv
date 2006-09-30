@@ -1435,64 +1435,43 @@ uint ChannelUtil::GetNextChannel(const DBChanList &sorted,
     if (it == sorted.end())
         return 0; // no channels..
 
+    DBChanList::const_iterator start = it;
     bool skip_non_visible = true; // TODO make DB selectable
-    if (skip_non_visible)
+
+    if (CHANNEL_DIRECTION_DOWN == direction)
     {
-        DBChanList::const_iterator start = it;
-        if (CHANNEL_DIRECTION_DOWN == direction)
+        do
         {
-            do
-            {
-                if (it == sorted.begin())
-                {
-                    it = find(sorted.begin(), sorted.end(),
-                              sorted.rbegin()->chanid);
-                }
-                else
-                {
-                    it--;
-                }
-            } while ((it != start) && !it->visible);
-        }
-        else if (CHANNEL_DIRECTION_UP == direction)
-        {
-            do
-            {
-                it++;
-                it = (it == sorted.end()) ? sorted.begin() : it;
-            } while ((it != start) && !it->visible);
-        }
-    }
-    else if (CHANNEL_DIRECTION_DOWN == direction)
-    {
-        if (it == sorted.begin())
-            return sorted.rbegin()->chanid;
-        it--;
+            if (it == sorted.begin())
+                it = find(sorted.begin(), sorted.end(),
+                          sorted.rbegin()->chanid);
+            else
+                it--;
+        } while ((it != start) && skip_non_visible && !it->visible);
+
     }
     else if (CHANNEL_DIRECTION_UP == direction)
     {
-        it++;
-        it = (it == sorted.end()) ? sorted.begin() : it;
+        do
+        {
+            it++;
+            if (it == sorted.end())
+                it = sorted.begin();
+        } while ((it != start) && skip_non_visible && !it->visible);
     }
     else if (CHANNEL_DIRECTION_FAVORITE == direction)
     {
-        DBChanList::const_iterator it_orig = it;
-        for (;;++it)
+        do
         {
-            it = (it == sorted.end()) ? sorted.begin() : it;
+            it++;
+            if (it == sorted.end())
+                it = sorted.begin();
 
-            if (it == it_orig)
-            {
-                if (!it->favorite)
-                    ++it;
-                it = (it == sorted.end()) ? sorted.begin() : it;
-                break; // no (other?) favorites
-            }
-
-            if (it->favorite)
-                break; // found next favorite
-        }
+        } while ((it != start) &&
+                 (!it->favorite || (skip_non_visible && !it->visible)));
     }
 
     return it->chanid;
 }
+
+/* vim: set expandtab tabstop=4 shiftwidth=4: */
