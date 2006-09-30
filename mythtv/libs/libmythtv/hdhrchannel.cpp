@@ -301,12 +301,6 @@ bool HDHRChannel::DeviceClearTarget()
     return TunerSet("target", "0.0.0.0:0");
 }
 
-bool HDHRChannel::TuneTo(uint freqid)
-{
-    VERBOSE(VB_CHANNEL, LOC + "TuneTo("<<freqid<<")");
-    return TunerSet("channel", QString::number(freqid));
-}
-
 bool HDHRChannel::SetChannelByString(const QString &channum)
 {
     QString loc = LOC + QString("SetChannelByString(%1)").arg(channum);
@@ -379,8 +373,10 @@ bool HDHRChannel::SetChannelByString(const QString &channum)
         }
         else
         {
-            if (!TuneTo(freqid.toInt()))
-                return false;
+            VERBOSE(VB_IMPORTANT, LOC_ERR +
+                    "dtv_multiplex data is required for tuning");
+
+            return false;
         }
     }
     else if (!ChangeExternalChannel(freqid))
@@ -449,10 +445,18 @@ bool HDHRChannel::TuneMultiplex(uint mplexid)
 
 bool HDHRChannel::Tune(uint frequency, QString /*input*/, QString modulation)
 {
-    int freqid = get_closest_freqid("atsc", modulation, "us", frequency);
-    if (freqid > 0)
-        return TuneTo(freqid);
-    return false;
+    bool ok = false;
+
+    VERBOSE(VB_CHANNEL, LOC + "TuneTo("<<frequency<<","<<modulation<<")");
+
+    if (modulation == "8vsb")
+        ok = TunerSet("channel", QString("8vsb:%1").arg(frequency));
+    else if (modulation == "qam_64")
+        ok = TunerSet("channel", QString("qam64:%1").arg(frequency));
+    else if (modulation == "qam_256")
+        ok = TunerSet("channel", QString("qam256:%1").arg(frequency));
+
+    return ok;
 }
 
 bool HDHRChannel::SwitchToInput(const QString &inputname,

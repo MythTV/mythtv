@@ -62,7 +62,6 @@ class HDHRChannel : public ChannelBase
 
     bool DeviceSetTarget(unsigned short localPort);
     bool DeviceClearTarget(void);
-    bool TuneTo(uint freqid);
 
     QString DeviceGet(const QString &name);
     QString DeviceSet(const QString &name, const QString &value);
