@@ -31,7 +31,7 @@
 #******************************************************************************
 
 # version of script - change after each update
-VERSION="0.1.20060930-1"
+VERSION="0.1.20060930-2"
 
 
 ##You can use this debug flag when testing out new themes
@@ -1987,74 +1987,155 @@ def createDVDAuthorXMLNoMenus(screensize, numberofitems):
                 '''
                 <dvdauthor>
                     <vmgm>
+                        <menus lang="en">
+                            <pgc entry="title" pause="0">
+                            </pgc>
+                        </menus>
                     </vmgm>
                 </dvdauthor>''')
 
     dvdauthor_element = dvddom.documentElement
-    titleset = dvddom.createElement("titleset")
-    titles = dvddom.createElement("titles")
-    titleset.appendChild(titles)
-    dvdauthor_element.appendChild(titleset)
+    menus = dvdauthor_element.childNodes[1].childNodes[1]
+    menu_pgc = menus.childNodes[1]
 
     dvdauthor_element.insertBefore(dvddom.createComment("dvdauthor XML file created by MythBurn script"), dvdauthor_element.firstChild )
     dvdauthor_element.setAttribute("dest",os.path.join(getTempPath(),"dvd"))
 
-    fileCount = 0
-    itemNum = 1
-
+    # create pgc for menu 1 holds the intro if required, blank mpg if not
     if wantIntro:
-        node = themeDOM.getElementsByTagName("intro")[0]
-        introFile = node.attributes["filename"].value
+        video = dvddom.createElement("video")
+        video.setAttribute("format", videomode)
 
-        titles.appendChild(dvddom.createComment("Intro movie"))
-        pgc = dvddom.createElement("pgc")
+        # set aspect ratio
+        if mainmenuAspectRatio == "4:3":
+            video.setAttribute("aspect", "4:3")
+        else:
+            video.setAttribute("aspect", "16:9")
+            video.setAttribute("widescreen", "nopanscan")
+        menus.appendChild(video)
+
+        pre = dvddom.createElement("pre")
+        pre.appendChild(dvddom.createTextNode("if (g2==1) jump menu 2;"))
+        menu_pgc.appendChild(pre)
+
         vob = dvddom.createElement("vob")
-        vob.setAttribute("file",os.path.join(getThemeFile(themeName, videomode + '_' + introFile)))
-        pgc.appendChild(vob)
-        titles.appendChild(pgc)
+        vob.setAttribute("file", getThemeFile(themeName, videomode + '_' + introFile))
+        menu_pgc.appendChild(vob)
+
         post = dvddom.createElement("post")
-        post .appendChild(dvddom.createTextNode("jump title 2 chapter 1;"))
-        pgc.appendChild(post)
-        titles.appendChild(pgc)
-        fileCount +=1
-        del pgc
-        del vob
+        post.appendChild(dvddom.createTextNode("g2=1; jump menu 2;"))
+        menu_pgc.appendChild(post)
+        del menu_pgc
         del post
+        del pre
+        del vob
+    else:
+        pre = dvddom.createElement("pre")
+        pre.appendChild(dvddom.createTextNode("g2=1;jump menu 2;"))
+        menu_pgc.appendChild(pre)
 
+        vob = dvddom.createElement("vob")
+        vob.setAttribute("file", getThemeFile(themeName, videomode + '_' + "blank.mpg"))
+        menu_pgc.appendChild(vob)
 
+        del menu_pgc
+        del pre
+        del vob
+
+    # create menu 2 - dummy menu that allows us to jump to each titleset in sequence
+    menu_pgc = dvddom.createElement("pgc")
+    menu_pgc.setAttribute("pause", "0")
+
+    preText = "if (g1==0) g1=1;"
+    for i in range(numberofitems):
+        preText += "if (g1==%d) jump titleset %d menu;" % (i + 1, i + 1)
+
+    pre = dvddom.createElement("pre")
+    pre.appendChild(dvddom.createTextNode(preText))
+    menu_pgc.appendChild(pre)
+
+    vob = dvddom.createElement("vob")
+    vob.setAttribute("file", getThemeFile(themeName, videomode + '_' + "blank.mpg"))
+    menu_pgc.appendChild(vob)
+    menus.appendChild(menu_pgc)
+
+    # for each title add a <titleset> section
+    itemNum = 1
     while itemNum <= numberofitems:
         write( "Adding item %s" % itemNum)
 
-        pgc = dvddom.createElement("pgc")
+        titleset = dvddom.createElement("titleset")
+        dvdauthor_element.appendChild(titleset)
+
+        # create menu
+        menu = dvddom.createElement("menus")
+        menupgc = dvddom.createElement("pgc")
+        menu.appendChild(menupgc)
+        menupgc.setAttribute("pause","0")
+        titleset.appendChild(menu)
 
         if wantDetailsPage:
             #add the detail page intro for this item
             vob = dvddom.createElement("vob")
-            vob.setAttribute("file",os.path.join(getTempPath(),"details-%s.mpg" % itemNum))
-            pgc.appendChild(vob)
-            fileCount +=1
-            del vob
+            vob.setAttribute("file", os.path.join(getTempPath(),"details-%s.mpg" % itemNum))
+            menupgc.appendChild(vob)
+
+            post = dvddom.createElement("post")
+            post.appendChild(dvddom.createTextNode("jump title 1;"))
+            menupgc.appendChild(post)
+            del post
+        else:
+            #add dummy menu for this item
+            pre = dvddom.createElement("pre")
+            pre.appendChild(dvddom.createTextNode("jump title 1;"))
+            menupgc.appendChild(pre)
+            del pre
+
+            vob = dvddom.createElement("vob")
+            vob.setAttribute("file", getThemeFile(themeName, videomode + '_' + "blank.mpg"))
+            menupgc.appendChild(vob)
+
+        titles = dvddom.createElement("titles")
+
+        # set the right aspect ratio
+        title_video = dvddom.createElement("video")
+        title_video.setAttribute("format", videomode)
+
+        # use aspect ratio of video
+        if getAspectRatioOfVideo(itemNum) > aspectRatioThreshold:
+            title_video.setAttribute("aspect", "16:9")
+            title_video.setAttribute("widescreen", "nopanscan")
+        else:
+            title_video.setAttribute("aspect", "4:3")
+
+        titles.appendChild(title_video)
+
+        pgc = dvddom.createElement("pgc")
 
         vob = dvddom.createElement("vob")
         vob.setAttribute("file", os.path.join(getItemTempPath(itemNum), "final.mpg"))
         vob.setAttribute("chapters", createVideoChaptersFixedLength(chapterLength, getLengthOfVideo(itemNum)))
         pgc.appendChild(vob)
+
         del vob
+        del menupgc
 
         post = dvddom.createElement("post")
         if itemNum == numberofitems:
             post.appendChild(dvddom.createTextNode("exit;"))
         else:
-            if wantIntro:
-                post.appendChild(dvddom.createTextNode("jump title %d chapter 1;" % (itemNum + 2)))
-            else:
-                post.appendChild(dvddom.createTextNode("jump title %d chapter 1;" % (itemNum + 1)))
+            post.appendChild(dvddom.createTextNode("g1=%d;call vmgm menu 2;" % (itemNum + 1)))
 
         pgc.appendChild(post)
-        fileCount +=1
 
         titles.appendChild(pgc)
+        titleset.appendChild(titles)
+
         del pgc
+        del titles
+        del title_video
+        del post
+        del titleset
 
         itemNum +=1
 
