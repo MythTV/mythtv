@@ -1374,6 +1374,18 @@ bool DiSEqCDevSwitch::ShouldSwitch(const DiSEqCDevSettings &settings,
            horizontal != m_last_horizontal)
             return true;
     }
+    else if (kTypeLegacySW42 == m_type ||
+             kTypeLegacySW64 == m_type)
+    {
+        // retrieve LNB info
+        bool horizontal = false;
+        DiSEqCDevLNB *lnb  = m_tree.FindLNB(settings);
+        if (lnb)
+            horizontal  = lnb->IsHorizontal(tuning);
+
+        if (horizontal != m_last_horizontal)
+            return true;
+    }
 
     return m_last_pos != (uint)pos;
 }
