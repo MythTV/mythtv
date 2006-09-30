@@ -15,10 +15,12 @@
 # Variables
     my $help;   # Name of a new xml file to input
     my $input;  # Name of a new xml file to input
+    my $lookup; # Requested callsign to look up
 
 # Load the cli options
-    GetOptions('input:s'      => \$input,
-               'help|h|usage' => sub { print_help(); }
+    GetOptions('input=s'           => \$input,
+               'callsign|lookup=s' => \$lookup,
+               'help|h|usage'      => sub { print_help(); }
               );
 
 # Load the callsigns
@@ -53,6 +55,19 @@
         $urls{$stub} = $url;
     }
     close DATA;
+
+# Looking for the URL for a specific callsign?
+    if ($lookup) {
+        $lookup = uc($lookup);
+        if ($callsigns{$lookup}) {
+            my $url = $networks{$callsigns{$lookup}};
+            $url =~ s/\[(.+?)\]/$urls{$1}/sg;
+            print $url;
+        }
+        print "\n";
+    # Done
+        exit;
+    }
 
 # Import a new file?
     if ($input) {
@@ -138,7 +153,30 @@ EOF
 
 # Function
     sub print_help {
-        print "no help here yet\n";
+        print <<EOF;
+usage:  ./build_map.pl [options]
+
+    If no options are given, this will build a new master_iconmap.xml file
+    from the existing data files.
+
+options:
+
+    --input=<filename>
+
+        Parse a preexisting channelmap.xml file into the master_iconmap data
+        directory.
+
+    --callsign=<callsign>
+    --lookup=<callsign>
+
+        Look up a specific callsign and return the URL for its icon.
+
+    --help
+    --usage
+
+        Print this help message.
+
+EOF
         exit;
     }
 
