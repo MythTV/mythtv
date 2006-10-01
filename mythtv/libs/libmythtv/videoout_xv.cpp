@@ -64,7 +64,12 @@ extern "C" {
 #define XVMC_CHROMA_FORMAT_420 0x00000001
 #endif
 
-//#define USE_ATI_PROPRIETARY_DRIVER_XVIDEO_HACK
+// define the following for the ATI Proprietary driver and the Intel
+// IEGD driver for the i830M chipset (as of Oct 1st, 2006). Please
+// report the problem to the driver developers as well, the more
+// people report the bug in the driver the more likely it is to be
+// fixed.
+//#define USE_HACK_FOR_BROKEN_I420_SUPPORT_IN_DRIVER
 
 static void SetFromEnv(bool &useXvVLD, bool &useXvIDCT, bool &useXvMC,
                        bool &useXV, bool &useShm);
@@ -855,9 +860,9 @@ bool VideoOutputXv::InitXVideo()
                 .arg(i).arg(chr[0]).arg(chr[1]).arg(chr[2]).arg(chr[3]));
     }
 
-#ifdef USE_ATI_PROPRIETARY_DRIVER_XVIDEO_HACK
+#ifdef USE_HACK_FOR_BROKEN_I420_SUPPORT_IN_DRIVER
     swap(ids[0], ids[2]);
-#endif // USE_ATI_PROPRIETARY_DRIVER_XVIDEO_HACK
+#endif // USE_HACK_FOR_BROKEN_I420_SUPPORT_IN_DRIVER
 
     for (uint i = 0; i < sizeof(ids)/sizeof(int); i++)
     {
