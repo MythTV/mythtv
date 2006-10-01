@@ -430,12 +430,15 @@ bool MpegRecorder::SetIVTVDeviceOptions(int chanfd)
 
     if (vbimode)
     {
+#ifdef IVTV_IOC_S_VBI_MODE
         struct ivtv_sliced_vbi_format vbifmt;
         bzero(&vbifmt, sizeof(struct ivtv_sliced_vbi_format));
         vbifmt.service_set = (1 == vbimode) ? VBI_TYPE_TELETEXT : VBI_TYPE_CC;
 
         if (ioctl(chanfd, IVTV_IOC_S_VBI_MODE, &vbifmt) < 0) 
+#endif // IVTV_IOC_S_VBI_MODE
         {
+#ifdef V4L2_BUF_TYPE_SLICED_VBI_CAPTURE
             struct v4l2_format vbi_fmt;
             bzero(&vbi_fmt, sizeof(struct v4l2_format));
             vbi_fmt.type = V4L2_BUF_TYPE_SLICED_VBI_CAPTURE;
@@ -443,23 +446,28 @@ bool MpegRecorder::SetIVTVDeviceOptions(int chanfd)
                 V4L2_SLICED_VBI_625 : V4L2_SLICED_VBI_525;
 
             if (ioctl(chanfd, VIDIOC_S_FMT, &vbi_fmt) < 0)
+#endif // V4L2_BUF_TYPE_SLICED_VBI_CAPTURE
             {
                 VERBOSE(VB_IMPORTANT, "Can't enable VBI recording" + ENO);
             }
         }
 
+#ifdef IVTV_IOC_S_VBI_EMBED
         int embedon = 1;
         if (ioctl(chanfd, IVTV_IOC_S_VBI_EMBED, &embedon) < 0)
+#endif // IVTV_IOC_S_VBI_EMBED
         {
             VERBOSE(VB_IMPORTANT, LOC + "Can't enable VBI recording (2)"+ENO);
         }
 
+#ifdef IVTV_IOC_G_VBI_MODE
         ioctl(chanfd, IVTV_IOC_G_VBI_MODE, &vbifmt);
 
         VERBOSE(VB_RECORD, LOC + QString(
                     "VBI service:%1, packet size:%2, io size:%3")
                 .arg(vbifmt.service_set).arg(vbifmt.packet_size)
                 .arg(vbifmt.io_size));
+#endif // IVTV_IOC_G_VBI_MODE
     }
 
     return true;
