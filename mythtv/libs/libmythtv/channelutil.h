@@ -103,7 +103,7 @@ class ChannelUtil
                                  bool use_on_air_guide,
                                  bool hidden,
                                  bool hidden_in_guide,
-                                 int  freqid,
+                                 const QString &freqid,
                                  QString icon    = "",
                                  QString format  = "Default",
                                  QString xmltvid = "");

@@ -1004,7 +1004,7 @@ void SIScan::UpdatePMTinDB(
             chan_num,
             pmt->ProgramNumber(),
             0, 0,
-            false, false, false, freqid);
+            false, false, false, QString::number(freqid));
     }
     else
     {   // The service is in database, update it
@@ -1158,7 +1158,7 @@ void SIScan::UpdateVCTinDB(int db_mplexid,
                     vct->MajorChannel(i), vct->MinorChannel(i),
                     !vct->IsHiddenInGuide(i) /* use on air guide */,
                     vct->IsHidden(i), vct->IsHiddenInGuide(i),
-                    freqid);
+                    QString::number(freqid));
             }
         }
         else
@@ -1279,7 +1279,7 @@ void SIScan::UpdateSDTinDB(int /*mplexid*/, const ServiceDescriptionTable *sdt,
                     sdt->HasEITSchedule(i) ||
                     sdt->HasEITPresentFollowing(i) ||
                     force_guide_present,
-                    false, false, -1);
+                    false, false, QString::null);
             }
         }
         else if (force_update || (desc && have_uk_chan_num))

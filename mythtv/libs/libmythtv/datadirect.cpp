@@ -1873,13 +1873,14 @@ static void update_channel_basic(uint    sourceid,   bool    insert,
         bool oag       = false; // use on air guide
         bool hidden    = false;
         bool hidden_in_guide = false;
+        QString freq_id= QString::number(freqid);
 
         ChannelUtil::CreateChannel(
             mplexid,   sourceid,  chanid, 
             callsign,  name,      channum,
             serviceid, majorC,    minorC,
             oag,       hidden,    hidden_in_guide,
-            freqid,    icon,      tvformat,
+            freq_id,   icon,      tvformat,
             xmltvid);
     }
 }

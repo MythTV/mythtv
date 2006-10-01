@@ -1008,7 +1008,7 @@ bool ChannelUtil::CreateChannel(uint db_mplexid,
                                 bool use_on_air_guide,
                                 bool hidden,
                                 bool hidden_in_guide,
-                                int  freqid,
+                                const QString &freqid,
                                 QString icon,
                                 QString format,
                                 QString xmltvid)
@@ -1048,7 +1048,7 @@ bool ChannelUtil::CreateChannel(uint db_mplexid,
     query.bindValue(":VISIBLE",   !hidden);
     (void) hidden_in_guide; // MythTV can't hide the channel in just the guide.
 
-    if (freqid > 0)
+    if (!freqid.isEmpty())
         query.bindValue(":FREQID",    freqid);
 
     QString tvformat = (atsc_minor_channel > 0) ? "ATSC" : format;

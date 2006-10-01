@@ -2075,9 +2075,9 @@ void handleChannels(int id, QValueList<ChanInfo> *chanlist)
         }
         else
         {
-            int major, minor, freqid = (*i).freqid.toInt();
+            int major, minor;
             long long freq;
-            get_atsc_stuff((*i).chanstr, id, freqid, major, minor, freq);
+            get_atsc_stuff((*i).chanstr, id, (*i).freqid.toInt(), major, minor, freq);
 
             if (interactive && ((minor == 0) || (freq > 0)))
             {
@@ -2088,7 +2088,7 @@ void handleChannels(int id, QValueList<ChanInfo> *chanlist)
                 cout << "### callsign = " << (*i).callsign.local8Bit() << endl;
                 cout << "### channum  = " << (*i).chanstr.local8Bit()  << endl;
                 if (channel_preset)
-                    cout << "### freqid   = " << freqid                << endl;
+                    cout << "### freqid   = " << (*i).freqid.local8Bit() << endl;
                 cout << "### finetune = " << (*i).finetune.local8Bit() << endl;
                 cout << "### tvformat = " << (*i).tvformat.local8Bit() << endl;
                 cout << "### icon     = " << localfile.local8Bit()     << endl;
@@ -2111,7 +2111,7 @@ void handleChannels(int id, QValueList<ChanInfo> *chanlist)
                         0 /*service id*/, major,            minor,
                         false /*use on air guide*/, false /*hidden*/,
                         false /*hidden in guide*/,
-                        freqid,           localfile,        (*i).tvformat,
+                        (*i).freqid,      localfile,        (*i).tvformat,
                         (*i).xmltvid))
                 {
                     cout << "### " << endl;
@@ -2168,7 +2168,7 @@ void handleChannels(int id, QValueList<ChanInfo> *chanlist)
                         0 /*service id*/, major,     minor,
                         false /*use on air guide*/,  false /*hidden*/,
                         false /*hidden in guide*/,
-                        freqid,      localfile, (*i).tvformat,
+                        (*i).freqid,      localfile, (*i).tvformat,
                         (*i).xmltvid);
                 }
             }
