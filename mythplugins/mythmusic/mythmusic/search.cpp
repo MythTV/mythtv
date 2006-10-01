@@ -103,7 +103,7 @@ void SearchDialog::runQuery(QString searchText)
 
     MSqlQuery query(MSqlQuery::InitCon());
 
-    QString queryString("SELECT filename, artist_name, album_name, name, song_id "
+    QString queryString("SELECT filename, music_artists.artist_name, album_name, name, song_id "
                         "FROM music_songs "
                         "LEFT JOIN music_artists ON music_songs.artist_id=music_artists.artist_id "
                         "LEFT JOIN music_albums ON music_songs.album_id=music_albums.album_id ");      
@@ -143,7 +143,7 @@ void SearchDialog::runQuery(QString searchText)
     }
 
     queryString += whereClause;
-    queryString += " ORDER BY artist_name, album_name, name, song_id, filename ";
+    queryString += " ORDER BY music_artists.artist_name, album_name, name, song_id, filename ";
 
     query.prepare(queryString);
 
