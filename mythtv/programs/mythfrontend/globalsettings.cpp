@@ -800,6 +800,17 @@ static HostSpinBox *OSDNotifyTimeout()
     return gs;
 }
 
+static HostSpinBox *ThemeCacheSize()
+{
+    HostSpinBox *gs = new HostSpinBox("ThemeCacheSize", 1, 1000, 1, true);
+    gs->setLabel(QObject::tr("Theme cache size"));
+    gs->setValue(1);
+    gs->setHelpText(QObject::tr(
+                        "Maximum number of prescaled themes to cache."));
+
+    return gs;
+}
+
 static HostComboBox *MenuTheme()
 {
     HostComboBox *gc = new HostComboBox("MenuTheme");
@@ -3757,6 +3768,7 @@ AppearanceSettings::AppearanceSettings()
     theme->addChild(ThemeFontSizeType());
     theme->addChild(RandomTheme());
     theme->addChild(MenuTheme());
+    theme->addChild(ThemeCacheSize());
     addChild(theme);
 
     VerticalConfigurationGroup* screen = new VerticalConfigurationGroup(false);

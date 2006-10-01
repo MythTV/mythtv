@@ -1331,6 +1331,7 @@ void MythContext::ClearOldImageCache(void)
 
     QFileInfoListIterator it(*list);
     QFileInfo *fi;
+    QMap<QDateTime, QString> dirtimes;
 
     while ((fi = it.current()) != 0)
     {
@@ -1341,8 +1342,22 @@ void MythContext::ClearOldImageCache(void)
         {
             if (fi->absFilePath() == themecachedir)
                 continue;
-            RemoveCacheDir(fi->absFilePath());
+            dirtimes[fi->lastModified()] = fi->absFilePath();
         }
+    }
+
+    const size_t max_cached = GetNumSetting("ThemeCacheSize", 1);
+    while (dirtimes.size() >= max_cached)
+    {
+        VERBOSE(VB_FILE, "Removing cache dir: " << dirtimes.begin().data());
+        RemoveCacheDir(dirtimes.begin().data());
+        dirtimes.erase(dirtimes.begin());
+    }
+
+    QMap<QDateTime, QString>::const_iterator dit = dirtimes.begin();
+    for (; dit != dirtimes.end(); ++dit)
+    {
+        VERBOSE(VB_FILE, "Keeping cache dir: " << (*dit).data());
     }
 }
 
