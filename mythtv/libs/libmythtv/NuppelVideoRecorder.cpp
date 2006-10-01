@@ -1053,19 +1053,27 @@ void NuppelVideoRecorder::StartRecording(void)
     if (ioctl(fd, VIDIOCGCHAN, &vchan) < 0)
         perror("VIDIOCGCHAN");
 
-    // if channel has a audio then activate it
-    if (!skip_btaudio && (vchan.flags & VIDEO_VC_AUDIO) == VIDEO_VC_AUDIO) {
-        if (ioctl(fd, VIDIOCGAUDIO, &va)<0)
-            perror("VIDIOCGAUDIO");
-
-        va.flags &= ~VIDEO_AUDIO_MUTE; // now this really has to work
-
-        va.volume = volume * 65535 / 100;
-
-        if (ioctl(fd, VIDIOCSAUDIO, &va) < 0)
-            perror("VIDIOCSAUDIO");
-        //if (ioctl(fd, VIDIOCSCHAN, &vchan) < 0)
-        //    perror("VIDIOCSCHAN");
+    // Set volume level for audio recording (unless feature is disabled).
+    if (!skip_btaudio)
+    {
+        // v4l1 compat in Linux 2.6.18 does not set VIDEO_VC_AUDIO,
+        // so we just use VIDIOCGAUDIO unconditionally.. then only
+        // report a get failure as an error if VIDEO_VC_AUDIO is set.
+        if (ioctl(fd, VIDIOCGAUDIO, &va) < 0)
+        {
+            bool reports_audio = vchan.flags & VIDEO_VC_AUDIO;
+            int err_level = reports_audio ? VB_IMPORTANT : VB_AUDIO;
+            // print at VB_IMPORTANT if driver reports audio.
+            VERBOSE(err_level, LOC_ERR + "Failed to get audio" + ENO);
+        }
+        else
+        {
+            // if channel has a audio then activate it
+            va.flags &= ~VIDEO_AUDIO_MUTE; // now this really has to work
+            va.volume = volume * 65535 / 100;
+            if (ioctl(fd, VIDIOCSAUDIO, &va) < 0)
+                VERBOSE(VB_IMPORTANT, LOC_ERR + "Failed to set audio" + ENO);
+        }
     }
 
     if ((vc.type & VID_TYPE_MJPEG_ENCODER) && hardware_encode)
