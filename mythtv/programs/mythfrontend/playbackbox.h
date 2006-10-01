@@ -68,6 +68,7 @@ class PlaybackBox : public MythDialog
         VIEW_CATEGORIES =  0x02,
         VIEW_RECGROUPS  =  0x04,
         VIEW_WATCHLIST  =  0x08,
+        VIEW_SEARCHES   =  0x10,
         VIEW_ALL        = ~0x00,
     } ViewMask;
 
@@ -309,16 +310,18 @@ class PlaybackBox : public MythDialog
     bool                useCategories;
     /// useRecGroups controls showing of recording groups in group list
     bool                useRecGroups;
-    /// contains "DispRecGroupAsAllProg" setting
-    bool                groupnameAsAllProg;
-    /// include the Watch List feature
-    bool                watchList;
+    /// useSearches controls showing search rules in group list
+    bool                useSearches;
+    /// useWatchList controls showing the Watch List in group list
+    bool                useWatchList;
     /// exclude recording not marked for auto-expire from the Watch List
     bool                watchListAutoExpire;
     /// add 1 to the Watch List scord up to this many days 
     int                 watchListMaxAge;
     /// adjust exclusion of a title from the Watch List after a delete
     int                 watchListBlackOut;
+    /// contains "DispRecGroupAsAllProg" setting
+    bool                groupnameAsAllProg;
     /// if true we allow arrow keys to replace SELECT and ESCAPE as appropiate
     bool                arrowAccel;
     /// if true keypress events are ignored  

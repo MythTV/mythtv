@@ -177,9 +177,10 @@ PlaybackBox::PlaybackBox(BoxType ltype, MythMainWindow *parent,
       formatShortDate("M/d"),           formatLongDate("ddd MMMM d"),
       formatTime("h:mm AP"),
       titleView(true),                  useCategories(false),
-      useRecGroups(false),              groupnameAsAllProg(false),
-      watchList(false),                 watchListAutoExpire(false),
+      useRecGroups(false),              useSearches(false),
+      useWatchList(false),              watchListAutoExpire(false),
       watchListMaxAge(60),              watchListBlackOut(2),
+      groupnameAsAllProg(false),
       arrowAccel(true),                 ignoreKeyPressEvents(false),
       listOrder(1),                     listsize(0),
       // Recording Group settings
@@ -240,11 +241,12 @@ PlaybackBox::PlaybackBox(BoxType ltype, MythMainWindow *parent,
     formatTime         = gContext->GetSetting("TimeFormat", "h:mm AP");
     recGroup           = gContext->GetSetting("DisplayRecGroup","All Programs");
     listOrder          = gContext->GetNumSetting("PlayBoxOrdering", 1);
-    groupnameAsAllProg = gContext->GetNumSetting("DispRecGroupAsAllProg", 0);
-    watchList          = gContext->GetNumSetting("PlaybackWatchList", 1);
+    useSearches        = gContext->GetNumSetting("PlaybackSearches", 0);
+    useWatchList       = gContext->GetNumSetting("PlaybackWatchList", 1);
     watchListAutoExpire= gContext->GetNumSetting("PlaybackWLAutoExpire", 0);
     watchListMaxAge    = gContext->GetNumSetting("PlaybackWLMaxAge", 60);
     watchListBlackOut  = gContext->GetNumSetting("PlaybackWLBlackOut", 2);
+    groupnameAsAllProg = gContext->GetNumSetting("DispRecGroupAsAllProg", 0);
     arrowAccel         = gContext->GetNumSetting("UseArrowAccels", 1);
     inTitle            = gContext->GetNumSetting("PlaybackBoxStartInTitle", 0);
     previewVideoEnabled =gContext->GetNumSetting("PlaybackPreview");
@@ -452,7 +454,9 @@ void PlaybackBox::setDefaultView(ViewType defaultView)
             mask =                                      VIEW_RECGROUPS;
             break;
     }
-    if (watchList)
+    if (useSearches)
+        mask = mask | VIEW_SEARCHES;
+    if (useWatchList)
         mask = mask | VIEW_WATCHLIST;
 
     viewMask = (PlaybackBox::ViewMask)mask;
@@ -1223,27 +1227,18 @@ void PlaybackBox::updateShowTitles(QPainter *p)
 
                 tempInfo = plist->at(skip+cnt);
 
-                if ((titleList[titleIndex] == "") ||
-                    (titleList[titleIndex] == watchGroup) ||
-                    ((titleList[titleIndex] != tempInfo->title) &&
-                     ((titleList[titleIndex] == tempInfo->recgroup) ||
-                      (titleList[titleIndex] == tempInfo->category))) ||
-                    (!(viewMask & VIEW_TITLES)))
-                    tempSubTitle = tempInfo->title; 
-                else
-                    tempSubTitle = tempInfo->subtitle;
-                if (tempSubTitle.stripWhiteSpace().length() == 0)
-                    tempSubTitle = tempInfo->title;
-                if ((tempInfo->subtitle).stripWhiteSpace().length() > 0 
-                    && ((titleList[titleIndex] == "") ||
-                        (titleList[titleIndex] == watchGroup) ||
-                        ((titleList[titleIndex] != tempInfo->title) &&
-                         ((titleList[titleIndex] == tempInfo->recgroup) ||
-                          (titleList[titleIndex] == tempInfo->category))) ||
-                        (!(viewMask & VIEW_TITLES))))
+                if (titleList[titleIndex] != tempInfo->title)
                 {
-                    tempSubTitle = tempSubTitle + " - \"" + 
-                        tempInfo->subtitle + "\"";
+                    tempSubTitle = tempInfo->title;
+                    if (tempInfo->subtitle.stripWhiteSpace().length() > 0)
+                        tempSubTitle = tempSubTitle + " - \"" + 
+                                       tempInfo->subtitle + "\"";
+                }
+                else
+                {
+                    tempSubTitle = tempInfo->subtitle;
+                    if (tempSubTitle.stripWhiteSpace().length() == 0)
+                        tempSubTitle = tempInfo->title;
                 }
 
                 tempDate = (tempInfo->recstartts).toString(formatShortDate);
@@ -1498,6 +1493,7 @@ bool PlaybackBox::FillList(bool useCachedData)
             "DisplayGroupTitleSort", TitleSortAlphabetical);
 
     QMap<QString, QString> sortedList;
+    QMap<int, QString> searchRule;
     QMap<int, int> recidEpisodes;
     QString sTitle = "";
 
@@ -1512,6 +1508,24 @@ bool PlaybackBox::FillList(bool useCachedData)
 
     if (progCache)
     {
+        if ((viewMask & VIEW_SEARCHES))
+        {
+            MSqlQuery query(MSqlQuery::InitCon());
+            query.prepare("SELECT recordid,title FROM record "
+                          "WHERE search > 0 AND search != :MANUAL;");
+            query.bindValue(":MANUAL", kManualSearch);
+
+            if (query.exec() && query.isActive())
+            {
+                while (query.next())
+                {
+                    QString tmpTitle = query.value(1).toString();
+                    tmpTitle.remove(QRegExp(" \\(.*\\)$"));
+                    searchRule[query.value(0).toInt()] = tmpTitle;
+                }
+            }
+        }
+
         sortedList[""] = "";
         vector<ProgramInfo *>::iterator i = progCache->begin();
         for ( ; i != progCache->end(); i++)
@@ -1548,8 +1562,8 @@ bool PlaybackBox::FillList(bool useCachedData)
                 } 
 
                 if ((viewMask & VIEW_RECGROUPS) &&
-                    p->recgroup != "") // Show recording groups                 
-                { 
+                    p->recgroup != "") // Show recording groups
+                {
                     sortedList[p->recgroup.lower()] = p->recgroup;
                     progLists[p->recgroup].prepend(p);
                     progLists[p->recgroup].setAutoDelete(false);
@@ -1562,6 +1576,18 @@ bool PlaybackBox::FillList(bool useCachedData)
                     progLists[p->category].prepend(p);
                     progLists[p->category].setAutoDelete(false);
                 }
+
+                if ((viewMask & VIEW_SEARCHES) &&
+                    searchRule[p->recordid] != "" &&
+                    p->title != searchRule[p->recordid]) // Show search rules
+                {
+                    QString tmpTitle = QString("(%1)")
+                                               .arg(searchRule[p->recordid]);
+                    sortedList[tmpTitle] = tmpTitle;
+                    progLists[tmpTitle].prepend(p);
+                    progLists[tmpTitle].setAutoDelete(false);
+                }
+
                 if ((viewMask & VIEW_WATCHLIST))
                 {
                     if (watchListAutoExpire && !p->GetAutoExpireFromRecorded())

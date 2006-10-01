@@ -1350,8 +1350,8 @@ static HostCheckBox *UseVirtualKeyboard()
     gc->setLabel(QObject::tr("Use line edit virtual keyboards"));
     gc->setValue(true);
     gc->setHelpText(QObject::tr("Allows you to use a virtual keyboard "
-		    "in Myth line edit boxes.  To use, hit OK/Select "
-		    "while a line edit is in focus."));
+                    "in Myth line edit boxes.  To use, hit OK/Select "
+                    "while a line edit is in focus."));
     return gc;
 }
 
@@ -1477,11 +1477,10 @@ static HostComboBox *AspectOverride()
     gc->addSelection(QObject::tr("16/9 Stretch"), "5");
     gc->addSelection(QObject::tr("Fill"), "6");
     gc->setHelpText(QObject::tr("This will override any aspect ratio in the "
-                    "recorded stream, the same as pressing the W Key "
-                    "during playback. "
-		    "Fill will \"fill\" the screen with the image clipping as required. "
-		    "Fill is useful when using 4:3 interlaced TV's for display."
-		    ));
+                    "recorded stream, the same as pressing the W Key during "
+                    "playback. Fill will \"fill\" the screen with the image "
+                    "clipping as required. Fill is useful when using 4:3 "
+                    "interlaced TV's for display."));
     return gc;
 }
 
@@ -2018,7 +2017,7 @@ static GlobalSpinBox *ATSCCheckSignalThreshold()
 static GlobalSpinBox *HDRingbufferSize()
 {
     GlobalSpinBox *bs = new GlobalSpinBox("HDRingbufferSize",
-					    25*188, 512*188, 25*188);
+                                            25*188, 512*188, 25*188);
     bs->setLabel(QObject::tr("HD Ringbuffer size (KB)"));
     bs->setHelpText(QObject::tr("The HD device ringbuffer allows the "
                     "backend to weather moments of stress. "
@@ -2643,6 +2642,16 @@ public:
     }
 };
 
+static HostCheckBox *PlaybackSearches()
+{
+    HostCheckBox *gc = new HostCheckBox("PlaybackSearches");
+    gc->setLabel(QObject::tr("Include search rule groups"));
+    gc->setValue(false);
+    gc->setHelpText(QObject::tr("Include title groups for recordings from "
+                                "search rule."));
+    return gc;
+}
+
 static HostCheckBox *PlaybackWatchList()
 {
     HostCheckBox *gc = new HostCheckBox("PlaybackWatchList");
@@ -2692,15 +2701,13 @@ static HostSpinBox *PlaybackWLBlackOut()
     return gs;
 }
 
-class WatchListSettings: public  VerticalConfigurationGroup,
-                     public TriggeredConfigurationGroup {
+class WatchListSettings: public VerticalConfigurationGroup,
+                         public TriggeredConfigurationGroup {
 public:
      WatchListSettings():
-         ConfigurationGroup(false, true, false, false),
+         ConfigurationGroup(false, false, true, true),
          VerticalConfigurationGroup(false, true, false, false),
          TriggeredConfigurationGroup(false) {
-         setLabel(QObject::tr("View Recordings (Watch List)"));
-         setUseLabel(false);
 
          Setting* watchList = PlaybackWatchList();
          addChild(watchList);
@@ -2844,8 +2851,8 @@ static HostSpinBox *LogCleanDays()
     gs->setLabel(QObject::tr("Number of days to keep acknowledged log "
                  "entries"));
     gs->setValue(14);
-    gs->setHelpText(QObject::tr("The number of days before a log entry that has "
-                    "been acknowledged will be deleted by the log cleanup "
+    gs->setHelpText(QObject::tr("The number of days before a log entry that "
+                    "has been acknowledged will be deleted by the log cleanup "
                     "process."));
     return gs;
 }
@@ -3147,10 +3154,10 @@ static HostLineEdit *LCDKeyString()
     ge->setLabel(QObject::tr("LCD Key order"));
     ge->setValue("ABCDEF");
     ge->setHelpText(QObject::tr("Enter the 6 Keypad Return Codes for your "
-	    "LCD keypad in the order in which you want the functions "
-	    "up/down/left/right/yes/no to operate. "
-	    "(See lcdproc/server/drivers/hd44780.c/keyMapMatrix[] "
-	    "or the matrix for your display)"));
+            "LCD keypad in the order in which you want the functions "
+            "up/down/left/right/yes/no to operate. "
+            "(See lcdproc/server/drivers/hd44780.c/keyMapMatrix[] "
+            "or the matrix for your display)"));
     return ge;
 }
 
@@ -3554,10 +3561,14 @@ PlaybackSettings::PlaybackSettings()
     pbox2->addChild(RememberRecGroup());
     pbox2->addChild(UseGroupNameAsAllPrograms());
     pbox2->addChild(LiveTVInAllPrograms());
-    pbox2->addChild(new DefaultViewSettings());
     addChild(pbox2);
 
-    addChild(new WatchListSettings());
+    VerticalConfigurationGroup* pbox3 = new VerticalConfigurationGroup(false);
+    pbox3->setLabel(QObject::tr("View Recordings (Views)"));
+    pbox3->addChild(new DefaultViewSettings());
+    pbox3->addChild(PlaybackSearches());
+    pbox3->addChild(new WatchListSettings());
+    addChild(pbox3);
 
     addChild(new HwDecSettings());
 
