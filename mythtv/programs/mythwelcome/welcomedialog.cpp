@@ -465,7 +465,7 @@ bool WelcomeDialog::updateRecordingList()
     QStringList strlist;
     
     // get list of current recordings
-    QString querytext = QString("SELECT cardid FROM capturecard;");
+    QString querytext = QString("SELECT cardid FROM capturecard WHERE parentid = 0;");
     MSqlQuery query(MSqlQuery::InitCon());
     query.exec(querytext);
     QString Status = "";
