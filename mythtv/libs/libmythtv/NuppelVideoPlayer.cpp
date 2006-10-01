@@ -2474,12 +2474,6 @@ void NuppelVideoPlayer::DisplayNormalFrame(void)
             }
         }
     }
-    else 
-    {
-        OSD *osd = GetOSD();
-        if (osd)
-            osd->HideSet("interactive");
-    }
 
     // handle EIA-608 and Teletext
     if (textDisplayMode & kDisplayNUVCaptions)
