@@ -480,7 +480,7 @@ int get_audio_info(ringbuffer *rbuf, audio_frame_t *af, int off, int le)
 {
 	int c = 0;
 	int fr =0;
-	uint8_t headr[4];
+	uint8_t headr[7];
 
 	af->set=0;
 
@@ -529,7 +529,7 @@ int get_audio_info(ringbuffer *rbuf, audio_frame_t *af, int off, int le)
 int get_ac3_info(ringbuffer *rbuf, audio_frame_t *af, int off, int le)
 {
 	int c=0;
-	uint8_t headr[6];
+	uint8_t headr[7];
 	uint8_t frame;
 	int half = 0;
 	int fr;

@@ -294,10 +294,13 @@ void analyze_audio( pes_in_t *p, struct replex *rx, int len, int num, int type)
 						// add each extra frame required direct to the output file
 						int x;
 						for (x = 0; x < framesdiff; x++){
-							if (type == AC3)
-								write(rx->dmx_out[num+1+rx->apidn], framebuf, aframe->framesize);
-							else
-								write(rx->dmx_out[num+1], framebuf, aframe->framesize);
+							if (type == AC3){
+								if (rx->dmx_out[num+1+rx->apidn])	
+									write(rx->dmx_out[num+1+rx->apidn], framebuf, aframe->framesize);
+							}else{
+								if (rx->dmx_out[num+1])
+									write(rx->dmx_out[num+1], framebuf, aframe->framesize);
+							}
 							*acount += 1;
 						}
 						
