@@ -90,7 +90,7 @@ MpegRecorder::MpegRecorder(TVRec *rec) :
     streamtype(0),            aspectratio(2),
     audtype(2),               audsamplerate(48000),
     audbitratel1(14),         audbitratel2(14),
-    audvolume(80),
+    audvolume(80),            language(0),
     // Input file descriptors
     chanfd(-1),               readfd(-1),
     // Keyframe tracking inforamtion
@@ -201,6 +201,16 @@ void MpegRecorder::SetOption(const QString &opt, const QString &value)
                     QString("%1 is invalid").arg(value));
         }
     }
+    else if (opt == "mpeg2language")
+    {
+        bool ok = false;
+        language = value.toInt(&ok); // on failure language will be 0
+        if (!ok)
+        {
+            VERBOSE(VB_IMPORTANT, LOC_ERR + "MPEG2 language (stereo) flag " +
+                    QString("'%1' is invalid").arg(value));
+        }
+    }
     else if (opt == "mpeg2aspectratio")
     {
         bool found = false;
@@ -268,6 +278,8 @@ void MpegRecorder::SetOptionsFromProfile(RecordingProfile *profile,
               profile->byName("mpeg2streamtype")->getValue());
     SetOption("mpeg2aspectratio",
               profile->byName("mpeg2aspectratio")->getValue());
+    SetOption("mpeg2language",
+              profile->byName("mpeg2language")->getValue());
 
     SetIntOption(profile, "samplerate");
     SetOption("mpeg2audtype", profile->byName("mpeg2audtype")->getValue());
@@ -322,6 +334,38 @@ bool MpegRecorder::OpenV4L2DeviceAsInput(void)
         return false;
     }
 
+    // Set audio language mode
+    bool do_audmode_set = true;
+    struct v4l2_tuner vt;
+    bzero(&vt, sizeof(struct v4l2_tuner));
+    if (ioctl(chanfd, VIDIOC_G_TUNER, &vt) < 0)
+    {
+        VERBOSE(VB_IMPORTANT, LOC_WARN + "Unable to get audio mode" + ENO);
+        do_audmode_set = false;
+    }
+
+    static const int v4l2_lang[3] =
+    {
+        V4L2_TUNER_MODE_LANG1,
+        V4L2_TUNER_MODE_LANG2,
+        V4L2_TUNER_MODE_STEREO,
+    };
+    language = (language > 2) ? 0 : language;
+    vt.audmode = v4l2_lang[language];
+
+    if (do_audmode_set && (2 == language) && (1 == audtype))
+    {
+        VERBOSE(VB_GENERAL, "Dual audio mode incompatible with Layer I audio."
+                "\n\t\t\tFalling back to Main Language");
+        vt.audmode = V4L2_TUNER_MODE_LANG1;
+    }
+
+    if (do_audmode_set && ioctl(chanfd, VIDIOC_S_TUNER, &vt) < 0)
+    {
+        VERBOSE(VB_IMPORTANT, LOC_WARN + "Unable to set audio mode" + ENO);
+    }
+
+    // Set recording volume
     struct v4l2_control ctrl;
     ctrl.id = V4L2_CID_AUDIO_VOLUME;
     ctrl.value = 65536 / 100 *audvolume;

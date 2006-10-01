@@ -77,6 +77,7 @@ class MpegRecorder : public RecorderBase
     int bitrate, maxbitrate, streamtype, aspectratio;
     int audtype, audsamplerate, audbitratel1, audbitratel2;
     int audvolume;
+    unsigned int language; ///< 0 is Main Lang; 1 is SAP Lang; 2 is Dual
 
     // Input file descriptors
     int chanfd;

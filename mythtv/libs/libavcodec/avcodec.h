@@ -854,6 +854,15 @@ typedef struct AVCodecContext {
      */
     int delay;
 
+    /**
+     * set when bilingual audio data has been detected.
+     * 0 normally, 1 if dual language flag is set
+     *
+     * - encoding: unused (called delay in this case...)
+     * - decoding: set by lavc
+     */
+    int avcodec_dual_language;
+
     /* - encoding parameters */
     float qcompress;  ///< amount of qscale change between easy & hard scenes (0.0-1.0)
     float qblur;      ///< amount of qscale smoothing over time (0.0-1.0)

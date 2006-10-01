@@ -187,30 +187,56 @@ public:
     };
 };
 
-class MPEG2AudioBitrateSettings: public VerticalConfigurationGroup,
-                                 public TriggeredConfigurationGroup {
-public:
+class MPEG2AudioBitrateSettings: public HorizontalConfigurationGroup,
+                                 public TriggeredConfigurationGroup
+{
+  public:
     MPEG2AudioBitrateSettings(const RecordingProfile& parent) :
-        ConfigurationGroup(false, true, false, false),
-        VerticalConfigurationGroup(false, true, false, false)
+        ConfigurationGroup(false, true, true, true),
+        HorizontalConfigurationGroup(false, true, true, true)
     {
         setLabel(QObject::tr("Bitrate Settings"));
         MPEG2audType* audType = new MPEG2audType(parent);
         addChild(audType);
         setTrigger(audType);
 
-        ConfigurationGroup* audbr = new VerticalConfigurationGroup(false);
+        ConfigurationGroup *audbr =
+            new VerticalConfigurationGroup(false, true, true, true);
         audbr->addChild(new MPEG2audBitrateL1(parent));
         audbr->setLabel("Layer I");
         addTarget("Layer I", audbr);
         audType->addSelection("Layer I");
 
-        audbr = new VerticalConfigurationGroup(false);
+        audbr = new VerticalConfigurationGroup(false, true, true, true);
         audbr->addChild(new MPEG2audBitrateL2(parent));
         audbr->setLabel("Layer II");
         addTarget("Layer II", audbr);
         audType->addSelection("Layer II");
         audType->setValue(1);
+    };
+};
+
+class MPEG2Language : public CodecParam, public ComboBoxSetting
+{
+  public:
+    MPEG2Language(const RecordingProfile &parent)
+        : CodecParam(parent, "mpeg2language")
+    {
+        setLabel(QObject::tr("SAP/Bilingual"));
+
+        addSelection(QObject::tr("Main Language"), "0");
+        addSelection(QObject::tr("SAP Language"),  "1");
+        addSelection(QObject::tr("Dual"),          "2");
+
+        setValue(0);
+        setHelpText(QObject::tr(
+                        "Chooses the language(s) to record when "
+                        "two languages are broadcast. Only Layer II "
+                        "supports the recording of two languages (Dual). ") +
+                    // Delete this part of message once 0.1.10 is old...
+                    QObject::tr(
+                        "Version 0.1.10+ of ivtv driver is required for "
+                        "this setting to have any effect."));
     };
 };
 
@@ -239,10 +265,11 @@ public:
         params->addChild(new BTTVVolume(parent));
         addTarget("MP3", params);
 
-        params = new VerticalConfigurationGroup(false);
+        params = new VerticalConfigurationGroup(false, false, true, true);
         params->setLabel("MPEG-2 Hardware Encoder");
         params->addChild(new SampleRate(parent, false));
         params->addChild(new MPEG2AudioBitrateSettings(parent));
+        params->addChild(new MPEG2Language(parent));
         params->addChild(new MPEG2audVolume(parent));
         addTarget("MPEG-2 Hardware Encoder", params);
 
