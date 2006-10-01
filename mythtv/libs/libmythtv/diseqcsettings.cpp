@@ -482,32 +482,42 @@ void RotorConfig::RunRotorPositionsDialog(void)
 
 //////////////////////////////////////// LnbPresetSetting
 
-struct lnb_preset
+class lnb_preset
 {
+  public:
+    lnb_preset(const QString &_name, DiSEqCDevLNB::dvbdev_lnb_t _type,
+               uint _lof_sw = 0, uint _lof_lo = 0,
+               uint _lof_hi = 0, bool _pol_inv = false) :
+        name(_name),     type(_type),
+        lof_sw(_lof_sw), lof_lo(_lof_lo),
+        lof_hi(_lof_hi), pol_inv(_pol_inv) {}
+
+  public:
     QString                    name;
     DiSEqCDevLNB::dvbdev_lnb_t type;
     uint                       lof_sw;
     uint                       lof_lo;
     uint                       lof_hi;
+    bool                       pol_inv;
 };
 
 static lnb_preset lnb_presets[] =
 {
-    /* description, type, LOF switch, LOF low, LOF high */
-    { DeviceTree::tr("Single (Europe)"),
-      DiSEqCDevLNB::kTypeVoltageControl,               0,  9750000,        0 },
-    { DeviceTree::tr("Universal (Europe)"),
-      DiSEqCDevLNB::kTypeVoltageAndToneControl, 11700000,  9750000, 10600000 },
-    { DeviceTree::tr("Circular (N. America)"),
-      DiSEqCDevLNB::kTypeVoltageControl,               0, 11250000,        0 },
-    { DeviceTree::tr("Linear (N. America)"),
-      DiSEqCDevLNB::kTypeVoltageControl,               0, 10750000,        0 },
-    { DeviceTree::tr("C Band"),
-      DiSEqCDevLNB::kTypeVoltageControl,               0,  5150000,        0 },
-    { DeviceTree::tr("DishPro Bandstacked"),
-      DiSEqCDevLNB::kTypeBandstacked,                  0, 11250000, 14350000 },
-    { QString::null,
-      DiSEqCDevLNB::kTypeVoltageControl,               0,        0,        0 },
+    /* description, type, LOF switch, LOF low, LOF high, inverted polarity */
+    lnb_preset(DeviceTree::tr("Single (Europe)"),
+               DiSEqCDevLNB::kTypeVoltageControl,       0,  9750000),
+    lnb_preset(DeviceTree::tr("Universal (Europe)"),
+               DiSEqCDevLNB::kTypeVoltageAndToneControl,
+               11700000,  9750000, 10600000),
+    lnb_preset(DeviceTree::tr("Circular (N. America)"),
+               DiSEqCDevLNB::kTypeVoltageControl,       0, 11250000),
+    lnb_preset(DeviceTree::tr("Linear (N. America)"),
+               DiSEqCDevLNB::kTypeVoltageControl,       0, 10750000),
+    lnb_preset(DeviceTree::tr("C Band"),
+               DiSEqCDevLNB::kTypeVoltageControl,       0,  5150000),
+    lnb_preset(DeviceTree::tr("DishPro Bandstacked"),
+               DiSEqCDevLNB::kTypeBandstacked,          0, 11250000, 14350000),
+    lnb_preset(QString::null, DiSEqCDevLNB::kTypeVoltageControl),
 };
 
 uint FindPreset(const DiSEqCDevLNB &lnb)
@@ -518,7 +528,8 @@ uint FindPreset(const DiSEqCDevLNB &lnb)
         if (lnb_presets[i].type   == lnb.GetType()      &&
             lnb_presets[i].lof_sw == lnb.GetLOFSwitch() &&
             lnb_presets[i].lof_lo == lnb.GetLOFLow()    &&
-            lnb_presets[i].lof_hi == lnb.GetLOFHigh())
+            lnb_presets[i].lof_hi == lnb.GetLOFHigh()   &&
+            lnb_presets[i].pol_inv== lnb.IsPolarityInverted())
         {
             break;
         }
@@ -677,6 +688,34 @@ class LNBLOFHighSetting : public LineEditSetting
     DiSEqCDevLNB &m_lnb;
 };
 
+class LNBPolarityInvertedSetting : public CheckBoxSetting
+{
+  public:
+    LNBPolarityInvertedSetting(DiSEqCDevLNB &lnb) : m_lnb(lnb)
+    {
+        setLabel(DeviceTree::tr("LNB Reversed"));
+        QString help = DeviceTree::tr(
+            "This defines whether the signal reaching the LNB "
+            "is reversed from normal polarization. This happens "
+            "to circular signals bouncing twice on a toroidal "
+            "dish.");
+        setHelpText(help);
+    }
+
+    virtual void load(void)
+    {
+        setValue(m_lnb.IsPolarityInverted());
+    }
+
+    virtual void save(void)
+    {
+        m_lnb.SetPolarityInverted(getValue());
+    }
+
+  private:
+    DiSEqCDevLNB &m_lnb;
+};
+
 //////////////////////////////////////// LNBConfig
 
 LNBConfig::LNBConfig(DiSEqCDevLNB &lnb)
@@ -696,6 +735,8 @@ LNBConfig::LNBConfig(DiSEqCDevLNB &lnb)
     group->addChild(m_lof_lo);
     m_lof_hi = new LNBLOFHighSetting(lnb);
     group->addChild(m_lof_hi);
+    m_pol_inv = new LNBPolarityInvertedSetting(lnb);
+    group->addChild(m_pol_inv);
     connect(m_type, SIGNAL(valueChanged(const QString&)),
             this,   SLOT(  UpdateType(  void)));
     connect(preset, SIGNAL(valueChanged(const QString&)),
@@ -722,10 +763,12 @@ void LNBConfig::SetPreset(const QString &value)
         m_lof_switch->setValue(QString::number(preset.lof_sw / 1000));
         m_lof_lo->setValue(QString::number(preset.lof_lo / 1000));
         m_lof_hi->setValue(QString::number(preset.lof_hi / 1000));
+        m_pol_inv->setValue(preset.pol_inv);
         m_type->setEnabled(false);
         m_lof_switch->setEnabled(false);
         m_lof_hi->setEnabled(false);
         m_lof_lo->setEnabled(false);
+        m_pol_inv->setEnabled(false);
     }
 }
 
@@ -741,16 +784,19 @@ void LNBConfig::UpdateType(void)
             m_lof_switch->setEnabled(false);
             m_lof_hi->setEnabled(false);
             m_lof_lo->setEnabled(true);
+            m_pol_inv->setEnabled(true);
             break;
         case DiSEqCDevLNB::kTypeVoltageAndToneControl:
             m_lof_switch->setEnabled(true);
             m_lof_hi->setEnabled(true);
             m_lof_lo->setEnabled(true);
+            m_pol_inv->setEnabled(true);
             break;
         case DiSEqCDevLNB::kTypeBandstacked:
             m_lof_switch->setEnabled(false);
             m_lof_hi->setEnabled(true);
             m_lof_lo->setEnabled(true);
+            m_pol_inv->setEnabled(true);
             break;
     }
 }

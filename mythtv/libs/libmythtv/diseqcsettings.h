@@ -75,6 +75,7 @@ class LNBTypeSetting;
 class LNBLOFSwitchSetting;
 class LNBLOFLowSetting;
 class LNBLOFHighSetting;
+class LNBPolarityInvertedSetting;
 
 class LNBConfig : public ConfigurationWizard
 {
@@ -92,6 +93,7 @@ class LNBConfig : public ConfigurationWizard
     LNBLOFSwitchSetting *m_lof_switch;
     LNBLOFLowSetting    *m_lof_lo;
     LNBLOFHighSetting   *m_lof_hi;
+    LNBPolarityInvertedSetting *m_pol_inv;
 };
 
 class DeviceTree : public ListBoxSetting

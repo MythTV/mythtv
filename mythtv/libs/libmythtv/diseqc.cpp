@@ -1907,7 +1907,8 @@ const DiSEqCDevDevice::TypeTable DiSEqCDevLNB::LNBTypeTable[5] =
 DiSEqCDevLNB::DiSEqCDevLNB(DiSEqCDevTree &tree, uint devid)
     : DiSEqCDevDevice(tree, devid),
       m_type(kTypeVoltageAndToneControl), m_lof_switch(11700000),
-      m_lof_hi(10600000),       m_lof_lo(9750000)
+      m_lof_hi(10600000),       m_lof_lo(9750000),
+      m_pol_inv(false)
 {
     Reset();
 }
@@ -1942,7 +1943,7 @@ bool DiSEqCDevLNB::Load(void)
     query.prepare(
         "SELECT subtype,         lnb_lof_switch, "
         "       lnb_lof_hi,      lnb_lof_lo, "
-        "       cmd_repeat "
+        "       lnb_pol_inv,     cmd_repeat "
         "FROM diseqc_tree "
         "WHERE diseqcid = :DEVID");
     query.bindValue(":DEVID", GetDeviceID());
@@ -1959,6 +1960,7 @@ bool DiSEqCDevLNB::Load(void)
         m_lof_hi     = query.value(2).toInt();
         m_lof_lo     = query.value(3).toInt();
         m_repeat     = query.value(4).toUInt();
+        m_pol_inv    = query.value(5).toUInt();
     }
 
     return true;
@@ -1982,6 +1984,7 @@ bool DiSEqCDevLNB::Store(void) const
             "    lnb_lof_switch  = :LOFSW,   "
             "    lnb_lof_lo      = :LOFLO,   "
             "    lnb_lof_hi      = :LOFHI,   "
+            "    lnb_pol_inv     = :POLINV "
             "    cmd_repeat      = :REPEAT   "
             "WHERE diseqcid = :DEVID");
     }
@@ -1991,11 +1994,13 @@ bool DiSEqCDevLNB::Store(void) const
             "INSERT INTO diseqc_tree"
             " ( parentid,      ordinal,         type, "
             "   description,   subtype,         lnb_lof_switch, "
-            "   lnb_lof_lo,    lnb_lof_hi,      cmd_repeat ) "
+            "   lnb_lof_lo,    lnb_lof_hi,      lnb_pol_inv, "
+            "   cmd_repeat ) "
             "VALUES "
             " (:PARENT,       :ORDINAL,         'lnb', "
             "  :DESC,         :TYPE,            :LOFSW, "
-            "  :LOFLO,        :LOFHI,           :REPEAT ) ");
+            "  :LOFLO,        :LOFHI,           :POLINV, "
+            "  :REPEAT ) ");
     }
 
     if (m_parent)
@@ -2007,6 +2012,7 @@ bool DiSEqCDevLNB::Store(void) const
     query.bindValue(":LOFSW",   m_lof_switch);
     query.bindValue(":LOFLO",   m_lof_lo);
     query.bindValue(":LOFHI",   m_lof_hi);
+    query.bindValue(":POLINV",  m_pol_inv);
     query.bindValue(":REPEAT",  m_repeat);
     query.bindValue(":DEVID",   GetDeviceID());
 
@@ -2058,7 +2064,7 @@ bool DiSEqCDevLNB::IsHorizontal(const DVBTuning &tuning) const
     (void) tuning;
 #ifdef USING_DVB
     char pol = tuning.PolarityChar();
-    return (pol == 'h' || pol == 'l');
+    return (pol == 'h' || pol == 'l') ^ IsPolarityInverted();
 #else
     return false;
 #endif // !USING_DVB
