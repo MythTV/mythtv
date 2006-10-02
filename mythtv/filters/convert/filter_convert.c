@@ -14,6 +14,20 @@
 #include "filter.h"
 #include "frame.h"
 
+/*
+  Disabled conversion filter Oct 2, 2006 -- dtk
+  This filter is broken. First off the conversion is wrong,
+  422P has the same height as YV12 and twice the width in the chroma,
+  this is written as if the chroma is half the height and has the
+  same width as YV12. Second, this filter assumes that the memory
+  of YV12 is in one block, and that we have allocated width * height * 2
+  bytes. In fact if this is an XVideo surface the memory may be in
+  up to three segments, and we only allocate width * height * 3 / 2
+  bytes when it is continuous. In order for this filter to work
+  we need to change the VideoFilter::filter function to take a
+  separate input and output video frames.
+*/
+
 typedef struct ThisFilter
 {
     VideoFilter vf;
@@ -138,6 +152,7 @@ static FmtConv FmtList[] =
     FMT_NULL
 };
 
+#if 0
 FilterInfo filter_table[] = 
 {
     {
@@ -149,3 +164,4 @@ FilterInfo filter_table[] =
     },
     FILT_NULL
 };
+#endif
