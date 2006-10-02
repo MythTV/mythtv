@@ -37,24 +37,22 @@ typedef struct ThisFilter
 {
     VideoFilter vf;
 
-    int width;
-    int height;
-    int uoff;
-    int voff;
-    int cwidth;
-    int cheight;
-    int first;
+    int offsets[3];
+    int pitches[3];
     int mm_flags;
-    void (*filtfunc)(uint8_t*, uint8_t*, uint8_t*, int, int, uint8_t*,
-                     uint8_t*);
+    int line_size;
+    int prev_size;
     uint8_t *line;
     uint8_t *prev;
     uint8_t coefs[4][512];
+
+    void (*filtfunc)(uint8_t*, uint8_t*, uint8_t*,
+                     int, int, uint8_t*, uint8_t*);
+
     TF_STRUCT;
 } ThisFilter;
 
-static void
-PrecalcCoefs (uint8_t * Ct, double Dist25)
+static void calc_coefs(uint8_t * Ct, double Dist25)
 {
     int i;
     double Gamma, Simil, C;
@@ -69,45 +67,11 @@ PrecalcCoefs (uint8_t * Ct, double Dist25)
     }
 }
 
-static void SetupSize(ThisFilter *filter, VideoFrameType inpixfmt,
-                      int *width, int *height)
-{
-    (void) inpixfmt;
-
-    if (filter->line)
-        free(filter->line);
-
-    filter->line = (uint8_t *) malloc (*width);
-    if (filter->line == NULL )
-    {
-        fprintf (stderr, "Denoise3D: failed to allocate line buffer\n");
-        free (filter);
-    }
-
-    if (filter->prev)
-        free(filter->prev);
-
-    filter->prev = (uint8_t *) malloc (*width * *height * 3 / 2);
-    if (filter->prev == NULL )
-    {
-        fprintf (stderr, "Denoise3D: failed to allocate frame buffer\n");
-        free (filter->line);
-        filter->line = NULL;
-    }
-    filter->width = *width;
-    filter->height = *height;
-    filter->uoff = *width * *height;
-    filter->voff = *width * *height * 5 / 4;
-    filter->cwidth = *width / 2;
-    filter->cheight = *height / 2;
-}
-
-static void
-denoise (uint8_t * Frame,
-         uint8_t * FramePrev,
-         uint8_t * Line,
-         int W, int H,
-         uint8_t * Spatial, uint8_t * Temporal)
+static void denoise(uint8_t *Frame,
+                    uint8_t *FramePrev,
+                    uint8_t *Line,
+                    int W, int H,
+                    uint8_t *Spatial, uint8_t *Temporal)
 {
     uint8_t prev;
     int X, Y;
@@ -141,12 +105,11 @@ denoise (uint8_t * Frame,
 
 #ifdef MMX
 
-static void
-denoiseMMX (uint8_t * Frame,
-            uint8_t * FramePrev,
-            uint8_t * Line,
-            int W, int H,
-            uint8_t * Spatial, uint8_t * Temporal)
+static void denoiseMMX(uint8_t *Frame,
+                       uint8_t *FramePrev,
+                       uint8_t *Line,
+                       int W, int H,
+                       uint8_t *Spatial, uint8_t *Temporal)
 {
     int X, i;
     uint8_t *LineCur = Frame;
@@ -306,138 +269,196 @@ denoiseMMX (uint8_t * Frame,
 }
 #endif /* MMX */
 
-static int
-denoise3DFilter (VideoFilter * f, VideoFrame * frame)
+static int alloc_line(ThisFilter *filter, int size)
 {
-    int width = frame->width;
-    int height = frame->height;
-    uint8_t *yuvptr = frame->buf;
-    ThisFilter *filter = (ThisFilter *) f;
+    if (filter->line_size >= size)
+        return 1;
+
+    uint8_t *tmp = realloc(filter->line, size);
+    if (!tmp)
+    {
+        fprintf(stderr, "Couldn't allocate memory for line buffer\n");
+        return 0;
+    }
+
+    filter->line = tmp;
+    filter->line_size = size;
+
+    return 1;
+}
+
+static int alloc_prev(ThisFilter *filter, int size)
+{
+    if (filter->prev_size >= size)
+        return 1;
+
+    uint8_t *tmp = realloc(filter->prev, size);
+    if (!tmp)
+    {
+        fprintf(stderr, "Couldn't allocate memory for frame buffer\n");
+        return 0;
+    }
+
+    filter->prev = tmp;
+    filter->prev_size = size;
+
+    return 1;
+}
+
+static int imax(int a, int b) { return (a > b) ? a : b; }
+
+static int init_buf(ThisFilter *filter, VideoFrame *frame)
+{
+    if (!alloc_prev(filter, frame->size))
+        return 0;
+
+    int sz = imax(imax(frame->pitches[0], frame->pitches[1]), frame->pitches[2]);
+    if (!alloc_line(filter, sz))
+        return 0;
+
+    if ((filter->prev_size  != frame->size)       ||
+        (filter->offsets[0] != frame->offsets[0]) ||
+        (filter->offsets[1] != frame->offsets[1]) ||
+        (filter->offsets[2] != frame->offsets[2]) ||
+        (filter->pitches[0] != frame->pitches[0]) ||
+        (filter->pitches[1] != frame->pitches[1]) ||
+        (filter->pitches[2] != frame->pitches[2]))
+    {
+        memcpy(filter->prev,    frame->buf,     frame->size);
+        memcpy(filter->offsets, frame->offsets, sizeof(int) * 3);
+        memcpy(filter->pitches, frame->pitches, sizeof(int) * 3);
+    }
+
+    return 1;
+}
+
+static int denoise3DFilter(VideoFilter *f, VideoFrame *frame)
+{
+    ThisFilter *filter = (ThisFilter*) f;
     TF_VARS;
 
-    if (frame->width != filter->width || frame->height != filter->height)
-        SetupSize(filter, frame->codec, &frame->width, &frame->height);
-
-    if (!filter->line || !filter->prev)
-    {
-        fprintf(stderr, "denoise3d: failed to allocate buffers\n");
+    if (!init_buf(filter, frame))
         return -1;
-    }
 
     TF_START;
-    if (filter->first)
-    {
-        memcpy(filter->prev, yuvptr, frame->size);
-        filter->first = 0;
-    }
 
-    (filter->filtfunc) (yuvptr, filter->prev, filter->line, width, height,
-                        filter->coefs[0] + 256, filter->coefs[1] + 256);
-    (filter->filtfunc) (yuvptr + filter->uoff, filter->prev + filter->uoff,
-                        filter->line, filter->cwidth, filter->cheight,
-                        filter->coefs[2] + 256, filter->coefs[3] + 256);
-    (filter->filtfunc) (yuvptr + filter->voff, filter->prev + filter->voff,
-                        filter->line, filter->cwidth, filter->cheight,
-                        filter->coefs[2] + 256, filter->coefs[3] + 256);
 #ifdef MMX
     if (filter->mm_flags & MM_MMX)
         emms();
 #endif
+
+    (filter->filtfunc)(frame->buf   + frame->offsets[0],
+                       filter->prev + frame->offsets[0],
+                       filter->line,  frame->pitches[0], frame->height,
+                       filter->coefs[0] + 256,
+                       filter->coefs[1] + 256);
+
+    (filter->filtfunc)(frame->buf   + frame->offsets[1],
+                       filter->prev + frame->offsets[1],
+                       filter->line,  frame->pitches[1], frame->height >> 1,
+                       filter->coefs[2] + 256,
+                       filter->coefs[3] + 256);
+
+    (filter->filtfunc)(frame->buf   + frame->offsets[2],
+                       filter->prev + frame->offsets[2],
+                       filter->line,  frame->pitches[2], frame->height >> 1,
+                       filter->coefs[2] + 256,
+                       filter->coefs[3] + 256);
+#ifdef MMX
+    if (filter->mm_flags & MM_MMX)
+        emms();
+#endif
+
     TF_END(filter, "Denoise3D: ");
     return 0;
 }
 
-void
-Denoise3DFilterCleanup (VideoFilter * filter)
+void Denoise3DFilterCleanup(VideoFilter *filter)
 {
-    free (((ThisFilter *)filter)->prev);
-    free (((ThisFilter *)filter)->line);
+    if (((ThisFilter*)filter)->prev)
+        free(((ThisFilter*)filter)->prev);
+
+    if (((ThisFilter*)filter)->line)
+        free (((ThisFilter*)filter)->line);
 }
 
-VideoFilter *
-NewDenoise3DFilter (VideoFrameType inpixfmt, VideoFrameType outpixfmt, 
-                    int *width, int *height, char *options)
+VideoFilter *NewDenoise3DFilter(VideoFrameType inpixfmt, VideoFrameType outpixfmt, 
+                                int *width, int *height, char *options)
 {
-    double LumSpac, LumTmp, ChromSpac, ChromTmp;
-    double Param1, Param2, Param3;
+    double LumSpac   = PARAM1_DEFAULT;
+    double LumTmp    = PARAM3_DEFAULT;
+    double ChromSpac = PARAM2_DEFAULT;
+    double ChromTmp  = 0.0;
     ThisFilter *filter;
-    if (inpixfmt != FMT_YV12)
+
+    (void) width;
+    (void) height;
+
+    if (inpixfmt != FMT_YV12 || outpixfmt != FMT_YV12)
+    {
+        fprintf(stderr, "Denoise3D: attempt to initialize "
+                "with unsupported format\n");
         return NULL;
-    if (outpixfmt != FMT_YV12)
-        return NULL;
-    filter = malloc (sizeof (ThisFilter));
+    }
+
+    filter = malloc(sizeof (ThisFilter));
     if (filter == NULL)
     {
         fprintf (stderr, "Denoise3D: failed to allocate memory for filter\n");
         return NULL;
     }
 
-    filter->line = NULL;
-    filter->prev = NULL;
+    bzero(filter, sizeof (ThisFilter));
 
-    SetupSize(filter, inpixfmt, width, height);
+    filter->vf.filter = &denoise3DFilter;
+    filter->vf.cleanup = &Denoise3DFilterCleanup;
+    filter->filtfunc = &denoise;
 
 #ifdef MMX
     filter->mm_flags = mm_support();
     if (filter->mm_flags & MM_MMX)
         filter->filtfunc = &denoiseMMX;
-    else
-#else
-        filter->mm_flags = 0,
 #endif
-        filter->filtfunc = &denoise;
-    filter->vf.filter = &denoise3DFilter;
-    filter->vf.cleanup = &Denoise3DFilterCleanup;
+
     TF_INIT(filter);
-    filter->first = 1;
 
     if (options)
     {
-        switch (sscanf (options, "%lf:%lf:%lf", &Param1, &Param2, &Param3))
+        double param1, param2, param3;
+        switch (sscanf (options, "%lf:%lf:%lf", &param1, &param2, &param3))
         {
-        case 0:
-            LumSpac = PARAM1_DEFAULT;
-            LumTmp = PARAM3_DEFAULT;
-            ChromSpac = PARAM2_DEFAULT;
-            break;
+            case 0:
+            default:
+                break;
 
-        case 1:
-            LumSpac = Param1;
-            LumTmp = PARAM3_DEFAULT * Param1 / PARAM1_DEFAULT;
-            ChromSpac = PARAM2_DEFAULT * Param1 / PARAM1_DEFAULT;
-            break;
+            case 1:
+                LumSpac   = param1;
+                LumTmp    = PARAM3_DEFAULT * param1 / PARAM1_DEFAULT;
+                ChromSpac = PARAM2_DEFAULT * param1 / PARAM1_DEFAULT;
+                break;
 
-        case 2:
-            LumSpac = Param1;
-            LumTmp = PARAM3_DEFAULT * Param1 / PARAM1_DEFAULT;
-            ChromSpac = Param2;
-            break;
+            case 2:
+                LumSpac   = param1;
+                LumTmp    = PARAM3_DEFAULT * param1 / PARAM1_DEFAULT;
+                ChromSpac = param2;
+                break;
 
-        case 3:
-            LumSpac = Param1;
-            LumTmp = Param3;
-            ChromSpac = Param2;
-            break;
-
-        default:
-            LumSpac = PARAM1_DEFAULT;
-            LumTmp = PARAM3_DEFAULT;
-            ChromSpac = PARAM2_DEFAULT;
+            case 3:
+                LumSpac   = param1;
+                LumTmp    = param3;
+                ChromSpac = param2;
+                break;
         }
-    }
-    else
-    {
-        LumSpac = PARAM1_DEFAULT;
-        LumTmp = PARAM3_DEFAULT;
-        ChromSpac = PARAM2_DEFAULT;
     }
 
     ChromTmp = LumTmp * ChromSpac / LumSpac;
-    PrecalcCoefs (filter->coefs[0], LumSpac);
-    PrecalcCoefs (filter->coefs[1], LumTmp);
-    PrecalcCoefs (filter->coefs[2], ChromSpac);
-    PrecalcCoefs (filter->coefs[3], ChromTmp);
-    return (VideoFilter *) filter;
+
+    calc_coefs(filter->coefs[0], LumSpac);
+    calc_coefs(filter->coefs[1], LumTmp);
+    calc_coefs(filter->coefs[2], ChromSpac);
+    calc_coefs(filter->coefs[3], ChromTmp);
+
+    return (VideoFilter*) filter;
 }
 
 static FmtConv FmtList[] = 
