@@ -215,6 +215,9 @@ void EITHelper::AddEIT(const DVBEventInformationTable *eit)
     fix |= fixup[(((uint64_t)eit->TSID()) << 32) |
                  (eit->OriginalNetworkID() << 16)];
     fix |= fixup[(eit->OriginalNetworkID() << 16) | eit->ServiceID()];
+    fix |= fixup[(((uint64_t)eit->TSID()) << 32) |
+                 (uint64_t)(eit->OriginalNetworkID() << 16) |
+		 (uint64_t)eit->ServiceID()];
     fix |= EITFixUp::kFixGenericDVB;
 
     uint networkid = eit->OriginalNetworkID();
@@ -515,9 +518,36 @@ static void init_fixup(QMap<uint64_t,uint> &fix)
     fix[ 4096 << 16] = EITFixUp::kFixAUStar;
     fix[ 4096 << 16] = EITFixUp::kFixAUStar;
 
-    fix[ 769LL << 32 | 8468 << 16] = EITFixUp::kEFixPro7Sat; // DVB-T Berlin
-    fix[3075LL << 32 | 8468 << 16] = EITFixUp::kEFixPro7Sat; // DVB-T Bremen
-    fix[                133 << 16] = EITFixUp::kEFixPro7Sat; // Premiere and pro7/Sat.1 
+    fix[  769LL << 32 | 8468 << 16] = EITFixUp::kEFixPro7Sat; // DVB-T Berlin
+    fix[ 3075LL << 32 | 8468 << 16] = EITFixUp::kEFixPro7Sat; // DVB-T Bremen
+    fix[ 8705LL << 32 | 8468 << 16] = EITFixUp::kEFixPro7Sat; // DVB-T Hessen
+    fix[13057LL << 32 | 8468 << 16] = EITFixUp::kEFixPro7Sat; // DVB-T Munich
+
+    // DVB-C germany: Kabel Deutschland encoding fixes
+    fix[   112LL << 32 | 61441U << 16] = EITFixUp::kEFixPro7Sat;
+    fix[ 10000LL << 32 | 61441U << 16] = EITFixUp::kEFixPro7Sat;
+    fix[ 10001LL << 32 | 61441U << 16] = EITFixUp::kEFixPro7Sat;
+    fix[ 10002LL << 32 | 61441U << 16] = EITFixUp::kEFixPro7Sat;
+    fix[ 10003LL << 32 | 61441U << 16] = EITFixUp::kEFixPro7Sat;
+    fix[ 10004LL << 32 | 61441U << 16] = EITFixUp::kEFixPro7Sat;
+    fix[ 10005LL << 32 | 61441U << 16] = EITFixUp::kEFixPro7Sat;
+    fix[ 10006LL << 32 | 61441U << 16] = EITFixUp::kEFixPro7Sat;
+    fix[ 10008LL << 32 | 61441U << 16] = EITFixUp::kEFixPro7Sat;
+    fix[ 10009LL << 32 | 61441U << 16] = EITFixUp::kEFixPro7Sat;
+    // on the multiplex with RTL only following channels must be fixed
+    fix[ 10007LL << 32 | 61441U << 16 | 53605] = EITFixUp::kEFixPro7Sat; //terranova
+    fix[ 10007LL << 32 | 61441U << 16 | 53607] = EITFixUp::kEFixPro7Sat; //Eurosport
+    fix[ 10007LL << 32 | 61441U << 16 | 53608] = EITFixUp::kEFixPro7Sat; //Das Vierte
+    fix[ 10007LL << 32 | 61441U << 16 | 53609] = EITFixUp::kEFixPro7Sat; //Viva
+
+    fix[ 774LL << 32 | 8468 << 16 | 16392] = EITFixUp::kEFixPro7Sat; //DVB-T Berlin dsf
+    fix[1082LL << 32 |    1 << 16 | 20001] = EITFixUp::kEFixPro7Sat; //DVB-S Pro7 Swiss
+    fix[1082LL << 32 |    1 << 16 | 20002] = EITFixUp::kEFixPro7Sat; //DVB-S Pro7 Austria
+    fix[1082LL << 32 |    1 << 16 | 20003] = EITFixUp::kEFixPro7Sat; //DVB-S Kabel1 Swiss
+    fix[1082LL << 32 |    1 << 16 | 20004] = EITFixUp::kEFixPro7Sat; //DVB-S Kabel1 Austria
+    fix[1082LL << 32 |    1 << 16 | 20005] = EITFixUp::kEFixPro7Sat; //DVB-S Sat.1 Austria
+
+    fix[ 133 << 16] = EITFixUp::kEFixPro7Sat; // Premiere and Pro7/Sat.1
 
     fix[               6144 << 16] = EITFixUp::kFixMCA;      // MultiChoice Africa
 }
