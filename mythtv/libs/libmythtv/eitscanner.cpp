@@ -224,7 +224,7 @@ void EITScanner::StartActiveScan(TVRec *_rec, uint max_seconds_per_source,
         // TODO get input name and use it in crawl.
         MSqlQuery query(MSqlQuery::InitCon());
         query.prepare(
-            "SELECT min(channum) "
+            "SELECT channum, MIN(chanid) "
             "FROM channel, cardinput, capturecard, videosource "
             "WHERE cardinput.sourceid   = channel.sourceid AND "
             "      videosource.sourceid = channel.sourceid AND "
