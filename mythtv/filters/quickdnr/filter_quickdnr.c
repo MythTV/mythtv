@@ -44,501 +44,548 @@ static const char FILTER_NAME[] = "quickdnr";
 
 typedef struct ThisFilter
 {
-  VideoFilter vf;
+        VideoFilter vf;
 
-  int Luma_size;
-  int UV_size;
-  int first;
-  uint64_t Luma_threshold_mask1, Luma_threshold_mask2;
-  uint64_t Chroma_threshold_mask1, Chroma_threshold_mask2;
-  uint8_t Luma_threshold1, Luma_threshold2;
-  uint8_t Chroma_threshold1, Chroma_threshold2;
-  uint8_t *average;
+        uint64_t Luma_threshold_mask1;
+        uint64_t Luma_threshold_mask2;
+        uint64_t Chroma_threshold_mask1;
+        uint64_t Chroma_threshold_mask2;
+        uint8_t  Luma_threshold1;
+        uint8_t  Luma_threshold2;
+        uint8_t  Chroma_threshold1;
+        uint8_t  Chroma_threshold2;
+        uint8_t *average;
+        int      average_size;
+        int      offsets[3];
+        int      pitches[3];
 
-  TF_STRUCT;
+        TF_STRUCT;
 
 } ThisFilter;
 
+static int alloc_avg(ThisFilter *filter, int size)
+{
+    if (filter->average_size >= size)
+        return 1;
+
+    uint8_t *tmp = realloc(filter->average, size);
+    if (!tmp)
+    {
+        fprintf(stderr, "Couldn't allocate memory for DNR buffer\n");
+        return 0;
+    }
+
+    filter->average = tmp;
+    filter->average_size = size;
+
+    return 1;
+}
+
+static int init_avg(ThisFilter *filter, VideoFrame *frame)
+{
+    if (!alloc_avg(filter, frame->size))
+        return 0;
+    
+    if ((filter->offsets[0] != frame->offsets[0]) ||
+        (filter->offsets[1] != frame->offsets[1]) ||
+        (filter->offsets[2] != frame->offsets[2]) ||
+        (filter->pitches[0] != frame->pitches[0]) ||
+        (filter->pitches[1] != frame->pitches[1]) ||
+        (filter->pitches[2] != frame->pitches[2]))
+    {
+        memcpy(filter->average, frame->buf, frame->size);
+        memcpy(filter->offsets, frame->offsets, sizeof(int) * 3);
+        memcpy(filter->pitches, frame->pitches, sizeof(int) * 3);
+    }
+
+    return 1;
+}
+
+static void init_vars(ThisFilter *tf, VideoFrame *frame,
+                      int *thr1, int *thr2, int *height,
+                      uint8_t **avg, uint8_t **buf)
+{
+    thr1[0] = tf->Luma_threshold1;
+    thr1[1] = tf->Chroma_threshold1;
+    thr1[2] = tf->Chroma_threshold1;
+
+    thr2[0] = tf->Luma_threshold2;
+    thr2[1] = tf->Chroma_threshold2;
+    thr2[2] = tf->Chroma_threshold2;
+
+    height[0] = frame->height;
+    height[1] = frame->height >> 1;
+    height[2] = frame->height >> 1;
+
+    avg[0] = tf->average + frame->offsets[0];
+    avg[1] = tf->average + frame->offsets[1];
+    avg[2] = tf->average + frame->offsets[2];
+
+    buf[0] = frame->buf + frame->offsets[0];
+    buf[1] = frame->buf + frame->offsets[1];
+    buf[2] = frame->buf + frame->offsets[2];
+}
+
 int quickdnr(VideoFilter *f, VideoFrame *frame)
 {  
-  ThisFilter *tf = (ThisFilter *)f; 
-  int y; 
+    ThisFilter *tf = (ThisFilter *)f; 
+    int thr1[3], thr2[3], height[3];
+    uint8_t *avg[3], *buf[3];
+    int i, y;
 
-  if (tf->first)
-  {
-    memcpy (tf->average, frame->buf, frame->size);
-    tf->first = 0;
-  }
-  for(y = 0;y < tf->Luma_size;y++) {
-    if (abs(tf->average[y] - frame->buf[y]) < tf->Luma_threshold1) {
-      tf->average[y] = (tf->average[y] + frame->buf[y]) >> 1;
-      frame->buf[y] = tf->average[y];
+    TF_VARS;
+
+    TF_START;
+
+    if (!init_avg(tf, frame))
+        return 0;
+
+    init_vars(tf, frame, thr1, thr2, height, avg, buf);
+
+    for (i = 0; i < 3; i++)
+    {
+        int sz = height[i] * frame->pitches[i];
+        for (y = 0; y < sz; y++)
+        {
+            if (abs(avg[i][y] - buf[i][y]) < thr1[i])
+                buf[i][y] = avg[i][y] = (avg[i][y] + buf[i][y]) >> 1;
+            else
+                avg[i][y] = buf[i][y];
+        }
     }
-    else tf->average[y] = frame->buf[y];
-  }
-  
-  for(y = tf->Luma_size;y < tf->UV_size;y++) {
-    if (abs(tf->average[y] - frame->buf[y]) < tf->Chroma_threshold1) {
-      tf->average[y] = (tf->average[y] + frame->buf[y]) >> 1;
-      frame->buf[y] = tf->average[y];
-    }
-    else tf->average[y] = frame->buf[y];
-  }
-  return 0;
+
+    TF_END(tf, "QuickDNR: ");
+ 
+    return 0;
 }
 
 int quickdnr2(VideoFilter *f, VideoFrame *frame)
 {  
-  ThisFilter *tf = (ThisFilter *)f; 
-  int y,t; 
-  TF_VARS;
+    ThisFilter *tf = (ThisFilter *)f; 
+    int thr1[3], thr2[3], height[3];
+    uint8_t *avg[3], *buf[3];
+    int i, y;
+
+    TF_VARS;
  
-  TF_START;
-  if (tf->first)
-  {
-    memcpy (tf->average, frame->buf, frame->size);
-    tf->first = 0;
-  }
+    TF_START;
 
-  for(y = 0; y < tf->Luma_size; y++) {
-    t = abs(tf->average[y] - frame->buf[y]);
-    if (t < tf->Luma_threshold1) {
-      if (t > tf->Luma_threshold2)
-	tf->average[y] = (tf->average[y] + frame->buf[y]) >> 1;
-      frame->buf[y] = tf->average[y];
+    if (!init_avg(tf, frame))
+        return 0;
+
+    init_vars(tf, frame, thr1, thr2, height, avg, buf);
+
+    for (i = 0; i < 3; i++)
+    {
+        int sz = height[i] * frame->pitches[i];
+        for (y = 0; y < sz; y++)
+        {
+            int t = abs(avg[i][y] - buf[i][y]);
+            if (t < thr1[i])
+            {
+                if (t > thr2[i])
+                    avg[i][y] = (avg[i][y] + buf[i][y]) >> 1;
+                buf[i][y] = avg[i][y];
+            }
+            else
+            {
+                avg[i][y] = buf[i][y];
+            }
+        }
     }
-    else tf->average[y] = frame->buf[y];
-  }
 
- for(y = tf->Luma_size; y < (tf->UV_size); y++) {
-    t = abs(tf->average[y] - frame->buf[y]);
-    if (t < tf->Chroma_threshold1) {
-      if (t > tf->Chroma_threshold2)
-	tf->average[y] = (tf->average[y] + frame->buf[y]) >> 1;
-      frame->buf[y] = tf->average[y];
-    }
-    else tf->average[y] = frame->buf[y];
- }
-
- TF_END(tf, "QuickDNR: ");
+    TF_END(tf, "QuickDNR2: ");
  
- return 0;
+    return 0;
 }
 
 #ifdef MMX
 
 int quickdnrMMX(VideoFilter *f, VideoFrame *frame)
 {
-  ThisFilter *tf = (ThisFilter *)f;
-  int y;
-  uint64_t *buf = (uint64_t *)frame->buf;
-  uint64_t *av_p = (uint64_t *)tf->average;
-  const uint64_t sign_convert = 0x8080808080808080LL;
-  TF_VARS;
+    ThisFilter *tf = (ThisFilter *)f;
+    const uint64_t sign_convert = 0x8080808080808080LL;
+    int thr1[3], thr2[3], height[3];
+    uint64_t *avg[3], *buf[3];
+    int i, y;
 
-  TF_START;
-  if (tf->first)
-  {
-    memcpy (tf->average, frame->buf, frame->size);
-    tf->first = 0;
-  }
+    TF_VARS;
 
-  /*
-    Commented out all the prefetches. These don't do anything when
-    you are processing an array with sequential accesses because the
-    processor automatically does a prefetchT0 in these cases. The
-    instruction is meant to be used to specify a different prefetch
-    cache level, or to prefetch non-sequental data.
+    TF_START;
+
+    if (!init_avg(tf, frame))
+        return 0;
+
+    init_vars(tf, frame, thr1, thr2, height, (uint8_t**) avg, (uint8_t**) buf);
+
+    /*
+      Removed all the prefetches. These don't do anything when
+      you are processing an array with sequential accesses because the
+      processor automatically does a prefetchT0 in these cases. The
+      instruction is meant to be used to specify a different prefetch
+      cache level, or to prefetch non-sequental data.
     
-    These prefetches are not available on all MMX processors so if
-    we wanted to use them we would need to test for a prefetch
-    capable processor before using them. -- dtk
-  */
+      These prefetches are not available on all MMX processors so if
+      we wanted to use them we would need to test for a prefetch
+      capable processor before using them. -- dtk
+    */
 
-  asm volatile(/*
-               "prefetch 64(%0)     \n\t" //Experimental values from athlon
-               "prefetch 64(%1)     \n\t"
-               "prefetch 64(%2)     \n\t"
-               -- pointless & breaks on some processors */
-	       "movq (%0), %%mm4    \n\t"
-	       "movq (%1), %%mm5    \n\t"
-	       "movq (%2), %%mm6    \n\t"
-	       : : "r" (&sign_convert), "r" (&tf->Luma_threshold_mask1), "r" (&tf->Chroma_threshold_mask1)
-	       );
+    asm volatile("emms\n\t");
 
-  for(y = 0;y < (tf->Luma_size);y += 8) { //Luma
-    asm volatile(/*
-                 "prefetchw 384(%0)    \n\t" //Experimental values from athlon
-		 "prefetch 384(%1)     \n\t"
-                 -- pointless & breaks on some processors */
+    asm volatile("movq (%0), %%mm4" : : "r" (&sign_convert));
 
-		 "movq (%0), %%mm0     \n\t" //av-p
-		 "movq (%1), %%mm1     \n\t" //buf
-		 "movq %%mm0, %%mm2    \n\t"
-		 "movq %%mm1, %%mm3    \n\t"
-		 "movq %%mm1, %%mm7    \n\t"
+    for (i = 0; i < 3; i++)
+    {
+        int sz = (height[i] * frame->pitches[i]) >> 3;
 
-		 "pcmpgtb %%mm0, %%mm1 \n\t" //1 if av greater
-		 "psubb %%mm0, %%mm3   \n\t" //mm3=buf-av
-		 "psubb %%mm7, %%mm0   \n\t" //mm0=av-buf
-		 "pand %%mm1, %%mm3    \n\t" //select buf
-		 "pandn %%mm0,%%mm1    \n\t" //select av
-		 "por %%mm1, %%mm3     \n\t" //mm3=abs()
+        if (0 == i)
+            asm volatile("movq (%0), %%mm5" : : "r" (&tf->Luma_threshold_mask1));
+        else
+            asm volatile("movq (%0), %%mm5" : : "r" (&tf->Chroma_threshold_mask1));
 
-		 "paddb %%mm4, %%mm3   \n\t" //hack! No proper unsigned mmx compares!
-		 "pcmpgtb %%mm5, %%mm3 \n\t" //compare buf with mask
+        for (y = 0; y < sz; y++)
+        {
+            asm volatile(
+            "movq (%0), %%mm0     \n\t" // avg[i]
+            "movq (%1), %%mm1     \n\t" // buf[i]
+            "movq %%mm0, %%mm2    \n\t"
+            "movq %%mm1, %%mm3    \n\t"
+            "movq %%mm1, %%mm7    \n\t"
 
-		 "pavgb %%mm7, %%mm2   \n\t"
-		 "pand %%mm3, %%mm7    \n\t"
-		 "pandn %%mm2,%%mm3    \n\t"
-		 "por %%mm7, %%mm3     \n\t"
-		 "movq %%mm3, (%0)     \n\t"
-		 "movq %%mm3, (%1)     \n\t"
-		 : : "r" (av_p), "r" (buf)
-		 );
-    buf++;
-    av_p++;
-  }
+            "pcmpgtb %%mm0, %%mm1 \n\t" // 1 if av greater
+            "psubb %%mm0, %%mm3   \n\t" // mm3=buf-av
+            "psubb %%mm7, %%mm0   \n\t" // mm0=av-buf
+            "pand %%mm1, %%mm3    \n\t" // select buf
+            "pandn %%mm0,%%mm1    \n\t" // select av
+            "por %%mm1, %%mm3     \n\t" // mm3=abs()
 
-  for(y = tf->Luma_size;y < tf->UV_size;y += 8) { //Chroma
-    asm volatile(/*
-                 "prefetchw 384(%0)    \n\t" //Experimental values for athlon
-		 "prefetch 384(%1)     \n\t"
-                 -- pointless & breaks on some processors */
+            "paddb %%mm4, %%mm3   \n\t" // hack! No proper unsigned mmx compares!
+            "pcmpgtb %%mm5, %%mm3 \n\t" // compare buf with mask
 
-		 "movq (%0), %%mm0     \n\t" //av-p
-		 "movq (%1), %%mm1     \n\t" //buf
-		 "movq %%mm0, %%mm2    \n\t"
-		 "movq %%mm1, %%mm3    \n\t"
-		 "movq %%mm1, %%mm7    \n\t"
+            "pavgb %%mm7, %%mm2   \n\t"
+            "pand %%mm3, %%mm7    \n\t"
+            "pandn %%mm2,%%mm3    \n\t"
+            "por %%mm7, %%mm3     \n\t"
+            "movq %%mm3, (%0)     \n\t"
+            "movq %%mm3, (%1)     \n\t"
+            : : "r" (avg[i]), "r" (buf[i])
+            );
+            buf[i]++;
+            avg[i]++;
+        }
+    }
 
-		 "pcmpgtb %%mm0, %%mm1 \n\t" //1 if av greater
-		 "psubb %%mm0, %%mm3   \n\t" //mm3=buf-av
-		 "psubb %%mm7, %%mm0   \n\t" //mm0=av-buf
-		 "pand %%mm1, %%mm3    \n\t" //select buf
-		 "pandn %%mm0,%%mm1    \n\t" //select av
-		 "por %%mm1, %%mm3     \n\t" //mm3=abs()
+    asm volatile("emms\n\t");
 
-		 "paddb %%mm4, %%mm3   \n\t" //hack! No proper unsigned mmx compares!
-		 "pcmpgtb %%mm6, %%mm3 \n\t" //compare buf with mask
+    // filter the leftovers from the mmx rutine
+    for (i = 0; i < 3; i++)
+    {
+        int thr1[3], thr2[3], height[3];
+        uint8_t *avg8[3], *buf8[3];
+        int end, beg;
 
-		 "pavgb %%mm7, %%mm2   \n\t"
-		 "pand %%mm3, %%mm7    \n\t"
-		 "pandn %%mm2,%%mm3    \n\t"
-		 "por %%mm7, %%mm3     \n\t"
-		 "movq %%mm3, (%0)     \n\t"
-		 "movq %%mm3, (%1)     \n\t"
-		 : : "r" (av_p), "r" (buf)
-		 );
-    buf++;
-    av_p++;
-  }
+        init_vars(tf, frame, thr1, thr2, height, avg8, buf8);
 
-  asm volatile("emms\n\t");
+        end = height[i] * frame->pitches[i];
+        beg = end & ~0x7;
 
-  TF_END(tf, "QuickDNR: ");
+        if (beg == end)
+            continue;
 
-  return 0;
+        for (y = beg; y < end; y++)
+        {
+            if (abs(avg8[i][y] - buf8[i][y]) < thr1[i])
+                buf8[i][y] = avg8[i][y] = (avg8[i][y] + buf8[i][y]) >> 1;
+            else
+                avg8[i][y] = buf8[i][y];
+        }
+    }
+
+    TF_END(tf, "QuickDNRmmx: ");
+
+    return 0;
 }
 
 
 int quickdnr2MMX(VideoFilter *f, VideoFrame *frame)
 {
-  ThisFilter *tf = (ThisFilter *)f;
-  int y;
-  uint64_t *buf = (uint64_t *)frame->buf;
-  uint64_t *av_p = (uint64_t *)tf->average;
-  const uint64_t sign_convert = 0x8080808080808080LL;
-  TF_VARS;
+    ThisFilter *tf = (ThisFilter *)f;
+    const uint64_t sign_convert = 0x8080808080808080LL;
+    int thr1[3], thr2[3], height[3];
+    uint64_t *avg[3], *buf[3];
+    int i, y;
+
+    TF_VARS;
   
-  TF_START;
+    TF_START;
  
-  if (tf->first)
-  {
-    memcpy (tf->average, frame->buf, frame->size);
-    tf->first = 0;
-  }
+    if (!init_avg(tf, frame))
+        return 0;
 
-  asm volatile(/*
-               "prefetch 64(%0)     \n\t" //Experimental values from athlon
-               "prefetch 64(%1)     \n\t"
-               -- pointless & breaks on some processors */
-	       "movq (%0), %%mm4    \n\t"
-	       "movq (%1), %%mm5    \n\t"
-	       : : "r" (&sign_convert), "r" (&tf->Luma_threshold_mask1)
-	       );
+    init_vars(tf, frame, thr1, thr2, height, (uint8_t**) avg, (uint8_t**) buf);
 
-  for(y = 0;y < (tf->Luma_size);y += 8) { //Luma
-    asm volatile(/*
-                 "prefetchw 384(%0)    \n\t" //Experimental values from athlon
-                 "prefetch 384(%1)     \n\t"
-                 -- pointless & breaks on some processors */
+    asm volatile("emms\n\t");
 
-		 "movq (%0), %%mm0     \n\t" //av-p
-		 "movq (%1), %%mm1     \n\t" //buf
-		 "movq %%mm0, %%mm2    \n\t"
-		 "movq %%mm1, %%mm3    \n\t"
-		 "movq %%mm1, %%mm6    \n\t"
-		 "movq %%mm1, %%mm7    \n\t"
+    asm volatile("movq (%0), %%mm4" : : "r" (&sign_convert));
 
-		 "pcmpgtb %%mm0, %%mm1 \n\t" //1 if av greater
-		 "psubb %%mm0, %%mm3   \n\t" //mm3=buf-av
-		 "psubb %%mm7, %%mm0   \n\t" //mm0=av-buf
-		 "pand %%mm1, %%mm3    \n\t" //select buf
-		 "pandn %%mm0,%%mm1    \n\t" //select av
-		 "por %%mm1, %%mm3     \n\t" //mm3=abs(buf-av)
+    for (i = 0; i < 3; i++)
+    {
+        int sz = (height[i] * frame->pitches[i]) >> 3;
 
-		 "paddb %%mm4, %%mm3   \n\t" //hack! No proper unsigned mmx compares!
-		 "pcmpgtb %%mm5, %%mm3 \n\t" //compare diff with mask
+        if (0 == i)
+            asm volatile("movq (%0), %%mm5" : : "r" (&tf->Luma_threshold_mask1));
+        else
+            asm volatile("movq (%0), %%mm5" : : "r" (&tf->Chroma_threshold_mask1));
+
+        for (y = 0; y < sz; y++)
+        {
+            uint64_t *mask2 = (0 == i) ?
+                &tf->Luma_threshold_mask2 : &tf->Chroma_threshold_mask2;
+
+            asm volatile(
+                "movq (%0), %%mm0     \n\t" // avg[i]
+                "movq (%1), %%mm1     \n\t" // buf[i]
+                "movq %%mm0, %%mm2    \n\t"
+                "movq %%mm1, %%mm3    \n\t"
+                "movq %%mm1, %%mm6    \n\t"
+                "movq %%mm1, %%mm7    \n\t"
+
+                "pcmpgtb %%mm0, %%mm1 \n\t" // 1 if av greater
+                "psubb %%mm0, %%mm3   \n\t" // mm3=buf-av
+                "psubb %%mm7, %%mm0   \n\t" // mm0=av-buf
+                "pand %%mm1, %%mm3    \n\t" // select buf
+                "pandn %%mm0,%%mm1    \n\t" // select av
+                "por %%mm1, %%mm3     \n\t" // mm3=abs(buf-av)
+
+                "paddb %%mm4, %%mm3   \n\t" // hack! No proper unsigned mmx compares!
+                "pcmpgtb %%mm5, %%mm3 \n\t" // compare diff with mask
 		 
-		 "movq %%mm2, %%mm0    \n\t" //reload registers
-		 "movq %%mm7, %%mm1    \n\t"
+                "movq %%mm2, %%mm0    \n\t" // reload registers
+                "movq %%mm7, %%mm1    \n\t"
 
-		 "pcmpgtb %%mm0, %%mm1 \n\t" //Secondary threshold
-		 "psubb %%mm0, %%mm6   \n\t"
-		 "psubb %%mm7, %%mm0   \n\t"
-		 "pand %%mm1, %%mm6    \n\t"
-		 "pandn %%mm0,%%mm1    \n\t"
-		 "por %%mm1, %%mm6     \n\t"
+                "pcmpgtb %%mm0, %%mm1 \n\t" // Secondary threshold
+                "psubb %%mm0, %%mm6   \n\t"
+                "psubb %%mm7, %%mm0   \n\t"
+                "pand %%mm1, %%mm6    \n\t"
+                "pandn %%mm0,%%mm1    \n\t"
+                "por %%mm1, %%mm6     \n\t"
 
-		 "paddb %%mm4, %%mm6   \n\t"
-		 "pcmpgtb (%2), %%mm6  \n\t"
+                "paddb %%mm4, %%mm6   \n\t"
+                "pcmpgtb (%2), %%mm6  \n\t"
 
-		 "movq %%mm2, %%mm0    \n\t"
+                "movq %%mm2, %%mm0    \n\t"
 
- 		 "pavgb %%mm7, %%mm2   \n\t"
+                "pavgb %%mm7, %%mm2   \n\t"
 
-		 "pand %%mm6, %%mm2    \n\t"
-		 "pandn %%mm0,%%mm6    \n\t"
-		 "por %%mm2, %%mm6     \n\t" // Combined new/keep average
+                "pand %%mm6, %%mm2    \n\t"
+                "pandn %%mm0,%%mm6    \n\t"
+                "por %%mm2, %%mm6     \n\t" // Combined new/keep average
 
-		 "pand %%mm3, %%mm7    \n\t"
-		 "pandn %%mm6,%%mm3    \n\t"
-		 "por %%mm7, %%mm3     \n\t" // Combined new/keep average
+                "pand %%mm3, %%mm7    \n\t"
+                "pandn %%mm6,%%mm3    \n\t"
+                "por %%mm7, %%mm3     \n\t" // Combined new/keep average
 
-		 "movq %%mm3, (%0)     \n\t"
-		 "movq %%mm3, (%1)     \n\t"
-		 : : "r" (av_p), "r" (buf), "r" (&tf->Luma_threshold_mask2)
-		 );
-    buf++;
-    av_p++;
-  }
+                "movq %%mm3, (%0)     \n\t"
+                "movq %%mm3, (%1)     \n\t"
+                : :
+                "r" (avg[i]),
+                "r" (buf[i]),
+                "r" (mask2)
+                );
+            buf[i]++;
+            avg[i]++;
+        }
+    }
 
-  asm volatile(/*
-               "prefetch 64(%0)     \n\t" //Experimental values from athlon
-               -- pointless & breaks on some processors */
-	       "movq (%1), %%mm5    \n\t"
-	       : : "r" (&sign_convert), "r" (&tf->Chroma_threshold_mask1)
-	       );
+    asm volatile("emms\n\t");
 
-  for(y = tf->Luma_size;y < tf->UV_size;y += 8) { //Chroma
-    asm volatile(/*
-                 "prefetchw 384(%0)    \n\t" //Experimental values from athlon
-                 "prefetch 384(%1)     \n\t"
-                 -- pointless & breaks on some processors */
+    // filter the leftovers from the mmx rutine
+    for (i = 0; i < 3; i++)
+    {
+        int thr1[3], thr2[3], height[3];
+        uint8_t *avg8[3], *buf8[3];
+        int end, beg;
 
-		 "movq (%0), %%mm0     \n\t" //av-p
-		 "movq (%1), %%mm1     \n\t" //buf
-		 "movq %%mm0, %%mm2    \n\t"
-		 "movq %%mm1, %%mm3    \n\t"
-		 "movq %%mm1, %%mm6    \n\t"
-		 "movq %%mm1, %%mm7    \n\t"
+        init_vars(tf, frame, thr1, thr2, height, avg8, buf8);
 
-		 "pcmpgtb %%mm0, %%mm1 \n\t" //1 if av greater
-		 "psubb %%mm0, %%mm3   \n\t" //mm3=buf-av
-		 "psubb %%mm7, %%mm0   \n\t" //mm0=av-buf
-		 "pand %%mm1, %%mm3    \n\t" //select buf
-		 "pandn %%mm0,%%mm1    \n\t" //select av
-		 "por %%mm1, %%mm3     \n\t" //mm3=abs(buf-av)
+        end = height[i] * frame->pitches[i];
+        beg = end & ~0x7;
 
-		 "paddb %%mm4, %%mm3   \n\t" //hack! No proper unsigned mmx compares!
-		 "pcmpgtb %%mm5, %%mm3 \n\t" //compare diff with mask
-		 
-		 "movq %%mm2, %%mm0    \n\t" //reload registers
-		 "movq %%mm7, %%mm1    \n\t"
+        if (beg == end)
+            continue;
 
-		 "pcmpgtb %%mm0, %%mm1 \n\t" //Secondary threshold
-		 "psubb %%mm0, %%mm6   \n\t"
-		 "psubb %%mm7, %%mm0   \n\t"
-		 "pand %%mm1, %%mm6    \n\t"
-		 "pandn %%mm0,%%mm1    \n\t"
-		 "por %%mm1, %%mm6     \n\t"
+        for (y = beg; y < end; y++)
+        {
+            int t = abs(avg8[i][y] - buf8[i][y]);
+            if (t < thr1[i])
+            {
+                if (t > thr2[i])
+                    avg8[i][y] = (avg8[i][y] + buf8[i][y]) >> 1;
+                buf8[i][y] = avg8[i][y];
+            }
+            else
+            {
+                avg8[i][y] = buf8[i][y];
+            }
+        }
+    }
 
-		 "paddb %%mm4, %%mm6   \n\t"
-		 "pcmpgtb (%2), %%mm6  \n\t"
+    TF_END(tf, "QuickDNR2mmx: ");
 
-		 "movq %%mm2, %%mm0    \n\t"
-
- 		 "pavgb %%mm7, %%mm2   \n\t"
-
-		 "pand %%mm6, %%mm2    \n\t"
-		 "pandn %%mm0,%%mm6    \n\t"
-		 "por %%mm2, %%mm6     \n\t" //Combined new/keep average
-
-		 "pand %%mm3, %%mm7    \n\t"
-		 "pandn %%mm6,%%mm3    \n\t"
-		 "por %%mm7, %%mm3     \n\t" //Combined new/keep average
-
-		 "movq %%mm3, (%0)     \n\t"
-		 "movq %%mm3, (%1)     \n\t"
-		 : : "r" (av_p), "r" (buf), "r" (&tf->Chroma_threshold_mask2)
-		 );
-    buf++;
-    av_p++;
-  }
-
-  asm volatile("emms\n\t");
-
-  TF_END(tf, "QuickDNR: ");
-
-  return 0;
+    return 0;
 }
 #endif /* MMX */
 
 void cleanup(VideoFilter *vf)
 {
-  ThisFilter *tf;
-  tf = (ThisFilter *)vf;
-  free(tf->average);
+    ThisFilter *tf = (ThisFilter*) vf;
+
+    if (tf->average)
+        free(tf->average);
 }
 
 VideoFilter *new_filter(VideoFrameType inpixfmt, VideoFrameType outpixfmt, 
                         int *width, int *height, char *options)
 {
-  unsigned int Param1, Param2, Param3, Param4;
-  int i, double_threshold = 1;
-  ThisFilter *filter;
+    unsigned int Param1, Param2, Param3, Param4;
+    int i, double_threshold = 1;
+    ThisFilter *filter;
 
-  if (inpixfmt != FMT_YV12 || outpixfmt != FMT_YV12)
+    (void) width;
+    (void) height;
+
+    if (inpixfmt != FMT_YV12 || outpixfmt != FMT_YV12)
     {
-      fprintf(stderr,"QuickDNR: attempt to initialize with unsupported format\n");
-      return NULL;
+        fprintf(stderr, "QuickDNR: attempt to initialize "
+                "with unsupported format\n");
+        return NULL;
     }
 
-  filter = malloc(sizeof(ThisFilter));
-
-  if (filter == NULL)
+    filter = malloc(sizeof(ThisFilter));
+    if (filter == NULL)
     {
-      fprintf(stderr,"Couldn't allocate memory for filter\n");
-      return NULL;
+        fprintf(stderr, "Couldn't allocate memory for filter\n");
+        return NULL;
     }
 
-  filter->average=malloc(sizeof(uint8_t) * (*width) * 3 / 2 * (*height));
-  if (filter->average == NULL)
-    {
-      fprintf(stderr,"Couldn't allocate memory for DNR buffer\n");
-      free(filter);
-      return NULL;
-    }
-  filter->Luma_size = *width * *height;
-  filter->UV_size = *width * *height / 2 + filter->Luma_size;
-  
-  if (options)
-    switch(sscanf(options, "%u:%u:%u:%u", &Param1, &Param2, &Param3, &Param4)) {
-    case 1:
-      //These might be better as logarithmic if this gets used a lot.
-      filter->Luma_threshold1 = ((uint8_t) Param1) * 40 / 255;
-      filter->Luma_threshold2 = ((uint8_t)  Param1) * 4/255 > 2 ? 2 : ((uint8_t)  Param1) * 4/255;
-      filter->Chroma_threshold1 = ((uint8_t) Param1) * 80 / 255;
-      filter->Chroma_threshold2 = ((uint8_t)  Param1) * 8/255 > 4 ? 4 : ((uint8_t)  Param1) * 8/255;
-      double_threshold = 1; 
-      break;
-    case 2:
-      filter->Luma_threshold1 = (uint8_t) Param1;
-      filter->Chroma_threshold1 = (uint8_t) Param2;
-      double_threshold = 0;
-      break;
-    case 4:
-      filter->Luma_threshold1 = (uint8_t) Param1;
-      filter->Luma_threshold2 = (uint8_t) Param2;
-      filter->Chroma_threshold1 = (uint8_t) Param3;
-      filter->Chroma_threshold2 = (uint8_t) Param4;
-      double_threshold = 1;
-      break;
-    default:
-      filter->Luma_threshold1 = LUMA_THRESHOLD1_DEFAULT;
-      filter->Chroma_threshold1 = CHROMA_THRESHOLD1_DEFAULT;
-      filter->Luma_threshold2 = LUMA_THRESHOLD2_DEFAULT;
-      filter->Chroma_threshold2 = CHROMA_THRESHOLD2_DEFAULT;
-      double_threshold = 1;
-      break;
-    }
-  else {
-    filter->Luma_threshold1 = LUMA_THRESHOLD1_DEFAULT;
+    bzero(filter, sizeof(ThisFilter));
+    filter->vf.cleanup        = &cleanup;
+    filter->Luma_threshold1   = LUMA_THRESHOLD1_DEFAULT;
     filter->Chroma_threshold1 = CHROMA_THRESHOLD1_DEFAULT;
-    filter->Luma_threshold2 = LUMA_THRESHOLD2_DEFAULT;
+    filter->Luma_threshold2   = LUMA_THRESHOLD2_DEFAULT;
     filter->Chroma_threshold2 = CHROMA_THRESHOLD2_DEFAULT;
-    double_threshold = 1;
-  }
+    double_threshold          = 1;
+
+    if (options)
+    {
+        int ret = sscanf(options, "%u:%u:%u:%u",
+                         &Param1, &Param2, &Param3, &Param4);
+        switch (ret)
+        {
+            case 1:
+                //These might be better as logarithmic if this gets used a lot.
+                filter->Luma_threshold1   = ((uint8_t) Param1) * 40 / 255;
+                filter->Luma_threshold2   = ((uint8_t) Param1) * 4/255 > 2 ?
+                    2 : ((uint8_t) Param1) * 4/255;
+                filter->Chroma_threshold1 = ((uint8_t) Param1) * 80 / 255;
+                filter->Chroma_threshold2 = ((uint8_t) Param1) * 8/255 > 4 ?
+                    4 : ((uint8_t) Param1) * 8/255;
+                break;
+
+            case 2:
+                filter->Luma_threshold1   = (uint8_t) Param1;
+                filter->Chroma_threshold1 = (uint8_t) Param2;
+                double_threshold = 0;
+                break;
+
+            case 4:
+                filter->Luma_threshold1   = (uint8_t) Param1;
+                filter->Luma_threshold2   = (uint8_t) Param2;
+                filter->Chroma_threshold1 = (uint8_t) Param3;
+                filter->Chroma_threshold2 = (uint8_t) Param4;
+                break;
+
+            default:
+                break;
+        }
+    }
+
+    filter->vf.filter  = (double_threshold) ? &quickdnr2 : &quickdnr;
 
 #ifdef MMX
-  if (mm_support() > MM_MMXEXT) {
-    if (double_threshold) filter->vf.filter = &quickdnr2MMX;
-    else filter->vf.filter = &quickdnrMMX;
-    
-    filter->Luma_threshold_mask1 = 0;
-    filter->Chroma_threshold_mask1 = 0;
-    filter->Luma_threshold_mask2 = 0;
-    filter->Chroma_threshold_mask2 = 0;
-    
-    for(i = 0;i < 8;i++) {
-      // 8 sign-shifted bytes!
-      filter->Luma_threshold_mask1 = (filter->Luma_threshold_mask1 << 8)\
-	+ ((filter->Luma_threshold1 > 0x80) ? (filter->Luma_threshold1 - 0x80)
-	   : (filter->Luma_threshold1 + 0x80));
-      filter->Chroma_threshold_mask1 = (filter->Chroma_threshold_mask1 << 8)\
-	+ ((filter->Chroma_threshold1 > 0x80) ? (filter->Chroma_threshold1 - 0x80)
-	   :  (filter->Chroma_threshold1 + 0x80));
-      filter->Luma_threshold_mask2 = (filter->Luma_threshold_mask2 << 8)\
-	+ ((filter->Luma_threshold2 > 0x80) ? (filter->Luma_threshold2 - 0x80)
-	   : (filter->Luma_threshold2 + 0x80));
-      filter->Chroma_threshold_mask2 = (filter->Chroma_threshold_mask2 << 8)\
-	+ ((filter->Chroma_threshold2 > 0x80) ? (filter->Chroma_threshold2 - 0x80)
-	   :  (filter->Chroma_threshold2 + 0x80));
+    if (mm_support() > MM_MMXEXT)
+    {
+        filter->vf.filter = (double_threshold) ? &quickdnr2MMX : &quickdnrMMX;
+        for (i = 0; i < 8; i++)
+        {
+            // 8 sign-shifted bytes!
+            filter->Luma_threshold_mask1 =
+                (filter->Luma_threshold_mask1 << 8) +
+                ((filter->Luma_threshold1 > 0x80) ?
+                 (filter->Luma_threshold1 - 0x80) :
+                 (filter->Luma_threshold1 + 0x80));
+
+            filter->Chroma_threshold_mask1 =
+                (filter->Chroma_threshold_mask1 << 8) +
+                ((filter->Chroma_threshold1 > 0x80) ?
+                 (filter->Chroma_threshold1 - 0x80) :
+                 (filter->Chroma_threshold1 + 0x80));
+
+            filter->Luma_threshold_mask2 =
+                (filter->Luma_threshold_mask2 << 8) +
+                ((filter->Luma_threshold2 > 0x80) ?
+                 (filter->Luma_threshold2 - 0x80) :
+                 (filter->Luma_threshold2 + 0x80));
+
+            filter->Chroma_threshold_mask2 =
+                (filter->Chroma_threshold_mask2 << 8) +
+                ((filter->Chroma_threshold2 > 0x80) ?
+                 (filter->Chroma_threshold2 - 0x80) :
+                 (filter->Chroma_threshold2 + 0x80));
+        }
     }
-
-  }
-  else
 #endif
-  if (double_threshold) filter->vf.filter = &quickdnr2;
-  else filter->vf.filter = &quickdnr;
 
-  filter->first = 1;
-  TF_INIT(filter);
+    TF_INIT(filter);
   
 #ifdef QUICKDNR_DEBUG
-  fprintf(stderr,"DNR Loaded:%X Params: %u %u Luma1: %d %X%X Luma2: %X%X Chroma1: %d %X%X Chroma2: %X%X\n",
-	  mm_support(),Param1, Param2, filter->Luma_threshold1, ((int*)&filter->Luma_threshold_mask1)[1],
-	  ((int*)&filter->Luma_threshold_mask1)[0], ((int*)&filter->Luma_threshold_mask2)[1],
-	  ((int*)&filter->Luma_threshold_mask2)[0], filter->Chroma_threshold1,
-	  ((int*)&filter->Chroma_threshold_mask1)[1], ((int*)&filter->Chroma_threshold_mask1)[0],
-	  ((int*)&filter->Chroma_threshold_mask2)[1], ((int*)&filter->Chroma_threshold_mask2)[0]
-	  );
+    fprintf(stderr, "DNR Loaded: 0x%X Params: %u %u \n"
+            "Luma1:   %3d 0x%X%X  Luma2:   0x%X%X\n"
+            "Chroma1: %3d %X%X    Chroma2: 0x%X%X\n",
+            mm_support(), Param1, Param2, filter->Luma_threshold1,
+            ((int*)&filter->Luma_threshold_mask1)[1],
+            ((int*)&filter->Luma_threshold_mask1)[0],
+            ((int*)&filter->Luma_threshold_mask2)[1],
+            ((int*)&filter->Luma_threshold_mask2)[0],
+            filter->Chroma_threshold1,
+            ((int*)&filter->Chroma_threshold_mask1)[1],
+            ((int*)&filter->Chroma_threshold_mask1)[0],
+            ((int*)&filter->Chroma_threshold_mask2)[1],
+            ((int*)&filter->Chroma_threshold_mask2)[0]
+        );
 
-  fprintf(stderr, "Options:%d:%d:%d:%d\n",filter->Luma_threshold1, filter->Luma_threshold2, filter->Chroma_threshold1,  filter->Chroma_threshold2);
+    fprintf(stderr, "Options:%d:%d:%d:%d\n",
+            filter->Luma_threshold1, filter->Luma_threshold2,
+            filter->Chroma_threshold1, filter->Chroma_threshold2);
 #endif
 
-  filter->vf.cleanup = &cleanup;
-  return (VideoFilter *)filter;
+    return (VideoFilter*) filter;
 }
-
-
-
 
 static FmtConv FmtList[] = 
 {
-  { FMT_YV12, FMT_YV12 },
-  FMT_NULL
+    { FMT_YV12, FMT_YV12 },
+    FMT_NULL
 };
 
 FilterInfo filter_table[] = 
 {
-  {
-    symbol:     "new_filter",
-    name:       "quickdnr",
-    descript:   "removes noise with a fast single/double thresholded average filter",
-    formats:    FmtList,
-    libname:    NULL
-  },
-  FILT_NULL
+    {
+        symbol:     "new_filter",
+        name:       "quickdnr",
+        descript:   "removes noise with a fast single/double thresholded average filter",
+        formats:    FmtList,
+        libname:    NULL
+    },
+    FILT_NULL
 };
