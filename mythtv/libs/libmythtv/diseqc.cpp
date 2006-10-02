@@ -1984,7 +1984,7 @@ bool DiSEqCDevLNB::Store(void) const
             "    lnb_lof_switch  = :LOFSW,   "
             "    lnb_lof_lo      = :LOFLO,   "
             "    lnb_lof_hi      = :LOFHI,   "
-            "    lnb_pol_inv     = :POLINV "
+            "    lnb_pol_inv     = :POLINV,  "
             "    cmd_repeat      = :REPEAT   "
             "WHERE diseqcid = :DEVID");
     }
