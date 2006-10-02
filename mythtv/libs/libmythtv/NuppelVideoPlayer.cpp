@@ -3645,10 +3645,10 @@ void NuppelVideoPlayer::SetWatched(bool forceWatched)
         numFrames = (m_playbackinfo->endts.toTime_t() -
                     m_playbackinfo->recstartts.toTime_t()) * video_frame_rate;
 
-    int offset = (int) round(0.2 * (numFrames / video_frame_rate));
+    int offset = (int) round(0.14 * (numFrames / video_frame_rate));
 
-    if (offset < 300)
-        offset = 300; // 5 Minutes Min
+    if (offset < 240)
+        offset = 240; // 4 Minutes Min
     else if (offset > 720)
         offset = 720; // 12 Minutes Max
 

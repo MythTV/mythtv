@@ -1858,34 +1858,38 @@ long long ProgramInfo::GetBookmark(void) const
  */
 void ProgramInfo::SetWatchedFlag(bool watchedFlag) const
 {
-    MSqlQuery query(MSqlQuery::InitCon());
 
-    query.prepare("UPDATE recorded"
-                  " SET watched = :WATCHEDFLAG"
-                  " WHERE chanid = :CHANID"
-                  " AND starttime = :STARTTIME ;");
-    query.bindValue(":CHANID", chanid);
-    query.bindValue(":STARTTIME", recstartts);
+    if (!isVideo)
+    {
+        MSqlQuery query(MSqlQuery::InitCon());
 
-    if (watchedFlag)
-        query.bindValue(":WATCHEDFLAG", 1);
-    else
-        query.bindValue(":WATCHEDFLAG", 0);
+        query.prepare("UPDATE recorded"
+                    " SET watched = :WATCHEDFLAG"
+                    " WHERE chanid = :CHANID"
+                    " AND starttime = :STARTTIME ;");
+        query.bindValue(":CHANID", chanid);
+        query.bindValue(":STARTTIME", recstartts);
 
-    if (!query.exec() || !query.isActive())
-        MythContext::DBError("Set watched flag", query);
+        if (watchedFlag)
+            query.bindValue(":WATCHEDFLAG", 1);
+        else
+            query.bindValue(":WATCHEDFLAG", 0);
 
-    query.prepare("UPDATE record SET last_delete = :TIME "
-                  "WHERE recordid = :RECORDID");
-    query.bindValue(":RECORDID", recordid);
+        if (!query.exec() || !query.isActive())
+            MythContext::DBError("Set watched flag", query);
 
-    if (watchedFlag)
-        query.bindValue(":TIME", QDateTime::currentDateTime());
-    else
-        query.bindValue(":TIME", "0000-00-00T00:00:00");
+        query.prepare("UPDATE record SET last_delete = :TIME "
+                    "WHERE recordid = :RECORDID");
+        query.bindValue(":RECORDID", recordid);
 
-    if (!query.exec() || !query.isActive())
-        MythContext::DBError("Update last_delete", query);
+        if (watchedFlag)
+            query.bindValue(":TIME", QDateTime::currentDateTime());
+        else
+            query.bindValue(":TIME", "0000-00-00T00:00:00");
+
+        if (!query.exec() || !query.isActive())
+            MythContext::DBError("Update last_delete", query);
+    }
 }
 
 /** \fn ProgramInfo::IsEditing(void) const

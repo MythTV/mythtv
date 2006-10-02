@@ -1615,6 +1615,8 @@ void TV::RunTV(void)
             {
                 ChangeState(RemovePlaying(internalState));
                 endOfRecording = true;
+                if (nvp && gContext->GetNumSetting("AutomaticSetWatched", 0))
+                    nvp->SetWatched();
                 VERBOSE(VB_PLAYBACK, LOC_ERR + "nvp->IsPlaying() timed out");
             }
         }
@@ -1627,6 +1629,7 @@ void TV::RunTV(void)
                 GetOSD()->TurnDialogOff(dialogname);
                 usleep(1000);
             }
+
             ChangeState(kState_None);
             exitPlayer = false;
         }
@@ -2514,6 +2517,8 @@ void TV::ProcessKeypress(QKeyEvent *e)
             {
                 if (nvp && gContext->GetNumSetting("PlaybackExitPrompt") == 2)
                     nvp->SetBookmark();
+                if (nvp && gContext->GetNumSetting("AutomaticSetWatched", 0))
+                    nvp->SetWatched();
                 exitPlayer = true;
                 wantsToQuit = true;
             }
@@ -2902,6 +2907,8 @@ void TV::processNetworkControlCommand(QString command)
     {
         if (nvp)
             nvp->SetBookmark();
+        if (nvp && gContext->GetNumSetting("AutomaticSetWatched", 0))
+            nvp->SetWatched();
         exitPlayer = true;
         wantsToQuit = true;
     }
@@ -5172,6 +5179,8 @@ void TV::customEvent(QCustomEvent *e)
             int exitprompt = gContext->GetNumSetting("PlaybackExitPrompt");
             if (exitprompt == 1 || exitprompt == 2)
                 nvp->SetBookmark();
+            if (nvp && gContext->GetNumSetting("AutomaticSetWatched", 0))
+                    nvp->SetWatched();
             wantsToQuit = true;
             exitPlayer = true;
         }
