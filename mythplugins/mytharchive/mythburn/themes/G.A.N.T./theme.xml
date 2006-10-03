@@ -108,6 +108,7 @@
                 <textnormal x="520" y="305" w="145" h="28" value="%chapternumber. %chaptertime" font="0" colour="white" align="center"/>
                 <textselected x="520" y="305" w="145" h="28" value="%chapternumber. %chaptertime" font="0" colour="orange" align="center"/>
             </button>
+            <titlemenu filename="previous.png" x="336" y="490" w="48" h="48" mask="previous_mask.png" static="True"/>
         </chapter>
 	</submenu>
 

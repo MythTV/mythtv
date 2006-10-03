@@ -75,6 +75,7 @@
 		<chapter>
 			<graphic filename="%chapterthumbnail" x="520" y="205" w="145" h="110" static="False"/>
             <text x="520" y="320" w="145" h="28" value="%chapternumber. %chaptertime" font="0" colour="yellow" static="False" align="center"/>
+            <titlemenu filename="previous.png" x="336" y="490" w="48" h="48" mask="previous_mask.png" static="True"/>
         </chapter>
 	</submenu>
 </mythburntheme>

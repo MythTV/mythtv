@@ -31,7 +31,7 @@
 #******************************************************************************
 
 # version of script - change after each update
-VERSION="0.1.20060930-3"
+VERSION="0.1.20061003-1"
 
 
 ##You can use this debug flag when testing out new themes
@@ -1861,6 +1861,17 @@ def createDVDAuthorXML(screensize, numberofitems):
                     del button
                     x+=1
 
+                #add the titlemenu button if required
+                submenunode = themeDOM.getElementsByTagName("submenu")
+                submenunode = submenunode[0]
+                titlemenunodes = submenunode.getElementsByTagName("titlemenu")
+                if titlemenunodes.length > 0:
+                    button = dvddom.createElement("button")
+                    button.setAttribute("name","titlemenu")
+                    button.appendChild(dvddom.createTextNode("{jump vmgm menu;}"))
+                    mymenupgc.appendChild(button)
+                    del button
+
             titles = dvddom.createElement("titles")
             titleset.appendChild(titles)
 
@@ -2257,6 +2268,36 @@ def drawThemeItem(page, itemsonthispage, itemnum, menuitem, bgimage, draw,
 
                 button = spumuxdom.createElement("button")
                 button.setAttribute("name","next")
+                button.setAttribute("x0","%s" % getScaledAttribute(node, "x"))
+                button.setAttribute("y0","%s" % getScaledAttribute(node, "y"))
+                button.setAttribute("x1","%s" % (getScaledAttribute(node, "x") + getScaledAttribute(node, "w")))
+                button.setAttribute("y1","%s" % (getScaledAttribute(node, "y") + getScaledAttribute(node, "h")))
+                spunode.appendChild(button)
+
+        elif node.nodeName=="titlemenu":
+            if itemnum < numberofitems:
+                #Overlay next graphic button onto background
+                imagefilename = getThemeFile(themeName, node.attributes["filename"].value)
+                if not doesFileExist(imagefilename):
+                    fatalError("Cannot find image for titlemenu button (%s)." % imagefilename)
+                maskimagefilename = getThemeFile(themeName, node.attributes["mask"].value)
+                if not doesFileExist(maskimagefilename):
+                    fatalError("Cannot find mask image for titlemenu button (%s)." % maskimagefilename)
+
+                picture = Image.open(imagefilename,"r").resize((getScaledAttribute(node, "w"), getScaledAttribute(node, "h")))
+                picture = picture.convert("RGBA")
+                bgimage.paste(picture, (getScaledAttribute(node, "x"), getScaledAttribute(node, "y")), picture)
+                del picture
+                write( "Added titlemenu button image %s " % imagefilename)
+
+                picture=Image.open(maskimagefilename,"r").resize((getScaledAttribute(node, "w"), getScaledAttribute(node, "h")))
+                picture=picture.convert("RGBA")
+                bgimagemask.paste(picture, (getScaledAttribute(node, "x"), getScaledAttribute(node, "y")), picture)
+                del picture
+                write( "Added titlemenu button mask image %s" % imagefilename)
+
+                button = spumuxdom.createElement("button")
+                button.setAttribute("name","titlemenu")
                 button.setAttribute("x0","%s" % getScaledAttribute(node, "x"))
                 button.setAttribute("y0","%s" % getScaledAttribute(node, "y"))
                 button.setAttribute("x1","%s" % (getScaledAttribute(node, "x") + getScaledAttribute(node, "w")))
