@@ -35,6 +35,7 @@
 #include "util-x11.h"    // for OpenGL VSync
 
 #ifdef USING_OPENGL_VSYNC
+#define GLX_GLXEXT_PROTOTYPES
 #define XMD_H 1
 #include <GL/glx.h>
 #include <GL/gl.h>
