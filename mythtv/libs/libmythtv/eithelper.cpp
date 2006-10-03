@@ -271,16 +271,29 @@ void EITHelper::AddEIT(const DVBEventInformationTable *eit)
                     list, DescriptorID::short_event, languagePreferences);
 
             unsigned char enc_ch[1] = { 0x05 };
-            const unsigned char *enc =
-                (fix & EITFixUp::kEFixPro7Sat) ? enc_ch : NULL;
+            unsigned char enc_bev[3] = { 0x10, 0x00, 0x01 };
+            int enc_len = 0;
+            const unsigned char *enc = NULL;
+            if ( fix & EITFixUp::kEFixPro7Sat )
+            {
+                enc = enc_ch;
+                enc_len = sizeof(enc_ch);
+            }
+            // Is BellExpressVU?  Use an encoding over-ride of
+            // ISO 8859-1 (Latin1)
+            if ( fix & EITFixUp::kEFixBell )
+            {
+              enc = enc_bev;
+              enc_len = sizeof(enc_bev);
+            }
 
             if (bestShortEvent)
             {
                 ShortEventDescriptor sed(bestShortEvent);
                 if (enc)
                 {
-                    title    = sed.EventName(enc, 1);
-                    subtitle = sed.Text(enc, 1);
+                    title    = sed.EventName(enc, enc_len);
+                    subtitle = sed.Text(enc, enc_len);
                 }
                 else
                 {
@@ -304,7 +317,7 @@ void EITHelper::AddEIT(const DVBEventInformationTable *eit)
 
                 ExtendedEventDescriptor eed(bestExtendedEvents[j]);
                 if (enc)
-                    description += eed.Text(enc, 1);
+                    description += eed.Text(enc, enc_len);
                 else
                     description += eed.Text();
             }
@@ -488,18 +501,18 @@ static uint get_chan_id_from_db(uint sourceid, uint serviceid,
 static void init_fixup(QMap<uint64_t,uint> &fix)
 {
     // transport_id<<32 | netword_id<<16 | service_id
-    fix[  256 << 16] = EITFixUp::kFixBell;
-    fix[  257 << 16] = EITFixUp::kFixBell;
-    fix[ 4100 << 16] = EITFixUp::kFixBell;
-    fix[ 4101 << 16] = EITFixUp::kFixBell;
-    fix[ 4102 << 16] = EITFixUp::kFixBell;
-    fix[ 4103 << 16] = EITFixUp::kFixBell;
-    fix[ 4104 << 16] = EITFixUp::kFixBell;
-    fix[ 4105 << 16] = EITFixUp::kFixBell;
-    fix[ 4106 << 16] = EITFixUp::kFixBell;
-    fix[ 4107 << 16] = EITFixUp::kFixBell;
-    fix[ 4097 << 16] = EITFixUp::kFixBell;
-    fix[ 4098 << 16] = EITFixUp::kFixBell;
+    fix[  256 << 16] = EITFixUp::kEFixBell | EITFixUp::kFixBell;
+    fix[  257 << 16] = EITFixUp::kEFixBell | EITFixUp::kFixBell;
+    fix[ 4100 << 16] = EITFixUp::kEFixBell | EITFixUp::kFixBell;
+    fix[ 4101 << 16] = EITFixUp::kEFixBell | EITFixUp::kFixBell;
+    fix[ 4102 << 16] = EITFixUp::kEFixBell | EITFixUp::kFixBell;
+    fix[ 4103 << 16] = EITFixUp::kEFixBell | EITFixUp::kFixBell;
+    fix[ 4104 << 16] = EITFixUp::kEFixBell | EITFixUp::kFixBell;
+    fix[ 4105 << 16] = EITFixUp::kEFixBell | EITFixUp::kFixBell;
+    fix[ 4106 << 16] = EITFixUp::kEFixBell | EITFixUp::kFixBell;
+    fix[ 4107 << 16] = EITFixUp::kEFixBell | EITFixUp::kFixBell;
+    fix[ 4097 << 16] = EITFixUp::kEFixBell | EITFixUp::kFixBell;
+    fix[ 4098 << 16] = EITFixUp::kEFixBell | EITFixUp::kFixBell;
 
     fix[ 9018 << 16] = EITFixUp::kFixUK;
 

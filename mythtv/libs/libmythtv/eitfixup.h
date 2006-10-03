@@ -31,6 +31,7 @@ class EITFixUp
 
         // Early fixups
         kEFixPro7Sat   = 0x0100,
+        kEFixBell      = 0x0200,
     };
 
     EITFixUp();
