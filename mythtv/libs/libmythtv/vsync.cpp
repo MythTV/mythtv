@@ -35,7 +35,6 @@
 #include "util-x11.h"    // for OpenGL VSync
 
 #ifdef USING_OPENGL_VSYNC
-#define GLX_GLXEXT_PROTOTYPES
 #define XMD_H 1
 #include <GL/glx.h>
 #include <GL/gl.h>
@@ -437,12 +436,64 @@ void nVidiaVideoSync::AdvanceTrigger(void)
     UpdateNexttrigger();
 }
 
+#ifdef USING_OPENGL_VSYNC
+class OpenGLVideoSyncPrivate
+{
+  public:
+    OpenGLVideoSyncPrivate()
+    {
+        m_glXGetVideoSyncSGI = (PFNGLXGETVIDEOSYNCSGIPROC)
+                glXGetProcAddress("glXGetVideoSyncSGI");
+        m_glXWaitVideoSyncSGI = (PFNGLXWAITVIDEOSYNCSGIPROC)
+                glXGetProcAddress("glXWaitVideoSyncSGI");
+    }
+
+    bool funcsLoaded()
+    {
+        return m_glXGetVideoSyncSGI && m_glXWaitVideoSyncSGI;
+    }
+
+  public:
+    int glXGetVideoSyncSGI(unsigned int *count)
+    {
+        return m_glXGetVideoSyncSGI(count);
+    }
+
+    int glXWaitVideoSyncSGI(int divisor, int remainder, unsigned int *count)
+    {
+        return m_glXWaitVideoSyncSGI(divisor, remainder, count);
+    }
+
+  private:
+    __GLXextFuncPtr glXGetProcAddress(const char * const procName)
+    {
+        __GLXextFuncPtr ret = glXGetProcAddressARB((const GLubyte *) procName);
+
+        if (!ret)
+        {
+            VERBOSE(VB_PLAYBACK,
+                    QString("Error: glXGetProcAddressARB unable to find %1")
+                    .arg(procName));
+        }
+
+        return ret;
+    }
+
+  private:
+    PFNGLXGETVIDEOSYNCSGIPROC m_glXGetVideoSyncSGI;
+    PFNGLXWAITVIDEOSYNCSGIPROC m_glXWaitVideoSyncSGI;
+};
+#endif // USING_OPENGL_VSYNC
+
 OpenGLVideoSync::OpenGLVideoSync(VideoOutput *video_output,
                                  int frame_interval, int refresh_interval,
                                  bool interlaced)
     : VideoSync(video_output, frame_interval, refresh_interval, interlaced),
-      m_drawable(0), m_context(0)
+      m_drawable(0), m_context(0), m_imp(0)
 {
+#ifdef USING_OPENGL_VSYNC
+    m_imp = new OpenGLVideoSyncPrivate;
+#endif // USING_OPENGL_VSYNC
 }
 
 OpenGLVideoSync::~OpenGLVideoSync()
@@ -457,6 +508,7 @@ OpenGLVideoSync::~OpenGLVideoSync()
         if (m_drawable)
             X11S(XDestroyWindow(vo->XJ_disp, m_drawable));
     }
+    delete m_imp;
 #endif /* USING_OPENGL_VSYNC */
 }
 
@@ -501,6 +553,12 @@ bool OpenGLVideoSync::TryInit(void)
         VERBOSE(VB_PLAYBACK, "OpenGLVideoSync: GLX Video Sync"
                 " extension not present.");
         return false;
+    }
+
+    if (!m_imp->funcsLoaded())
+    {
+       VERBOSE(VB_PLAYBACK, QString("GL sync functions not found"));
+       return false;
     }
 
     int attribList[] = {GLX_RGBA, 
@@ -552,7 +610,7 @@ bool OpenGLVideoSync::TryInit(void)
     if (ret != False)
     {
         unsigned int count;
-        X11S(ret = glXGetVideoSyncSGI(&count));
+        X11S(ret = m_imp->glXGetVideoSyncSGI(&count));
         if (ret == 0)
         {
             VERBOSE(VB_PLAYBACK, "Using OpenGLVideoSync");
@@ -631,9 +689,9 @@ void OpenGLVideoSync::Start(void)
 
     // Wait for a refresh so we start out synched
     unsigned int count;
-    err = glXGetVideoSyncSGI(&count);
+    err = m_imp->glXGetVideoSyncSGI(&count);
     checkGLSyncError("OpenGLVideoSync::Start(): Frame Number Query", err);
-    err = glXWaitVideoSyncSGI(2, (count+1)%2 ,&count);
+    err = m_imp->glXWaitVideoSyncSGI(2, (count+1)%2 ,&count);
     checkGLSyncError("OpenGLVideoSync::Start(): A/V Sync", err);
 
     // Initialize next trigger 
@@ -649,13 +707,13 @@ void OpenGLVideoSync::WaitForFrame(int sync_delay)
     OffsetTimeval(m_nexttrigger, sync_delay);
 
     unsigned int frameNum = 0;
-    int err = glXGetVideoSyncSGI(&frameNum);
+    int err = m_imp->glXGetVideoSyncSGI(&frameNum);
     checkGLSyncError("Frame Number Query", err);
 
     // Always sync to the next retrace execpt when we are very late.
     if ((m_delay = CalcDelay()) > -(m_refresh_interval/2)) 
     {
-        err = glXWaitVideoSyncSGI(2, (frameNum+1)%2 ,&frameNum);
+        err = m_imp->glXWaitVideoSyncSGI(2, (frameNum+1)%2 ,&frameNum);
         checkGLSyncError(msg1, err);
         m_delay = CalcDelay();
     }
@@ -664,7 +722,7 @@ void OpenGLVideoSync::WaitForFrame(int sync_delay)
     if (m_delay > 0)
     {
         uint n = m_delay / m_refresh_interval + 1;
-        err = glXWaitVideoSyncSGI((n+1), (frameNum+n)%(n+1), &frameNum);
+        err = m_imp->glXWaitVideoSyncSGI((n+1), (frameNum+n)%(n+1), &frameNum);
         checkGLSyncError(msg2, err);
         m_delay = CalcDelay();
     }
