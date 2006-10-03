@@ -297,9 +297,6 @@ bool Scheduler::FillRecordList(void)
     VERBOSE(VB_SCHEDULE, "Sort by time...");
     reclist.sort(comp_recstart);
 
-    VERBOSE(VB_SCHEDULE, "UpdateNextRecord...");
-    UpdateNextRecord();
-
     return hasconflicts;
 }
 
@@ -1246,6 +1243,7 @@ void Scheduler::RunScheduler(void)
             gettimeofday(&fillstart, NULL);
             FillRecordList();
             gettimeofday(&fillend, NULL);
+            UpdateNextRecord();
             PrintList();
 
             placeTime = ((fillend.tv_sec - fillstart.tv_sec ) * 1000000 +
