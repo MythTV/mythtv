@@ -158,224 +158,230 @@ void get_pes (pes_in_t *p, uint8_t *buf, int count, void (*func)(pes_in_t *p))
 	int l;
 	unsigned short *pl;
 	int c=0;
+        int done;
 
 	uint8_t headr[3] = { 0x00, 0x00, 0x01} ;
-
-	while (c < count && (!p->mpeg ||
-			     (p->mpeg == 2 && p->found < 9))
-	       &&  (p->found < 5 || !p->done)){
-		switch ( p->found ){
-		case 0:
-		case 1:
-			if (buf[c] == 0x00) p->found++;
-			else p->found = 0;
-			c++;
-			break;
-		case 2:
-			if (buf[c] == 0x01) p->found++;
-			else if (buf[c] == 0){
-				p->found = 2;
-			} else p->found = 0;
-			c++;
-			break;
-		case 3:
-			p->cid = 0;
-			switch (buf[c]){
-			case PROG_STREAM_MAP:
-			case PRIVATE_STREAM2:
-			case PROG_STREAM_DIR:
-			case ECM_STREAM     :
-			case EMM_STREAM     :
-			case PADDING_STREAM :
-			case DSM_CC_STREAM  :
-			case ISO13522_STREAM:
-				p->done = 1;
-			case PRIVATE_STREAM1:
-			case VIDEO_STREAM_S ... VIDEO_STREAM_E:
-			case AUDIO_STREAM_S ... AUDIO_STREAM_E:
-				p->found++;
-				p->cid = buf[c];
+	do {
+		done = 1;
+		while (c < count && (!p->mpeg ||
+				     (p->mpeg == 2 && p->found < 9))
+	               &&  (p->found < 5 || !p->done)){
+			switch ( p->found ){
+			case 0:
+			case 1:
+				if (buf[c] == 0x00) p->found++;
+				else p->found = 0;
 				c++;
 				break;
-			default:
-			case PACK_START:
-			case SYS_START:
-				p->found = 0;
+			case 2:
+				if (buf[c] == 0x01) p->found++;
+				else if (buf[c] == 0){
+					p->found = 2;
+				} else p->found = 0;
 				c++;
 				break;
-			}
-			break;
+			case 3:
+				p->cid = 0;
+				switch (buf[c]){
+				case PROG_STREAM_MAP:
+				case PRIVATE_STREAM2:
+				case PROG_STREAM_DIR:
+				case ECM_STREAM     :
+				case EMM_STREAM     :
+				case PADDING_STREAM :
+				case DSM_CC_STREAM  :
+				case ISO13522_STREAM:
+					p->done = 1;
+				case PRIVATE_STREAM1:
+				case VIDEO_STREAM_S ... VIDEO_STREAM_E:
+				case AUDIO_STREAM_S ... AUDIO_STREAM_E:
+					p->found++;
+					p->cid = buf[c];
+					c++;
+					break;
+				default:
+				case PACK_START:
+				case SYS_START:
+					p->found = 0;
+					c++;
+					break;
+				}
+				break;
 			
 
-		case 4:
-			if (count-c > 1){
-				pl = (unsigned short *) (buf+c);
-				p->plength =  ntohs(*pl);
-				p->plen[0] = buf[c];
-				c++;
+			case 4:
+				if (count-c > 1){
+					pl = (unsigned short *) (buf+c);
+					p->plength =  ntohs(*pl);
+					p->plen[0] = buf[c];
+					c++;
+					p->plen[1] = buf[c];
+					c++;
+					p->found+=2;
+				} else {
+					p->plen[0] = buf[c];
+					p->found++;
+					return;
+				}
+				break;
+			case 5:
 				p->plen[1] = buf[c];
 				c++;
-				p->found+=2;
-			} else {
-				p->plen[0] = buf[c];
+				pl = (unsigned short *) p->plen;
+				p->plength = ntohs(*pl);
 				p->found++;
-				return;
-			}
-			break;
-		case 5:
-			p->plen[1] = buf[c];
-			c++;
-			pl = (unsigned short *) p->plen;
-			p->plength = ntohs(*pl);
-			p->found++;
-			break;
+				break;
 
 
-		case 6:
-			if (!p->done){
-				p->flag1 = buf[c];
-				c++;
-				p->found++;
-				if ( (p->flag1 & 0xC0) == 0x80 ) p->mpeg = 2;
-				else {
-					fprintf(stderr, 
-						"Error: THIS IS AN MPEG1 FILE\n");
-					exit(1);
+			case 6:
+				if (!p->done){
+					p->flag1 = buf[c];
+					c++;
+					p->found++;
+					if ( (p->flag1 & 0xC0) == 0x80 ) p->mpeg = 2;
+					else {
+						fprintf(stderr, 
+							"Error: THIS IS AN MPEG1 FILE\n");
+						exit(1);
+					}
 				}
-			}
-			break;
+				break;
 
-		case 7:
-			if ( !p->done && p->mpeg == 2){
-				p->flag2 = buf[c];
-				c++;
-				p->found++;
-			}	
-			break;
+			case 7:
+				if ( !p->done && p->mpeg == 2){
+					p->flag2 = buf[c];
+					c++;
+					p->found++;
+				}	
+				break;
 
-		case 8:
-			if ( !p->done && p->mpeg == 2){
-				p->hlength = buf[c];
-				c++;
-				p->found++;
-			}
-			break;
+			case 8:
+				if ( !p->done && p->mpeg == 2){
+					p->hlength = buf[c];
+					c++;
+					p->found++;
+				}
+				break;
 			
-		default:
+			default:
 
-			break;
+				break;
+			}
 		}
-	}
 
-	if (!p->plength) p->plength = MMAX_PLENGTH-6;
+		if (!p->plength) p->plength = MMAX_PLENGTH-6;
 
 
-	if ( p->done || (p->mpeg == 2 && p->found >= 9) ){
-		switch (p->cid){
+		if ( p->done || (p->mpeg == 2 && p->found >= 9) ){
+			switch (p->cid){
 			
-		case AUDIO_STREAM_S ... AUDIO_STREAM_E:			
-		case VIDEO_STREAM_S ... VIDEO_STREAM_E:
-		case PRIVATE_STREAM1:
+			case AUDIO_STREAM_S ... AUDIO_STREAM_E:			
+			case VIDEO_STREAM_S ... VIDEO_STREAM_E:
+			case PRIVATE_STREAM1:
 
-			if (p->withbuf){
-				memcpy(p->buf, headr, 3);
-				p->buf[3] = p->cid;
-				memcpy(p->buf+4,p->plen,2);
-			} else {
-				memcpy(p->hbuf, headr, 3);
-				p->hbuf[3] = p->cid;
-				memcpy(p->hbuf+4,p->plen,2);
-			}
-
-			if (p->found == 9){
 				if (p->withbuf){
-					p->buf[6] = p->flag1;
-					p->buf[7] = p->flag2;
-					p->buf[8] = p->hlength;
+					memcpy(p->buf, headr, 3);
+					p->buf[3] = p->cid;
+					memcpy(p->buf+4,p->plen,2);
 				} else {
-					p->hbuf[6] = p->flag1;
-					p->hbuf[7] = p->flag2;
-					p->hbuf[8] = p->hlength;
+					memcpy(p->hbuf, headr, 3);
+					p->hbuf[3] = p->cid;
+					memcpy(p->hbuf+4,p->plen,2);
 				}
-			}
 
-			if ( (p->flag2 & PTS_ONLY) &&  p->found < 14){
-				while (c < count && p->found < 14){
-					p->pts[p->found-9] = buf[c];
-					if (p->withbuf)
-						p->buf[p->found] = buf[c];
-					else 
-						p->hbuf[p->found] = buf[c];
-					c++;
-					p->found++;
-				}
-				if (c == count) return;
-			}
-
-			if (((p->flag2 & PTS_DTS) == 0xC0) && p->found < 19){
-				while (c < count && p->found < 19){
-					p->dts[p->found-14] = buf[c];
-					if (p->withbuf)
-						p->buf[p->found] = buf[c];
-					else 
-						p->hbuf[p->found] = buf[c];
-					c++;
-					p->found++;
-				}
-				if (c == count) return;
-			}
-
-
-			while (c < count && p->found < p->plength+6){
-				l = count -c;
-				if (l+p->found > p->plength+6)
-					l = p->plength+6-p->found;
-				if (p->withbuf)
-					memcpy(p->buf+p->found, buf+c, l);
-				else {
-					if ( p->found < 
-                                             (unsigned int)p->hlength+9 ){
-						int rest = p->hlength+9-p->found;
-						memcpy(p->hbuf+p->found, buf+c, rest);
-						if (ring_write(p->rbuf, buf+c+rest, 
-							       l-rest) <0){
-							exit(1);
-						}
+				if (p->found == 9){
+					if (p->withbuf){
+						p->buf[6] = p->flag1;
+						p->buf[7] = p->flag2;
+						p->buf[8] = p->hlength;
 					} else {
-						if (ring_write(p->rbuf, buf+c, l)<0){
-							fprintf(stderr,
-								"ring buffer overflow %d\n"
-								,p->rbuf->size);
-							exit(1);
-						}
+						p->hbuf[6] = p->flag1;
+						p->hbuf[7] = p->flag2;
+						p->hbuf[8] = p->hlength;
 					}
 				}
 
-				p->found += l;
-				c += l;
-			}			
-			if(p->found == p->plength+6){
-				func(p);
-			}
-			break;
-		}
+				if ( (p->flag2 & PTS_ONLY) &&  p->found < 14){
+					while (c < count && p->found < 14){
+						p->pts[p->found-9] = buf[c];
+						if (p->withbuf)
+							p->buf[p->found] = buf[c];
+						else 
+							p->hbuf[p->found] = buf[c];
+						c++;
+						p->found++;
+					}
+					if (c == count) return;
+				}
 
-		if ( p->done ){
-			if( p->found + count - c < p->plength+6){
-				p->found += count-c;
-				c = count;
-			} else {
-				c += p->plength+6 - p->found;
-				p->found = p->plength+6;
-			}
-		}
+				if (((p->flag2 & PTS_DTS) == 0xC0) && p->found < 19){
+					while (c < count && p->found < 19){
+						p->dts[p->found-14] = buf[c];
+						if (p->withbuf)
+							p->buf[p->found] = buf[c];
+						else 
+							p->hbuf[p->found] = buf[c];
+						c++;
+						p->found++;
+					}
+					if (c == count) return;
+				}
 
-		if (p->plength && p->found == p->plength+6) {
-			init_pes_in(p, p->type, NULL, p->withbuf);
-			if (c < count)
-				get_pes(p, buf+c, count-c, func);
-		}
-	}
+
+				while (c < count && p->found < p->plength+6){
+					l = count -c;
+					if (l+p->found > p->plength+6)
+						l = p->plength+6-p->found;
+					if (p->withbuf)
+						memcpy(p->buf+p->found, buf+c, l);
+					else {
+						if ( p->found < 
+                                                     (unsigned int)p->hlength+9 ){
+							int rest = p->hlength+9-p->found;
+							memcpy(p->hbuf+p->found, buf+c, rest);
+							if (ring_write(p->rbuf, buf+c+rest, 
+								       l-rest) <0){
+								exit(1);
+							}
+						} else {
+							if (ring_write(p->rbuf, buf+c, l)<0){
+								fprintf(stderr,
+									"ring buffer overflow %d\n"
+									,p->rbuf->size);
+								exit(1);
+							}
+						}
+					}
+
+					p->found += l;
+					c += l;
+				}			
+				if(p->found == p->plength+6){
+					func(p);
+				}
+				break;
+			}
+
+			if ( p->done ){
+				if( p->found + count - c < p->plength+6){
+					p->found += count-c;
+					c = count;
+				} else {
+					c += p->plength+6 - p->found;
+					p->found = p->plength+6;
+				}
+			}
+
+			if (p->plength && p->found == p->plength+6) {
+				init_pes_in(p, p->type, NULL, p->withbuf);
+				if (c < count) {
+					done = 0;
+					count -= c;
+					buf += c;
+				}
+			}
+		} 
+	} while(!done);
 	return;
 }
 
