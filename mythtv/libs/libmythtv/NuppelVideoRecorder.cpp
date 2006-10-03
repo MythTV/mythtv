@@ -1370,6 +1370,7 @@ void NuppelVideoRecorder::DoV4L2(void)
 
     encoding = true;
     recording = true;
+    resetcapture = false;
 
     while (encoding) {
 again:
@@ -1387,9 +1388,10 @@ again:
         }
         mainpaused = false;
 
-        if (resetcapture && go7007)
+        if (resetcapture)
         {
-            int turnon = V4L2_BUF_TYPE_VIDEO_CAPTURE;
+            VERBOSE(VB_IMPORTANT, LOC_ERR + "Reseting and requeueing.."); 
+            turnon = V4L2_BUF_TYPE_VIDEO_CAPTURE;
             ioctl(fd, VIDIOC_STREAMOFF, &turnon);
 
             for (int i = 0; i < numbuffers; i++)
@@ -1430,22 +1432,22 @@ again:
             VERBOSE(VB_IMPORTANT, LOC_ERR + "DQBUF ioctl failed." + ENO);
 
             // EIO failed DQBUF de-tunes post 2.6.15.3 for cx88
+            // EIO or EINVAL on bttv means we need to reset the buffers..
             if (errno == EIO && channelObj)
             {
                 channelObj->Retune();
+                resetcapture = true;
                 continue;
             }
 
-            if (errno == -EINVAL)
+            if (errno == EIO || errno == EINVAL)
             {
-                for (int i = 0; i < numbuffers; i++)
-                {
-                    vbuf.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
-                    vbuf.index = i;
-                    ioctl(fd, VIDIOC_QBUF, &vbuf);
-                }
+                resetcapture = true;
                 continue;
             }
+
+            if (errno == EAGAIN)
+                continue;
         }
 
         frame = vbuf.index;
@@ -2867,7 +2869,8 @@ void NuppelVideoRecorder::ResetForNewFile(void)
     positionMapDelta.clear();
     positionMapLock.unlock();
 
-    resetcapture = true;
+    if (go7007)
+        resetcapture = true;
 }
 
 void NuppelVideoRecorder::StartNewFile(void)
