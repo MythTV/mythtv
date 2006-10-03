@@ -3021,7 +3021,7 @@ bool fillData(QValueList<Source> &sourcelist)
                                "LEFT JOIN program p ON c.chanid = p.chanid "
                                "  AND starttime >= "
                                    "DATE_ADD(DATE_ADD(CURRENT_DATE(), "
-                                   "INTERVAL '%1' DAY), INTERVAL '18' HOUR) "
+                                   "INTERVAL '%1' DAY), INTERVAL '20' HOUR) "
                                "  AND starttime < DATE_ADD(CURRENT_DATE(), "
                                    "INTERVAL '%2' DAY) "
                                "WHERE c.sourceid = %3 "
@@ -3076,7 +3076,7 @@ bool fillData(QValueList<Source> &sourcelist)
                                     "Data refresh needed because only %1 out "
                                     "of %2 channels have at least one "
                                     "program listed for day @ offset %3 from "
-                                    "6PM - midnight.  Previous day had %4 "
+                                    "8PM - midnight.  Previous day had %4 "
                                     "channels with data in that time period.")
                                     .arg(currentChanCount).arg(source_channels)
                                     .arg(i).arg(prevChanCount));
@@ -3086,7 +3086,7 @@ bool fillData(QValueList<Source> &sourcelist)
                         {
                             VERBOSE(VB_GENERAL, QString(
                                     "Data refresh needed because no data "
-                                    "exists for day @ offset %1 from 6PM - "
+                                    "exists for day @ offset %1 from 8PM - "
                                     "midnight.").arg(i)); 
                             download_needed = true;
                         }
@@ -3094,22 +3094,22 @@ bool fillData(QValueList<Source> &sourcelist)
                         {
                             VERBOSE(VB_GENERAL, QString(
                                     "Data refresh needed because no data "
-                                    "exists for day @ offset %1 from 6PM - "
+                                    "exists for day @ offset %1 from 8PM - "
                                     "midnight.  Unable to calculate how much "
                                     "we should have for the current day so "
                                     "a refresh is being forced.").arg(i-1)); 
                             download_needed = true;
                         }
-                        else if (currentDayCount < (currentChanCount * 4))
+                        else if (currentDayCount < (currentChanCount * 3))
                         {
                             VERBOSE(VB_GENERAL, QString(
                                     "Data Refresh needed because offset day %1 "
-                                    "has less than 4 programs "
-                                    "per channel for the 6PM - midnight "
+                                    "has less than 3 programs "
+                                    "per channel for the 8PM - midnight "
                                     "time window for channels that "
                                     "normally have data. "
                                     "We want at least %2 programs, but only "
-                                    "found %3").arg(i).arg(currentChanCount * 4)
+                                    "found %3").arg(i).arg(currentChanCount * 3)
                                     .arg(currentDayCount));
                             download_needed = true;
                         }
@@ -3118,7 +3118,7 @@ bool fillData(QValueList<Source> &sourcelist)
                             VERBOSE(VB_GENERAL, QString(
                                     "Data Refresh needed because offset day %1 "
                                     "has less than half the number of programs "
-                                    "as the previous day for the 6PM - "
+                                    "as the previous day for the 8PM - "
                                     "midnight time window. "
                                     "We want at least %2 programs, but only "
                                     "found %3").arg(i)
