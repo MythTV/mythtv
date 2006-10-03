@@ -57,6 +57,7 @@ using namespace std;
 #include "mpegtables.h"
 #include "iso639.h"
 #include "atscstreamdata.h"
+#include "atsctables.h"
 #include "cardutil.h"
 #include "tv_rec.h"
 
@@ -843,6 +844,50 @@ void DVBRecorder::CreatePAT(void)
     SetOutputPAT(pat);
 }
 
+desc_list_t extract_atsc_desc(const tvct_vec_t &tvct,
+                              const cvct_vec_t &cvct,
+                              uint pnum)
+{
+    desc_list_t desc;
+
+    vector<const VirtualChannelTable*> vct;
+
+    for (uint i = 0; i < tvct.size(); i++)
+        vct.push_back(tvct[i]);
+
+    for (uint i = 0; i < cvct.size(); i++)
+        vct.push_back(cvct[i]);
+
+    for (uint i = 0; i < tvct.size(); i++)
+    {
+        for (uint j = 0; j < vct[i]->ChannelCount(); j++)
+        {
+            if (vct[i]->ProgramNumber(j) == pnum)
+            {
+                desc_list_t ldesc = MPEGDescriptor::ParseOnlyInclude(
+                    vct[i]->Descriptors(j), vct[i]->DescriptorsLength(j),
+                    DescriptorID::caption_service);
+
+                if (ldesc.size())
+                    desc.insert(desc.end(), ldesc.begin(), ldesc.end());
+            }
+        }
+
+        if (0 != vct[i]->GlobalDescriptorsLength())
+        {
+            desc_list_t vdesc = MPEGDescriptor::ParseOnlyInclude(
+                vct[i]->GlobalDescriptors(),
+                vct[i]->GlobalDescriptorsLength(),
+                DescriptorID::caption_service); 
+
+            if (vdesc.size())
+                desc.insert(desc.end(), vdesc.begin(), vdesc.end());
+        }
+    }
+
+    return desc;
+}
+
 void DVBRecorder::CreatePMT(void)
 {
     QMutexLocker read_lock(&_pid_lock);
@@ -856,6 +901,23 @@ void DVBRecorder::CreatePMT(void)
     desc_list_t gdesc = MPEGDescriptor::ParseAndExclude(
         _input_pmt->ProgramInfo(), _input_pmt->ProgramInfoLength(),
         DescriptorID::conditional_access);
+
+    // If there is no caption descriptor in PMT, copy any caption
+    // descriptor found in VCT to global descriptors...
+    ATSCStreamData *sd = dynamic_cast<ATSCStreamData*>(GetStreamData());
+    tvct_vec_t tvct;
+    cvct_vec_t cvct;
+    if (sd && !MPEGDescriptor::Find(gdesc, DescriptorID::caption_service))
+    {
+        tvct = sd->GetAllCachedTVCTs();
+        cvct = sd->GetAllCachedCVCTs();
+
+        desc_list_t vdesc = extract_atsc_desc(
+            tvct, cvct, _input_pmt->ProgramNumber());
+
+        if (vdesc.size())
+            gdesc.insert(gdesc.end(), vdesc.begin(), vdesc.end());
+    }
 
     vector<uint> pids;
     vector<uint> types;
@@ -900,6 +962,13 @@ void DVBRecorder::CreatePMT(void)
         programNumber, _pmt_pid, _input_pmt->PCRPID(),
         _next_pmt_version, gdesc,
         pids, types, pdesc);
+
+    // Return any TVCT & CVCT tables, once we've copied any descriptors.
+    if (sd)
+    {
+        sd->ReturnCachedTVCTTables(tvct);
+        sd->ReturnCachedCVCTTables(cvct);
+    }
 
     // Set the continuity counter...
     if (_pmt)
