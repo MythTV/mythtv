@@ -952,15 +952,16 @@ void Scheduler::PruneRedundants(void)
 
 void Scheduler::UpdateNextRecord(void)
 {
+    if (specsched)
+        return;
+
     QMap<int, QDateTime> nextRecMap;
-    QDateTime now = QDateTime::currentDateTime();
 
     RecIter i = reclist.begin();
     while (i != reclist.end())
     {
         ProgramInfo *p = *i;
-        if (p->recstartts > now && p->recstatus == rsWillRecord && 
-            nextRecMap[p->recordid].isNull())
+        if (p->recstatus == rsWillRecord && nextRecMap[p->recordid].isNull())
             nextRecMap[p->recordid] = p->recstartts;
         i++;
     }
@@ -1450,6 +1451,9 @@ void Scheduler::RunScheduler(void)
 
             VERBOSE(VB_GENERAL, msg << ": " << details);
             gContext->LogEntry("scheduler", LP_NOTICE, msg, details);
+
+            if (is_rec)
+                UpdateNextRecord();
 
             if (nextRecording->recstatus == rsFailed)
             {
