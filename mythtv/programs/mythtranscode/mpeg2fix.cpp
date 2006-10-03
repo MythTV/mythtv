@@ -726,7 +726,8 @@ int MPEG2fixup::InitAV(const char *inputfile, const char *type, int64_t offset)
         {
 
             case CODEC_TYPE_VIDEO:
-                vid_id = i;
+                if(vid_id == -1)
+                    vid_id = i;
                 break;
 
             case CODEC_TYPE_AUDIO:
@@ -1134,6 +1135,12 @@ int MPEG2fixup::GetFrame(AVPacket *pkt)
             if (ret < 0)
             {
                 //insert a bogus frame (this won't be written out)
+                if(vFrame.isEmpty())
+                {
+                    VERBOSE(MPF_IMPORTANT, "Found end of file without finding "
+                                           " any frames");
+                    return TRANSCODE_EXIT_UNKNOWN_ERROR;
+                }
                 MPEG2frame *tmpFrame = GetPoolFrame(&vFrame.last()->pkt);
                 if (tmpFrame == NULL)
                     return TRANSCODE_EXIT_UNKNOWN_ERROR;
