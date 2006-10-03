@@ -1959,8 +1959,8 @@ bool DiSEqCDevLNB::Load(void)
         m_lof_switch = query.value(1).toInt();
         m_lof_hi     = query.value(2).toInt();
         m_lof_lo     = query.value(3).toInt();
-        m_repeat     = query.value(4).toUInt();
-        m_pol_inv    = query.value(5).toUInt();
+        m_pol_inv    = query.value(4).toUInt();
+        m_repeat     = query.value(5).toUInt();
     }
 
     return true;
