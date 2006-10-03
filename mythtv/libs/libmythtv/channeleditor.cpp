@@ -304,9 +304,36 @@ void ChannelEditor::deleteChannels(void)
         return;
 
     MSqlQuery query(MSqlQuery::InitCon());
-    if ((currentSourceID == "") || (currentSourceID == "Unassigned"))
+    if (currentSourceID.isEmpty())
     {
         query.prepare("TRUNCATE TABLE channel");
+    }
+    else if (currentSourceID == "Unassigned")
+    {
+        query.prepare("SELECT sourceid "
+                      "FROM videosource "
+                      "GROUP BY sourceid");
+
+        if (!query.exec() || !query.isActive())
+        {
+            MythContext::DBError("ChannelEditor Delete Channels", query);
+            return;
+        }
+
+        QString tmp = "";
+        while (query.next())
+            tmp += "'" + query.value(0).toString() + "',";
+
+        if (tmp.isEmpty())
+        {
+            query.prepare("TRUNCATE TABLE channel");
+        }
+        else
+        {
+            tmp = tmp.left(tmp.length() - 1);
+            query.prepare(QString("DELETE FROM channel "
+                                  "WHERE sourceid NOT IN (%1)").arg(tmp));
+        }
     }
     else
     {
@@ -314,7 +341,9 @@ void ChannelEditor::deleteChannels(void)
                       "WHERE sourceid = :SOURCEID");
         query.bindValue(":SOURCEID", currentSourceID);
     }
-    query.exec();
+
+    if (!query.exec())
+        MythContext::DBError("ChannelEditor Delete Channels", query);
 
     list->fillSelections();
 }
