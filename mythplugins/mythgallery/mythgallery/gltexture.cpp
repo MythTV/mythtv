@@ -104,10 +104,10 @@ void GLTexture::SetItem(ThumbItem *thumbItem, const QSize &sz)
     }
 }
 
-QString GLTexture::GetDescription(void) const
+QString GLTexture::GetDescription(const QString &status) const
 {
     if (item)
-        return item->GetDescription(GetSize(), angle);
+        return item->GetDescription(status, GetSize(), angle);
 
     return QString::null;
 }

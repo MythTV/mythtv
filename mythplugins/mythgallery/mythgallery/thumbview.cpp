@@ -90,11 +90,16 @@ long ThumbItem::GetRotationAngle(void)
     return GalleryUtil::GetNaturalRotation(m_path);
 }
 
-QString ThumbItem::GetDescription(const QSize &sz, int angle) const
+QString ThumbItem::GetDescription(const QString &status,
+                                  const QSize &sz, int angle) const
 {
     QFileInfo fi(GetPath());
 
     QString info = GetName();
+
+    if (!status.isEmpty())
+        info += status;
+
     info += "\n\n" + QObject::tr("Folder: ") + fi.dir().dirName();
     info += "\n" + QObject::tr("Created: ") + fi.created().toString();
     info += "\n" + QObject::tr("Modified: ") +

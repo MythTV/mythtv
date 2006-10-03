@@ -59,7 +59,7 @@ class GLTexture
     float   GetTextureX(void)    const { return cx; }
     float   GetTextureY(void)    const { return cy; }
     int     GetAngle(void)       const { return angle; }
-    QString GetDescription(void) const;
+    QString GetDescription(const QString &status) const;
 
   private:
     GLuint     tex;

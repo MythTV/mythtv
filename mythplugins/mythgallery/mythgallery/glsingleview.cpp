@@ -243,12 +243,22 @@ void GLSingleView::keyPressEvent(QKeyEvent *e)
 
     bool wasInfo = m_info_show;
     m_info_show = false;
+    bool wasInfoShort = m_info_show_short;
+    m_info_show_short = false;
 
     QStringList actions;
     gContext->GetMainWindow()->TranslateKeyPress("Gallery", e, actions);
 
     float scrollX = 0.02f;
     float scrollY = 0.02f;
+
+    if (actions.empty())
+    {
+        handled = false;
+        m_info_show = wasInfo;
+        m_info_show_short = true;
+        m_slideshow_running = wasRunning;
+    }
 
     for (unsigned int i = 0; i < actions.size() && !handled; i++)
     {
@@ -257,10 +267,14 @@ void GLSingleView::keyPressEvent(QKeyEvent *e)
 
         if (action == "LEFT" || action == "UP")
         {
+            m_info_show = wasInfo;
+            m_slideshow_running = wasRunning;
             DisplayPrev(true, true);
         }
         else if (action == "RIGHT" || action == "DOWN")
         {
+            m_info_show = wasInfo;
+            m_slideshow_running = wasRunning;
             DisplayNext(true, true);
         }
         else if (action == "ZOOMOUT")
@@ -380,6 +394,8 @@ void GLSingleView::keyPressEvent(QKeyEvent *e)
                 item->SetPixmap(NULL);
                 DisplayNext(true, true);
             }
+            m_info_show = wasInfo;
+            m_slideshow_running = wasRunning;
         }
         else if (action == "PLAY" || action == "SLIDESHOW" ||
                  action == "RANDOMSHOW")
@@ -387,25 +403,38 @@ void GLSingleView::keyPressEvent(QKeyEvent *e)
             m_source_x   = 0;
             m_source_y   = 0;
             SetZoom(1.0f);
+            m_info_show = wasInfo;
+            m_info_show_short = true;
             m_slideshow_running = !wasRunning;
         }
         else if (action == "INFO")
         {
-            m_info_show = !wasInfo;
+            m_info_show = !wasInfo && !wasInfoShort;
+            m_slideshow_running = wasRunning;
         }
         else
+        {
             handled = false;
+            m_info_show = wasInfo;
+            m_info_show_short = true;
+            m_slideshow_running = wasRunning;
+        }
+    }
+
+    if (m_slideshow_running || m_info_show_short)
+    {
+        m_slideshow_timer->start(m_slideshow_frame_delay_state, true);
     }
 
     if (m_slideshow_running)
     {
-        m_slideshow_timer->start(m_slideshow_frame_delay_state, true);
         gContext->DisableScreensaver();
     }
 
+    updateGL();
+
     if (handled)
     {
-        updateGL();
         e->accept();
     }
     else {
@@ -423,7 +452,7 @@ void GLSingleView::paintTexture(void)
 
     m_texItem[m_texCur].MakeQuad();
 
-    if (m_info_show)
+    if (m_info_show || m_info_show_short)
     {
         createTexInfo();
 
@@ -1150,38 +1179,45 @@ void GLSingleView::SlideTimeout(void)
             // timed out after showing current image
             // load next image and start effect
 
-            if (m_effect_random)
-                m_effect_method = GetRandomEffect();
-
-            DisplayNext(false, false);
-
-            wasMovie = m_movieState > 0;
-            LoadImage();
-            isMovie = m_movieState > 0;
-            // If transitioning to/from a movie, don't do an effect,
-            // and shorten timeout
-            if (wasMovie || isMovie)
+            if (m_slideshow_running)
             {
-                m_slideshow_frame_delay_state = 1;
+                if (m_effect_random)
+                    m_effect_method = GetRandomEffect();
+
+                DisplayNext(false, false);
+
+                wasMovie = m_movieState > 0;
+                LoadImage();
+                isMovie = m_movieState > 0;
+                // If transitioning to/from a movie, don't do an effect,
+                // and shorten timeout
+                if (wasMovie || isMovie)
+                {
+                    m_slideshow_frame_delay_state = 1;
+                }
+                else
+                {
+                    m_slideshow_frame_delay_state = 10;
+                    m_effect_running = true;
+                    m_effect_current_frame = 0;
+                }
+                m_effect_frame_time.restart();
             }
-            else
-            {
-                m_slideshow_frame_delay_state = 10;
-                m_effect_running = true;
-                m_effect_current_frame = 0;
-            }
-            m_effect_frame_time.restart();
+            m_info_show_short = false;
         }
     }
 
     updateGL();
-    m_slideshow_timer->start(m_slideshow_frame_delay_state, true);
-
-    // If transitioning to/from a movie, no effect is running so
-    // next timeout should trigger proper immage delay.
-    if (wasMovie || isMovie)
+    if (m_slideshow_running)
     {
-        m_slideshow_frame_delay_state = -1;
+        m_slideshow_timer->start(m_slideshow_frame_delay_state, true);
+
+        // If transitioning to/from a movie, no effect is running so
+        // next timeout should trigger proper immage delay.
+        if (wasMovie || isMovie)
+        {
+            m_slideshow_frame_delay_state = -1;
+        }
     }
 }
 
@@ -1190,7 +1226,7 @@ void GLSingleView::createTexInfo(void)
     if (m_texInfo)
         glDeleteTextures(1, &m_texInfo);
 
-    QString info = m_texItem[m_texCur].GetDescription();
+    QString info = m_texItem[m_texCur].GetDescription(GetDescriptionStatus());
     if (info.isEmpty())
         return;
 

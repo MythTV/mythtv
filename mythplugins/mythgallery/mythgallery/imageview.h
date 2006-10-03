@@ -58,6 +58,7 @@ class ImageView
     virtual void RunEffect(const QString &effect) = 0;
 
     void UpdateLCD(const ThumbItem *item);
+    QString GetDescriptionStatus(void) const;
   protected:
     QSize                  m_screenSize;
     float                  m_wmult;
@@ -68,6 +69,7 @@ class ImageView
     float                  m_zoom;
 
     bool                   m_info_show;
+    bool                   m_info_show_short;
 
     // Common slideshow variables
     bool                   m_slideshow_running;
@@ -77,6 +79,7 @@ class ImageView
     int                    m_slideshow_frame_delay;
     int                    m_slideshow_frame_delay_state;
     QTimer                *m_slideshow_timer;
+    const char            *m_slideshow_mode;
 
     // Common effect state variables
     bool                   m_effect_running;

@@ -239,7 +239,7 @@ void SingleView::paintEvent(QPaintEvent *)
                 p.end();
             }
 
-            if (m_info_show)
+            if (m_info_show || m_info_show_short)
             {
                 if (!m_info_pixmap)
                 {
@@ -255,7 +255,10 @@ void SingleView::paintEvent(QPaintEvent *)
                 ThumbItem *item = m_itemList.at(m_pos);
                 QString info = QString::null;
                 if (item)
-                    info = item->GetDescription(m_image.size(), m_angle);
+                {
+                    info = item->GetDescription(GetDescriptionStatus(),
+                                                m_image.size(), m_angle);
+                }
 
                 if (!info.isEmpty())
                 {
@@ -292,6 +295,8 @@ void SingleView::keyPressEvent(QKeyEvent *e)
 
     bool wasInfo = m_info_show;
     m_info_show = false;
+    bool wasInfoShort = m_info_show_short;
+    m_info_show_short = false;
     
     QStringList actions;
     gContext->GetMainWindow()->TranslateKeyPress("Gallery", e, actions);
@@ -299,6 +304,14 @@ void SingleView::keyPressEvent(QKeyEvent *e)
     int scrollX = (int)(10*wmult);
     int scrollY = (int)(10*hmult);
     
+    if (actions.empty())
+    {
+        handled = false;
+        m_info_show = wasInfo;
+        m_info_show_short = true;
+        m_slideshow_running = wasRunning;
+    }
+
     for (unsigned int i = 0; i < actions.size() && !handled; i++)
     {
         QString action = actions[i];
@@ -306,10 +319,14 @@ void SingleView::keyPressEvent(QKeyEvent *e)
 
         if (action == "LEFT" || action == "UP")
         {
+            m_info_show = wasInfo;
+            m_slideshow_running = wasRunning;
             DisplayPrev(true, true);
         }
         else if (action == "RIGHT" || action == "DOWN")
         {
+            m_info_show = wasInfo;
+            m_slideshow_running = wasRunning;
             DisplayNext(true, true);
         }
         else if (action == "ZOOMOUT")
@@ -431,6 +448,8 @@ void SingleView::keyPressEvent(QKeyEvent *e)
                 item->SetPixmap(NULL);
                 DisplayNext(true, true);
             }
+            m_info_show = wasInfo;
+            m_slideshow_running = wasRunning;
         }
         else if (action == "PLAY" || action == "SLIDESHOW" ||
                  action == "RANDOMSHOW")
@@ -438,30 +457,37 @@ void SingleView::keyPressEvent(QKeyEvent *e)
             m_source_loc = QPoint(0, 0);
             m_zoom = 1.0f;
             m_angle = 0;
+            m_info_show = wasInfo;
+            m_info_show_short = true;
             m_slideshow_running = !wasRunning;
         }
         else if (action == "INFO")
         {
-            m_info_show = !wasInfo;
+            m_info_show = !wasInfo && !wasInfoShort;
+            m_slideshow_running = wasRunning;
         }
         else 
+        {
             handled = false;
+            m_info_show = wasInfo;
+            m_info_show_short = true;
+            m_slideshow_running = wasRunning;
+        }
     }
 
-    if (m_slideshow_running)
+    if (m_slideshow_running || m_info_show_short)
     {
         m_slideshow_timer->start(m_slideshow_frame_delay_state, true);
+    }
+    if (m_slideshow_running)
+    {
         gContext->DisableScreensaver();
     }
 
-    if (handled)
-    {
-        update();
-    }
-    else
-    {
+    update();
+
+    if (!handled)
         MythDialog::keyPressEvent(e);
-    }
 }
 
 void SingleView::DisplayNext(bool reset, bool loadImage)
@@ -1315,38 +1341,46 @@ void SingleView::SlideTimeout(void)
         {
             // timed out after showing current image
             // load next image and start effect
-            if (m_effect_random)
-                m_effect_method = GetRandomEffect();
-
-            DisplayNext(false, false);
-
-            wasMovie = m_movieState > 0;
-            LoadImage();
-            isMovie = m_movieState > 0;
-            // If transitioning to/from a movie, don't do an effect,
-            // and shorten timeout
-            if (wasMovie || isMovie)
+            if (m_slideshow_running)
             {
-                m_slideshow_frame_delay_state = 1;
-            }
-            else
-            {
-                CreateEffectPixmap();
-                m_effect_running = true;
-                m_slideshow_frame_delay_state = 10;
-                m_effect_current_frame = 0;
-            }
-        }   
+                if (m_effect_random)
+                    m_effect_method = GetRandomEffect();
+
+                DisplayNext(false, false);
+
+                wasMovie = m_movieState > 0;
+                LoadImage();
+                isMovie = m_movieState > 0;
+                // If transitioning to/from a movie, don't do an effect,
+                // and shorten timeout
+                if (wasMovie || isMovie)
+                {
+                    m_slideshow_frame_delay_state = 1;
+                }
+                else
+                {
+                    CreateEffectPixmap();
+                    m_effect_running = true;
+                    m_slideshow_frame_delay_state = 10;
+                    m_effect_current_frame = 0;
+                }
+            }   
+            m_info_show_short = false;
+        }
     }
 
     update();
-    m_slideshow_timer->start(m_slideshow_frame_delay_state, true);
 
-    // If transitioning to/from a movie, no effect is running so 
-    // next timeout should trigger proper immage delay.
-    if (wasMovie || isMovie)
+    if (m_slideshow_running)
     {
-        m_slideshow_frame_delay_state = -1;
+        m_slideshow_timer->start(m_slideshow_frame_delay_state, true);
+
+        // If transitioning to/from a movie, no effect is running so 
+        // next timeout should trigger proper immage delay.
+        if (wasMovie || isMovie)
+        {
+            m_slideshow_frame_delay_state = -1;
+        }
     }
 }
 

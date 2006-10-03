@@ -49,7 +49,8 @@ class ThumbItem
     QString GetCaption(void) const { return m_caption;            }
     QString GetPath(void)    const { return m_path;               }
     bool    IsDir(void)      const { return m_isDir;              }
-    QString GetDescription(const QSize &sz, int angle) const;
+    QString GetDescription(const QString &status,
+                           const QSize &sz, int angle) const;
 
     // non-const gets
     QPixmap         *GetPixmap(void)      { return m_pixmap;      }
