@@ -97,7 +97,7 @@ extern "C" {
 
 	static inline unsigned int ring_free(ringbuffer *rbuf){
 		int free;
-		free = rbuf->read_pos - rbuf->write_pos-1;
+		free = rbuf->read_pos - rbuf->write_pos;
 		if (free <= 0) free += rbuf->size;
 		
 		return free;
