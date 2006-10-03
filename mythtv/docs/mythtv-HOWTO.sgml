@@ -3,7 +3,7 @@
 <title>Installing and using MythTV
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com"
 name="mailto:rkulagow@rocketmail.com">
-<date>2006-09-22, v0.20.03
+<date>2006-10-03, v0.20.04
 <abstract>
 Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -1729,16 +1729,6 @@ build process.
 # emerge lirc
 </verb></tscreen>
 
-<sect1>Red Hat Linux/Fedora Core
-<p>You should already have the source from the "Kernel Development" package
-you installed in section 3.2. Ensure that a symlink has been created:
-<tscreen><verb>
-$ cd /usr/src
-$ su
-# ln -s linux-2.4 /usr/src/linux
-# exit
-</verb></tscreen>
-
 <sect1>Obtaining and compiling lirc
 <p>You're going to need to download and compile <bf>lircd</bf>.  Go to <url
 url="http://www.lirc.org" name="http://www.lirc.org"> and download lirc; as
@@ -1871,6 +1861,37 @@ users, type: <tt># /etc/rc.d/init.d/lircd start</tt> instead of:
 <tscreen><verb>
 # /usr/local/sbin/lircd
 </verb></tscreen>
+
+<bf>NOTE</bf>:  Read this next section if you're not familiar with how lirc works!
+
+There are two separate files used by lirc, and both are required for your
+remote control to do anything useful. First is the <tt>lircd.conf</tt> file. 
+<tt>lircd.conf</tt> tells the lirc daemon how to interpret the IR pulses
+that it receives from a remote control and what name to assign to each
+sequence of pulses.  Without getting too involved, a particular series of
+pulses may correlate to "Channel Up".  The <tt>lircd.conf</tt> file will
+then contain a line that looks something like this:
+
+<tscreen><verb>
+          ChannelUp                0x0000000000001020
+</verb></tscreen>
+
+The <tt>lircd.conf</tt> file can have multiple remote controls defined.
+
+The second file is <tt>lircrc</tt>, which takes the name of the button which
+was pressed ("ChannelUp") in the above example, and correlates that to an
+action to be performed by a program using the remote control.  So in MythTV,
+ChannelUp means one thing, while in <bf>mplayer</bf> it means something
+different.  <tt>lircrc</tt> gives you the flexibility of taking the name of
+the button and having it perform different actions depending on which
+program you're using at the time.
+
+<bf>NOTE</bf>:  The definitions in <tt>lircd.conf</tt> come from the user
+community, and there is no standard for the common button names.  One
+<tt>lircd.conf</tt> file may contain a definition for a button called
+"ChannelUp", while another may contain a definition for "Chan+".  Your
+<tt>lircrc</tt> file must therefore be configured appropriately, or it won't
+work.
 
 If this fails, complaining of a missing <tt>lircd.conf</tt> file, then you
 must find or make one. First look for a pre-made configuration file at <url
@@ -7019,6 +7040,9 @@ v0.20.01, 2006-09-11.  Get rid of stuff that's been deprecated.  Add other
 updates, like the blurb about using a VM for commercial flagging.
 v0.20.02, 2006-09-13.  Update install instructions for mythweb.
 v0.20.03, 2006-09-22.  Does MythTV work with QT4?  No.
+v0.20.04, 2006-10-03.  Update lirc section; explain how lircd.conf and
+lircrc work together.
+
 -->
 
 <!--
