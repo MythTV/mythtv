@@ -221,6 +221,7 @@ static GlobalComboBox *TimeOffset()
     return gc;
 };
 
+#if 0
 static GlobalComboBox *EITTimeOffset()
 {
     GlobalComboBox *gc = new GlobalComboBox("EITTimeOffset");
@@ -235,6 +236,7 @@ static GlobalComboBox *EITTimeOffset()
     gc->setHelpText(helptext);
     return gc;
 };
+#endif
 
 static GlobalSpinBox *EITTransportTimeout()
 {
@@ -702,7 +704,7 @@ BackendSettings::BackendSettings() {
 
     VerticalConfigurationGroup* group2a1 = new VerticalConfigurationGroup(false);
     group2a1->setLabel(QObject::tr("EIT Scanner Options"));                
-    group2a1->addChild(EITTimeOffset());
+    //group2a1->addChild(EITTimeOffset());
     group2a1->addChild(EITTransportTimeout());
     group2a1->addChild(EITIgnoresSource());
     group2a1->addChild(EITCrawIdleStart());

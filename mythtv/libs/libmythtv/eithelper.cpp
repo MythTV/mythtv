@@ -1,5 +1,8 @@
 // -*- Mode: c++ -*-
 
+// Std C headers
+#include <time.h>
+
 // Std C++ headers
 #include <algorithm>
 using namespace std;
@@ -380,8 +383,22 @@ void EITHelper::CompleteEvent(uint atsc_major, uint atsc_minor,
         return;
 
     QDateTime starttime;
-    int off = secs_Between_1Jan1970_6Jan1980 + gps_offset + utc_offset;
-    starttime.setTime_t(off + event.start_time, Qt::LocalTime);
+    time_t off = secs_Between_1Jan1970_6Jan1980 + gps_offset + utc_offset;
+    time_t tmp = event.start_time + off;
+    tm result;
+
+    if (gmtime_r(&tmp, &result))
+    {
+        starttime.setDate(QDate(result.tm_year + 1900,
+                                result.tm_mon + 1,
+                                result.tm_mday));
+        starttime.setTime(QTime(result.tm_hour, result.tm_min, result.tm_sec));
+    }
+    else
+    {
+        starttime.setTime_t(tmp - utc_offset, Qt::LocalTime);
+    }
+
     EITFixUp::TimeFix(starttime);
     QDateTime endtime = starttime.addSecs(event.length);
 
