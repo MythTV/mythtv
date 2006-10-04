@@ -202,7 +202,7 @@ typedef map<unsigned char *, IDirectFBSurface *> BufferMap;
 class DirectfbData
 {
   public:
-    DirectfbData::DirectfbData()
+    DirectfbData()
       : dfb(NULL),            primaryLayer(NULL),
         primarySurface(NULL), videoLayer(NULL),
         videoSurface(NULL),   inputbuf(NULL),
