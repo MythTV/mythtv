@@ -36,7 +36,7 @@
 #include "settings.h"
 
 class DTVTStandard;
-class DvbTATSCModulation;
+class ATSCModulation;
 class DvbTFrequency;
 class DvbTSymbolrate;
 class DvbTPolarity;
@@ -142,7 +142,7 @@ protected:
 private:
 
     DTVTStandard*      dtvStandard;
-    DvbTATSCModulation* atscmodulation;
+    ATSCModulation    *atscmodulation;
     DvbTFrequency* frequency;
     DvbTSymbolrate* symbolrate;
     DvbTPolarity* polarity;

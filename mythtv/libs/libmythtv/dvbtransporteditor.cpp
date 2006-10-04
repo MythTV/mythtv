@@ -34,62 +34,131 @@
 #include "mythcontext.h"
 #include "mythdbcon.h"
 
+#define LOC QString("DVBTransportList: ")
+#define LOC_ERR QString("DVBTransportList, Error: ")
+
+QString pp_modulation(QString mod)
+{
+    if (mod.right(3) == "vsb")
+        mod = mod.left(mod.length() - 3) + "-VSB";
+    else if (mod.left(4) == "qam_")
+        mod = "QAM-" + mod.mid(4,mod.length());
+    else
+        mod = mod.upper();
+    return mod;
+}
+
 void DVBTransportList::fillSelections(void)
 {
     clearSelections();
     addSelection("(New Transport)");
 
+    setHelpText(QObject::tr(
+                    "This section lists each transport that MythTV "
+                    "currently knows about. The display fields are "
+                    "video source, modulation, frequency, and when "
+                    "relevant symbol rate, network id, and transport id."));
+
     MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare(
+        "SELECT count(diseqc_config.cardinputid) "
+        "FROM diseqc_config, cardinput "
+        "WHERE diseqc_config.cardinputid = cardinput.cardinputid AND "
+        "      sourceid = :SOURCEID");
+    query.bindValue(":SOURCEID", strSourceID);
 
-    QString querystr = QString("SELECT mplexid, networkid, transportid, "
-                       " frequency, symbolrate, modulation FROM dtv_multiplex channel "
-                       " WHERE sourceid=%1 ORDER by networkid, transportid ")
-                       .arg(strSourceID);
-    query.prepare(querystr);
-
-    if (query.exec() && query.isActive() && query.size() > 0)
+    if (!query.exec() || !query.isActive())
     {
-        while(query.next()) 
-        {
-            QString DisplayText;
-            DisplayText = QString("%1 Hz (%2) (%3) (%4)")
-                                  .arg(query.value(3).toString())
-                                  .arg(query.value(4).toString())
-                                  .arg(query.value(1).toInt())
-                                  .arg(query.value(2).toInt());
-            addSelection(DisplayText, query.value(0).toString());
-        }
+        MythContext::DBError("DVBTransportList::fillSelections 1", query);
+        return;
     }
-    setHelpText(QObject::tr("This section lists each transport that MythTV "
-                "currently knows about. The display fields are Frequency, "
-                "SymbolRate, NetworkID, and TransportID "));
+
+    if (!query.next())
+    {
+        VERBOSE(VB_IMPORTANT, LOC + "Couldn't determine DiSEqC status");
+        return;
+    }
+
+    bool dvbs = query.value(0).toUInt();
+
+    query.prepare(
+        "SELECT mplexid, modulation, frequency, "
+        "       symbolrate, networkid, transportid "
+        "FROM dtv_multiplex, videosource "
+        "WHERE dtv_multiplex.sourceid = :SOURCEID AND "
+        "      dtv_multiplex.sourceid = videosource.sourceid "
+        "ORDER by networkid, transportid, mplexid");
+    query.bindValue(":SOURCEID", strSourceID);
+
+    if (!query.exec() || !query.isActive())
+    {
+        MythContext::DBError("DVBTransportList::fillSelections 2", query);
+        return;
+    }
+
+    while (query.next())
+    {
+        QString mod   = pp_modulation(query.value(1).toString());
+        while (mod.length() < 7)
+            mod += " ";
+
+        QString rate  = query.value(3).toString();
+        rate = (rate == "0") ? "" : QString("rate %1").arg(rate);
+
+        QString netid = query.value(4).toUInt() ?
+            QString("netid %1").arg(query.value(4).toUInt(),5) : "";
+
+        QString tid = query.value(5).toUInt() ?
+            QString("tid %1").arg(query.value(5).toUInt(),5) : "";
+
+        QString txt = QString("%1 %2 %3 %4 %5 %6")
+            .arg(mod).arg(query.value(2).toString())
+            .arg((dvbs) ? "kHz" : "Hz").arg(rate).arg(netid).arg(tid);
+
+        addSelection(txt, query.value(0).toString());
+    }
 }
 
-class DVBTSourceSetting: public ComboBoxSetting {
-public:
-    DVBTSourceSetting(): ComboBoxSetting() {
+class DVBTSourceSetting : public ComboBoxSetting
+{
+  public:
+    DVBTSourceSetting(): ComboBoxSetting()
+    {
         setLabel(QObject::tr("Video Source"));
     };
 
-    void save() { };
-    void load() 
-    {
-        MSqlQuery query(MSqlQuery::InitCon());
-
-        query.prepare("SELECT DISTINCT videosource.name, videosource.sourceid "
-                      "FROM cardinput, videosource, capturecard "
-                      "WHERE cardinput.sourceid=videosource.sourceid "
-                      "AND cardinput.cardid=capturecard.cardid "
-                      "AND capturecard.cardtype in ('DVB') "
-                      "AND capturecard.hostname=:HOSTNAME");
-        query.bindValue(":HOSTNAME", gContext->GetHostName());
-
-        if (query.exec() && query.isActive() && query.size() > 0)
-            while(query.next())
-                addSelection(query.value(0).toString(),
-                             query.value(1).toString());
-    };
+    void save(void) {;}
+    void load(void);
 };
+
+void DVBTSourceSetting::load(void)
+{
+    MSqlQuery query(MSqlQuery::InitCon());
+
+    query.prepare(
+        "SELECT DISTINCT videosource.name, videosource.sourceid "
+        "FROM channel, cardinput, videosource, capturecard "
+        "WHERE cardinput.sourceid    = videosource.sourceid AND "
+        "      cardinput.cardid      = capturecard.cardid   AND "
+        "      channel.sourceid      = videosource.sourceid AND "
+        "      channel.mplexid      != 32767                AND "
+        "      channel.mplexid      != 0                    AND "
+        "      capturecard.hostname  = :HOSTNAME");
+
+    query.bindValue(":HOSTNAME", gContext->GetHostName());
+
+    if (!query.exec() || !query.isActive())
+    {
+        MythContext::DBError("DVBTSourceSetting::videoSource", query);
+        return;
+    }
+
+    while (query.next())
+    {
+        addSelection(query.value(0).toString(),
+                     query.value(1).toString());
+    }
+}
 
 DVBTransportsEditor::DVBTransportsEditor() :
     ConfigurationGroup(false, true, false, false),
@@ -116,26 +185,28 @@ void DVBTransportsEditor::videoSource(const QString& str )
 {
     MSqlQuery query(MSqlQuery::InitCon());
 
-    bool fEnable = false;
+    query.prepare(
+        "SELECT count(mplexid) "
+        "FROM channel, cardinput, videosource, capturecard "
+        "WHERE cardinput.sourceid    = videosource.sourceid AND "
+        "      cardinput.cardid      = capturecard.cardid   AND "
+        "      channel.sourceid      = videosource.sourceid AND "
+        "      channel.mplexid      != 32767                AND "
+        "      channel.mplexid      != 0                    AND "
+        "      videosource.sourceid  = :SOURCEID            AND "
+        "      capturecard.hostname  = :HOSTNAME");
 
-    query.prepare("SELECT count(cardtype) "
-                  "FROM cardinput, videosource, capturecard "
-                  "WHERE cardinput.sourceid=videosource.sourceid "
-                  "AND cardinput.cardid=capturecard.cardid "
-                  "AND capturecard.cardtype in ('DVB') "
-                  "AND videosource.sourceid = :SOURCEID "
-                  "AND capturecard.hostname = :HOSTNAME");
     query.bindValue(":SOURCEID", str);
     query.bindValue(":HOSTNAME", gContext->GetHostName());
     
-    if (query.exec() && query.isActive() && query.size() > 0)
+    if (!query.exec() || !query.isActive())
     {
-         query.next();
-         if (query.value(0).toInt() > 0)
-             fEnable = true;
+        MythContext::DBError("DVBTransportsEditor::videoSource", query);
+        m_list->setEnabled(false);
+        return;
     }
 
-    m_list->setEnabled(fEnable);
+    m_list->setEnabled(query.next() && query.value(0).toUInt());
 }
 
 int DVBTransportsEditor::exec()
@@ -157,6 +228,7 @@ void DVBTransportsEditor::edit(int /*tid*/)
     edit();
 }
 
+// TODO FIXME this only deletes the transport, not the associated channels.
 void DVBTransportsEditor::del(void)
 {
     int val = MythPopupBox::show2ButtonPopup(
@@ -301,15 +373,17 @@ public:
     };
 };
 
-class DvbTATSCModulation: public ComboBoxSetting, public DvbTransSetting {
-public:
-    DvbTATSCModulation(const DVBTID& id):
-        ComboBoxSetting(), DvbTransSetting(id, "modulation") {
+class ATSCModulation: public ComboBoxSetting, public DvbTransSetting
+{
+  public:
+    ATSCModulation(const DVBTID& id) :
+        ComboBoxSetting(), DvbTransSetting(id, "modulation")
+    {
         setLabel(QObject::tr("Modulation"));
         setHelpText(QObject::tr("Modulation Used"));
-        addSelection(QObject::tr("8VSB"), "8vsb");
-        addSelection(QObject::tr("QAM64"), "qam_64");
-        addSelection(QObject::tr("QAM256"), "qam_256");
+        addSelection(QObject::tr("8-VSB"),   "8vsb");
+        addSelection(QObject::tr("QAM-64"),  "qam_64");
+        addSelection(QObject::tr("QAM-256"), "qam_256");
     };
 };
 
@@ -342,16 +416,18 @@ public:
     };
 };
 
-class DvbTModulationSetting: public ComboBoxSetting {
-public:
-    DvbTModulationSetting() {
+class DvbTModulationSetting: public ComboBoxSetting
+{
+  public:
+    DvbTModulationSetting()
+    {
         addSelection(QObject::tr("Auto"),"auto");
-        addSelection("QPSK","qpsk");
-        addSelection("QAM 16","qam_16");
-        addSelection("QAM 32","qam_32");
-        addSelection("QAM 64","qam_64");
-        addSelection("QAM 128","qam_128");
-        addSelection("QAM 256","qam_256");
+        addSelection("QPSK",    "qpsk");
+        addSelection("QAM-16",  "qam_16");
+        addSelection("QAM-32",  "qam_32");
+        addSelection("QAM-64",  "qam_64");
+        addSelection("QAM-128", "qam_128");
+        addSelection("QAM-256", "qam_256");
     };
 };
 
@@ -536,11 +612,13 @@ DVBTransportPage::DVBTransportPage(const DVBTID &_id, unsigned nType) :
         right->addChild(inversion      = new DvbTInversion(id));
         right->addChild(fec            = new DvbTFec(id));
     }
-    else if (CardUtil::ATSC == nType)
+    else if (CardUtil::ATSC      == nType ||
+             CardUtil::HDTV      == nType ||
+             CardUtil::HDHOMERUN == nType)
     {
         left->addChild(dtvStandard     = new DTVTStandard(id));
         left->addChild(frequency       = new DvbTFrequency(id));
-        left->addChild(atscmodulation  = new DvbTATSCModulation(id));
+        left->addChild(atscmodulation  = new ATSCModulation(id));
         use_right = false;
     }
     else
