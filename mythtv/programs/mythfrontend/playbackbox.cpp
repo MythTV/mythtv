@@ -2800,23 +2800,29 @@ void PlaybackBox::showStoragePopup()
 
     QButton *storageButton;
 
+    MythPushButton *toggleButton;
+    
     storageButton = popup->addButton(tr("Change Recording Group"), this,
                                      SLOT(showRecGroupChanger()));
 
     popup->addButton(tr("Change Playback Group"), this,
                      SLOT(showPlayGroupChanger()));
 
-    if (delitem && delitem->GetAutoExpireFromRecorded())
-        popup->addButton(tr("Disable Auto Expire"), this, SLOT(noAutoExpire()));
-    else
-        popup->addButton(tr("Enable Auto Expire"), this, SLOT(doAutoExpire()));
-
-    if (delitem && delitem->UsesMaxEpisodes())
+    if (delitem)
     {
-        if (delitem && delitem->GetPreserveEpisodeFromRecorded())
-            popup->addButton(tr("Do not preserve this episode"), this, SLOT(noPreserveEpisode()));
-        else
-            popup->addButton(tr("Preserve this episode"), this, SLOT(doPreserveEpisode()));
+        toggleButton = new MythPushButton(
+            tr("Disable Auto Expire"), tr("Enable Auto Expire"),
+            popup, delitem->GetAutoExpireFromRecorded());
+        connect(toggleButton, SIGNAL(toggled(bool)), this,
+                SLOT(toggleAutoExpire(bool)));
+        popup->addWidget(toggleButton, false);
+
+        toggleButton = new MythPushButton(
+            tr("Do not preserve this episode"), tr("Preserve this episode"),
+            popup, delitem->GetPreserveEpisodeFromRecorded());
+        connect(toggleButton, SIGNAL(toggled(bool)), this,
+                SLOT(togglePreserveEpisode(bool)));
+        popup->addWidget(toggleButton, false);
     }
 
     popup->ShowPopup(this, SLOT(doCancel()));
@@ -3152,32 +3158,6 @@ void PlaybackBox::doPlayListRandom(void)
     cancelPopup();
 
     playSelectedPlaylist(true);
-}
-
-void PlaybackBox::doPreserveEpisode(void)
-{
-    if (!expectingPopup)
-        return;
-
-    cancelPopup();
-
-    if (delitem->availableStatus != asAvailable)
-        showAvailablePopup(delitem);
-    else
-        delitem->SetPreserveEpisode(true);
-}
-
-void PlaybackBox::noPreserveEpisode(void)
-{
-    if (!expectingPopup)
-        return;
-
-    cancelPopup();
-
-    if (delitem->availableStatus != asAvailable)
-        showAvailablePopup(delitem);
-    else
-        delitem->SetPreserveEpisode(false);
 }
 
 void PlaybackBox::askStop(void)
@@ -3574,46 +3554,40 @@ void PlaybackBox::setWatched(void)
     update(drawListBounds);
 }
 
-void PlaybackBox::noAutoExpire(void)
-{
-    if (!expectingPopup && delitem)
-        return;
-
-    cancelPopup();
-
-    delitem->SetAutoExpire(0);
-
-    ProgramInfo *tmpItem = findMatchingProg(delitem);
-    if (tmpItem)
-        tmpItem->programflags &= ~FL_AUTOEXP;
-
-    delete delitem;
-    delitem = NULL;
-
-    previewVideoState = kChanging;
-
-    update(drawListBounds);
-}
-
-void PlaybackBox::doAutoExpire(void)
+void PlaybackBox::toggleAutoExpire(bool turnOn)
 {
     if (!expectingPopup)
         return;
 
-    cancelPopup();
+    ProgramInfo *tmpItem = findMatchingProg(delitem);
 
-    delitem->SetAutoExpire(1);
+    if (tmpItem)
+    {
+        tmpItem->SetAutoExpire(turnOn);
+
+        if (turnOn)
+            tmpItem->programflags |= FL_AUTOEXP;
+        else
+            tmpItem->programflags &= ~FL_AUTOEXP;
+
+        update(drawListBounds);
+    }
+}
+
+void PlaybackBox::togglePreserveEpisode(bool turnOn)
+{
+    if (!expectingPopup)
+        return;
 
     ProgramInfo *tmpItem = findMatchingProg(delitem);
+
     if (tmpItem)
-        tmpItem->programflags |= FL_AUTOEXP;
-
-    delete delitem;
-    delitem = NULL;
-
-    previewVideoState = kChanging;
-
-    update(drawListBounds);
+    {
+        if (tmpItem->availableStatus != asAvailable)
+            showAvailablePopup(tmpItem);
+        else
+            tmpItem->SetPreserveEpisode(turnOn);
+    }
 }
 
 void PlaybackBox::doCancel(void)

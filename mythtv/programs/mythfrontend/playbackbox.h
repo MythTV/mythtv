@@ -164,10 +164,8 @@ class PlaybackBox : public MythDialog
     void setWatched();
     void setUnwatched();
 
-    void doAutoExpire();
-    void noAutoExpire();
-    void doPreserveEpisode();
-    void noPreserveEpisode();
+    void toggleAutoExpire(bool turnOn);
+    void togglePreserveEpisode(bool turnOn);
 
     void doCancel();
     void toggleTitleView();
