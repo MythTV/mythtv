@@ -395,6 +395,9 @@ enum PixelFormat avcodec_default_get_format(struct AVCodecContext *s, const enum
     return fmt[0];
 }
 
+void avcodec_default_decode_cc_dvd(AVCodecContext *c, const uint8_t *buf, int buf_size){
+}
+
 static const char* context_to_name(void* ptr) {
     AVCodecContext *avc= ptr;
 
@@ -751,6 +754,7 @@ void avcodec_get_context_defaults(AVCodecContext *s){
 
     s->palctrl = NULL;
     s->reget_buffer= avcodec_default_reget_buffer;
+    s->decode_cc_dvd= avcodec_default_decode_cc_dvd;
 }
 
 /**
