@@ -2079,6 +2079,30 @@ void VideoSourceEditor::del()
     if (val == 0)
     {
         MSqlQuery query(MSqlQuery::InitCon());
+
+        // Delete the channels associated with the source
+        query.prepare("DELETE FROM channel "
+                      "WHERE sourceid = :SOURCEID");
+        query.bindValue(":SOURCEID", getValue());
+
+        if (!query.exec() || !query.isActive())
+        {
+            MythContext::DBError("Deleting Channels", query);
+            return;
+        }
+
+        // Delete the inputs associated with the source
+        query.prepare("DELETE FROM cardinput "
+                      "WHERE sourceid = :SOURCEID");
+        query.bindValue(":SOURCEID", getValue());
+
+        if (!query.exec() || !query.isActive())
+        {
+            MythContext::DBError("Deleting cardinputs", query);
+            return;
+        }
+
+        // Delete the source itself
         query.prepare("DELETE FROM videosource "
                       "WHERE sourceid = :SOURCEID");
         query.bindValue(":SOURCEID", getValue());
