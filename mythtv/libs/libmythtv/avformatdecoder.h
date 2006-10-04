@@ -168,7 +168,8 @@ class AvFormatDecoder : public DecoderBase
 
     void DecodeDTVCC(const uint8_t *buf);
     void InitByteContext(void);
-    void InitVideoCodec(AVStream *stream, AVCodecContext *enc);
+    void InitVideoCodec(AVStream *stream, AVCodecContext *enc,
+                        bool selectedStream = false);
 
     /// Preprocess a packet, setting the video parms if nessesary.
     void MpegPreProcessPkt(AVStream *stream, AVPacket *pkt);
@@ -256,3 +257,5 @@ class AvFormatDecoder : public DecoderBase
 };
 
 #endif
+
+/* vim: set expandtab tabstop=4 shiftwidth=4: */
