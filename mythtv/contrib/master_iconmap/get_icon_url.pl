@@ -26,7 +26,7 @@
               );
 
 # Nothing requested
-    print_help() unless ($lookup =~ /\w/);
+    print_help() unless ($lookup && $lookup =~ /\w/);
 
 # All callsigns are stored in upper case
     $lookup = uc($lookup);
