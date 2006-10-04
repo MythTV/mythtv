@@ -169,6 +169,22 @@ static QString sortTitle(QString title, PlaybackBox::ViewMask viewmask,
     return sTitle;
 }
 
+static int comp_recordDate(ProgramInfo *a, ProgramInfo *b)
+{
+    if (a->startts.date() == b->startts.date())
+        return (a->recstartts < b->recstartts ? 1 : -1);
+    else
+        return (a->startts.date() < b->startts.date() ? 1 : -1);
+}
+
+static int comp_recordDate_rev(ProgramInfo *a, ProgramInfo *b)
+{
+    if (a->startts.date() == b->startts.date())
+        return (a->recstartts > b->recstartts ? 1 : -1);
+    else
+        return (a->startts.date() > b->startts.date() ? 1 : -1);
+}
+
 PlaybackBox::PlaybackBox(BoxType ltype, MythMainWindow *parent, 
                          const char *name)
     : MythDialog(parent, name),
@@ -240,7 +256,9 @@ PlaybackBox::PlaybackBox(BoxType ltype, MythMainWindow *parent,
     formatLongDate     = gContext->GetSetting("DateFormat", "ddd MMMM d");
     formatTime         = gContext->GetSetting("TimeFormat", "h:mm AP");
     recGroup           = gContext->GetSetting("DisplayRecGroup","All Programs");
-    listOrder          = gContext->GetNumSetting("PlayBoxOrdering", 1);
+    int pbOrder        = gContext->GetNumSetting("PlayBoxOrdering", 1);
+    // Split out sort order modes, wacky order for backward compatibility
+    listOrder = (pbOrder >> 1) ^ (allOrder = pbOrder & 1);
     useSearches        = gContext->GetNumSetting("PlaybackSearches", 0);
     useWatchList       = gContext->GetNumSetting("PlaybackWatchList", 1);
     watchListAutoExpire= gContext->GetNumSetting("PlaybackWLAutoExpire", 0);
@@ -1503,7 +1521,7 @@ bool PlaybackBox::FillList(bool useCachedData)
     {
         clearProgramCache();
 
-        progCache = RemoteGetRecordedList(listOrder == 0 || type == Delete);
+        progCache = RemoteGetRecordedList(allOrder == 0 || type == Delete);
     }
 
     if (progCache)
@@ -1666,6 +1684,21 @@ bool PlaybackBox::FillList(bool useCachedData)
             }
         }
     }
+    else if (episodeSort == "Date")
+    {
+        QMap<QString, ProgramList>::iterator it;
+        for (it = progLists.begin(); it != progLists.end(); ++it)
+        {
+            if (!it.key().isEmpty())
+            {
+                if (!listOrder || type == Delete)
+                    (*it).Sort(comp_recordDate_rev);
+                else
+                    (*it).Sort(comp_recordDate);
+            }
+        }
+    }
+
     if (progLists[watchGroup].count() > 1)
     {
         QDateTime now = QDateTime::currentDateTime();
@@ -1869,40 +1902,56 @@ bool PlaybackBox::FillList(bool useCachedData)
 
             if (oldtitle != watchGroup)
             {
-                if (listOrder == 0 || type == Delete)
+                if (titleIndex == 0)
                 {
-                    if (episodeSort == "OrigAirDate" && titleIndex > 0)
-                    {
-                        if (oldoriginalAirDate > p->originalAirDate)
-                            break;
-                    }
-                    else if (episodeSort == "Id" && titleIndex > 0)
-                    {
-                        if (oldprogramid > p->programid)
-                            break;
-                    }
-                    else 
+                    if (allOrder == 0 || type == Delete)
                     {
                         if (oldstartts > p->recstartts)
-                            break;
-                    }
-                }
-                else
-                {
-                    if (episodeSort == "OrigAirDate" && titleIndex > 0)
-                    {
-                        if (oldoriginalAirDate < p->originalAirDate)
-                            break;
-                    }
-                    else if (episodeSort == "Id" && titleIndex > 0)
-                    {
-                        if (oldprogramid < p->programid)
                             break;
                     }
                     else
                     {
                         if (oldstartts < p->recstartts)
-                            break;
+                            break;  
+                    }
+                }
+                else
+                {
+                    if (!listOrder || type == Delete)
+                    {
+                        if (episodeSort == "OrigAirDate")
+                        {
+                            if (oldoriginalAirDate > p->originalAirDate)
+                                break;
+                        }
+                        else if (episodeSort == "Id")
+                        {
+                            if (oldprogramid > p->programid)
+                                break;
+                        }
+                        else 
+                        {
+                            if (oldstartts > p->recstartts)
+                                break;
+                        }
+                    }
+                    else
+                    {
+                        if (episodeSort == "OrigAirDate")
+                        {
+                            if (oldoriginalAirDate < p->originalAirDate)
+                                break;
+                        }
+                        else if (episodeSort == "Id")
+                        {
+                            if (oldprogramid < p->programid)
+                                break;
+                        }
+                        else
+                        {
+                            if (oldstartts < p->recstartts)
+                                break;
+                        }
                     }
                 }
             }

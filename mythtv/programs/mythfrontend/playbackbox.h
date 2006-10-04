@@ -324,6 +324,8 @@ class PlaybackBox : public MythDialog
     bool                arrowAccel;
     /// if true keypress events are ignored  
     bool                ignoreKeyPressEvents;
+    /// allOrder controls the ordering of the "All Programs" list
+    int                 allOrder;
     /// listOrder controls the ordering of the recordings in the list
     int                 listOrder;
     /// Number of items in selector that can be shown on the screen at once

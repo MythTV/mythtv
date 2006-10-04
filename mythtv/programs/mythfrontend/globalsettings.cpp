@@ -704,15 +704,30 @@ static VerticalConfigurationGroup *CategoryOverTimeSettings()
     return vcg;
 }
 
-static HostCheckBox *PlayBoxOrdering()
+static HostComboBox *PlayBoxOrdering()
 {
-    HostCheckBox *gc = new HostCheckBox("PlayBoxOrdering");
-    gc->setLabel(QObject::tr("List Newest Recording First"));
-    gc->setValue(true);
-    gc->setHelpText(QObject::tr("When enabled, the most recent recording "
-                    "will be listed first in the 'Watch Recordings' "
-                    "screen, otherwise the oldest recording will be "
-                    "listed first."));
+    QString str[4] =
+    {
+        QObject::tr("Sort all sub-titles/multi-titles Ascending"),
+        QObject::tr("Sort all sub-titles/multi-titles Descending"),
+        QObject::tr("Sort sub-titles Descending, multi-titles Ascending"),
+        QObject::tr("Sort sub-titles Ascending, multi-titles Descending"),
+    };
+    QString help = QObject::tr(
+        "Selects how to sort show episodes. Sub-titles refers to the "
+        "episodes listed under a specific show title. Multi-title "
+        "refers to sections (e.g. \"All Programs\") which list "
+        "multiple titles. Sections in parentheses are not affected.");
+
+    HostComboBox *gc = new HostComboBox("PlayBoxOrdering");
+    gc->setLabel(QObject::tr("Title sort orderings"));
+
+    for (int i = 0; i < 4; i++)
+        gc->addSelection(str[i], QString::number(i));
+
+    gc->setValue(1);
+    gc->setHelpText(help);
+
     return gc;
 }
 
