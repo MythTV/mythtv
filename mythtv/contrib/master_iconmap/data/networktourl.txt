@@ -85,8 +85,14 @@ IND-WRDQ                [ls-logo]/ww/wrdq_action27_orlando.jpg
 IND-WSBK                [ls-logo]/ww/wsbk_tv38_boston.jpg
 IND-WTGL                [ls-logo]/ww/wtgl_52_cocoa.jpg
 IPLEX                   [ls-icon]/ee/encore_indieplex.gif
+KBCB                    [ls-icon]/kk/kbcb_24_world_tv_seattle.gif
+KHCV                    [ls-icon]/kk/khcv45_seattle.gif
+KIRO                    [ls-icon]/kk/kiro_cbs7_seattle.gif
 KMEX                    [zap2it]/uni.gif
+KOMO                    [ls-icon]/kk/komo.gif
 KONG                    [ls-icon]/kk/kong6_16_seattle.gif
+KSTW                    [ls-icon]/kk/kstw_cw11_seattle.gif
+KWOG                    [ls-icon]/kk/kwog_nbc51_seattle.gif
 LIFETIME                [zap2it]/life.jpg
 LIFETIMEMOVIE           [ls-icon]/ll/lifetime_movie.gif
 MNTV                    [zap2it]/mynetworktv_affiliate.gif

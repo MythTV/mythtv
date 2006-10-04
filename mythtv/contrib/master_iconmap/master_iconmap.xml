@@ -925,6 +925,10 @@
         <network>FOX</network>
     </callsigntonetwork>
     <callsigntonetwork>
+        <callsign>KBCB</callsign>
+        <network>KBCB</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
         <callsign>KBCW</callsign>
         <network>CW</network>
     </callsigntonetwork>
@@ -1401,6 +1405,10 @@
         <network>ABC</network>
     </callsigntonetwork>
     <callsigntonetwork>
+        <callsign>KHCV</callsign>
+        <network>KHCV</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
         <callsign>KHET</callsign>
         <network>PBS-KHET</network>
     </callsigntonetwork>
@@ -1490,11 +1498,11 @@
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>KIRO</callsign>
-        <network>CBS</network>
+        <network>KIRO</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>KIRODT</callsign>
-        <network>CBS</network>
+        <network>KIRO</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>KITV</callsign>
@@ -1866,11 +1874,11 @@
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>KOMO</callsign>
-        <network>ABC</network>
+        <network>KOMO</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>KOMODT</callsign>
-        <network>ABC</network>
+        <network>KOMO</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>KOMU</callsign>
@@ -2210,7 +2218,11 @@
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>KSTW</callsign>
-        <network>UPN</network>
+        <network>KSTW</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>KSTWDT</callsign>
+        <network>KSTW</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>KSVI</callsign>
@@ -2691,6 +2703,10 @@
     <callsigntonetwork>
         <callsign>KWNB</callsign>
         <network>ABC</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>KWOG</callsign>
+        <network>KWOG</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>KWPX</callsign>
@@ -6145,12 +6161,36 @@
         <url>[ls-icon]/ee/encore_indieplex.gif</url>
     </networktourl>
     <networktourl>
+        <network>KBCB</network>
+        <url>[ls-icon]/kk/kbcb_24_world_tv_seattle.gif</url>
+    </networktourl>
+    <networktourl>
+        <network>KHCV</network>
+        <url>[ls-icon]/kk/khcv45_seattle.gif</url>
+    </networktourl>
+    <networktourl>
+        <network>KIRO</network>
+        <url>[ls-icon]/kk/kiro_cbs7_seattle.gif</url>
+    </networktourl>
+    <networktourl>
         <network>KMEX</network>
         <url>[zap2it]/uni.gif</url>
     </networktourl>
     <networktourl>
+        <network>KOMO</network>
+        <url>[ls-icon]/kk/komo.gif</url>
+    </networktourl>
+    <networktourl>
         <network>KONG</network>
         <url>[ls-icon]/kk/kong6_16_seattle.gif</url>
+    </networktourl>
+    <networktourl>
+        <network>KSTW</network>
+        <url>[ls-icon]/kk/kstw_cw11_seattle.gif</url>
+    </networktourl>
+    <networktourl>
+        <network>KWOG</network>
+        <url>[ls-icon]/kk/kwog_nbc51_seattle.gif</url>
     </networktourl>
     <networktourl>
         <network>LIFETIME</network>

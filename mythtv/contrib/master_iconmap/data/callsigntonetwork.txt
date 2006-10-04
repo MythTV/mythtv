@@ -229,6 +229,7 @@ KAUT        UPN
 KAVU        ABC
 KAWE        PBS-KAWE
 KAYU        FOX
+KBCB        KBCB
 KBCW        CW
 KBDI        PBS-KBDI
 KBEH        UPN
@@ -348,6 +349,7 @@ KGWB        WB
 KHAS        NBC
 KHBB        UPN
 KHBS        ABC
+KHCV        KHCV
 KHET        PBS-KHET
 KHGI        ABC
 KHMT        UPN
@@ -370,8 +372,8 @@ KIMT        UPN
 KING        NBC
 KINGDT      NBC
 KION        CBS
-KIRO        CBS
-KIRODT      CBS
+KIRO        KIRO
+KIRODT      KIRO
 KITV        ABC
 KIVI        ABC
 KIXE        PBS-KIXE
@@ -464,8 +466,8 @@ KOIN        CBS
 KOKH        FOX
 KOKI        FOX
 KOLO        ABC
-KOMO        ABC
-KOMODT      ABC
+KOMO        KOMO
+KOMODT      KOMO
 KOMU        NBC
 KONG        KONG
 KONGDT      KONG
@@ -550,7 +552,8 @@ KSPS        PBS-KSPS
 KSTP        ABC
 KSTS        TELEMUNDO
 KSTU        FOX
-KSTW        UPN
+KSTW        KSTW
+KSTWDT      KSTW
 KSVI        ABC
 KSWB        WB
 KSWO        ABC
@@ -671,6 +674,7 @@ KWIB        WB
 KWKB        WB
 KWKT        FOX
 KWNB        ABC
+KWOG        KWOG
 KWPX        PAX
 KWQC        NBC
 KWSD        WB
