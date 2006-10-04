@@ -271,10 +271,15 @@ class MythPushButton : public QPushButton
                  : QPushButton(text, parent)
                   { setBackgroundOrigin(WindowOrigin); arrowAccel = aa;}
 
+    MythPushButton(const QString &ontext, const QString &offtext,
+                   QWidget *parent, bool isOn = true, bool aa = false);
+
     void setHelpText(const QString &help) { helptext = help; }
 
     void keyPressEvent(QKeyEvent *e);
     void keyReleaseEvent(QKeyEvent *e);
+
+    void toggleText(void);
 
   signals:
     void changeHelpText(QString);
@@ -286,6 +291,8 @@ class MythPushButton : public QPushButton
   private:
     QColor origcolor;
     QString helptext;
+    QString onText;
+    QString offText;
     bool arrowAccel;
 
     QStringList keyPressActions;

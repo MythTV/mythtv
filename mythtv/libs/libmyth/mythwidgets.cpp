@@ -1028,6 +1028,26 @@ void MythButtonGroup::moveFocus(int key)
     }
 }
 
+MythPushButton::MythPushButton(const QString &ontext, const QString &offtext,
+                               QWidget *parent, bool isOn, bool aa)
+                               : QPushButton(ontext, parent)
+{
+    setBackgroundOrigin(WindowOrigin);
+    arrowAccel = aa;
+
+    onText = ontext;
+    offText = offtext;
+
+    setToggleButton(true);
+
+    if (isOn)
+        setText(onText);
+    else
+        setText(offText);
+
+    setOn(isOn);
+}
+
 void MythPushButton::keyPressEvent(QKeyEvent *e)
 {
     bool handled = false;
@@ -1046,6 +1066,8 @@ void MythPushButton::keyPressEvent(QKeyEvent *e)
             {
                 setDown(true);
                 emit pressed();
+                if (isToggleButton())
+                    toggleText();
                 handled = true;
             }
             else if (arrowAccel)
@@ -1059,6 +1081,8 @@ void MythPushButton::keyPressEvent(QKeyEvent *e)
                 {
                     setDown(true);
                     emit pressed();
+                    if (isToggleButton())
+                        toggleText();
                     handled = true;
                 }
             }
@@ -1086,6 +1110,17 @@ void MythPushButton::keyReleaseEvent(QKeyEvent *e)
 
     if (!handled)
         QPushButton::keyReleaseEvent(e);
+}
+
+void MythPushButton::toggleText(void)
+{
+    if (!isToggleButton())
+        return;
+
+    if (isOn())
+        setText(offText);
+    else
+        setText(onText);
 }
 
 void MythPushButton::focusInEvent(QFocusEvent *e)
@@ -1357,3 +1392,5 @@ void MythListBox::focusInEvent(QFocusEvent *e)
     emit changeHelpText(helptext);
     QListBox::focusInEvent(e);
 }
+
+/* vim: set expandtab tabstop=4 shiftwidth=4: */
