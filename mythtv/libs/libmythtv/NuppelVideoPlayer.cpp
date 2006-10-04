@@ -4386,9 +4386,9 @@ bool NuppelVideoPlayer::DoKeypress(QKeyEvent *e)
                     if (!deleteMap.contains(it.key()))
                     {
                         if (it.data() == MARK_COMM_START)
-                            AddMark(it.key(), 1);
+                            AddMark(it.key(), MARK_CUT_END);
                         else
-                            AddMark(it.key(), 0);
+                            AddMark(it.key(), MARK_CUT_START);
                     }
                 }
                 commBreakMapLock.unlock();
@@ -4679,10 +4679,10 @@ void NuppelVideoPlayer::HandleResponse(void)
         switch (result)
         {
             case 1:
-                AddMark(framesPlayed, 0);
+                AddMark(framesPlayed, MARK_CUT_END);
                 break;
             case 2:
-                AddMark(framesPlayed, 1);
+                AddMark(framesPlayed, MARK_CUT_START);
                 break;
             case 3: case 0: default:
                 break;
@@ -4713,10 +4713,10 @@ void NuppelVideoPlayer::ReverseMark(long long frames)
 {
     osd->HideEditArrow(frames, deleteMap[frames]);
 
-    if (deleteMap[frames] == 0)
-        deleteMap[frames] = 1;
+    if (deleteMap[frames] == MARK_CUT_END)
+        deleteMap[frames] = MARK_CUT_START;
     else
-        deleteMap[frames] = 0;
+        deleteMap[frames] = MARK_CUT_END;
 
     osd->ShowEditArrow(frames, totalFrames, deleteMap[frames]);
 }
@@ -4856,7 +4856,7 @@ void NuppelVideoPlayer::SaveCutList(void)
 
         if (direction == 0 && !indelete && first)
         {
-            deleteMap[0] = 1;
+            deleteMap[0] = MARK_CUT_START;
             startpos = 0;
             endpos = frame;
         }
@@ -4894,7 +4894,7 @@ void NuppelVideoPlayer::SaveCutList(void)
     }
 
     if (indelete)
-        deleteMap[totalFrames] = 0;
+        deleteMap[totalFrames] = MARK_CUT_END;
 
     m_playbackinfo->SetMarkupFlag(MARK_UPDATED_CUT, true);
     m_playbackinfo->SetCutList(deleteMap);
