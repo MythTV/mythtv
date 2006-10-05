@@ -113,6 +113,7 @@ package MythTV::Program;
         my $separator   = (shift or '-');
         my $replacement = (shift or '-');
         my $allow_dirs  = (shift) ? 1 : 0;
+        my $underscores = (shift) ? 1 : 0;
     # Escape where necessary
         my $safe_sep = $separator;
            $safe_sep =~ s/([^\w\s])/\\$1/sg;
@@ -150,6 +151,7 @@ package MythTV::Program;
         elsif ($hour < 1) {
             $hour = 12;
         }
+        $sminute = "0$sminute" if ($sminute < 10);
         # End time
         $eyear += 1900;
         $emonth++;
@@ -163,6 +165,7 @@ package MythTV::Program;
         elsif ($ethour < 1) {
             $ethour = 12;
         }
+        $eminute = "0$eminute" if ($eminute < 10);
     # Original airdate
         my ($oday, $omonth, $oyear) = (localtime($self->{'airdate'}))[3,4,5];
         $oyear += 1900;
