@@ -14,22 +14,14 @@
     my $networktourl      = 'data/networktourl.txt';
     my $baseurl           = 'data/baseurl.txt';
 
-# Includes
-    use Getopt::Long;
-
-# Variables
-    my $lookup; # Requested callsign to look up
-
-# Load the cli options
-    GetOptions('callsign|lookup=s' => \$lookup,
-               'help|h|usage'      => sub { print_help(); }
-              );
-
-# Nothing requested
-    print_help() unless ($lookup && $lookup =~ /\w/);
+# Nothing requested?
+    unless ($ARGV[0] && $ARGV[0] =~ /\w/ && $ARGV[0] !~ /\W/) {
+        print "usage:  ./get_icon_url.pl CALLSIGN\n";
+        exit;
+    }
 
 # All callsigns are stored in upper case
-    $lookup = uc($lookup);
+    my $lookup = uc($ARGV[0]);
 
 # Variables we will use
     my $ignore  = '';
@@ -88,22 +80,4 @@
 
 # Done
     exit;
-
-# Function
-    sub print_help {
-        print <<EOF;
-usage:  ./get_icon_url.pl [options]
-
-    --callsign=<callsign>
-
-        Look up a specific callsign and return the URL for its icon.
-
-    --help
-    --usage
-
-        Print this help message.
-
-EOF
-        exit;
-    }
 
