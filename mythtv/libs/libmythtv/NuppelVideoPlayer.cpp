@@ -4386,9 +4386,9 @@ bool NuppelVideoPlayer::DoKeypress(QKeyEvent *e)
                     if (!deleteMap.contains(it.key()))
                     {
                         if (it.data() == MARK_COMM_START)
-                            AddMark(it.key(), MARK_CUT_END);
-                        else
                             AddMark(it.key(), MARK_CUT_START);
+                        else
+                            AddMark(it.key(), MARK_CUT_END);
                     }
                 }
                 commBreakMapLock.unlock();
