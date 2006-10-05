@@ -224,6 +224,8 @@ EOF
         my $show = new MythTV::Recording(@$row);
     # Skip LiveTV recordings?
         next unless (defined($live) || $show->{'recgroup'} ne 'LiveTV');
+    # File doesn't exist locally
+        next unless (-e $show->{'local_path'});
     # Load info about the file so we can determine the file type
         $show->load_file_info();
     # Format the name
