@@ -38,11 +38,9 @@ class Scheduler : public QObject
                          const QDateTime &startts, RecStatusType recstatus, 
                          const QDateTime &recendts);
 
-    RecList *getAllPending(void) { return &reclist; }
     void getAllPending(RecList *retList);
     void getAllPending(QStringList &strList);
 
-    RecList *getAllScheduled(void);
     void getAllScheduled(QStringList &strList);
 
     void getConflicting(ProgramInfo *pginfo, QStringList &strlist);
@@ -106,13 +104,11 @@ class Scheduler : public QObject
     QWaitCondition reschedWait;
     RecList reclist;
     RecList retrylist;
-    RecList schedlist;
     QMap<int, RecList> cardlistmap;
     QMap<int, RecList> recordidlistmap;
     QMap<QString, RecList> titlelistmap;
 
     QMutex *reclist_lock;
-    QMutex *schedlist_lock;
 
     bool specsched;
     bool hasconflicts;
@@ -123,6 +119,7 @@ class Scheduler : public QObject
 
     QMap<QString, bool> recPendingList;
 
+    pthread_t schedThread;
     bool threadrunning;
 
     MainServer *m_mainServer;

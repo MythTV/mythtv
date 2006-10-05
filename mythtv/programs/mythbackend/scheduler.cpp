@@ -67,12 +67,17 @@ Scheduler::Scheduler(bool runthread, QMap<int, EncoderLink *> *tvList,
     threadrunning = runthread;
 
     reclist_lock = new QMutex(true);
-    schedlist_lock = new QMutex(true);
 
     if (runthread)
     {
-        pthread_t scthread;
-        pthread_create(&scthread, NULL, SchedulerThread, this);
+        int err = pthread_create(&schedThread, NULL, SchedulerThread, this);
+        if (err != 0)
+        {
+            VERBOSE(VB_IMPORTANT, 
+                    QString("Failed to start scheduler thread: error %1")
+                    .arg(err));
+            threadrunning = false;
+        }
     }
 }
 
@@ -84,6 +89,15 @@ Scheduler::~Scheduler()
         delete pginfo;
         reclist.pop_back();
     }
+
+    if (threadrunning)
+    {
+        pthread_cancel(schedThread);
+        pthread_join(schedThread, NULL);
+    }
+
+    if (reclist_lock)
+        delete reclist_lock;
 }
 
 void Scheduler::SetMainServer(MainServer *ms)
@@ -1084,31 +1098,21 @@ void Scheduler::getAllPending(QStringList &strList)
     delete retList;
 }
 
-RecList *Scheduler::getAllScheduled(void)
+void Scheduler::getAllScheduled(QStringList &strList)
 {
-    while (schedlist.size() > 0)
-    {
-        ProgramInfo *pginfo = schedlist.back();
-        delete pginfo;
-        schedlist.pop_back();
-    }
+    RecList schedlist;
 
     findAllScheduledPrograms(schedlist);
 
-    return &schedlist;
-}
-
-void Scheduler::getAllScheduled(QStringList &strList)
-{
-    QMutexLocker lockit(schedlist_lock);
-
-    getAllScheduled();
-
     strList << QString::number(schedlist.size());
 
-    RecIter i = schedlist.begin();
-    for (; i != schedlist.end(); i++)
-        (*i)->ToStringList(strList);
+    while (schedlist.size() > 0)
+    {
+        ProgramInfo *pginfo = schedlist.front();
+        pginfo->ToStringList(strList);
+        delete pginfo;
+        schedlist.pop_front();
+    }
 }
 
 void Scheduler::Reschedule(int recordid) { 
