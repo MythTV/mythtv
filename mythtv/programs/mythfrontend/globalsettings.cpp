@@ -316,33 +316,6 @@ static HostCheckBox *RememberRecGroup()
     return gc;
 }
 
-static HostComboBox *DefaultView()
-{
-    HostComboBox *gc = new HostComboBox("DisplayGroupDefaultView");
-    gc->setLabel(QObject::tr("Default View"));
-
-    gc->addSelection(QObject::tr("Show Titles only"),
-            QString::number(PlaybackBox::TitlesOnly));
-    gc->addSelection(QObject::tr("Show Titles and Categories"),
-            QString::number(PlaybackBox::TitlesCategories));
-    gc->addSelection(QObject::tr(
-                "Show Titles, Categories, and Recording Groups"),
-            QString::number(PlaybackBox::TitlesCategoriesRecGroups));
-    gc->addSelection(QObject::tr("Show Titles and Recording Groups"),
-            QString::number(PlaybackBox::TitlesRecGroups));
-    gc->addSelection(QObject::tr("Show Categories only"),
-            QString::number(PlaybackBox::Categories));
-    gc->addSelection(QObject::tr("Show Categories and Recording Groups"),
-            QString::number(PlaybackBox::CategoriesRecGroups));
-    gc->addSelection(QObject::tr("Show Recording Groups only"),
-            QString::number(PlaybackBox::RecGroups));
-
-    gc->setHelpText(QObject::tr("Select what type of grouping to show on the Watch Recordings screen "
-                    "by default."));
-
-    return gc;
-}
-
 static HostCheckBox *UseGroupNameAsAllPrograms()
 {
     HostCheckBox *gc = new HostCheckBox("DispRecGroupAsAllProg");
@@ -2636,45 +2609,16 @@ static HostCheckBox *EnableMediaMon()
     return gc;
 }
 
-class DefaultViewSettings: public VerticalConfigurationGroup,
-                           public TriggeredConfigurationGroup {
-public:
-    DefaultViewSettings():
-            VerticalConfigurationGroup(false, false, true, true),
-            TriggeredConfigurationGroup(false) {
-
-        TriggeredConfigurationGroup::setOptions(false, false, true, true);
-        VerticalConfigurationGroup::setOptions(false, false, true, true);
-
-        HostComboBox *defaultView = DefaultView();
-        addChild(defaultView);
-        setTrigger(defaultView);
-
-        HostComboBox *titleSort = new HostComboBox("DisplayGroupTitleSort");
-        titleSort->setLabel(QObject::tr("Sort Titles"));
-        titleSort->addSelection(QObject::tr("Alphabetically"),
-                QString::number(PlaybackBox::TitleSortAlphabetical));
-        titleSort->addSelection(QObject::tr("By Recording Priority"),
-                QString::number(PlaybackBox::TitleSortRecPriority));
-
-        for (unsigned int ii = 0; ii < PlaybackBox::ViewTypes; ii++)
-        {
-            if (ii == PlaybackBox::TitlesOnly)
-                addTarget(QString::number(ii), titleSort);
-            else
-                addTarget(QString::number(ii),
-                        new VerticalConfigurationGroup(false, false));
-        }
-    }
-};
-
-static HostCheckBox *PlaybackSearches()
+static HostComboBox *DisplayGroupTitleSort()
 {
-    HostCheckBox *gc = new HostCheckBox("PlaybackSearches");
-    gc->setLabel(QObject::tr("Include search rule groups"));
-    gc->setValue(false);
-    gc->setHelpText(QObject::tr("Include title groups for recordings from "
-                                "search rule."));
+    HostComboBox *gc = new HostComboBox("DisplayGroupTitleSort");
+    gc->setLabel(QObject::tr("Sort Titles"));
+    gc->addSelection(QObject::tr("Alphabetically"),
+            QString::number(PlaybackBox::TitleSortAlphabetical));
+    gc->addSelection(QObject::tr("By Recording Priority"),
+            QString::number(PlaybackBox::TitleSortRecPriority));
+    gc->setHelpText(QObject::tr("Sets the Title sorting order when the "
+                    "view is set to Titles only."));
     return gc;
 }
 
@@ -3591,8 +3535,7 @@ PlaybackSettings::PlaybackSettings()
 
     VerticalConfigurationGroup* pbox3 = new VerticalConfigurationGroup(false);
     pbox3->setLabel(QObject::tr("View Recordings (Views)"));
-    pbox3->addChild(new DefaultViewSettings());
-    pbox3->addChild(PlaybackSearches());
+    pbox3->addChild(DisplayGroupTitleSort());
     pbox3->addChild(new WatchListSettings());
     addChild(pbox3);
 

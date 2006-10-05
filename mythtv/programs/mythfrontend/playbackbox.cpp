@@ -193,8 +193,7 @@ PlaybackBox::PlaybackBox(BoxType ltype, MythMainWindow *parent,
       formatShortDate("M/d"),           formatLongDate("ddd MMMM d"),
       formatTime("h:mm AP"),
       titleView(true),                  useCategories(false),
-      useRecGroups(false),              useSearches(false),
-      useWatchList(false),              watchListAutoExpire(false),
+      useRecGroups(false),              watchListAutoExpire(false),
       watchListMaxAge(60),              watchListBlackOut(2),
       groupnameAsAllProg(false),
       arrowAccel(true),                 ignoreKeyPressEvents(false),
@@ -259,8 +258,6 @@ PlaybackBox::PlaybackBox(BoxType ltype, MythMainWindow *parent,
     int pbOrder        = gContext->GetNumSetting("PlayBoxOrdering", 1);
     // Split out sort order modes, wacky order for backward compatibility
     listOrder = (pbOrder >> 1) ^ (allOrder = pbOrder & 1);
-    useSearches        = gContext->GetNumSetting("PlaybackSearches", 0);
-    useWatchList       = gContext->GetNumSetting("PlaybackWatchList", 1);
     watchListAutoExpire= gContext->GetNumSetting("PlaybackWLAutoExpire", 0);
     watchListMaxAge    = gContext->GetNumSetting("PlaybackWLMaxAge", 60);
     watchListBlackOut  = gContext->GetNumSetting("PlaybackWLBlackOut", 2);
@@ -275,9 +272,13 @@ PlaybackBox::PlaybackBox(BoxType ltype, MythMainWindow *parent,
         drawTransPixmap = new QPixmap();
 
     bool displayCat  = gContext->GetNumSetting("DisplayRecGroupIsCategory", 0);
-    ViewType defaultView = (ViewType)gContext->GetNumSetting(
-            "DisplayGroupDefaultView", TitlesOnly);
     int  initialFilt = gContext->GetNumSetting("QueryInitialFilter", 0);
+
+    viewMask = (ViewMask)gContext->GetNumSetting(
+            "DisplayGroupDefaultViewMask", VIEW_TITLES);
+
+    if (gContext->GetNumSetting("PlaybackWatchList", 1))
+        viewMask = (ViewMask)(viewMask | VIEW_WATCHLIST);
 
     progLists[""];
     titleList << "";
@@ -297,7 +298,6 @@ PlaybackBox::PlaybackBox(BoxType ltype, MythMainWindow *parent,
         }
     }
     recGroupPassword = getRecGroupPassword(recGroup);
-    setDefaultView(defaultView);
 
     // theme stuff
     theme->SetWMult(wmult);
@@ -441,43 +441,6 @@ PlaybackBox::~PlaybackBox(void)
         delete previewPixmap;
         previewPixmap = NULL;
     }
-}
-
-void PlaybackBox::setDefaultView(ViewType defaultView)
-{
-    int mask;
-
-    switch (defaultView)
-    {
-        default:
-        case TitlesOnly:
-            mask = VIEW_TITLES;
-            break;
-        case TitlesCategories:
-            mask = VIEW_TITLES |    VIEW_CATEGORIES;
-            break;
-        case TitlesCategoriesRecGroups:
-            mask = VIEW_TITLES |    VIEW_CATEGORIES |   VIEW_RECGROUPS;
-            break;
-        case TitlesRecGroups:
-            mask = VIEW_TITLES |                        VIEW_RECGROUPS;
-            break;
-        case Categories:
-            mask =                  VIEW_CATEGORIES;
-            break;
-        case CategoriesRecGroups:
-            mask =                  VIEW_CATEGORIES |   VIEW_RECGROUPS;
-            break;
-        case RecGroups:
-            mask =                                      VIEW_RECGROUPS;
-            break;
-    }
-    if (useSearches)
-        mask = mask | VIEW_SEARCHES;
-    if (useWatchList)
-        mask = mask | VIEW_WATCHLIST;
-
-    viewMask = (PlaybackBox::ViewMask)mask;
 }
 
 /* blocks until playing has stopped */
@@ -3649,15 +3612,16 @@ void PlaybackBox::doCancel(void)
     previewVideoState = kChanging;
 }
 
-void PlaybackBox::toggleTitleView(void)
+void PlaybackBox::toggleView(ViewMask itemMask, bool setOn)
 {
-    if (expectingPopup)
-        cancelPopup();
+    if (setOn)
+        viewMask = (ViewMask)(viewMask | itemMask);
+    else
+        viewMask = (ViewMask)(viewMask & ~itemMask);
 
-    viewMask = viewMaskToggle(viewMask, VIEW_TITLES);
-
-    playList.clear();
-    connected = FillList(true);      
+    connected = FillList(true);
+    paintSkipUpdate = false;
+    update(drawTotalBounds);
 }
 
 void PlaybackBox::promptEndOfRecording(ProgramInfo *rec)
@@ -4427,6 +4391,8 @@ void PlaybackBox::closeRecGroupPopup(bool refreshList)
 
 void PlaybackBox::showViewChanger(void)
 {
+    ViewMask savedMask = viewMask;
+
     if (!expectingPopup)
         return;
 
@@ -4434,32 +4400,66 @@ void PlaybackBox::showViewChanger(void)
 
     initRecGroupPopup(tr("Group View"), "showViewChanger");
 
-    QStringList views;
+    MythCheckBox *checkBox;
 
-    views += tr("Show Titles only");
-    views += tr("Show Titles and Categories");
-    views += tr("Show Titles, Categories, and Recording Groups");
-    views += tr("Show Titles and Recording Groups");
-    views += tr("Show Categories only");
-    views += tr("Show Categories and Recording Groups");
-    views += tr("Show Recording Groups only");
+    checkBox = new MythCheckBox(tr("Show Titles"), recGroupPopup);
+    checkBox->setChecked(viewMask & VIEW_TITLES);
+    connect(checkBox, SIGNAL(toggled(bool)), this, SLOT(toggleTitleView(bool)));
+    recGroupPopup->addWidget(checkBox, false);
+    checkBox->setFocus();
 
-    MythComboBox *recGroupComboBox = new MythComboBox(false, recGroupPopup);
-    recGroupComboBox->insertStringList(views);
-    recGroupComboBox->setAcceptOnSelect(true);
-    recGroupPopup->addWidget(recGroupComboBox);
+    checkBox = new MythCheckBox(tr("Show Categories"), recGroupPopup);
+    checkBox->setChecked(viewMask & VIEW_CATEGORIES);
+    connect(checkBox, SIGNAL(toggled(bool)), this,
+            SLOT(toggleCategoryView(bool)));
+    recGroupPopup->addWidget(checkBox, false);
 
-    recGroupComboBox->setFocus();
+    checkBox = new MythCheckBox(tr("Show Recording Groups"), recGroupPopup);
+    checkBox->setChecked(viewMask & VIEW_RECGROUPS);
+    connect(checkBox, SIGNAL(toggled(bool)), this,
+            SLOT(toggleRecGroupView(bool)));
+    recGroupPopup->addWidget(checkBox, false);
 
-    connect(recGroupComboBox, SIGNAL(accepted(int)), recGroupPopup,
-            SLOT(accept()));
+    checkBox = new MythCheckBox(tr("Show Watch List"), recGroupPopup);
+    checkBox->setChecked(viewMask & VIEW_WATCHLIST);
+    connect(checkBox, SIGNAL(toggled(bool)), this,
+            SLOT(toggleWatchListView(bool)));
+    recGroupPopup->addWidget(checkBox, false);
+
+    checkBox = new MythCheckBox(tr("Show Searches"), recGroupPopup);
+    checkBox->setChecked(viewMask & VIEW_SEARCHES);
+    connect(checkBox, SIGNAL(toggled(bool)), this,
+            SLOT(toggleSearchView(bool)));
+    recGroupPopup->addWidget(checkBox, false);
+
+    MythPushButton *okbutton = new MythPushButton(recGroupPopup);
+    okbutton->setText(tr("Save Current View"));
+    recGroupPopup->addWidget(okbutton);
+    connect(okbutton, SIGNAL(clicked()), recGroupPopup, SLOT(accept()));
+
+    MythPushButton *exitbutton = new MythPushButton(recGroupPopup);
+    exitbutton->setText(tr("Cancel"));
+    recGroupPopup->addWidget(exitbutton);
+    connect(exitbutton, SIGNAL(clicked()), recGroupPopup, SLOT(reject()));
 
     int result = recGroupPopup->ExecPopup();
 
     if (result == MythDialog::Accepted)
-        setDefaultView((ViewType)recGroupComboBox->currentItem());
-
-    delete recGroupComboBox;
+    {
+        if (viewMask == VIEW_NONE)
+            viewMask = VIEW_TITLES;
+        connected = FillList(true);
+        gContext->SaveSetting("DisplayGroupDefaultViewMask", (int)viewMask);
+        gContext->SaveSetting("PlaybackWatchList",
+            (bool)(viewMask & VIEW_WATCHLIST));
+    }
+    else
+    {
+        viewMask = savedMask;
+        connected = FillList(true);
+        paintSkipUpdate = false;
+        update(drawTotalBounds);
+    }
 
     closeRecGroupPopup(result == MythDialog::Accepted);
 }

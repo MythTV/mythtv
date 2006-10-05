@@ -10,7 +10,7 @@ using namespace std;
 #include "mythdbcon.h"
 
 /// This is the DB schema version expected by the running MythTV instance.
-const QString currentDatabaseVersion = "1162";
+const QString currentDatabaseVersion = "1163";
 
 static bool UpdateDBVersionNumber(const QString &newnumber);
 static bool performActualUpdate(const QString updates[], QString version,
@@ -2565,6 +2565,43 @@ static bool doUpgradeTVDatabaseSchema(void)
 };
 
         if (!performActualUpdate(updates, "1162", dbver))
+            return false;
+    }
+
+    if (dbver == "1162")
+    {
+        MSqlQuery query(MSqlQuery::InitCon());
+        QMap<int,int> fixupMap;
+
+        // For new mask values, see playbackbox.h
+        fixupMap[0] = 0x01; // Titles
+        fixupMap[1] = 0x03; // Titles & Categories
+        fixupMap[2] = 0x07; // Titles & Categories & Recording Groups
+        fixupMap[3] = 0x05; // Titles & Recording Groups
+        fixupMap[4] = 0x02; // Categories
+        fixupMap[5] = 0x06; // Categories & Recording Groups
+        fixupMap[6] = 0x04; // Recording Groups
+
+        query.prepare("SELECT data, hostname FROM settings "
+                          "WHERE value = 'DisplayGroupDefaultView'");
+        if (query.exec() && query.isActive() && query.size() > 0)
+        {
+            MSqlQuery fixup(MSqlQuery::InitCon());
+
+            fixup.prepare("INSERT settings ( value, data, hostname ) "
+                              "VALUES ( :VALUE, :DATA, :HOSTNAME )");
+            fixup.bindValue(":VALUE", "DisplayGroupDefaultViewMask");
+
+            while (query.next())
+            {
+                fixup.bindValue(":DATA", fixupMap[query.value(0).toInt()]);
+                fixup.bindValue(":HOSTNAME", query.value(1).toString());
+                fixup.exec();
+            }
+        }
+
+        const QString updates[] = { "" };
+        if (!performActualUpdate(updates, "1163", dbver))
             return false;
     }
 

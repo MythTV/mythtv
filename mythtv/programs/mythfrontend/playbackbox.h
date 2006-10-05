@@ -69,7 +69,6 @@ class PlaybackBox : public MythDialog
         VIEW_RECGROUPS  =  0x04,
         VIEW_WATCHLIST  =  0x08,
         VIEW_SEARCHES   =  0x10,
-        VIEW_ALL        = ~0x00,
     } ViewMask;
 
     typedef enum
@@ -168,7 +167,12 @@ class PlaybackBox : public MythDialog
     void togglePreserveEpisode(bool turnOn);
 
     void doCancel();
-    void toggleTitleView();
+    void toggleView(ViewMask itemMask, bool setOn);
+    void toggleTitleView(bool setOn)     { toggleView(VIEW_TITLES, setOn); }
+    void toggleCategoryView(bool setOn)  { toggleView(VIEW_CATEGORIES, setOn); }
+    void toggleRecGroupView(bool setOn)  { toggleView(VIEW_RECGROUPS, setOn); }
+    void toggleWatchListView(bool setOn) { toggleView(VIEW_WATCHLIST, setOn); }
+    void toggleSearchView(bool setOn)    { toggleView(VIEW_SEARCHES, setOn); }
 
     void exitWin();
 
@@ -290,7 +294,6 @@ class PlaybackBox : public MythDialog
     void updateCurGroup(QPainter *p);
     void updateGroupInfo(QPainter *p, QRect& pr, QPixmap& pix,
                          QString cont_name = "group_info");
-    void setDefaultView(ViewType defaultView);
 
     void clearProgramCache(void);
 
@@ -308,10 +311,6 @@ class PlaybackBox : public MythDialog
     bool                useCategories;
     /// useRecGroups controls showing of recording groups in group list
     bool                useRecGroups;
-    /// useSearches controls showing search rules in group list
-    bool                useSearches;
-    /// useWatchList controls showing the Watch List in group list
-    bool                useWatchList;
     /// exclude recording not marked for auto-expire from the Watch List
     bool                watchListAutoExpire;
     /// add 1 to the Watch List scord up to this many days 
