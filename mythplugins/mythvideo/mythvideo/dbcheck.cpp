@@ -227,13 +227,26 @@ void UpgradeVideoDatabaseSchema(void)
 
     if (dbver == "1008")
     {
-        const QString updates[] = {
-"UPDATE videometadata "
-"LEFT JOIN videocategory ON (videometadata.category = videocategory.intid) "
-"SET videometadata.category = 0 "
-"WHERE videocategory.intid IS NULL;",
-""
-};
+        QStringList updates;
+
+        MSqlQuery query(MSqlQuery::InitCon());
+        query.exec("SELECT intid FROM videocategory;");
+
+        if (query.isActive() && query.size())
+        {
+            QString categoryIDs = "'0'";
+            while (query.next())
+            {
+                categoryIDs += ",'" + query.value(0).toString() + "'";
+            }
+            updates.append(QString(
+"UPDATE videometadata SET category = 0 WHERE category NOT IN (%1);")
+                           .arg(categoryIDs));
+        }
+        else
+        {
+            updates.append("SELECT 1;");
+        }
 
         performActualUpdate(updates, "1009", dbver);
     }
