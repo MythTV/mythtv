@@ -304,6 +304,8 @@ class MythCheckBox: public QCheckBox
   public:
     MythCheckBox(QWidget* parent = 0, const char* name = 0):
         QCheckBox(parent, name) {};
+    MythCheckBox(const QString &text, QWidget* parent = 0, const char* name = 0):
+        QCheckBox(text, parent, name) {};
     void setHelpText(QString help) { helptext = help; }
 
   signals:
