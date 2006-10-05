@@ -22,12 +22,13 @@
     use File::Path;
     use File::Basename;
     use File::Find;
+    use MythTV;
 
 # Some variables we'll use here
     our ($dest, $format, $usage, $underscores, $live);
     our ($dformat, $dseparator, $dreplacement, $separator, $replacement);
     our ($db_host, $db_user, $db_name, $db_pass, $video_dir, $verbose);
-    our ($hostname, $dbh, $sh, $sh2, $q, $q2, $count);
+    our ($hostname, $dbh, $sh, $q, $count);
 
 # Default filename format
     $dformat = '%T %- %Y-%m-%d, %g-%i %A %- %S';
@@ -177,67 +178,17 @@ EOF
     $hostname = `hostname`;
     chomp($hostname);
 
-# Read the mysql.txt file in use by MythTV.
-# could be in a couple places, so try the usual suspects
-    my $found = 0;
-    my @mysql = ('/usr/local/share/mythtv/mysql.txt',
-                 '/usr/share/mythtv/mysql.txt',
-                 '/etc/mythtv/mysql.txt',
-                 '/usr/local/etc/mythtv/mysql.txt',
-                 "$ENV{HOME}/.mythtv/mysql.txt",
-                 'mysql.txt'
-                );
-    foreach my $file (@mysql) {
-        next unless (-e $file);
-        $found = 1;
-        open(CONF, $file) or die "Unable to open $file:  $!\n\n";
-        while (my $line = <CONF>) {
-        # Cleanup
-            next if ($line =~ /^\s*#/);
-            $line =~ s/^str //;
-            chomp($line);
-        # Split off the var=val pairs
-            my ($var, $val) = split(/\=/, $line, 2);
-            next unless ($var && $var =~ /\w/);
-            if ($var eq 'DBHostName') {
-                $db_host = $val;
-            }
-            elsif ($var eq 'DBUserName') {
-                $db_user = $val;
-            }
-            elsif ($var eq 'DBName') {
-                $db_name = $val;
-            }
-            elsif ($var eq 'DBPassword') {
-                $db_pass = $val;
-            }
-        # Hostname override
-            elsif ($var eq 'LocalHostName') {
-                $hostname = $val;
-            }
-        }
-        close CONF;
-    }
-    die "Unable to locate mysql.txt:  $!\n\n" unless ($found && $db_host);
+# Connect to mythbackend
+    my $Myth = new MythTV();
 
 # Connect to the database
-    $dbh = DBI->connect("dbi:mysql:database=$db_name:host=$db_host", $db_user, $db_pass)
-        or die "Cannot connect to database: $!\n\n";
+    $dbh = $Myth->{'dbh'};
     END {
-        $sh->finish      if ($sh);
-        $sh2->finish     if ($sh2);
-        $dbh->disconnect if ($dbh);
+        $sh->finish  if ($sh);
     }
 
 # Find the directory where the recordings are located
-    $q = 'SELECT data FROM settings WHERE value="RecordFilePrefix" AND hostname=?';
-    $sh = $dbh->prepare($q);
-        $sh->execute($hostname) or die "Could not execute ($q):  $!\n\n";
-    ($video_dir) = $sh->fetchrow_array;
-    $sh->finish;
-    die "This host not configured for myth.\n(No RecordFilePrefix defined for $hostname in the settings table.)\n\n" unless ($video_dir);
-    die "Recordings directory $video_dir doesn't exist!\n\n" unless (-d $video_dir);
-    $video_dir =~ s/\/+$//;
+    $video_dir = $Myth->{'video_dir'};
 
 # Link destination
     if (defined($dest)) {
@@ -261,128 +212,29 @@ EOF
         finddepth sub { rmdir $_; }, $dest;
     }
 
-# Prepare a database queries
-    if (defined($live)) {
-        $q  = 'SELECT * FROM recorded';
-    } else {
-        $q  = 'SELECT * FROM recorded where recgroup != "LiveTV"';
-    }
-    $sh  = $dbh->prepare($q);
-    $sh->execute() or die "Couldn't execute $q:  $!\n";
-
 # Only if we're renaming files
     unless ($dest) {
-        $q2  = 'UPDATE recorded SET basename=? WHERE chanid=? AND starttime=?';
-        $sh2 = $dbh->prepare($q2);
+        $q  = 'UPDATE recorded SET basename=? WHERE chanid=? AND starttime=?';
+        $sh = $dbh->prepare($q);
     }
 
 # Create symlinks for the files on this machine
-    while (my $ref = $sh->fetchrow_hashref()) {
-        my %info = %{$ref};
-        die "This script requires mythtv >= 0.19\n" unless ($info{'basename'});
-        next unless (-e "$video_dir/".$info{'basename'});
-    # Default times
-        my ($syear, $smonth, $sday, $shour, $sminute, $ssecond) = $info{'starttime'} =~ /(\d+)-(\d+)-(\d+)\s+(\d+):(\d+):(\d+)/;
-        my ($eyear, $emonth, $eday, $ehour, $eminute, $esecond) = $info{'endtime'}   =~ /(\d+)-(\d+)-(\d+)\s+(\d+):(\d+):(\d+)/;
-    # Format some fields we may be parsing below
-        # Start time
-        my $meridian = ($shour > 12) ? 'PM' : 'AM';
-        my $hour = ($shour > 12) ? $shour - 12 : $shour;
-        if ($hour < 10) {
-            $hour = "0$hour";
-        }
-        elsif ($hour < 1) {
-            $hour = 12;
-        }
-        # End time
-        my $emeridian = ($ehour > 12) ? 'PM' : 'AM';
-        my $ethour = ($ehour > 12) ? $ehour - 12 : $ehour;
-        if ($ethour < 10) {
-            $ethour = "0$ethour";
-        }
-        elsif ($ethour < 1) {
-            $ethour = 12;
-        }
-    # Original airdate
-        $info{'originalairdate'} ||= '0000-00-00';
-        my ($oyear, $omonth, $oday) = split(/\-/, $info{'originalairdate'}, 3);
-    # Build a list of name format options
-        my %fields;
-        ($fields{'T'} = ($info{'title'}       or '')) =~ s/%/%%/g;
-        ($fields{'S'} = ($info{'subtitle'}    or '')) =~ s/%/%%/g;
-        ($fields{'R'} = ($info{'description'} or '')) =~ s/%/%%/g;
-        ($fields{'C'} = ($info{'category'}    or '')) =~ s/%/%%/g;
-        ($fields{'U'} = ($info{'recgroup'}    or '')) =~ s/%/%%/g;
-        $fields{'c'}  = $info{'chanid'};
-    # Start time
-        $fields{'y'} = substr($syear, 2);   # year, 2 digits
-        $fields{'Y'} = $syear;              # year, 4 digits
-        $fields{'n'} = int($smonth);        # month
-        $fields{'m'} = $smonth;             # month, leading zero
-        $fields{'j'} = int($sday);          # day of month
-        $fields{'d'} = $sday;               # day of month, leading zero
-        $fields{'g'} = int($hour);          # 12-hour hour
-        $fields{'G'} = int($shour);         # 24-hour hour
-        $fields{'h'} = $hour;               # 12-hour hour, with leading zero
-        $fields{'H'} = $shour;              # 24-hour hour, with leading zero
-        $fields{'i'} = $sminute;            # minutes
-        $fields{'s'} = $ssecond;            # seconds
-        $fields{'a'} = lc($meridian);       # am/pm
-        $fields{'A'} = $meridian;           # AM/PM
-    # End time
-        $fields{'ey'} = substr($eyear, 2);  # year, 2 digits
-        $fields{'eY'} = $eyear;             # year, 4 digits
-        $fields{'en'} = int($emonth);       # month
-        $fields{'em'} = $emonth;            # month, leading zero
-        $fields{'ej'} = int($eday);         # day of month
-        $fields{'ed'} = $eday;              # day of month, leading zero
-        $fields{'eg'} = int($ethour);       # 12-hour hour
-        $fields{'eG'} = int($ehour);        # 24-hour hour
-        $fields{'eh'} = $ethour;            # 12-hour hour, with leading zero
-        $fields{'eH'} = $ehour;             # 24-hour hour, with leading zero
-        $fields{'ei'} = $eminute;           # minutes
-        $fields{'es'} = $esecond;           # seconds
-        $fields{'ea'} = lc($emeridian);     # am/pm
-        $fields{'eA'} = $emeridian;         # AM/PM
-    # Original Airdate
-        $fields{'oy'} = substr($oyear, 2);  # year, 2 digits
-        $fields{'oY'} = $oyear;             # year, 4 digits
-        $fields{'on'} = int($omonth);       # month
-        $fields{'om'} = $omonth;            # month, leading zero
-        $fields{'oj'} = int($oday);         # day of month
-        $fields{'od'} = $oday;              # day of month, leading zero
-    # Literals
-        $fields{'%'}   = '%';
-        ($fields{'-'}  = $separator) =~ s/%/%%/g;
-    # Make the substitution
-        my $keys = join('|', sort keys %fields);
-        my $name = $format;
-        $name =~ s#/#$dest ? "\0" : $separator#ge;
-        $name =~ s/(?<!%)(?:%($keys))/$fields{$1}/g;
-        $name =~ s/%%/%/g;
-    # Some basic cleanup for illegal (windows) filename characters, etc.
-        $name =~ tr/\ \t\r\n/ /s;
-        $name =~ tr/"/'/s;
-        $name =~ s/(?:[\/\\:*?<>|]+\s*)+(?=[^\d\s])/$replacement /sg;
-        $name =~ s/[\/\\:*?<>|]/$replacement/sg;
-        $name =~ s/(?:(?:$safe_sep)+\s*)+(?=[^\d\s])/$separator /sg;
-        $name =~ s/^($safe_sep|$safe_rep|\ )+//s;
-        $name =~ s/($safe_sep|$safe_rep|\ )+$//s;
-        $name =~ s/\0($safe_sep|$safe_rep|\ )+/\0/s;
-        $name =~ s/($safe_sep|$safe_rep|\ )+\0/\0/s;
-    # Underscores?
-        if ($underscores) {
-            $name =~ tr/ /_/s;
-        }
-    # Folders
-        $name =~ s#\0#/#sg;
+    my %rows = $Myth->backend_rows('QUERY_RECORDINGS Delete');
+    foreach my $row (@{$rows{'rows'}}) {
+        my $show = new MythTV::Recording(@$row);
+    # Skip LiveTV recordings?
+        next unless (defined($live) || $show->{'recgroup'} ne 'LiveTV');
+    # Load info about the file so we can determine the file type
+        $show->load_file_info();
+    # Format the name
+        my $name = $show->format_name($format,$separator,$replacement,$dest,$underscores);
     # Get a shell-safe version of the filename (yes, I know it's not needed in this case, but I'm anal about such things)
-        my $safe_file = $info{'basename'};
+        my $safe_file = $show->{'local_path'};
         $safe_file =~ s/'/'\\''/sg;
         $safe_file = "'$safe_file'";
     # Figure out the suffix
         my $out    = `file -b $safe_file 2>/dev/null`;
-        my $suffix = ($out =~ /mpe?g/i) ? '.mpg' : '.nuv';
+        my $suffix = ($show->{'finfo'}->{'is_mpeg'}) ? '.mpg' : '.nuv';
     # Link destination
         if ($dest) {
         # Check for duplicates
@@ -400,13 +252,13 @@ EOF
                 mkpath($directory, 0, 0755)
                     or die "Failed to create $directory:  $!\n";
             }
-            symlink "$video_dir/".$info{'basename'}, "$dest/$name"
+            symlink $show->{'local_path'}, "$dest/$name"
                 or die "Can't create symlink $dest/$name:  $!\n";
             vprint("$dest/$name");
         }
     # Rename the file, but only if it's a real file
-        elsif (-f "$video_dir/".$info{'basename'}) {
-            if ($info{'basename'} ne $name.$suffix) {
+        elsif (-f $show->{'local_path'}) {
+            if ($show->{'basename'} ne $name.$suffix) {
             # Check for duplicates
                 if (-e "$video_dir/$name$suffix") {
                     $count = 2;
@@ -417,21 +269,20 @@ EOF
                 }
                 $name .= $suffix;
             # Update the database
-                my $rows = $sh2->execute($name, $info{'chanid'}, $info{'starttime'});
-                die "Couldn't update basename in database for ".$info{'basename'}.":  ($q2)\n" unless ($rows == 1);
-                my $ret = rename "$video_dir/".$info{'basename'}, "$video_dir/$name";
+                my $rows = $sh->execute($name, $show->{'chanid'}, $show->{'starttime'});
+                die "Couldn't update basename in database for ".$show->{'basename'}.":  ($q)\n" unless ($rows == 1);
+                my $ret = rename $show->{'local_path'}, "$video_dir/$name";
             # Rename failed -- Move the database back to how it was (man, do I miss transactions)
                 if (!$ret) {
-                    $rows = $sh2->execute($info{'basename'}, $info{'chanid'}, $info{'starttime'});
-                    die "Couldn't restore original basename in database for ".$info{'basename'}.":  ($q2)\n" unless ($rows == 1);
+                    $rows = $sh->execute($show->{'basename'}, $show->{'chanid'}, $show->{'starttime'});
+                    die "Couldn't restore original basename in database for ".$show->{'basename'}.":  ($q)\n" unless ($rows == 1);
                 }
-                vprint($info{'basename'}."\t-> $name");
+                vprint($show->{'basename'}."\t-> $name");
             }
         }
     }
 
-    $sh->finish;
-    $sh2->finish if ($sh2);
+    $sh->finish if ($sh);
 
 # Print the message, but only if verbosity is enabled
     sub vprint {
