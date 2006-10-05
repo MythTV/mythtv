@@ -84,6 +84,7 @@ package MythTV::Program;
         $self->{'hasairdate'}      = $rows->[38]; #
         $self->{'timestretch'}     = $rows->[39]; #
         $self->{'recpriority2'}    = $rows->[40]; #
+        $self->{'parentid'}        = $rows->[41]; #
 
     # Load the channel data
         if ($self->{'chanid'}) {
