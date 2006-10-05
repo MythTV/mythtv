@@ -720,7 +720,7 @@ static HostComboBox *PlayBoxOrdering()
         "multiple titles. Sections in parentheses are not affected.");
 
     HostComboBox *gc = new HostComboBox("PlayBoxOrdering");
-    gc->setLabel(QObject::tr("Title sort orderings"));
+    gc->setLabel(QObject::tr("Episode sort orderings"));
 
     for (int i = 0; i < 4; i++)
         gc->addSelection(str[i], QString::number(i));
