@@ -231,6 +231,10 @@ package MythTV::Recording;
     # Make sure some things are actually numbers
         $info{'width'}  += 0;
         $info{'height'} += 0;
+    # HD fix
+        if ($info{'height'} == 1080) {
+            $info{'height'} = 1088;
+        }
     # Make some corrections for myth bugs
         $info{'audio_sample_rate'} = 44100 if ($info{'audio_sample_rate'} == 42501 || $info{'audio_sample_rate'} =~ /^44\d\d\d$/);
         $info{'aspect'} = '4:3';
@@ -297,6 +301,19 @@ package MythTV::Recording;
                ."    $program -v -v -v -v -nolirc -nojoystick -vo null -ao null \\\n"
                ."             -frames 0 -identify '$file'\n\n";
         }
+    # HD fix
+        if ($info{'height'} == 1080) {
+            $info{'height'} = 1088;
+        }
+    # mplayer is confused and we need to detect the aspect on our own
+        if ($info{'aspect'} =~ /^0.0/) {
+            if ($info{'height'} == 1088 || $info{'height'} == 720) {
+                $info{'aspect'} = 16 / 9;
+            }
+            else {
+                $info{'aspect'} = 4 / 3;
+            }
+        }
     # Cleanup
         $info{'aspect'}   = aspect_str($info{'aspect'});
         $info{'aspect_f'} = aspect_float($info{'aspect'});
@@ -330,7 +347,7 @@ package MythTV::Recording;
             return $w / $h;
         }
     # Parse out decimal formats
-        if ($aspect == 1)          { return  1;     }
+        if ($aspect eq '1')        { return  1;     }
         elsif ($aspect =~ m/^1.3/) { return  4 / 3; }
         elsif ($aspect =~ m/^1.7/) { return 16 / 9; }
     # Unknown aspect
