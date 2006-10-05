@@ -8,7 +8,7 @@
 #
 
 # Version
-    $VERSION = '.20svn';
+    $VERSION = '.21svn';
 
 # Load sub libraries
     use MythTV::Program;
@@ -48,12 +48,12 @@ package MythTV;
 
 # MYTH_PROTO_VERSION is defined in libmyth in mythtv/libs/libmyth/mythcontext.h
 # and should be the current MythTV protocol version.
-    our $PROTO_VERSION = 29;
+    our $PROTO_VERSION = 31;
 
 # NUMPROGRAMLINES is defined in mythtv/libs/libmythtv/programinfo.h and is
 # the number of items in a ProgramInfo QStringList group used by
 # ProgramInfo::ToSringList and ProgramInfo::FromStringList.
-    our $NUMPROGRAMLINES = 41;
+    our $NUMPROGRAMLINES = 42;
 
 # Reasons a recording wouldn't be happening (from libs/libmythtv/programinfo.h)
     our %RecStatus_Types = (
