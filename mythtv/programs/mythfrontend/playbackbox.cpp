@@ -3874,6 +3874,8 @@ void PlaybackBox::keyPressEvent(QKeyEvent *e)
         }
         else if (action == "CHANGERECGROUP")
             showRecGroupChooser();
+        else if (action == "CHANGEGROUPVIEW")
+            showViewChanger();
         else if (titleList.count() > 1)
         {
             if (action == "DELETE")
