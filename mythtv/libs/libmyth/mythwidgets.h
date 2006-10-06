@@ -265,11 +265,13 @@ class MythPushButton : public QPushButton
   public:
     MythPushButton(QWidget *parent, const char *name = 0, bool aa = false)
                  : QPushButton(parent, name)
-                  { setBackgroundOrigin(WindowOrigin); arrowAccel = aa;}
+                  { setBackgroundOrigin(WindowOrigin); arrowAccel = aa;
+                    setToggleButton(false); }
 
     MythPushButton(const QString &text, QWidget *parent, bool aa = false)
                  : QPushButton(text, parent)
-                  { setBackgroundOrigin(WindowOrigin); arrowAccel = aa;}
+                  { setBackgroundOrigin(WindowOrigin); arrowAccel = aa;
+                    setToggleButton(false); }
 
     MythPushButton(const QString &ontext, const QString &offtext,
                    QWidget *parent, bool isOn = true, bool aa = false);
@@ -384,3 +386,5 @@ class MythListBox: public QListBox {
 };
 
 #endif
+
+/* vim: set expandtab tabstop=4 shiftwidth=4: */
