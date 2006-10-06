@@ -157,11 +157,11 @@ void get_pes (pes_in_t *p, uint8_t *buf, int count, void (*func)(pes_in_t *p))
 
 	int l;
 	unsigned short *pl;
-	int c=0;
         int done;
 
 	uint8_t headr[3] = { 0x00, 0x00, 0x01} ;
 	do {
+		int c=0;
 		done = 1;
 		while (c < count && (!p->mpeg ||
 				     (p->mpeg == 2 && p->found < 9))
