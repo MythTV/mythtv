@@ -221,16 +221,11 @@ void HouseKeeper::RunHouseKeeping(void)
                 }
             }
 
-            if (wantToRun("JobQueueCleanup", 1, 0, 24))
-            {
+            if (wantToRun("DailyCleanup", 1, 0, 24)) {
                 JobQueue::CleanupOldJobsInQueue();
-                updateLastrun("JobQueueCleanup");
-            }
-
-            if (wantToRun("InUseProgramsCleanup", 1, 0, 24))
-            {
                 CleanupAllOldInUsePrograms();
-                updateLastrun("InUseProgramsCleanup");
+                CleanupRecordedTables();
+                updateLastrun("DailyCleanup");
             }
         }
 
@@ -329,6 +324,48 @@ void HouseKeeper::CleanupAllOldInUsePrograms(void)
                   "WHERE lastupdatetime < :FOURHOURSAGO ;");
     query.bindValue(":FOURHOURSAGO", fourHoursAgo);
     query.exec();
+}
+
+void HouseKeeper::CleanupRecordedTables(void)
+{
+    MSqlQuery query(MSqlQuery::InitCon());
+    MSqlQuery deleteQuery(MSqlQuery::InitCon());
+    int tableIndex = 0;
+    QString tables[] = {
+        "recordedprogram",
+        "recordedrating",
+        "recordedcredits",
+        "" }; // This blank entry must exist, do not remove.
+    QString table = tables[tableIndex];
+   
+    while (table != "")
+    {
+        query.prepare(QString("SELECT DISTINCT p.chanid, p.starttime "
+                              "FROM %1 p LEFT JOIN recorded r "
+                              "ON p.chanid = r.chanid "
+                              "AND p.starttime = r.progstart "
+                              "WHERE r.chanid IS NULL;")
+                              .arg(table));
+        if (!query.exec() || !query.isActive())
+        {
+            MythContext::DBError("HouseKeeper Cleaning Recorded Tables", query);
+            return;
+        }
+
+        deleteQuery.prepare(QString("DELETE FROM %1 "
+                                    "WHERE chanid = :CHANID "
+                                    "AND starttime = :STARTTIME;")
+                                    .arg(table));
+        while (query.next())
+        {
+            deleteQuery.bindValue(":CHANID", query.value(0).toString());
+            deleteQuery.bindValue(":STARTTIME", query.value(1).toString());
+            deleteQuery.exec();
+        }
+
+        tableIndex++;
+        table = tables[tableIndex];
+    }
 }
 
 void *HouseKeeper::doHouseKeepingThread(void *param)

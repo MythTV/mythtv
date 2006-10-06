@@ -34,6 +34,7 @@ class HouseKeeper
     void runFillDatabase();
     void CleanupMyOldRecordings(void);
     void CleanupAllOldInUsePrograms(void);
+    void CleanupRecordedTables(void);
     bool threadrunning;
     bool filldbRunning;
     bool isMaster;
