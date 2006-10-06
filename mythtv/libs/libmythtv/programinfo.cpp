@@ -3667,7 +3667,8 @@ int ProgramInfo::getProgramFlags(void) const
     MSqlQuery query(MSqlQuery::InitCon());
 
     query.prepare("SELECT commflagged, cutlist, autoexpire, "
-                  "editing, bookmark, stereo, closecaptioned, hdtv, watched "
+                  "editing, bookmark, stereo, closecaptioned, "
+                  "hdtv, watched, preserve "
                   "FROM recorded LEFT JOIN recordedprogram ON "
                   "(recorded.chanid = recordedprogram.chanid AND "
                   "recorded.starttime = recordedprogram.starttime) "
@@ -3690,6 +3691,7 @@ int ProgramInfo::getProgramFlags(void) const
         flags |= (query.value(6).toInt() == 1) ? FL_CC : 0;
         flags |= (query.value(7).toInt() == 1) ? FL_HDTV : 0;
         flags |= (query.value(8).toInt() == 1) ? FL_WATCHED : 0;
+        flags |= (query.value(9).toInt() == 1) ? FL_PRESERVED : 0;
     }
 
     return flags;

@@ -45,18 +45,19 @@ enum TranscodingStatuses {
 };
 
 enum FlagMask {
-    FL_COMMFLAG       = 0x001,
-    FL_CUTLIST        = 0x002,
-    FL_AUTOEXP        = 0x004,
-    FL_EDITING        = 0x008,
-    FL_BOOKMARK       = 0x010,
-    FL_INUSERECORDING = 0x020,
-    FL_INUSEPLAYING   = 0x040,
-    FL_STEREO         = 0x080,
-    FL_CC             = 0x100,
-    FL_HDTV           = 0x200,
-    FL_TRANSCODED     = 0x400,
-    FL_WATCHED        = 0x800
+    FL_COMMFLAG       = 0x0001,
+    FL_CUTLIST        = 0x0002,
+    FL_AUTOEXP        = 0x0004,
+    FL_EDITING        = 0x0008,
+    FL_BOOKMARK       = 0x0010,
+    FL_INUSERECORDING = 0x0020,
+    FL_INUSEPLAYING   = 0x0040,
+    FL_STEREO         = 0x0080,
+    FL_CC             = 0x0100,
+    FL_HDTV           = 0x0200,
+    FL_TRANSCODED     = 0x0400,
+    FL_WATCHED        = 0x0800,
+    FL_PRESERVED      = 0x1000,
 };
 
 enum RecStatusType {

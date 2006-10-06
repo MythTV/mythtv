@@ -887,11 +887,16 @@
           <filename>type/watched.png</filename>
           <position>302,106</position>
       </image>
-
       <image name="processing" draworder="6">
         <filename>processing.png</filename>
         <position>20,106</position>
       </image>
+      <!--
+      <image name="preserved" draworder="6">
+        <filename>preserved.png</filename>
+        <position>289,106</position>
+      </image>
+      -->
 
     </container>
 

@@ -792,6 +792,7 @@ void PlaybackBox::updateProgramInfo(QPainter *p, QRect& pr, QPixmap& pix)
         iconMap["cc"]          = FL_CC;
         iconMap["hdtv"]        = FL_HDTV;
         iconMap["watched"]     = FL_WATCHED;
+        iconMap["preserved"]   = FL_PRESERVED;
 
         UIImageType *itype;
         for (it = iconMap.begin(); it != iconMap.end(); ++it)
@@ -4290,6 +4291,7 @@ void PlaybackBox::showIconHelp(void)
     iconMap["stereo"]      = tr("Recording is in Stereo");
     iconMap["cc"]          = tr("Recording is Closed Captioned");
     iconMap["hdtv"]        = tr("Recording is in High Definition");
+    iconMap["preserved"]   = tr("Recording is preserved");
 
     for (it = iconMap.begin(); it != iconMap.end(); ++it)
     {
