@@ -383,6 +383,13 @@ int Transcode::TranscodeFile(char *inputname, char *outputname,
 
     int video_width = nvp->GetVideoWidth();
     int video_height = nvp->GetVideoHeight();
+     
+    if (video_height == 1088) {
+       VERBOSE(VB_IMPORTANT, "Found video height of 1088.  This is unusual and "
+               "more than likely the video is actually 1080 so mythtranscode "
+               "will treat it as such.");
+    }
+
     float video_aspect = nvp->GetVideoAspect();
     float video_frame_rate = nvp->GetFrameRate();
     int newWidth = video_width;
@@ -415,23 +422,25 @@ int Transcode::TranscodeFile(char *inputname, char *outputname,
         }
         else if (profile.byName("transcoderesize")->getValue().toInt())
         {
+            int actualHeight = (video_height == 1088 ? 1080 : video_height);
+
             nvp->SetVideoFilters(vidfilters);
             newWidth = profile.byName("width")->getValue().toInt();
             newHeight = profile.byName("height")->getValue().toInt();
 
             // If height or width are 0, then we need to calculate them
             if (newHeight == 0 && newWidth > 0)
-                newHeight = (int)(1.0 * newWidth * video_height / video_width);
+                newHeight = (int)(1.0 * newWidth * actualHeight / video_width);
             else if (newWidth == 0 && newHeight > 0)
-                newWidth = (int)(1.0 * newHeight * video_width / video_height);
+                newWidth = (int)(1.0 * newHeight * video_width / actualHeight);
             else if (newWidth == 0 && newHeight == 0)
             {
                 newHeight = 480;
-                newWidth = (int)(1.0 * 480 * video_width / video_height);
+                newWidth = (int)(1.0 * 480 * video_width / actualHeight);
                 if (newWidth > 640)
                 {
                     newWidth = 640;
-                    newHeight = (int)(1.0 * 640 * video_height / video_width);
+                    newHeight = (int)(1.0 * 640 * actualHeight / video_width);
                 }
             }
 
@@ -786,8 +795,14 @@ int Transcode::TranscodeFile(char *inputname, char *outputname,
                                    video_width, video_height);
                     avpicture_fill(&imageOut, frame.buf, PIX_FMT_YUV420P,
                                    newWidth, newHeight);
-                    scontext = img_resample_init(newWidth, newHeight,
-                                                 video_width, video_height);
+                    if (video_height != 1088) {
+                        scontext = img_resample_init(newWidth, newHeight,
+                                                     video_width, video_height);
+                    } else {
+                        scontext = img_resample_full_init(newWidth, newHeight,
+                                                     video_width, video_height,
+                                                     0,8,0,0,0,0,0,0);
+                    }
                     img_resample(scontext, &imageOut, &imageIn);
                     img_resample_close(scontext);
                 }
@@ -832,8 +847,17 @@ int Transcode::TranscodeFile(char *inputname, char *outputname,
                                video_width, video_height);
                 avpicture_fill(&imageOut, frame.buf, PIX_FMT_YUV420P,
                                newWidth, newHeight);
-                scontext = img_resample_init(newWidth, newHeight,
-                                             video_width, video_height);
+                if (video_height != 1088) {
+                    scontext = img_resample_init(newWidth, newHeight,
+                                                 video_width, video_height);
+                }
+                else
+                {
+                    scontext = img_resample_full_init(newWidth, newHeight,
+                                                      video_width, video_height,
+                                                      0,8,0,0,0,0,0,0);
+                }
+ 
                 img_resample(scontext, &imageOut, &imageIn);
                 img_resample_close(scontext);
             }
