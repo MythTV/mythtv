@@ -2721,6 +2721,9 @@ bool NuppelVideoPlayer::FastForward(float seconds)
     if (!videoOutput)
         return false;
 
+    if (ringBuffer->isDVD())
+        GetDecoder()->UpdateDVDFramesPlayed();
+
     if (fftime <= 0)
         fftime = (int)(seconds * video_frame_rate);
 
@@ -2734,6 +2737,9 @@ bool NuppelVideoPlayer::Rewind(float seconds)
 {
     if (!videoOutput)
         return false;
+
+    if (ringBuffer->isDVD())
+       GetDecoder()->UpdateDVDFramesPlayed();
 
     if (rewindtime <= 0)
         rewindtime = (int)(seconds * video_frame_rate);
