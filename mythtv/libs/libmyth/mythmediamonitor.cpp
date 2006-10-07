@@ -210,24 +210,20 @@ void MediaMonitor::ChooseAndEjectMedia(void)
 MediaMonitor::MediaMonitor(QObject* par, unsigned long interval, 
                            bool allowEject) 
     : QObject(par), m_Active(false), m_Thread(NULL),
-      m_MonitorPollingInterval(interval),
-      m_AllowEject(allowEject), m_fifo(-1)
+    m_MonitorPollingInterval(interval),
+    m_AllowEject(allowEject), m_fifo(-1)
 {
 }
 
 MediaMonitor::~MediaMonitor()
 {
-    if (m_Thread) 
-    { 
-        delete m_Thread; 
-        m_Thread = NULL; 
-    } 
-    
     if (m_fifo > 0)
     {
         close(m_fifo);
         unlink(kUDEV_FIFO);
     }
+
+    delete m_Thread;
 }
 
 // Loop through the file system table and add any supported devices.
@@ -759,7 +755,7 @@ void MediaMonitor::StartMonitoring(void)
     if (m_Active)
         return;
 
-    if (!m_Thread) 
+    if (!m_Thread)
         m_Thread = new MonitorThread(this, m_MonitorPollingInterval);
 
     m_Active = true;

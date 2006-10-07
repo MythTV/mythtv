@@ -6,9 +6,11 @@
 #include <qmutex.h>
 #include <qptrqueue.h>
 
+#include "mythexp.h"
+
 using namespace std;
 
-class FIFOWriter
+class MPUBLIC FIFOWriter
 {
   public:
     FIFOWriter(int count, bool sync);

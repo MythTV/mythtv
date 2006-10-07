@@ -8,7 +8,8 @@
 #include <qlabel.h>
 #include <qdom.h>
 
-class XMLParse
+
+class MPUBLIC XMLParse
 {
   public:
     XMLParse();

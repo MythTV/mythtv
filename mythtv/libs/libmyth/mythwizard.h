@@ -44,7 +44,7 @@
 class QHBoxLayout;
 class MythWizardPrivate;
 
-class Q_EXPORT MythWizard : public MythDialog
+class MPUBLIC MythWizard : public MythDialog
 {
     Q_OBJECT
     Q_PROPERTY(QFont titleFont READ titleFont WRITE setTitleFont)
@@ -116,7 +116,7 @@ protected:
     MythWizardPrivate *d;
 };
 
-class Q_EXPORT MythJumpWizard : public MythWizard
+class MPUBLIC MythJumpWizard : public MythWizard
 {
     Q_OBJECT
 

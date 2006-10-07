@@ -20,6 +20,7 @@
 
 #include "mythobservable.h"
 #include "mythsocket.h"
+#include "mythexp.h"
 
 using namespace std;
 
@@ -90,10 +91,10 @@ enum VerboseMask
 
 /// This global variable is set at startup with the flags 
 /// of the verbose messages we want to see.
-extern unsigned int print_verbose_messages;
-extern QString verboseString;
+extern MPUBLIC unsigned int print_verbose_messages;
+extern MPUBLIC QString verboseString;
 
-int parse_verbose_arg(QString arg);
+MPUBLIC int parse_verbose_arg(QString arg);
 
 
 /// These are the database logging priorities used for filterig the logs.
@@ -110,7 +111,7 @@ enum LogPriorities
 };
 
 /// Structure containing the basic Database parameters
-struct DatabaseParams
+struct MPUBLIC DatabaseParams
 {
     QString dbHostName;         ///< database server
     int     dbPort;             ///< database port
@@ -174,7 +175,7 @@ do { \
 #define ENO QString("\n\t\t\teno: ") + safe_eno_to_string(errno)
 
 /// Verbose helper function for ENO macro
-QString safe_eno_to_string(int errnum);
+MPUBLIC QString safe_eno_to_string(int errnum);
 
 /** \class MythPrivRequest
  *  \brief Container for requests that require privledge escalation.
@@ -186,7 +187,7 @@ QString safe_eno_to_string(int errnum);
  *  \sa NuppelVideoPlayer::StartPlaying(void)
  *  \sa MythContext:addPrivRequest(MythPrivRequest::Type, void*)
  */
-class MythPrivRequest
+class MPUBLIC MythPrivRequest
 {
   public:
     typedef enum { MythRealtime, MythExit, PrivEnd } Type;
@@ -219,7 +220,8 @@ class MythPrivRequest
  *   It also contains support for database error printing, and
  *   database message logging.
  */
-class MythContext : public QObject, public MythObservable, public MythSocketCBs
+class MPUBLIC MythContext : public QObject, public MythObservable,
+    public MythSocketCBs
 {
     Q_OBJECT
   public:
@@ -421,10 +423,10 @@ class MythContext : public QObject, public MythObservable, public MythSocketCBs
 };
 
 /// This global variable contains the MythContext instance for the application
-extern MythContext *gContext;
+extern MPUBLIC MythContext *gContext;
 
 /// This global variable is used to makes certain calls to avlib threadsafe.
-extern QMutex avcodeclock;
+extern MPUBLIC QMutex avcodeclock;
 
 #endif
 

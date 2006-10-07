@@ -12,7 +12,7 @@
     Any subclass of this that adds data to the event should override
     the clone method. As example, see OutputEvent in output.h. 
  */
-class MythEvent : public QCustomEvent
+class MPUBLIC MythEvent : public QCustomEvent
 {
   public:
     enum Type { MythEventMessage = (User + 1000) };

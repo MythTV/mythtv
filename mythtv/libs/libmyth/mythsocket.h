@@ -6,11 +6,12 @@
 #include <qtimer.h>
 #include <pthread.h>
 #include <qptrlist.h>
+#include "mythexp.h"
 
 class QHostAddress;
 class MythSocket;
 
-class MythSocketCBs
+class MPUBLIC MythSocketCBs
 {
   public:
     virtual ~MythSocketCBs() {}
@@ -20,7 +21,7 @@ class MythSocketCBs
     virtual void connectionClosed(MythSocket*) = 0;
 };
 
-class MythSocket : public QSocketDevice
+class MPUBLIC MythSocket : public QSocketDevice
 {
   public:
     MythSocket(int socket = -1, MythSocketCBs *cb = NULL);

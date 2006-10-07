@@ -13,7 +13,7 @@ using namespace std;
 #include "mythcontext.h"
 
 /// \brief QSqlDatabase wrapper, used by MSqlQuery. Do not use directly.
-class MSqlDatabase
+class MPUBLIC MSqlDatabase
 {
   friend class MDBManager;
   friend class MSqlQuery;
@@ -70,10 +70,10 @@ typedef struct _MSqlQueryInfo
 typedef QMap<QString, QVariant> MSqlBindings;
 
 /// \brief Add the entries in addfrom to the map in output
-void MSqlAddMoreBindings(MSqlBindings &output, MSqlBindings &addfrom);
+MPUBLIC void MSqlAddMoreBindings(MSqlBindings &output, MSqlBindings &addfrom);
 
 /// \brief Given a partial query string and a bindings object, escape the string
-void MSqlEscapeAsAQuery(QString &query, MSqlBindings &bindings);
+MPUBLIC void MSqlEscapeAsAQuery(QString &query, MSqlBindings &bindings);
 
 /** \brief QSqlQuery wrapper that fetches a DB connection from the connection pool.
  *
@@ -94,7 +94,7 @@ void MSqlEscapeAsAQuery(QString &query, MSqlBindings &bindings);
  *   will crash if closed and reopend - so we never close them and keep them in
  *   a pool. 
  */
-class MSqlQuery : public QSqlQuery
+class MPUBLIC MSqlQuery : public QSqlQuery
 {
   public:
     /// \brief Get DB connection from pool 

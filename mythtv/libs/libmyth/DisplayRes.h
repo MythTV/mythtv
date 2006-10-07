@@ -7,6 +7,7 @@ using namespace std;
 #include <vector>
 #include <map>
 #include "DisplayResScreen.h"
+#include "mythexp.h"
 
 /** \class DisplayRes
  *  \brief The DisplayRes module allows for the display resolution
@@ -23,7 +24,7 @@ using namespace std;
 
 typedef enum { GUI = 0, VIDEO = 1, CUSTOM_GUI = 2, CUSTOM_VIDEO = 3 } tmode;
 
-class DisplayRes {
+class MPUBLIC DisplayRes {
   public:
     /** \brief Factory method that returns a DisplayRes singleton */
     static DisplayRes *GetDisplayRes(void);
@@ -144,6 +145,6 @@ class DisplayRes {
  *   class if needed, and returns a copy of vector returned by
  *   GetVideoModes(void).
  */
-const vector<DisplayResScreen> GetVideoModes(void);
+MPUBLIC const vector<DisplayResScreen> GetVideoModes(void);
 
 #endif

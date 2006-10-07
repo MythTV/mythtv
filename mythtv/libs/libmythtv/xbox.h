@@ -4,7 +4,9 @@
 #include <qobject.h>
 #include <qtimer.h>
 
-class XBox : public QObject
+#include "mythexp.h"
+
+class MPUBLIC XBox : public QObject
 {
     Q_OBJECT
   public:

@@ -93,7 +93,7 @@ typedef struct jobqueueentry {
     QString comment;
 } JobQueueEntry;
 
-class JobQueue : public QObject
+class MPUBLIC JobQueue : public QObject
 {
     Q_OBJECT
   public:

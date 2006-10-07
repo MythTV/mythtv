@@ -1,4 +1,5 @@
 #include "mythcdrom.h"
+#include "mythcdrom-freebsd.h"
 #include <errno.h>
 #include <sys/ioctl.h>
 #include <sys/cdio.h>
@@ -6,6 +7,26 @@
 
 
 #define ASSUME_WANT_AUDIO 1
+
+class MythCDROMFreeBSD: public MythCDROM
+{
+public:
+    MythCDROMFreeBSD(QObject* par, const char* DevicePath, bool SuperMount,
+                     bool AllowEject):
+        MythCDROM(par, DevicePath, SuperMount, AllowEject) {
+    }
+
+    virtual MediaError testMedia(void);
+    virtual MediaError eject(bool open_close = true);
+    virtual MediaError lock(void);
+    virtual MediaError unlock(void);
+};
+
+MythCDROM *GetMythCDROMFreeBSD(QObject* par, const char* devicePath,
+                               bool SuperMount, bool AllowEject)
+{
+    return new MythCDROMFreeBSD(par, devicePath, SuperMount, AllowEject);
+}
 
 MediaError MythCDROMFreeBSD::eject(bool open_close)
 {

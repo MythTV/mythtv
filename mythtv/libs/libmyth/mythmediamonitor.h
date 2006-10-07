@@ -12,9 +12,7 @@
 
 const int kMediaEventType = 30042;
 
-class MediaMonitor;
-
-class MediaEvent : public QCustomEvent
+class MPUBLIC MediaEvent : public QCustomEvent
 {
   public:
     MediaEvent(MediaStatus oldStatus, MythMediaDevice* pDevice) 
@@ -29,12 +27,11 @@ class MediaEvent : public QCustomEvent
     QGuardedPtr<MythMediaDevice> m_Device;
 };
 
-struct mntent;
-
+class MediaMonitor;
 class MonitorThread : public QThread
 {
   public:
-    MonitorThread( MediaMonitor* pMon,  unsigned long interval);
+    MonitorThread(MediaMonitor* pMon,  unsigned long interval);
     void setMonitor(MediaMonitor* pMon) { m_Monitor = pMon; }
     virtual void run(void);
 
@@ -43,7 +40,7 @@ class MonitorThread : public QThread
     unsigned long m_Interval;
 };
 
-class MediaMonitor : public QObject
+class MPUBLIC MediaMonitor : public QObject
 {
     Q_OBJECT
     friend class MonitorThread;
@@ -99,7 +96,7 @@ class MediaMonitor : public QObject
     QMap<MythMediaDevice*, int>  m_UseCount;
 
     bool                         m_Active;
-    MonitorThread               *m_Thread;
+    MonitorThread                *m_Thread;
     unsigned long                m_MonitorPollingInterval;
     bool                         m_AllowEject;
     int                          m_fifo;

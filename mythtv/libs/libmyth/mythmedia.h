@@ -5,6 +5,8 @@
 #include <qstring.h>
 #include <qstringlist.h>
 
+#include "mythexp.h"
+
 typedef enum {
     MEDIASTAT_ERROR,
     MEDIASTAT_UNKNOWN,
@@ -37,7 +39,7 @@ typedef enum {
 typedef QMap<QString,uint> ext_cnt_t;
 typedef QMap<QString,uint> ext_to_media_t;
 
-class MythMediaDevice : public QObject
+class MPUBLIC MythMediaDevice : public QObject
 {
     Q_OBJECT
  public:

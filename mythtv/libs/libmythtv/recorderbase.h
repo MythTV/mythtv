@@ -10,6 +10,8 @@
 
 #include <pthread.h>
 
+#include "mythexp.h"
+
 class TVRec;
 class RingBuffer;
 class ProgramInfo;
@@ -27,7 +29,7 @@ class RecordingProfile;
  *
  *  \sa TVRec
  */
-class RecorderBase
+class MPUBLIC RecorderBase
 {
   public:
     RecorderBase(TVRec *rec);

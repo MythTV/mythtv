@@ -15,6 +15,8 @@
 #include <qthread.h>
 #include <qlayout.h>
 
+#include "mythexp.h"
+
 #include <vector>
 using namespace std;
 
@@ -47,7 +49,7 @@ class MythMainWindow;
 
 #include "libmythui/mythmainwindow.h"
 
-class MythDialog : public QFrame
+class MPUBLIC MythDialog : public QFrame
 {
     Q_OBJECT
   public:
@@ -95,7 +97,7 @@ class MythDialog : public QFrame
     QFont defaultBigFont, defaultMediumFont, defaultSmallFont;
 };
 
-class MythPopupBox : public MythDialog
+class MPUBLIC MythPopupBox : public MythDialog
 {
     Q_OBJECT
   public:
@@ -167,7 +169,7 @@ class MythPopupBox : public MythDialog
     The dialog widget also updates the LCD display if present.
 
 */
-class MythProgressDialog: public MythDialog
+class MPUBLIC MythProgressDialog: public MythDialog
 {
   public:
     /** Create a progress bar dialog.
@@ -210,7 +212,7 @@ class MythProgressDialog: public MythDialog
 
     Ie. used by MythMusic when scanning the filesystem for musicfiles.
  */
-class MythBusyDialog : public MythProgressDialog
+class MPUBLIC MythBusyDialog : public MythProgressDialog
 {
     Q_OBJECT
   public:
@@ -248,7 +250,7 @@ class MythBusyDialog : public MythProgressDialog
     QTimer *timer;
 };
 
-class MythThemedDialog : public MythDialog
+class MPUBLIC MythThemedDialog : public MythDialog
 {
     Q_OBJECT
   public:
@@ -329,7 +331,7 @@ class MythThemedDialog : public MythDialog
     QRect redrawRect;
 };
 
-class MythPasswordDialog: public MythDialog
+class MPUBLIC MythPasswordDialog: public MythDialog
 {
   Q_OBJECT
 
@@ -362,7 +364,7 @@ class MythPasswordDialog: public MythDialog
     bool                *success_flag;
 };
 
-class MythSearchDialog: public MythPopupBox
+class MPUBLIC MythSearchDialog: public MythPopupBox
 {
   Q_OBJECT
 
@@ -395,7 +397,7 @@ class MythSearchDialog: public MythPopupBox
     QButton             *cancel_button;
 };
 
-class MythImageFileDialog: public MythThemedDialog
+class MPUBLIC MythImageFileDialog: public MythThemedDialog
 {
     //
     //  Simple little popup dialog (themeable)
@@ -442,7 +444,7 @@ class MythImageFileDialog: public MythThemedDialog
 
 // ---------------------------------------------------------------------------
 
-class MythScrollDialog : public QScrollView
+class MPUBLIC MythScrollDialog : public QScrollView
 {
     Q_OBJECT
     

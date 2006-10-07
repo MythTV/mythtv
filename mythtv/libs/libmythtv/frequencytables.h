@@ -28,6 +28,8 @@ using namespace std;
 #define VSB_16   8
 #endif // USING_DVB
 
+#include "mythexp.h"
+
 class FrequencyTable;
 class TransportScanItem;
 
@@ -39,7 +41,7 @@ bool init_freq_tables();
 freq_table_list_t get_matching_freq_tables(
     QString format, QString modulation, QString country);
 
-long long get_center_frequency(
+MPUBLIC long long get_center_frequency(
     QString format, QString modulation, QString country, int freqid);
 
 int get_closest_freqid(

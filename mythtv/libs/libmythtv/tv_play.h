@@ -71,7 +71,7 @@ enum scheduleEditTypes {
     kScheduledRecording
 };
 
-class TV : public QObject
+class MPUBLIC TV : public QObject
 {
     Q_OBJECT
   public:

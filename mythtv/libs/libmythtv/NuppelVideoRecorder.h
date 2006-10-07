@@ -32,6 +32,8 @@ using namespace std;
 #include "format.h"
 #include "cc608decoder.h"
 
+#include "mythexp.h"
+
 struct video_audio;
 struct VBIData;
 struct cc;
@@ -41,7 +43,7 @@ class ChannelBase;
 class FilterManager;
 class FilterChain;
 
-class NuppelVideoRecorder : public RecorderBase, public CC608Reader
+class MPUBLIC NuppelVideoRecorder : public RecorderBase, public CC608Reader
 {
  public:
     NuppelVideoRecorder(TVRec *rec, ChannelBase *channel);

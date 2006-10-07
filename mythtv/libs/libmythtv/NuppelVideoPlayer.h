@@ -21,6 +21,8 @@
 #include "cc708decoder.h"
 #include "cc708window.h"
 
+#include "mythexp.h"
+
 extern "C" {
 #include "filter.h"
 }
@@ -97,7 +99,7 @@ enum
     kDisplayTeletextMenu        = 0x40,
 };
 
-class NuppelVideoPlayer : public CC608Reader, public CC708Reader
+class MPUBLIC NuppelVideoPlayer : public CC608Reader, public CC708Reader
 {
  public:
     NuppelVideoPlayer(QString inUseID = "Unknown",

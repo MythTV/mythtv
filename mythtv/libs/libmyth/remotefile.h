@@ -4,10 +4,12 @@
 #include <qstring.h>
 #include <qmutex.h>
 
+#include "mythexp.h"
+
 class MythContext;
 class MythSocket;
 
-class RemoteFile
+class MPUBLIC RemoteFile
 {
   public:
     RemoteFile(const QString &url, bool usereadahead = true, int retries = -1);

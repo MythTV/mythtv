@@ -2,6 +2,7 @@
 #define MYTHOBSERVABLE_H_
 
 #include <qptrlist.h>
+#include "mythexp.h"
 #include "mythevent.h"
 
 class QObject;
@@ -36,7 +37,7 @@ class QObject;
     MythListenable just doesn't sound right, and fixing all the calls
     to addListener was too big a patch.
 */
-class MythObservable
+class MPUBLIC MythObservable
 {
   public:
     MythObservable();

@@ -5,10 +5,12 @@
 #include <qmutex.h>
 #include <qmap.h>
 
+#include "mythexp.h"
+
 class ProgramInfo;
 class MythSocket;
 
-class RemoteEncoder
+class MPUBLIC RemoteEncoder
 {
   public:
     RemoteEncoder(int num, const QString &host, short port);

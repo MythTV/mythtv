@@ -5,7 +5,9 @@
 // Qt headers
 #include <qstring.h>
 
-class SourceUtil
+#include "mythexp.h"
+
+class MPUBLIC SourceUtil
 {
   public:
     static QString GetChannelSeparator(uint sourceid);

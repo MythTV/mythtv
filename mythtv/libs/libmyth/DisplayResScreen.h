@@ -7,8 +7,9 @@ using namespace std;
 #include <vector>
 #include <map>
 #include <algorithm>
+#include "mythexp.h"
 
-class DisplayResScreen
+class MPUBLIC DisplayResScreen
 {
   public:
     // Constructors, initializers

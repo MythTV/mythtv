@@ -8,7 +8,7 @@
 
 #include "mythdialogs.h"
 
-class LircClient : public QObject
+class MPUBLIC LircClient : public QObject
 {
     Q_OBJECT
   public:

@@ -22,7 +22,7 @@ namespace MythTV {
 class Visual;
 }
 
-class OutputEvent : public MythEvent
+class MPUBLIC OutputEvent : public MythEvent
 {
 public:
     enum Type { Playing = (User + 200), Buffering, Info, Paused,
@@ -72,7 +72,7 @@ private:
 };
 
 
-class OutputListeners : public MythObservable
+class MPUBLIC OutputListeners : public MythObservable
 {
 public:
     OutputListeners();

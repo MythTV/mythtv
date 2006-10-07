@@ -27,7 +27,7 @@
 class UIListBtnType;
 class UIListBtnTypeItem;
 
-class UIListGenericTree : public GenericTree
+class MPUBLIC UIListGenericTree : public GenericTree
 {
   public:
     // will _not_ delete the image it's given, if any.
@@ -66,7 +66,7 @@ class UIListGenericTree : public GenericTree
     bool m_active;
 };
 
-class UIListTreeType : public UIType
+class MPUBLIC UIListTreeType : public UIType
 {
     Q_OBJECT
   public:
@@ -161,7 +161,7 @@ class UIListTreeType : public UIType
     bool    list_tree_active;
 };
 
-class UIListBtnType : public UIType
+class MPUBLIC UIListBtnType : public UIType
 {
     Q_OBJECT
   public:
@@ -294,7 +294,7 @@ class UIListBtnType : public UIType
     void itemSelected(UIListBtnTypeItem* item);
 };
 
-class UIListBtnTypeItem
+class MPUBLIC UIListBtnTypeItem
 {
 
   public:

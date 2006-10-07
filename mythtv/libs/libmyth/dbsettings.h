@@ -3,7 +3,7 @@
 
 #include "settings.h"
 
-class DatabaseSettings: virtual public ConfigurationWizard {
+class MPUBLIC DatabaseSettings: virtual public ConfigurationWizard {
 public:
     DatabaseSettings();
     

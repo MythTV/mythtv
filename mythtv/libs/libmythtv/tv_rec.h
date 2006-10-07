@@ -132,7 +132,7 @@ class TuningRequest
 };
 typedef MythDeque<TuningRequest> TuningQueue;
 
-class TVRec : public QObject
+class MPUBLIC TVRec : public QObject
 {
     friend class TuningRequest;
     Q_OBJECT

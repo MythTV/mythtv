@@ -1,4 +1,5 @@
 #include "mythcdrom.h"
+#include "mythcdrom-linux.h"
 #include <sys/ioctl.h>                // ioctls
 #include <linux/cdrom.h>        // old ioctls for cdrom
 #include <errno.h>
@@ -7,6 +8,29 @@
 #include <unistd.h>
 
 #define ASSUME_WANT_AUDIO 1
+
+class MythCDROMLinux: public MythCDROM
+{
+public:
+    MythCDROMLinux(QObject* par, const char* DevicePath, bool SuperMount,
+                   bool AllowEject):
+        MythCDROM(par, DevicePath, SuperMount, AllowEject) {
+    }
+
+    virtual MediaError testMedia(void);
+    virtual bool mediaChanged(void);
+    virtual bool checkOK(void);
+    virtual MediaStatus checkMedia(void);
+    virtual MediaError eject(bool open_close = true);
+    virtual MediaError lock(void);
+    virtual MediaError unlock(void);
+};
+
+MythCDROM *GetMythCDROMLinux(QObject* par, const char* devicePath,
+                             bool SuperMount, bool AllowEject)
+{
+    return new MythCDROMLinux(par, devicePath, SuperMount, AllowEject);
+}
 
 MediaError MythCDROMLinux::eject(bool open_close)
 {

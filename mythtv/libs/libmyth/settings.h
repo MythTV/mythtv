@@ -7,6 +7,7 @@
 #include <vector>
 #include <map>
 
+#include "mythexp.h"
 #include "mythwidgets.h"
 #include "mythdialogs.h"
 #include "mythdbcon.h"
@@ -18,7 +19,7 @@ class QWidget;
 class ConfigurationGroup;
 class QDir;
 
-class Configurable: virtual public QObject {
+class MPUBLIC Configurable: virtual public QObject {
     Q_OBJECT
 public:
     Configurable():
@@ -71,7 +72,7 @@ private:
     bool visible;
 };
 
-class Setting: virtual public Configurable {
+class MPUBLIC Setting: virtual public Configurable {
     Q_OBJECT
 public:
     Setting(): changed(false) {};
@@ -105,7 +106,7 @@ protected:
     bool changed;
 };
 
-class ConfigurationGroup: virtual public Configurable 
+class MPUBLIC ConfigurationGroup: virtual public Configurable 
 {
     Q_OBJECT
   public:
@@ -151,7 +152,7 @@ class ConfigurationGroup: virtual public Configurable
     bool zeroSpace;
 };
 
-class VerticalConfigurationGroup : virtual public ConfigurationGroup
+class MPUBLIC VerticalConfigurationGroup : virtual public ConfigurationGroup
 {
   public:
     VerticalConfigurationGroup(
@@ -165,7 +166,8 @@ class VerticalConfigurationGroup : virtual public ConfigurationGroup
                                   const char* widgetName = NULL);
 };
 
-class HorizontalConfigurationGroup : virtual public ConfigurationGroup
+class MPUBLIC HorizontalConfigurationGroup :
+    virtual public ConfigurationGroup
 {
   public:
     HorizontalConfigurationGroup(
@@ -179,7 +181,7 @@ class HorizontalConfigurationGroup : virtual public ConfigurationGroup
                                   const char* widgetName = NULL);
 };
 
-class GridConfigurationGroup: virtual public ConfigurationGroup {
+class MPUBLIC GridConfigurationGroup: virtual public ConfigurationGroup {
  public:
     GridConfigurationGroup(uint col,
                            bool uselabel   = true,  bool useframe  = true,
@@ -195,7 +197,7 @@ class GridConfigurationGroup: virtual public ConfigurationGroup {
     uint columns;
 };
 
-class StackedConfigurationGroup: virtual public ConfigurationGroup {
+class MPUBLIC StackedConfigurationGroup: virtual public ConfigurationGroup {
     Q_OBJECT
 public:
     StackedConfigurationGroup(bool uselabel = true) :
@@ -222,7 +224,7 @@ protected:
     bool saveAll;
 };
 
-class ConfigurationDialogWidget: public MythDialog {
+class MPUBLIC ConfigurationDialogWidget: public MythDialog {
     Q_OBJECT
 public:
     ConfigurationDialogWidget(MythMainWindow *parent, 
@@ -236,7 +238,7 @@ signals:
     void deleteButtonPressed();
 };
 
-class ConfigurationDialog: virtual public Configurable {
+class MPUBLIC ConfigurationDialog: virtual public Configurable {
 public:
     ConfigurationDialog() : 
         Configurable(), dialog(NULL) {};
@@ -255,7 +257,7 @@ protected:
 /** \class ConfigurationWizard
  *  \brief A wizard is a group with one child per page.
  */
-class ConfigurationWizard: public ConfigurationDialog,
+class MPUBLIC ConfigurationWizard: public ConfigurationDialog,
                            public ConfigurationGroup
 {
   public:
@@ -266,7 +268,7 @@ class ConfigurationWizard: public ConfigurationDialog,
 };
 
 // Read-only display of a setting
-class LabelSetting: virtual public Setting {
+class MPUBLIC LabelSetting: virtual public Setting {
 protected:
     LabelSetting() {};
 public:
@@ -274,7 +276,7 @@ public:
                                   const char* widgetName = 0);
 };
 
-class LineEditSetting: virtual public Setting {
+class MPUBLIC LineEditSetting: virtual public Setting {
 protected:
     LineEditSetting(bool readwrite = true) : edit(NULL) { rw = readwrite; };
 public:
@@ -300,7 +302,7 @@ private:
 
 // TODO: set things up so that setting the value as a string emits
 // the int signal also
-class IntegerSetting: virtual public Setting {
+class MPUBLIC IntegerSetting: virtual public Setting {
     Q_OBJECT
 protected:
     IntegerSetting() {};
@@ -317,7 +319,7 @@ signals:
     void valueChanged(int newValue);
 };
 
-class BoundedIntegerSetting: public IntegerSetting {
+class MPUBLIC BoundedIntegerSetting: public IntegerSetting {
 protected:
     BoundedIntegerSetting(int _min, int _max, int _step) {
         min=_min, max=_max, step=_step;
@@ -328,7 +330,7 @@ protected:
     int step;
 };
 
-class SliderSetting: public BoundedIntegerSetting {
+class MPUBLIC SliderSetting: public BoundedIntegerSetting {
 protected:
     SliderSetting(int min, int max, int step):
         BoundedIntegerSetting(min, max, step) {};
@@ -337,7 +339,7 @@ public:
                                   const char* widgetName = 0);
 };
 
-class SpinBoxSetting: public BoundedIntegerSetting {
+class MPUBLIC SpinBoxSetting: public BoundedIntegerSetting {
 protected:
     SpinBoxSetting(int min, int max, int step, 
                    bool allow_single_step = false,
@@ -354,7 +356,7 @@ public:
                                   const char* widgetName = 0);
 };
 
-class SelectSetting: virtual public Setting {
+class MPUBLIC SelectSetting: virtual public Setting {
     Q_OBJECT
 protected:
     SelectSetting() { isSet = false; };
@@ -404,7 +406,7 @@ protected:
     bool isSet;
 };
 
-class SelectLabelSetting: public LabelSetting, public SelectSetting {
+class MPUBLIC SelectLabelSetting: public LabelSetting, public SelectSetting {
 protected:
     SelectLabelSetting() {};
 
@@ -413,15 +415,15 @@ public:
                                   const char* widgetName = 0);
 };
 
-class ComboBoxSetting: public SelectSetting {
-    Q_OBJECT;
+class MPUBLIC ComboBoxSetting: public SelectSetting {
+    Q_OBJECT
 
 protected:
     ComboBoxSetting(bool _rw = false, int _step = 1) {
         rw = _rw;
         step = _step;
         widget = NULL;
-    };
+    }
 
 public:
     virtual void setValue(QString newValue);
@@ -454,7 +456,7 @@ protected:
     int step;
 };
 
-class ListBoxSetting: public SelectSetting {
+class MPUBLIC ListBoxSetting: public SelectSetting {
     Q_OBJECT
 public:
     ListBoxSetting(): widget(NULL), selectionMode(MythListBox::Single) { }
@@ -489,13 +491,13 @@ protected:
     MythListBox::SelectionMode selectionMode;
 };
 
-class RadioSetting: public SelectSetting {
+class MPUBLIC RadioSetting: public SelectSetting {
 public:
     virtual QWidget* configWidget(ConfigurationGroup *cg, QWidget* parent, 
                                   const char* widgetName = 0);
 };
 
-class ImageSelectSetting: public SelectSetting {
+class MPUBLIC ImageSelectSetting: public SelectSetting {
     Q_OBJECT
 public:
     virtual ~ImageSelectSetting();
@@ -515,7 +517,7 @@ protected:
     float m_hmult, m_wmult;
 };
 
-class BooleanSetting: virtual public Setting {
+class MPUBLIC BooleanSetting: virtual public Setting {
     Q_OBJECT
 public:
     bool boolValue(void) const {
@@ -533,7 +535,7 @@ signals:
     void valueChanged(bool);
 };
 
-class CheckBoxSetting: public BooleanSetting {
+class MPUBLIC CheckBoxSetting: public BooleanSetting {
 public:
     CheckBoxSetting() : widget(NULL) {}
     virtual QWidget* configWidget(ConfigurationGroup *cg, QWidget* parent,
@@ -544,7 +546,9 @@ protected:
 };
 
 
-class TriggeredConfigurationGroup: virtual public ConfigurationGroup {
+class MPUBLIC TriggeredConfigurationGroup :
+    virtual public ConfigurationGroup
+{
     Q_OBJECT
 public:
     TriggeredConfigurationGroup(bool uselabel = true) :
@@ -569,7 +573,7 @@ protected:
     map<QString,Configurable*> triggerMap;
 };
     
-class TabbedConfigurationGroup: virtual public ConfigurationGroup
+class MPUBLIC TabbedConfigurationGroup: virtual public ConfigurationGroup
 {
     Q_OBJECT
 
@@ -583,7 +587,8 @@ class TabbedConfigurationGroup: virtual public ConfigurationGroup
                                   const char* widgetName = 0);
 };
 
-class PathSetting: public ComboBoxSetting {
+class MPUBLIC PathSetting : public ComboBoxSetting
+{
 public:
     PathSetting(bool _mustexist):
         ComboBoxSetting(true), mustexist(_mustexist) {
@@ -601,12 +606,12 @@ protected:
     bool mustexist;
 };
 
-class HostnameSetting: virtual public Setting {
+class MPUBLIC HostnameSetting: virtual public Setting {
 public:
     HostnameSetting();
 };
 
-class ChannelSetting: virtual public SelectSetting {
+class MPUBLIC ChannelSetting: virtual public SelectSetting {
 public:
     ChannelSetting() {
         setLabel("Channel");
@@ -619,7 +624,7 @@ public:
 };
 
 class QDate;
-class DateSetting: virtual public Setting {
+class MPUBLIC DateSetting: virtual public Setting {
     Q_OBJECT
 public:
     QDate dateValue(void) const;
@@ -632,7 +637,7 @@ public:
 };
 
 class QTime;
-class TimeSetting: virtual public Setting {
+class MPUBLIC TimeSetting: virtual public Setting {
     Q_OBJECT
 public:
     QTime timeValue(void) const;
@@ -644,7 +649,7 @@ public:
     void setValue(const QTime& newValue);
 };
 
-class DBStorage: virtual public Setting {
+class MPUBLIC DBStorage: virtual public Setting {
 public:
     DBStorage(QString _table, QString _column):
         table(_table), column(_column) {};
@@ -661,7 +666,7 @@ protected:
     QString column;
 };
 
-class SimpleDBStorage: public DBStorage {
+class MPUBLIC SimpleDBStorage: public DBStorage {
 public:
     SimpleDBStorage(QString table, QString column):
         DBStorage(table, column) {};
@@ -678,14 +683,15 @@ protected:
     virtual QString setClause(MSqlBindings& bindings);
 };
 
-class TransientStorage: virtual public Setting {
+class MPUBLIC TransientStorage: virtual public Setting {
 public:
     virtual void load() {  }
     virtual void save() {  }
     virtual void save(QString) {  }
 };
 
-class AutoIncrementStorage: virtual public IntegerSetting, public DBStorage {
+class MPUBLIC AutoIncrementStorage: virtual public IntegerSetting,
+    public DBStorage {
 public:
     AutoIncrementStorage(QString table, QString column):
         DBStorage(table, column) {
@@ -697,7 +703,7 @@ public:
     virtual void save(QString destination);
 };
 
-class ButtonSetting: virtual public Setting {
+class MPUBLIC ButtonSetting: virtual public Setting {
     Q_OBJECT
 public:
     ButtonSetting(QString _name = "button") :
@@ -719,12 +725,13 @@ protected:
     MythPushButton *button;
 };
 
-class TransButtonSetting: public ButtonSetting, public TransientStorage {
+class MPUBLIC TransButtonSetting: public ButtonSetting, public TransientStorage
+{
 public:
     TransButtonSetting(QString name = "button") : ButtonSetting(name) {}
 };
 
-class ConfigPopupDialogWidget: public MythPopupBox {
+class MPUBLIC ConfigPopupDialogWidget: public MythPopupBox {
     Q_OBJECT
 public:
     ConfigPopupDialogWidget(MythMainWindow* parent, const char* widgetName=0):
@@ -735,7 +742,7 @@ public:
     void reject() { MythPopupBox::reject(); };
 };
 
-class ConfigurationPopupDialog: virtual public Configurable {
+class MPUBLIC ConfigurationPopupDialog: virtual public Configurable {
     Q_OBJECT
 public:
     ConfigurationPopupDialog() { dialog=NULL; };
@@ -756,7 +763,7 @@ protected:
     ConfigPopupDialogWidget* dialog;
 };
 
-class ProgressSetting: virtual public IntegerSetting {
+class MPUBLIC ProgressSetting: virtual public IntegerSetting {
 public:
     ProgressSetting(int _totalSteps): totalSteps(_totalSteps) {};
 
@@ -767,17 +774,20 @@ private:
     int totalSteps;
 };
 
-class TransLabelSetting: public LabelSetting, public TransientStorage {
+class MPUBLIC TransLabelSetting: public LabelSetting, public TransientStorage {
 public:
     TransLabelSetting() {};
 };
 
-class TransCheckBoxSetting: public CheckBoxSetting, public TransientStorage {
+class MPUBLIC TransCheckBoxSetting: public CheckBoxSetting,
+    public TransientStorage
+{
 public:
     TransCheckBoxSetting() {};
 };
 
-class HostSetting: public SimpleDBStorage, virtual public Configurable {
+class MPUBLIC HostSetting: public SimpleDBStorage,
+    virtual public Configurable {
 public:
     HostSetting(QString name):
         SimpleDBStorage("settings", "data") {
@@ -790,7 +800,8 @@ protected:
     virtual QString setClause(MSqlBindings& bindings);
 };
 
-class GlobalSetting: public SimpleDBStorage, virtual public Configurable {
+class MPUBLIC GlobalSetting: public SimpleDBStorage,
+    virtual public Configurable {
 public:
     GlobalSetting(QString name):
         SimpleDBStorage("settings", "data") {
@@ -802,14 +813,14 @@ protected:
     virtual QString setClause(MSqlBindings& bindings);
 };
 
-class HostSlider: public SliderSetting, public HostSetting {
+class MPUBLIC HostSlider: public SliderSetting, public HostSetting {
   public:
     HostSlider(const QString &name, int min, int max, int step) :
         SliderSetting(min, max, step),
         HostSetting(name) { }
 };
 
-class HostSpinBox: public SpinBoxSetting, public HostSetting {
+class MPUBLIC HostSpinBox: public SpinBoxSetting, public HostSetting {
   public:
     HostSpinBox(const QString &name, int min, int max, int step, 
                   bool allow_single_step = false) :
@@ -817,14 +828,14 @@ class HostSpinBox: public SpinBoxSetting, public HostSetting {
         HostSetting(name) { }
 };
 
-class HostCheckBox: public CheckBoxSetting, public HostSetting {
+class MPUBLIC HostCheckBox: public CheckBoxSetting, public HostSetting {
   public:
     HostCheckBox(const QString &name) :
         HostSetting(name) { }
     virtual ~HostCheckBox() { ; }
 };
 
-class HostComboBox: public ComboBoxSetting, public HostSetting {
+class MPUBLIC HostComboBox: public ComboBoxSetting, public HostSetting {
   public:
     HostComboBox(const QString &name, bool rw = false) :
         ComboBoxSetting(rw),
@@ -832,7 +843,7 @@ class HostComboBox: public ComboBoxSetting, public HostSetting {
     virtual ~HostComboBox() { ; }
 };
 
-class HostRefreshRateComboBox: virtual public HostComboBox
+class MPUBLIC HostRefreshRateComboBox: virtual public HostComboBox
 {
     Q_OBJECT
   public:
@@ -845,7 +856,7 @@ class HostRefreshRateComboBox: virtual public HostComboBox
     static const vector<short> GetRefreshRates(const QString &resolution);
 };
 
-class HostTimeBox: public ComboBoxSetting, public HostSetting {
+class MPUBLIC HostTimeBox: public ComboBoxSetting, public HostSetting {
   public:
     HostTimeBox(const QString &name, const QString &defaultTime = "00:00",
                 const int interval = 1) :
@@ -867,27 +878,27 @@ class HostTimeBox: public ComboBoxSetting, public HostSetting {
     }
 };
 
-class HostLineEdit: public LineEditSetting, public HostSetting {
+class MPUBLIC HostLineEdit: public LineEditSetting, public HostSetting {
   public:
     HostLineEdit(const QString &name, bool rw = true) :
         LineEditSetting(rw),
         HostSetting(name) { }
 };
 
-class HostImageSelect: public ImageSelectSetting, public HostSetting {
+class MPUBLIC HostImageSelect: public ImageSelectSetting, public HostSetting {
   public:
     HostImageSelect(const QString &name) :
         HostSetting(name) { }
 };
 
-class GlobalSlider: public SliderSetting, public GlobalSetting {
+class MPUBLIC GlobalSlider: public SliderSetting, public GlobalSetting {
   public:
     GlobalSlider(const QString &name, int min, int max, int step) :
         SliderSetting(min, max, step),
         GlobalSetting(name) { }
 };
 
-class GlobalSpinBox: public SpinBoxSetting, public GlobalSetting {
+class MPUBLIC GlobalSpinBox: public SpinBoxSetting, public GlobalSetting {
   public:
     GlobalSpinBox(const QString &name, int min, int max, int step,
                    bool allow_single_step = false) :
@@ -895,33 +906,34 @@ class GlobalSpinBox: public SpinBoxSetting, public GlobalSetting {
         GlobalSetting(name) { }
 };
 
-class GlobalCheckBox: public CheckBoxSetting, public GlobalSetting {
+class MPUBLIC GlobalCheckBox: public CheckBoxSetting, public GlobalSetting {
   public:
     GlobalCheckBox(const QString &name) :
         GlobalSetting(name) { }
 };
 
-class GlobalComboBox: public ComboBoxSetting, public GlobalSetting {
+class MPUBLIC GlobalComboBox: public ComboBoxSetting, public GlobalSetting {
   public:
     GlobalComboBox(const QString &name, bool rw = false) :
         ComboBoxSetting(rw),
         GlobalSetting(name) { }
 };
 
-class GlobalLineEdit: public LineEditSetting, public GlobalSetting {
+class MPUBLIC GlobalLineEdit: public LineEditSetting, public GlobalSetting {
   public:
     GlobalLineEdit(const QString &name, bool rw = true) :
         LineEditSetting(rw),
         GlobalSetting(name) { }
 };
 
-class GlobalImageSelect: public ImageSelectSetting, public GlobalSetting {
+class MPUBLIC GlobalImageSelect: public ImageSelectSetting, public GlobalSetting
+{
   public:
     GlobalImageSelect(const QString &name) :
         GlobalSetting(name) { }
 };
 
-class GlobalTimeBox: public ComboBoxSetting, public GlobalSetting {
+class MPUBLIC GlobalTimeBox: public ComboBoxSetting, public GlobalSetting {
   public:
     GlobalTimeBox(const QString &name, const QString &defaultTime = "00:00",
                   const int interval = 1) :
@@ -946,7 +958,7 @@ class GlobalTimeBox: public ComboBoxSetting, public GlobalSetting {
 /** \class JumpConfigurationWizard
  *  \brief A jump wizard is a group with one child per page, and jump buttons
  */
-class JumpConfigurationWizard : public ConfigurationWizard
+class MPUBLIC JumpConfigurationWizard : public ConfigurationWizard
 {
     Q_OBJECT
 
@@ -960,7 +972,7 @@ class JumpConfigurationWizard : public ConfigurationWizard
     vector<QWidget*> childWidgets;
 };
 
-class JumpPane : public VerticalConfigurationGroup
+class MPUBLIC JumpPane : public VerticalConfigurationGroup
 {
     Q_OBJECT
 

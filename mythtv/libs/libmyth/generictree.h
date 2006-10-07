@@ -6,11 +6,13 @@
 #include <qvaluelist.h>
 #include <qptrlist.h>
 
+#include "mythexp.h"
+
 using namespace std;
 
 class SortableGenericTreeList;
 
-class GenericTree
+class MPUBLIC GenericTree
 {
     typedef QValueVector<int> IntVector;
 

@@ -444,7 +444,8 @@ private:
     const CardInput& parent;
 };
 
-class CaptureCardEditor: public ListBoxSetting, public ConfigurationDialog {
+class MPUBLIC CaptureCardEditor: public ListBoxSetting,
+    public ConfigurationDialog {
     Q_OBJECT
 public:
     CaptureCardEditor() {
@@ -465,7 +466,8 @@ public slots:
 protected:
 };
 
-class VideoSourceEditor: public ListBoxSetting, public ConfigurationDialog {
+class MPUBLIC VideoSourceEditor: public ListBoxSetting,
+    public ConfigurationDialog {
     Q_OBJECT
 public:
     VideoSourceEditor() {
@@ -490,7 +492,8 @@ public slots:
 protected:
 };
 
-class CardInputEditor: public ListBoxSetting, public ConfigurationDialog {
+class MPUBLIC CardInputEditor: public ListBoxSetting,
+    public ConfigurationDialog {
 public:
     CardInputEditor() {
         setLabel(QObject::tr("Input connections"));

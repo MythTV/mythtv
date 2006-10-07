@@ -53,7 +53,8 @@ class SRFindTime;
 class SRFindId;
 class SRParentId;
 
-class ScheduledRecording: public ConfigurationGroup, public ConfigurationDialog {
+class MPUBLIC ScheduledRecording: public ConfigurationGroup,
+    public ConfigurationDialog {
     Q_OBJECT
 public:
     ScheduledRecording();

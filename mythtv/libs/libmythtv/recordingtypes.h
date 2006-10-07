@@ -1,6 +1,8 @@
 #ifndef RECORDINGTYPES_H_
 #define RECORDINGTYPES_H_
 
+#include "mythexp.h"
+
 enum RecordingType
 {
     kNotRecording = 0,
@@ -16,7 +18,7 @@ enum RecordingType
     kFindWeeklyRecord
 };
 
-int RecTypePriority(RecordingType rectype);
+MPUBLIC int RecTypePriority(RecordingType rectype);
 
 enum RecordingDupInType
 {

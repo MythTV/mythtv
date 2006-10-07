@@ -9,7 +9,7 @@ class QVBoxLayout;
 class QButtonGroup;
 class QString;
 
-class DialogBox : public MythDialog
+class MPUBLIC DialogBox : public MythDialog
 {
     Q_OBJECT
   public:

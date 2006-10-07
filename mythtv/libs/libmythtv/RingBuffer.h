@@ -8,6 +8,7 @@
 #include <qmutex.h>
 #include <pthread.h>
 #include "avcodec.h"
+#include "mythexp.h"
 
 class RemoteFile;
 class RemoteEncoder;
@@ -15,7 +16,7 @@ class ThreadedFileWriter;
 class DVDRingBufferPriv;
 class LiveTVChain;
 
-class RingBuffer
+class MPUBLIC RingBuffer
 {
   public:
     RingBuffer(const QString &lfilename, bool write,

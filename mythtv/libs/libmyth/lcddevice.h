@@ -13,10 +13,11 @@ using namespace std;
 #include <qmutex.h>
 
 #include "mythsocket.h"
+#include "mythexp.h"
 
 enum CHECKED_STATE {CHECKED = 0, UNCHECKED, NOTCHECKABLE };
 
-class LCDMenuItem
+class MPUBLIC LCDMenuItem
 {
   public:
     LCDMenuItem() {}
@@ -58,7 +59,7 @@ class LCDMenuItem
 
 enum TEXT_ALIGNMENT {ALIGN_LEFT, ALIGN_RIGHT, ALIGN_CENTERED };
 
-class LCDTextItem
+class MPUBLIC LCDTextItem
 {
   public:
     LCDTextItem() {}
@@ -99,7 +100,7 @@ class LCDTextItem
     bool itemScrollable;
 };
 
-class LCD : public QObject, public MythSocketCBs
+class MPUBLIC LCD : public QObject, public MythSocketCBs
 {
     Q_OBJECT
 

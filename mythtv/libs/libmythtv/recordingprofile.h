@@ -41,7 +41,7 @@ class TranscodeResize;
 class TranscodeLossless;
 class TranscodeFilters;
 
-class RecordingProfile: public ConfigurationWizard
+class MPUBLIC RecordingProfile: public ConfigurationWizard
 {
   Q_OBJECT
   protected:

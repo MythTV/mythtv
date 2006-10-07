@@ -10,16 +10,17 @@
 #include <X11/Xlib.h>
 #include <vector>
 
-Display *MythXOpenDisplay(void);
-int XJ_error_catcher(Display * d, XErrorEvent * xeev);
-void InstallXErrorHandler(Display *d);
-void PrintXErrors(Display *d, const std::vector<XErrorEvent>& events);
-std::vector<XErrorEvent> UninstallXErrorHandler(Display *d, bool printErrors = true);
+#include "mythexp.h"
+
+MPUBLIC Display *MythXOpenDisplay(void);
+MPUBLIC void InstallXErrorHandler(Display *d);
+MPUBLIC void PrintXErrors(Display *d, const std::vector<XErrorEvent>& events);
+MPUBLIC std::vector<XErrorEvent> UninstallXErrorHandler(Display *d, bool printErrors = true);
 #endif // USING_XV
 
-int GetNumberOfXineramaScreens();
+MPUBLIC int GetNumberOfXineramaScreens();
 
-extern QMutex x11_lock;
+MPUBLIC extern QMutex x11_lock;
 
 #define X11L x11_lock.lock()
 #define X11U x11_lock.unlock()

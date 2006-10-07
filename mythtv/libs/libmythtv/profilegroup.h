@@ -106,7 +106,8 @@ private:
     Is_default* is_default;
 };
 
-class ProfileGroupEditor: public ListBoxSetting, public ConfigurationDialog {
+class MPUBLIC ProfileGroupEditor: public ListBoxSetting,
+    public ConfigurationDialog {
     Q_OBJECT
 public:
     ProfileGroupEditor() {};

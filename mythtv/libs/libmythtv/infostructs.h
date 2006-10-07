@@ -3,9 +3,11 @@
 
 #include <qstring.h>
 
+#include "mythexp.h"
+
 class QPixmap;
 
-class ChannelInfo
+class MPUBLIC ChannelInfo
 {
  public:
     ChannelInfo() {}

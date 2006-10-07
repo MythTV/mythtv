@@ -1,4 +1,12 @@
 #include "mythcdrom.h"
+
+#ifdef linux
+#include "mythcdrom-linux.h"
+#elif defined(__FreeBSD__)
+#include "mythcdrom-freebsd.h"
+#endif
+
+
 #include <sys/stat.h>
 
 #include "mythconfig.h"
@@ -29,9 +37,9 @@ using namespace std;
 MythCDROM* MythCDROM::get(QObject* par, const char* devicePath, bool SuperMount,
                                  bool AllowEject) {
 #ifdef linux
-    return new MythCDROMLinux(par, devicePath, SuperMount, AllowEject);
+    return GetMythCDROMLinux(par, devicePath, SuperMount, AllowEject);
 #elif defined(__FreeBSD__)
-    return new MythCDROMFreeBSD(par, devicePath, SuperMount, AllowEject);
+    return GetMythCDROMFreeBSD(par, devicePath, SuperMount, AllowEject);
 #elif defined(CONFIG_DARWIN)
     return new MythCDROM(par, devicePath, SuperMount, AllowEject);
 #else

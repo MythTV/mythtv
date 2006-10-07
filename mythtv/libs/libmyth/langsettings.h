@@ -3,7 +3,7 @@
 
 #include "settings.h"
 
-class LanguageSettings {
+class MPUBLIC LanguageSettings {
 public:
     /// Load a QTranslator for the user's preferred
     /// language. The module_name indicates

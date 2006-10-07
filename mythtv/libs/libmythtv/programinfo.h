@@ -101,7 +101,7 @@ enum WatchListStatus {
 class ScheduledRecording;
 class QGridLayout;
 
-class ProgramInfo
+class MPUBLIC ProgramInfo
 {
   public:
     // Constructors and bulk set methods.
@@ -340,7 +340,7 @@ class ProgramInfo
 /** \class ProgramList
  *  \brief QPtrList of ProgramInfo instances, with helper functions.
  */
-class ProgramList: public QPtrList<ProgramInfo> {
+class MPUBLIC ProgramList: public QPtrList<ProgramInfo> {
  public:
     ProgramList(bool autoDelete = true) {
         setAutoDelete(autoDelete);

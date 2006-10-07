@@ -7,10 +7,12 @@
 #include <qmutex.h>
 #include <qptrlist.h>
 
+#include "mythexp.h"
+
 class ProgramInfo;
 class MythSocket;
 
-struct LiveTVChainEntry
+struct MPUBLIC LiveTVChainEntry
 {
     QString chanid;
     QDateTime starttime;
@@ -22,7 +24,7 @@ struct LiveTVChainEntry
     QString inputname;
 };
 
-class LiveTVChain
+class MPUBLIC LiveTVChain
 {
   public:
     LiveTVChain();

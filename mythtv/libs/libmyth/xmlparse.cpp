@@ -8,7 +8,7 @@ using namespace std;
 #include "uilistbtntype.h"
 #include "xmlparse.h"
 
-QMap<QString, fontProp> globalFontMap;
+MPUBLIC QMap<QString, fontProp> globalFontMap;
 
 XMLParse::XMLParse(void)
 {

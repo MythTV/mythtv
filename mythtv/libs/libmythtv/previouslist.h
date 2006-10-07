@@ -9,7 +9,7 @@
 #include "libmythtv/programinfo.h"
 
 
-class PreviousList : public MythDialog
+class MPUBLIC PreviousList : public MythDialog
 {
     Q_OBJECT
 

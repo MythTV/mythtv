@@ -34,7 +34,7 @@ struct fontProp {
     QColor dropColor;
 };
 
-class LayerSet
+class MPUBLIC LayerSet
 {
   public:
     LayerSet(const QString &name);
@@ -82,7 +82,7 @@ class LayerSet
     vector<UIType *> *allTypes;
 };
 
-class UIType : public QObject
+class MPUBLIC UIType : public QObject
 {
   Q_OBJECT
 
@@ -154,7 +154,7 @@ class UIType : public QObject
     bool     hidden;        // Is this "widget" seen or hidden ?
 };
 
-class UIBarType : public UIType
+class MPUBLIC UIBarType : public UIType
 {
   public:
     UIBarType(const QString &name, QString, int, QRect);
@@ -222,7 +222,7 @@ class AlphaBlender
     int alpha;
 };
 
-class UIGuideType : public UIType
+class MPUBLIC UIGuideType : public UIType
 {
   public:
     UIGuideType(const QString &name, int order);
@@ -339,7 +339,7 @@ class UIGuideType : public UIType
     int prog_past_col;
 };
 
-class UIListType : public UIType
+class MPUBLIC UIListType : public UIType
 {
     Q_OBJECT
 
@@ -439,7 +439,7 @@ class UIListType : public UIType
     QMap<int, int> columnContext;
 };
 
-class UIImageType : public UIType
+class MPUBLIC UIImageType : public UIType
 {
     Q_OBJECT
 
@@ -499,7 +499,7 @@ class UIImageType : public UIType
 
 };
 
-class UIAnimatedImageType : public UIType
+class MPUBLIC UIAnimatedImageType : public UIType
 {
     Q_OBJECT
 
@@ -559,7 +559,7 @@ class UIAnimatedImageType : public UIType
     MythDialog* m_window;
 };
 
-class UIRepeatedImageType : public UIImageType
+class MPUBLIC UIRepeatedImageType : public UIImageType
 {
     Q_OBJECT
 
@@ -591,7 +591,7 @@ class UIRepeatedImageType : public UIImageType
 };
 
 
-class UITextType : public UIType
+class MPUBLIC UITextType : public UIType
 {
   public:
     UITextType(const QString &, fontProp *, const QString &, int,
@@ -632,7 +632,7 @@ class UITextType : public UIType
 
 };
 
-class UIRichTextType : public UIType
+class MPUBLIC UIRichTextType : public UIType
 {
     Q_OBJECT
 
@@ -718,7 +718,7 @@ class UIRichTextType : public UIType
         QPixmap  m_dnArrowSel;
 };
 
-class UIMultiTextType : public UITextType
+class MPUBLIC UIMultiTextType : public UITextType
 {
 
   Q_OBJECT
@@ -775,7 +775,7 @@ class UIMultiTextType : public UITextType
 
 };
 
-class UIRemoteEditType : public UIType
+class MPUBLIC UIRemoteEditType : public UIType
 {
     Q_OBJECT
 
@@ -818,7 +818,7 @@ class UIRemoteEditType : public UIType
     MythThemedDialog* m_parentDialog;
 };
 
-class UIStatusBarType : public UIType
+class MPUBLIC UIStatusBarType : public UIType
 {
   public:
     UIStatusBarType(QString &, QPoint, int);
@@ -855,7 +855,7 @@ class UIStatusBarType : public UIType
 
 };
 
-class UIManagedTreeListType : public UIType
+class MPUBLIC UIManagedTreeListType : public UIType
 {
     Q_OBJECT
 
@@ -984,7 +984,7 @@ class UIManagedTreeListType : public UIType
     bool                    bIncSearchContains;
 };
 
-class UIPushButtonType : public UIType
+class MPUBLIC UIPushButtonType : public UIType
 {
     Q_OBJECT
 
@@ -1017,7 +1017,7 @@ class UIPushButtonType : public UIType
 
 };
 
-class UITextButtonType : public UIType
+class MPUBLIC UITextButtonType : public UIType
 {
     Q_OBJECT
 
@@ -1056,7 +1056,7 @@ class UITextButtonType : public UIType
 
 
 
-class UICheckBoxType : public UIType
+class MPUBLIC UICheckBoxType : public UIType
 {
     Q_OBJECT
 
@@ -1122,7 +1122,7 @@ class IntStringPair
 };
 
 
-class UISelectorType : public UIPushButtonType
+class MPUBLIC UISelectorType : public UIPushButtonType
 {
     Q_OBJECT
 
@@ -1171,7 +1171,7 @@ class UISelectorType : public UIPushButtonType
 
 
 
-class UIBlackHoleType : public UIType
+class MPUBLIC UIBlackHoleType : public UIType
 {
     Q_OBJECT
 
@@ -1193,7 +1193,7 @@ class UIBlackHoleType : public UIType
     QRect area;
 };
 
-class UIKeyType : public UIType
+class MPUBLIC UIKeyType : public UIType
 {
     Q_OBJECT
 
@@ -1280,7 +1280,7 @@ class UIKeyType : public UIType
     QTimer  m_pushTimer;
 };
 
-class UIKeyboardType : public UIType
+class MPUBLIC UIKeyboardType : public UIType
 {
     Q_OBJECT
 

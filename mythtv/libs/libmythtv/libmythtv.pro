@@ -458,6 +458,10 @@ using_backend {
     DEFINES += USING_BACKEND
 }
 
+use_hidesyms {
+    QMAKE_CXXFLAGS += -fvisibility=hidden
+}
+
 # install headers required by mytharchive
 inc.path = $${PREFIX}/include/mythtv/libmythtv/
 inc.files = programinfo.h remoteutil.h recordingtypes.h

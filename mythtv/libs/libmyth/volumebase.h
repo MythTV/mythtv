@@ -14,7 +14,7 @@ typedef enum {
     MUTE_BOTH
 } kMuteState;
 
-class VolumeBase
+class MPUBLIC VolumeBase
 {
  public:
     VolumeBase();    

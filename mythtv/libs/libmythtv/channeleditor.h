@@ -7,7 +7,7 @@
 
 class SourceSetting;
 class ChannelListSetting;
-class ChannelEditor: public VerticalConfigurationGroup,
+class MPUBLIC ChannelEditor: public VerticalConfigurationGroup,
                      public ConfigurationDialog {
     Q_OBJECT
 public:

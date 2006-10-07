@@ -27,6 +27,7 @@ using namespace std;
 
 #include "virtualkeyboard.h"
 
+#include "mythexp.h"
 
 // These widgets follow these general navigation rules:
 //
@@ -36,7 +37,7 @@ using namespace std;
 // - Space selects
 
 
-class MythComboBox: public QComboBox 
+class MPUBLIC MythComboBox: public QComboBox 
 {
     Q_OBJECT
   public:
@@ -68,7 +69,7 @@ class MythComboBox: public QComboBox
     int step;
 };
 
-class MythSpinBox: public QSpinBox 
+class MPUBLIC MythSpinBox: public QSpinBox 
 {
     Q_OBJECT
   public:
@@ -95,7 +96,7 @@ class MythSpinBox: public QSpinBox
     bool singlestep;
 };
 
-class MythSlider: public QSlider 
+class MPUBLIC MythSlider: public QSlider 
 {
     Q_OBJECT
   public:
@@ -117,7 +118,7 @@ class MythSlider: public QSlider
 };
 
 
-class MythLineEdit : public QLineEdit 
+class MPUBLIC MythLineEdit : public QLineEdit 
 {
     Q_OBJECT
   public:
@@ -163,7 +164,7 @@ class MythLineEdit : public QLineEdit
 };
 
 // A Line edit that does special things when you press number keys 
-class MythRemoteLineEdit : public QTextEdit
+class MPUBLIC MythRemoteLineEdit : public QTextEdit
 {
     Q_OBJECT
   public:
@@ -243,7 +244,7 @@ class MythRemoteLineEdit : public QTextEdit
     PopupPosition popupPosition;
 };
 
-class MythTable : public QTable
+class MPUBLIC MythTable : public QTable
 {
   public:
     MythTable(QWidget *parent) : QTable(parent) { }
@@ -251,7 +252,7 @@ class MythTable : public QTable
     void keyPressEvent(QKeyEvent *e);
 };
 
-class MythButtonGroup : public QButtonGroup
+class MPUBLIC MythButtonGroup : public QButtonGroup
 {
   public:
     MythButtonGroup(QWidget *parent = 0) : QButtonGroup(parent) { }
@@ -259,7 +260,7 @@ class MythButtonGroup : public QButtonGroup
     void moveFocus(int key);
 };
 
-class MythPushButton : public QPushButton
+class MPUBLIC MythPushButton : public QPushButton
 {
     Q_OBJECT
   public:
@@ -300,7 +301,7 @@ class MythPushButton : public QPushButton
     QStringList keyPressActions;
 };
 
-class MythCheckBox: public QCheckBox
+class MPUBLIC MythCheckBox: public QCheckBox
 {
     Q_OBJECT
   public:
@@ -322,7 +323,7 @@ class MythCheckBox: public QCheckBox
     QString helptext;
 };
 
-class MythRadioButton: public QRadioButton
+class MPUBLIC MythRadioButton: public QRadioButton
 {
     Q_OBJECT
   public:
@@ -342,7 +343,7 @@ class MythRadioButton: public QRadioButton
     QString helptext;
 };
 
-class MythListView : public QListView
+class MPUBLIC MythListView : public QListView
 {
     Q_OBJECT
   public:
@@ -355,7 +356,7 @@ class MythListView : public QListView
     void focusInEvent(QFocusEvent *e);
 };
 
-class MythListBox: public QListBox {
+class MPUBLIC MythListBox: public QListBox {
     Q_OBJECT
   public:
     MythListBox(QWidget* parent);

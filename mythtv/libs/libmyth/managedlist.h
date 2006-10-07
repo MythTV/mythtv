@@ -23,7 +23,7 @@ class ManagedListGroup;
 //
 // This is an abstract base class that defines the interface.
 //
-class ManagedListItem : public QObject
+class MPUBLIC ManagedListItem : public QObject
 {
     Q_OBJECT
 
@@ -79,7 +79,7 @@ class ManagedListItem : public QObject
 };
 
 
-class DialogDoneListItem : public ManagedListItem
+class MPUBLIC DialogDoneListItem : public ManagedListItem
 {
     Q_OBJECT
     public:
@@ -169,7 +169,7 @@ class IntegerManagedListItem : public ManagedListItem
 //
 // A list item that can contain more items.
 //
-class ManagedListGroup : public ManagedListItem
+class MPUBLIC ManagedListGroup : public ManagedListItem
 {
     Q_OBJECT
 
@@ -231,7 +231,7 @@ class ManagedListGroup : public ManagedListItem
 // A specialized version of the ManagedListGroup that allows for swtiching the
 // values using left/right without having to pop up the list.
 //
-class SelectManagedListItem : public ManagedListGroup
+class MPUBLIC SelectManagedListItem : public ManagedListGroup
 {
     Q_OBJECT
 
@@ -297,7 +297,7 @@ class SelectManagedListItem : public ManagedListGroup
 };
 
 
-class BoolManagedListItem : public SelectManagedListItem
+class MPUBLIC BoolManagedListItem : public SelectManagedListItem
 {
     Q_OBJECT
     public:
@@ -342,7 +342,7 @@ class BoolManagedListItem : public SelectManagedListItem
 //
 // An IntegerManagedListItem with a minimum and maximum value.
 //
-class BoundedIntegerManagedListItem : public SelectManagedListItem
+class MPUBLIC BoundedIntegerManagedListItem : public SelectManagedListItem
 {
     Q_OBJECT
 
@@ -425,7 +425,7 @@ class BoundedIntegerManagedListItem : public SelectManagedListItem
 };
 
 
-class ManagedListSetting: public SimpleDBStorage
+class MPUBLIC ManagedListSetting: public SimpleDBStorage
 {
     Q_OBJECT
 
@@ -495,7 +495,7 @@ class ManagedListSetting: public SimpleDBStorage
 };
 
 
-class SelectManagedListSetting : public ManagedListSetting
+class MPUBLIC SelectManagedListSetting : public ManagedListSetting
 {
     protected:
         SelectManagedListSetting(const QString& listName,  const QString& listText, ManagedListGroup* _group,
@@ -550,7 +550,7 @@ class SelectManagedListSetting : public ManagedListSetting
 };
 
 
-class BoolManagedListSetting : public ManagedListSetting
+class MPUBLIC BoolManagedListSetting : public ManagedListSetting
 {
     public:
         BoolManagedListSetting(const QString& trueText, const QString& falseText, const QString& ItemName,
@@ -571,7 +571,7 @@ class BoolManagedListSetting : public ManagedListSetting
 };
 
 
-class IntegerManagedListSetting : public ManagedListSetting
+class MPUBLIC IntegerManagedListSetting : public ManagedListSetting
 {
     public:
         IntegerManagedListSetting(int _bigStep, int _step, const QString& ItemName, QString _table,
@@ -600,7 +600,7 @@ class IntegerManagedListSetting : public ManagedListSetting
         IntegerManagedListItem* IntegerListItem;
 };
 
-class BoundedIntegerManagedListSetting : public ManagedListSetting
+class MPUBLIC BoundedIntegerManagedListSetting : public ManagedListSetting
 {
     public:
         BoundedIntegerManagedListSetting(int _min, int _max, int _bigStep, int _step, const QString& ItemName,
@@ -633,7 +633,7 @@ class BoundedIntegerManagedListSetting : public ManagedListSetting
 //
 // The ManagedList takes care of the heavy lifting when using a UIListType.
 //
-class ManagedList : public QObject
+class MPUBLIC ManagedList : public QObject
 {
     Q_OBJECT
 

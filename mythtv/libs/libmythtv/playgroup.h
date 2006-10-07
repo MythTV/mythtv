@@ -7,7 +7,7 @@
 
 class ProgramInfo;
 
-class PlayGroup: public ConfigurationWizard
+class MPUBLIC PlayGroup: public ConfigurationWizard
 {
  public:
     PlayGroup(QString _name);
@@ -23,7 +23,7 @@ class PlayGroup: public ConfigurationWizard
     QString name;
 };
 
-class PlayGroupEditor: public ListBoxSetting, public ConfigurationDialog {
+class MPUBLIC PlayGroupEditor: public ListBoxSetting, public ConfigurationDialog {
     Q_OBJECT
  public:
     PlayGroupEditor(void);

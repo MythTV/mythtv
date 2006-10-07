@@ -26,6 +26,7 @@ class QWidget;
 #define MAX_DISPLAY_TIMES 30
 
 // Use this function to instantiate a guidegrid instance.
+MPUBLIC
 bool RunProgramGuide(uint &startChanId, QString &startChanNum,
                      bool thread = false, TV *player = NULL,
                      bool allowsecondaryepg = true);

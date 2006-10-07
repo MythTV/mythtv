@@ -6,8 +6,9 @@
 #include <qurl.h>
 #include <qobject.h>
 #include <qtimer.h>
+#include "mythexp.h"
 
-class HttpComms : public QObject
+class MPUBLIC HttpComms : public QObject
 {
     Q_OBJECT
   public:

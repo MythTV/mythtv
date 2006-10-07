@@ -14,7 +14,7 @@ typedef enum {
     AUDIOOUTPUT_TELEPHONY
 } AudioOutputSource;
 
-class AudioOutput : public VolumeBase, public OutputListeners
+class MPUBLIC AudioOutput : public VolumeBase, public OutputListeners
 {
  public:
     // opens one of the concrete subclasses

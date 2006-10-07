@@ -12,6 +12,8 @@
 #include <qstring.h>
 #include <map>
 
+#include "mythexp.h"
+
 using namespace std;
 
 /**This class contains configuration information.  
@@ -20,7 +22,7 @@ using namespace std;
   */
 
 class QPixmap;
-class Settings {
+class MPUBLIC Settings {
 public: 
         Settings(QString strSettingFile = "settings.txt");
         ~Settings();

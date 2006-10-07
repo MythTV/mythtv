@@ -6,6 +6,8 @@
 #include <qmap.h>
 #include <qptrlist.h>
 
+#include "mythexp.h"
+
 class QSqlDatabase;
 class MythContext;
 class QPainter;
@@ -58,7 +60,7 @@ class MythPlugin : public QLibrary
 };
 
 // this should only be instantiated through MythContext.
-class MythPluginManager
+class MPUBLIC MythPluginManager
 {
   public:   
     MythPluginManager();

@@ -12,7 +12,7 @@
 
 class MythSocket;
 
-class PreviewGenerator : public QObject
+class MPUBLIC PreviewGenerator : public QObject
 {
     Q_OBJECT
   public:

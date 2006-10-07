@@ -40,6 +40,8 @@
 #include <qstring.h>
 #include <qiodevice.h>
 
+#include "mythexp.h"
+
 /**
  * A wrapper class for the most commonly used encoding and
  * decoding algorithms.  Currently there is support for encoding
@@ -68,7 +70,7 @@
  * @author Dawit Alemayehu <adawit@kde.org>
  * @author Rik Hemsley <rik@kde.org>
  */
-class QCodecs
+class MPUBLIC QCodecs
 {
 public:
 
@@ -401,7 +403,7 @@ class QMD5Private;
  * @author Dirk Mueller <mueller@kde.org>, Dawit Alemayehu <adawit@kde.org>
  */
 
-class QMD5
+class MPUBLIC QMD5
 {
 public:
 

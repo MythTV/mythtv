@@ -7,6 +7,8 @@
 
 #include <time.h>
 
+#include "mythexp.h"
+
 #define MYTH_SYSTEM_DONT_BLOCK_LIRC          0x1 //< myth_system() flag to avoid blocking
 #define MYTH_SYSTEM_DONT_BLOCK_JOYSTICK_MENU 0x2 //< myth_system() flag to avoid blocking
 
@@ -15,7 +17,7 @@ class QImage;
 class QPainter;
 class QFont;
 
-class MythTimer
+class MPUBLIC MythTimer
 {
   public:
     MythTimer() {}
@@ -36,30 +38,30 @@ class MythTimer
     QTime m_timer;
 };
 
-QDateTime mythCurrentDateTime();
+MPUBLIC QDateTime mythCurrentDateTime();
 
 // This is necessary for GCC 3.3, which has llabs(long long)
 // but not abs(long long) or std::llabs(long long)
-inline  long long  absLongLong(long long  n)  { return n >= 0 ? n : -n; } 
+MPUBLIC inline long long absLongLong(long long  n) { return n >= 0 ? n : -n; }
 
-void encodeLongLong(QStringList &list, long long num);
-long long decodeLongLong(QStringList &list, uint offset);
-long long decodeLongLong(QStringList &list, QStringList::iterator &it);
+MPUBLIC void encodeLongLong(QStringList &list, long long num);
+MPUBLIC long long decodeLongLong(QStringList &list, uint offset);
+MPUBLIC long long decodeLongLong(QStringList &list, QStringList::iterator &it);
 
-QRgb blendColors(QRgb source, QRgb add, int alpha);
+MPUBLIC QRgb blendColors(QRgb source, QRgb add, int alpha);
 
-uint myth_system(const QString &command, int flags = 0);
+MPUBLIC uint myth_system(const QString &command, int flags = 0);
 
-QString cutDownString(const QString &text, QFont *testFont, uint maxwidth);
+MPUBLIC QString cutDownString(const QString &text, QFont *testFont, uint maxwidth);
 
-QDateTime MythUTCToLocal(const QDateTime &utc);
-int MythSecsTo(const QDateTime &from, const QDateTime &to);
+MPUBLIC QDateTime MythUTCToLocal(const QDateTime &utc);
+MPUBLIC int MythSecsTo(const QDateTime &from, const QDateTime &to);
 
-long long stringToLongLong(const QString &str);
-QString longLongToString(long long ll);
+MPUBLIC long long stringToLongLong(const QString &str);
+MPUBLIC QString longLongToString(long long ll);
 
-long long getDiskSpace(const QString&,long long&,long long&);
-bool getUptime(time_t &uptime);
-bool getMemStats(int &totalMB, int &freeMB, int &totalVM, int &freeVM);
+MPUBLIC long long getDiskSpace(const QString&,long long&,long long&);
+MPUBLIC bool getUptime(time_t &uptime);
+MPUBLIC bool getMemStats(int &totalMB, int &freeMB, int &totalVM, int &freeVM);
 
 #endif // UTIL_H_

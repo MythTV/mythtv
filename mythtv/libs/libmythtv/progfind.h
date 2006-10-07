@@ -25,7 +25,7 @@ class ProgramInfo;
 class QWidget;
 class TV;
 
-void RunProgramFind(bool thread = false, bool ggActive = false);
+MPUBLIC void RunProgramFind(bool thread = false, bool ggActive = false);
 
 class ProgFinder : public MythDialog
 {

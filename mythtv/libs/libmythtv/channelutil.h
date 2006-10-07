@@ -7,6 +7,8 @@ using namespace std;
 #include <stdint.h>
 #include <qstring.h>
 
+#include "mythexp.h"
+
 class NetworkInformationTable;
 
 class DBChannel
@@ -44,7 +46,7 @@ typedef vector<DBChannel> DBChanList;
 /** \class ChannelUtil
  *  \brief Collection of helper utilities for channel DB use
  */
-class ChannelUtil
+class MPUBLIC ChannelUtil
 {
   public:
     // Multiplex Stuff

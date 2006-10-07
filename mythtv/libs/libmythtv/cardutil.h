@@ -33,7 +33,7 @@ typedef enum
 /** \class CardUtil
  *  \brief Collection of helper utilities for capture card DB use
  */
-class CardUtil
+class MPUBLIC CardUtil
 {
   public:
     /// \brief all the different capture cards

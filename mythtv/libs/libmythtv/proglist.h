@@ -25,7 +25,7 @@ enum ProgListType {
 };
 
 
-class ProgLister : public MythDialog
+class MPUBLIC ProgLister : public MythDialog
 {
     Q_OBJECT
 

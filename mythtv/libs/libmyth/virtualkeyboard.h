@@ -15,7 +15,7 @@ enum PopupPosition
     VK_POSBOTTOMDIALOG
 };
 
-class VirtualKeyboard : public MythThemedDialog
+class MPUBLIC VirtualKeyboard : public MythThemedDialog
 {
     Q_OBJECT
   public:

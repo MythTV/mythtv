@@ -11,7 +11,7 @@
 class QLabel;
 class ProgramInfo;
 
-class CustomEdit : public MythDialog
+class MPUBLIC CustomEdit : public MythDialog
 {
     Q_OBJECT
   public:

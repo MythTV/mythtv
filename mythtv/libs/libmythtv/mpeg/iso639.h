@@ -6,9 +6,10 @@
 #include <qstring.h>
 #include <qstringlist.h>
 #include <vector>
+#include "mythexp.h"
 using namespace std;
 
-extern QMap<int, QString> _iso639_key_to_english_name;
+extern MPUBLIC QMap<int, QString> _iso639_key_to_english_name;
 
 /** \file iso639.h
  *  \brief ISO 639-1 and ISO 639-2 support functions
@@ -36,7 +37,7 @@ void        iso639_clear_language_list(void);
 QStringList iso639_get_language_list(void);
 vector<int> iso639_get_language_key_list(void);
 int         iso639_key_to_canonical_key(int iso639_2);
-QString     iso639_str2_to_str3(const QString &str2);
+MPUBLIC QString     iso639_str2_to_str3(const QString &str2);
 
 static inline QString iso639_key_to_str3(int code)
 {
