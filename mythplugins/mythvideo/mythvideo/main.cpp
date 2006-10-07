@@ -3,6 +3,7 @@
 #include <mythtv/mythcontext.h>
 #include <mythtv/lcddevice.h>
 #include <mythtv/libmythui/myththemedmenu.h>
+#include <mythtv/mythpluginapi.h>
 
 #include "videomanager.h"
 #include "videobrowser.h"
@@ -280,14 +281,6 @@ void runMenu(QString themedir, const QString &menuname)
         VERBOSE(VB_IMPORTANT, QString("Couldn't find theme %1").arg(themedir));
         delete diag;
     }
-}
-
-extern "C"
-{
-    int mythplugin_init(const char *libversion);
-    int mythplugin_run();
-    int mythplugin_config();
-    void mythplugin_destroy();
 }
 
 int mythplugin_init(const char *libversion)

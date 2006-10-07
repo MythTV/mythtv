@@ -38,3 +38,7 @@ macx {
     # need C99 flag for isnan() to work
     DEFINES += _GLIBCPP_USE_C99
 }
+
+use_hidesyms {
+    QMAKE_CXXFLAGS += -fvisibility=hidden
+}

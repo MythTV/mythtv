@@ -24,3 +24,7 @@ SOURCES += titledialog.cpp
 macx {
     QMAKE_LFLAGS += -flat_namespace -undefined suppress
 }
+
+use_hidesyms {
+    QMAKE_CXXFLAGS += -fvisibility=hidden
+}
