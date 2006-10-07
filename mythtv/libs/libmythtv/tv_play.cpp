@@ -6090,6 +6090,8 @@ void TV::TreeMenuSelected(OSDListTreeType *tree, OSDGenericTree *item)
     {
         if (action == "JUMPTODVDROOTMENU")
             activenvp->GoToDVDMenu("menu");
+        else if (action == "JUMPTODVDCHAPTERMENU")
+            activenvp->GoToDVDMenu("chapter");
         else if (action == "TOGGLEEDIT")
             StartProgramEditMode();
         else if (action == "TOGGLEAUTOEXPIRE")
@@ -6273,7 +6275,10 @@ void TV::BuildOSDTreeMenu(void)
     }
     else if (StateIsPlaying(internalState) && activerbuffer->isDVD())
     {
-        item = new OSDGenericTree(treeMenu,tr("DVD Root Menu"), "JUMPTODVDROOTMENU");
+        item = new OSDGenericTree(treeMenu,tr("DVD Root Menu"), 
+                "JUMPTODVDROOTMENU");
+        item = new OSDGenericTree(treeMenu, tr("DVD Chapter Menu"), 
+                "JUMPTODVDCHAPTERMENU");
     }
     else if (StateIsPlaying(internalState))
     {

@@ -527,18 +527,14 @@ void DVDRingBufferPriv::WaitSkip(void)
 void DVDRingBufferPriv::GoToMenu(const QString str)
 {
     DVDMenuID_t menuid;
-    if (str.compare("part") == 0)
-        menuid = DVD_MENU_Part;
-    else if (str.compare("menu") == 0)
+    if (str.compare("chapter") == 0)
         menuid = DVD_MENU_Root;
+    else if (str.compare("menu") == 0)
+        menuid = DVD_MENU_Title;
     else
         return;
 
-    if ((dvdnav_menu_call(dvdnav, menuid) == DVDNAV_STATUS_ERR) &&
-        (str == "menu"))
-    {
-        dvdnav_menu_call(dvdnav, DVD_MENU_Title);
-    }
+    dvdnav_menu_call(dvdnav, menuid);
 }
 
 void DVDRingBufferPriv::GoToNextProgram(void)
