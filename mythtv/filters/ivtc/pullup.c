@@ -153,6 +153,7 @@ static int licomb_y_mmx(unsigned char *a, unsigned char *b, int s)
 
 static int var_y_mmx(unsigned char *a, unsigned char *b, int s)
 {
+    (void) b;
 	int ret;
 	asm volatile (
 		"movl $3, %%ecx \n\t"
@@ -816,6 +817,11 @@ void pullup_free_context(struct pullup_context *c)
 	} while (f != c->head);
     free(c->frame->ifields);
 	free(c->frame);
+    free(c->stride);
+    free(c->bpp);
+    free(c->w);
+    free(c->h);
+    free(c->background);
 	free(c);
 }
 
