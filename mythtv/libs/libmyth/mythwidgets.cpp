@@ -1064,10 +1064,10 @@ void MythPushButton::keyPressEvent(QKeyEvent *e)
             QString action = actions[i];
             if (action == "SELECT")
             {
-                setDown(true);
-                emit pressed();
                 if (isToggleButton())
                     toggleText();
+                setDown(true);
+                emit pressed();
                 handled = true;
             }
             else if (arrowAccel)
@@ -1079,10 +1079,10 @@ void MythPushButton::keyPressEvent(QKeyEvent *e)
                 }
                 else if (action == "RIGHT")
                 {
-                    setDown(true);
-                    emit pressed();
                     if (isToggleButton())
                         toggleText();
+                    setDown(true);
+                    emit pressed();
                     handled = true;
                 }
             }
