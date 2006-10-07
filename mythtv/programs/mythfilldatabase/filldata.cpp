@@ -1318,6 +1318,49 @@ void parseCredits(QDomElement &element, ProgInfo *pginfo)
     }
 }
 
+void parseVideo(QDomElement &element, ProgInfo *pginfo)
+{
+    for (QDomNode child = element.firstChild(); !child.isNull();
+         child = child.nextSibling())
+    {
+        QDomElement info = child.toElement();
+        if (!info.isNull())
+        {
+            if (info.tagName() == "quality")
+            {
+                if (getFirstText(info) == "HDTV")
+                        pginfo->hdtv = true;
+            }
+        }
+    }
+}
+
+void parseAudio(QDomElement &element, ProgInfo *pginfo)
+{
+    for (QDomNode child = element.firstChild(); !child.isNull();
+         child = child.nextSibling())
+    {
+        QDomElement info = child.toElement();
+        if (!info.isNull())
+        {
+            if (info.tagName() == "stereo")
+            {
+                if (getFirstText(info) == "mono")
+                {
+                    pginfo->stereo = false;
+                }
+                else if (getFirstText(info) == "stereo" ||
+                        getFirstText(info) == "dolby" ||
+                        getFirstText(info) == "dolby digital" ||
+                        getFirstText(info) == "surround")
+                {
+                    pginfo->stereo = true;
+                }
+            }
+        }
+    }
+}
+
 ProgInfo *parseProgram(QDomElement &element, int localTimezoneOffset)
 {
     QString uniqueid, seriesid, season, episode;
@@ -1463,6 +1506,22 @@ ProgInfo *parseProgram(QDomElement &element, int localTimezoneOffset)
             else if (info.tagName() == "credits")
             {
                 parseCredits(info, pginfo);
+            }
+            else if (info.tagName() == "subtitles" && info.attribute("type") == "teletext")
+            {
+                pginfo->closecaptioned = true;
+            }
+            else if (info.tagName() == "subtitles" && info.attribute("type") == "onscreen")
+            {
+                pginfo->subtitled = true;
+            }
+            else if (info.tagName() == "audio")
+            {
+                parseAudio(info, pginfo);
+            }
+            else if (info.tagName() == "video")
+            {
+                parseVideo(info, pginfo);
             }
             else if (info.tagName() == "episode-num" &&
                      info.attribute("system") == "xmltv_ns")
