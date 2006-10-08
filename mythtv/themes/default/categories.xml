@@ -305,5 +305,32 @@
   <catcolor category="Боевик" color="MediumVioletRed"></catcolor>
   <catcolor category="Фильм ужасов" color="firebrick3"></catcolor>
 
+  <!-- Categories introduced by tv_grab_ee -->
+  <catcolor category="Doksaated" color="goldenrod"></catcolor>
+  <catcolor category="Draama" color="rosybrown3"></catcolor>
+  <catcolor category="Filmid" color="Blue"></catcolor>
+  <catcolor category="Kodusisustus" color="#00cc00"></catcolor>
+  <catcolor category="Kokandus" color="tan3"></catcolor>
+  <catcolor category="Komöödia" color="DarkOrchid"></catcolor>
+  <catcolor category="Krimi" color="MediumVioletRed"></catcolor>
+  <catcolor category="Krimisaated" color="MediumVioletRed"></catcolor>
+  <catcolor category="Lastele" color="MediumSlateBlue"></catcolor>
+  <catcolor category="Liiklussaated" color="#a8bde8"></catcolor>
+  <catcolor category="Loodus" color="#33ff99"></catcolor>
+  <catcolor category="Muusika" color="DarkRed"></catcolor>
+  <catcolor category="Päevakajaline" color="DarkOrange3"></catcolor>
+  <catcolor category="Perefilm" color="#222200"></catcolor>
+  <catcolor category="Põnevus" color="firebrick3"></catcolor>
+  <catcolor category="Reisisaated" color="#aa00aa"></catcolor>
+  <catcolor category="Romantika" color="#ff9999"></catcolor>
+  <catcolor category="Seiklus" color="maroon"></catcolor>
+  <catcolor category="Sport" color="DarkCyan"></catcolor>
+  <catcolor category="Telemängud" color="orchid"></catcolor>
+  <catcolor category="Telesarjad" color="DarkOrchid"></catcolor>
+  <catcolor category="Tõsielu" color="sienna"></catcolor>
+  <catcolor category="Uudised" color="DarkOrange3"></catcolor>
+  <catcolor category="Vestlussaated" color="MediumTurquoise"></catcolor>
+  <catcolor category="Õudus" color="firebrick3"></catcolor>
+
 </categorycolors>
 
