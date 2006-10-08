@@ -234,7 +234,8 @@ bool FirewireChannel::OpenFirewire(void)
                 VERBOSE(VB_IMPORTANT, LOC + QString("Power on cmd successful "
                                                     "(0x%1)")
                                                     .arg(response[0], 0, 16));
-                sleep(1);
+                // allow some time for the stb to power on
+                sleep(3);
                 if (GetPowerState() == Off)
                 {
                     VERBOSE(VB_IMPORTANT, LOC + "STB is still off!?");
