@@ -72,7 +72,7 @@ if ( $archiveDir ) {
 			printf( "    Curr Free: %6d MB\n", $freeSpace );
 		}
 
-		if (( $freeSpace - ($size / 1024.0 / 1024.0)) > $keepFree ) {
+		if (( $freeSpace - $size) > $keepFree ) {
 			printf( "Attempting archive to %s\nStatus: ", $archiveDir );
 			if (MoveFileToArchiveDir( $file, $directory, $archiveDir )) {
 				printf( "Success.\n" );
@@ -97,7 +97,7 @@ sub GetFreeSpace {
 	if ( ! -r $dir ) {
 		return 0;
 	} else {
-		my( $freeSpace ) = `df -m $dir | grep -v Available | awk '{print \$4}'`;
+		my( $freeSpace ) = `df -Pm $dir | grep -v Available | awk '{print \$4}'`;
 
 		return $freeSpace;
 	}
