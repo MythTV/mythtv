@@ -52,7 +52,7 @@ package MythTV::Recording;
             }
             else {
                 $self->{'basename'}  = $self->{'filename'};
-                $self->{'basename'} =~ s/^$self->{'video_dir'}\/+//sg;
+                $self->{'basename'} =~ s/^$self->{'_mythtv'}{'video_dir'}\/+//sg;
             }
         }
 
