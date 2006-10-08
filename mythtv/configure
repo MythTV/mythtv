@@ -2261,7 +2261,7 @@ check_cflags -Wno-switch
 
 # GCC version
 cat > $TMPC << EOF
-int main(int argc, chr **argv)
+int main(int argc, char **argv)
 {
     int ret = 0;
     if (argc == 1)
