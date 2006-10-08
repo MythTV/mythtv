@@ -50,6 +50,10 @@ package MythTV::Recording;
                 $self->{'file_port'} = ($2 or 6543);
                 $self->{'basename'}  = $3;
             }
+            else {
+                $self->{'basename'}  = $self->{'filename'};
+                $self->{'basename'} =~ s/^$self->{'video_dir'}\/+//sg;
+            }
         }
 
     # Pull the cutlist info from the database
