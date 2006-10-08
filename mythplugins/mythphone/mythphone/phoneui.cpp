@@ -1030,11 +1030,11 @@ void PhoneUIBox::alertUser(QString callerUser, QString callerName, QString calle
         // Popup the caller's details
         closeCallPopup(); // Check we were not displaying one (e.g. user was getting ready to dial)
         if (entry)
-            doCallPopup(entry, "Answer", inAudioOnly);
+            doCallPopup(entry, tr("Answer"), inAudioOnly);
         else
         {
             DirEntry dummyEntry(callerDisplay, callerUrl, "", "", "");
-            doCallPopup(&dummyEntry, "Answer", inAudioOnly);
+            doCallPopup(&dummyEntry, tr("Answer"), inAudioOnly);
         }
     }
 }
@@ -1716,7 +1716,7 @@ void PhoneUIBox::doCallPopup(DirEntry *entry, QString DialorAnswer, bool audioOn
         }
     
         QButton *button2=0;
-        if (DialorAnswer == "Dial")
+        if (DialorAnswer == tr("Dial"))
         {
             if (!audioOnly)
             {
