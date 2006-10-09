@@ -185,6 +185,7 @@ class AvFormatDecoder : public DecoderBase
     void SeekReset(long long, uint skipFrames, bool doFlush, bool discardFrames);
 
     bool SetupAudioStream(void);
+    void SetupAudioStreamSubIndexes(int streamIndex);
 
     /// Update our position map, keyframe distance, and the like.
     /// Called for key frame packets.

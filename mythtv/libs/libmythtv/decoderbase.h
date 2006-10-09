@@ -17,14 +17,24 @@ const int kDecoderProbeBufferSize = 65536;
 class StreamInfo
 {
   public:
-    StreamInfo() : av_stream_index(-1), language(-2), language_index(0),
+    StreamInfo() :
+        av_stream_index(-1), av_substream_index(-1),
+        language(-2), language_index(0),
         stream_id(-1), easy_reader(false), wide_aspect_ratio(false) {}
     StreamInfo(int a, int b, uint c, int d, bool e = false, bool f = false) :
-        av_stream_index(a), language(b), language_index(c), stream_id(d),
+        av_stream_index(a), av_substream_index(-1),
+        language(b), language_index(c), stream_id(d),
         easy_reader(e), wide_aspect_ratio(f) {}
+    StreamInfo(int a, int b, uint c, int d, int e,
+               bool f = false, bool g = false) :
+        av_stream_index(a), av_substream_index(e),
+        language(b), language_index(c), stream_id(d),
+        easy_reader(f), wide_aspect_ratio(g) {}
 
   public:
     int  av_stream_index;
+    /// -1 for no substream, 0 for first dual audio stream, 1 for second dual
+    int  av_substream_index;
     int  language; ///< ISO639 canonical language key
     uint language_index;
     int  stream_id;

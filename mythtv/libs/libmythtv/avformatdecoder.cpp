@@ -40,6 +40,7 @@ extern "C" {
 
 #define LOC QString("AFD: ")
 #define LOC_ERR QString("AFD Error: ")
+#define LOC_WARN QString("AFD Warning: ")
 
 #define MAX_AC3_FRAME_SIZE 6144
 
@@ -1488,8 +1489,19 @@ int AvFormatDecoder::ScanStreams(bool novideo)
                 lang_indx = lang_aud_cnt[lang];
                 lang_aud_cnt[lang]++;
             }
-            tracks[kTrackTypeAudio].push_back(
-                StreamInfo(i, lang, lang_indx, ic->streams[i]->id));
+
+            if (ic->streams[i]->codec->avcodec_dual_language)
+            {
+                tracks[kTrackTypeAudio].push_back(
+                    StreamInfo(i, lang, lang_indx, ic->streams[i]->id, 0));
+                tracks[kTrackTypeAudio].push_back(
+                    StreamInfo(i, lang, lang_indx, ic->streams[i]->id, 1));
+            }
+            else
+            {
+                tracks[kTrackTypeAudio].push_back(
+                    StreamInfo(i, lang, lang_indx, ic->streams[i]->id));
+            }
 
             VERBOSE(VB_AUDIO, LOC + QString(
                         "Audio Track #%1 is A/V stream #%2 "
@@ -1553,6 +1565,73 @@ int AvFormatDecoder::ScanStreams(bool novideo)
         scanerror = -1;
 
     return scanerror;
+}
+
+/** \fn AvFormatDecoder::SetupAudioStreamSubIndexes(bool, bool)
+ *  \brief Reacts to DUAL/STEREO changes on the fly and fix streams.
+ *
+ *  This function should be called when a switch between dual and 
+ *  stereo mpeg audio is detected. Such changes can and will happen at
+ *  any time.
+ *
+ *  After this method returns, a new audio stream should be selected
+ *  using AvFormatDecoder::autoSelectSubtitleTrack().
+ *
+ *  \param index av_stream_index of the stream that has changed
+ */
+void AvFormatDecoder::SetupAudioStreamSubIndexes(int streamIndex)
+{
+    QMutexLocker locker(&avcodeclock);
+
+    // Find the position of the streaminfo in tracks[kTrackTypeAudio] 
+    sinfo_vec_t::iterator current = tracks[kTrackTypeAudio].begin();
+    for (; current != tracks[kTrackTypeAudio].end(); ++current) 
+    {
+        if (current->av_stream_index == streamIndex)
+            break;
+    }
+
+    if (current == tracks[kTrackTypeAudio].end())
+    {
+        VERBOSE(VB_IMPORTANT, LOC_WARN +
+                "Invalid stream index passed to "
+                "SetupAudioStreamSubIndexes: "<<streamIndex);
+
+        return;
+    }
+
+    // Remove the extra substream or duplicate the current substream
+    sinfo_vec_t::iterator next = current + 1;
+    if (current->av_substream_index == -1)
+    {
+        // Split stream in two (Language I + Language II)
+        StreamInfo lang1 = *current;
+        StreamInfo lang2 = *current;
+        lang1.av_substream_index = 0;
+        lang2.av_substream_index = 1;
+        *current = lang1;
+        tracks[kTrackTypeAudio].insert(next, lang2);
+        return;
+    }
+
+    if ((next == tracks[kTrackTypeAudio].end()) ||
+        (next->av_stream_index != streamIndex))
+    {
+        QString msg = QString(
+            "Expected substream 1 (Language I) of stream %1\n\t\t\t"
+            "following substream 0, found end of list or another stream.")
+            .arg(streamIndex);
+
+        VERBOSE(VB_IMPORTANT, LOC_WARN + msg);
+
+        return;
+    }
+
+    // Remove extra stream info
+    StreamInfo stream = *current;
+    stream.av_substream_index = -1;
+    *current = stream;
+    tracks[kTrackTypeAudio].erase(next);
 }
 
 int get_avf_buffer(struct AVCodecContext *c, AVFrame *pic)
@@ -2368,7 +2447,9 @@ static int filter_max_ch(const AVFormatContext *ic,
  *   preference:
  *
  *   1) The stream last selected by the user, which is
- *      recalled as the Nth stream in the preferred language.
+ *      recalled as the Nth stream in the preferred language
+ *      or the Nth substream when audio is in dual language
+ *      format (each channel contains a different language track)
  *      If it can not be located we attempt to find a stream
  *      in the same language.
  *
@@ -2434,6 +2515,24 @@ int AvFormatDecoder::AutoSelectAudioTrack(void)
 
     int selTrack = (1 == numStreams) ? 0 : -1;
     int wlang    = wtrack.language;
+
+    if ((selTrack < 0) && (wtrack.av_substream_index >= 0))
+    {
+        VERBOSE(VB_AUDIO, LOC + "Trying to reselect audio sub-stream");
+        // Dual stream without language information: choose
+        // the previous substream that was kept in wtrack,
+        // ignoring the stream index (which might have changed). 
+        int substream_index = wtrack.av_substream_index;
+
+        for (uint i = 0; i < numStreams; i++)
+        {
+            if (atracks[i].av_substream_index == substream_index)
+            {
+                selTrack = i;
+                break;
+            }
+        }
+    }
 
     if ((selTrack < 0) && wlang >= -1 && numStreams)
     {
@@ -2513,6 +2612,30 @@ int AvFormatDecoder::AutoSelectAudioTrack(void)
 
     SetupAudioStream();
     return selTrack;
+}
+
+static void extract_mono_channel(uint channel, AudioInfo *audioInfo,
+                                 char *buffer, int bufsize)
+{
+    // Only stereo -> mono (left or right) is supported
+    if (audioInfo->channels != 2)
+        return;
+
+    if (channel < (uint)audioInfo->channels)
+        return;
+
+    const uint samplesize = audioInfo->sample_size;
+    const uint samples    = bufsize / samplesize;
+    const uint halfsample = samplesize >> 1;
+
+    const char *from = (channel == 1) ? buffer + halfsample : buffer;
+    char *to         = (channel == 0) ? buffer + halfsample : buffer;
+
+    for (uint sample = 0; sample < samples;
+         (sample++), (from += samplesize), (to += samplesize))
+    {
+        memmove(to, from, halfsample);
+    }
 }
 
 bool AvFormatDecoder::GetFrame(int onlyvideo)
@@ -2783,6 +2906,7 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
         avcodeclock.lock();
         int ctype  = curstream->codec->codec_type;
         int audIdx = selectedTrack[kTrackTypeAudio].av_stream_index;
+        int audSubIdx = selectedTrack[kTrackTypeAudio].av_substream_index;
         int subIdx = selectedTrack[kTrackTypeSubtitle].av_stream_index;
         avcodeclock.unlock();
 
@@ -2792,6 +2916,17 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
             {
                 case CODEC_TYPE_AUDIO:
                 {
+                    bool reselectAudioTrack = false;
+
+                    // detect switches between stereo and dual languages
+                    bool wasDual = audSubIdx != -1;
+                    bool isDual = curstream->codec->avcodec_dual_language;
+                    if ((wasDual && !isDual) || (!wasDual &&  isDual))
+                    {
+                        SetupAudioStreamSubIndexes(audIdx);
+                        reselectAudioTrack = true;
+                    }                            
+
                     // detect channels on streams that need
                     // to be decoded before we can know this
                     if (!curstream->codec->channels)
@@ -2801,16 +2936,23 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
                         ret = avcodec_decode_audio(
                             curstream->codec, audioSamples,
                             &data_size, ptr, len);
-                        if (curstream->codec->channels)
-                        {
-                            currentTrack[kTrackTypeAudio] = -1;
-                            selectedTrack[kTrackTypeAudio]
-                                .av_stream_index = -1;
-                            audIdx = -1;
-                            AutoSelectAudioTrack();
-                            audIdx = selectedTrack[kTrackTypeAudio]
-                                .av_stream_index;
-                        }
+
+                        reselectAudioTrack |= curstream->codec->channels;
+                    }
+
+                    if (reselectAudioTrack)
+                    {
+                        QMutexLocker locker(&avcodeclock);
+                        currentTrack[kTrackTypeAudio] = -1;
+                        selectedTrack[kTrackTypeAudio]
+                            .av_stream_index = -1;
+                        audIdx = -1;
+                        audSubIdx = -1;
+                        AutoSelectAudioTrack();
+                        audIdx = selectedTrack[kTrackTypeAudio]
+                            .av_stream_index;
+                        audSubIdx = selectedTrack[kTrackTypeAudio]
+                            .av_substream_index;
                     }
 
                     if (firstloop && pkt->pts != (int64_t)AV_NOPTS_VALUE)
@@ -2891,9 +3033,15 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
                                 curstream->codec->sample_rate);
 
                     VERBOSE(VB_PLAYBACK|VB_TIMESTAMP,
-					        LOC + QString("audio timecode %1 %2 %3 %4") 
-                            .arg(pkt->pts).arg(pkt->dts).arg(temppts)
-							.arg(lastapts)); 
+                            LOC + QString("audio timecode %1 %2 %3 %4") 
+                            .arg(pkt->pts).arg(pkt->dts)
+                            .arg(temppts).arg(lastapts)); 
+
+                    if (audSubIdx != -1)
+                    {
+                        extract_mono_channel(audSubIdx, &audioOut,
+                                             (char*)audioSamples, data_size);
+                    }
 
                     GetNVP()->AddAudioData((char *)audioSamples, data_size,
                                            temppts);
