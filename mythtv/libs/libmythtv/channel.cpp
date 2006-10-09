@@ -263,7 +263,7 @@ bool Channel::InitializeInputs(void)
                 .arg(it.key()).arg((*it)->name).arg((*it)->startChanNum)
                 .arg((*it)->tuneToChannel)
                 .arg(mode_to_format((*it)->videoModeV4L1,1))
-                .arg(mode_to_format((*it)->videoModeV4L1,2)));
+                .arg(mode_to_format((*it)->videoModeV4L2,2)));
     }
 
     return valid_cnt;
