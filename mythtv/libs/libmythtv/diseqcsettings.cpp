@@ -709,7 +709,7 @@ class LNBPolarityInvertedSetting : public CheckBoxSetting
 
     virtual void save(void)
     {
-        m_lnb.SetPolarityInverted(getValue());
+        m_lnb.SetPolarityInverted(boolValue());
     }
 
   private:
