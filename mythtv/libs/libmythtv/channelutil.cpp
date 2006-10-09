@@ -1341,18 +1341,35 @@ inline bool lt_smart(const DBChannel &a, const DBChannel &b)
     bool isIntA, isIntB;
     int a_int = a.channum.toUInt(&isIntA);
     int b_int = b.channum.toUInt(&isIntB);
+    int a_major = a.major_chan;
+    int b_major = b.major_chan;
+    int a_minor = a.minor_chan;
+    int b_minor = b.minor_chan;
+
+    // If ATSC channel has been renumbered, sort by new channel number
+    if ((a_minor > 0) && a_int)
+    {
+        int atsc_int = (QString("%1%2").arg(a_major).arg(a_minor)).toInt();
+        a_minor = (atsc_int == a_int) ? a_minor : 0;
+    }
+
+    if ((b_minor > 0) && b_int)
+    {
+        int atsc_int = (QString("%1%2").arg(b_major).arg(b_minor)).toInt();
+        b_minor = (atsc_int == b_int) ? b_minor : 0;
+    }
 
     // one of the channels is an ATSC channel, and the other
     // is either ATSC or is numeric.
-    if ((a.minor_chan || b.minor_chan) &&
-        (a.minor_chan || isIntA) && (b.minor_chan || isIntB))
+    if ((a_minor || b_minor) &&
+        (a_minor || isIntA) && (b_minor || isIntB))
     {
-        int a_maj = (!a.minor_chan && isIntA) ? a_int : a.major_chan;
-        int b_maj = (!b.minor_chan && isIntB) ? b_int : b.major_chan;
+        int a_maj = (!a_minor && isIntA) ? a_int : a_major;
+        int b_maj = (!b_minor && isIntB) ? b_int : b_major;
         if ((cmp = a_maj - b_maj))
             return cmp < 0;
         
-        if ((cmp = a.minor_chan - b.minor_chan))
+        if ((cmp = a_minor - b_minor))
             return cmp < 0;
     }
 
