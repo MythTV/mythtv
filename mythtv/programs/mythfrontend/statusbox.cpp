@@ -55,6 +55,7 @@ StatusBox::StatusBox(MythMainWindow *parent, const char *name)
         return;
   
     icon_list->SetItemText(item_count++, QObject::tr("Listings Status"));
+    icon_list->SetItemText(item_count++, QObject::tr("Schedule Status"));
     icon_list->SetItemText(item_count++, QObject::tr("Tuner Status"));
     icon_list->SetItemText(item_count++, QObject::tr("Log Entries"));
     icon_list->SetItemText(item_count++, QObject::tr("Job Queue"));
@@ -478,6 +479,10 @@ void StatusBox::setHelpText()
                                           "status information from "
                                           "mythfilldatabase"));
 
+        if (currentItem == QObject::tr("Schedule Status"))
+            helptext->SetText(QObject::tr("Schedule Status shows current "
+                                          "statistics from the scheduler."));
+
         if (currentItem == QObject::tr("Tuner Status"))
             helptext->SetText(QObject::tr("Tuner Status shows the current "
                                           "information about the state of "
@@ -670,6 +675,8 @@ void StatusBox::clicked()
 
     if (currentItem == QObject::tr("Listings Status"))
         doListingsStatus();
+    else if (currentItem == QObject::tr("Schedule Status"))
+        doScheduleStatus();
     else if (currentItem == QObject::tr("Tuner Status"))
         doTunerStatus();
     else if (currentItem == QObject::tr("Log Entries"))
@@ -771,6 +778,101 @@ void StatusBox::doListingsStatus()
         contentLines[count++] = DataDirectMessage;
     }
    
+    contentTotalLines = count;
+    update(ContentRect);
+}
+
+void StatusBox::doScheduleStatus()
+{
+    doScroll = true;
+    contentLines.clear();
+    contentDetail.clear();
+    contentFont.clear();
+
+    uint count = 0;
+
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare("SELECT COUNT(*) FROM record WHERE search = 0");
+
+    if (!query.exec() || !query.isActive())
+    {
+        MythContext::DBError("StatusBox::doScheduleStatus()", query);
+        contentTotalLines = 0;
+        update(ContentRect);
+        return;
+    }
+    else
+    {
+        query.next();
+        QString rules = QString("%1 %2").arg(query.value(0).toInt())
+                                        .arg(tr("standard rules are defined"));
+        contentLines[count]  = rules;
+        contentDetail[count] = rules;
+        count++;
+    }
+    query.prepare("SELECT COUNT(*) FROM record WHERE search > 0");
+
+    if (!query.exec() || !query.isActive())
+    {
+        MythContext::DBError("StatusBox::doScheduleStatus()", query);
+        contentTotalLines = 0;
+        update(ContentRect);
+        return;
+    }
+    else
+    {
+        query.next();
+        QString rules = QString("%1 %2").arg(query.value(0).toInt())
+                                        .arg(tr("search rules are defined"));
+        contentLines[count]  = rules;
+        contentDetail[count] = rules;
+        count++;
+    }
+
+    QMap<RecStatusType, int> statusMatch;
+    QMap<RecStatusType, QString> statusText;
+    QString tmpstr;
+
+    ProgramList schedList;
+    schedList.FromScheduler();
+
+    tmpstr = QString("%1 %2").arg(schedList.count()).arg("matching showings");
+    contentLines[count]  = tmpstr;
+    contentDetail[count] = tmpstr;
+    count++;
+
+    ProgramInfo *s;
+    for (s = schedList.first(); s; s = schedList.next())
+    {
+        if (statusMatch[s->recstatus] < 1)
+            statusText[s->recstatus] = s->RecStatusText();
+
+        ++statusMatch[s->recstatus];
+    }
+    QMap<int, RecStatusType> statusMap;
+    int i = 0;
+    statusMap[i++] = rsRecording;
+    statusMap[i++] = rsWillRecord;
+    statusMap[i++] = rsConflict;
+    statusMap[i++] = rsTooManyRecordings;
+    statusMap[i++] = rsLowDiskSpace;
+    statusMap[i++] = rsLaterShowing;
+    statusMap[i++] = rsNotListed;
+    int j = i;
+
+    for (i = 0; i < j; i++)
+    {
+        RecStatusType type = statusMap[i];
+
+        if (statusMatch[type] > 0)
+        {
+            tmpstr = QString("%1 %2").arg(statusMatch[type])
+                                     .arg(statusText[type]);
+            contentLines[count]  = tmpstr;
+            contentDetail[count] = tmpstr;
+            count++;
+        }
+    }
     contentTotalLines = count;
     update(ContentRect);
 }

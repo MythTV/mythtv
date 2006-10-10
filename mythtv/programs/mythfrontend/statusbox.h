@@ -33,6 +33,7 @@ class StatusBox : public MythDialog
     void updateContent();
     void LoadTheme();
     void doListingsStatus();
+    void doScheduleStatus();
     void doTunerStatus();
     void doLogEntries();
     void doJobQueueStatus();
