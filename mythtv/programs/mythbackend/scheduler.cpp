@@ -977,6 +977,10 @@ void Scheduler::UpdateNextRecord(void)
         ProgramInfo *p = *i;
         if (p->recstatus == rsWillRecord && nextRecMap[p->recordid].isNull())
             nextRecMap[p->recordid] = p->recstartts;
+
+        if (p->rectype == kOverrideRecord && p->parentid > 0 &&
+            p->recstatus == rsWillRecord && nextRecMap[p->parentid].isNull())
+            nextRecMap[p->parentid] = p->recstartts;
         i++;
     }
 
