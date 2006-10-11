@@ -7,7 +7,7 @@ WARNING: You must install MythTV before configuring
 For installation help for everything but mythweb, run:
   ./configure --help
 
-After running configure with whatever options you, just:
+After running configure with whatever options you need, just:
 
   qmake mythplugins.pro
   make
