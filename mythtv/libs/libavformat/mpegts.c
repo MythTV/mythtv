@@ -591,6 +591,7 @@ static void pmt_cb(void *opaque, const uint8_t *section, int section_len)
     SectionHeader header;
 
     int last_item = 0;
+    int desc_count = 0;
     pmt_entry_t items[PMT_PIDS_MAX];
     bzero(&items, sizeof(pmt_entry_t) * PMT_PIDS_MAX);
 
@@ -642,6 +643,7 @@ static void pmt_cb(void *opaque, const uint8_t *section, int section_len)
             break;
         }
         pid &= 0x1fff;
+        desc_count++;
 
         if (dvbci.sub_id && (stream_type == STREAM_TYPE_PRIVATE_DATA))
             stream_type = STREAM_TYPE_SUBTITLE_DVB;
@@ -652,9 +654,9 @@ static void pmt_cb(void *opaque, const uint8_t *section, int section_len)
         if ((dvbci.component_tag >= 0) && (stream_type == STREAM_TYPE_PRIVATE_DATA))
         {
             /* Audio and video are sometimes encoded in private streams labelled with a component tag. */
-            if (dvbci.language[0])
+            if (dvbci.component_tag == 0x0a)
                 stream_type = STREAM_TYPE_AUDIO_MPEG2;
-            else
+            else if (dvbci.component_tag == 0x52 && desc_count == 1)
                 stream_type = STREAM_TYPE_VIDEO_MPEG2;
         }
 
@@ -855,6 +857,7 @@ static int is_desired_stream(int stream_type)
         case STREAM_TYPE_AUDIO_AAC:
         case STREAM_TYPE_AUDIO_AC3:
         case STREAM_TYPE_AUDIO_DTS:
+        case STREAM_TYPE_PRIVATE_DATA:
         case STREAM_TYPE_VBI_DVB:
         case STREAM_TYPE_SUBTITLE_DVB:
         case STREAM_TYPE_DSMCC_B:
