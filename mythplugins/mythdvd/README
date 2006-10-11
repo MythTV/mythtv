@@ -21,7 +21,7 @@ BUILD INSTRUCTIONS
 First, you need MythTV to be installed. If you don't have that
 done, don't even bother with this, as it won't work.
 
-Also, you need MythVideo installed (because mythDVD needs to know where you
+Also, you need MythVideo installed (because MythDVD needs to know where you
 like to store your videos, and that's defined in the MythVideo setup).
 
 In addition to MythTV's prerequisites, you'll have to have the following
@@ -67,16 +67,15 @@ software packages installed for *transcoding* to work:
                 currently using 0.6.12, but you can probably use an earlier
                 version (unless you're using subtitles, in which case you'll
                 almost certainly _need_ 0.6.12 or later).
-                http://www.theorie.physik.uni-goettingen.de/
-                ~ostreich/transcode/
+                http://www.transcoding.org
 
 
 If you want to be able to read encrypted DVD's, you might want to have this
 installed as well:
 
     libdvdcss - A way to access the bits on that DVD you payed for.
-                Probably want 1.2.7
-                http://developers.videolan.org/pub/videolan/libdvdcss/   
+                Probably want 1.2.9
+                http://downloads.videolan.org/pub/videolan/libdvdcss/
 
 
 If the internal player can't play your DVDs, you will need a player.
@@ -95,6 +94,10 @@ applications available. You'll want one or more of:
          xine - Another player. Almost certainly required for
 		fully functional XVCD playback. 
                 http://xinehq.de/
+
+
+2006-10-11:  TODO:  NOTE: the following compile instructions are incorrect and must
+be updated to reflect the plugins architecture.
 
 
 Ok, still with me? To configure the source code for transcoding and xvcd
