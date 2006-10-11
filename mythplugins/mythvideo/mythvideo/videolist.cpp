@@ -1001,15 +1001,14 @@ namespace
         }
     }
 
+    void tree_view_to_flat(meta_dir_node &tree,
+                           VideoListImp::metadata_view_list &flat);
     struct call_tree_flat
     {
         call_tree_flat(VideoListImp::metadata_view_list &list) : m_list(list) {}
 
         void operator()(smart_dir_node &sdn)
         {
-            void tree_view_to_flat(meta_dir_node &,
-                                   VideoListImp::metadata_view_list &);
-
             tree_view_to_flat(*(sdn.get()), m_list);
         }
 

@@ -46,7 +46,6 @@ class MultiValue
     void remove(int id);
     bool exists(int id, int value);
     bool exists(int id);
-    const entry_list &getList();
 
     void load_data();
 

@@ -18,7 +18,7 @@ static HostComboBox *VideoDefaultParentalLevel()
                     "the list or while browsing by default. The Parental PIN "
                     "should be set to limit changing of the default level."));
     return gc;
-};
+}
 
 
 static HostComboBox *VideoDefaultView()
@@ -32,7 +32,7 @@ static HostComboBox *VideoDefaultView()
                     "Other views can be reached via the popup menu available "
                     "via the MENU key."));
     return gc;
-};
+}
 
 
 static HostLineEdit *VideoAdminPassword()
@@ -44,7 +44,7 @@ static HostLineEdit *VideoAdminPassword()
                     "setting the value to all numbers will make your life much "
                     "easier."));
     return gc;
-};
+}
 
 static HostCheckBox *VideoAggressivePC()
 {
@@ -56,7 +56,7 @@ static HostCheckBox *VideoAggressivePC()
                     "PIN without first entering the current PIN. You have "
                     "been warned."));
     return gc;
-};
+}
 
 static HostCheckBox *VideoListUnknownFiletypes()
 {
@@ -67,7 +67,7 @@ static HostCheckBox *VideoListUnknownFiletypes()
                     "directory will be displayed unless their "
                     "extension is explicitly set to be ignored. "));
     return gc;
-};
+}
 
 static HostCheckBox *VideoBrowserNoDB()
 {
@@ -79,7 +79,7 @@ static HostCheckBox *VideoBrowserNoDB()
                     "the MythVideo starting directory whether "
                     "they have been scanned or not."));
     return gc;
-};
+}
 
 static HostCheckBox *VideoGalleryNoDB()
 {
@@ -91,7 +91,7 @@ static HostCheckBox *VideoGalleryNoDB()
                     "the MythVideo starting directory whether "
                     "they have been scanned or not."));
     return gc;
-};
+}
 
 static HostCheckBox *VideoTreeNoDB()
 {
@@ -103,7 +103,7 @@ static HostCheckBox *VideoTreeNoDB()
                     "the MythVideo starting directory whether "
                     "they have been scanned or not."));
     return gc;
-};
+}
 
 static HostCheckBox *VideoTreeNoMetaData()
 {
@@ -115,7 +115,7 @@ static HostCheckBox *VideoTreeNoMetaData()
                     "data from the database. Turning this off can greatly "
                     " speed up how long it takes to load the Video List tree"));
     return gc;
-};
+}
 
 
 static HostCheckBox *VideoNewBrowsable()
@@ -127,7 +127,7 @@ static HostCheckBox *VideoNewBrowsable()
                     "Manager will be marked as browsable and will appear in "
                     "the 'Browse' menu."));
     return gc;
-};
+}
 
 namespace
 {
@@ -175,7 +175,7 @@ static HostLineEdit *SearchListingsCommand()
     gc->setHelpText(QObject::tr("This command must be "
                     "executable by the user running MythVideo."));
     return gc;
-};
+}
 
 
 static HostLineEdit *GetPostersCommand()
@@ -186,7 +186,7 @@ static HostLineEdit *GetPostersCommand()
     gc->setHelpText(QObject::tr("This command must be "
                     "executable by the user running MythVideo."));
     return gc;
-};
+}
 
 
 static HostLineEdit *GetDataCommand()
@@ -197,7 +197,7 @@ static HostLineEdit *GetDataCommand()
     gc->setHelpText(QObject::tr("This command must be "
                     "executable by the user running MythVideo."));
     return gc;
-};
+}
 
 
 static HostLineEdit *VideoStartupDirectory()
@@ -209,7 +209,7 @@ static HostLineEdit *VideoStartupDirectory()
                     "running MythVideo only needs to have read permission "
                     "to the directory."));
     return gc;
-};
+}
 
 
 static HostLineEdit *VideoArtworkDirectory()
@@ -221,7 +221,7 @@ static HostLineEdit *VideoArtworkDirectory()
                     "running MythVideo needs to have read/write permission "
                     "to the directory."));
     return gc;
-};
+}
 
 //Player Settings
 
@@ -235,7 +235,7 @@ static HostLineEdit *VideoDefaultPlayer()
                     "You may also enter the name of one of the playback "
                     "plugins such as 'Internal'."));
     return gc;
-};
+}
 
 static HostSpinBox *VideoGalleryRows()
 {
@@ -243,7 +243,7 @@ static HostSpinBox *VideoGalleryRows()
     gc->setLabel(QObject::tr("Rows to display"));
     gc->setValue(3);
     return gc;
-};
+}
 
 static HostSpinBox *VideoGalleryColumns()
 {
@@ -251,7 +251,7 @@ static HostSpinBox *VideoGalleryColumns()
     gc->setLabel(QObject::tr("Columns to display"));
     gc->setValue(4);
     return gc;
-};
+}
 
 static HostCheckBox *VideoGallerySubtitle()
 {
@@ -261,7 +261,7 @@ static HostCheckBox *VideoGallerySubtitle()
     gc->setHelpText(QObject::tr("If set, the additional text will make the "
                     "thumbnails smaller."));
     return gc;
-};
+}
 
 static HostCheckBox *VideoGalleryAspectRatio()
 {
@@ -272,7 +272,7 @@ static HostCheckBox *VideoGalleryAspectRatio()
                     "their original aspect ratio. If not set, they are scaled "
                     "to match the size of the background icon."));
     return gc;
-};
+}
 
 VideoGeneralSettings::VideoGeneralSettings()
 {

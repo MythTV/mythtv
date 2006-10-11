@@ -258,7 +258,6 @@ void SingleValue::load_data()
 class MultiValueImp
 {
   public:
-    typedef MultiValue::entry_list entry_list;
     typedef MultiValue::entry entry;
 
   private:
@@ -268,7 +267,7 @@ class MultiValueImp
     MultiValueImp(const QString &table_name, const QString &id_name,
                   const QString &value_name) : m_table_name(table_name),
         m_id_name(id_name), m_value_name(value_name), m_ready(false),
-        m_dirty(true), m_clean_stub(this)
+        m_clean_stub(this)
     {
         m_insert_sql = QString("INSERT INTO %1 (%2, %3) VALUES (:ID, :VALUE)")
                 .arg(m_table_name).arg(m_id_name).arg(m_value_name);
@@ -288,8 +287,6 @@ class MultiValueImp
     void cleanup()
     {
         m_ready = false;
-        m_dirty = true;
-        m_ret_list.clear();
         m_val_map.clear();
     }
 
@@ -351,7 +348,6 @@ class MultiValueImp
                               value);
             if (vp != p->second.values.end())
             {
-                m_dirty = true;
                 MSqlQuery query(MSqlQuery::InitCon());
                 QString del_query = QString("DELETE FROM %1 WHERE %2 = :ID AND "
                                             "%3 = :VALUE")
@@ -373,7 +369,6 @@ class MultiValueImp
         id_map::iterator p = m_val_map.find(id);
         if (p != m_val_map.end())
         {
-            m_dirty = true;
             MSqlQuery query(MSqlQuery::InitCon());
             QString del_query = QString("DELETE FROM %1 WHERE %2 = :ID")
                     .arg(m_table_name).arg(m_id_name);
@@ -405,29 +400,10 @@ class MultiValueImp
         return m_val_map.find(id) != m_val_map.end();
     }
 
-    const entry_list &getList()
-    {
-        if (m_dirty)
-        {
-            m_dirty = false;
-            m_ret_list.clear();
-            for (id_map::const_iterator p = m_val_map.begin();
-                 p != m_val_map.end(); ++p)
-            {
-                m_ret_list.push_back(p->second);
-            }
-        }
-
-        return m_ret_list;
-    }
-
   private:
     void fill_from_db()
     {
         m_val_map.clear();
-        m_ret_list.clear();
-
-        m_dirty = true;
 
         MSqlQuery query(MSqlQuery::InitCon());
         query.exec(m_fill_sql);
@@ -457,7 +433,6 @@ class MultiValueImp
     }
 
   private:
-    entry_list m_ret_list;
     id_map m_val_map;
 
     QString m_table_name;
@@ -469,7 +444,6 @@ class MultiValueImp
     QString m_id_sql;
 
     bool m_ready;
-    bool m_dirty;
     SimpleCleanup<MultiValueImp> m_clean_stub;
 };
 
@@ -511,11 +485,6 @@ bool MultiValue::exists(int id, int value)
 bool MultiValue::exists(int id)
 {
     return m_imp->exists(id);
-}
-
-const MultiValue::entry_list &MultiValue::getList()
-{
-    return m_imp->getList();
 }
 
 void MultiValue::load_data()
