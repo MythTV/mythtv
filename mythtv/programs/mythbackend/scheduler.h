@@ -38,18 +38,18 @@ class Scheduler : public QObject
                          const QDateTime &startts, RecStatusType recstatus, 
                          const QDateTime &recendts);
 
-    void getAllPending(RecList *retList);
+    bool getAllPending(RecList *retList);
     void getAllPending(QStringList &strList);
 
     void getAllScheduled(QStringList &strList);
 
     void getConflicting(ProgramInfo *pginfo, QStringList &strlist);
-    RecList *getConflicting(ProgramInfo *pginfo);
+    void getConflicting(ProgramInfo *pginfo, RecList *retlist);
 
-    void PrintList(bool onlyFutureRecordings = false);
+    void PrintList(bool onlyFutureRecordings = false) 
+        { PrintList(reclist, onlyFutureRecordings); };
+    void PrintList(RecList &list, bool onlyFutureRecordings = false);
     void PrintRec(ProgramInfo *p, const char *prefix = NULL);
-
-    bool HasConflicts(void) { return hasconflicts; }
 
     void SetMainServer(MainServer *ms);
 
@@ -71,7 +71,8 @@ class Scheduler : public QObject
     bool FillRecordList(void);
     void UpdateMatches(int recordid);
     void UpdateManuals(int recordid);
-    void PruneOldRecords(void);
+    void BuildWorkList(void);
+    bool ClearWorkList(void);
     void AddNewRecords(void);
     void AddNotListed(void);
     void BuildNewRecordsQueries(int recordid, QStringList &from, QStringList &where,
@@ -103,15 +104,16 @@ class Scheduler : public QObject
     QMutex recordmatchLock;
     QWaitCondition reschedWait;
     RecList reclist;
+    RecList worklist;
     RecList retrylist;
     QMap<int, RecList> cardlistmap;
     QMap<int, RecList> recordidlistmap;
     QMap<QString, RecList> titlelistmap;
 
     QMutex *reclist_lock;
+    bool reclist_changed;
 
     bool specsched;
-    bool hasconflicts;
     bool schedMoveHigher;
     bool schedulingEnabled;
 
