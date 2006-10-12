@@ -1,8 +1,7 @@
-/* -*- myth -*- */
-/**
+/** -*- Mode: c++ -*-
  * @file main.cpp
  * @author Micah F. Galizia <mfgalizi@csd.uwo.ca>
- * @brief This is the main file.
+ * @brief This file contains the plug-in glue functions
  *
  * Copyright (C) 2005 Micah Galizia
  *
@@ -24,63 +23,51 @@
 #ifndef MAIN_CPP
 #define MAIN_CPP
 
-using namespace std;
-
-#include "mythcontrols.h"
+// MythTV headers
+#include <mythtv/mythcontext.h> // for MYTH_BINARY_VERSION
 #include <mythtv/mythdialogs.h>
 
+// MythControls headers
+#include "mythcontrols.h"
 
-/**
- * @brief Initializes the plugin.
- * @param libversion The mythtv library version.
- * @return zero if all is well, otherwise, less than zero
+/** \brief Initializes the plugin.
+ *  \param libversion The mythtv library version.
+ *  \return 0 if all is well, otherwise -1
  */
 extern "C" int mythplugin_init(const char *libversion)
 {
-    if (!gContext->TestPopupVersion("mythcontrols", libversion,
-                                    MYTH_BINARY_VERSION)) return -1;
-    else return 0;
+    bool ok = gContext->TestPopupVersion(
+        "mythcontrols", libversion, MYTH_BINARY_VERSION);
+
+    return (ok) ? 0 : -1;
 }
 
-
-
-/**
- * @brief Runs the plugin.
- * @return zero if all is well, otherwise, less than zero
+/** \brief Runs the plugin.
+ *  \return 0 if all is well, otherwise -1
  */
-extern "C" int mythplugin_run (void)
+extern "C" int mythplugin_run(void)
 {
-    bool uiloaded;
-    MythMainWindow *window = gContext->GetMainWindow();
+    bool ok = true;
+    MythControls controls(gContext->GetMainWindow(), ok);
 
-    /* create the keybinding plugin.  uiloaded will be set to false
-     * if the theme was not correct */
-    MythControls controls(window, uiloaded);
-
-    /* if the UI is successfully loaded, just giv'er*/
-    if (uiloaded)
+    if (ok)
     {
         controls.exec();
         return 0;    
     }
-    else
-    {
-        MythPopupBox::showOkPopup(window, "Theme Error", "Could not load the "
-                                  "keybinding plugin's theme.  Check the "
-                                  "console for detailed output.");
 
-        return -1;
-    }
+    MythPopupBox::showOkPopup(
+        gContext->GetMainWindow(), QObject::tr("Theme Error"),
+        QObject::tr("Could not load the keybinding plugin's theme. "
+                    "See console for details."));
+
+    return -1;
 }
 
-
-
-/**
- * @brief Configures the plugin.
- * @return zero.
- */
-extern "C" int mythplugin_config (void) { return 0; }
-
-
+/// \brief Plug-in config handler, does nothing.
+extern "C" int mythplugin_config(void)
+{
+    return 0;
+}
 
 #endif /* MAIN_CPP */

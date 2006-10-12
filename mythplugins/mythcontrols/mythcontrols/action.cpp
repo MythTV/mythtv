@@ -24,65 +24,86 @@
 #ifndef ACTION_CPP
 #define ACTION_CPP
 
-#include <iostream>
+// Qt headers
 #include <qkeysequence.h>
 
-using namespace std;
-
+// MythControls headers
 #include "action.h"
 
-
-Action::Action(const QString & description, const QString & keys)
+/** \fn Action::Action(const QString&, const QString&)
+ *  \brief Create a new action.
+ *
+ *   The keys are parased by a QKeySequence, so they should be in ","
+ *   or ", " delimeted format.  Also, there should be no more than
+ *   four keys in the string.
+ *
+ *  \param description The description of the action.
+ *  \param keys The key sequence (strings) that trigger the action.
+ */
+Action::Action(const QString &description, const QString &keys)
+    : m_description(description),
+      m_keys(QStringList::split(", ", QString(QKeySequence(keys))))
 {
-    this->description() = description;
-    this->keys() = QStringList::split(", ", QString(QKeySequence(keys)));
 }
 
-
-
-bool Action::hasKey(const QString & key) const
+/** \fn Action::HasKey(const QString&) const
+ *  \brief Determine if the action already has a key.
+ *  \param key The key to check for.
+ *  \return true if the key is already bound in this action,
+ *          otherwise, false is returned.
+ */
+bool Action::HasKey(const QString &key) const
 {
-    /* check the keys */
-    for (size_t i = 0; i < getKeys().count(); i++)
+    for (size_t i = 0; i < GetKeys().count(); i++)
     {
-        if (getKeys()[i] == key) return true;
+        if (GetKeys()[i] == key)
+            return true;
     }
 
-    /* the key was not found, so return false */
     return false;
 }
 
-
-
-bool Action::addKey(const QString & key)
+/** \fn Action::AddKey(const QString&)
+ *  \brief Add a key sequence to this action.
+ *
+ *   We don't add empty keys nor duplicates, and can not
+ *   add more than kMaximumNumberOfBindings. If any of
+ *   these restrictions are a problem we return false and
+ *   do not add the binding.
+ *
+ *  \param key The key to add to the action.
+ *  \return true if the key was added otherwise, false.
+ */
+bool Action::AddKey(const QString &key)
 {
-
-    /* dont add empty keys and dont add too many, or duplicates  */
-    if ((key.length() == 0) ||
-        (getKeys().size() >= MAX_KEYS) ||
-        (getKeys().contains(key)))
+    if (key.isEmpty() ||
+        (GetKeys().size() >= kMaximumNumberOfBindings) ||
+        (GetKeys().contains(key)))
+    {
         return false;
+    }
 
-    /* add the key */
-    this->keys().push_back(key);
+    m_keys.push_back(key);
     return true;
 }
 
-
-
-/* comments in header */
-bool Action::replaceKey(const QString & newkey, const QString &oldkey)
+/** \fn Action::ReplaceKey(const QString&, const QString&)
+ *  \brief Replace a key.
+ *  \param newkey The new key.
+ *  \param oldkey The old key, which is being replaced.
+ */
+bool Action::ReplaceKey(const QString &newkey, const QString &oldkey)
 {
-    /* make sure that the key list doesn't already have the new key */
-    if (getKeys().contains(newkey) == 0)
+    // make sure that the key list doesn't already have the new key
+    if (GetKeys().contains(newkey) != 0)
+        return false;
+
+    for (size_t i = 0; i < GetKeys().size(); i++)
     {
-        for (size_t i = 0; i < getKeys().size(); i++)
+        if (GetKeys()[i] == oldkey)
         {
-            if (getKeys()[i] == oldkey)
-            {
-                keys()[i] = newkey;
-                return true;
-            }
+            m_keys[i] = newkey;
+            return true;
         }
     }
 

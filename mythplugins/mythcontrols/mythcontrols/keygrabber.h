@@ -22,265 +22,153 @@
  * 02111-1307, USA
  */
 
+// MythTV headers
 #include <mythtv/mythdialogs.h>
 
 
-
-/**
- * @class KeyGrabPopupBox
- * @brief Captures a key.
+/** \class KeyGrabPopupBox
+ *  \brief Captures a key.
  *
- * This popup box takes control over the keyboard until a key is released.
+ *   NOTE: This popup box takes control over the keyboard
+ *         until a key is released.
  */
 class KeyGrabPopupBox : public MythPopupBox
 {
-
     Q_OBJECT
 
-public:
+  public:
+    KeyGrabPopupBox(MythMainWindow *window);
 
-    /**
-     * @brief Create a new key grabber.
-     * @param window The main myth window.
-     */
-    KeyGrabPopupBox(MythMainWindow * window);
+    /// \brief Get the string containing the captured key event plus
+    ///        modifier keys. (note: result not thread-safe)
+    QString GetCapturedKey(void) const { return m_capturedKey; }
 
-    /**
-     * @brief Get the string containing the captured key event.
-     */
-    inline QString getCapturedKey() { return this->captured_key_event; }
+  public slots:
+    void Accept(void) { done(1); }
+    void Cancel(void) { done(0); }
 
-public slots:
-
-    /**
-     * @brief Accept the captured keybinding.
-     *
-     * The QString provided in the constructor will be set to the
-     * captured key value.
-     */
-    inline void acceptBinding(void) { done(1); }
-
-    /**
-     * @brief Reject the captured key binding.
-     *
-     * The QString provided in the constructor will be set to NULL.
-     */
-    inline void cancel(void) { done(0); }
-
-protected:
-
-    /**
-     * @brief The key press handler.
-     * @param e The key event.
-     */
+  protected:
     void keyPressEvent(QKeyEvent *e);
-
-    /**
-     * @brief The key release handler.
-     * @param e The key event.
-     */
     void keyReleaseEvent(QKeyEvent *e);
 
-private:
-
-    bool is_capturing;
-    bool has_captured;
-    QString captured_key_event;
-    QButton *ok_button;
-    QButton *cancel_button;
-    QLabel *key_label;
+  private:
+    bool     m_waitingForKeyRelease;
+    bool     m_keyReleaseSeen;
+    QString  m_capturedKey;
+    QButton *m_ok;
+    QButton *m_cancel;
+    QLabel  *m_label;
 };
 
 
-
-/**
- * @class InvalidBindingPopup
- * @brief Tells the user that they are being bad!!!
+/** \class InvalidBindingPopup
+ *  \brief Creates a popup that tells the user why a binding change failed.
  */
 class InvalidBindingPopup : public MythPopupBox
 {
-    Q_OBJECT;
+    Q_OBJECT
 
-public:
-
-    /**
-     * @brief Create a popup that explains that they are removing a
-     * critical key binding.
-     * @param window The main myth window.
-     */
+  public:
+    /// \brief Creates popup that tells the user he is breaking
+    ///        a required binding.
     InvalidBindingPopup(MythMainWindow *window);
 
-    /**
-     * @brief Tell the user that the binding conflicts with another
-     * action.
-     */
-    InvalidBindingPopup(MythMainWindow *window, const QString &action,
-                        const QString &context);
+    /// \brief Tell the user that the binding conflicts with another action.
+    InvalidBindingPopup(MythMainWindow *window,
+                        const QString  &action,
+                        const QString  &context);
 
-    /**
-     * @brief Execute the error popup
-     */
-    inline int getOption(void) { return ExecPopup(this,SLOT(finish())); }
+    /// \brief Execute the error popup
+    int GetOption(void) { return ExecPopup(this, SLOT(Finish())); }
 
-protected slots:
-    /**
-     * @brief Close the popup.
-     */
-    inline void finish(void) { done(0); }
+  protected slots:
+    void Finish(void) { done(0); }
 };
 
 
-/**
- * @class OptionsMenu
- * @brief A popup containing a list of options.
+/** \class OptionsMenu
+ *  \brief Creates popup containing a list of options
  */
 class OptionsMenu : public MythPopupBox
 {
+    Q_OBJECT
 
-    Q_OBJECT;
+  public:
+    enum actions { kSave, kCancel, };
 
-public:
-
-    enum actions { SAVE, CANCEL };
-
-    /**
-     * @brief Create a new action window.
-     */
+    /// \brief Create a new action window. Does not pop-up menu.
     OptionsMenu(MythMainWindow *window);
 
-    /**
-     * @brief Execute the option popup.
-     */
-    inline int getOption(void) { return ExecPopup(this,SLOT(cancel())); }
+    /// \brief Execute the option popup.
+    int GetOption(void) { return ExecPopup(this,SLOT(Cancel())); }
 
-public slots:
-
-    /**
-     * @brief Slot to connect to when the save button is pressed.
-     */
-    inline void save(void) { done(OptionsMenu::SAVE); }
-
-    /**
-     * @brief Slot to connect to when the cancel button is pressed.
-     */
-    inline void cancel(void) { done(OptionsMenu::CANCEL); }
-
+  public slots:
+    void Save(void)     { done(OptionsMenu::kSave);   }
+    void Cancel(void)   { done(OptionsMenu::kCancel); }
 };
 
 
-
-/**
- * @class ActionMenu
- * @brief A popup listing ways to modify an action.
+/** \class ActionMenu
+ *  \brief Creates popup listing ways to modify an action
  */
 class ActionMenu : public MythPopupBox
 {
+    Q_OBJECT
 
-    Q_OBJECT;
+  public:
+    enum actions { kSet, kRemove, kCancel, };
 
-public:
-
-    enum actions { SET, REMOVE, CANCEL };
-
-    /**
-     * @brief Create a new action window.
-     */
+    /// \brief Create a new action window. Does not pop-up menu.
     ActionMenu(MythMainWindow *window);
 
-    /**
-     * @brief Execute the option popup.
-     */
-    inline int getOption(void) { return ExecPopup(this,SLOT(cancel())); }
+    /// \brief Execute the option popup.
+    int GetOption(void) { return ExecPopup(this, SLOT(Cancel())); }
 
-public slots:
-
-    /**
-     * @brief Slot to connect to when the set button is pressed.
-     */
-    inline void set(void) { done(ActionMenu::SET); }
-
-    /**
-     * @brief Slot to connect to when the remove button is pressed.
-     */
-    inline void remove(void) { done(ActionMenu::REMOVE); }
-
-    /**
-     * @brief Slot to connect to when the cancel button is pressed.
-     */
-    inline void cancel(void) { done(ActionMenu::CANCEL); }
-
+  public slots:
+    void Set(void)      { done(ActionMenu::kSet);    }
+    void Remove(void)   { done(ActionMenu::kRemove); }
+    void Cancel(void)   { done(ActionMenu::kCancel); }
 };
 
-/**
- * @class OptionsMenu
- * @brief A popup containing a list of options.
+
+/** \class OptionsMenu
+ *  \brief Creates popup containing a list of options
  */
 class UnsavedMenu : public MythPopupBox
 {
+    Q_OBJECT
 
-    Q_OBJECT;
+  public:
+    enum actions { kSave, kExit, };
 
-public:
-
-    enum actions { SAVE, EXIT };
-
-    /**
-     * @brief Create a new action window.
-     */
+    /// \brief Create a new action window. Does not pop-up menu.
     UnsavedMenu(MythMainWindow *window);
 
-    /**
-     * @brief Execute the option popup.
-     */
-    inline int getOption(void) { return ExecPopup(this,SLOT(cancel())); }
+    /// \brief Execute the option popup.
+    int GetOption(void) { return ExecPopup(this, SLOT(Cancel())); }
 
-public slots:
-
-    /**
-     * @brief Slot to connect to when the save button is pressed.
-     */
-    inline void save(void) { done(UnsavedMenu::SAVE); }
-
-    /**
-     * @brief Slot to connect to when the cancel button is pressed.
-     */
-    inline void cancel(void) { done(UnsavedMenu::EXIT); }
-
+  public slots:
+    void Save(void)     { done(UnsavedMenu::kSave); }
+    void Cancel(void)   { done(UnsavedMenu::kExit); }
 };
 
-/**
- * @class ConfirmMenu
- * @brief A popup confirming an action
+/** \class ConfirmMenu
+ *  \brief Creates popup confirming an action
  */
 class ConfirmMenu : public MythPopupBox
 {
+    Q_OBJECT
 
-    Q_OBJECT;
+  public:
+    enum actions { kConfirm, kCancel, };
 
-public:
+    /// \brief Create a new action window. Does not pop-up menu.
+    ConfirmMenu(MythMainWindow *window, const QString &msg);
 
-    enum actions { CONFIRM, CANCEL };
+    /// \brief Execute the option popup.
+    int GetOption(void) { return ExecPopup(this,SLOT(Cancel())); }
 
-    /**
-     * @brief Create a new action window.
-     */
-    ConfirmMenu(MythMainWindow *window, QString msg);
-
-    /**
-     * @brief Execute the option popup.
-     */
-    inline int getOption(void) { return ExecPopup(this,SLOT(cancel())); }
-
-public slots:
-
-    /**
-     * @brief Slot to connect to when the save button is pressed.
-     */
-    inline void confirm(void) { done(UnsavedMenu::SAVE); }
-
-    /**
-     * @brief Slot to connect to when the cancel button is pressed.
-     */
-    inline void cancel(void) { done(UnsavedMenu::EXIT); }
-
+  public slots:
+    void Confirm(void)  { done(ConfirmMenu::kConfirm); }
+    void Cancel(void)   { done(ConfirmMenu::kCancel);  }
 };

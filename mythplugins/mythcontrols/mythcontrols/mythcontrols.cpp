@@ -26,203 +26,199 @@
  * 02111-1307, USA
  */
 
-#ifndef MYTHCONTROLS_CPP
-#define MYTHCONTROLS_CPP
-
-/* QT includes */
+// Qt headers
 #include <qnamespace.h>
 #include <qstringlist.h>
 #include <qapplication.h>
 #include <qbuttongroup.h>
 
-/* MythTV includes */
+// MythTV headers
 #include <mythtv/mythcontext.h>
 #include <mythtv/mythdialogs.h>
 
-using namespace std;
-
+// MythControls headers
 #include "mythcontrols.h"
 #include "keygrabber.h"
 
+static QString key_to_display(const QString &key);
+static QString display_to_key(const QString &key);
 
+#define LOC QString("MythControls: ")
+#define LOC_ERR QString("MythControls, Error: ")
 
-static const QString KeyToDisplay(const QString key)
+/** \fn MythControls::MythControls(MythMainWindow*, bool&)
+ *  \brief Creates a new MythControls wizard
+ *  \param parent The main myth window.
+ *  \param ui_ok Set if UI was correctly loaded, cleared otherwise.
+ */
+MythControls::MythControls(MythMainWindow *parent, bool &ok)
+    : MythThemedDialog(parent, "controls", "controls-", "controls"),
+      m_focusedUIElement(NULL),
+      m_leftList(NULL),        m_rightList(NULL),
+      m_description(NULL),
+      m_leftDescription(NULL), m_rightDescription(NULL),
+      m_bindings(NULL),     m_container(NULL)
 {
-    if (key.left(6) == "remote")
-        return "[" + key.mid(6) + "]";
-    else
-        return key;
-}
-
-static const QString DisplayToKey(const QString key)
-{
-    if (key.left(1) == "[" && key != "[")
-        return "remote" + key.mid(1,key.length()-2);
-    else
-        return key;
-}
-
-/* comments in header */
-MythControls::MythControls (MythMainWindow *parent, bool& ui_ok)
-    :MythThemedDialog(parent, "controls", "controls-", "controls")
-{
-    /* Nullify keybindings so the deconstructor knows not to delete it */
-    this->key_bindings = NULL;
-
-    /* delete the contents when we're done */
+    bzero(m_actionButtons, sizeof(void*) * Action::kMaximumNumberOfBindings);
     m_contexts.setAutoDelete(true);
     
-    /* load up the ui components */
-    if ((ui_ok = loadUI()))
-    {
-        leftType = kContextList;
-        rightType = kActionList;
-
-        /* for starters, load this host */
-        loadHost(gContext->GetHostName());
-
-        /* update the information */
-        refreshKeyInformation();
-
-        /* capture the signals we want */
-        connect(LeftList, SIGNAL(itemSelected(UIListBtnTypeItem*)),
-                this, SLOT(leftSelected(UIListBtnTypeItem*)));
-        connect(RightList, SIGNAL(itemSelected(UIListBtnTypeItem*)),
-                this, SLOT(rightSelected(UIListBtnTypeItem*)));
-
-    }
-}
-
-
-
-/* comments in header */
-MythControls::~MythControls() { delete this->key_bindings; }
-
-
-
-/* comments in header */
-bool MythControls::loadUI()
-{
-    /* the return value of the method */
-    bool retval = true;
-
-    /* Get the UI widgets that we need to work with */
-    if ((description = getUITextType("description")) == NULL)
-    {
-        VERBOSE(VB_IMPORTANT, "MythControls: Unable to load action_description");
-        retval = false;
-    }
-
-    if ((container = getContainer("controls")) == NULL) {
-        VERBOSE(VB_IMPORTANT, "MythControls:  No controls container in theme");
-        retval = false;
-    }
-    else if ((LeftList = getUIListBtnType("leftlist")) == NULL) {
-        VERBOSE(VB_IMPORTANT, "MythControls:  No leftlist in theme");
-        retval = false;
-    }
-    else if ((RightList = getUIListBtnType("rightlist")) == NULL) {
-        VERBOSE(VB_IMPORTANT, "MythControls:  No rightList in theme");
-        retval = false;
-    }
-    else {
-        LeftDesc = getUITextType("leftdesc");
-        RightDesc = getUITextType("rightdesc");
-        /* focus the context list by default */
-        focused = LeftList;
-        LeftList->calculateScreenArea();
-        LeftList->SetActive(true);
-        RightList->calculateScreenArea();
-        RightList->SetActive(false);
-    }
-
-    /* Check that all the buttons are there */
-    if ((ActionButtons[0] = getUITextButtonType("action_one")) == NULL)
-    {
-        VERBOSE(VB_IMPORTANT, "MythControls: Unable to load first action button");
-        retval = false;
-    }
-    else if ((ActionButtons[1] = getUITextButtonType("action_two")) == NULL)
-    {
-        VERBOSE(VB_IMPORTANT, "MythControls: Unable to load second action button");
-        retval = false;
-    }
-    else if ((ActionButtons[2] = getUITextButtonType("action_three")) == NULL)
-    {
-        VERBOSE(VB_IMPORTANT, "MythControls: Unable to load thrid action button");
-        retval = false;
-    }
-    else if ((ActionButtons[3] = getUITextButtonType("action_four")) == NULL)
-    {
-        VERBOSE(VB_IMPORTANT, "MythControls: Unable to load fourth action button");
-        retval = false;
-    }
-
-    return retval;
-}
-
-
-
-/* comments in header */
-size_t MythControls::focusedButton(void) const
-{
-    for (size_t i = 0; i < Action::MAX_KEYS; i++)
-        if (focused == ActionButtons[i]) return i;
-
-    return Action::MAX_KEYS;
-}
-
-
-void MythControls::focusButton(int direction)
-{
-    if (leftType != kContextList || rightType != kActionList)
+    // Load up the ui components
+    ok = LoadUI();
+    if (!ok)
         return;
-    if (direction == 0)
+
+    m_leftListType  = kContextList;
+    m_rightListType = kActionList;
+
+    LoadData(gContext->GetHostName());
+    RefreshKeyInformation();
+
+    connect(m_leftList,  SIGNAL(itemSelected( UIListBtnTypeItem*)),
+            this,        SLOT(  LeftSelected( UIListBtnTypeItem*)));
+    connect(m_rightList, SIGNAL(itemSelected( UIListBtnTypeItem*)),
+            this,        SLOT(  RightSelected(UIListBtnTypeItem*)));
+}
+
+MythControls::~MythControls()
+{
+    if (m_bindings)
     {
-        focused = ActionButtons[0];
-        ActionButtons[0]->takeFocus();
-        RightList->looseFocus();
-        RightList->SetActive(false);
+        delete m_bindings;
+        m_bindings = NULL;
     }
-    else
+}
+
+/** \fn MythControls::LoadUI(void)
+ *  \brief Loads UI elements from theme
+ *
+ *   This method grabs all of the UI elements that are needed by
+ *   mythcontrols. If this method returns false the plugin must
+ *   exit, otherwise the application will crash.
+ *
+ *  \return true iff all UI elements load successfully.
+ */
+bool MythControls::LoadUI(void)
+{
+    void *err_test[4];
+    err_test[0] = m_description = getUITextType("description");
+    err_test[1] = m_container   = getContainer("controls");
+    err_test[2] = m_leftList    = getUIListBtnType("leftlist");
+    err_test[3] = m_rightList   = getUIListBtnType("rightlist");
+
+    QString err_msg[4] =
     {
+        "Unable to load action_description",
+        "No controls container in theme",
+        "No leftlist in theme",
+        "No rightList in theme",
+    };
 
-        /* change focus by at most one in either direction */
-        if (direction > 0) direction = 1;
-        else direction = -1;
-
-        /* figure out which button is focused */
-        int current = 0;
-        if (focused == ActionButtons[1]) current=1;
-        else if (focused == ActionButtons[2]) current = 2;
-        else if (focused == ActionButtons[3]) current = 3;
-
-        /* determine the new focused button index */
-        int newb = current + direction;
-
-        /* focus an existing button */
-        if ((newb >= 0) && (newb < Action::MAX_KEYS))
+    bool ok = true;
+    for (uint i = 0; i < 4; i++)
+    {
+        if (!err_test[i])
         {
-            focused->looseFocus();
-            focused = ActionButtons[newb];
-            focused->takeFocus();
+            VERBOSE(VB_IMPORTANT, LOC_ERR + err_msg[i]);
+            ok = false;
         }
     }
+
+    if (ok)
+    {
+        m_leftDescription  = getUITextType("leftdesc");
+        m_rightDescription = getUITextType("rightdesc");
+        m_focusedUIElement   = m_leftList;
+
+        m_leftList->calculateScreenArea();
+        m_leftList->SetActive(true);
+
+        m_rightList->calculateScreenArea();
+        m_rightList->SetActive(false);
+    }
+
+    static const QString numstr[Action::kMaximumNumberOfBindings] =
+        { "one", "two", "three", "four", };
+
+    for (uint i = 0; i < Action::kMaximumNumberOfBindings; i++)
+    {
+        m_actionButtons[i] = getUITextButtonType(
+            QString("action_%1").arg(numstr[i]));
+
+        if (!m_actionButtons[i])
+        {
+            VERBOSE(VB_IMPORTANT, LOC_ERR +
+                    QString("Unable to load action button #%1").arg(i));
+
+            ok = false;
+        }
+    }
+
+    return ok;
 }
 
+/** \fn MythControls::GetCurrentButton(void) const
+ *  \brief Returns the focused button, or 
+ *         Action::kMaximumNumberOfBindings if no buttons are focued.
+ */
+uint MythControls::GetCurrentButton(void) const
+{
+    for (uint i = 0; i < Action::kMaximumNumberOfBindings; i++)
+    {
+        if (m_focusedUIElement == m_actionButtons[i])
+            return i;
+    }
 
+    return Action::kMaximumNumberOfBindings;
+}
 
-void MythControls::switchListFocus(UIListBtnType *focus, UIListBtnType *unfocus)
+/** \fn MythControls::ChangeButtonFocus(int)
+ *  \brief Change button focus in a particular direction
+ *  \param direction +1 moves focus to the right, -1 moves to the left,
+ *                   and 0 changes the focus to the first button.
+ */
+void MythControls::ChangeButtonFocus(int direction)
+{
+    if ((m_leftListType != kContextList) || (m_rightListType != kActionList))
+        return;
+
+    if (direction == 0)
+    {
+        m_focusedUIElement = m_actionButtons[0];
+        m_actionButtons[0]->takeFocus();
+        m_rightList->looseFocus();
+        m_rightList->SetActive(false);
+        return;
+    }
+
+    direction = (direction > 0) ? 1 : -1;
+
+    int newb = (GetCurrentButton() + direction);
+    newb %= Action::kMaximumNumberOfBindings;
+
+    m_focusedUIElement->looseFocus();
+    m_focusedUIElement = m_actionButtons[newb];
+    m_focusedUIElement->takeFocus();
+}
+
+/** \fn MythControls::ChangeListFocus(UIListBtnType*,UIListBtnType*)
+ *  \brief Change list focus from "unfocus" list to "focus" list.
+ *  \param focus The list to gain focus
+ *  \param unfocus The list to loose focus
+ */
+void MythControls::ChangeListFocus(UIListBtnType *focus,
+                                   UIListBtnType *unfocus)
 {
     /* unfocus a list (setactive(false)) or a button (focused->looseFocus) */
     if (unfocus)
         unfocus->SetActive(false);
 
-    focused->looseFocus();
-    focused = focus;
+    m_focusedUIElement->looseFocus();
+    m_focusedUIElement = focus;
+
     focus->SetActive(true);
     focus->takeFocus();
-    refreshKeyInformation();
+
+    RefreshKeyInformation();
 }
 
 void MythControls::keyPressEvent(QKeyEvent *e)
@@ -232,184 +228,240 @@ void MythControls::keyPressEvent(QKeyEvent *e)
     QStringList actions;
     gContext->GetMainWindow()->TranslateKeyPress("Controls", e, actions);
 
-    for (size_t i = 0; i < actions.size() && !handled; i++)
+    for (uint i = 0; i < actions.size() && !handled; i++)
     {
         QString action = actions[i];
         handled = true;
 
         if (action == "MENU" || action == "INFO")
         {
-            focused->looseFocus();
+            m_focusedUIElement->looseFocus();
+
             OptionsMenu popup(gContext->GetMainWindow());
-            int a = (int)popup.getOption();
-            switch (a) {
-                case (int)OptionsMenu::SAVE:
-                    save();
-                    break;
-            }
-            focused->takeFocus();
-//            if (popup.getOption() == OptionsMenu::SAVE) save();
+            if (OptionsMenu::kSave == popup.GetOption())
+                Save();
+
+            m_focusedUIElement->takeFocus();
         }
         else if (action == "SELECT")
         {
-            if (focused == LeftList)
-                switchListFocus(RightList, LeftList);
-            else if (focused == RightList)
-                focusButton(0);
-            else {
-                QString key = getCurrentKey();
+            if (m_focusedUIElement == m_leftList)
+                ChangeListFocus(m_rightList, m_leftList);
+            else if (m_focusedUIElement == m_rightList)
+                ChangeButtonFocus(0);
+            else
+            {
+                QString key = GetCurrentKey();
                 if (!key.isEmpty())
                 {
                     ActionMenu popup(gContext->GetMainWindow());
-                    int result = popup.getOption();
-                    if (result == ActionMenu::SET) addKeyToAction();
-                    else if (result == ActionMenu::REMOVE) deleteKey();
-                } else // for blank keys, no reason to ask what to do
-                    addKeyToAction();
+                    int result = popup.GetOption();
+                    if (result == ActionMenu::kSet)
+                        AddKeyToAction();
+                    else if (result == ActionMenu::kRemove)
+                        DeleteKey();
+                }
+                else // for blank keys, no reason to ask what to do
+                    AddKeyToAction();
             }
+            
         }
         else if (action == "ESCAPE")
         {
             escape = true;
-            if (focused == LeftList)
+            if (m_focusedUIElement == m_leftList)
             {
                 handled = false;
-                if (key_bindings->hasChanges())
+                if (m_bindings->HasChanges())
                 {
                     /* prompt user to save changes */
                     UnsavedMenu popup(gContext->GetMainWindow());
-                    if (popup.getOption() == UnsavedMenu::SAVE)
-                    {
-                        save();
-                    }
+                    if (popup.GetOption() == UnsavedMenu::kSave)
+                        Save();
                 }
             }
-            else if (focused == RightList)
-                switchListFocus(LeftList, RightList);
+            else if (m_focusedUIElement == m_rightList)
+                ChangeListFocus(m_leftList, m_rightList);
             else
-                switchListFocus(RightList, NULL);
+                ChangeListFocus(m_rightList, NULL);
         }
         else if (action == "UP")
         {
-            if (focused == LeftList)
-                LeftList->MoveUp();
-            else if (focused == RightList)
-                RightList->MoveUp();
+            if (m_focusedUIElement == m_leftList)
+                m_leftList->MoveUp();
+            else if (m_focusedUIElement == m_rightList)
+                m_rightList->MoveUp();
         }
         else if (action == "DOWN")
         {
-            if (focused == LeftList)
-                LeftList->MoveDown();
-            else if (focused == RightList)
-                RightList->MoveDown();
+            if (m_focusedUIElement == m_leftList)
+                m_leftList->MoveDown();
+            else if (m_focusedUIElement == m_rightList)
+                m_rightList->MoveDown();
         }
         else if (action == "LEFT")
         {
-            if (focused==RightList)
-                switchListFocus(LeftList, RightList);
-            else if (focused != LeftList)
-                focusButton(-1);
+            if (m_focusedUIElement==m_rightList)
+                ChangeListFocus(m_leftList, m_rightList);
+            else if (m_focusedUIElement != m_leftList)
+                ChangeButtonFocus(-1);
         }
         else if (action == "RIGHT")
         {
-            if (focused == LeftList)
-                switchListFocus(RightList, LeftList);
-            else if (focused != RightList)
-                focusButton(1);
+            if (m_focusedUIElement == m_leftList)
+                ChangeListFocus(m_rightList, m_leftList);
+            else if (m_focusedUIElement != m_rightList)
+                ChangeButtonFocus(1);
         }
         else if (action == "PAGEUP")
         {
-            if (focused == LeftList)
-                LeftList->MoveUp(UIListBtnType::MovePage);
-            else if (focused == RightList)
-                RightList->MoveUp(UIListBtnType::MovePage);
+            if (m_focusedUIElement == m_leftList)
+                m_leftList->MoveUp(UIListBtnType::MovePage);
+            else if (m_focusedUIElement == m_rightList)
+                m_rightList->MoveUp(UIListBtnType::MovePage);
         }
         else if (action == "PAGEDOWN")
         {
-            if (focused == LeftList)
-                LeftList->MoveDown(UIListBtnType::MovePage);
-            else if (focused == RightList)
-                RightList->MoveDown(UIListBtnType::MovePage);
+            if (m_focusedUIElement == m_leftList)
+                m_leftList->MoveDown(UIListBtnType::MovePage);
+            else if (m_focusedUIElement == m_rightList)
+                m_rightList->MoveDown(UIListBtnType::MovePage);
         }
         else if (action == "1")
         {
-            if (leftType != kContextList || rightType != kActionList)
+            if ((m_leftListType  != kContextList) ||
+                (m_rightListType != kActionList))
             {
-                leftType = kContextList;
-                rightType = kActionList;
-                updateLists();
-                if (focused != LeftList)
-                    switchListFocus(LeftList,
-                                    (focused == RightList) ? RightList : NULL);
-            } else handled = false;
+                m_leftListType  = kContextList;
+                m_rightListType = kActionList;
+                UpdateLists();
+
+                if (m_focusedUIElement != m_leftList)
+                {
+                    ChangeListFocus(m_leftList,
+                                    (m_focusedUIElement == m_rightList) ?
+                                    m_rightList : NULL);
+                }
+            }
+            else
+            {
+                handled = false;
+            }
         }
         else if (action == "2")
         {
-            if (leftType != kContextList || rightType != kKeyList)
+            if ((m_leftListType  != kContextList) ||
+                (m_rightListType != kKeyList))
             {
-                leftType = kContextList;
-                rightType = kKeyList;
-                updateLists();
-                if (focused != LeftList)
-                    switchListFocus(LeftList,
-                                    (focused == RightList) ? RightList : NULL);
-            } else handled = false;
+                m_leftListType  = kContextList;
+                m_rightListType = kKeyList;
+                UpdateLists();
+
+                if (m_focusedUIElement != m_leftList)
+                {
+                    ChangeListFocus(m_leftList,
+                                    (m_focusedUIElement == m_rightList) ?
+                                    m_rightList : NULL);
+                }
+            }
+            else
+            {
+                handled = false;
+            }
         }
         else if (action == "3")
         {
-            if (leftType != kKeyList || rightType != kContextList)
+            if ((m_leftListType  != kKeyList) ||
+                (m_rightListType != kContextList))
             {
-                leftType = kKeyList;
-                rightType = kContextList;
-                updateLists();
-                if (focused != LeftList)
-                    switchListFocus(LeftList,
-                                    (focused == RightList) ? RightList : NULL);
-            } else handled = false;
+                m_leftListType  = kKeyList;
+                m_rightListType = kContextList;
+                UpdateLists();
+
+                if (m_focusedUIElement != m_leftList)
+                {
+                    ChangeListFocus(m_leftList,
+                                    (m_focusedUIElement == m_rightList) ?
+                                    m_rightList : NULL);
+                }
+            }
+            else
+            {
+                handled = false;
+            }
         }
-        else handled = false;
+        else
+        {
+            handled = false;
+        }
     }
 
-    if (handled) return;
-
-    if (!escape && JumpTo(e)) handled = true;
-
     if (!handled)
-        MythThemedDialog::keyPressEvent(e);
+    {
+        handled |= (!escape && JumpTo(e));
+        if (!handled)
+            MythThemedDialog::keyPressEvent(e);
+    }
 }
 
+/** \fn MythControls::JumpTo(QKeyEvent*)
+ *  \brief Jump to a particular key binding
+ *  \param e key event to use as jump
+ */
 bool MythControls::JumpTo(QKeyEvent *e)
 {
     UIListBtnType *list = NULL;
-    if (focused == LeftList && leftType == kKeyList) list = LeftList;
-    if (focused == RightList && rightType == kKeyList) list = RightList;
-    if (!list) return false;
+
+    list = ((m_focusedUIElement == m_leftList) &&
+            (m_leftListType     == kKeyList)) ? m_leftList  : list;
+    list = ((m_focusedUIElement == m_rightList) &&
+            (m_rightListType    == kKeyList)) ? m_rightList : list;
+
+    if (!list)
+        return false;
 
     QString key = e->text();
-    if (key.left(6) == "remote") {
-        key = KeyToDisplay(key);
-    } else {
+    if (key.left(6) == "remote")
+    {
+        key = key_to_display(key);
+    }
+    else
+    {
         key = QString(QKeySequence(e->key()));
-        if (key.isEmpty()) return false;
+
+        if (key.isEmpty())
+            return false;
+
         QString modifiers = "";
-        if (e->state()&Qt::ShiftButton) modifiers+="Shift+";
-        if (e->state()&Qt::ControlButton) modifiers+="Ctrl+";
-        if (e->state()&Qt::AltButton) modifiers+="Alt+";
-        if (e->state()&Qt::MetaButton) modifiers+="Meta+";
+
+        if (e->state() & Qt::ShiftButton)
+            modifiers += "Shift+";
+        if (e->state() & Qt::ControlButton)
+            modifiers += "Ctrl+";
+        if (e->state() & Qt::AltButton)
+            modifiers += "Alt+";
+        if (e->state() & Qt::MetaButton)
+            modifiers += "Meta+";
+
         key = modifiers + key;
     }
 
-    UIListBtnTypeItem *b;
     uint len = 1024; // infinity
-    if (list == RightList)
+    if (list == m_rightList)
     {
         key = key + " ";
         len = key.length();
     }
 
+    UIListBtnTypeItem *b;
     for (b = list->GetItemFirst(); b; b = list->GetItemNext(b))
-        if (b->text().left(len) == key) break;
-    if (!b) return false;
+    {
+        if (b->text().left(len) == key)
+            break;
+    }
+
+    if (!b)
+        return false;
 
     int curpos = list->GetItemPos(list->GetItemCurrent());
     int newpos = list->GetItemPos(b);
@@ -418,436 +470,547 @@ bool MythControls::JumpTo(QKeyEvent *e)
         list->MoveDown(newpos - curpos);
     else if (newpos < curpos)
         list->MoveUp(curpos - newpos);
+
     return true;
 }
 
-
-void MythControls::leftSelected(UIListBtnTypeItem*)
+/** \fn MythControls::LeftSelected(UIListBtnTypeItem*)
+ *  \brief Refreshes the right list when an item in the
+ *         left list is selected
+ */
+void MythControls::LeftSelected(UIListBtnTypeItem*)
 {
-    LeftList->refresh();
-    RightList->blockSignals(true);
-    refreshRightList();
-    RightList->blockSignals(false);
-    RightList->refresh();
+    m_leftList->refresh();
+    m_rightList->blockSignals(true);
+    RefreshRightList();
+    m_rightList->blockSignals(false);
+    m_rightList->refresh();
 }
 
-void MythControls::rightSelected(UIListBtnTypeItem*)
+/** \fn MythControls::RightSelected(UIListBtnTypeItem*)
+ *  \brief Refreshes key information when an item in the
+ *         right list is selected
+ */
+void MythControls::RightSelected(UIListBtnTypeItem*)
 {
-    RightList->refresh();
-    refreshKeyInformation();
+    m_rightList->refresh();
+    RefreshKeyInformation();
 }
 
-
-
-/* method description in header */
-void MythControls::refreshRightList()
+/** \fn MythControls::RefreshRightList(void)
+ *  \brief Load the appropriate actions into the action list
+ */
+void MythControls::RefreshRightList(void)
 {
-    RightList->Reset();
+    m_rightList->Reset();
 
-    if (LeftList->GetItemCurrent() == NULL)
+    if (!m_leftList->GetItemCurrent())
         return;
 
-    if (leftType == kContextList)
+    if (m_leftListType == kContextList)
     {
-        if (rightType == kActionList)
+        if (m_rightListType == kActionList)
         {
             /* add all of the actions to the context list */
-            QString context = LeftList->GetItemCurrent()->text();
+            QString context = m_leftList->GetItemCurrent()->text();
             QStringList *actions = m_contexts[context];
-            if (actions == NULL)
+            if (!actions || actions->empty())
             {
-                VERBOSE(VB_IMPORTANT, QString("MythControls: Unable to find actions for context %1").arg(context));
+                VERBOSE(VB_IMPORTANT, LOC_ERR + 
+                        QString("Unable to find actions for context %1")
+                        .arg(context));
+
                 return;
             }
-            UIListBtnTypeItem *item;
-            for (size_t i = 0; i < actions->size(); i++)
-                item = new UIListBtnTypeItem(RightList, (*actions)[i]);
+
+            for (uint i = 0; i < actions->size(); i++)
+                new UIListBtnTypeItem(m_rightList, (*actions)[i]);
         }
-        else if (rightType == kKeyList)
+        else if (m_rightListType == kKeyList)
         {
             /* add all of the actions to the context list */
-            QString context = LeftList->GetItemCurrent()->text();
-            BindingList *list = contextKeys[context];
-            if (list == NULL)
+            QString context = m_leftList->GetItemCurrent()->text();
+            const BindingList *list = m_contextToBindingsMap[context];
+            if (!list)
             {
-                VERBOSE(VB_IMPORTANT, QString("MythControls: Unable to find keys for context %1").arg(context));
+                VERBOSE(VB_IMPORTANT, LOC_ERR+ 
+                        QString("Unable to find keys for context %1")
+                        .arg(context));
+
                 return;
             }
-            UIListBtnTypeItem *item;
-            for (BindingList::iterator it = list->begin(); it != list->end(); ++it)
+
+            BindingList::const_iterator it = list->begin();
+            for (; it != list->end(); ++it)
             {
-                binding_t *b = *it;
-                item = new UIListBtnTypeItem(RightList, KeyToDisplay(b->key) + " => " + b->action);
+                new UIListBtnTypeItem(
+                    m_rightList,
+                    key_to_display((*it)->key) + " => " + (*it)->action);
             }
         }
-    } else if (leftType == kKeyList && rightType == kContextList)
+    }
+    else if ((m_leftListType == kKeyList) && (m_rightListType == kContextList))
     {
-        QString key = DisplayToKey(LeftList->GetItemCurrent()->text());
-        BindingList *list = keyActions[key];
-        if (list == NULL)
+        QString key = display_to_key(m_leftList->GetItemCurrent()->text());
+        const BindingList *list = m_keyToBindingsMap[key];
+        if (!list)
         {
-            VERBOSE(VB_IMPORTANT, QString("MythControls: Unable to find actions for key %1").arg(key));
+            VERBOSE(VB_IMPORTANT, LOC + QString(
+                        "Unable to find actions for key %1").arg(key));
             return;
         }
-        UIListBtnTypeItem *item;
-        BindingList::iterator it = list->begin();
-        binding_t *b = *it;
-        for (size_t i = 0; i < contexts.size(); i++)
+
+        BindingList::const_iterator it = list->begin();
+        const Binding *b = *it;
+        for (uint i = 0; i < m_sortedContexts.size(); i++)
         {
-            QString context = contexts[i];
-            QString action = "<none>";
+            const QString context = m_sortedContexts[i];
+            QString action  = "<none>";
+
             if (b && b->context == context)
             {
                 action = b->action;
                 ++it;
-                if (it != list->end()) b = *it;
-                else b = NULL;
+                b = (it != list->end()) ? *it : NULL;
             }
-            item = new UIListBtnTypeItem(RightList, context + " => " + action);
+
+            new UIListBtnTypeItem(m_rightList, context + " => " + action);
         }
     }
 }
 
-
-/* comments in header */
-void MythControls::refreshKeyInformation()
+QString MythControls::RefreshKeyInformationKeyList(void)
 {
-    /* get the description of the current action */
-    QString desc;
+    if ((m_leftListType != kKeyList) && (m_rightListType != kKeyList))
+        return "";
 
-    if (focused == LeftList)
+    QString action  = GetCurrentAction();
+    QString context = GetCurrentContext();
+
+    if (action.isEmpty())
+        return "";
+
+    QString desc = m_bindings->GetActionDescription(context, action);
+    
+    BindingList *list = NULL;
+    if (m_leftListType == kKeyList && m_rightListType == kContextList)
     {
-        /* blank all keys on the context */
-        for (size_t i = 0; i < Action::MAX_KEYS; i++)
-            ActionButtons[i]->setText("");
+        list = m_keyToBindingsMap[display_to_key(GetCurrentKey())];
     }
-    else if (leftType == kKeyList || rightType == kKeyList)
-    { // Should show appropriate description 
-        QString action = getCurrentAction();
-        QString context = getCurrentContext();
-        /* blank all keys on the context */
-        for (size_t i = 0; i < Action::MAX_KEYS; i++)
-            ActionButtons[i]->setText("");
-        if (!action.isEmpty())
-            {
-    
-            desc = key_bindings->getActionDescription(context, action);
-    
-            BindingList *list = NULL;
-            if (leftType == kKeyList && rightType == kContextList)
-            {
-                QString key = getCurrentKey();
-                list = keyActions[DisplayToKey(key)];
-            }
-            else if (leftType == kContextList && rightType == kKeyList)
-                list = contextKeys[context];
-            if (list)
-            {
-                QString searchKey;
-                if (rightType == kContextList)
-                    searchKey = context;
-                else if (rightType == kActionList)
-                    searchKey = action;
-                else if (rightType == kKeyList)
-                    searchKey = DisplayToKey(getCurrentKey());
-                binding_t *binding = NULL;
-                for (BindingList::iterator it = list->begin(); it != list->end(); ++it)
-                {
-                    binding_t *b = *it;
-                    switch (rightType)
-                    {
-                        case kContextList:
-                            if (b->context == searchKey) binding = b;
-                            break;
-                        case kActionList:
-                            if (b->action == searchKey) binding = b;
-                            break;
-                        case kKeyList:
-                            if (b->key == searchKey) binding = b;
-                            break;
-                    }
-                    if (binding) break;
-                }
-    
-                if (binding)
-                {
-                    if (desc.isEmpty() && context != binding->contextFrom)
-                        desc = key_bindings->getActionDescription(binding->contextFrom, action);
-                    desc += "\n" + tr("Binding comes from %1 context")
-                            .arg(binding->contextFrom);
-                }
-            }
-        }
-    } else {
-        QString context = getCurrentContext();
-        QString action = getCurrentAction();
-        /* set the description */
-        desc = key_bindings->getActionDescription(getCurrentContext(),
-                                                  getCurrentAction());
-
-        /* get the bindings of the current action */
-        QStringList keys = key_bindings->getActionKeys(getCurrentContext(),
-                                                       getCurrentAction());
-
-        size_t i;
-
-        /* fill existing keys */
-        for (i = 0; i < keys.count(); i++)
-            ActionButtons[i]->setText(KeyToDisplay(keys[i]));
-
-        /* blank the other ones */
-        for (; i < Action::MAX_KEYS; i++)
-            ActionButtons[i]->setText("");
+    else if (m_leftListType == kContextList && m_rightListType == kKeyList)
+    {
+        list = m_contextToBindingsMap[context];
     }
 
-    /* set the information */
-    description->SetText(desc);
-}
-
-
-
-/* comments in header */
-QString MythControls::getCurrentContext(void) const
-{
-    if (leftType == kContextList)
-        return LeftList->GetItemCurrent()->text();
-    if (focused == LeftList) return "";
-
-    QString desc = RightList->GetItemCurrent()->text();
-    int loc = desc.find(" => ");
-    if (loc == -1) return ""; // Should not happen
-    if (rightType == kContextList) return desc.left(loc);
-    else return desc.mid(loc+4);
-}
-
-/* comments in header */
-QString MythControls::getCurrentAction(void) const
-{
-    if (leftType == kActionList)
-        return LeftList->GetItemCurrent()->text();
-    if (focused == LeftList) return "";
-
-    QString desc = RightList->GetItemCurrent()->text();
-    if (leftType == kContextList && rightType == kActionList)
+    if (!list)
         return desc;
-    int loc = desc.find(" => ");
-    if (loc == -1) return ""; // Should not happen
-    if (rightType == kActionList) return desc.left(loc);
-    else
+
+    QString searchKey = QString::null;
+    if (m_rightListType == kContextList)
     {
-        QString rv = desc.mid(loc+4);
-        if (rv == "<none>") return "";
-        else return rv;
+        searchKey = context;
     }
+    else if (m_rightListType == kActionList)
+    {
+        searchKey = action;
+    }
+    else if (m_rightListType == kKeyList)
+    {
+        searchKey = display_to_key(GetCurrentKey());
+    }
+
+    const Binding *binding = NULL;
+    for (BindingList::const_iterator it = list->begin();
+         it != list->end(); ++it)
+    {
+        switch (m_rightListType)
+        {
+            case kContextList:
+                if ((*it)->context == searchKey)
+                    binding = *it;
+                break;
+            case kActionList:
+                if ((*it)->action == searchKey)
+                    binding = *it;
+                break;
+            case kKeyList:
+                if ((*it)->key == searchKey)
+                    binding = *it;
+                break;
+        }
+
+        if (binding)
+            break;
+    }
+    
+    if (!binding)
+        return desc;
+
+
+    if (desc.isEmpty() && (context != binding->contextFrom))
+    {
+        desc = m_bindings->GetActionDescription(
+            binding->contextFrom, action);
+    }
+
+    desc += "\n" + tr("Binding comes from %1 context")
+        .arg(binding->contextFrom);
+
+    return desc;
 }
 
-/* comments in header */
-QString MythControls::getCurrentKey(void) const
+/** \fn MythControls::RefreshKeyInformation(void)
+ *  \brief Updates the list of keys that are shown and the
+ *         description of the action.
+ */
+void MythControls::RefreshKeyInformation(void)
 {
-    if (leftType == kKeyList)
-        return LeftList->GetItemCurrent()->text();
-    if (focused == LeftList) return "";
+    for (uint i = 0; i < Action::kMaximumNumberOfBindings; i++)
+        m_actionButtons[i]->setText("");
 
-    if (leftType == kContextList && rightType == kActionList)
+    if (m_focusedUIElement == m_leftList)
     {
-        QString context = getCurrentContext();
-        QString action = getCurrentAction();
-        size_t b = focusedButton();
-        QStringList keys = key_bindings->getActionKeys(context, action);
-        if (b < keys.count()) return keys[b];
-        else return "";
-    }
-
-    QString desc = RightList->GetItemCurrent()->text();
-    int loc = desc.find(" => ");
-    if (loc == -1) return ""; // Should not happen
-    if (rightType == kKeyList) return desc.left(loc);
-    else return desc.mid(loc+4);
-}
-
-
-/* comments in header */
-void MythControls::loadHost(const QString & hostname) {
-
-    /* create the key bindings and the tree */
-    key_bindings = new KeyBindings(hostname);
-    contexts = *key_bindings->getContexts();
-
-    keys.clear();
-
-    /* Alphabetic order, but jump and global at the top  */
-    contexts.sort();
-    contexts.remove(JUMP_CONTEXT);
-    contexts.remove(GLOBAL_CONTEXT);
-    contexts.insert(contexts.begin(), 1, GLOBAL_CONTEXT);
-    contexts.insert(contexts.begin(), 1, JUMP_CONTEXT);
-
-    QStringList *actions;
-    for (size_t i = 0; i < contexts.size(); i++)
-    {
-        actions = key_bindings->getActions(contexts[i]);
-        actions->sort();
-        m_contexts.insert(contexts[i], actions);
-    }
-
-    refreshKeyBindings();
-    updateLists();
-}
-
-
-
-/* comments in header */
-void MythControls::deleteKey()
-{
-    // This code needs work to support deleteKey in any mode exc. Context/Action
-    QString context = getCurrentContext();
-    QString key = getCurrentKey();
-    QString action = getCurrentAction();
-    if (context.isEmpty() || key.isEmpty() || action.isEmpty())
-    {
-        InvalidBindingPopup popup(gContext->GetMainWindow());
-        popup.getOption();
+        m_description->SetText("");
         return;
     }
 
-    BindingList *list = keyActions[key];
-    binding_t *binding = NULL;
+    if ((m_leftListType == kKeyList) || (m_rightListType == kKeyList))
+    {
+        m_description->SetText(RefreshKeyInformationKeyList());
+        return;
+    }
+
+    const QString context = GetCurrentContext();
+    const QString action  = GetCurrentAction();
+
+    QString desc = m_bindings->GetActionDescription(context, action);
+    m_description->SetText(desc);
+
+    QStringList keys = m_bindings->GetActionKeys(context, action);
+    for (uint i = 0; (i < keys.count()) &&
+             (i < Action::kMaximumNumberOfBindings); i++)
+    {
+        m_actionButtons[i]->setText(key_to_display(keys[i]));
+    }
+}
+
+
+/** \fn MythControls::GetCurrentContext(void) const
+ *  \brief Get the currently selected context string.
+ *
+ *   If no context is selected, an empty string is returned.
+ *
+ *  \return The currently selected context string.
+ */
+QString MythControls::GetCurrentContext(void) const
+{
+    if (m_leftListType == kContextList)
+        return m_leftList->GetItemCurrent()->text();
+
+    if (m_focusedUIElement == m_leftList)
+        return QString::null;
+
+    QString desc = m_rightList->GetItemCurrent()->text();
+    int loc = desc.find(" => ");
+    if (loc == -1)
+        return QString::null; // Should not happen
+
+    if (m_rightListType == kContextList)
+        return desc.left(loc);
+
+    return desc.mid(loc + 4);
+}
+
+/** \fn MythControls::GetCurrentAction(void) const
+ *  \brief Get the currently selected action string.
+ *
+ *   If no action is selected, an empty string is returned.
+ *
+ *  \return The currently selected action string.
+ */
+QString MythControls::GetCurrentAction(void) const
+{
+    if (m_leftListType == kActionList)
+        return m_leftList->GetItemCurrent()->text();
+
+    if (m_focusedUIElement == m_leftList)
+        return QString::null;
+
+    QString desc = m_rightList->GetItemCurrent()->text();
+    if (m_leftListType == kContextList && m_rightListType == kActionList)
+        return desc;
+
+    int loc = desc.find(" => ");
+    if (loc == -1)
+        return QString::null; // should not happen..
+
+    if (m_rightListType == kActionList)
+        return desc.left(loc);
+
+    QString rv = desc.mid(loc+4);
+    if (rv == "<none>")
+        return QString::null;
+
+    return rv;
+}
+
+/** \fn MythControls::GetCurrentKey(void) const
+ *  \brief Get the currently selected key string
+ *
+ *   If no key is selected, an empty string is returned.
+ *
+ *  \return The currently selected key string
+ */
+QString MythControls::GetCurrentKey(void) const
+{
+    if (m_leftListType == kKeyList)
+        return m_leftList->GetItemCurrent()->text();
+
+    if (m_focusedUIElement == m_leftList)
+        return QString::null;
+
+    if ((m_leftListType == kContextList) && (m_rightListType == kActionList))
+    {
+        QString context = GetCurrentContext();
+        QString action = GetCurrentAction();
+        uint b = GetCurrentButton();
+        QStringList keys = m_bindings->GetActionKeys(context, action);
+
+        if (b < keys.count())
+            return keys[b];
+
+        return QString::null;
+    }
+
+    QString desc = m_rightList->GetItemCurrent()->text();
+    int loc = desc.find(" => ");
+    if (loc == -1)
+        return QString::null; // Should not happen
+
+
+    if (m_rightListType == kKeyList)
+        return desc.left(loc);
+
+    return desc.mid(loc + 4);
+}
+
+/** \fn MythControls::LoadAll(const QString&)
+ *  \brief Load the settings for a particular host.
+ *  \param hostname The host to load settings for.
+ */
+void MythControls::LoadData(const QString &hostname)
+{
+    /* create the key bindings and the tree */
+    m_bindings = new KeyBindings(hostname);
+    m_sortedContexts = m_bindings->GetContexts();
+
+    m_sortedKeys.clear();
+
+    /* Alphabetic order, but jump and global at the top  */
+    m_sortedContexts.sort();
+    m_sortedContexts.remove(ActionSet::kJumpContext);
+    m_sortedContexts.remove(ActionSet::kGlobalContext);
+    m_sortedContexts.insert(m_sortedContexts.begin(), 1,
+                            ActionSet::kGlobalContext);
+    m_sortedContexts.insert(m_sortedContexts.begin(), 1,
+                            ActionSet::kJumpContext);
+
+    QStringList actions;
+    for (uint i = 0; i < m_sortedContexts.size(); i++)
+    {
+        actions = m_bindings->GetActions(m_sortedContexts[i]);
+        actions.sort();
+        m_contexts.insert(m_sortedContexts[i], new QStringList(actions));
+    }
+
+    RefreshKeyBindings();
+    UpdateLists();
+}
+
+/** \fn MythControls::DeleteKey(void)
+ *  \brief Delete the currently active key to action mapping
+ *
+ *   TODO FIXME This code needs work to support deleteKey
+ *              in any mode exc. Context/Action
+ */
+void MythControls::DeleteKey(void)
+{
+    QString context = GetCurrentContext();
+    QString key     = GetCurrentKey();
+    QString action  = GetCurrentAction();
+
+    if (context.isEmpty() || key.isEmpty() || action.isEmpty())
+    {
+        InvalidBindingPopup popup(gContext->GetMainWindow());
+        popup.GetOption();
+        return;
+    }
+
+    BindingList *list = m_keyToBindingsMap[key];
+    Binding *binding = NULL;
+
     for (BindingList::iterator it = list->begin(); it != list->end(); ++it)
     {
-        binding_t *b = *it;
-        if (b->context == context) binding = b;
+        Binding *b = *it;
+        if (b->context == context)
+            binding = b;
     }
+
     if (!binding)
     {
         InvalidBindingPopup popup(gContext->GetMainWindow());
-        popup.getOption();
+        popup.GetOption();
         return;
     }
 
     if (binding->contextFrom != context)
     {
-        ConfirmMenu popup(gContext->GetMainWindow(), tr("Delete this key binding from context %1?").arg(binding->contextFrom));
-        if (popup.getOption() != ConfirmMenu::CONFIRM) return;
-    } else {
-        ConfirmMenu popup(gContext->GetMainWindow(), tr("Delete this binding?"));
-        if (popup.getOption() != ConfirmMenu::CONFIRM) return;
-    }
+        ConfirmMenu popup(gContext->GetMainWindow(),
+                          tr("Delete this key binding from context %1?")
+                          .arg(binding->contextFrom));
 
-    if (!key_bindings->removeActionKey(binding->contextFrom, action, key))
-    {
-        InvalidBindingPopup popup(gContext->GetMainWindow());
-        popup.getOption();
-        return;
-    }
-
-    // refreshing everything is overkill.  I tried incrementally updating, but the
-    // code was ugly.  Since this is quick in my experience, overkill away!
-    refreshKeyBindings();
-    refreshKeyInformation();
-}
-
-/* method description in header */
-bool MythControls::resolveConflict(ActionID *conflict, int level)
-{
-    MythMainWindow *window = gContext->GetMainWindow();
-
-    /* prevent a fatal binding */
-    if (level == KeyBindings::Error)
-    {
-        InvalidBindingPopup popup(gContext->GetMainWindow(),
-                                  conflict->action(),
-                                  conflict->context());
-        popup.getOption();
-        return false;
+        if (popup.GetOption() != ConfirmMenu::kConfirm)
+            return;
     }
     else
     {
-        /* warn the user that this could conflict */
-        QString message = "This kebinding may conflict with ";
-        message += conflict->action() + " in the " + conflict->context();
-        message += " context.  Do you want to bind it anyways?";
+        ConfirmMenu popup(gContext->GetMainWindow(),
+                          tr("Delete this binding?"));
 
-        if (MythPopupBox::show2ButtonPopup(window, "Conflict Warning",
-                                           message,"Bind Key","Cancel",0))
-            return false;
+        if (popup.GetOption() != ConfirmMenu::kConfirm)
+            return;
+    }
+
+    if (!m_bindings->RemoveActionKey(binding->contextFrom, action, key))
+    {
+        InvalidBindingPopup popup(gContext->GetMainWindow());
+        popup.GetOption();
+        return;
+    }
+
+    RefreshKeyBindings();
+    RefreshKeyInformation();
+}
+
+/** \fn ResolveConflict(ActionID*, int)
+ *  \brief Resolve a potential conflict
+ *  \return true if the conflict should be bound, false otherwise.
+ */
+bool MythControls::ResolveConflict(ActionID *conflict, int error_level)
+{
+    if (KeyBindings::kKeyBindingError == error_level)
+    {
+        InvalidBindingPopup popup(gContext->GetMainWindow(),
+                                  conflict->GetAction(),
+                                  conflict->GetContext());
+
+        popup.GetOption();
+
+        return false;
+    }
+
+    QString msg =
+        tr("This kebinding may conflict with %1 in the %2 context. "
+           "Do you want to bind it anyways?")
+        .arg(conflict->GetAction()).arg(conflict->GetContext());
+
+    if (MythPopupBox::show2ButtonPopup(
+            gContext->GetMainWindow(), tr("Conflict Warning"),
+            msg, tr("Bind Key"), QObject::tr("Cancel"), 0))
+    {
+        return false;
     }
 
     return true;
 }
 
-
-
-/* method description in header */
-void MythControls::addKeyToAction(void)
+/** \fn MythControls::AddKeyToAction(void)
+ *  \brief Add a key to the currently selected action.
+ *
+ *  TODO FIXME This code needs work to support deleteKey
+ *             in any mode exc. Context/Action
+ *  TODO FIXME This code needs work to deal with multiple
+ *             binding conflicts.
+ */
+void MythControls::AddKeyToAction(void)
 {
-    // This code needs work to support deleteKey in any mode exc. Context/Action
     /* grab a key from the user */
-    KeyGrabPopupBox *kg = new KeyGrabPopupBox(gContext->GetMainWindow());
-    int result = kg->ExecPopup(kg,SLOT(cancel()));
-    QString key = kg->getCapturedKey();
-    delete kg;
+    KeyGrabPopupBox getkey(gContext->GetMainWindow());
+    if (0 == getkey.ExecPopup(&getkey, SLOT(Cancel())))
+        return; // user hit Cancel button
 
-    /* go no further if canceled */
-    if (result == 0) return;
+    QString     key     = getkey.GetCapturedKey();
+    QString     action  = GetCurrentAction();
+    QString     context = GetCurrentContext();
+    QStringList keys    = m_bindings->GetActionKeys(context, action);
 
-    /* get the keys for the selected action */
-    size_t b = focusedButton();
-    QString action = getCurrentAction(), context = getCurrentContext();
-    QStringList keys = key_bindings->getActionKeys(context, action);
+    // Don't recreating an existing binding...
+    uint binding_index = GetCurrentButton();
+    if ((binding_index >= Action::kMaximumNumberOfBindings) ||
+        (keys[binding_index] == key))
+    {
+        return;
+    }
 
-    /* dont bother rebinding the same key */
-    if (keys[b] == key) return;
+    // Check for first of the potential conflicts.
+    int err_level;
+    ActionID *conflict = m_bindings->GetConflict(context, key, err_level);
+    if (conflict)
+    {
+        bool ok = ResolveConflict(conflict, err_level);
 
-    bool bind = true;
-    int level;
+        delete conflict;
 
-    /* get the potential conflict */
-    ActionID *conflict = NULL;
-    if ((conflict = key_bindings->conflicts(context, key, level)))
-        bind = resolveConflict(conflict, level);
+        if (!ok)
+            return; // abort on unresolved conflicts
+    }
 
-    delete conflict;
-
-    /* dont bind if we shouldn't bind */
-    if (!bind) return;
-
-    /* finally bind or rebind a key to the action */
-    if (b < keys.count())
-        key_bindings->replaceActionKey(context,action, key, keys[b]);
+    if (binding_index < keys.count())
+    {
+        VERBOSE(VB_IMPORTANT, "ReplaceActionKey");
+        m_bindings->ReplaceActionKey(context, action, key,
+                                     keys[binding_index]);
+    }
     else
-        key_bindings->addActionKey(context, action, key);
+    {
+        VERBOSE(VB_IMPORTANT, "AddActionKey");
+        m_bindings->AddActionKey(context, action, key);
+    }
 
-    refreshKeyBindings();
-    refreshKeyInformation();
+    RefreshKeyBindings();
+    RefreshKeyInformation();
 }
 
-
-
-void MythControls::addBindings(QDict<binding_t> &bindings,
-                               const QString &context,
-                               const QString &contextParent, int bindlevel)
+/** \fn MythControls::AddBindings(QDict<Binding>&, const QString&,
+                                  const QString&, int)
+ *  \brief Add bindings to QDict<Binding> for specified context
+ *  \param bindings the QDict to which to add the bindings
+ *  \param context the context to grab keybindings from
+ *  \param contextParent the context whose keybindings are being calculated
+ *  \param bindlevel the bind level associated with this context
+ */
+void MythControls::AddBindings(QDict<Binding> &bindings,
+                               const QString    &context,
+                               const QString    &contextParent,
+                               int               bindlevel)
 {
-    QStringList *actions = key_bindings->getActions(context);
+    QStringList actions = m_bindings->GetActions(context);
 
-    for (size_t i = 0; i < actions->size(); i++)
+    for (uint i = 0; i < actions.size(); i++)
     {
-        QString action = (*actions)[i];
-        QStringList keys = key_bindings->getActionKeys(context, action);
+        QString action = actions[i];
+        QStringList keys = m_bindings->GetActionKeys(context, action);
 
-        for (size_t j = 0; j < keys.size(); j++)
+        for (uint j = 0; j < keys.size(); j++)
         {
-            QString key = keys[j];
+            Binding *b = bindings.find(keys[j]);
 
-            binding_t *b = bindings.find(key);
             if (!b) 
             {
-                b = new(binding_t);
-                b->key = key;
-                b->action = action;
-                b->context = contextParent;
-                b->contextFrom = context;
-                b->bindlevel = bindlevel;
-                bindings.insert(key, b);
+                b = new Binding(keys[j], contextParent,
+                                context, action, bindlevel);
+
+                bindings.insert(keys[j], b);
             }
             else if (b->bindlevel == bindlevel)
             {
@@ -857,108 +1020,102 @@ void MythControls::addBindings(QDict<binding_t> &bindings,
     }
 }
 
-BindingList *MythControls::getKeyBindings(const QString &context)
+/** \fn MythControls::GetKeyBindings(const QString&)
+ *  \brief Create a BindingList for the specified context
+ *  \param context the context for which a BindingList should be created
+ *  \return a BindingList with "auto delete" property enabled.
+ */
+BindingList *MythControls::GetKeyBindings(const QString &context)
 {
+    QDict<Binding> bindings;
+    for (uint i = 0; i < m_sortedContexts.size(); i++)
+        AddBindings(bindings, m_sortedContexts[i], context, i);
+
     QStringList keys;
-    QDict<binding_t> bindings;
-    bindings.clear();
+    for (QDictIterator<Binding> it(bindings); it.current(); ++it)
+        keys.append(it.currentKey());
 
-    for (size_t i = 0; i < contexts.size(); i++)
-        addBindings(bindings, contexts[i], context, i);
+    SortKeyList(keys);
 
+    BindingList *blist = new BindingList();
+    blist->setAutoDelete(true);
 
-    for (QDictIterator<binding_t> it(bindings); it.current(); ++it)
-    {
-        QString key = it.currentKey();
-        keys.append(key);
-    }
+    QStringList::const_iterator kit = keys.begin();
+    for (; kit != keys.end(); ++kit)
+        blist->append(bindings[*kit]);
 
-    sortKeyList(keys);
-
-    BindingList *retval = new BindingList;
-    retval->clear();
-
-    for (QStringList::Iterator kit = keys.begin(); kit != keys.end(); ++kit)
-    {
-        QString key = *kit;
-        retval->append(bindings[key]);
-    }
-    retval->setAutoDelete(true);
-    return retval;
+    return blist;
 }
 
-void MythControls::refreshKeyBindings()
+/** \fn MythControls::RefreshKeyBindings(void)
+ *  \brief Refresh binding information
+ */
+void MythControls::RefreshKeyBindings(void)
 {
-    contextKeys.clear();
-    keyActions.clear();
-    for (size_t i = 0; i < contexts.size(); i++)
+    m_contextToBindingsMap.clear();
+    m_keyToBindingsMap.clear();
+    m_contextToBindingsMap.setAutoDelete(true);
+    m_keyToBindingsMap.setAutoDelete(true);
+
+    for (uint i = 0; i < m_sortedContexts.size(); i++)
     {
-        QString context = contexts[i];
-        BindingList *list = getKeyBindings(context);
-        contextKeys.insert(context, list);
-        for (BindingList::iterator it = list->begin(); it != list->end(); ++it)
+        QString context = m_sortedContexts[i];
+        BindingList *list = GetKeyBindings(context);
+        m_contextToBindingsMap.insert(context, list);
+
+        BindingList::const_iterator it = list->begin();
+        for (; it != list->end(); ++it)
         {
-            binding_t *b = *it;
-            BindingList *list = keyActions.find(b->key);
+            BindingList *list = m_keyToBindingsMap.find((*it)->key);
+
             if (!list)
             {
-                list = new BindingList;
-                list->clear();
-                keyActions.insert(b->key, list);
+                list = new BindingList();
+                m_keyToBindingsMap.insert((*it)->key, list);
             }
-            keys.append(b->key);
-            list->append(b);
+
+            m_sortedKeys.append((*it)->key);
+            list->append(*it);
         }
     }
-    contextKeys.setAutoDelete(true);
-    keyActions.setAutoDelete(true);
 
-    sortKeyList(keys);
+    SortKeyList(m_sortedKeys);
 }
 
-void MythControls::sortKeyList(QStringList &keys)
+/** \fn MythControls::SortKeyList(QStringList&)
+ *  \brief Sort a list of keys, removing duplicates
+ *  \param keys the list of keys to sort
+ */
+void MythControls::SortKeyList(QStringList &keys)
 {
-    QStringList t;
-    t.clear();
-
-    for ( QStringList::Iterator it = keys.begin(); it != keys.end(); ++it )
+    QStringList tmp;
+    QStringList::const_iterator it = keys.begin();
+    for (; it != keys.end(); ++it)
     {
-        QString key = *it;
+        QString key     = *it;
+        QString keydesc = (key.left(6) == "remote") ? "0 " : "3 ";
 
-        QString keydesc = "3 ";
-        if (key.left(6) == "remote")
-        {
-            keydesc = "0 ";
-        }
-        else if (key.length() == 1)
-        {
-            switch (key[0].category())
-            {
-                case QChar::Letter_Uppercase:
-                    keydesc = "2 ";
-                    break;
-                case QChar::Number_DecimalDigit:
-                    keydesc = "1 ";
-                    break;
-                default:
-                    keydesc = "5 ";
-                    break;
-            }
-        }
-        else if (key.find("+", 1) != -1)
-            keydesc = "4 ";
+        keydesc = ((key.length() > 1) && !(key.left(6) == "remote") &&
+                   (key.find("+", 1) >= 0)) ? "4 " : keydesc;
 
-        t.push_back(keydesc + key);
+        if (key.length() == 1)
+        {
+            QChar::Category cat = key[0].category();
+            keydesc = (QChar::Letter_Uppercase    == cat) ? "2 " : "5 ";
+            keydesc = (QChar::Number_DecimalDigit == cat) ? "1 " : keydesc;
+        }
+
+        tmp.push_back(keydesc + key);
     }
-    t.sort();
-
-    QString prev = "";
+    tmp.sort();
 
     keys.clear();
-    for (QStringList::Iterator kit = t.begin(); kit != t.end(); ++kit)
+
+    QString prev = QString::null;
+    for (it = tmp.begin(); it != tmp.end(); ++it)
     {
-        QString cur = (*kit).mid(2);
-        if (cur != prev) 
+        QString cur = (*it).mid(2);
+        if (cur != prev)
         {
             keys.append(cur);
             prev = cur;
@@ -966,7 +1123,9 @@ void MythControls::sortKeyList(QStringList &keys)
     }
 }
 
-QString MythControls::getTypeDesc(ListType type)
+/// NOTE: This can not be a static method because the QObject::tr()
+///       translations do not work reliably in static initializers.
+QString MythControls::GetTypeDesc(ListType type) const
 {
     switch (type)
     {
@@ -984,42 +1143,65 @@ QString MythControls::getTypeDesc(ListType type)
     }
 }
 
-void MythControls::updateLists()
+/** \fn MythControls::UpdateLists(void)
+ *  \brief Redisplays both the left and right lists and fixes focus issues.
+ */
+void MythControls::UpdateLists(void)
 {
-    RightList->blockSignals(true);
-    LeftList->blockSignals(true);
-    LeftList->Reset();
-    if (leftType == kContextList)
+    m_rightList->blockSignals(true);
+    m_leftList->blockSignals(true);
+    m_leftList->Reset();
+
+    if (m_leftListType == kContextList)
     {
-        UIListBtnTypeItem *item;
-        for (size_t i = 0; i < contexts.size(); i++)
+        for (uint i = 0; i < m_sortedContexts.size(); i++)
         {
-            item = new UIListBtnTypeItem(LeftList, contexts[i]);
-            item->setDrawArrow(true);
-        }
-    } else if (leftType == kKeyList)
-    {
-        UIListBtnTypeItem *item;
-        for (size_t i = 0; i < keys.size(); i++)
-        {
-            QString key = KeyToDisplay(keys[i]);
-            item = new UIListBtnTypeItem(LeftList, key);
+            UIListBtnTypeItem *item = new UIListBtnTypeItem(
+                m_leftList, m_sortedContexts[i]);
+
             item->setDrawArrow(true);
         }
     }
-    refreshRightList();
-    RightList->blockSignals(false);
-    LeftList->blockSignals(false);
-    LeftList->refresh();
-    RightList->refresh();
+    else if (m_leftListType == kKeyList)
+    {
+        for (uint i = 0; i < m_sortedKeys.size(); i++)
+        {
+            UIListBtnTypeItem *item = new UIListBtnTypeItem(
+                m_leftList, key_to_display(m_sortedKeys[i]));
 
-    if (LeftDesc != NULL)
-        LeftDesc->SetText(getTypeDesc(leftType));
-    if (RightDesc != NULL)
-        RightDesc->SetText(getTypeDesc(rightType));
+            item->setDrawArrow(true);
+        }
+    }
+
+    RefreshRightList();
+
+    m_rightList->blockSignals(false);
+    m_leftList->blockSignals(false);
+
+    m_leftList->refresh();
+    m_rightList->refresh();
+
+    if (m_leftDescription)
+        m_leftDescription->SetText(GetTypeDesc(m_leftListType));
+
+    if (m_rightDescription)
+        m_rightDescription->SetText(GetTypeDesc(m_rightListType));
 }
 
+static QString key_to_display(const QString &key)
+{
+    if (key.left(6) == "remote")
+        return "[" + key.mid(6) + "]";
 
-#endif /* MYTHCONTROLS_CPP */
+    return key;
+}
+
+static QString display_to_key(const QString &key)
+{
+    if (key.left(1) == "[" && key != "[")
+        return "remote" + key.mid(1, key.length() - 2);
+
+    return key;
+}
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

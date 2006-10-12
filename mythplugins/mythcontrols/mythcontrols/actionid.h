@@ -24,80 +24,43 @@
 #ifndef ACTIONID_H
 #define ACTIONID_H
 
+// Qt headers
 #include <qstring.h>
+#include <qdict.h>
 
-
-/**
- * @class ActionID
- * @brief A class that uniquely identifies an action.
+/** \class ActionID
+ *  \brief A class that uniquely identifies an action.
  *
- * Actions are identified based on their action name and context.
+ *  Actions are identified based on their action name and context.
  */
 class ActionID
 {
+  public:
+    /// \brief Create an empty action
+    ActionID() : m_context(QString::null), m_action(QString::null) { }
 
-public:
-
-    /**
-     * @brief Create an empty action
+    /** \brief Create a new action identifier
+     *  \param context The action's context
+     *  \param action The action's name
      */
-    inline ActionID() {}
+    ActionID(const QString &context, const QString &action)
+        : m_context(context), m_action(action) { }
 
-    /**
-     * @brief Create a new action identifier.
-     * @param context The action's context name.
-     * @param action The action's name
-     */
-    inline ActionID(const QString & context, const QString & action)
-        : _context(context), _action(action) {};
+    /// \brief Returns the context name. (note: result is not thread-safe)
+    QString GetContext(void) const { return m_context; }
 
-    /**
-     * @brief Get the context name.
-     * @return The context name.
-     */
-    inline QString context(void) const { return this->_context; }
+    /// \brief Returns the action name. (note: result is not thread-safe)
+    QString GetAction(void)  const { return m_action; }
 
-    /**
-     * @brief Get the action name
-     * @return The action name.
-     */
-    inline QString action(void) const { return this->_action; }
-
-    /**
-     * @brief Determine if two actions identifiers have the same
-     * context.
-     * @return True if the actions have a common context.
-     */
-    inline static bool sameContext(const ActionID &a, const ActionID &b)
+    bool operator==(const ActionID &other) const
     {
-        return (a.context() == b.context());
+        return (m_action == other.m_action) && (m_context == other.m_context);
     }
 
-    /**
-     * @brief Determine if two actions have the same action name.
-     * @return True if the actions have the same action name.
-     */
-    inline static bool sameAction(const ActionID &a, const ActionID &b)
-    {
-        return (a.action() == b.action());
-    }
-
-    /**
-     * @brief Determine if the action identifiers are equal
-     * @return true if the operators are equal, otherwise, false is
-     * returned.
-     */
-    inline bool operator == (const ActionID &that) const
-    {
-        return (sameAction(*this,that) && sameContext(*this,that));
-    }
-
-private:
-    QString _context;
-    QString _action;
+  private:
+    QString m_context;
+    QString m_action;
 };
-
-
-
+typedef QValueList<ActionID> ActionList;
 
 #endif /* ACTIONID_H */
