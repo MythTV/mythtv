@@ -2017,14 +2017,6 @@ void AvFormatDecoder::MpegPreProcessPkt(AVStream *stream, AVPacket *pkt)
                 GetNVP()->SetVideoParams(awidth, aheight, seqFPS,
                                          keyframedist, aspect, 
                                          kScan_Detect);
-
-                if (ringBuffer->InDVDMenuOrStillFrame())
-                {
-                    ringBuffer->Seek(ringBuffer->DVD()->GetCellStartPos(),
-                                     SEEK_SET);
-                    av_read_frame_flush(ic);
-                }
-
                 current_width  = width;
                 current_height = height;
                 current_aspect = aspect;
@@ -2780,13 +2772,17 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
             {
                 int current_width = curstream->codec->width;
                 int video_width = GetNVP()->GetVideoWidth();
-                if (video_width > 0 && video_width != current_width &&
-                        !ringBuffer->DVD()->InStillFrame())
+                if (video_width > 0 && video_width != current_width)
                 {
                     av_free_packet(pkt);
                     CloseCodecs();
                     ScanStreams(false);
                     allowedquit = true;
+                    if (ringBuffer->DVD()->InStillFrame())
+                    {
+                        long long cellstartpos = ringBuffer->DVD()->GetCellStartPos();
+                        ringBuffer->DVD()->Seek(cellstartpos, SEEK_SET);
+                    }
                     continue;
                 }
             }
