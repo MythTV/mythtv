@@ -2116,6 +2116,18 @@ void ProgramInfo::SetPreserveEpisode(bool preserveEpisode) const
 
     if (!query.exec() || !query.isActive())
         MythContext::DBError("PreserveEpisode update", query);
+
+        query.prepare("UPDATE record SET last_delete = :TIME "
+                    "WHERE recordid = :RECORDID");
+        query.bindValue(":RECORDID", recordid);
+
+        if (preserveEpisode)
+            query.bindValue(":TIME", QDateTime::currentDateTime());
+        else
+            query.bindValue(":TIME", "0000-00-00T00:00:00");
+
+        if (!query.exec() || !query.isActive())
+            MythContext::DBError("Update last_delete", query);
 }
 
 /** \fn ProgramInfo::SetAutoExpire(int) const
@@ -2135,8 +2147,19 @@ void ProgramInfo::SetAutoExpire(int autoExpire) const
     query.bindValue(":STARTTIME", recstartts);
 
     if (!query.exec() || !query.isActive())
-        MythContext::DBError("AutoExpire update",
-                             query);
+        MythContext::DBError("AutoExpire update", query);
+
+        query.prepare("UPDATE record SET last_delete = :TIME "
+                    "WHERE recordid = :RECORDID");
+        query.bindValue(":RECORDID", recordid);
+
+        if (autoExpire)
+            query.bindValue(":TIME", QDateTime::currentDateTime());
+        else
+            query.bindValue(":TIME", "0000-00-00T00:00:00");
+
+        if (!query.exec() || !query.isActive())
+            MythContext::DBError("Update last_delete", query);
 }
 
 /** \fn ProgramInfo::GetAutoExpireFromRecorded(void) const
