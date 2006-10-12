@@ -211,6 +211,7 @@ class MPUBLIC ProgramInfo
     void SetCommFlagged(int flag) const; // 1 = flagged, 2 = processing
     void SetAutoExpire(int autoExpire) const;
     void SetPreserveEpisode(bool preserveEpisode) const;
+    void UpdateLastDelete(bool setTime) const;
 
     // Commercial/Edit flagging maps
     void GetCutList(frm_dir_map_t &) const;
