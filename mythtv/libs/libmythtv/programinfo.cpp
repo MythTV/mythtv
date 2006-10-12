@@ -1878,7 +1878,7 @@ void ProgramInfo::SetWatchedFlag(bool watchedFlag) const
         if (!query.exec() || !query.isActive())
             MythContext::DBError("Set watched flag", query);
         else
-            UpdateLastDelete(watchFlag);
+            UpdateLastDelete(watchedFlag);
     }
 }
 
