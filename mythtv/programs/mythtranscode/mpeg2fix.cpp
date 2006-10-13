@@ -1513,7 +1513,7 @@ MPEG2frame *MPEG2fixup::DecodeToFrame(int frameNum, int skip_reset)
     return spare;
 }
 
-int MPEG2fixup::ConvertToI(int frameNum, int numFrames, int headPos)
+int MPEG2fixup::ConvertToI(QPtrList<MPEG2frame> *orderedFrames, int headPos)
 {
     MPEG2frame *spare = NULL;
     AVPacket pkt;
@@ -1524,8 +1524,10 @@ int MPEG2fixup::ConvertToI(int frameNum, int numFrames, int headPos)
         if (PlaybackSecondary())
             return 1;
 
-    for (int i = frameNum; i < frameNum + numFrames; i++)
+    QPtrListIterator<MPEG2frame> it(*orderedFrames);
+    for (it.toFirst(); *it; ++it)
     {
+        int i = GetFrameNum(it.current());
         if ((spare = DecodeToFrame(i, headPos == 0)) == NULL)
             return 1;
         if(GetFrameTypeT(spare) == 'I')
@@ -1553,7 +1555,7 @@ int MPEG2fixup::ConvertToI(int frameNum, int numFrames, int headPos)
 
     vFrame.remove();
 
-    vFrame.insert(headPos + numFrames - 1, spare);
+    vFrame.insert(headPos + orderedFrames->count() - 1, spare);
 
     vFrame.at(headPos);
     return 0;
@@ -1931,8 +1933,7 @@ int MPEG2fixup::Start()
                             VERBOSE(MPF_IMPORTANT, QString("Saving frame #%1")
                                                .arg(frame_count));
                             if(GetFrameTypeT(curFrame) != 'I')
-                                if (ConvertToI(GetFrameNum(Lreorder.getFirst()),
-                                           Lreorder.count(), frame_pos))
+                                if (ConvertToI(&Lreorder, frame_pos))
                                   return TRANSCODE_BUGGY_EXIT_WRITE_FRAME_ERROR;
                             WriteFrame(QString("save%1.yuv").arg(frame_count),
                                        curFrame);
@@ -1970,8 +1971,7 @@ int MPEG2fixup::Start()
                                 ! new_discard_state &&
                                 GetFrameTypeT(curFrame) == 'P')
                         {
-                            if (ConvertToI(GetFrameNum(Lreorder.getFirst()),
-                                           Lreorder.count(), frame_pos))
+                            if (ConvertToI(&Lreorder, frame_pos))
                                 return TRANSCODE_BUGGY_EXIT_WRITE_FRAME_ERROR;
                             ptsorder_eq_dtsorder = true;
                         }

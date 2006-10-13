@@ -174,7 +174,7 @@ class MPEG2fixup
     void StoreSecondary();
     int  PlaybackSecondary();
     MPEG2frame *DecodeToFrame(int frameNum, int skip_reset);
-    int ConvertToI(int frameNum, int numFrames, int headPos);
+    int ConvertToI(QPtrList<MPEG2frame> *orderedFrames, int headPos);
     int InsertFrame(int frameNum, int64_t deltaPTS,
                      int64_t ptsIncrement, int64_t initPTS);
     void AddSequence(MPEG2frame *frame1, MPEG2frame *frame2);
