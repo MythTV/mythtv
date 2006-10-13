@@ -488,6 +488,13 @@ int Transcode::TranscodeFile(char *inputname, char *outputname,
             SetProfileOption(profile, "rtjpeglumafilter");
             nvr->SetupRTjpeg();
         }
+        else if (vidsetting == "")
+        {
+            VERBOSE(VB_IMPORTANT, "No video information found!");
+            VERBOSE(VB_IMPORTANT, "Please ensure that recording profiles "
+                                  "for the transcoder are set");
+            return REENCODE_ERROR;
+        }
         else
         {
             VERBOSE(VB_IMPORTANT, QString("Unknown video codec: %1").arg(vidsetting));
