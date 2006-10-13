@@ -8,6 +8,8 @@
 #include <qstringlist.h>
 #include <qdatetime.h>
 
+#include "transcodedefs.h"
+
 extern "C"
 {
 //AVFormat/AVCodec
@@ -131,7 +133,8 @@ class MPEG2fixup
   public:
     MPEG2fixup(const char *inf, const char *outf,
                QMap<long long, int> *deleteMap, const char *fmt, int norp,
-               int fixPTS, int maxf, bool showprog, int otype);
+               int fixPTS, int maxf, bool showprog, int otype,
+               void (*update_func)(float) = NULL, int (*check_func)() = NULL);
     ~MPEG2fixup();
     int Start();
     void AddRangeList(QStringList cutlist, int type);
@@ -210,6 +213,9 @@ class MPEG2fixup
         return inputFC->streams[id]->codec;
     }
 
+    int (*check_abort)();
+    void (*update_status)(float percent_done);
+
     QPtrList<MPEG2frame> vSecondary;
     bool use_secondary;
 
@@ -249,6 +255,8 @@ class MPEG2fixup
     bool showprogress;
     uint64_t filesize;
     int framenum;
+    int status_update_time;
+    uint64_t last_written_pos;
 };
 
 #ifdef NO_MYTH
@@ -266,9 +274,9 @@ class MPEG2fixup
         } \
     } while (0)
     #define TRANSCODE_EXIT_OK                         0
-    #define TRANSCODE_EXIT_UNKNOWN_ERROR              -1
-    #define TRANSCODE_BUGGY_EXIT_WRITE_FRAME_ERROR    -2
-    #define TRANSCODE_BUGGY_EXIT_DEADLOCK             -3
+    #define TRANSCODE_EXIT_UNKNOWN_ERROR              -10
+    #define TRANSCODE_BUGGY_EXIT_WRITE_FRAME_ERROR    -11
+    #define TRANSCODE_BUGGY_EXIT_DEADLOCK             -12
 #else
    #include "mythcontext.h"
    #include "exitcodes.h"

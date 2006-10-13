@@ -27,6 +27,9 @@ void UpdatePositionMap(QMap <long long, long long> &posMap, QString mapfile,
 int BuildKeyframeIndex(MPEG2fixup *m2f, QString &infile,
                         QMap <long long, long long> &posMap, int jobID);
 void CompleteJob(int jobID, ProgramInfo *pginfo, bool useCutlist, int &resultCode);
+void UpdateJobQueue(float percent_done);
+int CheckJobQueue();
+static int glbl_jobID = -1;
 
 void usage(char *progname) 
 {
@@ -463,12 +466,20 @@ int main(int argc, char *argv[])
     int exitcode = TRANSCODE_EXIT_OK;
     if ((result == REENCODE_MPEG2TRANS) || mpeg2)
     {
+        void (*update_func)(float) = NULL;
+        int (*check_func)() = NULL;
         if (useCutlist && !found_infile)
             pginfo->GetCutList(deleteMap);
-       
+        if (jobID >= 0)
+        {
+           glbl_jobID = jobID;
+           update_func = &UpdateJobQueue;
+           check_func = &CheckJobQueue;
+        }
         MPEG2fixup *m2f = new MPEG2fixup(infile.ascii(), outfile.ascii(),
                                          &deleteMap, NULL, false, false, 20,
-                                         showprogress, otype);
+                                         showprogress, otype, update_func,
+                                         check_func);
         if (build_index)
         {
             int err = BuildKeyframeIndex(m2f, infile, posMap, jobID);
@@ -481,19 +492,21 @@ int main(int argc, char *argv[])
         }
         else
         {
-            int err = m2f->Start();
-            if (err)
-                return err;
-            err = BuildKeyframeIndex(m2f, outfile, posMap, jobID);
-            if (err)
-                return err;
-            if (update_index)
-                UpdatePositionMap(posMap, NULL, pginfo);
-            else
-                UpdatePositionMap(posMap, outfile + QString(".map"), pginfo);
+            result = m2f->Start();
+            if (result == REENCODE_OK)
+            {
+                result = BuildKeyframeIndex(m2f, outfile, posMap, jobID);
+                if (result == REENCODE_OK)
+                {
+                    if (update_index)
+                        UpdatePositionMap(posMap, NULL, pginfo);
+                    else
+                        UpdatePositionMap(posMap, outfile + QString(".map"),
+                                          pginfo);
+                }
+            }
         }
         delete m2f;
-        result = REENCODE_OK;
     }
     
     if (result == REENCODE_OK)
@@ -523,7 +536,7 @@ int main(int argc, char *argv[])
         if (jobID >= 0)
             JobQueue::ChangeJobStatus(jobID, JOB_ERRORING);
         VERBOSE(VB_GENERAL, QString("Transcoding %1 failed").arg(infile));
-        exitcode = TRANSCODE_EXIT_UNKNOWN_ERROR;
+        exitcode = result;
     }
 
     if (jobID >= 0)
@@ -719,4 +732,20 @@ void CompleteJob(int jobID, ProgramInfo *pginfo, bool useCutlist, int &resultCod
     }
 }
 
+void UpdateJobQueue(float percent_done)
+{
+    JobQueue::ChangeJobComment(glbl_jobID, 
+                               QString("%1% " + QObject::tr("Completed"))
+                               .arg(percent_done, 0, 'f', 1));
+}
+
+int CheckJobQueue()
+{
+    if (JobQueue::GetJobCmd(glbl_jobID) == JOB_STOP)
+    {
+        VERBOSE(VB_IMPORTANT, "Transcoding stopped by JobQueue");
+        return 1;
+    }
+    return 0;
+}
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

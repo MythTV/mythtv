@@ -199,7 +199,8 @@ int64_t PTSOffsetQueue::UpdateOrigPTS(int idx, int64_t &origPTS, AVPacket &pkt)
 MPEG2fixup::MPEG2fixup(const char *inf, const char *outf,
                        QMap<long long, int> *deleteMap,
                        const char *fmt, int norp, int fixPTS, int maxf,
-                       bool showprog, int otype)
+                       bool showprog, int otype, void (*update_func)(float),
+                       int (*check_func)())
 {
     displayFrame = new QPtrListIterator<MPEG2frame> (vFrame);
 
@@ -248,10 +249,19 @@ MPEG2fixup::MPEG2fixup(const char *inf, const char *outf,
 
     //initialize progress stats
     showprogress = showprog;
-    if (showprogress)
+    update_status = update_func;
+    check_abort = check_func;
+    if (showprogress || update_status)
     {
+        if (update_status)
+        {
+            status_update_time = 20;
+            update_status(0);
+        }
+        else
+            status_update_time = 5;
         statustime = QDateTime::currentDateTime();
-        statustime = statustime.addSecs(5);
+        statustime = statustime.addSecs(status_update_time);
 
         struct stat filestat;
         if(stat(inf, &filestat)) {
@@ -675,6 +685,7 @@ int MPEG2fixup::AddFrame(MPEG2frame *f)
     ring_write(rb, f->pkt.data, f->pkt.size);
     ring_write(rbi, (uint8_t *)&iu, sizeof(index_unit));
     pthread_mutex_unlock(&rx.mutex);
+    last_written_pos = f->pkt.pos;
     return 0;
 }
 
@@ -1157,12 +1168,19 @@ int MPEG2fixup::GetFrame(AVPacket *pkt)
                 av_free_packet(pkt);
         }
         pkt->duration = framenum++;
-        if (showprogress && QDateTime::currentDateTime() > statustime)
+        if ((showprogress || update_status) &&
+            QDateTime::currentDateTime() > statustime)
         {
-            VERBOSE(MPF_IMPORTANT, QString("%1% complete")
-                    .arg(100.0 * pkt->pos / filesize, 0, 'f', 1));
+            float percent_done = 100.0 * pkt->pos / filesize;
+            if (update_status)
+                update_status(percent_done);
+            if (showprogress)
+                VERBOSE(MPF_IMPORTANT, QString("%1% complete")
+                        .arg(percent_done, 0, 'f', 1));
+            if (check_abort && check_abort())
+                return REENCODE_STOPPED;
             statustime = QDateTime::currentDateTime();
-            statustime = statustime.addSecs(5);
+            statustime = statustime.addSecs(status_update_time);
         }
 
 #ifdef DEBUG_AUDIO
@@ -1175,7 +1193,7 @@ int MPEG2fixup::GetFrame(AVPacket *pkt)
 
         MPEG2frame *tmpFrame = GetPoolFrame(pkt);
         if (tmpFrame == NULL)
-            return -1;
+            return TRANSCODE_EXIT_UNKNOWN_ERROR;
         switch (inputFC->streams[pkt->stream_index]->codec->codec_type)
         {
 
@@ -1198,7 +1216,7 @@ int MPEG2fixup::GetFrame(AVPacket *pkt)
             default:
                 framePool.enqueue(tmpFrame);
                 av_free_packet(pkt);
-                return -1;
+                return TRANSCODE_EXIT_UNKNOWN_ERROR;
         }
     }
 }
@@ -1734,6 +1752,7 @@ int MPEG2fixup::Start()
     int64_t cutStartPTS = 0, cutEndPTS = 0;
     int64_t frame_count = 0;
     int new_discard_state = 0;
+    int ret;
     QMap<int, int> af_dlta_cnt, cutState;
     //  int i;
 
@@ -1745,7 +1764,7 @@ int MPEG2fixup::Start()
     }
 
     if (! FindStart())
-        return ( -1);
+        return (TRANSCODE_EXIT_UNKNOWN_ERROR);
 
     av_init_packet(&pkt);
 
@@ -1811,8 +1830,8 @@ int MPEG2fixup::Start()
         /* read packet */
         if (! file_end)
         {
-            if (GetFrame(&pkt) < 0)
-                return TRANSCODE_EXIT_UNKNOWN_ERROR;
+            if ((ret = GetFrame(&pkt)) < 0)
+                return ret;
         }
         else
             break;
@@ -1877,8 +1896,8 @@ int MPEG2fixup::Start()
                     int pos = vFrame.count();
                     int count = Lreorder.count();
                     while (vFrame.count() - frame_pos - count < 20 && !file_end)
-                        if (GetFrame(&pkt) < 0)
-                            return TRANSCODE_EXIT_UNKNOWN_ERROR;
+                        if ((ret = GetFrame(&pkt)) < 0)
+                            return ret;
                     if (! file_end)
                     {
                         int64_t tmp_origvPTS = origvPTS;
@@ -2304,7 +2323,7 @@ int MPEG2fixup::Start()
 
     av_close_input_file(inputFC);
     inputFC = NULL;
-    return 0;
+    return REENCODE_OK;
 }
 
 #ifdef NO_MYTH
@@ -2462,5 +2481,5 @@ int MPEG2fixup::BuildKeyframeIndex(QString &file,
 
     VERBOSE(MPF_GENERAL, "Transcode Completed");
 
-    return TRANSCODE_EXIT_OK;
+    return REENCODE_OK;
 }

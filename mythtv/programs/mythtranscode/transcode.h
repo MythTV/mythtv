@@ -8,12 +8,7 @@
 #include "fifowriter.h"
 #include "programinfo.h"
 #include "mythdbcon.h"
-
-#define REENCODE_MPEG2TRANS      2
-#define REENCODE_OK              1
-#define REENCODE_CUTLIST_CHANGE -1
-#define REENCODE_STOPPED        -2
-#define REENCODE_ERROR           0
+#include "transcodedefs.h"
 
 class Transcode : public QObject
 {
