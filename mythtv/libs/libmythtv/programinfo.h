@@ -180,6 +180,7 @@ class MPUBLIC ProgramInfo
     QString RecStatusText(void) const;
     QString RecStatusDesc(void) const;
     void UpdateInUseMark(bool force = false);
+    bool PathnameExists(void);
 
     // Quick sets
     /// \brief If "ignore" is true GetBookmark() will return 0, otherwise

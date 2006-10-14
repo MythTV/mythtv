@@ -243,60 +243,14 @@ void startManualSchedule(void)
     qApp->lock();
 }
 
-void startTV(bool startInGuide)
-{
-    TV *tv = new TV();
-
-    if (!tv->Init())
-    {
-        VERBOSE(VB_IMPORTANT, "Experienced fatal error "
-                "initializing TV class in startTV().");
-        delete tv;
-        return;
-    }
-
-    bool quitAll = false;
-    bool showDialogs = true;
-
-    if (!tv->LiveTV(showDialogs, startInGuide))
-    {
-        tv->StopLiveTV();
-        quitAll = true;
-    }
-
-    while (!quitAll)
-    {
-        while (tv->GetState() != kState_None)
-        {
-            qApp->unlock();
-            qApp->processEvents();
-            usleep(10000);
-            qApp->lock();
-        }
-
-        if (tv->WantsToQuit())
-            quitAll = true;
-    }
-
-    while (tv->IsMenuRunning()) 
-    {
-        qApp->unlock();
-        qApp->processEvents();
-        usleep(10000);
-        qApp->lock();
-    }
-
-    delete tv;
-}
-
 void startTVInGuide(void)
 {
-    startTV(true);
+    TV::StartTV(NULL, true);
 }
 
 void startTVNormal(void)
 {
-    startTV(false);
+    TV::StartTV(NULL, false);
 }
 
 void showStatus(void)
@@ -576,16 +530,6 @@ int internal_play_media(const QString &mrl, const QString &plot,
         return res;
     }
     
-    TV *tv = new TV();
-
-    if (!tv->Init())
-    {
-        VERBOSE(VB_IMPORTANT, "Experienced fatal error initializing "
-                "TV class in internal_play_media().");
-        delete tv;
-        return res;
-    }
-
     ProgramInfo *pginfo = new ProgramInfo();
     pginfo->recstartts = QDateTime::currentDateTime().addSecs((0 - (lenMins + 1)) * 60 );
     pginfo->recendts = QDateTime::currentDateTime().addSecs(-60);
@@ -609,22 +553,12 @@ int internal_play_media(const QString &mrl, const QString &plot,
     
     pginfo->title = title;
 
-    if (tv->Playback(pginfo))
-    {
-        while (tv->GetState() != kState_None)
-        {
-            qApp->unlock();
-            qApp->processEvents();
-            usleep(10000);
-            qApp->lock();
-            
-        }
-    }
+   
+    TV::StartTV(pginfo);
     
     res = 0;
     
     sleep(1);
-    delete tv;
     delete pginfo;
     
     return res;

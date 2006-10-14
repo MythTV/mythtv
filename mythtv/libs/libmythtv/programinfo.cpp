@@ -3722,6 +3722,16 @@ void ProgramInfo::UpdateInUseMark(bool force)
         MarkAsInUse(true);
 }
 
+bool ProgramInfo::PathnameExists(void)
+{
+    if (pathname.left(7) == "myth://")
+       return RemoteCheckFile(this);
+    
+    QFile checkFile(pathname);
+
+    return checkFile.exists();
+}
+
 void ProgramInfo::MarkAsInUse(bool inuse, QString usedFor)
 {
     if (isVideo)

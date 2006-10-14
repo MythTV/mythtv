@@ -252,28 +252,21 @@ int main(int argc, char *argv[])
         return TV_EXIT_NO_TV;
     }
 
+    ProgramInfo *pginfo = NULL;
+
     if (filename != "")
     {
-        ProgramInfo *pginfo = new ProgramInfo();
+        pginfo = new ProgramInfo();
         pginfo->endts = QDateTime::currentDateTime().addSecs(-180);
         pginfo->pathname = QString::fromLocal8Bit(filename);
         pginfo->isVideo = true;
+    }
+
+    TV::StartTV(pginfo, true);
+
+    if (pginfo)
+        delete pginfo;
     
-        tv->Playback(pginfo);
-    }
-    else
-        tv->LiveTV(true);
-
-    qApp->unlock();
-    while (tv->GetState() != kState_None)
-    {
-        usleep(1000);
-        qApp->processEvents();
-    }
-
-    sleep(1);
-    delete tv;
-
     if (priv_thread != 0) 
     {
         void *value;

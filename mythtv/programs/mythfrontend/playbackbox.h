@@ -392,8 +392,6 @@ class PlaybackBox : public MythDialog
     ProgramInfo        *curitem;
     /// Program currently selected for deletion
     ProgramInfo        *delitem;
-    /// Last Program played by play(ProgramInfo*,bool)
-    ProgramInfo        *lastProgram;
     /// ProgramInfo cache for FillList()
     vector<ProgramInfo *> *progCache;
     /// playingSomething is set to true iff a full screen recording is playing

@@ -57,6 +57,126 @@ const int TV::kInputModeTimeout=5000;
 #define LOC QString("TV: ")
 #define LOC_ERR QString("TV Error: ")
 
+/*
+ * \brief stores last program info. maintains info so long as
+ * mythfrontend is active
+ */
+static QStringList lastProgramStringList = QStringList();
+
+/*
+ \brief returns true if the recording completed when exiting.
+ */
+bool TV::StartTV (ProgramInfo *tvrec, bool startInGuide, 
+                bool inPlaylist, bool initByNetworkCommand)
+{
+    TV *tv = new TV();
+    bool quitAll = false;
+    bool showDialogs = true;
+    bool playCompleted = false;
+    ProgramInfo *curProgram = NULL;
+    
+
+    if (tvrec)
+        curProgram = new ProgramInfo(*tvrec);
+    
+    // Initialize TV
+    if (!tv->Init())
+    {
+        VERBOSE(VB_IMPORTANT, "Experienced fatal error:"
+                "Failed initializing TV");
+        delete tv;
+        return false;
+    }
+
+    if (!lastProgramStringList.empty())
+    {
+        ProgramInfo *p = new ProgramInfo();
+        p->FromStringList(lastProgramStringList, 0);
+        tv->setLastProgram(p);
+        delete p;
+    }
+
+    while (!quitAll)
+    {
+        if (curProgram)
+        {
+            if (!tv->Playback(curProgram))
+                quitAll = true;
+        }
+        else
+        {
+            if (!tv->LiveTV(showDialogs, startInGuide))
+            {
+                tv->StopLiveTV();
+                quitAll = true;
+            }
+        }
+        
+        tv->setInPlayList(inPlaylist);
+        tv->setUnderNetworkControl(initByNetworkCommand);
+        
+        // Process Events
+        while (tv->GetState() != kState_None)
+        {
+            qApp->unlock();
+            qApp->processEvents();
+            usleep(100000);
+            qApp->lock();
+        }
+
+        if (tv->getJumpToProgram())
+        {
+            
+            ProgramInfo *tmpProgram  = tv->getLastProgram();
+            ProgramInfo *nextProgram = new ProgramInfo(*tmpProgram);
+
+            tv->setLastProgram(curProgram);
+
+            if (curProgram)
+                delete curProgram;
+
+            curProgram = nextProgram;
+
+            continue;
+        }
+        
+        if (tv->WantsToQuit())
+            quitAll = true;
+    }
+
+    while (tv->IsMenuRunning())
+    {
+        qApp->unlock();
+        qApp->processEvents();
+        usleep(100000);
+        qApp->lock();
+    }
+
+    // check if the show has reached the end.
+    if (tvrec && tv->getEndOfRecording())
+        playCompleted = true;
+    
+    bool allowrerecord = tv->getAllowRerecord();
+    bool deleterecording = tv->getRequestDelete();
+    
+    delete tv;
+    
+    if (curProgram)
+    {
+        if (deleterecording)
+            RemoteDeleteRecording(curProgram, allowrerecord, false);
+        else if (!curProgram->isVideo)
+        {
+            lastProgramStringList.clear();
+            curProgram->ToStringList(lastProgramStringList);
+        }
+        
+        delete curProgram;
+    }
+
+    return playCompleted;
+}
+        
 void TV::InitKeys(void)
 {
     REG_KEY("TV Frontend", "PAGEUP", "Page Up", "3");
@@ -187,6 +307,7 @@ void TV::InitKeys(void)
     REG_KEY("TV Playback", "JUMPREC", "Display menu of recorded programs to jump to", "");
     REG_KEY("TV Playback", "SIGNALMON", "Monitor Signal Quality", "F7");
     REG_KEY("TV Playback", "JUMPTODVDROOTMENU", "Jump to the DVD Root Menu", "");
+    REG_KEY("TV Playback", "STOPSHOW","Stop Watching a Recorded Show", "Ctrl+E");
 
     /* Editing keys */
     REG_KEY("TV Editing", "CLEARMAP", "Clear editing cut points", "C,Q,Home");
@@ -275,6 +396,7 @@ TV::TV(void)
       autoCommercialSkip(CommSkipOff), tryUnflaggedSkip(false),
       smartForward(false), stickykeys(0),
       ff_rew_repos(1.0f), ff_rew_reverse(false),
+      jumped_back(false),
       vbimode(VBIMode::None),
       // State variables
       internalState(kState_None),
@@ -284,7 +406,8 @@ TV::TV(void)
       audiosyncAdjustment(false), audiosyncBaseline(LONG_LONG_MIN),
       editmode(false),     zoomMode(false),
       sigMonMode(false),
-      update_osd_pos(false), endOfRecording(false), requestDelete(false),
+      update_osd_pos(false), endOfRecording(false), 
+      requestDelete(false),  allowRerecord(false),
       doSmartForward(false),
       queuedTranscode(false), getRecorderPlaybackInfo(false),
       adjustingPicture(kAdjustingPicture_None),
@@ -320,6 +443,7 @@ TV::TV(void)
       recorderPlaybackInfo(NULL),
       playbackinfo(NULL), playbackLen(0),
       lastProgram(NULL), jumpToProgram(false),
+      inPlaylist(false), underNetworkControl(false),
       // Video Players
       nvp(NULL), pipnvp(NULL), activenvp(NULL),
       // Remote Encoders
@@ -525,6 +649,9 @@ TV::~TV(void)
     if (playbackinfo)
         delete playbackinfo;
 
+    if (lastProgram)
+        delete lastProgram;
+
     if (class LCD * lcd = LCD::Get())
         lcd->switchToTime();
 
@@ -583,6 +710,9 @@ void TV::GetPlayGroupSettings(const QString &group)
  */
 int TV::LiveTV(bool showDialogs, bool startInGuide)
 {
+    requestDelete = false;
+    allowRerecord = false;
+    
     if (internalState == kState_None && RequestNextRecorder(showDialogs))
     {
         if (tvchain)
@@ -724,8 +854,11 @@ void TV::AskAllowRecording(const QStringList &messages, int timeuntil,
 
 int TV::Playback(ProgramInfo *rcinfo)
 {
+    wantsToQuit   = false;
     jumpToProgram = false;
-
+    allowRerecord = false;
+    requestDelete = false;
+    
     if (internalState != kState_None)
         return 0;
 
@@ -1616,12 +1749,47 @@ void TV::RunTV(void)
             {
                 ChangeState(RemovePlaying(internalState));
                 endOfRecording = true;
+                wantsToQuit = true;
                 if (nvp && gContext->GetNumSetting("AutomaticSetWatched", 0))
                     nvp->SetWatched();
                 VERBOSE(VB_PLAYBACK, LOC_ERR + "nvp->IsPlaying() timed out");
             }
         }
 
+        if (!endOfRecording)
+        {
+
+           
+            if (jumped_back && !nvp->IsNearEnd())
+                jumped_back = false;
+            
+            if (internalState == kState_WatchingPreRecorded && !inPlaylist &&
+                dialogname == "" && nvp->IsNearEnd() && !exitPlayer && !underNetworkControl &&
+                (gContext->GetNumSetting("EndofRecordingExitPrompt") == 1) &&
+                !jumped_back)
+            {
+                PromptDeleteRecording(tr("End Of Recording"));
+            }
+            
+                
+            // disable dialog and enable playback after 2 minutes
+            if (IsVideoExitDialog() &&
+                dialogboxTimer.elapsed() > (2 * 60 * 1000))
+            {
+                GetOSD()->TurnDialogOff(dialogname);
+                dialogname = "";
+                DoPause();
+                ClearOSD();
+
+                requestDelete = false;
+                if (activenvp->IsNearEnd())
+                {
+                    exitPlayer  = true;
+                    wantsToQuit = true;
+                }
+            }
+        }
+        
         if (exitPlayer)
         {
             while (GetOSD() && GetOSD()->DialogShowing(dialogname))
@@ -1630,8 +1798,31 @@ void TV::RunTV(void)
                 GetOSD()->TurnDialogOff(dialogname);
                 usleep(1000);
             }
+            
+            
+            if (jumpToProgram)
+            {
+                bool fileExists = lastProgram->PathnameExists();
+                
+                if (!fileExists)
+                {
+                    if (GetOSD())
+                    {
+                        QString msg = tr("Last Program: %1 Doesn't Exist")
+                            .arg(lastProgram->title);
+                        GetOSD()->SetSettingsText(msg, 3);
+                    }
+                    lastProgramStringList.clear();
+                    setLastProgram(NULL);
+                    VERBOSE(VB_PLAYBACK, LOC_ERR + "Last Program File does not exist");
+                    jumpToProgram = false;
+                }
+                else
+                    ChangeState(kState_None);
+            }
+            else
+                ChangeState(kState_None);
 
-            ChangeState(kState_None);
             exitPlayer = false;
         }
 
@@ -2088,6 +2279,33 @@ void TV::ProcessKeypress(QKeyEvent *e)
                 GetOSD()->DialogUp(dialogname); 
             else if (action == "DOWN")
                 GetOSD()->DialogDown(dialogname);
+            else if ((action == "FFWDSTICKY" || action == "SEEKFFWD" ||
+                        action == "JUMPFFWD") &&
+                        IsVideoExitDialog());
+                // do nothing
+            else if (((action == "RWNDSTICKY" || action == "SEEKRWND" ||
+                        action == "JUMPRWND"))
+                    && IsVideoExitDialog())
+            {
+                DoPause(false);
+                GetOSD()->TurnDialogOff(dialogname);
+                dialogname = "";
+                ClearInputQueues(true);
+                requestDelete = false;
+                jumped_back = true;
+                if (action == "RWNDSTICKY")
+                    ChangeFFRew(-3);
+                else if (action == "JUMPRWND")
+                    DoSeek(-jumptime * 60, tr("Jump Back"));
+                else
+                    DoSeek(-rewtime, tr("Skip Back"));
+            }
+            else if (action == "ESCAPE" && activenvp->IsNearEnd())
+            {
+                requestDelete = false;
+                exitPlayer    = true;
+                wantsToQuit   = true;
+            }
             else if (action == "SELECT" || action == "ESCAPE" || 
                      action == "CLEAROSD" ||
                      ((arrowAccel) && (action == "LEFT" || action == "RIGHT")))
@@ -2116,23 +2334,23 @@ void TV::ProcessKeypress(QKeyEvent *e)
 
                     switch (result)
                     {
-                        case 1:
-                            nvp->SetBookmark();
-                            wantsToQuit = true;
-                            exitPlayer = true;
-                            break;
-                        case 3: case 0:
-                            paused = !paused;
+                        case 0: case 1:
                             DoPause();
                             break;
-                        case 4:
-                            wantsToQuit = true;
+                        case 2:
+                            nvp->SetBookmark();
                             exitPlayer = true;
-                            requestDelete = true;
+                            wantsToQuit = true;
                             break;
+                        case 4:
+                            dialogname = "";
+                            requestDelete = true;
+                            DoPause();
+                            PromptDeleteRecording("Delete Recording?"); 
+                            return;
                         default:
-                            wantsToQuit = true;
                             exitPlayer = true;
+                            wantsToQuit = true;
                             break;
                     }
                 }
@@ -2142,19 +2360,74 @@ void TV::ProcessKeypress(QKeyEvent *e)
 
                     switch (result)
                     {
-                        case 0: case 2:
-                            paused = !paused;
+                        case 0: case 1:
                             DoPause();
                             break;
-                        case 1:
-                            wantsToQuit = true;
-                            exitPlayer = true;
-                            requestDelete = true;
-                            break;
                         default:
-                            wantsToQuit = true;
                             exitPlayer = true;
+                            wantsToQuit = true;
                             break;
+                    }
+                }
+                else if (dialogname == "askdeleterecording")
+                {
+                    int result = GetOSD()->GetDialogResponse(dialogname);
+
+                    if (requestDelete)
+                    {
+                        switch (result)
+                        {
+                            case 1:
+                                exitPlayer = true;
+                                wantsToQuit = true;
+                                allowRerecord = true;
+                                break;
+                            case 2:
+                                exitPlayer = true;
+                                wantsToQuit = true;
+                                break;
+                            default:
+                                requestDelete = false;
+                                if (activenvp->IsNearEnd())
+                                {
+                                    exitPlayer = true;
+                                    wantsToQuit = true;
+                                }
+                                else
+                                    DoPause();
+                                break;
+                        }
+                    }
+                    else
+                    {
+                        switch (result)
+                        {
+                            case 1:
+                                if (activenvp->IsNearEnd())
+                                {
+                                    exitPlayer = true;
+                                    wantsToQuit = true;
+                                }
+                                else
+                                    DoPause();
+                                break;
+                            case 2:
+                                dialogname = "";
+                                requestDelete = true;
+                                DoPause();
+                                PromptDeleteRecording("Delete Recording ? Are you Sure?");
+                                return;
+                            case 3:
+                                requestDelete = false;
+                                if (activenvp->IsNearEnd())
+                                {
+                                    exitPlayer = true;
+                                    wantsToQuit = true;
+                                }
+                                else
+                                    DoPause();
+                                break;
+                        }
                     }
                 }
                 else if (dialogname == "allowrecordingbox")
@@ -2439,7 +2712,6 @@ void TV::ProcessKeypress(QKeyEvent *e)
         {
             nvp->SetBookmark();
             exitPlayer = true;
-            wantsToQuit = true;
             jumpToProgram = true;
         }
         else if (action == "JUMPREC")
@@ -2480,41 +2752,7 @@ void TV::ProcessKeypress(QKeyEvent *e)
             NormalSpeed();
             StopFFRew();
 
-            if (StateIsPlaying(internalState) &&
-                gContext->GetNumSetting("PlaybackExitPrompt") == 1 && 
-                (!playbackinfo || !playbackinfo->isVideo)  )
-            {
-                nvp->Pause();
-
-                QString message = tr("You are exiting this recording");
-
-                QStringList options;
-                options += tr("Save this position and go to the menu");
-                options += tr("Do not save, just exit to the menu");
-                options += tr("Keep watching");
-                options += tr("Delete this recording");
-
-                dialogname = "exitplayoptions";
-                if (GetOSD())
-                    GetOSD()->NewDialogBox(dialogname, message, options, 0);
-            }
-            else if (StateIsPlaying(internalState) &&
-                     gContext->GetNumSetting("PlaybackExitPrompt") == 1 && 
-                     playbackinfo && playbackinfo->isVideo && 
-                     !activerbuffer->InDVDMenuOrStillFrame())
-            {
-                nvp->Pause();
-
-                QString vmessage = tr("You are exiting this video");
-
-                QStringList voptions;
-                voptions += tr("Exit to the menu");
-                voptions += tr("Keep watching");
-                dialogname = "videoexitplayoptions";
-                if (GetOSD())
-                    GetOSD()->NewDialogBox(dialogname, vmessage, voptions, 0);
-            }
-            else if (StateIsLiveTV(GetState()))
+            if (StateIsLiveTV(GetState()))
             {
                 if (nvp && gContext->GetNumSetting("PlaybackExitPrompt") == 2)
                     nvp->SetBookmark();
@@ -2525,7 +2763,7 @@ void TV::ProcessKeypress(QKeyEvent *e)
             }
             else 
             {
-                if (nvp && gContext->GetNumSetting("PlaybackExitPrompt") == 2)
+                if (nvp && gContext->GetNumSetting("PlaybackExitPrompt") > 0)
                     nvp->SetBookmark();
                 if (nvp && gContext->GetNumSetting("AutomaticSetWatched", 0))
                     nvp->SetWatched();
@@ -2739,13 +2977,30 @@ void TV::ProcessKeypress(QKeyEvent *e)
                 NormalSpeed();
                 StopFFRew();
                 nvp->SetBookmark(); 
-
+               
                 requestDelete = true;
-                exitPlayer = true;
-                wantsToQuit = true;
+                if (gContext->GetNumSetting("PlaybackExitPrompt") == 1)
+                    PromptDeleteRecording("Delete Recording ? Are You Sure ?");
+                else
+                {
+                    exitPlayer = true;
+                    wantsToQuit = true;
+                }
+
             }
             else if (action == "JUMPTODVDROOTMENU")
                 activenvp->GoToDVDMenu("menu");
+            else if (action == "STOPSHOW")
+            {
+                if (gContext->GetNumSetting("PlaybackExitPrompt") == 1)
+                    PromptStopWatchingRecording();
+                else
+                {
+                    requestDelete = false;
+                    exitPlayer = true;
+                    wantsToQuit = true;
+                }
+            }
             else if (action == "GUIDE")
                 EditSchedule(kScheduleProgramGuide);
             else if (action == "FINDER")
@@ -3236,7 +3491,7 @@ QString TV::PlayMesg()
     return mesg;
 }
 
-void TV::DoPause(void)
+void TV::DoPause(bool showOSD)
 {
     if (activerbuffer->InDVDMenuOrStillFrame())
         return;
@@ -3267,13 +3522,15 @@ void TV::DoPause(void)
     {
         activerbuffer->WaitForPause();
         DoNVPSeek(time);
-        UpdateOSDSeekMessage(tr("Paused"), -1);
+        if (showOSD)
+            UpdateOSDSeekMessage(tr("Paused"), -1);
         gContext->RestoreScreensaver();
     }
     else
     {
         DoNVPSeek(time);
-        UpdateOSDSeekMessage(PlayMesg(), osd_general_timeout);
+        if (showOSD)
+            UpdateOSDSeekMessage(PlayMesg(), osd_general_timeout);
         gContext->DisableScreensaver();
     }
 }
@@ -6112,7 +6369,6 @@ void TV::TreeMenuSelected(OSDListTreeType *tree, OSDGenericTree *item)
         {
             nvp->SetBookmark();
             exitPlayer = true;
-            wantsToQuit = true;
             jumpToProgram = true;
         }
         else if (action == "JUMPREC")
@@ -6123,7 +6379,6 @@ void TV::TreeMenuSelected(OSDListTreeType *tree, OSDGenericTree *item)
                              action.section(" ",-1,-1).toInt());
             nvp->SetBookmark();
             exitPlayer = true;
-            wantsToQuit = true;
             jumpToProgram = true;
         }
         else
@@ -6666,7 +6921,7 @@ void TV::SetJumpToProgram(QString progKey, int progIndex)
     ProgramList plist = Iprog.data();
     ProgramInfo *p = plist.at(progIndex);
     VERBOSE(VB_IMPORTANT, QString("Switching to program: %1: %2").arg(p->title).arg(p->subtitle));
-    setLastProgram(new ProgramInfo(*p));
+    setLastProgram(p);
 }
 
 void TV::ToggleSleepTimer(const QString time)
@@ -7090,6 +7345,103 @@ void TV::DVDJumpForward(void)
                                 osd_general_timeout);
         }
     }
+}
+
+
+void
+TV::PromptStopWatchingRecording(void)
+{
+    ClearOSD();
+    DoPause(false);
+    dialogboxTimer.restart();
+    QString message;
+    QStringList options;
+    if (playbackinfo && !playbackinfo->isVideo)
+    {
+        message = tr("You are exiting this recording");
+
+        options += tr("Keep Watching");
+        options += tr("Bookmark This Position");
+        options += tr("Do Not Bookmark This Position");
+        options += tr("Delete Recording");
+
+        dialogname = "exitplayoptions";
+    }
+    else if (playbackinfo && playbackinfo->isVideo)
+    {
+        message = tr("You are exiting this Video/DVD");
+        options += tr("Keep Watching");
+        options += tr("Exit Video");
+        
+        dialogname = "videoexitplayoptions";
+    }
+
+    if (GetOSD())
+        GetOSD()->NewDialogBox(dialogname, message, options, 0);
+}
+
+void TV::PromptDeleteRecording(QString title)
+{
+    if (playbackinfo->isVideo ||
+        doing_ff_rew ||
+        StateIsLiveTV(internalState) ||
+        exitPlayer)
+    {
+        return;
+    }
+
+    ClearOSD();
+    DoPause(false);
+    dialogboxTimer.restart();
+    
+    if (dialogname == "")
+    {
+        QMap<QString, QString> infoMap;
+        playbackinfo->ToMap(infoMap);
+        QString message = tr("%1\nChannel: %2\nTitle: %3\n (%4)")
+                            .arg(title, infoMap["channum"])
+                            .arg(infoMap["title"]).arg(infoMap["timedate"]);
+        QStringList options;
+        if (requestDelete)
+        {
+            options += "Yes and allow re-record";
+            options += "Yes, delete it";
+            options += "No, keep it, I changed my mind";
+        }
+        else
+        {
+            options += tr("Do not delete. Just exit");
+            options += tr("Delete this recording");
+            if (!activenvp->IsNearEnd())
+                options += tr("Keep Watching");
+        }
+        
+        dialogname = "askdeleterecording";
+        
+        if (GetOSD())
+            GetOSD()->NewDialogBox(dialogname, message, options, 0);
+    }
+}
+
+bool TV::IsVideoExitDialog(void)
+{
+    if (dialogname == "")
+        return false;
+    
+    return (dialogname == "askdeleterecording" ||
+            dialogname == "exitplayoptions"    ||
+            dialogname == "videoexitplayoptions");
+}
+
+void TV::setLastProgram(ProgramInfo *rcinfo)
+{
+    if (lastProgram)
+        delete lastProgram;
+
+    if (rcinfo)
+        lastProgram = new ProgramInfo(*rcinfo);
+    else
+        lastProgram = NULL;
 }
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

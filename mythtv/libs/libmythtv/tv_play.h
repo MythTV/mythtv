@@ -112,13 +112,18 @@ class MPUBLIC TV : public QObject
     // Recording commands
     int  PlayFromRecorder(int recordernum);
     int  Playback(ProgramInfo *rcinfo);
-    void setLastProgram(ProgramInfo *rcinfo) { lastProgram = rcinfo; }
+    void setLastProgram(ProgramInfo *rcinfo); 
     ProgramInfo *getLastProgram(void) { return lastProgram; }
+    void setInPlayList(bool setting) { inPlaylist = setting; }
+    void setUnderNetworkControl(bool setting) { underNetworkControl = setting; }
 
     // Various commands
     void ShowNoRecorderDialog(void);
     void FinishRecording(void);
     void AskAllowRecording(const QStringList&, int, bool);
+    void PromptStopWatchingRecording(void);
+    void PromptDeleteRecording(QString title);
+    
 
     // Boolean queries
 
@@ -139,6 +144,8 @@ class MPUBLIC TV : public QObject
     /// Returns true if the user told MythTV to delete the recording
     /// we were most recently playing.
     bool getRequestDelete(void)  const { return requestDelete; }
+    /// Returns true if the user told Mythtv to allow re-recording of the show
+    bool getAllowRerecord(void) const { return allowRerecord;  }
     /// This is set to true if the player reaches the end of the
     /// recording without the user explicitly exiting the player.
     bool getEndOfRecording(void) const { return endOfRecording; }
@@ -147,7 +154,9 @@ class MPUBLIC TV : public QObject
     bool getJumpToProgram(void)  const { return jumpToProgram; }
     /// This is set if the player encountered some irrecoverable error.
     bool IsErrored(void)         const { return errored; }
-
+    /// true if dialog is either videoplayexit, playexit or askdelete dialog
+    bool IsVideoExitDialog(void);
+    
     // Other queries
     int GetLastRecorderNum(void) const;
     TVState GetState(void) const;
@@ -162,6 +171,9 @@ class MPUBLIC TV : public QObject
 
     // static functions
     static void InitKeys(void);
+    static bool StartTV(ProgramInfo *tvrec = NULL, bool startInGuide = false,
+                        bool inPlaylist = false, bool initByNetworkCommand = false);
+        
 
     void SetIgnoreKeys(bool ignore) { ignoreKeys = ignore; }
 
@@ -239,7 +251,7 @@ class MPUBLIC TV : public QObject
     void ToggleSleepTimer(const QString);
 
     void DoPlay(void);
-    void DoPause(void);
+    void DoPause(bool showOSD = true);
     void DoSeek(float time, const QString &mesg);
     bool DoNVPSeek(float time);
     enum ArbSeekWhence {
@@ -379,6 +391,7 @@ class MPUBLIC TV : public QObject
     int     stickykeys;
     float   ff_rew_repos;
     bool    ff_rew_reverse;
+    bool    jumped_back; ///< Used by PromptDeleteRecording 
     vector<int> ff_rew_speeds;
 
     uint    vbimode;
@@ -403,6 +416,7 @@ class MPUBLIC TV : public QObject
     bool update_osd_pos; ///< Redisplay osd?
     bool endOfRecording; ///< !nvp->IsPlaying() && StateIsPlaying(internalState)
     bool requestDelete;  ///< User wants last video deleted
+    bool allowRerecord;  ///< User wants to rerecord the last video if deleted
     bool doSmartForward;
     bool queuedTranscode;
     bool getRecorderPlaybackInfo; ///< Main loop should get recorderPlaybackInfo
@@ -500,6 +514,9 @@ class MPUBLIC TV : public QObject
     int          playbackLen;   ///< initial playbackinfo->CalculateLength()
     ProgramInfo *lastProgram;   ///< last program played with this player
     bool         jumpToProgram;
+    
+    bool         inPlaylist; ///< show is part of a playlist
+    bool         underNetworkControl; ///< initial show started via by the network control interface
 
     // Recording to play next, after LiveTV
     ProgramInfo *pseudoLiveTVRec[2];
@@ -536,6 +553,7 @@ class MPUBLIC TV : public QObject
     // OSD info
     QString         dialogname; ///< Name of current OSD dialog
     OSDGenericTree *treeMenu;   ///< OSD menu, 'm' using default keybindings
+    MythTimer  dialogboxTimer;  ///< How long a dialog box is on the screen
 
     /// UDPNotify instance which shows messages sent
     /// to the "UDPNotifyPort" in an OSD dialog.

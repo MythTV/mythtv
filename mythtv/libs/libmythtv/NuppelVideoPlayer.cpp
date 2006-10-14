@@ -1217,7 +1217,8 @@ bool NuppelVideoPlayer::GetFrameNormal(int onlyvideo)
 
     CheckPrebuffering();
 
-    if ((play_speed > 1.01f) && (audio_stretchfactor > 1.01f) && IsNearEnd())
+    if ((play_speed > 1.01f) && (audio_stretchfactor > 1.01f) && 
+         livetv && IsNearEnd())
     {
         VERBOSE(VB_PLAYBACK, LOC + "Near end, Slowing down playback.");
         Play(1.0f, true, true);
@@ -4007,17 +4008,28 @@ bool NuppelVideoPlayer::IsReallyNearEnd(void) const
 bool NuppelVideoPlayer::IsNearEnd(long long margin) const
 {
     long long framesRead, framesLeft;
+
+    if (!m_playbackinfo || m_playbackinfo->isVideo)
+        return false;
+    
+    margin = (margin >= 0) ? margin: (long long) (video_frame_rate*2);
+    margin = (long long) (margin * audio_stretchfactor);
     bool watchingTV = watchingrecording && nvr_enc && nvr_enc->IsValidRecorder();
+    
+    framesRead = GetDecoder()->GetFramesRead();
+  
+    if (m_tv && m_tv->GetState() == kState_WatchingPreRecorded)
+    {
+        framesLeft = totalFrames - framesRead;
+        return (framesLeft < margin);
+    }
+    
     if (!livetv && !watchingTV)
         return false;
 
     if (livetv && livetvchain && livetvchain->HasNext())
         return false;
 
-    margin = (margin >= 0) ? margin: (long long) (video_frame_rate*2);
-    margin = (long long) (margin * audio_stretchfactor);
-
-    framesRead = GetDecoder()->GetFramesRead();
     framesLeft = nvr_enc->GetCachedFramesWritten() - framesRead;
 
     // if it looks like we are near end, get an updated GetFramesWritten()

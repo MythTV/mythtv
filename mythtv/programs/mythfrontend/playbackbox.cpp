@@ -228,8 +228,7 @@ PlaybackBox::PlaybackBox(BoxType ltype, MythMainWindow *parent,
       progsInDB(0),
       // Other state
       curitem(NULL),                    delitem(NULL),
-      lastProgram(NULL),                progCache(NULL),
-      playingSomething(false),
+      progCache(NULL),                  playingSomething(false),
       // Selection state variables
       haveGroupInfoSet(false),          inTitle(false),
       leftRight(false),
@@ -415,12 +414,6 @@ PlaybackBox::~PlaybackBox(void)
     {
         delete delitem;
         delitem = NULL;
-    }
-
-    if (lastProgram)
-    {
-        delete lastProgram;
-        lastProgram = NULL;
     }
 
     clearProgramCache();
@@ -2280,104 +2273,17 @@ bool PlaybackBox::play(ProgramInfo *rec, bool inPlaylist)
 
     ProgramInfo *tvrec = new ProgramInfo(*rec);
 
-    TV *tv = new TV();
-    if (!tv->Init())
-    {
-        VERBOSE(VB_IMPORTANT, "PlaybackBox::play(): "
-                "Error, initializing TV class.");
-        delete tv;
-        delete tvrec;
-        return false;
-    }
-
     setEnabled(false);
     previewVideoState = kKilling; // stop preview playback and don't restart it
     playingSomething = true;
 
-    tv->setLastProgram(lastProgram);
-
-    if (tv->Playback(tvrec))
-    {
-        while (tv->GetState() != kState_None)
-        {
-            qApp->unlock();
-            qApp->processEvents();
-            usleep(100000);
-            qApp->lock();
-        }
-        while (tv->getJumpToProgram())
-        {
-            lastProgram = tv->getLastProgram();
-            ProgramInfo *tmpProgram = new ProgramInfo(*lastProgram);
-
-            if (lastProgram)
-                delete lastProgram;
-
-            lastProgram = new ProgramInfo(*tvrec);
-            tv->setLastProgram(lastProgram);
-
-            if (tvrec)
-                delete tvrec;
-
-            tvrec = tmpProgram;
-
-            if (tv->Playback(tvrec))
-            {
-                while (tv->GetState() != kState_None)
-                {
-                    qApp->unlock();
-                    qApp->processEvents();
-                    usleep(100000);
-                    qApp->lock();
-                }
-            }
-        }
-    }
-
-    if (lastProgram)
-        delete lastProgram;
-
-    lastProgram = new ProgramInfo(*tvrec);
+    playCompleted = TV::StartTV(tvrec, false, inPlaylist, underNetworkControl);
 
     playingSomething = false;
     setEnabled(true);
 
-    bool doremove = false;
-    bool doprompt = false;
 
-    if (tv->getEndOfRecording())
-        playCompleted = true;
-
-    if (tv->getRequestDelete() &&
-        !underNetworkControl &&
-        !inPlaylist)
-    {
-        doremove = true;
-    }
-    else if (tv->getEndOfRecording() &&
-             !underNetworkControl &&
-             !inPlaylist &&
-             gContext->GetNumSetting("EndOfRecordingExitPrompt"))
-    {
-        doprompt = true;
-    }
-
-    delete tv;
-
-    previewSuspend = doremove || doprompt;
-
-    if (doremove)
-    {
-        remove(tvrec);
-    }
-    else if (doprompt) 
-    {
-        promptEndOfRecording(tvrec);
-    }
-    else
-    {
-        previewVideoState = kStarting; // restart playback preview
-    }
+    previewVideoState = kStarting; // restart playback preview
 
     delete tvrec;
 
