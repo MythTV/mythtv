@@ -2378,16 +2378,16 @@ void TV::ProcessKeypress(QKeyEvent *e)
                     {
                         switch (result)
                         {
-                            case 1:
-                                exitPlayer = true;
-                                wantsToQuit = true;
-                                break;
-                            case 2:
+                            case 3:
                                 exitPlayer = true;
                                 wantsToQuit = true;
                                 allowRerecord = true;
                                 break;
-                            case 3:
+                            case 2:
+                                exitPlayer = true;
+                                wantsToQuit = true;
+                                break;
+                            case 1:
                                 exitPlayer = true;
                                 wantsToQuit = true;
                                 requestDelete = false;
@@ -7413,9 +7413,9 @@ void TV::PromptDeleteRecording(QString title)
         QStringList options;
         if (requestDelete)
         {
+            options += "No, do not delete";
             options += "Yes, delete it";
             options += "Yes and allow re-record";
-            options += "No, keep it, I changed my mind";
         }
         else
         {
