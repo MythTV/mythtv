@@ -307,7 +307,7 @@ void TV::InitKeys(void)
     REG_KEY("TV Playback", "JUMPREC", "Display menu of recorded programs to jump to", "");
     REG_KEY("TV Playback", "SIGNALMON", "Monitor Signal Quality", "F7");
     REG_KEY("TV Playback", "JUMPTODVDROOTMENU", "Jump to the DVD Root Menu", "");
-    REG_KEY("TV Playback", "STOPSHOW","Stop Watching a Recorded Show", "Ctrl+E");
+    REG_KEY("TV Playback", "EXITSHOWNOPROMPTS","Exit Show without any prompts", "Ctrl+E");
 
     /* Editing keys */
     REG_KEY("TV Editing", "CLEARMAP", "Clear editing cut points", "C,Q,Home");
@@ -2386,6 +2386,10 @@ void TV::ProcessKeypress(QKeyEvent *e)
                                 exitPlayer = true;
                                 wantsToQuit = true;
                                 break;
+                            case 3:
+                                exitPlayer = true;
+                                wantsToQuit = true;
+                                requestDelete = false;
                             default:
                                 requestDelete = false;
                                 if (activenvp->IsNearEnd())
@@ -2741,6 +2745,12 @@ void TV::ProcessKeypress(QKeyEvent *e)
                 sigMonMode  = !sigMonMode;
             }
         }
+        else if (action == "EXITSHOWNOPROMPTS")
+        {
+            requestDelete = false;
+            exitPlayer = true;
+            wantsToQuit = true;
+        }
         else if (action == "ESCAPE")
         {
             if (StateIsLiveTV(internalState) &&
@@ -2763,12 +2773,19 @@ void TV::ProcessKeypress(QKeyEvent *e)
             }
             else 
             {
-                if (nvp && gContext->GetNumSetting("PlaybackExitPrompt") > 0)
+                if (nvp && gContext->GetNumSetting("PlaybackExitPrompt") == 1 &&
+                    !underNetworkControl)
+                {
+                    PromptStopWatchingRecording();
+                    break;
+                }
+                else if (nvp && gContext->GetNumSetting("PlaybackExitPrompt") == 2)
                     nvp->SetBookmark();
                 if (nvp && gContext->GetNumSetting("AutomaticSetWatched", 0))
                     nvp->SetWatched();
                 exitPlayer = true;
                 wantsToQuit = true;
+                requestDelete = false;
             }
             break;
         }
@@ -2990,17 +3007,6 @@ void TV::ProcessKeypress(QKeyEvent *e)
             }
             else if (action == "JUMPTODVDROOTMENU")
                 activenvp->GoToDVDMenu("menu");
-            else if (action == "STOPSHOW")
-            {
-                if (gContext->GetNumSetting("PlaybackExitPrompt") == 1)
-                    PromptStopWatchingRecording();
-                else
-                {
-                    requestDelete = false;
-                    exitPlayer = true;
-                    wantsToQuit = true;
-                }
-            }
             else if (action == "GUIDE")
                 EditSchedule(kScheduleProgramGuide);
             else if (action == "FINDER")
