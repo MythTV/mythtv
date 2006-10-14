@@ -2334,10 +2334,10 @@ void TV::ProcessKeypress(QKeyEvent *e)
 
                     switch (result)
                     {
-                        case 0: case 1:
+                        case 0: case 3:
                             DoPause();
                             break;
-                        case 2:
+                        case 1:
                             nvp->SetBookmark();
                             exitPlayer = true;
                             wantsToQuit = true;
@@ -2346,7 +2346,8 @@ void TV::ProcessKeypress(QKeyEvent *e)
                             dialogname = "";
                             requestDelete = true;
                             DoPause();
-                            PromptDeleteRecording("Delete Recording?"); 
+                            PromptDeleteRecording(
+                                tr("Delete this recording?")); 
                             return;
                         default:
                             exitPlayer = true;
@@ -2380,11 +2381,11 @@ void TV::ProcessKeypress(QKeyEvent *e)
                             case 1:
                                 exitPlayer = true;
                                 wantsToQuit = true;
-                                allowRerecord = true;
                                 break;
                             case 2:
                                 exitPlayer = true;
                                 wantsToQuit = true;
+                                allowRerecord = true;
                                 break;
                             case 3:
                                 exitPlayer = true;
@@ -2419,7 +2420,8 @@ void TV::ProcessKeypress(QKeyEvent *e)
                                 dialogname = "";
                                 requestDelete = true;
                                 DoPause();
-                                PromptDeleteRecording("Delete Recording ? Are you Sure?");
+                                PromptDeleteRecording(
+                                    tr("Delete this recording?"));
                                 return;
                             case 3:
                                 requestDelete = false;
@@ -2997,7 +2999,7 @@ void TV::ProcessKeypress(QKeyEvent *e)
                
                 requestDelete = true;
                 if (gContext->GetNumSetting("PlaybackExitPrompt") == 1)
-                    PromptDeleteRecording("Delete Recording ? Are You Sure ?");
+                    PromptDeleteRecording(tr("Delete this recording?"));
                 else
                 {
                     exitPlayer = true;
@@ -7366,16 +7368,17 @@ TV::PromptStopWatchingRecording(void)
     {
         message = tr("You are exiting this recording");
 
-        options += tr("Keep Watching");
-        options += tr("Bookmark This Position");
-        options += tr("Do Not Bookmark This Position");
-        options += tr("Delete Recording");
+        options += tr("Save this position and go to the menu");
+        options += tr("Do not save, just exit to the menu");
+        options += tr("Keep watching");
+        options += tr("Delete this recording");
 
         dialogname = "exitplayoptions";
     }
     else if (playbackinfo && playbackinfo->isVideo)
     {
         message = tr("You are exiting this Video/DVD");
+
         options += tr("Keep Watching");
         options += tr("Exit Video");
         
@@ -7404,14 +7407,14 @@ void TV::PromptDeleteRecording(QString title)
     {
         QMap<QString, QString> infoMap;
         playbackinfo->ToMap(infoMap);
-        QString message = tr("%1\nChannel: %2\nTitle: %3\n (%4)")
-                            .arg(title, infoMap["channum"])
-                            .arg(infoMap["title"]).arg(infoMap["timedate"]);
+        QString message = QString("%1\n%2\n%3")
+                                  .arg(title).arg(infoMap["title"])
+                                  .arg(infoMap["timedate"]);
         QStringList options;
         if (requestDelete)
         {
-            options += "Yes and allow re-record";
             options += "Yes, delete it";
+            options += "Yes and allow re-record";
             options += "No, keep it, I changed my mind";
         }
         else
