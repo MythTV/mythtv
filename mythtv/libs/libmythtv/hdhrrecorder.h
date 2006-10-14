@@ -39,8 +39,8 @@ class HDHRRecorder : public DTVRecorder,
     void StartRecording(void);
 
     void SetStreamData(MPEGStreamData*);
-    MPEGStreamData *GetStreamData(void);
-    ATSCStreamData *GetATSCStreamData(void) { return _stream_data; }
+    MPEGStreamData *GetStreamData(void) { return _stream_data; }
+    ATSCStreamData *GetATSCStreamData(void);
 
     // MPEG Stream Listener
     void HandlePAT(const ProgramAssociationTable*);
@@ -69,7 +69,7 @@ class HDHRRecorder : public DTVRecorder,
   private:
     HDHRChannel                   *_channel;
     struct hdhomerun_video_sock_t *_video_socket;
-    ATSCStreamData                *_stream_data;
+    MPEGStreamData                *_stream_data;
 
     ProgramAssociationTable       *_input_pat;
     ProgramMapTable               *_input_pmt;
