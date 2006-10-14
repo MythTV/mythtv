@@ -2893,7 +2893,10 @@ QString ProgramInfo::RecStatusChar(void) const
     case rsRecorded:
         return QObject::tr("R", "RecStatusChar rsRecorded");
     case rsRecording:
-        return QString::number(cardid);
+        if (cardid > 0)
+            return QString::number(cardid);
+        else
+            return QObject::tr("R", "RecStatusChar rsCurrentRecording");
     case rsWillRecord:
         return QString::number(cardid);
     case rsDontRecord:
