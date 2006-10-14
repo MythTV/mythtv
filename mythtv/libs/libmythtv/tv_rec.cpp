@@ -1822,25 +1822,26 @@ bool TVRec::SetupDTVSignalMonitor(void)
  *  \brief This creates a SignalMonitor instance if one is needed and
  *         begins signal monitoring.
  *
- *   If the channel exists and the cardtype is "DVB" or "HDTV" a 
- *   SignalMonitor instance is created and SignalMonitor::Start()
+ *   If the channel exists and the cardtype is "DVB", "HDTV" or "HDHomeRun"
+ *   a SignalMonitor instance is created and SignalMonitor::Start()
  *   is called to start the signal monitoring thread.
  *
  *  \param tablemon If set we enable table monitoring
  *  \param notify   If set we notify the frontend of the signal values
+ *  \return true on success, false on failure
  */
-void TVRec::SetupSignalMonitor(bool tablemon, bool notify)
+bool TVRec::SetupSignalMonitor(bool tablemon, bool notify)
 {
     VERBOSE(VB_RECORD, LOC + "SetupSignalMonitor("
             <<tablemon<<", "<<notify<<")");
 
     // if it already exists, there no need to initialize it
     if (signalMonitor)
-        return;
+        return true;
 
     // if there is no channel object we can't monitor it
     if (!channel)
-        return;
+        return false;
 
     // make sure statics are initialized
     SignalMonitorValue::Init();
@@ -1852,8 +1853,13 @@ void TVRec::SetupSignalMonitor(bool tablemon, bool notify)
     {
         VERBOSE(VB_RECORD, LOC + "Signal monitor successfully created");
         // If this is a monitor for Digital TV, initialize table monitors
-        if (GetDTVSignalMonitor() && tablemon)
-            SetupDTVSignalMonitor();
+        if (GetDTVSignalMonitor() && tablemon && !SetupDTVSignalMonitor())
+        {
+            VERBOSE(VB_IMPORTANT, LOC_ERR +
+                    "Failed to setup digital signal monitoring");
+
+            return false;
+        }
 
         connect(signalMonitor, SIGNAL(AllGood(void)),
                 this, SLOT(SignalMonitorAllGood(void)));
@@ -1864,6 +1870,8 @@ void TVRec::SetupSignalMonitor(bool tablemon, bool notify)
         // Start the monitoring thread
         signalMonitor->Start();
     }
+
+    return true;
 }
 
 /** \fn TVRec::TeardownSignalMonitor()
@@ -3505,7 +3513,21 @@ void TVRec::TuningFrequency(const TuningRequest &request)
     if (use_sm)
     {
         VERBOSE(VB_RECORD, LOC + "Starting Signal Monitor");
-        SetupSignalMonitor(!antadj, livetv | antadj);
+        bool error = false;
+        if (!SetupSignalMonitor(!antadj, livetv | antadj))
+        {
+            VERBOSE(VB_IMPORTANT, LOC_ERR + "Failed to setup signal monitor");
+            if (signalMonitor)
+            {
+                signalMonitor->deleteLater();
+                signalMonitor = NULL;
+            }
+
+            // pretend the signal monitor is running to prevent segfault
+            SetFlags(kFlagSignalMonitorRunning);
+            ClearFlags(kFlagWaitingForSignal);
+            error = true;
+        }
 
         if (signalMonitor)
         {
@@ -3533,6 +3555,11 @@ void TVRec::TuningFrequency(const TuningRequest &request)
             VERBOSE(VB_RECORD, "DummyDTVRecorder -- started");
             SetFlags(kFlagRingBufferReady);
         }
+
+        // if we had problems starting the signal monitor,
+        // we don't want to start the recorder...
+        if (error)
+            return;
     }
 
     // Request a recorder, if the command is a recording command
