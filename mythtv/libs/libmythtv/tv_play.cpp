@@ -2408,13 +2408,9 @@ void TV::ProcessKeypress(QKeyEvent *e)
                         switch (result)
                         {
                             case 1:
-                                if (activenvp->IsNearEnd())
-                                {
-                                    exitPlayer = true;
-                                    wantsToQuit = true;
-                                }
-                                else
-                                    DoPause();
+                                exitPlayer = true;
+                                wantsToQuit = true;
+                                requestDelete = false;
                                 break;
                             case 2:
                                 dialogname = "";
@@ -2423,7 +2419,7 @@ void TV::ProcessKeypress(QKeyEvent *e)
                                 PromptDeleteRecording(
                                     tr("Delete this recording?"));
                                 return;
-                            case 3:
+                            default:
                                 requestDelete = false;
                                 if (activenvp->IsNearEnd())
                                 {
@@ -2776,7 +2772,7 @@ void TV::ProcessKeypress(QKeyEvent *e)
             else 
             {
                 if (nvp && gContext->GetNumSetting("PlaybackExitPrompt") == 1 &&
-                    !underNetworkControl)
+                    !underNetworkControl && !prbuffer->InDVDMenuOrStillFrame())
                 {
                     PromptStopWatchingRecording();
                     break;
@@ -2996,16 +2992,7 @@ void TV::ProcessKeypress(QKeyEvent *e)
                 NormalSpeed();
                 StopFFRew();
                 nvp->SetBookmark(); 
-               
-                requestDelete = true;
-                if (gContext->GetNumSetting("PlaybackExitPrompt") == 1)
-                    PromptDeleteRecording(tr("Delete this recording?"));
-                else
-                {
-                    exitPlayer = true;
-                    wantsToQuit = true;
-                }
-
+                PromptDeleteRecording("Delete Recording ?");
             }
             else if (action == "JUMPTODVDROOTMENU")
                 activenvp->GoToDVDMenu("menu");
