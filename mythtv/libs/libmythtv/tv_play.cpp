@@ -2992,7 +2992,7 @@ void TV::ProcessKeypress(QKeyEvent *e)
                 NormalSpeed();
                 StopFFRew();
                 nvp->SetBookmark(); 
-                PromptDeleteRecording("Delete Recording ?");
+                PromptDeleteRecording(tr("Delete this recording?"));
             }
             else if (action == "JUMPTODVDROOTMENU")
                 activenvp->GoToDVDMenu("menu");
