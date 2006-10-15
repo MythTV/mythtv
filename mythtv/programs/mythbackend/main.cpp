@@ -268,6 +268,7 @@ int main(int argc, char **argv)
     bool testsched = false;
     bool resched = false;
     bool nosched = false;
+    bool noupnp = false;
     bool nojobqueue = false;
     bool nohousekeeper = false;
     bool noexpirer = false;
@@ -378,6 +379,10 @@ int main(int argc, char **argv)
         {
             nosched = true;
         } 
+        else if (!strcmp(a.argv()[argpos],"--noupnp"))
+        {
+            noupnp = true;
+        } 
         else if (!strcmp(a.argv()[argpos],"--nojobqueue"))
         {
             nojobqueue = true;
@@ -422,6 +427,7 @@ int main(int argc, char **argv)
                     "--testsched                    Test run scheduler (ignore existing schedule)" << endl <<
                     "--resched                      Force the scheduler to update" << endl <<
                     "--nosched                      Do not perform any scheduling" << endl <<
+                    "--noupnp                       Do not enable the UPNP server" << endl <<
                     "--nojobqueue                   Do not start the JobQueue" << endl <<
                     "--nohousekeeper                Do not start the Housekeeper" << endl <<
                     "--noautoexpire                 Do not start the AutoExpire thread" << endl <<
@@ -626,7 +632,11 @@ int main(int argc, char **argv)
     g_pHttpServer->RegisterExtension(new HttpStatus(&tvList, sched, expirer, ismaster ));
 
     // Start UPnP Services For Master Backends Only
-    if (ismaster)
+    if (ismaster && noupnp)
+        cerr << "********* The UPNP service has been DISABLED with the "
+                "--noupnp option *********\n";
+
+    if (ismaster && !noupnp)
     {
         g_pUPnp = new UPnp(ismaster, g_pHttpServer);
 
