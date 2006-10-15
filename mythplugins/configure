@@ -114,14 +114,20 @@ if [ -e config.log ] ; then
         PCONF=`echo $PCONF | sed 's/.\/configure//g'`
     fi
     for opt do
+        if test x"$opt" != x"--prev" -a x"$opt" != x"--previous" ; then
+            OTHOPT="$OTHOPT$opt"
+        fi
         if test x"$opt" = x"--prev" -o x"$opt" = x"--previous" ; then
             if test x"$PCONF" != "--prev" ; then
-                echo "Options: $PCONF"
-                ./configure $PCONF
-                exit
+                PREV="yes";
             fi
         fi
     done
+    if test x"$PREV" = x"yes"; then
+        echo "Options: $PCONF $OTHOPT"
+        ./configure $PCONF $OTHOPT
+        exit
+    fi
 fi
 
 CONFIGURATION_OPTS=""
