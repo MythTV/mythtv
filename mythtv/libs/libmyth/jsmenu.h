@@ -64,7 +64,7 @@ class JoystickMap
 ** JoystickMenuClient
 **  Main object for injecting key strokes based on joystick movements
 **--------------------------------------------------------------------------*/
-class JoystickMenuClient : public QObject
+class MPUBLIC JoystickMenuClient : public QObject
 {
     Q_OBJECT
   public:
