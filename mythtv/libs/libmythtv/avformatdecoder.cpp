@@ -1355,10 +1355,8 @@ int AvFormatDecoder::ScanStreams(bool novideo)
                 enc->decode_cc_dvd  = decode_cc_dvd;
 
                 // Set the default stream to the stream
-                // with the lowest component tag.
-                if (selectedVideoIndex < 0 ||
-                    ic->streams[i]->component_tag <
-                    ic->streams[selectedVideoIndex]->component_tag)
+                // that is found first in the PMT
+                if (selectedVideoIndex < 0)
                 {
                     selectedVideoIndex = i;
                 }
