@@ -15,6 +15,7 @@ using namespace std;
 #include <mythtv/mythdbcon.h>
 #include <mythtv/lcddevice.h>
 #include <mythtv/libmythui/myththemedmenu.h>
+#include <mythtv/mythpluginapi.h>
 
 struct GameData
 {
@@ -75,12 +76,6 @@ void runMenu(QString which_menu)
         cerr << "Couldn't find theme " << themedir << endl;
         delete diag;
     }
-}
-
-extern "C" {
-int mythplugin_init(const char *libversion);
-int mythplugin_run(void);
-int mythplugin_config(void);
 }
 
 void runGames(void);

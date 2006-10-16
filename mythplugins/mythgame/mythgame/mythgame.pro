@@ -24,3 +24,8 @@ SOURCES += gamesettings.cpp dbcheck.cpp rom_metadata.cpp romedit.cpp
 macx {
     QMAKE_LFLAGS += -flat_namespace -undefined suppress
 }
+
+use_hidesyms {
+    QMAKE_CXXFLAGS += -fvisibility=hidden
+}
+
