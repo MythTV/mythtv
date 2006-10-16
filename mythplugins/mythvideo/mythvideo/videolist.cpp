@@ -17,7 +17,7 @@
 #include <iterator>
 #include <map>
 
-namespace
+namespace fake_unnamed
 {
     class meta_node
     {
@@ -408,6 +408,7 @@ namespace
         kOrderItem
     };
 }
+using namespace fake_unnamed;
 
 class VideoListImp
 {
@@ -972,7 +973,7 @@ int VideoListImp::addFileNode(GenericTree *where_to_add, const QString &name,
     return 1;
 }
 
-namespace
+namespace fake_unnamed
 {
     void copy_entries(meta_dir_node &dst, meta_dir_node &src,
                       const VideoFilterSettings &filter)
@@ -1083,7 +1084,7 @@ void VideoListImp::update_meta_view(bool flat_list)
     update_flat_index();
 }
 
-namespace
+namespace fake_unnamed
 {
     class dirhandler : public DirectoryHandler
     {
