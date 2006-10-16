@@ -38,6 +38,7 @@ using namespace std;
 
 #include "upnpcdstv.h"
 #include "upnpcdsmusic.h"
+#include "upnpcdsvideo.h"
 #include "httpstatus.h"
 
 QMap<int, EncoderLink *> tvList;
@@ -650,6 +651,11 @@ int main(int argc, char **argv)
         VERBOSE(VB_UPNP, "Main::Registering UPnpCDSMusic Extension");
 
         g_pUPnp->RegisterExtension(new UPnpCDSMusic());
+
+        VERBOSE(VB_UPNP, "Main::Registering UPnpCDSVideo Extension");
+
+        g_pUPnp->RegisterExtension(new UPnpCDSVideo());
+
     }
     // End uPnP &  Mini HttpServer Initialization
 

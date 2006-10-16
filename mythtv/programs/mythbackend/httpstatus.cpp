@@ -73,6 +73,7 @@ HttpStatusMethod HttpStatus::GetMethod( const QString &sURI )
     if (sURI == "getExpiring"          ) return( HSM_GetExpiring     );
     if (sURI == "getPreviewImage"      ) return( HSM_GetPreviewImage );
     if (sURI == "getRecording"         ) return( HSM_GetRecording    );
+    if (sURI == "getVideo"             ) return( HSM_GetVideo        );
     if (sURI == "getMusic"             ) return( HSM_GetMusic        );
 
     if (sURI == "getDeviceDesc"        ) return( HSM_GetDeviceDesc   );
@@ -118,6 +119,8 @@ bool HttpStatus::ProcessRequest( HttpWorkerThread *pThread, HTTPRequest *pReques
 
                 case HSM_GetRecording   : GetRecording   ( pThread, pRequest ); return( true );
                 case HSM_GetMusic       : GetMusic       ( pThread, pRequest ); return( true );
+                case HSM_GetVideo       : GetVideo       ( pThread, pRequest ); return( true );
+
                 default: break;
             }
         }
@@ -1051,6 +1054,82 @@ void HttpStatus::GetMusic( HttpWorkerThread *pThread,
         // ------------------------------------------------------------------
 
         pData = new ThreadData( nTrack, pRequest->m_sFileName );
+
+        pThread->SetWorkerData( pData );
+    }
+
+    // ----------------------------------------------------------------------
+    // check to see if the file exists
+    // ----------------------------------------------------------------------
+
+    if (QFile::exists( pRequest->m_sFileName ))
+    {
+        pRequest->m_eResponseType   = ResponseTypeFile;
+        pRequest->m_nResponseStatus = 200;
+    }
+}
+
+void HttpStatus::GetVideo( HttpWorkerThread *pThread,
+                           HTTPRequest      *pRequest )
+{
+    pRequest->m_eResponseType   = ResponseTypeHTML;
+    pRequest->m_mapRespHeaders[ "Cache-Control" ] = "no-cache=\"Ext\", max-age = 5000";
+    pRequest->m_nResponseStatus = 404;
+
+    QString sId   = pRequest->m_mapParams[ "VideoID"    ];
+
+    if (sId.length() == 0) 
+        return;
+
+    // ----------------------------------------------------------------------
+    // Check to see if this is another request for the same recording...
+    // ----------------------------------------------------------------------
+
+    ThreadData *pData = (ThreadData *)pThread->GetWorkerData();
+
+    if ((pData != NULL) && (pData->m_eType == ThreadData::DT_Video))
+    {
+        if (pData->m_sVideoID == sId )
+           pRequest->m_sFileName = pData->m_sFileName;
+        else
+           pData = NULL;
+
+    }
+
+    // ----------------------------------------------------------------------
+    // New request if pData == NULL
+    // ----------------------------------------------------------------------
+
+    if (pData == NULL)
+    {
+        QString sBasePath = "";
+
+        // ------------------------------------------------------------------
+        // Load Track's FileName
+        // ------------------------------------------------------------------
+
+        MSqlQuery query(MSqlQuery::InitCon());
+
+        if (query.isConnected())
+        {
+            query.prepare("SELECT filename FROM videometadata WHERE intid = :KEY" );
+            query.bindValue(":KEY", sId );
+            query.exec();
+
+            if (query.isActive() && query.size() > 0)
+            {
+                query.first();
+                pRequest->m_sFileName = QString( "%1/%2" )
+                                           .arg( sBasePath )
+                                           .arg( query.value(0).toString() );
+            }
+        }
+
+        // ------------------------------------------------------------------
+        // Store information in WorkerThread Storage for next request (cache)
+        // ------------------------------------------------------------------
+
+        pData = new ThreadData( sId, pRequest->m_sFileName );
 
         pThread->SetWorkerData( pData );
     }

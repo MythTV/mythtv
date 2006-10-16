@@ -48,7 +48,9 @@ typedef enum
     HSM_Asterisk        = 16,
 
     HSM_GetExpiring       = 17,
-    HSM_GetProgramDetails = 18
+    HSM_GetProgramDetails = 18,
+
+    HSM_GetVideo        = 19
 
 } HttpStatusMethod;
 
@@ -68,7 +70,9 @@ class ThreadData : public HttpWorkerData
         {
             DT_Unknown   = 0,
             DT_Recording = 1,
-            DT_Music     = 2
+            DT_Music     = 2,
+            DT_Video     = 3
+
 
         } ThreadDataType;
         
@@ -78,6 +82,7 @@ class ThreadData : public HttpWorkerData
         QString         m_sChanId;   
         QString         m_sStartTime;
         QString         m_sFileName;
+        QString         m_sVideoID;
 
         int             m_nTrackNumber;
 
@@ -99,6 +104,15 @@ class ThreadData : public HttpWorkerData
             m_sStartTime = sStartTime;
             m_sFileName  = sFileName;
         }
+
+        ThreadData( const QString &sVideoID,
+                    const QString &sFileName )
+        {
+            m_eType      = DT_Video;
+            m_sVideoID   = sVideoID;
+            m_sFileName  = sFileName;
+        }
+
 
         virtual ~ThreadData() 
         {
@@ -155,6 +169,9 @@ class HttpStatus : public HttpServerExtension
                                  HTTPRequest      *pRequest );
 
         void    GetMusic       ( HttpWorkerThread *pThread, 
+                                 HTTPRequest      *pRequest );
+
+        void    GetVideo       ( HttpWorkerThread *pThread,
                                  HTTPRequest      *pRequest );
 
         void    GetDeviceDesc  ( HTTPRequest *pRequest ); 
