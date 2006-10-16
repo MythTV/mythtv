@@ -164,7 +164,10 @@ bool TV::StartTV (ProgramInfo *tvrec, bool startInGuide,
     if (curProgram)
     {
         if (deleterecording)
+        {
+            curProgram->UpdateLastDelete(true);
             RemoteDeleteRecording(curProgram, allowrerecord, false);
+        }
         else if (!curProgram->isVideo)
         {
             lastProgramStringList.clear();

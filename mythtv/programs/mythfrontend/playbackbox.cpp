@@ -1737,7 +1737,7 @@ bool PlaybackBox::FillList(bool useCachedData)
                     p->recpriority2 += maxAge * (48 - hrs) / 48;
             }
             // Daily 
-            else if (spanHours[recid] < 36 ||
+            else if (spanHours[recid] < 50 ||
                      recType[recid] == kTimeslotRecord ||
                      recType[recid] == kFindDailyRecord)
             {
@@ -2307,13 +2307,7 @@ bool PlaybackBox::doRemove(ProgramInfo *rec, bool forgetHistory,
         togglePlayListItem(rec);
 
     if (!forceMetadataDelete)
-    {
-        MSqlQuery query(MSqlQuery::InitCon());
-        query.prepare("UPDATE record SET last_delete = NOW() "
-                      "WHERE recordid = :RECORDID");
-        query.bindValue(":RECORDID", rec->recordid);
-        query.exec();
-    }
+        rec->UpdateLastDelete(true);
 
     return RemoteDeleteRecording(rec, forgetHistory, forceMetadataDelete);
 }
