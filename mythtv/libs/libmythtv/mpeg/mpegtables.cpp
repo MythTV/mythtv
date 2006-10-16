@@ -422,8 +422,8 @@ const QString ProgramAssociationTable::toString() const
         const unsigned char* p = psipdata() + (i<<2);
         str.append(QString("  program number %1").arg(int(ProgramNumber(i)))).
             append(QString(" has PID 0x%1   data ").arg(ProgramPID(i),4,16)).
-            append(QString(" 0x%1 0x%2").arg(int(p[0])).arg(int(p[1]))).
-            append(QString(" 0x%1 0x%2\n").arg(int(p[2])).arg(int(p[3])));
+            append(QString(" 0x%1 0x%2").arg(p[0],2,16).arg(p[1],2,16)).
+            append(QString(" 0x%1 0x%2\n").arg(p[2],2,16).arg(p[3],2,16));
     }
     return str;
 }
@@ -448,7 +448,7 @@ const QString ProgramMapTable::toString() const
     {
         str.append(QString(" Stream #%1 pid(0x%2) type(%3  0x%4)\n")
                    .arg(i).arg(StreamPID(i), 0, 16)
-                   .arg(StreamTypeString(i)).arg(int(StreamType(i))));
+                   .arg(StreamTypeString(i)).arg(StreamType(i), 0, 16));
         if (0 != StreamInfoLength(i))
         {
             vector<const unsigned char*> desc = 
