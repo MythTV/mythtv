@@ -22,6 +22,7 @@ EITFixUp::EITFixUp()
       m_ukCC("\\[(AD)(,(S)){,1}(,SL){,1}\\]|\\[(S)(,AD){,1}(,SL){,1}\\]|"
              "\\[(SL)(,AD){,1}(,(S)){,1}\\]"),
       m_ukYear("[\\[\\(]([\\d]{4})[\\)\\]]"),
+      m_uk24ep("^\\d{1,2}:00[ap]m to \\d{1,2}:00[ap]m: "),
       m_comHemCountry("^(\\(.+\\))?\\s?([^ ]+)\\s([^\\.0-9]+)"
                       "(?:\\sfrån\\s([0-9]{4}))(?:\\smed\\s([^\\.]+))?\\.?"),
       m_comHemDirector("[Rr]egi"),
@@ -236,6 +237,15 @@ void EITFixUp::FixUK(DBEvent &event) const
     {
         event.subtitle = event.title.mid(position + 1);
         event.title = event.title.left(position);
+    }
+
+    // Special case for episodes of 24.
+    QRegExp tmp24ep = m_uk24ep;
+    if ((position = tmp24ep.search(event.description)) != -1)
+    {
+        // -2 from the length cause we don't want ": " on the end
+        event.subtitle = event.description.mid(position, tmp24ep.cap(0).length() - 2);
+        event.description = event.description.replace(tmp24ep.cap(0),"");
     }
     else if ((position = event.description.find(":")) != -1)
     {
