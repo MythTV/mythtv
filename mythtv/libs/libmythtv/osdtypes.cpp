@@ -2349,6 +2349,12 @@ void OSDTypeCC::Draw(OSDSurface *surface, int fade, int maxfade, int xoff,
     maxfade = maxfade;
     xoff = xoff;
     yoff = yoff;
+ 
+    static const QColor clr[8] =
+    {
+        Qt::white,   Qt::red,     Qt::green, Qt::yellow,
+        Qt::blue,    Qt::magenta, Qt::cyan,  Qt::white,
+    };
 
     vector<ccText*>::iterator i = m_textlist->begin();
     for (; i != m_textlist->end(); i++)
@@ -2391,19 +2397,9 @@ void OSDTypeCC::Draw(OSDSurface *surface, int fade, int maxfade, int xoff,
                 m_box->Draw(surface, 0, 0, x - 2, y - 2);
             }
 
-            m_font->setOutline(TRUE);
-
-            switch (cc->color)
-            {
-                case 1: m_font->setColor((Qt::red), kTTF_Normal); break;
-                case 2: m_font->setColor((Qt::green), kTTF_Normal); break;
-                case 3: m_font->setColor((Qt::yellow), kTTF_Normal); break;
-                case 4: m_font->setColor((Qt::blue), kTTF_Normal); break;
-                case 5: m_font->setColor((Qt::magenta), kTTF_Normal); break;
-                case 6: m_font->setColor((Qt::cyan), kTTF_Normal); break;
-                case 7: m_font->setColor((Qt::white), kTTF_Normal); break;
-                default: m_font->setColor((Qt::white), kTTF_Normal); break;
-            }
+            m_font->setOutline(!m_ccbackground);
+            m_font->setColor(Qt::black, kTTF_Outline);
+            m_font->setColor(clr[max(min(0, cc->color), 7)], kTTF_Normal);
 
             m_font->DrawString(surface, x, y + 2, cc->text, maxx, maxy, 255); 
         }
