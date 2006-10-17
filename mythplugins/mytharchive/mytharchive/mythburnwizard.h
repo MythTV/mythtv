@@ -105,6 +105,8 @@ class MythburnWizard : public MythThemedDialog
     void loadConfiguration(void);
     void saveConfiguration(void);
     void updateSelectedArchiveList(void);
+    void toggleReorderState(void);
+    void reloadSelectedList(void);
     void showEditMetadataDialog();
     QString loadFile(const QString &filename);
     vector<ArchiveItem *>  *getArchiveListFromDB(void);
@@ -146,6 +148,10 @@ class MythburnWizard : public MythThemedDialog
 
     UIListBtnType  *archive_list;
     UIListBtnType  *selected_list;
+
+    // selected list reordering state
+    bool            bReordering;
+    QPixmap        *movePixmap;
 
     bool            bCreateISO;
     bool            bDoBurn;

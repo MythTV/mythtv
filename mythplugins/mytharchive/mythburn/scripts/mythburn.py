@@ -31,7 +31,7 @@
 #******************************************************************************
 
 # version of script - change after each update
-VERSION="0.1.20060910-1"
+VERSION="0.1.20061003-1"
 
 
 ##You can use this debug flag when testing out new themes
@@ -78,6 +78,9 @@ dvdrsize=(4482,8964)
 frameratePAL=25
 framerateNTSC=29.97
 
+#any aspect ratio above this value is assumed to be 16:9
+aspectRatioThreshold = 1.4
+
 #Just blank globals at startup
 temppath=""
 logpath=""
@@ -98,6 +101,8 @@ useFIFO = True
 encodetoac3 = False
 alwaysRunMythtranscode = False
 copyremoteFiles = False
+thumboffset = 10
+usebookmark = True
 
 #main menu aspect ratio (4:3 or 16:9)
 mainmenuAspectRatio = "16:9"
@@ -139,6 +144,10 @@ themeName = ''
 #Maximum of 10 theme fonts
 themeFonts = [0,0,0,0,0,0,0,0,0,0]
 
+# no. of processors we have access to
+cpuCount = 1
+
+
 def write(text, progress=True):
     """Simple place to channel all text output through"""
     sys.stdout.write(text + "\n")
@@ -160,9 +169,25 @@ def getTempPath():
     """This is the folder where all temporary files will be created."""
     return temppath
 
-def getIntroPath():
-    """This is the folder where all intro files are located."""
-    return os.path.join(sharepath, "mytharchive", "intro")
+def getCPUCount():
+    """return the number of CPU's"""
+    cpustat = open("/proc/cpuinfo")
+    cpudata = cpustat.readlines()
+    cpustat.close()
+
+    cpucount = 0
+    for line in cpudata:
+        tokens = line.split()
+        if len(tokens) > 0:
+            if tokens[0] == "processor":
+                cpucount += 1
+
+    if cpucount == 0:
+        cpucount = 1
+
+    write("Found %d CPUs" % cpucount)
+ 
+    return cpucount
 
 def getEncodingProfilePath():
     """This is the folder where all encoder profile files are located."""
@@ -223,6 +248,9 @@ def getThemeFile(theme,file):
 
     if os.path.exists(os.path.join(sharepath, "mytharchive", "images", file)):
         return os.path.join(sharepath, "mytharchive", "images", file)
+
+    if os.path.exists(os.path.join(sharepath, "mytharchive", "intro", file)):
+        return os.path.join(sharepath, "mytharchive", "intro", file)
 
     if os.path.exists(os.path.join(sharepath, "mytharchive", "music", file)):
         return os.path.join(sharepath, "mytharchive", "music", file)
@@ -366,7 +394,7 @@ def getAudioParams(folder):
 
     #error out if its the wrong XML
     if infoDOM.documentElement.tagName != "file":
-        fatalError("Stream info file doesn't look right (%s)" % os.path.join(getItemTempPath(index), 'streaminfo.xml'))
+        fatalError("Stream info file doesn't look right (%s)" % os.path.join(folder, 'streaminfo.xml'))
     audio = infoDOM.getElementsByTagName("file")[0].getElementsByTagName("streams")[0].getElementsByTagName("audio")[0]
 
     samplerate = audio.attributes["samplerate"].value
@@ -435,7 +463,13 @@ def createVideoChapters(itemnum, numofchapters, lengthofvideo, getthumbnails):
     while count<=numofchapters:
         chapters+=time.strftime("%H:%M:%S",time.gmtime(starttime))
 
-        thumbList+="%s," % starttime
+        if starttime==0:
+            if thumboffset < segment:
+                thumbList+="%s," % thumboffset
+            else:
+                thumbList+="%s," % starttime
+        else:
+            thumbList+="%s," % starttime
 
         if numofchapters>1:
             chapters+="," 
@@ -496,6 +530,8 @@ def getDefaultParametersFromMythTVDB():
                         'MythArchiveUseFIFO',
                         'MythArchiveMainMenuAR',
                         'MythArchiveChapterMenuAR',
+                        'MythArchiveDateFormat',
+                        'MythArchiveTimeFormat',
                         'ISO639Language0',
                         'ISO639Language1'
                         )) order by value"""
@@ -544,59 +580,6 @@ def getOptions(options):
     write("Options - mediatype = %d, doburn = %d, createiso = %d, erasedvdrw = %d" \
            % (mediatype, doburn, docreateiso, erasedvdrw))
     write("          savefilename = '%s'" % savefilename)
-
-def getTimeDateFormats():
-    """Reads date and time settings from MythTV database and converts them into python date time formats"""
-
-    global dateformat
-    global timeformat
-
-    #DateFormat = 	ddd MMM d
-    #ShortDateFormat = M/d
-    #TimeFormat = h:mm AP
-
-
-    write( "Obtaining date and time settings from MySQL database for hostname "+ configHostname)
-
-    #TVFormat is not dependant upon the hostname.
-    sqlstatement = """select value,data from settings where (hostname='"""  + configHostname \
-                        + """' and value in (
-                        'DateFormat',
-                        'ShortDateFormat',
-                        'TimeFormat'
-                        )) order by value"""
-
-    # connect
-    db = getDatabaseConnection()
-    # create a cursor
-    cursor = db.cursor()
-    # execute SQL statement
-    cursor.execute(sqlstatement)
-    # get the resultset as a tuple
-    result = cursor.fetchall()
-    #We must have exactly 3 rows returned or else we have some MythTV settings missing
-    if int(cursor.rowcount)!=3:
-        fatalError("Failed to get time formats from the DB")
-    db.close()
-    del db
-    del cursor
-
-    #Copy the results into a dictionary for easier use
-    mydict = {}
-    for i in range(len(result)):
-        mydict[result[i][0]] = result[i][1]
-
-    del result
-
-    #At present we ignore the date time formats from MythTV and default to these
-    #basically we need to convert the MythTV formats into Python formats
-    #spit2k1 - TO BE COMPLETED!!
-
-    #Date and time formats used to show recording times see full list at
-    #http://www.python.org/doc/current/lib/module-time.html
-    dateformat="%a %d %b %Y"    #Mon 15 Dec 2005
-    timeformat="%I:%M %p"       #8:15 pm
-
 
 def expandItemText(infoDOM, text, itemnumber, pagenumber, keynumber,chapternumber, chapterlist ):
     """Replaces keywords in a string with variables from the XML and filesystem"""
@@ -792,9 +775,57 @@ def getFileInformation(file, outputfile):
         node.appendChild(infoDOM.createTextNode(""))
         top_element.appendChild(node)
 
-    #recorded table contains
-    #progstart, stars, cutlist, category, description, subtitle, title, chanid
-    #2005-12-20 00:00:00, 0.0, 
+        #if this a myth recording we still need to find the chanid, starttime and hascutlist
+        if file.attributes["type"].value=="recording":
+            sqlstatement  = """SELECT starttime, chanid FROM recorded 
+                               WHERE basename = '%s'""" % file.attributes["filename"].value.replace("'", "\\'")
+
+            db = getDatabaseConnection()
+            cursor = db.cursor()
+            cursor.execute(sqlstatement)
+            result = cursor.fetchall()
+            numrows = int(cursor.rowcount)
+
+            #We must have exactly 1 row returned for this recording
+            if numrows!=1:
+                fatalError("Failed to get recording details from the DB for %s" % file.attributes["filename"].value)
+
+            # iterate through resultset
+            for record in result:
+                node = infoDOM.createElement("chanid")
+                node.appendChild(infoDOM.createTextNode("%s" % record[0]))
+                top_element.appendChild(node)
+
+                #date time is returned as 2005-12-19 00:15:00 
+                recdate=time.strptime( "%s" % record[1],"%Y-%m-%d %H:%M:%S")
+
+                node = infoDOM.createElement("starttime")
+                node.appendChild(infoDOM.createTextNode( time.strftime("%Y-%m-%dT%H:%M:%S", recdate)))
+                top_element.appendChild(node)
+
+                starttime = record[0]
+                chanid = record[1]
+
+                # find the cutlist if available
+                sqlstatement  = """SELECT mark, type FROM recordedmarkup 
+                                WHERE chanid = '%s' AND starttime = '%s' 
+                                AND type IN (0,1) ORDER BY mark""" % (chanid, starttime)
+                cursor = db.cursor()
+                # execute SQL statement
+                cursor.execute(sqlstatement)
+                if cursor.rowcount > 0:
+                    node = infoDOM.createElement("hascutlist")
+                    node.appendChild(infoDOM.createTextNode("yes"))
+                    top_element.appendChild(node)
+                else:
+                    node = infoDOM.createElement("hascutlist")
+                    node.appendChild(infoDOM.createTextNode("no"))
+                    top_element.appendChild(node)
+
+                db.close()
+                del db
+                del cursor
+
     elif file.attributes["type"].value=="recording":
         sqlstatement  = """SELECT progstart, stars, cutlist, category, description, subtitle, 
                            title, starttime, chanid
@@ -1067,11 +1098,16 @@ def preProcessFile(file, folder):
 
 def encodeAudio(format, sourcefile, destinationfile, deletesourceafterencode):
     write( "Encoding audio to "+format)
-    if format=="ac3":
-        cmd=path_ffmpeg[0] + " -v 0 -y -i '%s' -f ac3 -ab 192 -ar 48000 '%s'" % (sourcefile, destinationfile)
-        result=runCommand(cmd)
+    if format == "ac3":
+        cmd = path_ffmpeg[0] + " -v 0 -y "
 
-        if result!=0:
+        if cpuCount > 1:
+            cmd += "-threads %d " % cpuCount
+
+        cmd += "-i '%s' -f ac3 -ab 192 -ar 48000 '%s'" % (sourcefile, destinationfile)
+        result = runCommand(cmd)
+
+        if result != 0:
             fatalError("Failed while running ffmpeg to re-encode the audio to ac3\n"
                        "Command was %s" % cmd)
     else:
@@ -1087,6 +1123,19 @@ def multiplexMPEGStream(video, audio1, audio2, destination):
 
     if doesFileExist(destination)==True:
         os.remove(destination)
+
+    # figure out what audio files to use
+    if doesFileExist(audio1 + ".ac3"):
+        audio1 = audio1 + ".ac3"
+    elif doesFileExist(audio1 + ".mp2"):
+        audio1 = audio1 + ".mp2"
+    else:
+        fatalError("No audio stream available!")
+
+    if doesFileExist(audio2 + ".ac3"):
+        audio2 = audio2 + ".ac3"
+    elif doesFileExist(audio2 + ".mp2"):
+        audio2 = audio2 + ".mp2"
 
     if useFIFO==True:
         os.mkfifo(destination)
@@ -1130,6 +1179,10 @@ def getStreamInformation(filename, xmlFilename, lenMethod):
 
     if result <> 0:
         fatalError("Failed while running mytharchivehelper to get stream information from %s" % filename)
+
+    # print out the streaminfo.xml file to the log
+    infoDOM = xml.dom.minidom.parse(xmlFilename)
+    write("streaminfo.xml :-\n" + infoDOM.toprettyxml("    ", ""))
 
 def getVideoSize(xmlFilename):
     """Get video width and height from stream.xml file"""
@@ -1224,6 +1277,9 @@ def encodeVideoToMPEG2(source, destvideofile, video, audio1, audio2, aspectratio
     passes = int(getText(profileNode.getElementsByTagName("passes")[0]))
 
     command = path_ffmpeg[0]
+
+    if cpuCount > 1:
+        command += " -threads %d" % cpuCount
 
     parameters = profileNode.getElementsByTagName("parameter")
 
@@ -1357,6 +1413,10 @@ def encodeNuvToMPEG2(chanid, starttime, destvideofile, folder, profile, usecutli
     videores, fps, aspectratio = getVideoParams(folder)
 
     command =  path_ffmpeg[0] + " -y "
+
+    if cpuCount > 1:
+        command += "-threads %d " % cpuCount
+
     command += "-f s16le -ar %s -ac %s -i %s " % (samplerate, channels, os.path.join(folder, "audout")) 
     command += "-f rawvideo -pix_fmt yuv420p -s %s -aspect %s -r %s " % (videores, aspectratio, fps)
     command += "-i %s " % os.path.join(folder, "vidout")
@@ -1510,13 +1570,26 @@ def calculateFileSizes(files):
         file=os.path.join(folder,"stream.mv2")
         #Get size of video in MBytes
         totalvideosize+=os.path.getsize(file) / 1024 / 1024
+
         #Get size of audio track 1
-        totalaudiosize+=os.path.getsize(os.path.join(folder,"stream0.ac3")) / 1024 / 1024
+        if doesFileExist(os.path.join(folder,"stream0.ac3")):
+            totalaudiosize+=os.path.getsize(os.path.join(folder,"stream0.ac3")) / 1024 / 1024
+        if doesFileExist(os.path.join(folder,"stream0.mp2")):
+            totalaudiosize+=os.path.getsize(os.path.join(folder,"stream0.mp2")) / 1024 / 1024
+
         #Get size of audio track 2 if available 
         if doesFileExist(os.path.join(folder,"stream1.ac3")):
             totalaudiosize+=os.path.getsize(os.path.join(folder,"stream1.ac3")) / 1024 / 1024
+        if doesFileExist(os.path.join(folder,"stream1.mp2")):
+            totalaudiosize+=os.path.getsize(os.path.join(folder,"stream1.mp2")) / 1024 / 1024
+
+        # add chapter menu if available
         if doesFileExist(os.path.join(getTempPath(),"chaptermenu-%s.mpg" % filecount)):
             totalmenusize+=os.path.getsize(os.path.join(getTempPath(),"chaptermenu-%s.mpg" % filecount)) / 1024 / 1024
+
+        # add details page if available
+        if doesFileExist(os.path.join(getTempPath(),"details-%s.mpg" % filecount)):
+            totalmenusize+=os.path.getsize(os.path.join(getTempPath(),"details-%s.mpg" % filecount)) / 1024 / 1024
 
     filecount=1
     while doesFileExist(os.path.join(getTempPath(),"menu-%s.mpg" % filecount)):
@@ -1662,7 +1735,7 @@ def createDVDAuthorXML(screensize, numberofitems):
         #Pick the correct intro movie based on video format ntsc/pal
         vob = dvddom.createElement("vob")
         vob.setAttribute("pause","")
-        vob.setAttribute("file",os.path.join(getIntroPath(), videomode + '_' + introFile))
+        vob.setAttribute("file",os.path.join(getThemeFile(themeName, videomode + '_' + introFile)))
         pgc.appendChild(vob)
         del vob
 
@@ -1745,7 +1818,7 @@ def createDVDAuthorXML(screensize, numberofitems):
                 video.setAttribute("widescreen", "nopanscan")
             else: 
                 # use same aspect ratio as the video
-                if getAspectRatioOfVideo(itemnum) > 1.4:
+                if getAspectRatioOfVideo(itemnum) > aspectRatioThreshold:
                     video.setAttribute("aspect", "16:9")
                     video.setAttribute("widescreen", "nopanscan")
                 else:
@@ -1788,6 +1861,17 @@ def createDVDAuthorXML(screensize, numberofitems):
                     del button
                     x+=1
 
+                #add the titlemenu button if required
+                submenunode = themeDOM.getElementsByTagName("submenu")
+                submenunode = submenunode[0]
+                titlemenunodes = submenunode.getElementsByTagName("titlemenu")
+                if titlemenunodes.length > 0:
+                    button = dvddom.createElement("button")
+                    button.setAttribute("name","titlemenu")
+                    button.appendChild(dvddom.createTextNode("{jump vmgm menu;}"))
+                    mymenupgc.appendChild(button)
+                    del button
+
             titles = dvddom.createElement("titles")
             titleset.appendChild(titles)
 
@@ -1802,13 +1886,23 @@ def createDVDAuthorXML(screensize, numberofitems):
                 title_video.setAttribute("widescreen", "nopanscan")
             else: 
                 # use same aspect ratio as the video
-                if getAspectRatioOfVideo(itemnum) > 1.4:
+                if getAspectRatioOfVideo(itemnum) > aspectRatioThreshold:
                     title_video.setAttribute("aspect", "16:9")
                     title_video.setAttribute("widescreen", "nopanscan")
                 else:
                     title_video.setAttribute("aspect", "4:3")
 
             titles.appendChild(title_video)
+
+            #set right audio format
+            if doesFileExist(os.path.join(getItemTempPath(itemnum), "stream0.mp2")):
+                title_audio = dvddom.createElement("audio")
+                title_audio.setAttribute("format", "mp2")
+            else:
+                title_audio = dvddom.createElement("audio")
+                title_audio.setAttribute("format", "ac3")
+
+            titles.appendChild(title_audio)
 
             pgc = dvddom.createElement("pgc")
             titles.appendChild(pgc)
@@ -1912,74 +2006,155 @@ def createDVDAuthorXMLNoMenus(screensize, numberofitems):
                 '''
                 <dvdauthor>
                     <vmgm>
+                        <menus lang="en">
+                            <pgc entry="title" pause="0">
+                            </pgc>
+                        </menus>
                     </vmgm>
                 </dvdauthor>''')
 
     dvdauthor_element = dvddom.documentElement
-    titleset = dvddom.createElement("titleset")
-    titles = dvddom.createElement("titles")
-    titleset.appendChild(titles)
-    dvdauthor_element.appendChild(titleset)
+    menus = dvdauthor_element.childNodes[1].childNodes[1]
+    menu_pgc = menus.childNodes[1]
 
     dvdauthor_element.insertBefore(dvddom.createComment("dvdauthor XML file created by MythBurn script"), dvdauthor_element.firstChild )
     dvdauthor_element.setAttribute("dest",os.path.join(getTempPath(),"dvd"))
 
-    fileCount = 0
-    itemNum = 1
-
+    # create pgc for menu 1 holds the intro if required, blank mpg if not
     if wantIntro:
-        node = themeDOM.getElementsByTagName("intro")[0]
-        introFile = node.attributes["filename"].value
+        video = dvddom.createElement("video")
+        video.setAttribute("format", videomode)
 
-        titles.appendChild(dvddom.createComment("Intro movie"))
-        pgc = dvddom.createElement("pgc")
+        # set aspect ratio
+        if mainmenuAspectRatio == "4:3":
+            video.setAttribute("aspect", "4:3")
+        else:
+            video.setAttribute("aspect", "16:9")
+            video.setAttribute("widescreen", "nopanscan")
+        menus.appendChild(video)
+
+        pre = dvddom.createElement("pre")
+        pre.appendChild(dvddom.createTextNode("if (g2==1) jump menu 2;"))
+        menu_pgc.appendChild(pre)
+
         vob = dvddom.createElement("vob")
-        vob.setAttribute("file",os.path.join(getIntroPath(), videomode + '_' + introFile))
-        pgc.appendChild(vob)
-        titles.appendChild(pgc)
+        vob.setAttribute("file", getThemeFile(themeName, videomode + '_' + introFile))
+        menu_pgc.appendChild(vob)
+
         post = dvddom.createElement("post")
-        post .appendChild(dvddom.createTextNode("jump title 2 chapter 1;"))
-        pgc.appendChild(post)
-        titles.appendChild(pgc)
-        fileCount +=1
-        del pgc
-        del vob
+        post.appendChild(dvddom.createTextNode("g2=1; jump menu 2;"))
+        menu_pgc.appendChild(post)
+        del menu_pgc
         del post
+        del pre
+        del vob
+    else:
+        pre = dvddom.createElement("pre")
+        pre.appendChild(dvddom.createTextNode("g2=1;jump menu 2;"))
+        menu_pgc.appendChild(pre)
 
+        vob = dvddom.createElement("vob")
+        vob.setAttribute("file", getThemeFile(themeName, videomode + '_' + "blank.mpg"))
+        menu_pgc.appendChild(vob)
 
+        del menu_pgc
+        del pre
+        del vob
+
+    # create menu 2 - dummy menu that allows us to jump to each titleset in sequence
+    menu_pgc = dvddom.createElement("pgc")
+    menu_pgc.setAttribute("pause", "0")
+
+    preText = "if (g1==0) g1=1;"
+    for i in range(numberofitems):
+        preText += "if (g1==%d) jump titleset %d menu;" % (i + 1, i + 1)
+
+    pre = dvddom.createElement("pre")
+    pre.appendChild(dvddom.createTextNode(preText))
+    menu_pgc.appendChild(pre)
+
+    vob = dvddom.createElement("vob")
+    vob.setAttribute("file", getThemeFile(themeName, videomode + '_' + "blank.mpg"))
+    menu_pgc.appendChild(vob)
+    menus.appendChild(menu_pgc)
+
+    # for each title add a <titleset> section
+    itemNum = 1
     while itemNum <= numberofitems:
         write( "Adding item %s" % itemNum)
 
-        pgc = dvddom.createElement("pgc")
+        titleset = dvddom.createElement("titleset")
+        dvdauthor_element.appendChild(titleset)
+
+        # create menu
+        menu = dvddom.createElement("menus")
+        menupgc = dvddom.createElement("pgc")
+        menu.appendChild(menupgc)
+        menupgc.setAttribute("pause","0")
+        titleset.appendChild(menu)
 
         if wantDetailsPage:
             #add the detail page intro for this item
             vob = dvddom.createElement("vob")
-            vob.setAttribute("file",os.path.join(getTempPath(),"details-%s.mpg" % itemNum))
-            pgc.appendChild(vob)
-            fileCount +=1
-            del vob
+            vob.setAttribute("file", os.path.join(getTempPath(),"details-%s.mpg" % itemNum))
+            menupgc.appendChild(vob)
+
+            post = dvddom.createElement("post")
+            post.appendChild(dvddom.createTextNode("jump title 1;"))
+            menupgc.appendChild(post)
+            del post
+        else:
+            #add dummy menu for this item
+            pre = dvddom.createElement("pre")
+            pre.appendChild(dvddom.createTextNode("jump title 1;"))
+            menupgc.appendChild(pre)
+            del pre
+
+            vob = dvddom.createElement("vob")
+            vob.setAttribute("file", getThemeFile(themeName, videomode + '_' + "blank.mpg"))
+            menupgc.appendChild(vob)
+
+        titles = dvddom.createElement("titles")
+
+        # set the right aspect ratio
+        title_video = dvddom.createElement("video")
+        title_video.setAttribute("format", videomode)
+
+        # use aspect ratio of video
+        if getAspectRatioOfVideo(itemNum) > aspectRatioThreshold:
+            title_video.setAttribute("aspect", "16:9")
+            title_video.setAttribute("widescreen", "nopanscan")
+        else:
+            title_video.setAttribute("aspect", "4:3")
+
+        titles.appendChild(title_video)
+
+        pgc = dvddom.createElement("pgc")
 
         vob = dvddom.createElement("vob")
         vob.setAttribute("file", os.path.join(getItemTempPath(itemNum), "final.mpg"))
         vob.setAttribute("chapters", createVideoChaptersFixedLength(chapterLength, getLengthOfVideo(itemNum)))
         pgc.appendChild(vob)
+
         del vob
+        del menupgc
 
         post = dvddom.createElement("post")
         if itemNum == numberofitems:
             post.appendChild(dvddom.createTextNode("exit;"))
         else:
-            if wantIntro:
-                post.appendChild(dvddom.createTextNode("jump title %d chapter 1;" % (itemNum + 2)))
-            else:
-                post.appendChild(dvddom.createTextNode("jump title %d chapter 1;" % (itemNum + 1)))
+            post.appendChild(dvddom.createTextNode("g1=%d;call vmgm menu 2;" % (itemNum + 1)))
 
         pgc.appendChild(post)
-        fileCount +=1
 
         titles.appendChild(pgc)
+        titleset.appendChild(titles)
+
         del pgc
+        del titles
+        del title_video
+        del post
+        del titleset
 
         itemNum +=1
 
@@ -2093,6 +2268,36 @@ def drawThemeItem(page, itemsonthispage, itemnum, menuitem, bgimage, draw,
 
                 button = spumuxdom.createElement("button")
                 button.setAttribute("name","next")
+                button.setAttribute("x0","%s" % getScaledAttribute(node, "x"))
+                button.setAttribute("y0","%s" % getScaledAttribute(node, "y"))
+                button.setAttribute("x1","%s" % (getScaledAttribute(node, "x") + getScaledAttribute(node, "w")))
+                button.setAttribute("y1","%s" % (getScaledAttribute(node, "y") + getScaledAttribute(node, "h")))
+                spunode.appendChild(button)
+
+        elif node.nodeName=="titlemenu":
+            if itemnum < numberofitems:
+                #Overlay next graphic button onto background
+                imagefilename = getThemeFile(themeName, node.attributes["filename"].value)
+                if not doesFileExist(imagefilename):
+                    fatalError("Cannot find image for titlemenu button (%s)." % imagefilename)
+                maskimagefilename = getThemeFile(themeName, node.attributes["mask"].value)
+                if not doesFileExist(maskimagefilename):
+                    fatalError("Cannot find mask image for titlemenu button (%s)." % maskimagefilename)
+
+                picture = Image.open(imagefilename,"r").resize((getScaledAttribute(node, "w"), getScaledAttribute(node, "h")))
+                picture = picture.convert("RGBA")
+                bgimage.paste(picture, (getScaledAttribute(node, "x"), getScaledAttribute(node, "y")), picture)
+                del picture
+                write( "Added titlemenu button image %s " % imagefilename)
+
+                picture=Image.open(maskimagefilename,"r").resize((getScaledAttribute(node, "w"), getScaledAttribute(node, "h")))
+                picture=picture.convert("RGBA")
+                bgimagemask.paste(picture, (getScaledAttribute(node, "x"), getScaledAttribute(node, "y")), picture)
+                del picture
+                write( "Added titlemenu button mask image %s" % imagefilename)
+
+                button = spumuxdom.createElement("button")
+                button.setAttribute("name","titlemenu")
                 button.setAttribute("x0","%s" % getScaledAttribute(node, "x"))
                 button.setAttribute("y0","%s" % getScaledAttribute(node, "y"))
                 button.setAttribute("x1","%s" % (getScaledAttribute(node, "x") + getScaledAttribute(node, "w")))
@@ -2239,7 +2444,7 @@ def createMenu(screensize, screendpi, numberofitems):
         highlightcolor = menunode.attributes["highlightcolor"].value
 
     #Get menu music
-    menumusic = "menumusic.mp2"
+    menumusic = "menumusic.ac3"
     if menunode.hasAttribute("music"):
         menumusic = menunode.attributes["music"].value
 
@@ -2363,7 +2568,7 @@ def createChapterMenu(screensize, screendpi, numberofitems):
         highlightcolor = menunode.attributes["highlightcolor"].value
 
     #Get menu music
-    menumusic = "menumusic.mp2"
+    menumusic = "menumusic.ac3"
     if menunode.hasAttribute("music"):
         menumusic = menunode.attributes["music"].value
 
@@ -2434,7 +2639,7 @@ def createChapterMenu(screensize, screendpi, numberofitems):
         elif chaptermenuAspectRatio == "16:9":
             aspect_ratio = '3'
         else: 
-            if getAspectRatioOfVideo(page) > 1.4:
+            if getAspectRatioOfVideo(page) > aspectRatioThreshold:
                 aspect_ratio = '3'
             else:
                 aspect_ratio = '2'
@@ -2478,7 +2683,7 @@ def createDetailsPage(screensize, screendpi, numberofitems):
         fatalError("Background image not found (%s)" % backgroundfilename)
 
     #Get menu music
-    menumusic = "menumusic.mp2"
+    menumusic = "menumusic.ac3"
     if detailnode.hasAttribute("music"):
         menumusic = detailnode.attributes["music"].value
 
@@ -2514,7 +2719,7 @@ def createDetailsPage(screensize, screendpi, numberofitems):
 
         # always use the same aspect ratio as the video
         aspect_ratio='2'
-        if getAspectRatioOfVideo(itemnum) > 1.4:
+        if getAspectRatioOfVideo(itemnum) > aspectRatioThreshold:
             aspect_ratio='3'
 
         #write( spumuxdom.toprettyxml())
@@ -2545,7 +2750,7 @@ def processAudio(folder):
     # process track 1
     if not encodetoac3 and doesFileExist(os.path.join(folder,'stream0.mp2')):
         #don't re-encode to ac3 if the user doesn't want it
-        os.rename(os.path.join(folder,'stream0.mp2'), os.path.join(folder,'stream0.ac3'))
+        write( "Audio track 1 is in mp2 format - NOT re-encoding to ac3")
     elif doesFileExist(os.path.join(folder,'stream0.mp2'))==True:
         write( "Audio track 1 is in mp2 format - re-encoding to ac3")
         encodeAudio("ac3",os.path.join(folder,'stream0.mp2'), os.path.join(folder,'stream0.ac3'),True)
@@ -2554,23 +2759,19 @@ def processAudio(folder):
         encodeAudio("ac3",os.path.join(folder,'stream0.mpa'), os.path.join(folder,'stream0.ac3'),True)
     elif doesFileExist(os.path.join(folder,'stream0.ac3'))==True:
         write( "Audio is already in ac3 format")
-    elif doesFileExist(os.path.join(folder,'stream0.ac3'))==True:
-        write( "Audio is already in ac3 format")
     else:
         fatalError("Track 1 - Unknown audio format or de-multiplex failed!")
 
     # process track 2
     if not encodetoac3 and doesFileExist(os.path.join(folder,'stream1.mp2')):
         #don't re-encode to ac3 if the user doesn't want it
-        os.rename(os.path.join(folder,'stream1.mp2'), os.path.join(folder,'stream1.ac3'))
+        write( "Audio track 1 is in mp2 format - NOT re-encoding to ac3")
     elif doesFileExist(os.path.join(folder,'stream1.mp2'))==True:
         write( "Audio track 2 is in mp2 format - re-encoding to ac3")
         encodeAudio("ac3",os.path.join(folder,'stream1.mp2'), os.path.join(folder,'stream1.ac3'),True)
     elif doesFileExist(os.path.join(folder,'stream1.mpa'))==True:
         write( "Audio track 2 is in mpa format - re-encoding to ac3")
         encodeAudio("ac3",os.path.join(folder,'stream1.mpa'), os.path.join(folder,'stream1.ac3'),True)
-    elif doesFileExist(os.path.join(folder,'stream1.ac3'))==True:
-        write( "Audio is already in ac3 format")
     elif doesFileExist(os.path.join(folder,'stream1.ac3'))==True:
         write( "Audio is already in ac3 format")
 
@@ -2835,6 +3036,8 @@ def isFileOkayForDVD(file, folder):
     return True
 
 def processFile(file, folder):
+    from shutil import copy
+
     """Process a single video/recording file ready for burning."""
 
     write( "*************************************************************")
@@ -3012,12 +3215,15 @@ def processFile(file, folder):
     # check if we need to convert any of the audio streams to ac3
     processAudio(folder)
 
-    #do a quick sense check before we continue...
-    assert doesFileExist(os.path.join(folder,'stream.mv2'))
-    assert doesFileExist(os.path.join(folder,'stream0.ac3'))
-    #assert doesFileExist(os.path.join(folder,'stream1.ac3'))
-
-    extractVideoFrame(os.path.join(folder,"stream.mv2"), os.path.join(folder,"thumbnail.jpg"), 0)
+    # if the file is a recording try to use its preview image for the thumb
+    if file.attributes["type"].value == "recording":
+        previewImage = os.path.join(recordingpath, file.attributes["filename"].value + ".png")
+        if usebookmark == True and os.path.exists(previewImage):
+            copy(previewImage, os.path.join(folder, "thumbnail.jpg"))
+        else:
+            extractVideoFrame(os.path.join(folder, "stream.mv2"), os.path.join(folder,"thumbnail.jpg"), thumboffset)
+    else:
+        extractVideoFrame(os.path.join(folder, "stream.mv2"), os.path.join(folder, "thumbnail.jpg"), thumboffset)
 
     write( "*************************************************************")
     write( "Finished processing file " + file.attributes["filename"].value)
@@ -3217,8 +3423,8 @@ def processJob(job):
                 #(This also removes non-required audio feeds inside mpeg streams 
                 #(through re-multiplexing) we only take 1 video and 1 or 2 audio streams)
                 pid=multiplexMPEGStream(os.path.join(folder,'stream.mv2'),
-                        os.path.join(folder,'stream0.ac3'),
-                        os.path.join(folder,'stream1.ac3'),
+                        os.path.join(folder,'stream0'),
+                        os.path.join(folder,'stream1'),
                         os.path.join(folder,'final.mpg'))
 
             #Now all the files are completed and ready to be burnt
@@ -3313,6 +3519,7 @@ if progresslog != "":
     progressfile = open(progresslog, 'w')
     write( "mythburn.py (%s) starting up..." % VERSION)
 
+cpuCount = getCPUCount()
 
 #Get mysql database parameters
 getMysqlDBParameters();
@@ -3343,6 +3550,8 @@ alwaysRunMythtranscode = (defaultsettings["MythArchiveAlwaysUseMythTranscode"] =
 copyremoteFiles = (defaultsettings["MythArchiveCopyRemoteFiles"] == '1')
 mainmenuAspectRatio = defaultsettings["MythArchiveMainMenuAR"]
 chaptermenuAspectRatio = defaultsettings["MythArchiveChapterMenuAR"]
+dateformat = defaultsettings.get("MythArchiveDateFormat", "%a %d %b %Y")
+timeformat = defaultsettings.get("MythArchiveTimeFormat", "%I:%M %p")
 
 # external commands
 path_mplex = [defaultsettings["MythArchiveMplexCmd"], os.path.split(defaultsettings["MythArchiveMplexCmd"])[1]]
@@ -3365,11 +3574,6 @@ try:
         file = open(os.path.join(logpath, "mythburn.lck"), 'w')
         file.write("lock")
         file.close()
-
-        #debug use 
-        #videomode="ntsc"
-
-        getTimeDateFormats()
 
         #Load XML input file from disk
         jobDOM = xml.dom.minidom.parse(jobfile)

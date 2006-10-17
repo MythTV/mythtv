@@ -42,6 +42,7 @@ MythburnWizard::MythburnWizard(MythMainWindow *parent, QString window_name,
     wireUpTheme();
     assignFirstFocus();
     updateForeground();
+    bReordering = false;
 
     bCreateISO = false;
     bDoBurn = false;
@@ -87,7 +88,15 @@ void MythburnWizard::keyPressEvent(QKeyEvent *e)
             }
             else if (getCurrentFocusWidget() == selected_list)
             {
-                selected_list->MoveDown(UIListBtnType::MoveItem);
+                if (bReordering)
+                {
+                    UIListBtnTypeItem *item = selected_list->GetItemCurrent();
+                    item->moveUpDown(false);
+                    reloadSelectedList();
+                }
+                else
+                    selected_list->MoveDown(UIListBtnType::MoveItem);
+
                 selected_list->refresh();
             }
             else
@@ -102,7 +111,15 @@ void MythburnWizard::keyPressEvent(QKeyEvent *e)
             }
             else  if (getCurrentFocusWidget() == selected_list)
             {
-                selected_list->MoveUp(UIListBtnType::MoveItem);
+                if (bReordering)
+                {
+                    UIListBtnTypeItem *item = selected_list->GetItemCurrent();
+                    item->moveUpDown(true);
+                    reloadSelectedList();
+                }
+                else
+                    selected_list->MoveUp(UIListBtnType::MoveItem);
+
                 selected_list->refresh();
             }
             else
@@ -126,6 +143,15 @@ void MythburnWizard::keyPressEvent(QKeyEvent *e)
         }
         else if (action == "LEFT")
         {
+            if (bReordering)
+            {
+                UIListBtnTypeItem *item = selected_list->GetItemCurrent();
+                if (item)
+                    item->setPixmap(NULL);
+                bReordering = false;
+                selected_list->refresh();
+            }
+
             if (getCurrentFocusWidget() == theme_selector)
                 theme_selector->push(false);
             else if (getCurrentFocusWidget() == category_selector)
@@ -139,6 +165,16 @@ void MythburnWizard::keyPressEvent(QKeyEvent *e)
         }
         else if (action == "RIGHT")
         {
+            if (bReordering)
+            {
+                UIListBtnTypeItem *item = selected_list->GetItemCurrent();
+                if (item)
+                    item->setPixmap(NULL);
+
+                bReordering = false;
+                selected_list->refresh();
+            }
+
             if (getCurrentFocusWidget() == theme_selector)
                 theme_selector->push(true);
             else if (getCurrentFocusWidget() == category_selector)
@@ -154,6 +190,8 @@ void MythburnWizard::keyPressEvent(QKeyEvent *e)
         {
             if (getCurrentFocusWidget() == archive_list)
                 toggleSelectedState();
+            else if (getCurrentFocusWidget() == selected_list)
+                toggleReorderState();
             else
                 activateCurrent();
         }
@@ -225,6 +263,35 @@ void MythburnWizard::toggleSelectedState()
     updateSizeBar();
 
     updateSelectedArchiveList();
+}
+
+void MythburnWizard::toggleReorderState()
+{
+    UIListBtnTypeItem *item = selected_list->GetItemCurrent();
+    if (bReordering)
+    {
+        bReordering = false;
+        item->setPixmap(NULL);
+    }
+    else
+    {
+        bReordering = true;
+        item->setPixmap(movePixmap);
+    }
+
+    selected_list->refresh();
+}
+
+void MythburnWizard::reloadSelectedList()
+{
+    selectedList.clear();
+
+    for (int x = 0; x < selected_list->GetCount(); x++)
+    {
+        UIListBtnTypeItem *item = selected_list->GetItemAt(x);
+        if (item)
+            selectedList.append((ArchiveItem *) item->getData());
+    }
 }
 
 void MythburnWizard::updateSizeBar(void)
@@ -299,6 +366,9 @@ void MythburnWizard::updateSizeBar(void)
 
 void MythburnWizard::wireUpTheme()
 {
+    // load pixmap
+    movePixmap = gContext->LoadScalePixmap("ma_updown.png");
+
     // make iso image checkbox
     createISO_check = getUICheckBoxType("makeisoimage_check");
     if (createISO_check)
@@ -1299,6 +1369,10 @@ void MythburnWizard::updateSelectedArchiveList(void)
     for (a = selectedList.first(); a; a = selectedList.next())
     {
         QString s = a->title;
+        if (a->subtitle != "")
+            s += " ~ " + a->subtitle;
+        if (a->type == "Recording" && a->startDate != "")
+            s += " ~ " + a->startDate + " " + a->startTime;
         UIListBtnTypeItem* item = new UIListBtnTypeItem(selected_list, s);
         item->setCheckable(true);
         if (a->useCutlist) 

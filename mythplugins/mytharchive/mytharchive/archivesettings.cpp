@@ -128,6 +128,54 @@ static HostComboBox *ChapterMenuAspectRatio()
     return gc;
 };
 
+static HostComboBox *MythArchiveDateFormat()
+{
+    HostComboBox *gc = new HostComboBox("MythArchiveDateFormat");
+    gc->setLabel(QObject::tr("Date format"));
+
+    QDate sampdate = QDate::currentDate();
+    QString sampleStr =
+            QObject::tr("Samples are shown using today's date.");
+
+    if (sampdate.month() == sampdate.day())
+    {
+        sampdate = sampdate.addDays(1);
+        sampleStr =
+                QObject::tr("Samples are shown using tomorrow's date.");
+    }
+
+    gc->addSelection(sampdate.toString("ddd MMM d"), "%a  %b  %d");
+    gc->addSelection(sampdate.toString("ddd MMMM d"), "%a %B %d");
+    gc->addSelection(sampdate.toString("MMM d"), "%b %d");
+    gc->addSelection(sampdate.toString("MM/dd"), "%m/%d");
+    gc->addSelection(sampdate.toString("MM.dd"), "%m.%d");
+    gc->addSelection(sampdate.toString("ddd d MMM"), "%a %d %b");
+    gc->addSelection(sampdate.toString("M/d/yyyy"), "%m/%d/%Y");
+    gc->addSelection(sampdate.toString("dd.MM.yyyy"), "%d.%m.%Y");
+    gc->addSelection(sampdate.toString("yyyy-MM-dd"), "%Y-%m-%d");
+    gc->addSelection(sampdate.toString("ddd MMM d yyyy"), "%a %b %d %Y"); 
+    gc->addSelection(sampdate.toString("ddd yyyy-MM-dd"), "%a %Y-%m-%d");
+    gc->addSelection(sampdate.toString("ddd dd MMM yyyy"), "%a %d %b %Y");
+    gc->setHelpText(QObject::tr("Your preferred date format to use on DVD menus.") + " " +
+            sampleStr);
+    return gc;
+}
+
+static HostComboBox *MythArchiveTimeFormat()
+{
+    HostComboBox *gc = new HostComboBox("MythArchiveTimeFormat");
+    gc->setLabel(QObject::tr("Time format"));
+
+    QTime samptime = QTime::currentTime();
+
+    gc->addSelection(samptime.toString("hh:mm AP"), "%I:%M %p");
+    gc->addSelection(samptime.toString("hh:mm"), "%H:%M");
+    gc->setHelpText(QObject::tr("Your preferred time format to display on DVD menus. "
+            "You must choose a format with \"AM\" or \"PM\" in it, otherwise your "
+            "time display will be 24-hour or \"military\" time."));
+    return gc;
+}
+
 static HostLineEdit *MythArchiveFfmpegCmd()
 {
     HostLineEdit *gc = new HostLineEdit("MythArchiveFfmpegCmd");
@@ -228,6 +276,8 @@ ArchiveSettings::ArchiveSettings()
     vcg2->addChild(MythArchiveUseFIFO());
     vcg2->addChild(MainMenuAspectRatio());
     vcg2->addChild(ChapterMenuAspectRatio());
+    vcg2->addChild(MythArchiveDateFormat());
+    vcg2->addChild(MythArchiveTimeFormat());
     addChild(vcg2);
 
     VerticalConfigurationGroup* vcg3 = new VerticalConfigurationGroup(false);
