@@ -1181,6 +1181,16 @@ static struct CHANLIST pal_bcast_sg[] = {
 };
 
 /* --------------------------------------------------------------------- */
+/* Malaysia broadcast added by Andrew Chuah on 26 Sept 2006 */
+static struct CHANLIST pal_bcast_my[] = {
+    { "1", 175500 },
+    { "2", 217500 },
+    { "3", 535000 },
+    { "4", 599000 },
+    { "5", 654500 },
+    { "6", 687300 },
+};
+/* --------------------------------------------------------------------- */
 
 static struct CHANLIST argentina[] = {
     { "001",   56250 },
@@ -1299,5 +1309,6 @@ struct CHANLISTS chanlists[] = {
     { "argentina",        argentina,         CHAN_COUNT(argentina)         },
     { "australia-optus",  pal_australia_optus, CHAN_COUNT(pal_australia_optus) },
     { "singapore",        pal_bcast_sg,      CHAN_COUNT(pal_bcast_sg)      },
+    { "malaysia",         pal_bcast_my,	     CHAN_COUNT(pal_bcast_my)      },
     { NULL, NULL, 0 } /* EOF */
 };
