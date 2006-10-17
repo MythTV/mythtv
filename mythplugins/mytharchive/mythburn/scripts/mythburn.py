@@ -31,7 +31,7 @@
 #******************************************************************************
 
 # version of script - change after each update
-VERSION="0.1.20061003-1"
+VERSION="0.1.20061017-1"
 
 
 ##You can use this debug flag when testing out new themes
@@ -793,11 +793,11 @@ def getFileInformation(file, outputfile):
             # iterate through resultset
             for record in result:
                 node = infoDOM.createElement("chanid")
-                node.appendChild(infoDOM.createTextNode("%s" % record[0]))
+                node.appendChild(infoDOM.createTextNode("%s" % record[1]))
                 top_element.appendChild(node)
 
                 #date time is returned as 2005-12-19 00:15:00 
-                recdate=time.strptime( "%s" % record[1],"%Y-%m-%d %H:%M:%S")
+                recdate=time.strptime( "%s" % record[0],"%Y-%m-%d %H:%M:%S")
 
                 node = infoDOM.createElement("starttime")
                 node.appendChild(infoDOM.createTextNode( time.strftime("%Y-%m-%dT%H:%M:%S", recdate)))
