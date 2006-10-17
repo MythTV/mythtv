@@ -388,6 +388,8 @@ bool HDHRChannel::SetChannelByString(const QString &channum)
     // Set the major and minor channel for any additional multiplex tuning
     if (atsc_major || atsc_minor)
         SetCachedATSCInfo(QString("%1_%2").arg(atsc_major).arg(atsc_minor));
+    else if (mpeg_prog_num >= 0)
+        SetCachedATSCInfo(QString("0-%1").arg(mpeg_prog_num));
     else
         SetCachedATSCInfo(QString("%1_0").arg(channum));
 

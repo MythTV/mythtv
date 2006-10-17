@@ -151,15 +151,12 @@ void HDHRRecorder::ProcessTSData(const uint8_t *buffer, int len)
     }
 }
 
-void HDHRRecorder::SetStreamData(MPEGStreamData *xdata)
+void HDHRRecorder::SetStreamData(MPEGStreamData *data)
 {
-    ATSCStreamData *data = dynamic_cast<ATSCStreamData*>(xdata);
-    VERBOSE(VB_IMPORTANT, LOC + "SetStreamData(xdata: "<<xdata<<") "<<data);
-
     if (data == _stream_data)
         return;
 
-    ATSCStreamData *old_data = _stream_data;
+    MPEGStreamData *old_data = _stream_data;
     _stream_data = data;
     if (old_data)
         delete old_data;
@@ -168,14 +165,20 @@ void HDHRRecorder::SetStreamData(MPEGStreamData *xdata)
     {
         data->AddMPEGSPListener(this);
         data->AddMPEGListener(this);
-        data->SetDesiredChannel(data->DesiredMajorChannel(),
-                                data->DesiredMinorChannel());
+
+        ATSCStreamData *atsc = dynamic_cast<ATSCStreamData*>(data);
+
+        if (atsc && atsc->DesiredMinorChannel())
+            atsc->SetDesiredChannel(atsc->DesiredMajorChannel(),
+                                    atsc->DesiredMinorChannel());
+        else if (data->DesiredProgram() >= 0)
+            data->SetDesiredProgram(data->DesiredProgram());
     }
 }
 
-MPEGStreamData *HDHRRecorder::GetStreamData(void)
+ATSCStreamData *HDHRRecorder::GetATSCStreamData(void)
 {
-    return _stream_data;
+    return dynamic_cast<ATSCStreamData*>(_stream_data);
 }
 
 void HDHRRecorder::HandlePAT(const ProgramAssociationTable *_pat)
