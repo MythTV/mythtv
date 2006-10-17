@@ -45,7 +45,9 @@
 #define DCT6200_MODEL_ID1  0x0000620a
 #define DCT6200_MODEL_ID2  0x00006200
 #define DCT6412_VENDOR_ID1 0x00000f9f
+#define DCT6412_VENDOR_ID2 0x0000152f
 #define DCT6412_MODEL_ID1  0x000064ca
+#define DCT6412_MODEL_ID2  0x000064cb
 
 #define AVC1394_SUBUNIT_TYPE_6200 (9 << 19)  /* uses a reserved subunit type */ 
 
@@ -173,10 +175,12 @@ int main (int argc, char *argv[])
             (dir.vendor_id == DCT6200_VENDOR_ID9) ||
             (dir.vendor_id == DCT6200_VENDOR_ID10) ||
             (dir.vendor_id == DCT6200_VENDOR_ID11) ||
-            (dir.vendor_id == DCT6412_VENDOR_ID1)) &&
+            (dir.vendor_id == DCT6412_VENDOR_ID1) ||
+            (dir.vendor_id == DCT6412_VENDOR_ID2)) &&
            ((dir.model_id == DCT6200_MODEL_ID1) ||
             (dir.model_id == DCT6200_MODEL_ID2) ||
-            (dir.model_id == DCT6412_MODEL_ID1)) ) {
+            (dir.model_id == DCT6412_MODEL_ID1) ||
+            (dir.model_id == DCT6412_MODEL_ID2)) ) {
             if (dir.unit_spec_id != DCT6200_SPEC_ID)
                fprintf(stderr, "Warning: Unit Spec ID different.\n");
             if (dir.unit_sw_version != DCT6200_SW_VERSION)
