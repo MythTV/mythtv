@@ -336,6 +336,7 @@ KFXO        FOX
 KFXP        FOX
 KFYR        NBC
 KGET        NBC
+KGIN        CBS
 KGJT        UPN
 KGMB        UPN
 KGNS        NBC
@@ -466,6 +467,7 @@ KOIN        CBS
 KOKH        FOX
 KOKI        FOX
 KOLO        ABC
+KOLN        CBS
 KOMO        KOMO
 KOMODT      KOMO
 KOMU        NBC
@@ -732,6 +734,7 @@ MTVS        MTV
 MYSTERY     Encore_Mystery
 MYSTERYP    Encore_Mystery
 NASA        NASA
+NET1        PBS-KUON
 NEWSENG     NEWSENG
 NEXTP       SHOWTIME
 NFL         NFL

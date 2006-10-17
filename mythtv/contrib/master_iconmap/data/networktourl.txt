@@ -184,6 +184,7 @@ PBS-KUAC                [pbs]/KUAC.gif
 PBS-KUAT                [pbs]/KUAT.gif
 PBS-KUED                [pbs]/KUED.gif
 PBS-KUHT                [pbs]/KUHT.gif
+PBS-KUON                [pbs]/KUON.gif
 PBS-KUSD                [pbs]/KUSD.gif
 PBS-KUSM                [pbs]/KUSM.gif
 PBS-KVCR                [pbs]/KVCR.gif
