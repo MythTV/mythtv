@@ -188,7 +188,7 @@ void EITFixUp::FixBellExpressVu(DBEvent &event) const
  */
 void EITFixUp::FixUK(DBEvent &event) const
 {
-    const uint SUBTITLE_PCT = 35; //% of description to allow subtitle up to
+    const uint SUBTITLE_PCT = 30; //% of description to allow subtitle up to
     const uint SUBTITLE_MAX_LEN = 128; // max length of subtitle field in db.
     int position = event.description.find("New Series");
     if (position != -1)
@@ -207,6 +207,26 @@ void EITFixUp::FixUK(DBEvent &event) const
     event.description = event.description.replace(m_ukThen, "");
     event.description = event.description.replace(m_ukNew, "");
     event.title  = event.title.replace(m_ukT4, "");
+
+    // First join up event data, that's spread across title/desc
+    // at this point there is no subtitle.
+    if (event.title.endsWith("...") ||
+        event.description.startsWith("..") ||
+        event.description.isEmpty())
+    {
+        // try and make the subtitle
+        QString Full = event.title.replace(m_ukPEnd, "") + " " +
+            event.description.replace(m_ukPStart, "");
+
+        if ((position = Full.find(m_ukEPQ)) != -1)
+        {
+            if (Full[position] == '!' || Full[position] == '?' ||
+                Full[position] == '.')
+                position++;
+            event.title = Full.left(position);
+            event.description = Full.mid(position + 1);
+        }
+    }
 
     // This is trying to catch the case where the subtitle is in the main title
     // but avoid cases where it isn't a subtitle e.g cd:uk
@@ -227,60 +247,14 @@ void EITFixUp::FixUK(DBEvent &event) const
             event.description = event.description.mid(position + 1);
         }
     }
-    else if ((position = event.description.find(m_ukEQ)) != -1)
+    else if ((position = event.description.find(m_ukEPQ)) != -1)
     {
         if (((uint)position < SUBTITLE_MAX_LEN) &&
             ((position*100)/event.description.length() < SUBTITLE_PCT))
         {
             event.subtitle = event.description.left(position + 1);
             event.description = event.description.mid(position + 2);
-        }
-    }
-
-    if (event.title.endsWith("...") &&
-        event.subtitle.startsWith(".."))
-    {
-        // try and make the subtitle
-        QString Full = event.title.replace(m_ukPEnd, "") + " " +
-            event.subtitle.replace(m_ukPStart, "");
-
-        if ((position = Full.find(m_ukEPQ)) != -1)
-        {
-            if (Full[position] == '!' || Full[position] == '?')
-                position++;
-            event.title = Full.left(position);
-            event.subtitle = Full.mid(position + 1);
-        }
-        else
-        {
-            event.title = Full;
-            event.subtitle = "";
-        }
-    }
-    else if (event.subtitle.endsWith("...") &&
-             event.description.startsWith("..."))
-    {
-        QString Full = event.subtitle.replace(m_ukPEnd, "") + " " +
-            event.description.replace(m_ukPStart, "");
-        if ((position = Full.find(m_ukEPQ)) != -1)
-        {
-            if (Full[position] == '!' || Full[position] == '?')
-                position++;
-            event.subtitle = Full.left(position);
-            event.description = Full.mid(position + 1);
-        }
-    }
-    else if (event.title.endsWith("...") &&
-             event.description.startsWith("...") && event.subtitle.isEmpty())
-    {
-        QString Full = event.title.replace(m_ukPEnd, "") + " " +
-            event.description.replace(m_ukPStart, "");
-        if ((position = Full.find(m_ukEPQ)) != -1)
-        {
-            if (Full[position] == '!' || Full[position] == '?')
-                position++;
-            event.title = Full.left(position);
-            event.description = Full.mid(position + 1);
+            event.subtitle.replace(m_ukPEnd, ""); // Trim trailing '.'
         }
     }
 
