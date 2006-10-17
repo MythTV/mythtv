@@ -2611,7 +2611,7 @@ static void extract_mono_channel(uint channel, AudioInfo *audioInfo,
     if (audioInfo->channels != 2)
         return;
 
-    if (channel < (uint)audioInfo->channels)
+    if (channel >= (uint)audioInfo->channels)
         return;
 
     const uint samplesize = audioInfo->sample_size;
