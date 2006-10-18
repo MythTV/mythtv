@@ -2282,10 +2282,6 @@ void TV::ProcessKeypress(QKeyEvent *e)
                 GetOSD()->DialogUp(dialogname); 
             else if (action == "DOWN")
                 GetOSD()->DialogDown(dialogname);
-            else if ((action == "FFWDSTICKY" || action == "SEEKFFWD" ||
-                        action == "JUMPFFWD") &&
-                        IsVideoExitDialog());
-                // do nothing
             else if (((action == "RWNDSTICKY" || action == "SEEKRWND" ||
                         action == "JUMPRWND"))
                     && IsVideoExitDialog())
