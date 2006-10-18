@@ -1,7 +1,7 @@
 /* =============================================================
  * File  : osdtypeteletext.cpp
  * Author: Frank Muenchow <beebof@gmx.de>
- *         Martin Barnasconi
+ *         Martin Barnasconi <martin@barnasconi.net>
  * Date  : 2005-10-25
  *
  * This program is free software; you can redistribute it
@@ -248,8 +248,8 @@ void OSDTypeTeletext::AddTeletextData(int magazine, int row,
             {
                 case VBI_IVTV:
                     b1 = hamm8(buf, &err);
-                    b2 = hamm8(buf + 37, & err);
-                    if (err & 0xF00)
+                    b2 = hamm8(buf + 37, &err);
+                    if (err & 0xF000)
                         return;
                      break;
                 case VBI_DVB:
@@ -512,6 +512,7 @@ void OSDTypeTeletext::KeyPress(uint key)
                 m_pageinput[2] = ' ';
             }
 
+            PageUpdated(m_curpage, m_cursubpage);
             break;
 
         case TTKey::kNextPage:
@@ -911,6 +912,7 @@ void OSDTypeTeletext::DrawLine(OSDSurface *surface, const unsigned char *page,
     hold = false;
     endbox = false;
     startbox = false;
+    uint flof_link_count = 0;
 
     if (row == 1)
     {
@@ -942,6 +944,8 @@ void OSDTypeTeletext::DrawLine(OSDSurface *surface, const unsigned char *page,
                 fgcolor = ch & 7;
                 mosaic = false;
                 conceal = false;
+                // increment FLOF/FastText count if menu item detected
+                flof_link_count += (row == 25) ? 1 : 0;
                 goto ctrl;
             case 0x08: // flash
                 // XXX
@@ -1006,6 +1010,19 @@ void OSDTypeTeletext::DrawLine(OSDSurface *surface, const unsigned char *page,
                 if (conceal && !m_revealHidden)
                     ch = ' ';
                 break;
+        }
+
+        // Hide FastText/FLOF menu characters if not available
+        if (flof_link_count && (flof_link_count <= 6))
+        {
+            const TeletextSubPage *ttpage =
+                FindSubPage(m_curpage, m_cursubpage);
+
+            if (ttpage)
+            {
+                bool has_flof = ttpage->floflink[flof_link_count - 1];
+                ch = (has_flof) ? ch : ' ';
+            }
         }
 
         newfgcolor = fgcolor;
