@@ -243,6 +243,17 @@ void HDHRRecorder::HandleSingleProgramPMT(ProgramMapTable *pmt)
 
     int next = (pmt->tsheader()->ContinuityCounter()+1)&0xf;
     pmt->tsheader()->SetContinuityCounter(next);
+
+    // Normalize stream types
+    for (uint i = 0; i < pmt->StreamCount(); i++)
+    {
+        desc_list_t desc = MPEGDescriptor::Parse(
+            _input_pmt->StreamInfo(i), _input_pmt->StreamInfoLength(i));
+        uint type = StreamID::Normalize(_input_pmt->StreamType(i), desc);
+        if (StreamID::IsVideo(type) || StreamID::IsAudio(type))
+            pmt->SetStreamType(i, type);
+    }
+
     BufferedWrite(*(reinterpret_cast<TSPacket*>(pmt->tsheader())));
 }
 
