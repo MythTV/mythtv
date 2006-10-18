@@ -2347,7 +2347,6 @@ void TV::ProcessKeypress(QKeyEvent *e)
                             break;
                         case 4:
                             dialogname = "";
-                            requestDelete = true;
                             DoPause();
                             PromptDeleteRecording(
                                 tr("Delete this recording?")); 
@@ -2377,62 +2376,32 @@ void TV::ProcessKeypress(QKeyEvent *e)
                 {
                     int result = GetOSD()->GetDialogResponse(dialogname);
 
-                    if (requestDelete)
+                    switch (result)
                     {
-                        switch (result)
-                        {
-                            case 3:
+                        case 1:
+                            exitPlayer = true;
+                            wantsToQuit = true;
+                            allowRerecord = true;
+                            break;
+                        case 2:
+                            exitPlayer = true;
+                            wantsToQuit = true;
+                            break;
+                        case 3:
+                            exitPlayer = true;
+                            wantsToQuit = true;
+                            requestDelete = false;
+                            break;
+                        default:
+                            requestDelete = false;
+                            if (activenvp->IsNearEnd())
+                            {
                                 exitPlayer = true;
                                 wantsToQuit = true;
-                                allowRerecord = true;
-                                break;
-                            case 2:
-                                exitPlayer = true;
-                                wantsToQuit = true;
-                                break;
-                            case 1:
-                                exitPlayer = true;
-                                wantsToQuit = true;
-                                requestDelete = false;
-                            default:
-                                requestDelete = false;
-                                if (activenvp->IsNearEnd())
-                                {
-                                    exitPlayer = true;
-                                    wantsToQuit = true;
-                                }
-                                else
-                                    DoPause();
-                                break;
-                        }
-                    }
-                    else
-                    {
-                        switch (result)
-                        {
-                            case 1:
-                                exitPlayer = true;
-                                wantsToQuit = true;
-                                requestDelete = false;
-                                break;
-                            case 2:
-                                dialogname = "";
-                                requestDelete = true;
+                            }
+                            else
                                 DoPause();
-                                PromptDeleteRecording(
-                                    tr("Delete this recording?"));
-                                return;
-                            default:
-                                requestDelete = false;
-                                if (activenvp->IsNearEnd())
-                                {
-                                    exitPlayer = true;
-                                    wantsToQuit = true;
-                                }
-                                else
-                                    DoPause();
-                                break;
-                        }
+                            break;
                     }
                 }
                 else if (dialogname == "allowrecordingbox")
@@ -7401,25 +7370,18 @@ void TV::PromptDeleteRecording(QString title)
                                   .arg(title).arg(infoMap["title"])
                                   .arg(infoMap["timedate"]);
         QStringList options;
-        if (requestDelete)
-        {
-            options += "No, do not delete";
-            options += "Yes, delete it";
-            options += "Yes and allow re-record";
-        }
-        else
-        {
-            options += tr("Do not delete. Just exit");
-            options += tr("Delete this recording");
-            if (!activenvp->IsNearEnd())
-                options += tr("Keep Watching");
-        }
+        options += "Yes, and allow re-record";
+        options += "Yes, delete it";
+        options += "No, keep it, I changed my mind";
         
         dialogname = "askdeleterecording";
         
         if (GetOSD())
-            GetOSD()->NewDialogBox(dialogname, message, options, 0);
+            GetOSD()->NewDialogBox(dialogname, message, options, 0, 2);
     }
+
+    requestDelete = true;
+
 }
 
 bool TV::IsVideoExitDialog(void)
