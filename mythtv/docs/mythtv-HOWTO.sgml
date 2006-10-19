@@ -3,7 +3,7 @@
 <title>Installing and using MythTV
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com"
 name="mailto:rkulagow@rocketmail.com">
-<date>2006-10-03, v0.20.04
+<date>2006-10-20, v0.20.05
 <abstract>
 Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -867,7 +867,7 @@ pre-requisites required to compile MythTV.
 <figure loc="here">
 <eps file="warning.eps" height="1cm">
 <img src="warning.png">
-<caption><bf>NOTE</bf>:  Due to the requirement for Qt 3.2+, there are no packages for
+<caption><bf>NOTE</bf>:  Due to the requirement for Qt 3.3+, there are no packages for
 Debian woody/stable.
 </caption></figure>
 
@@ -896,7 +896,7 @@ going to need the <bf>cdialog</bf> package in order to compile
 <bf>perl</bf>.
 
 <code>
-NOTE:  Qt v3.2 or higher is required.
+NOTE:  Qt v3.3 or higher is required.
 
 NOTE:  MythTV DOES NOT WORK with Qt4.
 
@@ -1492,6 +1492,10 @@ Add mysql to your USE variable.  i.e. <tt>USE="mysql ...."</tt>
 # emerge mythtv
 </verb></tscreen>
 <sect>MySQL.<label id="mysql">
+<p>If you install MySQL 4.x, rather than 3.x, you will also want to comment
+out "log-bin" in your <tt>my.cnf</tt> configuration file. This option will
+quickly fill your "/var" disk partition with many gigabytes of data,
+unless you are doing database replication and deleting these files regularly.
 <sect1>Distribution-specific information
 <sect2>Mandriva
 <p>If this is the system maintaining the database, make sure that MySQL is
@@ -1527,12 +1531,7 @@ This can be done from the command line by typing:
 
 <sect2>Gentoo
 <p>After installing MySQL you need to initialize the database by running
-mysql_install_db as root. 
-<p>If you install MySQL 4.x, rather than 3.x, you will also want to comment
-out "log-bin" in your /etc/mysql/my.cnf configuration file. This option will
-quickly fill your "/var" disk partition with many gigabytes of data,
-unless you are doing database replication and deleting these files regularly.
-
+<bf>mysql_install_db</bf> as root. 
 <sect1>Setting up the initial database
 <p>This step is only required on the system maintaining the database, which
 may or may not be one of your MythTV boxes.  If the database is on a
@@ -1950,7 +1949,7 @@ to control MythTV.  MythTV now includes native support for lirc and can
 interact directly with 
 
 <tscreen><verb>
-$ cd ~/mythtv-0.20/configfiles
+$ cd ~/mythtv-0.20/contrib/configfiles
 $ cp lircrc.example ~/.lircrc
 </verb></tscreen> 
 or
@@ -1981,7 +1980,7 @@ If <bf>irxevent</bf> isn't running, then MythTV will not respond to your remote
 control unless you're using native lirc support.
 
 <sect1>Additional information for lirc
-<p>Take a look at the lircrc.example files in the <tt>configfiles/</tt>
+<p>Take a look at the lircrc.example files in the <tt>contrib/configfiles/</tt>
 directory.  In my case, (Pinnacle Studio card) the channel up and down functions
 weren't working, due to the fact that the button names were different than
 the default <tt>lircrc.example</tt> file that came with MythTV.
@@ -2025,7 +2024,7 @@ end
 </verb></tscreen>
 which took care of basic functionality.  Because the PCTV Studio remote
 has additional buttons, look at the
-<tt>configfiles/lircrc.example.pinnaclestudiopctv</tt> for an example of how
+<tt>contrib/configfiles/lircrc.example.pinnaclestudiopctv</tt> for an example of how
 to define additional buttons, and how to debug potential button name
 conflicts between the <tt>lircrc.example</tt> file and how <bf>your</bf>
 remote defines the button names.
@@ -2510,6 +2509,11 @@ to have mythbackend automatically start up during boot.  You can follow the
 steps outlined in the section called <ref id="mythbackend_autostart"
 name="Automatically starting mythbackend at system boot time"> for
 configuration steps.
+
+If you enable the <tt>-l</tt> parameter, you will want to keep your logfiles
+rotated (so that they don't fill up a partition).  See the section called
+<ref id="logrotate" name="Automatically rotating logs"> for more
+information.
 
 <sect1>Configuring a non-master backend <label id="nonmaster_backend">
 <p>Ensure that you've granted access to the master MySQL database for remote
@@ -5795,7 +5799,7 @@ $ cat vidout > video.yuv
 
 <sect1>Using a different window manager
 <p>MythTV is not dependent on any particular window manager.  If you wish to
-run a lightweight window manager, the <tt>configfiles/</tt> directory has an
+run a lightweight window manager, the <tt>contrib/configfiles/</tt> directory has an
 example of a <tt>.twmrc</tt> and <tt>.fvwmrc</tt> file you may use.
 
 <sect1>What capture resolution should I use?  How does video work?
@@ -6190,6 +6194,7 @@ $ su
 $
 </verb></tscreen>
 
+<label id="logrotate">
 <sect3>Log files 
 <p>By default, the log file for mythbackend will be written to
 <tt>/var/tmp/mythbackend.log</tt>. This has been tested and is known to work
@@ -6212,6 +6217,57 @@ $ su
 $ ls -ld /var/log/mythtv
 drwxrwxr-x    2 root     mythtv       4096 Apr 28 21:58 /var/log/mythtv/
 $
+</verb></tscreen>
+
+<!-- From an email by chris at cpr.homelinux.net on 2006-09-01 -->
+Create a <tt>mythtv</tt> file in <tt>/etc/logrotate.d</tt>:
+<tscreen><verb>
+$ su
+# cat > /etc/logrotate.d/mythtv
+# Set default values for all log files first...
+
+# Rotate the logs once a week, or more frequently if they 
+# exceed 10Mb in size (size is checked daily).
+weekly
+size 10M
+
+# 'copytruncate' is used for logs generated by 
+# currently-running programs that should not be restarted 
+# (and can't be signalled to start a new log) after the 
+# rotation.  It duplicates the existing log file and then 
+# sets the length of the existing file to 0.  The only time 
+# this would break would be if the program writing the log 
+# was using lseek.
+copytruncate
+
+# After rotating the files, leave the most recent rotated 
+# copy alone but gzip everything else to save space.
+compress
+delaycompress
+
+# If a log isn't present then don't worry about it.
+missingok
+
+# Don't rotate an empty file.
+notifempty
+
+# end of the global options
+
+/var/log/mythtv/mythbackend.log /var/log/mythtv/mythfrontend.log {
+  # Keep logs until they are 2 months old or the number of 
+  # logs reaches 12.  If the log files stay small, the age will 
+  # kick in first and you'll only have 8 log files.  If they 
+  # get larger than 10Mb then you won't keep all 60 days.
+  rotate 12
+  maxage 60
+}
+
+# Different options for mythfilldatabase:
+/var/log/mythtv/mythfilldatabase.log {
+  rotate 2
+}
+^D
+#
 </verb></tscreen>
 
 <sect3>Mandriva 
@@ -6605,23 +6661,26 @@ impact the viewing experience on the frontend.
 <p>Use the mytharchive plugin.
 
 <sect1>Using the DBoxII within MythTV
-<p>The configuration of the DBoxII for use within MythTV is tricky 
-(as of May 16 2005), that's why it's covered here. Your DBoxII has to be 
-running linux and the Neutrino GUI instead of the stock BetaNova firmware. 
-For further information, please refer to <url url="http://www.tuxbox.org" name="http://www.tuxbox.org">. Additionally, you need to enable the SPTS mode in 
-Neutrino.
+<p>The configuration of the DBoxII for use within MythTV is tricky (as of
+May 16 2005), that's why it's covered here. Your DBoxII has to be running
+linux and the Neutrino GUI instead of the stock BetaNova firmware.  For
+further information, please refer to <url url="http://www.tuxbox.org"
+name="http://www.tuxbox.org">. Additionally, you need to enable the SPTS
+mode in Neutrino.
 
-1.) Add a new "Capture Card" in the setup. The "Card type" is "DBOX2 Input", 
+<itemize>
+<item>Add a new "Capture Card" in the setup. The "Card type" is "DBOX2 Input", 
 the other values have to be adjusted according to your setup. 
 The default values, except for the "DBOX2 host ip", should work fine.
-2.) Define a new video source. It doesn't need to be configured, 
+<item>Define a new video source. It doesn't need to be configured, 
 you just need to define it. MythTV grabs the EPG from the DBoxII.
-3.) Connect the DBoxII to the newly defined input source in "input connections".
-4.) Since channel scanning is not implemented yet, you need to define channels 
+<item>Connect the DBoxII to the newly defined input source in "input connections".
+<item>Since channel scanning is not implemented yet, you need to define channels 
 in the "Channel Editor". Make sure that you use the same value for 
 "Channel Name" as on the DBoxII. You can get a list of available 
 channels from the web interface of Neutrino at http://ip-of-your-box:80/. 
 Associate the channel with your new video source and repeat when needed.
+</itemize>
 
 You may leave the Setup now and proceed as usual.
 
@@ -6695,13 +6754,13 @@ interface.
 Note that for the PVR-350 there are some <ref id="PVR-350" name="considerations">
 regarding the way audio is handled.
 
-The PVR-500 is a dual-encoder version of the PVR-150 card.  This means that
-you can simultaneously record two different programs at the same time,
-because there are two encoder chips on the PCI card.  Hauppuage has also
-installed an onboard splitter, so you can use one COAX to feed both tuners. 
-Current versions of the PVR-500 should come with an adapter to allow you to
-connect a second S-Video or composite input.  Early adopters may need to
-purchase this item separately.
+The PVR-500 is a dual-encoder version of the PVR-150 card, so you can
+simultaneously record two different programs at the same time, because there
+are two encoder chips on the PCI card.  Hauppuage has also installed an
+onboard splitter, so you can use one COAX to feed both tuners.  Current
+versions of the PVR-500 should come with an adapter to allow you to connect
+a second S-Video or composite input, but this will take up a second PCI
+slot.  Early adopters may need to purchase this item separately.
 
 <sect1>Changing channels on an external Set Top Box
 <p>If you need to use an external Set Top Box (STB), such as for satellite
@@ -6912,12 +6971,11 @@ fact that there are.  You may need to specify the physical volume in the
 Once you've completed one of the following two procedures, use <bf>df</bf>
 to check that you've got more space.
 
-<sect2>ReiserFS
-<p>Make the logical volume used for video bigger:
+Make the logical volume used for video bigger:
 
 <tt># lvextend --size +50G /dev/VGforMyth/video</tt>
-
-Unmount, resize and remount the filesystem.  Technically, you don't need to
+<sect2>ReiserFS
+<p>Unmount, resize and remount the filesystem.  Technically, you don't need to
 unmount and remount the ReiserFS. 
 <tscreen><verb>
 # umount /var/video
@@ -6926,19 +6984,18 @@ unmount and remount the ReiserFS.
 </verb></tscreen>
 
 <sect2>ext2 or ext3
-<p>LVM comes with a program called <bf>e2fsadm</bf>.
+<p>LVM comes with a program called <bf>resize2fs</bf>.
 
 Unmount, resize and remount the filesystem.  The filesystem <em>must</em> be
 unmounted during this procedure.
 <tscreen><verb>
 # umount /var/video
-# e2fsadm --size +50G /dev/VGforMyth/video
+# resize2fs --size +50G /dev/VGforMyth/video
 # mount /dev/VGforMyth/video /var/video
 </verb></tscreen>
 <sect2>xfs
 <p>XFS does not need to be unmounted to extend the size:
 <tscreen><verb>
-# lvextend --size +50G /dev/VGforMyth/video
 # xfs_growfs /var/video
 </verb></tscreen>
 <sect1>Advanced Partition Formatting <label
@@ -7035,13 +7092,16 @@ v0.20.00, 2006-09-10.  Start prepping for 0.20.  Add HDHomeRun as a capture devi
 Update URLs.  Move around some of the HDTV stuff.  Add a part about HDTV and
 capturing it in raw format (you can't, so stop asking).  Update information
 on filesystems and the slow delete feature.
-
 v0.20.01, 2006-09-11.  Get rid of stuff that's been deprecated.  Add other
 updates, like the blurb about using a VM for commercial flagging.
 v0.20.02, 2006-09-13.  Update install instructions for mythweb.
 v0.20.03, 2006-09-22.  Does MythTV work with QT4?  No.
-v0.20.04, 2006-10-03.  Update lirc section; explain how lircd.conf and
-lircrc work together.
+v0.20.04, 2006-10-06.  Update lirc section; explain how lircd.conf and
+lircrc work together.  Closes #2445.  Closes #2474.  Move a warning about
+mysql 4.x and log-bin.  Add a section on logrotate.
+v0.20.05, 2006-10-19.  Update file path for configfiles directory now that
+it's under contrib/
+
 
 -->
 

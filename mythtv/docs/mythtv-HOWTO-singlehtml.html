@@ -8,7 +8,7 @@
 <H1>Installing and using MythTV</H1>
 
 <H2>Robert Kulagowski, 
-<A HREF="mailto:rkulagow@rocketmail.com">mailto:rkulagow@rocketmail.com</A></H2>2006-09-22, v0.20.03
+<A HREF="mailto:rkulagow@rocketmail.com">mailto:rkulagow@rocketmail.com</A></H2>2006-10-20, v0.20.05
 <HR>
 <EM>Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -77,11 +77,10 @@ necessary.</EM>
 
 <UL>
 <LI><A NAME="toc8.1">8.1</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss8.1">Gentoo</A>
-<LI><A NAME="toc8.2">8.2</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss8.2">Red Hat Linux/Fedora Core</A>
-<LI><A NAME="toc8.3">8.3</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss8.3">Obtaining and compiling lirc</A>
-<LI><A NAME="toc8.4">8.4</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss8.4">Completing the lirc install </A>
-<LI><A NAME="toc8.5">8.5</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss8.5">Additional information for lirc</A>
-<LI><A NAME="toc8.6">8.6</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss8.6">Configuring lirc for use with an IR blaster</A>
+<LI><A NAME="toc8.2">8.2</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss8.2">Obtaining and compiling lirc</A>
+<LI><A NAME="toc8.3">8.3</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss8.3">Completing the lirc install </A>
+<LI><A NAME="toc8.4">8.4</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss8.4">Additional information for lirc</A>
+<LI><A NAME="toc8.5">8.5</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss8.5">Configuring lirc for use with an IR blaster</A>
 </UL>
 <P>
 <H2><A NAME="toc9">9.</A> <A HREF="mythtv-HOWTO-singlehtml.html#s9">Configuring MythTV. </A></H2>
@@ -1097,7 +1096,7 @@ pre-requisites required to compile MythTV.</P>
 <FIGURE>
 <EPS FILE="warning.eps">
 <IMG SRC="warning.png">
-<CAPTION><B>NOTE</B>:  Due to the requirement for Qt 3.2+, there are no packages for
+<CAPTION><B>NOTE</B>:  Due to the requirement for Qt 3.3+, there are no packages for
 Debian woody/stable.</CAPTION>
 </FIGURE>
 </P>
@@ -1128,7 +1127,7 @@ going to need the <B>cdialog</B> package in order to compile
 <P>
 <HR>
 <PRE>
-NOTE:  Qt v3.2 or higher is required.
+NOTE:  Qt v3.3 or higher is required.
 
 NOTE:  MythTV DOES NOT WORK with Qt4.
 
@@ -1828,6 +1827,10 @@ Add mysql to your USE variable.  i.e. <CODE>USE="mysql ...."</CODE>
 </P>
 <H2><A NAME="mysql"></A> <A NAME="s6">6.</A> <A HREF="#toc6">MySQL.</A></H2>
 
+<P>If you install MySQL 4.x, rather than 3.x, you will also want to comment
+out "log-bin" in your <CODE>my.cnf</CODE> configuration file. This option will
+quickly fill your "/var" disk partition with many gigabytes of data,
+unless you are doing database replication and deleting these files regularly.</P>
 <H2><A NAME="ss6.1">6.1</A> <A HREF="#toc6.1">Distribution-specific information</A>
 </H2>
 
@@ -1873,12 +1876,7 @@ Click Save, then close the window.</P>
 <H3>Gentoo</H3>
 
 <P>After installing MySQL you need to initialize the database by running
-mysql_install_db as root. </P>
-<P>If you install MySQL 4.x, rather than 3.x, you will also want to comment
-out "log-bin" in your /etc/mysql/my.cnf configuration file. This option will
-quickly fill your "/var" disk partition with many gigabytes of data,
-unless you are doing database replication and deleting these files regularly.</P>
-
+<B>mysql_install_db</B> as root. </P>
 <H2><A NAME="ss6.2">6.2</A> <A HREF="#toc6.2">Setting up the initial database</A>
 </H2>
 
@@ -2111,22 +2109,7 @@ build process. </P>
 </CODE></BLOCKQUOTE>
 </P>
 
-<H2><A NAME="ss8.2">8.2</A> <A HREF="#toc8.2">Red Hat Linux/Fedora Core</A>
-</H2>
-
-<P>You should already have the source from the "Kernel Development" package
-you installed in section 3.2. Ensure that a symlink has been created:
-<BLOCKQUOTE><CODE>
-<PRE>
-$ cd /usr/src
-$ su
-# ln -s linux-2.4 /usr/src/linux
-# exit
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
-
-<H2><A NAME="ss8.3">8.3</A> <A HREF="#toc8.3">Obtaining and compiling lirc</A>
+<H2><A NAME="ss8.2">8.2</A> <A HREF="#toc8.2">Obtaining and compiling lirc</A>
 </H2>
 
 <P>You're going to need to download and compile <B>lircd</B>.  Go to 
@@ -2239,7 +2222,7 @@ to emulate the various keystrokes from <CODE>keys.txt</CODE> of your IR
 keyboard.  Using this method removes lirc entirely from the picture - your
 remote will be sending keypresses that your PC "sees" on the keyboard port.</P>
 
-<H2><A NAME="completing_lirc_install"></A> <A NAME="ss8.4">8.4</A> <A HREF="#toc8.4">Completing the lirc install </A>
+<H2><A NAME="completing_lirc_install"></A> <A NAME="ss8.3">8.3</A> <A HREF="#toc8.3">Completing the lirc install </A>
 </H2>
 
 <P>
@@ -2278,6 +2261,35 @@ users, type: <CODE># /etc/rc.d/init.d/lircd start</CODE> instead of:
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
+<P><B>NOTE</B>:  Read this next section if you're not familiar with how lirc works!</P>
+<P>There are two separate files used by lirc, and both are required for your
+remote control to do anything useful. First is the <CODE>lircd.conf</CODE> file. 
+<CODE>lircd.conf</CODE> tells the lirc daemon how to interpret the IR pulses
+that it receives from a remote control and what name to assign to each
+sequence of pulses.  Without getting too involved, a particular series of
+pulses may correlate to "Channel Up".  The <CODE>lircd.conf</CODE> file will
+then contain a line that looks something like this:</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+          ChannelUp                0x0000000000001020
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>The <CODE>lircd.conf</CODE> file can have multiple remote controls defined.</P>
+<P>The second file is <CODE>lircrc</CODE>, which takes the name of the button which
+was pressed ("ChannelUp") in the above example, and correlates that to an
+action to be performed by a program using the remote control.  So in MythTV,
+ChannelUp means one thing, while in <B>mplayer</B> it means something
+different.  <CODE>lircrc</CODE> gives you the flexibility of taking the name of
+the button and having it perform different actions depending on which
+program you're using at the time.</P>
+<P><B>NOTE</B>:  The definitions in <CODE>lircd.conf</CODE> come from the user
+community, and there is no standard for the common button names.  One
+<CODE>lircd.conf</CODE> file may contain a definition for a button called
+"ChannelUp", while another may contain a definition for "Chan+".  Your
+<CODE>lircrc</CODE> file must therefore be configured appropriately, or it won't
+work.</P>
 <P>If this fails, complaining of a missing <CODE>lircd.conf</CODE> file, then you
 must find or make one. First look for a pre-made configuration file at 
 <A HREF="http://lirc.sourceforge.net/remotes/">http://lirc.sourceforge.net/remotes/</A>.  Mandriva 9.1 users, look in
@@ -2343,7 +2355,7 @@ interact directly with </P>
 <P>
 <BLOCKQUOTE><CODE>
 <PRE>
-$ cd ~/mythtv-0.20/configfiles
+$ cd ~/mythtv-0.20/contrib/configfiles
 $ cp lircrc.example ~/.lircrc
 </PRE>
 </CODE></BLOCKQUOTE>
@@ -2383,10 +2395,10 @@ $ irxevent &amp;
 If <B>irxevent</B> isn't running, then MythTV will not respond to your remote
 control unless you're using native lirc support.</P>
 
-<H2><A NAME="ss8.5">8.5</A> <A HREF="#toc8.5">Additional information for lirc</A>
+<H2><A NAME="ss8.4">8.4</A> <A HREF="#toc8.4">Additional information for lirc</A>
 </H2>
 
-<P>Take a look at the lircrc.example files in the <CODE>configfiles/</CODE>
+<P>Take a look at the lircrc.example files in the <CODE>contrib/configfiles/</CODE>
 directory.  In my case, (Pinnacle Studio card) the channel up and down functions
 weren't working, due to the fact that the button names were different than
 the default <CODE>lircrc.example</CODE> file that came with MythTV.</P>
@@ -2438,7 +2450,7 @@ end
 
 which took care of basic functionality.  Because the PCTV Studio remote
 has additional buttons, look at the
-<CODE>configfiles/lircrc.example.pinnaclestudiopctv</CODE> for an example of how
+<CODE>contrib/configfiles/lircrc.example.pinnaclestudiopctv</CODE> for an example of how
 to define additional buttons, and how to debug potential button name
 conflicts between the <CODE>lircrc.example</CODE> file and how <B>your</B>
 remote defines the button names.</P>
@@ -2452,7 +2464,7 @@ will only send one keypress to the application, even if you're holding down
 the key.  The actual <B>repeat =</B> number will vary from system to
 system, so experiment and see which value works best for you.</P>
 
-<H2><A NAME="ss8.6">8.6</A> <A HREF="#toc8.6">Configuring lirc for use with an IR blaster</A>
+<H2><A NAME="ss8.5">8.5</A> <A HREF="#toc8.5">Configuring lirc for use with an IR blaster</A>
 </H2>
 
 <P>Lirc has support for various IR transmitters. A popular model is the Actisys
@@ -2920,6 +2932,10 @@ to have mythbackend automatically start up during boot.  You can follow the
 steps outlined in the section called 
 <A HREF="#mythbackend_autostart">Automatically starting mythbackend at system boot time</A> for
 configuration steps.</P>
+<P>If you enable the <CODE>-l</CODE> parameter, you will want to keep your logfiles
+rotated (so that they don't fill up a partition).  See the section called
+<A HREF="#logrotate">Automatically rotating logs</A> for more
+information.</P>
 
 <H2><A NAME="nonmaster_backend"></A> <A NAME="ss9.3">9.3</A> <A HREF="#toc9.3">Configuring a non-master backend </A>
 </H2>
@@ -6345,7 +6361,7 @@ $ cat vidout > video.yuv
 </H2>
 
 <P>MythTV is not dependent on any particular window manager.  If you wish to
-run a lightweight window manager, the <CODE>configfiles/</CODE> directory has an
+run a lightweight window manager, the <CODE>contrib/configfiles/</CODE> directory has an
 example of a <CODE>.twmrc</CODE> and <CODE>.fvwmrc</CODE> file you may use.</P>
 
 <H2><A NAME="capture_resolution_"></A> <A NAME="ss23.3">23.3</A> <A HREF="#toc23.3">What capture resolution should I use?  How does video work?</A>
@@ -6767,7 +6783,8 @@ $
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
-
+<P>
+<A NAME="logrotate"></A> </P>
 <H3>Log files </H3>
 
 <P>By default, the log file for mythbackend will be written to
@@ -6790,6 +6807,58 @@ $ su
 $ ls -ld /var/log/mythtv
 drwxrwxr-x    2 root     mythtv       4096 Apr 28 21:58 /var/log/mythtv/
 $
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>Create a <CODE>mythtv</CODE> file in <CODE>/etc/logrotate.d</CODE>:
+<BLOCKQUOTE><CODE>
+<PRE>
+$ su
+# cat > /etc/logrotate.d/mythtv
+# Set default values for all log files first...
+
+# Rotate the logs once a week, or more frequently if they 
+# exceed 10Mb in size (size is checked daily).
+weekly
+size 10M
+
+# 'copytruncate' is used for logs generated by 
+# currently-running programs that should not be restarted 
+# (and can't be signalled to start a new log) after the 
+# rotation.  It duplicates the existing log file and then 
+# sets the length of the existing file to 0.  The only time 
+# this would break would be if the program writing the log 
+# was using lseek.
+copytruncate
+
+# After rotating the files, leave the most recent rotated 
+# copy alone but gzip everything else to save space.
+compress
+delaycompress
+
+# If a log isn't present then don't worry about it.
+missingok
+
+# Don't rotate an empty file.
+notifempty
+
+# end of the global options
+
+/var/log/mythtv/mythbackend.log /var/log/mythtv/mythfrontend.log {
+  # Keep logs until they are 2 months old or the number of 
+  # logs reaches 12.  If the log files stay small, the age will 
+  # kick in first and you'll only have 8 log files.  If they 
+  # get larger than 10Mb then you won't keep all 60 days.
+  rotate 12
+  maxage 60
+}
+
+# Different options for mythfilldatabase:
+/var/log/mythtv/mythfilldatabase.log {
+  rotate 2
+}
+^D
+#
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
@@ -7212,23 +7281,27 @@ impact the viewing experience on the frontend.</P>
 <H2><A NAME="ss23.20">23.20</A> <A HREF="#toc23.20">Using the DBoxII within MythTV</A>
 </H2>
 
-<P>The configuration of the DBoxII for use within MythTV is tricky 
-(as of May 16 2005), that's why it's covered here. Your DBoxII has to be 
-running linux and the Neutrino GUI instead of the stock BetaNova firmware. 
-For further information, please refer to 
-<A HREF="http://www.tuxbox.org">http://www.tuxbox.org</A>. Additionally, you need to enable the SPTS mode in 
-Neutrino.</P>
-<P>1.) Add a new "Capture Card" in the setup. The "Card type" is "DBOX2 Input", 
+<P>The configuration of the DBoxII for use within MythTV is tricky (as of
+May 16 2005), that's why it's covered here. Your DBoxII has to be running
+linux and the Neutrino GUI instead of the stock BetaNova firmware.  For
+further information, please refer to 
+<A HREF="http://www.tuxbox.org">http://www.tuxbox.org</A>. Additionally, you need to enable the SPTS
+mode in Neutrino.</P>
+<P>
+<UL>
+<LI>Add a new "Capture Card" in the setup. The "Card type" is "DBOX2 Input", 
 the other values have to be adjusted according to your setup. 
-The default values, except for the "DBOX2 host ip", should work fine.
-2.) Define a new video source. It doesn't need to be configured, 
-you just need to define it. MythTV grabs the EPG from the DBoxII.
-3.) Connect the DBoxII to the newly defined input source in "input connections".
-4.) Since channel scanning is not implemented yet, you need to define channels 
+The default values, except for the "DBOX2 host ip", should work fine.</LI>
+<LI>Define a new video source. It doesn't need to be configured, 
+you just need to define it. MythTV grabs the EPG from the DBoxII.</LI>
+<LI>Connect the DBoxII to the newly defined input source in "input connections".</LI>
+<LI>Since channel scanning is not implemented yet, you need to define channels 
 in the "Channel Editor". Make sure that you use the same value for 
 "Channel Name" as on the DBoxII. You can get a list of available 
 channels from the web interface of Neutrino at http://ip-of-your-box:80/. 
-Associate the channel with your new video source and repeat when needed.</P>
+Associate the channel with your new video source and repeat when needed.</LI>
+</UL>
+</P>
 <P>You may leave the Setup now and proceed as usual.</P>
 
 <H2><A NAME="ss23.21">23.21</A> <A HREF="#toc23.21">What do the icons on the Watch Recordings screen mean?</A>
@@ -7299,13 +7372,13 @@ interface.</P>
 <P>Note that for the PVR-350 there are some 
 <A HREF="#PVR-350">considerations</A>
 regarding the way audio is handled.</P>
-<P>The PVR-500 is a dual-encoder version of the PVR-150 card.  This means that
-you can simultaneously record two different programs at the same time,
-because there are two encoder chips on the PCI card.  Hauppuage has also
-installed an onboard splitter, so you can use one COAX to feed both tuners. 
-Current versions of the PVR-500 should come with an adapter to allow you to
-connect a second S-Video or composite input.  Early adopters may need to
-purchase this item separately.</P>
+<P>The PVR-500 is a dual-encoder version of the PVR-150 card, so you can
+simultaneously record two different programs at the same time, because there
+are two encoder chips on the PCI card.  Hauppuage has also installed an
+onboard splitter, so you can use one COAX to feed both tuners.  Current
+versions of the PVR-500 should come with an adapter to allow you to connect
+a second S-Video or composite input, but this will take up a second PCI
+slot.  Early adopters may need to purchase this item separately.</P>
 
 <H2><A NAME="ss23.24">23.24</A> <A HREF="#toc23.24">Changing channels on an external Set Top Box</A>
 </H2>
@@ -7511,11 +7584,10 @@ fact that there are.  You may need to specify the physical volume in the <CODE>/
 
 Once you've completed one of the following two procedures, use <B>df</B>
 to check that you've got more space.</P>
-
-<H3>ReiserFS</H3>
-
 <P>Make the logical volume used for video bigger:</P>
 <P><CODE># lvextend --size +50G /dev/VGforMyth/video</CODE></P>
+<H3>ReiserFS</H3>
+
 <P>Unmount, resize and remount the filesystem.  Technically, you don't need to
 unmount and remount the ReiserFS. 
 <BLOCKQUOTE><CODE>
@@ -7529,13 +7601,13 @@ unmount and remount the ReiserFS.
 
 <H3>ext2 or ext3</H3>
 
-<P>LVM comes with a program called <B>e2fsadm</B>.</P>
+<P>LVM comes with a program called <B>resize2fs</B>.</P>
 <P>Unmount, resize and remount the filesystem.  The filesystem <EM>must</EM> be
 unmounted during this procedure.
 <BLOCKQUOTE><CODE>
 <PRE>
 # umount /var/video
-# e2fsadm --size +50G /dev/VGforMyth/video
+# resize2fs --size +50G /dev/VGforMyth/video
 # mount /dev/VGforMyth/video /var/video
 </PRE>
 </CODE></BLOCKQUOTE>
@@ -7545,7 +7617,6 @@ unmounted during this procedure.
 <P>XFS does not need to be unmounted to extend the size:
 <BLOCKQUOTE><CODE>
 <PRE>
-# lvextend --size +50G /dev/VGforMyth/video
 # xfs_growfs /var/video
 </PRE>
 </CODE></BLOCKQUOTE>

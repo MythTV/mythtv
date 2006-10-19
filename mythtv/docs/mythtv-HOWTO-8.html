@@ -46,22 +46,7 @@ build process. </P>
 </CODE></BLOCKQUOTE>
 </P>
 
-<H2><A NAME="ss8.2">8.2</A> <A HREF="mythtv-HOWTO.html#toc8.2">Red Hat Linux/Fedora Core</A>
-</H2>
-
-<P>You should already have the source from the "Kernel Development" package
-you installed in section 3.2. Ensure that a symlink has been created:
-<BLOCKQUOTE><CODE>
-<PRE>
-$ cd /usr/src
-$ su
-# ln -s linux-2.4 /usr/src/linux
-# exit
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
-
-<H2><A NAME="ss8.3">8.3</A> <A HREF="mythtv-HOWTO.html#toc8.3">Obtaining and compiling lirc</A>
+<H2><A NAME="ss8.2">8.2</A> <A HREF="mythtv-HOWTO.html#toc8.2">Obtaining and compiling lirc</A>
 </H2>
 
 <P>You're going to need to download and compile <B>lircd</B>.  Go to 
@@ -174,7 +159,7 @@ to emulate the various keystrokes from <CODE>keys.txt</CODE> of your IR
 keyboard.  Using this method removes lirc entirely from the picture - your
 remote will be sending keypresses that your PC "sees" on the keyboard port.</P>
 
-<H2><A NAME="completing_lirc_install"></A> <A NAME="ss8.4">8.4</A> <A HREF="mythtv-HOWTO.html#toc8.4">Completing the lirc install </A>
+<H2><A NAME="completing_lirc_install"></A> <A NAME="ss8.3">8.3</A> <A HREF="mythtv-HOWTO.html#toc8.3">Completing the lirc install </A>
 </H2>
 
 <P>
@@ -213,6 +198,35 @@ users, type: <CODE># /etc/rc.d/init.d/lircd start</CODE> instead of:
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
+<P><B>NOTE</B>:  Read this next section if you're not familiar with how lirc works!</P>
+<P>There are two separate files used by lirc, and both are required for your
+remote control to do anything useful. First is the <CODE>lircd.conf</CODE> file. 
+<CODE>lircd.conf</CODE> tells the lirc daemon how to interpret the IR pulses
+that it receives from a remote control and what name to assign to each
+sequence of pulses.  Without getting too involved, a particular series of
+pulses may correlate to "Channel Up".  The <CODE>lircd.conf</CODE> file will
+then contain a line that looks something like this:</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+          ChannelUp                0x0000000000001020
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>The <CODE>lircd.conf</CODE> file can have multiple remote controls defined.</P>
+<P>The second file is <CODE>lircrc</CODE>, which takes the name of the button which
+was pressed ("ChannelUp") in the above example, and correlates that to an
+action to be performed by a program using the remote control.  So in MythTV,
+ChannelUp means one thing, while in <B>mplayer</B> it means something
+different.  <CODE>lircrc</CODE> gives you the flexibility of taking the name of
+the button and having it perform different actions depending on which
+program you're using at the time.</P>
+<P><B>NOTE</B>:  The definitions in <CODE>lircd.conf</CODE> come from the user
+community, and there is no standard for the common button names.  One
+<CODE>lircd.conf</CODE> file may contain a definition for a button called
+"ChannelUp", while another may contain a definition for "Chan+".  Your
+<CODE>lircrc</CODE> file must therefore be configured appropriately, or it won't
+work.</P>
 <P>If this fails, complaining of a missing <CODE>lircd.conf</CODE> file, then you
 must find or make one. First look for a pre-made configuration file at 
 <A HREF="http://lirc.sourceforge.net/remotes/">http://lirc.sourceforge.net/remotes/</A>.  Mandriva 9.1 users, look in
@@ -278,7 +292,7 @@ interact directly with </P>
 <P>
 <BLOCKQUOTE><CODE>
 <PRE>
-$ cd ~/mythtv-0.20/configfiles
+$ cd ~/mythtv-0.20/contrib/configfiles
 $ cp lircrc.example ~/.lircrc
 </PRE>
 </CODE></BLOCKQUOTE>
@@ -318,10 +332,10 @@ $ irxevent &amp;
 If <B>irxevent</B> isn't running, then MythTV will not respond to your remote
 control unless you're using native lirc support.</P>
 
-<H2><A NAME="ss8.5">8.5</A> <A HREF="mythtv-HOWTO.html#toc8.5">Additional information for lirc</A>
+<H2><A NAME="ss8.4">8.4</A> <A HREF="mythtv-HOWTO.html#toc8.4">Additional information for lirc</A>
 </H2>
 
-<P>Take a look at the lircrc.example files in the <CODE>configfiles/</CODE>
+<P>Take a look at the lircrc.example files in the <CODE>contrib/configfiles/</CODE>
 directory.  In my case, (Pinnacle Studio card) the channel up and down functions
 weren't working, due to the fact that the button names were different than
 the default <CODE>lircrc.example</CODE> file that came with MythTV.</P>
@@ -373,7 +387,7 @@ end
 
 which took care of basic functionality.  Because the PCTV Studio remote
 has additional buttons, look at the
-<CODE>configfiles/lircrc.example.pinnaclestudiopctv</CODE> for an example of how
+<CODE>contrib/configfiles/lircrc.example.pinnaclestudiopctv</CODE> for an example of how
 to define additional buttons, and how to debug potential button name
 conflicts between the <CODE>lircrc.example</CODE> file and how <B>your</B>
 remote defines the button names.</P>
@@ -387,7 +401,7 @@ will only send one keypress to the application, even if you're holding down
 the key.  The actual <B>repeat =</B> number will vary from system to
 system, so experiment and see which value works best for you.</P>
 
-<H2><A NAME="ss8.6">8.6</A> <A HREF="mythtv-HOWTO.html#toc8.6">Configuring lirc for use with an IR blaster</A>
+<H2><A NAME="ss8.5">8.5</A> <A HREF="mythtv-HOWTO.html#toc8.5">Configuring lirc for use with an IR blaster</A>
 </H2>
 
 <P>Lirc has support for various IR transmitters. A popular model is the Actisys

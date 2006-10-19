@@ -166,11 +166,10 @@ fact that there are.  You may need to specify the physical volume in the <CODE>/
 
 Once you've completed one of the following two procedures, use <B>df</B>
 to check that you've got more space.</P>
-
-<H3>ReiserFS</H3>
-
 <P>Make the logical volume used for video bigger:</P>
 <P><CODE># lvextend --size +50G /dev/VGforMyth/video</CODE></P>
+<H3>ReiserFS</H3>
+
 <P>Unmount, resize and remount the filesystem.  Technically, you don't need to
 unmount and remount the ReiserFS. 
 <BLOCKQUOTE><CODE>
@@ -184,13 +183,13 @@ unmount and remount the ReiserFS.
 
 <H3>ext2 or ext3</H3>
 
-<P>LVM comes with a program called <B>e2fsadm</B>.</P>
+<P>LVM comes with a program called <B>resize2fs</B>.</P>
 <P>Unmount, resize and remount the filesystem.  The filesystem <EM>must</EM> be
 unmounted during this procedure.
 <BLOCKQUOTE><CODE>
 <PRE>
 # umount /var/video
-# e2fsadm --size +50G /dev/VGforMyth/video
+# resize2fs --size +50G /dev/VGforMyth/video
 # mount /dev/VGforMyth/video /var/video
 </PRE>
 </CODE></BLOCKQUOTE>
@@ -200,7 +199,6 @@ unmounted during this procedure.
 <P>XFS does not need to be unmounted to extend the size:
 <BLOCKQUOTE><CODE>
 <PRE>
-# lvextend --size +50G /dev/VGforMyth/video
 # xfs_growfs /var/video
 </PRE>
 </CODE></BLOCKQUOTE>
