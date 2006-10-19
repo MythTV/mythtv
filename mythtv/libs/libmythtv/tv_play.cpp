@@ -310,7 +310,7 @@ void TV::InitKeys(void)
     REG_KEY("TV Playback", "JUMPREC", "Display menu of recorded programs to jump to", "");
     REG_KEY("TV Playback", "SIGNALMON", "Monitor Signal Quality", "F7");
     REG_KEY("TV Playback", "JUMPTODVDROOTMENU", "Jump to the DVD Root Menu", "");
-    REG_KEY("TV Playback", "EXITSHOWNOPROMPTS","Exit Show without any prompts", "Ctrl+E");
+    REG_KEY("TV Playback", "EXITSHOWNOPROMPTS","Exit Show without any prompts", "");
 
     /* Editing keys */
     REG_KEY("TV Editing", "CLEARMAP", "Clear editing cut points", "C,Q,Home");
@@ -1769,7 +1769,7 @@ void TV::RunTV(void)
             if (internalState == kState_WatchingPreRecorded && !inPlaylist &&
                 dialogname == "" && nvp->IsNearEnd() && !exitPlayer && !underNetworkControl &&
                 (gContext->GetNumSetting("EndofRecordingExitPrompt") == 1) &&
-                !jumped_back)
+                !jumped_back && !editmode)
             {
                 PromptDeleteRecording(tr("End Of Recording"));
             }
@@ -2713,6 +2713,8 @@ void TV::ProcessKeypress(QKeyEvent *e)
         }
         else if (action == "EXITSHOWNOPROMPTS")
         {
+            if (nvp)
+                nvp->SetBookmark();
             requestDelete = false;
             exitPlayer = true;
             wantsToQuit = true;
