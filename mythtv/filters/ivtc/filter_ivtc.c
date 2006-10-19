@@ -62,7 +62,8 @@ IvtcFilter (VideoFilter *vf, VideoFrame *frame)
     if (!frame->interlaced_frame &&
         !filter->apply_filter &&
         filter->interlaced_frame_seen &&
-        filter->progressive_frame_seen)
+        filter->progressive_frame_seen &&
+        frame->width <= 720)
     {
         fprintf(stderr,"turning on inverse telecine filter");
         filter->apply_filter = 1;
