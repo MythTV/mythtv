@@ -44,6 +44,8 @@ class MHIContext : public MHContext
 
     void QueueDSMCCPacket(unsigned char *data, int length, int componentTag,
         unsigned carouselId, int dataBroadcastId);
+    // A NetworkBootInfo sub-descriptor is present in the PMT.
+    void SetNetBootInfo(const unsigned char *data, uint length);
     /// Restart the MHEG engine.
     void Restart(uint chanid, uint cardid, bool isLive);
     // Offer a key press.  Returns true if it accepts it.
@@ -133,6 +135,7 @@ class MHIContext : public MHContext
     static void *StartMHEGEngine(void *param);
     void RunMHEGEngine(void);
     void ProcessDSMCCQueue(void);
+    void NetworkBootRequested(void);
 
     InteractiveTV   *m_parent;
 
@@ -169,6 +172,9 @@ class MHIContext : public MHContext
     int              m_audioTag;
     int              m_videoTag;
     int              m_tuningTo;
+
+    uint             m_lastNbiVersion;
+    QMemArray<unsigned char> m_nbiData;
 };
 
 // Object for drawing text.

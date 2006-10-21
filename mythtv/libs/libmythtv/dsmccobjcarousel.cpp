@@ -150,20 +150,26 @@ void ObjCarousel::AddModuleInfo(DsmccDii *dii, Dsmcc *status,
                     VERBOSE(VB_DSMCC, QString("[dsmcc] Already Know "
                                               "Module %1")
                             .arg(info->module_id));
-
-                    return;
+                    if (cachep->ModuleSize() == info->module_size)
+                        return;
+                    // It seems that when ITV4 starts broadcasting it
+                    // updates the contents of a file but doesn't
+                    // update the version.  This is a work-around.
+                    VERBOSE(VB_DSMCC, QString("[dsmcc] Module %1 size "
+                                              "has changed (%2 to %3) "
+                                              "but version has not!!")
+                             .arg(info->module_id)
+                             .arg(info->module_size)
+                             .arg(cachep->DataSize()));
                 }
-                else
-                {
-                    // Version has change - Drop old data.
-                    VERBOSE(VB_DSMCC, QString("[dsmcc] Updated "
-                                              "Module %1")
-                            .arg(info->module_id));
+                // Version has changed - Drop old data.
+                VERBOSE(VB_DSMCC, QString("[dsmcc] Updated "
+                                          "Module %1")
+                        .arg(info->module_id));
 
-                    // Remove and delete the cache object.
-                    m_Cache.remove();
-                    break;
-                }
+                // Remove and delete the cache object.
+                m_Cache.remove();
+                break;
             }
         }
 

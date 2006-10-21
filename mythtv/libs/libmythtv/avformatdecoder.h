@@ -147,6 +147,7 @@ class AvFormatDecoder : public DecoderBase
 
     void ScanATSCCaptionStreams(int av_stream_index);
     void ScanTeletextCaptions(int av_stream_index);
+    void ScanDSMCCStreams(void);
     int AutoSelectAudioTrack(void);
 
   private:

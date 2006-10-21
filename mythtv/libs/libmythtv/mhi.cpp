@@ -21,6 +21,10 @@ class MHIImageData
     int    m_y;
 };
 
+// Special values for the NetworkBootInfo version.  Real values are a byte.
+#define NBI_VERSION_UNSET       257
+#define NBI_VERSION_ABSENT      256
+
 MHIContext::MHIContext(InteractiveTV *parent)
     : m_parent(parent),     m_dsmcc(NULL),
       m_engine(NULL),       m_stop(false),
@@ -29,7 +33,7 @@ MHIContext::MHIContext(InteractiveTV *parent)
       m_face_loaded(false), m_currentChannel(-1),
       m_isLive(false),      m_currentCard(0),
       m_audioTag(-1),       m_videoTag(-1),
-      m_tuningTo(-1)
+      m_tuningTo(-1),       m_lastNbiVersion(NBI_VERSION_UNSET)
 {
     m_display.setAutoDelete(true);
     m_dsmccQueue.setAutoDelete(true);
@@ -146,6 +150,8 @@ void MHIContext::Restart(uint chanid, uint cardid, bool isLive)
         m_updated = true;
         m_stop = false;
         m_isLive = isLive;
+        // Don't set the NBI version here.  Restart is called
+        // after the PMT is processed.
         m_stopped = pthread_create(&m_engineThread, NULL,
                                    StartMHEGEngine, this) != 0;
         m_audioTag = -1;
@@ -173,6 +179,7 @@ void MHIContext::RunMHEGEngine(void)
         int key = 0;
         do
         {
+            (void)NetworkBootRequested();
             ProcessDSMCCQueue();
             {
                 QMutexLocker locker(&m_keyLock);
@@ -240,6 +247,40 @@ void MHIContext::QueueDSMCCPacket(
                                          componentTag, carouselId,
                                          dataBroadcastId));
     m_engine_wait.wakeAll();
+}
+
+// A NetworkBootInfo sub-descriptor is present in the PMT.
+void MHIContext::SetNetBootInfo(const unsigned char *data, uint length)
+{
+    if (length < 2) return;
+    QMutexLocker locker(&m_dsmccLock);
+    // Save the data from the descriptor.
+    m_nbiData.duplicate(data, length);
+    // If there is no Network Boot Info or we're setting it
+    // for the first time just update the "last version".
+    if (length < 2)
+        m_lastNbiVersion = NBI_VERSION_ABSENT;
+    else if (m_lastNbiVersion == NBI_VERSION_UNSET)
+        m_lastNbiVersion = data[0];
+    else
+        m_engine_wait.wakeAll();
+}
+
+void MHIContext::NetworkBootRequested(void)
+{
+    QMutexLocker locker(&m_dsmccLock);
+    if (m_nbiData.size() >= 2 && m_nbiData[0] != m_lastNbiVersion)
+    {
+        m_lastNbiVersion = m_nbiData[0]; // Update the saved version
+        if (m_nbiData[1] == 1)
+        {
+            m_dsmcc->Reset();
+            m_engine->SetBooting();
+            m_display.clear();
+            m_updated = true;
+        }
+        // TODO: else if it is 2 generate an EngineEvent.
+    }
 }
 
 // Called by the engine to check for the presence of an object in the carousel.
@@ -549,7 +590,10 @@ bool MHIContext::TuneTo(int channel)
     // Post an event requesting a channel change.
     MythEvent me(QString("NETWORK_CONTROL CHANID %1").arg(channel));
     gContext->dispatch(me);
-
+    // Reset the NBI version here to prevent a reboot.
+    QMutexLocker locker(&m_dsmccLock);
+    m_lastNbiVersion = NBI_VERSION_UNSET;
+    m_nbiData.resize(0);
     return true;
 }
 

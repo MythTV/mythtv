@@ -1251,6 +1251,64 @@ void AvFormatDecoder::ScanTeletextCaptions(int av_index)
     }
 }
 
+/** \fn AvFormatDecoder::ScanDSMCCStreams(void)
+ *  \brief Check to see whether there is a Network Boot Ifo sub-descriptor in the PMT which
+ *         requires the MHEG application to reboot.
+ */
+void AvFormatDecoder::ScanDSMCCStreams(void)
+{
+    if (!ic->cur_pmt_sect)
+        return;
+
+    if (!itv && ! (itv = GetNVP()->GetInteractiveTV()))
+        return;
+
+    const PESPacket pes = PESPacket::ViewData(ic->cur_pmt_sect);
+    const PSIPTable psip(pes);
+    const ProgramMapTable pmt(psip);
+    
+    for (uint i = 0; i < pmt.StreamCount(); i++)
+    {
+        if (! StreamID::IsObjectCarousel(pmt.StreamType(i)))
+            continue;
+
+        const desc_list_t desc_list = MPEGDescriptor::ParseOnlyInclude(
+            pmt.StreamInfo(i), pmt.StreamInfoLength(i),
+            DescriptorID::data_broadcast_id);
+
+        for (uint j = 0; j < desc_list.size(); j++)
+        {
+            const unsigned char *desc = desc_list[j];
+            desc++; // Skip tag
+            uint length = *desc++;
+            const unsigned char *endDesc = desc+length;
+            uint dataBroadcastId = desc[0]<<8 | desc[1];
+            if (dataBroadcastId != 0x0106) // ETSI/UK Profile
+                continue;
+            desc += 2; // Skip data ID
+            while (desc != endDesc)
+            {
+                uint appTypeCode = desc[0]<<8 | desc[1];
+                desc += 3; // Skip app type code and boot priority hint
+                uint appSpecDataLen = *desc++;
+                if (appTypeCode == 0x101) // UK MHEG profile
+                {
+                    const unsigned char *subDescEnd = desc + appSpecDataLen;
+                    while (desc < subDescEnd)
+                    {
+                        uint sub_desc_tag = *desc++;
+                        uint sub_desc_len = *desc++;
+                        if (sub_desc_tag == 1) // Network boot info sub-descriptor.
+                            itv->SetNetBootInfo(desc, sub_desc_len);
+                        desc += sub_desc_len;
+                    }
+                }
+                else desc += appSpecDataLen;
+            }
+        }
+    }
+}
+
 int AvFormatDecoder::ScanStreams(bool novideo)
 {
     int scanerror = 0;
@@ -1561,6 +1619,8 @@ int AvFormatDecoder::ScanStreams(bool novideo)
 
     if (GetNVP()->IsErrored())
         scanerror = -1;
+
+    ScanDSMCCStreams();
 
     return scanerror;
 }

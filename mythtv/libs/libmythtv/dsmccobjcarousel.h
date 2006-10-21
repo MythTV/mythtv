@@ -35,6 +35,7 @@ class DSMCCCacheModuleData
     unsigned short ModuleId(void)   const { return m_module_id;   }
     unsigned short StreamId(void)   const { return m_stream_id;   }
     unsigned char  Version(void)    const { return m_version;     }
+    unsigned long  ModuleSize(void) const { return m_moduleSize;  }
 
     /// Return the, possibly uncompressed, module size
     unsigned long  DataSize(void) const

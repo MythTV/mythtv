@@ -21,6 +21,9 @@ class InteractiveTV
                              int componentTag, unsigned carouselId,
                              int dataBroadcastId);
 
+    // A NetworkBootInfo sub-descriptor is present in the PMT
+    void SetNetBootInfo(const unsigned char *data, uint length);
+
     // See if the image has changed.
     bool ImageHasChanged(void);
     // Draw the (updated) image.

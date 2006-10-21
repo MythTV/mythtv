@@ -75,3 +75,8 @@ void InteractiveTV::GetInitialStreams(int &audioTag, int &videoTag)
 {
     m_context->GetInitialStreams(audioTag, videoTag);
 }
+
+void InteractiveTV::SetNetBootInfo(const unsigned char *data, uint length)
+{
+    m_context->SetNetBootInfo(data, length);
+}
