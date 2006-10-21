@@ -1730,15 +1730,9 @@ void ProgramInfo::UpdateRecordingEnd(void)
 {
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("UPDATE recorded SET endtime = :ENDTIME, "
-                  "    recordid = :RECORDID "
                   "WHERE chanid = :CHANID AND "
                   "    starttime = :STARTTIME ");
     query.bindValue(":ENDTIME", recendts);
-
-    if (rectype == kOverrideRecord && parentid > 0)
-        query.bindValue(":RECORDID", parentid);
-    else
-        query.bindValue(":RECORDID", recordid);
 
     query.bindValue(":CHANID", chanid);
     query.bindValue(":STARTTIME", recstartts);
