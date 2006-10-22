@@ -1686,12 +1686,13 @@ bool PlaybackBox::FillList(bool useCachedData)
                 // Time between the last and next recordings
                 spanHours[recid] = 1000;
                 if (last_record.isValid() && next_record.isValid())
-                    spanHours[recid] = last_record.secsTo(next_record) / 3600;
+                    spanHours[recid] =
+                        last_record.secsTo(next_record) / 3600 + 1;
 
                 // Time since the last episode was deleted
                 delHours[recid] = 1000;
                 if (last_delete.isValid())
-                    delHours[recid] = last_delete.secsTo(now) / 3600;
+                    delHours[recid] = last_delete.secsTo(now) / 3600 + 1;
 
                 // Time until the next recording if any
                 if (next_record.isValid())
