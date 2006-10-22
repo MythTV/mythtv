@@ -6,11 +6,11 @@
 #include "mythcdrom-freebsd.h"
 #endif
 
-
-#include <sys/stat.h>
-
 #include "mythconfig.h"
 #include "mythcontext.h"
+
+#include <qdir.h>
+#include <qfileinfo.h>
 
 // For testing
 #include <cstdio>
@@ -33,6 +33,12 @@ using namespace std;
 #ifndef PATHTO_SVCD_DETECT
 #define PATHTO_SVCD_DETECT "/svcd"
 #endif
+
+// Mac OS X mounts audio CDs ready to use
+#ifndef PATHTO_AUDIO_DETECT
+#define PATHTO_AUDIO_DETECT "/.TOC.plist"
+#endif
+
 
 MythCDROM* MythCDROM::get(QObject* par, const char* devicePath, bool SuperMount,
                                  bool AllowEject) {
@@ -69,7 +75,19 @@ bool MythCDROM::openDevice()
 
 void MythCDROM::onDeviceMounted()
 {
-    QString DetectPath, DetectPath2;
+    if (!QDir(m_MountPath).exists())
+    {
+        VERBOSE(VB_IMPORTANT, QString("Mountpoint '%1' doesn't exist")
+                              .arg(m_MountPath));
+        m_MediaType = MEDIATYPE_UNKNOWN;
+        m_Status    = MEDIASTAT_ERROR;
+        return;
+    }
+
+    QFileInfo audio = QFileInfo(m_MountPath + PATHTO_AUDIO_DETECT);
+    QDir        dvd = QDir(m_MountPath  + PATHTO_DVD_DETECT);
+    QDir       svcd = QDir(m_MountPath  + PATHTO_SVCD_DETECT);
+    QDir        vcd = QDir(m_MountPath  + PATHTO_VCD_DETECT);
 
     // Default is data media
     m_MediaType = MEDIATYPE_DATA;
@@ -77,11 +95,7 @@ void MythCDROM::onDeviceMounted()
     // Default is mounted media
     m_Status = MEDIASTAT_MOUNTED;
 
-    DetectPath.sprintf("%s%s", (const char*)m_MountPath, PATHTO_DVD_DETECT);
-    VERBOSE(VB_IMPORTANT, QString("Looking for: '%1'").arg(DetectPath));
-
-    struct stat sbuf;
-    if (stat(DetectPath, &sbuf) == 0)
+    if (dvd.exists())
     {
         VERBOSE(VB_GENERAL, "Probable DVD detected.");
         m_MediaType = MEDIATYPE_DVD;
@@ -89,14 +103,13 @@ void MythCDROM::onDeviceMounted()
         performMountCmd(false);
         m_Status = MEDIASTAT_USEABLE; 
     }
-    
-    DetectPath.sprintf("%s%s", (const char*)m_MountPath, PATHTO_VCD_DETECT);
-    VERBOSE(VB_IMPORTANT, QString("Looking for: '%1'").arg(DetectPath));
-
-    DetectPath2.sprintf("%s%s", (const char*)m_MountPath, PATHTO_SVCD_DETECT);
-    VERBOSE(VB_IMPORTANT, QString("Looking for: '%1'").arg(DetectPath2));
-
-    if (stat(DetectPath, &sbuf) == 0 || stat(DetectPath2, &sbuf) == 0)
+    else if (audio.exists())
+    {
+        VERBOSE(VB_GENERAL, "Probable Audio CD detected.");
+        m_MediaType = MEDIATYPE_AUDIO;
+        m_Status = MEDIASTAT_USEABLE; 
+    }
+    else if (vcd.exists() || svcd.exists())
     {
         VERBOSE(VB_GENERAL, "Probable VCD/SVCD detected.");
         m_MediaType = MEDIATYPE_VCD;
@@ -105,7 +118,7 @@ void MythCDROM::onDeviceMounted()
         m_Status = MEDIASTAT_USEABLE; 
     }
 
-    // If not DVB or VCD, use parent to check file ext to determine media type
+    // If not DVD/AudioCD/VCD/SVCD, use parent's more generic version
     if (MEDIATYPE_DATA == m_MediaType)
         MythMediaDevice::onDeviceMounted();
 
