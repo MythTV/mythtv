@@ -7317,7 +7317,10 @@ void
 TV::PromptStopWatchingRecording(void)
 {
     ClearOSD();
-    DoPause(false);
+
+    if (!paused)
+        DoPause(false);
+    
     dialogboxTimer.restart();
     QString message;
     QStringList options;
@@ -7357,7 +7360,10 @@ void TV::PromptDeleteRecording(QString title)
     }
 
     ClearOSD();
-    DoPause(false);
+
+    if (!paused)
+        DoPause(false);
+
     dialogboxTimer.restart();
     
     if (dialogname == "")
