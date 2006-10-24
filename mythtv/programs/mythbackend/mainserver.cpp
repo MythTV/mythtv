@@ -177,7 +177,7 @@ MainServer::MainServer(bool master, int port, int /*statusport*/,
 
     recordfileprefix = gContext->GetFilePrefix();
 
-    masterBackendOverride = gContext->GetSetting("MasterBackendOverride", 0);
+    masterBackendOverride = gContext->GetNumSetting("MasterBackendOverride", 0);
 
     mythserver = new MythServer(port);
     if (!mythserver->ok())
