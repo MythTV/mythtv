@@ -243,7 +243,15 @@ int DBox2Recorder::OpenStream(void)
 
     VERBOSE(VB_RECORD, LOC + "Opening pids " + message);
 
-    struct hostent * hp = gethostbyname(ip);
+    struct hostent *hp = gethostbyname(ip);
+    if (!hp)
+    {
+        VERBOSE(VB_IMPORTANT, LOC_ERR +
+                "OpenStream() Unable to look up hostname (1).");
+
+	return -1;
+    }
+
     struct sockaddr_in adr;
     memset ((char *)&adr, 0, sizeof(struct sockaddr_in));
 
@@ -253,10 +261,10 @@ int DBox2Recorder::OpenStream(void)
 
     adr.sin_port = htons(port);
 
-    if (adr.sin_addr.s_addr == 0)
+    if (!adr.sin_addr.s_addr)
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR +
-                "OpenStream() Unable to look up hostname.");
+                "OpenStream() Unable to look up hostname (2).");
 
         return -1;
     }
