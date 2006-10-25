@@ -232,11 +232,8 @@ class MPEG2Language : public CodecParam, public ComboBoxSetting
         setHelpText(QObject::tr(
                         "Chooses the language(s) to record when "
                         "two languages are broadcast. Only Layer II "
-                        "supports the recording of two languages (Dual). ") +
-                    // Delete this part of message once 0.1.10 is old...
-                    QObject::tr(
-                        "Version 0.1.10+ of ivtv driver is required for "
-                        "this setting to have any effect."));
+                        "supports the recording of two languages (Dual)."
+                        "Requires ivtv 0.4.0 or later."));
     };
 };
 
