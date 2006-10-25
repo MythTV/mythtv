@@ -11,6 +11,7 @@
 #include <qdom.h>
 #include <qmutex.h>
 #include <qobject.h>
+#include <qregexp.h>
 
 #include <vector>
 using namespace std;
@@ -234,6 +235,9 @@ class OSD : public QObject
     QString ccfontname;
     QString cc708fontnames[16];
     QString fontSizeType;
+
+    // Text file subtitles
+    QRegExp removeHTML;
 };
     
 #endif

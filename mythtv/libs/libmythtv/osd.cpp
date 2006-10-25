@@ -56,8 +56,11 @@ OSD::OSD(const QRect &osd_bounds, int   frameRate,
       editarrowleft(NULL),                editarrowright(NULL),
       drawSurface(new OSDSurface(osd_bounds.width(), osd_bounds.height())),
       changed(false),                     runningTreeMenu(NULL),
-      treeMenuContainer("")
+      treeMenuContainer(""),
+      removeHTML(QRegExp("</?.+>"))
 {
+    removeHTML.setMinimal(true);
+
     if (!cc708_defaults_initialized)
         initialize_osd_fonts();
 
@@ -312,7 +315,8 @@ void OSD::SetTextSubtitles(const QStringList &lines)
     QStringList::const_iterator it = lines.begin();
     for (; it != lines.end(); ++it)
     {
-        const QString line = *it;
+        QString tmp = *it;
+        const QString line = tmp.remove((const QRegExp&) removeHTML);
 
         if (line.length() <= MAX_CHARACTERS_PER_ROW)
         {
