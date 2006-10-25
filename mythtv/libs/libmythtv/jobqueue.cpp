@@ -40,6 +40,9 @@ JobQueue::JobQueue(bool master)
     pthread_create(&queueThread, NULL, QueueProcesserThread, this);
     queueThreadCond.wait(&queueThreadCondLock);
     queueThreadCondLock.unlock();
+#else
+    VERBOSE(VB_IMPORTANT, LOC_ERR + "The JobQueue has been disabled because "
+            "you compiled with the --enable-valgrind option.");
 #endif // USING_VALGRIND
 
     gContext->addListener(this);
