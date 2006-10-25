@@ -67,6 +67,19 @@ Watching TV or a recording
 - ] or F11    Increase volume
 - Ctrl+B      Jump to the beginning of the recording / ringbuffer.
 
+When in Teletext Menu mode:
+- Up/Down     Previous/Next Page
+- Left/Right  Previous/Next Subpage
+- T           Exit Teletext Menu
+- F2-F6       Menu Red, Green, Yellow, Blue, or White, respectively
+- F7          Toggle Background on/off
+- F8          Reveal hidden text.
+
+When in MHEG ITV Menu mode:
+- F2-F5       Menu Red, Green, Yellow, or Blue, respectively
+- F6          Exit ITV Menu
+- F7          Toggle Menu Text
+
 Without the stickykeys option selected:
 
 - Left arrow to rewind the configured number of seconds.  (default is 5)
