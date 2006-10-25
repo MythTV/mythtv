@@ -214,6 +214,8 @@ class OpenGLVideoSync : public VideoSync
   private:
     GLXDrawable m_drawable;
     GLXContext  m_context;
+  private:
+    class OpenGLVideoSyncPrivate *m_imp;
 };
 
 #ifdef __linux__
