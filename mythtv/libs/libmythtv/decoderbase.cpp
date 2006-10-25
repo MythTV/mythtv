@@ -23,6 +23,7 @@ DecoderBase::DecoderBase(NuppelVideoPlayer *parent, ProgramInfo *pginfo)
 
       current_width(640), current_height(480),
       current_aspect(1.33333), fps(29.97),
+      bitrate(4000),
 
       framesPlayed(0), framesRead(0), lastKey(0), keyframedist(-1),
       indexOffset(0),

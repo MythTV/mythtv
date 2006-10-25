@@ -2852,6 +2852,9 @@ void NuppelVideoPlayer::SwitchToProgram(void)
         return;
     }
 
+    // the bitrate is reset by ringBuffer->OpenFile()...
+    ringBuffer->UpdateRawBitrate(GetDecoder()->GetRawBitrate());
+
     ringBuffer->Unpause();
 
     if (discontinuity || newtype)
@@ -2956,6 +2959,9 @@ void NuppelVideoPlayer::JumpToProgram(void)
         errored = true;
         return;
     }
+
+    // the bitrate is reset by ringBuffer->OpenFile()...
+    ringBuffer->UpdateRawBitrate(GetDecoder()->GetRawBitrate());
 
     ringBuffer->Unpause();
     ringBuffer->IgnoreLiveEOF(false);

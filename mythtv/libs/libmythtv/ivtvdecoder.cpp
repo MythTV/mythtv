@@ -49,6 +49,7 @@ IvtvDecoder::IvtvDecoder(NuppelVideoPlayer *parent, ProgramInfo *pginfo)
 {
     lastResetTime.start();
     fps = 29.97f;
+    bitrate = 8000;
     lastKey = 0;
 }
 
@@ -277,7 +278,7 @@ int IvtvDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
 
     fps = (ntsc) ? 29.97f : 25.0f; // save for later length calculations
 
-    ringBuffer->UpdateRawBitrate(8000);
+    ringBuffer->UpdateRawBitrate(GetRawBitrate());
 
     if (m_playbackinfo || livetv || watchingrecording)
     {

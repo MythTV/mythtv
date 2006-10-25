@@ -89,6 +89,8 @@ class DecoderBase
 
     virtual QString GetEncodingType(void) const = 0;
     virtual double  GetFPS(void) const { return fps; }
+    /// Returns the estimated bitrate if the video were played at normal speed.
+    uint GetRawBitrate(void) const { return bitrate; }
 
     virtual void UpdateFramesPlayed(void);
     long long GetFramesRead(void) const { return framesRead; };
@@ -173,6 +175,7 @@ class DecoderBase
     int current_height;
     float current_aspect;
     double fps;
+    uint bitrate;
 
     long long framesPlayed;
     long long framesRead;

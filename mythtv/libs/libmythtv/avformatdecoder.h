@@ -206,8 +206,6 @@ class AvFormatDecoder : public DecoderBase
     bool directrendering;
     bool drawband;
 
-    int bitrate;
-
     bool gopset;
     /// A flag to indicate that we've seen a GOP frame.  Used in junction with seq_count.
     bool seen_gop;
