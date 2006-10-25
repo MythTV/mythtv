@@ -157,6 +157,7 @@ void GameHandler::GetMetadata(GameHandler *handler, QString rom, QString* Genre,
     {
         if (romDB.contains(key)) 
         {
+            //cerr << "ROMDB FOUND for " << romDB[key].GameName() << endl;
             *Year = romDB[key].Year();
             *Country = romDB[key].Country();
             *Genre = romDB[key].Genre();
@@ -164,6 +165,8 @@ void GameHandler::GetMetadata(GameHandler *handler, QString rom, QString* Genre,
             *GameName = romDB[key].GameName();
             *Version = romDB[key].Version();
         }
+        //else cerr << "NO ROMDB FOUND for " << rom << endl;
+
     };
 
     if (*Genre == "Unknown")

@@ -12,25 +12,12 @@ using namespace std;
 #include <mythtv/mythwidgets.h>
 #include <mythtv/uitypes.h>
 
-QString GameTreeItem::getFillSql() const
+QString GameTreeItem::getFillSql(QString layer) const
 {
     unsigned childDepth = m_depth + 1;
     bool childIsLeaf = childDepth == m_root->getDepth();
     QString childLevel = m_root->getLevel(childDepth - 1);
     QString columns;
-
-    if ((childLevel == "gamename") && (m_gameShowFileName))
-    {
-        columns = childIsLeaf
-                    ? "romname,system,year,genre,gamename"
-                    : "romname";
-    }
-    else {
-
-        columns = childIsLeaf
-                    ? childLevel + ",system,year,genre,gamename"
-                    : childLevel;
-    }
 
     QString filter = m_root->getFilter();
     QString conj = "where ";
@@ -40,11 +27,38 @@ QString GameTreeItem::getFillSql() const
         filter = conj + filter;
         conj = " and ";
     }
+    if ((childLevel == "gamename") && (m_gameShowFileName))
+    {
+        columns = childIsLeaf
+                    ? "romname,system,year,genre,gamename"
+                    : "romname";
 
+        if (m_showHashed)
+            filter += " and romname like \"" + layer + "%\"";
+
+    }
+    else if ((childLevel == "gamename") && (layer.length() == 1)) {
+        columns = childIsLeaf
+                    ? childLevel + ",system,year,genre,gamename"
+                    : childLevel;
+
+        if (m_showHashed) 
+            filter += " and gamename like \"" + layer + "%\"";
+
+    }
+    else if (childLevel == "hash") {
+        columns = "left(gamename,1)";
+    }
+    else {
+
+        columns = childIsLeaf
+                    ? childLevel + ",system,year,genre,gamename"
+                    : childLevel;
+    }
     //  this whole section ought to be in rominfo.cpp really, but I've put it
     //  in here for now to minimise the number of files changed by this mod
-    if (m_romInfo)
-    {
+    if (m_romInfo) {
+    
         if (!m_romInfo->System().isEmpty())
         {
             filter += conj + "trim(system)='" + m_romInfo->System() + "'";
@@ -80,7 +94,15 @@ QString GameTreeItem::getFillSql() const
                 + " order by romname"
                 + ";";
     }
-    else 
+    else if (childLevel == "hash") {
+        sql = "select distinct "
+                + columns
+                + " from gamemetadata "
+                + filter
+                + " order by gamename,romname"
+                + ";";
+    }
+    else
     {
         sql = "select distinct "
                 + columns
@@ -96,7 +118,7 @@ QString GameTreeItem::getFillSql() const
 
 GameTreeItem* GameTreeItem::createChild(QSqlQuery *query) const
 {
-    GameTreeItem *childItem = new GameTreeItem(m_root);
+    GameTreeItem *childItem = new GameTreeItem(m_root, m_showHashed);
     childItem->m_depth = m_depth + 1;
 
     QString current = query->value(0).toString().stripWhiteSpace();
@@ -116,7 +138,9 @@ GameTreeItem* GameTreeItem::createChild(QSqlQuery *query) const
         childItem->m_romInfo = m_romInfo
                              ? new RomInfo(*m_romInfo)
                              : new RomInfo();
-        childItem->m_romInfo->setField(childItem->getLevel(), current);
+        if (childItem->getLevel() != "hash")
+            childItem->m_romInfo->setField(childItem->getLevel(), current);
+
     }
 
     return childItem;
@@ -133,6 +157,7 @@ GameTree::GameTree(MythMainWindow *parent, QString windowName,
     QString levels;
     GameTreeRoot *root;
     GenericTree *node;
+    int pos = 0;
 
     m_gameTree = new GenericTree("game root", 0, false);
 
@@ -163,8 +188,7 @@ GameTree::GameTree(MythMainWindow *parent, QString windowName,
     else
         systemFilter += ")";
 
-
-//    m_gameShowFileName = gContext->GetSetting("GameShowFileNames").toInt();
+    m_showHashed = gContext->GetSetting("GameTreeView").toInt();
 
     //  create a few top level nodes - this could be moved to a config based
     //  approach with multiple roots if/when someone has the time to create
@@ -178,9 +202,18 @@ GameTree::GameTree(MythMainWindow *parent, QString windowName,
     m_favouriteNode = node;
 
     levels = gContext->GetSetting("GameAllTreeLevels");
+
+    if (m_showHashed) {
+        pos = levels.find("gamename",0);
+
+        if (pos != -1) 
+            levels.insert(pos, " hash ");
+
+    }
+
     root = new GameTreeRoot(levels, systemFilter);
     m_gameTreeRoots.push_back(root);
-    m_gameTreeItems.push_back(new GameTreeItem(root));
+    m_gameTreeItems.push_back(new GameTreeItem(root, m_showHashed));
     node = m_gameTree->addNode(tr("All Games"), m_gameTreeItems.size(), false);
 
     root = new GameTreeRoot("genre gamename", systemFilter);
@@ -474,9 +507,10 @@ void GameTree::fillNode(GenericTree *node)
 {
     int i = node->getInt();
     GameTreeItem* curItem = m_gameTreeItems[i - 1];
+    QString layername = node->getString();
 
     MSqlQuery query(MSqlQuery::InitCon());
-    query.exec(curItem->getFillSql());
+    query.exec(curItem->getFillSql(layername));
 
     if (query.isActive() && query.size() > 0)
     {

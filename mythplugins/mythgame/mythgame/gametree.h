@@ -54,7 +54,20 @@ class GameTreeItem : public QObject
     {
         info_popup = NULL;
         m_gameShowFileName = gContext->GetSetting("GameShowFileNames").toInt();
+        m_showHashed = false;
     }
+
+    GameTreeItem(GameTreeRoot* root, bool showHashed)
+      : m_root(root)
+      , m_romInfo(0)
+      , m_depth(0)
+      , m_isFilled(false)
+    {
+        info_popup = NULL;
+        m_gameShowFileName = gContext->GetSetting("GameShowFileNames").toInt();
+        m_showHashed = showHashed;
+    }
+
 
     ~GameTreeItem()
     {
@@ -67,7 +80,7 @@ class GameTreeItem : public QObject
 
     const QString& getLevel() const   { return m_root->getLevel(m_depth - 1); }
     RomInfo* getRomInfo() const       { return m_romInfo; }
-    QString getFillSql() const;
+    QString getFillSql(QString layer) const;
 
     void setFilled(bool isFilled)     { m_isFilled = isFilled; }
 
@@ -86,6 +99,7 @@ class GameTreeItem : public QObject
     unsigned m_depth;
     bool m_isFilled;
     int m_gameShowFileName;
+    bool m_showHashed;
 };
 
 class GameTree : public MythThemedDialog
@@ -128,6 +142,7 @@ class GameTree : public MythThemedDialog
     UIImageType *m_gameImage;
 
     QTimer      *timer;
+    int m_showHashed;
 };
 
 #endif

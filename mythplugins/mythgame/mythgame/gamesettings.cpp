@@ -76,6 +76,14 @@ static HostCheckBox *GameShowFileNames()
     return gc;
 }   
 
+static HostCheckBox *GameTreeView()
+{
+    HostCheckBox *gc = new HostCheckBox("GameTreeView");
+    gc->setLabel(QObject::tr("Hash filenames in display"));
+    gc->setValue(0);
+    gc->setHelpText(QObject::tr("Enable hashing of names in the display tree. This can make navigating long lists a little faster"));
+    return gc;
+}
 
 MythGameGeneralSettings::MythGameGeneralSettings()
 {
@@ -86,9 +94,8 @@ MythGameGeneralSettings::MythGameGeneralSettings()
     general->addChild(GameDeepScan());
     general->addChild(GameRemovalPrompt());
     general->addChild(GameShowFileNames());
-
+    general->addChild(GameTreeView());
     addChild(general);
-
 }
 
 // Player Settings
