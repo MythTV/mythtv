@@ -69,6 +69,12 @@ bool DVDRingBufferPriv::IsInMenu(void) const
             (NumMenuButtons() > 0));
 }
 
+long long DVDRingBufferPriv::NormalSeek(long long pos, int whence)
+{
+    QMutexLocker lock(&seekLock);
+    return Seek(pos, whence);
+}
+
 long long DVDRingBufferPriv::Seek(long long pos, int whence)
 {
     dvdnav_status_t dvdRet = dvdnav_sector_search(this->dvdnav, pos / DVD_BLOCK_SIZE , whence);
@@ -900,12 +906,6 @@ uint DVDRingBufferPriv::GetCurrentTime(void)
     return currentTime;
 }
 
-long long DVDRingBufferPriv::GetCellStartPos(void)
-{
-    gotoCellStart = true;
-    return cellstartPos;
-}
-
 uint DVDRingBufferPriv::GetAudioLanguage(int id)
 {
     int8_t channel = dvdnav_get_audio_logical_stream(dvdnav,id);
@@ -1018,6 +1018,13 @@ bool DVDRingBufferPriv::IsSameChapter(int tmpcellid, int tmpvobid)
         return true;
 
     return false;
+}
+
+void DVDRingBufferPriv::SeekCellStart(void)
+{
+    QMutexLocker lock(&seekLock);
+    gotoCellStart = true;
+    Seek(cellstartPos, SEEK_SET);
 }
 
 /**

@@ -94,7 +94,7 @@ class VideoOutputXv : public VideoOutput
     static MythCodecID GetBestSupportedCodec(uint width, uint height,
                                              uint osd_width, uint osd_height,
                                              uint stream_type, int xvmc_chroma,
-                                             bool test_surface);
+                                             bool test_surface, bool force_xv);
 
     static int GrabSuitableXvPort(Display* disp, Window root,
                                   MythCodecID type,
@@ -144,7 +144,7 @@ class VideoOutputXv : public VideoOutput
     bool CreateBuffers(VOSType subtype);
     vector<void*> CreateXvMCSurfaces(uint num, bool create_xvmc_blocks);
     vector<unsigned char*> CreateShmImages(uint num, bool use_xv);
-    void CreatePauseFrame(void);
+    void CreatePauseFrame(VOSType subtype);
     void CopyFrame(VideoFrame *to, const VideoFrame *from);
 
     void DeleteBuffers(VOSType subtype, bool delete_pause_frame);

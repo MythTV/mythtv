@@ -848,14 +848,15 @@ void NuppelVideoPlayer::SetScanType(FrameScanType scan)
 
 void NuppelVideoPlayer::SetVideoParams(int width, int height, double fps,
                                        int keyframedistance, float aspect,
-                                       FrameScanType scan)
+                                       FrameScanType scan, bool video_codec_changed)
 {
     if (width == 0 || height == 0 || isnan(aspect) || isnan(fps))
         return;
 
     if ((video_width  == width ) && (video_height     == height) && 
         (video_aspect == aspect) && (video_frame_rate == fps   ) &&
-        ((keyframedistance <= 0) || (keyframedistance == keyframedist)))
+        ((keyframedistance <= 0) || (keyframedistance == keyframedist)) &&
+        !video_codec_changed)
     {
         return;
     }

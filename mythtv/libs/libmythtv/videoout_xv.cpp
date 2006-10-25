@@ -649,10 +649,10 @@ int VideoOutputXv::GrabSuitableXvPort(Display* disp, Window root,
  *
  * \sideeffect sets av_pause_frame.
  */
-void VideoOutputXv::CreatePauseFrame(void)
+void VideoOutputXv::CreatePauseFrame(VOSType subtype)
 {
     // All methods but XvMC use a pause frame, create it if needed
-    if (VideoOutputSubType() <= XVideo)
+    if (subtype <= XVideo)
     {
         vbuffers.LockFrame(&av_pause_frame, "CreatePauseFrame");
 
@@ -992,11 +992,14 @@ bool VideoOutputXv::InitXlib()
 MythCodecID VideoOutputXv::GetBestSupportedCodec(
     uint width,       uint height,
     uint osd_width,   uint osd_height,
-    uint stream_type, int xvmc_chroma,    bool test_surface)
+    uint stream_type, int xvmc_chroma,    
+    bool test_surface, bool force_xv)
 {
     (void)width, (void)height, (void)osd_width, (void)osd_height;
     (void)stream_type, (void)xvmc_chroma, (void)test_surface;
 
+    if (force_xv)
+        return (MythCodecID)(kCodec_MPEG1 + (stream_type-1));
 #ifdef USING_XVMC
     Display *disp = MythXOpenDisplay();
 
@@ -1719,7 +1722,7 @@ bool VideoOutputXv::CreateBuffers(VOSType subtype)
     }
 
     if (ok)
-        CreatePauseFrame();
+        CreatePauseFrame(subtype);
 
     return ok;
 }

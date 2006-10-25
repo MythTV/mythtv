@@ -2078,6 +2078,8 @@ static int mpeg_decode_init(AVCodecContext *avctx)
     s->mpeg_enc_ctx.picture_number = 0;
     s->repeat_field = 0;
     s->mpeg_enc_ctx.codec_id= avctx->codec->id;
+    avctx->xvmc_acceleration = 0;
+    avctx->xvmc_vld_hwslice  = 0;
     return 0;
 }
 

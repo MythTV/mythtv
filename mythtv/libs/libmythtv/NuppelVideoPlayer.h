@@ -151,7 +151,8 @@ class MPUBLIC NuppelVideoPlayer : public CC608Reader, public CC708Reader
     void SetBookmark(void);
     void SetKeyframeDistance(int keyframedistance);
     void SetVideoParams(int w, int h, double fps, int keydist,
-                        float a = 1.33333, FrameScanType scan = kScan_Ignore);
+                        float a = 1.33333, FrameScanType scan = kScan_Ignore, 
+                        bool video_codec_changed = false);
     void SetFileLength(int total, int frames);
     void Zoom(int direction);
     void ClearBookmark(void);

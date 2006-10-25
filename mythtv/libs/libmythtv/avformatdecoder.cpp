@@ -292,7 +292,8 @@ AvFormatDecoder::AvFormatDecoder(NuppelVideoPlayer *parent,
       disable_passthru(false),
       // DVD
       lastdvdtitle(-1), lastcellstart(0),
-      dvdmenupktseen(false), dvdvideopause(false)
+      dvdmenupktseen(false), dvdvideopause(false),
+      dvd_xvmc_enabled(false), dvd_video_codec_changed(false)
 {
     bzero(&params, sizeof(AVFormatParameters));
     bzero(prvpkt, 3 * sizeof(char));
@@ -803,6 +804,9 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
         av_free_packet(&pkt1);
         ringBuffer->Seek(0,SEEK_SET);
         ringBuffer->DVD()->IgnoreStillOrWait(false);
+        QString dec = gContext->GetSetting("PreferredMPEG2Decoder", "ffmpeg");
+        if (dec.contains("xvmc"))
+            dvd_xvmc_enabled = true;
     }
     else
     {
@@ -944,6 +948,8 @@ void AvFormatDecoder::InitVideoCodec(AVStream *stream, AVCodecContext *enc,
 {
     float aspect_ratio;
 
+    directrendering = false;
+
     if (selectedStream)
     {
         fps = normalized_fps(stream, enc);
@@ -1027,7 +1033,9 @@ void AvFormatDecoder::InitVideoCodec(AVStream *stream, AVCodecContext *enc,
         }
 
         GetNVP()->SetVideoParams(align_width, align_height, fps,
-                                 keyframedist, aspect_ratio, kScan_Detect);
+                                 keyframedist, aspect_ratio, kScan_Detect, 
+                                 dvd_video_codec_changed);
+        dvd_video_codec_changed = false;
     }
 }
 
@@ -1365,17 +1373,28 @@ int AvFormatDecoder::ScanStreams(bool novideo)
                         enc->codec_id = CODEC_ID_MPEG2VIDEO;
                     // HACK -- end
 
+                    bool force_xv = false;
+                    if (ringBuffer->InDVDMenuOrStillFrame() &&
+                        dvd_xvmc_enabled)
+                    {
+                        force_xv = true;
+                        enc->pix_fmt = PIX_FMT_YUV420P;
+                    }
+                    
                     MythCodecID mcid;
                     mcid = VideoOutputXv::GetBestSupportedCodec(
                         /* disp dim     */ enc->width, enc->height,
                         /* osd dim      */ /*enc->width*/ 0, /*enc->height*/ 0,
                         /* mpeg type    */ xvmc_stream_type(enc->codec_id),
                         /* xvmc pix fmt */ xvmc_pixel_format(enc->pix_fmt),
-                        /* test surface */ kCodec_NORMAL_END > video_codec_id);
+                        /* test surface */ kCodec_NORMAL_END > video_codec_id,
+                        /* force_xv     */ force_xv);
                     bool vcd, idct, mc;
                     enc->codec_id = myth2av_codecid(mcid, vcd, idct, mc);
+                    if (ringBuffer->isDVD() && (mcid != video_codec_id))
+                        dvd_video_codec_changed = true;
                     video_codec_id = mcid;
-                    if (kCodec_NORMAL_END < mcid && kCodec_STD_XVMC_END > mcid)
+                    if (!force_xv && kCodec_NORMAL_END < mcid && kCodec_STD_XVMC_END > mcid)
                     {
                         enc->pix_fmt = (idct) ?
                             PIX_FMT_XVMC_MPEG2_IDCT : PIX_FMT_XVMC_MPEG2_MC;
@@ -2830,17 +2849,28 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
             {
                 int current_width = curstream->codec->width;
                 int video_width = GetNVP()->GetVideoWidth();
-                if (video_width > 0 && video_width != current_width)
+                bool switch_to_xv = false;
+                bool switch_to_xvmc = false;
+                if (dvd_xvmc_enabled && GetNVP() && GetNVP()->getVideoOutput())
+                {
+                    bool dvd_xvmc_active = GetNVP()->getVideoOutput()->hasMCAcceleration();
+                    bool indvdmenu   = ringBuffer->InDVDMenuOrStillFrame();
+                    if (indvdmenu && dvd_xvmc_active)
+                        switch_to_xv = true;
+                    else if (!indvdmenu && !dvd_xvmc_active)
+                        switch_to_xvmc = true;
+                }
+                
+                if ((video_width > 0 && video_width != current_width) ||
+                    switch_to_xv || switch_to_xvmc)
                 {
                     av_free_packet(pkt);
                     CloseCodecs();
                     ScanStreams(false);
+                    QMutexLocker locker(&avcodeclock);
                     allowedquit = true;
                     if (ringBuffer->DVD()->InStillFrame())
-                    {
-                        long long cellstartpos = ringBuffer->DVD()->GetCellStartPos();
-                        ringBuffer->DVD()->Seek(cellstartpos, SEEK_SET);
-                    }
+                        ringBuffer->DVD()->SeekCellStart();
                     continue;
                 }
             }

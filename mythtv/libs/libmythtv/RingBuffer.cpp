@@ -1160,7 +1160,7 @@ long long RingBuffer::Seek(long long pos, int whence)
 #ifdef USING_FRONTEND
     else if (dvdPriv)
     {
-        dvdPriv->Seek(pos, whence);
+        dvdPriv->NormalSeek(pos, whence);
     }
 #endif // USING_FRONTEND
     else

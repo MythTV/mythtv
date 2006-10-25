@@ -50,7 +50,6 @@ class DVDRingBufferPriv
     void ReleaseMenuButton(void);
 
     bool IgnoringStillorWait(void) { return skipstillorwait; }
-    long long GetCellStartPos(void);
     uint ButtonPosX(void) { return hl_startx; }
     uint ButtonPosY(void) { return hl_starty; }
     uint GetAudioLanguage(int id);
@@ -80,7 +79,7 @@ class DVDRingBufferPriv
     bool nextTrack(void);
     void prevTrack(void);
     int  safe_read(void *data, unsigned sz);
-    long long Seek(long long pos, int whence);
+    long long NormalSeek(long long pos, int whence);
     void SkipStillFrame(void);
     void WaitSkip(void);
     void GoToMenu(const QString str);
@@ -98,8 +97,11 @@ class DVDRingBufferPriv
     int   GetTrack(uint type);
     uint8_t GetNumAudioChannels(int id);
     void JumpToTitle(bool change) { jumptotitle = change; }
-    
+    void SeekCellStart(void);
+
     void SetParent(NuppelVideoPlayer *p) { parent = p; }
+
+
     
   protected:
     dvdnav_t      *dvdnav;
@@ -160,7 +162,9 @@ class DVDRingBufferPriv
     NuppelVideoPlayer *parent;
 
     QMutex menuBtnLock;
+    QMutex seekLock;
 
+    long long Seek(long long pos, int whence);
     bool DrawMenuButton(uint8_t *spu_pkt, int buf_size);
     bool DVDButtonUpdate(bool b_mode);
     void ClearMenuSPUParameters(void);
