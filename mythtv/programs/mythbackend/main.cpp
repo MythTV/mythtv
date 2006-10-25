@@ -274,6 +274,8 @@ int main(int argc, char **argv)
     bool nohousekeeper = false;
     bool noexpirer = false;
     bool printexpire = false;
+    bool clearsettingscache = false;
+
     for (int argpos = 1; argpos < a.argc(); ++argpos)
     {
         if (!strcmp(a.argv()[argpos],"-l") ||
@@ -400,6 +402,10 @@ int main(int argc, char **argv)
         {
             printexpire = true;
         } 
+        else if (!strcmp(a.argv()[argpos],"--clearcache"))
+        {
+            clearsettingscache = true;
+        } 
         else if (!strcmp(a.argv()[argpos],"--version"))
         {
             extern const char *myth_source_version;
@@ -432,6 +438,7 @@ int main(int argc, char **argv)
                     "--nojobqueue                   Do not start the JobQueue" << endl <<
                     "--nohousekeeper                Do not start the Housekeeper" << endl <<
                     "--noautoexpire                 Do not start the AutoExpire thread" << endl <<
+                    "--clearcache                   Clear the settings cache on all myth servers" << endl <<
                     "--version                      Version information" << endl;
             return BACKEND_EXIT_INVALID_CMDLINE;
         }
@@ -482,6 +489,22 @@ int main(int argc, char **argv)
         return BACKEND_EXIT_NO_MYTHCONTEXT;
     }
     gContext->SetBackend(true);
+
+    if (clearsettingscache)
+    {
+        if (gContext->ConnectToMasterServer())
+        {
+            RemoteSendMessage("CLEAR_SETTINGS_CACHE");
+            VERBOSE(VB_IMPORTANT, "Sent CLEAR_SETTINGS_CACHE message");
+            return BACKEND_EXIT_OK;
+        }
+        else
+        {
+            VERBOSE(VB_IMPORTANT, "Unable to connect to backend, settings "
+                    "cache will not be cleared.");
+            return BACKEND_EXIT_NO_CONNECT;
+        }
+    }
 
     close(0);
 
