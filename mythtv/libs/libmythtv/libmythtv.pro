@@ -336,6 +336,10 @@ using_backend {
     SOURCES += eitfixup.cpp                eitcache.cpp
     SOURCES += eit.cpp
 
+    # non-EIT EPG stuff
+    HEADERS += programdata.h
+    SOURCES += programdata.cpp
+
     # TVRec & Recorder base classes
     HEADERS += tv_rec.h
     HEADERS += recorderbase.h              DeviceReadBuffer.h

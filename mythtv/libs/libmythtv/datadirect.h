@@ -316,6 +316,7 @@ class MPUBLIC DataDirectProcessor
     // static commands (these update regular DB tables from temp DB tables)
     static int  UpdateChannelsSafe(uint sourceid, bool insert_channels);
     static bool UpdateChannelsUnsafe(uint sourceid);
+    static void DataDirectProgramUpdate(void);
 
   private:
     void CreateTempTables(void);
