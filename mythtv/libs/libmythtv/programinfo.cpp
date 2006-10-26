@@ -3226,6 +3226,61 @@ void ProgramInfo::EditScheduled(void)
     record->exec();
 }
 
+static QString get_ratings(bool recorded, uint chanid, QDateTime startts)
+{
+    QString table = (recorded) ? "recordedrating" : "programrating";
+    QString sel = QString(
+        "SELECT system, rating FROM %1 "
+        "WHERE chanid  = :CHANID "
+        "AND starttime = :STARTTIME").arg(table);
+
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare(sel);
+    query.bindValue(":CHANID", chanid);
+    query.bindValue(":STARTTIME", startts);
+        
+    if (!query.exec() || !query.isActive())
+    {
+        MythContext::DBError("programinfo.cpp: get_ratings", query);
+        return "";
+    }
+
+    QMap<QString,QString> main_ratings;
+    QString advisory = "";
+    while (query.next())
+    {
+        if (query.value(0).toString().lower() == "advisory")
+        {
+            advisory += query.value(1).toString() + ", ";
+            continue;
+        }
+        main_ratings[query.value(0).toString()] = query.value(1).toString();
+    }
+
+    if (!advisory.length() > 2)
+        advisory.left(advisory.length() - 2);
+
+    if (main_ratings.empty())
+        return advisory;
+
+    if (!advisory.isEmpty())
+        advisory = ": " + advisory;
+
+    if (main_ratings.size() == 1)
+    {
+        return *main_ratings.begin() + advisory;
+    }
+
+    QString ratings = "";
+    QMap<QString,QString>::const_iterator it;
+    for (it = main_ratings.begin(); it != main_ratings.end(); ++it)
+    {
+        ratings += it.key() + ": " + *it + ", ";
+    }
+
+    return ratings + "Advisory" + advisory;
+}
+
 #define ADD_PAR(title,text,result)                                    \
     result += details_dialog->themeText("heading", title + ":  ", 3)  \
            +  details_dialog->themeText("body", text, 3) + "<br>";
@@ -3293,23 +3348,7 @@ void ProgramInfo::showDetails(void) const
         else if (!query.isActive())
             MythContext::DBError("ProgramInfo::showDetails", query);
 
-        if (recorded)
-            query.prepare("SELECT rating FROM recordedrating"
-                          " WHERE chanid = :CHANID"
-                          " AND starttime = :STARTTIME ;");
-        else
-            query.prepare("SELECT rating FROM programrating"
-                          " WHERE chanid = :CHANID"
-                          " AND starttime = :STARTTIME ;");
-
-        query.bindValue(":CHANID", chanid);
-        query.bindValue(":STARTTIME", startts);
-        
-        if (query.exec() && query.isActive() && query.size() > 0)
-        {
-            query.next();
-            rating = query.value(0).toString();
-        }
+        rating = get_ratings(recorded, chanid.toUInt(), startts);
     }
 
     if (category_type == "" && programid != "")
