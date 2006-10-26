@@ -132,6 +132,10 @@ show_help(){
   echo "  --enable-opengl-vsync    enable OpenGL vsync method"
   echo "  --enable-directfb        enable DirectFB  (Linux non-X11 video)"
   echo "  --enable-directx         enable DirectX   (Microsoft video)"
+  echo ""
+  echo "  --with-bindings=LIST     install the bindings specified in the"
+  echo "                           comma-separated list"
+  echo "                           Supported bindings: perl"
   #echo ""
   #echo "NOTE: The object files are build at the place where configure is launched"
   exit 1
