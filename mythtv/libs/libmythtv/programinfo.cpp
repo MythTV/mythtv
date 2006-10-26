@@ -1729,7 +1729,7 @@ void ProgramInfo::FinishedRecording(bool prematurestop)
 void ProgramInfo::UpdateRecordingEnd(void)
 {
     MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare("UPDATE recorded SET endtime = :ENDTIME, "
+    query.prepare("UPDATE recorded SET endtime = :ENDTIME "
                   "WHERE chanid = :CHANID AND "
                   "    starttime = :STARTTIME ");
     query.bindValue(":ENDTIME", recendts);
