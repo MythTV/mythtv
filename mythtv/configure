@@ -2308,6 +2308,8 @@ if test x"$symbol_visibility" == x"yes"; then
         check_cflags -fvisibility-inlines-hidden
         ECXXFLAGS="$ECXXFLAGS -fvisibility-inlines-hidden"
         CCONFIG="$CCONFIG use_hidesyms"
+    else
+        echo "Warning: --enable-symbol-visibility requires gcc 4.x"
     fi
 fi
 
