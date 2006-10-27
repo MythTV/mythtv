@@ -242,10 +242,10 @@ int main(int argc, char *argv[])
 #if 0
         else if (!strcmp(a.argv()[argpos], "--dd-grab-all"))
         {
-            dd_grab_all = true;
-            refresh_today = false;
-            refresh_tomorrow = false;
-            refresh_second = false;
+            fill_data.dd_grab_all = true;
+            fill_data.refresh_today = false;
+            fill_data.refresh_tomorrow = false;
+            fill_data.refresh_second = false;
         }
 #endif
         else if (!strcmp(a.argv()[argpos], "--quiet"))
