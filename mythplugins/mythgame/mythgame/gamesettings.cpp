@@ -135,7 +135,7 @@ public:
     Command(const MythGamePlayerSettings& parent):
         MGSetting(parent, "commandline") {
         setLabel(QObject::tr("Command"));
-        setHelpText(QObject::tr("Path+name of binary and optional parameters. \%s can be used to represent the name of any rom being launched. if not specified the rom filename will be added to the end of the command. As well \%d1, \%d2, \%d3 and \%d4 represent disks in a multidisk/game situation"));
+        setHelpText(QObject::tr("Binary and optional parameters. Multiple commands seperated with \; . Use \%s for the rom name. \%d1, \%d2, \%d3 and \%d4 represent disks in a multidisk/game. %s auto appended if not specified"));
     };
 };
 

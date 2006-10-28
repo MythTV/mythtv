@@ -796,7 +796,17 @@ void GameHandler::Launchgame(RomInfo *romdata, QString systemname)
        
     cout << "Launching Game : " << handler->SystemName() << " : " << exec << " : " << endl;
 
-    myth_system(exec);
+    QStringList cmdlist = QStringList::split(";", exec);
+    if (cmdlist.count() > 0) {
+        for ( QStringList::Iterator cmd = cmdlist.begin(); cmd != cmdlist.end(); ++cmd ) {
+            cout << "   Executing : " << *cmd <<endl;
+            myth_system(*cmd);
+        }
+    }
+    else {
+        cout << "   Executing : " << exec <<endl;
+        myth_system(exec);
+    }
 
     (void)d.cd(savedir);      
 }
