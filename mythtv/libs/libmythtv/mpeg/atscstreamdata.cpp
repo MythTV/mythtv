@@ -461,7 +461,7 @@ void ATSCStreamData::ProcessVCT(uint tsid, const VirtualChannelTable *vct)
     _sourceid_to_atsc_maj_min.clear();
     for (uint i = 0; i < vct->ChannelCount() ; i++)
     {
-        if (vct->IsHiddenInGuide(i))
+        if (vct->IsHidden(i) && vct->IsHiddenInGuide(i))
         {
             VERBOSE(VB_EIT, QString("%1 chan %2-%3 is hidden in guide")
                     .arg(vct->ModulationMode(i) == 1 ? "NTSC" : "ATSC")

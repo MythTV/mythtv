@@ -1147,6 +1147,9 @@ void SIScan::UpdateVCTinDB(int db_mplexid,
             chanid = ChannelUtil::CreateChanID(db_source_id, chan_num);
             if (chanid > 0)
             {
+                bool use_eit = !vct->IsHidden(i) ||
+                    (vct->IsHidden(i) && !vct->IsHiddenInGuide(i));
+
                 ChannelUtil::CreateChannel(
                     db_mplexid,
                     db_source_id,
@@ -1156,7 +1159,7 @@ void SIScan::UpdateVCTinDB(int db_mplexid,
                     chan_num,
                     vct->ProgramNumber(i),
                     vct->MajorChannel(i), vct->MinorChannel(i),
-                    !vct->IsHiddenInGuide(i) /* use on air guide */,
+                    use_eit,
                     vct->IsHidden(i), vct->IsHiddenInGuide(i),
                     QString::number(freqid));
             }
