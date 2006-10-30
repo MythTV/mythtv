@@ -1,8 +1,8 @@
 // This header is based on Accellent by John Dagliesh:
 //   http://www.defyne.org/dvb/accellent.html
 
-#ifndef ACCEL_PRIVATE_H_
-#define ACCEL_PRIVATE_H_
+#ifndef VIDEOOUT_DVDV_PRIVATE_H
+#define VIDEOOUT_DVDV_PRIVATE_H
 
 extern "C" {
 typedef int CGSConnectionID;
@@ -176,4 +176,4 @@ extern int DVDVideoShowMPBuffer( DVDVideoContext * pContext,
 	int whichBuf, ShowBufferParams * params, CallbackTuple * callback );
 }
 
-#endif // ACCEL_PRIVATE_H_
+#endif // VIDEOOUT_DVDV_PRIVATE_H
