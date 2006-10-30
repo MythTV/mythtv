@@ -1,4 +1,4 @@
-// AccelUtils is based on Accellent by John Dagliesh:
+// DVDV is based on Accellent by John Dagliesh:
 //   http://www.defyne.org/dvb/accellent.html
 
 #import <Cocoa/Cocoa.h>
@@ -12,12 +12,13 @@
 #include <qmap.h>
 using namespace std;
 
+#include "mythconfig.h"
 
-#include "videoout_accel_utils.h"
+#include "videoout_dvdv.h"
 #undef ABS
 #include "avcodec.h"
 #include "dvdv.h"
-#include "videoout_accel_private.h"
+#include "videoout_dvdv_private.h"
 #include "yuv2rgb.h"
 
 // Global which Nigel has not been able to put anywhere else:
@@ -25,6 +26,7 @@ static DVDV_CurPtrs gDVDVState;
 
 // Default number of buffers in Apple's code
 const int kAppleBuffers = 4;
+
 // Storage for subpictures during decoding
 const int kSubpictureSize = 8 * 1024 * 1024;
 
@@ -34,7 +36,7 @@ const int kAccelBuffers = 33;
 
 // Make a poor copy of Myth's VERBOSE -- we can't include
 // mythcontext.h without running into compilation errors.
-#define VERBOSE(mask,msg) cout << "AccelUtils: " << msg << endl;
+#define VERBOSE(mask,msg) cout << "DVDV: " << msg << endl;
 
 
 // All the data we need to encapsulate one frame.
@@ -63,7 +65,7 @@ struct FrameData
 };
 
 // We hide the icky stuff here, to avoid header bloat.
-struct AccelUtilsData
+struct DVDV_Private
 {
   // The reference ID for our video decoding.
   DVDVideoContext * gDVDContext;
@@ -138,11 +140,11 @@ struct AccelUtilsData
 
 
 // static class vars
-AccelUtils *AccelUtils::m_singleton = NULL;
+DVDV *DVDV::m_singleton = NULL;
 
-AccelUtils::AccelUtils()
+DVDV::DVDV()
 {
-  d = new AccelUtilsData();
+  d = new DVDV_Private();
   d->gPool = NULL;
   d->gConn = 0;
   d->gSurfaceID = 0;
@@ -159,21 +161,23 @@ AccelUtils::AccelUtils()
   {
     NSThread *thr = [[NSThread alloc] init];
     SEL threadSelector = @selector(run);
-    [NSThread detachNewThreadSelector:threadSelector toTarget:thr withObject:nil];
+    [NSThread detachNewThreadSelector:threadSelector
+                             toTarget:thr
+                           withObject:nil];
   }
   
   m_singleton = this;
 }
 
 
-AccelUtils::~AccelUtils()
+DVDV::~DVDV()
 {
   m_singleton = NULL;
   Teardown();
   delete d;
 }
 
-void AccelUtils::Teardown()
+void DVDV::Teardown()
 {
   d->mutex.lock();
   
@@ -225,8 +229,21 @@ void AccelUtils::Teardown()
 }
 
 // Initialize the Accel params with the size of video to be decoded.
-void AccelUtils::SetVideoSize(int width, int height)
+bool DVDV::SetVideoSize(int width, int height)
 {
+#ifdef NIGEL
+  // This only seems to be true on 10.3?
+
+  if ((width > 720) || (height > 576))
+  {
+    // Every HD recording Nigel plays causes a nasty hang,
+    // so disable accellent on any HD-ish stream?
+
+    VERBOSE(VB_PLAYBACK, "Stream is HD - Disabling Accellent!");
+    return false;
+  }
+#endif
+
   d->mutex.lock();
 
   // Make sure we have an autorelease pool in our thread.
@@ -329,10 +346,12 @@ void AccelUtils::SetVideoSize(int width, int height)
   d->gBufPast = d->gBufFuture = d->gBufRecent = 0;
 
   d->mutex.unlock();
+
+  return true;
 }
 
 // Resize and reposition the video subwindow.
-void AccelUtils::MoveResize(int imgx, int imgy, int imgw, int imgh,
+void DVDV::MoveResize(int imgx, int imgy, int imgw, int imgh,
                             int dispxoff, int dispyoff,
                             int dispwoff, int disphoff)
 {
@@ -396,10 +415,8 @@ void AccelUtils::MoveResize(int imgx, int imgy, int imgw, int imgh,
 }
 
 // Update the OSD display.
-void AccelUtils::DrawOSD(unsigned char *y,
-                         unsigned char *u,
-                         unsigned char *v,
-                         unsigned char *alpha)
+void DVDV::DrawOSD(unsigned char *y, unsigned char *u,
+                   unsigned char *v, unsigned char *alpha)
 {
   d->mutex.lock();
   
@@ -418,7 +435,7 @@ void AccelUtils::DrawOSD(unsigned char *y,
   }
 
   // Convert 4:2:0 to 4:2:2
-  yuv2vuy_fun convert = yuv2vuy_init_altivec();
+  yuv2vuy_fun convert = get_yuv2vuy_conv();
   uint8_t *yuvData = new uint8_t[d->osdWidth * d->osdHeight * 2];
   convert(yuvData, y, u, v, d->osdWidth, d->osdHeight, 0, 0, 0);
 
@@ -536,7 +553,7 @@ void AccelUtils::DrawOSD(unsigned char *y,
 }
 
 // Reset the Accel state.
-void AccelUtils::Reset(void)
+void DVDV::Reset(void)
 {
   d->mutex.lock();
   
@@ -555,7 +572,7 @@ void AccelUtils::Reset(void)
 }
 
 // Prepare the Accel code for a call to avcodec_decode_video.
-bool AccelUtils::PreProcessFrame(AVCodecContext *context)
+bool DVDV::PreProcessFrame(AVCodecContext *context)
 {
   d->mutex.lock();
   
@@ -591,24 +608,20 @@ bool AccelUtils::PreProcessFrame(AVCodecContext *context)
   d->curFrame->vf = NULL;
 
   gDVDVState = d->curFrame->state;
-  context->accellent = &gDVDVState;
-  
-  // Allow accel decoding path for the next decode_video call.
-  context->accellent_enabled = 1;
-  
+  context->dvdv = &gDVDVState;
+
   d->mutex.unlock();
   return true;
 }
 
 // Process the macroblocks collected by avcodec_decode_video.
-void AccelUtils::PostProcessFrame(AVCodecContext *context,
-                                  VideoFrame *pic, int pict_type,
-				  bool gotpicture)
+void DVDV::PostProcessFrame(AVCodecContext *context,
+                            VideoFrame *pic, int pict_type, bool gotpicture)
 {  
   d->mutex.lock();
   
   // Turn accel decoding path off again until the next PreProcessFrame.
-  context->accellent_enabled = 0;
+  context->dvdv = NULL;
   
   // get the buffer we used for this run
   FrameData *frame = d->curFrame;
@@ -690,7 +703,7 @@ void AccelUtils::PostProcessFrame(AVCodecContext *context,
 }
 
 // Decode a buffered frame
-void AccelUtils::DecodeFrame(VideoFrame *pic)
+void DVDV::DecodeFrame(VideoFrame *pic)
 {
   d->mutex.lock();
   
@@ -727,7 +740,7 @@ void AccelUtils::DecodeFrame(VideoFrame *pic)
 }
 
 // Draw the most recently decoded video frame to the screen.
-void AccelUtils::ShowFrame(void)
+void DVDV::ShowFrame(void)
 {
   d->mutex.lock();
   if (d->gDVDContext && d->gBufShow < kAppleBuffers)
