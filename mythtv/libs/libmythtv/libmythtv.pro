@@ -77,8 +77,8 @@ macx {
         # In that case, rebuild the framework with your (old) Xcode version
     }
 
-    using_mac_accel {
-        # accel_utils uses Objective-C++, activated by .mm suffix
+    using_dvdv {
+        # DVDUtils uses Objective-C++, activated by .mm suffix
         QMAKE_EXT_CPP += .mm
     }
 
@@ -254,9 +254,8 @@ using_frontend {
     macx:HEADERS +=               videoout_quartz.h
     macx:SOURCES +=               videoout_quartz.cpp
 
-    using_mac_accel:HEADERS +=    videoout_accel_utils.h
-    using_mac_accel:HEADERS +=    videoout_accel_private.h
-    using_mac_accel:SOURCES +=    videoout_accel_utils.mm
+    using_dvdv:HEADERS +=         videoout_dvdv.h  videoout_dvdv_private.h
+    using_dvdv:SOURCES +=         videoout_dvdv.mm
 
     using_directfb:HEADERS +=     videoout_directfb.h
     using_directfb:SOURCES +=     videoout_directfb.cpp
