@@ -40,7 +40,6 @@ const int kKeepPrebuffer   = 2;
 using namespace std;
 
 #include <qptrlist.h>
-#include <qmutex.h>
 
 #include "DisplayRes.h"
 #include "yuv2rgb.h"
@@ -331,7 +330,7 @@ void VideoOutputQuartzView::Transform(void)
             // scale height down
             double aspectScale = sw / (aspect * sh);
             VERBOSE(VB_PLAYBACK,
-                    QString("Scaling to %1 of height")
+                    QString("%0Scaling to %1 of height")
                            .arg(name).arg(aspectScale));
             ScaleMatrix(&matrix,
                         one,
@@ -608,6 +607,7 @@ class VoqvMainWindow : public VideoOutputQuartzView
     {
         alpha = fminf(1.0, fmaxf(0.0, alphaBlend));
         applyTVoffset = true;
+        name = "Main window: ";
     };
 
    ~VoqvMainWindow()
@@ -689,6 +689,7 @@ class VoqvEmbedded : public VideoOutputQuartzView
         desiredYoff = y;
         desiredWidth = w;
         desiredHeight = h;
+        name = "Embedded window: ";
     };
 
    ~VoqvEmbedded()
@@ -738,7 +739,7 @@ class VoqvFullscreen : public VideoOutputQuartzView
     : VideoOutputQuartzView(pData)
     {
         applyTVoffset = true;
-        name = "";
+        name = "Full screen: ";
     };
 
    ~VoqvFullscreen()
