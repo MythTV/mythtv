@@ -419,7 +419,7 @@ xvmc_vld="yes"
 xvmc_pro="no"
 xvmc_opengl="no"
 xvmc_lib=""
-mac_accel="no"
+dvdv="no"
 mac_corevideo="no"
 opengl_vsync="no"
 direct_fb="no"
@@ -1171,9 +1171,9 @@ for opt do
   ;;
   --xvmc-lib=*) xvmc_lib="$optval"
   ;;
-  --enable-mac-accel) mac_accel="yes"
+  --enable-mac-accel) dvdv="yes"
   ;;
-  --disable-mac-accel) mac_accel="no"
+  --disable-mac-accel) dvdv="no"
   ;;
   --enable-opengl-vsync) opengl_vsync="yes"
   ;;
@@ -2552,10 +2552,10 @@ if test x"$xvmc_opengl" = x"yes" ; then
     opengl="yes"
 fi
 
-if test x"$mac_accel" = x"yes" ; then
+if test x"$dvdv" = x"yes" ; then
     # Can only do Mac accel on Mac platform
     if test $targetos != Darwin; then
-        mac_accel="no"
+        dvdv="no"
     fi
 fi
 
@@ -2729,7 +2729,7 @@ if test x"$frontend" = x"yes" ; then
 if test "$VENDOR_XVMC_LIBS" != "" ; then
   echo "XvMC libs        $VENDOR_XVMC_LIBS"
 fi
-  echo "Mac accel.       $mac_accel"
+  echo "Mac acceleration $dvdv"
   echo "OpenGL vsync     $opengl_vsync"
   echo "DirectFB         $direct_fb"
   if test x"$mingw32" = x"yes" -o x"$cygwin" = x"yes" ; then
@@ -3164,11 +3164,10 @@ if test "$xvid" = "yes" ; then
   echo "CONFIG_XVID=yes" >> $MYTH_CONFIG_MAK
 fi
 
-if test "$mac_accel" = "yes" ; then
-  CCONFIG="$CCONFIG using_mac_accel"
+if test "$dvdv" = "yes" ; then
+  CCONFIG="$CCONFIG using_dvdv"
   echo "#define HAVE_DVDV 1" >> $TMPH
-  echo "#define CONFIG_MAC_ACCEL 1" >> $TMPH
-  echo "CONFIG_MAC_ACCEL=yes" >> $MYTH_CONFIG_MAK
+  echo "CONFIG_DVDV=yes" >> $MYTH_CONFIG_MAK
 fi
 
 if test "$mac_corevideo" = "yes"; then

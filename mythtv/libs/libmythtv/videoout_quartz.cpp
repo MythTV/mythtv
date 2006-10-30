@@ -59,8 +59,8 @@ using namespace std;
 #include "osd.h"
 #include "osdsurface.h"
 #include "mythconfig.h"
-#ifdef CONFIG_MAC_ACCEL
-#include "videoout_accel_utils.h"
+#ifdef HAVE_DVDV
+#include "videoout_dvdv.h"
 #endif
 
 class VideoOutputQuartzView;
@@ -403,13 +403,12 @@ void VideoOutputQuartzView::Transform(void)
         TranslateMatrix(&matrix, X2Fix((w - sw) / 2.0), X2Fix((h - sh) / 2.0));
     }
 
-// apply the basic sizing to AccelUtils
-#ifdef CONFIG_MAC_ACCEL
-    AccelUtils *accel = AccelUtils::singleton();
-    if (accel)
-      accel->MoveResize(0, 0, parentData->srcWidth, parentData->srcHeight,
-                        (int)((w - sw) / 2.0), (int)((h - sh) / 2.0),
-                        sw, sh);
+// apply the basic sizing to DVDV
+#ifdef HAVE_DVDV
+    DVDV *dvdv = DVDV::singleton();
+    if (dvdv)
+        dvdv->MoveResize(0, 0, parentData->srcWidth, parentData->srcHeight,
+                         (int)((w - sw) / 2.0), (int)((h - sh) / 2.0), sw, sh);
 #endif
 
     // apply over/underscan
@@ -1643,11 +1642,11 @@ void VideoOutputQuartz::PrepareFrame(VideoFrame *buffer, FrameScanType t)
 {
     (void)t;
 
-#ifdef CONFIG_MAC_ACCEL
-    AccelUtils *accel = AccelUtils::singleton();
-    if (accel && buffer)
-        accel->DecodeFrame(buffer);
-#endif // CONFIG_MAC_ACCEL
+#ifdef HAVE_DVDV
+    DVDV *dvdv = DVDV::singleton();
+    if (dvdv && buffer)
+        dvdv->DecodeFrame(buffer);
+#endif
 
     if (!buffer)
         buffer = vbuffers.GetScratchFrame();
@@ -1663,14 +1662,14 @@ void VideoOutputQuartz::Show(FrameScanType t)
 {
     (void)t;
 
-#ifdef CONFIG_MAC_ACCEL
-    AccelUtils *accel = AccelUtils::singleton();
-    if (accel)
+#ifdef HAVE_DVDV
+    DVDV *dvdv = DVDV::singleton();
+    if (dvdv)
     {
-        accel->ShowFrame();
+        dvdv->ShowFrame();
         return;
     }
-#endif // CONFIG_MAC_ACCEL
+#endif
 
     data->pixelLock.lock();
     for (VideoOutputQuartzView *view = data->views.first();
@@ -1716,26 +1715,22 @@ void VideoOutputQuartz::ProcessFrame(VideoFrame *frame, OSD *osd,
         CopyFrame(vbuffers.GetScratchFrame(), &pauseFrame);
     }
 
-#ifdef CONFIG_MAC_ACCEL
-    AccelUtils *accel = AccelUtils::singleton();
-    if (accel)
+#ifdef HAVE_DVDV
+    DVDV *dvdv = DVDV::singleton();
+    if (dvdv)
     {
         if (osd && osd->Visible())
         {
             OSDSurface *surface = osd->Display();
             if (surface && surface->Changed())
-            {
-              accel->DrawOSD(surface->y, surface->u, surface->v,
-                             surface->alpha);
-            }
+                dvdv->DrawOSD(surface->y, surface->u,
+                              surface->v, surface->alpha);
         }
         else
-        {
-          accel->DrawOSD(NULL, NULL, NULL, NULL);
-        }
+            dvdv->DrawOSD(NULL, NULL, NULL, NULL);
         return;   // no need to process frame, it won't be used
     }
-#endif // CONFIG_MAC_ACCEL
+#endif
 
     if (filterList)
         filterList->ProcessFrame(frame);
