@@ -61,7 +61,12 @@ const int TV::kInputModeTimeout=5000;
  * \brief stores last program info. maintains info so long as
  * mythfrontend is active
  */
-static QStringList lastProgramStringList = QStringList();
+QStringList TV::lastProgramStringList = QStringList();
+
+/*
+ * \brief function pointer for RunPlaybackBox in playbackbox.cpp
+ */
+RUNPLAYBACKBOX TV::RunPlaybackBoxPtr = NULL;
 
 /*
  \brief returns true if the recording completed when exiting.
@@ -130,7 +135,11 @@ bool TV::StartTV (ProgramInfo *tvrec, bool startInGuide,
             ProgramInfo *tmpProgram  = tv->getLastProgram();
             ProgramInfo *nextProgram = new ProgramInfo(*tmpProgram);
 
-            tv->setLastProgram(curProgram);
+            //Temp workaround until Pin support for password protected last show is implemented.
+            if (curProgram->recgroup == nextProgram->recgroup)
+                tv->setLastProgram(curProgram);
+            else
+                tv->setLastProgram(NULL);
 
             if (curProgram)
                 delete curProgram;
@@ -179,7 +188,12 @@ bool TV::StartTV (ProgramInfo *tvrec, bool startInGuide,
 
     return playCompleted;
 }
-        
+       
+void TV::SetEmbedPbbFunc(RUNPLAYBACKBOX lptr)
+{
+    RunPlaybackBoxPtr = lptr;
+}
+
 void TV::InitKeys(void)
 {
     REG_KEY("TV Frontend", "PAGEUP", "Page Up", "3");
@@ -415,7 +429,7 @@ TV::TV(void)
       queuedTranscode(false), getRecorderPlaybackInfo(false),
       adjustingPicture(kAdjustingPicture_None),
       adjustingPictureAttribute(kPictureAttribute_None),
-      ignoreKeys(false), needToSwapPIP(false), needToJumpMenu(false),
+      ignoreKeys(false), needToSwapPIP(false),
       // Channel Editing
       chanEditMapLock(true), ddMapSourceId(0), ddMapLoaderRunning(false),
       // Sleep Timer
@@ -1785,11 +1799,8 @@ void TV::RunTV(void)
                 ClearOSD();
 
                 requestDelete = false;
-                if (activenvp->IsNearEnd())
-                {
-                    exitPlayer  = true;
-                    wantsToQuit = true;
-                }
+                exitPlayer  = true;
+                wantsToQuit = true;
             }
         }
         
@@ -1934,12 +1945,6 @@ void TV::RunTV(void)
             ClearOSD();
             SwapPIP();
             needToSwapPIP = false;
-        }
-
-        if (needToJumpMenu)
-        {
-            DoDisplayJumpMenu();
-            needToJumpMenu = false;
         }
     }
   
@@ -2685,7 +2690,10 @@ void TV::ProcessKeypress(QKeyEvent *e)
             jumpToProgram = true;
         }
         else if (action == "JUMPREC")
-            DisplayJumpMenuSoon();
+        {
+            if (RunPlaybackBoxPtr)
+                EditSchedule(kPlaybackBox);
+        }
         else if (action == "SIGNALMON")
         {
             if ((GetState() == kState_WatchingLiveTV) && activerecorder)
@@ -4940,6 +4948,7 @@ void TV::doEditSchedule(int editType)
     pbinfoLock.unlock();
 
     bool changeChannel = false;
+    ProgramInfo *nextProgram = NULL;
 
     if (StateIsLiveTV(GetState()))
     {
@@ -4969,12 +4978,26 @@ void TV::doEditSchedule(int editType)
                     RunProgramFind(true, false);
                     break;
             case kScheduledRecording:
+            {
                     pbinfoLock.lock();
                     ScheduledRecording record;
                     record.loadByProgram(playbackinfo);
                     record.exec();
                     pbinfoLock.unlock();
                     break;
+            }
+            case kPlaybackBox:
+            {
+                    nextProgram = RunPlaybackBoxPtr((void *)this);
+                    if (nextProgram)
+                    {
+                        setLastProgram(nextProgram);
+                        jumpToProgram = true;
+                        exitPlayer = true;
+                        delete nextProgram;
+                    }
+                    break;
+            }
         }
 
         if (!stayPaused)
@@ -5020,6 +5043,14 @@ void *TV::ScheduleMenuHandler(void *param)
     return NULL;
 }
 
+void *TV::RecordedShowMenuHandler(void *param)
+{
+    TV *obj = (TV *)param;
+    obj->doEditSchedule(kPlaybackBox);
+
+    return NULL;
+}
+
 void TV::EditSchedule(int editType)
 {
     if (menurunning == true)
@@ -5041,6 +5072,9 @@ void TV::EditSchedule(int editType)
                 break;
         case kScheduledRecording:
                 pthread_create(&tid, &attr, TV::ScheduleMenuHandler, this);
+                break;
+        case kPlaybackBox:
+                pthread_create(&tid, &attr, TV::RecordedShowMenuHandler, this);
                 break;
     }
 }
@@ -6337,7 +6371,10 @@ void TV::TreeMenuSelected(OSDListTreeType *tree, OSDGenericTree *item)
             jumpToProgram = true;
         }
         else if (action == "JUMPREC")
-            DisplayJumpMenuSoon();
+        {
+            if (RunPlaybackBoxPtr)
+                EditSchedule(kPlaybackBox);
+        }
         else if (action.left(8) == "JUMPPROG")
         {
             SetJumpToProgram(action.section(" ",1,-2),
@@ -6366,78 +6403,6 @@ void TV::TreeMenuSelected(OSDListTreeType *tree, OSDGenericTree *item)
         tree->SetVisible(false);
         tree->disconnect();
     }
-}
-
-void TV::DoDisplayJumpMenu(void)
-{
-    if (treeMenu)
-        delete treeMenu;
-
-    treeMenu = new OSDGenericTree(NULL, "treeMenu");
-    OSDGenericTree *item, *subitem;
-
-    // Build jumpMenu of recorded program titles
-    ProgramInfo *p;
-    progLists.clear();
-    vector<ProgramInfo *> *infoList;
-    infoList = RemoteGetRecordedList(false);
-
-    bool LiveTVInAllPrograms = gContext->GetNumSetting("LiveTVInAllPrograms",0);
-
-    if (infoList)
-    {
-        pbinfoLock.lock();
-        vector<ProgramInfo *>::iterator i = infoList->begin();
-        for ( ; i != infoList->end(); i++)
-        {
-            p = *i;
-            //if (p->recgroup != "LiveTV" || LiveTVInAllPrograms)
-            if (p->recgroup == playbackinfo->recgroup)
-                progLists[p->title].prepend(p);
-        }
-        pbinfoLock.unlock();
-
-        QMap<QString,ProgramList>::Iterator Iprog;
-        for (Iprog = progLists.begin(); Iprog != progLists.end(); Iprog++)
-        {
-            ProgramList plist = Iprog.data();
-            int progIndex = plist.count();
-            if (progIndex == 1)
-            {
-                item = new OSDGenericTree(treeMenu, tr(Iprog.key()),
-                    QString("JUMPPROG %1 0").arg(Iprog.key()));
-            } 
-            else 
-            {
-                item = new OSDGenericTree(treeMenu, tr(Iprog.key()));
-                for (int i = 0; i < progIndex; i++)
-                {
-                    p = plist.at(i);
-                    if (p->subtitle != "")
-                        subitem = new OSDGenericTree(item, tr(p->subtitle), 
-                            QString("JUMPPROG %1 %2").arg(Iprog.key()).arg(i));
-                    else 
-                        subitem = new OSDGenericTree(item, tr(p->title), 
-                            QString("JUMPPROG %1 %2").arg(Iprog.key()).arg(i));
-                }
-            }
-        }
-    } 
-
-    if (GetOSD())
-    {
-        ClearOSD();
-
-        OSDListTreeType *tree = GetOSD()->ShowTreeMenu("menu", treeMenu);
-        if (tree)
-        {
-            connect(tree, SIGNAL(itemSelected(OSDListTreeType *,OSDGenericTree *)), 
-                    this, SLOT(TreeMenuSelected(OSDListTreeType *, OSDGenericTree *)));
-
-            connect(tree, SIGNAL(itemEntered(OSDListTreeType *, OSDGenericTree *)),
-                    this, SLOT(TreeMenuEntered(OSDListTreeType *, OSDGenericTree *)));
-        }
-    } 
 }
 
 void TV::ShowOSDTreeMenu(void)
@@ -7407,6 +7372,14 @@ void TV::setLastProgram(ProgramInfo *rcinfo)
         lastProgram = new ProgramInfo(*rcinfo);
     else
         lastProgram = NULL;
+}
+
+bool TV::IsSameProgram(ProgramInfo *rcinfo)
+{
+    if (rcinfo && playbackinfo)
+        return playbackinfo->IsSameProgram(*rcinfo);
+
+    return false;
 }
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

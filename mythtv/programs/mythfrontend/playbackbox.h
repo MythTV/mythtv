@@ -13,6 +13,7 @@
 #include "xmlparse.h"
 #include "programinfo.h"
 #include "jobqueue.h"
+#include "tv_play.h"
 
 #include <qvaluelist.h>
 #include <pthread.h>
@@ -98,11 +99,13 @@ class PlaybackBox : public MythDialog
     } killStateType;
      
 
-    PlaybackBox(BoxType ltype, MythMainWindow *parent, const char *name = 0);
+    PlaybackBox(BoxType ltype, MythMainWindow *parent, const char *name = 0, TV *player = NULL);
    ~PlaybackBox(void);
    
     void customEvent(QCustomEvent *e);
-  
+    static ProgramInfo *RunPlaybackBox(void *player);
+    
+    
   protected slots:
     void timeout(void);
 
@@ -246,6 +249,8 @@ class PlaybackBox : public MythDialog
     void stop(ProgramInfo *);
     void remove(ProgramInfo *);
     void showActions(ProgramInfo *);
+    ProgramInfo *getSelected(void){ return curitem; }
+        
 
     void togglePlayListItem(ProgramInfo *pginfo);
     void randomizePlayList(void);
@@ -451,6 +456,8 @@ class PlaybackBox : public MythDialog
     mutable QMutex      ncLock;
     QValueList<QString> networkControlCommands;
     bool                underNetworkControl;
+    
+    TV                  *m_player;
 };
 
 #endif

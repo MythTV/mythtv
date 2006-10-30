@@ -16,6 +16,7 @@
 #include <qfileinfo.h>
 #include <qsqldatabase.h>
 #include <qmap.h>
+#include <qwaitcondition.h>
 
 #include <cmath>
 #include <unistd.h>
@@ -49,6 +50,8 @@ using namespace std;
       ((rec)->recgroup != "LiveTV")))
 
 #define USE_PREV_GEN_THREAD
+
+QWaitCondition pbbIsVisibleCond;
 
 static int comp_programid(ProgramInfo *a, ProgramInfo *b)
 {
@@ -185,8 +188,29 @@ static int comp_recordDate_rev(ProgramInfo *a, ProgramInfo *b)
         return (a->startts.date() > b->startts.date() ? 1 : -1);
 }
 
+
+ProgramInfo *PlaybackBox::RunPlaybackBox(void * player)
+{
+    ProgramInfo *nextProgram = NULL;
+    qApp->lock();
+
+    PlaybackBox *pbb = new PlaybackBox(PlaybackBox::Play,
+            gContext->GetMainWindow(), "tvplayselect", (TV *)player);
+    pbb->Show();
+
+    qApp->unlock();
+    pbbIsVisibleCond.wait();
+
+    if (pbb->getSelected())
+        nextProgram = new ProgramInfo(*pbb->getSelected());
+   
+    delete pbb;
+    
+    return nextProgram;
+}
+
 PlaybackBox::PlaybackBox(BoxType ltype, MythMainWindow *parent, 
-                         const char *name)
+                         const char *name, TV *player)
     : MythDialog(parent, name),
       // Settings
       type(ltype),
@@ -248,7 +272,8 @@ PlaybackBox::PlaybackBox(BoxType ltype, MythMainWindow *parent,
       previewPixmapEnabled(false),      previewPixmap(NULL),
       previewSuspend(false),            previewChanid(""),
       // Network Control Variables
-      underNetworkControl(false)
+      underNetworkControl(false),
+      m_player(NULL)
 {
     formatShortDate    = gContext->GetSetting("ShortDateFormat", "M/d");
     formatLongDate     = gContext->GetSetting("DateFormat", "ddd MMMM d");
@@ -263,7 +288,8 @@ PlaybackBox::PlaybackBox(BoxType ltype, MythMainWindow *parent,
     groupnameAsAllProg = gContext->GetNumSetting("DispRecGroupAsAllProg", 0);
     arrowAccel         = gContext->GetNumSetting("UseArrowAccels", 1);
     inTitle            = gContext->GetNumSetting("PlaybackBoxStartInTitle", 0);
-    previewVideoEnabled =gContext->GetNumSetting("PlaybackPreview");
+    if (!player)
+        previewVideoEnabled =gContext->GetNumSetting("PlaybackPreview");
     previewPixmapEnabled=gContext->GetNumSetting("GeneratePreviewPixmaps");
     previewFromBookmark= gContext->GetNumSetting("PreviewFromBookmark");
     drawTransPixmap    = gContext->LoadScalePixmap("trans-backup.png");
@@ -282,6 +308,9 @@ PlaybackBox::PlaybackBox(BoxType ltype, MythMainWindow *parent,
     progLists[""];
     titleList << "";
     playList.clear();
+
+    if (player)
+        m_player = player;
 
     // recording group stuff
     recGroupType.clear();
@@ -369,7 +398,8 @@ PlaybackBox::~PlaybackBox(void)
     gContext->removeListener(this);
     gContext->removeCurrentLocation();
 
-    killPlayerSafe();
+    if (!m_player)
+        killPlayerSafe();
 
     if (previewVideoRefreshTimer)
     {
@@ -566,7 +596,16 @@ void PlaybackBox::parsePopup(QDomElement &element)
 
 void PlaybackBox::exitWin()
 {
-    killPlayerSafe();
+    if (m_player)
+    {
+        if (curitem)
+            delete curitem;
+        curitem = NULL;
+        pbbIsVisibleCond.wakeAll();
+    }
+    else
+        killPlayerSafe();
+
     accept();
 }
 
@@ -1247,7 +1286,8 @@ void PlaybackBox::updateShowTitles(QPainter *p)
                 if (playList.grep(tempInfo->MakeUniqueKey()).count())
                     ltype->EnableForcedFont(cnt, "tagged");
 
-                if (tempInfo->availableStatus != asAvailable)
+                if (tempInfo->availableStatus != asAvailable || 
+                        (m_player && m_player->IsSameProgram(tempInfo)) && tempInfo->recstatus != rsRecording)
                     ltype->EnableForcedFont(cnt, "inactive");
             }
         } 
@@ -2080,10 +2120,19 @@ void PlaybackBox::playSelected()
     if (!curitem)
         return;
 
+    if (m_player && m_player->IsSameProgram(curitem))
+        exitWin();
+
     if (curitem && curitem->availableStatus != asAvailable)
         showAvailablePopup(curitem);
     else
         play(curitem);
+
+    if (m_player)
+    {
+        pbbIsVisibleCond.wakeAll();
+        accept();
+    }
 }
 
 void PlaybackBox::stopSelected()
@@ -2212,7 +2261,7 @@ void PlaybackBox::showMenu()
         popup->addButton(tr("Playlist options"), this,
                          SLOT(showPlaylistPopup()));
     }
-    else
+    else if (!m_player)
     {
         if (inTitle)
         {
@@ -2255,6 +2304,9 @@ bool PlaybackBox::play(ProgramInfo *rec, bool inPlaylist)
     if (!rec)
         return false;
 
+    if (m_player)
+        return true;
+            
     if (fileExists(rec) == false)
     {
         QString msg = 
@@ -2913,20 +2965,26 @@ void PlaybackBox::showActionPopup(ProgramInfo *program)
 
     initPopup(popup, program, "", "");
 
-    QButton *playButton;
+    QButton *playButton = new QButton();
 
-    if (curitem->programflags & FL_BOOKMARK)
-        playButton = popup->addButton(tr("Play from..."), this,
-                                      SLOT(showPlayFromPopup()));
-    else
-        playButton = popup->addButton(tr("Play"), this, SLOT(doPlay()));
+    if (!(m_player && m_player->IsSameProgram(curitem)))
+    {
+        if (curitem->programflags & FL_BOOKMARK)
+            popup->addButton(tr("Play from..."), this,
+                                        SLOT(showPlayFromPopup()));
+        else
+            popup->addButton(tr("Play"), this, SLOT(doPlay()));
+    }
 
-    if (playList.grep(curitem->MakeUniqueKey()).count())
-        popup->addButton(tr("Remove from Playlist"), this,
-                         SLOT(togglePlayListItem()));
-    else
-        popup->addButton(tr("Add to Playlist"), this,
-                         SLOT(togglePlayListItem()));
+    if (!m_player)
+    {
+        if (playList.grep(curitem->MakeUniqueKey()).count())
+            popup->addButton(tr("Remove from Playlist"), this,
+                            SLOT(togglePlayListItem()));
+        else
+            popup->addButton(tr("Add to Playlist"), this,
+                            SLOT(togglePlayListItem()));
+    }
 
     if (program->recstatus == rsRecording)
         popup->addButton(tr("Stop Recording"), this, SLOT(askStop()));
@@ -2942,7 +3000,8 @@ void PlaybackBox::showActionPopup(ProgramInfo *program)
     popup->addButton(tr("Recording Options"), this, SLOT(showRecordingPopup()));
     popup->addButton(tr("Job Options"), this, SLOT(showJobPopup()));
 
-    popup->addButton(tr("Delete"), this, SLOT(askDelete()));
+    if (!(m_player && m_player->IsSameProgram(curitem)))
+        popup->addButton(tr("Delete"), this, SLOT(askDelete()));
 
     popup->ShowPopup(this, SLOT(doCancel()));
 

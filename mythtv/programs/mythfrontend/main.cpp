@@ -614,6 +614,8 @@ void InitJumpPoints(void)
     REG_JUMP("Previously Recorded", "", "", startPrevious);
 
     TV::InitKeys();
+
+    TV::SetEmbedPbbFunc(PlaybackBox::RunPlaybackBox);
 }
 
 int internal_media_init() 

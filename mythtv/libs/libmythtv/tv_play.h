@@ -38,6 +38,8 @@ typedef QValueVector<QString>    str_vec_t;
 typedef QMap<QString,QString>    InfoMap;
 typedef QMap<QString,InfoMap>    DDValueMap;
 typedef QMap<QString,DDValueMap> DDKeyMap;
+typedef ProgramInfo * (*RUNPLAYBACKBOX)(void *);
+
 
 class VBIMode
 {
@@ -68,7 +70,8 @@ typedef enum
 enum scheduleEditTypes {
     kScheduleProgramGuide = 0,
     kScheduleProgramFinder,
-    kScheduledRecording
+    kScheduledRecording,
+    kPlaybackBox,
 };
 
 class MPUBLIC TV : public QObject
@@ -112,12 +115,14 @@ class MPUBLIC TV : public QObject
     // Recording commands
     int  PlayFromRecorder(int recordernum);
     int  Playback(ProgramInfo *rcinfo);
+
+    // Various commands
     void setLastProgram(ProgramInfo *rcinfo); 
     ProgramInfo *getLastProgram(void) { return lastProgram; }
     void setInPlayList(bool setting) { inPlaylist = setting; }
     void setUnderNetworkControl(bool setting) { underNetworkControl = setting; }
+    bool IsSameProgram(ProgramInfo *p);
 
-    // Various commands
     void ShowNoRecorderDialog(void);
     void FinishRecording(void);
     void AskAllowRecording(const QStringList&, int, bool);
@@ -173,7 +178,7 @@ class MPUBLIC TV : public QObject
     static void InitKeys(void);
     static bool StartTV(ProgramInfo *tvrec = NULL, bool startInGuide = false,
                         bool inPlaylist = false, bool initByNetworkCommand = false);
-        
+    static void SetEmbedPbbFunc(RUNPLAYBACKBOX lptr);
 
     void SetIgnoreKeys(bool ignore) { ignoreKeys = ignore; }
 
@@ -194,11 +199,14 @@ class MPUBLIC TV : public QObject
     static void *EPGMenuHandler(void *param);
     static void *FinderMenuHandler(void *param);
     static void *ScheduleMenuHandler(void *param);
+    static void *RecordedShowMenuHandler(void *param);
 
     void RunTV(void);
     static void *EventThread(void *param);
 
     bool eventFilter(QObject *o, QEvent *e);
+    static QStringList lastProgramStringList;
+    static RUNPLAYBACKBOX RunPlaybackBoxPtr;
 
   private:
     bool RequestNextRecorder(bool showDialogs);
@@ -297,7 +305,6 @@ class MPUBLIC TV : public QObject
     void SetAutoCommercialSkip(enum commSkipMode skipMode = CommSkipOff);
     void SetManualZoom(bool zoomON = false);
 
-    void DoDisplayJumpMenu(void);
     void SetJumpToProgram(QString progKey = "", int progIndex = 0);
  
     bool ClearOSD(void);
@@ -325,7 +332,6 @@ class MPUBLIC TV : public QObject
     void ToggleActiveWindow(void);
     void SwapPIP(void);
     void SwapPIPSoon(void) { needToSwapPIP = true; }
-    void DisplayJumpMenuSoon(void) { needToJumpMenu = true; }
 
     void ToggleAutoExpire(void);
 
@@ -426,7 +432,6 @@ class MPUBLIC TV : public QObject
 
     bool ignoreKeys;
     bool needToSwapPIP;
-    bool needToJumpMenu;
     QMap<QString,ProgramList> progLists;
 
     mutable QMutex chanEditMapLock; ///< Lock for chanEditMap and ddMap
