@@ -294,18 +294,28 @@ void GameTree::handleTreeListEntry(int nodeInt, IntVector *)
                 else 
                     timer->start(330, true); 
 
-            }
+            } 
+        } 
+        else {
+            if ( timer->isActive() )
+                timer->stop();   
+
+            m_gameFavourite->SetText("");
+            m_gameImage->SetImage("");
+            if (m_gameImage->isShown())
+                m_gameImage->hide();
         }
     }
     else 
     {   // Otherwise use some defaults.
-        timer->stop();
-        m_gameImage->SetImage("");
-        m_gameTitle->SetText("");
-        m_gameSystem->SetText("Unknown");
-        m_gameYear->SetText("19xx");
-        m_gameGenre->SetText("Unknown");
-        m_gameFavourite->SetText("");
+        if ( timer->isActive() )
+            timer->stop();
+
+            m_gameFavourite->SetText("");
+            m_gameImage->SetImage("");
+            if (m_gameImage->isShown())
+                m_gameImage->hide();
+
     }
 
 }
@@ -313,6 +323,8 @@ void GameTree::handleTreeListEntry(int nodeInt, IntVector *)
 void GameTree::showImageTimeout(void) 
 { 
     m_gameImage->LoadImage(); 
+    if (!m_gameImage->isShown())
+        m_gameImage->show();
 } 
 
 
