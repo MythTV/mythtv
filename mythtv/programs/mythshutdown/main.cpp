@@ -139,6 +139,23 @@ int getStatus()
     QDateTime dtPeriod2End = getDailyWakeupTime("DailyWakeupEndPeriod2");
     QDateTime dtCurrent = QDateTime::currentDateTime();
 
+    // Check for time periods that cross midnight
+    if (dtPeriod1End < dtPeriod1Start)
+    {
+        if (dtCurrent > dtPeriod1End)
+            dtPeriod1End = dtPeriod1End.addDays(1);
+        else
+            dtPeriod1Start = dtPeriod1Start.addDays(-1);
+    }
+
+    if (dtPeriod2End < dtPeriod2Start)
+    {
+        if (dtCurrent > dtPeriod2End)
+            dtPeriod2End = dtPeriod2End.addDays(1);
+        else
+            dtPeriod2Start = dtPeriod2Start.addDays(-1);
+    }
+
     // Check for one of the daily wakeup periods
     if (dtPeriod1Start != dtPeriod1End)
     {
@@ -245,6 +262,23 @@ int shutdown()
     QDateTime dtCurrent = QDateTime::currentDateTime();
     QDateTime dtNextDailyWakeup = QDateTime();
 
+    // Check for time periods that cross midnight
+    if (dtPeriod1End < dtPeriod1Start)
+    {
+        if (dtCurrent > dtPeriod1End)
+            dtPeriod1End = dtPeriod1End.addDays(1);
+        else
+            dtPeriod1Start = dtPeriod1Start.addDays(-1);
+    }
+
+    if (dtPeriod2End < dtPeriod2Start)
+    {
+        if (dtCurrent > dtPeriod2End)
+            dtPeriod2End = dtPeriod2End.addDays(1);
+        else
+            dtPeriod2Start = dtPeriod2Start.addDays(-1);
+    }
+
     // have we passed the first wakeup time today
     if (dtPeriod1Start != dtPeriod1End)
     {
@@ -278,7 +312,7 @@ int shutdown()
 
         if (dtNextDailyWakeup.isValid())
         {
-            dtNextDailyWakeup = dtNextDailyWakeup.addDays(1);    
+            dtNextDailyWakeup = dtNextDailyWakeup.addDays(1);
 
             VERBOSE(VB_IMPORTANT, "next daily wakeup is tomorrow at " << 
                         dtNextDailyWakeup.toString("hh:mm:ss"));
