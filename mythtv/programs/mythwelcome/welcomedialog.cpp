@@ -1,8 +1,10 @@
-#include <qapplication.h>
 #include <unistd.h>
-
 #include <sys/wait.h>   // For WIFEXITED on Mac OS X
 
+// qt
+#include <qapplication.h>
+
+// myth
 #include "mythcontext.h"
 #include "mythdbcon.h"
 #include "lcddevice.h"
@@ -25,19 +27,19 @@ WelcomeDialog::WelcomeDialog(MythMainWindow *parent,
                 :MythThemedDialog(parent, window_name, theme_filename, name)
 {
     checkConnectionToServer();
-    
+
     LCD::SetupLCD();
-        
+
     if (class LCD *lcd = LCD::Get())
-        lcd->switchToTime();      
+        lcd->switchToTime();
 
     gContext->addListener(this);
-        
+
     m_installDir = gContext->GetInstallPrefix();
     m_preRollSeconds = gContext->GetNumSetting("RecordPreRoll");
     m_idleWaitForRecordingTime =
                        gContext->GetNumSetting("idleWaitForRecordingTime", 15);
-    
+
     m_timeFormat = gContext->GetSetting("TimeFormat", "h:mm AP");
 
     // if idleTimeoutSecs is 0, the user disabled the auto-shutdown feature
@@ -46,30 +48,30 @@ WelcomeDialog::WelcomeDialog(MythMainWindow *parent,
 
     wireUpTheme();
     assignFirstFocus();
-    
+
     m_updateStatusTimer = new QTimer(this);
-    connect(m_updateStatusTimer, SIGNAL(timeout()), this, 
+    connect(m_updateStatusTimer, SIGNAL(timeout()), this,
                                  SLOT(updateStatus()));
     m_updateStatusTimer->start(UPDATE_STATUS_INTERVAL);
-    
+
     m_updateScreenTimer = new QTimer(this);
-    connect(m_updateScreenTimer, SIGNAL(timeout()), this, 
+    connect(m_updateScreenTimer, SIGNAL(timeout()), this,
                                  SLOT(updateScreen()));
-                               
+
     m_timeTimer = new QTimer(this);
-    connect(m_timeTimer, SIGNAL(timeout()), this, 
+    connect(m_timeTimer, SIGNAL(timeout()), this,
                                  SLOT(updateTime()));
     m_timeTimer->start(1000);
-    
-    m_tunerList.setAutoDelete(true);                           
+
+    m_tunerList.setAutoDelete(true);
     m_scheduledList.setAutoDelete(true);
-    
-    popup = NULL;                           
+
+    popup = NULL;
 }
 
 void WelcomeDialog::startFrontend(void)
 {
-    QString startFECmd = gContext->GetSetting("MythWelcomeStartFECmd", 
+    QString startFECmd = gContext->GetSetting("MythWelcomeStartFECmd",
                          m_installDir + "/bin/mythfrontend");
 
     myth_system(startFECmd.ascii());
@@ -89,17 +91,17 @@ int WelcomeDialog::exec()
 
     if (WIFEXITED(state))
         state = WEXITSTATUS(state);
-    
+
     VERBOSE(VB_GENERAL, "mythshutdown --startup returned: " << state);
 
     bool bAutoStartFrontend = gContext->GetNumSetting("AutoStartFrontend", 1);
 
-    if (state == 1 && bAutoStartFrontend) 
+    if (state == 1 && bAutoStartFrontend)
         startFrontend();
-    
+
     // update status now
     updateAll();
-    
+
     return MythDialog::exec();
 }
 
@@ -214,15 +216,15 @@ void WelcomeDialog::keyPressEvent(QKeyEvent *e)
             int statusCode = system(m_installDir + "/bin/mythshutdown --status");
             if (WIFEXITED(statusCode))
                 statusCode = WEXITSTATUS(statusCode);
-        
+
             // is shutdown locked by a user
             if (statusCode & 16)
                 system(m_installDir + "/bin/mythshutdown --unlock");
-            else    
+            else
                 system(m_installDir + "/bin/mythshutdown --lock");
-                    
+
             updateStatusMessage();
-            updateScreen();    
+            updateScreen();
         }
         else if (action == "STARTXTERM")
         {
@@ -230,7 +232,7 @@ void WelcomeDialog::keyPressEvent(QKeyEvent *e)
             if (cmd != "")
             {
                 system(cmd);
-            }    
+            }
         }
         else
             handled = false;
@@ -243,16 +245,16 @@ void WelcomeDialog::keyPressEvent(QKeyEvent *e)
 UITextType* WelcomeDialog::getTextType(QString name)
 {
     UITextType* type = getUITextType(name);
-    
+
     if (!type)
     {
         cout << "ERROR: Failed to find '" << name <<  "' UI element in theme file\n"
              << "Bailing out!" << endl;
-        exit(0);        
+        exit(0);
     }
-    
-    return type;    
-}    
+
+    return type;
+}
 
 void WelcomeDialog::wireUpTheme()
 {
@@ -261,10 +263,10 @@ void WelcomeDialog::wireUpTheme()
     m_scheduled_text = getTextType("scheduled_text");
     m_time_text = getTextType("time_text");
     m_date_text = getTextType("date_text");
-    
+
     m_warning_text = getTextType("conflicts_text");
     m_warning_text->hide();
-    
+
     m_startfrontend_button = getUITextButtonType("startfrontend_button");
     if (m_startfrontend_button)
     {
@@ -277,27 +279,27 @@ void WelcomeDialog::wireUpTheme()
         cout << "ERROR: Failed to find 'startfrontend_button' "
              << "UI element in theme file\n"
              << "Bailing out!" << endl;
-        exit(0);        
+        exit(0);
     }
-    
+
     buildFocusList();
 }
 
 void WelcomeDialog::closeDialog()
 {
-    done(1);  
+    done(1);
 }
 
 WelcomeDialog::~WelcomeDialog()
 {
     gContext->removeListener(this);
-    
+
     if (m_updateStatusTimer)
-        delete m_updateStatusTimer;    
-    
+        delete m_updateStatusTimer;
+
     if (m_updateScreenTimer)
         delete m_updateScreenTimer;
-    
+
     if (m_timeTimer)
         delete m_timeTimer;
 }
@@ -305,20 +307,20 @@ WelcomeDialog::~WelcomeDialog()
 void WelcomeDialog::updateTime(void)
 {
     QString s = QTime::currentTime().toString(m_timeFormat);
-    
+
     if (s != m_time_text->GetText())
         m_time_text->SetText(s);
-    
+
     s = QDateTime::currentDateTime().toString("dddd\ndd MMM yyyy");
-    
+
     if (s != m_date_text->GetText())
-        m_date_text->SetText(s); 
+        m_date_text->SetText(s);
 }
 
 void WelcomeDialog::updateStatus(void)
 {
     checkConnectionToServer();
-  
+
     updateStatusMessage();
 }
 
@@ -332,8 +334,8 @@ void WelcomeDialog::updateScreen(void)
         m_scheduled_text->SetText(tr("Cannot connect to server!"));
         m_warning_text->hide();
     }
-    else    
-    {    
+    else
+    {
         // update recording 
         if (m_isRecording)
         {
@@ -341,7 +343,7 @@ void WelcomeDialog::updateScreen(void)
                 m_screenTunerNo = 0;
 
             TunerStatus *tuner = m_tunerList.at(m_screenTunerNo);
-            
+
             if (tuner->isRecording)
             {
                 status = QString(tr("Tuner %1 is recording:\n")).arg(tuner->id);
@@ -354,7 +356,7 @@ void WelcomeDialog::updateScreen(void)
             }
             else
                 status = QString(tr("Tuner %1 is not recording")).arg(tuner->id);
-        
+
             if (m_screenTunerNo < m_tunerList.count() - 1)
                 m_screenTunerNo++;
             else
@@ -362,28 +364,28 @@ void WelcomeDialog::updateScreen(void)
         }
         else
             status = tr("There are no recordings currently taking place");
-        
+
         m_recording_text->SetText(status);
-        
+
         // update scheduled
         if (m_scheduledList.count() > 0)
         {
             if (m_screenScheduledNo >= m_scheduledList.count())
                 m_screenScheduledNo = 0;
-            
+
             ProgramDetail *prog = m_scheduledList.at(m_screenScheduledNo);
-            
+
             //status = QString("%1 of %2\n").arg(m_screenScheduledNo + 1)
             //                               .arg(m_scheduledList.count());
             status = prog->channel + "\n";
             status += prog->title;
             if (prog->subtitle != "")
                 status += "\n(" + prog->subtitle + ")";
-                        
+
             status += "\n" + prog->startTime.
-                    toString("ddd dd MMM yyyy (hh:mm") + " to " + 
-                    prog->endTime.toString("hh:mm)");    
-       
+                    toString("ddd dd MMM yyyy (hh:mm") + " to " +
+                    prog->endTime.toString("hh:mm)");
+
             if (m_screenScheduledNo < m_scheduledList.count() - 1)
                 m_screenScheduledNo++;
             else
@@ -391,29 +393,29 @@ void WelcomeDialog::updateScreen(void)
         }
         else
             status = tr("There are no scheduled recordings");
-                
+
         m_scheduled_text->SetText(status);
     }
-    
+
     // update status message
     if (m_statusList.count() == 0)
         status = tr("Please Wait ...");
-    else     
+    else
     {
         if (m_statusListNo >= m_statusList.count())
             m_statusListNo = 0;
-            
+
         status = m_statusList[m_statusListNo];
         if (m_statusList.count() > 1)
             status += "...";
         m_status_text->SetText(status);
-        
+
         if (m_statusListNo < m_statusList.count() - 1)
             m_statusListNo++;
         else
             m_statusListNo = 0;
     }
-     
+
     m_updateScreenTimer->start(UPDATE_SCREEN_INTERVAL, true);
 }
 
@@ -432,11 +434,11 @@ void WelcomeDialog::runMythFillDatabase()
         command = QString("%1 %2").arg(mfpath).arg(mfarg);
     else
         command = QString("%1 %2 >>%3 2>&1").arg(mfpath).arg(mfarg).arg(mflog);
-    
+
     command += "&";
-    
+
     VERBOSE(VB_GENERAL, "Grabbing EPG data using command:\n" << command);
-    
+
     myth_system(command.ascii());
 }
 
@@ -458,12 +460,12 @@ bool WelcomeDialog::updateRecordingList()
     m_tunerList.clear();
     m_isRecording = false;
     m_screenTunerNo = 0;
-    
+
     if (!gContext->IsConnectedToMaster())
         return false;
-    
+
     QStringList strlist;
-    
+
     // get list of current recordings
     QString querytext = QString("SELECT cardid FROM capturecard WHERE parentid = 0;");
     MSqlQuery query(MSqlQuery::InitCon());
@@ -490,47 +492,47 @@ bool WelcomeDialog::updateRecordingList()
                 strlist = cmd;
                 strlist << "GET_STATE";
                 gContext->SendReceiveStringList(strlist);
-                
+
                 state = strlist[0].toInt();
                 if (state == kState_ChangingState)
                     usleep(500);
             }
-              
+
             if (state == kState_RecordingOnly || state == kState_WatchingRecording)
             {
                 m_isRecording = true;
-                
+
                 strlist = QString("QUERY_RECORDER %1").arg(cardid);
                 strlist << "GET_RECORDING";
                 gContext->SendReceiveStringList(strlist);
                 ProgramInfo *progInfo = new ProgramInfo;
                 progInfo->FromStringList(strlist, 0);
-   
+
                 title = progInfo->title;
                 subtitle = progInfo->subtitle;
                 channelName = progInfo->channame;
-                dtStart = progInfo->startts; 
-                dtEnd = progInfo->endts; 
+                dtStart = progInfo->startts;
+                dtEnd = progInfo->endts;
             }
-        
+
             TunerStatus *tuner = new TunerStatus;
             tuner->id = cardid;
-            tuner->isRecording = (state == kState_RecordingOnly || 
+            tuner->isRecording = (state == kState_RecordingOnly ||
                                   state == kState_WatchingRecording);
             tuner->program.channel = channelName;
             tuner->program.title = title;
             tuner->program.subtitle = subtitle;
             tuner->program.startTime = dtStart;
             tuner->program.endTime = dtEnd;
-            m_tunerList.append(tuner); 
-        }        
+            m_tunerList.append(tuner);
+        }
     }
-    
-    return true;    
+
+    return true;
 }
 
 bool WelcomeDialog::updateScheduledList()
-{    
+{
     {
         // clear pending flag early in case something happens while
         // we're updating
@@ -540,13 +542,13 @@ bool WelcomeDialog::updateScheduledList()
 
     m_scheduledList.clear();
     m_screenScheduledNo = 0;
-    
+
     if (!gContext->IsConnectedToMaster())
-    {    
+    {
         updateStatusMessage();
         return false;
     }
-        
+
     m_nextRecordingStart = QDateTime();
 
     ProgramList *progList = new ProgramList(true);
@@ -561,48 +563,48 @@ bool WelcomeDialog::updateScheduledList()
             {
                 if (progInfo->recstatus == rsWillRecord)
                 {
-                    if (m_nextRecordingStart.isNull() || 
+                    if (m_nextRecordingStart.isNull() ||
                             m_nextRecordingStart > progInfo->recstartts)
-                    {    
-                        m_nextRecordingStart = progInfo->recstartts;  
-                    } 
+                    {
+                        m_nextRecordingStart = progInfo->recstartts;
+                    }
                 }
-            }        
-                    
+            }
+
             // save the details of the earliest recording(s)
             for (progInfo = progList->first(); progInfo; progInfo = progList->next())
             {
                 if (progInfo->recstatus == rsWillRecord)
                 {
                     if (progInfo->recstartts == m_nextRecordingStart)
-                    { 
+                    {
                         ProgramDetail *prog = new ProgramDetail;
                         prog->channel = progInfo->channame;
                         prog->title = progInfo->title;
                         prog->subtitle = progInfo->subtitle;
                         prog->startTime = progInfo->recstartts;
                         prog->endTime = progInfo->recendts;
-                        m_scheduledList.append(prog); 
+                        m_scheduledList.append(prog);
                     }
                 }
             }
-        }   
+        }
     }
-        
+
     delete progList;
-    
+
     updateStatus();
     updateScreen();
-    
-    return true;        
+
+    return true;
 }
 
 void WelcomeDialog::updateStatusMessage(void)
-{    
+{
     m_statusList.clear();
-    
+
     QDateTime curtime = QDateTime::currentDateTime();
-    
+
     if (!m_isRecording && !m_nextRecordingStart.isNull() && 
             curtime.secsTo(m_nextRecordingStart) - 
             m_preRollSeconds < m_idleWaitForRecordingTime * 60)
@@ -614,24 +616,24 @@ void WelcomeDialog::updateStatusMessage(void)
     {
         m_statusList.append(tr("MythTV is busy recording."));
     }
-        
+
     int statusCode = system(m_installDir + "/bin/mythshutdown --status");
     if (WIFEXITED(statusCode))
         statusCode = WEXITSTATUS(statusCode);
-    
+
     if (statusCode & 1)
-        m_statusList.append(tr("MythTV is busy transcoding."));        
+        m_statusList.append(tr("MythTV is busy transcoding."));
     if (statusCode & 2)
         m_statusList.append(tr("MythTV is busy flagging commercials."));
     if (statusCode & 4)
-        m_statusList.append(tr("MythTV is busy grabbing EPG data."));        
+        m_statusList.append(tr("MythTV is busy grabbing EPG data."));
     if (statusCode & 16)
         m_statusList.append(tr("MythTV is locked by a user."));
     if (statusCode & 64)
         m_statusList.append(tr("MythTV is in a daily wakeup/shutdown period."));
     if (statusCode & 128)
         m_statusList.append(tr("MythTV is about to start a wakeup/shutdown period."));
-    
+
     if (m_statusList.count() == 0)
     {
         if (m_bWillShutdown && m_secondsToShutdown != -1)
@@ -640,7 +642,7 @@ void WelcomeDialog::updateStatusMessage(void)
         else
             m_statusList.append(tr("MythTV is idle."));
     }
-    
+
     if (m_hasConflicts)
         m_warning_text->show();
     else
@@ -650,40 +652,40 @@ void WelcomeDialog::updateStatusMessage(void)
 bool WelcomeDialog::checkConnectionToServer(void)
 {
     bool bRes = false;
-    
+
     if (gContext->IsConnectedToMaster())
         bRes = true;
     else
-    {    
+    {
         if (!gContext->ConnectToMasterServer(false))
             bRes = true;
     }
-     
-    return bRes;        
+
+    return bRes;
 }
 
 void WelcomeDialog::showPopup(void)
 {
     if (popup)
         return;
-        
+
     popup = new MythPopupBox(gContext->GetMainWindow(), "Menu");
 
     QButton *topButton;
     QLabel *label = popup->addLabel(tr("Menu"), MythPopupBox::Large, false);
     label->setAlignment(Qt::AlignCenter | Qt::WordBreak);
-    
+
     int statusCode = system(m_installDir + "/bin/mythshutdown --status");
     if (WIFEXITED(statusCode))
         statusCode = WEXITSTATUS(statusCode);
- 
+
     if (statusCode & 16)
-        topButton = popup->addButton(tr("Unlock Shutdown"), this, 
+        topButton = popup->addButton(tr("Unlock Shutdown"), this,
                          SLOT(unlockShutdown()));
-    else    
-        topButton = popup->addButton(tr("Lock Shutdown"), this, 
+    else
+        topButton = popup->addButton(tr("Lock Shutdown"), this,
                          SLOT(lockShutdown()));
-  
+
     popup->addButton(tr("Run mythfilldatabase"), this,
                          SLOT(runEPGGrabber()));
     popup->addButton(tr("Shutdown Now"), this,
@@ -751,19 +753,19 @@ void WelcomeDialog::shutdownNow(void)
     // don't shutdown if we are recording
     if (m_isRecording)
     {
-        MythPopupBox::showOkPopup(gContext->GetMainWindow(), "Cannot shutdown", 
+        MythPopupBox::showOkPopup(gContext->GetMainWindow(), "Cannot shutdown",
                 tr("Cannot shutdown because MythTV is currently recording"));
         return;
     }
-    
+
     QDateTime curtime = QDateTime::currentDateTime();
-    
+
     // don't shutdown if we are about to start recording
     if (!m_nextRecordingStart.isNull() && 
-            curtime.secsTo(m_nextRecordingStart) - 
+            curtime.secsTo(m_nextRecordingStart) -
             m_preRollSeconds < m_idleWaitForRecordingTime * 60)
     {
-        MythPopupBox::showOkPopup(gContext->GetMainWindow(), "Cannot shutdown", 
+        MythPopupBox::showOkPopup(gContext->GetMainWindow(), "Cannot shutdown",
                 tr("Cannot shutdown because MythTV is about to start recording"));
         return;
     }
@@ -772,45 +774,45 @@ void WelcomeDialog::shutdownNow(void)
     int statusCode = system(m_installDir + "/bin/mythshutdown --status");
     if (WIFEXITED(statusCode))
         statusCode = WEXITSTATUS(statusCode);
-        
+
     if (statusCode & 128)
-    {        
-        MythPopupBox::showOkPopup(gContext->GetMainWindow(), "Cannot shutdown", 
+    {
+        MythPopupBox::showOkPopup(gContext->GetMainWindow(), "Cannot shutdown",
                 tr("Cannot shutdown because MythTV is about to start "
                 "a wakeup/shutdown period."));
         return;
     }
-    
+
     // set the wakeup time for the next scheduled recording
     if (!m_nextRecordingStart.isNull())
-    {    
+    {
         QDateTime restarttime = m_nextRecordingStart.addSecs((-1) * m_preRollSeconds);
-    
+
         int add = gContext->GetNumSetting("StartupSecsBeforeRecording", 240);
         if (add)
             restarttime = restarttime.addSecs((-1) * add);
-    
+
         QString wakeup_timeformat = gContext->GetSetting("WakeupTimeFormat",
                                                             "yyyy-MM-ddThh:mm");
         QString setwakeup_cmd = gContext->GetSetting("SetWakeuptimeCommand",
                                                         "echo \'Wakeuptime would "
                                                         "be $time if command "
                                                         "set.\'");
-    
+
         if (wakeup_timeformat == "time_t")
         {
             QString time_ts;
-            setwakeup_cmd.replace("$time", 
+            setwakeup_cmd.replace("$time",
                                   time_ts.setNum(restarttime.toTime_t()));
         }
         else
-            setwakeup_cmd.replace("$time", 
+            setwakeup_cmd.replace("$time",
                                   restarttime.toString(wakeup_timeformat));
-       
+
         if (!setwakeup_cmd.isEmpty())
             system(setwakeup_cmd.ascii());
     }
-    
+
     // run command to set wakeuptime in bios and shutdown the system
     system("sudo " + m_installDir + "/bin/mythshutdown --shutdown");
 }
