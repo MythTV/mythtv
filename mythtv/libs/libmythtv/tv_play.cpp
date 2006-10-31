@@ -2289,7 +2289,8 @@ void TV::ProcessKeypress(QKeyEvent *e)
                 GetOSD()->DialogDown(dialogname);
             else if (((action == "RWNDSTICKY" || action == "SEEKRWND" ||
                         action == "JUMPRWND"))
-                    && IsVideoExitDialog())
+                    && IsVideoExitDialog() &&
+                    !(has_action("LEFT", actions) && arrowAccel))
             {
                 DoPause(false);
                 GetOSD()->TurnDialogOff(dialogname);
