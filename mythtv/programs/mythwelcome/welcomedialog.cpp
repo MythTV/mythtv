@@ -203,7 +203,11 @@ void WelcomeDialog::keyPressEvent(QKeyEvent *e)
         {
             MythWelcomeSettings settings;
             if (settings.exec() == 1)
+            {
                 RemoteSendMessage("CLEAR_SETTINGS_CACHE");
+                updateStatus();
+                updateScreen();
+            }
         }
         else if (action == "SHOWSETTINGS")
         {
