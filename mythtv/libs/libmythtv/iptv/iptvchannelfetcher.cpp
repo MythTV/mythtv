@@ -14,6 +14,8 @@
 #define LOC QString("IPTVChanFetch: ")
 #define LOC_ERR QString("IPTVChanFetch, Error: ")
 
+void *run_scan_thunk(void*);
+
 static bool parse_chan_info(const QString   &rawdata,
                             IPTVChannelInfo &info,
                             QString         &channum,
