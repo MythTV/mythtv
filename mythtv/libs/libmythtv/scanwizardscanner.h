@@ -43,7 +43,7 @@
 
 class ScanWizard;
 class AnalogScan;
-class FreeboxChannelFetcher;
+class IPTVChannelFetcher;
 class LogList;
 class SIScan;
 class ScanProgressPopup;
@@ -80,10 +80,10 @@ class ScanWizardScanner : public VerticalConfigurationGroup
 
   protected:
     void Import(uint sourceid, int cardtype, const QString &file);
+    void ImportM3U(uint cardid, uint sourceid);
     void PreScanCommon(uint cardid, uint sourceid);
     void TunedScanCommon(uint cardid, uint sourceid, bool ok);
     void ScanAnalog(uint cardid, uint sourceid);
-    void ScanFreeBox(uint cardid, uint sourceid);
 
     void dvbLock(int);
     void dvbSNR(int);
@@ -103,7 +103,7 @@ class ScanWizardScanner : public VerticalConfigurationGroup
 
     SIScan            *scanner;
     AnalogScan        *analogScanner;
-    FreeboxChannelFetcher *freeboxScanner;
+    IPTVChannelFetcher *freeboxScanner;
 
     int                nScanType;
     int                nMultiplexToTuneTo;

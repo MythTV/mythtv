@@ -1,20 +1,25 @@
-#ifndef _FREEBOXCHANNELINFO_H_
-#define _FREEBOXCHANNELINFO_H_
+/** -*- Mode: c++ -*-
+ *  IPTVChannelInfo
+ *  Distributed as part of MythTV under GPL v2 and later.
+ */
+
+#ifndef _IPTV_CHANNELINFO_H_
+#define _IPTV_CHANNELINFO_H_
 
 #include <qmap.h>
 #include <qstring.h>
 
-class FreeboxChannelInfo
+class IPTVChannelInfo
 {
   public:
-    FreeboxChannelInfo() :
+    IPTVChannelInfo() :
         m_name(QString::null),
         m_url(QString::null),
         m_xmltvid(QString::null) {}
 
-    FreeboxChannelInfo(const QString &name,
-                       const QString &url,
-                       const QString &xmltvid) :
+    IPTVChannelInfo(const QString &name,
+                    const QString &url,
+                    const QString &xmltvid) :
         m_name(name), m_url(url), m_xmltvid(xmltvid) {}
 
     bool isValid(void) const
@@ -28,8 +33,8 @@ class FreeboxChannelInfo
     QString m_xmltvid;
 };
 
-typedef QMap<QString,FreeboxChannelInfo> fbox_chan_map_t;
+typedef QMap<QString,IPTVChannelInfo> fbox_chan_map_t;
 
-#endif //_FREEBOXCHANNELINFO_H_
+#endif // _IPTV_CHANNELINFO_H_
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

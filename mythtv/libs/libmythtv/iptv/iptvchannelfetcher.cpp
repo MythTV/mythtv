@@ -2,96 +2,103 @@
 
 // Std C headers
 #include <cmath>
-#include <unistd.h>
 
 // MythTV headers
 #include "mythcontext.h"
 #include "httpcomms.h"
 #include "cardutil.h"
 #include "channelutil.h"
-#include "freeboxchannelfetcher.h"
+#include "urlfetcher.h"
+#include "iptvchannelfetcher.h"
 
-#define LOC QString("FBChanFetch: ")
-#define LOC_ERR QString("FBChanFetch, Error: ")
+#define LOC QString("IPTVChanFetch: ")
+#define LOC_ERR QString("IPTVChanFetch, Error: ")
 
-static bool parse_chan_info(const QString      &rawdata,
-                            FreeboxChannelInfo &info,
-                            QString            &channum,
-                            uint               &lineNum);
+static bool parse_chan_info(const QString   &rawdata,
+                            IPTVChannelInfo &info,
+                            QString         &channum,
+                            uint            &lineNum);
+
 static bool parse_extinf(const QString &data,
-                         QString &channum, QString &name);
+                         QString       &channum,
+                         QString       &name);
 
-FreeboxChannelFetcher::FreeboxChannelFetcher(unsigned _sourceid,
-                                             unsigned _cardid) :
-    sourceid(_sourceid),    cardid(_cardid),
-    chan_cnt(1),            thread_running(false),
-    stop_now(false),        lock(false)
+IPTVChannelFetcher::IPTVChannelFetcher(uint sourceid, uint cardid) :
+    _sourceid(sourceid),   _cardid(cardid),
+    _chan_cnt(1),          _thread_running(false),
+    _stop_now(false),      _lock(false)
 {
 }
 
-FreeboxChannelFetcher::~FreeboxChannelFetcher()
+IPTVChannelFetcher::~IPTVChannelFetcher()
 {
     do
     {
         Stop();
         usleep(5000);
     }
-    while (thread_running);
+    while (_thread_running);
 }
 
-void FreeboxChannelFetcher::Stop(void)
+/** \fn IPTVChannelFetcher::Stop(void)
+ *  \brief Stops the scanning thread running
+ */
+void IPTVChannelFetcher::Stop(void)
 {
-    lock.lock();
+    _lock.lock();
 
-    if (thread_running)
+    if (_thread_running)
     {
-        stop_now = true;
-        lock.unlock();
+        _stop_now = true;
+        _lock.unlock();
 
-        pthread_join(thread, NULL);
+        pthread_join(_thread, NULL);
         return;
     }
 
-    lock.unlock();
+    _lock.unlock();
+}
+
+/** \fn IPTVChannelFetcher::Scan(void)
+ *  \brief Scans the given frequency list, blocking call.
+ */
+bool IPTVChannelFetcher::Scan(void)
+{
+    _lock.lock();
+    do { _lock.unlock(); Stop(); _lock.lock(); } while (_thread_running);
+
+    // Should now have _lock and no thread should be running.
+
+    _stop_now = false;
+
+    pthread_create(&_thread, NULL, run_scan_thunk, this);
+
+    while (!_thread_running && !_stop_now)
+        usleep(5000);
+
+    _lock.unlock();
+
+    return _thread_running;
 }
 
 void *run_scan_thunk(void *param)
 {
-    FreeboxChannelFetcher *chanscan = (FreeboxChannelFetcher*) param;
+    IPTVChannelFetcher *chanscan = (IPTVChannelFetcher*) param;
     chanscan->RunScan();
 
     return NULL;
 }
 
-bool FreeboxChannelFetcher::Scan(void)
+void IPTVChannelFetcher::RunScan(void)
 {
-    lock.lock();
-    do { lock.unlock(); Stop(); lock.lock(); } while (thread_running);
-
-    // Should now have lock and no thread should be running.
-
-    stop_now = false;
-
-    pthread_create(&thread, NULL, run_scan_thunk, this);
-
-    while (!thread_running && !stop_now)
-        usleep(5000);
-
-    lock.unlock();
-
-    return thread_running;
-}
-
-void FreeboxChannelFetcher::RunScan(void)
-{
-    thread_running = true;
+    _thread_running = true;
 
     // Step 1/4 : Get info from DB
-    QString url = CardUtil::GetVideoDevice(cardid, sourceid);
+    QString url = CardUtil::GetVideoDevice(_cardid, _sourceid);
 
-    if (stop_now || url.isEmpty())
+    if (_stop_now || url.isEmpty())
     {
-        thread_running = false;
+        _thread_running = false;
         return;
     }
 
@@ -103,9 +110,9 @@ void FreeboxChannelFetcher::RunScan(void)
 
     QString playlist = DownloadPlaylist(url, false);
 
-    if (stop_now || playlist.isEmpty())
+    if (_stop_now || playlist.isEmpty())
     {
-        thread_running = false;
+        _thread_running = false;
         return;
     }
 
@@ -126,22 +133,23 @@ void FreeboxChannelFetcher::RunScan(void)
         QString xmltvid = (*it).m_xmltvid.isEmpty() ? "" : (*it).m_xmltvid;
         QString msg     = tr("Channel #%1 : %2").arg(channum).arg(name);
 
-        int chanid = ChannelUtil::GetChanID(sourceid, channum);
+        int chanid = ChannelUtil::GetChanID(_sourceid, channum);
         if (chanid <= 0)
         { 
             emit ServiceScanUpdateText(tr("Adding %1").arg(msg));
-            chanid = ChannelUtil::CreateChanID(sourceid, channum);
+            chanid = ChannelUtil::CreateChanID(_sourceid, channum);
             ChannelUtil::CreateChannel(
-                0, sourceid, chanid, name, name, channum,
-                0, 0, 0, false, false, false, 0,
-                "", "Default", xmltvid);
+                0, _sourceid, chanid, name, name, channum,
+                0, 0, 0, false, false, false, QString::null,
+                QString::null, "Default", xmltvid);
         }
         else
         {
             emit ServiceScanUpdateText(tr("Updating %1").arg(msg));
             ChannelUtil::UpdateChannel(
-                0, sourceid, chanid, name, name, channum, 0, 0, 0, 0);
-            //TODO Update the xmltvid
+                0, _sourceid, chanid, name, name, channum,
+                0, 0, 0, false, false, false, QString::null,
+                QString::null, "Default", xmltvid);
         }
 
         SetNumChannelsInserted(i);
@@ -152,31 +160,35 @@ void FreeboxChannelFetcher::RunScan(void)
     emit ServiceScanPercentComplete(100);
     emit ServiceScanComplete();
 
-    thread_running = false;
+    _thread_running = false;
 }
 
-void FreeboxChannelFetcher::SetNumChannelsParsed(uint val)
+void IPTVChannelFetcher::SetNumChannelsParsed(uint val)
 {
     uint minval = 35, range = 70 - minval;
-    uint pct = minval + (uint) truncf((((float)val) / chan_cnt) * range);
+    uint pct = minval + (uint) truncf((((float)val) / _chan_cnt) * range);
     emit ServiceScanPercentComplete(pct);
 }
 
-void FreeboxChannelFetcher::SetNumChannelsInserted(uint val)
+void IPTVChannelFetcher::SetNumChannelsInserted(uint val)
 {
     uint minval = 70, range = 100 - minval;
-    uint pct = minval + (uint) truncf((((float)val) / chan_cnt) * range);
+    uint pct = minval + (uint) truncf((((float)val) / _chan_cnt) * range);
     emit ServiceScanPercentComplete(pct);
 }
 
-void FreeboxChannelFetcher::SetMessage(const QString &status)
+void IPTVChannelFetcher::SetMessage(const QString &status)
 {
     emit ServiceScanUpdateText(status);
 }
 
-QString FreeboxChannelFetcher::DownloadPlaylist(const QString &url,
-                                                bool inQtThread)
+QString IPTVChannelFetcher::DownloadPlaylist(const QString &url,
+                                             bool inQtThread)
 {
+    if (!url.startsWith("http:"))
+        return URLFetcher::FetchData(url, inQtThread);
+
+    // Use Myth HttpComms for http URLs
     QString redirected_url = url;
 
     QString tmp = HttpComms::getHttp(
@@ -210,8 +222,8 @@ static uint estimate_number_of_channels(const QString &rawdata)
     }
 }
 
-fbox_chan_map_t FreeboxChannelFetcher::ParsePlaylist(
-    const QString &rawdata, FreeboxChannelFetcher *fetcher)
+fbox_chan_map_t IPTVChannelFetcher::ParsePlaylist(
+    const QString &rawdata, IPTVChannelFetcher *fetcher)
 {
     fbox_chan_map_t chanmap;
 
@@ -242,7 +254,7 @@ fbox_chan_map_t FreeboxChannelFetcher::ParsePlaylist(
     uint lineNum = 1;
     for (uint i = 1; true; i++)
     {
-        FreeboxChannelInfo info;
+        IPTVChannelInfo info;
         QString channum = QString::null;
 
         if (!parse_chan_info(rawdata, info, channum, lineNum))
@@ -271,15 +283,15 @@ fbox_chan_map_t FreeboxChannelFetcher::ParsePlaylist(
     return chanmap;
 }
 
-static bool parse_chan_info(const QString      &rawdata,
-                            FreeboxChannelInfo &info,
-                            QString            &channum,
-                            uint               &lineNum)
+static bool parse_chan_info(const QString   &rawdata,
+                            IPTVChannelInfo &info,
+                            QString         &channum,
+                            uint            &lineNum)
 {
     // #EXTINF:0,2 - France 2                <-- duration,channum - channame
     // #EXTMYTHTV:xmltvid=C2.telepoche.com   <-- optional line (myth specific)
     // #...                                  <-- ignored comments
-    // rtsp://mafreebox.freebox.fr/freeboxtv/201 <-- url
+    // rtsp://maiptv.iptv.fr/iptvtv/201 <-- url
 
     QString name;
     QString xmltvid;
@@ -314,14 +326,15 @@ static bool parse_chan_info(const QString      &rawdata,
             if (name.isEmpty())
                 return false;
             QString url = line;
-            info = FreeboxChannelInfo(name, url, xmltvid);
+            info = IPTVChannelInfo(name, url, xmltvid);
             return true;
         }
     }
 }
 
 static bool parse_extinf(const QString &line1,
-                         QString &channum, QString &name)
+                         QString       &channum,
+                         QString       &name)
 {
     // data is supposed to contain the "0,2 - France 2" part
     QString msg = LOC_ERR +
@@ -336,7 +349,7 @@ static bool parse_extinf(const QString &line1,
         return false;
     }
 
-    // Parse freebox channel number
+    // Parse iptv channel number
     int oldpos = pos + 1;
     pos = line1.find(" ", pos + 1);
     if (pos < 0)
@@ -346,7 +359,7 @@ static bool parse_extinf(const QString &line1,
     }
     channum = line1.mid(oldpos, pos - oldpos);
 
-    // Parse freebox channel name
+    // Parse iptv channel name
     pos = line1.find("- ", pos + 1);
     if (pos < 0)
     {

@@ -1054,7 +1054,10 @@ bool ChannelUtil::CreateChannel(uint db_mplexid,
     QString tvformat = (atsc_minor_channel > 0) ? "ATSC" : format;
     query.bindValue(":TVFORMAT", tvformat);
 
+    icon = (icon.isEmpty()) ? "" : icon;
     query.bindValue(":ICON",      icon);
+
+    xmltvid = (xmltvid.isEmpty()) ? "" : xmltvid;
     query.bindValue(":XMLTVID",   xmltvid);
 
     if (!query.exec() || !query.isActive())
@@ -1074,7 +1077,13 @@ bool ChannelUtil::UpdateChannel(uint db_mplexid,
                                 uint service_id,
                                 uint atsc_major_channel,
                                 uint atsc_minor_channel,
-                                int freqid)
+                                bool use_on_air_guide,
+                                bool hidden,
+                                bool hidden_in_guide,
+                                QString freqid,
+                                QString icon,
+                                QString format,
+                                QString xmltvid)
 {
     MSqlQuery query(MSqlQuery::InitCon());
 
@@ -1084,23 +1093,38 @@ bool ChannelUtil::UpdateChannel(uint db_mplexid,
         "    atsc_major_chan = :MAJORCHAN, atsc_minor_chan = :MINORCHAN, "
         "    callsign        = :CALLSIGN,  name            = :NAME,      "
         "    channum         = :CHANNUM,   freqid          = :FREQID,    "
-        "    tvformat        = :TVFORMAT,  sourceid        = :SOURCEID   "
+        "    tvformat        = :TVFORMAT,  sourceid        = :SOURCEID,  "
+        "    useonairguide   = :USEOAG,    visible         = :VISIBLE,   "
+        "    tvformat        = :TVFORMAT,  icon            = :ICON,      "
+        "    xmltvid         = :XMLTVID "
         "WHERE chanid=:CHANID");
 
+    if (!chan_num.isEmpty() && chan_num != "-1")
+        query.bindValue(":CHANNUM",   chan_num);
+    query.bindValue(":SOURCEID",  source_id);
+    query.bindValue(":CALLSIGN",  callsign.utf8());
+    query.bindValue(":NAME",      service_name.utf8());
+
     query.bindValue(":MPLEXID",   db_mplexid);
+
     query.bindValue(":SERVICEID", service_id);
     query.bindValue(":MAJORCHAN", atsc_major_channel);
     query.bindValue(":MINORCHAN", atsc_minor_channel);
-    query.bindValue(":CALLSIGN",  callsign.utf8());
-    query.bindValue(":NAME",      service_name.utf8());
-    query.bindValue(":SOURCEID",  source_id);
-    query.bindValue(":CHANID",    channel_id);
-    if (chan_num != "-1")
-        query.bindValue(":CHANNUM",   chan_num);
-    if (freqid > 0)
+    query.bindValue(":USEOAG",    use_on_air_guide);
+    query.bindValue(":VISIBLE",   !hidden);
+    (void) hidden_in_guide; // MythTV can't hide the channel in just the guide.
+
+    if (!freqid.isEmpty())
         query.bindValue(":FREQID",    freqid);
-    if (atsc_minor_channel > 0)
-        query.bindValue(":TVFORMAT",  "ATSC");
+
+    QString tvformat = (atsc_minor_channel > 0) ? "ATSC" : format;
+    if (!tvformat.isEmpty())
+        query.bindValue(":TVFORMAT",  tvformat);
+
+    if (!icon.isEmpty())
+        query.bindValue(":ICON",      icon);
+    if (!xmltvid.isEmpty())
+        query.bindValue(":XMLTVID",   xmltvid);
 
     if (!query.exec() || !query.isActive())
     {

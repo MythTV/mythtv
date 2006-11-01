@@ -9,7 +9,7 @@ INSTALLS = target
 
 INCLUDEPATH += ../.. ..
 INCLUDEPATH += ../libmyth ../libavcodec ../libavutil ../libmythmpeg2
-INCLUDEPATH += ./dvbdev ./mpeg
+INCLUDEPATH += ./dvbdev ./mpeg ./iptv
 INCLUDEPATH += ../libmythlivemedia/BasicUsageEnvironment/include
 INCLUDEPATH += ../libmythlivemedia/groupsock/include
 INCLUDEPATH += ../libmythlivemedia/liveMedia/include
@@ -17,7 +17,7 @@ INCLUDEPATH += ../libmythlivemedia/UsageEnvironment/include
 
 DEPENDPATH  += ../libmyth ../libavcodec ../libavformat ../libavutil
 DEPENDPATH  += ../libmythmpeg2 ../libmythdvdnav
-DEPENDPATH  += ./dvbdev ./mpeg ./hdhomerun
+DEPENDPATH  += ./dvbdev ./mpeg ./hdhomerun ./iptv
 DEPENDPATH  += ../libmythlivemedia/BasicUsageEnvironment/include
 DEPENDPATH  += ../libmythlivemedia/BasicUsageEnvironment
 DEPENDPATH  += ../libmythlivemedia/groupsock/include
@@ -395,18 +395,25 @@ using_backend {
     using_dbox2:HEADERS += dbox2recorder.h dbox2channel.h dbox2epg.h
     using_dbox2:DEFINES += USING_DBOX2
     
-    # Support for freebox (http://adsl.free.fr/)
-    using_freebox {
-        HEADERS += freeboxrecorder.h           freeboxmediasink.h
-        HEADERS += freeboxchannel.h            freeboxchannelfetcher.h
-        HEADERS += freeboxsignalmonitor.h      rtspcomms.h
-        HEADERS += freeboxchannelinfo.h
+    # Support for MPEG2 TS streams (including FreeBox http://adsl.free.fr/)
+    using_iptv {
+        HEADERS += iptvchannel.h              iptvrecorder.h
+        HEADERS += iptvsignalmonitor.h
+        HEADERS += iptv/iptvchannelfetcher.h  iptv/iptvchannelinfo.h
+        HEADERS += iptv/iptvmediasink.h       iptv/iptvlistener.h
+        HEADERS += iptv/iptvfeeder.h          iptv/iptvfeederwrapper.h
+        HEADERS += iptv/iptvfeederrtsp.h      iptv/iptvfeederlive.h
+        HEADERS += iptv/urlfetcher.h          iptv/timeoutedtaskscheduler.h
 
-        SOURCES += freeboxrecorder.cpp         freeboxmediasink.cpp
-        SOURCES += freeboxchannel.cpp          freeboxchannelfetcher.cpp
-        SOURCES += freeboxsignalmonitor.cpp    rtspcomms.cpp
+        SOURCES += iptvchannel.cpp            iptvrecorder.cpp
+        SOURCES += iptvsignalmonitor.cpp
+        SOURCES += iptv/iptvchannelfetcher.cpp
+        SOURCES += iptv/iptvmediasink.cpp
+        SOURCES += iptv/iptvfeeder.cpp        iptv/iptvfeederwrapper.cpp
+        SOURCES += iptv/iptvfeederrtsp.cpp    iptv/iptvfeederlive.cpp
+        SOURCES += iptv/urlfetcher.cpp        iptv/timeoutedtaskscheduler.cpp
 
-        DEFINES += USING_FREEBOX
+        DEFINES += USING_IPTV
     }
 
     # Support for HDHomeRun box

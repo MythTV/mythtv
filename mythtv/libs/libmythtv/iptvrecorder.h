@@ -1,31 +1,31 @@
-/**
- *  FreeboxRecorder
+// -*- Mode: c++ -*-
+/** 
+ *  IPTVRecorder
  *  Copyright (c) 2006 by Laurent Arnal, Benjamin Lerman & Mickaël Remars
  *  Distributed as part of MythTV under GPL v2 and later.
  */
 
-#ifndef FREEBOXRECORDER_H_
-#define FREEBOXRECORDER_H_
+#ifndef _IPTV_RECORDER_H_
+#define _IPTV_RECORDER_H_
 
 #include <qwaitcondition.h>
 
 #include "dtvrecorder.h"
-#include "freeboxmediasink.h"
+#include "iptvlistener.h"
 #include "streamlisteners.h"
 
-class FreeboxChannel;
+class IPTVChannel;
 
-/** \brief Processes data from RTSPComms and writes it to disk.
+/** \brief Processes data from a IPTVFeeder and writes it to disk.
  */
-class FreeboxRecorder : public DTVRecorder, public RTSPListener,
-                        public MPEGSingleProgramStreamListener
+class IPTVRecorder : public DTVRecorder, public IPTVListener,
+                     public MPEGSingleProgramStreamListener
 {
-    friend class FreeboxMediaSink;
-    friend class RTSPComms;
+    friend class IPTVMediaSink;
 
   public:
-    FreeboxRecorder(TVRec *rec, FreeboxChannel *channel);
-    ~FreeboxRecorder();
+    IPTVRecorder(TVRec *rec, IPTVChannel *channel);
+    ~IPTVRecorder();
 
     bool Open(void);
     void Close(void);
@@ -45,27 +45,25 @@ class FreeboxRecorder : public DTVRecorder, public RTSPListener,
   private:
     void ProcessTSPacket(const TSPacket& tspacket);
 
-    // implements RTSPListener
+    // implements IPTVListener
     void AddData(unsigned char *data,
-                 unsigned int   dataSize,
-                 struct timeval presentationTime);
+                 unsigned int   dataSize);
 
     // implements MPEGSingleProgramStreamListener
     void HandleSingleProgramPAT(ProgramAssociationTable *pat);
     void HandleSingleProgramPMT(ProgramMapTable *pmt);
 
   private:
-    FreeboxChannel *_channel;
+    IPTVChannel *_channel;
     MPEGStreamData *_stream_data;
     QWaitCondition  _cond_recording;
 
-
   private:
-    FreeboxRecorder& operator=(const FreeboxRecorder&); //< avoid default impl
-    FreeboxRecorder(const FreeboxRecorder&);            //< avoid default impl
-    FreeboxRecorder();                                  //< avoid default impl
+    IPTVRecorder &operator=(const IPTVRecorder&); //< avoid default impl
+    IPTVRecorder(const IPTVRecorder&);            //< avoid default impl
+    IPTVRecorder();                                  //< avoid default impl
 };
 
-#endif //FREEBOXRECORDER_H_
+#endif // _IPTV_RECORDER_H_
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

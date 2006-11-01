@@ -14,16 +14,7 @@ using namespace std;
 
 #include <MediaSink.hh>
 
-class RTSPListener
-{
-  public:
-    /// Callback function to add MPEG2 TS data
-    virtual void AddData(unsigned char *data,
-                         unsigned int   dataSize,
-                         struct timeval presentationTime) = 0;
-  protected:
-    virtual ~RTSPListener() {}
-};
+class IPTVListener;
 
 // ============================================================================
 // FreeboxMediaSink : Helper class use to receive RTSP data from socket.
@@ -34,8 +25,8 @@ class FreeboxMediaSink : public MediaSink
     static FreeboxMediaSink *CreateNew(UsageEnvironment &env,
                                        unsigned          bufferSize);
 
-    void AddListener(RTSPListener*);
-    void RemoveListener(RTSPListener*);
+    void AddListener(IPTVListener*);
+    void RemoveListener(IPTVListener*);
 
   protected:
     FreeboxMediaSink(UsageEnvironment &env,
@@ -58,7 +49,7 @@ class FreeboxMediaSink : public MediaSink
     unsigned char         *fBuffer;
     unsigned int           fBufferSize;
     UsageEnvironment      &env;
-    vector<RTSPListener*>  listeners;
+    vector<IPTVListener*>  listeners;
     mutable QMutex         lock;
 
   private:

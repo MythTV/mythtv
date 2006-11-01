@@ -953,15 +953,15 @@ class HDHomeRunDeviceID: public LineEditSetting, public CCSetting
     }
 };
 
-class FreeboxHost : public LineEditSetting, public CCSetting
+class IPTVHost : public LineEditSetting, public CCSetting
 {
   public:
-    FreeboxHost(const CaptureCard &parent):
+    IPTVHost(const CaptureCard &parent):
         CCSetting(parent, "videodevice")
     {
         setValue("http://mafreebox.freebox.fr/freeboxtv/playlist.m3u");
-        setLabel(QObject::tr("Freebox MRL"));
-        setHelpText(QObject::tr("The FreeBox Media Resource Locator (MRL)."));
+        setLabel(QObject::tr("M3U URL"));
+        setHelpText(QObject::tr("URL of M3U containing IPTV channel URLs."));
     }
 };
 
@@ -977,16 +977,16 @@ class HDHomeRunTunerIndex: public ComboBoxSetting, public CCSetting
     }
 };
 
-class FreeboxConfigurationGroup : public VerticalConfigurationGroup
+class IPTVConfigurationGroup : public VerticalConfigurationGroup
 {
   public:
-    FreeboxConfigurationGroup(CaptureCard& a_parent):
+    IPTVConfigurationGroup(CaptureCard& a_parent):
        ConfigurationGroup(false, true, false, false),
        VerticalConfigurationGroup(false, true, false, false),
        parent(a_parent)
     {
         setUseLabel(false);
-        addChild(new FreeboxHost(parent));
+        addChild(new IPTVHost(parent));
 
         // TODO Create a generic fixed input class to replace duplicates
         HDHRCardInput *defaultinput = new HDHRCardInput(parent);
@@ -1230,9 +1230,9 @@ CaptureCardGroup::CaptureCardGroup(CaptureCard& parent) :
     addTarget("CRC_IP",   new CRCIpNetworkRecorderConfigurationGroup(parent));
 #endif // USING_CRC_IP_NETWORK_REC
 
-#ifdef USING_FREEBOX
-    addTarget("FREEBOX",   new FreeboxConfigurationGroup(parent));
-#endif // USING_FREEBOX
+#ifdef USING_IPTV
+    addTarget("FREEBOX",   new IPTVConfigurationGroup(parent));
+#endif // USING_IPTV
 }
 
 void CaptureCardGroup::triggerChanged(const QString& value) 
@@ -1357,9 +1357,9 @@ void CardType::fillSelections(SelectSetting* setting)
         QObject::tr("CRC IP Network Recorder"), "CRC_IP");
 #endif // USING_CRC_IP_NETWORK_REC
 
-#ifdef USING_FREEBOX
-    setting->addSelection(QObject::tr("Freebox Network Recorder"), "FREEBOX");
-#endif // USING_FREEBOX
+#ifdef USING_IPTV
+    setting->addSelection(QObject::tr("RTSP Network Recorder"), "FREEBOX");
+#endif // USING_IPTV
 }
 
 class CardID: public SelectLabelSetting, public CISetting {

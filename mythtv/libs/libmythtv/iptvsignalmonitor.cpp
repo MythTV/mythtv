@@ -2,17 +2,18 @@
 
 // MythTV headers
 #include "mpegstreamdata.h"
-#include "freeboxsignalmonitor.h"
-#include "rtspcomms.h"
+#include "iptvchannel.h"
+#include "iptvfeederwrapper.h"
+#include "iptvsignalmonitor.h"
 
 #undef DBG_SM
 #define DBG_SM(FUNC, MSG) VERBOSE(VB_CHANNEL, \
-    "FreeboxSM("<<channel->GetDevice()<<")::"<<FUNC<<": "<<MSG);
+    "IPTVSM("<<channel->GetDevice()<<")::"<<FUNC<<": "<<MSG);
 
-#define LOC QString("FreeboxSM(%1): ").arg(channel->GetDevice())
-#define LOC_ERR QString("FreeboxSM(%1), Error: ").arg(channel->GetDevice())
+#define LOC QString("IPTVSM(%1): ").arg(channel->GetDevice())
+#define LOC_ERR QString("IPTVSM(%1), Error: ").arg(channel->GetDevice())
 
-/** \fn FreeboxSignalMonitor::FreeboxSignalMonitor(int,FreeboxChannel*,uint,const char*)
+/** \fn IPTVSignalMonitor::IPTVSignalMonitor(int,IPTVChannel*,uint,const char*)
  *  \brief Initializes signal lock and signal values.
  *
  *   Start() must be called to actually begin continuous
@@ -23,22 +24,21 @@
  *                    if this is less than 0, SIGNAL events will not be
  *                    sent to the frontend even if SetNotifyFrontend(true)
  *                    is called.
- *  \param _channel FreeboxChannel for card
+ *  \param _channel IPTVChannel for card
  *  \param _flags   Flags to start with
  *  \param _name    Instance name for Qt signal/slot debugging
  */
-FreeboxSignalMonitor::FreeboxSignalMonitor(
-    int db_cardnum, FreeboxChannel *_channel,
+IPTVSignalMonitor::IPTVSignalMonitor(
+    int db_cardnum, IPTVChannel *_channel,
     uint _flags, const char *_name)
     : DTVSignalMonitor(db_cardnum, _channel, _flags, _name),
       dtvMonitorRunning(false)
 {
     bool isLocked = false;
-    if (GetChannel()->GetRTSP()->Init())
+    IPTVChannelInfo chaninfo = GetChannel()->GetCurrentChanInfo();
+    if (chaninfo.isValid())
     {
-        FreeboxChannelInfo chaninfo = GetChannel()->GetCurrentChanInfo();
-        isLocked = (chaninfo.isValid() && 
-                    GetChannel()->GetRTSP()->Open(chaninfo.m_url));
+        isLocked = GetChannel()->GetFeeder()->Open(chaninfo.m_url);
     }
 
     QMutexLocker locker(&statusLock);
@@ -46,89 +46,89 @@ FreeboxSignalMonitor::FreeboxSignalMonitor(
     signalStrength.SetValue((isLocked) ? 100 : 0);
 }
 
-/** \fn FreeboxSignalMonitor::~FreeboxSignalMonitor()
+/** \fn IPTVSignalMonitor::~IPTVSignalMonitor()
  *  \brief Stops signal monitoring and table monitoring threads.
  */
-FreeboxSignalMonitor::~FreeboxSignalMonitor()
+IPTVSignalMonitor::~IPTVSignalMonitor()
 {
-    GetChannel()->GetRTSP()->RemoveListener(this);
+    GetChannel()->GetFeeder()->RemoveListener(this);
     Stop();
 }
 
-FreeboxChannel *FreeboxSignalMonitor::GetChannel(void)
+IPTVChannel *IPTVSignalMonitor::GetChannel(void)
 {
-    return dynamic_cast<FreeboxChannel*>(channel);
+    return dynamic_cast<IPTVChannel*>(channel);
 }
 
-void FreeboxSignalMonitor::deleteLater(void)
+void IPTVSignalMonitor::deleteLater(void)
 {
     disconnect(); // disconnect signals we may be sending...
-    GetChannel()->GetRTSP()->RemoveListener(this);
+    GetChannel()->GetFeeder()->RemoveListener(this);
     Stop();
     DTVSignalMonitor::deleteLater();
 }
 
-/** \fn FreeboxSignalMonitor::Stop(void)
+/** \fn IPTVSignalMonitor::Stop(void)
  *  \brief Stop signal monitoring and table monitoring threads.
  */
-void FreeboxSignalMonitor::Stop(void)
+void IPTVSignalMonitor::Stop(void)
 {
     DBG_SM("Stop", "begin");
-    GetChannel()->GetRTSP()->RemoveListener(this);
+    GetChannel()->GetFeeder()->RemoveListener(this);
     SignalMonitor::Stop();
     if (dtvMonitorRunning)
     {
-        GetChannel()->GetRTSP()->Stop();
+        GetChannel()->GetFeeder()->Stop();
         dtvMonitorRunning = false;
         pthread_join(table_monitor_thread, NULL);
     }
     DBG_SM("Stop", "end");
 }
 
-void *FreeboxSignalMonitor::TableMonitorThread(void *param)
+void *IPTVSignalMonitor::TableMonitorThread(void *param)
 {
-    FreeboxSignalMonitor *mon = (FreeboxSignalMonitor*) param;
+    IPTVSignalMonitor *mon = (IPTVSignalMonitor*) param;
     mon->RunTableMonitor();
     return NULL;
 }
 
-/** \fn FreeboxSignalMonitor::RunTableMonitor(void)
+/** \fn IPTVSignalMonitor::RunTableMonitor(void)
  */
-void FreeboxSignalMonitor::RunTableMonitor(void)
+void IPTVSignalMonitor::RunTableMonitor(void)
 {
     DBG_SM("Run", "begin");
     dtvMonitorRunning = true;
 
     GetStreamData()->AddListeningPID(0);
 
-    GetChannel()->GetRTSP()->AddListener(this);
-    GetChannel()->GetRTSP()->Run();
-    GetChannel()->GetRTSP()->RemoveListener(this);
+    GetChannel()->GetFeeder()->AddListener(this);
+    GetChannel()->GetFeeder()->Run();
+    GetChannel()->GetFeeder()->RemoveListener(this);
 
     dtvMonitorRunning = false;
     DBG_SM("Run", "end");
 }
 
-void FreeboxSignalMonitor::AddData(
-    unsigned char *data, unsigned dataSize, struct timeval)
+void IPTVSignalMonitor::AddData(
+    unsigned char *data, unsigned int dataSize)
 {
     GetStreamData()->ProcessData(data, dataSize);
 }
 
-/** \fn FreeboxSignalMonitor::UpdateValues(void)
+/** \fn IPTVSignalMonitor::UpdateValues(void)
  *  \brief Fills in frontend stats and emits status Qt signals.
  *
  *   This is automatically called by MonitorLoop(), after Start()
  *   has been used to start the signal monitoring thread.
  */
-void FreeboxSignalMonitor::UpdateValues(void)
+void IPTVSignalMonitor::UpdateValues(void)
 {
     if (!running || exit)
         return;
 
     if (dtvMonitorRunning)
     {
-        EmitFreeboxSignals();
+        EmitIPTVSignals();
         if (IsAllGood())
             emit AllGood();
         // TODO dtv signals...
@@ -143,7 +143,7 @@ void FreeboxSignalMonitor::UpdateValues(void)
         isLocked = signalLock.IsGood();
     }
 
-    EmitFreeboxSignals();
+    EmitIPTVSignals();
     if (IsAllGood())
         emit AllGood();
 
@@ -171,10 +171,10 @@ void FreeboxSignalMonitor::UpdateValues(void)
          statusLock.unlock(); \
          emit SIGNAL_FUNC(val); } while (false)
 
-/** \fn FreeboxSignalMonitor::EmitFreeboxSignals(void)
+/** \fn IPTVSignalMonitor::EmitIPTVSignals(void)
  *  \brief Emits signals for lock, signal strength, etc.
  */
-void FreeboxSignalMonitor::EmitFreeboxSignals(void)
+void IPTVSignalMonitor::EmitIPTVSignals(void)
 {
     // Emit signals..
     EMIT(StatusSignalLock, signalLock); 

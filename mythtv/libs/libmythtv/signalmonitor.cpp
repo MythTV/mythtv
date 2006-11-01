@@ -28,9 +28,9 @@
 #   include "hdhrchannel.h"
 #endif
 
-#ifdef USING_FREEBOX
-#   include "freeboxsignalmonitor.h"
-#   include "freeboxchannel.h"
+#ifdef USING_IPTV
+#   include "iptvsignalmonitor.h"
+#   include "iptvchannel.h"
 #endif
 
 #undef DBG_SM
@@ -100,12 +100,12 @@ SignalMonitor *SignalMonitor::Init(QString cardtype, int db_cardnum,
     }
 #endif
 
-#ifdef USING_FREEBOX
+#ifdef USING_IPTV
     if (cardtype.upper() == "FREEBOX")
     {
-        FreeboxChannel *fbc = dynamic_cast<FreeboxChannel*>(channel);
+        IPTVChannel *fbc = dynamic_cast<IPTVChannel*>(channel);
         if (fbc)
-            signalMonitor = new FreeboxSignalMonitor(db_cardnum, fbc);
+            signalMonitor = new IPTVSignalMonitor(db_cardnum, fbc);
     }
 #endif
 

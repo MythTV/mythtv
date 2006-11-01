@@ -1011,15 +1011,13 @@ void SIScan::UpdatePMTinDB(
         emit ServiceScanUpdateText(
             tr("Updating %1").arg(common_status_info));
         ChannelUtil::UpdateChannel(
-            db_mplexid,
-            db_source_id,
-            chanid,
+            db_mplexid, db_source_id, chanid,
             callsign,
             service_name,
             chan_num,
             pmt->ProgramNumber(),
             0, 0,
-            freqid);
+            false, false, false, QString::number(freqid));
     }
 }
 
@@ -1140,6 +1138,9 @@ void SIScan::UpdateVCTinDB(int db_mplexid,
             .arg(vct->MajorChannel(i)).arg(vct->MinorChannel(i))
             .arg(chan_num).arg(friendlyName).arg(freqid);
 
+        bool use_eit = !vct->IsHidden(i) ||
+            (vct->IsHidden(i) && !vct->IsHiddenInGuide(i));
+
         QString msg = "";
         if (chanid < 0)
         {   // The service is not in database, add it
@@ -1147,9 +1148,6 @@ void SIScan::UpdateVCTinDB(int db_mplexid,
             chanid = ChannelUtil::CreateChanID(db_source_id, chan_num);
             if (chanid > 0)
             {
-                bool use_eit = !vct->IsHidden(i) ||
-                    (vct->IsHidden(i) && !vct->IsHiddenInGuide(i));
-
                 ChannelUtil::CreateChannel(
                     db_mplexid,
                     db_source_id,
@@ -1176,7 +1174,9 @@ void SIScan::UpdateVCTinDB(int db_mplexid,
                 chan_num,
                 vct->ProgramNumber(i),
                 vct->MajorChannel(i), vct->MinorChannel(i),
-                freqid);
+                use_eit,
+                vct->IsHidden(i), vct->IsHiddenInGuide(i),
+                QString::number(freqid));
         }
         emit ServiceScanUpdateText(msg);
         VERBOSE(VB_SIPARSER, msg);
@@ -1301,7 +1301,10 @@ void SIScan::UpdateSDTinDB(int /*mplexid*/, const ServiceDescriptionTable *sdt,
                 chan_num,
                 sdt->ServiceID(i),
                 0, 0, 
-                -1);
+                sdt->HasEITSchedule(i) ||
+                sdt->HasEITPresentFollowing(i) ||
+                force_guide_present,
+                false, false, QString::null);
         }
         else
         {

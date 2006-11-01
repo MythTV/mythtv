@@ -1,10 +1,10 @@
 /** -*- Mode: c++ -*-
- *  RTSPComms
+ *  IPTVFeederRtsp
  *  Copyright (c) 2006 by Laurent Arnal, Benjamin Lerman & Mickaël Remars
  *  Distributed as part of MythTV under GPL v2 and later.
  */
 
-#include "rtspcomms.h"
+#include "iptvfeederrtsp.h"
 
 // Live555 headers
 #include <RTSPClient.hh>
@@ -12,16 +12,16 @@
 #include <MediaSession.hh>
 
 // MythTV headers
-#include "freeboxmediasink.h"
+#include "iptvmediasink.h"
 #include "mythcontext.h"
 #include "tspacket.h"
 
-#define LOC QString("RTSPData:")
-#define LOC_ERR QString("RTSPData, Error:")
+#define LOC QString("IPTVFeedRTSP:")
+#define LOC_ERR QString("IPTVFeedRTSP, Error:")
 
-// ============================================================================
-// RTSPData : Helper class use for static Callback handler
-// ============================================================================
+/** \class RTSPData
+ *  \brief Helper class use for static Callback handler
+ */
 class RTSPData
 {
   public:
@@ -42,15 +42,6 @@ void RTSPData::SubsessionAfterPlayingCB(void)
     MediaSubsession *subsession = mediaSubSession;
     Medium::close(subsession->sink);
     subsession->sink = NULL;
-
-    MediaSession &session = subsession->parentSession();
-    MediaSubsessionIterator iter(session);
-
-    while ((subsession = iter.next())) /* <- extra braces for pedantic gcc */
-    {
-        if (subsession->sink)
-            return;
-    }
 }
 
 static void sub_after_playing_cb(void *clientData)
@@ -68,96 +59,53 @@ static void sub_bye_handler_cb(void *clientData)
     ((RTSPData*)clientData)->SubsessionByeHandlerCB();
 }
 
-RTSPComms::RTSPComms() :
-    _abort(0),          _running(false),
-    _live_env(NULL),    _rtsp_client(NULL),
-    _session(NULL),     _lock(false)
+//////////////////////////////////////////////////////////////////////////////
+
+IPTVFeederRTSP::IPTVFeederRTSP() :
+    _rtsp_client(NULL),
+    _session(NULL)
 {
-    //Init();
+    VERBOSE(VB_RECORD, LOC + "ctor -- success");
 }
 
-RTSPComms::~RTSPComms()
+IPTVFeederRTSP::~IPTVFeederRTSP()
 {
     VERBOSE(VB_RECORD, LOC + "dtor -- begin");
-    //Stop();
     Close();
-    //Deinit();
     VERBOSE(VB_RECORD, LOC + "dtor -- end");
 }
 
-bool RTSPComms::Init(void)
+bool IPTVFeederRTSP::IsRTSP(const QString &url)
 {
-    VERBOSE(VB_RECORD, LOC + "Init() -- begin");
+    return url.startsWith("rtsp://", false);
+}
+
+bool IPTVFeederRTSP::Open(const QString &url)
+{
+    VERBOSE(VB_RECORD, LOC + QString("Open(%1) -- begin").arg(url));
+
     QMutexLocker locker(&_lock);
 
     if (_rtsp_client)
+    {
+        VERBOSE(VB_RECORD, LOC + "Open() -- end 1");
+
         return true;
+    }
 
     // Begin by setting up our usage environment:
-    TaskScheduler *scheduler = BasicTaskScheduler::createNew();
-    if (!scheduler)
-    {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "Failed to create Live Scheduler.");
+    if (!InitEnv())
         return false;
-    }
-
-    _live_env = BasicUsageEnvironment::createNew(*scheduler);
-    if (!_live_env)
-    {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "Failed to create Live Environment.");
-        delete scheduler;
-        return false;
-    }
 
     // Create our client object:
     _rtsp_client = RTSPClient::createNew(*_live_env, 0, "myRTSP", 0);
-
     if (!_rtsp_client)
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR +
                 QString("Failed to create RTSP client: %1")
                 .arg(_live_env->getResultMsg()));
-
-        _live_env->reclaim();
-        _live_env = NULL;
-        delete scheduler;
+        FreeEnv();
     }
-
-    VERBOSE(VB_RECORD, LOC + "Init() -- end");
-    return _rtsp_client;
-}
-
-void RTSPComms::Deinit(void)
-{
-    VERBOSE(VB_RECORD, LOC + "Deinit() -- begin");
-
-    if (_session)
-        Close();
-
-    if (_rtsp_client)
-    {
-        Medium::close(_rtsp_client);
-        _rtsp_client = NULL;
-    }
-
-    if (_live_env)
-    {
-        TaskScheduler *scheduler = &_live_env->taskScheduler();
-        _live_env->reclaim();
-        _live_env = NULL;
-        delete scheduler;
-    }
-    VERBOSE(VB_RECORD, LOC + "Deinit() -- end");
-}
-
-bool RTSPComms::Open(const QString &url)
-{
-    VERBOSE(VB_RECORD, LOC + "Open() -- begin");
-
-    if (!Init())
-        return false;
-
-    QMutexLocker locker(&_lock);
 
     // Setup URL for the current session
     char *sdpDescription = _rtsp_client->describeURL(url);
@@ -259,20 +207,20 @@ bool RTSPComms::Open(const QString &url)
         if (!subsession->readSource())
             continue; // was not initiated
 
-        FreeboxMediaSink *freeboxMediaSink = FreeboxMediaSink::CreateNew(
+        IPTVMediaSink *iptvMediaSink = IPTVMediaSink::CreateNew(
             *_live_env, TSPacket::SIZE * 128*1024);
 
-        subsession->sink = freeboxMediaSink;
+        subsession->sink = iptvMediaSink;
         if (!subsession->sink)
         {
             VERBOSE(VB_IMPORTANT,
-                    QString("Freebox # Failed to create sink: %1")
+                    QString("IPTV # Failed to create sink: %1")
                     .arg(_live_env->getResultMsg()));
         }
 
-        vector<RTSPListener*>::iterator it = _listeners.begin();
+        vector<IPTVListener*>::iterator it = _listeners.begin();
         for (; it != _listeners.end(); ++it)
-            freeboxMediaSink->AddListener(*it);
+            iptvMediaSink->AddListener(*it);
 
         subsession->sink->startPlaying(*(subsession->readSource()),
                                        sub_after_playing_cb,
@@ -303,7 +251,7 @@ bool RTSPComms::Open(const QString &url)
     return true;
 }
 
-void RTSPComms::Close(void)
+void IPTVFeederRTSP::Close(void)
 {
     VERBOSE(VB_RECORD, LOC + "Close() -- begin");
     Stop();
@@ -330,44 +278,18 @@ void RTSPComms::Close(void)
     }
     _lock.unlock();
 
-    VERBOSE(VB_RECORD, LOC + "Close() -- middle 2");
+    if (_rtsp_client)
+    {
+        Medium::close(_rtsp_client);
+        _rtsp_client = NULL;
+    }
 
-    Deinit();
+    FreeEnv();
+
     VERBOSE(VB_RECORD, LOC + "Close() -- end");
 }
 
-void RTSPComms::Run(void)
-{
-    VERBOSE(VB_RECORD, LOC + "Run() -- begin");
-    _lock.lock();
-    _running = true;
-    _abort   = 0;
-    _lock.unlock();
-
-    VERBOSE(VB_RECORD, LOC + "Run() -- loop begin");
-    if (_live_env)
-        _live_env->taskScheduler().doEventLoop(&_abort);
-    VERBOSE(VB_RECORD, LOC + "Run() -- loop end");
-
-    _lock.lock();
-    _running = false;
-    _cond.wakeAll();
-    _lock.unlock();
-    VERBOSE(VB_RECORD, LOC + "Run() -- end");
-}
-
-void RTSPComms::Stop(void)
-{
-    VERBOSE(VB_RECORD, LOC + "Stop() -- begin");
-    QMutexLocker locker(&_lock);
-    _abort = 0xFF;
-
-    while (_running)
-        _cond.wait(&_lock, 500);
-    VERBOSE(VB_RECORD, LOC + "Stop() -- end");
-}
-
-void RTSPComms::AddListener(RTSPListener *item)
+void IPTVFeederRTSP::AddListener(IPTVListener *item)
 {
     VERBOSE(VB_RECORD, LOC + "AddListener("<<item<<") -- begin");
     if (!item)
@@ -394,18 +316,18 @@ void RTSPComms::AddListener(RTSPListener *item)
     MediaSubsession *subsession;
     while ((subsession = mit.next())) /* <- extra braces for pedantic gcc */
     {
-        FreeboxMediaSink *sink = NULL;
-        if ((sink = dynamic_cast<FreeboxMediaSink*>(subsession->sink)))
+        IPTVMediaSink *sink = NULL;
+        if ((sink = dynamic_cast<IPTVMediaSink*>(subsession->sink)))
             sink->AddListener(item);
     }
     VERBOSE(VB_RECORD, LOC + "AddListener("<<item<<") -- end 2");
 }
 
-void RTSPComms::RemoveListener(RTSPListener *item)
+void IPTVFeederRTSP::RemoveListener(IPTVListener *item)
 {
     VERBOSE(VB_RECORD, LOC + "RemoveListener("<<item<<") -- begin");
     QMutexLocker locker(&_lock);
-    vector<RTSPListener*>::iterator it =
+    vector<IPTVListener*>::iterator it =
         find(_listeners.begin(), _listeners.end(), item);
 
     if (it == _listeners.end())
@@ -429,8 +351,8 @@ void RTSPComms::RemoveListener(RTSPListener *item)
     MediaSubsession *subsession;
     while ((subsession = mit.next())) /* <- extra braces for pedantic gcc */
     {
-        FreeboxMediaSink *sink = NULL;
-        if ((sink = dynamic_cast<FreeboxMediaSink*>(subsession->sink)))
+        IPTVMediaSink *sink = NULL;
+        if ((sink = dynamic_cast<IPTVMediaSink*>(subsession->sink)))
             sink->RemoveListener(item);
     }
     VERBOSE(VB_RECORD, LOC + "RemoveListener("<<item<<") -- end 3");

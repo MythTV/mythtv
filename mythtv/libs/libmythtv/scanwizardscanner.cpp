@@ -61,7 +61,7 @@
 #include "hdhrsignalmonitor.h"
 #endif
 
-#include "freeboxchannelfetcher.h"
+#include "iptvchannelfetcher.h"
 
 #define LOC QString("SWizScan: ")
 #define LOC_ERR QString("SWizScan, Error: ")
@@ -138,7 +138,7 @@ void ScanWizardScanner::finish()
     }
 #endif
 
-#ifdef USING_FREEBOX
+#ifdef USING_IPTV
     if (freeboxScanner)
     {
         freeboxScanner->Stop();
@@ -382,10 +382,10 @@ void ScanWizardScanner::scan()
             startChan["modulation"]);
 #endif // USING_DVB
     }
-    else if (nScanType == ScanTypeSetting::FreeBoxImport)
+    else if (nScanType == ScanTypeSetting::IPTVImport)
     {
         do_scan = false;
-        ScanFreeBox(cardid, nVideoSource);
+        ImportM3U(cardid, nVideoSource);
     }
     else
     {
@@ -611,11 +611,11 @@ void ScanWizardScanner::ScanAnalog(uint cardid, uint sourceid)
 #endif
 }
 
-void ScanWizardScanner::ScanFreeBox(uint cardid, uint sourceid)
+void ScanWizardScanner::ImportM3U(uint cardid, uint sourceid)
 {
-#ifdef USING_FREEBOX
+#ifdef USING_IPTV
     //Create an analog scan object
-    freeboxScanner = new FreeboxChannelFetcher(sourceid, cardid);
+    freeboxScanner = new IPTVChannelFetcher(sourceid, cardid);
     popupProgress  = new ScanProgressPopup(this, false);
 
     connect(freeboxScanner, SIGNAL(ServiceScanComplete(void)),
@@ -635,7 +635,7 @@ void ScanWizardScanner::ScanFreeBox(uint cardid, uint sourceid)
                                   tr("Error starting scan"));
         cancelScan();
     }
-#endif // USING_FREEBOX
+#endif // USING_IPTV
 }
 
 void ScanWizardScanner::HandleTuneComplete(void)

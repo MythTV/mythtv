@@ -1,43 +1,44 @@
 /** -*- Mode: c++ -*-
- *  FreeboxChannel
+ *  IPTVChannel
  *  Copyright (c) 2006 by Laurent Arnal, Benjamin Lerman & Mickaël Remars
  *  Distributed as part of MythTV under GPL v2 and later.
  */
 
-#include "freeboxchannel.h"
+#include "iptvchannel.h"
 
 #include <qdeepcopy.h>
 
-#include "libmyth/mythcontext.h"
-#include "libmyth/mythdbcon.h"
-#include "libmythtv/freeboxchannelfetcher.h"
-#include "libmythtv/rtspcomms.h"
+// MythTV headers
+#include "mythcontext.h"
+#include "mythdbcon.h"
+#include "iptvchannelfetcher.h"
+#include "iptvfeederwrapper.h"
 
-#define LOC QString("FBChan(%1): ").arg(GetCardID())
-#define LOC_ERR QString("FBChan(%1), Error: ").arg(GetCardID())
+#define LOC QString("IPTVChan(%1): ").arg(GetCardID())
+#define LOC_ERR QString("IPTVChan(%1), Error: ").arg(GetCardID())
 
-FreeboxChannel::FreeboxChannel(TVRec         *parent,
-                               const QString &videodev)
+IPTVChannel::IPTVChannel(TVRec         *parent,
+                         const QString &videodev)
     : ChannelBase(parent),
       m_videodev(QDeepCopy<QString>(videodev)),
-      m_rtsp(new RTSPComms()),
+      m_feeder(new IPTVFeederWrapper()),
       m_lock(true)
 {
     VERBOSE(VB_CHANNEL, LOC + "ctor");
 }
 
-FreeboxChannel::~FreeboxChannel()
+IPTVChannel::~IPTVChannel()
 {
     VERBOSE(VB_CHANNEL, LOC + "dtor -- begin");
-    if (m_rtsp)
+    if (m_feeder)
     {
-        delete m_rtsp;
-        m_rtsp = NULL;
+        delete m_feeder;
+        m_feeder = NULL;
     }
     VERBOSE(VB_CHANNEL, LOC + "dtor -- end");
 }
 
-bool FreeboxChannel::Open(void)
+bool IPTVChannel::Open(void)
 {
     VERBOSE(VB_CHANNEL, LOC + "Open() -- begin");
     QMutexLocker locker(&m_lock);
@@ -51,9 +52,9 @@ bool FreeboxChannel::Open(void)
     
     if (m_freeboxchannels.empty())
     {
-        QString content = FreeboxChannelFetcher::DownloadPlaylist(
+        QString content = IPTVChannelFetcher::DownloadPlaylist(
             m_videodev, true);
-        m_freeboxchannels = FreeboxChannelFetcher::ParsePlaylist(content);
+        m_freeboxchannels = IPTVChannelFetcher::ParsePlaylist(content);
         VERBOSE(VB_IMPORTANT, LOC + QString("Loaded %1 channels from %2")
             .arg(m_freeboxchannels.size())
             .arg(m_videodev));
@@ -64,7 +65,7 @@ bool FreeboxChannel::Open(void)
     return open;
 }
 
-void FreeboxChannel::Close(void)
+void IPTVChannel::Close(void)
 {
     VERBOSE(VB_CHANNEL, LOC + "Close() -- begin");
     QMutexLocker locker(&m_lock);
@@ -73,7 +74,7 @@ void FreeboxChannel::Close(void)
     VERBOSE(VB_CHANNEL, LOC + "Close() -- end");
 }
 
-bool FreeboxChannel::IsOpen(void) const
+bool IPTVChannel::IsOpen(void) const
 {
     VERBOSE(VB_CHANNEL, LOC + "IsOpen() -- begin");
     QMutexLocker locker(&m_lock);
@@ -83,8 +84,8 @@ bool FreeboxChannel::IsOpen(void) const
     return open;
 }
 
-bool FreeboxChannel::SwitchToInput(const QString &inputname,
-                                   const QString &channum)
+bool IPTVChannel::SwitchToInput(const QString &inputname,
+                                const QString &channum)
 {
     VERBOSE(VB_CHANNEL, LOC + QString("SwitchToInput(%1)").arg(inputname));
     QMutexLocker locker(&m_lock);
@@ -96,7 +97,7 @@ bool FreeboxChannel::SwitchToInput(const QString &inputname,
     return SetChannelByString(channum);
 }
 
-bool FreeboxChannel::SwitchToInput(int inputNum, bool setstarting)
+bool IPTVChannel::SwitchToInput(int inputNum, bool setstarting)
 {
     VERBOSE(VB_CHANNEL, LOC + QString("SwitchToInput(%1)").arg(inputNum));
     QMutexLocker locker(&m_lock);
@@ -113,7 +114,7 @@ bool FreeboxChannel::SwitchToInput(int inputNum, bool setstarting)
     return true;
 }
 
-bool FreeboxChannel::SetChannelByString(const QString &channum)
+bool IPTVChannel::SetChannelByString(const QString &channum)
 {
     VERBOSE(VB_CHANNEL, LOC + "SetChannelByString() -- begin");
     QMutexLocker locker(&m_lock);
@@ -136,14 +137,14 @@ bool FreeboxChannel::SetChannelByString(const QString &channum)
     return true;
 }
 
-FreeboxChannelInfo FreeboxChannel::GetChanInfo(const QString &channum,
-                                               uint           sourceid) const
+IPTVChannelInfo IPTVChannel::GetChanInfo(
+    const QString &channum, uint sourceid) const
 { 
     VERBOSE(VB_CHANNEL, LOC + "GetChanInfo() -- begin");
     QMutexLocker locker(&m_lock);
     VERBOSE(VB_CHANNEL, LOC + "GetChanInfo() -- locked");
 
-    FreeboxChannelInfo dummy;
+    IPTVChannelInfo dummy;
     QString msg = LOC_ERR + QString("GetChanInfo(%1) failed").arg(channum);
 
     if (channum.isEmpty())
@@ -193,7 +194,7 @@ FreeboxChannelInfo FreeboxChannel::GetChanInfo(const QString &channum,
         }
 
         // Try to map name to a channel in the map
-        const QString name    = query.value(1).toString();
+        const QString name = QString::fromUtf8(query.value(1).toString());
         for (it = m_freeboxchannels.begin();
              it != m_freeboxchannels.end(); ++it)
         {

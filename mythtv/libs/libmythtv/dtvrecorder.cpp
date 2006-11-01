@@ -490,7 +490,7 @@ bool DTVRecorder::FindH264Keyframes(const TSPacket* tspacket)
             _frames_written_count++;
     }
 
-    return hasKeyFrame;
+    return hasKeyFrame || (_payload_buffer.size() >= (188*50));
 }
 
 /** \fn DTVRecorder::HandleH264Keyframe(void)

@@ -45,7 +45,7 @@ using namespace std;
 #include "dvbchannel.h"
 #include "dbox2channel.h"
 #include "hdhrchannel.h"
-#include "freeboxchannel.h"
+#include "iptvchannel.h"
 
 #include "recorderbase.h"
 #include "NuppelVideoRecorder.h"
@@ -54,7 +54,7 @@ using namespace std;
 #include "dvbrecorder.h"
 #include "dbox2recorder.h"
 #include "hdhrrecorder.h"
-#include "freeboxrecorder.h"
+#include "iptvrecorder.h"
 
 #ifdef USING_CRC_IP_NETWORK_REC
 #include "crcipnetworkrecorder.h"
@@ -209,8 +209,8 @@ bool TVRec::CreateChannel(const QString &startchannel)
     }
     else if (genOpt.cardtype == "FREEBOX")
     {
-#ifdef USING_FREEBOX
-        channel = new FreeboxChannel(this, genOpt.videodev);
+#ifdef USING_IPTV
+        channel = new IPTVChannel(this, genOpt.videodev);
         if (!channel->Open())
             return false;
         InitChannel(genOpt.defaultinput, startchannel);
@@ -904,12 +904,12 @@ bool TVRec::SetupRecorder(RecordingProfile &profile)
     }
     else if (genOpt.cardtype == "FREEBOX")
     {
-#ifdef USING_FREEBOX
-        FreeboxChannel *chan = dynamic_cast<FreeboxChannel*>(channel);
-        recorder = new FreeboxRecorder(this, chan);
+#ifdef USING_IPTV
+        IPTVChannel *chan = dynamic_cast<IPTVChannel*>(channel);
+        recorder = new IPTVRecorder(this, chan);
         ringBuffer->SetWriteBufferSize(4*1024*1024);
         recorder->SetOption("mrl", genOpt.videodev);
-#endif // USING_FREEBOX
+#endif // USING_IPTV
     }
     else
     {

@@ -1,5 +1,6 @@
+// -*- Mode: c++ -*-
 /**
- *  FreeboxRecorder
+ *  IPTVRecorder
  *  Copyright (c) 2006 by Laurent Arnal, Benjamin Lerman & Mickaël Remars
  *  Distributed as part of MythTV under GPL v2 and later.
  */
@@ -7,81 +8,79 @@
 // MythTV headers
 #include "mpegstreamdata.h"
 #include "tspacket.h"
-#include "freeboxchannel.h"
-#include "freeboxrecorder.h"
-#include "rtspcomms.h"
+#include "iptvchannel.h"
+#include "iptvfeederwrapper.h"
+#include "iptvrecorder.h"
 
-#define LOC QString("FBRec: ")
-#define LOC_ERR QString("FBRec, Error: ")
+#define LOC QString("IPTVRec: ")
+#define LOC_ERR QString("IPTVRec, Error: ")
 
 // ============================================================================
-// FreeboxRecorder : Processes data from RTSPComms and writes it to disk
+// IPTVRecorder : Processes data from RTSPComms and writes it to disk
 // ============================================================================
 
-FreeboxRecorder::FreeboxRecorder(TVRec *rec, FreeboxChannel *channel) :
+IPTVRecorder::IPTVRecorder(TVRec *rec, IPTVChannel *channel) :
     DTVRecorder(rec),
     _channel(channel),
     _stream_data(NULL)
 {
-    _channel->GetRTSP()->AddListener(this);
+    _channel->GetFeeder()->AddListener(this);
 }
 
-FreeboxRecorder::~FreeboxRecorder()
+IPTVRecorder::~IPTVRecorder()
 {
     StopRecording();
-    _channel->GetRTSP()->RemoveListener(this);
+    _channel->GetFeeder()->RemoveListener(this);
 }
 
-bool FreeboxRecorder::Open(void)
+bool IPTVRecorder::Open(void)
 {
     VERBOSE(VB_RECORD, LOC + "Open() -- begin");
 
-    if (_channel->GetRTSP()->IsOpen())
-        _channel->GetRTSP()->Close();
+    if (_channel->GetFeeder()->IsOpen())
+        _channel->GetFeeder()->Close();
 
-    FreeboxChannelInfo chaninfo = _channel->GetCurrentChanInfo();
-    if (!chaninfo.isValid())
-    {
-        _error = true;
-    }
-    else
-    {
-        _error = !(_channel->GetRTSP()->Init()); 
-        if (!_error)
-            _error = !(_channel->GetRTSP()->Open(chaninfo.m_url));
-    }
+    IPTVChannelInfo chaninfo = _channel->GetCurrentChanInfo();
+    _error = (!chaninfo.isValid() ||
+              !_channel->GetFeeder()->Open(chaninfo.m_url));
 
     VERBOSE(VB_RECORD, LOC + "Open() -- end err("<<_error<<")");
     return !_error;
 }
 
-void FreeboxRecorder::Close(void)
+void IPTVRecorder::Close(void)
 {
     VERBOSE(VB_RECORD, LOC + "Close() -- begin");
-    _channel->GetRTSP()->Stop();
-    _channel->GetRTSP()->Close();
+    _channel->GetFeeder()->Stop();
+    _channel->GetFeeder()->Close();
     VERBOSE(VB_RECORD, LOC + "Close() -- end");
 }
 
-void FreeboxRecorder::Pause(bool clear)
+void IPTVRecorder::Pause(bool clear)
 {
     VERBOSE(VB_RECORD, LOC + "Pause() -- begin");
     DTVRecorder::Pause(clear);
-    _channel->GetRTSP()->Stop();
-    _channel->GetRTSP()->Close();
+    _channel->GetFeeder()->Stop();
+    _channel->GetFeeder()->Close();
     VERBOSE(VB_RECORD, LOC + "Pause() -- end");
 }
 
-void FreeboxRecorder::Unpause(void)
+void IPTVRecorder::Unpause(void)
 {
     VERBOSE(VB_RECORD, LOC + "Unpause() -- begin");
-    if (_recording && !_channel->GetRTSP()->IsOpen())
+
+    if (_recording && !_channel->GetFeeder()->IsOpen())
         Open();
+
+    if (_stream_data)
+        _stream_data->Reset(_stream_data->DesiredProgram());
+
     DTVRecorder::Unpause();
+
     VERBOSE(VB_RECORD, LOC + "Unpause() -- end");
 }
 
-void FreeboxRecorder::StartRecording(void)
+void IPTVRecorder::StartRecording(void)
 {
     VERBOSE(VB_RECORD, LOC + "StartRecording() -- begin");
     if (!Open())
@@ -99,14 +98,14 @@ void FreeboxRecorder::StartRecording(void)
         if (PauseAndWait())
             continue;
 
-        if (!_channel->GetRTSP()->IsOpen())
+        if (!_channel->GetFeeder()->IsOpen())
         {
             usleep(5000);
             continue;
         }
 
         // Go into main RTSP loop, feeding data to AddData
-        _channel->GetRTSP()->Run();
+        _channel->GetFeeder()->Run();
     }
 
     // Finish up...
@@ -118,11 +117,11 @@ void FreeboxRecorder::StartRecording(void)
     _cond_recording.wakeAll();
 }
 
-void FreeboxRecorder::StopRecording(void)
+void IPTVRecorder::StopRecording(void)
 {
     VERBOSE(VB_RECORD, LOC + "StopRecording() -- begin");
     Pause();
-    _channel->GetRTSP()->Close();
+    _channel->GetFeeder()->Close();
 
     _request_recording = false;
     while (_recording)
@@ -134,7 +133,7 @@ void FreeboxRecorder::StopRecording(void)
 // ===================================================
 // findTSHeader : find a TS Header in flow
 // ===================================================
-static int FreeboxRecorder_findTSHeader(const unsigned char *data,
+static int IPTVRecorder_findTSHeader(const unsigned char *data,
                                         uint dataSize)
 {
     unsigned int pos = 0;
@@ -152,9 +151,8 @@ static int FreeboxRecorder_findTSHeader(const unsigned char *data,
 // ===================================================
 // AddData : feed data from RTSP flow to mythtv
 // ===================================================
-void FreeboxRecorder::AddData(unsigned char *data,
-                              unsigned       dataSize,
-                              struct timeval)
+void IPTVRecorder::AddData(unsigned char *data,
+                              unsigned       dataSize)
 {
     unsigned int readIndex = 0;
 
@@ -166,7 +164,8 @@ void FreeboxRecorder::AddData(unsigned char *data,
             return;
 
         // Find the next TS Header in data
-        int tsPos = FreeboxRecorder_findTSHeader(data + readIndex, dataSize);
+        int tsPos = IPTVRecorder_findTSHeader(
+            data + readIndex, dataSize - readIndex);
 
         // if no TS, something bad happens
         if (tsPos == -1)
@@ -184,7 +183,7 @@ void FreeboxRecorder::AddData(unsigned char *data,
 
         // Check if the next packet in buffer is complete :
         // packet size is 188 bytes long
-        if ((dataSize - tsPos) < TSPacket::SIZE)
+        if ((dataSize - tsPos - readIndex) < TSPacket::SIZE)
         {
             VERBOSE(VB_IMPORTANT, LOC_ERR +
                     "TS packet at stradles end of buffer.");
@@ -200,7 +199,7 @@ void FreeboxRecorder::AddData(unsigned char *data,
     }
 }
 
-void FreeboxRecorder::ProcessTSPacket(const TSPacket& tspacket)
+void IPTVRecorder::ProcessTSPacket(const TSPacket& tspacket)
 {
     if (!_stream_data)
         return;
@@ -218,8 +217,16 @@ void FreeboxRecorder::ProcessTSPacket(const TSPacket& tspacket)
         // Pass or reject packets based on PID, and parse info from them
         if (lpid == _stream_data->VideoPIDSingleProgram())
         {
-            _buffer_packets = !FindMPEG2Keyframes(&tspacket);
-            BufferedWrite(tspacket);
+            ProgramMapTable *pmt = _stream_data->PMTSingleProgram();
+            uint video_stream_type = pmt->StreamType(pmt->FindPID(lpid));
+
+            if (video_stream_type == StreamID::H264Video)
+                _buffer_packets = !FindH264Keyframes(&tspacket);
+            else if (StreamID::IsVideo(video_stream_type))
+                _buffer_packets = !FindMPEG2Keyframes(&tspacket);
+
+            if ((video_stream_type != StreamID::H264Video) || _seen_sps)
+                BufferedWrite(tspacket);            
         }
         else if (_stream_data->IsAudioPID(lpid))
             BufferedWrite(tspacket);
@@ -230,11 +237,16 @@ void FreeboxRecorder::ProcessTSPacket(const TSPacket& tspacket)
     }
 }
 
-void FreeboxRecorder::SetStreamData(MPEGStreamData *data)
+void IPTVRecorder::SetStreamData(MPEGStreamData *data)
 {
-    VERBOSE(VB_RECORD, LOC + "SetStreamData()");
+    VERBOSE(VB_RECORD, LOC + "SetStreamData("<<data<<") -- begin");
+
     if (data == _stream_data)
+    {
+        VERBOSE(VB_RECORD, LOC + "SetStreamData("<<data<<") -- end 0");
+
         return;
+    }
 
     MPEGStreamData *old_data = _stream_data;
     _stream_data = data;
@@ -243,9 +255,11 @@ void FreeboxRecorder::SetStreamData(MPEGStreamData *data)
 
     if (data)
         data->AddMPEGSPListener(this);
+
+    VERBOSE(VB_RECORD, LOC + "SetStreamData("<<data<<") -- end 1");
 }
 
-void FreeboxRecorder::HandleSingleProgramPAT(ProgramAssociationTable *pat)
+void IPTVRecorder::HandleSingleProgramPAT(ProgramAssociationTable *pat)
 {
     if (!pat)
         return;
@@ -255,7 +269,7 @@ void FreeboxRecorder::HandleSingleProgramPAT(ProgramAssociationTable *pat)
     BufferedWrite(*(reinterpret_cast<const TSPacket*>(pat->tsheader())));
 }
 
-void FreeboxRecorder::HandleSingleProgramPMT(ProgramMapTable *pmt)
+void IPTVRecorder::HandleSingleProgramPMT(ProgramMapTable *pmt)
 {
     if (!pmt)
         return;

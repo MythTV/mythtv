@@ -106,9 +106,9 @@ class MPUBLIC ChannelUtil
                                  bool hidden,
                                  bool hidden_in_guide,
                                  const QString &freqid,
-                                 QString icon    = "",
+                                 QString icon    = QString::null,
                                  QString format  = "Default",
-                                 QString xmltvid = "");
+                                 QString xmltvid = QString::null);
 
     static bool    UpdateChannel(uint db_mplexid,
                                  uint source_id,
@@ -119,7 +119,13 @@ class MPUBLIC ChannelUtil
                                  uint service_id,
                                  uint atsc_major_channel,
                                  uint atsc_minor_channel,
-                                 int freqid);
+                                 bool use_on_air_guide,
+                                 bool hidden,
+                                 bool hidden_in_guide,
+                                 QString freqid  = QString::null,
+                                 QString icon    = QString::null,
+                                 QString format  = QString::null,
+                                 QString xmltvid = QString::null);
 
     static bool    SetServiceVersion(int mplexid, int version);
 
