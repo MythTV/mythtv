@@ -946,12 +946,10 @@ class HDHomeRunDeviceID: public LineEditSetting, public CCSetting
     {
         setValue("FFFFFFFF");
         setLabel(QObject::tr("Device ID"));
-        setHelpText(QObject::tr("Device ID from the back of "
-                                "the HDHomeRun unit.  You may use "
+        setHelpText(QObject::tr("IP address or Device ID from the bottom of "
+                                "the HDHomeRun.  You may use "
                                 "'FFFFFFFF' if there is only one unit "
-                                "on your your network.  Alternatively, "
-                                "you may enter the IP address "
-                                "of the HDHomeRun unit."));
+                                "on your your network."));
     }
 };
 
