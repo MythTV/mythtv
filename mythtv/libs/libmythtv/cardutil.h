@@ -104,6 +104,13 @@ class MPUBLIC CardUtil
             (rawtype == "CRC_IP");
     }
 
+    static bool         IsEITCapable(const QString &rawtype)
+    {
+        return
+            (rawtype == "DVB")       || (rawtype == "HDTV")  ||
+            (rawtype == "HDHOMERUN");
+    }
+
     static int          GetCardID(const QString &videodevice,
                                   QString hostname = QString::null);
     static uint         GetChildCardID(uint cardid);

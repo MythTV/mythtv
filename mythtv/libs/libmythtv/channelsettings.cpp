@@ -1,4 +1,5 @@
 #include "channelsettings.h"
+#include "cardutil.h"
 
 QString CSetting::whereClause(MSqlBindings& bindings) {
     QString fieldTag = (":WHERE" + id.getField().upper());
@@ -354,9 +355,6 @@ void ChannelOptionsCommon::load()
 void ChannelOptionsCommon::onAirGuideChanged(bool fValue)
 {
     (void)fValue;
-#ifdef USING_DVB
-    xmltvID->setEnabled(!fValue);
-#endif
 }
 
 void ChannelOptionsCommon::sourceChanged(const QString& sourceid)
@@ -365,19 +363,23 @@ void ChannelOptionsCommon::sourceChanged(const QString& sourceid)
     bool uses_eit_only = false;
 
     MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare("SELECT SUM(1) "
+    query.prepare("SELECT cardtype "
                   "FROM capturecard, videosource, cardinput "
                   "WHERE cardinput.sourceid   = videosource.sourceid AND "
                   "      cardinput.cardid     = capturecard.cardid   AND "
-                  "      videosource.sourceid = :SOURCEID            AND "
-                  "      cardtype IN ('DVB','HDTV')");
+                  "      videosource.sourceid = :SOURCEID");
     query.bindValue(":SOURCEID", sourceid);
 
     if (!query.exec() || !query.isActive())
         MythContext::DBError("sourceChanged -- supports eit", query);
     else
     {
-        supports_eit = query.next() && query.value(0).toInt();
+        supports_eit = (query.size()) ? false : true;
+        while (query.next())
+        {
+            supports_eit |= CardUtil::IsEITCapable(
+                query.value(0).toString().upper());
+        }
 
         query.prepare("SELECT xmltvgrabber "
                       "FROM videosource "
@@ -386,8 +388,14 @@ void ChannelOptionsCommon::sourceChanged(const QString& sourceid)
 
         if (!query.exec() || !query.isActive())
             MythContext::DBError("sourceChanged -- eit only", query);
-        else if (query.next())
-            uses_eit_only = (query.value(0).toString() == "eitonly");
+        else
+        {
+            uses_eit_only = (query.size()) ? true : false;
+            while (query.next())
+            {
+                uses_eit_only &= (query.value(0).toString() == "eitonly");
+            }
+        }
     }
 
     onairguide->setEnabled(supports_eit);
