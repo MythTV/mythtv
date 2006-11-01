@@ -438,7 +438,7 @@ bool MpegRecorder::SetIVTVDeviceOptions(int chanfd)
         if (ioctl(chanfd, IVTV_IOC_S_VBI_MODE, &vbifmt) < 0) 
 #endif // IVTV_IOC_S_VBI_MODE
         {
-#ifdef V4L2_BUF_TYPE_SLICED_VBI_CAPTURE
+#ifdef V4L2_CAP_SLICED_VBI_CAPTURE
             struct v4l2_format vbi_fmt;
             bzero(&vbi_fmt, sizeof(struct v4l2_format));
             vbi_fmt.type = V4L2_BUF_TYPE_SLICED_VBI_CAPTURE;
@@ -446,7 +446,7 @@ bool MpegRecorder::SetIVTVDeviceOptions(int chanfd)
                 V4L2_SLICED_VBI_625 : V4L2_SLICED_VBI_525;
 
             if (ioctl(chanfd, VIDIOC_S_FMT, &vbi_fmt) < 0)
-#endif // V4L2_BUF_TYPE_SLICED_VBI_CAPTURE
+#endif // V4L2_CAP_SLICED_VBI_CAPTURE
             {
                 VERBOSE(VB_IMPORTANT, "Can't enable VBI recording" + ENO);
             }
