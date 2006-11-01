@@ -37,13 +37,22 @@ HDHRChannel::HDHRChannel(TVRec *parent, const QString &device, uint tuner)
     bool valid;
     _device_id = device.toUInt(&valid, 16);
 
-    if (!valid || !hdhomerun_discover_validate_device_id(_device_id))
-    {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + QString("Invalid DeviceID '%1'")
-                .arg(device));
+    if (valid && hdhomerun_discover_validate_device_id(_device_id))
+	return;
 
-        _device_id = HDHOMERUN_DEVICE_ID_WILDCARD;
+    /* Otherwise, is it a valid IP address? */
+    struct in_addr address;
+    if (inet_aton(device, &address)) 
+    {
+	_device_ip = ntohl(address.s_addr);
+	return;
     }
+
+    /* Invalid, use wildcard device ID. */
+    VERBOSE(VB_IMPORTANT, LOC_ERR + QString("Invalid DeviceID '%1'")
+	    .arg(device));
+
+    _device_id = HDHOMERUN_DEVICE_ID_WILDCARD;
 }
 
 HDHRChannel::~HDHRChannel(void)
@@ -76,6 +85,9 @@ void HDHRChannel::Close(void)
 
 bool HDHRChannel::FindDevice(void)
 {
+    if (!_device_id)
+        return _device_ip;
+
     _device_ip = 0;
 
     /* Create socket. */

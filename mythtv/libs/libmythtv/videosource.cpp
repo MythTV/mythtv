@@ -949,7 +949,9 @@ class HDHomeRunDeviceID: public LineEditSetting, public CCSetting
         setHelpText(QObject::tr("Device ID from the back of "
                                 "the HDHomeRun unit.  You may use "
                                 "'FFFFFFFF' if there is only one unit "
-                                "on your your network."));
+                                "on your your network.  Alternatively, "
+                                "you may enter the IP address "
+                                "of the HDHomeRun unit."));
     }
 };
 
