@@ -620,7 +620,7 @@ void DVDV::PostProcessFrame(AVCodecContext *context,
 {  
   d->mutex.lock();
   
-  // Turn accel decoding path off again until the next PreProcessFrame.
+  // Turn decoding path off again until the next PreProcessFrame.
   context->dvdv = NULL;
   
   // get the buffer we used for this run

@@ -43,16 +43,19 @@ typedef struct DVDV_Frame
     int  alternate_scan;
 } DVDV_Frame;
 
-struct DVDV_CurPtrs
+typedef struct DVDV_CurPtrs
 {
     DVDV_MBInfo  * mb;
     DVDV_DCTElt  * dct;
     uint8_t      * cbp;
     DVDV_Frame   * frame;
-};
+} DVDV_CurPtrs;
 
-extern struct DVDV_CurPtrs gDVDVState;
-extern int gDVDVEnabled;
+// Convenience macro to get the above from an MpegEncContext
+#define DVDV_MB(x)     (((DVDV_CurPtrs *)(x->avctx->dvdv))->mb)
+#define DVDV_DCT(x)    (((DVDV_CurPtrs *)(x->avctx->dvdv))->dct)
+#define DVDV_CBP(x)    (((DVDV_CurPtrs *)(x->avctx->dvdv))->cbp)
+#define DVDV_FRAME(x)  (((DVDV_CurPtrs *)(x->avctx->dvdv))->frame)
 
 #ifdef __cplusplus
 }

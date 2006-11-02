@@ -4,6 +4,22 @@
 #ifndef VIDEOOUT_DVDV_H_
 #define VIDEOOUT_DVDV_H_
 
+#ifndef HAVE_DVDV
+// This eliminates several #ifdefs in avformatdecoder.cpp
+
+class DVDV {
+  public:
+    DVDV();
+    ~DVDV();
+
+    void Reset() {};
+    void SetVideoSize(int, int) {};
+    bool PreProcessFrame(AVCodecContext *) { return false; };
+    void PostProcessFrame(AVCodecContext *, VideoFrame *, int, bool) {};
+};
+
+#else // HAVE_DVDV
+
 #include "dvdv.h"
 #include "frame.h"
 
@@ -66,4 +82,5 @@ class DVDV
     struct DVDV_Private *d;
 };
 
+#endif // HAVE_DVDV
 #endif // VIDEOOUT_DVDV_H_
