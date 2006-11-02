@@ -3388,7 +3388,13 @@ void NuppelVideoPlayer::StartPlaying(void)
         {
             ++deleteIter;
             if (deleteIter.key() == totalFrames)
-                eof = true;
+            {
+                if (!(gContext->GetNumSetting("EndofRecordingExitPrompt") == 1 &&
+                    m_tv && m_tv->GetState() == kState_WatchingPreRecorded))
+                {
+                    eof = true;
+                }
+            }
             else
             {
                 PauseVideo();
@@ -4027,7 +4033,20 @@ bool NuppelVideoPlayer::IsNearEnd(long long margin) const
   
     if (m_tv && m_tv->GetState() == kState_WatchingPreRecorded)
     {
-        framesLeft = totalFrames - framesRead;
+        framesLeft = margin;
+        if (!editmode && hasdeletetable && IsInDelete(framesRead))
+        {
+            QMapConstIterator<long long, int> it = deleteMap.end();
+            --it;
+            if (it.key() == totalFrames)
+            {
+                --it;
+                if (framesRead >= it.key())
+                    return true;
+            }
+        }
+        else
+            framesLeft = totalFrames - framesRead;
         return (framesLeft < margin);
     }
     
@@ -4054,6 +4073,17 @@ bool NuppelVideoPlayer::DoFastForward(void)
     long long number = fftime - 1;
     long long desiredFrame = framesPlayed + number;
 
+    if (!editmode && hasdeletetable && IsInDelete(desiredFrame))
+    {
+        QMap<long long, int>::Iterator it = deleteMap.end();
+        --it;
+        if ( it.key() == totalFrames)
+        {
+            --it;
+            if (desiredFrame > it.key())
+                desiredFrame = it.key();
+        }
+    }
     if (paused && !editmode)
         GetDecoder()->setExactSeeks(true);
     GetDecoder()->DoFastForward(desiredFrame);
