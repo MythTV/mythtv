@@ -3,7 +3,7 @@
 <title>Installing and using MythTV
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com"
 name="mailto:rkulagow@rocketmail.com">
-<date>2006-10-20, v0.20.05
+<date>2006-11-02, v0.20.06
 <abstract>
 Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -1331,29 +1331,23 @@ see what is available and to override and automatically detected options.
 See the <tt>config.log</tt> file after running <bf>configure</bf> to see
 previous runs.
 
-On a single CPU machine, you would type the following to compile MythTV:
+To compile:
 <tscreen><verb>
-$ qmake mythtv.pro
-$ make
-</verb></tscreen>
-
-If you want to build MythTV on a multi-CPU machine (or with
-<bf>distcc</bf>), specify "-j numjobs".  In the following example, we will
-have two concurrent jobs executing.  Do not set the number of jobs too high,
-or your compile will actually take longer to complete than it would if you
-did a "normal" build.
-<tscreen><verb>
-$ qmake mythtv.pro
-$ make qmake
 $ make -j 2
 </verb></tscreen>
+
+MythTV can take advantage of multiple CPUs, SMP and Hyperthreading.  If you
+want to build MythTV on a multi-CPU machine (or with <bf>distcc</bf>),
+specify "-j numjobs", where "numjobs" is greater than 2.  In the above
+example, we had two concurrent jobs executing, which is recommended for a
+single CPU system.  Do not set the number of jobs too high, or your compile
+will actually take longer to complete than it would if you did a "normal"
+build.
 
 If you are using <bf>distcc</bf>, and you had two other host machines (red, blue)
 participating, you would do something like:
 <tscreen><verb>
 $ export DISTCC_HOSTS='localhost red blue'
-$ qmake mythtv.pro
-$ make qmake
 $ make -j 6 CXX=distcc
 </verb></tscreen>
 
@@ -7101,7 +7095,7 @@ lircrc work together.  Closes #2445.  Closes #2474.  Move a warning about
 mysql 4.x and log-bin.  Add a section on logrotate.
 v0.20.05, 2006-10-19.  Update file path for configfiles directory now that
 it's under contrib/
-
+v0.20.06, 2006-11-02.  Update compile docs; no reason not to use at least -j 2
 
 -->
 

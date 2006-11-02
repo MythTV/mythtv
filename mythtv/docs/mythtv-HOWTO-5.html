@@ -244,34 +244,25 @@ $ ./configure
 see what is available and to override and automatically detected options. 
 See the <CODE>config.log</CODE> file after running <B>configure</B> to see
 previous runs.</P>
-<P>On a single CPU machine, you would type the following to compile MythTV:
+<P>To compile:
 <BLOCKQUOTE><CODE>
 <PRE>
-$ qmake mythtv.pro
-$ make
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
-<P>If you want to build MythTV on a multi-CPU machine (or with
-<B>distcc</B>), specify "-j numjobs".  In the following example, we will
-have two concurrent jobs executing.  Do not set the number of jobs too high,
-or your compile will actually take longer to complete than it would if you
-did a "normal" build.
-<BLOCKQUOTE><CODE>
-<PRE>
-$ qmake mythtv.pro
-$ make qmake
 $ make -j 2
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
+<P>MythTV can take advantage of multiple CPUs, SMP and Hyperthreading.  If you
+want to build MythTV on a multi-CPU machine (or with <B>distcc</B>),
+specify "-j numjobs", where "numjobs" is greater than 2.  In the above
+example, we had two concurrent jobs executing, which is recommended for a
+single CPU system.  Do not set the number of jobs too high, or your compile
+will actually take longer to complete than it would if you did a "normal"
+build.</P>
 <P>If you are using <B>distcc</B>, and you had two other host machines (red, blue)
 participating, you would do something like:
 <BLOCKQUOTE><CODE>
 <PRE>
 $ export DISTCC_HOSTS='localhost red blue'
-$ qmake mythtv.pro
-$ make qmake
 $ make -j 6 CXX=distcc
 </PRE>
 </CODE></BLOCKQUOTE>
