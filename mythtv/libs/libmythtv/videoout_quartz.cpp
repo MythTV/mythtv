@@ -85,8 +85,6 @@ struct QuartzData
 
     // Pixel storage for the media stream:
     ImageDescriptionHandle imgDesc;       // source description header
-    PlanarPixmapInfoYUV420 *pixmap;       // frame header + data
-    size_t             pixmapSize;        // pixmap size
     void *             pixelData;         // start of data section
     size_t             pixelSize;         // data size
     QMutex             pixelLock;         // to update pixels safely
@@ -539,14 +537,14 @@ void VideoOutputQuartzView::Show(void)
         return;
 
     viewLock.lock();
-    if (theCodec && thePort && parentData->pixmap)
+    if (theCodec && thePort && parentData->pixelData)
     {
       CodecFlags outFlags;
 
       // tell QuickTime to draw the current frame
       if (DecompressSequenceFrameWhen(theCodec,
-                                      (Ptr)parentData->pixmap,
-                                      parentData->pixmapSize,
+                                      (Ptr)parentData->pixelData,
+                                      parentData->pixelSize,
                                       0,
                                       &outFlags,
                                       NULL,
@@ -1340,10 +1338,7 @@ bool VideoOutputQuartz::Init(int width, int height, float aspect,
     data->windowedMode = gContext->GetNumSetting("RunFrontendInWindow", 0);
     data->correctGamma = gContext->GetNumSetting("MacGammaCorrect", 0);
     
-    if (gContext->GetNumSetting("MacYuvConversion", 1))
-        data->yuvConverter = get_yuv2vuy_conv();
-    else
-        data->yuvConverter = NULL;
+    data->yuvConverter = get_yuv2vuy_conv();
 
     if (!CreateQuartzBuffers())
     {
@@ -1459,12 +1454,8 @@ bool VideoOutputQuartz::CreateQuartzBuffers(void)
     ImageDescription *desc = *data->imgDesc;
 
     desc->idSize = sizeof(ImageDescription);
-#ifdef WORDS_BIGENDIAN
-    desc->cType = kYUV420CodecType;
-#else
-    desc->cType = kComponentVideoCodecType;  // Wrong, but prevents Intel crash
-#endif
-    desc->version = 1;
+    desc->cType = k422YpCbCr8CodecType;
+    desc->version = 2;
     desc->revisionLevel = 0;
     desc->spatialQuality = codecNormalQuality;
     desc->width = width;
@@ -1476,42 +1467,11 @@ bool VideoOutputQuartz::CreateQuartzBuffers(void)
     desc->dataSize = 0;
     desc->clutID = -1;
     
-    if (data->yuvConverter)
-    {
-        desc->cType = k422YpCbCr8CodecType;
-        desc->version = 2;
-    }
-
     HUnlock((Handle)(data->imgDesc));
 
-    // Set up storage area for one YUV frame (header + data)
-    if (data->yuvConverter)
-    {
-        // 2VUY data needs no header
-        data->pixelSize = width * height * 2;
-        data->pixmapSize = data->pixelSize;
-        data->pixmap = (PlanarPixmapInfoYUV420 *) new char[data->pixmapSize];
-        data->pixelData = data->pixmap;
-    }
-    else
-    {
-        // YUV420 uses a descriptive header
-        uint hdrSize = sizeof(PlanarPixmapInfoYUV420);
-
-        data->pixelSize  = scratch->size;
-        data->pixmapSize = hdrSize + data->pixelSize;
-        data->pixmap = (PlanarPixmapInfoYUV420 *) new char[data->pixmapSize];
-
-        // Jump past the header:
-        data->pixelData = (char *)data->pixmap + hdrSize;
-
-        data->pixmap->componentInfoY.offset    = scratch->offsets[0] + hdrSize;
-        data->pixmap->componentInfoY.rowBytes  = scratch->pitches[0];
-        data->pixmap->componentInfoCb.offset   = scratch->offsets[1] + hdrSize;
-        data->pixmap->componentInfoCb.rowBytes = scratch->pitches[1];
-        data->pixmap->componentInfoCr.offset   = scratch->offsets[2] + hdrSize;
-        data->pixmap->componentInfoCr.rowBytes = scratch->pitches[2];
-    }
+    // Set up storage area for one YUV frame
+    data->pixelSize = width * height * 2;
+    data->pixelData = new char[data->pixelSize];
     
     data->pixelLock.unlock();
 
@@ -1549,11 +1509,9 @@ void VideoOutputQuartz::DeleteQuartzBuffers()
         DisposeHandle((Handle)(data->imgDesc));
         data->imgDesc = NULL;
     }
-    if (data->pixmap)
+    if (data->pixelData)
     {
-        delete [] data->pixmap;
-        data->pixmap = NULL;
-        data->pixmapSize = 0;
+        delete [] data->pixelData;
         data->pixelData = NULL;
         data->pixelSize = 0;
     }
@@ -1728,6 +1686,7 @@ void VideoOutputQuartz::ProcessFrame(VideoFrame *frame, OSD *osd,
         }
         else
             dvdv->DrawOSD(NULL, NULL, NULL, NULL);
+
         return;   // no need to process frame, it won't be used
     }
 #endif
@@ -1754,21 +1713,13 @@ void VideoOutputQuartz::ProcessFrame(VideoFrame *frame, OSD *osd,
 
     // copy data to our buffer
     data->pixelLock.lock();
-    if (data->pixelData)
-    {
-        if (data->yuvConverter)
-        {
-            data->yuvConverter((uint8_t *)(data->pixelData),
-                               frame->buf + frame->offsets[0], // Y
-                               frame->buf + frame->offsets[1], // U
-                               frame->buf + frame->offsets[2], // V
-                               frame->width, frame->height,
-                               (frame->width % 2), (frame->width % 2), 0);
+    data->yuvConverter((uint8_t *)(data->pixelData),
+                       frame->buf + frame->offsets[0], // Y
+                       frame->buf + frame->offsets[1], // U
+                       frame->buf + frame->offsets[2], // V
+                       frame->width, frame->height,
+                       (frame->width % 2), (frame->width % 2), 0);
             // FIXME - These values (stride) should be calculated
             //         from frame->pitches and frame->width ?
-        }
-        else
-            memcpy(data->pixelData, frame->buf, frame->size);
-    }
     data->pixelLock.unlock();
 }

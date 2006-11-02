@@ -1060,9 +1060,9 @@ static HostComboBox *PreferredMPEG2Decoder()
 #ifdef USING_XVMC_VLD
     gc->addSelection(QObject::tr("VIA XvMC"), "xvmc-vld");
 #endif // USING_XVMC_VLD    
-#ifdef CONFIG_MAC_ACCEL
+#ifdef HAVE_DVDV
     gc->addSelection(QObject::tr("Mac hardware acceleration"), "macaccel");
-#endif // CONFIG_MAC_ACCEL
+#endif
     gc->setHelpText(
         QObject::tr("Decoder to use to play back MPEG2 video.") + " " +
         QObject::tr("Standard will use ffmpeg library.") + " " +
@@ -3196,22 +3196,6 @@ static HostCheckBox *MacGammaCorrect()
     return gc;
 }
 
-static HostCheckBox *MacYuvConversion()
-{
-    HostCheckBox *gc = new HostCheckBox("MacYuvConversion");
-    gc->setLabel(QObject::tr("Use Vector-enhanced color space conversion"));
-#if defined(HAVE_ALTIVEC) || defined(MMX)
-    gc->setValue(true);
-#else
-    gc->setValue(false);
-#endif
-    gc->setHelpText(QObject::tr("If checked, YUV 4:2:0 will be converted to "
-                    "UYVY 4:2:2 in an Altivec/MMX enabled routine.  "
-                    "If unchecked, "
-                    "QuickTime will handle the conversion instead."));
-    return gc;
-}
-
 static HostCheckBox *MacScaleUp()
 {
     HostCheckBox *gc = new HostCheckBox("MacScaleUp");
@@ -3601,7 +3585,6 @@ PlaybackSettings::PlaybackSettings()
     VerticalConfigurationGroup* mac1 = new VerticalConfigurationGroup(false);
     mac1->setLabel(QObject::tr("Mac OS X video settings") + " 1/2");
     mac1->addChild(MacGammaCorrect());
-    mac1->addChild(MacYuvConversion());
     mac1->addChild(MacScaleUp());
     mac1->addChild(MacFullSkip());
     addChild(mac1);
