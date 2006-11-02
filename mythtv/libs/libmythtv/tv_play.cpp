@@ -7340,9 +7340,18 @@ void TV::PromptDeleteRecording(QString title)
                                   .arg(title).arg(infoMap["title"])
                                   .arg(infoMap["timedate"]);
         QStringList options;
-        options += "Yes, and allow re-record";
-        options += "Yes, delete it";
-        options += "No, keep it, I changed my mind";
+        if (title == "End Of Recording")
+        {
+            options += "Delete it, but allow it to re-record";
+            options += "Delete it";
+            options += "Save it so I can watch it again";
+        }
+        else
+        {
+            options += "Yes, and allow re-record";
+            options += "Yes, delete it";
+            options += "No, keep it, I changed my mind";
+        }
         
         dialogname = "askdeleterecording";
         
