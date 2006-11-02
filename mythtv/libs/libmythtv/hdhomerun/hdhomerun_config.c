@@ -18,7 +18,6 @@
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-#include <stdio.h>
 #include "hdhomerun_os.h"
 #include "hdhomerun_pkt.h"
 #include "hdhomerun_discover.h"
@@ -33,6 +32,7 @@ static int help(void)
 	printf("\t%s <id|ip> get help\n", appname);
 	printf("\t%s <id|ip> get <item>\n", appname);
 	printf("\t%s <id|ip> set <item> <value>\n", appname);
+	printf("\t%s <id|ip> scan <tuner> <starting channel>\n", appname);
 	printf("\t%s <id|ip> upgrade <filename>\n", appname);
 	return 1;
 }
@@ -234,6 +234,132 @@ int cmd_set(struct hdhomerun_control_sock_t *control_sock, const char *item, con
 	return 0;
 }
 
+int cmd_scan(struct hdhomerun_control_sock_t *control_sock, const char *tuner_str, const char *start_value)
+{
+	int tuner = atoi(tuner_str);
+
+	/* Test starting channel. */
+	char item[64];
+	sprintf(item, "/tuner%d/channel", tuner);
+	int ret = cmd_set(control_sock, item, start_value);
+	if (ret != 0) {
+		return ret;
+	}
+
+	char channel_value[64];
+	strncpy(channel_value, start_value, sizeof(channel_value));
+	channel_value[sizeof(channel_value) - 8] = 0;
+
+	char *ptr = strrchr(channel_value, ':');
+	if (!ptr) {
+		ptr = channel_value;
+	} else {
+		ptr++;
+	}
+
+	int channel = atol(ptr);
+	if (channel == 0) {
+		fprintf(stderr, "invalid starting channel\n");
+		return 1;
+	}
+
+	while (1) {
+		/* Update channel value */
+		sprintf(ptr, "%d", channel);
+
+		/* Set channel. */
+		sprintf(item, "/tuner%d/channel", tuner);
+		if (hdhomerun_control_send_set_request(control_sock, item, channel_value) < 0) {
+			fprintf(stderr, "communication error sending request to hdhomerun device\n");
+			return 1;
+		}
+	
+		/* Verify set succeeded. */
+		struct hdhomerun_control_data_t result;
+		if (hdhomerun_control_recv(control_sock, &result, 1000) <= 0) {
+			fprintf(stderr, "communication error receiving response from hdhomerun device\n");
+			return 1;
+		}
+		if (result.type != HDHOMERUN_TYPE_GETSET_RPY) {
+			fprintf(stderr, "unexpected reply type from hdhomerun device\n");
+			return 1;
+		}
+		while (result.ptr < result.end) {
+			unsigned char tag;
+			int length;
+			unsigned char *value;
+			if (hdhomerun_read_tlv(&result.ptr, result.end, &tag, &length, &value) < 0) {
+				break;
+			}
+			if (tag == HDHOMERUN_TAG_ERROR_MESSAGE) {
+				return 0;
+			}
+		}
+
+		/* Wait for 1s. */
+		sleep(1);
+
+		/* Get status. */
+		sprintf(item, "/tuner%d/status", tuner);
+		if (hdhomerun_control_send_get_request(control_sock, item) < 0) {
+			fprintf(stderr, "communication error sending request to hdhomerun device\n");
+			return 1;
+		}
+
+		/* Status result. */
+		if (hdhomerun_control_recv(control_sock, &result, 1000) <= 0) {
+			fprintf(stderr, "communication error receiving response from hdhomerun device\n");
+			return 1;
+		}
+		if (result.type != HDHOMERUN_TYPE_GETSET_RPY) {
+			fprintf(stderr, "unexpected reply type from hdhomerun device\n");
+			return 1;
+		}
+		char *status = NULL;
+		while (result.ptr < result.end) {
+			unsigned char tag;
+			int length;
+			unsigned char *value;
+			if (hdhomerun_read_tlv(&result.ptr, result.end, &tag, &length, &value) < 0) {
+				break;
+			}
+			if (tag == HDHOMERUN_TAG_ERROR_MESSAGE) {
+				return 0;
+			}
+			if (tag == HDHOMERUN_TAG_GETSET_VALUE) {
+				status = (char *)value;
+			}
+		}
+		if (!status) {
+			fprintf(stderr, "unexpected reply type from hdhomerun device\n");
+			return 1;
+		}
+
+		/* If no signal then advance to next channel. */
+		char *ss_str = strstr(status, "ss=");
+		if (!ss_str) {
+			printf("%s\n", status);
+			channel++;
+			continue;
+		}
+		int ss = atoi(ss_str + strlen("ss="));
+		if (ss == 0) {
+			printf("%s\n", status);
+			channel++;
+			continue;
+		}
+
+		/* Wait for 2s. */
+		sleep(2);
+
+		/* Display channel status. */
+		cmd_get(control_sock, item);
+
+		/* Advance to next channel. */
+		channel++;
+	}
+}
+
 int cmd_upgrade(struct hdhomerun_control_sock_t *control_sock, const char *filename)
 {
 	FILE *fp = fopen(filename, "rb");
@@ -272,6 +398,7 @@ int cmd_upgrade(struct hdhomerun_control_sock_t *control_sock, const char *filen
 		return 1;
 	}
 
+	printf("upgrade complete\n");
 	return 0;
 }
 
@@ -295,6 +422,13 @@ int main_cmd(struct hdhomerun_control_sock_t *control_sock, int argc, char *argv
 			return help();
 		}
 		return cmd_set(control_sock, argv[0], argv[1]);
+	}
+
+	if (contains(cmd, "scan")) {
+		if (argc < 2) {
+			return help();
+		}
+		return cmd_scan(control_sock, argv[0], argv[1]);
 	}
 
 	if (contains(cmd, "upgrade")) {

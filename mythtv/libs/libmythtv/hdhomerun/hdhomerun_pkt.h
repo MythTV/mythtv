@@ -49,6 +49,7 @@ extern unsigned long hdhomerun_read_u32(unsigned char **pptr);
 extern void hdhomerun_write_u8(unsigned char **pptr, unsigned char v);
 extern void hdhomerun_write_u16(unsigned char **pptr, unsigned short v);
 extern void hdhomerun_write_u32(unsigned char **pptr, unsigned long v);
+extern void hdhomerun_write_crc(unsigned char **pptr, unsigned char *start);
 
 extern int hdhomerun_peek_packet_length(unsigned char *ptr);
 extern int hdhomerun_process_packet(unsigned char **pptr, unsigned char **pend);

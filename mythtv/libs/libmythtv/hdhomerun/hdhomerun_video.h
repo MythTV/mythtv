@@ -30,6 +30,8 @@ extern struct hdhomerun_video_sock_t *hdhomerun_video_create(unsigned long buffe
 extern void hdhomerun_video_destroy(struct hdhomerun_video_sock_t *vs);
 extern unsigned short hdhomerun_video_get_local_port(struct hdhomerun_video_sock_t *vs);
 extern int hdhomerun_video_get_state(struct hdhomerun_video_sock_t *vs);
+extern int hdhomerun_video_get_sock(struct hdhomerun_video_sock_t *vs);
+extern unsigned long hdhomerun_video_available_length(struct hdhomerun_video_sock_t *vs);
 extern unsigned long hdhomerun_video_recv_memcpy(struct hdhomerun_video_sock_t *vs, unsigned char *buffer, unsigned long size);
 extern unsigned char *hdhomerun_video_recv_inplace(struct hdhomerun_video_sock_t *vs, unsigned long max_size, unsigned long *pactual_size);
 extern void hdhomerun_video_flush(struct hdhomerun_video_sock_t *vs);

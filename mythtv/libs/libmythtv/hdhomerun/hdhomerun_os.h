@@ -19,6 +19,7 @@
  */
 
 #include <stdlib.h>
+#include <stdio.h>
 #include <string.h>
 #include <unistd.h>
 #include <errno.h>
@@ -29,3 +30,10 @@
 #include <netdb.h>
 #include <sys/time.h>
 #include <fcntl.h>
+
+#if !defined(TRUE)
+#define TRUE 1
+#endif
+#if !defined(FALSE)
+#define FALSE 0
+#endif
