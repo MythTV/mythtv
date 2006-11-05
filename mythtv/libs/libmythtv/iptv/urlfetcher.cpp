@@ -1,5 +1,8 @@
 // -*- Mode: c++ -*-
 
+// POSIX headers
+#include <stdint.h>
+
 // Qt headers
 #include <qapplication.h>
 #include <qurloperator.h>
