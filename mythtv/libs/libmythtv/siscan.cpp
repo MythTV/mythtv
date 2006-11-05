@@ -322,7 +322,10 @@ void SIScan::HandleMPEGDBInsertion(const ScanStreamData *sd, bool)
     pat_vec_t pats = sd->GetCachedPATs();
     pmt_map_t pmt_map = sd->GetCachedPMTMap();
     for (uint i = 0; i < pats.size(); i++)
-        UpdatePATinDB(mplexid, fn, freqid, pats[i], pmt_map, true);
+    {
+        UpdatePATinDB(mplexid, fn, freqid, pats[i], pmt_map,
+                      (*current).expectedChannels, true);
+    }
     sd->ReturnCachedPMTTables(pmt_map);
     sd->ReturnCachedPATTables(pats);
 
@@ -354,13 +357,19 @@ void SIScan::HandleATSCDBInsertion(const ScanStreamData *sd,
     // Insert Terrestrial VCTs
     tvct_vec_t tvcts = sd->GetAllCachedTVCTs();
     for (uint i = 0; i < tvcts.size(); i++)
-        UpdateVCTinDB(mplexid, fn, freqid, tvcts[i], true);
+    {
+        UpdateVCTinDB(mplexid, fn, freqid, tvcts[i],
+                      (*current).expectedChannels, true);
+    }
     sd->ReturnCachedTVCTTables(tvcts);
 
     // Insert Cable VCTs
     cvct_vec_t cvcts = sd->GetAllCachedCVCTs();
     for (uint i = 0; i < cvcts.size(); i++)
-        UpdateVCTinDB(mplexid, fn, freqid, cvcts[i], true);
+    {
+        UpdateVCTinDB(mplexid, fn, freqid, cvcts[i],
+                      (*current).expectedChannels, true);
+    }
     sd->ReturnCachedCVCTTables(cvcts);
 
     // tell UI we are done with these channels
@@ -386,7 +395,10 @@ void SIScan::HandleDVBDBInsertion(const ScanStreamData *sd,
 
     vector<const ServiceDescriptionTable*> sdts = sd->GetAllCachedSDTs();
     for (uint i = 0; i < sdts.size(); i++)
-        UpdateSDTinDB((*current).mplexid, sdts[i], forceUpdate);
+    {
+        UpdateSDTinDB((*current).mplexid, sdts[i],
+                      (*current).expectedChannels, forceUpdate);
+    }
     sd->ReturnCachedSDTTables(sdts);
 
     emit ServiceScanUpdateText(tr("Finished processing Services"));
@@ -787,6 +799,41 @@ bool SIScan::ScanTransports(int SourceID,
     return true;
 }
 
+bool SIScan::ScanForChannels(uint sourceid,
+                             const QString &std,
+                             const QString &cardtype,
+                             const DTVChannelList &channels)
+{
+    scanTransports.clear();
+    nextIt = scanTransports.end();
+
+    DTVChannelList::const_iterator it = channels.begin();
+    for (uint i = 0; it != channels.end(); ++it, i++)
+    {
+        TransportScanItem item(sourceid, std, QString::number(i),
+                               cardtype, *it, signalTimeout);
+
+        scanTransports += item;
+
+        VERBOSE(VB_SIPARSER, LOC + item.toString());
+    }
+
+    if (scanTransports.empty())
+    {
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "ScanForChannels() no transports");
+        return false;
+    }
+
+    timer.start();
+    waitingForTables = false;
+
+    nextIt            = scanTransports.begin();
+    transportsScanned = 0;
+    scanMode          = TRANSPORT_LIST;
+
+    return true;
+}
+
 /** \fn SIScan::ScanTransportsStartingOn(int,const QMap<QString,QString>&)
  *  \brief Generates a list of frequencies to scan and adds it to the
  *   scanTransport list, and then sets the scanMode to TRANSPORT_LIST.
@@ -953,6 +1000,52 @@ void SIScan::OptimizeNITFrequencies(NetworkInformationTable *nit)
 #endif // USING_DVB
 }
 
+/** \fn SIScan::CheckImportedList(const DTVChannelInfoList&,uint,QString&,QString&,QString&)
+ *  \brief If we as scanning a dvb-utils import verify channel is in list..
+ */
+bool SIScan::CheckImportedList(const DTVChannelInfoList &channels,
+                               uint mpeg_program_num,
+                               QString &service_name,
+                               QString &callsign,
+                               QString &common_status_info)
+{
+    if (channels.empty())
+        return true;
+
+    bool found = false;
+    for (uint i = 0; i < channels.size(); i++)
+    {
+        VERBOSE(VB_IMPORTANT,
+                QString("comparing %1 %2 against %3 %4")
+                .arg(channels[i].serviceid).arg(channels[i].name)
+                .arg(mpeg_program_num).arg(common_status_info));
+
+        if (channels[i].serviceid == mpeg_program_num)
+        {
+            found = true;
+            if (!channels[i].name.isEmpty())
+            {
+                service_name = QDeepCopy<QString>(channels[i].name);
+                callsign     = QDeepCopy<QString>(channels[i].name);
+            }
+        }
+    }
+
+    if (found)
+    {
+        common_status_info += QString(" %1 %2")
+            .arg(tr("as")).arg(service_name);
+    }
+    else
+    {
+        emit ServiceScanUpdateText(
+            tr("Skipping %1, not in imported channel map")
+            .arg(common_status_info));
+    }
+
+    return found;
+}
+
 // ///////////////////// DB STUFF /////////////////////
 // ///////////////////// DB STUFF /////////////////////
 // ///////////////////// DB STUFF /////////////////////
@@ -962,7 +1055,8 @@ void SIScan::OptimizeNITFrequencies(NetworkInformationTable *nit)
 void SIScan::UpdatePMTinDB(
     int db_source_id,
     int db_mplexid, const QString &friendlyName, int freqid,
-    int pmt_indx, const ProgramMapTable *pmt, bool /*force_update*/)
+    int pmt_indx, const ProgramMapTable *pmt,
+    const DTVChannelInfoList &channels, bool /*force_update*/)
 {
     // See if service already in database based on program number
     int chanid = ChannelUtil::GetChanID(
@@ -988,9 +1082,15 @@ void SIScan::UpdatePMTinDB(
 
     QString common_status_info = tr("%1%2%3 on %4 (%5)")
         .arg(service_name)
-        .arg(service_name.isEmpty() ? "" : " as ")
+        .arg(service_name.isEmpty() ? "" : QString(" %1 ").arg(tr("as")))
         .arg(chan_num)
         .arg(friendlyName).arg(freqid);
+
+    if (!CheckImportedList(channels, pmt->ProgramNumber(),
+                           service_name, chan_num, common_status_info))
+    {
+        return;
+    }
 
     if (chanid < 0)
     {   // The service is not in database, add it
@@ -1024,7 +1124,7 @@ void SIScan::UpdatePMTinDB(
 void SIScan::UpdatePATinDB(
     int db_mplexid, const QString &friendlyName, int freqid,
     const ProgramAssociationTable *pat, const pmt_map_t &pmt_map,
-    bool force_update)
+    const DTVChannelInfoList &channels, bool force_update)
 {
     VERBOSE(VB_SIPARSER, LOC +
             QString("UpdatePATinDB(): tsid: 0x%1  mplex: %2")
@@ -1062,7 +1162,7 @@ void SIScan::UpdatePATinDB(
                 continue;
 
             UpdatePMTinDB(db_source_id, db_mplexid, friendlyName, freqid,
-                          i, *vit, force_update);
+                          i, *vit, channels, force_update);
         }
     }    
 }
@@ -1072,6 +1172,7 @@ void SIScan::UpdatePATinDB(
 void SIScan::UpdateVCTinDB(int db_mplexid,
                            const QString &friendlyName, int freqid,
                            const VirtualChannelTable *vct,
+                           const DTVChannelInfoList &channels,
                            bool force_update)
 {
     (void) force_update;
@@ -1141,6 +1242,14 @@ void SIScan::UpdateVCTinDB(int db_mplexid,
         bool use_eit = !vct->IsHidden(i) ||
             (vct->IsHidden(i) && !vct->IsHiddenInGuide(i));
 
+        QString callsign = vct->ShortChannelName(i);
+
+        if (!CheckImportedList(channels, vct->ProgramNumber(i),
+                               longName, callsign, common_status_info))
+        {
+            continue;
+        }
+
         QString msg = "";
         if (chanid < 0)
         {   // The service is not in database, add it
@@ -1152,7 +1261,7 @@ void SIScan::UpdateVCTinDB(int db_mplexid,
                     db_mplexid,
                     db_source_id,
                     chanid,
-                    vct->ShortChannelName(i),
+                    callsign,
                     longName,
                     chan_num,
                     vct->ProgramNumber(i),
@@ -1169,7 +1278,7 @@ void SIScan::UpdateVCTinDB(int db_mplexid,
                 db_mplexid,
                 db_source_id,
                 chanid,
-                vct->ShortChannelName(i),
+                callsign,
                 longName,
                 chan_num,
                 vct->ProgramNumber(i),
@@ -1187,6 +1296,7 @@ void SIScan::UpdateVCTinDB(int db_mplexid,
  *  \brief Inserts channels from service description table.
  */
 void SIScan::UpdateSDTinDB(int /*mplexid*/, const ServiceDescriptionTable *sdt,
+                           const DTVChannelInfoList &channels,
                            bool force_update)
 {
     if (!sdt->ServiceCount())
@@ -1259,6 +1369,14 @@ void SIScan::UpdateSDTinDB(int /*mplexid*/, const ServiceDescriptionTable *sdt,
         {
             emit ServiceScanUpdateText(tr("Skipping %1 - Encrypted Service")
                 .arg(service_name));
+            continue;
+        }
+
+        QString common_status_info = service_name;
+
+        if (!CheckImportedList(channels, sdt->ServiceID(i),
+                               service_name, service_name, common_status_info))
+        {
             continue;
         }
 

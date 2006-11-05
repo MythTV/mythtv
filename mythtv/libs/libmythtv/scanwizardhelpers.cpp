@@ -315,29 +315,27 @@ void ScanTypeSetting::refresh(const QString& card)
         addSelection(tr("Full Scan (Tuned)"),
                      QString::number(NITAddScan_OFDM));
         addSelection(tr("Import channels.conf"),
-                     QString::number(Import));
+                     QString::number(DVBUtilsImport));
         break;
     case CardUtil::QPSK:
         addSelection(tr("Full Scan (Tuned)"),
                      QString::number(NITAddScan_QPSK));
         addSelection(tr("Import channels.conf"),
-                     QString::number(Import));
+                     QString::number(DVBUtilsImport));
         break;
     case CardUtil::QAM:
         addSelection(tr("Full Scan (Tuned)"),
                      QString::number(NITAddScan_QAM));
         addSelection(tr("Import channels.conf"),
-                     QString::number(Import));
+                     QString::number(DVBUtilsImport));
         break;
     case CardUtil::ATSC:
     case CardUtil::HDTV:
     case CardUtil::HDHOMERUN:
         addSelection(tr("Full Scan"),
                      QString::number(FullScan_ATSC), true);
-#ifdef USING_DVB
         addSelection(tr("Import channels.conf"),
-                     QString::number(Import));
-#endif
+                     QString::number(DVBUtilsImport));
         break;
     case CardUtil::FREEBOX:
         addSelection(tr("M3U Import"),
@@ -393,8 +391,7 @@ ScanOptionalConfig::ScanOptionalConfig(ScanWizard *wizard,
     ConfigurationGroup(false, false, true, true),
     VerticalConfigurationGroup(false, false, true, true),
     country(new ScanCountry()),
-    ignoreSignalTimeoutAll(new IgnoreSignalTimeout()),
-    filename(new ScanFileImport())
+    ignoreSignalTimeoutAll(new IgnoreSignalTimeout())
 {
     setTrigger(scanType);
 
@@ -432,8 +429,8 @@ ScanOptionalConfig::ScanOptionalConfig(ScanWizard *wizard,
               scanAllTransports);
     addTarget(QString::number(ScanTypeSetting::IPTVImport),
               new BlankSetting());
-    addTarget(QString::number(ScanTypeSetting::Import),
-              filename);
+    addTarget(QString::number(ScanTypeSetting::DVBUtilsImport),
+              wizard->paneDVBUtilsImport);
 }
 
 void ScanOptionalConfig::triggerChanged(const QString& value)

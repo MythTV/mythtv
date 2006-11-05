@@ -55,6 +55,49 @@ TransportScanItem::TransportScanItem(int            _sourceid,
 }
 #endif // USING_DVB
 
+
+TransportScanItem::TransportScanItem(int                 _sourceid,
+                                     const QString      &_std,
+                                     const QString      &_name,
+                                     const QString      &_cardtype,
+                                     const DTVTransport &_tuning,
+                                     uint                _timeoutTune)
+    : mplexid(-1),         standard(_std),
+      FriendlyName(_name), friendlyNum(0),
+      SourceID(_sourceid), UseTimer(false),
+      scanning(false),     timeoutTune(_timeoutTune)
+{
+    (void) _cardtype;
+
+    bzero(freq_offsets, sizeof(int) * 3);
+    expectedChannels = _tuning.channels;
+
+#ifdef USING_DVB
+    bzero(&tuning, sizeof(DVBTuning));
+
+    fe_type type = FE_QPSK;
+
+    type = (_cardtype.upper() == "QAM")    ? FE_QAM    : type;
+    type = (_cardtype.upper() == "OFDM")   ? FE_OFDM   : type
+    type = (_cardtype.upper() == "ATSC")   ? FE_ATSC   : type;
+    type = (_cardtype.upper() == "DVB_S2") ? FE_DVB_S2 : type;
+
+    tuning.ParseTuningParams(
+        type,
+        QString::number(_tuning.frequency),  _tuning.inversion.toString(),
+        QString::number(_tuning.symbolrate), _tuning.fec.toString(),
+        _tuning.polarity.toString(),         _tuning.hp_code_rate.toString(),
+        _tuning.lp_code_rate,                _tuning.constellation.toString(),
+        _tuning.trans_mode.toString(),       _tuning.guard_interval.toString(),
+        _tuning.hierarchy.toString(),        _tuning.modulation.toString(),
+        _tuning.bandwidth.toString());
+
+#else
+    frequency  = _tuning.frequency;
+    modulation = _tuning.modulation;
+#endif
+}
+
 TransportScanItem::TransportScanItem(int sourceid,
                                      const QString &std,
                                      const QString &fn,

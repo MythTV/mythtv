@@ -321,10 +321,12 @@ using_backend {
 
     # Channel scanner stuff
     HEADERS += scanwizard.h                scanwizardhelpers.h
+    HEADERS += dvbconfparser.h             dtvconfparserhelpers.h
     HEADERS += siscan.h
     HEADERS += scanwizardscanner.h
     SOURCES += scanwizard.cpp              scanwizardhelpers.cpp
     SOURCES += siscan.cpp
+    SOURCES += dvbconfparser.cpp           dtvconfparserhelpers.cpp
     SOURCES += scanwizardscanner.cpp
 
     # EIT stuff
@@ -459,8 +461,8 @@ using_backend {
         SOURCES += dvbrecorder.cpp
 
         # Misc
-        HEADERS += dvbconfparser.h        dvbdev/dvbci.h
-        SOURCES += dvbconfparser.cpp      dvbdev/dvbci.cpp
+        HEADERS += dvbdev/dvbci.h
+        SOURCES += dvbdev/dvbci.cpp
 
         DEFINES += USING_DVB
     }

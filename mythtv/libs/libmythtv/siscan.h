@@ -14,6 +14,7 @@
 // MythTV includes
 #include "frequencytables.h"
 #include "streamlisteners.h"
+#include "dvbconfparser.h"
 
 class MSqlQuery;
 
@@ -54,6 +55,9 @@ class SIScan : public QObject,
     bool ScanTransportsStartingOn(
         int sourceid, const QMap<QString,QString> &valueMap);
     bool ScanTransport(int mplexid);
+    bool ScanForChannels(
+        uint sourceid, const QString &std, const QString &cardtype,
+        const DTVChannelList&);
 
     bool ScanServicesSourceID(int SourceID);
 
@@ -119,24 +123,34 @@ class SIScan : public QObject,
     /// \brief Updates Transport Scan progress bar
     inline void UpdateScanPercentCompleted(void);
 
+    bool CheckImportedList(const DTVChannelInfoList&,
+                           uint mpeg_program_num,
+                           QString &service_name,
+                           QString &callsign,
+                           QString &common_status_info);
+
     void HandleMPEGDBInsertion(const ScanStreamData *sd, bool wait);
     void UpdatePATinDB(int mplexid, const QString &friendlyName, int freqid,
                        const ProgramAssociationTable*, const pmt_map_t&,
+                       const DTVChannelInfoList&,
                        bool force_update);
 
     void UpdatePMTinDB(int sourceid,
                        int mplexid, const QString &friendlyName, int freqid,
                        int pmt_indx, const ProgramMapTable*,
+                       const DTVChannelInfoList&,
                        bool force_update);
 
     void HandleATSCDBInsertion(const ScanStreamData *sd, bool wait);
     void UpdateVCTinDB(int mplexid, const QString &friendlyName, int freqid,
                        const VirtualChannelTable*,
+                       const DTVChannelInfoList&,
                        bool force_update);
 
     void HandleDVBDBInsertion(const ScanStreamData *sd, bool wait);
     void UpdateSDTinDB(int mplexid,
                        const ServiceDescriptionTable*,
+                       const DTVChannelInfoList&,
                        bool force_update);
 
     bool HandlePostInsertion(void);

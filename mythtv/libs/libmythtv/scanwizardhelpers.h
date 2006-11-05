@@ -188,16 +188,6 @@ class ScanCountry: public ComboBoxSetting, public TransientStorage
     ScanCountry();
 };
 
-class ScanFileImport : public LineEditSetting, public TransientStorage
-{
-public:
-    ScanFileImport() : LineEditSetting()
-    {
-        setLabel(QObject::tr("File location"));
-        setHelpText(QObject::tr("Location of the channels.conf file."));
-    }
-};
-
 class ScanTypeSetting : public ComboBoxSetting, public TransientStorage
 {
     Q_OBJECT
@@ -222,7 +212,7 @@ class ScanTypeSetting : public ComboBoxSetting, public TransientStorage
         // IPTV import of channels from M3U URL
         IPTVImport,
         // Imports lists from dvb-utils scanners
-        Import
+        DVBUtilsImport,
     };
     ScanTypeSetting() : nCaptureCard(-1)
     {
@@ -244,7 +234,7 @@ class ScanOptionalConfig: public VerticalConfigurationGroup,
 
     ScanCountry         *country;
     IgnoreSignalTimeout *ignoreSignalTimeoutAll;
-    ScanFileImport      *filename;
+
   protected slots:
     void triggerChanged(const QString&);
 };
@@ -776,6 +766,43 @@ class STPane : public VerticalConfigurationGroup
 
   protected:
     MultiplexSetting        *transport_setting;
+    ScanATSCChannelFormat   *atsc_format;
+    ScanOldChannelTreatment *old_channel_treatment;
+    IgnoreSignalTimeout     *ignore_signal_timeout;
+};
+
+class DVBUtilsImportPane : public VerticalConfigurationGroup
+{
+  public:
+    DVBUtilsImportPane() :
+        ConfigurationGroup(false,false,true,false),
+        VerticalConfigurationGroup(false,false,true,false),
+        filename(new TransLineEditSetting()),
+        atsc_format(new ScanATSCChannelFormat()),
+        old_channel_treatment(new ScanOldChannelTreatment()),
+        ignore_signal_timeout(new IgnoreSignalTimeout())
+    {
+        filename->setLabel(tr("File location"));
+        filename->setHelpText(tr("Location of the channels.conf file."));
+        addChild(filename);
+
+        addChild(atsc_format);
+        addChild(old_channel_treatment);
+        addChild(ignore_signal_timeout);
+    }
+
+    QString GetFilename(void)   const { return filename->getValue();    }
+    QString GetATSCFormat(void) const { return atsc_format->getValue(); }
+
+    bool DoDeleteChannels(void) const
+        { return old_channel_treatment->getValue() == "delete"; }
+    bool DoRenameChannels(void) const
+        { return old_channel_treatment->getValue() == "rename"; }
+    bool DoIgnoreSignalTimeout(void) const
+        { return ignore_signal_timeout->getValue().toInt(); }
+
+  private:
+    TransLineEditSetting    *filename;
     ScanATSCChannelFormat   *atsc_format;
     ScanOldChannelTreatment *old_channel_treatment;
     IgnoreSignalTimeout     *ignore_signal_timeout;
