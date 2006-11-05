@@ -129,6 +129,11 @@ class SIScan : public QObject,
                            QString &callsign,
                            QString &common_status_info);
 
+    void IgnoreDataOnlyMsg( const QString &name, int aux_num);
+    void IgnoreEmptyChanMsg(const QString &name, int aux_num);
+    void IgnoreAudioOnlyMsg(const QString &name, int aux_num);
+    void IgnoreEncryptedMsg(const QString &name, int aux_num);
+
     void HandleMPEGDBInsertion(const ScanStreamData *sd, bool wait);
     void UpdatePATinDB(int mplexid, const QString &friendlyName, int freqid,
                        const ProgramAssociationTable*, const pmt_map_t&,

@@ -1121,6 +1121,70 @@ void SIScan::UpdatePMTinDB(
     }
 }
 
+void SIScan::IgnoreDataOnlyMsg(const QString &name, int aux_num)
+{
+    QString vmsg = QString("Ignoring Data Channel: %1").arg(name);
+    if (aux_num > 0)
+        vmsg += QString(" on %1").arg(aux_num);
+    VERBOSE(VB_SIPARSER, vmsg);
+
+    //
+
+    QString tmsg = tr("Skipping %1").arg(name);
+    if (aux_num > 0)
+        tmsg += " " + tr("on %1").arg(aux_num);
+    tmsg += " - " + tr("Data Only Channel (off-air?)");
+    emit ServiceScanUpdateText(tmsg);
+}
+
+void SIScan::IgnoreEmptyChanMsg(const QString &name, int aux_num)
+{
+    QString vmsg = QString("Ignoring Empty Channel: %1").arg(name);
+    if (aux_num > 0)
+        vmsg += QString(" on %1").arg(aux_num);
+    VERBOSE(VB_SIPARSER, vmsg);
+
+    //
+
+    QString tmsg = tr("Skipping %1").arg(name);
+    if (aux_num > 0)
+        tmsg += " " + tr("on %1").arg(aux_num);
+    tmsg += " - " + tr("Empty Channel (off-air?)");
+    emit ServiceScanUpdateText(tmsg);
+}
+
+void SIScan::IgnoreAudioOnlyMsg(const QString &name, int aux_num)
+{
+    QString vmsg = QString("Ignoring Audio Only Channel: %1").arg(name);
+    if (aux_num > 0)
+        vmsg += QString(" on %1").arg(aux_num);
+    VERBOSE(VB_SIPARSER, vmsg);
+
+    //
+
+    QString tmsg = tr("Skipping %1").arg(name);
+    if (aux_num > 0)
+        tmsg += " " + tr("on %1").arg(aux_num);
+    tmsg += " - " + tr("Audio Only Channel");
+    emit ServiceScanUpdateText(tmsg);
+}
+
+void SIScan::IgnoreEncryptedMsg(const QString &name, int aux_num)
+{
+    QString vmsg = QString("Ignoring Encrypted Channel: %1").arg(name);
+    if (aux_num > 0)
+        vmsg += QString(" on %1").arg(aux_num);
+    VERBOSE(VB_SIPARSER, vmsg);
+
+    //
+
+    QString tmsg = tr("Skipping %1").arg(name);
+    if (aux_num > 0)
+        tmsg += " " + tr("on %1").arg(aux_num);
+    tmsg += " - " + tr("Encrypted Channel");
+    emit ServiceScanUpdateText(tmsg);
+}
+
 void SIScan::UpdatePATinDB(
     int db_mplexid, const QString &friendlyName, int freqid,
     const ProgramAssociationTable *pat, const pmt_map_t &pmt_map,
@@ -1155,11 +1219,20 @@ void SIScan::UpdatePATinDB(
             if (!(*vit))
                 continue;
             else if ((*vit)->StreamCount() <= 0)
+            {
+                IgnoreEmptyChanMsg(friendlyName, pat->ProgramNumber(i));
                 continue;
+            }
             else if (ignoreAudioOnlyServices && (*vit)->IsStillPicture())
+            {
+                IgnoreAudioOnlyMsg(friendlyName, pat->ProgramNumber(i));
                 continue;
+            }
             else if (ignoreEncryptedServices && (*vit)->IsEncrypted())
+            {
+                IgnoreEncryptedMsg(friendlyName, pat->ProgramNumber(i));
                 continue;
+            }
 
             UpdatePMTinDB(db_source_id, db_mplexid, friendlyName, freqid,
                           i, *vit, channels, force_update);
@@ -1191,27 +1264,25 @@ void SIScan::UpdateVCTinDB(int db_mplexid,
             continue;
         }
 
+        QString basic_status_info = QString("%1 %2-%3")
+            .arg(vct->ShortChannelName(i))
+            .arg(vct->MajorChannel(i)).arg(vct->MinorChannel(i));
+
         if (vct->ServiceType(i) == 0x04 && ignoreDataServices)
         {
-            VERBOSE(VB_IMPORTANT, QString("Ignoring Data Service: %1 %2-%3")
-                    .arg(vct->ShortChannelName(i))
-                    .arg(vct->MajorChannel(i)).arg(vct->MinorChannel(i)));
+            IgnoreEmptyChanMsg(basic_status_info, vct->ProgramNumber(i));
             continue;            
         }
 
         if (vct->ServiceType(i) == 0x03 && ignoreAudioOnlyServices)
         {
-            VERBOSE(VB_IMPORTANT, QString("Ignoring Radio Service: %1 %2-%3")
-                    .arg(vct->ShortChannelName(i))
-                    .arg(vct->MajorChannel(i)).arg(vct->MinorChannel(i)));
+            IgnoreAudioOnlyMsg(basic_status_info, vct->ProgramNumber(i));
             continue;            
         }
 
         if (vct->IsAccessControlled(i) && ignoreEncryptedServices)
         {
-            VERBOSE(VB_IMPORTANT, QString("Ignoring Encrypted Service: %1 %2-%3")
-                    .arg(vct->ShortChannelName(i))
-                    .arg(vct->MajorChannel(i)).arg(vct->MinorChannel(i)));
+            IgnoreEncryptedMsg(basic_status_info, vct->ProgramNumber(i));
             continue;
         }
 
@@ -1354,21 +1425,18 @@ void SIScan::UpdateSDTinDB(int /*mplexid*/, const ServiceDescriptionTable *sdt,
         // Skip to next if this is a service we don't care for
         if (desc && desc->IsDigitalAudio() && ignoreAudioOnlyServices)
         {
-            emit ServiceScanUpdateText(
-                tr("Skipping %1 - Radio Service").arg(service_name));
+            IgnoreAudioOnlyMsg(service_name, sdt->ServiceID(i));
             continue;
         }
         else if (desc && !desc->IsDTV() && !desc->IsDigitalAudio() &&
                  ignoreDataServices)
         {
-            emit ServiceScanUpdateText(tr("Skipping %1 - not a Television or "
-                                          "Radio Service").arg(service_name));
+            IgnoreDataOnlyMsg(service_name, sdt->ServiceID(i));
             continue;
         }
         else if (ignoreEncryptedServices && sdt->IsEncrypted(i))
         {
-            emit ServiceScanUpdateText(tr("Skipping %1 - Encrypted Service")
-                .arg(service_name));
+            IgnoreEncryptedMsg(service_name, sdt->ServiceID(i));
             continue;
         }
 
