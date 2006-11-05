@@ -4,40 +4,6 @@
 #include <qfile.h>
 #include <qdir.h>
 
-class TransientSetting: public TransientStorage, virtual public Configurable {
-public:
-    TransientSetting() { };
-};
-
-class TransientSpinBox: public SpinBoxSetting, public TransientSetting {
-  public:
-    TransientSpinBox(int min, int max, int step, 
-                   bool allow_single_step = false) :
-        SpinBoxSetting(min, max, step, allow_single_step) { };
-};
-
-class TransientCheckBox: public CheckBoxSetting, public TransientSetting {
-  public:
-    TransientCheckBox() { };
-};
-
-class TransientLineEdit: public LineEditSetting, public TransientSetting {
-  public:
-    TransientLineEdit(bool rw = true) :
-        LineEditSetting(rw) { };
-};
-
-class TransientComboBox: public ComboBoxSetting, public TransientSetting {
-  public:
-    TransientComboBox(bool rw = true) :
-        ComboBoxSetting(rw) { };
-};
-
-class TransientLabel: public LabelSetting, public TransientSetting {
-  public:
-    TransientLabel() { };
-};
-
 class MythDbSettings1: public VerticalConfigurationGroup {
 public:
     MythDbSettings1();
@@ -46,13 +12,13 @@ public:
     void save();
     
 protected:
-    TransientLabel    *info;
-    TransientLineEdit *dbHostName;
-    TransientLineEdit *dbPort;
-    TransientLineEdit *dbName;
-    TransientLineEdit *dbUserName;
-    TransientLineEdit *dbPassword;
-    TransientComboBox *dbType;
+    TransLabelSetting    *info;
+    TransLineEditSetting *dbHostName;
+    TransLineEditSetting *dbPort;
+    TransLineEditSetting *dbName;
+    TransLineEditSetting *dbUserName;
+    TransLineEditSetting *dbPassword;
+    TransComboBoxSetting *dbType;
 }; 
 
 class MythDbSettings2: public VerticalConfigurationGroup {
@@ -63,12 +29,12 @@ public:
     void save();
     
 protected:
-    TransientCheckBox *localEnabled;
-    TransientLineEdit *localHostName;
-    TransientCheckBox *wolEnabled;
-    TransientSpinBox  *wolReconnect;
-    TransientSpinBox  *wolRetry;
-    TransientLineEdit *wolCommand;
+    TransCheckBoxSetting *localEnabled;
+    TransLineEditSetting *localHostName;
+    TransCheckBoxSetting *wolEnabled;
+    TransSpinBoxSetting  *wolReconnect;
+    TransSpinBoxSetting  *wolRetry;
+    TransLineEditSetting *wolCommand;
 }; 
 
 
@@ -116,7 +82,7 @@ MythDbSettings1::MythDbSettings1() :
     setLabel(QObject::tr("Database Configuration") + " 1/2");
     setUseLabel(false);
     
-    info = new TransientLabel();
+    info = new TransLabelSetting();
 
     MSqlQuery query(MSqlQuery::InitCon());
     if (query.isConnected())
@@ -128,41 +94,41 @@ MythDbSettings1::MythDbSettings1() :
                                    "below."));
     addChild(info);
     
-    dbHostName = new TransientLineEdit(true);
+    dbHostName = new TransLineEditSetting(true);
     dbHostName->setLabel(QObject::tr("Host name"));
     dbHostName->setHelpText(QObject::tr("The host name or IP address of "
                                         "the machine hosting the database. "
                                         "This information is required."));
     addChild(dbHostName);
 
-    dbPort = new TransientLineEdit(true);
+    dbPort = new TransLineEditSetting(true);
     dbPort->setLabel(QObject::tr("Host Port"));
     dbPort->setHelpText(QObject::tr("The port number the database is running "
                                     "on, if it's not the default database "
                                     "port."));
     addChild(dbPort);
     
-    dbName = new TransientLineEdit(true);
+    dbName = new TransLineEditSetting(true);
     dbName->setLabel(QObject::tr("Database"));
     dbName->setHelpText(QObject::tr("The name of the database. "
                                     "This information is required."));
     addChild(dbName);
 
-    dbUserName = new TransientLineEdit(true);
+    dbUserName = new TransLineEditSetting(true);
     dbUserName->setLabel(QObject::tr("User"));
     dbUserName->setHelpText(QObject::tr("The user name to use while "
                                         "connecting to the database. "
                                         "This information is required."));
     addChild(dbUserName);
     
-    dbPassword = new TransientLineEdit(true);
+    dbPassword = new TransLineEditSetting(true);
     dbPassword->setLabel(QObject::tr("Password"));
     dbPassword->setHelpText(QObject::tr("The password to use while "
                                         "connecting to the database. "
                                         "This information is required."));
     addChild(dbPassword);
     
-    dbType = new TransientComboBox(false);
+    dbType = new TransComboBoxSetting(false);
     dbType->setLabel(QObject::tr("Database type"));
     dbType->addSelection(QObject::tr("MySQL"), "QMYSQL3");
     //dbType->addSelection(QObject::tr("PostgreSQL"), "QPSQL7");
@@ -179,7 +145,7 @@ MythDbSettings2::MythDbSettings2(void) :
     setLabel(QObject::tr("Database Configuration") + " 2/2");
     setUseLabel(false);
     
-    localEnabled = new TransientCheckBox();
+    localEnabled = new TransCheckBoxSetting();
     localEnabled->setLabel(QObject::tr("Use custom identifier for frontend "
                                        "preferences"));
     localEnabled->setHelpText(QObject::tr("If this frontend's host name "
@@ -191,7 +157,7 @@ MythDbSettings2::MythDbSettings2(void) :
                                           "be used to save preferences in "
                                           "the database."));
     
-    localHostName = new TransientLineEdit(true);
+    localHostName = new TransLineEditSetting(true);
     localHostName->setLabel(QObject::tr("Custom identifier"));
     localHostName->setHelpText(QObject::tr("An identifier to use while "
                                            "saving the settings for this "
@@ -205,24 +171,24 @@ MythDbSettings2::MythDbSettings2(void) :
         new LocalHostNameSettings(localEnabled, group1);
     addChild(sub3);
     
-    wolEnabled = new TransientCheckBox();
+    wolEnabled = new TransCheckBoxSetting();
     wolEnabled->setLabel(QObject::tr("Use Wake-On-LAN to wake database"));
     wolEnabled->setHelpText(QObject::tr("If checked, the frontend will use "
                                         "Wake-On-LAN parameters to "
                                         "reconnect to the database server."));
     
-    wolReconnect = new TransientSpinBox(0, 60, 1, true);
+    wolReconnect = new TransSpinBoxSetting(0, 60, 1, true);
     wolReconnect->setLabel(QObject::tr("Reconnect time"));
     wolReconnect->setHelpText(QObject::tr("The time in seconds to wait for "
                                           "the server to wake up."));
     
-    wolRetry = new TransientSpinBox(1, 10, 1, true);
+    wolRetry = new TransSpinBoxSetting(1, 10, 1, true);
     wolRetry->setLabel(QObject::tr("Retry attempts"));
     wolRetry->setHelpText(QObject::tr("The number of retries to wake the "
                                       "server before the frontend gives "
                                       "up."));
     
-    wolCommand = new TransientLineEdit(true);
+    wolCommand = new TransLineEditSetting(true);
     wolCommand->setLabel(QObject::tr("Wake command"));
     wolCommand->setHelpText(QObject::tr("The command executed on this "
                                         "frontend to wake up the database "

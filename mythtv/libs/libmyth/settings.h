@@ -725,12 +725,6 @@ protected:
     MythPushButton *button;
 };
 
-class MPUBLIC TransButtonSetting: public ButtonSetting, public TransientStorage
-{
-public:
-    TransButtonSetting(QString name = "button") : ButtonSetting(name) {}
-};
-
 class MPUBLIC ConfigPopupDialogWidget: public MythPopupBox {
     Q_OBJECT
 public:
@@ -774,18 +768,6 @@ private:
     int totalSteps;
 };
 
-class MPUBLIC TransLabelSetting: public LabelSetting, public TransientStorage {
-public:
-    TransLabelSetting() {};
-};
-
-class MPUBLIC TransCheckBoxSetting: public CheckBoxSetting,
-    public TransientStorage
-{
-public:
-    TransCheckBoxSetting() {};
-};
-
 class MPUBLIC HostSetting: public SimpleDBStorage,
     virtual public Configurable {
 public:
@@ -812,6 +794,57 @@ protected:
     virtual QString whereClause(MSqlBindings& bindings);
     virtual QString setClause(MSqlBindings& bindings);
 };
+
+///////////////////////////////////////////////////////////////////////////////
+
+class MPUBLIC TransButtonSetting :
+    public ButtonSetting, public TransientStorage
+{
+  public:
+    TransButtonSetting(QString name = "button") : ButtonSetting(name) { }
+};
+
+class MPUBLIC TransLabelSetting :
+    public LabelSetting, public TransientStorage
+{
+  public:
+    TransLabelSetting() { }
+};
+
+class MPUBLIC TransLineEditSetting :
+    public LineEditSetting, public TransientStorage
+{
+  public:
+    TransLineEditSetting(bool rw = true) : LineEditSetting(rw) { }
+};
+
+class MPUBLIC TransCheckBoxSetting :
+    public CheckBoxSetting, public TransientStorage
+{
+  public:
+    TransCheckBoxSetting() { }
+};
+
+class MPUBLIC TransComboBoxSetting :
+    public ComboBoxSetting, public TransientStorage
+{
+  public:
+    TransComboBoxSetting(bool rw = true, int _step = 1) :
+        ComboBoxSetting(rw, _step) { }
+};
+
+class MPUBLIC TransSpinBoxSetting :
+    public SpinBoxSetting, public TransientStorage
+{
+  public:
+    TransSpinBoxSetting(int min, int max, int step,
+                        bool allow_single_step = false,
+                        QString special_value_text = "") :
+        SpinBoxSetting(min, max, step, allow_single_step,
+                       special_value_text) { }
+};
+
+///////////////////////////////////////////////////////////////////////////////
 
 class MPUBLIC HostSlider: public SliderSetting, public HostSetting {
   public:
