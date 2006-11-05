@@ -78,16 +78,18 @@ TransportScanItem::TransportScanItem(int                 _sourceid,
     fe_type type = FE_QPSK;
 
     type = (_cardtype.upper() == "QAM")    ? FE_QAM    : type;
-    type = (_cardtype.upper() == "OFDM")   ? FE_OFDM   : type
+    type = (_cardtype.upper() == "OFDM")   ? FE_OFDM   : type;
     type = (_cardtype.upper() == "ATSC")   ? FE_ATSC   : type;
+#ifdef FE_GET_EXTENDED_INFO
     type = (_cardtype.upper() == "DVB_S2") ? FE_DVB_S2 : type;
+#endif
 
     tuning.ParseTuningParams(
         type,
         QString::number(_tuning.frequency),  _tuning.inversion.toString(),
         QString::number(_tuning.symbolrate), _tuning.fec.toString(),
         _tuning.polarity.toString(),         _tuning.hp_code_rate.toString(),
-        _tuning.lp_code_rate,                _tuning.constellation.toString(),
+        _tuning.lp_code_rate.toString(),     _tuning.constellation.toString(),
         _tuning.trans_mode.toString(),       _tuning.guard_interval.toString(),
         _tuning.hierarchy.toString(),        _tuning.modulation.toString(),
         _tuning.bandwidth.toString());

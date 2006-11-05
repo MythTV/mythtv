@@ -179,7 +179,6 @@ class DVBTuning
                     const QString& pol,            const QString& modulation);
 #endif
 
-  private:
     bool ParseTuningParams(
         fe_type_t type,
         QString frequency,    QString inversion,      QString symbolrate,
