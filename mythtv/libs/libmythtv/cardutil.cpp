@@ -735,6 +735,7 @@ void CardUtil::GetCardInputs(
 {
     int rcardid = (parentid) ? parentid : cardid;
     QStringList inputs;
+    bool is_dtv = !IsEncoder(cardtype) && !IsUnscanable(cardtype);
 
     if (("FIREWIRE"  == cardtype) ||
         ("FREEBOX"   == cardtype) ||
@@ -753,7 +754,7 @@ void CardUtil::GetCardInputs(
     QStringList::iterator it = inputs.begin();
     for (; it != inputs.end(); ++it)
     {
-        CardInput* cardinput = new CardInput(false, cardid);
+        CardInput* cardinput = new CardInput(is_dtv, false, cardid);
         cardinput->loadByInput(rcardid, (*it));
         cardinput->SetChildCardID((parentid) ? cardid : 0);
         inputLabels.push_back(
@@ -774,7 +775,7 @@ void CardUtil::GetCardInputs(
         InputNames::const_iterator it;
         for (it = list.begin(); it != list.end(); ++it)
         {
-            CardInput *cardinput = new CardInput(true, rcardid);
+            CardInput *cardinput = new CardInput(is_dtv, true, rcardid);
             cardinput->loadByInput(rcardid, *it);
             cardinput->SetChildCardID(parentid ? cardid : 0);
             inputLabels.push_back(
@@ -786,7 +787,7 @@ void CardUtil::GetCardInputs(
         // plus add one "new" input
         if (needs_conf)
         {
-            CardInput *newcard = new CardInput(true, rcardid);
+            CardInput *newcard = new CardInput(is_dtv, true, rcardid);
             QString newname = QString("DVBInput #%1").arg(list.size() + 1);
             newcard->loadByInput(rcardid, newname);
             newcard->SetChildCardID((parentid) ? cardid : 0);

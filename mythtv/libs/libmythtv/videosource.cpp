@@ -1432,26 +1432,32 @@ class InputName: public LabelSetting, public CISetting {
     };
 };
 
-class FreeToAir: public CheckBoxSetting, public CISetting {
+class FreeToAir: public CheckBoxSetting, public CISetting
+{
   public:
     FreeToAir(const CardInput& parent):
         CISetting(parent, "freetoaironly")
     {
         setValue(true);
-        setLabel(QObject::tr("Free to air channels only."));
-        setHelpText(QObject::tr("If set, only free to air channels will be "
-                    "used."));
+        setLabel(QObject::tr("Unencrypted channels only"));
+        setHelpText(QObject::tr(
+                        "If set, only unencrypted channels will be tuned to "
+                        "by MythTV or not be ignored by the MythTV channel "
+                        "scanner."));
     };
 };
 
-class RadioServices: public CheckBoxSetting, public CISetting {
-public:
+class RadioServices: public CheckBoxSetting, public CISetting
+{
+  public:
     RadioServices(const CardInput& parent):
         CISetting(parent, "radioservices")
     {
         setValue(true);
-        setLabel(QObject::tr("Radio channels."));
-        setHelpText(QObject::tr("If set, radio channels will also be included.")); 
+        setLabel(QObject::tr("Allow audio only channels"));
+        setHelpText(QObject::tr(
+                        "If set, audio only channels will not be ignored "
+                        "by the MythTV channel scanner.")); 
     };
 };
 
@@ -1552,7 +1558,7 @@ class DishNetEIT: public CheckBoxSetting, public CISetting
     };
 };
 
-CardInput::CardInput(bool isDVBcard, int _cardid)
+CardInput::CardInput(bool isDTVcard, bool isDVBcard, int _cardid)
 {
     (void) _cardid;
 
@@ -1576,28 +1582,30 @@ CardInput::CardInput(bool isDVBcard, int _cardid)
         group->addChild(new PresetTuner(*this));
     }
 
+    if (isDTVcard)
+    {
+        // we place this in a group just so the margins match the DVB ones.
+        ConfigurationGroup *chgroup = 
+            new HorizontalConfigurationGroup(false, false, true, true);
+        chgroup->addChild(new FreeToAir(*this));
+        group->addChild(chgroup);
+    }
+
 #ifdef USING_DVB
     if (isDVBcard)
     {
-        ConfigurationGroup *dvbgroup =
-            new HorizontalConfigurationGroup();
-        dvbgroup->setLabel(QObject::tr("DVB options"));
-
-        ConfigurationGroup *chgroup = 
-            new VerticalConfigurationGroup(false, false, true, true);
-
         TransButtonSetting *diseqc = new TransButtonSetting();
         diseqc->setLabel(tr("DVB-S"));
         diseqc->setHelpText(tr("Input and satellite settings."));
         diseqc->setVisible(DTVDeviceNeedsConfiguration(_cardid));
-        dvbgroup->addChild(diseqc);
+        group->addChild(diseqc);
         connect(diseqc, SIGNAL(pressed()), SLOT(diseqcConfig()));
    
-        chgroup->addChild(new FreeToAir(*this));
+        ConfigurationGroup *chgroup = 
+            new HorizontalConfigurationGroup(false, false, true, true);
         chgroup->addChild(new RadioServices(*this));
         chgroup->addChild(new DishNetEIT(*this));
-        dvbgroup->addChild(chgroup);
-        group->addChild(dvbgroup);
+        group->addChild(chgroup);
     }
 #endif
 

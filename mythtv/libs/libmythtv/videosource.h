@@ -534,7 +534,7 @@ class CardInput: public ConfigurationWizard
 {
     Q_OBJECT
   public:
-    CardInput(bool is_dvb_card, int cardid);
+    CardInput(bool is_dtv_card, bool is_dvb_card, int cardid);
 
     int getInputID(void) const { return id->intValue(); };
 
