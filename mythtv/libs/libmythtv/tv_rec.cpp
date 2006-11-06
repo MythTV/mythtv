@@ -1127,11 +1127,7 @@ DBox2Channel *TVRec::GetDBox2Channel(void)
 
 DTVChannel *TVRec::GetDTVChannel(void)
 {
-#ifdef USING_DVB
     return dynamic_cast<DTVChannel*>(channel);
-#else
-    return NULL;
-#endif // USING_DVB
 }
 
 HDHRChannel *TVRec::GetHDHRChannel(void)
@@ -1689,6 +1685,11 @@ bool TVRec::SetupDTVSignalMonitor(void)
 
     DTVSignalMonitor *sm = GetDTVSignalMonitor();
     DTVChannel *dtvchan = GetDTVChannel();
+    if (!sm || !dtvchan)
+    {
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "Setting up table monitoring.");
+        return false;
+    }
 
     MPEGStreamData *sd = NULL;
     if (GetDTVRecorder())
