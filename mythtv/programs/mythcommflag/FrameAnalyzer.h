@@ -44,7 +44,7 @@ public:
     static const long long ANYFRAME = LONG_LONG_MAX;
     static const long long NEXTFRAME = -1;
     virtual enum analyzeFrameResult analyzeFrame(const VideoFrame *frame,
-            long long frameno, long long *pNextFrame) = 0;
+            long long frameno, long long *pNextFrame /* [out] */) = 0;
 
     virtual int finished(long long nframes, bool final) {
         (void)nframes;

@@ -88,7 +88,8 @@ next_pixel:
 }
 
 bool
-readMatches(QString filename, unsigned short *matches, long long nframes)
+readMatches(QString filename, unsigned short *matches, unsigned char *match,
+        long long nframes, int mintmpledges)
 {
     FILE        *fp;
     long long   frameno;
@@ -105,6 +106,7 @@ readMatches(QString filename, unsigned short *matches, long long nframes)
                     .arg(filename).arg(frameno));
             goto error;
         }
+        match[frameno] = matches[frameno] >= mintmpledges ? 1 : 0;
     }
 
     if (fclose(fp))
@@ -137,139 +139,101 @@ writeMatches(QString filename, unsigned short *matches, long long nframes)
     return true;
 }
 
-int 
-finishedDebug(PGMConverter *pgmConverter, EdgeDetector *edgeDetector,
-        NuppelVideoPlayer *nvp,
-        long long nframes, const unsigned char *match,
-        const unsigned short *matches, AVPicture *overlay, AVPicture *cropped,
+int
+writeJPG(QString prefix, const AVPicture *img, int imgheight)
+{
+    const int imgwidth = img->linesize[0];
+    QFileInfo jpgfi(prefix + ".jpg");
+    if (!jpgfi.exists())
+    {
+        QFile pgmfile(prefix + ".pgm");
+        if (!pgmfile.exists() && pgm_write(img->data[0], imgwidth, imgheight,
+                    pgmfile.name().ascii()))
+            return -1;
+
+        if (myth_system(QString("convert -quality 50 -resize 192x144 %1 %2")
+                    .arg(pgmfile.name()).arg(jpgfi.filePath())))
+            return -1;
+    }
+    return 0;
+}
+
+int
+analyzeFrameDebugCleanup(QString filename)
+{
+    QFile tfile(filename);
+    if (tfile.exists() && !tfile.remove())
+    {
+        VERBOSE(VB_COMMFLAG, QString("Error removing %1 (%2)")
+                .arg(tfile.name()).arg(strerror(errno)));
+        return -1;
+    }
+    return 0;
+}
+
+int
+analyzeFrameDebug(long long frameno, const unsigned short *matches,
+        const unsigned char *match, AVPicture *overlay,
+        const AVPicture *pgm, int pgmheight, const AVPicture *edges,
         int tmplrow, int tmplcol, int tmplwidth, int tmplheight,
         bool debug_frames, QString debugdir)
 {
-    static const int    FRAMESGMPCTILE = 70; /* TemplateMatcher::analyzeFrame */
-    const int           width = overlay->linesize[0];
-    const int           height = nvp->GetVideoHeight();
+    static unsigned short   low, high;
+    static long long        startframe;
+    const unsigned short    score = matches[frameno];
 
-    long long           frameno, startframe;
-    unsigned short      score, low, high;
+    (void)tmplwidth;    /* gcc */
 
-    score = matches[0];
-
-    low = score;
-    high = score;
-    startframe = 0;
-
-    for (frameno = 1; frameno < nframes; frameno++)
+    if (frameno == 0)
     {
-        score = matches[frameno];
-
-        if (match[frameno - 1] == match[frameno])
-        {
-            if (score < low)
-                low = score;
-            if (score > high)
-                high = score;
-            if (frameno < nframes - 1)
-                continue;
-        }
-
-        VERBOSE(VB_COMMFLAG, QString("Frame %1-%2: %3 L-H: %4-%5 (%6)")
-                .arg(startframe, 6).arg(frameno - 1, 6)
-                .arg(match[frameno - 1] ? "logo        " : "     no-logo")
-                .arg(low, 4).arg(high, 4).arg(frameno - startframe, 5));
-
         low = score;
         high = score;
         startframe = frameno;
+        return 0;
+    }
 
-        if (debug_frames)
-        {
-            VideoFrame          *frame;
-            const AVPicture     *pgm;
-            const AVPicture     *edges;
-            int                 pgmwidth, pgmheight;
+    if (match[frameno - 1] == match[frameno])
+    {
+        if (score < low)
+            low = score;
+        if (score > high)
+            high = score;
+        return 0;
+    }
 
-            frame = nvp->GetRawVideoFrame(frameno);
+    VERBOSE(VB_COMMFLAG, QString("Frame %1-%2: %3 L-H: %4-%5 (%6)")
+            .arg(startframe, 6).arg(frameno - 1, 6)
+            .arg(match[frameno - 1] ? "logo        " : "     no-logo")
+            .arg(low, 4).arg(high, 4).arg(frameno - startframe, 5));
 
-            if (!(pgm = pgmConverter->getImage(frame, frameno,
-                            &pgmwidth, &pgmheight)))
-                continue;
+    low = score;
+    high = score;
+    startframe = frameno;
 
-            if (pgm_crop(cropped, pgm, pgmheight, tmplrow, tmplcol,
-                        tmplwidth, tmplheight))
-                continue;
+    if (debug_frames)
+    {
+        if (pgm_overlay(overlay, pgm, pgmheight, tmplrow, tmplcol,
+                    edges, tmplheight))
+            return -1;
 
-            if (!(edges = edgeDetector->detectEdges(cropped, tmplheight,
-                            FRAMESGMPCTILE)))
-                continue;
+        QString base, fullbase;
+        base.sprintf("%s/tm-%05lld-%d", debugdir.ascii(), frameno, score);
 
-            QString basefilename;
-            basefilename.sprintf("%s/tm-%05lld-%d",
-                    debugdir.ascii(), frameno, score);
-            QFile tfile;
+        fullbase = base;
+        if (!match[frameno])
+            fullbase += "-c";
 
-            /* Compose template over frame. Write out and convert to JPG. */
+        if (writeJPG(fullbase, overlay, pgmheight))
+            return -1;
+        if (writeJPG(base + "-edges", edges, tmplheight))
+            return -1;
 
-            QString basename = basefilename;
-            if (!match[frameno])
-                basename += "-c";
-
-            QString jpgfilename(basename + ".jpg");
-            QFileInfo jpgfi(jpgfilename);
-            QFile pgmfile(basename + ".pgm");
-
-            QString edgefilename(basefilename + "-edges.jpg");
-            QFileInfo jpgedges(edgefilename);
-            QFile pgmedges(basefilename + "-edges.pgm");
-
-            if (pgm_overlay(overlay, pgm, height, tmplrow, tmplcol,
-                        edges, tmplheight))
-                continue;
-
-            if (!jpgfi.exists())
-            {
-                if (!pgmfile.exists() && pgm_write(overlay->data[0],
-                            width, height, pgmfile.name().ascii()))
-                    continue;
-                if (myth_system(QString(
-                                "convert -quality 50 -resize 192x144 %1 %2")
-                            .arg(pgmfile.name()).arg(jpgfi.filePath())))
-                    continue;
-            }
-
-            if (!jpgedges.exists())
-            {
-                if (!pgmedges.exists() && pgm_write(edges->data[0],
-                            tmplwidth, tmplheight, pgmedges.name().ascii()))
-                    continue;
-                if (myth_system(QString(
-                                "convert -quality 50 -resize 192x144 %1 %2")
-                            .arg(pgmedges.name()).arg(jpgedges.filePath())))
-                    continue;
-            }
-
-            /* Delete any existing PGM files to save disk space. */
-            tfile.setName(basefilename + ".pgm");
-            if (tfile.exists() && !tfile.remove())
-            {
-                VERBOSE(VB_COMMFLAG, QString("Error removing %1 (%2)")
-                        .arg(tfile.name()).arg(strerror(errno)));
-                continue;
-            }
-            tfile.setName(basefilename + "-c.pgm");
-            if (tfile.exists() && !tfile.remove())
-            {
-                VERBOSE(VB_COMMFLAG, QString("Error removing %1 (%2)")
-                        .arg(tfile.name()).arg(strerror(errno)));
-                continue;
-            }
-            tfile.setName(basefilename + "-edges.pgm");
-            if (tfile.exists() && !tfile.remove())
-            {
-                VERBOSE(VB_COMMFLAG, QString("Error removing %1 (%2)")
-                        .arg(tfile.name()).arg(strerror(errno)));
-                continue;
-            }
-        }
+        if (analyzeFrameDebugCleanup(base + ".pgm"))
+            return -1;
+        if (analyzeFrameDebugCleanup(base + "-c.pgm"))
+            return -1;
+        if (analyzeFrameDebugCleanup(base + "-edges.pgm"))
+            return -1;
     }
 
     return 0;
@@ -366,7 +330,7 @@ TemplateMatcher::nuppelVideoPlayerInited(NuppelVideoPlayer *_nvp,
      * identification of template-matching frames when the scene just happens
      * to have lots of edges in the same region of the frame.
      */
-    const float     MINMATCHPCT = 0.559670;
+    const float     MINMATCHPCT = 0.459670;
 
     const int       width = _nvp->GetVideoWidth();
     const int       height = _nvp->GetVideoHeight();
@@ -422,7 +386,7 @@ TemplateMatcher::nuppelVideoPlayerInited(NuppelVideoPlayer *_nvp,
 
     if (debug_matches)
     {
-        if (readMatches(debugdata, matches, nframes))
+        if (readMatches(debugdata, matches, match, nframes, mintmpledges))
         {
             VERBOSE(VB_COMMFLAG, QString(
                         "TemplateMatcher::nuppelVideoPlayerInited read %1")
@@ -462,7 +426,7 @@ TemplateMatcher::analyzeFrame(const VideoFrame *frame, long long frameno,
      * non-template edges can be picked up and cause false identification of
      * matches.
      */
-    const int           FRAMESGMPCTILE = 70;    /* sync with finishedDebug */
+    const int           FRAMESGMPCTILE = 70;
 
     /*
      * TUNABLE:
@@ -505,6 +469,16 @@ TemplateMatcher::analyzeFrame(const VideoFrame *frame, long long frameno,
     if (pgm_match(tmpl, edges, tmplheight, JITTER_RADIUS, &matches[frameno]))
         goto error;
 
+    match[frameno] = matches[frameno] >= mintmpledges ? 1 : 0;
+
+    if (debugLevel >= 2)
+    {
+        if (analyzeFrameDebug(frameno, matches, match, &overlay, pgm, pgmheight,
+                    edges, tmplrow, tmplcol, tmplwidth, tmplheight,
+                    debug_frames, debugdir))
+            goto error;
+    }
+
     (void)gettimeofday(&end, NULL);
     timersub(&end, &start, &elapsed);
     timeradd(&analyze_time, &elapsed, &analyze_time);
@@ -546,20 +520,7 @@ TemplateMatcher::finished(long long nframes, bool final)
         }
     }
 
-    VERBOSE(VB_COMMFLAG, QString("TemplateMatcher::finished(%1)")
-            .arg(nframes));
-
-    for (long long ii = 0; ii < nframes; ii++)
-        match[ii] = matches[ii] >= mintmpledges ? 1 : 0;
-
-    if (debugLevel >= 2)
-    {
-        if (final && finishedDebug(pgmConverter, edgeDetector, nvp,
-                    nframes, match, matches, &overlay, &cropped,
-                    tmplrow, tmplcol, tmplwidth, tmplheight, debug_frames,
-                    debugdir))
-            goto error;
-    }
+    VERBOSE(VB_COMMFLAG, QString("TemplateMatcher::finished(%1)").arg(nframes));
 
     /*
      * Construct breaks.
@@ -646,9 +607,6 @@ TemplateMatcher::finished(long long nframes, bool final)
     frameAnalyzerReportMap(&breakMap, fps, "TM Break");
 
     return 0;
-
-error:
-    return -1;
 }
 
 int

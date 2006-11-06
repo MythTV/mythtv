@@ -19,6 +19,33 @@ using namespace commDetector2;
 namespace {
 
 int
+writeJPG(QString prefix, const AVPicture *img, int imgheight)
+{
+    const int imgwidth = img->linesize[0];
+    QFileInfo jpgfi(prefix + ".jpg");
+    if (!jpgfi.exists())
+    {
+        QFile pgmfile(prefix + ".pgm");
+        if (!pgmfile.exists() && pgm_write(img->data[0], imgwidth, imgheight,
+                    pgmfile.name().ascii()))
+            return -1;
+
+        if (myth_system(QString("convert -quality 50 -resize 192x144 %1 %2")
+                    .arg(pgmfile.name()).arg(jpgfi.filePath())))
+            return -1;
+
+        if (!pgmfile.remove())
+        {
+            VERBOSE(VB_COMMFLAG, QString(
+                        "TemplateFinder.writeJPG error removing %1 (%2)")
+                    .arg(pgmfile.name()).arg(strerror(errno)));
+            return -1;
+        }
+    }
+    return 0;
+}
+
+int
 pgm_scorepixels(unsigned int *scores, int width, int row, int col,
         const AVPicture *src, int srcheight)
 {
@@ -322,25 +349,26 @@ template_alloc(const unsigned int *scores, int width, int height,
 
     if (debug_edgecounts)
     {
-        QString convertfmt("convert -quality 50 -resize 192x144 %1 %2");
-        QString base, pgmfile, jpgfile;
-        QFile tfile;
-
-        base = debugdir + "/tf-edgecounts";
-        pgmfile = base + ".pgm";
-        jpgfile = base + ".jpg";
-        if (pgm_write(thresh.data[0], width, height, pgmfile.ascii()))
-            goto free_thresh;
-        if (myth_system(convertfmt.arg(pgmfile).arg(jpgfile)))
-            goto free_thresh;
-        tfile.setName(pgmfile);
-        if (!tfile.remove())
+        /* Scores, rescaled to [0..UCHAR_MAX]. */
+        AVPicture scored;
+        if (avpicture_alloc(&scored, PIX_FMT_GRAY8, width, height))
         {
-            VERBOSE(VB_COMMFLAG, QString(
-                        "template_alloc error removing %1 (%2)")
-                    .arg(tfile.name()).arg(strerror(errno)));
+            VERBOSE(VB_COMMFLAG, QString("template_alloc "
+                    "avpicture_alloc scored (%1x%2) failed")
+                    .arg(width).arg(height));
             goto free_thresh;
         }
+        unsigned int maxscore = sortedscores[nn - 1];
+        for (ii = 0; ii < nn; ii++)
+            scored.data[0][ii] = scores[ii] * UCHAR_MAX / maxscore;
+        int error = writeJPG(debugdir + "/tf-scores", &scored, height);
+        avpicture_free(&scored);
+        if (error)
+            goto free_thresh;
+
+        /* Thresholded scores. */
+        if (writeJPG(debugdir + "/tf-edgecounts", &thresh, height))
+            goto free_thresh;
     }
 
     /* Crop to a minimal bounding box. */
@@ -381,14 +409,12 @@ free_thresh:
 }
 
 int
-analyzeFrameDebug(const VideoFrame *frame, long long frameno,
-        const AVPicture *pgm, int pgmheight,
+analyzeFrameDebug(long long frameno, const AVPicture *pgm, int pgmheight,
         const AVPicture *cropped, const AVPicture *edges, int cropheight,
         int croprow, int cropcol, bool debug_frames, QString debugdir)
 {
     static const int    delta = 24;
     static int          lastrow, lastcol, lastwidth, lastheight;
-    const int           pgmwidth = pgm->linesize[0];
     const int           cropwidth = cropped->linesize[0];
     int                 rowsame, colsame, widthsame, heightsame;
 
@@ -412,70 +438,20 @@ analyzeFrameDebug(const VideoFrame *frame, long long frameno,
 
     if (debug_frames)
     {
-        QString convertfmt("convert -quality 50 -resize 192x144 %1 %2");
-        QString base, pgmfile, jpgfile, yfile;
-        QFile tfile;
+        QString base;
         base.sprintf("%s/tf-%05lld", debugdir.ascii(), frameno);
 
-        pgmfile = base + ".pgm";
-        jpgfile = base + ".jpg";
-        if (pgm_write(pgm->data[0], pgmwidth, pgmheight, pgmfile.ascii()))
+        /* PGM greyscale image of frame. */
+        if (writeJPG(base, pgm, pgmheight))
             goto error;
-        if (myth_system(convertfmt.arg(pgmfile).arg(jpgfile)))
-            goto error;
-        tfile.setName(pgmfile);
-        if (!tfile.remove())
-        {
-            VERBOSE(VB_COMMFLAG, QString("TemplateFinder.analyzeFrameDebug"
-                        " error removing %1 (%2)")
-                    .arg(tfile.name()).arg(strerror(errno)));
-            goto error;
-        }
 
-        pgmfile = base + "-cropped.pgm";
-        jpgfile = base + "-cropped.jpg";
-        if (pgm_write(cropped->data[0], cropwidth, cropheight, pgmfile.ascii()))
+        /* Cropped template area of frame. */
+        if (writeJPG(base + "-cropped", cropped, cropheight))
             goto error;
-        if (myth_system(convertfmt.arg(pgmfile).arg(jpgfile)))
-            goto error;
-        tfile.setName(pgmfile);
-        if (!tfile.remove())
-        {
-            VERBOSE(VB_COMMFLAG, QString("TemplateFinder.analyzeFrameDebug"
-                        " error removing %1 (%2)")
-                    .arg(tfile.name()).arg(strerror(errno)));
-            goto error;
-        }
 
-        pgmfile = base + "-edges.pgm";
-        jpgfile = base + "-edges.jpg";
-        if (pgm_write(edges->data[0], cropwidth, cropheight, pgmfile.ascii()))
+        /* Edges of cropped template area of frame. */
+        if (writeJPG(base + "-edges", edges, cropheight))
             goto error;
-        if (myth_system(convertfmt.arg(pgmfile).arg(jpgfile)))
-            goto error;
-        tfile.setName(pgmfile);
-        if (!tfile.remove())
-        {
-            VERBOSE(VB_COMMFLAG, QString("TemplateFinder.analyzeFrameDebug"
-                        " error removing %1 (%2)")
-                    .arg(tfile.name()).arg(strerror(errno)));
-            goto error;
-        }
-
-        pgmfile = base + "-y.pgm";
-        jpgfile = base + "-y.jpg";
-        if (pgm_write(frame->buf, pgmwidth, pgmheight, pgmfile.ascii()))
-            goto error;
-        if (myth_system(convertfmt.arg(pgmfile).arg(jpgfile)))
-            goto error;
-        tfile.setName(pgmfile);
-        if (!tfile.remove())
-        {
-            VERBOSE(VB_COMMFLAG, QString("TemplateFinder.analyzeFrameDebug"
-                        " error removing %1 (%2)")
-                    .arg(tfile.name()).arg(strerror(errno)));
-            goto error;
-        }
     }
 
     return 0;
@@ -817,9 +793,8 @@ TemplateFinder::analyzeFrame(const VideoFrame *frame, long long frameno,
 
         if (debugLevel >= 2)
         {
-            if (analyzeFrameDebug(frame, frameno, pgm, pgmheight,
-                        &cropped, edges, cropheight, croprow, cropcol,
-                        debug_frames, debugdir))
+            if (analyzeFrameDebug(frameno, pgm, pgmheight, &cropped, edges,
+                        cropheight, croprow, cropcol, debug_frames, debugdir))
                 goto error;
         }
 

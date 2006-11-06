@@ -533,8 +533,8 @@ bool CommDetector2::go(void)
 
     nvp->SetCaptionsEnabled(false);
 
-    QTime flagTime;
-    flagTime.start();
+    QTime totalFlagTime;
+    totalFlagTime.start();
     
     /* If still recording, estimate the eventual total number of frames. */
     long long nframes = isRecording ?
@@ -581,23 +581,24 @@ bool CommDetector2::go(void)
         long long nextFrame = -1;
         currentFrameNumber = 0;
         long long lastLoggedFrame = currentFrameNumber;
-        QTime clock;
+        QTime passTime, clock;
         struct timeval getframetime;
 
         if (searchingForLogo(logoFinder, &(*currentPass)))
             emit statusUpdate("Performing Logo Identification");
 
         clock.start();
+        passTime.start();
         memset(&getframetime, 0, sizeof(getframetime));
         while (!(*currentPass).isEmpty() && !nvp->GetEof())
         {
-            struct timeval start, end, elapsed;
+            struct timeval start, end, elapsedtv;
 
             (void)gettimeofday(&start, NULL);
             VideoFrame *currentFrame = nvp->GetRawVideoFrame(nextFrame);
             (void)gettimeofday(&end, NULL);
-            timersub(&end, &start, &elapsed);
-            timeradd(&getframetime, &elapsed, &getframetime);
+            timersub(&end, &start, &elapsedtv);
+            timeradd(&getframetime, &elapsedtv, &getframetime);
 
             if (stopForBreath(isRecording, currentFrameNumber))
             {
@@ -619,7 +620,7 @@ bool CommDetector2::go(void)
                     needToReportState(showProgress, isRecording,
                         currentFrameNumber))
             {
-                reportState(flagTime.elapsed(), currentFrameNumber,
+                reportState(passTime.elapsed(), currentFrameNumber,
                         nframes, passno, npasses);
             }
 
@@ -647,7 +648,7 @@ bool CommDetector2::go(void)
             {
                 waitForBuffer(&start, minlag,
                         recstartts.secsTo(QDateTime::currentDateTime()) -
-                        flagTime.elapsed() / 1000, nvp->GetFrameRate(),
+                        totalFlagTime.elapsed() / 1000, nvp->GetFrameRate(),
                         fullSpeed);
             }
 
