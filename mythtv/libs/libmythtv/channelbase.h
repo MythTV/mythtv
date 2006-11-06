@@ -1,23 +1,15 @@
 #ifndef CHANNELBASE_H
 #define CHANNELBASE_H
 
-// C++ headers
-#include <vector>
-
 // Qt headers
 #include <qmap.h>
-#include <qstring.h>
-#include <qsqldatabase.h>
+#include <qstringlist.h>
 
 // MythTV headers
 #include "channelutil.h"
-#include "frequencies.h"
 #include "tv.h"
 
 class TVRec;
-
-typedef std::pair<uint,uint> pid_cache_item_t;
-typedef std::vector<pid_cache_item_t> pid_cache_t;
 
 class InputBase
 {
@@ -141,32 +133,6 @@ class ChannelBase
 
     bool CheckChannel(const QString &channum, QString& inputName) const;
 
-    // MPEG stuff
-    /** \brief Returns cached MPEG PIDs for last tuned channel.
-     *  \param pid_cache List of PIDs with their TableID
-     *                   types is returned in pid_cache. */
-    virtual void GetCachedPids(pid_cache_t &pid_cache) const
-        { (void) pid_cache; }
-    /// \brief Saves MPEG PIDs to cache to database
-    /// \param pid_cache List of PIDs with their TableID types to be saved.
-    virtual void SaveCachedPids(const pid_cache_t &pid_cache) const
-        { (void) pid_cache; }
-    /// \brief Returns program number in PAT, -1 if unknown.
-    virtual int GetProgramNumber(void) const
-        { return currentProgramNum; };
-    /// \brief Returns major channel, 0 if unknown.
-    virtual uint GetMajorChannel(void) const
-        { return currentATSCMajorChannel; };
-    /// \brief Returns minor channel, 0 if unknown.
-    virtual uint GetMinorChannel(void) const
-        { return currentATSCMinorChannel; };
-    /// \brief Returns DVB original_network_id, 0 if unknown.
-    virtual uint GetOriginalNetworkID(void) const
-        { return currentOriginalNetworkID; };
-    /// \brief Returns DVB transport_stream_id, 0 if unknown.
-    virtual uint GetTransportID(void) const
-        { return currentTransportID; };
-
     // \brief Set cardid for scanning
     void SetCardID(uint _cardid) { cardid = _cardid; }
 
@@ -177,9 +143,6 @@ class ChannelBase
 
     virtual int GetCardID(void) const;
     virtual bool ChangeExternalChannel(const QString &newchan);
-    virtual void SetCachedATSCInfo(const QString &chan);
-    static void GetCachedPids(int chanid, pid_cache_t&);
-    static void SaveCachedPids(int chanid, const pid_cache_t&);
     static void StoreInputChannels(const InputMap&);
 
     TVRec   *pParent;
@@ -189,12 +152,6 @@ class ChannelBase
     uint     cardid;
     InputMap inputs;
     DBChanList allchannels; ///< channels across all inputs
-
-    int     currentProgramNum;
-    uint    currentATSCMajorChannel;
-    uint    currentATSCMinorChannel;
-    uint    currentTransportID;
-    uint    currentOriginalNetworkID;
 };
 
 #endif

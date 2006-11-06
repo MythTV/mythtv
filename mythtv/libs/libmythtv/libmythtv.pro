@@ -314,9 +314,9 @@ using_frontend {
 
 using_backend {
     # Channel stuff
-    HEADERS += channelbase.h
+    HEADERS += channelbase.h               dtvchannel.h
     HEADERS += signalmonitor.h             dtvsignalmonitor.h
-    SOURCES += channelbase.cpp
+    SOURCES += channelbase.cpp             dtvchannel.h
     SOURCES += signalmonitor.cpp           dtvsignalmonitor.cpp
 
     # Channel scanner stuff

@@ -7,14 +7,14 @@
 #ifndef _IPTV_CHANNEL_H_
 #define _IPTV_CHANNEL_H_
 
-#include "channelbase.h"
+#include "dtvchannel.h"
 #include "iptvchannelinfo.h"
 
 #include <qmutex.h>
 
 class IPTVFeederWrapper;
 
-class IPTVChannel : public ChannelBase
+class IPTVChannel : public DTVChannel
 {
   public:
     IPTVChannel(TVRec *parent, const QString &videodev);
@@ -28,6 +28,8 @@ class IPTVChannel : public ChannelBase
     bool SwitchToInput(const QString &inputname, const QString &channum);
     bool SwitchToInput(int inputNum, bool setstarting);
     bool SetChannelByString(const QString &channum);
+    bool TuneMultiplex(uint /*mplexid*/, QString /*sourceid*/)
+        { return false; } // TODO
 
     IPTVChannelInfo GetCurrentChanInfo(void) const
         { return GetChanInfo(curchannelname); }

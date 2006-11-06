@@ -30,7 +30,7 @@ using namespace std;
 #define LOC_ERR QString("HDHRChan(%1), Error: ").arg(GetDevice())
 
 HDHRChannel::HDHRChannel(TVRec *parent, const QString &device, uint tuner)
-    : ChannelBase(parent),      _control_socket(NULL),
+    : DTVChannel(parent),       _control_socket(NULL),
       _device_id(0),            _device_ip(0),
       _tuner(tuner),            _lock(true)
 {
@@ -411,45 +411,25 @@ bool HDHRChannel::SetChannelByString(const QString &channum)
     return true;
 }
 
-bool HDHRChannel::TuneMultiplex(uint mplexid)
+// documented in dtvchannel.h
+bool HDHRChannel::TuneMultiplex(uint mplexid, QString inputname)
 {
     VERBOSE(VB_CHANNEL, LOC + QString("TuneMultiplex(%1)").arg(mplexid));
 
-    MSqlQuery query(MSqlQuery::InitCon());
+    QString  modulation;
+    uint64_t frequency;
+    uint     transportid;
+    uint     dvb_networkid;
 
-    int cardid = GetCardID();
-    if (cardid < 0)
-        return false;
-
-    // Query for our tuning params
-    QString thequery(
-        "SELECT frequency, inputname, modulation "
-        "FROM dtv_multiplex, cardinput, capturecard "
-        "WHERE dtv_multiplex.sourceid = cardinput.sourceid AND "
-        "      cardinput.cardid = capturecard.cardid AND ");
-
-    thequery += QString("mplexid = '%1' AND cardinput.cardid = '%2'")
-        .arg(mplexid).arg(cardid);
-
-    query.prepare(thequery);
-    if (!query.exec() || !query.isActive())
-    {
-        MythContext::DBError(
-            LOC + QString("TuneMultiplex(): Error, could not find tuning "
-                          "parameters for transport %1.").arg(mplexid),query);
-        return false;
-    }
-    if (!query.next())
+    if (!ChannelUtil::GetTuningParams(mplexid, modulation, frequency,
+                                      transportid, dvb_networkid))
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR + "TuneMultiplex(): " +
-                QString("Could not find tuning parameters for transport %1.")
+                QString("Could not find tuning parameters for multiplex %1.")
                 .arg(mplexid));
+
         return false;
     }
-
-    uint    frequency  = query.value(0).toInt();
-    QString inputname  = query.value(1).toString();
-    QString modulation = query.value(2).toString();
 
     if (!Tune(frequency, inputname, modulation))
         return false;

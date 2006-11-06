@@ -13,13 +13,8 @@
 #include "scheduledrecording.h"
 #include "frequencies.h"
 #include "mythdbcon.h"
-#include "channelbase.h"
 #include "channelutil.h"
 #include "cardutil.h"
-
-#ifdef USING_V4L
-#include "channel.h"
-#endif // USING_V4L
 
 // MythTV includes - DTV
 #include "dtvsignalmonitor.h"
@@ -37,9 +32,8 @@
 #include "dvbtypes.h"
 #endif // USING_DVB
 
-#ifdef USING_HDHOMERUN
 #include "hdhrchannel.h"
-#endif // USING_HDHOMERUN
+#include "channel.h"
 
 QString SIScan::loc(const SIScan *siscan)
 {
@@ -475,6 +469,15 @@ DVBSignalMonitor* SIScan::GetDVBSignalMonitor(void)
 #endif
 }
 
+DTVChannel *SIScan::GetDTVChannel(void)
+{
+#ifdef USING_DVB
+    return dynamic_cast<DTVChannel*>(channel);
+#else
+    return NULL;
+#endif
+}
+
 DVBChannel *SIScan::GetDVBChannel(void)
 {
 #ifdef USING_DVB
@@ -625,55 +628,46 @@ bool SIScan::Tune(const transport_scan_items_it_t transport)
 {
     const TransportScanItem &item = *transport;
     const uint freq = item.freq_offset(transport.offset());
-    bool ok = false;
 
 #ifdef USING_DVB
-    // Tune to multiplex
-    if (GetDVBChannel())
+    if (GetDVBSignalMonitor())
     {
         // always wait for rotor to finish
         GetDVBSignalMonitor()->AddFlags(kDVBSigMon_WaitForPos);
         GetDVBSignalMonitor()->SetRotorTarget(1.0f);
+    }
+#endif // USING_DVB
 
-        if (item.mplexid > 0)
-        {
-            ok = GetDVBChannel()->TuneMultiplex(item.mplexid, item.SourceID);
-        }
-        else
-        {
-            DVBTuning tuning = item.tuning;
-            tuning.params.frequency = freq;
-            ok = GetDVBChannel()->Tune(tuning, true, item.SourceID);
-        }
+    // TODO we should actually use the input the user specifies...
+    QString inputname = ChannelUtil::GetInputName(item.SourceID);
+
+    if (GetDTVChannel() && (item.mplexid > 0))
+    {
+        return GetDTVChannel()->TuneMultiplex(item.mplexid, inputname);
+    }
+
+    bool ok = false;
+#ifdef USING_DVB
+    if (GetDVBChannel())
+    {
+        DVBTuning tuning = item.tuning;
+        tuning.params.frequency = freq;
+        ok = GetDVBChannel()->Tune(tuning, true, item.SourceID);
     }
 #endif // USING_DVB
 
 #ifdef USING_V4L
     if (GetChannel())
     {
-        if (item.mplexid > 0)
-            ok = GetChannel()->TuneMultiplex(item.mplexid);
-        else 
-        {
-            const uint freq_vis = freq - 1750000; // to visual carrier
-            QString inputname = ChannelUtil::GetInputName(item.SourceID);
-            ok = GetChannel()->Tune(freq_vis, inputname,
-                                    item.ModulationDB());
-        }
+        const uint freq_vis = freq - 1750000; // to visual carrier
+        ok = GetChannel()->Tune(freq_vis, inputname, item.ModulationDB());
     }
 #endif // USING_V4L
 
 #ifdef USING_HDHOMERUN
     if (GetHDHRChannel())
     {
-        if (item.mplexid > 0)
-            ok = GetHDHRChannel()->TuneMultiplex(item.mplexid);
-        else 
-        {
-            QString inputname = ChannelUtil::GetInputName(item.SourceID);
-            ok = GetHDHRChannel()->Tune(freq, inputname,
-                                        item.ModulationDB());
-        }        
+        ok = GetHDHRChannel()->Tune(freq, inputname, item.ModulationDB());
     }
 #endif // USING_HDHOMERUN
 

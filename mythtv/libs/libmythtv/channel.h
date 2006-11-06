@@ -1,7 +1,9 @@
+// -*- Mode: c++ -*-
+
 #ifndef CHANNEL_H
 #define CHANNEL_H
 
-#include "channelbase.h"
+#include "dtvchannel.h"
 #include "videodev_myth.h" // needed for v4l2_std_id type
 
 using namespace std;
@@ -13,9 +15,17 @@ class TVRec;
 typedef QMap<int,int>         VidModV4L1;
 typedef QMap<int,v4l2_std_id> VidModV4L2;
 
-// Implements tuning for analog TV cards (both software and hardware encoding)
-// using the V4L driver API
-class Channel : public ChannelBase
+/** \class Channel
+ *  \brief Implements tuning for TV cards using the V4L driver API,
+ *         both versions 1 and 2.
+ *
+ *   This class supports a wide range of tuning hardware including
+ *   frame grabbers (whose output requires encoding), hardware encoders,
+ *   digital cameras, and non-encoding hardware which simply records
+ *   pre-encoded broadcast streams.
+ *
+ */
+class Channel : public DTVChannel
 {
  public:
     Channel(TVRec *parent, const QString &videodevice);
@@ -50,7 +60,7 @@ class Channel : public ChannelBase
     void GetCachedPids(pid_cache_t&) const;
 
     // ATSC scanning stuff
-    bool TuneMultiplex(uint mplexid);
+    bool TuneMultiplex(uint mplexid, QString inputname);
     bool Tune(uint frequency, QString inputname="",
               QString modulation="analog");
     // V4L scanning stuff

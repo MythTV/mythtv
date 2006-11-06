@@ -14,7 +14,7 @@
 
 #include "mythcontext.h"
 #include "mythdbcon.h"
-#include "channelbase.h"
+#include "dtvchannel.h"
 #include "streamlisteners.h"
 #include "diseqc.h"
 
@@ -32,7 +32,7 @@ class TVRec;
 class DVBCam;
 class DVBRecorder;
 
-class DVBChannel : public ChannelBase
+class DVBChannel : public DTVChannel
 {
   public:
     DVBChannel(int cardnum, TVRec *parent = NULL);
@@ -70,7 +70,7 @@ class DVBChannel : public ChannelBase
               bool force_reset = false,
               uint sourceid    = 0,
               bool same_input  = false);
-    bool TuneMultiplex(uint mplexid, uint sourceid = 0);
+    bool TuneMultiplex(uint mplexid, QString inputname);
     bool Retune(void);
 
     bool GetTuningParams(DVBTuning &tuning) const;

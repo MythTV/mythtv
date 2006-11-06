@@ -19,7 +19,7 @@
 
 IPTVChannel::IPTVChannel(TVRec         *parent,
                          const QString &videodev)
-    : ChannelBase(parent),
+    : DTVChannel(parent),
       m_videodev(QDeepCopy<QString>(videodev)),
       m_feeder(new IPTVFeederWrapper()),
       m_lock(true)

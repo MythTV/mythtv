@@ -1,4 +1,4 @@
-/**
+/** -*- Mode: c++ -*-
  *  Dbox2Channel
  *  Copyright (c) 2006 by Silicondust Engineering Ltd.
  *  Distributed as part of MythTV under GPL v2 and later.
@@ -7,13 +7,13 @@
 #ifndef HDHOMERUNCHANNEL_H
 #define HDHOMERUNCHANNEL_H
 
+// Qt headers
 #include <qstring.h>
 
-#include "mythcontext.h"
-#include "mythdbcon.h"
-#include "channelbase.h"
-#include "hdhrsignalmonitor.h"
+// MythTV headers
+#include "dtvchannel.h"
 
+// HDHomeRun headers
 #include "hdhomerun/hdhomerun_pkt.h"
 #include "hdhomerun/hdhomerun_discover.h"
 #include "hdhomerun/hdhomerun_control.h"
@@ -21,7 +21,7 @@
 
 typedef struct hdhomerun_control_sock_t hdhr_socket_t;
 
-class HDHRChannel : public ChannelBase
+class HDHRChannel : public DTVChannel
 {
     friend class HDHRSignalMonitor;
     friend class HDHRRecorder;
@@ -52,7 +52,7 @@ class HDHRChannel : public ChannelBase
     bool UpdateFilters(void);
 
     // ATSC scanning stuff
-    bool TuneMultiplex(uint mplexid);
+    bool TuneMultiplex(uint mplexid, QString inputname);
     bool Tune(uint frequency, QString inputname = "",
               QString modulation = "8vsb");
 

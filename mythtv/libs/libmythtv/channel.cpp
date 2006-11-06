@@ -43,7 +43,7 @@ static QString mode_to_format(int mode, int v4l_version);
  */
 
 Channel::Channel(TVRec *parent, const QString &videodevice)
-    : ChannelBase(parent),
+    : DTVChannel(parent),
       device(videodevice),          videofd(-1),
       device_name(QString::null),   driver_name(QString::null),
       curList(NULL),                totalChannels(0),
@@ -365,15 +365,15 @@ int Channel::GetCurrentChannelNum(const QString &channame)
 void Channel::SaveCachedPids(const pid_cache_t &pid_cache) const
 {
     int chanid = GetChanID();
-    if (chanid >= 0)
-        ChannelBase::SaveCachedPids(chanid, pid_cache);
+    if (chanid > 0)
+        DTVChannel::SaveCachedPids(chanid, pid_cache);
 }
 
 void Channel::GetCachedPids(pid_cache_t &pid_cache) const
 {
     int chanid = GetChanID();
-    if (chanid >= 0)
-        ChannelBase::GetCachedPids(chanid, pid_cache);
+    if (chanid > 0)
+        DTVChannel::GetCachedPids(chanid, pid_cache);
 }
 
 bool Channel::SetChannelByDirection(ChannelChangeDirection dir)
@@ -718,54 +718,25 @@ bool Channel::IsTuned() const
     }
 }
 
-/** \fn Channel::TuneMultiplex(uint mplexid)
- *  \brief To be used by the siscan
- *
- *   mplexid is how the db indexes each transport
- */
-bool Channel::TuneMultiplex(uint mplexid)
+// documented in dtvchannel.h
+bool Channel::TuneMultiplex(uint mplexid, QString inputname)
 {
-    VERBOSE(VB_CHANNEL, QString("Channel(%1)::TuneMultiplex(%2)")
-            .arg(device).arg(mplexid));
+    VERBOSE(VB_CHANNEL, LOC + QString("TuneMultiplex(%1)").arg(mplexid));
 
-    MSqlQuery query(MSqlQuery::InitCon());
+    QString  modulation;
+    uint64_t frequency;
+    uint     transportid;
+    uint     dvb_networkid;
 
-    int cardid = GetCardID();
-    if (cardid < 0)
-        return false;
-
-    // Query for our tuning params
-    QString thequery(
-        "SELECT frequency, inputname, modulation "
-        "FROM dtv_multiplex, cardinput, capturecard "
-        "WHERE dtv_multiplex.sourceid = cardinput.sourceid AND "
-        "      cardinput.cardid = capturecard.cardid AND ");
-
-    thequery += QString("mplexid = '%1' AND cardinput.cardid = '%2'")
-        .arg(mplexid).arg(cardid);
-
-    query.prepare(thequery);
-    if (!query.exec() || !query.isActive())
+    if (!ChannelUtil::GetTuningParams(mplexid, modulation, frequency,
+                                      transportid, dvb_networkid))
     {
-        MythContext::DBError(
-            QString("Channel(%1)::TuneMultiplex(): Error, could not find "
-                    "tuning parameters for transport %1.")
-            .arg(device).arg(mplexid), query);
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "TuneMultiplex(): " +
+                QString("Could not find tuning parameters for multiplex %1.")
+                .arg(mplexid));
+
         return false;
     }
-    if (query.size() <= 0)
-    {
-        VERBOSE(VB_IMPORTANT, QString(
-                    "Channel(%1)::TuneMultiplex(): Error, could not find "
-                    "tuning parameters for transport %1.")
-                .arg(device).arg(mplexid));
-        return false;
-    }
-    query.next();
-
-    uint    frequency  = query.value(0).toInt();
-    QString inputname  = query.value(1).toString();
-    QString modulation = query.value(2).toString();
 
     if (!Tune(frequency, inputname, modulation))
         return false;

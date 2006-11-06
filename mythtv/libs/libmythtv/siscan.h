@@ -19,6 +19,7 @@
 class MSqlQuery;
 
 class ChannelBase;
+class DTVChannel;
 class Channel;
 class DVBChannel;
 class HDHRChannel;
@@ -104,6 +105,7 @@ class SIScan : public QObject,
 
   private:
     // some useful gets
+    DTVChannel       *GetDTVChannel(void);
     Channel          *GetChannel(void);
     DVBChannel       *GetDVBChannel(void);
     HDHRChannel      *GetHDHRChannel(void);

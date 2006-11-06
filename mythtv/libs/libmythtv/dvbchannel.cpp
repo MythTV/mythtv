@@ -72,7 +72,7 @@ static bool wait_for_backend(int fd, int timeout_ms);
  *  \bug Only supports single input cards.
  */
 DVBChannel::DVBChannel(int aCardNum, TVRec *parent)
-    : ChannelBase(parent),
+    : DTVChannel(parent),
       // Helper classes
       diseqc_tree(NULL),            dvbcam(NULL),
       // Tuning
@@ -205,18 +205,18 @@ bool DVBChannel::Open()
     return (fd_frontend >= 0);
 }
 
-/** \fn DVBChannel::TuneMultiplex(uint mplexid, uint sourceid)
- *  \brief To be used by setup sdt/nit scanner and eit parser.
- *
- *   mplexid is how the db indexes each transport
- */
-bool DVBChannel::TuneMultiplex(uint mplexid, uint sourceid)
+// documented in dtvchannel.h
+bool DVBChannel::TuneMultiplex(uint mplexid, QString inputname)
 {
     DVBTuning tuning;
     if (!tuning.FillFromDB(info.type, mplexid))
         return false;
 
     CheckOptions(tuning);
+
+    // TODO Tune() should actually use the specified input,
+    //      not the first input with the same sourceid.
+    uint sourceid = ChanUtil::GetSourceID(cardid, inputname);
 
     if (!Tune(tuning, false, sourceid))
         return false;
@@ -764,15 +764,15 @@ int DVBChannel::GetChanID() const
 void DVBChannel::SaveCachedPids(const pid_cache_t &pid_cache) const
 {
     int chanid = GetChanID();
-    if (chanid >= 0)
-        ChannelBase::SaveCachedPids(chanid, pid_cache);
+    if (chanid > 0)
+        DTVChannel::SaveCachedPids(chanid, pid_cache);
 }
 
 void DVBChannel::GetCachedPids(pid_cache_t &pid_cache) const
 {
     int chanid = GetChanID();
-    if (chanid >= 0)
-        ChannelBase::GetCachedPids(chanid, pid_cache);
+    if (chanid > 0)
+        DTVChannel::GetCachedPids(chanid, pid_cache);
 }
 
 const DiSEqCDevRotor *DVBChannel::GetRotor(void) const

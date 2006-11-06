@@ -42,6 +42,7 @@ using namespace std;
 #include "channelutil.h"
 #include "channelbase.h"
 #include "dummychannel.h"
+#include "dtvchannel.h"
 #include "dvbchannel.h"
 #include "dbox2channel.h"
 #include "hdhrchannel.h"
@@ -1124,6 +1125,15 @@ DBox2Channel *TVRec::GetDBox2Channel(void)
 #endif // USING_DBOX2
 }
 
+DTVChannel *TVRec::GetDTVChannel(void)
+{
+#ifdef USING_DVB
+    return dynamic_cast<DTVChannel*>(channel);
+#else
+    return NULL;
+#endif // USING_DVB
+}
+
 HDHRChannel *TVRec::GetHDHRChannel(void)
 {
 #ifdef USING_HDHOMERUN
@@ -1643,7 +1653,7 @@ void GetPidsToCache(DTVSignalMonitor *dtvMon, pid_cache_t &pid_cache)
     dtvMon->GetATSCStreamData()->ReturnCachedTable(mgt);
 }
 
-bool ApplyCachedPids(DTVSignalMonitor *dtvMon, const ChannelBase* channel)
+bool ApplyCachedPids(DTVSignalMonitor *dtvMon, const DTVChannel* channel)
 {
     pid_cache_t pid_cache;
     channel->GetCachedPids(pid_cache);
@@ -1678,6 +1688,8 @@ bool TVRec::SetupDTVSignalMonitor(void)
     VERBOSE(VB_RECORD, LOC + "Setting up table monitoring.");
 
     DTVSignalMonitor *sm = GetDTVSignalMonitor();
+    DTVChannel *dtvchan = GetDTVChannel();
+
     MPEGStreamData *sd = NULL;
     if (GetDTVRecorder())
     {
@@ -1689,8 +1701,8 @@ bool TVRec::SetupDTVSignalMonitor(void)
         GetCaptureCardNum(), channel->GetCurrentInput());
 
     // Check if this is an ATSC Channel
-    int major = channel->GetMajorChannel();
-    int minor = channel->GetMinorChannel();
+    int major = dtvchan->GetMajorChannel();
+    int minor = dtvchan->GetMinorChannel();
     if (minor > 0)
     {
         QString msg = QString("ATSC channel: %1_%2").arg(major).arg(minor);
@@ -1713,7 +1725,7 @@ bool TVRec::SetupDTVSignalMonitor(void)
 
         // Try to get pid of VCT from cache and
         // require MGT if we don't have VCT pid.
-        if (!ApplyCachedPids(sm, channel))
+        if (!ApplyCachedPids(sm, dtvchan))
             sm->AddFlags(kDTVSigMon_WaitForMGT);
 
         VERBOSE(VB_RECORD, LOC + "Successfully set up ATSC table monitoring.");
@@ -1721,10 +1733,10 @@ bool TVRec::SetupDTVSignalMonitor(void)
     }
 
     // Check if this is an DVB channel
-    int progNum = channel->GetProgramNumber();
+    int progNum = dtvchan->GetProgramNumber();
 #ifdef USING_DVB
-    int netid   = channel->GetOriginalNetworkID();
-    int tsid    = channel->GetTransportID();
+    int netid   = dtvchan->GetOriginalNetworkID();
+    int tsid    = dtvchan->GetTransportID();
     if (netid > 0 && tsid > 0 && progNum >= 0)
     {
         uint neededVideo = 0;
@@ -1883,13 +1895,14 @@ void TVRec::TeardownSignalMonitor()
     VERBOSE(VB_RECORD, LOC + "TeardownSignalMonitor() -- begin");
 
     // If this is a DTV signal monitor, save any pids we know about.
-    DTVSignalMonitor *dtvMon = GetDTVSignalMonitor();
-    if (dtvMon && channel)
+    DTVSignalMonitor *dtvMon  = GetDTVSignalMonitor();
+    DTVChannel       *dtvChan = GetDTVChannel();
+    if (dtvMon && dtvChan)
     {
         pid_cache_t pid_cache;
         GetPidsToCache(dtvMon, pid_cache);
         if (pid_cache.size())
-            channel->SaveCachedPids(pid_cache);
+            dtvChan->SaveCachedPids(pid_cache);
     }
 
     if (signalMonitor)

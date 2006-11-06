@@ -33,9 +33,10 @@ class DTVSignalMonitor;
 
 class ChannelBase;
 class DBox2Channel;
-class HDHRChannel;
+class DTVChannel;
 class DVBChannel;
 class Channel;
+class HDHRChannel;
 
 class MPEGStreamData;
 class ProgramMapTable;
@@ -255,6 +256,7 @@ class MPUBLIC TVRec : public QObject
     void InitChannel(const QString &inputname, const QString &startchannel);
     void CloseChannel(void);
     DBox2Channel *GetDBox2Channel(void);
+    DTVChannel   *GetDTVChannel(void);
     HDHRChannel  *GetHDHRChannel(void);
     DVBChannel   *GetDVBChannel(void);
     Channel      *GetV4LChannel(void);
