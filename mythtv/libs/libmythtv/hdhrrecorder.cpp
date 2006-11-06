@@ -249,7 +249,10 @@ void HDHRRecorder::HandleSingleProgramPMT(ProgramMapTable *pmt)
     {
         desc_list_t desc = MPEGDescriptor::Parse(
             _input_pmt->StreamInfo(i), _input_pmt->StreamInfoLength(i));
-        uint type = StreamID::Normalize(_input_pmt->StreamType(i), desc);
+
+        uint type = StreamID::Normalize(
+            _input_pmt->StreamType(i), desc, _channel->GetSIStandard());
+
         if (StreamID::IsVideo(type) || StreamID::IsAudio(type))
             pmt->SetStreamType(i, type);
     }

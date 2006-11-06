@@ -349,7 +349,7 @@ ssize_t CRCIpNetworkRecorder::ProcessData(unsigned char *buffer, ssize_t len)
                 uint stream_index = 0;
                 for (; stream_index < stream_count; stream_index++)
                 {
-                    if (pmt.IsVideo(stream_index))
+                    if (pmt.IsVideo(stream_index, "mpeg"))
                     {
                         video_pid = pmt.StreamPID(stream_index);
                         video_stream_type = pmt.StreamType(stream_index);

@@ -83,7 +83,8 @@ class MPUBLIC ChannelUtil
                                    QString  &modulation,
                                    uint64_t &frequency,
                                    uint     &dvb_transportid,
-                                   uint     &dvb_networkid);
+                                   uint     &dvb_networkid,
+                                   QString  &si_std);
 
     static bool    GetATSCChannel(uint sourceid, const QString &channum,
                                   uint &major,   uint          &minor);
@@ -144,7 +145,7 @@ class MPUBLIC ChannelUtil
         QString &tvformat,        QString       &modulation,
         QString &freqtable,       QString       &freqid,
         int     &finetune,        uint64_t      &frequency,
-        int     &mpeg_prog_num,
+        QString &dtv_si_std,      int     &mpeg_prog_num,
         uint    &atsc_major,      uint          &atsc_minor,
         uint    &dvb_transportid, uint          &dvb_networkid,
         uint    &mplexid,         bool          &commfree);

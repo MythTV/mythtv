@@ -1153,11 +1153,14 @@ void AvFormatDecoder::ScanATSCCaptionStreams(int av_index)
     uint i;
     for (i = 0; i < pmt.StreamCount(); i++)
     {
-        if (pmt.IsVideo(i))
+        // MythTV remaps OpenCable Video to normal video during recording
+        // so "dvb" is the safest choice for system info type, since this
+        // will ignore other uses of the same stream id in DVB countries.
+        if (pmt.IsVideo(i, "dvb"))
             break;
     }
 
-    if (!pmt.IsVideo(i))
+    if (!pmt.IsVideo(i, "dvb"))
     {
         default_captions(tracks, av_index);
         return;

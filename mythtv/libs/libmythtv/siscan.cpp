@@ -303,6 +303,9 @@ void SIScan::HandleNIT(const NetworkInformationTable *nit)
 
 void SIScan::HandleMPEGDBInsertion(const ScanStreamData *sd, bool)
 {
+    // Try to determine if this might be "OpenCable" transport.
+    (*current).standard = sd->GetSIStandard((*current).standard);
+
     if ((*current).mplexid <= 0)
         (*current).mplexid = InsertMultiplex(current);
 
@@ -318,7 +321,8 @@ void SIScan::HandleMPEGDBInsertion(const ScanStreamData *sd, bool)
     for (uint i = 0; i < pats.size(); i++)
     {
         UpdatePATinDB(mplexid, fn, freqid, pats[i], pmt_map,
-                      (*current).expectedChannels, true);
+                      (*current).expectedChannels,
+                      (*current).standard, true);
     }
     sd->ReturnCachedPMTTables(pmt_map);
     sd->ReturnCachedPATTables(pats);
@@ -652,7 +656,7 @@ bool SIScan::Tune(const transport_scan_items_it_t transport)
     {
         DVBTuning tuning = item.tuning;
         tuning.params.frequency = freq;
-        ok = GetDVBChannel()->Tune(tuning, true, item.SourceID);
+        ok = GetDVBChannel()->Tune(tuning, item.standard, true, item.SourceID);
     }
 #endif // USING_DVB
 
@@ -660,14 +664,16 @@ bool SIScan::Tune(const transport_scan_items_it_t transport)
     if (GetChannel())
     {
         const uint freq_vis = freq - 1750000; // to visual carrier
-        ok = GetChannel()->Tune(freq_vis, inputname, item.ModulationDB());
+        ok = GetChannel()->Tune(freq_vis, inputname,
+                                item.ModulationDB(), item.standard);
     }
 #endif // USING_V4L
 
 #ifdef USING_HDHOMERUN
     if (GetHDHRChannel())
     {
-        ok = GetHDHRChannel()->Tune(freq, inputname, item.ModulationDB());
+        ok = GetHDHRChannel()->Tune(freq, inputname,
+                                    item.ModulationDB(), item.standard);
     }
 #endif // USING_HDHOMERUN
 
@@ -1052,6 +1058,8 @@ void SIScan::UpdatePMTinDB(
     int pmt_indx, const ProgramMapTable *pmt,
     const DTVChannelInfoList &channels, bool /*force_update*/)
 {
+    VERBOSE(VB_IMPORTANT, LOC + pmt->toString());
+
     // See if service already in database based on program number
     int chanid = ChannelUtil::GetChanID(
         db_mplexid, -1, -1, -1, pmt->ProgramNumber());
@@ -1182,11 +1190,14 @@ void SIScan::IgnoreEncryptedMsg(const QString &name, int aux_num)
 void SIScan::UpdatePATinDB(
     int db_mplexid, const QString &friendlyName, int freqid,
     const ProgramAssociationTable *pat, const pmt_map_t &pmt_map,
-    const DTVChannelInfoList &channels, bool force_update)
+    const DTVChannelInfoList &channels, const QString &si_standard,
+    bool force_update)
 {
     VERBOSE(VB_SIPARSER, LOC +
             QString("UpdatePATinDB(): tsid: 0x%1  mplex: %2")
             .arg(pat->TransportStreamID(),0,16).arg(db_mplexid));
+
+    VERBOSE(VB_IMPORTANT, LOC + pat->toString());
 
     int db_source_id   = ChannelUtil::GetSourceID(db_mplexid);
 
@@ -1217,7 +1228,8 @@ void SIScan::UpdatePATinDB(
                 IgnoreEmptyChanMsg(friendlyName, pat->ProgramNumber(i));
                 continue;
             }
-            else if (ignoreAudioOnlyServices && (*vit)->IsStillPicture())
+            else if (ignoreAudioOnlyServices &&
+                     (*vit)->IsStillPicture(si_standard))
             {
                 IgnoreAudioOnlyMsg(friendlyName, pat->ProgramNumber(i));
                 continue;
@@ -1503,12 +1515,14 @@ void SIScan::UpdateSDTinDB(int /*mplexid*/, const ServiceDescriptionTable *sdt,
 //  - Examines the freq in the DB against the curent tuning frequency and
 //    it's offset frequencies. If the frequency in the DB is any of the
 //    tuning frequencies or offsets then use the DB frequency.
-uint SIScan::FindBestMplexFreq(const uint tuning_freq,
+uint SIScan::FindBestMplexFreq(
+    const uint tuning_freq,
     const transport_scan_items_it_t transport, const uint sourceid,
     const uint transportid, const uint networkid)
 {
     uint64_t    db_freq;
     QString     tmp_modulation;
+    QString     tmp_si_std;
     uint        tmp_transportid, tmp_networkid;
     int         mplexid;
 
@@ -1516,8 +1530,9 @@ uint SIScan::FindBestMplexFreq(const uint tuning_freq,
     if (mplexid < 0)
         return tuning_freq;
 
-    if (!ChannelUtil::GetTuningParams((uint)mplexid, tmp_modulation,
-        db_freq, tmp_transportid, tmp_networkid))
+    if (!ChannelUtil::GetTuningParams(
+            (uint)mplexid, tmp_modulation,
+            db_freq, tmp_transportid, tmp_networkid, tmp_si_std))
     {
         return tuning_freq;
     }

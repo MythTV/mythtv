@@ -1,5 +1,6 @@
 #include <unistd.h>
 
+#include "dtvchannel.h"
 #include "dtvsignalmonitor.h"
 #include "scanstreamdata.h"
 #include "mpegtables.h"
@@ -18,7 +19,7 @@
  */
 
 DTVSignalMonitor::DTVSignalMonitor(int db_cardnum,
-                                   ChannelBase *_channel,
+                                   DTVChannel *_channel,
                                    uint wait_for_mask,
                                    const char *name)
     : SignalMonitor(db_cardnum, _channel, wait_for_mask, name),
@@ -52,6 +53,11 @@ DTVSignalMonitor::~DTVSignalMonitor()
 void DTVSignalMonitor::deleteLater(void)
 {
     SetStreamData(NULL);
+}
+
+DTVChannel *DTVSignalMonitor::GetDTVChannel(void)
+{
+    return dynamic_cast<DTVChannel*>(channel);
 }
 
 QStringList DTVSignalMonitor::GetStatusList(bool kick)
@@ -315,8 +321,8 @@ void DTVSignalMonitor::HandlePMT(uint, const ProgramMapTable *pmt)
 
     for (uint i = 0; i < pmt->StreamCount(); i++)
     {
-        hasVideo += pmt->IsVideo(i);
-        hasAudio += pmt->IsAudio(i);
+        hasVideo += pmt->IsVideo(i, GetDTVChannel()->GetSIStandard());
+        hasAudio += pmt->IsAudio(i, GetDTVChannel()->GetSIStandard());
     }
 
     if ((hasVideo >= GetStreamData()->GetVideoStreamsRequired()) &&

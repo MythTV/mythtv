@@ -39,9 +39,10 @@ static const uint len_for_alloc[] =
     4000,
 };
 
-uint StreamID::Normalize(uint stream_id, const desc_list_t &desc)
+uint StreamID::Normalize(uint stream_id, const desc_list_t &desc,
+                         const QString sistandard)
 {
-    if (OpenCableVideo == stream_id)
+    if ((sistandard != "dvb") && (OpenCableVideo == stream_id))
         return MPEG2Video;
 
     if (MPEGDescriptor::Find(desc, DescriptorID::AC3))
@@ -233,7 +234,28 @@ void ProgramMapTable::AppendStream(
     SetTotalLength(_ptrs[StreamCount()] - pesdata());
 }
 
-/** \fn ProgramMapTable::IsAudio(uint) const
+/** \fn ProgramMapTable::IsVideo(uint,QString) const
+ *  \brief Returns true iff the stream at index i is an audio stream.
+ *
+ *   This of course returns true if StreamID::IsVideo() is true.
+ *   And, it also returns true if IsVideo returns true after
+ *   StreamID::Normalize() is used on the stream type.
+ *
+ *  \param i index of stream
+ */
+bool ProgramMapTable::IsVideo(uint i, QString sistandard) const
+{
+    if (StreamID::IsVideo(StreamType(i)))
+        return true;
+
+    desc_list_t list = MPEGDescriptor::
+        Parse(StreamInfo(i), StreamInfoLength(i));
+    uint stream_id = StreamID::Normalize(StreamType(i), list, sistandard);
+
+    return StreamID::IsVideo(stream_id);
+}
+
+/** \fn ProgramMapTable::IsAudio(uint,QString) const
  *  \brief Returns true iff the stream at index i is an audio stream.
  *
  *   This of course returns true if StreamID::IsAudio() is true.
@@ -242,18 +264,21 @@ void ProgramMapTable::AppendStream(
  *
  *  \param i index of stream
  */
-bool ProgramMapTable::IsAudio(uint i) const
+bool ProgramMapTable::IsAudio(uint i, QString sistandard) const
 {
     if (StreamID::IsAudio(StreamType(i)))
         return true;
 
     desc_list_t list = MPEGDescriptor::
         Parse(StreamInfo(i), StreamInfoLength(i));
-    uint stream_id = StreamID::Normalize(StreamType(i), list);
+    uint stream_id = StreamID::Normalize(StreamType(i), list, sistandard);
 
     return StreamID::IsAudio(stream_id);
 }
 
+/** \fn ProgramMapTable::IsEncrypted(void) const
+ *  \brief Returns true iff PMT contains CA descriptor.
+ */
 bool ProgramMapTable::IsEncrypted(void) const
 {
     desc_list_t descs = MPEGDescriptor::ParseOnlyInclude(
@@ -289,13 +314,13 @@ bool ProgramMapTable::IsEncrypted(void) const
     return encrypted;
 }
 
-bool ProgramMapTable::IsStillPicture(void) const
+bool ProgramMapTable::IsStillPicture(QString sistandard) const
 {
     static const unsigned char STILL_PICTURE_FLAG = 0x01;
     
     for (uint i = 0; i < StreamCount(); i++)
     {
-        if (IsVideo(i))
+        if (IsVideo(i, sistandard))
         {
             return StreamInfoLength(i) > 2 &&
                    (StreamInfo(i)[2] & STILL_PICTURE_FLAG);
@@ -311,7 +336,8 @@ bool ProgramMapTable::IsStillPicture(void) const
  *  \param pids vector pids will be added to
  *  \return number of pids in list
  */
-uint ProgramMapTable::FindPIDs(uint type, vector<uint>& pids) const
+uint ProgramMapTable::FindPIDs(uint type, vector<uint>& pids,
+                               QString sistandard) const
 {
     if ((StreamID::AnyMask & type) != StreamID::AnyMask)
     {
@@ -322,13 +348,13 @@ uint ProgramMapTable::FindPIDs(uint type, vector<uint>& pids) const
     else if (StreamID::AnyVideo == type)
     {
         for (uint i=0; i < StreamCount(); i++)
-            if (IsVideo(i))
+            if (IsVideo(i, sistandard))
                 pids.push_back(StreamPID(i));
     }
     else if (StreamID::AnyAudio == type)
     {
         for (uint i=0; i < StreamCount(); i++)
-            if (IsAudio(i))
+            if (IsAudio(i, sistandard))
                 pids.push_back(StreamPID(i));
     }
 
@@ -343,7 +369,7 @@ uint ProgramMapTable::FindPIDs(uint type, vector<uint>& pids) const
  *  \return number of items in pids and types lists.
  */
 uint ProgramMapTable::FindPIDs(uint type, vector<uint>& pids,
-                               vector<uint>& types) const
+                               vector<uint>& types, QString sistandard) const
 {
     if ((StreamID::AnyMask & type) != StreamID::AnyMask)
     {
@@ -357,7 +383,7 @@ uint ProgramMapTable::FindPIDs(uint type, vector<uint>& pids,
     else if (StreamID::AnyVideo == type)
     {
         for (uint i=0; i < StreamCount(); i++)
-            if (IsVideo(i))
+            if (IsVideo(i, sistandard))
             {
                 pids.push_back(StreamPID(i));
                 types.push_back(StreamType(i));
@@ -366,7 +392,7 @@ uint ProgramMapTable::FindPIDs(uint type, vector<uint>& pids,
     else if (StreamID::AnyAudio == type)
     {
         for (uint i=0; i < StreamCount(); i++)
-            if (IsAudio(i))
+            if (IsAudio(i, sistandard))
             {
                 pids.push_back(StreamPID(i));
                 types.push_back(StreamType(i));
@@ -542,12 +568,12 @@ QString ProgramMapTable::GetLanguage(uint i) const
     return iso_lang.CanonicalLanguageString();
 }
 
-QString ProgramMapTable::StreamDescription(uint i) const
+QString ProgramMapTable::StreamDescription(uint i, QString sistandard) const
 {
     desc_list_t list;
 
     list         = MPEGDescriptor::Parse(StreamInfo(i), StreamInfoLength(i));
-    uint    type = StreamID::Normalize(StreamType(i), list);
+    uint    type = StreamID::Normalize(StreamType(i), list, sistandard);
     QString desc = StreamID::toString(type);
     QString lang = GetLanguage(i);
 

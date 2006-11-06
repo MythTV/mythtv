@@ -9,9 +9,13 @@
 #include "mythcontext.h"
 #include "mythdbcon.h"
 
+#define LOC QString("DTVChan(%1): ").arg(GetDevice())
+#define LOC_WARN QString("DTVChan(%1) Warning: ").arg(GetDevice())
+#define LOC_ERR QString("DTVChan(%1) Error: ").arg(GetDevice())
+
 DTVChannel::DTVChannel(TVRec *parent)
     : ChannelBase(parent),
-      currentProgramNum(-1),
+      sistandard("mpeg"),         currentProgramNum(-1),
       currentATSCMajorChannel(0), currentATSCMinorChannel(0),
       currentTransportID(0),      currentOriginalNetworkID(0)
 {
@@ -118,22 +122,34 @@ void DTVChannel::SetCachedATSCInfo(const QString &chan)
 
     if (currentATSCMinorChannel > 0)
     {
-        VERBOSE(VB_CHANNEL,
-                QString("ChannelBase(%1)::SetCachedATSCInfo(%2): %3_%4")
+        VERBOSE(VB_CHANNEL, LOC +
+                QString("SetCachedATSCInfo(%2): %3_%4")
                 .arg(GetDevice()).arg(chan)
                 .arg(currentATSCMajorChannel).arg(currentATSCMinorChannel));
     }
     else if ((0 == currentATSCMajorChannel) && (0 == currentProgramNum))
     {
-        VERBOSE(VB_CHANNEL,
-                QString("ChannelBase(%1)::SetCachedATSCInfo(%2): RESET")
+        VERBOSE(VB_CHANNEL, LOC +
+                QString("SetCachedATSCInfo(%2): RESET")
                 .arg(GetDevice()).arg(chan));
     }
     else
     {
-        VERBOSE(VB_CHANNEL,
-                QString("ChannelBase(%1)::SetCachedATSCInfo(%2): %3-%4")
+        VERBOSE(VB_CHANNEL, LOC +
+                QString("SetCachedATSCInfo(%2): %3-%4")
                 .arg(GetDevice()).arg(chan)
                 .arg(currentATSCMajorChannel).arg(currentProgramNum));
     }
+}
+
+QString DTVChannel::GetSIStandard(void) const
+{
+    QMutexLocker locker(&dtvinfo_lock);
+    return QDeepCopy<QString>(sistandard);
+}
+
+void DTVChannel::SetSIStandard(const QString &si_std)
+{
+    QMutexLocker locker(&dtvinfo_lock);
+    sistandard = QDeepCopy<QString>(si_std);
 }

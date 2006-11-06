@@ -101,7 +101,7 @@ void AnalogScan::doScan()
     for (uint i = 0; i < count && !fStop; i++, flist++)
     {
         unsigned frequency = flist->freq * 1000;
-        channel->Tune(frequency,input);
+        channel->Tune(frequency, input, "analog", QString::null);
         usleep(200000); /* 0.2 sec */
         if (channel->IsTuned())
         {

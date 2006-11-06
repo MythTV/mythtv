@@ -448,7 +448,7 @@ bool Channel::SetChannelByString(const QString &channum)
         return false;
 
     // Fetch tuning data from the database.
-    QString tvformat, modulation, freqtable, freqid;
+    QString tvformat, modulation, freqtable, freqid, dtv_si_std;
     int finetune;
     uint64_t frequency;
     int mpeg_prog_num;
@@ -458,7 +458,7 @@ bool Channel::SetChannelByString(const QString &channum)
         (*it)->sourceid, channum,
         tvformat, modulation, freqtable, freqid,
         finetune, frequency,
-        mpeg_prog_num, atsc_major, atsc_minor, tsid, netid,
+        dtv_si_std, mpeg_prog_num, atsc_major, atsc_minor, tsid, netid,
         mplexid, commfree))
     {
         return false;
@@ -497,8 +497,10 @@ bool Channel::SetChannelByString(const QString &channum)
     {
         if (isFrequency)
         {
-            if (!Tune(frequency))
+            if (!Tune(frequency, "", (is_dtv) ? "8vsb" : "analog", dtv_si_std))
+            {
                 return false;
+            }
         }
         else
         {
@@ -542,10 +544,10 @@ bool Channel::TuneTo(const QString &channum, int finetune)
 
     int frequency = (curList[i].freq + finetune) * 1000;
 
-    return Tune(frequency);
+    return Tune(frequency, "", "analog", "analog");
 }
 
-/** \fn Channel::Tune(uint frequency, QString inputname, QString modulation)
+/** \fn Channel::Tune(uint,QString,QString,QString)
  *  \brief Tunes to a specific frequency (Hz) on a particular input, using
  *         the specified modulation.
  *
@@ -556,10 +558,12 @@ bool Channel::TuneTo(const QString &channum, int finetune)
  *  \param inputname Name of the input (Television, Antenna 1, etc.)
  *  \param modulation "radio", "analog", or "digital"
  */
-bool Channel::Tune(uint frequency, QString inputname, QString modulation)
+bool Channel::Tune(uint frequency, QString inputname,
+                   QString modulation, QString si_std)
 {
-    VERBOSE(VB_CHANNEL, QString("Channel(%1)::Tune(%2, %3, %4)")
-            .arg(device).arg(frequency).arg(inputname).arg(modulation));
+    VERBOSE(VB_CHANNEL, LOC + QString("Tune(%1, %2, %3, %4)")
+            .arg(frequency).arg(inputname).arg(modulation).arg(si_std));
+
     int ioctlval = 0;
 
     if (modulation == "8vsb")
@@ -657,6 +661,8 @@ bool Channel::Tune(uint frequency, QString inputname, QString modulation)
         return false;
     }
 
+    SetSIStandard(si_std);
+
     return true;
 }
 
@@ -724,12 +730,14 @@ bool Channel::TuneMultiplex(uint mplexid, QString inputname)
     VERBOSE(VB_CHANNEL, LOC + QString("TuneMultiplex(%1)").arg(mplexid));
 
     QString  modulation;
+    QString  si_std;
     uint64_t frequency;
     uint     transportid;
     uint     dvb_networkid;
 
-    if (!ChannelUtil::GetTuningParams(mplexid, modulation, frequency,
-                                      transportid, dvb_networkid))
+    if (!ChannelUtil::GetTuningParams(
+            mplexid, modulation, frequency,
+            transportid, dvb_networkid, si_std))
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR + "TuneMultiplex(): " +
                 QString("Could not find tuning parameters for multiplex %1.")
@@ -738,7 +746,7 @@ bool Channel::TuneMultiplex(uint mplexid, QString inputname)
         return false;
     }
 
-    if (!Tune(frequency, inputname, modulation))
+    if (!Tune(frequency, inputname, modulation, si_std))
         return false;
 
     return true;

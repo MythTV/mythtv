@@ -167,7 +167,8 @@ class StreamID
                 (StreamID::DSMCC_C == type) ||
                 (StreamID::DSMCC_D == type));
     }
-    static uint Normalize(uint stream_id, const desc_list_t &desc);
+    static uint Normalize(uint stream_id, const desc_list_t &desc,
+                          const QString sistandard);
     static const char* toString(uint streamID);
 };
 
@@ -524,24 +525,23 @@ class ProgramMapTable : public PSIPTable
         { _ptrs[i][0] = type; }
 
     // helper methods
-    /// Returns true iff StreamID::IsVideo(StreamType(i)) returns true.
-    bool IsVideo(uint i) const { return StreamID::IsVideo(StreamType(i)); }
-    bool IsAudio(uint i) const;
-    /// Returns true iff PMT contains CA descriptor.
+    bool IsVideo(uint i, QString sistandard) const;
+    bool IsAudio(uint i, QString sistandard) const;
     bool IsEncrypted(void) const;
     /// Returns true iff PMT contains a still-picture video stream
-    bool IsStillPicture(void) const;
+    bool IsStillPicture(QString sistandard) const;
     /// Returns a string representation of type at stream index i
     QString StreamTypeString(uint i) const
         { return StreamID::toString(StreamType(i)); }
     /// Returns a better (and more expensive) string representation
     /// of type at stream index i than StreamTypeString(uint)
-    QString StreamDescription(uint i) const;
+    QString StreamDescription(uint i, QString sistandard) const;
     /// Returns the cannonical language if we find the iso639 descriptor
     QString GetLanguage(uint i) const;
 
-    uint FindPIDs(uint type, vector<uint>& pids) const;
-    uint FindPIDs(uint type, vector<uint>& pids, vector<uint>& types) const;
+    uint FindPIDs(uint type, vector<uint>& pids, QString sistandard) const;
+    uint FindPIDs(uint type, vector<uint>& pids, vector<uint>& types,
+                  QString sistandard) const;
 
     /// \brief Locates stream index of pid.
     /// \return stream index if successful, -1 otherwise

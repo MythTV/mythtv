@@ -25,6 +25,8 @@ class ScanStreamData :
     bool GetEITPIDChanges(const uint_vec_t& /*in_use_pids*/,
                           uint_vec_t& /*add_pids*/,
                           uint_vec_t& /*del_pids*/) const { return false; }
+
+    QString GetSIStandard(QString guess = "mpeg") const;
 };
 
 #endif // SCANSTREAMDATA_H_

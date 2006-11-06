@@ -350,7 +350,7 @@ bool HDHRChannel::SetChannelByString(const QString &channum)
         return false;
 
     // Fetch tuning data from the database.
-    QString tvformat, modulation, freqtable, freqid;
+    QString tvformat, modulation, freqtable, freqid, si_std;
     int finetune;
     uint64_t frequency;
     int mpeg_prog_num;
@@ -360,7 +360,7 @@ bool HDHRChannel::SetChannelByString(const QString &channum)
         (*it)->sourceid, channum,
         tvformat, modulation, freqtable, freqid,
         finetune, frequency,
-        mpeg_prog_num, atsc_major, atsc_minor, tsid, netid,
+        si_std, mpeg_prog_num, atsc_major, atsc_minor, tsid, netid,
         mplexid, commfree))
     {
         return false;
@@ -380,7 +380,7 @@ bool HDHRChannel::SetChannelByString(const QString &channum)
     {
         if (isFrequency)
         {
-            if (!Tune(frequency, inputName, modulation))
+            if (!Tune(frequency, inputName, modulation, si_std))
                 return false;
         }
         else
@@ -417,12 +417,14 @@ bool HDHRChannel::TuneMultiplex(uint mplexid, QString inputname)
     VERBOSE(VB_CHANNEL, LOC + QString("TuneMultiplex(%1)").arg(mplexid));
 
     QString  modulation;
+    QString  si_std;
     uint64_t frequency;
     uint     transportid;
     uint     dvb_networkid;
 
-    if (!ChannelUtil::GetTuningParams(mplexid, modulation, frequency,
-                                      transportid, dvb_networkid))
+    if (!ChannelUtil::GetTuningParams(
+            mplexid, modulation, frequency,
+            transportid, dvb_networkid, si_std))
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR + "TuneMultiplex(): " +
                 QString("Could not find tuning parameters for multiplex %1.")
@@ -431,17 +433,19 @@ bool HDHRChannel::TuneMultiplex(uint mplexid, QString inputname)
         return false;
     }
 
-    if (!Tune(frequency, inputname, modulation))
+    if (!Tune(frequency, inputname, modulation, si_std))
         return false;
 
     return true;
 }
 
-bool HDHRChannel::Tune(uint frequency, QString /*input*/, QString modulation)
+bool HDHRChannel::Tune(uint frequency, QString /*input*/,
+                       QString modulation, QString si_std)
 {
     bool ok = false;
 
-    VERBOSE(VB_CHANNEL, LOC + "TuneTo("<<frequency<<","<<modulation<<")");
+    VERBOSE(VB_CHANNEL, LOC +
+            QString("TuneTo(%1,%2)").arg(frequency).arg(modulation));
 
     if (modulation == "8vsb")
         ok = TunerSet("channel", QString("8vsb:%1").arg(frequency));
@@ -449,6 +453,9 @@ bool HDHRChannel::Tune(uint frequency, QString /*input*/, QString modulation)
         ok = TunerSet("channel", QString("qam64:%1").arg(frequency));
     else if (modulation == "qam_256")
         ok = TunerSet("channel", QString("qam256:%1").arg(frequency));
+
+    if (ok)
+        SetSIStandard(si_std);
 
     return ok;
 }

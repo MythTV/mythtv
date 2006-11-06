@@ -209,16 +209,17 @@ bool DVBChannel::Open()
 bool DVBChannel::TuneMultiplex(uint mplexid, QString inputname)
 {
     DVBTuning tuning;
-    if (!tuning.FillFromDB(info.type, mplexid))
+    QString si_std;
+    if (!tuning.FillFromDB(info.type, mplexid, si_std))
         return false;
 
     CheckOptions(tuning);
 
     // TODO Tune() should actually use the specified input,
     //      not the first input with the same sourceid.
-    uint sourceid = ChanUtil::GetSourceID(cardid, inputname);
+    uint sourceid = ChannelUtil::GetSourceID(mplexid);
 
-    if (!Tune(tuning, false, sourceid))
+    if (!Tune(tuning, si_std, false, sourceid))
         return false;
 
     return true;
@@ -267,7 +268,8 @@ bool DVBChannel::SetChannelByString(const QString &channum)
 
     // Initialize all the tuning parameters
     DVBTuning tuning;
-    if (!InitChannelParams(tuning, (*it)->sourceid, channum))
+    QString si_std;
+    if (!InitChannelParams(tuning, si_std, (*it)->sourceid, channum))
     {
         VERBOSE(VB_IMPORTANT, loc_err +
                 "Failed to initialize channel options");
@@ -277,7 +279,7 @@ bool DVBChannel::SetChannelByString(const QString &channum)
 
     CheckOptions(tuning);
 
-    if (!Tune(tuning))
+    if (!Tune(tuning, si_std))
     {
         VERBOSE(VB_IMPORTANT, loc_err + "Tuning to frequency.");
 
@@ -331,6 +333,7 @@ bool DVBChannel::SwitchToInput(int newInputNum, bool setstarting)
  *  \return true on success and false on failure
  */
 bool DVBChannel::InitChannelParams(DVBTuning     &tuning,
+                                   QString       &si_std,
                                    uint           sourceid,
                                    const QString &channum)
 {
@@ -342,7 +345,8 @@ bool DVBChannel::InitChannelParams(DVBTuning     &tuning,
     if (!ChannelUtil::GetChannelData(
             sourceid,   channum,
             tvformat,   modulation,   freqtable,   freqid,
-            finetune,   frequency,    currentProgramNum,
+            finetune,   frequency,
+            si_std,                   currentProgramNum,
             currentATSCMajorChannel,  currentATSCMinorChannel,
             currentTransportID,       currentOriginalNetworkID,
             mplexid,    commfree))
@@ -354,7 +358,7 @@ bool DVBChannel::InitChannelParams(DVBTuning     &tuning,
         currentProgramNum = -1;
 
     if (mplexid)
-        return tuning.FillFromDB(info.type, mplexid);
+        return tuning.FillFromDB(info.type, mplexid, si_std);
 
     VERBOSE(VB_IMPORTANT, LOC_ERR + "Unable to find channel in database.");
     return false;
@@ -579,6 +583,7 @@ void DVBChannel::SetPMT(const ProgramMapTable *pmt)
  *  \return true on success, false on failure
  */
 bool DVBChannel::Tune(const DVBTuning &tuning,
+                      const QString &si_std,
                       bool force_reset,
                       uint sourceid,
                       bool same_input)
@@ -696,6 +701,8 @@ bool DVBChannel::Tune(const DVBTuning &tuning,
         first_tune = false;
     }
 
+    SetSIStandard(si_std);
+
     VERBOSE(VB_CHANNEL, LOC + "Tune(): Frequency tuning successful.");
 
     return true;
@@ -703,7 +710,7 @@ bool DVBChannel::Tune(const DVBTuning &tuning,
 
 bool DVBChannel::Retune(void)
 {
-    return Tune(desired_tuning, true, 0, true);
+    return Tune(desired_tuning, GetSIStandard(), true, 0, true);
 }
 
 /** \fn DVBChannel::GetTuningParams(DVBTuning& tuning) const

@@ -365,7 +365,7 @@ cCiCaPmt CreateCAPMT(const ProgramMapTable &pmt,
     {
         VERBOSE(VB_CHANNEL,
                 QString("Adding elementary stream: %1, pid(0x%2)")
-                .arg(pmt.StreamDescription(i))
+                .arg(pmt.StreamDescription(i, "dvb"))
                 .arg(pmt.StreamPID(i),0,16));
             
         capmt.AddElementaryStream(pmt.StreamType(i), pmt.StreamPID(i));

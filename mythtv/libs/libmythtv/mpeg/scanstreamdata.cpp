@@ -43,3 +43,39 @@ void ScanStreamData::Reset(void)
     AddListeningPID(DVB_NIT_PID);
     AddListeningPID(DVB_SDT_PID);
 }
+
+QString ScanStreamData::GetSIStandard(QString guess) const
+{
+    if (HasCachedMGT())
+        return "atsc";
+
+    if (HasCachedAnyNIT())
+        return "dvb";
+
+    QMutexLocker locker(&_cache_lock);
+
+    pmt_cache_t::const_iterator it = _cached_pmts.begin();
+    for (; it != _cached_pmts.end(); ++it)
+    {
+        ProgramMapTable *pmt = *it;
+
+        for (uint i = 0; (guess != "dvb") && (i < pmt->StreamCount()); i++)
+        {
+            if (StreamID::OpenCableVideo == pmt->StreamType(i))
+                return "opencable";
+        }
+
+        desc_list_t descs = MPEGDescriptor::ParseOnlyInclude(
+            pmt->ProgramInfo(), pmt->ProgramInfoLength(),
+            DescriptorID::registration);
+
+        for (uint i = 0; i < descs.size(); i++)
+        {
+            RegistrationDescriptor reg(descs[i]);
+            if (reg.FormatIdentifierString() == "CUEI")
+                return "opencable";
+        }
+    }
+
+    return "mpeg";
+}

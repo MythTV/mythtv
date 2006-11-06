@@ -168,8 +168,8 @@ also uniquely identifies a channel in the \ref channel_table. The
 'modulation' field tells us whether the modulation mode is "qpsk",
 "qam_16", "qam_32", "qam_64", "qam_128", "qam_256", "8vsb", "16vsb",
 or "auto". Finally, the 'sistandard' field is the last field which
-applies to both DVB and ATSC, it contains on of two strings, "dvb" or
-"atsc".
+applies to both DVB and ATSC, it contains on of four strings, "dvb",
+"atsc", "mpeg" or "opencable".
 
 When describing a DVB Multiplex, the networkid, and transportid are
 used along with the serviceid in the \ref channel_table to tune to

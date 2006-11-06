@@ -224,6 +224,8 @@ class MPEGStreamData : public EITSource
     void CachePMT(const ProgramMapTable *pmt);
 
   protected:
+    QString                   _sistandard;
+
     bool                      _have_CRC_bug;
 
     // Generic EIT stuff used for ATSC and DVB

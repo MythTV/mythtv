@@ -10,6 +10,8 @@ using namespace std;
 #include "signalmonitorvalue.h"
 #include "streamlisteners.h"
 
+class DTVChannel;
+
 class DTVSignalMonitor : public SignalMonitor,
                          public MPEGStreamListener,
                          public ATSCMainStreamListener,
@@ -19,7 +21,7 @@ class DTVSignalMonitor : public SignalMonitor,
     Q_OBJECT
   public:
     DTVSignalMonitor(int db_cardnum,
-                     ChannelBase *_channel,
+                     DTVChannel *_channel,
                      uint wait_for_mask,
                      const char *name = "DTVSignalMonitor");
     ~DTVSignalMonitor();
@@ -103,8 +105,11 @@ class DTVSignalMonitor : public SignalMonitor,
     void HandleSDT(uint, const ServiceDescriptionTable*);
 
   protected:
+    DTVChannel *GetDTVChannel(void);
     void UpdateMonitorValues(void);
     void UpdateListeningForEIT(void);
+
+  protected:
     MPEGStreamData    *stream_data;
     vector<uint>       eit_pids;
     SignalMonitorValue seenPAT;

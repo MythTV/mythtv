@@ -45,7 +45,8 @@ const unsigned char MPEGStreamData::bit_sel[8] =
  *  \param cacheTables    If true PAT and PMT tables will be cached
  */
 MPEGStreamData::MPEGStreamData(int desiredProgram, bool cacheTables)
-    : _have_CRC_bug(false), _eit_helper(NULL), _eit_rate(0.0f),
+    : _sistandard("mpeg"),
+      _have_CRC_bug(false), _eit_helper(NULL), _eit_rate(0.0f),
       _listener_lock(true),
       _cache_tables(cacheTables), _cache_lock(true),
       // Single program stuff
@@ -410,7 +411,8 @@ bool MPEGStreamData::CreatePMTSingleProgram(const ProgramMapTable& pmt)
     vector<uint> pids, types;
 
     // Video
-    uint video_cnt = pmt.FindPIDs(StreamID::AnyVideo, videoPIDs, videoTypes);
+    uint video_cnt = pmt.FindPIDs(StreamID::AnyVideo, videoPIDs,
+                                  videoTypes, _sistandard);
     if (video_cnt < _pmt_single_program_num_video) 
     {
         VERBOSE(VB_RECORD, "Only "<<video_cnt<<" video streams seen in PMT, "
@@ -432,7 +434,7 @@ bool MPEGStreamData::CreatePMTSingleProgram(const ProgramMapTable& pmt)
     }
 
     // Audio
-    pmt.FindPIDs(StreamID::AnyAudio, audioPIDs, audioTypes);
+    pmt.FindPIDs(StreamID::AnyAudio, audioPIDs, audioTypes, _sistandard);
     if (audioPIDs.size() < _pmt_single_program_num_audio)
     {
         VERBOSE(VB_RECORD, "Only "<<audioPIDs.size()
@@ -456,7 +458,7 @@ bool MPEGStreamData::CreatePMTSingleProgram(const ProgramMapTable& pmt)
     uint programNumber = 1;
 
     // Construct
-    pmt.FindPIDs(StreamID::AnyAudio, pids, types);
+    pmt.FindPIDs(StreamID::AnyAudio, pids, types, _sistandard);
     ProgramMapTable *pmt2 = ProgramMapTable::
         Create(programNumber, _pid_pmt_single_program,
                pmt.PCRPID(), pmt.Version(), pids, types);

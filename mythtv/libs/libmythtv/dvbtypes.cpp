@@ -1,5 +1,9 @@
 // -*- Mode: c++ -*-
 
+// Qt headers
+#include <qdeepcopy.h>
+
+// MythTV headers
 #include "mythcontext.h"
 #include "mythdbcon.h"
 #include "dvbtypes.h"
@@ -330,7 +334,7 @@ QString DVBTuning::toString(fe_type_t type) const
     return msg;
 }
 
-bool DVBTuning::FillFromDB(fe_type_t type, uint mplexid)
+bool DVBTuning::FillFromDB(fe_type_t type, uint mplexid, QString &sistandard)
 {
     MSqlQuery q(MSqlQuery::InitCon());
 
@@ -340,7 +344,7 @@ bool DVBTuning::FillFromDB(fe_type_t type, uint mplexid)
         "       fec,               polarity, "
         "       hp_code_rate,      lp_code_rate,   constellation, "
         "       transmission_mode, guard_interval, hierarchy, "
-        "       modulation,        bandwidth "
+        "       modulation,        bandwidth,      sistandard "
         "FROM dtv_multiplex "
         "WHERE dtv_multiplex.mplexid = :MPLEXID");
     q.bindValue(":MPLEXID", mplexid);
@@ -359,6 +363,8 @@ bool DVBTuning::FillFromDB(fe_type_t type, uint mplexid)
 
         return false;
     }
+
+    sistandard = QDeepCopy<QString>(q.value(13).toString());
 
     // Parse the query into our DVBTuning class
     return ParseTuningParams(

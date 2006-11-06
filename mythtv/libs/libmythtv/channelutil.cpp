@@ -216,9 +216,10 @@ void handle_transport_desc(vector<uint> &muxes, const MPEGDescriptor &desc,
         if (mux > 0)
         {
             QString dummy_mod;
+            QString dummy_sistd;
             uint dummy_tsid, dummy_netid;
             ChannelUtil::GetTuningParams(mux, dummy_mod, freq,
-                                         dummy_tsid, dummy_netid);
+                                         dummy_tsid, dummy_netid, dummy_sistd);
         }
 
         mux = ChannelUtil::CreateMultiplex(
@@ -593,14 +594,15 @@ bool ChannelUtil::GetTuningParams(uint      mplexid,
                                   QString  &modulation,
                                   uint64_t &frequency,
                                   uint     &dvb_transportid,
-                                  uint     &dvb_networkid)
+                                  uint     &dvb_networkid,
+                                  QString  &si_std)
 {
     if (!mplexid || (mplexid == 32767)) /* 32767 deals with old lineups */
         return false;
 
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare(
-        "SELECT transportid, networkid, frequency, modulation "
+        "SELECT transportid, networkid, frequency, modulation, sistandard "
         "FROM dtv_multiplex "
         "WHERE mplexid = :MPLEXID");
     query.bindValue(":MPLEXID", mplexid);
@@ -618,6 +620,7 @@ bool ChannelUtil::GetTuningParams(uint      mplexid,
     dvb_networkid   = query.value(1).toUInt();
     frequency       = (uint64_t) query.value(2).toDouble(); // Qt 3.1 compat
     modulation      = query.value(3).toString();
+    si_std          = query.value(4).toString();
 
     return true;
 }
@@ -1233,17 +1236,19 @@ bool ChannelUtil::GetChannelData(
     QString &tvformat,        QString       &modulation,
     QString &freqtable,       QString       &freqid,
     int     &finetune,        uint64_t      &frequency,
-    int     &mpeg_prog_num,
+    QString &dtv_si_std,      int           &mpeg_prog_num,
     uint    &atsc_major,      uint          &atsc_minor,
     uint    &dvb_transportid, uint          &dvb_networkid,
     uint    &mplexid,
     bool    &commfree)
 {
-    tvformat      = modulation = freqtable = freqid = QString::null;
+    tvformat      = modulation = freqtable = QString::null;
+    freqid        = dtv_si_std = QString::null;
     finetune      = 0;
     frequency     = 0;
     mpeg_prog_num = -1;
     atsc_major    = atsc_minor = mplexid = 0;
+    dvb_networkid = dvb_transportid = 0;
     commfree      = false;
 
     MSqlQuery query(MSqlQuery::InitCon());
@@ -1286,7 +1291,7 @@ bool ChannelUtil::GetChannelData(
         return true;
 
     return GetTuningParams(mplexid, modulation, frequency,
-                           dvb_transportid, dvb_networkid);
+                           dvb_transportid, dvb_networkid, dtv_si_std);
 }
 
 DBChanList ChannelUtil::GetChannels(uint sourceid, bool vis_only, QString grp)

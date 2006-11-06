@@ -66,7 +66,7 @@ class DVBChannel : public DTVChannel
     bool SwitchToInput(const QString &inputname, const QString &chan);
     bool SwitchToInput(int newcapchannel, bool setstarting);
     bool SetChannelByString(const QString &chan);
-    bool Tune(const DVBTuning &tuning,
+    bool Tune(const DVBTuning &tuning, const QString &si_std,
               bool force_reset = false,
               uint sourceid    = 0,
               bool same_input  = false);
@@ -81,7 +81,7 @@ class DVBChannel : public DTVChannel
 
   private:
     int  GetChanID(void) const;
-    bool InitChannelParams(DVBTuning &t,
+    bool InitChannelParams(DVBTuning &t, QString &si_std,
                            uint sourceid, const QString &channum);
 
     void CheckOptions(DVBTuning &t) const;
@@ -96,7 +96,7 @@ class DVBChannel : public DTVChannel
     DVBCam           *dvbcam; ///< Used to decrypt encrypted streams
 
     // Tuning State
-    QMutex            tune_lock;
+    mutable QMutex    tune_lock;
     dvb_frontend_info info;        ///< Contains info on tuning hardware
 #ifdef FE_GET_EXTENDED_INFO
     dvb_fe_caps_extended extinfo;  ///< Additional info on tuning hardware

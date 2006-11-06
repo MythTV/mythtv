@@ -14,6 +14,9 @@
 #include <vector>
 using namespace std;
 
+// Qt headers
+#include "qmutex.h"
+
 // MythTV headers
 #include "channelbase.h"
 
@@ -29,43 +32,66 @@ class TVRec;
 class DTVChannel : public ChannelBase
 {
   public:
-    DTVChannel::DTVChannel(TVRec *parent);
+    DTVChannel(TVRec *parent);
     virtual ~DTVChannel() {}
 
-    /** \brief Returns cached MPEG PIDs for last tuned channel.
-     *  \param pid_cache List of PIDs with their TableID
-     *                   types is returned in pid_cache. */
-    virtual void GetCachedPids(pid_cache_t &pid_cache) const
-        { (void) pid_cache; }
-    /// \brief Saves MPEG PIDs to cache to database
-    /// \param pid_cache List of PIDs with their TableID types to be saved.
-    virtual void SaveCachedPids(const pid_cache_t &pid_cache) const
-        { (void) pid_cache; }
-    /// \brief Returns program number in PAT, -1 if unknown.
-    virtual int GetProgramNumber(void) const
-        { return currentProgramNum; };
-    /// \brief Returns major channel, 0 if unknown.
-    virtual uint GetMajorChannel(void) const
-        { return currentATSCMajorChannel; };
-    /// \brief Returns minor channel, 0 if unknown.
-    virtual uint GetMinorChannel(void) const
-        { return currentATSCMinorChannel; };
-    /// \brief Returns DVB original_network_id, 0 if unknown.
-    virtual uint GetOriginalNetworkID(void) const
-        { return currentOriginalNetworkID; };
-    /// \brief Returns DVB transport_stream_id, 0 if unknown.
-    virtual uint GetTransportID(void) const
-        { return currentTransportID; };
+    // Commands
 
     /// \brief To be used by the channel scanner and possibly the EIT scanner.
     virtual bool TuneMultiplex(uint mplexid, QString inputname) = 0;
 
+    // Gets
+
+    /// \brief Returns program number in PAT, -1 if unknown.
+    int GetProgramNumber(void) const
+        { return currentProgramNum; };
+
+    /// \brief Returns major channel, 0 if unknown.
+    uint GetMajorChannel(void) const
+        { return currentATSCMajorChannel; };
+
+    /// \brief Returns minor channel, 0 if unknown.
+    uint GetMinorChannel(void) const
+        { return currentATSCMinorChannel; };
+
+    /// \brief Returns DVB original_network_id, 0 if unknown.
+    uint GetOriginalNetworkID(void) const
+        { return currentOriginalNetworkID; };
+
+    /// \brief Returns DVB transport_stream_id, 0 if unknown.
+    uint GetTransportID(void) const
+        { return currentTransportID; };
+
+    /// \brief Returns PSIP table standard: MPEG, DVB, ATSC, or OpenCable
+    QString GetSIStandard(void) const;
+
+    /** \brief Returns cached MPEG PIDs for last tuned channel.
+     *  \param pid_cache List of PIDs with their TableID
+     *                   types is returned in pid_cache.
+     */
+    virtual void GetCachedPids(pid_cache_t &pid_cache) const
+        { (void) pid_cache; }
+
+    // Sets
+
+    /** \brief Saves MPEG PIDs to cache to database
+     * \param pid_cache List of PIDs with their TableID types to be saved.
+     */
+    virtual void SaveCachedPids(const pid_cache_t &pid_cache) const
+        { (void) pid_cache; }
+
   protected:
-    virtual void SetCachedATSCInfo(const QString &chan);
+    /// \brief Sets PSIP table standard: MPEG, DVB, ATSC, or OpenCable
+    void SetSIStandard(const QString&);
+    void SetCachedATSCInfo(const QString &chan);
+
     static void GetCachedPids(int chanid, pid_cache_t&);
     static void SaveCachedPids(int chanid, const pid_cache_t&);
 
   protected:
+    mutable QMutex dtvinfo_lock;
+
+    QString sistandard; ///< PSIP table standard: MPEG, DVB, ATSC, OpenCable
     int     currentProgramNum;
     uint    currentATSCMajorChannel;
     uint    currentATSCMinorChannel;

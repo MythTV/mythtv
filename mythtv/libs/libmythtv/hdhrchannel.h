@@ -42,6 +42,7 @@ class HDHRChannel : public DTVChannel
         { return QString("%1/%2").arg(_device_id, 8, 16).arg(_tuner); }
     vector<uint> GetPIDs(void) const
         { QMutexLocker locker(&_lock); return _pids; }
+    QString GetSIStandard(void) const { return "atsc"; }
 
     // Commands
     bool SwitchToInput(const QString &inputname, const QString &chan);
@@ -53,8 +54,8 @@ class HDHRChannel : public DTVChannel
 
     // ATSC scanning stuff
     bool TuneMultiplex(uint mplexid, QString inputname);
-    bool Tune(uint frequency, QString inputname = "",
-              QString modulation = "8vsb");
+    bool Tune(uint frequency, QString inputname,
+              QString modulation, QString si_std);
 
   private:
     bool FindDevice(void);

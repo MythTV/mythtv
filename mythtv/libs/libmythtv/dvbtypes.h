@@ -152,7 +152,7 @@ class DVBTuning
     QString HierarchyString() const;
     QString toString(fe_type_t type) const;
 
-    bool FillFromDB(fe_type_t type, uint mplexid);
+    bool FillFromDB(fe_type_t type, uint mplexid, QString &sistandard);
 
     bool parseATSC(const QString& frequency,      const QString modulation);
 

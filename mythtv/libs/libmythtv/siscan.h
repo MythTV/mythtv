@@ -139,7 +139,7 @@ class SIScan : public QObject,
     void HandleMPEGDBInsertion(const ScanStreamData *sd, bool wait);
     void UpdatePATinDB(int mplexid, const QString &friendlyName, int freqid,
                        const ProgramAssociationTable*, const pmt_map_t&,
-                       const DTVChannelInfoList&,
+                       const DTVChannelInfoList&, const QString &si_standard,
                        bool force_update);
 
     void UpdatePMTinDB(int sourceid,

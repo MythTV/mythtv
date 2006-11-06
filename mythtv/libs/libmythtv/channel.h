@@ -45,6 +45,7 @@ class Channel : public DTVChannel
     bool IsOpen(void)       const { return GetFd() >= 0; }
     int  GetFd(void)        const { return videofd; }
     QString GetDevice(void) const { return device; }
+    QString GetSIStandard(void) const { return "atsc"; }
 
     // Commands
     bool SwitchToInput(int newcapchannel, bool setstarting);
@@ -61,8 +62,8 @@ class Channel : public DTVChannel
 
     // ATSC scanning stuff
     bool TuneMultiplex(uint mplexid, QString inputname);
-    bool Tune(uint frequency, QString inputname="",
-              QString modulation="analog");
+    bool Tune(uint frequency, QString inputname,
+              QString modulation, QString si_std);
     // V4L scanning stuff
     bool IsTuned(void) const;
   private:

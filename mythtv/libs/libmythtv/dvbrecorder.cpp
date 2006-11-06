@@ -929,7 +929,8 @@ void DVBRecorder::CreatePMT(void)
         desc_list_t desc = MPEGDescriptor::ParseAndExclude(
             _input_pmt->StreamInfo(i), _input_pmt->StreamInfoLength(i),
             DescriptorID::conditional_access);
-        uint type = StreamID::Normalize(_input_pmt->StreamType(i), desc);
+        uint type = StreamID::Normalize(
+            _input_pmt->StreamType(i), desc, dvbchannel->GetSIStandard());
 
         // Filter out streams not used for basic television
         if (_recording_type == "tv" &&
@@ -1290,7 +1291,8 @@ void DVBRecorder::StartDummyVideo(void)
     }
 
     vector<uint> video_pids;
-    uint video_cnt = _input_pmt->FindPIDs(StreamID::AnyVideo, video_pids);
+    uint video_cnt = _input_pmt->FindPIDs(
+        StreamID::AnyVideo, video_pids, dvbchannel->GetSIStandard());
 
     if (!video_cnt)
     {
