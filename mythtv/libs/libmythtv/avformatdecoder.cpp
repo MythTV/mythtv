@@ -2863,6 +2863,11 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
                 if ((video_width > 0 && video_width != current_width) ||
                     switch_to_xv || switch_to_xvmc)
                 {
+                    VERBOSE(VB_PLAYBACK, LOC + QString("DVD Stream/Codec Change"
+                                "video_width %1 current_width %2"
+                                "switch_to_xv %3 switch_to_xvmc %4")
+                            .arg(video_width).arg(current_width)
+                            .arg(switch_to_xv).arg(switch_to_xvmc));
                     av_free_packet(pkt);
                     CloseCodecs();
                     ScanStreams(false);

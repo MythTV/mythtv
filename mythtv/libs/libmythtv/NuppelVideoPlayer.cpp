@@ -6392,7 +6392,10 @@ void NuppelVideoPlayer::ChangeDVDTrack(bool ffw)
 void NuppelVideoPlayer::DoChangeDVDTrack(void)
 {
     GetDecoder()->ChangeDVDTrack(need_change_dvd_track > 0);
-    ClearAfterSeek(false);
+    if (ringBuffer->InDVDMenuOrStillFrame())
+        ClearAfterSeek(false);
+    else
+        ClearAfterSeek(true);
 }
 
 void NuppelVideoPlayer::DisplayDVDButton(void)

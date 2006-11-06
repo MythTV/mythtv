@@ -2610,7 +2610,10 @@ void TV::ProcessKeypress(QKeyEvent *e)
             if (HasQueuedInput())
                 DoArbSeek(ARBSEEK_FORWARD);
             else if (paused)
-                DoSeek(1.001 / frameRate, tr("Forward"));
+            {
+                if (!activerbuffer->isDVD())
+                    DoSeek(1.001 / frameRate, tr("Forward"));
+            }
             else if (!stickykeys)
             {
                 if (smartForward && doSmartForward)
@@ -2635,7 +2638,10 @@ void TV::ProcessKeypress(QKeyEvent *e)
             if (HasQueuedInput())
                 DoArbSeek(ARBSEEK_REWIND);
             else if (paused)
-                DoSeek(-1.001 / frameRate, tr("Rewind"));
+            {
+                if (!activerbuffer->isDVD())
+                    DoSeek(-1.001 / frameRate, tr("Rewind"));
+            }
             else if (!stickykeys)
             {
                 DoSeek(-rewtime, tr("Skip Back"));
