@@ -108,7 +108,7 @@ show_help(){
   echo "  --disable-lirc           disable lirc support (Infrared Remotes)"
   echo "  --disable-joystick-menu  disable joystick menu"
   echo "  --disable-firewire       disable support for FireWire cable boxes"
-  echo "  --disable-iptv           disable support for recording RTSC streams"
+  echo "  --disable-iptv           disable support for recording RTSP streams"
   echo "  --disable-dbox2          disable support for Nokia DBOX2 DVB boxes (or compatibles)"
   echo "  --disable-hdhomerun      disable support for HDHomeRun boxes"
   echo "  --disable-crciprec       disable support for recording UDP streams"
