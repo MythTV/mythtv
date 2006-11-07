@@ -37,6 +37,7 @@ class ViewScheduled : public MythDialog
     void FillList(void);
     void setShowAll(bool all);
     void viewCards(void);
+    void viewVideoSources(void);
 
     void updateBackground(void);
     void updateList(QPainter *);
@@ -78,6 +79,10 @@ class ViewScheduled : public MythDialog
     QMap<int, int> cardref;
     int maxcard;
     int curcard;
+
+    QMap<int, int> srcref;
+    int maxsrc;
+    int cursrc;
 };
 
 #endif

@@ -65,6 +65,9 @@ ViewScheduled::ViewScheduled(MythMainWindow *parent, const char *name)
     needFill = false;
 
     curcard = 0;
+    maxcard = 0;
+    cursrc  = 0;
+    maxsrc  = 0;
     listPos = 0;
     FillList();
  
@@ -126,6 +129,8 @@ void ViewScheduled::keyPressEvent(QKeyEvent *e)
                 setShowAll(!showAll);
             else if (action == "VIEWCARD")
                 viewCards();
+            else if (action == "VIEWVIDEOSOURCE")
+                viewVideoSources();
             else
                 handled = false;
         }
@@ -282,6 +287,10 @@ void ViewScheduled::FillList(void)
             if (p->cardid > maxcard)
                 maxcard = p->cardid;
 
+            srcref[p->sourceid]++;
+            if (p->sourceid > maxsrc)
+                maxsrc = p->sourceid;
+
             p = recList.next();
         }
         else
@@ -375,7 +384,8 @@ void ViewScheduled::updateList(QPainter *p)
                     ltype->EnableForcedFont(i, "conflictingrecording");
                 else if (p->recstatus == rsWillRecord)
                     {
-                    if (curcard == 0 || p->cardid == curcard)
+                    if ((curcard == 0 && cursrc == 0) || 
+                        p->cardid == curcard || p->sourceid == cursrc)
                         ltype->EnableForcedFont(i, "record");
                     }
                 else if (p->recstatus == rsRepeat ||
@@ -630,6 +640,7 @@ void ViewScheduled::setShowAll(bool all)
 
 void ViewScheduled::viewCards()
 {
+    cursrc = 0;
     needFill = true;
 
     curcard++;
@@ -640,4 +651,19 @@ void ViewScheduled::viewCards()
         curcard++;
     }
     curcard = 0;
+}
+
+void ViewScheduled::viewVideoSources()
+{
+    curcard = 0;
+    needFill = true;
+
+    cursrc++;
+    while (cursrc <= maxsrc)
+    {
+        if (srcref[cursrc] > 0)
+            return;
+        cursrc++;
+    }
+    cursrc = 0;
 }
