@@ -1628,6 +1628,8 @@ if test x"$tune" = x"generic" -a x"$cpu_overide" != x"yes"; then
 # Multiprocessor Xeon
    elif expr "$processor" : ".*XEON(TM) MP CPU" > /dev/null ; then
        ARCHFLAGS="-march=pentium4"
+   elif expr "$processor" : ".*Intel(R) Xeon(R) CPU.*5110" > /dev/null ; then
+       ARCHFLAGS="-march=k8" # this would be pentium4 on 32 bit systems
 # Various Intel Duo processors
    elif expr "$processor" : ".*Genuine.*Intel.*CPU" > /dev/null ; then
        ARCHFLAGS="-march=pentium4"
