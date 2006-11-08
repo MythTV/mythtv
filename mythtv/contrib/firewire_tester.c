@@ -22,11 +22,13 @@
 
 #define SYNC_BYTE           0x47
 #define MIN_PACKETS         25
+#define MAX_NODATA          10
 
 #define VERBOSE(args...)    do { if (verbose) printf(args); } while (0)
 
 int verbose = 0;
 int sync_failed = 0;
+int nodata = 0;
 
 static int read_packet (unsigned char *tspacket, int len, 
                         unsigned int dropped, void *callback_data)
@@ -44,6 +46,7 @@ static int read_packet (unsigned char *tspacket, int len,
         sync_failed = 1;
         return 0;
     }
+    nodata = 0;
     *count = *count + 1;
     return 1;
 }
@@ -60,7 +63,8 @@ int test_connection(raw1394handle_t handle, int channel)
     sync_failed = 0;
     mpeg = iec61883_mpeg2_recv_init(handle, read_packet, (void*) &count);
     iec61883_mpeg2_recv_start(mpeg, channel);
-    while(count < MIN_PACKETS && retry < 2 && !sync_failed)
+    while(count < MIN_PACKETS && retry < 2 && !sync_failed 
+          && nodata < MAX_NODATA)
     {
         FD_ZERO(&rfds);
         FD_SET(fd, &rfds);
@@ -69,6 +73,7 @@ int test_connection(raw1394handle_t handle, int channel)
 
         if (select(fd + 1, &rfds, NULL, NULL, &tv) > 0)
         {
+             nodata++;
              raw1394_loop_iterate(handle);
         }
         else
