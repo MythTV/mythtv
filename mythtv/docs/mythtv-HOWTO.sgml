@@ -3,7 +3,7 @@
 <title>Installing and using MythTV
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com"
 name="mailto:rkulagow@rocketmail.com">
-<date>2006-11-02, v0.20.06
+<date>2006-11-08, v0.20.07
 <abstract>
 Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -508,7 +508,8 @@ work with Over The Air signals captured with an antenna (with 8VSB).
 
 Cards that have been reported to work include:
 <itemize>
-<item>pcHDTV HD-2000, Air2PC PCI rev 1-3, SiliconDust HDHomeRun (8VSB only)
+<item>pcHDTV HD-2000, Air2PC PCI rev 1-3 (8VSB only)
+<item>SiliconDust HDHomeRun           (8VSB, QAM256)
 <item>pcHDTV HD-3000/5500             (8VSB, QAM256)
 <item>Air2PC HD-5000                  (8VSB, QAM256)
 <item>DViCO Fusion HDTV Lite/Gold 5   (8VSB, QAM256)
@@ -7096,7 +7097,7 @@ mysql 4.x and log-bin.  Add a section on logrotate.
 v0.20.05, 2006-10-19.  Update file path for configfiles directory now that
 it's under contrib/
 v0.20.06, 2006-11-02.  Update compile docs; no reason not to use at least -j 2
-
+v0.20.07, 2006-11-08.  HDHR does QAM.
 -->
 
 <!--

@@ -1,7 +1,7 @@
   Installing and using MythTV
   Robert Kulagowski, mailto:rkulagow@rocketmail.com
   <mailto:rkulagow@rocketmail.com>
-  2006-11-02, v0.20.06
+  2006-11-08, v0.20.07
 
   Initially, installation of MythTV seems like a huge task.  There are
   lots of dependencies, and various distributions seem to do the same
@@ -873,8 +873,9 @@
 
   Cards that have been reported to work include:
 
-  +o  pcHDTV HD-2000, Air2PC PCI rev 1-3, SiliconDust HDHomeRun (8VSB
-     only)
+  +o  pcHDTV HD-2000, Air2PC PCI rev 1-3 (8VSB only)
+
+  +o  SiliconDust HDHomeRun           (8VSB, QAM256)
 
   +o  pcHDTV HD-3000/5500             (8VSB, QAM256)
 
