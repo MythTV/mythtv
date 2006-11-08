@@ -475,11 +475,7 @@ DVBSignalMonitor* SIScan::GetDVBSignalMonitor(void)
 
 DTVChannel *SIScan::GetDTVChannel(void)
 {
-#ifdef USING_DVB
     return dynamic_cast<DTVChannel*>(channel);
-#else
-    return NULL;
-#endif
 }
 
 DVBChannel *SIScan::GetDVBChannel(void)
