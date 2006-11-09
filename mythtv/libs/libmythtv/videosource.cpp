@@ -35,10 +35,10 @@
 #include "diseqcsettings.h"
 
 #ifdef USING_DVB
-#include <linux/dvb/frontend.h>
+#include "dvbtypes.h"
 #endif
 
-#if defined(CONFIG_VIDEO4LINUX)
+#ifdef USING_V4L
 #include "videodev_myth.h"
 #endif
 

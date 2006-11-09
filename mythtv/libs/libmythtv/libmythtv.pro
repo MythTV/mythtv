@@ -316,8 +316,10 @@ using_backend {
     # Channel stuff
     HEADERS += channelbase.h               dtvchannel.h
     HEADERS += signalmonitor.h             dtvsignalmonitor.h
+    HEADERS += dtvmultiplex.h
     SOURCES += channelbase.cpp             dtvchannel.h
     SOURCES += signalmonitor.cpp           dtvsignalmonitor.cpp
+    SOURCES += dtvmultiplex.cpp
 
     # Channel scanner stuff
     HEADERS += scanwizard.h                scanwizardhelpers.h

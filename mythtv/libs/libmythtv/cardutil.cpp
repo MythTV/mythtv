@@ -8,9 +8,10 @@
 #include "videosource.h"
 #include "mythcontext.h"
 #include "mythdbcon.h"
+#include "dvbchannel.h"
 
 #ifdef USING_DVB
-#include "dvbchannel.h"
+#include "dvbtypes.h"
 #endif
 
 #ifdef USING_V4L
@@ -62,17 +63,10 @@ QString CardUtil::ProbeDVBType(uint device)
         close(fd_frontend);
         return "ERROR_PROBE";
     }
-
-    if (FE_QAM == info.type)
-        ret = "QAM";
-    else if (FE_QPSK == info.type)
-        ret = "QPSK";
-    else if (FE_OFDM == info.type)
-        ret = "OFDM";
-    else if (FE_ATSC == info.type)
-        ret = "ATSC";
-
     close(fd_frontend);
+
+    DTVTunerType type(info.type);
+    ret = (type.toString() != "UNKNOWN") ? type.toString().upper() : ret;
 #endif // USING_DVB
 
     return ret;

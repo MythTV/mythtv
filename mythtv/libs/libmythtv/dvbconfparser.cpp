@@ -60,36 +60,6 @@
          VAR = (*it++).toUInt() * 1000ULL; else return false; } while(0)
 
 
-QString DTVMultiplex::toString() const
-{
-    QString ret = QString("%1 %2 %3 ")
-        .arg(frequency).arg(modulation.toString()).arg(inversion.toString());
-
-    ret += QString("%1 %2 %3 %4 %5 %6 %7 %8")
-        .arg(hp_code_rate.toString()).arg(lp_code_rate.toString())
-        .arg(constellation.toString()).arg(bandwidth.toString())
-        .arg(trans_mode.toString()).arg(guard_interval.toString())
-        .arg(hierarchy.toString()).arg(polarity.toString());
-
-    return ret;
-}
-
-bool DTVMultiplex::operator==(const DTVMultiplex &m) const
-{
-    return ((frequency == m.frequency) &&
-            (modulation == m.modulation) &&
-            (inversion == m.inversion) &&
-            (bandwidth == m.bandwidth) &&
-            (hp_code_rate == m.hp_code_rate) &&
-            (lp_code_rate == m.lp_code_rate) &&
-            (constellation == m.constellation) &&
-            (trans_mode == m.trans_mode) &&
-            (guard_interval == m.guard_interval) &&
-            (fec == m.fec) &&
-            (polarity == m.polarity) &&
-            (hierarchy == m.hierarchy));
-}
-
 QString DTVChannelInfo::toString() const
 {
     return QString("%1 %2 %3 ").arg(name).arg(serviceid).arg(lcn);
@@ -168,7 +138,7 @@ bool DTVConfParser::ParseConfOFDM(const QStringList &tokens)
     PARSE_CONF(mux.bandwidth);
     PARSE_CONF(mux.hp_code_rate);
     PARSE_CONF(mux.lp_code_rate);
-    PARSE_CONF(mux.constellation);
+    PARSE_CONF(mux.modulation);
     PARSE_CONF(mux.trans_mode);
     PARSE_CONF(mux.guard_interval);
     PARSE_CONF(mux.hierarchy);
@@ -282,7 +252,7 @@ bool DTVConfParser::ParseVDR(const QStringList &tokens, int channelNo)
                 mux.lp_code_rate.ParseVDR(params);
                 break;
             case 'M':
-                mux.constellation.ParseVDR(params);
+                mux.modulation.ParseVDR(params);
                 break;
             case 'T':
                 mux.trans_mode.ParseVDR(params);

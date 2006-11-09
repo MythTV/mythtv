@@ -330,6 +330,23 @@ uint ChannelUtil::CreateMultiplex(
         lp_code_rate,       guard_interval);
 }
 
+uint ChannelUtil::CreateMultiplex(uint sourceid, const DTVMultiplex &mux,
+                                  int transport_id, int network_id)
+{
+    return insert_dtv_multiplex(
+        sourceid,                    mux.sistandard,
+        mux.frequency,               mux.modulation.toString(),
+        // DVB specific
+        transport_id,                network_id,
+        mux.symbolrate,              mux.bandwidth.toChar(),
+        mux.polarity.toChar(),       mux.inversion.toChar(),
+        mux.trans_mode.toChar(),
+        mux.fec.toString(),          mux.modulation.toString(),
+        mux.hierarchy.toChar(),      mux.hp_code_rate.toString(),
+        mux.lp_code_rate.toString(), mux.guard_interval.toString());
+}
+
+
 /** \fn ChannelUtil::CreateMultiplexes(int, const NetworkInformationTable*)
  *
  */
@@ -1099,11 +1116,15 @@ bool ChannelUtil::UpdateChannel(uint db_mplexid,
         "    tvformat        = :TVFORMAT,  sourceid        = :SOURCEID,  "
         "    useonairguide   = :USEOAG,    visible         = :VISIBLE,   "
         "    tvformat        = :TVFORMAT,  icon            = :ICON,      "
-        "    xmltvid         = :XMLTVID "
+        "    xmltvid         = :XMLTVID,   channum         = :CHANNUM    "
         "WHERE chanid=:CHANID");
 
+    if (channel_id > 0)
+        query.bindValue(":CHANID", channel_id);
+
     if (!chan_num.isEmpty() && chan_num != "-1")
-        query.bindValue(":CHANNUM",   chan_num);
+        query.bindValue(":CHANNUM", chan_num.utf8());
+
     query.bindValue(":SOURCEID",  source_id);
     query.bindValue(":CALLSIGN",  callsign.utf8());
     query.bindValue(":NAME",      service_name.utf8());

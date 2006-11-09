@@ -27,11 +27,7 @@
 #include "dvbsignalmonitor.h"
 #include "dvbtables.h"
 
-#ifdef USING_DVB
 #include "dvbchannel.h"
-#include "dvbtypes.h"
-#endif // USING_DVB
-
 #include "hdhrchannel.h"
 #include "channel.h"
 
@@ -258,9 +254,6 @@ void SIScan::HandleNIT(const NetworkInformationTable *nit)
 
     dvbChanNums.clear();
 
-    //emit TransportScanUpdateText(tr("Optimizing transport frequency"));
-    //OptimizeNITFrequencies(&nit);
-
     if (nit->TransportStreamCount())
     {
         emit TransportScanUpdateText(
@@ -304,12 +297,12 @@ void SIScan::HandleNIT(const NetworkInformationTable *nit)
 void SIScan::HandleMPEGDBInsertion(const ScanStreamData *sd, bool)
 {
     // Try to determine if this might be "OpenCable" transport.
-    (*current).standard = sd->GetSIStandard((*current).standard);
+    QString sistandard = sd->GetSIStandard((*current).tuning.sistandard);
 
-    if ((*current).mplexid <= 0)
+    if (!(*current).mplexid)
         (*current).mplexid = InsertMultiplex(current);
 
-    if ((*current).mplexid <= 0)
+    if (!(*current).mplexid)
         return;
 
     int     mplexid = (*current).mplexid;
@@ -321,8 +314,7 @@ void SIScan::HandleMPEGDBInsertion(const ScanStreamData *sd, bool)
     for (uint i = 0; i < pats.size(); i++)
     {
         UpdatePATinDB(mplexid, fn, freqid, pats[i], pmt_map,
-                      (*current).expectedChannels,
-                      (*current).standard, true);
+                      (*current).expectedChannels, sistandard, true);
     }
     sd->ReturnCachedPMTTables(pmt_map);
     sd->ReturnCachedPATTables(pats);
@@ -342,10 +334,10 @@ void SIScan::HandleATSCDBInsertion(const ScanStreamData *sd,
     if (wait_until_complete && !sd->HasCachedAllVCTs())
         return;
 
-    if ((*current).mplexid <= 0)
+    if (!(*current).mplexid)
         (*current).mplexid = InsertMultiplex(current);
 
-    if ((*current).mplexid <= 0)
+    if (!(*current).mplexid)
         return;
 
     int     mplexid = (*current).mplexid;
@@ -388,7 +380,7 @@ void SIScan::HandleDVBDBInsertion(const ScanStreamData *sd,
 
     emit ServiceScanUpdateText(tr("Updating Services"));
 
-    if ((*current).mplexid <= 0)
+    if (!(*current).mplexid)
         (*current).mplexid = InsertMultiplex(current);
 
     vector<const ServiceDescriptionTable*> sdts = sd->GetAllCachedSDTs();
@@ -482,15 +474,6 @@ DVBChannel *SIScan::GetDVBChannel(void)
 {
 #ifdef USING_DVB
     return dynamic_cast<DVBChannel*>(channel);
-#else
-    return NULL;
-#endif
-}
-
-HDHRChannel *SIScan::GetHDHRChannel(void)
-{
-#ifdef USING_HDHOMERUN
-    return dynamic_cast<HDHRChannel*>(channel);
 #else
     return NULL;
 #endif
@@ -627,7 +610,7 @@ void SIScan::HandleActiveScan(void)
 bool SIScan::Tune(const transport_scan_items_it_t transport)
 {
     const TransportScanItem &item = *transport;
-    const uint freq = item.freq_offset(transport.offset());
+    const uint64_t freq = item.freq_offset(transport.offset());
 
 #ifdef USING_DVB
     if (GetDVBSignalMonitor())
@@ -641,39 +624,15 @@ bool SIScan::Tune(const transport_scan_items_it_t transport)
     // TODO we should actually use the input the user specifies...
     QString inputname = ChannelUtil::GetInputName(item.SourceID);
 
-    if (GetDTVChannel() && (item.mplexid > 0))
-    {
+    if (!GetDTVChannel())
+        return false;
+
+    if (item.mplexid > 0)
         return GetDTVChannel()->TuneMultiplex(item.mplexid, inputname);
-    }
 
-    bool ok = false;
-#ifdef USING_DVB
-    if (GetDVBChannel())
-    {
-        DVBTuning tuning = item.tuning;
-        tuning.params.frequency = freq;
-        ok = GetDVBChannel()->Tune(tuning, item.standard, true, item.SourceID);
-    }
-#endif // USING_DVB
-
-#ifdef USING_V4L
-    if (GetChannel())
-    {
-        const uint freq_vis = freq - 1750000; // to visual carrier
-        ok = GetChannel()->Tune(freq_vis, inputname,
-                                item.ModulationDB(), item.standard);
-    }
-#endif // USING_V4L
-
-#ifdef USING_HDHOMERUN
-    if (GetHDHRChannel())
-    {
-        ok = GetHDHRChannel()->Tune(freq, inputname,
-                                    item.ModulationDB(), item.standard);
-    }
-#endif // USING_HDHOMERUN
-
-    return ok;
+    DTVMultiplex tuning = item.tuning;
+    tuning.frequency = freq;
+    return GetDTVChannel()->Tune(tuning, inputname);
 }
 
 void SIScan::ScanTransport(const transport_scan_items_it_t transport)
@@ -803,11 +762,16 @@ bool SIScan::ScanForChannels(uint sourceid,
     scanTransports.clear();
     nextIt = scanTransports.end();
 
+    DTVTunerType tunertype;
+    tunertype.Parse(cardtype);
+
     DTVChannelList::const_iterator it = channels.begin();
     for (uint i = 0; it != channels.end(); ++it, i++)
     {
-        TransportScanItem item(sourceid, std, QString::number(i),
-                               cardtype, *it, signalTimeout);
+        DTVTransport tmp = *it;
+        tmp.sistandard = std;
+        TransportScanItem item(sourceid, QString::number(i),
+                               tunertype, tmp, signalTimeout);
 
         scanTransports += item;
 
@@ -846,7 +810,7 @@ bool SIScan::ScanTransportsStartingOn(int sourceid,
     }
 
     QString std    = *startChan.find("std");
-    QString mod    = *startChan.find("modulation");
+    QString mod    = (*(startChan.find("modulation"))).upper();
     QString si_std = (std.lower() != "atsc") ? "dvb" : "atsc";
     QString name   = "";
     bool    ok     = false;
@@ -857,40 +821,40 @@ bool SIScan::ScanTransportsStartingOn(int sourceid,
     scanTransports.clear();
     nextIt = scanTransports.end();
 
-#ifdef USING_DVB
-    DVBTuning tuning;
-    bzero(&tuning, sizeof(DVBTuning));
-    if (std == "dvb" && mod == "ofdm")
+    DTVMultiplex tuning;
+
+    DTVTunerType type;
+
+    if (std == "dvb") 
     {
-        ok = tuning.parseOFDM(
-            startChan["frequency"],   startChan["inversion"],
-            startChan["bandwidth"],   startChan["coderate_hp"],
-            startChan["coderate_lp"], startChan["constellation"],
-            startChan["trans_mode"],  startChan["guard_interval"],
-            startChan["hierarchy"]);
+        ok = type.Parse(mod);
     }
-    if (std == "dvb" && mod == "qpsk")
+    else if (std == "atsc")
     {
-        ok = tuning.parseQPSK(
-            startChan["frequency"],   startChan["inversion"],
-            startChan["symbolrate"],  startChan["fec"],
-            startChan["polarity"]);
-    }
-    else if (std == "dvb" && mod.left(3) == "qam")
-    {
-        ok = tuning.parseQAM(
-            startChan["frequency"],   startChan["inversion"],
-            startChan["symbolrate"],  startChan["fec"],
-            startChan["modulation"]);
+        type = DTVTunerType::kTunerTypeATSC;
+        ok = true;
     }
 
     if (ok)
     {
+        ok = tuning.ParseTuningParams(
+            type,
+            startChan["frequency"],      startChan["inversion"],
+            startChan["symbolrate"],     startChan["fec"],
+            startChan["polarity"],
+            startChan["coderate_hp"],    startChan["coderate_lp"],
+            startChan["constellation"],  startChan["trans_mode"],
+            startChan["guard_interval"], startChan["hierarchy"],
+            startChan["modulation"],     startChan["bandwidth"]);
+    }
+
+    if (ok)
+    {
+        tuning.sistandard = si_std;
         scanTransports += TransportScanItem(
-            sourceid, si_std, tr("Frequency %1").arg(startChan["frequency"]),
+            sourceid, tr("Frequency %1").arg(startChan["frequency"]),
             tuning, signalTimeout);
     }
-#endif // USING_DVB
 
     if (!ok)
         return false;
@@ -958,42 +922,6 @@ bool SIScan::ScanTransport(int mplexid)
     }
 
     return false;
-}
-
-/** \fn SIScan::OptimizeNITFrequencies(NetworkInformationTable *nit)
- *  \brief Checks that we can tune to a transports described in NIT.
- *
- *   For each transport freqency list entry, we try to tune to it
- *   if it works use it as the frequency.
- *
- *  \todo We should probably try and work out the strongest signal.
- */
-void SIScan::OptimizeNITFrequencies(NetworkInformationTable *nit)
-{
-    (void) nit;
-#if 0
-    dvb_channel_t chan_opts;
-    DVBTuning    &tuning = chan_opts.tuning;
-
-    QValueList<TransportObject>::iterator it;
-    for (it = NIT.Transport.begin() ; it != NIT.Transport.end() ; ++it )
-    {
-        const TransportObject& transport = *it;
-        // Parse the default transport object
-        bool ok = false;
-        if (transport.Type == "DVB-T")
-            ok = tuning.parseOFDM(transport);
-        else if (transport.Type == "DVB-C")
-            ok = tuning.parseQAM(transport);
-
-        // Find the best frequency from those listed in transport object.
-        if (ok)
-        {
-            (*it).Frequency = scan_for_best_freq(
-                transport, GetDVBChannel(), chan_opts);
-        }
-    }
-#endif // USING_DVB
 }
 
 /** \fn SIScan::CheckImportedList(const DTVChannelInfoList&,uint,QString&,QString&,QString&)
@@ -1511,8 +1439,8 @@ void SIScan::UpdateSDTinDB(int /*mplexid*/, const ServiceDescriptionTable *sdt,
 //  - Examines the freq in the DB against the curent tuning frequency and
 //    it's offset frequencies. If the frequency in the DB is any of the
 //    tuning frequencies or offsets then use the DB frequency.
-uint SIScan::FindBestMplexFreq(
-    const uint tuning_freq,
+uint64_t SIScan::FindBestMplexFreq(
+    const uint64_t tuning_freq,
     const transport_scan_items_it_t transport, const uint sourceid,
     const uint transportid, const uint networkid)
 {
@@ -1522,8 +1450,11 @@ uint SIScan::FindBestMplexFreq(
     uint        tmp_transportid, tmp_networkid;
     int         mplexid;
 
+    if (!transportid || !networkid)
+        return tuning_freq;
+
     mplexid = ChannelUtil::GetMplexID(sourceid, transportid, networkid);
-    if (mplexid < 0)
+    if (mplexid <= 0)
         return tuning_freq;
 
     if (!ChannelUtil::GetTuningParams(
@@ -1535,100 +1466,46 @@ uint SIScan::FindBestMplexFreq(
 
     for (uint i = 0; i < (*transport).offset_cnt(); i++)
     {
-        if ((uint)db_freq == (*transport).freq_offset(i))
-            return (uint)db_freq;
+        if (db_freq == (*transport).freq_offset(i))
+            return db_freq;
     }
+
     return tuning_freq;
 }
 
-int SIScan::InsertMultiplex(const transport_scan_items_it_t transport)
+uint SIScan::InsertMultiplex(const transport_scan_items_it_t transport)
 {
-    int mplexid = -1;
+    DTVMultiplex tuning = (*transport).tuning;
+    uint tsid  = 0;
+    uint netid = 0;
+
+    tuning.frequency = (*transport).freq_offset(transport.offset());
 
 #ifdef USING_DVB
-    if (GetDVBChannel())
+    if (GetDVBSignalMonitor())
     {
         DVBSignalMonitor *sm = GetDVBSignalMonitor();
+
+        tsid  = sm->GetDetectedTransportID();
+        netid = sm->GetDetectedNetworkID();
+
         // Try to read the actual values back from the card
-        DVBTuning tuning;
-        if (!GetDVBChannel()->GetTuningParams(tuning))
-            tuning = (*transport).tuning;
+        if (GetDVBChannel()->IsTuningParamsProbeSupported())
+            GetDVBChannel()->ProbeTuningParams(tuning);
 
-        uint bestFrequency = FindBestMplexFreq(
-            tuning.Frequency(),
-            transport,
-            (*transport).SourceID,
-            sm->GetDetectedTransportID(),
-            sm->GetDetectedNetworkID());
-
-        // Write the best info we have to the DB
-        if (FE_OFDM == GetDVBChannel()->GetCardType())
-            mplexid = ChannelUtil::CreateMultiplex(
-                (*transport).SourceID,      (*transport).standard,
-                bestFrequency,              tuning.ModulationDB(),
-                sm->GetDetectedTransportID(),
-                sm->GetDetectedNetworkID(),
-                -1 /* symbol rate */,       tuning.BandwidthChar(),
-                -1 /* polarity */,          tuning.InversionChar(),
-                tuning.TransmissionModeChar(),
-                QString::null /*inner FEC*/,tuning.ConstellationDB(),
-                tuning.HierarchyChar(),     tuning.HPCodeRateString(),
-                tuning.LPCodeRateString(),  tuning.GuardIntervalString());
-        else if (FE_QPSK == GetDVBChannel()->GetCardType()) 
-            mplexid = ChannelUtil::CreateMultiplex( 
-                (*transport).SourceID,      (*transport).standard, 
-                (*transport).tuning.Frequency(),
-                (*transport).ModulationDB(), 
-                sm->GetDetectedTransportID(), 
-                sm->GetDetectedNetworkID(), 
-                tuning.QPSKSymbolRate(),    -1, 
-                tuning.PolarityChar(),      tuning.InversionChar(), 
-                -1, 
-                tuning.QPSKInnerFECString(),QString::null, 
-                -1,                         QString::null, 
-                QString::null,              QString::null); 
-        else if (FE_QAM == GetDVBChannel()->GetCardType())
-            mplexid = ChannelUtil::CreateMultiplex(
-                (*transport).SourceID,      (*transport).standard,
-                (*transport).tuning.Frequency(),
-                tuning.ModulationString(),
-                sm->GetDetectedTransportID(),
-                sm->GetDetectedNetworkID(),
-                tuning.QAMSymbolRate(),     -1,
-                -1 /* polarity */,          tuning.InversionChar(),
-                -1 /* transmission mode */,
-                tuning.QAMInnerFECString(), QString::null,
-                -1,                         QString::null,
-                QString::null,              QString::null);
-        else
-            mplexid = ChannelUtil::CreateMultiplex(
-                (*transport).SourceID,      (*transport).standard,
-                tuning.Frequency(),         (*transport).ModulationDB(),
-                sm->GetDetectedTransportID(),
-                sm->GetDetectedNetworkID());
+        tuning.frequency = FindBestMplexFreq(
+            tuning.frequency, transport, (*transport).SourceID, tsid, netid);
     }
 #endif // USING_DVB
 
 #ifdef USING_V4L
     if (GetChannel())
     {
-        const uint freq = (*transport).freq_offset(transport.offset());
-        const uint freq_vis = freq - 1750000; // convert to visual carrier
-        mplexid = ChannelUtil::CreateMultiplex(
-            (*transport).SourceID, (*transport).standard,
-            freq_vis, (*transport).ModulationDB());
+        // convert to visual carrier
+        tuning.frequency = tuning.frequency - 1750000;
     }
 #endif // USING_V4L
 
-#ifdef USING_HDHOMERUN
-    if (GetHDHRChannel())
-    {
-        const uint freq = (*transport).freq_offset(transport.offset());
-        mplexid = ChannelUtil::CreateMultiplex(
-            (*transport).SourceID, (*transport).standard,
-            freq, (*transport).ModulationDB());
-    }
-#endif
-
-    return mplexid;
+    return ChannelUtil::CreateMultiplex(
+        (*transport).SourceID, tuning, tsid, netid);
 }

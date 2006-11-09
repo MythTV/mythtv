@@ -108,8 +108,6 @@ class SIScan : public QObject,
     DTVChannel       *GetDTVChannel(void);
     Channel          *GetChannel(void);
     DVBChannel       *GetDVBChannel(void);
-    HDHRChannel      *GetHDHRChannel(void);
-
 
     /// \brief Called by SpawnScanner to run scanning thread
     void RunScanner(void);
@@ -119,7 +117,7 @@ class SIScan : public QObject,
     bool HasTimedOut(void);
     void HandleActiveScan(void);
     bool Tune(const transport_scan_items_it_t transport);
-    int InsertMultiplex(const transport_scan_items_it_t transport);
+    uint InsertMultiplex(const transport_scan_items_it_t transport);
     void ScanTransport(const transport_scan_items_it_t transport);
 
     /// \brief Updates Transport Scan progress bar
@@ -162,12 +160,10 @@ class SIScan : public QObject,
 
     bool HandlePostInsertion(void);
 
-    void OptimizeNITFrequencies(NetworkInformationTable *nit);
-
-    uint FindBestMplexFreq(const uint tuning_freq,
-                       const transport_scan_items_it_t transport,
-                       const uint sourceid, const uint transportid,
-                       const uint networkid);
+    uint64_t FindBestMplexFreq(const uint64_t tuning_freq,
+                               const transport_scan_items_it_t transport,
+                               const uint sourceid, const uint transportid,
+                               const uint networkid);
 
 
     static QString loc(const SIScan*);

@@ -31,14 +31,7 @@
  *   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#include <qsqldatabase.h>
-
-#include <iostream>
-#include <string>
-#include <vector>
-using namespace std;
-
-#include <pthread.h>
+// POSIX headers
 #include <fcntl.h>
 #include <unistd.h>
 #include <sys/poll.h>
@@ -46,21 +39,21 @@ using namespace std;
 #include <sys/time.h>
 #include <sys/types.h>
 
-#include "RingBuffer.h"
-#include "recorderbase.h"
+// MythTV headers
 #include "mythcontext.h"
 #include "mythdbcon.h"
-#include "tv_rec.h"
 #include "cardutil.h"
 #include "channelutil.h"
-
 #include "dvbtypes.h"
 #include "dvbchannel.h"
-#include "dvbrecorder.h"
 #include "dvbcam.h"
 
 static void drain_dvb_events(int fd);
 static bool wait_for_backend(int fd, int timeout_ms);
+static struct dvb_fe_params dtvmultiplex_to_dvbparams(
+    DTVTunerType, const DTVMultiplex&);
+static DTVMultiplex dvbparams_to_dtvmultiplex(
+    DTVTunerType, const dvb_fe_params&);
 
 #define LOC QString("DVBChan(%1): ").arg(cardnum)
 #define LOC_WARN QString("DVBChan(%1) Warning: ").arg(cardnum)
@@ -75,6 +68,8 @@ DVBChannel::DVBChannel(int aCardNum, TVRec *parent)
     : DTVChannel(parent),
       // Helper classes
       diseqc_tree(NULL),            dvbcam(NULL),
+      // Device info
+      frontend_name(QString::null), card_type(DTVTunerType::kTunerTypeUnknown),
       // Tuning
       tuning_delay(0),              sigmon_delay(25),
       first_tune(true),
@@ -83,7 +78,6 @@ DVBChannel::DVBChannel(int aCardNum, TVRec *parent)
       has_crc_bug(false)
 {
     dvbcam = new DVBCam(cardnum);
-    bzero(&info, sizeof(info));
     has_crc_bug = CardUtil::HasDVBCRCBug(aCardNum);
     sigmon_delay = CardUtil::GetMinSignalMonitoringDelay(aCardNum);
 }
@@ -132,6 +126,8 @@ bool DVBChannel::Open()
         return false;
     }
 
+    dvb_frontend_info info;
+    bzero(&info, sizeof(info));
     if (ioctl(fd_frontend, FE_GET_INFO, &info) < 0)
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR +
@@ -145,45 +141,59 @@ bool DVBChannel::Open()
 #ifdef FE_GET_EXTENDED_INFO
     if (info.caps & FE_HAS_EXTENDED_INFO)
     {
+        bool ok = true;
+        bzero(&extinfo, sizeof(extinfo));
         if (ioctl(fd_frontend, FE_GET_EXTENDED_INFO, &extinfo) < 0)
         {
             VERBOSE(VB_IMPORTANT, LOC_ERR +
                     "Failed to get frontend extended information." + ENO);
-            close(fd_frontend);
-            fd_frontend = -1;
-            return false;
+
+            ok = false;
         }
-        if (extinfo.modulations & MOD_8PSK)
+
+        if (ok && (extinfo.modulations & MOD_8PSK))
         {
             if (ioctl(fd_frontend, FE_SET_STANDARD, FE_DVB_S2) < 0)
             {
                 VERBOSE(VB_IMPORTANT, LOC_ERR +
-                        "Failed to get extended frontend information." + ENO);
-                close(fd_frontend);
-                fd_frontend = -1;
-                return false;
+                        "Failed to set frontend standard to DVB-S2." + ENO);
+
+                ok = false;
             }
-            if (ioctl(fd_frontend, FE_GET_INFO, &info) < 0)
+            else if (ioctl(fd_frontend, FE_GET_INFO, &info) < 0)
             {
                 VERBOSE(VB_IMPORTANT, LOC_ERR +
                         "Failed to get frontend information." + ENO);
-                close(fd_frontend);
-                fd_frontend = -1;
-                return false;
+
+                ok = false;
             }
         }
+
+        if (!ok)
+        {
+            close(fd_frontend);
+            fd_frontend = -1;
+            return false;
+        }
+
+        ext_modulations   = extinfo.modulations;
     }
 #endif
 
+    frontend_name       = info.name;
+    card_type           = info.type;
+    capabilities        = info.caps;
+    frequency_minimum   = info.frequency_min;
+    frequency_maximum   = info.frequency_max;
+    symbol_rate_minimum = info.symbol_rate_min;
+    symbol_rate_maximum = info.symbol_rate_max;
+
     VERBOSE(VB_RECORD, LOC + QString("Using DVB card %1, with frontend '%2'.")
-            .arg(cardnum).arg(info.name));
+            .arg(cardnum).arg(frontend_name));
 
     // Turn on the power to the LNB
-#ifdef FE_GET_EXTENDED_INFO
-    if (info.type == FE_QPSK || info.type == FE_DVB_S2)
-#else
-    if (info.type == FE_QPSK)
-#endif
+    if (card_type == DTVTunerType::kTunerTypeQPSK ||
+        card_type == DTVTunerType::kTunerTypeDVB_S2)
     {
         diseqc_tree = diseqc_dev.FindTree(GetCardID());
         if (diseqc_tree)
@@ -208,18 +218,13 @@ bool DVBChannel::Open()
 // documented in dtvchannel.h
 bool DVBChannel::TuneMultiplex(uint mplexid, QString inputname)
 {
-    DVBTuning tuning;
-    QString si_std;
-    if (!tuning.FillFromDB(info.type, mplexid, si_std))
+    DTVMultiplex tuning;
+    if (!tuning.FillFromDB(card_type, mplexid))
         return false;
 
     CheckOptions(tuning);
 
-    // TODO Tune() should actually use the specified input,
-    //      not the first input with the same sourceid.
-    uint sourceid = ChannelUtil::GetSourceID(mplexid);
-
-    if (!Tune(tuning, si_std, false, sourceid))
+    if (!Tune(tuning, inputname))
         return false;
 
     return true;
@@ -267,9 +272,8 @@ bool DVBChannel::SetChannelByString(const QString &channum)
         return false;
 
     // Initialize all the tuning parameters
-    DVBTuning tuning;
-    QString si_std;
-    if (!InitChannelParams(tuning, si_std, (*it)->sourceid, channum))
+    DTVMultiplex tuning;
+    if (!InitChannelParams(tuning, (*it)->sourceid, channum))
     {
         VERBOSE(VB_IMPORTANT, loc_err +
                 "Failed to initialize channel options");
@@ -279,7 +283,7 @@ bool DVBChannel::SetChannelByString(const QString &channum)
 
     CheckOptions(tuning);
 
-    if (!Tune(tuning, si_std))
+    if (!Tune(tuning, ""))
     {
         VERBOSE(VB_IMPORTANT, loc_err + "Tuning to frequency.");
 
@@ -327,17 +331,16 @@ bool DVBChannel::SwitchToInput(int newInputNum, bool setstarting)
     return SetChannelByString((*it)->startChanNum);
 }
 
-/** \fn DVBChannel::InitChannelParams(DVBTuning&,uint,const QString&)
+/** \fn DVBChannel::InitChannelParams(DTVMultiplex&,uint,const QString&)
  *  \brief Initializes all variables pertaining to a channel.
  *
  *  \return true on success and false on failure
  */
-bool DVBChannel::InitChannelParams(DVBTuning     &tuning,
-                                   QString       &si_std,
+bool DVBChannel::InitChannelParams(DTVMultiplex  &tuning,
                                    uint           sourceid,
                                    const QString &channum)
 {
-    QString tvformat, modulation, freqtable, freqid;
+    QString tvformat, modulation, freqtable, freqid, si_std;
     int finetune;
     uint64_t frequency;
     uint mplexid;
@@ -358,203 +361,167 @@ bool DVBChannel::InitChannelParams(DVBTuning     &tuning,
         currentProgramNum = -1;
 
     if (mplexid)
-        return tuning.FillFromDB(info.type, mplexid, si_std);
+        return tuning.FillFromDB(card_type, mplexid);
 
     VERBOSE(VB_IMPORTANT, LOC_ERR + "Unable to find channel in database.");
     return false;
 }
 
-/** \fn DVBChannel::CheckOptions(DVBTuning&) const
+/** \fn DVBChannel::CheckOptions(DTVMultiplex&) const
  *  \brief Checks tuning for problems, and tries to fix them.
  */
-void DVBChannel::CheckOptions(DVBTuning &t) const
+void DVBChannel::CheckOptions(DTVMultiplex &tuning) const
 {
-    if ((t.params.inversion == INVERSION_AUTO) &&
-        !(info.caps & FE_CAN_INVERSION_AUTO))
+    if ((tuning.inversion == DTVInversion::kInversionAuto) &&
+        !(capabilities & FE_CAN_INVERSION_AUTO))
     {
         VERBOSE(VB_GENERAL, LOC_WARN +
                 "Unsupported inversion option 'auto', "
                 "falling back to 'off'");
 
-        t.params.inversion = INVERSION_OFF;
+        tuning.inversion = DTVInversion::kInversionAuto;
     }
 
-    uint64_t frequency = t.params.frequency;
+    uint64_t frequency = tuning.frequency;
     if (diseqc_tree)
     {
         DiSEqCDevLNB* lnb = diseqc_tree->FindLNB(diseqc_settings);
         if (lnb)
-            frequency = lnb->GetIntermediateFrequency(diseqc_settings, t);
+            frequency = lnb->GetIntermediateFrequency(diseqc_settings, tuning);
     }
 
-    if ((info.frequency_min > 0 && info.frequency_max > 0) &&
-       (frequency < info.frequency_min || frequency > info.frequency_max))
+    if (frequency_minimum && frequency_maximum &&
+        (frequency_minimum <= frequency_maximum) &&
+        (frequency < frequency_minimum || frequency > frequency_maximum))
     {
         VERBOSE(VB_GENERAL, LOC_WARN +
-                QString("Your frequency setting (%1) is"
-                        " out of range. (min/max:%2/%3)")
+                QString("Your frequency setting (%1) is "
+                        "out of range. (min/max:%2/%3)")
                 .arg(frequency)
-                .arg(info.frequency_min).arg(info.frequency_max));
+                .arg(frequency_minimum).arg(frequency_maximum));
     }
 
-    unsigned int symbol_rate = 0;
-    switch(info.type)
-    {
-        case FE_QPSK:
-            symbol_rate = t.QPSKSymbolRate();
-
-            if (!CheckCodeRate(t.params.u.qpsk.fec_inner))
-            {
-                VERBOSE(VB_GENERAL, LOC_WARN +
-                        "Unsupported fec_inner parameter.");
-            }
-            break;
-
-#ifdef FE_GET_EXTENDED_INFO
-        case FE_DVB_S2:
-            symbol_rate = t.DVBS2SymbolRate();
-
-            if (!CheckModulation(t.params.u.qpsk2.modulation))
-                VERBOSE(VB_GENERAL, LOC_WARN +
-                        "Unsupported modulation parameter.");
-
-            if (!CheckCodeRate(t.params.u.qpsk2.fec_inner))
-                VERBOSE(VB_GENERAL, LOC_WARN +
-                        "Unsupported fec_inner parameter.");
-            break;
-#endif
-
-        case FE_QAM:
-            symbol_rate = t.QAMSymbolRate();
-
-            if (!CheckCodeRate(t.params.u.qam.fec_inner))
-            {
-                VERBOSE(VB_GENERAL, LOC_WARN +
-                        "Unsupported fec_inner parameter.");
-            }
-
-            if (!CheckModulation(t.params.u.qam.modulation))
-            {
-                VERBOSE(VB_GENERAL, LOC_WARN +
-                        "Unsupported modulation parameter.");
-            }
-            break;
-
-        case FE_OFDM:
-            if (!CheckCodeRate(t.params.u.ofdm.code_rate_HP))
-            {
-                VERBOSE(VB_GENERAL, LOC_WARN +
-                        "Unsupported code_rate_hp option.");
-            }
-
-            if (!CheckCodeRate(t.params.u.ofdm.code_rate_LP))
-            {
-                VERBOSE(VB_GENERAL, LOC_WARN +
-                        "Unsupported code_rate_lp parameter.");
-            }
-
-            if ((t.params.u.ofdm.bandwidth == BANDWIDTH_AUTO) &&
-                !(info.caps & FE_CAN_BANDWIDTH_AUTO))
-            {
-                VERBOSE(VB_GENERAL, LOC_WARN +
-                        "Unsupported bandwidth parameter.");
-            }
-
-            if ((t.params.u.ofdm.transmission_mode ==
-                 TRANSMISSION_MODE_AUTO) &&
-                !(info.caps & FE_CAN_TRANSMISSION_MODE_AUTO))
-            {
-                VERBOSE(VB_GENERAL, LOC_WARN +
-                        "Unsupported transmission_mode parameter.");
-            }
-
-            if ((t.params.u.ofdm.guard_interval == GUARD_INTERVAL_AUTO) &&
-                !(info.caps & FE_CAN_GUARD_INTERVAL_AUTO))
-            {
-                VERBOSE(VB_GENERAL, LOC_WARN +
-                        "Unsupported guard_interval parameter.");
-            }
-
-            if ((t.params.u.ofdm.hierarchy_information == HIERARCHY_AUTO) &&
-                !(info.caps & FE_CAN_HIERARCHY_AUTO))
-            {
-                VERBOSE(VB_GENERAL, LOC_WARN +
-                        "Unsupported hierarchy parameter.");
-            }
-
-            if (!CheckModulation(t.params.u.ofdm.constellation))
-            {
-                VERBOSE(VB_GENERAL, LOC_WARN +
-                        "Unsupported constellation parameter.");
-            }
-            break;
-
-       case FE_ATSC:
-            // ATSC doesn't need any validation
-            break;
-       default:
-            break;
-    }
-
-    if (info.type != FE_OFDM &&
-       (symbol_rate < info.symbol_rate_min ||
-        symbol_rate > info.symbol_rate_max))
+    if (card_type.IsFECVariable() &&
+        symbol_rate_minimum && symbol_rate_maximum &&
+        (symbol_rate_minimum <= symbol_rate_maximum) &&
+        (tuning.symbolrate < symbol_rate_minimum ||
+         tuning.symbolrate > symbol_rate_maximum))
     {
         VERBOSE(VB_GENERAL, LOC_WARN +
                 QString("Symbol Rate setting (%1) is "
                         "out of range (min/max:%2/%3)")
-                .arg(symbol_rate)
-                .arg(info.symbol_rate_min).arg(info.symbol_rate_max));
+                .arg(tuning.symbolrate)
+                .arg(symbol_rate_minimum).arg(symbol_rate_maximum));
     }
 
-    VERBOSE(VB_CHANNEL, LOC + t.toString(info.type));
+    if (card_type.IsFECVariable() && !CheckCodeRate(tuning.fec))
+    {
+        VERBOSE(VB_GENERAL, LOC_WARN + "Unsupported fec_inner parameter.");
+    }
+
+    if (card_type.IsModulationVariable() && !CheckModulation(tuning.modulation))
+    {
+        VERBOSE(VB_GENERAL, LOC_WARN + "Unsupported modulation parameter.");
+    }
+
+    if (DTVTunerType::kTunerTypeOFDM != card_type)
+    {
+        VERBOSE(VB_CHANNEL, LOC + tuning.toString());
+        return;
+    }
+
+    // Check OFDM Tuning params
+
+    if (!CheckCodeRate(tuning.hp_code_rate))
+    {
+        VERBOSE(VB_GENERAL, LOC_WARN + "Unsupported code_rate_hp parameter.");
+    }
+
+    if (!CheckCodeRate(tuning.lp_code_rate))
+    {
+        VERBOSE(VB_GENERAL, LOC_WARN + "Unsupported code_rate_lp parameter.");
+    }
+
+    if ((tuning.bandwidth == DTVBandwidth::kBandwidthAuto) &&
+        !(capabilities & FE_CAN_BANDWIDTH_AUTO))
+    {
+        VERBOSE(VB_GENERAL, LOC_WARN + "Unsupported bandwidth parameter.");
+    }
+
+    if ((tuning.trans_mode == DTVTransmitMode::kTransmissionModeAuto) &&
+        !(capabilities & FE_CAN_TRANSMISSION_MODE_AUTO))
+    {
+        VERBOSE(VB_GENERAL, LOC_WARN +
+                "Unsupported transmission_mode parameter.");
+    }
+
+    if ((tuning.guard_interval == DTVGuardInterval::kGuardIntervalAuto) &&
+        !(capabilities & FE_CAN_GUARD_INTERVAL_AUTO))
+    {
+        VERBOSE(VB_GENERAL, LOC_WARN +
+                "Unsupported guard_interval parameter.");
+    }
+
+    if ((tuning.hierarchy == DTVHierarchy::kHierarchyAuto) &&
+        !(capabilities & FE_CAN_HIERARCHY_AUTO))
+    {
+        VERBOSE(VB_GENERAL, LOC_WARN + "Unsupported hierarchy parameter.");
+    }
+
+    if (!CheckModulation(tuning.modulation))
+    {
+        VERBOSE(VB_GENERAL, LOC_WARN + "Unsupported constellation parameter.");
+    }
+
+    VERBOSE(VB_CHANNEL, LOC + tuning.toString());
 }
 
 /** \fn DVBChannel::CheckCodeRate(fe_code_rate_t) const
  *  \brief Return true iff rate is supported rate on the frontend
  */
-bool DVBChannel::CheckCodeRate(fe_code_rate_t rate) const
+bool DVBChannel::CheckCodeRate(DTVCodeRate rate) const
 {
-    switch (rate)
-    {
-        case FEC_1_2:  if (info.caps & FE_CAN_FEC_1_2)  return true;
-        case FEC_2_3:  if (info.caps & FE_CAN_FEC_2_3)  return true;
-        case FEC_3_4:  if (info.caps & FE_CAN_FEC_3_4)  return true;
-        case FEC_4_5:  if (info.caps & FE_CAN_FEC_4_5)  return true;
-        case FEC_5_6:  if (info.caps & FE_CAN_FEC_5_6)  return true;
-        case FEC_6_7:  if (info.caps & FE_CAN_FEC_6_7)  return true;
-        case FEC_7_8:  if (info.caps & FE_CAN_FEC_7_8)  return true;
-        case FEC_8_9:  if (info.caps & FE_CAN_FEC_8_9)  return true;
-        case FEC_AUTO: if (info.caps & FE_CAN_FEC_AUTO) return true;
-        case FEC_NONE: return true;
-        default: return false;
-    }
-    return false;
+    const uint64_t caps = capabilities;
+    return
+        ((DTVCodeRate::kFECNone == rate))                            ||
+        ((DTVCodeRate::kFEC_1_2 == rate) && (caps & FE_CAN_FEC_1_2)) ||
+        ((DTVCodeRate::kFEC_2_3 == rate) && (caps & FE_CAN_FEC_2_3)) ||
+        ((DTVCodeRate::kFEC_3_4 == rate) && (caps & FE_CAN_FEC_3_4)) ||
+        ((DTVCodeRate::kFEC_4_5 == rate) && (caps & FE_CAN_FEC_4_5)) ||
+        ((DTVCodeRate::kFEC_5_6 == rate) && (caps & FE_CAN_FEC_5_6)) ||
+        ((DTVCodeRate::kFEC_6_7 == rate) && (caps & FE_CAN_FEC_6_7)) ||
+        ((DTVCodeRate::kFEC_7_8 == rate) && (caps & FE_CAN_FEC_7_8)) ||
+        ((DTVCodeRate::kFEC_8_9 == rate) && (caps & FE_CAN_FEC_8_9)) ||
+        ((DTVCodeRate::kFECAuto == rate) && (caps & FE_CAN_FEC_AUTO));
 }
 
 /** \fn DVBChannel::CheckModulation(fe_modulation_t) const
  *  \brief Return true iff modulation is supported modulation on the frontend
  */
-bool DVBChannel::CheckModulation(fe_modulation_t modulation) const
+bool DVBChannel::CheckModulation(DTVModulation modulation) const
 {
-    switch (modulation)
-    {
-        case QPSK:     if (info.caps & FE_CAN_QPSK)     return true;
-        case QAM_16:   if (info.caps & FE_CAN_QAM_16)   return true;
-        case QAM_32:   if (info.caps & FE_CAN_QAM_32)   return true;
-        case QAM_64:   if (info.caps & FE_CAN_QAM_64)   return true;
-        case QAM_128:  if (info.caps & FE_CAN_QAM_128)  return true;
-        case QAM_256:  if (info.caps & FE_CAN_QAM_256)  return true;
-        case QAM_AUTO: if (info.caps & FE_CAN_QAM_AUTO) return true;
-        case VSB_8:    if (info.caps & FE_CAN_8VSB)     return true;
-        case VSB_16:   if (info.caps & FE_CAN_16VSB)    return true;
+    const DTVModulation m = modulation;
+    const uint64_t      c = capabilities;
+
 #ifdef FE_GET_EXTENDED_INFO
-        case MOD_8PSK: if (info.caps & FE_HAS_EXTENDED_INFO &&
-                           extinfo.modulations & MOD_8PSK) return true;
-#endif
-        default: return false;
+    if ((c & FE_HAS_EXTENDED_INFO)            &&
+        (DTVModulation::kModulation8PSK == m) &&
+        (ext_modulations & DTVModulation::kModulation8PSK))
+    {
+        return true;
     }
-    return false;
+#endif // FE_GET_EXTENDED_INFO
+
+    return
+        ((DTVModulation::kModulationQPSK    == m) && (c & FE_CAN_QPSK))     ||
+        ((DTVModulation::kModulationQAM16   == m) && (c & FE_CAN_QAM_16))   ||
+        ((DTVModulation::kModulationQAM32   == m) && (c & FE_CAN_QAM_32))   ||
+        ((DTVModulation::kModulationQAM64   == m) && (c & FE_CAN_QAM_64))   ||
+        ((DTVModulation::kModulationQAM128  == m) && (c & FE_CAN_QAM_128))  ||
+        ((DTVModulation::kModulationQAM256  == m) && (c & FE_CAN_QAM_256))  ||
+        ((DTVModulation::kModulationQAMAuto == m) && (c & FE_CAN_QAM_AUTO)) ||
+        ((DTVModulation::kModulation8VSB    == m) && (c & FE_CAN_8VSB))     ||
+        ((DTVModulation::kModulation16VSB   == m) && (c & FE_CAN_16VSB));
 }
 
 /** \fn DVBChannel::SetPMT(const ProgramMapTable*)
@@ -576,27 +543,24 @@ void DVBChannel::SetPMT(const ProgramMapTable *pmt)
  *   This is used by DVB Channel Scanner, the EIT Parser, and by TVRec.
  *
  *  \param tuning      Info on transport to tune to
+ *  \param inputname    Optional, forces specific input (for DiSEqC)
  *  \param force_reset If true, frequency tuning is done
  *                     even if it should not be needed.
- *  \param sourceid    Optional, forces specific sourceid (for diseqc setup).
  *  \param same_input  Optional, doesn't change input (for retuning).
  *  \return true on success, false on failure
  */
-bool DVBChannel::Tune(const DVBTuning &tuning,
-                      const QString &si_std,
+bool DVBChannel::Tune(const DTVMultiplex &tuning,
+                      QString inputname,
                       bool force_reset,
-                      uint sourceid,
                       bool same_input)
 {
     QMutexLocker lock(&tune_lock);
 
     bool reset = (force_reset || first_tune);
-    struct dvb_fe_params params = tuning.params;
+    struct dvb_fe_params params = dtvmultiplex_to_dvbparams(card_type, tuning);
 
-    bool is_dvbs = (FE_QPSK == info.type);
-#ifdef FE_GET_EXTENDED_INFO
-    is_dvbs |= (FE_DVB_S2 == info.type);
-#endif // FE_GET_EXTENDED_INFO
+    bool is_dvbs = (DTVTunerType::kTunerTypeQPSK   == card_type ||
+                    DTVTunerType::kTunerTypeDVB_S2 == card_type);
 
     bool has_diseqc = (diseqc_tree != NULL);
     if (is_dvbs && !has_diseqc)
@@ -627,8 +591,17 @@ bool DVBChannel::Tune(const DVBTuning &tuning,
         // configure for new input
         if (!same_input)
         {
-            uint inputid = (!sourceid) ? nextInputID :
-                ChannelUtil::GetInputID(sourceid, GetCardID());
+            int inputid = (inputname.isEmpty()) ?
+                nextInputID : GetInputByName(inputname);
+
+            if (inputid < 0)
+            {
+                VERBOSE(VB_IMPORTANT, LOC_ERR + "Tune(): " +
+                        QString("Invalid input '%1'").arg(inputname));
+
+                return false;
+            }
+
             diseqc_settings.Load(inputid);
         }
             
@@ -652,26 +625,26 @@ bool DVBChannel::Tune(const DVBTuning &tuning,
             diseqc_settings, tuning);
 
         // if card can auto-FEC, use it -- sometimes NITs are inaccurate
-        if (info.caps & FE_CAN_FEC_AUTO)
+        if (capabilities & FE_CAN_FEC_AUTO)
             params.u.qpsk.fec_inner = FEC_AUTO;
     }
 
     VERBOSE(VB_CHANNEL, LOC + "Old Params: " +
-            prev_tuning.toString(info.type) +
+            prev_tuning.toString() +
             "\n\t\t\t" + LOC + "New Params: " +
-            tuning.toString(info.type));
+            tuning.toString());
 
     // DVB-S is in kHz, other DVB is in Hz
     int     freq_mult = (is_dvbs) ? 1 : 1000;
     QString suffix    = (is_dvbs) ? "kHz" : "Hz";
 
-    if (reset || !prev_tuning.equal(info.type, tuning, 500 * freq_mult))
+    if (reset || !prev_tuning.IsEqual(card_type, tuning, 500 * freq_mult))
     {
         VERBOSE(VB_CHANNEL, LOC + QString("Tune(): Tuning to %1%2")
                 .arg(params.frequency).arg(suffix));
 
 #ifdef FE_GET_EXTENDED_INFO
-        if (info.type == FE_DVB_S2)
+        if (card_type == DTVTunerType::kTunerTypeDVB_S2)
         {
             if (ioctl(fd_frontend, FE_SET_FRONTEND2, &params) < 0)
             {
@@ -701,7 +674,7 @@ bool DVBChannel::Tune(const DVBTuning &tuning,
         first_tune = false;
     }
 
-    SetSIStandard(si_std);
+    SetSIStandard(tuning.sistandard);
 
     VERBOSE(VB_CHANNEL, LOC + "Tune(): Frequency tuning successful.");
 
@@ -710,14 +683,18 @@ bool DVBChannel::Tune(const DVBTuning &tuning,
 
 bool DVBChannel::Retune(void)
 {
-    return Tune(desired_tuning, GetSIStandard(), true, 0, true);
+    return Tune(desired_tuning, "", true, true);
 }
 
-/** \fn DVBChannel::GetTuningParams(DVBTuning& tuning) const
- *  \brief Fetches DVBTuning params from driver
- *  \return true on success, false on failure
+QString DVBChannel::GetFrontendName(void) const
+{
+    return QDeepCopy<QString>(frontend_name);
+}
+
+/** \fn DVBChannel::IsTuningParamsProbeSupported(void) const
+ *  \brief Returns true iff tuning info probing is working.
  */
-bool DVBChannel::GetTuningParams(DVBTuning& tuning) const
+bool DVBChannel::IsTuningParamsProbeSupported(void) const
 {
     if (fd_frontend < 0)
     {
@@ -726,13 +703,37 @@ bool DVBChannel::GetTuningParams(DVBTuning& tuning) const
         return false;
     }
 
-    if (ioctl(fd_frontend, FE_GET_FRONTEND, &tuning.params) < 0)
+    dvb_fe_params params;
+    return ioctl(fd_frontend, FE_GET_FRONTEND, &params) >= 0;
+}
+
+/** \fn DVBChannel::ProbeTuningParams(DTVMultiplex&) const
+ *  \brief Fetches DTVMultiplex params from driver
+ *
+ *   Note: Only updates tuning on success.
+ *
+ *  \return true on success, false on failure
+ */
+bool DVBChannel::ProbeTuningParams(DTVMultiplex &tuning) const
+{
+    if (fd_frontend < 0)
+    {
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "Card not open!");
+
+        return false;
+    }
+
+    dvb_fe_params params;
+    if (ioctl(fd_frontend, FE_GET_FRONTEND, &params) < 0)
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR +
                 "Getting Frontend tuning parameters failed." + ENO);
 
         return false;
     }
+
+    tuning = dvbparams_to_dtvmultiplex(card_type, params);
+
     return true;
 }
 
@@ -847,4 +848,94 @@ static bool wait_for_backend(int fd, int timeout_ms)
     VERBOSE(VB_CHANNEL, QString("dvbchannel.cpp:wait_for_backend: Status: %1")
             .arg(toString(status)));
     return true;
+}
+
+static struct dvb_fe_params dtvmultiplex_to_dvbparams(
+    DTVTunerType tuner_type, const DTVMultiplex &tuning)
+{
+    dvb_fe_params params;
+    bzero(&params, sizeof(params));
+
+    params.frequency = tuning.frequency;
+    params.inversion = (fe_spectral_inversion_t) (int) tuning.inversion;
+
+    if (DTVTunerType::kTunerTypeQPSK == tuner_type)
+    {
+        params.u.qpsk.symbol_rate = tuning.symbolrate;
+        params.u.qpsk.fec_inner   = (fe_code_rate_t) (int) tuning.fec;
+    }
+
+    if (DTVTunerType::kTunerTypeQAM  == tuner_type)
+    {
+        params.u.qam.symbol_rate  = tuning.symbolrate;
+        params.u.qam.fec_inner    = (fe_code_rate_t) (int) tuning.fec;
+        params.u.qam.modulation   = (fe_modulation_t) (int) tuning.modulation;
+    }
+
+    if (DTVTunerType::kTunerTypeOFDM == tuner_type)
+    {
+        params.u.ofdm.bandwidth             =
+            (fe_bandwidth_t) (int) tuning.bandwidth;
+        params.u.ofdm.code_rate_HP          =
+            (fe_code_rate_t) (int) tuning.hp_code_rate;
+        params.u.ofdm.code_rate_LP          =
+            (fe_code_rate_t) (int) tuning.lp_code_rate;
+        params.u.ofdm.constellation         =
+            (fe_modulation_t) (int) tuning.modulation;
+        params.u.ofdm.transmission_mode     =
+            (fe_transmit_mode_t) (int) tuning.trans_mode;
+        params.u.ofdm.guard_interval        =
+            (fe_guard_interval_t) (int) tuning.guard_interval;
+        params.u.ofdm.hierarchy_information =
+            (fe_hierarchy_t) (int) tuning.hierarchy;
+    }
+
+    if (DTVTunerType::kTunerTypeATSC == tuner_type)
+    {
+        params.u.vsb.modulation   =
+            (fe_modulation_t) (int) tuning.modulation;
+    }
+
+    return params;
+}
+
+static DTVMultiplex dvbparams_to_dtvmultiplex(
+    DTVTunerType tuner_type, const dvb_fe_params &params)
+{
+    DTVMultiplex tuning;
+
+    tuning.frequency = params.frequency;
+    tuning.inversion = params.inversion;
+
+    if ((DTVTunerType::kTunerTypeQPSK   == tuner_type) ||
+        (DTVTunerType::kTunerTypeDVB_S2 == tuner_type))
+    {
+        tuning.symbolrate     = params.u.qpsk.symbol_rate;
+        tuning.fec            = params.u.qpsk.fec_inner;
+    }
+
+    if (DTVTunerType::kTunerTypeQAM  == tuner_type)
+    {
+        tuning.symbolrate     = params.u.qam.symbol_rate;
+        tuning.fec            = params.u.qam.fec_inner;
+        tuning.modulation     = params.u.qam.modulation;
+    }
+
+    if (DTVTunerType::kTunerTypeOFDM == tuner_type)
+    {
+        tuning.bandwidth      = params.u.ofdm.bandwidth;
+        tuning.hp_code_rate   = params.u.ofdm.code_rate_HP;
+        tuning.lp_code_rate   = params.u.ofdm.code_rate_LP;
+        tuning.modulation     = params.u.ofdm.constellation;
+        tuning.trans_mode     = params.u.ofdm.transmission_mode;
+        tuning.guard_interval = params.u.ofdm.guard_interval;
+        tuning.hierarchy      = params.u.ofdm.hierarchy_information;
+    }
+
+    if (DTVTunerType::kTunerTypeATSC == tuner_type)
+    {
+        tuning.modulation     = params.u.vsb.modulation;
+    }
+
+    return tuning;
 }

@@ -8,6 +8,7 @@ using namespace std;
 #include <qstring.h>
 
 #include "mythexp.h"
+#include "dtvmultiplex.h"
 
 class NetworkInformationTable;
 
@@ -50,6 +51,7 @@ class MPUBLIC ChannelUtil
 {
   public:
     // Multiplex Stuff
+
     static uint    CreateMultiplex(
         int  sourceid,          QString sistandard,
         uint freq,              QString modulation,
@@ -66,6 +68,9 @@ class MPUBLIC ChannelUtil
         QString     inner_FEC,    QString     constellation,
         signed char hierarchy,    QString     hp_code_rate,
         QString     lp_code_rate, QString     guard_interval);
+
+    static uint    CreateMultiplex(uint sourceid, const DTVMultiplex&,
+                                   int transport_id, int network_id);
 
     static vector<uint> CreateMultiplexes(
         int sourceid, const NetworkInformationTable *nit);

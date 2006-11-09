@@ -30,6 +30,8 @@ class IPTVChannel : public DTVChannel
     bool SetChannelByString(const QString &channum);
     bool TuneMultiplex(uint /*mplexid*/, QString /*sourceid*/)
         { return false; } // TODO
+    bool Tune(const DTVMultiplex &/*tuning*/, QString /*inputname*/)
+        { return false; } // TODO
 
     IPTVChannelInfo GetCurrentChanInfo(void) const
         { return GetChanInfo(curchannelname); }

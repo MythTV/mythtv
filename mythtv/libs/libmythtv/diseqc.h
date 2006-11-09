@@ -19,18 +19,14 @@ using namespace std;
 #include <qstring.h>
 #include <qmutex.h>
 
+class DTVMultiplex;
+
 class DiSEqCDevSettings;
 class DiSEqCDevTrees;
 class DiSEqCDevTree;
 class DiSEqCDevDevice;
 class DiSEqCDevRotor;
 class DiSEqCDevLNB;
-
-#ifdef USING_DVB
-class DVBTuning;
-#else // if !USING_DVB
-typedef int DVBTuning;
-#endif // !USING_DVB
 
 typedef QMap<uint, double>         uint_to_dbl_t;
 typedef QMap<double, uint>         dbl_to_uint_t;
@@ -83,7 +79,8 @@ class DiSEqCDevTree
 
     bool Load(uint cardid);
     bool Store(uint cardid);
-    bool Execute(const DiSEqCDevSettings &settings, const DVBTuning &tuning);
+    bool Execute(const DiSEqCDevSettings &settings,
+                 const DTVMultiplex &tuning);
     void Reset(void);
 
     DiSEqCDevRotor  *FindRotor(const DiSEqCDevSettings &settings, uint index = 0);
@@ -118,7 +115,8 @@ class DiSEqCDevTree
     static bool IsFakeDiSEqCID(uint id) { return id >= kFirstFakeDiSEqCID; }
 
   protected:
-    bool ApplyVoltage(const DiSEqCDevSettings &settings, const DVBTuning &tuning);
+    bool ApplyVoltage(const DiSEqCDevSettings &settings,
+                      const DTVMultiplex &tuning);
 
     int              m_fd_frontend;
     DiSEqCDevDevice *m_root;
@@ -137,7 +135,7 @@ class DiSEqCDevDevice
 
     // Commands
     virtual void Reset(void) {}
-    virtual bool Execute(const DiSEqCDevSettings&, const DVBTuning&) = 0;
+    virtual bool Execute(const DiSEqCDevSettings&, const DTVMultiplex&) = 0;
     virtual bool Load(void) = 0;
     virtual bool Store(void) const = 0;
 
@@ -161,10 +159,10 @@ class DiSEqCDevDevice
     uint          GetRepeatCount(void) const { return m_repeat;      }
     virtual uint  GetChildCount(void)  const { return 0;             }
     virtual bool  IsCommandNeeded(
-        const DiSEqCDevSettings&, const DVBTuning&)
+        const DiSEqCDevSettings&, const DTVMultiplex&)
                                        const { return false;         }
     virtual uint  GetVoltage(
-        const DiSEqCDevSettings&, const DVBTuning&) const = 0;
+        const DiSEqCDevSettings&, const DTVMultiplex&) const = 0;
 
     // Non-const Gets
     DiSEqCDevDevice *FindDevice(uint dev_id);
@@ -212,7 +210,7 @@ class DiSEqCDevSwitch : public DiSEqCDevDevice
 
     // Commands
     virtual void Reset(void);
-    virtual bool Execute(const DiSEqCDevSettings&, const DVBTuning&);
+    virtual bool Execute(const DiSEqCDevSettings&, const DTVMultiplex&);
     virtual bool Load(void);
     virtual bool Store(void) const;
 
@@ -234,12 +232,12 @@ class DiSEqCDevSwitch : public DiSEqCDevDevice
     dvbdev_switch_t GetType(void)       const { return m_type;      }
     uint            GetNumPorts(void)   const { return m_num_ports; }
     bool            ShouldSwitch(const DiSEqCDevSettings &settings,
-                                 const DVBTuning &tuning) const;
+                                 const DTVMultiplex &tuning) const;
     virtual uint    GetChildCount(void) const;
     virtual bool    IsCommandNeeded(const DiSEqCDevSettings&,
-                                    const DVBTuning&) const;
+                                    const DTVMultiplex&) const;
     virtual uint    GetVoltage(const DiSEqCDevSettings&,
-                               const DVBTuning&) const;
+                               const DTVMultiplex&) const;
 
     // Non-const Gets
     virtual DiSEqCDevDevice *GetSelectedChild(const DiSEqCDevSettings&) const;
@@ -253,9 +251,9 @@ class DiSEqCDevSwitch : public DiSEqCDevDevice
 
 
   protected:
-    bool ExecuteLegacy(const DiSEqCDevSettings&, const DVBTuning&, uint pos);
-    bool ExecuteTone(  const DiSEqCDevSettings&, const DVBTuning&, uint pos);
-    bool ExecuteDiseqc(const DiSEqCDevSettings&, const DVBTuning&, uint pos);
+    bool ExecuteLegacy(const DiSEqCDevSettings&, const DTVMultiplex&, uint pos);
+    bool ExecuteTone(  const DiSEqCDevSettings&, const DTVMultiplex&, uint pos);
+    bool ExecuteDiseqc(const DiSEqCDevSettings&, const DTVMultiplex&, uint pos);
 
     int  GetPosition(  const DiSEqCDevSettings&) const;
 
@@ -278,7 +276,7 @@ class DiSEqCDevRotor : public DiSEqCDevDevice
 
     // Commands
     virtual void Reset(void);
-    virtual bool Execute(const DiSEqCDevSettings&, const DVBTuning&);
+    virtual bool Execute(const DiSEqCDevSettings&, const DTVMultiplex&);
     virtual bool Load(void);
     virtual bool Store(void) const;
 
@@ -300,10 +298,10 @@ class DiSEqCDevRotor : public DiSEqCDevDevice
     bool           IsPositionKnown(void) const;
     virtual uint   GetChildCount(void)   const { return 1;           }
     virtual bool   IsCommandNeeded(const DiSEqCDevSettings&,
-                                   const DVBTuning&) const;
+                                   const DTVMultiplex&) const;
     bool           IsMoving(const DiSEqCDevSettings&) const;
     virtual uint   GetVoltage(const DiSEqCDevSettings&,
-                              const DVBTuning&) const;
+                              const DTVMultiplex&) const;
 
     // Non-const Gets
     virtual DiSEqCDevDevice *GetSelectedChild(const DiSEqCDevSettings&) const;
@@ -316,9 +314,9 @@ class DiSEqCDevRotor : public DiSEqCDevDevice
         { return (dvbdev_rotor_t) TableFromString(type, RotorTypeTable); }
 
   protected:
-    bool   ExecuteRotor(const DiSEqCDevSettings&, const DVBTuning&,
+    bool   ExecuteRotor(const DiSEqCDevSettings&, const DTVMultiplex&,
                         double angle);
-    bool   ExecuteUSALS(const DiSEqCDevSettings&, const DVBTuning&,
+    bool   ExecuteUSALS(const DiSEqCDevSettings&, const DTVMultiplex&,
                         double angle);
     void   StartRotorPositionTracking(double azimuth);
 
@@ -353,7 +351,7 @@ class DiSEqCDevLNB : public DiSEqCDevDevice
     DiSEqCDevLNB(DiSEqCDevTree &tree, uint devid);
 
     // Commands
-    virtual bool Execute(const DiSEqCDevSettings&, const DVBTuning&);
+    virtual bool Execute(const DiSEqCDevSettings&, const DTVMultiplex&);
     virtual bool Load(void);
     virtual bool Store(void) const;
 
@@ -377,11 +375,12 @@ class DiSEqCDevLNB : public DiSEqCDevDevice
     uint         GetLOFHigh(void)   const { return m_lof_hi;           }
     uint         GetLOFLow(void)    const { return m_lof_lo;           }
     bool         IsPolarityInverted(void) const { return m_pol_inv;    }
-    bool         IsHighBand(const DVBTuning&) const;
-    bool         IsHorizontal(const DVBTuning&) const;
+    bool         IsHighBand(const DTVMultiplex&) const;
+    bool         IsHorizontal(const DTVMultiplex&) const;
     uint32_t     GetIntermediateFrequency(const DiSEqCDevSettings&,
-                                          const DVBTuning&) const;
-    virtual uint GetVoltage(const DiSEqCDevSettings&, const DVBTuning&) const;
+                                          const DTVMultiplex&) const;
+    virtual uint GetVoltage(const DiSEqCDevSettings&,
+                            const DTVMultiplex&) const;
 
     // statics
     static QString LNBTypeToString(dvbdev_lnb_t type)

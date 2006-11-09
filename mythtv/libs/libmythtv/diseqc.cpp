@@ -16,6 +16,7 @@
 #include "mythcontext.h"
 #include "mythdbcon.h"
 #include "diseqc.h"
+#include "dtvmultiplex.h"
 
 #ifdef USING_DVB
 #   include "dvbtypes.h"
@@ -431,14 +432,14 @@ bool DiSEqCDevTree::SetTone(bool on)
     return success;
 }
 
-/** \fn DiSEqCDevTree::Execute(const DiSEqCDevSettings&, const DVBTuning&)
+/** \fn DiSEqCDevTree::Execute(const DiSEqCDevSettings&, const DTVMultiplex&)
  *  \brief Applies settings to the entire tree.
  *  \param settings Configuration chain to apply.
  *  \param tuning Tuning parameters.
  *  \return True if execution completed successfully.
  */
 bool DiSEqCDevTree::Execute(const DiSEqCDevSettings &settings,
-                            const DVBTuning &tuning)
+                            const DTVMultiplex      &tuning)
 {
     if (!m_root)
     {
@@ -715,7 +716,7 @@ bool DiSEqCDevTree::SetVoltage(uint voltage)
 }
 
 bool DiSEqCDevTree::ApplyVoltage(const DiSEqCDevSettings &settings,
-                                 const DVBTuning         &tuning)
+                                 const DTVMultiplex      &tuning)
 {
     uint voltage = SEC_VOLTAGE_18;
 
@@ -853,7 +854,7 @@ DiSEqCDevDevice *DiSEqCDevDevice::CreateByType(DiSEqCDevTree &tree,
     return node;
 }
 
-/** \fn DiSEqCDevDevice::Execute(const DiSEqCDevSettings&,const DVBTuning&)
+/** \fn DiSEqCDevDevice::Execute(const DiSEqCDevSettings&,const DTVMultiplex&)
  *  \brief Applies DiSEqC settings to this node and any children.
  *  \param settings Configuration chain to apply.
  *  \param tuning Tuning parameters.
@@ -897,7 +898,7 @@ DiSEqCDevDevice *DiSEqCDevDevice::CreateByType(DiSEqCDevTree &tree,
  *  \return true if object was added to tree.
  */
 
-/** \fn DiSEqCDevDevice::GetVoltage(const DiSEqCDevSettings&,const DVBTuning&) const
+/** \fn DiSEqCDevDevice::GetVoltage(const DiSEqCDevSettings&,const DTVMultiplex&) const
  *  \brief Retrives the desired voltage for this config.
  *  \param settings Configuration chain in effect.
  *  \param tuning Tuning parameters.
@@ -960,7 +961,7 @@ DiSEqCDevSwitch::~DiSEqCDevSwitch()
 }
 
 bool DiSEqCDevSwitch::Execute(const DiSEqCDevSettings &settings,
-                              const DVBTuning         &tuning)
+                              const DTVMultiplex      &tuning)
 {
     bool success = true;
 
@@ -1025,7 +1026,7 @@ void DiSEqCDevSwitch::Reset(void)
 }
 
 bool DiSEqCDevSwitch::IsCommandNeeded(const DiSEqCDevSettings &settings,
-                                      const DVBTuning         &tuning) const
+                                      const DTVMultiplex      &tuning) const
 {
     int pos = GetPosition(settings);
     if (pos < 0)
@@ -1077,7 +1078,7 @@ bool DiSEqCDevSwitch::SetChild(uint ordinal, DiSEqCDevDevice *device)
 }
 
 uint DiSEqCDevSwitch::GetVoltage(const DiSEqCDevSettings &settings,
-                                 const DVBTuning         &tuning) const
+                                 const DTVMultiplex         &tuning) const
 {
     uint voltage = SEC_VOLTAGE_18;
     DiSEqCDevDevice *child = GetSelectedChild(settings);
@@ -1239,7 +1240,7 @@ void DiSEqCDevSwitch::SetNumPorts(uint num_ports)
 }
 
 bool DiSEqCDevSwitch::ExecuteLegacy(const DiSEqCDevSettings &settings,
-                                    const DVBTuning &tuning,
+                                    const DTVMultiplex &tuning,
                                     uint pos)
 {
     (void) settings;
@@ -1335,7 +1336,7 @@ static bool mini_diseqc(int fd, fe_sec_mini_cmd cmd)
 #endif // USING_DVB
 
 bool DiSEqCDevSwitch::ExecuteTone(const DiSEqCDevSettings &/*settings*/,
-                                  const DVBTuning &/*tuning*/,
+                                  const DTVMultiplex &/*tuning*/,
                                   uint pos)
 {
     VERBOSE(VB_CHANNEL, LOC + "Changing to Tone switch port " +
@@ -1351,7 +1352,7 @@ bool DiSEqCDevSwitch::ExecuteTone(const DiSEqCDevSettings &/*settings*/,
 }
 
 bool DiSEqCDevSwitch::ShouldSwitch(const DiSEqCDevSettings &settings,
-                                   const DVBTuning &tuning) const
+                                   const DTVMultiplex &tuning) const
 {
     int pos = GetPosition(settings);
     if (pos < 0)
@@ -1391,7 +1392,7 @@ bool DiSEqCDevSwitch::ShouldSwitch(const DiSEqCDevSettings &settings,
 }
 
 bool DiSEqCDevSwitch::ExecuteDiseqc(const DiSEqCDevSettings &settings,
-                                    const DVBTuning &tuning,
+                                    const DTVMultiplex &tuning,
                                     uint pos)
 {
     // retrieve LNB info
@@ -1498,7 +1499,7 @@ DiSEqCDevRotor::~DiSEqCDevRotor()
 }
 
 bool DiSEqCDevRotor::Execute(const DiSEqCDevSettings &settings,
-                             const DVBTuning &tuning)
+                             const DTVMultiplex &tuning)
 {
     bool success = true;
 
@@ -1539,7 +1540,7 @@ void DiSEqCDevRotor::Reset(void)
 }
 
 bool DiSEqCDevRotor::IsCommandNeeded(const DiSEqCDevSettings &settings,
-                                     const DVBTuning         &tuning) const
+                                     const DTVMultiplex         &tuning) const
 {
     double position = settings.GetValue(GetDeviceID());
 
@@ -1587,7 +1588,7 @@ bool DiSEqCDevRotor::IsMoving(const DiSEqCDevSettings &settings) const
 }
 
 uint DiSEqCDevRotor::GetVoltage(const DiSEqCDevSettings &settings,
-                                const DVBTuning         &tuning) const
+                                const DTVMultiplex         &tuning) const
 {
     // override voltage if the last position is known and the rotor is moving
     if (IsMoving(settings))
@@ -1800,7 +1801,7 @@ void DiSEqCDevRotor::SetPosMap(const uint_to_dbl_t &inv_posmap)
         m_posmap[*it] = it.key();
 }
 
-bool DiSEqCDevRotor::ExecuteRotor(const DiSEqCDevSettings&, const DVBTuning&,
+bool DiSEqCDevRotor::ExecuteRotor(const DiSEqCDevSettings&, const DTVMultiplex&,
                                   double angle)
 {
     // determine stored position from position map
@@ -1819,7 +1820,7 @@ bool DiSEqCDevRotor::ExecuteRotor(const DiSEqCDevSettings&, const DVBTuning&,
                               m_repeat, 1, &index);
 }
 
-bool DiSEqCDevRotor::ExecuteUSALS(const DiSEqCDevSettings&, const DVBTuning&,
+bool DiSEqCDevRotor::ExecuteUSALS(const DiSEqCDevSettings&, const DTVMultiplex&,
                                   double angle)
 {
     double azimuth = CalculateAzimuth(angle);
@@ -1913,7 +1914,7 @@ DiSEqCDevLNB::DiSEqCDevLNB(DiSEqCDevTree &tree, uint devid)
     Reset();
 }
 
-bool DiSEqCDevLNB::Execute(const DiSEqCDevSettings&, const DVBTuning &tuning)
+bool DiSEqCDevLNB::Execute(const DiSEqCDevSettings&, const DTVMultiplex &tuning)
 {
     // set tone for bandselect
     if (m_type == kTypeVoltageAndToneControl)
@@ -1923,7 +1924,7 @@ bool DiSEqCDevLNB::Execute(const DiSEqCDevSettings&, const DVBTuning &tuning)
 }
 
 uint DiSEqCDevLNB::GetVoltage(const DiSEqCDevSettings&,
-                              const DVBTuning &tuning) const
+                              const DTVMultiplex &tuning) const
 {
     uint voltage = SEC_VOLTAGE_18;
 
@@ -2030,48 +2031,40 @@ bool DiSEqCDevLNB::Store(void) const
     return true;
 }
 
-/** \fn DiSEqCDevLNB::IsHighBand(const DVBTuning&) const
+/** \fn DiSEqCDevLNB::IsHighBand(const DTVMultiplex&) const
  *  \brief Determine if the high frequency band is active
  *         (for switchable LNBs).
  *  \param tuning Tuning parameters.
  *  \return True if high band is active.
  */
-bool DiSEqCDevLNB::IsHighBand(const DVBTuning &tuning) const
+bool DiSEqCDevLNB::IsHighBand(const DTVMultiplex &tuning) const
 {
-    (void) tuning;
-#ifdef USING_DVB
     switch (m_type)
     {
         case kTypeVoltageAndToneControl:
-            return (tuning.params.frequency > m_lof_switch);
+            return (tuning.frequency > m_lof_switch);
         case kTypeBandstacked:
             return IsHorizontal(tuning);
         default:
             return false;
     }
-#endif // USING_DVB
 
     return false;
 }
 
-/** \fn DiSEqCDevLNB::IsHorizontal(const DVBTuning&) const
+/** \fn DiSEqCDevLNB::IsHorizontal(const DTVMultiplex&) const
  *  \brief Determine if horizontal polarity is active (for switchable LNBs).
  *  \param tuning Tuning parameters.
  *  \return True if polarity is horizontal.
  */
-bool DiSEqCDevLNB::IsHorizontal(const DVBTuning &tuning) const
+bool DiSEqCDevLNB::IsHorizontal(const DTVMultiplex &tuning) const
 {
-    (void) tuning;
-#ifdef USING_DVB
-    char pol = tuning.PolarityChar();
-    return (pol == 'h' || pol == 'l') ^ IsPolarityInverted();
-#else
-    return false;
-#endif // !USING_DVB
+    QString pol = tuning.polarity.toString().lower();
+    return (pol == "h" || pol == "l") ^ IsPolarityInverted();
 }
 
 /** \fn DiSEqCDevLNB::GetIntermediateFrequency(const DiSEqCDevSettings&,
-                                            const DVBTuning&) const
+                                               const DTVMultiplex&) const
  *  \brief Calculate proper intermediate frequency for the given settings
  *         and tuning parameters.
  *  \param settings Configuration chain in effect.
@@ -2079,14 +2072,12 @@ bool DiSEqCDevLNB::IsHorizontal(const DVBTuning &tuning) const
  *  \return Frequency for use with FE_SET_FRONTEND.
  */
 uint32_t DiSEqCDevLNB::GetIntermediateFrequency(
-    const DiSEqCDevSettings&, const DVBTuning &tuning) const
+    const DiSEqCDevSettings&, const DTVMultiplex &tuning) const
 {
     (void) tuning;
-#ifdef USING_DVB
-    uint abs_freq = tuning.params.frequency;
-    uint lof      = (IsHighBand(tuning)) ? m_lof_hi : m_lof_lo;
+
+    uint64_t abs_freq = tuning.frequency;
+    uint lof = (IsHighBand(tuning)) ? m_lof_hi : m_lof_lo;
+
     return (lof > abs_freq) ? (lof - abs_freq) : (abs_freq - lof);
-#else
-    return 0;
-#endif // !USING_DVB
 }

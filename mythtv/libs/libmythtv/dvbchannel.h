@@ -10,23 +10,12 @@
 
 #include <qobject.h>
 #include <qstring.h>
-#include <qsqldatabase.h>
 
 #include "mythcontext.h"
 #include "mythdbcon.h"
 #include "dtvchannel.h"
 #include "streamlisteners.h"
 #include "diseqc.h"
-
-#ifdef USING_DVB
-#include "dvbtypes.h"
-#else // if !USING_DVB
-typedef int fe_type_t;
-typedef int fe_modulation_t;
-typedef int fe_code_rate_t;
-typedef int DVBTuning;
-typedef struct { QString name; fe_type_t type; } dvb_frontend_info;
-#endif //!USING_DVB
 
 class TVRec;
 class DVBCam;
@@ -49,13 +38,14 @@ class DVBChannel : public DTVChannel
     // Gets
     bool IsOpen(void)                   const { return GetFd() >= 0; }
     int  GetFd(void)                    const { return fd_frontend; }
+    bool IsTuningParamsProbeSupported(void) const;
 
     QString GetDevice(void) const { return QString::number(GetCardNum()); }
     /// Returns DVB device number, used to construct filenames for DVB devices
     int     GetCardNum(void)            const { return cardnum; };
     /// Returns frontend name as reported by driver
-    QString GetFrontendName(void)       const { return info.name; }
-    fe_type_t   GetCardType(void)       const { return info.type; };
+    QString GetFrontendName(void)       const;
+    DTVTunerType GetCardType(void)      const { return card_type; }
     /// Returns true iff we have a faulty DVB driver that munges PMT
     bool HasCRCBug(void)                const { return has_crc_bug; }
     uint GetMinSignalMonitorDelay(void) const { return sigmon_delay; }
@@ -66,14 +56,14 @@ class DVBChannel : public DTVChannel
     bool SwitchToInput(const QString &inputname, const QString &chan);
     bool SwitchToInput(int newcapchannel, bool setstarting);
     bool SetChannelByString(const QString &chan);
-    bool Tune(const DVBTuning &tuning, const QString &si_std,
-              bool force_reset = false,
-              uint sourceid    = 0,
-              bool same_input  = false);
+    bool Tune(const DTVMultiplex &tuning, QString inputname)
+        { return Tune(tuning, inputname, false, false); }
+    bool Tune(const DTVMultiplex &tuning, QString inputname,
+              bool force_reset, bool same_input);
     bool TuneMultiplex(uint mplexid, QString inputname);
     bool Retune(void);
 
-    bool GetTuningParams(DVBTuning &tuning) const;
+    bool ProbeTuningParams(DTVMultiplex &tuning) const;
 
     // PID caching
     void SaveCachedPids(const pid_cache_t&) const;
@@ -81,12 +71,12 @@ class DVBChannel : public DTVChannel
 
   private:
     int  GetChanID(void) const;
-    bool InitChannelParams(DVBTuning &t, QString &si_std,
+    bool InitChannelParams(DTVMultiplex &t,
                            uint sourceid, const QString &channum);
 
-    void CheckOptions(DVBTuning &t) const;
-    bool CheckModulation(fe_modulation_t modulation) const;
-    bool CheckCodeRate(fe_code_rate_t rate) const;
+    void CheckOptions(DTVMultiplex &t) const;
+    bool CheckModulation(DTVModulation modulation) const;
+    bool CheckCodeRate(DTVCodeRate rate) const;
 
   private:
     // Data
@@ -95,17 +85,22 @@ class DVBChannel : public DTVChannel
     DiSEqCDevTree    *diseqc_tree;
     DVBCam           *dvbcam; ///< Used to decrypt encrypted streams
 
+    // Device info
+    QString           frontend_name;
+    DTVTunerType      card_type;
+    uint64_t          capabilities;
+    uint64_t          ext_modulations;
+    uint64_t          frequency_minimum;
+    uint64_t          frequency_maximum;
+    uint              symbol_rate_minimum;
+    uint              symbol_rate_maximum;
+
     // Tuning State
     mutable QMutex    tune_lock;
-    dvb_frontend_info info;        ///< Contains info on tuning hardware
-#ifdef FE_GET_EXTENDED_INFO
-    dvb_fe_caps_extended extinfo;  ///< Additional info on tuning hardware
-#endif
-
     /// Last tuning options Tune() attempted to send to hardware
-    DVBTuning         desired_tuning;
+    DTVMultiplex      desired_tuning;
     /// Last tuning options Tune() succesfully sent to hardware
-    DVBTuning         prev_tuning;
+    DTVMultiplex      prev_tuning;
 
     uint              tuning_delay;///< Extra delay to add for broken drivers
     uint              sigmon_delay;///< Minimum delay between FE_LOCK checks

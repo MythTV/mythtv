@@ -8,6 +8,7 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include <sys/select.h>
+#include <sys/ioctl.h>
 
 #include "mythcontext.h"
 #include "mythdbcon.h"
@@ -18,6 +19,7 @@
 #include "atsctables.h"
 #include "cardutil.h"
 
+#include "dvbtypes.h"
 #include "dvbchannel.h"
 #include "dvbrecorder.h"
 

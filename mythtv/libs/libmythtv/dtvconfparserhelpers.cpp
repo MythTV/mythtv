@@ -1,3 +1,7 @@
+
+#include <qmutex.h>
+#include <qmap.h>
+
 #include "mythcontext.h"
 #include "dtvconfparserhelpers.h"
 
@@ -34,6 +38,45 @@ QString DTVParamHelper::toString(const char *strings[], int index,
     return strings[index];
 }
 
+static QMutex dtv_tt_canonical_str_lock;
+static QMap<int,QString> dtv_tt_canonical_str;
+void DTVTunerType::initStr(void)
+{
+    QMutexLocker locker(&dtv_tt_canonical_str_lock);
+    dtv_tt_canonical_str[kTunerTypeQPSK]    = "QPSK";
+    dtv_tt_canonical_str[kTunerTypeQAM]     = "QAM";
+    dtv_tt_canonical_str[kTunerTypeOFDM]    = "OFDM";
+    dtv_tt_canonical_str[kTunerTypeATSC]    = "ATSC";
+    dtv_tt_canonical_str[kTunerTypeDVB_S]   = "DVB_S";
+    dtv_tt_canonical_str[kTunerTypeDVB_C]   = "DVB_C";
+    dtv_tt_canonical_str[kTunerTypeDVB_T]   = "DVB_T";
+    dtv_tt_canonical_str[kTunerTypeDVB_S2]  = "DVB_S2";
+    dtv_tt_canonical_str[kTunerTypeUnknown] = "UNKNOWN";
+}
+
+QString DTVTunerType::toString(int _value)
+{
+    QMutexLocker locker(&dtv_tt_canonical_str_lock);
+    QMap<int,QString>::const_iterator it = dtv_tt_canonical_str.find(_value);
+    if (it != dtv_tt_canonical_str.end())
+        return *it;
+    return dtv_tt_canonical_str[kTunerTypeUnknown];
+}
+
+const DTVParamHelperStruct DTVTunerType::parseTable[] =
+{
+    { "QPSK",    kTunerTypeQPSK    },
+    { "QAM",     kTunerTypeQAM     },
+    { "OFDM",    kTunerTypeOFDM    },
+    { "ATSC",    kTunerTypeATSC    },
+    { "DVB_S",   kTunerTypeDVB_S   },
+    { "DVB_C",   kTunerTypeDVB_C   },
+    { "DVB_T",   kTunerTypeDVB_T   },
+    { "DVB_S2",  kTunerTypeDVB_S2  },
+    { "UNKNOWN", kTunerTypeUnknown },
+    { NULL,      kTunerTypeUnknown },
+};
+
 const DTVParamHelperStruct DTVInversion::confTable[] =
 {
    { "INVERSION_AUTO", kInversionAuto },
@@ -68,35 +111,35 @@ const char *DTVInversion::dbStr[DTVInversion::kDBStrCnt] =
 const DTVParamHelperStruct DTVBandwidth::confTable[] =
 {
    { "BANDWIDTH_AUTO",  kBandwidthAuto },
-   { "BANDWIDTH_8_MHZ", kBandwidth8Mhz },
-   { "BANDWIDTH_7_MHZ", kBandwidth7Mhz },
-   { "BANDWIDTH_6_MHZ", kBandwidth6Mhz },
+   { "BANDWIDTH_8_MHZ", kBandwidth8MHz },
+   { "BANDWIDTH_7_MHZ", kBandwidth7MHz },
+   { "BANDWIDTH_6_MHZ", kBandwidth6MHz },
    { NULL,              kBandwidthAuto },
 };
 
 const DTVParamHelperStruct DTVBandwidth::vdrTable[] =
 {
    { "999", kBandwidthAuto },
-   { "8",   kBandwidth8Mhz },
-   { "7",   kBandwidth7Mhz },
-   { "6",   kBandwidth6Mhz },
+   { "8",   kBandwidth8MHz },
+   { "7",   kBandwidth7MHz },
+   { "6",   kBandwidth6MHz },
    { NULL,  kBandwidthAuto },
 };
 
 const DTVParamHelperStruct DTVBandwidth::parseTable[] =
 {
    { "auto", kBandwidthAuto },
-   { "8",    kBandwidth8Mhz },
-   { "7",    kBandwidth7Mhz },
-   { "6",    kBandwidth6Mhz },
+   { "8",    kBandwidth8MHz },
+   { "7",    kBandwidth7MHz },
+   { "6",    kBandwidth6MHz },
    { NULL,   kBandwidthAuto },
 };
 
 const char *DTVBandwidth::dbStr[DTVBandwidth::kDBStrCnt] =
 {
-    "8",   ///< kBandwidth8Mhz
-    "7",   ///< kBandwidth7Mhz
-    "6",   ///< kBandwidth6Mhz
+    "8",   ///< kBandwidth8MHz
+    "7",   ///< kBandwidth7MHz
+    "6",   ///< kBandwidth6MHz
     "auto" ///< kBandwidthAUTO
 };
 
@@ -168,7 +211,15 @@ const DTVParamHelperStruct DTVModulation::confTable[] =
    { "QAM_128",  kModulationQAM128  },
    { "QAM_256",  kModulationQAM256  },
    { "QPSK",     kModulationQPSK    },
+   { "8VSB",     kModulation8VSB    },
+   { "16VSB",    kModulation16VSB   },
+   { "2VSB",     kModulation2VSB    },
+   { "4VSB",     kModulation4VSB    },
+   { "BPSK",     kModulationBPSK    },
+   { "16APSK",   kModulation16APSK  },
+   { "32APSK",   kModulation32APSK  },
    { "8PSK",     kModulation8PSK    },
+   { "16PSK",    kModulation16PSK   },
    { NULL,       kModulationQAMAuto },
 };
 
@@ -195,8 +246,14 @@ const DTVParamHelperStruct DTVModulation::parseTable[] =
    { "qpsk",     kModulationQPSK    },
    { "8vsb",     kModulation8VSB    },
    { "16vsb",    kModulation16VSB   },
+   { "2vsb",     kModulation2VSB    },
+   { "4vsb",     kModulation4VSB    },
+   { "bpsk",     kModulationBPSK    },
+   { "16apsk",   kModulation16APSK  },
+   { "32apsk",   kModulation32APSK  },
    { "8psk",     kModulation8PSK    },
-   // alternates from dvbtypes
+   { "16psk",    kModulation16PSK   },
+   // alternates
    { "a",        kModulationQAMAuto },
    { "qam_auto", kModulationQAMAuto },
    { "qam-16",   kModulationQAM16   },
@@ -204,9 +261,16 @@ const DTVParamHelperStruct DTVModulation::parseTable[] =
    { "qam-64",   kModulationQAM64   },
    { "qam-128",  kModulationQAM128  },
    { "qam-256",  kModulationQAM256  },
+   // qpsk, no alternative
    { "8-vsb",    kModulation8VSB    },
    { "16-vsb",   kModulation16VSB   },
+   { "2-vsb",    kModulation2VSB    },
+   { "4-vsb",    kModulation4VSB    },
+   // bpsk, no alternative
+   { "16-apsk",  kModulation16APSK  },
+   { "32-apsk",  kModulation32APSK  },
    { "8-psk",    kModulation8PSK    },
+   { "16-psk",   kModulation16PSK   },
    { NULL,       kModulationQAMAuto },
 };
 
@@ -221,7 +285,13 @@ const char *DTVModulation::dbStr[DTVModulation::kDBStrCnt] =
     "auto",    ///< kModulationQAMAuto
     "8vsb",    ///< kModulation8VSB
     "16vsb",   ///< kModulation16VSB
+    "2vsb",    ///< kModulation2VSB
+    "4vsb",    ///< kModulation4VSB
+    "bpsk",    ///< kModulationBPSK
+    "16apsk",  ///< kModulation16APSK
+    "32apsk",  ///< kModulation32APSK
     "8psk",    ///< kModulation8PSK
+    "16psk",   ///< kModulation16PSK
 };
 
 const DTVParamHelperStruct DTVTransmitMode::confTable[] =

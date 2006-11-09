@@ -547,6 +547,12 @@ bool Channel::TuneTo(const QString &channum, int finetune)
     return Tune(frequency, "", "analog", "analog");
 }
 
+bool Channel::Tune(const DTVMultiplex &tuning, QString inputname)
+{
+    return Tune(tuning.frequency - 1750000, // to visual carrier
+                inputname, tuning.modulation.toString(), tuning.sistandard);
+}
+
 /** \fn Channel::Tune(uint,QString,QString,QString)
  *  \brief Tunes to a specific frequency (Hz) on a particular input, using
  *         the specified modulation.

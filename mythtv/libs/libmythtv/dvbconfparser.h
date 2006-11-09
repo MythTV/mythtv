@@ -44,34 +44,9 @@ using namespace std;
 #include <qstring.h>
 
 // MythTV headers
-#include "dtvconfparserhelpers.h"
+#include "dtvchannel.h"
 
 class QStringList;
-
-class DTVMultiplex
-{
-  public:
-    DTVMultiplex() : frequency(0), symbolrate(0) { }
-
-    bool operator==(const DTVMultiplex &m) const;
- 
-    QString toString() const;
-
- public:
-    uint64_t         frequency;
-    uint             symbolrate;
-    DTVInversion     inversion;
-    DTVBandwidth     bandwidth;
-    DTVCodeRate      hp_code_rate;
-    DTVCodeRate      lp_code_rate;
-    DTVModulation    constellation;
-    DTVModulation    modulation;
-    DTVTransmitMode  trans_mode;
-    DTVGuardInterval guard_interval;
-    DTVHierarchy     hierarchy;
-    DTVPolarity      polarity;
-    DTVCodeRate      fec;
-};
 
 class DTVChannelInfo
 {

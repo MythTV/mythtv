@@ -60,12 +60,15 @@ class Channel : public DTVChannel
     void SaveCachedPids(const pid_cache_t&) const;
     void GetCachedPids(pid_cache_t&) const;
 
-    // ATSC scanning stuff
+    // Digital scanning stuff
     bool TuneMultiplex(uint mplexid, QString inputname);
+    bool Tune(const DTVMultiplex &tuning, QString inputname);
+
+    // Analog scanning stuff
     bool Tune(uint frequency, QString inputname,
               QString modulation, QString si_std);
-    // V4L scanning stuff
     bool IsTuned(void) const;
+
   private:
     // Helper Sets
     void SetFreqTable(const int index);

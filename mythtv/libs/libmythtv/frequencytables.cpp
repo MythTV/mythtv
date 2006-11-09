@@ -6,46 +6,35 @@ freq_table_map_t frequencies;
 static void init_freq_tables(freq_table_map_t&);
 
 TransportScanItem::TransportScanItem()
-    : mplexid(-1),        standard("dvb"),      FriendlyName(""),
+    : mplexid(-1),        FriendlyName(""),
       friendlyNum(0),     SourceID(0),          UseTimer(false),
       scanning(false),    timeoutTune(1000)
 { 
     bzero(freq_offsets, sizeof(int)*3);
 
-#ifdef USING_DVB
-    bzero(&tuning, sizeof(DVBTuning));
-#else
-    frequency  = 0;
-    modulation = 0;
-#endif
+    tuning.Clear();
 }
 
-TransportScanItem::TransportScanItem(int sourceid,
-                                     const QString &std,
-                                     const QString &fn,
-                                     int _mplexid,
-                                     uint tuneTO)
-    : mplexid(_mplexid),  standard(std),        FriendlyName(fn),
+TransportScanItem::TransportScanItem(uint           sourceid,
+                                     const QString &_si_std,
+                                     const QString &_name,
+                                     uint           _mplexid,
+                                     uint           _timeoutTune)
+    : mplexid(_mplexid),  FriendlyName(_name),
       friendlyNum(0),     SourceID(sourceid),   UseTimer(false),
-      scanning(false),    timeoutTune(tuneTO)
+      scanning(false),    timeoutTune(_timeoutTune)
 {
     bzero(freq_offsets, sizeof(int)*3);
 
-#ifdef USING_DVB
-    bzero(&tuning, sizeof(DVBTuning));
-#else
-    frequency  = 0;
-    modulation = 0;
-#endif
+    tuning.Clear();
+    tuning.sistandard = _si_std;
 }
 
-#ifdef USING_DVB
-TransportScanItem::TransportScanItem(int            _sourceid,
-                                     const QString &_std,
+TransportScanItem::TransportScanItem(uint           _sourceid,
                                      const QString &_name,
-                                     DVBTuning     &_tuning,
+                                     DTVMultiplex  &_tuning,
                                      uint           _timeoutTune)
-    : mplexid(-1),         standard(_std),
+    : mplexid(0),
       FriendlyName(_name), friendlyNum(0),
       SourceID(_sourceid), UseTimer(false),
       scanning(false),     timeoutTune(_timeoutTune)
@@ -53,186 +42,123 @@ TransportScanItem::TransportScanItem(int            _sourceid,
     bzero(freq_offsets, sizeof(int) * 3);
     tuning = _tuning;
 }
-#endif // USING_DVB
 
-
-TransportScanItem::TransportScanItem(int                 _sourceid,
-                                     const QString      &_std,
+TransportScanItem::TransportScanItem(uint                _sourceid,
                                      const QString      &_name,
-                                     const QString      &_cardtype,
+                                     DTVTunerType        _tuner_type,
                                      const DTVTransport &_tuning,
                                      uint                _timeoutTune)
-    : mplexid(-1),         standard(_std),
+    : mplexid(0),
       FriendlyName(_name), friendlyNum(0),
       SourceID(_sourceid), UseTimer(false),
       scanning(false),     timeoutTune(_timeoutTune)
 {
-    (void) _cardtype;
-
-    bzero(freq_offsets, sizeof(int) * 3);
+    bzero(freq_offsets, sizeof(int) * 3); 
     expectedChannels = _tuning.channels;
 
-#ifdef USING_DVB
-    bzero(&tuning, sizeof(DVBTuning));
-
-    fe_type type = FE_QPSK;
-
-    type = (_cardtype.upper() == "QAM")    ? FE_QAM    : type;
-    type = (_cardtype.upper() == "OFDM")   ? FE_OFDM   : type;
-    type = (_cardtype.upper() == "ATSC")   ? FE_ATSC   : type;
-#ifdef FE_GET_EXTENDED_INFO
-    type = (_cardtype.upper() == "DVB_S2") ? FE_DVB_S2 : type;
-#endif
+    tuning.Clear();
 
     tuning.ParseTuningParams(
-        type,
+        _tuner_type,
         QString::number(_tuning.frequency),  _tuning.inversion.toString(),
         QString::number(_tuning.symbolrate), _tuning.fec.toString(),
         _tuning.polarity.toString(),         _tuning.hp_code_rate.toString(),
-        _tuning.lp_code_rate.toString(),     _tuning.constellation.toString(),
+        _tuning.lp_code_rate.toString(),     _tuning.modulation.toString(),
         _tuning.trans_mode.toString(),       _tuning.guard_interval.toString(),
         _tuning.hierarchy.toString(),        _tuning.modulation.toString(),
         _tuning.bandwidth.toString());
-
-#else
-    frequency  = _tuning.frequency;
-    modulation = _tuning.modulation;
-#endif
 }
 
-TransportScanItem::TransportScanItem(int sourceid,
+TransportScanItem::TransportScanItem(uint sourceid,
                                      const QString &std,
                                      const QString &fn,
                                      uint fnum,
                                      uint freq,
                                      const FrequencyTable &ft,
                                      uint tuneTO)
-    : mplexid(-1),        standard(std),        FriendlyName(fn),
+    : mplexid(0),         FriendlyName(fn),
       friendlyNum(fnum),  SourceID(sourceid),   UseTimer(false),
       scanning(false),    timeoutTune(tuneTO)
 {
     bzero(freq_offsets, sizeof(int)*3);
-#ifdef USING_DVB
-    bzero(&tuning, sizeof(DVBTuning));
+
+    tuning.Clear();
 
     // setup tuning params
-    tuning.params.frequency                    = freq;
-    const DVBFrequencyTable *dvbft =
-        dynamic_cast<const DVBFrequencyTable*>(&ft);
-    if (standard == "dvb" && dvbft)
+    tuning.frequency  = freq;
+    tuning.sistandard = std;
+    freq_offsets[1]   = ft.offset1;
+    freq_offsets[2]   = ft.offset2;
+
+    if (std == "dvb")
     {
-        tuning.params.inversion                    = dvbft->inversion;
-        freq_offsets[1]                            = dvbft->offset1;
-        freq_offsets[2]                            = dvbft->offset2;
-        tuning.params.u.ofdm.bandwidth             = dvbft->bandwidth;
-        tuning.params.u.ofdm.code_rate_HP          = dvbft->coderate_hp;
-        tuning.params.u.ofdm.code_rate_LP          = dvbft->coderate_lp;
-        tuning.params.u.ofdm.constellation         = dvbft->constellation;
-        tuning.params.u.ofdm.transmission_mode     = dvbft->trans_mode;
-        tuning.params.u.ofdm.guard_interval        = dvbft->guard_interval;
-        tuning.params.u.ofdm.hierarchy_information = dvbft->hierarchy;
+        tuning.inversion      = ft.inversion;
+        tuning.bandwidth      = ft.bandwidth;
+        tuning.hp_code_rate   = ft.coderate_hp;
+        tuning.lp_code_rate   = ft.coderate_lp;
+        tuning.modulation     = ft.modulation;
+        tuning.trans_mode     = ft.trans_mode;
+        tuning.guard_interval = ft.guard_interval;
+        tuning.hierarchy      = ft.hierarchy;
     }
-    else if (standard == "atsc")
+    else
     {
-#if (DVB_API_VERSION_MINOR == 1)
-        tuning.params.u.vsb.modulation = (fe_modulation) ft.modulation;
-#endif
-        if (dvbft)
-        {
-            freq_offsets[1]                        = dvbft->offset1;
-            freq_offsets[2]                        = dvbft->offset2;
-        }
+        tuning.modulation     = ft.modulation;
     }
-#else
-    frequency  = freq;
-    modulation = ft.modulation;
-#endif // USING_DVB
+
     mplexid = GetMultiplexIdFromDB();
 }
 
-/** \fn TransportScanItem::GetMultiplexIdFromDB() const
+/** \fn TransportScanItem::GetMultiplexIdFromDB(void) const
  *  \brief Fetches mplexid if it exists, based on the frequency and sourceid
  */
-int TransportScanItem::GetMultiplexIdFromDB() const
+uint TransportScanItem::GetMultiplexIdFromDB(void) const
 {
-    int mplexid = -1;
+    int mplexid = 0;
 
     for (uint i = 0; (i < offset_cnt()) && (mplexid <= 0); i++)
         mplexid = ChannelUtil::GetMplexID(SourceID, freq_offset(i));
 
-    return mplexid;
+    return mplexid < 0 ? 0 : mplexid;
 }
 
-uint TransportScanItem::freq_offset(uint i) const
+uint64_t TransportScanItem::freq_offset(uint i) const
 {
-#ifdef USING_DVB
-    int freq = (int) tuning.params.frequency;
-#else
-    int freq = (int) frequency;
-#endif
+    int64_t freq = (int64_t) tuning.frequency;
 
-    return (uint) (freq + freq_offsets[i]);
+    return (uint64_t) (freq + freq_offsets[i]);
 }
-
-QString TransportScanItem::ModulationDB(void) const
-{
-#ifdef USING_DVB
-    return tuning.ModulationDB();
-#else
-    switch (modulation)
-    {
-//        case QPSK:     return "qpsk";
-        case QAM_AUTO: return "auto";
-        case QAM_16:   return "qam_16";
-        case QAM_32:   return "qam_32";
-        case QAM_64:   return "qam_64";
-        case QAM_128:  return "qam_128";
-        case QAM_256:  return "qam_256";
-        case VSB_8:    return "8vsb";
-        case VSB_16:   return "16vsb";
-        default:       return "auto";
-    }
-#endif
-}
-
 
 QString TransportScanItem::toString() const
 {
     QString str = QString("Transport Scan Item '%1' #%2\n")
         .arg(FriendlyName).arg(friendlyNum);
     str += QString("\tmplexid(%1) standard(%2) sourceid(%3)\n")
-        .arg(mplexid).arg(standard).arg(SourceID);
+        .arg(mplexid).arg(tuning.sistandard).arg(SourceID);
     str += QString("\tUseTimer(%1) scanning(%2)\n")
         .arg(UseTimer).arg(scanning);
     str += QString("\ttimeoutTune(%3 msec)\n").arg(timeoutTune);
-#ifdef USING_DVB
-#if (DVB_API_VERSION_MINOR == 1)
-    if (standard == "atsc")
+    if (tuning.sistandard == "atsc")
     {
         str += QString("\tfrequency(%1) modulation(%2)\n")
-            .arg(tuning.params.frequency)
-            .arg(tuning.params.u.vsb.modulation);
+            .arg(tuning.frequency)
+            .arg(tuning.modulation);
     }
     else
-#endif // (DVB_API_VERSION_MINOR == 1)
     {
         str += QString("\tfrequency(%1) constellation(%2)\n")
-            .arg(tuning.params.frequency)
-            .arg(tuning.params.u.ofdm.constellation);
+            .arg(tuning.frequency)
+            .arg(tuning.modulation);
         str += QString("\t  inv(%1) bandwidth(%2) hp(%3) lp(%4)\n")
-            .arg(tuning.params.inversion)
-            .arg(tuning.params.u.ofdm.bandwidth)
-            .arg(tuning.params.u.ofdm.code_rate_HP)
-            .arg(tuning.params.u.ofdm.code_rate_LP);
+            .arg(tuning.inversion)
+            .arg(tuning.bandwidth)
+            .arg(tuning.hp_code_rate)
+            .arg(tuning.lp_code_rate);
         str += QString("\t  trans_mode(%1) guard_int(%2) hierarchy(%3)\n")
-            .arg(tuning.params.u.ofdm.transmission_mode)
-            .arg(tuning.params.u.ofdm.guard_interval)
-            .arg(tuning.params.u.ofdm.hierarchy_information);
+            .arg(tuning.trans_mode)
+            .arg(tuning.guard_interval)
+            .arg(tuning.hierarchy);
     }
-#else
-    str += QString("\tfrequency(%1) modulation(%2)")
-        .arg(frequency).arg(modulation);
-#endif // USING_DVB
     str += QString("\t offset[0..2]: %1 %2 %3")
         .arg(freq_offsets[0]).arg(freq_offsets[1]).arg(freq_offsets[2]);
     return str;
@@ -325,80 +251,113 @@ int get_closest_freqid(
 
 static void init_freq_tables(freq_table_map_t &fmap)
 {
-#ifdef USING_DVB
     // United Kingdom
-    fmap["dvbt_ofdm_uk0"] = new DVBFrequencyTable(
-        474000000, 850000000, 8000000, "" , 0, INVERSION_OFF,
-        BANDWIDTH_8_MHZ, FEC_AUTO, FEC_AUTO, QAM_AUTO, TRANSMISSION_MODE_2K,
-        GUARD_INTERVAL_1_32, HIERARCHY_NONE, QAM_AUTO, 166670, -166670);
+    fmap["dvbt_ofdm_uk0"] = new FrequencyTable(
+        474000000, 850000000, 8000000, "" , 0, DTVInversion::kInversionOff,
+        DTVBandwidth::kBandwidth8MHz, DTVCodeRate::kFECAuto,
+        DTVCodeRate::kFECAuto, DTVModulation::kModulationQAMAuto,
+        DTVTransmitMode::kTransmissionMode2K,
+        DTVGuardInterval::kGuardInterval_1_32, DTVHierarchy::kHierarchyNone,
+        DTVModulation::kModulationQAMAuto, 166670, -166670);
 
     // Finland
-    fmap["dvbt_ofdm_fi0"] = new DVBFrequencyTable(
-        474000000, 850000000, 8000000, "", 0, INVERSION_OFF,
-        BANDWIDTH_8_MHZ, FEC_AUTO, FEC_AUTO, QAM_64, TRANSMISSION_MODE_AUTO,
-        GUARD_INTERVAL_AUTO, HIERARCHY_NONE, QAM_AUTO, 0, 0);
+    fmap["dvbt_ofdm_fi0"] = new FrequencyTable(
+        474000000, 850000000, 8000000, "", 0, DTVInversion::kInversionOff,
+        DTVBandwidth::kBandwidth8MHz, DTVCodeRate::kFECAuto,
+        DTVCodeRate::kFECAuto, DTVModulation::kModulationQAM64,
+        DTVTransmitMode::kTransmissionModeAuto,
+        DTVGuardInterval::kGuardIntervalAuto, DTVHierarchy::kHierarchyNone,
+        DTVModulation::kModulationQAMAuto, 0, 0);
 
     // Sweden
-    fmap["dvbt_ofdm_se0"] = new DVBFrequencyTable(
-        474000000, 850000000, 8000000, "", 0, INVERSION_OFF,
-        BANDWIDTH_8_MHZ, FEC_AUTO, FEC_AUTO, QAM_64, TRANSMISSION_MODE_AUTO,
-        GUARD_INTERVAL_AUTO, HIERARCHY_NONE, QAM_AUTO, 0, 0);
+    fmap["dvbt_ofdm_se0"] = new FrequencyTable(
+        474000000, 850000000, 8000000, "", 0, DTVInversion::kInversionOff,
+        DTVBandwidth::kBandwidth8MHz, DTVCodeRate::kFECAuto,
+        DTVCodeRate::kFECAuto, DTVModulation::kModulationQAM64,
+        DTVTransmitMode::kTransmissionModeAuto,
+        DTVGuardInterval::kGuardIntervalAuto, DTVHierarchy::kHierarchyNone,
+        DTVModulation::kModulationQAMAuto, 0, 0);
 
     // Australia
-    fmap["dvbt_ofdm_au0"] = new DVBFrequencyTable(
-        177500000, 226500000, 7000000, "", 0, INVERSION_OFF,
-        BANDWIDTH_7_MHZ, FEC_AUTO, FEC_AUTO, QAM_64, TRANSMISSION_MODE_8K,
-        GUARD_INTERVAL_AUTO, HIERARCHY_NONE, QAM_AUTO, 125000, 0); // VHF 6-12
-    fmap["dvbt_ofdm_au1"] = new DVBFrequencyTable(
-        529500000, 816500000, 7000000, "", 0, INVERSION_OFF,
-        BANDWIDTH_7_MHZ, FEC_AUTO, FEC_AUTO, QAM_64, TRANSMISSION_MODE_8K,
-        GUARD_INTERVAL_AUTO, HIERARCHY_NONE, QAM_AUTO, 125000, 0); // UHF 28-69
+    fmap["dvbt_ofdm_au0"] = new FrequencyTable(
+        177500000, 226500000, 7000000, "", 0, DTVInversion::kInversionOff,
+        DTVBandwidth::kBandwidth7MHz, DTVCodeRate::kFECAuto,
+        DTVCodeRate::kFECAuto, DTVModulation::kModulationQAM64,
+        DTVTransmitMode::kTransmissionMode8K, DTVGuardInterval::kGuardIntervalAuto, DTVHierarchy::kHierarchyNone,
+        DTVModulation::kModulationQAMAuto, 125000, 0); // VHF 6-12
+    fmap["dvbt_ofdm_au1"] = new FrequencyTable(
+        529500000, 816500000, 7000000, "", 0, DTVInversion::kInversionOff,
+        DTVBandwidth::kBandwidth7MHz, DTVCodeRate::kFECAuto,
+        DTVCodeRate::kFECAuto, DTVModulation::kModulationQAM64,
+        DTVTransmitMode::kTransmissionMode8K,
+        DTVGuardInterval::kGuardIntervalAuto, DTVHierarchy::kHierarchyNone,
+        DTVModulation::kModulationQAMAuto, 125000, 0); // UHF 28-69
 
     // Germany (Deuschland)
-    fmap["dvbt_ofdm_de0"] = new DVBFrequencyTable(
-        177500000, 226500000, 7000000, "", 0, INVERSION_OFF,
-        BANDWIDTH_7_MHZ, FEC_AUTO, FEC_AUTO, QAM_AUTO, TRANSMISSION_MODE_8K,
-        GUARD_INTERVAL_AUTO, HIERARCHY_NONE, QAM_AUTO, 125000, 0); // VHF 6-12
-    fmap["dvbt_ofdm_de1"] = new DVBFrequencyTable(
-        474000000, 826000000, 8000000, "", 0, INVERSION_OFF,
-        BANDWIDTH_8_MHZ, FEC_AUTO, FEC_AUTO, QAM_AUTO, TRANSMISSION_MODE_AUTO,
-        GUARD_INTERVAL_AUTO, HIERARCHY_NONE, QAM_AUTO, 125000, 0); // UHF 21-65
+    fmap["dvbt_ofdm_de0"] = new FrequencyTable(
+        177500000, 226500000, 7000000, "", 0, DTVInversion::kInversionOff,
+        DTVBandwidth::kBandwidth7MHz, DTVCodeRate::kFECAuto,
+        DTVCodeRate::kFECAuto, DTVModulation::kModulationQAMAuto,
+        DTVTransmitMode::kTransmissionMode8K,
+        DTVGuardInterval::kGuardIntervalAuto, DTVHierarchy::kHierarchyNone,
+        DTVModulation::kModulationQAMAuto, 125000, 0); // VHF 6-12
+    fmap["dvbt_ofdm_de1"] = new FrequencyTable(
+        474000000, 826000000, 8000000, "", 0, DTVInversion::kInversionOff,
+        DTVBandwidth::kBandwidth8MHz, DTVCodeRate::kFECAuto,
+        DTVCodeRate::kFECAuto, DTVModulation::kModulationQAMAuto,
+        DTVTransmitMode::kTransmissionModeAuto,
+        DTVGuardInterval::kGuardIntervalAuto, DTVHierarchy::kHierarchyNone,
+        DTVModulation::kModulationQAMAuto, 125000, 0); // UHF 21-65
 
     // Spain
-    fmap["dvbt_ofdm_es0"] = new DVBFrequencyTable(
-        474000000, 858000000, 8000000, "", 0, INVERSION_OFF,
-        BANDWIDTH_8_MHZ, FEC_AUTO, FEC_AUTO, QAM_AUTO, TRANSMISSION_MODE_AUTO,
-        GUARD_INTERVAL_AUTO, HIERARCHY_NONE, QAM_AUTO, 125000, 0); // UHF 21-69
-#endif // USING_DVB
+    fmap["dvbt_ofdm_es0"] = new FrequencyTable(
+        474000000, 858000000, 8000000, "", 0, DTVInversion::kInversionOff,
+        DTVBandwidth::kBandwidth8MHz, DTVCodeRate::kFECAuto,
+        DTVCodeRate::kFECAuto, DTVModulation::kModulationQAMAuto,
+        DTVTransmitMode::kTransmissionModeAuto,
+        DTVGuardInterval::kGuardIntervalAuto, DTVHierarchy::kHierarchyNone,
+        DTVModulation::kModulationQAMAuto, 125000, 0); // UHF 21-69
 
 //#define DEBUG_DVB_OFFSETS
 #ifdef DEBUG_DVB_OFFSETS
     // UHF 14-69
-    fmap["atsc_vsb8_us0"] = new DVBFrequencyTable(
-        533000000, 803000000, 6000000, "xATSC Channel %1", 24, INVERSION_OFF,
-        BANDWIDTH_7_MHZ, FEC_AUTO, FEC_AUTO, QAM_AUTO, TRANSMISSION_MODE_8K,
-        GUARD_INTERVAL_AUTO, HIERARCHY_NONE, VSB_8, -100000, 100000);
-#else
-    // USA Terrestrial (center frequency, subtract 1.75 Mhz for visual carrier)
+    fmap["atsc_vsb8_us0"] = new FrequencyTable(
+        533000000, 803000000, 6000000, "xATSC Channel %1", 24,
+        DTVInversion::kInversionOff,
+        DTVBandwidth::kBandwidth7MHz, DTVCodeRate::kFECAuto,
+        DTVCodeRate::kFECAuto, DTVModulation::kModulationQAMAuto,
+        DTVTransmitMode::kTransmissionMode8K,
+        DTVGuardInterval::kGuardIntervalAuto, DTVHierarchy::kHierarchyNone,
+        DTVModulation::kModulation8VSB, -100000, 100000);
+#else // if !DEBUG_DVB_OFFSETS
+    // USA Terrestrial (center frequency, subtract 1.75 MHz for visual carrier)
     // VHF 2-4
     fmap["atsc_vsb8_us0"] = new FrequencyTable(
-        "ATSC Channel %1",  2,  57000000,  69000000, 6000000, VSB_8);
+        "ATSC Channel %1",  2,  57000000,  69000000, 6000000,
+        DTVModulation::kModulation8VSB);
     // VHF 5-6
     fmap["atsc_vsb8_us1"] = new FrequencyTable(
-        "ATSC Channel %1",  5,  79000000,  85000000, 6000000, VSB_8);
+        "ATSC Channel %1",  5,  79000000,  85000000, 6000000,
+        DTVModulation::kModulation8VSB);
     // VHF 7-13
     fmap["atsc_vsb8_us2"] = new FrequencyTable(
-        "ATSC Channel %1",  7, 177000000, 213000000, 6000000, VSB_8);
+        "ATSC Channel %1",  7, 177000000, 213000000, 6000000,
+        DTVModulation::kModulation8VSB);
     // UHF 14-69
     fmap["atsc_vsb8_us3"] = new FrequencyTable(
-        "ATSC Channel %1", 14, 473000000, 803000000, 6000000, VSB_8);
+        "ATSC Channel %1", 14, 473000000, 803000000, 6000000,
+        DTVModulation::kModulation8VSB);
     // UHF 70-83
     fmap["atsc_vsb8_us4"] = new FrequencyTable(
-        "ATSC Channel %1", 70, 809000000, 887000000, 6000000, VSB_8);
-#endif // USING_DVB
+        "ATSC Channel %1", 70, 809000000, 887000000, 6000000,
+        DTVModulation::kModulation8VSB);
+#endif // !DEBUG_DVB_OFFSETS
 
     QString modStr[] = { "vsb8",  "qam256",   "qam128",   "qam64",   };
-    uint    mod[]    = { VSB_8,    QAM_256,    QAM_128,    QAM_64,   };
+    uint    mod[]    = { DTVModulation::kModulation8VSB,
+                         DTVModulation::kModulationQAM256,
+                         DTVModulation::kModulationQAM128,
+                         DTVModulation::kModulationQAM64, };
     QString desc[]   = { "ATSC ", "QAM-256 ", "QAM-128 ", "QAM-64 ", };
 
 #define FREQ(A,B, C,D, E,F,G, H, I) \

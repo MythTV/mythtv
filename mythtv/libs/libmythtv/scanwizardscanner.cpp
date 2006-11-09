@@ -291,7 +291,7 @@ void ScanWizardScanner::scan()
     nScanType    = parent->scanType();
     nVideoSource = parent->videoSource();
     bool do_scan = true;
-    bool nit_scan_parse_failed = false;
+    DTVTunerType parse_type = DTVTunerType::kTunerTypeUnknown;
 
     VERBOSE(VB_SIPARSER, LOC + "scan(): " +
             QString("type(%1) src(%2) cardid(%3)")
@@ -329,15 +329,7 @@ void ScanWizardScanner::scan()
         startChan["guard_interval"] = pane->guard_interval();
         startChan["hierarchy"]      = pane->hierarchy();
 
-#ifdef USING_DVB
-        DVBTuning tuning;
-        nit_scan_parse_failed = !tuning.parseOFDM(
-            startChan["frequency"],   startChan["inversion"],
-            startChan["bandwidth"],   startChan["coderate_hp"],
-            startChan["coderate_lp"], startChan["constellation"],
-            startChan["trans_mode"],  startChan["guard_interval"],
-            startChan["hierarchy"]);
-#endif // USING_DVB
+        parse_type = DTVTunerType::kTunerTypeOFDM;
     }
     else if (nScanType == ScanTypeSetting::NITAddScan_QPSK)
     {
@@ -351,16 +343,7 @@ void ScanWizardScanner::scan()
         startChan["modulation"] = "qpsk";
         startChan["polarity"]   = pane->polarity();
 
-#ifdef USING_DVB
-        if (!nit_scan_parse_failed)
-        {
-            DVBTuning tuning;
-            nit_scan_parse_failed = !tuning.parseQPSK(
-                startChan["frequency"],   startChan["inversion"],
-                startChan["symbolrate"],  startChan["fec"],
-                startChan["polarity"]);
-        }
-#endif // USING_DVB
+        parse_type = DTVTunerType::kTunerTypeQPSK;
     }
     else if (nScanType == ScanTypeSetting::NITAddScan_QAM)
     {
@@ -373,13 +356,7 @@ void ScanWizardScanner::scan()
         startChan["fec"]        = pane->fec();
         startChan["modulation"] = pane->modulation();
 
-#ifdef USING_DVB
-        DVBTuning tuning;
-        nit_scan_parse_failed = !tuning.parseQAM(
-            startChan["frequency"],   startChan["inversion"],
-            startChan["symbolrate"],  startChan["fec"],
-            startChan["modulation"]);
-#endif // USING_DVB
+        parse_type = DTVTunerType::kTunerTypeQAM;
     }
     else if (nScanType == ScanTypeSetting::IPTVImport)
     {
@@ -398,12 +375,23 @@ void ScanWizardScanner::scan()
             "Programmer Error, see console");
     }
 
-    if (nit_scan_parse_failed)
+    DTVMultiplex tuning;
+    if ((DTVTunerType::kTunerTypeUnknown != parse_type) &&
+        !tuning.ParseTuningParams(
+            parse_type,
+            startChan["frequency"],      startChan["inversion"],
+            startChan["symbolrate"],     startChan["fec"],
+            startChan["polarity"],
+            startChan["coderate_hp"],    startChan["coderate_lp"],
+            startChan["constellation"],  startChan["trans_mode"],
+            startChan["guard_interval"], startChan["hierarchy"],
+            startChan["modulation"],     startChan["bandwidth"]))
     {
         MythPopupBox::showOkPopup(
             gContext->GetMainWindow(), tr("ScanWizard"),
             tr("Error parsing parameters"));
-        return;
+
+        do_scan = false;
     }
 
     if (do_scan)

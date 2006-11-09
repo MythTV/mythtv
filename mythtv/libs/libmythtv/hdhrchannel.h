@@ -54,12 +54,13 @@ class HDHRChannel : public DTVChannel
 
     // ATSC scanning stuff
     bool TuneMultiplex(uint mplexid, QString inputname);
-    bool Tune(uint frequency, QString inputname,
-              QString modulation, QString si_std);
+    bool Tune(const DTVMultiplex &tuning, QString inputname);
 
   private:
     bool FindDevice(void);
     bool Connect(void);
+    bool Tune(uint frequency, QString inputname,
+              QString modulation, QString si_std);
 
     bool DeviceSetTarget(unsigned short localPort);
     bool DeviceClearTarget(void);

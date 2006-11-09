@@ -13,23 +13,11 @@ using namespace std;
 #include <qmutex.h>
 
 // MythTV includes
-#ifdef USING_DVB
-#include "dvbchannel.h"
-#include "dvbtypes.h"
-#else // if ! USING_DVB
-//#define QPSK     0
-#define QAM_16   1
-#define QAM_32   2
-#define QAM_64   3
-#define QAM_128  4
-#define QAM_256  5
-#define QAM_AUTO 6
-#define VSB_8    7
-#define VSB_16   8
-#endif // USING_DVB
+#include "dtvchannel.h"
 
 #include "mythexp.h"
 #include "dvbconfparser.h"
+#include "dtvconfparserhelpers.h"
 
 class FrequencyTable;
 class TransportScanItem;
@@ -53,65 +41,62 @@ class FrequencyTable
   public:
     FrequencyTable(QString                 _name_format,
                    int                     _name_offset,
-                   uint                    _frequencyStart,
-                   uint                    _frequencyEnd,
+                   uint64_t                _frequencyStart,
+                   uint64_t                _frequencyEnd,
                    uint                    _frequencyStep,
-                   uint                    _modulation)
+                   DTVModulation           _modulation)
         : name_format(_name_format),       name_offset(_name_offset),
           frequencyStart(_frequencyStart), frequencyEnd(_frequencyEnd),
           frequencyStep(_frequencyStep),   
           modulation(_modulation) { ; }
-    virtual ~FrequencyTable() { ; }
 
-    QString name_format;          ///< pretty name format
-    int     name_offset;          ///< Offset to add to the pretty name
-    uint    frequencyStart;       ///< The staring centre frequency
-    uint    frequencyEnd;         ///< The ending centre frequency
-    uint    frequencyStep;        ///< The step in frequency
-    uint    modulation;
-};
-
-#ifdef USING_DVB
-class DVBFrequencyTable : public FrequencyTable
-{
-  public:
-    DVBFrequencyTable(uint                    _frequencyStart,
-                      uint                    _frequencyEnd,
-                      uint                    _frequencyStep,
-                      QString                 _name_format,
-                      int                     _name_offset,
-                      fe_spectral_inversion_t _inversion,
-                      fe_bandwidth_t          _bandwidth,
-                      fe_code_rate_t          _coderate_hp,
-                      fe_code_rate_t          _coderate_lp,
-                      fe_modulation_t         _constellation,  
-                      fe_transmit_mode_t      _trans_mode, 
-                      fe_guard_interval_t     _guard_interval,
-                      fe_hierarchy_t          _hierarchy,
-                      fe_modulation_t         _modulation,
-                      int                     _offset1,
-                      int                     _offset2)
-        : FrequencyTable(_name_format,     _name_offset,
-                         _frequencyStart,  _frequencyEnd,
-                         _frequencyStep,   _modulation),
+    FrequencyTable(uint64_t                _frequencyStart,
+                   uint64_t                _frequencyEnd,
+                   uint                    _frequencyStep,
+                   QString                 _name_format,
+                   int                     _name_offset,
+                   DTVInversion            _inversion,
+                   DTVBandwidth            _bandwidth,
+                   DTVCodeRate             _coderate_hp,
+                   DTVCodeRate             _coderate_lp,
+                   DTVModulation           _constellation,  
+                   DTVTransmitMode         _trans_mode, 
+                   DTVGuardInterval        _guard_interval,
+                   DTVHierarchy            _hierarchy,
+                   DTVModulation           _modulation,
+                   int                     _offset1,
+                   int                     _offset2)
+        : name_format(_name_format),       name_offset(_name_offset),
+          frequencyStart(_frequencyStart), frequencyEnd(_frequencyEnd),
+          frequencyStep(_frequencyStep),   modulation(_modulation),
+          offset1(_offset1),               offset2(_offset2),
           inversion(_inversion),           bandwidth(_bandwidth),
           coderate_hp(_coderate_hp),       coderate_lp(_coderate_lp),
           constellation(_constellation),   trans_mode(_trans_mode),
-          guard_interval(_guard_interval), hierarchy(_hierarchy),
-          offset1(_offset1),               offset2(_offset2) { ; }
+          guard_interval(_guard_interval), hierarchy(_hierarchy) { ; }
 
-    fe_spectral_inversion_t inversion;
-    fe_bandwidth_t          bandwidth;
-    fe_code_rate_t          coderate_hp;
-    fe_code_rate_t          coderate_lp;
-    fe_modulation_t         constellation;  
-    fe_transmit_mode_t      trans_mode; 
-    fe_guard_interval_t     guard_interval;
-    fe_hierarchy_t          hierarchy;
-    int     offset1;              ///< The first offset from the centre freq
-    int     offset2;              ///< The second offset from the centre freq
+    virtual ~FrequencyTable() { ; }
+
+    // Common Stuff
+    QString           name_format;    ///< pretty name format
+    int               name_offset;    ///< Offset to add to the pretty name
+    uint64_t          frequencyStart; ///< The staring centre frequency
+    uint64_t          frequencyEnd;   ///< The ending centre frequency
+    uint              frequencyStep;  ///< The step in frequency
+    DTVModulation     modulation;
+    int               offset1; ///< The first  offset from the centre freq
+    int               offset2; ///< The second offset from the centre freq
+
+    // DVB OFDM stuff
+    DTVInversion      inversion;
+    DTVBandwidth      bandwidth;
+    DTVCodeRate       coderate_hp;
+    DTVCodeRate       coderate_lp;
+    DTVModulation     constellation; 
+    DTVTransmitMode   trans_mode;
+    DTVGuardInterval  guard_interval;
+    DTVHierarchy      hierarchy;
 };
-#endif // USING_DVB
 
 /**
  *  \brief Class used for doing a list of frequencies / transports.
@@ -122,46 +107,43 @@ class TransportScanItem
 {
   public:
     TransportScanItem();
-    TransportScanItem(int sourceid, const QString &std,
-                      const QString &name, int mplexid,
-                      uint tuneTimeout);
-#ifdef USING_DVB
-    TransportScanItem(int            _sourceid,
-                      const QString &_std,
+    TransportScanItem(uint           _sourceid,
+                      const QString &_si_std,
                       const QString &_name,
-                      DVBTuning     &_tuning,
+                      uint           _mplexid,
                       uint           _timeoutTune);
-#endif // USING_DVB
 
-    TransportScanItem(int                 _sourceid,
-                      const QString      &_std,
+    TransportScanItem(uint           _sourceid,
+                      const QString &_name,
+                      DTVMultiplex  &_tuning,
+                      uint           _timeoutTune);
+
+    TransportScanItem(uint                _sourceid,
                       const QString      &_name,
-                      const QString      &_cardtype,
+                      DTVTunerType        _tuner_type,
                       const DTVTransport &_tuning,
                       uint                _timeoutTune);
 
-    TransportScanItem(int sourceid,           /* source id in DB */
-                      const QString &std,     /* atsc/dvb */
+    TransportScanItem(uint                _sourceid,
+                      const QString      &_si_std,
                       const QString &strFmt,  /* fmt for info shown to user  */
                       uint freqNum,
                       uint frequency,         /* center frequency to use     */
                       const FrequencyTable&,  /* freq table to get info from */
-                      uint tuneTimeout);
+                      uint                _timeoutTune);
 
     uint offset_cnt() const
         { return (freq_offsets[2]) ? 3 : ((freq_offsets[1]) ? 2 : 1); }
 
-    uint freq_offset(uint i) const;
+    uint64_t freq_offset(uint i) const;
 
-    QString ModulationDB(void) const;
     QString toString() const;
 
   private:
-    int GetMultiplexIdFromDB() const;
+    uint GetMultiplexIdFromDB(void) const;
 
   public:
-    int       mplexid;          ///< DB Mplexid
-    QString   standard;         ///< DVB/ATSC
+    uint      mplexid;          ///< DB Mplexid
 
     QString   FriendlyName;     ///< Name to display in scanner dialog
     uint      friendlyNum;      ///< Frequency number (freqid w/freq table)
@@ -173,12 +155,7 @@ class TransportScanItem
     int       freq_offsets[3];  ///< Frequency offsets
     unsigned  timeoutTune;      ///< Timeout to tune to a frequency
 
-#ifdef USING_DVB
-    DVBTuning tuning;           ///< DVB Tuning struct if mplexid == -1
-#else
-    uint      frequency;        ///< Tuning frequency if mplexid == -1
-    uint      modulation;       ///< Tuning frequency if mplexid == -1
-#endif
+    DTVMultiplex tuning;        ///< Tuning info
 
     DTVChannelInfoList expectedChannels;
 };

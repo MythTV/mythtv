@@ -67,6 +67,52 @@ class DTVParamHelper
     int value;
 };
 
+class DTVTunerType : public DTVParamHelper
+{
+    static const DTVParamHelperStruct parseTable[];
+
+  public:
+    enum
+    {
+        kTunerTypeQPSK    = 0,
+        kTunerTypeQAM     = 1,
+        kTunerTypeOFDM    = 2,
+        kTunerTypeATSC    = 3,
+        kTunerTypeDVB_S   = (1 << 2), // same as QPSK but for new API
+        kTunerTypeDVB_C   = (1 << 3), // same as QAM  but for new API
+        kTunerTypeDVB_T   = (1 << 4), // same as OFDM but for new API
+        kTunerTypeDVB_S2  = (1 << 5),
+        kTunerTypeUnknown = (1 << 31),
+    };
+
+    DTVTunerType(int _default = kTunerTypeUnknown)
+        : DTVParamHelper(_default) { initStr(); }
+
+    bool Parse(const QString &_value)
+        { return ParseParam(_value, value, parseTable); }
+
+    bool IsFECVariable(void) const
+    {
+        return ((kTunerTypeQPSK   == value) ||
+                (kTunerTypeQAM    == value) ||
+                (kTunerTypeDVB_S  == value) ||
+                (kTunerTypeDVB_C  == value) ||
+                (kTunerTypeDVB_S2 == value));
+    }
+
+    bool IsModulationVariable(void) const
+    {
+        return ((DTVTunerType::kTunerTypeQAM    == value) ||
+                (DTVTunerType::kTunerTypeATSC   == value) ||
+                (DTVTunerType::kTunerTypeDVB_S2 == value));
+    }
+
+    QString toString() const { return toString(value); }
+
+    static void initStr(void);
+    static QString toString(int _value);
+};
+
 class DTVInversion : public DTVParamHelper
 {
   protected:
@@ -95,6 +141,9 @@ class DTVInversion : public DTVParamHelper
        { return ParseParam(_value, value, parseTable); }
 
     QString toString() const { return toString(value); }
+    QChar   toChar() const
+        { if (toString().length() > 0)
+              return toString()[0]; else return QChar(0); }
 
     static QString toString(int _value)
         { return DTVParamHelper::toString(dbStr, _value, kDBStrCnt); }
@@ -112,9 +161,9 @@ class DTVBandwidth : public DTVParamHelper
   public:
     enum
     {
-        kBandwidth8Mhz,
-        kBandwidth7Mhz,
-        kBandwidth6Mhz,
+        kBandwidth8MHz,
+        kBandwidth7MHz,
+        kBandwidth6MHz,
         kBandwidthAuto,
     };
 
@@ -128,6 +177,9 @@ class DTVBandwidth : public DTVParamHelper
        { return ParseParam(_value, value, parseTable); }
 
     QString toString() const { return toString(value); }
+    QChar   toChar() const
+        { if (toString().length() > 0)
+              return toString()[0]; else return QChar(0); }
 
     static QString toString(int _value)
         { return DTVParamHelper::toString(dbStr, _value, kDBStrCnt); }
@@ -178,22 +230,28 @@ class DTVModulation : public DTVParamHelper
     static const DTVParamHelperStruct confTable[];
     static const DTVParamHelperStruct vdrTable[];
     static const DTVParamHelperStruct parseTable[];
-    static const uint kDBStrCnt = 10;
+    static const uint kDBStrCnt = 16;
     static const char *dbStr[kDBStrCnt];
 
   public:
     enum
     {
-        kModulationQPSK,
-        kModulationQAM16,
-        kModulationQAM32, 
-        kModulationQAM64, 
-        kModulationQAM128,
-        kModulationQAM256,
-        kModulationQAMAuto,
-        kModulation8VSB,
-        kModulation16VSB,
-        kModulation8PSK, 
+        kModulationQPSK    = 0,
+        kModulationQAM16   = 1,
+        kModulationQAM32   = 2,
+        kModulationQAM64   = 3,
+        kModulationQAM128  = 4,
+        kModulationQAM256  = 5,
+        kModulationQAMAuto = 6,
+        kModulation8VSB    = 7,
+        kModulation16VSB   = 8,
+        kModulation2VSB    = 9,
+        kModulation4VSB    = 10,
+        kModulationBPSK    = 11,
+        kModulation16APSK  = 12,
+        kModulation32APSK  = 13,
+        kModulation8PSK    = 14,
+        kModulation16PSK   = 15,
     };
 
     DTVModulation(int _default = kModulationQAMAuto)
@@ -240,6 +298,10 @@ class DTVTransmitMode : public DTVParamHelper
        { return ParseParam(_value, value, parseTable); }
 
     QString toString() const { return toString(value); }
+    QChar   toChar() const
+        { if (toString().length() > 0)
+              return toString()[0]; else return QChar(0); }
+
     static QString toString(int _value)
         { return DTVParamHelper::toString(dbStr, _value, kDBStrCnt); }
 };
@@ -308,6 +370,9 @@ class DTVHierarchy : public DTVParamHelper
        { return ParseParam(_value, value, parseTable); }
 
     QString toString() const { return toString(value); }
+    QChar   toChar() const
+        { if (toString().length() > 0)
+              return toString()[0]; else return QChar(0); }
 
     static QString toString(int _value)
         { return DTVParamHelper::toString(dbStr, _value, kDBStrCnt); }
@@ -340,6 +405,9 @@ class DTVPolarity : public DTVParamHelper
        { return ParseParam(_value, value, parseTable); }
 
     QString toString() const { return toString(value); }
+    QChar   toChar() const
+        { if (toString().length() > 0)
+              return toString()[0]; else return QChar(0); }
 
     static QString toString(int _value)
         { return DTVParamHelper::toString(dbStr, _value, kDBStrCnt); }

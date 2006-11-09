@@ -15,7 +15,8 @@
 using namespace std;
 
 // Qt headers
-#include "qmutex.h"
+#include <qmutex.h>
+#include <qstring.h>
 
 // MythTV headers
 #include "channelbase.h"
@@ -23,7 +24,6 @@ using namespace std;
 typedef pair<uint,uint> pid_cache_item_t;
 typedef vector<pid_cache_item_t> pid_cache_t;
 
-class QString;
 class TVRec;
 
 /** \class DTVChannel
@@ -39,6 +39,8 @@ class DTVChannel : public ChannelBase
 
     /// \brief To be used by the channel scanner and possibly the EIT scanner.
     virtual bool TuneMultiplex(uint mplexid, QString inputname) = 0;
+    /// \brief To be used by the channel scanner and possibly the EIT scanner.
+    virtual bool Tune(const DTVMultiplex &tuning, QString inputname) = 0;
 
     // Gets
 

@@ -439,6 +439,12 @@ bool HDHRChannel::TuneMultiplex(uint mplexid, QString inputname)
     return true;
 }
 
+bool HDHRChannel::Tune(const DTVMultiplex &tuning, QString inputname)
+{
+    return Tune(tuning.frequency, inputname,
+                tuning.modulation.toString(), tuning.sistandard);
+}
+
 bool HDHRChannel::Tune(uint frequency, QString /*input*/,
                        QString modulation, QString si_std)
 {
