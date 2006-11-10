@@ -255,7 +255,7 @@ PlaybackBox::PlaybackBox(BoxType ltype, MythMainWindow *parent,
       progCache(NULL),                  playingSomething(false),
       // Selection state variables
       haveGroupInfoSet(false),          inTitle(false),
-      leftRight(false),
+      leftRight(false), playbackVideoContainer(false),
       // Free disk space tracking
       freeSpaceNeedsUpdate(true),       freeSpaceTimer(new QTimer(this)),
       freeSpaceTotal(0),                freeSpaceUsed(0),
@@ -330,7 +330,15 @@ PlaybackBox::PlaybackBox(BoxType ltype, MythMainWindow *parent,
     // theme stuff
     theme->SetWMult(wmult);
     theme->SetHMult(hmult);
-    theme->LoadTheme(xmldata, "playback");
+    if (m_player && m_player->GetState() == kState_WatchingLiveTV &&
+        theme->LoadTheme(xmldata,"playback-video"))
+    {
+        playbackVideoContainer = true;
+        previewPixmapEnabled = false;
+    }
+    else
+        theme->LoadTheme(xmldata,"playback");
+
     LoadWindow(xmldata);
 
     LayerSet *container = theme->GetSet("selector");
@@ -880,6 +888,12 @@ void PlaybackBox::updateInfo(QPainter *p)
 
 void PlaybackBox::updateVideo(QPainter *p)
 {
+    if (playbackVideoContainer)
+    {
+        m_player->EmbedOutput(this->winId(), drawVideoBounds.x(), drawVideoBounds.y(),
+                                drawVideoBounds.width(), drawVideoBounds.height());
+        return;
+    }
     // If we're displaying group info don't update the video.
     if (inTitle && haveGroupInfoSet)
         return;
@@ -2986,8 +3000,12 @@ void PlaybackBox::showActionPopup(ProgramInfo *program)
                             SLOT(togglePlayListItem()));
     }
 
-    if (program->recstatus == rsRecording)
+    if (program->recstatus == rsRecording &&
+        (!(m_player && m_player->GetState() == kState_WatchingLiveTV &&
+           m_player->IsSameProgram(curitem))))
+    {
         popup->addButton(tr("Stop Recording"), this, SLOT(askStop()));
+    }
 
     if (curitem->programflags & FL_WATCHED)
         popup->addButton(tr("Mark as Unwatched"), this,
@@ -3924,15 +3942,9 @@ void PlaybackBox::customEvent(QCustomEvent *e)
 
 bool PlaybackBox::fileExists(ProgramInfo *pginfo)
 {
-    if (pginfo->pathname.left(7) == "myth://")
-    {
-        bool ret = RemoteCheckFile(pginfo);
-        return ret;
-    }
-
-    QFile checkFile(pginfo->pathname);
-
-    return checkFile.exists();
+    if (pginfo)
+       return pginfo->PathnameExists();
+    return false;
 }
 
 QDateTime PlaybackBox::getPreviewLastModified(ProgramInfo *pginfo)
@@ -4625,28 +4637,7 @@ void PlaybackBox::setGroupFilter(void)
 
 QString PlaybackBox::getRecGroupPassword(QString group)
 {
-    QString result = QString("");
-
-    if (group == "All Programs")
-    {
-        result = gContext->GetSetting("AllRecGroupPassword");
-    }
-    else
-    {
-        MSqlQuery query(MSqlQuery::InitCon());
-        query.prepare("SELECT password FROM recgrouppassword "
-                                   "WHERE recgroup = :GROUP ;");
-        query.bindValue(":GROUP", group.utf8());
-
-        if (query.exec() && query.isActive() && query.size() > 0)
-            if (query.next())
-                result = query.value(0).toString();
-    }
-
-    if (result == QString::null)
-        result = QString("");
-
-    return(result);
+    return ProgramInfo::GetRecGroupPassword(group);
 }
 
 void PlaybackBox::fillRecGroupPasswordCache(void)

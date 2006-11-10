@@ -128,6 +128,7 @@ class MPUBLIC TV : public QObject
     void AskAllowRecording(const QStringList&, int, bool);
     void PromptStopWatchingRecording(void);
     void PromptDeleteRecording(QString title);
+    bool PromptRecGroupPassword(void);
     
 
     // Boolean queries

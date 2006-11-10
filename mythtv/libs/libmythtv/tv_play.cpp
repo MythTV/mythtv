@@ -135,14 +135,13 @@ bool TV::StartTV (ProgramInfo *tvrec, bool startInGuide,
             ProgramInfo *tmpProgram  = tv->getLastProgram();
             ProgramInfo *nextProgram = new ProgramInfo(*tmpProgram);
 
-            //Temp workaround until Pin support for password protected last show is implemented.
-            if (curProgram->recgroup == nextProgram->recgroup)
+            if (curProgram)
+            {
                 tv->setLastProgram(curProgram);
+                delete curProgram;
+            }
             else
                 tv->setLastProgram(NULL);
-
-            if (curProgram)
-                delete curProgram;
 
             curProgram = nextProgram;
 
@@ -1815,10 +1814,9 @@ void TV::RunTV(void)
             }
             
             
-            if (jumpToProgram)
+            if (jumpToProgram && lastProgram)
             {
                 bool fileExists = lastProgram->PathnameExists();
-                
                 if (!fileExists)
                 {
                     if (GetOSD())
@@ -2693,9 +2691,12 @@ void TV::ProcessKeypress(QKeyEvent *e)
         }
         else if (action == "JUMPPREV")
         {
-            nvp->SetBookmark();
-            exitPlayer = true;
-            jumpToProgram = true;
+            if (PromptRecGroupPassword())
+            {
+                nvp->SetBookmark();
+                exitPlayer = true;
+                jumpToProgram = true;
+            }
         }
         else if (action == "JUMPREC")
         {
@@ -4960,14 +4961,46 @@ void TV::doEditSchedule(int editType)
 
     if (StateIsLiveTV(GetState()))
     {
-        // See if we can provide a channel preview in EPG
-        bool allowsecondary = true;
-        if (nvp && nvp->getVideoOutput())
-            allowsecondary = nvp->getVideoOutput()->AllowPreviewEPG();
+        switch (editType)
+        {
+            default:
+            case kScheduleProgramGuide:
+            {
+                // See if we can provide a channel preview in EPG
+                bool allowsecondary = true;
+                if (nvp && nvp->getVideoOutput())
+                    allowsecondary = nvp->getVideoOutput()->AllowPreviewEPG();
 
-        // Start up EPG
-        changeChannel = RunProgramGuide(chanid, channum, true, this, allowsecondary);
-
+                // Start up EPG
+                changeChannel = RunProgramGuide(chanid, channum, true, this, allowsecondary);
+                break;
+            }
+            case kPlaybackBox:
+            {
+                bool stayPaused = false;
+                QDomElement pbbxmldata;
+                XMLParse    *theme = new XMLParse();
+                if (!theme->LoadTheme(pbbxmldata, "playback-video"))
+                {
+                    stayPaused = paused;
+                    if (!paused)
+                        DoPause();
+                }
+                if (theme)
+                    delete theme;
+                nextProgram = RunPlaybackBoxPtr((void *)this);
+                if (nextProgram)
+                {
+                    setLastProgram(nextProgram);
+                    jumpToProgram = true;
+                    exitPlayer = true;
+                    delete nextProgram;
+                }
+                if (paused & !stayPaused)
+                    DoPause();
+                break;
+            }
+        }
         StopEmbeddingOutput();
     }
     else
@@ -6331,6 +6364,20 @@ void TV::TreeMenuSelected(OSDListTreeType *tree, OSDGenericTree *item)
         EditSchedule(kScheduleProgramFinder);
     else if (action == "SCHEDULE")
         EditSchedule(kScheduledRecording);
+    else if (action == "JUMPPREV")
+    {
+        if (PromptRecGroupPassword())
+        {
+            nvp->SetBookmark();
+            exitPlayer = true;
+            jumpToProgram = true;
+        }
+    }
+    else if (action == "JUMPREC")
+    {
+        if (RunPlaybackBoxPtr)
+            EditSchedule(kPlaybackBox);
+    }
     else if (StateIsLiveTV(GetState()))
     {
         if (action == "TOGGLEPIPMODE")
@@ -6372,17 +6419,6 @@ void TV::TreeMenuSelected(OSDListTreeType *tree, OSDGenericTree *item)
             DoQueueTranscode("Medium Quality");
         else if (action == "QUEUETRANSCODE_LOW")
             DoQueueTranscode("Low Quality");
-        else if (action == "JUMPPREV")
-        {
-            nvp->SetBookmark();
-            exitPlayer = true;
-            jumpToProgram = true;
-        }
-        else if (action == "JUMPREC")
-        {
-            if (RunPlaybackBoxPtr)
-                EditSchedule(kPlaybackBox);
-        }
         else if (action.left(8) == "JUMPPROG")
         {
             SetJumpToProgram(action.section(" ",1,-2),
@@ -6448,6 +6484,10 @@ void TV::BuildOSDTreeMenu(void)
             freeRecorders = RemoteGetFreeRecorderCount();
 
         item = new OSDGenericTree(treeMenu, tr("Program Guide"), "GUIDE");
+        item = new OSDGenericTree(treeMenu, tr("Jump to Program"));
+        subitem = new OSDGenericTree(item, tr("Recorded Program"), "JUMPREC");
+        if (lastProgram != NULL)
+            subitem = new OSDGenericTree(item, lastProgram->title, "JUMPPREV");
 
         if (freeRecorders)
         {
@@ -7397,6 +7437,46 @@ bool TV::IsSameProgram(ProgramInfo *rcinfo)
         return playbackinfo->IsSameProgram(*rcinfo);
 
     return false;
+}
+
+bool TV::PromptRecGroupPassword(void)
+{
+    if (!lastProgram)
+        return false;
+  
+    bool stayPaused = paused;
+    if (!paused)
+        DoPause();
+    QString recGroupPassword;
+    lastProgram->UpdateRecGroup();
+    recGroupPassword = ProgramInfo::GetRecGroupPassword(lastProgram->recgroup);
+    if (recGroupPassword != "")
+    {
+        qApp->lock();
+        bool ok = false;
+        QString text = tr("'%1' Group Password:")
+            .arg(lastProgram->recgroup);
+        MythPasswordDialog *pwd = new MythPasswordDialog(text, &ok,
+                                                recGroupPassword,
+                                                gContext->GetMainWindow());
+        pwd->exec();
+        delete pwd;
+        qApp->unlock();
+        if (!ok)
+        {
+            if (GetOSD())
+            {
+                QString msg = tr("Password Failed");
+                GetOSD()->SetSettingsText(msg, 3);
+            }
+            if (paused && !stayPaused)
+                DoPause();
+            return false;
+        }
+    }
+    if (paused && !stayPaused)
+        DoPause();
+    return true;
 }
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

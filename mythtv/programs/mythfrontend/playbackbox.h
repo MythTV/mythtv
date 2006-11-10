@@ -408,6 +408,8 @@ class PlaybackBox : public MythDialog
     /// If change is left or right, don't restart video
     bool                leftRight;
 
+    bool                playbackVideoContainer; ///< true if theme is using playback-video container.
+
     // Free disk space tracking
     bool                freeSpaceNeedsUpdate;
     QTimer             *freeSpaceTimer;

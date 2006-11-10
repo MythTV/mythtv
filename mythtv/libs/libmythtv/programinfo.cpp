@@ -3768,6 +3768,48 @@ bool ProgramInfo::PathnameExists(void)
     return checkFile.exists();
 }
 
+QString ProgramInfo::GetRecGroupPassword(QString group)
+{
+    QString result = QString("");
+
+    if (group == "All Programs")
+    {
+        result = gContext->GetSetting("AllRecGroupPassword");
+    }
+    else
+    {
+        MSqlQuery query(MSqlQuery::InitCon());
+        query.prepare("SELECT password FROM recgrouppassword "
+                        "WHERE recgroup = :GROUP ;");
+        query.bindValue(":GROUP", group.utf8());
+
+        if (query.exec() && query.isActive() && query.size() > 0)
+            if (query.next())
+                result = query.value(0).toString();
+    }
+
+    if (result == QString::null)
+        result = QString("");
+
+    return(result);
+}
+
+/** \brief Update Rec Group if its changed by a different programinfo instance.
+ */
+void ProgramInfo::UpdateRecGroup(void)
+{
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare("SELECT recgroup FROM recorded"
+                    "WHERE chaind = :CHANID"
+                    "AND starttime = :START ;");
+    query.bindValue(":START", recstartts);
+    query.bindValue(":CHANID", chanid);
+    if (query.exec() && query.isActive() && query.size() > 0)
+    {
+        if(query.next() && recgroup != query.value(0).toString())
+            recgroup = query.value(0).toString();
+    }
+}
 void ProgramInfo::MarkAsInUse(bool inuse, QString usedFor)
 {
     if (isVideo)

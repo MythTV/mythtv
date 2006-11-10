@@ -246,6 +246,10 @@ class MPUBLIC ProgramInfo
     // In-use, autodeletion prevention stuff
     void MarkAsInUse(bool inuse, QString usedFor = "");
 
+    // Rec Group
+    static QString GetRecGroupPassword(QString group);
+    void   UpdateRecGroup(void);
+
   private:
     // GUI helper functions
     bool IsFindApplicable(void) const;
