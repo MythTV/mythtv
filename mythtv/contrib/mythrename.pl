@@ -211,7 +211,7 @@ EOF
 
 # Only if we're renaming files
     unless ($dest) {
-        $q  = 'UPDATE recorded SET basename=? WHERE chanid=? AND starttime=?';
+        $q  = 'UPDATE recorded SET basename=? WHERE chanid=? AND starttime=FROM_UNIXTIME(?)';
         $sh = $dbh->prepare($q);
     }
 
