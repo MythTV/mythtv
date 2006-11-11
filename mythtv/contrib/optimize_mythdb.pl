@@ -1,63 +1,24 @@
 #!/usr/bin/perl -w
 #
-# $Date$
-# $Revision$
-# $Author$
+# Connects to the mythtv database and repairs/optimizes the tables that it
+# finds.  Suggested use is to cron it to run once per day.
 #
-#  optimize_mythdb.pl:
-#
-#   Connects to the mythtv database and repairs/optimizes the tables that it
-#   finds.  Suggested use is to cron it to run once per day.
+# @url       $URL$
+# @date      $Date$
+# @version   $Revision$
+# @author    $Author$
+# @license   GPL
 #
 
-# Load DBI
+# Includes
     use DBI;
+    use MythTV;
 
-# Some variables we'll use here
-    my ($db_host, $db_user, $db_name, $db_pass);
-
-# Read the mysql.txt file in use by MythTV.
-# could be in a couple places, so try the usual suspects
-    my $found = 0;
-    my @mysql = ('/usr/local/share/mythtv/mysql.txt',
-                 '/usr/share/mythtv/mysql.txt',
-                 '/etc/mythtv/mysql.txt',
-                 '/usr/local/etc/mythtv/mysql.txt',
-                 "$ENV{HOME}/.mythtv/mysql.txt",
-                 'mysql.txt'
-                );
-    foreach my $file (@mysql) {
-        next unless (-e $file);
-        $found = 1;
-        open(CONF, $file) or die "Unable to open $file:  $!\n\n";
-        while (my $line = <CONF>) {
-        # Cleanup
-            next if ($line =~ /^\s*#/);
-            $line =~ s/^str //;
-            chomp($line);
-        # Split off the var=val pairs
-            my ($var, $val) = split(/\=/, $line, 2);
-            next unless ($var && $var =~ /\w/);
-            if ($var eq 'DBHostName') {
-                $db_host = $val;
-            }
-            elsif ($var eq 'DBUserName') {
-                $db_user = $val;
-            }
-            elsif ($var eq 'DBName') {
-                $db_name = $val;
-            }
-            elsif ($var eq 'DBPassword') {
-                $db_pass = $val;
-            }
-        }
-        close CONF;
-    }
-    die "Unable to locate mysql.txt:  $!\n\n" unless ($found && $db_host);
+# Connect to mythbackend
+    my $Myth = new MythTV();
 
 # Connect to the database
-    $dbh = DBI->connect("dbi:mysql:database=$db_name:host=$db_host;mysql_emulated_prepare=1", $db_user, $db_pass)
-        or die "Cannot connect to database: $!\n\n";
+    $dbh = $Myth->{'dbh'};
 
 # Repair and optimize each table
     foreach $table ($dbh->tables) {
@@ -69,7 +30,4 @@
             print "Repaired/Optimized: $table\n";
         }
     }
-
-# Close the database connection
-    $dbh->disconnect;
 
