@@ -235,7 +235,6 @@ EOF
         $safe_file =~ s/'/'\\''/sg;
         $safe_file = "'$safe_file'";
     # Figure out the suffix
-        my $out    = `file -b $safe_file 2>/dev/null`;
         my $suffix = ($show->{'finfo'}->{'is_mpeg'}) ? '.mpg' : '.nuv';
     # Link destination
         if ($dest) {
