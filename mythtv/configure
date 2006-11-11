@@ -174,7 +174,7 @@ Rerun configure with logging enabled (do not use --log=no), and include the
 log this produces with your report.
 EOF
     fi
-    rm -f $TMPC $TMPO $TMPE $TMPS $TMPH
+    rm -f $TMPC $TMPCXX $TMPO $TMPE $TMPS $TMPH
     exit 1
 }
 
@@ -228,6 +228,10 @@ add_cflags(){
     append CFLAGS "$@"
 }
 
+add_cppflags(){
+    append ECXXFLAGS "$@"
+}
+
 add_ldflags(){
     append LDFLAGS "$@"
 }
@@ -250,9 +254,9 @@ check_cc(){
 
 check_cpp(){
     log check_cpp "$@"
-    cat >$TMPC
-    log_file $TMPC
-    check_cmd $cc $CFLAGS "$@" -E -o $TMPO $TMPC
+    cat >$TMPCXX
+    log_file $TMPCXX
+    check_cmd $cxx $CFLAGS "$@" -E -o $TMPO $TMPCXX
 }
 
 check_ld(){
@@ -264,6 +268,14 @@ check_ld(){
 check_cflags(){
     log check_cflags "$@"
     check_cc "$@" <<EOF && add_cflags "$@"
+int x;
+EOF
+}
+
+check_cppflags(){
+    log check_cppflags "$@"
+    check_cpp "$@" <<EOF && add_cppflags "$@"
+class X {};
 int x;
 EOF
 }
@@ -357,6 +369,7 @@ else
 fi
 
 TMPC="${TMPDIR1}/ffmpeg-conf-${RANDOM}-$$-${RANDOM}.c"
+TMPCXX="${TMPDIR1}/ffmpeg-conf-${RANDOM}-$$-${RANDOM}.cpp"
 TMPO="${TMPDIR1}/ffmpeg-conf-${RANDOM}-$$-${RANDOM}.o"
 TMPE="${TMPDIR1}/ffmpeg-conf-${RANDOM}-$$-${RANDOM}"
 TMPS="${TMPDIR1}/ffmpeg-conf-${RANDOM}-$$-${RANDOM}.S"
@@ -2277,6 +2290,7 @@ enabled debug && add_cflags -g
 #check_cflags -Wdeclaration-after-statement
 check_cflags -Wall
 check_cflags -Wno-switch
+check_cppflags -Wno-non-virtual-dtor
 
 # GCC version
 cat > $TMPC << EOF

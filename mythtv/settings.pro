@@ -27,14 +27,13 @@ QMAKE_CXXFLAGS += $$ARCHFLAGS
 QMAKE_CXXFLAGS += $$CONFIG_AUDIO_ARTS_CFLAGS
 QMAKE_CXXFLAGS += $$CONFIG_DIRECTFB_CXXFLAGS
 QMAKE_CXXFLAGS_SHLIB = -DPIC -fPIC
-QMAKE_CXXFLAGS += $$ECXXFLAGS
 
 # Allow compilation with Qt Embedded, if Qt is compiled without "-fno-rtti"
 QMAKE_CXXFLAGS -= -fno-exceptions -fno-rtti
 
-QMAKE_CXXFLAGS_RELEASE = $$OPTFLAGS -fomit-frame-pointer
+QMAKE_CXXFLAGS_RELEASE = $$OPTFLAGS $$ECXXFLAGS -fomit-frame-pointer
 release:contains( TARGET_ARCH_POWERPC, yes ) {
-    QMAKE_CXXFLAGS_RELEASE = $$OPTFLAGS
+    QMAKE_CXXFLAGS_RELEASE = $$OPTFLAGS $$ECXXFLAGS
     # Auto-inlining causes some Qt moc methods to go missing
     macx:QMAKE_CXXFLAGS_RELEASE += -fno-inline-functions
 }
@@ -49,6 +48,8 @@ profile {
     QMAKE_CFLAGS_DEBUG = $${QMAKE_CXXFLAGS_RELEASE} $$PROFILEFLAGS
     CONFIG += debug    
 }
+
+QMAKE_CXXFLAGS_DEBUG += $$ECXXFLAGS
 
 # figure out defines 
 
