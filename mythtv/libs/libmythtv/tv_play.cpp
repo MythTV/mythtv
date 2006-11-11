@@ -3475,8 +3475,12 @@ QString TV::PlayMesg()
 
 void TV::DoPause(bool showOSD)
 {
-    if (activerbuffer->InDVDMenuOrStillFrame())
+    QMutexLocker locker(&stateLock);
+    if (activerbuffer && 
+        activerbuffer->InDVDMenuOrStillFrame())
+    {
         return;
+    }
 
     speed_index = 0;
     float time = 0.0;
@@ -4984,7 +4988,7 @@ void TV::doEditSchedule(int editType)
                 {
                     stayPaused = paused;
                     if (!paused)
-                        DoPause();
+                        DoPause(false);
                 }
                 if (theme)
                     delete theme;
@@ -4997,7 +5001,7 @@ void TV::doEditSchedule(int editType)
                     delete nextProgram;
                 }
                 if (paused & !stayPaused)
-                    DoPause();
+                    DoPause(false);
                 break;
             }
         }
@@ -5007,7 +5011,7 @@ void TV::doEditSchedule(int editType)
     {
         bool stayPaused = paused;
         if (!paused)
-            DoPause();
+            DoPause(false);
 
         switch (editType)
         {
@@ -5042,7 +5046,7 @@ void TV::doEditSchedule(int editType)
         }
 
         if (!stayPaused)
-            DoPause();
+            DoPause(false);
     }
 
     // Resize the window back to the MythTV Player size
@@ -7446,7 +7450,7 @@ bool TV::PromptRecGroupPassword(void)
   
     bool stayPaused = paused;
     if (!paused)
-        DoPause();
+        DoPause(false);
     QString recGroupPassword;
     lastProgram->UpdateRecGroup();
     recGroupPassword = ProgramInfo::GetRecGroupPassword(lastProgram->recgroup);
@@ -7470,12 +7474,12 @@ bool TV::PromptRecGroupPassword(void)
                 GetOSD()->SetSettingsText(msg, 3);
             }
             if (paused && !stayPaused)
-                DoPause();
+                DoPause(false);
             return false;
         }
     }
     if (paused && !stayPaused)
-        DoPause();
+        DoPause(false);
     return true;
 }
 
