@@ -1,19 +1,16 @@
 #!/usr/bin/perl -w
 #
-# $Date$
-# $Revision$
-# $Author$
+# Renames mythtv recordings to more human-readable filenames.
+# See --help for instructions.
 #
-# license: GPL
-# author:  Chris Petersen (based on the ideas in mythlink.sh from Dale Gass)
+# Automatically detects database settings from mysql.txt, and loads
+# the mythtv recording directory from the database (code from nuvexport).
 #
-# mythrename.pl (formerly mythlink.pl)
-#
-#   Renames mythtv recordings to more human-readable filenames.
-#   See --help for instructions.
-#
-#   Automatically detects database settings from mysql.txt, and loads
-#   the mythtv recording directory from the database (code from nuvexport).
+# @url       $URL$
+# @date      $Date$
+# @version   $Revision$
+# @author    $Author$
+# @license   GPL
 #
 
 # Includes
