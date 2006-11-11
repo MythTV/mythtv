@@ -12,6 +12,9 @@
 package MythTV::Recording;
     use base 'MythTV::Program';
 
+# Required for checking byteorder when processing NuppelVideo files
+    use Config;
+
 # Constructor
     sub new {
         my $class = shift;
