@@ -43,7 +43,7 @@ class PIDInfo
     int    priority;          ///< filters with priority < 0 can be closed
                               //   if a new filter can't be opened
 
-    inline void Close(void);
+    inline uint Close(uint open_filters);
     inline bool CheckCC(uint cc);
 };
 typedef QMap<uint,PIDInfo*> PIDInfoMap;
@@ -134,6 +134,8 @@ class DVBRecorder : public DTVRecorder,
     /// Set when we want to generate a new filter set
     MPEGStreamData *_stream_data;
     bool            _reset_pid_filters;
+    uint            _open_pid_filters;
+    uint            _max_pid_filters;
     QMutex          _pid_lock;
     PIDInfoMap      _pid_infos;
     uint_vec_t      _eit_pids;
@@ -186,10 +188,15 @@ class DVBRecorder : public DTVRecorder,
     static const int kFilterPriorityLow;
 };
 
-inline void PIDInfo::Close(void)
+inline uint PIDInfo::Close(uint open_filters)
 {
     if (filter_fd >= 0)
+    {
         close(filter_fd);
+        return open_filters - 1;
+    }
+
+    return open_filters;
 }
 
 inline bool PIDInfo::CheckCC(uint new_cnt)

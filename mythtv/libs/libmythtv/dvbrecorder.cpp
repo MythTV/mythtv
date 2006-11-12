@@ -95,6 +95,8 @@ DVBRecorder::DVBRecorder(TVRec *rec, DVBChannel* advbchannel)
       dvbchannel(advbchannel),
       _stream_data(NULL),
       _reset_pid_filters(true),
+      _open_pid_filters(0),
+      _max_pid_filters(0x1 << 13),
       _pid_lock(true),
       _input_pat(NULL),
       _input_pmt(NULL),
@@ -316,15 +318,20 @@ void DVBRecorder::CloseFilters(void)
     PIDInfoMap::iterator it;
     for (it = _pid_infos.begin(); it != _pid_infos.end(); ++it)
     {
-        (*it)->Close();
+        _open_pid_filters = (*it)->Close(_open_pid_filters);
         delete *it;
     }
     _pid_infos.clear();
     _eit_pids.clear();
+    _open_pid_filters = 0;
+    _max_pid_filters  = 0x1 << 13;
 }
 
 int DVBRecorder::OpenFilterFd(uint pid, int pes_type, uint stream_type)
 {
+    if (_open_pid_filters >= _max_pid_filters)
+        return -1;
+
     // bits per millisecond
     uint bpms = (StreamID::IsVideo(stream_type)) ? 19200 : 500;
     // msec of buffering we want
@@ -380,9 +387,11 @@ int DVBRecorder::OpenFilterFd(uint pid, int pes_type, uint stream_type)
         close(fd_tmp);
 
         VERBOSE(VB_IMPORTANT, LOC_ERR + "Failed to set demux filter." + ENO);
+        _max_pid_filters = _open_pid_filters;
         return -1;
     }
 
+    _open_pid_filters++;
     return fd_tmp;
 }
 
@@ -406,58 +415,63 @@ bool DVBRecorder::OpenFilter(uint pid, int pes_type,
         if (info->pesType == pes_type)
             fd_tmp = info->filter_fd;
         else
-            info->Close();
+            _open_pid_filters = info->Close(_open_pid_filters);
+
+        _pid_infos.erase(it);
+        delete info;
     }
 
     if (fd_tmp < 0)
+    {
         fd_tmp = OpenFilterFd(pid, pes_type, stream_type);
 
-    // try to close a low priority filter
-    if (fd_tmp < 0)
-    {
-        // no free filters available
-        avail = false;
-        PIDInfoMap::iterator lp_it = _pid_infos.begin();
-        for (;lp_it != _pid_infos.end(); ++lp_it)
+        if (fd_tmp < 0)
         {
-            if (lp_it != it && (*lp_it)->priority < kFilterPriorityHigh)
+            // no free filters, try to close a low priority filter
+            avail = false;
+            int min_priority = kFilterPriorityHigh;
+            PIDInfoMap::iterator min_it;
+
+            PIDInfoMap::iterator lp_it = _pid_infos.begin();
+            for (; lp_it != _pid_infos.end(); ++lp_it)
             {
-                (*lp_it)->Close();
-                break;
+                if ((*lp_it)->priority < kFilterPriorityHigh)
+                {
+                    (*lp_it)->priority--;
+                    if ((*lp_it)->priority < min_priority)
+                    {
+                        min_priority = (*lp_it)->priority;
+                        min_it = lp_it;
+                    }
+                }
             }
-        }
-        if (lp_it != _pid_infos.end())
-        {
-            // PMT PIDs are the only low priority pids
-            uint lp_pid = lp_it.key();
 
-            VERBOSE(VB_RECORD, LOC + "Closing low priority PID filter " +
-                    QString("on PID 0x%1.").arg(lp_pid, 0, 16));
+            if (min_priority < kFilterPriorityHigh)
+            {
+                _open_pid_filters = (*min_it)->Close(_open_pid_filters);
 
-            _pmt_monitoring_pids.push_back(lp_pid);
-            delete *lp_it;
-            _pid_infos.erase(lp_it);
+                VERBOSE(VB_RECORD, LOC + "Closing low priority PID filter "
+                        + QString("on PID 0x%1.").arg(min_it.key(), 0, 16));
+
+                // PMT PIDs are the only low priority pids
+                _pmt_monitoring_pids.push_back(min_it.key());
+                delete *min_it;
+                _pid_infos.erase(min_it);
+            }
+            else
+            {
+                VERBOSE(VB_IMPORTANT, LOC_ERR + "Out of PID filters!");
+                return false;
+            }
 
             fd_tmp = OpenFilterFd(pid, pes_type, stream_type);
         }
-        else
-        {
-            VERBOSE(VB_RECORD, LOC_ERR + "Out of PID filters!");
-        }
     }
 
     if (fd_tmp < 0)
-    {
-        if (info)
-        {
-            delete *it;
-            _pid_infos.erase(it);
-        }
-        return avail;
-    }
-
-    if (!info)
-        info = new PIDInfo();
+        return false;
+    
+    info = new PIDInfo();
 
     // Add the file descriptor to the filter list
     info->filter_fd  = fd_tmp;
@@ -567,7 +581,7 @@ bool DVBRecorder::AdjustFilters(void)
         // Delete pids we are no longer interested in
         _stream_data->RemoveListeningPID(it.key());
         _stream_data->RemoveWritingPID(it.key());
-        (*it)->Close();
+        _open_pid_filters = (*it)->Close(_open_pid_filters);
         delete *it;
         _pid_infos.erase(it);
     }
@@ -642,7 +656,7 @@ void DVBRecorder::AdjustMonitoringPMTPIDs()
     if (VB_RECORD & print_verbose_messages)
     {
         QString tmp0 = ""; 
-        QString tmp1 = QString("%1 PID filters open.").arg(_pid_infos.size());
+        QString tmp1 = QString("%1 PID filters open.").arg(_open_pid_filters);
 
         int sz = _pmt_monitoring_pids.size();
         if (sz)
