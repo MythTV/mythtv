@@ -1783,6 +1783,9 @@ bool PlaybackBox::FillList(bool useCachedData)
             if (hrs < 24)
                 p->recpriority2 += 24 - hrs;
 
+            // add points for how close the recorded time of day is to 'now'
+            p->recpriority2 += abs((hrs % 24) - 12);
+
             // Single
             if (recType[recid] == kSingleRecord || 
                 recType[recid] == kFindOneRecord)
