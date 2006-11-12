@@ -56,11 +56,11 @@ private:
     const struct AVPicture  *tmpl;                  /* template image */
     int                     tmplrow, tmplcol;       /* template location */
     int                     tmplwidth, tmplheight;  /* template dimensions */
-    int                     mintmpledges;           /* # edge pixels in tmpl */
 
     /* Per-frame info. */
     unsigned short          *matches;               /* matching pixels */
     unsigned char           *match;                 /* boolean result: 1/0 */
+    unsigned short          *tmatches;              /* temporary buffer */
 
     float                   fps;
     AVPicture               cropped;                /* pre-allocated buffer */
@@ -70,8 +70,6 @@ private:
     int                     debugLevel;
     QString                 debugdir;
     QString                 debugdata;              /* filename */
-    bool                    debug_frames;
-    AVPicture               overlay;                /* frame + logo overlay */
     NuppelVideoPlayer       *nvp;
     bool                    debug_matches;
     bool                    matches_done;

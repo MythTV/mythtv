@@ -88,8 +88,7 @@ next_pixel:
 }
 
 bool
-readMatches(QString filename, unsigned short *matches, unsigned char *match,
-        long long nframes, int mintmpledges)
+readMatches(QString filename, unsigned short *matches, long long nframes)
 {
     FILE        *fp;
     long long   frameno;
@@ -106,7 +105,6 @@ readMatches(QString filename, unsigned short *matches, unsigned char *match,
                     .arg(filename).arg(frameno));
             goto error;
         }
-        match[frameno] = matches[frameno] >= mintmpledges ? 1 : 0;
     }
 
     if (fclose(fp))
@@ -140,100 +138,37 @@ writeMatches(QString filename, unsigned short *matches, long long nframes)
 }
 
 int
-writeJPG(QString prefix, const AVPicture *img, int imgheight)
+finishedDebug(long long nframes, const unsigned short *matches,
+        const unsigned char *match)
 {
-    const int imgwidth = img->linesize[0];
-    QFileInfo jpgfi(prefix + ".jpg");
-    if (!jpgfi.exists())
+    unsigned short  low, high, score;
+    long long       startframe;
+
+    score = matches[0];
+    low = score;
+    high = score;
+    startframe = 0;
+
+    for (long long frameno = 1; frameno < nframes; frameno++)
     {
-        QFile pgmfile(prefix + ".pgm");
-        if (!pgmfile.exists() && pgm_write(img->data[0], imgwidth, imgheight,
-                    pgmfile.name().ascii()))
-            return -1;
+        score = matches[frameno];
+        if (match[frameno - 1] == match[frameno])
+        {
+            if (score < low)
+                low = score;
+            if (score > high)
+                high = score;
+            continue;
+        }
 
-        if (myth_system(QString("convert -quality 50 -resize 192x144 %1 %2")
-                    .arg(pgmfile.name()).arg(jpgfi.filePath())))
-            return -1;
-    }
-    return 0;
-}
+        VERBOSE(VB_COMMFLAG, QString("Frame %1-%2: %3 L-H: %4-%5 (%6)")
+                .arg(startframe, 6).arg(frameno - 1, 6)
+                .arg(match[frameno - 1] ? "logo        " : "     no-logo")
+                .arg(low, 4).arg(high, 4).arg(frameno - startframe, 5));
 
-int
-analyzeFrameDebugCleanup(QString filename)
-{
-    QFile tfile(filename);
-    if (tfile.exists() && !tfile.remove())
-    {
-        VERBOSE(VB_COMMFLAG, QString("Error removing %1 (%2)")
-                .arg(tfile.name()).arg(strerror(errno)));
-        return -1;
-    }
-    return 0;
-}
-
-int
-analyzeFrameDebug(long long frameno, const unsigned short *matches,
-        const unsigned char *match, AVPicture *overlay,
-        const AVPicture *pgm, int pgmheight, const AVPicture *edges,
-        int tmplrow, int tmplcol, int tmplwidth, int tmplheight,
-        bool debug_frames, QString debugdir)
-{
-    static unsigned short   low, high;
-    static long long        startframe;
-    const unsigned short    score = matches[frameno];
-
-    (void)tmplwidth;    /* gcc */
-
-    if (frameno == 0)
-    {
         low = score;
         high = score;
         startframe = frameno;
-        return 0;
-    }
-
-    if (match[frameno - 1] == match[frameno])
-    {
-        if (score < low)
-            low = score;
-        if (score > high)
-            high = score;
-        return 0;
-    }
-
-    VERBOSE(VB_COMMFLAG, QString("Frame %1-%2: %3 L-H: %4-%5 (%6)")
-            .arg(startframe, 6).arg(frameno - 1, 6)
-            .arg(match[frameno - 1] ? "logo        " : "     no-logo")
-            .arg(low, 4).arg(high, 4).arg(frameno - startframe, 5));
-
-    low = score;
-    high = score;
-    startframe = frameno;
-
-    if (debug_frames)
-    {
-        if (pgm_overlay(overlay, pgm, pgmheight, tmplrow, tmplcol,
-                    edges, tmplheight))
-            return -1;
-
-        QString base, fullbase;
-        base.sprintf("%s/tm-%05lld-%d", debugdir.ascii(), frameno, score);
-
-        fullbase = base;
-        if (!match[frameno])
-            fullbase += "-c";
-
-        if (writeJPG(fullbase, overlay, pgmheight))
-            return -1;
-        if (writeJPG(base + "-edges", edges, tmplheight))
-            return -1;
-
-        if (analyzeFrameDebugCleanup(base + ".pgm"))
-            return -1;
-        if (analyzeFrameDebugCleanup(base + "-c.pgm"))
-            return -1;
-        if (analyzeFrameDebugCleanup(base + "-edges.pgm"))
-            return -1;
     }
 
     return 0;
@@ -264,6 +199,7 @@ TemplateMatcher::TemplateMatcher(PGMConverter *pgmc, EdgeDetector *ed,
     , templateFinder(tf)
     , matches(NULL)
     , match(NULL)
+    , tmatches(NULL)
     , debugLevel(0)
     , debugdir(debugdir)
 #ifdef PGM_CONVERT_GREYSCALE
@@ -271,13 +207,11 @@ TemplateMatcher::TemplateMatcher(PGMConverter *pgmc, EdgeDetector *ed,
 #else  /* !PGM_CONVERT_GREYSCALE */
     , debugdata(debugdir + "/TemplateMatcher-yuv.txt")
 #endif /* !PGM_CONVERT_GREYSCALE */
-    , debug_frames(false)
     , nvp(NULL)
     , debug_matches(false)
     , matches_done(false)
 {
     memset(&cropped, 0, sizeof(cropped));
-    memset(&overlay, 0, sizeof(overlay));
     memset(&analyze_time, 0, sizeof(analyze_time));
 
     /*
@@ -285,7 +219,6 @@ TemplateMatcher::TemplateMatcher(PGMConverter *pgmc, EdgeDetector *ed,
      *      0: no debugging
      *      1: cache frame edge counts into debugdir [1 file]
      *      2: extra verbosity [O(nframes)]
-     *      3: dump overlay frames into debugdir [O(nframes)]
      */
     debugLevel = gContext->GetNumSetting("TemplateMatcherDebugLevel", 0);
 
@@ -295,15 +228,12 @@ TemplateMatcher::TemplateMatcher(PGMConverter *pgmc, EdgeDetector *ed,
 
     if (debugLevel >= 1)
         debug_matches = true;
-
-    if (debugLevel >= 3)
-        debug_frames = true;
 }
 
 TemplateMatcher::~TemplateMatcher(void)
 {
-    avpicture_free(&overlay);
-
+    if (tmatches)
+        delete []tmatches;
     if (matches)
         delete []matches;
     if (match)
@@ -315,28 +245,6 @@ enum FrameAnalyzer::analyzeFrameResult
 TemplateMatcher::nuppelVideoPlayerInited(NuppelVideoPlayer *_nvp,
         long long nframes)
 {
-    /*
-     * TUNABLE:
-     *
-     * Percent of template's edges that must be covered by candidate frame's
-     * test area to be considered a match.
-     *
-     * Higher values have tighter matching requirements, but can cause
-     * legitimate template-matching frames to be passed over (for example, if
-     * the template is fading into or out of existence in a sequence of
-     * frames).
-     *
-     * Lower values relax matching requirements, but can yield false
-     * identification of template-matching frames when the scene just happens
-     * to have lots of edges in the same region of the frame.
-     */
-    const float     MINMATCHPCT = 0.459670;
-
-    const int       width = _nvp->GetVideoWidth();
-    const int       height = _nvp->GetVideoHeight();
-
-    int             tmpledges;
-
     nvp = _nvp;
     fps = nvp->GetFrameRate();
 
@@ -348,45 +256,26 @@ TemplateMatcher::nuppelVideoPlayerInited(NuppelVideoPlayer *_nvp,
         return ANALYZE_FATAL;
     }
 
-    tmpledges = pgm_set(tmpl, tmplheight);
-    mintmpledges = (int)roundf(tmpledges * MINMATCHPCT);
-
-    VERBOSE(VB_COMMFLAG, QString("TemplateMatcher::nuppelVideoPlayerInited "
-                "%1x%2@(%3,%4), %5 edge pixels (want %6)")
-            .arg(tmplwidth).arg(tmplheight).arg(tmplcol).arg(tmplrow)
-            .arg(tmpledges).arg(mintmpledges));
-
-    if (debug_frames)
-    {
-        if (avpicture_alloc(&overlay, PIX_FMT_GRAY8, width, height))
-        {
-            VERBOSE(VB_COMMFLAG, QString(
-                        "TemplateMatcher::nuppelVideoPlayerInited "
-                    "avpicture_alloc overlay (%1x%2) failed")
-                    .arg(width).arg(height));
-            return ANALYZE_FATAL;
-        }
-    }
-
     if (avpicture_alloc(&cropped, PIX_FMT_GRAY8, tmplwidth, tmplheight))
     {
         VERBOSE(VB_COMMFLAG, QString("TemplateMatcher::nuppelVideoPlayerInited "
                 "avpicture_alloc cropped (%1x%2) failed").
                 arg(tmplwidth).arg(tmplheight));
-        goto free_overlay;
+        return ANALYZE_FATAL;
     }
 
     if (pgmConverter->nuppelVideoPlayerInited(nvp))
         goto free_cropped;
 
     matches = new unsigned short[nframes];
+    tmatches = new unsigned short[nframes];
     memset(matches, 0, nframes * sizeof(*matches));
 
     match = new unsigned char[nframes];
 
     if (debug_matches)
     {
-        if (readMatches(debugdata, matches, match, nframes, mintmpledges))
+        if (readMatches(debugdata, matches, nframes))
         {
             VERBOSE(VB_COMMFLAG, QString(
                         "TemplateMatcher::nuppelVideoPlayerInited read %1")
@@ -402,8 +291,6 @@ TemplateMatcher::nuppelVideoPlayerInited(NuppelVideoPlayer *_nvp,
 
 free_cropped:
     avpicture_free(&cropped);
-free_overlay:
-    avpicture_free(&overlay);
     return ANALYZE_FATAL;
 }
 
@@ -469,16 +356,6 @@ TemplateMatcher::analyzeFrame(const VideoFrame *frame, long long frameno,
     if (pgm_match(tmpl, edges, tmplheight, JITTER_RADIUS, &matches[frameno]))
         goto error;
 
-    match[frameno] = matches[frameno] >= mintmpledges ? 1 : 0;
-
-    if (debugLevel >= 2)
-    {
-        if (analyzeFrameDebug(frameno, matches, match, &overlay, pgm, pgmheight,
-                    edges, tmplrow, tmplcol, tmplwidth, tmplheight,
-                    debug_frames, debugdir))
-            goto error;
-    }
-
     (void)gettimeofday(&end, NULL);
     timersub(&end, &start, &elapsed);
     timeradd(&analyze_time, &elapsed, &analyze_time);
@@ -507,6 +384,7 @@ TemplateMatcher::finished(long long nframes, bool final)
     const int       MINBREAKLEN = (int)roundf(25 * fps);  /* frames */
     const int       MINSEGLEN = (int)roundf(25 * fps);    /* frames */
 
+    int                                 tmpledges, mintmpledges, ii;
     long long                           segb, brkb;
     FrameAnalyzer::FrameMap::Iterator   bb;
 
@@ -520,7 +398,30 @@ TemplateMatcher::finished(long long nframes, bool final)
         }
     }
 
-    VERBOSE(VB_COMMFLAG, QString("TemplateMatcher::finished(%1)").arg(nframes));
+    tmpledges = pgm_set(tmpl, tmplheight);
+    memcpy(tmatches, matches, nframes * sizeof(*matches));
+    qsort(tmatches, nframes, sizeof(*tmatches), sort_ascending);
+    ii = (int)((nframes - 1) * 0.47);  /* A median-ish value. */
+    mintmpledges = tmatches[ii];
+    for (; ii > 0; ii--) {
+        if (tmatches[ii - 1] != mintmpledges)
+            break;
+    }
+
+    VERBOSE(VB_COMMFLAG, QString("TemplateMatcher::finished "
+                "%1x%2@(%3,%4), %5 edge pixels (want %6, pctile=%7)")
+            .arg(tmplwidth).arg(tmplheight).arg(tmplcol).arg(tmplrow)
+            .arg(tmpledges).arg(mintmpledges)
+            .arg((float)ii / nframes, 0, 'f', 6));
+
+    for (ii = 0; ii < nframes; ii++)
+        match[ii] = matches[ii] >= mintmpledges ? 1 : 0;
+
+    if (debugLevel >= 2)
+    {
+        if (final && finishedDebug(nframes, matches, match))
+            goto error;
+    }
 
     /*
      * Construct breaks.
@@ -607,6 +508,9 @@ TemplateMatcher::finished(long long nframes, bool final)
     frameAnalyzerReportMap(&breakMap, fps, "TM Break");
 
     return 0;
+
+error:
+    return -1;
 }
 
 int
