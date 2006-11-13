@@ -1043,7 +1043,7 @@ void RecordingProfile::loadByID(int profileId)
     }
 
     id->setValue(profileId);
-    cfgGrp->load();
+    load();
 }
 
 void RecordingProfile::FiltersChanged(const QString &val)
