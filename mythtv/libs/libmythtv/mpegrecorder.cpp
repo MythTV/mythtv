@@ -274,15 +274,12 @@ void MpegRecorder::SetOptionsFromProfile(RecordingProfile *profile,
 
     SetIntOption(profile, "mpeg2bitrate");
     SetIntOption(profile, "mpeg2maxbitrate");
-    SetOption("mpeg2streamtype",
-              profile->byName("mpeg2streamtype")->getValue());
-    SetOption("mpeg2aspectratio",
-              profile->byName("mpeg2aspectratio")->getValue());
-    SetOption("mpeg2language",
-              profile->byName("mpeg2language")->getValue());
+    SetStrOption(profile, "mpeg2streamtype");
+    SetStrOption(profile, "mpeg2aspectratio");
+    SetStrOption(profile, "mpeg2language");
 
     SetIntOption(profile, "samplerate");
-    SetOption("mpeg2audtype", profile->byName("mpeg2audtype")->getValue());
+    SetStrOption(profile, "mpeg2audtype");
     SetIntOption(profile, "mpeg2audbitratel1");
     SetIntOption(profile, "mpeg2audbitratel2");
     SetIntOption(profile, "mpeg2audvolume");
