@@ -7,76 +7,79 @@
 class ProfileGroup;
 
 // A parameter associated with the profile itself
-class ProfileGroupParam: public SimpleDBStorage {
-protected:
-    ProfileGroupParam(const ProfileGroup& parentProfile, QString name):
-        SimpleDBStorage("profilegroups", name),
-        parent(parentProfile) {
-        setName(name);
-    };
+class ProfileGroupStorage : public SimpleDBStorage
+{
+  protected:
+    ProfileGroupStorage(Setting            *_setting,
+                        const ProfileGroup &_parentProfile,
+                        QString             _name) :
+        SimpleDBStorage(_setting, "profilegroups", _name),
+        parent(_parentProfile)
+    {
+        _setting->setName(_name);
+    }
 
     virtual QString setClause(MSqlBindings& bindings);
     virtual QString whereClause(MSqlBindings& bindings);
     const ProfileGroup& parent;
 };
 
-class ProfileGroup: public ConfigurationWizard {
-protected:
-    class ID: virtual public IntegerSetting,
-              public AutoIncrementStorage {
-    public:
-        ID():
-            AutoIncrementStorage("profilegroups", "id") {
+class ProfileGroup : public ConfigurationWizard
+{
+    friend class ProfileGroupEditor;
+  protected:
+    class ID : public AutoIncrementDBSetting
+    {
+      public:
+        ID() : AutoIncrementDBSetting("profilegroups", "id")
+        {
             setVisible(false);
-        };
-
-        // Should never be called because this setting is not visible
-        virtual QWidget* configWidget(ConfigurationGroup *cg,
-                                      QWidget* parent = NULL,
-                                      const char* widgetName = NULL) {
-            (void)cg; (void)parent; (void)widgetName;
-            return NULL;
-        };
+        }
     };
 
-    class Is_default: virtual public IntegerSetting, public ProfileGroupParam {
-    public:
-        Is_default(const ProfileGroup& parent):
-            ProfileGroupParam(parent, "is_default") {
+    class Is_default : public IntegerSetting, public ProfileGroupStorage
+    {
+      public:
+        Is_default(const ProfileGroup &parent) :
+            IntegerSetting(this),
+            ProfileGroupStorage(this, parent, "is_default")
+        {
             setVisible(false);
-        };
-
-        // Should never be called because this setting is not visible
-        virtual QWidget* configWidget(ConfigurationGroup *cg,
-                                      QWidget* parent = NULL,
-                                      const char* widgetName = NULL) {
-            (void)cg; (void)parent; (void)widgetName;
-            return NULL;
-        };
+        }
     };
 
-    class Name: public LineEditSetting, public ProfileGroupParam {
-    public:
-        Name(const ProfileGroup& parent): ProfileGroupParam(parent, "name") {
+    class Name : public LineEditSetting, public ProfileGroupStorage
+    {
+      public:
+        Name(const ProfileGroup &parent) :
+            LineEditSetting(this),
+            ProfileGroupStorage(this, parent, "name")
+        {
             setLabel(QObject::tr("Profile Group Name"));
-        };
+        }
     };
 
-    class HostName: public ComboBoxSetting, public ProfileGroupParam {
-    public:
-        HostName(const ProfileGroup& parent):
-            ProfileGroupParam(parent, "hostname") {
+    class HostName : public ComboBoxSetting, public ProfileGroupStorage
+    {
+      public:
+        HostName(const ProfileGroup &parent) :
+            ComboBoxSetting(this),
+            ProfileGroupStorage(this, parent, "hostname")
+        {
             setLabel(QObject::tr("Hostname"));
-        };
+        }
         void fillSelections();
     };
 
-    class CardInfo: public ComboBoxSetting, public ProfileGroupParam {
-    public:
-        CardInfo(const ProfileGroup& parent):
-            ProfileGroupParam(parent, "cardtype") {
+    class CardInfo : public ComboBoxSetting, public ProfileGroupStorage
+    {
+      public:
+        CardInfo(const ProfileGroup &parent) :
+            ComboBoxSetting(this),
+            ProfileGroupStorage(this, parent, "cardtype")
+        {
             setLabel(QObject::tr("Card-Type"));
-        };
+        }
     };
 
 public:
@@ -106,23 +109,27 @@ private:
     Is_default* is_default;
 };
 
-class MPUBLIC ProfileGroupEditor: public ListBoxSetting,
-    public ConfigurationDialog {
+class MPUBLIC ProfileGroupEditor :
+    public QObject, public ConfigurationDialog, public Storage
+{
     Q_OBJECT
-public:
-    ProfileGroupEditor() {};
+  public:
+    ProfileGroupEditor() :
+        listbox(new ListBoxSetting(this)), dialog(NULL), redraw(true)
+        { addChild(listbox); }
 
     virtual int exec();
     virtual void load();
     virtual void save() {};
 
-protected slots:
+  protected slots:
     void open(int id);
     void callDelete(void);
 
-protected:
-    MythDialog* dialog;
-    bool redraw;
+  protected:
+    ListBoxSetting *listbox;
+    MythDialog     *dialog;
+    bool            redraw;
 };
 
 #endif

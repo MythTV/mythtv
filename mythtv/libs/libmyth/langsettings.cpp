@@ -10,9 +10,11 @@ using namespace std;
 
 // LangEditor provides the GUI for the prompt() routine.
 
-class LangEditor: public ListBoxSetting, public ConfigurationDialog {
-public:
-    LangEditor() {
+class LangEditorSetting : public ListBoxSetting, public Storage
+{
+  public:
+    LangEditorSetting() : ListBoxSetting(this)
+    {
         setLabel(QObject::tr("Select your preferred language"));
     };
     
@@ -25,8 +27,9 @@ public:
         gContext->SaveSetting("Language", getValue());
         LanguageSettings::reload();
     };
-};
 
+    virtual void save(QString /*destination*/) { }
+};
 
 // LanguageSettingsPrivate holds our persistent data.
 // It's a singleton class, instantiated in the static
@@ -101,9 +104,9 @@ void LanguageSettings::prompt(bool force)
     // Ask for language if we don't already know.
     if (force || d.m_language.isEmpty())
     {
-        LangEditor *ed = new LangEditor();
-        ed->exec();
-        delete ed;
+        ConfigurationDialog langEdit;
+        langEdit.addChild(new LangEditorSetting());
+        langEdit.exec();
     }
     // Always update the database, even if there's
     // no change -- during bootstrapping, we don't

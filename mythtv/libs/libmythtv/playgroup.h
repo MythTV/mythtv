@@ -23,7 +23,9 @@ class MPUBLIC PlayGroup: public ConfigurationWizard
     QString name;
 };
 
-class MPUBLIC PlayGroupEditor: public ListBoxSetting, public ConfigurationDialog {
+class MPUBLIC PlayGroupEditor :
+    public QObject, public ConfigurationDialog, public Storage
+{
     Q_OBJECT
  public:
     PlayGroupEditor(void);
@@ -34,12 +36,13 @@ class MPUBLIC PlayGroupEditor: public ListBoxSetting, public ConfigurationDialog
     virtual MythDialog* dialogWidget(MythMainWindow* parent,
                                      const char* widgetName=0);
 
-protected slots:
+  protected slots:
     void open(QString name);
     void doDelete(void);
 
- protected:
-    QString lastValue;
+  protected:
+    ListBoxSetting *listbox;
+    QString         lastValue;
 };
 
 #endif

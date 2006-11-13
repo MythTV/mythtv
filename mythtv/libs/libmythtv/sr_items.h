@@ -8,16 +8,16 @@
 #include "recordingprofile.h"
 #include "playgroup.h"
 
-class SimpleSRSetting: public SimpleDBStorage
+class SimpleSRStorage : public SimpleDBStorage
 {
-    protected:
-        SimpleSRSetting(ScheduledRecording *_parent, QString name)
-                      : SimpleDBStorage("record", name),
-                        parent(_parent)
-        {
-            parent->addChild(this);
-            setName(name);
-        }
+  protected:
+    SimpleSRStorage(Setting *_setting, ScheduledRecording *_parent,
+                    QString name) :
+        SimpleDBStorage(_setting, "record", name), parent(_parent)
+    {
+        parent->addChild(_setting);
+        _setting->setName(name);
+    }
 
         virtual QString setClause(MSqlBindings& bindings)
         {
@@ -28,7 +28,7 @@ class SimpleSRSetting: public SimpleDBStorage
                     getColumn() + " = " + colTag);
 
             bindings.insert(recordidTag, parent->getRecordID());
-            bindings.insert(colTag, getValue().utf8());
+            bindings.insert(colTag, setting->getValue().utf8());
 
             return query;
         }
@@ -331,17 +331,19 @@ class SRDupMethod: public SRSelectSetting
 };
 
 
-class SRRecSearchType: public IntegerSetting, public SimpleSRSetting
+class SRRecSearchType : public IntegerSetting, public SimpleSRStorage
 {
-    public:
-        SRRecSearchType(ScheduledRecording *parent):
-            SimpleSRSetting(parent, "search") {
-            setVisible(false);
-        }
+  public:
+    SRRecSearchType(ScheduledRecording *parent) :
+        IntegerSetting(this), SimpleSRStorage(this, parent, "search")
+    {
+        setVisible(false);
+    }
 };
 
 
-class SRProfileSelector: public SRSelectSetting {
+class SRProfileSelector : public SRSelectSetting
+{
     public:
         SRProfileSelector(ScheduledRecording *_parent, ManagedList* _list, ManagedListGroup* _group)
             : SRSelectSetting(_parent, "profileList", QObject::tr("[ Select recording Profile ]"), _group,
@@ -456,161 +458,133 @@ class SRStorageOptionsGroup : public ManagedListGroup
 };
 
 
-class SRChannel: public ChannelSetting, public SimpleSRSetting
+class SRChannel : public ChannelSetting, public SimpleSRStorage
 {
-    public:
-        SRChannel(ScheduledRecording *parent): SimpleSRSetting(parent, "chanid") {
-            setVisible(false);
-        }
+  public:
+    SRChannel(ScheduledRecording *parent) :
+        ChannelSetting(this),
+        SimpleSRStorage(this, parent, "chanid") { setVisible(false); }
 };
 
-class SRStation: public LineEditSetting, public SimpleSRSetting
+class SRStation : public LineEditSetting, public SimpleSRStorage
 {
-    public:
-        SRStation(ScheduledRecording *parent): SimpleSRSetting(parent, "station") {
-            setVisible(false);
-        }
+  public:
+    SRStation(ScheduledRecording *parent) :
+        LineEditSetting(this),
+        SimpleSRStorage(this, parent, "station") { setVisible(false); }
 };
 
-class SRTitle: public LineEditSetting, public SimpleSRSetting
+class SRTitle : public LineEditSetting, public SimpleSRStorage
 {
-    public:
-        SRTitle(ScheduledRecording *parent)
-              : SimpleSRSetting(parent, "title")
-        {
-            setVisible(false);
-        }
+  public:
+    SRTitle(ScheduledRecording *parent) :
+        LineEditSetting(this),
+        SimpleSRStorage(this, parent, "title") { setVisible(false); }
 };
 
-class SRSubtitle: public LineEditSetting, public SimpleSRSetting
+class SRSubtitle : public LineEditSetting, public SimpleSRStorage
 {
-    public:
-        SRSubtitle(ScheduledRecording *parent)
-                 : SimpleSRSetting(parent, "subtitle")
-        {
-            setVisible(false);
-        }
+  public:
+    SRSubtitle(ScheduledRecording *parent) :
+        LineEditSetting(this),
+        SimpleSRStorage(this, parent, "subtitle") { setVisible(false); }
 };
 
-class SRDescription: public LineEditSetting, public SimpleSRSetting
+class SRDescription : public LineEditSetting, public SimpleSRStorage
 {
-    public:
-        SRDescription(ScheduledRecording *parent)
-                    : SimpleSRSetting(parent, "description")
-        {
-            setVisible(false);
-        }
+  public:
+    SRDescription(ScheduledRecording *parent) :
+        LineEditSetting(this),
+        SimpleSRStorage(this, parent, "description") { setVisible(false); }
 };
 
-class SRStartTime: public TimeSetting, public SimpleSRSetting
+class SRStartTime : public TimeSetting, public SimpleSRStorage
 {
-    public:
-        SRStartTime(ScheduledRecording *parent)
-                  : SimpleSRSetting(parent, "starttime")
-        {
-            setVisible(false);
-        }
+  public:
+    SRStartTime(ScheduledRecording *parent) :
+        TimeSetting(this),
+        SimpleSRStorage(this, parent, "starttime") { setVisible(false); }
 };
 
-class SRStartDate: public DateSetting, public SimpleSRSetting
+class SRStartDate : public DateSetting, public SimpleSRStorage
 {
-    public:
-        SRStartDate(ScheduledRecording *parent)
-                  : SimpleSRSetting(parent, "startdate")
-        {
-            setVisible(false);
-        }
+  public:
+    SRStartDate(ScheduledRecording *parent) :
+        DateSetting(this),
+        SimpleSRStorage(this, parent, "startdate") { setVisible(false); }
 };
 
-class SREndTime: public TimeSetting, public SimpleSRSetting
+class SREndTime : public TimeSetting, public SimpleSRStorage
 {
-    public:
-        SREndTime(ScheduledRecording *parent)
-                : SimpleSRSetting(parent, "endtime")
-        {
-            setVisible(false);
-        }
+  public:
+    SREndTime(ScheduledRecording *parent) :
+        TimeSetting(this),
+        SimpleSRStorage(this, parent, "endtime") { setVisible(false); }
 };
 
-class SREndDate: public DateSetting, public SimpleSRSetting
+class SREndDate : public DateSetting, public SimpleSRStorage
 {
-    public:
-        SREndDate(ScheduledRecording *parent)
-                : SimpleSRSetting(parent, "enddate")
-        {
-            setVisible(false);
-        }
+  public:
+    SREndDate(ScheduledRecording *parent) :
+        DateSetting(this),
+        SimpleSRStorage(this, parent, "enddate") { setVisible(false); }
 };
 
 
-class SRCategory: public LineEditSetting, public SimpleSRSetting
+class SRCategory : public LineEditSetting, public SimpleSRStorage
 {
-    public:
-        SRCategory(ScheduledRecording *parent)
-                 : SimpleSRSetting(parent, "category")
-        {
-            setVisible(false);
-        }
+  public:
+    SRCategory(ScheduledRecording *parent) :
+        LineEditSetting(this),
+        SimpleSRStorage(this, parent, "category") { setVisible(false); }
 };
 
-class SRSeriesid: public LineEditSetting, public SimpleSRSetting
+class SRSeriesid : public LineEditSetting, public SimpleSRStorage
 {
-    public:
-        SRSeriesid(ScheduledRecording *parent)
-                 : SimpleSRSetting(parent, "seriesid")
-        {
-            setVisible(false);
-        }
+  public:
+    SRSeriesid(ScheduledRecording *parent) :
+        LineEditSetting(this),
+        SimpleSRStorage(this, parent, "seriesid") { setVisible(false); }
 };
 
-class SRProgramid: public LineEditSetting, public SimpleSRSetting
+class SRProgramid : public LineEditSetting, public SimpleSRStorage
 {
-    public:
-        SRProgramid(ScheduledRecording *parent)
-                  : SimpleSRSetting(parent, "programid")
-        {
-            setVisible(false);
-        };
+  public:
+    SRProgramid(ScheduledRecording *parent) :
+        LineEditSetting(this),
+        SimpleSRStorage(this, parent, "programid") { setVisible(false); }
 };
 
-class SRFindDay: public IntegerSetting, public SimpleSRSetting
+class SRFindDay : public IntegerSetting, public SimpleSRStorage
 {
-    public:
-        SRFindDay(ScheduledRecording *parent)
-            : SimpleSRSetting(parent, "findday")
-        {
-            setVisible(false);
-        }
+  public:
+    SRFindDay(ScheduledRecording *parent) :
+        IntegerSetting(this),
+        SimpleSRStorage(this, parent, "findday") { setVisible(false); }
 };
 
-class SRFindTime: public TimeSetting, public SimpleSRSetting
+class SRFindTime : public TimeSetting, public SimpleSRStorage
 {
-    public:
-        SRFindTime(ScheduledRecording *parent)
-            : SimpleSRSetting(parent, "findtime")
-        {
-            setVisible(false);
-        }
+  public:
+    SRFindTime(ScheduledRecording *parent) :
+        TimeSetting(this),
+        SimpleSRStorage(this, parent, "findtime") { setVisible(false); }
 };
 
-class SRFindId: public IntegerSetting, public SimpleSRSetting
+class SRFindId : public IntegerSetting, public SimpleSRStorage
 {
-    public:
-        SRFindId(ScheduledRecording *parent)
-            : SimpleSRSetting(parent, "findid")
-        {
-            setVisible(false);
-        }
+  public:
+    SRFindId(ScheduledRecording *parent) :
+        IntegerSetting(this),
+        SimpleSRStorage(this, parent, "findid") { setVisible(false); }
 };
 
-class SRParentId: public IntegerSetting, public SimpleSRSetting
+class SRParentId : public IntegerSetting, public SimpleSRStorage
 {
-    public:
-        SRParentId(ScheduledRecording *parent)
-            : SimpleSRSetting(parent, "parentid")
-        {
-            setVisible(false);
-        }
+  public:
+    SRParentId(ScheduledRecording *parent) :
+        IntegerSetting(this),
+        SimpleSRStorage(this, parent, "parentid") { setVisible(false); }
 };
 
 class SRAutoTranscode: public SRSelectSetting 

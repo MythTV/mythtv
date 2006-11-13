@@ -175,13 +175,12 @@ static HostCheckBox *SlideshowRecursive()
     return gc;
 };
 
-class GalleryConfigurationGroup: public VerticalConfigurationGroup,
-                                 public TriggeredConfigurationGroup {
-public:
-
-    GalleryConfigurationGroup():
-        VerticalConfigurationGroup(false),
-        TriggeredConfigurationGroup(false) {
+class GalleryConfigurationGroup : public TriggeredConfigurationGroup
+{
+  public:
+    GalleryConfigurationGroup() :
+        TriggeredConfigurationGroup(false, true, false, false)
+    {
         setLabel(QObject::tr("MythGallery Settings (Slideshow)"));
         setUseLabel(false);
 

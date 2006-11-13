@@ -17,6 +17,9 @@
 
 #include <pthread.h>
 
+#include <algorithm>
+using namespace std;
+
 #ifdef USE_LIRC
 #include "lirc.h"
 #include "lircevent.h"
@@ -600,13 +603,16 @@ void MythMainWindow::attach(QWidget *child)
 
 void MythMainWindow::detach(QWidget *child)
 {
-    if (d->widgetList.back() != child)
+    vector<QWidget*>::iterator it = 
+        std::find(d->widgetList.begin(), d->widgetList.end(), child);
+
+    if (it == d->widgetList.end())
     {
-        //cerr << "Not removing top-most widget\n";
+        VERBOSE(VB_IMPORTANT, "Could not find widget to detach");
         return;
     }
 
-    d->widgetList.pop_back();
+    d->widgetList.erase(it);
     QWidget *current = currentWidget();
 
     if (current)

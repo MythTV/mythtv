@@ -9,21 +9,23 @@
 #include "programinfo.h"
 
 // A parameter associated with the profile itself
-class PlayGroupSetting: public SimpleDBStorage,
-                        virtual public Setting {
-protected:
-    PlayGroupSetting(const PlayGroup& _parent, QString _name):
-        SimpleDBStorage("playgroup", _name),
-        parent(_parent) {
-        setName(_name);
-    };
+class PlayGroupDBStorage : public SimpleDBStorage
+{
+  protected:
+    PlayGroupDBStorage(Setting         *_setting,
+                       const PlayGroup &_parent,
+                       QString          _name) :
+        SimpleDBStorage(_setting, "playgroup", _name), parent(_parent)
+    {
+        _setting->setName(_name);
+    }
 
     virtual QString whereClause(MSqlBindings& bindings);
 
     const PlayGroup &parent;
 };
 
-QString PlayGroupSetting::whereClause(MSqlBindings& bindings)
+QString PlayGroupDBStorage::whereClause(MSqlBindings& bindings)
 {
     QString nameTag(":WHERENAME");
     QString query("name = " + nameTag);
@@ -33,11 +35,12 @@ QString PlayGroupSetting::whereClause(MSqlBindings& bindings)
     return query;
 }
 
-class TitleMatch: public LineEditSetting, public PlayGroupSetting {
-public:
+class TitleMatch : public LineEditSetting, public PlayGroupDBStorage
+{
+  public:
     TitleMatch(const PlayGroup& _parent):
-        LineEditSetting(),
-        PlayGroupSetting(_parent, "titlematch") {
+        LineEditSetting(this), PlayGroupDBStorage(this, _parent, "titlematch")
+    {
         setLabel(QObject::tr("Title match (regex)"));
         setHelpText(QObject::tr("Automatically set new recording rules to "
                                 "use this group if the title matches this "
@@ -47,44 +50,55 @@ public:
     };
 };
 
-class SkipAhead: public SpinBoxSetting, public PlayGroupSetting {
-public:
+class SkipAhead : public SpinBoxSetting, public PlayGroupDBStorage
+{
+  public:
     SkipAhead(const PlayGroup& _parent):
-        SpinBoxSetting(0, 600, 5, true, "(" + QObject::tr("default") + ")"),
-        PlayGroupSetting(_parent, "skipahead") {
+        SpinBoxSetting(this, 0, 600, 5, true,
+                       "(" + QObject::tr("default") + ")"),
+        PlayGroupDBStorage(this, _parent, "skipahead") {
         setLabel(QObject::tr("Skip ahead (seconds)"));
         setHelpText(QObject::tr("How many seconds to skip forward on a fast "
                                 "forward."));
     };
 };
 
-class SkipBack: public SpinBoxSetting, public PlayGroupSetting {
-public:
+class SkipBack : public SpinBoxSetting, public PlayGroupDBStorage
+{
+  public:
     SkipBack(const PlayGroup& _parent):
-        SpinBoxSetting(0, 600, 5, true, "(" + QObject::tr("default") + ")"),
-        PlayGroupSetting(_parent, "skipback") {
+        SpinBoxSetting(this, 0, 600, 5, true,
+                       "(" + QObject::tr("default") + ")"),
+        PlayGroupDBStorage(this, _parent, "skipback")
+    {
         setLabel(QObject::tr("Skip back (seconds)"));
         setHelpText(QObject::tr("How many seconds to skip backward on a "
                                 "rewind."));
     };
 };
 
-class JumpMinutes: public SpinBoxSetting, public PlayGroupSetting {
-public:
+class JumpMinutes : public SpinBoxSetting, public PlayGroupDBStorage
+{
+  public:
     JumpMinutes(const PlayGroup& _parent):
-        SpinBoxSetting(0, 30, 10, true, "(" + QObject::tr("default") + ")"),
-        PlayGroupSetting(_parent, "jump") {
+        SpinBoxSetting(this, 0, 30, 10, true,
+                       "(" + QObject::tr("default") + ")"),
+        PlayGroupDBStorage(this, _parent, "jump")
+    {
         setLabel(QObject::tr("Jump amount (in minutes)"));
         setHelpText(QObject::tr("How many minutes to jump forward or backward "
                     "when the jump keys are pressed."));
     };
 };
 
-class TimeStretch: public SpinBoxSetting, public PlayGroupSetting {
-public:
+class TimeStretch : public SpinBoxSetting, public PlayGroupDBStorage
+{
+  public:
     TimeStretch(const PlayGroup& _parent):
-        SpinBoxSetting(45, 200, 5, false, "(" + QObject::tr("default") + ")"),
-        PlayGroupSetting(_parent, "timestretch") {
+        SpinBoxSetting(this, 45, 200, 5, false,
+                       "(" + QObject::tr("default") + ")"),
+        PlayGroupDBStorage(this, _parent, "timestretch")
+    {
         setValue(45);
         setLabel(QObject::tr("Time stretch (speed x 100)"));
         setHelpText(QObject::tr("Initial playback speed with adjusted audio.  "
@@ -93,7 +107,7 @@ public:
     };
 
     virtual void load(void) {
-        PlayGroupSetting::load();
+        PlayGroupDBStorage::load();
         if (intValue() < 50 || intValue() > 200)
             setValue(45);
     };
@@ -101,7 +115,7 @@ public:
     virtual void save(void) {
         if (intValue() < 50 || intValue() > 200)
             setValue(0);
-        PlayGroupSetting::save();
+        PlayGroupDBStorage::save();
     }
 };
 
@@ -109,7 +123,7 @@ PlayGroup::PlayGroup(QString _name)
     : name(_name)
 {
     ConfigurationGroup* cgroup = new VerticalConfigurationGroup(false);
-    cgroup->setLabel(getName() + " " + tr("Group"));
+    cgroup->setLabel(getName() + " " + QObject::tr("Group", "Play Group"));
 
     cgroup->addChild(new TitleMatch(*this));
     cgroup->addChild(new SkipAhead(*this));
@@ -195,10 +209,11 @@ int PlayGroup::GetSetting(const QString &name, const QString &field,
     return res;
 }
 
-PlayGroupEditor::PlayGroupEditor(void)
-    : lastValue("Default")
+PlayGroupEditor::PlayGroupEditor(void) :
+    listbox(new ListBoxSetting(this)), lastValue("Default")
 {
-    setLabel(tr("Playback Groups"));
+    listbox->setLabel(tr("Playback Groups"));
+    addChild(listbox);
 }
 
 void PlayGroupEditor::open(QString name) 
@@ -239,7 +254,7 @@ void PlayGroupEditor::open(QString name)
 
 void PlayGroupEditor::doDelete(void) 
 {
-    QString name = getValue();
+    QString name = listbox->getValue();
     if (name.isEmpty() || name == "Default")
         return;
 
@@ -259,35 +274,37 @@ void PlayGroupEditor::doDelete(void)
         if (!query.exec())
             MythContext::DBError("PlayGroupEditor::doDelete", query);
 
-        int lastIndex = getValueIndex(name);
+        int lastIndex = listbox->getValueIndex(name);
         lastValue = "";
         load();
-        setValue(lastIndex);
+        listbox->setValue(lastIndex);
     }
 
-    setFocus();
+    listbox->setFocus();
 }
 
-void PlayGroupEditor::load() {
-    clearSelections();
+void PlayGroupEditor::load(void)
+{
+    listbox->clearSelections();
 
-    addSelection(tr("Default"), "Default");
+    listbox->addSelection(tr("Default"), "Default");
 
     QStringList names = PlayGroup::GetNames();
     while (!names.isEmpty())
     {
-        addSelection(names.front());
+        listbox->addSelection(names.front());
         names.pop_front();
     }
 
-    addSelection(tr("(Create new group)"), "");
+    listbox->addSelection(tr("(Create new group)"), "");
 
-    setValue(lastValue);
+    listbox->setValue(lastValue);
 }
 
-int PlayGroupEditor::exec() {
+int PlayGroupEditor::exec(void)
+{
     while (ConfigurationDialog::exec() == QDialog::Accepted)
-        open(getValue());
+        open(listbox->getValue());
 
     return QDialog::Rejected;
 }

@@ -11,30 +11,35 @@
 
 #include "managedlist.h"
 
-QString RecordingProfileParam::whereClause(MSqlBindings& bindings) {
+QString RecordingProfileStorage::whereClause(MSqlBindings& bindings) {
     QString idTag(":WHEREID");
     QString query("id = " + idTag);
 
-    bindings.insert(idTag, parentProfile.getProfileNum());
+    bindings.insert(idTag, parent.getProfileNum());
 
     return query;
 }
 
-class CodecParam: public SimpleDBStorage,
-                  public RecordingProfileSetting {
-protected:
-    CodecParam(const RecordingProfile& parentProfile,
-                    QString name):
-        SimpleDBStorage("codecparams", "value"),
-        RecordingProfileSetting(parentProfile) {
-        setName(name);
-    };
+class CodecParamStorage : public SimpleDBStorage
+{
+  protected:
+    CodecParamStorage(Setting *_setting,
+                      const RecordingProfile &parentProfile,
+                      QString name) :
+        SimpleDBStorage(_setting, "codecparams", "value"),
+        parent(parentProfile)
+    {
+        _setting->setName(name);
+    }
 
     virtual QString setClause(MSqlBindings& bindings);
     virtual QString whereClause(MSqlBindings& bindings);
+
+    const RecordingProfile &parent;
 };
 
-QString CodecParam::setClause(MSqlBindings& bindings) {
+QString CodecParamStorage::setClause(MSqlBindings &bindings)
+{
     QString profileTag(":SETPROFILE");
     QString nameTag(":SETNAME");
     QString valueTag(":SETVALUE");
@@ -42,38 +47,44 @@ QString CodecParam::setClause(MSqlBindings& bindings) {
     QString query("profile = " + profileTag + ", name = " + nameTag
             + ", value = " + valueTag);
 
-    bindings.insert(profileTag, parentProfile.getProfileNum());
-    bindings.insert(nameTag, getName());
-    bindings.insert(valueTag, getValue());
+    bindings.insert(profileTag, parent.getProfileNum());
+    bindings.insert(nameTag, setting->getName());
+    bindings.insert(valueTag, setting->getValue());
 
     return query;
 }
 
-QString CodecParam::whereClause(MSqlBindings& bindings) {
+QString CodecParamStorage::whereClause(MSqlBindings &bindings)
+{
     QString profileTag(":WHEREPROFILE");
     QString nameTag(":WHERENAME");
 
     QString query("profile = " + profileTag + " AND name = " + nameTag);
 
-    bindings.insert(profileTag, parentProfile.getProfileNum());
-    bindings.insert(nameTag, getName());
+    bindings.insert(profileTag, parent.getProfileNum());
+    bindings.insert(nameTag, setting->getName());
 
     return query;
 }
 
-class AudioCodecName: public ComboBoxSetting, public RecordingProfileParam {
-public:
-    AudioCodecName(const RecordingProfile& parent):
-        RecordingProfileParam(parent, "audiocodec") {
+class AudioCodecName: public ComboBoxSetting, public RecordingProfileStorage
+{
+  public:
+    AudioCodecName(const RecordingProfile &parent) :
+        ComboBoxSetting(this),
+        RecordingProfileStorage(this, parent, "audiocodec")
+    {
         setLabel(QObject::tr("Codec"));
-    };
+    }
 };
 
-class MP3Quality: public CodecParam, public SliderSetting {
-public:
-    MP3Quality(const RecordingProfile& parent):
-        CodecParam(parent, "mp3quality"),
-        SliderSetting(1,9,1) {
+class MP3Quality : public SliderSetting, public CodecParamStorage
+{
+  public:
+    MP3Quality(const RecordingProfile &parent) :
+        SliderSetting(this, 1, 9, 1),
+        CodecParamStorage(this, parent, "mp3quality")
+    {
         setLabel(QObject::tr("MP3 Quality"));
         setValue(7);
         setHelpText(QObject::tr("The higher the slider number, the lower the "
@@ -82,21 +93,25 @@ public:
     };
 };
 
-class BTTVVolume: public CodecParam, public SliderSetting {
-public:
-    BTTVVolume(const RecordingProfile& parent):
-       CodecParam(parent, "volume"),
-       SliderSetting(0,100,1) {
+class BTTVVolume : public SliderSetting, public CodecParamStorage
+{
+  public:
+    BTTVVolume(const RecordingProfile& parent) :
+        SliderSetting(this, 0, 100, 1),
+        CodecParamStorage(this, parent, "volume")
+    {
        setLabel(QObject::tr("Volume (%)"));
        setValue(90);
        setHelpText(QObject::tr("Recording volume of the capture card"));
     };
 };
 
-class SampleRate: public CodecParam, public ComboBoxSetting {
-public:
-    SampleRate(const RecordingProfile& parent, bool analog = true):
-        CodecParam(parent, "samplerate") {
+class SampleRate : public ComboBoxSetting, public CodecParamStorage
+{
+  public:
+    SampleRate(const RecordingProfile &parent, bool analog = true) :
+        ComboBoxSetting(this), CodecParamStorage(this, parent, "samplerate")
+    {
         setLabel(QObject::tr("Sampling rate"));
         if (analog)
         {
@@ -116,19 +131,24 @@ public:
     };
 };
 
-class MPEG2audType: public CodecParam, public ComboBoxSetting {
-public:
-   MPEG2audType(const RecordingProfile& parent):
-        CodecParam(parent, "mpeg2audtype") {
+class MPEG2audType : public ComboBoxSetting, public CodecParamStorage
+{
+  public:
+    MPEG2audType(const RecordingProfile &parent) :
+        ComboBoxSetting(this), CodecParamStorage(this, parent, "mpeg2audtype")
+    {
         setLabel(QObject::tr("Type"));
         setHelpText(QObject::tr("Sets the audio type"));
-    };
+    }
 };
 
-class MPEG2audBitrateL1: public CodecParam, public ComboBoxSetting {
-public:
-   MPEG2audBitrateL1(const RecordingProfile& parent):
-        CodecParam(parent, "mpeg2audbitratel1") {
+class MPEG2audBitrateL1 : public ComboBoxSetting, public CodecParamStorage
+{
+  public:
+    MPEG2audBitrateL1(const RecordingProfile &parent) :
+        ComboBoxSetting(this),
+        CodecParamStorage(this, parent, "mpeg2audbitratel1")
+    {
         setLabel(QObject::tr("Bitrate"));
         
         addSelection("32 kbps", "32");
@@ -150,10 +170,13 @@ public:
     };
 };
 
-class MPEG2audBitrateL2: public CodecParam, public ComboBoxSetting {
-public:
-   MPEG2audBitrateL2(const RecordingProfile& parent):
-        CodecParam(parent, "mpeg2audbitratel2") {
+class MPEG2audBitrateL2 : public ComboBoxSetting, public CodecParamStorage
+{
+  public:
+    MPEG2audBitrateL2(const RecordingProfile &parent) :
+        ComboBoxSetting(this),
+        CodecParamStorage(this, parent, "mpeg2audbitratel2")
+    {
         setLabel(QObject::tr("Bitrate"));
         
         addSelection("32 kbps", "32");
@@ -175,11 +198,13 @@ public:
     };
 };
 
-class MPEG2audVolume: public CodecParam, public SliderSetting {
-public:
-    MPEG2audVolume(const RecordingProfile& parent):
-        CodecParam(parent, "mpeg2audvolume"),
-        SliderSetting(0,100,1) {
+class MPEG2audVolume : public SliderSetting, public CodecParamStorage
+{
+  public:
+    MPEG2audVolume(const RecordingProfile &parent) :
+        SliderSetting(this, 0, 100, 1),
+        CodecParamStorage(this, parent, "mpeg2audvolume")
+    {
 
         setLabel(QObject::tr("Volume (%)"));
         setValue(90);
@@ -187,14 +212,13 @@ public:
     };
 };
 
-class MPEG2AudioBitrateSettings: public HorizontalConfigurationGroup,
-                                 public TriggeredConfigurationGroup
+class MPEG2AudioBitrateSettings : public TriggeredConfigurationGroup
 {
   public:
-    MPEG2AudioBitrateSettings(const RecordingProfile& parent) :
-        ConfigurationGroup(false, true, true, true),
-        HorizontalConfigurationGroup(false, true, true, true)
+    MPEG2AudioBitrateSettings(const RecordingProfile &parent) :
+        TriggeredConfigurationGroup(false, true, true, true)
     {
+        SetVertical(false);
         setLabel(QObject::tr("Bitrate Settings"));
         MPEG2audType* audType = new MPEG2audType(parent);
         addChild(audType);
@@ -216,11 +240,11 @@ class MPEG2AudioBitrateSettings: public HorizontalConfigurationGroup,
     };
 };
 
-class MPEG2Language : public CodecParam, public ComboBoxSetting
+class MPEG2Language : public ComboBoxSetting, public CodecParamStorage
 {
   public:
-    MPEG2Language(const RecordingProfile &parent)
-        : CodecParam(parent, "mpeg2language")
+    MPEG2Language(const RecordingProfile &parent) :
+        ComboBoxSetting(this), CodecParamStorage(this, parent, "mpeg2language")
     {
         setLabel(QObject::tr("SAP/Bilingual"));
 
@@ -237,12 +261,11 @@ class MPEG2Language : public CodecParam, public ComboBoxSetting
     };
 };
 
-class AudioCompressionSettings: public VerticalConfigurationGroup,
-                                public TriggeredConfigurationGroup {
-public:
-    AudioCompressionSettings(const RecordingProfile& parent, QString profName) :
-        ConfigurationGroup(false, true, false, false),
-        VerticalConfigurationGroup(false, true, false, false)
+class AudioCompressionSettings : public TriggeredConfigurationGroup
+{
+  public:
+    AudioCompressionSettings(const RecordingProfile &parent, QString profName) :
+        TriggeredConfigurationGroup(false, true, false, false)
     {
         QString labelName;
         if (profName.isNull())
@@ -301,53 +324,63 @@ private:
     AudioCodecName* codecName;
 };
 
-class VideoCodecName: public ComboBoxSetting, public RecordingProfileParam {
-public:
-    VideoCodecName(const RecordingProfile& parent):
-        RecordingProfileParam(parent, "videocodec") {
+class VideoCodecName : public ComboBoxSetting, public RecordingProfileStorage
+{
+  public:
+    VideoCodecName(const RecordingProfile &parent) :
+        ComboBoxSetting(this),
+        RecordingProfileStorage(this, parent, "videocodec")
+    {
         setLabel(QObject::tr("Codec"));
-    };
+    }
 };
 
-class RTjpegQuality: public CodecParam, public SliderSetting {
-public:
-    RTjpegQuality(const RecordingProfile& parent):
-        CodecParam(parent, "rtjpegquality"),
-        SliderSetting(1,255,1) {
+class RTjpegQuality : public SliderSetting, public CodecParamStorage
+{
+  public:
+    RTjpegQuality(const RecordingProfile &parent) :
+        SliderSetting(this, 1, 255, 1),
+        CodecParamStorage(this, parent, "rtjpegquality")
+    {
         setLabel(QObject::tr("RTjpeg Quality"));
         setValue(170);
         setHelpText(QObject::tr("Higher is better quality."));
     };
 };
 
-class RTjpegLumaFilter: public CodecParam, public SpinBoxSetting {
-public:
-    RTjpegLumaFilter(const RecordingProfile& parent):
-        CodecParam(parent, "rtjpeglumafilter"),
-        SpinBoxSetting(0,31,1) {
+class RTjpegLumaFilter : public SpinBoxSetting, public CodecParamStorage
+{
+  public:
+    RTjpegLumaFilter(const RecordingProfile &parent) :
+        SpinBoxSetting(this, 0, 31, 1),
+        CodecParamStorage(this, parent, "rtjpeglumafilter")
+    {
         setLabel(QObject::tr("Luma filter"));
         setValue(0);
         setHelpText(QObject::tr("Lower is better."));
     };
 };
 
-class RTjpegChromaFilter: public CodecParam, public SpinBoxSetting {
-public:
-    RTjpegChromaFilter(const RecordingProfile& parent):
-        CodecParam(parent, "rtjpegchromafilter"),
-        SpinBoxSetting(0,31,1) {
+class RTjpegChromaFilter : public SpinBoxSetting, public CodecParamStorage
+{
+  public:
+    RTjpegChromaFilter(const RecordingProfile &parent) :
+        SpinBoxSetting(this, 0, 31, 1),
+        CodecParamStorage(this, parent, "rtjpegchromafilter")
+    {
         setLabel(QObject::tr("Chroma filter"));
         setValue(0);
         setHelpText(QObject::tr("Lower is better."));
     };
 };
 
-class MPEG4bitrate: public CodecParam, public SliderSetting {
-public:
-    MPEG4bitrate(const RecordingProfile& parent):
-        CodecParam(parent, "mpeg4bitrate"),
-        SliderSetting(100,8000,100) {
-
+class MPEG4bitrate : public SliderSetting, public CodecParamStorage
+{
+  public:
+    MPEG4bitrate(const RecordingProfile &parent) :
+        SliderSetting(this, 100, 8000, 100),
+        CodecParamStorage(this, parent, "mpeg4bitrate")
+    {
         setLabel(QObject::tr("Bitrate"));
         setValue(2200);
         setHelpText(QObject::tr("Bitrate in kilobits/second.  2200Kbps is "
@@ -355,10 +388,13 @@ public:
     };
 };
 
-class MPEG4ScaleBitrate: public CodecParam, public CheckBoxSetting {
-public:
-    MPEG4ScaleBitrate(const RecordingProfile& parent):
-        CodecParam(parent, "mpeg4scalebitrate") {
+class MPEG4ScaleBitrate : public CheckBoxSetting, public CodecParamStorage
+{
+  public:
+    MPEG4ScaleBitrate(const RecordingProfile &parent) :
+        CheckBoxSetting(this),
+        CodecParamStorage(this, parent, "mpeg4scalebitrate")
+    {
         setLabel(QObject::tr("Scale bitrate for frame size"));
         setValue(true);
         setHelpText(QObject::tr("If set, the MPEG4 bitrate will be used for "
@@ -367,12 +403,13 @@ public:
     };
 };
 
-class MPEG4MinQuality: public CodecParam, public SliderSetting {
-public:
-    MPEG4MinQuality(const RecordingProfile& parent):
-        CodecParam(parent, "mpeg4minquality"),
-        SliderSetting(1,31,1) {
-
+class MPEG4MinQuality : public SliderSetting, public CodecParamStorage
+{
+  public:
+    MPEG4MinQuality(const RecordingProfile &parent) :
+        SliderSetting(this, 1, 31, 1),
+        CodecParamStorage(this, parent, "mpeg4minquality")
+    {
         setLabel(QObject::tr("Minimum quality"));
         setValue(15);
         setHelpText(QObject::tr("Modifying the default may have severe "
@@ -380,12 +417,13 @@ public:
     };
 };
 
-class MPEG4MaxQuality: public CodecParam, public SliderSetting {
-public:
-    MPEG4MaxQuality(const RecordingProfile& parent):
-        CodecParam(parent, "mpeg4maxquality"),
-        SliderSetting(0,31,1) {
-
+class MPEG4MaxQuality : public SliderSetting, public CodecParamStorage
+{
+  public:
+    MPEG4MaxQuality(const RecordingProfile &parent) :
+        SliderSetting(this, 0, 31, 1),
+        CodecParamStorage(this, parent, "mpeg4maxquality")
+    {
         setLabel(QObject::tr("Maximum quality"));
         setValue(2);
         setHelpText(QObject::tr("Modifying the default may have severe "
@@ -393,11 +431,13 @@ public:
     };
 };
 
-class MPEG4QualDiff: public CodecParam, public SliderSetting {
-public:
-    MPEG4QualDiff(const RecordingProfile& parent):
-        CodecParam(parent, "mpeg4qualdiff"),
-        SliderSetting(1,31,1) {
+class MPEG4QualDiff : public SliderSetting, public CodecParamStorage
+{
+  public:
+    MPEG4QualDiff(const RecordingProfile &parent) :
+        SliderSetting(this, 1, 31, 1),
+        CodecParamStorage(this, parent, "mpeg4qualdiff")
+    {
 
         setLabel(QObject::tr("Max quality difference between frames"));
         setValue(3);
@@ -406,10 +446,13 @@ public:
     };
 };
 
-class MPEG4OptionIDCT: public CodecParam, public CheckBoxSetting {
-public:
-    MPEG4OptionIDCT(const RecordingProfile& parent):
-        CodecParam(parent, "mpeg4optionidct") {
+class MPEG4OptionIDCT : public CheckBoxSetting, public CodecParamStorage
+{
+  public:
+    MPEG4OptionIDCT(const RecordingProfile &parent) :
+        CheckBoxSetting(this),
+        CodecParamStorage(this, parent, "mpeg4optionidct")
+    {
         setLabel(QObject::tr("Enable interlaced DCT encoding"));
         setValue(false);
         setHelpText(QObject::tr("If set, the MPEG4 encoder will use "
@@ -419,10 +462,13 @@ public:
     };
 };
 
-class MPEG4OptionIME: public CodecParam, public CheckBoxSetting {
-public:
-    MPEG4OptionIME(const RecordingProfile& parent):
-        CodecParam(parent, "mpeg4optionime") {
+class MPEG4OptionIME : public CheckBoxSetting, public CodecParamStorage
+{
+  public:
+    MPEG4OptionIME(const RecordingProfile &parent) :
+        CheckBoxSetting(this),
+        CodecParamStorage(this, parent, "mpeg4optionime")
+    {
         setLabel(QObject::tr("Enable interlaced motion estimation"));
         setValue(false);
         setHelpText(QObject::tr("If set, the MPEG4 encoder will use "
@@ -432,10 +478,13 @@ public:
     };
 };
 
-class MPEG4OptionVHQ: public CodecParam, public CheckBoxSetting {
-public:
-    MPEG4OptionVHQ(const RecordingProfile& parent):
-        CodecParam(parent, "mpeg4optionvhq") {
+class MPEG4OptionVHQ : public CheckBoxSetting, public CodecParamStorage
+{
+  public:
+    MPEG4OptionVHQ(const RecordingProfile &parent) :
+        CheckBoxSetting(this),
+        CodecParamStorage(this, parent, "mpeg4optionvhq")
+    {
         setLabel(QObject::tr("Enable high-quality encoding"));
         setValue(false);
         setHelpText(QObject::tr("If set, the MPEG4 encoder will use "
@@ -444,10 +493,13 @@ public:
     };
 };
 
-class MPEG4Option4MV: public CodecParam, public CheckBoxSetting {
-public:
-    MPEG4Option4MV(const RecordingProfile& parent):
-        CodecParam(parent, "mpeg4option4mv") {
+class MPEG4Option4MV : public CheckBoxSetting, public CodecParamStorage
+{
+  public:
+    MPEG4Option4MV(const RecordingProfile &parent) :
+        CheckBoxSetting(this),
+        CodecParamStorage(this, parent, "mpeg4option4mv")
+    {
         setLabel(QObject::tr("Enable 4MV encoding"));
         setValue(false);
         setHelpText(QObject::tr("If set, the MPEG4 encoder will use '4MV' "
@@ -458,11 +510,13 @@ public:
     };
 };
 
-class EncodingThreadCount: public CodecParam, public SliderSetting {
-public:
-    EncodingThreadCount(const RecordingProfile& parent):
-        CodecParam(parent, "encodingthreadcount"),
-        SliderSetting(1,8,1) {
+class EncodingThreadCount : public SliderSetting, public CodecParamStorage
+{
+  public:
+    EncodingThreadCount(const RecordingProfile &parent) :
+        SliderSetting(this, 1, 8, 1),
+        CodecParamStorage(this, parent, "encodingthreadcount")
+    {
 
         setLabel(QObject::tr("Number of threads"));
         setValue(1);
@@ -474,11 +528,13 @@ public:
     };
 };
 
-class MPEG2bitrate: public CodecParam, public SliderSetting {
-public:
-    MPEG2bitrate(const RecordingProfile& parent):
-        CodecParam(parent, "mpeg2bitrate"),
-        SliderSetting(1000,16000,100) {
+class MPEG2bitrate : public SliderSetting, public CodecParamStorage
+{
+  public:
+    MPEG2bitrate(const RecordingProfile &parent) :
+        SliderSetting(this, 1000, 16000, 100),
+        CodecParamStorage(this, parent, "mpeg2bitrate")
+    {
 
         setLabel(QObject::tr("Bitrate"));
         setValue(4500);
@@ -487,11 +543,13 @@ public:
     };
 };
 
-class MPEG2maxBitrate: public CodecParam, public SliderSetting {
-public:
-    MPEG2maxBitrate(const RecordingProfile& parent):
-        CodecParam(parent, "mpeg2maxbitrate"),
-        SliderSetting(1000,16000,100) {
+class MPEG2maxBitrate : public SliderSetting, public CodecParamStorage
+{
+  public:
+    MPEG2maxBitrate(const RecordingProfile &parent) :
+        SliderSetting(this, 1000, 16000, 100),
+        CodecParamStorage(this, parent, "mpeg2maxbitrate")
+    {
 
         setLabel(QObject::tr("Max. Bitrate"));
         setValue(6000);
@@ -500,10 +558,13 @@ public:
     };
 };
 
-class MPEG2streamType: public CodecParam, public ComboBoxSetting {
-public:
-    MPEG2streamType(const RecordingProfile& parent):
-        CodecParam(parent, "mpeg2streamtype") {
+class MPEG2streamType : public ComboBoxSetting, public CodecParamStorage
+{
+  public:
+    MPEG2streamType(const RecordingProfile &parent) :
+        ComboBoxSetting(this),
+        CodecParamStorage(this, parent, "mpeg2streamtype")
+    {
         setLabel(QObject::tr("Stream Type"));
         
         addSelection("MPEG-2 PS");
@@ -521,10 +582,13 @@ public:
     };
 };
 
-class MPEG2aspectRatio: public CodecParam, public ComboBoxSetting {
-public:
-    MPEG2aspectRatio(const RecordingProfile& parent):
-        CodecParam(parent, "mpeg2aspectratio") {
+class MPEG2aspectRatio : public ComboBoxSetting, public CodecParamStorage
+{
+  public:
+    MPEG2aspectRatio(const RecordingProfile &parent) :
+        ComboBoxSetting(this),
+        CodecParamStorage(this, parent, "mpeg2aspectratio")
+    {
         setLabel(QObject::tr("Aspect Ratio"));
         
         addSelection(QObject::tr("Square"), "Square");
@@ -537,20 +601,26 @@ public:
     };
 };
 
-class HardwareMJPEGQuality: public CodecParam, public SliderSetting {
-public:
-    HardwareMJPEGQuality(const RecordingProfile& parent):
-        CodecParam(parent, "hardwaremjpegquality"),
-        SliderSetting(0, 100, 1) {
+class HardwareMJPEGQuality : public SliderSetting, public CodecParamStorage
+{
+  public:
+    HardwareMJPEGQuality(const RecordingProfile &parent) :
+        SliderSetting(this, 0, 100, 1),
+        CodecParamStorage(this, parent, "hardwaremjpegquality")
+    {
         setLabel(QObject::tr("Quality"));
         setValue(100);
     };
 };
 
-class HardwareMJPEGHDecimation: public CodecParam, public ComboBoxSetting {
-public:
-    HardwareMJPEGHDecimation(const RecordingProfile& parent):
-        CodecParam(parent, "hardwaremjpeghdecimation") {
+class HardwareMJPEGHDecimation : public ComboBoxSetting,
+                                 public CodecParamStorage
+{
+  public:
+    HardwareMJPEGHDecimation(const RecordingProfile &parent) :
+        ComboBoxSetting(this),
+        CodecParamStorage(this, parent, "hardwaremjpeghdecimation")
+    {
         setLabel(QObject::tr("Horizontal Decimation"));
         addSelection("1");
         addSelection("2");
@@ -559,10 +629,13 @@ public:
     };
 };
 
-class HardwareMJPEGVDecimation: public CodecParam, public ComboBoxSetting {
-public:
-    HardwareMJPEGVDecimation(const RecordingProfile& parent):
-        CodecParam(parent, "hardwaremjpegvdecimation") {
+class HardwareMJPEGVDecimation : public ComboBoxSetting,
+                                 public CodecParamStorage
+{
+  public:
+    HardwareMJPEGVDecimation(const RecordingProfile &parent) :
+        ComboBoxSetting(this),
+        CodecParamStorage(this, parent, "hardwaremjpegvdecimation") {
         setLabel(QObject::tr("Vertical Decimation"));
         addSelection("1");
         addSelection("2");
@@ -571,13 +644,11 @@ public:
     };
 };
 
-class VideoCompressionSettings: public VerticalConfigurationGroup,
-                                public TriggeredConfigurationGroup {
-public:
-    VideoCompressionSettings(const RecordingProfile& parent, QString profName) :
-        ConfigurationGroup(false, true, false, false),
-        VerticalConfigurationGroup(false, true, false, false),
-        TriggeredConfigurationGroup(false)
+class VideoCompressionSettings : public TriggeredConfigurationGroup
+{
+  public:
+    VideoCompressionSettings(const RecordingProfile &parent, QString profName) :
+        TriggeredConfigurationGroup(false, true, false, false)
     {
         QString labelName;
         if (profName.isNull())
@@ -685,10 +756,13 @@ private:
     VideoCodecName* codecName;
 };
 
-class AutoTranscode: public CodecParam, public CheckBoxSetting {
-public:
-    AutoTranscode(const RecordingProfile& parent):
-        CodecParam(parent, "autotranscode") {
+class AutoTranscode : public CheckBoxSetting, public CodecParamStorage
+{
+  public:
+    AutoTranscode(const RecordingProfile &parent) :
+        CheckBoxSetting(this),
+        CodecParamStorage(this, parent, "autotranscode")
+    {
         setLabel(QObject::tr("Enable auto-transcode after recording"));
         setValue(false);
         setHelpText(QObject::tr("Automatically transcode when a recording is "
@@ -697,10 +771,13 @@ public:
     };
 };
 
-class TranscodeResize: public CodecParam, public CheckBoxSetting {
-public:
-    TranscodeResize(const RecordingProfile& parent):
-        CodecParam(parent, "transcoderesize") {
+class TranscodeResize : public CheckBoxSetting, public CodecParamStorage
+{
+  public:
+    TranscodeResize(const RecordingProfile &parent) :
+        CheckBoxSetting(this),
+        CodecParamStorage(this, parent, "transcoderesize")
+    {
         setLabel(QObject::tr("Resize Video while transcoding"));
         setValue(false);
         setHelpText(QObject::tr("Allows the transcoder to "
@@ -708,10 +785,13 @@ public:
     };
 };
 
-class TranscodeLossless: public CodecParam, public CheckBoxSetting {
-public:
-    TranscodeLossless(const RecordingProfile& parent):
-        CodecParam(parent, "transcodelossless") {
+class TranscodeLossless : public CheckBoxSetting, public CodecParamStorage
+{
+  public:
+    TranscodeLossless(const RecordingProfile &parent) :
+        CheckBoxSetting(this),
+        CodecParamStorage(this, parent, "transcodelossless")
+    {
         setLabel(QObject::tr("Lossless transcoding"));
         setValue(false);
         setHelpText(QObject::tr("Only reencode where absolutely needed "
@@ -723,11 +803,11 @@ public:
     };
 };
 
-class RecordingType : public CodecParam, public ComboBoxSetting
+class RecordingType : public ComboBoxSetting, public CodecParamStorage
 {
   public:
-    RecordingType(const RecordingProfile& parent) :
-        CodecParam(parent, "recordingtype")
+    RecordingType(const RecordingProfile &parent) :
+        ComboBoxSetting(this), CodecParamStorage(this, parent, "recordingtype")
     {
         setLabel(QObject::tr("Recording Type"));
 
@@ -745,12 +825,13 @@ class RecordingType : public CodecParam, public ComboBoxSetting
     };
 };
 
-
-class TranscodeFilters: public CodecParam, public LineEditSetting {
-public:
-    TranscodeFilters(const RecordingProfile& parent):
-        CodecParam(parent, "transcodefilters"),
-        LineEditSetting() {
+class TranscodeFilters : public LineEditSetting, public CodecParamStorage
+{
+  public:
+    TranscodeFilters(const RecordingProfile &parent) :
+        LineEditSetting(this),
+        CodecParamStorage(this, parent, "transcodefilters")
+    {
         setLabel(QObject::tr("Custom Filters"));
         setHelpText(QObject::tr("Filters used when transcoding with this "
                                 "profile. This value must be blank to perform "
@@ -760,16 +841,19 @@ public:
     };
 };
 
-class ImageSize: public VerticalConfigurationGroup {
-public:
-    class Width: public SpinBoxSetting, public CodecParam {
-    public:
-        Width(const RecordingProfile& parent, int maxwidth=704,
-              bool transcoding = false):
-            SpinBoxSetting(transcoding ? 0 : 160,
+class ImageSize : public VerticalConfigurationGroup
+{
+  public:
+    class Width : public SpinBoxSetting, public CodecParamStorage
+    {
+      public:
+        Width(const RecordingProfile &parent, int maxwidth = 704,
+              bool transcoding = false) :
+            SpinBoxSetting(this, transcoding ? 0 : 160,
                            maxwidth, 16, false,
                            transcoding ? QObject::tr("Auto") : ""),
-            CodecParam(parent, "width") {
+            CodecParamStorage(this, parent, "width")
+        {
             setLabel(QObject::tr("Width"));
             setValue(480);
             if (transcoding)
@@ -779,14 +863,16 @@ public:
         };
     };
 
-    class Height: public SpinBoxSetting, public CodecParam {
-    public:
-        Height(const RecordingProfile& parent, int maxheight=576,
+    class Height: public SpinBoxSetting, public CodecParamStorage
+    {
+      public:
+        Height(const RecordingProfile &parent, int maxheight=576,
                bool transcoding = false):
-            SpinBoxSetting(transcoding ? 0 : 160,
+            SpinBoxSetting(this, transcoding ? 0 : 160,
                            maxheight, 16, false,
                            transcoding ? QObject::tr("Auto") : ""),
-            CodecParam(parent, "height") {
+            CodecParamStorage(this, parent, "height")
+        {
             setLabel(QObject::tr("Height"));
             setValue(480);
             if (transcoding)
@@ -796,9 +882,8 @@ public:
         };
     };
 
-    ImageSize(const RecordingProfile& parent, QString tvFormat,
-              QString profName) :
-        ConfigurationGroup(false, true, false, false),
+    ImageSize(const RecordingProfile &parent,
+              QString tvFormat, QString profName) :
         VerticalConfigurationGroup(false, true, false, false)
     {
         ConfigurationGroup* imgSize = new HorizontalConfigurationGroup(false);
@@ -944,12 +1029,12 @@ void RecordingProfile::loadByID(int profileId)
 
         if (profileName && profileName.left(11) == "Transcoders")
         {
-            connect(tr_resize, SIGNAL(valueChanged   (bool)),
-                    this,      SLOT(  ResizeTranscode(bool)));
+            connect(tr_resize,   SIGNAL(valueChanged   (bool)),
+                    this,        SLOT(  ResizeTranscode(bool)));
             connect(tr_lossless, SIGNAL(valueChanged        (bool)),
-                    this,      SLOT(  SetLosslessTranscode(bool)));
-            connect(tr_filters, SIGNAL(valueChanged(const QString &)),
-                    this,      SLOT(FiltersChanged(const QString &)));
+                    this,        SLOT(  SetLosslessTranscode(bool)));
+            connect(tr_filters,  SIGNAL(valueChanged(const QString&)),
+                    this,        SLOT(FiltersChanged(const QString&)));
         }
     }
     else if (type.upper() == "DVB")
@@ -958,7 +1043,7 @@ void RecordingProfile::loadByID(int profileId)
     }
 
     id->setValue(profileId);
-    load();
+    cfgGrp->load();
 }
 
 void RecordingProfile::FiltersChanged(const QString &val)
@@ -1043,9 +1128,10 @@ void RecordingProfile::setCodecTypes()
         audioSettings->selectCodecs(groupType());
 }
 
-int RecordingProfile::exec()
+int RecordingProfile::exec(void)
 {
-    MythDialog* dialog = dialogWidget(gContext->GetMainWindow());
+    MythDialog *dialog = dialogWidget(
+        gContext->GetMainWindow(), "Recording Profile");
 
     dialog->Show();
     if (tr_lossless)
@@ -1080,23 +1166,25 @@ void RecordingProfileEditor::open(int id)
     delete profile;
 };
 
-RecordingProfileEditor::RecordingProfileEditor(int id, QString profName)
+RecordingProfileEditor::RecordingProfileEditor(int id, QString profName) :
+    listbox(new ListBoxSetting(this)), group(id), labelName(profName)
 {
-    labelName = profName;
-    group = id;
-    if (! labelName.isNull())
-        this->setLabel(labelName);
+    if (!labelName.isEmpty())
+        listbox->setLabel(labelName);
+    addChild(listbox);
 }
 
-void RecordingProfileEditor::load() {
-    clearSelections();
-    //addSelection("(Create new profile)", "0");
-    RecordingProfile::fillSelections(this, group);
+void RecordingProfileEditor::load(void)
+{
+    listbox->clearSelections();
+    //listbox->addSelection("(Create new profile)", "0");
+    RecordingProfile::fillSelections(listbox, group);
 }
 
-int RecordingProfileEditor::exec() {
+int RecordingProfileEditor::exec(void)
+{
     while (ConfigurationDialog::exec() == QDialog::Accepted)
-        open(getValue().toInt());
+        open(listbox->getValue().toInt());
 
     return QDialog::Rejected;
 }

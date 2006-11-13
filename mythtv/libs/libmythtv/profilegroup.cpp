@@ -10,7 +10,8 @@
 #include <iostream>
 #include <qaccel.h>
 
-QString ProfileGroupParam::whereClause(MSqlBindings& bindings) {
+QString ProfileGroupStorage::whereClause(MSqlBindings &bindings)
+{
     QString idTag(":WHEREID");
     QString query("id = " + idTag);
 
@@ -19,7 +20,8 @@ QString ProfileGroupParam::whereClause(MSqlBindings& bindings) {
     return query;
 }
 
-QString ProfileGroupParam::setClause(MSqlBindings& bindings) {
+QString ProfileGroupStorage::setClause(MSqlBindings &bindings)
+{
     QString idTag(":SETID");
     QString colTag(":SET" + getColumn().upper());
 
@@ -27,7 +29,7 @@ QString ProfileGroupParam::setClause(MSqlBindings& bindings) {
             getColumn() + " = " + colTag);
 
     bindings.insert(idTag, parent.getProfileNum());
-    bindings.insert(colTag, getValue().utf8());
+    bindings.insert(colTag, setting->getValue().utf8());
 
     return query;
 }
@@ -232,44 +234,53 @@ void ProfileGroupEditor::open(int id) {
     delete profilegroup;
 };
 
-void ProfileGroupEditor::load() 
+void ProfileGroupEditor::load(void) 
 {
-    clearSelections();
-    ProfileGroup::fillSelections(this);
-    addSelection(QObject::tr("(Create new profile group)"), "0");
+    listbox->clearSelections();
+    ProfileGroup::fillSelections(listbox);
+    listbox->addSelection(QObject::tr("(Create new profile group)"), "0");
 }
 
 int ProfileGroupEditor::exec() 
 {
-    int ret;
-    do {
-    redraw = false;
-    load();
-    dialog = new ConfigurationDialogWidget(gContext->GetMainWindow());
-    connect(dialog, SIGNAL(menuButtonPressed()), this, SLOT(callDelete()));
-    int width = 0, height = 0;
-    float wmult = 0, hmult = 0;
+    int ret = QDialog::Accepted;
+    redraw = true;
 
-    gContext->GetScreenSettings(width, wmult, height, hmult);
+    while ((QDialog::Accepted == ret) || redraw)
+    {
+        redraw = false;
 
-    QVBoxLayout* layout = new QVBoxLayout(dialog, (int)(20 * hmult));
-    layout->addWidget(configWidget(NULL, dialog));
+        load();
 
-    dialog->Show();
+        dialog = new ConfigurationDialogWidget(gContext->GetMainWindow(),
+                                               "ProfileGroupEditor");
 
-    ret = dialog->exec();
+        connect(dialog, SIGNAL(menuButtonPressed()), this, SLOT(callDelete()));
 
-    delete dialog;
-    if (ret == QDialog::Accepted)
-        open(getValue().toInt());
-    } while (ret == QDialog::Accepted || redraw);
+        int   width = 0,    height = 0;
+        float wmult = 0.0f, hmult  = 0.0f;
+        gContext->GetScreenSettings(width, wmult, height, hmult);
+
+        QVBoxLayout *layout = new QVBoxLayout(dialog, (int)(20 * hmult));
+        layout->addWidget(listbox->configWidget(NULL, dialog));
+
+        dialog->Show();
+
+        ret = dialog->exec();
+
+        dialog->deleteLater();
+        dialog = NULL;
+
+        if (ret == QDialog::Accepted)
+            open(listbox->getValue().toInt());
+    }
 
     return QDialog::Rejected;
 }
 
 void ProfileGroupEditor::callDelete(void)
 {
-    int id = getValue().toInt();
+    int id = listbox->getValue().toInt();
     
     MSqlQuery result(MSqlQuery::InitCon());
     QString querystr = QString("SELECT id FROM profilegroups WHERE "
@@ -306,7 +317,9 @@ void ProfileGroupEditor::callDelete(void)
             result.exec();
 
             redraw = true;
-            dialog->done(QDialog::Rejected);
+
+            if (dialog)
+                dialog->done(QDialog::Rejected);
         }
     }
 

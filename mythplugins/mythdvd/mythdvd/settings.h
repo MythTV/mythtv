@@ -14,23 +14,21 @@
 #include "mythtv/settings.h"
 #include "mythtv/mythcontext.h"
 
-
-
-// The real work.
-
-// Temporary dumping ground for things that have not been properly categorized yet
-class DVDGeneralSettings: virtual public ConfigurationWizard {
-public:
+class DVDGeneralSettings :  public ConfigurationWizard
+{
+  public:
     DVDGeneralSettings();
 };
 
-class DVDPlayerSettings: virtual public ConfigurationWizard {
-public:
+class DVDPlayerSettings :  public ConfigurationWizard
+{
+  public:
     DVDPlayerSettings();
 };
 
-class DVDRipperSettings: virtual public ConfigurationWizard {
-public:
+class DVDRipperSettings :  public ConfigurationWizard
+{
+  public:
     DVDRipperSettings();
 };
 

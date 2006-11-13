@@ -4,14 +4,10 @@
 #include "mythtv/settings.h"
 #include "mythtv/mythcontext.h"
 
-// The real work.
-
-class GallerySettings: virtual public ConfigurationWizard {
-
-public:
-    
+class GallerySettings : public ConfigurationWizard
+{
+  public:  
     GallerySettings();
-
 };
 
 #endif

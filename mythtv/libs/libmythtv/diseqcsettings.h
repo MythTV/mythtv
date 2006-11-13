@@ -18,7 +18,7 @@ bool DTVDeviceNeedsConfiguration(DiSEqCDevTree& tree);
 class SwitchTypeSetting;
 class SwitchPortsSetting;
 
-class SwitchConfig : public ConfigurationWizard
+class SwitchConfig : public QObject, public ConfigurationWizard
 {
     Q_OBJECT
 
@@ -33,7 +33,7 @@ class SwitchConfig : public ConfigurationWizard
     SwitchPortsSetting *m_ports;
 };
 
-class RotorPosMap : public ListBoxSetting
+class RotorPosMap : public ListBoxSetting, public Storage
 {
     Q_OBJECT
 
@@ -42,6 +42,7 @@ class RotorPosMap : public ListBoxSetting
 
     virtual void load(void);
     virtual void save(void);
+    virtual void save(QString /*destination*/) {}
 
   public slots:
     void edit(void);
@@ -55,7 +56,7 @@ class RotorPosMap : public ListBoxSetting
     uint_to_dbl_t   m_posmap;
 };
 
-class RotorConfig : public ConfigurationWizard
+class RotorConfig : public QObject, public ConfigurationWizard
 {
     Q_OBJECT
 
@@ -77,7 +78,7 @@ class LNBLOFLowSetting;
 class LNBLOFHighSetting;
 class LNBPolarityInvertedSetting;
 
-class LNBConfig : public ConfigurationWizard
+class LNBConfig : public QObject, public ConfigurationWizard
 {
     Q_OBJECT
 
@@ -96,7 +97,7 @@ class LNBConfig : public ConfigurationWizard
     LNBPolarityInvertedSetting *m_pol_inv;
 };
 
-class DeviceTree : public ListBoxSetting
+class DeviceTree : public ListBoxSetting, public Storage
 {
     Q_OBJECT
 
@@ -105,6 +106,7 @@ class DeviceTree : public ListBoxSetting
 
     virtual void load(void);
     virtual void save(void);
+    virtual void save(QString /*destination*/) { }
 
   protected:
     bool EditNodeDialog(uint nodeid);
@@ -126,18 +128,15 @@ class DeviceTree : public ListBoxSetting
     DiSEqCDevTree &m_tree;
 };
 
-class DTVDeviceTreeWizard : public VerticalConfigurationGroup,
-                            public ConfigurationDialog
+class DTVDeviceTreeWizard : public ConfigurationDialog
 {
-    Q_OBJECT
-
   public:
     DTVDeviceTreeWizard(DiSEqCDevTree &tree);
 
     virtual int exec(void);
 };
 
-class DTVDeviceConfigWizard : public ConfigurationWizard
+class DTVDeviceConfigWizard : public QObject, public ConfigurationWizard
 {
     Q_OBJECT
 

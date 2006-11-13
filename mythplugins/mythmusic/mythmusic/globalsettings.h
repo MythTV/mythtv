@@ -4,18 +4,21 @@
 #include "mythtv/settings.h"
 #include "mythtv/mythcontext.h"
 
-class MusicGeneralSettings: virtual public ConfigurationWizard {
-public:
+class MusicGeneralSettings : public ConfigurationWizard
+{
+  public:
     MusicGeneralSettings();
 };
 
-class MusicPlayerSettings: virtual public ConfigurationWizard {
-public:
+class MusicPlayerSettings : public ConfigurationWizard
+{
+  public:
     MusicPlayerSettings();
 };
 
-class MusicRipperSettings: virtual public ConfigurationWizard {
-public:
+class MusicRipperSettings : public ConfigurationWizard
+{
+  public:
     MusicRipperSettings();
 };
 

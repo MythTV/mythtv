@@ -3,14 +3,15 @@
 
 #include <settings.h>
 
-
-class MythWelcomeSettings: virtual public ConfigurationWizard {
-public:
+class MythWelcomeSettings : public ConfigurationWizard
+{
+  public:
     MythWelcomeSettings();
 };
 
-class MythShutdownSettings: virtual public ConfigurationWizard {
-public:
+class MythShutdownSettings : public ConfigurationWizard
+{
+  public:
     MythShutdownSettings();
 };
 

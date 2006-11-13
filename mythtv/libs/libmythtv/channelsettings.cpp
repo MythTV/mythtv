@@ -1,7 +1,8 @@
 #include "channelsettings.h"
 #include "cardutil.h"
 
-QString CSetting::whereClause(MSqlBindings& bindings) {
+QString ChannelDBStorage::whereClause(MSqlBindings &bindings)
+{
     QString fieldTag = (":WHERE" + id.getField().upper());
     QString query(id.getField() + " = " + fieldTag);
 
@@ -10,15 +11,16 @@ QString CSetting::whereClause(MSqlBindings& bindings) {
     return query;
 }
 
-QString CSetting::setClause(MSqlBindings& bindings) {
+QString ChannelDBStorage::setClause(MSqlBindings &bindings)
+{
     QString fieldTag = (":SET" + id.getField().upper());
-    QString nameTag = (":SET" + getName().upper());
+    QString nameTag = (":SET" + setting->getName().upper());
 
     QString query(id.getField() + " = " + fieldTag + ", " +
-                  getName() + " = " + nameTag);
+                  setting->getName() + " = " + nameTag);
 
     bindings.insert(fieldTag, id.getValue());
-    bindings.insert(nameTag, getValue());
+    bindings.insert(nameTag, setting->getValue());
 
     return query;
 }
@@ -27,36 +29,40 @@ QString CSetting::setClause(MSqlBindings& bindings) {
         Channel Options - Common
  *****************************************************************************/
 
-class Name: public LineEditSetting, public CSetting {
-public:
-    Name(const ChannelID& id):
-        LineEditSetting(), CSetting(id, "name") {
+class Name : public LineEditSetting, public ChannelDBStorage
+{
+  public:
+    Name(const ChannelID &id) :
+        LineEditSetting(this), ChannelDBStorage(this, id, "name")
+    {
         setLabel(QObject::tr("Channel Name"));
-    };
+    }
 };
 
-class Channum: public LineEditSetting, public CSetting {
-public:
-    Channum(const ChannelID& id):
-        LineEditSetting(), CSetting(id, "channum") {
+class Channum : public LineEditSetting, public ChannelDBStorage
+{
+  public:
+    Channum(const ChannelID &id) :
+        LineEditSetting(this), ChannelDBStorage(this, id, "channum")
+    {
         setLabel(QObject::tr("Channel Number"));
-    };
+    }
 };
 
-class Source: public ComboBoxSetting, public CSetting
+class Source : public ComboBoxSetting, public ChannelDBStorage
 {
   public:
     Source(const ChannelID &id, uint _default_sourceid) :
-        ComboBoxSetting(), CSetting(id, "sourceid"),
+        ComboBoxSetting(this), ChannelDBStorage(this, id, "sourceid"),
         default_sourceid(_default_sourceid)
     {
         setLabel(QObject::tr("Video Source"));
-    };
+    }
 
     void load(void)
     {
         fillSelections();
-        CSetting::load();
+        ChannelDBStorage::load();
 
         if (default_sourceid && !getValue().toUInt())
         {
@@ -64,7 +70,7 @@ class Source: public ComboBoxSetting, public CSetting
             if (which)
                 setValue(which);
         }
-    };
+    }
 
     void fillSelections(void)
     {
@@ -90,25 +96,29 @@ class Source: public ComboBoxSetting, public CSetting
         }
 
         sourceid_to_index[0] = 0; // Not selected entry.
-    };
+    }
 
   private:
     uint            default_sourceid;
     QMap<uint,uint> sourceid_to_index;
 };
 
-class Callsign: public LineEditSetting, public CSetting {
-public:
-    Callsign(const ChannelID& id):
-        LineEditSetting(), CSetting(id, "callsign") {
+class Callsign : public LineEditSetting, public ChannelDBStorage
+{
+  public:
+    Callsign(const ChannelID &id) :
+        LineEditSetting(this), ChannelDBStorage(this, id, "callsign")
+    {
         setLabel(QObject::tr("Callsign"));
-    };
+    }
 };
 
-class ChannelTVFormat: public ComboBoxSetting, public CSetting {
-public:
-    ChannelTVFormat(const ChannelID& id):
-       ComboBoxSetting(), CSetting(id, "tvformat") {
+class ChannelTVFormat : public ComboBoxSetting, public ChannelDBStorage
+{
+  public:
+    ChannelTVFormat(const ChannelID &id) :
+       ComboBoxSetting(this), ChannelDBStorage(this, id, "tvformat")
+    {
        setLabel(QObject::tr("TV Format"));
        setHelpText(QObject::tr("If this channel uses a format other than TV "
                    "Format in the General Backend Setup screen, set it here."));
@@ -121,26 +131,32 @@ public:
        addSelection("PAL-M");
        addSelection("PAL-N");
        addSelection("NTSC-JP");
-    };
+    }
 };
 
-class TimeOffset: public SpinBoxSetting, public CSetting {
-public:
-    TimeOffset(const ChannelID& id):
-        SpinBoxSetting(-1440, 1440, 1), CSetting(id, "tmoffset") {
+class TimeOffset : public SpinBoxSetting, public ChannelDBStorage
+{
+  public:
+    TimeOffset(const ChannelID &id) :
+        SpinBoxSetting(this, -1440, 1440, 1),
+        ChannelDBStorage(this, id, "tmoffset")
+    {
         setLabel(QObject::tr("DataDirect") + " " + QObject::tr("Time Offset"));
         setHelpText(QObject::tr("Offset (in minutes) to apply to the program "
                     "guide data during import.  This can be used when the "
                     "listings for a particular channel are in a different "
                     "time zone.") + " " +
                     QObject::tr("(Works for DataDirect listings only.)"));
-    };
+    }
 };
 
-class Priority: public SpinBoxSetting, public CSetting {
-public:
-    Priority(const ChannelID& id):
-        SpinBoxSetting(-99,99,1), CSetting(id, "recpriority") {
+class Priority : public SpinBoxSetting, public ChannelDBStorage
+{
+  public:
+    Priority(const ChannelID &id) :
+        SpinBoxSetting(this, -99, 99, 1),
+        ChannelDBStorage(this, id, "recpriority")
+    {
         setLabel(QObject::tr("Priority"));
         setHelpText(
             QObject::tr("Number of priority points to be added to any "
@@ -148,155 +164,180 @@ public:
             QObject::tr("Use a positive number as the priority if you "
                         "want this to be a preferred channel, a "
                         "negative one to deprecate this channel."));
-    };
+    }
 };
 
-class Icon: public LineEditSetting, public CSetting {
-public:
-    Icon(const ChannelID& id):
-        LineEditSetting(), CSetting(id, "icon") {
+class Icon : public LineEditSetting, public ChannelDBStorage
+{
+  public:
+    Icon(const ChannelID &id) :
+        LineEditSetting(this), ChannelDBStorage(this, id, "icon")
+    {
         setLabel(QObject::tr("Icon"));
         setHelpText(QObject::tr("Image file to use as the icon for this "
                                 "channel on various MythTV displays."));
-    };
+    }
 };
 
-class VideoFilters: public LineEditSetting, public CSetting {
-public:
-    VideoFilters(const ChannelID& id):
-        LineEditSetting(), CSetting(id, "videofilters") {
+class VideoFilters : public LineEditSetting, public ChannelDBStorage
+{
+  public:
+    VideoFilters(const ChannelID &id) :
+        LineEditSetting(this), ChannelDBStorage(this, id, "videofilters")
+    {
         setLabel(QObject::tr("Video filters"));
         setHelpText(QObject::tr("Filters to be used when recording "
                                 "from this channel.  Not used with "
                                 "hardware encoding cards."));
 
-    };
+    }
 };
 
 
-class OutputFilters: public LineEditSetting, public CSetting {
-public:
-    OutputFilters(const ChannelID& id):
-        LineEditSetting(), CSetting(id, "outputfilters") {
+class OutputFilters : public LineEditSetting, public ChannelDBStorage
+{
+  public:
+    OutputFilters(const ChannelID &id) :
+        LineEditSetting(this), ChannelDBStorage(this, id, "outputfilters")
+    {
         setLabel(QObject::tr("Playback filters"));
         setHelpText(QObject::tr("Filters to be used when recordings "
                                 "from this channel are viewed.  "
                                 "Start with a plus to append to the "
                                 "global playback filters."));
-    };
+    }
 };
 
 
-class XmltvID: public LineEditSetting, public CSetting {
-public:
-    XmltvID(const ChannelID& id):
-        LineEditSetting(), CSetting(id, "xmltvid") {
+class XmltvID : public LineEditSetting, public ChannelDBStorage
+{
+  public:
+    XmltvID(const ChannelID &id) :
+        LineEditSetting(this), ChannelDBStorage(this, id, "xmltvid")
+    {
         setLabel(QObject::tr("XMLTV ID"));
         setHelpText(QObject::tr(
                         "ID used by listing services to get an exact "
                         "correspondance between a channel in your line-up "
                         "and a channel in their database. Normally this is "
                         "set automatically when 'mythfilldatabase' is run."));
-    };
+    }
 };
 
-class CommFree: public CheckBoxSetting, public CSetting {
-public:
-    CommFree(const ChannelID& id):
-        CheckBoxSetting(), CSetting(id, "commfree") {
+class CommFree : public CheckBoxSetting, public ChannelDBStorage
+{
+  public:
+    CommFree(const ChannelID &id) :
+        CheckBoxSetting(this), ChannelDBStorage(this, id, "commfree")
+    {
         setLabel(QObject::tr("Commercial Free"));
         setHelpText(QObject::tr("If set automatic commercial flagging will "
                 "be skipped for this channel.  Useful for "
                 "premium channels like HBO."));
-    };
+    }
 };
 
-class Visible: public CheckBoxSetting, public CSetting {
-public:
-    Visible(const ChannelID& id):
-        CheckBoxSetting(), CSetting(id, "visible") {
+class Visible : public CheckBoxSetting, public ChannelDBStorage
+{
+  public:
+    Visible(const ChannelID &id) :
+        CheckBoxSetting(this), ChannelDBStorage(this, id, "visible")
+    {
         setValue(true);
         setLabel(QObject::tr("Visible"));
         setHelpText(QObject::tr("If set, the channel will be visible in the "
                     "EPG."));
-    };
+    }
 };
 
-class OnAirGuide: public CheckBoxSetting, public CSetting {
-public:
-    OnAirGuide(const ChannelID& id):
-        CheckBoxSetting(), CSetting(id, "useonairguide") {
+class OnAirGuide : public CheckBoxSetting, public ChannelDBStorage
+{
+  public:
+    OnAirGuide(const ChannelID &id) :
+        CheckBoxSetting(this), ChannelDBStorage(this, id, "useonairguide")
+    {
         setLabel(QObject::tr("Use on air guide"));
         setHelpText(QObject::tr("If set the guide information will be taken "
                     "from the On Air Channel guide."));
-    };
+    }
 };
 
 /*****************************************************************************
         Channel Options - Video 4 Linux
  *****************************************************************************/
 
-class Freqid: public LineEditSetting, public CSetting
+class Freqid : public LineEditSetting, public ChannelDBStorage
 {
   public:
-    Freqid(const ChannelID& id)
-        : LineEditSetting(), CSetting(id, "freqid")
+    Freqid(const ChannelID &id) :
+        LineEditSetting(this), ChannelDBStorage(this, id, "freqid")
     {
         setLabel(QObject::tr("Frequency")+" "+QObject::tr("or")+" "+
                  QObject::tr("Channel"));
         setHelpText(QObject::tr(
                         "Specify either the exact frequency in kHz or "
                         "a valid channel for your 'TV Format'."));
-    };
+    }
 };
 
-class Finetune: public SliderSetting, public CSetting
+class Finetune : public SliderSetting, public ChannelDBStorage
 {
   public:
     Finetune(const ChannelID& id)
-        : SliderSetting(-300,300,1), CSetting(id, "finetune")
+        : SliderSetting(this, -300, 300, 1),
+        ChannelDBStorage(this, id, "finetune")
     {
         setLabel(QObject::tr("Finetune")+" (kHz)");
         setHelpText(QObject::tr("Value to be added to your desired frequency "
                                 "in kHz, for 'fine tuning'."));
-    };
+    }
 };
 
-class Contrast: public SliderSetting, public CSetting {
-public:
-    Contrast(const ChannelID& id):
-        SliderSetting(0,65535,655), CSetting(id, "contrast") {
+class Contrast : public SliderSetting, public ChannelDBStorage
+{
+  public:
+    Contrast(const ChannelID &id) :
+        SliderSetting(this, 0, 65535, 655),
+        ChannelDBStorage(this, id, "contrast")
+    {
         setLabel(QObject::tr("Contrast"));
-    };
+    }
 };
 
-class Brightness: public SliderSetting, public CSetting {
-public:
-    Brightness(const ChannelID& id):
-        SliderSetting(0,65535,655), CSetting(id, "brightness") {
+class Brightness : public SliderSetting, public ChannelDBStorage
+{
+  public:
+    Brightness(const ChannelID &id) :
+        SliderSetting(this, 0, 65535, 655),
+        ChannelDBStorage(this, id, "brightness")
+    {
         setLabel(QObject::tr("Brightness"));
-    };
+    }
 };
 
-class Colour: public SliderSetting, public CSetting {
-public:
-    Colour(const ChannelID& id):
-        SliderSetting(0,65535,655), CSetting(id, "colour") {
+class Colour : public SliderSetting, public ChannelDBStorage
+{
+  public:
+    Colour(const ChannelID &id) :
+        SliderSetting(this, 0, 65535, 655),
+        ChannelDBStorage(this, id, "colour")
+    {
         setLabel(QObject::tr("Color"));
-    };
+    }
 };
 
-class Hue: public SliderSetting, public CSetting {
-public:
-    Hue(const ChannelID& id):
-        SliderSetting(0,65535,655), CSetting(id, "hue") {
+class Hue : public SliderSetting, public ChannelDBStorage
+{
+  public:
+    Hue(const ChannelID &id) :
+        SliderSetting(this, 0, 65535, 655), ChannelDBStorage(this, id, "hue")
+    {
         setLabel(QObject::tr("Hue"));
-    };
+    }
 };
 
 ChannelOptionsCommon::ChannelOptionsCommon(const ChannelID &id,
                                            uint default_sourceid) :
-    ConfigurationGroup(        false, true, false, false),
     VerticalConfigurationGroup(false, true, false, false)
 {
     setLabel(QObject::tr("Channel Options - Common"));
@@ -403,7 +444,6 @@ void ChannelOptionsCommon::sourceChanged(const QString& sourceid)
 }
 
 ChannelOptionsV4L::ChannelOptionsV4L(const ChannelID& id) :
-    ConfigurationGroup(false, true, false, false),
     VerticalConfigurationGroup(false, true, false, false)
 {
     setLabel(QObject::tr("Channel Options - Video 4 Linux"));

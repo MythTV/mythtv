@@ -14,6 +14,8 @@ struct GameTypes {
 
 #define MAX_GAME_TYPES 12
 
+// TODO FIXME Can't initialize translated values statically. They are only
+//            translated if you get lucky with dynamic linking order.
 const GameTypes GameTypeList[MAX_GAME_TYPES] =
 {   
     { QObject::tr("OTHER"),   "OTHER",  "" },
@@ -36,14 +38,16 @@ class MythGameGeneralSettings;
 class MythGamePlayerSettings;
 class MythGamePlayerEditor;
 
-
-class MGSetting: public SimpleDBStorage {
-protected:
-    MGSetting(const MythGamePlayerSettings& _parent, QString name):
-        SimpleDBStorage("gameplayers", name),
-        parent(_parent) {
-        setName(name);
-    };
+class GameDBStorage : public SimpleDBStorage
+{
+  protected:
+    GameDBStorage(Setting                      *_setting,
+                  const MythGamePlayerSettings &_parent,
+                  const QString                &_name) :
+        SimpleDBStorage(_setting, "gameplayers", _name), parent(_parent)
+    {
+        _setting->setName(_name);
+    }
 
     virtual QString setClause(MSqlBindings &bindings);
     virtual QString whereClause(MSqlBindings &bindings);
@@ -51,14 +55,17 @@ protected:
     const MythGamePlayerSettings& parent;
 };
 
-class MythGameGeneralSettings: virtual public ConfigurationWizard {
-public:
+class MythGameGeneralSettings : public ConfigurationWizard
+{
+  public:
     MythGameGeneralSettings();
 };
 
-class MythGamePlayerSettings: virtual public ConfigurationWizard {
+class MythGamePlayerSettings : public QObject, public ConfigurationWizard
+{
     Q_OBJECT
-public:
+
+  public:
     MythGamePlayerSettings();
 
     int getGamePlayerID(void) const { return id->intValue(); };
@@ -75,48 +82,43 @@ public:
             ConfigurationWizard::save();
     };
 
-private:
-    class ID: virtual public IntegerSetting,
-              public AutoIncrementStorage {
-    public:
-        ID():
-            AutoIncrementStorage("gameplayers", "gameplayerid") {
+  private:
+    class ID : public AutoIncrementDBSetting
+    {
+      public:
+        ID() : AutoIncrementDBSetting("gameplayers", "gameplayerid")
+        {
             setName("GamePlayerName");
             setVisible(false);
-        };
-        virtual QWidget* configWidget(ConfigurationGroup *cg,
-                                      QWidget* parent,
-                                      const char* widgetName = 0) {
-            (void)cg; (void)parent; (void)widgetName;
-            return NULL;
-        };
+        }
     };
-    class Name: virtual public MGSetting,
-                virtual public LineEditSetting {
-    public:
-        Name(const MythGamePlayerSettings& parent):
-            MGSetting(parent, "playername") {
+
+    class Name : public LineEditSetting, public GameDBStorage
+    {
+      public:
+        Name(const MythGamePlayerSettings &parent) :
+            LineEditSetting(this), GameDBStorage(this, parent, "playername")
+        {
             setLabel(QObject::tr("Player Name"));
             setHelpText(QObject::tr("Name of this Game and or Emulator"));
-
-        };
+        }
     };
 
-private:
+  private:
     QString settingValue;
-    bool changed;
-    ID* id;
-    Name* name;
-protected:
-
+    bool    changed;
+    ID     *id;
+    Name   *name;
 };
 
-class MythGamePlayerEditor: public ListBoxSetting, public ConfigurationDialog {
+class MythGamePlayerEditor :
+    public QObject, public ConfigurationDialog, public Storage
+{
     Q_OBJECT
-public:
 
-    virtual MythDialog* dialogWidget(MythMainWindow* parent,
-                                     const char* widgetName=0);
+  public:
+    virtual MythDialog *dialogWidget(MythMainWindow *parent,
+                                     const char     *widgetName);
 
     virtual int exec();
     virtual void load();
@@ -127,7 +129,8 @@ public slots:
     void edit();
     void del();
 
-protected:
+  private:
+    ListBoxSetting *listbox;
 };
 
 

@@ -33,11 +33,11 @@
 /** \class Configurable
  *  \brief Configurable is the root of all the database aware widgets.
  *
- *   This is an abstract class and several methods must be implemented
- *   in children. load(), save(), and byName(QString), are all abstract.
- *   And while configWidget(ConfigurationGroup *, QWidget*, const char*)
- *   has an implementation, all it does is print an error message and
- *   return a NULL pointer.
+ *   This is an abstract class and some methods must be implemented
+ *   in children. byName(QString) is abstract. While 
+ *   configWidget(ConfigurationGroup *, QWidget*, const char*)
+ *   has an implementation, all it does is print an error message
+ *   and return a NULL pointer.
  */
 
 QWidget* Configurable::configWidget(ConfigurationGroup *cg, QWidget* parent,
@@ -71,14 +71,34 @@ void Configurable::enableOnUnset(const QString &val)
     setEnabled( val == "0" );
 }
 
+QString Setting::getValue(void) const
+{
+    return QDeepCopy<QString>(settingValue);
+}
+
+void Setting::setValue(const QString &newValue)
+{
+    settingValue = QDeepCopy<QString>(newValue);
+    SetChanged(true);
+    emit valueChanged(settingValue);
+}
+
 ConfigurationGroup::~ConfigurationGroup()
 {
-    childList::iterator it = children.begin();
-    while (it != children.end())
+    for (childList::iterator it = children.begin(); it != children.end() ; ++it)
     {
         if (*it)
-            delete *it;
-        ++it;
+            (*it)->deleteLater();
+    }
+    children.clear();
+}
+
+void ConfigurationGroup::deleteLater(void)
+{
+    for (childList::iterator it = children.begin(); it != children.end() ; ++it)
+    {
+        if (*it)
+            (*it)->disconnect();
     }
 }
 
@@ -95,25 +115,28 @@ Setting* ConfigurationGroup::byName(QString name) {
     return NULL;
 }
 
-void ConfigurationGroup::load() {
-    for(childList::iterator i = children.begin() ;
-        i != children.end() ;
-        ++i )
-        (*i)->load();
+void ConfigurationGroup::load(void)
+{
+    childList::iterator it = children.begin();
+    for (; it != children.end() ; ++it)
+        if (*it && (*it)->GetStorage())
+            (*it)->GetStorage()->load();
 }
 
-void ConfigurationGroup::save() {
-    for(childList::iterator i = children.begin() ;
-        i != children.end() ;
-        ++i )
-        (*i)->save();
+void ConfigurationGroup::save(void)
+{
+    childList::iterator it = children.begin();
+    for (; it != children.end() ; ++it)
+        if (*it && (*it)->GetStorage())
+            (*it)->GetStorage()->save();
 }
 
-void ConfigurationGroup::save(QString destination) {
-    for(childList::iterator i = children.begin() ;
-        i != children.end() ;
-        ++i )
-        (*i)->save(destination);
+void ConfigurationGroup::save(QString destination)
+{
+    childList::iterator it = children.begin();
+    for (; it != children.end() ; ++it)
+        if (*it && (*it)->GetStorage())
+            (*it)->GetStorage()->save(destination);
 }
 
 QWidget* VerticalConfigurationGroup::configWidget(ConfigurationGroup *cg, 
@@ -333,32 +356,106 @@ void StackedConfigurationGroup::raise(Configurable* child) {
     cout << "BUG: StackedConfigurationGroup::raise(): unrecognized child " << child << " on setting " << getName() << '/' << getLabel() << endl;
 }
 
-void StackedConfigurationGroup::save() {
+void StackedConfigurationGroup::save(void)
+{
     if (saveAll)
         ConfigurationGroup::save();
     else if (top < children.size())
-        children[top]->save();
+        children[top]->GetStorage()->save();
 }
 
-void StackedConfigurationGroup::save(QString destination) {
+void StackedConfigurationGroup::save(QString destination)
+{
     if (saveAll)
         ConfigurationGroup::save(destination);
     else if (top < children.size())
-        children[top]->save(destination);
+        children[top]->GetStorage()->save(destination);
 }
 
-void TriggeredConfigurationGroup::setTrigger(Configurable* _trigger) {
-    trigger = _trigger;
-    // Make sure the stack is after the trigger
-    addChild(configStack = new StackedConfigurationGroup());
-
-    connect(trigger, SIGNAL(valueChanged(const QString&)),
-            this, SLOT(triggerChanged(const QString&)));
+void TriggeredConfigurationGroup::addChild(Configurable* child)
+{
+    VerifyLayout();
+    configLayout->addChild(child);
 }
 
-void TriggeredConfigurationGroup::addTarget(QString triggerValue, Configurable* target) {
-    configStack->addChild(target);
+void TriggeredConfigurationGroup::addTarget(QString triggerValue,
+                                            Configurable *target)
+{
+    VerifyLayout();
     triggerMap[triggerValue] = target;
+
+    if (!configStack)
+    {
+        configStack = new StackedConfigurationGroup(
+            stackUseLabel, stackUseFrame, stackZeroMargin, stackZeroSpace);
+        configStack->setSaveAll(isSaveAll);
+    }
+
+    configStack->addChild(target);
+}
+
+void TriggeredConfigurationGroup::setTrigger(Configurable *_trigger)
+{
+    if (trigger)
+    {
+        trigger->disconnect();
+    }
+
+    trigger = _trigger;
+
+    if (trigger)
+    {
+        connect(trigger, SIGNAL(valueChanged(  const QString&)),
+                this,    SLOT(  triggerChanged(const QString&)));
+    }
+}
+
+/** \fn TriggeredConfigurationGroup::SetVertical(bool)
+ *  \brief By default we use a vertical layout, but you can call this
+ *         with a false value to use a horizontal layout instead.
+ *
+ *  NOTE: This must be called before this addChild() is first called.
+ */
+void TriggeredConfigurationGroup::SetVertical(bool vert)
+{
+    if (configLayout)
+    {
+        VERBOSE(VB_IMPORTANT, "TriggeredConfigurationGroup::setVertical(): "
+                "Sorry, this must be called before any children are added "
+                "to the group.");
+        return;
+    }
+
+    isVertical = vert;
+}
+
+void TriggeredConfigurationGroup::VerifyLayout(void)
+{
+    if (configLayout)
+        return;
+
+    if (isVertical)
+    {
+        configLayout = new VerticalConfigurationGroup(
+            uselabel, useframe, zeroMargin, zeroSpace);
+    }
+    else
+    {
+        configLayout = new HorizontalConfigurationGroup(
+            uselabel, useframe, zeroMargin, zeroSpace);
+    }
+
+    ConfigurationGroup::addChild(configLayout);
+}
+
+QWidget *TriggeredConfigurationGroup::configWidget(
+    ConfigurationGroup *cg, QWidget *parent, const char *widgetName)
+{
+    VerifyLayout();
+
+    configLayout->addChild(configStack);
+
+    return configLayout->configWidget(cg, parent, widgetName);
 }
 
 void SelectSetting::addSelection(const QString& label, QString value, bool select) {
@@ -912,8 +1009,14 @@ MythDialog* ConfigurationDialog::dialogWidget(MythMainWindow *parent,
 
     gContext->GetScreenSettings(wmult, hmult);
 
-    QVBoxLayout* layout = new QVBoxLayout(dialog, (int)(20 * hmult));
-    layout->addWidget(configWidget(NULL, dialog));
+    QVBoxLayout *layout = new QVBoxLayout(dialog, (int)(20 * hmult));
+
+    ChildList::iterator it = cfgChildren.begin();
+    for (; it != cfgChildren.end(); ++it)
+    {
+        if ((*it)->isVisible())
+            layout->addWidget((*it)->configWidget(cfgGrp, dialog));
+    }
 
     return dialog;
 }
@@ -921,46 +1024,57 @@ MythDialog* ConfigurationDialog::dialogWidget(MythMainWindow *parent,
 int ConfigurationDialog::exec(bool saveOnAccept, bool doLoad) 
 {
     if (doLoad)
-        load();
+        cfgGrp->load();
 
-    MythDialog* dialog = dialogWidget(gContext->GetMainWindow());
+    MythDialog *dialog = dialogWidget(
+        gContext->GetMainWindow(), "Configuration Dialog");
+
     dialog->Show();
 
-    int ret;
+    int ret = dialog->exec();
 
-    if ((ret = dialog->exec()) == QDialog::Accepted && saveOnAccept)
-        save();
+    if ((QDialog::Accepted == ret) && saveOnAccept)
+        cfgGrp->save();
 
-    delete dialog;
+    dialog->deleteLater();
+    dialog = NULL;
 
     return ret;
 }
 
-MythDialog* ConfigurationWizard::dialogWidget(MythMainWindow *parent,
-                                              const char *widgetName) {
-    MythWizard* wizard = new MythWizard(parent, widgetName);
+void ConfigurationDialog::addChild(Configurable *child)
+{
+    cfgChildren.push_back(child);
+    cfgGrp->addChild(child);
+}
+
+MythDialog *ConfigurationWizard::dialogWidget(MythMainWindow *parent,
+                                              const char     *widgetName)
+{
+    MythWizard *wizard = new MythWizard(parent, widgetName);
     dialog = wizard;
 
-    connect(this, SIGNAL(changeHelpText(QString)), wizard,
-            SLOT(setHelpText(QString)));
+    QObject::connect(cfgGrp, SIGNAL(changeHelpText(QString)),
+                     wizard, SLOT(  setHelpText(   QString)));
 
-    unsigned i;
-    for(i = 0 ; i < children.size() ; ++i)
-        if (children[i]->isVisible()) {
-            QWidget* child = children[i]->configWidget(this, parent);
+    QWidget *child = NULL;
+    ChildList::iterator it = cfgChildren.begin();
+    for (; it != cfgChildren.end(); ++it)
+    {
+        if (!(*it)->isVisible())
+            continue;
 
-            wizard->addPage(child, children[i]->getLabel());
-            if (i == children.size()-1)
-                // Last page always has finish enabled.  Stuff should
-                // have sane defaults.
-                wizard->setFinishEnabled(child, true);
-        }
+        child = (*it)->configWidget(cfgGrp, parent);
+        wizard->addPage(child, (*it)->getLabel());
+    }
+
+    if (child)
+        wizard->setFinishEnabled(child, true);
         
     return wizard;
 }
 
 JumpPane::JumpPane(const QStringList &labels, const QStringList &helptext) :
-    ConfigurationGroup(true, false, true, true),
     VerticalConfigurationGroup(true, false, true, true)
 {
     //setLabel(tr("Jump To Buttons"));
@@ -982,23 +1096,23 @@ MythDialog *JumpConfigurationWizard::dialogWidget(MythMainWindow *parent,
     MythJumpWizard *wizard = new MythJumpWizard(parent, widgetName);
     dialog = wizard;
 
-    connect(this,   SIGNAL(changeHelpText(QString)),
-            wizard, SLOT(  setHelpText(   QString)));
+    QObject::connect(cfgGrp, SIGNAL(changeHelpText(QString)),
+                     wizard, SLOT(  setHelpText(   QString)));
 
     childWidgets.clear();
     QStringList labels, helptext;
-    for (uint i = 0; i < children.size(); i++)
+    for (uint i = 0; i < cfgChildren.size(); i++)
     {
-        if (children[i]->isVisible())
+        if (cfgChildren[i]->isVisible())
         {
-            childWidgets.push_back(children[i]->configWidget(this, parent));
-            labels.push_back(children[i]->getLabel());
-            helptext.push_back(children[i]->getHelpText());
+            childWidgets.push_back(cfgChildren[i]->configWidget(cfgGrp, parent));
+            labels.push_back(cfgChildren[i]->getLabel());
+            helptext.push_back(cfgChildren[i]->getHelpText());
         }
     }
 
     JumpPane *jumppane = new JumpPane(labels, helptext);
-    QWidget  *widget   = jumppane->configWidget(this, parent);
+    QWidget  *widget   = jumppane->configWidget(cfgGrp, parent, "JumpCfgWiz");
     wizard->addPage(widget, "");
     wizard->setFinishEnabled(widget, true);
     connect(jumppane, SIGNAL(pressed( QString)),
@@ -1039,15 +1153,15 @@ void SimpleDBStorage::load()
         if (result != QString::null) 
         {
           result = QString::fromUtf8(query.value(0).toString());
-          setValue(result);
-          setUnchanged();
+          setting->setValue(result);
+          setting->setUnchanged();
         }
     }
 }
 
 void SimpleDBStorage::save(QString table) 
 {
-    if (!isChanged())
+    if (!setting->isChanged())
         return;
 
     MSqlBindings bindings;
@@ -1094,7 +1208,8 @@ void SimpleDBStorage::save()
     save(table);
 }
 
-void AutoIncrementStorage::save(QString table) {
+void AutoIncrementDBSetting::save(QString table)
+{
     if (intValue() == 0) 
     {
         // Generate a new, unique ID
@@ -1113,7 +1228,7 @@ void AutoIncrementStorage::save(QString table) {
     }
 }
 
-void AutoIncrementStorage::save() 
+void AutoIncrementDBSetting::save() 
 {
     save(table);
 }
@@ -1124,6 +1239,14 @@ void ListBoxSetting::setEnabled(bool b)
     if (widget)
         widget->setEnabled(b);
 }
+
+void ListBoxSetting::addSelection(
+    const QString &label, QString value, bool select)
+{
+    SelectSetting::addSelection(label, value, select);
+    if (widget)
+        widget->insertItem(label);
+};
 
 QWidget* ListBoxSetting::configWidget(ConfigurationGroup *cg, QWidget* parent, 
                                       const char* widgetName) {
@@ -1293,7 +1416,8 @@ QWidget* ImageSelectSetting::configWidget(ConfigurationGroup *cg,
     return box;
 }
 
-HostnameSetting::HostnameSetting(void)  {
+HostnameSetting::HostnameSetting(Storage *storage) : Setting(storage)
+{
     setVisible(false);
     
     setValue(gContext->GetHostName());
@@ -1398,7 +1522,7 @@ MythDialog* ConfigurationPopupDialog::dialogWidget(MythMainWindow* parent,
         dialog->addWidget(box);
     }
 
-    QWidget* widget = configWidget(NULL, dialog);
+    QWidget *widget = configWidget(NULL, dialog, "ConfigurationPopup");
     dialog->addWidget(widget);
     widget->setFocus();
 
@@ -1407,30 +1531,43 @@ MythDialog* ConfigurationPopupDialog::dialogWidget(MythMainWindow* parent,
 
 int ConfigurationPopupDialog::exec(bool saveOnAccept)
 {
-    load();
+    storage->load();
 
-    dialog = (ConfigPopupDialogWidget*)dialogWidget(gContext->GetMainWindow());
+    dialog = (ConfigPopupDialogWidget*)
+        dialogWidget(gContext->GetMainWindow(), "ConfigurationPopupDialog");
     dialog->ShowPopup(this);
 
-    int ret;
+    int ret = dialog->exec();
 
-    if ((ret = dialog->exec()) == QDialog::Accepted && saveOnAccept)
-        save();
+    if ((QDialog::Accepted == ret) && saveOnAccept)
+        storage->save();
 
     return ret;
 }
 
-QString SimpleDBStorage::setClause(MSqlBindings& bindings)
+HostDBStorage::HostDBStorage(Setting *_setting, QString name) :
+    SimpleDBStorage(_setting, "settings", "data")
+{
+    _setting->setName(name);
+}
+
+GlobalDBStorage::GlobalDBStorage(Setting *_setting, QString name) :
+    SimpleDBStorage(_setting, "settings", "data")
+{
+    _setting->setName(name);
+}
+
+QString SimpleDBStorage::setClause(MSqlBindings &bindings)
 {
     QString tagname(":SET" + column.upper());
     QString clause(column + " = " + tagname);
 
-    bindings.insert(tagname, getValue().utf8());
+    bindings.insert(tagname, setting->getValue().utf8());
 
     return clause;
 }
 
-QString HostSetting::whereClause(MSqlBindings& bindings)
+QString HostDBStorage::whereClause(MSqlBindings &bindings)
 {
     /* Returns a where clause of the form:
      * "value = :VALUE AND hostname = :HOSTNAME"
@@ -1441,13 +1578,13 @@ QString HostSetting::whereClause(MSqlBindings& bindings)
 
     QString clause("value = " + valueTag + " AND hostname = " + hostnameTag);
 
-    bindings.insert(valueTag, getName());
+    bindings.insert(valueTag, setting->getName());
     bindings.insert(hostnameTag, gContext->GetHostName());
 
     return clause;
 }
 
-QString HostSetting::setClause(MSqlBindings& bindings)
+QString HostDBStorage::setClause(MSqlBindings &bindings)
 {
     QString valueTag(":SETVALUE");
     QString dataTag(":SETDATA");
@@ -1455,32 +1592,32 @@ QString HostSetting::setClause(MSqlBindings& bindings)
     QString clause("value = " + valueTag + ", data = " + dataTag
             + ", hostname = " + hostnameTag);
 
-    bindings.insert(valueTag, getName());
-    bindings.insert(dataTag, getValue().utf8());
+    bindings.insert(valueTag, setting->getName());
+    bindings.insert(dataTag, setting->getValue().utf8());
     bindings.insert(hostnameTag, gContext->GetHostName());
 
     return clause;
 }
 
-QString GlobalSetting::whereClause(MSqlBindings& bindings)
+QString GlobalDBStorage::whereClause(MSqlBindings &bindings)
 {
     QString valueTag(":WHEREVALUE");
     QString clause("value = " + valueTag);
 
-    bindings.insert(valueTag, getName());
+    bindings.insert(valueTag, setting->getName());
 
     return clause;
 }
 
-QString GlobalSetting::setClause(MSqlBindings& bindings)
+QString GlobalDBStorage::setClause(MSqlBindings &bindings)
 {
     QString valueTag(":SETVALUE");
     QString dataTag(":SETDATA");
 
     QString clause("value = " + valueTag + ", data = " + dataTag);
 
-    bindings.insert(valueTag, getName());
-    bindings.insert(dataTag, getValue().utf8());
+    bindings.insert(valueTag, setting->getName());
+    bindings.insert(dataTag, setting->getValue().utf8());
 
     return clause;
 }

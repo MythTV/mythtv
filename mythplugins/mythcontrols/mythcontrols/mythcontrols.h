@@ -50,7 +50,7 @@ typedef QPtrList<Binding> BindingList;
 /** \class MythControls
  *  \brief The myth controls configuration class.
  */
-class MythControls : virtual public MythThemedDialog
+class MythControls : public MythThemedDialog
 {
     Q_OBJECT
 

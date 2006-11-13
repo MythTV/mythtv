@@ -7,8 +7,8 @@
 
 class SourceSetting;
 class ChannelListSetting;
-class MPUBLIC ChannelEditor: public VerticalConfigurationGroup,
-                     public ConfigurationDialog {
+class MPUBLIC ChannelEditor : public QObject, public ConfigurationDialog
+{
     Q_OBJECT
 public:
     ChannelEditor();
@@ -35,7 +35,8 @@ private:
 
 class ChannelID;
 
-class ChannelWizard: public ConfigurationWizard {
+class ChannelWizard : public QObject, public ConfigurationWizard
+{
     Q_OBJECT
 public:
     ChannelWizard(int id, int default_sourceid);
@@ -47,19 +48,20 @@ private:
     ChannelID *cid;
 };
 
-class ChannelListSetting: public ListBoxSetting {
+class ChannelListSetting : public ListBoxSetting, public Storage
+{
     Q_OBJECT
 public:
-    ChannelListSetting(): ListBoxSetting() {
+    ChannelListSetting() : ListBoxSetting(this)
+    {
         currentSourceID = "";
         currentSortMode = QObject::tr("Channel Name");
         currentHideMode = false;
     };
 
-    void save() {};
-    void load() {
-        fillSelections();
-    };
+    void load(void) { fillSelections(); }
+    void save(void) { }
+    void save(QString /*destination*/) { }
 
     QString getSourceID() { return currentSourceID; };
     QString getSortMode() { return currentSortMode; };

@@ -19,7 +19,7 @@ void RomInfo::edit_rominfo()
 
     QString rom_ver = Version();
 
-    RomEditDLG romeditdlg(Romname().latin1());
+    GameEditDialog romeditdlg(Romname().latin1());
     romeditdlg.exec();
 
     if (rom_ver != "CUSTOM") 

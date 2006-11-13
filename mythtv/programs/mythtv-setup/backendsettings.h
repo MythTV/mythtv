@@ -3,8 +3,9 @@
 
 #include "libmyth/settings.h"
 
-class BackendSettings: virtual public ConfigurationWizard {
-public:
+class BackendSettings : public ConfigurationWizard
+{
+  public:
     BackendSettings();
 };
 

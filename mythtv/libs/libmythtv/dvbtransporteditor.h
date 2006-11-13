@@ -55,9 +55,9 @@ class DvbTHierarchy;
  *  Objects added for new DVB Transport Editing section
  */
 
-class DVBTID: virtual public IntegerSetting, public AutoIncrementStorage {
+class DVBTID: public AutoIncrementDBSetting {
 public:
-    DVBTID() : AutoIncrementStorage("dtv_multiplex", "mplexid"),
+    DVBTID() : AutoIncrementDBSetting("dtv_multiplex", "mplexid"),
           field("mplexid"),table("dtv_multiplex")
     {
         setVisible(false);
@@ -72,16 +72,16 @@ protected:
     QString field,table;
 };
 
-class DVBTransportList: public ListBoxSetting {
+class DVBTransportList : public ListBoxSetting, public Storage
+{
     Q_OBJECT
-public:
-    DVBTransportList() {}
+  public:
+    DVBTransportList() : ListBoxSetting(this) {}
 
-    void save() { };
-    void load() 
-    {
-        fillSelections();
-    };
+    void load() { fillSelections(); }
+    void save(void) { }
+    void save(QString /*destination*/) { }
+
 public slots:
     void fillSelections(void);
     void sourceID(const QString& str) { strSourceID=str; fillSelections();}
@@ -92,17 +92,13 @@ private:
 
 class DVBTSourceSetting;
 //Page for selecting a transport to be created/edited
-class DVBTransportsEditor: public VerticalConfigurationGroup ,
-                               public ConfigurationDialog
+class DVBTransportsEditor : public QObject, public ConfigurationDialog
 {
     Q_OBJECT
 public:
     DVBTransportsEditor();
 
-    void load()
-    {
-         VerticalConfigurationGroup::load();
-    };
+    void load(void) { cfgGrp->load(); }
 
     virtual int exec();
 
@@ -121,7 +117,7 @@ private:
     int m_nID;
 };
 
-class DVBTransportWizard: public ConfigurationWizard
+class DVBTransportWizard : public QObject, public ConfigurationWizard
 {
     Q_OBJECT
 public:

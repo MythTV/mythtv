@@ -119,16 +119,17 @@ void DVBTransportList::fillSelections(void)
     }
 }
 
-class DVBTSourceSetting : public ComboBoxSetting
+class DVBTSourceSetting : public ComboBoxSetting, public Storage
 {
   public:
-    DVBTSourceSetting(): ComboBoxSetting()
+    DVBTSourceSetting() : ComboBoxSetting(this)
     {
         setLabel(QObject::tr("Video Source"));
     };
 
-    void save(void) {;}
     void load(void);
+    void save(void) { }
+    void save(QString /*destination*/) { }
 };
 
 void DVBTSourceSetting::load(void)
@@ -160,12 +161,12 @@ void DVBTSourceSetting::load(void)
     }
 }
 
-DVBTransportsEditor::DVBTransportsEditor() :
-    ConfigurationGroup(false, true, false, false),
-    VerticalConfigurationGroup(false, true, false, false)
+DVBTransportsEditor::DVBTransportsEditor()
 {
+/* TODO FIXME
     setLabel(tr("DVB Transport Editor"));
     setUseLabel(true);
+*/
     addChild(m_list = new DVBTransportList());
     addChild(m_videoSource = new DVBTSourceSetting());
 
@@ -282,21 +283,23 @@ void DVBTransportsEditor::menu(int /*iSelected*/) {
     }
 }
 
-class DvbTransSetting: public SimpleDBStorage {
-protected:
-    DvbTransSetting(const DVBTID& id, QString name):
-      SimpleDBStorage("dtv_multiplex", name), id(id)
+class MuxDBStorage : public SimpleDBStorage
+{
+  protected:
+    MuxDBStorage(Setting *_setting, const DVBTID &_id, QString _name) :
+        SimpleDBStorage(_setting, "dtv_multiplex", _name), id(_id)
     {
-        setName(name);
-    };
+        _setting->setName(_name);
+    }
 
-    virtual QString setClause(MSqlBindings& bindings);
-    virtual QString whereClause(MSqlBindings& bindings);
+    virtual QString setClause(MSqlBindings &bindings);
+    virtual QString whereClause(MSqlBindings &bindings);
 
-    const DVBTID& id;
+    const DVBTID &id;
 };
 
-QString DvbTransSetting::whereClause(MSqlBindings& bindings) {
+QString MuxDBStorage::whereClause(MSqlBindings &bindings)
+{
     QString fieldTag(":WHERE" + id.getField().upper());
     QString query(id.getField() + " = " + fieldTag);
     
@@ -305,34 +308,38 @@ QString DvbTransSetting::whereClause(MSqlBindings& bindings) {
     return query;
 }
 
-QString DvbTransSetting::setClause(MSqlBindings& bindings) {
+QString MuxDBStorage::setClause(MSqlBindings &bindings)
+{
     QString fieldTag = (":SET" + id.getField().upper());
-    QString nameTag = (":SET" + getName().upper());
+    QString nameTag = (":SET" + setting->getName().upper());
 
     QString query(id.getField() + " = " + fieldTag + ", " +
-                  getName() + " = " + nameTag);
+                  setting->getName() + " = " + nameTag);
 
     bindings.insert(fieldTag, id.getValue());
-    bindings.insert(nameTag, getValue());
+    bindings.insert(nameTag, setting->getValue());
 
     return query;
 }
 
 
-class DvbTVideoSourceID: public IntegerSetting, public DvbTransSetting {
-public:
-    DvbTVideoSourceID(const DVBTID& id,unsigned _nVideoSource) :
-        DvbTransSetting(id, "sourceid")
+class DvbTVideoSourceID : public IntegerSetting, public MuxDBStorage
+{
+  public:
+    DvbTVideoSourceID(const DVBTID &id, uint _sourceid) :
+        IntegerSetting(this),
+        MuxDBStorage(this, id, "sourceid")
     {
         setVisible(false);
-        setValue(_nVideoSource);
+        setValue(_sourceid);
     }
 };
 
-class DTVTStandard: public ComboBoxSetting, public DvbTransSetting {
-public:
-    DTVTStandard(const DVBTID& id): ComboBoxSetting(),
-                 DvbTransSetting(id, "sistandard")
+class DTVTStandard : public ComboBoxSetting, public MuxDBStorage
+{
+  public:
+    DTVTStandard(const DVBTID &id) :
+        ComboBoxSetting(this), MuxDBStorage(this, id, "sistandard")
     {
         setLabel(QObject::tr("Standard"));
         setHelpText(QObject::tr("Digital TV standard.\n"));
@@ -341,29 +348,35 @@ public:
     };
 };
 
-class DvbTFrequency: public LineEditSetting, public DvbTransSetting {
-public:
-    DvbTFrequency(const DVBTID& id):
-        LineEditSetting(), DvbTransSetting(id, "frequency") {
+class DvbTFrequency : public LineEditSetting, public MuxDBStorage
+{
+  public:
+    DvbTFrequency(const DVBTID &id) :
+        LineEditSetting(this), MuxDBStorage(this, id, "frequency")
+    {
         setLabel(QObject::tr("Frequency"));
         setHelpText(QObject::tr("Frequency (Option has no default)\n"
                     "The frequency for this channel in Hz."));
     };
 };
 
-class DvbTSymbolrate: public LineEditSetting, public DvbTransSetting {
-public:
-    DvbTSymbolrate(const DVBTID& id):
-        LineEditSetting(), DvbTransSetting(id, "symbolrate") {
+class DvbTSymbolrate : public LineEditSetting, public MuxDBStorage
+{
+  public:
+    DvbTSymbolrate(const DVBTID &id) :
+        LineEditSetting(this), MuxDBStorage(this, id, "symbolrate")
+    {
         setLabel(QObject::tr("Symbol Rate"));
         setHelpText(QObject::tr("Symbol Rate (Option has no default)"));
     };
 };
 
-class DvbTPolarity: public ComboBoxSetting, public DvbTransSetting {
-public:
-    DvbTPolarity(const DVBTID& id):
-        ComboBoxSetting(), DvbTransSetting(id, "polarity") {
+class DvbTPolarity : public ComboBoxSetting, public MuxDBStorage
+{
+  public:
+    DvbTPolarity(const DVBTID &id) :
+        ComboBoxSetting(this), MuxDBStorage(this, id, "polarity")
+    {
         setLabel(QObject::tr("Polarity"));
         setHelpText(QObject::tr("Polarity (Option has no default)"));
         addSelection(QObject::tr("Horizontal"), "h");
@@ -373,11 +386,11 @@ public:
     };
 };
 
-class ATSCModulation: public ComboBoxSetting, public DvbTransSetting
+class ATSCModulation : public ComboBoxSetting, public MuxDBStorage
 {
   public:
     ATSCModulation(const DVBTID& id) :
-        ComboBoxSetting(), DvbTransSetting(id, "modulation")
+        ComboBoxSetting(this), MuxDBStorage(this, id, "modulation")
     {
         setLabel(QObject::tr("Modulation"));
         setHelpText(QObject::tr("Modulation Used"));
@@ -389,10 +402,12 @@ class ATSCModulation: public ComboBoxSetting, public DvbTransSetting
 
 
 
-class DvbTInversion: public ComboBoxSetting, public DvbTransSetting {
-public:
-    DvbTInversion(const DVBTID& id):
-        ComboBoxSetting(), DvbTransSetting(id, "inversion") {
+class DvbTInversion : public ComboBoxSetting, public MuxDBStorage
+{
+  public:
+    DvbTInversion(const DVBTID &id) :
+        ComboBoxSetting(this), MuxDBStorage(this, id, "inversion")
+    {
         setLabel(QObject::tr("Inversion"));
         setHelpText(QObject::tr("Inversion (Default: Auto):\n"
                     "Most cards can autodetect this now, so leave it at Auto"
@@ -403,10 +418,12 @@ public:
     };
 };
 
-class DvbTBandwidth: public ComboBoxSetting, public DvbTransSetting {
-public:
-    DvbTBandwidth(const DVBTID& id):
-        ComboBoxSetting(), DvbTransSetting(id, "bandwidth") {
+class DvbTBandwidth : public ComboBoxSetting, public MuxDBStorage
+{
+  public:
+    DvbTBandwidth(const DVBTID &id) :
+        ComboBoxSetting(this), MuxDBStorage(this, id, "bandwidth")
+    {
         setLabel(QObject::tr("Bandwidth"));
         setHelpText(QObject::tr("Bandwidth (Default: Auto)"));
         addSelection(QObject::tr("Auto"),"a");
@@ -416,10 +433,10 @@ public:
     };
 };
 
-class DvbTModulationSetting: public ComboBoxSetting
+class DvbTModulationSetting : public ComboBoxSetting
 {
   public:
-    DvbTModulationSetting()
+    DvbTModulationSetting(Storage *_storage) : ComboBoxSetting(_storage)
     {
         addSelection(QObject::tr("Auto"),"auto");
         addSelection("QPSK",    "qpsk");
@@ -431,27 +448,33 @@ class DvbTModulationSetting: public ComboBoxSetting
     };
 };
 
-class DvbTModulation: public DvbTModulationSetting, public DvbTransSetting {
-public:
-    DvbTModulation(const DVBTID& id):
-        DvbTModulationSetting(), DvbTransSetting(id, "modulation") {
+class DvbTModulation : public DvbTModulationSetting, public MuxDBStorage
+{
+  public:
+    DvbTModulation(const DVBTID &id) :
+        DvbTModulationSetting(this), MuxDBStorage(this, id, "modulation")
+    {
         setLabel(QObject::tr("Modulation"));
         setHelpText(QObject::tr("Modulation (Default: Auto)"));
     };
 };
 
-class DvbTConstellation: public DvbTModulationSetting, public DvbTransSetting {
-public:
-    DvbTConstellation(const DVBTID& id):
-        DvbTModulationSetting(), DvbTransSetting(id, "constellation") {
+class DvbTConstellation : public DvbTModulationSetting, public MuxDBStorage
+{
+  public:
+    DvbTConstellation(const DVBTID &id) :
+        DvbTModulationSetting(this), MuxDBStorage(this, id, "constellation")
+    {
         setLabel(QObject::tr("Constellation"));
         setHelpText(QObject::tr("Constellation (Default: Auto)"));
     };
 };
 
-class DvbTFecSetting: public ComboBoxSetting {
-public:
-    DvbTFecSetting(): ComboBoxSetting() {
+class DvbTFecSetting : public ComboBoxSetting
+{
+  public:
+    DvbTFecSetting(Storage *_storage): ComboBoxSetting(_storage)
+    {
         addSelection(QObject::tr("Auto"),"auto");
         addSelection(QObject::tr("None"),"none");
         addSelection("1/2");
@@ -465,37 +488,45 @@ public:
     };
 };
 
-class DvbTFec: public DvbTFecSetting, public DvbTransSetting {
-public:
-    DvbTFec(const DVBTID& id):
-        DvbTFecSetting(), DvbTransSetting(id, "fec") {
+class DvbTFec : public DvbTFecSetting, public MuxDBStorage
+{
+  public:
+    DvbTFec(const DVBTID &id) :
+        DvbTFecSetting(this), MuxDBStorage(this, id, "fec")
+    {
         setLabel(QObject::tr("FEC"));
         setHelpText(QObject::tr("Forward Error Correction (Default: Auto)"));
     };
 };
 
-class DvbTCoderateLP: public DvbTFecSetting, public DvbTransSetting {
-public:
-    DvbTCoderateLP(const DVBTID& id):
-        DvbTFecSetting(), DvbTransSetting(id, "lp_code_rate") {
+class DvbTCoderateLP : public DvbTFecSetting, public MuxDBStorage
+{
+  public:
+    DvbTCoderateLP(const DVBTID &id) :
+        DvbTFecSetting(this), MuxDBStorage(this, id, "lp_code_rate")
+    {
         setLabel(QObject::tr("LP Coderate"));
         setHelpText(QObject::tr("Low Priority Code Rate (Default: Auto)"));
     };
 };
 
-class DvbTCoderateHP: public DvbTFecSetting, public DvbTransSetting {
-public:
-    DvbTCoderateHP(const DVBTID& id):
-        DvbTFecSetting(), DvbTransSetting(id, "hp_code_rate") {
+class DvbTCoderateHP : public DvbTFecSetting, public MuxDBStorage
+{
+  public:
+    DvbTCoderateHP(const DVBTID &id) :
+        DvbTFecSetting(this), MuxDBStorage(this, id, "hp_code_rate")
+    {
         setLabel(QObject::tr("HP Coderate"));
         setHelpText(QObject::tr("High Priority Code Rate (Default: Auto)"));
     };
 };
 
-class DvbTGuardInterval: public ComboBoxSetting, public DvbTransSetting {
-public:
-    DvbTGuardInterval(const DVBTID& id):
-        ComboBoxSetting(), DvbTransSetting(id, "guard_interval") {
+class DvbTGuardInterval : public ComboBoxSetting, public MuxDBStorage
+{
+  public:
+    DvbTGuardInterval(const DVBTID &id) :
+        ComboBoxSetting(this), MuxDBStorage(this, id, "guard_interval")
+    {
         setLabel(QObject::tr("Guard Interval"));
         setHelpText(QObject::tr("Guard Interval (Default: Auto)"));
         addSelection(QObject::tr("Auto"),"auto");
@@ -506,10 +537,12 @@ public:
     };
 };
 
-class DvbTTransmissionMode: public ComboBoxSetting, public DvbTransSetting {
-public:
-    DvbTTransmissionMode(const DVBTID& id):
-        ComboBoxSetting(), DvbTransSetting(id, "transmission_mode") {
+class DvbTTransmissionMode : public ComboBoxSetting, public MuxDBStorage
+{
+  public:
+    DvbTTransmissionMode(const DVBTID &id) :
+        ComboBoxSetting(this), MuxDBStorage(this, id, "transmission_mode")
+    {
         setLabel(QObject::tr("Trans. Mode"));
         setHelpText(QObject::tr("Transmission Mode (Default: Auto)"));
         addSelection(QObject::tr("Auto"),"a");
@@ -518,10 +551,12 @@ public:
     };
 };
 
-class DvbTHierarchy: public ComboBoxSetting, public DvbTransSetting {
-public:
-    DvbTHierarchy(const DVBTID& id):
-        ComboBoxSetting(), DvbTransSetting(id, "hierarchy") {
+class DvbTHierarchy : public ComboBoxSetting, public MuxDBStorage
+{
+  public:
+    DvbTHierarchy(const DVBTID &id) :
+        ComboBoxSetting(this), MuxDBStorage(this, id, "hierarchy")
+    {
         setLabel(QObject::tr("Hierarchy"));
         setHelpText(QObject::tr("Hierarchy (Default: Auto)"));
         addSelection(QObject::tr("Auto"),"a");
@@ -535,7 +570,9 @@ public:
 DVBTransportWizard::DVBTransportWizard(int id, unsigned _nVideoSourceID) :
               ConfigurationWizard()
 {
+/* TODO FIXME
     setLabel(QObject::tr("DVB Transport"));
+*/
 
     // Must be first.
     dvbtid = new DVBTID();
@@ -570,7 +607,6 @@ DVBTransportWizard::DVBTransportWizard(int id, unsigned _nVideoSourceID) :
 }
 
 DVBTransportPage::DVBTransportPage(const DVBTID &_id, unsigned nType) :
-    ConfigurationGroup(false, true, false, false),
     HorizontalConfigurationGroup(false, true, false, false), id(_id)
 {
     setLabel(QObject::tr("Transport Options"));
@@ -632,5 +668,5 @@ DVBTransportPage::DVBTransportPage(const DVBTID &_id, unsigned nType) :
     if (use_right)
         addChild(right);
     else
-        delete right;
+        right->deleteLater();
 };

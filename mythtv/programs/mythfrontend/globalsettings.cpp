@@ -189,15 +189,17 @@ static HostComboBox *DeinterlaceFilter()
     return gc;
 }
 
-class DeinterlaceSettings: public HorizontalConfigurationGroup,
-                           public TriggeredConfigurationGroup {
-public:
-    DeinterlaceSettings():
-        ConfigurationGroup(false, false, false, false),
-        HorizontalConfigurationGroup(false, false, false, false),
-        TriggeredConfigurationGroup(false) {
+class DeinterlaceSettings : public TriggeredConfigurationGroup
+{
+  public:
+    DeinterlaceSettings() :
+        TriggeredConfigurationGroup(false, false, true, true,
+                                    false, false, true, true)
+    {
         setLabel(QObject::tr("Deinterlace settings"));
-        setUseLabel(false);
+
+        SetVertical(false);
+
         Setting *deinterlace = Deinterlace();
         addChild(deinterlace);
         setTrigger(deinterlace);
@@ -1698,13 +1700,12 @@ static HostComboBox *TVVidModeForceAspect(int idx=-1)
     return gc;
 }
 
-class VideoModeSettings: public VerticalConfigurationGroup,
-                         public TriggeredConfigurationGroup {
+class VideoModeSettings : public TriggeredConfigurationGroup
+{
   public:
-    VideoModeSettings():
-        ConfigurationGroup(false, true, false, false),
-        VerticalConfigurationGroup(false, true, false, false),
-        TriggeredConfigurationGroup(false) {
+    VideoModeSettings() :
+        TriggeredConfigurationGroup(false, true, false, false)
+    {
         setLabel(QObject::tr("Video Mode Settings"));
         setUseLabel(false);
 
@@ -2400,13 +2401,12 @@ static HostSpinBox *EPGRecThreshold()
     return gs;
 }
 
-class AudioSettings: public VerticalConfigurationGroup,
-                     public TriggeredConfigurationGroup {
-public:
-     AudioSettings():
-         ConfigurationGroup(false, true, false, false),
-         VerticalConfigurationGroup(false, true, false, false),
-         TriggeredConfigurationGroup(false) {
+class AudioSettings : public TriggeredConfigurationGroup
+{
+  public:
+     AudioSettings() :
+         TriggeredConfigurationGroup(false, true, false, false)
+     {
          setLabel(QObject::tr("Audio"));
          setUseLabel(false);
 
@@ -2439,9 +2439,9 @@ public:
 
          // Mixer settings
          ConfigurationGroup *settings =
-             new VerticalConfigurationGroup(false, false, false, false);
+             new VerticalConfigurationGroup(false, false, true, true);
          HorizontalConfigurationGroup *mixgrp =
-             new HorizontalConfigurationGroup(false, false, false, false);
+             new HorizontalConfigurationGroup(false, false, true, true);
          mixgrp->addChild(MixerDevice());
          mixgrp->addChild(MixerControl());
          settings->addChild(mixgrp);
@@ -2671,13 +2671,12 @@ static HostSpinBox *PlaybackWLBlackOut()
     return gs;
 }
 
-class WatchListSettings: public VerticalConfigurationGroup,
-                         public TriggeredConfigurationGroup {
-public:
-     WatchListSettings():
-         ConfigurationGroup(false, false, true, true),
-         VerticalConfigurationGroup(false, true, false, false),
-         TriggeredConfigurationGroup(false) {
+class WatchListSettings : public TriggeredConfigurationGroup
+{
+  public:
+     WatchListSettings() :
+         TriggeredConfigurationGroup(false, false, true, true)
+     {
 
          Setting* watchList = PlaybackWatchList();
          addChild(watchList);
@@ -2749,13 +2748,11 @@ static HostCheckBox *UseOpenGLVSync()
 }
 #endif
 
-class HwDecSettings: public  VerticalConfigurationGroup,
-                     public TriggeredConfigurationGroup {
-public:
-     HwDecSettings():
-         ConfigurationGroup(false, true, false, false),
-         VerticalConfigurationGroup(false, true, false, false),
-         TriggeredConfigurationGroup(false) {
+class HwDecSettings : public TriggeredConfigurationGroup
+{
+   public:
+     HwDecSettings() : TriggeredConfigurationGroup(false, true, false, false)
+     {
          setLabel(QObject::tr("Hardware Decoding Settings"));
          setUseLabel(false);
 
@@ -2947,13 +2944,11 @@ static GlobalLineEdit *MythFillDatabaseLog()
     return be;
 }
 
-class MythLogSettings: public VerticalConfigurationGroup,
-                       public TriggeredConfigurationGroup {
-public:
-    MythLogSettings():
-         ConfigurationGroup(false, true, false, false),
-         VerticalConfigurationGroup(false, true, false, false),
-         TriggeredConfigurationGroup(false) {
+class MythLogSettings : public TriggeredConfigurationGroup
+{
+  public:
+    MythLogSettings() : TriggeredConfigurationGroup(false, true, false, false)
+    {
          setLabel(QObject::tr("Myth Database Logging"));
 //         setUseLabel(false);
 
@@ -2975,13 +2970,12 @@ public:
      };
 };
 
-class MythFillSettings: public VerticalConfigurationGroup,
-                        public TriggeredConfigurationGroup {
-public:
-     MythFillSettings():
-         ConfigurationGroup(false, true, false, false),
-         VerticalConfigurationGroup(false, true, false, false),
-         TriggeredConfigurationGroup(false) {
+class MythFillSettings : public TriggeredConfigurationGroup
+{
+  public:
+     MythFillSettings() :
+         TriggeredConfigurationGroup(false, true, false, false)
+     {
          setLabel(QObject::tr("Mythfilldatabase"));
          setUseLabel(false);
 
@@ -3141,13 +3135,11 @@ static HostCheckBox *LCDEnable()
     return gc;
 }
 
-class LcdSettings: public  VerticalConfigurationGroup,
-                   public TriggeredConfigurationGroup {
-public:
-     LcdSettings():
-         ConfigurationGroup(false, true, false, false),
-         VerticalConfigurationGroup(false, true, false, false),
-         TriggeredConfigurationGroup(false) {
+class LcdSettings : public TriggeredConfigurationGroup
+{
+  public:
+    LcdSettings() : TriggeredConfigurationGroup(false, true, false, false)
+    {
          setLabel(QObject::tr("LCD device display"));
          setUseLabel(false);
 
@@ -3255,13 +3247,11 @@ static HostSpinBox *MacMainOpacity()
     return gs;
 }
 
-class MacMainSettings: public HorizontalConfigurationGroup,
-                       public TriggeredConfigurationGroup {
-public:
-    MacMainSettings():
-        ConfigurationGroup(false, false, false, false),
-        HorizontalConfigurationGroup(false, false, false, false),
-        TriggeredConfigurationGroup(false) {
+class MacMainSettings : public TriggeredConfigurationGroup
+{
+  public:
+    MacMainSettings() : TriggeredConfigurationGroup(false)
+    {
         setLabel(QObject::tr("Video in main window"));
         setUseLabel(false);
         Setting *gc = MacMainEnabled();
@@ -3312,13 +3302,11 @@ static HostSpinBox *MacFloatOpacity()
     return gs;
 }
 
-class MacFloatSettings: public HorizontalConfigurationGroup,
-                        public TriggeredConfigurationGroup {
-public:
-    MacFloatSettings():
-        ConfigurationGroup(false, false, false, false),
-        HorizontalConfigurationGroup(false, false, false, false),
-        TriggeredConfigurationGroup(false) {
+class MacFloatSettings : public TriggeredConfigurationGroup
+{
+  public:
+    MacFloatSettings() : TriggeredConfigurationGroup(false)
+    {
         setLabel(QObject::tr("Video in floating window"));
         setUseLabel(false);
         Setting *gc = MacFloatEnabled();
@@ -3358,13 +3346,11 @@ static HostSpinBox *MacDockSkip()
     return gs;
 }
 
-class MacDockSettings: public HorizontalConfigurationGroup,
-                       public TriggeredConfigurationGroup {
-public:
-    MacDockSettings():
-        ConfigurationGroup(false, false, false, false),
-        HorizontalConfigurationGroup(false, false, false, false),
-        TriggeredConfigurationGroup(false) {
+class MacDockSettings : public TriggeredConfigurationGroup
+{
+  public:
+    MacDockSettings() : TriggeredConfigurationGroup(false)
+    {
         setLabel(QObject::tr("Video in the dock"));
         setUseLabel(false);
         Setting *gc = MacDockEnabled();
@@ -3400,13 +3386,11 @@ static HostSpinBox *MacDesktopSkip()
     return gs;
 }
 
-class MacDesktopSettings: public HorizontalConfigurationGroup,
-                          public TriggeredConfigurationGroup {
-public:
-    MacDesktopSettings():
-        ConfigurationGroup(false, false, false, false),
-        HorizontalConfigurationGroup(false, false, false, false),
-        TriggeredConfigurationGroup(false) {
+class MacDesktopSettings : public TriggeredConfigurationGroup
+{
+  public:
+    MacDesktopSettings() : TriggeredConfigurationGroup(false)
+    {
         setLabel(QObject::tr("Video on the desktop"));
         setUseLabel(false);
         Setting *gc = MacDesktopEnabled();

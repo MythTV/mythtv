@@ -39,16 +39,13 @@ protected:
 
 
 
-class LocalHostNameSettings: public VerticalConfigurationGroup,
-                             public TriggeredConfigurationGroup {
-public:
-    LocalHostNameSettings(Setting *checkbox, ConfigurationGroup *group):
-        ConfigurationGroup(false, true, false, false),
-        VerticalConfigurationGroup(false, true, false, false)
+class LocalHostNameSettings : public TriggeredConfigurationGroup
+{
+  public:
+    LocalHostNameSettings(Setting *checkbox, ConfigurationGroup *group) :
+        TriggeredConfigurationGroup(false, false, false, false)
     {
         setLabel(QObject::tr("Use custom identifier for frontend preferences"));
-        setUseLabel(false);
-        setUseFrame(false);
         addChild(checkbox);
         setTrigger(checkbox);
 
@@ -57,16 +54,14 @@ public:
     }
 };
 
-class WOLsqlSettings: public VerticalConfigurationGroup,
-                      public TriggeredConfigurationGroup {
-public:
-    WOLsqlSettings(Setting *checkbox, ConfigurationGroup *group):
-        ConfigurationGroup(false, true, false, false),
-        VerticalConfigurationGroup(false, true, false, false),
-        TriggeredConfigurationGroup(false) {
+class WOLsqlSettings : public TriggeredConfigurationGroup
+{
+  public:
+    WOLsqlSettings(Setting *checkbox, ConfigurationGroup *group) :
+        TriggeredConfigurationGroup(false, false, false, false)
+    {
         setLabel(QObject::tr("Wake-On-LAN settings"));
-        setUseLabel(false);
-        setUseFrame(false);
+
         addChild(checkbox);
         setTrigger(checkbox);
         
@@ -76,11 +71,9 @@ public:
 };
 
 MythDbSettings1::MythDbSettings1() :
-    ConfigurationGroup(false, true, false, false),
     VerticalConfigurationGroup(false, true, false, false)
 {
     setLabel(QObject::tr("Database Configuration") + " 1/2");
-    setUseLabel(false);
     
     info = new TransLabelSetting();
 
@@ -139,11 +132,9 @@ MythDbSettings1::MythDbSettings1() :
 }
 
 MythDbSettings2::MythDbSettings2(void) :
-    ConfigurationGroup(false, true, false, false),
     VerticalConfigurationGroup(false, true, false, false)
 {
     setLabel(QObject::tr("Database Configuration") + " 2/2");
-    setUseLabel(false);
     
     localEnabled = new TransCheckBoxSetting();
     localEnabled->setLabel(QObject::tr("Use custom identifier for frontend "

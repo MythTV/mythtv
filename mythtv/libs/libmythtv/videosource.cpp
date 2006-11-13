@@ -42,13 +42,13 @@
 #include "videodev_myth.h"
 #endif
 
-class RecorderOptions: public ConfigurationWizard
+class RecorderOptions : public ConfigurationWizard
 {
   public:
     RecorderOptions(CaptureCard& parent);
 };
 
-QString VSSetting::whereClause(MSqlBindings& bindings)
+QString VideoSourceDBStorage::whereClause(MSqlBindings& bindings)
 {
     QString sourceidTag(":WHERESOURCEID");
     
@@ -59,7 +59,7 @@ QString VSSetting::whereClause(MSqlBindings& bindings)
     return query;
 }
 
-QString VSSetting::setClause(MSqlBindings& bindings)
+QString VideoSourceDBStorage::setClause(MSqlBindings& bindings)
 {
     QString sourceidTag(":SETSOURCEID");
     QString colTag(":SET" + getColumn().upper());
@@ -68,12 +68,12 @@ QString VSSetting::setClause(MSqlBindings& bindings)
             getColumn() + " = " + colTag);
 
     bindings.insert(sourceidTag, parent.getSourceID());
-    bindings.insert(colTag, getValue());
+    bindings.insert(colTag, setting->getValue());
 
     return query;
 }
 
-QString CCSetting::whereClause(MSqlBindings& bindings)
+QString CaptureCardDBStorage::whereClause(MSqlBindings& bindings)
 {
     QString cardidTag(":WHERECARDID");
     
@@ -84,7 +84,7 @@ QString CCSetting::whereClause(MSqlBindings& bindings)
     return query;
 }
 
-QString CCSetting::setClause(MSqlBindings& bindings)
+QString CaptureCardDBStorage::setClause(MSqlBindings& bindings)
 {
     QString cardidTag(":SETCARDID");
     QString colTag(":SET" + getColumn().upper());
@@ -93,23 +93,23 @@ QString CCSetting::setClause(MSqlBindings& bindings)
             getColumn() + " = " + colTag);
 
     bindings.insert(cardidTag, parent.getCardID());
-    bindings.insert(colTag, getValue());
+    bindings.insert(colTag, setting->getValue());
 
     return query;
 }
 
-class XMLTVGrabber: public ComboBoxSetting, public VSSetting
+class XMLTVGrabber : public ComboBoxSetting, public VideoSourceDBStorage
 {
   public:
-    XMLTVGrabber(const VideoSource& parent)
-      : VSSetting(parent, "xmltvgrabber")
+    XMLTVGrabber(const VideoSource &parent) :
+        ComboBoxSetting(this), VideoSourceDBStorage(this, parent, "xmltvgrabber")
     {
         setLabel(QObject::tr("Listings grabber"));
     };
 };
 
-FreqTableSelector::FreqTableSelector(const VideoSource& parent) 
-  : VSSetting(parent, "freqtable")
+FreqTableSelector::FreqTableSelector(const VideoSource &parent) :
+    ComboBoxSetting(this), VideoSourceDBStorage(this, parent, "freqtable")
 {
     setLabel(QObject::tr("Channel frequency table"));
     addSelection("default");
@@ -122,10 +122,11 @@ FreqTableSelector::FreqTableSelector(const VideoSource& parent)
                 "defined in the General settings."));
 }
 
-class UseEIT : public CheckBoxSetting, public VSSetting
+class UseEIT : public CheckBoxSetting, public VideoSourceDBStorage
 {
   public:
-    UseEIT(const VideoSource& parent) : VSSetting(parent, "useeit")
+    UseEIT(const VideoSource &parent) :
+        CheckBoxSetting(this), VideoSourceDBStorage(this, parent, "useeit")
     {
         setLabel(QObject::tr("Perform EIT Scan"));
         setHelpText(QObject::tr(
@@ -135,22 +136,24 @@ class UseEIT : public CheckBoxSetting, public VSSetting
     }
 };
 
-class DataDirectUserID: public LineEditSetting, public VSSetting
+class DataDirectUserID : public LineEditSetting, public VideoSourceDBStorage
 {
   public:
-    DataDirectUserID(const VideoSource& parent)
-      : VSSetting(parent, "userid")
+    DataDirectUserID(const VideoSource &parent) :
+        LineEditSetting(this), VideoSourceDBStorage(this, parent, "userid")
     {
         setLabel(QObject::tr("User ID"));
-    };
+    }
 };
 
-class DataDirectPassword: public LineEditSetting, public VSSetting {
+class DataDirectPassword : public LineEditSetting, public VideoSourceDBStorage
+{
   public:
-    DataDirectPassword(const VideoSource& parent):
-        VSSetting(parent, "password") {
+    DataDirectPassword(const VideoSource &parent) :
+        LineEditSetting(this), VideoSourceDBStorage(this, parent, "password")
+    {
         setLabel(QObject::tr("Password"));
-    };
+    }
 };
 
 void DataDirectLineupSelector::fillSelections(const QString &uid,
@@ -212,7 +215,6 @@ void DataDirect_config::load()
 }
 
 DataDirect_config::DataDirect_config(const VideoSource& _parent, int _source) :
-    ConfigurationGroup(false, false, false, false),
     VerticalConfigurationGroup(false, false, false, false),
     parent(_parent) 
 {
@@ -241,7 +243,6 @@ void DataDirect_config::fillDataDirectLineupSelector(void)
 
 XMLTV_generic_config::XMLTV_generic_config(const VideoSource& _parent, 
                                            QString _grabber) :
-    ConfigurationGroup(false, false, false, false),
     VerticalConfigurationGroup(false, false, false, false),
     parent(_parent), grabber(_grabber) 
 {
@@ -309,7 +310,6 @@ void XMLTV_generic_config::save()
 }
 
 EITOnly_config::EITOnly_config(const VideoSource& _parent) :
-    ConfigurationGroup(false, false, true, true),
     VerticalConfigurationGroup(false, false, true, true)
 {
     useeit = new UseEIT(_parent);
@@ -339,7 +339,6 @@ void EITOnly_config::save()
 }
 
 NoGrabber_config::NoGrabber_config(const VideoSource& _parent) :
-    ConfigurationGroup(false, false, false, false),
     VerticalConfigurationGroup(false, false, false, false)
 {
     useeit = new UseEIT(_parent);
@@ -354,9 +353,8 @@ void NoGrabber_config::save()
     useeit->save();
 }
 
-XMLTVConfig::XMLTVConfig(const VideoSource& parent) :
-    ConfigurationGroup(false, true, false, false),
-    VerticalConfigurationGroup(false, true, false, false)
+XMLTVConfig::XMLTVConfig(const VideoSource &parent) :
+    TriggeredConfigurationGroup(false, true, false, false)
 {
     XMLTVGrabber* grabber = new XMLTVGrabber(parent);
     addChild(grabber);
@@ -457,15 +455,16 @@ void VideoSource::loadByID(int sourceid)
     load();
 }
 
-class VideoDevice: public PathSetting, public CCSetting
+class VideoDevice : public PathSetting, public CaptureCardDBStorage
 {
   public:
     VideoDevice(const CaptureCard &parent,
                 uint    minor_min = 0,
                 uint    minor_max = UINT_MAX,
                 QString card      = QString::null,
-                QString driver    = QString::null)
-      : PathSetting(true), CCSetting(parent, "videodevice")
+                QString driver    = QString::null) :
+        PathSetting(this, true),
+        CaptureCardDBStorage(this, parent, "videodevice")
     {
         setLabel(QObject::tr("Video device"));
 
@@ -556,11 +555,12 @@ class VideoDevice: public PathSetting, public CCSetting
     QMap<uint, uint> minor_list;
 };
 
-class VBIDevice: public PathSetting, public CCSetting
+class VBIDevice : public PathSetting, public CaptureCardDBStorage
 {
   public:
-    VBIDevice(const CaptureCard& parent)
-      : PathSetting(true), CCSetting(parent, "vbidevice")
+    VBIDevice(const CaptureCard &parent) :
+        PathSetting(this, true),
+        CaptureCardDBStorage(this, parent, "vbidevice")
     {
         setLabel(QObject::tr("VBI device"));
         setFilter(QString::null, QString::null);
@@ -611,11 +611,12 @@ class VBIDevice: public PathSetting, public CCSetting
     }
 };
 
-class AudioDevice: public PathSetting, public CCSetting
+class AudioDevice : public PathSetting, public CaptureCardDBStorage
 {
   public:
-    AudioDevice(const CaptureCard& parent)
-      : PathSetting(true), CCSetting(parent, "audiodevice")
+    AudioDevice(const CaptureCard &parent) :
+        PathSetting(this, true),
+        CaptureCardDBStorage(this, parent, "audiodevice")
     {
         setLabel(QObject::tr("Audio device"));
         QDir dev("/dev", "dsp*", QDir::Name, QDir::System);
@@ -626,12 +627,12 @@ class AudioDevice: public PathSetting, public CCSetting
     };
 };
 
-class SignalTimeout: public SpinBoxSetting, public CCSetting
+class SignalTimeout : public SpinBoxSetting, public CaptureCardDBStorage
 {
   public:
-    SignalTimeout(const CaptureCard& parent, int start_val)
-      : SpinBoxSetting(start_val,60000,250),
-        CCSetting(parent, "signal_timeout")
+    SignalTimeout(const CaptureCard &parent, int start_val) :
+        SpinBoxSetting(this, start_val, 60000, 250),
+        CaptureCardDBStorage(this, parent, "signal_timeout")
     {
         setLabel(QObject::tr("Signal Timeout (msec)"));
         setHelpText(QObject::tr(
@@ -640,12 +641,12 @@ class SignalTimeout: public SpinBoxSetting, public CCSetting
     };
 };
 
-class ChannelTimeout: public SpinBoxSetting, public CCSetting
+class ChannelTimeout : public SpinBoxSetting, public CaptureCardDBStorage
 {
   public:
-    ChannelTimeout(const CaptureCard& parent, int start_val)
-      : SpinBoxSetting(start_val,65000,250),
-        CCSetting(parent, "channel_timeout")
+    ChannelTimeout(const CaptureCard &parent, int start_val) :
+        SpinBoxSetting(this, start_val, 65000, 250),
+        CaptureCardDBStorage(this, parent, "channel_timeout")
     {
         setLabel(QObject::tr("Tuning Timeout (msec)"));
         setHelpText(QObject::tr(
@@ -655,11 +656,12 @@ class ChannelTimeout: public SpinBoxSetting, public CCSetting
     };
 };
 
-class AudioRateLimit: public ComboBoxSetting, public CCSetting
+class AudioRateLimit : public ComboBoxSetting, public CaptureCardDBStorage
 {
   public:
-    AudioRateLimit(const CaptureCard& parent)
-      : CCSetting(parent, "audioratelimit")
+    AudioRateLimit(const CaptureCard &parent) :
+        ComboBoxSetting(this),
+        CaptureCardDBStorage(this, parent, "audioratelimit")
     {
         setLabel(QObject::tr("Audio sampling rate limit"));
         addSelection(QObject::tr("(None)"), "0");
@@ -669,11 +671,12 @@ class AudioRateLimit: public ComboBoxSetting, public CCSetting
     };
 };
 
-class SkipBtAudio: public CheckBoxSetting, public CCSetting
+class SkipBtAudio : public CheckBoxSetting, public CaptureCardDBStorage
 {
   public:
-    SkipBtAudio(const CaptureCard& parent)
-      : CCSetting(parent, "skipbtaudio")
+    SkipBtAudio(const CaptureCard &parent) :
+        CheckBoxSetting(this),
+        CaptureCardDBStorage(this, parent, "skipbtaudio")
     {
         setLabel(QObject::tr("Do not adjust volume"));
         setHelpText(
@@ -683,11 +686,12 @@ class SkipBtAudio: public CheckBoxSetting, public CCSetting
    };
 };
 
-class DVBInput: public ComboBoxSetting, public CCSetting
+class DVBInput : public ComboBoxSetting, public CaptureCardDBStorage
 {
   public:
-    DVBInput(const CaptureCard& parent)
-      : CCSetting(parent, "defaultinput")
+    DVBInput(const CaptureCard &parent) :
+        ComboBoxSetting(this),
+        CaptureCardDBStorage(this, parent, "defaultinput")
     {
         setLabel(QObject::tr("Default Input"));
         fillSelections(false);
@@ -700,11 +704,12 @@ class DVBInput: public ComboBoxSetting, public CCSetting
     }
 };
 
-class DVBCardNum: public SpinBoxSetting, public CCSetting
+class DVBCardNum : public SpinBoxSetting, public CaptureCardDBStorage
 {
   public:
-    DVBCardNum(const CaptureCard& parent)
-      : SpinBoxSetting(0,7,1), CCSetting(parent, "videodevice")
+    DVBCardNum(const CaptureCard &parent) :
+        SpinBoxSetting(this, 0, 7, 1),
+        CaptureCardDBStorage(this, parent, "videodevice")
     {
         setLabel(QObject::tr("DVB Card Number"));
         setHelpText(
@@ -715,7 +720,7 @@ class DVBCardNum: public SpinBoxSetting, public CCSetting
     };
 };
 
-class DVBCardType: public LabelSetting, public TransientStorage
+class DVBCardType : public TransLabelSetting
 {
   public:
     DVBCardType()
@@ -724,7 +729,7 @@ class DVBCardType: public LabelSetting, public TransientStorage
     };
 };
 
-class DVBCardName: public LabelSetting, public TransientStorage
+class DVBCardName : public TransLabelSetting
 {
   public:
     DVBCardName()
@@ -733,11 +738,12 @@ class DVBCardName: public LabelSetting, public TransientStorage
     };
 };
 
-class DVBNoSeqStart: public CheckBoxSetting, public CCSetting
+class DVBNoSeqStart : public CheckBoxSetting, public CaptureCardDBStorage
 {
   public:
-    DVBNoSeqStart(const CaptureCard& parent)
-      : CCSetting(parent, "dvb_wait_for_seqstart")
+    DVBNoSeqStart(const CaptureCard &parent) :
+        CheckBoxSetting(this),
+        CaptureCardDBStorage(this, parent, "dvb_wait_for_seqstart")
     {
         setLabel(QObject::tr("Wait for SEQ start header."));
         setValue(true);
@@ -747,11 +753,12 @@ class DVBNoSeqStart: public CheckBoxSetting, public CCSetting
     };
 };
 
-class DVBOnDemand: public CheckBoxSetting, public CCSetting
+class DVBOnDemand : public CheckBoxSetting, public CaptureCardDBStorage
 {
   public:
-    DVBOnDemand(const CaptureCard& parent)
-      : CCSetting(parent, "dvb_on_demand")
+    DVBOnDemand(const CaptureCard &parent) :
+        CheckBoxSetting(this),
+        CaptureCardDBStorage(this, parent, "dvb_on_demand")
     {
         setLabel(QObject::tr("Open DVB card on demand"));
         setValue(true);
@@ -762,11 +769,12 @@ class DVBOnDemand: public CheckBoxSetting, public CCSetting
     };
 };
 
-class DVBTuningDelay: public SpinBoxSetting, public CCSetting
+class DVBTuningDelay : public SpinBoxSetting, public CaptureCardDBStorage
 {
   public:
-    DVBTuningDelay(const CaptureCard& parent)
-      : SpinBoxSetting(0,2000,25), CCSetting(parent, "dvb_tuning_delay")
+    DVBTuningDelay(const CaptureCard &parent) :
+        SpinBoxSetting(this, 0, 2000, 25),
+        CaptureCardDBStorage(this, parent, "dvb_tuning_delay")
     {
         setLabel(QObject::tr("DVB Tuning Delay (msec)"));
         setHelpText(
@@ -776,11 +784,12 @@ class DVBTuningDelay: public SpinBoxSetting, public CCSetting
     };
 };
 
-class FirewireModel: public ComboBoxSetting, public CCSetting
+class FirewireModel : public ComboBoxSetting, public CaptureCardDBStorage
 {
   public:
-    FirewireModel(const CaptureCard& parent)
-      : CCSetting(parent, "firewire_model")
+    FirewireModel(const CaptureCard &parent) :
+        ComboBoxSetting(this),
+        CaptureCardDBStorage(this, parent, "firewire_model")
     {
         setLabel(QObject::tr("Cable box model"));
         addSelection(QObject::tr("Other"));
@@ -795,22 +804,25 @@ class FirewireModel: public ComboBoxSetting, public CCSetting
     }
 };
 
-class FirewireConnection: public ComboBoxSetting, public CCSetting
-{
-      public:
-       FirewireConnection(const CaptureCard& parent):
-       CCSetting(parent, "firewire_connection") {
-            setLabel(QObject::tr("Connection Type"));
-            addSelection(QObject::tr("Point to Point"),"0");
-            addSelection(QObject::tr("Broadcast"),"1");
-        }
-};
-
-class FirewirePort: public SpinBoxSetting, public CCSetting
+class FirewireConnection : public ComboBoxSetting, public CaptureCardDBStorage
 {
   public:
-    FirewirePort(const CaptureCard& parent)
-      : SpinBoxSetting(0,63,1), CCSetting(parent, "firewire_port")
+    FirewireConnection(const CaptureCard &parent) :
+        ComboBoxSetting(this),
+        CaptureCardDBStorage(this, parent, "firewire_connection")
+    {
+        setLabel(QObject::tr("Connection Type"));
+        addSelection(QObject::tr("Point to Point"),"0");
+        addSelection(QObject::tr("Broadcast"),"1");
+    }
+};
+
+class FirewirePort : public SpinBoxSetting, public CaptureCardDBStorage
+{
+  public:
+    FirewirePort(const CaptureCard &parent) :
+        SpinBoxSetting(this, 0, 63, 1),
+        CaptureCardDBStorage(this, parent, "firewire_port")
     {
         setValue(0);
         setLabel(QObject::tr("IEEE-1394 Port"));
@@ -818,11 +830,12 @@ class FirewirePort: public SpinBoxSetting, public CCSetting
     }
 };
 
-class FirewireNode: public SpinBoxSetting, public CCSetting
+class FirewireNode : public SpinBoxSetting, public CaptureCardDBStorage
 {
   public:
-    FirewireNode(const CaptureCard& parent)
-      : SpinBoxSetting(0,63,1), CCSetting(parent, "firewire_node")
+    FirewireNode(const CaptureCard &parent) :
+        SpinBoxSetting(this, 0, 63, 1),
+        CaptureCardDBStorage(this, parent, "firewire_node")
     {
         setValue(2);
         setLabel(QObject::tr("Node"));
@@ -830,11 +843,12 @@ class FirewireNode: public SpinBoxSetting, public CCSetting
     }
 };
 
-class FirewireSpeed: public ComboBoxSetting, public CCSetting
+class FirewireSpeed : public ComboBoxSetting, public CaptureCardDBStorage
 {
   public:
-    FirewireSpeed(const CaptureCard& parent)
-      : CCSetting(parent, "firewire_speed")
+    FirewireSpeed(const CaptureCard &parent) :
+        ComboBoxSetting(this),
+        CaptureCardDBStorage(this, parent, "firewire_speed")
     {
         setLabel(QObject::tr("Speed"));
         addSelection(QObject::tr("100Mbps"),"0");
@@ -843,11 +857,12 @@ class FirewireSpeed: public ComboBoxSetting, public CCSetting
     }
 };
 
-class FirewireInput: public ComboBoxSetting, public CCSetting
+class FirewireInput : public ComboBoxSetting, public CaptureCardDBStorage
 {
   public:
-    FirewireInput(const CaptureCard& parent)
-      : CCSetting(parent, "defaultinput")
+    FirewireInput(const CaptureCard &parent) :
+        ComboBoxSetting(this),
+        CaptureCardDBStorage(this, parent, "defaultinput")
     {
         setLabel(QObject::tr("Default Input"));
         addSelection("MPEG2TS");
@@ -855,11 +870,10 @@ class FirewireInput: public ComboBoxSetting, public CCSetting
     }
 };
 
-class FirewireConfigurationGroup: public VerticalConfigurationGroup
+class FirewireConfigurationGroup : public VerticalConfigurationGroup
 {
   public:
     FirewireConfigurationGroup(CaptureCard& a_parent) :
-        ConfigurationGroup(false, true, false, false),
         VerticalConfigurationGroup(false, true, false, false),
         parent(a_parent)
     {
@@ -877,43 +891,54 @@ class FirewireConfigurationGroup: public VerticalConfigurationGroup
         addChild(new FirewireInput(parent));
     };
   private:
-    CaptureCard& parent;
+    CaptureCard &parent;
 };
 
-class DBOX2Port: public LineEditSetting, public CCSetting {
-    public:
-      DBOX2Port(const CaptureCard& parent):
-      CCSetting(parent, "dbox2_port") {
-            setValue("31338");
-            setLabel(QObject::tr("DBOX2 Streaming Port"));
-            setHelpText(QObject::tr("DBOX2 streaming port on your DBOX2."));
-        }
-};
-
-class DBOX2HttpPort: public LineEditSetting, public CCSetting {
-  public:
-      DBOX2HttpPort(const CaptureCard& parent):
-      CCSetting(parent, "dbox2_httpport") {
-            setValue("80");
-            setLabel(QObject::tr("DBOX2 HTTP Port"));
-            setHelpText(QObject::tr("DBOX2 http port on your DBOX2."));
-        }
-};
-class DBOX2Host: public LineEditSetting, public CCSetting {
-   public:
-       DBOX2Host(const CaptureCard& parent):
-       CCSetting(parent, "dbox2_host") {
-           setValue("dbox");
-           setLabel(QObject::tr("DBOX2 Host IP"));
-           setHelpText(QObject::tr("DBOX2 Host IP is the remote device."));
-       }
-};
-
-class DBOX2Input: public ComboBoxSetting, public CCSetting
+class DBOX2Port : public LineEditSetting, public CaptureCardDBStorage
 {
   public:
-    DBOX2Input(const CaptureCard& parent)
-      : CCSetting(parent, "defaultinput")
+    DBOX2Port(const CaptureCard &parent) :
+        LineEditSetting(this),
+        CaptureCardDBStorage(this, parent, "dbox2_port")
+    {
+        setValue("31338");
+        setLabel(QObject::tr("DBOX2 Streaming Port"));
+        setHelpText(QObject::tr("DBOX2 streaming port on your DBOX2."));
+    }
+};
+
+class DBOX2HttpPort : public LineEditSetting, public CaptureCardDBStorage
+{
+  public:
+    DBOX2HttpPort(const CaptureCard &parent) :
+        LineEditSetting(this),
+        CaptureCardDBStorage(this, parent, "dbox2_httpport")
+    {
+        setValue("80");
+        setLabel(QObject::tr("DBOX2 HTTP Port"));
+        setHelpText(QObject::tr("DBOX2 http port on your DBOX2."));
+    }
+};
+
+class DBOX2Host : public LineEditSetting, public CaptureCardDBStorage
+{
+  public:
+    DBOX2Host(const CaptureCard &parent) :
+        LineEditSetting(this),
+        CaptureCardDBStorage(this, parent, "dbox2_host")
+    {
+        setValue("dbox");
+        setLabel(QObject::tr("DBOX2 Host IP"));
+        setHelpText(QObject::tr("DBOX2 Host IP is the remote device."));
+    }
+};
+
+class DBOX2Input : public ComboBoxSetting, public CaptureCardDBStorage
+{
+  public:
+    DBOX2Input(const CaptureCard &parent) :
+        ComboBoxSetting(this),
+        CaptureCardDBStorage(this, parent, "defaultinput")
     {
         setLabel(QObject::tr("Default Input"));
         addSelection("MPEG2TS");
@@ -921,11 +946,10 @@ class DBOX2Input: public ComboBoxSetting, public CCSetting
     }
 };
 
-class DBOX2ConfigurationGroup: public VerticalConfigurationGroup
+class DBOX2ConfigurationGroup : public VerticalConfigurationGroup
 {
   public:
     DBOX2ConfigurationGroup(CaptureCard& a_parent):
-        ConfigurationGroup(false, true, false, false),
         VerticalConfigurationGroup(false, true, false, false),
         parent(a_parent)
     {
@@ -938,11 +962,12 @@ class DBOX2ConfigurationGroup: public VerticalConfigurationGroup
     CaptureCard &parent;
  };
 
-class HDHomeRunDeviceID: public LineEditSetting, public CCSetting
+class HDHomeRunDeviceID : public LineEditSetting, public CaptureCardDBStorage
 {
   public:
-    HDHomeRunDeviceID(const CaptureCard& parent):
-        CCSetting(parent, "videodevice")
+    HDHomeRunDeviceID(const CaptureCard &parent) :
+        LineEditSetting(this),
+        CaptureCardDBStorage(this, parent, "videodevice")
     {
         setValue("FFFFFFFF");
         setLabel(QObject::tr("Device ID"));
@@ -953,11 +978,12 @@ class HDHomeRunDeviceID: public LineEditSetting, public CCSetting
     }
 };
 
-class IPTVHost : public LineEditSetting, public CCSetting
+class IPTVHost : public LineEditSetting, public CaptureCardDBStorage
 {
   public:
-    IPTVHost(const CaptureCard &parent):
-        CCSetting(parent, "videodevice")
+    IPTVHost(const CaptureCard &parent) :
+        LineEditSetting(this),
+        CaptureCardDBStorage(this, parent, "videodevice")
     {
         setValue("http://mafreebox.freebox.fr/freeboxtv/playlist.m3u");
         setLabel(QObject::tr("M3U URL"));
@@ -965,11 +991,12 @@ class IPTVHost : public LineEditSetting, public CCSetting
     }
 };
 
-class HDHomeRunTunerIndex: public ComboBoxSetting, public CCSetting
+class HDHomeRunTunerIndex : public ComboBoxSetting, public CaptureCardDBStorage
 {
   public:
-    HDHomeRunTunerIndex(const CaptureCard& parent):
-        CCSetting(parent, "dbox2_port")
+    HDHomeRunTunerIndex(const CaptureCard &parent) :
+        ComboBoxSetting(this),
+        CaptureCardDBStorage(this, parent, "dbox2_port")
     {
         setLabel(QObject::tr("Tuner"));
         addSelection("0");
@@ -981,7 +1008,6 @@ class IPTVConfigurationGroup : public VerticalConfigurationGroup
 {
   public:
     IPTVConfigurationGroup(CaptureCard& a_parent):
-       ConfigurationGroup(false, true, false, false),
        VerticalConfigurationGroup(false, true, false, false),
        parent(a_parent)
     {
@@ -1004,7 +1030,7 @@ void HDHRCardInput::fillSelections(const QString&)
     addSelection("MPEG2TS");
 }
 
-class HDHomeRunConfigurationGroup: public VerticalConfigurationGroup
+class HDHomeRunConfigurationGroup : public VerticalConfigurationGroup
 {
   public:
     HDHomeRunConfigurationGroup(CaptureCard& a_parent):
@@ -1020,14 +1046,16 @@ class HDHomeRunConfigurationGroup: public VerticalConfigurationGroup
     };
 
   private:
-    CaptureCard& parent;
+    CaptureCard &parent;
 };
 
-class CRCIpNetworkRecorderDeviceID: public LineEditSetting, public CCSetting
+class CRCIpNetworkRecorderDeviceID :
+    public LineEditSetting, public CaptureCardDBStorage
 {
   public:
-    CRCIpNetworkRecorderDeviceID(const CaptureCard& parent):
-        CCSetting(parent, "videodevice")
+    CRCIpNetworkRecorderDeviceID(const CaptureCard &parent) :
+        LineEditSetting(this),
+        CaptureCardDBStorage(this, parent, "videodevice")
     {
         setValue("udp://?localport=1234");
         setLabel(QObject::tr("URL"));
@@ -1042,7 +1070,7 @@ void CRCIpNetworkRecorderInput::fillSelections(const QString&)
     addSelection("MPEG2TS");
 }
 
-class CRCIpNetworkRecorderConfigurationGroup: public VerticalConfigurationGroup
+class CRCIpNetworkRecorderConfigurationGroup : public VerticalConfigurationGroup
 {
   public:
     CRCIpNetworkRecorderConfigurationGroup(CaptureCard& a_parent):
@@ -1059,11 +1087,10 @@ class CRCIpNetworkRecorderConfigurationGroup: public VerticalConfigurationGroup
     };
 
   private:
-    CaptureCard& parent;
+    CaptureCard &parent;
 };
 
 V4LConfigurationGroup::V4LConfigurationGroup(CaptureCard& a_parent) :
-    ConfigurationGroup(false, true, false, false),
     VerticalConfigurationGroup(false, true, false, false),
     parent(a_parent),
     cardinfo(new TransLabelSetting()),  vbidev(new VBIDevice(parent)),
@@ -1111,7 +1138,6 @@ void V4LConfigurationGroup::probeCard(const QString &device)
 
 
 MPEGConfigurationGroup::MPEGConfigurationGroup(CaptureCard &a_parent) :
-    ConfigurationGroup(false, true, false, false),
     VerticalConfigurationGroup(false, true, false, false),
     parent(a_parent), cardinfo(new TransLabelSetting()),
     input(new TunerCardInput(parent))
@@ -1150,7 +1176,6 @@ void MPEGConfigurationGroup::probeCard(const QString &device)
 }
 
 pcHDTVConfigurationGroup::pcHDTVConfigurationGroup(CaptureCard& a_parent) :
-    ConfigurationGroup(false, true, false, false),
     VerticalConfigurationGroup(false, true, false, false),
     parent(a_parent), cardinfo(new TransLabelSetting()),
     input(new TunerCardInput(parent))
@@ -1189,9 +1214,8 @@ void pcHDTVConfigurationGroup::probeCard(const QString &device)
     input->fillSelections(device);
 }
 
-CaptureCardGroup::CaptureCardGroup(CaptureCard& parent) :
-    ConfigurationGroup(true, true, false, false),
-    VerticalConfigurationGroup(true, true, false, false)
+CaptureCardGroup::CaptureCardGroup(CaptureCard &parent) :
+    TriggeredConfigurationGroup(true, true, false, false)
 {
     setLabel(QObject::tr("Capture Card Setup"));
 
@@ -1200,7 +1224,6 @@ CaptureCardGroup::CaptureCardGroup(CaptureCard& parent) :
 
     setTrigger(cardtype);
     setSaveAll(false);
-    
     
 #ifdef USING_V4L
     addTarget("V4L",       new V4LConfigurationGroup(parent));
@@ -1295,8 +1318,9 @@ void CaptureCard::loadByID(int cardid)
     load();
 }
 
-CardType::CardType(const CaptureCard& parent)
-        : CCSetting(parent, "cardtype") 
+CardType::CardType(const CaptureCard &parent) :
+    ComboBoxSetting(this),
+    CaptureCardDBStorage(this, parent, "cardtype") 
 {
     setLabel(QObject::tr("Card type"));
     setHelpText(QObject::tr("Change the cardtype to the appropriate type for "
@@ -1353,16 +1377,18 @@ void CardType::fillSelections(SelectSetting* setting)
 #endif // USING_IPTV
 }
 
-class CardID: public SelectLabelSetting, public CISetting {
+class CardID : public SelectLabelSetting, public CardInputDBStorage
+{
   public:
-    CardID(const CardInput& parent):
-        CISetting(parent, "cardid") {
+    CardID(const CardInput &parent) :
+        SelectLabelSetting(this), CardInputDBStorage(this, parent, "cardid")
+    {
         setLabel(QObject::tr("Capture device"));
     };
 
     virtual void load() {
         fillSelections();
-        CISetting::load();
+        CardInputDBStorage::load();
     };
 
     void fillSelections() {
@@ -1370,21 +1396,23 @@ class CardID: public SelectLabelSetting, public CISetting {
     };
 };
 
-class ChildID: public CISetting
+class ChildID : public LabelSetting, public CardInputDBStorage
 {
   public:
-    ChildID(const CardInput &parent) : CISetting(parent, "childcardid")
+    ChildID(const CardInput &parent) :
+        LabelSetting(this), CardInputDBStorage(this, parent, "childcardid")
     {
         setValue("0");
         setVisible(false);
     }
 };
 
-class InputDisplayName: public LineEditSetting, public CISetting
+class InputDisplayName : public LineEditSetting, public CardInputDBStorage
 {
   public:
-    InputDisplayName(const CardInput& parent):
-        CISetting(parent, "displayname")
+    InputDisplayName(const CardInput &parent) :
+        LineEditSetting(this),
+        CardInputDBStorage(this, parent, "displayname")
     {
         setLabel(QObject::tr("Display Name (optional)"));
         setHelpText(QObject::tr(
@@ -1395,17 +1423,19 @@ class InputDisplayName: public LineEditSetting, public CISetting
     };
 };
 
-class SourceID: public ComboBoxSetting, public CISetting {
+class SourceID : public ComboBoxSetting, public CardInputDBStorage
+{
   public:
-    SourceID(const CardInput& parent):
-        CISetting(parent, "sourceid") {
+    SourceID(const CardInput &parent) :
+        ComboBoxSetting(this), CardInputDBStorage(this, parent, "sourceid")
+    {
         setLabel(QObject::tr("Video source"));
         addSelection(QObject::tr("(None)"), "0");
     };
 
     virtual void load() {
         fillSelections();
-        CISetting::load();
+        CardInputDBStorage::load();
     };
 
     void fillSelections() {
@@ -1415,19 +1445,22 @@ class SourceID: public ComboBoxSetting, public CISetting {
     };
 };
 
-class InputName: public LabelSetting, public CISetting {
+class InputName : public LabelSetting, public CardInputDBStorage
+{
   public:
-    InputName(const CardInput& parent):
-        CISetting(parent, "inputname") {
+    InputName(const CardInput &parent) :
+        LabelSetting(this), CardInputDBStorage(this, parent, "inputname")
+    {
         setLabel(QObject::tr("Input"));
     };
 };
 
-class FreeToAir: public CheckBoxSetting, public CISetting
+class FreeToAir : public CheckBoxSetting, public CardInputDBStorage
 {
   public:
-    FreeToAir(const CardInput& parent):
-        CISetting(parent, "freetoaironly")
+    FreeToAir(const CardInput &parent) :
+        CheckBoxSetting(this),
+        CardInputDBStorage(this, parent, "freetoaironly")
     {
         setValue(true);
         setLabel(QObject::tr("Unencrypted channels only"));
@@ -1438,11 +1471,12 @@ class FreeToAir: public CheckBoxSetting, public CISetting
     };
 };
 
-class RadioServices: public CheckBoxSetting, public CISetting
+class RadioServices : public CheckBoxSetting, public CardInputDBStorage
 {
   public:
-    RadioServices(const CardInput& parent):
-        CISetting(parent, "radioservices")
+    RadioServices(const CardInput &parent) :
+        CheckBoxSetting(this), 
+        CardInputDBStorage(this, parent, "radioservices")
     {
         setValue(true);
         setLabel(QObject::tr("Allow audio only channels"));
@@ -1452,10 +1486,14 @@ class RadioServices: public CheckBoxSetting, public CISetting
     };
 };
 
-class ExternalChannelCommand: public LineEditSetting, public CISetting {
+class ExternalChannelCommand :
+    public LineEditSetting, public CardInputDBStorage
+{
   public:
-    ExternalChannelCommand(const CardInput& parent):
-        CISetting(parent,"externalcommand") {
+    ExternalChannelCommand(const CardInput &parent) :
+        LineEditSetting(this),
+        CardInputDBStorage(this, parent, "externalcommand")
+    {
         setLabel(QObject::tr("External channel change command"));
         setValue("");
         setHelpText(QObject::tr("If specified, this command will be run to "
@@ -1465,10 +1503,13 @@ class ExternalChannelCommand: public LineEditSetting, public CISetting {
     };
 };
 
-class PresetTuner: public LineEditSetting, public CISetting {
+class PresetTuner : public LineEditSetting, public CardInputDBStorage
+{
   public:
-    PresetTuner(const CardInput& parent):
-        CISetting(parent, "tunechan") {
+    PresetTuner(const CardInput &parent) :
+        LineEditSetting(this),
+        CardInputDBStorage(this, parent, "tunechan")
+    {
         setLabel(QObject::tr("Preset tuner to channel"));
         setValue("");
         setHelpText(QObject::tr("Leave this blank unless you have an external "
@@ -1519,11 +1560,13 @@ void StartingChannel::SetSourceID(const QString &sourceid)
     }
 }
 
-class InputPriority: public SpinBoxSetting, public CISetting {
+class InputPriority : public SpinBoxSetting, public CardInputDBStorage
+{
   public:
-    InputPriority(const CardInput& parent):
-        SpinBoxSetting(-99,99,1),
-        CISetting(parent, "recpriority") {
+    InputPriority(const CardInput &parent) :
+        SpinBoxSetting(this, -99, 99, 1),
+        CardInputDBStorage(this, parent, "recpriority")
+    {
         setLabel(QObject::tr("Input priority"));
         setValue(0);
         setHelpText(QObject::tr("If the input priority is not equal for "
@@ -1533,11 +1576,12 @@ class InputPriority: public SpinBoxSetting, public CISetting {
     };
 };
 
-class DishNetEIT: public CheckBoxSetting, public CISetting
+class DishNetEIT : public CheckBoxSetting, public CardInputDBStorage
 {
   public:
-    DishNetEIT(const CardInput& parent)
-        : CISetting(parent, "dishnet_eit")
+    DishNetEIT(const CardInput &parent) :
+        CheckBoxSetting(this), 
+        CardInputDBStorage(this, parent, "dishnet_eit")
     {
         setLabel(QObject::tr("Use DishNet Long-term EIT Data"));
         setValue(false);
@@ -1720,7 +1764,7 @@ void CardInput::diseqcConfig(void)
 #endif // USING_DVB
 }
 
-QString CISetting::whereClause(MSqlBindings& bindings) 
+QString CardInputDBStorage::whereClause(MSqlBindings& bindings) 
 {
     QString cardinputidTag(":WHERECARDINPUTID");
     
@@ -1731,7 +1775,7 @@ QString CISetting::whereClause(MSqlBindings& bindings)
     return query;
 }
 
-QString CISetting::setClause(MSqlBindings& bindings) 
+QString CardInputDBStorage::setClause(MSqlBindings& bindings) 
 {
     QString cardinputidTag(":SETCARDINPUTID");
     QString colTag(":SET" + getColumn().upper());
@@ -1740,7 +1784,7 @@ QString CISetting::setClause(MSqlBindings& bindings)
             getColumn() + " = " + colTag);
 
     bindings.insert(cardinputidTag, parent.getInputID());
-    bindings.insert(colTag, getValue());
+    bindings.insert(colTag, setting->getValue());
 
     return query;
 }
@@ -1751,7 +1795,7 @@ void CardInput::loadByID(int inputid)
 #ifdef USING_DVB
     settings.Load(inputid);
 #endif
-    load();
+    cfgGrp->load();
 }
 
 void CardInput::loadByInput(int _cardid, QString _inputname) 
@@ -1769,7 +1813,7 @@ void CardInput::loadByInput(int _cardid, QString _inputname)
     } 
     else 
     {
-        load(); // new
+        cfgGrp->load(); // new
         cardid->setValue(QString::number(_cardid));
         inputname->setValue(_inputname);
     }
@@ -1788,24 +1832,30 @@ void CardInput::save()
     }
     else
     {
-        ConfigurationWizard::save();
+        cfgGrp->save();
 #ifdef USING_DVB
         settings.Store(getInputID());
 #endif
     }
 }
 
-int CISetting::getInputID(void) const 
+int CardInputDBStorage::getInputID(void) const 
 {
     return parent.getInputID();
 }
 
-int CCSetting::getCardID(void) const 
+int CaptureCardDBStorage::getCardID(void) const 
 {
     return parent.getCardID();
 }
 
-int CaptureCardEditor::exec() 
+CaptureCardEditor::CaptureCardEditor() : listbox(new ListBoxSetting(this))
+{
+    listbox->setLabel(tr("Capture cards"));
+    addChild(listbox);
+}
+
+int CaptureCardEditor::exec(void)
 {
     while (ConfigurationDialog::exec() == QDialog::Accepted)
         edit();
@@ -1813,14 +1863,14 @@ int CaptureCardEditor::exec()
     return QDialog::Rejected;
 }
 
-void CaptureCardEditor::load() 
+void CaptureCardEditor::load(void)
 {
-    clearSelections();
-    addSelection(QObject::tr("(New capture card)"), "0");
-    addSelection(QObject::tr("(Delete all capture cards on %1)")
-                 .arg(gContext->GetHostName()), "-1");
-    addSelection(QObject::tr("(Delete all capture cards)"), "-2");
-    CaptureCard::fillSelections(this, true);
+    listbox->clearSelections();
+    listbox->addSelection(QObject::tr("(New capture card)"), "0");
+    listbox->addSelection(QObject::tr("(Delete all capture cards on %1)")
+                          .arg(gContext->GetHostName()), "-1");
+    listbox->addSelection(QObject::tr("(Delete all capture cards)"), "-2");
+    CaptureCard::fillSelections(listbox, true);
 }
 
 MythDialog* CaptureCardEditor::dialogWidget(MythMainWindow* parent,
@@ -1835,7 +1885,7 @@ MythDialog* CaptureCardEditor::dialogWidget(MythMainWindow* parent,
 
 void CaptureCardEditor::menu(void)
 {
-    if (getValue().toInt() == 0) 
+    if (!listbox->getValue().toInt())
     {
         CaptureCard cc;
         cc.exec();
@@ -1859,7 +1909,7 @@ void CaptureCardEditor::menu(void)
 
 void CaptureCardEditor::edit(void)
 {
-    const int cardid = getValue().toInt();
+    const int cardid = listbox->getValue().toInt();
     if (-1 == cardid)
     {
         int val = MythPopupBox::show2ButtonPopup(
@@ -1932,9 +1982,15 @@ void CaptureCardEditor::del(void)
 
     if (val == 0)
     {
-        CardUtil::DeleteCard(getValue().toUInt());
+        CardUtil::DeleteCard(listbox->getValue().toUInt());
         load();
     }
+}
+
+VideoSourceEditor::VideoSourceEditor() : listbox(new ListBoxSetting(this))
+{
+    listbox->setLabel(tr("Video sources"));
+    addChild(listbox);
 }
 
 MythDialog* VideoSourceEditor::dialogWidget(MythMainWindow* parent,
@@ -1954,16 +2010,17 @@ int VideoSourceEditor::exec() {
     return QDialog::Rejected;
 }
 
-void VideoSourceEditor::load() {
-    clearSelections();
-    addSelection(QObject::tr("(New video source)"), "0");
-    addSelection(QObject::tr("(Delete all video sources)"), "-1");
-    VideoSource::fillSelections(this);
+void VideoSourceEditor::load(void)
+{
+    listbox->clearSelections();
+    listbox->addSelection(QObject::tr("(New video source)"), "0");
+    listbox->addSelection(QObject::tr("(Delete all video sources)"), "-1");
+    VideoSource::fillSelections(listbox);
 }
 
-void VideoSourceEditor::menu()
+void VideoSourceEditor::menu(void)
 {
-    if (getValue().toInt() == 0) 
+    if (!listbox->getValue().toInt())
     {
         VideoSource vs;
         vs.exec();
@@ -1985,9 +2042,9 @@ void VideoSourceEditor::menu()
     }
 }
 
-void VideoSourceEditor::edit() 
+void VideoSourceEditor::edit(void)
 {
-    const int sourceid = getValue().toInt();
+    const int sourceid = listbox->getValue().toInt();
     if (-1 == sourceid)
     {
         int val = MythPopupBox::show2ButtonPopup(
@@ -2037,7 +2094,7 @@ void VideoSourceEditor::del()
         // Delete the channels associated with the source
         query.prepare("DELETE FROM channel "
                       "WHERE sourceid = :SOURCEID");
-        query.bindValue(":SOURCEID", getValue());
+        query.bindValue(":SOURCEID", listbox->getValue());
 
         if (!query.exec() || !query.isActive())
         {
@@ -2048,7 +2105,7 @@ void VideoSourceEditor::del()
         // Delete the inputs associated with the source
         query.prepare("DELETE FROM cardinput "
                       "WHERE sourceid = :SOURCEID");
-        query.bindValue(":SOURCEID", getValue());
+        query.bindValue(":SOURCEID", listbox->getValue());
 
         if (!query.exec() || !query.isActive())
         {
@@ -2059,7 +2116,7 @@ void VideoSourceEditor::del()
         // Delete the source itself
         query.prepare("DELETE FROM videosource "
                       "WHERE sourceid = :SOURCEID");
-        query.bindValue(":SOURCEID", getValue());
+        query.bindValue(":SOURCEID", listbox->getValue());
 
         if (!query.exec() || !query.isActive())
             MythContext::DBError("Deleting VideoSource", query);
@@ -2068,10 +2125,16 @@ void VideoSourceEditor::del()
     }
 }
 
-int CardInputEditor::exec() 
+CardInputEditor::CardInputEditor() : listbox(new ListBoxSetting(this))
+{
+    listbox->setLabel(tr("Input connections"));
+    addChild(listbox);
+}
+
+int CardInputEditor::exec(void)
 {
     while (ConfigurationDialog::exec() == QDialog::Accepted)
-        cardinputs[getValue().toInt()]->exec();
+        cardinputs[listbox->getValue().toInt()]->exec();
 
     return QDialog::Rejected;
 }
@@ -2079,7 +2142,7 @@ int CardInputEditor::exec()
 void CardInputEditor::load() 
 {
     cardinputs.clear();
-    clearSelections();
+    listbox->clearSelections();
 
     // We do this manually because we want custom labels.  If
     // SelectSetting provided a facility to edit the labels, we
@@ -2112,14 +2175,9 @@ void CardInputEditor::load()
         for (uint i = 0; i < inputLabels.size(); i++, j++)
         {
             cardinputs.push_back(cardInputs[i]);
-            addSelection(inputLabels[i], QString::number(j));
+            listbox->addSelection(inputLabels[i], QString::number(j));
         }
     }
-}
-
-CardInputEditor::~CardInputEditor()
-{
-    // CardInput instances are deleted by Qt, no need to do that here
 }
 
 #ifdef USING_DVB
@@ -2250,11 +2308,9 @@ void DVBConfigurationGroup::probeCard(const QString &videodevice)
 }
 
 TunerCardInput::TunerCardInput(const CaptureCard &parent,
-                               QString dev, QString type)
-    : CCSetting(parent, "defaultinput"),
-      last_device(dev),
-      last_cardtype(type),
-      last_diseqct(-1)
+                               QString dev, QString type) :
+    ComboBoxSetting(this), CaptureCardDBStorage(this, parent, "defaultinput"),
+    last_device(dev), last_cardtype(type), last_diseqct(-1)
 {
     setLabel(QObject::tr("Default input"));
     int cardid = parent.getCardID();
@@ -2281,7 +2337,6 @@ void TunerCardInput::fillSelections(const QString& device)
 }
 
 DVBConfigurationGroup::DVBConfigurationGroup(CaptureCard& a_parent) :
-    ConfigurationGroup(false, true, false, false),
     VerticalConfigurationGroup(false, true, false, false),
     parent(a_parent)
 {
@@ -2407,7 +2462,9 @@ void CaptureCard::analogPanel()
         card->loadByID(child_cardid);
     else
         card->setParentID(cardid);
+/* TODO FIXME
     card->setLabel(tr("Analog Options for") + " " + devname);
+*/
     card->exec();
     delete card;
 }
@@ -2420,7 +2477,7 @@ void CaptureCard::recorderOptionsPanel()
     acw.exec();
 }
 
-RecorderOptions::RecorderOptions(CaptureCard& parent)
+RecorderOptions::RecorderOptions(CaptureCard &parent)
 {
     VerticalConfigurationGroup* rec = new VerticalConfigurationGroup(false);
     rec->setLabel(QObject::tr("Recorder Options"));

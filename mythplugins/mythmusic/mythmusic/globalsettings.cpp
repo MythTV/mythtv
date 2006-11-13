@@ -522,7 +522,7 @@ static HostComboBox *CDBlankType()
     return gc;
 };
 
-MusicGeneralSettings::MusicGeneralSettings()
+MusicGeneralSettings::MusicGeneralSettings(void)
 {
     VerticalConfigurationGroup* general = new VerticalConfigurationGroup(false);
     general->setLabel(QObject::tr("General Settings"));
@@ -548,7 +548,7 @@ MusicGeneralSettings::MusicGeneralSettings()
     addChild(general2);
 }
 
-MusicPlayerSettings::MusicPlayerSettings()
+MusicPlayerSettings::MusicPlayerSettings(void)
 {
     VerticalConfigurationGroup* playersettings = new VerticalConfigurationGroup(false);
     playersettings->setLabel(QObject::tr("Playback Settings"));
@@ -572,7 +572,7 @@ MusicPlayerSettings::MusicPlayerSettings()
     addChild(playersettings2);
 }
 
-MusicRipperSettings::MusicRipperSettings()
+MusicRipperSettings::MusicRipperSettings(void)
 {
     VerticalConfigurationGroup* rippersettings = new VerticalConfigurationGroup(false);
     rippersettings->setLabel(QObject::tr("CD Ripper Settings"));

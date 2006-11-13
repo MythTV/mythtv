@@ -4,45 +4,51 @@
 #include "libmyth/settings.h"
 #include "libmyth/mythcontext.h"
 
-class ThemeSelector: public HostImageSelect {
-public:
+class ThemeSelector : public HostImageSelect
+{
+  public:
     ThemeSelector();
 };
 
-// The real work.
-
-class PlaybackSettings: virtual public ConfigurationWizard {
-public:
+class PlaybackSettings : public ConfigurationWizard
+{
+  public:
     PlaybackSettings();
 };
 
-class GeneralSettings: virtual public ConfigurationWizard {
-public:
+class GeneralSettings : public ConfigurationWizard
+{
+  public:
     GeneralSettings();
 };
 
-class EPGSettings: virtual public ConfigurationWizard {
-public:
+class EPGSettings : public ConfigurationWizard
+{
+  public:
     EPGSettings();
 };
 
-class AppearanceSettings: virtual public ConfigurationWizard {
-public:
+class AppearanceSettings : public ConfigurationWizard
+{
+  public:
     AppearanceSettings();
 };
 
-class MainGeneralSettings: virtual public ConfigurationWizard {
-public:
+class MainGeneralSettings : public ConfigurationWizard
+{
+  public:
     MainGeneralSettings();
 };
 
-class GeneralRecPrioritiesSettings: virtual public ConfigurationWizard {
-public:
+class GeneralRecPrioritiesSettings : public ConfigurationWizard
+{
+  public:
     GeneralRecPrioritiesSettings();
 };
 
-class XboxSettings: virtual public ConfigurationWizard {
-public:
+class XboxSettings : public ConfigurationWizard
+{
+  public:
     XboxSettings();
 };
 

@@ -53,10 +53,13 @@ class SRFindTime;
 class SRFindId;
 class SRParentId;
 
-class MPUBLIC ScheduledRecording: public ConfigurationGroup,
-    public ConfigurationDialog {
+class MPUBLIC ScheduledRecording : public QObject, public ConfigurationDialog
+{
     Q_OBJECT
-public:
+
+    friend class SimpleSRStorage;
+
+  public:
     ScheduledRecording();
     ~ScheduledRecording();
     ScheduledRecording(const ScheduledRecording& other);
@@ -189,12 +192,11 @@ protected:
     virtual void setProgram(const ProgramInfo *proginfo);
     void fetchChannelInfo();
     
-    class ID: virtual public IntegerSetting,
-              public AutoIncrementStorage 
+    class ID : public AutoIncrementDBSetting
     {
         public:
             ID()
-               : AutoIncrementStorage("record", "recordid") 
+               : AutoIncrementDBSetting("record", "recordid") 
             {
                 setName("RecordID");
                 setVisible(false);
@@ -255,22 +257,28 @@ protected:
     QString timeFormat;
     QString dateFormat;
     QString shortDateFormat;
+
+    ConfigurationGroup *cfgGrp;
 };
 
-class ScheduledRecordingEditor: public ListBoxSetting, public ConfigurationDialog {
+class ScheduledRecordingEditor :
+    public QObject, public ConfigurationDialog, public Storage
+{
     Q_OBJECT
-public:
-    ScheduledRecordingEditor() {};
-    virtual ~ScheduledRecordingEditor() {};
+
+  public:
+    ScheduledRecordingEditor() : listbox(new ListBoxSetting(this))
+        { addChild(listbox); }
 
     virtual int exec();
     virtual void load();
     virtual void save() { };
 
-protected slots:
+  protected slots:
     void open(int id);
 
-protected:
+  private:
+    ListBoxSetting *listbox;
 };
 
 

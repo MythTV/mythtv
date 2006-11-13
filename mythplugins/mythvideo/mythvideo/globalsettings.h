@@ -3,17 +3,13 @@
 
 #include <mythtv/settings.h>
 
-// The real work.
-
-// Temporary dumping ground for things that have not been properly
-// categorized yet
-class VideoGeneralSettings: virtual public ConfigurationWizard
+class VideoGeneralSettings : public ConfigurationWizard
 {
   public:
     VideoGeneralSettings();
 };
 
-class VideoPlayerSettings: virtual public ConfigurationWizard
+class VideoPlayerSettings : public ConfigurationWizard
 {
   public:
     VideoPlayerSettings();

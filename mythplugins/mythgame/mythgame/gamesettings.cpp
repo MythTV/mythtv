@@ -99,7 +99,8 @@ MythGameGeneralSettings::MythGameGeneralSettings()
 }
 
 // Player Settings
-QString MGSetting::whereClause(MSqlBindings &bindings) {
+QString GameDBStorage::whereClause(MSqlBindings &bindings)
+{
     QString playerId(":PLAYERID");
     QString query("gameplayerid = " + playerId);
 
@@ -108,7 +109,8 @@ QString MGSetting::whereClause(MSqlBindings &bindings) {
     return query;
 }
 
-QString MGSetting::setClause(MSqlBindings &bindings) {
+QString GameDBStorage::setClause(MSqlBindings &bindings)
+{
     QString playerID(":SETPLAYERID");
     QString colTag(":SET" + getColumn().upper());
 
@@ -116,33 +118,39 @@ QString MGSetting::setClause(MSqlBindings &bindings) {
                   getColumn() + " = " + colTag);
 
     bindings.insert(playerID, parent.getGamePlayerID());
-    bindings.insert(colTag, getValue());
+    bindings.insert(colTag, setting->getValue());
 
     return query;
 }
 
-class AllowMultipleRoms: virtual public MGSetting, virtual public CheckBoxSetting {
-public:
-    AllowMultipleRoms(const MythGamePlayerSettings& parent):
-        MGSetting(parent, "spandisks") {
+class AllowMultipleRoms : public CheckBoxSetting, public GameDBStorage
+{
+  public:
+    AllowMultipleRoms(const MythGamePlayerSettings &parent) :
+        CheckBoxSetting(this), GameDBStorage(this, parent, "spandisks")
+    {
         setLabel(QObject::tr("Allow games to span multiple roms/disks"));
         setHelpText(QObject::tr("This setting means that we will look for items like game.1.rom, game.2.rom and consider them a single game."));
     };
 };
 
-class Command: virtual public MGSetting, virtual public LineEditSetting {
-public:
-    Command(const MythGamePlayerSettings& parent):
-        MGSetting(parent, "commandline") {
+class Command : public LineEditSetting, public GameDBStorage
+{
+  public:
+    Command(const MythGamePlayerSettings &parent) :
+        LineEditSetting(this), GameDBStorage(this, parent, "commandline")
+    {
         setLabel(QObject::tr("Command"));
         setHelpText(QObject::tr("Binary and optional parameters. Multiple commands seperated with \';\' . Use \%s for the rom name. \%d1, \%d2, \%d3 and \%d4 represent disks in a multidisk/game. %s auto appended if not specified"));
     };
 };
 
-class GameType: public ComboBoxSetting, public MGSetting {
-public:
-    GameType(const MythGamePlayerSettings& parent):
-        MGSetting(parent, "gametype") {
+class GameType : public ComboBoxSetting, public GameDBStorage
+{
+  public:
+    GameType(const MythGamePlayerSettings &parent) :
+        ComboBoxSetting(this), GameDBStorage(this, parent, "gametype")
+    {
         setLabel(QObject::tr("Type"));
         for (int i = 0; i < MAX_GAME_TYPES; i++)
         {
@@ -153,38 +161,46 @@ public:
     };
 };
 
-class RomPath: virtual public MGSetting, virtual public LineEditSetting {
-public:
-    RomPath(const MythGamePlayerSettings& parent):
-        MGSetting(parent, "rompath") {
+class RomPath : public LineEditSetting, public GameDBStorage
+{
+  public:
+    RomPath(const MythGamePlayerSettings &parent) :
+        LineEditSetting(this), GameDBStorage(this, parent, "rompath")
+    {
         setLabel(QObject::tr("Rom Path"));
         setHelpText(QObject::tr("Location of the ROM files for this emulator"));
     };
 };
 
-class WorkingDirPath: virtual public MGSetting, virtual public LineEditSetting {
-public:
-    WorkingDirPath(const MythGamePlayerSettings& parent):
-        MGSetting(parent, "workingpath") {
+class WorkingDirPath : public LineEditSetting, public GameDBStorage
+{
+  public:
+    WorkingDirPath(const MythGamePlayerSettings &parent) :
+        LineEditSetting(this), GameDBStorage(this, parent, "workingpath")
+    {
         setLabel(QObject::tr("Working Directory"));
         setHelpText(QObject::tr("Directory to change to before launching emulator. Blank is usually fine"));
     };
 };
 
-class Extensions: virtual public MGSetting, virtual public LineEditSetting {
-public:
-    Extensions(const MythGamePlayerSettings& parent):
-        MGSetting(parent, "extensions") {
+class Extensions : public LineEditSetting, public GameDBStorage
+{
+  public:
+    Extensions(const MythGamePlayerSettings &parent) :
+        LineEditSetting(this), GameDBStorage(this, parent, "extensions")
+    {
         setLabel(QObject::tr("File Extensions"));
         setHelpText(QObject::tr("A Comma seperated list of all file extensions for this emulator. Blank means any file under ROM PATH is considered to be used with this emulator"));
     };
 };
 
 
-class ScreenPath: virtual public MGSetting, virtual public LineEditSetting {
-public:
-    ScreenPath(const MythGamePlayerSettings& parent):
-        MGSetting(parent, "screenshots") {
+class ScreenPath : public LineEditSetting, public GameDBStorage
+{
+  public:
+    ScreenPath(const MythGamePlayerSettings &parent) :
+        LineEditSetting(this), GameDBStorage(this, parent, "screenshots")
+    {
         setLabel(QObject::tr("ScreenShots"));
         setHelpText(QObject::tr("Path to any screenshots for this player"));
     };
@@ -236,14 +252,15 @@ int MythGamePlayerEditor::exec() {
     return QDialog::Rejected;
 }
 
-void MythGamePlayerEditor::load() {
-    clearSelections();
-    addSelection(QObject::tr("(New Game Player)"), "0");
-    MythGamePlayerSettings::fillSelections(this);
+void MythGamePlayerEditor::load(void)
+{
+    listbox->clearSelections();
+    listbox->addSelection(QObject::tr("(New Game Player)"), "0");
+    MythGamePlayerSettings::fillSelections(listbox);
 }
 
-MythDialog* MythGamePlayerEditor::dialogWidget(MythMainWindow* parent,
-                                            const char* widgetName)
+MythDialog *MythGamePlayerEditor::dialogWidget(MythMainWindow *parent,
+                                               const char     *widgetName)
 {
     dialog = ConfigurationDialog::dialogWidget(parent, widgetName);
     connect(dialog, SIGNAL(menuButtonPressed()), this, SLOT(menu()));
@@ -254,7 +271,7 @@ MythDialog* MythGamePlayerEditor::dialogWidget(MythMainWindow* parent,
 
 void MythGamePlayerEditor::menu(void)
 {
-    if (getValue().toInt() == 0)
+    if (!listbox->getValue().toUInt())
     {   
         MythGamePlayerSettings gp;
         gp.exec();
@@ -273,12 +290,15 @@ void MythGamePlayerEditor::menu(void)
     }
 }
 
-void MythGamePlayerEditor::edit(void)                                                  {   
+void MythGamePlayerEditor::edit(void)
+{   
     MythGamePlayerSettings gp;
-    if (getValue().toInt() != 0)
-        gp.loadByID(getValue().toInt());
 
-   gp.exec();
+    uint sourceid = listbox->getValue().toUInt();
+    if (sourceid)
+        gp.loadByID(sourceid);
+
+    gp.exec();
 }
 
 void MythGamePlayerEditor::del(void)
@@ -292,8 +312,9 @@ void MythGamePlayerEditor::del(void)
     if (val == 0)
     {
         MSqlQuery query(MSqlQuery::InitCon());
-        query.prepare("DELETE FROM gameplayers WHERE gameplayerid= :SOURCEID ;");
-        query.bindValue(":SOURCEID", getValue());
+        query.prepare("DELETE FROM gameplayers "
+                      "WHERE gameplayerid = :SOURCEID");
+        query.bindValue(":SOURCEID", listbox->getValue());
 
         if (!query.exec() || !query.isActive())
             MythContext::DBError("Deleting MythGamePlayerSettings:", query);

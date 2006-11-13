@@ -6,12 +6,13 @@
 #include <mythtv/mythcontext.h>
 #include <mythtv/settings.h>
 
-class RomSetting: public SimpleDBStorage {
-public:
-    RomSetting(QString name, QString _romname):
-        SimpleDBStorage("gamemetadata", name),
-        romname(_romname) {
-        setName(name);
+class ROMDBStorage : public SimpleDBStorage
+{
+  public:
+    ROMDBStorage(Setting *_setting, QString _name, QString _romname) :
+        SimpleDBStorage(_setting, "gamemetadata", _name), romname(_romname)
+    {
+        _setting->setName(romname);
     }
 
     virtual QString setClause(MSqlBindings &bindings)
@@ -23,7 +24,7 @@ public:
                       getColumn() + " = " + colTag);
 
         bindings.insert(romTag, romname);
-        bindings.insert(colTag, getValue());
+        bindings.insert(colTag, setting->getValue());
 
         return query;
     }
@@ -42,11 +43,10 @@ public:
     QString romname;
 };
 
-class RomEditDLG: virtual public ConfigurationWizard {
-public:
-    RomEditDLG(QString romname);
+class GameEditDialog : public QObject, public ConfigurationDialog
+{
+  public:
+    GameEditDialog(const QString &romname);
 };
 
-#endif
-
-
+#endif // ROMEDITDLG_H_

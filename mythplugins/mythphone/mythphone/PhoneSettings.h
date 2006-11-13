@@ -19,8 +19,9 @@
 // The real work.
 
 // Temporary dumping ground for things that have not been properly categorized yet
-class MythPhoneSettings: virtual public ConfigurationWizard {
-public:
+class MythPhoneSettings : public ConfigurationWizard
+{
+  public:
     MythPhoneSettings();
 };
 

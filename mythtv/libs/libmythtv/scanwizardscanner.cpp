@@ -99,8 +99,7 @@ Channel *ScanWizardScanner::GetChannel(void)
 }
 
 ScanWizardScanner::ScanWizardScanner(ScanWizard *_parent)
-    : ConfigurationGroup(false, true, false, false),
-      VerticalConfigurationGroup(false, true, false, false),
+    : VerticalConfigurationGroup(false, true, false, false),
       parent(_parent),
       log(new LogList()),
       channel(NULL),                popupProgress(NULL),

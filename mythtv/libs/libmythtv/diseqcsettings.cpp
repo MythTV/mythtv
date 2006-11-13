@@ -38,10 +38,11 @@ static GlobalLineEdit *DiSEqCLongitude(void)
 
 //////////////////////////////////////// DeviceTypeSetting
 
-class DeviceTypeSetting : public ComboBoxSetting
+class DeviceTypeSetting : public ComboBoxSetting, public Storage
 {
   public:
-    DeviceTypeSetting(DiSEqCDevDevice &device) : m_device(device)
+    DeviceTypeSetting(DiSEqCDevDevice &device) :
+        ComboBoxSetting(this), m_device(device)
     {
         setLabel(DeviceTree::tr("Device Type"));
         addSelection(DeviceTree::tr("Switch"),
@@ -64,16 +65,19 @@ class DeviceTypeSetting : public ComboBoxSetting
             (DiSEqCDevDevice::dvbdev_t) getValue().toUInt());
     }
 
+    virtual void save(QString /*destination*/) { }
+
   private:
     DiSEqCDevDevice &m_device;
 };
 
 //////////////////////////////////////// DeviceDescrSetting
 
-class DeviceDescrSetting : public LineEditSetting
+class DeviceDescrSetting : public LineEditSetting, public Storage
 {
   public:
-    DeviceDescrSetting(DiSEqCDevDevice &device) : m_device(device)
+    DeviceDescrSetting(DiSEqCDevDevice &device) :
+        LineEditSetting(this), m_device(device)
     {
         setLabel(DeviceTree::tr("Description"));
         QString help = DeviceTree::tr(
@@ -92,6 +96,8 @@ class DeviceDescrSetting : public LineEditSetting
         m_device.SetDescription(getValue());
     }
 
+    virtual void save(QString /*destination*/) { }
+
   private:
     DiSEqCDevDevice &m_device;
 };
@@ -99,11 +105,11 @@ class DeviceDescrSetting : public LineEditSetting
 
 //////////////////////////////////////// DeviceRepeatSetting
 
-class DeviceRepeatSetting : public SpinBoxSetting
+class DeviceRepeatSetting : public SpinBoxSetting, public Storage
 {
   public:
     DeviceRepeatSetting(DiSEqCDevDevice &device) :
-        SpinBoxSetting(1, 5, 1), m_device(device)
+        SpinBoxSetting(this, 1, 5, 1), m_device(device)
     {
         setLabel(DeviceTree::tr("Repeat Count"));
         QString help = DeviceTree::tr(
@@ -122,16 +128,19 @@ class DeviceRepeatSetting : public SpinBoxSetting
         m_device.SetRepeatCount(getValue().toUInt());
     }
 
+    virtual void save(QString /*destination*/) { }
+
   private:
     DiSEqCDevDevice &m_device;
 };
 
 //////////////////////////////////////// SwitchTypeSetting
 
-class SwitchTypeSetting : public ComboBoxSetting
+class SwitchTypeSetting : public ComboBoxSetting, public Storage
 {
   public:
-    SwitchTypeSetting(DiSEqCDevSwitch &switch_dev) : m_switch(switch_dev)
+    SwitchTypeSetting(DiSEqCDevSwitch &switch_dev) :
+        ComboBoxSetting(this), m_switch(switch_dev)
     {
         setLabel(DeviceTree::tr("Switch Type"));
         setHelpText(DeviceTree::tr("Select the type of switch from the list."));
@@ -163,16 +172,19 @@ class SwitchTypeSetting : public ComboBoxSetting
                          getValue().toUInt());
     }
 
+    virtual void save(QString /*destination*/) { }
+
   private:
     DiSEqCDevSwitch &m_switch;
 };
 
 //////////////////////////////////////// SwitchPortsSetting
 
-class SwitchPortsSetting : public LineEditSetting
+class SwitchPortsSetting : public LineEditSetting, public Storage
 {
   public:
-    SwitchPortsSetting(DiSEqCDevSwitch &switch_dev) : m_switch(switch_dev)
+    SwitchPortsSetting(DiSEqCDevSwitch &switch_dev) :
+        LineEditSetting(this), m_switch(switch_dev)
     {
         setLabel(DeviceTree::tr("Number of ports"));
         setHelpText(DeviceTree::tr("The number of ports this switch has."));
@@ -187,6 +199,8 @@ class SwitchPortsSetting : public LineEditSetting
     {
         m_switch.SetNumPorts(getValue().toUInt());
     }
+
+    virtual void save(QString /*destination*/) { }
 
   private:
     DiSEqCDevSwitch &m_switch;
@@ -236,10 +250,11 @@ void SwitchConfig::update(void)
 
 //////////////////////////////////////// RotorTypeSetting
 
-class RotorTypeSetting : public ComboBoxSetting
+class RotorTypeSetting : public ComboBoxSetting, public Storage
 {
   public:
-    RotorTypeSetting(DiSEqCDevRotor &rotor) : m_rotor(rotor)
+    RotorTypeSetting(DiSEqCDevRotor &rotor) :
+        ComboBoxSetting(this), m_rotor(rotor)
     {
         setLabel(DeviceTree::tr("Rotor Type"));
         setHelpText(DeviceTree::tr("Select the type of rotor from the list."));
@@ -259,16 +274,19 @@ class RotorTypeSetting : public ComboBoxSetting
         m_rotor.SetType((DiSEqCDevRotor::dvbdev_rotor_t)getValue().toUInt());
     }
 
+    virtual void save(QString /*destination*/) { }
+
   private:
     DiSEqCDevRotor &m_rotor;
 };
 
 //////////////////////////////////////// RotorLoSpeedSetting
 
-class RotorLoSpeedSetting : public LineEditSetting
+class RotorLoSpeedSetting : public LineEditSetting, public Storage
 {
   public:
-    RotorLoSpeedSetting(DiSEqCDevRotor &rotor) : m_rotor(rotor)
+    RotorLoSpeedSetting(DiSEqCDevRotor &rotor) :
+        LineEditSetting(this), m_rotor(rotor)
     {
         setLabel(DeviceTree::tr("Rotor Low Speed (deg/sec)"));
         QString help = DeviceTree::tr(
@@ -287,16 +305,19 @@ class RotorLoSpeedSetting : public LineEditSetting
         m_rotor.SetLoSpeed(getValue().toDouble());
     }
 
+    virtual void save(QString /*destination*/) { }
+
   private:
     DiSEqCDevRotor &m_rotor;
 };
 
 //////////////////////////////////////// RotorHiSpeedSetting
 
-class RotorHiSpeedSetting : public LineEditSetting
+class RotorHiSpeedSetting : public LineEditSetting, public Storage
 {
   public:
-    RotorHiSpeedSetting(DiSEqCDevRotor &rotor) : m_rotor(rotor)
+    RotorHiSpeedSetting(DiSEqCDevRotor &rotor) :
+        LineEditSetting(this), m_rotor(rotor)
     {
         setLabel(DeviceTree::tr("Rotor High Speed (deg/sec)"));
         QString help = DeviceTree::tr(
@@ -314,6 +335,8 @@ class RotorHiSpeedSetting : public LineEditSetting
     {
         m_rotor.SetHiSpeed(getValue().toDouble());
     }
+
+    virtual void save(QString /*destination*/) { }
 
   private:
     DiSEqCDevRotor &m_rotor;
@@ -352,7 +375,8 @@ static double AngleToFloat(const QString &angle)
     return pos;
 }
 
-RotorPosMap::RotorPosMap(DiSEqCDevRotor &rotor) : m_rotor(rotor)
+RotorPosMap::RotorPosMap(DiSEqCDevRotor &rotor) :
+    ListBoxSetting(this), m_rotor(rotor)
 {
     connect(this, SIGNAL(editButtonPressed(int)),   SLOT(edit(void)));
     connect(this, SIGNAL(deleteButtonPressed(int)), SLOT(del(void)));
@@ -412,16 +436,19 @@ void RotorPosMap::PopulateList(void)
 
 //////////////////////////////////////// RotorPosConfig
 
-class RotorPosConfig : public VerticalConfigurationGroup,
-                       public ConfigurationDialog
+class RotorPosConfig : public ConfigurationDialog
 {
   public:
     RotorPosConfig(DiSEqCDevRotor &rotor)
     {
+/* TODO FIXME
         setLabel(DeviceTree::tr("Rotor Position Map"));
         setUseLabel(true);
+*/
         addChild(new RotorPosMap(rotor));
     }
+
+    void save(void) { cfgGrp->save(); }
 
     virtual int exec(void)
     {
@@ -537,10 +564,10 @@ uint FindPreset(const DiSEqCDevLNB &lnb)
     return i;
 }
 
-class LNBPresetSetting : public ComboBoxSetting
+class LNBPresetSetting : public ComboBoxSetting, public Storage
 {
   public:
-    LNBPresetSetting(DiSEqCDevLNB &lnb) : m_lnb(lnb)
+    LNBPresetSetting(DiSEqCDevLNB &lnb) : ComboBoxSetting(this), m_lnb(lnb)
     {
         setLabel(DeviceTree::tr("LNB Preset"));
         QString help = DeviceTree::tr(
@@ -563,16 +590,20 @@ class LNBPresetSetting : public ComboBoxSetting
     {
     }
 
+    virtual void save(QString /*destination*/)
+    {
+    }
+
   private:
     DiSEqCDevLNB &m_lnb;
 };
 
 //////////////////////////////////////// LNBTypeSetting
 
-class LNBTypeSetting : public ComboBoxSetting
+class LNBTypeSetting : public ComboBoxSetting, public Storage
 {
   public:
-    LNBTypeSetting(DiSEqCDevLNB &lnb) : m_lnb(lnb)
+    LNBTypeSetting(DiSEqCDevLNB &lnb) : ComboBoxSetting(this), m_lnb(lnb)
     {
         setLabel(DeviceTree::tr("LNB Type"));
         setHelpText(DeviceTree::tr("Select the type of LNB from the list."));
@@ -598,16 +629,18 @@ class LNBTypeSetting : public ComboBoxSetting
         m_lnb.SetType((DiSEqCDevLNB::dvbdev_lnb_t) getValue().toUInt());
     }
 
+    virtual void save(QString /*destination*/) { }
+
   private:
     DiSEqCDevLNB &m_lnb;
 };
 
 //////////////////////////////////////// LNBLOFSwitchSetting
 
-class LNBLOFSwitchSetting : public LineEditSetting
+class LNBLOFSwitchSetting : public LineEditSetting, public Storage
 {
   public:
-    LNBLOFSwitchSetting(DiSEqCDevLNB &lnb) : m_lnb(lnb)
+    LNBLOFSwitchSetting(DiSEqCDevLNB &lnb) : LineEditSetting(this), m_lnb(lnb)
     {
         setLabel(DeviceTree::tr("LNB LOF Switch (MHz)"));
         QString help = DeviceTree::tr(
@@ -626,16 +659,18 @@ class LNBLOFSwitchSetting : public LineEditSetting
         m_lnb.SetLOFSwitch(getValue().toUInt() * 1000);
     }
 
+    virtual void save(QString /*destination*/) { }
+
   private:
     DiSEqCDevLNB &m_lnb;
 };
 
 //////////////////////////////////////// LNBLOFLowSetting
 
-class LNBLOFLowSetting : public LineEditSetting
+class LNBLOFLowSetting : public LineEditSetting, public Storage
 {
   public:
-    LNBLOFLowSetting(DiSEqCDevLNB &lnb) : m_lnb(lnb)
+    LNBLOFLowSetting(DiSEqCDevLNB &lnb) : LineEditSetting(storage), m_lnb(lnb)
     {
         setLabel(DeviceTree::tr("LNB LOF Low (MHz)"));
         QString help = DeviceTree::tr(
@@ -655,16 +690,18 @@ class LNBLOFLowSetting : public LineEditSetting
         m_lnb.SetLOFLow(getValue().toUInt() * 1000);
     }
 
+    virtual void save(QString /*destination*/) { }
+
   private:
     DiSEqCDevLNB &m_lnb;
 };
 
 //////////////////////////////////////// LNBLOFHighSetting
 
-class LNBLOFHighSetting : public LineEditSetting
+class LNBLOFHighSetting : public LineEditSetting, public Storage
 {
   public:
-    LNBLOFHighSetting(DiSEqCDevLNB &lnb) : m_lnb(lnb)
+    LNBLOFHighSetting(DiSEqCDevLNB &lnb) : LineEditSetting(this), m_lnb(lnb)
     {
         setLabel(DeviceTree::tr("LNB LOF High (MHz)"));
         QString help = DeviceTree::tr(
@@ -684,14 +721,17 @@ class LNBLOFHighSetting : public LineEditSetting
         m_lnb.SetLOFHigh(getValue().toUInt() * 1000);
     }
 
+    virtual void save(QString /*destination*/) { }
+
   private:
     DiSEqCDevLNB &m_lnb;
 };
 
-class LNBPolarityInvertedSetting : public CheckBoxSetting
+class LNBPolarityInvertedSetting : public CheckBoxSetting, public Storage
 {
   public:
-    LNBPolarityInvertedSetting(DiSEqCDevLNB &lnb) : m_lnb(lnb)
+    LNBPolarityInvertedSetting(DiSEqCDevLNB &lnb) :
+        CheckBoxSetting(this), m_lnb(lnb)
     {
         setLabel(DeviceTree::tr("LNB Reversed"));
         QString help = DeviceTree::tr(
@@ -711,6 +751,8 @@ class LNBPolarityInvertedSetting : public CheckBoxSetting
     {
         m_lnb.SetPolarityInverted(boolValue());
     }
+
+    virtual void save(QString /*destination*/) { }
 
   private:
     DiSEqCDevLNB &m_lnb;
@@ -803,7 +845,8 @@ void LNBConfig::UpdateType(void)
 
 //////////////////////////////////////// DeviceTree
 
-DeviceTree::DeviceTree(DiSEqCDevTree &tree) : m_tree(tree)
+DeviceTree::DeviceTree(DiSEqCDevTree &tree) :
+    ListBoxSetting(this), m_tree(tree)
 {
     connect(this, SIGNAL(editButtonPressed(int)),   SLOT(edit(void)));
     connect(this, SIGNAL(deleteButtonPressed(int)), SLOT(del(void)));
@@ -1023,10 +1066,10 @@ void DeviceTree::PopulateTree(DiSEqCDevDevice *node,
 //////////////////////////////////////// DTVDeviceTreeWizard
 
 DTVDeviceTreeWizard::DTVDeviceTreeWizard(DiSEqCDevTree &tree)
-    : ConfigurationGroup(false, true, false, false),
-      VerticalConfigurationGroup(false, true, false, false)
 {
+/* TODO FIXME
     setLabel(DeviceTree::tr("DiSEqC Device Tree"));
+*/
     addChild(new DeviceTree(tree));
 }
 
@@ -1038,13 +1081,15 @@ int DTVDeviceTreeWizard::exec(void)
 
 //////////////////////////////////////// SwitchSetting
 
-class SwitchSetting : public ComboBoxSetting
+class SwitchSetting : public ComboBoxSetting, public Storage
 {
   public:
     SwitchSetting(DiSEqCDevDevice &node, DiSEqCDevSettings &settings)
-        : m_node(node), m_settings(settings)
+        : ComboBoxSetting(this), m_node(node), m_settings(settings)
     {
+/* TODO FIXME
         setLabel(node.GetDescription());
+*/
         setHelpText(DeviceTree::tr("Choose a port to use for this switch."));
 
         uint num_children = node.GetChildCount();
@@ -1070,6 +1115,8 @@ class SwitchSetting : public ComboBoxSetting
         m_settings.SetValue(m_node.GetDeviceID(), getValue().toDouble());
     }
 
+    virtual void save(QString /*destination*/) {}
+
   private:
     DiSEqCDevDevice   &m_node;
     DiSEqCDevSettings &m_settings;
@@ -1077,11 +1124,11 @@ class SwitchSetting : public ComboBoxSetting
 
 //////////////////////////////////////// RotorSetting
 
-class RotorSetting : public ComboBoxSetting
+class RotorSetting : public ComboBoxSetting, public Storage
 {
   public:
     RotorSetting(DiSEqCDevDevice &node, DiSEqCDevSettings &settings)
-        : m_node(node), m_settings(settings)
+        : ComboBoxSetting(this), m_node(node), m_settings(settings)
     {
         setLabel(node.GetDescription());
         setHelpText(DeviceTree::tr("Choose a satellite position."));
@@ -1108,6 +1155,8 @@ class RotorSetting : public ComboBoxSetting
         m_settings.SetValue(m_node.GetDeviceID(), getValue().toDouble());
     }
 
+    virtual void save(QString /*destination*/) { }
+
   private:
     DiSEqCDevDevice   &m_node;
     DiSEqCDevSettings &m_settings;
@@ -1116,11 +1165,11 @@ class RotorSetting : public ComboBoxSetting
 
 //////////////////////////////////////// USALSRotorSetting
 
-class USALSRotorSetting : public LineEditSetting
+class USALSRotorSetting : public LineEditSetting, public Storage
 {
   public:
-    USALSRotorSetting(DiSEqCDevDevice &node, DiSEqCDevSettings &settings)
-        : m_node(node), m_settings(settings)
+    USALSRotorSetting(DiSEqCDevDevice &node, DiSEqCDevSettings &settings) :
+        LineEditSetting(this), m_node(node), m_settings(settings)
     {
         setLabel(node.GetDescription());
         QString help = DeviceTree::tr(
@@ -1139,6 +1188,8 @@ class USALSRotorSetting : public LineEditSetting
     {
         m_settings.SetValue(m_node.GetDeviceID(), AngleToFloat(getValue()));
     }
+
+    virtual void save(QString /*destination*/) { }
 
   private:
     DiSEqCDevDevice   &m_node;
@@ -1226,7 +1277,7 @@ void DTVDeviceConfigWizard::AddNodes(ConfigurationGroup &group,
 
 void DTVDeviceConfigWizard::SelectNodes(void)
 {
-    save();
+    cfgGrp->save();
 
     QMap<uint,bool> active;
     DiSEqCDevDevice *node = m_tree.Root();

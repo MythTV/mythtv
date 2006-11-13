@@ -21,7 +21,7 @@
 // in recordingtypes.cpp.
 
 ScheduledRecording::ScheduledRecording() :
-    ConfigurationGroup(true, true, false, false)
+    cfgGrp(new ConfigurationGroup(true, true, false, false))
 {
     m_pginfo = NULL;
     type = NULL;
@@ -80,17 +80,19 @@ ScheduledRecording::ScheduledRecording() :
 
 ScheduledRecording::~ScheduledRecording() 
 {
-    // rootGroup is unique among this class' member variables in
-    // that it's not self-managed
+    // rootGroup and cfgGrp are unique among this class'
+    // instance variables in that they are not self-managed
     if (!rootGroup.isNull())
         delete rootGroup;
+    if (cfgGrp)
+        cfgGrp->deleteLater();
 }
 
 void ScheduledRecording::load()
 {
     if (getRecordID())
     {
-        ConfigurationGroup::load();
+        cfgGrp->load();
         
         QString tmpType = type->getValue();
         type->clearSelections();
@@ -447,7 +449,7 @@ void ScheduledRecording::save(bool sendSig)
     }
     else
     {
-        ConfigurationGroup::save();
+        cfgGrp->save();
 
         MSqlQuery query(MSqlQuery::InitCon());
         query.prepare(
@@ -475,7 +477,7 @@ void ScheduledRecording::save(QString destination)
     }
     else
     {
-        ConfigurationGroup::save(destination);
+        cfgGrp->save(destination);
     }
 }
 
@@ -659,17 +661,17 @@ void ScheduledRecording::fillSelections(SelectSetting* setting)
     }
 }
 
-void ScheduledRecordingEditor::load() 
+void ScheduledRecordingEditor::load(void) 
 {
-    clearSelections();
-    ScheduledRecording::fillSelections(this);
+    listbox->clearSelections();
+    ScheduledRecording::fillSelections(listbox);
 }
 
 
-int ScheduledRecordingEditor::exec() 
+int ScheduledRecordingEditor::exec(void) 
 {
     while (ConfigurationDialog::exec() == QDialog::Accepted)
-        open(getValue().toInt());
+        open(listbox->getValue().toInt());
 
     return QDialog::Rejected;
 }

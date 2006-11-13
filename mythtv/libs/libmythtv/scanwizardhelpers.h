@@ -46,13 +46,13 @@ class OptionalTypeSetting;
 class ScanSignalMeter: public ProgressSetting, public TransientStorage
 {
   public:
-    ScanSignalMeter(int steps): ProgressSetting(steps) {};
+    ScanSignalMeter(int steps): ProgressSetting(this, steps) {};
 };
 
-class ScanProgressPopup : public ConfigurationPopupDialog,
-                          public VerticalConfigurationGroup
+class ScanProgressPopup : public ConfigurationPopupDialog
 {
     Q_OBJECT
+
   protected:
     ScanSignalMeter   *ss;
     ScanSignalMeter   *sn;
@@ -113,28 +113,36 @@ class ScannerEvent : public QCustomEvent
 // Settings Below Here
 // ///////////////////////////////
 
-class VideoSourceSetting: public ComboBoxSetting
+class VideoSourceSetting: public ComboBoxSetting, public Storage
 {
   public:
-    VideoSourceSetting(int srcid) : sourceid(srcid)
-        { setLabel(QObject::tr("Video Source")); }
+    VideoSourceSetting(int srcid) :
+        ComboBoxSetting(this), sourceid(srcid)
+    {
+        setLabel(tr("Video Source"));
+    }
+
     virtual void load();
     virtual void save() {}
+    virtual void save(QString /*destination*/) { }
+
   private:
     int sourceid;
 };
 
-class MultiplexSetting : public ComboBoxSetting
+class MultiplexSetting : public ComboBoxSetting, public Storage
 {
     Q_OBJECT
   protected:
     int nSourceID;
 
   public:
-    MultiplexSetting() : nSourceID(0)
-        { setLabel(QObject::tr("Transport")); }
+    MultiplexSetting() : ComboBoxSetting(this), nSourceID(0)
+        { setLabel(tr("Transport")); }
+
     virtual void load() { refresh(); }
     virtual void save() { ; }
+    virtual void save(QString /*destination*/) { }
 
     void refresh();
   public slots:
@@ -144,7 +152,7 @@ class MultiplexSetting : public ComboBoxSetting
 class IgnoreSignalTimeout : public CheckBoxSetting, public TransientStorage
 {
   public:
-    IgnoreSignalTimeout()
+    IgnoreSignalTimeout() : CheckBoxSetting(this)
     {
         setLabel(QObject::tr("Ignore Signal Timeout"));
         setHelpText(
@@ -154,17 +162,21 @@ class IgnoreSignalTimeout : public CheckBoxSetting, public TransientStorage
     }
 };
 
-class CaptureCardSetting: public ComboBoxSetting
+class CaptureCardSetting : public ComboBoxSetting, public Storage
 {
     Q_OBJECT
   protected:
     int nSourceID;
 
   public:
-    CaptureCardSetting() : nSourceID(0)
-        { setLabel(QObject::tr("Capture Card")); }
+    CaptureCardSetting() : ComboBoxSetting(this), nSourceID(0)
+    {
+        setLabel(tr("Capture Card"));
+    }
     virtual void load() { refresh(); }
     virtual void save() { ; }
+    virtual void save(QString /*destination*/) { }
+
     void refresh();
 
   public slots:
@@ -214,7 +226,8 @@ class ScanTypeSetting : public ComboBoxSetting, public TransientStorage
         // Imports lists from dvb-utils scanners
         DVBUtilsImport,
     };
-    ScanTypeSetting() : nCaptureCard(-1)
+
+    ScanTypeSetting() : ComboBoxSetting(this), nCaptureCard(-1)
     {
         setLabel(QObject::tr("Scan Type"));
         refresh("");
@@ -225,8 +238,7 @@ class ScanTypeSetting : public ComboBoxSetting, public TransientStorage
     int nCaptureCard;
 };
 
-class ScanOptionalConfig: public VerticalConfigurationGroup,
-                          public TriggeredConfigurationGroup 
+class ScanOptionalConfig : public TriggeredConfigurationGroup 
 {
     Q_OBJECT
   public:
@@ -268,7 +280,7 @@ class LogList: public ListBoxSetting, public TransientStorage
 class ScanFrequencyTable: public ComboBoxSetting, public TransientStorage
 {
   public:
-    ScanFrequencyTable()
+    ScanFrequencyTable() : ComboBoxSetting(this)
     {
         addSelection(QObject::tr("Broadcast"),        "us",          true);
         addSelection(QObject::tr("Cable")     + " " +
@@ -293,7 +305,7 @@ class ScanFrequencyTable: public ComboBoxSetting, public TransientStorage
 class ScanATSCModulation: public ComboBoxSetting, public TransientStorage
 {
   public:
-    ScanATSCModulation()
+    ScanATSCModulation() : ComboBoxSetting(this)
     {
         addSelection(QObject::tr("Terrestrial")+" (8-VSB)","vsb8",  true);
         addSelection(QObject::tr("Cable") + " (QAM-256)", "qam256", false);
@@ -312,7 +324,7 @@ class ScanATSCModulation: public ComboBoxSetting, public TransientStorage
 class ScanATSCChannelFormat: public ComboBoxSetting, public TransientStorage
 {
   public:
-    ScanATSCChannelFormat()
+    ScanATSCChannelFormat() : ComboBoxSetting(this)
     {
         addSelection(QObject::tr("(5_1) Underscore"), "%1_%2", true);
         addSelection(QObject::tr("(5-1) Minus"),      "%1-%2", false);
@@ -328,7 +340,7 @@ class ScanATSCChannelFormat: public ComboBoxSetting, public TransientStorage
 class ScanOldChannelTreatment: public ComboBoxSetting, public TransientStorage
 {
   public:
-    ScanOldChannelTreatment()
+    ScanOldChannelTreatment() : ComboBoxSetting(this)
     {
         addSelection(QObject::tr("Minimal Updates"),    "minimal");
         addSelection(QObject::tr("Rename to Match"),    "rename");
@@ -341,7 +353,7 @@ class ScanOldChannelTreatment: public ComboBoxSetting, public TransientStorage
 class ScanFrequency: public LineEditSetting, public TransientStorage
 {
   public:
-    ScanFrequency(): LineEditSetting()
+    ScanFrequency() : LineEditSetting(this)
     {
         setLabel(QObject::tr("Frequency"));
         setHelpText(QObject::tr("Frequency (Option has no default)\n"
@@ -352,8 +364,7 @@ class ScanFrequency: public LineEditSetting, public TransientStorage
 class ScanSymbolRate: public LineEditSetting, public TransientStorage
 {
   public:
-    ScanSymbolRate():
-    LineEditSetting()
+    ScanSymbolRate() : LineEditSetting(this)
     {
         setLabel(QObject::tr("Symbol Rate"));
         setHelpText(QObject::tr("Symbol Rate (Option has no default)"));
@@ -363,8 +374,7 @@ class ScanSymbolRate: public LineEditSetting, public TransientStorage
 class ScanPolarity: public ComboBoxSetting, public TransientStorage
 {
   public:
-    ScanPolarity():
-    ComboBoxSetting()
+    ScanPolarity() : ComboBoxSetting(this)
     {
         setLabel(QObject::tr("Polarity"));
         setHelpText(QObject::tr("Polarity (Option has no default)"));
@@ -378,8 +388,7 @@ class ScanPolarity: public ComboBoxSetting, public TransientStorage
 class ScanInversion: public ComboBoxSetting, public TransientStorage
 {
   public:
-    ScanInversion():
-    ComboBoxSetting()
+    ScanInversion() : ComboBoxSetting(this)
     {
         setLabel(QObject::tr("Inversion"));
         setHelpText(QObject::tr(
@@ -395,8 +404,7 @@ class ScanInversion: public ComboBoxSetting, public TransientStorage
 class ScanBandwidth: public ComboBoxSetting, public TransientStorage
 {
   public:
-    ScanBandwidth():
-    ComboBoxSetting()
+    ScanBandwidth() : ComboBoxSetting(this)
     {
         setLabel(QObject::tr("Bandwidth"));
         setHelpText(QObject::tr("Bandwidth (Default: Auto)\n"));
@@ -410,7 +418,7 @@ class ScanBandwidth: public ComboBoxSetting, public TransientStorage
 class ScanModulationSetting: public ComboBoxSetting
 {
   public:
-    ScanModulationSetting()
+    ScanModulationSetting(Storage *_storage) : ComboBoxSetting(_storage)
     {
         addSelection(QObject::tr("Auto"),"auto",true);
         addSelection("QPSK","qpsk");
@@ -428,8 +436,7 @@ class ScanModulationSetting: public ComboBoxSetting
 class ScanModulation: public ScanModulationSetting, public TransientStorage
 {
   public:
-    ScanModulation():
-    ScanModulationSetting()
+    ScanModulation() : ScanModulationSetting(this)
     {
         setLabel(QObject::tr("Modulation"));
         setHelpText(QObject::tr("Modulation (Default: Auto)"));
@@ -440,8 +447,7 @@ class ScanConstellation: public ScanModulationSetting,
                          public TransientStorage
 {
   public:
-    ScanConstellation():
-    ScanModulationSetting()
+    ScanConstellation() : ScanModulationSetting(this)
     {
         setLabel(QObject::tr("Constellation"));
         setHelpText(QObject::tr("Constellation (Default: Auto)"));
@@ -451,7 +457,7 @@ class ScanConstellation: public ScanModulationSetting,
 class ScanFecSetting: public ComboBoxSetting
 {
   public:
-    ScanFecSetting()
+    ScanFecSetting(Storage *_storage) : ComboBoxSetting(_storage)
     {
         addSelection(QObject::tr("Auto"),"auto",true);
         addSelection(QObject::tr("None"),"none");
@@ -469,8 +475,7 @@ class ScanFecSetting: public ComboBoxSetting
 class ScanFec: public ScanFecSetting, public TransientStorage
 {
   public:
-    ScanFec():
-    ScanFecSetting()
+    ScanFec() : ScanFecSetting(this)
     {
         setLabel(QObject::tr("FEC"));
         setHelpText(QObject::tr(
@@ -481,7 +486,7 @@ class ScanFec: public ScanFecSetting, public TransientStorage
 class ScanCodeRateLP: public ScanFecSetting, public TransientStorage
 {
   public:
-    ScanCodeRateLP(): ScanFecSetting()
+    ScanCodeRateLP() : ScanFecSetting(this)
     {
         setLabel(QObject::tr("LP Coderate"));
         setHelpText(QObject::tr("Low Priority Code Rate (Default: Auto)"));
@@ -491,7 +496,7 @@ class ScanCodeRateLP: public ScanFecSetting, public TransientStorage
 class ScanCodeRateHP: public ScanFecSetting, public TransientStorage
 {
   public:
-    ScanCodeRateHP(): ScanFecSetting()
+    ScanCodeRateHP() : ScanFecSetting(this)
     {
         setLabel(QObject::tr("HP Coderate"));
         setHelpText(QObject::tr("High Priority Code Rate (Default: Auto)"));
@@ -501,8 +506,7 @@ class ScanCodeRateHP: public ScanFecSetting, public TransientStorage
 class ScanGuardInterval: public ComboBoxSetting, public TransientStorage
 {
   public:
-    ScanGuardInterval():
-    ComboBoxSetting()
+    ScanGuardInterval() : ComboBoxSetting(this)
     {
         setLabel(QObject::tr("Guard Interval"));
         setHelpText(QObject::tr("Guard Interval (Default: Auto)"));
@@ -517,8 +521,7 @@ class ScanGuardInterval: public ComboBoxSetting, public TransientStorage
 class ScanTransmissionMode: public ComboBoxSetting, public TransientStorage
 {
   public:
-    ScanTransmissionMode()
-        : ComboBoxSetting()
+    ScanTransmissionMode() : ComboBoxSetting(this)
     {
         setLabel(QObject::tr("Trans. Mode"));
         setHelpText(QObject::tr("Transmission Mode (Default: Auto)"));
@@ -531,8 +534,7 @@ class ScanTransmissionMode: public ComboBoxSetting, public TransientStorage
 class ScanHierarchy: public ComboBoxSetting, public TransientStorage
 {
     public:
-    ScanHierarchy():
-    ComboBoxSetting()
+    ScanHierarchy() : ComboBoxSetting(this)
     {
         setLabel(QObject::tr("Hierarchy"));
         setHelpText(QObject::tr("Hierarchy (Default: Auto)"));
@@ -547,9 +549,7 @@ class ScanHierarchy: public ComboBoxSetting, public TransientStorage
 class OFDMPane : public HorizontalConfigurationGroup
 {
   public:
-    OFDMPane() :
-        ConfigurationGroup(false,false,true,true),
-        HorizontalConfigurationGroup(false,false,true,true)
+    OFDMPane() : HorizontalConfigurationGroup(false, false, true, true)
     {
         setUseFrame(false);
         VerticalConfigurationGroup *left =
@@ -631,9 +631,7 @@ class DVBS2Pane : public HorizontalConfigurationGroup
 class QPSKPane : public HorizontalConfigurationGroup
 {
   public:
-    QPSKPane() :
-        ConfigurationGroup(false,false,true,false),
-        HorizontalConfigurationGroup(false,false,true,false)
+    QPSKPane() : HorizontalConfigurationGroup(false, false, true, false)
     {
         setUseFrame(false);
         VerticalConfigurationGroup *left =
@@ -666,9 +664,7 @@ class QPSKPane : public HorizontalConfigurationGroup
 class QAMPane : public HorizontalConfigurationGroup
 {
   public:
-    QAMPane() :
-        ConfigurationGroup(false,false,true,false),
-        HorizontalConfigurationGroup(false,false,true,false)
+    QAMPane() : HorizontalConfigurationGroup(false, false, true, false)
     {
         setUseFrame(false);
         VerticalConfigurationGroup *left =
@@ -701,9 +697,7 @@ class QAMPane : public HorizontalConfigurationGroup
 class ATSCPane : public VerticalConfigurationGroup
 {
   public:
-    ATSCPane() :
-        ConfigurationGroup(false,false,true,false),
-        VerticalConfigurationGroup(false,false,true,false)
+    ATSCPane() : VerticalConfigurationGroup(false, false, true, false)
     {
         addChild(atsc_table            = new ScanFrequencyTable());
         addChild(atsc_modulation       = new ScanATSCModulation());
@@ -737,8 +731,7 @@ class STPane : public VerticalConfigurationGroup
     Q_OBJECT
   public:
     STPane() :
-        ConfigurationGroup(false,false,true,false),
-        VerticalConfigurationGroup(false,false,true,false),
+        VerticalConfigurationGroup(false, false, true, false),
         transport_setting(new MultiplexSetting()),
         atsc_format(new ScanATSCChannelFormat()),
         old_channel_treatment(new ScanOldChannelTreatment()),
@@ -775,7 +768,6 @@ class DVBUtilsImportPane : public VerticalConfigurationGroup
 {
   public:
     DVBUtilsImportPane() :
-        ConfigurationGroup(false,false,true,false),
         VerticalConfigurationGroup(false,false,true,false),
         filename(new TransLineEditSetting()),
         atsc_format(new ScanATSCChannelFormat()),
@@ -811,8 +803,7 @@ class DVBUtilsImportPane : public VerticalConfigurationGroup
 class ErrorPane : public HorizontalConfigurationGroup
 {
   public:
-    ErrorPane(const QString& error) :
-        ConfigurationGroup(false, false, true, false),
+    ErrorPane(const QString &error) :
         HorizontalConfigurationGroup(false, false, true, false)
     {
         TransLabelSetting* label = new TransLabelSetting();

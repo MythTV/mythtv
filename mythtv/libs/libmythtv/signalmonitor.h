@@ -60,7 +60,7 @@ enum {
 
 inline QString sm_flags_to_string(uint);
 
-class SignalMonitor: virtual public QObject
+class SignalMonitor : public QObject
 {
     Q_OBJECT
   public:

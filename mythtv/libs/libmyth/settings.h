@@ -18,21 +18,93 @@ using namespace std;
 class QWidget;
 class ConfigurationGroup;
 class QDir;
+class Setting;
 
-class MPUBLIC Configurable: virtual public QObject {
+class MPUBLIC Storage
+{
+  public:
+    Storage() {}
+    virtual ~Storage() {}
+
+    virtual void load(void) = 0;
+    virtual void save(void) = 0;
+    virtual void save(QString /*destination*/) { }
+};
+
+class MPUBLIC DBStorage : public Storage
+{
+  public:
+    DBStorage(Setting *_setting, QString _table, QString _column) :
+        setting(_setting), table(_table), column(_column) {}
+
+    virtual ~DBStorage() {}
+
+  protected:
+    QString getColumn(void) const { return column; };
+    QString getTable(void) const { return table; };
+
+    Setting *setting;
+    QString table;
+    QString column;
+};
+
+class MPUBLIC SimpleDBStorage : public DBStorage
+{
+  public:
+    SimpleDBStorage(Setting *_setting,
+                    QString _table, QString _column) :
+        DBStorage(_setting, _table, _column) {}
+    virtual ~SimpleDBStorage() {};
+
+    virtual void load(void);
+    virtual void save(void);
+    virtual void save(QString destination);
+
+  protected:
+    virtual QString whereClause(MSqlBindings&) = 0;
+    virtual QString setClause(MSqlBindings& bindings);
+};
+
+class MPUBLIC TransientStorage : public Storage
+{
+  public:
+    TransientStorage() {}
+    virtual ~TransientStorage() {}
+
+    virtual void load(void) { }
+    virtual void save(void) { }
+};
+
+class MPUBLIC HostDBStorage : public SimpleDBStorage
+{
+  public:
+    HostDBStorage(Setting *_setting, QString name);
+
+  protected:
+    virtual QString whereClause(MSqlBindings &bindings);
+    virtual QString setClause(MSqlBindings &bindings);
+};
+
+class MPUBLIC GlobalDBStorage : public SimpleDBStorage
+{
+  public:
+    GlobalDBStorage(Setting *_setting, QString name);
+
+  protected:
+    virtual QString whereClause(MSqlBindings &bindings);
+    virtual QString setClause(MSqlBindings &bindings);
+};
+
+///////////////////////////////////////////////////////////////////////////////
+
+class MPUBLIC Configurable : public QObject
+{
     Q_OBJECT
-public:
-    Configurable():
-        labelAboveWidget(false), enabled(true), visible(true) {};
-    virtual ~Configurable() {};
 
+  public:
     // Create and return a widget for configuring this entity
     virtual QWidget* configWidget(ConfigurationGroup *cg, QWidget* parent,
                                   const char* widgetName = 0);
-
-    virtual void load() = 0;
-    virtual void save() = 0;
-    virtual void save(QString /*destination*/) { }
 
     // A name for looking up the setting
     void setName(QString str) {
@@ -41,7 +113,7 @@ public:
             setLabel(str);
     };
     QString getName(void) const { return configName; };
-    virtual class Setting* byName(QString name) = 0;
+    virtual Setting* byName(const QString &name) = 0;
 
     // A label displayed to the user
     void setLabel(QString str) { label = str; };
@@ -57,229 +129,80 @@ public:
     virtual void setEnabled(bool b) { enabled = b; }
     bool isEnabled() { return enabled; }
 
-public slots:
+    Storage *GetStorage(void) { return storage; }
+
+  public slots:
     virtual void enableOnSet(const QString &val);
     virtual void enableOnUnset(const QString &val);
 
-protected:
+  protected:
+    Configurable(Storage *_storage) :
+        labelAboveWidget(false), enabled(true), storage(_storage),
+        configName(""), label(""), helptext(""), visible(true) { }
+    virtual ~Configurable() { }
+
+  protected:
     bool labelAboveWidget; 
     bool enabled;
-
-private:
+    Storage *storage;
     QString configName;
     QString label;
     QString helptext;
     bool visible;
 };
 
-class MPUBLIC Setting: virtual public Configurable {
-    Q_OBJECT
-public:
-    Setting(): changed(false) {};
-    virtual ~Setting() {};
-
-    virtual QString getValue(void) const {
-        return settingValue;
-    };
-
-    virtual Setting* byName(QString name) {
-        if (name == getName())
-            return this;
-        return NULL;
-    };
-
-    bool isChanged(void) { return changed; };
-    void setUnchanged(void) { changed = false; };
-    void setChanged(void) { changed = true; };
-
-public slots:
-    virtual void setValue(const QString& newValue) {
-        settingValue = newValue;
-        changed = true;
-        emit valueChanged(settingValue);
-    };
-signals:
-    void valueChanged(const QString&);
-
-protected:
-    QString settingValue;
-    bool changed;
-};
-
-class MPUBLIC ConfigurationGroup: virtual public Configurable 
+class MPUBLIC Setting : public Configurable
 {
     Q_OBJECT
+
   public:
-    ConfigurationGroup(bool luselabel = true, bool luseframe = true,
-                       bool lzeroMargin = false, bool lzeroSpace = false) :
-        uselabel(luselabel),     useframe(luseframe),
-        zeroMargin(lzeroMargin), zeroSpace(lzeroSpace)
-    {
-    }
-    virtual ~ConfigurationGroup();
+    // Gets
+    bool isChanged(void) const { return changed; }
+    virtual QString getValue(void) const;
 
+    // non-const Gets
+    virtual Setting *byName(const QString &name)
+        { return (name == configName) ? this : NULL; }
 
-    void addChild(Configurable* child) {
-        children.push_back(child);
-    };
+    // Sets
+    void SetChanged(bool c) { changed = c;       }
+    void setUnchanged(void) { SetChanged(false); }
+    void setChanged(void)   { SetChanged(true);  }
 
-    virtual Setting* byName(QString name);
-
-    virtual void load();
-
-    virtual void save();
-    virtual void save(QString destination);
-
-    void setUseLabel(bool useit) { uselabel = useit; }
-    void setUseFrame(bool useit) { useframe = useit; }
-
-    void setOptions(bool luselabel = true, bool luseframe = true,
-                    bool lzeroMargin = false, bool lzeroSpace = false)
-    {
-        uselabel = luselabel; useframe = luseframe;
-        zeroMargin = lzeroMargin; zeroSpace = lzeroSpace;
-    }
+  public slots:
+    virtual void setValue(const QString &newValue);
 
   signals:
-    void changeHelpText(QString);
-    
+    void valueChanged(const QString&);
+
   protected:
-    typedef vector<Configurable*> childList;
-    childList children;
-    bool uselabel;
-    bool useframe;
-    bool zeroMargin;
-    bool zeroSpace;
+    Setting(Storage *_storage) : Configurable(_storage), changed(false) {};
+    virtual ~Setting() {};
+
+  protected:
+    QString settingValue;
+    bool    changed;
 };
 
-class MPUBLIC VerticalConfigurationGroup : virtual public ConfigurationGroup
-{
-  public:
-    VerticalConfigurationGroup(
-        bool luselabel   = true,  bool luseframe  = true,
-        bool lzeroMargin = false, bool lzeroSpace = false) :
-        ConfigurationGroup(luselabel, luseframe, lzeroMargin, lzeroSpace)
-    {
-    }
-
-    virtual QWidget* configWidget(ConfigurationGroup *cg, QWidget* parent,
-                                  const char* widgetName = NULL);
-};
-
-class MPUBLIC HorizontalConfigurationGroup :
-    virtual public ConfigurationGroup
-{
-  public:
-    HorizontalConfigurationGroup(
-        bool luselabel   = true,  bool luseframe  = true,
-        bool lzeroMargin = false, bool lzeroSpace = false) :
-        ConfigurationGroup(luselabel, luseframe, lzeroMargin, lzeroSpace)
-    {
-    }
-
-    virtual QWidget* configWidget(ConfigurationGroup *cg, QWidget* parent,
-                                  const char* widgetName = NULL);
-};
-
-class MPUBLIC GridConfigurationGroup: virtual public ConfigurationGroup {
- public:
-    GridConfigurationGroup(uint col,
-                           bool uselabel   = true,  bool useframe  = true,
-                           bool zeroMargin = false, bool zeroSpace = false) :
-        ConfigurationGroup(uselabel, useframe, zeroMargin, zeroSpace), 
-        columns(col)
-    {
-    }
-
-    virtual QWidget* configWidget(ConfigurationGroup *cg, QWidget* parent,
-                                  const char* widgetName = 0);
- private:
-    uint columns;
-};
-
-class MPUBLIC StackedConfigurationGroup: virtual public ConfigurationGroup {
-    Q_OBJECT
-public:
-    StackedConfigurationGroup(bool uselabel = true) :
-        ConfigurationGroup(uselabel, true, false, false),
-        top(0), saveAll(true)
-    {
-    }
-
-    virtual QWidget* configWidget(ConfigurationGroup *cg, QWidget* parent,
-                                  const char* widgetName = 0);
-
-    void raise(Configurable* child);
-    virtual void save();
-    virtual void save(QString destination);
-
-    // save all children, or only the top?
-    void setSaveAll(bool b) { saveAll = b; };
-
-signals:
-    void raiseWidget(int);
-
-protected:
-    unsigned top;
-    bool saveAll;
-};
-
-class MPUBLIC ConfigurationDialogWidget: public MythDialog {
-    Q_OBJECT
-public:
-    ConfigurationDialogWidget(MythMainWindow *parent, 
-                              const char* widgetName = 0):
-        MythDialog(parent, widgetName) {};
-
-    virtual void keyPressEvent(QKeyEvent* e);
-
-signals:
-    void editButtonPressed();
-    void deleteButtonPressed();
-};
-
-class MPUBLIC ConfigurationDialog: virtual public Configurable {
-public:
-    ConfigurationDialog() : 
-        Configurable(), dialog(NULL) {};
-
-    // Make a modal dialog containing configWidget
-    virtual MythDialog* dialogWidget(MythMainWindow *parent,
-                                     const char* widgetName = 0);
-
-    // Show a dialogWidget, and save if accepted
-    int exec(bool saveOnExec = true, bool doLoad = true);
-
-protected:
-    MythDialog *dialog;
-};
-
-/** \class ConfigurationWizard
- *  \brief A wizard is a group with one child per page.
- */
-class MPUBLIC ConfigurationWizard: public ConfigurationDialog,
-                           public ConfigurationGroup
-{
-  public:
-    ConfigurationWizard() : ConfigurationGroup(true, true, false, false) {}
-
-    virtual MythDialog* dialogWidget(MythMainWindow *parent,
-                                     const char *widgetName = NULL);
-};
+///////////////////////////////////////////////////////////////////////////////
 
 // Read-only display of a setting
-class MPUBLIC LabelSetting: virtual public Setting {
-protected:
-    LabelSetting() {};
-public:
+class MPUBLIC LabelSetting : public Setting
+{
+  protected:
+    LabelSetting(Storage *_storage) : Setting(_storage) { }
+  public:
     virtual QWidget* configWidget(ConfigurationGroup *cg, QWidget* parent, 
                                   const char* widgetName = 0);
 };
 
-class MPUBLIC LineEditSetting: virtual public Setting {
-protected:
-    LineEditSetting(bool readwrite = true) : edit(NULL) { rw = readwrite; };
-public:
+class MPUBLIC LineEditSetting: public Setting
+{
+  protected:
+    LineEditSetting(Storage *_storage, bool readwrite = true) :
+        Setting(_storage), edit(NULL), rw(readwrite) { }
+
+  public:
     virtual QWidget* configWidget(ConfigurationGroup *cg, QWidget* parent, 
                                   const char* widgetName = 0);
 
@@ -302,11 +225,14 @@ private:
 
 // TODO: set things up so that setting the value as a string emits
 // the int signal also
-class MPUBLIC IntegerSetting: virtual public Setting {
+class MPUBLIC IntegerSetting : public Setting
+{
     Q_OBJECT
-protected:
-    IntegerSetting() {};
-public:
+
+  protected:
+    IntegerSetting(Storage *_storage) : Setting(_storage) { }
+
+  public:
     int intValue(void) const {
         return settingValue.toInt();
     };
@@ -319,12 +245,13 @@ signals:
     void valueChanged(int newValue);
 };
 
-class MPUBLIC BoundedIntegerSetting: public IntegerSetting {
-protected:
-    BoundedIntegerSetting(int _min, int _max, int _step) {
-        min=_min, max=_max, step=_step;
-    };
-protected:
+class MPUBLIC BoundedIntegerSetting : public IntegerSetting
+{
+  protected:
+    BoundedIntegerSetting(Storage *_storage, int _min, int _max, int _step) :
+        IntegerSetting(_storage), min(_min), max(_max), step(_step) { }
+
+  protected:
     int min;
     int max;
     int step;
@@ -332,8 +259,8 @@ protected:
 
 class MPUBLIC SliderSetting: public BoundedIntegerSetting {
 protected:
-    SliderSetting(int min, int max, int step):
-        BoundedIntegerSetting(min, max, step) {};
+    SliderSetting(Storage *_storage, int min, int max, int step) :
+        BoundedIntegerSetting(_storage, min, max, step) { }
 public:
     virtual QWidget* configWidget(ConfigurationGroup *cg, QWidget* parent, 
                                   const char* widgetName = 0);
@@ -341,10 +268,10 @@ public:
 
 class MPUBLIC SpinBoxSetting: public BoundedIntegerSetting {
 protected:
-    SpinBoxSetting(int min, int max, int step, 
+    SpinBoxSetting(Storage *_storage, int min, int max, int step, 
                    bool allow_single_step = false,
                    QString special_value_text = ""):
-        BoundedIntegerSetting(min, max, step),
+        BoundedIntegerSetting(_storage, min, max, step),
 	sstep(allow_single_step),
         svtext(special_value_text) {};
 
@@ -356,11 +283,15 @@ public:
                                   const char* widgetName = 0);
 };
 
-class MPUBLIC SelectSetting: virtual public Setting {
+class MPUBLIC SelectSetting : public Setting
+{
     Q_OBJECT
-protected:
-    SelectSetting() { isSet = false; };
-public:
+
+  protected:
+    SelectSetting(Storage *_storage) :
+        Setting(_storage), current(0), isSet(false) { }
+
+  public:
     virtual void addSelection(const QString& label,
                               QString value=QString::null,
                               bool select=false);
@@ -406,11 +337,12 @@ protected:
     bool isSet;
 };
 
-class MPUBLIC SelectLabelSetting: public LabelSetting, public SelectSetting {
-protected:
-    SelectLabelSetting() {};
+class MPUBLIC SelectLabelSetting : public SelectSetting
+{
+  protected:
+    SelectLabelSetting(Storage *_storage) : SelectSetting(_storage) { }
 
-public:
+  public:
     virtual QWidget* configWidget(ConfigurationGroup *cg, QWidget* parent, 
                                   const char* widgetName = 0);
 };
@@ -419,11 +351,8 @@ class MPUBLIC ComboBoxSetting: public SelectSetting {
     Q_OBJECT
 
 protected:
-    ComboBoxSetting(bool _rw = false, int _step = 1) {
-        rw = _rw;
-        step = _step;
-        widget = NULL;
-    }
+    ComboBoxSetting(Storage *_storage, bool _rw = false, int _step = 1) :
+        SelectSetting(_storage), rw(_rw), widget(NULL), step(_step) { }
 
 public:
     virtual void setValue(QString newValue);
@@ -459,7 +388,10 @@ protected:
 class MPUBLIC ListBoxSetting: public SelectSetting {
     Q_OBJECT
 public:
-    ListBoxSetting(): widget(NULL), selectionMode(MythListBox::Single) { }
+    ListBoxSetting(Storage *_storage) :
+        SelectSetting(_storage), widget(NULL),
+        selectionMode(MythListBox::Single) { }
+
     virtual QWidget* configWidget(ConfigurationGroup *cg, QWidget* parent, 
                                   const char* widgetName = 0);
 
@@ -476,23 +408,23 @@ signals:
     void editButtonPressed(int);
     void deleteButtonPressed(int);
 
+  public slots:
+    void addSelection(const QString &label,
+                      QString        value  = QString::null,
+                      bool           select = false);
+
 protected slots:
     void setValueByIndex(int index);
-    void addSelection(const QString& label,
-                      QString value=QString::null,
-                      bool select=false) {
-        SelectSetting::addSelection(label, value, select);
-        if (widget != NULL)
-            widget->insertItem(label);
-    };
     void widgetDestroyed() { widget=NULL; };
 protected:
     MythListBox* widget;
     MythListBox::SelectionMode selectionMode;
 };
 
-class MPUBLIC RadioSetting: public SelectSetting {
+class MPUBLIC RadioSetting : public SelectSetting
+{
 public:
+    RadioSetting(Storage *_storage) : SelectSetting(_storage) { }
     virtual QWidget* configWidget(ConfigurationGroup *cg, QWidget* parent, 
                                   const char* widgetName = 0);
 };
@@ -500,6 +432,7 @@ public:
 class MPUBLIC ImageSelectSetting: public SelectSetting {
     Q_OBJECT
 public:
+    ImageSelectSetting(Storage *_storage) : SelectSetting(_storage) { }
     virtual ~ImageSelectSetting();
     virtual QWidget* configWidget(ConfigurationGroup *cg, QWidget* parent, 
                                   const char* widgetName = 0);
@@ -517,9 +450,13 @@ protected:
     float m_hmult, m_wmult;
 };
 
-class MPUBLIC BooleanSetting: virtual public Setting {
+class MPUBLIC BooleanSetting : public Setting
+{
     Q_OBJECT
-public:
+
+  public:
+    BooleanSetting(Storage *_storage) : Setting(_storage) {}
+
     bool boolValue(void) const {
         return getValue().toInt() != 0;
     };
@@ -537,7 +474,8 @@ signals:
 
 class MPUBLIC CheckBoxSetting: public BooleanSetting {
 public:
-    CheckBoxSetting() : widget(NULL) {}
+    CheckBoxSetting(Storage *_storage) :
+        BooleanSetting(_storage), widget(NULL) { }
     virtual QWidget* configWidget(ConfigurationGroup *cg, QWidget* parent,
                                   const char* widgetName = 0);
     virtual void setEnabled(bool b);
@@ -545,54 +483,11 @@ protected:
     MythCheckBox *widget;
 };
 
-
-class MPUBLIC TriggeredConfigurationGroup :
-    virtual public ConfigurationGroup
-{
-    Q_OBJECT
-public:
-    TriggeredConfigurationGroup(bool uselabel = true) :
-        ConfigurationGroup(uselabel, true, false, false),
-        configStack(NULL), trigger(NULL)
-    {
-    }
-
-    void setTrigger(Configurable* _trigger);
-
-    void addTarget(QString triggerValue, Configurable* target);
-
-    void setSaveAll(bool b) { configStack->setSaveAll(b); };
-
-protected slots:
-    virtual void triggerChanged(const QString& value) {
-        configStack->raise(triggerMap[value]);
-    };
-protected:
-    StackedConfigurationGroup* configStack;
-    Configurable* trigger;
-    map<QString,Configurable*> triggerMap;
-};
-    
-class MPUBLIC TabbedConfigurationGroup: virtual public ConfigurationGroup
-{
-    Q_OBJECT
-
-  public:
-    TabbedConfigurationGroup() :
-        ConfigurationGroup(true, true, false, false)
-    {
-    }
-
-    virtual QWidget* configWidget(ConfigurationGroup *cg, QWidget* parent,
-                                  const char* widgetName = 0);
-};
-
 class MPUBLIC PathSetting : public ComboBoxSetting
 {
 public:
-    PathSetting(bool _mustexist):
-        ComboBoxSetting(true), mustexist(_mustexist) {
-    };
+    PathSetting(Storage *_storage, bool _mustexist):
+        ComboBoxSetting(_storage, true), mustexist(_mustexist) { }
 
     // TODO: this should support globbing of some sort
     virtual void addSelection(const QString& label,
@@ -606,14 +501,17 @@ protected:
     bool mustexist;
 };
 
-class MPUBLIC HostnameSetting: virtual public Setting {
-public:
-    HostnameSetting();
+class MPUBLIC HostnameSetting : public Setting
+{
+  public:
+    HostnameSetting(Storage *_storage);
 };
 
-class MPUBLIC ChannelSetting: virtual public SelectSetting {
-public:
-    ChannelSetting() {
+class MPUBLIC ChannelSetting : public SelectSetting
+{
+  public:
+    ChannelSetting(Storage *_storage) : SelectSetting(_storage)
+    {
         setLabel("Channel");
     };
 
@@ -624,9 +522,13 @@ public:
 };
 
 class QDate;
-class MPUBLIC DateSetting: virtual public Setting {
+class MPUBLIC DateSetting : public Setting
+{
     Q_OBJECT
-public:
+
+  public:
+    DateSetting(Storage *_storage) : Setting(_storage) { }
+
     QDate dateValue(void) const;
 
     virtual QWidget* configWidget(ConfigurationGroup* cg, QWidget* parent,
@@ -637,9 +539,12 @@ public:
 };
 
 class QTime;
-class MPUBLIC TimeSetting: virtual public Setting {
+class MPUBLIC TimeSetting : public Setting
+{
     Q_OBJECT
-public:
+
+  public:
+    TimeSetting(Storage *_storage) : Setting(_storage) { }
     QTime timeValue(void) const;
 
     virtual QWidget* configWidget(ConfigurationGroup* cg, QWidget* parent,
@@ -649,65 +554,29 @@ public:
     void setValue(const QTime& newValue);
 };
 
-class MPUBLIC DBStorage: virtual public Setting {
-public:
-    DBStorage(QString _table, QString _column):
-        table(_table), column(_column) {};
-
-    virtual void load() = 0;
-    virtual void save() = 0;
-    virtual void save(QString /*destination*/) { }
-
-protected:
-    QString getColumn(void) const { return column; };
-    QString getTable(void) const { return table; };
-
-    QString table;
-    QString column;
-};
-
-class MPUBLIC SimpleDBStorage: public DBStorage {
-public:
-    SimpleDBStorage(QString table, QString column):
-        DBStorage(table, column) {};
-
-    virtual ~SimpleDBStorage() {};
-
-    virtual void load();
-    virtual void save();
-    virtual void save(QString destination);
-
-protected:
-
-    virtual QString whereClause(MSqlBindings&) = 0;
-    virtual QString setClause(MSqlBindings& bindings);
-};
-
-class MPUBLIC TransientStorage: virtual public Setting {
-public:
-    virtual void load() {  }
-    virtual void save() {  }
-    virtual void save(QString) {  }
-};
-
-class MPUBLIC AutoIncrementStorage: virtual public IntegerSetting,
-    public DBStorage {
-public:
-    AutoIncrementStorage(QString table, QString column):
-        DBStorage(table, column) {
+class MPUBLIC AutoIncrementDBSetting :
+    public IntegerSetting, public DBStorage
+{
+  public:
+    AutoIncrementDBSetting(QString _table, QString _column) :
+        IntegerSetting(this), DBStorage(this, _table, _column)
+    {
         setValue(0);
-    };
+    }
 
     virtual void load() { };
     virtual void save();
     virtual void save(QString destination);
 };
 
-class MPUBLIC ButtonSetting: virtual public Setting {
+class MPUBLIC ButtonSetting: public Setting
+{
     Q_OBJECT
-public:
-    ButtonSetting(QString _name = "button") :
-        name(_name), button(NULL) {}
+
+  public:
+    ButtonSetting(Storage *_storage, QString _name = "button") :
+        Setting(_storage), name(_name), button(NULL) { }
+
     virtual QWidget* configWidget(ConfigurationGroup* cg, QWidget* parent,
                                   const char* widgetName=0);
 
@@ -725,41 +594,11 @@ protected:
     MythPushButton *button;
 };
 
-class MPUBLIC ConfigPopupDialogWidget: public MythPopupBox {
-    Q_OBJECT
-public:
-    ConfigPopupDialogWidget(MythMainWindow* parent, const char* widgetName=0):
-        MythPopupBox(parent, widgetName) {};
-
-    virtual void keyPressEvent(QKeyEvent* e);
-    void accept() { MythPopupBox::accept(); };
-    void reject() { MythPopupBox::reject(); };
-};
-
-class MPUBLIC ConfigurationPopupDialog: virtual public Configurable {
-    Q_OBJECT
-public:
-    ConfigurationPopupDialog() { dialog=NULL; };
-    ~ConfigurationPopupDialog() { delete dialog; };
-
-    virtual MythDialog* dialogWidget(MythMainWindow* parent,
-                                     const char* widgetName=0);
-    int exec(bool saveOnAccept=true);
-
-public slots:
-    void accept() { if (dialog) dialog->accept(); };
-    void reject() { if (dialog) dialog->reject(); };
-
-signals:
-    void popupDone();
-
-protected:
-    ConfigPopupDialogWidget* dialog;
-};
-
-class MPUBLIC ProgressSetting: virtual public IntegerSetting {
-public:
-    ProgressSetting(int _totalSteps): totalSteps(_totalSteps) {};
+class MPUBLIC ProgressSetting : public IntegerSetting
+{
+  public:
+    ProgressSetting(Storage *_storage, int _totalSteps) :
+        IntegerSetting(_storage), totalSteps(_totalSteps) { }
 
     QWidget* configWidget(ConfigurationGroup* cg, QWidget* parent,
                           const char* widgetName = 0);
@@ -768,61 +607,36 @@ private:
     int totalSteps;
 };
 
-class MPUBLIC HostSetting: public SimpleDBStorage,
-    virtual public Configurable {
-public:
-    HostSetting(QString name):
-        SimpleDBStorage("settings", "data") {
-        setName(name);
-    };
-    virtual ~HostSetting() { ; }
-
-protected:
-    virtual QString whereClause(MSqlBindings& bindings);
-    virtual QString setClause(MSqlBindings& bindings);
-};
-
-class MPUBLIC GlobalSetting: public SimpleDBStorage,
-    virtual public Configurable {
-public:
-    GlobalSetting(QString name):
-        SimpleDBStorage("settings", "data") {
-        setName(name);
-    };
-
-protected:
-    virtual QString whereClause(MSqlBindings& bindings);
-    virtual QString setClause(MSqlBindings& bindings);
-};
-
 ///////////////////////////////////////////////////////////////////////////////
 
 class MPUBLIC TransButtonSetting :
     public ButtonSetting, public TransientStorage
 {
   public:
-    TransButtonSetting(QString name = "button") : ButtonSetting(name) { }
+    TransButtonSetting(QString name = "button") :
+        ButtonSetting(this, name), TransientStorage() { }
 };
 
 class MPUBLIC TransLabelSetting :
     public LabelSetting, public TransientStorage
 {
   public:
-    TransLabelSetting() { }
+    TransLabelSetting() : LabelSetting(this), TransientStorage() { }
 };
 
 class MPUBLIC TransLineEditSetting :
     public LineEditSetting, public TransientStorage
 {
   public:
-    TransLineEditSetting(bool rw = true) : LineEditSetting(rw) { }
+    TransLineEditSetting(bool rw = true) :
+        LineEditSetting(this, rw), TransientStorage() { }
 };
 
 class MPUBLIC TransCheckBoxSetting :
     public CheckBoxSetting, public TransientStorage
 {
   public:
-    TransCheckBoxSetting() { }
+    TransCheckBoxSetting() : CheckBoxSetting(this), TransientStorage() { }
 };
 
 class MPUBLIC TransComboBoxSetting :
@@ -830,7 +644,7 @@ class MPUBLIC TransComboBoxSetting :
 {
   public:
     TransComboBoxSetting(bool rw = true, int _step = 1) :
-        ComboBoxSetting(rw, _step) { }
+        ComboBoxSetting(this, rw, _step), TransientStorage() { }
 };
 
 class MPUBLIC TransSpinBoxSetting :
@@ -840,61 +654,67 @@ class MPUBLIC TransSpinBoxSetting :
     TransSpinBoxSetting(int min, int max, int step,
                         bool allow_single_step = false,
                         QString special_value_text = "") :
-        SpinBoxSetting(min, max, step, allow_single_step,
-                       special_value_text) { }
+        SpinBoxSetting(this, min, max, step, allow_single_step,
+                       special_value_text), TransientStorage() { }
 };
 
 ///////////////////////////////////////////////////////////////////////////////
 
-class MPUBLIC HostSlider: public SliderSetting, public HostSetting {
+class MPUBLIC HostSlider : public SliderSetting, public HostDBStorage
+{
   public:
     HostSlider(const QString &name, int min, int max, int step) :
-        SliderSetting(min, max, step),
-        HostSetting(name) { }
+        SliderSetting(this, min, max, step),
+        HostDBStorage(this, name) { }
 };
 
-class MPUBLIC HostSpinBox: public SpinBoxSetting, public HostSetting {
+class MPUBLIC HostSpinBox: public SpinBoxSetting, public HostDBStorage
+{
   public:
     HostSpinBox(const QString &name, int min, int max, int step, 
                   bool allow_single_step = false) :
-        SpinBoxSetting(min, max, step, allow_single_step),
-        HostSetting(name) { }
+        SpinBoxSetting(this, min, max, step, allow_single_step),
+        HostDBStorage(this, name) { }
 };
 
-class MPUBLIC HostCheckBox: public CheckBoxSetting, public HostSetting {
+class MPUBLIC HostCheckBox : public CheckBoxSetting, public HostDBStorage
+{
   public:
     HostCheckBox(const QString &name) :
-        HostSetting(name) { }
+        CheckBoxSetting(this), HostDBStorage(this, name) { }
     virtual ~HostCheckBox() { ; }
 };
 
-class MPUBLIC HostComboBox: public ComboBoxSetting, public HostSetting {
+class MPUBLIC HostComboBox : public ComboBoxSetting, public HostDBStorage
+{
   public:
     HostComboBox(const QString &name, bool rw = false) :
-        ComboBoxSetting(rw),
-        HostSetting(name) { }
+        ComboBoxSetting(this, rw), HostDBStorage(this, name) { }
     virtual ~HostComboBox() { ; }
 };
 
-class MPUBLIC HostRefreshRateComboBox: virtual public HostComboBox
+class MPUBLIC HostRefreshRateComboBox : public HostComboBox
 {
     Q_OBJECT
   public:
     HostRefreshRateComboBox(const QString &name, bool rw = false) :
-        HostComboBox(name, rw) { ; }
+        HostComboBox(name, rw) { }
     virtual ~HostRefreshRateComboBox() { ; }
+
   public slots:
     virtual void ChangeResolution(const QString& resolution);
+
   private:
     static const vector<short> GetRefreshRates(const QString &resolution);
 };
 
-class MPUBLIC HostTimeBox: public ComboBoxSetting, public HostSetting {
+class MPUBLIC HostTimeBox : public ComboBoxSetting, public HostDBStorage
+{
   public:
     HostTimeBox(const QString &name, const QString &defaultTime = "00:00",
                 const int interval = 1) :
-        ComboBoxSetting(false, 30 / interval),
-        HostSetting(name)
+        ComboBoxSetting(this, false, 30 / interval),
+        HostDBStorage(this, name)
     {
         int hour;
         int minute;
@@ -911,67 +731,74 @@ class MPUBLIC HostTimeBox: public ComboBoxSetting, public HostSetting {
     }
 };
 
-class MPUBLIC HostLineEdit: public LineEditSetting, public HostSetting {
+class MPUBLIC HostLineEdit: public LineEditSetting, public HostDBStorage
+{
   public:
     HostLineEdit(const QString &name, bool rw = true) :
-        LineEditSetting(rw),
-        HostSetting(name) { }
+        LineEditSetting(this, rw), HostDBStorage(this, name) { }
 };
 
-class MPUBLIC HostImageSelect: public ImageSelectSetting, public HostSetting {
+class MPUBLIC HostImageSelect : public ImageSelectSetting, public HostDBStorage
+{
   public:
     HostImageSelect(const QString &name) :
-        HostSetting(name) { }
+        ImageSelectSetting(this), HostDBStorage(this, name) { }
 };
 
-class MPUBLIC GlobalSlider: public SliderSetting, public GlobalSetting {
+///////////////////////////////////////////////////////////////////////////////
+
+class MPUBLIC GlobalSlider : public SliderSetting, public GlobalDBStorage
+{
   public:
     GlobalSlider(const QString &name, int min, int max, int step) :
-        SliderSetting(min, max, step),
-        GlobalSetting(name) { }
+        SliderSetting(this, min, max, step), GlobalDBStorage(this, name) { }
 };
 
-class MPUBLIC GlobalSpinBox: public SpinBoxSetting, public GlobalSetting {
+class MPUBLIC GlobalSpinBox : public SpinBoxSetting, public GlobalDBStorage
+{
   public:
     GlobalSpinBox(const QString &name, int min, int max, int step,
                    bool allow_single_step = false) :
-        SpinBoxSetting(min, max, step, allow_single_step),
-        GlobalSetting(name) { }
+        SpinBoxSetting(this, min, max, step, allow_single_step),
+        GlobalDBStorage(this, name) { }
 };
 
-class MPUBLIC GlobalCheckBox: public CheckBoxSetting, public GlobalSetting {
+class MPUBLIC GlobalCheckBox : public CheckBoxSetting, public GlobalDBStorage
+{
   public:
     GlobalCheckBox(const QString &name) :
-        GlobalSetting(name) { }
+        CheckBoxSetting(this), GlobalDBStorage(this, name) { }
 };
 
-class MPUBLIC GlobalComboBox: public ComboBoxSetting, public GlobalSetting {
+class MPUBLIC GlobalComboBox : public ComboBoxSetting, public GlobalDBStorage
+{
   public:
     GlobalComboBox(const QString &name, bool rw = false) :
-        ComboBoxSetting(rw),
-        GlobalSetting(name) { }
+        ComboBoxSetting(this, rw), GlobalDBStorage(this, name) { }
 };
 
-class MPUBLIC GlobalLineEdit: public LineEditSetting, public GlobalSetting {
+class MPUBLIC GlobalLineEdit : public LineEditSetting, public GlobalDBStorage
+{
   public:
     GlobalLineEdit(const QString &name, bool rw = true) :
-        LineEditSetting(rw),
-        GlobalSetting(name) { }
+        LineEditSetting(this, rw), GlobalDBStorage(this, name) { }
 };
 
-class MPUBLIC GlobalImageSelect: public ImageSelectSetting, public GlobalSetting
+class MPUBLIC GlobalImageSelect :
+   public ImageSelectSetting, public GlobalDBStorage
 {
   public:
     GlobalImageSelect(const QString &name) :
-        GlobalSetting(name) { }
+        ImageSelectSetting(this), GlobalDBStorage(this, name) { }
 };
 
-class MPUBLIC GlobalTimeBox: public ComboBoxSetting, public GlobalSetting {
+class MPUBLIC GlobalTimeBox : public ComboBoxSetting, public GlobalDBStorage
+{
   public:
     GlobalTimeBox(const QString &name, const QString &defaultTime = "00:00",
                   const int interval = 1) :
-        ComboBoxSetting(false, 30 / interval),
-        GlobalSetting(name)
+        ComboBoxSetting(this, false, 30 / interval),
+        GlobalDBStorage(this, name)
     {
         int hour;
         int minute;
@@ -986,20 +813,366 @@ class MPUBLIC GlobalTimeBox: public ComboBoxSetting, public GlobalSetting {
             }
         }
     }
+};
+
+///////////////////////////////////////////////////////////////////////////////
+
+class MPUBLIC ConfigurationGroup : public Setting, public Storage
+{
+    Q_OBJECT
+  public:
+    ConfigurationGroup(bool luselabel = true, bool luseframe = true,
+                       bool lzeroMargin = false, bool lzeroSpace = false) :
+        Setting(this),
+        uselabel(luselabel),     useframe(luseframe),
+        zeroMargin(lzeroMargin), zeroSpace(lzeroSpace)
+    {
+    }
+
+    virtual void deleteLater(void);
+
+    void addChild(Configurable* child) {
+        children.push_back(child);
+    };
+
+    virtual Setting* byName(QString name);
+
+    virtual void load();
+
+    virtual void save();
+    virtual void save(QString destination);
+
+    void setUseLabel(bool useit) { uselabel = useit; }
+    void setUseFrame(bool useit) { useframe = useit; }
+
+    void setOptions(bool luselabel = true, bool luseframe = true,
+                    bool lzeroMargin = false, bool lzeroSpace = false)
+    {
+        uselabel = luselabel; useframe = luseframe;
+        zeroMargin = lzeroMargin; zeroSpace = lzeroSpace;
+    }
+
+  signals:
+    void changeHelpText(QString);
+    
+  protected:
+    virtual ~ConfigurationGroup();
+
+  protected:
+    typedef vector<Configurable*> childList;
+    childList children;
+    bool uselabel;
+    bool useframe;
+    bool zeroMargin;
+    bool zeroSpace;
+};
+
+class MPUBLIC VerticalConfigurationGroup : public ConfigurationGroup
+{
+  public:
+    VerticalConfigurationGroup(
+        bool luselabel   = true,  bool luseframe  = true,
+        bool lzeroMargin = false, bool lzeroSpace = false) :
+        ConfigurationGroup(luselabel, luseframe, lzeroMargin, lzeroSpace)
+    {
+    }
+
+    virtual QWidget *configWidget(ConfigurationGroup *cg,
+                                  QWidget            *parent,
+                                  const char         *widgetName);
+
+  protected:
+    /// You need to call deleteLater to delete QObject
+    virtual ~VerticalConfigurationGroup() { }
+};
+
+class MPUBLIC HorizontalConfigurationGroup : public ConfigurationGroup
+{
+  public:
+    HorizontalConfigurationGroup(
+        bool luselabel   = true,  bool luseframe  = true,
+        bool lzeroMargin = false, bool lzeroSpace = false) :
+        ConfigurationGroup(luselabel, luseframe, lzeroMargin, lzeroSpace)
+    {
+    }
+
+    virtual QWidget *configWidget(ConfigurationGroup *cg,
+                                  QWidget            *parent,
+                                  const char         *widgetName);
+
+  protected:
+    /// You need to call deleteLater to delete QObject
+    virtual ~HorizontalConfigurationGroup() { }
+};
+
+class MPUBLIC GridConfigurationGroup : public ConfigurationGroup
+{
+  public:
+    GridConfigurationGroup(uint col,
+                           bool uselabel   = true,  bool useframe  = true,
+                           bool zeroMargin = false, bool zeroSpace = false) :
+        ConfigurationGroup(uselabel, useframe, zeroMargin, zeroSpace), 
+        columns(col)
+    {
+    }
+
+    virtual QWidget *configWidget(ConfigurationGroup *cg,
+                                  QWidget            *parent,
+                                  const char         *widgetName);
+
+  protected:
+    /// You need to call deleteLater to delete QObject
+    virtual ~GridConfigurationGroup() { }
+
+  private:
+    uint columns;
+};
+
+class MPUBLIC StackedConfigurationGroup : public ConfigurationGroup
+{
+    Q_OBJECT
+
+  public:
+    StackedConfigurationGroup(
+        bool uselabel   = true,  bool useframe  = true,
+        bool zeroMargin = false, bool zeroSpace = false) :
+        ConfigurationGroup(uselabel, useframe, zeroMargin, zeroSpace),
+        top(0), saveAll(true)
+    {
+    }
+
+    virtual QWidget* configWidget(ConfigurationGroup *cg, QWidget* parent,
+                                  const char* widgetName = 0);
+
+    void raise(Configurable* child);
+    virtual void save(void);
+    virtual void save(QString destination);
+
+    // save all children, or only the top?
+    void setSaveAll(bool b) { saveAll = b; };
+
+  signals:
+    void raiseWidget(int);
+
+  protected:
+    /// You need to call deleteLater to delete QObject
+    virtual ~StackedConfigurationGroup() { }
+
+  protected:
+    uint top;
+    bool saveAll;
+};
+
+
+class MPUBLIC TriggeredConfigurationGroup : public ConfigurationGroup
+{
+    Q_OBJECT
+
+  public:
+    TriggeredConfigurationGroup(
+        bool uselabel         = true,  bool useframe        = true,
+        bool zeroMargin       = false, bool zeroSpace       = false,
+        bool stack_uselabel   = true,  bool stack_useframe  = true,
+        bool stack_zeroMargin = false, bool stack_zeroSpace = false) :
+        ConfigurationGroup(uselabel, useframe, zeroMargin, zeroSpace),
+        stackUseLabel(stack_uselabel),     stackUseFrame(stack_useframe),
+        stackZeroMargin(stack_zeroMargin), stackZeroSpace(stack_zeroSpace),
+        isVertical(true),                  isSaveAll(true),
+        configLayout(NULL),                configStack(NULL),
+        trigger(NULL)
+    {
+    }
+
+    // Commands
+
+    virtual void addChild(Configurable *child);
+
+    void addTarget(QString triggerValue, Configurable *target);
+
+    virtual QWidget *configWidget(ConfigurationGroup *cg, 
+                                  QWidget            *parent,
+                                  const char         *widgetName);
+
+    // Sets
+
+    void SetVertical(bool vert);
+
+    virtual void setSaveAll(bool b)
+    {
+        if (configStack)
+            configStack->setSaveAll(b);
+        isSaveAll = b;
+    }
+
+    void setTrigger(Configurable *_trigger);
+
+  protected slots:
+    virtual void triggerChanged(const QString &value)
+    {
+        if (configStack)
+            configStack->raise(triggerMap[value]);
+    }
+
+  protected:
+    /// You need to call deleteLater to delete QObject
+    virtual ~TriggeredConfigurationGroup() { }
+    void VerifyLayout(void);
+
+  protected:
+    bool stackUseLabel;
+    bool stackUseFrame;
+    bool stackZeroMargin;
+    bool stackZeroSpace;
+    bool isVertical;
+    bool isSaveAll;
+    ConfigurationGroup          *configLayout;
+    StackedConfigurationGroup   *configStack;
+    Configurable                *trigger;
+    QMap<QString,Configurable*>  triggerMap;
+};
+    
+class MPUBLIC TabbedConfigurationGroup : public ConfigurationGroup
+{
+    Q_OBJECT
+
+  public:
+    TabbedConfigurationGroup() :
+        ConfigurationGroup(true, true, false, false) { }
+
+    virtual QWidget* configWidget(ConfigurationGroup *cg,
+                                  QWidget            *parent,
+                                  const char         *widgetName);
+};
+
+///////////////////////////////////////////////////////////////////////////////
+
+class MPUBLIC ConfigPopupDialogWidget : public MythPopupBox
+{
+    Q_OBJECT
+  public:
+    ConfigPopupDialogWidget(MythMainWindow* parent, const char *widgetName) :
+        MythPopupBox(parent, widgetName) { }
+
+    virtual void keyPressEvent(QKeyEvent* e);
+    void accept() { MythPopupBox::accept(); }
+    void reject() { MythPopupBox::reject(); }
+
+  protected:
+    /// You need to call deleteLater to delete QObject
+    virtual ~ConfigPopupDialogWidget() { }
+};
+
+class MPUBLIC ConfigurationPopupDialog : public VerticalConfigurationGroup
+{
+    Q_OBJECT
+
+  public:
+    ConfigurationPopupDialog() :
+        VerticalConfigurationGroup(), dialog(NULL) { }
+
+    virtual MythDialog *dialogWidget(
+        MythMainWindow *parent, const char* widgetName);
+
+    int exec(bool saveOnAccept = true);
+
+  public slots:
+    void accept(void) { if (dialog) dialog->accept(); }
+    void reject(void) { if (dialog) dialog->reject(); }
+
+  signals:
+    void popupDone(void);
+
+  protected:
+    /// You need to call deleteLater to delete QObject
+    virtual ~ConfigurationPopupDialog() { dialog->deleteLater(); }
+
+  protected:
+    ConfigPopupDialogWidget* dialog;
+};
+
+///////////////////////////////////////////////////////////////////////////////
+
+class MPUBLIC ConfigurationDialogWidget : public MythDialog
+{
+    Q_OBJECT
+
+  public:
+    ConfigurationDialogWidget(MythMainWindow *parent, 
+                              const char     *widgetName) :
+        MythDialog(parent, widgetName) { }
+
+    virtual void keyPressEvent(QKeyEvent* e);
+
+  signals:
+    void editButtonPressed(void);
+    void deleteButtonPressed(void);
+};
+
+/** \class ConfigurationDialog
+ *  \brief A ConfigurationDialog that uses a ConfigurationGroup
+ *         all children on one page in a vertical layout.
+ */
+class MPUBLIC ConfigurationDialog
+{
+  public:
+    ConfigurationDialog() : dialog(NULL), cfgGrp(new ConfigurationGroup()) { }
+    virtual ~ConfigurationDialog() { cfgGrp->deleteLater(); }
+
+    // Make a modal dialog containing configWidget
+    virtual MythDialog *dialogWidget(MythMainWindow *parent,
+                                     const char     *widgetName);
+
+    // Show a dialogWidget, and save if accepted
+    virtual int exec(bool saveOnExec = true, bool doLoad = true);
+
+    virtual void addChild(Configurable *child);
+
+    virtual Setting *byName(const QString &settingName)
+        { return cfgGrp->byName(settingName); }
+
+  protected:
+    typedef vector<Configurable*> ChildList;
+
+    ChildList           cfgChildren;
+    MythDialog         *dialog;
+    ConfigurationGroup *cfgGrp;
+};
+
+/** \class ConfigurationWizard
+ *  \brief A ConfigurationDialog that uses a ConfigurationGroup
+ *         with one child per page.
+ */
+class MPUBLIC ConfigurationWizard : public ConfigurationDialog, public Storage
+{
+  public:
+    ConfigurationWizard() : ConfigurationDialog() {}
+
+    virtual MythDialog *dialogWidget(MythMainWindow *parent,
+                                     const char *widgetName);
+
+    virtual void load(void) { cfgGrp->load(); }
+    virtual void save(void) { cfgGrp->save(); }
+    virtual void save(QString destination) { cfgGrp->save(destination); }
 };
 
 /** \class JumpConfigurationWizard
  *  \brief A jump wizard is a group with one child per page, and jump buttons
  */
-class MPUBLIC JumpConfigurationWizard : public ConfigurationWizard
+class MPUBLIC JumpConfigurationWizard :
+    public QObject, public ConfigurationWizard
 {
     Q_OBJECT
 
   public:
-    virtual MythDialog* dialogWidget(MythMainWindow *parent,
-                                     const char *widgetName = NULL);
+    virtual MythDialog *dialogWidget(MythMainWindow *parent,
+                                     const char     *widgetName);
+
   protected slots:
     void showPage(QString);
+
+  protected:
+    /// You need to call deleteLater to delete QObject
+    virtual ~JumpConfigurationWizard() { }
 
   protected:
     vector<QWidget*> childWidgets;

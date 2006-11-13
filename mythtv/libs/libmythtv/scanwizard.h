@@ -46,7 +46,7 @@ class DVBUtilsImportPane;
 class ScanWizardScanType;
 class ScanWizardScanner;
 
-class ScanWizard : public ConfigurationWizard 
+class ScanWizard : public QObject, public ConfigurationWizard 
 {
     Q_OBJECT
     friend class ScanWizardScanType;

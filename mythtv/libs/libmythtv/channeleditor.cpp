@@ -21,8 +21,9 @@
 
 ChannelWizard::ChannelWizard(int id, int default_sourceid)
              : ConfigurationWizard() {
+/* TODO FIXME
     setLabel(QObject::tr("Channel Options"));
-
+*/
     // Must be first.
     addChild(cid = new ChannelID());
     cid->setValue(id);
@@ -182,14 +183,15 @@ void ChannelListSetting::fillSelections(void)
     }
 }
 
-class SourceSetting: public ComboBoxSetting {
-public:
-    SourceSetting(): ComboBoxSetting() {
+class SourceSetting : public ComboBoxSetting, public Storage
+{
+  public:
+    SourceSetting() : ComboBoxSetting(this)
+    {
         setLabel(QObject::tr("Video Source"));
         addSelection(QObject::tr("(All)"),"");
     };
 
-    void save() {};
     void load() 
     {
         MSqlQuery query(MSqlQuery::InitCon());
@@ -205,31 +207,33 @@ public:
         } 
         addSelection(QObject::tr("(Unassigned)"),"Unassigned");
     }
+    void save(void) { }
+    void save(QString /*destination*/) { }
 };
 
-class SortMode: public ComboBoxSetting, public TransientStorage {
-public:
-    SortMode(): ComboBoxSetting() {
+class SortMode : public ComboBoxSetting, public TransientStorage
+{
+  public:
+    SortMode() : ComboBoxSetting(this)
+    {
         setLabel(QObject::tr("Sort Mode"));
         addSelection(QObject::tr("Channel Name"));
         addSelection(QObject::tr("Channel Number"));
     };
 };
 
-class NoChanNumHide: public CheckBoxSetting, public TransientStorage {
-public:
-    NoChanNumHide() {
-        setLabel(QObject::tr("Hide channels without channel number."));
-    };
+class NoChanNumHide : public CheckBoxSetting, public TransientStorage
+{
+  public:
+    NoChanNumHide() : CheckBoxSetting(this)
+        { setLabel(QObject::tr("Hide channels without channel number.")); }
 };
 
-ChannelEditor::ChannelEditor() :
-    ConfigurationGroup(true, true, false, false),
-    VerticalConfigurationGroup(true, true, false, false),
-    ConfigurationDialog()
+ChannelEditor::ChannelEditor() : ConfigurationDialog()
 {
-
+/* TODO FIXME
     setLabel(tr("Channels"));
+*/
     addChild(list = new ChannelListSetting());
 
     SortMode           *sort   = new SortMode();
@@ -443,4 +447,3 @@ void ChannelEditor::transportEditor()
     list->fillSelections();
     list->setFocus();
 }
-

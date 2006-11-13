@@ -76,10 +76,9 @@ static QString card_types(void)
     return QString("(%1)").arg(cardTypes);
 }
 
-ScanProgressPopup::ScanProgressPopup(ScanWizardScanner *parent,
-                                     bool signalmonitors) :
-    ConfigurationGroup(false, false, false, false),
-    VerticalConfigurationGroup(false, false, false, false)
+ScanProgressPopup::ScanProgressPopup(
+    ScanWizardScanner *parent, bool signalmonitors) :
+    ConfigurationPopupDialog()
 {
     setLabel(tr("Scan Progress"));
 
@@ -147,7 +146,7 @@ void ScanProgressPopup::status(const QString& value)
 void ScanProgressPopup::exec(ScanWizardScanner *parent)
 {
     dialog = (ConfigPopupDialogWidget*)
-        dialogWidget(gContext->GetMainWindow());
+        dialogWidget(gContext->GetMainWindow(), "ScanProgressPopup");
     connect(dialog, SIGNAL(popupDone(void)),
             parent, SLOT(cancelScan(void)));
     dialog->ShowPopup(this);
@@ -357,7 +356,7 @@ void ScanTypeSetting::refresh(const QString& card)
                  QString::number(TransportScan));
 }
 
-ScanCountry::ScanCountry()
+ScanCountry::ScanCountry() : ComboBoxSetting(this)
 {
     Country country = AU;
 #if (QT_VERSION >= 0x030300)
@@ -387,9 +386,8 @@ ScanCountry::ScanCountry()
 }
 
 ScanOptionalConfig::ScanOptionalConfig(ScanWizard *wizard,
-                                      ScanTypeSetting *scanType) : 
-    ConfigurationGroup(false, false, true, true),
-    VerticalConfigurationGroup(false, false, true, true),
+                                       ScanTypeSetting *scanType) :
+    TriggeredConfigurationGroup(false, false, true, true),
     country(new ScanCountry()),
     ignoreSignalTimeoutAll(new IgnoreSignalTimeout())
 {
@@ -439,7 +437,6 @@ void ScanOptionalConfig::triggerChanged(const QString& value)
 }
 
 ScanWizardScanType::ScanWizardScanType(ScanWizard *_parent, int sourceid) :
-    ConfigurationGroup(true, true, false, false),
     VerticalConfigurationGroup(true, true, false, false),
     parent(_parent)
 {
@@ -472,7 +469,7 @@ ScanWizardScanType::ScanWizardScanType(ScanWizard *_parent, int sourceid) :
         parent, SLOT(captureCard(const QString&)));
 }
 
-LogList::LogList() : n(0)
+LogList::LogList() : ListBoxSetting(this), n(0)
 {
     setSelectionMode(MythListBox::NoSelection);
 }

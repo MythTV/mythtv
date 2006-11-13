@@ -12,12 +12,14 @@
 #include "mythcontext.h"
 #include "mythdbcon.h"
 
-class ChannelID: public IntegerSetting, public TransientStorage {
-public:
-    ChannelID(QString field = "chanid", QString table = "channel"):
-      field(field), table(table) {
+class ChannelID : public IntegerSetting, public TransientStorage
+{
+  public:
+    ChannelID(QString _field = "chanid", QString _table = "channel") :
+        IntegerSetting(this), field(_field), table(_table)
+    {
         setVisible(false);
-    };
+    }
 
     QWidget* configWidget(ConfigurationGroup* cg, QWidget* widget,
                           const char* widgetName = 0) {
@@ -90,12 +92,14 @@ protected:
     QString field,table;
 };
 
-class CSetting: public SimpleDBStorage {
-protected:
-    CSetting(const ChannelID& id, QString name):
-      SimpleDBStorage("channel", name), id(id) {
-        setName(name);
-    };
+class ChannelDBStorage : public SimpleDBStorage
+{
+  protected:
+    ChannelDBStorage(Setting *_setting, const ChannelID &_id, QString _name) :
+        SimpleDBStorage(_setting, "channel", _name), id(_id)
+    {
+        _setting->setName(_name);
+    }
 
     virtual QString setClause(MSqlBindings& bindings);
     virtual QString whereClause(MSqlBindings& bindings);

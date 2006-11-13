@@ -8,8 +8,9 @@
 #include <mythtv/settings.h>
 
 
-class ArchiveSettings: virtual public ConfigurationWizard {
-public:
+class ArchiveSettings : public ConfigurationWizard
+{
+  public:
     ArchiveSettings();
 };
 

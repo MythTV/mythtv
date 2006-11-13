@@ -425,19 +425,18 @@ class MPUBLIC BoundedIntegerManagedListItem : public SelectManagedListItem
 };
 
 
-class MPUBLIC ManagedListSetting: public SimpleDBStorage
+class MPUBLIC ManagedListSetting : public Setting, public SimpleDBStorage
 {
     Q_OBJECT
 
-    protected:
-        ManagedListSetting(QString _table, QString _column, ManagedList* _parentList=NULL):
-            SimpleDBStorage(_table, _column ),
-            parentList(_parentList) {
-            listItem = NULL;
-        };
+  protected:
+    ManagedListSetting(QString _table, QString _column,
+                       ManagedList *_parentList = NULL) :
+        Setting(this), SimpleDBStorage(this, _table, _column),
+        parentList(_parentList), listItem(NULL) { }
 
-        QGuardedPtr<ManagedList> parentList;
-        QGuardedPtr<ManagedListItem> listItem;
+    QGuardedPtr<ManagedList> parentList;
+    QGuardedPtr<ManagedListItem> listItem;
 
     public slots:
         void itemChanged(ManagedListItem*) { syncDBFromItem(); }
@@ -461,7 +460,7 @@ class MPUBLIC ManagedListSetting: public SimpleDBStorage
             }
             else
             {
-                SimpleDBStorage::setValue(val);
+                Setting::setValue(val);
             }
         }
 
@@ -473,7 +472,7 @@ class MPUBLIC ManagedListSetting: public SimpleDBStorage
             }
             else
             {
-                return SimpleDBStorage::getValue();
+                return Setting::getValue();
             }
 
         }
@@ -481,7 +480,7 @@ class MPUBLIC ManagedListSetting: public SimpleDBStorage
         virtual void syncDBFromItem()
         {
             if (listItem)
-                SimpleDBStorage::setValue(listItem->getValue());
+                Setting::setValue(listItem->getValue());
         }
 
         virtual void syncItemFromDB()

@@ -14,26 +14,22 @@ class AudioCompressionSettings;
 
 class SelectManagedListItem;
 
-
-// Any setting associated with a recording profile
-class RecordingProfileSetting: virtual public Setting {
-protected:
-    RecordingProfileSetting(const RecordingProfile& _parent):
-        parentProfile(_parent) {};
-    const RecordingProfile& parentProfile;
-};
-
 // A parameter associated with the profile itself
-class RecordingProfileParam: public SimpleDBStorage,
-                             public RecordingProfileSetting {
-protected:
-    RecordingProfileParam(const RecordingProfile& parentProfile, QString name):
-        SimpleDBStorage("recordingprofiles", name),
-        RecordingProfileSetting(parentProfile) {
-        setName(name);
-    };
+class RecordingProfileStorage : public SimpleDBStorage
+{
+  protected:
+    RecordingProfileStorage(Setting *_setting,
+                            const RecordingProfile &parentProfile,
+                            QString name) :
+        SimpleDBStorage(_setting, "recordingprofiles", name),
+        parent(parentProfile)
+    {
+        _setting->setName(name);
+    }
 
     virtual QString whereClause(MSqlBindings& bindings);
+
+    const RecordingProfile &parent;
 };
 
 class ImageSize;
@@ -41,15 +37,14 @@ class TranscodeResize;
 class TranscodeLossless;
 class TranscodeFilters;
 
-class MPUBLIC RecordingProfile: public ConfigurationWizard
+class MPUBLIC RecordingProfile : public QObject, public ConfigurationWizard
 {
   Q_OBJECT
   protected:
-    class ID: virtual public IntegerSetting,
-              public AutoIncrementStorage {
+    class ID : public AutoIncrementDBSetting {
       public:
         ID():
-            AutoIncrementStorage("recordingprofiles", "id") {
+            AutoIncrementDBSetting("recordingprofiles", "id") {
             setVisible(false);
         };
 
@@ -62,12 +57,12 @@ class MPUBLIC RecordingProfile: public ConfigurationWizard
         };
     };
 
-    class Name: public LineEditSetting, public RecordingProfileParam
+    class Name: public LineEditSetting, public RecordingProfileStorage
     {
       public:
-        Name(const RecordingProfile& parent):
-            LineEditSetting(false),
-            RecordingProfileParam(parent, "name")
+        Name(const RecordingProfile &parent):
+            LineEditSetting(this, false),
+            RecordingProfileStorage(this, parent, "name")
         {
             setEnabled(false);
             setLabel(QObject::tr("Profile name"));
@@ -132,21 +127,26 @@ class MPUBLIC RecordingProfile: public ConfigurationWizard
     bool                      isEncoder;
 };
 
-class RecordingProfileEditor: public ListBoxSetting, public ConfigurationDialog {
+class RecordingProfileEditor :
+    public QObject, public ConfigurationDialog, public Storage
+{
     Q_OBJECT
-public:
+
+  public:
     RecordingProfileEditor(int id, QString profName);
 
     virtual int exec();
     virtual void load();
     virtual void save() { };
+    virtual void save(QString /*destination*/) { }
 
-protected slots:
+  protected slots:
     void open(int id);
 
-protected:
-    int group;
-    QString labelName;
+  protected:
+    ListBoxSetting *listbox;
+    int             group;
+    QString         labelName;
 };
 
 #endif
