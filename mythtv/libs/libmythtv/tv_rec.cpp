@@ -797,19 +797,6 @@ void TVRec::ChangeState(TVState nextState)
     triggerEventLoop.wakeAll();
 }
 
-/** \fn TVRec::SetOption(RecordingProfile&, const QString&)
- *  \brief Calls RecorderBase::SetOption(const QString&,int) with the "name"d
- *         option from the recording profile.
- *  \sa RecordingProfile, RecorderBase
- *  \param profile RecordingProfile to use
- *  \param name RecordingProfile option to get and RecorderBase option to set
- */
-void TVRec::SetOption(RecordingProfile &profile, const QString &name)
-{
-    int value = profile.byName(name)->getValue().toInt();
-    recorder->SetOption(name, value);
-}
-
 /** \fn TVRec::SetupRecorder(RecordingProfile&)
  *  \brief Allocates and initializes the RecorderBase instance.
  *

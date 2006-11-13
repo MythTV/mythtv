@@ -31,6 +31,8 @@ class RecordingProfile;
  */
 class MPUBLIC RecorderBase
 {
+    friend class Transcode; // for access to SetIntOption(), SetStrOption()
+
   public:
     RecorderBase(TVRec *rec);
     virtual ~RecorderBase();

@@ -25,6 +25,9 @@ extern "C" {
 #include "../libavcodec/avcodec.h"
 }
 
+#define LOC QString("Transcode: ")
+#define LOC_ERR QString("Transcode, Error: ")
+
 // This class is to act as a fake audio output device to store the data
 // for reencoding.
 
@@ -282,9 +285,34 @@ bool Transcode::GetProfile(QString profileName, QString encodingType)
     return true;
 }
 
-#define SetProfileOption(profile, name) { \
-    int value = profile.byName(name)->getValue().toInt(); \
-    nvr->SetOption(name, value); \
+static QString get_str_option(RecordingProfile &profile, const QString &name)
+{
+    const Setting *setting = profile.byName(name);
+    if (setting)
+        return setting->getValue();
+
+    VERBOSE(VB_IMPORTANT, LOC_ERR + QString(
+                "get_str_option(...%1): Option not in profile.").arg(name));
+
+    return QString::null;
+}
+
+static int get_int_option(RecordingProfile &profile, const QString &name)
+{
+    QString ret_str = get_str_option(profile, name);
+    if (ret_str.isEmpty())
+        return 0;
+
+    bool ok = false;
+    int ret_int = ret_str.toInt(&ok);
+
+    if (!ok)
+    {
+        VERBOSE(VB_IMPORTANT, LOC_ERR + QString(
+                    "get_int_option(...%1): Option is not an int.").arg(name));
+    }
+
+    return ret_int;
 }
 
 void TranscodeWriteText(void *ptr, unsigned char *buf, int len, int timecode, int pagenr)
@@ -403,30 +431,30 @@ int Transcode::TranscodeFile(char *inputname, char *outputname,
             VERBOSE(VB_IMPORTANT, "Transcoding aborted, no profile found.");
             return REENCODE_ERROR;
         }
-        vidsetting = profile.byName("videocodec")->getValue();
-        audsetting = profile.byName("audiocodec")->getValue();
-        vidfilters = profile.byName("transcodefilters")->getValue();
+        vidsetting = get_str_option(profile, "videocodec");
+        audsetting = get_str_option(profile, "audiocodec");
+        vidfilters = get_str_option(profile, "transcodefilters");
 
         if (encodingType == "MPEG-2" &&
-            profile.byName("transcodelossless")->getValue().toInt())
+            get_int_option(profile, "transcodelossless"))
         {
             VERBOSE(VB_IMPORTANT, "Switching to MPEG-2 transcoder.");
             return REENCODE_MPEG2TRANS;
         }
 
         // Recorder setup
-        if (profile.byName("transcodelossless")->getValue().toInt())
+        if (get_int_option(profile, "transcodelossless"))
         {
             vidsetting = encodingType;
             audsetting = "MP3";
         }
-        else if (profile.byName("transcoderesize")->getValue().toInt())
+        else if (get_int_option(profile, "transcoderesize"))
         {
             int actualHeight = (video_height == 1088 ? 1080 : video_height);
 
             nvp->SetVideoFilters(vidfilters);
-            newWidth = profile.byName("width")->getValue().toInt();
-            newHeight = profile.byName("height")->getValue().toInt();
+            newWidth = get_int_option(profile, "width");
+            newHeight = get_int_option(profile, "height");
 
             // If height or width are 0, then we need to calculate them
             if (newHeight == 0 && newWidth > 0)
@@ -471,21 +499,21 @@ int Transcode::TranscodeFile(char *inputname, char *outputname,
         {
             nvr->SetOption("codec", "mpeg4");
 
-            SetProfileOption(profile, "mpeg4bitrate");
-            SetProfileOption(profile, "mpeg4scalebitrate");
-            SetProfileOption(profile, "mpeg4maxquality");
-            SetProfileOption(profile, "mpeg4minquality");
-            SetProfileOption(profile, "mpeg4qualdiff");
-            SetProfileOption(profile, "mpeg4optionvhq");
-            SetProfileOption(profile, "mpeg4option4mv");
+            nvr->SetIntOption(&profile, "mpeg4bitrate");
+            nvr->SetIntOption(&profile, "mpeg4scalebitrate");
+            nvr->SetIntOption(&profile, "mpeg4maxquality");
+            nvr->SetIntOption(&profile, "mpeg4minquality");
+            nvr->SetIntOption(&profile, "mpeg4qualdiff");
+            nvr->SetIntOption(&profile, "mpeg4optionvhq");
+            nvr->SetIntOption(&profile, "mpeg4option4mv");
             nvr->SetupAVCodec();
         }
         else if (vidsetting == "RTjpeg")
         {
             nvr->SetOption("codec", "rtjpeg");
-            SetProfileOption(profile, "rtjpegquality");
-            SetProfileOption(profile, "rtjpegchromafilter");
-            SetProfileOption(profile, "rtjpeglumafilter");
+            nvr->SetIntOption(&profile, "rtjpegquality");
+            nvr->SetIntOption(&profile, "rtjpegchromafilter");
+            nvr->SetIntOption(&profile, "rtjpeglumafilter");
             nvr->SetupRTjpeg();
         }
         else if (vidsetting == "")
@@ -505,7 +533,7 @@ int Transcode::TranscodeFile(char *inputname, char *outputname,
         if (audsetting == "MP3")
         {
             nvr->SetOption("audiocompression", 1);
-            SetProfileOption(profile, "mp3quality");
+            nvr->SetIntOption(&profile, "mp3quality");
             copyaudio = true;
         }
         else if (audsetting == "Uncompressed")

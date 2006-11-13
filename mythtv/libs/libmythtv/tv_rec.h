@@ -301,8 +301,6 @@ class MPUBLIC TVRec : public QObject
     void CheckForRecGroupChange(void);
     void NotifySchedulerOfRecording(ProgramInfo*);
 
-    void SetOption(RecordingProfile &profile, const QString &name);
-
     // Various components TVRec coordinates
     RecorderBase     *recorder;
     ChannelBase      *channel;
