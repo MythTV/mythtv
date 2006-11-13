@@ -8,6 +8,9 @@
 
 #include "iptvfeeder.h"
 #include "iptvfeederrtsp.h"
+#include "iptvfeederudp.h"
+#include "iptvfeederrtp.h"
+#include "iptvfeederfile.h"
 #include "mythcontext.h"
 
 #define LOC QString("IPTVFeed: ")
@@ -47,6 +50,18 @@ bool IPTVFeederWrapper::InitFeeder(const QString &url)
     if (IPTVFeederRTSP::IsRTSP(url))
     {
         tmp_feeder = new IPTVFeederRTSP();
+    }
+    else if (IPTVFeederUDP::IsUDP(url))
+    {
+        tmp_feeder = new IPTVFeederUDP();
+    }
+    else if (IPTVFeederRTP::IsRTP(url))
+    {
+        tmp_feeder = new IPTVFeederRTP();
+    }
+    else if (IPTVFeederFile::IsFile(url))
+    {
+        tmp_feeder = new IPTVFeederFile();
     }
     else
     {

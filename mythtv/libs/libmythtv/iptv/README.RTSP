@@ -1,0 +1,50 @@
+The Freebox recorder was originaly written to retrieve TV channels from the
+Freebox (the modem used by ISP free.fr) using the rtsp protocol.
+
+External streams can be imported even if you don't have the Freebox modem,
+thanks to the VOD functions of VLC.
+
+Here are the scripts I used to test the FreeboxRecorder when I didn't have
+access to the freebox's channels. I hope it could be extended by VLC gurus to
+import/transcode external streams like nasatv.
+
+===== vlcserver.sh =====
+#!/bin/sh
+vlc -vvv --color -I telnet --telnet-password toto --rtsp-host 0.0.0.0:5554
+========================
+
+===== vlcconfig.sh =====
+#!/bin/sh
+(
+echo 'toto'
+cat vlc.vod.conf
+echo 'quit'
+) | telnet localhost 4212
+========================
+
+===== vlc.vod.conf =====
+new test vod input /home/mykeul/test.mpeg mux mp2t enabled
+new test2 vod input /home/mykeul/test2.mpeg mux mp2t enabled
+========================
+
+vlcserver.sh starts vlc as a VOD server, and wait for its configuration on
+port 4212 (telnet interface).
+
+vlcconfig.sh connects to the telnet interface of the previous vlc VOD server,
+and configures it using the vlc.vod.vonf file.
+
+vlc.vod.conf contains the commands to configure the different streams to be
+served by the VOD server.
+
+
+The playlist.m3u originaly served by the freebox modem, may be served by a
+local http server. Here is a simple one to connect to the previously configured
+vlc server.
+
+===== playlist.m3u =====
+#EXTM3U
+#EXTINF:0,1 - test
+rtsp://localhost:5554/test
+#EXTINF:0,2 - test2
+rtsp://localhost:5554/test2
+========================
