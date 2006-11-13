@@ -2916,10 +2916,12 @@ static GlobalCheckBox *MythFillGrabberSuggestsTime()
 static GlobalLineEdit *MythFillDatabasePath()
 {
     GlobalLineEdit *be = new GlobalLineEdit("MythFillDatabasePath");
-    be->setLabel(QObject::tr("mythfilldatabase Path"));
-    be->setValue(gContext->GetInstallPrefix() + "/bin/mythfilldatabase");
-    be->setHelpText(QObject::tr("Path (including executable) of the "
-                    "mythfilldatabase program."));
+    be->setLabel(QObject::tr("mythfilldatabase Program"));
+    be->setValue("mythfilldatabase");
+    be->setHelpText(QObject::tr(
+                        "Use 'mythfilldatabase' or the name of a custom "
+                        "script that will populate the program guide info "
+                        "for all your video sources."));
     return be;
 }
 
