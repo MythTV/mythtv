@@ -3659,11 +3659,14 @@ void NuppelVideoPlayer::SetWatched(bool forceWatched)
     if (!m_playbackinfo)
         return;
 
-    int numFrames = totalFrames;
+    long long numFrames = totalFrames;
 
     if (m_playbackinfo->GetTranscodedStatus() != TRANSCODING_COMPLETE)
-        numFrames = (m_playbackinfo->endts.toTime_t() -
-                    m_playbackinfo->recstartts.toTime_t()) * video_frame_rate;
+    {
+        numFrames = (long long)
+            ((m_playbackinfo->endts.toTime_t() -
+              m_playbackinfo->recstartts.toTime_t()) * video_frame_rate);
+    }
 
     int offset = (int) round(0.14 * (numFrames / video_frame_rate));
 

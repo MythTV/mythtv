@@ -16,18 +16,7 @@
 
 // C++ headers
 #include <vector>
-#include <map>
 using namespace std;
-
-// Qt headers
-#include <qdatetime.h>
-#include <qstringlist.h>
-#include <qmutex.h>
-
-// MythTV headers
-#include "mpegdescriptors.h"
-#include "mpegtables.h"
-#include "dtvchannel.h"
 
 // DVB headers
 #include <linux/dvb/version.h>
@@ -65,10 +54,8 @@ using namespace std;
   #define dvb_fe_params dvb_frontend_parameters
 #endif
 
-QString toString(const fe_type_t);
-QString toString(const struct dvb_fe_params&, const fe_type_t);
+class QString;
 QString toString(fe_status);
-QString toString(const struct dvb_frontend_event&, const fe_type_t);
 
 typedef vector<uint16_t> dvb_pid_t;
 // needs to add provider id so dvbcam doesnt require parsing

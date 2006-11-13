@@ -4,8 +4,9 @@
 #include <deque>
 using namespace std;
 
-#include <qobject.h>
 #include <qmutex.h>
+
+#include "mpegtables.h"
 
 #include "dvbtypes.h"
 
