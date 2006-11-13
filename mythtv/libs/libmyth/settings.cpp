@@ -34,7 +34,7 @@
  *  \brief Configurable is the root of all the database aware widgets.
  *
  *   This is an abstract class and some methods must be implemented
- *   in children. byName(QString) is abstract. While 
+ *   in children. byName(const &QString) is abstract. While 
  *   configWidget(ConfigurationGroup *, QWidget*, const char*)
  *   has an implementation, all it does is print an error message
  *   and return a NULL pointer.
@@ -102,17 +102,18 @@ void ConfigurationGroup::deleteLater(void)
     }
 }
 
-Setting* ConfigurationGroup::byName(QString name) {
-    for(childList::iterator i = children.begin() ;
-        i != children.end() ;
-        ++i ) {
-        
-        Setting* c = (*i)->byName(name);
-        if (c != NULL)
-            return c;
+Setting *ConfigurationGroup::byName(const QString &name)
+{
+    Setting *tmp = NULL;
+
+    childList::iterator it = children.begin();
+    for (; !tmp && (it != children.end()); ++it)
+    {
+        if (*it)
+            tmp = (*it)->byName(name);
     }
     
-    return NULL;
+    return tmp;
 }
 
 void ConfigurationGroup::load(void)
@@ -394,6 +395,50 @@ void TriggeredConfigurationGroup::addTarget(QString triggerValue,
     configStack->addChild(target);
 }
 
+Setting *TriggeredConfigurationGroup::byName(const QString &settingName)
+{
+    VerifyLayout();
+    Setting *setting = ConfigurationGroup::byName(settingName);
+
+    if (!setting)
+        setting = configLayout->byName(settingName);
+
+    if (!setting && !widget)
+        setting = configStack->byName(settingName);
+
+    return setting;
+}
+
+void TriggeredConfigurationGroup::load(void)
+{
+    VerifyLayout();
+
+    configLayout->load();
+
+    if (!widget)
+        configStack->load();
+}
+
+void TriggeredConfigurationGroup::save(void)
+{
+    VerifyLayout();
+
+    configLayout->save();
+
+    if (!widget)
+        configStack->save();
+}
+
+void TriggeredConfigurationGroup::save(QString destination)
+{
+    VerifyLayout();
+
+    configLayout->save(destination);
+
+    if (!widget)
+        configStack->save(destination);
+}
+
 void TriggeredConfigurationGroup::setTrigger(Configurable *_trigger)
 {
     if (trigger)
@@ -455,7 +500,9 @@ QWidget *TriggeredConfigurationGroup::configWidget(
 
     configLayout->addChild(configStack);
 
-    return configLayout->configWidget(cg, parent, widgetName);
+    widget = configLayout->configWidget(cg, parent, widgetName);
+
+    return widget;
 }
 
 void SelectSetting::addSelection(const QString& label, QString value, bool select) {

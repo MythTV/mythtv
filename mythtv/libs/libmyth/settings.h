@@ -835,7 +835,7 @@ class MPUBLIC ConfigurationGroup : public Setting, public Storage
         children.push_back(child);
     };
 
-    virtual Setting* byName(QString name);
+    virtual Setting *byName(const QString &name);
 
     virtual void load();
 
@@ -979,7 +979,7 @@ class MPUBLIC TriggeredConfigurationGroup : public ConfigurationGroup
         stackZeroMargin(stack_zeroMargin), stackZeroSpace(stack_zeroSpace),
         isVertical(true),                  isSaveAll(true),
         configLayout(NULL),                configStack(NULL),
-        trigger(NULL)
+        trigger(NULL),                     widget(NULL)
     {
     }
 
@@ -992,6 +992,12 @@ class MPUBLIC TriggeredConfigurationGroup : public ConfigurationGroup
     virtual QWidget *configWidget(ConfigurationGroup *cg, 
                                   QWidget            *parent,
                                   const char         *widgetName);
+
+    virtual Setting *byName(const QString &settingName);
+
+    virtual void load(void);
+    virtual void save(void);
+    virtual void save(QString destination);
 
     // Sets
 
@@ -1029,6 +1035,7 @@ class MPUBLIC TriggeredConfigurationGroup : public ConfigurationGroup
     StackedConfigurationGroup   *configStack;
     Configurable                *trigger;
     QMap<QString,Configurable*>  triggerMap;
+    QWidget                     *widget;
 };
     
 class MPUBLIC TabbedConfigurationGroup : public ConfigurationGroup
