@@ -364,9 +364,15 @@ static void init_freq_tables(freq_table_map_t &fmap)
     fmap[QString("atsc_%1_us%2").arg(A).arg(B)] = \
         new FrequencyTable(C+D, E, F, G, H, I);
 
+// The maximum channel defined in the US frequency tables (standard, HRC, IRC)
+#define US_MAX_CHAN 159
+// Equation for computing EIA-542 frequency of channels > 99
+// A = bandwidth, B = offset, C = channel designation (number)
+#define EIA_542_FREQUENCY(A,B,C) ( ( A * ( 8 + C ) ) + B )
+
     for (uint i = 0; i < 4; i++)
     {
-        // USA Cable, ch 2 to 159 and T.7 to T.14
+        // USA Cable, ch 2 to US_MAX_CHAN and T.7 to T.14
         FREQ(modStr[i], "cable0", desc[i], "Channel %1",
              2,    57000000,   69000000, 6000000, mod[i]); // 2-4
         FREQ(modStr[i], "cable1", desc[i], "Channel %1",
@@ -382,17 +388,21 @@ static void init_freq_tables(freq_table_map_t &fmap)
         // The center frequency of any EIA-542 std cable channel over 99 is
         // Frequency_MHz = ( 6 * ( 8 + channel_designation ) ) + 3
         FREQ(modStr[i], "cable6", desc[i], "Channel %1",
-             100, 651000000, 1005000000, 6000000, mod[i]); // 100-159
+             100, 651000000,
+             EIA_542_FREQUENCY(6000000, 3000000, US_MAX_CHAN),
+             6000000, mod[i]);                             // 100-US_MAX_CHAN
         FREQ(modStr[i], "cable7", desc[i], "Channel T-%1",
              7,    8750000,   50750000, 6000000, mod[i]); // T7-14
 
-        // USA Cable, QAM 256 ch 78 to 159
+        // USA Cable, QAM 256 ch 78 to US_MAX_CHAN
         FREQ(modStr[i], "cablehigh0", desc[i], "Channel %1",
              78,  549000000,  645000000, 6000000, mod[i]); // 78-94
         FREQ(modStr[i], "cablehigh1", desc[i], "Channel %1",
-             100, 651000000, 1005000000, 6000000, mod[i]); // 100-159
+             100, 651000000,
+             EIA_542_FREQUENCY(6000000, 3000000, US_MAX_CHAN),
+             6000000, mod[i]);                             // 100-US_MAX_CHAN
 
-        // USA Cable HRC, ch 1 to 125
+        // USA Cable HRC, ch 1 to US_MAX_CHAN
         FREQ(modStr[i], "hrc0", desc[i], "HRC %1",
              1,    73753600,  73753601, 6000300, mod[i]); // 1
         FREQ(modStr[i], "hrc1", desc[i], "HRC %1",
@@ -410,16 +420,20 @@ static void init_freq_tables(freq_table_map_t &fmap)
         // The center frequency of any EIA-542 HRC cable channel over 99 is
         // Frequency_MHz = ( 6.0003 * ( 8 + channel_designation ) ) + 1.75
         FREQ(modStr[i], "hrc7", desc[i], "HRC %1",
-             100, 649782400, 799789900, 6000300, mod[i]); // 100-125
+             100, 649782400,
+             EIA_542_FREQUENCY(6000300, 1750000, US_MAX_CHAN),
+             6000300, mod[i]); // 100-US_MAX_CHAN
 
-        // USA Cable HRC, ch 76-94 and 100-125
+        // USA Cable HRC, ch 76-94 and 100-US_MAX_CHAN
         // Channels 95-99 are low frequency despite high channel numbers
         FREQ(modStr[i], "hrchigh0", desc[i], "HRC %1",
              76,  535776700, 643782100, 6000300, mod[i]); // 76-94
         FREQ(modStr[i], "hrchigh1", desc[i], "HRC %1",
-             100, 649782400, 799789900, 6000300, mod[i]); // 100-125
+             100, 649782400,
+             EIA_542_FREQUENCY(6000300, 1750000, US_MAX_CHAN),
+             6000300, mod[i]); // 100-US_MAX_CHAN
 
-        // USA Cable IRC, ch 1 to 125
+        // USA Cable IRC, ch 1 to US_MAX_CHAN
         FREQ(modStr[i], "irc0", desc[i], "IRC %1",
              1,    75012500,  75012501, 6000000, mod[i]); // 1
         FREQ(modStr[i], "irc1", desc[i], "IRC %1",
@@ -443,13 +457,17 @@ static void init_freq_tables(freq_table_map_t &fmap)
         // The center frequency of any EIA-542 IRC cable channel over 99 is
         // Frequency_MHz = ( 6 * ( 8 + channel_designation ) ) + 3.0125
         FREQ(modStr[i], "irc10", desc[i], "IRC %1",
-             100, 651012500, 801012500, 6000000, mod[i]); // 100-125
+             100, 651012500,
+             EIA_542_FREQUENCY(6000000, 3012500, US_MAX_CHAN),
+             6000000, mod[i]); // 100-US_MAX_CHAN
 
         // USA Cable IRC, ch 76-94 and 100-125
         // Channels 95-99 are low frequency despite high channel numbers
         FREQ(modStr[i], "irchigh0", desc[i], "IRC %1",
              76,  537012500, 645012500, 6000000, mod[i]); // 76-94
         FREQ(modStr[i], "irchigh1", desc[i], "IRC %1",
-             100, 651012500, 801012500, 6000000, mod[i]); // 100-125
+             100, 651012500,
+             EIA_542_FREQUENCY(6000000, 3012500, US_MAX_CHAN),
+             6000000, mod[i]); // 100-US_MAX_CHAN
     }
 }
