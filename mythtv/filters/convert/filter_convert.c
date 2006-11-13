@@ -145,6 +145,7 @@ newConvertFilter (VideoFrameType inpixfmt, VideoFrameType outpixfmt,
     return (VideoFilter *) filter;
 }
 
+#if 0
 static FmtConv FmtList[] = 
 {
     { FMT_YV12, FMT_YUV422P },
@@ -152,7 +153,6 @@ static FmtConv FmtList[] =
     FMT_NULL
 };
 
-#if 0
 FilterInfo filter_table[] = 
 {
     {

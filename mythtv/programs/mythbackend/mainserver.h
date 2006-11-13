@@ -141,7 +141,7 @@ class MainServer : public QObject, public MythSocketCBs
 
     static void *SpawnDeleteThread(void *param);
     void DoDeleteThread(const DeleteStruct *ds);
-    void DoDeleteInDB(const DeleteStruct *ds, const ProgramInfo *pginfo);
+    void DoDeleteInDB(const DeleteStruct *ds);
 
     LiveTVChain *GetExistingChain(QString id);
     LiveTVChain *GetExistingChain(MythSocket *sock);

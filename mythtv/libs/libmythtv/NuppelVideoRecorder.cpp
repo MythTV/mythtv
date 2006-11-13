@@ -1069,7 +1069,7 @@ void NuppelVideoRecorder::StartRecording(void)
         if (ioctl(fd, VIDIOCGAUDIO, &va) < 0)
         {
             bool reports_audio = vchan.flags & VIDEO_VC_AUDIO;
-            int err_level = reports_audio ? VB_IMPORTANT : VB_AUDIO;
+            uint err_level = reports_audio ? VB_IMPORTANT : VB_AUDIO;
             // print at VB_IMPORTANT if driver reports audio.
             VERBOSE(err_level, LOC_ERR + "Failed to get audio" + ENO);
         }

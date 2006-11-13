@@ -1477,7 +1477,7 @@ void MainServer::DoDeleteThread(const DeleteStruct *ds)
     /* Delete preview thumbnail. */
     delete_file_immediately(ds->filename + ".png", followLinks, false);
 
-    DoDeleteInDB(ds, pginfo);
+    DoDeleteInDB(ds);
 
     if (pginfo->recgroup != "LiveTV")
         ScheduledRecording::signalChange(0);
@@ -1494,8 +1494,7 @@ void MainServer::DoDeleteThread(const DeleteStruct *ds)
     }
 }
 
-void MainServer::DoDeleteInDB(const DeleteStruct *ds,
-                              const ProgramInfo *pginfo)
+void MainServer::DoDeleteInDB(const DeleteStruct *ds)
 {
     QString logInfo = QString("chanid %1 at %2")
         .arg(ds->chanid).arg(ds->recstartts.toString());
