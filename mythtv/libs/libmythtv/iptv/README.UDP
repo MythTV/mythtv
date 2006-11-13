@@ -1,0 +1,69 @@
+Copyright (C) Her Majesty the Queen in Right of Canada, 2006
+Communications Research Centre (CRC)
+
+Distributed as part of MythTV (www.mythtv.org)
+
+     This program is free software; you can redistribute it and/or modify
+     it under the terms of the GNU General Public License as published by
+     the Free Software Foundation; either version 2 of the License, or
+     (at your option) any later version.
+
+     This program is distributed in the hope that it will be useful,
+     but WITHOUT ANY WARRANTY; without even the implied warranty of
+     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+     GNU General Public License for more details.
+
+     You should have received a copy of the GNU General Public License
+     along with this program; if not, write to the Free Software
+     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+
+Contact:
+Francois Lefebvre <francois [dot] lefebvre [at] crc [dot] ca>
+Web: http://www.crc.ca
+
+This type of "Capture Card" will record MPEG-2 Transport Stream feeds
+over UDP/IP. This recorder supports MPEG1/MPEG2/MPEG4-AVC video.
+
+================ Usage ==================
+
+To use this recorder in MythTV, start mythtv-setup and:
+- Start the streaming (see below for example with VLC).
+- Create a playlist.m3u with the streams you wish to listen to.
+- Create the a new "Network Recorder" capture card
+  with the URL to the playlist.m3u as your M3U URL
+- Create a new video source with no listing grabber.
+- Set the FREEBOX->MPEG2TS input to the new video source and 
+  "scan for channels"
+- [re]start the backend and frontend and watch TV.
+
+========= Example playlist.m3u ==========
+
+#EXTM3U
+#EXTINF:0,1 - test
+udp://localhost:1234
+#EXTINF:0,2 - test2
+udp://localhost:2345
+
+===== Examples of VLC UDP streaming =====
+
+The easiest way to try the IP streaming recorder is to use the VLC player
+(www.videolan.org) to stream the content of a file (MPEG1 or MPEG2), DVD or VCD
+to a UDP address using MPEG-TS transport. You can also use the H264 transcoder
+included in VLC if you have installed the mythtv_crc_h264 patch to MythTV. H264
+transcoding seems to work correctly only from VLC 0.8.5-test3. A H264 video is
+known to work with mp3 audio only, AAC support in MythTV is not working.
+
+Here are some examples of VLC usage to test the Network input. These examples
+are for the VLC player for Win32 but it should be the same for the linux version
+except for the paths. Any movie DVD can be used in these examples. The IP
+destination 192.168.1.100:1234 can be changed for your network configuration:
+
+To stream the content of a DVD:
+  vlc dvdsimple://dev/dvd :sout=#duplicate{dst=std{access=udp,mux=ts,dst=192.168.1.100:1234}}
+
+To stream the content of a DVD transcoded in realtime to h264 (fast cpu needed!):
+  vlc dvdsimple://dev/dvd :sout=#transcode{vcodec=h264,vb=512,scale=0.5,acodec=mp3,ab=128,channels=2}:duplicate{dst=std{access=udp,mux=ts,dst=192.168.1.100:1234}}
+
+To transcode a DVD to h264 in a file named test.ts and then stream it:
+  vlc dvdsimple://dev/dvd :sout=#transcode{vcodec=h264,vb=512,scale=0.5,acodec=mp3,ab=128,channels=2}:duplicate{dst=std{access=file,mux=ts,dst="test.ts"}}
+  vlc "test.ts" :sout=#duplicate{dst=std{access=udp,mux=ts,dst=192.168.1.100:1234}}

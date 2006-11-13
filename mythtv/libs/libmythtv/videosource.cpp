@@ -1226,10 +1226,6 @@ CaptureCardGroup::CaptureCardGroup(CaptureCard& parent) :
     addTarget("HDHOMERUN", new HDHomeRunConfigurationGroup(parent));
 #endif // USING_HDHOMERUN
 
-#ifdef USING_CRC_IP_NETWORK_REC
-    addTarget("CRC_IP",   new CRCIpNetworkRecorderConfigurationGroup(parent));
-#endif // USING_CRC_IP_NETWORK_REC
-
 #ifdef USING_IPTV
     addTarget("FREEBOX",   new IPTVConfigurationGroup(parent));
 #endif // USING_IPTV
@@ -1352,13 +1348,8 @@ void CardType::fillSelections(SelectSetting* setting)
         QObject::tr("HDHomeRun DTV tuner box"), "HDHOMERUN");
 #endif // USING_HDHOMERUN
 
-#ifdef USING_CRC_IP_NETWORK_REC
-    setting->addSelection(
-        QObject::tr("CRC IP Network Recorder"), "CRC_IP");
-#endif // USING_CRC_IP_NETWORK_REC
-
 #ifdef USING_IPTV
-    setting->addSelection(QObject::tr("RTSP Network Recorder"), "FREEBOX");
+    setting->addSelection(QObject::tr("Network Recorder"), "FREEBOX");
 #endif // USING_IPTV
 }
 

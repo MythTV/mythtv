@@ -57,10 +57,6 @@ using namespace std;
 #include "hdhrrecorder.h"
 #include "iptvrecorder.h"
 
-#ifdef USING_CRC_IP_NETWORK_REC
-#include "crcipnetworkrecorder.h"
-#endif
-
 #ifdef USING_V4L
 #include "channel.h"
 #endif
@@ -197,16 +193,6 @@ bool TVRec::CreateChannel(const QString &startchannel)
         channel = new DummyChannel(this);
         InitChannel(genOpt.defaultinput, startchannel);
         init_run = true;
-    }
-    else if (genOpt.cardtype == "CRC_IP")
-    {
-#ifdef USING_CRC_IP_NETWORK_REC
-        channel = new DummyChannel(this);
-        if (!channel->Open())
-            return false;
-        InitChannel(genOpt.defaultinput, startchannel);
-        init_run = true;
-#endif // USING_CRC_IP_NETWORK_REC
     }
     else if (genOpt.cardtype == "FREEBOX")
     {
@@ -853,14 +839,6 @@ bool TVRec::SetupRecorder(RecordingProfile &profile)
         ringBuffer->SetWriteBufferSize(4*1024*1024);
         recorder->SetOption("wait_for_seqstart", genOpt.wait_for_seqstart);
 #endif // USING_V4L
-    }
-    else if (genOpt.cardtype == "CRC_IP")
-    {
-#ifdef USING_CRC_IP_NETWORK_REC
-        recorder = new CRCIpNetworkRecorder(this);
-        recorder->SetOption("wait_for_seqstart", genOpt.wait_for_seqstart);
-        ringBuffer->SetWriteBufferSize(4*1024*1024);
-#endif // USING_CRC_IP_NETWORK_REC
     }
     else if (genOpt.cardtype == "FIREWIRE")
     {
