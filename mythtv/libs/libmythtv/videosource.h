@@ -37,6 +37,23 @@ class VideoSourceDBStorage : public SimpleDBStorage
     const VideoSource& parent;
 };
 
+class VideoSourceSelector : public ComboBoxSetting, public TransientStorage
+{
+  public:
+    VideoSourceSelector(uint           _initial_sourceid,
+                        const QString &_card_types,
+                        bool           _must_have_mplexid);
+
+    virtual void load(void);
+
+    uint GetSourceID(void) const { return getValue().toUInt(); }
+
+  private:
+    uint    initial_sourceid;
+    QString card_types;
+    bool    must_have_mplexid;
+};
+
 class FreqTableSelector :
     public ComboBoxSetting, public VideoSourceDBStorage
 {

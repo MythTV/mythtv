@@ -42,6 +42,65 @@
 #include "videodev_myth.h"
 #endif
 
+VideoSourceSelector::VideoSourceSelector(uint           _initial_sourceid,
+                                         const QString &_card_types,
+                                         bool           _must_have_mplexid) :
+    ComboBoxSetting(this),
+    initial_sourceid(_initial_sourceid),
+    card_types(QDeepCopy<QString>(_card_types)),
+    must_have_mplexid(_must_have_mplexid)
+{
+    setLabel(tr("Video Source"));
+}
+
+void VideoSourceSelector::load(void)
+{
+    MSqlQuery query(MSqlQuery::InitCon());
+    
+    QString querystr =
+        "SELECT DISTINCT videosource.name, videosource.sourceid "
+        "FROM channel, cardinput, videosource, capturecard "
+        "WHERE cardinput.sourceid   = videosource.sourceid AND "
+        "      cardinput.cardid     = capturecard.cardid   AND "
+        "      capturecard.hostname = :HOSTNAME ";
+
+    if (!card_types.isEmpty())
+    {
+        querystr += QString(" AND capturecard.cardtype in %1 ")
+            .arg(card_types);
+    }
+
+    if (must_have_mplexid)
+    {
+        querystr +=
+            " AND channel.sourceid      = videosource.sourceid "
+            " AND channel.mplexid      != 32767                "
+            " AND channel.mplexid      != 0                    ";
+    }
+
+    query.prepare(querystr);
+    query.bindValue(":HOSTNAME", gContext->GetHostName());
+
+    if (!query.exec() || !query.isActive() || query.size() <= 0)
+        return;
+
+    uint sel = 0, cnt = 0;
+    for (; query.next(); cnt++)
+    {
+        addSelection(query.value(0).toString(),
+                     query.value(1).toString());
+
+        sel = (query.value(1).toUInt() == initial_sourceid) ? cnt : sel;
+    }
+
+    if (initial_sourceid)
+    {
+        if (cnt)
+            setValue(sel);
+        setEnabled(false);
+    }
+}
+
 class RecorderOptions : public ConfigurationWizard
 {
   public:

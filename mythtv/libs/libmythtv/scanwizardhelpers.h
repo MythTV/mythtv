@@ -39,6 +39,7 @@ class TransLabelSetting;
 class ScanWizardScanner;
 class ScanWizard;
 class OptionalTypeSetting;
+class VideoSourceSelector;
 
 /// Max range of the ScanProgressPopup progress bar
 #define PROGRESS_MAX  1000
@@ -112,23 +113,6 @@ class ScannerEvent : public QCustomEvent
 // ///////////////////////////////
 // Settings Below Here
 // ///////////////////////////////
-
-class VideoSourceSetting: public ComboBoxSetting, public Storage
-{
-  public:
-    VideoSourceSetting(int srcid) :
-        ComboBoxSetting(this), sourceid(srcid)
-    {
-        setLabel(tr("Video Source"));
-    }
-
-    virtual void load();
-    virtual void save() {}
-    virtual void save(QString /*destination*/) { }
-
-  private:
-    int sourceid;
-};
 
 class MultiplexSetting : public ComboBoxSetting, public Storage
 {
@@ -255,16 +239,16 @@ class ScanWizardScanType: public VerticalConfigurationGroup
 {
     Q_OBJECT
     friend class ScanWizard;
+
   public:
     ScanWizardScanType(ScanWizard *_parent, int sourceid);
 
   protected:
-    ScanWizard *parent;
-
-    ScanOptionalConfig *scanConfig;
-    CaptureCardSetting *capturecard;
-    VideoSourceSetting *videoSource;
-    ScanTypeSetting *scanType;
+    ScanWizard          *parent;
+    ScanOptionalConfig  *scanConfig;
+    CaptureCardSetting  *capturecard;
+    VideoSourceSelector *videoSource;
+    ScanTypeSetting     *scanType;
 };
 
 class LogList: public ListBoxSetting, public TransientStorage

@@ -29,130 +29,64 @@
  *
  */
 
-#ifndef DVBTRANSPORTEDITOR_H
-#define DVBTRANSPORTEDITOR_H
+#ifndef _TRANSPORT_EDITOR_H_
+#define _TRANSPORT_EDITOR_H_
 
 #include <qobject.h>
 #include "settings.h"
 
-class DTVTStandard;
-class ATSCModulation;
-class DvbTFrequency;
-class DvbTSymbolrate;
-class DvbTPolarity;
-class DvbTFec;
-class DvbTModulation;
-class DvbTInversion;
-class DvbTBandwidth;
-class DvbTConstellation;
-class DvbTCoderateLP;
-class DvbTCoderateHP;
-class DvbTTransmissionMode;
-class DvbTGuardInterval;
-class DvbTHierarchy;
+class VideoSourceSelector;
+class MultiplexID;
 
 /*
- *  Objects added for new DVB Transport Editing section
+ *  Objects added for Transport Editing section
  */
 
-class DVBTID: public AutoIncrementDBSetting {
-public:
-    DVBTID() : AutoIncrementDBSetting("dtv_multiplex", "mplexid"),
-          field("mplexid"),table("dtv_multiplex")
-    {
-        setVisible(false);
-        setName("DVBTID");
-    };
-
-    const QString& getField(void) const {
-        return field;
-    };
-
-protected:
-    QString field,table;
-};
-
-class DVBTransportList : public ListBoxSetting, public Storage
+class TransportList : public ListBoxSetting, public TransientStorage
 {
     Q_OBJECT
+
   public:
-    DVBTransportList() : ListBoxSetting(this) {}
+    TransportList() : ListBoxSetting(this), sourceid(0) { }
 
-    void load() { fillSelections(); }
-    void save(void) { }
-    void save(QString /*destination*/) { }
+    virtual void load(void) { fillSelections(); }
+    virtual void fillSelections(void);
 
-public slots:
-    void fillSelections(void);
-    void sourceID(const QString& str) { strSourceID=str; fillSelections();}
+    void SetSourceID(uint _sourceid);
 
-private:
-    QString strSourceID;
+  public slots:
+    void SetSourceID(const QString &_sourceid)
+        { SetSourceID(_sourceid.toUInt()); }
+
+  private:
+    ~TransportList() { }
+
+  private:
+    uint sourceid;
+    uint cardtype;
 };
 
-class DVBTSourceSetting;
-//Page for selecting a transport to be created/edited
-class DVBTransportsEditor : public QObject, public ConfigurationDialog
+// Page for selecting a transport to be created/edited
+class TransportListEditor : public QObject, public ConfigurationDialog
 {
     Q_OBJECT
-public:
-    DVBTransportsEditor();
 
-    void load(void) { cfgGrp->load(); }
+  public:
+    TransportListEditor(uint initial_sourceid);
 
-    virtual int exec();
+    virtual int exec(void);
 
-public slots:
-    void menu(int);
-    void del();
-    void del(int);
-    void edit();
-    void edit(int);
-    void videoSource(const QString& str);
+  public slots:
+    void Menu(void);
+    void Delete(void);
+    void Edit(void);
 
-private:
-    DVBTransportList* m_list;
-    DVBTSourceSetting* m_videoSource;
-    DVBTID *m_id;
-    int m_nID;
+  private:
+    ~TransportListEditor() { }
+
+  private:
+    VideoSourceSelector *m_videosource;
+    TransportList       *m_list;
 };
 
-class DVBTransportWizard : public QObject, public ConfigurationWizard
-{
-    Q_OBJECT
-public:
-    DVBTransportWizard(int id, unsigned _nVideoSorceID);
-
-private:
-    DVBTID *dvbtid;
-};
-
-class DVBTransportPage: public HorizontalConfigurationGroup
-{
-    Q_OBJECT
-public:
-    DVBTransportPage(const DVBTID& id,unsigned nType);
-protected:
-    const DVBTID& id;
-
-private:
-
-    DTVTStandard*      dtvStandard;
-    ATSCModulation    *atscmodulation;
-    DvbTFrequency* frequency;
-    DvbTSymbolrate* symbolrate;
-    DvbTPolarity* polarity;
-    DvbTFec* fec;
-    DvbTModulation* modulation;
-    DvbTInversion* inversion;
-
-    DvbTBandwidth* bandwidth;
-    DvbTConstellation* constellation;
-    DvbTCoderateLP* coderate_lp;
-    DvbTCoderateHP* coderate_hp;
-    DvbTTransmissionMode* trans_mode;
-    DvbTGuardInterval* guard_interval;
-    DvbTHierarchy* hierarchy;
-};
-
-#endif //DVBTRANSPORTEDITOR_H
+#endif // _TRANSPORT_EDITOR_H_

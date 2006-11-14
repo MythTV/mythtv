@@ -440,10 +440,14 @@ void ChannelEditor::scan()
 #endif
 }
 
-void ChannelEditor::transportEditor()
+void ChannelEditor::transportEditor(void)
 {
-    DVBTransportsEditor advancedDialog;
-    advancedDialog.exec();
+    uint sourceid = source->getValue().toUInt();
+
+    TransportListEditor *editor = new TransportListEditor(sourceid);
+    editor->exec();
+    editor->deleteLater();
+
     list->fillSelections();
     list->setFocus();
 }

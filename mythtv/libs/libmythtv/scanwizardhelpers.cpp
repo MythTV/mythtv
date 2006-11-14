@@ -36,6 +36,7 @@
 // MythTV headers
 #include "mythcontext.h"
 #include "frequencies.h"
+#include "videosource.h"
 #include "cardutil.h"
 #include "scanwizardhelpers.h"
 #include "scanwizardscanner.h"
@@ -150,42 +151,6 @@ void ScanProgressPopup::exec(ScanWizardScanner *parent)
     connect(dialog, SIGNAL(popupDone(void)),
             parent, SLOT(cancelScan(void)));
     dialog->ShowPopup(this);
-}
-
-void VideoSourceSetting::load()
-{
-    MSqlQuery query(MSqlQuery::InitCon());
-    
-    QString querystr = QString(
-        "SELECT DISTINCT videosource.name, videosource.sourceid "
-        "FROM cardinput, videosource, capturecard "
-        "WHERE cardinput.sourceid=videosource.sourceid AND "
-        "      cardinput.cardid=capturecard.cardid AND "
-        "      capturecard.cardtype in %1 AND "
-        "      capturecard.hostname = :HOSTNAME").arg(card_types());
-    
-    query.prepare(querystr);
-    query.bindValue(":HOSTNAME", gContext->GetHostName());
-
-    if (!query.exec() || !query.isActive() || query.size() <= 0)
-        return;
-
-    int which = 0, i = 0;
-    while (query.next())
-    {
-        addSelection(query.value(0).toString(),
-                     query.value(1).toString());
-
-        if (sourceid == query.value(1).toInt())
-            which = i;
-        i++;
-    }
-
-    if (sourceid > -1)
-    {
-        setValue(which);
-        setEnabled(false);
-    }
 }
 
 void MultiplexSetting::refresh()
@@ -443,7 +408,9 @@ ScanWizardScanType::ScanWizardScanType(ScanWizard *_parent, int sourceid) :
     setLabel(tr("Scan Type"));
     setUseLabel(false);
 
-    videoSource = new VideoSourceSetting(sourceid);
+    videoSource = new VideoSourceSelector(
+        (sourceid < 0) ? 0 : sourceid, card_types(), false);
+
     capturecard = new CaptureCardSetting();
 
     HorizontalConfigurationGroup *h1 =

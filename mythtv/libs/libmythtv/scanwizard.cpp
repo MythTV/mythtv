@@ -34,6 +34,7 @@
 #include "scanwizard.h"
 #include "sourceutil.h"
 #include "cardutil.h"
+#include "videosource.h"
 
 ScanWizard::ScanWizard(int sourceid)
     : paneOFDM(new OFDMPane()),     paneQPSK(new QPSKPane()),
