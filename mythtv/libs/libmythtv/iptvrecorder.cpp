@@ -5,6 +5,8 @@
  *  Distributed as part of MythTV under GPL v2 and later.
  */
 
+#include <unistd.h>
+
 // MythTV headers
 #include "mpegstreamdata.h"
 #include "tspacket.h"

@@ -2,6 +2,7 @@
 
 // POSIX headers
 #include <stdint.h>
+#include <unistd.h>
 
 // Qt headers
 #include <qapplication.h>

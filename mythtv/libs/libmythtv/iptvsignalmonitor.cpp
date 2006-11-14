@@ -1,5 +1,7 @@
 // -*- Mode: c++ -*-
 
+#include <unistd.h>
+
 // MythTV headers
 #include "mpegstreamdata.h"
 #include "iptvchannel.h"
