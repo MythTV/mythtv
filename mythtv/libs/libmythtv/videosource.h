@@ -557,7 +557,7 @@ class StartingChannel : public ComboBoxSetting, public CardInputDBStorage
     Q_OBJECT
   public:
     StartingChannel(const CardInput &parent) :
-        ComboBoxSetting(false, 1),
+        ComboBoxSetting(this, false, 1),
         CardInputDBStorage(this, parent, "startchan")
     {
         setLabel(QObject::tr("Starting channel"));
