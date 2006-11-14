@@ -5061,6 +5061,9 @@ void TV::doEditSchedule(int editType)
     if (changeChannel)
         EPGChannelUpdate(chanid, channum);
 
+    if (jumpToProgram)
+        activenvp->DiscardVideoFrames(true);
+
     menurunning = false;
 }
 
