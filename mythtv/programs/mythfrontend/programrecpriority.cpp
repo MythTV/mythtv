@@ -502,12 +502,16 @@ void ProgramRecPriority::edit(void)
     if (rec)
     {
         int recid = 0;
-        ScheduledRecording record;
-        record.loadByID(rec->recordid);
-        if (record.getSearchType() == kNoSearch)
-            record.loadByProgram(rec);
-        record.exec();
-        recid = record.getRecordID();
+
+        {
+            ScheduledRecording *record = new ScheduledRecording();
+            record->loadByID(rec->recordid);
+            if (record->getSearchType() == kNoSearch)
+                record->loadByProgram(rec);
+            record->exec();
+            recid = record->getRecordID();
+            record->deleteLater();
+        }
 
         // We need to refetch the recording priority values since the Advanced
         // Recording Options page could've been used to change them 
@@ -612,8 +616,11 @@ void ProgramRecPriority::customEdit(void)
     if (!curitem)
         return;
 
-    ScheduledRecording record;
-    record.loadByID(curitem->recordid);
+    {
+        ScheduledRecording *record = new ScheduledRecording();
+        record->loadByID(curitem->recordid);
+        record->deleteLater();
+    }
 
     CustomEdit *ce = new CustomEdit(gContext->GetMainWindow(),
                                         "customedit", curitem);
@@ -680,10 +687,10 @@ void ProgramRecPriority::upcoming(void)
     if (!curitem)
         return;
 
-    ScheduledRecording record;
-
-    record.loadByID(curitem->recordid);
-    record.runRuleList();
+    ScheduledRecording *record = new ScheduledRecording();
+    record->loadByID(curitem->recordid);
+    record->runRuleList();
+    record->deleteLater();
 }
 
 void ProgramRecPriority::changeRecPriority(int howMuch) 

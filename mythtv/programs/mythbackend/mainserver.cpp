@@ -2178,10 +2178,11 @@ void MainServer::HandleGetPendingRecordings(PlaybackSock *pbs, QString table, in
 
             if (query.exec() && query.isActive() && query.size())
             {
-                ScheduledRecording s;
-                s.loadByID(recordid);
-                if (s.getSearchType() == kManualSearch)
+                ScheduledRecording *record = new ScheduledRecording();
+                record->loadByID(recordid);
+                if (record->getSearchType() == kManualSearch)
                     HandleRescheduleRecordings(recordid, NULL);
+                record->deleteLater();
             }
             else if (recordid > 0)
             {

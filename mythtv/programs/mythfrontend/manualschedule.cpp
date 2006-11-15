@@ -325,16 +325,17 @@ void ManualSchedule::recordClicked(void)
 
     p.title += " (" + tr("Manual Record") + ")";
 
-    ScheduledRecording record;
+    ScheduledRecording *record = new ScheduledRecording();
+    record->loadByProgram(&p);
+    record->setSearchType(kManualSearch);
+    record->exec();
 
-    record.loadByProgram(&p);
-    record.setSearchType(kManualSearch);
-    record.exec();
-
-    if (record.getRecordID())
+    if (record->getRecordID())
         accept();
     else
         m_recordButton->setFocus();
+
+    record->deleteLater();
 }
 
 void ManualSchedule::cancelClicked(void)

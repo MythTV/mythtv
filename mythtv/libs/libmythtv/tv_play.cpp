@@ -5024,12 +5024,12 @@ void TV::doEditSchedule(int editType)
                     break;
             case kScheduledRecording:
             {
-                    pbinfoLock.lock();
-                    ScheduledRecording record;
-                    record.loadByProgram(playbackinfo);
-                    record.exec();
-                    pbinfoLock.unlock();
-                    break;
+                QMutexLocker locker(&pbinfoLock);
+                ScheduledRecording *record = new ScheduledRecording();
+                record->loadByProgram(playbackinfo);
+                record->exec();
+                record->deleteLater();
+                break;
             }
             case kPlaybackBox:
             {

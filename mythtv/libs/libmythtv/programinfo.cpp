@@ -155,7 +155,10 @@ ProgramInfo &ProgramInfo::operator=(const ProgramInfo &other)
 ProgramInfo &ProgramInfo::clone(const ProgramInfo &other)
 {
     if (record)
-        delete record;
+    {
+        record->deleteLater();
+        record = NULL;
+    }
     
     isVideo = other.isVideo;
     lenMins = other.lenMins;
@@ -235,8 +238,11 @@ ProgramInfo &ProgramInfo::clone(const ProgramInfo &other)
  */
 ProgramInfo::~ProgramInfo() 
 {
-    if (record != NULL)
-        delete record;
+    if (record)
+    {
+        record->deleteLater();
+        record = NULL;
+    }
 }
 
 /** \fn ProgramInfo::MakeUniqueKey(void) const

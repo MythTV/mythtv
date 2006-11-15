@@ -518,20 +518,21 @@ void CustomEdit::recordClicked(void)
         return;
     }
 
-    ScheduledRecording record;
+    ScheduledRecording *record = new ScheduledRecording();
 
     int cur_recid = m_recid[m_rule->currentItem()].toInt();
 
     if (cur_recid > 0)
-        record.modifyPowerSearchByID(cur_recid, m_title->text(),
-                                     m_subtitle->text(),
-                                     m_description->text()); 
+        record->modifyPowerSearchByID(cur_recid, m_title->text(),
+                                      m_subtitle->text(),
+                                      m_description->text()); 
     else
-        record.loadBySearch(kPowerSearch, m_title->text(),
-                            m_subtitle->text(), m_description->text());
-    record.exec();
+        record->loadBySearch(kPowerSearch, m_title->text(),
+                             m_subtitle->text(), m_description->text());
+    record->exec();
+    record->deleteLater();
 
-    if (record.getRecordID())
+    if (record->getRecordID())
         accept();
     else
         m_recordButton->setFocus();

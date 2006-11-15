@@ -3219,9 +3219,10 @@ void PlaybackBox::doEditScheduled()
     }
     else
     {
-        ScheduledRecording record;
-        record.loadByProgram(curitem);
-        record.exec();
+        ScheduledRecording *record = new ScheduledRecording();
+        record->loadByProgram(curitem);
+        record->exec();
+        record->deleteLater();
 
         connected = FillList();
     }

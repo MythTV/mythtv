@@ -61,14 +61,13 @@ class MPUBLIC ScheduledRecording : public ConfigurationGroup
 
   public:
     ScheduledRecording();
-    ~ScheduledRecording();
     ScheduledRecording(const ScheduledRecording& other);
 
     virtual void load();
     
     void makeOverride(void);
     const ProgramInfo* getProgramInfo() const { return m_pginfo; }
-    RootSRGroup* getRootGroup() { return rootGroup; }
+    QGuardedPtr<RootSRGroup> getRootGroup(void) { return rootGroup; }
 
     RecordingType getRecordingType(void) const;
     void setRecordingType(RecordingType);
@@ -187,6 +186,9 @@ protected:
     virtual void setDefault(bool haschannel);
     virtual void setProgram(const ProgramInfo *proginfo);
     void fetchChannelInfo();
+
+    // Use deleteLater, we can't use directly because we inherit from QObject
+    ~ScheduledRecording();
     
     class ID : public AutoIncrementDBSetting
     {
@@ -241,7 +243,6 @@ protected:
     
     const ProgramInfo* m_pginfo;
     QGuardedPtr<RootSRGroup> rootGroup;
-    QGuardedPtr<RecOptDialog> m_dialog;
     QString chanstr;
     QString chansign;
     QString channame;

@@ -589,21 +589,22 @@ void ProgLister::addSearchRecord(void)
         MSqlEscapeAsAQuery(what, bindings);
     }
 
-
-    ScheduledRecording record;
+    ScheduledRecording *record = new ScheduledRecording();
 
     if (genreflag)
     {
         QString fromgenre = QString("LEFT JOIN programgenres ON "
                 "program.chanid = programgenres.chanid AND "
                 "program.starttime = programgenres.starttime ");
-        record.loadBySearch(searchtype, text, fromgenre, what);
+        record->loadBySearch(searchtype, text, fromgenre, what);
     }
     else
     {
-        record.loadBySearch(searchtype, text, what);
+        record->loadBySearch(searchtype, text, what);
     }
-    record.exec();
+
+    record->exec();
+    record->deleteLater();
 
     chooseListBox->setFocus();
     setViewFromEdit();

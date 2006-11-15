@@ -41,7 +41,6 @@ ScheduledRecording::ScheduledRecording() :
     endoffset = NULL;
     maxepisodes = NULL;
     maxnewest = NULL;
-    m_dialog = NULL;
     recpriority = NULL;
     recgroup = NULL;
     playgroup = NULL;
@@ -82,8 +81,11 @@ ScheduledRecording::~ScheduledRecording()
 {
     // rootGroup is unique among this class' member variables in
     // that it's not self-managed
-    if (!rootGroup.isNull())
-        delete rootGroup;
+    if (rootGroup)
+    {
+        rootGroup->deleteLater();
+        rootGroup = NULL;
+    }
 }
 
 void ScheduledRecording::load()
