@@ -53,7 +53,7 @@ class SRFindTime;
 class SRFindId;
 class SRParentId;
 
-class MPUBLIC ScheduledRecording : public QObject, public ConfigurationDialog
+class MPUBLIC ScheduledRecording : public ConfigurationGroup
 {
     Q_OBJECT
 
@@ -65,9 +65,6 @@ class MPUBLIC ScheduledRecording : public QObject, public ConfigurationDialog
     ScheduledRecording(const ScheduledRecording& other);
 
     virtual void load();
-    
-    virtual MythDialog* dialogWidget(MythMainWindow* parent,
-                                     const char* widgetName=0);    
     
     void makeOverride(void);
     const ProgramInfo* getProgramInfo() const { return m_pginfo; }
@@ -110,8 +107,7 @@ class MPUBLIC ScheduledRecording : public QObject, public ConfigurationDialog
     virtual void modifyPowerSearchByID(int rid, QString textname,
                                        QString from, QString forwhat);
 
-    virtual int exec(bool saveOnExec = true, bool doLoad = false)
-        { return ConfigurationDialog::exec(saveOnExec, doLoad); }    
+    virtual int exec(bool saveOnExec = true, bool doLoad = false);
         
     void remove();
     int getRecordID(void) const { return id->intValue(); };
@@ -257,8 +253,6 @@ protected:
     QString timeFormat;
     QString dateFormat;
     QString shortDateFormat;
-
-    ConfigurationGroup *cfgGrp;
 };
 
 class ScheduledRecordingEditor :

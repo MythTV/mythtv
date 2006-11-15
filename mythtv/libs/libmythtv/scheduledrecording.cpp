@@ -21,7 +21,7 @@
 // in recordingtypes.cpp.
 
 ScheduledRecording::ScheduledRecording() :
-    cfgGrp(new ConfigurationGroup(true, true, false, false))
+    ConfigurationGroup(true, true, false, false)
 {
     m_pginfo = NULL;
     type = NULL;
@@ -80,19 +80,17 @@ ScheduledRecording::ScheduledRecording() :
 
 ScheduledRecording::~ScheduledRecording() 
 {
-    // rootGroup and cfgGrp are unique among this class'
-    // instance variables in that they are not self-managed
+    // rootGroup is unique among this class' member variables in
+    // that it's not self-managed
     if (!rootGroup.isNull())
         delete rootGroup;
-    if (cfgGrp)
-        cfgGrp->deleteLater();
 }
 
 void ScheduledRecording::load()
 {
     if (getRecordID())
     {
-        cfgGrp->load();
+        ConfigurationGroup::load();
         
         QString tmpType = type->getValue();
         type->clearSelections();
@@ -449,7 +447,7 @@ void ScheduledRecording::save(bool sendSig)
     }
     else
     {
-        cfgGrp->save();
+        ConfigurationGroup::save();
 
         MSqlQuery query(MSqlQuery::InitCon());
         query.prepare(
@@ -477,7 +475,7 @@ void ScheduledRecording::save(QString destination)
     }
     else
     {
-        cfgGrp->save(destination);
+        ConfigurationGroup::save(destination);
     }
 }
 
@@ -661,6 +659,48 @@ void ScheduledRecording::fillSelections(SelectSetting* setting)
     }
 }
 
+///////////////////////////////////////////////////////////////////////////////
+
+class ScheduledRecordingDialog : public ConfigurationDialog
+{
+  public:
+    ScheduledRecordingDialog(ScheduledRecording *sr) : schedrec(sr)
+        { addChild(schedrec); }
+
+    virtual MythDialog *dialogWidget(
+        MythMainWindow *parent,
+        const char     *widgetName = "ScheduledRecordingDialog");
+
+    ScheduledRecording *schedrec;
+};
+
+MythDialog *ScheduledRecordingDialog::dialogWidget(
+    MythMainWindow *parent, const char *name)
+{
+    (void) parent;
+    (void) name;
+
+#ifdef USING_FRONTEND
+
+    MythDialog *dlg = new RecOptDialog(schedrec, parent, name);
+    schedrec->getRootGroup()->setDialog(dlg);
+
+    return dlg;
+
+#else
+
+#warning You must compile the frontend to use a dialogWidget.
+
+    VERBOSE(VB_IMPORTANT,
+            "You must compile the frontend to use a dialogWidget.");
+
+    return NULL;
+
+#endif
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
 void ScheduledRecordingEditor::load(void) 
 {
     listbox->clearSelections();
@@ -684,7 +724,16 @@ void ScheduledRecordingEditor::open(int id) {
 
     if (sr->exec() == QDialog::Accepted)
         sr->save();
-    delete sr;
+
+    sr->deleteLater();
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+int ScheduledRecording::exec(bool saveOnExec, bool doLoad)
+{
+    ScheduledRecordingDialog dialog(this);
+    return dialog.exec(saveOnExec, doLoad);
 }
 
 void ScheduledRecording::setStart(const QDateTime& start) {
@@ -732,24 +781,6 @@ QString ScheduledRecording::getRecordSubTitle(void) const {
 QString ScheduledRecording::getRecordDescription(void) const {
     return description->getValue();
 }
-
-MythDialog* ScheduledRecording::dialogWidget(MythMainWindow *parent,
-                                             const char *name)
-{
-    (void) parent;
-    (void) name;
-#ifdef USING_FRONTEND
-    MythDialog* dlg = new RecOptDialog(this, parent, name);
-    rootGroup->setDialog(dlg);
-    return dlg;
-#else
-    VERBOSE(VB_IMPORTANT, "You must compile the frontend "
-            "to use a dialogWidget.");
-    return NULL;
-#endif
-}
-
-
 
 void ScheduledRecording::setDefault(bool haschannel)
 {
