@@ -15,7 +15,7 @@
 #include <mythwizard.h>
 
 #include "channelsettings.h"
-#include "dvbtransporteditor.h"
+#include "transporteditor.h"
 
 #include "scanwizard.h"
 

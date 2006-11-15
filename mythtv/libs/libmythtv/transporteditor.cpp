@@ -33,7 +33,7 @@
 #include <vector>
 using namespace std;
 
-#include "dvbtransporteditor.h"
+#include "transporteditor.h"
 #include "videosource.h"
 #include "cardutil.h"
 #include "mythcontext.h"

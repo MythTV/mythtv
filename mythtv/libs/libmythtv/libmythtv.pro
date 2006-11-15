@@ -138,7 +138,7 @@ HEADERS += signalmonitorvalue.h     viewschdiff.h
 HEADERS += livetvchain.h
 HEADERS += playgroup.h              progdetails.h
 HEADERS += channeleditor.h          channelsettings.h
-HEADERS += previewgenerator.h       dvbtransporteditor.h
+HEADERS += previewgenerator.h       transporteditor.h
 
 SOURCES += programinfo.cpp          proglist.cpp
 SOURCES += RingBuffer.cpp
@@ -159,7 +159,7 @@ SOURCES += livetvchain.cpp
 SOURCES += playgroup.cpp
 SOURCES += progdetails.cpp
 SOURCES += channeleditor.cpp        channelsettings.cpp
-SOURCES += previewgenerator.cpp     dvbtransporteditor.cpp
+SOURCES += previewgenerator.cpp     transporteditor.cpp
 
 # DiSEqC
 HEADERS += diseqc.h                 diseqcsettings.h
