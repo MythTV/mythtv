@@ -58,7 +58,8 @@ static MIMETypes g_MIMETypes[] =
     { "zip" , "application/x-tar"          },
     { "gz"  , "application/x-tar"          },
     { "mpg" , "video/mpeg"                 },
-    { "mpeg", "video/mpeg"                 }
+    { "mpeg", "video/mpeg"                 },
+    { "nuv" , "video/nupplevideo"          }
 };
 
 static const int     g_nMIMELength    = sizeof( g_MIMETypes) / sizeof( MIMETypes );
