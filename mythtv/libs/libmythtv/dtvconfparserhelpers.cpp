@@ -312,7 +312,7 @@ const DTVParamHelperStruct DTVTransmitMode::vdrTable[] =
 
 const DTVParamHelperStruct DTVTransmitMode::parseTable[] =
 {
-   { "auto", kTransmissionModeAuto },
+   { "a",    kTransmissionModeAuto },
    { "2",    kTransmissionMode2K   },
    { "8",    kTransmissionMode8K   },
    { NULL,   kTransmissionModeAuto },
@@ -322,7 +322,7 @@ const char *DTVTransmitMode::dbStr[DTVTransmitMode::kDBStrCnt] =
 {
     "2",   ///< kTransmissionMode2K
     "8",   ///< kTransmissionMode8K
-    "auto" ///< kTransmissionModeAuto
+    "a"    ///< kTransmissionModeAuto
 };
 
 const DTVParamHelperStruct DTVGuardInterval::confTable[] =
