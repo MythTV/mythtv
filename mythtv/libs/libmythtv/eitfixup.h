@@ -30,8 +30,8 @@ class EITFixUp
         kFixMCA        = 0x0080,
 
         // Early fixups
-        kEFixPro7Sat   = 0x0100,
-        kEFixBell      = 0x0200,
+        kEFixForceISO8859_1  = 0x0100,
+        kEFixForceISO8859_15 = 0x0200,
     };
 
     EITFixUp();
