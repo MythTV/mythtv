@@ -2107,14 +2107,14 @@ void ProgramInfo::SetPreserveEpisode(bool preserveEpisode) const
     if (!query.exec() || !query.isActive())
         MythContext::DBError("PreserveEpisode update", query);
     else
-        UpdateLastDelete(preserveEpisode);
+        UpdateLastDelete(false);
 }
 
 /** \fn ProgramInfo::SetAutoExpire(int) const
  *  \brief Set "autoexpire" field in "recorded" table to "autoExpire".
  *  \param autoExpire value to set auto expire field to.
  */
-void ProgramInfo::SetAutoExpire(int autoExpire) const
+void ProgramInfo::SetAutoExpire(int autoExpire, bool updateDelete) const
 {
     MSqlQuery query(MSqlQuery::InitCon());
 
@@ -2128,8 +2128,8 @@ void ProgramInfo::SetAutoExpire(int autoExpire) const
 
     if (!query.exec() || !query.isActive())
         MythContext::DBError("AutoExpire update", query);
-    else
-        UpdateLastDelete(autoExpire);
+    else if (updateDelete)
+        UpdateLastDelete(true);
 }
 
 /** \fn ProgramInfo::UpdateLastDelete(bool) const

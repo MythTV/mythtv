@@ -210,7 +210,7 @@ class MPUBLIC ProgramInfo
     void SetWatchedFlag(bool watchedFlag) const;
     void SetDeleteFlag(bool deleteFlag) const;
     void SetCommFlagged(int flag) const; // 1 = flagged, 2 = processing
-    void SetAutoExpire(int autoExpire) const;
+    void SetAutoExpire(int autoExpire, bool updateDelete = false) const;
     void SetPreserveEpisode(bool preserveEpisode) const;
     void UpdateLastDelete(bool setTime) const;
 

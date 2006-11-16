@@ -3558,7 +3558,7 @@ void PlaybackBox::toggleAutoExpire(bool turnOn)
 
     if (tmpItem)
     {
-        tmpItem->SetAutoExpire(turnOn);
+        tmpItem->SetAutoExpire(turnOn, true);
 
         if (turnOn)
             tmpItem->programflags |= FL_AUTOEXP;
