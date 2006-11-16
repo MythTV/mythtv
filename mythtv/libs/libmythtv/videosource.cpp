@@ -59,7 +59,11 @@ void VideoSourceSelector::load(void)
     
     QString querystr =
         "SELECT DISTINCT videosource.name, videosource.sourceid "
-        "FROM channel, cardinput, videosource, capturecard "
+        "FROM cardinput, videosource, capturecard";
+
+    querystr += (must_have_mplexid) ? ", channel " : " ";
+
+    querystr +=
         "WHERE cardinput.sourceid   = videosource.sourceid AND "
         "      cardinput.cardid     = capturecard.cardid   AND "
         "      capturecard.hostname = :HOSTNAME ";
