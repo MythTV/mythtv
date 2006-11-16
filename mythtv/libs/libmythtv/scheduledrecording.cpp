@@ -786,14 +786,16 @@ QString ScheduledRecording::getRecordDescription(void) const {
 
 void ScheduledRecording::setDefault(bool haschannel)
 {
+    QDate date = QDate::currentDate();
+    QTime time = QTime::currentTime();
+    QDate epoch = QDate::QDate (1970, 1, 1);
+
     id->setValue(0);
     title->setValue("");
     subtitle->setValue("");
     description->setValue("");
     channel->setValue("");
     station->setValue("");
-    QDate date = QDate::currentDate();
-    QTime time = QTime::currentTime();
     startDate->setValue(date);
     startTime->setValue(time);
     endDate->setValue(date);
@@ -802,12 +804,10 @@ void ScheduledRecording::setDefault(bool haschannel)
     programid->setValue("");
     findday->setValue(-1);
     findtime->setValue(QTime::fromString("00:00:00", Qt::ISODate));
-    findid->setValue(0);
+    findid->setValue(epoch.daysTo(date) + 719528);
     parentid->setValue(0);
     category->setValue("");
     search->setValue(kNoSearch);
-
-     
     
     if (!type)   
     {
