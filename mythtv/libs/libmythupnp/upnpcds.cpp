@@ -138,6 +138,7 @@ bool UPnpCDS::ProcessRequest( HttpWorkerThread * /*pThread*/, HTTPRequest *pRequ
             case CDSM_GetSortCapabilities  : HandleGetSortCapabilities  ( pRequest ); break;
             case CDSM_GetSystemUpdateID    : HandleGetSystemUpdateID    ( pRequest ); break;
             default:
+                pRequest->m_nResponseStatus = 501;
                 pRequest->FormatErrorReponse( 401, "Invalid Action" );
                 break;
         }       
@@ -321,7 +322,7 @@ void UPnpCDS::HandleBrowse( HTTPRequest *pRequest )
 void UPnpCDS::HandleSearch( HTTPRequest *pRequest )
 {
     // -=>TODO: Need to implement
-
+    pRequest->m_nResponseStatus = 501;
     pRequest->FormatErrorReponse( 401, "Invalid Action" );
 }
 
