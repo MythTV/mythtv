@@ -1,7 +1,7 @@
   Installing and using MythTV
   Robert Kulagowski, mailto:rkulagow@rocketmail.com
   <mailto:rkulagow@rocketmail.com>
-  2006-11-08, v0.20.07
+  2006-11-17, v0.20.09
 
   Initially, installation of MythTV seems like a huge task.  There are
   lots of dependencies, and various distributions seem to do the same
@@ -40,7 +40,7 @@
            3.1.5.5 Firewire.
            3.1.5.6 DBoxII or other devices running Neutrino
            3.1.5.7 USB Capture Devices.
-           3.1.5.8 IP Recorders (RTSP, UDP)
+           3.1.5.8 IP Recorder (RTSP, RTS, UDP)
         3.1.6 Hardware known NOT to work and other issues
         3.1.7 Sound card
         3.1.8 Video Display Card
@@ -945,18 +945,15 @@
   emulates a PVR-x50 card.
 
 
-  [1m3.1.5.8.  IP Recorders (RTSP, UDP)[0m
+  [1m3.1.5.8.  IP Recorder (RTSP, RTS, UDP)[0m
 
-  RTSP MPEG-2 TS recording is supported using the Freebox recorder in
-  MythTV, which expects the channels to be supplied as a m3u playlist.
-  If your DSL/Fiber provider supplies television service, but does not
-  provide a m3u playlist for the channels, you can construct one for
-  your own use (you do not need to download it from the same server as
-  the streams themselves).
-
-  UDP MPEG-2 TS and MPEG-4 TS recording is supported by the CRC IP
-  Network recorder, but this recorder only supports recording of a
-  single channel per recorder.
+  MPEG-2, MPEG-4 and H.264 internet TS stream recording is supported
+  using the IPTV recorder in MythTV. This recorder expects the channels
+  to be supplied as a m3u playlist. If your DSL/Fiber provider supplies
+  television service, but does not provide a m3u playlist for the
+  channels, you can construct one for your own use. You do not need to
+  download it from the same server as the streams themselves, and can
+  also read it from a file if this is more convenient.
 
   [1mNOTE[22m: Some DSL providers only allow you to use one recorder at a time,
   so you may need to limit yourself to one recorder in MythTV and turn
@@ -977,7 +974,6 @@
      supported by the IvyTV driver)
 
   +o  ATI All-in-Wonder series
-
 
 
   [1m3.1.7.  Sound card[0m
@@ -1039,6 +1035,7 @@
 
   Note that with some video cards and X drivers, XVideo extensions are
   only supported on the VGA output, and not on the TV output.
+
 
   [1m3.1.9.  Cards with TV-out[0m
 
@@ -1106,10 +1103,10 @@
   The PVR-350 is unique amongst the Hauppauge PVR-x50 cards in that it
   also supports audio output, but you need to connect that audio output
   to something.  There are two courses of action you may take:
+
   1. Take the audio output from the PVR-350 and plug it into an input on
      a sound card on your machine.  You may then use MythTV's internal
      audio controls.
-
   2. Take the audio output from the PVR-350 and connect it directly to
      your television / audio system.  You must indicate that you are
      using external audio control on the PVR-350 setup page.
@@ -1168,6 +1165,8 @@
 
   A number of people have created pre-compiled packages for MythTV that
   may make your installation easier.
+
+
 
           [1mBIG FAT WARNING[22m:  This HOWTO assumes that you have [4mnot[0m
   installed MythTV from a package.  All example command lines and file
@@ -7048,6 +7047,7 @@
        $ grep "INSERT INTO recorded "       mythtv_backup.sql >> restore.sql
        $ grep "INSERT INTO oldrecorded "    mythtv_backup.sql >> restore.sql
        $ grep "INSERT INTO recordedmarkup " mythtv_backup.sql >> restore.sql
+       $ grep "INSERT INTO recordedseek "   mythtv_backup.sql >> restore.sql
 
 
 
@@ -7065,12 +7065,14 @@
        $ grep "INSERT INTO \`recorded\` "       mythtv_backup.sql >> restore.sql
        $ grep "INSERT INTO \`oldrecorded\` "    mythtv_backup.sql >> restore.sql
        $ grep "INSERT INTO \`recordedmarkup\` " mythtv_backup.sql >> restore.sql
+       $ grep "INSERT INTO \`recordedseek\` "   mythtv_backup.sql >> restore.sql
 
 
 
   Note the space after the table name and the ">>" to append to the file
-  for all but the first [1mgrep[22m. "recordedmarkup" is huge and may be
-  hundreds of thousands of lines if you had lots of hours of recordings.
+  for all but the first [1mgrep[22m. "recordedmarkup" and "recordedseek" are
+  huge and there may be hundreds of thousands of lines if you had lots
+  of hours of recordings.
 
   After you have moved the data files to the new hardware, configure
   MythTV using the [1mmythtv-setup [22mprogram as you normally would with a
@@ -7101,6 +7103,7 @@
   that will allow you to use the btaudio module is the MSP34xx.
   However, having a MSP34xx is no guarantee that you will be able to use
   the btaudio module.
+
   As of 2003-03-31, this is the current list of cards and their status:
   Works with btaudio:
 
@@ -7157,15 +7160,18 @@
   MySQL:
 
 
-       $ mysql -u root mythconverg
-       mysql> select chanid from channel where channum=15;
-       +--------+
-       | chanid |
-       +--------+
-       |   1015 |
-       +--------+
-       1 row in set (0.00 sec)
-       mysql> delete from channel where chanid = 1015;
+
+  $ mysql -u root mythconverg
+  mysql> select chanid from channel where channum=15;
+  +--------+
+  | chanid |
+  +--------+
+  |   1015 |
+  +--------+
+  1 row in set (0.00 sec)
+  mysql> delete from channel where chanid = 1015;
+
+
 
   Old program data will be removed over the course of a week. However,
   you may want to immediately delete any current program listings for
@@ -7214,6 +7220,7 @@
   additional information regarding performance optimization.
 
 
+
   [1m23.11.  Automatically starting mythfrontend at system boot time[0m
 
   Here's an example submitted to the mythtv-dev list by Pat Pflaum
@@ -7228,6 +7235,8 @@
        Style myth* NoTitle, NoHandles, Sticky, WindowListSkip, SloppyFocus, GrabFocus, BorderWidth 0
        ^D
        $
+
+
 
   The following also works with blackbox:
 
@@ -7292,10 +7301,10 @@
   runlevels 3, 4 or 5:
 
 
-  $ su
-  # chkconfig --level 345 mythbackend on
-  # exit
-  $
+       $ su
+       # chkconfig --level 345 mythbackend on
+       # exit
+       $
 
 
 

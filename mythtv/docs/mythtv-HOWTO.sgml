@@ -3,7 +3,7 @@
 <title>Installing and using MythTV
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com"
 name="mailto:rkulagow@rocketmail.com">
-<date>2006-11-13, v0.20.08
+<date>2006-11-17, v0.20.09
 <abstract>
 Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -5969,6 +5969,7 @@ $ grep "INSERT INTO record "         mythtv_backup.sql > restore.sql
 $ grep "INSERT INTO recorded "       mythtv_backup.sql >> restore.sql
 $ grep "INSERT INTO oldrecorded "    mythtv_backup.sql >> restore.sql
 $ grep "INSERT INTO recordedmarkup " mythtv_backup.sql >> restore.sql
+$ grep "INSERT INTO recordedseek "   mythtv_backup.sql >> restore.sql
 </verb></tscreen>
 
 <bf>NOTE</bf>:  Newer versions of <bf>mysqldump</bf> place backticks around
@@ -5984,11 +5985,13 @@ $ grep "INSERT INTO \`record\` "         mythtv_backup.sql > restore.sql
 $ grep "INSERT INTO \`recorded\` "       mythtv_backup.sql >> restore.sql
 $ grep "INSERT INTO \`oldrecorded\` "    mythtv_backup.sql >> restore.sql
 $ grep "INSERT INTO \`recordedmarkup\` " mythtv_backup.sql >> restore.sql
+$ grep "INSERT INTO \`recordedseek\` "   mythtv_backup.sql >> restore.sql
 </verb></tscreen>
 
 Note the space after the table name and the ">>" to append to the file for
-all but the first <bf>grep</bf>. "recordedmarkup" is huge and may be
-hundreds of thousands of lines if you had lots of hours of recordings.
+all but the first <bf>grep</bf>. "recordedmarkup" and "recordedseek" are
+huge and there may be hundreds of thousands of lines if you had lots of
+hours of recordings.
 
 After you have moved the data files to the new hardware, configure MythTV
 using the <bf>mythtv-setup</bf> program as you normally would with a
@@ -7096,6 +7099,8 @@ it's under contrib/
 v0.20.06, 2006-11-02.  Update compile docs; no reason not to use at least -j 2
 v0.20.07, 2006-11-08.  HDHR does QAM.
 v0.20.08, 2006-11-13.  Update IPTV portion.
+v0.20.09, 2006-11-17.  Update backup portion now that there's an additional
+table.  Closes #2696.
 -->
 
 <!--

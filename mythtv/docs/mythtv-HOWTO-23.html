@@ -289,6 +289,7 @@ $ grep "INSERT INTO record "         mythtv_backup.sql > restore.sql
 $ grep "INSERT INTO recorded "       mythtv_backup.sql >> restore.sql
 $ grep "INSERT INTO oldrecorded "    mythtv_backup.sql >> restore.sql
 $ grep "INSERT INTO recordedmarkup " mythtv_backup.sql >> restore.sql
+$ grep "INSERT INTO recordedseek "   mythtv_backup.sql >> restore.sql
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
@@ -305,12 +306,14 @@ $ grep "INSERT INTO \`record\` "         mythtv_backup.sql > restore.sql
 $ grep "INSERT INTO \`recorded\` "       mythtv_backup.sql >> restore.sql
 $ grep "INSERT INTO \`oldrecorded\` "    mythtv_backup.sql >> restore.sql
 $ grep "INSERT INTO \`recordedmarkup\` " mythtv_backup.sql >> restore.sql
+$ grep "INSERT INTO \`recordedseek\` "   mythtv_backup.sql >> restore.sql
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
 <P>Note the space after the table name and the ">>" to append to the file for
-all but the first <B>grep</B>. "recordedmarkup" is huge and may be
-hundreds of thousands of lines if you had lots of hours of recordings.</P>
+all but the first <B>grep</B>. "recordedmarkup" and "recordedseek" are
+huge and there may be hundreds of thousands of lines if you had lots of
+hours of recordings.</P>
 <P>After you have moved the data files to the new hardware, configure MythTV
 using the <B>mythtv-setup</B> program as you normally would with a
 standard MythTV installation.</P>

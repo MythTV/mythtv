@@ -8,7 +8,7 @@
 <H1>Installing and using MythTV</H1>
 
 <H2>Robert Kulagowski, 
-<A HREF="mailto:rkulagow@rocketmail.com">mailto:rkulagow@rocketmail.com</A></H2>2006-11-08, v0.20.07
+<A HREF="mailto:rkulagow@rocketmail.com">mailto:rkulagow@rocketmail.com</A></H2>2006-11-17, v0.20.09
 <HR>
 <EM>Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -789,16 +789,14 @@ Plextor to capture hardware encoded MPEG-4, so the host CPU requirements are low
 <A HREF="http://www.isely.net/pvrusb2/">http://www.isely.net/pvrusb2/</A>) emulates a PVR-x50
 card.</P>
 
-<H3>IP Recorders (RTSP, UDP)</H3>
+<H3>IP Recorder (RTSP, RTS, UDP)</H3>
 
-<P>RTSP MPEG-2 TS recording is supported using the Freebox recorder in
-MythTV, which expects the channels to be supplied as a m3u playlist. If your
-DSL/Fiber provider supplies television service, but does not provide a m3u
-playlist for the channels, you can construct one for your own use (you do
-not need to download it from the same server as the streams themselves).</P>
-<P>UDP MPEG-2 TS and MPEG-4 TS recording is supported by the CRC IP Network
-recorder, but this recorder only supports recording of a single channel per
-recorder.</P>
+<P>MPEG-2, MPEG-4 and H.264 internet TS stream recording is supported using
+the IPTV recorder in MythTV. This recorder expects the channels to be supplied
+as a m3u playlist. If your DSL/Fiber provider supplies television service,
+but does not provide a m3u playlist for the channels, you can construct one
+for your own use. You do not need to download it from the same server as the
+streams themselves, and can also read it from a file if this is more convenient.</P>
 <P><B>NOTE</B>: Some DSL providers only allow you to use one recorder at a
 time, so you may need to limit yourself to one recorder in MythTV and turn
 off any set top box the cable provider sold or rented to you with your
@@ -6534,6 +6532,7 @@ $ grep "INSERT INTO record "         mythtv_backup.sql > restore.sql
 $ grep "INSERT INTO recorded "       mythtv_backup.sql >> restore.sql
 $ grep "INSERT INTO oldrecorded "    mythtv_backup.sql >> restore.sql
 $ grep "INSERT INTO recordedmarkup " mythtv_backup.sql >> restore.sql
+$ grep "INSERT INTO recordedseek "   mythtv_backup.sql >> restore.sql
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
@@ -6550,12 +6549,14 @@ $ grep "INSERT INTO \`record\` "         mythtv_backup.sql > restore.sql
 $ grep "INSERT INTO \`recorded\` "       mythtv_backup.sql >> restore.sql
 $ grep "INSERT INTO \`oldrecorded\` "    mythtv_backup.sql >> restore.sql
 $ grep "INSERT INTO \`recordedmarkup\` " mythtv_backup.sql >> restore.sql
+$ grep "INSERT INTO \`recordedseek\` "   mythtv_backup.sql >> restore.sql
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
 <P>Note the space after the table name and the ">>" to append to the file for
-all but the first <B>grep</B>. "recordedmarkup" is huge and may be
-hundreds of thousands of lines if you had lots of hours of recordings.</P>
+all but the first <B>grep</B>. "recordedmarkup" and "recordedseek" are
+huge and there may be hundreds of thousands of lines if you had lots of
+hours of recordings.</P>
 <P>After you have moved the data files to the new hardware, configure MythTV
 using the <B>mythtv-setup</B> program as you normally would with a
 standard MythTV installation.</P>
