@@ -268,16 +268,16 @@ package MythTV::Recording;
         my $data = `$program -v -v -v -v -nolirc -nojoystick -vo null -ao null -frames 0 -identify '$file' 2>/dev/null`;
         study $data;
         ($info{'video_type'})            = $data =~ m/^VIDEO:\s*(MPEG[12])/m;
-        ($info{'width'})                 = $data =~ m/^ID_VIDEO_WIDTH=((?!0.0)\d+)/m;
-        ($info{'height'})                = $data =~ m/^ID_VIDEO_HEIGHT=((?!0.0)\d+)/m;
-        ($info{'fps'})                   = $data =~ m/^ID_VIDEO_FPS=((?!0.0)\d+(?:\.\d*)?)/m;
-        ($info{'audio_sample_rate'})     = $data =~ m/^ID_AUDIO_RATE=((?!0.0)\d+)/m;
-        ($info{'audio_bitrate'})         = $data =~ m/^ID_AUDIO_BITRATE=((?!0.0)\d+)/m;
+        ($info{'width'})                 = $data =~ m/^ID_VIDEO_WIDTH=((?!0\.0)\d+)/m;
+        ($info{'height'})                = $data =~ m/^ID_VIDEO_HEIGHT=((?!0\.0)\d+)/m;
+        ($info{'fps'})                   = $data =~ m/^ID_VIDEO_FPS=((?!0\.0)\d+(?:\.\d*)?)/m;
+        ($info{'audio_sample_rate'})     = $data =~ m/^ID_AUDIO_RATE=((?!0\.0)\d+)/m;
+        ($info{'audio_bitrate'})         = $data =~ m/^ID_AUDIO_BITRATE=((?!0\.0)\d+)/m;
         ($info{'audio_bits_per_sample'}) = $data =~ m/^AUDIO:.+?ch,\s*[su](8|16)/mi;
-        ($info{'audio_channels'})        = $data =~ m/^ID_AUDIO_NCH=((?!0.0)\d+)/m;
-        ($info{'fps'})                   = $data =~ m/^ID_VIDEO_FPS=((?!0.0)\d+(?:\.\d*)?)/m;
-        ($info{'aspect'})                = $data =~ m/^ID_VIDEO_ASPECT=((?!0.0)\d+(?:[\.\,]\d*)?)/m;
-        ($info{'audio_type'})            = $data =~ m/^ID_AUDIO_CODEC=((?!0.0)\d+(?:\.\d*)?)/m;
+        ($info{'audio_channels'})        = $data =~ m/^ID_AUDIO_NCH=((?!0\.0)\d+)/m;
+        ($info{'fps'})                   = $data =~ m/^ID_VIDEO_FPS=((?!0\.0)\d+(?:\.\d*)?)/m;
+        ($info{'aspect'})                = $data =~ m/^ID_VIDEO_ASPECT=((?!0\.0)\d+(?:[\.\,]\d*)?)/m;
+        ($info{'audio_type'})            = $data =~ m/^ID_AUDIO_CODEC=((?!0\.0)\d+(?:\.\d*)?)/m;
         ($info{'mpeg_stream_type'})      = $data =~ m/^ID_DEMUXER=(\w+)/mi;
     # Stream type
         $info{'mpeg_stream_type'} = lc($info{'mpeg_stream_type'});
@@ -313,7 +313,7 @@ package MythTV::Recording;
             $info{'height'} = 1088;
         }
     # mplayer is confused and we need to detect the aspect on our own
-        if ($info{'aspect'} =~ /^0.0/) {
+        if (!$info{'aspect'}) {
             if ($info{'height'} == 1088 || $info{'height'} == 720) {
                 $info{'aspect'} = 16 / 9;
             }
