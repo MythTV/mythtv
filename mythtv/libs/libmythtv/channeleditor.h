@@ -21,7 +21,7 @@ public slots:
     void del();
     void edit();
     void edit(int);
-    void scan();
+    void scan(void);
     void transportEditor();
     void deleteChannels();
 

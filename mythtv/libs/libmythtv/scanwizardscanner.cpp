@@ -71,7 +71,20 @@
 /// Percentage to set to after the first tune
 #define TUNED_PCT     3
 
-const QString ScanWizardScanner::strTitle(QObject::tr("Scanning"));
+QString ScanWizardScanner::kTitle = QString::null;
+
+// kTitel must be initialized after the Qt translation system is initialized...
+static void init_statics(void)
+{
+    static QMutex lock;
+    static bool do_init = true;
+    QMutexLocker locker(&lock);
+    if (do_init)
+    {
+        ScanWizardScanner::kTitle = ScanWizardScanner::tr("Scanning");
+        do_init = false;
+    }
+}
 
 void post_event(QObject *dest, ScannerEvent::TYPE type, int val)
 {
@@ -80,45 +93,26 @@ void post_event(QObject *dest, ScannerEvent::TYPE type, int val)
     QApplication::postEvent(dest, e);
 }
 
-DVBChannel *ScanWizardScanner::GetDVBChannel(void)
-{
-#ifdef USING_DVB
-    return dynamic_cast<DVBChannel*>(channel);
-#else
-    return NULL;
-#endif
-}
-
-Channel *ScanWizardScanner::GetChannel(void)
-{
-#ifdef USING_V4L
-    return dynamic_cast<Channel*>(channel);
-#else
-    return NULL;
-#endif
-}
-
-ScanWizardScanner::ScanWizardScanner(ScanWizard *_parent)
+ScanWizardScanner::ScanWizardScanner(void)
     : VerticalConfigurationGroup(false, true, false, false),
-      parent(_parent),
       log(new LogList()),
       channel(NULL),                popupProgress(NULL),
       scanner(NULL),                analogScanner(NULL),
       freeboxScanner(NULL),
-      nScanType(-1),
-      nMultiplexToTuneTo(0),        nVideoSource(0),
       frequency(0),                 modulation("8vsb")
 {
-    setLabel(strTitle);
+    init_statics();
+
+    setLabel(kTitle);
     addChild(log);
 }
 
-void ScanWizardScanner::finish()
+void ScanWizardScanner::Teardown()
 {
     // Join the thread and close the channel
     if (scanner)
     {
-        delete scanner;
+        delete scanner; // TODO we should use deleteLater...
         scanner = NULL;
     }
 
@@ -132,7 +126,7 @@ void ScanWizardScanner::finish()
     if (analogScanner)
     {
         analogScanner->stop();
-        delete analogScanner;
+        analogScanner->deleteLater();
         analogScanner = NULL;
     }
 #endif
@@ -141,10 +135,16 @@ void ScanWizardScanner::finish()
     if (freeboxScanner)
     {
         freeboxScanner->Stop();
-        delete freeboxScanner;
+        freeboxScanner->deleteLater();
         freeboxScanner = NULL;
     }
 #endif
+
+    if (popupProgress)
+    {
+        delete popupProgress; // TODO we should use deleteLater...
+        popupProgress = NULL;
+    }
 }
 
 void ScanWizardScanner::customEvent(QCustomEvent *e)
@@ -160,7 +160,7 @@ void ScanWizardScanner::customEvent(QCustomEvent *e)
     {
         case ScannerEvent::ServiceScanComplete:
             popupProgress->progress(PROGRESS_MAX);
-            cancelScan();
+            Teardown();
             break;
         case ScannerEvent::Update:
             log->updateText(scanEvent->strValue());
@@ -181,20 +181,6 @@ void ScanWizardScanner::customEvent(QCustomEvent *e)
         case ScannerEvent::DVBSignalStrength:
             popupProgress->signalStrength(scanEvent->intValue());
             break;
-        case ScannerEvent::TuneComplete:
-        {
-            if (scanEvent->intValue() == ScannerEvent::OK)
-            {
-                HandleTuneComplete();
-            }
-            else
-            {
-                MythPopupBox::showOkPopup(gContext->GetMainWindow(),
-                                          tr("ScanWizard"),
-                                          tr("Error tuning to transport"));
-                cancelScan();
-            }
-        }
     }
 }
 
@@ -273,132 +259,165 @@ void ScanWizardScanner::dvbSignalStrength(int i)
     QApplication::postEvent(this, e);
 }
 
-void ScanWizardScanner::cancelScan()
-{
-    finish();
-    delete popupProgress;
-    popupProgress = NULL;
-}
-
 // full scan of existing transports broken
 // existing transport scan broken
-void ScanWizardScanner::scan()
+void ScanWizardScanner::Scan(
+    int            scantype,
+    uint           parent_cardid,
+    uint           child_cardid,
+    const QString &inputname,
+    uint           sourceid,
+    bool           do_delete_channels,
+    bool           do_rename_channels,
+    bool           do_ignore_signal_timeout,
+    // stuff needed for particular scans
+    uint           mplexid /* TransportScan */,
+    const QMap<QString,QString> &startChan /* NITAddScan */,
+    const QString &mod /* FullScan */,
+    const QString &tbl /* FullScan */,
+    const QString &atsc_format /* any ATSC scan */)
 {
-    int  ccardid = parent->captureCard();
-    int  pcardid = CardUtil::GetParentCardID(ccardid);
-    int  cardid  = (pcardid) ? pcardid : ccardid;
-    nScanType    = parent->scanType();
-    nVideoSource = parent->videoSource();
-    bool do_scan = true;
-    DTVTunerType parse_type = DTVTunerType::kTunerTypeUnknown;
+    nVideoSource = sourceid;
+    PreScanCommon(scantype, parent_cardid, child_cardid, inputname,
+                  sourceid, do_ignore_signal_timeout);
 
-    VERBOSE(VB_SIPARSER, LOC + "scan(): " +
-            QString("type(%1) src(%2) cardid(%3)")
-            .arg(nScanType).arg(nVideoSource).arg(cardid));
+    VERBOSE(VB_SIPARSER, LOC + "HandleTuneComplete()");
 
-    if (nScanType == ScanTypeSetting::FullScan_Analog)
+    if (!scanner)
     {
-        do_scan = false;
-        ScanAnalog(cardid, nVideoSource);
-    }
-    else if (nScanType == ScanTypeSetting::DVBUtilsImport)
-    {
-        ImportDVBUtils(nVideoSource, parent->nCardType, parent->filename());
-    }
-    else if ((nScanType == ScanTypeSetting::FullScan_ATSC)     ||
-             (nScanType == ScanTypeSetting::FullTransportScan) ||
-             (nScanType == ScanTypeSetting::TransportScan)     ||
-             (nScanType == ScanTypeSetting::FullScan_OFDM))
-    {
-        ;
-    }
-    else if (nScanType == ScanTypeSetting::NITAddScan_OFDM)
-    {
-        OFDMPane *pane = parent->paneOFDM;
-        startChan.clear();
-        startChan["std"]            = "dvb";
-        startChan["frequency"]      = pane->frequency();
-        startChan["inversion"]      = pane->inversion();
-        startChan["bandwidth"]      = pane->bandwidth();
-        startChan["modulation"]     = "ofdm";
-        startChan["coderate_hp"]    = pane->coderate_hp();
-        startChan["coderate_lp"]    = pane->coderate_lp();
-        startChan["constellation"]  = pane->constellation();
-        startChan["trans_mode"]     = pane->trans_mode();
-        startChan["guard_interval"] = pane->guard_interval();
-        startChan["hierarchy"]      = pane->hierarchy();
-
-        parse_type = DTVTunerType::kTunerTypeOFDM;
-    }
-    else if (nScanType == ScanTypeSetting::NITAddScan_QPSK)
-    {
-        QPSKPane *pane = parent->paneQPSK;
-        startChan.clear();
-        startChan["std"]        = "dvb";
-        startChan["frequency"]  = pane->frequency();
-        startChan["inversion"]  = pane->inversion();
-        startChan["symbolrate"] = pane->symbolrate();
-        startChan["fec"]        = pane->fec();
-        startChan["modulation"] = "qpsk";
-        startChan["polarity"]   = pane->polarity();
-
-        parse_type = DTVTunerType::kTunerTypeQPSK;
-    }
-    else if (nScanType == ScanTypeSetting::NITAddScan_QAM)
-    {
-        QAMPane *pane = parent->paneQAM;
-        startChan.clear();
-        startChan["std"]        = "dvb";
-        startChan["frequency"]  = pane->frequency();
-        startChan["inversion"]  = pane->inversion();
-        startChan["symbolrate"] = pane->symbolrate();
-        startChan["fec"]        = pane->fec();
-        startChan["modulation"] = pane->modulation();
-
-        parse_type = DTVTunerType::kTunerTypeQAM;
-    }
-    else if (nScanType == ScanTypeSetting::IPTVImport)
-    {
-        do_scan = false;
-        ImportM3U(cardid, nVideoSource);
-    }
-    else
-    {
-        do_scan = false;
-        VERBOSE(VB_SIPARSER, LOC_ERR + "scan(): " +
-                QString("type(%1) src(%2) cardid(%3) not handled")
-                .arg(nScanType).arg(nVideoSource).arg(cardid));
-
-        MythPopupBox::showOkPopup(
-            gContext->GetMainWindow(), tr("ScanWizard"),
-            "Programmer Error, see console");
+        VERBOSE(VB_SIPARSER, LOC + "HandleTuneComplete(): "
+                "scanner does not exist...");
+        return;
     }
 
-    DTVMultiplex tuning;
-    if ((DTVTunerType::kTunerTypeUnknown != parse_type) &&
-        !tuning.ParseTuningParams(
-            parse_type,
-            startChan["frequency"],      startChan["inversion"],
-            startChan["symbolrate"],     startChan["fec"],
-            startChan["polarity"],
-            startChan["coderate_hp"],    startChan["coderate_lp"],
-            startChan["constellation"],  startChan["trans_mode"],
-            startChan["guard_interval"], startChan["hierarchy"],
-            startChan["modulation"],     startChan["bandwidth"]))
-    {
-        MythPopupBox::showOkPopup(
-            gContext->GetMainWindow(), tr("ScanWizard"),
-            tr("Error parsing parameters"));
+    scanner->StartScanner();
 
-        do_scan = false;
+    popupProgress->status(tr("Scanning"));
+    popupProgress->progress( (TUNED_PCT * PROGRESS_MAX) / 100 );
+
+    QString std = (ScanTypeSetting::FullScan_ATSC == scantype)? "atsc":"dvbt";
+
+    bool ok = false;
+
+    if (do_delete_channels && (ScanTypeSetting::TransportScan == scantype))
+    {
+        MSqlQuery query(MSqlQuery::InitCon());
+        query.prepare("DELETE FROM channel "
+                      "WHERE sourceid = :SOURCEID AND "
+                      "      mplexid  = :MPLEXID");
+        query.bindValue(":SOURCEID", sourceid);
+        query.bindValue(":MPLEXID",  mplexid);
+        query.exec();
+    }
+    else if (do_delete_channels)
+    {
+        MSqlQuery query(MSqlQuery::InitCon());
+        query.prepare("DELETE FROM channel "
+                      "WHERE sourceid = :SOURCEID");
+        query.bindValue(":SOURCEID", sourceid);
+        query.exec();
+
+        if (ScanTypeSetting::TransportScan != scantype)
+        {
+            query.prepare("DELETE FROM dtv_multiplex "
+                          "WHERE sourceid = :SOURCEID");
+            query.bindValue(":SOURCEID", sourceid);
+            query.exec();
+        }
     }
 
-    if (do_scan)
+    scanner->SetChannelFormat(atsc_format);
+    scanner->SetRenameChannels(do_rename_channels);
+
+    if ((ScanTypeSetting::FullScan_ATSC == scantype) ||
+        (ScanTypeSetting::FullScan_OFDM == scantype))
     {
-        PreScanCommon(cardid, nVideoSource);
-        ScannerEvent* e = new ScannerEvent(ScannerEvent::TuneComplete);
-        e->intValue(ScannerEvent::OK);
-        QApplication::postEvent(this, e);
+        VERBOSE(VB_SIPARSER, LOC +
+                "ScanTransports("<<std<<", "<<mod<<", "<<tbl<<")");
+
+        // HACK HACK HACK -- begin
+        // if using QAM we may need additional time... (at least with HD-3000)
+        if ((mod.left(3).lower() == "qam") &&
+            (scanner->GetSignalTimeout() < 1000))
+        {
+            scanner->SetSignalTimeout(1000);
+        }
+        // HACK HACK HACK -- end
+
+        ok = scanner->ScanTransports(sourceid, std, mod, tbl);
+    }
+    else if ((ScanTypeSetting::NITAddScan_OFDM == scantype) ||
+             (ScanTypeSetting::NITAddScan_QPSK == scantype) ||
+             (ScanTypeSetting::NITAddScan_QAM  == scantype))
+    {
+        VERBOSE(VB_SIPARSER, LOC + "ScanTransports()");
+
+        ok = scanner->ScanTransportsStartingOn(sourceid, startChan);
+    }
+    else if (ScanTypeSetting::FullTransportScan == scantype)
+    {
+        VERBOSE(VB_SIPARSER, LOC + "ScanServicesSourceID("<<sourceid<<")");
+
+        ok = scanner->ScanServicesSourceID(sourceid);
+        if (ok)
+        {
+            post_event(this, ScannerEvent::ServicePct,
+                       TRANSPORT_PCT);
+        }
+        else
+        {
+            MythPopupBox::showOkPopup(gContext->GetMainWindow(),
+                                      tr("ScanWizard"),
+                                      tr("Error tuning to transport"));
+            Teardown();
+        }
+    }
+    else if ((ScanTypeSetting::DVBUtilsImport == scantype) && channels.size())
+    {
+        ok = true;
+
+        VERBOSE(VB_SIPARSER, LOC + "ScanForChannels("<<sourceid<<")");
+
+        QString card_type = CardUtil::GetRawCardType(parent_cardid, inputname);
+        QString sub_type  = card_type;
+        if (card_type == "DVB")
+        {
+            QString device = CardUtil::GetVideoDevice(
+                parent_cardid, inputname);
+
+            ok = !device.isEmpty();
+            if (ok)
+                sub_type = CardUtil::ProbeDVBType(device.toUInt()).upper();
+        }
+
+        if (ok)
+        {
+            ok = scanner->ScanForChannels(sourceid, std,
+                                          sub_type, channels);
+        }
+        if (ok)
+        {
+            post_event(this, ScannerEvent::ServicePct,
+                       TRANSPORT_PCT);
+        }
+        else
+        {
+            MythPopupBox::showOkPopup(gContext->GetMainWindow(),
+                                      tr("ScanWizard"),
+                                      tr("Error tuning to transport"));
+            Teardown();
+        }
+    }
+    else if (ScanTypeSetting::TransportScan == scantype)
+    {
+        VERBOSE(VB_SIPARSER, LOC + "ScanTransport("<<mplexid<<")");
+
+        ok = scanner->ScanTransport(mplexid);
+    }
+
+    if (!ok)
+    {
+        VERBOSE(VB_IMPORTANT, "Failed to handle tune complete.");
     }
 }
 
@@ -434,20 +453,26 @@ void ScanWizardScanner::ImportDVBUtils(uint sourceid, int cardtype,
     }
 }
 
-void ScanWizardScanner::PreScanCommon(uint cardid, uint sourceid)
+void ScanWizardScanner::PreScanCommon(int scantype,
+                                      uint pcardid,
+                                      uint ccardid,
+                                      const QString &inputname,
+                                      uint sourceid,
+                                      bool do_ignore_signal_timeout)
 {
+    uint hw_cardid       = (ccardid) ? ccardid : pcardid;
     uint signal_timeout  = 1000;
     uint channel_timeout = 40000;
-    CardUtil::GetTimeouts(parent->captureCard(),
-                          signal_timeout, channel_timeout);
+    CardUtil::GetTimeouts(hw_cardid, signal_timeout, channel_timeout);
 
-    nMultiplexToTuneTo = parent->paneSingle->GetMultiplex();
-
-    QString device = CardUtil::GetVideoDevice(cardid, sourceid);
+    QString device = CardUtil::GetVideoDevice(pcardid, inputname);
     if (device.isEmpty())
+    {
+        VERBOSE(VB_IMPORTANT, "No Device");
         return;
+    }
 
-    QString card_type = CardUtil::GetRawCardType(cardid, sourceid);
+    QString card_type = CardUtil::GetRawCardType(pcardid, inputname);
 
     if ("DVB" == card_type)
     {
@@ -457,10 +482,10 @@ void ScanWizardScanner::PreScanCommon(uint cardid, uint sourceid)
                          ("OFDM" == sub_type));
 
         // Ugh, Some DVB drivers don't fully support signal monitoring...
-        if (ScanTypeSetting::TransportScan == parent->scanType() ||
-            ScanTypeSetting::FullTransportScan == parent->scanType())
+        if ((ScanTypeSetting::TransportScan     == scantype) ||
+            (ScanTypeSetting::FullTransportScan == scantype))
         {
-            signal_timeout = (parent->ignoreSignalTimeout()) ?
+            signal_timeout = (do_ignore_signal_timeout) ?
                 channel_timeout * 10 : signal_timeout;
         }
 
@@ -482,7 +507,7 @@ void ScanWizardScanner::PreScanCommon(uint cardid, uint sourceid)
 #ifdef USING_HDHOMERUN
     if ("HDHOMERUN" == card_type)
     {
-        uint tuner = CardUtil::GetHDHRTuner(cardid, sourceid);
+        uint tuner = CardUtil::GetHDHRTuner(pcardid, inputname);
         channel = new HDHRChannel(NULL, device, tuner);
     }
 #endif // USING_HDHOMERUN
@@ -494,7 +519,7 @@ void ScanWizardScanner::PreScanCommon(uint cardid, uint sourceid)
     }
 
     // explicitly set the cardid
-    channel->SetCardID(cardid);
+    channel->SetCardID(pcardid);
 
     // If the backend is running this may fail...
     if (!channel->Open())
@@ -503,15 +528,15 @@ void ScanWizardScanner::PreScanCommon(uint cardid, uint sourceid)
         return;
     }
 
-    scanner = new SIScan(card_type, channel, parent->videoSource(),
+    scanner = new SIScan(card_type, channel, sourceid,
                          signal_timeout, channel_timeout);
 
     scanner->SetForceUpdate(true);
 
-    bool ftao = CardUtil::IgnoreEncrypted(cardid, channel->GetCurrentInput());
+    bool ftao = CardUtil::IgnoreEncrypted(pcardid, inputname);
     scanner->SetFTAOnly(ftao);
 
-    bool tvo = CardUtil::TVOnly(cardid, channel->GetCurrentInput());
+    bool tvo = CardUtil::TVOnly(pcardid, inputname);
     scanner->SetTVOnly(tvo);
 
     connect(scanner, SIGNAL(ServiceScanComplete(void)),
@@ -557,11 +582,12 @@ void ScanWizardScanner::PreScanCommon(uint cardid, uint sourceid)
     popupProgress->exec(this);
 }
 
-void ScanWizardScanner::ScanAnalog(uint cardid, uint sourceid)
+void ScanWizardScanner::ScanAnalog(
+    uint cardid, const QString &inputname, uint sourceid)
 {
 #ifdef USING_V4L
     //Create an analog scan object
-    analogScanner    = new AnalogScan(sourceid, cardid);
+    analogScanner = new AnalogScan(cardid, sourceid, inputname);
     popupProgress = new ScanProgressPopup(this, false);
 
     connect(analogScanner, SIGNAL(serviceScanComplete(void)),
@@ -579,16 +605,17 @@ void ScanWizardScanner::ScanAnalog(uint cardid, uint sourceid)
         MythPopupBox::showOkPopup(gContext->GetMainWindow(),
                                   tr("ScanWizard"),
                                   tr("Error starting scan"));
-        cancelScan();
+        Teardown();
     }
 #endif
 }
 
-void ScanWizardScanner::ImportM3U(uint cardid, uint sourceid)
+void ScanWizardScanner::ImportM3U(uint cardid, const QString &inputname,
+                                  uint sourceid)
 {
 #ifdef USING_IPTV
     //Create an analog scan object
-    freeboxScanner = new IPTVChannelFetcher(sourceid, cardid);
+    freeboxScanner = new IPTVChannelFetcher(cardid, inputname, sourceid);
     popupProgress  = new ScanProgressPopup(this, false);
 
     connect(freeboxScanner, SIGNAL(ServiceScanComplete(void)),
@@ -606,178 +633,7 @@ void ScanWizardScanner::ImportM3U(uint cardid, uint sourceid)
         MythPopupBox::showOkPopup(gContext->GetMainWindow(),
                                   tr("ScanWizard"),
                                   tr("Error starting scan"));
-        cancelScan();
+        Teardown();
     }
 #endif // USING_IPTV
-}
-
-void ScanWizardScanner::HandleTuneComplete(void)
-{
-    VERBOSE(VB_SIPARSER, LOC + "HandleTuneComplete()");
-
-    if (!scanner)
-    {
-        VERBOSE(VB_SIPARSER, LOC + "HandleTuneComplete(): "
-                "Waiting for scan to start.");
-        MythTimer t;
-        t.start();
-        while (!scanner && t.elapsed() < 500)
-            usleep(250);
-        if (!scanner)
-        {
-            VERBOSE(VB_SIPARSER, LOC +
-                    "HandleTuneComplete(): "
-                    "scan() did not start scanner! Aborting.");
-            return;
-        }
-        VERBOSE(VB_SIPARSER, LOC + "HandleTuneComplete(): "
-                "scan() has started scanner.");
-        usleep(5000);
-    }
-
-    scanner->StartScanner();
-
-    popupProgress->status(tr("Scanning"));
-    popupProgress->progress( (TUNED_PCT * PROGRESS_MAX) / 100 );
-
-    QString std     = "dvbt";
-    QString mod     = "ofdm";
-    QString country = parent->country();
-    if (nScanType == ScanTypeSetting::FullScan_ATSC)
-    {
-        std     = "atsc";
-        mod     = parent->paneATSC->atscModulation();
-        country = parent->paneATSC->atscFreqTable();
-    }
-
-    bool ok = false;
-
-    if ((nScanType == ScanTypeSetting::FullScan_ATSC) ||
-        (nScanType == ScanTypeSetting::FullScan_OFDM))
-    {
-        VERBOSE(VB_SIPARSER, LOC +
-                "ScanTransports("<<std<<", "<<mod<<", "<<country<<")");
-        scanner->SetChannelFormat(parent->paneATSC->atscFormat());
-        if (parent->paneATSC->DoDeleteChannels())
-        {
-            MSqlQuery query(MSqlQuery::InitCon());
-            query.prepare("DELETE FROM channel "
-                          "WHERE sourceid = :SOURCEID");
-            query.bindValue(":SOURCEID", nVideoSource);
-            query.exec();
-            query.prepare("DELETE FROM dtv_multiplex "
-                          "WHERE sourceid = :SOURCEID");
-            query.bindValue(":SOURCEID", nVideoSource);
-            query.exec();
-        }
-        scanner->SetRenameChannels(parent->paneATSC->DoRenameChannels());
-
-        // HACK HACK HACK -- begin
-        // if using QAM we may need additional time... (at least with HD-3000)
-        if ((mod.left(3).lower() == "qam") &&
-            (scanner->GetSignalTimeout() < 1000))
-        {
-            scanner->SetSignalTimeout(1000);
-        }
-        // HACK HACK HACK -- end
-
-        ok = scanner->ScanTransports(nVideoSource, std, mod, country);
-    }
-    else if ((nScanType == ScanTypeSetting::NITAddScan_OFDM) ||
-             (nScanType == ScanTypeSetting::NITAddScan_QPSK) ||
-             (nScanType == ScanTypeSetting::NITAddScan_QAM))
-    {
-        VERBOSE(VB_SIPARSER, LOC + "ScanTransports()");
-        scanner->SetRenameChannels(false);
-        ok = scanner->ScanTransportsStartingOn(nVideoSource, startChan);
-    }
-    else if (nScanType == ScanTypeSetting::FullTransportScan)
-    {
-        VERBOSE(VB_SIPARSER, LOC + "ScanServicesSourceID("<<nVideoSource<<")");
-        scanner->SetRenameChannels(false);
-        ok = scanner->ScanServicesSourceID(nVideoSource);
-        if (ok)
-        {
-            post_event(this, ScannerEvent::ServicePct,
-                       TRANSPORT_PCT);
-        }
-        else
-        {
-            post_event(this, ScannerEvent::TuneComplete,
-                       ScannerEvent::ERROR_TUNE);
-        }
-    }
-    else if (nScanType == ScanTypeSetting::DVBUtilsImport && channels.size())
-    {
-        ok = true;
-
-        VERBOSE(VB_SIPARSER, LOC + "ScanForChannels("<<nVideoSource<<")");
-
-        scanner->SetChannelFormat(parent->paneDVBUtilsImport->GetATSCFormat());
-
-        if (parent->paneDVBUtilsImport->DoDeleteChannels())
-        {
-            MSqlQuery query(MSqlQuery::InitCon());
-            query.prepare("DELETE FROM channel "
-                          "WHERE sourceid = :SOURCEID");
-            query.bindValue(":SOURCEID", nVideoSource);
-            query.exec();
-        }
-
-        scanner->SetRenameChannels(
-            parent->paneDVBUtilsImport->DoRenameChannels());
-
-        int  ccardid = parent->captureCard();
-        int  pcardid = CardUtil::GetParentCardID(ccardid);
-        int  cardid  = (pcardid) ? pcardid : ccardid;
-        QString card_type = CardUtil::GetRawCardType(cardid, nVideoSource);
-        QString sub_type = card_type;
-        if (card_type == "DVB")
-        {
-            QString device = CardUtil::GetVideoDevice(cardid, nVideoSource);
-            ok = !device.isEmpty();
-            if (ok)
-                sub_type = CardUtil::ProbeDVBType(device.toUInt()).upper();
-        }
-
-        if (ok)
-        {
-            ok = scanner->ScanForChannels(nVideoSource, std,
-                                          sub_type, channels);
-        }
-        if (ok)
-        {
-            post_event(this, ScannerEvent::ServicePct,
-                       TRANSPORT_PCT);
-        }
-        else
-        {
-            post_event(this, ScannerEvent::TuneComplete,
-                       ScannerEvent::ERROR_TUNE);
-        }
-    }
-    else if (nScanType == ScanTypeSetting::TransportScan)
-    {
-        VERBOSE(VB_SIPARSER, LOC + "ScanTransport("<<nMultiplexToTuneTo<<")");
-        scanner->SetChannelFormat(parent->paneSingle->atscFormat());
-
-        if (parent->paneSingle->DoDeleteChannels())
-        {
-            MSqlQuery query(MSqlQuery::InitCon());
-            query.prepare("DELETE FROM channel "
-                          "WHERE sourceid = :SOURCEID AND "
-                          "      mplexid  = :MPLEXID");
-            query.bindValue(":SOURCEID", nVideoSource);
-            query.bindValue(":MPLEXID",  nMultiplexToTuneTo);
-            query.exec();
-        }
-
-        scanner->SetRenameChannels(parent->paneSingle->DoRenameChannels());
-        ok = scanner->ScanTransport(nMultiplexToTuneTo);
-    }
-
-    if (!ok)
-    {
-        VERBOSE(VB_IMPORTANT, "Failed to handle tune complete.");
-    }
 }

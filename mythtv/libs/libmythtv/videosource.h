@@ -591,6 +591,7 @@ class CardInput : public QObject, public ConfigurationWizard
     void channelScanner();
     void sourceFetch();
     void diseqcConfig();
+    void SetSourceID(const QString &sourceid);
 
   private:
     class ID: public AutoIncrementDBSetting
@@ -600,13 +601,7 @@ class CardInput : public QObject, public ConfigurationWizard
         {
             setVisible(false);
             setName("CardInputID");
-        };
-        virtual QWidget* configWidget(ConfigurationGroup *cg, QWidget* parent,
-                                      const char* widgetName = 0)
-        {
-            (void)cg; (void)parent; (void)widgetName;
-            return NULL;
-        };
+        }
     };
 
     ID              *id;
@@ -615,6 +610,8 @@ class CardInput : public QObject, public ConfigurationWizard
     InputName       *inputname;
     SourceID        *sourceid;
     StartingChannel *startchan;
+    TransButtonSetting *scan;
+    TransButtonSetting *srcfetch;
     DiSEqCDevSettings  settings;
 };
 

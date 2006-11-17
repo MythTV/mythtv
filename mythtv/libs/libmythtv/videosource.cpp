@@ -1707,12 +1707,12 @@ CardInput::CardInput(bool isDTVcard, bool isDVBcard, int _cardid)
     }
 #endif
 
-    TransButtonSetting *scan = new TransButtonSetting();
+    scan = new TransButtonSetting();
     scan->setLabel(tr("Scan for channels"));
     scan->setHelpText(
         tr("Use channel scanner to find channels for this input."));
 
-    TransButtonSetting *srcfetch = new TransButtonSetting();
+    srcfetch = new TransButtonSetting();
     srcfetch->setLabel(tr("Fetch channels from listings source"));
     srcfetch->setHelpText(
         tr("This uses the listings data source to "
@@ -1735,10 +1735,21 @@ CardInput::CardInput(bool isDTVcard, bool isDVBcard, int _cardid)
     addChild(childid);
 
     setName("CardInput");
+    SetSourceID("-1");
+
     connect(scan,     SIGNAL(pressed()), SLOT(channelScanner()));
     connect(srcfetch, SIGNAL(pressed()), SLOT(sourceFetch()));
     connect(sourceid, SIGNAL(valueChanged(const QString&)),
             startchan,SLOT(  SetSourceID (const QString&)));
+    connect(sourceid, SIGNAL(valueChanged(const QString&)),
+            this,     SLOT(  SetSourceID (const QString&)));
+}
+
+void CardInput::SetSourceID(const QString &sourceid)
+{
+    bool enable = (sourceid.toInt() > 0);
+    scan->setEnabled(enable);
+    srcfetch->setEnabled(enable);
 }
 
 QString CardInput::getSourceName(void) const
@@ -1755,13 +1766,14 @@ void CardInput::channelScanner(void)
 {
     uint srcid = sourceid->getValue().toUInt();
     uint crdid = cardid->getValue().toUInt();
+    QString in = inputname->getValue();
 
 #ifdef USING_BACKEND
     uint num_channels_before = SourceUtil::GetChannelCount(srcid);
 
     save(); // save info for scanner.
 
-    QString cardtype = CardUtil::GetRawCardType(crdid, srcid);
+    QString cardtype = CardUtil::GetRawCardType(crdid, in);
     if (CardUtil::IsUnscanable(cardtype))
     {
         VERBOSE(VB_IMPORTANT, QString("Sorry, %1 cards do not "
@@ -1769,8 +1781,9 @@ void CardInput::channelScanner(void)
         return;
     }
 
-    ScanWizard scanwizard(srcid);
-    scanwizard.exec(false,true);
+    ScanWizard *scanwizard = new ScanWizard(srcid, crdid, in, true);
+    scanwizard->exec(false, true);
+    scanwizard->deleteLater();
 
     if (SourceUtil::GetChannelCount(srcid))
         startchan->SetSourceID(QString::number(srcid));        

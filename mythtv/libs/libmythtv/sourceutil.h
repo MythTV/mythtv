@@ -18,6 +18,7 @@ class MPUBLIC SourceUtil
                                         QString &passwd,  QString &lineupid);
     static bool    IsEncoder(uint sourceid);
     static bool    IsUnscanable(uint sourceid);
+    static bool    IsAnySourceScanable(void);
     static bool    UpdateChannelsFromListings(
         uint sourceid, QString cardtype = QString::null);
 };

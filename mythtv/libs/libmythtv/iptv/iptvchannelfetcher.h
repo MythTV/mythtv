@@ -18,8 +18,7 @@ class IPTVChannelFetcher : public QObject
     friend void *run_scan_thunk(void *param);
 
   public:
-    IPTVChannelFetcher(uint sourceid, uint cardid);
-    ~IPTVChannelFetcher();
+    IPTVChannelFetcher(uint cardid, const QString &inputname, uint sourceid);
 
     bool Scan(void);
     void Stop(void);
@@ -39,6 +38,7 @@ class IPTVChannelFetcher : public QObject
     void ServiceScanComplete(void);
 
   private:
+    ~IPTVChannelFetcher();
     void SetTotalNumChannels(uint val) { _chan_cnt = (val) ? val : 1; }
     void SetNumChannelsParsed(uint);
     void SetNumChannelsInserted(uint);
@@ -46,8 +46,9 @@ class IPTVChannelFetcher : public QObject
     void RunScan(void);
 
   private:
-    uint      _sourceid;
     uint      _cardid;
+    QString   _inputname;
+    uint      _sourceid;
     uint      _chan_cnt;
     bool      _thread_running;
     bool      _stop_now;

@@ -37,55 +37,33 @@
 #include "mythwizard.h"
 #include "settings.h"
 
-class OFDMPane;
-class QPSKPane;
-class ATSCPane;
-class QAMPane;
-class STPane;
-class DVBUtilsImportPane;
-class ScanWizardScanType;
+class ScanWizardConfig;
 class ScanWizardScanner;
 
 class ScanWizard : public QObject, public ConfigurationWizard 
 {
     Q_OBJECT
-    friend class ScanWizardScanType;
-    friend class ScanWizardScanner;
-    friend class ScanOptionalConfig;
 
   public:
-    ScanWizard(int sourceid = -1);
+    ScanWizard(uint    default_sourceid  = 0,
+               uint    default_cardid    = 0,
+               QString default_inputname = QString::null,
+               bool    force_sourceid    = false);
 
     MythDialog *dialogWidget(MythMainWindow *parent, const char *widgetName);
 
   protected slots:
-    void pageSelected(const QString &strTitle);
-    void captureCard(const QString &device);
-
-  signals:
-    void cardTypeChanged(const QString&);
+    void SetPage(const QString &pageTitle);
+    void SetInput(const QString &cardid_inputname);
 
   protected:
-    uint videoSource(void) const;
-    int captureCard(void) const;
-    int scanType(void) const;
-    bool ignoreSignalTimeout(void) const;
-    QString country(void) const;
-    QString filename(void) const;
+    ~ScanWizard() { }
 
-    OFDMPane     *paneOFDM;
-    QPSKPane     *paneQPSK;
-    ATSCPane     *paneATSC;
-    QAMPane      *paneQAM;
-    STPane       *paneSingle;
-    DVBUtilsImportPane *paneDVBUtilsImport;
-
-    int           nVideoDev;
-    unsigned      nCardType;
-    int           nCaptureCard;
-    ScanWizardScanType *configPane;
-    ScanWizardScanner  *scannerPane;
+  protected:
+    uint               lastHWCardID;
+    uint               lastHWCardType;
+    ScanWizardConfig  *configPane;
+    ScanWizardScanner *scannerPane;
 };
-
 
 #endif // SCANWIZARD_H

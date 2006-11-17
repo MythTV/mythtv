@@ -16,6 +16,7 @@
 
 #include "channelsettings.h"
 #include "transporteditor.h"
+#include "sourceutil.h"
 
 #include "scanwizard.h"
 
@@ -261,6 +262,7 @@ ChannelEditor::ChannelEditor() : ConfigurationDialog()
     buttonScan = new TransButtonSetting();
     buttonScan->setLabel(QObject::tr("Channel Scanner"));
     buttonScan->setHelpText(QObject::tr("Starts the channel scanner."));
+    buttonScan->setEnabled(SourceUtil::IsAnySourceScanable());
 
     buttonTransportEditor = new TransButtonSetting();
     buttonTransportEditor->setLabel(QObject::tr("Transport Editor"));
@@ -426,11 +428,14 @@ void ChannelEditor::menu(int /*iSelected*/)
     }
 }
 
-void ChannelEditor::scan()
+void ChannelEditor::scan(void)
 {
 #ifdef USING_BACKEND
-    ScanWizard scanwizard;
-    scanwizard.exec(false,true);
+    int val = source->getValue().toInt();
+    uint sourceid = (val > 0) ? val : 0;
+    ScanWizard *scanwizard = new ScanWizard(sourceid);
+    scanwizard->exec(false, true);
+    scanwizard->deleteLater();
 
     list->fillSelections();
     list->setFocus();

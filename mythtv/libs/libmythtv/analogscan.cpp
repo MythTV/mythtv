@@ -45,11 +45,11 @@
 
 #include "analogscan.h"
 
-AnalogScan::AnalogScan(unsigned _sourceid, unsigned _cardid) :
-    fRunning(false),
-    fStop(false),
-    sourceid(_sourceid),
-    cardid(_cardid)
+AnalogScan::AnalogScan(uint _cardid, uint _sourceid,
+                       const QString &_inputname) :
+    cardid(_cardid), sourceid(_sourceid),
+    inputname(QDeepCopy<QString>(_inputname)),
+    fRunning(false), fStop(false), nTable(0)
 {
 }
 
@@ -84,13 +84,12 @@ void AnalogScan::doScan()
     struct CHANLIST *flist   = NULL;
     uint count               = 0;
 
-    QString device = CardUtil::GetVideoDevice(cardid, sourceid);
-    QString input  = CardUtil::GetInputName(cardid, sourceid);
-    if (device.isEmpty() || input.isEmpty())
+    QString device = CardUtil::GetVideoDevice(cardid, inputname);
+    if (device.isEmpty() || inputname.isEmpty())
         goto do_scan_end;
 
     VERBOSE(VB_SIPARSER, "AnalogScan::doScan() " +
-            QString("dev(%1) input(%2)").arg(device).arg(input));
+            QString("dev(%1) input(%2)").arg(device).arg(inputname));
 
     channel = new Channel(NULL, device);
     if (!channel->Open())
@@ -101,7 +100,7 @@ void AnalogScan::doScan()
     for (uint i = 0; i < count && !fStop; i++, flist++)
     {
         unsigned frequency = flist->freq * 1000;
-        channel->Tune(frequency, input, "analog", QString::null);
+        channel->Tune(frequency, inputname, "analog", QString::null);
         usleep(200000); /* 0.2 sec */
         if (channel->IsTuned())
         {

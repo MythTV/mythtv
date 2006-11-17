@@ -36,95 +36,153 @@
 #include "cardutil.h"
 #include "videosource.h"
 
-ScanWizard::ScanWizard(int sourceid)
-    : paneOFDM(new OFDMPane()),     paneQPSK(new QPSKPane()),
-      paneATSC(new ATSCPane()),     paneQAM(new QAMPane()),
-      paneSingle(new STPane()),
-      paneDVBUtilsImport(new DVBUtilsImportPane()),
-#ifdef FE_GET_EXTENDED_INFO
-      paneDVBS2(new DVBS2Pane()),
-#endif
-      nVideoDev(-1),                nCardType(CardUtil::ERROR_PROBE),
-      nCaptureCard(-1),
-      configPane(new ScanWizardScanType(this, sourceid)),
-      scannerPane(new ScanWizardScanner(this))
+#define LOC QString("SWiz: ")
+#define LOC_ERR QString("SWiz, Error: ")
+
+ScanWizard::ScanWizard(uint    default_sourceid,  uint default_cardid,
+                       QString default_inputname, bool force_sourceid) :
+    lastHWCardID(0),
+    lastHWCardType(CardUtil::ERROR_PROBE),
+    configPane(new ScanWizardConfig(this,
+                                    default_sourceid,  default_cardid,
+                                    default_inputname, force_sourceid)),
+    scannerPane(new ScanWizardScanner())
 {
     addChild(configPane);
     addChild(scannerPane);
 }
 
-MythDialog* ScanWizard::dialogWidget(MythMainWindow *parent,
-                                     const char *widgetName)
+MythDialog *ScanWizard::dialogWidget(MythMainWindow *parent, const char*)
 {
-    MythWizard* wizard = (MythWizard*)
-        ConfigurationWizard::dialogWidget(parent, widgetName);
+    MythWizard *wizard = (MythWizard*)
+        ConfigurationWizard::dialogWidget(parent, "ScanWizard");
 
-    connect(wizard, SIGNAL(selected(    const QString&)),
-            this,   SLOT(  pageSelected(const QString&)));
+    connect(wizard, SIGNAL(selected(const QString&)),
+            this,   SLOT(  SetPage( const QString&)));
 
     return wizard;
 }
 
-void ScanWizard::pageSelected(const QString& strTitle)
+void ScanWizard::SetPage(const QString &pageTitle)
 {
-    if (strTitle == ScanWizardScanner::strTitle)
-       scannerPane->scan();
-}
+    VERBOSE(VB_SIPARSER, QString("SetPage(%1)").arg(pageTitle));
+    if (pageTitle != ScanWizardScanner::kTitle)
+        return;
 
-void ScanWizard::captureCard(const QString &str)
-{
-    int new_cardid = str.toUInt();
-    //Work out what kind of card we've got
-    //We need to check against the last capture card so that we don't
-    //try and probe a card which is already open by scan()
-    if ((nCaptureCard != new_cardid) ||
-        (nCardType == CardUtil::ERROR_OPEN))
+    QMap<QString,QString> start_chan;
+    DTVTunerType parse_type = DTVTunerType::kTunerTypeUnknown;
+
+    uint    pcardid   = configPane->GetParentCardID();
+    QString inputname = configPane->GetInputName();
+    uint    sourceid  = configPane->GetSourceID();
+    int     scantype  = configPane->GetScanType();
+    bool    do_scan   = true;
+
+    VERBOSE(VB_SIPARSER, LOC + "SetPage(): " +
+            QString("type(%1) pcardid(%2) inputname(%3)")
+            .arg(scantype).arg(pcardid).arg(inputname));
+
+    if (scantype == ScanTypeSetting::FullScan_Analog)
     {
-        nCaptureCard    = new_cardid;
-        QString subtype = CardUtil::ProbeSubTypeName(nCaptureCard, 0);
-        nCardType       = CardUtil::toCardType(subtype);
-        QString fmt     = SourceUtil::GetChannelFormat(videoSource());
-        paneATSC->SetDefaultFormat(fmt);
-        emit cardTypeChanged(QString::number(nCardType));
+        do_scan = false;
+        scannerPane->ScanAnalog(pcardid, inputname, sourceid);
+    }
+    else if (scantype == ScanTypeSetting::DVBUtilsImport)
+    {
+        scannerPane->ImportDVBUtils(sourceid, lastHWCardType,
+                                    configPane->GetFilename());
+    }
+    else if (scantype == ScanTypeSetting::NITAddScan_OFDM)
+    {
+        start_chan = configPane->GetStartChan();
+        parse_type = DTVTunerType::kTunerTypeOFDM;
+    }
+    else if (scantype == ScanTypeSetting::NITAddScan_QPSK)
+    {
+        start_chan = configPane->GetStartChan();
+        parse_type = DTVTunerType::kTunerTypeQPSK;
+    }
+    else if (scantype == ScanTypeSetting::NITAddScan_QAM)
+    {
+        start_chan = configPane->GetStartChan();
+        parse_type = DTVTunerType::kTunerTypeQAM;
+    }
+    else if (scantype == ScanTypeSetting::IPTVImport)
+    {
+        do_scan = false;
+        scannerPane->ImportM3U(pcardid, inputname, sourceid);
+    }
+    else if ((scantype == ScanTypeSetting::FullScan_ATSC)     ||
+             (scantype == ScanTypeSetting::FullTransportScan) ||
+             (scantype == ScanTypeSetting::TransportScan)     ||
+             (scantype == ScanTypeSetting::FullScan_OFDM))
+    {
+        ;
+    }
+    else
+    {
+        do_scan = false;
+        VERBOSE(VB_SIPARSER, LOC_ERR + "SetPage(): " +
+                QString("type(%1) src(%2) pcardid(%3) not handled")
+                .arg(scantype).arg(sourceid).arg(pcardid));
+
+        MythPopupBox::showOkPopup(
+            gContext->GetMainWindow(), tr("ScanWizard"),
+            "Programmer Error, see console");
+    }
+
+    // Just verify what we get from the UI...
+    DTVMultiplex tuning;
+    if ((DTVTunerType::kTunerTypeUnknown != parse_type) &&
+        !tuning.ParseTuningParams(
+            parse_type,
+            start_chan["frequency"],      start_chan["inversion"],
+            start_chan["symbolrate"],     start_chan["fec"],
+            start_chan["polarity"],
+            start_chan["coderate_hp"],    start_chan["coderate_lp"],
+            start_chan["constellation"],  start_chan["trans_mode"],
+            start_chan["guard_interval"], start_chan["hierarchy"],
+            start_chan["modulation"],     start_chan["bandwidth"]))
+    {
+        MythPopupBox::showOkPopup(
+            gContext->GetMainWindow(), tr("ScanWizard"),
+            tr("Error parsing parameters"));
+
+        do_scan = false;
+    }
+
+    if (do_scan)
+    {
+        scannerPane->Scan(
+            configPane->GetScanType(),       configPane->GetParentCardID(),
+            configPane->GetChildCardID(),    configPane->GetInputName(),
+            configPane->GetSourceID(),
+            configPane->DoDeleteChannels(),  configPane->DoRenameChannels(),
+            configPane->DoIgnoreSignalTimeout(), configPane->GetMultiplex(),
+            start_chan,                      configPane->GetModulation(),
+            configPane->GetFrequencyTable(), configPane->GetATSCFormat());
     }
 }
 
-uint ScanWizard::videoSource(void) const
+void ScanWizard::SetInput(const QString &cardids_inputname)
 {
-    return configPane->videoSource->getValue().toInt();
-}
+    uint pcardid, ccardid;
+    QString inputname;
+    if (!InputSelector::Parse(cardids_inputname, pcardid, ccardid, inputname))
+        return;
 
-int ScanWizard::captureCard(void) const
-{
-    return configPane->capturecard->getValue().toInt();
-}
+    uint hw_cardid = (ccardid) ? ccardid : pcardid;
 
-int ScanWizard::scanType(void) const
-{
-    return configPane->scanType->getValue().toInt();
-}
-
-bool ScanWizard::ignoreSignalTimeout(void) const
-{
-    bool ts0 = (ScanTypeSetting::TransportScan == scanType());
-    bool vl0 = paneSingle->ignoreSignalTimeout();
-
-    bool ts1 = (ScanTypeSetting::FullTransportScan == scanType());
-    bool vl1 = (configPane->scanConfig->
-                ignoreSignalTimeoutAll->getValue().toInt());
-
-    bool ts2 = (ScanTypeSetting::DVBUtilsImport == scanType());
-    bool vl2 = paneDVBUtilsImport->DoIgnoreSignalTimeout();
-
-    return (ts0) ? vl0 : ((ts1) ? vl1 : (ts2) ? vl2 : false);
-}
-
-QString ScanWizard::country(void) const
-{
-    return configPane->scanConfig->country->getValue();
-}
-
-QString ScanWizard::filename(void) const
-{
-    return paneDVBUtilsImport->GetFilename();
+    // Work out what kind of card we've got
+    // We need to check against the last capture card so that we don't
+    // try and probe a card which is already open by scan()
+    if ((lastHWCardID != hw_cardid) ||
+        (lastHWCardType == CardUtil::ERROR_OPEN))
+    {
+        lastHWCardID    = hw_cardid;
+        QString subtype = CardUtil::ProbeSubTypeName(hw_cardid, 0);
+        lastHWCardType  = CardUtil::toCardType(subtype);
+        configPane->SetDefaultATSCFormat(
+            SourceUtil::GetChannelFormat(configPane->GetSourceID()));
+    }
 }

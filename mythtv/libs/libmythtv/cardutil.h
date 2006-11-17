@@ -118,24 +118,14 @@ class MPUBLIC CardUtil
 
     static bool         IsCardTypePresent(const QString &strType);
 
-    static QString      GetRawCardType(uint cardid, uint sourceid)
-        { return get_on_source("cardtype", cardid, sourceid).upper(); }
-    static QString      GetVideoDevice(uint cardid, uint sourceid)
-        { return get_on_source("videodevice", cardid, sourceid); }
-    static bool         GetVBIDevice(uint cardid, uint sourceid)
-        { return get_on_source("vbidevice", cardid, sourceid); }
-    static uint         GetDBOX2Port(uint cardid, uint sourceid)
-        { return get_on_source("dbox2_port", cardid, sourceid).toUInt(); }
-    static uint         GetHDHRTuner(uint cardid, uint sourceid)
-        { return get_on_source("dbox2_port", cardid, sourceid).toUInt(); }
-
     static QString      GetRawCardType(uint cardid, const QString &input)
         { return get_on_input("cardtype", cardid, input).upper(); }
     static QString      GetVideoDevice(uint cardid, const QString &input)
         { return get_on_input("videodevice", cardid, input); }
     static QString      GetVBIDevice(uint cardid, const QString &input)
         { return get_on_input("vbidevice", cardid, input); }
-
+    static uint         GetHDHRTuner(uint cardid, const QString &input)
+        { return get_on_input("dbox2_port", cardid, input).toUInt(); }
 
     static int          GetValueInt(const QString &col, uint cid, uint sid)
         { return get_on_source(col, cid, sid).toInt(); }

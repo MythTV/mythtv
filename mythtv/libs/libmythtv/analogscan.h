@@ -48,14 +48,8 @@ class AnalogScan : public QObject
 {
    Q_OBJECT
 public:
-    /** 
-      @brief constructs the Analog Scanner
-      @param _sourceid the video source id 
-      @param _cardid the card id to perform the scan on
-     */
-    AnalogScan(unsigned _sourceid, unsigned _cardid);
-
-    ~AnalogScan();
+    /// @brief constructs the Analog Scanner
+    AnalogScan(uint _cardid, uint _sourceid, const QString &_inputname);
 
     /** @brief Stops the scanning thread running */
     void stop();
@@ -75,13 +69,14 @@ signals:
     /** @brief signals the scan is complete */ 
     void serviceScanComplete();
 
-protected:
+  protected:
+    uint    cardid;
+    uint    sourceid;
+    QString inputname;
+
     bool fRunning;
     bool fStop;
-
-    unsigned sourceid;
-    unsigned cardid;
-    unsigned nTable;
+    uint nTable;
 
     /** @brief adds a found channel to the database
         @param name name of the channel
@@ -100,5 +95,8 @@ protected:
     void doScan();
     /** @brief Actual thread proc , calls doScan*/
     static void *spawn(void *param);
+
+  private:
+    ~AnalogScan();
 };
 #endif //ANALOGSCAN_H

@@ -26,8 +26,10 @@ static bool parse_extinf(const QString &data,
                          QString       &channum,
                          QString       &name);
 
-IPTVChannelFetcher::IPTVChannelFetcher(uint sourceid, uint cardid) :
-    _sourceid(sourceid),   _cardid(cardid),
+IPTVChannelFetcher::IPTVChannelFetcher(
+    uint cardid, const QString &inputname, uint sourceid) :
+    _cardid(cardid),       _inputname(QDeepCopy<QString>(inputname)),
+    _sourceid(sourceid),
     _chan_cnt(1),          _thread_running(false),
     _stop_now(false),      _lock(false)
 {
@@ -97,7 +99,7 @@ void IPTVChannelFetcher::RunScan(void)
     _thread_running = true;
 
     // Step 1/4 : Get info from DB
-    QString url = CardUtil::GetVideoDevice(_cardid, _sourceid);
+    QString url = CardUtil::GetVideoDevice(_cardid, _inputname);
 
     if (_stop_now || url.isEmpty())
     {

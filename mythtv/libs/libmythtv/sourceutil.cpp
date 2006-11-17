@@ -157,6 +157,26 @@ bool SourceUtil::IsUnscanable(uint sourceid)
     return types.empty() || unscanable;
 }
 
+bool SourceUtil::IsAnySourceScanable(void)
+{
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare("SELECT sourceid FROM videosource");
+
+    if (!query.exec() || !query.isActive())
+    {
+        MythContext::DBError("SourceUtil::IsAnySourceScanable", query);
+        return false;
+    }
+
+    while (query.next())
+    {
+        if (!IsUnscanable(query.value(0).toUInt()))
+            return true;
+    }
+ 
+    return false;
+}
+
 bool SourceUtil::UpdateChannelsFromListings(uint sourceid, QString cardtype)
 {
     QString cmd = "mythfilldatabase --only-update-channels ";

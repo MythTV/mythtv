@@ -40,6 +40,13 @@ class ScanWizardScanner;
 class ScanWizard;
 class OptionalTypeSetting;
 class VideoSourceSelector;
+class OFDMPane;
+class QPSKPane;
+class DVBS2Pane;
+class ATSCPane;
+class QAMPane;
+class STPane;
+class DVBUtilsImportPane;
 
 /// Max range of the ScanProgressPopup progress bar
 #define PROGRESS_MAX  1000
@@ -87,12 +94,6 @@ class ScannerEvent : public QCustomEvent
         DVBSNR,
         DVBSignalStrength,
         DVBLock,
-        TuneComplete
-    };
-    enum TUNING
-    {
-        OK,
-        ERROR_TUNE
     };
 
     ScannerEvent(TYPE t) : QCustomEvent(t + QEvent::User) { ; }
@@ -105,7 +106,10 @@ class ScannerEvent : public QCustomEvent
 
     TYPE    eventType()       const { return (TYPE)(type()-QEvent::User); }
 
-  protected:
+  private:
+    ~ScannerEvent() { }
+
+  private:
     QString str;
     int     intvalue;
 };
@@ -114,23 +118,18 @@ class ScannerEvent : public QCustomEvent
 // Settings Below Here
 // ///////////////////////////////
 
-class MultiplexSetting : public ComboBoxSetting, public Storage
+class MultiplexSetting : public ComboBoxSetting, public TransientStorage
 {
-    Q_OBJECT
-  protected:
-    int nSourceID;
-
   public:
-    MultiplexSetting() : ComboBoxSetting(this), nSourceID(0)
+    MultiplexSetting() : ComboBoxSetting(this), sourceid(0)
         { setLabel(tr("Transport")); }
 
-    virtual void load() { refresh(); }
-    virtual void save() { ; }
-    virtual void save(QString /*destination*/) { }
+    virtual void load(void);
 
-    void refresh();
-  public slots:
-    void sourceID(const QString& str);
+    void SetSourceID(uint _sourceid);
+
+  protected:
+    uint sourceid;
 };
 
 class IgnoreSignalTimeout : public CheckBoxSetting, public TransientStorage
@@ -146,30 +145,38 @@ class IgnoreSignalTimeout : public CheckBoxSetting, public TransientStorage
     }
 };
 
-class CaptureCardSetting : public ComboBoxSetting, public Storage
+class InputSelector : public ComboBoxSetting, public TransientStorage
 {
     Q_OBJECT
-  protected:
-    int nSourceID;
 
   public:
-    CaptureCardSetting() : ComboBoxSetting(this), nSourceID(0)
-    {
-        setLabel(tr("Capture Card"));
-    }
-    virtual void load() { refresh(); }
-    virtual void save() { ; }
-    virtual void save(QString /*destination*/) { }
+    InputSelector(uint _default_cardid, const QString &_default_inputname);
 
-    void refresh();
+    virtual void load(void);
+
+    uint GetParentCardID(void) const;
+    uint GetChildCardID(void) const;
+    uint GetHWCardID(void) const
+        { return GetChildCardID() ? GetChildCardID() : GetParentCardID(); }
+
+    QString GetInputName(void) const;
+
+    static bool Parse(const QString &cardids_inputname,
+                      uint &parent_cardid,
+                      uint &child_cardid,
+                      QString &inputname);
 
   public slots:
-    void sourceID(const QString& str);
+    void SetSourceID(const QString &_sourceid);
+
+  private:
+    uint    sourceid;
+    uint    default_cardid;
+    QString default_inputname;
 };
 
-class ScanCountry: public ComboBoxSetting, public TransientStorage
+class ScanCountry : public ComboBoxSetting, public TransientStorage
 {
-    Q_OBJECT
   public:
     enum Country
     {
@@ -211,44 +218,86 @@ class ScanTypeSetting : public ComboBoxSetting, public TransientStorage
         DVBUtilsImport,
     };
 
-    ScanTypeSetting() : ComboBoxSetting(this), nCaptureCard(-1)
-    {
-        setLabel(QObject::tr("Scan Type"));
-        refresh("");
-    }
+    ScanTypeSetting() : ComboBoxSetting(this), hw_cardid(0)
+        { setLabel(QObject::tr("Scan Type")); }
+
   protected slots:
-    void refresh(const QString&);
+    void SetInput(const QString &cardids_inputname);
+
   protected:
-    int nCaptureCard;
+    uint    hw_cardid;
 };
 
 class ScanOptionalConfig : public TriggeredConfigurationGroup 
 {
     Q_OBJECT
-  public:
-    ScanOptionalConfig(ScanWizard* wizard, ScanTypeSetting* scanType);
 
+  public:
+    ScanOptionalConfig(ScanTypeSetting *_scan_type);
+
+    QString GetATSCFormat(const QString&)    const;
+    QString GetModulation(void)              const;
+    QString GetFrequencyTable(void)          const;
+    bool    DoIgnoreSignalTimeout(void)      const;
+    QString GetFilename(void)                const;
+    uint    GetMultiplex(void)               const;
+    bool    DoDeleteChannels(void)           const;
+    bool    DoRenameChannels(void)           const;
+    QMap<QString,QString> GetStartChan(void) const;
+
+    void SetDefaultATSCFormat(const QString &atscFormat);
+
+  public slots:
+    void SetSourceID(const QString&);
+    void triggerChanged(const QString&);
+
+  private:
+    ScanTypeSetting     *scanType;
     ScanCountry         *country;
     IgnoreSignalTimeout *ignoreSignalTimeoutAll;
-
-  protected slots:
-    void triggerChanged(const QString&);
+    OFDMPane            *paneOFDM;
+    QPSKPane            *paneQPSK;
+    DVBS2Pane           *paneDVBS2;
+    ATSCPane            *paneATSC;
+    QAMPane             *paneQAM;
+    STPane              *paneSingle;
+    DVBUtilsImportPane  *paneDVBUtilsImport;
 };
 
-class ScanWizardScanType: public VerticalConfigurationGroup
+class ScanWizardConfig: public VerticalConfigurationGroup
 {
-    Q_OBJECT
-    friend class ScanWizard;
-
   public:
-    ScanWizardScanType(ScanWizard *_parent, int sourceid);
+    ScanWizardConfig(ScanWizard *_parent,
+                     uint    default_sourceid,  uint default_cardid,
+                     QString default_inputname, bool force_sourceid);
+
+    uint    GetSourceID(void)     const;
+    QString GetATSCFormat(void)   const;
+    QString GetModulation(void)   const { return scanConfig->GetModulation(); }
+    int     GetScanType(void)     const { return scanType->getValue().toInt();}
+    uint    GetParentCardID(void) const { return input->GetParentCardID();    }
+    uint    GetChildCardID(void)  const { return input->GetChildCardID();     }
+    uint    GetHWCardID(void)     const { return input->GetHWCardID();        }
+    QString GetInputName(void)    const { return input->GetInputName();       }
+    QString GetFilename(void)     const { return scanConfig->GetFilename();   }
+    uint    GetMultiplex(void)    const { return scanConfig->GetMultiplex();  }
+    bool DoDeleteChannels(void) const { return scanConfig->DoDeleteChannels();}
+    bool DoRenameChannels(void) const { return scanConfig->DoRenameChannels();}
+    QString GetFrequencyTable(void) const
+        { return scanConfig->GetFrequencyTable(); }
+    QMap<QString,QString> GetStartChan(void) const
+        { return scanConfig->GetStartChan(); }
+    bool    DoIgnoreSignalTimeout(void) const
+        { return scanConfig->DoIgnoreSignalTimeout(); }
+
+    void SetDefaultATSCFormat(const QString &atscFormat)
+        { scanConfig->SetDefaultATSCFormat(atscFormat); }
 
   protected:
-    ScanWizard          *parent;
-    ScanOptionalConfig  *scanConfig;
-    CaptureCardSetting  *capturecard;
     VideoSourceSelector *videoSource;
+    InputSelector       *input;
     ScanTypeSetting     *scanType;
+    ScanOptionalConfig  *scanConfig;
 };
 
 class LogList: public ListBoxSetting, public TransientStorage
@@ -296,9 +345,9 @@ class ScanATSCModulation: public ComboBoxSetting, public TransientStorage
         addSelection(QObject::tr("Cable") + " (QAM-128)", "qam128", false);
         addSelection(QObject::tr("Cable") + " (QAM-64)",  "qam64",  false);
 
-        setLabel(QObject::tr("ATSC Modulation"));
+        setLabel(QObject::tr("Modulation"));
         setHelpText(
-            QObject::tr("ATSC modulation, 8-VSB, QAM-256, etc.") + " " +
+            QObject::tr("Modulation, 8-VSB, QAM-256, etc.") + " " +
             QObject::tr("Most cable systems in the United States use "
                         "QAM-256 or QAM-64, but some mixed systems "
                         "may use 8-VSB for over-the-air channels."));
@@ -315,7 +364,7 @@ class ScanATSCChannelFormat: public ComboBoxSetting, public TransientStorage
         addSelection(QObject::tr("(5.1) Period"),     "%1.%2", false);
         addSelection(QObject::tr("(501) Zero"),       "%10%2", false);
         addSelection(QObject::tr("(51) None"),        "%1%2",  false);
-        setLabel(QObject::tr("Channel Separator"));
+        setLabel(QObject::tr("ATSC Channel Separator"));
         setHelpText(QObject::tr("What to use to separate ATSC major "
                                 "and minor channels."));
     }
@@ -553,15 +602,15 @@ class OFDMPane : public HorizontalConfigurationGroup
         addChild(right);
     }
 
-    QString frequency()      { return pfrequency->getValue(); }
-    QString bandwidth()      { return pbandwidth->getValue(); }
-    QString inversion()      { return pinversion->getValue(); }
-    QString constellation()  { return pconstellation->getValue(); }
-    QString coderate_lp()    { return pcoderate_lp->getValue(); }
-    QString coderate_hp()    { return pcoderate_hp->getValue(); }
-    QString trans_mode()     { return ptrans_mode->getValue(); }
-    QString guard_interval() { return pguard_interval->getValue(); }
-    QString hierarchy()      { return phierarchy->getValue(); }
+    QString frequency(void)      const { return pfrequency->getValue();     }
+    QString bandwidth(void)      const { return pbandwidth->getValue();     }
+    QString inversion(void)      const { return pinversion->getValue();     }
+    QString constellation(void)  const { return pconstellation->getValue(); }
+    QString coderate_lp(void)    const { return pcoderate_lp->getValue();   }
+    QString coderate_hp(void)    const { return pcoderate_hp->getValue();   }
+    QString trans_mode(void)     const { return ptrans_mode->getValue();    }
+    QString guard_interval(void) const { return pguard_interval->getValue(); }
+    QString hierarchy(void)      const { return phierarchy->getValue();     }
 
   protected:
     ScanFrequency        *pfrequency;
@@ -574,7 +623,7 @@ class OFDMPane : public HorizontalConfigurationGroup
     ScanGuardInterval    *pguard_interval;
     ScanHierarchy        *phierarchy;
 };
-#ifdef FE_GET_EXTENDED_INFO
+
 class DVBS2Pane : public HorizontalConfigurationGroup
 {
   public:
@@ -610,7 +659,6 @@ class DVBS2Pane : public HorizontalConfigurationGroup
     ScanPolarity   *ppolarity;
     ScanModulation *pmodulation;
 };
-#endif
 
 class QPSKPane : public HorizontalConfigurationGroup
 {
@@ -631,11 +679,11 @@ class QPSKPane : public HorizontalConfigurationGroup
         addChild(right);     
     }
 
-    QString frequency()  { return pfrequency->getValue(); }
-    QString symbolrate() { return psymbolrate->getValue(); }
-    QString inversion()  { return pinversion->getValue(); }
-    QString fec()        { return pfec->getValue(); }
-    QString polarity()   { return ppolarity->getValue(); }
+    QString frequency(void)  const { return pfrequency->getValue();  }
+    QString symbolrate(void) const { return psymbolrate->getValue(); }
+    QString inversion(void)  const { return pinversion->getValue();  }
+    QString fec(void)        const { return pfec->getValue();        }
+    QString polarity(void)   const { return ppolarity->getValue();   }
 
   protected:
     ScanFrequency  *pfrequency;
@@ -664,11 +712,11 @@ class QAMPane : public HorizontalConfigurationGroup
         addChild(right);     
     }
 
-    QString frequency()  { return pfrequency->getValue(); }
-    QString symbolrate() { return psymbolrate->getValue(); }
-    QString inversion()  { return pinversion->getValue(); }
-    QString fec()        { return pfec->getValue(); }
-    QString modulation() { return pmodulation->getValue(); }
+    QString frequency(void)  const { return pfrequency->getValue();  }
+    QString symbolrate(void) const { return psymbolrate->getValue(); }
+    QString inversion(void)  const { return pinversion->getValue();  }
+    QString fec(void)        const { return pfec->getValue();        }
+    QString modulation(void) const { return pmodulation->getValue(); }
 
   protected:
     ScanFrequency  *pfrequency;
@@ -691,13 +739,13 @@ class ATSCPane : public VerticalConfigurationGroup
 
     QString atscFreqTable(void)  const { return atsc_table->getValue();      }
     QString atscModulation(void) const { return atsc_modulation->getValue(); }
-    QString atscFormat(void)     const { return atsc_format->getValue();     }
+    QString GetATSCFormat(void)  const { return atsc_format->getValue();     }
     bool DoDeleteChannels(void) const
         { return old_channel_treatment->getValue() == "delete"; }
     bool DoRenameChannels(void) const
         { return old_channel_treatment->getValue() == "rename"; }
 
-    void SetDefaultFormat(QString d)
+    void SetDefaultATSCFormat(const QString &d)
     {
         int val = atsc_format->getValueIndex(d);
         atsc_format->setValue(val);
@@ -712,7 +760,6 @@ class ATSCPane : public VerticalConfigurationGroup
 
 class STPane : public VerticalConfigurationGroup
 {
-    Q_OBJECT
   public:
     STPane() :
         VerticalConfigurationGroup(false, false, true, false),
@@ -727,7 +774,7 @@ class STPane : public VerticalConfigurationGroup
         addChild(ignore_signal_timeout);
     }
 
-    QString atscFormat(void) const { return atsc_format->getValue(); }
+    QString GetATSCFormat(void) const { return atsc_format->getValue(); }
     bool DoDeleteChannels(void) const
         { return old_channel_treatment->getValue() == "delete"; }
     bool DoRenameChannels(void) const
@@ -737,9 +784,14 @@ class STPane : public VerticalConfigurationGroup
     bool ignoreSignalTimeout(void) const
         { return ignore_signal_timeout->getValue().toInt(); }
 
-  public slots:
-    void sourceID(const QString &str)
-        { transport_setting->sourceID(str); }
+    void SetDefaultATSCFormat(const QString &d)
+    {
+        int val = atsc_format->getValueIndex(d);
+        atsc_format->setValue(val);
+    }
+
+    void SetSourceID(uint sourceid)
+        { transport_setting->SetSourceID(sourceid); }
 
   protected:
     MultiplexSetting        *transport_setting;
@@ -776,6 +828,12 @@ class DVBUtilsImportPane : public VerticalConfigurationGroup
         { return old_channel_treatment->getValue() == "rename"; }
     bool DoIgnoreSignalTimeout(void) const
         { return ignore_signal_timeout->getValue().toInt(); }
+
+    void SetDefaultATSCFormat(const QString &d)
+    {
+        int val = atsc_format->getValueIndex(d);
+        atsc_format->setValue(val);
+    }
 
   private:
     TransLineEditSetting    *filename;

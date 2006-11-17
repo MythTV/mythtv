@@ -38,6 +38,7 @@
 #include "frequencies.h"
 #include "videosource.h"
 #include "cardutil.h"
+#include "sourceutil.h"
 #include "scanwizardhelpers.h"
 #include "scanwizardscanner.h"
 #include "scanwizard.h"
@@ -113,7 +114,7 @@ ScanProgressPopup::ScanProgressPopup(
     addChild(cancel);
 
     connect(cancel, SIGNAL(pressed(void)),
-            parent, SLOT(  cancelScan(void)));
+            parent, SLOT(  CancelScan(void)));
 
     //Seem to need to do this as the constructor doesn't seem enough
     setUseLabel(false);
@@ -122,6 +123,7 @@ ScanProgressPopup::ScanProgressPopup(
 
 ScanProgressPopup::~ScanProgressPopup()
 {
+    VERBOSE(VB_IMPORTANT, "~ScanProgressPopup()");
 }
 
 void ScanProgressPopup::signalToNoise(int value)
@@ -149,14 +151,17 @@ void ScanProgressPopup::exec(ScanWizardScanner *parent)
     dialog = (ConfigPopupDialogWidget*)
         dialogWidget(gContext->GetMainWindow(), "ScanProgressPopup");
     connect(dialog, SIGNAL(popupDone(void)),
-            parent, SLOT(cancelScan(void)));
+            parent, SLOT(  CancelScan(void)));
     dialog->ShowPopup(this);
 }
 
-void MultiplexSetting::refresh()
+void MultiplexSetting::load(void)
 {
     clearSelections();
-    
+
+    if (!sourceid)
+        return;
+
     MSqlQuery query(MSqlQuery::InitCon());
 
     query.prepare(
@@ -165,7 +170,7 @@ void MultiplexSetting::refresh()
         "FROM dtv_multiplex "
         "WHERE sourceid = :SOURCEID "
         "ORDER by frequency, networkid, transportid");
-    query.bindValue(":SOURCEID", nSourceID);
+    query.bindValue(":SOURCEID", sourceid);
 
     if (!query.exec() || !query.isActive() || query.size() <= 0)
         return;
@@ -202,67 +207,177 @@ void MultiplexSetting::refresh()
     }
 }
 
-void MultiplexSetting::sourceID(const QString& str)
+void MultiplexSetting::SetSourceID(uint _sourceid)
 {
-    nSourceID = str.toInt();
-    refresh();
+    sourceid = _sourceid;
+    load();
 }
 
-void CaptureCardSetting::refresh()
+InputSelector::InputSelector(
+    uint _default_cardid, const QString &_default_inputname) :
+    ComboBoxSetting(this), sourceid(0), default_cardid(_default_cardid),
+    default_inputname(QDeepCopy<QString>(_default_inputname))
+{
+    setLabel(tr("Input"));
+}
+
+void InputSelector::load(void)
 {
     clearSelections();
 
-    MSqlQuery query(MSqlQuery::InitCon());
+    if (!sourceid)
+        return;
 
-    QString qstr =
-        "SELECT DISTINCT cardtype, videodevice, capturecard.cardid "
-        "FROM capturecard, videosource, cardinput "
-        "WHERE videosource.sourceid = :SOURCEID            AND "
-        "      cardinput.sourceid   = videosource.sourceid AND "
-        "      capturecard.cardtype in ";
-    qstr += card_types() + "       AND "
-        "      capturecard.hostname = :HOSTNAME            AND "
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare(
+        "SELECT capturecard.cardid, cardinput.childcardid, "
+        "       cardtype, videodevice, inputname "
+        "FROM capturecard, cardinput, videosource "
+        "WHERE cardinput.sourceid = videosource.sourceid AND "
+        "      hostname           = :HOSTNAME            AND "
+        "      cardinput.sourceid = :SOURCEID            AND "
         "      ( ( cardinput.childcardid != '0' AND "
         "          cardinput.childcardid  = capturecard.cardid ) OR "
         "        ( cardinput.childcardid  = '0' AND "
         "          cardinput.cardid       = capturecard.cardid ) "
-        "      )";
+        "      )");
 
-    query.prepare(qstr);
-    query.bindValue(":SOURCEID", nSourceID);
     query.bindValue(":HOSTNAME", gContext->GetHostName());
+    query.bindValue(":SOURCEID", sourceid);
 
     if (!query.exec() || !query.isActive())
     {
-        MythContext::DBError("CaptureCardSetting::refresh()", query);
+        MythContext::DBError("InputSelector::load()", query);
         return;
     }
 
-    while (query.next())
+    uint which = 0, cnt = 0;
+    for (; query.next(); cnt++)
     {
-        addSelection("[ " + query.value(0).toString() + " : " +
-                     query.value(1).toString() + " ]",
-                     query.value(2).toString());
+        uint parent_cardid = query.value(0).toUInt();
+        uint child_cardid  = query.value(1).toUInt();
+        QString inputname  = query.value(4).toString();
+
+        QString desc = CardUtil::GetDeviceLabel(
+            parent_cardid,
+            query.value(2).toString(), query.value(3).toString());
+
+        if (child_cardid)
+        {
+            MSqlQuery query2(MSqlQuery::InitCon());
+            query2.prepare(
+                "SELECT cardtype, videodevice "
+                "FROM capturecard "
+                "WHERE cardid = :CARDID");
+
+            if (query2.next())
+            {
+                desc += " " + CardUtil::GetDeviceLabel(
+                    child_cardid,
+                    query2.value(0).toString(), query2.value(1).toString());
+            }
+        }
+
+        desc += QString(" (%1)").arg(inputname);
+
+        QString key = QString("%1:%2:%3")
+            .arg(parent_cardid).arg(child_cardid).arg(inputname);
+
+        addSelection(desc, key);
+
+        which = (((default_cardid == parent_cardid) ||
+                  (default_cardid == child_cardid)) &&
+                 (default_inputname == inputname)) ? cnt : which;
+    }
+
+    if (cnt)
+        setValue(which);
+}
+
+void InputSelector::SetSourceID(const QString &_sourceid)
+{
+    if (sourceid != _sourceid.toUInt())
+    {
+        sourceid = _sourceid.toUInt();
+        load();
     }
 }
 
-void CaptureCardSetting::sourceID(const QString& str)
+uint InputSelector::GetParentCardID(void) const
 {
-    nSourceID = str.toInt();
-    refresh();
+    uint    parent_cardid = 0;
+    uint    child_cardid  = 0;
+    QString inputname     = QString::null;
+
+    Parse(getValue(), parent_cardid, child_cardid, inputname);
+
+    return parent_cardid;
 }
 
-void ScanTypeSetting::refresh(const QString& card)
+uint InputSelector::GetChildCardID(void) const
 {
-    int nCard = card.toInt();
+    uint    parent_cardid = 0;
+    uint    child_cardid  = 0;
+    QString inputname     = QString::null;
+
+    Parse(getValue(), parent_cardid, child_cardid, inputname);
+
+    return child_cardid;
+}
+
+QString InputSelector::GetInputName(void) const
+{
+    uint    parent_cardid = 0;
+    uint    child_cardid  = 0;
+    QString inputname = QString::null;
+
+    Parse(getValue(), parent_cardid, child_cardid, inputname);
+
+    return inputname;
+}
+
+bool InputSelector::Parse(const QString &cardids_inputname,
+                          uint &parent_cardid,
+                          uint &child_cardid,
+                          QString &inputname)
+{
+    parent_cardid = 0;
+    child_cardid  = 0;
+    inputname     = QString::null;
+
+    int sep0 = cardids_inputname.find(':');
+    if (sep0 < 1)
+        return false;
+
+    QString child_cardid_inputname = cardids_inputname.mid(sep0 + 1);
+    int sep1 = child_cardid_inputname.find(':');
+    if (sep1 < 1)
+        return false;
+
+    parent_cardid = cardids_inputname.left(sep0).toUInt();
+    child_cardid  = child_cardid_inputname.left(sep1).toUInt();
+    inputname     = child_cardid_inputname.mid(sep1 + 1);
+
+    return true;
+}
+
+void ScanTypeSetting::SetInput(const QString &cardids_inputname)
+{
+    uint pcardid, ccardid;
+    QString inputname;
+    if (!InputSelector::Parse(cardids_inputname, pcardid, ccardid, inputname))
+        return;
+
+    const uint new_cardid = ccardid ? ccardid : pcardid;
+
     // Only refresh if we really have to. If we do it too often
     // Then we end up fighting the scan routine when we want to
     // check the type of dvb card :/
-    if (nCard == nCaptureCard)
+    if (new_cardid == hw_cardid)
         return;
 
-    nCaptureCard    = nCard;
-    QString subtype = CardUtil::ProbeSubTypeName(nCard, 0);
+    hw_cardid       = new_cardid;
+    QString subtype = CardUtil::ProbeSubTypeName(hw_cardid, 0);
     int nCardType   = CardUtil::toCardType(subtype);
     clearSelections();
 
@@ -350,11 +465,16 @@ ScanCountry::ScanCountry() : ComboBoxSetting(this)
     addSelection(QObject::tr("Spain"),          "es", country == ES);
 }
 
-ScanOptionalConfig::ScanOptionalConfig(ScanWizard *wizard,
-                                       ScanTypeSetting *scanType) :
-    TriggeredConfigurationGroup(false, false, true, true),
+ScanOptionalConfig::ScanOptionalConfig(ScanTypeSetting *_scan_type) :
+    TriggeredConfigurationGroup(false, false, true, true,
+                                false, false, true, true),
+    scanType(_scan_type),
     country(new ScanCountry()),
-    ignoreSignalTimeoutAll(new IgnoreSignalTimeout())
+    ignoreSignalTimeoutAll(new IgnoreSignalTimeout()),
+    paneOFDM(new OFDMPane()),     paneQPSK(new QPSKPane()),
+    paneDVBS2(new DVBS2Pane()),   paneATSC(new ATSCPane()),
+    paneQAM(new QAMPane()),       paneSingle(new STPane()),
+    paneDVBUtilsImport(new DVBUtilsImportPane())
 {
     setTrigger(scanType);
 
@@ -375,25 +495,25 @@ ScanOptionalConfig::ScanOptionalConfig(ScanWizard *wizard,
     addTarget(QString::number(ScanTypeSetting::Error_Probe),
              new ErrorPane(QObject::tr("Failed to probe the card")));
     addTarget(QString::number(ScanTypeSetting::NITAddScan_QAM),
-              wizard->paneQAM);
+              paneQAM);
     addTarget(QString::number(ScanTypeSetting::NITAddScan_QPSK),
-              wizard->paneQPSK);
+              paneQPSK);
     addTarget(QString::number(ScanTypeSetting::NITAddScan_OFDM),
-              wizard->paneOFDM);
+              paneOFDM);
     addTarget(QString::number(ScanTypeSetting::FullScan_ATSC),
-              wizard->paneATSC);
+              paneATSC);
     addTarget(QString::number(ScanTypeSetting::FullScan_OFDM),
               country);
     addTarget(QString::number(ScanTypeSetting::FullScan_Analog),
               new BlankSetting());
     addTarget(QString::number(ScanTypeSetting::TransportScan),
-              wizard->paneSingle);
+              paneSingle);
     addTarget(QString::number(ScanTypeSetting::FullTransportScan),
               scanAllTransports);
     addTarget(QString::number(ScanTypeSetting::IPTVImport),
               new BlankSetting());
     addTarget(QString::number(ScanTypeSetting::DVBUtilsImport),
-              wizard->paneDVBUtilsImport);
+              paneDVBUtilsImport);
 }
 
 void ScanOptionalConfig::triggerChanged(const QString& value)
@@ -401,39 +521,207 @@ void ScanOptionalConfig::triggerChanged(const QString& value)
     TriggeredConfigurationGroup::triggerChanged(value);
 }
 
-ScanWizardScanType::ScanWizardScanType(ScanWizard *_parent, int sourceid) :
-    VerticalConfigurationGroup(true, true, false, false),
-    parent(_parent)
+void ScanOptionalConfig::SetSourceID(const QString &sourceid)
 {
-    setLabel(tr("Scan Type"));
-    setUseLabel(false);
+    paneSingle->SetSourceID(sourceid.toUInt());
+}
 
-    videoSource = new VideoSourceSelector(
-        (sourceid < 0) ? 0 : sourceid, card_types(), false);
+void ScanOptionalConfig::SetDefaultATSCFormat(const QString &atscFormat)
+{
+    paneATSC->SetDefaultATSCFormat(atscFormat);
+    paneSingle->SetDefaultATSCFormat(atscFormat);
+    paneDVBUtilsImport->SetDefaultATSCFormat(atscFormat);
+}
 
-    capturecard = new CaptureCardSetting();
+QString ScanOptionalConfig::GetATSCFormat(const QString &dfl) const
+{
+    int     st =  scanType->getValue().toInt();
 
-    HorizontalConfigurationGroup *h1 =
-        new HorizontalConfigurationGroup(false,false,true,true);
-    h1->addChild(videoSource);
-    h1->addChild(capturecard);
-    addChild(h1);
-    scanType = new ScanTypeSetting();
+    bool    ts0 = (ScanTypeSetting::FullScan_ATSC  == st);
+    QString vl0 = paneATSC->GetATSCFormat();
+
+    bool    ts1 = (ScanTypeSetting::TransportScan  == st);
+    QString vl1 = paneSingle->GetATSCFormat();
+
+    bool    ts2 = (ScanTypeSetting::DVBUtilsImport == st);
+    QString vl2 = paneDVBUtilsImport->GetATSCFormat();
+
+    return (ts0) ? vl0 : ((ts1) ? vl1 : (ts2) ? vl2 : dfl);
+}
+
+QString ScanOptionalConfig::GetModulation(void) const
+{
+    int     st =  scanType->getValue().toInt();
+
+    bool    ts0 = (ScanTypeSetting::FullScan_ATSC == st);
+    QString vl0 = paneATSC->atscModulation();
+
+    bool    ts1 = (ScanTypeSetting::FullScan_OFDM == st);
+    QString vl1 = "ofdm";
+
+    return (ts0) ? vl0 : ((ts1) ? vl1 : "ofdm");
+}
+
+QString ScanOptionalConfig::GetFrequencyTable(void) const
+{
+    int     st =  scanType->getValue().toInt();
+
+    bool    ts0 = (ScanTypeSetting::FullScan_ATSC == st);
+    QString vl0 = paneATSC->atscFreqTable();
+
+    bool    ts1 = (ScanTypeSetting::FullScan_OFDM == st);
+    QString vl1 = country->getValue();
+
+    return (ts0) ? vl0 : ((ts1) ? vl1 : "vsb8");
+}
+
+bool ScanOptionalConfig::DoIgnoreSignalTimeout(void) const
+{
+    int  st  = scanType->getValue().toInt();
+
+    bool ts0 = (ScanTypeSetting::TransportScan     == st);
+    bool vl0 = paneSingle->ignoreSignalTimeout();
+
+    bool ts1 = (ScanTypeSetting::FullTransportScan == st);
+    bool vl1 = (ignoreSignalTimeoutAll->getValue().toInt());
+
+    bool ts2 = (ScanTypeSetting::DVBUtilsImport    == st);
+    bool vl2 = paneDVBUtilsImport->DoIgnoreSignalTimeout();
+
+    return (ts0) ? vl0 : ((ts1) ? vl1 : (ts2) ? vl2 : false);
+}
+
+bool ScanOptionalConfig::DoDeleteChannels(void) const
+{
+    int  st  = scanType->getValue().toInt();
+
+    bool ts0 = (ScanTypeSetting::FullScan_ATSC  == st);
+    bool vl0 = paneATSC->DoDeleteChannels();
+
+    bool ts1 = (ScanTypeSetting::TransportScan  == st);
+    bool vl1 = paneSingle->DoDeleteChannels();
+
+    bool ts2 = (ScanTypeSetting::DVBUtilsImport == st);
+    bool vl2 = paneDVBUtilsImport->DoDeleteChannels();
+
+    return (ts0) ? vl0 : ((ts1) ? vl1 : (ts2) ? vl2 : false);
+}
+
+bool ScanOptionalConfig::DoRenameChannels(void) const
+{
+    int  st  = scanType->getValue().toInt();
+
+    bool ts0 = (ScanTypeSetting::FullScan_ATSC  == st);
+    bool vl0 = paneATSC->DoRenameChannels();
+
+    bool ts1 = (ScanTypeSetting::TransportScan  == st);
+    bool vl1 = paneSingle->DoRenameChannels();
+
+    bool ts2 = (ScanTypeSetting::DVBUtilsImport == st);
+    bool vl2 = paneDVBUtilsImport->DoRenameChannels();
+
+    return (ts0) ? vl0 : ((ts1) ? vl1 : (ts2) ? vl2 : false);
+}
+
+QString ScanOptionalConfig::GetFilename(void) const
+{
+    return paneDVBUtilsImport->GetFilename();
+}
+
+uint ScanOptionalConfig::GetMultiplex(void) const
+{
+    int mplexid = paneSingle->GetMultiplex();
+    return (mplexid <= 0) ? 0 : mplexid;
+}
+
+QMap<QString,QString> ScanOptionalConfig::GetStartChan(void) const
+{
+    QMap<QString,QString> startChan;
+
+    int st = scanType->getValue().toInt();
+    if (ScanTypeSetting::NITAddScan_OFDM == st)
+    {
+        const OFDMPane *pane = paneOFDM;
+
+        startChan["std"]            = "dvb";
+        startChan["frequency"]      = pane->frequency();
+        startChan["inversion"]      = pane->inversion();
+        startChan["bandwidth"]      = pane->bandwidth();
+        startChan["modulation"]     = "ofdm";
+        startChan["coderate_hp"]    = pane->coderate_hp();
+        startChan["coderate_lp"]    = pane->coderate_lp();
+        startChan["constellation"]  = pane->constellation();
+        startChan["trans_mode"]     = pane->trans_mode();
+        startChan["guard_interval"] = pane->guard_interval();
+        startChan["hierarchy"]      = pane->hierarchy();
+    }
+    else if (ScanTypeSetting::NITAddScan_QPSK == st)
+    {
+        const QPSKPane *pane = paneQPSK;
+
+        startChan["std"]        = "dvb";
+        startChan["frequency"]  = pane->frequency();
+        startChan["inversion"]  = pane->inversion();
+        startChan["symbolrate"] = pane->symbolrate();
+        startChan["fec"]        = pane->fec();
+        startChan["modulation"] = "qpsk";
+        startChan["polarity"]   = pane->polarity();
+    }
+    else if (ScanTypeSetting::NITAddScan_QAM == st)
+    {
+        const QAMPane *pane = paneQAM;
+
+        startChan["std"]        = "dvb";
+        startChan["frequency"]  = pane->frequency();
+        startChan["inversion"]  = pane->inversion();
+        startChan["symbolrate"] = pane->symbolrate();
+        startChan["fec"]        = pane->fec();
+        startChan["modulation"] = pane->modulation();
+    }
+
+    return startChan;
+}
+
+ScanWizardConfig::ScanWizardConfig(
+    ScanWizard *_parent,
+    uint    default_sourceid,  uint default_cardid,
+    QString default_inputname, bool force_sourceid) :
+    VerticalConfigurationGroup(false, true, false, false),
+    videoSource(new VideoSourceSelector(
+                    default_sourceid, card_types(), false)),
+    input(new InputSelector(default_cardid, default_inputname)),
+    scanType(new ScanTypeSetting()),
+    scanConfig(new ScanOptionalConfig(scanType))
+{
+    setLabel(tr("Scan Configuration"));
+
+    addChild(videoSource);
+    addChild(input);
     addChild(scanType);
-    scanConfig = new ScanOptionalConfig(_parent,scanType);
     addChild(scanConfig);
 
     connect(videoSource, SIGNAL(valueChanged(const QString&)),
-        _parent->paneSingle, SLOT(sourceID(const QString&)));
+            scanConfig,  SLOT(  SetSourceID( const QString&)));
+
     connect(videoSource, SIGNAL(valueChanged(const QString&)),
-        capturecard, SLOT(sourceID(const QString&)));
+            input,       SLOT(  SetSourceID( const QString&)));
 
-    //Setup signals to refill the scan types
-    connect(capturecard, SIGNAL(valueChanged(const QString&)),
-        scanType, SLOT(refresh(const QString&)));
+    connect(input,       SIGNAL(valueChanged(const QString&)),
+            scanType,    SLOT(  SetInput(    const QString&)));
 
-    connect(capturecard, SIGNAL(valueChanged(const QString&)),
-        parent, SLOT(captureCard(const QString&)));
+    connect(input,       SIGNAL(valueChanged(const QString&)),
+            _parent,     SLOT(  SetInput(    const QString&)));
+}
+
+uint ScanWizardConfig::GetSourceID(void) const
+{
+    return videoSource->getValue().toInt();
+}
+
+QString ScanWizardConfig::GetATSCFormat(void) const
+{
+    QString dfl = SourceUtil::GetChannelFormat(GetSourceID());
+    return scanConfig->GetATSCFormat(dfl);
 }
 
 LogList::LogList() : ListBoxSetting(this), n(0)

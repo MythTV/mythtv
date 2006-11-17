@@ -56,18 +56,34 @@ class SignalMonitorValue;
 
 class ScanWizardScanner : public VerticalConfigurationGroup
 {
-    friend class ScanWizard;
     Q_OBJECT
+
   public:
-    static const QString strTitle;
+    ScanWizardScanner(void);
+    virtual void deleteLater(void)
+        { Teardown(); VerticalConfigurationGroup::deleteLater(); }
 
-    ScanWizardScanner(ScanWizard *_parent);
-    ~ScanWizardScanner() { finish(); }
+    void Scan(int            scantype,
+              uint           parent_cardid,
+              uint           child_cardid,
+              const QString &inputname,
+              uint           sourceid,
+              bool           do_delete_channels,
+              bool           do_rename_channels,
+              bool           do_ignore_signal_timeout,
+              // stuff needed for particular scans
+              uint           mplexid,
+              const QMap<QString,QString> &startChan,
+              const QString &mod,
+              const QString &tbl,
+              const QString &atsc_format);
 
-    void scan(void);
+    void ImportDVBUtils(uint sourceid, int cardtype, const QString &file);
+    void ImportM3U(     uint cardid, const QString &inputname, uint sourceid);
+    void ScanAnalog(    uint cardid, const QString &inputname, uint sourceid);
 
   protected slots:
-    void cancelScan(void);
+    void CancelScan(void) { Teardown(); }
     void scanComplete(void);
     void transportScanComplete(void);
     void updateText(const QString& status);
@@ -80,24 +96,22 @@ class ScanWizardScanner : public VerticalConfigurationGroup
     void serviceScanPctComplete(int pct);
 
   protected:
-    void ImportDVBUtils(uint sourceid, int cardtype, const QString &file);
-    void ImportM3U(uint cardid, uint sourceid);
-    void PreScanCommon(uint cardid, uint sourceid);
-    void TunedScanCommon(uint cardid, uint sourceid, bool ok);
-    void ScanAnalog(uint cardid, uint sourceid);
+    ~ScanWizardScanner() { Teardown(); }
+    void Teardown(void);
+
+    void PreScanCommon(int scantype, uint parent_cardid, uint child_cardid,
+                       const QString &inputname,
+                       uint sourceid, bool do_ignore_signal_timeout);
 
     void dvbLock(int);
     void dvbSNR(int);
     void dvbSignalStrength(int);
-    void finish(void);
-    void HandleTuneComplete(void);
     void customEvent(QCustomEvent *e);
 
-    DVBChannel *GetDVBChannel(void);
-    Channel    *GetChannel(void);
+  public:
+    static QString kTitle;
 
   private:
-    ScanWizard        *parent;
     LogList           *log;
     ChannelBase       *channel;
     ScanProgressPopup *popupProgress;
@@ -106,14 +120,11 @@ class ScanWizardScanner : public VerticalConfigurationGroup
     AnalogScan        *analogScanner;
     IPTVChannelFetcher *freeboxScanner;
 
-    int                nScanType;
-    int                nMultiplexToTuneTo;
     uint               nVideoSource;
 
     // tranport info
     uint               frequency;
     QString            modulation;
-    QMap<QString,QString> startChan;
 
     // dvb-utils imported channels
     DTVChannelList channels;
