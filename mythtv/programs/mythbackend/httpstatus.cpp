@@ -916,10 +916,14 @@ void HttpStatus::GetRecording( HttpWorkerThread *pThread,
 
     ThreadData *pData = (ThreadData *)pThread->GetWorkerData();
 
-    if ((pData != NULL) && (pData->m_eType == ThreadData::DT_Recording))
-    {
-        if (pData->IsSameRecording( sChanId, sStartTime ))
-           pRequest->m_sFileName = pData->m_sFileName;
+    if (pData != NULL)
+    {   
+        if ((pData->m_eType == ThreadData::DT_Recording) && 
+               pData->IsSameRecording( sChanId, sStartTime ))
+        {   
+            pRequest->m_sFileName = pData->m_sFileName;
+
+        }
         else
            pData = NULL;
     }
@@ -1012,10 +1016,14 @@ void HttpStatus::GetMusic( HttpWorkerThread *pThread,
 
     ThreadData *pData = (ThreadData *)pThread->GetWorkerData();
 
-    if ((pData != NULL) && (pData->m_eType == ThreadData::DT_Music))
-    {
-        if (pData->m_nTrackNumber == nTrack )
-           pRequest->m_sFileName = pData->m_sFileName;
+    if (pData != NULL)
+    {   
+        if ((pData->m_eType == ThreadData::DT_Music) && 
+               (pData->m_nTrackNumber == nTrack))
+        {   
+            pRequest->m_sFileName = pData->m_sFileName;
+
+        }
         else
            pData = NULL;
     }
@@ -1087,13 +1095,15 @@ void HttpStatus::GetVideo( HttpWorkerThread *pThread,
 
     ThreadData *pData = (ThreadData *)pThread->GetWorkerData();
 
-    if ((pData != NULL) && (pData->m_eType == ThreadData::DT_Video))
+    if (pData != NULL)
     {
-        if (pData->m_sVideoID == sId )
-           pRequest->m_sFileName = pData->m_sFileName;
+        if ((pData->m_eType == ThreadData::DT_Video) && (pData->m_sVideoID == sId ))
+        {
+            pRequest->m_sFileName = pData->m_sFileName;
+
+        }
         else
            pData = NULL;
-
     }
 
     // ----------------------------------------------------------------------

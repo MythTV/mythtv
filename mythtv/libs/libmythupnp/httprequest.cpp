@@ -173,6 +173,10 @@ long HTTPRequest::SendResponse( void )
 
             // Write out Header.
 
+            VERBOSE(VB_UPNP,QString("HTTPRequest::SendResponse :%1 -> %2:")
+                            .arg(GetResponseStatus())
+                            .arg(GetPeerAddress()));
+
             nBytes = WriteBlock( sHeader.data(), sHeader.length() );
 
             break;
@@ -239,7 +243,9 @@ long HTTPRequest::SendResponseFile( QString sFileName )
                                                               .arg( llStart )
                                                               .arg( llEnd   )
                                                               .arg( llSize  );
-                llSize = (llEnd - llStart) + 1;
+                //llSize = (llEnd - llStart) + 1;
+                llSize = (llEnd - llStart);
+
             }
         }
         
@@ -1253,5 +1259,14 @@ Q_LONG BufferedSocketDeviceRequest::WriteBlock( char *pData, Q_ULONG nLen )
 QString BufferedSocketDeviceRequest::GetHostAddress()
 {
     return( m_pSocket->SocketDevice()->address().toString() );    
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
+QString BufferedSocketDeviceRequest::GetPeerAddress()
+{
+    return( m_pSocket->SocketDevice()->peerAddress().toString() );
 }
 

@@ -190,6 +190,7 @@ class HTTPRequest
         virtual Q_LONG  ReadBlock       ( char *pData, Q_ULONG nMaxLen, int msecs = 0 ) = 0;
         virtual Q_LONG  WriteBlock      ( char *pData, Q_ULONG nLen    ) = 0;
         virtual QString GetHostAddress  () = 0;
+        virtual QString GetPeerAddress  () = 0;
         virtual void    Flush           () = 0;
         virtual bool    IsValid         () = 0;
         virtual int     getSocketHandle () = 0;
@@ -279,6 +280,7 @@ class BufferedSocketDeviceRequest : public HTTPRequest
         virtual Q_LONG  ReadBlock       ( char *pData, Q_ULONG nMaxLen, int msecs = 0  );
         virtual Q_LONG  WriteBlock      ( char *pData, Q_ULONG nLen    );
         virtual QString GetHostAddress  ();
+        virtual QString GetPeerAddress  ();
         virtual void    Flush           () { m_pSocket->Flush(); }
         virtual bool    IsValid         () {return( m_pSocket->IsValid() ); }
         virtual int     getSocketHandle () {return( m_pSocket->socket() ); }
