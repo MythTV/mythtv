@@ -1852,6 +1852,83 @@ long long ProgramInfo::GetBookmark(void) const
     return pos;
 }
 
+/** \brief Queries "dvdbookmark" table for bookmarking DVD
+ * serial number. Deletes old dvd bookmarks if "delete" is true;
+ *
+ * \return list containing title, audio track, subtitle, framenum
+ */
+QStringList ProgramInfo::GetDVDBookmark(QString serialid, bool delbookmark) const
+{
+    QStringList fields = QStringList();
+    MSqlQuery query(MSqlQuery::InitCon());
+
+    if (!ignoreBookmark)
+    {
+        query.prepare(" SELECT title, framenum, audionum, subtitlenum "
+                        " FROM dvdbookmark "
+                        " WHERE serialid = ? ");
+        query.addBindValue(serialid.utf8());
+
+        if (query.exec() && query.isActive() && query.size() > 0)
+        {
+            query.next();
+            for(int i = 0; i < 4; i++)
+                fields.append(query.value(i).toString());
+        }
+    }
+
+    if (delbookmark)
+    {
+        int days = -(gContext->GetNumSetting("DVDBookmarkDays", 10));
+        QDateTime removedate = mythCurrentDateTime().addDays(days);
+        query.prepare(" DELETE from dvdbookmark "
+                        " WHERE timestamp < ? ");
+        query.addBindValue(removedate.toString(Qt::ISODate));
+
+        if (!query.exec() || !query.isActive())
+            MythContext::DBError("GetDVDBookmark deleting old entries", query);
+    }
+
+    return fields;
+}
+
+void ProgramInfo::SetDVDBookmark(QStringList fields) const
+{
+    QStringList::Iterator it = fields.begin();
+    MSqlQuery query(MSqlQuery::InitCon());
+
+    QString serialid    = *(it);
+    QString name        = *(++it);
+    QString title       = *(++it);
+    QString audionum    = *(++it);
+    QString subtitlenum = *(++it);
+    QString frame       = *(++it);
+
+    query.prepare("INSERT IGNORE INTO dvdbookmark "
+                    " (serialid, name)"
+                    " VALUES ( :SERIALID, :NAME );");
+    query.bindValue(":SERIALID", serialid.utf8());
+    query.bindValue(":NAME", name.utf8());
+
+    if (!query.exec() || !query.isActive())
+        MythContext::DBError("SetDVDBookmark inserting", query);
+
+    query.prepare(" UPDATE dvdbookmark "
+                    " SET title       = ? , "
+                    "     audionum    = ? , "
+                    "     subtitlenum = ? , "
+                    "     framenum    = ? , "
+                    "     timestamp   = NOW() "
+                    " WHERE serialid = ? ;");
+    query.addBindValue(title.utf8());
+    query.addBindValue(audionum.utf8());
+    query.addBindValue(subtitlenum.utf8());
+    query.addBindValue(frame.utf8());
+    query.addBindValue(serialid.utf8());
+
+    if (!query.exec() || !query.isActive())
+        MythContext::DBError("SetDVDBookmark updating", query);
+}
 /** \fn ProgramInfo::SetWatchedFlag(bool) const
  *  \brief Set "watched" field in "recorded" table to "watchedFlag".
  *  \param watchedFlag value to set watched field to.

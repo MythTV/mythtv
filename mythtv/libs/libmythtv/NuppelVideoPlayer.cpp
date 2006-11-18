@@ -1050,9 +1050,11 @@ int NuppelVideoPlayer::OpenFile(bool skipDsp, uint retries,
         }
     }
   
-    // need this til proper DVD bookmarking is implemented
-    if (!ringBuffer->isDVD())
-        bookmarkseek = GetBookmark();
+
+    if (ringBuffer->isDVD())
+        ringBuffer->DVD()->JumpToTitle(false);
+
+    bookmarkseek = GetBookmark();
 
     return IsErrored() ? -1 : 0;
 }
@@ -3132,13 +3134,20 @@ void NuppelVideoPlayer::StartPlaying(void)
         GetDecoder()->setExactSeeks(false);
 
         fftime = bookmarkseek;
+        if (ringBuffer->isDVD())
+            GetDVDBookmark();
         DoFastForward();
         fftime = 0;
 
         GetDecoder()->setExactSeeks(seeks);
 
         if (gContext->GetNumSetting("ClearSavedPosition", 1))
-            m_playbackinfo->SetBookmark(0);
+        {
+            if (ringBuffer->isDVD())
+                SetDVDBookmark(0);
+            else
+                m_playbackinfo->SetBookmark(0);
+        }
     }
 
     commBreakMapLock.lock();
@@ -3692,6 +3701,13 @@ void NuppelVideoPlayer::SetBookmark(void)
     if (!m_playbackinfo || !osd)
         return;
 
+    if (ringBuffer->isDVD())
+    {
+        if (ringBuffer->InDVDMenuOrStillFrame())
+            SetDVDBookmark(0);
+        else
+            SetDVDBookmark(framesPlayed);
+    }
     m_playbackinfo->SetBookmark(framesPlayed);
     osd->SetSettingsText(QObject::tr("Position Saved"), 1);
 
@@ -3705,7 +3721,10 @@ void NuppelVideoPlayer::ClearBookmark(void)
     if (!m_playbackinfo || !osd)
         return;
 
-    m_playbackinfo->SetBookmark(0);
+    if (ringBuffer->isDVD())
+        SetDVDBookmark(0);
+    else
+        m_playbackinfo->SetBookmark(0);
     osd->SetSettingsText(QObject::tr("Position Cleared"), 1);
 }
 
@@ -3713,6 +3732,9 @@ long long NuppelVideoPlayer::GetBookmark(void) const
 {
     if (!m_playbackinfo)
         return 0;
+
+    if (ringBuffer->isDVD())
+        return GetDVDBookmark();
 
     return m_playbackinfo->GetBookmark();
 }
@@ -6513,6 +6535,82 @@ void NuppelVideoPlayer::GoToDVDProgram(bool direction)
         ringBuffer->DVD()->GoToPreviousProgram();
     else
         ringBuffer->DVD()->GoToNextProgram();
+}
+
+long long NuppelVideoPlayer::GetDVDBookmark(void) const
+{
+    if (!ringBuffer->isDVD())
+        return 0;
+
+    QStringList dvdbookmark = QStringList();
+    QString name;
+    QString serialid;
+    long long frames = 0;
+    bool delbookmark, jumptotitle;
+    delbookmark = jumptotitle = ringBuffer->DVD()->JumpToTitle();
+    if (m_playbackinfo)
+    {
+        if(!ringBuffer->DVD()->GetNameAndSerialNum(name, serialid))
+            return 0;
+        dvdbookmark = m_playbackinfo->GetDVDBookmark(serialid,
+                                                        !delbookmark);
+        if (!dvdbookmark.empty())
+        {
+            QStringList::Iterator it = dvdbookmark.begin();
+            int title = atoi((*it).ascii());
+            frames = (long long)(atoi((*++it).ascii()) & 0xffffffffLL);
+            if (jumptotitle)
+            {
+                ringBuffer->DVD()->PlayTitleAndPart(title, 1);
+                int audiotrack = atoi((*++it).ascii());
+                int subtitletrack = atoi((*++it).ascii());
+                ringBuffer->DVD()->SetTrack(kTrackTypeAudio, audiotrack);
+                ringBuffer->DVD()->SetTrack(kTrackTypeSubtitle, subtitletrack);
+            }
+            ringBuffer->DVD()->JumpToTitle(true);
+        }
+    }
+    return frames;
+}
+
+void NuppelVideoPlayer::SetDVDBookmark(long long frames)
+{
+    if (!ringBuffer->isDVD())
+        return;
+
+    long long framenum = frames;
+    QStringList fields;
+    QString name;
+    QString serialid;
+    int title = 0;
+    int part;
+    int audiotrack = -1;
+    int subtitletrack = -1;
+    if (!ringBuffer->DVD()->GetNameAndSerialNum(name, serialid))
+        return;
+
+    if (!ringBuffer->InDVDMenuOrStillFrame() &&
+            ringBuffer->DVD()->GetTotalTimeOfTitle() > 120 &&
+            frames > 0)
+    {
+        audiotrack = GetTrack(kTrackTypeAudio);
+        if (GetCaptionMode() == kDisplayAVSubtitle)
+            subtitletrack = GetTrack(kTrackTypeSubtitle);
+        ringBuffer->DVD()->GetPartAndTitle(part, title);
+    }
+    else
+        framenum = 0;
+    
+    if (m_playbackinfo)
+    {
+        fields += serialid;
+        fields += name;
+        fields += QString("%1").arg(title);
+        fields += QString("%1").arg(audiotrack);
+        fields += QString("%1").arg(subtitletrack);
+        fields += QString("%1").arg(framenum);
+        m_playbackinfo->SetDVDBookmark(fields);
+    }
 }
 
 // EIA-708 caption support -- begin

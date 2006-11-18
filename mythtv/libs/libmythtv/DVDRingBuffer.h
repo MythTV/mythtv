@@ -58,9 +58,7 @@ class DVDRingBufferPriv
     long long GetMenuPktPts(void) { return menupktpts; }
     bool DecodeSubtitles(AVSubtitle * sub, int * gotSubtitles, 
                          const uint8_t * buf, int buf_size);
-    void GetNameAndSerialNum(const char **_name, const char **_serial)
-        { (*_name) = dvdname; (*_serial) = serialnumber; }
-
+    bool GetNameAndSerialNum(QString& _name, QString& _serialnum);
     bool JumpToTitle(void) { return jumptotitle; }
     double GetFrameRate(void);
     bool StartOfTitle(void) { return (part == 0); }
@@ -152,12 +150,12 @@ class DVDRingBufferPriv
     int8_t         curSubtitleTrack;
     bool           autoselectaudio;
     bool           autoselectsubtitle;
-    const char     *dvdname;
-    const char     *serialnumber;
     bool           jumptotitle;
     bool           repeatseek;
     long long      seekpos;
     int            seekwhence;
+    QString        dvdname;
+    QString        serialnumber;
 
     NuppelVideoPlayer *parent;
 

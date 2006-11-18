@@ -41,7 +41,8 @@ DVDRingBufferPriv::DVDRingBufferPriv()
       curSubtitleTrack(0), autoselectaudio(true),
       autoselectsubtitle(true), 
       jumptotitle(true), repeatseek(false),
-      seekpos(0), seekwhence(0),
+      seekpos(0), seekwhence(0), 
+      dvdname(NULL), serialnumber(NULL),
       parent(0)
 {
     memset(&dvdMenuButton, 0, sizeof(AVSubtitle));
@@ -152,10 +153,14 @@ bool DVDRingBufferPriv::OpenFile(const QString &filename)
                         .arg(curTitle).arg(titleParts));
             }
         }
-        
+       
+        const char *name;
+        const char *serialnum;
         dvdnav_current_title_info(dvdnav, &title, &part);
-        dvdnav_get_title_string(dvdnav, &dvdname);
-        dvdnav_get_serial_number(dvdnav, &serialnumber);
+        dvdnav_get_title_string(dvdnav, &name);
+        dvdnav_get_serial_number(dvdnav, &serialnum);
+        dvdname = QString(name);
+        serialnumber = QString(serialnum);
         return true;
     }
 }
@@ -994,6 +999,18 @@ void DVDRingBufferPriv::ClearSubtitlesOSD(void)
         parent->GetOSD()->HideSet("subtitles");
         parent->GetOSD()->ClearAll("subtitles");
     }
+}
+
+/** \brief Get the dvd title and serial num
+ *  \return false if libdvdnav is unable to return a title and serial num
+ */
+bool DVDRingBufferPriv::GetNameAndSerialNum(QString& _name, QString& _serial)
+{
+    (_name)    = dvdname; 
+    (_serial)  = serialnumber;
+    if (dvdname == "" && serialnumber == "")
+        return false;
+    return true;
 }
 
 /** \fn DVDRingBufferPriv::GetFrameRate()

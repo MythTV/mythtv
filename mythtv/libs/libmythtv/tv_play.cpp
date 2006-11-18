@@ -2673,7 +2673,7 @@ void TV::ProcessKeypress(QKeyEvent *e)
             else
                 DoSeek(jumptime * 60, tr("Jump Ahead"));
         }
-        else if (action == "JUMPBKMRK" && !activerbuffer->isDVD())
+        else if (action == "JUMPBKMRK")
         {
             int bookmark = activenvp->GetBookmark();
             if (bookmark > frameRate)
@@ -2905,6 +2905,9 @@ void TV::ProcessKeypress(QKeyEvent *e)
             {
                 if (!was_doing_ff_rew)
                 {
+                    if (prbuffer->isDVD())
+                        prbuffer->DVD()->JumpToTitle(false);
+
                     if (gContext->GetNumSetting("AltClearSavedPosition", 1)
                         && nvp->GetBookmark())
                         nvp->ClearBookmark(); 
@@ -7344,21 +7347,37 @@ TV::PromptStopWatchingRecording(void)
     dialogboxTimer.restart();
     QString message;
     QStringList options;
-    if (playbackinfo && !playbackinfo->isVideo)
+    bool allowbookmark = true;
+    bool allowdvdbookmark = gContext->GetNumSetting("EnableDVDBookmark", 0);
+    if (prbuffer->isDVD())
     {
-        message = tr("You are exiting this recording");
+        if (!allowdvdbookmark || 
+            prbuffer->DVD()->GetTotalTimeOfTitle() < 120)
+        {
+            allowbookmark = false;
+        }
+    }
+    else if (playbackinfo->isVideo)
+        allowbookmark = false;
+    
+    if (playbackinfo && allowbookmark)
+    {
+        QString videotype = (prbuffer->isDVD()) ? "DVD":"recording";
+        message = tr("You are exiting this %1").arg(videotype);
 
         options += tr("Save this position and go to the menu");
         options += tr("Do not save, just exit to the menu");
         options += tr("Keep watching");
-        options += tr("Delete this recording");
+        if (!prbuffer->isDVD())
+            options += tr("Delete this recording");
 
         dialogname = "exitplayoptions";
     }
-    else if (playbackinfo && playbackinfo->isVideo)
+    else
     {
-        message = tr("You are exiting this Video/DVD");
 
+        message = tr("You are exiting this Video/DVD");
+       
         options += tr("Keep Watching");
         options += tr("Exit Video");
         

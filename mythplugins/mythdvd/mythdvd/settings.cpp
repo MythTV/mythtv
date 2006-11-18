@@ -57,6 +57,53 @@ static HostComboBox *SetOnInsertDVD()
     return gc;
 }
 
+static HostSlider *DVDBookmarkDays()
+{
+    HostSlider *gs = new HostSlider("DVDBookmarkDays",5, 50, 5);
+    gs->setLabel(QObject::tr("Remove DVD Bookmarks Older then (days)"));
+    gs->setValue(10);
+    gs->setHelpText((QObject::tr("Delete DVD Bookmarks that are older then the "
+                                 "Number of days specified")));
+    return gs;
+}
+
+static HostCheckBox *EnableDVDBookmark()
+{
+    HostCheckBox *gc = new HostCheckBox("EnableDVDBookmark");
+    gc->setLabel(QObject::tr("Enable DVD Bookmark Support"));
+    gc->setValue(false);
+    gc->setHelpText(QObject::tr("Enable DVD Bookmark Support"));
+    return gc;
+}
+
+static HostCheckBox *DVDBookmarkPrompt()
+{
+    HostCheckBox *gc = new HostCheckBox("DVDBookmarkPrompt");
+    gc->setLabel(QObject::tr("DVD Bookmark Prompt"));
+    gc->setValue(false);
+    gc->setHelpText(QObject::tr("Display a prompt to choose whether "
+                "to play the DVD from the beginning or from the bookmark"));
+    return gc;
+}                
+
+class DVDBookmarkSettings: public TriggeredConfigurationGroup
+{
+    public:
+        DVDBookmarkSettings():
+            TriggeredConfigurationGroup(false, false, true, true)
+        {
+            Setting* dvdbookmarkSettings = EnableDVDBookmark();
+            addChild(dvdbookmarkSettings);
+            setTrigger(dvdbookmarkSettings);
+
+            ConfigurationGroup *settings = new VerticalConfigurationGroup(false);
+            settings->addChild(DVDBookmarkPrompt());
+            settings->addChild(DVDBookmarkDays());
+            addTarget("1", settings);
+            addTarget("0", new VerticalConfigurationGroup(true));
+        };
+};
+
 DVDGeneralSettings::DVDGeneralSettings()
 {
     VerticalConfigurationGroup* general = new VerticalConfigurationGroup(false);
@@ -64,6 +111,7 @@ DVDGeneralSettings::DVDGeneralSettings()
     general->addChild(SetDVDDevice());
     general->addChild(SetVCDDevice());
     general->addChild(SetOnInsertDVD());
+    general->addChild(new DVDBookmarkSettings());
     addChild(general);
 }
 

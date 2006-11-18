@@ -30,6 +30,7 @@ using namespace std;
 #include "profilegroup.h"
 #include "playgroup.h"
 #include "networkcontrol.h"
+#include "DVDRingBuffer.h"
 
 #include "exitcodes.h"
 #include "programinfo.h"
@@ -553,7 +554,50 @@ int internal_play_media(const QString &mrl, const QString &plot,
     
     pginfo->title = title;
 
-   
+    if (pginfo->pathname.startsWith("dvd:"))
+    {
+        bool allowdvdbookmark = gContext->GetNumSetting("EnableDVDBookmark", 0);
+        pginfo->setIgnoreBookmark(!allowdvdbookmark);
+        if (allowdvdbookmark && 
+            gContext->GetNumSetting("DVDBookmarkPrompt", 0))
+        {
+            RingBuffer *tmprbuf = new RingBuffer(pginfo->pathname, false);
+            QString name;
+            QString serialid;
+            if (tmprbuf->isDVD() &&
+                 tmprbuf->DVD()->GetNameAndSerialNum(name, serialid))
+            {
+                QStringList fields = pginfo->GetDVDBookmark(serialid, false);
+                if (!fields.empty())
+                {
+                    QStringList::Iterator it = fields.begin();
+                    long long pos = (long long)(atoi((*++it).ascii()) & 0xffffffffLL);
+                    if (pos > 0)
+                    {
+                        QString msg = QString("DVD contains a bookmark");
+                        QString button1msg = QString("Play from bookmark");
+                        QString button2msg = QString("Play from beginning");
+        
+                        int ret = MythPopupBox::show2ButtonPopup(gContext->GetMainWindow(),
+                                                            "", msg,
+                                                            button1msg,
+                                                            button2msg,
+                                                            1);
+                        if (ret == 1)
+                            pginfo->setIgnoreBookmark(true);
+                        else if (ret == -1)
+                        {
+                            delete tmprbuf;
+                            delete pginfo;
+                            return res;
+                        }
+                    }
+                }
+            }
+            delete tmprbuf;
+        }
+    }
+
     TV::StartTV(pginfo);
     
     res = 0;

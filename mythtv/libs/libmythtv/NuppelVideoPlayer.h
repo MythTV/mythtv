@@ -498,6 +498,8 @@ class MPUBLIC NuppelVideoPlayer : public CC608Reader, public CC708Reader
 
     // Private DVD stuff
     void DisplayDVDButton(void);
+    long long GetDVDBookmark(void) const;
+    void SetDVDBookmark(long long frames);
 
   private:
     VideoOutputType forceVideoOutput;

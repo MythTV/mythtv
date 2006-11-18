@@ -190,6 +190,7 @@ class MPUBLIC ProgramInfo
     // DB gets
     long long GetFilesize(void);
     long long GetBookmark(void) const;
+    QStringList GetDVDBookmark(QString serialid, bool delbookmark) const;
     bool IsEditing(void) const;
     bool IsCommFlagged(void) const;
     bool IsInUse(QString &byWho) const;
@@ -205,6 +206,7 @@ class MPUBLIC ProgramInfo
     // DB sets
     void SetFilesize(long long fsize);
     void SetBookmark(long long pos) const;
+    void SetDVDBookmark(QStringList fields) const;
     void SetEditing(bool edit) const;
     void SetTranscoded(int transFlag) const;
     void SetWatchedFlag(bool watchedFlag) const;
