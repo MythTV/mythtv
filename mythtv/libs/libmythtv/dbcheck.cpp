@@ -2662,7 +2662,7 @@ static bool doUpgradeTVDatabaseSchema(void)
 "   subtitlenum tinyint(4) NOT NULL default -1,"
 "   framenum bigint(20) NOT NULL default 0,"
 "   timestamp timestamp NOT NULL default "
-"   CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,"
+"   CURRENT_TIMESTAMP,"
 "   PRIMARY KEY (serialid));",
 "",
 };
