@@ -487,11 +487,6 @@ bool Channel::SetChannelByString(const QString &channum)
     // Set NTSC, PAL, ATSC, etc.
     SetFormat(tvformat);
 
-    // Setup filters & recording picture attributes for framegrabing recorders.
-    if (pParent)
-        pParent->SetVideoFiltersForChannel(GetCurrentSourceID(), channum);
-    InitPictureAttributes();
-
     // Tune to proper frequency
     if ((*it)->externalChanger.isEmpty())
     {
@@ -513,6 +508,12 @@ bool Channel::SetChannelByString(const QString &channum)
 
     // Set the current channum to the new channel's channum
     curchannelname = QDeepCopy<QString>(channum);
+
+    // Setup filters & recording picture attributes for framegrabing recorders
+    // now that the new curchannelname has been established.
+    if (pParent)
+        pParent->SetVideoFiltersForChannel(GetCurrentSourceID(), channum);
+    InitPictureAttributes();
 
     // Set the major and minor channel for any additional multiplex tuning
     if (atsc_major || atsc_minor)
@@ -1049,8 +1050,9 @@ bool Channel::InitPictureAttribute(const QString db_col_name)
         ctrl.value = max(value1, (int)qctrl.minimum);
 
 #if DEBUG_ATTRIB
-        VERBOSE(VB_CHANNEL, loc + QString("\n\t\t\t[%1,%2] dflt(%3, %4, %5)")
-                .arg(qctrl.minimum, 5).arg(qctrl.maximum, 5)
+        VERBOSE(VB_CHANNEL, loc + QString(" %1\n\t\t\t"
+                                          "[%2,%3] dflt(%4, %5, %6)")
+                .arg(value0).arg(qctrl.minimum, 5).arg(qctrl.maximum, 5)
                 .arg(qctrl.default_value, 5).arg(dfl, 4, 'f', 2)
                 .arg(norm_dfl));
 #endif
