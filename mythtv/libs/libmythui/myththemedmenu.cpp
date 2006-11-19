@@ -1868,12 +1868,14 @@ bool MythThemedMenuPrivate::keyHandler(QStringList &actions,
             }
             lastbutton = NULL;
         }
+#ifndef _WIN32
         else if (action == "EJECT")
         {
             MediaMonitor *mon = MediaMonitor::GetMediaMonitor();
             if (mon)
                 mon->ChooseAndEjectMedia();
         }
+#endif // !_WIN32
         else
             handled = false;
     }
@@ -2076,12 +2078,14 @@ bool MythThemedMenuPrivate::handleAction(const QString &action)
             wantpop = true;
         }
     }
+#ifndef _WIN32
     else if (action.left(5) == "EJECT")
     {
         MediaMonitor *mon = MediaMonitor::GetMediaMonitor();
         if (mon)
             mon->ChooseAndEjectMedia();
     }
+#endif // !_WIN32
     else if (action.left(5) == "JUMP ")
     {
         QString rest = action.right(action.length() - 5);

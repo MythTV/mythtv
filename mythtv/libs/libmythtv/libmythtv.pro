@@ -40,6 +40,11 @@ isEmpty(QMAKE_EXTENSION_SHLIB) {
 isEmpty(QMAKE_EXTENSION_LIB) {
   QMAKE_EXTENSION_LIB=a
 }
+
+cygwin {
+  QMAKE_EXTENSION_SHLIB=$${QMAKE_EXTENSION_SHLIB}$${QMAKE_EXTENSION_CYGWIN}
+}
+
 TARGETDEPS += ../libmyth/libmyth-$${LIBVERSION}.$${QMAKE_EXTENSION_SHLIB}
 TARGETDEPS += ../libavutil/libmythavutil-$${LIBVERSION}.$${QMAKE_EXTENSION_SHLIB}
 TARGETDEPS += ../libavcodec/libmythavcodec-$${LIBVERSION}.$${QMAKE_EXTENSION_SHLIB}
@@ -88,6 +93,9 @@ macx {
 
     QMAKE_LFLAGS_SHLIB += -seg1addr 0xC9000000
 }
+
+cygwin:QMAKE_LFLAGS_SHLIB += -Wl,--noinhibit-exec
+cygwin:DEFINES += _WIN32
 
 # Enable Linux Open Sound System support
 using_oss:DEFINES += USING_OSS

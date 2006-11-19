@@ -7,6 +7,14 @@ isEmpty( PREFIX ) {
 LIBVERSION = 0.20
 VERSION = 0.20.0
 
+# if CYGWIN compile, set up flag in CONFIG 
+contains(TARGET_OS, CYGWIN) { 
+    CONFIG += cygwin 
+    QMAKE_EXTENSION_SHLIB=dll
+    QMAKE_EXTENSION_CYGWIN = .a
+    DEFINES += CONFIG_CYGWIN
+}
+
 # Die on the (common) case where OS X users inadvertently use Fink's
 # Qt/X11 install instead of Qt/Mac. '
 contains(CONFIG_DARWIN, yes) {

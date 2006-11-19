@@ -1,6 +1,8 @@
 #ifndef MYTH_MEDIA_MONITOR_H
 #define MYTH_MEDIA_MONITOR_H
 
+#ifndef _WIN32
+
 #include <fstab.h>
 
 #include <qvaluelist.h>
@@ -105,4 +107,6 @@ class MPUBLIC MediaMonitor : public QObject
     static MediaMonitor         *c_monitor;
 };
 
-#endif
+#endif // !_WIN32
+
+#endif // MYTH_MEDIA_MONITOR_H

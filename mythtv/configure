@@ -2742,10 +2742,10 @@ fi
   echo "Mac acceleration $dvdv"
   echo "OpenGL vsync     $opengl_vsync"
   echo "DirectFB         $direct_fb"
-  if test x"$mingw32" = x"yes" -o x"$cygwin" = x"yes" ; then
-  echo "DirectX          $direct_x"
-fi
-echo
+  if test x"$mingw32" = x"yes" -o x"$targetos" = x"CYGWIN" ; then
+    echo "DirectX          $direct_x"
+  fi
+  echo
 fi
 
 echo "# Misc Features"
@@ -3187,6 +3187,21 @@ fi
 if test "$x264" = "yes" ; then
   echo "#define CONFIG_X264 1" >> $TMPH
   echo "CONFIG_X264=yes" >> $MYTH_CONFIG_MAK
+fi
+
+if test x"$targetos" = x"CYGWIN" ; then
+  echo "#define CONFIG_CYGWIN 1" >> $TMPH
+  echo "#ifndef llrint" >> $TMPH
+  echo "#define llrint llrint  // make sure not to define twice" >> $TMPH
+  echo "static inline long long int llrint (double x)" >> $TMPH
+  echo "{" >> $TMPH
+  echo "    long long int llrintres;" >> $TMPH
+  echo "    asm" >> $TMPH
+  echo "    (\"fistpll %0\"" >> $TMPH
+  echo "    : \"=m\" (llrintres) : \"t\" (x) : \"st\");" >> $TMPH
+  echo "    return llrintres;" >> $TMPH
+  echo "}" >> $TMPH
+  echo "#endif" >> $TMPH
 fi
 
 if test "$mingw32" = "yes" ; then

@@ -18,7 +18,7 @@
 #include <qfileinfo.h>
 
 #include "mythconfig.h"
-#ifdef CONFIG_DARWIN
+#if defined CONFIG_DARWIN || defined CONFIG_CYGWIN
 #include "darwin-sendfile.h"
 #else
 #include <sys/sendfile.h>

@@ -561,6 +561,9 @@ set_decode_parms(struct vbi *vbi, struct v4l2_vbi_format *p)
 static int
 setup_dev(struct vbi *vbi)
 {
+#ifdef _WIN32
+    (void) vbi;
+#else // if !_WIN32
     struct v4l2_format v4l2_format[1];
     struct v4l2_vbi_format *vbifmt = &v4l2_format->fmt.vbi;
 
@@ -613,6 +616,7 @@ setup_dev(struct vbi *vbi)
             error("malloc refused in setup_dev()\n");
     }
 
+#endif // !_WIN32
     return 0;
 }
 

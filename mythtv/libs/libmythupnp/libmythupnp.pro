@@ -42,6 +42,10 @@ isEmpty(QMAKE_EXTENSION_LIB) {
   QMAKE_EXTENSION_LIB=a
 }
 
+cygwin {
+  QMAKE_EXTENSION_SHLIB=$${QMAKE_EXTENSION_SHLIB}$${QMAKE_EXTENSION_CYGWIN}
+}
+
 TARGETDEPS += ../libmyth/libmyth-$${LIBVERSION}.$${QMAKE_EXTENSION_SHLIB}
 TARGETDEPS += ../libmythtv/libmythtv-$${LIBVERSION}.$${QMAKE_EXTENSION_SHLIB}
 TARGETDEPS += ../libavcodec/libmythavcodec-$${LIBVERSION}.$${QMAKE_EXTENSION_SHLIB}
@@ -54,6 +58,9 @@ inc.files += upnpdevice.h upnptasknotify.h upnptasksearch.h threadpool.h upnpglo
 inc.files += httpserver.h httpstatus.h upnpcds.h upnpcdsobjects.h
 
 INSTALLS += inc
+
+cygwin:HEADERS += darwin-sendfile.h
+cygwin:SOURCES += darwin-sendfile.c
 
 macx {
     HEADERS += darwin-sendfile.h

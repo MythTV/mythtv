@@ -71,6 +71,9 @@ extern "C" {
 #include "videoout_dx.h"
 #undef GetFreeSpace
 #undef GetFileSize
+#ifdef CONFIG_CYGWIN
+#undef DialogBox
+#endif
 #endif
 
 #ifndef HAVE_ROUND
@@ -5522,7 +5525,12 @@ void NuppelVideoPlayer::calcSliderPos(struct StatusPosInfo &posInfo,
     if (ringBuffer->isDVD())
     {
         if (!ringBuffer->DVD()->IsInMenu())
+#ifndef CONFIG_CYGWIN
             secsplayed = ringBuffer->DVD()->GetCurrentTime();
+#else
+            // DVD playing non-functional under windows for now
+            secsplayed = 0;
+#endif
     }
     else
         secsplayed = ((float)framesPlayed / video_frame_rate);

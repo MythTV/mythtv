@@ -71,3 +71,4 @@ using_lirc {
     DEFINES += USE_LIRC
 }
 
+cygwin:DEFINES += _WIN32

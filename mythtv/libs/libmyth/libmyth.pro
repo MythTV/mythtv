@@ -61,13 +61,16 @@ inc.files += exitcodes.h mythconfig.h mythconfig.mak virtualkeyboard.h
 inc.files += mythevent.h mythobservable.h mythsocket.h
 inc.files += mythexp.h mythpluginapi.h
 
+cygwin:QMAKE_LFLAGS_SHLIB += -Wl,--noinhibit-exec
+cygwin:DEFINES += _WIN32
+
 using_oss {
     DEFINES += USING_OSS
     SOURCES += audiooutputoss.cpp
     HEADERS += audiooutputoss.h
 }
 
-unix {
+unix:!cygwin {
     SOURCES += mythhdd.cpp mythcdrom.cpp mythmediamonitor.cpp
     HEADERS += mythhdd.h mythcdrom.h   mythmediamonitor.h
     inc.files += mythhdd.h mythcdrom.h mythmediamonitor.h

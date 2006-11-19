@@ -1291,6 +1291,10 @@ void StatusBox::doMachineStatus()
     // weighted average loads
     contentLines[count].append(".   " + QObject::tr("Load") + ": ");
 
+#ifdef _WIN32
+    contentLines[count].append(
+        QObject::tr("unknown") + " - getloadavg() " + QObject::tr("failed"));
+#else // if !_WIN32
     double loads[3];
     if (getloadavg(loads,3) == -1)
         contentLines[count].append(QObject::tr("unknown") +
@@ -1302,6 +1306,8 @@ void StatusBox::doMachineStatus()
         sprintf(buff, "%0.2lf, %0.2lf, %0.2lf", loads[0], loads[1], loads[2]);
         contentLines[count].append(QString(buff));
     }
+#endif // _WIN32
+
     detailString += contentLines[count] + "\n";
     count++;
 

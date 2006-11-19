@@ -13,13 +13,17 @@ using namespace std;
 #include <sys/stat.h>
 
 #ifdef linux
-#include <sys/vfs.h>
-#include <sys/statvfs.h>
-#include <sys/sysinfo.h>
+#  include <sys/vfs.h>
+#  include <sys/statvfs.h>
+#  include <sys/sysinfo.h>
 #else
-#include <sys/param.h>
-#include <sys/sysctl.h>
-#include <sys/mount.h>
+#  include <sys/param.h>
+#  include <sys/mount.h>
+#  ifdef CONFIG_CYGWIN
+#    include <sys/statfs.h>
+#  else // if !CONFIG_CYGWIN
+#    include <sys/sysctl.h>
+#  endif // !CONFIG_CYGWIN
 #endif
 
 // Qt headers

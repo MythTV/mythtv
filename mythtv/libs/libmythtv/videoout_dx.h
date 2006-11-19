@@ -9,6 +9,9 @@
 #include <ddraw.h>   // HACK HACK HACK
 
 // MythTV headers
+#ifdef CONFIG_CYGWIN
+#undef max
+#endif
 #include "videooutbase.h"
 
 class VideoOutputDX : public VideoOutput
@@ -40,9 +43,9 @@ class VideoOutputDX : public VideoOutput
 
     void MoveResize(void);
     int  SetPictureAttribute(int attribute, int newValue);
- 
-    float GetDisplayAspect(void) const { return ((float) dispw)/disph; }
-    
+
+    float GetDisplayAspect(void) const;
+
     void WaitForVSync(void);
 
   private:
@@ -73,6 +76,8 @@ class VideoOutputDX : public VideoOutput
     LPDIRECTDRAWSURFACE2 back_surface;
 
     DWORD chroma;
+
+    int XJ_width, XJ_height;
 
     int colorkey;
     int rgb_colorkey;

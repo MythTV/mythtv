@@ -3,11 +3,15 @@
 #include <algorithm>
 using namespace std;
 
+#define _WIN32_WINNT 0x500
 #include "mythcontext.h"
 #include "videoout_dx.h"
 #include "filtermanager.h"
 
 #include "mmsystem.h"
+#ifdef CONFIG_CYGWIN
+#include "tv.h"
+#endif
 
 extern "C" {
 #include "../libavcodec/avcodec.h"
@@ -33,7 +37,7 @@ DEFINE_GUID( IID_IDirectDrawColorControl,     0x4B9F0EE0,0x0D7E,0x11D0,0x9B,0x06
 
 
 VideoOutputDX::VideoOutputDX(void)
-               : VideoOutput()
+    : VideoOutput(), XJ_width(0), XJ_height(0)
 {
     HMODULE user32;
 
@@ -101,6 +105,9 @@ void VideoOutputDX::InputChanged(int width, int height, float aspect,
 {
     VideoOutput::InputChanged(width, height, aspect, av_codec_id);
 
+    XJ_width  = width;
+    XJ_height = height;
+
     vbuffers.DeleteBuffers();
     
     DirectXCloseSurface();
@@ -155,6 +162,9 @@ bool VideoOutputDX::Init(int width, int height, float aspect,
 
     wnd = winid;
 
+    XJ_width  = width;
+    XJ_height = height;
+
     vbuffers.CreateBuffers(XJ_width, XJ_height);
     MoveResize();
 
@@ -182,10 +192,12 @@ bool VideoOutputDX::Init(int width, int height, float aspect,
     InitPictureAttributes();
 
     MoveResize();
-    
+
+#ifndef CONFIG_CYGWIN    
     if (!CreateVideoBuffers())
         return false;
-    
+#endif
+
     pauseFrame.height = vbuffers.GetScratchFrame()->height;
     pauseFrame.width  = vbuffers.GetScratchFrame()->width;
     pauseFrame.bpp    = vbuffers.GetScratchFrame()->bpp;
@@ -335,35 +347,52 @@ void VideoOutputDX::Show(FrameScanType )
         RECT rect_src;
         RECT rect_dest;
         
-        rect_src.left = imgx;
-        rect_src.right = XJ_width;
-        rect_src.top = imgy;
+        rect_src.left   = video_rect.left();
+        rect_src.right  = XJ_width;
+        rect_src.top    = video_rect.top();
         rect_src.bottom = XJ_height;
 
-        if (dispxoff < dispx || dispxoff + dispwoff > dispx + dispw)
+        if (display_video_rect.left()  < display_visible_rect.left() ||
+            display_video_rect.right() > display_visible_rect.right())
         {
-            rect_dest.left = dispx;
-            rect_dest.right = dispx + dispw;
+            rect_dest.left   = display_visible_rect.left();
+            rect_dest.right  = display_visible_rect.right();
 
-            rect_src.left += XJ_width * (dispx - dispxoff) / dispwoff;
-            rect_src.right -= XJ_width * (dispwoff + dispxoff - (dispw + dispx)) / dispwoff;
-        } else {
-            rect_dest.left = dispxoff;
-            rect_dest.right = dispxoff + dispwoff;
+            int diff_x  = display_visible_rect.left();
+            diff_x     -= display_video_rect.left();
+            int diff_w  = display_video_rect.width();
+            diff_x     -= display_visible_rect.width();
+
+            rect_src.left  += (XJ_width * diff_x) / display_video_rect.width();
+            rect_src.right -= ((XJ_width * (diff_w - diff_x)) /
+                               display_video_rect.width());
+        }
+        else
+        {
+            rect_dest.left  = display_video_rect.left();
+            rect_dest.right = display_video_rect.right();
         }
 
-        if (dispyoff < dispy || dispyoff + disphoff > dispy + disph)
+        if (display_video_rect.top()    < display_visible_rect.top() ||
+            display_video_rect.bottom() > display_visible_rect.bottom())
         {
-            rect_dest.top = dispy;
-            rect_dest.bottom = dispy + disph;
+            rect_dest.top    = display_visible_rect.top();
+            rect_dest.bottom = display_visible_rect.bottom();
 
-            rect_src.top += XJ_height * (dispy - dispyoff) / disphoff;
-            rect_src.bottom -= XJ_height * (disphoff + dispyoff - (disph + dispy)) / disphoff;
-        } else {
-            rect_dest.top = dispyoff;
-            rect_dest.bottom = dispyoff + disphoff;
+            int diff_y  = display_visible_rect.top();
+            diff_y     -= display_video_rect.top();
+            int diff_h  = display_video_rect.height();
+            diff_h     -= display_visible_rect.height();
+
+            rect_src.top += (XJ_height * diff_y) / display_video_rect.height();
+            rect_src.bottom -= ((XJ_height * (diff_h - diff_y)) /
+                                display_video_rect.height());
         }
-
+        else
+        {
+            rect_dest.top    = display_video_rect.top();
+            rect_dest.bottom = display_video_rect.bottom();
+        }
 
         /* We ask for the "NOTEARING" option */
         memset(&ddbltfx, 0, sizeof(DDBLTFX));
@@ -488,6 +517,16 @@ int VideoOutputDX::SetPictureAttribute(int attribute, int newValue)
     return newValue;
 }
 
+float VideoOutputDX::GetDisplayAspect(void) const
+{
+    float width  = display_visible_rect.width();
+    float height = display_visible_rect.height();
+
+    if (height <= 0.0001f)
+        return 4.0f / 3.0f;
+
+    return width / height;
+}
 
 static const DWORD pref_chromas[] = {    MAKEFOURCC('I','Y','U','V'),
                                         MAKEFOURCC('I','4','2','0'),
@@ -1312,33 +1351,53 @@ int VideoOutputDX::DirectXUpdateOverlay()
     /* The new window dimensions should already have been computed by the
      * caller of this function */
 
-    rect_src.left = imgx;
-    rect_src.right = imgx + imgw;
-    rect_src.top = imgy;
-    rect_src.bottom = imgy + imgh;
+    rect_src.left   = video_rect.left();
+    rect_src.right  = video_rect.right();
+    rect_src.top    = video_rect.top();
+    rect_src.bottom = video_rect.bottom();
 
-    if (dispxoff < dispx || dispxoff + dispwoff > dispx + dispw)
+    if (display_video_rect.left()  < display_visible_rect.left() ||
+        display_video_rect.right() > display_visible_rect.right())
     {
-        rect_dest.left = dispx;
-        rect_dest.right = dispx + dispw;
-        
-        rect_src.left += XJ_width * (dispx - dispxoff) / dispwoff;
-        rect_src.right -= XJ_width * (dispwoff + dispxoff - (dispw + dispx)) / dispwoff;
-    } else {
-        rect_dest.left = dispxoff;
-        rect_dest.right = dispxoff + dispwoff;
+        rect_dest.left  = display_visible_rect.left();
+        rect_dest.right = display_visible_rect.right();
+
+        int diff_x  = display_visible_rect.left();
+        diff_x     -= display_video_rect.left();
+        int diff_w  = display_video_rect.width();
+        diff_x     -= display_visible_rect.width()
+
+        rect_src.left  += (XJ_width * diff_x) / display_video_rect.width();
+        rect_src.right -= ((XJ_width * (diff_w - diff_x)) /
+                           display_video_rect.width());
+    }
+    else
+    {
+        rect_dest.left  = display_video_rect.left();
+        rect_dest.right = display_video_rect.right();
     }
     
-    if (dispyoff < dispy || dispyoff + disphoff > dispy + disph)
+    if (display_video_rect.top()    < display_visible_rect.top() ||
+        display_video_rect.bottom() > display_visible_rect.bottom())
     {
-        rect_dest.top = dispy;
-        rect_dest.bottom = dispy + disph;
-        
-        rect_src.top += imgw * (dispy - dispyoff) / disphoff;
-        rect_src.bottom -= imgh * (disphoff + dispyoff - (disph + dispy)) / disphoff;
-    } else {
-        rect_dest.top = dispyoff;
-        rect_dest.bottom = dispyoff + disphoff;
+        rect_dest.top    = display_visible_rect.top();
+        rect_dest.bottom = display_visible_rect.bottom();
+
+        int diff_y  = display_visible_rect.top();
+        diff_y     -= display_video_rect.top();
+        int diff_h  = display_video_rect.height();
+        diff_h     -= display_visible_rect.height();
+
+        rect_src.top += ((video_rect.width() * diff_x) /
+                         display_video_rect.height());
+
+        rect_src.bottom -= (video_rect.height() * (diff_h - diff_y) /
+                            display_video_rect.height());
+    }
+    else
+    {
+        rect_dest.top    = display_video_rect.top();
+        rect_dest.bottom = display_video_rect.bottom();
     }
 
     VERBOSE(VB_IMPORTANT, "rect_src ("

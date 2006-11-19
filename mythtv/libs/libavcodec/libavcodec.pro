@@ -17,6 +17,8 @@ debug:contains(TARGET_ARCH_X86, yes) {
     QMAKE_CFLAGS_SHLIB = 
 }
 
+cygwin:LIBS += -lz
+
 QMAKE_CFLAGS_DEBUG += -O
 
 QMAKE_CLEAN += $(TARGET) $(TARGETA) $(TARGETD) $(TARGET0) $(TARGET1) $(TARGET2)

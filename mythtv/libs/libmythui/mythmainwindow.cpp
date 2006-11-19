@@ -997,6 +997,7 @@ void MythMainWindow::RegisterMediaHandler(const QString &destination,
                                           int            mediaType,
                                           const QString &extensions)
 {
+#ifndef _WIN32
     if (d->mediaHandlerMap.count(destination) == 0) 
     {
         MHData mhd = { callback, mediaType, destination, description };
@@ -1015,6 +1016,7 @@ void MythMainWindow::RegisterMediaHandler(const QString &destination,
        VERBOSE(VB_GENERAL, QString("%1 is already registered as a media "
                                    "handler.").arg(destination));
     }
+#endif // !_WIN32
 }
 
 void MythMainWindow::RegisterMediaPlugin(const QString &name, 
@@ -1220,6 +1222,7 @@ void MythMainWindow::customEvent(QCustomEvent *ce)
         else
             QApplication::sendEvent(key_target, &key);
     }
+#ifndef _WIN32
     else if (ce->type() == kMediaEventType) 
     {
         MediaEvent *media_event = (MediaEvent*)ce;
@@ -1266,6 +1269,8 @@ void MythMainWindow::customEvent(QCustomEvent *ce)
                 mon->Unlock(pDev);
         }
     }
+#endif // !_WIN32
+
 #if defined(USE_LIRC) || defined(USING_APPLEREMOTE)
     else if (ce->type() == kLircKeycodeEventType && !d->ignore_lirc_keys) 
     {
