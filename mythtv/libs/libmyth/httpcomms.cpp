@@ -55,6 +55,7 @@ void HttpComms::init()
     connect(http, SIGNAL(stateChanged(int)), this, SLOT(stateChanged(int)));
     connect(http, SIGNAL(responseHeaderReceived(const QHttpResponseHeader &)),
             this, SLOT(headerReceived(const QHttpResponseHeader &)));
+    connect(http, SIGNAL(dataReadProgress(int, int)), this, SLOT(dataReadProgress(int, int)));
 
 }
 
@@ -257,6 +258,12 @@ void HttpComms::timeout()
                                .arg(m_url.toString().latin1()));
    m_timeout = true;
    m_done = true;
+}
+
+void HttpComms::dataReadProgress(int done, int total)
+{
+   m_progress = done;
+   m_total = total;
 }
 
 

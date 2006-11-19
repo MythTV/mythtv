@@ -20,7 +20,9 @@
  * ============================================================ */
 
 #include <iostream>
+#include <math.h>
 
+#include <qapplication.h>
 #include <qnetwork.h>
 #include <qdatetime.h>
 #include <qpainter.h>
@@ -30,8 +32,40 @@
 
 #include "mythtv/mythcontext.h"
 #include "mythtv/mythdbcon.h"
+#include "mythtv/httpcomms.h"
 
 #include "mythnews.h"
+
+MythNewsBusyDialog::MythNewsBusyDialog(const QString &title)
+    : MythBusyDialog(title)
+{
+}
+
+MythNewsBusyDialog::~MythNewsBusyDialog()
+{
+}
+
+void MythNewsBusyDialog::keyPressEvent(QKeyEvent *e)
+{
+    bool handled = false;
+    QStringList actions;
+    if (gContext->GetMainWindow()->TranslateKeyPress("qt", e, actions))
+    {
+        for (unsigned int i = 0; i < actions.size() && !handled; i++)
+        {
+            QString action = actions[i];
+            if (action == "ESCAPE")
+            {
+                emit cancelAction();
+                handled = true;
+            }
+        }
+    }
+
+    if (!handled)
+        MythDialog::keyPressEvent(e);
+}
+
 
 MythNews::MythNews(MythMainWindow *parent, const char *name )
     : MythDialog(parent, name)
@@ -61,6 +95,7 @@ MythNews::MythNews(MythMainWindow *parent, const char *name )
     m_UISites      = 0;
     m_UIArticles   = 0;
     m_TimerTimeout = 10*60*1000; 
+    httpGrabber = NULL;
 
     timeFormat = gContext->GetSetting("TimeFormat", "h:mm AP");
     dateFormat = gContext->GetSetting("DateFormat", "ddd MMMM d");
@@ -153,6 +188,8 @@ void MythNews::loadTheme()
                     m_ArticlesRect = area;
                 else if (name.lower() == "info")
                     m_InfoRect = area;
+                else if (name.lower() == "icons")
+                    m_StatusRect = area;
             }
             else {
                 std::cerr << "Unknown element: " << e.tagName()
@@ -209,6 +246,8 @@ void MythNews::paintEvent(QPaintEvent *e)
         updateArticlesView();
     if (r.intersects(m_InfoRect))
         updateInfoView();
+    if (r.intersects(m_StatusRect))
+        updateStatusView();
 }
 
 
@@ -260,6 +299,81 @@ void MythNews::updateArticlesView()
            &pix, 0, 0, -1, -1, Qt::CopyROP);
 }
 
+void MythNews::updateStatusView()
+{
+    QPixmap pix(m_StatusRect.size());
+    pix.fill(this, m_StatusRect.topLeft());
+    QPainter p(&pix);
+
+    LayerSet* container = m_Theme->GetSet("icons");
+    if (container)
+    {
+        NewsSite    *site     = 0;
+        NewsArticle *article  = 0;
+
+        UIListBtnTypeItem *siteUIItem = m_UISites->GetItemCurrent();
+        if (siteUIItem && siteUIItem->getData()) 
+            site = (NewsSite*) siteUIItem->getData();
+        
+        UIListBtnTypeItem *articleUIItem = m_UIArticles->GetItemCurrent();
+        if (articleUIItem && articleUIItem->getData())
+            article = (NewsArticle*) articleUIItem->getData();
+
+        UIImageType *itype = (UIImageType *)container->GetType("enclosures");
+        if (itype)
+        {
+            // if (!itype->isHidden())
+            //     itype->hide();
+            if ((article) && (m_InColumn == 1))
+            {
+                if (article->enclosure())
+                {
+                    if (itype->isHidden())
+                        itype->show();
+                } else {
+                    itype->hide();
+                }
+            } else {
+                itype->hide(); 
+            }
+        }
+
+        UIImageType *dtype = (UIImageType *)container->GetType("download");
+        if (dtype)
+        {
+            // if (!dtype->isHidden())
+            //     dtype->hide();
+            if ((article) && (m_InColumn == 1))
+            {
+                if (article->enclosure())
+                {
+                    if (dtype->isHidden())
+                        dtype->show();
+                } else {
+                    dtype->hide(); 
+                }
+            } else {
+                dtype->hide(); 
+            }
+        }
+
+        container->Draw(&p, 0, 0);
+        container->Draw(&p, 1, 0);
+        container->Draw(&p, 2, 0);
+        container->Draw(&p, 3, 0);
+        container->Draw(&p, 4, 0);
+        container->Draw(&p, 5, 0);
+        container->Draw(&p, 6, 0);
+        container->Draw(&p, 7, 0);
+        container->Draw(&p, 8, 0);
+    }
+
+    p.end();
+
+    bitBlt(this, m_StatusRect.left(), m_StatusRect.top(),
+           &pix, 0, 0, -1, -1, Qt::CopyROP);
+}
+
 void MythNews::updateInfoView()
 {
     QPixmap pix(m_InfoRect.size());
@@ -293,8 +407,8 @@ void MythNews::updateInfoView()
                     (UITextType *)container->GetType("description");
                 if (ttype)
                 {
-                    QString artText(article->description());
-                    
+                    QString artText = article->description();
+                    // Replace paragraph and break HTML with newlines
                     if( artText.find(QRegExp("</(p|P)>")) )
                     {
                         artText.replace( QRegExp("<(p|P)>"), "");
@@ -305,14 +419,71 @@ void MythNews::updateInfoView()
                         artText.replace( QRegExp("<(p|P)>"), "\n\n");
                         artText.replace( QRegExp("</(p|P)>"), "");
                     }                        
+                    artText.replace( QRegExp("<(br|BR|)/>"), "\n");
                     artText.replace( QRegExp("<(br|BR|)>"), "\n");
-                    artText.replace( QRegExp("</(a|A|b|B|i|I)>"), "");
-                    artText.replace( QRegExp("<(a|A|).*>"), "");
+                    // These are done instead of simplifyWhitespace
+                    // because that function also strips out newlines
+                    // Replace tab characters with nothing
+                    artText.replace( QRegExp("\t"), "");
+                    // Replace double space with single
+                    artText.replace( QRegExp("  "), "");
+                    // Replace whitespace at beginning of lines with newline
+                    artText.replace( QRegExp("\n "), "\n");
+                    // Remove any remaining HTML tags
+                    QRegExp removeHTML(QRegExp("</?.+>"));
+                    removeHTML.setMinimal(true);
+                    artText.remove((const QRegExp&) removeHTML);
+                    artText = artText.stripWhiteSpace();
                     ttype->SetText(artText);
+                }
+
+                if (article->thumbnail())
+                {
+                    QString fileprefix = MythContext::GetConfDir();
+
+                    QDir dir(fileprefix);
+                    if (!dir.exists())
+                         dir.mkdir(fileprefix);
+
+                    fileprefix += "/MythNews/tcache";
+
+                    dir = QDir(fileprefix);
+                    if (!dir.exists())
+                        dir.mkdir(fileprefix);
+
+                    QString url = article->thumbnail();
+                    // VERBOSE(VB_GENERAL, QString("MythNews: Thumbnail url %1").arg(url));
+                    QString sFilename = QString("%1/%2").arg(fileprefix).arg(qChecksum(url,url.length()));
+                    // VERBOSE(VB_GENERAL, QString("MythNews: Thumbnail filename %1").arg(sFilename));
+
+                    bool exists = QFile::exists(sFilename);
+                    if (!exists)
+                        HttpComms::getHttpFile(sFilename, url, 20000);
+
+                    UIImageType *itype = (UIImageType *)container->GetType("thumbnail");
+                    if (itype)
+                    {
+                       itype->SetImage(sFilename);
+                       itype->LoadImage();
+
+                       if (itype->isHidden())
+                           itype->show();
+                    }
+                } else {
+                    UIImageType *itype = (UIImageType *)container->GetType("thumbnail");
+                    if (itype)
+                    {
+                        itype->hide();
+                    }
                 }
             }
         }
         else {
+            UIImageType *itype = (UIImageType *)container->GetType("thumbnail");
+            if (itype)
+            {
+                itype->hide();
+            }
 
             if (site)
             {
@@ -325,6 +496,40 @@ void MythNews::updateInfoView()
                     (UITextType *)container->GetType("description");
                 if (ttype)
                     ttype->SetText(site->description());
+
+                if (site->imageURL())
+                {
+                    QString fileprefix = MythContext::GetConfDir();
+
+                    QDir dir(fileprefix);
+                    if (!dir.exists())
+                         dir.mkdir(fileprefix);
+
+                    fileprefix += "/MythNews/scache";
+
+                    dir = QDir(fileprefix);
+                    if (!dir.exists())
+                        dir.mkdir(fileprefix);
+
+                    QString sitename = site->name();
+                    QString sFilename(fileprefix + "/" + sitename + ".jpg");
+                    QString url = site->imageURL();
+
+                    bool exists = QFile::exists(sFilename);
+                    if (!exists)
+                        HttpComms::getHttpFile(sFilename, url, 20000);
+
+                    UIImageType *itype = (UIImageType *)container->GetType("thumbnail");
+                    if (itype)
+                    {
+                       itype->SetImage(sFilename);
+                       itype->LoadImage();
+
+                       if (itype->isHidden())
+                           itype->show();
+                    }
+                }
+
             }
         }
 
@@ -343,6 +548,18 @@ void MythNews::updateInfoView()
                 else
                     text += tr("Unknown");
                 ttype->SetText(text);
+            }
+
+            if (httpGrabber != NULL)
+            {
+                int progress = httpGrabber->getProgress();
+                int total = httpGrabber->getTotal();
+                if ((progress > 0) && (total > 0) && (progress < total))
+                {
+                    float fProgress = (float)progress/total;
+                    QString text = QString("%1 of %2 (%3 percent)").arg(progress).arg(total).arg(floor(fProgress*100));
+                    ttype->SetText(text);
+                }
             }
         }
 
@@ -445,6 +662,7 @@ void MythNews::cursorRight()
     update(m_SitesRect);
     update(m_ArticlesRect);
     update(m_InfoRect);
+    update(m_StatusRect);
 }
 
 void MythNews::cursorLeft()
@@ -463,6 +681,7 @@ void MythNews::cursorLeft()
     update(m_SitesRect);
     update(m_ArticlesRect);
     update(m_InfoRect);
+    update(m_StatusRect);
 }
 
 void MythNews::slotRetrieveNews()
@@ -573,6 +792,92 @@ void MythNews::slotArticleSelected(UIListBtnTypeItem*)
 {
     update(m_ArticlesRect);
     update(m_InfoRect);
+    update(m_StatusRect);
+}
+
+void MythNews::slotProgressCancelled()
+{
+    abortHttp = true;
+}
+
+void MythNews::createProgress(QString title)
+{
+    busy = new MythNewsBusyDialog(title);
+    busy->start();
+    connect(busy, SIGNAL(cancelAction()),
+            SLOT(slotProgressCancelled()));
+}
+
+bool MythNews::getHttpFile(QString sFilename, QString cmdURL)
+{
+    int redirectCount = 0;
+    int timeoutCount = 0;
+    QByteArray data(0);
+    bool res = false;
+    httpGrabber = NULL;
+    QString hostname = "";
+
+                busy = NULL;
+                createProgress(QObject::tr("Downloading media..."));
+                while (1)
+                {
+                    QUrl qurl(cmdURL);
+                    if (hostname == "")
+                        hostname = qurl.host();  // hold onto original host
+
+                    if (!qurl.hasHost())        // can occur on redirects to partial paths
+                        qurl.setHost(hostname);
+
+                    if (httpGrabber != NULL)
+                        delete httpGrabber;
+
+                    httpGrabber = new HttpComms;
+                    abortHttp = false;
+
+                    httpGrabber->request(qurl, -1, true);
+
+                    while ((!httpGrabber->isDone()) && (!abortHttp))
+                    {
+                        update(m_InfoRect);
+                        qApp->processEvents();
+                        usleep(100000);
+                    }
+ 
+                    if (abortHttp)
+                        break;
+
+                    // Check for redirection
+                    if (!httpGrabber->getRedirectedURL().isEmpty())
+                    {
+                        if (redirectCount++ < 3)
+                            cmdURL = httpGrabber->getRedirectedURL();
+
+                        // Try again
+                        timeoutCount = 0;
+                        continue;
+                    }
+
+                    data = httpGrabber->getRawData();
+
+                    if (data.size() > 0)
+                    {
+                        QFile file(sFilename);
+                        if (file.open( IO_WriteOnly ))
+                        {
+                            QDataStream stream(& file);
+                            stream.writeRawBytes( (const char*) (data), data.size() );
+                            file.close();
+                            res = true;
+                        }
+                    }
+                    break;
+                }
+
+                delete httpGrabber;
+                httpGrabber = NULL;
+                delete busy;
+                return res;
+
 }
 
 void MythNews::slotViewArticle()
@@ -584,14 +889,57 @@ void MythNews::slotViewArticle()
         NewsArticle *article = (NewsArticle*) articleUIItem->getData();
         if(article)
         {
-            QString cmdUrl(article->articleURL());
-            cmdUrl.replace('\'', "%27");
+            if (article->enclosure())
+            {
+                QString cmdURL(article->enclosure());
+                // Handle special cases for media here
+                // YouTube: Fetch the mediaURL page and parse out the video URL
+                if (cmdURL.contains("youtube.com"))
+                {
+                    cmdURL = QString(article->mediaURL());
+                    QString mediaPage = HttpComms::getHttp(cmdURL);
+                    if (mediaPage)
+                    {
+                        int playerPos = mediaPage.find("player2.swf?") + 12;
+                        int playerEndPos = mediaPage.find("\"", playerPos);
+                        QString videoURL = mediaPage.mid(playerPos, playerEndPos - playerPos);
+                        // VERBOSE(VB_GENERAL, QString("MythNews: VideoURL %1").arg(videoURL));
+                        cmdURL = QString("http://youtube.com/get_video.php?%1").arg(videoURL);
+                    }
+                }
 
-            QString cmd = QString("%1 %2 '%3'")
-                 .arg(browser)
-                 .arg(zoom)
-                 .arg(cmdUrl);
-            myth_system(cmd);
+                QString fileprefix = MythContext::GetConfDir();
+
+                QDir dir(fileprefix);
+                if (!dir.exists())
+                     dir.mkdir(fileprefix);
+
+                fileprefix += "/MythNews";
+
+                dir = QDir(fileprefix);
+                if (!dir.exists())
+                    dir.mkdir(fileprefix);
+
+                QString sFilename(fileprefix + "/newstempfile");
+
+                if (getHttpFile(sFilename, cmdURL))
+                {
+                    qApp->unlock();
+                    QString handler = "Internal";
+                    gContext->GetMainWindow()->HandleMedia(handler, sFilename);
+                    qApp->lock();
+                    // myth_system(QString("mplayer -fs %1").arg(sFilename));
+                }
+            } else {
+                QString cmdUrl(article->articleURL());
+                cmdUrl.replace('\'', "%27");
+
+                QString cmd = QString("%1 %2 '%3'")
+                     .arg(browser)
+                     .arg(zoom)
+                     .arg(cmdUrl);
+                myth_system(cmd);
+            }
         }
     } 
 }

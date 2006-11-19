@@ -27,11 +27,27 @@
 #include <mythtv/uilistbtntype.h>
 #include <mythtv/xmlparse.h>
 #include <mythtv/mythdialogs.h>
+#include <mythtv/httpcomms.h>
 
 #include "newsengine.h"
 
 class QTimer;
 class UIListBtnType;
+
+class MPUBLIC MythNewsBusyDialog : public MythBusyDialog
+{
+    Q_OBJECT
+  public:
+    MythNewsBusyDialog(const QString &title);
+
+    ~MythNewsBusyDialog();
+
+    void keyPressEvent(QKeyEvent *);
+
+  signals:
+    void cancelAction();
+
+};
 
 class MythNews : public MythDialog
 {
@@ -51,6 +67,7 @@ private:
     void updateSitesView();
     void updateArticlesView();
     void updateInfoView();
+    void updateStatusView();
     
     void keyPressEvent(QKeyEvent *e);
     void cursorUp(bool page=false);
@@ -67,6 +84,10 @@ private:
 
     bool removeFromDB(const QString &name);
 
+    bool getHttpFile(QString sFilename, QString cmdURL);
+    void createProgress(QString title);
+    void createProgress(QString title, int total);
+
     XMLParse      *m_Theme;
 
     UIListBtnType *m_UISites;
@@ -74,6 +95,7 @@ private:
     QRect          m_SitesRect;
     QRect          m_ArticlesRect;
     QRect          m_InfoRect;
+    QRect          m_StatusRect;
     unsigned int   m_InColumn;
 
     NewsSite::List m_NewsSites;
@@ -88,6 +110,11 @@ private:
     QString        browser;
     MythPopupBox   *menu;
 
+    bool           abortHttp;
+
+    MythNewsBusyDialog *busy;
+    HttpComms      *httpGrabber;
+
 private slots:
     void slotViewArticle();
     void slotRetrieveNews();
@@ -97,6 +124,7 @@ private slots:
     void slotSiteSelected(NewsSite*);
     
     void slotArticleSelected(UIListBtnTypeItem *item);
+    void slotProgressCancelled();
 
     // menu stuff
     void showMenu();

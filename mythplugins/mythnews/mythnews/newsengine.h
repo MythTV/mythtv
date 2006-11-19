@@ -41,12 +41,17 @@ public:
     typedef QPtrList<NewsArticle> List;
 
     NewsArticle(NewsSite *parent, const QString& title,
-                const QString& desc, const QString& artURL);
+                const QString& desc, const QString& artURL,
+                const QString& thumbnail, const QString& mediaURL,
+                const QString& enclosure);
     ~NewsArticle();
 
-    const QString& title() const;
-    const QString& description() const;
+    const QString& title() const { return m_title; }
+    const QString& description() const { return m_desc; }
     const QString& articleURL() const { return m_articleURL; }
+    const QString& thumbnail() const { return m_thumbnail; }
+    const QString& mediaURL() const { return m_mediaURL; }
+    const QString& enclosure() const { return m_enclosure; }
 
 private:
 
@@ -54,6 +59,10 @@ private:
     QString   m_desc;
     NewsSite *m_parent;
     QString m_articleURL;
+    QString   m_thumbnail;
+    QString   m_mediaURL;
+    QString   m_enclosure;
+    QString   m_enclosureType;
 };
 
 // -------------------------------------------------------
@@ -81,6 +90,7 @@ public:
     const QString&   name() const;
     QString          description() const;
     const QDateTime& lastUpdated() const;
+    const QString&   imageURL() const;
     unsigned int timeSinceLastUpdate() const; // in minutes
 
     void insertNewsArticle(NewsArticle* item);
@@ -104,6 +114,7 @@ private:
     QByteArray m_data;
     State      m_state;
     QString    m_errorString;
+    QString    m_imageURL;
 
     NewsArticle::List m_articleList;
     QUrlOperator*     m_urlOp;

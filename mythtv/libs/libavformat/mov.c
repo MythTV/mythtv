@@ -1255,7 +1255,8 @@ static int mov_read_trak(MOVContext *c, ByteIOContext *pb, MOV_atom_t atom)
     AVStream *st;
     MOVStreamContext *sc;
 
-    st = av_new_stream(c->fc, c->fc->nb_streams);
+    // st = av_new_stream(c->fc, c->fc->nb_streams);
+    st = av_new_stream(c->fc, -1);
     if (!st) return -2;
     sc = (MOVStreamContext*) av_mallocz(sizeof(MOVStreamContext));
     if (!sc) {

@@ -36,30 +36,24 @@ extern "C" {
 using namespace std;
 
 NewsArticle::NewsArticle(NewsSite *parent, const QString& title,
-                         const QString& desc, const QString& articleURL)
+                         const QString& desc, const QString& articleURL,
+                         const QString& thumbnail, const QString& mediaURL,
+                         const QString& enclosure)
 {
     parent->insertNewsArticle(this);
     m_title  = title;
     m_desc   = desc;
     m_parent = parent;
     m_articleURL = articleURL;
+    m_thumbnail = thumbnail;
+    m_mediaURL = mediaURL;
+    m_enclosure = enclosure;
 }
 
 NewsArticle::~NewsArticle()
 {
 
 }
-
-const QString& NewsArticle::title() const
-{
-    return m_title;
-}
-
-const QString& NewsArticle::description() const
-{
-    return m_desc;
-}
-
 
 NewsSite::NewsSite(const QString& name,
                    const QString& url,
@@ -113,6 +107,11 @@ QString NewsSite::description() const
 {
     QString desc(m_desc+"\n"+m_errorString);
     return desc;
+}
+
+const QString& NewsSite::imageURL() const
+{
+    return m_imageURL;
 }
 
 const QDateTime& NewsSite::lastUpdated() const
@@ -208,19 +207,19 @@ void NewsSite::process()
 
     QFile xmlFile(m_destDir+QString("/")+m_name);
     if (!xmlFile.exists()) {
-        new NewsArticle(this, tr("Failed to retrieve news"), "", "");
+        new NewsArticle(this, tr("Failed to retrieve news"), "", "", "", "", "");
         m_errorString += tr("No Cached News");
         return;
     }
 
     if (!xmlFile.open(IO_ReadOnly)) {
-        new NewsArticle(this, tr("Failed to retrieve news"), "", "");
+        new NewsArticle(this, tr("Failed to retrieve news"), "", "", "", "", "");
         cerr << "MythNews: NewsEngine: failed to open xmlfile" << endl;
         return;
     }
 
     if (!domDoc.setContent(&xmlFile)) {
-        new NewsArticle(this, tr("Failed to retrieve news"), "", "");
+        new NewsArticle(this, tr("Failed to retrieve news"), "", "", "", "", "");
         cerr << "MythNews: NewsEngine: failed to set content from xmlfile" << endl;
         m_errorString += tr("Failed to read downloaded file");
         return;
@@ -234,13 +233,18 @@ void NewsSite::process()
 
     m_desc = channelNode.namedItem(QString::fromLatin1("description")).toElement().text().simplifyWhiteSpace();
 
+    QDomNode imageNode = channelNode.namedItem(QString::fromLatin1("image"));
+    if (!imageNode.isNull())
+        m_imageURL = imageNode.namedItem(QString::fromLatin1("url")).toElement().text().simplifyWhiteSpace();
+
     QDomNodeList items = domDoc.elementsByTagName(QString::fromLatin1("item"));
 
     QDomNode itemNode;
-    QString title, description, url;
+    QString title, description, url, thumbnail, mediaurl, enclosure, imageURL, enclosure_type;
     for (unsigned int i = 0; i < items.count(); i++) {
         itemNode = items.item(i);
         title    = itemNode.namedItem(QString::fromLatin1("title")).toElement().text().simplifyWhiteSpace();
+
         QDomNode descNode = itemNode.namedItem(QString::fromLatin1("description"));
         if (!descNode.isNull())
         {
@@ -249,14 +253,99 @@ void NewsSite::process()
         }            
         else
             description = QString::null;
+
         QDomNode linkNode = itemNode.namedItem(QString::fromLatin1("link"));
         if (!linkNode.isNull())
             url = linkNode.toElement().text().simplifyWhiteSpace();
         else
             url = QString::null;
 
+        QDomNode enclosureNode = itemNode.namedItem(QString::fromLatin1("enclosure"));
+        if (!enclosureNode.isNull())
+        {
+            QDomAttr enclosureURL = enclosureNode.toElement().attributeNode("url");
+            if (!enclosureURL.isNull())
+               enclosure  = enclosureURL.value();
+
+            QDomAttr enclosureType = enclosureNode.toElement().attributeNode("type");
+            if (!enclosureType.isNull())
+               enclosure_type  = enclosureType.value();
+               
+            // VERBOSE(VB_GENERAL, QString("MythNews: Enclosure URL is %1").arg(enclosure));
+        } else 
+            enclosure = QString::null;
+
+        // From this point forward, we process RSS 2.0 media tags.  Please put all
+        // other tag processing before this
+        // Some media: tags can be enclosed in a media:group item.  If this item is
+        // present, use it to find the media tags, otherwise, proceed.
+        QDomNode mediaGroup = itemNode.namedItem(QString::fromLatin1("media:group"));
+        if (!mediaGroup.isNull())
+            itemNode = mediaGroup;
+
+        QDomNode thumbNode = itemNode.namedItem(QString::fromLatin1("media:thumbnail"));
+        if (!thumbNode.isNull())
+        {
+            QDomAttr thumburl = thumbNode.toElement().attributeNode("url");
+            if (!thumburl.isNull())
+                thumbnail = thumburl.value();
+            // VERBOSE(VB_GENERAL, QString("MythNews: Thumbnail is %1").arg(thumbnail));
+        } else
+            thumbnail = QString::null;
             
-        new NewsArticle(this, title, description, url);
+        QDomNode playerNode = itemNode.namedItem(QString::fromLatin1("media:player"));
+        if (!playerNode.isNull())
+        {
+            QDomAttr mediaURL = playerNode.toElement().attributeNode("url");
+            if (!mediaURL.isNull())
+               mediaurl  = mediaURL.value();
+            // VERBOSE(VB_GENERAL, QString("MythNews: Media URL is %1").arg(mediaurl));
+        } else
+            mediaurl = QString::null;
+
+        // If present, the media:description superscedes the RSS description
+        descNode = itemNode.namedItem(QString::fromLatin1("media:description"));
+        if (!descNode.isNull())
+            description = descNode.toElement().text().simplifyWhiteSpace();
+ 
+        if (!enclosure)
+        {
+            QDomNode contentNode = itemNode.namedItem(QString::fromLatin1("media:content"));
+            if (!contentNode.isNull())
+            {
+                QDomAttr enclosureURL = contentNode.toElement().attributeNode("url");
+                if (!enclosureURL.isNull())
+                   enclosure  = enclosureURL.value();
+
+                QDomAttr enclosureType = contentNode.toElement().attributeNode("type");
+                if (!enclosureType.isNull())
+                   enclosure_type  = enclosureType.value();
+                // VERBOSE(VB_GENERAL, QString("MythNews: media:content URL is %1").arg(enclosure));
+
+                // This hack causes the engine to prefer other content over MP4 encoded content
+                // because this can often include AAC audio which requires additional compile options
+                // to enable in MythTV Internal player
+                /*
+                while (enclosure_type == "video/mp4")
+                {
+                    QDomNode altcontentNode = contentNode.nextSibling();
+                    if (altcontentNode.nodeName() != "media:content")
+                        break;
+  
+                    QDomAttr enclosureType = altcontentNode.toElement().attributeNode("type");
+                    if (!enclosureType.isNull())
+                    {
+                        enclosure_type  = enclosureType.value();
+
+                        QDomAttr altenclosureURL = altcontentNode.toElement().attributeNode("url");
+                        if (!altenclosureURL.isNull())
+                            enclosure  = altenclosureURL.value();
+                    }
+                }
+                */
+            }
+        }
+        new NewsArticle(this, title, description, url, thumbnail, mediaurl, enclosure);
     }
 
     xmlFile.close();

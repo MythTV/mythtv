@@ -1258,5 +1258,250 @@
     </item>
 </category>
 
+<category name="YouTube">
+    <item>
+        <title>YouTube Recently Featured</title>
+        <url>http://youtube.com/rss/global/recently_featured.rss</url>
+        <ico>http://youtube.com/favicon.ico</ico>
+    </item> 
+    <item>
+        <title>YouTube Recently Added</title>
+        <url>http://youtube.com/rss/global/recently_added.rss</url>
+        <ico>http://youtube.com/favicon.ico</ico>
+    </item> 
+    <item>
+        <title>YouTube Top Favorites</title>
+        <url>http://youtube.com/rss/global/top_favorites.rss</url>
+        <ico>http://youtube.com/favicon.ico</ico>
+    </item> 
+    <item>
+        <title>YouTube Top Rated</title>
+        <url>http://youtube.com/rss/global/top_rated.rss</url>
+        <ico>http://youtube.com/favicon.ico</ico>
+    </item> 
+    <item>
+        <title>YouTube MythTV Channel</title>
+        <url>http://www.youtube.com/rss/tag/mythtv.rss</url>
+        <ico>http://youtube.com/favicon.ico</ico>
+    </item> 
+</category>
 
+<category name="GoogleVideo">
+    <item>
+        <title>Google Video Top 100 New Videos</title>
+        <url>http://video.google.com/videofeed?type=search&amp;q=type:gpick&amp;output=rss</url>
+        <ico>http://video.google.com/favicon.ico</ico>
+    </item> 
+    <item>
+        <title>Google Video Google Picks</title>
+        <url>http://video.google.com/videofeed?type=gpickw&amp;output=rss</url>
+        <ico>http://video.google.com/favicon.ico</ico>
+    </item> 
+    <item>
+        <title>Google Video Comedy</title>
+        <url>http://video.google.com/videofeed?type=search&amp;q=genre:comedy&amp;so=1</url>
+        <ico>http://video.google.com/favicon.ico</ico>
+    </item> 
+    <item>
+        <title>Google Video Music</title>
+        <url>http://video.google.com/videofeed?type=search&amp;q=type:music_video&amp;so=1</url>
+        <ico>http://video.google.com/favicon.ico</ico>
+    </item> 
+    <item>
+        <title>Google Video Movie Trailers</title>
+        <url>http://video.google.com/videofeed?type=search&amp;q=type:movie_trailer&amp;so=1</url>
+        <ico>http://video.google.com/favicon.ico</ico>
+    </item> 
+    <item>
+        <title>Google Video TV Shows</title>
+        <url>http://video.google.com/videofeed?type=search&amp;q=type:tvshow&amp;so=1</url>
+        <ico>http://video.google.com/favicon.ico</ico>
+    </item> 
+    <item>
+        <title>Google Video TV Sports</title>
+        <url>http://video.google.com/videofeed?type=search&amp;q=type:sports%20OR%20genre:sports&amp;so=1</url>
+        <ico>http://video.google.com/favicon.ico</ico>
+    </item> 
+    <item>
+        <title>Google Video TV Educational</title>
+        <url>http://video.google.com/videofeed?type=search&amp;q=genre:educational&amp;so=1</url>
+        <ico>http://video.google.com/favicon.ico</ico>
+    </item> 
+</category>
+
+<category name="G4TV">
+    <item>
+        <title>G4TV X-Play Daily Video Podcast</title>
+        <url>http://www.g4tv.com/xplay/podcasts/6/XPlay_Daily_Video_Podcast.xml</url>
+        <ico>http://www.g4tv.com/favicon.ico</ico>
+    </item> 
+    <item>
+        <title>G4TV Attack of the Show Daily Video Podcast</title>
+        <url>http://www.g4tv.com/attackoftheshow/podcasts/5/Attack_of_the_Show_Daily_Video_Podcast.xml</url>
+        <ico>http://www.g4tv.com/favicon.ico</ico>
+    </item> 
+    <item>
+        <title>G4TV The Daily Feed Video Podcast</title>
+        <url>http://www.g4tv.com/thefeed/podcasts/19/The_Daily_Feed_Video_Podcast.xml</url>
+        <ico>http://www.g4tv.com/favicon.ico</ico>
+    </item> 
+    <item>
+        <title>G4TV Cheat! Video Podcast</title>
+        <url>http://www.g4tv.com/cheat/podcasts/7/Cheat_Video_Podcast.xml</url>
+        <ico>http://www.g4tv.com/favicon.ico</ico>
+    </item> 
+    <item>
+        <title>G4TV The Daily Nut</title>
+        <url>http://www.g4tv.com/dailynut/podcasts/15/The_Daily_Nut.xml</url>
+        <ico>http://www.g4tv.com/favicon.ico</ico>
+    </item> 
+    <item>
+        <title>G4TV ICONS Video Podcast</title>
+        <url>http://www.g4tv.com/icons/podcasts/17/ICONS_Video_Podcast.xml</url>
+        <ico>http://www.g4tv.com/favicon.ico</ico>
+    </item> 
+    <item>
+        <title>G4TV Formula D Video Podcast</title>
+        <url>http://www.g4tv.com/formulad/podcasts/18/Formula_D_Video_Podcast.xml</url>
+        <ico>http://www.g4tv.com/favicon.ico</ico>
+    </item> 
+    <item>
+        <title>G4TV Street Fury Video Podcast</title>
+        <url>http://www.g4tv.com/streetfury/podcasts/11/Street_Fury_Video_Podcast.xml</url>
+        <ico>http://www.g4tv.com/favicon.ico</ico>
+    </item> 
+    <item>
+        <title>G4TV The Man Show Video Podcast</title>
+        <url>http://www.g4tv.com/themanshow/podcasts/14/The_Man_Show_Video_Podcast.xml</url>
+        <ico>http://www.g4tv.com/favicon.ico</ico>
+    </item> 
+    <item>
+        <title>G4TV Cinematech Video Podcast</title>
+        <url>http://www.g4tv.com/cinematech/podcasts/8/Cinematech_Video_Podcast.xml</url>
+        <ico>http://www.g4tv.com/favicon.ico</ico>
+    </item> 
+    <item>
+        <title>G4TV Cinematech: Nocturnal Emissions Video Podcast</title>
+        <url>http://www.g4tv.com/cinematechnocturnalemissions/podcasts/9/Cinematech_Nocturnal_Emissions_Video_Podcast.xml</url>
+        <ico>http://www.g4tv.com/favicon.ico</ico>
+    </item> 
+    <item>
+        <title>G4TV Filter Video Podcast</title>
+        <url>http://www.g4tv.com/filter/podcasts/10/Filter_Video_Podcast.xml</url>
+        <ico>http://www.g4tv.com/favicon.ico</ico>
+    </item> 
+</category>
+
+<category name="News Video">
+    <item>
+        <title>CNET TV</title>
+        <url>http://reviews.cnet.com/html/xml/2001-12839_7-0.xml</url>
+        <ico>http://www.cnet.com/favicon.ico</ico>
+    </item>
+    <item>
+        <title>Reuters Video Top News</title>
+        <url>http://today.reuters.com/tv/rss/default.aspx?channelId=3fe70fe45a9e09f79818a5848a0a6039e8e2a37b</url>
+        <ico>http://www.reuters.com/favicon.ico</ico>
+    </item> 
+    <item>
+        <title>Reuters Video In Depth</title>
+        <url>http://today.reuters.com/tv/rss/default.aspx?channelId=9784d2e333d72cb34b52f788c6e44bb63d086ef0</url>
+        <ico>http://www.reuters.com/favicon.ico</ico>
+    </item> 
+    <item>
+        <title>Reuters Video In Depth</title>
+        <url>http://today.reuters.com/tv/rss/default.aspx?channelId=9784d2e333d72cb34b52f788c6e44bb63d086ef0</url>
+        <ico>http://www.reuters.com/favicon.ico</ico>
+    </item> 
+    <item>
+        <title>Reuters Video Entertainment</title>
+        <url>http://today.reuters.com/tv/rss/default.aspx?channelId=189f8813eb619acad6694531e1004d4fcae3c097</url>
+        <ico>http://www.reuters.com/favicon.ico</ico>
+    </item> 
+    <item>
+        <title>Reuters Video Oddly Enough</title>
+        <url>http://today.reuters.com/tv/rss/default.aspx?channelId=4ccf1d535d893e464710e92b6722e47e8a3524df</url>
+        <ico>http://www.reuters.com/favicon.ico</ico>
+    </item> 
+    <item>
+        <title>Reuters Video Business</title>
+        <url>http://today.reuters.com/tv/rss/default.aspx?channelId=6ffc0233e09c26943b265ef3abd575b2d872818b</url>
+        <ico>http://www.reuters.com/favicon.ico</ico>
+    </item> 
+    <item>
+        <title>Reuters Video Technology</title>
+        <url>http://today.reuters.com/tv/rss/default.aspx?channelId=d45538fb92ef02a065c15e16d3dd6a297c2ae7d7</url>
+        <ico>http://www.reuters.com/favicon.ico</ico>
+    </item> 
+    <item>
+        <title>Reuters Video Archive</title>
+        <url>http://today.reuters.com/tv/rss/default.aspx?channelId=2ec8a55340373e6476cf68c0942c4a804b8abd47</url>
+        <ico>http://www.reuters.com/favicon.ico</ico>
+    </item> 
+    <item>
+        <title>CNN Daily Video Podcast</title>
+        <url>http://rss.cnn.com/services/podcasting/cnnnewsroom/rss.xml</url>
+        <ico>http://rss.cnn.com/favicon.ico</ico>
+    </item> 
+    <item>
+        <title>CNN Now in the News Commuter Edition Daily Video Podcast</title>
+        <url>http://rss.cnn.com/services/podcasting/nitn/rss.xml</url>
+        <ico>http://rss.cnn.com/favicon.ico</ico>
+    </item> 
+    <item>
+        <title>CNN In Case You Missed It Daily Video Podcast</title>
+        <url>http://rss.cnn.com/services/podcasting/incaseyoumissed/rss.xml</url>
+        <ico>http://rss.cnn.com/favicon.ico</ico>
+    </item> 
+    <item>
+        <title>CNN All Access - Backstage Pass Weekly Video Podcast</title>
+        <url>http://rss.cnn.com/services/podcasting/allaccess/rss.xml</url>
+        <ico>http://rss.cnn.com/favicon.ico</ico>
+    </item> 
+    <item>
+        <title>CNN The Glenn Beck Show Weekly Video Podcast</title>
+        <url>http://rss.cnn.com/services/podcasting/askglenn/rss.xml</url>
+        <ico>http://rss.cnn.com/favicon.ico</ico>
+    </item> 
+    <item>
+        <title>CNN The Gryst Weekly Video Podcast</title>
+        <url>http://rss.cnn.com/services/podcasting/thegrist/rss.xml</url>
+        <ico>http://rss.cnn.com/favicon.ico</ico>
+    </item> 
+    <item>
+        <title>CNN SHOWandTELL Weekly Video Podcast</title>
+        <url>http://rss.cnn.com/services/podcasting/showandtell/rss.xml</url>
+        <ico>http://rss.cnn.com/favicon.ico</ico>
+    </item> 
+    <item>
+        <title>CNN Paging Dr. Gupta Weekly Video Podcast</title>
+        <url>http://rss.cnn.com/services/podcasting/doctalk/rss.xml</url>
+        <ico>http://rss.cnn.com/favicon.ico</ico>
+    </item> 
+    <item>
+        <title>CNN Reliable Sources Weekly Video Podcast</title>
+        <url>http://www.cnn.com/services/podcasting/reliablesources/rss.xml</url>
+        <ico>http://rss.cnn.com/favicon.ico</ico>
+    </item> 
+    <item>
+        <title>CNN Late Edition with Wolf Blitzer Weekly Video Podcast</title>
+        <url>http://www.cnn.com/services/podcasting/lateedition/rss.xml</url>
+        <ico>http://rss.cnn.com/favicon.ico</ico>
+    </item> 
+    <item>
+        <title>CNN The Scene Weekly Video Podcast</title>
+        <url>http://rss.cnn.com/services/podcasting/thescene/rss.xml</url>
+        <ico>http://rss.cnn.com/favicon.ico</ico>
+    </item> 
+    <item>
+        <title>CNN Student News Daily Video Podcast</title>
+        <url>http://rss.cnn.com/services/podcasting/studentnews/rss.xml</url>
+        <ico>http://rss.cnn.com/favicon.ico</ico>
+    </item> 
+    <item>
+        <title>CNN Special Programming Weekly Video Podcast</title>
+        <url>http://rss.cnn.com/rss/cnn_bestinlife.rss</url>
+        <ico>http://rss.cnn.com/favicon.ico</ico>
+    </item> 
+</category>
 </sites>

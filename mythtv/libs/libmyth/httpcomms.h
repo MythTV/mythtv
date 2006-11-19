@@ -18,6 +18,8 @@ class MPUBLIC HttpComms : public QObject
     virtual ~HttpComms();
 
     bool isDone(void) { return m_done; }
+    int getProgress(void) { return m_progress; }
+    int getTotal(void) { return m_total; }
     
     int getStatusCode(void) { return m_statusCode; }
     QString getResponseReason(void) { return m_responseReason; }
@@ -92,7 +94,7 @@ class MPUBLIC HttpComms : public QObject
     void timeout();
     void done(bool error);
     void stateChanged(int state);
-
+    void dataReadProgress(int done, int total);
     void headerReceived(const QHttpResponseHeader &resp);
 
   private:
@@ -110,6 +112,8 @@ class MPUBLIC HttpComms : public QObject
     bool m_authNeeded;
     int m_timeoutInterval;
     QString m_cookie;
+    int m_progress;
+    int m_total;
     
     QHttpRequestHeader m_curRequest;
 };
