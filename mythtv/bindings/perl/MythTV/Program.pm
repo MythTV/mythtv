@@ -151,6 +151,7 @@ package MythTV::Program;
         elsif ($hour < 1) {
             $hour = 12;
         }
+        $shour   = "0$shour"   if ($shour < 10);
         $sminute = "0$sminute" if ($sminute < 10);
         # End time
         $eyear += 1900;
@@ -165,6 +166,7 @@ package MythTV::Program;
         elsif ($ethour < 1) {
             $ethour = 12;
         }
+        $ehour   = "0$ehour"   if ($ehour < 10);
         $eminute = "0$eminute" if ($eminute < 10);
     # Original airdate
         my ($oday, $omonth, $oyear) = (localtime($self->{'airdate'}))[3,4,5];
