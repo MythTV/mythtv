@@ -128,7 +128,7 @@ const DTVParamHelperStruct DTVBandwidth::vdrTable[] =
 
 const DTVParamHelperStruct DTVBandwidth::parseTable[] =
 {
-   { "auto", kBandwidthAuto },
+   { "a",    kBandwidthAuto },
    { "8",    kBandwidth8MHz },
    { "7",    kBandwidth7MHz },
    { "6",    kBandwidth6MHz },
@@ -140,7 +140,7 @@ const char *DTVBandwidth::dbStr[DTVBandwidth::kDBStrCnt] =
     "8",   ///< kBandwidth8MHz
     "7",   ///< kBandwidth7MHz
     "6",   ///< kBandwidth6MHz
-    "auto" ///< kBandwidthAUTO
+    "a"    ///< kBandwidthAUTO
 };
 
 const DTVParamHelperStruct DTVCodeRate::confTable[] =
