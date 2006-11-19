@@ -238,7 +238,9 @@ long HTTPRequest::SendResponseFile( QString sFileName )
                                                               .arg( llStart )
                                                               .arg( llEnd   )
                                                               .arg( llSize  );
-                llSize = (llEnd - llStart) + 1;
+                //llSize = (llEnd - llStart) + 1;
+                llSize = (llEnd - llStart);
+
             }
         }
         
