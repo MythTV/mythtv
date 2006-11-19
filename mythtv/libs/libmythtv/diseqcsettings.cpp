@@ -819,7 +819,7 @@ void LNBConfig::UpdateType(void)
     if (!m_type->isEnabled())
         return;
 
-    switch ((DiSEqCDevSwitch::dvbdev_switch_t) m_type->getValue().toUInt())
+    switch ((DiSEqCDevLNB::dvbdev_lnb_t) m_type->getValue().toUInt())
     {
         case DiSEqCDevLNB::kTypeFixed:
         case DiSEqCDevLNB::kTypeVoltageControl:
