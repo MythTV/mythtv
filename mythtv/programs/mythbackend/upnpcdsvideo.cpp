@@ -668,7 +668,7 @@ void UPnpCDSVideo::AddVideoItem( UPnpCDSBrowseRequest    *pRequest,
                             .arg( sServerIp )
                             .arg( sPort     );
 
-    QString sURIParams = QString( "?VideoID=%1&amp" )
+    QString sURIParams = QString( "?VideoID=%1&amp;" )
                             .arg( nVidID );
 
     QString sId        = QString( "%1/item%2")
