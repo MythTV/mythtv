@@ -207,11 +207,13 @@ SOURCES += mpeg/h264utils.cpp
 
 DEFINES += USING_H264TOOLS
 
-# C stuff
+# Channels, and the multiplexes that transmit them
 HEADERS += frequencies.h
 HEADERS += frequencytables.h        channelutil.h
+HEADERS += dtvmultiplex.h           dtvconfparserhelpers.h
 SOURCES += frequencies.c
 SOURCES += frequencytables.cpp      channelutil.cpp
+SOURCES += dtvmultiplex.cpp         dtvconfparserhelpers.cpp
 
 using_frontend {
     # Recording profile stuff
@@ -324,19 +326,17 @@ using_backend {
     # Channel stuff
     HEADERS += channelbase.h               dtvchannel.h
     HEADERS += signalmonitor.h             dtvsignalmonitor.h
-    HEADERS += dtvmultiplex.h
     SOURCES += channelbase.cpp             dtvchannel.h
     SOURCES += signalmonitor.cpp           dtvsignalmonitor.cpp
-    SOURCES += dtvmultiplex.cpp
 
     # Channel scanner stuff
     HEADERS += scanwizard.h                scanwizardhelpers.h
-    HEADERS += dvbconfparser.h             dtvconfparserhelpers.h
+    HEADERS += dvbconfparser.h
     HEADERS += siscan.h
     HEADERS += scanwizardscanner.h
     SOURCES += scanwizard.cpp              scanwizardhelpers.cpp
     SOURCES += siscan.cpp
-    SOURCES += dvbconfparser.cpp           dtvconfparserhelpers.cpp
+    SOURCES += dvbconfparser.cpp
     SOURCES += scanwizardscanner.cpp
 
     # EIT stuff
