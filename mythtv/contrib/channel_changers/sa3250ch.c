@@ -158,6 +158,7 @@ int main (int argc, char *argv[])
             printf("AV/C Command: cmd0=0x%08x cmd1=0x%08x cmd2=0x%08x\n",
                    cmd[0], cmd[1], cmd[2]);
        avc1394_transaction_block(handle, 0, cmd, 3, 1);       
+       avc1394_transaction_block_close(handle);
    } else {
        /* Default method sending three seperate digits */
        dig[2] = 0x30 | (chn % 10);
@@ -173,6 +174,7 @@ int main (int argc, char *argv[])
                 dig[0] & 0xf, dig[1] & 0xf, dig[2] & 0xf, cmd[0], cmd[1], cmd[2]);
 
        avc1394_transaction_block(handle, 0, cmd, 3, 1);
+       avc1394_transaction_block_close(handle);
        cmd[0] = CTL_CMD0 | AVC1394_SA3250_OPERAND_KEY_RELEASE;
        cmd[1] = CTL_CMD1 | (dig[0] << 16) | (dig[1] << 8) | dig[2];
        cmd[2] = CTL_CMD2;
@@ -182,6 +184,7 @@ int main (int argc, char *argv[])
                 dig[0] & 0xf, dig[1] & 0xf, dig[2] & 0xf, cmd[0], cmd[1], cmd[2]);
 
        avc1394_transaction_block(handle, 0, cmd, 3, 1);
+       avc1394_transaction_block_close(handle);
    }
 
    raw1394_destroy_handle(handle);
