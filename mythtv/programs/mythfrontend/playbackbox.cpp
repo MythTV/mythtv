@@ -2433,8 +2433,6 @@ void PlaybackBox::showDeletePopup(ProgramInfo *program, deletePopupType types)
     QString message2 = "";
     switch (types)
     {
-        case EndOfRecording:
-             message1 = tr("You have finished watching:"); break;
         case DeleteRecording:
              message1 = tr("Are you sure you want to delete:"); break;
         case ForceDeleteRecording:
@@ -2450,24 +2448,17 @@ void PlaybackBox::showDeletePopup(ProgramInfo *program, deletePopupType types)
     QString tmpmessage;
     const char *tmpslot = NULL;
 
-    if ((types == EndOfRecording || types == DeleteRecording) &&
+    if ((types == DeleteRecording) &&
         (program->IsSameProgram(*program)) &&
         (program->recgroup != "LiveTV"))
     {
-        if (types == EndOfRecording)
-            tmpmessage = tr("Delete it, but allow it to re-record"); 
-        else
-            tmpmessage = tr("Yes, and allow re-record"); 
+        tmpmessage = tr("Yes, and allow re-record"); 
         tmpslot = SLOT(doDeleteForgetHistory());
         popup->addButton(tmpmessage, this, tmpslot);
     }
 
     switch (types)
     {
-        case EndOfRecording:
-             tmpmessage = tr("Delete it"); 
-             tmpslot = SLOT(doDelete());
-             break;
         case DeleteRecording:
              tmpmessage = tr("Yes, delete it"); 
              tmpslot = SLOT(doDelete());
@@ -2486,10 +2477,6 @@ void PlaybackBox::showDeletePopup(ProgramInfo *program, deletePopupType types)
 
     switch (types)
     {
-        case EndOfRecording:
-             tmpmessage = tr("Save it so I can watch it again"); 
-             tmpslot = SLOT(noDelete());
-             break;
         case DeleteRecording:
         case ForceDeleteRecording:
              tmpmessage = tr("No, keep it, I changed my mind"); 
@@ -2502,7 +2489,7 @@ void PlaybackBox::showDeletePopup(ProgramInfo *program, deletePopupType types)
     }
     QButton *noButton = popup->addButton(tmpmessage, this, tmpslot);
 
-    if (types == EndOfRecording || types == DeleteRecording ||
+    if (types == DeleteRecording ||
         types == ForceDeleteRecording)
         noButton->setFocus();
     else
@@ -3605,23 +3592,6 @@ void PlaybackBox::toggleView(ViewMask itemMask, bool setOn)
     connected = FillList(true);
     paintSkipUpdate = false;
     update(drawTotalBounds);
-}
-
-void PlaybackBox::promptEndOfRecording(ProgramInfo *rec)
-{
-    if (!rec)
-        return;
-
-    previewVideoState = kStopping;
-
-    if (!rec)
-        return;
-
-    if (delitem)
-        delete delitem;
-        
-    delitem = new ProgramInfo(*rec);
-    showDeletePopup(delitem, EndOfRecording);
 }
 
 void PlaybackBox::UpdateProgressBar(void)

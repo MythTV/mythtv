@@ -74,7 +74,6 @@ class PlaybackBox : public MythDialog
 
     typedef enum
     {
-        EndOfRecording,
         DeleteRecording,
         StopRecording,
         ForceDeleteRecording,
@@ -272,7 +271,6 @@ class PlaybackBox : public MythDialog
     void startPlayer(ProgramInfo *rec);
 
     bool doRemove(ProgramInfo *, bool forgetHistory, bool forceMetadataDelete);
-    void promptEndOfRecording(ProgramInfo *);
     void showDeletePopup(ProgramInfo *, deletePopupType);
     void showActionPopup(ProgramInfo *program);
     void showFileNotFoundActionPopup(ProgramInfo *program);
