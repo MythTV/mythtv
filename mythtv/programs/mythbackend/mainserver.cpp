@@ -359,6 +359,10 @@ void MainServer::ProcessRequestWork(MythSocket *sock)
         else
             HandleQueryRecordings(tokens[1], pbs);
     }
+    else if (command == "QUERY_RECORDING")
+    {
+        HandleQueryRecording(tokens, pbs);
+    }
     else if (command == "QUERY_FREE_SPACE")
     {
         HandleQueryFreeSpace(pbs, false);
@@ -1297,6 +1301,37 @@ void MainServer::HandleQueryRecordings(QString type, PlaybackSock *pbs)
         delete (*ri);
 
     SendResponse(pbssock, outputlist);
+}
+
+void MainServer::HandleQueryRecording(QStringList &slist, PlaybackSock *pbs)
+{
+    MythSocket *pbssock = pbs->getSocket();
+    QString command = slist[1].upper();
+    ProgramInfo *pginfo = NULL;
+
+    if (command == "BASENAME")
+    {
+        pginfo = ProgramInfo::GetProgramFromBasename(slist[2]);
+    }
+    else if (command == "TIMESLOT")
+    {
+        pginfo = ProgramInfo::GetProgramFromRecorded(slist[2], slist[3]);
+    }
+
+    QStringList strlist;
+
+    if (pginfo)
+    {
+        strlist << "OK";
+        pginfo->ToStringList(strlist);
+        delete pginfo;
+    }
+    else
+    {
+        strlist << "ERROR";
+    }
+
+    SendResponse(pbssock, strlist);
 }
 
 void MainServer::HandleFillProgramInfo(QStringList &slist, PlaybackSock *pbs)

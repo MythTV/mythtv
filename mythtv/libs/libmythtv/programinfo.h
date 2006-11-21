@@ -111,6 +111,7 @@ class MPUBLIC ProgramInfo
                                              const QDateTime &dtime, 
                                              bool genUnknown = false, 
                                              int clampHoursMax = 0);
+    static ProgramInfo *GetProgramFromBasename(const QString filename);
     static ProgramInfo *GetProgramFromRecorded(const QString &channel, 
                                                const QString &starttime);
     static ProgramInfo *GetProgramFromRecorded(const QString &channel, 

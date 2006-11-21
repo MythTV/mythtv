@@ -782,6 +782,29 @@ QString ProgramInfo::toString(void) const
     return str;
 }
 
+/** \fn ProgramInfo::GetProgramFromBasename()
+ *  \brief Returns a new ProgramInfo for an existing recording.
+ *  \return Pointer to a ProgramInfo if it succeeds, NULL otherwise.
+ */
+ProgramInfo *ProgramInfo::GetProgramFromBasename(const QString filename)
+{
+    MSqlQuery query(MSqlQuery::InitCon());
+
+    query.prepare("SELECT chanid, starttime FROM recorded "
+                  "WHERE basename = :BASENAME;");
+    query.bindValue(":BASENAME", filename);
+
+    if (query.exec() && query.isActive() && query.size() > 0)
+    {
+        query.next();
+
+        return GetProgramFromRecorded(query.value(0).toString(),
+                                      query.value(1).toDateTime());
+    }
+    
+    return NULL;
+}
+
 /** \fn ProgramInfo::GetProgramFromRecorded(const QString&, const QDateTime&)
  *  \brief Returns a new ProgramInfo for an existing recording.
  *  \return Pointer to a ProgramInfo if it succeeds, NULL otherwise.

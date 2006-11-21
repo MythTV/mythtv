@@ -73,6 +73,7 @@ class MainServer : public QObject, public MythSocketCBs
 
     void HandleIsActiveBackendQuery(QStringList &slist, PlaybackSock *pbs);
     void HandleQueryRecordings(QString type, PlaybackSock *pbs);
+    void HandleQueryRecording(QStringList &slist, PlaybackSock *pbs);
     void HandleStopRecording(QStringList &slist, PlaybackSock *pbs);
     void DoHandleStopRecording(ProgramInfo *pginfo, PlaybackSock *pbs);
     void HandleDeleteRecording(QStringList &slist, PlaybackSock *pbs,
