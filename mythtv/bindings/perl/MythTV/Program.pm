@@ -19,6 +19,11 @@ package MythTV::Program;
         my $class = shift;
         my $self  = { };
         bless($self, $class);
+
+    # We need MythTV
+        die "Please create a MythTV object before creating a $class object.\n" unless ($MythTV::last);
+
+    # Parse the data
         $self->_parse_data(@_);
         return $self;
     }
@@ -29,65 +34,54 @@ package MythTV::Program;
         my $self = shift;
 
     # Figure out how the data was passed in
-        my $rows;
         if (ref $_[0]) {
-            $rows              = $_[0];
-            $self->{'_mythtv'} = $_[0];
-        }
-        else {
-            $rows = \@_;
+            $self->{'_mythtv'} = shift;
         }
         $self->{'_mythtv'} ||= $MythTV::last;
 
-    # No connection to the backend?
-        unless ($self->{'_mythtv'}) {
-            die "Attempted to create a $class object with no defined"
-               ." MythTV object.\n";
-        }
-
     # Load the passed-in data
-        $self->{'title'}           = $rows->[0];  # title
-        $self->{'subtitle'}        = $rows->[1];  # subtitle
-        $self->{'description'}     = $rows->[2];  # description
-        $self->{'category'}        = $rows->[3];  # category
-        $self->{'chanid'}          = $rows->[4];  # chanid
-        $self->{'channum'}         = $rows->[5];  # chanstr
-        $self->{'callsign'}        = $rows->[6];  # chansign
-        $self->{'channame'}        = $rows->[7];  # channame
-        $self->{'filename'}        = $rows->[8];  # pathname
-        $self->{'fs_high'}         = $rows->[9];  # filesize upper 32 bits
-        $self->{'fs_low'}          = $rows->[10]; # filesize lower 32 bits
-        $self->{'starttime'}       = $rows->[11]; # startts                    Scheduled starttime (unix timestamp)
-        $self->{'endtime'}         = $rows->[12]; # endts                      Scheduled endtime (unix timestamp)
-        $self->{'duplicate'}       = $rows->[13]; # duplicate
-        $self->{'shareable'}       = $rows->[14]; # shareable
-        $self->{'findid'}          = $rows->[15]; # findid
-        $self->{'hostname'}        = $rows->[16]; # hostname
-        $self->{'sourceid'}        = $rows->[17]; # sourceid
-        $self->{'cardid'}          = $rows->[18]; # cardid
-        $self->{'inputid'}         = $rows->[19]; # inputid
-        $self->{'recpriority'}     = $rows->[20]; # recpriority
-        $self->{'recstatus'}       = $rows->[21]; # recstatus
-        $self->{'recordid'}        = $rows->[22]; # recordid
-        $self->{'rectype'}         = $rows->[23]; # rectype
-        $self->{'dupin'}           = $rows->[24]; # dupin
-        $self->{'dupmethod'}       = $rows->[25]; # dupmethod
-        $self->{'recstartts'}      = $rows->[26]; # recstartts                 ACTUAL start time (unix timestamp)
-        $self->{'recendts'}        = $rows->[27]; # recendts                   ACTUAL end time (unix timestamp)
-        $self->{'previouslyshown'} = $rows->[28]; # repeat
-        $self->{'progflags'}       = $rows->[29]; # programflags
-        $self->{'recgroup'}        = $rows->[30]; # recgroup
-        $self->{'commfree'}        = $rows->[31]; # chancommfree
-        $self->{'outputfilters'}   = $rows->[32]; # chanOutputFilters
-        $self->{'seriesid'}        = $rows->[33]; # seriesid
-        $self->{'programid'}       = $rows->[34]; # programid
-        $self->{'lastmodified'}    = $rows->[35]; # lastmodified
-        $self->{'recpriority'}     = $rows->[36]; # stars
-        $self->{'airdate'}         = $rows->[37]; # originalAirDate            Original airdate (unix timestamp)
-        $self->{'hasairdate'}      = $rows->[38]; # hasAirDate
-        $self->{'playgroup'}       = $rows->[39]; # playgroup
-        $self->{'recpriority2'}    = $rows->[40]; # recpriority2
-        $self->{'parentid'}        = $rows->[41]; # parentid
+        $self->{'title'}           = $_[0];  # title
+        $self->{'subtitle'}        = $_[1];  # subtitle
+        $self->{'description'}     = $_[2];  # description
+        $self->{'category'}        = $_[3];  # category
+        $self->{'chanid'}          = $_[4];  # chanid
+        $self->{'channum'}         = $_[5];  # chanstr
+        $self->{'callsign'}        = $_[6];  # chansign
+        $self->{'channame'}        = $_[7];  # channame
+        $self->{'filename'}        = $_[8];  # pathname
+        $self->{'fs_high'}         = $_[9];  # filesize upper 32 bits
+        $self->{'fs_low'}          = $_[10]; # filesize lower 32 bits
+        $self->{'starttime'}       = $_[11]; # startts                    Scheduled starttime (unix timestamp)
+        $self->{'endtime'}         = $_[12]; # endts                      Scheduled endtime (unix timestamp)
+        $self->{'duplicate'}       = $_[13]; # duplicate
+        $self->{'shareable'}       = $_[14]; # shareable
+        $self->{'findid'}          = $_[15]; # findid
+        $self->{'hostname'}        = $_[16]; # hostname
+        $self->{'sourceid'}        = $_[17]; # sourceid
+        $self->{'cardid'}          = $_[18]; # cardid
+        $self->{'inputid'}         = $_[19]; # inputid
+        $self->{'recpriority'}     = $_[20]; # recpriority
+        $self->{'recstatus'}       = $_[21]; # recstatus
+        $self->{'recordid'}        = $_[22]; # recordid
+        $self->{'rectype'}         = $_[23]; # rectype
+        $self->{'dupin'}           = $_[24]; # dupin
+        $self->{'dupmethod'}       = $_[25]; # dupmethod
+        $self->{'recstartts'}      = $_[26]; # recstartts                 ACTUAL start time (unix timestamp)
+        $self->{'recendts'}        = $_[27]; # recendts                   ACTUAL end time (unix timestamp)
+        $self->{'previouslyshown'} = $_[28]; # repeat
+        $self->{'progflags'}       = $_[29]; # programflags
+        $self->{'recgroup'}        = $_[30]; # recgroup
+        $self->{'commfree'}        = $_[31]; # chancommfree
+        $self->{'outputfilters'}   = $_[32]; # chanOutputFilters
+        $self->{'seriesid'}        = $_[33]; # seriesid
+        $self->{'programid'}       = $_[34]; # programid
+        $self->{'lastmodified'}    = $_[35]; # lastmodified
+        $self->{'recpriority'}     = $_[36]; # stars
+        $self->{'airdate'}         = $_[37]; # originalAirDate            Original airdate (unix timestamp)
+        $self->{'hasairdate'}      = $_[38]; # hasAirDate
+        $self->{'playgroup'}       = $_[39]; # playgroup
+        $self->{'recpriority2'}    = $_[40]; # recpriority2
+        $self->{'parentid'}        = $_[41]; # parentid
 
     # Load the channel data
         if ($self->{'chanid'}) {

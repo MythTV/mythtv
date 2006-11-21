@@ -20,6 +20,16 @@ package MythTV;
     use IO::Socket;
     use Sys::Hostname;
     use DBI;
+    use Date::Manip;
+
+# Export some routines
+    BEGIN {
+        use Exporter;
+        our @ISA = qw/ Exporter /;
+
+        our @EXPORT = qw/ &unix_to_myth_time
+                        /;
+    }
 
 # Constants for the recording types
     our $rectype_once       =  \1;
@@ -422,6 +432,57 @@ package MythTV;
         }
     # Return
         return $MythTV::find_program_cache{$hash_id};
+    }
+
+# Format a unix timestamp into a MythTV timestamp.  This function is exported.
+    sub unix_to_myth_time {
+        my $self = shift if (ref $_[0]);
+        my $time = shift;
+    # Already formatted
+        return $time if ($time =~ /\D/);
+    # Not a unix epoch
+        if ($time =~ /^(\d{4})(\d\d)(\d\d)(\d\d)(\d\d)(\d\d)$/) {
+            return "$1-$2-${3}T$4:$5:$6";
+        }
+    # Otherwise, format it as necessary
+        return UnixDate("epoch $time", '%Y-%m-%d\T%H:%M:%S');
+    }
+
+# Create a new MythTV::Program object
+    sub new_program {
+        my $self = shift;
+    # Two parameters means chanid and starttime
+        if ($#_ == 1) {
+            my $chanid    = shift;
+            my $starttime = unix_to_myth_time(shift);
+            my %rows = $self->backend_rows("QUERY_RECORDING TIMESLOT $chanid $starttime", 1);
+            return undef unless ($rows{'offset'}[0] eq 'OK');
+            return MythTV::Program->new($self, @{$rows{'rows'}[0]});
+        }
+    # Otherwise, we just expect a standard backend-formatted row
+        return MythTV::Program->new($self, @_);
+    }
+
+# Create a new MythTV::Recording object
+    sub new_recording {
+        my $self = shift;
+    # Only one parameter passed in -- that means it's a basename
+        if ($#_ == 0) {
+            my $basename = shift;
+            my %rows = $self->backend_rows("QUERY_RECORDING BASENAME $basename", 1);
+            return undef unless ($rows{'offset'}[0] eq 'OK');
+            return MythTV::Recording->new($self, @{$rows{'rows'}[0]});
+        }
+    # Two parameters means chanid and starttime
+        elsif ($#_ == 1) {
+            my $chanid    = shift;
+            my $starttime = unix_to_myth_time(shift);
+            my %rows = $self->backend_rows("QUERY_RECORDING TIMESLOT $chanid $starttime", 1);
+            return undef unless ($rows{'offset'}[0] eq 'OK');
+            return MythTV::Recording->new($self, @{$rows{'rows'}[0]});
+        }
+    # Otherwise, we just expect a standard backend-formatted row
+        return MythTV::Recording->new($self, @_);
     }
 
 # Return true

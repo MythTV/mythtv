@@ -27,8 +27,11 @@ package MythTV::Recording;
                     };
         bless($self, $class);
 
+    # We need MythTV
+        die "Please create a MythTV object before creating a $class object.\n" unless ($MythTV::last);
+
     # Load the parent module's settings
-        $self->SUPER::_parse_data(@_);
+        $self->_parse_data(@_);
 
     # These fields will only be set for recorded programs
         $self->{'cutlist'}         = '';
