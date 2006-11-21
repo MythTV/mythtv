@@ -1400,6 +1400,7 @@ void ProgLister::fillItemList(void)
     if (curView < 0)
          return;
 
+    bool oneChanid = false;
     QString where = "";
     QString startstr = startTime.toString("yyyy-MM-ddThh:mm:50");
     QString qphrase = viewList[curView].utf8();
@@ -1509,6 +1510,7 @@ void ProgLister::fillItemList(void)
     }
     else if (type == plChannel) // list by channel
     {
+        oneChanid = true;
         where = "WHERE channel.visible = 1 "
                 "  AND program.endtime > :PGILSTART "
                 "  AND channel.chanid = :PGILPHRASE ";
@@ -1546,7 +1548,7 @@ void ProgLister::fillItemList(void)
     }
 
     schedList.FromScheduler();
-    itemList.FromProgram(where, bindings, schedList);
+    itemList.FromProgram(where, bindings, schedList, oneChanid);
 
     ProgramInfo *s;
     vector<ProgramInfo *> sortedList;

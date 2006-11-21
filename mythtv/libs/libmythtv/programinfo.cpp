@@ -4369,7 +4369,7 @@ bool ProgramList::FromScheduler(bool &hasConflicts, QString rectable,
 }
 
 bool ProgramList::FromProgram(const QString &sql, MSqlBindings &bindings,
-                              ProgramList &schedList)
+                              ProgramList &schedList, bool oneChanid)
 {
     clear();
 
@@ -4476,6 +4476,21 @@ bool ProgramList::FromProgram(const QString &sql, MSqlBindings &bindings,
                 p->dupin = s->dupin;
                 p->dupmethod = s->dupmethod;
                 p->findid = s->findid;
+
+                if (s->recstatus == rsWillRecord)
+                {
+                    if (oneChanid)
+                    {
+                        p->chanid   = s->chanid;
+                        p->chanstr  = s->chanstr;
+                        p->chansign = s->chansign;
+                        p->channame = s->channame;
+                    }
+                    else if (p->chanid != s->chanid)
+                    {
+                        p->recstatus = rsEarlierShowing;
+                    }
+                }
             }
         }
 

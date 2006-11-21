@@ -368,7 +368,7 @@ class MPUBLIC ProgramList: public QPtrList<ProgramInfo> {
     };
 
     bool FromProgram(const QString &sql, MSqlBindings &bindings,
-                     ProgramList &schedList);
+                     ProgramList &schedList, bool oneChanid = false);
     bool FromProgram(const QString &sql, MSqlBindings &bindings) {
         ProgramList dummySched;
         return FromProgram(sql, bindings, dummySched);
