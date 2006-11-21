@@ -22,7 +22,7 @@
 
 class NuppelVideoPlayer;
 
-class DVDRingBufferPriv
+class MPUBLIC DVDRingBufferPriv
 {
   public:
     DVDRingBufferPriv();
