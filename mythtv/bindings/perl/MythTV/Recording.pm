@@ -91,6 +91,24 @@ package MythTV::Recording;
         return $self;
     }
 
+# Load the credits
+    sub load_credits {
+        my $self = shift;
+        $self->{'credits'} = ();
+        my $sh = $self->{'_mythtv'}{'dbh'}->prepare('SELECT credits.role, people.name
+                                                       FROM people,
+                                                            recordedcredits AS credits
+                                                      WHERE credits.person        = people.person
+                                                            AND credits.chanid    = ?
+                                                            AND credits.starttime = FROM_UNIXTIME(?)
+                                                   ORDER BY credits.role, people.name');
+        $sh->execute($self->{'chanid'}, $self->{'starttime'});
+        while (my ($role, $name) = $sh->fetchrow_array) {
+            push @{$self->{'credits'}{$role}}, $name;
+        }
+        $sh->finish;
+    }
+
 # Pull the recording file details out of the file itself.  This is often too
 # slow to run on each file at load time, so it is left to the program itself to
 # figure out when is most appropriate to run it.

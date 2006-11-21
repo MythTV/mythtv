@@ -46,45 +46,48 @@ package MythTV::Program;
         }
 
     # Load the passed-in data
-        $self->{'title'}           = $rows->[0];  # program name/title
-        $self->{'subtitle'}        = $rows->[1];  # episode name
-        $self->{'description'}     = $rows->[2];  # episode description
-        $self->{'category'}        = $rows->[3];  #
-        $self->{'chanid'}          = $rows->[4];  #
-        $self->{'channum'}         = $rows->[5];  #
-        $self->{'callsign'}        = $rows->[6];  #
-        $self->{'channame'}        = $rows->[7];  #
-        $self->{'filename'}        = $rows->[8];  # Recorded hostname/filename
-        $self->{'fs_high'}         = $rows->[9];  # High byte of the filesize
-        $self->{'fs_low'}          = $rows->[10]; # Low byte of the filesize
-        $self->{'starttime'}       = $rows->[11]; # Scheduled starttime (unix timestamp)
-        $self->{'endtime'}         = $rows->[12]; # Scheduled endtime (unix timestamp)
-        $self->{'hostname'}        = $rows->[16]; #
-        $self->{'sourceid'}        = $rows->[17]; #
-        $self->{'cardid'}          = $rows->[18]; #
-        $self->{'inputid'}         = $rows->[19]; #
-        $self->{'recpriority'}     = $rows->[20]; #
-        $self->{'recstatus'}       = $rows->[21]; #
-        $self->{'recordid'}        = $rows->[22]; #
-        $self->{'rectype'}         = $rows->[23]; #
-        $self->{'dupin'}           = $rows->[24]; # Fields to use for duplicate checking
-        $self->{'dupmethod'}       = $rows->[25]; #
-        $self->{'recstartts'}      = $rows->[26]; # ACTUAL start time (unix timestamp)
-        $self->{'recendts'}        = $rows->[27]; # ACTUAL end time (unix timestamp)
-        $self->{'previouslyshown'} = $rows->[28]; # Rerun
-        $self->{'progflags'}       = $rows->[29]; #
-        $self->{'recgroup'}        = $rows->[30]; #
-        $self->{'commfree'}        = $rows->[31]; #
-        $self->{'outputfilters'}   = $rows->[32]; #
-        $self->{'seriesid'}        = $rows->[33]; #
-        $self->{'programid'}       = $rows->[34]; #
-        $self->{'lastmodified'}    = $rows->[35]; #
-        $self->{'recpriority'}     = $rows->[36]; #
-        $self->{'airdate'}         = $rows->[37]; # Original airdate (unix timestamp)
-        $self->{'hasairdate'}      = $rows->[38]; #
-        $self->{'timestretch'}     = $rows->[39]; #
-        $self->{'recpriority2'}    = $rows->[40]; #
-        $self->{'parentid'}        = $rows->[41]; #
+        $self->{'title'}           = $rows->[0];  # title
+        $self->{'subtitle'}        = $rows->[1];  # subtitle
+        $self->{'description'}     = $rows->[2];  # description
+        $self->{'category'}        = $rows->[3];  # category
+        $self->{'chanid'}          = $rows->[4];  # chanid
+        $self->{'channum'}         = $rows->[5];  # chanstr
+        $self->{'callsign'}        = $rows->[6];  # chansign
+        $self->{'channame'}        = $rows->[7];  # channame
+        $self->{'filename'}        = $rows->[8];  # pathname
+        $self->{'fs_high'}         = $rows->[9];  # filesize upper 32 bits
+        $self->{'fs_low'}          = $rows->[10]; # filesize lower 32 bits
+        $self->{'starttime'}       = $rows->[11]; # startts                    Scheduled starttime (unix timestamp)
+        $self->{'endtime'}         = $rows->[12]; # endts                      Scheduled endtime (unix timestamp)
+        $self->{'duplicate'}       = $rows->[13]; # duplicate
+        $self->{'shareable'}       = $rows->[14]; # shareable
+        $self->{'findid'}          = $rows->[15]; # findid
+        $self->{'hostname'}        = $rows->[16]; # hostname
+        $self->{'sourceid'}        = $rows->[17]; # sourceid
+        $self->{'cardid'}          = $rows->[18]; # cardid
+        $self->{'inputid'}         = $rows->[19]; # inputid
+        $self->{'recpriority'}     = $rows->[20]; # recpriority
+        $self->{'recstatus'}       = $rows->[21]; # recstatus
+        $self->{'recordid'}        = $rows->[22]; # recordid
+        $self->{'rectype'}         = $rows->[23]; # rectype
+        $self->{'dupin'}           = $rows->[24]; # dupin
+        $self->{'dupmethod'}       = $rows->[25]; # dupmethod
+        $self->{'recstartts'}      = $rows->[26]; # recstartts                 ACTUAL start time (unix timestamp)
+        $self->{'recendts'}        = $rows->[27]; # recendts                   ACTUAL end time (unix timestamp)
+        $self->{'previouslyshown'} = $rows->[28]; # repeat
+        $self->{'progflags'}       = $rows->[29]; # programflags
+        $self->{'recgroup'}        = $rows->[30]; # recgroup
+        $self->{'commfree'}        = $rows->[31]; # chancommfree
+        $self->{'outputfilters'}   = $rows->[32]; # chanOutputFilters
+        $self->{'seriesid'}        = $rows->[33]; # seriesid
+        $self->{'programid'}       = $rows->[34]; # programid
+        $self->{'lastmodified'}    = $rows->[35]; # lastmodified
+        $self->{'recpriority'}     = $rows->[36]; # stars
+        $self->{'airdate'}         = $rows->[37]; # originalAirDate            Original airdate (unix timestamp)
+        $self->{'hasairdate'}      = $rows->[38]; # hasAirDate
+        $self->{'playgroup'}       = $rows->[39]; # playgroup
+        $self->{'recpriority2'}    = $rows->[40]; # recpriority2
+        $self->{'parentid'}        = $rows->[41]; # parentid
 
     # Load the channel data
         if ($self->{'chanid'}) {
@@ -92,18 +95,47 @@ package MythTV::Program;
         }
 
     # Assign the program flags
-        $self->{'has_commflag'} = ($self->{'progflags'} & 0x01) ? 1 : 0;    # FL_COMMFLAG  = 0x01
-        $self->{'has_cutlist'}  = ($self->{'progflags'} & 0x02) ? 1 : 0;    # FL_CUTLIST   = 0x02
-        $self->{'auto_expire'}  = ($self->{'progflags'} & 0x04) ? 1 : 0;    # FL_AUTOEXP   = 0x04
-        $self->{'is_editing'}   = ($self->{'progflags'} & 0x08) ? 1 : 0;    # FL_EDITING   = 0x08
-        $self->{'bookmark'}     = ($self->{'progflags'} & 0x10) ? 1 : 0;    # FL_BOOKMARK  = 0x10
+        $self->{'has_commflag'}   = ($self->{'progflags'} & 0x001) ? 1 : 0;     # FL_COMMFLAG       = 0x001
+        $self->{'has_cutlist'}    = ($self->{'progflags'} & 0x002) ? 1 : 0;     # FL_CUTLIST        = 0x002
+        $self->{'auto_expire'}    = ($self->{'progflags'} & 0x004) ? 1 : 0;     # FL_AUTOEXP        = 0x004
+        $self->{'is_editing'}     = ($self->{'progflags'} & 0x008) ? 1 : 0;     # FL_EDITING        = 0x008
+        $self->{'bookmark'}       = ($self->{'progflags'} & 0x010) ? 1 : 0;     # FL_BOOKMARK       = 0x010
+                                                                                # FL_INUSERECORDING = 0x020
+                                                                                # FL_INUSEPLAYING   = 0x040
+        $self->{'stereo'}         = ($self->{'progflags'} & 0x080) ? 1 : 0;     # FL_STEREO         = 0x080
+        $self->{'closecaptioned'} = ($self->{'progflags'} & 0x100) ? 1 : 0;     # FL_CC             = 0x100
+        $self->{'hdtv'}           = ($self->{'progflags'} & 0x200) ? 1 : 0;     # FL_HDTV           = 0x200
+                                                                                # FL_TRANSCODED     = 0x400
+        $self->{'is_watched'}     = ($self->{'progflags'} & 0x800) ? 1 : 0;     # FL_WATCHED        = 0x800
+
     # And some other calculated fields
-        $self->{'will_record'} = ($self->{'rectype'} && $self->{'rectype'} != rectype_dontrec) ? 1 : 0;
+        $self->{'will_record'} = ($self->{'rectype'} && $self->{'rectype'} != $MythTV::rectype_dontrec) ? 1 : 0;
 
     # Defaults
         $self->{'title'}       = 'Untitled'       unless ($self->{'title'} =~ /\S/);
         $self->{'subtitle'}    = 'Untitled'       unless ($self->{'subtitle'} =~ /\S/);
         $self->{'description'} = 'No Description' unless ($self->{'description'} =~ /\S/);
+
+    # Credits
+        $self->load_credits();
+
+    }
+
+# Load the credits
+    sub load_credits {
+        my $self = shift;
+        $self->{'credits'} = ();
+        my $sh = $self->{'_mythtv'}{'dbh'}->prepare('SELECT credits.role, people.name
+                                                       FROM people, credits
+                                                      WHERE credits.person        = people.person
+                                                            AND credits.chanid    = ?
+                                                            AND credits.starttime = FROM_UNIXTIME(?)
+                                                   ORDER BY credits.role, people.name');
+        $sh->execute($self->{'chanid'}, $self->{'starttime'});
+        while (my ($role, $name) = $sh->fetchrow_array) {
+            push @{$self->{'credits'}{$role}}, $name;
+        }
+        $sh->finish;
     }
 
 # Return a formatted filename for this Recording

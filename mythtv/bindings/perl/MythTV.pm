@@ -15,35 +15,33 @@
     use MythTV::Recording;
     use MythTV::Channel;
 
-# Define some constants
-    use constant {
-                 # Constants for the recording types
-                  rectype_once       =>  1,
-                  rectype_daily      =>  2,
-                  rectype_channel    =>  3,
-                  rectype_always     =>  4,
-                  rectype_weekly     =>  5,
-                  rectype_findone    =>  6,
-                  rectype_override   =>  7,
-                  rectype_dontrec    =>  8,
-                  rectype_finddaily  =>  9,
-                  rectype_findweekly => 10,
-                 # And the search types
-                  searchtype_power   => 1,
-                  searchtype_title   => 2,
-                  searchtype_keyword => 3,
-                  searchtype_people  => 4,
-                  searchtype_manual  => 5,
-                 };
-
 package MythTV;
 
     use IO::Socket;
     use Sys::Hostname;
     use DBI;
 
+# Constants for the recording types
+    our $rectype_once       =  \1;
+    our $rectype_daily      =  \2;
+    our $rectype_channel    =  \3;
+    our $rectype_always     =  \4;
+    our $rectype_weekly     =  \5;
+    our $rectype_findone    =  \6;
+    our $rectype_override   =  \7;
+    our $rectype_dontrec    =  \8;
+    our $rectype_finddaily  =  \9;
+    our $rectype_findweekly = \10;
+
+# And the search types
+    our $searchtype_power   = \1;
+    our $searchtype_title   = \2;
+    our $searchtype_keyword = \3;
+    our $searchtype_people  = \4;
+    our $searchtype_manual  = \5;
+
 # The character string used by the backend to separate records
-    our $BACKEND_SEP    = '[]:[]';
+    our $BACKEND_SEP    = \'[]:[]';
     our $BACKEND_SEP_rx = qr/\[\]:\[\]/;
 
 # MYTH_PROTO_VERSION is defined in libmyth in mythtv/libs/libmyth/mythcontext.h
