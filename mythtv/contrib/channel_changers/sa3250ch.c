@@ -54,7 +54,8 @@ void usage()
 {
    fprintf(stderr, "Usage: sa3250ch [-v] [-s] <channel_num>\n");
    fprintf(stderr, "  -v : Verbose Mode\n");
-   fprintf(stderr, "  -s : Send command as single digit (for SA4200 and some SA3250s)\n");
+   fprintf(stderr, "  -s : Send command as single digit "
+           "(for SA4200 and some SA3250s and SA4200HD's)\n");
    exit(1);
 }
 
