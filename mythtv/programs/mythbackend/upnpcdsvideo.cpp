@@ -56,7 +56,30 @@ static RootInfo g_RootNodes[] =
             "%1 "
             "GROUP BY title "
             "ORDER BY title", 
-        "WHERE title=:KEY" }
+        "WHERE title=:KEY" },
+
+    {   "By Genre",
+        "idgenre",
+        "SELECT intid as id, "
+          "genre as name, "
+          "count( genre ) as children "
+            "FROM videogenre "
+            "%1 "
+            "GROUP BY genre "
+            "ORDER BY genre",
+        "WHERE genre=:KEY" },
+
+     {   "By Country",
+        "idcountry",
+        "SELECT intid as id, "
+          "country as name, "
+          "count( country ) as children "
+            "FROM videocountry "
+            "%1 "
+            "GROUP BY country "
+            "ORDER BY country",
+        "WHERE country=:KEY" }
+
 
 };
 
@@ -66,9 +89,36 @@ static const short g_nRootNodeLength = sizeof( g_RootNodes ) / sizeof( RootInfo 
 //
 /////////////////////////////////////////////////////////////////////////////
 
+//#define SHARED_VIDEO_SQL "SELECT intid, title, director, plot, year, " \
+//                                   "userrating, length, filename, "   \
+//                                   "coverfile, category FROM videometadata "
+
+// 
 #define SHARED_VIDEO_SQL "SELECT intid, title, director, plot, year, " \
-                                   "userrating, length, filename, "   \
-                                   "coverfile, category FROM videometadata "
+                            "userrating, length, filename, coverfile, "   \
+                            "category FROM videometadata " 
+
+
+#define SHARED_ALLVIDEO_SQL "SELECT intid, title, director, plot, year, " \
+                            "userrating, length, filename, coverfile, "   \
+                            "category, idgenre, idcountry FROM videometadata " \
+                            "LEFT JOIN (videometadatagenre) ON " \
+                            "(videometadatagenre.idvideo = videometadata.intid) " \
+                            "LEFT JOIN (videometadatacountry) ON " \
+                            "(videometadatacountry.idvideo = videometadata.intid) " 
+
+#define SHARED_GENRE_SQL "SELECT intid, title, director, plot, year, " \
+                            "userrating, length, filename, coverfile, "   \
+                            "category, idgenre FROM videometadata " \
+                            "LEFT JOIN (videometadatagenre) ON " \
+                            "(videometadatagenre.idvideo = videometadata.intid) " 
+
+#define SHARED_COUNTRY_SQL "SELECT intid, title, director, plot, year, " \
+                            "userrating, length, filename, coverfile, "   \
+                            "category, idcountry FROM videometadata " \
+                            "LEFT JOIN (videometadatacountry) ON " \
+                            "(videometadatacountry.idvideo = videometadata.intid) " 
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -528,7 +578,21 @@ int UPnpCDSVideo::GetDistinctCount( const QString &sColumn )
         if (sColumn == "*")
             sSQL = QString( "SELECT count( %1 ) FROM videometadata" ).arg( sColumn );
         else
-            sSQL = QString( "SELECT count( DISTINCT %1 ) FROM videometadata" ).arg( sColumn );
+        {
+            QString sTable;
+
+            if (sColumn == "idgenre")
+                sTable = "videometadatagenre";
+            else if (sColumn == "idcountry")
+                sTable = "videometadatacountry";
+            else 
+                sTable = "videometadata";
+
+
+            sSQL = QString( "SELECT count( DISTINCT %1 ) FROM %2" )
+                   .arg( sColumn )
+                   .arg( sTable );
+        }
 
         query.prepare( sSQL );
         query.exec();
@@ -564,9 +628,21 @@ int UPnpCDSVideo::GetCount( const QString &sColumn, const QString &sKey )
         if (sColumn == "*")
             sSQL = "SELECT count( * ) FROM videometadata";
         else
-            sSQL = QString( "SELECT count( %1 ) FROM videometadata WHERE %2=:KEY" )
+        {
+            QString sTable;
+    
+            if (sColumn == "idgenre")
+                sTable = "videometadatagenre";
+            else if (sColumn == "idcountry")
+                sTable = "videometadatacountry";
+            else
+                sTable = "videometadata";
+
+            sSQL = QString( "SELECT count( %1 ) FROM %2 WHERE %3=:KEY" )
                       .arg( sColumn )
+                      .arg( sTable )
                       .arg( sColumn );
+        }
 
         query.prepare( sSQL );
         query.bindValue( ":KEY", sKey );
@@ -588,12 +664,104 @@ int UPnpCDSVideo::GetCount( const QString &sColumn, const QString &sKey )
 //
 /////////////////////////////////////////////////////////////////////////////
 
+//  -- TODO -- Going to improve this later, just a rough in right now
+
+void UPnpCDSVideo::FillMetaMaps(void)
+{
+    MSqlQuery query(MSqlQuery::InitCon());
+
+    if (query.isConnected())
+    {   
+        QString sSQL = "SELECT intid, genre FROM videogenre";
+
+        query.prepare  ( sSQL );
+        query.exec();
+
+        if (query.isActive() && query.size() > 0)
+        {   
+            while(query.next())
+                m_mapGenreNames[query.value(0).toInt()] = query.value(1).toString();
+        }
+
+        sSQL = "SELECT intid, country FROM videocountry";
+
+        query.prepare  ( sSQL );
+        query.exec();
+
+        if (query.isActive() && query.size() > 0)
+        {   
+            while(query.next())
+                m_mapCountryNames[query.value(0).toInt()] = query.value(1).toString();
+        }
+
+        // Forcibly map "0" to "Unknown"
+        m_mapGenreNames[0] = "Unknown";
+        m_mapCountryNames[0] = "Unknown";
+
+
+        int nVidID,nGenreID,nCountryID = 0;
+
+        sSQL = SHARED_GENRE_SQL;
+
+        query.prepare  ( sSQL );
+        query.exec();
+
+        if (query.isActive() && query.size() > 0)
+        {
+            while(query.next())
+            {   
+                nVidID = query.value(0).toInt();               
+                nGenreID = query.value(10).toInt();
+
+                if (m_mapGenre.contains(nVidID))
+                    m_mapGenre[nVidID] = QString("%1 / %2")
+                                             .arg(m_mapGenre[nVidID])
+                                             .arg(m_mapGenreNames[nGenreID]);
+                else
+                    m_mapGenre[nVidID] = m_mapGenreNames[nGenreID];
+
+            }
+        }
+
+        sSQL = SHARED_COUNTRY_SQL;
+
+        query.prepare  ( sSQL );
+        query.exec();
+
+        if (query.isActive() && query.size() > 0)
+        {   
+            while(query.next())
+            {   
+                nVidID = query.value(0).toInt();
+                nCountryID = query.value(10).toInt();
+
+                if (m_mapCountry.contains(nVidID))
+                    m_mapCountry[nVidID] =  QString("%1 / %2")
+                                             .arg(m_mapCountry[nVidID])
+                                             .arg(m_mapCountryNames[nCountryID]);
+                else
+                    m_mapCountry[nVidID] = m_mapCountryNames[nCountryID];
+
+            }
+        }
+
+
+
+    }
+}
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
 void UPnpCDSVideo::CreateVideoItems( UPnpCDSBrowseRequest    *pRequest,
                                   UPnpCDSExtensionResults *pResults,
                                   int                      nNodeIdx,
                                   const QString           &sKey, 
                                   bool                     bAddRef )
 {
+    QString sSQLBase;
 
     pResults->m_nTotalMatches = GetCount( g_RootNodes[ nNodeIdx ].column, sKey );
     pResults->m_nUpdateID     = 1;
@@ -613,9 +781,17 @@ void UPnpCDSVideo::CreateVideoItems( UPnpCDSBrowseRequest    *pRequest,
                        .arg( g_RootNodes[ nNodeIdx ].column );
         }
 
-        QString sSQL = QString( SHARED_VIDEO_SQL 
-                                "%1 "
-                                "LIMIT %2, %3" )
+        if ( g_RootNodes[ nNodeIdx ].column == "idgenre" )
+            sSQLBase = SHARED_GENRE_SQL;
+        else if ( g_RootNodes[ nNodeIdx ].column == "idcountry" )
+            sSQLBase = SHARED_COUNTRY_SQL;
+        else 
+            sSQLBase = SHARED_VIDEO_SQL;
+   
+        QString sSQL = QString( "%1 " 
+                                "%2 "
+                                "LIMIT %3, %4" )
+                          .arg( sSQLBase )
                           .arg( sWhere )
                           .arg( pRequest->m_nStartingIndex  )
                           .arg( pRequest->m_nRequestedCount );
@@ -645,12 +821,16 @@ void UPnpCDSVideo::AddVideoItem( UPnpCDSBrowseRequest    *pRequest,
     QString        sTitle       = query.value( 1).toString();
     QString        sDirector    = query.value( 2).toString();
     QString        sDescription = query.value( 3).toString();
-    int            nYear        = query.value( 4).toInt();
+    QString        sYear        = query.value( 4).toString();
     QString        sUserRating  = query.value( 5).toString();
     long long      nFileSize    = stringToLongLong( query.value( 6).toString() );
     QString        sFileName    = query.value( 7).toString();
     QString        sCover       = query.value( 8).toString();
     int            nCategory    = query.value( 9).toInt();
+
+    // This should be a lookup from acache of the videometagenre and such tables.
+    QString        sGenre       = m_mapGenre[nVidID];
+    QString        sCountry     = m_mapCountry[nVidID];
 
     // ----------------------------------------------------------------------
     // Cache Host ip Address & Port
@@ -691,7 +871,11 @@ void UPnpCDSVideo::AddVideoItem( UPnpCDSBrowseRequest    *pRequest,
         pItem->SetPropValue( "refID", sRefId );
     }
 
-    //pItem->SetPropValue( "genre"          , sCategory    );
+    pItem->SetPropValue( "country"        , sCountry );
+    pItem->SetPropValue( "director"       , sDirector );
+    pItem->SetPropValue( "year"           , sYear    );
+    pItem->SetPropValue( "genre"          , sGenre    );
+    //cerr << QString("Setting GENRE : %1 for item (%3) %2").arg(sGenre).arg(sTitle).arg(nVidID) << endl;
     pItem->SetPropValue( "longDescription", sDescription );
     pItem->SetPropValue( "description"    , sDescription    );
 

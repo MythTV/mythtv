@@ -18,6 +18,8 @@
 
 typedef QMap< QString, QString > StringMap;
 
+typedef QMap<int, QString> IntMap;
+
 //////////////////////////////////////////////////////////////////////////////
 //
 //////////////////////////////////////////////////////////////////////////////
@@ -29,12 +31,19 @@ class UPnpCDSVideo : public UPnpCDSExtension
         StringMap    m_mapBackendIp;
         StringMap    m_mapBackendPort;
 
+        IntMap       m_mapGenreNames;
+        IntMap       m_mapCountryNames;
+        IntMap       m_mapGenre;
+        IntMap       m_mapCountry;
+
     private:
 
         QString RemoveToken ( const QString &sToken, const QString &sStr, int num );
 
         int  GetDistinctCount      ( const QString &sColumn );
         int  GetCount              ( const QString &sColumn, const QString &sKey );
+
+        void FillMetaMaps (void);
 
         void BuildContainerChildren( UPnpCDSExtensionResults *pResults, 
                                      int                      nNodeIdx,
@@ -75,6 +84,7 @@ class UPnpCDSVideo : public UPnpCDSExtension
 
         UPnpCDSVideo( ) : UPnpCDSExtension( "Videos", "Videos" )
         {
+            FillMetaMaps();
         }
 
         virtual ~UPnpCDSVideo() {}
