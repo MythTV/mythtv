@@ -77,15 +77,15 @@ static RootInfo g_RootNodes[] =
         "WHERE category=:KEY" },
 
     {   "By Date",
-        "DATE( starttime )",
-        "SELECT DATE( starttime ) as id, "
+        "DATE_FORMAT(starttime, '%Y-%m-%d')",
+        "SELECT  DATE_FORMAT(starttime, '%Y-%m-%d') as id, "
           "DATE_FORMAT(starttime, '%Y-%m-%d %W') as name, "
           "count( DATE_FORMAT(starttime, '%Y-%m-%d %W') ) as children "
             "FROM recorded "
             "%1 "
             "GROUP BY name "
             "ORDER BY starttime DESC",
-        "WHERE DATE( starttime )=:KEY" },
+        "WHERE DATE_FORMAT(starttime, '%Y-%m-%d') =:KEY" },
 
     {   "By Channel", 
         "chanid", 
