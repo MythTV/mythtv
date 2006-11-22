@@ -892,8 +892,10 @@ static struct dvb_fe_params dtvmultiplex_to_dvbparams(
 
     if (DTVTunerType::kTunerTypeATSC == tuner_type)
     {
+#ifdef USE_ATSC
         params.u.vsb.modulation   =
             (fe_modulation_t) (int) tuning.modulation;
+#endif // USE_ATSC
     }
 
     return params;
@@ -934,7 +936,9 @@ static DTVMultiplex dvbparams_to_dtvmultiplex(
 
     if (DTVTunerType::kTunerTypeATSC == tuner_type)
     {
+#ifdef USE_ATSC
         tuning.modulation     = params.u.vsb.modulation;
+#endif // USE_ATSC
     }
 
     return tuning;
