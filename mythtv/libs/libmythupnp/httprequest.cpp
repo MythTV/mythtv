@@ -59,7 +59,9 @@ static MIMETypes g_MIMETypes[] =
     { "gz"  , "application/x-tar"          },
     { "mpg" , "video/mpeg"                 },
     { "mpeg", "video/mpeg"                 },
-    { "nuv" , "video/nupplevideo"          }
+    { "vob",  "video/mpeg"                 },
+    { "nuv" , "video/nupplevideo"          },
+    { "wmv" , "video/x-ms-wmv"             }
 };
 
 static const int     g_nMIMELength    = sizeof( g_MIMETypes) / sizeof( MIMETypes );
@@ -480,9 +482,13 @@ QString HTTPRequest::GetResponseType( void )
 
 QString HTTPRequest::GetMimeType( const QString &sFileExtension )
 {
+    QString ext;
+
     for (int i = 0; i < g_nMIMELength; i++)
     {
-        if ( sFileExtension == g_MIMETypes[i].pszExtension )
+        ext = g_MIMETypes[i].pszExtension;
+
+        if ( sFileExtension.upper() == ext.upper() )
             return( g_MIMETypes[i].pszType );
     }
 
