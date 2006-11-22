@@ -947,7 +947,8 @@ void AvFormatDecoder::InitVideoCodec(AVStream *stream, AVCodecContext *enc,
 {
     float aspect_ratio;
 
-    directrendering = false;
+    if (ringBuffer->isDVD())
+        directrendering = false;
 
     if (selectedStream)
     {
