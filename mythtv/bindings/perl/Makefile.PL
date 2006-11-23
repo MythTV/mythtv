@@ -18,6 +18,9 @@ WriteMakefile(
                             'Sys::Hostname' => 0,
                             'DBI'           => 0,
                             'DBD::mysql'    => 0,
+                            'Date::Manip'   => 0,
+                            'Exporter'      => 0,
+                            'Config'        => 0,
                            },
         'NO_META'       => 1,
 );
