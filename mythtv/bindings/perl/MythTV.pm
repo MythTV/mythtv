@@ -27,31 +27,31 @@ package MythTV;
         use Exporter;
         our @ISA = qw/ Exporter /;
 
-        our @EXPORT = qw/ &unix_to_myth_time
+        our @EXPORT = qw/ &unix_to_myth_time &myth_to_unix_time
                         /;
     }
 
 # Constants for the recording types
-    our $rectype_once       =  \1;
-    our $rectype_daily      =  \2;
-    our $rectype_channel    =  \3;
-    our $rectype_always     =  \4;
-    our $rectype_weekly     =  \5;
-    our $rectype_findone    =  \6;
-    our $rectype_override   =  \7;
-    our $rectype_dontrec    =  \8;
-    our $rectype_finddaily  =  \9;
-    our $rectype_findweekly = \10;
+    our $rectype_once       =  1;
+    our $rectype_daily      =  2;
+    our $rectype_channel    =  3;
+    our $rectype_always     =  4;
+    our $rectype_weekly     =  5;
+    our $rectype_findone    =  6;
+    our $rectype_override   =  7;
+    our $rectype_dontrec    =  8;
+    our $rectype_finddaily  =  9;
+    our $rectype_findweekly = 10;
 
 # And the search types
-    our $searchtype_power   = \1;
-    our $searchtype_title   = \2;
-    our $searchtype_keyword = \3;
-    our $searchtype_people  = \4;
-    our $searchtype_manual  = \5;
+    our $searchtype_power   = 1;
+    our $searchtype_title   = 2;
+    our $searchtype_keyword = 3;
+    our $searchtype_people  = 4;
+    our $searchtype_manual  = 5;
 
 # The character string used by the backend to separate records
-    our $BACKEND_SEP    = \'[]:[]';
+    our $BACKEND_SEP    = '[]:[]';
     our $BACKEND_SEP_rx = qr/\[\]:\[\]/;
 
 # MYTH_PROTO_VERSION is defined in libmyth in mythtv/libs/libmyth/mythcontext.h
@@ -94,9 +94,6 @@ package MythTV;
     our %setting_cache;
     our %proto_cache;
     our %fp_cache;
-
-# Cache the results from find_program
-    our %find_program_cache;
 
 # Get the user's login and home directory, so we can look for config files
     my ($username, $homedir) = (getpwuid $>)[0,7];
@@ -392,48 +389,6 @@ package MythTV;
         $sh->finish;
     }
 
-# Find the requested program in the path
-# This searches the path for the specified programs, and returns the
-#   lowest-index-value program found, caching the results
-    sub find_program {
-    # Get the hash id
-        my $hash_id = join("\n", @_);
-    # No cache?
-        if (!defined($MythTV::find_program_cache{$hash_id})) {
-        # Load the programs, and get a count of the priorities
-            my (%programs, $num_programs);
-            foreach my $program (@_) {
-                $programs{$program} = ++$num_programs;
-            }
-        # No programs requested?
-            return undef unless ($num_programs > 0);
-        # Need a path?
-            $ENV{'PATH'} ||= '/usr/local/bin:/usr/bin:/bin';
-        # Search for the program(s)
-            my %found;
-            foreach my $path ('.', split(/:/, $ENV{'PATH'})) {
-                foreach my $program (keys %programs) {
-                    if (-e "$path/$program" && (!$found{'name'} || $programs{$program} < $programs{$found{'name'}})) {
-                        $found{'name'} = $program;
-                        $found{'path'} = $path;
-                    }
-                    elsif ($^O eq "darwin" && -e "$path/$program.app" && (!$found{'name'} || $programs{$program} < $programs{$found{'name'}})) {
-                        $found{'name'} = $program;
-                        $found{'path'} = "$path/$program.app/Contents/MacOS";
-                    }
-                # Leave early if we found the highest priority program
-                    last if ($found{'name'} && $programs{$found{'name'}} == 1);
-                }
-            }
-        # Set the cache
-            $MythTV::find_program_cache{$hash_id} = ($found{'path'} && $found{'name'})
-                                                    ? $found{'path'}.'/'.$found{'name'}
-                                                    : '';
-        }
-    # Return
-        return $MythTV::find_program_cache{$hash_id};
-    }
-
 # Format a unix timestamp into a MythTV timestamp.  This function is exported.
     sub unix_to_myth_time {
         my $self = shift if (ref $_[0]);
@@ -445,7 +400,14 @@ package MythTV;
             return "$1-$2-${3}T$4:$5:$6";
         }
     # Otherwise, format it as necessary
-        return UnixDate("epoch $time", '%Y-%m-%d\T%H:%M:%S');
+        return UnixDate("epoch $time", '%O');
+    }
+
+# Format a unix timestamp into a MythTV timestamp.  This function is exported.
+    sub myth_to_unix_time {
+        my $self = shift if (ref $_[0]);
+        my $time = shift;
+        return UnixDate($time, '%s');
     }
 
 # Create a new MythTV::Program object

@@ -15,6 +15,9 @@ package MythTV::Recording;
 # Required for checking byteorder when processing NuppelVideo files
     use Config;
 
+# Cache the results from find_program
+    our %find_program_cache;
+
 # Constructor
     sub new {
         my $class = shift;
@@ -30,6 +33,9 @@ package MythTV::Recording;
     # We need MythTV
         die "Please create a MythTV object before creating a $class object.\n" unless ($MythTV::last);
 
+    # Var
+        my $sh;
+
     # Load the parent module's settings
         $self->_parse_data(@_);
 
@@ -38,34 +44,37 @@ package MythTV::Recording;
         $self->{'last_frame'}      = 0;
         $self->{'cutlist_frames'}  = 0;
 
-    # Is this a previously-recorded program?
-        if ($self->{'filename'}) {
-            my $sh;
-        # Calculate the filesize
-            $self->{'filesize'} = ($self->{'fs_high'} + ($self->{'fs_low'} < 0)) * 4294967296
-                                  + $self->{'fs_low'};
-        # Pull the last known frame from the database, to help guestimate the
-        # total frame count.
-            $sh = $self->{'_mythtv'}{'dbh'}->prepare('SELECT MAX(mark) FROM recordedseek WHERE chanid=? AND starttime=FROM_UNIXTIME(?)');
-            $sh->execute($self->{'chanid'}, $self->{'recstartts'});
-            ($self->{'last_frame'}) = $sh->fetchrow_array();
-            $sh->finish();
-        # Split the filename up into its respective parts
-            if ($self->{'filename'} =~ m#myth://(.+?)(?::(\d+))?/(.*?)$#) {
-                $self->{'file_host'} = $1;
-                $self->{'file_port'} = ($2 or 6543);
-                $self->{'basename'}  = $3;
-            }
-            else {
-                $self->{'basename'}  = $self->{'filename'};
-                $self->{'basename'} =~ s/^$self->{'_mythtv'}{'video_dir'}\/+//sg;
-            }
+    # Calculate the filesize
+        $self->{'filesize'} = ($self->{'fs_high'} + ($self->{'fs_low'} < 0)) * 4294967296
+                              + $self->{'fs_low'};
+    # Pull the last known frame from the database, to help guestimate the
+    # total frame count.
+        $sh = $self->{'_mythtv'}{'dbh'}->prepare('SELECT MAX(mark)
+                                                    FROM recordedseek
+                                                   WHERE chanid=? AND starttime=FROM_UNIXTIME(?)');
+        $sh->execute($self->{'chanid'}, $self->{'recstartts'});
+        ($self->{'last_frame'}) = $sh->fetchrow_array();
+        $sh->finish();
+
+    # Split the filename up into its respective parts
+        if ($self->{'filename'} =~ m#myth://(.+?)(?::(\d+))?/(.*?)$#) {
+            $self->{'file_host'} = $1;
+            $self->{'file_port'} = ($2 or 6543);
+            $self->{'basename'}  = $3;
+        }
+        else {
+            $self->{'basename'}  = $self->{'filename'};
+            $self->{'basename'} =~ s/^$self->{'_mythtv'}{'video_dir'}\/+//sg;
         }
 
     # Pull the cutlist info from the database
         if ($self->{'has_cutlist'}) {
             my $last_mark = 0;
-            $sh = $self->{'_mythtv'}{'dbh'}->prepare('SELECT type, mark FROM recordedmarkup WHERE chanid=? AND starttime=FROM_UNIXTIME(?) AND type IN (0,1) ORDER BY mark');
+            $sh = $self->{'_mythtv'}{'dbh'}->prepare('SELECT type, mark
+                                                        FROM recordedmarkup
+                                                       WHERE chanid=? AND starttime=FROM_UNIXTIME(?)
+                                                             AND type IN (0,1)
+                                                    ORDER BY mark');
             $sh->execute($self->{'chanid'}, $self->{'recstartts'});
             while (my ($type, $mark) = $sh->fetchrow_array) {
                 if ($type == 1) {
@@ -280,7 +289,7 @@ package MythTV::Recording;
         $file =~ s/'/'\\''/sg;
         my %info;
     # First, we check for the existence of  an mpeg info program
-        my $program = MythTV::find_program('mplayer');
+        my $program = find_program('mplayer');
     # Nothing found?  Die
         die "You need mplayer to use this script on mpeg-based files.\n\n" unless ($program);
     # Set the is_mpeg flag
@@ -380,6 +389,49 @@ package MythTV::Recording;
         elsif ($aspect =~ m/^1.7/) { return 16 / 9; }
     # Unknown aspect
         return $aspect;
+    }
+
+# Find the requested program in the path
+# This searches the path for the specified programs, and returns the
+#   lowest-index-value program found, caching the results
+
+    sub find_program {
+    # Get the hash id
+        my $hash_id = join("\n", @_);
+    # No cache?
+        if (!defined($MythTV::Recording::find_program_cache{$hash_id})) {
+        # Load the programs, and get a count of the priorities
+            my (%programs, $num_programs);
+            foreach my $program (@_) {
+                $programs{$program} = ++$num_programs;
+            }
+        # No programs requested?
+            return undef unless ($num_programs > 0);
+        # Need a path?
+            $ENV{'PATH'} ||= '/usr/local/bin:/usr/bin:/bin';
+        # Search for the program(s)
+            my %found;
+            foreach my $path ('.', split(/:/, $ENV{'PATH'})) {
+                foreach my $program (keys %programs) {
+                    if (-e "$path/$program" && (!$found{'name'} || $programs{$program} < $programs{$found{'name'}})) {
+                        $found{'name'} = $program;
+                        $found{'path'} = $path;
+                    }
+                    elsif ($^O eq "darwin" && -e "$path/$program.app" && (!$found{'name'} || $programs{$program} < $programs{$found{'name'}})) {
+                        $found{'name'} = $program;
+                        $found{'path'} = "$path/$program.app/Contents/MacOS";
+                    }
+                # Leave early if we found the highest priority program
+                    last if ($found{'name'} && $programs{$found{'name'}} == 1);
+                }
+            }
+        # Set the cache
+            $MythTV::Recording::find_program_cache{$hash_id} = ($found{'path'} && $found{'name'})
+                                                                ? $found{'path'}.'/'.$found{'name'}
+                                                                : '';
+        }
+    # Return
+        return $MythTV::Recording::find_program_cache{$hash_id};
     }
 
 # Return true

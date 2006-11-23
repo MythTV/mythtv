@@ -115,6 +115,56 @@ package MythTV::Program;
 
     }
 
+# Return a mythproto-compatible row of data for this show.
+    sub to_string() {
+        my $self = shift;
+        return join($MythTV::BACKEND_SEP,
+                    ' ',                    # 00 title
+                    ' ',                    # 01 subtitle
+                    ' ',                    # 02 description
+                    ' ',                    # 03 category
+                    $self->{'chanid'},      # 04 chanid
+                    ' ',                    # 05 chanstr
+                    ' ',                    # 06 chansign
+                    ' ',                    # 07 channame
+                    $self->{'filename'},    # 08 pathname
+                    '0',                    # 09 filesize upper 32 bits
+                    '0',                    # 10 filesize lower 32 bits
+                    $self->{'starttime'},   # 11 startts
+                    $self->{'endtime'},     # 12 endts
+                    '0',                    # 13 duplicate
+                    '1',                    # 14 shareable
+                    '0',                    # 15 findid
+                    $self->{'hostname'},    # 16 hostname
+                    '-1',                   # 17 sourceid
+                    '-1',                   # 18 cardid
+                    '-1',                   # 19 inputid
+                    ' ',                    # 20 recpriority
+                    ' ',                    # 21 recstatus
+                    ' ',                    # 22 recordid
+                    ' ',                    # 23 rectype
+                    '15',                   # 24 dupin
+                    '6',                    # 25 dupmethod
+                    $self->{'recstartts'},  # 26 recstartts
+                    $self->{'recendts'},    # 27 recendts
+                    ' ',                    # 28 repeat
+                    ' ',                    # 29 programflags
+                    ' ',                    # 30 recgroup
+                    ' ',                    # 31 chancommfree
+                    ' ',                    # 32 chanOutputFilters
+                    $self->{'seriesid'},    # 33 seriesid
+                    $self->{'programid'},   # 34 programid
+                    $self->{'starttime'},   # 35 lastmodified
+                    '0',                    # 36 stars
+                    $self->{'starttime'},   # 37 originalAirDate
+                    '',                     # 38 hasAirDate
+                    '',                     # 39 playgroup
+                    '',                     # 40 recpriority2
+                    '',                     # 41 parentid
+                    '',                     # 42 trailing separator
+                   );
+    }
+
 # Load the credits
     sub load_credits {
         my $self = shift;
