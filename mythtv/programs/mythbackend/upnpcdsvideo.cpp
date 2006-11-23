@@ -13,17 +13,6 @@
 #include <limits.h>
 #include "util.h"
 
-/*
-   Videos                                  Videos
-    - All Videos                           Videos/All
-      + <Video 1>                          Videos/All/item?VideoID=1004
-      + <Video 2>
-      + <Video 3>
-    - By Title                             Videos/title
-      - <title 1>                          Videos/title/key=Stargate SG-1
-        + <Video 1>                        Videos/title/key=Stargate SG-1/item?VideoID=1004
-        + <Video 2>
-*/
 
 
 typedef struct
@@ -46,17 +35,6 @@ static RootInfo g_RootNodes[] =
             "%1 "
             "ORDER BY title DESC",
         "" },
-
-    {   "By Title", 
-        "title",
-        "SELECT title as id, "
-          "title as name, "
-          "count( title ) as children "
-            "FROM videometadata "
-            "%1 "
-            "GROUP BY title "
-            "ORDER BY title", 
-        "WHERE title=:KEY" },
 
     {   "By Genre",
         "idgenre",
