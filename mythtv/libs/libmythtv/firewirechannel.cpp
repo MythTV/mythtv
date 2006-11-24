@@ -104,11 +104,9 @@ bool FirewireChannel::SetChannelByNumber(int channel)
             quadlet_t cmd[2] =  { DCT6200_CMD0 | dig[i], 0x0, };
             if (!avc1394_transaction_block(fwhandle, fw_opts.node, cmd, 2, 1))
             {
-                 avc1394_transaction_block_close(fwhandle);
                  VERBOSE(VB_IMPORTANT, "AVC transaction failed.");
                  return false;
             }
-            avc1394_transaction_block_close(fwhandle);
             usleep(500000);
         }
     }
@@ -134,11 +132,9 @@ bool FirewireChannel::SetChannelByNumber(int channel)
 
         if(!avc1394_transaction_block(fwhandle, fw_opts.node, cmd, 3, 1))
         {
-            avc1394_transaction_block_close(fwhandle);
             VERBOSE(VB_IMPORTANT, "AVC transaction failed.");
             return false;
         }
-        avc1394_transaction_block_close(fwhandle);
 
         cmd[0] = SA3250_CMD0 | AVC1394_SA3250_OPERAND_KEY_RELEASE;
         cmd[1] = SA3250_CMD1 | (dig[0] << 16) | (dig[1] << 8) | dig[2];
@@ -153,11 +149,9 @@ bool FirewireChannel::SetChannelByNumber(int channel)
 
         if (!avc1394_transaction_block(fwhandle, fw_opts.node, cmd, 3, 1))
         {
-            avc1394_transaction_block_close(fwhandle);
             VERBOSE(VB_IMPORTANT, "AVC transaction failed.");
             return false;
         }
-        avc1394_transaction_block_close(fwhandle);
     }
     else if (fw_opts.model == "SA4200HD")
     {
@@ -176,11 +170,9 @@ bool FirewireChannel::SetChannelByNumber(int channel)
 
         if (!avc1394_transaction_block(fwhandle, fw_opts.node, cmd, 3, 1))
         {
-            avc1394_transaction_block_close(fwhandle);
             VERBOSE(VB_IMPORTANT, "AVC transaction failed.");
             return false;
         }
-        avc1394_transaction_block_close(fwhandle);
     }
 
     return true;
@@ -237,7 +229,6 @@ bool FirewireChannel::OpenFirewire(void)
         if (rval)
         {
             response = rval[0];
-            avc1394_transaction_block_close(fwhandle);
 
             if (AVC1394_MASK_RESPONSE(response) == AVC1394_RESPONSE_ACCEPTED)
             {
@@ -263,7 +254,6 @@ bool FirewireChannel::OpenFirewire(void)
         }
         else
         {
-            avc1394_transaction_block_close(fwhandle);
             VERBOSE(VB_IMPORTANT, LOC + "Power on cmd failed (no response)");
             return false;
         }
@@ -288,7 +278,6 @@ FirewireChannel::PowerState FirewireChannel::GetPowerState(void)
     if (rval)
     {
         response = rval[0];
-        avc1394_transaction_block_close(fwhandle);
 
         if (AVC1394_MASK_RESPONSE(response) == AVC1394_RESPONSE_IMPLEMENTED)
         {
@@ -320,7 +309,6 @@ FirewireChannel::PowerState FirewireChannel::GetPowerState(void)
             return Failed;
         }
     }
-    avc1394_transaction_block_close(fwhandle);
     VERBOSE(VB_CHANNEL, LOC + "Failed to get STB Power State");
     return Failed;
 }
