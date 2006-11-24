@@ -567,18 +567,18 @@ static void init_fixup(QMap<uint64_t,uint> &fix)
     // transport_id<<32 | netword_id<<16 | service_id
 
     // Bell Express VU Canada
-    fix[ 256U << 16] = EITFixUp::kEFixForceISO8859_1;
-    fix[ 257U << 16] = EITFixUp::kEFixForceISO8859_1;
-    fix[4100U << 16] = EITFixUp::kEFixForceISO8859_1;
-    fix[4101U << 16] = EITFixUp::kEFixForceISO8859_1;
-    fix[4102U << 16] = EITFixUp::kEFixForceISO8859_1;
-    fix[4103U << 16] = EITFixUp::kEFixForceISO8859_1;
-    fix[4104U << 16] = EITFixUp::kEFixForceISO8859_1;
-    fix[4105U << 16] = EITFixUp::kEFixForceISO8859_1;
-    fix[4106U << 16] = EITFixUp::kEFixForceISO8859_1;
-    fix[4107U << 16] = EITFixUp::kEFixForceISO8859_1;
-    fix[4097U << 16] = EITFixUp::kEFixForceISO8859_1;
-    fix[4098U << 16] = EITFixUp::kEFixForceISO8859_1;
+    fix[ 256U << 16] |= EITFixUp::kEFixForceISO8859_1;
+    fix[ 257U << 16] |= EITFixUp::kEFixForceISO8859_1;
+    fix[4100U << 16] |= EITFixUp::kEFixForceISO8859_1;
+    fix[4101U << 16] |= EITFixUp::kEFixForceISO8859_1;
+    fix[4102U << 16] |= EITFixUp::kEFixForceISO8859_1;
+    fix[4103U << 16] |= EITFixUp::kEFixForceISO8859_1;
+    fix[4104U << 16] |= EITFixUp::kEFixForceISO8859_1;
+    fix[4105U << 16] |= EITFixUp::kEFixForceISO8859_1;
+    fix[4106U << 16] |= EITFixUp::kEFixForceISO8859_1;
+    fix[4107U << 16] |= EITFixUp::kEFixForceISO8859_1;
+    fix[4097U << 16] |= EITFixUp::kEFixForceISO8859_1;
+    fix[4098U << 16] |= EITFixUp::kEFixForceISO8859_1;
 
     // DVB-T Berlin Germany
     fix[   769LL << 32 |  8468U << 16] = EITFixUp::kEFixForceISO8859_15;
