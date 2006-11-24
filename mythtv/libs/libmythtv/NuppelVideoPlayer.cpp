@@ -4589,6 +4589,13 @@ void NuppelVideoPlayer::ExposeEvent(void)
         videoOutput->ExposeEvent();
 }
 
+bool NuppelVideoPlayer::IsEmbedding(void)
+{
+    if (videoOutput)
+        return videoOutput->IsEmbedding();
+    return false;
+}
+
 void NuppelVideoPlayer::UpdateSeekAmount(bool up)
 {
     if (seekamountpos > 0 && !up)

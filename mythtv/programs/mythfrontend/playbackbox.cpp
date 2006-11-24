@@ -330,8 +330,7 @@ PlaybackBox::PlaybackBox(BoxType ltype, MythMainWindow *parent,
     // theme stuff
     theme->SetWMult(wmult);
     theme->SetHMult(hmult);
-    if (m_player && m_player->GetState() == kState_WatchingLiveTV &&
-        theme->LoadTheme(xmldata,"playback-video"))
+    if (m_player && theme->LoadTheme(xmldata,"playback-video"))
     {
         playbackVideoContainer = true;
         previewPixmapEnabled = false;
@@ -2990,9 +2989,15 @@ void PlaybackBox::showActionPopup(ProgramInfo *program)
                             SLOT(togglePlayListItem()));
     }
 
+    TVState m_tvstate = kState_None;
+    if (m_player)
+        m_tvstate = m_player->GetState();
+    
     if (program->recstatus == rsRecording &&
-        (!(m_player && m_player->GetState() == kState_WatchingLiveTV &&
-           m_player->IsSameProgram(curitem))))
+        (!(m_player && 
+            (m_tvstate == kState_WatchingLiveTV || 
+            m_tvstate == kState_WatchingRecording) &&
+            m_player->IsSameProgram(curitem))))
     {
         popup->addButton(tr("Stop Recording"), this, SLOT(askStop()));
     }
@@ -3682,6 +3687,12 @@ void PlaybackBox::togglePlayListItem(ProgramInfo *pginfo)
 
 void PlaybackBox::timeout(void)
 {
+    if (m_player && !m_player->IsEmbedding() &&
+        playbackVideoContainer)
+    {
+        exitWin();
+    }
+
     if (titleList.count() <= 1)
         return;
 

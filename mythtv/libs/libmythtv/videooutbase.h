@@ -257,7 +257,10 @@ class VideoOutput
     /// \brief Returns true iff we have at least the minimum number of
     ///        decoded frames ready for display.
     bool EnoughPrebufferedFrames(void) { return vbuffers.EnoughPrebufferedFrames(); }
-    
+
+    /// \brief Returns if videooutput is embedding
+    bool IsEmbedding(void) { return embedding; }
+
     /**
      * \brief Blocks until it is possible to return a frame for decoding onto.
      * \param with_lock if true frames are properly locked, but this means you

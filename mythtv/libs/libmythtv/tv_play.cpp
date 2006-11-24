@@ -1785,7 +1785,10 @@ void TV::RunTV(void)
                 (gContext->GetNumSetting("EndofRecordingExitPrompt") == 1) &&
                 !jumped_back && !editmode)
             {
-                PromptDeleteRecording(tr("End Of Recording"));
+                if (IsEmbedding())
+                    StopEmbeddingOutput();
+                else
+                    PromptDeleteRecording(tr("End Of Recording"));
             }
             
                 
@@ -4938,6 +4941,13 @@ void TV::StopEmbeddingOutput(void)
     embedWinID = 0;
 }
 
+bool TV::IsEmbedding(void)
+{
+    if (nvp)
+        return nvp->IsEmbedding();
+    return false;
+}
+
 void TV::doEditSchedule(int editType)
 {
     if (!playbackinfo)
@@ -4965,6 +4975,8 @@ void TV::doEditSchedule(int editType)
 
     bool changeChannel = false;
     ProgramInfo *nextProgram = NULL;
+    if (!nvp)
+        return;
 
     if (StateIsLiveTV(GetState()))
     {
@@ -5003,12 +5015,13 @@ void TV::doEditSchedule(int editType)
                     exitPlayer = true;
                     delete nextProgram;
                 }
-                if (paused & !stayPaused)
+                if (paused && !stayPaused)
                     DoPause(false);
                 break;
             }
         }
-        StopEmbeddingOutput();
+        if (IsEmbedding())
+            StopEmbeddingOutput();
     }
     else
     {
@@ -5020,11 +5033,11 @@ void TV::doEditSchedule(int editType)
         {
             default:
             case kScheduleProgramGuide:
-                    RunProgramGuide(chanid, channum, true);
-                    break;
+                RunProgramGuide(chanid, channum, true);
+                break;
             case kScheduleProgramFinder:
-                    RunProgramFind(true, false);
-                    break;
+                RunProgramFind(true, false);
+                break;
             case kScheduledRecording:
             {
                 QMutexLocker locker(&pbinfoLock);
@@ -5036,15 +5049,33 @@ void TV::doEditSchedule(int editType)
             }
             case kPlaybackBox:
             {
-                    nextProgram = RunPlaybackBoxPtr((void *)this);
-                    if (nextProgram)
+                long long margin = 
+                    (long long)(nvp->GetFrameRate() * nvp->GetAudioStretchFactor());
+                // keep video paused if only 5 seconds left in recording
+                margin = margin * 5; 
+                QDomElement pbbxmldata;
+                XMLParse *theme = new XMLParse();
+                if (theme->LoadTheme(pbbxmldata, "playback-video"))
+                {
+                    if (!stayPaused && paused && !nvp->IsNearEnd(margin))
                     {
-                        setLastProgram(nextProgram);
-                        jumpToProgram = true;
-                        exitPlayer = true;
-                        delete nextProgram;
+                        DoPause(false);
+                        stayPaused = true;
                     }
-                    break;
+                }
+                if (theme)
+                    delete theme;
+                nextProgram = RunPlaybackBoxPtr((void *)this);
+                if (IsEmbedding())
+                    StopEmbeddingOutput();
+                if (nextProgram)
+                {
+                    setLastProgram(nextProgram);
+                    jumpToProgram = true;
+                    exitPlayer = true;
+                    delete nextProgram;
+                }
+                break;
             }
         }
 
@@ -5064,8 +5095,8 @@ void TV::doEditSchedule(int editType)
     if (changeChannel)
         EPGChannelUpdate(chanid, channum);
 
-    if (jumpToProgram)
-        activenvp->DiscardVideoFrames(true);
+    if (nvp && jumpToProgram)
+        nvp->DiscardVideoFrames(true);
 
     menurunning = false;
 }
