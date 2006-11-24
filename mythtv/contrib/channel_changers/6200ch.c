@@ -229,7 +229,6 @@ void set_chan_slow(raw1394handle_t handle, int device, int verbose, int chn)
       cmd[1] = 0x0;
     
       avc1394_transaction_block(handle, device, cmd, 2, RETRY_COUNT_SLOW);
-      avc1394_transaction_block_close(handle);
       usleep(500000);  // small delay for button to register
    }
 }
@@ -247,5 +246,4 @@ void set_chan_fast(raw1394handle_t handle, int device, int verbose, int chn)
                chn, cmd[0], cmd[1], cmd[2]);
  
     avc1394_transaction_block(handle, device, cmd, 3, RETRY_COUNT_FAST);
-    avc1394_transaction_block_close(handle);
 }
