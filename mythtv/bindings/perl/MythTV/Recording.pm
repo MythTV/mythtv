@@ -39,6 +39,15 @@ package MythTV::Recording;
     # Load the parent module's settings
         $self->_parse_data(@_);
 
+    # Load fields from the DB that don't get passed into the object
+        $sh = $self->{'_mythtv'}{'dbh'}->prepare('SELECT transcoder
+                                                    FROM recorded
+                                                   WHERE starttime  = FROM_UNIXTIME(?)
+                                                         AND chanid = ?');
+        $sh->execute($self->{'recstartts'}, $self->{'chanid'});
+        ($self->{'transcoder'}) = $sh->fetchrow_array();
+        $sh->finish;
+
     # These fields will only be set for recorded programs
         $self->{'cutlist'}         = '';
         $self->{'last_frame'}      = 0;
