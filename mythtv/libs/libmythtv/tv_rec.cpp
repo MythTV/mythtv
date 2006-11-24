@@ -1666,10 +1666,12 @@ bool TVRec::SetupDTVSignalMonitor(void)
     bool fta = CardUtil::IgnoreEncrypted(
         GetCaptureCardNum(), channel->GetCurrentInput());
 
+    QString sistandard = dtvchan->GetSIStandard();
+
     // Check if this is an ATSC Channel
     int major = dtvchan->GetMajorChannel();
     int minor = dtvchan->GetMinorChannel();
-    if (minor > 0)
+    if ((minor > 0) && (sistandard == "atsc"))
     {
         QString msg = QString("ATSC channel: %1_%2").arg(major).arg(minor);
         VERBOSE(VB_RECORD, LOC + msg);
@@ -1701,10 +1703,11 @@ bool TVRec::SetupDTVSignalMonitor(void)
     // Check if this is an DVB channel
     int progNum = dtvchan->GetProgramNumber();
 #ifdef USING_DVB
-    int netid   = dtvchan->GetOriginalNetworkID();
-    int tsid    = dtvchan->GetTransportID();
-    if (netid > 0 && tsid > 0 && progNum >= 0)
+    if ((progNum >= 0) && (sistandard == "dvb"))
     {
+        int netid   = dtvchan->GetOriginalNetworkID();
+        int tsid    = dtvchan->GetTransportID();
+
         uint neededVideo = 0;
         uint neededAudio = 0;
 
