@@ -39,49 +39,49 @@ package MythTV::Program;
         }
         $self->{'_mythtv'} ||= $MythTV::last;
 
-    # Load the passed-in data
-        $self->{'title'}           = $_[0];  # title
-        $self->{'subtitle'}        = $_[1];  # subtitle
-        $self->{'description'}     = $_[2];  # description
-        $self->{'category'}        = $_[3];  # category
-        $self->{'chanid'}          = $_[4];  # chanid
-        $self->{'channum'}         = $_[5];  # chanstr
-        $self->{'callsign'}        = $_[6];  # chansign
-        $self->{'channame'}        = $_[7];  # channame
-        $self->{'filename'}        = $_[8];  # pathname
-        $self->{'fs_high'}         = $_[9];  # filesize upper 32 bits
-        $self->{'fs_low'}          = $_[10]; # filesize lower 32 bits
-        $self->{'starttime'}       = $_[11]; # startts                    Scheduled starttime (unix timestamp)
-        $self->{'endtime'}         = $_[12]; # endts                      Scheduled endtime (unix timestamp)
-        $self->{'duplicate'}       = $_[13]; # duplicate
-        $self->{'shareable'}       = $_[14]; # shareable
-        $self->{'findid'}          = $_[15]; # findid
-        $self->{'hostname'}        = $_[16]; # hostname
-        $self->{'sourceid'}        = $_[17]; # sourceid
-        $self->{'cardid'}          = $_[18]; # cardid
-        $self->{'inputid'}         = $_[19]; # inputid
-        $self->{'recpriority'}     = $_[20]; # recpriority
-        $self->{'recstatus'}       = $_[21]; # recstatus
-        $self->{'recordid'}        = $_[22]; # recordid
-        $self->{'rectype'}         = $_[23]; # rectype
-        $self->{'dupin'}           = $_[24]; # dupin
-        $self->{'dupmethod'}       = $_[25]; # dupmethod
-        $self->{'recstartts'}      = $_[26]; # recstartts                 ACTUAL start time (unix timestamp)
-        $self->{'recendts'}        = $_[27]; # recendts                   ACTUAL end time (unix timestamp)
-        $self->{'previouslyshown'} = $_[28]; # repeat
-        $self->{'progflags'}       = $_[29]; # programflags
-        $self->{'recgroup'}        = $_[30]; # recgroup
-        $self->{'commfree'}        = $_[31]; # chancommfree
-        $self->{'outputfilters'}   = $_[32]; # chanOutputFilters
-        $self->{'seriesid'}        = $_[33]; # seriesid
-        $self->{'programid'}       = $_[34]; # programid
-        $self->{'lastmodified'}    = $_[35]; # lastmodified
-        $self->{'recpriority'}     = $_[36]; # stars
-        $self->{'airdate'}         = $_[37]; # originalAirDate            Original airdate (unix timestamp)
-        $self->{'hasairdate'}      = $_[38]; # hasAirDate
-        $self->{'playgroup'}       = $_[39]; # playgroup
-        $self->{'recpriority2'}    = $_[40]; # recpriority2
-        $self->{'parentid'}        = $_[41]; # parentid
+    # Load the passed-in data - info about this data structure is stored in libs/libmythtv/programinfo.cpp
+        $self->{'title'}           = $_[0];  # 00 title
+        $self->{'subtitle'}        = $_[1];  # 01 subtitle
+        $self->{'description'}     = $_[2];  # 02 description
+        $self->{'category'}        = $_[3];  # 03 category
+        $self->{'chanid'}          = $_[4];  # 04 chanid
+        $self->{'channum'}         = $_[5];  # 05 chanstr
+        $self->{'callsign'}        = $_[6];  # 06 chansign
+        $self->{'channame'}        = $_[7];  # 07 channame
+        $self->{'filename'}        = $_[8];  # 08 pathname
+        $self->{'fs_high'}         = $_[9];  # 09 filesize upper 32 bits
+        $self->{'fs_low'}          = $_[10]; # 10 filesize lower 32 bits
+        $self->{'starttime'}       = $_[11]; # 11 startts                   Scheduled starttime (unix timestamp)
+        $self->{'endtime'}         = $_[12]; # 12 endts                     Scheduled endtime (unix timestamp)
+        $self->{'duplicate'}       = $_[13]; # 13 duplicate
+        $self->{'shareable'}       = $_[14]; # 14 shareable
+        $self->{'findid'}          = $_[15]; # 15 findid
+        $self->{'hostname'}        = $_[16]; # 16 hostname
+        $self->{'sourceid'}        = $_[17]; # 17 sourceid
+        $self->{'cardid'}          = $_[18]; # 18 cardid
+        $self->{'inputid'}         = $_[19]; # 19 inputid
+        $self->{'recpriority'}     = $_[20]; # 20 recpriority
+        $self->{'recstatus'}       = $_[21]; # 21 recstatus
+        $self->{'recordid'}        = $_[22]; # 22 recordid
+        $self->{'rectype'}         = $_[23]; # 23 rectype
+        $self->{'dupin'}           = $_[24]; # 24 dupin
+        $self->{'dupmethod'}       = $_[25]; # 25 dupmethod
+        $self->{'recstartts'}      = $_[26]; # 26 recstartts                ACTUAL start time (unix timestamp)
+        $self->{'recendts'}        = $_[27]; # 27 recendts                  ACTUAL end time (unix timestamp)
+        $self->{'previouslyshown'} = $_[28]; # 28 repeat
+        $self->{'progflags'}       = $_[29]; # 29 programflags
+        $self->{'recgroup'}        = $_[30]; # 30 recgroup
+        $self->{'commfree'}        = $_[31]; # 31 chancommfree
+        $self->{'outputfilters'}   = $_[32]; # 32 chanOutputFilters
+        $self->{'seriesid'}        = $_[33]; # 33 seriesid
+        $self->{'programid'}       = $_[34]; # 34 programid
+        $self->{'lastmodified'}    = $_[35]; # 35 lastmodified
+        $self->{'stars'}           = $_[36]; # 36 stars
+        $self->{'airdate'}         = $_[37]; # 37 originalAirDate (unix timestamp)
+        $self->{'hasairdate'}      = $_[38]; # 38 hasAirDate
+        $self->{'playgroup'}       = $_[39]; # 39 playgroup
+        $self->{'recpriority2'}    = $_[40]; # 40 recpriority2
+        $self->{'parentid'}        = $_[41]; # 41 parentid
 
     # Load the channel data
         if ($self->{'chanid'}) {
@@ -116,6 +116,7 @@ package MythTV::Program;
     }
 
 # Return a mythproto-compatible row of data for this show.
+# Info about this data structure is stored in libs/libmythtv/programinfo.cpp
     sub to_string() {
         my $self = shift;
         return join($MythTV::BACKEND_SEP,
