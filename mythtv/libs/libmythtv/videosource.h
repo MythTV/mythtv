@@ -64,6 +64,21 @@ protected:
     QString freq;
 };
 
+class TransFreqTableSelector : public ComboBoxSetting, public TransientStorage
+{
+  public:
+    TransFreqTableSelector(uint _sourceid);
+
+    virtual void load(void);
+    virtual void save(void);
+
+    void SetSourceID(uint _sourceid);
+
+  private:
+    uint    sourceid;
+    QString loaded_freq_table;
+};
+
 class DataDirectLineupSelector :
     public ComboBoxSetting, public VideoSourceDBStorage
 {

@@ -35,6 +35,7 @@
 
 #include "settings.h"
 
+class TransFreqTableSelector;
 class TransLabelSetting;
 class ScanWizardScanner;
 class ScanWizard;
@@ -45,6 +46,7 @@ class QPSKPane;
 class DVBS2Pane;
 class ATSCPane;
 class QAMPane;
+class AnalogPane;
 class STPane;
 class DVBUtilsImportPane;
 
@@ -236,6 +238,7 @@ class ScanOptionalConfig : public TriggeredConfigurationGroup
     ScanOptionalConfig(ScanTypeSetting *_scan_type);
 
     QString GetATSCFormat(const QString&)    const;
+    QString GetFrequencyStandard(void)       const;
     QString GetModulation(void)              const;
     QString GetFrequencyTable(void)          const;
     bool    DoIgnoreSignalTimeout(void)      const;
@@ -260,6 +263,7 @@ class ScanOptionalConfig : public TriggeredConfigurationGroup
     DVBS2Pane           *paneDVBS2;
     ATSCPane            *paneATSC;
     QAMPane             *paneQAM;
+    AnalogPane          *paneAnalog;
     STPane              *paneSingle;
     DVBUtilsImportPane  *paneDVBUtilsImport;
 };
@@ -283,6 +287,8 @@ class ScanWizardConfig: public VerticalConfigurationGroup
     uint    GetMultiplex(void)    const { return scanConfig->GetMultiplex();  }
     bool DoDeleteChannels(void) const { return scanConfig->DoDeleteChannels();}
     bool DoRenameChannels(void) const { return scanConfig->DoRenameChannels();}
+    QString GetFrequencyStandard(void) const
+        { return scanConfig->GetFrequencyStandard(); }
     QString GetFrequencyTable(void) const
         { return scanConfig->GetFrequencyTable(); }
     QMap<QString,QString> GetStartChan(void) const
@@ -373,10 +379,11 @@ class ScanATSCChannelFormat: public ComboBoxSetting, public TransientStorage
 class ScanOldChannelTreatment: public ComboBoxSetting, public TransientStorage
 {
   public:
-    ScanOldChannelTreatment() : ComboBoxSetting(this)
+    ScanOldChannelTreatment(bool rename = true) : ComboBoxSetting(this)
     {
         addSelection(QObject::tr("Minimal Updates"),    "minimal");
-        addSelection(QObject::tr("Rename to Match"),    "rename");
+        if (rename)
+            addSelection(QObject::tr("Rename to Match"),    "rename");
         addSelection(QObject::tr("Delete"),             "delete");
         setLabel(QObject::tr("Existing Channel Treatment"));
         setHelpText(QObject::tr("How to treat existing channels."));
@@ -755,6 +762,25 @@ class ATSCPane : public VerticalConfigurationGroup
     ScanFrequencyTable      *atsc_table;
     ScanATSCModulation      *atsc_modulation;
     ScanATSCChannelFormat   *atsc_format;
+    ScanOldChannelTreatment *old_channel_treatment;
+};
+
+class AnalogPane : public VerticalConfigurationGroup
+{
+  public:
+    AnalogPane();
+
+    void SetSourceID(uint sourceid);
+
+    QString GetFrequencyTable(void) const;
+
+    bool DoDeleteChannels(void) const
+        { return old_channel_treatment->getValue() == "delete"; }
+    bool DoRenameChannels(void) const
+        { return old_channel_treatment->getValue() == "rename"; }
+
+  protected:
+    TransFreqTableSelector  *freq_table;
     ScanOldChannelTreatment *old_channel_treatment;
 };
 

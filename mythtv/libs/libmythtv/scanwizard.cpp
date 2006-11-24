@@ -82,12 +82,7 @@ void ScanWizard::SetPage(const QString &pageTitle)
             QString("type(%1) pcardid(%2) inputname(%3)")
             .arg(scantype).arg(pcardid).arg(inputname));
 
-    if (scantype == ScanTypeSetting::FullScan_Analog)
-    {
-        do_scan = false;
-        scannerPane->ScanAnalog(pcardid, inputname, sourceid);
-    }
-    else if (scantype == ScanTypeSetting::DVBUtilsImport)
+    if (scantype == ScanTypeSetting::DVBUtilsImport)
     {
         scannerPane->ImportDVBUtils(sourceid, lastHWCardType,
                                     configPane->GetFilename());
@@ -115,7 +110,8 @@ void ScanWizard::SetPage(const QString &pageTitle)
     else if ((scantype == ScanTypeSetting::FullScan_ATSC)     ||
              (scantype == ScanTypeSetting::FullTransportScan) ||
              (scantype == ScanTypeSetting::TransportScan)     ||
-             (scantype == ScanTypeSetting::FullScan_OFDM))
+             (scantype == ScanTypeSetting::FullScan_OFDM)     ||
+             (scantype == ScanTypeSetting::FullScan_Analog))
     {
         ;
     }
@@ -159,7 +155,8 @@ void ScanWizard::SetPage(const QString &pageTitle)
             configPane->GetSourceID(),
             configPane->DoDeleteChannels(),  configPane->DoRenameChannels(),
             configPane->DoIgnoreSignalTimeout(), configPane->GetMultiplex(),
-            start_chan,                      configPane->GetModulation(),
+            start_chan,
+            configPane->GetFrequencyStandard(), configPane->GetModulation(),
             configPane->GetFrequencyTable(), configPane->GetATSCFormat());
     }
 }

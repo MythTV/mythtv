@@ -1,3 +1,4 @@
+#include "frequencies.h"
 #include "frequencytables.h"
 #include "channelutil.h"
 
@@ -470,4 +471,20 @@ static void init_freq_tables(freq_table_map_t &fmap)
              EIA_542_FREQUENCY(6000000, 3012500, US_MAX_CHAN),
              6000000, mod[i]); // 100-US_MAX_CHAN
     }
+
+    // create old school frequency tables...
+    for (struct CHANLISTS *ptr = chanlists; ptr->name ; ptr++)
+    {
+        QString tbl_name = ptr->name;
+        for (uint i = 0; i < (uint)ptr->count; i++)
+        {
+            uint64_t freq = (ptr->list[i].freq * 1000LL) + 1750000;
+            fmap[QString("analog_analog_%1%2").arg(tbl_name).arg(i)] =
+                new FrequencyTable(
+                    QString("%1 %2").arg(tbl_name).arg(ptr->list[i].name), i+2,
+                    freq, freq + 3000000,
+                    6000000, DTVModulation::kModulationAnalog);
+        }
+    }
+
 }

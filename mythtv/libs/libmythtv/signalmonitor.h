@@ -65,7 +65,8 @@ class SignalMonitor : public QObject
     Q_OBJECT
   public:
     /// Returns true iff the card type supports signal monitoring.
-    static inline bool IsSupported(QString cardtype);
+    static inline bool IsRequired(const QString &cardtype);
+    static inline bool IsSupported(const QString &cardtype);
     static SignalMonitor *Init(QString cardtype, int db_cardnum,
                                ChannelBase *channel);
     virtual ~SignalMonitor();
@@ -247,12 +248,18 @@ inline QString sm_flags_to_string(uint flags)
     return str;
 }
 
-inline bool SignalMonitor::IsSupported(QString cardtype)
+inline bool SignalMonitor::IsRequired(const QString &cardtype)
 {
     return (CardUtil::IsDVBCardType(cardtype) ||
             (cardtype.upper() == "HDTV")      ||
             (cardtype.upper() == "HDHOMERUN") ||
             (cardtype.upper() == "FREEBOX"));
+}
+
+inline bool SignalMonitor::IsSupported(const QString &cardtype)
+{
+    return (IsRequired(cardtype) ||
+            (cardtype.upper() == "V4L"));
 }
 
 

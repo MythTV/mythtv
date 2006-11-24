@@ -1890,13 +1890,18 @@ static void update_channel_basic(uint    sourceid,   bool    insert,
 
     // First check if channel already in DB, but without xmltvid
     MSqlQuery query(MSqlQuery::DDCon());
-    query.prepare("SELECT chanid FROM channel "
+    query.prepare("SELECT chanid, callsign, name "
+                  "FROM channel "
                   "WHERE sourceid = :SOURCEID AND xmltvid = 0 AND "
                   "      ( channum = :CHANNUM OR "
+                  "        ( freqid  = :FREQID AND "
+                  "          freqid != '0'     AND "
+                  "          freqid != '' ) OR "
                   "        ( atsc_major_chan = :MAJORCHAN AND "
                   "          atsc_minor_chan = :MINORCHAN ) )");
     query.bindValue(":SOURCEID",  sourceid);
     query.bindValue(":CHANNUM",   channum);
+    query.bindValue(":FREQID",    freqid);
     query.bindValue(":MAJORCHAN", chan_major.toUInt());
     query.bindValue(":MINORCHAN", chan_minor.toUInt());
 
@@ -1907,22 +1912,35 @@ static void update_channel_basic(uint    sourceid,   bool    insert,
         return; // go on to next channel without xmltv
     }
 
-    if (query.size() > 0)
+    if (query.next())
     {
         // The channel already exists in DB, at least once,
         // so set the xmltvid..
         MSqlQuery chan_update_q(MSqlQuery::DDCon());
         chan_update_q.prepare(
             "UPDATE channel "
-            "SET xmltvid = :XMLTVID "
+            "SET xmltvid = :XMLTVID, name = :NAME, callsign = :CALLSIGN "
             "WHERE chanid = :CHANID AND sourceid = :SOURCEID");
 
-        while (query.next())
+        do
         {
             uint chanid = query.value(0).toInt();
-            chan_update_q.bindValue(":CHANID",    chanid);
-            chan_update_q.bindValue(":XMLTVID",   xmltvid);
-            chan_update_q.bindValue(":SOURCEID",  sourceid);
+
+            QString new_callsign = query.value(1).toString();
+            new_callsign =
+                (new_callsign.find(ChannelUtil::GetUnknownCallsign()) == 0) ?
+                callsign : new_callsign;
+
+            QString new_name = query.value(2).toString();
+            new_name = (new_name.isEmpty()) ? name         : new_name;
+            new_name = (new_name.isEmpty()) ? new_callsign : new_name;
+
+            chan_update_q.bindValue(":CHANID",   chanid);
+            chan_update_q.bindValue(":NAME",     new_name);
+            chan_update_q.bindValue(":CALLSIGN", new_callsign);
+            chan_update_q.bindValue(":XMLTVID",  xmltvid);
+            chan_update_q.bindValue(":SOURCEID", sourceid);
+
             if (!chan_update_q.exec() || !chan_update_q.isActive())
             {
                 MythContext::DBError(
@@ -1930,6 +1948,8 @@ static void update_channel_basic(uint    sourceid,   bool    insert,
                 continue; // go on to next instance of this channel
             }
         }
+        while (query.next());
+
         return; // go on to next channel without xmltv
     }
 

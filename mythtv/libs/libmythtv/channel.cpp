@@ -710,27 +710,6 @@ bool Channel::Retune(void)
     return false;
 }
 
-bool Channel::IsTuned() const
-{
-    if (usingv4l2)
-    {
-        struct v4l2_tuner tuner;
-
-        memset(&tuner,0,sizeof(tuner));
-        if (-1 == ::ioctl(videofd,VIDIOC_G_TUNER,&tuner,0))
-            return false;
-        return tuner.signal ? true : false;
-    }
-    else 
-    {
-        struct video_tuner tuner;
-        memset(&tuner,0,sizeof(tuner));
-        if (-1 == ::ioctl(videofd,VIDIOCGTUNER,&tuner,0))
-             return false;
-        return tuner.signal ? true : false;
-    }
-}
-
 // documented in dtvchannel.h
 bool Channel::TuneMultiplex(uint mplexid, QString inputname)
 {

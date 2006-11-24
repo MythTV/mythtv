@@ -865,6 +865,11 @@ bool ChannelUtil::SetChannelValue(const QString &field_name,
     return query.exec();
 }
 
+QString ChannelUtil::GetUnknownCallsign(void)
+{
+    return QDeepCopy<QString>(QObject::tr("UNKNOWN", "Synthesized callsign"));
+}
+
 int ChannelUtil::GetChanID(int mplexid,       int service_transport_id,
                            int major_channel, int minor_channel,
                            int program_number)
@@ -937,6 +942,26 @@ int ChannelUtil::GetChanID(int mplexid,       int service_transport_id,
 
     return -1;
 }
+
+uint ChannelUtil::FindChannel(uint sourceid, const QString &freqid)
+{
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare("SELECT chanid "
+                  "FROM channel "
+                  "WHERE sourceid = :SOURCEID AND "
+                  "      freqid   = :FREQID");
+
+    query.bindValue(":SOURCEID", sourceid);
+    query.bindValue(":FREQID",   freqid);
+
+    if (!query.exec() || !query.isActive())
+        MythContext::DBError("FindChannel", query);
+    else if (query.next())
+        return query.value(0).toUInt();
+
+    return 0;
+}
+
 
 static uint get_max_chanid(uint sourceid)
 {

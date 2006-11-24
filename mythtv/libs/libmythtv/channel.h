@@ -67,7 +67,6 @@ class Channel : public DTVChannel
     // Analog scanning stuff
     bool Tune(uint frequency, QString inputname,
               QString modulation, QString si_std);
-    bool IsTuned(void) const;
 
   private:
     // Helper Sets

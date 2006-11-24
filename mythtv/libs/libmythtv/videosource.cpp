@@ -185,6 +185,86 @@ FreqTableSelector::FreqTableSelector(const VideoSource &parent) :
                 "defined in the General settings."));
 }
 
+TransFreqTableSelector::TransFreqTableSelector(uint _sourceid) :
+    ComboBoxSetting(this), sourceid(_sourceid),
+    loaded_freq_table(QString::null)
+{
+    setLabel(QObject::tr("Channel frequency table"));
+
+    for (uint i = 0; chanlists[i].name; i++)
+        addSelection(chanlists[i].name);
+}
+
+void TransFreqTableSelector::load(void)
+{
+    int idx = getValueIndex(gContext->GetSetting("FreqTable"));
+    if (idx >= 0)
+        setValue(idx);
+
+    if (!sourceid)
+        return;
+
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare(
+        "SELECT freqtable "
+        "FROM videosource "
+        "WHERE sourceid = :SOURCEID");
+    query.bindValue(":SOURCEID", sourceid);
+
+    if (!query.exec() || !query.isActive())
+    {
+        MythContext::DBError("TransFreqTableSelector::load", query);
+        return;
+    }
+
+    loaded_freq_table = QString::null;
+
+    if (query.next())
+    {
+        loaded_freq_table = query.value(0).toString();
+        if (!loaded_freq_table.isEmpty() &&
+            (loaded_freq_table.lower() != "default"))
+        {
+            int idx = getValueIndex(loaded_freq_table);
+            if (idx >= 0)
+                setValue(idx);
+        }
+    }
+}
+
+void TransFreqTableSelector::save(void)
+{
+    VERBOSE(VB_IMPORTANT, "TransFreqTableSelector::save(void)");
+
+    if ((loaded_freq_table == getValue()) ||
+        ((loaded_freq_table.lower() == "default") &&
+         (getValue() == gContext->GetSetting("FreqTable"))))
+    {
+        return;
+    }
+
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare(
+        "UPDATE videosource "
+        "SET freqtable = :FREQTABLE "
+        "WHERE sourceid = :SOURCEID");
+
+    query.bindValue(":FREQTABLE", getValue());
+    query.bindValue(":SOURCEID",  sourceid);
+
+    if (!query.exec() || !query.isActive())
+    {
+        MythContext::DBError("TransFreqTableSelector::load", query);
+        return;
+    }
+}
+
+void TransFreqTableSelector::SetSourceID(uint _sourceid)
+{
+    sourceid = _sourceid;
+    load();
+}
+
 class UseEIT : public CheckBoxSetting, public VideoSourceDBStorage
 {
   public:

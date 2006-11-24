@@ -465,6 +465,25 @@ ScanCountry::ScanCountry() : ComboBoxSetting(this)
     addSelection(QObject::tr("Spain"),          "es", country == ES);
 }
 
+AnalogPane::AnalogPane() :
+    VerticalConfigurationGroup(false, false, true, false),
+    freq_table(new TransFreqTableSelector(0)),
+    old_channel_treatment(new ScanOldChannelTreatment(false))
+{
+    addChild(freq_table);
+    addChild(old_channel_treatment);
+}
+
+void AnalogPane::SetSourceID(uint sourceid)
+{
+    freq_table->SetSourceID(sourceid);
+}
+
+QString AnalogPane::GetFrequencyTable(void) const
+{
+    return freq_table->getValue();
+}
+
 ScanOptionalConfig::ScanOptionalConfig(ScanTypeSetting *_scan_type) :
     TriggeredConfigurationGroup(false, false, true, true,
                                 false, false, true, true),
@@ -473,7 +492,8 @@ ScanOptionalConfig::ScanOptionalConfig(ScanTypeSetting *_scan_type) :
     ignoreSignalTimeoutAll(new IgnoreSignalTimeout()),
     paneOFDM(new OFDMPane()),     paneQPSK(new QPSKPane()),
     paneDVBS2(new DVBS2Pane()),   paneATSC(new ATSCPane()),
-    paneQAM(new QAMPane()),       paneSingle(new STPane()),
+    paneQAM(new QAMPane()),       paneAnalog(new AnalogPane()),
+    paneSingle(new STPane()),
     paneDVBUtilsImport(new DVBUtilsImportPane())
 {
     setTrigger(scanType);
@@ -505,7 +525,7 @@ ScanOptionalConfig::ScanOptionalConfig(ScanTypeSetting *_scan_type) :
     addTarget(QString::number(ScanTypeSetting::FullScan_OFDM),
               country);
     addTarget(QString::number(ScanTypeSetting::FullScan_Analog),
-              new BlankSetting());
+              paneAnalog);
     addTarget(QString::number(ScanTypeSetting::TransportScan),
               paneSingle);
     addTarget(QString::number(ScanTypeSetting::FullTransportScan),
@@ -523,6 +543,7 @@ void ScanOptionalConfig::triggerChanged(const QString& value)
 
 void ScanOptionalConfig::SetSourceID(const QString &sourceid)
 {
+    paneAnalog->SetSourceID(sourceid.toUInt());
     paneSingle->SetSourceID(sourceid.toUInt());
 }
 
@@ -549,6 +570,16 @@ QString ScanOptionalConfig::GetATSCFormat(const QString &dfl) const
     return (ts0) ? vl0 : ((ts1) ? vl1 : (ts2) ? vl2 : dfl);
 }
 
+QString ScanOptionalConfig::GetFrequencyStandard(void) const
+{
+    int     st =  scanType->getValue().toInt();
+
+    bool    ts0 = (ScanTypeSetting::FullScan_ATSC   == st);
+    bool    ts1 = (ScanTypeSetting::FullScan_Analog == st);
+
+    return (ts0) ? "atsc" : ((ts1) ? "analog" : "dvbt");
+}
+
 QString ScanOptionalConfig::GetModulation(void) const
 {
     int     st =  scanType->getValue().toInt();
@@ -559,7 +590,10 @@ QString ScanOptionalConfig::GetModulation(void) const
     bool    ts1 = (ScanTypeSetting::FullScan_OFDM == st);
     QString vl1 = "ofdm";
 
-    return (ts0) ? vl0 : ((ts1) ? vl1 : "ofdm");
+    bool    ts2 = (ScanTypeSetting::FullScan_Analog == st);
+    QString vl2 = "analog";
+
+    return (ts0) ? vl0 : ((ts1) ? vl1 : (ts2) ? vl2 : "unknown");
 }
 
 QString ScanOptionalConfig::GetFrequencyTable(void) const
@@ -572,7 +606,10 @@ QString ScanOptionalConfig::GetFrequencyTable(void) const
     bool    ts1 = (ScanTypeSetting::FullScan_OFDM == st);
     QString vl1 = country->getValue();
 
-    return (ts0) ? vl0 : ((ts1) ? vl1 : "vsb8");
+    bool    ts2 = (ScanTypeSetting::FullScan_Analog == st);
+    QString vl2 = paneAnalog->GetFrequencyTable();
+
+    return (ts0) ? vl0 : ((ts1) ? vl1 : (ts2) ? vl2 : "unknown");
 }
 
 bool ScanOptionalConfig::DoIgnoreSignalTimeout(void) const
@@ -604,7 +641,10 @@ bool ScanOptionalConfig::DoDeleteChannels(void) const
     bool ts2 = (ScanTypeSetting::DVBUtilsImport == st);
     bool vl2 = paneDVBUtilsImport->DoDeleteChannels();
 
-    return (ts0) ? vl0 : ((ts1) ? vl1 : (ts2) ? vl2 : false);
+    bool ts3 = (ScanTypeSetting::FullScan_Analog == st);
+    bool vl3 = paneAnalog->DoDeleteChannels();
+
+    return (ts0) ? vl0 : (((ts1) ? vl1 : (ts2) ? vl2 : (ts3) ? vl3 : false));
 }
 
 bool ScanOptionalConfig::DoRenameChannels(void) const
@@ -620,7 +660,10 @@ bool ScanOptionalConfig::DoRenameChannels(void) const
     bool ts2 = (ScanTypeSetting::DVBUtilsImport == st);
     bool vl2 = paneDVBUtilsImport->DoRenameChannels();
 
-    return (ts0) ? vl0 : ((ts1) ? vl1 : (ts2) ? vl2 : false);
+    bool ts3 = (ScanTypeSetting::FullScan_Analog == st);
+    bool vl3 = paneAnalog->DoRenameChannels();
+
+    return (ts0) ? vl0 : (((ts1) ? vl1 : (ts2) ? vl2 : (ts3) ? vl3 : false));
 }
 
 QString ScanOptionalConfig::GetFilename(void) const
@@ -715,7 +758,7 @@ ScanWizardConfig::ScanWizardConfig(
 
 uint ScanWizardConfig::GetSourceID(void) const
 {
-    return videoSource->getValue().toInt();
+    return videoSource->getValue().toUInt();
 }
 
 QString ScanWizardConfig::GetATSCFormat(void) const

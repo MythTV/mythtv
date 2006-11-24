@@ -136,6 +136,72 @@ SIScan::~SIScan(void)
         delete signalMonitor;
 }
 
+void SIScan::SetAnalog(bool is_analog)
+{
+    if (is_analog)
+    {
+        connect(signalMonitor, SIGNAL(AllGood(      void)),
+                this,          SLOT(  HandleAllGood(void)));
+    }
+    else
+    {
+        disconnect(signalMonitor, SIGNAL(AllGood(      void)),
+                   this,          SLOT(  HandleAllGood(void)));
+    }
+}
+
+void SIScan::HandleAllGood(void)
+{
+    QString cur_chan = (*current).FriendlyName;
+    QStringList list = QStringList::split(" ", cur_chan);
+    QString freqid = (list.size() >= 2) ? list[1] : cur_chan;
+
+    bool ok = false;
+
+    QString msg = tr("Updated Channel %1").arg(cur_chan);
+
+    if (!ChannelUtil::FindChannel(sourceID, freqid))
+    {
+        int chanid = ChannelUtil::CreateChanID(sourceID, freqid);
+
+        QString callsign = QString("%1%2")
+            .arg(ChannelUtil::GetUnknownCallsign()).arg(freqid);
+
+        ok = ChannelUtil::CreateChannel(
+            0      /* mplexid */,
+            sourceID,
+            chanid,
+            callsign,
+            ""     /* service name       */,
+            freqid /* channum            */,
+            0      /* service id         */,
+            0      /* ATSC major channel */,
+            0      /* ATSC minor channel */,
+            false  /* use on air guide   */,
+            false  /* hidden             */,
+            false  /* hidden in guide    */,
+            freqid);
+
+        msg = (ok) ?
+            tr("Added Channel %1").arg(cur_chan) :
+            tr("Failed to add channel %1").arg(cur_chan);
+    }
+    else
+    {
+        // nothing to do here, XMLTV & DataDirect have better info
+    }
+
+    emit ServiceScanUpdateText(msg);
+
+    // tell UI we are done with these channels
+    if (scanMode == TRANSPORT_LIST)
+    {
+        UpdateScanPercentCompleted();
+        waitingForTables = false;
+        nextIt = current.nextTransport();
+    }
+}
+
 /** \fn SIScan::ScanServicesSourceID(int)
  *  \brief If we are not already scanning a frequency table, this creates
  *         a new frequency table from database and begins scanning it.
@@ -575,7 +641,7 @@ void SIScan::HandleActiveScan(void)
 
     if (!HasTimedOut())
         return;
-    
+
     if (0 == nextIt.offset() && nextIt != scanTransports.begin())
     {
         // Stop signal monitor for previous transport
@@ -718,8 +784,9 @@ bool SIScan::ScanTransports(int SourceID,
     freq_table_list_t tables =
         get_matching_freq_tables(std, modulation, country);
 
-    VERBOSE(VB_SIPARSER, LOC + QString("Looked up freq table (%1, %2, %3)")
-            .arg(std).arg(modulation).arg(country));
+    VERBOSE(VB_SIPARSER, LOC + 
+            QString("Looked up freq table (%1, %2, %3) w/%4 entries")
+            .arg(std).arg(modulation).arg(country).arg(tables.size()));
 
     freq_table_list_t::iterator it = tables.begin();
     for (; it != tables.end(); ++it)
@@ -730,7 +797,8 @@ bool SIScan::ScanTransports(int SourceID,
         uint    freq             = ft.frequencyStart;
         while (freq <= ft.frequencyEnd)
         {
-            if (strNameFormat.length() >= 2)
+            name = strNameFormat;
+            if (strNameFormat.find("%") >= 0)
                 name = strNameFormat.arg(name_num);
 
             TransportScanItem item(SourceID, si_std, name, name_num,
@@ -1000,7 +1068,8 @@ void SIScan::UpdatePMTinDB(
 
     if (callsign.isEmpty())
     {
-        callsign = QObject::tr("UNKNOWN%1", "Synthesized callsign")
+        callsign = QString("%1%2")
+            .arg(ChannelUtil::GetUnknownCallsign())
             .arg(chan_num);
     }
     else if (service_name.isEmpty())

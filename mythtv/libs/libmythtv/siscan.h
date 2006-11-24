@@ -62,6 +62,7 @@ class SIScan : public QObject,
 
     bool ScanServicesSourceID(int SourceID);
 
+    void SetAnalog(bool is_analog);
     void SetSourceID(int _SourceID)   { sourceID                = _SourceID; }
     void SetFTAOnly(bool _fFTAOnly)   { ignoreEncryptedServices = _fFTAOnly; }
     void SetTVOnly(bool _tvOnly)
@@ -92,6 +93,9 @@ class SIScan : public QObject,
     // DVB Main
     void HandleNIT(const NetworkInformationTable*);
     void HandleSDT(uint tsid, const ServiceDescriptionTable*);
+
+  private slots:
+    void HandleAllGood(void);
 
   signals:
     // Values from 1-100 of scan completion

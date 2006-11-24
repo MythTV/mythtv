@@ -48,7 +48,7 @@
 #ifdef USING_V4L
 #include "channel.h"
 #include "pchdtvsignalmonitor.h"
-#include "analogscan.h"
+#include "analogsignalmonitor.h"
 #endif
 
 #ifdef USING_DVB
@@ -121,15 +121,6 @@ void ScanWizardScanner::Teardown()
         delete channel;
         channel = NULL;
     }
-
-#ifdef USING_V4L
-    if (analogScanner)
-    {
-        analogScanner->stop();
-        analogScanner->deleteLater();
-        analogScanner = NULL;
-    }
-#endif
 
 #ifdef USING_IPTV
     if (freeboxScanner)
@@ -273,6 +264,7 @@ void ScanWizardScanner::Scan(
     // stuff needed for particular scans
     uint           mplexid /* TransportScan */,
     const QMap<QString,QString> &startChan /* NITAddScan */,
+    const QString &freq_std /* FullScan */,
     const QString &mod /* FullScan */,
     const QString &tbl /* FullScan */,
     const QString &atsc_format /* any ATSC scan */)
@@ -294,8 +286,6 @@ void ScanWizardScanner::Scan(
 
     popupProgress->status(tr("Scanning"));
     popupProgress->progress( (TUNED_PCT * PROGRESS_MAX) / 100 );
-
-    QString std = (ScanTypeSetting::FullScan_ATSC == scantype)? "atsc":"dvbt";
 
     bool ok = false;
 
@@ -329,11 +319,12 @@ void ScanWizardScanner::Scan(
     scanner->SetChannelFormat(atsc_format);
     scanner->SetRenameChannels(do_rename_channels);
 
-    if ((ScanTypeSetting::FullScan_ATSC == scantype) ||
-        (ScanTypeSetting::FullScan_OFDM == scantype))
+    if ((ScanTypeSetting::FullScan_ATSC   == scantype) ||
+        (ScanTypeSetting::FullScan_OFDM   == scantype) ||
+        (ScanTypeSetting::FullScan_Analog == scantype))
     {
         VERBOSE(VB_SIPARSER, LOC +
-                "ScanTransports("<<std<<", "<<mod<<", "<<tbl<<")");
+                "ScanTransports("<<freq_std<<", "<<mod<<", "<<tbl<<")");
 
         // HACK HACK HACK -- begin
         // if using QAM we may need additional time... (at least with HD-3000)
@@ -344,7 +335,9 @@ void ScanWizardScanner::Scan(
         }
         // HACK HACK HACK -- end
 
-        ok = scanner->ScanTransports(sourceid, std, mod, tbl);
+        scanner->SetAnalog(ScanTypeSetting::FullScan_Analog == scantype);
+
+        ok = scanner->ScanTransports(sourceid, freq_std, mod, tbl);
     }
     else if ((ScanTypeSetting::NITAddScan_OFDM == scantype) ||
              (ScanTypeSetting::NITAddScan_QPSK == scantype) ||
@@ -392,7 +385,7 @@ void ScanWizardScanner::Scan(
 
         if (ok)
         {
-            ok = scanner->ScanForChannels(sourceid, std,
+            ok = scanner->ScanForChannels(sourceid, freq_std,
                                           sub_type, channels);
         }
         if (ok)
@@ -500,7 +493,7 @@ void ScanWizardScanner::PreScanCommon(int scantype,
 #endif
 
 #ifdef USING_V4L
-    if ("HDTV" == card_type)
+    if (("HDTV" == card_type) || ("V4L" == card_type) || ("MPEG" == card_type))
         channel = new Channel(NULL, device);
 #endif
 
@@ -580,34 +573,6 @@ void ScanWizardScanner::PreScanCommon(int scantype,
     popupProgress = new ScanProgressPopup(this);
     popupProgress->progress(0);
     popupProgress->exec(this);
-}
-
-void ScanWizardScanner::ScanAnalog(
-    uint cardid, const QString &inputname, uint sourceid)
-{
-#ifdef USING_V4L
-    //Create an analog scan object
-    analogScanner = new AnalogScan(cardid, sourceid, inputname);
-    popupProgress = new ScanProgressPopup(this, false);
-
-    connect(analogScanner, SIGNAL(serviceScanComplete(void)),
-            this,       SLOT(  scanComplete(void)));
-    connect(analogScanner, SIGNAL(serviceScanUpdateText(const QString&)),
-            this,       SLOT(  updateText(const QString&)));
-    connect(analogScanner, SIGNAL(serviceScanPCTComplete(int)),
-            this,       SLOT(  serviceScanPctComplete(int)));
-
-    popupProgress->progress(0);
-    popupProgress->exec(this);
-
-    if (!analogScanner->scan())
-    {
-        MythPopupBox::showOkPopup(gContext->GetMainWindow(),
-                                  tr("ScanWizard"),
-                                  tr("Error starting scan"));
-        Teardown();
-    }
-#endif
 }
 
 void ScanWizardScanner::ImportM3U(uint cardid, const QString &inputname,

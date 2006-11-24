@@ -74,13 +74,13 @@ class ScanWizardScanner : public VerticalConfigurationGroup
               // stuff needed for particular scans
               uint           mplexid,
               const QMap<QString,QString> &startChan,
+              const QString &freq_std,
               const QString &mod,
               const QString &tbl,
               const QString &atsc_format);
 
     void ImportDVBUtils(uint sourceid, int cardtype, const QString &file);
     void ImportM3U(     uint cardid, const QString &inputname, uint sourceid);
-    void ScanAnalog(    uint cardid, const QString &inputname, uint sourceid);
 
   protected slots:
     void CancelScan(void) { Teardown(); }

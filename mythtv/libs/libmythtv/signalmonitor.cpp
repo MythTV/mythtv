@@ -20,6 +20,7 @@
 
 #ifdef USING_V4L
 #   include "pchdtvsignalmonitor.h"
+#   include "analogsignalmonitor.h"
 #   include "channel.h"
 #endif
 
@@ -88,6 +89,13 @@ SignalMonitor *SignalMonitor::Init(QString cardtype, int db_cardnum,
         Channel *hdtvc = dynamic_cast<Channel*>(channel);
         if (hdtvc)
             signalMonitor = new pcHDTVSignalMonitor(db_cardnum, hdtvc);
+    }
+    if ((cardtype.upper() == "V4L") ||
+        (cardtype.upper() == "MPEG"))
+    {
+        Channel *chan = dynamic_cast<Channel*>(channel);
+        if (chan)
+            signalMonitor = new AnalogSignalMonitor(db_cardnum, chan);
     }
 #endif
 

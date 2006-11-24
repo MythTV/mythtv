@@ -230,7 +230,7 @@ class DTVModulation : public DTVParamHelper
     static const DTVParamHelperStruct confTable[];
     static const DTVParamHelperStruct vdrTable[];
     static const DTVParamHelperStruct parseTable[];
-    static const uint kDBStrCnt = 16;
+    static const uint kDBStrCnt = 17;
     static const char *dbStr[kDBStrCnt];
 
   public:
@@ -252,6 +252,7 @@ class DTVModulation : public DTVParamHelper
         kModulation32APSK  = 13,
         kModulation8PSK    = 14,
         kModulation16PSK   = 15,
+        kModulationAnalog  = 16, /* for analog channel scanner */
     };
 
     DTVModulation(int _default = kModulationQAMAuto)

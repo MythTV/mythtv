@@ -3458,7 +3458,7 @@ void TVRec::TuningFrequency(const TuningRequest &request)
 
     bool livetv = request.flags & kFlagLiveTV;
     bool antadj = request.flags & kFlagAntennaAdjust;
-    bool use_sm = SignalMonitor::IsSupported(genOpt.cardtype);
+    bool use_sm = SignalMonitor::IsRequired(genOpt.cardtype);
     bool use_dr = use_sm && (livetv || antadj);
     bool has_dummy = false;
 

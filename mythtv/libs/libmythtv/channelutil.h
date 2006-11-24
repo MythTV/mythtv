@@ -143,6 +143,8 @@ class MPUBLIC ChannelUtil
 
     // Misc gets
 
+    static QString GetUnknownCallsign(void);
+    static uint    FindChannel(uint sourceid, const QString &freqid);
     static int     GetChanID(uint sourceid, const QString &channum)
         { return GetChannelValueInt("chanid", sourceid, channum); }
     static bool    GetChannelData(
