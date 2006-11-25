@@ -10,7 +10,7 @@ using namespace std;
 #include "mythdbcon.h"
 
 /// This is the DB schema version expected by the running MythTV instance.
-const QString currentDatabaseVersion = "1169";
+const QString currentDatabaseVersion = "1170";
 
 static bool UpdateDBVersionNumber(const QString &newnumber);
 static bool performActualUpdate(const QString updates[], QString version,
@@ -2681,6 +2681,55 @@ static bool doUpgradeTVDatabaseSchema(void)
         if (!performActualUpdate(updates, "1169", dbver))
             return false;
     }
+
+    if (dbver == "1169")
+    {
+        QString thequery =
+            "SELECT mplexid "
+            "FROM channel "
+            "WHERE mplexid != 0     AND "
+            "      mplexid != 32767 AND "
+            "      atsc_minor_chan > 0  "
+            "GROUP BY mplexid";
+
+        MSqlQuery query(MSqlQuery::InitCon());
+        query.prepare(thequery);
+        if (!query.exec())
+        {
+            QString msg =
+                QString("DB Error (Performing database upgrade): \n"
+                        "Query was: %1 \nError was: %2 \nnew version: %3")
+                .arg(thequery)
+                .arg(MythContext::DBErrorMessage(query.lastError()))
+                .arg("1170");
+            VERBOSE(VB_IMPORTANT, msg);
+            return false;
+        }
+
+        QString in = "(";
+
+        while (query.next())
+            in += query.value(0).toString() + ",";
+
+        thequery = "";
+        if (in.length() > 2)
+        {
+            in.truncate(in.length() - 1);
+            thequery =
+                "UPDATE dtv_multiplex "
+                "SET sistandard='atsc' "
+                "WHERE mplexid IN " + in + ")";
+        }
+
+        const QString updates[] = {
+thequery,
+""};
+
+        if (!performActualUpdate(updates, "1170", dbver))
+            return false;
+    }
+
+
 //"ALTER TABLE cardinput DROP COLUMN preference;" in 0.22
 //"ALTER TABLE channel DROP COLUMN atscsrcid;" in 0.22
 //"ALTER TABLE recordedmarkup DROP COLUMN offset;" in 0.22
