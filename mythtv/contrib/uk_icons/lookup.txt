@@ -96,6 +96,7 @@ Extreme Sports Channel|http://www.lyngsat-logo.com/logo/tv/ee/extremesports.jpg
 FX +2|http://www.lyngsat-logo.com/logo/tv/ff/fx_us.jpg
 FX|http://www.lyngsat-logo.com/logo/tv/ff/fx_us.jpg
 Film4 +1|http://www.lyngsat-logo.com/logo/tv/ff/film4.jpg
+Film4+1|http://www.lyngsat-logo.com/logo/tv/ff/film4.jpg
 Film4|http://www.lyngsat-logo.com/logo/tv/ff/film4.jpg
 FilmFour Weekly|http://www.lyngsat-logo.com/logo/tv/ff/film4.jpg
 Five Life|http://www.lyngsat-logo.com/logo/tv/ff/five_life.jpg
@@ -129,7 +130,7 @@ ITV3|http://www.lyngsat-logo.com/logo/tv/ii/itv3.jpg
 ITV4|http://www.lyngsat-logo.com/logo/tv/ii/itv4.jpg
 Ideal World|http://www.lyngsat-logo.com/logo/tv/ii/ideal_world.jpg
 Idealworld|http://www.lyngsat-logo.com/logo/tv/ii/ideal_world.jpg
-Kerrang!|http://www.lyngsat-logo.com/logo/tv/kk/kerrang_tv.jpg
+Kerrang!|http://www.lyngsat-logo.com/logo/radio/gk/kerrang_radio.jpg
 Kerrang|http://www.lyngsat-logo.com/logo/tv/kk/kerrang_tv.jpg
 Kiss|http://www.lyngsat-logo.com/logo/tv/kk/kiss_uk.jpg
 LivingTV +1|http://www.lyngsat-logo.com/logo/tv/ll/living_tv_uk.jpg
