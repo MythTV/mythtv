@@ -439,7 +439,7 @@ uint RemoteEncoder::GetSignalLockTimeout(QString input)
     if (!query.exec() || !query.isActive())
         MythContext::DBError("Getting timeout", query);
     else if (query.next() &&
-             SignalMonitor::IsSupported(query.value(1).toString()))
+             SignalMonitor::IsRequired(query.value(1).toString()))
         timeout = max(query.value(0).toInt(), 500);
 
 /*
