@@ -293,7 +293,7 @@
     </message>
     <message>
         <source>ch</source>
-        <translation type="unfinished"></translation>
+        <translation>kanal</translation>
     </message>
     <message>
         <source>Output error.</source>

@@ -301,6 +301,10 @@
         <source>Dial</source>
         <translation>Vali</translation>
     </message>
+    <message>
+        <source>Answer</source>
+        <translation>Vasta</translation>
+    </message>
 </context>
 <context>
     <name>QObject</name>

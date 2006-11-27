@@ -441,6 +441,30 @@ This may take a few minutes.</source>
         <translation>Taustakirjutamine on peatatud.
 Selleks võib kuluda mõni minut.</translation>
     </message>
+    <message>
+        <source>Date format</source>
+        <translation>Kuupäeva formaat</translation>
+    </message>
+    <message>
+        <source>Samples are shown using today&apos;s date.</source>
+        <translation>Näidetes kasutatakse tänast kuupäeva.</translation>
+    </message>
+    <message>
+        <source>Samples are shown using tomorrow&apos;s date.</source>
+        <translation>Näidetes kasutatakse homset kuupäeva.</translation>
+    </message>
+    <message>
+        <source>Your preferred date format to use on DVD menus.</source>
+        <translation>DVD menüüdes kasutatav kuupäevaformaat.</translation>
+    </message>
+    <message>
+        <source>Time format</source>
+        <translation>Ajaformaat</translation>
+    </message>
+    <message>
+        <source>Your preferred time format to display on DVD menus. You must choose a format with &quot;AM&quot; or &quot;PM&quot; in it, otherwise your time display will be 24-hour or &quot;military&quot; time.</source>
+        <translation>DVD menüüdes kasutatav ajaformaat. Valida on 12-tunnise AM/PM ja 24-tunnise formaadi vahel.</translation>
+    </message>
 </context>
 <context>
     <name>RecordingSelector</name>

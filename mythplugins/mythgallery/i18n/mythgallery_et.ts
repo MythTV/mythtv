@@ -309,11 +309,11 @@
     </message>
     <message>
         <source>MythGallery Settings (Slideshow)</source>
-        <translation type="unfinished"></translation>
+        <translation>MythGallery sätted (slaidiprogramm)</translation>
     </message>
     <message>
         <source>MythGallery Settings (General)</source>
-        <translation type="unfinished"></translation>
+        <translation>MythGallery sätted (üldine)</translation>
     </message>
 </context>
 <context>
