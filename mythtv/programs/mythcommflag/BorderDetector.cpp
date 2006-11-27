@@ -4,9 +4,11 @@
 #include "mythcontext.h"    /* gContext */
 
 #include "CommDetector2.h"
+#include "FrameAnalyzer.h"
 #include "TemplateFinder.h"
 #include "BorderDetector.h"
 
+using namespace frameAnalyzer;
 using namespace commDetector2;
 
 BorderDetector::BorderDetector(void)
@@ -41,14 +43,11 @@ void
 BorderDetector::setLogoState(TemplateFinder *finder)
 {
     if ((logoFinder = finder) && (logo = logoFinder->getTemplate(
-                    &logorr1, &logocc1, &logowidth, &logoheight)))
+                    &logorow, &logocol, &logowidth, &logoheight)))
     {
-        logorr2 = logorr1 + logoheight - 1;
-        logocc2 = logocc1 + logowidth - 1;
-
         VERBOSE(VB_COMMFLAG, QString(
                     "BorderDetector::setLogoState: %1x%2@(%3,%4)")
-            .arg(logowidth).arg(logoheight).arg(logocc1).arg(logorr1));
+            .arg(logowidth).arg(logoheight).arg(logocol).arg(logorow));
     }
 }
 
@@ -68,84 +67,66 @@ BorderDetector::getDimensions(const AVPicture *pgm, int pgmheight,
      */
 
     /*
-     * TUNABLE:
+     * TUNABLES:
      *
-     * The maximum range of values allowed for letterboxing/pillarboxing bars.
-     * Usually the bars are black (0x00), but sometimes they are grey (0x71).
-     * Sometimes the letterboxing and pillarboxing (when one is embedded inside
-     * the other) are different colors.
+     * Higher values mean more tolerance for noise (e.g., analog recordings).
+     * However, in the absence of noise, content/logos can be cropped away from
+     * analysis.
      *
-     * Higher values mean more tolerance for noise. This means that
-     * letterboxing/pillarboxing might be over-cropped, which might cause faint
-     * template edges to also be cropped out of consideration.
-     *
-     * Lower values mean less tolerance for noise, which means that
-     * letterboxing/pillarboxing might not be detected. If this happens, the
-     * letterboxing/pillarboxing edges will make their way into the
-     * edge-detection phase where they are likely to take edge pixels away from
-     * possible template edges.
+     * Lower values mean less tolerance for noise. In a noisy recording, the
+     * transition between pillarbox/letterbox black to content color will be
+     * detected as an edge, and thwart logo edge detection. In the absence of
+     * noise, content/logos will be more faithfully analyzed.
      */
-    static const unsigned char  MAXRANGE = 8;
 
     /*
-     * TUNABLE:
-     *
-     * The maximum number of consecutive rows or columns with too many outlier
-     * points that may be scanned before declaring the existence of a border.
-     *
-     * Higher values mean more tolerance for noise, but content might be
-     * cropped.
-     *
-     * Lower values mean less tolerance for noise, but noise might interfere
-     * with letterbox/pillarbox detection.
+     * TUNABLE: The maximum range of values allowed for
+     * letterboxing/pillarboxing bars. Usually the bars are black (0x00), but
+     * sometimes they are grey (0x71). Sometimes the letterboxing and
+     * pillarboxing (when one is embedded inside the other) are different
+     * colors.
+     */
+    static const unsigned char  MAXRANGE = 32;
+
+    /*
+     * TUNABLE: The maximum number of consecutive rows or columns with too many
+     * outlier points that may be scanned before declaring the existence of a
+     * border.
      */
     static const int        MAXLINES = 2;
 
     const int               pgmwidth = pgm->linesize[0];
 
     /*
-     * TUNABLE:
-     *
-     * The maximum number of outlier points in a single row or column with grey
-     * values outside of MAXRANGE before declaring the existence of a border.
-     *
-     * Higher values mean more tolerance for noise, but content might be
-     * cropped.
-     *
-     * Lower values mean less tolerance for noise, but noise might interfere
-     * with letterbox/pillarbox detection.
+     * TUNABLE: The maximum number of outlier points in a single row or column
+     * with grey values outside of MAXRANGE before declaring the existence of a
+     * border.
      */
-    const int               MAXOUTLIERS = pgmwidth * 25 / 1000;
+    const int               MAXOUTLIERS = pgmwidth * 12 / 1000;
 
     /*
-     * TUNABLE:
-     *
-     * Margins to avoid noise at the extreme edges of the signal (VBI?).
+     * TUNABLE: Margins to avoid noise at the extreme edges of the signal
+     * (VBI?). (Really, just a special case of VERTSLOP and HORIZSLOP, below.)
      */
     const int               VERTMARGIN = max(2, pgmheight * 1 / 60);
-    const int               HORIZMARGIN = max(2, pgmwidth * 125 / 10000);
+    const int               HORIZMARGIN = max(2, pgmwidth * 1 / 80);
 
     /*
-     * TUNABLE:
-     *
-     * Slop to accommodate any jagged letterboxing/pillarboxing edges.
+     * TUNABLE: Slop to accommodate any jagged letterboxing/pillarboxing edges,
+     * or noise between edges and content. (Really, a more general case of
+     * VERTMARGIN and HORIZMARGIN, above.)
      */
     const int               VERTSLOP = max(MAXLINES, pgmheight * 1 / 120);
-    const int               HORIZSLOP = max(MAXLINES, pgmwidth * 5 / 1000);
+    const int               HORIZSLOP = max(MAXLINES, pgmwidth * 1 / 160);
 
     struct timeval          start, end, elapsed;
     unsigned char           minval, maxval, val;
-    int                     rr, cc, minrow, maxrow, mincol, maxcol, rr2, cc2;
+    int                     rr, cc, minrow, mincol, maxrow1, maxcol1, saved;
     int                     newrow, newcol, newwidth, newheight;
-    bool                    top, bottom, left, right;
+    bool                    top, bottom, left, right, inrange;
     int                     range, outliers, lines;
 
     (void)gettimeofday(&start, NULL);
-
-    newrow = 0;
-    newcol = 0;
-    newwidth = 0;
-    newheight = 0;
 
     if (_frameno != UNCACHED && _frameno == frameno)
         goto done;
@@ -156,36 +137,43 @@ BorderDetector::getDimensions(const AVPicture *pgm, int pgmheight,
     right = false;
 
     minrow = VERTMARGIN;
-    maxrow = pgmheight - VERTMARGIN - 1;
+    maxrow1 = pgmheight - VERTMARGIN;   /* maxrow + 1 */
 
     mincol = HORIZMARGIN;
-    maxcol = pgmwidth - HORIZMARGIN - 1;
+    maxcol1 = pgmwidth - HORIZMARGIN;   /* maxcol + 1 */
+
+    newrow = minrow - 1;
+    newcol = mincol - 1;
+    newwidth = maxcol1 + 1 - mincol;
+    newheight = maxrow1 + 1 - minrow;
 
     for (;;)
     {
         /* Find left edge. */
+        left = false;
         minval = UCHAR_MAX;
         maxval = 0;
         lines = 0;
-        for (cc = mincol; cc <= maxcol; cc++)
+        saved = mincol;
+        for (cc = mincol; cc < maxcol1; cc++)
         {
             outliers = 0;
-            for (rr = minrow; rr <= maxrow; rr++)
+            inrange = true;
+            for (rr = minrow; rr < maxrow1; rr++)
             {
-                if (logo && rr >= logorr1 && rr <= logorr2 &&
-                        cc >= logocc1 && cc <= logocc2)
+                if (logo && rrccinrect(rr, cc, logorow, logocol,
+                            logowidth, logoheight))
                     continue;   /* Exclude logo area from analysis. */
 
                 val = pgm->data[0][rr * pgmwidth + cc];
-                range = max(maxval, val) - min(minval, val);
+                range = max(maxval, val) - min(minval, val) + 1;
                 if (range > MAXRANGE)
                 {
                     if (outliers++ < MAXOUTLIERS)
-                        continue;
+                        continue;   /* Next row. */
+                    inrange = false;
                     if (lines++ < MAXLINES)
-                        break;
-                    if (cc != mincol)
-                        left = true;
+                        break;  /* Next column. */
                     goto found_left;
                 }
                 if (val < minval)
@@ -193,38 +181,51 @@ BorderDetector::getDimensions(const AVPicture *pgm, int pgmheight,
                 if (val > maxval)
                     maxval = val;
             }
+            if (inrange)
+            {
+                saved = cc;
+                lines = 0;
+            }
         }
 found_left:
-        newcol = cc + HORIZSLOP;
-        newwidth = max(0, maxcol - HORIZSLOP - newcol + 1);
-        if (newcol > maxcol)
+        if (newcol != saved + 1 + HORIZSLOP)
+        {
+            newcol = min(maxcol1, saved + 1 + HORIZSLOP);
+            newwidth = max(0, maxcol1 - newcol);
+            left = true;
+        }
+
+        if (!newwidth)
             goto monochromatic_frame;
 
+        mincol = newcol;
+
         /*
-         * Find right edge. Keep same minval/maxval as left edge. Also, right
-         * pillarbox should be roughly the same size as the left pillarbox.
+         * Find right edge. Keep same minval/maxval (pillarboxing colors) as
+         * left edge.
          */
+        right = false;
         lines = 0;
-        cc2 = max(newcol, pgmwidth - newcol);
-        for (cc = maxcol; cc > cc2; cc--)
+        saved = maxcol1 - 1;
+        for (cc = maxcol1 - 1; cc >= mincol; cc--)
         {
             outliers = 0;
-            for (rr = minrow; rr <= maxrow; rr++)
+            inrange = true;
+            for (rr = minrow; rr < maxrow1; rr++)
             {
-                if (logo && rr >= logorr1 && rr <= logorr2 &&
-                        cc >= logocc1 && cc <= logocc2)
+                if (logo && rrccinrect(rr, cc, logorow, logocol,
+                            logowidth, logoheight))
                     continue;   /* Exclude logo area from analysis. */
 
                 val = pgm->data[0][rr * pgmwidth + cc];
-                range = max(maxval, val) - min(minval, val);
+                range = max(maxval, val) - min(minval, val) + 1;
                 if (range > MAXRANGE)
                 {
                     if (outliers++ < MAXOUTLIERS)
-                        continue;
+                        continue;   /* Next row. */
+                    inrange = false;
                     if (lines++ < MAXLINES)
-                        break;
-                    if (cc != maxcol)
-                        right = true;
+                        break;  /* Next column. */
                     goto found_right;
                 }
                 if (val < minval)
@@ -232,40 +233,52 @@ found_left:
                 if (val > maxval)
                     maxval = val;
             }
+            if (inrange)
+            {
+                saved = cc;
+                lines = 0;
+            }
         }
 found_right:
-        newwidth = max(0, cc - HORIZSLOP - newcol + 1);
+        if (newwidth != saved - mincol - HORIZSLOP)
+        {
+            newwidth = max(0, saved - mincol - HORIZSLOP);
+            right = true;
+        }
 
         if (!newwidth)
             goto monochromatic_frame;
 
         if (top || bottom)
-            break;  /* No need to repeat letterboxing check. */
+            break;  /* Do not repeat letterboxing check. */
+
+        maxcol1 = mincol + newwidth;
 
         /* Find top edge. */
+        top = false;
         minval = UCHAR_MAX;
         maxval = 0;
         lines = 0;
-        cc2 = newcol + newwidth;
-        for (rr = minrow; rr <= maxrow; rr++)
+        saved = minrow;
+        for (rr = minrow; rr < maxrow1; rr++)
         {
             outliers = 0;
-            for (cc = newcol; cc < cc2; cc++)
+            inrange = true;
+            for (cc = mincol; cc < maxcol1; cc++)
             {
-                if (logo && rr >= logorr1 && rr <= logorr2 &&
-                        cc >= logocc1 && cc <= logocc2)
+                if (logo && rrccinrect(rr, cc, logorow, logocol,
+                            logowidth, logoheight))
                     continue;   /* Exclude logo area from analysis. */
 
                 val = pgm->data[0][rr * pgmwidth + cc];
-                range = max(maxval, val) - min(minval, val);
+                range = max(maxval, val) - min(minval, val) + 1;
                 if (range > MAXRANGE)
                 {
                     if (outliers++ < MAXOUTLIERS)
-                        continue;
+                        continue;   /* Next column. */
+                    inrange = false;
                     if (lines++ < MAXLINES)
-                        break;
-                    if (rr != minrow)
-                        top = true;
+                        break;  /* Next row. */
                     goto found_top;
                 }
                 if (val < minval)
@@ -273,39 +286,48 @@ found_right:
                 if (val > maxval)
                     maxval = val;
             }
+            if (inrange)
+            {
+                saved = rr;
+                lines = 0;
+            }
         }
 found_top:
-        newrow = rr + VERTSLOP;
-        newheight = max(0, maxrow - VERTSLOP - newrow + 1);
-        if (newrow > maxrow)
+        if (newrow != saved + 1 + VERTSLOP)
+        {
+            newrow = min(maxrow1, saved + 1 + VERTSLOP);
+            newheight = max(0, maxrow1 - newrow);
+            top = true;
+        }
+
+        if (!newheight)
             goto monochromatic_frame;
 
-        /*
-         * Find bottom edge. Keep same minval/maxval as top edge. Also, bottom
-         * letterbox should be roughly the same size as the top letterbox.
-         */
+        minrow = newrow;
+
+        /* Find bottom edge. Keep same minval/maxval as top edge. */
+        bottom = false;
         lines = 0;
-        rr2 = max(newrow, pgmheight - newrow);
-        cc2 = newcol + newwidth;
-        for (rr = maxrow; rr > rr2; rr--)
+        saved = maxrow1 - 1;
+        for (rr = maxrow1 - 1; rr >= minrow; rr--)
         {
             outliers = 0;
-            for (cc = newcol; cc < cc2; cc++)
+            inrange = true;
+            for (cc = mincol; cc < maxcol1; cc++)
             {
-                if (logo && rr >= logorr1 && rr <= logorr2 &&
-                        cc >= logocc1 && cc <= logocc2)
+                if (logo && rrccinrect(rr, cc, logorow, logocol,
+                            logowidth, logoheight))
                     continue;   /* Exclude logo area from analysis. */
 
                 val = pgm->data[0][rr * pgmwidth + cc];
-                range = max(maxval, val) - min(minval, val);
+                range = max(maxval, val) - min(minval, val) + 1;
                 if (range > MAXRANGE)
                 {
                     if (outliers++ < MAXOUTLIERS)
-                        continue;
+                        continue;   /* Next column. */
+                    inrange = false;
                     if (lines++ < MAXLINES)
-                        break;
-                    if (rr != maxrow)
-                        bottom = true;
+                        break;  /* Next row. */
                     goto found_bottom;
                 }
                 if (val < minval)
@@ -313,29 +335,26 @@ found_top:
                 if (val > maxval)
                     maxval = val;
             }
+            if (inrange)
+            {
+                saved = rr;
+                lines = 0;
+            }
         }
 found_bottom:
-        newheight = max(0, rr - VERTSLOP - newrow + 1);
+        if (newheight != saved - minrow - VERTSLOP)
+        {
+            newheight = max(0, saved - minrow - VERTSLOP);
+            bottom = true;
+        }
 
         if (!newheight)
             goto monochromatic_frame;
 
         if (left || right)
-            break;  /* No need to repeat pillarboxing check. */
+            break;  /* Do not repeat pillarboxing check. */
 
-        if (top || bottom)
-        {
-            /*
-             * Letterboxing was found; repeat loop to look for embedded
-             * pillarboxing.
-             */
-            minrow = newrow;
-            maxrow = newrow + newheight - 1;
-            continue;
-        }
-
-        /* No pillarboxing or letterboxing. */
-        break;
+        maxrow1 = minrow + newheight;
     }
 
     frameno = _frameno;

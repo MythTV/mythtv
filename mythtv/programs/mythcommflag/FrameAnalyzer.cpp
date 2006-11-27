@@ -6,6 +6,13 @@ using namespace commDetector2;
 
 namespace frameAnalyzer {
 
+bool
+rrccinrect(int rr, int cc, int rrow, int rcol, int rwidth, int rheight)
+{
+    return rr >= rrow && cc >= rcol &&
+        rr < rrow + rheight && cc < rcol + rwidth;
+}
+
 void
 frameAnalyzerReportMap(const FrameAnalyzer::FrameMap *frameMap, float fps,
         const char *comment)

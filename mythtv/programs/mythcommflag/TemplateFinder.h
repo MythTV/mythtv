@@ -63,9 +63,9 @@ private:
     unsigned int    *scores;            /* pixel "edge" scores */
 
     int             mincontentrow;      /* limits of content area of images */
-    int             maxcontentrow;
     int             mincontentcol;
-    int             maxcontentcol;
+    int             maxcontentrow1;     /* minrow + height ("maxrow + 1") */
+    int             maxcontentcol1;     /* mincol + width ("maxcol + 1") */
 
     AVPicture       tmpl;               /* logo-matching template */
     int             tmplrow, tmplcol;

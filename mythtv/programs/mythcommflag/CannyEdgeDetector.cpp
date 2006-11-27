@@ -51,6 +51,7 @@ CannyEdgeDetector::CannyEdgeDetector(void)
     memset(&s2, 0, sizeof(s2));
     memset(&convolved, 0, sizeof(convolved));
     memset(&edges, 0, sizeof(edges));
+    memset(&exclude, 0, sizeof(exclude));
 }
 
 CannyEdgeDetector::~CannyEdgeDetector(void)
@@ -135,6 +136,16 @@ free_s1:
     return -1;
 }
 
+int
+CannyEdgeDetector::setExcludeArea(int row, int col, int width, int height)
+{
+    exclude.row = row;
+    exclude.col = col;
+    exclude.width = width;
+    exclude.height = height;
+    return 0;
+}
+
 const AVPicture *
 CannyEdgeDetector::detectEdges(const AVPicture *pgm, int pgmheight,
         int percentile)
@@ -156,9 +167,12 @@ CannyEdgeDetector::detectEdges(const AVPicture *pgm, int pgmheight,
                 mask, mask_radius))
         return NULL;
 
-    if (edge_mark_uniform(&edges, pgmheight, mask_radius,
-                sgm_init(sgm, &convolved, padded_height), sgmsorted,
-                percentile))
+    if (edge_mark_uniform_exclude(&edges, pgmheight, mask_radius,
+                sgm_init_exclude(sgm, &convolved, padded_height,
+                    exclude.row + mask_radius, exclude.col + mask_radius,
+                    exclude.width, exclude.height),
+                sgmsorted, percentile,
+                exclude.row, exclude.col, exclude.width, exclude.height))
         return NULL;
 
     return &edges;

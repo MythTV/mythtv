@@ -2,12 +2,16 @@
 #include "avcodec.h"        // AVPicture
 #include "frame.h"          // VideoFrame
 
+#include "FrameAnalyzer.h"
 #include "EdgeDetector.h"
 
 namespace edgeDetector {
 
+using namespace frameAnalyzer;
+
 unsigned int *
-sgm_init(unsigned int *sgm, const AVPicture *src, int srcheight)
+sgm_init_exclude(unsigned int *sgm, const AVPicture *src, int srcheight,
+        int excluderow, int excludecol, int excludewidth, int excludeheight)
 {
     /*
      * Squared Gradient Magnitude (SGM) calculations: use a 45-degree rotated
@@ -20,22 +24,34 @@ sgm_init(unsigned int *sgm, const AVPicture *src, int srcheight)
     int             rr, cc, dx, dy, rr2, cc2;
     unsigned char   *rr0, *rr1;
 
-    (void)srcheight;    /* gcc */
+    memset(sgm, 0, srcwidth * srcheight * sizeof(*sgm));
     rr2 = srcheight - 1;
     cc2 = srcwidth - 1;
     for (rr = 0; rr < rr2; rr++)
     {
         for (cc = 0; cc < cc2; cc++)
         {
-            rr0 = src->data[0] + rr * srcwidth + cc;
-            rr1 = src->data[0] + (rr + 1) * srcwidth + cc;
-            dx = rr1[1] - rr0[0];   /* southeast - northwest */
-            dy = rr1[0] - rr0[1];   /* southwest - northeast */
-            sgm[rr * srcwidth + cc] = dx * dx + dy * dy;
+            if (!rrccinrect(rr, cc, excluderow, excludecol,
+                        excludewidth, excludeheight))
+            {
+                rr0 = &src->data[0][rr * srcwidth + cc];
+                rr1 = &src->data[0][(rr + 1) * srcwidth + cc];
+                dx = rr1[1] - rr0[0];   /* southeast - northwest */
+                dy = rr1[0] - rr0[1];   /* southwest - northeast */
+                sgm[rr * srcwidth + cc] = dx * dx + dy * dy;
+            }
         }
     }
     return sgm;
 }
+
+#ifdef LATER
+unsigned int *
+sgm_init(unsigned int *sgm, const AVPicture *src, int srcheight)
+{
+    return sgm_init_exclude(sgm, src, srcheight, 0, 0, 0, 0);
+}
+#endif /* LATER */
 
 int
 sort_ascending(const void *aa, const void *bb)
@@ -46,8 +62,8 @@ sort_ascending(const void *aa, const void *bb)
 int
 edge_mark(AVPicture *dst, int dstheight,
         int extratop, int extraright, int extrabottom, int extraleft,
-        const unsigned int *sgm, unsigned int *sgmsorted,
-        int percentile)
+        const unsigned int *sgm, unsigned int *sgmsorted, int percentile,
+        int excluderow, int excludecol, int excludewidth, int excludeheight)
 {
     /*
      * TUNABLE:
@@ -62,27 +78,50 @@ edge_mark(AVPicture *dst, int dstheight,
     const int           dstwidth = dst->linesize[0];
     const int           padded_width = extraleft + dstwidth + extraright;
     unsigned int        thresholdval;
-    int                 nn, ii, rr, cc, first, last, last2;
+    int                 nn, dstnn, ii, rr, cc, first, last, last2;
+
+    (void)extrabottom;  /* gcc */
 
     /*
      * sgm: SGM values of padded (convolved) image
      *
-     * sgmsorted: SGM values of unpadded image (same dimensions as "dst"), then
-     * with all values sorted.
+     * sgmsorted: sorted SGM values of unexcluded areas of unpadded image (same
+     * dimensions as "dst").
      */
+    nn = 0;
     for (rr = 0; rr < dstheight; rr++)
     {
-        memcpy(sgmsorted + rr * dstwidth,
-                sgm + (extratop + rr) * padded_width + extraleft,
-                dstwidth * sizeof(*sgmsorted));
+        for (cc = 0; cc < dstwidth; cc++)
+        {
+            if (!rrccinrect(rr, cc, excluderow, excludecol,
+                        excludewidth, excludeheight))
+            {
+                sgmsorted[nn++] = sgm[(extratop + rr) * padded_width +
+                    extraleft + cc];
+            }
+        }
     }
-    nn = dstheight * dstwidth;
+
+    dstnn = dstwidth * dstheight;
+#if 0
+    assert(nn == dstnn -
+            (min(max(0, excluderow + excludeheight), dstheight) -
+                min(max(0, excluderow), dstheight)) *
+            (min(max(0, excludecol + excludewidth), dstwidth) -
+                min(max(0, excludecol), dstwidth)));
+#endif
+    memset(dst->data[0], 0, dstnn * sizeof(*dst->data[0]));
+
+    if (!nn)
+    {
+            /* Degenerate case (entire area excluded from analysis). */
+            return 0;
+    }
+
     qsort(sgmsorted, nn, sizeof(*sgmsorted), sort_ascending);
 
     ii = percentile * nn / 100;
     thresholdval = sgmsorted[ii];
-
-    memset(dst->data[0], 0, nn * sizeof(*dst->data[0]));
 
     /*
      * Try not to pick up too many edges, and eliminate degenerate edge-less
@@ -116,29 +155,51 @@ edge_mark(AVPicture *dst, int dstheight,
     {
         for (cc = 0; cc < dstwidth; cc++)
         {
-            if (sgm[(extratop + rr) * padded_width + extraleft + cc] >=
-                    thresholdval)
+            if (!rrccinrect(rr, cc, excluderow, excludecol,
+                        excludewidth, excludeheight) &&
+                    sgm[(extratop + rr) * padded_width + extraleft + cc] >=
+                        thresholdval)
                 dst->data[0][rr * dstwidth + cc] = UCHAR_MAX;
         }
     }
-
-    (void)extrabottom;  /* gcc */
     return 0;
 }
 
+#ifdef LATER
 int edge_mark_uniform(AVPicture *dst, int dstheight, int extramargin,
         const unsigned int *sgm, unsigned int *sgmsorted,
         int percentile)
 {
     return edge_mark(dst, dstheight,
             extramargin, extramargin, extramargin, extramargin,
-            sgm, sgmsorted, percentile);
+            sgm, sgmsorted, percentile, 0, 0, 0, 0);
+}
+#endif /* LATER */
+
+int edge_mark_uniform_exclude(AVPicture *dst, int dstheight, int extramargin,
+        const unsigned int *sgm, unsigned int *sgmsorted, int percentile,
+        int excluderow, int excludecol, int excludewidth, int excludeheight)
+{
+    return edge_mark(dst, dstheight,
+            extramargin, extramargin, extramargin, extramargin,
+            sgm, sgmsorted, percentile,
+            excluderow, excludecol, excludewidth, excludeheight);
 }
 
 };  /* namespace */
 
 EdgeDetector::~EdgeDetector(void)
 {
+}
+
+int
+EdgeDetector::setExcludeArea(int row, int col, int width, int height)
+{
+    (void)row;  /* gcc */
+    (void)col;  /* gcc */
+    (void)width;    /* gcc */
+    (void)height;   /* gcc */
+    return 0;
 }
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

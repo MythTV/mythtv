@@ -35,8 +35,8 @@ public:
 private:
     TemplateFinder          *logoFinder;
     const struct AVPicture  *logo;
+    int                     logorow, logocol;
     int                     logowidth, logoheight;
-    int                     logorr1, logocc1, logorr2, logocc2;
 
     long long               frameno;            /* frame number */
     int                     row, col;           /* content location */

@@ -71,10 +71,10 @@ sort_ascending(const void *aa, const void *bb)
     return *(unsigned int*)aa - *(unsigned int*)bb;
 }
 
-unsigned int
+float
 bounding_score(const AVPicture *img, int row, int col, int width, int height)
 {
-    /* Return a value scaled to [0..1000000 (100M)] */
+    /* Return a value between [0..1] */
     const int       imgwidth = img->linesize[0];
     unsigned int    score;
     int             rr, cc, rr2, cc2;
@@ -90,14 +90,35 @@ bounding_score(const AVPicture *img, int row, int col, int width, int height)
                 score++;
         }
     }
-    return score * 1000000 / (width * height);
+    return (float)score / (width * height);
+}
+
+bool
+rowisempty(const AVPicture *img, int row, int col, int width)
+{
+    const int   imgwidth = img->linesize[0];
+    for (int cc = col; cc < col + width; cc++)
+        if (img->data[0][row * imgwidth + cc])
+            return false;
+    return true;
+}
+
+bool
+colisempty(const AVPicture *img, int col, int row, int height)
+{
+    const int   imgwidth = img->linesize[0];
+    for (int rr = row; rr < row + height; rr++)
+        if (img->data[0][rr * imgwidth + col])
+            return false;
+    return true;
 }
 
 int
-bounding_box(const AVPicture *img,
-        int minrow, int maxrow, int mincol, int maxcol,
+bounding_box(const AVPicture *img, int imgheight,
+        int minrow, int mincol, int maxrow1, int maxcol1,
         int *prow, int *pcol, int *pwidth, int *pheight)
 {
+    const int           imgwidth = img->linesize[0];
     /*
      * TUNABLE:
      *
@@ -107,21 +128,32 @@ bounding_box(const AVPicture *img,
     static const int    MAXWIDTHPCT = 20;
     static const int    MAXHEIGHTPCT = 20;
 
+    /*
+     * TUNABLE:
+     *
+     * Safety margin to avoid cutting too much of the logo.
+     * Higher values cut more, but avoid noise as part of the template..
+     * Lower values cut less, but can include noise as part of the template.
+     */
+    const int           VERTSLOP = max(4, imgheight * 1 / 15);
+    const int           HORIZSLOP = max(4, imgwidth * 1 / 20);
+
     int                 maxwidth, maxheight;
     int                 width, height, row, col;
+    int                 newrow, newcol, newright, newbottom;
 
-    maxwidth = (maxcol - mincol + 1) * MAXWIDTHPCT / 100;
-    maxheight = (maxrow - minrow + 1) * MAXHEIGHTPCT / 100;
+    maxwidth = (maxcol1 - mincol) * MAXWIDTHPCT / 100;
+    maxheight = (maxrow1 - minrow) * MAXHEIGHTPCT / 100;
 
     row = minrow;
     col = mincol;
-    width = maxcol - mincol + 1;
-    height = maxrow - minrow + 1;
+    width = maxcol1 - mincol;
+    height = maxrow1 - minrow;
 
     for (;;)
     {
-        unsigned int    score, newscore;
-        int             ii, newrow, newcol, newright, newbottom;
+        float           score, newscore;
+        int             ii;
         bool            improved = false;
 
         VERBOSE(VB_COMMFLAG, QString("bounding_box %1x%2@(%3,%4)")
@@ -211,13 +243,14 @@ bounding_box(const AVPicture *img,
             /* Too wide; test left and right portions. */
             int             chop = width / 3;
             int             chopwidth = width - chop;
-            unsigned int    left, right, minscore, maxscore;
+            float           left, right, minscore, maxscore;
 
             left = bounding_score(img, row, col, chopwidth, height);
             right = bounding_score(img, row, col + chop, chopwidth, height);
             VERBOSE(VB_COMMFLAG, QString(
                         "bounding_box too wide (%1 > %2); left=%3, right=%4")
-                    .arg(width).arg(maxwidth).arg(left).arg(right));
+                    .arg(width).arg(maxwidth)
+                    .arg(left, 0, 'f', 3).arg(right, 0, 'f', 3));
             minscore = min(left, right);
             maxscore = max(left, right);
             if (maxscore < 3 * minscore / 2)
@@ -225,7 +258,7 @@ bounding_box(const AVPicture *img,
                 /*
                  * Edge pixel distribution too uniform; give up.
                  *
-                 * XXX: also fails for left-right centered templates ...
+                 * XXX: also fails for horizontally-centered templates ...
                  */
                 VERBOSE(VB_COMMFLAG, "bounding_box giving up"
                         " (edge pixels distributed too uniformly)");
@@ -243,13 +276,14 @@ bounding_box(const AVPicture *img,
             /* Too tall; test upper and lower portions. */
             int             chop = height / 3;
             int             chopheight = height - chop;
-            unsigned int    upper, lower, minscore, maxscore;
+            float           upper, lower, minscore, maxscore;
 
             upper = bounding_score(img, row, col, width, chopheight);
             lower = bounding_score(img, row + chop, col, width, chopheight);
             VERBOSE(VB_COMMFLAG, QString(
                         "bounding_box too tall (%1 > %2); upper=%3, lower=%4")
-                    .arg(height).arg(maxheight).arg(upper).arg(lower));
+                    .arg(height).arg(maxheight)
+                    .arg(upper, 0, 'f', 3).arg(lower, 0, 'f', 3));
             minscore = min(upper, lower);
             maxscore = max(upper, lower);
             if (maxscore < 3 * minscore / 2)
@@ -257,7 +291,7 @@ bounding_box(const AVPicture *img,
                 /*
                  * Edge pixel distribution too uniform; give up.
                  *
-                 * XXX: also fails for upper-lower centered templates ...
+                 * XXX: also fails for vertically-centered templates ...
                  */
                 VERBOSE(VB_COMMFLAG, "bounding_box giving up"
                         " (edge pixel distribution too uniform)");
@@ -273,6 +307,109 @@ bounding_box(const AVPicture *img,
         break;
     }
 
+    /*
+     * The above "chop" algorithm often cuts off the outside edges of the
+     * logos because the outside edges don't contribute enough to the score. So
+     * compensate by now expanding the bounding box (up to a *SLOP pixels in
+     * each direction) to include all edge pixels.
+     */
+
+    VERBOSE(VB_COMMFLAG, QString("bounding_box %1x%2@(%3,%4);"
+                " horizslop=%5,vertslop=%6")
+            .arg(width).arg(height).arg(col).arg(row)
+            .arg(HORIZSLOP).arg(VERTSLOP));
+
+    /* Expand upwards. */
+    newrow = row - 1;
+    for (;;)
+    {
+        if (newrow <= minrow)
+        {
+            newrow = minrow;
+            break;
+        }
+        if (row - newrow >= VERTSLOP)
+        {
+            newrow = row - VERTSLOP;
+            break;
+        }
+        if (rowisempty(img, newrow, col, width))
+        {
+            newrow++;
+            break;
+        }
+        newrow--;
+    }
+    newrow = max(minrow, newrow - 1);   /* Empty row on top. */
+
+    /* Expand leftwards. */
+    newcol = col - 1;
+    for (;;)
+    {
+        if (newcol <= mincol)
+        {
+            newcol = mincol;
+            break;
+        }
+        if (col - newcol >= HORIZSLOP)
+        {
+            newcol = col - HORIZSLOP;
+            break;
+        }
+        if (colisempty(img, newcol, row, height))
+        {
+            newcol++;
+            break;
+        }
+        newcol--;
+    }
+    newcol = max(mincol, newcol - 1);   /* Empty column to left. */
+
+    /* Expand rightwards. */
+    newright = col + width;
+    for (;;)
+    {
+        if (newright >= maxcol1)
+        {
+            newright = maxcol1;
+            break;
+        }
+        if (newright - (col + width) >= HORIZSLOP)
+        {
+            newright = col + width + HORIZSLOP;
+            break;
+        }
+        if (colisempty(img, newright, row, height))
+            break;
+        newright++;
+    }
+    newright = min(maxcol1, newright + 1);  /* Empty column to right. */
+
+    /* Expand downwards. */
+    newbottom = row + height;
+    for (;;)
+    {
+        if (newbottom >= maxrow1)
+        {
+            newbottom = maxrow1;
+            break;
+        }
+        if (newbottom - (row + height) >= VERTSLOP)
+        {
+            newbottom = row + height + VERTSLOP;
+            break;
+        }
+        if (rowisempty(img, newbottom, col, width))
+            break;
+        newbottom++;
+    }
+    newbottom = min(maxrow1, newbottom + 1);    /* Empty row on bottom. */
+
+    row = newrow;
+    col = newcol;
+    width = newright - newcol;
+    height = newbottom - newrow;
+
     VERBOSE(VB_COMMFLAG, QString("bounding_box %1x%2@(%3,%4)")
             .arg(width).arg(height).arg(col).arg(row));
 
@@ -285,7 +422,7 @@ bounding_box(const AVPicture *img,
 
 int
 template_alloc(const unsigned int *scores, int width, int height,
-        int minrow, int maxrow, int mincol, int maxcol, AVPicture *tmpl,
+        int minrow, int mincol, int maxrow1, int maxcol1, AVPicture *tmpl,
         int *ptmplrow, int *ptmplcol, int *ptmplwidth, int *ptmplheight,
         bool debug_edgecounts, QString debugdir)
 {
@@ -373,7 +510,7 @@ template_alloc(const unsigned int *scores, int width, int height,
 
     /* Crop to a minimal bounding box. */
 
-    if (bounding_box(&thresh, minrow, maxrow, mincol, maxcol,
+    if (bounding_box(&thresh, height, minrow, mincol, maxrow1, maxcol1,
                 ptmplrow, ptmplcol, ptmplwidth, ptmplheight))
         goto free_thresh;
 
@@ -542,9 +679,9 @@ TemplateFinder::TemplateFinder(PGMConverter *pgmc, BorderDetector *bd,
     , height(-1)
     , scores(NULL)
     , mincontentrow(INT_MAX)
-    , maxcontentrow(INT_MIN)
     , mincontentcol(INT_MAX)
-    , maxcontentcol(INT_MIN)
+    , maxcontentrow1(INT_MIN)
+    , maxcontentcol1(INT_MIN)
     , tmplrow(-1)
     , tmplcol(-1)
     , tmplwidth(-1)
@@ -740,11 +877,26 @@ TemplateFinder::analyzeFrame(const VideoFrame *frame, long long frameno,
      * The TemplateFinder accumulates all its state in the "scores" array to
      * be processed later by TemplateFinder::finished.
      */
-    const int           FRAMESGMPCTILE = 97;
+    const int           FRAMESGMPCTILE = 90;
+
+    /*
+     * TUNABLE:
+     *
+     * Exclude some portion of the center of the frame from edge analysis.
+     * Elminate false edge-detection logo positives from talking-host types of
+     * shows where the high-contrast host and clothes (e.g., tie against white
+     * shirt against dark jacket) dominates the edges.
+     *
+     * This has a nice side-effect of reducing the area to be examined (speed
+     * optimization).
+     */
+    static const float  EXCLUDEWIDTH = 0.5;
+    static const float  EXCLUDEHEIGHT = 0.5;
 
     const AVPicture     *pgm, *edges;
     int                 pgmwidth, pgmheight;
     int                 croprow, cropcol, cropwidth, cropheight;
+    int                 excluderow, excludecol, excludewidth, excludeheight;
     struct timeval      start, end, elapsed;
 
     if (frameno < nextFrame)
@@ -768,13 +920,12 @@ TemplateFinder::analyzeFrame(const VideoFrame *frame, long long frameno,
 
         if (croprow < mincontentrow)
             mincontentrow = croprow;
-        if (croprow + cropheight - 1 > maxcontentrow)
-            maxcontentrow = croprow + cropheight - 1;
-
         if (cropcol < mincontentcol)
             mincontentcol = cropcol;
-        if (cropcol + cropwidth - 1 > maxcontentcol)
-            maxcontentcol = cropcol + cropwidth - 1;
+        if (cropcol + cropwidth > maxcontentcol1)
+            maxcontentcol1 = cropcol + cropwidth;
+        if (croprow + cropheight > maxcontentrow1)
+            maxcontentrow1 = croprow + cropheight;
 
         if (resetBuffers(cropwidth, cropheight))
             goto error;
@@ -782,6 +933,17 @@ TemplateFinder::analyzeFrame(const VideoFrame *frame, long long frameno,
         if (pgm_crop(&cropped, pgm, pgmheight, croprow, cropcol,
                     cropwidth, cropheight))
             goto error;
+
+        /*
+         * Translate the excluded area of the screen into "cropped"
+         * coordinates.
+         */
+        excludewidth = (int)(pgmwidth * EXCLUDEWIDTH);
+        excludeheight = (int)(pgmheight * EXCLUDEHEIGHT);
+        excluderow = (pgmheight - excludeheight) / 2 - croprow;
+        excludecol = (pgmwidth - excludewidth) / 2 - cropcol;
+        (void)edgeDetector->setExcludeArea(excluderow, excludecol,
+                excludewidth, excludeheight);
 
         if (!(edges = edgeDetector->detectEdges(&cropped, cropheight,
                         FRAMESGMPCTILE)))
@@ -822,11 +984,12 @@ error:
 int
 TemplateFinder::finished(long long nframes, bool final)
 {
-    (void)nframes;  /* unused */
+    (void)nframes;  /* gcc */
     if (!tmpl_done)
     {
         if (template_alloc(scores, width, height,
-                    mincontentrow, maxcontentrow, mincontentcol, maxcontentcol,
+                    mincontentrow, mincontentcol,
+                    maxcontentrow1, maxcontentcol1,
                     &tmpl, &tmplrow, &tmplcol, &tmplwidth, &tmplheight,
                     debug_edgecounts, debugdir))
         {
@@ -837,9 +1000,8 @@ TemplateFinder::finished(long long nframes, bool final)
         {
             if (final && debug_template)
             {
-                if (!(tmpl_valid = writeTemplate(debugtmpl, &tmpl,
-                            debugdata, tmplrow, tmplcol,
-                            tmplwidth, tmplheight)))
+                if (!(tmpl_valid = writeTemplate(debugtmpl, &tmpl, debugdata,
+                                tmplrow, tmplcol, tmplwidth, tmplheight)))
                     goto free_tmpl;
 
                 VERBOSE(VB_COMMFLAG, QString("TemplateFinder::finished wrote %1"

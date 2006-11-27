@@ -59,6 +59,8 @@ public:
 
 namespace frameAnalyzer {
 
+bool rrccinrect(int rr, int cc, int rrow, int rcol, int rwidth, int rheight);
+
 void frameAnalyzerReportMap(const FrameAnalyzer::FrameMap *frameMap,
         float fps, const char *comment);
 

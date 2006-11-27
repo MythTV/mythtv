@@ -255,15 +255,26 @@ computeBreakMap(FrameAnalyzer::FrameMap *breakMap,
                     continue;   /* Outside delta range; try next end-blank. */
 
                 /* Mark this commercial break. */
+                bool inserted = false;
                 for (unsigned int jj = 0;; jj++)
                 {
                     long long newbrkb = brkb + jj;
+                    if (newbrkb >= brke)
+                    {
+                        VERBOSE(VB_COMMFLAG,
+                            QString("BF [%1,%2] ran out of slots")
+                                .arg(brkb).arg(brke - 1));
+                        break;
+                    }
                     if (breakMap->find(newbrkb) == breakMap->end())
                     {
                         breakMap->insert(newbrkb, brke - newbrkb);
+                        inserted = true;
                         break;
                     }
                 }
+                if (inserted)
+                    break;  /* next break type */
             }
         }
     }

@@ -184,6 +184,7 @@ long long
 matchspn(long long nframes, unsigned char *match, long long frameno,
         unsigned char acceptval)
 {
+    /* Return the first frame that does not match "acceptval". */
     while (frameno < nframes && match[frameno] == acceptval)
         frameno++;
     return frameno;
@@ -384,6 +385,16 @@ TemplateMatcher::finished(long long nframes, bool final)
     const int       MINBREAKLEN = (int)roundf(25 * fps);  /* frames */
     const int       MINSEGLEN = (int)roundf(25 * fps);    /* frames */
 
+    /*
+     * TUNABLE:
+     *
+     * The percentile of template matching frames to mark as "matching".
+     *
+     * Higher values require closer matches, and could miss true matches.
+     * Lower values can yield false content.
+     */
+    static const float  MATCHPCTILE = 0.47;
+
     int                                 tmpledges, mintmpledges, ii;
     long long                           segb, brkb;
     FrameAnalyzer::FrameMap::Iterator   bb;
@@ -401,7 +412,7 @@ TemplateMatcher::finished(long long nframes, bool final)
     tmpledges = pgm_set(tmpl, tmplheight);
     memcpy(tmatches, matches, nframes * sizeof(*matches));
     qsort(tmatches, nframes, sizeof(*tmatches), sort_ascending);
-    ii = (int)((nframes - 1) * 0.47);  /* A median-ish value. */
+    ii = (int)((nframes - 1) * MATCHPCTILE);
     mintmpledges = tmatches[ii];
     for (; ii > 0; ii--) {
         if (tmatches[ii - 1] != mintmpledges)
@@ -592,7 +603,7 @@ TemplateMatcher::adjustForBlanks(const BlankFrameDetector *blankFrameDetector)
      * to deviate by up to MAXBLANKADJUSTMENT frames before/after the break
      * actually begins/ends.
      */
-    const int       MAXBLANKADJUSTMENT = (int)roundf(25 * fps);  /* frames */
+    const int       MAXBLANKADJUSTMENT = (int)roundf(60 * fps);  /* 60 sec */
     const bool      skipCommBlanks = blankFrameDetector->getSKipCommBlanks();
 
     const FrameAnalyzer::FrameMap *blankMap = blankFrameDetector->getBlanks();

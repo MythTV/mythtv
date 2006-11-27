@@ -20,7 +20,8 @@ public:
     ~CannyEdgeDetector(void);
     int nuppelVideoPlayerInited(const NuppelVideoPlayer *nvp,
             int width, int height);
-    const AVPicture *detectEdges(const AVPicture *pgm, int pgmheight,
+    virtual int setExcludeArea(int row, int col, int width, int height);
+    virtual const AVPicture *detectEdges(const AVPicture *pgm, int pgmheight,
             int percentile);
 
 private:
@@ -33,6 +34,10 @@ private:
     AVPicture       s1, s2, convolved;      /* smoothed grayscale frame */
     int             ewidth, eheight;        /* dimensions */
     AVPicture       edges;                  /* detected edges */
+
+    struct {
+        int         row, col, width, height;
+    }               exclude;
 };
 
 #endif  /* !__CANNYEDGEDETECTOR_H__ */
