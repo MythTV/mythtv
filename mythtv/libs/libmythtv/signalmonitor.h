@@ -258,8 +258,9 @@ inline bool SignalMonitor::IsRequired(const QString &cardtype)
 
 inline bool SignalMonitor::IsSupported(const QString &cardtype)
 {
-    return (IsRequired(cardtype) ||
-            (cardtype.upper() == "V4L"));
+    return (IsRequired(cardtype)        ||
+            (cardtype.upper() == "V4L") ||
+            (cardtype.upper() == "MPEG"));
 }
 
 
