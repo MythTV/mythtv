@@ -592,7 +592,7 @@
     </message>
     <message>
         <source>Forecast for</source>
-        <translation>Vejrudsigt for</translation>
+        <translation>Vejrudsigt for </translation>
     </message>
     <message>
         <source>doppler radar</source>
@@ -743,15 +743,15 @@
     </message>
     <message>
         <source>Today a high of </source>
-        <translation>Dagens højeste temperatur er på ca. </translation>
+        <translation>Dagens højeste temperatur er </translation>
     </message>
     <message>
         <source> and a low of </source>
-        <translation> grader, og den laveste er ca. </translation>
+        <translation> og den laveste er </translation>
     </message>
     <message>
         <source>. Currently there is a humidity of </source>
-        <translation> grader. Lige nu er luftfugtigheden </translation>
+        <translation> Lige nu er luftfugtigheden </translation>
     </message>
     <message>
         <source>% and the winds are</source>

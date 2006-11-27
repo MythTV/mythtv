@@ -349,11 +349,11 @@
     </message>
     <message>
         <source>1 Shuffle: Album</source>
-        <translation type="unfinished"></translation>
+        <translation>1 Bland: Album</translation>
     </message>
     <message>
         <source>Shuffle: Album</source>
-        <translation type="unfinished"></translation>
+        <translation>Bland: Album</translation>
     </message>
 </context>
 <context>
@@ -364,7 +364,7 @@
     </message>
     <message>
         <source>Updating music database</source>
-        <translation>Opdaterer musik-databasen</translation>
+        <translation>Opdatérer musik-databasen</translation>
     </message>
     <message>
         <source>BumpScope</source>
@@ -908,15 +908,15 @@
     </message>
     <message>
         <source>Order in which to sort the Music Tree. Possible values are a space-separated list of genre, splitartist, splitartist1, artist, album, and title OR the keyword &quot;directory&quot; to indicate that the onscreen tree mirrors the filesystem.</source>
-        <translation>CD: %1 ~ %2 - %3</translation>
+        <translation>Orden for musik-hierarkiet. Mulige værdier er en liste (adskilt af mellemrum) med følgende mulige værdier: genre, splitartist, artist, album, og title ELLER &quot;directory&quot; for at indikere at billedet på skærmen har samme struktur som filsystemet.</translation>
     </message>
     <message>
         <source>Automatically play CDs</source>
-        <translation>Nummer %1</translation>
+        <translation>Afspil CD&apos;er automatisk</translation>
     </message>
     <message>
         <source>Automatically put a new CD on the playlist and start playing the CD.</source>
-        <translation>Orden for musik-hierarkiet. Mulige værdier er en liste (adskilt af mellemrum) med følgende mulige værdier: genre, splitartist, artist, album, og title ELLER &quot;directory&quot; for at indikere at billedet på skærmen har samme struktur som filsystemet.</translation>
+        <translation>Anbringer automatisk nye CD i playlisten og afspiller CD&apos;en.</translation>
     </message>
     <message>
         <source>Select the SCSI or IDE Device for CD Writing.</source>
@@ -936,7 +936,7 @@
     </message>
     <message>
         <source>Checks the database for duplicates when importing/ripping CDs.</source>
-        <translation>Check databsen for dubletter når der importéres/rippes cd&apos;er.</translation>
+        <translation>Check databasen for dubletter når der importéres/rippes cd&apos;er.</translation>
     </message>
     <message>
         <source>Loading Music</source>
@@ -944,15 +944,15 @@
     </message>
     <message>
         <source>default</source>
-        <translation type="unfinished"></translation>
+        <translation>standard</translation>
     </message>
     <message>
         <source>Audio Device used for playback. &apos;default&apos; will use the device specified in MythTV</source>
-        <translation type="unfinished"></translation>
+        <translation>Lyd-enhed, der anvendes til afspilning. &apos;standard&apos; vil bruge endheden opsat i MythTV</translation>
     </message>
     <message>
         <source>Unknown Title</source>
-        <translation type="unfinished"></translation>
+        <translation>Ukendt titel</translation>
     </message>
 </context>
 <context>
