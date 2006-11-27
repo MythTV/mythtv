@@ -123,21 +123,18 @@ void DTVChannel::SetCachedATSCInfo(const QString &chan)
     if (currentATSCMinorChannel > 0)
     {
         VERBOSE(VB_CHANNEL, LOC +
-                QString("SetCachedATSCInfo(%2): %3_%4")
-                .arg(GetDevice()).arg(chan)
+                QString("SetCachedATSCInfo(%2): %3_%4").arg(chan)
                 .arg(currentATSCMajorChannel).arg(currentATSCMinorChannel));
     }
     else if ((0 == currentATSCMajorChannel) && (0 == currentProgramNum))
     {
         VERBOSE(VB_CHANNEL, LOC +
-                QString("SetCachedATSCInfo(%2): RESET")
-                .arg(GetDevice()).arg(chan));
+                QString("SetCachedATSCInfo(%2): RESET").arg(chan));
     }
     else
     {
         VERBOSE(VB_CHANNEL, LOC +
-                QString("SetCachedATSCInfo(%2): %3-%4")
-                .arg(GetDevice()).arg(chan)
+                QString("SetCachedATSCInfo(%2): %3-%4").arg(chan)
                 .arg(currentATSCMajorChannel).arg(currentProgramNum));
     }
 }
