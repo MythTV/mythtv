@@ -429,7 +429,7 @@ TV::TV(void)
       queuedTranscode(false), getRecorderPlaybackInfo(false),
       adjustingPicture(kAdjustingPicture_None),
       adjustingPictureAttribute(kPictureAttribute_None),
-      ignoreKeys(false), needToSwapPIP(false),
+      ignoreKeys(false), needToSwapPIP(false), needToJumpMenu(false),
       // Channel Editing
       chanEditMapLock(true), ddMapSourceId(0), ddMapLoaderRunning(false),
       // Sleep Timer
@@ -1782,7 +1782,7 @@ void TV::RunTV(void)
             
             if (internalState == kState_WatchingPreRecorded && !inPlaylist &&
                 dialogname == "" && nvp->IsNearEnd() && !exitPlayer && !underNetworkControl &&
-                (gContext->GetNumSetting("EndofRecordingExitPrompt") == 1) &&
+                (gContext->GetNumSetting("EndOfRecordingExitPrompt") == 1) &&
                 !jumped_back && !editmode)
             {
                 if (IsEmbedding())
@@ -1947,6 +1947,12 @@ void TV::RunTV(void)
             ClearOSD();
             SwapPIP();
             needToSwapPIP = false;
+        }
+
+        if (needToJumpMenu)
+        {
+            DoDisplayJumpMenu();
+            needToJumpMenu = false;
         }
     }
   
@@ -2703,7 +2709,12 @@ void TV::ProcessKeypress(QKeyEvent *e)
         }
         else if (action == "JUMPREC")
         {
-            if (RunPlaybackBoxPtr)
+            if (gContext->GetNumSetting("JumpToProgramOSD", 1) 
+                    && StateIsPlaying(internalState))
+            {
+                DisplayJumpMenuSoon();
+            }
+            else if (RunPlaybackBoxPtr)
                 EditSchedule(kPlaybackBox);
         }
         else if (action == "SIGNALMON")
@@ -4957,6 +4968,9 @@ void TV::doEditSchedule(int editType)
         return;
     }
 
+    if (!nvp || nvp->IsNearEnd())
+        return;
+
     // Resize window to the MythTV GUI size
     MythMainWindow *mwnd = gContext->GetMainWindow();
     bool using_gui_size_for_tv = gContext->GetNumSetting("GuiSizeForTV", 0);
@@ -4975,8 +4989,6 @@ void TV::doEditSchedule(int editType)
 
     bool changeChannel = false;
     ProgramInfo *nextProgram = NULL;
-    if (!nvp)
-        return;
 
     if (StateIsLiveTV(GetState()))
     {
@@ -6416,7 +6428,12 @@ void TV::TreeMenuSelected(OSDListTreeType *tree, OSDGenericTree *item)
     }
     else if (action == "JUMPREC")
     {
-        if (RunPlaybackBoxPtr)
+        if (gContext->GetNumSetting("JumpToProgramOSD", 1)
+            && StateIsPlaying(internalState))
+        {
+            DisplayJumpMenuSoon();
+        }
+         else if (RunPlaybackBoxPtr)
             EditSchedule(kPlaybackBox);
     }
     else if (StateIsLiveTV(GetState()))
@@ -6525,11 +6542,13 @@ void TV::BuildOSDTreeMenu(void)
             freeRecorders = RemoteGetFreeRecorderCount();
 
         item = new OSDGenericTree(treeMenu, tr("Program Guide"), "GUIDE");
-        item = new OSDGenericTree(treeMenu, tr("Jump to Program"));
-        subitem = new OSDGenericTree(item, tr("Recorded Program"), "JUMPREC");
-        if (lastProgram != NULL)
+        if (!gContext->GetNumSetting("JumpToProgramOSD", 1))
+        {
+            item = new OSDGenericTree(treeMenu, tr("Jump to Program"));
+            subitem = new OSDGenericTree(item, tr("Recorded Program"), "JUMPREC");
+            if (lastProgram != NULL)
             subitem = new OSDGenericTree(item, lastProgram->title, "JUMPPREV");
-
+        }
         if (freeRecorders)
         {
             item = new OSDGenericTree(treeMenu, tr("Picture-in-Picture"));
@@ -7534,6 +7553,77 @@ bool TV::PromptRecGroupPassword(void)
     if (paused && !stayPaused)
         DoPause(false);
     return true;
+}
+
+void TV::DoDisplayJumpMenu(void)
+{
+    if (treeMenu)
+        delete treeMenu;
+
+     treeMenu = new OSDGenericTree(NULL, "treeMenu"); 
+     OSDGenericTree *item, *subitem; 
+   
+     // Build jumpMenu of recorded program titles 
+        ProgramInfo *p; 
+    progLists.clear(); 
+    vector<ProgramInfo *> *infoList; 
+    infoList = RemoteGetRecordedList(false); 
+   
+    //bool LiveTVInAllPrograms = gContext->GetNumSetting("LiveTVInAllPrograms",0); 
+    if (infoList) 
+    { 
+        pbinfoLock.lock(); 
+        vector<ProgramInfo *>::iterator i = infoList->begin(); 
+        for ( ; i != infoList->end(); i++) 
+        { 
+            p = *i; 
+            //if (p->recgroup != "LiveTV" || LiveTVInAllPrograms) 
+            if (p->recgroup == playbackinfo->recgroup) 
+                progLists[p->title].prepend(p); 
+        } 
+        pbinfoLock.unlock(); 
+  
+        QMap<QString,ProgramList>::Iterator Iprog; 
+        for (Iprog = progLists.begin(); Iprog != progLists.end(); Iprog++) 
+        { 
+            ProgramList plist = Iprog.data(); 
+            int progIndex = plist.count(); 
+            if (progIndex == 1) 
+            {  
+                item = new OSDGenericTree(treeMenu, tr(Iprog.key()), 
+                    QString("JUMPPROG %1 0").arg(Iprog.key())); 
+            }  
+            else  
+            { 
+                item = new OSDGenericTree(treeMenu, tr(Iprog.key())); 
+                for (int i = 0; i < progIndex; i++) 
+                { 
+                    p = plist.at(i); 
+                    if (p->subtitle != "") 
+                        subitem = new OSDGenericTree(item, tr(p->subtitle),  
+                            QString("JUMPPROG %1 %2").arg(Iprog.key()).arg(i)); 
+                    else  
+                        subitem = new OSDGenericTree(item, tr(p->title),  
+                            QString("JUMPPROG %1 %2").arg(Iprog.key()).arg(i)); 
+                } 
+            } 
+        } 
+    }  
+       
+    if (GetOSD()) 
+    { 
+        ClearOSD(); 
+    
+        OSDListTreeType *tree = GetOSD()->ShowTreeMenu("menu", treeMenu); 
+        if (tree) 
+        { 
+            connect(tree, SIGNAL(itemSelected(OSDListTreeType *,OSDGenericTree *)),  
+                this, SLOT(TreeMenuSelected(OSDListTreeType *, OSDGenericTree *))); 
+
+            connect(tree, SIGNAL(itemEntered(OSDListTreeType *, OSDGenericTree *)), 
+                this, SLOT(TreeMenuEntered(OSDListTreeType *, OSDGenericTree *))); 
+        } 
+    }  
 }
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

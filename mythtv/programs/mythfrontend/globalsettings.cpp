@@ -1248,6 +1248,17 @@ static HostCheckBox *EndOfRecordingExitPrompt()
     return gc;
 }
 
+static HostCheckBox *JumpToProgramOSD()
+{
+    HostCheckBox *gc = new HostCheckBox("JumpToProgramOSD");
+    gc->setLabel(QObject::tr("Jump to Program OSD"));
+    gc->setValue(true);
+    gc->setHelpText(QObject::tr("Set the choice between viewing the current recording group "
+                "in the OSD, or showing the 'Watch Recording' screen when 'Jump to Program' "
+                "is activated. If set, the recordings are shown in the OSD"));
+    return gc;
+}
+
 static HostCheckBox *AutomaticSetWatched()
 {
     HostCheckBox *gc = new HostCheckBox("AutomaticSetWatched");
@@ -3470,6 +3481,7 @@ PlaybackSettings::PlaybackSettings()
     gen2->setLabel(QObject::tr("General playback (part 2)"));
     gen2->addChild(PlaybackExitPrompt());
     gen2->addChild(EndOfRecordingExitPrompt());
+    gen2->addChild(JumpToProgramOSD());
     gen2->addChild(AutomaticSetWatched());
     gen2->addChild(ClearSavedPosition());
     gen2->addChild(AltClearSavedPosition());

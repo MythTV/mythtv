@@ -307,6 +307,7 @@ class MPUBLIC TV : public QObject
     void SetAutoCommercialSkip(enum commSkipMode skipMode = CommSkipOff);
     void SetManualZoom(bool zoomON = false);
 
+    void DoDisplayJumpMenu(void);
     void SetJumpToProgram(QString progKey = "", int progIndex = 0);
  
     bool ClearOSD(void);
@@ -334,6 +335,7 @@ class MPUBLIC TV : public QObject
     void ToggleActiveWindow(void);
     void SwapPIP(void);
     void SwapPIPSoon(void) { needToSwapPIP = true; }
+    void DisplayJumpMenuSoon(void) { needToJumpMenu = true; }
 
     void ToggleAutoExpire(void);
 
@@ -434,6 +436,7 @@ class MPUBLIC TV : public QObject
 
     bool ignoreKeys;
     bool needToSwapPIP;
+    bool needToJumpMenu;
     QMap<QString,ProgramList> progLists;
 
     mutable QMutex chanEditMapLock; ///< Lock for chanEditMap and ddMap

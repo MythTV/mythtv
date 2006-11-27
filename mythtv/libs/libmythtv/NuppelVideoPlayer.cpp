@@ -3401,7 +3401,7 @@ void NuppelVideoPlayer::StartPlaying(void)
             ++deleteIter;
             if (deleteIter.key() == totalFrames)
             {
-                if (!(gContext->GetNumSetting("EndofRecordingExitPrompt") == 1 &&
+                if (!(gContext->GetNumSetting("EndOfRecordingExitPrompt") == 1 &&
                     m_tv && m_tv->GetState() == kState_WatchingPreRecorded))
                 {
                     eof = true;
