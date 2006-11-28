@@ -28,10 +28,11 @@ class EITFixUp
         kFixSubtitle   = 0x0020,
         kFixAUStar     = 0x0040,
         kFixMCA        = 0x0080,
+        kFixRTL        = 0x0100,
 
         // Early fixups
-        kEFixForceISO8859_1  = 0x0100,
-        kEFixForceISO8859_15 = 0x0200,
+        kEFixForceISO8859_1  = 0x1000,
+        kEFixForceISO8859_15 = 0x2000,
     };
 
     EITFixUp();
@@ -54,6 +55,7 @@ class EITFixUp
     void FixComHem(DBEvent &event, bool parse_subtitle) const; // Sweden DVB-C
     void FixAUStar(DBEvent &event) const;        // Australia DVB-S
     void FixMCA(DBEvent &event) const;        // MultiChoice Africa DVB-S
+    void FixRTL(DBEvent &event) const;        // RTL group DVB
 
     const QRegExp m_bellYear;
     const QRegExp m_bellActors;
@@ -92,6 +94,7 @@ class EITFixUp
     const QRegExp m_mcaActorsSeparator;
     const QRegExp m_mcaYear;
     const QRegExp m_mcaCC;
+    const QRegExp m_RTLSubtitle;
 };
 
 #endif // EITFIXUP_H

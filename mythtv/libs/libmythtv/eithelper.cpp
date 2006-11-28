@@ -562,6 +562,10 @@ static void init_fixup(QMap<uint64_t,uint> &fix)
     // MultiChoice Africa
     fix[ 6144U << 16] = EITFixUp::kFixMCA;
 
+    // RTL Subtitle parsing
+    fix[  1089LL << 32 |     1  << 16] = EITFixUp::kFixRTL;// DVB-S
+    fix[   773LL << 32 |  8468U << 16] = EITFixUp::kFixRTL;// DVB-T Berlin
+
     ///////////////////////////////////////////////////////////////////////////
     // Special Early fixups for providers that break DVB EIT spec.
     // transport_id<<32 | netword_id<<16 | service_id

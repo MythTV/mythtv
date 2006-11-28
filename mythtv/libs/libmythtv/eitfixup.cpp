@@ -47,7 +47,8 @@ EITFixUp::EITFixUp()
       m_mcaActors("(.*\\.)\\s+([^\\.]+ [A-Z][^\\.]+)\\.\\s*"),
       m_mcaActorsSeparator("(,\\s+)"),
       m_mcaYear("(.*) \\((\\d{4})\\)\\s*$"),
-      m_mcaCC("(.*)\\. HI Subtitles$")
+      m_mcaCC("(.*)\\. HI Subtitles$"),
+      m_RTLSubtitle("([^\\.]+)\\.\\s+(.+)")
 {
 }
 
@@ -82,6 +83,9 @@ void EITFixUp::Fix(DBEvent &event) const
 
     if (kFixMCA & event.fixup)
         FixMCA(event);
+
+    if (kFixRTL & event.fixup)
+        FixRTL(event);
 
     if (event.fixup)
     {
@@ -725,5 +729,34 @@ void EITFixUp::FixMCA(DBEvent &event) const
             event.description = tmpExp1.cap(1).stripWhiteSpace();
         }
         event.category_type = kCategoryMovie;
+    }
+}
+
+/** \fn EITFixUp::FixRTL(DBEvent&) const
+ *  \brief Use this to standardise the RTL group guide in Germany.
+ */
+void EITFixUp::FixRTL(DBEvent &event) const
+{
+    const uint SUBTITLE_PCT = 35; //% of description to allow subtitle up to
+    const uint SUBTITLE_MAX_LEN = 128; // max length of subtitle field in db.
+    int        position;
+    QRegExp    tmpExp1;
+
+    // No need to continue without a description.
+    if (event.description.length() <= 0)
+    {
+        return;
+    }
+    // Try to find subtitle in description
+    tmpExp1 = m_RTLSubtitle;
+    if ((position = tmpExp1.search(event.description)) != -1)
+    {
+        if ((tmpExp1.cap(1).length() < SUBTITLE_MAX_LEN) &&
+            ((tmpExp1.cap(1).length()*100)/event.description.length() <
+             SUBTITLE_PCT))
+        {
+            event.subtitle    = tmpExp1.cap(1);
+            event.description = tmpExp1.cap(2);
+        }
     }
 }
