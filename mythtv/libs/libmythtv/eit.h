@@ -133,7 +133,7 @@ class DBEvent
     uint16_t      partnumber;
     uint16_t      parttotal;
     QString       syndicatedepisodenumber;
-    unsigned char fixup;
+    uint32_t      fixup;
     unsigned char flags;
     unsigned char category_type;
 
