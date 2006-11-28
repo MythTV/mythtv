@@ -2392,18 +2392,18 @@ void TV::ProcessKeypress(QKeyEvent *e)
                             exitPlayer = true;
                             wantsToQuit = true;
                             allowRerecord = true;
+                            requestDelete = true;
                             break;
                         case 2:
                             exitPlayer = true;
                             wantsToQuit = true;
+                            requestDelete = true;
                             break;
                         case 3:
                             exitPlayer = true;
                             wantsToQuit = true;
-                            requestDelete = false;
                             break;
                         default:
-                            requestDelete = false;
                             if (activenvp->IsNearEnd())
                             {
                                 exitPlayer = true;
@@ -7481,9 +7481,6 @@ void TV::PromptDeleteRecording(QString title)
         if (GetOSD())
             GetOSD()->NewDialogBox(dialogname, message, options, 0, 2);
     }
-
-    requestDelete = true;
-
 }
 
 bool TV::IsVideoExitDialog(void)
