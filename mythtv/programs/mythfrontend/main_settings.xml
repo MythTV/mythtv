@@ -164,4 +164,11 @@
       <depends>mythphone</depends>
    </button>
 
+   <button>
+       <type>ZONEMINDER</type>
+       <text>ZomeMinder Settings</text>
+       <action>CONFIGPLUGIN mythzoneminder</action>
+       <depends>mythzoneminder</depends>
+   </button>
+
 </mythmenu>

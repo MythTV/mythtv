@@ -368,4 +368,11 @@
      <depends>mytharchive</depends>
    </button>
 
+   <button>
+       <type>SETTINGS_ZONEMINDER</type>
+       <text>ZoneMinder Settings</text>
+       <action>CONFIGPLUGIN mythzoneminder</action>
+       <depends>mythzoneminder</depends>
+   </button>
+
 </mythmenu>
