@@ -7,6 +7,7 @@
 // POSIX C headers
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <sys/time.h>
 #include <unistd.h>
 #include <fcntl.h>
 #include <pthread.h>
@@ -39,7 +40,9 @@ using namespace std;
 #define O_LARGEFILE 0
 #endif
 
-const uint RingBuffer::kBufferSize = 10 * 256 * 1024;
+const uint RingBuffer::kBufferSize = 3 * 1024 * 1024;
+
+#define CHUNK 32768 /* readblocksize increments */
 
 #define PNG_MIN_SIZE   20 /* header plus one empty chunk */
 #define NUV_MIN_SIZE  204 /* header size? */
@@ -92,8 +95,8 @@ RingBuffer::RingBuffer(const QString &lfilename,
       internalreadpos(0),       ateof(false),
       readsallowed(false),      wantseek(false), setswitchtonext(false),
       rawbitrate(4000),         playspeed(1.0f),
-      fill_threshold(-1),       fill_min(-1),
-      readblocksize(128000),    wanttoread(0),
+      fill_threshold(65536),    fill_min(-1),
+      readblocksize(CHUNK),     wanttoread(0),
       numfailures(0),           commserror(false),
       dvdPriv(NULL),            oldfile(false),
       livetvchain(NULL),        ignoreliveeof(false),
@@ -534,48 +537,51 @@ void RingBuffer::UpdatePlaySpeed(float play_speed)
  */
 void RingBuffer::CalcReadAheadThresh(void)
 {
-    const uint KB32  =  32*1024;
-    const uint KB64  =  64*1024;
-    const uint KB128 = 128*1024;
-    const uint KB256 = 256*1024;
-    const uint KB512 = 512*1024;
     uint estbitrate;
 
-    wantseek = true;
     pthread_rwlock_wrlock(&rwlock);
-
-    estbitrate     = (uint) max(abs(rawbitrate * playspeed), 0.5f * rawbitrate);
-    estbitrate     = min(rawbitrate * 3, estbitrate);
     wantseek       = false;
     readsallowed   = false;
+    readblocksize  = CHUNK;
+
+    // loop without sleeping if the buffered data is less than this
+    fill_threshold = CHUNK * 2;
     fill_min       = 1;
-    readblocksize  = (estbitrate > 2500)  ? KB64  : KB32;
-    readblocksize  = (estbitrate > 5000)  ? KB128 : readblocksize;
-    readblocksize  = (estbitrate > 9000)  ? KB256 : readblocksize;
-    readblocksize  = (estbitrate > 18000) ? KB512 : readblocksize;
 
-    uint  secs_thr = 300; // seconds of buffering desired
-    float secs_min = 0.1; // minumum seconds of buffering before allowing read
+#ifdef USING_FRONTEND
+    if (dvdPriv)
+    {
+        const uint KB32  =  32*1024;
+        const uint KB64  =  64*1024;
+        const uint KB128 = 128*1024;
+        const uint KB256 = 256*1024;
+        const uint KB512 = 512*1024;
 
-    // set basic fill_threshold based on bitrate
-    fill_threshold = (estbitrate * secs_thr) >> 3; // >>3 => bits -> bytes
-    // extra buffering for remote files
-    fill_threshold = fill_threshold + ((remotefile) ? KB256 : 0);
-    // make the fill_threshold at least one block
-    fill_threshold = max(readblocksize, fill_threshold);
+        estbitrate     = (uint) max(abs(rawbitrate * playspeed),
+                                    0.5f * rawbitrate);
+        estbitrate     = min(rawbitrate * 3, estbitrate);
+        readblocksize  = (estbitrate > 2500)  ? KB64  : KB32;
+        readblocksize  = (estbitrate > 5000)  ? KB128 : readblocksize;
+        readblocksize  = (estbitrate > 9000)  ? KB256 : readblocksize;
+        readblocksize  = (estbitrate > 18000) ? KB512 : readblocksize;
 
-    // set the minimum buffering before allowing ffmpeg read
-    fill_min        = (uint) ((estbitrate * secs_min) * 0.125f);
-    // make this a multiple of ffmpeg block size..
-    fill_min        = ((fill_min / KB32) + 1) * KB32;
+        // minumum seconds of buffering before allowing read
+        float secs_min = 0.1;
+
+        // set the minimum buffering before allowing ffmpeg read
+        fill_min        = (uint) ((estbitrate * secs_min) * 0.125f);
+        // make this a multiple of ffmpeg block size..
+        fill_min        = ((fill_min / KB32) + 1) * KB32;
+    }
+#endif // USING_FRONTEND    
+
+    pthread_rwlock_unlock(&rwlock);
 
     VERBOSE(VB_PLAYBACK, LOC +
             QString("CalcReadAheadThresh(%1 KB)\n\t\t\t -> "
                     "threshhold(%2 KB) min read(%3 KB) blk size(%4 KB)")
             .arg(estbitrate).arg(fill_threshold/1024)
             .arg(fill_min/1024).arg(readblocksize/1024));
-
-    pthread_rwlock_unlock(&rwlock);
 }
 
 /** \fn RingBuffer::ReadBufFree(void) const
@@ -611,6 +617,7 @@ int RingBuffer::ReadBufAvail(void) const
 void RingBuffer::ResetReadAhead(long long newinternal)
 {
     readAheadLock.lock();
+    readblocksize = CHUNK;
     rbrpos = 0;
     rbwpos = 0;
     internalreadpos = newinternal;
@@ -722,9 +729,15 @@ void RingBuffer::ReadAheadThread(void)
     int used = 0;
     int loops = 0;
 
+    struct timeval lastread, now;
+    gettimeofday(&lastread, NULL);
+    const int KB640 = 640*1024;
+    int readtimeavg = 300;
+    int readinterval;
+
     pausereadthread = false;
 
-    readAheadBuffer = new char[kBufferSize + 256000];
+    readAheadBuffer = new char[kBufferSize + KB640];
 
     ResetReadAhead(0);
     totfree = ReadBufFree();
@@ -767,6 +780,31 @@ void RingBuffer::ReadAheadThread(void)
         {
             // limit the read size
             totfree = readblocksize;
+
+            // adapt blocksize
+            gettimeofday(&now, NULL);
+            readinterval = (now.tv_sec  - lastread.tv_sec ) * 1000 +
+                           (now.tv_usec - lastread.tv_usec) / 1000;
+
+            readtimeavg = (readtimeavg * 9 + readinterval) / 10;
+
+            if (readtimeavg < 200 && readblocksize < KB640)
+            {
+                readblocksize += CHUNK;
+                VERBOSE(VB_PLAYBACK,
+                    QString("Avg read interval was %1 msec. %2K block size")
+                            .arg(readtimeavg).arg(readblocksize/1024));
+                readtimeavg = 300;
+            }
+            else if (readtimeavg > 400 && readblocksize > CHUNK)
+            {
+                readblocksize -= CHUNK;
+                VERBOSE(VB_PLAYBACK,
+                    QString("Avg read interval was %1 msec. %2K block size")
+                            .arg(readtimeavg).arg(readblocksize/1024));
+                readtimeavg = 300;
+            }
+            lastread = now;
 
             if (rbwpos + totfree > kBufferSize)
                 totfree = kBufferSize - rbwpos;
