@@ -4477,7 +4477,8 @@ bool ProgramList::FromProgram(const QString &sql, MSqlBindings &bindings,
                 p->dupmethod = s->dupmethod;
                 p->findid = s->findid;
 
-                if (s->recstatus == rsWillRecord)
+                if (s->recstatus == rsWillRecord || 
+                    s->recstatus == rsRecording)
                 {
                     if (oneChanid)
                     {
