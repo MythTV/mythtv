@@ -1,0 +1,21 @@
+<mythmenu name="ZONEMINDER">
+
+   <button>
+      <type>ZM_CONSOLE</type>
+      <text>Show Console</text>
+      <action>ZM_CONSOLE</action>
+   </button>
+
+   <button>
+      <type>ZM_LIVE_VIEWER</type>
+      <text>Show Live View</text>
+      <action>ZM_LIVE_VIEWER</action>
+   </button>
+
+   <button>
+       <type>ZM_EVENT_VIEWER</type>
+       <text>Show Events</text>
+       <action>ZM_EVENT_VIEWER</action>
+   </button>
+
+</mythmenu>

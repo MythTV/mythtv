@@ -22,6 +22,7 @@ browser="yes"
 controls="yes"
 flix="yes"
 archive="yes"
+zoneminder="yes"
 
 cc="gcc"
 
@@ -104,6 +105,9 @@ MythVideo related options:
 
 MythWeather related options:
   --enable-mythweather     build the mythweather plugin [$weather]
+
+MythZoneMinder related options:
+  --enable-mythzoneminder  build the mythzoneminder plugin [$zoneminder]
 EOF
 exit 1
 fi
@@ -195,6 +199,10 @@ for opt do
   --enable-mythbrowser) browser="yes"
   ;;
   --disable-mythbrowser) browser="no"
+  ;;
+  --enable-mythzoneminder) zoneminder="yes"
+  ;;
+  --disable-mythzoneminder) zoneminder="no"
   ;;
   --enable-mythcontrols) controls="yes"
   ;;
@@ -622,6 +630,13 @@ if test "$weather" = "yes" ; then
   echo "SUBDIRS += mythweather" >> ./config.pro
 else
   echo "        MythWeather    plugin will not be built"
+fi
+
+if test "$zoneminder" = "yes" ; then
+  echo "        MythZoneMinder plugin will be built"
+  echo "SUBDIRS += mythzoneminder" >> ./config.pro
+else
+  echo "        MythZoneMinder plugin will not be built"
 fi
 
 ###########################################################
