@@ -1933,6 +1933,12 @@ void UITextType::SetText(const QString &text)
     refresh();
 }
 
+void UITextType::SetFont(fontProp *font)
+{
+    m_font = font;
+    refresh();
+}
+
 void UITextType::Draw(QPainter *dr, int drawlayer, int context)
 {
     if (hidden)

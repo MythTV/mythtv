@@ -616,6 +616,9 @@ class MPUBLIC UITextType : public UIType
 
     virtual void Draw(QPainter *, int, int);
 
+    fontProp *GetFont(void) { return m_font; }
+    void SetFont(fontProp *font);
+
   protected:
 
     //QString cutDown(QString, QFont *, int, int);
