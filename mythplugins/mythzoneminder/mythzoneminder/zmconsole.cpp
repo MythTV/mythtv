@@ -13,6 +13,7 @@
  * ============================================================ */
 
 #include <iostream>
+#include <unistd.h>
 
 // qt
 #include <qdatetime.h>
