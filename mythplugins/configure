@@ -250,6 +250,7 @@ for opt do
                  news="yes";
                  phone="yes";
                  browser="yes";
+                 zoneminder="yes";
                  controls="yes";
                  flix="yes";
                  sdl="yes";
@@ -272,6 +273,7 @@ for opt do
                  news="no";
                  phone="no";
                  browser="no";
+                 zoneminder="no";
                  controls="no";
                  flix="no";
                  sdl="no";  
