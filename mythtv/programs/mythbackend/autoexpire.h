@@ -15,6 +15,7 @@
 using namespace std;
 class ProgramInfo;
 class EncoderLink;
+class FileSystemInfo;
 
 typedef vector<ProgramInfo*> pginfolist_t;
 typedef vector<EncoderLink*> enclinklist_t;
@@ -30,14 +31,17 @@ enum ExpireMethodType {
 class AutoExpire : public QObject
 {
   public:
-    AutoExpire(bool runthread, bool master);
+    AutoExpire(QMap<int, EncoderLink *> *encoderList);
+    AutoExpire(void);
    ~AutoExpire();
 
-    void CalcParams(vector<EncoderLink*>);
-    void FillExpireList();
-    void PrintExpireList();
+    void CalcParams(void);
+    void PrintExpireList(void);
     void TruncatePending(void);
     void TruncateFinished(void);
+
+    size_t GetDesiredSpace(void) const
+        { return desired_space; }
 
     size_t GetMaxRecordRate(void) const
         { return max_record_rate; }
@@ -48,38 +52,41 @@ class AutoExpire : public QObject
     void GetAllExpiring(QStringList &strList);
     void GetAllExpiring(pginfolist_t &list);
 
-    static void Update(QMap<int, EncoderLink*>*, bool immediately);
+    static void Update(bool immediately);
+
+    QMap<int, EncoderLink *> *encoderList;
+
   protected:
     void RunExpirer(void);
     static void *ExpirerThread(void *param);
 
   private:
+    void Init(void);
+
     void ExpireLiveTV(int type);
     void ExpireRecordings(void);
     void ExpireEpisodesOverMax(void);
 
-    void FillDBOrdered(int expMethod, bool allHosts = false);
-    void SendDeleteMessages(size_t availFreeKB, size_t desiredFreeKB,
-                            bool deleteAll = false);
-    void ClearExpireList(void);
+    void FillExpireList(pginfolist_t &expireList);
+    void FillDBOrdered(pginfolist_t &expireList, int expMethod);
+    void SendDeleteMessages(pginfolist_t &deleteList);
+    void ClearExpireList(pginfolist_t &expireList, bool deleteProg = true);
     void Sleep(int sleepTime);
     void WaitForPendingTruncates(void);
 
     void UpdateDontExpireSet(void);
     bool IsInDontExpireSet(QString chanid, QDateTime starttime);
-    bool IsInExpireList(QString chanid, QDateTime starttime);
+    bool IsInExpireList(pginfolist_t &expireList, QString chanid,
+                        QDateTime starttime);
 
     // main expire info
     set<QString>  dont_expire_set;
-    pginfolist_t  expire_list;
     pthread_t     expire_thread;
     QMutex        instance_lock;
-    QString       record_file_prefix;
     size_t        desired_space;
     uint          desired_freq;
     size_t        max_record_rate; // bytes/sec
     bool          expire_thread_running;
-    bool          is_master_backend;
 
     // Pending truncates monitor
     mutable QMutex truncate_monitor_lock;
@@ -89,7 +96,6 @@ class AutoExpire : public QObject
     // update info
     bool          update_pending;
     pthread_t     update_thread;
-    enclinklist_t encoder_links;
 
     friend void *SpawnUpdateThread(void *param);
 };

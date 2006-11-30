@@ -42,27 +42,12 @@ vector<FileSystemInfo> RemoteGetFreeSpace()
         while (it != strlist.end())
         {
             fsInfo.hostname = *(it++);
+            fsInfo.directory = *(it++);
+            fsInfo.isLocal = (*(it++)).toInt();
+            fsInfo.fsID = (*(it++)).toInt();
             fsInfo.totalSpaceKB = decodeLongLong(strlist, it);
             fsInfo.usedSpaceKB = decodeLongLong(strlist, it);
             fsInfos.push_back(fsInfo);
-        }
-    }
-
-    // Consolidate hosts sharing storage
-    vector<FileSystemInfo>::iterator it1, it2;
-    for (it1 = fsInfos.begin(); it1 != fsInfos.end(); it1++)
-    {
-        it2 = it1;
-        for (it2++; it2 != fsInfos.end(); it2++)
-        {
-            if ((it1->totalSpaceKB == it2->totalSpaceKB) &&
-                (it1->usedSpaceKB*0.95 < it2->usedSpaceKB) &&
-                (it1->usedSpaceKB*1.05 > it2->usedSpaceKB))
-            {
-                it1->hostname = it1->hostname + ", " + it2->hostname;
-                fsInfos.erase(it2);
-                it2 = it1;
-            }
         }
     }
 
@@ -122,14 +107,16 @@ bool RemoteGetMemStats(int &totalMB, int &freeMB, int &totalVM, int &freeVM)
     return false;
 }
 
-bool RemoteCheckFile(ProgramInfo *pginfo)
+bool RemoteCheckFile(ProgramInfo *pginfo, bool checkSlaves)
 {
     QStringList strlist = "QUERY_CHECKFILE";
+    strlist << QString::number((int)checkSlaves);
     pginfo->ToStringList(strlist);
 
     if (!gContext->SendReceiveStringList(strlist))
         return false;
 
+    pginfo->pathname = strlist[1];
     return strlist[0].toInt();
 }
 
@@ -438,3 +425,4 @@ int RemoteGetRecordingStatus(ProgramInfo *pginfo, int overrecsecs,
     return retval;
 }
 
+/* vim: set expandtab tabstop=4 shiftwidth=4: */

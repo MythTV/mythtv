@@ -938,7 +938,7 @@ int TV::PlayFromRecorder(int recordernum)
             fileexists = RemoteCheckFile(recorderPlaybackInfo);
         else
         {
-            QFile checkFile(recorderPlaybackInfo->pathname);
+            QFile checkFile(recorderPlaybackInfo->GetPlaybackURL());
             fileexists = checkFile.exists();
         }
 
@@ -1122,7 +1122,8 @@ void TV::HandleStateChange(void)
             (playbackinfo->isVideo))
             playbackURL = playbackinfo->pathname;
         else
-            playbackURL = playbackinfo->GetPlaybackURL();
+            playbackURL = playbackinfo->GetPlaybackURL(
+                              desiredNextState != kState_WatchingRecording);
 
         prbuffer = new RingBuffer(playbackURL, false);
         if (prbuffer->IsOpen())

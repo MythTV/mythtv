@@ -43,10 +43,9 @@ class EncoderLink
     /// \brief Returns true iff the tuner is locked.
     /// \sa LockTuner(), FreeTuner()
     bool IsTunerLocked(void) const { return locked; }
-    
-    long long GetFreeDiskSpace(long long &total, long long &used,
-                               bool from_cache=false);
-    long long GetFreeDiskSpace(bool from_cache=false);
+
+    bool CheckFile(ProgramInfo *pginfo);
+    void GetDiskSpace(QStringList &o_strlist);
     long long GetMaxBitrate(void);
     int SetSignalMonitoringRate(int rate, int notifyFrontend);
 
@@ -56,8 +55,6 @@ class EncoderLink
     TVState GetState();
     bool IsRecording(const ProgramInfo *rec); // scheduler call only.
 
-    bool HasEnoughFreeSpace(const ProgramInfo *rec,
-                            bool try_to_use_cache = false);
     bool MatchesRecording(const ProgramInfo *rec);
     void RecordPending(const ProgramInfo *rec, int secsleft);
     RecStatusType StartRecording(const ProgramInfo *rec);
@@ -78,6 +75,7 @@ class EncoderLink
     void StopLiveTV(void);
     void PauseRecorder(void);
     void SetLiveRecording(int);
+    void SetNextLiveTVDir(QString dir);
     QStringList GetConnectedInputs(void) const;
     QString GetInput(void) const;
     QString SetInput(QString);
@@ -126,7 +124,6 @@ class EncoderLink
     QDateTime endRecordingTime;
     QDateTime startRecordingTime;
     QString chanid;
-    QString recordfileprefix;
 };
 
 #endif

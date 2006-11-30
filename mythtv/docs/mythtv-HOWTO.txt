@@ -119,6 +119,7 @@
         9.1.3 Video Sources
         9.1.4 Input Connections
         9.1.5 Channel Editor
+        9.1.6 Storage Groups
      9.2 Post-configuration
      9.3 Configuring a non-master backend
      9.4 Configuring and running mythfilldatabase
@@ -212,6 +213,7 @@
      16.4 Download and Install MythGame.
      16.5 Setup xmame in MythGame
      16.6 Hints:
+
   17. MythMusic.
      17.1 Manual installation of prerequisites
      17.2 Mandriva
@@ -341,6 +343,7 @@
   mythical home media convergence box on your own using Open Source
   software and operating systems.  MythTV is known to work on Linux and
   Mac OS X (PowerPC and Intel).  It does not run on Windows.
+
   MythTV has a number of capabilities.  The television portion allows
   you to do the following:
 
@@ -469,6 +472,8 @@
 
 
                            Pay more attention.
+
+
 
                         Ignore at your own peril.
 
@@ -665,6 +670,7 @@
 
   +o  A P4 2.4GHz machine can encode two 3300Kbps 480x480 MPEG-4 files
      and simultaneously serve content to a remote frontend.
+
   The second mode of operation is where MythTV is paired with a
   hardware-based video encoder, such as a Matrox G200 or a Hauppauge
   WinTV-PVR-150/250/350/500.  In this mode, because the video encoding
@@ -781,7 +787,6 @@
   NOTE:  The ATI TV Wonder series and the ATI All-in-Wonder series of cards
   are not the same.  The All-in-Wonder cards will not work with MythTV.
   ______________________________________________________________________
-
 
 
         [1mNOTE[22m: The ATI All-in-Wonder cards (which are not the same
@@ -2786,18 +2791,16 @@
 
   [1m9.1.  Configuring the Master backend system[0m
 
-  Open a shell and decide where you will store your video files.  By
-  default, MythTV will assume that you will be using /mnt/store/, but if
-  this directory doesn't exist, or it exists and you don't have write
-  privileges to it then MythTV will fail when you attempt to make a
-  recording.  The following example is specific for /var/video, but the
-  same instructions would apply if you want to keep the default but
-  don't have the directory structure setup yet.  See the ``Advanced
-  Partition Formatting'' section for hints on creating a partition for
-  MythTV.
+  Open a shell and decide where you will store your video files.  This
+  may be one directory or multiple directories on the same or different
+  filesystems.  There is no default directory used for new recordings,
+  you [1mmust [22mcreate at least one storage directory and configure Myth to
+  use it by running mythtv-setup.  If you do not do this, then MythTV
+  will be unable to record anything.  The following example is specific
+  for /var/video, but the same instructions would apply for any
+  directory name you choose to use.  See the ``Advanced Partition
+  Formatting'' section for hints on creating a partition for MythTV.
 
-  If you create a /var/video subdirectory, change /mnt/store/ to
-  /var/video/ in the mythtv-setup screens.
 
 
        $ su
@@ -2805,7 +2808,14 @@
        # chmod a+rwx /var/video
        # exit
 
+
+
   [1mNOTE[22m:  The last slash "/" is not required.
+
+  After you create the desired directory or directories for storing your
+  video files, you will need to add them to the proper Storage Group
+  using mythtv-setup.  This procedure is described below in the
+  ``Storage Groups'' section.
 
   The first thing to configure is the Master backend system.  If you are
   running multiple backend systems, the Master backend will make all
@@ -2862,7 +2872,6 @@
   choices.  It is [4mstrongly[24m recommended that you go through them in
   order.
 
-
   The first question will ask if you wish to clear out your existing
   configurations for your capture cards.  Initially, you should say
   "YES" so that there are no surprises later.
@@ -2870,8 +2879,7 @@
   The next question will ask you if you wish to clear out your video
   source information.  You should answer "YES" to this as well.
 
-  Once the graphical setup starts, you'll see that there are five
-  choices.
+  Once the graphical setup starts, you'll see that there are six choices
 
   1. General
 
@@ -2882,6 +2890,8 @@
   4. Input Connections
 
   5. Channel Editor
+
+  6. Storage Directories
 
   Use the arrow keys to move around, and press the space bar to select
   which option you wish to configure.
@@ -2924,9 +2934,6 @@
   through the choices available on each setting, and the up and down
   keys to move between settings.  Move to Finish when you're done and
   press the space bar, taking you back to the main configuration screen.
-
-
-
   [1m9.1.2.  Capture Cards[0m
 
   You should have no capture cards defined, so the highlight will be on
@@ -3062,6 +3069,56 @@
   North America shouldn't run the channel editor until you've completed
   the initial mythtv-setup and ran [1mmythfilldatabase [22mat least once to
   populate the database.
+
+
+  [1m9.1.6.  Storage Groups[0m
+
+  Storage Groups are lists of directories that are used to hold MythTV
+  recording files.  There is only one Storage Group by default.  This
+  Storage Group is called the 'Default' Storage Group.  [1mYou need to add[0m
+  [1mat least one recording directory to the Default Storage Group or else[0m
+  [1myou will not be able to record anything inside MythTV.  [22mYou may create
+  additional Storage Groups to store specific recordings in their own
+  directories.  Storage Groups are editted via the 'Storage Directories'
+  section of mythtv-setup.  Some users will want to add multiple
+  directories to a Storage Group in order to spread out filesystem I/O
+  onto multiple filesystems.  Another use of Storage Groups is to group
+  all recordings for a particular recording schedule into the same
+  directory or filesystem.
+
+
+  MythTV will balance concurrent recordings across the available
+  directories in a Storage Group in order to spread out the file I/O
+  load.  MythTV will prefer filesystems that are local to the backend
+  over filesystems that are remote until the local filesystem has 2
+  concurrent recordings active or other equivalent I/O, then the next
+  recording will go to the remote filesystem.  The balancing method is
+  based purely on I/O, Myth does not try to balance out disk space
+  unless a filesystem is too low on free disk space in which case it
+  will not be used except as a last resort.
+
+
+  Storage Groups are global, but can be overridden on a slave backend by
+  creating a local Storage Group by running mythtv-setup on the slave.
+  If a problem occurs and the slave backend is unable to use the desired
+  Storage Group, it will fail back and try the directories defined in
+  the master's Storage Group.
+
+
+  You can also create a special 'LiveTV' Storage Group.  If a LiveTV
+  Storage Group directory exists, it will be used instead of putting
+  LiveTV recordings in the Default Storage Group.  This allows you to
+  put your LiveTV recordings on their own filesystem if you prefer the
+  old MythTV method which used a RingBuffer for LiveTV which could be on
+  a different filesystem than regular recordings.
+
+
+  Usage information for all Storage Group directories is visible on the
+  mythfrontend status screen as well as the mythbackend status webpage.
+  MythTV is smart enough to realize what directories are on shared
+  filesystems so it should not count free or used space twice if you
+  have multiple directories on the same filesystem.
+
 
 
   [1m9.2.  Post-configuration[0m

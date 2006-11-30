@@ -13,6 +13,7 @@ using namespace std;
 #include "programinfo.h"
 #include "util.h"
 #include "previewgenerator.h"
+#include "storagegroup.h"
 
 /**
  * \class EncoderLink
@@ -36,7 +37,7 @@ EncoderLink::EncoderLink(int capturecardnum, PlaybackSock *lsock,
                          QString lhostname)
     : m_capturecardnum(capturecardnum), sock(lsock), hostname(lhostname),
       freeDiskSpaceKB(-1), tv(NULL), local(false), locked(false), 
-      chanid(""), recordfileprefix(QString::null)
+      chanid("")
 {
     endRecordingTime = QDateTime::currentDateTime().addDays(-2);
     startRecordingTime = endRecordingTime;
@@ -51,11 +52,10 @@ EncoderLink::EncoderLink(int capturecardnum, PlaybackSock *lsock,
 EncoderLink::EncoderLink(int capturecardnum, TVRec *ltv)
     : m_capturecardnum(capturecardnum), sock(NULL), hostname(QString::null),
       freeDiskSpaceKB(-1), tv(ltv), local(true), locked(false), 
-      chanid(""), recordfileprefix(QString::null)
+      chanid("")
 {
     endRecordingTime = QDateTime::currentDateTime().addDays(-2);
     startRecordingTime = endRecordingTime;
-    recordfileprefix = gContext->GetSetting("RecordFilePrefix");
 }
 
 /** \fn EncoderLink::~EncoderLink()
@@ -229,45 +229,30 @@ bool EncoderLink::WouldConflict(const ProgramInfo *rec)
     return false;
 }
 
-/** \fn EncoderLink::GetFreeDiskSpace(long long&,long long&,bool)
- *  \brief Returns total used and free disk space in Kilobytes
- *         and if use_cache is false updates the cached value.
- *
- *   May be a local or remote query.
- *
- *  \param use_cache if true, then a cached value is used.
- */
-long long EncoderLink::GetFreeDiskSpace(long long &totalKB, long long &usedKB,
-                                        bool use_cache)
+bool EncoderLink::CheckFile(ProgramInfo *pginfo)
 {
-    if (!use_cache)
+    if (sock)
+        return sock->CheckFile(pginfo);
+    else
     {
-        if (local)
-            freeDiskSpaceKB = getDiskSpace(recordfileprefix, totalKB, usedKB);
-        else if (sock)
-        {
-            sock->GetFreeDiskSpace(totalKB, usedKB);
-            freeDiskSpaceKB = totalKB - usedKB;
-            if ((-1 == totalKB) || (-1 == usedKB))
-                freeDiskSpaceKB = -1;
-        }
+        StorageGroup sgroup(pginfo->storagegroup, gContext->GetHostName());
+        pginfo->pathname =
+            sgroup.FindRecordingFile(pginfo->GetRecordBasename(true));
+        if (pginfo->pathname != "")
+            return true;
     }
-    return freeDiskSpaceKB;
+    return false;
 }
 
-/** \fn EncoderLink::GetFreeDiskSpace(bool use_cache=false)
- *  \brief Returns total used and free disk space in Kilobytes
- *         and if use_cache is false updates the cached value.
+/** \fn EncoderLink::GetDiskSpace()
+ *  \brief Appends total and used disk space in Kilobytes
  *
- *   May be a local or remote query.
- *
- *  \param use_cache if true, then a cached value is used.
+ *  \param o_strlist, list to append to
  */
-long long EncoderLink::GetFreeDiskSpace(bool use_cache)
+void EncoderLink::GetDiskSpace(QStringList &o_strlist)
 {
-    long long totalKB = 0LL;
-    long long usedKB  = 0LL;
-    return GetFreeDiskSpace(totalKB, usedKB, use_cache);
+    if (sock)
+        sock->GetDiskSpace(o_strlist);
 }
 
 /** \fn EncoderLink::GetMaxBitrate()
@@ -321,73 +306,6 @@ int EncoderLink::LockTuner()
 
     locked = true;  
     return m_capturecardnum;
-}
-
-/** \fn  EncoderLink::HasEnoughFreeSpace(const ProgramInfo*, bool)
- *  \brief Returns true if there is enough free space for entire recording.
- *
- *   May be a local or remote query.
- *
- *   If AutoExpire is enabled, and the encoder is connected, this always
- *   returns true. If it is not enabled this function estimates the size
- *   of the recording, and only records if there is enough space left on
- *   the file system for both the recording and the "Extra Space" the 
- *   user desires on the file system.
- *
- *
- *   Note: If AutoExpire is not enabled, the calculation is only valid
- *         when one recording per file system is in progress at any one
- *         time.
- *
- *  \param rec Recording we wish to make, used to determine length of recording.
- *  \param try_to_use_cache If true we try the the free space calculation with
- *                          the cached disk free space, and only query the
- *                          backend for the true free space value, if the
- *                          cached value tells us we don't have enough free
- *                          space to fit the recording.
- */
-bool EncoderLink::HasEnoughFreeSpace(const ProgramInfo *rec, bool try_to_use_cache)
-{
-    if (!IsConnected())
-        return false;
-
-    // if auto expire is enabled, the space will be freed just in time...
-    if (gContext->GetNumSetting("AutoExpireMethod", 1))
-        return true;
-
-    // if we can't determine the free space, assume it's just an fstat problem.
-    long long freeSpaceKB = GetFreeDiskSpace(try_to_use_cache);
-    if (freeSpaceKB<0)
-        return true;
-    // shrink by "Extra Space" desired for other non-MythTV activities.
-    freeSpaceKB -= 1024 * 1024 *
-        gContext->GetNumSetting("AutoExpireExtraSpace", 0);
-    // if already below threshold we can't record anything.
-    if (freeSpaceKB<0)
-        return false;
-
-    // if we can't determine the bitrate assume it's ATSC 1080i.
-    long long maxBitrate = GetMaxBitrate();
-    if (maxBitrate<=0)
-        maxBitrate = 19500000LL;
-
-    // determine maximum program size
-    size_t bitRateKBperMin = (((size_t)maxBitrate)*((size_t)15))>>11;
-    size_t progLengthMin = (rec->startts.secsTo(rec->endts)+59)/60;
-    size_t programSizeKB = bitRateKBperMin * progLengthMin;
-    programSizeKB += programSizeKB>>2; // + 25%
-    VERBOSE(VB_IMPORTANT,
-            QString("Estimated program length: %1 minutes, "
-                    "size: %2 MB, free space: %3 MB")
-            .arg(progLengthMin).arg((long)(programSizeKB/1024))
-            .arg((long)(freeSpaceKB/1024)));
-    
-    // if program is smaller than available space, then ok
-    // if not ok, and we were using cache, try again with measured values
-    bool ok = ((long long)programSizeKB < freeSpaceKB);
-    if (!ok && try_to_use_cache)
-        ok = HasEnoughFreeSpace(rec, false);
-    return ok;
 }
 
 /** \fn EncoderLink::StartRecording(const ProgramInfo*)
@@ -654,6 +572,17 @@ void EncoderLink::SetLiveRecording(int recording)
         tv->SetLiveRecording(recording);
     else
         VERBOSE(VB_IMPORTANT, "Should be local only query: SetLiveRecording");
+}
+
+/** \fn EncoderLink::SetNextLiveTVDir()
+ *  \brief Tells TVRec where to put the next LiveTV recording.
+ */
+void EncoderLink::SetNextLiveTVDir(QString dir)
+{
+    if (local)
+        tv->SetNextLiveTVDir(dir);
+    else
+        sock->SetNextLiveTVDir(m_capturecardnum, dir);
 }
 
 /** \fn EncoderLink::GetConnectedInputs(void) const
@@ -936,3 +865,4 @@ char *EncoderLink::GetScreenGrab(const ProgramInfo *pginfo,
     return NULL;
 }
 
+/* vim: set expandtab tabstop=4 shiftwidth=4: */

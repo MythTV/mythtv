@@ -168,24 +168,8 @@ void RingBuffer::OpenFile(const QString &lfilename, uint retryCount)
     bool is_dvd = false;
     (void) is_dvd; // not used when frontend is disabled.
 
-    if ((filename.left(7) == "myth://") &&
-        (filename.length() > 7 ))
-    {
-        QString local_pathname = gContext->GetSetting("RecordFilePrefix");
-        int hostlen = filename.find(QRegExp("/"), 7);
-
-        if (hostlen != -1)
-        {
-            local_pathname += filename.right(filename.length() - hostlen);
-
-            QFile checkFile(local_pathname);
-            if (checkFile.exists())
-            {
-                is_local = true;
-                filename = local_pathname;
-            }
-        }
-    }
+    if (QFile::exists(filename))
+        is_local = true;
 #ifdef USING_FRONTEND
     else if (filename.left(4) == "dvd:")
     {
@@ -209,8 +193,6 @@ void RingBuffer::OpenFile(const QString &lfilename, uint retryCount)
         }
     }
 #endif // USING_FRONTEND
-    else
-        is_local = true;
 
     if (is_local)
     {
@@ -1334,3 +1316,5 @@ bool RingBuffer::InDVDMenuOrStillFrame(void)
 #endif // USING_FRONTEND
     return false;
 }
+
+/* vim: set expandtab tabstop=4 shiftwidth=4: */

@@ -1048,8 +1048,11 @@ void PlaybackBox::updateUsage(QPainter *p)
             fsInfos = RemoteGetFreeSpace();
             for (unsigned int i = 0; i < fsInfos.size(); i++)
             {
-                freeSpaceTotal += (int) (fsInfos[i].totalSpaceKB >> 10);
-                freeSpaceUsed += (int) (fsInfos[i].usedSpaceKB >> 10);
+                if (fsInfos[i].directory == "TotalDiskSpace")
+                {
+                    freeSpaceTotal = (int) (fsInfos[i].totalSpaceKB >> 10);
+                    freeSpaceUsed = (int) (fsInfos[i].usedSpaceKB >> 10);
+                }
             }
             freeSpaceTimer->start(15000);
         }    
@@ -2062,6 +2065,8 @@ void PlaybackBox::startPlayer(ProgramInfo *rec)
             return;
         }
 
+        if (rec->pathname.left(1) != "/")
+            rec->pathname = rec->GetPlaybackURL(true);
         previewVideoRingBuf = new RingBuffer(rec->pathname, false, false, 1);
         if (!previewVideoRingBuf->IsOpen())
         {
@@ -2322,6 +2327,8 @@ bool PlaybackBox::play(ProgramInfo *rec, bool inPlaylist)
 
     if (m_player)
         return true;
+
+    rec->pathname = rec->GetPlaybackURL(true);
             
     if (fileExists(rec) == false)
     {
@@ -3756,7 +3763,6 @@ void PlaybackBox::processNetworkControlCommand(QString command)
                     delete curitem;
 
                 curitem = tmpItem;
-                curitem->pathname = curitem->GetPlaybackURL();
 
                 MythEvent me("NETWORK_CONTROL RESPONSE OK");
                 gContext->dispatch(me);

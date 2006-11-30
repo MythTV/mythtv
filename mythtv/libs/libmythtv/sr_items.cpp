@@ -109,6 +109,9 @@ SRStorageOptionsGroup::SRStorageOptionsGroup(ScheduledRecording *_rec, ManagedLi
     recGroup = new SRRecGroup(_rec, _parentList, this);
     addItem(recGroup->getItem(), -1);
 
+    storageGroup = new SRStorageGroup(_rec, _parentList, this);
+    addItem(storageGroup->getItem(), -1);
+
     playGroup = new SRPlayGroup(_rec, _parentList, this);
     addItem(playGroup->getItem(), -1);
 
@@ -189,7 +192,8 @@ void SRRecGroup::showNewRecGroup()
                                              newGroup);
     if (ok)
     {
-        addSelection(QString(QObject::tr("Store in the \"%1\" recording group")).arg(newGroup), newGroup);
+        addSelection(QObject::tr("Include in the \"%1\" recording group")
+                                 .arg(newGroup), newGroup);
         selectItem->selectValue(newGroup);
     }
 }

@@ -17,8 +17,14 @@ class MPUBLIC FileSystemInfo
 {
   public:
     QString hostname;
+    QString directory;
+    bool isLocal;
+    int fsID;
     long long totalSpaceKB;
     long long usedSpaceKB;
+    long long liveTVSpaceKB;
+    long long freeSpaceKB;
+    int weight;
 };
 
 MPUBLIC vector<ProgramInfo *> *RemoteGetRecordedList(bool deltype);
@@ -27,7 +33,7 @@ MPUBLIC bool RemoteGetLoad(float load[3]);
 MPUBLIC bool RemoteGetUptime(time_t &uptime);
 MPUBLIC
 bool RemoteGetMemStats(int &totalMB, int &freeMB, int &totalVM, int &freeVM);
-MPUBLIC bool RemoteCheckFile(ProgramInfo *pginfo);
+MPUBLIC bool RemoteCheckFile(ProgramInfo *pginfo, bool checkSlaves = true);
 MPUBLIC void RemoteStopRecording(ProgramInfo *pginfo);
 MPUBLIC
 bool RemoteDeleteRecording(ProgramInfo *pginfo, bool forgetHistory,
@@ -59,3 +65,5 @@ MPUBLIC int RemoteGetRecordingStatus(ProgramInfo *pginfo, int overrecsecs,
                                      int underrecsecs);
 
 #endif
+
+/* vim: set expandtab tabstop=4 shiftwidth=4: */

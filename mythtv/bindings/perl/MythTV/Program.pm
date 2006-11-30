@@ -82,6 +82,7 @@ package MythTV::Program;
         $self->{'playgroup'}       = $_[39]; # 39 playgroup
         $self->{'recpriority2'}    = $_[40]; # 40 recpriority2
         $self->{'parentid'}        = $_[41]; # 41 parentid
+        $self->{'storagegroup'}    = $_[42]; # storagegroup
 
     # Load the channel data
         if ($self->{'chanid'}) {

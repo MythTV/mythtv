@@ -2816,7 +2816,8 @@ void NuppelVideoPlayer::SwitchToProgram(void)
         return;
     }
 
-    ringBuffer->OpenFile(pginfo->pathname, 10 /* retries -- about 5 seconds */);
+    ringBuffer->OpenFile(pginfo->GetPlaybackURL(),
+                         10 /* retries -- about 5 seconds */);
     if (!ringBuffer->IsOpen())
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR + "SwitchToProgram's OpenFile failed.");
@@ -2940,7 +2941,7 @@ void NuppelVideoPlayer::JumpToProgram(void)
         return;
     }
 
-    ringBuffer->OpenFile(pginfo->pathname);
+    ringBuffer->OpenFile(pginfo->GetPlaybackURL());
     if (!ringBuffer->IsOpen())
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR + "JumpToProgram's OpenFile failed.");

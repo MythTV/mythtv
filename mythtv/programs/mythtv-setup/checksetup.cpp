@@ -46,25 +46,56 @@ bool checkStoragePaths(QString *probs)
 {
     bool problemFound = false;
 
+    QString recordFilePrefix = gContext->GetSetting("RecordFilePrefix", "EMPTY");
+
     MSqlQuery query(MSqlQuery::InitCon());
 
-    query.prepare("SELECT data FROM settings"
-                  " WHERE value='RecordFilePrefix' AND hostname = :HOSTNAME;");
-    query.bindValue(":HOSTNAME", gContext->GetHostName());
-    if (!query.exec() || !query.isActive())
+    query.prepare("SELECT count(groupname) FROM storagegroup;");
+    if (!query.exec() || !query.isActive() || query.size() < 1)
     {
         MythContext::DBError("checkStoragePaths", query);
         return false;
     }
 
-    if (query.size())
+    query.next();
+    if (query.value(0).toInt() == 0)
     {
-        query.next();
-        if (checkPath(query.value(0).toString(), probs))
-            problemFound = true;
+        VERBOSE(VB_IMPORTANT, "No Storage Group directories are defined. You "
+                "must add at least one directory to the Default Storage Group "
+                "where new recordings will be stored.");
+        *probs = QObject::tr("No Storage Group directories are defined.  You "
+                             "must add at least one directory to the Default "
+                             "Storage Group where new recordings will be "
+                             "stored.") + "\n";
+        return true;
     }
-    else
-        VERBOSE(VB_GENERAL, QString("RecordFilePrefix is not set?"));
+
+    query.prepare("SELECT groupname, dirname "
+                  "FROM storagegroup "
+                  "WHERE hostname = :HOSTNAME;");
+    query.bindValue(":HOSTNAME", gContext->GetHostName());
+    if (!query.exec() || !query.isActive() || query.size() < 1)
+    {
+        MythContext::DBError("checkStoragePaths", query);
+        return false;
+    }
+
+    QDir checkDir("");
+    while (query.next())
+    {
+        QString sgDir = query.value(0).toString();
+        QStringList tokens = QStringList::split(",", query.value(1).toString());
+        unsigned int curToken = 0;
+        while (curToken < tokens.size())
+        {
+            checkDir.setPath(tokens[curToken]);
+            if (checkPath(tokens[curToken], probs))
+            {
+                problemFound = true;
+            }
+            curToken++;
+        }
+    }
 
     return problemFound;
 }
@@ -134,3 +165,5 @@ bool CheckSetup(QString *problems)
     return checkStoragePaths(problems)
         || checkChannelPresets(problems);
 }
+
+/* vim: set expandtab tabstop=4 shiftwidth=4: */

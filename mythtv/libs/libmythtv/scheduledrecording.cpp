@@ -43,6 +43,7 @@ ScheduledRecording::ScheduledRecording() :
     maxnewest = NULL;
     recpriority = NULL;
     recgroup = NULL;
+    storagegroup = NULL;
     playgroup = NULL;
     prefinput = NULL;
     inactive = NULL;
@@ -764,6 +765,14 @@ QString ScheduledRecording::GetRecGroup(void) const {
     return recgroup->getValue();
 }
 
+void ScheduledRecording::setStorageGroup(const QString& newstoragegroup) {
+    storagegroup->setValue(newstoragegroup);
+}
+
+QString ScheduledRecording::GetStorageGroup(void) const {
+    return storagegroup->getValue();
+}
+
 void ScheduledRecording::setPlayGroup(const QString& newplaygroup) {
     playgroup->setValue(newplaygroup);
 }
@@ -844,6 +853,8 @@ void ScheduledRecording::setDefault(bool haschannel)
 
     recgroup->fillSelections();    
     recgroup->setValue("Default");
+    storagegroup->fillSelections();    
+    storagegroup->setValue("Default");
     playgroup->fillSelections();    
     playgroup->setValue("Default");
     prefinput->fillSelections();    
@@ -930,6 +941,7 @@ void ScheduledRecording::makeOverride(void)
     endoffset->setChanged();
     recpriority->setChanged();
     recgroup->setChanged();
+    storagegroup->setChanged();
     playgroup->setChanged();
 }
 

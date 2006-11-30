@@ -34,6 +34,7 @@ using namespace std;
 #include "libmythtv/programinfo.h"
 #include "libmythtv/dbcheck.h"
 #include "libmythtv/jobqueue.h"
+#include "libmythtv/storagegroup.h"
 #include "libmythupnp/upnp.h"
 
 #include "upnpcdstv.h"
@@ -46,7 +47,6 @@ AutoExpire *expirer = NULL;
 Scheduler *sched = NULL;
 JobQueue *jobqueue = NULL;
 QString pidfile;
-QString lockfile_location;
 HouseKeeper *housekeeping = NULL;
 QString logfile = "";
 
@@ -216,8 +216,6 @@ void cleanup(void)
 
     if (pidfile != "")
         unlink(pidfile.ascii());
-
-    unlink(lockfile_location.ascii());
 
     signal(SIGHUP, SIG_DFL);
 }
@@ -570,8 +568,7 @@ int main(int argc, char **argv)
 
     if (printexpire)
     {
-        expirer = new AutoExpire(false, false);
-        expirer->FillExpireList();
+        expirer = new AutoExpire();
         expirer->PrintExpireList();
         cleanup();
         return BACKEND_EXIT_OK;
@@ -631,11 +628,17 @@ int main(int argc, char **argv)
             sched->DisableScheduling();
     }
 
-    if (noexpirer)
-        cerr << "********* Auto-Expire has been DISABLED with "
-                "the --noautoexpire option ********\n";
-    else
-        expirer = new AutoExpire(true, ismaster);
+    if (ismaster)
+    {
+        if (noexpirer)
+            cerr << "********* Auto-Expire has been DISABLED with "
+                    "the --noautoexpire option ********\n";
+        else
+            expirer = new AutoExpire(&tvList);
+    }
+
+    if (sched && expirer)
+        sched->SetExpirer(expirer);
 
     if (nojobqueue)
         cerr << "********* The JobQueue has been DISABLED with "
@@ -687,27 +690,6 @@ int main(int argc, char **argv)
 
     VERBOSE(VB_IMPORTANT, QString("Enabled verbose msgs: %1").arg(verboseString));
 
-    lockfile_location = gContext->GetSetting("RecordFilePrefix") + "/nfslockfile.lock";
-
-    if (ismaster)
-// Create a file in the recording directory.  A slave encoder will 
-// look for this file and return 0 bytes free if it finds it when it's
-// queried about its available/used diskspace.  This will prevent double (or
-// more) counting of available disk space.
-// If the slave doesn't find this file then it will assume that it has
-// a seperate store.
-    {
-        if (creat(lockfile_location.ascii(), 0664) == -1)
-        {
-            perror(lockfile_location.ascii()); 
-            cerr << "Unable to open lockfile!\n"
-                 << "Be sure that \'" << gContext->GetSetting("RecordFilePrefix")
-                 << "\' exists and that both \nthe directory and that "
-                 << "file are writeable by this user.\n";
-            return BACKEND_EXIT_OPENING_VLOCKFILE_ERROR;
-        }
-    }
-
     new MainServer(ismaster, port, statusport, &tvList, sched, expirer);
 
     if (ismaster)
@@ -721,6 +703,8 @@ int main(int argc, char **argv)
         }
     }
 
+    StorageGroup::CheckAllStorageGroupDirs();
+ 
     a.exec();
 
     gContext->LogEntry("mythbackend", LP_INFO, "MythBackend exiting", "");

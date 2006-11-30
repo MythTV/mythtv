@@ -222,6 +222,8 @@ class MPUBLIC TVRec : public QObject
     void RingBufferChanged(RingBuffer *rb, ProgramInfo *pginfo);
     void RecorderPaused(void);
 
+    void SetNextLiveTVDir(QString dir);
+
   public slots:
     void SignalMonitorAllGood() { triggerEventLoop.wakeAll(); }
     void deleteLater(void);
@@ -291,6 +293,7 @@ class MPUBLIC TVRec : public QObject
     TVState RemovePlaying(TVState state);
     TVState RemoveRecording(TVState state);
 
+    bool WaitForNextLiveTVDir(void);
     bool GetProgramRingBufferForLiveTV(ProgramInfo **pginfo, RingBuffer **rb);
     bool CreateLiveTVRingBuffer(void);
     bool SwitchLiveTVRingBuffer(bool discont = false, bool set_rec = true);
@@ -360,13 +363,14 @@ class MPUBLIC TVRec : public QObject
 
     // Pseudo LiveTV recording
     ProgramInfo *pseudoLiveTVRecording;
+    QString      nextLiveTVDir;
+    QMutex       nextLiveTVDirLock;
 
     // LiveTV file chain
     LiveTVChain *tvchain;
 
     // RingBuffer info
     RingBuffer  *ringBuffer;
-    QString      rbFilePrefix;
     QString      rbFileExt;
 
   public:

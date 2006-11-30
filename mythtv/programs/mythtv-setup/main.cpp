@@ -30,6 +30,7 @@
 #include "libmythtv/videosource.h"
 #include "libmythtv/channeleditor.h"
 #include "libmythtv/remoteutil.h"
+#include "libmythtv/storagegroup.h"
 #include "backendsettings.h"
 #include "checksetup.h"
 
@@ -56,6 +57,9 @@ void SetupMenuCallback(void* data, QString& selection) {
     } else if (sel == "channel editor") {
         ChannelEditor ce;
         ce.exec();
+    } else if (sel == "storage groups") {
+        StorageGroupListEditor sge;
+        sge.exec();
     }
 }
 

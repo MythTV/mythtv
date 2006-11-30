@@ -13,12 +13,12 @@ QMAKE_CLEAN += $(TARGET)
 
 # Input
 HEADERS += autoexpire.h encoderlink.h filetransfer.h httpstatus.h mainserver.h
-HEADERS += playbacksock.h scheduler.h server.h housekeeper.h
+HEADERS += playbacksock.h scheduler.h server.h housekeeper.h backendutil.h
 HEADERS += upnpcdstv.h upnpcdsmusic.h upnpcdsvideo.h
 
 SOURCES += autoexpire.cpp encoderlink.cpp filetransfer.cpp httpstatus.cpp
 SOURCES += main.cpp mainserver.cpp playbacksock.cpp scheduler.cpp server.cpp
-SOURCES += housekeeper.cpp
+SOURCES += housekeeper.cpp backendutil.h
 SOURCES += upnpcdstv.cpp upnpcdsmusic.cpp upnpcdsvideo.cpp
 
 using_oss:DEFINES += USING_OSS

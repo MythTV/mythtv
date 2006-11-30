@@ -40,6 +40,7 @@ using namespace std;
 
 #include "mainserver.h"
 #include "scheduler.h"
+#include "backendutil.h"
 #include "programinfo.h"
 #include "jobqueue.h"
 #include "autoexpire.h"
@@ -166,7 +167,7 @@ MainServer::MainServer(bool master, int port, int /*statusport*/,
     masterServer = NULL;
 
     encoderList = tvList;
-    AutoExpire::Update(encoderList, true);
+    AutoExpire::Update(true);
 
     for (int i = 0; i < PRT_STARTUP_THREAD_COUNT; i++)
     {
@@ -174,8 +175,6 @@ MainServer::MainServer(bool master, int port, int /*statusport*/,
         prt->start();
         threadPool.push_back(prt);
     }
-
-    recordfileprefix = gContext->GetFilePrefix();
 
     masterBackendOverride = gContext->GetNumSetting("MasterBackendOverride", 0);
 
@@ -225,7 +224,7 @@ MainServer::~MainServer()
 
 void MainServer::autoexpireUpdate(void)
 {
-    AutoExpire::Update(encoderList, false);
+    AutoExpire::Update(false);
 }
 
 void MainServer::newConnection(MythSocket *socket)
@@ -371,6 +370,10 @@ void MainServer::ProcessRequestWork(MythSocket *sock)
     {
         HandleQueryFreeSpace(pbs, true);
     }
+    else if (command == "QUERY_FREE_SPACE_SUMMARY")
+    {
+        HandleQueryFreeSpaceSummary(pbs);
+    }
     else if (command == "QUERY_LOAD")
     {
         HandleQueryLoad(pbs);
@@ -461,6 +464,13 @@ void MainServer::ProcessRequestWork(MythSocket *sock)
             VERBOSE(VB_IMPORTANT, "Bad QUERY_RECORDER");
         else
             HandleRecorderQuery(listline, tokens, pbs);
+    }
+    else if (command == "SET_NEXT_LIVETV_DIR")
+    {
+        if (tokens.size() != 3)
+            VERBOSE(VB_IMPORTANT, "Bad SET_NEXT_LIVETV_DIR");
+        else
+            HandleSetNextLiveTVDir(tokens, pbs);
     }
     else if (command == "SET_CHANNEL_INFO")
     {
@@ -682,6 +692,18 @@ void MainServer::customEvent(QCustomEvent *e)
             }
 
             return;
+        }
+
+        if (me->Message().left(21) == "QUERY_NEXT_LIVETV_DIR" && m_sched)
+        {
+            QStringList tokens = QStringList::split(" ", me->Message());
+            if (tokens.size() != 2)
+            {
+                VERBOSE(VB_IMPORTANT, QString("Bad %1 message").arg(tokens[0]));
+                return;
+            }
+
+            m_sched->GetNextLiveTVDir(tokens[1].toInt());
         }
 
         if ((me->Message().left(16) == "DELETE_RECORDING") ||
@@ -1009,7 +1031,6 @@ void MainServer::SendResponse(MythSocket *socket, QStringList &commands)
 void MainServer::HandleQueryRecordings(QString type, PlaybackSock *pbs)
 {
     MythSocket *pbssock = pbs->getSocket();
-    bool islocal = pbs->isLocal();
     QString playbackhost = pbs->getHostname();
 
     QString fs_db_name = "";
@@ -1068,7 +1089,8 @@ void MainServer::HandleQueryRecordings(QString type, PlaybackSock *pbs)
         "recorded.progend, recorded.stars, "
         "recordedprogram.stereo, recordedprogram.hdtv, "
         "recordedprogram.closecaptioned, transcoded, "
-        "recorded.recpriority, watched, recorded.preserve "
+        "recorded.recpriority, watched, recorded.preserve, "
+        "recorded.storagegroup "
         "FROM recorded "
         "LEFT JOIN record ON recorded.recordid = record.recordid "
         "LEFT JOIN channel ON recorded.chanid = channel.chanid "
@@ -1143,7 +1165,7 @@ void MainServer::HandleQueryRecordings(QString type, PlaybackSock *pbs)
                 proginfo->hasAirDate = true;
             }
 
-            QString basename = query.value(28).toString();
+            proginfo->pathname = query.value(28).toString();
 
             if (proginfo->hostname.isEmpty() || proginfo->hostname.isNull())
                 proginfo->hostname = gContext->GetHostName();
@@ -1198,6 +1220,8 @@ void MainServer::HandleQueryRecordings(QString type, PlaybackSock *pbs)
 
             proginfo->recgroup = QString::fromUtf8(query.value(16).toString());
             proginfo->playgroup = QString::fromUtf8(query.value(27).toString());
+            proginfo->storagegroup =
+                QString::fromUtf8(query.value(39).toString());
 
             proginfo->recpriority = query.value(36).toInt();
 
@@ -1218,39 +1242,34 @@ void MainServer::HandleQueryRecordings(QString type, PlaybackSock *pbs)
 
             proginfo->stars = query.value(31).toDouble();
 
-            QString lpath = fileprefix + "/" + basename;
             PlaybackSock *slave = NULL;
-            QFile checkFile(lpath);
 
             if (proginfo->hostname != gContext->GetHostName())
                 slave = getSlaveByHostname(proginfo->hostname);
 
-            if ((masterBackendOverride && checkFile.exists()) || 
-                (proginfo->hostname == gContext->GetHostName()) ||
-                (!slave && checkFile.exists()))
+            if (proginfo->hostname == gContext->GetHostName())
             {
-                if (islocal)
-                    proginfo->pathname = lpath;
-                else
-                    proginfo->pathname = QString("myth://") + ip + ":" + port
-                                         + "/" + basename;
-
+                proginfo->pathname = QString("myth://") + ip + ":" + port
+                                     + "/" + proginfo->pathname;
                 if (proginfo->filesize == 0)
                 {
-                    struct stat st;
-
-                    long long size = 0;
-                    if (stat(lpath.ascii(), &st) == 0)
-                        size = st.st_size;
-
-                    proginfo->filesize = size;
-
-                    proginfo->SetFilesize(size);
+                    QString tmpURL = proginfo->GetPlaybackURL();
+                    QFile checkFile(tmpURL);
+                    if (tmpURL != "" && checkFile.exists())
+                    {
+                        struct stat st;
+                        if (stat(tmpURL.ascii(), &st) == 0)
+                        {
+                            proginfo->filesize = st.st_size;
+                            proginfo->SetFilesize(proginfo->filesize);
+                        }
+                    }
                 }
             }
-            else
+            else if (!slave)
             {
-                if (!slave)
+                proginfo->pathname = proginfo->GetPlaybackURL();
+                if (proginfo->pathname == "")
                 {
                     VERBOSE(VB_IMPORTANT,
                             "MainServer::HandleQueryRecordings()"
@@ -1261,30 +1280,30 @@ void MainServer::HandleQueryRecordings(QString type, PlaybackSock *pbs)
                     proginfo->filesize = 0;
                     proginfo->pathname = "file not found";
                 }
+            }
+            else
+            {
+                if (proginfo->filesize == 0)
+                {
+                    slave->FillProgramInfo(proginfo, playbackhost);
+
+                    proginfo->SetFilesize(proginfo->filesize);
+                }
                 else
                 {
-                    if (proginfo->filesize == 0)
-                    {
-                        slave->FillProgramInfo(proginfo, playbackhost);
-
-                        proginfo->SetFilesize(proginfo->filesize);
-                    }
-                    else
-                    {
-                        ProgramInfo *p = proginfo;
-                        if (!backendIpMap.contains(p->hostname))
-                            backendIpMap[p->hostname] =
-                                gContext->GetSettingOnHost("BackendServerIp",
-                                                           p->hostname);
-                        if (!backendPortMap.contains(p->hostname))
-                            backendPortMap[p->hostname] =
-                                gContext->GetSettingOnHost("BackendServerPort",
-                                                           p->hostname);
-                        p->pathname = QString("myth://") +
-                                      backendIpMap[p->hostname] + ":" +
-                                      backendPortMap[p->hostname] + "/" +
-                                      basename;
-                    }
+                    ProgramInfo *p = proginfo;
+                    if (!backendIpMap.contains(p->hostname))
+                        backendIpMap[p->hostname] =
+                            gContext->GetSettingOnHost("BackendServerIp",
+                                                       p->hostname);
+                    if (!backendPortMap.contains(p->hostname))
+                        backendPortMap[p->hostname] =
+                            gContext->GetSettingOnHost("BackendServerPort",
+                                                       p->hostname);
+                    p->pathname = QString("myth://") +
+                                  backendIpMap[p->hostname] + ":" +
+                                  backendPortMap[p->hostname] + "/" +
+                                  p->pathname;
                 }
             }
 
@@ -1343,8 +1362,7 @@ void MainServer::HandleFillProgramInfo(QStringList &slist, PlaybackSock *pbs)
     ProgramInfo *pginfo = new ProgramInfo();
     pginfo->FromStringList(slist, 2);
 
-    QString fileprefix = gContext->GetFilePrefix();
-    QString lpath = pginfo->GetRecordFilename(fileprefix);
+    QString lpath = pginfo->GetPlaybackURL();
     QString ip = gContext->GetSetting("BackendServerIP");
     QString port = gContext->GetSetting("BackendServerPort");
 
@@ -1875,8 +1893,7 @@ void MainServer::DoHandleDeleteRecording(ProgramInfo *pginfo, PlaybackSock *pbs,
     if (pbs)
         pbssock = pbs->getSocket();
 
-    QString fileprefix = gContext->GetFilePrefix();
-    QString filename = pginfo->GetRecordFilename(fileprefix, true);
+    QString filename = pginfo->GetPlaybackURL();
 
     // If this recording was made by a another recorder, and that
     // recorder is available, tell it to do the deletion.
@@ -2041,41 +2058,27 @@ void MainServer::HandleForgetRecording(QStringList &slist, PlaybackSock *pbs)
 void MainServer::HandleQueryFreeSpace(PlaybackSock *pbs, bool allHosts)
 {    
     QStringList strlist;
-    long long totalKB = -1, usedKB = -1;
-    getDiskSpace(recordfileprefix, totalKB, usedKB);
-    if (!allHosts)
-    {
-        encodeLongLong(strlist, totalKB);
-        encodeLongLong(strlist, usedKB);
-        SendResponse(pbs->getSocket(), strlist);
-    }
-    else
-    {
-        strlist<<gContext->GetHostName();
-        encodeLongLong(strlist, totalKB);
-        encodeLongLong(strlist, usedKB);
 
-        QMap <QString, bool> backendsCounted;
-        QString encoderHost;
-        QMap<int, EncoderLink *>::Iterator eit = encoderList->begin();
-        while (ismaster && eit != encoderList->end())
-        {
-            encoderHost = eit.data()->GetHostName();
-            if (eit.data()->IsConnected() &&
-                !eit.data()->IsLocal() &&
-                !backendsCounted.contains(encoderHost))
-            {
-                backendsCounted[encoderHost] = true;
+    BackendQueryDiskSpace(strlist, encoderList, allHosts, allHosts);
 
-                eit.data()->GetFreeDiskSpace(totalKB, usedKB);
-                strlist<<encoderHost;
-                encodeLongLong(strlist, totalKB);
-                encodeLongLong(strlist, usedKB);
-            }
-            ++eit;
-        }
-        SendResponse(pbs->getSocket(), strlist);
-    }
+    SendResponse(pbs->getSocket(), strlist);
+}
+
+void MainServer::HandleQueryFreeSpaceSummary(PlaybackSock *pbs)
+{    
+    QStringList fullStrList;
+    QStringList strList;
+
+    BackendQueryDiskSpace(fullStrList, encoderList, true, true);
+
+    // The TotalKB and UsedKB are the last two numbers encoded in the list
+    unsigned int index = fullStrList.size() - 4;
+    strList << fullStrList[index++];
+    strList << fullStrList[index++];
+    strList << fullStrList[index++];
+    strList << fullStrList[index++];
+
+    SendResponse(pbs->getSocket(), strList);
 }
 
 void MainServer::HandleQueryLoad(PlaybackSock *pbs)
@@ -2127,13 +2130,16 @@ void MainServer::HandleQueryMemStats(PlaybackSock *pbs)
 void MainServer::HandleQueryCheckFile(QStringList &slist, PlaybackSock *pbs)
 {
     MythSocket *pbssock = pbs->getSocket();
+    bool checkSlaves = slist[1].toInt();
 
     ProgramInfo *pginfo = new ProgramInfo();
-    pginfo->FromStringList(slist, 1);
+    pginfo->FromStringList(slist, 2);
 
     int exists = 0;
 
-    if (ismaster && pginfo->hostname != gContext->GetHostName())
+    if ((ismaster) &&
+        (pginfo->hostname != gContext->GetHostName()) &&
+        (checkSlaves))
     {
         PlaybackSock *slave = getSlaveByHostname(pginfo->hostname);
 
@@ -2143,20 +2149,28 @@ void MainServer::HandleQueryCheckFile(QStringList &slist, PlaybackSock *pbs)
              slave->DownRef();
 
              QStringList outputlist = QString::number(exists);
+             if (exists)
+                 outputlist << pginfo->pathname;
+             else
+                 outputlist << "";
+
              SendResponse(pbssock, outputlist);
              delete pginfo;
              return;
         }
     }
 
-    QUrl qurl(pginfo->pathname);
-    QString cpath = LocalFilePath(qurl);
-    QFile checkFile(cpath);
+    QString pburl = pginfo->GetPlaybackURL();
+    QFile checkFile(pburl);
 
     if (checkFile.exists() == true)
         exists = 1;
 
     QStringList strlist = QString::number(exists);
+    if (exists)
+        strlist << pburl;
+    else
+        strlist << "";
     SendResponse(pbssock, strlist);
 
     delete pginfo;
@@ -2946,6 +2960,30 @@ void MainServer::HandleRecorderQuery(QStringList &slist, QStringList &commands,
     }
 
     SendResponse(pbssock, retlist);    
+}
+
+void MainServer::HandleSetNextLiveTVDir(QStringList &commands,
+                                        PlaybackSock *pbs)
+{
+    MythSocket *pbssock = pbs->getSocket();
+
+    int recnum = commands[1].toInt();
+
+    QMap<int, EncoderLink *>::Iterator iter = encoderList->find(recnum);
+    if (iter == encoderList->end())
+    {
+        VERBOSE(VB_IMPORTANT, "MainServer::HandleSetNextLiveTVDir() " +
+                QString("Unknown encoder: %1").arg(recnum));
+        QStringList retlist = "bad";
+        SendResponse(pbssock, retlist);
+        return;
+    }
+
+    EncoderLink *enc = iter.data();
+    enc->SetNextLiveTVDir(commands[2]);
+
+    QStringList retlist = "OK";
+    SendResponse(pbssock, retlist);
 }
 
 void MainServer::HandleSetChannelInfo(QStringList &slist, PlaybackSock *pbs)
@@ -3887,9 +3925,37 @@ QString MainServer::LocalFilePath(QUrl &url)
     else
     {
         lpath = lpath.section('/', -1);
-        lpath = gContext->GetFilePrefix() + "/" + lpath;
+
+        QString fpath = lpath;
+        if (fpath.right(4) == ".png")
+            fpath = fpath.left(fpath.length() - 4);
+
+        ProgramInfo *pginfo = ProgramInfo::GetProgramFromBasename(fpath);
+        if (pginfo)
+        {
+            QString pburl = pginfo->GetPlaybackURL();
+            if (pburl.left(1) == "/")
+            {
+                lpath = pburl.section('/', 0, -2) + "/" + lpath;
+                VERBOSE(VB_FILE, QString("Local file path: %1").arg(lpath));
+            }
+            else
+            {
+                VERBOSE(VB_IMPORTANT,
+                        QString("ERROR: LocalFilePath unable to find local "
+                                "path for '%1', found '%2' instead.")
+                                .arg(lpath).arg(pburl));
+                lpath = "";
+            }
+        }
+        else
+        {
+            VERBOSE(VB_IMPORTANT,
+                    QString("ERROR: LocalFilePath unable to find local "
+                            "path for '%1', but unable to find recording info.")
+                                .arg(lpath));
+        }
     }
-    VERBOSE(VB_FILE, QString("Local file path: %1").arg(lpath));
 
     return lpath;
 }

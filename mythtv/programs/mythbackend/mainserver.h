@@ -83,6 +83,7 @@ class MainServer : public QObject, public MythSocketCBs
     void HandleForgetRecording(QStringList &slist, PlaybackSock *pbs);
     void HandleRescheduleRecordings(int recordid, PlaybackSock *pbs);
     void HandleQueryFreeSpace(PlaybackSock *pbs, bool allBackends);
+    void HandleQueryFreeSpaceSummary(PlaybackSock *pbs);
     void HandleQueryCheckFile(QStringList &slist, PlaybackSock *pbs);
     void HandleQueryGuideDataThrough(PlaybackSock *pbs);
     void HandleGetPendingRecordings(PlaybackSock *pbs, QString table = "", int recordid=-1);
@@ -96,6 +97,7 @@ class MainServer : public QObject, public MythSocketCBs
     void HandleGetConnectedRecorderList(PlaybackSock *pbs);
     void HandleRecorderQuery(QStringList &slist, QStringList &commands,
                              PlaybackSock *pbs);
+    void HandleSetNextLiveTVDir(QStringList &commands, PlaybackSock *pbs);
     void HandleFileTransferQuery(QStringList &slist, QStringList &commands,
                                  PlaybackSock *pbs); 
     void HandleGetRecorderNum(QStringList &slist, PlaybackSock *pbs);
@@ -165,8 +167,6 @@ class MainServer : public QObject, public MythSocketCBs
 
     vector<PlaybackSock *> playbackList;
     vector<FileTransfer *> fileTransferList;
-
-    QString recordfileprefix;
 
     QTimer *masterServerReconnect;
     PlaybackSock *masterServer;

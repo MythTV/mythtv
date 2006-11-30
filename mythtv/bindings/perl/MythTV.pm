@@ -56,12 +56,12 @@ package MythTV;
 
 # MYTH_PROTO_VERSION is defined in libmyth in mythtv/libs/libmyth/mythcontext.h
 # and should be the current MythTV protocol version.
-    our $PROTO_VERSION = 31;
+    our $PROTO_VERSION = 32;
 
 # NUMPROGRAMLINES is defined in mythtv/libs/libmythtv/programinfo.h and is
 # the number of items in a ProgramInfo QStringList group used by
 # ProgramInfo::ToSringList and ProgramInfo::FromStringList.
-    our $NUMPROGRAMLINES = 42;
+    our $NUMPROGRAMLINES = 43;
 
 # Reasons a recording wouldn't be happening (from libs/libmythtv/programinfo.h)
     our %RecStatus_Types = (
@@ -205,8 +205,7 @@ package MythTV;
         }
 
     # Find the directory where the recordings are located
-        $self->{'video_dir'} = $self->backend_setting('RecordFilePrefix', $self->{'hostname'});
-        $self->{'video_dir'} =~ s/\/+$//;
+        $self->{'video_dirs'} = $self->get_recording_dirs();
 
     # Cache the database handle
         $MythTV::last = $self;
@@ -445,6 +444,25 @@ package MythTV;
         }
     # Otherwise, we just expect a standard backend-formatted row
         return MythTV::Recording->new($self, @_);
+    }
+
+# Get the list of all recording directories
+    sub get_recording_dirs {
+        my $self = shift;
+
+        my @recdirs;
+        my $dir;
+        my $query = 'SELECT DISTINCT dirname FROM storagegroup;';
+        my $sh = $self->{'dbh'}->prepare($query);
+
+        $sh->execute(@params);
+        while (($dir) = $sh->fetchrow_array) {
+            $dir =~ s/\/+$//;
+            push(@recdirs, $dir);
+        }
+        $sh->finish;
+
+        return \@recdirs;
     }
 
 # Return true

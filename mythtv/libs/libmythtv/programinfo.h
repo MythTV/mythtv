@@ -13,7 +13,7 @@ using namespace std;
 typedef QMap<long long, long long> frm_pos_map_t;
 typedef QMap<long long, int> frm_dir_map_t;
 
-#define NUMPROGRAMLINES 42
+#define NUMPROGRAMLINES 43
 
 typedef enum {
     MARK_UNSET = -10,
@@ -156,7 +156,7 @@ class MPUBLIC ProgramInfo
     void SetDupHistory(void);
 
     // Used to update database with recording info
-    void StartedRecording(QString prefix, QString ext);
+    void StartedRecording(QString ext);
     void FinishedRecording(bool prematurestop);
     void UpdateRecordingEnd(void);
     void ApplyRecordRecID(void);
@@ -169,8 +169,7 @@ class MPUBLIC ProgramInfo
     // Quick gets
     bool SetRecordBasename(QString basename);
     QString GetRecordBasename(bool fromDB = false) const;
-    QString GetRecordFilename(const QString &prefix, bool fromDB = false) const;
-    QString GetPlaybackURL(QString playbackHost = "") const;
+    QString GetPlaybackURL(bool checkMaster = false);
     QString MakeUniqueKey(void) const;
     int CalculateLength(void) const;
     int SecsTillStart() const;
@@ -281,8 +280,10 @@ class MPUBLIC ProgramInfo
     int chancommfree;
 
     QString pathname;
+    QString playbackurl;
     long long filesize;
     QString hostname;
+    QString storagegroup;
 
     QDateTime startts;
     QDateTime endts;

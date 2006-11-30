@@ -41,14 +41,14 @@ class PlaybackSock
     void setIP(QString &lip) { ip = lip; }
     QString getIP(void) { return ip; }
 
-    void GetFreeDiskSpace(long long &totalspace, long long &usedspace);
+    void GetDiskSpace(QStringList &o_strlist);
     int StopRecording(const ProgramInfo *pginfo);
     int CheckRecordingActive(const ProgramInfo *pginfo);
     int DeleteRecording(const ProgramInfo *pginfo, bool forceMetadataDelete = false);
     void FillProgramInfo(ProgramInfo *pginfo, QString &playbackhost);
     void GenPreviewPixmap(const ProgramInfo *pginfo);
     QString PixmapLastModified(const ProgramInfo *pginfo);
-    bool CheckFile(const ProgramInfo *pginfo);
+    bool CheckFile(ProgramInfo *pginfo);
 
     bool IsBusy(int capturecardnum);
     int GetEncoderState(int capturecardnum);
@@ -59,6 +59,7 @@ class PlaybackSock
                                  const ProgramInfo *pginfo);
     void RecordPending(int capturecardnum, const ProgramInfo *pginfo, int secsleft);
     int SetSignalMonitoringRate(int capturecardnum, int rate, int notifyFrontend);
+    void SetNextLiveTVDir(int capturecardnum, QString dir);
 
   private:
     bool SendReceiveStringList(QStringList &strlist);

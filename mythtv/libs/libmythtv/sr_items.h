@@ -449,6 +449,7 @@ class SRStorageOptionsGroup : public ManagedListGroup
         friend class RootSRGroup;
         class SRProfileSelector* profile;
         class SRRecGroup* recGroup;
+        class SRStorageGroup* storageGroup;
         class SRPlayGroup* playGroup;
         class SRAutoExpire* autoExpire;
         class SRMaxEpisodes* maxEpisodes;
@@ -840,7 +841,7 @@ class SRRecGroup: public SRSelectSetting
                 if (!foundDefault && *it > QObject::tr("Default"))
                 {
                     addSelection(QObject::tr(
-                                 "Store in the \"%1\" recording group")
+                                 "Include in the \"%1\" recording group")
                                  .arg(QObject::tr("Default")), "Default");
                     foundDefault = true;
                 }
@@ -850,7 +851,7 @@ class SRRecGroup: public SRSelectSetting
                 else
                     dispValue = *it;
 
-                addSelection(QObject::tr("Store in the \"%1\" recording group")
+                addSelection(QObject::tr("Include in the \"%1\" recording group")
                                          .arg(dispValue), *it);
             }
 
@@ -860,6 +861,76 @@ class SRRecGroup: public SRSelectSetting
     public slots:
         void showNewRecGroup();
         void onGoingBack();
+};
+
+class SRStorageGroup: public SRSelectSetting
+{
+    Q_OBJECT
+
+    public:
+        SRStorageGroup(ScheduledRecording *_parent, ManagedList* _list,
+                       ManagedListGroup* _group)
+            : SRSelectSetting(_parent, "storagegroupList", QString("[ %1 ]")
+                              .arg(QObject::tr("Select Storage Group")),
+                              _group, "storagegroup", _list )
+        {
+            setValue("Default");
+            _parent->setStorageGroupObj(this);
+        }
+
+
+        virtual void load() {
+            fillSelections();
+            SRSelectSetting::load();
+        }
+
+        virtual QString getValue(void) const {
+            return settingValue;
+        }
+
+        virtual void fillSelections()
+        {
+            QStringList groups;
+            QStringList::Iterator it;
+            QString value, dispValue;
+            bool foundDefault = false;
+
+            MSqlQuery query(MSqlQuery::InitCon());
+
+            query.prepare("SELECT DISTINCT groupname FROM storagegroup;");
+            if (query.exec() && query.isActive() && query.size() > 0)
+                while (query.next())
+                {
+                    value = QString::fromUtf8(query.value(0).toString());
+                    groups += value;
+
+                    if (value == "Default")
+                        foundDefault = true;
+                }
+
+            groups.sort();
+            for (it = groups.begin(); it != groups.end(); ++it)
+            {
+                if (!foundDefault && *it > QObject::tr("Default"))
+                {
+                    addSelection(QObject::tr(
+                                 "Store in the \"%1\" storage group")
+                                 .arg(QObject::tr("Default")), "Default");
+                    foundDefault = true;
+                }
+
+                if (*it == "Default")
+                    dispValue = QObject::tr("Default");
+                else if (*it == "LiveTV")
+                    dispValue = QObject::tr("LiveTV");
+                else
+                    dispValue = *it;
+
+                addSelection(QObject::tr("Store in the \"%1\" storage group")
+                                         .arg(dispValue), *it);
+            }
+
+        }
 };
 
 class SRPlayGroup: public SRSelectSetting
@@ -915,3 +986,5 @@ class SRInput: public SRSelectSetting
 };
 
 #endif
+
+/* vim: set expandtab tabstop=4 shiftwidth=4: */

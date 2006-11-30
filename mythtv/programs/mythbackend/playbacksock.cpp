@@ -89,17 +89,17 @@ bool PlaybackSock::SendReceiveStringList(QStringList &strlist)
     return ok;
 }
 
-/** \fn PlaybackSock::GetFreeDiskSpace(long long&, long long&)
- *  \brief Returns total and used space in kilobytes.
+/** \fn PlaybackSock::GetDiskSpace()
+ *  \brief Appends host's dir's total and used space in kilobytes.
  */
-void PlaybackSock::GetFreeDiskSpace(long long &totalKB, long long &usedKB)
+void PlaybackSock::GetDiskSpace(QStringList &o_strlist)
 {
     QStringList strlist = QString("QUERY_FREE_SPACE");
 
     SendReceiveStringList(strlist);
 
-    totalKB = decodeLongLong(strlist, 0);
-    usedKB = decodeLongLong(strlist, 2);
+    o_strlist += strlist;
+
 }
 
 int PlaybackSock::CheckRecordingActive(const ProgramInfo *pginfo)
@@ -167,14 +167,16 @@ QString PlaybackSock::PixmapLastModified(const ProgramInfo *pginfo)
     return strlist[0];
 }
 
-bool PlaybackSock::CheckFile(const ProgramInfo *pginfo)
+bool PlaybackSock::CheckFile(ProgramInfo *pginfo)
 {
     QStringList strlist = "QUERY_CHECKFILE";
+    strlist << QString::number(0); // don't check slaves
     pginfo->ToStringList(strlist);
 
     SendReceiveStringList(strlist);
 
     bool exists = strlist[0].toInt();
+    pginfo->pathname = strlist[1];
     return exists;
 }
 
@@ -284,3 +286,13 @@ int PlaybackSock::SetSignalMonitoringRate(int capturecardnum,
     int ret = strlist[0].toInt();
     return ret;
 }
+
+void PlaybackSock::SetNextLiveTVDir(int capturecardnum, QString dir)
+{
+    QStringList strlist =
+        QString("SET_NEXT_LIVETV_DIR %1 %2").arg(capturecardnum).arg(dir);
+
+    SendReceiveStringList(strlist);
+}
+
+/* vim: set expandtab tabstop=4 shiftwidth=4: */

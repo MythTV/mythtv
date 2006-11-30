@@ -73,7 +73,7 @@ package MythTV::Recording;
         }
         else {
             $self->{'basename'}  = $self->{'filename'};
-            $self->{'basename'} =~ s/^$self->{'_mythtv'}{'video_dir'}\/+//sg;
+            $self->{'basename'} =~ s/.*\/([^\/]*)$/$1/;
         }
 
     # Pull the cutlist info from the database
@@ -103,13 +103,24 @@ package MythTV::Recording;
         }
 
     # File exists locally
-        if ($self->{'_mythtv'}{'video_dir'}) {
-            $self->{'local_path'} = $self->{'_mythtv'}{'video_dir'}.'/'.$self->{'basename'};
-            $self->{'local_path'} = '' unless (-e $self->{'local_path'});
-        }
+        $self->{'local_path'} = $self->find_local_path();
 
     # Return
         return $self;
+    }
+
+# Get the local filename if the file is accessible locally
+    sub find_local_path {
+        my $self = shift;
+
+        foreach my $dir ( @{$self->{'_mythtv'}{'video_dirs'}} ) {
+            my $filename = $dir.'/'.$self->{'basename'};
+            if (-e $filename) {
+                return $filename;
+            }
+        }
+
+        return '';
     }
 
 # Load the credits

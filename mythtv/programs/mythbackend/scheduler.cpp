@@ -26,12 +26,14 @@ using namespace std;
 #include "encoderlink.h"
 #include "mainserver.h"
 #include "remoteutil.h"
+#include "backendutil.h"
 #include "libmyth/util.h"
 #include "libmyth/exitcodes.h"
 #include "libmyth/mythcontext.h"
 #include "libmyth/mythdbcon.h"
 #include "libmythtv/programinfo.h"
 #include "libmythtv/scheduledrecording.h"
+#include "libmythtv/storagegroup.h"
 
 #define LOC QString("Scheduler: ")
 #define LOC_ERR QString("Scheduler, Error: ")
@@ -42,6 +44,8 @@ Scheduler::Scheduler(bool runthread, QMap<int, EncoderLink *> *tvList,
     m_tvList = tvList;
     specsched = false;
     schedulingEnabled = true;
+
+    expirer = NULL;
 
     if (master_sched)
     {
@@ -64,6 +68,8 @@ Scheduler::Scheduler(bool runthread, QMap<int, EncoderLink *> *tvList,
     verifyCards();
 
     threadrunning = runthread;
+
+    fsInfoCacheFillTime = QDateTime::currentDateTime().addSecs(-1000);
 
     reclist_lock = new QMutex(true);
 
@@ -264,20 +270,6 @@ static bool comp_timechannel(ProgramInfo *a, ProgramInfo *b)
     if (a->chanstr.toInt() > 0 && b->chanstr.toInt() > 0)
         return a->chanstr.toInt() < b->chanstr.toInt();
     return a->chanstr < b->chanstr;
-}
-
-void Scheduler::FillEncoderFreeSpaceCache()
-{
-    long long frsp;
-
-    QMap<int, EncoderLink *>::Iterator enciter = m_tvList->begin();
-    for (; enciter != m_tvList->end(); ++enciter)
-    {
-        frsp = enciter.data()->GetFreeDiskSpace(false); // update cache value
-        VERBOSE(VB_SCHEDULE, QString("Encoder card %1 free space %2")
-                                     .arg(enciter.data()->GetCardID())
-                                     .arg(frsp));
-    }
 }
 
 bool Scheduler::FillRecordList(void)
@@ -1046,7 +1038,6 @@ void Scheduler::UpdateNextRecord(void)
     if (query.exec() && query.isActive())
     {
         MSqlQuery subquery(dbConn);
-        QDateTime tmpdt;
 
         while (query.next())
         {
@@ -1136,7 +1127,6 @@ void Scheduler::getAllPending(QStringList &strList)
     strList << QString::number(hasconflicts);
     strList << QString::number(retlist.size());
 
-    RecIter i = retlist.begin();
     while (retlist.size() > 0)
     {
         ProgramInfo *p = retlist.front();
@@ -1221,8 +1211,6 @@ void Scheduler::RunScheduler(void)
     QDateTime curtime;
     QDateTime lastupdate = QDateTime::currentDateTime().addDays(-1);
 
-    QString recordfileprefix = gContext->GetFilePrefix();
-
     RecIter startIter = reclist.begin();
 
     bool blockShutdown = gContext->GetNumSetting("blockSDWUwithoutClient", 1);
@@ -1293,7 +1281,6 @@ void Scheduler::RunScheduler(void)
             matchTime = ((fillend.tv_sec - fillstart.tv_sec ) * 1000000 +
                          (fillend.tv_usec - fillstart.tv_usec)) / 1000000.0;
 
-            FillEncoderFreeSpaceCache();
             gettimeofday(&fillstart, NULL);
             bool worklistused = FillRecordList();
             gettimeofday(&fillend, NULL);
@@ -1318,6 +1305,8 @@ void Scheduler::RunScheduler(void)
                          
             VERBOSE(VB_GENERAL, msg);
             gContext->LogEntry("scheduler", LP_INFO, "Scheduled items", msg);
+
+            fsInfoCacheFillTime = QDateTime::currentDateTime().addSecs(-1000);
 
             lastupdate = curtime;
             startIter = reclist.begin();
@@ -1412,24 +1401,6 @@ void Scheduler::RunScheduler(void)
             // cerr << "nexttv = " << nextRecording->cardid;
             // cerr << " title: " << nextRecording->title << endl;
 
-            if (!nexttv->HasEnoughFreeSpace(nextRecording))
-            {
-                msg = QString("SUPPRESSED recording '%1' on channel"
-                              " %2 on cardid %3, sourceid %4.  Only"
-                              " %5 Megs of disk space available.")
-                    .arg(nextRecording->title.local8Bit())
-                    .arg(nextRecording->chanid)
-                    .arg(nextRecording->cardid)
-                    .arg(nextRecording->sourceid)
-                    .arg((long)nexttv->GetFreeDiskSpace(true)/1024);
-                VERBOSE(VB_GENERAL, msg);
-                QMutexLocker lockit(reclist_lock);
-                nextRecording->recstatus = rsLowDiskSpace;
-                nextRecording->AddHistory(true);
-                statuschanged = true;
-                continue;
-            }
-
             if (nexttv->IsTunerLocked())
             {
                 msg = QString("SUPPRESSED recording \"%1\" on channel: "
@@ -1459,6 +1430,12 @@ void Scheduler::RunScheduler(void)
 
             if (secsleft > 30)
                 continue;
+
+            if (nextRecording->pathname == "")
+            {
+                QMutexLocker lockit(reclist_lock);
+                FillRecordingDir(nextRecording, reclist);
+            }
 
             if (secsleft > 2)
             {
@@ -2182,7 +2159,8 @@ void Scheduler::AddNewRecords(void)
 "oldrecstatus.recstatus, oldrecstatus.reactivate, " 
 "channel.recpriority + cardinput.recpriority, "
 "RECTABLE.prefinput, program.hdtv, program.closecaptioned, "
-"program.first, program.last, program.stereo "
+"program.first, program.last, program.stereo, RECTABLE.storagegroup, "
+"capturecard.hostname "
 + QString(
 "FROM recordmatch "
 
@@ -2313,8 +2291,10 @@ void Scheduler::AddNewRecords(void)
         p->recendts = result.value(19).toDateTime();
         p->repeat = result.value(20).toInt();
         p->recgroup = result.value(21).toString();
+        p->storagegroup = result.value(46).toString();
         p->playgroup = result.value(36).toString();
         p->chancommfree = result.value(23).toInt();
+        p->hostname = result.value(47).toString();
         p->cardid = result.value(24).toInt();
         p->inputid = result.value(25).toInt();
         p->shareable = result.value(26).toInt();
@@ -2681,6 +2661,407 @@ void Scheduler::findAllScheduledPrograms(list<ProgramInfo *> &proglist)
             proglist.push_back(proginfo);
         }
     }
+}
+
+// Sort mode-preferred to least-preferred
+static bool comp_dirpreference(FileSystemInfo *a, FileSystemInfo *b)
+{
+    // local over remote
+    if (a->isLocal && !b->isLocal)
+    {
+        if (a->weight <= b->weight)
+        {
+            return true;
+        }
+    }
+    else if (a->isLocal == b->isLocal)
+    {
+        if (a->weight < b->weight)
+        {
+            return true;
+        }
+        else if (a->weight > b->weight)
+        {
+            return false;
+        }
+        else if (a->freeSpaceKB > b->freeSpaceKB)
+        {
+            return true;
+        }
+    }
+    else if (!a->isLocal && b->isLocal)
+    {
+        if (a->weight < b->weight)
+        {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+void Scheduler::GetNextLiveTVDir(int cardid)
+{
+    QMutexLocker lockit(reclist_lock);
+
+    ProgramInfo *pginfo = new ProgramInfo;
+
+    if (!pginfo)
+        return;
+
+    EncoderLink *tv = (*m_tvList)[cardid];
+
+    if (tv->IsLocal())
+        pginfo->hostname = gContext->GetHostName();
+    else
+        pginfo->hostname = tv->GetHostName();
+
+    pginfo->storagegroup = "LiveTV";
+    pginfo->recstartts   = mythCurrentDateTime();
+    pginfo->recendts     = pginfo->recstartts.addSecs(3600);
+    pginfo->title        = "LiveTV";
+    pginfo->cardid       = cardid;
+
+    FillRecordingDir(pginfo, reclist);
+
+    VERBOSE(VB_FILE, LOC + QString("FindNextLiveTVDir: next dir is '%1'")
+            .arg(pginfo->pathname));
+
+    tv->SetNextLiveTVDir(pginfo->pathname);
+
+    delete pginfo;
+}
+
+void Scheduler::FillRecordingDir(ProgramInfo *pginfo, RecList& reclist)
+{
+    VERBOSE(VB_SCHEDULE, LOC + "FillRecordingDir: Starting");
+
+    MSqlQuery query(MSqlQuery::InitCon());
+    QMap<QString, FileSystemInfo>::Iterator fsit;
+    QMap<QString, FileSystemInfo>::Iterator fsit2;
+    QString dirKey;
+    QStringList strlist;
+    ProgramInfo *thispg;
+    RecIter recIter;
+    StorageGroup mysgroup(pginfo->storagegroup, pginfo->hostname);
+    QStringList dirlist = mysgroup.GetDirList();
+    QStringList recsCounted;
+    list<FileSystemInfo *> fsInfoList;
+    list<FileSystemInfo *>::iterator fslistit;
+
+    if (dirlist.size() == 1)
+    {
+        VERBOSE(VB_FILE|VB_SCHEDULE, LOC + QString("FillRecordingDir: The only "
+                "directory in the %1 Storage Group is %2, so it will be used "
+                "by default.")
+                .arg(pginfo->storagegroup)
+                .arg(dirlist[0]));
+        pginfo->pathname = dirlist[0];
+        VERBOSE(VB_SCHEDULE, LOC + "FillRecordingDir: Finished");
+
+        return;
+    }
+
+    int weightPerRecording =
+            gContext->GetNumSetting("SGweightPerRecording", 10);
+    int weightPerPlayback =
+            gContext->GetNumSetting("SGweightPerPlayback", 5);
+    int weightPerCommFlag =
+            gContext->GetNumSetting("SGweightPerCommFlag", 5);
+    int weightPerTranscode =
+            gContext->GetNumSetting("SGweightPerTranscode", 5);
+    int localStartingWeight =
+            gContext->GetNumSetting("SGweightLocalStarting",
+                                    (int)(-1.99 * weightPerRecording));
+    int maxOverlap = gContext->GetNumSetting("SGmaxRecOverlapMins", 3) * 60;
+
+    FillDirectoryInfoCache();
+    
+    VERBOSE(VB_FILE|VB_SCHEDULE, LOC +
+            "FillRecordingDir: Calculating initial FS Weights.");
+
+    for (fsit = fsInfoCache.begin(); fsit != fsInfoCache.end(); fsit++)
+    {
+        FileSystemInfo *fs = &(fsit.data());
+        int tmpWeight = 0;
+
+        QString msg = QString("  %1:%2").arg(fs->hostname)
+                              .arg(fs->directory);
+        // allow local dives to have 2 recordings before we prefer remote
+        if (fs->isLocal)
+        {
+            tmpWeight = localStartingWeight;
+            msg += " is local (" + QString::number(tmpWeight) + ")";
+        }
+        else
+        {
+            tmpWeight = 0;
+            msg += " is remote (+" + QString::number(tmpWeight) + ")";
+        }
+
+        fs->weight = tmpWeight;
+
+        tmpWeight = gContext->GetNumSetting(QString("SGweightPerDir:%1:%2")
+                                .arg(fs->hostname).arg(fs->directory), 0);
+        fs->weight += tmpWeight;
+
+        if (tmpWeight)
+            msg += ", has SGweightPerDir offset of "
+                   + QString::number(tmpWeight) + ")";
+
+        msg += ". initial dir weight = " + QString::number(fs->weight);
+        VERBOSE(VB_FILE|VB_SCHEDULE, msg);
+
+        fsInfoList.push_back(fs);
+    }
+
+    VERBOSE(VB_FILE|VB_SCHEDULE, LOC +
+            "FillRecordingDir: Adjusting FS Weights from inuseprograms.");
+
+    query.prepare("SELECT i.chanid, i.starttime, r.endtime, recusage, "
+                      "rechost, recdir "
+                  "FROM inuseprograms i, recorded r "
+                  "WHERE DATE_ADD(lastupdatetime, INTERVAL 16 MINUTE) > NOW() "
+                    "AND recdir <> '' "
+                    "AND i.chanid = r.chanid "
+                    "AND i.starttime = r.starttime;");
+    if (!query.exec() || !query.isActive())
+        MythContext::DBError(LOC + "FillRecordingDir", query);
+    else
+    {
+        int recChanid;
+        QDateTime recStart;
+        QDateTime recEnd;
+        QString recUsage;
+        QString recHost;
+        QString recDir;
+
+        while (query.next())
+        {
+            recChanid = query.value(0).toInt();
+            recStart  = query.value(1).toDateTime();
+            recEnd    = query.value(2).toDateTime();
+            recUsage  = query.value(3).toString();
+            recHost   = query.value(4).toString();
+            recDir    = query.value(5).toString();
+
+            for (fslistit = fsInfoList.begin();
+                 fslistit != fsInfoList.end(); fslistit++)
+            {
+                FileSystemInfo *fs = *fslistit;
+                if ((recHost == fs->hostname) &&
+                    (recDir == fs->directory))
+                {
+                    int weightOffset = 0;
+
+                    if (recUsage == "recorder")
+                    {
+                        if (recEnd > pginfo->recstartts.addSecs(maxOverlap))
+                        {
+                            weightOffset += weightPerRecording;
+                            recsCounted << QString::number(recChanid) + ":" +
+                                           recStart.toString(Qt::ISODate);
+                        }
+                    }
+                    else if (recUsage == "player")
+                        weightOffset += weightPerPlayback;
+                    else if (recUsage == "flagger")
+                        weightOffset += weightPerCommFlag;
+                    else if (recUsage == "transcoder")
+                        weightOffset += weightPerTranscode;
+
+                    if (weightOffset)
+                    {
+                        VERBOSE(VB_FILE|VB_SCHEDULE, QString(
+                                "  %1 @ %2 in use by '%3'on %4:%5, FSID #%6, "
+                                "FSID weightOffset +%7.")
+                                .arg(recChanid)
+                                .arg(recStart.toString(Qt::ISODate))
+                                .arg(recUsage).arg(recHost).arg(recDir)
+                                .arg(fs->fsID).arg(weightOffset));
+
+                        // need to offset all directories on this filesystem
+                        for (fsit2 = fsInfoCache.begin();
+                             fsit2 != fsInfoCache.end(); fsit2++)
+                        {
+                            FileSystemInfo *fs2 = &(fsit2.data());
+                            if (fs2->fsID == fs->fsID)
+                            {
+                                VERBOSE(VB_FILE|VB_SCHEDULE, QString("    "
+                                        "%1:%2 => old weight %3 plus %4 = %5")
+                                        .arg(fs2->hostname).arg(fs2->directory)
+                                        .arg(fs2->weight).arg(weightOffset)
+                                        .arg(fs2->weight + weightOffset));
+
+                                fs2->weight += weightOffset;
+                            }
+                        }
+                    }
+                    break;
+                }
+            }
+        }
+    }
+
+    VERBOSE(VB_FILE|VB_SCHEDULE, LOC +
+            "FillRecordingDir: Adjusting FS Weights from scheduler.");
+
+    for (recIter = reclist.begin(); recIter != reclist.end(); recIter++)
+    {
+        thispg = *recIter;
+
+        if ((pginfo->recendts < thispg->recstartts) ||
+            (pginfo->recstartts > thispg->recendts) ||
+            (thispg->recstatus != rsWillRecord) ||
+            (thispg->cardid == 0) ||
+            (recsCounted.contains(thispg->chanid + ":" +
+                thispg->recstartts.toString(Qt::ISODate))) ||
+            (thispg->pathname == ""))
+            continue;
+
+        if (thispg->pathname != "")
+        {
+            for (fslistit = fsInfoList.begin();
+                 fslistit != fsInfoList.end(); fslistit++)
+            {
+                FileSystemInfo *fs = *fslistit;
+                if ((fs->hostname == thispg->hostname) &&
+                    (fs->directory == thispg->pathname))
+                {
+                    VERBOSE(VB_FILE|VB_SCHEDULE, QString(
+                            "%1 @ %2 will record on %3:%4, FSID #%5, "
+                            "weightPerRecording +%6.")
+                            .arg(thispg->chanid)
+                            .arg(thispg->recstartts.toString(Qt::ISODate))
+                            .arg(fs->hostname).arg(fs->directory)
+                            .arg(fs->fsID).arg(weightPerRecording));
+
+                    for (fsit2 = fsInfoCache.begin();
+                         fsit2 != fsInfoCache.end(); fsit2++)
+                    {
+                        FileSystemInfo *fs2 = &(fsit2.data());
+                        if (fs2->fsID == fs->fsID)
+                        {
+                            VERBOSE(VB_FILE|VB_SCHEDULE, QString("    "
+                                    "%1:%2 => old weight %3 plus %4 = %5")
+                                    .arg(fs2->hostname).arg(fs2->directory)
+                                    .arg(fs2->weight).arg(weightPerRecording)
+                                    .arg(fs2->weight + weightPerRecording));
+
+                            fs2->weight += weightPerRecording;
+                        }
+                    }
+                    break;
+                }
+            }
+        }
+    }
+
+    fsInfoList.sort(comp_dirpreference);
+
+    if (print_verbose_messages & (VB_FILE|VB_SCHEDULE))
+    {
+        cout << "--- FillRecordingDir Sorted fsInfoList start ---\n";
+        for (fslistit = fsInfoList.begin();fslistit != fsInfoList.end();
+             fslistit++)
+        {
+            FileSystemInfo *fs = *fslistit;
+            cout << fs->hostname << ":" << fs->directory << endl;
+            cout << "    Location    : ";
+            if (fs->isLocal)
+                cout << "local" << endl;
+            else
+                cout << "remote" << endl;
+            cout << "    weight      : " << fs->weight << endl;
+            cout << "    free space  : " << fs->freeSpaceKB << endl;
+            cout << endl;
+        }
+        cout << "--- FillRecordingDir Sorted fsInfoList end ---\n";
+    }
+
+    // This code could probably be expanded to check the actual bitrate the
+    // recording will record at for analog broadcasts that are encoded locally.
+    EncoderLink *nexttv = (*m_tvList)[pginfo->cardid];
+    long long maxByterate = nexttv->GetMaxBitrate() / 8;
+    long long maxSizeKB = maxByterate *
+                          pginfo->recstartts.secsTo(pginfo->recendts) / 1024;
+    long long desiredSpaceKB = 0;
+    if (expirer)
+        desiredSpaceKB = expirer->GetDesiredSpace();
+
+    // Loop though looking for a directory to put the file in.  The first time
+    // through we look for directories with enough free space in them.  If we
+    // can't find a directory that way we loop through and pick the first good
+    // one from the list no matter how much free space it has.  We assume that
+    // something will have to be expired for us to finish the recording.
+    for (unsigned int pass = 1; pass <= 2; pass++)
+    {
+        bool foundDir = false;
+        for (fslistit = fsInfoList.begin();
+            fslistit != fsInfoList.end(); fslistit++)
+        {
+            FileSystemInfo *fs = *fslistit;
+
+            if ((fs->hostname == pginfo->hostname) &&
+                (dirlist.contains(fs->directory)) &&
+                ((pass == 2) ||
+                 (fs->freeSpaceKB > (desiredSpaceKB + maxSizeKB))))
+            {
+                pginfo->pathname = fs->directory;
+
+                if (pass == 1)
+                    VERBOSE(VB_FILE, QString("'%1' will record in '%2' which "
+                            "has %3 MiB free. This recording could use a max "
+                            "of %4 MiB and the AutoExpirer wants to keep %5 "
+                            "MiB free.")
+                            .arg(pginfo->title).arg(pginfo->pathname)
+                            .arg(fs->freeSpaceKB / 1024).arg(maxSizeKB / 1024)
+                            .arg(desiredSpaceKB / 1024));
+                else
+                    VERBOSE(VB_FILE, QString("'%1' will record in '%2' "
+                            "although there is only %3 MiB free and the "
+                            "AutoExpirer wants at least %4 MiB.  Something "
+                            "will have to be deleted or expired in order for "
+                            "this recording to complete successfully.")
+                            .arg(pginfo->title).arg(pginfo->pathname)
+                            .arg(fs->freeSpaceKB).arg(desiredSpaceKB));
+
+                foundDir = true;
+                break;
+            }
+        }
+
+        if (foundDir)
+            break;
+    }
+
+    VERBOSE(VB_SCHEDULE, LOC + "FillRecordingDir: Finished");
+}
+
+void Scheduler::FillDirectoryInfoCache(bool force)
+{
+    if ((!force) &&
+        (fsInfoCacheFillTime > QDateTime::currentDateTime().addSecs(-180)))
+        return;
+
+    vector<FileSystemInfo> fsInfos;
+
+    fsInfoCache.clear();
+
+    GetFilesystemInfos(m_tvList, fsInfos);
+
+    QMap <int, bool> fsMap;
+    vector<FileSystemInfo>::iterator it1;
+    for (it1 = fsInfos.begin(); it1 != fsInfos.end(); it1++)
+    {
+        fsMap[it1->fsID] = true;
+        fsInfoCache[it1->hostname + ":" + it1->directory] = *it1;
+    }
+
+    VERBOSE(VB_FILE, LOC + QString("FillDirectoryInfoCache: found %1 unique "
+            "filesystems").arg(fsMap.size()));
+
+    fsInfoCacheFillTime = QDateTime::currentDateTime();
 }
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

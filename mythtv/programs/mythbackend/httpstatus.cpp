@@ -9,6 +9,7 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include "httpstatus.h"
+#include "backendutil.h"
 
 #include "libmyth/mythcontext.h"
 #include "libmyth/util.h"
@@ -796,7 +797,7 @@ void HttpStatus::GetPreviewImage( HTTPRequest *pRequest )
     // check to see if preview image is already created.
     // ----------------------------------------------------------------------
 
-    QString sFileName     = pInfo->GetRecordFilename( gContext->GetFilePrefix() );
+    QString sFileName     = pInfo->GetPlaybackURL();
     pRequest->m_sFileName = sFileName + ".png";
 
     if (!QFile::exists( pRequest->m_sFileName ))
@@ -961,7 +962,7 @@ void HttpStatus::GetRecording( HttpWorkerThread *pThread,
             return;     
         }
 
-        pRequest->m_sFileName = pInfo->GetRecordFilename( gContext->GetFilePrefix() );
+        pRequest->m_sFileName = pInfo->GetPlaybackURL();
 
         delete pInfo;
 
@@ -1370,67 +1371,44 @@ void HttpStatus::FillStatusXML( QDomDocument *pDoc )
     mInfo.appendChild(guide  );
 
     // drive space   --------------------- 
- 
+
+    QStringList strlist;
+    QString dirs = "";
+    QString hostname;
+    QString directory;
+    QString isLocalstr;
+    QString fsID;
+    QString ids;
     long long iTotal = -1, iUsed = -1, iAvail = -1; 
+
+    BackendQueryDiskSpace(strlist, m_pEncoders, true, m_bIsMaster);
+
+    QStringList::iterator sit = strlist.begin();
+    while (sit != strlist.end())
+    {
+        hostname   = *(sit++);
+        directory  = *(sit++);
+        isLocalstr = *(sit++);
+        fsID       = *(sit++);
+        iTotal     = decodeLongLong(strlist, sit);
+        iUsed      = decodeLongLong(strlist, sit);
+        iAvail     = iTotal - iUsed;
+
+        if (fsID == "-2")
+            fsID = "total";
+
+        if (ids == "")
+            ids = fsID;
+        else
+            ids = ids + "," + fsID;
+
+        storage.setAttribute("drive_" + fsID + "_total", (int)(iTotal>>10)); 
+        storage.setAttribute("drive_" + fsID + "_used" , (int)(iUsed>>10)); 
+        storage.setAttribute("drive_" + fsID + "_free" , (int)(iAvail>>10)); 
+        storage.setAttribute("drive_" + fsID + "_dirs" , directory); 
+    }
  
-    iAvail = getDiskSpace( gContext->GetFilePrefix(), iTotal, iUsed); 
- 
-    storage.setAttribute("_local_total", (int)(iTotal>>10)); 
-    storage.setAttribute("_local_used" , (int)(iUsed>>10)); 
-    storage.setAttribute("_local_free" , (int)(iAvail>>10)); 
- 
-    if (m_bIsMaster) 
-    { 
-        long long mTotal =  0, mUsed =  0, mAvail =  0; 
-        long long gTotal =  0, gUsed =  0, gAvail =  0; 
-        QString hosts = "_local"; 
-        QMap <QString, bool> backendsCounted; 
-        QString encoderHost; 
-        QMap<int, EncoderLink *>::Iterator eit; 
- 
-        gTotal = iTotal; 
-        gUsed  = iUsed; 
-        gAvail = iAvail; 
- 
-        for (eit = m_pEncoders->begin(); eit != m_pEncoders->end(); ++eit) 
-        { 
-            encoderHost = eit.data()->GetHostName(); 
-            if (eit.data()->IsConnected() && 
-                !eit.data()->IsLocal() && 
-                !backendsCounted.contains(encoderHost)) 
-            { 
-                backendsCounted[encoderHost] = true; 
-                hosts += "," + encoderHost; 
- 
-                eit.data()->GetFreeDiskSpace(mTotal, mUsed); 
-                mAvail = mTotal - mUsed; 
- 
-                storage.setAttribute(encoderHost + "_total", (int)(mTotal>>10)); 
-                storage.setAttribute(encoderHost + "_used" , (int)(mUsed>>10)); 
-                storage.setAttribute(encoderHost + "_free" , (int)(mAvail>>10)); 
- 
-                if ((mTotal == iTotal) && 
-                    (absLongLong(mAvail - iAvail) < (iAvail * 0.05))) 
-                { 
-                    storage.setAttribute(encoderHost + "_shared" , 1); 
-                } 
-                else 
-                { 
-                    storage.setAttribute(encoderHost + "_shared" , 0); 
-                    gTotal += mTotal; 
-                    gUsed  += mUsed; 
-                    gAvail += mAvail; 
-                } 
-            } 
-        } 
-        storage.setAttribute("_total_total", (int)(gTotal>>10)); 
-        storage.setAttribute("_total_used" , (int)(gUsed>>10)); 
-        storage.setAttribute("_total_free" , (int)(gAvail>>10)); 
- 
-        if (hosts != "") 
-            hosts += ",_total"; 
-        storage.setAttribute("slaves", hosts); 
-    } 
+    storage.setAttribute("fsids", ids); 
 
     // load average ---------------------
 
@@ -1758,7 +1736,6 @@ void HttpStatus::PrintStatus( QTextStream &os, QDomDocument *pDoc )
        << "  div.loadstatus {\r\n"
        << "    width:325px;\r\n"
        << "    height:7em;\r\n"
-       << "    float:right;\r\n"
        << "  }\r\n"
        << "  .jobfinished { color: #0000ff; }\r\n"
        << "  .jobaborted { color: #7f0000; }\r\n"
@@ -2268,41 +2245,47 @@ int HttpStatus::PrintMachineInfo( QTextStream &os, QDomElement info )
 
         if (!e.isNull())
         {
-            QString slaves = e.attribute("slaves", "_local");
-            QStringList tokens = QStringList::split(",", slaves);
+            QString ids = e.attribute("fsids", "");
+            QStringList tokens = QStringList::split(",", ids);
 
             os << "      Disk Usage:<br />\r\n";
             os << "      <ul>\r\n";
 
             for (unsigned int i = 0; i < tokens.size(); i++)
             {
-                int nFree = e.attribute(tokens[i] + "_free" , "0" ).toInt();
-                int nTotal= e.attribute(tokens[i] + "_total", "0" ).toInt();
-                int nUsed = e.attribute(tokens[i] + "_used" , "0" ).toInt();
+                // For a single-directory installation just display the totals
+                if ((tokens.size() == 2) && (i == 0) &&
+                    (tokens[i] != "total") &&
+                    (tokens[i+1] == "total"))
+                    i++;
 
-                if (slaves == "_local")
-                {
-                    // do nothing
-                }
-                else if (tokens[i] == "_local")
-                {
-                    os << "        <li>Master Backend:\r\n"
-                       << "          <ul>\r\n";
-                }
-                else if (tokens[i] == "_total")
+                int nFree =
+                    e.attribute("drive_" + tokens[i] + "_free" , "0" ).toInt();
+                int nTotal =
+                    e.attribute("drive_" + tokens[i] + "_total", "0" ).toInt();
+                int nUsed =
+                    e.attribute("drive_" + tokens[i] + "_used" , "0" ).toInt();
+                QString nDirs =
+                    e.attribute("drive_" + tokens[i] + "_dirs" , "" );
+
+                nDirs.replace(QRegExp(","), ", ");
+
+                if (tokens[i] == "total")
                 {
                     os << "        <li>Total Disk Space:\r\n"
                        << "          <ul>\r\n";
                 }
                 else
                 {
-                    os << "        <li>" << tokens[i] << ": ";
 
-                    if (e.attribute(tokens[i] + "shared", "0").toInt())
-                        os << " (Shared with master)";
+                    if (nDirs.contains(","))
+                        os << "        <li>Directories: ";
+                    else
+                        os << "        <li>Directory: ";
 
-                    os << "\r\n"
-                       << "          <ul>\r\n";
+                    os << nDirs << "<br />\r\n"
+                       << "          <ul><li>MythTV Drive #"
+                       << tokens[i] << "\r\n";
                 }
 
                 os << "            <li>Total Space: ";
@@ -2317,9 +2300,8 @@ int HttpStatus::PrintMachineInfo( QTextStream &os, QDomElement info )
                 sRep.sprintf( "%d,%03d MB ", (nFree) / 1000, (nFree) % 1000);
                 os << sRep << "</li>\r\n";
 
-                if (slaves != "_local_")
-                    os << "          </ul>\r\n"
-                       << "        </li>\r\n";
+                os << "          </ul>\r\n"
+                   << "        </li>\r\n";
             }
             os << "      </ul>\r\n";
         }

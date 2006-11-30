@@ -3,6 +3,7 @@
 
 class EncoderLink;
 class MainServer;
+class AutoExpire;
 
 #include <qmutex.h>
 #include <qwaitcondition.h>
@@ -13,6 +14,7 @@ class MainServer;
 
 #include "scheduledrecording.h"
 #include "programinfo.h"
+#include "remoteutil.h"
 
 using namespace std;
 
@@ -26,12 +28,12 @@ class Scheduler : public QObject
               QString recordTbl = "record", Scheduler *master_sched = NULL);
     ~Scheduler();
 
+    void SetExpirer(AutoExpire *autoExpirer) { expirer = autoExpirer; }
+
     void Reschedule(int recordid);
     void AddRecording(const ProgramInfo&);
     void FillRecordListFromDB(int recordid = -1);
     void FillRecordListFromMaster(void);
-
-    void FillEncoderFreeSpaceCache(void);
 
     void UpdateRecStatus(ProgramInfo *pginfo);
     void UpdateRecStatus(int cardid, const QString &chanid, 
@@ -58,6 +60,7 @@ class Scheduler : public QObject
 
     void DisableScheduling(void) { schedulingEnabled = false; }
     void EnableScheduling(void) { schedulingEnabled = true; }
+    void GetNextLiveTVDir(int cardid);
 
   protected:
     void RunScheduler(void);
@@ -98,6 +101,8 @@ class Scheduler : public QObject
                              bool &blockShutdown);
     void ShutdownServer(int prerollseconds);
 
+    void FillRecordingDir(ProgramInfo *pginfo, RecList& reclist);
+    void FillDirectoryInfoCache(bool force = false);
 
     QValueList<int> reschedQueue;
     QMutex reschedLock;
@@ -118,6 +123,7 @@ class Scheduler : public QObject
     bool schedulingEnabled;
 
     QMap<int, EncoderLink *> *m_tvList;   
+    AutoExpire *expirer;
 
     QMap<QString, bool> recPendingList;
 
@@ -129,6 +135,8 @@ class Scheduler : public QObject
     bool m_isShuttingDown;
     MSqlQueryInfo dbConn;
 
+    QDateTime fsInfoCacheFillTime;
+    QMap<QString, FileSystemInfo> fsInfoCache;
 };
 
 #endif

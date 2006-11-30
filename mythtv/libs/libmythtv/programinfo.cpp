@@ -6,6 +6,7 @@
 #include <qlabel.h>
 #include <qapplication.h>
 #include <qfile.h>
+#include <qfileinfo.h>
 
 #include <sys/types.h>
 #include <unistd.h>
@@ -19,6 +20,10 @@
 #include "remoteutil.h"
 #include "jobqueue.h"
 #include "mythdbcon.h"
+#include "storagegroup.h"
+
+#define LOC QString("ProgramInfo: ")
+#define LOC_ERR QString("ProgramInfo, Error: ")
 
 using namespace std;
 
@@ -81,6 +86,8 @@ ProgramInfo::ProgramInfo(void)
     availableStatus = asAvailable;    
 
     pathname = "";
+    playbackurl = "";
+    storagegroup = QString("Default");
     filesize = 0;
     hostname = "";
     programflags = 0;
@@ -175,6 +182,8 @@ ProgramInfo &ProgramInfo::clone(const ProgramInfo &other)
     chanOutputFilters = QDeepCopy<QString>(other.chanOutputFilters);
     
     pathname = QDeepCopy<QString>(other.pathname);
+    storagegroup = QDeepCopy<QString>(other.storagegroup);
+    playbackurl = QDeepCopy<QString>(other.playbackurl);
     filesize = other.filesize;
     hostname = QDeepCopy<QString>(other.hostname);
 
@@ -316,6 +325,7 @@ void ProgramInfo::ToStringList(QStringList &list) const
     STR_TO_LIST((playgroup != "") ? playgroup : "Default")
     INT_TO_LIST(recpriority2)
     INT_TO_LIST(parentid)
+    STR_TO_LIST((storagegroup != "") ? storagegroup : "Default")
 }
 
 /** \fn ProgramInfo::FromStringList(QStringList&,int)
@@ -366,8 +376,7 @@ bool ProgramInfo::FromStringList(QStringList &list, int offset)
  */
 bool ProgramInfo::FromStringList(QStringList &list, QStringList::iterator &it)
 {
-    const char* listerror = "ProgramInfo::FromStringList, not enough items"
-                            " in list. \n"; 
+    const char* listerror = LOC + "FromStringList, not enough items in list.\n"; 
     QStringList::iterator listend = list.end();
     QString ts;
     QDateTime td;
@@ -415,6 +424,7 @@ bool ProgramInfo::FromStringList(QStringList &list, QStringList::iterator &it)
     STR_FROM_LIST(playgroup)
     INT_FROM_LIST(recpriority2)
     INT_FROM_LIST(parentid)
+    STR_FROM_LIST(storagegroup)
 
     return true;
 }
@@ -698,7 +708,7 @@ ProgramInfo *ProgramInfo::GetProgramAtDateTime(const QString &channel,
 
     if (!query.exec() || !query.isActive())
     {
-        MythContext::DBError("ProgramInfo::GetProgramAtDateTime", 
+        MythContext::DBError(LOC + "GetProgramAtDateTime", 
                              query);
         return p;
     }
@@ -774,7 +784,7 @@ ProgramInfo *ProgramInfo::GetProgramAtDateTime(const QString &channel,
 QString ProgramInfo::toString(void) const
 {
     QString str("");
-    str += "ProgramInfo: channame(" + channame + ") startts(" +
+    str += LOC + "channame(" + channame + ") startts(" +
         startts.toString() + ") endts(" + endts.toString() + ")\n";
     str += "             recstartts(" + recstartts.toString() +
         ") recendts(" + recendts.toString() + ")\n";
@@ -829,7 +839,8 @@ ProgramInfo *ProgramInfo::GetProgramFromRecorded(const QString &channel,
                   "channel.outputfilters,seriesid,programid,filesize, "
                   "lastmodified,stars,previouslyshown,originalairdate, "
                   "hostname,recordid,transcoder,playgroup, "
-                  "recorded.recpriority,progstart,progend,basename,recgroup "
+                  "recorded.recpriority,progstart,progend,basename,recgroup, "
+                  "storagegroup "
                   "FROM recorded "
                   "LEFT JOIN channel "
                   "ON recorded.chanid = channel.chanid "
@@ -889,6 +900,7 @@ ProgramInfo *ProgramInfo::GetProgramFromRecorded(const QString &channel,
         proginfo->programflags = proginfo->getProgramFlags();
 
         proginfo->recgroup = query.value(26).toString();
+        proginfo->storagegroup = query.value(27).toString();
         proginfo->playgroup = query.value(21).toString();
         proginfo->recpriority = query.value(22).toInt();
 
@@ -1079,7 +1091,7 @@ void ProgramInfo::ApplyRecordRecID(void)
     query.bindValue(":START",  recstartts);
 
     if (!query.exec())
-        MythContext::DBError("ProgramInfo: RecordID update", query);
+        MythContext::DBError(LOC + "RecordID update", query);
 }
 
 /** \fn ProgramInfo::ApplyRecordStateChange(RecordingType)
@@ -1202,7 +1214,7 @@ void ProgramInfo::ApplyTranscoderProfileChange(QString profile)
         query.bindValue(":START",  recstartts);
     
         if (!query.exec())
-            MythContext::DBError("ProgramInfo: unable to update transcoder "
+            MythContext::DBError(LOC + "unable to update transcoder "
                                  "in recorded table", query);
     }
     else
@@ -1226,7 +1238,7 @@ void ProgramInfo::ApplyTranscoderProfileChange(QString profile)
             query.bindValue(":START",  recstartts);
     
             if (!query.exec())
-                MythContext::DBError("ProgramInfo: unable to update transcoder "
+                MythContext::DBError(LOC + "unable to update transcoder "
                                      "in recorded table", query);
         }
         else
@@ -1487,67 +1499,68 @@ QString ProgramInfo::GetRecordBasename(bool fromDB) const
     return retval;
 }               
 
-/** \fn ProgramInfo::GetRecordFilename() const
- *  \brief Returns prefix+"/"+GetRecordBasename()
- *  \param prefix Prefix to apply to GetRecordBasename().
+/** \fn ProgramInfo::GetPlaybackURL()
+ *  \brief Returns filename or URL to be used to play back this recording.
+ *         If the file is accessible locally, the filename will be returned,
+ *         otherwise a myth:// URL will be returned.
  */
-QString ProgramInfo::GetRecordFilename(const QString &prefix, bool fromDB) const
+QString ProgramInfo::GetPlaybackURL(bool checkMaster)
 {
-    return QString("%1/%2").arg(prefix).arg(GetRecordBasename(fromDB));
-}               
+    if (playbackurl != "")
+        return playbackurl;
 
-/** \fn ProgramInfo::GetPlaybackURL(QString) const
- *  \brief Returns URL to where %MythTV would stream the
- *         this program from, were it to be streamed.
- */
-QString ProgramInfo::GetPlaybackURL(QString playbackHost) const
-{
     QString tmpURL;
-    QString m_hostname = gContext->GetHostName();
+    pathname = GetRecordBasename(true);
 
-    if (playbackHost == "")
-        playbackHost = m_hostname;
+    // Check to see if the file exists locally
+    StorageGroup sgroup(storagegroup);
+    tmpURL = sgroup.FindRecordingFile(pathname);
 
-    tmpURL = GetRecordFilename(gContext->GetSettingOnHost("RecordFilePrefix",
-                                                          hostname));
-
-    if (playbackHost == hostname)
-        return tmpURL;
-
-    if (playbackHost == m_hostname)
+    if (tmpURL != "")
     {
-        QFile checkFile(tmpURL);
-
-        if (checkFile.exists())
-            return tmpURL;
-
-        tmpURL = GetRecordFilename(gContext->GetSettingOnHost(
-                                               "RecordFilePrefix", m_hostname));
-        checkFile.setName(tmpURL);
-
-        if (checkFile.exists())
-            return tmpURL;
+        VERBOSE(VB_FILE, LOC +
+                QString("GetPlaybackURL: File is local: '%1'").arg(tmpURL));
+        playbackurl = tmpURL;
+        return tmpURL;
     }
 
+    // Check to see if we should stream from the master backend
+    if ((checkMaster) &&
+        (gContext->GetNumSetting("MasterBackendOverride", 0)) &&
+        (RemoteCheckFile(this, false)))
+    {
+        tmpURL = QString("myth://") +
+                 gContext->GetSetting("MasterServerIP") + ":" +
+                 gContext->GetSetting("MasterServerPort") + "/" + pathname;
+        VERBOSE(VB_FILE, LOC +
+                QString("GetPlaybackURL: Found @ '%1'").arg(tmpURL));
+        return tmpURL;
+    }
+
+    // Fallback to streaming from the backend the recording was created on
     tmpURL = QString("myth://") +
              gContext->GetSettingOnHost("BackendServerIP", hostname) + ":" +
              gContext->GetSettingOnHost("BackendServerPort", hostname) + "/" +
-             GetRecordBasename();
+             pathname;
+
+    VERBOSE(VB_FILE, LOC + QString("GetPlaybackURL: Using default of: '%1'")
+                                   .arg(tmpURL));
 
     return tmpURL;
 }
 
-/** \fn ProgramInfo::StartedRecording(QString, QString)
+/** \fn ProgramInfo::StartedRecording()
  *  \brief Inserts this ProgramInfo into the database as an existing recording.
  *  
  *  This method, of course, only works if a recording has been scheduled
  *  and started.
  *
- *  \param prefix Directory recording should be placed in
  *  \param ext    File extension for recording
  */
-void ProgramInfo::StartedRecording(QString prefix, QString ext)
+void ProgramInfo::StartedRecording(QString ext)
 {
+    QString dirname = pathname;
+
     if (!record)
     {
         record = new ScheduledRecording();
@@ -1571,7 +1584,11 @@ void ProgramInfo::StartedRecording(QString prefix, QString ext)
         return;
     }
 
-    pathname = prefix + "/" + pathname;
+    pathname = dirname + "/" + pathname;
+
+    VERBOSE(VB_FILE, QString(LOC + "StartedRecording: Recording to '%1'")
+                             .arg(pathname));
+
 
     MSqlQuery query(MSqlQuery::InitCon());
 
@@ -1658,7 +1675,7 @@ static bool insert_program(const ProgramInfo        *pg,
         "    programid, stars,       previouslyshown, originalairdate,  "
         "    findid,    transcoder,  playgroup,       recpriority,      "
         "    basename,  progstart,   progend,         profile,          "
-        "    duplicate) "
+        "    duplicate, storagegroup) "
         "VALUES"
         "  (:CHANID,   :STARTS,     :ENDS,           :TITLE,            "
         "   :SUBTITLE, :DESC,       :HOSTNAME,       :CATEGORY,         "
@@ -1666,7 +1683,7 @@ static bool insert_program(const ProgramInfo        *pg,
         "   :PROGRAMID,:STARS,      :REPEAT,         :ORIGAIRDATE,      "
         "   :FINDID,   :TRANSCODER, :PLAYGROUP,      :RECPRIORITY,      "
         "   :BASENAME, :PROGSTART,  :PROGEND,        :PROFILE,          "
-        "   0) "
+        "   0,         :STORGROUP) "
         );
 
     if (pg->rectype == kOverrideRecord)
@@ -1694,6 +1711,7 @@ static bool insert_program(const ProgramInfo        *pg,
     query.bindValue(":PLAYGROUP",   pg->playgroup);
     query.bindValue(":RECPRIORITY", schd->getRecPriority());
     query.bindValue(":BASENAME",    pg->pathname);
+    query.bindValue(":STORGROUP",   pg->storagegroup);
     query.bindValue(":PROGSTART",   pg->startts);
     query.bindValue(":PROGEND",     pg->endts);
     query.bindValue(":PROFILE",     schd->getProfileName());
@@ -3452,7 +3470,7 @@ void ProgramInfo::showDetails(void) const
             title_pronounce = QString::fromUtf8(query.value(13).toString());
         }
         else if (!query.isActive())
-            MythContext::DBError("ProgramInfo::showDetails", query);
+            MythContext::DBError(LOC + "showDetails", query);
 
         rating = get_ratings(recorded, chanid.toUInt(), startts);
     }
@@ -3799,6 +3817,7 @@ void ProgramInfo::showDetails(void) const
                         QObject::tr(query.value(0).toString()), msg)
         }
         ADD_PAR(QObject::tr("Recording Group"), QObject::tr(recgroup), msg)
+        ADD_PAR(QObject::tr("Storage Group"), QObject::tr(storagegroup), msg)
         ADD_PAR(QObject::tr("Playback Group"), QObject::tr(playgroup), msg)
     }
     else if (recordid)
@@ -3860,7 +3879,7 @@ void ProgramInfo::UpdateInUseMark(bool force)
     if (inUseForWhat == "")
         return;
 
-    if (force || lastInUseTime.secsTo(QDateTime::currentDateTime()) > 60 * 60)
+    if (force || lastInUseTime.secsTo(QDateTime::currentDateTime()) > 15 * 60)
         MarkAsInUse(true);
 }
 
@@ -3957,17 +3976,54 @@ void ProgramInfo::MarkAsInUse(bool inuse, QString usedFor)
         return;
     }
 
+    if (pathname.right(1) == "/")
+        pathname.remove(pathname.length() - 1, 1);
+
+    QString recDir = "";
+    if (hostname == gContext->GetHostName())
+    {
+        // we may be recording this file and it may not exist yet so we need
+        // to do some checking to see what is in pathname
+        QFileInfo testFile(pathname);
+        if (testFile.exists())
+        {
+            if (testFile.isFile() || testFile.isSymLink())
+                recDir = pathname.section("/", 0, -2);
+            else if (testFile.isDir())
+                recDir = pathname;
+        }
+        else
+        {
+            testFile.setFile(pathname.section("/", 0, -2));
+            if (testFile.exists() && testFile.isDir())
+                recDir = testFile.filePath();
+        }
+    }
+    else if (inUseForWhat == "preview_generator")
+    {
+        recDir = "";
+    }
+    else if (RemoteCheckFile(this))
+    {
+        // if we hit here we're not recording this file
+        recDir = pathname.section("/", 0, -2);
+    }
+
     lastInUseTime = mythCurrentDateTime();
 
     query.prepare("INSERT INTO inuseprograms "
-                  " (chanid, starttime, recusage, hostname, lastupdatetime) "
+                  " (chanid, starttime, recusage, hostname, lastupdatetime, "
+                      " rechost, recdir ) "
                   " VALUES "
-                  " (:CHANID, :STARTTIME, :RECUSAGE, :HOSTNAME, :UPDATETIME);");
+                  " (:CHANID, :STARTTIME, :RECUSAGE, :HOSTNAME, :UPDATETIME, "
+                      " :RECHOST, :RECDIR);");
     query.bindValue(":CHANID", chanid);
     query.bindValue(":STARTTIME", recstartts);
     query.bindValue(":HOSTNAME", gContext->GetHostName());
     query.bindValue(":RECUSAGE", inUseForWhat);
     query.bindValue(":UPDATETIME", lastInUseTime);
+    query.bindValue(":RECHOST", hostname);
+    query.bindValue(":RECDIR", recDir);
 
     if (!query.exec() || !query.isActive())
         MythContext::DBError("SetInUse", query);
@@ -4561,7 +4617,8 @@ bool ProgramList::FromRecorded( bool bDescending, ProgramList *pSchedList )
         "recorded.basename, recorded.progstart, "
         "recorded.progend, recorded.stars, "
         "recordedprogram.stereo, recordedprogram.hdtv, "
-        "recordedprogram.closecaptioned, recorded.watched "
+        "recordedprogram.closecaptioned, recorded.watched, "
+        "recorded.storagegroup "
         "FROM recorded "
         "LEFT JOIN record ON recorded.recordid = record.recordid "
         "LEFT JOIN channel ON recorded.chanid = channel.chanid "
@@ -4678,6 +4735,7 @@ bool ProgramList::FromRecorded( bool bDescending, ProgramList *pSchedList )
             proginfo->category     = QString::fromUtf8(query.value(15).toString());
             proginfo->recgroup     = query.value(16).toString();
             proginfo->playgroup    = query.value(27).toString();
+            proginfo->storagegroup = query.value(36).toString();
             proginfo->recstatus    = rsRecorded;
 
             if ((pSchedList != NULL) && (proginfo->recendts > rectime))

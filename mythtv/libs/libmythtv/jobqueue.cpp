@@ -1613,8 +1613,19 @@ QString JobQueue::GetJobCommand(int id, int jobType, ProgramInfo *tmpInfo)
 
     if (command != "")
     {
-        command.replace(QRegExp("%DIR%"), gContext->GetFilePrefix());
-        command.replace(QRegExp("%FILE%"), tmpInfo->GetRecordBasename());
+        QString pburl = tmpInfo->GetPlaybackURL();
+        if (pburl.left(7) == "myth://")
+        {
+            // If the file isn't accessible locally, at least show where it is.
+            command.replace(QRegExp("%DIR%"), pburl);
+        }
+        else
+        {
+            QFileInfo dirInfo(pburl);
+            command.replace(QRegExp("%DIR%"), dirInfo.dirPath());
+        }
+
+        command.replace(QRegExp("%FILE%"), tmpInfo->GetRecordBasename(true));
         command.replace(QRegExp("%TITLE%"), tmpInfo->title);
         command.replace(QRegExp("%SUBTITLE%"), tmpInfo->subtitle);
         command.replace(QRegExp("%DESCRIPTION%"), tmpInfo->description);
@@ -2044,8 +2055,7 @@ void JobQueue::DoFlagCommercialsThread(void)
         MythEvent me("RECORDING_LIST_CHANGE");
         gContext->dispatch(me);
 
-        const QString prefix   = gContext->GetSetting("RecordFilePrefix");
-        program_info->pathname = prefix + "/" + program_info->pathname;
+        program_info->pathname = program_info->GetPlaybackURL();
         (new PreviewGenerator(program_info, true))->Run();
     }
 

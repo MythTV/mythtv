@@ -64,16 +64,6 @@ static GlobalLineEdit *MasterServerPort()
     return gc;
 };
 
-static HostLineEdit *RecordFilePrefix()
-{
-    HostLineEdit *gc = new HostLineEdit("RecordFilePrefix");
-    gc->setLabel(QObject::tr("Directory to hold recordings"));
-    gc->setValue("/mnt/store/");
-    gc->setHelpText(QObject::tr("All recordings get stored in this "
-                    "directory."));
-    return gc;
-};
-
 static GlobalComboBox *TVFormat()
 {
     GlobalComboBox *gc = new GlobalComboBox("TVFormat");
@@ -139,7 +129,8 @@ static HostCheckBox *TruncateDeletes()
     hc->setValue(false);
     hc->setHelpText(QObject::tr("Some filesystems use a lot of resources when "
                     "deleting large recording files.  This option makes Myth "
-                    "delete the file slowly to lessen the impact."));
+                    "delete the file slowly on this backend to lessen the "
+                    "impact."));
     return hc;
 };
 
@@ -686,20 +677,15 @@ BackendSettings::BackendSettings() {
     server->addChild(MasterServerPort());
     addChild(server);
 
-    VerticalConfigurationGroup* group1 = new VerticalConfigurationGroup(false);
-    group1->setLabel(QObject::tr("Host-specific Backend Setup"));
-    group1->addChild(RecordFilePrefix());
-    group1->addChild(TruncateDeletes());
-    addChild(group1);
-
     VerticalConfigurationGroup* group2 = new VerticalConfigurationGroup(false);
-    group2->setLabel(QObject::tr("Global Backend Setup"));
+    group2->setLabel(QObject::tr("Backend Setup"));
     group2->addChild(TVFormat());
     group2->addChild(VbiFormat());
     group2->addChild(FreqTable());
     group2->addChild(TimeOffset());
     group2->addChild(MasterBackendOverride());
     group2->addChild(DeletesFollowLinks());
+    group2->addChild(TruncateDeletes());
     addChild(group2);
 
     VerticalConfigurationGroup* group2a1 = new VerticalConfigurationGroup(false);

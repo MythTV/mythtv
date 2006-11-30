@@ -11,8 +11,8 @@
 ## It first scans through your myth database and displays all shows listed
 ## in the recorded table.
 ##
-## It will then traverse your myth directory (queried from the myth
-## database or set with --dir /YOURMYTHDIR) and find all files with
+## It will then traverse the specified MythTV recordings directory 
+## set with --dir /YOURMYTHDIR) and find all files with
 ## video extensions (set with --ext) and check if they appear in the
 ## database. If no entry exists you will be prompted for identifying
 ## information and a recording entry will be created.
@@ -70,6 +70,7 @@ my $ext = "{nuv,mpg,mpeg,avi}";
 my $file = "";
 my @answers;
 my $norename = 0;
+my $storagegroup = "Default";
 
 my $date_regx = qr/(\d\d\d\d)(\d\d)(\d\d)(\d\d)(\d\d)(\d\d)/;
 my $db_date_regx = qr/(\d\d\d\d)-(\d\d)-(\d\d) (\d\d):(\d\d):(\d\d)/;
@@ -128,7 +129,8 @@ if ($argc == 0) {
       --pass          - DBPASSWORD (default: \"$pass\")
       --database      - DATABASENAME (default: \"$database\")
       --show_existing - Dumps current recorded table.
-      --dir           - path to recordings (default: queried from db)
+      --dir           - path to recordings
+      --group         - Storage Group to import as (default: \"Default\")
       --try_default   - Try to just run with the defaults.
       --quick_run     - don't prompt for title/subtitle/description just
                         use the default
@@ -175,6 +177,7 @@ GetOptions('verbose+'=>\$verbose,
 		'user=s'=>\$user,
 		'pass=s'=>\$pass,
 		'dir=s'=>\$dir,
+		'group=s'=>\$storagegroup,
 		'show_existing|se'=>\$show_existing,
 		'try_default|td'=>\$try_default,
 		'quick_run|qr'=>\$quick_run,
@@ -196,16 +199,8 @@ my $q = "";
 my $sth;
 
 if (!$dir) {
-	my $dir_query = "select data from settings where value='RecordFilePrefix' and hostname=(?)";
-	$sth = $dbh->prepare($dir_query);
-	$sth->execute($host) or die "Could not execute ($dir_query)";
-	if (my @row = $sth->fetchrow_array) {
-		$dir = $row[0];
-	}
-}
-
-if (!$dir) {
-	print("Error: no directory found or specified\n");
+	print("Error: No recordings directory specified.\n");
+	print("       You must use the --dir option to specify a recording directory to use.\n");
 	exit 1;
 }
 
@@ -376,14 +371,14 @@ foreach my $show (@files) {
         $mythfile = sprintf("%s_%s.%s", $channel, $time1, $ext);
     }
 
-    my $sql = "insert into recorded (chanid, starttime, endtime, title, subtitle, description, hostname, basename, progstart, progend) values ((?), (?), (?), (?), (?), (?), (?), (?), (?), (?))";
+    my $sql = "insert into recorded (chanid, starttime, endtime, title, subtitle, description, hostname, basename, progstart, progend, storagegroup) values ((?), (?), (?), (?), (?), (?), (?), (?), (?), (?), (?))";
 
     if ($test_mode) {
 
         $sql =~ s/\(\?\)/"%s"/g;
         my $statement = sprintf($sql, $channel, $starttime, $endtime, $newtitle,
                                 $newsubtitle, $newdescription, $host, $mythfile,
-                                $starttime, $endtime);
+                                $starttime, $endtime, storagegroup);
         print("Test mode: insert would have been been:\n");
         print($statement, ";\n");
 
@@ -392,7 +387,7 @@ foreach my $show (@files) {
         $sth = $dbh->prepare($sql);
         $sth->execute($channel, $starttime, $endtime, $newtitle,
                       $newsubtitle, $newdescription, $host, $mythfile,
-                      $starttime, $endtime)
+                      $starttime, $endtime, storagegroup)
             or die "Could not execute ($sql)\n";
 
         if ($mythfile ne $showBase) {

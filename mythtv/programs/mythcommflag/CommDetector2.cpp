@@ -213,10 +213,18 @@ QString debugDirectory(int chanid, const QDateTime& recstartts)
         return "";
     }
 
-    QString recordfileprefix = gContext->GetSetting("RecordFilePrefix");
-    QString basename = query.value(0).toString();
-    QFileInfo baseinfo(recordfileprefix + "/" + basename);
-    QString debugdir = recordfileprefix + "/" + baseinfo.baseName(TRUE) +
+    ProgramInfo *pginfo = ProgramInfo::GetProgramFromRecorded(
+                              QString::number(chanid), recstartts);
+
+    if (!pginfo)
+        return "";
+
+    QString pburl = pginfo->GetPlaybackURL(true);
+    if (pburl.left(1) != "/")
+        return "";
+
+    QFileInfo baseinfo(query.value(0).toString());
+    QString debugdir = pburl.section('/',0,-2) + "/" + baseinfo.baseName(TRUE) +
         "-debug";
 
     return debugdir;

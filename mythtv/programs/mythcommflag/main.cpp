@@ -492,7 +492,6 @@ int FlagCommercials(QString chanid, QString starttime)
         return COMMFLAG_EXIT_NO_ERROR_WITH_NO_BREAKS;
     }
 
-    QString filename = program_info->GetRecordFilename("...");
 
     if (!quiet)
     {
@@ -513,7 +512,7 @@ int FlagCommercials(QString chanid, QString starttime)
         return COMMFLAG_EXIT_IN_USE;
     }
 
-    filename = program_info->GetPlaybackURL();
+    QString filename = program_info->GetPlaybackURL(true);
 
     RingBuffer *tmprbuf = new RingBuffer(filename, false);
     if (!tmprbuf)

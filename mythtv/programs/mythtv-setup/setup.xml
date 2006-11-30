@@ -94,4 +94,10 @@
      <action>CHANNEL EDITOR</action>
    </button>
 
+   <button>
+     <type>SETUP_GENERAL</type>
+     <text>6. Storage Directories</text>
+     <action>STORAGE GROUPS</action>
+   </button>
+
 </mythmenu>

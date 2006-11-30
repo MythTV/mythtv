@@ -10,7 +10,7 @@ using namespace std;
 #include "mythdbcon.h"
 
 /// This is the DB schema version expected by the running MythTV instance.
-const QString currentDatabaseVersion = "1170";
+const QString currentDatabaseVersion = "1171";
 
 static bool UpdateDBVersionNumber(const QString &newnumber);
 static bool performActualUpdate(const QString updates[], QString version,
@@ -2729,6 +2729,30 @@ thequery,
             return false;
     }
 
+    if (dbver == "1170")
+    {
+        const QString updates[] = {
+"CREATE TABLE IF NOT EXISTS storagegroup ( "
+"    id           INT(11) NOT NULL auto_increment, "
+"    groupname    VARCHAR(32) NOT NULL, "
+"    hostname     VARCHAR(64) NOT NULL DEFAULT '', "
+"    dirname      VARCHAR(255) NOT NULL DEFAULT '', "
+"    PRIMARY KEY (id), "
+"    UNIQUE KEY grouphostdir (groupname, hostname, dirname)"
+"    );",
+"INSERT storagegroup (groupname, hostname, dirname) "
+"    SELECT 'Default', hostname, data "
+"    FROM settings "
+"    WHERE value = 'RecordFilePrefix';",
+"ALTER TABLE recorded ADD storagegroup VARCHAR(32) NOT NULL DEFAULT 'Default';",
+"ALTER TABLE record   ADD storagegroup VARCHAR(32) NOT NULL DEFAULT 'Default';",
+"ALTER TABLE inuseprograms ADD rechost VARCHAR(64) NOT NULL;",
+"ALTER TABLE inuseprograms ADD recdir VARCHAR(255) NOT NULL DEFAULT '';",
+""
+};
+        if (!performActualUpdate(updates, "1171", dbver))
+            return false;
+    }
 
 //"ALTER TABLE cardinput DROP COLUMN preference;" in 0.22
 //"ALTER TABLE channel DROP COLUMN atscsrcid;" in 0.22

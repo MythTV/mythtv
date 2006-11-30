@@ -44,6 +44,7 @@ class SREndDate;
 class SRCategory;
 class SRRecPriority;
 class SRRecGroup;
+class SRStorageGroup;
 class SRPlayGroup;
 class SRInput;
 class SRSeriesid;
@@ -88,8 +89,9 @@ class MPUBLIC ScheduledRecording : public ConfigurationGroup
     void setEnd(const QDateTime& end);
     int getRecPriority(void) const;
     void setRecPriority(int recpriority);
-    void setRecGroup(const QString& recgroup);
-    void setPlayGroup(const QString& recgroup);
+    void setRecGroup(const QString& newrecgroup);
+    void setStorageGroup(const QString& newstoragegroup);
+    void setPlayGroup(const QString& newplaygroup);
 
     virtual void save(void);
     virtual void save(bool send_reschedule_signal);
@@ -115,6 +117,7 @@ class MPUBLIC ScheduledRecording : public ConfigurationGroup
     QString getRecordDescription(void) const;
     QString getProfileName(void) const;
     QString GetRecGroup(void) const;
+    QString GetStorageGroup(void) const;
 
     void findMatchingPrograms(list<ProgramInfo*>& proglist);
 
@@ -160,6 +163,7 @@ class MPUBLIC ScheduledRecording : public ConfigurationGroup
     void setCategoryObj(SRCategory* val) {category = val;}
     void setRecPriorityObj(SRRecPriority* val) {recpriority = val;}
     void setRecGroupObj(SRRecGroup* val) {recgroup = val;}
+    void setStorageGroupObj(SRStorageGroup* val) {storagegroup = val;}
     void setPlayGroupObj(SRPlayGroup* val) {playgroup = val;}
     void setInputObj(SRInput* val) {prefinput = val;}
     void setSeriesIDObj(SRSeriesid* val) {seriesid = val;}
@@ -232,6 +236,7 @@ protected:
     class SRCategory* category;
     class SRRecPriority* recpriority;
     class SRRecGroup* recgroup;
+    class SRStorageGroup* storagegroup;
     class SRPlayGroup* playgroup;
     class SRInput* prefinput;
     class SRSeriesid* seriesid;

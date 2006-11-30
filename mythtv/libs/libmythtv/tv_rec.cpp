@@ -56,6 +56,7 @@ using namespace std;
 #include "dbox2recorder.h"
 #include "hdhrrecorder.h"
 #include "iptvrecorder.h"
+#include "storagegroup.h"
 
 #ifdef USING_V4L
 #include "channel.h"
@@ -130,10 +131,11 @@ TVRec::TVRec(int capturecardnum)
       pendingRecording(NULL),
       // Pseudo LiveTV recording
       pseudoLiveTVRecording(NULL),
+      nextLiveTVDir(""),            nextLiveTVDirLock(false),
       // tvchain
       tvchain(NULL),
       // RingBuffer info
-      ringBuffer(NULL), rbFilePrefix(""), rbFileExt("mpg")
+      ringBuffer(NULL), rbFileExt("mpg")
 {
 }
 
@@ -263,7 +265,6 @@ bool TVRec::Init(void)
     overRecordSecNrml = gContext->GetNumSetting("RecordOverTime");
     overRecordSecCat  = gContext->GetNumSetting("CategoryOverTime") * 60;
     overRecordCategory= gContext->GetSetting("OverTimeCategory");
-    rbFilePrefix      = gContext->GetSetting("RecordFilePrefix");
 
     pthread_create(&event_thread, NULL, EventThread, this);
 
@@ -629,7 +630,7 @@ void TVRec::StartedRecording(ProgramInfo *curRec)
     if (!curRec)
         return;
 
-    curRec->StartedRecording(rbFilePrefix, rbFileExt);
+    curRec->StartedRecording(rbFileExt);
     VERBOSE(VB_RECORD, LOC + "StartedRecording("<<curRec<<") fn("
             <<curRec->GetFileName()<<")");
 
@@ -4002,6 +4003,30 @@ QString TVRec::FlagToString(uint f)
     return msg;
 }
 
+bool TVRec::WaitForNextLiveTVDir(void)
+{
+    bool found = false;
+    MythTimer t;
+    t.start();
+    while (!found && ((unsigned long) t.elapsed()) < 1000)
+    {
+        usleep(50);
+
+        QMutexLocker lock(&nextLiveTVDirLock);
+        if (nextLiveTVDir != "")
+            found = true;
+    }
+
+    return found;
+}
+
+void TVRec::SetNextLiveTVDir(QString dir)
+{
+    QMutexLocker lock(&nextLiveTVDirLock);
+
+    nextLiveTVDir = dir;
+}
+
 bool TVRec::GetProgramRingBufferForLiveTV(ProgramInfo **pginfo,
                                           RingBuffer **rb)
 {
@@ -4046,6 +4071,26 @@ bool TVRec::GetProgramRingBufferForLiveTV(ProgramInfo **pginfo,
 
     if (!pseudoLiveTVRecording)
         prog->recstartts = mythCurrentDateTime();
+
+    prog->storagegroup = "LiveTV";
+
+    nextLiveTVDirLock.lock();
+    nextLiveTVDir = "";
+    nextLiveTVDirLock.unlock();
+
+    MythEvent me(QString("QUERY_NEXT_LIVETV_DIR %1").arg(cardid));
+    gContext->dispatch(me);
+
+    if (WaitForNextLiveTVDir())
+    {
+        QMutexLocker lock(&nextLiveTVDirLock);
+        prog->pathname = nextLiveTVDir;
+    }
+    else
+    {
+        StorageGroup sgroup("LiveTV", gContext->GetHostName());
+        prog->pathname = sgroup.FindNextDirMostFree();
+    }
 
     StartedRecording(prog);
 

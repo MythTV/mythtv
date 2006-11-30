@@ -1401,6 +1401,12 @@ void StatusBox::doMachineStatus()
     vector<FileSystemInfo> fsInfos = RemoteGetFreeSpace();
     for (uint i=0; i<fsInfos.size(); i++)
     {
+        // For a single-directory installation just display the totals
+        if ((fsInfos.size() == 2) && (i == 0) &&
+            (fsInfos[i].directory != "TotalDiskSpace") &&
+            (fsInfos[i+1].directory == "TotalDiskSpace"))
+            i++;
+
         hostnames = QString("\"%1\"").arg(fsInfos[i].hostname);
         hostnames.replace(QRegExp(" "), "");
         hostnames.replace(QRegExp(","), "\",\"");
@@ -1413,10 +1419,38 @@ void StatusBox::doMachineStatus()
             fsInfos[i].totalSpaceKB - fsInfos[i].usedSpaceKB,
             recordingProfilesBPS);
 
-        contentLines[count] = 
-            QObject::tr("Disk usage on %1:").arg(fsInfos[i].hostname);
-        detailString += contentLines[count] + "\n";
-        count++;
+        if (fsInfos[i].directory == "TotalDiskSpace")
+        {
+            contentLines[count] = QObject::tr("Total Disk Space:");
+            detailString += contentLines[count] + "\n";
+            count++;
+        }
+        else
+        {
+            contentLines[count] = 
+                QObject::tr("MythTV Drive #%1:")
+                            .arg(fsInfos[i].fsID);
+            detailString += contentLines[count] + "\n";
+            count++;
+
+            QStringList tokens = QStringList::split(",", fsInfos[i].directory);
+
+            if (tokens.size() > 1)
+            {
+                contentLines[count++] +=
+                    QString("   ") + QObject::tr("Directories:");
+
+                unsigned int curToken = 0;
+                while (curToken < tokens.size())
+                    contentLines[count++] =
+                        QString("      ") + tokens[curToken++];
+            }
+            else
+            {
+                contentLines[count++] += QString("   " ) +
+                    QObject::tr("Directory:") + " " + fsInfos[i].directory;
+            }
+        }
 
         QStringList::iterator it = list.begin();
         for (;it != list.end(); ++it)
