@@ -157,7 +157,7 @@ void createISOImage(QString &sourceDirectory)
 
 void burnISOImage(int mediaType, bool bEraseDVDRW)
 {
-    QString dvdDrive = gContext->GetSetting(" MythArchiveDVDLocation", "/dev/dvd");
+    QString dvdDrive = gContext->GetSetting("MythArchiveDVDLocation", "/dev/dvd");
     VERBOSE(VB_JOBQUEUE, "Burning ISO image to " + dvdDrive);
 
     QString tempDirectory = gContext->GetSetting("MythArchiveTempDir", "");
