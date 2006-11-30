@@ -670,7 +670,7 @@ class LNBLOFSwitchSetting : public LineEditSetting, public Storage
 class LNBLOFLowSetting : public LineEditSetting, public Storage
 {
   public:
-    LNBLOFLowSetting(DiSEqCDevLNB &lnb) : LineEditSetting(storage), m_lnb(lnb)
+    LNBLOFLowSetting(DiSEqCDevLNB &lnb) : LineEditSetting(this), m_lnb(lnb)
     {
         setLabel(DeviceTree::tr("LNB LOF Low (MHz)"));
         QString help = DeviceTree::tr(
