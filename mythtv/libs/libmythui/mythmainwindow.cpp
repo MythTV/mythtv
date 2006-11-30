@@ -1181,6 +1181,34 @@ bool MythMainWindow::eventFilter(QObject *, QEvent *e)
             }
             break;
         }
+	case QEvent::Wheel:
+	{
+	    QWheelEvent* qmw = dynamic_cast<QWheelEvent*>(e);
+	    int delta = qmw->delta();
+	    if (delta>0)
+	    {
+		qmw->accept();
+	       	// UP
+		QKeyEvent *key = new QKeyEvent(QEvent::KeyPress, Qt::Key_Up, 0, Qt::NoButton);
+                QObject *key_target = getTarget(*key);
+            	if (!key_target)
+                    QApplication::postEvent(this, key);
+            	else
+                    QApplication::postEvent(key_target, key);
+	    }
+	    if (delta<0)
+	    {
+		qmw->accept();
+	       	// DOWN
+		QKeyEvent *key = new QKeyEvent(QEvent::KeyPress, Qt::Key_Down, 0, Qt::NoButton);
+                QObject *key_target = getTarget(*key);
+                if (!key_target)
+                    QApplication::postEvent(this, key);
+            	else
+                    QApplication::postEvent(key_target, key);
+	    }
+	    break;	    
+	}
         default:
             break;
     }
