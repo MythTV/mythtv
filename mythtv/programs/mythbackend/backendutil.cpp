@@ -81,8 +81,9 @@ void BackendQueryDiskSpace(QStringList &strlist,
                     // FIXME, Not sure what these strings should be so this
                     // code is really a placeholder for now.
                     if ((statfs(currentDir, &statbuf) == 0) &&
-                        ((!strcmp(statbuf.f_fstypename, "NFS")) ||  // NFS
-                         (!strcmp(statbuf.f_fstypename, "SMB"))))    // SMB
+                        ((!strcmp(statbuf.f_fstypename, "nfs")) ||   // NFS|FTP
+                         (!strcmp(statbuf.f_fstypename, "afpfs")) || // ApplShr
+                         (!strcmp(statbuf.f_fstypename, "smbfs"))))  // SMB
                         localStr = "0";
 #elif __linux__
                     if ((statfs(currentDir, &statbuf) == 0) &&
