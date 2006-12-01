@@ -31,7 +31,7 @@
 #******************************************************************************
 
 # version of script - change after each update
-VERSION="0.1.20061017-2"
+VERSION="0.1.20061201-1"
 
 
 ##You can use this debug flag when testing out new themes
@@ -797,7 +797,7 @@ def getFileInformation(file, outputfile):
                 top_element.appendChild(node)
 
                 #date time is returned as 2005-12-19 00:15:00 
-                recdate=time.strptime( "%s" % record[0],"%Y-%m-%d %H:%M:%S")
+                recdate = time.strptime(str(record[0])[0:19], "%Y-%m-%d %H:%M:%S")
 
                 node = infoDOM.createElement("starttime")
                 node.appendChild(infoDOM.createTextNode( time.strftime("%Y-%m-%dT%H:%M:%S", recdate)))
@@ -864,7 +864,7 @@ def getFileInformation(file, outputfile):
             top_element.appendChild(node)
 
             #date time is returned as 2005-12-19 00:15:00            
-            recdate=time.strptime( "%s" % record[0],"%Y-%m-%d %H:%M:%S")
+            recdate = time.strptime(str(record[0])[0:19], "%Y-%m-%d %H:%M:%S")
 
             node = infoDOM.createElement("recordingdate")
             node.appendChild(infoDOM.createTextNode( time.strftime(dateformat,recdate)  ))
@@ -896,7 +896,7 @@ def getFileInformation(file, outputfile):
             top_element.appendChild(node)
 
             #date time is returned as 2005-12-19 00:15:00 
-            recdate=time.strptime( "%s" % record[7],"%Y-%m-%d %H:%M:%S")
+            recdate = time.strptime(str(record[7])[0:19], "%Y-%m-%d %H:%M:%S")
 
             node = infoDOM.createElement("starttime")
             node.appendChild(infoDOM.createTextNode( time.strftime("%Y-%m-%dT%H:%M:%S", recdate)))
