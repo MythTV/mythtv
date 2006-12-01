@@ -84,7 +84,6 @@ void AutoExpire::Init(void)
     desired_space      = 3 * 1024 * 1024;
     desired_freq       = 10;
     max_record_rate    = 5 * 1024 * 1024;
-    truncates_pending  = 0;
     update_pending     = false;
 }
 
@@ -141,9 +140,10 @@ void AutoExpire::CalcParams()
 
         VERBOSE(VB_FILE, QString(
                 "fsID #%1: Total: %2 GB   Used: %3 GB   Free: %4 GB")
-                .arg(fsit->fsID).arg(fsit->totalSpaceKB >> 20, 7, 'f', 1)
-                .arg(fsit->usedSpaceKB >> 20, 7, 'f', 1)
-                .arg(fsit->freeSpaceKB >> 20, 7, 'f', 1));
+                .arg(fsit->fsID)
+                .arg(fsit->totalSpaceKB / 1024.0 / 1024.0, 7, 'f', 1)
+                .arg(fsit->usedSpaceKB / 1024.0 / 1024.0, 7, 'f', 1)
+                .arg(fsit->freeSpaceKB / 1024.0 / 1024.0, 7, 'f', 1));
 
         VERBOSE(VB_FILE, "Checking Hosts that use this filesystem.");
 
@@ -266,9 +266,6 @@ void AutoExpire::RunExpirer(void)
         // Expire normal recordings depending on frequency calculated
         if (curTime >= next_expire)
         {
-            // Wait for all pending truncates to finish
-            WaitForPendingTruncates();
-
             next_expire =
                 QDateTime::currentDateTime().addSecs(desired_freq * 60);
 
@@ -300,38 +297,6 @@ void AutoExpire::Sleep(int sleepTime)
     }
 }
 
-void AutoExpire::TruncatePending(void)
-{
-    QMutexLocker locker(&truncate_monitor_lock);
-
-    truncates_pending++;
-
-    VERBOSE(VB_FILE, LOC<<truncates_pending<<" file truncates are pending");
-}
-
-void AutoExpire::TruncateFinished(void)
-{
-    QMutexLocker locker(&truncate_monitor_lock);
-
-    truncates_pending--;
-
-    if (truncates_pending <= 0)
-    {
-        VERBOSE(VB_FILE, LOC + "All file truncates have finished");
-        truncate_monitor_condition.wakeAll();
-    }
-}
-
-void AutoExpire::WaitForPendingTruncates(void)
-{
-    QMutexLocker locker(&truncate_monitor_lock);
-    while (truncates_pending > 0)
-    {
-        VERBOSE(VB_FILE, LOC + "Waiting for pending file truncates");
-        truncate_monitor_condition.wait(&truncate_monitor_lock);
-    }
-}
-
 /** \fn AutoExpire::ExpireLiveTV(int type)
  *  \brief This expires LiveTV programs.
  */
@@ -354,6 +319,7 @@ void AutoExpire::ExpireRecordings(void)
     pginfolist_t expireList;
     pginfolist_t deleteList;
     vector<FileSystemInfo> fsInfos;
+    vector<FileSystemInfo>::iterator fsit;
 
     VERBOSE(VB_FILE, LOC + "ExpireRecordings()");
 
@@ -372,8 +338,37 @@ void AutoExpire::ExpireRecordings(void)
 
     FillExpireList(expireList);
 
+    QMap <int, bool> truncateMap;
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare("SELECT DISTINCT rechost, recdir "
+                  "FROM inuseprograms "
+                  "WHERE recusage = 'truncatingdelete' "
+                   "AND lastupdatetime > DATE_ADD(NOW(), INTERVAL -2 MINUTE);");
+
+    if (query.exec() && query.isActive() && query.size() > 0)
+    {
+        while (query.next())
+        {
+            QString rechost = query.value(0).toString();
+            QString recdir  = query.value(1).toString();
+
+            VERBOSE(VB_FILE, LOC + QString(
+                    "%1:%2 has an in-progress truncating delete.")
+                    .arg(rechost).arg(recdir));
+
+            for (fsit = fsInfos.begin(); fsit != fsInfos.end(); fsit++)
+            {
+                if ((fsit->hostname == rechost) &&
+                    (fsit->directory == recdir))
+                {
+                    truncateMap[fsit->fsID] = true;
+                    break;
+                }
+            }
+        }
+    }
+
     QMap <int, bool> fsMap;
-    vector<FileSystemInfo>::iterator fsit;
     for (fsit = fsInfos.begin(); fsit != fsInfos.end(); fsit++)
     {
         if (fsMap.contains(fsit->fsID))
@@ -383,9 +378,19 @@ void AutoExpire::ExpireRecordings(void)
 
         VERBOSE(VB_FILE, QString(
                 "fsID #%1: Total: %2 GB   Used: %3 GB   Free: %4 GB")
-                .arg(fsit->fsID).arg(fsit->totalSpaceKB >> 20, 7, 'f', 1)
-                .arg(fsit->usedSpaceKB >> 20, 7, 'f', 1)
-                .arg(fsit->freeSpaceKB >> 20, 7, 'f', 1));
+                .arg(fsit->fsID)
+                .arg(fsit->totalSpaceKB / 1024.0 / 1024.0, 7, 'f', 1)
+                .arg(fsit->usedSpaceKB / 1024.0 / 1024.0, 7, 'f', 1)
+                .arg(fsit->freeSpaceKB / 1024.0 / 1024.0, 7, 'f', 1));
+
+        if (truncateMap.contains(fsit->fsID))
+        {
+            VERBOSE(VB_FILE, QString(
+                "    fsid %1 has a truncating delete in progress,  AutoExpire "
+                "can not run for this filesystem until the delete has "
+                "finished.  Continuing on to next...").arg(fsit->fsID));
+            continue;
+        }
 
         if (fsit->freeSpaceKB < desired_space)
         {

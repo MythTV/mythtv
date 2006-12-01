@@ -154,7 +154,7 @@ class MainServer : public QObject, public MythSocketCBs
 
     static int  DeleteFile(const QString &filename, bool followLinks);
     static int  OpenAndUnlink(const QString &filename);
-    static bool TruncateAndClose(const AutoExpire *expirer,
+    static bool TruncateAndClose(ProgramInfo *pginfo,
                                  int fd, const QString &filename,
                                  off_t fsize);
 

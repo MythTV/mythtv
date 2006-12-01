@@ -1535,16 +1535,12 @@ void MainServer::DoDeleteThread(const DeleteStruct *ds)
     if (pginfo->recgroup != "LiveTV")
         ScheduledRecording::signalChange(0);
 
-    delete pginfo;
-
     deletelock.unlock();
 
     if (slowDeletes && fd != -1)
-    {
-        m_expirer->TruncatePending();
-        TruncateAndClose(m_expirer, fd, ds->filename, size);
-        m_expirer->TruncateFinished();
-    }
+        TruncateAndClose(pginfo, fd, ds->filename, size);
+
+    delete pginfo;
 }
 
 void MainServer::DoDeleteInDB(const DeleteStruct *ds)
@@ -1688,7 +1684,7 @@ int MainServer::OpenAndUnlink(const QString &filename)
     return fd;
 }
 
-/** \fn MainServer::TruncateAndClose(const AutoExpire*,int,const QString&)
+/** \fn MainServer::TruncateAndClose(ProgramInfo*,int,const QString&)
  *  \brief Repeatedly truncate an open file in small increments.
  *
  *   When the file is small enough this closes the file and returns.
@@ -1696,22 +1692,25 @@ int MainServer::OpenAndUnlink(const QString &filename)
  *   NOTE: This aquires a lock so that only one instance of TruncateAndClose()
  *         is running at a time.
  */
-bool MainServer::TruncateAndClose(const AutoExpire *expirer,
-                                  int fd, const QString &filename,
-                                  off_t fsize)
+bool MainServer::TruncateAndClose(ProgramInfo *pginfo, int fd,
+                                  const QString &filename, off_t fsize)
 {
     QMutexLocker locker(&truncate_and_close_lock);
 
+    pginfo->pathname = filename;
+    pginfo->MarkAsInUse(true, "truncatingdelete");
+
+    int cards = 5;
+
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare("SELECT COUNT(cardid) FROM capturecard;");
+    if (query.exec() && query.isActive() && query.size() && query.next())
+        cards = query.value(0).toInt();
+
     // Time between truncation steps in milliseconds
     const size_t sleep_time = 500;
-    const size_t min_tps    = 8 * 1024 * 1024;
-    const size_t min_trunc  = (size_t) (min_tps * (sleep_time * 0.001f));
-
-    // Compute the truncate increment such that we delete
-    // 20% faster than the maximum recording rate.
-    size_t increment;
-    increment = (expirer->GetMinTruncateRate() * sleep_time + 999) / 1000;
-    increment = max(increment, min_trunc);
+    const size_t min_tps    = (size_t) (cards * 1.2 * (19400000LL / 8));
+    const size_t increment  = (size_t) (min_tps * (sleep_time * 0.001f));
 
     VERBOSE(VB_FILE,
             QString("Truncating '%1' by %2 MB every %3 milliseconds")
@@ -1719,6 +1718,7 @@ bool MainServer::TruncateAndClose(const AutoExpire *expirer,
             .arg(increment / (1024.0 * 1024.0), 0, 'f', 2)
             .arg(sleep_time));
 
+    int count = 0;
     while (fsize > 0)
     {
         //VERBOSE(VB_FILE, QString("Truncating '%1' to %2 MB")
@@ -1729,15 +1729,23 @@ bool MainServer::TruncateAndClose(const AutoExpire *expirer,
         {
             VERBOSE(VB_IMPORTANT, QString("Error truncating '%1'")
                     .arg(filename) + ENO);
+            pginfo->MarkAsInUse(false);
             return 0 == close(fd);
         }
 
         fsize -= increment;
 
+        if ((count % 100) == 0)
+            pginfo->UpdateInUseMark(true);
+
+        count++;
+
         usleep(sleep_time * 1000);
     }
 
     bool ok = (0 == close(fd));
+
+    pginfo->MarkAsInUse(false);
 
     VERBOSE(VB_FILE, QString("Finished truncating '%1'").arg(filename));
 

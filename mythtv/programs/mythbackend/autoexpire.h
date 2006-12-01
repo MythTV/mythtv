@@ -37,17 +37,12 @@ class AutoExpire : public QObject
 
     void CalcParams(void);
     void PrintExpireList(void);
-    void TruncatePending(void);
-    void TruncateFinished(void);
 
     size_t GetDesiredSpace(void) const
         { return desired_space; }
 
     size_t GetMaxRecordRate(void) const
         { return max_record_rate; }
-
-    size_t GetMinTruncateRate(void) const
-        { return ((max_record_rate * 6) / 5) + 1; }
 
     void GetAllExpiring(QStringList &strList);
     void GetAllExpiring(pginfolist_t &list);
@@ -72,7 +67,6 @@ class AutoExpire : public QObject
     void SendDeleteMessages(pginfolist_t &deleteList);
     void ClearExpireList(pginfolist_t &expireList, bool deleteProg = true);
     void Sleep(int sleepTime);
-    void WaitForPendingTruncates(void);
 
     void UpdateDontExpireSet(void);
     bool IsInDontExpireSet(QString chanid, QDateTime starttime);
@@ -87,11 +81,6 @@ class AutoExpire : public QObject
     uint          desired_freq;
     size_t        max_record_rate; // bytes/sec
     bool          expire_thread_running;
-
-    // Pending truncates monitor
-    mutable QMutex truncate_monitor_lock;
-    QWaitCondition truncate_monitor_condition;
-    int            truncates_pending;
 
     // update info
     bool          update_pending;
