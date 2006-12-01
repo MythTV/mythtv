@@ -120,6 +120,7 @@ class MPUBLIC TV : public QObject
     // Various commands
     void setLastProgram(ProgramInfo *rcinfo); 
     ProgramInfo *getLastProgram(void) { return lastProgram; }
+    ProgramInfo *getCurrentProgram(void) { return playbackinfo; }
     void setInPlayList(bool setting) { inPlaylist = setting; }
     void setUnderNetworkControl(bool setting) { underNetworkControl = setting; }
     bool IsSameProgram(ProgramInfo *p);

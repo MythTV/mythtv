@@ -310,8 +310,11 @@ PlaybackBox::PlaybackBox(BoxType ltype, MythMainWindow *parent,
     playList.clear();
 
     if (player)
+    {
         m_player = player;
-
+        if (m_player->getCurrentProgram())
+            recGroup = m_player->getCurrentProgram()->recgroup;
+    }
     // recording group stuff
     recGroupType.clear();
     recGroupType[recGroup] = (displayCat) ? "category" : "recgroup";
@@ -325,7 +328,9 @@ PlaybackBox::PlaybackBox(BoxType ltype, MythMainWindow *parent,
             groupDisplayName = tr(recGroup);
         }
     }
-    recGroupPassword = getRecGroupPassword(recGroup);
+
+    if (!m_player)
+        recGroupPassword = getRecGroupPassword(recGroup);
 
     // theme stuff
     theme->SetWMult(wmult);
@@ -392,9 +397,9 @@ PlaybackBox::PlaybackBox(BoxType ltype, MythMainWindow *parent,
     setNoErase();
     gContext->addListener(this);
 
-    if ((!recGroupPassword.isEmpty()) ||
+    if (!player && ((!recGroupPassword.isEmpty()) ||
         ((titleList.count() <= 1) && (progsInDB > 0)) ||
-        (initialFilt))
+        (initialFilt)))
         showRecGroupChooser();
 
     gContext->addCurrentLocation((type == Delete)? "DeleteBox":"PlaybackBox");
