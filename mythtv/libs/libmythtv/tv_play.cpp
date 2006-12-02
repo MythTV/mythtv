@@ -4969,7 +4969,7 @@ void TV::doEditSchedule(int editType)
         return;
     }
 
-    if (!nvp || nvp->IsNearEnd())
+    if (!nvp)
         return;
 
     // Resize window to the MythTV GUI size
