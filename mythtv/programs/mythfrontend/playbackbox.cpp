@@ -3007,10 +3007,12 @@ void PlaybackBox::doEditScheduled()
     else
     {
         ScheduledRecording record;
-        record.loadByProgram(curitem);
+        ProgramInfo *t_pginfo = new ProgramInfo(*curitem);
+        record.loadByProgram(t_pginfo);
         record.exec();
     
         connected = FillList();
+        delete t_pginfo;
     }
 }    
 

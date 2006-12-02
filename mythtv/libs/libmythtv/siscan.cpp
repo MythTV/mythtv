@@ -220,6 +220,7 @@ void SIScan::HandlePAT(const ProgramAssociationTable *pat)
             QString("Got a Program Association Table for %1")
             .arg((*current).FriendlyName));
 
+#if 0
     // Add pmts to list, so we can do MPEG scan properly.
     ScanStreamData *sd = GetDTVSignalMonitor()->GetScanStreamData();
     for (uint i = 0; i < pat->ProgramCount(); i++)
@@ -227,6 +228,7 @@ void SIScan::HandlePAT(const ProgramAssociationTable *pat)
         if (pat->ProgramPID(i)) // don't add NIT "program", MPEG/ATSC safe.
             sd->AddListeningPID(pat->ProgramPID(i));
     }
+#endif
 }
 
 void SIScan::HandleVCT(uint, const VirtualChannelTable*)
