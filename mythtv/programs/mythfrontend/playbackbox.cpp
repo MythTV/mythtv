@@ -3224,11 +3224,13 @@ void PlaybackBox::doEditScheduled()
     else
     {
         ScheduledRecording *record = new ScheduledRecording();
-        record->loadByProgram(curitem);
+        ProgramInfo *t_pginfo = new ProgramInfo(*curitem);
+        record->loadByProgram(t_pginfo);
         record->exec();
         record->deleteLater();
 
         connected = FillList();
+        delete t_pginfo;
     }
 }    
 
