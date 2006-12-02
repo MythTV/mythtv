@@ -1510,11 +1510,12 @@ QString ProgramInfo::GetPlaybackURL(bool checkMaster)
         return playbackurl;
 
     QString tmpURL;
-    pathname = GetRecordBasename(true);
+    QString basename = GetRecordBasename(true);
+    pathname = basename;
 
     // Check to see if the file exists locally
     StorageGroup sgroup(storagegroup);
-    tmpURL = sgroup.FindRecordingFile(pathname);
+    tmpURL = sgroup.FindRecordingFile(basename);
 
     if (tmpURL != "")
     {
@@ -1531,7 +1532,7 @@ QString ProgramInfo::GetPlaybackURL(bool checkMaster)
     {
         tmpURL = QString("myth://") +
                  gContext->GetSetting("MasterServerIP") + ":" +
-                 gContext->GetSetting("MasterServerPort") + "/" + pathname;
+                 gContext->GetSetting("MasterServerPort") + "/" + basename;
         VERBOSE(VB_FILE, LOC +
                 QString("GetPlaybackURL: Found @ '%1'").arg(tmpURL));
         return tmpURL;
@@ -1541,7 +1542,7 @@ QString ProgramInfo::GetPlaybackURL(bool checkMaster)
     tmpURL = QString("myth://") +
              gContext->GetSettingOnHost("BackendServerIP", hostname) + ":" +
              gContext->GetSettingOnHost("BackendServerPort", hostname) + "/" +
-             pathname;
+             basename;
 
     VERBOSE(VB_FILE, LOC + QString("GetPlaybackURL: Using default of: '%1'")
                                    .arg(tmpURL));

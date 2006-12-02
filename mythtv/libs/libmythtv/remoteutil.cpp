@@ -113,11 +113,12 @@ bool RemoteCheckFile(ProgramInfo *pginfo, bool checkSlaves)
     strlist << QString::number((int)checkSlaves);
     pginfo->ToStringList(strlist);
 
-    if (!gContext->SendReceiveStringList(strlist))
+    if ((!gContext->SendReceiveStringList(strlist)) ||
+        (!strlist[0].toInt()))
         return false;
 
     pginfo->pathname = strlist[1];
-    return strlist[0].toInt();
+    return true;
 }
 
 void RemoteStopRecording(ProgramInfo *pginfo)
