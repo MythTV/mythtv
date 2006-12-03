@@ -142,6 +142,7 @@ bool DVBChannel::Open()
     if (info.caps & FE_HAS_EXTENDED_INFO)
     {
         bool ok = true;
+        dvb_fe_caps_extended extinfo;
         bzero(&extinfo, sizeof(extinfo));
         if (ioctl(fd_frontend, FE_GET_EXTENDED_INFO, &extinfo) < 0)
         {
