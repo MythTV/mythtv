@@ -139,11 +139,7 @@ ProgramInfo *getProgramInfoForFile(const QString &inFile)
         pinfo = ProgramInfo::GetProgramFromRecorded(chanID, startTime);
 
         if (pinfo)
-        {
-            // file is a myth recording
-            pinfo->pathname = gContext->GetSetting("RecordFilePrefix") + "/" +
-                    pinfo->pathname;
-        }
+            pinfo->pathname = pinfo->GetPlaybackURL(true);
     }
 
     if (!pinfo)
@@ -159,3 +155,5 @@ ProgramInfo *getProgramInfoForFile(const QString &inFile)
 
     return pinfo;
 }
+
+/* vim: set expandtab tabstop=4 shiftwidth=4: */

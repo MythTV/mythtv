@@ -649,7 +649,16 @@ bool MythburnWizard::getFileDetails(ArchiveItem *a)
     int lenMethod = 0;
     if (a->type == "Recording")
     {
-        inFile = gContext->GetSetting("RecordFilePrefix") + "/" + a->filename;
+        ProgramInfo *pginfo = ProgramInfo::GetProgramFromBasename(a->filename);
+        if (pginfo)
+        {
+            inFile = pginfo->GetPlaybackURL();
+            if (inFile.left(1) != "/")
+                inFile = a->filename;
+        }
+        else
+            inFile = a->filename;
+
         lenMethod = 2;
     }
     else
@@ -1609,3 +1618,5 @@ void MythburnWizard::runScript()
 
     done(Accepted);
 }
+
+/* vim: set expandtab tabstop=4 shiftwidth=4: */
