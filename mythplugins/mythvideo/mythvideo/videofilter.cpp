@@ -205,26 +205,28 @@ bool VideoFilterSettings::matches_filter(const Metadata &mdata) const
 
     if (genre != kGenreFilterAll)
     {
-        bool found_genre = false;
         const Metadata::genre_list &gl = mdata.Genres();
         for (Metadata::genre_list::const_iterator p = gl.begin();
              p != gl.end(); ++p)
         {
-            found_genre = p->first == genre;
+            if ((matches = p->first == genre))
+            {
+                break;
+            }
         }
-        matches = found_genre;
     }
 
     if (matches && country != kCountryFilterAll)
     {
-        bool found_country = false;
         const Metadata::country_list &cl = mdata.Countries();
         for (Metadata::country_list::const_iterator p = cl.begin();
              p != cl.end(); ++p)
         {
-            found_country = p->first == country;
+            if ((matches = p->first == country))
+            {
+                break;
+            }
         }
-        matches = found_country;
     }
 
     if (matches && category != kCategoryFilterAll)
