@@ -25,7 +25,7 @@
     our ($dest, $format, $usage, $underscores, $live);
     our ($dformat, $dseparator, $dreplacement, $separator, $replacement);
     our ($db_host, $db_user, $db_name, $db_pass, $video_dir, $verbose);
-    our ($hostname, $dbh, $sh, $q, $count);
+    our ($hostname, $dbh, $sh, $q, $count, $base_dir);
 
 # Default filename format
     $dformat = '%T %- %Y-%m-%d, %g-%i %A %- %S';
@@ -184,13 +184,18 @@ EOF
         $sh->finish  if ($sh);
     }
 
-# Find the directory where the recordings are located
-    $video_dir = $Myth->{'video_dir'};
+    my $sgroup = new MythTV::StorageGroup();
+
+# Get our base location
+    $base_dir = $sgroup->FindRecordingDir('show_names');
+    if ($base_dir eq '') {
+        $base_dir = $sgroup->GetFirstStorageDir();
+    }
 
 # Link destination
     if (defined($dest)) {
     # Double-check the destination
-        $dest ||= "$video_dir/show_names";
+        $dest ||= "$base_dir/show_names";
     # Alert the user
         vprint("Link destination directory:  $dest");
     # Create nonexistent paths
@@ -258,6 +263,7 @@ EOF
         elsif (-f $show->{'local_path'}) {
             if ($show->{'basename'} ne $name.$suffix) {
             # Check for duplicates
+                $video_dir = $sgroup->FindRecordingDir($show->{'basename'});
                 if (-e "$video_dir/$name$suffix") {
                     $count = 2;
                     while (-e "$video_dir/$name.$count$suffix") {

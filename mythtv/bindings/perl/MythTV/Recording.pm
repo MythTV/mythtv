@@ -11,6 +11,7 @@
 
 package MythTV::Recording;
     use base 'MythTV::Program';
+    use MythTV::StorageGroup;
 
 # Required for checking byteorder when processing NuppelVideo files
     use Config;
@@ -103,24 +104,11 @@ package MythTV::Recording;
         }
 
     # File exists locally
-        $self->{'local_path'} = $self->find_local_path();
+        my $sgroup = new MythTV::StorageGroup();
+        $self->{'local_path'} = $sgroup->FindRecordingFile($self->{'basename'});
 
     # Return
         return $self;
-    }
-
-# Get the local filename if the file is accessible locally
-    sub find_local_path {
-        my $self = shift;
-
-        foreach my $dir ( @{$self->{'_mythtv'}{'video_dirs'}} ) {
-            my $filename = $dir.'/'.$self->{'basename'};
-            if (-e $filename) {
-                return $filename;
-            }
-        }
-
-        return '';
     }
 
 # Load the credits

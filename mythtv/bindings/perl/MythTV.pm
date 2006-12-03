@@ -14,6 +14,7 @@
     use MythTV::Program;
     use MythTV::Recording;
     use MythTV::Channel;
+    use MythTV::StorageGroup;
 
 package MythTV;
 
