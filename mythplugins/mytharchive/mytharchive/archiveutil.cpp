@@ -7,6 +7,7 @@
 
 // qt
 #include <qdir.h>
+#include <qdom.h>
 
 // myth
 #include <mythtv/mythcontext.h>
@@ -97,15 +98,27 @@ void checkTempDirectory()
     }
 }
 
+QString getBaseName(const QString &filename)
+{
+    QString baseName = filename;
+    int pos = filename.findRev('/');
+    if (pos > 0)
+        baseName = filename.mid(pos + 1);
+
+    return baseName;
+}
+
 bool extractDetailsFromFilename(const QString &inFile,
                                 QString &chanID, QString &startTime)
 {
     VERBOSE(VB_JOBQUEUE, "Extracting details from: " + inFile);
 
+    QString baseName = getBaseName(inFile);
+
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("SELECT chanid, starttime FROM recorded "
             "WHERE basename = :BASENAME");
-    query.bindValue(":BASENAME", inFile);
+    query.bindValue(":BASENAME", baseName);
 
     query.exec();
     if (query.isActive() && query.numRowsAffected())
@@ -154,6 +167,72 @@ ProgramInfo *getProgramInfoForFile(const QString &inFile)
         VERBOSE(VB_JOBQUEUE, "File is a Myth recording.");
 
     return pinfo;
+}
+
+bool getFileDetails(ArchiveItem *a)
+{
+    QString tempDir = gContext->GetSetting("MythArchiveTempDir", "");
+
+    if (!tempDir.endsWith("/"))
+        tempDir += "/";
+
+    QString inFile;
+    int lenMethod = 0;
+    if (a->type == "Recording")
+    {
+        inFile = a->filename;
+        lenMethod = 2;
+    }
+    else
+    {
+        inFile = a->filename;
+    }
+
+    QString outFile = tempDir + "/work/file.xml";
+
+    // call mytharchivehelper to get files stream info etc.
+    QString command = QString("mytharchivehelper -i \"%1\" \"%2\" %3 > /dev/null 2>&1")
+            .arg(inFile).arg(outFile).arg(lenMethod);
+
+    int res = system(command);
+    if (WIFEXITED(res))
+        res = WEXITSTATUS(res);
+    if (res != 0)
+        return false;
+
+    QDomDocument doc("mydocument");
+    QFile file(outFile);
+    if (!file.open(IO_ReadOnly))
+        return false;
+
+    if (!doc.setContent( &file )) 
+    {
+        file.close();
+        return false;
+    }
+    file.close();
+
+    // get file type and duration
+    QDomElement docElem = doc.documentElement();
+    QDomNodeList nodeList = doc.elementsByTagName("file");
+    if (nodeList.count() < 1)
+        return false;
+    QDomNode n = nodeList.item(0);
+    QDomElement e = n.toElement();
+    a->fileCodec = e.attribute("type");
+    a->duration = e.attribute("duration").toInt();
+
+    // get frame size and video codec
+    nodeList = doc.elementsByTagName("video");
+    if (nodeList.count() < 1)
+        return false;
+    n = nodeList.item(0);
+    e = n.toElement();
+    a->videoCodec = e.attribute("codec");
+    a->videoWidth = e.attribute("width").toInt();
+    a->videoHeight = e.attribute("height").toInt();
+
+    return true;
 }
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

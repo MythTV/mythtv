@@ -332,7 +332,7 @@ void RecordingSelector::OKPressed()
         query.bindValue(":STARTDATE", p->startts.toString("dd MMM yy"));
         query.bindValue(":STARTTIME", p->startts.toString("(hh:mm)"));
         query.bindValue(":SIZE", p->filesize);
-        query.bindValue(":FILENAME", p->GetRecordBasename());
+        query.bindValue(":FILENAME", p->GetPlaybackURL(true));
         query.bindValue(":HASCUTLIST", (p->programflags & FL_CUTLIST));
         if (!query.exec())
             MythContext::DBError("archive item insert", query);
@@ -400,13 +400,20 @@ void RecordingSelector::getRecordingList(void)
         {
             p = *i;
 
+            // we can't handle recordings that have to be streamed to us
+            if (p->GetPlaybackURL(true).startsWith("myth://"))
+            {
+                recordingList->erase(i);
+                continue;
+            }
+
             if (categories.find(p->title) == categories.end())
                 categories.append(p->title);
         }
     }
     else
     {
-        MythPopupBox::showOkPopup(gContext->GetMainWindow(), tr("Myth Burn"),
+        MythPopupBox::showOkPopup(gContext->GetMainWindow(), tr("MythArchive"),
                                   tr("You don't have any recordings!\n\nClick OK"));
         QTimer::singleShot(100, this, SLOT(cancelPressed()));
         return;
@@ -456,7 +463,7 @@ void RecordingSelector::updateSelectedList()
             for ( ; i != recordingList->end(); i++)
             {
                 p = *i;
-                if (p->GetRecordBasename() == filename) // is this unique ??
+                if (p->GetPlaybackURL(true) == filename)
                 {
                     if (selectedList.find(p) == -1)
                         selectedList.append(p);

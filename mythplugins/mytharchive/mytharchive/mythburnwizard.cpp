@@ -635,86 +635,6 @@ void MythburnWizard::setProfile(EncoderProfile *profile, ArchiveItem *item)
     }
 }
 
-bool MythburnWizard::getFileDetails(ArchiveItem *a)
-{
-//    MythBusyDialog *busy = new MythBusyDialog(tr("Getting file details. Please Wait..."));
-//    busy->start();
-
-    QString tempDir = gContext->GetSetting("MythArchiveTempDir", "");
-
-    if (!tempDir.endsWith("/"))
-        tempDir += "/";
-
-    QString inFile;
-    int lenMethod = 0;
-    if (a->type == "Recording")
-    {
-        ProgramInfo *pginfo = ProgramInfo::GetProgramFromBasename(a->filename);
-        if (pginfo)
-        {
-            inFile = pginfo->GetPlaybackURL();
-            if (inFile.left(1) != "/")
-                inFile = a->filename;
-        }
-        else
-            inFile = a->filename;
-
-        lenMethod = 2;
-    }
-    else
-    {
-        inFile = a->filename;
-    }
-
-    QString outFile = tempDir + "/work/file.xml";
-
-    // call mytharchivehelper to get files stream info etc.
-    QString command = QString("mytharchivehelper -i \"%1\" \"%2\" %3 > /dev/null 2>&1")
-            .arg(inFile).arg(outFile).arg(lenMethod);
-
-    int res = system(command);
-    if (WIFEXITED(res))
-        res = WEXITSTATUS(res);
-    if (res != 0)
-        return false;
-
-    QDomDocument doc("mydocument");
-    QFile file(outFile);
-    if (!file.open(IO_ReadOnly))
-        return false;
-
-    if (!doc.setContent( &file )) 
-    {
-        file.close();
-        return false;
-    }
-    file.close();
-
-    // get file type and duration
-    QDomElement docElem = doc.documentElement();
-    QDomNodeList nodeList = doc.elementsByTagName("file");
-    if (nodeList.count() < 1)
-        return false;
-    QDomNode n = nodeList.item(0);
-    QDomElement e = n.toElement();
-    a->fileCodec = e.attribute("type");
-    a->duration = e.attribute("duration").toInt();
-
-    // get frame size and video codec
-    nodeList = doc.elementsByTagName("video");
-    if (nodeList.count() < 1)
-        return false;
-    n = nodeList.item(0);
-    e = n.toElement();
-    a->videoCodec = e.attribute("codec");
-    a->videoWidth = e.attribute("width").toInt();
-    a->videoHeight = e.attribute("height").toInt();
-//    busy->Close();
-//    delete busy;
-
-    return true;
-}
-
 long long MythburnWizard::recalcSize(EncoderProfile *profile, ArchiveItem *a)
 {
     if (a->duration == 0)
@@ -1036,13 +956,15 @@ void MythburnWizard::updateArchiveList(void)
     archive_list->refresh();
 }
 
-bool MythburnWizard::isArchiveItemValid(QString &type, QString &filename)
+bool MythburnWizard::isArchiveItemValid(const QString &type, const QString &filename)
 {
     if (type == "Recording")
     {
+        QString baseName = getBaseName(filename);
+
         MSqlQuery query(MSqlQuery::InitCon());
         query.prepare("SELECT title FROM recorded WHERE basename = :FILENAME");
-        query.bindValue(":FILENAME", filename);
+        query.bindValue(":FILENAME", baseName);
         query.exec();
         if (query.isActive() && query.numRowsAffected())
             return true;
@@ -1103,31 +1025,6 @@ bool MythburnWizard::hasCutList(QString &type, QString &filename)
     }
 
     return res;
-}
-
-bool MythburnWizard::extractDetailsFromFilename(const QString &inFile,
-                                QString &chanID, QString &startTime)
-{
-    MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare("SELECT chanid, starttime FROM recorded "
-                  "WHERE basename = :BASENAME");
-    query.bindValue(":BASENAME", inFile);
-
-    query.exec();
-    if (query.isActive() && query.numRowsAffected())
-    {
-        query.first();
-        chanID = query.value(0).toString();
-        startTime= query.value(1).toString();
-    }
-    else
-    {
-        VERBOSE(VB_IMPORTANT, 
-                QString("MythArchive: Cannot find details for %1").arg(inFile));
-        return false;
-    }
-
-    return true;
 }
 
 vector<ArchiveItem *> *MythburnWizard::getArchiveListFromDB(void)
@@ -1446,7 +1343,7 @@ void MythburnWizard::removeItem()
     closePopupMenu();
 }
 
-bool MythburnWizard::doRemoveArchiveItem(QString &filename)
+bool MythburnWizard::doRemoveArchiveItem(const QString &filename)
 {
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("DELETE FROM archiveitems WHERE filename = :FILENAME;");

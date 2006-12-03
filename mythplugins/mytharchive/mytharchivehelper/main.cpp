@@ -644,7 +644,8 @@ int NativeArchive::exportRecording(QDomElement &itemNode, const QString &saveDir
     }
 
     // finally save the xml to the file
-    QString xmlFile = saveDirectory + title + "/" + filename + ".xml";
+    QString baseName = getBaseName(filename);
+    QString xmlFile = saveDirectory + title + "/" + baseName + ".xml";
     QFile f(xmlFile);
     if (!f.open(IO_WriteOnly))
     {
@@ -657,24 +658,18 @@ int NativeArchive::exportRecording(QDomElement &itemNode, const QString &saveDir
     f.close();
 
     // copy the file
-    QString prefix = gContext->GetSettingOnHost("RecordFilePrefix", gContext->GetHostName());
     VERBOSE(VB_JOBQUEUE, "Copying video file");
-    bool res = copyFile(prefix + "/" + filename, saveDirectory + title + "/" + filename);
+    bool res = copyFile(filename, saveDirectory + title + "/" + baseName);
     if (!res)
-    {
         return 0;
-    }
 
     // copy preview image
-    if (QFile::exists(prefix + "/" + filename + ".png"))
+    if (QFile::exists(filename + ".png"))
     {
         VERBOSE(VB_JOBQUEUE, "Copying preview image");
-        res = copyFile(prefix + "/" + filename + ".png", saveDirectory + title 
-                + "/" + filename + ".png");
+        res = copyFile(filename + ".png", saveDirectory + title + "/" + baseName + ".png");
         if (!res)
-        {
             return 0;
-        }
     }
 
     VERBOSE(VB_JOBQUEUE, "Item Archived OK");
@@ -1022,7 +1017,7 @@ int NativeArchive::importRecording(const QDomElement &itemNode, const QString &x
 
     // check this recording doesn't already exist
     MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare("select * FROM recorded "
+    query.prepare("SELECT * FROM recorded "
             "WHERE chanid = :CHANID AND starttime = :STARTTIME;");
     query.bindValue(":CHANID", chanID);
     query.bindValue(":STARTTIME", startTime);
@@ -1035,23 +1030,34 @@ int NativeArchive::importRecording(const QDomElement &itemNode, const QString &x
         }
     }
 
-    // copy file to recording directory
-    VERBOSE(VB_JOBQUEUE, "Copying video file.");
-    if (!copyFile(videoFile, gContext->GetSetting("RecordFilePrefix") + 
-            "/" + basename))
+    // find the default storage location for this host
+    QString storageDir = "";
+    query.prepare("SELECT dirname FROM storagegroup "
+            "WHERE groupname = :GROUPNAME AND hostname = :HOSTNAME;");
+    query.bindValue(":GROUPNAME", "Default");
+    query.bindValue(":HOSTNAME", gContext->GetHostName());
+    if (query.exec())
     {
+        query.first();
+        storageDir = query.value(0).toString();
+    }
+    else
+    {
+        VERBOSE(VB_JOBQUEUE, "ERROR: Failed to get 'Default' storage directory for this host");
         return 1;
     }
+
+    // copy file to recording directory
+    VERBOSE(VB_JOBQUEUE, "Copying video file.");
+    if (!copyFile(videoFile,  storageDir + "/" + basename))
+        return 1;
 
     // copy any preview image to recording directory
     if (QFile::exists(videoFile + ".png"))
     {
         VERBOSE(VB_JOBQUEUE, "Copying preview image file.");
-        if (!copyFile(videoFile + ".png", gContext->GetSetting("RecordFilePrefix") + 
-             "/" + basename + ".png"))
-        {
+        if (!copyFile(videoFile + ".png", storageDir + "/" + basename + ".png"))
             return 1;
-        }
     }
 
     // copy recorded to database

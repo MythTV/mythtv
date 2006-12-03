@@ -30,6 +30,35 @@ typedef struct ArchiveDestination
 extern struct ArchiveDestination ArchiveDestinations[];
 extern int ArchiveDestinationsCount;
 
+typedef struct
+{
+    QString name;
+    QString description;
+    float bitrate;
+} EncoderProfile;
+
+typedef struct
+{
+    int     id;
+    QString type;
+    QString title;
+    QString subtitle;
+    QString description;
+    QString startDate;
+    QString startTime;
+    QString filename;
+    long long size;
+    long long newsize;
+    int duration;
+    EncoderProfile *encoderProfile;
+    QString fileCodec;
+    QString videoCodec;
+    int videoWidth, videoHeight;
+    bool hasCutlist;
+    bool useCutlist;
+    bool editedDetails;
+} ArchiveItem;
+
 
 QString formatSize(long long sizeKB, int prec = 2);
 QString getTempDirectory();
@@ -37,5 +66,7 @@ void checkTempDirectory();
 bool extractDetailsFromFilename(const QString &inFile,
                                 QString &chanID, QString &startTime);
 ProgramInfo *getProgramInfoForFile(const QString &inFile);
+bool getFileDetails(ArchiveItem *a);
+QString getBaseName(const QString &filename);
 
 #endif

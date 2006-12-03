@@ -13,43 +13,6 @@
 
 #include "archiveutil.h"
 
-enum ArchiveItemType
-{
-    AT_RECORDING = 1,
-    AT_VIDEO,
-    AT_FILE
-};
-
-typedef struct
-{
-    QString name;
-    QString description;
-    float bitrate;
-} EncoderProfile;
-
-typedef struct
-{
-    int     id;
-    QString type;
-    QString title;
-    QString subtitle;
-    QString description;
-    QString startDate;
-    QString startTime;
-    QString filename;
-    long long size;
-    long long newsize;
-    int duration;
-    EncoderProfile *encoderProfile;
-    QString fileCodec;
-    QString videoCodec;
-    int videoWidth, videoHeight;
-    bool hasCutlist;
-    bool useCutlist;
-    bool editedDetails;
-} ArchiveItem;
-
-
 class MythburnWizard : public MythThemedDialog
 {
 
@@ -110,15 +73,12 @@ class MythburnWizard : public MythThemedDialog
     void showEditMetadataDialog();
     QString loadFile(const QString &filename);
     vector<ArchiveItem *>  *getArchiveListFromDB(void);
-    bool doRemoveArchiveItem(QString &filename);
-    bool isArchiveItemValid(QString &type, QString &filename);
+    bool doRemoveArchiveItem(const QString &filename);
+    bool isArchiveItemValid(const QString &type, const QString &filename);
     bool hasCutList(QString &type, QString &filename);
-    bool extractDetailsFromFilename(const QString &inFile,
-                                    QString &chanID, QString &startTime);
     void loadEncoderProfiles(void);
     EncoderProfile *getDefaultProfile(ArchiveItem *item);
     long long recalcSize(EncoderProfile *profile, ArchiveItem *a);
-    bool getFileDetails(ArchiveItem *a);
     void setProfile(EncoderProfile *profile, ArchiveItem *item);
     void runScript();
 
