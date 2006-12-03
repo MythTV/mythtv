@@ -521,8 +521,8 @@ void ScanWizardScanner::PreScanCommon(int scantype,
         return;
     }
 
-    scanner = new SIScan(card_type, channel, sourceid,
-                         signal_timeout, channel_timeout);
+    scanner = new SIScan(card_type, channel, sourceid, signal_timeout,
+                         channel_timeout, inputname);
 
     scanner->SetForceUpdate(true);
 

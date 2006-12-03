@@ -81,10 +81,11 @@ QString SIScan::loc(const SIScan *siscan)
  *   HandleDVBDBInsertion() and HandleMPEGDBInsertion() are similar.
  */
 
-/** \fn SIScan::SIScan(QString,ChannelBase*,int,uint,uint)
+/** \fn SIScan::SIScan(QString,ChannelBase*,int,uint,uint,const QString&)
  */
-SIScan::SIScan(QString _cardtype, ChannelBase* _channel, int _sourceID,
-               uint signal_timeout, uint channel_timeout)
+SIScan::SIScan(const QString &_cardtype, ChannelBase *_channel, int _sourceID,
+               uint signal_timeout, uint channel_timeout,
+               const QString &_inputname)
     : // Set in constructor
       channel(_channel),
       signalMonitor(SignalMonitor::Init(_cardtype, -1, _channel)),
@@ -92,6 +93,7 @@ SIScan::SIScan(QString _cardtype, ChannelBase* _channel, int _sourceID,
       scanMode(IDLE),
       signalTimeout(signal_timeout),
       channelTimeout(channel_timeout),
+      inputname(QDeepCopy<QString>(_inputname)),
       // Settable
       ignoreAudioOnlyServices(false),
       ignoreDataServices(false),
@@ -686,9 +688,6 @@ bool SIScan::Tune(const transport_scan_items_it_t transport)
         GetDVBSignalMonitor()->SetRotorTarget(1.0f);
     }
 #endif // USING_DVB
-
-    // TODO we should actually use the input the user specifies...
-    QString inputname = ChannelUtil::GetInputName(item.SourceID);
 
     if (!GetDTVChannel())
         return false;

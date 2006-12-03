@@ -699,28 +699,6 @@ int ChannelUtil::GetSourceID(int db_mplexid)
     return -1;
 }
 
-/** \fn ChannelUtil::GetInputName(int)
- *  \brief Returns input name for a card input
- *  NOTE: This is BROKEN, it does not specify which card the input is on.
- */
-QString ChannelUtil::GetInputName(int source_id)
-{
-    QString inputname = QString::null;
-
-    MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare("SELECT inputname "
-                  "FROM cardinput "
-                  "WHERE sourceid = :SOURCEID");
-    query.bindValue(":SOURCEID", source_id);
-
-    if (query.exec() && query.isActive() && query.size() > 0)
-    {
-        query.next();
-        inputname = query.value(0).toString();
-    }
-    return inputname;
-}
-
 int ChannelUtil::GetInputID(int source_id, int card_id)
 {
     int input_id = -1;

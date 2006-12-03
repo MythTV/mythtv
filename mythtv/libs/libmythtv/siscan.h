@@ -44,8 +44,9 @@ class SIScan : public QObject,
 {
     Q_OBJECT
   public:
-    SIScan(QString _cardtype, ChannelBase* _channel, int _sourceID,
-           uint signal_timeout, uint channel_timeout);
+    SIScan(const QString &_cardtype, ChannelBase* _channel, int _sourceID,
+           uint signal_timeout, uint channel_timeout,
+           const QString &_inputname);
     ~SIScan();
 
     void StartScanner(void);
@@ -180,6 +181,7 @@ class SIScan : public QObject,
     SCANMODE          scanMode;
     uint              signalTimeout;
     uint              channelTimeout;
+    QString           inputname;
 
     // Settable
     bool              ignoreAudioOnlyServices;

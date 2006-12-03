@@ -138,7 +138,7 @@ class MPUBLIC CardUtil
 
 
     static QString      GetDefaultInput(uint cardid);
-    static QString      GetInputName(uint cardid, uint sourceid);
+    static QStringList  GetInputNames(uint cardid, uint sourceid);
 
     static QString      GetDeviceLabel(uint    cardid,
                                        QString cardtype,

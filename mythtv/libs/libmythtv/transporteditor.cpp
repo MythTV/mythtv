@@ -188,34 +188,39 @@ static CardUtil::CARD_TYPES get_cardtype(uint sourceid)
     vector<uint>::const_iterator it = cardids.begin();
     for (; it != cardids.end(); ++it)
     {
-        CardUtil::CARD_TYPES nType = CardUtil::ERROR_PROBE;
-        QString inputname = CardUtil::GetInputName(*it, sourceid);
+        QStringList inputnames = CardUtil::GetInputNames(*it, sourceid);
+        QStringList::const_iterator it2 = inputnames.begin();
 
-        if (!inputname.isEmpty())
+        for (; it2 != inputnames.end(); ++it2)
         {
-            QString cardtype = CardUtil::GetRawCardType(*it, inputname);
+            CardUtil::CARD_TYPES nType = CardUtil::ERROR_PROBE;
+            QString cardtype = CardUtil::GetRawCardType(*it, *it2);
             if (cardtype == "DVB")
-                cardtype = CardUtil::ProbeSubTypeName(*it, inputname);
+                cardtype = CardUtil::ProbeSubTypeName(*it, *it2);
             nType = CardUtil::toCardType(cardtype);
+
+            if ((CardUtil::ERROR_OPEN    == nType) ||
+                (CardUtil::ERROR_UNKNOWN == nType) ||
+                (CardUtil::ERROR_PROBE   == nType))
+            {
+                MythPopupBox::showOkPopup(
+                    gContext->GetMainWindow(), 
+                    QObject::tr("Transport Editor"), 
+                    QObject::tr(
+                        "Failed to probe a capture card connected to this "
+                        "transport's video source. Please make sure the "
+                        "backend is not running."));
+
+                return CardUtil::ERROR_PROBE;
+            }
+
+            cardtypes.push_back(nType);
         }
-
-        if ((CardUtil::ERROR_OPEN    == nType) ||
-            (CardUtil::ERROR_UNKNOWN == nType) ||
-            (CardUtil::ERROR_PROBE   == nType))
-        {
-            MythPopupBox::showOkPopup(
-                gContext->GetMainWindow(), 
-                QObject::tr("Transport Editor"), 
-                QObject::tr(
-                    "Failed to probe a capture card connected to this "
-                    "transport's video source. Please make sure the "
-                    "backend is not running."));
-
-            return CardUtil::ERROR_PROBE;
-        }
-
-        cardtypes.push_back(nType);
     }
+
+    // This should never happen... (unless DB has changed under us)
+    if (cardtypes.empty())
+        return CardUtil::ERROR_PROBE;
 
     for (uint i = 1; i < cardtypes.size(); i++)
     {

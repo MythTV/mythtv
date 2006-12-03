@@ -348,9 +348,9 @@ QString CardUtil::GetDefaultInput(uint nCardID)
     return str;
 }
 
-QString CardUtil::GetInputName(uint cardid, uint sourceid)
+QStringList CardUtil::GetInputNames(uint cardid, uint sourceid)
 {
-    QString str = QString::null;
+    QStringList list;
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("SELECT inputname "
                   "FROM cardinput "
@@ -360,11 +360,16 @@ QString CardUtil::GetInputName(uint cardid, uint sourceid)
     query.bindValue(":CARDID",   cardid);
 
     if (!query.exec() || !query.isActive())
-        MythContext::DBError("CardUtil::GetInputName()", query);
-    else if (query.next())
-        str = query.value(0).toString();
+    {
+        MythContext::DBError("CardUtil::GetInputNames()", query);
+    }
+    else
+    {
+        while (query.next())
+            list = query.value(0).toString();
+    }
 
-    return str;
+    return list;
 }
 
 bool CardUtil::GetTimeouts(uint cardid,
