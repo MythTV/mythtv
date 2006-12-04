@@ -1524,6 +1524,13 @@ QString ProgramInfo::GetPlaybackURL(bool checkMaster)
         playbackurl = tmpURL;
         return tmpURL;
     }
+    else if (hostname == gContext->GetHostName())
+    {
+        VERBOSE(VB_FILE, LOC_ERR + QString("GetPlaybackURL: '%1' should be "
+                "local, but it can not be found.").arg(basename));
+        return QString("/GetPlaybackURL/UNABLE/TO/FIND/LOCAL/FILE/ON/%1/%2")
+                       .arg(hostname).arg(basename);
+    }
 
     // Check to see if we should stream from the master backend
     if ((checkMaster) &&
