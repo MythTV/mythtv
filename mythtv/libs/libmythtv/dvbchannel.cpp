@@ -866,6 +866,18 @@ static struct dvb_fe_params dtvmultiplex_to_dvbparams(
         params.u.qpsk.fec_inner   = (fe_code_rate_t) (int) tuning.fec;
     }
 
+    if (DTVTunerType::kTunerTypeDVB_S2 == tuner_type)
+    {
+#ifdef FE_GET_EXTENDED_INFO
+        params.u.qpsk2.symbol_rate = tuning.symbolrate;
+        params.u.qpsk2.fec_inner   = (fe_code_rate_t) (int) tuning.fec;
+        params.u.qpsk2.modulation  = (fe_modulation_t) (int) tuning.modulation;
+#else // if !FE_GET_EXTENDED_INFO
+        VERBOSE(VB_IMPORTANT, "DVBChan Error, MythTV was compiled without "
+                "DVB-S2 headers being present so DVB-S2 tuning will fail.");
+#endif // !FE_GET_EXTENDED_INFO
+    }
+
     if (DTVTunerType::kTunerTypeQAM  == tuner_type)
     {
         params.u.qam.symbol_rate  = tuning.symbolrate;
