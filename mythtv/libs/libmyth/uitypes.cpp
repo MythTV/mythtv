@@ -1,5 +1,7 @@
 
 #include <iostream>
+#include <math.h>
+
 #include <qapplication.h>
 #include <qsimplerichtext.h>
 #include <qbitmap.h>
