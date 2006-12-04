@@ -6652,6 +6652,11 @@ void TV::BuildOSDTreeMenu(void)
 
     int letterbox = nvp->GetLetterbox();
     item = new OSDGenericTree(treeMenu, tr("Change Aspect Ratio"));
+    subitem = new OSDGenericTree(item, tr("Off"), "TOGGLEASPECT" +
+                                 QString("%1").arg(kLetterbox_Off),
+                                 ((letterbox <= kLetterbox_Off) ||
+                                  (letterbox >= kLetterbox_END)) ? 1 : 0,
+                                 NULL, "ASPECTGROUP");
     subitem = new OSDGenericTree(item, tr("4:3"), "TOGGLEASPECT" +
                                  QString("%1").arg(kLetterbox_4_3),
                                  (letterbox == kLetterbox_4_3) ? 1 : 0,
@@ -6671,6 +6676,10 @@ void TV::BuildOSDTreeMenu(void)
     subitem = new OSDGenericTree(item, tr("16:9 Stretch"), "TOGGLEASPECT" +
                                  QString("%1").arg(kLetterbox_16_9_Stretch),
                                  (letterbox == kLetterbox_16_9_Stretch) ? 1 : 0,
+                                 NULL, "ASPECTGROUP");
+    subitem = new OSDGenericTree(item, tr("Fill"), "TOGGLEASPECT" +
+                                 QString("%1").arg(kLetterbox_Fill),
+                                 (letterbox == kLetterbox_Fill) ? 1 : 0,
                                  NULL, "ASPECTGROUP");
 
     if (db_use_picture_attr)
