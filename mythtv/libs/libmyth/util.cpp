@@ -405,9 +405,15 @@ long long getDiskSpace(const QString &file_on_disk,
         (statbuf.f_blocks > 0) &&
         (statbuf.f_bsize > 0))
     {
-        freespace = (statbuf.f_bsize * statbuf.f_bavail) >> 10;
-        total     = (statbuf.f_bsize * statbuf.f_blocks) >> 10;
-        used      = total - freespace;
+        total      = statbuf.f_blocks;
+        total     *= statbuf.f_bsize;
+        total      = total >> 10;
+
+        freespace  = statbuf.f_bavail;
+        freespace *= statbuf.f_bsize;
+        freespace  = freespace >> 10;
+
+        used       = total - freespace;
     }
 
     return freespace;
