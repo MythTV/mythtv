@@ -2070,8 +2070,7 @@ void PlaybackBox::startPlayer(ProgramInfo *rec)
             return;
         }
 
-        if (rec->pathname.left(1) != "/")
-            rec->pathname = rec->GetPlaybackURL(true);
+        rec->pathname = rec->GetPlaybackURL(true);
         previewVideoRingBuf = new RingBuffer(rec->pathname, false, false, 1);
         if (!previewVideoRingBuf->IsOpen())
         {
