@@ -1643,6 +1643,27 @@ UIKeyboardType *MythThemedDialog::getUIKeyboardType(const QString &name)
     return NULL;
 }
 
+UIImageGridType* MythThemedDialog::getUIImageGridType(const QString &name)
+{
+    QPtrListIterator<LayerSet> an_it(my_containers);
+    LayerSet *looper;
+
+    while( (looper = an_it.current()) != 0)
+    {
+        UIType *hunter = looper->GetType(name);
+        if (hunter)
+        {
+            UIImageGridType *hunted;
+            if ( (hunted = dynamic_cast<UIImageGridType*>(hunter)) )
+            {
+                return hunted;
+            }
+        }
+        ++an_it;
+    }
+    return NULL;
+}
+
 LayerSet* MythThemedDialog::getContainer(const QString& name)
 {
     QPtrListIterator<LayerSet> an_it(my_containers);

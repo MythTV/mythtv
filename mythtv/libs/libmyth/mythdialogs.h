@@ -34,6 +34,7 @@ class UICheckBoxType;
 class UISelectorType;
 class UIBlackHoleType;
 class UIImageType;
+class UIImageGridType;
 class UIStatusBarType;
 class UIListBtnType;
 class UIListTreeType;
@@ -282,6 +283,7 @@ class MPUBLIC MythThemedDialog : public MythDialog
     UICheckBoxType *getUICheckBoxType(const QString &name);
     UISelectorType *getUISelectorType(const QString &name);
     UIBlackHoleType *getUIBlackHoleType(const QString &name);
+    UIImageGridType *getUIImageGridType(const QString &name);
     UIImageType *getUIImageType(const QString &name);
     UIStatusBarType *getUIStatusBarType(const QString &name);
     UIListBtnType *getUIListBtnType(const QString &name);

@@ -1888,8 +1888,523 @@ void UIRepeatedImageType::refresh()
     }
 }
 
+// **************************************************************
+
+UIImageGridType::UIImageGridType(const QString &name, int order)
+    : UIType(name)
+{
+    m_name = name;
+    m_order = order;
+
+    activeFont = inactiveFont = selectedFont = NULL;
+    window = NULL;
+    defaultPixmap = normalPixmap = selectedPixmap = highlightedPixmap = NULL;
+
+    topRow = rowCount = columnCount = itemCount = currentItem =
+            borderWidth = padding = topRow = cellWidth = cellHeight =
+            lastRow = lastColumn = curColumn = curRow = 0;
+
+    textPos = UIImageGridType::textPosBottom;
+    textHeight = 20;
+    cutdown = true;
+    setJustification((Qt::AlignLeft | Qt::AlignVCenter));
+    allowFocus(true);
+    showCheck = false;
+    showSelected = false;
+
+    allData = new QPtrList<ImageGridItem>;
+    allData->setAutoDelete(true);
+}
+
+UIImageGridType::~UIImageGridType(void)
+{
+    if (normalPixmap)
+        delete normalPixmap;
+    if (highlightedPixmap)
+        delete highlightedPixmap;
+    if (selectedPixmap)
+        delete selectedPixmap;
+    if (defaultPixmap)
+        delete defaultPixmap;
+
+    if (checkNonPixmap)
+        delete checkNonPixmap;
+    if (checkHalfPixmap)
+        delete checkHalfPixmap;
+    if (checkFullPixmap)
+        delete checkFullPixmap;
+
+    if (upArrowRegPixmap)
+        delete upArrowRegPixmap;
+    if (upArrowActPixmap)
+        delete upArrowActPixmap;
+    if (dnArrowRegPixmap)
+        delete dnArrowRegPixmap;
+    if (upArrowActPixmap)
+        delete dnArrowActPixmap;
+
+    delete allData;
+}
+
+void UIImageGridType::reset(void)
+{
+    allData->clear();
+    topRow = itemCount = currentItem = topRow = lastRow =
+            lastColumn = curColumn = curRow = 0;
+}
+
+void  UIImageGridType::setCurrentPos(int pos)
+{
+    if (pos < 0 || pos > (int) allData->count() - 1)
+        return;
+
+    // make sure the selected item is visible
+    currentItem = pos;
+    topRow = currentItem / columnCount;
+    curRow = topRow;
+    if (curRow > lastRow - rowCount)
+        topRow = lastRow - rowCount + 1;
+    curColumn = currentItem % columnCount;
+    refresh();
+}
+
+void  UIImageGridType::setCurrentPos(QString value)
+{
+    ImageGridItem *item;
+    for (item = allData->first(); item; item = allData->next())
+    {
+        if (item->text == value)
+        {
+            setCurrentPos(allData->at());
+            return;
+        }
+    }
+}
+
+ImageGridItem *UIImageGridType::getCurrentItem(void)
+{
+    return getItemAt(currentItem);
+}
+
+ImageGridItem *UIImageGridType::getItemAt(int pos)
+{
+    if (pos < 0 || pos > (int) allData->count() - 1)
+        return NULL;
+
+    return allData->at(pos);
+}
+
+void UIImageGridType::appendItem(ImageGridItem *item)
+{
+    allData->append(item);
+    itemCount = allData->count();
+}
+
+void UIImageGridType::updateItem(ImageGridItem *item)
+{
+    int itemNo = allData->find(item);
+
+    updateItem(itemNo, item);
+}
+
+void UIImageGridType::updateItem(int itemNo, ImageGridItem *item)
+{
+    if (itemNo < 0 || itemNo > (int) allData->count() - 1)
+        return;
+
+    ImageGridItem *gridItem = allData->at(itemNo);
+
+    if (gridItem)
+    {
+        gridItem = item;
+    }
+
+    // if this item is visible update the imagegrid
+    if ((itemNo >= topRow * columnCount) && (itemNo < (topRow + rowCount) * columnCount))
+        refresh();
+}
+
+void UIImageGridType::setJustification(int jst)
+{
+    justification = jst;
+    multilineText = (justification & Qt::WordBreak) > 0;
+}
+
+bool UIImageGridType::handleKeyPress(QString action)
+{
+    if (!has_focus)
+        return false;
+
+    if (action == "LEFT")
+    {
+        if (curRow == 0 && curColumn == 0)
+            return true;
+
+        curColumn--;
+        if (curColumn < 0)
+        {
+            curColumn = columnCount - 1;
+            curRow--;
+            if (curRow < topRow)
+                topRow = curRow;
+        }
+    }
+    else if (action == "RIGHT")
+    {
+        if (curRow * columnCount + curColumn >= itemCount - 1)
+            return true;
+
+        curColumn++;
+        if (curColumn >= columnCount)
+        {
+            curColumn = 0;
+            curRow++;
+            if (curRow >= topRow + rowCount)
+                topRow++;
+        }
+    }
+    else if (action == "UP")
+    {
+        if (curRow == 0)
+        {
+            curRow = lastRow;
+            curColumn = QMIN(curColumn, lastColumn);
+            topRow  = QMAX(curRow - rowCount + 1,0);
+        }
+        else
+        {
+            curRow--;
+            if (curRow < topRow)
+                topRow = curRow;
+        }
+    }
+    else if (action == "DOWN")
+    {
+        if (curRow == lastRow)
+        {
+            curRow = 0;
+            topRow = 0;
+        }
+        else
+        {
+            curRow++;
+
+            if (curRow == lastRow)
+                curColumn = QMIN(curColumn, lastColumn);
+
+            if (curRow >= topRow + rowCount)
+                topRow++;
+        }
+    }
+    else if (action == "PAGEUP")
+    {
+        if (curRow == 0)
+            return true;
+        else
+            curRow = QMAX(curRow - rowCount, 0);
+
+        topRow = curRow;
+    }
+    else if (action == "PAGEDOWN")
+    {
+        if (curRow == lastRow)
+            return true;
+        else
+            curRow += rowCount;
+
+        if (curRow >= lastRow)
+        {
+            curRow = lastRow;
+            curColumn = QMIN(curColumn, lastColumn);
+        }
+
+        topRow = QMAX(curRow - rowCount + 1,0);
+    }
+    else if (action == "SELECT" && showSelected)
+    {
+        ImageGridItem *item = allData->at(currentItem);
+        if (item)
+            item->selected = ! item->selected;
+    }
+    else
+        return false;
 
 
+    currentItem = curRow * columnCount + curColumn;
+
+    showUpArrow = (topRow != 0);
+    showDnArrow = (topRow + rowCount <= lastRow);
+
+    refresh();
+
+    emit itemChanged(allData->at(currentItem));
+
+    return true;
+}
+
+void UIImageGridType::Draw(QPainter *p, int drawlayer, int context)
+{
+    if (hidden)
+        return;
+
+    if ((m_context != context && m_context != -1) || drawlayer != m_order)
+        return;
+
+    // redraw the complete view rectangle
+    QRect pr = displayRect;
+
+    if (m_debug == true)
+    {
+        p->setPen(Qt::red);
+        p->drawRect(QRect(0, 0, displayRect.width(), displayRect.height()));
+    }
+
+    int curPos = topRow * columnCount;
+
+    for (int y = 0; y < rowCount; y++)
+    {
+        int ypos = y * (padding + cellHeight);
+
+        for (int x = 0; x < columnCount; x++)
+        {
+            if (curPos >= itemCount)
+                continue;
+
+            int xpos = x * (padding + cellWidth);
+            drawCell(p, curPos, xpos, ypos);
+
+            curPos++;
+        }
+    }
+
+    if (showScrollArrows)
+    {
+        if (showUpArrow)
+            p->drawPixmap(displayRect.x(),
+                          displayRect.bottom() - upArrowActPixmap->height(),
+                          *upArrowActPixmap);
+        else
+            p->drawPixmap(displayRect.x(),
+                          displayRect.bottom() - upArrowRegPixmap->height(),
+                          *upArrowRegPixmap);
+        if (showDnArrow)
+            p->drawPixmap(displayRect.x() + upArrowRegPixmap->width() +
+                    (int)(5 * m_wmult),
+        displayRect.bottom() - dnArrowActPixmap->height(),
+        *dnArrowActPixmap);
+        else
+            p->drawPixmap(displayRect.x() + upArrowRegPixmap->width() +
+                    (int)(5 * m_wmult),
+        displayRect.bottom() - dnArrowRegPixmap->height(),
+        *dnArrowRegPixmap);
+    }
+}
+
+void UIImageGridType::drawCell(QPainter *p, int curPos, int xpos, int ypos)
+{
+    QRect r(xpos, ypos, cellWidth, cellHeight);
+
+    if (curPos == currentItem)
+    {
+        // highlighted
+        if (m_debug == true)
+            p->setPen(Qt::yellow);
+        if (highlightedPixmap)
+            p->drawPixmap(xpos, ypos, *highlightedPixmap);
+    }
+    else
+    {
+        if (m_debug == true)
+            p->setPen(Qt::green);
+        if (normalPixmap)
+            p->drawPixmap(xpos, ypos, *normalPixmap);
+    }
+
+    // draw item image
+    QPixmap *pixmap = NULL;
+    QString filename = "";
+    ImageGridItem *item = allData->at(curPos);
+
+    // use pixmap stored in item
+    if (item)
+        pixmap = item->pixmap;
+
+    // use default pixmap if non found
+    if (!pixmap)
+        pixmap = defaultPixmap;
+
+    if (pixmap && !pixmap->isNull())
+        p->drawPixmap(xpos + imageRect.x() + ( (imageRect.width() - pixmap->width()) / 2 ),
+                      ypos + imageRect.y() + ( (imageRect.height() - pixmap->height()) / 2 ),
+                      *pixmap, 0, 0, -1, -1);
+
+    if (m_debug == true)
+    {
+      p->setBrush(Qt::NoBrush);
+      p->drawRect(r);
+    }
+
+    // draw text area
+    drawText(p, curPos, xpos, ypos);
+}
+
+void UIImageGridType::drawText(QPainter *p, int curPos, int xpos, int ypos)
+{
+    QRect textRect(xpos, ypos, cellWidth, textHeight);
+    if (textPos == UIImageGridType::textPosBottom)
+        textRect.moveTop(ypos + cellHeight - textHeight);
+
+    if (m_debug == true)
+    {
+        p->setBrush(Qt::NoBrush);
+        p->setPen(Qt::blue);
+        p->drawRect(textRect);
+    }
+
+    QString msg = "Invalid Item!!";
+    ImageGridItem * item = allData->at(curPos);
+    if (item)
+    {
+        msg = item->text;
+
+        if (showCheck)
+        {
+            QRect cr(checkRect);
+            cr.moveBy(textRect.x(), textRect.y());
+            if (item->selected)
+                p->drawPixmap(cr, *checkFullPixmap);
+            else
+                p->drawPixmap(cr, *checkNonPixmap);
+
+            textRect.setX(textRect.x() + cr.width() + (int)(5 * m_wmult));
+        }
+    }
+
+    if (m_debug == true)
+    {
+        p->setBrush(Qt::NoBrush);
+        p->setPen(Qt::blue);
+        p->drawRect(textRect);
+    }
+
+    fontProp *font = has_focus ? activeFont : inactiveFont;
+
+    if (item && item->selected && showSelected)
+        font = selectedFont;
+
+    if (cutdown)
+        msg = cutDown(msg, &font->face, multilineText,
+                      textRect.width(), textRect.height());
+
+    p->setFont(font->face);
+
+    if (font->shadowOffset.x() != 0 || font->shadowOffset.y() != 0)
+    {
+        p->setBrush(font->dropColor);
+        p->setPen(QPen(font->dropColor, (int)(2 * m_wmult)));
+        p->drawText(textRect.left() + font->shadowOffset.x(),
+                    textRect.top() + font->shadowOffset.y(),
+                    textRect.width(), textRect.height(), justification, msg);
+    }
+
+    p->setBrush(font->color);
+    p->setPen(QPen(font->color, (int)(2 * m_wmult)));
+    p->drawText(textRect, justification, msg);
+}
+
+void UIImageGridType::recalculateLayout(void)
+{
+    loadImages();
+
+    int arrowHeight = 0;
+    if (showScrollArrows)
+        arrowHeight = upArrowRegPixmap->height() + (int)(5 * m_hmult);
+
+    cellWidth = (displayRect.width() - (padding * (columnCount -1))) / columnCount;
+    cellHeight = (displayRect.height() - arrowHeight -
+            (padding * (rowCount -1))) / rowCount;
+    lastRow = QMAX((int) ceilf((float) itemCount/columnCount) - 1, 0);
+    lastColumn = QMAX(itemCount - lastRow * columnCount - 1, 0);
+
+    // calc image item bounding rect
+    int yoffset = 0;
+    int bw = cellWidth;
+    int bh = cellHeight - textHeight;
+    int sw = (int) (7 * m_wmult);
+    int sh = (int) (7 * m_hmult);
+
+    imageRect.setX(sw);
+    imageRect.setY(sh + yoffset);
+    imageRect.setWidth((int) (bw - 2 * sw));
+    imageRect.setHeight((int) (bh - 2 * sw));
+
+    // centre check pixmap in text area
+    int cw = checkFullPixmap->width();
+    int ch = checkFullPixmap->height();
+    checkRect = QRect(0, (textHeight - ch) / 2, cw, ch);
+}
+
+QPixmap *UIImageGridType::createScaledPixmap(QString filename,
+                                             int width, int height, QImage::ScaleMode mode)
+{
+    QPixmap *pixmap = NULL;
+
+    if (filename != "")
+    {
+        QImage *img = gContext->LoadScaleImage(filename);
+        if (!img)
+        {
+            cout << "Failed to load image" << filename << endl;
+            return NULL;
+        }
+        else
+        {
+            pixmap = new QPixmap(img->smoothScale(width, height, mode));
+            delete img;
+        }
+    }
+
+    return pixmap;
+}
+
+void UIImageGridType::loadImages(void)
+{
+    int imgHeight = cellHeight - textHeight;
+    int imgWidth = cellWidth;
+    int sw = (int) (7 * m_wmult);
+    int sh = (int) (7 * m_hmult);
+
+    normalPixmap = createScaledPixmap(normalImage, imgWidth, imgHeight,
+                                      QImage::ScaleFree);
+    highlightedPixmap = createScaledPixmap(highlightedImage, imgWidth, imgHeight,
+                                           QImage::ScaleFree);
+    selectedPixmap = createScaledPixmap(selectedImage, imgWidth, imgHeight,
+                                        QImage::ScaleFree);
+    defaultPixmap = createScaledPixmap(defaultImage, imgWidth - 2 * sw,
+                                       imgHeight - 2 * sh,
+                                       QImage::ScaleMin);
+
+    checkNonPixmap = gContext->LoadScalePixmap("lb-check-empty.png");
+    checkHalfPixmap = gContext->LoadScalePixmap("lb-check-half.png");
+    checkFullPixmap = gContext->LoadScalePixmap("lb-check-full.png");
+    upArrowRegPixmap = gContext->LoadScalePixmap("lb-uparrow-reg.png");
+    upArrowActPixmap = gContext->LoadScalePixmap("lb-uparrow-sel.png");
+    dnArrowRegPixmap = gContext->LoadScalePixmap("lb-dnarrow-reg.png");
+    dnArrowActPixmap = gContext->LoadScalePixmap("lb-dnarrow-sel.png");
+}
+
+void UIImageGridType::calculateScreenArea(void)
+{
+    QRect r = displayRect;
+    r.moveBy(m_parent->GetAreaRect().left(),
+             m_parent->GetAreaRect().top());
+    screen_area = r;
+}
+
+QSize UIImageGridType::getImageItemSize(void)
+{
+    return QSize(imageRect.width(), imageRect.height());
+}
 
 // ******************************************************************
 

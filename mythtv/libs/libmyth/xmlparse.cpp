@@ -912,6 +912,244 @@ void XMLParse::parseGuideGrid(LayerSet *container, QDomElement &element)
     container->AddType(guide);
 }
 
+void XMLParse::parseImageGrid(LayerSet *container, QDomElement &element)
+{
+    int context = -1;
+    QString align = "";
+    QString activeFont = "";
+    QString inactiveFont = "";
+    QString selectedFont = "";
+    QString color = "";
+    QString textposition = "bottom";
+    QRect area;
+    int textheight = 0;
+    int rowcount = 3;
+    int columncount = 3;
+    int padding = 10;
+    bool cutdown = true;
+    bool multiline = false;
+    bool showChecks = false;
+    bool showSelected = false;
+    bool showScrollArrows = false;
+    QString defaultImage = "";
+    QString normalImage = "";
+    QString selectedImage = "";
+    QString highlightedImage = "";
+
+    QString name = element.attribute("name", "");
+    if (name.isNull() || name.isEmpty())
+    {
+        cerr << "Image Grid needs a name\n";
+        return;
+    }
+
+    QString order = element.attribute("draworder", "");
+    if (order.isNull() || order.isEmpty())
+    {
+        cerr << "Image Grid needs an order\n";
+        return;
+    }
+
+    for (QDomNode child = element.firstChild(); !child.isNull();
+         child = child.nextSibling())
+    {
+        QDomElement info = child.toElement();
+        if (!info.isNull())
+        {
+            if (info.tagName() == "context")
+            {
+                context = getFirstText(info).toInt();
+            }
+            else if (info.tagName() == "activefont")
+            {
+                activeFont = getFirstText(info);
+            }
+            else if (info.tagName() == "inactivefont")
+            {
+                inactiveFont = getFirstText(info);
+            }
+
+            else if (info.tagName() == "selectedfont")
+            {
+                selectedFont = getFirstText(info);
+            }
+            else if (info.tagName() == "area")
+            {
+                area = parseRect(getFirstText(info));
+                normalizeRect(area);
+            }
+            else if (info.tagName() == "columncount")
+            {
+                columncount = getFirstText(info).toInt();
+            }
+            else if (info.tagName() == "rowcount")
+            {
+                rowcount = getFirstText(info).toInt();
+            }
+            else if (info.tagName() == "padding")
+            {
+                padding = getFirstText(info).toInt();
+            }
+            else if (info.tagName() == "align")
+            {
+                align = getFirstText(info);
+            }
+            else if (info.tagName() == "cutdown")
+            {
+                if (getFirstText(info).lower() == "no")
+                    cutdown = false;
+            }
+            else if (info.tagName() == "showchecks")
+            {
+                if (getFirstText(info).lower() == "yes")
+                    showChecks = true;
+            }
+            else if (info.tagName() == "showselected")
+            {
+                if (getFirstText(info).lower() == "yes")
+                    showSelected = true;
+            }
+            else if (info.tagName() == "showscrollarrows")
+            {
+                if (getFirstText(info).lower() == "yes")
+                    showScrollArrows = true;
+            }
+            else if (info.tagName() == "textheight")
+            {
+                textheight = getFirstText(info).toInt();
+            }
+            else if (info.tagName() == "textposition")
+            {
+                textposition = getFirstText(info);
+            }
+            else if (info.tagName() == "multiline")
+            {
+                if (getFirstText(info).lower() == "yes")
+                    multiline = true;
+            }
+            else if (info.tagName() == "image")
+            {
+                QString imgname = "";
+                QString file = "";
+
+                imgname = info.attribute("function", "");
+                if (imgname.isNull() || imgname.isEmpty())
+                {
+                    cerr << "Image in a image grid needs a function\n";
+                    return;
+                }
+
+                file = info.attribute("filename", "");
+                if (file.isNull() || file.isEmpty())
+                {
+                    cerr << "Image in a image grid needs a filename\n";
+                    return;
+                }
+
+                if (imgname.lower() == "normal")
+                {
+                    normalImage = file;
+                }
+
+                if (imgname.lower() == "selected")
+                {
+                    selectedImage = file;
+                }
+
+                if (imgname.lower() == "highlighted")
+                {
+                    highlightedImage = file;
+                }
+
+                if (imgname.lower() == "default")
+                {
+                    defaultImage = file;
+                }
+
+            }
+            else
+            {
+                cerr << "Unknown: " << info.tagName() << " in bar\n";
+                return;
+            }
+        }
+    }
+    fontProp *font1 = GetFont(activeFont);
+    if (!font1)
+    {
+        cerr << "Unknown font: " << activeFont << " in image grid: " << name << endl;
+        return;
+    }
+
+    fontProp *font2 = GetFont(selectedFont);
+    if (!font2)
+    {
+        cerr << "Unknown font: " << selectedFont << " in image grid: " << name << endl;
+        return;
+    }
+
+    fontProp *font3 = GetFont(inactiveFont);
+    if (!font2)
+    {
+        cerr << "Unknown font: " << inactiveFont << " in image grid: " << name << endl;
+        return;
+    }
+
+    UIImageGridType *grid = new UIImageGridType(name, order.toInt());
+    grid->SetScreen(wmult, hmult);
+    grid->setActiveFont(font1);
+    grid->setSelectedFont(font2);
+    grid->setInactiveFont(font3);
+    grid->setCutDown(cutdown);
+    grid->setShowChecks(showChecks);
+    grid->setShowSelected(showSelected);
+    grid->setShowScrollArrows(showScrollArrows);
+    grid->setArea(area);
+    grid->setTextHeight(textheight);
+    grid->setPadding(padding);
+    grid->setRowCount(rowcount);
+    grid->setColumnCount(columncount);
+    grid->setDefaultImage(defaultImage);
+    grid->setNormalImage(normalImage);
+    grid->setSelectedImage(selectedImage);
+    grid->setHighlightedImage(highlightedImage);
+
+    int jst = Qt::AlignLeft | Qt::AlignTop;
+    if (multiline == true)
+        jst = Qt::WordBreak;
+
+    if (!align.isNull() && !align.isEmpty())
+    {
+        if (align.lower() == "center")
+            grid->setJustification(Qt::AlignCenter | jst);
+        else if (align.lower() == "right")
+            grid->setJustification(Qt::AlignRight | jst);
+        else if (align.lower() == "allcenter")
+            grid->setJustification(Qt::AlignHCenter | Qt::AlignVCenter | jst);
+        else if (align.lower() == "vcenter")
+            grid->setJustification(Qt::AlignVCenter | jst);
+        else if (align.lower() == "hcenter")
+            grid->setJustification(Qt::AlignHCenter | jst);
+    }
+    else
+        grid->setJustification(jst);
+
+    align = "";
+
+    if (textposition == "top")
+        grid->setTextPosition(UIImageGridType::textPosTop);
+    else
+        grid->setTextPosition(UIImageGridType::textPosBottom);
+
+    if (context != -1)
+    {
+        grid->SetContext(context);
+    }
+    container->AddType(grid);
+    grid->calculateScreenArea();
+    grid->recalculateLayout();
+}
+
 void XMLParse::parseBar(LayerSet *container, QDomElement &element)
 {
     int context = -1;
@@ -1206,6 +1444,10 @@ void XMLParse::parseContainer(QDomElement &element, QString &newname, int &conte
             else if (info.tagName() == "guidegrid")
             {
                 parseGuideGrid(container, info);
+            }
+            else if (info.tagName() == "imagegrid")
+            {
+                parseImageGrid(container, info);
             }
             else
             {

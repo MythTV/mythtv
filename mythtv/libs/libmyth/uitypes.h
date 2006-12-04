@@ -339,6 +339,171 @@ class MPUBLIC UIGuideType : public UIType
     int prog_past_col;
 };
 
+class ImageGridItem
+{
+    public:
+        ImageGridItem(const QString &text, QPixmap *pixmap, bool selected, void *data)
+        {
+            this->text = text;
+            this->pixmap = pixmap;
+            this->selected = selected;
+            this->data = data;
+        }
+
+        ImageGridItem(const ImageGridItem &o)
+        {
+            text = o.text;
+            pixmap = o.pixmap;
+            selected = o.selected;
+            data = o.data;
+        }
+
+        ~ImageGridItem(void)
+        {
+            if (pixmap)
+            {
+                delete pixmap;
+                pixmap = NULL;
+            }
+        }
+
+        ImageGridItem& operator=(ImageGridItem *rhs)
+        {
+            text = rhs->text;
+            pixmap = rhs->pixmap;
+            selected = rhs->selected;
+            data = rhs->data;
+            return *this;
+        }
+
+        QString text;
+        QPixmap *pixmap;
+        bool selected;
+        void *data;
+};
+
+class MPUBLIC UIImageGridType : public UIType
+{
+    Q_OBJECT
+
+    public:
+
+        UIImageGridType(const QString &name, int order);
+        ~UIImageGridType(void);
+
+        void setColumnCount(int count) { columnCount = count; }
+        void setRowCount(int count) { rowCount = count; }
+        void setItemCount(int count) { itemCount = count; }
+        void setBorderWidth(int width){ borderWidth = width; }
+        void setPadding(int value){ padding = value; }
+        void setArea(QRect area){ displayRect = area; }
+        void appendItem(ImageGridItem *item);
+        void updateItem(int itemNo, ImageGridItem *item);
+        void updateItem(ImageGridItem *item);
+        void reset(void);
+        void setJustification(int jst);
+        void setCutDown(bool state) { cutdown = state; }
+        void setActiveFont(fontProp *font) { this->activeFont = font; }
+        void setInactiveFont(fontProp *font) { this->inactiveFont = font; }
+        void setSelectedFont(fontProp *font) { this->selectedFont = font; }
+        void setWindow(MythDialog *win) { window = win; }
+        void setNormalImage(QString filename) { normalImage = filename; }
+        void setSelectedImage(QString filename) { selectedImage = filename; }
+        void setHighlightedImage(QString filename) { highlightedImage = filename; }
+        void setDefaultImage(QString filename) { defaultImage = filename; }
+        void setShowChecks(bool value) { showCheck = value; }
+        void setShowScrollArrows(bool value) { showScrollArrows = value; }
+        void setShowSelected(bool value) { showSelected = value; }
+
+        QSize getImageItemSize();
+        void  setCurrentPos(int pos);
+        void  setCurrentPos(QString value);
+        int   getCurrentPos() { return currentItem; }
+        ImageGridItem *getCurrentItem(void);
+        ImageGridItem *getItemAt(int pos);
+        ImageGridItem *getTopItem(void) { return getItemAt(topRow * columnCount); }
+        int   getItemCount(void) { return itemCount; }
+        int   getVisibleCount(void) { return columnCount * rowCount; }
+        int   getTopItemPos(void) { return topRow * columnCount; }
+
+        void calculateScreenArea();
+
+        enum textPosition
+        {
+            textPosTop,
+            textPosBottom,
+        };
+        void setTextPosition(textPosition position) { textPos = position; }
+        void setTextHeight(int height) { textHeight = height; }
+
+        void recalculateLayout(void);
+
+        void Draw(QPainter *p, int drawlayer, int context);
+        bool handleKeyPress(QString action);
+
+
+    signals:
+        void itemChanged(ImageGridItem *item);
+        void selectionChanged(ImageGridItem *item);
+
+    private:
+        void drawCell(QPainter *p, int curPos, int xpos, int ypos);
+        void drawText(QPainter *p, int curPos, int xpos, int ypos);
+        void loadImages(void);
+        QPixmap *createScaledPixmap(QString filename, int width, int height,
+                                    QImage::ScaleMode mode);
+        MythDialog *window;
+        int rowCount;
+        int columnCount;
+        int itemCount;
+        int currentItem;
+        int borderWidth;
+        int padding;
+        int cellWidth;
+        int cellHeight;
+        int topRow;
+        int lastRow;
+        int lastColumn;
+        int curColumn;
+        int curRow;
+
+        QRect displayRect; // bounding rect of all imagegrid
+        QRect imageRect;   // bounding rect of image item relative to cell rect
+        QRect checkRect;   // bounding rect of check pixmap
+
+        textPosition textPos;
+        int textHeight;
+        int justification;
+        bool multilineText;
+        fontProp *activeFont, *inactiveFont, *selectedFont;
+        bool cutdown;
+        bool showCheck;
+        bool showScrollArrows;
+        bool showSelected;
+        bool showUpArrow;
+        bool showDnArrow;
+        QString normalImage;
+        QString highlightedImage;
+        QString selectedImage;
+        QString defaultImage;
+
+        QPixmap *normalPixmap;
+        QPixmap *highlightedPixmap;
+        QPixmap *selectedPixmap;
+        QPixmap *defaultPixmap;
+
+        QPixmap *checkNonPixmap;
+        QPixmap *checkHalfPixmap;
+        QPixmap *checkFullPixmap;
+
+        QPixmap *upArrowRegPixmap;
+        QPixmap *upArrowActPixmap;
+        QPixmap *dnArrowRegPixmap;
+        QPixmap *dnArrowActPixmap;
+
+        QPtrList<ImageGridItem> *allData;
+};
+
 class MPUBLIC UIListType : public UIType
 {
     Q_OBJECT
