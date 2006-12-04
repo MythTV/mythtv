@@ -3505,8 +3505,12 @@ void MainServer::HandleGenPreviewPixmap(QStringList &slist, PlaybackSock *pbs)
 
     ProgramInfo *pginfo = new ProgramInfo();
     pginfo->FromStringList(slist, 1);
+    pginfo->pathname = pginfo->GetPlaybackURL();
 
-    if (ismaster && pginfo->hostname != gContext->GetHostName())
+    if ((ismaster) &&
+        (pginfo->hostname != gContext->GetHostName()) &&
+        ((!masterBackendOverride) ||
+         (pginfo->pathname.left(1) != "/")))
     {
         PlaybackSock *slave = getSlaveByHostname(pginfo->hostname);
 
@@ -3525,11 +3529,15 @@ void MainServer::HandleGenPreviewPixmap(QStringList &slist, PlaybackSock *pbs)
                 .arg(pginfo->title).arg(pginfo->subtitle));
     }
 
-    QUrl qurl = pginfo->pathname;
-    QString filename = qurl.path();
-
-    if (qurl.host() != "")
-        filename = LocalFilePath(qurl);
+    if (pginfo->pathname.left(1) != "/")
+    {
+        VERBOSE(VB_IMPORTANT, "MainServer: HandleGenPreviewPixmap: Unable to "
+                "find file locally, unable to make preview image.");
+        QStringList outputlist = "BAD";
+        SendResponse(pbssock, outputlist);
+        delete pginfo;
+        return;
+    }
 
     int len = 0;
     int width = 0, height = 0;
@@ -3538,10 +3546,10 @@ void MainServer::HandleGenPreviewPixmap(QStringList &slist, PlaybackSock *pbs)
                     gContext->GetNumSetting("RecordPreRoll",0);
 
     unsigned char *data = (unsigned char *)
-        PreviewGenerator::GetScreenGrab(pginfo, filename, secondsin,
+        PreviewGenerator::GetScreenGrab(pginfo, pginfo->pathname, secondsin,
                                         len, width, height, aspect);
 
-    if (data && PreviewGenerator::SavePreview(filename + ".png", data,
+    if (data && PreviewGenerator::SavePreview(pginfo->pathname + ".png", data,
                                               width, height, aspect))
     {
         QStringList retlist = "OK";
@@ -3565,12 +3573,16 @@ void MainServer::HandlePixmapLastModified(QStringList &slist, PlaybackSock *pbs)
 
     ProgramInfo *pginfo = new ProgramInfo();
     pginfo->FromStringList(slist, 1);
+    pginfo->pathname = pginfo->GetPlaybackURL();
 
     QDateTime lastmodified;
     QStringList strlist;
     Qt::DateFormat f = Qt::TextDate;
 
-    if (ismaster && pginfo->hostname != gContext->GetHostName())
+    if ((ismaster) &&
+        (pginfo->hostname != gContext->GetHostName()) &&
+        ((!masterBackendOverride) ||
+         (pginfo->pathname.left(1) != "/")))
     {
         PlaybackSock *slave = getSlaveByHostname(pginfo->hostname);
 
@@ -3592,26 +3604,17 @@ void MainServer::HandlePixmapLastModified(QStringList &slist, PlaybackSock *pbs)
         }
     }
 
-    if (!masterBackendOverride && // look locally if override is on
-        pginfo->hostname != gContext->GetHostName())
+    if (pginfo->pathname.left(1) != "/")
     {
-        VERBOSE(VB_IMPORTANT, QString("Got requested for last modified date and time "
-                                "of preview pixmap on %1")
-                                .arg(pginfo->hostname));
-
+        VERBOSE(VB_IMPORTANT, "MainServer: HandlePixmapLastModified: Unable to "
+                "find file locally, unable to get last modified date.");
         QStringList outputlist = "BAD";
         SendResponse(pbssock, outputlist);
         delete pginfo;
         return;
     }
 
-    QUrl qurl = pginfo->pathname;
-    QString filename = qurl.path();
-
-    if (qurl.host() != "")
-        filename = LocalFilePath(qurl);
-
-    filename += ".png";
+    QString filename = pginfo->pathname + ".png";
 
     QFileInfo finfo(filename);
 
