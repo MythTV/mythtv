@@ -31,7 +31,7 @@
 #******************************************************************************
 
 # version of script - change after each update
-VERSION="0.1.20061203-1"
+VERSION="0.1.20061204-1"
 
 
 ##You can use this debug flag when testing out new themes
@@ -55,6 +55,7 @@ import time, datetime, tempfile
 from fcntl import ioctl
 from CDROM import CDROMEJECT
 from CDROM import CDROMCLOSETRAY
+from shutil import copy
 
 # media types (should match the enum in mytharchivewizard.h)
 DVD_SL = 0
@@ -449,8 +450,28 @@ def getFormatedLengthOfVideo(index):
 
     return '%02d:%02d:%02d' % (hours, minutes, seconds)
 
-def createVideoChapters(itemnum, numofchapters, lengthofvideo, getthumbnails):      
+def frameToTime(frame, fps):
+    sec = int(frame / fps)
+    frame = frame - int(sec * fps)
+    mins = sec / 60
+    sec %= 60
+    hour = mins / 60
+    mins %= 60
+
+    return '%02d:%02d:%02d' % (hour, mins, sec)
+
+def createVideoChapters(itemnum, numofchapters, lengthofvideo, getthumbnails):
     """Returns numofchapters chapter marks even spaced through a certain time period"""
+
+    # if there are user defined thumb images already available use them
+    infoDOM = xml.dom.minidom.parse(os.path.join(getItemTempPath(itemnum),"info.xml"))
+    thumblistNode = infoDOM.getElementsByTagName("thumblist")
+    if thumblistNode.length > 0:
+        thumblist = getText(thumblistNode[0])
+        write("Using user defined thumb images - %s" % thumblist)
+        return thumblist
+
+    # no user defined thumbs so create them
     segment=int(lengthofvideo / numofchapters)
 
     write( "Video length is %s seconds. Each chapter will be %s seconds" % (lengthofvideo,segment))
@@ -585,7 +606,7 @@ def expandItemText(infoDOM, text, itemnumber, pagenumber, keynumber,chapternumbe
 
     #See if we can use the thumbnail/cover file for videos if there is one.
     if getText( infoDOM.getElementsByTagName("coverfile")[0]) =="":
-        text=string.replace(text,"%thumbnail", os.path.join( getItemTempPath(itemnumber), "thumbnail.jpg"))
+        text=string.replace(text,"%thumbnail", os.path.join( getItemTempPath(itemnumber), "title.jpg"))
     else:
         text=string.replace(text,"%thumbnail", getText( infoDOM.getElementsByTagName("coverfile")[0]) )
 
@@ -724,7 +745,8 @@ def loadFonts(themeDOM):
         write( "Loading font %s, %s size %s" % (fontnumber,getFontPathName(fontname),fontsize) )
         fontnumber+=1
 
-def getFileInformation(file, outputfile):
+def getFileInformation(file, folder):
+    outputfile = os.path.join(folder, "info.xml")
     impl = xml.dom.minidom.getDOMImplementation()
     infoDOM = impl.createDocument(None, "fileinfo", None)
     top_element = infoDOM.documentElement
@@ -797,7 +819,6 @@ def getFileInformation(file, outputfile):
 
                 #date time is returned as 2005-12-19 00:15:00 
                 recdate = time.strptime(str(record[0])[0:19], "%Y-%m-%d %H:%M:%S")
-
                 node = infoDOM.createElement("starttime")
                 node.appendChild(infoDOM.createTextNode( time.strftime("%Y-%m-%dT%H:%M:%S", recdate)))
                 top_element.appendChild(node)
@@ -865,7 +886,6 @@ def getFileInformation(file, outputfile):
 
             #date time is returned as 2005-12-19 00:15:00            
             recdate = time.strptime(str(record[0])[0:19], "%Y-%m-%d %H:%M:%S")
-
             node = infoDOM.createElement("recordingdate")
             node.appendChild(infoDOM.createTextNode( time.strftime(dateformat,recdate)  ))
             top_element.appendChild(node)
@@ -897,7 +917,6 @@ def getFileInformation(file, outputfile):
 
             #date time is returned as 2005-12-19 00:15:00 
             recdate = time.strptime(str(record[7])[0:19], "%Y-%m-%d %H:%M:%S")
-
             node = infoDOM.createElement("starttime")
             node.appendChild(infoDOM.createTextNode( time.strftime("%Y-%m-%dT%H:%M:%S", recdate)))
             top_element.appendChild(node)
@@ -1051,6 +1070,33 @@ def getFileInformation(file, outputfile):
         node.appendChild(infoDOM.createTextNode(""))
         top_element.appendChild(node)   
 
+    # if the jobfile has thumb image details copy the images to the work dir
+    thumbs = file.getElementsByTagName("thumbimages")
+    if thumbs.length > 0:
+        thumbs = thumbs[0]
+        thumbs = file.getElementsByTagName("thumb")
+        thumblist = ""
+        res, fps, ar = getVideoParams(folder)
+
+        for thumb in thumbs:
+            caption = thumb.attributes["caption"].value
+            frame = thumb.attributes["frame"].value
+            filename = thumb.attributes["filename"].value
+            if caption != "Title":
+                if thumblist != "":
+                    thumblist += "," + frameToTime(int(frame), float(fps))
+                else:
+                    thumblist += frameToTime(int(frame), float(fps))
+
+            # copy thumb file to work dir
+            copy(filename, folder)
+
+        node = infoDOM.createElement("thumblist")
+        node.appendChild(infoDOM.createTextNode(thumblist))
+        top_element.appendChild(node)
+
+        #top_element.appendChild(thumbs)
+
     WriteXMLToFile (infoDOM, outputfile)
 
 def WriteXMLToFile(myDOM, filename):
@@ -1087,10 +1133,9 @@ def preProcessFile(file, folder):
     if file.hasAttribute("localfilename"):
         mediafile = file.attributes["localfilename"].value
 
-    #write( "Original file is",os.path.getsize(mediafile),"bytes in size")
-    getFileInformation(file, os.path.join(folder, "info.xml"))
-
     getStreamInformation(mediafile, os.path.join(folder, "streaminfo.xml"), 0)
+
+    getFileInformation(file, folder)
 
     videosize = getVideoSize(os.path.join(folder, "streaminfo.xml"))
 
@@ -1847,15 +1892,25 @@ def createDVDAuthorXML(screensize, numberofitems):
                 post.appendChild(dvddom.createTextNode("jump cell 1;"))
                 mymenupgc.appendChild(post)
 
+                # the first chapter MUST be 00:00:00 if its not dvdauthor adds it which 
+                # throws of the chapter selection - so make sure we add it if needed so we
+                # can compensate for it in the chapter selection menu 
+                firstChapter = 0
+                thumbNode = infoDOM.getElementsByTagName("thumblist")
+                if thumbNode.length > 0:
+                    thumblist = getText(thumbNode[0])
+                    chapterlist = string.split(thumblist, ",")
+                    if chapterlist[0] != '00:00:00':
+                        firstChapter = 1
                 x=1
                 while x<=chapters:
                     #Add this recording to this page's menu...
                     button=dvddom.createElement("button")
                     button.setAttribute("name","%s" % x)
                     if wantDetailsPage: 
-                        button.appendChild(dvddom.createTextNode("jump title %s chapter %s;" % (1, x + 1)))
+                        button.appendChild(dvddom.createTextNode("jump title %s chapter %s;" % (1, firstChapter + x + 1)))
                     else:
-                        button.appendChild(dvddom.createTextNode("jump title %s chapter %s;" % (1, x)))
+                        button.appendChild(dvddom.createTextNode("jump title %s chapter %s;" % (1, firstChapter + x)))
 
                     mymenupgc.appendChild(button)
                     del button
@@ -2603,8 +2658,7 @@ def createChapterMenu(screensize, screendpi, numberofitems):
         spumuxdom = xml.dom.minidom.parseString('<subpictures><stream><spu force="yes" start="00:00:00.0" highlight="" select="" ></spu></stream></subpictures>')
         spunode = spumuxdom.documentElement.firstChild.firstChild
 
-        #Extracting the thumbnails for the video takes an incredibly long time
-        #need to look at a switch to disable this. or not use FFMPEG
+        #Extract the thumbnails
         chapterlist=createVideoChapters(page,itemsperpage,getLengthOfVideo(page),True)
         chapterlist=string.split(chapterlist,",")
 
@@ -3039,8 +3093,6 @@ def isFileOkayForDVD(file, folder):
     return True
 
 def processFile(file, folder):
-    from shutil import copy
-
     """Process a single video/recording file ready for burning."""
 
     write( "*************************************************************")
@@ -3218,23 +3270,24 @@ def processFile(file, folder):
     # check if we need to convert any of the audio streams to ac3
     processAudio(folder)
 
-    # if the file is a recording try to use its preview image for the thumb
-    if file.attributes["type"].value == "recording":
-        previewImage = file.attributes["filename"].value + ".png"
-        if usebookmark == True and os.path.exists(previewImage):
-            copy(previewImage, os.path.join(folder, "thumbnail.jpg"))
+    # if we don't already have one find a title thumbnail image
+    titleImage = os.path.join(folder, "title.jpg")
+    if not os.path.exists(titleImage):
+        # if the file is a recording try to use its preview image for the thumb
+        if file.attributes["type"].value == "recording":
+            previewImage = file.attributes["filename"].value + ".png"
+            if usebookmark == True and os.path.exists(previewImage):
+                copy(previewImage, titleImage)
+            else:
+                extractVideoFrame(os.path.join(folder, "stream.mv2"), titleImage, thumboffset)
         else:
-            extractVideoFrame(os.path.join(folder, "stream.mv2"), os.path.join(folder,"thumbnail.jpg"), thumboffset)
-    else:
-        extractVideoFrame(os.path.join(folder, "stream.mv2"), os.path.join(folder, "thumbnail.jpg"), thumboffset)
+            extractVideoFrame(os.path.join(folder, "stream.mv2"), titleImage, thumboffset)
 
     write( "*************************************************************")
     write( "Finished processing file " + file.attributes["filename"].value)
     write( "*************************************************************")
 
 def copyRemote(files,tmpPath):
-    from shutil import copy
-
     localTmpPath = os.path.join(tmpPath, "localcopy")
     # Define remote filesystems
     remotefs = ['nfs','smbfs']

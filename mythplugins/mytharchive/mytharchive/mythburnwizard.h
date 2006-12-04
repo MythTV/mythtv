@@ -53,12 +53,6 @@ class MythburnWizard : public MythThemedDialog
     void toggleEraseDvdRw(bool state) { bEraseDvdRw = state; };
 
   private:
-    ArchiveDestination archiveDestination;
-    int destination_no;
-    QString themeDir; 
-    int freeSpace;
-    int usedSpace;
-
     void getThemeList(void);
     void updateArchiveList(void);
     void toggleSelectedState(void);
@@ -81,6 +75,12 @@ class MythburnWizard : public MythThemedDialog
     long long recalcSize(EncoderProfile *profile, ArchiveItem *a);
     void setProfile(EncoderProfile *profile, ArchiveItem *item);
     void runScript();
+
+    ArchiveDestination archiveDestination;
+    int destination_no;
+    QString themeDir; 
+    int freeSpace;
+    int usedSpace;
 
     vector<ArchiveItem *>  *archiveList;
     QPtrList<ArchiveItem> selectedList;

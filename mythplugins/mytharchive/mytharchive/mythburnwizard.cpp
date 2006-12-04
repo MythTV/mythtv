@@ -21,6 +21,7 @@
 #include "mythburnwizard.h"
 #include "editmetadata.h"
 #include "fileselector.h"
+#include "thumbfinder.h"
 
 // last page in wizard
 const int LAST_PAGE = 4;
@@ -34,6 +35,12 @@ MythburnWizard::MythburnWizard(MythMainWindow *parent, QString window_name,
                 : MythThemedDialog(parent, window_name, theme_filename, name, true)
 {
     themeDir = gContext->GetShareDir() + "mytharchive/themes/";
+
+    // remove any old thumb images
+    QString thumbDir = getTempDirectory() + "/config/thumbs";
+    QDir dir(thumbDir);
+    if (dir.exists())
+        system("rm -rf " + thumbDir);
 
     archiveList = NULL;
     popupMenu = NULL;
@@ -201,11 +208,19 @@ void MythburnWizard::keyPressEvent(QKeyEvent *e)
         }
         else if (action == "INFO")
         {
-            if (freeSpace == MAX_DVDR_SIZE_SL)
-                freeSpace = MAX_DVDR_SIZE_DL;
-            else
-                freeSpace = MAX_DVDR_SIZE_SL;
-            updateSizeBar();
+            if (getContext() == LAST_PAGE)
+            {
+                UIListBtnTypeItem *item = selected_list->GetItemCurrent();
+
+                if (!item)
+                    return;
+
+                ArchiveItem *a = (ArchiveItem *) item->getData();
+
+                ThumbFinder finder(a, theme_list[theme_no], gContext->GetMainWindow(), 
+                                   "thumbfinder", "mythburn-", "thumb finder");
+                finder.exec();
+            }
         }
         else if (action == "TOGGLECUT")
         {
@@ -1066,7 +1081,7 @@ vector<ArchiveItem *> *MythburnWizard::getArchiveListFromDB(void)
                 item->videoCodec = "";
                 item->videoWidth = 0;
                 item->videoHeight = 0;
-
+                item->thumbList.setAutoDelete(true);
                 archiveList->push_back(item);
             }
         }
@@ -1209,6 +1224,22 @@ void MythburnWizard::createConfigFile(const QString &filename)
             details.setAttribute("starttime", a->startTime.utf8());
             QDomText desc = doc.createTextNode(a->description.utf8());
             details.appendChild(desc);
+        }
+
+        if (a->thumbList.count() > 0)
+        {
+            QDomElement thumbs = doc.createElement("thumbimages");
+            file.appendChild(thumbs);
+
+            for (uint x = 0; x < a->thumbList.count(); x++)
+            {
+                QDomElement thumb = doc.createElement("thumb");
+                thumbs.appendChild(thumb);
+                ThumbImage *thumbImage = a->thumbList.at(x);
+                thumb.setAttribute("caption", thumbImage->caption.utf8());
+                thumb.setAttribute("filename", thumbImage->filename);
+                thumb.setAttribute("frame", (int) thumbImage->frame);
+            }
         }
 
         media.appendChild(file);

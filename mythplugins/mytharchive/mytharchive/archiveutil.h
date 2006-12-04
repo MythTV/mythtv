@@ -37,6 +37,13 @@ typedef struct
     float bitrate;
 } EncoderProfile;
 
+typedef struct ThumbImage
+{
+    QString caption;
+    QString filename;
+    int64_t frame;
+} ThumbImage;
+
 typedef struct
 {
     int     id;
@@ -57,8 +64,8 @@ typedef struct
     bool hasCutlist;
     bool useCutlist;
     bool editedDetails;
+    QPtrList<ThumbImage> thumbList;
 } ArchiveItem;
-
 
 QString formatSize(long long sizeKB, int prec = 2);
 QString getTempDirectory();

@@ -7,7 +7,8 @@ include (config.pro)
    error(Missing config.pro: please run the configure script)
 }
 
-INCLUDEPATH += $${PREFIX}/include/mythtv
+INCLUDEPATH += $${PREFIX}/include/mythtv $${PREFIX}/include/mythtv/ffmpeg 
+INCLUDEPATH += $${PREFIX}/include/mythtv/libmythtv
 
 TEMPLATE = lib opengl
 CONFIG += plugin thread
@@ -65,9 +66,18 @@ createdvd {
     INSTALLS +=  scriptfiles introfiles themefiles imagefiles musicfiles 
     INSTALLS +=  profilefiles burnuifiles
 
-    HEADERS += mythburnwizard.h editmetadata.h
+    HEADERS += mythburnwizard.h editmetadata.h thumbfinder.h
 
-    SOURCES += mythburnwizard.cpp editmetadata.cpp
+    SOURCES += mythburnwizard.cpp editmetadata.cpp thumbfinder.cpp
+
+#    LIBS += -lmythavutil-$$LIBVERSION
+#    LIBS += -lmythavcodec-$$LIBVERSION
+#    LIBS += -lmythavformat-$$LIBVERSION
+
+#    LIBS += -lavutil
+#    LIBS += -lavcodec
+#    LIBS += -lavformat
+
 }
 
 #######################################

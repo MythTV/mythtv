@@ -1719,9 +1719,12 @@ int grabThumbnail(QString inFile, QString thumbList, QString outFile)
                     int res = av_read_frame(inputFC, &pkt);
                     if (res < 0)
                         break;
-                    frameNo++;
-                    avcodec_decode_video(codecCtx, frame, &frameFinished, pkt.data, pkt.size);
-                    keyFrame = frame->key_frame;
+                    if (pkt.stream_index == videostream)
+                    {
+                        frameNo++;
+                        avcodec_decode_video(codecCtx, frame, &frameFinished, pkt.data, pkt.size);
+                        keyFrame = frame->key_frame;
+                    }
                 }
 
                 if (frameFinished)
