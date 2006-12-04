@@ -140,7 +140,7 @@ void ProgramData::clearOldDBEntries(void)
     if (no_delete)
     {
         offset = 7;
-        VERBOSE(VB_GENERAL, "Keeping 7 days of data.");
+        VERBOSE(VB_GENERAL, "Listings Cleanup: Keeping 7 days of data.");
     }
 
     query.prepare("DELETE FROM oldprogram WHERE airdate < "

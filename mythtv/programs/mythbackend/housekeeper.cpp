@@ -18,6 +18,8 @@ using namespace std;
 #include "libmyth/mythdbcon.h"
 #include "libmyth/util.h"
 
+#include "programdata.h"
+
 static bool HouseKeeper_filldb_running = false;
 
 HouseKeeper::HouseKeeper(bool runthread, bool master)
@@ -225,6 +227,7 @@ void HouseKeeper::RunHouseKeeping(void)
                 JobQueue::CleanupOldJobsInQueue();
                 CleanupAllOldInUsePrograms();
                 CleanupRecordedTables();
+                CleanupProgramListings();
                 updateLastrun("DailyCleanup");
             }
         }
@@ -368,6 +371,20 @@ void HouseKeeper::CleanupRecordedTables(void)
 
         tableIndex++;
         table = tables[tableIndex];
+    }
+}
+
+void HouseKeeper::CleanupProgramListings(void)
+{
+    if (!gContext->GetNumSetting("MythFillEnabled", 0))
+    {
+        ProgramData *prog_data = new ProgramData;
+        // Keep 7 days of old listings.  Users wanting listings deleted
+        // "immediately" may set up mythfilldatabase to run without
+        // the "--no-delete" argument
+        prog_data->no_delete = true;
+        prog_data->clearOldDBEntries();
+        delete prog_data;
     }
 }
 
