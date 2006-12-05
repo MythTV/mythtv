@@ -63,7 +63,7 @@ PreviewGenerator::PreviewGenerator(const ProgramInfo *pginfo,
         return;
 
     // Try to find a local means to access file...
-    QString localFN  = programInfo.GetPlaybackURL();
+    QString localFN  = programInfo.GetPlaybackURL(false, true);
     if (!(localFN.left(1) == "/" && QFileInfo(localFN).exists()))
         return; // didn't find file locally, must use remote backend
 

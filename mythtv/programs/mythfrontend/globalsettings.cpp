@@ -1089,6 +1089,18 @@ static HostComboBox *PreferredMPEG2Decoder()
     return gc;
 }
 
+static HostCheckBox *AlwaysStreamFiles()
+{
+    HostCheckBox *gc = new HostCheckBox("AlwaysStreamFiles");
+    gc->setLabel(QObject::tr("Always stream recordings from the backend"));
+    gc->setValue(false);
+    gc->setHelpText(QObject::tr("Enable this setting if you want MythTV to "
+                    "always stream files from a remote backend instead of "
+                    "directly reading a recording file if it is accessible "
+                    "locally."));
+    return gc;
+}
+
 static HostCheckBox *UseVideoTimebase()
 {
     HostCheckBox *gc = new HostCheckBox("UseVideoTimebase");
@@ -3466,7 +3478,6 @@ PlaybackSettings::PlaybackSettings()
     general->setLabel(QObject::tr("General playback"));
     general->addChild(new DeinterlaceSettings());
     general->addChild(CustomFilters());
-    general->addChild(PreferredMPEG2Decoder());
 #ifdef USING_OPENGL_VSYNC
     general->addChild(UseOpenGLVSync());
 #endif // USING_OPENGL_VSYNC
@@ -3521,7 +3532,12 @@ PlaybackSettings::PlaybackSettings()
     pbox3->addChild(new WatchListSettings());
     addChild(pbox3);
 
-    addChild(new HwDecSettings());
+    VerticalConfigurationGroup* decoder = new VerticalConfigurationGroup(false);
+    decoder->setLabel(QObject::tr("Decoder Settings"));
+    decoder->addChild(PreferredMPEG2Decoder());
+    decoder->addChild(AlwaysStreamFiles());
+    decoder->addChild(new HwDecSettings());
+    addChild(decoder);
 
     VerticalConfigurationGroup* seek = new VerticalConfigurationGroup(false);
     seek->setLabel(QObject::tr("Seeking"));

@@ -398,7 +398,7 @@ int main(int argc, char *argv[])
             return TRANSCODE_EXIT_NO_RECORDING_DATA;
         }
 
-        infile = pginfo->GetPlaybackURL();
+        infile = pginfo->GetPlaybackURL(false, true);
     }
     else
     {
@@ -597,7 +597,7 @@ void CompleteJob(int jobID, ProgramInfo *pginfo, bool useCutlist, int &resultCod
         return;
     }
 
-    QString filename = pginfo->GetPlaybackURL();
+    QString filename = pginfo->GetPlaybackURL(false, true);
 
     if (status == JOB_STOPPING)
     {

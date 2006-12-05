@@ -1504,7 +1504,7 @@ QString ProgramInfo::GetRecordBasename(bool fromDB) const
  *         If the file is accessible locally, the filename will be returned,
  *         otherwise a myth:// URL will be returned.
  */
-QString ProgramInfo::GetPlaybackURL(bool checkMaster)
+QString ProgramInfo::GetPlaybackURL(bool checkMaster, bool forceCheckLocal)
 {
     if (playbackurl != "")
         return playbackurl;
@@ -1513,23 +1513,30 @@ QString ProgramInfo::GetPlaybackURL(bool checkMaster)
     QString basename = GetRecordBasename(true);
     pathname = basename;
 
-    // Check to see if the file exists locally
-    StorageGroup sgroup(storagegroup);
-    tmpURL = sgroup.FindRecordingFile(basename);
+    bool alwaysStream = gContext->GetNumSetting("AlwaysStreamFiles", 0);
 
-    if (tmpURL != "")
+    if ((!alwaysStream) ||
+        (forceCheckLocal) ||
+        (hostname == gContext->GetHostName()))
     {
-        VERBOSE(VB_FILE, LOC +
-                QString("GetPlaybackURL: File is local: '%1'").arg(tmpURL));
-        playbackurl = tmpURL;
-        return tmpURL;
-    }
-    else if (hostname == gContext->GetHostName())
-    {
-        VERBOSE(VB_FILE, LOC_ERR + QString("GetPlaybackURL: '%1' should be "
-                "local, but it can not be found.").arg(basename));
-        return QString("/GetPlaybackURL/UNABLE/TO/FIND/LOCAL/FILE/ON/%1/%2")
-                       .arg(hostname).arg(basename);
+        // Check to see if the file exists locally
+        StorageGroup sgroup(storagegroup);
+        tmpURL = sgroup.FindRecordingFile(basename);
+
+        if (tmpURL != "")
+        {
+            VERBOSE(VB_FILE, LOC +
+                    QString("GetPlaybackURL: File is local: '%1'").arg(tmpURL));
+            playbackurl = tmpURL;
+            return tmpURL;
+        }
+        else if (hostname == gContext->GetHostName())
+        {
+            VERBOSE(VB_FILE, LOC_ERR + QString("GetPlaybackURL: '%1' should be "
+                    "local, but it can not be found.").arg(basename));
+            return QString("/GetPlaybackURL/UNABLE/TO/FIND/LOCAL/FILE/ON/%1/%2")
+                           .arg(hostname).arg(basename);
+        }
     }
 
     // Check to see if we should stream from the master backend

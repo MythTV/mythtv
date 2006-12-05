@@ -1613,7 +1613,7 @@ QString JobQueue::GetJobCommand(int id, int jobType, ProgramInfo *tmpInfo)
 
     if (command != "")
     {
-        QString pburl = tmpInfo->GetPlaybackURL();
+        QString pburl = tmpInfo->GetPlaybackURL(false, true);
         if (pburl.left(7) == "myth://")
         {
             // If the file isn't accessible locally, at least show where it is.
@@ -1790,7 +1790,7 @@ void JobQueue::DoTranscodeThread(void)
         ChangeJobStatus(jobID, JOB_STARTING);
         program_info->SetTranscoded(TRANSCODING_RUNNING);
 
-        QString filename = program_info->GetPlaybackURL();
+        QString filename = program_info->GetPlaybackURL(false, true);
 
         origfilesize = 0;
         filesize = 0;
@@ -1853,7 +1853,7 @@ void JobQueue::DoTranscodeThread(void)
                 // Clear the pathname to force rechecking the DB in case 
                 // mythtranscode renamed the file.
                 program_info->pathname = "";
-                filename = program_info->GetPlaybackURL();
+                filename = program_info->GetPlaybackURL(false, true);
 
                 if (stat(filename.ascii(), &st) == 0)
                 {

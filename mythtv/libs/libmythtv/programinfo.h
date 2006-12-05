@@ -169,7 +169,8 @@ class MPUBLIC ProgramInfo
     // Quick gets
     bool SetRecordBasename(QString basename);
     QString GetRecordBasename(bool fromDB = false) const;
-    QString GetPlaybackURL(bool checkMaster = false);
+    QString GetPlaybackURL(bool checkMaster = false,
+                           bool forceCheckLocal = false);
     QString MakeUniqueKey(void) const;
     int CalculateLength(void) const;
     int SecsTillStart() const;
