@@ -312,7 +312,7 @@ PlaybackBox::PlaybackBox(BoxType ltype, MythMainWindow *parent,
     if (player)
     {
         m_player = player;
-        if (m_player->getCurrentProgram())
+        if (m_player->getCurrentProgram() && m_player->IsPlaying())
             recGroup = m_player->getCurrentProgram()->recgroup;
     }
     // recording group stuff
@@ -397,7 +397,7 @@ PlaybackBox::PlaybackBox(BoxType ltype, MythMainWindow *parent,
     setNoErase();
     gContext->addListener(this);
 
-    if (!player && ((!recGroupPassword.isEmpty()) ||
+    if (!m_player && ((!recGroupPassword.isEmpty()) ||
         ((titleList.count() <= 1) && (progsInDB > 0)) ||
         (initialFilt)))
         showRecGroupChooser();
