@@ -1,6 +1,14 @@
 #include <iostream>
 #include <stdint.h>
 #include <sys/wait.h>  // for WIFEXITED and WEXITSTATUS
+
+#ifdef CONFIG_DARWIN
+#include <sys/param.h>
+#include <sys/mount.h>
+#elif __linux__
+#include <sys/vfs.h>
+#endif
+
 using namespace std;
 
 
@@ -2083,33 +2091,67 @@ int getDBParamters(QString outFile)
     return 0;
 }
 
+int isRemote(QString filename)
+{
+    // check if the file exists
+    if (!QFile::exists(filename))
+        return 0;
+
+    struct statfs statbuf;
+    bzero(&statbuf, sizeof(statbuf));
+
+#ifdef CONFIG_DARWIN
+    if ((statfs(filename, &statbuf) == 0) &&
+        ((!strcmp(statbuf.f_fstypename, "nfs")) ||      // NFS|FTP
+            (!strcmp(statbuf.f_fstypename, "afpfs")) || // ApplShr
+            (!strcmp(statbuf.f_fstypename, "smbfs"))))  // SMB
+        return 2;
+#elif __linux__
+    if ((statfs(filename, &statbuf) == 0) &&
+        ((statbuf.f_type == 0x6969) ||      // NFS
+            (statbuf.f_type == 0x517B)))    // SMB
+        return 2;
+#endif
+
+    return 1;
+}
+
 void showUsage()
 {
     cout << "Usage of mytharchivehelper\n"; 
     cout << "-t/--createthumbnail infile thumblist outfile\n";
-    cout << "                          (create one or more thumbnails\n";
+    cout << "       (create one or more thumbnails)\n";
     cout << "       infile    - filename of recording to grab thumbs from\n";
     cout << "       thumblist - comma seperated list of required thumbs in seconds\n";
     cout << "       outfile   - name of file to save thumbs to eg 'thumb-%1.jpg'\n";
-    cout << "                   %1 will be replaced with the no. of the thumb\n";
+    cout << "                   %1 will be replaced with the no. of the thumb\n\n";
     cout << "-i/--getfileinfo infile outfile method\n";
-    cout << "                          (write some file information to outfile for infile)\n";
-    cout << "                          method is the method to used to calc the file duration\n";
-    cout << "                          0 - use av_estimate_timings() (quick but not very accurate)\n";
-    cout << "                          1 - read all frames (most accurate but slow)\n";
-    cout << "                          2 - use position map in DB (quick, only works for myth recordings)\n";
+    cout << "       (write some file information to outfile for infile)\n";
+    cout << "       method is the method to used to calc the file duration\n";
+    cout << "       0 - use av_estimate_timings() (quick but not very accurate)\n";
+    cout << "       1 - read all frames (most accurate but slow)\n";
+    cout << "       2 - use position map in DB (quick, only works for myth recordings)\n\n";
     cout << "-p/--getdbparameters outfile\n";
-    cout << "                          (write the mysql database parameters to outfile)\n";
+    cout << "       (write the mysql database parameters to outfile)\n\n";
     cout << "-n/--nativearchive jobfile \n";
-    cout << "                          (archive files to a native archive format)\n";
-    cout << "       jobfile    - filename of archive job file\n";
+    cout << "       (archive files to a native archive format)\n";
+    cout << "       jobfile    - filename of archive job file\n\n";
     cout << "-f/--importarchive xmlfile chanID\n";
-    cout << "                          (import an archived file)\n";
+    cout << "       (import an archived file)\n";
     cout << "       xmlfile    - filename of the archive xml file\n";
-    cout << "       chanID     - chanID to use when inserting records in DB\n";
-    cout << "-l/--log logfile          (name of log file to send messages)\n";
-    cout << "-v/--verbose debug-level  (Use '-v help' for level info)\n";
-    cout << "-h/--help                 (shows this usage)\n";
+    cout << "       chanID     - chanID to use when inserting records in DB\n\n";
+    cout << "-r/--isremote file\n";
+    cout << "       (check if file is on a remote filesystem)\n";
+    cout << "       file       - filename to check\n";
+    cout << "       returns    - 0 on error or file not found\n";
+    cout << "                  - 1 file is on a local filesystem\n";
+    cout << "                  - 2 file is on a remote filesystem\n";
+    cout << "-l/--log logfile\n"; 
+    cout << "       (name of log file to send messages)\n\n";
+    cout << "-v/--verbose debug-level\n";  
+    cout << "       (Use '-v help' for level info)\n\n";
+    cout << "-h/--help\n";
+    cout << "       (shows this usage)\n";
 }
 
 int main(int argc, char **argv)
@@ -2135,6 +2177,7 @@ int main(int argc, char **argv)
     bool bNativeArchive = false;
     bool bImportArchive = false;
     bool bGetFileInfo = false;
+    bool bIsRemote = false;
     QString thumbList;
     QString inFile;
     QString outFile;
@@ -2211,6 +2254,21 @@ int main(int argc, char **argv)
             else
             {
                 cerr << "Missing argument to -p/--getdbparameters option\n";
+                return FRONTEND_EXIT_INVALID_CMDLINE;
+            }
+        }
+        else if (!strcmp(a.argv()[argpos],"-r") ||
+                  !strcmp(a.argv()[argpos],"--isremote"))
+        {
+            bIsRemote = true;
+            if (a.argc()-1 > argpos)
+            {
+                inFile = a.argv()[argpos+1]; 
+                ++argpos;
+            } 
+            else
+            {
+                cerr << "Missing argument to -r/--isremote option\n";
                 return FRONTEND_EXIT_INVALID_CMDLINE;
             }
         }
@@ -2335,6 +2393,8 @@ int main(int argc, char **argv)
         res = doImportArchive(inFile, chanID);
     else if (bGetFileInfo)
         res = getFileInfo(inFile, outFile, lenMethod);
+    else if (bIsRemote)
+        res = isRemote(inFile);
     else 
         showUsage();
 

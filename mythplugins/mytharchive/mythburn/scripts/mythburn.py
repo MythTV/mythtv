@@ -31,7 +31,7 @@
 #******************************************************************************
 
 # version of script - change after each update
-VERSION="0.1.20061204-1"
+VERSION="0.1.20061205-1"
 
 
 ##You can use this debug flag when testing out new themes
@@ -300,6 +300,8 @@ def checkCancelFlag():
 def runCommand(command):
     checkCancelFlag()
     result=os.system(command)
+    if os.WIFEXITED(result):
+        result = os.WEXITSTATUS(result)
     checkCancelFlag()
     return result
 
@@ -3287,47 +3289,26 @@ def processFile(file, folder):
     write( "Finished processing file " + file.attributes["filename"].value)
     write( "*************************************************************")
 
-def copyRemote(files,tmpPath):
+def copyRemote(files, tmpPath):
+    '''go through the list of files looking for files on remote filesytems
+       and copy them to a local file for quicker processing'''
     localTmpPath = os.path.join(tmpPath, "localcopy")
-    # Define remote filesystems
-    remotefs = ['nfs','smbfs']
-    remotemounts = []
-    # What does mount say?
-    mounts = os.popen('mount')
-    # Go through each line of mounts output
-    for line in mounts.readlines():
-        parts = line.split()
-        # mount says in this format
-        device, txt1, mountpoint, txt2, filesystem, options = parts
-        # only do if really remote
-        if filesystem in remotefs:
-            # add remote to list
-            remotemounts.append(string.split(mountpoint,'/'))
-            # go through files
-            for node in files:
-                # go through list
-                for mount in remotemounts:
-                    tmpfile = string.split(node.attributes["filename"].value, '/')
-                    filename = tmpfile[len(tmpfile)-1]
-                    tmpfiledirs=""
-                    tmpremotedir=""
-                    # path has to be minimum length of mountpoint
-                    if len(tmpfile) > len(mount):
-                        for i in range(len(mount)):
-                            tmpfiledirs = tmpfiledirs + tmpfile[i] + "/"
-                        for i in range(len(mount)):
-                            tmpremotedir = tmpremotedir + mount[i] + "/"
-                        # Is it like the mount point?
-                        if tmpfiledirs == tmpremotedir:
-                            # Write that we copy
-                            write("Copying file from " + node.attributes["filename"].value)
-                            write("to " + os.path.join(localTmpPath, filename))
-                            # Copy file
-                            if not doesFileExist(os.path.join(localTmpPath, filename)):
-                                copy(node.attributes["filename"].value, os.path.join(localTmpPath, filename))
-                            # update node
-                            node.setAttribute("localfilename", os.path.join(localTmpPath, filename))
-			    print node.attributes["localfilename"].value
+    for node in files:
+        tmpfile = node.attributes["filename"].value
+        filename = os.path.basename(tmpfile)
+
+        res = runCommand("mytharchivehelper -r " + quoteFilename(tmpfile))
+        if res == 2:
+            # file is on a remote filesystem so copy it to a local file
+            write("Copying file from " + tmpfile)
+            write("to " + os.path.join(localTmpPath, filename))
+
+            # Copy file
+            if not doesFileExist(os.path.join(localTmpPath, filename)):
+                copy(tmpfile, os.path.join(localTmpPath, filename))
+
+            # update node
+            node.setAttribute("localfilename", os.path.join(localTmpPath, filename))
     return files
 
 def processJob(job):
