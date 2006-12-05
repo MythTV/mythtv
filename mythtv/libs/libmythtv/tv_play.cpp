@@ -6410,7 +6410,6 @@ void TV::TreeMenuSelected(OSDListTreeType *tree, OSDGenericTree *item)
     else if (action.left(12) == "TOGGLEASPECT")
     {
         ToggleLetterbox(action.right(1).toInt());
-        hidetree = false;
     }
     else if (action == "GUIDE")
         EditSchedule(kScheduleProgramGuide);
