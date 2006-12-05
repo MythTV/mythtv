@@ -603,7 +603,7 @@ TemplateMatcher::adjustForBlanks(const BlankFrameDetector *blankFrameDetector)
      * to deviate by up to MAXBLANKADJUSTMENT frames before/after the break
      * actually begins/ends.
      */
-    const int       MAXBLANKADJUSTMENT = (int)roundf(60 * fps);  /* 60 sec */
+    const int       MAXBLANKADJUSTMENT = (int)roundf(120 * fps);  /* 120 sec */
     const bool      skipCommBlanks = blankFrameDetector->getSKipCommBlanks();
 
     const FrameAnalyzer::FrameMap *blankMap = blankFrameDetector->getBlanks();
