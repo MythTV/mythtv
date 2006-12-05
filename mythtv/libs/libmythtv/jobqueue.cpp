@@ -948,6 +948,9 @@ bool JobQueue::ChangeJobStatus(int jobID, int newStatus, QString comment)
     if (jobID < 0)
         return false;
 
+    VERBOSE(VB_JOBQUEUE, LOC + QString("ChangeJobStatus(%1, %2, '%3')")
+            .arg(jobID).arg(StatusText(newStatus)).arg(comment));
+
     MSqlQuery query(MSqlQuery::InitCon());
 
     query.prepare("UPDATE jobqueue SET status = :STATUS, comment = :COMMENT "
@@ -972,6 +975,9 @@ bool JobQueue::ChangeJobComment(int jobID, QString comment)
 {
     if (jobID < 0)
         return false;
+
+    VERBOSE(VB_JOBQUEUE, LOC + QString("ChangeJobComment(%1, '%2')")
+            .arg(jobID).arg(comment));
 
     MSqlQuery query(MSqlQuery::InitCon());
 
