@@ -1614,7 +1614,7 @@ int doImportArchive(const QString &inFile, int chanID)
     return na.doImportArchive(inFile, chanID);
 }
 
-int grabThumbnail(QString inFile, QString thumbList, QString outFile)
+int grabThumbnail(QString inFile, QString thumbList, QString outFile, int frameCount)
 {
     int ret;
 
@@ -1689,7 +1689,7 @@ int grabThumbnail(QString inFile, QString thumbList, QString outFile)
 
     // get list of required thumbs
     QStringList list = QStringList::split(",", thumbList);
-
+    cout << "list.count(): " << list.count() << endl; 
     AVFrame *frame = avcodec_alloc_frame();
     AVPacket pkt;
     AVPicture orig;
@@ -1712,10 +1712,6 @@ int grabThumbnail(QString inFile, QString thumbList, QString outFile)
             if (list[thumbCount].toInt() == (int)(frameNo / fps))
             {
                 thumbCount++;
-                QString filename = outFile;
-
-                if (outFile.contains("%1"))
-                    filename = outFile.arg(thumbCount);
 
                 avcodec_flush_buffers(codecCtx);
                 avcodec_decode_video(codecCtx, frame, &frameFinished, pkt.data, pkt.size);
@@ -1737,20 +1733,54 @@ int grabThumbnail(QString inFile, QString thumbList, QString outFile)
 
                 if (frameFinished)
                 {
-                    avpicture_fill(&retbuf, outputbuf, PIX_FMT_RGBA32, width, height);
+                    // work out what format to save to
+                    QString saveFormat = "JPEG";
+                    if (outFile.right(4) == ".png")
+                        saveFormat = "PNG";
 
-                    avpicture_deinterlace((AVPicture*)frame, (AVPicture*)frame,
-                                           codecCtx->pix_fmt, width, height);
-
-                    img_convert(&retbuf, PIX_FMT_RGBA32, 
-                                 (AVPicture*) frame, codecCtx->pix_fmt, width, height);
-
-                    QImage img(outputbuf, width, height, 32, NULL,
-                               65536 * 65536, QImage::LittleEndian);
-
-                    if (!img.save(filename.ascii(), "JPEG"))
+                    int count = 0;
+                    while (count < frameCount)
                     {
-                        VERBOSE(VB_IMPORTANT, "Failed to save thumb: " + filename);
+                        QString filename = outFile;
+                        if (filename.contains("%1") && filename.contains("%2"))
+                            filename = filename.arg(thumbCount).arg(count+1);
+                        else if (filename.contains("%1"))
+                            filename = filename.arg(thumbCount);
+
+                        avpicture_fill(&retbuf, outputbuf, PIX_FMT_RGBA32, width, height);
+
+                        avpicture_deinterlace((AVPicture*)frame, (AVPicture*)frame,
+                                               codecCtx->pix_fmt, width, height);
+
+                        img_convert(&retbuf, PIX_FMT_RGBA32, 
+                                    (AVPicture*) frame, codecCtx->pix_fmt, width, height);
+
+                        QImage img(outputbuf, width, height, 32, NULL,
+                                65536 * 65536, QImage::LittleEndian);
+
+                        if (!img.save(filename.ascii(), saveFormat))
+                        {
+                            VERBOSE(VB_IMPORTANT, "Failed to save thumb: " + filename);
+                        }
+
+                        count++;
+
+                        if (count <= frameCount)
+                        {
+                            //grab next frame
+                            frameFinished = false;
+                            while (!frameFinished)
+                            {
+                                int res = av_read_frame(inputFC, &pkt);
+                                if (res < 0)
+                                    break;
+                                if (pkt.stream_index == videostream)
+                                {
+                                    frameNo++;
+                                    avcodec_decode_video(codecCtx, frame, &frameFinished, pkt.data, pkt.size);
+                                }
+                            }
+                        }
                     }
                 }
 
@@ -2119,12 +2149,14 @@ int isRemote(QString filename)
 void showUsage()
 {
     cout << "Usage of mytharchivehelper\n"; 
-    cout << "-t/--createthumbnail infile thumblist outfile\n";
+    cout << "-t/--createthumbnail infile thumblist outfile framecount\n";
     cout << "       (create one or more thumbnails)\n";
-    cout << "       infile    - filename of recording to grab thumbs from\n";
-    cout << "       thumblist - comma seperated list of required thumbs in seconds\n";
-    cout << "       outfile   - name of file to save thumbs to eg 'thumb-%1.jpg'\n";
-    cout << "                   %1 will be replaced with the no. of the thumb\n\n";
+    cout << "       infile     - filename of recording to grab thumbs from\n";
+    cout << "       thumblist  - comma seperated list of required thumbs in seconds\n";
+    cout << "       outfile    - name of file to save thumbs to eg 'thumb%1-%2.jpg'\n";
+    cout << "                    %1 will be replaced with the no. of the thumb\n";
+    cout << "                    %2 will be replaced with the frame no.\n";
+    cout << "       framecount - no of frames to grab\n\n";
     cout << "-i/--getfileinfo infile outfile method\n";
     cout << "       (write some file information to outfile for infile)\n";
     cout << "       method is the method to used to calc the file duration\n";
@@ -2184,6 +2216,7 @@ int main(int argc, char **argv)
     QString logFile;
     int lenMethod = 0;
     int chanID;
+    int frameCount = 1;
 
     //  Check command line arguments
     for (int argpos = 1; argpos < a.argc(); ++argpos)
@@ -2240,6 +2273,13 @@ int main(int argc, char **argv)
             {
                 cerr << "Missing outfile in -t/--grabthumbnail option\n";
                 return FRONTEND_EXIT_INVALID_CMDLINE;
+            }
+
+            if (a.argc()-1 > argpos)
+            {
+                QString arg(a.argv()[argpos+1]); 
+                frameCount = arg.toInt();
+                ++argpos;
             }
         }
         else if (!strcmp(a.argv()[argpos],"-p") ||
@@ -2384,7 +2424,7 @@ int main(int argc, char **argv)
     if (bShowUsage)
         showUsage();
     else if (bGrabThumbnail)
-        res = grabThumbnail(inFile, thumbList, outFile);
+        res = grabThumbnail(inFile, thumbList, outFile, frameCount);
     else if (bGetDBParameters)
         res = getDBParamters(outFile);
     else if (bNativeArchive)
