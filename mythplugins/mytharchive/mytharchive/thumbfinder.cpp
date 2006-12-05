@@ -1,3 +1,4 @@
+#include <math.h>
 
 // qt
 #include <qdir.h>
