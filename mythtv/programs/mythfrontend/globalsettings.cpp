@@ -291,7 +291,7 @@ static HostComboBox *DisplayRecGroup()
     }
 
     gc->setHelpText(QObject::tr("Default group filter to apply "
-                    "on the View Recordings screen."));
+                    "on the Watch Recordings screen."));
     return gc;
 }
 
@@ -2657,6 +2657,17 @@ static HostCheckBox *PlaybackWatchList()
     return gc;
 }
 
+static HostCheckBox *PlaybackWLStart()
+{
+    HostCheckBox *gc = new HostCheckBox("PlaybackWLStart");
+    gc->setLabel(QObject::tr("Start from the Watch List view"));
+    gc->setValue(false);
+    gc->setHelpText(QObject::tr("If set, the 'Watch List' will be the "
+                                "initial view each time you enter the "
+                                "Watch Recordings screen"));
+    return gc;
+}
+
 static HostCheckBox *PlaybackWLAutoExpire()
 {
     HostCheckBox *gc = new HostCheckBox("PlaybackWLAutoExpire");
@@ -2706,6 +2717,7 @@ class WatchListSettings : public TriggeredConfigurationGroup
          setTrigger(watchList);
 
          ConfigurationGroup* settings = new VerticalConfigurationGroup(false);
+         settings->addChild(PlaybackWLStart());
          settings->addChild(PlaybackWLAutoExpire());
          settings->addChild(PlaybackWLMaxAge());
          settings->addChild(PlaybackWLBlackOut());

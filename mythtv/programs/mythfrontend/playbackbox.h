@@ -314,6 +314,8 @@ class PlaybackBox : public MythDialog
     bool                useCategories;
     /// useRecGroups controls showing of recording groups in group list
     bool                useRecGroups;
+    /// use the Watch List as the initial view
+    bool                watchListStart;
     /// exclude recording not marked for auto-expire from the Watch List
     bool                watchListAutoExpire;
     /// add 1 to the Watch List scord up to this many days 

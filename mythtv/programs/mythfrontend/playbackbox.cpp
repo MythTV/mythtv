@@ -282,6 +282,7 @@ PlaybackBox::PlaybackBox(BoxType ltype, MythMainWindow *parent,
     int pbOrder        = gContext->GetNumSetting("PlayBoxOrdering", 1);
     // Split out sort order modes, wacky order for backward compatibility
     listOrder = (pbOrder >> 1) ^ (allOrder = pbOrder & 1);
+    watchListStart     = gContext->GetNumSetting("PlaybackWLStart", 0);
     watchListAutoExpire= gContext->GetNumSetting("PlaybackWLAutoExpire", 0);
     watchListMaxAge    = gContext->GetNumSetting("PlaybackWLMaxAge", 60);
     watchListBlackOut  = gContext->GetNumSetting("PlaybackWLBlackOut", 2);
@@ -743,8 +744,7 @@ void PlaybackBox::updateGroupInfo(QPainter *p, QRect& pr,
         QPainter tmp(&pix);
         QMap<QString, QString> infoMap;
         int countInGroup; // = progLists[""].count();
-        
-       
+
         if (titleList[titleIndex] == "")
         {
            countInGroup = progLists[""].count(); 
@@ -753,7 +753,7 @@ void PlaybackBox::updateGroupInfo(QPainter *p, QRect& pr,
            infoMap["show"] = QObject::tr("All Programs");
         }
         else
-        {                  
+        {
             countInGroup = progLists[titleList[titleIndex]].count();
             infoMap["group"] = groupDisplayName;
             infoMap["show"] = titleList[titleIndex];
@@ -1657,6 +1657,10 @@ bool PlaybackBox::FillList(bool useCachedData)
                         }
                     }
                 }
+                else
+                {
+                    watchListStart = 0;
+                }
             }
         }
     }
@@ -1895,6 +1899,11 @@ bool PlaybackBox::FillList(bool useCachedData)
     titleIndex = titleList.count() - 1;
     for (titleIndex = titleList.count() - 1; titleIndex >= 0; titleIndex--)
     {
+        if (watchListStart && sTitleList[titleIndex] == watchGroup)
+        {
+            watchListStart = 0;
+            break;
+        }
         sTitle = sTitleList[titleIndex];
         sTitle = sTitle.lower();
         
