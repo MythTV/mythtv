@@ -152,7 +152,7 @@ ProgramInfo *getProgramInfoForFile(const QString &inFile)
         pinfo = ProgramInfo::GetProgramFromRecorded(chanID, startTime);
 
         if (pinfo)
-            pinfo->pathname = pinfo->GetPlaybackURL(true);
+            pinfo->pathname = pinfo->GetPlaybackURL(false, true);
     }
 
     if (!pinfo)

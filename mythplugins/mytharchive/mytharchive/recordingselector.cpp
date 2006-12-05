@@ -332,7 +332,7 @@ void RecordingSelector::OKPressed()
         query.bindValue(":STARTDATE", p->startts.toString("dd MMM yy"));
         query.bindValue(":STARTTIME", p->startts.toString("(hh:mm)"));
         query.bindValue(":SIZE", p->filesize);
-        query.bindValue(":FILENAME", p->GetPlaybackURL(true));
+        query.bindValue(":FILENAME", p->GetPlaybackURL(false, true));
         query.bindValue(":HASCUTLIST", (p->programflags & FL_CUTLIST));
         if (!query.exec())
             MythContext::DBError("archive item insert", query);
@@ -401,7 +401,7 @@ void RecordingSelector::getRecordingList(void)
             p = *i;
 
             // we can't handle recordings that have to be streamed to us
-            if (p->GetPlaybackURL(true).startsWith("myth://"))
+            if (p->GetPlaybackURL(false, true).startsWith("myth://"))
             {
                 recordingList->erase(i);
                 continue;
@@ -463,7 +463,7 @@ void RecordingSelector::updateSelectedList()
             for ( ; i != recordingList->end(); i++)
             {
                 p = *i;
-                if (p->GetPlaybackURL(true) == filename)
+                if (p->GetPlaybackURL(false, true) == filename)
                 {
                     if (selectedList.find(p) == -1)
                         selectedList.append(p);
