@@ -1636,10 +1636,13 @@ static int set_PGCN(vm_t *vm, int pgcN) {
   pgcit = get_PGCIT(vm);
   assert(pgcit != NULL);  /* ?? Make this return -1 instead */
 
+  vm->pgcN_invalid = 0;
+
   if(pgcN < 1 || pgcN > pgcit->nr_of_pgci_srp) {
 #ifdef TRACE
     fprintf(MSG_OUT, "libdvdnav:  ** No such pgcN = %d\n", pgcN);
 #endif
+    vm->pgcN_invalid = 1;
     return 0;
   }
   

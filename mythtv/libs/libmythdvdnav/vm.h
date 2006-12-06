@@ -91,6 +91,7 @@ typedef struct {
   char          serial_number[19];
   remap_t      *map;
   int           stopped;
+  int           pgcN_invalid;
 } vm_t;
 
 /* magic number for seeking hops */

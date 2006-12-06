@@ -416,6 +416,51 @@ dvdnav_status_t dvdnav_next_pg_search(dvdnav_t *this) {
   return DVDNAV_STATUS_OK;
 }
 
+dvdnav_status_t dvdnav_menu_supported(dvdnav_t *this, DVDMenuID_t menu)
+{
+  vm_t *try_vm;
+
+  if (!this) {
+    printerr("Passed a NULL pointer.");
+    return DVDNAV_STATUS_ERR;
+  }
+
+  pthread_mutex_lock(&this->vm_lock);
+  if(!this->vm->state.pgc) {
+    printerr("No current PGC");
+    pthread_mutex_unlock(&this->vm_lock);
+    return DVDNAV_STATUS_ERR;
+  }
+
+  /* make a copy of the current VM and try to navigate the copy to the menu */
+  try_vm = vm_new_copy(this->vm);
+  if ((menu == DVD_MENU_Escape) && (this->vm->state.domain != VTS_DOMAIN)) {
+    /* Try resume */
+    if (vm_jump_resume(try_vm) && !try_vm->stopped) {
+        vm_free_copy(try_vm);
+        pthread_mutex_unlock(&this->vm_lock);
+        return DVDNAV_STATUS_OK;
+    }
+  }
+
+  if (menu == DVD_MENU_Escape) menu = DVD_MENU_Root;
+
+  if (vm_jump_menu(try_vm, menu) && !try_vm->stopped) {
+    vm_get_next_cell(try_vm);
+    if (!try_vm->pgcN_invalid)
+    {
+      vm_free_copy(try_vm);
+      pthread_mutex_unlock(&this->vm_lock);
+      return DVDNAV_STATUS_OK;
+    }
+  }
+  
+  vm_free_copy(try_vm);
+  printerr("No such menu or menu not reachable.");
+  pthread_mutex_unlock(&this->vm_lock);
+  return DVDNAV_STATUS_ERR;
+}
+
 dvdnav_status_t dvdnav_menu_call(dvdnav_t *this, DVDMenuID_t menu) {
   vm_t *try_vm;
   

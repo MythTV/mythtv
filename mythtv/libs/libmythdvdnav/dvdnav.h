@@ -299,6 +299,9 @@ dvdnav_status_t dvdnav_part_play_auto_stop(dvdnav_t *self, int32_t title,
 dvdnav_status_t dvdnav_time_play(dvdnav_t *self, int32_t title,
 				 uint64_t time);
 
+/* Check if the given menu is supported */
+dvdnav_status_t dvdnav_menu_supported(dvdnav_t *self, DVDMenuID_t menu);
+
 /*
  * Stop playing the current position and jump to the specified menu.
  *
