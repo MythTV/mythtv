@@ -57,7 +57,7 @@
 PreviewGenerator::PreviewGenerator(const ProgramInfo *pginfo,
                                    bool local_only)
     : programInfo(*pginfo), localOnly(local_only), isConnected(false),
-      createSockets(false), serverSock(NULL)
+      createSockets(false), serverSock(NULL),      pathname(pginfo->pathname)
 {
     if (IsLocal())
         return;
@@ -71,9 +71,9 @@ PreviewGenerator::PreviewGenerator(const ProgramInfo *pginfo,
     QString msg = QString(
         "'%1' is not local, "
         "\n\t\t\treplacing with '%2', which is local.")
-        .arg(programInfo.pathname).arg(localFN);
+        .arg(pathname).arg(localFN);
     VERBOSE(VB_RECORD, LOC + msg);
-    programInfo.pathname = localFN;
+    pathname = localFN;
 }
 
 PreviewGenerator::~PreviewGenerator()
@@ -157,7 +157,7 @@ void PreviewGenerator::Run(void)
     else
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR + QString("Run() file not local: '%1'")
-                .arg(programInfo.pathname));
+                .arg(pathname));
     }
 }
 
@@ -209,7 +209,7 @@ void PreviewGenerator::RemotePreviewRun(void)
         ok = gContext->SendReceiveStringList(strlist);
     }
 
-    if (ok)
+    if (ok && (strlist[0] == "OK"))
     {
         QMutexLocker locker(&previewLock);
         emit previewReady(&programInfo);
@@ -279,10 +279,10 @@ void PreviewGenerator::LocalPreviewRun(void)
 
     len = width = height = sz = 0;
     unsigned char *data = (unsigned char*)
-        GetScreenGrab(&programInfo, programInfo.pathname, secsin,
+        GetScreenGrab(&programInfo, pathname, secsin,
                       sz, width, height, aspect);
     
-    bool ok = SavePreview(programInfo.pathname + ".png",
+    bool ok = SavePreview(pathname + ".png",
                           data, width, height, aspect);
     if (ok)
     {
@@ -309,7 +309,7 @@ void PreviewGenerator::LocalPreviewRun(void)
 
 bool PreviewGenerator::IsLocal(void) const
 {
-    return QFileInfo(programInfo.pathname).exists();
+    return QFileInfo(pathname).exists();
 }
 
 /** \fn PreviewGenerator::GetScreenGrab(const ProgramInfo*,const QString&,int,int&,int&,int&,float&)

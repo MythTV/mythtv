@@ -1511,7 +1511,6 @@ QString ProgramInfo::GetPlaybackURL(bool checkMaster, bool forceCheckLocal)
 
     QString tmpURL;
     QString basename = GetRecordBasename(true);
-    pathname = basename;
 
     bool alwaysStream = gContext->GetNumSetting("AlwaysStreamFiles", 0);
 

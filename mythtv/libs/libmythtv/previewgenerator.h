@@ -59,6 +59,7 @@ class MPUBLIC PreviewGenerator : public QObject
     bool               isConnected;
     bool               createSockets;
     MythSocket        *serverSock;
+    QString            pathname;
 };
 
 #endif // PREVIEW_GENERATOR_H_
