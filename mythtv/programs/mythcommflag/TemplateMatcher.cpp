@@ -420,9 +420,10 @@ TemplateMatcher::finished(long long nframes, bool final)
     }
 
     VERBOSE(VB_COMMFLAG, QString("TemplateMatcher::finished "
-                "%1x%2@(%3,%4), %5 edge pixels (want %6, pctile=%7)")
+                "%1x%2@(%3,%4), %5 edge pixels "
+                "(want %6 pctile=%7, got pctile=%8)")
             .arg(tmplwidth).arg(tmplheight).arg(tmplcol).arg(tmplrow)
-            .arg(tmpledges).arg(mintmpledges)
+            .arg(tmpledges).arg(mintmpledges).arg(MATCHPCTILE, 0, 'f', 6)
             .arg((float)ii / nframes, 0, 'f', 6));
 
     for (ii = 0; ii < nframes; ii++)
