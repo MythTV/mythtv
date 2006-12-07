@@ -733,7 +733,13 @@ bool DVBChannel::ProbeTuningParams(DTVMultiplex &tuning) const
         return false;
     }
 
+    uint    mplex      = tuning.mplex;
+    QString sistandard = QDeepCopy<QString>(tuning.sistandard);
+
     tuning = dvbparams_to_dtvmultiplex(card_type, params);
+
+    tuning.mplex       = mplex;
+    tuning.sistandard  = sistandard;
 
     return true;
 }
