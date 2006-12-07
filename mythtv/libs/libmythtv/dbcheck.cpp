@@ -10,7 +10,7 @@ using namespace std;
 #include "mythdbcon.h"
 
 /// This is the DB schema version expected by the running MythTV instance.
-const QString currentDatabaseVersion = "1171";
+const QString currentDatabaseVersion = "1172";
 
 static bool UpdateDBVersionNumber(const QString &newnumber);
 static bool performActualUpdate(const QString updates[], QString version,
@@ -2751,6 +2751,24 @@ thequery,
 ""
 };
         if (!performActualUpdate(updates, "1171", dbver))
+            return false;
+    }
+
+    if (dbver == "1171")
+    {
+        // Add Firewire and DBox2 default recording profiles..
+        const QString updates[] = {
+"INSERT INTO recordingprofiles SET name = \"Default\",      profilegroup = 7;",
+"INSERT INTO recordingprofiles SET name = \"Live TV\",      profilegroup = 7;",
+"INSERT INTO recordingprofiles SET name = \"High Quality\", profilegroup = 7;",
+"INSERT INTO recordingprofiles SET name = \"Low Quality\",  profilegroup = 7;",
+"INSERT INTO recordingprofiles SET name = \"Default\",      profilegroup = 9;",
+"INSERT INTO recordingprofiles SET name = \"Live TV\",      profilegroup = 9;",
+"INSERT INTO recordingprofiles SET name = \"High Quality\", profilegroup = 9;",
+"INSERT INTO recordingprofiles SET name = \"Low Quality\",  profilegroup = 9;",
+""
+};
+        if (!performActualUpdate(updates, "1172", dbver))
             return false;
     }
 
