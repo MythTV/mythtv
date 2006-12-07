@@ -8,9 +8,13 @@
    <device>
       <deviceType>urn:schemas-upnp-org:device:MediaServer:1</deviceType>
       <friendlyName>MythTV AV Media Server</friendlyName>
-      <manufacturer />
+      <manufacturer>MythTV</manufacturer>
+      <manufacturerURL>http://www.mythtv.org/</manufacturerURL>
+      <modelDescription>MythTV AV Media Server</modelDescription>
+      <modelName>MythTV AV Media Server</modelName>
       <modelURL>http://www.mythtv.org/</modelURL>
       <UDN>uuid:a111a1b9-54f6-475a-bb06-57d83161c0b0</UDN>
+      <presentationURL>/</presentationURL>
       <serviceList>
          <service>
             <serviceType>urn:schemas-upnp-org:service:ConnectionManager:1</serviceType>
