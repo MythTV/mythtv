@@ -1161,6 +1161,7 @@ void TV::HandleStateChange(void)
         else
         {
             SET_LAST();
+            wantsToQuit   = true;
         }
     }
     else if (TRANSITION(kState_WatchingPreRecorded, kState_None) ||
