@@ -53,8 +53,8 @@ class DTVSignalMonitor : public SignalMonitor,
     /// Sets rotor target pos from 0.0 to 1.0
     virtual void SetRotorTarget(float) {}
 
-    void AddFlags(uint _flags);
-    void RemoveFlags(uint _flags);
+    virtual void AddFlags(uint64_t _flags);
+    virtual void RemoveFlags(uint64_t _flags);
 
     /// Sets the MPEG stream data for DTVSignalMonitor to use,
     /// and connects the table signals to the monitor.

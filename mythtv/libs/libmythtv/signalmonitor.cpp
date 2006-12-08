@@ -174,6 +174,28 @@ void SignalMonitor::deleteLater(void)
     QObject::deleteLater();
 }
 
+void SignalMonitor::AddFlags(uint64_t _flags)
+{
+    DBG_SM("AddFlags", sm_flags_to_string(_flags));
+    flags |= _flags;
+}
+
+void SignalMonitor::RemoveFlags(uint64_t _flags)
+{
+    DBG_SM("RemoveFlags", sm_flags_to_string(_flags));
+    flags &= ~_flags;
+}
+
+bool SignalMonitor::HasFlags(uint64_t _flags) const
+{
+    return (flags & _flags) == _flags;
+}
+
+bool SignalMonitor::HasAnyFlag(uint64_t _flags) const
+{
+    return (flags & _flags);
+}
+
 /** \fn SignalMonitor::Start()
  *  \brief Start signal monitoring thread.
  */

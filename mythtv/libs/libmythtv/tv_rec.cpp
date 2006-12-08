@@ -32,6 +32,7 @@ using namespace std;
 #include "eitscanner.h"
 #include "RingBuffer.h"
 #include "previewgenerator.h"
+#include "storagegroup.h"
 
 #include "atscstreamdata.h"
 #include "dvbstreamdata.h"
@@ -56,7 +57,6 @@ using namespace std;
 #include "dbox2recorder.h"
 #include "hdhrrecorder.h"
 #include "iptvrecorder.h"
-#include "storagegroup.h"
 
 #ifdef USING_V4L
 #include "channel.h"
@@ -1695,7 +1695,7 @@ bool TVRec::SetupDTVSignalMonitor(void)
         // Try to get pid of VCT from cache and
         // require MGT if we don't have VCT pid.
         if (!ApplyCachedPids(sm, dtvchan))
-            sm->AddFlags(kDTVSigMon_WaitForMGT);
+            sm->AddFlags(SignalMonitor::kDTVSigMon_WaitForMGT);
 
         VERBOSE(VB_RECORD, LOC + "Successfully set up ATSC table monitoring.");
         return true;
@@ -1748,8 +1748,9 @@ bool TVRec::SetupDTVSignalMonitor(void)
         sd->SetAudioStreamsRequired(neededAudio);
         sm->SetFTAOnly(fta);
 
-        sm->AddFlags(kDTVSigMon_WaitForPMT | kDTVSigMon_WaitForSDT);
-        sm->AddFlags(kDVBSigMon_WaitForPos);
+        sm->AddFlags(SignalMonitor::kDTVSigMon_WaitForPMT |
+                     SignalMonitor::kDTVSigMon_WaitForSDT |
+                     SignalMonitor::kDVBSigMon_WaitForPos);
         sm->SetRotorTarget(0.0f);
 
         VERBOSE(VB_RECORD, LOC + "Successfully set up DVB table monitoring.");
@@ -1784,8 +1785,9 @@ bool TVRec::SetupDTVSignalMonitor(void)
         sm->SetProgramNumber(progNum);
         sd->SetVideoStreamsRequired(1);
         sm->SetFTAOnly(fta);
-        sm->AddFlags(kDTVSigMon_WaitForPAT | kDTVSigMon_WaitForPMT);
-        sm->AddFlags(kDVBSigMon_WaitForPos);
+        sm->AddFlags(SignalMonitor::kDTVSigMon_WaitForPAT |
+                     SignalMonitor::kDTVSigMon_WaitForPMT |
+                     SignalMonitor::kDVBSigMon_WaitForPos);
         sm->SetRotorTarget(1.0f);
 
         VERBOSE(VB_RECORD, LOC + "Successfully set up MPEG table monitoring.");

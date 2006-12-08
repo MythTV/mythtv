@@ -119,13 +119,13 @@ QStringList DTVSignalMonitor::GetStatusList(bool kick)
     return list;
 }
 
-void DTVSignalMonitor::AddFlags(uint _flags)
+void DTVSignalMonitor::AddFlags(uint64_t _flags)
 {
     SignalMonitor::AddFlags(_flags);
     UpdateMonitorValues();
 }
 
-void DTVSignalMonitor::RemoveFlags(uint _flags)
+void DTVSignalMonitor::RemoveFlags(uint64_t _flags)
 {
     SignalMonitor::RemoveFlags(_flags);
     UpdateMonitorValues();

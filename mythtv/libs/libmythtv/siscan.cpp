@@ -121,8 +121,10 @@ SIScan::SIScan(const QString &_cardtype, ChannelBase *_channel, int _sourceID,
         ScanStreamData *data = new ScanStreamData();
 
         dtvSigMon->SetStreamData(data);
-        dtvSigMon->AddFlags(kDTVSigMon_WaitForMGT | kDTVSigMon_WaitForVCT |
-                            kDTVSigMon_WaitForNIT | kDTVSigMon_WaitForSDT);
+        dtvSigMon->AddFlags(SignalMonitor::kDTVSigMon_WaitForMGT |
+                            SignalMonitor::kDTVSigMon_WaitForVCT |
+                            SignalMonitor::kDTVSigMon_WaitForNIT |
+                            SignalMonitor::kDTVSigMon_WaitForSDT);
 
         data->AddMPEGListener(this);
         data->AddATSCMainListener(this);
@@ -684,7 +686,7 @@ bool SIScan::Tune(const transport_scan_items_it_t transport)
     if (GetDVBSignalMonitor())
     {
         // always wait for rotor to finish
-        GetDVBSignalMonitor()->AddFlags(kDVBSigMon_WaitForPos);
+        GetDVBSignalMonitor()->AddFlags(SignalMonitor::kDVBSigMon_WaitForPos);
         GetDVBSignalMonitor()->SetRotorTarget(1.0f);
     }
 #endif // USING_DVB

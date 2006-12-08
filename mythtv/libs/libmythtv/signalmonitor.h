@@ -23,42 +23,7 @@ using namespace std;
 #define DBG_SM(FUNC, MSG) VERBOSE(VB_CHANNEL, \
     "SM("<<channel->GetDevice()<<")::"<<FUNC<<": "<<MSG);
 
-enum {
-    kDTVSigMon_PATSeen    = 0x00000001, ///< maps program numbers to PMT pids
-    kDTVSigMon_PMTSeen    = 0x00000002, ///< maps to audio, video and other streams pids
-    kDTVSigMon_MGTSeen    = 0x00000004, ///< like NIT, but there is only one.
-    kDTVSigMon_VCTSeen    = 0x00000008, ///< like SDT
-    kDTVSigMon_TVCTSeen   = 0x00000010, ///< terrestrial version of VCT
-    kDTVSigMon_CVCTSeen   = 0x00000020, ///< cable version of VCT
-    kDTVSigMon_NITSeen    = 0x00000040, ///< like MGT, but there can be multiple tables.
-    kDTVSigMon_SDTSeen    = 0x00000080, ///< like VCT
-
-    kDTVSigMon_PATMatch   = 0x00000100,
-    kDTVSigMon_PMTMatch   = 0x00000200,
-    kDTVSigMon_MGTMatch   = 0x00000400,
-    kDTVSigMon_VCTMatch   = 0x00000800,
-    kDTVSigMon_TVCTMatch  = 0x00001000,
-    kDTVSigMon_CVCTMatch  = 0x00002000,
-    kDTVSigMon_NITMatch   = 0x00004000,
-    kDTVSigMon_SDTMatch   = 0x00008000,
-
-    kDTVSigMon_WaitForPAT = 0x00010000,
-    kDTVSigMon_WaitForPMT = 0x00020000,
-    kDTVSigMon_WaitForMGT = 0x00040000,
-    kDTVSigMon_WaitForVCT = 0x00080000,
-    kDTVSigMon_WaitForNIT = 0x00100000,
-    kDTVSigMon_WaitForSDT = 0x00200000,
-    kDTVSigMon_WaitForSig = 0x00400000,
-
-    kDTVSigMon_WaitForAll = 0x00FF0000,
-
-    kDVBSigMon_WaitForSNR = 0x01000000,
-    kDVBSigMon_WaitForBER = 0x02000000,
-    kDVBSigMon_WaitForUB  = 0x04000000,
-    kDVBSigMon_WaitForPos = 0x08000000, ///< Wait for rotor
-};
-
-inline QString sm_flags_to_string(uint);
+inline QString sm_flags_to_string(uint64_t);
 
 class SignalMonitor : public QObject
 {
@@ -82,19 +47,11 @@ class SignalMonitor : public QObject
     // // // // // // // // // // // // // // // // // // // // // // // //
     // Flags // // // // // // // // // // // // // // // // // // // // //
 
-    virtual void AddFlags(uint _flags)
-    {
-        DBG_SM("AddFlags", sm_flags_to_string(_flags));
-        flags |= _flags;
-    }
-    virtual void RemoveFlags(uint _flags)
-    {
-        DBG_SM("RemoveFlags", sm_flags_to_string(_flags));
-        flags &= ~_flags;
-    }
-    bool HasFlags(uint _flags) const   { return (flags & _flags) == _flags; }
-    bool HasAnyFlag(uint _flags) const { return (flags & _flags); }
-    uint GetFlags(void) const          { return flags; }
+    virtual void AddFlags(uint64_t _flags);
+    virtual void RemoveFlags(uint64_t _flags);
+    bool HasFlags(uint64_t _flags)   const;
+    bool HasAnyFlag(uint64_t _flags) const;
+    uint64_t GetFlags(void)          const { return flags; }
 
     // // // // // // // // // // // // // // // // // // // // // // // //
     // Gets  // // // // // // // // // // // // // // // // // // // // //
@@ -166,10 +123,76 @@ class SignalMonitor : public QObject
     /// \brief This should be overriden to actually do signal monitoring.
     virtual void UpdateValues() { ; }
 
+  public:
+    /// We've seen a PAT,
+    /// which maps MPEG program numbers to pids where we find PMTs
+    static const uint64_t kDTVSigMon_PATSeen    = 0x0000000001ULL;
+    /// We've seen a PMT,
+    /// which maps program to audio, video and other stream PIDs
+    static const uint64_t kDTVSigMon_PMTSeen    = 0x0000000002ULL;
+    /// We've seen an MGT,
+    /// which ells us on which PIDs to find VCT and other ATSC tables
+    static const uint64_t kDTVSigMon_MGTSeen    = 0x0000000004ULL;
+    /// We've seen a VCT, which maps ATSC Channels to
+    /// MPEG program numbers, and provides additional data
+    static const uint64_t kDTVSigMon_VCTSeen    = 0x0000000008ULL;
+    /// We've seen a TVCT, the terrestrial version of the VCT
+    static const uint64_t kDTVSigMon_TVCTSeen   = 0x0000000010ULL;
+    /// We've seen a CVCT, the cable version of the VCT
+    static const uint64_t kDTVSigMon_CVCTSeen   = 0x0000000020ULL;
+    /// We've seen an NIT,
+    /// which tells us where to find SDT and other DVB tables
+    static const uint64_t kDTVSigMon_NITSeen    = 0x0000000040ULL;
+    /// We've seen an SDT, which maps DVB Channels to MPEG
+    /// program numbers, and provides additional data
+    static const uint64_t kDTVSigMon_SDTSeen    = 0x0000000080ULL;
+    /// We've seen the FireWire STB power state
+    static const uint64_t kFWSigMon_PowerSeen   = 0x0000000100ULL;
+
+    /// We've seen a PAT matching our requirements
+    static const uint64_t kDTVSigMon_PATMatch   = 0x0000001000ULL;
+    /// We've seen a PMT matching our requirements
+    static const uint64_t kDTVSigMon_PMTMatch   = 0x0000002000ULL;
+    /// We've seen an MGT matching our requirements
+    static const uint64_t kDTVSigMon_MGTMatch   = 0x0000004000ULL;
+    /// We've seen a VCT matching our requirements
+    static const uint64_t kDTVSigMon_VCTMatch   = 0x0000008000ULL;
+    /// We've seen a TVCT matching our requirements
+    static const uint64_t kDTVSigMon_TVCTMatch  = 0x0000010000ULL;
+    /// We've seen a CVCT matching our requirements
+    static const uint64_t kDTVSigMon_CVCTMatch  = 0x0000020000ULL;
+    /// We've seen an NIT matching our requirements
+    static const uint64_t kDTVSigMon_NITMatch   = 0x0000040000ULL;
+    /// We've seen an SDT matching our requirements
+    static const uint64_t kDTVSigMon_SDTMatch   = 0x0000080000ULL;
+    /// We've seen a FireWire STB power state matching our requirements
+    static const uint64_t kFWSigMon_PowerMatch  = 0x0000100000ULL;
+
+    static const uint64_t kDTVSigMon_WaitForPAT = 0x0001000000ULL;
+    static const uint64_t kDTVSigMon_WaitForPMT = 0x0002000000ULL;
+    static const uint64_t kDTVSigMon_WaitForMGT = 0x0004000000ULL;
+    static const uint64_t kDTVSigMon_WaitForVCT = 0x0008000000ULL;
+    static const uint64_t kDTVSigMon_WaitForNIT = 0x0010000000ULL;
+    static const uint64_t kDTVSigMon_WaitForSDT = 0x0020000000ULL;
+    static const uint64_t kDTVSigMon_WaitForSig = 0x0040000000ULL;
+    static const uint64_t kFWSigMon_WaitForPower= 0x0080000000ULL;
+
+    static const uint64_t kDTVSigMon_WaitForAll = 0x00FF000000ULL;
+
+    /// Wait for the Signal to Noise Ratio to rise above a threshhold
+    static const uint64_t kDVBSigMon_WaitForSNR = 0x0100000000ULL;
+    /// Wait for the Bit Error Rate to fall below a threshhold
+    static const uint64_t kDVBSigMon_WaitForBER = 0x0200000000ULL;
+    /// Wait for uncorrected FEC blocks to fall below a threshhold
+    static const uint64_t kDVBSigMon_WaitForUB  = 0x0400000000ULL;
+    /// Wait for rotor to complete turning the antenna
+    static const uint64_t kDVBSigMon_WaitForPos = 0x0800000000ULL;
+
+  protected:
     pthread_t    monitor_thread;
     ChannelBase *channel;
     int          capturecardnum;
-    uint         flags;
+    uint64_t     flags;
     int          update_rate;
     uint         minimum_update_rate;
     bool         running;
@@ -184,66 +207,75 @@ class SignalMonitor : public QObject
     mutable QMutex     statusLock;
 };
 
-inline QString sm_flags_to_string(uint flags)
+inline QString sm_flags_to_string(uint64_t flags)
 {
     QString str("Seen(");
-    if (kDTVSigMon_PATSeen    & flags)
+    if (SignalMonitor::kDTVSigMon_PATSeen    & flags)
         str += "PAT,";
-    if (kDTVSigMon_PMTSeen    & flags)
+    if (SignalMonitor::kDTVSigMon_PMTSeen    & flags)
         str += "PMT,";
-    if (kDTVSigMon_MGTSeen    & flags)
+    if (SignalMonitor::kDTVSigMon_MGTSeen    & flags)
         str += "MGT,";
-    if (kDTVSigMon_VCTSeen    & flags)
+    if (SignalMonitor::kDTVSigMon_VCTSeen    & flags)
         str += "VCT,";
-    if (kDTVSigMon_TVCTSeen   & flags)
+    if (SignalMonitor::kDTVSigMon_TVCTSeen   & flags)
         str += "TVCT,";
-    if (kDTVSigMon_CVCTSeen   & flags)
+    if (SignalMonitor::kDTVSigMon_CVCTSeen   & flags)
         str += "CVCT,";
-    if (kDTVSigMon_NITSeen    & flags)
+    if (SignalMonitor::kDTVSigMon_NITSeen    & flags)
         str += "NIT,";
-    if (kDTVSigMon_SDTSeen    & flags)
+    if (SignalMonitor::kDTVSigMon_SDTSeen    & flags)
         str += "SDT,";
+    if (SignalMonitor::kFWSigMon_PowerSeen   & flags)
+        str += "STB,";
 
     str += ") Match(";
-    if (kDTVSigMon_PATMatch   & flags)
+    if (SignalMonitor::kDTVSigMon_PATMatch   & flags)
         str += "PAT,";
-    if (kDTVSigMon_PMTMatch   & flags)
+    if (SignalMonitor::kDTVSigMon_PMTMatch   & flags)
         str += "PMT,";
-    if (kDTVSigMon_MGTMatch   & flags)
+    if (SignalMonitor::kDTVSigMon_MGTMatch   & flags)
         str += "MGT,";
-    if (kDTVSigMon_VCTMatch   & flags)
+    if (SignalMonitor::kDTVSigMon_VCTMatch   & flags)
         str += "VCT,";
-    if (kDTVSigMon_TVCTMatch  & flags)
+    if (SignalMonitor::kDTVSigMon_TVCTMatch  & flags)
         str += "TVCT,";
-    if (kDTVSigMon_CVCTMatch  & flags)
+    if (SignalMonitor::kDTVSigMon_CVCTMatch  & flags)
         str += "CVCT,";
-    if (kDTVSigMon_NITMatch   & flags)
+    if (SignalMonitor::kDTVSigMon_NITMatch   & flags)
         str += "NIT,";
-    if (kDTVSigMon_SDTMatch   & flags)
+    if (SignalMonitor::kDTVSigMon_SDTMatch   & flags)
         str += "SDT,";
+    if (SignalMonitor::kFWSigMon_PowerMatch  & flags)
+        str += "STB,";
 
     str += ") Wait(";
-    if (kDTVSigMon_WaitForPAT & flags)
+    if (SignalMonitor::kDTVSigMon_WaitForPAT & flags)
         str += "PAT,";
-    if (kDTVSigMon_WaitForPMT & flags)
+    if (SignalMonitor::kDTVSigMon_WaitForPMT & flags)
         str += "PMT,";
-    if (kDTVSigMon_WaitForMGT & flags)
+    if (SignalMonitor::kDTVSigMon_WaitForMGT & flags)
         str += "MGT,";
-    if (kDTVSigMon_WaitForVCT & flags)
+    if (SignalMonitor::kDTVSigMon_WaitForVCT & flags)
         str += "VCT,";
-    if (kDTVSigMon_WaitForNIT & flags)
+    if (SignalMonitor::kDTVSigMon_WaitForNIT & flags)
         str += "NIT,";
-    if (kDTVSigMon_WaitForSDT & flags)
+    if (SignalMonitor::kDTVSigMon_WaitForSDT & flags)
         str += "SDT,";
-    if (kDTVSigMon_WaitForSig & flags)
+    if (SignalMonitor::kDTVSigMon_WaitForSig & flags)
         str += "Sig,";
+    if (SignalMonitor::kFWSigMon_WaitForPower& flags)
+        str += "STB,";
 
-    if (kDVBSigMon_WaitForSNR & flags)
+    if (SignalMonitor::kDVBSigMon_WaitForSNR & flags)
         str += "SNR,";
-    if (kDVBSigMon_WaitForBER & flags)
+    if (SignalMonitor::kDVBSigMon_WaitForBER & flags)
         str += "BER,";
-    if (kDVBSigMon_WaitForUB  & flags)
+    if (SignalMonitor::kDVBSigMon_WaitForUB  & flags)
         str += "UB,";
+    if (SignalMonitor::kDVBSigMon_WaitForPos & flags)
+        str += "Pos,";
+
     str += ")";
     return str;
 }
