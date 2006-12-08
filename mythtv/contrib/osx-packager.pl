@@ -47,6 +47,34 @@ our @targetsBE = ( 'MythBackend',   'MythFillDatabase',
 
 # Patches for MythTV source
 our %patches = (
+  'mythtv' => 'Index: libs/libmythui/mythmainwindow.cpp
+===================================================================
+--- libs/libmythui/mythmainwindow.cpp  (revision 12154)
++++ libs/libmythui/mythmainwindow.cpp  (working copy)
+@@ -1089,9 +1089,13 @@
+     {
+         case QEvent::KeyPress:
+         {
++            QKeyEvent *ke = dynamic_cast<QKeyEvent*>(e);
++
++            if (!ke)
++                {puts("No RTTI?");ke = (QKeyEvent *)e;}
++
+             if (currentWidget())
+             {
+-                QKeyEvent *ke = dynamic_cast<QKeyEvent*>(e);
+                 ke->accept();
+                 QWidget *current = currentWidget();
+                 if (current && current->isEnabled())
+@@ -1108,7 +1112,7 @@
+                 MythScreenType *top = (*it)->GetTopScreen();
+                 if (top)
+                 {
+-                    if (top->keyPressEvent(dynamic_cast<QKeyEvent*>(e)))
++                    if (top->keyPressEvent(ke))
+                         return true;
+                 }
+             }'
 );
 
 our %depend_order = (
@@ -61,6 +89,8 @@ our %depend_order = (
       ],
   'mythplugins'
   =>  [
+        # 10.4 already has a TIFF library, which can clash with this one.
+        # If that happens, comment this out:
         'tiff',
         'exif',
         'dvdcss',
@@ -451,9 +481,8 @@ our %conf = (
         '--enable-new-exif',
         '--disable-mythgame',
         '--disable-mythmusic', 
-        '--enable-mythnews',
         '--disable-mythphone',
-        '--enable-mythweather',
+        '--disable-mythzoneminder',
       ],
   'myththemes'
   =>  [
