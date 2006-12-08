@@ -2314,8 +2314,8 @@ if $cc $CFLAGS $TMPC -o $TMPE ; then
     GCC_MINOR=$?
 fi
 
-if test x"$symbol_visibility" == x"yes"; then
-    if test x"$GCC_MAJOR" == x"4" ; then
+if test x"$symbol_visibility" = x"yes"; then
+    if test x"$GCC_MAJOR" = x"4" ; then
         check_cflags -fvisibility-inlines-hidden
         ECXXFLAGS="$ECXXFLAGS -fvisibility-inlines-hidden"
         CCONFIG="$CCONFIG use_hidesyms"
@@ -2418,7 +2418,7 @@ fi
 
 if test x"$lamemp3" = x"no" ; then
     echo "You must have the Lame MP3 encoding library installed to compile Myth."
-    exit -1
+    exit 255
 fi
 
 #test for lirc client libraries
