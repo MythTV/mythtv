@@ -1,4 +1,4 @@
-
+#include "mythconfig.h"
 #ifdef CONFIG_DARWIN
 #include <sys/param.h>
 #include <sys/mount.h>
