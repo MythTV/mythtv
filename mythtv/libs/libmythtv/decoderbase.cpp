@@ -698,9 +698,6 @@ void DecoderBase::ChangeDVDTrack(bool ffw)
         return;
     
     bool result = true;
-    int prevcellstart = ringBuffer->DVD()->GetCellStart();
-    int prevcellid = ringBuffer->DVD()->GetCellID();
-    int prevvobid  = ringBuffer->DVD()->GetVobID();
 
     if (ffw)
         result = ringBuffer->DVD()->nextTrack();
@@ -709,17 +706,6 @@ void DecoderBase::ChangeDVDTrack(bool ffw)
 
     if (result)
     {
-        if ((prevcellstart == 0 && ffw) || (prevcellstart != 0))
-        {
-            int limit = 0;
-            while (ringBuffer->DVD()->IsSameChapter(prevcellid, prevvobid)
-                    && limit < 50)
-            {
-                limit++;
-                usleep(10000);
-            }
-        } 
-
         uint elapsed = ringBuffer->DVD()->GetCellStart();
 
         UpdateDVDFramesPlayed();
