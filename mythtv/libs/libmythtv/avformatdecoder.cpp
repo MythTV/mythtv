@@ -2093,6 +2093,13 @@ void AvFormatDecoder::MpegPreProcessPkt(AVStream *stream, AVPacket *pkt)
                 GetNVP()->SetVideoParams(awidth, aheight, seqFPS,
                                          keyframedist, aspect, 
                                          kScan_Detect);
+                
+                if (ringBuffer->InDVDMenuOrStillFrame())
+                {
+                    ringBuffer->DVD()->SeekCellStart();
+                    av_read_frame_flush(ic);
+                }
+                
                 current_width  = width;
                 current_height = height;
                 current_aspect = aspect;

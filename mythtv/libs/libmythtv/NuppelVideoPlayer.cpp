@@ -2405,7 +2405,8 @@ void NuppelVideoPlayer::DisplayNormalFrame(void)
     resetvideo = false;
 
     if (!ringBuffer->InDVDMenuOrStillFrame() ||
-        ringBuffer->DVD()->GetChapterLength() > 3)
+        (ringBuffer->DVD()->NumMenuButtons() > 0 && 
+         ringBuffer->DVD()->GetChapterLength() > 3))
     {
         if (!PrebufferEnoughFrames())
         {
@@ -2504,7 +2505,14 @@ void NuppelVideoPlayer::DisplayNormalFrame(void)
     AutoDeint(frame);
 
     videofiltersLock.lock();
-    videoOutput->ProcessFrame(frame, osd, videoFilters, pipplayer);
+    if (ringBuffer->isDVD() &&
+        ringBuffer->DVD()->InStillFrame() &&
+        videoOutput->ValidVideoFrames() < 3)
+    {
+        videoOutput->ProcessFrame(frame, NULL, NULL, pipplayer);
+    }
+    else
+        videoOutput->ProcessFrame(frame, osd, videoFilters, pipplayer);
     videofiltersLock.unlock();
 
     if (audioOutput && !audio_paused && audioOutput->GetPause())
