@@ -749,17 +749,16 @@ TemplateFinder::TemplateFinder(PGMConverter *pgmc, BorderDetector *bd,
     debugLevel = gContext->GetNumSetting("TemplateFinderDebugLevel", 0);
 
     if (debugLevel >= 1)
+    {
         createDebugDirectory(debugdir,
             QString("TemplateFinder debugLevel %1").arg(debugLevel));
 
-    if (debugLevel >= 1)
-    {
         debug_template = true;
         debug_edgecounts = true;
-    }
 
-    if (debugLevel >= 3)
-        debug_frames = true;
+        if (debugLevel >= 3)
+            debug_frames = true;
+    }
 }
 
 TemplateFinder::~TemplateFinder(void)

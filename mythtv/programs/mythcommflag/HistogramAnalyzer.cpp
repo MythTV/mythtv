@@ -162,11 +162,11 @@ HistogramAnalyzer::HistogramAnalyzer(PGMConverter *pgmc, BorderDetector *bd,
     debugLevel = gContext->GetNumSetting("HistogramAnalyzerDebugLevel", 0);
 
     if (debugLevel >= 1)
+    {
         createDebugDirectory(debugdir,
             QString("HistogramAnalyzer debugLevel %1").arg(debugLevel));
-
-    if (debugLevel >= 1)
         debug_histval = true;
+    }
 }
 
 HistogramAnalyzer::~HistogramAnalyzer(void)

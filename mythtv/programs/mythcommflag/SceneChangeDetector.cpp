@@ -113,11 +113,11 @@ SceneChangeDetector::SceneChangeDetector(HistogramAnalyzer *ha,
     debugLevel = gContext->GetNumSetting("SceneChangeDetectorDebugLevel", 0);
 
     if (debugLevel >= 1)
+    {
         createDebugDirectory(debugdir,
             QString("SceneChangeDetector debugLevel %1").arg(debugLevel));
-
-    if (debugLevel >= 1)
         debug_scenechange = true;
+    }
 }
 
 SceneChangeDetector::~SceneChangeDetector(void)
