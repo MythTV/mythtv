@@ -2873,7 +2873,7 @@ void Scheduler::FillRecordingDir(ProgramInfo *pginfo, RecList& reclist)
                     if (weightOffset)
                     {
                         VERBOSE(VB_FILE|VB_SCHEDULE, QString(
-                                "  %1 @ %2 in use by '%3'on %4:%5, FSID #%6, "
+                                "  %1 @ %2 in use by '%3' on %4:%5, FSID #%6, "
                                 "FSID weightOffset +%7.")
                                 .arg(recChanid)
                                 .arg(recStart.toString(Qt::ISODate))
