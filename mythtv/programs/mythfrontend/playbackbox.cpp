@@ -3980,7 +3980,7 @@ QDateTime PlaybackBox::getPreviewLastModified(ProgramInfo *pginfo)
  */
 bool PlaybackBox::SetPreviewGenerator(const QString &xfn, PreviewGenerator *g)
 {
-    QString fn = xfn.mid(max(xfn.findRev('/'),0));
+    QString fn = xfn.mid(xfn.findRev('/') + 1);
     if (!g)
     {
         if (previewGeneratorLock.tryLock())
