@@ -6468,8 +6468,10 @@ void NuppelVideoPlayer::DisplayDVDButton(void)
         osd->HideSet("subtitles");
         osd->ClearAll("subtitles");
         subtitleLock.lock();
-        int h = highlightButton->h;
-        int w = highlightButton->w;
+        uint h = ringBuffer->DVD()->ButtonHeight();
+        uint w = ringBuffer->DVD()->ButtonWidth();
+        uint bitmapHeight = highlightButton->h;
+        uint bitmapWidth  = highlightButton->w;
         int linesize = highlightButton->linesize;
         int x1 = highlightButton->x;
         int y1 = highlightButton->y;
@@ -6477,14 +6479,18 @@ void NuppelVideoPlayer::DisplayDVDButton(void)
         uint btnY = ringBuffer->DVD()->ButtonPosY();
         subtitleOSD = osd->GetSet("subtitles");
 
+        if ((w + x1) > bitmapWidth)
+            w = w - ((w + x1) - bitmapWidth);
+       
+        if ((h + y1) > bitmapHeight)
+            h = h - ((h + y1) - bitmapHeight);
+        
         QImage hl_button(w, h, 32);
         hl_button.setAlphaBuffer(true);
-        for (int y = 0; y < h; y++)
+        for (uint y = 0; y < h; y++)
         {
-            for (int x = 0; x < w; x++)
+            for (uint x = 0; x < w; x++)
             {
-                if ((x+x1) >= linesize)
-                    break;
                 uint8_t color = highlightButton->bitmap[(y+y1)*linesize+(x+x1)];
                 uint32_t pixel = highlightButton->rgba_palette[color];
                 hl_button.setPixel(x, y, pixel);

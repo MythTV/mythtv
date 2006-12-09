@@ -670,8 +670,6 @@ bool DVDRingBufferPriv::DrawMenuButton(uint8_t *spu_pkt, int buf_size)
         int x1, y1;
         x1 = dvdMenuButton.rects[0].x;
         y1 = dvdMenuButton.rects[0].y;
-        dvdMenuButton.rects[0].w = hl_width;
-        dvdMenuButton.rects[0].h = hl_height;
         if (hl_startx > x1)
             dvdMenuButton.rects[0].x = hl_startx - x1;
         else

@@ -50,8 +50,10 @@ class MPUBLIC DVDRingBufferPriv
     void ReleaseMenuButton(void);
 
     bool IgnoringStillorWait(void) { return skipstillorwait; }
-    uint ButtonPosX(void) { return hl_startx; }
-    uint ButtonPosY(void) { return hl_starty; }
+    uint ButtonPosX(void)   { return hl_startx; }
+    uint ButtonPosY(void)   { return hl_starty; }
+    uint ButtonWidth(void)  { return hl_width; }
+    uint ButtonHeight(void) { return hl_height; }
     uint GetAudioLanguage(int id);
     uint GetSubtitleLanguage(int id);
     void SetMenuPktPts(long long pts) { menupktpts = pts; }
