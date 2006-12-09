@@ -296,6 +296,8 @@ foreach my $show (@files) {
     }
 
     if ($showBase =~ m/$channel_regx\_$date_regx\_$date_regx/) {
+        ($syear, $smonth, $sday, $shour, $sminute, $ssecond) =
+            ($2, $3, $4, $5, $6, $7);
         ($eyear, $emonth, $eday, $ehour, $eminute, $esecond) =
             ($8, $9, $10, $11, $12, $13);
     }
