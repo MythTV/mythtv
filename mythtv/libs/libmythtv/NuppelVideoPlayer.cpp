@@ -6483,6 +6483,8 @@ void NuppelVideoPlayer::DisplayDVDButton(void)
         {
             for (int x = 0; x < w; x++)
             {
+                if ((x+x1) >= linesize)
+                    break;
                 uint8_t color = highlightButton->bitmap[(y+y1)*linesize+(x+x1)];
                 uint32_t pixel = highlightButton->rgba_palette[color];
                 hl_button.setPixel(x, y, pixel);
