@@ -378,7 +378,7 @@ foreach my $show (@files) {
         $sql =~ s/\(\?\)/"%s"/g;
         my $statement = sprintf($sql, $channel, $starttime, $endtime, $newtitle,
                                 $newsubtitle, $newdescription, $host, $mythfile,
-                                $starttime, $endtime, storagegroup);
+                                $starttime, $endtime, $storagegroup);
         print("Test mode: insert would have been been:\n");
         print($statement, ";\n");
 
@@ -387,7 +387,7 @@ foreach my $show (@files) {
         $sth = $dbh->prepare($sql);
         $sth->execute($channel, $starttime, $endtime, $newtitle,
                       $newsubtitle, $newdescription, $host, $mythfile,
-                      $starttime, $endtime, storagegroup)
+                      $starttime, $endtime, $storagegroup)
             or die "Could not execute ($sql)\n";
 
         if ($mythfile ne $showBase) {
