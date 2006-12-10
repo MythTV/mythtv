@@ -29,6 +29,7 @@ class EITFixUp
         kFixAUStar     = 0x0040,
         kFixMCA        = 0x0080,
         kFixRTL        = 0x0100,
+        kFixFI         = 0x0200,
 
         // Early fixups
         kEFixForceISO8859_1  = 0x1000,
@@ -56,6 +57,7 @@ class EITFixUp
     void FixAUStar(DBEvent &event) const;        // Australia DVB-S
     void FixMCA(DBEvent &event) const;        // MultiChoice Africa DVB-S
     void FixRTL(DBEvent &event) const;        // RTL group DVB
+    void FixFI(DBEvent &event) const;            // Finland DVB-T
 
     const QRegExp m_bellYear;
     const QRegExp m_bellActors;
@@ -95,6 +97,8 @@ class EITFixUp
     const QRegExp m_mcaYear;
     const QRegExp m_mcaCC;
     const QRegExp m_RTLSubtitle;
+    const QRegExp m_fiRerun;
+    const QRegExp m_Stereo;
 };
 
 #endif // EITFIXUP_H

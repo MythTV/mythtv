@@ -48,7 +48,9 @@ EITFixUp::EITFixUp()
       m_mcaActorsSeparator("(,\\s+)"),
       m_mcaYear("(.*) \\((\\d{4})\\)\\s*$"),
       m_mcaCC("(.*)\\. HI Subtitles$"),
-      m_RTLSubtitle("([^\\.]+)\\.\\s+(.+)")
+      m_RTLSubtitle("([^\\.]+)\\.\\s+(.+)"),
+      m_fiRerun("Uusinta.?"),
+      m_Stereo("(Stereo)")
 {
 }
 
@@ -86,6 +88,9 @@ void EITFixUp::Fix(DBEvent &event) const
 
     if (kFixRTL & event.fixup)
         FixRTL(event);
+
+    if (kFixFI & event.fixup)
+        FixFI(event);
 
     if (event.fixup)
     {
@@ -760,3 +765,24 @@ void EITFixUp::FixRTL(DBEvent &event) const
         }
     }
 }
+
+/** \fn EITFixUp::FixFI(DBEvent&) const
+ *  \brief Use this to clean DVB-T guide in Finland.
+ */
+void EITFixUp::FixFI(DBEvent &event) const
+{
+    int position = event.description.find(m_fiRerun);
+    if (position != -1)
+    {
+        event.description = event.description.replace(m_fiRerun, "");
+    }
+
+    // Check for (Stereo) in the decription and set the <audio> tags
+    position = event.description.find(m_Stereo);
+    if (position != -1)
+    {
+        event.flags |= DBEvent::kStereo;
+        event.description = event.description.replace(m_Stereo, "");
+    }
+}
+
