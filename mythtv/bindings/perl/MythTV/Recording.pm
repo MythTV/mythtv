@@ -16,6 +16,16 @@ package MythTV::Recording;
 # Required for checking byteorder when processing NuppelVideo files
     use Config;
 
+# Some other necessities
+    use Date::Manip;
+
+# Necessary constants for sysopen
+    use Fcntl;
+
+# Sometimes used by get_pixmap()
+    use File::Copy;
+    use Sys::Hostname;
+
 # Cache the results from find_program
     our %find_program_cache;
 
@@ -397,6 +407,127 @@ package MythTV::Recording;
         elsif ($aspect =~ m/^1.7/) { return 16 / 9; }
     # Unknown aspect
         return $aspect;
+    }
+
+# Get the modification date of the pixmap
+    sub pixmap_last_mod {
+        my $self = shift;
+        my $mod = $self->{'_mythtv'}->backend_command(join($MythTV::BACKEND_SEP,
+                                                           'QUERY_PIXMAP_LASTMODIFIED',
+                                                           $self->to_string())
+                                                     );
+        if ($mod eq 'BAD') {
+            return 0;
+        }
+        return UnixDate($mod, '%s');
+    }
+
+# Generate a pixmap for this recording
+    sub generate_pixmap {
+        my $self = shift;
+        my $ret = $self->{'_mythtv'}->backend_command(join($MythTV::BACKEND_SEP,
+                                                           'QUERY_GENPIXMAP',
+                                                           $self->to_string())
+                                                     );
+        if ($ret eq 'BAD') {
+            print STDERR "Unknown error generating pixmap for $self->{'chanid'}:$self->{'starttime'}\n";
+            return 0;
+        }
+        return 1;
+    }
+
+# Get a preview pixmap from the backend and store it into $fh/$path if
+# appropriate.  Return values are:
+#
+# undef:  Error
+# 1:      Current file is up to date
+# 2:      File copied into place
+# 3:      File retrieved from the backend
+#
+    sub get_pixmap {
+        my $self = shift;
+    # The second parameter can be a file handle or a string
+        my $path = undef;
+        if (ref($_[0]) eq 'GLOB') {
+            my $fh = shift;
+        }
+        else {
+            $path = shift;
+            if (ref(\$path) ne 'SCALAR') {
+                die "Developer passed an unrecognized filehandle/path value to MythTV::Recording::preview_pixmap().\n";
+            }
+        }
+    # Find out when the pixmap was last modified
+        my $png_mod = $self->pixmap_last_mod();
+    # Regenerate the pixmap if the recording has since been updated
+        if ($png_mod < $self->{'lastmodified'}) {
+            $png_mod = $self->{'lastmodified'};
+            unless ($self->generate_pixmap()) {
+                return undef;
+            }
+        }
+    # Is our target file already up to date?
+       my $mtime = (stat($path ? $path : $fh))[9];
+          $mtime ||= 0;
+       if ($mtime >= $png_mod) {
+           return 1;
+       }
+    # Local path to the png that we can just copy from?
+        if ($self->{'local_path'} && -e $self->{'local_path'}.'.png') {
+            copy($self->{'local_path'}.'.png', $path ? $path : $fh);
+            return 2;
+        }
+    # Announce the file transfer request to the backend with the file, and
+    # prepare a file pointer to hold the data from the backend.
+        my $sock;
+        my @recs = split($MythTV::BACKEND_SEP_rx,
+                         $self->{'_mythtv'}->backend_command2(join($MythTV::BACKEND_SEP,
+                                                                   'ANN FileTransfer '.hostname,
+                                                                   $self->{'filename'}.'.png'),
+                                                              \$sock,
+                                                              $self->{'file_host'},
+                                                              $self->{'file_port'}
+                                                             )
+                        );
+    # Error?
+        if ($recs[0] ne 'OK') {
+            print STDERR "Unknown error starting transfer of $self->{'filename'}.png\n";
+            return undef;
+        }
+    # If we were given a pathname as a parameter, it's now time to open the
+    # file for writing.
+        if ($path) {
+            sysopen($fh, $path, O_CREAT|O_TRUNC|O_WRONLY) or die "Can't create $path:  $!\n";
+        }
+    # Make sure the file handle is in binary mode
+        binmode($fh);
+    # Tell the backend to send the data
+        $self->{'_mythtv'}->backend_command('ANN Playback '.hostname.' 0',
+                                            $self->{'file_host'},
+                                            $self->{'file_port'});
+        $self->{'_mythtv'}->backend_command(join($MythTV::BACKEND_SEP,
+                                                 'QUERY_FILETRANSFER '.$recs[1],
+                                                 'REQUEST_BLOCK',
+                                                 $recs[3]),
+                                            $self->{'file_host'},
+                                            $self->{'file_port'});
+    # Read the data from the socket and save it into the requested file.
+    # We have to loop here because sometimes the backend can't send data fast
+    # enough, even if we're dealing with small files.
+        my $length = $recs[3];
+        my $png;
+        while ($length) {
+            my $bytes = sysread($sock, $png, $length);
+            last if ($bytes < 1);
+            print $fh $png;
+            $length -= $bytes;
+        };
+    # Make sure we close any files we created
+        if ($path) {
+            close($fh);
+        }
+    # Return
+        return 3;
     }
 
 # Find the requested program in the path

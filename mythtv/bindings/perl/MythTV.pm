@@ -270,15 +270,11 @@ package MythTV;
         }
     # Open a connection to the requested backend, unless we've already done so
         if (!$$fp) {
-            if (!$fp_cache{$host}{$port}) {
-                $fp_cache{$host}{$port}
-                    = IO::Socket::INET->new(PeerAddr => $host,
-                                            PeerPort => $port,
-                                            Proto    => 'tcp',
-                                            Timeout  => 25)
-                             or die "Couldn't communicate with $host on port $port:  $@\n";
-            }
-            $fp = \$fp_cache{$host}{$port};
+            $$fp = IO::Socket::INET->new(PeerAddr => $host,
+                                         PeerPort => $port,
+                                         Proto    => 'tcp',
+                                         Timeout  => 25)
+                          or die "Couldn't communicate with $host on port $port:  $@\n";
             if ($$fp && $command !~ /^MYTH_PROTO_VERSION\s/) {
                 $self->check_proto_version($host, $port) or return;
             }
@@ -297,12 +293,12 @@ package MythTV;
             return;
         }
     # Read the response header to find out how much data we'll be grabbing
-        read($$fp, $length, 8);
+        sysread($$fp, $length, 8);
         $length = int($length);
     # Read and return any data that was returned
         $ret = '';
         while ($length > 0) {
-            my $bytes = read($$fp, $data, ($length < 8192 ? $length : 8192));
+            my $bytes = sysread($$fp, $data, ($length < 8192 ? $length : 8192));
         # EOF?
             last if ($bytes < 1);
         # On to the next

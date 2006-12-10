@@ -9,10 +9,10 @@
 # @author    $Author$
 #
 
+package MythTV::Program;
+
 # Make sure that the main MythTV package is loaded
     use MythTV;
-
-package MythTV::Program;
 
 # Constructor
     sub new {
