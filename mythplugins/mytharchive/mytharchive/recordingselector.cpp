@@ -404,6 +404,15 @@ void RecordingSelector::getRecordingList(void)
             if (p->GetPlaybackURL(false, true).startsWith("myth://"))
             {
                 recordingList->erase(i);
+                i--;
+                continue;
+            }
+
+            // ignore live tv recordings
+            if (p->recgroup == "LiveTV")
+            {
+                recordingList->erase(i);
+                i--;
                 continue;
             }
 
