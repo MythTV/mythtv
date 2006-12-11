@@ -230,12 +230,12 @@ static HostLineEdit *MythArchiveTcrequantCmd()
     return gc;
 };
 
-static HostLineEdit *MythArchivePng2yuvCmd()
+static HostLineEdit *MythArchiveJpeg2yuvCmd()
 {
-    HostLineEdit *gc = new HostLineEdit("MythArchivePng2yuvCmd");
-    gc->setLabel(QObject::tr("png2yuv command"));
-    gc->setValue("png2yuv");
-    gc->setHelpText(QObject::tr("Command to run png2yuv. Part of mjpegtools package")); 
+    HostLineEdit *gc = new HostLineEdit("MythArchiveJpeg2yuvCmd");
+    gc->setLabel(QObject::tr("jpeg2yuv command"));
+    gc->setValue("jpeg2yuv");
+    gc->setHelpText(QObject::tr("Command to run jpeg2yuv. Part of mjpegtools package")); 
     return gc;
 };
 
@@ -294,6 +294,6 @@ ArchiveSettings::ArchiveSettings()
     vcg4->addChild(MythArchiveMkisofsCmd());
     vcg4->addChild(MythArchiveGrowisofsCmd());
     vcg4->addChild(MythArchiveTcrequantCmd());
-    vcg4->addChild(MythArchivePng2yuvCmd());
+    vcg4->addChild(MythArchiveJpeg2yuvCmd());
     addChild(vcg4);
 }

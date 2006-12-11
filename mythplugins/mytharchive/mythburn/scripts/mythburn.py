@@ -31,7 +31,7 @@
 #******************************************************************************
 
 # version of script - change after each update
-VERSION="0.1.20061205-1"
+VERSION="0.1.20061211-1"
 
 
 ##You can use this debug flag when testing out new themes
@@ -305,6 +305,16 @@ def runCommand(command):
     checkCancelFlag()
     return result
 
+def secondsToFrames(seconds):
+    """Convert a time in seconds to a frame position"""
+    if videomode=="pal":
+        framespersecond=frameratePAL
+    else:
+        framespersecond=framerateNTSC
+
+    frames=int(seconds * framespersecond)
+    return frames
+
 def encodeMenu(background, tempvideo, music, musiclength, tempmovie, xmlfile, finaloutput, aspectratio):
     if videomode=="pal":
         framespersecond=frameratePAL
@@ -313,11 +323,11 @@ def encodeMenu(background, tempvideo, music, musiclength, tempmovie, xmlfile, fi
 
     totalframes=int(musiclength * framespersecond)
 
-    command = path_png2yuv[0] + " -n %s -v0 -I p -f %s -j '%s' | %s -b 5000 -a %s -v 1 -f 8 -o '%s'" \
-               % (totalframes, framespersecond, background, path_mpeg2enc[0], aspectratio, tempvideo)
+    command = path_jpeg2yuv[0] + " -n %s -v0 -I p -f %s -j '%s' | %s -b 5000 -a %s -v 1 -f 8 -o '%s'" \
+              % (totalframes, framespersecond, background, path_mpeg2enc[0], aspectratio, tempvideo)
     result = runCommand(command)
     if result<>0:
-        fatalError("Failed while running png2yuv - %s" % command)
+        fatalError("Failed while running jpeg2yuv - %s" % command)
 
     command = path_mplex[0] + " -f 8 -v 0 -o '%s' '%s' '%s'" % (tempmovie, tempvideo, music)
     result = runCommand(command)
@@ -542,7 +552,7 @@ def getDefaultParametersFromMythTVDB():
                         'MythArchiveProjectXCmd',
                         'MythArchiveDVDLocation',
                         'MythArchiveGrowisofsCmd',
-                        'MythArchivePng2yuvCmd',
+                        'MythArchiveJpeg2yuvCmd',
                         'MythArchiveSpumuxCmd',
                         'MythArchiveMpeg2encCmd',
                         'MythArchiveEncodeToAc3',
@@ -2224,6 +2234,53 @@ def createDVDAuthorXMLNoMenus(screensize, numberofitems):
     #Destroy the DOM and free memory
     dvddom.unlink()
 
+def createEmptyPreviewFolder(videoitem):
+    previewfolder = os.path.join(getItemTempPath(videoitem), "preview")
+    if os.path.exists(previewfolder):
+        deleteAllFilesInFolder(previewfolder)
+        os.rmdir (previewfolder)
+    os.makedirs(previewfolder)
+    return previewfolder
+
+
+def generateVideoPreview(videoitem, itemonthispage, menuitem, starttime, menulength, previewfolder):
+    """generate thumbnails for a preview in a menu"""
+
+    positionx = 9999
+    positiony = 9999
+    width = 0
+    height = 0
+    maskpicture = None
+
+    #run through the theme items and find any graphics that is using a movie identifier
+    for node in menuitem.childNodes:
+        if node.nodeName=="graphic":
+            if node.attributes["filename"].value == "%movie":
+                #This is a movie preview item so we need to generate the thumbnails
+                inputfile = os.path.join(getItemTempPath(videoitem),"stream.mv2")
+                outputfile = os.path.join(previewfolder, "preview-i%d-t%%1-f%%2.jpg" % itemonthispage)
+                width = getScaledAttribute(node, "w")
+                height = getScaledAttribute(node, "h")
+                frames = int(secondsToFrames(menulength))
+
+                command = "mytharchivehelper -t  %s '%s' '%s' %d" % (inputfile, starttime, outputfile, frames)
+                result = runCommand(command)
+                if (result != 0):
+                    write( "mytharchivehelper failed with code %d. Command = %s" % (result, command) )
+
+                positionx = getScaledAttribute(node, "x")
+                positiony = getScaledAttribute(node, "y")
+
+                #see if this graphics item has a mask
+                if node.hasAttribute("mask"):
+                    imagemaskfilename = getThemeFile(themeName, node.attributes["mask"].value)
+                    if node.attributes["mask"].value <> "" and doesFileExist(imagemaskfilename):
+                        maskpicture = Image.open(imagemaskfilename,"r").resize((width, height))
+                        maskpicture = maskpicture.convert("RGBA")
+
+    return (positionx, positiony, width, height, maskpicture)
+
+
 def drawThemeItem(page, itemsonthispage, itemnum, menuitem, bgimage, draw,
                   bgimagemask, drawmask, highlightcolor, spumuxdom, spunode,
                   numberofitems, chapternumber, chapterlist):
@@ -2244,18 +2301,39 @@ def drawThemeItem(page, itemsonthispage, itemnum, menuitem, bgimage, draw,
         #Process each type of item to add it onto the background image
         if node.nodeName=="graphic":
             #Overlay graphic image onto background
-            imagefilename = expandItemText(infoDOM,node.attributes["filename"].value, itemnum, page, itemsonthispage, chapternumber, chapterlist)
 
-            if doesFileExist(imagefilename):
-                picture = Image.open(imagefilename,"r").resize((getScaledAttribute(node, "w"), getScaledAttribute(node, "h")))
-                picture = picture.convert("RGBA")
-                bgimage.paste(picture, (getScaledAttribute(node, "x"), getScaledAttribute(node, "y")), picture)
-                del picture
-                write( "Added image %s" % imagefilename)
-
+            #if this graphic item is a movie thumbnail then we dont process it here
+            if node.attributes["filename"].value == "%movie":
+                #this is a movie item but we must still update the boundary box
                 boundarybox=checkBoundaryBox(boundarybox, node)
             else:
-                write( "Image file does not exist '%s'" % imagefilename)
+                imagefilename = expandItemText(infoDOM,node.attributes["filename"].value, itemnum, page, itemsonthispage, chapternumber, chapterlist)
+
+                if doesFileExist(imagefilename) == False:
+                    if imagefilename == node.attributes["filename"].value:
+                        imagefilename = getThemeFile(themeName, node.attributes["filename"].value)
+                if doesFileExist(imagefilename):
+                    picture = Image.open(imagefilename,"r").resize((getScaledAttribute(node, "w"), getScaledAttribute(node, "h")))
+                    picture = picture.convert("RGBA")
+
+                    #see if an image mask exists
+                    imagemaskfilename = None
+                    if node.hasAttribute("mask"):
+                        if node.attribute["mask"].value <> "":
+                            imagemaskfilename = getThemeFile(themeName, node.attributes["mask"].value)
+                    if imagemaskfilename <> None and doesFileExist(imagemaskfilename):
+                        maskpicture = Image.open(imagemaskfilename,"r").resize((getScaledAttribute(node, "w"), getScaledAttribute(node, "h")))
+                        maskpicture = maskpicture.convert("RGBA")
+                        bgimage.paste(picture, (getScaledAttribute(node, "x"), getScaledAttribute(node, "y")), maskpicture)
+                        del maskpicture
+                    else:
+                        bgimage.paste(picture, (getScaledAttribute(node, "x"), getScaledAttribute(node, "y")), picture)
+                    del picture
+                    write( "Added image %s" % imagefilename)
+
+                    boundarybox=checkBoundaryBox(boundarybox, node)
+                else:
+                    write( "Image file does not exist '%s'" % imagefilename)
 
         elif node.nodeName=="text":
             #Apply some text to the background, including wordwrap if required.
@@ -2452,14 +2530,12 @@ def drawThemeItem(page, itemsonthispage, itemnum, menuitem, bgimage, draw,
     #Draw the mask for this item
 
     if wantHighlightBox == True:
-        #Make the boundary box bigger than the content to avoid over write(ing (2 pixels)
+        # Make the boundary box bigger than the content to avoid over writing it
         boundarybox=boundarybox[0]-1,boundarybox[1]-1,boundarybox[2]+1,boundarybox[3]+1
-        #draw.rectangle(boundarybox,outline="white")
         drawmask.rectangle(boundarybox,outline=highlightcolor)
 
-        #Draw another line to make the box thicker - PIL does not support linewidth
+        # Draw another line to make the box thicker - PIL does not support linewidth
         boundarybox=boundarybox[0]-1,boundarybox[1]-1,boundarybox[2]+1,boundarybox[3]+1
-        #draw.rectangle(boundarybox,outline="white")
         drawmask.rectangle(boundarybox,outline=highlightcolor)
 
     node = spumuxdom.createElement("button")
@@ -2521,22 +2597,61 @@ def createMenu(screensize, screendpi, numberofitems):
     #Item counter to indicate current video item
     itemnum=1
 
-    write( "Creating DVD menus")
+    write("Creating DVD menus")
 
     while itemnum <= numberofitems:
-        write( "Menu page %s" % page)
+        write("Menu page %s" % page)
 
-        #Default settings for this page
+        #need to check if any of the videos are flaged as movies
+        #and if so generate the required preview
+
+        write("Creating Preview Video")
+        previewitem = itemnum
+        itemsonthispage = 0
+        haspreview = False
+
+        previewx = []
+        previewy = []
+        previeww = []
+        previewh = []
+        previewmask = []
+
+        while previewitem <= numberofitems and itemsonthispage < itemsperpage:
+            menuitem=menuitems[ itemsonthispage ]
+            itemsonthispage+=1
+
+            #make sure the preview folder is empty and present
+            previewfolder = createEmptyPreviewFolder(previewitem)
+
+            #and then generate the preview if required (px=9999 means not required)
+            px, py, pw, ph, maskimage = generateVideoPreview(previewitem, itemsonthispage, menuitem, 0, menulength, previewfolder)
+            previewx.append(px)
+            previewy.append(py)
+            previeww.append(pw)
+            previewh.append(ph)
+            previewmask.append(maskimage)
+            if px != 9999:
+                haspreview = True
+
+            previewitem+=1
+
+        #previews generated but need to save where we started from
+        savedpreviewitem = itemnum
 
         #Number of video items on this menu page
         itemsonthispage=0
 
-        #Load background image
-        bgimage=Image.open(backgroundfilename,"r").resize(screensize)
-        draw=ImageDraw.Draw(bgimage)
+        #instead of loading the background image and drawing on it we now
+        #make a transparent image and draw all items on it. This overlay
+        #image is then added to the required background image when the
+        #preview items are added (the reason for this is it will assist
+        #if the background image is actually a video)
+
+        overlayimage=Image.new("RGBA",screensize)
+        draw=ImageDraw.Draw(overlayimage)
 
         #Create image to hold button masks (same size as background)
-        bgimagemask=Image.new("RGBA",bgimage.size)
+        bgimagemask=Image.new("RGBA",overlayimage.size)
         drawmask=ImageDraw.Draw(bgimagemask)
 
         spumuxdom = xml.dom.minidom.parseString('<subpictures><stream><spu force="yes" start="00:00:00.0" highlight="" select="" ></spu></stream></subpictures>')
@@ -2549,20 +2664,58 @@ def createMenu(screensize, screendpi, numberofitems):
             itemsonthispage+=1
 
             drawThemeItem(page, itemsonthispage,
-                        itemnum, menuitem, bgimage,
+                        itemnum, menuitem, overlayimage,
                         draw, bgimagemask, drawmask, highlightcolor,
                         spumuxdom, spunode, numberofitems, 0,"")
 
             #On to the next item
             itemnum+=1
 
+        #Paste the overlay image onto the background
+        bgimage=Image.open(backgroundfilename,"r").resize(screensize)
+        bgimage.paste(overlayimage, (0,0), overlayimage)
+
         #Save this menu image and its mask
-        bgimage.save(os.path.join(getTempPath(),"background-%s.png" % page),"PNG",quality=99,optimize=0,dpi=screendpi)
+        bgimage.save(os.path.join(getTempPath(),"background-%s.jpg" % page),"JPEG", quality=90)
         bgimagemask.save(os.path.join(getTempPath(),"backgroundmask-%s.png" % page),"PNG",quality=99,optimize=0,dpi=screendpi)
 
-## Experimental!
-##        for i in range(1,750):
-##            bgimage.save(os.path.join(getTempPath(),"background-%s-%s.ppm" % (page,i)),"PPM",quality=99,optimize=0)
+        #now that the base background has been made and all the previews generated
+        #we need to add the previews to the background
+        #Assumption: We assume that there is nothing in the location of where the items go 
+        #(ie, no text on the images)
+
+        itemsonthispage = 0
+
+        #numframes should be the number of preview images that have been created
+        numframes=secondsToFrames(menulength)
+
+        # only generate the preview video if required.
+        if haspreview == True:
+            write( "Generating the preview images" )
+            framenum = 0
+            while framenum < numframes:
+                previewitem = savedpreviewitem
+                itemsonthispage = 0
+                while previewitem <= numberofitems and itemsonthispage < itemsperpage:
+                    itemsonthispage+=1
+                    if previewx[itemsonthispage-1] != 9999:
+                        previewpath = os.path.join(getItemTempPath(previewitem), "preview")
+                        previewfile = "preview-i%d-t1-f%d.jpg" % (itemsonthispage, framenum)
+                        imagefile = os.path.join(previewpath, previewfile)
+
+                        if doesFileExist(imagefile):
+                            picture = Image.open(imagefile, "r").resize((previeww[itemsonthispage-1], previewh[itemsonthispage-1]))
+                            picture = picture.convert("RGBA")
+                            imagemaskfile = os.path.join(previewpath, "mask-i%d.png" % itemsonthispage)
+                            if previewmask[itemsonthispage-1] != None:
+                                bgimage.paste(picture, (previewx[itemsonthispage-1], previewy[itemsonthispage-1]), previewmask[itemsonthispage-1])
+                            else:
+                                bgimage.paste(picture, (previewx[itemsonthispage-1], previewy[itemsonthispage-1]))
+                            del picture
+                    previewitem+=1
+                #bgimage.save(os.path.join(getTempPath(),"background-%s-f%06d.png" % (page, framenum)),"PNG",quality=100,optimize=0,dpi=screendpi)
+                bgimage.save(os.path.join(getTempPath(),"background-%s-f%06d.jpg" % (page, framenum)),"JPEG",quality=90)
+                framenum+=1
 
         spumuxdom.documentElement.firstChild.firstChild.setAttribute("select",os.path.join(getTempPath(),"backgroundmask-%s.png" % page))
         spumuxdom.documentElement.firstChild.firstChild.setAttribute("highlight",os.path.join(getTempPath(),"backgroundmask-%s.png" % page))
@@ -2572,8 +2725,11 @@ def createMenu(screensize, screendpi, numberofitems):
         del bgimage
         del drawmask
         del bgimagemask
+        del overlayimage
+        del previewx
+        del previewy
+        del previewmask
 
-        #write( spumuxdom.toprettyxml())
         WriteXMLToFile (spumuxdom,os.path.join(getTempPath(),"spumux-%s.xml" % page))
 
         if mainmenuAspectRatio == "4:3":
@@ -2582,19 +2738,24 @@ def createMenu(screensize, screendpi, numberofitems):
             aspect_ratio = 3
 
         write("Encoding Menu Page %s using aspect ratio '%s'" % (page, mainmenuAspectRatio))
-        encodeMenu(os.path.join(getTempPath(),"background-%s.png" % page),
-                    os.path.join(getTempPath(),"temp.m2v"),
-                    getThemeFile(themeName,menumusic),
-                    menulength,
-                    os.path.join(getTempPath(),"temp.mpg"),
-                    os.path.join(getTempPath(),"spumux-%s.xml" % page),
-                    os.path.join(getTempPath(),"menu-%s.mpg" % page),
-                    aspect_ratio)
-
-        #Tidy up temporary files
-####        os.remove(os.path.join(getTempPath(),"spumux-%s.xml" % page))
-####        os.remove(os.path.join(getTempPath(),"background-%s.png" % page))
-####        os.remove(os.path.join(getTempPath(),"backgroundmask-%s.png" % page))
+        if haspreview == True:
+            encodeMenu(os.path.join(getTempPath(),"background-%s-f%%06d.jpg" % page),
+                        os.path.join(getTempPath(),"temp.m2v"),
+                        getThemeFile(themeName,menumusic),
+                        menulength,
+                        os.path.join(getTempPath(),"temp.mpg"),
+                        os.path.join(getTempPath(),"spumux-%s.xml" % page),
+                        os.path.join(getTempPath(),"menu-%s.mpg" % page),
+                        aspect_ratio)
+        else:
+            encodeMenu(os.path.join(getTempPath(),"background-%s.jpg" % page),
+                        os.path.join(getTempPath(),"temp.m2v"),
+                        getThemeFile(themeName,menumusic),
+                        menulength,
+                        os.path.join(getTempPath(),"temp.mpg"),
+                        os.path.join(getTempPath(),"spumux-%s.xml" % page),
+                        os.path.join(getTempPath(),"menu-%s.mpg" % page),
+                        aspect_ratio)
 
         #Move on to the next page
         page+=1
@@ -2647,14 +2808,17 @@ def createChapterMenu(screensize, screendpi, numberofitems):
     while page <= numberofitems:
         write( "Sub-menu %s " % page)
 
-        #Default settings for this page
+        #instead of loading the background image and drawing on it we now
+        #make a transparent image and draw all items on it. This overlay
+        #image is then added to the required background image when the
+        #preview items are added (the reason for this is it will assist
+        #if the background image is actually a video)
 
-        #Load background image
-        bgimage=Image.open(backgroundfilename,"r").resize(screensize)
-        draw=ImageDraw.Draw(bgimage)
+        overlayimage=Image.new("RGBA",screensize)
+        draw=ImageDraw.Draw(overlayimage)
 
         #Create image to hold button masks (same size as background)
-        bgimagemask=Image.new("RGBA",bgimage.size)
+        bgimagemask=Image.new("RGBA",overlayimage.size)
         drawmask=ImageDraw.Draw(bgimagemask)
 
         spumuxdom = xml.dom.minidom.parseString('<subpictures><stream><spu force="yes" start="00:00:00.0" highlight="" select="" ></spu></stream></subpictures>')
@@ -2664,22 +2828,87 @@ def createChapterMenu(screensize, screendpi, numberofitems):
         chapterlist=createVideoChapters(page,itemsperpage,getLengthOfVideo(page),True)
         chapterlist=string.split(chapterlist,",")
 
+        #now need to preprocess the menu to see if any preview videos are required
+        #This must be done on an individual basis since we do the resize as the
+        #images are extracted.
+
+        #first make sure the preview folder is empty and present
+        previewfolder = createEmptyPreviewFolder(page)
+
+        haspreview = False
+
+        previewsegment=int(getLengthOfVideo(page) / itemsperpage)
+        previewtime = 0
+        previewchapter = 0
+        previewx = []
+        previewy = []
+        previeww = []
+        previewh = []
+        previewmask = []
+
+        while previewchapter < itemsperpage:
+            menuitem=menuitems[ previewchapter ]
+
+            #generate the preview if required (px=9999 means not required)
+            px, py, pw, ph, maskimage = generateVideoPreview(page, previewchapter, menuitem, previewtime, menulength, previewfolder)
+            previewx.append(px)
+            previewy.append(py)
+            previeww.append(pw)
+            previewh.append(ph)
+            previewmask.append(maskimage)
+
+            if px != 9999:
+                haspreview = True
+
+            previewchapter+=1
+            previewtime+=previewsegment
+
         #Loop through all the items on this menu page
         chapter=0
         while chapter < itemsperpage:  # and itemsonthispage < itemsperpage:
             menuitem=menuitems[ chapter ]
             chapter+=1
 
-            drawThemeItem(page, itemsperpage, page, menuitem, 
-                        bgimage, draw, 
+            drawThemeItem(page, itemsperpage, page, menuitem,
+                        overlayimage, draw, 
                         bgimagemask, drawmask, highlightcolor,
-                        spumuxdom, spunode, 
+                        spumuxdom, spunode,
                         999, chapter, chapterlist)
 
         #Save this menu image and its mask
-        bgimage.save(os.path.join(getTempPath(),"chaptermenu-%s.png" % page),"PNG",quality=99,optimize=0,dpi=screendpi)
+        bgimage=Image.open(backgroundfilename,"r").resize(screensize)
+        bgimage.paste(overlayimage, (0,0), overlayimage)
+        bgimage.save(os.path.join(getTempPath(),"chaptermenu-%s.jpg" % page),"JPEG", quality=90)
 
-        bgimagemask.save(os.path.join(getTempPath(),"chaptermenumask-%s.png" % page),"PNG",quality=99,optimize=0,dpi=screendpi)
+        bgimagemask.save(os.path.join(getTempPath(),"chaptermenumask-%s.png" % page),"PNG",quality=90,optimize=0)
+
+        if haspreview == True:
+            numframes=secondsToFrames(menulength)
+
+            #numframes should be the number of preview images that have been created
+
+            write( "Generating the preview images" )
+            framenum = 0
+            while framenum < numframes:
+                previewchapter = 0
+                while previewchapter < itemsperpage:
+                    if previewx[previewchapter] != 9999:
+                        previewpath = os.path.join(getItemTempPath(page), "preview")
+                        previewfile = "preview-i%d-t1-f%d.jpg" % (previewchapter, framenum)
+                        imagefile = os.path.join(previewpath, previewfile)
+
+                        if doesFileExist(imagefile):
+                            picture = Image.open(imagefile, "r").resize((previeww[previewchapter], previewh[previewchapter]))
+                            picture = picture.convert("RGBA")
+                            imagemaskfile = os.path.join(previewpath, "mask-i%d.png" % previewchapter)
+                            if previewmask[previewchapter] != None:
+                                bgimage.paste(picture, (previewx[previewchapter], previewy[previewchapter]), previewmask[previewchapter])
+                            else:
+                                bgimage.paste(picture, (previewx[previewchapter], previewy[previewchapter]))
+                            del picture
+                    previewchapter+=1
+                bgimage.save(os.path.join(getTempPath(),"chaptermenu-%s-f%06d.jpg" % (page, framenum)),"JPEG",quality=90)
+                framenum+=1
 
         spumuxdom.documentElement.firstChild.firstChild.setAttribute("select",os.path.join(getTempPath(),"chaptermenumask-%s.png" % page))
         spumuxdom.documentElement.firstChild.firstChild.setAttribute("highlight",os.path.join(getTempPath(),"chaptermenumask-%s.png" % page))
@@ -2689,6 +2918,10 @@ def createChapterMenu(screensize, screendpi, numberofitems):
         del bgimage
         del drawmask
         del bgimagemask
+        del overlayimage
+        del previewx
+        del previewy
+        del previewmask
 
         #write( spumuxdom.toprettyxml())
         WriteXMLToFile (spumuxdom,os.path.join(getTempPath(),"chapterspumux-%s.xml" % page))
@@ -2704,19 +2937,25 @@ def createChapterMenu(screensize, screendpi, numberofitems):
                 aspect_ratio = '2'
 
         write("Encoding Chapter Menu Page %s using aspect ratio '%s'" % (page, chaptermenuAspectRatio))
-        encodeMenu(os.path.join(getTempPath(),"chaptermenu-%s.png" % page),
-                    os.path.join(getTempPath(),"temp.m2v"),
-                    getThemeFile(themeName,menumusic),
-                    menulength,
-                    os.path.join(getTempPath(),"temp.mpg"),
-                    os.path.join(getTempPath(),"chapterspumux-%s.xml" % page),
-                    os.path.join(getTempPath(),"chaptermenu-%s.mpg" % page),
-                    aspect_ratio)
 
-        #Tidy up
-####        os.remove(os.path.join(getTempPath(),"chaptermenu-%s.png" % page))
-####        os.remove(os.path.join(getTempPath(),"chaptermenumask-%s.png" % page))
-####        os.remove(os.path.join(getTempPath(),"chapterspumux-%s.xml" % page))
+        if haspreview == True:
+            encodeMenu(os.path.join(getTempPath(),"chaptermenu-%s-f%%06d.jpg" % page),
+                        os.path.join(getTempPath(),"temp.m2v"),
+                        getThemeFile(themeName,menumusic),
+                        menulength,
+                        os.path.join(getTempPath(),"temp.mpg"),
+                        os.path.join(getTempPath(),"chapterspumux-%s.xml" % page),
+                        os.path.join(getTempPath(),"chaptermenu-%s.mpg" % page),
+                        aspect_ratio)
+        else:
+            encodeMenu(os.path.join(getTempPath(),"chaptermenu-%s.jpg" % page),
+                        os.path.join(getTempPath(),"temp.m2v"),
+                        getThemeFile(themeName,menumusic),
+                        menulength,
+                        os.path.join(getTempPath(),"temp.mpg"),
+                        os.path.join(getTempPath(),"chapterspumux-%s.xml" % page),
+                        os.path.join(getTempPath(),"chaptermenu-%s.mpg" % page),
+                        aspect_ratio)
 
         #Move on to the next page
         page+=1
@@ -2759,18 +2998,59 @@ def createDetailsPage(screensize, screendpi, numberofitems):
     while itemnum <= numberofitems:
         write( "Creating details page for %s" % itemnum)
 
-        #Load background image
-        bgimage=Image.open(backgroundfilename,"r").resize(screensize)
-        draw=ImageDraw.Draw(bgimage)
+        #make sure the preview folder is empty and present
+        previewfolder = createEmptyPreviewFolder(itemnum)
+        haspreview = False
+
+        #and then generate the preview if required (px=9999 means not required)
+        previewx, previewy, previeww, previewh, previewmask = generateVideoPreview(itemnum, 1, detailnode, 0, menulength, previewfolder)
+        if previewx != 9999:
+            haspreview = True
+
+        #instead of loading the background image and drawing on it we now
+        #make a transparent image and draw all items on it. This overlay
+        #image is then added to the required background image when the
+        #preview items are added (the reason for this is it will assist
+        #if the background image is actually a video)
+
+        overlayimage=Image.new("RGBA",screensize)
+        draw=ImageDraw.Draw(overlayimage)
 
         spumuxdom = xml.dom.minidom.parseString('<subpictures><stream><spu force="yes" start="00:00:00.0" highlight="" select="" ></spu></stream></subpictures>')
         spunode = spumuxdom.documentElement.firstChild.firstChild
 
-        drawThemeItem(0, 0, itemnum, detailnode, bgimage, draw, None, None,
+        drawThemeItem(0, 0, itemnum, detailnode, overlayimage, draw, None, None,
                       "", spumuxdom, spunode, numberofitems, 0, "")
 
         #Save this details image
-        bgimage.save(os.path.join(getTempPath(),"details-%s.png" % itemnum),"PNG",quality=99,optimize=0,dpi=screendpi)
+        bgimage=Image.open(backgroundfilename,"r").resize(screensize)
+        bgimage.paste(overlayimage, (0,0), overlayimage)
+        bgimage.save(os.path.join(getTempPath(),"details-%s.jpg" % itemnum),"JPEG", quality=90)
+
+        if haspreview == True:
+            numframes=secondsToFrames(menulength)
+
+            #numframes should be the number of preview images that have been created
+            write( "Generating the detail preview images" )
+            framenum = 0
+            while framenum < numframes:
+                if previewx != 9999:
+                    previewpath = os.path.join(getItemTempPath(itemnum), "preview")
+                    previewfile = "preview-i%d-t1-f%d.jpg" % (1, framenum)
+                    imagefile = os.path.join(previewpath, previewfile)
+
+                    if doesFileExist(imagefile):
+                        picture = Image.open(imagefile, "r").resize((previeww, previewh))
+                        picture = picture.convert("RGBA")
+                        imagemaskfile = os.path.join(previewpath, "mask-i%d.png" % 1)
+                        if previewmask != None:
+                            bgimage.paste(picture, (previewx, previewy), previewmask)
+                        else:
+                            bgimage.paste(picture, (previewx, previewy))
+                        del picture
+                bgimage.save(os.path.join(getTempPath(),"details-%s-f%06d.jpg" % (itemnum, framenum)),"JPEG",quality=90)
+                framenum+=1
+
 
         #Release large amounts of memory ASAP !
         del draw
@@ -2785,14 +3065,24 @@ def createDetailsPage(screensize, screendpi, numberofitems):
         WriteXMLToFile (spumuxdom,os.path.join(getTempPath(),"detailsspumux-%s.xml" % itemnum))
 
         write("Encoding Details Page %s" % itemnum)
-        encodeMenu(os.path.join(getTempPath(),"details-%s.png" % itemnum),
-                    os.path.join(getTempPath(),"temp.m2v"),
-                    getThemeFile(themeName,menumusic),
-                    menulength,
-                    os.path.join(getTempPath(),"temp.mpg"),
-                    "",
-                    os.path.join(getTempPath(),"details-%s.mpg" % itemnum),
-                    aspect_ratio)
+        if haspreview == True:
+            encodeMenu(os.path.join(getTempPath(),"details-%s-f%%06d.jpg" % itemnum),
+                        os.path.join(getTempPath(),"temp.m2v"),
+                        getThemeFile(themeName,menumusic),
+                        menulength,
+                        os.path.join(getTempPath(),"temp.mpg"),
+                        "",
+                        os.path.join(getTempPath(),"details-%s.mpg" % itemnum),
+                        aspect_ratio)
+        else:
+            encodeMenu(os.path.join(getTempPath(),"details-%s.jpg" % itemnum),
+                        os.path.join(getTempPath(),"temp.m2v"),
+                        getThemeFile(themeName,menumusic),
+                        menulength,
+                        os.path.join(getTempPath(),"temp.mpg"),
+                        "",
+                        os.path.join(getTempPath(),"details-%s.mpg" % itemnum),
+                        aspect_ratio)
 
         #On to the next item
         itemnum+=1
@@ -3399,6 +3689,10 @@ def processJob(job):
                     if os.path.exists(folder):
                         #Remove all the files first
                         deleteAllFilesInFolder(folder)
+                        previewfolder = os.path.join(folder, "preview")
+                        if os.path.exists(previewfolder):
+                            deleteAllFilesInFolder(previewfolder)
+                            os.rmdir(previewfolder)
                         #Remove the folder
                         os.rmdir (folder)
                     os.makedirs(folder)
@@ -3590,7 +3884,7 @@ path_dvdauthor = [defaultsettings["MythArchiveDvdauthorCmd"], os.path.split(defa
 path_mkisofs = [defaultsettings["MythArchiveMkisofsCmd"], os.path.split(defaultsettings["MythArchiveMkisofsCmd"])[1]]
 path_growisofs = [defaultsettings["MythArchiveGrowisofsCmd"], os.path.split(defaultsettings["MythArchiveGrowisofsCmd"])[1]]
 path_tcrequant = [defaultsettings["MythArchiveTcrequantCmd"], os.path.split(defaultsettings["MythArchiveTcrequantCmd"])[1]]
-path_png2yuv = [defaultsettings["MythArchivePng2yuvCmd"], os.path.split(defaultsettings["MythArchivePng2yuvCmd"])[1]]
+path_jpeg2yuv = [defaultsettings["MythArchiveJpeg2yuvCmd"], os.path.split(defaultsettings["MythArchiveJpeg2yuvCmd"])[1]]
 path_spumux = [defaultsettings["MythArchiveSpumuxCmd"], os.path.split(defaultsettings["MythArchiveSpumuxCmd"])[1]]
 path_mpeg2enc = [defaultsettings["MythArchiveMpeg2encCmd"], os.path.split(defaultsettings["MythArchiveMpeg2encCmd"])[1]]
 

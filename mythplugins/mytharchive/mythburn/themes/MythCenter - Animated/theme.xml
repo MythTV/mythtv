@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mythburntheme>
+    <!-- Example theme for MythBurn 3 recordings per page, with scene selection submenu -->
+    <fonts>
+        <font size="23">FreeSans.ttf</font>
+        <font size="18">FreeSans.ttf</font>
+        <font size="16">FreeSans.ttf</font>
+	</fonts>
+
+    <intro filename="mythlogo_intro.mpg"/>
+
+    <menu background="MythCenter-Background.png" highlightcolor="yellow" music="menumusic2.ac3" length="10" >
+        <!-- item holds the position of a menu item ie. recording -->
+        <item>
+            <text x="60" y="25" w="200" h="25" value="Page %page" font="2" colour="white" static="True" align="left"/>
+            <previous filename="previous.png" x="300" y="465" w="48" h="48" mask="previous_mask.png" static="True"/>
+            <graphic filename="preview-frame.png" x="55" y="50" w="155" h="120" static="False"/>
+            <graphic filename="%movie" x="60" y="55" w="145" h="110" mask="preview-mask.png" static="False"/>
+            <text x="215" y="55" w="450" h="28" value="%title" font="0" colour="yellow" static="False" align="left"/>
+            <text x="215" y="80" w="450" h="25" value="%subtitle" font="1" colour="white" static="False" align="left"/>
+            <text x="215" y="100" w="450" h="25" value="%recordingdate %recordingtime" font="2" colour="white" static="False" align="left"/>
+            <text x="215" y="120" w="450" h="60" value="%description" font="2" colour="white" static="False" align="left"/>
+        </item>
+        <item>
+            <graphic filename="preview-frame.png" x="55" y="190" w="155" h="120" static="False"/>
+            <graphic filename="%movie" x="60" y="195" w="145" h="110" mask="preview-mask.png" static="False"/>
+            <text x="215" y="195" w="450" h="28" value="%title" font="0" colour="yellow" static="False" align="left"/>
+            <text x="215" y="220" w="450" h="25" value="%subtitle" font="1" colour="white" static="False" align="left"/>
+            <text x="215" y="240" w="450" h="25" value="%recordingdate %recordingtime" font="2" colour="white" static="False" align="left"/>
+            <text x="215" y="260" w="450" h="60" value="%description" font="2" colour="white" static="False" align="left"/>
+        </item>
+        <item>
+            <graphic filename="preview-frame.png" x="55" y="330" w="155" h="120" static="False"/>
+            <graphic filename="%movie" x="60" y="335" w="145" h="110" mask="preview-mask.png" static="False"/>
+            <text x="215" y="335" w="450" h="28" value="%title" font="0" colour="yellow" static="False" align="left"/>
+            <text x="215" y="360" w="450" h="25" value="%subtitle" font="1" colour="white" static="False" align="left"/>
+            <text x="215" y="380" w="450" h="25" value="%recordingdate %recordingtime" font="2" colour="white" static="False" align="left"/>
+            <text x="215" y="400" w="450" h="60" value="%description" font="2" colour="white" static="False" align="left"/>
+            <next filename="next.png" x="375" y="465" w="48" h="48" mask="next_mask.png" static="True"/>
+        </item>
+    </menu>
+
+    <submenu background="MythCenter-Background.png" highlightcolor="yellow" music="menumusic2.ac3" length="10" >
+        <!-- Describes a menu or short video that will appear after the recording has been selected -->
+        <chapter>
+            <graphic filename="preview-frame.png" x="55" y="45" w="145" h="110" static="False"/>
+            <graphic filename="%movie" x="60" y="50" w="135" h="100" mask="preview-mask.png" static="False"/>
+            <text x="55" y="160" w="145" h="28" value="%chapternumber. %chaptertime" font="0" colour="yellow" static="False" align="center"/>
+            <text x="55" y="365" w="500" h="28" value="%title" font="0" colour="yellow" static="True" align="left"/>
+            <text x="55" y="390" w="600" h="28" value="%subtitle" font="1" colour="white" static="True" align="left"/>
+            <text x="55" y="390" w="600" h="28" value="%recordingdate %recordingtime (%duration)" font="1" colour="white" static="True" align="right"/>
+            <text x="55" y="415" w="600" h="130" value="%description" font="2" colour="white" static="True" align="left"/>
+        </chapter>
+        <chapter>
+            <graphic filename="preview-frame.png" x="210" y="45" w="145" h="110" static="False"/>
+            <graphic filename="%movie" x="215" y="50" w="135" h="100" mask="preview-mask.png" static="False"/>
+            <text x="210" y="160" w="145" h="28" value="%chapternumber. %chaptertime" font="0" colour="yellow" static="False" align="center"/>
+        </chapter>
+        <chapter>
+            <graphic filename="preview-frame.png" x="365" y="45" w="145" h="110" static="False"/>
+            <graphic filename="%movie" x="370" y="50" w="135" h="100" mask="preview-mask.png" static="False"/>
+            <text x="365" y="160" w="145" h="28" value="%chapternumber. %chaptertime" font="0" colour="yellow" static="False" align="center"/>
+        </chapter>
+        <chapter>
+            <graphic filename="preview-frame.png" x="520" y="45" w="145" h="110" static="False"/>
+            <graphic filename="%movie" x="525" y="50" w="135" h="100" mask="preview-mask.png" static="False"/>
+            <text x="520" y="160" w="145" h="28" value="%chapternumber. %chaptertime" font="0" colour="yellow" static="False" align="center"/>
+        </chapter>
+        <!-- Row 2 -->
+        <chapter>
+            <graphic filename="preview-frame.png" x="55" y="205" w="145" h="110" static="False"/>
+            <graphic filename="%movie" x="60" y="210" w="135" h="100" mask="preview-mask.png" static="False"/>
+            <text x="55" y="320" w="145" h="28" value="%chapternumber. %chaptertime" font="0" colour="yellow" static="False" align="center"/>
+        </chapter>
+        <chapter>
+            <graphic filename="preview-frame.png" x="210" y="205" w="145" h="110" static="False"/>
+            <graphic filename="%movie" x="215" y="210" w="135" h="100" mask="preview-mask.png" static="False"/>
+            <text x="210" y="320" w="145" h="28" value="%chapternumber. %chaptertime" font="0" colour="yellow" static="False" align="center"/>
+        </chapter>
+        <chapter>
+            <graphic filename="preview-frame.png" x="365" y="205" w="145" h="110" static="False"/>
+            <graphic filename="%movie" x="370" y="210" w="135" h="100" mask="preview-mask.png" static="False"/>
+            <text x="365" y="320" w="145" h="28" value="%chapternumber. %chaptertime" font="0" colour="yellow" static="False" align="center"/>
+        </chapter>
+        <chapter>
+            <graphic filename="preview-frame.png" x="520" y="205" w="145" h="110" static="False"/>
+            <graphic filename="%movie" x="525" y="210" w="135" h="100" mask="preview-mask.png" static="False"/>
+            <text x="520" y="320" w="145" h="28" value="%chapternumber. %chaptertime" font="0" colour="yellow" static="False" align="center"/>
+            <titlemenu filename="previous.png" x="336" y="490" w="48" h="48" mask="previous_mask.png" static="True"/>
+        </chapter>
+    </submenu>
+</mythburntheme>
