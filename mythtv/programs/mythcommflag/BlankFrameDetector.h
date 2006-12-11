@@ -30,7 +30,7 @@ public:
     int reportTime(void) const;
 
     /* BlankFrameDetector interface. */
-    bool getSKipCommBlanks(void) const { return skipcommblanks; }
+    bool getSkipCommBlanks(void) const { return skipcommblanks; }
     const FrameAnalyzer::FrameMap *getBlanks(void) const { return &blankMap; }
     int computeForLogoSurplus(const TemplateMatcher *tm);
     int computeForLogoDeficit(const TemplateMatcher *tm);

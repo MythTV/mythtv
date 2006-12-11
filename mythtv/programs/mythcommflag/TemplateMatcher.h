@@ -46,7 +46,7 @@ public:
     /* TemplateMatcher interface. */
     int templateCoverage(long long nframes, bool final) const;
     const FrameAnalyzer::FrameMap *getBreaks(void) const { return &breakMap; }
-    int adjustForBlanks(const BlankFrameDetector *bf);
+    int adjustForBlanks(const BlankFrameDetector *bf, long long nframes);
     int computeBreaks(FrameMap *breaks);
 
 private:
@@ -72,6 +72,7 @@ private:
     QString                 debugdata;              /* filename */
     NuppelVideoPlayer       *nvp;
     bool                    debug_matches;
+    bool                    debug_removerunts;
     bool                    matches_done;
     struct timeval          analyze_time;
 };

@@ -491,7 +491,7 @@ int CommDetector2::computeBreaks(long long nframes)
         int cmp;
         if (!(cmp = matcher->templateCoverage(nframes, finished)))
         {
-            if (matcher->adjustForBlanks(blankFrameDetector))
+            if (matcher->adjustForBlanks(blankFrameDetector, nframes))
                 return -1;
             if (matcher->computeBreaks(&breaks))
                 return -1;
@@ -793,9 +793,8 @@ void CommDetector2::getCommercialBreakList(QMap<long long, int> &marks)
     const long long nframes = nvp->GetTotalFrameCount();
     VERBOSE(VB_COMMFLAG, QString("Flagged %1 of %2 frames (%3 of %4),"
                 " %5% commercials (%6)")
-            .arg(currentFrameNumber)
-            .arg(nframes)
-            .arg(frameToTimestamp(currentFrameNumber, fps))
+            .arg(currentFrameNumber + 1).arg(nframes)
+            .arg(frameToTimestamp(currentFrameNumber + 1, fps))
             .arg(frameToTimestamp(nframes, fps))
             .arg(breakframes * 100 / currentFrameNumber)
             .arg(frameToTimestamp(breakframes, fps)));

@@ -184,10 +184,232 @@ long long
 matchspn(long long nframes, unsigned char *match, long long frameno,
         unsigned char acceptval)
 {
-    /* Return the first frame that does not match "acceptval". */
+    /*
+     * strspn(3)-style interface: return the first frame number that does not
+     * match "acceptval".
+     */
     while (frameno < nframes && match[frameno] == acceptval)
         frameno++;
     return frameno;
+}
+
+bool
+removeShortBreaks(FrameAnalyzer::FrameMap *breakMap, float fps, int minbreaklen,
+    bool verbose)
+{
+    /*
+     * Remove any breaks that are less than "minbreaklen" units long.
+     *
+     * Return whether or not any breaks were actually removed.
+     */
+    FrameAnalyzer::FrameMap::Iterator   bb;
+    bool                                removed;
+
+    removed = false;
+
+    /* Don't remove the initial commercial break, no matter how short. */
+    bb = breakMap->begin();
+    if (bb != breakMap->end() && bb.key() == 0)
+        ++bb;
+    while (bb != breakMap->end())
+    {
+        if (bb.data() >= minbreaklen)
+        {
+            ++bb;
+            continue;
+        }
+
+        /* Don't remove the final commercial break, no matter how short. */
+        FrameAnalyzer::FrameMap::Iterator bb1 = bb;
+        ++bb;
+        if (bb == breakMap->end())
+            continue;
+
+        if (verbose)
+        {
+            long long start = bb1.key();
+            long long end = start + bb1.data() - 1;
+            VERBOSE(VB_COMMFLAG, QString("Removing break %1-%2 (%3-%4)")
+                .arg(frameToTimestamp(start, fps))
+                .arg(frameToTimestamp(end, fps))
+                .arg(start).arg(end));
+        }
+        breakMap->remove(bb1);
+        removed = true;
+    }
+
+    return removed;
+}
+
+bool
+removeShortSegments(FrameAnalyzer::FrameMap *breakMap, long long nframes,
+    float fps, int minseglen, bool verbose)
+{
+    /*
+     * Remove any segments that are less than "minseglen" units long.
+     *
+     * Return whether or not any segments were actually removed.
+     */
+    FrameAnalyzer::FrameMap::Iterator   bb, bbnext;
+    bool                                removed;
+
+    removed = false;
+
+    /* Handle initial segment. */
+    bb = breakMap->begin();
+    if (bb != breakMap->end() && bb.key() != 0 && bb.key() < minseglen)
+    {
+        bbnext = bb;
+        ++bbnext;
+        if (verbose)
+        {
+            long long remove1 = bb.key();
+            long long remove2 = remove1 + bb.data() - 1;
+            long long insert1 = 0;
+            long long insert2 = remove2;
+            VERBOSE(VB_COMMFLAG, QString("Removing segment %1-%2 (%3-%4),"
+                " inserting %5-%6 (%7-%8)")
+                .arg(frameToTimestamp(remove1, fps))
+                .arg(frameToTimestamp(remove2, fps))
+                .arg(remove1).arg(remove2)
+                .arg(frameToTimestamp(insert1, fps))
+                .arg(frameToTimestamp(insert2, fps))
+                .arg(insert1).arg(insert2));
+        }
+        breakMap->remove(bb);
+        breakMap->insert(0, bb.key() + bb.data() - 1);
+        bb = bbnext;
+        removed = true;
+    }
+    for (; bb != breakMap->end(); bb = bbnext)
+    {
+        bbnext = bb;
+        ++bbnext;
+        long long brkb = bb.key();
+        long long segb = brkb + bb.data();
+        long long sege = bbnext == breakMap->end() ? nframes : bbnext.key();
+        long long seglen = sege - segb;
+        if (seglen >= minseglen)
+            continue;
+
+        /* Merge break with next break. */
+        if (bbnext == breakMap->end())
+        {
+            if (segb != nframes)
+            {
+                /* Extend break "bb" to end of recording. */
+                if (verbose)
+                {
+                    long long old1 = brkb;
+                    long long old2 = segb - 1;
+                    long long new1 = brkb;
+                    long long new2 = nframes - 1;
+                    VERBOSE(VB_COMMFLAG,
+                        QString("Replacing segment %1-%2 (%3-%4)"
+                        " with %5-%6 (%7-%8, EOF)")
+                        .arg(frameToTimestamp(old1, fps))
+                        .arg(frameToTimestamp(old2, fps))
+                        .arg(old1).arg(old2)
+                        .arg(frameToTimestamp(new1, fps))
+                        .arg(frameToTimestamp(new2, fps))
+                        .arg(new1).arg(new2));
+                }
+                breakMap->replace(brkb, nframes - brkb);
+                removed = true;
+            }
+        }
+        else
+        {
+            /* Extend break "bb" to cover "bbnext"; delete "bbnext". */
+            if (verbose)
+            {
+                long long old1 = brkb;
+                long long old2 = segb - 1;
+                long long new1 = brkb;
+                long long new2 = bbnext.key() + bbnext.data() - 1;
+                VERBOSE(VB_COMMFLAG,
+                    QString("Replacing segment %1-%2 (%3-%4)"
+                    " with %5-%6 (%7-%8)")
+                    .arg(frameToTimestamp(old1, fps))
+                    .arg(frameToTimestamp(old2, fps))
+                    .arg(old1).arg(old2)
+                    .arg(frameToTimestamp(new1, fps))
+                    .arg(frameToTimestamp(new2, fps))
+                    .arg(new1).arg(new2));
+            }
+            breakMap->replace(brkb, bbnext.key() + bbnext.data() - brkb);
+            bb = bbnext;
+            ++bbnext;
+            if (verbose)
+            {
+                long long start = bb.key();
+                long long end = start + bb.data() - 1;
+                VERBOSE(VB_COMMFLAG, QString("Removing segment %1-%2 (%3-%4)")
+                    .arg(frameToTimestamp(start, fps))
+                    .arg(frameToTimestamp(end, fps))
+                    .arg(start).arg(end));
+            }
+            breakMap->remove(bb);
+            removed = true;
+        }
+    }
+
+    return removed;
+}
+
+FrameAnalyzer::FrameMap::const_iterator
+blankMapSearchForwards(const FrameAnalyzer::FrameMap *blankMap, long long mark,
+    long long markend)
+{
+    /*
+     * Search forwards to find the earliest blank block "blank" such that
+     *
+     *          mark <= blankbegin < markend
+     *
+     * Return blankMap->constEnd() if there is no such blank block.
+     */
+    FrameAnalyzer::FrameMap::const_iterator blank = blankMap->constBegin();
+
+    if (blank != blankMap->constEnd() && !blank.key() && !blank.data())
+        ++blank;   /* Skip faked-up dummy frame-0 blank frame. */
+    for (; blank != blankMap->constEnd(); ++blank)
+    {
+        const long long bb = blank.key();
+        const long long ee = bb + blank.data();
+        if (mark <= ee)
+        {
+            if (bb < markend)
+                return blank;
+            break;
+        }
+    }
+    return blankMap->constEnd();
+}
+
+FrameAnalyzer::FrameMap::const_iterator
+blankMapSearchBackwards(const FrameAnalyzer::FrameMap *blankMap,
+    long long markbegin, long long mark)
+{
+    /*
+     * Search backards to find the latest blank block "blank" such that
+     *
+     *          markbegin <= blankend < mark
+     *
+     * Return blankMap->constEnd() if there is no such blank block.
+     */
+    FrameAnalyzer::FrameMap::const_iterator blank = blankMap->constEnd();
+    for (--blank; blank != blankMap->constBegin(); --blank)
+    {
+        const long long bb = blank.key();
+        const long long ee = bb + blank.data();
+        if (bb < mark)
+        {
+            if (markbegin <= ee)
+                return blank;
+            break;
+        }
+    }
+    return blankMap->constEnd();
 }
 
 };  /* namespace */
@@ -210,6 +432,7 @@ TemplateMatcher::TemplateMatcher(PGMConverter *pgmc, EdgeDetector *ed,
 #endif /* !PGM_CONVERT_GREYSCALE */
     , nvp(NULL)
     , debug_matches(false)
+    , debug_removerunts(false)
     , matches_done(false)
 {
     memset(&cropped, 0, sizeof(cropped));
@@ -224,11 +447,13 @@ TemplateMatcher::TemplateMatcher(PGMConverter *pgmc, EdgeDetector *ed,
     debugLevel = gContext->GetNumSetting("TemplateMatcherDebugLevel", 0);
 
     if (debugLevel >= 1)
+    {
         createDebugDirectory(debugdir,
             QString("TemplateMatcher debugLevel %1").arg(debugLevel));
-
-    if (debugLevel >= 1)
         debug_matches = true;
+        if (debugLevel >= 2)
+            debug_removerunts = true;
+    }
 }
 
 TemplateMatcher::~TemplateMatcher(void)
@@ -376,14 +601,14 @@ TemplateMatcher::finished(long long nframes, bool final)
     /*
      * TUNABLE:
      *
-     * Eliminate false negatives and false positives by eliminating segments
-     * shorter than these periods.
+     * Eliminate false negatives and false positives by eliminating breaks and
+     * segments shorter than these periods, subject to maximum bounds.
      *
-     * Higher values could eliminate real breaks entirely.
-     * Lower values can yield more false "short" breaks.
+     * Higher values could eliminate real breaks or segments entirely.
+     * Lower values can yield more false "short" breaks or segments.
      */
-    const int       MINBREAKLEN = (int)roundf(25 * fps);  /* frames */
-    const int       MINSEGLEN = (int)roundf(25 * fps);    /* frames */
+    const int       MINBREAKLEN = (int)roundf(35 * fps);  /* frames */
+    const int       MINSEGLEN = (int)roundf(35 * fps);    /* frames */
 
     /*
      * TUNABLE:
@@ -396,7 +621,7 @@ TemplateMatcher::finished(long long nframes, bool final)
     static const float  MATCHPCTILE = 0.47;
 
     int                                 tmpledges, mintmpledges, ii;
-    long long                           segb, brkb;
+    long long                           brkb;
     FrameAnalyzer::FrameMap::Iterator   bb;
 
     if (!matches_done && debug_matches)
@@ -436,82 +661,30 @@ TemplateMatcher::finished(long long nframes, bool final)
     }
 
     /*
-     * Construct breaks.
+     * Construct breaks; find the first logo break.
      */
     breakMap.clear();
-    brkb = 0;
+    brkb = match[0] ? matchspn(nframes, match, 0, match[0]) : 0;
     while (brkb < nframes)
     {
-        /* Find break. */
-        if (match[brkb] &&
-                (brkb = matchspn(nframes, match, brkb, match[brkb])) == nframes)
-            break;
-
+        /* Skip over logo-less frames; find the next logo frame (brke). */
         long long brke = matchspn(nframes, match, brkb, match[brkb]);
         long long brklen = brke - brkb;
-        breakMap[brkb] = brklen;
+        breakMap.insert(brkb, brklen);
 
-        brkb = brke;
+        /* Find the next logo break. */
+        brkb = matchspn(nframes, match, brke, match[brke]);
     }
 
-    /*
-     * Eliminate false breaks (but allow short breaks if they start at the very
-     * beginning or end at the very end).
-     */
-    bb = breakMap.begin();
-    if (bb != breakMap.end() && bb.key() == 0)
-        ++bb;
-    while (bb != breakMap.end())
+    /* Clean up the "noise". */
+    for (;;)
     {
-        if (bb.data() >= MINBREAKLEN)
-        {
-            ++bb;
-            continue;
-        }
-
-        FrameAnalyzer::FrameMap::Iterator bb1 = bb;
-        ++bb;
-        if (bb == breakMap.end())
-            continue;
-
-        breakMap.remove(bb1);
-    }
-
-    /*
-     * Eliminate false segments.
-     */
-    segb = 0;
-    bb = breakMap.begin();
-    if (bb != breakMap.end() && bb.key() == 0)
-        ++bb;
-    while (bb != breakMap.end())
-    {
-        brkb = bb.key();
-        long long seglen = brkb - segb;
-        if (seglen >= MINSEGLEN)
-        {
-            segb = brkb + bb.data();
-            ++bb;
-            continue;
-        }
-
-        /* Merge break with next break. */
-        FrameAnalyzer::FrameMap::Iterator bb1 = bb;
-        ++bb1;
-        if (bb1 == breakMap.end())
-        {
-            /* Extend break to end of recording. */
-            breakMap[brkb] = nframes - brkb;
-        }
-        else
-        {
-            /* Extend break to cover next break; delete next break. */
-            breakMap[brkb] = bb1.key() + bb1.data() - brkb;  /* bb */
-            bb = bb1;
-            ++bb1;
-            breakMap.remove(bb);
-        }
-        bb = bb1;
+        bool f1 = removeShortBreaks(&breakMap, fps, MINBREAKLEN,
+            debug_removerunts);
+        bool f2 = removeShortSegments(&breakMap, nframes, fps, MINSEGLEN,
+            debug_removerunts);
+        if (!f1 && !f2)
+            break;
     }
 
     /*
@@ -593,21 +766,86 @@ TemplateMatcher::templateCoverage(long long nframes, bool final) const
 }
 
 int
-TemplateMatcher::adjustForBlanks(const BlankFrameDetector *blankFrameDetector)
+TemplateMatcher::adjustForBlanks(const BlankFrameDetector *blankFrameDetector,
+    long long nframes)
 {
+    const bool skipCommBlanks = blankFrameDetector->getSkipCommBlanks();
+    const FrameAnalyzer::FrameMap *blankMap = blankFrameDetector->getBlanks();
+
     /*
      * TUNABLE:
      *
-     * When logos are a good indicator of commercial breaks, allow blank frames
-     * to adjust logo breaks. Use BlankFrameDetector information to adjust
-     * beginnings and endings of existing TemplateMatcher breaks. Allow logos
-     * to deviate by up to MAXBLANKADJUSTMENT frames before/after the break
-     * actually begins/ends.
+     * Tune the search for blank frames near appearances and disappearances of
+     * the template.
+     *
+     * TEMPLATE_DISAPPEARS_EARLY: Handle the scenario where the template can
+     * disappear "early" before switching to commercial. Delay the beginning of
+     * the commercial break by searching forwards to find a blank frame.
+     *
+     *      Setting this value too low can yield false positives. If template
+     *      does indeed disappear "early" (common in US broadcast), the end of
+     *      the broadcast segment can be misidentified as part of the beginning
+     *      of the commercial break.
+     *
+     *      Setting this value too high can yield or worsen false negatives. If
+     *      the template presence extends at all into the commercial break,
+     *      immediate cuts to commercial without any intervening blank frames
+     *      can cause the broadcast to "continue" even further into the
+     *      commercial break.
+     *
+     * TEMPLATE_DISAPPEARS_LATE: If TEMPLATE_DISAPPEARS_EARLY doesn't find
+     * anything, handle the scenario where the template disappears "late" after
+     * having already switched to commercial (template presence extends into
+     * commercial break). Accelerate the beginning of the commercial break by
+     * searching backwards to find a blank frame.
+     *
+     *      Setting this value too low can yield false negatives. If the
+     *      template does extend deep into the commercial break, the first part
+     *      of the commercial break can be misidentifed as part of the
+     *      broadcast.
+     *
+     *      Setting this value too high can yield or worsen false positives. If
+     *      the template disappears extremely early (too early for
+     *      TEMPLATE_DISAPPEARS_EARLY), blank frames before the template
+     *      disappears can cause even more of the end of the broadcast segment
+     *      to be misidentified as the first part of the commercial break.
+     *
+     * TEMPLATE_REAPPEARS_LATE: Handle the scenario where the template
+     * reappears "late" after having already returned to the broadcast.
+     * Accelerate the beginning of the broadcast by searching backwards to find
+     * a blank frame.
+     *
+     *      Setting this value too low can yield false positives. If the
+     *      template does indeed reappear "late" (common in US broadcast), the
+     *      beginning of the broadcast segment can be misidentified as the end
+     *      of the commercial break.
+     *
+     *      Setting this value too high can yield or worsen false negatives. If
+     *      the template actually reappears early, blank frames before the
+     *      template reappears can cause even more of the end of the commercial
+     *      break to be misidentified as the first part of the broadcast break.
+     *
+     * TEMPLATE_REAPPEARS_EARLY: If TEMPLATE_REAPPEARS_LATE doesn't find
+     * anything, handle the scenario where the template reappears "early"
+     * before resuming the broadcast. Delay the beginning of the broadcast by
+     * searching forwards to find a blank frame.
+     *
+     *      Setting this value too low can yield false negatives. If the
+     *      template does reappear "early", the the last part of the commercial
+     *      break can be misidentified as part of the beginning of the
+     *      following broadcast segment.
+     *
+     *      Setting this value too high can yield or worsen false positives. If
+     *      the template reappears extremely late (too late for
+     *      TEMPLATE_REAPPEARS_LATE), blank frames after the template reappears
+     *      can cause even more of the broadcast segment can be misidentified
+     *      as part of the end of the commercial break.
      */
-    const int       MAXBLANKADJUSTMENT = (int)roundf(120 * fps);  /* 120 sec */
-    const bool      skipCommBlanks = blankFrameDetector->getSKipCommBlanks();
-
-    const FrameAnalyzer::FrameMap *blankMap = blankFrameDetector->getBlanks();
+    const int BLANK_NEARBY = (int)roundf(0.5 * fps);
+    const int TEMPLATE_DISAPPEARS_EARLY = (int)roundf(25 * fps);
+    const int TEMPLATE_DISAPPEARS_LATE = (int)roundf(0 * fps);
+    const int TEMPLATE_REAPPEARS_LATE = (int)roundf(25 * fps);
+    const int TEMPLATE_REAPPEARS_EARLY = (int)roundf(0 * fps);
 
     VERBOSE(VB_COMMFLAG, QString("TemplateMatcher adjusting for blanks"));
 
@@ -617,79 +855,75 @@ TemplateMatcher::adjustForBlanks(const BlankFrameDetector *blankFrameDetector)
         FrameAnalyzer::FrameMap::Iterator iinext = ii;
         ++iinext;
 
-        /* Get bounds of beginning of logo break. */
-        long long brkb = ii.key();
-        long long brkbmax = brkb + MAXBLANKADJUSTMENT;
-        FrameAnalyzer::FrameMap::const_iterator jjfound = blankMap->constEnd();
-
-        if (ii.key() > 0)
+        /*
+         * Where the template disappears, look for nearby blank frames. Prefer
+         * to assume that the template disappears early before the commercial
+         * break starts. Only adjust beginning-of-breaks that are not at the
+         * very beginning.
+         */
+        const long long brkb = ii.key();
+        const long long brke = brkb + ii.data();
+        FrameAnalyzer::FrameMap::const_iterator jj = blankMap->constEnd();
+        if (brkb > 0)
         {
-            /*
-             * Look for first blank frames ending on/after beginning of logo
-             * break.
-             */
-            FrameAnalyzer::FrameMap::const_iterator jj = blankMap->constBegin();
-            if (jj != blankMap->constEnd() && !jj.key() && !jj.data())
-                ++jj;   /* Skip faked-up dummy frame-0 blank frame. */
-            for (; jj != blankMap->constEnd(); ++jj)
-            {
-                long long jjbb = jj.key();
-                long long jjee = jjbb + jj.data();
-
-                if (brkb <= jjee)
-                {
-                    if (jjbb <= brkbmax)
-                        jjfound = jj;
-                    break;
-                }
-            }
+            jj = blankMapSearchForwards(blankMap,
+                max(0LL, brkb - BLANK_NEARBY),
+                min(brke, min(nframes, brkb + TEMPLATE_DISAPPEARS_EARLY)));
+        }
+        if (jj == blankMap->constEnd())
+        {
+            jj = blankMapSearchBackwards(blankMap,
+                max(0LL, brkb - TEMPLATE_DISAPPEARS_LATE),
+                min(brke, min(nframes, brkb + BLANK_NEARBY)));
+        }
+        long long newbrkb = brkb;
+        if (jj != blankMap->constEnd())
+        {
+            newbrkb = jj.key();
+            if (!skipCommBlanks)
+                newbrkb += jj.data();
         }
 
-        /* Get bounds of end of logo break. */
-        long long brke = ii.key() + ii.data();
-        long long brkemin = brke - MAXBLANKADJUSTMENT;
-
         /*
-         * Look for last blank frames beginning before/on end of logo break.
-         * (Going backwards, look for the "first" blank frames beginning
-         * before/on end of logo break.)
+         * Where the template reappears, look for nearby blank frames. Prefer
+         * to assume that the template reappears late after the broadcast has
+         * already resumed.
          */
-        FrameAnalyzer::FrameMap::const_iterator kkfound = blankMap->constEnd();
-        FrameAnalyzer::FrameMap::const_iterator kk = blankMap->constEnd();
-        --kk;
-        for (; kk != jjfound && kk != blankMap->constBegin(); --kk)
+        FrameAnalyzer::FrameMap::const_iterator kk = blankMapSearchBackwards(
+            blankMap,
+            max(newbrkb, brke - TEMPLATE_REAPPEARS_LATE),
+            max(newbrkb, min(nframes, brke + BLANK_NEARBY)));
+        if (kk == blankMap->constEnd())
         {
-            long long kkbb = kk.key();
-            long long kkee = kkbb + kk.data();
-
-            if (kkbb <= brke)
-            {
-                if (brkemin <= kkee)
-                    kkfound = kk;
-                break;
-            }
+            kk = blankMapSearchForwards(blankMap,
+                max(newbrkb, brke - BLANK_NEARBY),
+                max(newbrkb, min(nframes, brke + TEMPLATE_REAPPEARS_EARLY)));
+        }
+        long long newbrke = brke;
+        if (kk != blankMap->constEnd())
+        {
+            newbrke = kk.key();
+            if (skipCommBlanks)
+                newbrke += kk.data();
         }
 
         /*
          * Adjust breakMap for blank frames.
          */
-        long long start = ii.key();
-        long long end = start + ii.data();
-        if (jjfound != blankMap->constEnd())
+        long long newbrklen = newbrke - newbrkb;
+        if (newbrkb != brkb)
         {
-            start = jjfound.key();
-            if (!skipCommBlanks)
-                start += jjfound.data();
-        }
-        if (kkfound != blankMap->constEnd())
-        {
-            end = kkfound.key();
-            if (skipCommBlanks)
-                end += kkfound.data();
-        }
-        if (start != ii.key())
             breakMap.remove(ii);
-        breakMap[start] = end - start;
+            if (newbrkb < nframes && newbrklen)
+                breakMap.insert(newbrkb, newbrklen);
+        }
+        else if (newbrke != brke)
+        {
+            if (newbrklen)
+                breakMap.replace(newbrkb, newbrklen);
+            else
+                breakMap.remove(ii);
+        }
 
         ii = iinext;
     }
