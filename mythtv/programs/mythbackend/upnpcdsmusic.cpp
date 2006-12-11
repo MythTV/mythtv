@@ -754,7 +754,7 @@ void UPnpCDSMusic::AddMusicTrack( UPnpCDSBrowseRequest    *pRequest,
 
     CDSObject *pItem   = CDSObject::CreateMusicTrack( sId, 
                                                       sName, 
-                                                      pRequest->m_sParentId );
+                                                      pRequest->m_sObjectId );
     pItem->m_bRestricted  = true;
     pItem->m_bSearchable  = true;
     pItem->m_sWriteStatus = "NOT_WRITABLE";

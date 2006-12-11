@@ -835,7 +835,7 @@ void UPnpCDSVideo::AddVideoItem( UPnpCDSBrowseRequest    *pRequest,
 
     CDSObject *pItem   = CDSObject::CreateVideoItem( sId, 
                                                      sName, 
-                                                     pRequest->m_sParentId );
+                                                     pRequest->m_sObjectId );
     pItem->m_bRestricted  = false;
     pItem->m_bSearchable  = true;
     pItem->m_sWriteStatus = "WRITABLE";
