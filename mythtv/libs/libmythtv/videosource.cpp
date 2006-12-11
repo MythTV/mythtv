@@ -2351,6 +2351,8 @@ static QString remove_chaff(const QString &name)
         short_name = short_name.left(short_name.length() - 8);
     if (short_name.right(3) == "VSB")
         short_name = short_name.left(short_name.length() - 4);
+    if (short_name.right(3) == "DVB-T")
+        short_name = short_name.left(short_name.length() - 6);
 
     // It would be infinitely better if DVB allowed us to query
     // the vendor ID. But instead we have to guess based on the
@@ -2412,6 +2414,7 @@ void DVBConfigurationGroup::probeCard(const QString &videodevice)
             channel_timeout->setValue(3000);
             break;
         case CardUtil::OFDM:
+        {
             cardtype->setValue("DVB-T");
             cardname->setValue(frontend_name);
             signal_timeout->setValue(500);
@@ -2430,7 +2433,12 @@ void DVBConfigurationGroup::probeCard(const QString &videodevice)
                 tuning_delay->setValue(200);
             }
 
-            break;
+            QString short_name = remove_chaff(frontend_name);
+            buttonAnalog->setVisible(
+                short_name.left(15).lower() == "zarlink zl10353" ||
+                short_name.lower() == "wintv hvr 900 m/r: 65008/a1c0");
+        }
+        break;
         case CardUtil::ATSC:
         {
             QString short_name = remove_chaff(frontend_name);
