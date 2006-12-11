@@ -158,7 +158,6 @@ class MPUBLIC DVDRingBufferPriv
     int            seekwhence;
     QString        dvdname;
     QString        serialnumber;
-    bool           titleMenuSupported;
         
 
     NuppelVideoPlayer *parent;

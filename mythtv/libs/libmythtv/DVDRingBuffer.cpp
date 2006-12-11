@@ -43,7 +43,6 @@ DVDRingBufferPriv::DVDRingBufferPriv()
       jumptotitle(true), repeatseek(false),
       seekpos(0), seekwhence(0), 
       dvdname(NULL), serialnumber(NULL),
-      titleMenuSupported(true),
       parent(0)
 {
     memset(&dvdMenuButton, 0, sizeof(AVSubtitle));
@@ -162,8 +161,6 @@ bool DVDRingBufferPriv::OpenFile(const QString &filename)
         dvdnav_get_serial_number(dvdnav, &serialnum);
         dvdname = QString(name);
         serialnumber = QString(serialnum);
-        if (dvdnav_menu_supported(dvdnav, DVD_MENU_Title) == DVDNAV_STATUS_ERR)
-            titleMenuSupported = false;
             
         return true;
     }
@@ -544,14 +541,18 @@ void DVDRingBufferPriv::GoToMenu(const QString str)
     DVDMenuID_t menuid;
     if (str.compare("chapter") == 0)
     {
-        if (titleMenuSupported)
-            menuid = DVD_MENU_Root;
-        else
+        dvdnav_status_t partMenuSupported =
+            dvdnav_menu_supported(dvdnav, DVD_MENU_Part);
+        if (partMenuSupported == DVDNAV_STATUS_OK)
             menuid = DVD_MENU_Part;
+        else
+            menuid = DVD_MENU_Root;
     }
     else if (str.compare("menu") == 0)
     {
-        if (titleMenuSupported)
+        dvdnav_status_t titleMenuSupported =
+            dvdnav_menu_supported(dvdnav, DVD_MENU_Title);
+        if (titleMenuSupported == DVDNAV_STATUS_OK)
             menuid = DVD_MENU_Title;
         else
             menuid = DVD_MENU_Root;
