@@ -14,6 +14,7 @@
     use MythTV::Program;
     use MythTV::Recording;
     use MythTV::Channel;
+    use MythTV::Socket;
     use MythTV::StorageGroup;
 
 package MythTV;
@@ -249,32 +250,15 @@ package MythTV;
         my $command = shift;
         my $host    = (shift or $self->{'master_host'});
         my $port    = (shift or $self->{'master_port'});
-    # Execute the command
-        return $self->backend_command2($command, \$fp_cache{$host}{$port}, $host, $port);
-    }
-
-# A second backend command, so we can allow certain routines to use their own file pointer
-    sub backend_command2 {
-        my $self    = shift;
-        my $command = shift;
-        my $fp      = shift;
-        my $host    = (shift or $self->{'master_host'});
-        my $port    = (shift or $self->{'master_port'});
     # Command is an array -- join it
         if (ref $command) {
             $command = join($BACKEND_SEP, @{$command});
         }
-    # $fp should be a reference
-        if ($fp) {
-            $fp = \$fp unless (ref $fp);
-        }
+    # Smaller name for the socket pointer
+        my $fp = \$fp_cache{$host}{$port};
     # Open a connection to the requested backend, unless we've already done so
         if (!$$fp) {
-            $$fp = IO::Socket::INET->new(PeerAddr => $host,
-                                         PeerPort => $port,
-                                         Proto    => 'tcp',
-                                         Timeout  => 25)
-                          or die "Couldn't communicate with $host on port $port:  $@\n";
+            $$fp = $self->new_backend_socket($host, $port);
             if ($$fp && $command !~ /^MYTH_PROTO_VERSION\s/) {
                 $self->check_proto_version($host, $port) or return;
             }
@@ -285,30 +269,42 @@ package MythTV;
         my ($length, $data, $ret);
     # Send the command
     # The format should be <length + whitespace to 8 total bytes><data>
-        print $$fp length($command), ' ' x (8 - length(length($command))), $command;
-    # Did we send the close command?  Close the socket and set the file pointer to null - don't even bother waiting for a response
+        $$fp->send_data($command);
+    # Did we send the close command?  Close the socket and set the file pointer
+    # to null - don't even bother waiting for a response.
         if ($command eq 'DONE') {
             $$fp->close();
             $$fp = undef;
             return;
         }
-    # Read the response header to find out how much data we'll be grabbing
-        sysread($$fp, $length, 8);
-        $length = int($length);
-    # Read and return any data that was returned
-        $ret = '';
-        while ($length > 0) {
-            my $bytes = sysread($$fp, $data, ($length < 8192 ? $length : 8192));
-        # EOF?
-            last if ($bytes < 1);
-        # On to the next
-            $ret .= $data;
-            $length -= $bytes;
-        }
-    # Return
-        return $ret;
+    # Return the response
+        return $$fp->read_data();
     }
 
+# Create a new socket connection to the backend
+    sub new_backend_socket {
+        my $self    = shift;
+        my $host    = (shift or $self->{'master_host'});
+        my $port    = (shift or $self->{'master_port'});
+        my $data    = shift;
+        my $sock    = MythTV::Socket->new(PeerAddr => $host,
+                                          PeerPort => $port,
+                                          Proto    => 'tcp',
+                                          Reuse    => 1,
+                                          Timeout  => 25)
+                             or die "Couldn't communicate with $host on port $port:  $@\n";
+    # Send any data that we received
+        if ($data) {
+            if (ref $data) {
+                $data = join($BACKEND_SEP, @{$data});
+            }
+            $sock->send_data($data);
+        }
+    # Return the socket we just created
+        return $sock
+    }
+
+# Check the MythProto version between the backend and this script
     sub check_proto_version {
         my $self = shift;
         my $host = (shift or $self->{'master_host'});

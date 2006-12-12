@@ -477,23 +477,6 @@ package MythTV::Recording;
             copy($self->{'local_path'}.'.png', $path ? $path : $fh);
             return 2;
         }
-    # Announce the file transfer request to the backend with the file, and
-    # prepare a file pointer to hold the data from the backend.
-        my $sock;
-        my @recs = split($MythTV::BACKEND_SEP_rx,
-                         $self->{'_mythtv'}->backend_command2(join($MythTV::BACKEND_SEP,
-                                                                   'ANN FileTransfer '.hostname,
-                                                                   $self->{'filename'}.'.png'),
-                                                              \$sock,
-                                                              $self->{'file_host'},
-                                                              $self->{'file_port'}
-                                                             )
-                        );
-    # Error?
-        if ($recs[0] ne 'OK') {
-            print STDERR "Unknown error starting transfer of $self->{'filename'}.png\n";
-            return undef;
-        }
     # If we were given a pathname as a parameter, it's now time to open the
     # file for writing.
         if ($path) {
@@ -501,29 +484,47 @@ package MythTV::Recording;
         }
     # Make sure the file handle is in binary mode
         binmode($fh);
-    # Tell the backend to send the data
-        $self->{'_mythtv'}->backend_command('ANN Playback '.hostname.' 0',
-                                            $self->{'file_host'},
-                                            $self->{'file_port'});
-        $self->{'_mythtv'}->backend_command(join($MythTV::BACKEND_SEP,
-                                                 'QUERY_FILETRANSFER '.$recs[1],
-                                                 'REQUEST_BLOCK',
-                                                 $recs[3]),
-                                            $self->{'file_host'},
-                                            $self->{'file_port'});
+    # Tell the backend with the file that we're about to request some data.
+        my $csock = $self->{'_mythtv'}->new_backend_socket($self->{'file_host'},
+                                                           $self->{'file_port'},
+                                                           'ANN Playback '.hostname.' 0');
+        $csock->read_data();
+    # Announce the file transfer request to the backend, and prepare a new
+    # socket to hold the data from the backend.
+        my $sock = $self->{'_mythtv'}->new_backend_socket($self->{'file_host'},
+                                                          $self->{'file_port'},
+                                                          join($MythTV::BACKEND_SEP,
+                                                               'ANN FileTransfer '.hostname,
+                                                               $self->{'filename'}.'.png'));
+        my @recs = split($MythTV::BACKEND_SEP_rx,
+                         $sock->read_data());
+    # Error?
+        if ($recs[0] ne 'OK') {
+            print STDERR "Unknown error starting transfer of $self->{'filename'}.png\n";
+            return undef;
+        }
+    # Request a block of data from the backend.  In the case of a preview image,
+    # it should be small enough that we can request the whole thing at once.
+        $csock->send_data(join($MythTV::BACKEND_SEP,
+                               'QUERY_FILETRANSFER '.$recs[1],
+                               'REQUEST_BLOCK',
+                               $recs[3]));
     # Read the data from the socket and save it into the requested file.
     # We have to loop here because sometimes the backend can't send data fast
     # enough, even if we're dealing with small files.
+        my $data;
         my $length = $recs[3];
-        my $png;
-        while ($length) {
-            my $bytes = sysread($sock, $png, $length);
+        while ($length > 0) {
+            my $bytes = $sock->sysread($data, $length);
+        # Error?
+            last unless (defined $bytes);
+        # EOF?
             last if ($bytes < 1);
-            print $fh $png;
+        # On to the next
+            $fh->print($data);
             $length -= $bytes;
         }
     # Make sure we close any files we created
-        close $sock;
         if ($path) {
             close($fh);
         }
@@ -555,27 +556,11 @@ package MythTV::Recording;
     # downloads, etc.)
         my $seek = (shift or 0);
     # Local path to the file that we can just copy from?
+# Can't actually use this without taking $seek into account!!!
 #        if ($self->{'local_path'} && -e $self->{'local_path'}) {
 #            copy($self->{'local_path'}, $path ? $path : $fh);
 #            return 2;
 #        }
-    # Announce the file transfer request to the backend with the file, and
-    # prepare a file pointer to hold the data from the backend.
-        my $sock;
-        my @recs = split($MythTV::BACKEND_SEP_rx,
-                         $self->{'_mythtv'}->backend_command2(join($MythTV::BACKEND_SEP,
-                                                                   'ANN FileTransfer '.hostname,
-                                                                   $self->{'filename'}),
-                                                              \$sock,
-                                                              $self->{'file_host'},
-                                                              $self->{'file_port'}
-                                                             )
-                        );
-    # Error?
-        if ($recs[0] ne 'OK') {
-            print STDERR "Unknown error starting transfer of $self->{'filename'}\n";
-            return undef;
-        }
     # If we were given a pathname as a parameter, it's now time to open the
     # file for writing.
         if ($path) {
@@ -583,47 +568,66 @@ package MythTV::Recording;
         }
     # Make sure the file handle is in binary mode
         binmode($fh);
-    # Tell the backend to send the data
-        $self->{'_mythtv'}->backend_command('ANN Playback '.hostname.' 0',
-                                            $self->{'file_host'},
-                                            $self->{'file_port'});
+    # Tell the backend with the file that we're about to request some data.
+        my $csock = $self->{'_mythtv'}->new_backend_socket($self->{'file_host'},
+                                                           $self->{'file_port'},
+                                                           'ANN Playback '.hostname.' 0');
+        $csock->read_data();
+    # Announce the file transfer request to the backend, and prepare a new
+    # socket to hold the data from the backend.
+        my $sock = $self->{'_mythtv'}->new_backend_socket($self->{'file_host'},
+                                                          $self->{'file_port'},
+                                                          join($MythTV::BACKEND_SEP,
+                                                               'ANN FileTransfer '.hostname,
+                                                               $self->{'filename'}));
+        my @recs = split($MythTV::BACKEND_SEP_rx,
+                         $sock->read_data());
+    # Error?
+        if ($recs[0] ne 'OK') {
+            print STDERR "Unknown error starting transfer of $self->{'filename'}\n";
+            return undef;
+        }
     # Seek to the requested position?
         if ($seek > 0) {
-            $self->{'_mythtv'}->backend_command(join($MythTV::BACKEND_SEP,
-                                                     'QUERY_FILETRANSFER '.$recs[1],
-                                                     'SEEK',
-                                                     $seek,
-                                                     0,
-                                                     0),
-                                                $self->{'file_host'},
-                                                $self->{'file_port'});
+            $csock->send_data(join($MythTV::BACKEND_SEP,
+                                   'QUERY_FILETRANSFER '.$recs[1],
+                                   'SEEK',
+                                   $seek,
+                                   0,
+                                   0));
+            $csock->read_data();
         }
     # We want to save RAM, so only grab the data in 96k blocks (plus, the
     # backend barfs on larger chunks).
         my $total = 0;
-        while ($total < $recs[3]) {
-            $size = $self->{'_mythtv'}->backend_command(join($MythTV::BACKEND_SEP,
-                                                             'QUERY_FILETRANSFER '.$recs[1],
-                                                             'REQUEST_BLOCK',
-                                                             98304),
-                                                        $self->{'file_host'},
-                                                        $self->{'file_port'});
-            last if ($size < 1);
+        while ($sock && $total < $recs[3]) {
+        # Attempt to read in 2M chunks
+            my $length = 2097152;
+        # Request a block of data from the backend.  In the case of a preview image,
+        # it should be small enough that we can request the whole thing at once.
+            $csock->send_data(join($MythTV::BACKEND_SEP,
+                                   'QUERY_FILETRANSFER '.$recs[1],
+                                   'REQUEST_BLOCK',
+                                   $length));
         # Read the data from the socket and save it into the requested file.
-        # We have to loop here because sometimes the backend can't send data
-        # fast enough, even if we're dealing with relatively small data chunks.
-            my $length = $size;
+        # We have to loop here because sometimes the backend can't send data fast
+        # enough, even if we're dealing with small files.
             my $data;
-            while ($length) {
-                my $bytes = sysread($sock, $data, $length);
+            while ($length > 0) {
+                my $bytes = $sock->sysread($data, $length);
+            # Error?
+                last unless (defined $bytes);
+            # EOF?
                 last if ($bytes < 1);
-                print $fh $data;
-                $total  += $bytes;
+            # On to the next
+                $fh->print($data);
                 $length -= $bytes;
             }
+        # Get the response from the control socket
+            my $size = $csock->read_data();
+            last if ($size < 1);
         }
     # Make sure we close any files we created
-        close $sock;
         if ($path) {
             close($fh);
         }
