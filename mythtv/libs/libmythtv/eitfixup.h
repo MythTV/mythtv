@@ -96,7 +96,14 @@ class EITFixUp
     const QRegExp m_mcaActorsSeparator;
     const QRegExp m_mcaYear;
     const QRegExp m_mcaCC;
-    const QRegExp m_RTLSubtitle;
+    const QRegExp m_RTLrepeat;
+    const QRegExp m_RTLSubtitle1;
+    const QRegExp m_RTLSubtitle2;
+    const QRegExp m_RTLSubtitle3;
+    const QRegExp m_RTLSubtitle4;
+    const QRegExp m_RTLSubtitle5;
+    const QRegExp m_RTLEpisodeNo1;
+    const QRegExp m_RTLEpisodeNo2;
     const QRegExp m_fiRerun;
     const QRegExp m_Stereo;
 };

@@ -48,7 +48,14 @@ EITFixUp::EITFixUp()
       m_mcaActorsSeparator("(,\\s+)"),
       m_mcaYear("(.*) \\((\\d{4})\\)\\s*$"),
       m_mcaCC("(.*)\\. HI Subtitles$"),
-      m_RTLSubtitle("([^\\.]+)\\.\\s+(.+)"),
+      m_RTLrepeat("(\\(|\\s)?Wiederholung.+vo[m|n].+((?:\\d{2}\\.\\d{2}\\.\\d{4})|(?:\\d{2}[:\\.]\\d{2}\\sUhr))\\)?"),
+      m_RTLSubtitle1("^Folge\\s(\\d{1,4})\\s*:\\s+'(.*)'(?:\\.\\s*|$)"),
+      m_RTLSubtitle2("^Folge\\s(\\d{1,4})\\s+(.{,5}[^\\.]{,120})[\\?!\\.]\\s*"),
+      m_RTLSubtitle3("^(?:Folge\\s)?(\\d{1,4}(?:\\/[IVX]+)?)\\s+(.{,5}[^\\.]{,120})[\\?!\\.]\\s*"),
+      m_RTLSubtitle4("^Thema.{0,5}:\\s([^\\.]+)\\.\\s*"),
+      m_RTLSubtitle5("^'(.+)'\\.\\s*"),
+      m_RTLEpisodeNo1("^(Folge\\s\\d{1,4})\\.*\\s*"),
+      m_RTLEpisodeNo2("^(\\d{1,2}\\/[IVX]+)\\.*\\s*"),
       m_fiRerun("Uusinta.?"),
       m_Stereo("(Stereo)")
 {
@@ -742,27 +749,86 @@ void EITFixUp::FixMCA(DBEvent &event) const
  */
 void EITFixUp::FixRTL(DBEvent &event) const
 {
-    const uint SUBTITLE_PCT = 35; //% of description to allow subtitle up to
-    const uint SUBTITLE_MAX_LEN = 128; // max length of subtitle field in db.
-    int        position;
-    QRegExp    tmpExp1;
+    int        pos;
 
-    // No need to continue without a description.
-    if (event.description.length() <= 0)
-    {
+    // No need to continue without a description and with an subtitle.
+    if (event.description.length() <= 0 || event.subtitle.length() > 0)
         return;
-    }
-    // Try to find subtitle in description
-    tmpExp1 = m_RTLSubtitle;
-    if ((position = tmpExp1.search(event.description)) != -1)
+
+    // Repeat
+    QRegExp tmpExpRepeat = m_RTLrepeat;
+    if ((pos = tmpExpRepeat.search(event.description)) != -1)
     {
-        if ((tmpExp1.cap(1).length() < SUBTITLE_MAX_LEN) &&
-            ((tmpExp1.cap(1).length()*100)/event.description.length() <
-             SUBTITLE_PCT))
-        {
-            event.subtitle    = tmpExp1.cap(1);
-            event.description = tmpExp1.cap(2);
-        }
+        // remove '.' if it matches at the beginning of the description
+        int length = tmpExpRepeat.cap(0).length() + (pos ? 0 : 1);
+        event.description =
+            event.description.remove(pos, length).stripWhiteSpace();
+        event.originalairdate = event.starttime.addDays(-1).date();
+    }
+    
+    QRegExp tmpExpSubtitle1 = m_RTLSubtitle1;
+    tmpExpSubtitle1.setMinimal(true);
+    QRegExp tmpExpSubtitle2 = m_RTLSubtitle2;
+    QRegExp tmpExpSubtitle3 = m_RTLSubtitle3;
+    QRegExp tmpExpSubtitle4 = m_RTLSubtitle4;
+    QRegExp tmpExpSubtitle5 = m_RTLSubtitle5;
+    tmpExpSubtitle5.setMinimal(true);
+    QRegExp tmpExpEpisodeNo1 = m_RTLEpisodeNo1;
+    QRegExp tmpExpEpisodeNo2 = m_RTLEpisodeNo2;
+
+    // subtitle with episode number: "Folge *: 'subtitle'. description
+    if (tmpExpSubtitle1.search(event.description) != -1)
+    {
+        event.syndicatedepisodenumber = tmpExpSubtitle1.cap(1);
+        event.subtitle    = tmpExpSubtitle1.cap(2);
+        event.description =
+            event.description.remove(0, tmpExpSubtitle1.matchedLength());
+    }
+    // episode number subtitle 
+    else if (tmpExpSubtitle2.search(event.description) != -1)
+    {
+        event.syndicatedepisodenumber = tmpExpSubtitle2.cap(1);
+        event.subtitle    = tmpExpSubtitle2.cap(2);
+        event.description =
+            event.description.remove(0, tmpExpSubtitle2.matchedLength());
+    }
+    // episode number subtitle 
+    else if (tmpExpSubtitle3.search(event.description) != -1)
+    {
+        event.syndicatedepisodenumber = tmpExpSubtitle3.cap(1);
+        event.subtitle    = tmpExpSubtitle3.cap(2);
+        event.description =
+            event.description.remove(0, tmpExpSubtitle3.matchedLength());
+    }
+    // "Thema..."
+    else if (tmpExpSubtitle4.search(event.description) != -1)
+    {
+        event.subtitle    = tmpExpSubtitle4.cap(1);
+        event.description =
+            event.description.remove(0, tmpExpSubtitle4.matchedLength());
+    }
+    // "'...'"
+    else if (tmpExpSubtitle5.search(event.description) != -1)
+    {
+        event.subtitle    = tmpExpSubtitle5.cap(1);
+        event.description =
+            event.description.remove(0, tmpExpSubtitle5.matchedLength());
+    }
+    // episode number
+    else if (tmpExpEpisodeNo1.search(event.description) != -1)
+    {
+        event.syndicatedepisodenumber = tmpExpEpisodeNo1.cap(2);
+        event.subtitle    = tmpExpEpisodeNo1.cap(1);
+        event.description =
+            event.description.remove(0, tmpExpEpisodeNo1.matchedLength());
+    }
+    // episode number
+    else if (tmpExpEpisodeNo2.search(event.description) != -1)
+    {
+        event.syndicatedepisodenumber = tmpExpEpisodeNo2.cap(2);
+        event.subtitle    = tmpExpEpisodeNo2.cap(1);
+        event.description =
+            event.description.remove(0, tmpExpEpisodeNo2.matchedLength());
     }
 }
 
