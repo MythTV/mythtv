@@ -111,8 +111,7 @@ class MythGamePlayerSettings : public QObject, public ConfigurationWizard
     Name   *name;
 };
 
-class MythGamePlayerEditor :
-    public QObject, public ConfigurationDialog, public Storage
+class MythGamePlayerEditor : public QObject, public ConfigurationDialog
 {
     Q_OBJECT
 
