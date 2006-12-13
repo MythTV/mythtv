@@ -31,7 +31,7 @@ class MPUBLIC StorageGroup: public ConfigurationWizard
 };
 
 class MPUBLIC StorageGroupEditor :
-    public QObject, public ConfigurationDialog, public Storage
+    public QObject, public ConfigurationDialog
 {
     Q_OBJECT
   public:
@@ -54,7 +54,7 @@ class MPUBLIC StorageGroupEditor :
 };
 
 class MPUBLIC StorageGroupListEditor :
-    public QObject, public ConfigurationDialog, public Storage
+    public QObject, public ConfigurationDialog
 {
     Q_OBJECT
   public:

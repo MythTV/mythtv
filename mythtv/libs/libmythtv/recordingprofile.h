@@ -128,7 +128,7 @@ class MPUBLIC RecordingProfile : public QObject, public ConfigurationWizard
 };
 
 class RecordingProfileEditor :
-    public QObject, public ConfigurationDialog, public Storage
+    public QObject, public ConfigurationDialog
 {
     Q_OBJECT
 

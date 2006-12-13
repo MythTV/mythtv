@@ -23,11 +23,11 @@ class MPUBLIC PlayGroup: public ConfigurationWizard
     QString name;
 };
 
-class MPUBLIC PlayGroupEditor :
-    public QObject, public ConfigurationDialog, public Storage
+class MPUBLIC PlayGroupEditor : public QObject, public ConfigurationDialog
 {
     Q_OBJECT
- public:
+
+  public:
     PlayGroupEditor(void);
     virtual int exec(void);
     virtual void load(void);

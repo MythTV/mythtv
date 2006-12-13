@@ -448,8 +448,6 @@ class RotorPosConfig : public ConfigurationDialog
         addChild(new RotorPosMap(rotor));
     }
 
-    void save(void) { cfgGrp->save(); }
-
     virtual int exec(void)
     {
         while (ConfigurationDialog::exec() == QDialog::Accepted);
@@ -1277,7 +1275,7 @@ void DTVDeviceConfigWizard::AddNodes(ConfigurationGroup &group,
 
 void DTVDeviceConfigWizard::SelectNodes(void)
 {
-    cfgGrp->save();
+    ConfigurationWizard::save();
 
     QMap<uint,bool> active;
     DiSEqCDevDevice *node = m_tree.Root();

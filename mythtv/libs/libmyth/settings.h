@@ -1119,7 +1119,7 @@ class MPUBLIC ConfigurationDialogWidget : public MythDialog
  *  \brief A ConfigurationDialog that uses a ConfigurationGroup
  *         all children on one page in a vertical layout.
  */
-class MPUBLIC ConfigurationDialog
+class MPUBLIC ConfigurationDialog : public Storage
 {
   public:
     ConfigurationDialog() : dialog(NULL), cfgGrp(new ConfigurationGroup()) { }
@@ -1131,6 +1131,10 @@ class MPUBLIC ConfigurationDialog
 
     // Show a dialogWidget, and save if accepted
     virtual int exec(bool saveOnExec = true, bool doLoad = true);
+
+    virtual void load(void) { cfgGrp->load(); }
+    virtual void save(void) { cfgGrp->save(); }
+    virtual void save(QString destination) { cfgGrp->save(destination); }
 
     virtual void addChild(Configurable *child);
 
@@ -1149,17 +1153,13 @@ class MPUBLIC ConfigurationDialog
  *  \brief A ConfigurationDialog that uses a ConfigurationGroup
  *         with one child per page.
  */
-class MPUBLIC ConfigurationWizard : public ConfigurationDialog, public Storage
+class MPUBLIC ConfigurationWizard : public ConfigurationDialog
 {
   public:
     ConfigurationWizard() : ConfigurationDialog() {}
 
     virtual MythDialog *dialogWidget(MythMainWindow *parent,
                                      const char *widgetName);
-
-    virtual void load(void) { cfgGrp->load(); }
-    virtual void save(void) { cfgGrp->save(); }
-    virtual void save(QString destination) { cfgGrp->save(destination); }
 };
 
 /** \class JumpConfigurationWizard

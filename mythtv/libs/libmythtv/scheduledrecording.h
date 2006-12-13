@@ -262,7 +262,7 @@ protected:
 };
 
 class ScheduledRecordingEditor :
-    public QObject, public ConfigurationDialog, public Storage
+    public QObject, public ConfigurationDialog
 {
     Q_OBJECT
 

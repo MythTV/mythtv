@@ -502,8 +502,7 @@ private:
     const CardInput& parent;
 };
 
-class MPUBLIC CaptureCardEditor :
-    public QObject, public ConfigurationDialog, public Storage
+class MPUBLIC CaptureCardEditor : public QObject, public ConfigurationDialog
 {
     Q_OBJECT
 
@@ -525,8 +524,7 @@ class MPUBLIC CaptureCardEditor :
     ListBoxSetting *listbox;
 };
 
-class MPUBLIC VideoSourceEditor :
-    public QObject, public ConfigurationDialog, public Storage
+class MPUBLIC VideoSourceEditor : public QObject, public ConfigurationDialog
 {
     Q_OBJECT
 
@@ -552,8 +550,7 @@ class MPUBLIC VideoSourceEditor :
     ListBoxSetting *listbox;
 };
 
-class MPUBLIC CardInputEditor :
-    public QObject, public ConfigurationDialog, public Storage
+class MPUBLIC CardInputEditor : public QObject, public ConfigurationDialog
 {
   public:
     CardInputEditor();

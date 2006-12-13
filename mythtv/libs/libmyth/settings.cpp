@@ -1071,7 +1071,7 @@ MythDialog* ConfigurationDialog::dialogWidget(MythMainWindow *parent,
 int ConfigurationDialog::exec(bool saveOnAccept, bool doLoad) 
 {
     if (doLoad)
-        cfgGrp->load();
+        load();
 
     MythDialog *dialog = dialogWidget(
         gContext->GetMainWindow(), "Configuration Dialog");
@@ -1081,7 +1081,7 @@ int ConfigurationDialog::exec(bool saveOnAccept, bool doLoad)
     int ret = dialog->exec();
 
     if ((QDialog::Accepted == ret) && saveOnAccept)
-        cfgGrp->save();
+        save();
 
     dialog->deleteLater();
     dialog = NULL;

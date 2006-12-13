@@ -110,7 +110,7 @@ private:
 };
 
 class MPUBLIC ProfileGroupEditor :
-    public QObject, public ConfigurationDialog, public Storage
+    public QObject, public ConfigurationDialog
 {
     Q_OBJECT
   public:

@@ -1951,7 +1951,7 @@ void CardInput::loadByID(int inputid)
 #ifdef USING_DVB
     settings.Load(inputid);
 #endif
-    cfgGrp->load();
+    ConfigurationWizard::load();
 }
 
 void CardInput::loadByInput(int _cardid, QString _inputname) 
@@ -1968,8 +1968,8 @@ void CardInput::loadByInput(int _cardid, QString _inputname)
         loadByID(query.value(0).toInt());
     } 
     else 
-    {
-        cfgGrp->load(); // new
+    { // create new input connection
+        load();
         cardid->setValue(QString::number(_cardid));
         inputname->setValue(_inputname);
     }
@@ -1988,7 +1988,7 @@ void CardInput::save()
     }
     else
     {
-        cfgGrp->save();
+        ConfigurationWizard::save();
 #ifdef USING_DVB
         settings.Store(getInputID());
 #endif
