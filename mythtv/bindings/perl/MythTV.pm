@@ -24,6 +24,9 @@ package MythTV;
     use DBI;
     use Date::Manip;
 
+# Necessary constants for sysopen
+    use Fcntl;
+
 # Export some routines
     BEGIN {
         use Exporter;
@@ -302,6 +305,134 @@ package MythTV;
         }
     # Return the socket we just created
         return $sock
+    }
+
+# Download/stream a file from a backend.  Return values are:
+#
+# undef:  Error
+# 1:      File copied into place
+# 2:      File retrieved from the backend
+    sub stream_backend_file {
+        my $self = shift;
+    # The basename of the file to be downloaded
+        my $basename = shift;
+    # This parameter can be a file handle or a string.  We'll determine what to
+    # do with it below.
+        my $fh = shift;
+        my $target_path = ref($fh) ? undef : $fh;
+    # Local path is optional, but if it is provided, this routine will attempt
+    # to access it directly rather than streaming it over the network interface.
+        my $local_path = shift;
+    # Host and port are optional, but *really* should be provided, since it's
+    # not guaranteed that the master backend will hold all files.
+        my $host = (shift or $self->{'master_host'});
+        my $port = (shift or $self->{'master_port'});
+    # $seek is optional, and is the amount to seek from the start of the file
+    # (for resuming downloads, etc.)
+        my $seek = (shift or 0);
+    # We need to figure out if we were passed a file handle or a filename.  If
+    # it was a pathname, we should open the file for writing.
+        if ($target_path) {
+            sysopen($fh, $target_path, O_CREAT|O_TRUNC|O_WRONLY) or die "Can't create $target_path:  $!\n";
+        }
+        elsif (ref($fh) ne 'GLOB') {
+            die "Developer passed an unrecognized filehandle/path value to MythTV::stream_backend_file().\n";
+        }
+    # Make sure the output file handle is in binary mode
+        binmode($fh);
+    # Local path to the file that we can just copy from?
+        if ($local_path && -e $local_path) {
+            my $infh;
+            if (sysopen($infh, $local_path, O_RDONLY)) {
+                binmode($infh);
+            # Seek?
+                if ($seek > 0) {
+                    sysseek($infh, $seek, 0);
+                }
+            # Read the file
+                my $buffer;
+                while (sysread($infh, $buffer, 2097152)) {
+                    $fh->print($buffer);
+                }
+                close $infh;
+            # Close any file handles we created
+                $infh->close();
+                $fh->close() if ($target_path);
+                return 1;
+            }
+            else {
+                print STDERR "Can't read $local_path ($!).  Trying to stream from mythbackend instead.\n";
+            }
+        }
+    # Otherwise, we have to stream the file from the backend.
+    # First, tell the backend with the file that we're about to request some
+    # data.
+        my $csock = $self->new_backend_socket($self->{'file_host'},
+                                              $self->{'file_port'},
+                                              'ANN Playback '.hostname.' 0');
+        $csock->read_data();
+    # Announce the file transfer request to the backend, and prepare a new
+    # socket to hold the data from the backend.
+        my $sock = $self->new_backend_socket($self->{'file_host'},
+                                             $self->{'file_port'},
+                                             join($MythTV::BACKEND_SEP,
+                                                  'ANN FileTransfer '.hostname,
+                                                  $basename));
+        my @recs = split($MythTV::BACKEND_SEP_rx,
+                         $sock->read_data());
+    # Error?
+        if ($recs[0] ne 'OK') {
+            print STDERR "Unknown error starting transfer of $basename\n";
+            return undef;
+        }
+    # Seek to the requested position?
+        if ($seek > 0) {
+            $csock->send_data(join($MythTV::BACKEND_SEP,
+                                   'QUERY_FILETRANSFER '.$recs[1],
+                                   'SEEK',
+                                   $seek,
+                                   0,
+                                   0));
+            $csock->read_data();
+        }
+    # We want to save RAM, so only grab the data in 96k blocks (plus, the
+    # backend barfs on larger chunks).
+        my $total = $recs[3];
+        while ($sock && $total > 0) {
+        # Attempt to read in 2M chunks, or the remaining total, whichever is
+        # smaller.
+            my $length = $total > 2097152 ? 2097152 : $total;
+        # Request a block of data from the backend.  In the case of a preview image,
+        # it should be small enough that we can request the whole thing at once.
+            $csock->send_data(join($MythTV::BACKEND_SEP,
+                                   'QUERY_FILETRANSFER '.$recs[1],
+                                   'REQUEST_BLOCK',
+                                   $length));
+        # Read the data from the socket and save it into the requested file.
+        # We have to loop here because sometimes the backend can't send data fast
+        # enough, even if we're dealing with small files.
+            my $buffer;
+            while ($length > 0) {
+                my $bytes = $sock->sysread($buffer, $length);
+            # Error?
+                last unless (defined $bytes);
+            # EOF?
+                last if ($bytes < 1);
+            # On to the next
+                $fh->print($buffer);
+                $length -= $bytes;
+                $total  -= $bytes;
+            }
+        # Get the response from the control socket
+            my $size = $csock->read_data();
+            last if ($size < 1);
+        }
+    # Make sure we close any files we created
+        if ($target_path) {
+            close($fh);
+        }
+    # Return
+        return 2;
     }
 
 # Check the MythProto version between the backend and this script
