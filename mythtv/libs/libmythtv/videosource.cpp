@@ -2465,7 +2465,8 @@ void DVBConfigurationGroup::probeCard(const QString &videodevice)
             {
                 buttonAnalog->setVisible(
                     short_name.left(6).lower() == "pchdtv" ||
-                    short_name.left(5).lower() == "dvico");
+                    short_name.left(5).lower() == "dvico" ||
+                    short_name.left(8).lower() == "nextwave");
             }
         }
         break;
@@ -2542,8 +2543,8 @@ DVBConfigurationGroup::DVBConfigurationGroup(CaptureCard& a_parent) :
     buttonAnalog->setHelpText(
         tr("Analog child card settings."
            "\nWARNING: Do not press button if you are "
-           "using an Air2PC HD-5000 card!!!! "
-           "This card does not support analog tuning, "
+           "using an Air2PC HD-5000 or Avermedia A180 card. "
+           "These cards do not support analog tuning, "
            "but the DVB drivers do not yet allow us to "
            "detect this problem."));
 
