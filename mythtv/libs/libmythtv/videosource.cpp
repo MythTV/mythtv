@@ -1736,7 +1736,8 @@ class DishNetEIT : public CheckBoxSetting, public CardInputDBStorage
     };
 };
 
-CardInput::CardInput(bool isDTVcard, bool isDVBcard, int _cardid)
+CardInput::CardInput(bool isDTVcard, bool isDVBcard, int _cardid) :
+    externalInputSettings(new DiSEqCDevSettings())
 {
     (void) _cardid;
 
@@ -1775,7 +1776,7 @@ CardInput::CardInput(bool isDTVcard, bool isDVBcard, int _cardid)
         TransButtonSetting *diseqc = new TransButtonSetting();
         diseqc->setLabel(tr("DVB-S"));
         diseqc->setHelpText(tr("Input and satellite settings."));
-        diseqc->setVisible(DTVDeviceNeedsConfiguration(_cardid));
+        diseqc->setVisible(CardUtil::IsInNeedOfExternalInputConf(_cardid));
         group->addChild(diseqc);
         connect(diseqc, SIGNAL(pressed()), SLOT(diseqcConfig()));
    
@@ -1823,6 +1824,15 @@ CardInput::CardInput(bool isDTVcard, bool isDVBcard, int _cardid)
             startchan,SLOT(  SetSourceID (const QString&)));
     connect(sourceid, SIGNAL(valueChanged(const QString&)),
             this,     SLOT(  SetSourceID (const QString&)));
+}
+
+CardInput::~CardInput()
+{
+    if (externalInputSettings)
+    {
+        delete externalInputSettings;
+        externalInputSettings = NULL;
+    }
 }
 
 void CardInput::SetSourceID(const QString &sourceid)
@@ -1915,7 +1925,8 @@ void CardInput::sourceFetch(void)
 void CardInput::diseqcConfig(void)
 {
 #ifdef USING_DVB
-    DTVDeviceConfigWizard wizard(settings, cardid->getValue().toUInt());
+    DTVDeviceConfigWizard wizard(*externalInputSettings,
+                                 cardid->getValue().toUInt());
     wizard.exec();
 #endif // USING_DVB
 }
@@ -1948,9 +1959,7 @@ QString CardInputDBStorage::setClause(MSqlBindings& bindings)
 void CardInput::loadByID(int inputid) 
 {
     id->setValue(inputid);
-#ifdef USING_DVB
-    settings.Load(inputid);
-#endif
+    externalInputSettings->Load(inputid);
     ConfigurationWizard::load();
 }
 
@@ -1962,9 +1971,8 @@ void CardInput::loadByInput(int _cardid, QString _inputname)
     query.bindValue(":CARDID", _cardid);
     query.bindValue(":INPUTNAME", _inputname);
 
-    if (query.exec() && query.isActive() && query.size() > 0) 
+    if (query.exec() && query.isActive() && query.next())
     {
-        query.next();
         loadByID(query.value(0).toInt());
     } 
     else 
@@ -1975,7 +1983,7 @@ void CardInput::loadByInput(int _cardid, QString _inputname)
     }
 }
 
-void CardInput::save() 
+void CardInput::save(void)
 {
 
     if (sourceid->getValue() == "0")
@@ -1989,9 +1997,7 @@ void CardInput::save()
     else
     {
         ConfigurationWizard::save();
-#ifdef USING_DVB
-        settings.Store(getInputID());
-#endif
+        externalInputSettings->Store(getInputID());
     }
 }
 
@@ -2502,7 +2508,8 @@ void TunerCardInput::fillSelections(const QString& device)
 
 DVBConfigurationGroup::DVBConfigurationGroup(CaptureCard& a_parent) :
     VerticalConfigurationGroup(false, true, false, false),
-    parent(a_parent)
+    parent(a_parent),
+    diseqc_tree(new DiSEqCDevTree())
 {
     DVBCardNum* cardnum = new DVBCardNum(parent);
     cardname = new DVBCardName();
@@ -2570,34 +2577,37 @@ DVBConfigurationGroup::DVBConfigurationGroup(CaptureCard& a_parent) :
     cardnum->setValue(0);
 }
 
+DVBConfigurationGroup::~DVBConfigurationGroup()
+{
+    if (diseqc_tree)
+    {
+        delete diseqc_tree;
+        diseqc_tree = NULL;
+    }
+}
+
 void DVBConfigurationGroup::DiSEqCPanel()
 {
-#ifdef USING_DVB
     parent.reload(); // ensure card id is valid
 
-    DTVDeviceTreeWizard diseqcWiz(tree);
+    DTVDeviceTreeWizard diseqcWiz(*diseqc_tree);
     diseqcWiz.exec();
-    defaultinput->fillSelections(DTVDeviceNeedsConfiguration(tree));
-#endif // USING_DVB
+    defaultinput->fillSelections(diseqc_tree->IsInNeedOfConf());
 }
 
 void DVBConfigurationGroup::load()
 {
     VerticalConfigurationGroup::load();
-#ifdef USING_DVB
-    tree.Load(parent.getCardID());
-    defaultinput->fillSelections(DTVDeviceNeedsConfiguration(tree));
-#endif
+    diseqc_tree->Load(parent.getCardID());
+    defaultinput->fillSelections(diseqc_tree->IsInNeedOfConf());
 }
 
 void DVBConfigurationGroup::save()
 {
     VerticalConfigurationGroup::save();
-#ifdef USING_DVB
-    tree.Store(parent.getCardID());
+    diseqc_tree->Store(parent.getCardID());
     DiSEqCDev trees;
     trees.InvalidateTrees();
-#endif
 }
 
 void CaptureCard::reload(void)

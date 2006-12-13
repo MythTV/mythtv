@@ -12,9 +12,6 @@
 
 typedef QMap<uint, Setting*> devid_to_setting_t;
 
-bool DTVDeviceNeedsConfiguration(uint cardid);
-bool DTVDeviceNeedsConfiguration(DiSEqCDevTree& tree);
-
 class SwitchTypeSetting;
 class SwitchPortsSetting;
 

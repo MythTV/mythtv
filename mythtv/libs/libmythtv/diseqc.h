@@ -107,6 +107,7 @@ class DiSEqCDevTree
 
     // Gets
     uint GetVoltage(void) const { return m_last_voltage; }
+    bool IsInNeedOfConf(void) const;
 
     // tree management
     void AddDeferredDelete(uint dev_id) { m_delete.push_back(dev_id); }

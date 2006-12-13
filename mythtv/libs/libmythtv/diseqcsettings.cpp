@@ -1194,21 +1194,6 @@ class USALSRotorSetting : public LineEditSetting, public Storage
     DiSEqCDevSettings &m_settings;
 };
 
-//////////////////////////////////////// DTVDeviceNeedsConfiguration
-
-bool DTVDeviceNeedsConfiguration(uint cardid)
-{
-    DiSEqCDev dev;
-    DiSEqCDevTree *diseqc_tree = dev.FindTree(cardid);
-    return diseqc_tree ? DTVDeviceNeedsConfiguration(*diseqc_tree) : false;
-}
-
-bool DTVDeviceNeedsConfiguration(DiSEqCDevTree& tree)
-{
-    DiSEqCDevDevice *root = tree.Root();
-    return (root && root->GetDeviceType() != DiSEqCDevDevice::kTypeLNB);
-}
-
 //////////////////////////////////////// DTVDeviceConfigWizard
 
 DTVDeviceConfigWizard::DTVDeviceConfigWizard(DiSEqCDevSettings &settings,

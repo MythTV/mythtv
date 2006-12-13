@@ -715,6 +715,14 @@ bool DiSEqCDevTree::SetVoltage(uint voltage)
     return true;
 }
 
+bool DiSEqCDevTree::IsInNeedOfConf(void) const
+{
+    if (m_root)
+        return m_root->GetDeviceType() != DiSEqCDevDevice::kTypeLNB;
+
+    return false;
+}
+
 bool DiSEqCDevTree::ApplyVoltage(const DiSEqCDevSettings &settings,
                                  const DTVMultiplex      &tuning)
 {

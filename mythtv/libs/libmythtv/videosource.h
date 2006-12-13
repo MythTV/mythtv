@@ -6,7 +6,6 @@ using namespace std;
 
 #include "settings.h"
 #include "datadirect.h"
-#include "diseqcsettings.h"
 
 class SignalTimeout;
 class ChannelTimeout;
@@ -19,6 +18,8 @@ class CardID;
 class ChildID;
 class InputName;
 class SourceID;
+class DiSEqCDevTree;
+class DiSEqCDevSettings;
 
 class VideoSourceDBStorage : public SimpleDBStorage
 {
@@ -394,6 +395,7 @@ class DVBConfigurationGroup: public VerticalConfigurationGroup {
     Q_OBJECT
 public:
     DVBConfigurationGroup(CaptureCard& a_parent);
+    ~DVBConfigurationGroup();
 
     virtual void load(void);
     virtual void save(void);
@@ -412,7 +414,7 @@ private:
     ChannelTimeout     *channel_timeout;
     TransButtonSetting *buttonAnalog;
     DVBTuningDelay     *tuning_delay;
-    DiSEqCDevTree       tree;
+    DiSEqCDevTree      *diseqc_tree;
 };
 
 class CaptureCardGroup : public TriggeredConfigurationGroup
@@ -587,6 +589,7 @@ class CardInput : public QObject, public ConfigurationWizard
     Q_OBJECT
   public:
     CardInput(bool is_dtv_card, bool is_dvb_card, int cardid);
+    ~CardInput();
 
     int getInputID(void) const { return id->intValue(); };
 
@@ -624,7 +627,7 @@ class CardInput : public QObject, public ConfigurationWizard
     StartingChannel *startchan;
     TransButtonSetting *scan;
     TransButtonSetting *srcfetch;
-    DiSEqCDevSettings  settings;
+    DiSEqCDevSettings  *externalInputSettings;
 };
 
 #endif

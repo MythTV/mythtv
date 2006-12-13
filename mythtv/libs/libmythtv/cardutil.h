@@ -163,6 +163,7 @@ class MPUBLIC CardUtil
                                     uint &channel_timeout);
     static bool         IgnoreEncrypted(uint cardid, const QString &inputname);
     static bool         TVOnly(uint cardid, const QString &inputname);
+    static bool         IsInNeedOfExternalInputConf(uint cardid);
 
     // DVB info
     static bool         IsDVB(uint cardid, const QString &_inputname);

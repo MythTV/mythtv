@@ -9,6 +9,7 @@
 #include "mythcontext.h"
 #include "mythdbcon.h"
 #include "dvbchannel.h"
+#include "diseqcsettings.h"
 
 #ifdef USING_DVB
 #include "dvbtypes.h"
@@ -435,6 +436,18 @@ bool CardUtil::TVOnly(uint cardid, const QString &input_name)
     return !radioservices;
 }
 
+bool CardUtil::IsInNeedOfExternalInputConf(uint cardid)
+{
+    DiSEqCDev dev;
+    DiSEqCDevTree *diseqc_tree = dev.FindTree(cardid);
+
+    bool needsConf = false;
+    if (diseqc_tree)
+        needsConf = diseqc_tree->IsInNeedOfConf();
+
+    return needsConf;
+}
+
 bool CardUtil::hasV4L2(int videofd)
 {
     (void) videofd;
@@ -767,7 +780,7 @@ void CardUtil::GetCardInputs(
     {
         InputNames list;
         list[0] = "DVBInput";
-        bool needs_conf = DTVDeviceNeedsConfiguration(rcardid);
+        bool needs_conf = IsInNeedOfExternalInputConf(rcardid);
         if (needs_conf)
             list = GetConfiguredDVBInputs(rcardid);
 
