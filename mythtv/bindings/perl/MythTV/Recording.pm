@@ -440,7 +440,6 @@ package MythTV::Recording;
 # 1:      File copied into place
 # 2:      File retrieved from the backend
 # 3:      Current file is up to date
-#
     sub get_pixmap {
         my $self       = shift;
         my $fh_or_path = shift;
@@ -476,7 +475,6 @@ package MythTV::Recording;
 # undef:  Error
 # 1:      File copied into place
 # 2:      File retrieved from the backend
-#
     sub get_data {
         my $self       = shift;
         my $fh_or_path = shift;
@@ -493,7 +491,6 @@ package MythTV::Recording;
 # Find the requested program in the path
 # This searches the path for the specified programs, and returns the
 #   lowest-index-value program found, caching the results
-
     sub find_program {
     # Get the hash id
         my $hash_id = join("\n", @_);
