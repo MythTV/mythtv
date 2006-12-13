@@ -28,6 +28,7 @@
 #include <unistd.h>
 #include <fcntl.h>
 
+#include "util.h"
 #include "mythcontext.h"
 #include "upnp.h"
 
@@ -1192,6 +1193,7 @@ bool BufferedSocketDeviceRequest::CanReadLine()
 QString BufferedSocketDeviceRequest::ReadLine( int msecs )
 {
     QString sLine;
+    MythTimer timeout;
 
     if (m_pSocket)
     {
@@ -1206,13 +1208,24 @@ QString BufferedSocketDeviceRequest::ReadLine( int msecs )
         {
             bool bTimeout = false;
 
+            timeout.start();
+
             while ( !m_pSocket->CanReadLine() && !bTimeout )
             {
                 m_pSocket->WaitForMore( msecs, &bTimeout );
+
+                if ( timeout.elapsed() >= msecs ) 
+                {
+                    bTimeout = true;
+                    m_pSocket->ClearReadBuffer(); 
+                }
+                else 
+                    usleep(20);
             }
             
             if (!bTimeout)
                 sLine = m_pSocket->ReadLine();
+
         }
     }
 
