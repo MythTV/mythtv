@@ -36,4 +36,10 @@
        <action>ARCHIVE_IMPORT_VIDEO</action>
    </button>
 
+   <button>
+       <type>ARCHIVE_UTILITIES</type>
+       <text>Archive Utilities</text>
+       <action>MENU archiveutils.xml</action>
+   </button>
+
 </mythmenu>

@@ -1,0 +1,8 @@
+<mythmenu name="ARCHIVEUTILS">
+
+   <button>
+      <type>ARCHIVE_LAST_LOG</type>
+      <text>Show Log Viewer</text>
+      <action>ARCHIVE_LAST_LOG</action>
+   </button>
+</mythmenu>

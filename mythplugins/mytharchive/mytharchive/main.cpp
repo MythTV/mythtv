@@ -213,6 +213,34 @@ void runImportVideo(void)
 #endif
 }
 
+void runShowLog(void)
+{
+    QString tempDir = getTempDirectory();
+
+    if (tempDir == "")
+    {
+        MythPopupBox::showOkPopup(gContext->GetMainWindow(), 
+                                  QObject::tr("Myth Archive"),
+                                  QObject::tr("Cannot find the MythArchive work directory.\n" 
+                                          "Have you set the correct path in the settings?"));  
+        return;
+    }
+
+    QString logDir = tempDir + "logs";
+
+    // do any logs exist?
+    if (QFile::exists(logDir + "/progress.log") || QFile::exists(logDir + "/mythburn.log"))
+    {
+        LogViewer dialog(gContext->GetMainWindow(), "logviewer");
+        dialog.setFilenames(logDir + "/progress.log", logDir + "/mythburn.log");
+        dialog.exec();
+    }
+    else
+        MythPopupBox::showOkPopup(gContext->GetMainWindow(), 
+                                  QObject::tr("Myth Archive"),
+                                  QObject::tr("Cannot find any logs to show!"));
+}
+
 void runRecordingSelector(void)
 {
     RecordingSelector selector(gContext->GetMainWindow(),
@@ -333,6 +361,8 @@ void ArchiveCallback(void *data, QString &selection)
         runFormatMenu("archiveformat.xml");
     else if (sel == "archive_import_video")
         runImportVideo();
+    else if (sel == "archive_last_log")
+        runShowLog();
 }
 
 void runMenu(QString which_menu)

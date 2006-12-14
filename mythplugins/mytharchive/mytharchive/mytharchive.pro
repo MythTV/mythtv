@@ -19,7 +19,7 @@ INSTALLS += target
 # shared files
 ###############################################
 menufiles.path = $${PREFIX}/share/mythtv
-menufiles.files = archivemenu.xml archiveselect.xml archiveformat.xml
+menufiles.files = archivemenu.xml archiveselect.xml archiveformat.xml archiveutils.xml
 
 uifiles.path = $${PREFIX}/share/mythtv/themes/default
 uifiles.files = mytharchive-ui.xml ../images/*.png
