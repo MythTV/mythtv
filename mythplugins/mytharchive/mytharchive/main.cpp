@@ -70,7 +70,7 @@ void runCreateDVD(void)
     {
         // Yes so we just show the log viewer
         LogViewer dialog(gContext->GetMainWindow(), "logviewer");
-        dialog.setFilename(logDir + "/progress.log");
+        dialog.setFilenames(logDir + "/progress.log", logDir + "/mythburn.log");
         dialog.exec();
         return;
     }
@@ -91,7 +91,7 @@ void runCreateDVD(void)
 
     // now show the log viewer
     LogViewer dialog(gContext->GetMainWindow(), "logviewer");
-    dialog.setFilename(logDir + "/progress.log");
+    dialog.setFilenames(logDir + "/progress.log", logDir + "/mythburn.log");
     dialog.exec();
 #else
     cout << "DVD creation is not compiled in!!" << endl;
@@ -128,7 +128,7 @@ void runCreateArchive(void)
     {
         // Yes so we just show the log viewer
         LogViewer dialog(gContext->GetMainWindow(), "logviewer");
-        dialog.setFilename(logDir + "/progress.log");
+        dialog.setFilenames(logDir + "/progress.log", logDir + "/mythburn.log");
         dialog.exec();
         return;
     }
@@ -149,7 +149,7 @@ void runCreateArchive(void)
 
     // now show the log viewer
     LogViewer dialog(gContext->GetMainWindow(), "logviewer");
-    dialog.setFilename(logDir + "/progress.log");
+    dialog.setFilenames(logDir + "/progress.log", logDir + "/mythburn.log");
     dialog.exec();
 #else
     cout << "Native archive creation is not compiled in!!" << endl;
@@ -188,7 +188,7 @@ void runImportVideo(void)
     {
         // Yes so we just show the log viewer
         LogViewer dialog(gContext->GetMainWindow(), "logviewer");
-        dialog.setFilename(logDir + "/progress.log");
+        dialog.setFilenames(logDir + "/progress.log", logDir + "/mythburn.log");
         dialog.exec();
         return;
     }
@@ -206,7 +206,7 @@ void runImportVideo(void)
 
     // now show the log viewer
     LogViewer dialog(gContext->GetMainWindow(), "logviewer");
-    dialog.setFilename(logDir + "/progress.log");
+    dialog.setFilenames(logDir + "/progress.log", logDir + "/mythburn.log");
     dialog.exec();
 #else
     cout << "Native archive creation is not compiled in!!" << endl;
@@ -294,7 +294,6 @@ void FormatCallback(void *data, QString &selection)
     (void) data;
 
     QString sel = selection.lower();
-
     if (sel == "archive_create_dvd")
         runCreateDVD();
     else if (sel == "archive_create_archive")

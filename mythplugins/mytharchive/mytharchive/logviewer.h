@@ -18,10 +18,9 @@ class LogViewer : public MythDialog
 
     LogViewer(MythMainWindow *parent, const char *name = 0);
    ~LogViewer(void);
-    void setFilename(QString filename) { m_filename = filename; }
+    void setFilenames(const QString &progressLog, const QString &fullLog);
 
   protected slots:
-
     void exitClicked(void);
     void cancelClicked(void);
     void updateClicked(void);
@@ -29,17 +28,31 @@ class LogViewer : public MythDialog
     void updateTimeChanged(int value);
     void toggleAutoUpdate(bool checked);  
     bool loadFile(QString filename, QStringList &list, int startline);
+    void keyPressEvent(QKeyEvent *e);
+    void increaseFontSize(void);
+    void decreaseFontSize(void);
+    void showProgressLog(void);
+    void showFullLog(void);
+    void showMenu(void);
+    void closePopupMenu(void);
 
   private:
-    QTimer             *updateTimer;
-    QString            m_filename;
-    MythPushButton     *exitButton;
-    MythPushButton     *cancelButton;
-    MythPushButton     *updateButton;
+    int                 m_updateTime;
+    QTimer             *m_updateTimer;
 
-    MythSpinBox        *updateTimeSpin;
-    MythCheckBox       *autoupdateCheck;
-    MythListBox        *listbox;
+    QString             m_currentLog;
+    QString             m_progressLog;
+    QString             m_fullLog;
+
+    MythPushButton     *m_exitButton;
+    MythPushButton     *m_cancelButton;
+    MythPushButton     *m_updateButton;
+
+    MythSpinBox        *m_updateTimeSpin;
+    MythCheckBox       *m_autoupdateCheck;
+    MythListBox        *m_listbox;
+
+    MythPopupBox       *m_popupMenu;
 };
 
 #endif
