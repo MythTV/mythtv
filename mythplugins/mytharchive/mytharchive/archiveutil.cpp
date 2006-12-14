@@ -16,6 +16,7 @@
 // myth
 #include <mythtv/mythcontext.h>
 #include <libmythtv/programinfo.h>
+#include <mythtv/dialogbox.h>
 
 // mytharchive
 #include "archiveutil.h"
@@ -53,9 +54,15 @@ QString formatSize(long long sizeKB, int prec)
     return QString("%1 KB").arg(sizeKB);
 }
 
-QString getTempDirectory()
+QString getTempDirectory(bool showError)
 {
     QString tempDir = gContext->GetSetting("MythArchiveTempDir", "");
+
+    if (tempDir == "" && showError)
+        MythPopupBox::showOkPopup(gContext->GetMainWindow(), 
+                                  QObject::tr("Myth Archive"),
+                                  QObject::tr("Cannot find the MythArchive work directory.\n"
+                                          "Have you set the correct path in the settings?"));
 
     if (tempDir == "")
         return "";

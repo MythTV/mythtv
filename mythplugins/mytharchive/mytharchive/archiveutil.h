@@ -68,7 +68,7 @@ typedef struct
 } ArchiveItem;
 
 QString formatSize(long long sizeKB, int prec = 2);
-QString getTempDirectory();
+QString getTempDirectory(bool showError = false);
 void checkTempDirectory();
 bool extractDetailsFromFilename(const QString &inFile,
                                 QString &chanID, QString &startTime);

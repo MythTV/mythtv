@@ -46,16 +46,10 @@ void runCreateDVD(void)
     int res;
 
     QString commandline;
-    QString tempDir = getTempDirectory();
+    QString tempDir = getTempDirectory(true);
 
     if (tempDir == "")
-    {
-        MythPopupBox::showOkPopup(gContext->GetMainWindow(), 
-                                  QObject::tr("Myth Archive"),
-                                  QObject::tr("Cannot find the MythArchive work directory.\n" 
-                                          "Have you set the correct path in the settings?"));  
         return;
-    }
 
     QString logDir = tempDir + "logs";
     QString configDir = tempDir + "config";
@@ -104,16 +98,10 @@ void runCreateArchive(void)
     int res;
 
     QString commandline;
-    QString tempDir = getTempDirectory();
+    QString tempDir = getTempDirectory(true);
 
     if (tempDir == "")
-    {
-        MythPopupBox::showOkPopup(gContext->GetMainWindow(), 
-                                  QObject::tr("Myth Archive"),
-                                  QObject::tr("Cannot find the MythArchive work directory.\n" 
-                                          "Have you set the correct path in the settings?"));  
         return;
-    }
 
     QString logDir = tempDir + "logs";
     QString configDir = tempDir + "config";
@@ -164,16 +152,10 @@ void runEncodeVideo(void)
 void runImportVideo(void)
 {
 #ifdef CREATE_NATIVE
-    QString tempDir = getTempDirectory();
+    QString tempDir = getTempDirectory(true);
 
     if (tempDir == "")
-    {
-        MythPopupBox::showOkPopup(gContext->GetMainWindow(), 
-                                  QObject::tr("Myth Archive"),
-                                  QObject::tr("Cannot find the MythArchive work directory.\n" 
-                                          "Have you set the correct path in the settings?"));  
         return;
-    }
 
     QString logDir = tempDir + "logs";
     QString configDir = tempDir + "config";
@@ -215,16 +197,10 @@ void runImportVideo(void)
 
 void runShowLog(void)
 {
-    QString tempDir = getTempDirectory();
+    QString tempDir = getTempDirectory(true);
 
     if (tempDir == "")
-    {
-        MythPopupBox::showOkPopup(gContext->GetMainWindow(), 
-                                  QObject::tr("Myth Archive"),
-                                  QObject::tr("Cannot find the MythArchive work directory.\n" 
-                                          "Have you set the correct path in the settings?"));  
         return;
-    }
 
     QString logDir = tempDir + "logs";
 
@@ -239,6 +215,31 @@ void runShowLog(void)
         MythPopupBox::showOkPopup(gContext->GetMainWindow(), 
                                   QObject::tr("Myth Archive"),
                                   QObject::tr("Cannot find any logs to show!"));
+}
+
+void runTestDVD(void)
+{
+    QString tempDir = getTempDirectory(true);
+
+    if (tempDir == "")
+        return;
+
+    QString filename = tempDir + "work/dvd/";
+    QString command = gContext->GetSetting("MythArchiveDVDPlayerCmd", "");
+
+    if ((command.find("internal", 0, false) > -1) || (command.length() < 1))
+    {
+        filename = QString("dvd:/") + filename;
+        command = "Internal";
+        gContext->GetMainWindow()->HandleMedia(command, filename);
+        return;
+    }
+    else
+    {
+        if (command.contains("%f"))
+            command = command.replace(QRegExp("%f"), filename);
+        myth_system(command);
+    }
 }
 
 void runRecordingSelector(void)
@@ -363,6 +364,8 @@ void ArchiveCallback(void *data, QString &selection)
         runImportVideo();
     else if (sel == "archive_last_log")
         runShowLog();
+    else if (sel == "archive_test_dvd")
+        runTestDVD();
 }
 
 void runMenu(QString which_menu)

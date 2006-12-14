@@ -59,6 +59,17 @@ static HostLineEdit *MythArchiveDVDLocation()
     return gc;
 };
 
+static HostLineEdit *MythArchiveDVDPlayerCmd()
+{
+    HostLineEdit *gc = new HostLineEdit("MythArchiveDVDPlayerCmd");
+    gc->setLabel(QObject::tr("Command to play DVD"));
+    gc->setValue("Internal");
+    gc->setHelpText(QObject::tr("Command to run when test playing a created DVD. "
+             "'Internal' will use the internal MythTV player. %f will be replaced with "
+            "the path to the created DVD structure eg. 'xine -pfhq --no-splash dvd:/%f'."));
+    return gc;
+};
+
 static HostCheckBox *MythArchiveEncodeToAc3()
 {
     HostCheckBox *gc = new HostCheckBox("MythArchiveEncodeToAc3");
@@ -266,6 +277,7 @@ ArchiveSettings::ArchiveSettings()
     vcg1->addChild(PALNTSC());
     vcg1->addChild(MythArchiveFileFilter());
     vcg1->addChild(MythArchiveDVDLocation());
+    vcg1->addChild(MythArchiveDVDPlayerCmd());
     addChild(vcg1);
 
     VerticalConfigurationGroup* vcg2 = new VerticalConfigurationGroup(false);
