@@ -1,9 +1,13 @@
+
+// POSIX headers
+#include <sys/wait.h> // for WIF macros
 #include <unistd.h>
 
-#include <stdlib.h>
-#include <unistd.h>
-#include <iostream>
+// ANSI C headers
 #include <cstdlib>
+
+// C++ headers
+#include <iostream>
 
 // qt
 #include <qdir.h>
