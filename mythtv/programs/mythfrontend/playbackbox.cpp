@@ -1788,7 +1788,7 @@ bool PlaybackBox::FillList(bool useCachedData)
             if (nextHours[recid] > 0 && nextHours[recid] < maxAge * 2)
                 p->recpriority2 += (maxAge * 2 - nextHours[recid]) / 2;
 
-            int hrs = p->startts.secsTo(now) / 3600;
+            int hrs = p->endts.secsTo(now) / 3600;
 
             // add points for a new recording that decrease each hour
             if (hrs < 24)
@@ -2993,10 +2993,10 @@ void PlaybackBox::showActionPopup(ProgramInfo *program)
     if (!(m_player && m_player->IsSameProgram(curitem)))
     {
         if (curitem->programflags & FL_BOOKMARK)
-            popup->addButton(tr("Play from..."), this,
+            playButton = popup->addButton(tr("Play from..."), this,
                                         SLOT(showPlayFromPopup()));
         else
-            popup->addButton(tr("Play"), this, SLOT(doPlay()));
+            playButton = popup->addButton(tr("Play"), this, SLOT(doPlay()));
     }
 
     if (!m_player)
