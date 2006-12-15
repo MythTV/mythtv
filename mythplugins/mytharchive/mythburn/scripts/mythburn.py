@@ -31,7 +31,7 @@
 #******************************************************************************
 
 # version of script - change after each update
-VERSION="0.1.20061211-1"
+VERSION="0.1.20061215-1"
 
 
 ##You can use this debug flag when testing out new themes
@@ -163,6 +163,8 @@ def fatalError(msg):
     write("ERROR: " + msg)
     write("*"*60)
     write("")
+    saveSetting("MythArchiveLastRunResult", "Failed: " + msg);
+    saveSetting("MythArchiveLastRunEnd", time.strftime("%Y-%m-%d %H:%M:%S "))
     sys.exit(0)
 
 def getTempPath():
@@ -590,6 +592,20 @@ def getDefaultParametersFromMythTVDB():
     if not "MythArchiveTempDir" in cfg:
         fatalError("Can't find the setting for the temp directory. \nHave you run setup in the frontend?")
     return cfg
+
+def saveSetting(name, data):
+    db = getDatabaseConnection()
+    cursor = db.cursor()
+
+    query = "DELETE from settings WHERE value = '" + name + "' AND hostname = '" + configHostname + "'"
+    cursor.execute(query)
+
+    query = "INSERT INTO settings (value, data, hostname) VALUES ('" + name + "', '" + data + "', '" + configHostname + "')"
+    cursor.execute(query)
+
+    db.close()
+    del db
+    del cursor
 
 def getOptions(options):
     global doburn
@@ -1526,10 +1542,10 @@ def BurnDVDISO():
 
     if mediatype == DVD_RW and erasedvdrw == True:
         command = path_growisofs[0] + " -use-the-force-luke -Z " + dvddrivepath + \
-                  " -dvd-video -V 'MythTV BurnDVD' " + os.path.join(getTempPath(),'dvd')
+                  " -dvd-video -V 'MythTV DVD' " + os.path.join(getTempPath(),'dvd')
     else:
         command = path_growisofs[0] + " -Z " + dvddrivepath + \
-                  " -dvd-video -V 'MythTV BurnDVD' " + os.path.join(getTempPath(),'dvd')
+                  " -dvd-video -V 'MythTV DVD' " + os.path.join(getTempPath(),'dvd')
 
     if os.system(command) != 0:
         write("ERROR: Retrying to start growisofs after reload.")
@@ -3844,10 +3860,14 @@ if progresslog != "":
     progressfile = open(progresslog, 'w')
     write( "mythburn.py (%s) starting up..." % VERSION)
 
-cpuCount = getCPUCount()
-
 #Get mysql database parameters
-getMysqlDBParameters();
+getMysqlDBParameters()
+
+saveSetting("MythArchiveLastRunStart", time.strftime("%Y-%m-%d %H:%M:%S "))
+saveSetting("MythArchiveLastRunType", "DVD")
+saveSetting("MythArchiveLastRunStatus", "Running")
+
+cpuCount = getCPUCount()
 
 #if the script is run from the web interface the PATH environment variable does not include
 #many of the bin locations we need so just append a few likely locations where our required
@@ -3922,6 +3942,8 @@ try:
 
         jobDOM.unlink()
 
+        saveSetting("MythArchiveLastRunStatus", "Success")
+        saveSetting("MythArchiveLastRunEnd", time.strftime("%Y-%m-%d %H:%M:%S "))
         write("Finished processing jobs!!!")
     finally:
         # remove our lock file
@@ -3929,7 +3951,7 @@ try:
             os.remove(os.path.join(logpath, "mythburn.lck"))
 
         # make sure the files we created are read/writable by all 
-        os.system("chmod -R a+rw-x+X %s" % defaultsettings["MythArchiveTempDir"]) 
+        os.system("chmod -R a+rw-x+X %s" % defaultsettings["MythArchiveTempDir"])
 except SystemExit:
     write("Terminated")
 except:
@@ -3938,3 +3960,5 @@ except:
     if progresslog != "":
         traceback.print_exc(file=progressfile)
     write('-'*60)
+    saveSetting("MythArchiveLastRunStatus", "Failed")
+    saveSetting("MythArchiveLastRunEnd", time.strftime("%Y-%m-%d %H:%M:%S "))

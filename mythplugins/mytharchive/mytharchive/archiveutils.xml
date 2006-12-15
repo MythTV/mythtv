@@ -12,4 +12,10 @@
        <action>ARCHIVE_TEST_DVD</action>
    </button>
 
+   <button>
+       <type>ARCHIVE_BURN_DVD</type>
+       <text>Burn DVD</text>
+       <action>ARCHIVE_BURN_DVD</action>
+   </button>
+
 </mythmenu>

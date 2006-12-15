@@ -1533,6 +1533,8 @@ void MythburnWizard::runScript()
     commandline += " -l " + logDir + "/progress.log";              // progress log
     commandline += " > "  + logDir + "/mythburn.log 2>&1 &";       //Logs
 
+    gContext->SaveSetting("MythArchiveLastRunStatus", "Running");
+
     int state = system(commandline);
 
     if (state != 0) 

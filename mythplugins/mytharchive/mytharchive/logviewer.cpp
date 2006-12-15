@@ -181,8 +181,40 @@ void LogViewer::updateClicked(void)
             m_listbox->setCurrentItem(m_listbox->count() - 1);
     }
 
+    bool bRunning = (getSetting("MythArchiveLastRunStatus") == "Running");
+    m_cancelButton->setEnabled(bRunning);
+    m_updateButton->setEnabled(bRunning);
+
     if (m_autoupdateCheck->isChecked())
         m_updateTimer->start(m_updateTime * 1000);
+}
+
+QString LogViewer::getSetting(const QString &key)
+{
+    // read the setting direct from the DB rather than from the settings cache 
+    // which isn't aware that the script may have changed something
+    MSqlQuery query(MSqlQuery::InitCon());
+    if (query.isConnected())
+    {
+        query.prepare("SELECT data FROM settings WHERE value = :VALUE "
+                "AND hostname = :HOSTNAME ;");
+        query.bindValue(":VALUE", key);
+        query.bindValue(":HOSTNAME", gContext->GetHostName());
+
+        if (query.exec() && query.isActive() && query.size() > 0)
+        {
+            query.next();
+            return query.value(0).toString();
+        }
+    }
+    else
+    {
+        VERBOSE(VB_IMPORTANT, 
+                QString("Database not open while trying to load setting: %1")
+                        .arg(key));
+    }
+
+    return QString("");
 }
 
 bool LogViewer::loadFile(QString filename, QStringList &list, int startline)

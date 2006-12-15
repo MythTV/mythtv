@@ -164,7 +164,7 @@ void createISOImage(QString &sourceDirectory)
                 .arg(res));
 }
 
-void burnISOImage(int mediaType, bool bEraseDVDRW)
+int burnISOImage(int mediaType, bool bEraseDVDRW, bool nativeFormat)
 {
     QString dvdDrive = gContext->GetSetting("MythArchiveDVDLocation", "/dev/dvd");
     VERBOSE(VB_JOBQUEUE, "Burning ISO image to " + dvdDrive);
@@ -177,15 +177,32 @@ void burnISOImage(int mediaType, bool bEraseDVDRW)
 
     QString growisofs = gContext->GetSetting("MythArchiveGrowisofsCmd", "growisofs");
     QString command;
-    if (mediaType == AD_DVD_RW && bEraseDVDRW == true)
+
+    if (nativeFormat)
     {
-        command = growisofs + " -use-the-force-luke -Z " + dvdDrive;
-        command += " -V 'MythTV Archive' -R -J " + tempDirectory;
+        if (mediaType == AD_DVD_RW && bEraseDVDRW == true)
+        {
+            command = growisofs + " -use-the-force-luke -Z " + dvdDrive;
+            command += " -V 'MythTV Archive' -R -J " + tempDirectory;
+        }
+        else
+        {
+            command = growisofs + " -Z " + dvdDrive; 
+            command += " -V 'MythTV Archive' -R -J " + tempDirectory;
+        }
     }
     else
     {
-        command = growisofs + " -Z " + dvdDrive; 
-        command += " -V 'MythTV Archive' -R -J " + tempDirectory;
+        if (mediaType == AD_DVD_RW && bEraseDVDRW == true)
+        {
+            command = growisofs + " -use-the-force-luke -Z " + dvdDrive;
+            command += " -dvd-video -V 'MythTV DVD' " + tempDirectory + "/dvd";
+        }
+        else
+        {
+            command = growisofs + " -Z " + dvdDrive; 
+            command += " -dvd-video -V 'MythTV DVD' " + tempDirectory + "/dvd";
+        }
     }
 
     int res = system(command);
@@ -196,6 +213,20 @@ void burnISOImage(int mediaType, bool bEraseDVDRW)
     else
         VERBOSE(VB_JOBQUEUE, 
                 QString("ERROR: Failed while running growisofs. Result: %1").arg(res));
+
+    return res;
+}
+
+int doBurnDVD(int mediaType, bool bEraseDVDRW, bool nativeFormat)
+{
+    gContext->SaveSetting("MythArchiveLastRunStart", QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm"));
+    gContext->SaveSetting("MythArchiveLastRunStatus", "Running");
+
+    int res = burnISOImage(mediaType, bEraseDVDRW, nativeFormat);
+
+    gContext->SaveSetting("MythArchiveLastRunEnd", QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm"));
+    gContext->SaveSetting("MythArchiveLastRunStatus", "Success");
+    return res;
 }
 
 int NativeArchive::doNativeArchive(const QString &jobFile)
@@ -303,7 +334,7 @@ int NativeArchive::doNativeArchive(const QString &jobFile)
 
     // burn the iso if needed
     if (mediaType != AD_FILE && bDoBurn)
-        burnISOImage(mediaType, bEraseDVDRW);
+        burnISOImage(mediaType, bEraseDVDRW, true);
 
     // make sure the files we created are read/writable by all 
     //system("chmod -R a+rw-x+X " + saveDirectory);
@@ -1605,8 +1636,15 @@ QString NativeArchive::findNodeText(const QDomElement &elem, const QString &node
 
 int doNativeArchive(const QString &jobFile)
 {
+    gContext->SaveSetting("MythArchiveLastRunType", "Native Export");
+    gContext->SaveSetting("MythArchiveLastRunStart", QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm"));
+    gContext->SaveSetting("MythArchiveLastRunStatus", "Running");
+
     NativeArchive na;
-    return na.doNativeArchive(jobFile);
+    int res = na.doNativeArchive(jobFile);
+    gContext->SaveSetting("MythArchiveLastRunEnd", QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm"));
+    gContext->SaveSetting("MythArchiveLastRunStatus", (res == 0 ? "Success" : "Failed"));
+    return res;
 }
 
 int doImportArchive(const QString &inFile, int chanID)
@@ -2178,7 +2216,16 @@ void showUsage()
     cout << "       file       - filename to check\n";
     cout << "       returns    - 0 on error or file not found\n";
     cout << "                  - 1 file is on a local filesystem\n";
-    cout << "                  - 2 file is on a remote filesystem\n";
+    cout << "                  - 2 file is on a remote filesystem\n\n";
+    cout << "-b/--burndvd mediatype erasedvdrw format\n";
+    cout << "       (burn a created dvd to a blank disk)\n";
+    cout << "       mediatype  - 0 = single layer DVD\n";
+    cout << "                    1 = dual layer DVD\n";
+    cout << "                    2 = rewritable DVD\n";
+    cout << "       erasedvdrw - 0 = don't erase\n";
+    cout << "                    1 = force erase\n";
+    cout << "       native     - 0 = not a native archive\n";
+    cout << "                    1 = is a native archive\n\n"; 
     cout << "-l/--log logfile\n"; 
     cout << "       (name of log file to send messages)\n\n";
     cout << "-v/--verbose debug-level\n";  
@@ -2211,6 +2258,11 @@ int main(int argc, char **argv)
     bool bImportArchive = false;
     bool bGetFileInfo = false;
     bool bIsRemote = false;
+    bool bDoBurn = false;
+    int  mediaType = AD_DVD_SL;
+    bool bEraseDVDRW = false;
+    bool bNativeFormat = false;
+
     QString thumbList;
     QString inFile;
     QString outFile;
@@ -2310,6 +2362,63 @@ int main(int argc, char **argv)
             else
             {
                 cerr << "Missing argument to -r/--isremote option\n";
+                return FRONTEND_EXIT_INVALID_CMDLINE;
+            }
+        }
+        else if (!strcmp(a.argv()[argpos],"-b") ||
+                  !strcmp(a.argv()[argpos],"--burndvd"))
+        {
+            bDoBurn = true;
+            if (a.argc()-1 > argpos)
+            {
+                QString arg(a.argv()[argpos+1]); 
+                mediaType = arg.toInt();
+                if (mediaType < 0 || mediaType > 2)
+                {
+                    cerr << "Invalid mediatype given: " << mediaType << "\n";
+                    return FRONTEND_EXIT_INVALID_CMDLINE;
+                }
+                ++argpos;
+            }
+            else
+            {
+                cerr << "Missing argument to -b/--burndvd option\n";
+                return FRONTEND_EXIT_INVALID_CMDLINE;
+            }
+
+            if (a.argc()-1 > argpos)
+            {
+                QString arg(a.argv()[argpos+1]); 
+                int value = arg.toInt();
+                if (value < 0 || value > 1)
+                {
+                    cerr << "Invalid erasedvd parameter given: " << value << "\n";
+                    return FRONTEND_EXIT_INVALID_CMDLINE;
+                }
+                bEraseDVDRW = (value == 1);
+                ++argpos;
+            }
+            else
+            {
+                cerr << "Missing argument to -b/--burndvd option\n";
+                return FRONTEND_EXIT_INVALID_CMDLINE;
+            }
+
+            if (a.argc()-1 > argpos)
+            {
+                QString arg(a.argv()[argpos+1]); 
+                int value = arg.toInt();
+                if (value < 0 || value > 1)
+                {
+                    cerr << "Invalid native format parameter given: " << value << "\n";
+                    return FRONTEND_EXIT_INVALID_CMDLINE;
+                }
+                bNativeFormat = (value == 1);
+                ++argpos;
+            }
+            else
+            {
+                cerr << "Missing argument to -b/--burndvd option\n";
                 return FRONTEND_EXIT_INVALID_CMDLINE;
             }
         }
@@ -2436,6 +2545,8 @@ int main(int argc, char **argv)
         res = getFileInfo(inFile, outFile, lenMethod);
     else if (bIsRemote)
         res = isRemote(inFile);
+    else if (bDoBurn)
+        res = doBurnDVD(mediaType, bEraseDVDRW, bNativeFormat);
     else 
         showUsage();
 

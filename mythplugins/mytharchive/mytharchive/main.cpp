@@ -29,6 +29,7 @@ using namespace std;
 #include "recordingselector.h"
 #include "videoselector.h"
 #include "dbcheck.h"
+#include "archiveutil.h"
 
 #ifdef CREATE_DVD 
     #include "mythburnwizard.h"
@@ -38,7 +39,6 @@ using namespace std;
     #include "exportnativewizard.h"
     #include "importnativewizard.h"
 #endif
-
 
 void runCreateDVD(void)
 {
@@ -212,13 +212,23 @@ void runShowLog(void)
         dialog.exec();
     }
     else
-        MythPopupBox::showOkPopup(gContext->GetMainWindow(), 
-                                  QObject::tr("Myth Archive"),
-                                  QObject::tr("Cannot find any logs to show!"));
+        showWarningDialog(QObject::tr("Cannot find any logs to show!"));
 }
 
 void runTestDVD(void)
 {
+    if (!gContext->GetSetting("MythArchiveLastRunType").startsWith("DVD"))
+    {
+        showWarningDialog(QObject::tr("Last run did not create a playable DVD."));
+        return;
+    }
+
+    if (!gContext->GetSetting("MythArchiveLastRunStatus").startsWith("Success"))
+    {
+        showWarningDialog(QObject::tr("Last run failed to create a DVD."));
+        return;
+    }
+
     QString tempDir = getTempDirectory(true);
 
     if (tempDir == "")
@@ -240,6 +250,69 @@ void runTestDVD(void)
             command = command.replace(QRegExp("%f"), filename);
         myth_system(command);
     }
+}
+
+void runBurnDVD(void)
+{
+    if (!gContext->GetSetting("MythArchiveLastRunStatus").startsWith("Success"))
+    {
+        showWarningDialog(QObject::tr("Cannot burn a DVD.\nThe last run failed to create a DVD."));
+        return;
+    }
+
+    int res;
+
+    // ask the user what type of disk to burn to
+    DialogBox *dialog = new DialogBox(gContext->GetMainWindow(),
+            QObject::tr("\nPlace a blank DVD in the drive and select an option below."));
+
+    dialog->AddButton(QObject::tr("Burn DVD"));
+    dialog->AddButton(QObject::tr("Burn DVD Rewritable"));
+    dialog->AddButton(QObject::tr("Burn DVD Rewritable (Force Erase)"));
+    dialog->AddButton(QObject::tr("Cancel"));
+
+    res = dialog->exec();
+    delete dialog;
+
+    // cancel pressed?
+    if (res == 4)
+        return;
+
+    QString tempDir = getTempDirectory(true);
+
+    if (tempDir == "")
+        return;
+
+    QString logDir = tempDir + "logs";
+    QString configDir = tempDir + "config";
+    QString commandline;
+
+    // remove existing progress.log if present
+    if (QFile::exists(logDir + "/progress.log"))
+        QFile::remove(logDir + "/progress.log");
+
+    // remove cancel flag file if present
+    if (QFile::exists(logDir + "/mythburncancel.lck"))
+        QFile::remove(logDir + "/mythburncancel.lck");
+
+    QString sArchiveFormat = QString::number(res - 1);
+    QString sEraseDVDRW = (res == 3 ? "1" : "0");
+    QString sNativeFormat = (gContext->GetSetting("MythArchiveLastRunType").startsWith("Native") ? "1" : "0");
+
+    commandline = "mytharchivehelper -b " + sArchiveFormat + " " + sEraseDVDRW  + " " + sNativeFormat;
+    commandline += " > "  + logDir + "/progress.log 2>&1 &";
+    int state = system(commandline);
+
+    if (state != 0) 
+    {
+        showWarningDialog(QObject::tr("It was not possible to run mytharchivehelper to burn the DVD."));
+        return;
+    }
+
+    // now show the log viewer
+    LogViewer logViewer(gContext->GetMainWindow(), "logviewer");
+    logViewer.setFilenames(logDir + "/progress.log", logDir + "/mythburn.log");
+    logViewer.exec();
 }
 
 void runRecordingSelector(void)
@@ -366,6 +439,8 @@ void ArchiveCallback(void *data, QString &selection)
         runShowLog();
     else if (sel == "archive_test_dvd")
         runTestDVD();
+    else if (sel == "archive_burn_dvd")
+        runBurnDVD();
 }
 
 void runMenu(QString which_menu)

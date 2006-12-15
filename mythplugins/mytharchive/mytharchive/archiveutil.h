@@ -75,5 +75,6 @@ bool extractDetailsFromFilename(const QString &inFile,
 ProgramInfo *getProgramInfoForFile(const QString &inFile);
 bool getFileDetails(ArchiveItem *a);
 QString getBaseName(const QString &filename);
+void showWarningDialog(const QString msg);
 
 #endif

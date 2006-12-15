@@ -37,6 +37,8 @@ class LogViewer : public MythDialog
     void closePopupMenu(void);
 
   private:
+    QString getSetting(const QString &key);
+
     int                 m_updateTime;
     QTimer             *m_updateTimer;
 
