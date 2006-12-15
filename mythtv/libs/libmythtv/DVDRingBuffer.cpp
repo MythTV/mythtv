@@ -701,6 +701,7 @@ bool DVDRingBufferPriv::DecodeSubtitles(AVSubtitle *sub, int *gotSubtitles,
     if (buf_size < 4)
         return false;
 
+    bool force_subtitle_display = false;
     sub->rects = NULL;
     sub->num_rects = 0;
     sub->start_display_time = 0;
@@ -721,6 +722,7 @@ bool DVDRingBufferPriv::DecodeSubtitles(AVSubtitle *sub, int *gotSubtitles,
             switch(cmd) 
             {
                 case 0x00:
+                    force_subtitle_display = true;
                 break;  
                 case 0x01:
                     sub->start_display_time = (date << 10) / 90;
@@ -837,7 +839,17 @@ bool DVDRingBufferPriv::DecodeSubtitles(AVSubtitle *sub, int *gotSubtitles,
         cmd_pos = next_cmd_pos;
     }
     if (sub->num_rects > 0)
+    {
+        if (parent && curSubtitleTrack == -1 && !IsInMenu())
+        {
+            uint captionmode = parent->GetCaptionMode();
+            if (force_subtitle_display && captionmode != kDisplayAVSubtitle)
+                parent->SetCaptionsEnabled(true, false);
+            else if (!force_subtitle_display && captionmode == kDisplayAVSubtitle)
+                parent->SetCaptionsEnabled(false, false);
+        }
         return true;
+    }
 fail:
     return false;
 }
