@@ -961,7 +961,7 @@ foreach my $target ( @targets )
 
   if ( $target eq "MythFrontend" )
   {
-     my $mtd = "$svndir/mythplugins/mythdvd/mtd/mtd.app/Contents/MacOS/mtd";
+     my $mtd = "$PREFIX/bin/mtd";
      if ( -e $mtd )
      {
        &Verbose("Installing $mtd into $target");
