@@ -25,6 +25,9 @@
 #include <GL/glx.h>
 #include <GL/glu.h>
 
+// mythzoneminder
+#include "config.h"
+
 typedef enum 
 { 
     IDLE,
@@ -64,7 +67,11 @@ typedef struct
     int trigger_score;
     char trigger_cause[32];
     char trigger_text[256];
+#ifdef ZMVERSION_1_22_2
     char trigger_showtext[32];
+#else
+    char trigger_showtext[256];
+#endif
 } TriggerData;
 
 typedef struct
