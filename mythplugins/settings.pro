@@ -16,6 +16,9 @@ DEFINES += PREFIX=\"$${PREFIX}\"
 INCLUDEPATH += $${PREFIX}/include
 INCLUDEPATH += $$CONFIG_INCLUDEPATH
 
+# Prevent building .app bundles everywhere.
+macx:CONFIG += console
+
 # figure out compile flags based on qmake info
 
 QMAKE_CXXFLAGS += $$ARCHFLAGS
