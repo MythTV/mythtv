@@ -296,6 +296,7 @@ int DVDRingBufferPriv::safe_read(void *data, unsigned sz)
 
                 if (repeatseek)
                 {
+                    QMutexLocker lock(&seekLock);
                     Seek(seekpos, seekwhence);
                     repeatseek = false;
                 }       
@@ -519,7 +520,10 @@ void DVDRingBufferPriv::prevTrack(void)
     if (newPart > 0)
         dvdnav_part_play(dvdnav, title, newPart);
     else
-        Seek(0,SEEK_SET); // May cause picture to become jumpy.
+    {
+        QMutexLocker lock(&seekLock);
+        Seek(0,SEEK_SET);
+    }
     gotStop = false;
 }
 

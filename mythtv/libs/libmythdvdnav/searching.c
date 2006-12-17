@@ -258,11 +258,7 @@ dvdnav_status_t dvdnav_sector_search(dvdnav_t *this,
   for(cell_nr = first_cell_nr; (cell_nr <= last_cell_nr) && !found; cell_nr ++) {
     cell =  &(state->pgc->cell_playback[cell_nr-1]);
     length = cell->last_sector - cell->first_sector + 1;
-    if (target >= length) {
-      target -= length;
-    } else {
-      /* convert the target sector from Cell-relative to absolute physical sector */
-      target += cell->first_sector;
+    if (target >= cell->first_sector && target <= cell->last_sector) {
       found = 1;
       break;
     }
