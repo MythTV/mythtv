@@ -1740,6 +1740,11 @@ static bool insert_program(const ProgramInfo        *pg,
         MythContext::DBError("insert_program -- insert", query);
     else
     {
+        query.prepare("UPDATE channel SET last_record = NOW() "
+                      "WHERE chanid = :CHANID");
+        query.bindValue(":CHANID", pg->chanid);
+        query.exec();
+
         query.prepare("UPDATE record SET last_record = NOW() "
                       "WHERE recordid = :RECORDID");
         query.bindValue(":RECORDID", pg->recordid);
