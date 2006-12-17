@@ -326,6 +326,15 @@ int DVDRingBufferPriv::safe_read(void *data, unsigned sz)
                 ClearMenuSPUParameters();
                 ClearSubtitlesOSD();
 
+                if (IsInMenu())
+                {
+                    buttonstreamid = 32;
+                    int aspect = dvdnav_get_video_aspect(dvdnav);
+                    // determine which subtitle stream id to use
+                    if (aspect != 0)                           
+                        buttonstreamid = spu->physical_wide + buttonstreamid;
+                }
+
                 if (autoselectsubtitle)
                     curSubtitleTrack = dvdnav_get_active_spu_stream(dvdnav);
 
@@ -626,13 +635,11 @@ void DVDRingBufferPriv::GetMenuSPUPkt(uint8_t *buf, int buf_size, int stream_id)
     if (buf_size < 4)
         return;
 
-    if ((buttonstreamid < stream_id) && 
-        (buttonstreamid > 0))
+    if (buttonstreamid != stream_id) 
         return;
 
     QMutexLocker lock(&menuBtnLock);
 
-    buttonstreamid = stream_id;
     ClearMenuSPUParameters();
     uint8_t *spu_pkt;
     spu_pkt = (uint8_t*)av_malloc(buf_size);
@@ -867,7 +874,7 @@ bool DVDRingBufferPriv::DVDButtonUpdate(bool b_mode)
     dvdnav_highlight_area_t hl;
     dvdnav_get_current_highlight(dvdnav, &button);
     pci = dvdnav_get_current_nav_pci(dvdnav);
-    dvdnav_get_highlight_area(pci,button, b_mode, &hl);
+    dvdnav_get_highlight_area(pci, button, b_mode, &hl);
 
     for (int i = 0 ; i < 4 ; i++)
     {
@@ -914,7 +921,6 @@ void DVDRingBufferPriv::ClearMenuSPUParameters(void)
     menuBuflength = 0;
     hl_startx = hl_starty = 0;
     hl_width = hl_height = 0;
-    buttonstreamid = 0;
 }
 
 int DVDRingBufferPriv::NumMenuButtons(void) const
