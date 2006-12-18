@@ -85,8 +85,8 @@ struct QuartzData
 
     // Pixel storage for the media stream:
     ImageDescriptionHandle imgDesc;       // source description header
-    void *             pixelData;         // start of data section
-    size_t             pixelSize;         // data size
+    void *             pixelData;         // storage for one frame
+    size_t             pixelSize;         // size of one frame
     QMutex             pixelLock;         // to update pixels safely
 
     // Information about the display:
@@ -1709,6 +1709,13 @@ void VideoOutputQuartz::ProcessFrame(VideoFrame *frame, OSD *osd,
         !m_deinterlaceBeforeOSD)
     {
         m_deintFilter->ProcessFrame(frame);
+    }
+
+    if (!data->pixelData)
+    {
+        VERBOSE(VB_PLAYBACK,
+                "VideoOutputQuartz::ProcessFrame(): NULL pixelData!");
+        return;
     }
 
     // copy data to our buffer
