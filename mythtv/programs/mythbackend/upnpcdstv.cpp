@@ -155,7 +155,7 @@ UPnpCDSExtensionResults *UPnpCDSTv::Browse( UPnpCDSBrowseRequest *pRequest )
     // Parse out request object's path
     // ----------------------------------------------------------------------
 
-    QStringList idPath = QStringList::split( "/", pRequest->m_sObjectId );
+    QStringList idPath = QStringList::split( "/", pRequest->m_sObjectId.section('=',0,0) );
 
     if (idPath.count() == 0)
         return( NULL );
@@ -708,6 +708,8 @@ void UPnpCDSTv::AddVideoItem( UPnpCDSBrowseRequest    *pRequest,
     QString        sRecGroup    = query.value( 8).toString();
     long long      nFileSize    = stringToLongLong( query.value( 9).toString() );
     QString        sBaseName    = query.value(10).toString();
+    //VERBOSE(VB_UPNP, QString(" %1 : %2 - %3 - %4").arg(sTitle).arg(sSubtitle).arg(sBaseName).arg(nFileSize));
+
     QDateTime      dtProgStart  = query.value(11).toDateTime();
     QDateTime      dtProgEnd    = query.value(12).toDateTime();
 

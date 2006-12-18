@@ -129,7 +129,7 @@ UPnpCDSExtensionResults *UPnpCDSVideo::Browse( UPnpCDSBrowseRequest *pRequest )
     // Parse out request object's path
     // ----------------------------------------------------------------------
 
-    QStringList idPath = QStringList::split( "/", pRequest->m_sObjectId );
+    QStringList idPath = QStringList::split( "/", pRequest->m_sObjectId.section('=',0,0) );
 
     if (idPath.count() == 0)
         return( NULL );
