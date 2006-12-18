@@ -835,6 +835,34 @@ bool DVDRingBufferPriv::DecodeSubtitles(AVSubtitle *sub, int *gotSubtitles,
                 decode_rle(bitmap + w, w * 2, w, h / 2,
                             spu_pkt, offset2 * 2, buf_size);
                 guess_palette(sub->rects[0].rgba_palette, palette, alpha);
+                if (!IsInMenu() && y1 < 5)
+                {
+                    uint8_t *tmp_bitmap;
+                    int sy;
+                    bool found = false;
+                    for (sy = 0; sy < h && !found; ++sy)
+                    {
+                        for (int tmpx = 0; tmpx < w; ++tmpx)
+                        {
+                            const uint8_t color = bitmap[sy * w + tmpx];
+                            if (color > 0)
+                            {
+                                found = true;
+                                break;
+                            }
+                        }
+                    }
+                    
+                    int newh = h - sy;
+                    tmp_bitmap = (uint8_t*) av_malloc(w * newh);
+                    memcpy(tmp_bitmap, bitmap + (w * sy), (w * newh));
+                    av_free(bitmap);
+                    y1 = sy + y1;
+                    h = newh;
+                    bitmap = (uint8_t*) av_malloc(w * h);
+                    memcpy(bitmap, tmp_bitmap, (w * h));
+                    av_free(tmp_bitmap);
+                }
                 sub->rects[0].bitmap = bitmap;
                 sub->rects[0].x = x1;
                 sub->rects[0].y = y1;
