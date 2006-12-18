@@ -50,20 +50,28 @@ int XVMC_VLD_field_start(MpegEncContext* s, AVCodecContext* avctx)
              * QMatrix encoded in the alternative_scan mode rather than zig_zag,
              * when the IDCT's are sent in alternative_scan mode, then we
              * should re-zigzag and then de-alternative_scan the QMatrix data
-             * in intra_matrix and inter_matirx. The standard libavcodec always
+             * in intra_matrix and inter_matrix. The standard libavcodec always
              * de-zigzags the incoming MPeg QMatrix.
              */
-            qmatrix.intra_quantiser_matrix[i] = s->intra_matrix[s->dsp.idct_permutation[i]];
-            qmatrix.non_intra_quantiser_matrix[i] = s->inter_matrix[s->dsp.idct_permutation[i]];
-            qmatrix.chroma_intra_quantiser_matrix[i] = s->chroma_intra_matrix[s->dsp.idct_permutation[i]];
-            qmatrix.chroma_non_intra_quantiser_matrix[i] = s->chroma_inter_matrix[s->dsp.idct_permutation[i]];
+            qmatrix.intra_quantiser_matrix[i]
+                = s->intra_matrix[s->dsp.idct_permutation[i]];
+            qmatrix.non_intra_quantiser_matrix[i]
+                = s->inter_matrix[s->dsp.idct_permutation[i]];
+            qmatrix.chroma_intra_quantiser_matrix[i]
+                = s->chroma_intra_matrix[s->dsp.idct_permutation[i]];
+            qmatrix.chroma_non_intra_quantiser_matrix[i]
+                = s->chroma_inter_matrix[s->dsp.idct_permutation[i]];
         }
         else
         {
-            qmatrix.intra_quantiser_matrix[i] = s->intra_matrix[s->dsp.idct_permutation[i]];
-            qmatrix.non_intra_quantiser_matrix[i] = s->inter_matrix[s->dsp.idct_permutation[i]];
-            qmatrix.chroma_intra_quantiser_matrix[i] = s->chroma_intra_matrix[s->dsp.idct_permutation[i]];
-            qmatrix.chroma_non_intra_quantiser_matrix[i] = s->chroma_inter_matrix[s->dsp.idct_permutation[i]];
+            qmatrix.intra_quantiser_matrix[i]
+                = s->intra_matrix[s->dsp.idct_permutation[i]];
+            qmatrix.non_intra_quantiser_matrix[i]
+                = s->inter_matrix[s->dsp.idct_permutation[i]];
+            qmatrix.chroma_intra_quantiser_matrix[i]
+                = s->chroma_intra_matrix[s->dsp.idct_permutation[i]];
+            qmatrix.chroma_non_intra_quantiser_matrix[i]
+                = s->chroma_inter_matrix[s->dsp.idct_permutation[i]];
         }
     }
 
@@ -96,10 +104,12 @@ int XVMC_VLD_field_start(MpegEncContext* s, AVCodecContext* avctx)
     binfo.picture_structure = s->picture_structure;
     switch (s->pict_type)
     {
-    case I_TYPE:    binfo.picture_coding_type = XVMC_I_PICTURE;     break;
-    case P_TYPE:    binfo.picture_coding_type = XVMC_P_PICTURE;     break;
-    case B_TYPE:    binfo.picture_coding_type = XVMC_B_PICTURE;     break;
-    default:    av_log(avctx, AV_LOG_ERROR, "%s: Unknown picture coding type: %d\n", __FUNCTION__, s->pict_type);
+        case I_TYPE:  binfo.picture_coding_type = XVMC_I_PICTURE;  break;
+        case P_TYPE:  binfo.picture_coding_type = XVMC_P_PICTURE;  break;
+        case B_TYPE:  binfo.picture_coding_type = XVMC_B_PICTURE;  break;
+        default:      av_log(avctx, AV_LOG_ERROR,
+                             "%s: Unknown picture coding type: %d\n",
+                             __FUNCTION__, s->pict_type);
     }
 
     binfo.intra_dc_precision = s->intra_dc_precision;;
@@ -112,8 +122,9 @@ int XVMC_VLD_field_start(MpegEncContext* s, AVCodecContext* avctx)
 #ifdef ZAP
     /* Don't know if these are needed ??? */
     s->mb_width = (s->width + 15) / 16;
-    s->mb_height = (s->codec_id == CODEC_ID_MPEG2VIDEO && !s->progressive_sequence) ?
-        2 * ((s->height + 31) / 32) : (s->height + 15) / 16;
+    s->mb_height = (s->codec_id == CODEC_ID_MPEG2VIDEO
+                           && !s->progressive_sequence) ?
+                   2 * ((s->height + 31) / 32) : (s->height + 15) / 16;
 #endif
 
     binfo.FVMV_range = (s->mpeg_f_code[0][1] - 1);
@@ -170,7 +181,8 @@ static int length_to_next_start(uint8_t* pbuf_ptr, int buf_size)
 #define SLICE_MAX_START_CODE   0x000001af
 
 
-int XVMC_VLD_decode_slice(MpegEncContext* s, int mb_y, uint8_t* buffer, int buf_size)
+int XVMC_VLD_decode_slice(MpegEncContext* s, int mb_y,
+                          uint8_t* buffer, int buf_size)
 {
     int slicelen = length_to_next_start(buffer, buf_size);
     xvmc_render_state_t*    render;
