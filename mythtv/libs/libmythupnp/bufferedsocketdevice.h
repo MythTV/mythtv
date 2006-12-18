@@ -68,6 +68,7 @@ class BufferedSocketDevice
         Q_ULONG             WaitForMore         ( int msecs, bool *timeout = NULL );
         Q_ULONG             BytesToWrite        () const;
         void                ClearPendingData    ();
+        void                ClearReadBuffer     ();
 
         Q_LONG              ReadBlock           ( char *data, Q_ULONG maxlen );
         Q_LONG              WriteBlock          ( const char *data, Q_ULONG len );
