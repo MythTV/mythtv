@@ -25,7 +25,7 @@ using namespace std;
 
 // this holds Core Audio member variables
 struct CoreAudioData {
-    AudioUnit output_unit;
+    AudioUnit      mOutputUnit;
 };
 
 // This callback communicates with Core Audio.
@@ -41,21 +41,22 @@ OSStatus AuCA_AURender(void *inRefCon,
  *  \brief Implements Core Audio (Mac OS X Hardware Abstraction Layer) output.
  */
 
-AudioOutputCA::AudioOutputCA(
-    QString laudio_main_device, QString           laudio_passthru_device,
-    int     laudio_bits,        int               laudio_channels,
-    int     laudio_samplerate,  AudioOutputSource lsource,
-    bool    lset_initial_vol,   bool              laudio_passthru)
+AudioOutputCA::AudioOutputCA(QString laudio_main_device,
+                             QString laudio_passthru_device,
+                             int laudio_bits, int laudio_channels,
+                             int laudio_samplerate,
+                             AudioOutputSource lsource,
+                             bool lset_initial_vol, bool laudio_passthru)
     : AudioOutputBase(laudio_main_device, laudio_passthru_device,
                       laudio_bits,        laudio_channels,
                       laudio_samplerate,  lsource,
                       lset_initial_vol,   laudio_passthru),
-      coreaudio_data(new CoreAudioData()),
+      d(new CoreAudioData()),
       bufferedBytes(0)
 {
     // Create private data
-    coreaudio_data->output_unit = NULL;
-    
+    d->mOutputUnit = NULL;
+
     Reconfigure(laudio_bits, laudio_channels,
                 laudio_samplerate, laudio_passthru);
 }
@@ -63,8 +64,8 @@ AudioOutputCA::AudioOutputCA(
 AudioOutputCA::~AudioOutputCA()
 {
     KillAudio();
-    
-    delete coreaudio_data;
+
+    delete d;
 }
 
 bool AudioOutputCA::OpenDevice()
@@ -76,42 +77,40 @@ bool AudioOutputCA::OpenDevice()
     desc.componentManufacturer = kAudioUnitManufacturer_Apple;
     desc.componentFlags = 0;
     desc.componentFlagsMask = 0;
-    
+
     Component comp = FindNextComponent(NULL, &desc);
     if (comp == NULL)
     {
         Error(QString("FindNextComponent failed"));
         return false;
     }
-    
-    OSStatus err = OpenAComponent(comp, &coreaudio_data->output_unit);
+
+    OSStatus err = OpenAComponent(comp, &d->mOutputUnit);
     if (err)
     {
         Error(QString("OpenAComponent returned %1").arg((long)err));
         return false;
     }
-    
+
     // Attach callback to default output
     AURenderCallbackStruct input;
     input.inputProc = AuCA_AURender;
     input.inputProcRefCon = this;
-    
-    err = AudioUnitSetProperty(coreaudio_data->output_unit,
+
+    err = AudioUnitSetProperty(d->mOutputUnit,
                                kAudioUnitProperty_SetRenderCallback,
                                kAudioUnitScope_Input,
-                               0,
-                               &input,
-                               sizeof(input));
+                               0, &input, sizeof(input));
     if (err)
     {
         Error(QString("AudioUnitSetProperty (callback) returned %1")
                       .arg((long)err));
         return false;
     }
-    
+
     // base class does this after OpenDevice, but we need it now
     audio_bytes_per_sample = audio_channels * audio_bits / 8;
-    
+
     // Set up the audio output unit
     AudioStreamBasicDescription conv_in_desc;
     bzero(&conv_in_desc, sizeof(AudioStreamBasicDescription));
@@ -126,28 +125,27 @@ bool AudioOutputCA::OpenDevice()
     conv_in_desc.mBytesPerFrame    = audio_bytes_per_sample;
     conv_in_desc.mChannelsPerFrame = audio_channels;
     conv_in_desc.mBitsPerChannel   = audio_bits;
-    
-    err = AudioUnitSetProperty(coreaudio_data->output_unit,
+
+    err = AudioUnitSetProperty(d->mOutputUnit,
                                kAudioUnitProperty_StreamFormat,
                                kAudioUnitScope_Input,
-                               0,
-                               &conv_in_desc,
+                               0, &conv_in_desc,
                                sizeof(AudioStreamBasicDescription));
     if (err)
     {
         Error(QString("AudioUnitSetProperty returned %1").arg((long)err));
         return false;
     }
-    
+
     // We're all set up - start the audio output unit
-    ComponentResult res = AudioUnitInitialize(coreaudio_data->output_unit);
+    ComponentResult res = AudioUnitInitialize(d->mOutputUnit);
     if (res)
     {
         Error(QString("AudioUnitInitialize returned %1").arg((long)res));
         return false;
     }
-    
-    err = AudioOutputUnitStart(coreaudio_data->output_unit);
+
+    err = AudioOutputUnitStart(d->mOutputUnit);
     if (err)
     {
         Error(QString("AudioOutputUnitStart returned %1").arg((long)err));
@@ -166,28 +164,26 @@ bool AudioOutputCA::OpenDevice()
 
 void AudioOutputCA::CloseDevice()
 {
-    if (coreaudio_data->output_unit)
+    if (d->mOutputUnit)
     {
-        AudioOutputUnitStop(coreaudio_data->output_unit);
-        AudioUnitUninitialize(coreaudio_data->output_unit);
-        AudioUnitReset(coreaudio_data->output_unit,
-                       kAudioUnitScope_Input, NULL);
-        CloseComponent(coreaudio_data->output_unit);
-        coreaudio_data->output_unit = NULL;
+        AudioOutputUnitStop(d->mOutputUnit);
+        AudioUnitUninitialize(d->mOutputUnit);
+        AudioUnitReset(d->mOutputUnit, kAudioUnitScope_Input, NULL);
+        CloseComponent(d->mOutputUnit);
+        d->mOutputUnit = NULL;
     }
 }
-    
+
 /** Object-oriented part of callback */
 bool AudioOutputCA::RenderAudio(unsigned char *aubuf,
-                                int size,
-                                unsigned long long timestamp)
+                                int size, unsigned long long timestamp)
 {
     if (pauseaudio || killaudio)
     {
         audio_actually_paused = true;
         return false;
     }
-    
+
     /* This callback is called when the sound system requests
        data.  We don't want to block here, because that would
        just cause dropouts anyway, so we always return whatever
@@ -201,7 +197,7 @@ bool AudioOutputCA::RenderAudio(unsigned char *aubuf,
         // play silence on buffer underrun
         bzero(aubuf + written_size, size - written_size);
     }
-    
+
     /* update audiotime (bufferedBytes is read by getBufferedOnSoundcard) */
     UInt64 nanos = AudioConvertHostTimeToNanos(
                         timestamp - AudioGetCurrentHostTime());
@@ -209,7 +205,7 @@ bool AudioOutputCA::RenderAudio(unsigned char *aubuf,
                           (effdsp / 100.0) *          // samples/sec
                           audio_bytes_per_sample);    // bytes/sample
     SetAudiotime();
-    
+
     return (written_size > 0);
 }
 
@@ -304,9 +300,9 @@ OSStatus AuCA_AURender(void *inRefCon,
 {
     (void)inBusNumber;
     (void)inNumberFrames;
-    
+
     AudioOutputCA *inst = (AudioOutputCA *)inRefCon;
-    
+
     if (!inst->RenderAudio((unsigned char *)(ioData->mBuffers[0].mData),
                            ioData->mBuffers[0].mDataByteSize,
                            inTimeStamp->mHostTime))
@@ -323,14 +319,12 @@ int AudioOutputCA::GetVolumeChannel(int channel)
     // FIXME: this only returns global volume
     (void)channel;
     Float32 volume;
-    if (!AudioUnitGetParameter(coreaudio_data->output_unit,
+
+    if (!AudioUnitGetParameter(d->mOutputUnit,
                                kHALOutputParam_Volume,
-                              kAudioUnitScope_Global,
-                              0,
-                              &volume))
-    {
+                               kAudioUnitScope_Global, 0, &volume))
         return (int)lroundf(volume * 100.0);
-    }
+
     return 0;    // error case
 }
 
@@ -338,11 +332,6 @@ void AudioOutputCA::SetVolumeChannel(int channel, int volume)
 {
     // FIXME: this only sets global volume
     (void)channel;
-     AudioUnitSetParameter(coreaudio_data->output_unit,
-                           kHALOutputParam_Volume,
-                           kAudioUnitScope_Global,
-                           0,
-                           (volume * 0.01),
-                           0);
+     AudioUnitSetParameter(d->mOutputUnit, kHALOutputParam_Volume,
+                           kAudioUnitScope_Global, 0, (volume * 0.01), 0);
 }
-

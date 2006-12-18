@@ -52,7 +52,7 @@ protected:
 
 private:
 
-    CoreAudioData * coreaudio_data;
+    CoreAudioData * d;
     int             bufferedBytes;
     long            CA_audiotime_updated;
 };
