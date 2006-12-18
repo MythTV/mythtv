@@ -132,6 +132,8 @@ show_help(){
   echo "  --enable-directfb        enable DirectFB  (Linux non-X11 video)"
   echo "  --enable-directx         enable DirectX   (Microsoft video)"
   echo ""
+  echo "  --enable-mac-bundle      produce standalone OS X apps (e.g. mythfrontend.app)"
+  echo ""
   echo "  --with-bindings=LIST     install the bindings specified in the"
   echo "                           comma-separated list"
   echo "                           Supported bindings: perl"
@@ -431,6 +433,7 @@ xvmc_pro="no"
 xvmc_opengl="no"
 xvmc_lib=""
 dvdv="no"
+mac_bundle="no"
 mac_corevideo="no"
 opengl_vsync="no"
 direct_fb="no"
@@ -1209,6 +1212,8 @@ for opt do
 # disabled due to abuse in Gentoo ebuild
 #  --disable-backend) backend="no"
 #  ;;
+  --enable-mac-bundle) mac_bundle="yes"
+  ;;
   --cpu=*|--tune=*|--arch=*)
       # We already processed these options earlier so the empty case
       # here is so we don't error out and say they're unknown options.
@@ -3178,6 +3183,10 @@ if test "$dvdv" = "yes" ; then
   CCONFIG="$CCONFIG using_dvdv"
   echo "#define HAVE_DVDV 1" >> $TMPH
   echo "CONFIG_DVDV=yes" >> $MYTH_CONFIG_MAK
+fi
+
+if test "$mac_bundle" = "yes"; then
+  CCONFIG="$CCONFIG mac_bundle"
 fi
 
 if test "$mac_corevideo" = "yes"; then

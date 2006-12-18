@@ -20,3 +20,8 @@ QMAKE_CLEAN += $(TARGET)
 HEADERS += backendsettings.h
 SOURCES += backendsettings.cpp checksetup.cpp main.cpp
 
+macx {
+    mac_bundle {
+        QMAKE_POST_LINK = ../../contrib/OSX/makebundle.sh mythtv-setup
+    }
+}

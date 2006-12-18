@@ -32,10 +32,11 @@ SOURCES += globalsettings.cpp manualschedule.cpp programrecpriority.cpp
 SOURCES += channelrecpriority.cpp statusbox.cpp networkcontrol.cpp
 
 macx {
-    RC_FILE += mythfrontend.icns
-    LIBS += `freetype-config --libs`
-
-    using_mac_accel : LIBS += -lobjc
+    mac_bundle {
+        CONFIG -= console  # Force behaviour of producing .app bundle
+        RC_FILE += mythfrontend.icns
+        QMAKE_POST_LINK = ../../contrib/OSX/makebundle.sh mythfrontend.app
+    }
 
     # OS X has no ldconfig
     setting.extra -= -ldconfig

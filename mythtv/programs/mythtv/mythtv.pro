@@ -12,3 +12,9 @@ QMAKE_CLEAN += $(TARGET)
 
 # Input
 SOURCES += main.cpp
+
+macx {
+    mac_bundle {
+        QMAKE_POST_LINK = ../../contrib/OSX/makebundle.sh mythtv
+    }
+}
