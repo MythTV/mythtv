@@ -2764,6 +2764,13 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
                     VERBOSE(VB_PLAYBACK, LOC + "DVD Title Changed");
                     ScanStreams(true);
                     lastdvdtitle = dvdtitle;
+                    if (GetNVP() && GetNVP()->getVideoOutput())
+                    {
+                        if (ringBuffer->InDVDMenuOrStillFrame())
+                            GetNVP()->getVideoOutput()->SetPrebuffering(false);
+                        else
+                            GetNVP()->getVideoOutput()->SetPrebuffering(true);
+                    }   
                 }
                 UpdateDVDFramesPlayed();
                 VERBOSE(VB_PLAYBACK, QString(LOC + "DVD Cell Changed. "
