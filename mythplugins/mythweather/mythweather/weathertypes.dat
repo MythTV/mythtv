@@ -25,7 +25,7 @@
 38,AM Rain/ Snow Showers,rainsnow.png
 40,Light Rain/ Wind,lshowers.png
 41,Showers/ Wind,showers.png
-43,T-Showers,showers.png
+43,T-Showers,thunshowers.png
 44,Mostly Sunny/ Wind,sunny.png
 45,Flurries,flurries.png
 47,Rain/ Wind,showers.png
@@ -35,7 +35,7 @@
 53,Thunderstorms,thunshowers.png
 55,Sunny/ Windy,sunny.png
 56,AM Thunderstorms,thunshowers.png
-59,AM T-Showers,showers.png
+59,AM T-Showers,thunshowers.png
 62,AM Rain,showers.png
 64,Iso T-Storms/ Wind,thunshowers.png
 65,Rain/ Snow,rainsnow.png
