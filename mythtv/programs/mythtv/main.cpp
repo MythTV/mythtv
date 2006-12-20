@@ -4,6 +4,7 @@
 #include <qsqldatabase.h>
 #include <qstring.h>
 #include <qregexp.h>
+#include <qdir.h>
 
 #include "tv_play.h"
 #include "programinfo.h"
@@ -260,6 +261,10 @@ int main(int argc, char *argv[])
         pginfo->endts = QDateTime::currentDateTime().addSecs(-180);
         pginfo->pathname = QString::fromLocal8Bit(filename);
         pginfo->isVideo = true;
+
+        // RingBuffer doesn't like relative pathnames
+        if (filename.left(1) != "/")
+            pginfo->pathname.prepend(QDir::currentDirPath());
     }
 
     TV::StartTV(pginfo, true);
