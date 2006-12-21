@@ -133,24 +133,25 @@ class DTVDeviceTreeWizard : public ConfigurationDialog
     virtual int exec(void);
 };
 
-class DTVDeviceConfigWizard : public QObject, public ConfigurationWizard
+class DTVDeviceConfigGroup : public VerticalConfigurationGroup
 {
-    Q_OBJECT
-
   public:
-    DTVDeviceConfigWizard(DiSEqCDevSettings &settings, uint cardid);
-    ~DTVDeviceConfigWizard(void);
+    DTVDeviceConfigGroup(DiSEqCDevSettings &settings, uint cardid,
+                         bool switches_enabled);
+    ~DTVDeviceConfigGroup(void);
     
-  public slots:
-    void SelectNodes(void);
-  
   protected:
-    void AddNodes(ConfigurationGroup &group, DiSEqCDevDevice *node);
+    void AddNodes(ConfigurationGroup *group, const QString &trigger,
+                  DiSEqCDevDevice *node);
+
+    void AddChild(ConfigurationGroup *group, const QString &trigger,
+                  Setting *setting);
     
   private:
     DiSEqCDevTree       m_tree;
     DiSEqCDevSettings  &m_settings;
     devid_to_setting_t  m_devs;
+    bool                m_switches_enabled;
 };
 
 #endif // _DISEQCSETTINGS_H_

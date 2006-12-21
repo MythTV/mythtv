@@ -766,7 +766,7 @@ void CardUtil::GetCardInputs(
     QStringList::iterator it = inputs.begin();
     for (; it != inputs.end(); ++it)
     {
-        CardInput* cardinput = new CardInput(is_dtv, false, cardid);
+        CardInput* cardinput = new CardInput(is_dtv, false, false, cardid);
         cardinput->loadByInput(rcardid, (*it));
         cardinput->SetChildCardID((parentid) ? cardid : 0);
         inputLabels.push_back(
@@ -787,7 +787,7 @@ void CardUtil::GetCardInputs(
         InputNames::const_iterator it;
         for (it = list.begin(); it != list.end(); ++it)
         {
-            CardInput *cardinput = new CardInput(is_dtv, true, rcardid);
+            CardInput *cardinput = new CardInput(is_dtv, true, false, rcardid);
             cardinput->loadByInput(rcardid, *it);
             cardinput->SetChildCardID(parentid ? cardid : 0);
             inputLabels.push_back(
@@ -799,7 +799,7 @@ void CardUtil::GetCardInputs(
         // plus add one "new" input
         if (needs_conf)
         {
-            CardInput *newcard = new CardInput(is_dtv, true, rcardid);
+            CardInput *newcard = new CardInput(is_dtv, true, true, rcardid);
             QString newname = QString("DVBInput #%1").arg(list.size() + 1);
             newcard->loadByInput(rcardid, newname);
             newcard->SetChildCardID((parentid) ? cardid : 0);

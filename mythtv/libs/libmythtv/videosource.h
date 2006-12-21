@@ -588,7 +588,8 @@ class CardInput : public QObject, public ConfigurationWizard
 {
     Q_OBJECT
   public:
-    CardInput(bool is_dtv_card, bool is_dvb_card, int cardid);
+    CardInput(bool is_dtv_card, bool is_dvb_card,
+              bool is_new_input, int cardid);
     ~CardInput();
 
     int getInputID(void) const { return id->intValue(); };
@@ -605,7 +606,6 @@ class CardInput : public QObject, public ConfigurationWizard
   public slots:
     void channelScanner();
     void sourceFetch();
-    void diseqcConfig();
     void SetSourceID(const QString &sourceid);
 
   private:

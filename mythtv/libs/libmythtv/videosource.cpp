@@ -1736,12 +1736,25 @@ class DishNetEIT : public CheckBoxSetting, public CardInputDBStorage
     };
 };
 
-CardInput::CardInput(bool isDTVcard, bool isDVBcard, int _cardid) :
+CardInput::CardInput(bool isDTVcard,  bool isDVBcard,
+                     bool isNewInput, int _cardid) :
+    id(new ID()),
+    cardid(new CardID(*this)),
+    childid(),
+    inputname(new InputName(*this)),
+    sourceid(new SourceID(*this)),
+    startchan(new StartingChannel(*this)),
+    scan(new TransButtonSetting()),
+    srcfetch(new TransButtonSetting()),
     externalInputSettings(new DiSEqCDevSettings())
 {
-    (void) _cardid;
+    addChild(id);
 
-    addChild(id = new ID());
+    if (CardUtil::IsInNeedOfExternalInputConf(_cardid))
+    {
+        addChild(new DTVDeviceConfigGroup(*externalInputSettings,
+                                          _cardid, isNewInput));
+    }
 
     ConfigurationGroup *group =
         new VerticalConfigurationGroup(false, false, true, true);
@@ -1750,11 +1763,11 @@ CardInput::CardInput(bool isDTVcard, bool isDVBcard, int _cardid) :
 
     HorizontalConfigurationGroup *ci;
     ci = new HorizontalConfigurationGroup(false, false);
-    ci->addChild(cardid = new CardID(*this));
-    ci->addChild(inputname = new InputName(*this));
+    ci->addChild(cardid);
+    ci->addChild(inputname);
     group->addChild(ci);
     group->addChild(new InputDisplayName(*this));
-    group->addChild(sourceid = new SourceID(*this));
+    group->addChild(sourceid);
     if (!isDVBcard)
     {
         group->addChild(new ExternalChannelCommand(*this));
@@ -1770,30 +1783,19 @@ CardInput::CardInput(bool isDTVcard, bool isDVBcard, int _cardid) :
         group->addChild(chgroup);
     }
 
-#ifdef USING_DVB
     if (isDVBcard)
     {
-        TransButtonSetting *diseqc = new TransButtonSetting();
-        diseqc->setLabel(tr("DVB-S"));
-        diseqc->setHelpText(tr("Input and satellite settings."));
-        diseqc->setVisible(CardUtil::IsInNeedOfExternalInputConf(_cardid));
-        group->addChild(diseqc);
-        connect(diseqc, SIGNAL(pressed()), SLOT(diseqcConfig()));
-   
         ConfigurationGroup *chgroup = 
             new HorizontalConfigurationGroup(false, false, true, true);
         chgroup->addChild(new RadioServices(*this));
         chgroup->addChild(new DishNetEIT(*this));
         group->addChild(chgroup);
     }
-#endif
 
-    scan = new TransButtonSetting();
     scan->setLabel(tr("Scan for channels"));
     scan->setHelpText(
         tr("Use channel scanner to find channels for this input."));
 
-    srcfetch = new TransButtonSetting();
     srcfetch->setLabel(tr("Fetch channels from listings source"));
     srcfetch->setHelpText(
         tr("This uses the listings data source to "
@@ -1806,7 +1808,6 @@ CardInput::CardInput(bool isDTVcard, bool isDVBcard, int _cardid) :
     sgrp->addChild(srcfetch);
     group->addChild(sgrp);
 
-    startchan = new StartingChannel(*this);
     group->addChild(startchan);
     group->addChild(new InputPriority(*this));
 
@@ -1920,15 +1921,6 @@ void CardInput::sourceFetch(void)
         startchan->load();
         startchan->save();
     }
-}
-
-void CardInput::diseqcConfig(void)
-{
-#ifdef USING_DVB
-    DTVDeviceConfigWizard wizard(*externalInputSettings,
-                                 cardid->getValue().toUInt());
-    wizard.exec();
-#endif // USING_DVB
 }
 
 QString CardInputDBStorage::whereClause(MSqlBindings& bindings) 

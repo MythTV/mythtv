@@ -356,7 +356,19 @@ static QString AngleToString(double angle)
     return str;
 }
 
-static double AngleToFloat(const QString &angle)
+static double AngleToEdit(double angle, QString &hemi)
+{
+    if (angle > 0.0)
+    {
+        hemi = "E";
+        return angle;
+    }
+
+    hemi = "W";
+    return -angle;
+}
+
+static double AngleToFloat(const QString &angle, bool translated = true)
 {
     if (angle.length() < 2)
         return 0.0;
@@ -366,8 +378,12 @@ static double AngleToFloat(const QString &angle)
     if (postfix.isLetter())
     {
         pos = angle.left(angle.length() - 1).toDouble();
-        if (postfix.upper() == DeviceTree::tr("W", "Western Hemisphere"))
+        if ((translated &&
+             (postfix.upper() == DeviceTree::tr("W", "Western Hemisphere"))) ||
+            (!translated && (postfix.upper() == "W")))
+        {
             pos = -pos;
+        }
     }
     else
         pos = angle.toDouble();
@@ -1163,63 +1179,79 @@ class RotorSetting : public ComboBoxSetting, public Storage
 
 //////////////////////////////////////// USALSRotorSetting
 
-class USALSRotorSetting : public LineEditSetting, public Storage
+class USALSRotorSetting : public HorizontalConfigurationGroup
 {
   public:
     USALSRotorSetting(DiSEqCDevDevice &node, DiSEqCDevSettings &settings) :
-        LineEditSetting(this), m_node(node), m_settings(settings)
+        HorizontalConfigurationGroup(false, false, true, true),
+        numeric(new TransLineEditSetting()),
+        hemisphere(new TransComboBoxSetting(false)),
+        m_node(node), m_settings(settings)
     {
-        setLabel(node.GetDescription());
-        QString help = DeviceTree::tr(
-            "The longitude of the satellite you are aiming at, in degrees. "
-            "In the Western hemisphere use 'W' as the suffix. "
-            "In the Eastern hemisphere use 'E' as the suffix. ");
-        setHelpText(help);
+        QString help =
+            DeviceTree::tr(
+                "Locates the satelite you wish to point to "
+                "with the longitude along the Clarke Belt of"
+                "the satellite [-180..180] and its hemisphere.");
+
+        numeric->setLabel(DeviceTree::tr("Longitude (degrees)"));
+        numeric->setHelpText(help);
+        hemisphere->setLabel(DeviceTree::tr("Hemisphere"));
+        hemisphere->addSelection(DeviceTree::tr("Eastern"), "E", false);
+        hemisphere->addSelection(DeviceTree::tr("Western"), "W", true);
+        hemisphere->setHelpText(help);
+
+        addChild(numeric);
+        addChild(hemisphere);
     }
 
     virtual void load(void)
     {
-        setValue(AngleToString(m_settings.GetValue(m_node.GetDeviceID())));
+        double  val  = m_settings.GetValue(m_node.GetDeviceID());
+        QString hemi = QString::null;
+        double  eval = AngleToEdit(val, hemi);
+        numeric->setValue(QString::number(eval));
+        hemisphere->setValue(hemisphere->getValueIndex(hemi));
     }
 
     virtual void save(void)
     {
-        m_settings.SetValue(m_node.GetDeviceID(), AngleToFloat(getValue()));
+        QString val = QString::number(numeric->getValue().toDouble());
+        val += hemisphere->getValue();
+        m_settings.SetValue(m_node.GetDeviceID(), AngleToFloat(val, false));
     }
 
     virtual void save(QString /*destination*/) { }
 
   private:
-    DiSEqCDevDevice   &m_node;
-    DiSEqCDevSettings &m_settings;
+    TransLineEditSetting *numeric;
+    TransComboBoxSetting *hemisphere;
+    DiSEqCDevDevice      &m_node;
+    DiSEqCDevSettings    &m_settings;
 };
 
-//////////////////////////////////////// DTVDeviceConfigWizard
+//////////////////////////////////////// DTVDeviceConfigGroup
 
-DTVDeviceConfigWizard::DTVDeviceConfigWizard(DiSEqCDevSettings &settings,
-                                             uint cardid)
-    : m_settings(settings)
+DTVDeviceConfigGroup::DTVDeviceConfigGroup(
+    DiSEqCDevSettings &settings, uint cardid, bool switches_enabled) :
+    VerticalConfigurationGroup(false, false, true, true),
+    m_settings(settings), m_switches_enabled(switches_enabled)
 {
-    ConfigurationGroup *group =
-        new VerticalConfigurationGroup(false, false);
-    group->setLabel(DeviceTree::tr("DTV Device Configuration"));
+    setLabel(DeviceTree::tr("DTV Device Configuration"));
 
     // load
     m_tree.Load(cardid);
 
     // initial UI setup
-    AddNodes(*group, m_tree.Root());
-    SelectNodes();
-
-    addChild(group);
+    AddNodes(this, QString::null, m_tree.Root());
 }
 
-DTVDeviceConfigWizard::~DTVDeviceConfigWizard(void)
+DTVDeviceConfigGroup::~DTVDeviceConfigGroup(void)
 {
 }
 
-void DTVDeviceConfigWizard::AddNodes(ConfigurationGroup &group,
-                                     DiSEqCDevDevice    *node)
+void DTVDeviceConfigGroup::AddNodes(
+    ConfigurationGroup *group, const QString &trigger, DiSEqCDevDevice *node)
 {
     if (!node)
         return;
@@ -1229,8 +1261,7 @@ void DTVDeviceConfigWizard::AddNodes(ConfigurationGroup &group,
     {
         case DiSEqCDevDevice::kTypeSwitch:
             setting = new SwitchSetting(*node, m_settings);
-            connect(setting, SIGNAL(valueChanged(const QString&)),
-                    SLOT(SelectNodes()));
+            setting->setEnabled(m_switches_enabled);
             break;
         case DiSEqCDevDevice::kTypeRotor:
         {
@@ -1245,34 +1276,58 @@ void DTVDeviceConfigWizard::AddNodes(ConfigurationGroup &group,
             break;
     }
 
-    if (setting)
+    if (!setting)
     {
-        // add this node
-        m_devs[node->GetDeviceID()] = setting;
-        group.addChild(setting);
+        AddChild(group, trigger, new TransLabelSetting());
+        return;
     }
 
-    // add children
+    m_devs[node->GetDeviceID()] = setting;
+
     uint num_ch = node->GetChildCount();
-    for (uint ch = 0; ch < num_ch; ch++)
-        AddNodes(group, node->GetChild(ch));
+    if (DiSEqCDevDevice::kTypeSwitch == node->GetDeviceType())
+    {
+        bool useframe = (node != m_tree.Root());
+        bool zerospace = !useframe;
+        TriggeredConfigurationGroup *cgrp = new TriggeredConfigurationGroup(
+            false, useframe, true, true, false, false, true, zerospace);
+
+        cgrp->addChild(setting);
+        cgrp->setTrigger(setting);
+
+        for (uint i = 0; i < num_ch; i++)
+            AddNodes(cgrp, QString::number(i), node->GetChild(i));
+
+        AddChild(group, trigger, cgrp);
+        return;
+    }
+
+    if (!num_ch)
+    {
+        AddChild(group, trigger, setting);
+        return;
+    }
+
+    VerticalConfigurationGroup *cgrp =
+        new VerticalConfigurationGroup(false, false, true, true);
+
+    AddChild(cgrp, QString::null, setting);
+    for (uint i = 0; i < num_ch; i++)
+        AddNodes(cgrp, QString::null, node->GetChild(i));
+
+    AddChild(group, trigger, cgrp);
 }
 
-void DTVDeviceConfigWizard::SelectNodes(void)
+void DTVDeviceConfigGroup::AddChild(
+    ConfigurationGroup *group, const QString &trigger, Setting *setting)
 {
-    ConfigurationWizard::save();
+    TriggeredConfigurationGroup *grp =
+        dynamic_cast<TriggeredConfigurationGroup*>(group);
 
-    QMap<uint,bool> active;
-    DiSEqCDevDevice *node = m_tree.Root();
-    while (node)
-    {
-        active[node->GetDeviceID()] = true;
-        node = node->GetSelectedChild(m_settings);
-    }
-
-    devid_to_setting_t::iterator it = m_devs.begin();
-    for (; it != m_devs.end(); ++it)
-        (*it)->setEnabled(active[it.key()]);
+    if (grp && !trigger.isEmpty())
+        grp->addTarget(trigger, setting);
+    else
+        group->addChild(setting);
 }
 
 //////////////////////////////////////// Database Upgrade
