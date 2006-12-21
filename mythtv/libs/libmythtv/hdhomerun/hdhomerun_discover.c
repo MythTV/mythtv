@@ -22,7 +22,7 @@
 #include "hdhomerun_pkt.h"
 #include "hdhomerun_discover.h"
 
-#if defined(__CYGWIN__)
+#if defined(__CYGWIN__) || defined(__WINDOWS__)
 #include <windows.h>
 #include <iptypes.h>
 #include <iphlpapi.h>
@@ -32,7 +32,7 @@ struct hdhomerun_discover_sock_t {
 	int sock;
 };
 
-struct hdhomerun_discover_sock_t *hdhomerun_discover_create(unsigned long timeout)
+static struct hdhomerun_discover_sock_t *hdhomerun_discover_create(void)
 {
 	struct hdhomerun_discover_sock_t *ds = (struct hdhomerun_discover_sock_t *)malloc(sizeof(struct hdhomerun_discover_sock_t));
 	if (!ds) {
@@ -40,17 +40,15 @@ struct hdhomerun_discover_sock_t *hdhomerun_discover_create(unsigned long timeou
 	}
 	
 	/* Create socket. */
-	ds->sock = socket(AF_INET, SOCK_DGRAM, 0);
+	ds->sock = (int)socket(AF_INET, SOCK_DGRAM, 0);
 	if (ds->sock == -1) {
 		free(ds);
 		return NULL;
 	}
 
-	/* Set timeout. */
-	struct timeval t;
-	t.tv_sec = timeout / 1000;
-	t.tv_usec = (timeout % 1000) * 1000;
-	setsockopt(ds->sock, SOL_SOCKET, SO_RCVTIMEO, &t, sizeof(t));
+	/* Set timeouts. */
+	setsocktimeout(ds->sock, SOL_SOCKET, SO_SNDTIMEO, 1000);
+	setsocktimeout(ds->sock, SOL_SOCKET, SO_RCVTIMEO, 1000);
 
 	/* Allow broadcast. */
 	int sock_opt = 1;
@@ -63,7 +61,8 @@ struct hdhomerun_discover_sock_t *hdhomerun_discover_create(unsigned long timeou
 	sock_addr.sin_addr.s_addr = htonl(INADDR_ANY);
 	sock_addr.sin_port = htons(0);
 	if (bind(ds->sock, (struct sockaddr *)&sock_addr, sizeof(sock_addr)) != 0) {
-		hdhomerun_discover_destroy(ds);
+		close(ds->sock);
+		free(ds);
 		return NULL;
 	}
 
@@ -71,16 +70,16 @@ struct hdhomerun_discover_sock_t *hdhomerun_discover_create(unsigned long timeou
 	return ds;
 }
 
-void hdhomerun_discover_destroy(struct hdhomerun_discover_sock_t *ds)
+static void hdhomerun_discover_destroy(struct hdhomerun_discover_sock_t *ds)
 {
 	close(ds->sock);
 	free(ds);
 }
 
-static int hdhomerun_discover_send_packet(struct hdhomerun_discover_sock_t *ds, unsigned long ip_addr, unsigned long device_type, unsigned long device_id)
+static int hdhomerun_discover_send_packet(struct hdhomerun_discover_sock_t *ds, uint32_t ip_addr, uint32_t device_type, uint32_t device_id)
 {
-	unsigned char buffer[1024];
-	unsigned char *ptr = buffer;
+	uint8_t buffer[1024];
+	uint8_t *ptr = buffer;
 	hdhomerun_write_discover_request(&ptr, device_type, device_id);
 
 	struct sockaddr_in sock_addr;
@@ -89,19 +88,19 @@ static int hdhomerun_discover_send_packet(struct hdhomerun_discover_sock_t *ds, 
 	sock_addr.sin_addr.s_addr = htonl(ip_addr);
 	sock_addr.sin_port = htons(HDHOMERUN_DISCOVER_UDP_PORT);
 
-	int length = ptr - buffer;
-	if (sendto(ds->sock, (char *)buffer, length, 0, (struct sockaddr *)&sock_addr, sizeof(sock_addr)) != length) {
+	int length = (int)(ptr - buffer);
+	if (sendto(ds->sock, (char *)buffer, (int)length, 0, (struct sockaddr *)&sock_addr, sizeof(sock_addr)) != length) {
 		return -1;
 	}
 
 	return 0;
 }
 
-#if defined(__CYGWIN__)
-static int hdhomerun_discover_send_internal(struct hdhomerun_discover_sock_t *ds, unsigned long device_type, unsigned long device_id)
+#if defined(__CYGWIN__) || defined(__WINDOWS__)
+static int hdhomerun_discover_send_internal(struct hdhomerun_discover_sock_t *ds, uint32_t device_type, uint32_t device_id)
 {
 	PIP_ADAPTER_INFO pAdapterInfo = (IP_ADAPTER_INFO *)malloc(sizeof(IP_ADAPTER_INFO));
-	unsigned long ulOutBufLen = sizeof(IP_ADAPTER_INFO);
+	ULONG ulOutBufLen = sizeof(IP_ADAPTER_INFO);
 
 	DWORD Ret = GetAdaptersInfo(pAdapterInfo, &ulOutBufLen);
 	if (Ret != NO_ERROR) {
@@ -117,21 +116,25 @@ static int hdhomerun_discover_send_internal(struct hdhomerun_discover_sock_t *ds
 		}
 	}
 
-	int send_count = 0;
+	unsigned int send_count = 0;
 	PIP_ADAPTER_INFO pAdapter = pAdapterInfo;
 	while (pAdapter) {
 		IP_ADDR_STRING *pIPAddr = &pAdapter->IpAddressList;
 		while (pIPAddr) {
-			unsigned long addr = ntohl(inet_addr(pIPAddr->IpAddress.String));
-			unsigned long mask = ntohl(inet_addr(pIPAddr->IpMask.String));
+			uint32_t addr = ntohl(inet_addr(pIPAddr->IpAddress.String));
+			uint32_t mask = ntohl(inet_addr(pIPAddr->IpMask.String));
 			
-			unsigned long broadcast = addr | ~mask;
+			uint32_t broadcast = addr | ~mask;
 			if ((broadcast == 0x00000000) || (broadcast == 0xFFFFFFFF)) {
 				pIPAddr = pIPAddr->Next;
 				continue;
 			}
 
-			hdhomerun_discover_send_packet(ds, broadcast, device_type, device_id);
+			if (hdhomerun_discover_send_packet(ds, broadcast, device_type, device_id) < 0) {
+				pIPAddr = pIPAddr->Next;
+				continue;
+			}
+
 			send_count++;
 
 			pIPAddr = pIPAddr->Next;
@@ -150,14 +153,14 @@ static int hdhomerun_discover_send_internal(struct hdhomerun_discover_sock_t *ds
 #endif
 
 #if defined(__linux__)
-static int hdhomerun_discover_send_internal(struct hdhomerun_discover_sock_t *ds, unsigned long device_type, unsigned long device_id)
+static int hdhomerun_discover_send_internal(struct hdhomerun_discover_sock_t *ds, uint32_t device_type, uint32_t device_id)
 {
 	FILE *fp = fopen("/proc/net/route", "r");
 	if (!fp) {
 		return -1;
 	}
 
-	int send_count = 0;
+	unsigned int send_count = 0;
 	while (1) {
 		char line[256];
 		if (!fgets(line, sizeof(line), fp)) {
@@ -165,21 +168,24 @@ static int hdhomerun_discover_send_internal(struct hdhomerun_discover_sock_t *ds
 		}
 		line[255] = 0;
 
-		unsigned long dest;
-		unsigned long mask;
-		if (sscanf(line, "%*s %lx %*x %*x %*d %*d %*d %lx", &dest, &mask) != 2) {
+		uint32_t dest;
+		uint32_t mask;
+		if (sscanf(line, "%*s %x %*x %*x %*d %*d %*d %x", &dest, &mask) != 2) {
 			continue;
 		}
 		dest = ntohl(dest);
 		mask = ntohl(mask);
 		
-		unsigned long broadcast = dest | ~mask;
+		uint32_t broadcast = dest | ~mask;
 
 		if ((broadcast == 0x00000000) || (broadcast == 0xFFFFFFFF)) {
 			continue;
 		}
 
-		hdhomerun_discover_send_packet(ds, broadcast, device_type, device_id);
+		if (hdhomerun_discover_send_packet(ds, broadcast, device_type, device_id) < 0) {
+			continue;
+		}
+
 		send_count++;
 	}
 
@@ -191,14 +197,14 @@ static int hdhomerun_discover_send_internal(struct hdhomerun_discover_sock_t *ds
 }
 #endif
 
-#if !defined(__CYGWIN__) && !defined(__linux__)
-static int hdhomerun_discover_send_internal(struct hdhomerun_discover_sock_t *ds, unsigned long device_type, unsigned long device_id)
+#if !defined(__CYGWIN__) && !defined(__WINDOWS__) && !defined(__linux__)
+static int hdhomerun_discover_send_internal(struct hdhomerun_discover_sock_t *ds, uint32_t device_type, uint32_t device_id)
 {
 	return -1;
 }
 #endif
 
-int hdhomerun_discover_send(struct hdhomerun_discover_sock_t *ds, unsigned long device_type, unsigned long device_id)
+static int hdhomerun_discover_send(struct hdhomerun_discover_sock_t *ds, uint32_t device_type, uint32_t device_id)
 {
 	if (hdhomerun_discover_send_internal(ds, device_type, device_id) < 0) {
 		return hdhomerun_discover_send_packet(ds, 0xFFFFFFFF, device_type, device_id);
@@ -206,11 +212,11 @@ int hdhomerun_discover_send(struct hdhomerun_discover_sock_t *ds, unsigned long 
 	return 0;
 }
 
-int hdhomerun_discover_recv(struct hdhomerun_discover_sock_t *ds, struct hdhomerun_discover_device_t *result, unsigned long timeout)
+static int hdhomerun_discover_recv(struct hdhomerun_discover_sock_t *ds, struct hdhomerun_discover_device_t *result)
 {
 	struct timeval t;
-	t.tv_sec = timeout / 1000;
-	t.tv_usec = (timeout % 1000) * 1000;
+	t.tv_sec = 0;
+	t.tv_usec = 250000;
 
 	fd_set readfds;
 	FD_ZERO(&readfds);
@@ -223,23 +229,25 @@ int hdhomerun_discover_recv(struct hdhomerun_discover_sock_t *ds, struct hdhomer
 		return 0;
 	}
 
-	unsigned char buffer[1024];
+	uint8_t buffer[1024];
 	struct sockaddr_in sock_addr;
 	socklen_t sockaddr_size = sizeof(sock_addr);
 	int rx_length = recvfrom(ds->sock, (char *)buffer, sizeof(buffer), 0, (struct sockaddr *)&sock_addr, &sockaddr_size);
 	if (rx_length <= 0) {
-		return -1;
+		/* Don't return error - windows machine on VPN can sometimes cause a sock error here but otherwise works. */
+		return 0;
 	}
 	if (rx_length < HDHOMERUN_MIN_PEEK_LENGTH) {
 		return 0;
 	}
-	int length = hdhomerun_peek_packet_length(buffer);
-	if (rx_length < length) {
+
+	size_t length = hdhomerun_peek_packet_length(buffer);
+	if (length > (size_t)rx_length) {
 		return 0;
 	}
 
-	unsigned char *ptr = buffer;
-	unsigned char *end = buffer + length;
+	uint8_t *ptr = buffer;
+	uint8_t *end = buffer + length;
 	int type = hdhomerun_process_packet(&ptr, &end);
 	if (type != HDHOMERUN_TYPE_DISCOVER_RPY) {
 		return 0;
@@ -249,9 +257,9 @@ int hdhomerun_discover_recv(struct hdhomerun_discover_sock_t *ds, struct hdhomer
 	result->device_type = 0;
 	result->device_id = 0;
 	while (1) {
-		unsigned char tag;
-		int len;
-		unsigned char *value;
+		uint8_t tag;
+		size_t len;
+		uint8_t *value;
 		if (hdhomerun_read_tlv(&ptr, end, &tag, &len, &value) < 0) {
 			break;
 		}
@@ -277,11 +285,100 @@ int hdhomerun_discover_recv(struct hdhomerun_discover_sock_t *ds, struct hdhomer
 	return 1;
 }
 
-int hdhomerun_discover_validate_device_id(unsigned long device_id)
+static struct hdhomerun_discover_device_t *hdhomerun_discover_find_in_list(struct hdhomerun_discover_device_t result_list[], int count, uint32_t device_id)
 {
-	static unsigned long lookup_table[16] = {0xA, 0x5, 0xF, 0x6, 0x7, 0xC, 0x1, 0xB, 0x9, 0x2, 0x8, 0xD, 0x4, 0x3, 0xE, 0x0};
+	int index;
+	for (index = 0; index < count; index++) {
+		struct hdhomerun_discover_device_t *result = &result_list[index];
+		if (result->device_id == device_id) {
+			return result;
+		}
+	}
 
-	unsigned long checksum = 0;
+	return NULL;
+}
+
+static int hdhomerun_discover_find_devices_internal(struct hdhomerun_discover_sock_t *ds, uint32_t device_type, uint32_t device_id, struct hdhomerun_discover_device_t result_list[], int max_count)
+{
+	int count = 0;
+
+	int attempt;
+	for (attempt = 0; attempt < 4; attempt++) {
+		if (hdhomerun_discover_send(ds, device_type, device_id) < 0) {
+			return -1;
+		}
+
+		uint64_t timeout = getcurrenttime() + 250;
+		while (getcurrenttime() < timeout) {
+			struct hdhomerun_discover_device_t *result = &result_list[count];
+
+			int ret = hdhomerun_discover_recv(ds, result);
+			if (ret < 0) {
+				return -1;
+			}
+			if (ret == 0) {
+				break;
+			}
+
+			/* Filter. */
+			if (device_type != HDHOMERUN_DEVICE_TYPE_WILDCARD) {
+				if (device_type != result->device_type) {
+					continue;
+				}
+			}
+			if (device_id != HDHOMERUN_DEVICE_ID_WILDCARD) {
+				if (device_id != result->device_id) {
+					continue;
+				}
+			}
+
+			/* Ensure not already in list. */
+			if (hdhomerun_discover_find_in_list(result_list, count, result->device_id)) {
+				continue;
+			}
+
+			/* Add to list. */
+			count++;
+			if (count >= max_count) {
+				return count;
+			}
+		}
+	}
+
+	return count;
+}
+
+int hdhomerun_discover_find_device(uint32_t device_id, struct hdhomerun_discover_device_t *result)
+{
+	struct hdhomerun_discover_sock_t *ds = hdhomerun_discover_create();
+	if (!ds) {
+		return -1;
+	}
+
+	int ret = hdhomerun_discover_find_devices_internal(ds, HDHOMERUN_DEVICE_TYPE_WILDCARD, device_id, result, 1);
+
+	hdhomerun_discover_destroy(ds);
+	return ret;
+}
+
+int hdhomerun_discover_find_devices(uint32_t device_type, struct hdhomerun_discover_device_t result_list[], int max_count)
+{
+	struct hdhomerun_discover_sock_t *ds = hdhomerun_discover_create();
+	if (!ds) {
+		return -1;
+	}
+
+	int ret = hdhomerun_discover_find_devices_internal(ds, device_type, HDHOMERUN_DEVICE_ID_WILDCARD, result_list, max_count);
+
+	hdhomerun_discover_destroy(ds);
+	return ret;
+}
+
+bool_t hdhomerun_discover_validate_device_id(uint32_t device_id)
+{
+	static uint32_t lookup_table[16] = {0xA, 0x5, 0xF, 0x6, 0x7, 0xC, 0x1, 0xB, 0x9, 0x2, 0x8, 0xD, 0x4, 0x3, 0xE, 0x0};
+
+	uint32_t checksum = 0;
 
 	checksum ^= lookup_table[(device_id >> 28) & 0x0F];
 	checksum ^= (device_id >> 24) & 0x0F;
@@ -294,3 +391,4 @@ int hdhomerun_discover_validate_device_id(unsigned long device_id)
 
 	return (checksum == 0);
 }
+

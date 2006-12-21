@@ -21,6 +21,16 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+
+#if defined(WIN32)
+#define __WINDOWS__
+#endif
+
+#if defined(__WINDOWS__)
+#include <windows.h>
+#include <sys/types.h>
+#include <sys/timeb.h>
+#else
 #include <unistd.h>
 #include <errno.h>
 #include <sys/types.h>
@@ -29,7 +39,11 @@
 #include <arpa/inet.h>
 #include <netdb.h>
 #include <sys/time.h>
+#include <sys/timeb.h>
 #include <fcntl.h>
+#endif
+
+#include <pthread.h>
 
 #if !defined(TRUE)
 #define TRUE 1
@@ -37,3 +51,60 @@
 #if !defined(FALSE)
 #define FALSE 0
 #endif
+
+#if defined(__WINDOWS__)
+
+typedef int bool_t;
+typedef unsigned __int8 uint8_t;
+typedef unsigned __int16 uint16_t;
+typedef unsigned __int32 uint32_t;
+typedef unsigned __int64 uint64_t;
+
+#define socklen_t int
+#define close closesocket
+#define sock_getlasterror WSAGetLastError()
+#define sock_getlasterror_socktimeout (WSAGetLastError() == WSAETIMEDOUT)
+#define atoll _atoi64
+#define strcasecmp _stricmp
+#define fseeko _fseeki64
+#define ftello _ftelli64
+#define usleep(us) Sleep((us)/1000)
+#define sleep(sec) Sleep((sec)*1000)
+
+static inline uint64_t getcurrenttime(void)
+{
+	struct timeb tb;
+	ftime(&tb);
+	return ((uint64_t)tb.time * 1000) + tb.millitm;
+}
+
+static inline int setsocktimeout(int s, int level, int optname, uint64_t timeout)
+{
+	int t = (int)timeout;
+	return setsockopt(s, level, optname, (char *)&t, sizeof(t));
+}
+
+#else
+
+typedef int bool_t;
+
+#define sock_getlasterror errno
+#define sock_getlasterror_socktimeout (errno == EAGAIN)
+
+static inline uint64_t getcurrenttime(void)
+{
+	struct timeval t;
+	gettimeofday(&t, NULL);
+	return ((uint64_t)t.tv_sec * 1000) + (t.tv_usec / 1000);
+}
+
+static inline int setsocktimeout(int s, int level, int optname, uint64_t timeout)
+{
+	struct timeval t;
+	t.tv_sec = timeout / 1000;
+	t.tv_usec = (timeout % 1000) * 1000;
+	return setsockopt(s, level, optname, (char *)&t, sizeof(t));
+}
+
+#endif
+

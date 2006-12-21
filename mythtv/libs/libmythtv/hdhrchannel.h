@@ -14,10 +14,7 @@
 #include "dtvchannel.h"
 
 // HDHomeRun headers
-#include "hdhomerun/hdhomerun_pkt.h"
-#include "hdhomerun/hdhomerun_discover.h"
-#include "hdhomerun/hdhomerun_control.h"
-#include "hdhomerun/hdhomerun_video.h"
+#include "hdhomerun/hdhomerun.h"
 
 typedef struct hdhomerun_control_sock_t hdhr_socket_t;
 

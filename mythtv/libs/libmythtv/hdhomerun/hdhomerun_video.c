@@ -21,70 +21,98 @@
 #include "hdhomerun_os.h"
 #include "hdhomerun_pkt.h"
 #include "hdhomerun_video.h"
-#include <pthread.h>
 
 struct hdhomerun_video_sock_t {
-	unsigned char *buffer;
-	unsigned long buffer_size;
-	volatile unsigned long head;
-	volatile unsigned long tail;
-	unsigned long advance;
-	volatile int running;
-	volatile int terminate;
+	uint8_t *buffer;
+	size_t buffer_size;
+	volatile size_t head;
+	volatile size_t tail;
+	size_t advance;
+	volatile bool_t running;
+	volatile bool_t terminate;
 	pthread_t thread;
 	int sock;
 };
 
 static void *hdhomerun_video_thread(void *arg);
 
-struct hdhomerun_video_sock_t *hdhomerun_video_create(unsigned long buffer_size, unsigned long timeout)
+static bool_t hdhomerun_video_bind_sock_internal(struct hdhomerun_video_sock_t *vs, uint16_t listen_port)
 {
-	/* Buffer size. */
-	buffer_size = (buffer_size / VIDEO_DATA_PACKET_SIZE) * VIDEO_DATA_PACKET_SIZE;
-	if (buffer_size == 0) {
-		return NULL;
+	struct sockaddr_in sock_addr;
+	memset(&sock_addr, 0, sizeof(sock_addr));
+	sock_addr.sin_family = AF_INET;
+	sock_addr.sin_addr.s_addr = htonl(INADDR_ANY);
+	sock_addr.sin_port = htons(listen_port);
+	if (bind(vs->sock, (struct sockaddr *)&sock_addr, sizeof(sock_addr)) != 0) {
+		return FALSE;
 	}
-	buffer_size += VIDEO_DATA_PACKET_SIZE;
+	return TRUE;
+}
 
+static bool_t hdhomerun_video_bind_sock(struct hdhomerun_video_sock_t *vs, uint16_t listen_port)
+{
+	if (listen_port != 0) {
+		return hdhomerun_video_bind_sock_internal(vs, listen_port);
+	}
+
+#if defined(__CYGWIN__) || defined(__WINDOWS__)
+	/* Windows firewall silently blocks a listening port if the port number is not explicitly given. */
+	/* Workaround - pick a random port number. The port may already be in use to try multiple port numbers. */
+	srand((int)getcurrenttime());
+	int retry;
+	for (retry = 8; retry > 0; retry--) {
+		uint16_t listen_port = (uint16_t)((rand() % 32768) + 32768);
+		if (hdhomerun_video_bind_sock_internal(vs, listen_port)) {
+			return TRUE;
+		}
+	}
+	return FALSE;
+#else
+	return hdhomerun_video_bind_sock_internal(vs, listen_port);
+#endif
+}
+
+struct hdhomerun_video_sock_t *hdhomerun_video_create(uint16_t listen_port, size_t buffer_size)
+{
 	/* Create object. */
 	struct hdhomerun_video_sock_t *vs = (struct hdhomerun_video_sock_t *)calloc(1, sizeof(struct hdhomerun_video_sock_t));
 	if (!vs) {
 		return NULL;
 	}
 
+	/* Buffer size. */
+	vs->buffer_size = (buffer_size / VIDEO_DATA_PACKET_SIZE) * VIDEO_DATA_PACKET_SIZE;
+	if (vs->buffer_size == 0) {
+		free(vs);
+		return NULL;
+	}
+	vs->buffer_size += VIDEO_DATA_PACKET_SIZE;
+
 	/* Create buffer. */
-	vs->buffer_size = buffer_size;
-	vs->buffer = (unsigned char *)malloc(buffer_size);
+	vs->buffer = (uint8_t *)malloc(vs->buffer_size);
 	if (!vs->buffer) {
 		free(vs);
 		return NULL;
 	}
 	
 	/* Create socket. */
-	vs->sock = socket(AF_INET, SOCK_DGRAM, 0);
+	vs->sock = (int)socket(AF_INET, SOCK_DGRAM, 0);
 	if (vs->sock == -1) {
 		free(vs->buffer);
 		free(vs);
 		return NULL;
 	}
 
-	/* Set buffer size. */
-	unsigned long rx_size = 1024 * 1024;
-	setsockopt(vs->sock, SOL_SOCKET, SO_RCVBUF, &rx_size, sizeof(rx_size));
+	/* Expand socket buffer size. */
+	int rx_size = 1024 * 1024;
+	setsockopt(vs->sock, SOL_SOCKET, SO_RCVBUF, (char *)&rx_size, sizeof(rx_size));
 
-	/* Set timeout. */
-	struct timeval t;
-	t.tv_sec = timeout / 1000;
-	t.tv_usec = (timeout % 1000) * 1000;
-	setsockopt(vs->sock, SOL_SOCKET, SO_RCVTIMEO, &t, sizeof(t));
+	/* Set timeouts. */
+	setsocktimeout(vs->sock, SOL_SOCKET, SO_SNDTIMEO, 1000);
+	setsocktimeout(vs->sock, SOL_SOCKET, SO_RCVTIMEO, 1000);
 
 	/* Bind socket. */
-	struct sockaddr_in sock_addr;
-	memset(&sock_addr, 0, sizeof(sock_addr));
-	sock_addr.sin_family = AF_INET;
-	sock_addr.sin_addr.s_addr = htonl(INADDR_ANY);
-	sock_addr.sin_port = htons(0);
-	if (bind(vs->sock, (struct sockaddr *)&sock_addr, sizeof(sock_addr)) != 0) {
+	if (!hdhomerun_video_bind_sock(vs, listen_port)) {
 		hdhomerun_video_destroy(vs);
 		return NULL;
 	}
@@ -111,7 +139,7 @@ void hdhomerun_video_destroy(struct hdhomerun_video_sock_t *vs)
 	free(vs);
 }
 
-unsigned short hdhomerun_video_get_local_port(struct hdhomerun_video_sock_t *vs)
+uint16_t hdhomerun_video_get_local_port(struct hdhomerun_video_sock_t *vs)
 {
 	struct sockaddr_in sock_addr;
 	socklen_t sockaddr_size = sizeof(sock_addr);
@@ -119,14 +147,6 @@ unsigned short hdhomerun_video_get_local_port(struct hdhomerun_video_sock_t *vs)
 		return 0;
 	}
 	return ntohs(sock_addr.sin_port);
-}
-
-int hdhomerun_video_get_state(struct hdhomerun_video_sock_t *vs)
-{
-	if (vs->terminate) {
-		return 0;
-	}
-	return 1;
 }
 
 int hdhomerun_video_get_sock(struct hdhomerun_video_sock_t *vs)
@@ -139,16 +159,16 @@ static void *hdhomerun_video_thread(void *arg)
 	struct hdhomerun_video_sock_t *vs = (struct hdhomerun_video_sock_t *)arg;
 
 	while (!vs->terminate) {
-		unsigned long head = vs->head;
+		size_t head = vs->head;
 
 		/* Receive. */
-		int length = recv(vs->sock, vs->buffer + head, VIDEO_DATA_PACKET_SIZE, 0);
+		int length = recv(vs->sock, (char *)vs->buffer + head, VIDEO_DATA_PACKET_SIZE, 0);
 		if (length != VIDEO_DATA_PACKET_SIZE) {
 			if (length > 0) {
 				/* Data received but not valid - ignore. */
 				continue;
 			}
-			if (errno == EAGAIN) {
+			if (sock_getlasterror_socktimeout) {
 				/* Wait for more data. */
 				continue;
 			}
@@ -174,69 +194,10 @@ static void *hdhomerun_video_thread(void *arg)
 	return NULL;
 }
 
-static void hdhomerun_copy_and_advance_tail(struct hdhomerun_video_sock_t *vs, unsigned char *buffer, unsigned long size)
+uint8_t *hdhomerun_video_recv(struct hdhomerun_video_sock_t *vs, size_t max_size, size_t *pactual_size)
 {
-	unsigned long tail = vs->tail;
-	memcpy(buffer, vs->buffer + tail, size);
-
-	tail += size;
-	if (tail >= vs->buffer_size) {
-		tail -= vs->buffer_size;
-	}
-
-	/* Atomic update. */
-	vs->tail = tail;
-}
-
-unsigned long hdhomerun_video_available_length(struct hdhomerun_video_sock_t *vs)
-{
-	unsigned long head = vs->head;
-	unsigned long tail = vs->tail;
-
-	if (head >= tail) {
-		return head - tail - vs->advance;
-	} else {
-		return head + vs->buffer_size - tail - vs->advance;
-	}
-}
-
-unsigned long hdhomerun_video_recv_memcpy(struct hdhomerun_video_sock_t *vs, unsigned char *buffer, unsigned long size)
-{
-	unsigned long head = vs->head;
-	unsigned long tail = vs->tail;
-
-	if (head == tail) {
-		return 0;
-	}
-
-	size = (size / VIDEO_DATA_PACKET_SIZE) * VIDEO_DATA_PACKET_SIZE;
-
-	/* Straight memcpy case. */
-	if (head > tail) {
-		unsigned long avail = head - tail;
-		if (size > avail) {
-			size = avail;
-		}
-		hdhomerun_copy_and_advance_tail(vs, buffer, size);
-		return size;
-	}
-
-	/* Memcpy with wrap around check. */
-	unsigned long avail = vs->buffer_size - tail;
-	if (avail >= size) {
-		hdhomerun_copy_and_advance_tail(vs, buffer, size);
-		return size;
-	}
-
-	/* Memcpy with wrap around. */
-	hdhomerun_copy_and_advance_tail(vs, buffer, avail);
-	return avail + hdhomerun_video_recv_memcpy(vs, buffer + avail, size - avail);
-}
-
-unsigned char *hdhomerun_video_recv_inplace(struct hdhomerun_video_sock_t *vs, unsigned long max_size, unsigned long *pactual_size)
-{
-	unsigned long head = vs->head;
-	unsigned long tail = vs->tail;
+	size_t head = vs->head;
+	size_t tail = vs->tail;
 
 	if (vs->advance > 0) {
 		tail += vs->advance;
@@ -254,9 +215,14 @@ unsigned char *hdhomerun_video_recv_inplace(struct hdhomerun_video_sock_t *vs, u
 		return NULL;
 	}
 
-	unsigned long size = (max_size / VIDEO_DATA_PACKET_SIZE) * VIDEO_DATA_PACKET_SIZE;
+	size_t size = (max_size / VIDEO_DATA_PACKET_SIZE) * VIDEO_DATA_PACKET_SIZE;
+	if (size == 0) {
+		vs->advance = 0;
+		*pactual_size = 0;
+		return NULL;
+	}
 
-	unsigned long avail;
+	size_t avail;
 	if (head > tail) {
 		avail = head - tail;
 	} else {
@@ -274,4 +240,6 @@ void hdhomerun_video_flush(struct hdhomerun_video_sock_t *vs)
 {
 	/* Atomic update of tail. */
 	vs->tail = vs->head;
+	vs->advance = 0;
 }
+

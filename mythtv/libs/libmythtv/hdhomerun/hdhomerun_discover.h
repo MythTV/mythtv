@@ -21,20 +21,47 @@
 extern "C" {
 #endif
 
-struct hdhomerun_discover_sock_t;
-
 struct hdhomerun_discover_device_t {
-	unsigned long ip_addr;
-	unsigned long device_type;
-	unsigned long device_id;
+	uint32_t ip_addr;
+	uint32_t device_type;
+	uint32_t device_id;
 };
 
-extern struct hdhomerun_discover_sock_t *hdhomerun_discover_create(unsigned long timeout);
-extern void hdhomerun_discover_destroy(struct hdhomerun_discover_sock_t *ds);
-extern int hdhomerun_discover_send(struct hdhomerun_discover_sock_t *ds, unsigned long device_type, unsigned long device_id);
-extern int hdhomerun_discover_recv(struct hdhomerun_discover_sock_t *ds, struct hdhomerun_discover_device_t *result, unsigned long timeout);
+/*
+ * Find a device by device ID.
+ *
+ * The device information is stored in caller-supplied hdhomerun_discover_device_t var.
+ * Multiple attempts are made to find the device.
+ * Worst-case execution time is 1 second.
+ *
+ * Returns 1 on success.
+ * Returns 0 if not found.
+ * Retruns -1 on error.
+ */
+extern int hdhomerun_discover_find_device(uint32_t device_id, struct hdhomerun_discover_device_t *result);
 
-extern int hdhomerun_discover_validate_device_id(unsigned long device_id);
+/*
+ * Find all devices of a given type.
+ *
+ * The device information is stored in caller-supplied array of hdhomerun_discover_device_t vars.
+ * Multiple attempts are made to find devices.
+ * Execution time is 1 second.
+ *
+ * Returns the number of devices found.
+ * Retruns -1 on error.
+ */
+extern int hdhomerun_discover_find_devices(uint32_t device_type, struct hdhomerun_discover_device_t result_list[], int max_count);
+
+/*
+ * Verify that the device ID given is valid.
+ *
+ * The device ID contains a self-check sequence that detects common user input errors including
+ * single-digit errors and two digit transposition errors.
+ *
+ * Returns TRUE if valid.
+ * Returns FALSE if not valid.
+ */
+extern bool_t hdhomerun_discover_validate_device_id(uint32_t device_id);
 
 #ifdef __cplusplus
 }

@@ -100,7 +100,7 @@ bool HDHRRecorder::Open(void)
     }
 
     /* Create TS socket. */
-    _video_socket = hdhomerun_video_create(VIDEO_DATA_BUFFER_SIZE_1S, 50);
+    _video_socket = hdhomerun_video_create(0, VIDEO_DATA_BUFFER_SIZE_1S);
     if (!_video_socket)
     {
         VERBOSE(VB_IMPORTANT, LOC + "Open() failed to open socket");
@@ -357,16 +357,11 @@ void HDHRRecorder::StartRecording(void)
 
         unsigned long data_length;
         unsigned char *data_buffer =
-            hdhomerun_video_recv_inplace(_video_socket,
-                                         VIDEO_DATA_BUFFER_SIZE_1S / 5,
-                                         &data_length);
+            hdhomerun_video_recv(_video_socket,
+                                 VIDEO_DATA_BUFFER_SIZE_1S / 5,
+                                 &data_length);
         if (!data_buffer)
         {
-            if (hdhomerun_video_get_state(_video_socket) == 0)
-            {
-                VERBOSE(VB_IMPORTANT, LOC_ERR + "Recv error" + ENO);
-                break;
-            }
             usleep(5000);
 	    continue;
 	}

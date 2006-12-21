@@ -23,17 +23,57 @@ extern "C" {
 
 struct hdhomerun_video_sock_t;
 
+#define TS_PACKET_SIZE 188
 #define VIDEO_DATA_PACKET_SIZE (188 * 7)
 #define VIDEO_DATA_BUFFER_SIZE_1S (20000000 / 8)
 
-extern struct hdhomerun_video_sock_t *hdhomerun_video_create(unsigned long buffer_size, unsigned long timeout);
+/*
+ * Create a video/data socket.
+ *
+ * uint16_t listen_port: Port number to listen on. Set to 0 to auto-select.
+ * size_t buffer_size: Size of receive buffer. For 1 second of buffer use VIDEO_DATA_BUFFER_SIZE_1S. 
+ *
+ * Returns a pointer to the newly created control socket.
+ *
+ * When no longer needed, the socket should be destroyed by calling hdhomerun_control_destroy.
+ */
+extern struct hdhomerun_video_sock_t *hdhomerun_video_create(uint16_t listen_port, size_t buffer_size);
 extern void hdhomerun_video_destroy(struct hdhomerun_video_sock_t *vs);
-extern unsigned short hdhomerun_video_get_local_port(struct hdhomerun_video_sock_t *vs);
-extern int hdhomerun_video_get_state(struct hdhomerun_video_sock_t *vs);
+
+/*
+ * Get the port the socket is listening on.
+ *
+ * Returns 16-bit port with native endianness, or 0 on error.
+ */
+extern uint16_t hdhomerun_video_get_local_port(struct hdhomerun_video_sock_t *vs);
+
+/*
+ * Get the low-level socket handle.
+ */
 extern int hdhomerun_video_get_sock(struct hdhomerun_video_sock_t *vs);
-extern unsigned long hdhomerun_video_available_length(struct hdhomerun_video_sock_t *vs);
-extern unsigned long hdhomerun_video_recv_memcpy(struct hdhomerun_video_sock_t *vs, unsigned char *buffer, unsigned long size);
-extern unsigned char *hdhomerun_video_recv_inplace(struct hdhomerun_video_sock_t *vs, unsigned long max_size, unsigned long *pactual_size);
+
+/*
+ * Read data from buffer.
+ *
+ * size_t max_size: The maximum amount of data to be returned.
+ * size_t *pactual_size: The caller-supplied pactual_size value will be updated to contain the amount
+ *		of data available to the caller.
+ *
+ * Returns a pointer to the data, or NULL if no data is available.
+ * The data will remain valid until another call to hdhomerun_video_recv.
+ *
+ * The amount of data returned will always be a multiple of VIDEO_DATA_PACKET_SIZE (1316).
+ * Attempting to read a single TS frame (188 bytes) will not return data as it is less than
+ * the minimum size.
+ *
+ * The buffer is implemented as a ring buffer. It is possible for this function to return a small
+ * amount of data when more is available due to the wrap-around case.
+ */
+extern uint8_t *hdhomerun_video_recv(struct hdhomerun_video_sock_t *vs, size_t max_size, size_t *pactual_size);
+
+/*
+ * Flush the buffer.
+ */
 extern void hdhomerun_video_flush(struct hdhomerun_video_sock_t *vs);
 
 #ifdef __cplusplus

@@ -90,66 +90,41 @@ bool HDHRChannel::FindDevice(void)
 
     _device_ip = 0;
 
-    /* Create socket. */
-    struct hdhomerun_discover_sock_t *discoverSock = NULL;
-    discoverSock = hdhomerun_discover_create(500);
-
-    if (!discoverSock)
+    /* Discover. */
+    struct hdhomerun_discover_device_t result;
+    int ret = hdhomerun_discover_find_device(_device_id, &result);
+    if (ret < 0)
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "Unable to create discovery socket");
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "Unable to send discovery request" + ENO);
+        return false;
+    }
+    if (ret == 0)
+    {
+        VERBOSE(VB_IMPORTANT, LOC_ERR + QString("device not found"));
         return false;
     }
 
-    /* Discover. */
-    for (int retry = 0; retry < 6; retry++)
-    {
-        /* Send discovery request. */
-        int ret = hdhomerun_discover_send(discoverSock,
-                                          HDHOMERUN_DEVICE_TYPE_TUNER,
-                                          _device_id);
-        if (ret < 0)
-        {
-            VERBOSE(VB_IMPORTANT, LOC_ERR +
-                    "Unable to send discovery request" + ENO);
-            break;
-        }
+    /* Found. */
+    _device_ip = result.ip_addr;
 
-        /* Wait for response. */
-        struct hdhomerun_discover_device_t device;
-        ret = hdhomerun_discover_recv(discoverSock, &device, 500);
-        if (ret < 0)
-        {
-            VERBOSE(VB_IMPORTANT, LOC_ERR +
-                    "Unable to listen for discovery response" + ENO);
-            break;
-        }
-        if (ret == 0)
-        {
-            continue;
-        }
+    VERBOSE(VB_IMPORTANT, LOC +
+            QString("device found at address %1.%2.%3.%4")
+            .arg((_device_ip>>24) & 0xFF).arg((_device_ip>>16) & 0xFF)
+            .arg((_device_ip>> 8) & 0xFF).arg((_device_ip>> 0) & 0xFF));
 
-        /* Found. */
-        _device_ip = device.ip_addr;
-
-        VERBOSE(VB_IMPORTANT, LOC +
-                QString("device found at address %1.%2.%3.%4")
-                .arg((_device_ip>>24) & 0xFF).arg((_device_ip>>16) & 0xFF)
-                .arg((_device_ip>> 8) & 0xFF).arg((_device_ip>> 0) & 0xFF));
-
-        hdhomerun_discover_destroy(discoverSock);
-        return true;
-    }
-
-    VERBOSE(VB_IMPORTANT, LOC_ERR + QString("device not found"));
-    hdhomerun_discover_destroy(discoverSock);
-
-    return false;
+    return true;
 }
 
 bool HDHRChannel::Connect(void)
 {
-    _control_socket = hdhomerun_control_create(_device_ip, 2000);
+    _control_socket = hdhomerun_control_create(_device_id, _device_ip);
     if (!_control_socket)
+    {
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "Unable to create control socket");
+        return false;
+    }
+
+    if (hdhomerun_control_get_local_addr(_control_socket) == 0)
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR + "Unable to connect to device");
         return false;
@@ -162,7 +137,6 @@ bool HDHRChannel::Connect(void)
 QString HDHRChannel::DeviceGet(const QString &name)
 {
     QMutexLocker locker(&_lock);
-    //VERBOSE(VB_CHANNEL, LOC + QString("DeviceGet(%1)").arg(name));
 
     if (!_control_socket)
     {
@@ -170,53 +144,20 @@ QString HDHRChannel::DeviceGet(const QString &name)
         return QString::null;
     }
 
-    /* Send request. */
-    if (hdhomerun_control_send_get_request(_control_socket, name) < 0)
+    char *value = NULL;
+    char *error = NULL;
+    if (hdhomerun_control_get(_control_socket, name, &value, &error) < 0)
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "Get request failed (send)" + ENO);
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "Get request failed" + ENO);
         return QString::null;
     }
 
-    /* Wait for response. */
-    struct hdhomerun_control_data_t response;
-    if (hdhomerun_control_recv(_control_socket, &response, 2000) <= 0)
-    {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "Get request failed (timeout)");
-        return QString::null;
-    }
-    if (response.type != HDHOMERUN_TYPE_GETSET_RPY)
-    {
-        VERBOSE(VB_IMPORTANT, LOC_ERR +
-                "Get request failed (unexpected response)");
+    if (error) {
+        VERBOSE(VB_IMPORTANT, LOC_ERR + QString("DeviceGet(%1): %2").arg(name).arg(error));
         return QString::null;
     }
 
-    QString ret = QString::null;
-    unsigned char *ptr = response.ptr, *data = NULL;
-    unsigned char tag;
-    int dlen;
-    while (hdhomerun_read_tlv(&ptr, response.end, &tag, &dlen, &data) >= 0)
-    {
-        char buf[1024+64];
-        if (HDHOMERUN_TAG_GETSET_VALUE == tag)
-        {
-            memcpy(buf, (char*)data, dlen);
-            buf[dlen - 1] = 0x0;
-            ret = QString(buf);
-        }
-        else if (HDHOMERUN_TAG_ERROR_MESSAGE == tag)
-        {
-            memcpy(buf, (char*)data, dlen);
-            buf[dlen - 1] = 0x0;
-            VERBOSE(VB_IMPORTANT, LOC_ERR + QString("DeviceGet(%1): %2")
-                    .arg(name).arg(buf));
-        }
-    }
-
-    //VERBOSE(VB_CHANNEL, LOC + QString("DeviceGet(%1) -> '%2' len(%3)")
-    //        .arg(name).arg(ret).arg(len));
-
-    return ret;
+    return QString(value);
 }
 
 QString HDHRChannel::DeviceSet(const QString &name, const QString &val)
@@ -229,47 +170,20 @@ QString HDHRChannel::DeviceSet(const QString &name, const QString &val)
         return QString::null;
     }
 
-    /* Send request. */
-    if (hdhomerun_control_send_set_request(_control_socket, name, val) < 0)
+    char *value = NULL;
+    char *error = NULL;
+    if (hdhomerun_control_set(_control_socket, name, val, &value, &error) < 0)
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "Set request failed (send)" + ENO);
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "Set request failed" + ENO);
         return QString::null;
     }
 
-    /* Wait for response. */
-    struct hdhomerun_control_data_t response;
-    bzero(&response, sizeof(response));
-    if (hdhomerun_control_recv(_control_socket, &response, 2000) <= 0)
-    {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "Set request failed (timeout)");
-        return QString::null;
-    }
-    if (response.type != HDHOMERUN_TYPE_GETSET_RPY)
-    {
-        VERBOSE(VB_IMPORTANT, LOC_ERR +
-                "Set request failed (unexpected response)");
+    if (error) {
+        VERBOSE(VB_IMPORTANT, LOC_ERR + QString("DeviceSet(%1 %2): %3").arg(name).arg(val).arg(error));
         return QString::null;
     }
 
-    QStringList list;
-    QString tmp = "";
-    unsigned char *ptr = response.ptr;
-    for (;ptr < response.end; ptr++)
-    {
-        if (*ptr)
-        {
-            tmp += QChar(*((char*)ptr));
-            continue;
-        }
-        list.push_back(tmp);
-        tmp = "";
-        ptr++;
-        ptr++;
-    }
-
-    if (list.size() >= 2)
-        return list[1];
-    return "";
+    return QString(value);
 }
 
 QString HDHRChannel::TunerGet(const QString &name)
