@@ -162,7 +162,7 @@ void HDHRSignalMonitor::RunTableMonitor(void)
     {
         UpdateFiltersFromStreamData();
 
-        unsigned long data_length;
+        size_t data_length;
         unsigned char *data_buffer =
             hdhomerun_video_recv(_video_socket,
                                          VIDEO_DATA_BUFFER_SIZE_1S / 5,
