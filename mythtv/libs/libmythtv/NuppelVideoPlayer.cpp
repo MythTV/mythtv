@@ -6625,7 +6625,7 @@ void NuppelVideoPlayer::SetDVDBookmark(long long frames)
     {
         audiotrack = GetTrack(kTrackTypeAudio);
         if (GetCaptionMode() == kDisplayAVSubtitle)
-            subtitletrack = GetTrack(kTrackTypeSubtitle);
+            subtitletrack = ringBuffer->DVD()->GetTrack(kTrackTypeSubtitle);
         ringBuffer->DVD()->GetPartAndTitle(part, title);
     }
     else
