@@ -40,6 +40,8 @@ class VideoSourceDBStorage : public SimpleDBStorage
 
 class VideoSourceSelector : public ComboBoxSetting, public TransientStorage
 {
+    Q_OBJECT
+
   public:
     VideoSourceSelector(uint           _initial_sourceid,
                         const QString &_card_types,
@@ -554,6 +556,8 @@ class MPUBLIC VideoSourceEditor : public QObject, public ConfigurationDialog
 
 class MPUBLIC CardInputEditor : public QObject, public ConfigurationDialog
 {
+    Q_OBJECT
+
   public:
     CardInputEditor();
 

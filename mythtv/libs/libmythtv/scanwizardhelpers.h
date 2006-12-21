@@ -122,6 +122,8 @@ class ScannerEvent : public QCustomEvent
 
 class MultiplexSetting : public ComboBoxSetting, public TransientStorage
 {
+    Q_OBJECT
+
   public:
     MultiplexSetting() : ComboBoxSetting(this), sourceid(0)
         { setLabel(tr("Transport")); }
@@ -179,6 +181,8 @@ class InputSelector : public ComboBoxSetting, public TransientStorage
 
 class ScanCountry : public ComboBoxSetting, public TransientStorage
 {
+    Q_OBJECT
+
   public:
     enum Country
     {
@@ -270,6 +274,8 @@ class ScanOptionalConfig : public TriggeredConfigurationGroup
 
 class ScanWizardConfig: public VerticalConfigurationGroup
 {
+    Q_OBJECT
+
   public:
     ScanWizardConfig(ScanWizard *_parent,
                      uint    default_sourceid,  uint default_cardid,
@@ -828,6 +834,8 @@ class STPane : public VerticalConfigurationGroup
 
 class DVBUtilsImportPane : public VerticalConfigurationGroup
 {
+    Q_OBJECT
+
   public:
     DVBUtilsImportPane() :
         VerticalConfigurationGroup(false,false,true,false),
