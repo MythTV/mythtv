@@ -1000,19 +1000,6 @@ class FirewireSpeed : public ComboBoxSetting, public CaptureCardDBStorage
     }
 };
 
-class FirewireInput : public ComboBoxSetting, public CaptureCardDBStorage
-{
-  public:
-    FirewireInput(const CaptureCard &parent) :
-        ComboBoxSetting(this),
-        CaptureCardDBStorage(this, parent, "defaultinput")
-    {
-        setLabel(QObject::tr("Default Input"));
-        addSelection("MPEG2TS");
-        setHelpText(QObject::tr("Only MPEG2TS is supported at this time."));
-    }
-};
-
 class FirewireConfigurationGroup : public VerticalConfigurationGroup
 {
   public:
@@ -1031,7 +1018,7 @@ class FirewireConfigurationGroup : public VerticalConfigurationGroup
         hg1->addChild(new FirewireNode(parent));
         hg1->addChild(new FirewireSpeed(parent));
         addChild(hg1);
-        addChild(new FirewireInput(parent));
+        addChild(new SingleCardInput(parent));
     };
   private:
     CaptureCard &parent;
@@ -1076,19 +1063,6 @@ class DBOX2Host : public LineEditSetting, public CaptureCardDBStorage
     }
 };
 
-class DBOX2Input : public ComboBoxSetting, public CaptureCardDBStorage
-{
-  public:
-    DBOX2Input(const CaptureCard &parent) :
-        ComboBoxSetting(this),
-        CaptureCardDBStorage(this, parent, "defaultinput")
-    {
-        setLabel(QObject::tr("Default Input"));
-        addSelection("MPEG2TS");
-        setHelpText(QObject::tr("Only MPEG2TS is supported at this time."));
-    }
-};
-
 class DBOX2ConfigurationGroup : public VerticalConfigurationGroup
 {
   public:
@@ -1099,7 +1073,7 @@ class DBOX2ConfigurationGroup : public VerticalConfigurationGroup
         addChild(new DBOX2Port(parent));
         addChild(new DBOX2HttpPort(parent));
         addChild(new DBOX2Host(parent));
-        addChild(new DBOX2Input(parent));
+        addChild(new SingleCardInput(parent));
     };
   private:
     CaptureCard &parent;
@@ -1134,6 +1108,22 @@ class IPTVHost : public LineEditSetting, public CaptureCardDBStorage
     }
 };
 
+class IPTVConfigurationGroup : public VerticalConfigurationGroup
+{
+  public:
+    IPTVConfigurationGroup(CaptureCard& a_parent):
+       VerticalConfigurationGroup(false, true, false, false),
+       parent(a_parent)
+    {
+        setUseLabel(false);
+        addChild(new IPTVHost(parent));
+        addChild(new SingleCardInput(parent));
+    };
+
+  private:
+    CaptureCard &parent;
+};
+
 class HDHomeRunTunerIndex : public ComboBoxSetting, public CaptureCardDBStorage
 {
   public:
@@ -1147,86 +1137,17 @@ class HDHomeRunTunerIndex : public ComboBoxSetting, public CaptureCardDBStorage
     }
 };
 
-class IPTVConfigurationGroup : public VerticalConfigurationGroup
-{
-  public:
-    IPTVConfigurationGroup(CaptureCard& a_parent):
-       VerticalConfigurationGroup(false, true, false, false),
-       parent(a_parent)
-    {
-        setUseLabel(false);
-        addChild(new IPTVHost(parent));
-
-        // TODO Create a generic fixed input class to replace duplicates
-        HDHRCardInput *defaultinput = new HDHRCardInput(parent);
-        addChild(defaultinput);
-        defaultinput->setVisible(false);
-    };
-
-  private:
-    CaptureCard &parent;
-};
-
-void HDHRCardInput::fillSelections(const QString&)
-{
-    clearSelections();
-    addSelection("MPEG2TS");
-}
-
 class HDHomeRunConfigurationGroup : public VerticalConfigurationGroup
 {
   public:
-    HDHomeRunConfigurationGroup(CaptureCard& a_parent):
+    HDHomeRunConfigurationGroup(CaptureCard& a_parent) :
+        VerticalConfigurationGroup(false, true, false, false),
         parent(a_parent)
     {
         setUseLabel(false);
         addChild(new HDHomeRunDeviceID(parent));
         addChild(new HDHomeRunTunerIndex(parent));
-
-        HDHRCardInput *defaultinput = new HDHRCardInput(parent);
-        addChild(defaultinput);
-        defaultinput->setVisible(false);
-    };
-
-  private:
-    CaptureCard &parent;
-};
-
-class CRCIpNetworkRecorderDeviceID :
-    public LineEditSetting, public CaptureCardDBStorage
-{
-  public:
-    CRCIpNetworkRecorderDeviceID(const CaptureCard &parent) :
-        LineEditSetting(this),
-        CaptureCardDBStorage(this, parent, "videodevice")
-    {
-        setValue("udp://?localport=1234");
-        setLabel(QObject::tr("URL"));
-        setHelpText(QObject::tr("URL of the incoming stream "
-                                "(ex.: udp://?localport=1234)"));
-    }
-};
-
-void CRCIpNetworkRecorderInput::fillSelections(const QString&)
-{
-    clearSelections();
-    addSelection("MPEG2TS");
-}
-
-class CRCIpNetworkRecorderConfigurationGroup : public VerticalConfigurationGroup
-{
-  public:
-    CRCIpNetworkRecorderConfigurationGroup(CaptureCard& a_parent):
-        parent(a_parent)
-    {
-        setUseLabel(false);
-        addChild(new CRCIpNetworkRecorderDeviceID(parent));
-
-        CRCIpNetworkRecorderInput *defaultinput =
-            new CRCIpNetworkRecorderInput(parent);
-
-        addChild(defaultinput);
-        defaultinput->setVisible(false);
+        addChild(new SingleCardInput(parent));
     };
 
   private:

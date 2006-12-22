@@ -260,30 +260,24 @@ class TunerCardInput : public ComboBoxSetting, public CaptureCardDBStorage
     int     last_diseqct;
 };
 
-class HDHRCardInput: public TunerCardInput
+class SingleCardInput : public TunerCardInput
 {
     Q_OBJECT
+
   public:
-    HDHRCardInput(const CaptureCard& parent) : TunerCardInput(parent)
+    SingleCardInput(const CaptureCard &parent) : TunerCardInput(parent)
     {
+        setLabel(QObject::tr("Default Input"));
         addSelection("MPEG2TS");
+        setVisible(false);
     }
 
   public slots:
-    void fillSelections(const QString& device);
-};
-
-class CRCIpNetworkRecorderInput: public TunerCardInput
-{
-    Q_OBJECT
-  public:
-    CRCIpNetworkRecorderInput(const CaptureCard& parent) : TunerCardInput(parent)
+    void fillSelections(const QString&)
     {
+        clearSelections();
         addSelection("MPEG2TS");
     }
-
-  public slots:
-    void fillSelections(const QString& device);
 };
 
 class DVBAudioDevice : public LineEditSetting, public CaptureCardDBStorage
