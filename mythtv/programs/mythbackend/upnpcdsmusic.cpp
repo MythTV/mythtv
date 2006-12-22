@@ -155,6 +155,8 @@ UPnpCDSExtensionResults *UPnpCDSMusic::Browse( UPnpCDSBrowseRequest *pRequest )
 
     QStringList idPath = QStringList::split( "/", pRequest->m_sObjectId.section('=',0,0) );
 
+    QString key = pRequest->m_sObjectId.section('=',1);
+
     if (idPath.count() == 0)
         return( NULL );
 
@@ -166,6 +168,10 @@ UPnpCDSExtensionResults *UPnpCDSMusic::Browse( UPnpCDSBrowseRequest *pRequest )
 
     if (pResults != NULL)
     {
+
+        if (key)
+            idPath.last().append(QString("=%1").arg(key));
+
         QString sLast = idPath.last();
 
         pRequest->m_sParentId = RemoveToken( "/", pRequest->m_sObjectId, 1 );
