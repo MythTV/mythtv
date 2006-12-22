@@ -773,11 +773,12 @@ class AudioDevice : public PathSetting, public CaptureCardDBStorage
 class SignalTimeout : public SpinBoxSetting, public CaptureCardDBStorage
 {
   public:
-    SignalTimeout(const CaptureCard &parent, int start_val) :
-        SpinBoxSetting(this, start_val, 60000, 250),
+    SignalTimeout(const CaptureCard &parent, uint value, uint min_val) :
+        SpinBoxSetting(this, min_val, 60000, 250),
         CaptureCardDBStorage(this, parent, "signal_timeout")
     {
         setLabel(QObject::tr("Signal Timeout (msec)"));
+        setValue(value);
         setHelpText(QObject::tr(
                         "Maximum time MythTV waits for any signal when "
                         "scanning for channels."));
@@ -787,11 +788,12 @@ class SignalTimeout : public SpinBoxSetting, public CaptureCardDBStorage
 class ChannelTimeout : public SpinBoxSetting, public CaptureCardDBStorage
 {
   public:
-    ChannelTimeout(const CaptureCard &parent, int start_val) :
-        SpinBoxSetting(this, start_val, 65000, 250),
+    ChannelTimeout(const CaptureCard &parent, uint value, uint min_val) :
+        SpinBoxSetting(this, min_val, 65000, 250),
         CaptureCardDBStorage(this, parent, "channel_timeout")
     {
         setLabel(QObject::tr("Tuning Timeout (msec)"));
+        setValue(value);
         setHelpText(QObject::tr(
                         "Maximum time MythTV waits for a channel lock "
                         "when scanning for channels. Or, for issuing "
@@ -1117,6 +1119,7 @@ class IPTVConfigurationGroup : public VerticalConfigurationGroup
     {
         setUseLabel(false);
         addChild(new IPTVHost(parent));
+        addChild(new ChannelTimeout(parent, 3000, 1750));
         addChild(new SingleCardInput(parent));
     };
 
@@ -1147,6 +1150,8 @@ class HDHomeRunConfigurationGroup : public VerticalConfigurationGroup
         setUseLabel(false);
         addChild(new HDHomeRunDeviceID(parent));
         addChild(new HDHomeRunTunerIndex(parent));
+        addChild(new SignalTimeout(parent, 1000, 250));
+        addChild(new ChannelTimeout(parent, 3000, 1750));
         addChild(new SingleCardInput(parent));
     };
 
@@ -1245,8 +1250,8 @@ pcHDTVConfigurationGroup::pcHDTVConfigurationGroup(CaptureCard& a_parent) :
     input(new TunerCardInput(parent))
 {
     VideoDevice    *atsc_device     = new VideoDevice(parent, 0, 64);
-    SignalTimeout  *signal_timeout  = new SignalTimeout(parent, 500);
-    ChannelTimeout *channel_timeout = new ChannelTimeout(parent, 2000);
+    SignalTimeout  *signal_timeout  = new SignalTimeout(parent, 500, 250);
+    ChannelTimeout *channel_timeout = new ChannelTimeout(parent, 2000, 1750);
 
     addChild(atsc_device);
     addChild(cardinfo);
@@ -2429,8 +2434,8 @@ DVBConfigurationGroup::DVBConfigurationGroup(CaptureCard& a_parent) :
     cardname = new DVBCardName();
     cardtype = new DVBCardType();
 
-    signal_timeout = new SignalTimeout(parent, 500);
-    channel_timeout = new ChannelTimeout(parent, 3000);
+    signal_timeout = new SignalTimeout(parent, 500, 250);
+    channel_timeout = new ChannelTimeout(parent, 3000, 1750);
 
     addChild(cardnum);
 
