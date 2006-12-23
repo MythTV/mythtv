@@ -87,8 +87,9 @@ void BackendQueryDiskSpace(QStringList &strlist,
                         localStr = "0";
 #elif __linux__
                     if ((statfs(currentDir, &statbuf) == 0) &&
-                        ((statbuf.f_type == 0x6969) ||  // NFS
-                         (statbuf.f_type == 0x517B)))    // SMB
+                        ((statbuf.f_type == 0x6969) ||     // NFS
+                         (statbuf.f_type == 0x517B) ||     // SMB
+                         (statbuf.f_type == 0xFF534D42)))  // CIFS
                         localStr = "0";
 #endif
                     strlist << gContext->GetHostName();
