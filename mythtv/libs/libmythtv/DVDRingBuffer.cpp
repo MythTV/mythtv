@@ -461,7 +461,7 @@ int DVDRingBufferPriv::safe_read(void *data, unsigned sz)
                     if (still->length  < 0xff)
                     {
                         elapsedTime = stillFrameTimer.elapsed() / 1000; // in seconds
-                        if (elapsedTime == still->length)
+                        if (elapsedTime >= still->length)
                             SkipStillFrame();
                     }
                 }
