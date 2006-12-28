@@ -97,14 +97,20 @@ static dvdnav_status_t dvdnav_scan_admap(dvdnav_t *this, int32_t domain, uint32_
 }
 
 dvdnav_status_t dvdnav_time_search(dvdnav_t *this,
-				   uint64_t time) {
+				   uint64_t time, uint offset_divider) {
   
   uint64_t target = time;
   uint64_t length = 0;
+  uint64_t cell_length = 0;
+  uint64_t prev_length = 0;
   uint32_t first_cell_nr, last_cell_nr, cell_nr;
   int32_t found;
+  uint64_t offset = 0;
+  float diff2 = 1.0;
+  
   cell_playback_t *cell;
   dvd_state_t *state;
+  dsi_t *dsi;
   dvdnav_status_t result;
 
   if(this->position_current.still != 0) {
@@ -137,18 +143,21 @@ dvdnav_status_t dvdnav_time_search(dvdnav_t *this,
   found = 0;
   for(cell_nr = first_cell_nr; (cell_nr <= last_cell_nr) && !found; cell_nr ++) {
     cell =  &(state->pgc->cell_playback[cell_nr-1]);
-    length = dvdnav_convert_time(&cell->playback_time);
-    if (target >= length) {
-      target -= length;
-    } else {
-      /* FIXME: there must be a better way than interpolation */
-      target = target * (cell->last_sector - cell->first_sector + 1) / length;
-      target += cell->first_sector;
+    cell_length = dvdnav_convert_time(&cell->playback_time);
+    length += cell_length;
+    if (target <= length) {
+      offset = (cell->last_sector - cell->first_sector) / offset_divider;
+      diff2  = ((double)target - (double)prev_length) / (double)cell_length;
+      offset = (diff2 * offset);
+      target = cell->first_sector;
+      target += offset;
       
       found = 1;
       break;
     }
+    prev_length = length;
   }
+
 
   if(found) {
     int32_t vobu;
@@ -257,8 +266,12 @@ dvdnav_status_t dvdnav_sector_search(dvdnav_t *this,
   found = 0;
   for(cell_nr = first_cell_nr; (cell_nr <= last_cell_nr) && !found; cell_nr ++) {
     cell =  &(state->pgc->cell_playback[cell_nr-1]);
-    length = cell->last_sector - cell->first_sector + 1;
-    if (target >= cell->first_sector && target <= cell->last_sector) {
+    length += cell->last_sector - cell->first_sector + 1;
+    if (target >= length) {
+      target -= length;
+    } else {
+      /* convert the target sector from Cell-relative to absolute physical sector */
+      target += cell->first_sector;
       found = 1;
       break;
     }

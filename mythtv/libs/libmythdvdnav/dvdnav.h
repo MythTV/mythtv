@@ -365,7 +365,7 @@ dvdnav_status_t dvdnav_sector_search(dvdnav_t *self,
  * Currently unimplemented!
  */
 dvdnav_status_t dvdnav_time_search(dvdnav_t *self, 
-				   uint64_t time);
+				   uint64_t time, uint offset_divider);
 
 /*
  * Stop playing current position and play the "GoUp"-program chain.

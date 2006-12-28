@@ -118,7 +118,6 @@ class DecoderBase
     // DVD public stuff
     void ChangeDVDTrack(bool ffw);
     long long DVDFindPosition(long long desiredFrame);
-    long long DVDCurrentFrameNumber(void);
     void UpdateDVDFramesPlayed(void);
 
     // Audio/Subtitle/EIA-608/EIA-708 stream selection

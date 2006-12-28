@@ -79,7 +79,7 @@ class MPUBLIC DVDRingBufferPriv
     bool nextTrack(void);
     void prevTrack(void);
     int  safe_read(void *data, unsigned sz);
-    long long NormalSeek(long long pos, int whence);
+    long long NormalSeek(long long time);
     void SkipStillFrame(void);
     void WaitSkip(void);
     void GoToMenu(const QString str);
@@ -113,6 +113,7 @@ class MPUBLIC DVDRingBufferPriv
     long long      pgcLength;
     long long      cellStart;
     long long      pgStart;
+    long long      currentpos;
     dvdnav_t      *lastNav; // This really belongs in the player.
     int32_t        part;
     int32_t        title;
@@ -153,19 +154,19 @@ class MPUBLIC DVDRingBufferPriv
     bool           autoselectaudio;
     bool           autoselectsubtitle;
     bool           jumptotitle;
-    bool           repeatseek;
     long long      seekpos;
     int            seekwhence;
     QString        dvdname;
     QString        serialnumber;
-        
+    bool           seeking;
+    uint64_t       seekTime;
 
     NuppelVideoPlayer *parent;
 
     QMutex menuBtnLock;
     QMutex seekLock;
 
-    long long Seek(long long pos, int whence);
+    long long Seek(long long time);
     bool DrawMenuButton(uint8_t *spu_pkt, int buf_size);
     bool DVDButtonUpdate(bool b_mode);
     void ClearMenuSPUParameters(void);

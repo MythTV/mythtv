@@ -1258,6 +1258,8 @@ bool NuppelVideoPlayer::GetFrameFFREW(void)
         long long real_skip = (toBegin) ? -curFrame : ffrew_skip;
         GetDecoder()->DoRewind(curFrame + real_skip, false);
         stopFFREW = framesPlayed <= keyframedist;
+        if (ringBuffer->isDVD())
+            stopFFREW = (ringBuffer->DVD()->GetCurrentTime() < 2);
     }
 
     if (stopFFREW)
@@ -1295,9 +1297,6 @@ bool NuppelVideoPlayer::GetFrame(int onlyvideo, bool unsafe)
         }
         videobuf_retries = 0;
     }
-
-    if (framesPlayed < 5 && play_speed > 1 && ringBuffer->isDVD())
-        next_play_speed = 1;
 
     // Decode the correct frame
     if (!GetDecoder())
@@ -2406,7 +2405,7 @@ void NuppelVideoPlayer::DisplayNormalFrame(void)
 
     if (!ringBuffer->InDVDMenuOrStillFrame() ||
         (ringBuffer->DVD()->NumMenuButtons() > 0 && 
-         ringBuffer->DVD()->GetChapterLength() > 3))
+        ringBuffer->DVD()->GetChapterLength() > 3))
     {
         if (!PrebufferEnoughFrames())
         {
@@ -3218,9 +3217,6 @@ void NuppelVideoPlayer::StartPlaying(void)
             normal_speed = next_normal_speed;
             VERBOSE(VB_PLAYBACK, LOC + "Changing speed to " << play_speed);
 
-            if (ringBuffer->isDVD())
-                GetDecoder()->UpdateDVDFramesPlayed();
-
             if (play_speed == 0.0)
             {
                 DoPause();
@@ -3805,6 +3801,9 @@ void NuppelVideoPlayer::DoPlay(void)
         ffrew_skip = (play_speed > 0.0) ? ffrew_skip : -ffrew_skip;
     }
 
+    if (ringBuffer->isDVD() && GetDecoder())
+        GetDecoder()->UpdateDVDFramesPlayed();
+    
     if (skip_changed)
     {
         //cout << "handling skip change" << endl;
@@ -4006,6 +4005,15 @@ long long NuppelVideoPlayer::CalcMaxFFTime(long long ff, bool setjump) const
                 ret = 0;
             else if (behind - ff <= maxtime * 2)
                 ret = behind - maxtime * 2;
+
+            if (ringBuffer->isDVD())
+            {
+                if (ringBuffer->DVD()->GetCurrentTime() >
+                    ringBuffer->DVD()->GetTotalTimeOfTitle() - 5)
+                {
+                    ret = 0;
+                }
+            }
         }
     }
 

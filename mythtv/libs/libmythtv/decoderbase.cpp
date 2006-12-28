@@ -1,4 +1,5 @@
 #include <unistd.h>
+#include <math.h>
 
 #include <algorithm>
 using namespace std;
@@ -450,7 +451,7 @@ bool DecoderBase::DoRewind(long long desiredFrame, bool discardFrames)
     normalframes = max(normalframes, 0);
     SeekReset(lastKey, normalframes, true, discardFrames);
 
-    if (discardFrames)
+    if (ringBuffer->isDVD() || discardFrames)
     {
         // We need to tell the NVP and VideoOutput what frame we're on.
         GetNVP()->SetFramesPlayed(framesPlayed+1);
@@ -719,27 +720,35 @@ long long DecoderBase::DVDFindPosition(long long desiredFrame)
 {
     if (!ringBuffer->isDVD())
         return 0;
+    int diffTime = 0;
+    long long desiredTimePos;
+    int ffrewSkip = 1;
+    if (GetNVP())
+        ffrewSkip = GetNVP()->GetFFRewSkip();
+    if (ffrewSkip == 1)
+    {
+        diffTime = (int)ceil((desiredFrame - framesPlayed) / fps);
+        desiredTimePos = ringBuffer->DVD()->GetCurrentTime() +
+                        diffTime;
+        if (diffTime <= 0)
+            desiredTimePos--;
+        else
+            desiredTimePos++;
 
-    int size = m_positionMap.size() - 1;
-    int multiplier = m_positionMap[size].pos / m_positionMap[size].index ;
-    return (long long)(desiredFrame * multiplier);
+        if (desiredTimePos < 0)
+            desiredTimePos = 0;
+    }
+    else
+        desiredTimePos = (long long)ceil(desiredFrame / fps);
+    return (desiredTimePos * 90000LL);
 } 
 
-long long DecoderBase::DVDCurrentFrameNumber(void)
-{
-    int size = m_positionMap.size() - 1;
-    if (!ringBuffer->isDVD() || size < 0)
-        return 0;
-
-    long long currentpos = ringBuffer->GetReadPosition();
-    long long multiplier = (currentpos * m_positionMap[size].index);
-    long long currentframe = multiplier / m_positionMap[size].pos;
-    return currentframe;
-}
 
 void DecoderBase::UpdateDVDFramesPlayed(void)
 {
-    long long currentpos = DVDCurrentFrameNumber();
+    if (!ringBuffer->isDVD())
+        return;
+    long long currentpos = (long long)(ringBuffer->DVD()->GetCurrentTime() * fps);
     framesPlayed = framesRead = currentpos ;
     GetNVP()->getVideoOutput()->SetFramesPlayed(currentpos + 1);
     GetNVP()->SetFramesPlayed(currentpos + 1);
