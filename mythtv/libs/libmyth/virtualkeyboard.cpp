@@ -84,9 +84,14 @@ void VirtualKeyboard::switchLayout(QString language)
         MythLineEdit *par = (MythLineEdit *)m_parentEdit;
         preferredPos = par->getPopupPosition();
     }
-    else
+    else if (m_parentEdit->inherits("MythRemoteLineEdit"))
     {
         MythRemoteLineEdit *par = (MythRemoteLineEdit *)m_parentEdit;
+        preferredPos = par->getPopupPosition();
+    }
+    else
+    {
+        MythComboBox *par = (MythComboBox *)m_parentEdit;
         preferredPos = par->getPopupPosition();
     }
 
@@ -151,7 +156,14 @@ void VirtualKeyboard::switchLayout(QString language)
         return;
     }
 
-    m_keyboard->SetEdit(m_parentEdit);
+    if (m_parentEdit->inherits("QComboBox"))
+    {
+        QComboBox *combo = (QComboBox *) m_parentEdit;
+        m_keyboard->SetEdit(combo->lineEdit());
+    }
+    else
+        m_keyboard->SetEdit(m_parentEdit);
+
     m_keyboard->SetParentDialog(this);
 }
 

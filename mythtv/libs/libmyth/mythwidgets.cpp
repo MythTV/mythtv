@@ -16,11 +16,24 @@ using namespace std;
 #include "virtualkeyboard.h"
 #include "libmythui/mythmainwindow.h"
 
+MythComboBox::~MythComboBox()
+{
+    if (popup)
+        delete popup;
+}
+
+void MythComboBox::Init()
+{
+    popup = NULL;
+    popupPosition = VK_POSBELOWEDIT;
+}
+
 void MythComboBox::keyPressEvent(QKeyEvent *e)
 {
     bool handled = false;
     QStringList actions;
-    if (gContext->GetMainWindow()->TranslateKeyPress("qt", e, actions))
+    if ((!popup || !popup->isShown()) &&
+        (gContext->GetMainWindow()->TranslateKeyPress("qt", e, actions)))
     {
         for (unsigned int i = 0; i < actions.size() && !handled; i++)
         {
@@ -59,6 +72,24 @@ void MythComboBox::keyPressEvent(QKeyEvent *e)
             }
             else if (action == "SELECT" && AcceptOnSelect)
                 emit accepted(currentItem());
+            else if (action == "SELECT" && 
+                    (e->text().isNull() ||
+                    (e->key() == Qt::Key_Enter) ||
+                    (e->key() == Qt::Key_Return) ||
+                    (e->key() == Qt::Key_Space)))
+            {
+                if ((allowVirtualKeyboard) &&  (gContext->GetNumSetting("UseVirtualKeyboard", 1) == 1))
+                {
+                    popup = new VirtualKeyboard(gContext->GetMainWindow(), this);
+                    gContext->GetMainWindow()->detach(popup);
+                    popup->exec();
+                    delete popup;
+                    popup = NULL;
+                }
+                else
+                   handled = true;
+            }
+
             else
                 handled = false;
         }

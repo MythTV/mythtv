@@ -42,11 +42,18 @@ class MPUBLIC MythComboBox: public QComboBox
     Q_OBJECT
   public:
     MythComboBox(bool rw, QWidget* parent=0, const char* name=0):
-        QComboBox(rw, parent, name) { AcceptOnSelect = false; step = 1; };
+        QComboBox(rw, parent, name) { AcceptOnSelect = false; step = 1; 
+            allowVirtualKeyboard = rw; Init(); };
+
+    virtual ~MythComboBox();
 
     void setHelpText(QString help) { helptext = help; }
     void setAcceptOnSelect(bool Accept) { AcceptOnSelect = Accept; }
     void setStep(int _step = 1) { step = _step; }
+    void setAllowVirtualKeyboard(bool allowKbd = true)
+        { allowVirtualKeyboard = allowKbd; }
+    void setPopupPosition(PopupPosition pos) { popupPosition = pos; }
+    PopupPosition getPopupPosition(void) { return popupPosition; }
 
   signals:
     void changeHelpText(QString);
@@ -62,10 +69,14 @@ class MPUBLIC MythComboBox: public QComboBox
     virtual void keyPressEvent (QKeyEvent *e);
     virtual void focusInEvent(QFocusEvent *e);
     virtual void focusOutEvent(QFocusEvent *e);
+    void Init(void);
 
   private:
+    VirtualKeyboard *popup;
     QString helptext;
     bool AcceptOnSelect;
+    bool allowVirtualKeyboard;
+    PopupPosition popupPosition;
     int step;
 };
 
