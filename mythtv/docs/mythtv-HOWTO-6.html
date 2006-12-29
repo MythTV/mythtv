@@ -158,6 +158,15 @@ mysql> flush privileges;
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
+<P>You'll also need to check that the "networking" feature of MySQL is turned
+on. Check that <CODE>/etc/mysql/my.cnf</CODE> <EM>does not</EM> contain
+<CODE>skip-networking</CODE>.  If it does, remove it.  Also verify that
+<CODE>bind-address</CODE> is set to your IP address instead of
+<CODE>127.0.0.1</CODE>.  If you change either of these items, restart
+<B>MySQL</B>.</P>
+<P><B>NOTE</B>:  Your distribution may have a customized MySQL configuration
+file; in Mandrive, check <CODE>/etc/sysconfig/mysqld</CODE> for additional
+configuration.</P>
 
 <HR>
 <A HREF="mythtv-HOWTO-7.html">Next</A>
