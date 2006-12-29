@@ -956,7 +956,7 @@ void MythMainWindow::RegisterJump(const QString &destination,
                           "keylist, hostname) VALUES ( :DEST, :DESC, :KEYLIST, "
                           ":HOST );");
             query.bindValue(":DEST", destination);
-            query.bindValue(":DEDC", description);
+            query.bindValue(":DESC", description);
             query.bindValue(":KEYLIST", inskey);
             query.bindValue(":HOST", gContext->GetHostName());
 
