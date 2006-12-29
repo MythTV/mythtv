@@ -13,7 +13,7 @@ using namespace std;
 
 // We hide Core Audio-specific items, to avoid
 // pulling in Mac-specific header files.
-struct CoreAudioData;
+class CoreAudioData;
 
 class AudioOutputCA : public AudioOutputBase
 {
@@ -34,8 +34,17 @@ public:
                      unsigned long long timestamp);
 
     // Volume control
-    virtual int GetVolumeChannel(int channel); // Returns 0-100
-    virtual void SetVolumeChannel(int channel, int volume); // range 0-100 for vol
+    virtual int  GetVolumeChannel(int channel);
+    virtual void SetVolumeChannel(int channel, int volume);
+
+    void Debug(QString msg)
+    {   VERBOSE(VB_AUDIO,     "AudioOutputCA::" + msg);   }
+
+    void Error(QString msg)
+    {   VERBOSE(VB_IMPORTANT, "AudioOutputCA Error: " + msg);   }
+
+    void Warn(QString msg)
+    {   VERBOSE(VB_IMPORTANT, "AudioOutputCA Warning: " + msg);   }
 
 protected:
 
@@ -53,6 +62,8 @@ protected:
 private:
 
     CoreAudioData * d;
+    friend class    CoreAudioData;
+
     int             bufferedBytes;
     long            CA_audiotime_updated;
 };
