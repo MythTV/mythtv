@@ -264,7 +264,7 @@ int main(int argc, char *argv[])
 
         // RingBuffer doesn't like relative pathnames
         if (filename.left(1) != "/")
-            pginfo->pathname.prepend(QDir::currentDirPath());
+            pginfo->pathname.prepend(QDir::currentDirPath() + '/');
     }
 
     TV::StartTV(pginfo, true);
