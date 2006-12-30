@@ -19,9 +19,9 @@ INCLUDEPATH += replex
 INCLUDEPATH += ../../../libs/libavcodec ../../../libs/libavformat
 INCLUDEPATH += ../../../libs/libavutil  ../../../libs/libmythmpeg2
 
+LIBS += -L../../../libs/libavutil -L../../../libs/libavcodec -L../../../libs/libavformat
 LIBS += -lmythavcodec-$$LIBVERSION -lmythavformat-$$LIBVERSION -lmythavutil-$$LIBVERSION
 LIBS += $$EXTRA_LIBS
-LIBS += -L../../../libs/libavutil -L../../../libs/libavcodec -L../../../libs/libavformat
 
 isEmpty(QMAKE_EXTENSION_SHLIB) {
   QMAKE_EXTENSION_SHLIB=so
