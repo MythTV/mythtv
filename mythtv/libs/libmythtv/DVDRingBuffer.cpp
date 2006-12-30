@@ -81,12 +81,10 @@ long long DVDRingBufferPriv::NormalSeek(long long time)
 long long DVDRingBufferPriv::Seek(long long time)
 {
     seekTime = (uint64_t)time;
-    uint offset_divider = 2;
+    uint offset_divider = 1;
     int ffrewSkip = 1;
     if (parent)
         ffrewSkip = parent->GetFFRewSkip();
-    if (ffrewSkip != 1)
-        offset_divider = 1;
     dvdnav_status_t dvdRet = dvdnav_time_search(this->dvdnav, seekTime, offset_divider);
     if (dvdRet == DVDNAV_STATUS_ERR)
     {
@@ -96,8 +94,9 @@ long long DVDRingBufferPriv::Seek(long long time)
     else
     {
         gotStop = false;
-        if (time > 0 && ffrewSkip == 1)
-            seeking = true;
+        // TODO: precise seeking too inefficient
+        //if (time > 0 && ffrewSkip == 1)
+        //    seeking = true;
     }
     
     return currentpos;
@@ -890,7 +889,7 @@ bool DVDRingBufferPriv::DecodeSubtitles(AVSubtitle *sub, int *gotSubtitles,
                 sub->rects[0].x = x1;
                 sub->rects[0].y = y1;
                 sub->rects[0].w  = w;
-                sub->rects[0].h = h;
+                sub->rects[0].h = h - 1;
                 sub->rects[0].nb_colors = 4;
                 sub->rects[0].linesize = w;
                 *gotSubtitles = 1;
