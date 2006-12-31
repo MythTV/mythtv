@@ -194,6 +194,8 @@ uint myth_system(const QString &command, int flags)
     (void)flags; /* Kill warning */
 
     bool ready_to_lock = gContext && gContext->GetMainWindow();
+
+    (void)ready_to_lock; /* Kill warning */
 #ifdef USE_LIRC
     bool lirc_lock_flag = !(flags & MYTH_SYSTEM_DONT_BLOCK_LIRC);
     LircEventLock lirc_lock(lirc_lock_flag && ready_to_lock);
@@ -427,8 +429,8 @@ long long getDiskSpace(const QString &file_on_disk,
  */
 bool getMemStats(int &totalMB, int &freeMB, int &totalVM, int &freeVM)
 {
-    size_t MB = (1024*1024);
 #ifdef __linux__
+    size_t MB = (1024*1024);
     struct sysinfo sinfo;
     if (sysinfo(&sinfo) == -1)
     {
