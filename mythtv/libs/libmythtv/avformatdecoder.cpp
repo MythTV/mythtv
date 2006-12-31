@@ -945,7 +945,7 @@ static float normalized_fps(AVStream *stream, AVCodecContext *enc)
 void AvFormatDecoder::InitVideoCodec(AVStream *stream, AVCodecContext *enc,
                                      bool selectedStream)
 {
-    float aspect_ratio;
+    float aspect_ratio = 0.0;
 
     if (ringBuffer->isDVD())
         directrendering = false;
