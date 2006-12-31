@@ -130,6 +130,10 @@ bool UPnpCDS::ProcessRequest( HttpWorkerThread * /*pThread*/, HTTPRequest *pRequ
         if ( pRequest->m_sBaseUrl != "/_CDS_1-0_control" )
             return false;
 
+        VERBOSE(VB_UPNP,QString("UPnpCDS::ProcessRequest : %1 : %2 :")
+                        .arg(pRequest->m_sBaseUrl)
+                        .arg(pRequest->m_sMethod));
+
         switch( GetMethod( pRequest->m_sMethod ) )
         {
             case CDSM_Browse               : HandleBrowse               ( pRequest ); break;

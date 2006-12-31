@@ -114,6 +114,10 @@ void SSDP::run()
                         default: break;
                     }
                 }
+                else 
+                {
+                    VERBOSE(VB_UPNP, "No info from ParseRequest");
+                }  
 
                 delete pRequest;
                 pRequest = NULL;
@@ -252,6 +256,7 @@ SSDPMethod SSDPExtension::GetMethod( const QString &sURI )
     if (sURI == "getDeviceDesc") return( SSDPM_GetDeviceDesc );
     if (sURI == "getCMGRDesc"  ) return( SSDPM_GetCMGRDesc   );
     if (sURI == "getCDSDesc"   ) return( SSDPM_GetCDSDesc    );
+    if (sURI == "getMSRRDesc"  ) return( SSDPM_GetMSRRDesc   );
 
     return( SSDPM_Unknown );
 }
@@ -272,6 +277,8 @@ bool SSDPExtension::ProcessRequest( HttpWorkerThread *, HTTPRequest *pRequest )
             case SSDPM_GetDeviceDesc: GetDeviceDesc( pRequest ); return( true );
             case SSDPM_GetCDSDesc   : GetFile( pRequest, "CDS_scpd.xml" );  return( true );
             case SSDPM_GetCMGRDesc  : GetFile( pRequest, "CMGR_scpd.xml" ); return( true );
+            case SSDPM_GetMSRRDesc  : GetFile( pRequest, "MSRR_scpd.xml" ); return( true );
+
             default: break;
         }
     }

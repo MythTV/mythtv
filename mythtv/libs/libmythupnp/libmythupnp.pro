@@ -8,7 +8,7 @@ target.path = $${LIBDIR}
 INSTALLS = target
 
 setting.path = $${PREFIX}/share/mythtv/
-setting.files += upnpavcd.xml CDS_scpd.xml CMGR_scpd.xml 
+setting.files += upnpavcd.xml CDS_scpd.xml CMGR_scpd.xml MSRR_scpd.xml
 
 INSTALLS += setting
 
@@ -18,11 +18,12 @@ QMAKE_CLEAN += $(TARGET) $(TARGETA) $(TARGETD) $(TARGET0) $(TARGET1) $(TARGET2)
 
 HEADERS += httprequest.h upnp.h ssdp.h taskqueue.h  
 HEADERS += upnpdevice.h upnptasknotify.h upnptasksearch.h threadpool.h upnpglobal.h
-HEADERS += httpserver.h upnpcds.h upnpcdsobjects.h bufferedsocketdevice.h
+HEADERS += httpserver.h upnpcds.h upnpcdsobjects.h bufferedsocketdevice.h upnpmsrr.h
 
 SOURCES += httprequest.cpp upnp.cpp ssdp.cpp taskqueue.cpp 
 SOURCES += upnpdevice.cpp upnptasknotify.cpp upnptasksearch.cpp threadpool.cpp
 SOURCES += httpserver.cpp upnpcds.cpp upnpcdsobjects.cpp bufferedsocketdevice.cpp
+SOURCES += upnpmsrr.cpp
 
 INCLUDEPATH += ../libmyth
 INCLUDEPATH += ../..

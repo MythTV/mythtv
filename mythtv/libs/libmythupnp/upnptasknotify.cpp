@@ -173,6 +173,10 @@ void UPnpNotifyTask::ProcessDevice( QMulticastSocket *pSocket, UPnpDevice *pDevi
                        pService  = pDevice->m_listServices.next() )
     {
         SendNotifyMsg( pSocket, pService->m_sServiceType, pDevice->GetUDN() );
+
+        VERBOSE(VB_UPNP, QString("UPnpNotifyTask::ProcessDevice : %1 : %2 ")
+                         .arg(pService->m_sServiceType)
+                         .arg(pDevice->GetUDN()));
     }
 
     // ----------------------------------------------------------------------

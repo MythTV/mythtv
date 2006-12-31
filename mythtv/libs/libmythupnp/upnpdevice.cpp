@@ -171,6 +171,10 @@ void UPnpDeviceDesc::ProcessServiceList( QDomNode oListNode, UPnpDevice *pDevice
                 UPnpService *pService = new UPnpService(); 
                 pDevice->m_listServices.append( pService );
 
+                VERBOSE(VB_UPNP,QString("ProcessServiceList adding service : %1 : %2 :")
+                                .arg(pService->m_sServiceType)
+                                .arg(pService->m_sServiceId ));
+
                 SetStrValue( e.namedItem( "serviceType" ), pService->m_sServiceType );
                 SetStrValue( e.namedItem( "serviceId"   ), pService->m_sServiceId   );
                 SetStrValue( e.namedItem( "SCPDURL"     ), pService->m_sSCPDURL     );

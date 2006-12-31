@@ -50,7 +50,8 @@ typedef enum
     HSM_GetExpiring       = 17,
     HSM_GetProgramDetails = 18,
 
-    HSM_GetVideo        = 19
+    HSM_GetVideo        = 19,
+    HSM_GetMSRRDesc     = 20
 
 } HttpStatusMethod;
 

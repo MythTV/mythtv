@@ -28,7 +28,8 @@ typedef enum
     SSDPM_Unknown         = 0,
     SSDPM_GetDeviceDesc   = 1,
     SSDPM_GetCDSDesc      = 2,
-    SSDPM_GetCMGRDesc     = 3
+    SSDPM_GetCMGRDesc     = 3,
+    SSDPM_GetMSRRDesc     = 4
 
 } SSDPMethod;
 

@@ -21,6 +21,7 @@
 #include <sys/time.h>
 
 #include "upnpcds.h"
+#include "upnpmsrr.h"
 
 //////////////////////////////////////////////////////////////////////////////
 // Global/Class Static variables
@@ -86,6 +87,7 @@ UPnp::UPnp( bool /*bIsMaster */, HttpServer *pHttpServer )
     // ----------------------------------------------------------------------
 
     m_pHttpServer->RegisterExtension(              new SSDPExtension());
+    m_pHttpServer->RegisterExtension(              new UPnpMSRR     ());
     m_pHttpServer->RegisterExtension( m_pUPnpCDS = new UPnpCDS      ());
 
     // ----------------------------------------------------------------------

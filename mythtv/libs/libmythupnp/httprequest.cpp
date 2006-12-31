@@ -179,6 +179,7 @@ long HTTPRequest::SendResponse( void )
             VERBOSE(VB_UPNP,QString("HTTPRequest::SendResponse :%1 -> %2:")
                             .arg(GetResponseStatus())
                             .arg(GetPeerAddress()));
+            //                .arg(sHeader.data()));
 
             nBytes = WriteBlock( sHeader.data(), sHeader.length() );
 
@@ -191,8 +192,11 @@ long HTTPRequest::SendResponse( void )
     // Write out Response buffer.
 
     if (( m_eType != RequestTypeHead ) && ( m_aBuffer.size() > 0 ))
+    {
+        //VERBOSE(VB_UPNP,QString("HTTPRequest::SendResponse : DATA : %1 : ")
+        //                .arg(m_aBuffer.data()));
         nBytes += WriteBlock( m_aBuffer.data(), m_aBuffer.size() );
-
+    }
     Flush();
 
     return( nBytes );
@@ -782,7 +786,7 @@ bool HTTPRequest::ParseRange( QString sRange,
 
     QStringList parts = QStringList::split( "-", ranges[0], true );
 
-    if (parts.count() != 2)
+    if (parts.count() != 2) 
         return false;
 
     if (parts[0].isNull() && parts[1].isNull())
@@ -849,6 +853,7 @@ void HTTPRequest::ExtractMethodFromURL()
     }
 
     m_sBaseUrl = "/" + sList.join( "/" ); 
+    //VERBOSE(VB_UPNP, QString("ExtractMethodFromURL : %1 : ").arg(m_sMethod));
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -863,6 +868,7 @@ bool HTTPRequest::ProcessSOAPPayload( const QString &sSOAPAction )
     // Open Supplied XML uPnp Description file.
     // ----------------------------------------------------------------------
 
+    VERBOSE(VB_UPNP, QString("HTTPRequest::ProcessSOAPPayload : %1 : ").arg(sSOAPAction));
     QDomDocument doc ( "request" );
 
     QString sErrMsg;
@@ -1220,7 +1226,7 @@ QString BufferedSocketDeviceRequest::ReadLine( int msecs )
                     m_pSocket->ClearReadBuffer(); 
                 }
                 else 
-                    usleep(20);
+                    usleep(10);
             }
             
             if (!bTimeout)

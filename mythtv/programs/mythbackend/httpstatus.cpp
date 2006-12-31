@@ -80,6 +80,7 @@ HttpStatusMethod HttpStatus::GetMethod( const QString &sURI )
     if (sURI == "getDeviceDesc"        ) return( HSM_GetDeviceDesc   );
     if (sURI == "getCDSDesc"           ) return( HSM_GetCDSDesc      );
     if (sURI == "getCMGRDesc"          ) return( HSM_GetCMGRDesc     );
+    if (sURI == "getMSRRDesc"          ) return( HSM_GetMSRRDesc     );
 
     if (sURI == "*"                    ) return( HSM_Asterisk        );
 
