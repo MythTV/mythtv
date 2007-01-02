@@ -28,8 +28,11 @@ static const char *version = "v0.32";
 static KCmdLineOptions options[] = {
     { "zoom ",0,0},
     { "z ","Zoom factor 20-300 (default: 200)", "200"},
+    { "x ","X position of window (default: 0)", "0"},
+    { "y ","Y position of window (default: 0)", "0"},
     { "w ","Screen width (default: physical screen width)", 0 },
     { "h ","Screen height (default: physical screen height)", 0 },
+    { "g" ,"Run in windowed mode", 0 },
     { "+file ","URLs to display", 0 },
     KCmdLineLastOption
 };
@@ -57,10 +60,11 @@ void setupKeys(void)
 
 int main(int argc, char **argv)
 {
+    bool windowed = false;
     int x = 0, y = 0;
     float xm = 0, ym = 0;
     int zoom,width=-1,height=-1;    // defaults
-    char usage[] = "Usage: mythbrowser [-z n] [-w n] [-h n] -u URL [URL]";
+    char usage[] = "Usage: mythbrowser [-z n] [-g] [-x n] [-y n] [-w n] [-h n] -u URL [URL]";
     QStringList urls;
 
     KCmdLineArgs::init(argc, argv, "mythbrowser", "mythbrowser", usage , version);
@@ -71,6 +75,13 @@ int main(int argc, char **argv)
         width = args->getOption("w").toInt();
     if (args->isSet("h"))
         height = args->getOption("h").toInt();
+    if (args->isSet("x"))
+        x = args->getOption("x").toInt();
+    if (args->isSet("y"))
+        y = args->getOption("y").toInt();
+    if (args->isSet("g"))
+        windowed = true;
+
     for (int i=0;i<args->count();i++) 
     {
         urls += args->arg(i);
@@ -81,10 +92,6 @@ int main(int argc, char **argv)
         urls += "http://www.mythtv.org";
 
     KApplication a(argc,argv);
-    if (width == -1)
-        width = a.desktop()->width();
-    if (height == -1)
-        height = a.desktop()->height();
 
     gContext = NULL;
     gContext = new MythContext(MYTH_BINARY_VERSION);
@@ -93,6 +100,18 @@ int main(int argc, char **argv)
         VERBOSE(VB_IMPORTANT, "MythBrowser: Could not initialize myth context. Exiting.");
         return FRONTEND_EXIT_NO_MYTHCONTEXT;
     }
+
+    if (width == -1 || height == -1)
+    {
+        // Obtain width/height and x/y offset from context
+        gContext->GetScreenSettings(x, width, xm, y, height, ym);
+    }
+
+    gContext->ParseGeometryOverride(QString("%1x%2+%3+%4")
+            .arg(width).arg(height).arg(x).arg(y));
+
+    if (windowed)
+        gContext->OverrideSettingForSession("RunFrontendInWindow", "1");
 
     if (!MSqlQuery::testDBConnection())
     {
@@ -105,13 +124,9 @@ int main(int argc, char **argv)
     gContext->LoadQtConfig();
     setupKeys();
 
-
     MythMainWindow *mainWindow = GetMythMainWindow();
     mainWindow->Init();
     gContext->SetMainWindow(mainWindow);
-
-    // Obtain width/height and x/y offset from context
-    gContext->GetScreenSettings(x, width, xm, y, height, ym);
 
     TabView *tabView = 
             new TabView(mainWindow, "mythbrowser", urls, zoom, width, height,

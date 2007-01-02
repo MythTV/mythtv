@@ -934,14 +934,24 @@ void MythNews::slotViewArticle()
                 QString cmdUrl(article->articleURL());
                 cmdUrl.replace('\'', "%27");
 
-                QString cmd = QString("%1 %2 '%3'")
+                QString geometry = QString(" -x %1 -y %2 -w %3 -h %4 ")
+                        .arg(gContext->GetMainWindow()->x())
+                        .arg(gContext->GetMainWindow()->y())
+                        .arg(gContext->GetMainWindow()->width())
+                        .arg(gContext->GetMainWindow()->height());
+
+                if (!gContext->GetMainWindow()->testWFlags(Qt::WStyle_NoBorder))
+                    geometry += " -g ";
+
+                QString cmd = QString("%1 %2 %3 '%4'")
                      .arg(browser)
+                     .arg(geometry)
                      .arg(zoom)
                      .arg(cmdUrl);
                 myth_system(cmd);
             }
         }
-    } 
+    }
 }
 
 bool MythNews::showEditDialog(bool edit)

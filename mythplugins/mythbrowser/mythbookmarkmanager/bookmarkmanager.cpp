@@ -530,6 +530,15 @@ void Bookmarks::slotBookmarksViewExecuted(QListViewItem *item)
     QString cmd = gContext->GetSetting("WebBrowserCommand", PREFIX "/bin/mythbrowser");
     QString zoom = QString(" -z %1 ").arg(gContext->GetNumSetting("WebBrowserZoomLevel",200));
 
+    QString geometry = QString(" -x %1 -y %2 -w %3 -h %4 ")
+            .arg(gContext->GetMainWindow()->x())
+            .arg(gContext->GetMainWindow()->y())
+            .arg(gContext->GetMainWindow()->width())
+            .arg(gContext->GetMainWindow()->height());
+
+    if (!gContext->GetMainWindow()->testWFlags(Qt::WStyle_NoBorder))
+        geometry += " -g ";
+
     if(!item)
         return;
 
@@ -540,14 +549,14 @@ void Bookmarks::slotBookmarksViewExecuted(QListViewItem *item)
         while ( it.current() ) {
             BookmarkViewItem* leafItem = dynamic_cast<BookmarkViewItem*>(it.current());
             if(leafItem)
-                cmd += zoom+leafItem->myBookmarkSite->url;
+                cmd += geometry + zoom + leafItem->myBookmarkSite->url;
             else
                 break;
             ++it;
         }
         myth_system(cmd);
     } else {
-        cmd += zoom+viewItem->myBookmarkSite->url;
+        cmd += geometry + zoom + viewItem->myBookmarkSite->url;
         myth_system(cmd);
     }
 }
