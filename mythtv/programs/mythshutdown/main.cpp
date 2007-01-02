@@ -543,7 +543,7 @@ int startup()
 void showUsage()
 {
   cout << "Usage of mythshutdown\n"; 
-  cout << "-w/--setwakeup time (sets the wakeup time. time=yyyy-MM-ddTmm:hh:ss.\n";
+  cout << "-w/--setwakeup time (sets the wakeup time. time=yyyy-MM-ddThh:mm:ss.\n";
   cout << "                     doesn't write it into nvram)\n";
   cout << "-q/--shutdown       (set nvram-wakeup time and shutdown)\n";
   cout << "-p/--startup        (check startup. check will return 0 if automatic\n";
