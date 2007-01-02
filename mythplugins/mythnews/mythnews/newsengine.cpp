@@ -244,6 +244,8 @@ void NewsSite::process()
     for (unsigned int i = 0; i < items.count(); i++) {
         itemNode = items.item(i);
         title    = itemNode.namedItem(QString::fromLatin1("title")).toElement().text().simplifyWhiteSpace();
+        if (!title.isNull())
+            ReplaceHtmlChar(title);
 
         QDomNode descNode = itemNode.namedItem(QString::fromLatin1("description"));
         if (!descNode.isNull())
@@ -375,5 +377,7 @@ void NewsSite::ReplaceHtmlChar(QString &s)
     s.replace("&apos;", "\'");
     s.replace("&#8230;",QChar(8230));
     s.replace("&#233;",QChar(233));
+    s.replace("&mdash;", QChar(8212));
+    s.replace("&nbsp;", " ");
 }
 
