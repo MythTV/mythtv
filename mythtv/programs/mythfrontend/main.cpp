@@ -328,10 +328,15 @@ void TVMenuCallback(void *data, QString &selection)
         startPrevious();
     else if (sel == "settings appearance") 
     {
-        AppearanceSettings settings;
-        settings.exec();
+        AppearanceSettings *settings = new AppearanceSettings();
+        int res = settings->exec();
+        delete settings;
 
-        GetMythMainWindow()->JumpTo("Reload Theme");
+        if (res)
+        {
+            qApp->processEvents();
+            GetMythMainWindow()->JumpTo("Reload Theme");
+        }
     } 
     else if (sel == "settings recording") 
     {
