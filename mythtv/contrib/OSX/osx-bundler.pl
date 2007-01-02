@@ -56,6 +56,7 @@ my @libdirs = @ARGV;
 
 my $verbose = 0;
 my $Id = '$Id$';  # Version of this script. From version control system
+my $binbase;      # $binary without any directory path
 my $bundle;
 my $target;  # Full path to the binary under $bundle
 
@@ -64,8 +65,8 @@ if ( $binary =~ m/(.*)\.app$/ )
     $bundle = $binary;
 
     # executable name, which in blah.app is usually blah
-    $binary = basename($1);
-    $target = "$bundle/Contents/MacOS/$binary";
+    $binbase = basename($1);
+    $target = "$bundle/Contents/MacOS/$binbase";
 
     if ( ! -e $target )
     {
@@ -75,8 +76,16 @@ if ( $binary =~ m/(.*)\.app$/ )
 }
 else
 {
+    if ( ! -e $binary )
+    {
+        &Complain("Couldn't locate $binary");
+        exit -3;
+    }
+
     $bundle = "$binary.app";
-    $target = "$bundle/Contents/MacOS/$binary";
+
+    $binbase = basename($binary);
+    $target = "$bundle/Contents/MacOS/$binbase";
 
     mkdir $bundle || die;
     mkdir "$bundle/Contents";
@@ -84,8 +93,7 @@ else
     &Syscall([ '/bin/cp', '-p', $binary, $target ]) or die;
 
     # write a custom Info.plist
-    &GeneratePlist($binary, $binary, $bundle, '1.0');
-
+    &GeneratePlist($binary, $binbase, $bundle, '1.0');
 }
 
 &Verbose("Installing frameworks into $target");
