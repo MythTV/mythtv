@@ -44,7 +44,7 @@ fi
 
 echo "Installing libraries into bundle as Frameworks"
 ../../contrib/OSX/osx-bundler.pl $1 ../../libs/* $QTDIR/lib \
-	|| exit -1
+    || echo; echo "    ERROR.    osx-bundler.pl failed" ; exit -1
 
 # ===========================================================================
 # Install the config/filter/theme files in our bundle:
