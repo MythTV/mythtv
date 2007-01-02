@@ -43,8 +43,12 @@ fi
 # with a binary, this will also produce the .app directory structure too.
 
 echo "Installing libraries into bundle as Frameworks"
-../../contrib/OSX/osx-bundler.pl $1 ../../libs/* $QTDIR/lib \
-    || echo; echo "    ERROR.    osx-bundler.pl failed" ; exit -1
+../../contrib/OSX/osx-bundler.pl $1 ../../libs/* $QTDIR/lib
+if [ $? -ne 0 ] ; then
+    echo
+    echo "    ERROR.    osx-bundler.pl failed"
+    exit -1
+fi
 
 # ===========================================================================
 # Install the config/filter/theme files in our bundle:
