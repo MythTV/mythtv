@@ -113,10 +113,23 @@ MythWelcomeSettings::MythWelcomeSettings()
 static HostLineEdit *MythShutdownNvramCmd()
 {
     HostLineEdit *gc = new HostLineEdit("MythShutdownNvramCmd");
-    gc->setLabel(QObject::tr("nvram-wakeup Command"));
-    gc->setValue("/usr/bin/nvram-wakeup");
+    gc->setLabel(QObject::tr("Command to Set Wakeup Time"));
+    gc->setValue("/usr/bin/nvram-wakeup --settime $time");
     gc->setHelpText(QObject::tr("Command to set the wakeup time in the BIOS. "
                     "See the README file for more examples."));
+    return gc;
+};
+
+static HostComboBox *WakeupTimeFormat()
+{
+    HostComboBox *gc = new HostComboBox("WakeupTimeFormat", true);
+    gc->setLabel(QObject::tr("Wakeup time format"));
+    gc->addSelection("time_t");
+    gc->addSelection("yyyy-MM-dd hh:mm:ss");
+    gc->setHelpText(QObject::tr("The format of the time string passed to the "
+                    "\'Set Wakeup Time Command\' as $time. See "
+                    "QT::QDateTime.toString() for details. Set to 'time_t' for "
+                    "seconds since epoch (use time_t for nvram_wakeup)."));
     return gc;
 };
 
@@ -178,6 +191,7 @@ MythShutdownSettings::MythShutdownSettings()
     
     vcg->setLabel(QObject::tr("MythShutdown/MythWelcome Settings"));
     vcg->addChild(MythShutdownNvramCmd());
+    vcg->addChild(WakeupTimeFormat());
     vcg->addChild(MythShutdownNvramRestartCmd());
     vcg->addChild(MythShutdownReboot());
     vcg->addChild(MythShutdownPowerOff());

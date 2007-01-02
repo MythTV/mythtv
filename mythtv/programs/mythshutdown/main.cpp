@@ -413,9 +413,18 @@ int shutdown()
         if (dtCurrent.secsTo(dtWakeupTime) > 15 * 60)
         {
             QString nvramCommand = gContext->GetSetting("MythShutdownNvramCmd",
-                     "/usr/bin/nvram-wakeup");
-            nvramCommand += QString(" --settime %1")
-                            .arg(dtWakeupTime.toTime_t());
+                     "/usr/bin/nvram-wakeup --settime $time");
+
+            QString wakeup_timeformat = gContext->GetSetting("WakeupTimeFormat");
+        
+            if (wakeup_timeformat == "time_t")
+            {
+                QString time_ts;
+                nvramCommand.replace("$time", time_ts.setNum(dtWakeupTime.toTime_t()));
+            }
+            else
+                nvramCommand.replace("$time", dtWakeupTime.toString(wakeup_timeformat));
+            
 
             VERBOSE(VB_IMPORTANT, QString("sending command to set time in bios\n\t\t\t%1")
                             .arg(nvramCommand));

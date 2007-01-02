@@ -51,19 +51,25 @@ mythwelcome with the -s/--setup parameter or by pressing the
 'SHOWSETTINGS' key (defaults to F11 key). You will probably only ever
 set these options once when you first setup Mythwelcome.
 
-nvram-wakeup command -  command to set wakeup time in bios
-
+Command to Set        - command to set wakeup time in bios 
+Wakup Time
                         if you are really lucky nvram-wakeup will be able 
                         to recognise your M/B automatically 
-                        "/usr/sbin/nvram-wakeup"
+                        "/usr/sbin/nvram-wakeup  --settime $time"
 
                         if you need to explicitly set the info-writer use 
                         something like this
-                        "/usr/sbin/nvram-wakeup -A -I aopen_ax37"
+                        "/usr/sbin/nvram-wakeup -A -I aopen_ax37 --settime $time"
 
                         if you need to use a custom config file use something 
                         like this
-                        "/usr/sbin/nvram-wakeup -A -C /etc/nvram-wakeup.conf"
+                        "/usr/sbin/nvram-wakeup -A -C /etc/nvram-wakeup.conf --settime $time"
+
+Wakeup Time Format    - this should be set to either 'time_t' or a time format string that
+                        should be used when replacing $time in the above command.
+                        See the QT docs for QDateTime::toString() for the format used.
+
+                        nvram-wakeup requires this to be set to time_t
 
 nvram-wakeup restart  - command to set which bootloader menu option to use
 command                 after next reboot. This command is run if your bios 
