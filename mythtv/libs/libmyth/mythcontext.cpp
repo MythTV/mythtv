@@ -1715,8 +1715,13 @@ QString MythContext::FindThemeDir(const QString &themename)
     testdir = GetThemesParentDir() + "G.A.N.T.";
     dir.setPath(testdir);
     if (dir.exists())
+    {
+        VERBOSE(VB_IMPORTANT, QString("Could not find theme: %1 - "
+                "Switching to G.A.N.T.").arg(themename));
+        SaveSetting("Theme", "G.A.N.T.");
         return testdir;
- 
+    }
+
     VERBOSE(VB_IMPORTANT, QString("Could not find theme: %1").arg(themename));
     return "";
 }
