@@ -22,6 +22,8 @@ package MythTV;
     use Sys::Hostname;
     use DBI;
     use Date::Manip;
+    use HTTP::Request;
+    use LWP::UserAgent;
 
 # Necessary constants for sysopen
     use Fcntl;
@@ -281,6 +283,42 @@ package MythTV;
         }
     # Return the response
         return $$fp->read_data();
+    }
+
+# Connect to the status port and execute a command
+    sub status_command {
+        my $self   = shift;
+        my $path   = (shift or '');
+        my $params = (shift or {});
+        my $host   = (shift or $self->{'master_host'});
+    # This is a total kludge, since BackendStatusPort can be different for
+    # different hosts, but since the hostname field in the db is a NAME, and
+    # MasterServerIP can be either name or IP, there's not much else we can do
+    # here for now.
+        my $port   = (shift or $self->backend_setting('BackendStatusPort'));
+    # Generate the query string
+        my $query = '';
+        if (ref $params eq 'HASH') {
+            foreach my $var (keys %{$params}) {
+                my $svar = $var;
+                my $sval = ($params->{$var} or '');
+                $query .= '&' if ($query);
+                $svar =~ s/([^\w*\.\-])/sprintf '%%%02x', ord $1/sge;
+                $sval =~ s/([^\w*\.\-])/sprintf '%%%02x', ord $1/sge;
+                $query .= "$svar=$sval";
+            }
+        }
+    # Set up the HTTP::Request object
+        my $req = HTTP::Request->new('POST', "http://$host:$port/$path");
+        $req->header('Content-Type'   => 'application/x-www-form-urlencoded',
+                     'Content-Length' => length($query));
+        $req->content($query);
+    #Make the request
+        my $ua = LWP::UserAgent->new(keep_alive => 1);
+        my $response = $ua->request($req);
+    # Return the results
+        return undef unless ($response->is_success);
+        return $response->content;
     }
 
 # Create a new socket connection to the backend
