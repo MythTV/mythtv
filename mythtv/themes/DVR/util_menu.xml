@@ -58,22 +58,6 @@
    </button>
 
    <button>
-     <type>DVD</type>
-     <text>DVD</text>
-     <text lang="DE">DVD</text>
-     <text lang="PT">DVD</text>
-     <text lang="SV">DVD</text>
-     <text lang="SI">DVD</text>
-     <text lang="ET">DVD</text>
-     <text lang="DK">DVD</text>
-     <text lang="ES">DVD</text>
-     <text lang="NL">DVD</text>
-     <text lang="RU">DVD</text>
-     <action>PLUGIN mythdvd</action>
-     <depends>mythdvd</depends>
-   </button>
-
-   <button>
       <type>FM</type>
       <text>Radio</text>
       <text lang="DE">Radio</text>

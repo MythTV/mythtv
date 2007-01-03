@@ -118,26 +118,6 @@
    </button>
 
    <button>
-     <type>SETTINGS_DVD</type>
-     <text>DVD Settings</text>
-     <text lang="DE">DVD</text>
-     <text lang="FR">DVD</text>
-     <text lang="PT">Configurar DVD</text>
-     <text lang="ES">Configurar DVD</text>
-     <text lang="CA">Configurar DVD</text>
-     <text lang="NL">DVD Instellingen</text>
-     <text lang="SV">DVD</text>
-     <text lang="JA">DVD設定</text>
-     <text lang="SI">DVD nastavitve</text>
-     <text lang="ET">DVD sätted</text>
-     <text lang="DK">DVD Indstillinger</text>
-     <text lang="PL">Konfiguracja DVD</text>
-     <text lang="RU">Настройка DVD</text>
-     <action>CONFIGPLUGIN mythdvd</action>
-     <depends>mythdvd</depends>
-   </button>
-
-   <button>
       <type>SETTINGS_FM</type>
       <text>Radio Settings</text>
       <text lang="DE">Radio</text>

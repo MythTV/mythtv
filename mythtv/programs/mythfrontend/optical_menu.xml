@@ -21,7 +21,7 @@
       <text lang="CZ">Přehrát DVD</text>
       <text lang="RU">Смотреть DVD</text>
       <action>JUMP Play DVD</action>
-      <depends>mythdvd</depends>
+      <depends>mythvideo</depends>
    </button>
 
    <button>
@@ -45,7 +45,7 @@
       <text lang="CZ">Přehrát VCD</text>
       <text lang="RU">Смотреть VCD</text>
       <action>JUMP Play VCD</action>
-      <depends>mythdvd</depends>
+      <depends>mythvideo</depends>
    </button>
 
    <button>
@@ -70,7 +70,7 @@
       <text lang="CZ">Načíst DVD</text>
       <text lang="RU">Импортировать DVD</text>
       <action>JUMP Rip DVD</action>
-      <depends>mythdvd</depends>
+      <depends>mythvideo</depends>
    </button>
    
    <button>

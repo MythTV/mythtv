@@ -49,29 +49,6 @@
    </button>
 
    <button>
-     <type>SETTINGS_DVD</type>
-     <text>DVD Settings</text>
-     <text lang="DE">DVD</text>
-     <text lang="PT">Configurar DVD</text>
-     <text lang="ES">DVD</text>
-     <text lang="CA">Configurar DVD</text>
-     <text lang="FR">DVD</text>
-     <text lang="IS">Stillingar DVD</text>
-     <text lang="NL">DVD Instellingen</text>
-     <text lang="SV">DVD</text>
-     <text lang="JA">DVD設定</text>
-     <text lang="FI">DVD Asetukset</text>
-     <text lang="ZH_TW">DVD設定</text>
-     <text lang="SI">DVD nastavitve</text>
-     <text lang="ET">DVD sätted</text>
-     <text lang="NB">DVD-innstillinger</text>
-     <text lang="CZ">Nastavení DVD</text>
-     <text lang="RU">Настройки DVD</text>
-     <action>CONFIGPLUGIN mythdvd</action>
-     <depends>mythdvd</depends>
-   </button>
-
-   <button>
       <type>SETTINGS_IMAGES</type>
       <text>Images Settings</text>
       <text lang="ES">Fotos</text>
