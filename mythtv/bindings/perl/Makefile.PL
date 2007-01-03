@@ -14,16 +14,20 @@ WriteMakefile(
         'NAME'          => 'MythTV',
         'VERSION_FROM'  => 'MythTV.pm',
         'AUTHOR'        => 'Chris Petersen <mythtv@forevermore.net>',
-        'PREREQ_PM'     => {'IO::Socket'    => 0,
-                            'Sys::Hostname' => 0,
-                            'DBI'           => 0,
-                            'DBD::mysql'    => 0,
-                            'Date::Manip'   => 0,
-                            'Exporter'      => 0,
-                            'Config'        => 0,
+        'PREREQ_PM'     => {'Exporter'         => 0,
+                            'Config'           => 0,
+                            'DBI'              => 0,
+                            'DBD::mysql'       => 0,
+                            'Date::Manip'      => 0,
+                            'Fcntl'            => 0,
+                            'File::Copy'       => 0,
+                            'IO::Socket::INET' => 0,
+                            'Sys::Hostname'    => 0,
                            },
+        'PMLIBDIRS'     => [ 'MythTV', 'IO' ],
         'NO_META'       => 1,
 );
+
 
 
 

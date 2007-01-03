@@ -10,7 +10,7 @@
 # @copyright Silicon Mechanics
 #
 
-package MythTV::Socket;
+package IO::Socket::INET::MythTV;
     use base 'IO::Socket::INET';
 
 # Basically, just inherit the constructor from IO::Socket::INET

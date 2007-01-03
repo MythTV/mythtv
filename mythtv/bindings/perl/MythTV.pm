@@ -11,15 +11,14 @@
     $VERSION = '.21svn';
 
 # Load sub libraries
+    use IO::Socket::INET::MythTV;
     use MythTV::Program;
     use MythTV::Recording;
     use MythTV::Channel;
-    use MythTV::Socket;
     use MythTV::StorageGroup;
 
 package MythTV;
 
-    use IO::Socket;
     use Sys::Hostname;
     use DBI;
     use Date::Manip;
@@ -290,12 +289,12 @@ package MythTV;
         my $host    = (shift or $self->{'master_host'});
         my $port    = (shift or $self->{'master_port'});
         my $data    = shift;
-        my $sock    = MythTV::Socket->new(PeerAddr => $host,
-                                          PeerPort => $port,
-                                          Proto    => 'tcp',
-                                          Reuse    => 1,
-                                          Timeout  => 25)
-                             or die "Couldn't communicate with $host on port $port:  $@\n";
+        my $sock    = IO::Socket::INET::MythTV->new(PeerAddr => $host,
+                                                    PeerPort => $port,
+                                                    Proto    => 'tcp',
+                                                    Reuse    => 1,
+                                                    Timeout  => 25)
+                                       or die "Couldn't communicate with $host on port $port:  $@\n";
     # Send any data that we received
         if ($data) {
             if (ref $data) {
