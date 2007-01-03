@@ -12,7 +12,6 @@ libdir_name="lib"
 
 music="yes"
 video="yes"
-dvd="yes"
 weather="yes"
 gallery="yes"
 game="yes"
@@ -73,9 +72,6 @@ MythBrowser related options:
 
 MythControls related options:
   --enable-mythcontrols    build the mythcontrols plugin [$controls]
-
-MythDVD related options:
-  --enable-mythdvd         build the mythdvd plugin [$dvd]
 
 MythFlix related options:
   --enable-mythflix        build the mythflix plugin [$flix]
@@ -174,10 +170,6 @@ for opt do
   ;;
   --disable-mythvideo) video="no"
   ;;
-  --enable-mythdvd) dvd="yes"
-  ;;
-  --disable-mythdvd) dvd="no"
-  ;;
   --enable-mythweather) weather="yes"
   ;;
   --disable-mythweather) weather="no"
@@ -247,7 +239,6 @@ for opt do
   ;;
   --enable-all)  music="yes"; 
                  video="yes";
-                 dvd="yes";
                  weather="yes";
                  gallery="yes";
                  game="yes";
@@ -270,7 +261,6 @@ for opt do
   ;;
   --disable-all) music="no";  
                  video="no";  
-                 dvd="no";  
                  weather="no";  
                  gallery="no";  
                  game="no";  
@@ -587,13 +577,6 @@ if test "$flix" = "yes" ; then
   echo "SUBDIRS += mythflix" >> ./config.pro
 else
   echo "        MythFlix       plugin will not be built"
-fi
-
-if test "$dvd" = "yes" ; then
-  echo "        MythDVD        plugin will be built"
-  echo "SUBDIRS += mythdvd" >> ./config.pro
-else
-  echo "        MythDVD        plugin will not be built"
 fi
 
 if test "$gallery" = "yes" ; then

@@ -11,7 +11,17 @@ SOURCES += ../mythvideo/videodlg.cpp
 SOURCES += ../mythvideo/videofilter.cpp
 SOURCES += ../mythvideo/videogallery.cpp
 SOURCES += ../mythvideo/videoselected.cpp
+SOURCES += ../mythvideo/globals.cpp
+SOURCES += ../mythvideo/videolist.cpp
+SOURCES += ../mythvideo/videoscan.cpp
+SOURCES += ../mythvideo/videoutils.cpp
 SOURCES += ./themestrings.h
+
+# old MythDVD
+SOURCES += ../mythvideo/dvdripbox.cpp
+SOURCES += ../mythvideo/titledialog.cpp
+SOURCES += ../mtd/dvdprobe.cpp
+SOURCES += ../mtd/jobthread.cpp
 
 # Be sure to run 'lrelease -nocompress translate.pro'
 

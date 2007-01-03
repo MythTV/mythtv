@@ -1,9 +1,24 @@
+/////////////////////////////////////////////////////////////////////
+// main.cpp
+//
+// (c) 2003-2007 Thor Sigvaldason and Isaac Richards
+// Part of the MythTV project
+//
+// Several portions of this module rely heavily on the
+// transcode project. More information on transcode is
+// available at:
+//
+// http://www.transcoding.org/cgi-bin/transcode
+/////////////////////////////////////////////////////////////////////
+
 #include <qapplication.h>
 
 #include <mythtv/mythcontext.h>
 #include <mythtv/lcddevice.h>
 #include <mythtv/libmythui/myththemedmenu.h>
 #include <mythtv/mythpluginapi.h>
+#include <mythtv/mythmedia.h>
+#include <mythtv/util.h>
 
 #include "videomanager.h"
 #include "videobrowser.h"
@@ -17,6 +32,7 @@
 #include "globals.h"
 #include "videolist.h"
 #include "videoutils.h"
+#include "dvdripbox.h"
 
 #if defined(AEW_VG)
 #include <valgrind/memcheck.h>
@@ -178,108 +194,349 @@ namespace
     void screenVideoTree() { screens::runScreen(screens::stVideoTree); }
     void screenVideoGallery() { screens::runScreen(screens::stVideoGallery); }
     void screenVideoDefault() { screens::runScreen(screens::stDefaultView); }
-}
 
-void setupKeys()
-{
-    REG_JUMP(JUMP_VIDEO_DEFAULT, "The MythVideo default view", "",
-             screenVideoDefault);
+    ///////////////////////////////////////
+    // MythDVD functions
+    ///////////////////////////////////////
 
-    REG_JUMP(JUMP_VIDEO_MANAGER, "The MythVideo video manager", "",
-             screenVideoManager);
-    REG_JUMP(JUMP_VIDEO_BROWSER, "The MythVideo video browser", "",
-             screenVideoBrowser);
-    REG_JUMP(JUMP_VIDEO_TREE, "The MythVideo video listings", "",
-             screenVideoTree);
-    REG_JUMP(JUMP_VIDEO_GALLERY, "The MythVideo video gallery", "",
-             screenVideoGallery);
+    // This stores the last MythMediaDevice that was detected:
+    QString gDVDdevice;
 
-    REG_KEY("Video","FILTER","Open video filter dialog","F");
+    //
+    //  Transcode stuff only if we were ./configure'd for it
+    //
+    void startDVDRipper()
+    {
+        DVDRipBox *drb = new DVDRipBox(gContext->GetMainWindow(),
+                                       "dvd_rip", "dvd-"); 
+        gContext->addCurrentLocation("ripdvd");
+        qApp->unlock();
+        drb->exec();
+        qApp->lock();
+        gContext->removeCurrentLocation();
 
-    REG_KEY("Video","DELETE","Delete video","D");
-    REG_KEY("Video","BROWSE","Change browsable in video manager","B");
-    REG_KEY("Video","INCPARENT","Increase Parental Level","],},F11");
-    REG_KEY("Video","DECPARENT","Decrease Parental Level","[,{,F10");
+        qApp->processEvents();
 
-    REG_KEY("Video","HOME","Go to the first video","Home");
-    REG_KEY("Video","END","Go to the last video","End");
-}
+        delete drb;
+    }
 
-void VideoCallback(void *data, QString &selection)
-{
-    (void)data;
-
-    QString sel = selection.lower();
-
-    if (sel == "manager")
-        screenVideoManager();
-    else if (sel == "browser")
-        screenVideoBrowser();
-    else if (sel == "listing")
-        screenVideoTree();
-    else if (sel == "gallery")
-        screenVideoGallery();
-    else if (sel == "settings_general")
+    void playVCD()
     {
         //
-        //  If we are doing aggressive
-        //  Parental Control, then junior
-        //  is going to have to try harder
-        //  than that!
+        //  Get the command string to play a VCD
+        //
+        QString command_string = gContext->GetSetting("VCDPlayerCommand");
+
+        gContext->addCurrentLocation("playvcd");
+
+        if(command_string.length() < 1)
+        {
+            //
+            //  User probably never did setup
+            //
+            DialogBox *no_player_dialog =
+                    new DialogBox(gContext->GetMainWindow(),
+                    QObject::tr("\n\nYou have no VCD Player command defined."));
+            no_player_dialog->AddButton(QObject::tr("OK, I'll go run Setup"));
+            no_player_dialog->exec();
+
+            delete no_player_dialog;
+            gContext->removeCurrentLocation();
+            return;
+        }
+        else
+        {
+            if(command_string.contains("%d"))
+            {
+                //
+                //  Need to do device substitution
+                //
+                QString vcd_device = gContext->GetSetting("VCDDeviceLocation");
+                if(vcd_device.length() < 1)
+                {
+                    //
+                    //  RTF README
+                    //
+                    DialogBox *no_device_dialog =
+                            new DialogBox(gContext->GetMainWindow(),
+                            QObject::tr("\n\nYou have no VCD Device defined."));
+                    no_device_dialog->
+                            AddButton(QObject::tr("OK, I'll go run Setup"));
+                    no_device_dialog->exec();
+
+                    delete no_device_dialog;
+                    gContext->removeCurrentLocation();
+
+                    return;
+                }
+                else
+                {
+                    command_string =
+                            command_string.replace(QRegExp("%d"), vcd_device);
+                }
+            }
+            myth_system(command_string);
+            gContext->GetMainWindow()->raise();
+            gContext->GetMainWindow()->setActiveWindow();
+            if (gContext->GetMainWindow()->currentWidget())
+                gContext->GetMainWindow()->currentWidget()->setFocus();
+        }
+        gContext->removeCurrentLocation();
+    }
+
+    void playDVD()
+    {
+        //
+        //  Get the command string to play a DVD
         //
 
-        if (gContext->GetNumSetting("VideoAggressivePC", 0))
+        QString command_string =
+                gContext->GetSetting("mythdvd.DVDPlayerCommand");
+        //    , "Internal");
+        QString dvd_device = gDVDdevice;
+
+        if (dvd_device.isNull())
+            dvd_device = gContext->GetSetting("DVDDeviceLocation");
+
+        if(dvd_device.length() < 1)
         {
-            if (checkParentPassword())
+            //
+            //  RTF README
+            //
+            DialogBox *no_device_dialog =
+                    new DialogBox(gContext->GetMainWindow(),
+                    QObject::tr("\n\nYou have no DVD Device defined."));
+            no_device_dialog->AddButton(QObject::tr("OK, I'll go run Setup"));
+            no_device_dialog->exec();
+
+            delete no_device_dialog;
+            gContext->removeCurrentLocation();
+
+            return;
+        }
+
+        gContext->addCurrentLocation("playdvd");
+
+        if ((command_string.find("internal", 0, false) > -1) ||
+            (command_string.length() < 1))
+        {
+            QString filename = QString("dvd:/") + dvd_device;
+
+            command_string = "Internal";
+            gContext->GetMainWindow()->HandleMedia(command_string, filename);
+            gContext->removeCurrentLocation();
+
+            return;
+        }
+        else
+        {
+            if (command_string.contains("%d"))
+            {
+                //
+                //  Need to do device substitution
+                //
+                command_string =
+                        command_string.replace(QRegExp("%d"), dvd_device);
+            }
+            myth_system(command_string);
+            if (gContext->GetMainWindow())
+            {
+                gContext->GetMainWindow()->raise();
+                gContext->GetMainWindow()->setActiveWindow();
+                if (gContext->GetMainWindow()->currentWidget())
+                    gContext->GetMainWindow()->currentWidget()->setFocus();
+            }
+        }
+        gContext->removeCurrentLocation();
+    }
+
+    /////////////////////////////////////////////////
+    //// Media handlers
+    /////////////////////////////////////////////////
+    void handleDVDMedia(MythMediaDevice *dvd)
+    {
+        if (dvd)
+        {
+            gDVDdevice = dvd->getDevicePath();
+#ifdef Q_OS_MAC
+            gDVDdevice.prepend("/dev/r");
+#endif
+            VERBOSE(VB_UPNP, QString("Storing DVD device ") + gDVDdevice);
+        }
+
+        switch (gContext->GetNumSetting("DVDOnInsertDVD", 1))
+        {
+            case 0 : // Do nothing
+                break;
+            case 1 : // Display menu (mythdvd)*/
+                mythplugin_run();
+                break;
+            case 2 : // play DVD
+                playDVD();
+                break;
+            case 3 : //Rip DVD
+                startDVDRipper();
+                break;
+            default:
+                cerr << "mythdvd main.o: handleMedia() does not know what to do"
+                     << endl;
+        }
+    }
+
+    void handleVCDMedia(MythMediaDevice *)
+    {
+        switch (gContext->GetNumSetting("DVDOnInsertDVD", 1))
+        {
+           case 0 : // Do nothing
+               break;
+           case 1 : // Display menu (mythdvd)*/
+               mythplugin_run();
+               break;
+           case 2 : // play VCD
+               playVCD();
+               break;
+           case 3 : // Do nothing, cannot rip VCD?
+               break;
+        }
+    }
+
+    ///////////////////////////////////////
+    // MythVideo functions
+    ///////////////////////////////////////
+
+    void setupKeys()
+    {
+        REG_JUMP(JUMP_VIDEO_DEFAULT, "The MythVideo default view", "",
+                 screenVideoDefault);
+
+        REG_JUMP(JUMP_VIDEO_MANAGER, "The MythVideo video manager", "",
+                 screenVideoManager);
+        REG_JUMP(JUMP_VIDEO_BROWSER, "The MythVideo video browser", "",
+                 screenVideoBrowser);
+        REG_JUMP(JUMP_VIDEO_TREE, "The MythVideo video listings", "",
+                 screenVideoTree);
+        REG_JUMP(JUMP_VIDEO_GALLERY, "The MythVideo video gallery", "",
+                 screenVideoGallery);
+
+        REG_KEY("Video","FILTER","Open video filter dialog","F");
+
+        REG_KEY("Video","DELETE","Delete video","D");
+        REG_KEY("Video","BROWSE","Change browsable in video manager","B");
+        REG_KEY("Video","INCPARENT","Increase Parental Level","],},F11");
+        REG_KEY("Video","DECPARENT","Decrease Parental Level","[,{,F10");
+
+        REG_KEY("Video","HOME","Go to the first video","Home");
+        REG_KEY("Video","END","Go to the last video","End");
+
+        // MythDVD
+        REG_JUMP("Play DVD", "Play a DVD", "", playDVD);
+        REG_MEDIA_HANDLER("MythDVD DVD Media Handler", "", "", handleDVDMedia,
+                          MEDIATYPE_DVD, QString::null);
+
+        REG_JUMP("Play VCD", "Play a VCD", "", playVCD);
+        REG_MEDIA_HANDLER("MythDVD VCD Media Handler", "", "", handleVCDMedia,
+                          MEDIATYPE_VCD, QString::null);
+
+        REG_JUMP("Rip DVD", "Import a DVD into your MythVideo database", "",
+                 startDVDRipper);
+    }
+
+    void VideoCallback(void *data, QString &selection)
+    {
+        (void)data;
+
+        QString sel = selection.lower();
+
+        if (sel == "manager")
+            screenVideoManager();
+        else if (sel == "browser")
+            screenVideoBrowser();
+        else if (sel == "listing")
+            screenVideoTree();
+        else if (sel == "gallery")
+            screenVideoGallery();
+        else if (sel == "settings_general")
+        {
+            //
+            //  If we are doing aggressive
+            //  Parental Control, then junior
+            //  is going to have to try harder
+            //  than that!
+            //
+
+            if (gContext->GetNumSetting("VideoAggressivePC", 0))
+            {
+                if (checkParentPassword())
+                {
+                    VideoGeneralSettings settings;
+                    settings.exec();
+                }
+            }
+            else
             {
                 VideoGeneralSettings settings;
                 settings.exec();
             }
         }
-        else
+        else if (sel == "settings_player")
         {
-            VideoGeneralSettings settings;
+            VideoPlayerSettings settings;
+            settings.exec();
+        }
+        else if (sel == "settings_associations")
+        {
+            FileAssocDialog fa(gContext->GetMainWindow(),
+                               "file_associations",
+                               "video-",
+                               "fa dialog");
+
+            fa.exec();
+        }
+        else if (sel == "dvd_play")
+        {
+            playDVD();
+        }
+        else if (sel == "vcd_play")
+        {
+            playVCD();
+        }
+        else if (sel == "dvd_rip")
+        {
+            startDVDRipper();
+        }
+        else if (sel == "dvd_settings_rip")
+        {
+            DVDRipperSettings settings;
             settings.exec();
         }
     }
-    else if (sel == "settings_player")
+
+    void runMenu(const QString &menuname)
     {
-        VideoPlayerSettings settings;
-        settings.exec();
-    }
-    else if (sel == "settings_associations")
-    {
-        FileAssocDialog fa(gContext->GetMainWindow(),
-                           "file_associations",
-                           "video-",
-                           "fa dialog");
+        QString themedir = gContext->GetThemeDir();
 
-        fa.exec();
-    }
-}
+        MythThemedMenu *diag =
+                new MythThemedMenu(themedir.ascii(), menuname,
+                                   GetMythMainWindow()->GetMainStack(),
+                                   "video menu");
 
-void runMenu(QString themedir, const QString &menuname)
-{
-    MythThemedMenu *diag =
-            new MythThemedMenu(themedir.ascii(), menuname,
-                               GetMythMainWindow()->GetMainStack(),
-                               "video menu");
+        diag->setCallback(VideoCallback, NULL);
+        diag->setKillable();
 
-    diag->setCallback(VideoCallback, NULL);
-    diag->setKillable();
-
-    if (diag->foundTheme())
-    {
-        if (LCD *lcd = LCD::Get())
+        if (diag->foundTheme())
         {
-            lcd->switchToTime();
+            if (LCD *lcd = LCD::Get())
+            {
+                lcd->switchToTime();
+            }
+            GetMythMainWindow()->GetMainStack()->AddScreen(diag);
         }
-        GetMythMainWindow()->GetMainStack()->AddScreen(diag);
-    }
-    else
-    {
-        VERBOSE(VB_IMPORTANT, QString("Couldn't find theme %1").arg(themedir));
-        delete diag;
+        else
+        {
+            VERBOSE(VB_IMPORTANT,
+                    QString("Couldn't find theme %1").arg(themedir));
+            delete diag;
+        }
     }
 }
 
@@ -296,9 +553,14 @@ int mythplugin_init(const char *libversion)
     VideoGeneralSettings general;
     general.load();
     general.save();
+
     VideoPlayerSettings settings;
     settings.load();
     settings.save();
+
+    DVDRipperSettings rsettings;
+    rsettings.load();
+    rsettings.save();
 
     setupKeys();
 
@@ -307,15 +569,13 @@ int mythplugin_init(const char *libversion)
 
 int mythplugin_run()
 {
-    QString themedir = gContext->GetThemeDir();
-    runMenu(themedir, "videomenu.xml");
+    runMenu("videomenu.xml");
     return 0;
 }
 
 int mythplugin_config()
 {
-    QString themedir = gContext->GetThemeDir();
-    runMenu(themedir, "video_settings.xml");
+    runMenu("video_settings.xml");
 
     return 0;
 }

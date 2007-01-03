@@ -20,7 +20,7 @@
 #include <mythtv/mythdbcon.h>
 #include <mythtv/langsettings.h>
 
-#include "../mythdvd/dbcheck.h"
+#include "../mythvideo/dbcheck.h"
 #include "mtd.h"
 
 #define MTD_EXIT_DEAMONIZING_ERROR                FRONTEND_EXIT_START-1
@@ -127,7 +127,7 @@ int main(int argc, char **argv)
     }
 
     gContext->ActivateSettingsCache(false);
-    UpgradeDVDDatabaseSchema();
+    UpgradeVideoDatabaseSchema();
     gContext->ActivateSettingsCache(true);
  
     //

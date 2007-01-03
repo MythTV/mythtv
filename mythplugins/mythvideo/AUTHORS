@@ -1,4 +1,3 @@
-
 The usual bunch of people, probably including:
 
     Isaac Richards <ijr at po dot cwru dot edu>
@@ -20,6 +19,9 @@ MythDVD relies heavily on the transcode project:
 
 Translations:
     PT: Bruno Rodrigues <bruno.rodrigues at litux dot org>
+
+Previous maintainers:
+    John Danner <johndanner (at) untzuntz (dot) com>
 
 Fix to always use YV12/I420 codec
     Dave Alden <alden at math dot ohio-state dot edu>

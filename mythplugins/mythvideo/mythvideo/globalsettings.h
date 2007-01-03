@@ -15,4 +15,10 @@ class VideoPlayerSettings : public ConfigurationWizard
     VideoPlayerSettings();
 };
 
+class DVDRipperSettings :  public ConfigurationWizard
+{
+  public:
+    DVDRipperSettings();
+};
+
 #endif
