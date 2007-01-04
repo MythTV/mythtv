@@ -2504,8 +2504,7 @@ void NuppelVideoPlayer::DisplayNormalFrame(void)
     AutoDeint(frame);
 
     videofiltersLock.lock();
-    if (ringBuffer->isDVD() &&
-        ringBuffer->DVD()->InStillFrame() &&
+    if (ringBuffer->InDVDMenuOrStillFrame() &&
         videoOutput->ValidVideoFrames() < 3)
     {
         videoOutput->ProcessFrame(frame, NULL, NULL, pipplayer);
