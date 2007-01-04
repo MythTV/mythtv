@@ -55,6 +55,7 @@ DVDRingBufferPriv::DVDRingBufferPriv()
       seekpos(0), seekwhence(0), 
       dvdname(NULL), serialnumber(NULL),
       seeking(false), seekTime(0),
+      currentTime(0),
       parent(0)
 {
     memset(&dvdMenuButton, 0, sizeof(AVSubtitle));
@@ -91,11 +92,14 @@ long long DVDRingBufferPriv::NormalSeek(long long time)
 long long DVDRingBufferPriv::Seek(long long time)
 {
     seekTime = (uint64_t)time;
-    uint offset_divider = 1;
+    uint searchToCellStart = 1;
     int ffrewSkip = 1;
     if (parent)
         ffrewSkip = parent->GetFFRewSkip();
-    dvdnav_status_t dvdRet = dvdnav_time_search(this->dvdnav, seekTime, offset_divider);
+    if (ffrewSkip != 1)
+        searchToCellStart = 0;
+    dvdnav_status_t dvdRet = 
+        dvdnav_time_search(this->dvdnav, seekTime, searchToCellStart);
     if (dvdRet == DVDNAV_STATUS_ERR)
     {
         VERBOSE(VB_PLAYBACK, LOC_ERR + 
@@ -104,9 +108,8 @@ long long DVDRingBufferPriv::Seek(long long time)
     else
     {
         gotStop = false;
-        // TODO: precise seeking too inefficient
-        //if (time > 0 && ffrewSkip == 1)
-        //    seeking = true;
+        if (time > 0 && ffrewSkip == 1)
+            seeking = true;
     }
     
     return currentpos;
@@ -389,6 +392,7 @@ int DVDRingBufferPriv::safe_read(void *data, unsigned sz)
             break;
             case DVDNAV_NAV_PACKET:
             {
+                QMutexLocker lock(&seekLock);
                 lastNav = (dvdnav_t *)blockBuf;
                 dsi_t *dsi = dvdnav_get_current_nav_dsi(dvdnav);
                 if (vobid == 0 && cellid == 0)
@@ -402,18 +406,21 @@ int DVDRingBufferPriv::safe_read(void *data, unsigned sz)
                     }
                 }
 
+                dvd_time_t timeFromCellStart = dsi->dsi_gi.c_eltm;
+                currentTime = cellStart +
+                    (uint)(dvdnav_convert_time(&timeFromCellStart));
                 currentpos = GetReadPosition();
                 
                 if (seeking)
                 {
-                    dvd_time_t timeFromCellStart = dsi->dsi_gi.c_eltm;
-                    uint64_t currentpts = cellStart + 
-                        (uint)dvdnav_convert_time(&timeFromCellStart); 
-                    if (currentpts >= seekTime)
+                    uint relativeTime = (uint)((seekTime - currentTime)/ 90000);
+                    if (relativeTime == 0)
                     {
                         seeking = false;
                         seekTime = 0;
                     }
+                    else
+                        dvdnav_time_search_within_cell(dvdnav, relativeTime);
                 }
                 
                 if (blockBuf != dvdBlockWriteBuf)
@@ -997,16 +1004,6 @@ int DVDRingBufferPriv::NumMenuButtons(void) const
         return numButtons;
     else
         return 0;
-}
-
-uint DVDRingBufferPriv::GetCurrentTime(void)
-{
-    QMutexLocker lock(&seekLock);
-    dsi_t *dvdnavDsi = dvdnav_get_current_nav_dsi(dvdnav);
-    dvd_time_t timeFromCellStart = dvdnavDsi->dsi_gi.c_eltm;
-    uint currentTime = GetCellStart() +
-        (uint)(dvdnav_convert_time(&timeFromCellStart) / 90000);
-    return currentTime;
 }
 
 uint DVDRingBufferPriv::GetAudioLanguage(int id)

@@ -63,26 +63,47 @@ static dvdnav_status_t dvdnav_scan_admap(dvdnav_t *this, int32_t domain, uint32_
   }
   if(admap) {
     uint32_t address = 0;
-    uint32_t vobu_start, next_vobu;
+    uint32_t vobu_start, next_vobu, first_address, last_address;
     int32_t found = 0;
 
     /* Search through ADMAP for best sector */
     vobu_start = SRI_END_OF_CELL;
-    /* FIXME: Implement a faster search algorithm */
-    while((!found) && ((address<<2) < admap->last_byte)) {
-      next_vobu = admap->vobu_start_sectors[address];
+    /* use binary search algorithm to improve efficiency */
+    if (admap->last_byte > 20 && 
+        admap->vobu_start_sectors[20] >= seekto_block)
+    {
+      while((!found) && ((address<<2) < admap->last_byte)) {
+        next_vobu = admap->vobu_start_sectors[address];
 
-      /* fprintf(MSG_OUT, "libdvdnav: Found block %u\n", next_vobu); */
-
-      if (next_vobu == seekto_block) {
-		vobu_start = next_vobu;
-        found = 1;
-      } else if (vobu_start < seekto_block && next_vobu > seekto_block) {
-        found = 1;
-      } else {
-        vobu_start = next_vobu;
+        if (next_vobu == seekto_block) {
+		  vobu_start = next_vobu;
+          found = 1;
+        } else if (vobu_start < seekto_block && next_vobu > seekto_block) {
+          found = 1;
+        } else {
+          vobu_start = next_vobu;
+        }
+        address ++;
       }
-      address ++;
+    }
+    else {
+      found = 0;
+      first_address = 0;
+      last_address  = admap->last_byte >> 2;
+      while ((!found) && first_address <= last_address)
+      {
+        address = (first_address + last_address) / 2;
+        next_vobu = admap->vobu_start_sectors[address];
+        if (seekto_block > next_vobu)
+          first_address = address + 1;
+        else if (seekto_block < next_vobu)
+          last_address = address - 1;
+        else {
+          break;
+        }
+      }
+      found = 1;
+      vobu_start = next_vobu;
     }
     if(found) {
       *vobu = vobu_start;
@@ -97,7 +118,7 @@ static dvdnav_status_t dvdnav_scan_admap(dvdnav_t *this, int32_t domain, uint32_
 }
 
 dvdnav_status_t dvdnav_time_search(dvdnav_t *this,
-				   uint64_t time, uint offset_divider) {
+				   uint64_t time, uint search_to_nearest_cell) {
   
   uint64_t target = time;
   uint64_t length = 0;
@@ -110,7 +131,6 @@ dvdnav_status_t dvdnav_time_search(dvdnav_t *this,
   
   cell_playback_t *cell;
   dvd_state_t *state;
-  dsi_t *dsi;
   dvdnav_status_t result;
 
   if(this->position_current.still != 0) {
@@ -146,12 +166,12 @@ dvdnav_status_t dvdnav_time_search(dvdnav_t *this,
     cell_length = dvdnav_convert_time(&cell->playback_time);
     length += cell_length;
     if (target <= length) {
-      offset = (cell->last_sector - cell->first_sector) / offset_divider;
+      offset = (cell->last_sector - cell->first_sector);
       diff2  = ((double)target - (double)prev_length) / (double)cell_length;
       offset = (diff2 * offset);
       target = cell->first_sector;
-      target += offset;
-      
+      if (!search_to_nearest_cell)
+        target += offset;
       found = 1;
       break;
     }
@@ -617,5 +637,44 @@ dvdnav_status_t dvdnav_get_position_in_title(dvdnav_t *this,
   *pos = cur_sector - first_cell->first_sector;
   *len = last_cell->last_sector - first_cell->first_sector;
   
+  return DVDNAV_STATUS_OK;
+}
+
+dvdnav_status_t dvdnav_time_search_within_cell(dvdnav_t *this,
+                    uint relative_time)
+{
+  if(!this) {
+    printerr("Passed a NULL pointer.");
+    return DVDNAV_STATUS_ERR;
+  }
+
+  uint32_t cur_vobu, new_vobu, start, offset;
+  int current_cell, i;
+  
+  dsi_t * dsi;
+  dvd_state_t *state;
+  int stime[19] = { 240, 120, 60, 20, 15, 14, 13, 12, 11,
+                    10, 9, 8, 7, 6, 5, 4, 3, 2, 1};
+  pthread_mutex_lock(&this->vm_lock);
+  cur_vobu = this->vobu.vobu_start;
+  for (i = 0; i <= 19; i++) {
+    if (stime[i]/2.0 <= relative_time) {
+      dsi = dvdnav_get_current_nav_dsi(this);
+      offset = dsi->vobu_sri.fwda[i];
+      if (offset >> 31)
+        new_vobu = cur_vobu + (dsi->vobu_sri.fwda[i] & 0xfffff);
+      else
+        new_vobu = cur_vobu;
+      break;
+    }
+  }
+  
+  state = &(this->vm->state);
+  current_cell = state->cellN;
+  start =  state->pgc->cell_playback[current_cell-1].first_sector;
+  if (vm_jump_cell_block(this->vm, state->cellN, new_vobu - start)) {
+    this->vm->hop_channel += HOP_SEEK;
+  }
+  pthread_mutex_unlock(&this->vm_lock);
   return DVDNAV_STATUS_OK;
 }
