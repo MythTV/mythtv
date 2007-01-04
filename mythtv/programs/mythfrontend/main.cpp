@@ -775,7 +775,7 @@ int main(int argc, char **argv)
 
     bool ResetSettings = false;
 
-    if (binname != "mythfrontend")
+    if (binname.lower() != "mythfrontend")
         pluginname = binname;
 
     gContext = new MythContext(MYTH_BINARY_VERSION);
