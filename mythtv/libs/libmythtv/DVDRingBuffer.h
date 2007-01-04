@@ -98,6 +98,7 @@ class MPUBLIC DVDRingBufferPriv
     uint8_t GetNumAudioChannels(int id);
     void JumpToTitle(bool change) { jumptotitle = change; }
     void SeekCellStart(void);
+    void SetDVDSpeed(const char *device, int speed);
 
     void SetParent(NuppelVideoPlayer *p) { parent = p; }
 
@@ -107,6 +108,7 @@ class MPUBLIC DVDRingBufferPriv
     dvdnav_t      *dvdnav;
     unsigned char  dvdBlockWriteBuf[DVD_BLOCK_SIZE];
     unsigned char *dvdBlockReadBuf;
+    const char *dvdFilename;
     int            dvdBlockRPos;
     int            dvdBlockWPos;
     long long      pgLength;

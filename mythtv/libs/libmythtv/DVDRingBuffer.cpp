@@ -1,4 +1,13 @@
 #include <unistd.h>
+#ifdef __linux__
+#include <linux/cdrom.h>
+#include <scsi/sg.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <sys/ioctl.h>
+#include <fcntl.h>
+#endif
+
 
 #include "DVDRingBuffer.h"
 #include "mythcontext.h"
@@ -23,6 +32,7 @@ static const char *dvdnav_menu_table[] =
 
 DVDRingBufferPriv::DVDRingBufferPriv()
     : dvdnav(NULL),     dvdBlockReadBuf(NULL),
+      dvdFilename(NULL),
       dvdBlockRPos(0),  dvdBlockWPos(0),
       pgLength(0),      pgcLength(0),
       cellStart(0),     pgStart(0),
@@ -119,6 +129,7 @@ void DVDRingBufferPriv::GetDescForPos(QString &desc) const
 
 bool DVDRingBufferPriv::OpenFile(const QString &filename) 
 {
+    dvdFilename = filename.ascii();
     dvdnav_status_t dvdRet = dvdnav_open(&dvdnav, filename.local8Bit());
     if (dvdRet == DVDNAV_STATUS_ERR)
     {
@@ -857,6 +868,7 @@ bool DVDRingBufferPriv::DecodeSubtitles(AVSubtitle *sub, int *gotSubtitles,
                 decode_rle(bitmap + w, w * 2, w, h / 2,
                             spu_pkt, offset2 * 2, buf_size);
                 guess_palette(sub->rects[0].rgba_palette, palette, alpha);
+                h = h - 1;
                 if (!IsInMenu() && y1 < 5)
                 {
                     uint8_t *tmp_bitmap;
@@ -889,7 +901,7 @@ bool DVDRingBufferPriv::DecodeSubtitles(AVSubtitle *sub, int *gotSubtitles,
                 sub->rects[0].x = x1;
                 sub->rects[0].y = y1;
                 sub->rects[0].w  = w;
-                sub->rects[0].h = h - 1;
+                sub->rects[0].h = h;
                 sub->rects[0].nb_colors = 4;
                 sub->rects[0].linesize = w;
                 *gotSubtitles = 1;
@@ -1131,6 +1143,110 @@ void DVDRingBufferPriv::SeekCellStart(void)
     QMutexLocker lock(&seekLock);
     gotoCellStart = true;
     Seek(cellStart);
+}
+
+/*
+ * \brief obtained from the mplayer project
+ */
+void DVDRingBufferPriv::SetDVDSpeed(const char *device, int speed)
+{
+#if defined(__linux__) && defined(SG_IO) && defined(GPCMD_SET_STREAMING)
+    int fd;
+    unsigned char buffer[28];
+    unsigned char cmd[16];
+    unsigned char sense[16];
+    struct sg_io_hdr sghdr;
+    struct stat st;
+
+    memset(&sghdr, 0, sizeof(sghdr));
+    memset(buffer, 0, sizeof(buffer));
+    memset(sense, 0, sizeof(sense));
+    memset(cmd, 0, sizeof(cmd));
+    memset(&st, 0, sizeof(st));
+
+    if (stat(device, &st) == -1 ) 
+    {
+        VERBOSE(VB_PLAYBACK, LOC_ERR +
+                QString("SetDVDSpeed() Failed. device %1 not found")
+                .arg(device));
+        return;
+    }
+
+    if (!S_ISBLK(st.st_mode)) 
+    {
+        VERBOSE(VB_PLAYBACK, LOC_ERR + 
+                "SetDVDSpeed() Failed. Not a block device");
+        return;
+    }
+
+    if ((fd = open(device, O_RDWR | O_NONBLOCK)) == -1)
+    {
+        VERBOSE(VB_PLAYBACK, LOC_ERR + 
+                "Changing DVD speed needs write access");
+        return;
+    }
+
+    if (speed < 100)
+        speed *= 1350;
+
+    switch(speed)
+    {
+        case 0: // don't touch speed setting
+            return;
+        case -1: // restore default value
+        {
+            speed = 0;
+            buffer[0] = 4;
+            VERBOSE(VB_PLAYBACK, LOC + "Restored DVD Speed");
+            break;
+        }
+        default:
+        {
+            QString msg;
+            if (speed < 0)
+                msg = "Normal";
+            else
+                msg = QString("%1Kb/s").arg(speed);
+            VERBOSE(VB_PLAYBACK, LOC + QString("Limit DVD Speed to %1")
+                    .arg(msg));
+            break;
+        }
+    }
+
+    sghdr.interface_id = 'S';
+    sghdr.timeout = 5000;
+    sghdr.dxfer_direction = SG_DXFER_TO_DEV;
+    sghdr.mx_sb_len = sizeof(sense);
+    sghdr.dxfer_len = sizeof(buffer);
+    sghdr.cmd_len = sizeof(cmd);
+    sghdr.sbp = sense;
+    sghdr.dxferp = buffer;
+    sghdr.cmdp = cmd;
+
+    cmd[0] = GPCMD_SET_STREAMING;
+    cmd[10] = sizeof(buffer);
+
+    buffer[8]  = 0xff;
+    buffer[9]  = 0xff;
+    buffer[10] = 0xff;
+    buffer[11] = 0xff;
+
+    buffer[12] = buffer[20] = (speed >> 24) & 0xff;
+    buffer[13] = buffer[21] = (speed >> 16) & 0xff;
+    buffer[14] = buffer[22] = (speed >> 8)  & 0xff;
+    buffer[15] = buffer[23] = speed & 0xff;
+
+    buffer[18] = buffer[26] = 0x03;
+    buffer[19] = buffer[27] = 0xe8;
+
+    if (ioctl(fd, SG_IO, &sghdr) < 0)
+        VERBOSE(VB_PLAYBACK, LOC_ERR + "Limit DVD Speed Failed");
+    
+    VERBOSE(VB_PLAYBACK, LOC + "Limiting DVD Speed Successful");
+#else
+    (void)speed;
+    (void)device;
+#endif
 }
 
 /**
