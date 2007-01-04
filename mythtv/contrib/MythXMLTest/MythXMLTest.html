@@ -650,8 +650,23 @@ function OnLoad()
                             <td width="15%">&nbsp;</td>
                           </tr>
                           <tr>
-                            <td class="param">StartTime:</td>
-                            <td ><input class="inputfields" type="text" name="StartTime"></td>
+                            <td class="param" width="20%">StartTime:</td>
+                            <td width="65%"><input class="inputfields" type="text" name="StartTime"></td>
+                            <td width="15%">&nbsp;</td>
+                          </tr>
+                          <tr>
+                            <td class="param" width="20%">Width:</td>
+                            <td width="65%"><input class="inputfields" type="text" name="Width"></td>
+                            <td width="15%">&nbsp;</td>
+                          </tr>
+                          <tr>
+                            <td class="param" width="20%">Height:</td>
+                            <td width="65%"><input class="inputfields" type="text" name="Height"></td>
+                            <td width="15%">&nbsp;</td>
+                          </tr>
+                          <tr>
+                            <td class="param">SecsIn:</td>
+                            <td ><input class="inputfields" type="text" name="SecsIn"></td>
 							<td align="right"><input name="getPreviewImage" type="submit" class="formButton" value="getPreviewImage"/></td>                          
 						  </tr>
                         </table>
@@ -676,6 +691,25 @@ function OnLoad()
                           <td>&nbsp;</td>
                           <td class="desc">StartTime of recording (CCYY-MM-DDTHH:MM). &lt;required&gt;</td>
                         </tr>
+                        <tr> 
+                          <td colspan="2">&nbsp;</td>
+                          <td class="param">Width</td>
+                          <td>&nbsp;</td>
+                          <td class="desc">Width of image (optional)</td>
+                        </tr>
+                        <tr> 
+                          <td colspan="2">&nbsp;</td>
+                          <td class="param">Height</td>
+                          <td>&nbsp;</td>
+                          <td class="desc">Height of image (optional)</td>
+                        </tr>
+                        <tr> 
+                          <td colspan="2">&nbsp;</td>
+                          <td class="param">SecsIn</td>
+                          <td>&nbsp;</td>
+                          <td class="desc">Number of Seconds into video to extract image (optional)</td>
+                        </tr>
+
                       </table>
                     </td>
                   </tr>

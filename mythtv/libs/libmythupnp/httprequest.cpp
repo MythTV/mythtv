@@ -172,8 +172,12 @@ long HTTPRequest::SendResponse( void )
 
         case ResponseTypeXML: 
         case ResponseTypeHTML:
+        case ResponseTypeOther:
         {
-            QString sDate = QDateTime::currentDateTime()
+            QString sContentType = (m_eResponseType == ResponseTypeOther) ? 
+                                    m_sResponseTypeText : GetResponseType();
+
+            QString sDate        = QDateTime::currentDateTime()
                                         .toString( "d MMM yyyy hh:mm:ss" );  
 
             sHeader   = QString("HTTP/1.1 %1\r\n"
@@ -187,8 +191,8 @@ long HTTPRequest::SendResponse( void )
             
             sHeader += QString( "Content-Type: %1\r\n"
                                 "Content-Length: %2\r\n" )
-                                .arg( GetResponseType()  )
-                                .arg( m_aBuffer.size()   ).utf8();
+                                .arg( sContentType )
+                                .arg( m_aBuffer.size()).utf8();
              
              sHeader += QString("\r\n").utf8();
 

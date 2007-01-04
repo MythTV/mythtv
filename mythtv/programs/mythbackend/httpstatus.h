@@ -164,6 +164,11 @@ class HttpStatus : public HttpServerExtension
         void    GetRecorded    ( HTTPRequest *pRequest );
         void    GetPreviewImage( HTTPRequest *pRequest );
 
+        QImage *GeneratePreviewImage( ProgramInfo   *pInfo,
+                                      const QString &sFileName,
+                                      int            nSecsIn,
+                                      float         &fAspect );
+
         void    GetExpiring    ( HTTPRequest *pRequest );
 
         void    GetRecording   ( HttpWorkerThread *pThread, 

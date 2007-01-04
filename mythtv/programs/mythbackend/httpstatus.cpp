@@ -19,6 +19,7 @@
 #include <qdir.h>
 #include <qfile.h>
 #include <qregexp.h>
+#include <qbuffer.h>
 #include <math.h>
 
 #include "../../config.h"
@@ -769,13 +770,19 @@ void HttpStatus::GetExpiring( HTTPRequest *pRequest )
 
 void HttpStatus::GetPreviewImage( HTTPRequest *pRequest )
 {
+    bool bDefaultPixmap = false;
+
     pRequest->m_eResponseType   = ResponseTypeHTML;
     pRequest->m_nResponseStatus = 404;
 
-    // -=>TODO: Add Parameters to allow various sizes & times
-
     QString sChanId   = pRequest->m_mapParams[ "ChanId"    ];
     QString sStartTime= pRequest->m_mapParams[ "StartTime" ];
+
+    // Optional Parameters
+
+    int     nWidth    = pRequest->m_mapParams[ "Width"     ].toInt();
+    int     nHeight   = pRequest->m_mapParams[ "Height"    ].toInt();
+    int     nSecsIn   = pRequest->m_mapParams[ "SecsIn"    ].toInt();
 
     QDateTime dtStart = QDateTime::fromString( sStartTime, Qt::ISODate );
 
@@ -801,87 +808,164 @@ void HttpStatus::GetPreviewImage( HTTPRequest *pRequest )
     }
 
     // ----------------------------------------------------------------------
-    // check to see if preview image is already created.
+
+    if ((nWidth == 0) && (nHeight == 0))
+    {
+        bDefaultPixmap = true;
+        nWidth         = gContext->GetNumSetting("PreviewPixmapWidth", 160);
+        nHeight        = gContext->GetNumSetting("PreviewPixmapHeight", 120);
+    }
+
+    // ----------------------------------------------------------------------
+    // Determine Time the image should be extracted from
+    // ----------------------------------------------------------------------
+
+    if (nSecsIn == 0)
+    {
+        nSecsIn = gContext->GetNumSetting("PreviewPixmapOffset", 64) +
+                  gContext->GetNumSetting("RecordPreRoll",0);
+    }
+
+    // ----------------------------------------------------------------------
+    // If a specific size/time is requested, don't use cached image.
+    // ----------------------------------------------------------------------
+    // -=>TODO: should cache custom sized images... 
+    //          would need to decide how to delete
     // ----------------------------------------------------------------------
 
     QString sFileName     = pInfo->GetPlaybackURL();
-    pRequest->m_sFileName = sFileName + ".png";
 
-    if (!QFile::exists( pRequest->m_sFileName ))
-    {
-        // Must generate Preview Image 
+    if (bDefaultPixmap)
+        pRequest->m_sFileName = sFileName + ".png";
+    else
+        pRequest->m_sFileName = QString( "%1.%2x%3x%4.png" )
+                                   .arg( sFileName )
+                                   .arg( nWidth    )
+                                   .arg( nHeight   )
+                                   .arg( nSecsIn   );
 
-        // Find first Local encoder
-
-        EncoderLink *pEncoder = NULL;
-
-        for ( QMap<int, EncoderLink *>::Iterator it = m_pEncoders->begin();
-              it != m_pEncoders->end();
-              ++it )
-        {
-            if (it.data()->IsLocal())
-            {
-                pEncoder = it.data();
-                break;
-            }
-        }
-
-        if ( pEncoder == NULL)
-        {
-            delete pInfo;
-            return;
-        }
-
-        // ------------------------------------------------------------------
-        // Generate Preview Image and save.
-        // ------------------------------------------------------------------
-
-        int len = 0;
-        int width = 0, height = 0;
-        float aspect = 0;
-        int secondsin = gContext->GetNumSetting("PreviewPixmapOffset", 64) +
-                        gContext->GetNumSetting("RecordPreRoll",0);
-
-        unsigned char *data = (unsigned char *)pEncoder->GetScreenGrab(pInfo, 
-                                                                    sFileName, 
-                                                                    secondsin,
-                                                                    len, width,
-                                                                    height, aspect);
-
-
-        if (!data)
-        {
-            delete pInfo;
-            return;
-        }
-
-        QImage img(data, width, height, 32, NULL, 65536 * 65536, QImage::LittleEndian);
-
-        float ppw = gContext->GetNumSetting("PreviewPixmapWidth", 160);
-        float pph = gContext->GetNumSetting("PreviewPixmapHeight", 120);
-
-        if (aspect <= 0)
-            aspect = ((float) width) / height;
-
-        if (aspect > ppw / pph)
-            pph = rint(ppw / aspect);
-        else
-            ppw = rint(pph * aspect);
-
-        img = img.smoothScale((int) ppw, (int) pph);
-
-        img.save( pRequest->m_sFileName.ascii(), "PNG" );
-    }
-
-    if (pInfo)
-        delete pInfo;
+    // ----------------------------------------------------------------------
+    // check to see if preview image is already created.
+    // ----------------------------------------------------------------------
 
     if (QFile::exists( pRequest->m_sFileName ))
     {
         pRequest->m_eResponseType   = ResponseTypeFile;
         pRequest->m_nResponseStatus = 200;
+        return;
     }
 
+    // ------------------------------------------------------------------
+    // Must generate Preview Image, Generate Image and save.
+    // ------------------------------------------------------------------
+
+    float fAspect = 0.0;
+
+    QImage *pImage = GeneratePreviewImage( pInfo, 
+                                           sFileName, 
+                                           nSecsIn, 
+                                           fAspect );
+
+    if (pImage == NULL)
+    {
+        delete pInfo;
+        return;
+    }
+
+    // ------------------------------------------------------------------
+
+    if (bDefaultPixmap)
+    {
+
+       if (fAspect <= 0)
+           fAspect = (float)(nWidth) / nHeight;
+
+       if (fAspect > nWidth / nHeight)
+           nHeight = (int)rint(nWidth / fAspect);
+       else
+           nWidth = (int)rint(nHeight * fAspect);
+    }
+    else
+    {
+        if ( nWidth == 0 )
+            nWidth = (int)rint(nHeight * fAspect);
+
+        if ( nHeight == 0 )
+            nHeight = (int)rint(nWidth / fAspect);
+
+        /*
+        QByteArray aBytes;
+        QBuffer    buffer( aBytes );
+
+        buffer.open( IO_WriteOnly );
+        img.save( &buffer, "PNG" );
+
+        pRequest->m_eResponseType     = ResponseTypeOther;
+        pRequest->m_sResponseTypeText = pRequest->GetMimeType( "png" );
+        pRequest->m_nResponseStatus   = 200;
+
+        pRequest->m_response.writeRawBytes( aBytes.data(), aBytes.size() );
+        */
+    }
+
+    QImage img = pImage->smoothScale( nWidth, nHeight);
+
+    img.save( pRequest->m_sFileName.ascii(), "PNG" );
+
+    delete pImage;
+
+    if (pInfo)
+        delete pInfo;
+
+    pRequest->m_eResponseType   = ResponseTypeFile;
+    pRequest->m_nResponseStatus = 200;
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//                  
+/////////////////////////////////////////////////////////////////////////////
+
+QImage *HttpStatus::GeneratePreviewImage( ProgramInfo   *pInfo,
+                                          const QString &sFileName,
+                                          int            nSecsIn,
+                                          float         &fAspect )
+{
+
+    // Find first Local encoder
+
+    EncoderLink *pEncoder = NULL;
+
+    for ( QMap<int, EncoderLink *>::Iterator it = m_pEncoders->begin();
+          it != m_pEncoders->end();
+          ++it )
+    {
+        if (it.data()->IsLocal())
+        {
+            pEncoder = it.data();
+            break;
+        }
+    }
+
+    if ( pEncoder == NULL)
+        return NULL;
+
+    // ------------------------------------------------------------------
+    // Generate Preview Image and save.
+    // ------------------------------------------------------------------
+
+    int   nLen    = 0, nWidth = 0, nHeight = 0;
+
+    unsigned char *pData = (unsigned char *)pEncoder->GetScreenGrab( pInfo, 
+                                                                     sFileName, 
+                                                                     nSecsIn,
+                                                                     nLen, 
+                                                                     nWidth,
+                                                                     nHeight, 
+                                                                     fAspect);
+    if (!pData)
+        return NULL;
+
+    return new QImage( pData, nWidth, nHeight, 32, NULL, 65536 * 65536, QImage::LittleEndian );
 }
 
 /////////////////////////////////////////////////////////////////////////////

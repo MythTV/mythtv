@@ -1527,8 +1527,19 @@ void MainServer::DoDeleteThread(const DeleteStruct *ds)
         return;
     }
 
-    /* Delete preview thumbnail. */
-    delete_file_immediately(ds->filename + ".png", followLinks, false);
+    /* Delete all preview thumbnails. */
+
+    QFileInfo fInfo( ds->filename );
+    QDir      dir  ( fInfo.dirPath(), fInfo.fileName() + "*.png" );
+
+    for ( int nIdx = 0; nIdx < dir.count(); nIdx++ )
+    {
+        QString sFileName = QString( "%1/%2" )
+                               .arg( fInfo.dirPath() )
+                               .arg( dir[ nIdx ] );
+
+        delete_file_immediately( sFileName, followLinks, false);
+    }
 
     DoDeleteInDB(ds);
 

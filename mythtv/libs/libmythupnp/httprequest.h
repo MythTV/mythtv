@@ -56,7 +56,8 @@ typedef enum
     ResponseTypeUnknown  =  0,
     ResponseTypeXML      =  1,
     ResponseTypeHTML     =  2,
-    ResponseTypeFile     =  3
+    ResponseTypeFile     =  3,
+    ResponseTypeOther    =  4
 
 } ResponseType;
 
@@ -140,6 +141,8 @@ class HTTPRequest
         // Reponse
 
         ResponseType        m_eResponseType;
+        QString             m_sResponseTypeText;    // used for ResponseTypeOther
+
         long                m_nResponseStatus;
         QStringMap          m_mapRespHeaders;
 
