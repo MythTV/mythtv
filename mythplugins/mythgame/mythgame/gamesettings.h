@@ -111,13 +111,15 @@ class MythGamePlayerSettings : public QObject, public ConfigurationWizard
     Name   *name;
 };
 
-class MythGamePlayerEditor : public QObject, public ConfigurationDialog
+class MPUBLIC MythGamePlayerEditor : public QObject, public ConfigurationDialog
 {
     Q_OBJECT
 
   public:
+    MythGamePlayerEditor();
+
     virtual MythDialog *dialogWidget(MythMainWindow *parent,
-                                     const char     *widgetName);
+                                     const char     *widgetName=0);
 
     virtual int exec();
     virtual void load();

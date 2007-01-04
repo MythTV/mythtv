@@ -245,6 +245,12 @@ void MythGamePlayerSettings::loadByID(int sourceid)
     load();
 }
 
+MythGamePlayerEditor::MythGamePlayerEditor() : listbox(new ListBoxSetting(this))
+{
+    listbox->setLabel(tr("Game Players"));
+    addChild(listbox);
+}
+
 int MythGamePlayerEditor::exec() {
     while (ConfigurationDialog::exec() == QDialog::Accepted)
         edit();
