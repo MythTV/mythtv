@@ -81,9 +81,9 @@ void UPnpSearchTask::SendMsg( QSocketDevice  *pSocket,
                               .arg( sST )
                               .arg( sUSN );
 
-    VERBOSE(VB_UPNP, QString("UPnpSearchTask::SendMsg : %1 : %2 ")
-                        .arg( sST  )
-                        .arg( sUSN ));
+//    VERBOSE(VB_UPNP, QString("UPnpSearchTask::SendMsg : %1 : %2 ")
+//                        .arg( sST  )
+//                        .arg( sUSN ));
 
     for ( QStringList::Iterator it  = m_addressList.begin(); 
                                 it != m_addressList.end(); 

@@ -73,9 +73,9 @@ void UPnpNotifyTask::SendNotifyMsg( QMulticastSocket *pSocket,
                             .arg( sUSN         )
                             .arg( m_nMaxAge    );
 
-    VERBOSE(VB_UPNP, QString("UPnpNotifyTask::SendNotifyMsg : %1 : %2 ")
-                        .arg( sNT  )
-                        .arg( sUSN ));
+//    VERBOSE(VB_UPNP, QString("UPnpNotifyTask::SendNotifyMsg : %1 : %2 ")
+//                        .arg( sNT  )
+//                        .arg( sUSN ));
 
     for ( QStringList::Iterator it  = m_addressList.begin(); 
                                 it != m_addressList.end(); 
