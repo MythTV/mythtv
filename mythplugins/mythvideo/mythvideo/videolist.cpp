@@ -348,7 +348,7 @@ namespace fake_unnamed
 
         if (hint)
         {
-            if (metadata->Filename().startsWith(hint->getFQPath()))
+            if (metadata->Filename().startsWith(hint->getFQPath() + "/"))
             {
                 start = hint;
                 insert_chunk =
@@ -356,7 +356,7 @@ namespace fake_unnamed
             }
         }
 
-        if (insert_chunk.startsWith(dir->getFQPath()))
+        if (insert_chunk.startsWith(dir->getFQPath() + "/"))
         {
             insert_chunk = metadata->Filename().mid(dir->getFQPath().length());
         }
