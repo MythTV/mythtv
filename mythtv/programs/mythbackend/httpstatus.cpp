@@ -123,7 +123,13 @@ bool HttpStatus::ProcessRequest( HttpWorkerThread *pThread, HTTPRequest *pReques
                 case HSM_GetMusic       : GetMusic       ( pThread, pRequest ); return( true );
                 case HSM_GetVideo       : GetVideo       ( pThread, pRequest ); return( true );
 
-                default: break;
+                default: 
+                {
+				    pRequest->m_eResponseType   = ResponseTypeHTML;
+			        pRequest->m_nResponseStatus = 200;
+                
+	                break;
+				}
             }
         }
     }
@@ -1046,7 +1052,7 @@ void HttpStatus::GetMusic( HttpWorkerThread *pThread,
 
         if (query.isConnected())
         {
-            query.prepare("SELECT filename FROM musicmetadata WHERE intid = :KEY" );
+            query.prepare("SELECT filename FROM music_songs WHERE song_id = :KEY" );
             query.bindValue(":KEY", nTrack );
             query.exec();
 

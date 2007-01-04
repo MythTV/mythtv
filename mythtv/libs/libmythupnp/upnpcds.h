@@ -17,6 +17,7 @@
 #include "httpserver.h"
 #include "mythcontext.h"
 #include "upnpcdsobjects.h"
+#include "eventing.h"
               
 class UPnpCDS;
                           
@@ -145,11 +146,9 @@ typedef QPtrList< UPnpCDSExtension > UPnpCDSExtensionList;
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
 
-class UPnpCDS : public HttpServerExtension
+class UPnpCDS : public Eventing
 {
     private:
-
-        short                   m_nSystemUpdateId;
 
         UPnpCDSExtensionList   m_extensions;
         CDSObject              m_root;
@@ -174,7 +173,7 @@ class UPnpCDS : public HttpServerExtension
         void     RegisterExtension  ( UPnpCDSExtension *pExtension );
         void     UnregisterExtension( UPnpCDSExtension *pExtension );
 
-        bool     ProcessRequest( HttpWorkerThread *pThread, HTTPRequest *pRequest );
+        virtual bool ProcessRequest( HttpWorkerThread *pThread, HTTPRequest *pRequest );
 };
 
 #endif

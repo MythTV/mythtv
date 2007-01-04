@@ -77,10 +77,7 @@ class UPnpCDSMusic : public UPnpCDSExtension
         virtual ~UPnpCDSMusic() {}
 
         virtual UPnpCDSExtensionResults *Browse( UPnpCDSBrowseRequest *pRequest );
-        virtual UPnpCDSExtensionResults *Search( UPnpCDSSearchRequest * /* pRequest */ )
-        { 
-            return( NULL );
-        }
+        virtual UPnpCDSExtensionResults *Search( UPnpCDSSearchRequest *pRequest );
 
         virtual QString GetSearchCapabilities() { return( "" ); }
         virtual QString GetSortCapabilities  () { return( "" ); }

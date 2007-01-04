@@ -30,8 +30,10 @@
 //
 /////////////////////////////////////////////////////////////////////////////
 
-SSDP::SSDP() : m_bTermRequested( false )
+SSDP::SSDP( QSocketDevice *pSocket, bool bEnableNotify ) : m_bTermRequested( false )
 {
+    m_pSSDPSocket   = pSocket;
+    m_bEnableNotify = bEnableNotify;
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -68,27 +70,40 @@ void SSDP::RequestTerminate(void)
 
 void SSDP::run()
 {
-    QMulticastSocket     *pMulticastSocket = new QMulticastSocket( SSDP_GROUP, SSDP_PORT );
-    BufferedSocketDevice *pSocket          = new BufferedSocketDevice( pMulticastSocket  );
-    UPnpNotifyTask       *pNotifyTask      = new UPnpNotifyTask(); 
+    BufferedSocketDevice *pSocket          = new BufferedSocketDevice( m_pSSDPSocket );
+    UPnpNotifyTask       *pNotifyTask      = NULL;
     HTTPRequest          *pRequest         = NULL;
 
     //-=>TODO: Should add checks for NULL pointers?
 
-    // ----------------------------------------------------------------------
-    // Let's make sure to hold on to a reference of the NotifyTask.
-    // ----------------------------------------------------------------------
+    if (m_bEnableNotify)
+    {
+        pNotifyTask = new UPnpNotifyTask(); 
 
-    pNotifyTask->AddRef();
+        // ------------------------------------------------------------------
+        // Let's make sure to hold on to a reference of the NotifyTask.
+        // ------------------------------------------------------------------
+
+        pNotifyTask->AddRef();
+
+        // ------------------------------------------------------------------
+        // First Send out Notification that we are leaving the network.
+        // ------------------------------------------------------------------
+
+        pNotifyTask->SetNTS( NTS_byebye );
+        pNotifyTask->Execute( NULL );
+
+        // ------------------------------------------------------------------
+        // Add Announcement Task to the Queue
+        // ------------------------------------------------------------------
+
+        pNotifyTask->SetNTS( NTS_alive );
+        UPnp::g_pTaskQueue->AddTask( pNotifyTask  );
+
+    }
 
     // ----------------------------------------------------------------------
-    // Add Announcement Task to the Queue
-    // ----------------------------------------------------------------------
-                             
-    UPnp::g_pTaskQueue->AddTask( pNotifyTask  );
-
-    // ----------------------------------------------------------------------
-    // Listen for new Mutlicast Requests
+    // Listen for new Requests
     // ----------------------------------------------------------------------
 
     while (!IsTermRequested())
@@ -125,17 +140,23 @@ void SSDP::run()
         }
     }
 
-    // Send Announcement that we are leaving.
+    if (pNotifyTask != NULL)
+    {
+        // Send Announcement that we are leaving.
 
-    pNotifyTask->SetNTS( NTS_byebye );
-    pNotifyTask->Execute( NULL );
-    pNotifyTask->Release();
+        pNotifyTask->SetNTS( NTS_byebye );
+        pNotifyTask->Execute( NULL );
+        pNotifyTask->Release();
+    }
 
     if (pSocket != NULL) 
         delete pSocket;
 
-    if (pMulticastSocket != NULL)
-        delete pMulticastSocket;
+    if (m_pSSDPSocket != NULL)
+    {
+        delete m_pSSDPSocket;
+        m_pSSDPSocket = NULL;
+    }
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -150,6 +171,8 @@ bool SSDP::ProcessSearchRequest( HTTPRequest  *pRequest,
     QString sST  = pRequest->GetHeaderValue(  "ST", "" );
     QString sMX  = pRequest->GetHeaderValue(  "MX", "" );
     int     nMX  = 0;
+
+    //cout << "*** SSDP ProcessSearchrequest : [" << sST << "] MX = " << nMX << endl;
 
     // ----------------------------------------------------------------------
     // Validate Header Values...

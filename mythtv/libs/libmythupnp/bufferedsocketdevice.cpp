@@ -8,6 +8,7 @@
 //                                                                            
 //////////////////////////////////////////////////////////////////////////////
 
+#include "util.h"
 #include "bufferedsocketdevice.h"
 #include "upnpglobal.h"
 
@@ -19,8 +20,14 @@ BufferedSocketDevice::BufferedSocketDevice( int nSocket  )
 {
     m_pSocket = new QSocketDevice();
 
-    m_pSocket->setSocket( nSocket, QSocketDevice::Stream );
-    m_pSocket->setBlocking( true );
+    m_pSocket->setSocket         ( nSocket, QSocketDevice::Stream );
+    m_pSocket->setBlocking       ( false ); // true );
+    m_pSocket->setAddressReusable( true );
+    
+    struct linger ling = {1, 1};
+
+    //if ( setsockopt( socket(), SOL_SOCKET, SO_LINGER, &ling, sizeof( ling )) < 0) 
+    //    VERBOSE(VB_IMPORTANT, QString( "BufferedSocketDevice: setsockopt - SO_LINGER Error" ));
 
     m_bufWrite.setAutoDelete( TRUE );
 
@@ -30,7 +37,6 @@ BufferedSocketDevice::BufferedSocketDevice( int nSocket  )
     m_nWriteSize         = 0;
     m_nWriteIndex        = 0;
     m_bHandleSocketDelete= true;
-
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -91,6 +97,18 @@ void BufferedSocketDevice::Close()
 //
 /////////////////////////////////////////////////////////////////////////////
 
+bool BufferedSocketDevice::Connect( const QHostAddress &addr, Q_UINT16 port )
+{
+    if (m_pSocket == NULL)
+        return false;
+
+    return m_pSocket->connect( addr, port );
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
 QSocketDevice *BufferedSocketDevice::SocketDevice()
 {
     return( m_pSocket );
@@ -142,10 +160,10 @@ Q_ULONG BufferedSocketDevice::ReadBufferSize() const
 //
 /////////////////////////////////////////////////////////////////////////////
 
-void BufferedSocketDevice::ReadBytes()
+int BufferedSocketDevice::ReadBytes()
 {
     if (m_pSocket == NULL)
-        return;
+        return m_bufRead.size();
 
     Q_LONG maxToRead = 0;
 
@@ -154,7 +172,7 @@ void BufferedSocketDevice::ReadBytes()
         maxToRead = m_nMaxReadBufferSize - m_bufRead.size();
 
         if ( maxToRead <= 0 ) 
-            return;
+            return m_bufRead.size();
     }
 
     Q_LONG nbytes = m_pSocket->bytesAvailable();
@@ -176,8 +194,14 @@ void BufferedSocketDevice::ReadBytes()
     }
 
     if (a)
-        m_bufRead.append( a );
+    {
+        // for( long n = 0; n < a->count(); n++ )
+        //    cerr << a->at( n );
 
+        m_bufRead.append( a );
+    }
+
+    return m_bufRead.size();
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -228,11 +252,11 @@ void BufferedSocketDevice::Flush()
     bool osBufferFull = FALSE;
     int  consumed     = 0;
 
-    while ( !osBufferFull && ( m_nWriteSize > 0 ))
+    while ( !osBufferFull && ( m_nWriteSize > 0 ) && m_pSocket->isValid())
     {
         QByteArray *a = m_bufWrite.first();
 
-        int nwritten;
+        int nwritten = 0;
         int i = 0;
 
         if ( (int)a->size() - m_nWriteIndex < 1460 ) 
@@ -338,9 +362,7 @@ Q_ULONG BufferedSocketDevice::BytesAvailable()
     if ( !m_pSocket->isValid() )
         return 0;
 
-    ReadBytes();
-
-    return m_bufRead.size();
+    return ReadBytes();
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -349,6 +371,8 @@ Q_ULONG BufferedSocketDevice::BytesAvailable()
 
 Q_ULONG BufferedSocketDevice::WaitForMore( int msecs, bool *pTimeout /* = NULL*/ ) 
 {
+    bool bTimeout = false;
+
     if ( !m_pSocket->isValid() )
         return 0;
 
@@ -356,16 +380,39 @@ Q_ULONG BufferedSocketDevice::WaitForMore( int msecs, bool *pTimeout /* = NULL*/
 
     if (nBytes == 0)
     {
-        if ( pTimeout == NULL )
-            nBytes = m_pSocket->waitForMore( msecs );
-        else
-            nBytes = m_pSocket->waitForMore( msecs, pTimeout );
+/*
+        The following code is a possible workaround to the lost request problem
+        I just hate looping too much to put it in.  I believe there is something
+        I'm missing that is causing the lost packets... Just need to find it.
 
-        if ( nBytes > 0 )
-            ReadBytes();
+        bTimeout      = true;
+        int    nCount = 0;
+        int    msWait = msecs / 100;
+        
+        while (((nBytes = ReadBytes()) == 0 ) && 
+               (nCount++              < 100 ) &&
+                bTimeout                      && 
+                m_pSocket->isValid()         )
+        {
+            // give up control
+
+            usleep( 1000 );  // should be some multiple of msWait.
+
+        }
     }
+*/
+        // -=>TODO: Override the timeout to 1 second... Closes connection sooner
+        //          to help recover from lost requests.  (hack until better fix found)
 
-    return BytesAvailable();         //m_bufRead.size();
+        msecs  = 1000;
+
+        nBytes = m_pSocket->waitForMore( msecs, &bTimeout );
+
+        if (pTimeout != NULL)
+            *pTimeout = bTimeout;
+    }
+            
+    return nBytes; // nBytes  //m_bufRead.size();
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -559,6 +606,50 @@ QString BufferedSocketDevice::ReadLine()
     }
 
     return s;
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
+QString BufferedSocketDevice::ReadLine( int msecs )
+{
+    MythTimer timer;
+    QString   sLine;
+
+    if ( CanReadLine() )
+        return( ReadLine() );
+        
+    // ----------------------------------------------------------------------
+    // If the user supplied a timeout, lets loop until we can read a line 
+    // or timeout.
+    // ----------------------------------------------------------------------
+
+    if ( msecs > 0)
+    {
+        bool bTimeout = false;
+
+        timer.start();
+
+        while ( !CanReadLine() && !bTimeout )
+        {
+//            VERBOSE( VB_UPNP, "BufferedSocketDevice::ReadLine - Can't Read Line... Waiting for more." );
+
+            WaitForMore( msecs, &bTimeout );
+
+            if ( timer.elapsed() >= msecs ) 
+            {
+                bTimeout = true;
+                VERBOSE( VB_UPNP, "BufferedSocketDeviceRequest::ReadLine - Exceeded Total Elapsed Wait Time." );
+            }
+
+        }
+            
+        if (CanReadLine())
+            sLine = ReadLine();
+    }
+
+    return( sLine );
 }
 
 /////////////////////////////////////////////////////////////////////////////

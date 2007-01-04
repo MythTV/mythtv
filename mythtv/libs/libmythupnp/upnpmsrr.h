@@ -6,14 +6,14 @@
 
 #include "httpserver.h"
 #include "mythcontext.h"
-#include "upnpcdsobjects.h"
+#include "eventing.h"
               
 class UPnpMSRR;
                           
 typedef enum 
 {
     MSRR_Unknown                = 0,
-    MSRR_IsAuthorized		= 1,
+    MSRR_IsAuthorized           = 1,
     MSRR_RegisterDevice         = 2,
     MSRR_IsValidated            = 3
 
@@ -26,18 +26,15 @@ typedef enum
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
 
-class UPnpMSRR : public HttpServerExtension
+class UPnpMSRR : public Eventing
 {
     private:
 
         UPnpMSRRMethod       GetMethod              ( const QString &sURI  );
-        CDSObject            m_root;
 
         void            HandleIsAuthorized         ( HTTPRequest *pRequest );
         void            HandleRegisterDevice       ( HTTPRequest *pRequest );
         void            HandleIsValidated          ( HTTPRequest *pRequest );
-
-        QString        &Encode                     ( QString &sStr );
 
     public:
                  UPnpMSRR(); 

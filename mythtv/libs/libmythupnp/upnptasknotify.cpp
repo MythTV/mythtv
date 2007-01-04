@@ -73,15 +73,21 @@ void UPnpNotifyTask::SendNotifyMsg( QMulticastSocket *pSocket,
                             .arg( sUSN         )
                             .arg( m_nMaxAge    );
 
+    VERBOSE(VB_UPNP, QString("UPnpNotifyTask::SendNotifyMsg : %1 : %2 ")
+                        .arg( sNT  )
+                        .arg( sUSN ));
+
     for ( QStringList::Iterator it  = m_addressList.begin(); 
                                 it != m_addressList.end(); 
                               ++it ) 
-    {
-        QString sHeader = QString ( "NOTIFY * HTTP/1.1\r\n"
-                                    "HOST: 239.255.255.250:1900\r\n"
-                                    "LOCATION: http://%1:%2/getDeviceDesc\r\n" )
-                            .arg( *it )
-                            .arg( m_nStatusPort);
+    {                                                   //239.255.255.250:1900\r\n"
+        QString sHeader = QString( "NOTIFY * HTTP/1.1\r\n"
+                                   "HOST: %1:%2\r\n"    
+                                   "LOCATION: http://%3:%4/getDeviceDesc\r\n" )
+                             .arg( pSocket->address().toString() )
+                             .arg( pSocket->port() )
+                             .arg( *it )
+                             .arg( m_nStatusPort);
 
         QString  sPacket  = sHeader + sData;
         QCString scPacket = sPacket.utf8();
@@ -91,7 +97,7 @@ void UPnpNotifyTask::SendNotifyMsg( QMulticastSocket *pSocket,
         // ------------------------------------------------------------------
 
         pSocket->writeBlock( scPacket, scPacket.length(), pSocket->address(), pSocket->port() );
-        usleep( 500000 );
+        usleep( rand() % 250000 );
         pSocket->writeBlock( scPacket, scPacket.length(), pSocket->address(), pSocket->port() );
     }
 
@@ -173,10 +179,6 @@ void UPnpNotifyTask::ProcessDevice( QMulticastSocket *pSocket, UPnpDevice *pDevi
                        pService  = pDevice->m_listServices.next() )
     {
         SendNotifyMsg( pSocket, pService->m_sServiceType, pDevice->GetUDN() );
-
-        VERBOSE(VB_UPNP, QString("UPnpNotifyTask::ProcessDevice : %1 : %2 ")
-                         .arg(pService->m_sServiceType)
-                         .arg(pDevice->GetUDN()));
     }
 
     // ----------------------------------------------------------------------

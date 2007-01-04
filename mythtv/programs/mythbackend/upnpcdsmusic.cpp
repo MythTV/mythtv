@@ -52,61 +52,63 @@ typedef struct
 
 static RootInfo g_RootNodes[] = 
 {
-    {   "All Music", 
+    {   "All Music",
         "*",
-        "SELECT intid as id, "
-          "title as name, "
+        "SELECT song_id as id, "
+          "name, "
           "1 as children "
-            "FROM musicmetadata "
+            "FROM music_songs song "
             "%1 "
-            "ORDER BY title",
+            "ORDER BY name",
         "" },
 
     {   "Recently Added",
         "*",
-        "SELECT intid id, "
-          "title as name, "
+        "SELECT song_id id, "
+          "name, "
           "1 as children "
-            "FROM musicmetadata "
+            "FROM music_songs song "
             "%1 "
-            "ORDER BY title",
-        "WHERE (DATEDIFF( CURDATE(), date_added ) <= 30 ) " },
+            "ORDER BY name",
+        "WHERE (DATEDIFF( CURDATE(), date_modified ) <= 30 ) " },
 
-    {   "By Album", 
-        "album", 
-        "SELECT album as id, "
-          "album as name, "
-          "count( album ) as children "
-            "FROM musicmetadata "
+    {   "By Album",
+        "album_id",
+        "SELECT a.album_id as id, "
+          "a.album_name as name, "
+          "count( song.album_id ) as children "
+            "FROM music_songs song join music_albums a on a.album_id = song.album_id "
             "%1 "
-            "GROUP BY album "
-            "ORDER BY album",
-        "WHERE album=:KEY" },
+            "GROUP BY a.album_id "
+            "ORDER BY a.album_name",
+        "WHERE song.album_id=:KEY" },
+
+
 
 /*
 
-    {   "By Artist", 
-        "artist",
-        "SELECT artist as id, "
-          "artist as name, "
-          "count( distinct album ) as children "
-            "FROM musicmetadata "
+    {   "By Artist",
+        "artist_id",
+        "SELECT a.artist_id as id, "
+          "a.artist_name as name, "
+          "count( distinct song.artist_id ) as children "
+            "FROM music_songs song join music_artists a on a.artist_id = song.artist_id "
             "%1 "
-            "GROUP BY artist "
-            "ORDER BY artist", 
-        "WHERE artist=:KEY" },
+            "GROUP BY a.artist_id "
+            "ORDER BY a.artist_name",
+        "WHERE song.artist_id=:KEY" },
 */
 /*
-    {   "By Genre",
-        "genre",
-        "SELECT genre as id, "
+{   "By Genre",
+        "genre_id",
+        "SELECT g.genre_id as id, "
           "genre as name, "
-          "count( distinct artist ) as children "
-            "FROM musicmetadata "
+          "count( distinct song.genre_id ) as children "
+            "FROM music_songs song join music_genres g on g.genre_id = song.genre_id "
             "%1 "
-            "GROUP BY genre "
-            "ORDER BY genre",
-        "WHERE genre=:KEY" },
+            "GROUP BY g.genre_id "
+            "ORDER BY g.genre",
+        "WHERE song.genre_id=:KEY" },
 
 */
 };
@@ -117,10 +119,16 @@ static const short g_nRootNodeLength = sizeof( g_RootNodes ) / sizeof( RootInfo 
 //
 /////////////////////////////////////////////////////////////////////////////
 
-#define SHARED_MUSIC_SQL "SELECT intid, artist, album, title, "          \
-                                "genre, year, tracknum, description, "   \
-                                "filename, length "                      \
-                            "FROM musicmetadata "
+#define SHARED_MUSIC_SQL "SELECT song.song_id as intid, artist.artist_name as artist, "         \
+                             "album.album_name as album, song.name as title, "                  \
+                             "genre.genre, song.year, song.track as tracknum, "                 \
+                             "song.description, song.filename, song.length "                    \
+                          "FROM music_songs song "                                              \
+                             " join music_artists artist on artist.artist_id = song.artist_id " \
+                             " join music_albums album on album.album_id = song.album_id "      \
+                             " join music_genres genre on  genre.genre_id = song.genre_id "     \
+                             " %1 "                                                                                                     
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -135,7 +143,38 @@ template <class T> inline const T& Max( const T &x, const T &y )
 {
     return( ( x > y ) ? x : y );
 }
-                                                         
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+                                      
+UPnpCDSExtensionResults *UPnpCDSMusic::Search( UPnpCDSSearchRequest *pRequest )
+{
+    UPnpCDSBrowseRequest request;
+
+    VERBOSE(VB_UPNP, "UPnpCDSMusic::Search");
+
+    // Fake a browse request rather than duplicate all of that code.
+
+    if (pRequest->m_sContainerID == "7" )
+        request.m_sObjectId         = "Music/2";
+    else
+        request.m_sObjectId = pRequest->m_sContainerID;
+
+    //request.m_sParentId         = "";
+    //pRequest->m_sContainerID;
+
+    request.m_eBrowseFlag       = CDS_BrowseDirectChildren;
+    request.m_sFilter           = "*";
+    //pRequest->m_sFilter;
+    request.m_nStartingIndex    = pRequest->m_nStartingIndex;
+    request.m_nRequestedCount   = pRequest->m_nRequestedCount;
+    request.m_sSortCriteria     = "";
+    //pRequest->m_sSortCriteria;
+
+    return( Browse(  &request )  );
+}
+
 /////////////////////////////////////////////////////////////////////////////
 //
 /////////////////////////////////////////////////////////////////////////////
@@ -596,9 +635,9 @@ int UPnpCDSMusic::GetDistinctCount( const QString &sColumn, const QString &sWher
         QString sSQL;
         
         if (sColumn == "*")
-            sSQL = QString( "SELECT count( * ) FROM musicmetadata %1" ).arg( sWhere );
+            sSQL = QString( "SELECT count( * ) FROM music_songs song %1" ).arg( sWhere );
         else
-            sSQL = QString( "SELECT count( DISTINCT %1 ) FROM musicmetadata" ).arg( sColumn );
+            sSQL = QString( "SELECT count( DISTINCT %1 ) FROM music_songs song" ).arg( sColumn );
 
         query.prepare( sSQL );
         query.exec();
@@ -630,7 +669,7 @@ int UPnpCDSMusic::GetCount( int nNodeIdx , const QString &sKey )
         // Note: Tried to use Bind, however it would not allow me to use it
         //       for column & table names
 
-        QString sSQL = QString( "SELECT count( %1 ) FROM musicmetadata %2" )
+        QString sSQL = QString( "SELECT count( %1 ) FROM music_songs song %2" )
                           .arg( g_RootNodes[ nNodeIdx ].column )
                           .arg( g_RootNodes[ nNodeIdx ].where );
 
@@ -672,7 +711,7 @@ void UPnpCDSMusic::CreateMusicTracks( UPnpCDSBrowseRequest    *pRequest,
     if (query.isConnected())
     {
         QString sSQL = QString( SHARED_MUSIC_SQL
-                                "%1 LIMIT %2, %3" )
+                                "LIMIT %2, %3" )
                           .arg( g_RootNodes[ nNodeIdx ].where )
                           .arg( pRequest->m_nStartingIndex    )
                           .arg( pRequest->m_nRequestedCount   );

@@ -67,10 +67,6 @@ static const short g_nRootNodeLength = sizeof( g_RootNodes ) / sizeof( RootInfo 
 //
 /////////////////////////////////////////////////////////////////////////////
 
-//#define SHARED_VIDEO_SQL "SELECT intid, title, director, plot, year, " \
-//                                   "userrating, length, filename, "   \
-//                                   "coverfile, category FROM videometadata "
-
 // 
 #define SHARED_VIDEO_SQL "SELECT intid, title, director, plot, year, " \
                             "userrating, length, filename, coverfile, "   \
@@ -537,6 +533,9 @@ UPnpCDSExtensionResults *UPnpCDSVideo::ProcessContainer( UPnpCDSBrowseRequest   
 
             break;
         }
+
+        case CDS_BrowseUnknown:
+            break;
     }
 
     return( pResults );
@@ -807,10 +806,10 @@ void UPnpCDSVideo::AddVideoItem( UPnpCDSBrowseRequest    *pRequest,
     QString        sDescription = query.value( 3).toString();
     QString        sYear        = query.value( 4).toString();
     QString        sUserRating  = query.value( 5).toString();
-    long long      nFileSize    = stringToLongLong( query.value( 6).toString() );
+  //long long      nFileSize    = stringToLongLong( query.value( 6).toString() );
     QString        sFileName    = query.value( 7).toString();
     QString        sCover       = query.value( 8).toString();
-    int            nCategory    = query.value( 9).toInt();
+  //int            nCategory    = query.value( 9).toInt();
 
     // This should be a lookup from acache of the videometagenre and such tables.
     QString        sGenre       = m_mapGenre[nVidID];

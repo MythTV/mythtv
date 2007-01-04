@@ -21,6 +21,7 @@
 #include <sys/time.h>
 
 #include "upnpcds.h"
+#include "upnpcmgr.h"
 #include "upnpmsrr.h"
 
 //////////////////////////////////////////////////////////////////////////////
@@ -29,8 +30,9 @@
 
 QString          UPnp::g_sPlatform;
 UPnpDeviceDesc   UPnp::g_UPnpDeviceDesc;
-TaskQueue       *UPnp::g_pTaskQueue;
-SSDP            *UPnp::g_pSSDP;
+TaskQueue       *UPnp::g_pTaskQueue     = NULL;
+SSDP            *UPnp::g_pSSDP          = NULL;
+SSDP            *UPnp::g_pSSDPBroadcast = NULL;
 
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
@@ -53,6 +55,12 @@ UPnp::UPnp( bool /*bIsMaster */, HttpServer *pHttpServer )
         VERBOSE(VB_IMPORTANT, QString( "UPnp::UPnp:Invalid Parameter (pHttpServer == NULL)" ));
         return;
     }
+
+    // ----------------------------------------------------------------------
+    // Get Settings
+    // ----------------------------------------------------------------------
+
+    bool bBroadcastSupport = (bool)gContext->GetNumSetting("upnpSSDPBroadcast", 0 );
 
     // ----------------------------------------------------------------------
     // Build Platform String
@@ -88,16 +96,25 @@ UPnp::UPnp( bool /*bIsMaster */, HttpServer *pHttpServer )
 
     m_pHttpServer->RegisterExtension(              new SSDPExtension());
     m_pHttpServer->RegisterExtension(              new UPnpMSRR     ());
+    m_pHttpServer->RegisterExtension( m_pUPnpCMGR= new UPnpCMGR     ());
     m_pHttpServer->RegisterExtension( m_pUPnpCDS = new UPnpCDS      ());
 
     // ----------------------------------------------------------------------
     // Start up the SSDP (Upnp Discovery) Thread.
     // ----------------------------------------------------------------------
 
-    VERBOSE(VB_UPNP, QString( "UPnp::UPnp:Starting SSDP Thread" ));
+    VERBOSE(VB_UPNP, QString(  "UPnp::UPnp:Starting SSDP Thread (Multicast)" ));
 
-    g_pSSDP = new SSDP();
+    g_pSSDP = new SSDP( new QMulticastSocket( SSDP_GROUP, SSDP_PORT ) );
     g_pSSDP->start();
+
+    if (bBroadcastSupport)
+    {
+        VERBOSE(VB_UPNP, QString(  "UPnp::UPnp:Starting SSDP Thread (Broadcast)" ));
+
+        g_pSSDPBroadcast = new SSDP( new QBroadcastSocket( "255.255.255.255", SSDP_PORT ), false );
+        g_pSSDPBroadcast->start();
+    }
 
     // ----------------------------------------------------------------------
     //
@@ -136,6 +153,14 @@ void UPnp::CleanUp( void )
 
         delete g_pSSDP;
         g_pSSDP = NULL;
+    }
+
+    if (g_pSSDPBroadcast)
+    {
+        g_pSSDPBroadcast->RequestTerminate();
+
+        delete g_pSSDPBroadcast;
+        g_pSSDPBroadcast = NULL;
     }
 
     // ----------------------------------------------------------------------

@@ -25,6 +25,7 @@
 #include "httpserver.h"
 #include "ssdp.h"
 #include "upnpcds.h"
+#include "upnpcmgr.h"
 
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
@@ -41,6 +42,7 @@ class UPnp : public QObject
     protected:
         
         UPnpCDS                *m_pUPnpCDS;      // Do not delete (auto deleted)
+        UPnpCMGR               *m_pUPnpCMGR;     // Do not delete (auto deleted)
         HttpServer             *m_pHttpServer;
 
     public:
@@ -50,6 +52,7 @@ class UPnp : public QObject
         static UPnpDeviceDesc   g_UPnpDeviceDesc;
         static TaskQueue       *g_pTaskQueue;
         static SSDP            *g_pSSDP;
+        static SSDP            *g_pSSDPBroadcast;
 
     public:
                  UPnp( bool bMaster, HttpServer *pHttpServer );

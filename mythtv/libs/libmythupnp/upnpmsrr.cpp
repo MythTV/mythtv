@@ -7,28 +7,24 @@
 
 #include "upnpmsrr.h"
 
-#include "util.h"
-
-#include <qtextstream.h>
 #include <math.h>
 #include <qregexp.h>
-
-#define DIDL_LITE_BEGIN "<DIDL-Lite xmlns:dc=\"http://purl.org/dc/elements/1.1/\" xmlns:upnp=\"urn:schemas-upnp-org:metadata-1-0/upnp/\" xmlns=\"urn:schemas-upnp-org:metadata-1-0/DIDL-Lite/\">"
-#define DIDL_LITE_END   "</DIDL-Lite>";
 
 /////////////////////////////////////////////////////////////////////////////
 //
 /////////////////////////////////////////////////////////////////////////////
 
-UPnpMSRR::UPnpMSRR() : HttpServerExtension( "UPnpMSRR" )
+UPnpMSRR::UPnpMSRR() : Eventing( "UPnpMSRR", "_MSRR_1-0_event" )
 {
-    m_root.m_eType      = OT_Container;
-    m_root.m_sId        = "0";
-    m_root.m_sParentId  = "-1";
-    m_root.m_sTitle     = "MythTv";
-    m_root.m_sClass     = "object.container";
-    m_root.m_bRestricted= true;
-    m_root.m_bSearchable= true;
+    AddVariable( new StateVariable< unsigned short >( "AuthorizationGrantedUpdateID", true ) );
+    AddVariable( new StateVariable< unsigned short >( "AuthorizationDeniedUpdateID" , true ) );
+    AddVariable( new StateVariable< unsigned short >( "ValidationSucceededUpdateID" , true ) );
+    AddVariable( new StateVariable< unsigned short >( "ValidationRevokedUpdateID"   , true ) );
+
+    SetValue< unsigned short >( "AuthorizationGrantedUpdateID", 0 );
+    SetValue< unsigned short >( "AuthorizationDeniedUpdateID" , 0 );
+    SetValue< unsigned short >( "ValidationSucceededUpdateID" , 0 );
+    SetValue< unsigned short >( "ValidationRevokedUpdateID"   , 0 );
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -56,14 +52,19 @@ UPnpMSRRMethod UPnpMSRR::GetMethod( const QString &sURI )
 //
 /////////////////////////////////////////////////////////////////////////////
 
-bool UPnpMSRR::ProcessRequest( HttpWorkerThread * /*pThread*/, HTTPRequest *pRequest )
+bool UPnpMSRR::ProcessRequest( HttpWorkerThread *pThread, HTTPRequest *pRequest )
 {
-    VERBOSE(VB_UPNP, QString("UPnpMSRR::ProcessRequest : %1 : %2 :").arg(pRequest->m_sBaseUrl).arg(pRequest->m_sMethod));
-
     if (pRequest)
     {
+        if (Eventing::ProcessRequest( pThread, pRequest ))
+            return true;
+
         if ( pRequest->m_sBaseUrl != "/_MSRR_1-0_control" )
             return false;
+
+        VERBOSE(VB_UPNP, QString("UPnpMSRR::ProcessRequest : %1 : %2 :")
+                            .arg( pRequest->m_sBaseUrl )
+                            .arg( pRequest->m_sMethod  ));
 
         switch( GetMethod( pRequest->m_sMethod ) )
         {
@@ -73,7 +74,7 @@ bool UPnpMSRR::ProcessRequest( HttpWorkerThread * /*pThread*/, HTTPRequest *pReq
 
             default:
                 pRequest->FormatErrorReponse( 401, "Invalid Action" );
-                pRequest->m_nResponseStatus = 501;
+                pRequest->m_nResponseStatus = 401; //501;
                 break;
         }       
     }
@@ -118,24 +119,4 @@ void UPnpMSRR::HandleIsValidated( HTTPRequest *pRequest )
     pRequest->FormatActionReponse( &list );
 
 }
-
-//
-/////////////////////////////////////////////////////////////////////////////
-
-QString &UPnpMSRR::Encode( QString &sStr )
-{
-    sStr.replace(QRegExp( "&"), "&amp;" ); // This _must_ come first
-    sStr.replace(QRegExp( "<"), "&lt;"  );
-    sStr.replace(QRegExp( ">"), "&gt;"  );
-//    sStr.replace(QRegExp("\""), "&quot;");
-//    sStr.replace(QRegExp( "'"), "&apos;");
-
-    return( sStr );
-}
-
-/////////////////////////////////////////////////////////////////////////////
-//
-/////////////////////////////////////////////////////////////////////////////
-
-
 

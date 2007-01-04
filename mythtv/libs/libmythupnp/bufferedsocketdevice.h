@@ -12,6 +12,9 @@
 #define __BUFFEREDSOCKETDEVICE_H__
 
 #include <qsocketdevice.h>
+#include <sys/socket.h>
+
+#include "mythcontext.h"
 
 #include "private/qinternal_p.h"
 
@@ -41,7 +44,7 @@ class BufferedSocketDevice
         QMembuf                 m_bufRead;
         QPtrList<QByteArray>    m_bufWrite;
 
-        void    ReadBytes      ( );
+        int     ReadBytes      ( );
         bool    ConsumeWriteBuf( Q_ULONG nbytes );
 
     public:
@@ -57,6 +60,7 @@ class BufferedSocketDevice
         void                SetDestAddress      ( QHostAddress hostAddress,
                                                   Q_UINT16     nPort );
 
+        bool                Connect             ( const QHostAddress & addr, Q_UINT16 port );
         void                Close               ();
         void                Flush               ();
         QIODevice::Offset   Size                ();
@@ -66,6 +70,7 @@ class BufferedSocketDevice
 
         Q_ULONG             BytesAvailable      (); 
         Q_ULONG             WaitForMore         ( int msecs, bool *timeout = NULL );
+
         Q_ULONG             BytesToWrite        () const;
         void                ClearPendingData    ();
         void                ClearReadBuffer     ();
@@ -74,14 +79,14 @@ class BufferedSocketDevice
         Q_LONG              WriteBlock          ( const char *data, Q_ULONG len );
         Q_LONG              WriteBlockDirect    ( const char *data, Q_ULONG len );
 
-        Q_LONG              ReadLine            ( char *data, Q_ULONG maxlen );
-
         int                 Getch               ();
         int                 Putch               ( int );
         int                 Ungetch             (int);
 
         bool                CanReadLine         ();
-        virtual QString     ReadLine            ();
+        QString             ReadLine            ();
+        QString             ReadLine            ( int msecs );
+        Q_LONG              ReadLine            ( char *data, Q_ULONG maxlen );
 
         Q_UINT16            Port                () const;
         Q_UINT16            PeerPort            () const;
@@ -94,6 +99,5 @@ class BufferedSocketDevice
         bool                IsValid             () { return( ( m_pSocket ) ? m_pSocket->isValid() : false ); }
         int                 socket              () { return( ( m_pSocket ) ? m_pSocket->socket() : 0 ); }
 };
-
 
 #endif

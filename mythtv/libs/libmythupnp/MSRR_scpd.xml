@@ -1,5 +1,5 @@
-<?xml version=\"1.0\" encoding=\"utf-8\"?>
-<scpd xmlns=\"urn:schemas-upnp-org:service-1-0\">
+<?xml version="1.0" encoding="utf-8"?>
+<scpd xmlns="urn:schemas-upnp-org:service-1-0">
 <specVersion>
   <major>1</major>
   <minor>0</minor>
@@ -34,7 +34,7 @@
         <relatedStateVariable>A_ARG_TYPE_RegistrationRespMsg</relatedStateVariable>
       </argument>
     </argumentList>
-  </action>
+  </action>
   <action>
     <name>IsValidated</name>
     <argumentList>
@@ -52,35 +52,35 @@
   </action>
 </actionList>
 <serviceStateTable>
-  <stateVariable sendEvents=\"no\">
+  <stateVariable sendEvents="no">
     <name>A_ARG_TYPE_DeviceID</name>
     <dataType>string</dataType>
   </stateVariable>
-  <stateVariable sendEvents=\"no\">
+  <stateVariable sendEvents="no">
     <name>A_ARG_TYPE_Result</name>
     <dataType>int</dataType>
   </stateVariable>
-  <stateVariable sendEvents=\"no\">
+  <stateVariable sendEvents="no">
     <name>A_ARG_TYPE_RegistrationReqMsg</name>
     <dataType>bin.base64</dataType>
   </stateVariable>
-  <stateVariable sendEvents=\"no\">
+  <stateVariable sendEvents="no">
     <name>A_ARG_TYPE_RegistrationRespMsg</name>
     <dataType>bin.base64</dataType>
   </stateVariable>
-  <stateVariable sendEvents=\"no\">
+  <stateVariable sendEvents="yes">
     <name>AuthorizationGrantedUpdateID</name>
     <dataType>ui4</dataType>
   </stateVariable>
-  <stateVariable sendEvents=\"no\">
+  <stateVariable sendEvents="yes">
     <name>AuthorizationDeniedUpdateID</name>
     <dataType>ui4</dataType>
   </stateVariable>
-  <stateVariable sendEvents=\"no\">
+  <stateVariable sendEvents="yes">
     <name>ValidationSucceededUpdateID</name>
     <dataType>ui4</dataType>
   </stateVariable>
-  <stateVariable sendEvents=\"no\">
+  <stateVariable sendEvents="yes">
     <name>ValidationRevokedUpdateID</name>
     <dataType>ui4</dataType>
   </stateVariable>

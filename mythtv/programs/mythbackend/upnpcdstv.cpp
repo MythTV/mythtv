@@ -564,6 +564,10 @@ UPnpCDSExtensionResults *UPnpCDSTv::ProcessContainer( UPnpCDSBrowseRequest    *p
 
             break;
         }
+
+        case CDS_BrowseUnknown:
+            break;
+
     }
 
     return( pResults );
@@ -802,7 +806,7 @@ void UPnpCDSTv::AddVideoItem( UPnpCDSBrowseRequest    *pRequest,
     pRes->AddAttribute( "duration"  , sDur      );
     pRes->AddAttribute( "size"      , longLongToString( nFileSize) );
 
-
+/*
     // ----------------------------------------------------------------------
     // Add Video Resource Element based on File extension (mythtv)
     // ----------------------------------------------------------------------
@@ -816,7 +820,7 @@ void UPnpCDSTv::AddVideoItem( UPnpCDSBrowseRequest    *pRequest,
 
     pRes->AddAttribute( "duration"  , sDur      );
     pRes->AddAttribute( "size"      , longLongToString( nFileSize) );
-
+*/
     // ----------------------------------------------------------------------
     // Add Thumbnail Resource
     // ----------------------------------------------------------------------
@@ -825,5 +829,6 @@ void UPnpCDSTv::AddVideoItem( UPnpCDSBrowseRequest    *pRequest,
                                           .arg( sURIParams ); 
 
     pItem->AddResource( "http-get:*:image/png:*" , sURI );
+
 }
 

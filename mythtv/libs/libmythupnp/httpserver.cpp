@@ -9,6 +9,8 @@
 //                                                                            
 //////////////////////////////////////////////////////////////////////////////
 
+#include <unistd.h>
+
 #include <qregexp.h>
 #include <qstringlist.h>
 #include <qtextstream.h>
@@ -32,7 +34,7 @@
 /////////////////////////////////////////////////////////////////////////////
 
 HttpServer::HttpServer( int nPort ) 
-          : QServerSocket( nPort, 1), // 5),
+          : QServerSocket( nPort, 20 ), //5),
             ThreadPool( "HTTP" )
 {
     m_extensions.setAutoDelete( true );
@@ -140,8 +142,8 @@ HttpWorkerThread::HttpWorkerThread( HttpServer *pParent, const QString &sName ) 
                   WorkerThread( (ThreadPool *)pParent, sName )
 {
     m_pHttpServer    = pParent;
-    m_nSocket        = 0;
-    m_nSocketTimeout = gContext->GetNumSetting( "HTTPKeepAliveTimeoutSecs", 600 ) * 1000;
+    m_nSocket        = 0;                                                  
+    m_nSocketTimeout = gContext->GetNumSetting( "HTTPKeepAliveTimeoutSecs", 10 ) * 1000;
 
     m_pData          = NULL;
 }                  
@@ -177,13 +179,9 @@ void HttpWorkerThread::SetWorkerData( HttpWorkerData *pData )
 
 void HttpWorkerThread::StartWork( int nSocket )
 {
-//cout << "HttpWorkerThread::StartWork:Begin" << endl;
-
     m_nSocket = nSocket;
 
     SignalWork();
-
-//cout << "HttpWorkerThread::StartWork:End" << endl;
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -227,8 +225,6 @@ void  HttpWorkerThread::ProcessWork()
                     {
                         bKeepAlive = pRequest->GetKeepAlive();
 
-                        //  cout << "Request: (" << QThread::currentThread() << ") socket=" << m_nSocket << " " << pRequest->m_sRequest;
-
                         // ------------------------------------------------------
                         // Request Parsed... Pass on to Main HttpServer class to 
                         // delegate processing to HttpServerExtensions.
@@ -268,7 +264,19 @@ void  HttpWorkerThread::ProcessWork()
                 // Always MUST send a response.
                 // ----------------------------------------------------------
 
-                pRequest->SendResponse();
+                if (pRequest->SendResponse() < 0)
+                {
+                    bKeepAlive = false;
+                    VERBOSE( VB_UPNP, QString( "HttpWorkerThread::ProcessWork socket(%1) - Error returned from SendResponse... Closing connection" )
+                                         .arg( m_nSocket ));
+                }
+
+                // ----------------------------------------------------------
+                // Check to see if a PostProcess was registered
+                // ----------------------------------------------------------
+
+                if ( pRequest->m_pPostProcess != NULL )
+                    pRequest->m_pPostProcess->ExecutePostProcess();
 
                 delete pRequest;
                 pRequest = NULL;
