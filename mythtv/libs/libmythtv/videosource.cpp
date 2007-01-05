@@ -512,28 +512,42 @@ XMLTVConfig::XMLTVConfig(const VideoSource &parent) :
     addTarget("eitonly", new EITOnly_config(parent));
     grabber->addSelection("Transmitted guide only (EIT)", "eitonly");
 
-    QProcess find_grabber_proc( this );
-    find_grabber_proc.addArgument("tv_find_grabbers");
-    if ( !find_grabber_proc.start() ) {
-        VERBOSE(VB_IMPORTANT, "Failed to run tv_find_grabbers");
-    }
+    QProcess find_grabber_proc( QString("tv_find_grabbers"), this );
+    find_grabber_proc.addArgument("baseline");
+    find_grabber_proc.addArgument("manualconfig");
+    if ( find_grabber_proc.start() ) {
 
-    while (find_grabber_proc.isRunning())
-    {
-        usleep(100000);
-    }
-
-    if (find_grabber_proc.normalExit())
-    {
-        while (find_grabber_proc.canReadLineStdout())
+        int i=0;
+        // Assume it shouldn't take more than 5 seconds
+        // Broken versions of QT cause QProcess::start
+        // and QProcess::isRunning to return true even
+        // when the executable doesn't exist
+        while (find_grabber_proc.isRunning() && i < 50)
         {
-            QString grabber_list = find_grabber_proc.readLineStdout();
-            QStringList grabber_split = QStringList::split("|", grabber_list);
-            QString grabber_name = grabber_split[1] + " (xmltv)";
-            QFileInfo grabber_file(grabber_split[0]);
-            addTarget(grabber_file.fileName(), new XMLTV_generic_config(parent, grabber_file.fileName()));
-            grabber->addSelection(grabber_name, grabber_file.fileName());
+            usleep(100000);
+            ++i;
         }
+
+        if (find_grabber_proc.normalExit())
+        {
+            while (find_grabber_proc.canReadLineStdout())
+            {
+                QString grabber_list = find_grabber_proc.readLineStdout();
+                QStringList grabber_split = QStringList::split("|",
+                    grabber_list);
+                QString grabber_name = grabber_split[1] + " (xmltv)";
+                QFileInfo grabber_file(grabber_split[0]);
+                addTarget(grabber_file.fileName(),
+                    new XMLTV_generic_config(parent, grabber_file.fileName()));
+                grabber->addSelection(grabber_name, grabber_file.fileName());
+            }
+        }
+        else {
+            VERBOSE(VB_IMPORTANT, "tv_find_grabbers exited early or we timed out waiting");
+        }
+    }
+    else {
+        VERBOSE(VB_IMPORTANT, "Failed to run tv_find_grabbers");
     }
 
     addTarget("/bin/true", new NoGrabber_config(parent));
