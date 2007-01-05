@@ -315,6 +315,16 @@ HostSlider *DVDBookmarkDays()
     return gs;
 }
 
+HostSlider *SetDVDDriveSpeed()
+{
+    HostSlider *gs = new HostSlider("DVDDriveSpeed",2, 12, 2);
+    gs->setLabel(QObject::tr("DVD Drive Speed"));
+    gs->setValue(2);
+    gs->setHelpText(QObject::tr("Set DVD Drive Speed during DVD Playback. "
+                                "Speed is in multiples of 1350KB/sec"));
+    return gs;
+}
+
 HostCheckBox *EnableDVDBookmark()
 {
     HostCheckBox *gc = new HostCheckBox("EnableDVDBookmark");
@@ -548,6 +558,7 @@ VideoGeneralSettings::VideoGeneralSettings()
     general3->addChild(SetDVDDevice());
     general3->addChild(SetVCDDevice());
     general3->addChild(SetOnInsertDVD());
+    general3->addChild(SetDVDDriveSpeed());
     general3->addChild(new DVDBookmarkSettings());
     addChild(general3);
 

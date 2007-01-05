@@ -71,6 +71,7 @@ void DVDRingBufferPriv::close(void)
 {
     if (dvdnav)
     {
+        SetDVDSpeed(dvdFilename, -1);
         dvdnav_close(dvdnav);
         dvdnav = NULL;
     }            
@@ -133,6 +134,8 @@ void DVDRingBufferPriv::GetDescForPos(QString &desc) const
 bool DVDRingBufferPriv::OpenFile(const QString &filename) 
 {
     dvdFilename = filename.ascii();
+    int dvdDriveSpeed = gContext->GetNumSetting("DVDDriveSpeed", 2);
+    SetDVDSpeed(dvdFilename, dvdDriveSpeed);
     dvdnav_status_t dvdRet = dvdnav_open(&dvdnav, filename.local8Bit());
     if (dvdRet == DVDNAV_STATUS_ERR)
     {
