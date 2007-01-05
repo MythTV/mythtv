@@ -102,35 +102,6 @@ void ProgramData::clearDataBySource(int sourceid, QDateTime from, QDateTime to)
     }
 }
 
-void ProgramData::clearDBAtOffset(int offset, int chanid, QDate *qCurrentDate)
-{
-    if (no_delete)
-        return;
-
-    QDate newDate; 
-    if (qCurrentDate == 0)
-    {
-        newDate = QDate::currentDate();
-        qCurrentDate = &newDate;
-    }
-
-    int nextoffset = 1;
-
-    if (offset == -1)
-    {
-        offset = 0;
-        nextoffset = 10;
-    }
-
-    QDateTime from, to;
-    from.setDate(*qCurrentDate);
-    from = from.addDays(offset);
-    from = from.addSecs(listing_wrap_offset);
-    to = from.addDays(nextoffset);
-
-    clearDataByChannel(chanid, from, to);
-}
-
 void ProgramData::clearOldDBEntries(void)
 {
     MSqlQuery query(MSqlQuery::InitCon());

@@ -100,7 +100,6 @@ class MPUBLIC ProgramData
   public:
     ProgramData() : quiet(false), no_delete(false), listing_wrap_offset(0) {}
 
-    void clearDBAtOffset(int offset, int chanid, QDate *qCurrentDate);
     void clearOldDBEntries(void);
     void handlePrograms(int id,
                         QMap<QString, QValueList<ProgInfo> > *proglist);
