@@ -206,7 +206,11 @@ long HTTPRequest::SendResponse( void )
             // Make it so the header is sent with the data
             // --------------------------------------------------------------
 
-            setsockopt( getSocketHandle(), SOL_TCP, TCP_CORK, &g_on, sizeof( g_on )); 
+#if !defined(CONFIG_DARWIN) && !defined(CONFIG_CYGWIN)
+            // Never send out partially complete segments
+            setsockopt( getSocketHandle(), SOL_TCP, TCP_CORK,
+                        &g_on, sizeof( g_on ));
+#endif
 
             nBytes = WriteBlockDirect( sHeader.data(), sHeader.length() );
 
@@ -228,8 +232,10 @@ long HTTPRequest::SendResponse( void )
     // ----------------------------------------------------------------------
     // Turn off the option so any small remaining packets will be sent
     // ----------------------------------------------------------------------
-    
-    setsockopt( getSocketHandle(), SOL_TCP, TCP_CORK, &g_off, sizeof( g_off )); 
+
+#if !defined(CONFIG_DARWIN) && !defined(CONFIG_CYGWIN)
+    setsockopt( getSocketHandle(), SOL_TCP, TCP_CORK, &g_off, sizeof( g_off ));
+#endif
 
     return( nBytes );
 }
@@ -261,7 +267,10 @@ long HTTPRequest::SendResponseFile( QString sFileName )
     // Make it so the header is sent with the data
     // ----------------------------------------------------------------------
 
-    setsockopt( getSocketHandle(), SOL_TCP, TCP_CORK, &g_on, sizeof( g_on )); 
+#if !defined(CONFIG_DARWIN) && !defined(CONFIG_CYGWIN)
+    // Never send out partially complete segments
+    setsockopt( getSocketHandle(), SOL_TCP, TCP_CORK, &g_on, sizeof( g_on ));
+#endif
 
     if (QFile::exists( sFileName ))
     {
@@ -392,7 +401,9 @@ long HTTPRequest::SendResponseFile( QString sFileName )
     // Turn off the option so any small remaining packets will be sent
     // ----------------------------------------------------------------------
     
-    setsockopt( getSocketHandle(), SOL_TCP, TCP_CORK, &g_off, sizeof( g_off )); 
+#if !defined(CONFIG_DARWIN) && !defined(CONFIG_CYGWIN)
+    setsockopt( getSocketHandle(), SOL_TCP, TCP_CORK, &g_off, sizeof( g_off ));
+#endif
 
     // -=>TODO: Only returns header length... 
     //          should we change to return total bytes?
