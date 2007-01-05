@@ -7,8 +7,14 @@
 my $usage = '
 osx-bundler.pl executable [lib-dir] [lib-dir...]
 osx-bundler.pl target.app [lib-dir] [lib-dir...]
+osx-bundler.pl target1.app/Contents/MacOS/target2 [lib-dir...]
+osx-bundler.pl target1.app/Contents/Resources/lib/extra.dylib [lib-dir...]
 ';
 # The first form builds a new bundle, executable.app
+# The second form checks/adds Frameworks in an existing bundle
+# The third form checks/updates/adds Frameworks
+# for an extra executable in an existing bundle,
+# and the fourth form does the same for an extra library.
 #
 # = DESCRIPTION
 # On OS X, make usually just gives you an executable.
@@ -26,8 +32,7 @@ osx-bundler.pl target.app [lib-dir] [lib-dir...]
 # Doesn't do anything about Universal Binaries yet
 #
 # = TO DO
-# Remove QTDIR
-# Add arg processing for verbose, and to allow the user to specify
+# Add more arguments to allow the user to specify
 # .pinfo fields like CFBundleIdentifier, CFBundleSignature,
 # NSHumanReadableCopyright, CFBundleGetInfoString, et c.
 #
@@ -42,23 +47,38 @@ osx-bundler.pl target.app [lib-dir] [lib-dir...]
 use strict;
 use Cwd;
 use File::Basename;
+use Getopt::Long;
+
+sub usage($)
+{
+    print "Usage:$usage";
+    exit @_;
+}
 
 if ( $#ARGV < 0 )
 {
-    print "No application or executable provided\n$usage";
-    exit -1;
+    print "No application or executable provided\n";
+    usage(-1);
 }
-
-my $binary  = shift @ARGV;
-my @libdirs = @ARGV;
 
 # ============================================================================
 
 my $verbose = 0;
 my $Id = '$Id$';  # Version of this script. From version control system
+my $binary;
 my $binbase;      # $binary without any directory path
 my $bundle;
+my @libdirs;
 my $target;  # Full path to the binary under $bundle
+
+# Process arguments:
+
+Getopt::Long::GetOptions('verbose' => \$verbose) or usage(-1);
+
+$binary  = shift @ARGV;
+@libdirs = @ARGV;
+
+# ============================================================================
 
 if ( $binary =~ m/(.*)\.app$/ )
 {
@@ -74,7 +94,7 @@ if ( $binary =~ m/(.*)\.app$/ )
         exit -2;
     }
 }
-else
+elsif ( $binary !~ m/\.app/ )  # No .app means second form (binary executable)
 {
     if ( ! -e $binary )
     {
@@ -95,6 +115,20 @@ else
     # write a custom Info.plist
     &GeneratePlist($binary, $binbase, $bundle, '1.0');
 }
+elsif ( $binary =~ m/\.app/ )  # Third/fourth form (exe/lib in existing bundle)
+{
+    $target = $binary;
+
+    if ( ! -e $target )
+    {
+        &Complain("Couldn't locate $target");
+        exit -4;
+    }
+
+    $bundle = $target;
+    $bundle =~ s/\.app.*/.app/;
+}
+
 
 &Verbose("Installing frameworks into $target");
 &PackagedExecutable($bundle, $target, @libdirs);
@@ -243,7 +277,7 @@ sub GeneratePlist
   <key>CFBundleGetInfoString</key>
   <string>$vers, $Id</string>
   <key>CFBundleName</key>
-  <string>$name</string>
+  <string>$binary</string>
   <key>NSHumanReadableCopyright</key>
   <string>Packaged by $Id</string>
 </dict>
@@ -274,11 +308,7 @@ sub FindLibraryFile($@)
 
     return Cwd::abs_path($dylib) if (-e $dylib);
 
-    #if ( $ENV{'QTDIR'} )
-    #{
-    #    $path = "$ENV{'QTDIR'}/lib/$dylib";
-    #    if ( -e $path ) { return Cwd::abs_path($path) }
-    #}
+    # 
 
     foreach my $dir ( @libdirs )
     {
@@ -309,7 +339,7 @@ sub ProcessDependencies(@)
         &Verbose($cmd);
         my @deps = `$cmd`;
         shift @deps;  # first line just repeats filename
-        &Verbose("Dependencies for $file = @deps");
+        &Verbose("Dependencies for $file =\n @deps");
         foreach my $dep (@deps)
         {
             chomp $dep;
@@ -328,26 +358,17 @@ sub ProcessDependencies(@)
             # Any dependency which is already package relative can be ignored
             next if $dep =~ m/\@executable_path/;
 
-            # ONLY if it is already in the bundle:
-            if ( $dep =~ m/\@executable_path/ )
-            {
-                $dep =~ s,\@executable_path/..,$bundle/Contents,;
-
-                if ( -e $dep )
-                {  next;  }
-
-                &Complain("Can't locate dependency $dep");
-                #exit;
-            }
-
             # skip system library locations
             next if ($dep =~ m|^/System|  ||
                      $dep =~ m|^/usr/lib|);
 
             my ($base) = &BaseVers($dep);
-            $depfiles{$base} = $dep;
 
-            # Change references while we're here
+            # Only add this dependency if needed. This assumes that 
+            # we aren't mixing versions of the same library name
+            if ( ! -e "$bundle/Contents/Frameworks/$base.framework/$base" )
+            {   $depfiles{$base} = $dep   }
+
             &Syscall([ '/usr/bin/install_name_tool', '-change', $dep,
                        "\@executable_path/../Frameworks/$base.framework/$base",
                        $file ]) or die;
