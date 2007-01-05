@@ -1201,4 +1201,6 @@ bool BufferedSocketDeviceRequest::IsBlocking()
 {
     if (m_pSocket)
         return( m_pSocket->SocketDevice()->blocking());
+
+    return false;
 }

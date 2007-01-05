@@ -131,7 +131,8 @@ void SSDP::run()
                 }
                 else 
                 {
-                    VERBOSE(VB_UPNP, "No info from ParseRequest");
+                    VERBOSE(VB_UPNP, "No info from ParseRequest... Clearing");
+                    pSocket->ClearReadBuffer();
                 }  
 
                 delete pRequest;
