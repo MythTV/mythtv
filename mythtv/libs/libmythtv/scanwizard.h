@@ -47,8 +47,7 @@ class ScanWizard : public QObject, public ConfigurationWizard
   public:
     ScanWizard(uint    default_sourceid  = 0,
                uint    default_cardid    = 0,
-               QString default_inputname = QString::null,
-               bool    force_sourceid    = false);
+               QString default_inputname = QString::null);
 
     MythDialog *dialogWidget(MythMainWindow *parent, const char *widgetName);
 

@@ -728,7 +728,7 @@ QMap<QString,QString> ScanOptionalConfig::GetStartChan(void) const
 ScanWizardConfig::ScanWizardConfig(
     ScanWizard *_parent,
     uint    default_sourceid,  uint default_cardid,
-    QString default_inputname, bool force_sourceid) :
+    QString default_inputname) :
     VerticalConfigurationGroup(false, true, false, false),
     videoSource(new VideoSourceSelector(
                     default_sourceid, card_types(), false)),

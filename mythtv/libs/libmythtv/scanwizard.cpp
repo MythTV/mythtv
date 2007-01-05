@@ -39,13 +39,13 @@
 #define LOC QString("SWiz: ")
 #define LOC_ERR QString("SWiz, Error: ")
 
-ScanWizard::ScanWizard(uint    default_sourceid,  uint default_cardid,
-                       QString default_inputname, bool force_sourceid) :
+ScanWizard::ScanWizard(uint    default_sourceid,
+                       uint    default_cardid,
+                       QString default_inputname) :
     lastHWCardID(0),
     lastHWCardType(CardUtil::ERROR_PROBE),
-    configPane(new ScanWizardConfig(this,
-                                    default_sourceid,  default_cardid,
-                                    default_inputname, force_sourceid)),
+    configPane(new ScanWizardConfig(
+                   this, default_sourceid, default_cardid, default_inputname)),
     scannerPane(new ScanWizardScanner())
 {
     addChild(configPane);

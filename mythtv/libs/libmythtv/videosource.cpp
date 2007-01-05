@@ -1812,7 +1812,7 @@ void CardInput::channelScanner(void)
         return;
     }
 
-    ScanWizard *scanwizard = new ScanWizard(srcid, crdid, in, true);
+    ScanWizard *scanwizard = new ScanWizard(srcid, crdid, in);
     scanwizard->exec(false, true);
     scanwizard->deleteLater();
 

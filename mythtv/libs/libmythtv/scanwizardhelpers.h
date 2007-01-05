@@ -280,8 +280,9 @@ class ScanWizardConfig: public VerticalConfigurationGroup
 
   public:
     ScanWizardConfig(ScanWizard *_parent,
-                     uint    default_sourceid,  uint default_cardid,
-                     QString default_inputname, bool force_sourceid);
+                     uint        default_sourceid,
+                     uint        default_cardid,
+                     QString     default_inputname);
 
     uint    GetSourceID(void)     const;
     QString GetATSCFormat(void)   const;
