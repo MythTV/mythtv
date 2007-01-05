@@ -28,6 +28,11 @@
 #include <iphlpapi.h>
 #endif
 
+// for OSX
+#include <unistd.h>    // execl, pipe, sysconf
+#include <sys/types.h> // waitpid
+#include <sys/wait.h>  // waitpid
+
 struct hdhomerun_discover_sock_t {
 	int sock;
 };
@@ -96,7 +101,118 @@ static int hdhomerun_discover_send_packet(struct hdhomerun_discover_sock_t *ds, 
 	return 0;
 }
 
-#if defined(__CYGWIN__) || defined(__WINDOWS__)
+#if defined(__APPLE__)
+static int hdhomerun_discover_send_internal(struct hdhomerun_discover_sock_t *ds, unsigned long device_type, unsigned long device_id)
+{
+    /* printf("Looking for 0x%lx with id 0x%lx\n", device_type, device_id); */
+    int fds[2];
+    if (pipe(fds) < 0)
+    {
+        printf("Pipe Failed\n");
+        return -1;
+    }
+
+    pid_t child = fork();
+    if (child < 0)
+    {
+        printf("Fork Failed\n");
+        return -1;
+    }
+    else if (child == 0)
+    {
+        /* Child */
+        int i = 0;
+
+        /* Attach stdout to pipe */
+        close(1);
+        dup2(fds[1], 1);
+
+        /* Close all open file descriptors except stdout/stderr */
+        for (i = sysconf(_SC_OPEN_MAX) - 1; i > 2; i--)
+            close(i);
+
+        /* Run command */
+        execl("/bin/sh", "sh", "-c", "ifconfig", NULL);
+
+        /* Failed to exec */
+        _exit(1); /* this exit is ok */
+    }
+    else
+    {
+        /* Parent */
+        int send_count = 0;
+        int status;
+        FILE *fp;
+        char line[1024];
+        char adaptor[1024];
+
+        close(fds[1]);
+
+        if (waitpid(child, &status, 0) < 0)
+            return -1;
+
+        if (WEXITSTATUS(status))
+            return -1;
+
+        fp = fdopen(fds[0], "r");
+        while (1)
+        {
+            char *ptr = NULL;
+            int netmask, broadcast;
+            int a,b,c,d;
+
+            if (!fgets(line, sizeof(line) - 1, fp))
+            {
+                break;
+            }
+
+            line[1023] = 0;
+
+            /* find ": flags" */
+            ptr = strnstr(line, ": flags", 1024 - 1);
+            if (ptr >= line)
+            {
+                /* grab adaptor before that */
+                strncpy(adaptor, line, ptr-line);
+                adaptor[ptr-line] = 0;
+            }
+
+            /* find "netmask " */
+            ptr = strnstr(line, "netmask ", 1024 - 1);
+            if (ptr <= line)
+                continue;
+            ptr += strlen("netmask ");
+            sscanf(ptr, "%x", &netmask);
+
+            /* find "broadcast " */
+            ptr = strnstr(ptr, "broadcast ", 1024 - 1);
+            if (ptr <= line)
+                continue;
+            ptr += strlen("broadcast ");
+            sscanf(ptr, "%i.%i.%i.%i", &a, &b, &c, &d);
+            broadcast = a<<24 | b<<16 | c<<8 | d;
+            /*
+            printf("Adaptor: '%s' 0x%08x %i.%i.%i.%i\n",
+                   adaptor, broadcast, a,b,c,d);
+            */
+
+            /* send discover packet this adaptor */
+            if (hdhomerun_discover_send_packet(
+                    ds, broadcast, device_type, device_id) >= 0)
+            {
+                send_count++;
+            }
+        }
+
+        fclose(fp); /* this closes fds[0] as well */
+
+        /* printf("send_count: %i\n\n", send_count); */
+        return (send_count == 0) ? -1 : 0;
+    }
+}
+
+#elif defined(__CYGWIN__) || defined(__WINDOWS__)
+
 static int hdhomerun_discover_send_internal(struct hdhomerun_discover_sock_t *ds, uint32_t device_type, uint32_t device_id)
 {
 	PIP_ADAPTER_INFO pAdapterInfo = (IP_ADAPTER_INFO *)malloc(sizeof(IP_ADAPTER_INFO));
@@ -150,9 +266,9 @@ static int hdhomerun_discover_send_internal(struct hdhomerun_discover_sock_t *ds
 	}
 	return 0;
 }
-#endif
 
-#if defined(__linux__)
+#elif defined(__linux__)
+
 static int hdhomerun_discover_send_internal(struct hdhomerun_discover_sock_t *ds, uint32_t device_type, uint32_t device_id)
 {
 	FILE *fp = fopen("/proc/net/route", "r");
@@ -195,9 +311,9 @@ static int hdhomerun_discover_send_internal(struct hdhomerun_discover_sock_t *ds
 	}
 	return 0;
 }
-#endif
 
-#if !defined(__CYGWIN__) && !defined(__WINDOWS__) && !defined(__linux__)
+#else
+
 static int hdhomerun_discover_send_internal(struct hdhomerun_discover_sock_t *ds, uint32_t device_type, uint32_t device_id)
 {
 	return -1;
