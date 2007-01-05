@@ -168,10 +168,8 @@ void MHText::Preparation(MHEngine *engine)
 //  else m_Font.Copy(engine->m_DefaultFont);
     if (m_OriginalTextColour.IsSet()) m_textColour.Copy(m_OriginalTextColour);
     else engine->GetDefaultTextColour(m_textColour);
-    ASSERT(m_textColour.IsSet());
     if (m_OriginalBgColour.IsSet()) m_bgColour.Copy(m_OriginalBgColour);
     else engine->GetDefaultBGColour(m_bgColour);
-    ASSERT(m_bgColour.IsSet());
     if (m_OriginalFontAttrs.Size() > 0) m_fontAttrs.Copy(m_OriginalFontAttrs);
     else engine->GetDefaultFontAttrs(m_fontAttrs);
     MHVisible::Preparation(engine);
@@ -184,7 +182,8 @@ void MHText::Preparation(MHEngine *engine)
 void MHText::ContentPreparation(MHEngine *engine)
 {
     MHVisible::ContentPreparation(engine);
-    ASSERT(m_ContentType != IN_NoContent);
+    if (m_ContentType == IN_NoContent)
+        MHERROR("Text object must have content");
     if (m_ContentType == IN_IncludedContent) CreateContent(m_IncludedContent.Bytes(), m_IncludedContent.Size(), engine);
 }
 
@@ -243,7 +242,6 @@ static void InterpretAttributes(const MHOctetString &attrs, int &style, int &siz
     }
     else { // Textual form.
         const unsigned char *str = attrs.Bytes();
-        ASSERT(str != NULL);
         const char *p = (const char *)str;
         char *q = strchr(p, '.'); // Find the terminating dot
         if (q != NULL) { // plain, italic etc.
@@ -305,10 +303,12 @@ MHTextItem *MHTextItem::NewItem()
 // A line consists of one or more sequences of text items.
 class MHTextLine {
 public:
-    MHTextLine(): m_nLineWidth(0) {}
+    MHTextLine(): m_nLineWidth(0), m_nLineHeight(0), m_nDescent(0) {}
     ~MHTextLine();
     MHSequence <MHTextItem *> m_Items;
     int m_nLineWidth;
+    int m_nLineHeight;
+    int m_nDescent;
 };
 
 MHTextLine::~MHTextLine()
@@ -439,13 +439,8 @@ void MHText::Redraw()
             int nFullText = pItem->m_nUnicode;
             // Get the box size and update pItem->m_nUnicode to the number that will fit.
             QRect rect = m_pDisplay->GetBounds(pItem->m_Unicode, pItem->m_nUnicode, m_nBoxWidth - pLine->m_nLineWidth);
-            if (nFullText == pItem->m_nUnicode || ! m_fTextWrap) {
-                // All the characters fit or we're not wrapping.
-                pItem->m_Width = rect.width();
-                pLine->m_nLineWidth += rect.width();
-            }
 
-            else if (m_fTextWrap) { // No, we have to word-wrap.
+            if (nFullText != pItem->m_nUnicode && m_fTextWrap) { // Doesn't fit, we have to word-wrap.
                 int nTruncated = pItem->m_nUnicode; // Just in case.
                 // Now remove characters until we find a word-break character.
                 while (pItem->m_nUnicode > 0 && pItem->m_Unicode[pItem->m_nUnicode] != ' ') pItem->m_nUnicode--;
@@ -473,9 +468,12 @@ void MHText::Redraw()
                 // we are centering or right aligning the text we'll get it wrong.
                 while (pItem->m_nUnicode > 1 && pItem->m_Unicode[pItem->m_nUnicode-1] == ' ') pItem->m_nUnicode--;
                 rect = m_pDisplay->GetBounds(pItem->m_Unicode, pItem->m_nUnicode);
-                pItem->m_Width = rect.width();
-                pLine->m_nLineWidth += rect.width();
             }
+
+            pItem->m_Width = rect.width();
+            pLine->m_nLineWidth += rect.width();
+            if (rect.height() > pLine->m_nLineHeight) pLine->m_nLineHeight = rect.height();
+            if (rect.bottom() > pLine->m_nDescent) pLine->m_nDescent = rect.bottom();
         }
     }
 
@@ -494,7 +492,6 @@ void MHText::Redraw()
         int xOffset = 0;
         if (m_HorizJ == End) xOffset = m_nBoxWidth - pLine->m_nLineWidth;
         else if (m_HorizJ == Centre) xOffset = (m_nBoxWidth - pLine->m_nLineWidth)/2;
-        //ASSERT(xOffset >= 0);
 
         for (int j = 0; j < pLine->m_Items.Size(); j++) {
             MHTextItem *pItem = pLine->m_Items.GetAt(j);
@@ -502,7 +499,7 @@ void MHText::Redraw()
             for (int k = 0; k < pItem->m_nTabCount; k++) xOffset += TABSTOP - xOffset % TABSTOP;
 
             if (! pItem->m_Unicode.isEmpty()) { // We may have blank lines.
-                m_pDisplay->AddText(xOffset, yOffset + lineSpace,
+                m_pDisplay->AddText(xOffset, yOffset + (pLine->m_nLineHeight + lineSpace)/2 - pLine->m_nDescent,
                     pItem->m_Unicode.left(pItem->m_nUnicode), pItem->m_Colour);
             }
             xOffset += pItem->m_Width;

@@ -83,10 +83,7 @@ int MHEngine::RunAll()
         {
              startObj.m_GroupId.Copy(MHOctetString("~//startup"));
              if (! Launch(startObj))
-             {
-                 MHLOG(MHLogError, "Unable to launch application");
                  return -1;
-             }
         }
         m_fBooting = false;
     }
@@ -122,8 +119,9 @@ int MHEngine::RunAll()
 
         if (! m_EventQueue.isEmpty()) {
             MHAsynchEvent *pEvent = m_EventQueue.first();
-            MHLOG(MHLogLinks, QString("Asynchronous event dequeued - %1")
-                .arg(MHLink::EventTypeToString(pEvent->eventType)));
+            MHLOG(MHLogLinks, QString("Asynchronous event dequeued - %1 from %2")
+                .arg(MHLink::EventTypeToString(pEvent->eventType))
+                .arg(pEvent->pEventSource->m_ObjectReference.Printable()));
             CheckLinks(pEvent->pEventSource->m_ObjectReference, pEvent->eventType, pEvent->eventData);
             m_EventQueue.removeFirst();
         }
@@ -348,7 +346,6 @@ QString MHEngine::GetPathName(const MHOctetString &str)
     // Remove any occurrences of x/../
     int nPos;
     while ((nPos = csPath.find("/../")) >= 0) {
-        ASSERT(false); // To check.
         int nEnd = nPos+4;
         while (nPos >= 1 && csPath[nPos-1] != '/') nPos--;
         csPath = csPath.left(nPos) + csPath.mid(nEnd);
@@ -470,17 +467,12 @@ void MHEngine::CheckLinks(const MHObjectRef &sourceRef, enum EventType ev, const
 // Add and remove links to and from the active link table.
 void MHEngine::AddLink(MHLink *pLink)
 {
-#ifdef _DEBUG
-    // Should not be there already.
-    for (int i = 0; i < m_LinkTable.count(); i++) ASSERT(pLink != m_LinkTable.at(i));
-#endif
     m_LinkTable.append(pLink);
 }
 
 void MHEngine::RemoveLink(MHLink *pLink)
 {
-    bool fRes = m_LinkTable.removeRef(pLink);
-    ASSERT(fRes); // The link should have been there.
+    (void)m_LinkTable.removeRef(pLink);
 }
 
 // Called when a link fires to add the actions to the action stack.

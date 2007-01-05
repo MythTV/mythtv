@@ -475,11 +475,11 @@ void MHParseText::NextSym()
 
         case '`': // Start of a string using base 64
             // These can, presumably span lines.
-            ASSERT(FALSE); // TODO
+            MHERROR("Base 64 string is not implemented");
             break;
 
         case '#': // Start of 3-byte hex constant.
-            ASSERT(FALSE); // TODO
+            MHERROR("3-byte hex constant is not implemented");
             break;
 
         case '-': case '0': case '1': case '2': case '3': case '4': case '5': case '6': case '7': case '8': case '9':
@@ -495,7 +495,7 @@ void MHParseText::NextSym()
                 m_nInt = m_ch - '0';
                 GetNextChar();
                 if (m_nInt == 0 && (m_ch == 'x' || m_ch == 'X')) {
-                    ASSERT(FALSE); // TODO
+                    MHERROR("Hex constant is not implemented");
                 }
                 while (m_ch >= '0' && m_ch <= '9') {
                     m_nInt = m_nInt * 10 + m_ch - '0';
@@ -791,7 +791,7 @@ MHParseNode *MHParseText::DoParse()
 
         case PTEnum:
             {
-                pRes = new MHPEnum(m_nInt); ASSERT(m_nInt > 0);
+                pRes = new MHPEnum(m_nInt);
                 NextSym();
                 break;
             }

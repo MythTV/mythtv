@@ -35,6 +35,7 @@
 #include "DynamicLineArt.h"
 #include "Link.h"
 #include "TokenGroup.h"
+#include "Logging.h"
 
 MHGroup::MHGroup()
 {
@@ -48,7 +49,8 @@ void MHGroup::Initialise(MHParseNode *p, MHEngine *engine)
     engine->GetGroupId().Copy(""); // Set to empty before we start (just in case).
     MHRoot::Initialise(p, engine);
     // Must be an external reference with an object number of zero.
-    ASSERT(m_ObjectReference.m_nObjectNo == 0 && m_ObjectReference.m_GroupId.Size() != 0);
+    if (m_ObjectReference.m_nObjectNo != 0 || m_ObjectReference.m_GroupId.Size() == 0)
+        MHERROR("Object reference for a group object must be zero and external");
     // Set the group id for the rest of the group to this.
     engine->GetGroupId().Copy(m_ObjectReference.m_GroupId);
     // Some of the information is irrelevant.
@@ -99,7 +101,7 @@ void MHGroup::Initialise(MHParseNode *p, MHEngine *engine)
             case C_TOKEN_GROUP: pIngredient = new MHTokenGroup; break;
             case C_LIST_GROUP: pIngredient = new MHListGroup; break;
             default:
-                ASSERT(FALSE); // So we find out about these when debugging.
+                MHLOG(MHLogWarning, QString("Unknown ingredient %1").arg(pItem->GetTagNo()));
                 // Future proofing: ignore any ingredients that we don't know about.
                 // Obviously these can only arise in the binary coding.
             }
@@ -404,9 +406,7 @@ void MHScene::Initialise(MHParseNode *p, MHEngine *engine)
     // Moving cursor
     MHParseNode *pMovingCursor = p->GetNamedArg(C_MOVING_CURSOR);
     if (pMovingCursor) pMovingCursor->GetArgN(0)->GetBoolValue();
-    // Next scene sequence.
-    MHParseNode *pNextScenes = p->GetNamedArg(C_NEXT_SCENES);
-    if (pNextScenes) { ASSERT(FALSE); } // TODO:
+    // Next scene sequence: this is just a hint and isn't implemented
 }
 
 void MHScene::PrintMe(FILE *fd, int nTabs) const
@@ -559,7 +559,6 @@ void MHTransitionTo::Initialise(MHParseNode *p, MHEngine *engine)
             m_fIsTagged = TRUE;
             m_nConnectionTag = pCtag->GetIntValue();
         }
-        else ASSERT(pCtag->m_nNodeType == MHParseNode::PNNull);
     }
     if (p->GetArgCount() > 2) {
         MHParseNode *pTrEff = p->GetArgN(2);

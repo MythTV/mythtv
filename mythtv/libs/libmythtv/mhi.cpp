@@ -27,6 +27,7 @@ class MHIImageData
 
 MHIContext::MHIContext(InteractiveTV *parent)
     : m_parent(parent),     m_dsmcc(NULL),
+      m_keyProfile(0),
       m_engine(NULL),       m_stop(false),
       m_stopped(false),     m_updated(false),
       m_displayWidth(StdDisplayWidth), m_displayHeight(StdDisplayHeight),
@@ -359,8 +360,6 @@ bool MHIContext::OfferKey(QString key)
         if (m_keyProfile == 4 || m_keyProfile == 5)
             action = 15;
     }
-    // The EXIT key is supposed to be passed to the MHEG application
-    // in all circumstances but we need it for 
     else if (key == "TEXTEXIT")
         action = 16;
     else if (key == "MENURED")
@@ -680,49 +679,26 @@ void MHIContext::DrawRect(int xPos, int yPos, int width, int height,
     QRgb qColour = qRgba(colour.red(), colour.green(),
                          colour.blue(), colour.alpha());
 
-    QRgb qTransparent = qRgba(0,0,0,0);
-
-    int  scaledxPos   = xPos * GetWidth()  / MHIContext::StdDisplayWidth;
-    int  scaledyPos   = yPos * GetHeight() / MHIContext::StdDisplayHeight;
-    int  xboundary    = scaledxPos & 1;
-    int  yboundary    = scaledyPos & 1;
-    int  scaledWidth  = width  * GetWidth()  / MHIContext::StdDisplayWidth;
-    int  scaledHeight = height * GetHeight() / MHIContext::StdDisplayHeight;
-
-    if (xboundary)
-    {
-        scaledxPos--;
-        scaledWidth++;
-    }
-
-    if (yboundary)
-    {
-        scaledyPos--;
-        scaledHeight++;
-    }
-
+    // This is a bit of a mess: we should be able to create a rectangle object.
+    // Scale the image to the current display size
+    int scaledWidth = width * GetWidth() / MHIContext::StdDisplayWidth;
+    int scaledHeight = height * GetHeight() / MHIContext::StdDisplayHeight;
     QImage qImage(scaledWidth, scaledHeight, 32);
     qImage.setAlphaBuffer(true);
 
-    if (xboundary)
-    {
-        for (int i = 0; i < scaledHeight; i++)
-            qImage.setPixel(0, i, qTransparent);
-    }
-
-    if (yboundary)
+    // As far as I can tell this is the only way to draw with an
+    // intermediate transparency.
+    for (int i = 0; i < scaledHeight; i++)
     {
         for (int j = 0; j < scaledWidth; j++)
-            qImage.setPixel(j, 0, qTransparent);
+        {
+            qImage.setPixel(j, i, qColour);
+        }
     }
 
-    // As far as I can tell this is the only way to draw
-    // with an intermediate transparency. -- david mathews
-    for (int i = yboundary; i < scaledHeight; i++)
-        for (int j = xboundary; j < scaledWidth; j++)
-            qImage.setPixel(j, i, qColour);
-
-    AddToDisplay(qImage, scaledxPos, scaledyPos);
+    AddToDisplay(qImage,
+        xPos * GetWidth() / MHIContext::StdDisplayWidth,
+        yPos * GetHeight() / MHIContext::StdDisplayHeight);
 }
 
 // Draw an image at the specified position.
@@ -916,8 +892,7 @@ void MHIText::AddText(int x, int y, const QString &str, MHRgba colour)
     // X positions are computed to 64ths and rounded.
     // Y positions are in pixels
     int posX = x << 6;
-    // Add in the (negative) descender rounded up
-    int pixelY = y + ((face->descender - ((1<<6) -1)) >> 6);
+    int pixelY = y;
     FT_Bool useKerning = FT_HAS_KERNING(face);
     FT_UInt previous = 0;
 

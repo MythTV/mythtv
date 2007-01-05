@@ -55,7 +55,7 @@ public:
     virtual void Unload(MHEngine *engine) { Destruction(engine); }
 
     // Called by the engine to deliver external content.
-    virtual void ContentArrived(const unsigned char *, int, MHEngine *) { ASSERT(false); }
+    virtual void ContentArrived(const unsigned char *, int, MHEngine *) { }
 
 protected:
     bool    m_fInitiallyActive;

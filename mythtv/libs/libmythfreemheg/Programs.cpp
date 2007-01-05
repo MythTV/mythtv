@@ -387,48 +387,48 @@ void MHResidentProgram::CallProgram(bool fIsFork, const MHObjectRef &success, co
         }
         else if (m_Name.Equal("TII")) { // SI_TuneIndexInfo
             // Indicates whether to perform a subsequent TIn quietly or normally. 
-            ASSERT(false);
+            MHERROR("SI_TuneIndexInfo ResidentProgram is not implemented");
         }
         else if (m_Name.Equal("BSI")) { // SI_GetBasicSI
             // Returns basic SI information about the service indicated by an index
             // returned by GSI.
             // Returns networkID, origNetworkID, transportStreamID, serviceID
-            ASSERT(false);
+            MHERROR("SI_GetBasicSI ResidentProgram is not implemented");
         }
         else if (m_Name.Equal("GBI")) { // GetBootInfo
             // Gets the NB_info field.
-            ASSERT(false);
+            MHERROR("GetBootInfo ResidentProgram is not implemented");
         }
         else if (m_Name.Equal("CCR")) { // CheckContentRef
             // Sees if an item with a particular content reference is available
             // in the carousel.
-            ASSERT(false);
+            MHERROR("CheckContentRef ResidentProgram is not implemented");
         }
         else if (m_Name.Equal("CGR")) { // CheckGroupIDRef
             // Sees if an application or scene with a particular group id
             // is available in the carousel.
-            ASSERT(false);
+            MHERROR("CheckGroupIDRef ResidentProgram is not implemented");
         }
         else if (m_Name.Equal("VTG")) { // VideoToGraphics
             // Video to graphics transformation.
-            ASSERT(false);
+            MHERROR("VideoToGraphics ResidentProgram is not implemented");
         }
         else if (m_Name.Equal("SWA")) { // SetWidescreenAlignment
             // Sets either LetterBox or Centre-cut-out mode.
             // Seems to be concerned with aligning a 4:3 scene with an underlying 16:9 video
-            ASSERT(false);
+            MHERROR("SetWidescreenAlignment ResidentProgram is not implemented");
         }
         else if (m_Name.Equal("GDA")) { // GetDisplayAspectRatio
             // Returns the aspcet ratio.  4:3 => 1, 16:9 => 2
-            ASSERT(false);
+            MHERROR("GetDisplayAspectRatio ResidentProgram is not implemented");
         }
         else if (m_Name.Equal("CIS")) { // CI_SendMessage
             // Sends a message to a DVB CI application
-            ASSERT(false);
+            MHERROR("CI_SendMessage ResidentProgram is not implemented");
         }
         else if (m_Name.Equal("SSM")) { // SetSubtitleMode
             // Enable or disable subtitles in addition to MHEG.
-            ASSERT(false);
+            MHERROR("SetSubtitleMode ResidentProgram is not implemented");
         }
 
         else if (m_Name.Equal("WAI")) { // WhoAmI
@@ -449,10 +449,11 @@ void MHResidentProgram::CallProgram(bool fIsFork, const MHObjectRef &success, co
         }
 
         else if (m_Name.Equal("DBG")) { // Debug - optional
-            ASSERT(false);
+            MHERROR("Debug ResidentProgram is not implemented");
         }
+
         else {
-            ASSERT(false);
+            MHERROR(QString("Unknown ResidentProgram %1").arg(m_Name.Printable()));
         }
     }
     catch (char const *) {

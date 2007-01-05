@@ -133,7 +133,7 @@ void MHLink::PrintMe(FILE *fd, int nTabs) const
     PrintTabs(fd, nTabs);
     fprintf(fd, "{:Link"); MHIngredient::PrintMe(fd, nTabs+1);
     PrintTabs(fd, nTabs+1); fprintf(fd, ":EventSource "); m_EventSource.PrintMe(fd, nTabs+1); fprintf(fd, "\n");
-    ASSERT(m_nEventType > 0 && m_nEventType <= (int)(sizeof(rchEventType)/sizeof(rchEventType[0])));
+    MHASSERT(m_nEventType > 0 && m_nEventType <= (int)(sizeof(rchEventType)/sizeof(rchEventType[0])));
     PrintTabs(fd, nTabs+1); fprintf(fd, ":EventType %s\n", rchEventType[m_nEventType-1]);
     // The event data is optional and its format depends on the event type.
     switch (m_EventData.m_Type) {
@@ -180,18 +180,17 @@ void MHLink::Activate(bool fActivate, MHEngine *engine)
 // any event data the link fires whatever the value of the data.
 void MHLink::MatchEvent(const MHObjectRef &sourceRefRef, enum EventType ev, const MHUnion &evData, MHEngine *engine)
 {
-    ASSERT(m_fRunning); // Should now be true if we call this.
     if (m_fRunning && m_nEventType == ev && sourceRefRef.Equal(m_EventSource, engine)) { // Source and event type match.
         bool fMatch = false;
         switch (m_EventData.m_Type) {
         case MHUnion::U_None: fMatch = true; break; // No data specified - always matches.
-        case MHUnion::U_Bool: evData.CheckType(MHUnion::U_Bool);
-            ASSERT(evData.m_fBoolVal == 0 || evData.m_fBoolVal == 1);
-            ASSERT(m_EventData.m_fBoolVal == 0 || m_EventData.m_fBoolVal == 1);
-            fMatch = evData.m_fBoolVal == m_EventData.m_fBoolVal; break;
-        case MHUnion::U_Int: evData.CheckType(MHUnion::U_Int); fMatch = evData.m_nIntVal == m_EventData.m_nIntVal; break;
-        case MHUnion::U_String: evData.CheckType(MHUnion::U_String); fMatch = evData.m_StrVal.Equal(m_EventData.m_StrVal); break;
-        default: ASSERT(false); // Should only be the above types.
+        case MHUnion::U_Bool:
+            fMatch = evData.m_Type == MHUnion::U_Bool && evData.m_fBoolVal == m_EventData.m_fBoolVal; break;
+        case MHUnion::U_Int:
+            fMatch = evData.m_Type == MHUnion::U_Int && evData.m_nIntVal == m_EventData.m_nIntVal; break;
+        case MHUnion::U_String:
+            fMatch = evData.m_Type == MHUnion::U_String && evData.m_StrVal.Equal(m_EventData.m_StrVal); break;
+        default: fMatch = false; break;
         }
         // Fire the link
         if (fMatch) {

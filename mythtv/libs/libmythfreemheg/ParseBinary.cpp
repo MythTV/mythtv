@@ -53,7 +53,9 @@ unsigned char MHParseBinary::GetNextChar()
 // Parse a string argument.  ASN1 strings can include nulls as valid characters.
 void MHParseBinary::ParseString(int endStr, MHOctetString &str)
 {
-    ASSERT(endStr != INDEFINITE_LENGTH); // TODO: Don't deal with indefinite length at the moment.
+     // TODO: Don't deal with indefinite length at the moment.
+    if (endStr == INDEFINITE_LENGTH)
+        MHERROR("Indefinite length strings are not implemented");
     int nLength = endStr - m_p;
     unsigned char *stringValue = (unsigned char*)malloc(endStr - m_p);
     unsigned char *p = stringValue;
@@ -67,7 +69,8 @@ int MHParseBinary::ParseInt(int endInt)
 {
     int intVal = 0;
     bool firstByte = true;
-    ASSERT(endInt != INDEFINITE_LENGTH); // TODO: Don't deal with indefinite length at the moment.
+    if (endInt == INDEFINITE_LENGTH)
+        MHERROR("Indefinite length integers are not implemented");
     while (m_p < endInt) {
         unsigned char ch = GetNextChar();
         // Integer values are signed so if the top bit is set in the first byte
@@ -228,7 +231,8 @@ MHParseNode *MHParseBinary::DoParse()
                 {
                     // Everything else has either no argument or is self-describing
                     // TODO: Handle indefinite length.
-                    ASSERT(endOfItem != INDEFINITE_LENGTH); // For the moment.
+                    if (endOfItem == INDEFINITE_LENGTH)
+                        MHERROR("Indefinite length arguments are not implemented");
                     while (m_p < endOfItem) {
                         pNode->AddArg(DoParse());
                     }
@@ -274,7 +278,8 @@ MHParseNode *MHParseBinary::DoParse()
         case U_SEQUENCE: // Sequence
             {
                 MHParseSequence *pNode = new MHParseSequence();
-                ASSERT(endOfItem != INDEFINITE_LENGTH); // TODO: Implement this.
+                if (endOfItem == INDEFINITE_LENGTH)
+                    MHERROR("Indefinite length sequences are not implemented");
                 try {
                     while (m_p < endOfItem) {
                         pNode->Append(DoParse());
@@ -285,12 +290,10 @@ MHParseNode *MHParseBinary::DoParse()
                     delete pNode;
                     throw;
                 }
-                ASSERT(m_p == endOfItem);
                 return pNode;
             }
         default:
-            ASSERT(FALSE);
-            throw "Unknown universal";
+            MHERROR(QString("Unknown universal %1").arg(tagNumber));
         }
     }
 }

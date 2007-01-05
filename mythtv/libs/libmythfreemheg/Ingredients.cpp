@@ -26,6 +26,7 @@
 #include "ASN1Codes.h"
 #include "Actions.h"
 #include "Engine.h"
+#include "Logging.h"
 
 
 MHIngredient::MHIngredient()
@@ -56,7 +57,6 @@ MHIngredient::MHIngredient(const MHIngredient &ref): MHRoot(ref)
 void MHIngredient::Initialise(MHParseNode *p, MHEngine *engine)
 {
     MHRoot::Initialise(p, engine);
-    ASSERT(m_ObjectReference.m_nObjectNo > 0);
     MHParseNode *pIA = p->GetNamedArg(C_INITIALLY_ACTIVE);
     if (pIA) m_fInitiallyActive = pIA->GetArgN(0)->GetBoolValue();
 
@@ -152,17 +152,18 @@ void MHIngredient::SetData(const MHOctetString &included, MHEngine *engine)
     if (m_ContentType == IN_ReferencedContent) {
         m_ContentRef.m_ContentRef.Copy(included);
     }
-    else {
-        ASSERT(m_ContentType == IN_IncludedContent);
+    else if (m_ContentType == IN_IncludedContent) {
         m_IncludedContent.Copy(included);
         
     }
+    else MHLOG(MHLogWarning, "SetData with no content"); // MHEG Error
     ContentPreparation(engine);
 }
 
 void MHIngredient::SetData(const MHContentRef &referenced, bool /*fSizeGiven*/, int size, bool fCCGiven, int /*cc*/, MHEngine *engine)
 {
-    ASSERT(m_ContentType == IN_ReferencedContent);
+    if (m_ContentType != IN_ReferencedContent)
+        MHERROR("SetData with referenced content applied to an ingredient without referenced content");
     m_ContentRef.Copy(referenced);
     m_nContentSize = size;
     if (fCCGiven) m_nCCPrio = m_nOrigCCPrio;

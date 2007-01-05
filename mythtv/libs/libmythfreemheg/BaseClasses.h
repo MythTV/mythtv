@@ -21,14 +21,15 @@
 
 #if !defined(BASECLASSES_H)
 #define BASECLASSES_H
-#include <stdio.h>
-#include <assert.h>
+
 #include "../../config.h"
 #ifdef HAVE_MALLOC_H
 #include <malloc.h>
 #endif
 
 #include <qstring.h>
+
+#include "Logging.h" // For MHASSERT
 
 class MHEngine;
 
@@ -44,12 +45,12 @@ template <class BASE> class MHSequence {
         // Get the current size.
         int Size() const { return m_VecSize; }
         // Get an element at a particular index.
-        BASE GetAt(int i) const { ASSERT(i >= 0 && i < m_VecSize); return m_Values[i]; }
+        BASE GetAt(int i) const { MHASSERT(i >= 0 && i < m_VecSize); return m_Values[i]; }
         BASE operator[](int i) const { return GetAt(i); }
         // Add a new element at position n and move the existing element at that position
         // and anything above it up one place.
         void InsertAt(BASE b, int n) {
-            ASSERT(n >= 0 && n <= m_VecSize);
+            MHASSERT(n >= 0 && n <= m_VecSize);
             BASE *ptr = (BASE*)realloc(m_Values, (m_VecSize+1) * sizeof(BASE));
             if (ptr == NULL) throw "Out of Memory";
             m_Values = ptr;
@@ -61,7 +62,7 @@ template <class BASE> class MHSequence {
         void Append(BASE b) { InsertAt(b, m_VecSize); }
         // Remove an element and shift all the others down.
         void RemoveAt(int i) {
-            ASSERT(i >= 0 && i < m_VecSize);
+            MHASSERT(i >= 0 && i < m_VecSize);
             for (int j = i+1; j < m_VecSize; j++) m_Values[j-1] = m_Values[j];
             m_VecSize--;
         }
@@ -84,14 +85,14 @@ template <class BASE> class MHStack: protected MHSequence<BASE> {
         bool Empty() const { return Size() == 0; }
         // Pop an item from the stack.
         BASE Pop() {
-            ASSERT(MHSequence<BASE>::m_VecSize > 0);
+            MHASSERT(MHSequence<BASE>::m_VecSize > 0);
             return MHSequence<BASE>::m_Values[--MHSequence<BASE>::m_VecSize];
         }
         // Push an element on the stack.
         void Push(BASE b) { Append(b); }
         // Return the top of the stack.
         BASE Top() { 
-            ASSERT(MHSequence<BASE>::m_VecSize > 0);
+            MHASSERT(MHSequence<BASE>::m_VecSize > 0);
             return MHSequence<BASE>::m_Values[MHSequence<BASE>::m_VecSize-1];
         }
         int Size() const { return MHSequence<BASE>::Size(); }
@@ -115,7 +116,7 @@ public:
     // Comparison - returns <0, =0, >0 depending on the ordering.
     int Compare(const MHOctetString &str) const;
     bool Equal(const MHOctetString &str) const { return Compare(str) == 0; }
-    unsigned char GetAt(int i) const { ASSERT(i >= 0 && i < Size()); return m_pChars[i]; }
+    unsigned char GetAt(int i) const { MHASSERT(i >= 0 && i < Size()); return m_pChars[i]; }
     const unsigned char *Bytes() const { return m_pChars; } // Read-only pointer to the buffer.
     void Append(const MHOctetString &str); // Add text to the end of the string.
 

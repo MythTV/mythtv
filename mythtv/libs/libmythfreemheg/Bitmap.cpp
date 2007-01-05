@@ -92,9 +92,10 @@ void MHBitmap::Preparation(MHEngine *engine)
 void MHBitmap::ContentPreparation(MHEngine *engine)
 {
     MHVisible::ContentPreparation(engine);
-    ASSERT(m_ContentType != IN_NoContent);
-    ASSERT(m_ContentType != IN_IncludedContent); // We can't handle included content at the moment.
-//  if (m_ContentType == IN_IncludedContent) CreateContent(m_IncludedContent.Bytes(), m_IncludedContent.Size());
+    if (m_ContentType == IN_NoContent)
+        MHERROR("Bitmap must contain a content");
+    if (m_ContentType == IN_IncludedContent) // We can't handle included content at the moment.
+        MHERROR("Included content in bitmap is not implemented");
 }
 
 // Decode the content.
@@ -130,7 +131,8 @@ void MHBitmap::SetTransparency(int nTransPerCent, MHEngine *)
 {
     // The object transparency isn't actually used in UK MHEG.
     // We want a value between 0 and 255
-    ASSERT(nTransPerCent >= 0 && nTransPerCent <= 100); // This should really be a check.
+    if (nTransPerCent < 0) nTransPerCent = 0; // Make sure it's in the bounds
+    if (nTransPerCent > 100) nTransPerCent = 100;
     m_nTransparency = ((nTransPerCent * 255) + 50) / 100;
 }
 

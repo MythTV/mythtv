@@ -122,7 +122,6 @@ void MHVisible::Deactivation(MHEngine *engine)
 // Return the colour, looking up in the palette if necessary.  Used by the sub-classes
 MHRgba MHVisible::GetColour(const MHColour &colour)
 {
-    ASSERT(colour.m_nColIndex < 0); // We don't support palettes.
     int red = 0, green = 0, blue = 0, alpha = 0;
     int cSize = colour.m_ColStr.Size();
     if (cSize != 4) MHLOG(MHLogWarning, QString("Colour string has length %1 not 4.").arg(cSize));

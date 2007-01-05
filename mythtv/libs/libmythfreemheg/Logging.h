@@ -23,12 +23,11 @@
 #define LOGGING_H
 
 #include <qglobal.h> // For Q_ASSERT
+#include <qstring.h> // For QString
 
-#ifdef ASSERT
-#undef ASSERT
-#endif
+#include "freemheg.h" // For MHLogError
 
-#define ASSERT(f)          Q_ASSERT(f)
+#define MHASSERT(f)          Q_ASSERT(f)
 
 extern int __mhlogoptions;
 extern void __mhlog(QString logtext);
