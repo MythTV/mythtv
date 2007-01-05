@@ -1,7 +1,7 @@
   Installing and using MythTV
   Robert Kulagowski, mailto:rkulagow@rocketmail.com
   <mailto:rkulagow@rocketmail.com>
-  2006-12-29, v0.20.10
+  2007-01-05, v0.20.11
 
   Initially, installation of MythTV seems like a huge task.  There are
   lots of dependencies, and various distributions seem to do the same
@@ -192,6 +192,15 @@
         12.5.3 How it Works
         12.5.4 Common Tricks and Tips
         12.5.5 Working with SQL
+     12.6 Scheduling with more than one Input
+        12.6.1 Stations, Channels and Video Sources
+        12.6.2 Order of Inputs
+        12.6.3 Matching Callsigns
+        12.6.4 Using Priorities to Prefer an Input
+        12.6.5 Input Priority
+        12.6.6 Channel Priority
+        12.6.7 Preferred Input
+        12.6.8 HDTV Priority
 
   13. MythPlugins.
   14. MythWeb.
@@ -398,7 +407,6 @@
 
   +o  MythMusic, a music playing / ripping application which supports MP3
      and FLAC
-
   +o  MythNews, a RSS news grabber
 
   +o  MythPhone, phone and videophone using SIP.
@@ -462,6 +470,7 @@
   This HOWTO is for MythTV v0.20
 
 
+
   [1m1.5.  Document conventions[0m
 
   The following conventions are used throughout this document.
@@ -476,6 +485,11 @@
 
 
                         Ignore at your own peril.
+
+
+
+  Feature that has been added to SVN but is not available in the current
+  release.
 
 
   [1m1.6.  Mailing lists / getting help[0m
@@ -574,6 +588,7 @@
   [1mdoc.patch [22mand attach your contribution to the trac ticket.
 
 
+
   [1m2.  Introduction.[0m
 
   This HOWTO document will focus on manually building MythTV in a North
@@ -638,6 +653,7 @@
   fairly low CPU requirements compared to encoding video, which is why a
   device like a Series 1 TiVo can run with only 16MB of RAM and a 54MHz
   CPU.
+
 
   There are many variables that go into the question: "How fast a CPU do
   I need to run MythTV"?  Obviously, the faster your CPU, the better
@@ -704,8 +720,6 @@
   frames per second, but typical values for MythTV range from 700
   megabytes/hour for MPEG-4, 2 GB/hour for MPEG-2 and RTjpeg and 7
   GB/hour for ATSC HDTV.
-
-
 
          [1mNOTE[22m:  You [4mmust[24m use DMA for hard drive access to prevent
   choppy or jittery video.  Not all distributions enable DMA at boot
@@ -787,6 +801,7 @@
   NOTE:  The ATI TV Wonder series and the ATI All-in-Wonder series of cards
   are not the same.  The All-in-Wonder cards will not work with MythTV.
   ______________________________________________________________________
+
 
 
         [1mNOTE[22m: The ATI All-in-Wonder cards (which are not the same
@@ -1016,8 +1031,6 @@
   card, you will be getting Mono sound.  See the Linux MP3 HOWTO at
   http://www.tldp.org/HOWTO/MP3-HOWTO.html
   <http://www.tldp.org/HOWTO/MP3-HOWTO.html> for additional information.
-
-
   [1m3.1.8.  Video Display Card[0m
 
   MythTV will work with just about any video card.  However, it is
@@ -1112,6 +1125,7 @@
   1. Take the audio output from the PVR-350 and plug it into an input on
      a sound card on your machine.  You may then use MythTV's internal
      audio controls.
+
   2. Take the audio output from the PVR-350 and connect it directly to
      your television / audio system.  You must indicate that you are
      using external audio control on the PVR-350 setup page.
@@ -1235,6 +1249,7 @@
 
 
        # apt-get install mythtv-suite
+
 
 
   These steps however, do NOT perform the installation of any drivers
@@ -1362,6 +1377,7 @@
        everything already installed
 
 
+
   In that case, you're ready to move to the next ``section''.  Once you
   have completed installing the pre-requisites, exit out of the shell
   and start a new one to ensure that any environment variables setup by
@@ -1392,8 +1408,6 @@
   default installation doesn't include MySQL support, a requirement for
   MythTV.  To enable SQL support, add "mysql" to your USE variable in
   /etc/make.conf and rebuild Qt by running
-
-
        # emerge qt
 
 
@@ -1452,6 +1466,7 @@
   may have to adjust by hand before you compile MythTV.
 
   The reference compilation system for MythTV is Ubuntu.
+
 
 
   [1m4.2.  Shared-Library requirements for MythTV[0m
@@ -1518,7 +1533,6 @@
   (/usr/share/qt3/mkspecs for Debian) called default. If not, you'll get
   errors during the compile. See the Troubleshooting Section for more
   information.
-
   [1m4.3.2.  Distribution-Specific Notes[0m
 
   [1m4.3.2.1.  Mandriva[0m
@@ -1542,17 +1556,16 @@
             [1mNOTE[22m: ^D means press CTRL and d at the same time.
 
 
+       $ su
+       # cd /etc/profile.d
+       cat > mythtv.sh
+       export QTDIR=/usr/lib/qt3
+       export PATH=$PATH:/usr/lib/qt3/bin
+       ^D
 
-  $ su
-  # cd /etc/profile.d
-  cat > mythtv.sh
-  export QTDIR=/usr/lib/qt3
-  export PATH=$PATH:/usr/lib/qt3/bin
-  ^D
-
-  # chmod a+x mythtv.sh
-  # exit
-  $ exit
+       # chmod a+x mythtv.sh
+       # exit
+       $ exit
 
 
 
@@ -1640,13 +1653,13 @@
   Open a shell and switch to the directory where you saved lame.
 
 
-       $ tar -xzf lame-3.96.1.tar.gz
-       $ cd lame-3.96.1
-       $ ./configure
-       $ make
-       $ make test
-       $ su
-       # make install
+  $ tar -xzf lame-3.96.1.tar.gz
+  $ cd lame-3.96.1
+  $ ./configure
+  $ make
+  $ make test
+  $ su
+  # make install
 
 
 
@@ -1700,7 +1713,8 @@
   sites by typing:
 
 
-       # urpmi perl-xml-twig perl-xml-writer perl-datemanip perl-libwww-perl
+
+  # urpmi perl-xml-twig perl-xml-writer perl-datemanip perl-libwww-perl
 
 
 
@@ -1722,14 +1736,14 @@
 
 
 
-  $ su
-  # perl -MCPAN -e shell
-  cpan> install XML::Twig
-  cpan> install Date::Manip
-  Date::Manip is up to date.
-  cpan> install LWP
-  cpan> install XML::Writer
-  cpan> exit
+       $ su
+       # perl -MCPAN -e shell
+       cpan> install XML::Twig
+       cpan> install Date::Manip
+       Date::Manip is up to date.
+       cpan> install LWP
+       cpan> install XML::Writer
+       cpan> exit
 
 
 
@@ -1823,6 +1837,12 @@
   available and to override and automatically detected options.  See the
   config.log file after running [1mconfigure [22mto see previous runs.
 
+
+
+  If you're going to use the various perl scripts that are in the contrib
+  directory, make sure you add --with-bindings=perl to the [1mconfigure[0m
+  command.
+
   To compile:
 
 
@@ -1830,13 +1850,13 @@
 
 
 
-  MythTV can take advantage of multiple CPUs, SMP and Hyperthreading.
-  If you want to build MythTV on a multi-CPU machine (or with [1mdistcc[22m),
-  specify "-j numjobs", where "numjobs" is greater than 2.  In the above
-  example, we had two concurrent jobs executing, which is recommended
-  for a single CPU system.  Do not set the number of jobs too high, or
-  your compile will actually take longer to complete than it would if
-  you did a "normal" build.
+  The MythTV compile can take advantage of multiple CPUs, SMP and
+  Hyperthreading.  If you want to build MythTV on a multi-CPU machine
+  (or with [1mdistcc[22m), specify "-j numjobs", where "numjobs" is greater
+  than 2.  In the above example, we had two concurrent jobs executing,
+  which is recommended for a single CPU system.  Do not set the number
+  of jobs too high, or your compile will actually take longer to
+  complete than it would if you did a "normal" build.
 
   If you are using [1mdistcc[22m, and you had two other host machines (red,
   blue) participating, you would do something like:
@@ -2083,6 +2103,7 @@
        $ mysql < mc.sql
 
 
+
   [1m6.2.3.  Gentoo[0m
 
 
@@ -2138,6 +2159,8 @@
        mysql> grant all on mythconverg.* to mythtv@"192.168.1.%" identified by "mythtv";
        mysql> flush privileges;
 
+
+
   You'll also need to check that the "networking" feature of MySQL is
   turned on. Check that /etc/mysql/my.cnf [4mdoes[24m [4mnot[24m contain skip-
   networking.  If it does, remove it.  Also verify that bind-address is
@@ -2167,6 +2190,7 @@
   versions.  See the ``Troubleshooting Audio'' section for more
   information if you're having issues with sound.  Also, ensure that no
   other programs are grabbing the audio output, like [1marts [22mor [1mesd[22m.
+
 
   What you need to do is to mute the "line-in" of your sound card and
   also set it as the recording source.
@@ -2225,14 +2249,14 @@
 
 
 
-       $ amixer set Master,0 100%,100% unmute
-       $ amixer set PCM,0 100%,100% unmute
-       $ amixer set Line,0 75%,75% mute captur
-       $ amixer set Capture,0 100%,100% captur
-       $ su
-       # alsactl store
-       # exit
-       $
+  $ amixer set Master,0 100%,100% unmute
+  $ amixer set PCM,0 100%,100% unmute
+  $ amixer set Line,0 75%,75% mute captur
+  $ amixer set Capture,0 100%,100% captur
+  $ su
+  # alsactl store
+  # exit
+  $
 
 
 
@@ -2268,6 +2292,9 @@
   [1mlirc [22mhandles the IR hardware and passes keystrokes to MythTV, which
   then acts as if the user had pressed the keys on the keyboard.  The
   file keys.txt describes the keys used to control MythTV.
+
+
+
             [1mNOTE[22m: If you are running Mandriva, you may install
   [1mlirc [22mby executing: # urpmi lirc lirc-remotes and bypass the manual
   compilation steps described below by jumping to the ``Completing the
@@ -2284,7 +2311,7 @@
   To install lirc on Gentoo, all you need to do is:
 
 
-       # emerge lirc
+  # emerge lirc
 
 
 
@@ -2330,6 +2357,8 @@
        $ su
        # make install
        # chmod 666 /dev/lircd
+
+
 
   At this point, if you're using a serial receiver, check that there's a
   lirc device in /dev:
@@ -2388,6 +2417,7 @@
   See the lirc documentation for additional information.  The lirc
   installation [4mshould[24m create this for you, so manually creating it
   indicates that your lirc installation may have other issues.
+
   The second option is to post your issue to the [4mlirc[24m list, not the
   mythtv-users list.  The lirc programmers will be the ones that can
   assist you best.
@@ -2447,6 +2477,8 @@
   sequence of pulses.  Without getting too involved, a particular series
   of pulses may correlate to "Channel Up".  The lircd.conf file will
   then contain a line that looks something like this:
+
+
 
                  ChannelUp                0x0000000000001020
 
@@ -2510,16 +2542,18 @@
        # exit
 
 
+
   All other distributions:
 
 
-       # cd /etc/rc.d
-       # cat >> rc.local
-       echo "Starting lircd"
-       /usr/local/sbin/lircd
-       ^D
-       # exit
-       $
+
+  # cd /etc/rc.d
+  # cat >> rc.local
+  echo "Starting lircd"
+  /usr/local/sbin/lircd
+  ^D
+  # exit
+  $
 
 
 
@@ -2569,6 +2603,7 @@
 
 
        $ irxevent &
+
 
 
   If [1mirxevent [22misn't running, then MythTV will not respond to your remote
@@ -2634,6 +2669,7 @@
   tional buttons, and how to debug potential button name conflicts
   between the lircrc.example file and how [1myour [22mremote defines the button
   names.
+
   By examining the button names defined in /etc/lircd.conf and using the
   [1mirw [22mprogram to make sure that your remote is working, you can create
   the appropriate mappings in .lircrc to get excellent remote
@@ -5109,6 +5145,291 @@
   <http://www.mythtv.org/> .
 
 
+  [1m12.6.  Scheduling with more than one Input[0m
+
+  MythTV is designed to allow recording television programs from one or
+  more service providers, or video source, on one or more video input
+  from each provider. A single TV capture card may have video
+  connections to more than one of its input and each input may be from a
+  different service although the card may only be allowed to record from
+  one of these inputs at one time.
+
+
+
+                 Block Diagram of a Video Capture Device.
+
+  A television station may be broadcast on more than one channel from
+  one provider or may be available on channels from two or more
+  providers. If a TV station is available from more than one source, the
+  video quality or type of broadcast may differ. Therefore, MythTV
+  allows you to control how you would like the scheduler to select the
+  best channel and input for a show which is available on more than one
+  input or more than one channel.
+
+
+  [1m12.6.1.  Stations, Channels and Video Sources[0m
+
+  Although we may be accustomed to thinking of a broadcast station and
+  its channel number as being synonymous, stations and channels are very
+  different things. A "station" is in a building with wires and
+  employees. A "channel" is a carrier frequency or digital ID that
+  carries a broadcast stream. The same TV station may be broadcast over
+  different frequencies in different cities or by different providers in
+  the same city. The same frequency will carry different stations in
+  different cities.  In the digital realm of DVB and ATSC (HDTV), it is
+  even possible for a single frequency to carry multiple programs.
+
+
+  +o  Station: building
+
+  +o  Channel: frequency
+
+  In MythTV, a "video source" is a set of channels from a provider, or
+  over the air, that can be received by an input. The set defines the
+  channels and the broadcasters primarily associated with each of those
+  channels.  If you have more than one device or cable from the same
+  provider connected to more than one card and input, you only need to
+  create one video source in mythtv-setup then associate that one source
+  with each of these connected inputs. This will let your MythTV system
+  know that the same channels and their TV listings are available to be
+  recorded from any of these inputs.
+
+  For example. A MythTV system may have two capture cards. Both have a
+  cable connected to the coaxial connectors. These cables carry the
+  local cable TV service. In mythtv-setup, the user should create one
+  "Video source" called "Cable", for example. Under "Input connections",
+  "Cable" should be associated with each of the two tuner inputs. The
+  scheduler will then know that any program on one of the channels from
+  the "Cable" source could be recorded by either card from the card's
+  tuner input.
+
+  You need to create a different video source for each provider or
+  service that has a different set of channels. Each input with a
+  connection to that service should be associated with the video source
+  for that service so the system will know which set of channels are
+  available for each of your active inputs.
+  Let's say that this user also has one digital cable set top box. The
+  digital cable service carries channels that are not available over
+  basic cable. The user would create another source called "Digital".
+  This set top box is connected to the second card by s-video so under
+  "Input connections", "Digital" is associated with the s-video input of
+  card 2. The system would then know that programs on channels from the
+  Digital source can only be recorded from this input. Further, the
+  scheduler understands that it can only record one show at a time from
+  card 2 so it can assign Cable or Digital shows to the card but not
+  both at the same time.
+
+  Some TV stations may be broadcast over a channel from the Cable source
+  and also broadcast over a channel from the Digital source. Note that
+  two channels carrying the same primary station may not have the same
+  TV listings due to carrying the primary station part time, including
+  local programming exclusive to one of the channels, the channels may
+  be in different timezones, etc. Listings information must be
+  associated with each channel even if two or more channels report that
+  they carry the same station.
+
+
+  [1m12.6.2.  Order of Inputs[0m
+
+  By default the scheduler chooses the first (lowest numbered) input
+  which has a showing of the scheduled program as it fills the schedule.
+  If a lower priority show is on at the same time as a higher priority
+  show that has been assigned to input 1, then input 2 will be used next
+  and so on. Therefore, it is best to configure your best card and input
+  first and next best card second.  There may be differences in the type
+  or brand of capture card, signal quality from the cable, system
+  resources such as disk space, CPU, etc. By configuring your best input
+  first, more recordings, and your highest priority recordings, will use
+  that input.
+
+  A common situation is that a newer and better card is added last. For
+  example. someone may have two analog cable cards at first then adds an
+  HDTV card. If NBC is on a cable channel and "The Apprentice" is shown
+  in HDTV on an NBC HD channel, the scheduler would still prefer analog
+  inputs 1 and 2 over the new HD input 3.
+
+  Therefore, if you add a new source which you will prefer, it is wise
+  to run mythtv-setup and "Delete all capture cards" then enter your
+  cards and inputs in your new order of preference. This will not remove
+  your sources and channels. You want to keep those and only renumber
+  your cards and inputs. In this example, once the changes have been
+  made and the Master Backend is restarted, the scheduler would the
+  choose "The Apprentice" in HD on the new input 1 and only use the
+  analog inputs (now numbered 2 and 3) when the HDTV input was occupied
+  with another show.
+
+
+  [1m12.6.3.  Matching Callsigns[0m
+
+  If a recording rule is a type that can record from any channel, "The
+  Apprentice" would match for any channel that shows episodes which may
+  include CNBC or BRAVO. However, for Single, Timeslot. Weekslot or
+  Channel rules, "The Apprentice" would only match showings on the
+  selected station as identified by the "callsign". For example, KVBC is
+  an NBC affiliate on channel 3. Channel 733 is KVBCDT which is HDTV
+  over cable from the same station. If a Single record rule was set for
+  "The Apprentice" on KVBC channel 3, it could not record this showing
+  from KVBCDT on 733. If 733 was chosen when the rule was saved, channel
+  3 could not be used to record.
+
+  However, the "Channel Editor" in mythtv-setup can be used to change
+  the "Callsign" for channel 733 to be "KVBC" also. MythTV would then
+  understand that both of these channels are from the same broadcast
+  station. Assuming the HDTV input was input number "1", "The
+  Apprentice" would record on 733.  If, however, this HDTV input already
+  had a higher priority show assigned to it in that time slot, "The
+  Apprentice" would be assigned to KVBC channel 3 on input 2.
+
+  Having two channels with the same callsign may affect how program
+  information is shown in mythfrontend. If two sources have the same
+  callsign and channel number, the program guide and program lists will
+  only show one instance of the channel number and callsign. If the same
+  callsing is on two different channel numbers, both will be shown and
+  if two sources have different callsigns with the same channel number,
+  both of those will be shown.
+
+  Continuing with the example above, the Electronic Program Guide would
+  include rows for both "3 KVBC" and "733 KVBC". If channel 3 KVBC was
+  also included in the Digital cable source, the EPG would still include
+  just one line for "3 KVBC" even though there are two different
+  channels, Cable and Digital, with this identification. Regardless of
+  how these are displayed and which "KVBC" channel you select to add a
+  rule to record "The Apprentice", the scheduler will pick the best
+  channel, source and input to record "The Apprentice" on "KVBC".
+
+
+  [1m12.6.4.  Using Priorities to Prefer an Input[0m
+
+  The fundamental concept to keep in mind is that the MythTV scheduler
+  will choose the lowest numbered input available when showings have the
+  same priority. If there are factors that cause two showings of the
+  same show to have different priorities then the higher priority
+  showing will be considered before the showings with lower priority.
+
+
+  [1m12.6.5.  Input Priority[0m
+
+  "Input Connections" in mythtv-setup includes a box to set "Input
+  priority" which defaults to "0". If a value is set, that amount will
+  be added to the using favored cards or not using less favored cards
+  unless necessary.
+
+  Let's say the "The Apprentice" is on at 8:00pm with a priority of 3.
+  "Who Cares" is -2 and an episode is shown at 8:00pm then repeated at
+  11:00pm. The scheduler would assign "The Apprentice" to card 1 and
+  "Who Cares" to card 2 at 8:00pm. If the input priority for the input
+  on card 2 was changed to -1, "Who Cares" would have a total priority
+  of -2 for showings on card 1 and -3 for showings on card 2. The
+  scheduler would assign "The Apprentice" to card 1 at 8:00pm and "Who
+  Cares" to card 1 at 11:00pm when the better card is available. If
+  there was another higher priority show at 11pm, the next best choice
+  for "Who Cares" would be card 2 at 8pm with the priority -3.
+
+  Card 1 and 2 have input priority "0":
+
+
+
+        Time  Title     Priority  Card  Status
+        8:00  The Apprentice  +3  1     Will Record
+        8:00  Who Cares       -2  2     Will Record
+       11:00  Who Cares       -2  1     Earlier Showing
+
+
+
+  Card 2 with input priority "-1":
+
+
+        Time  Title     Priority  Card  Status
+        8:00  The Apprentice  +3  1     Will Record
+        8:00  Who Cares       -3  2     Later Showing
+       11:00  Who Cares       -2  1     Will Record
+
+
+
+  Card 2 at "-1" but higher priority shows at both 8 and 11:
+
+
+
+        Time  Title     Priority  Card  Status
+        8:00  The Apprentice  +3  1     Will Record
+        8:00  Who Cares       -3  2     Will Record
+       11:00  The Daily Show  +1  1     Will Record
+       11:00  Who Cares       -3  2     Earlier Showing
+
+
+
+  Note the two different effects, each of which may be what you desire
+  depending on circumstance. If input priorities are equal, shows will
+  record at the earliest time if any input is available. If input
+  priorities differ, shows may be postponed to a later time in order to
+  record on the best input.
+
+
+  [1m12.6.6.  Channel Priority[0m
+
+  Priority can be added for individual channels (remember, frequencies
+  from a video source, not stations). This can be used to tell the
+  system that you generally prefer the content of the station on a
+  channel over the formats of other stations. You may want to raise the
+  priority for ESPN, SciFi, Comedy Central or lower the priority for
+  CSPAN, CourtTV, etc. If the same station is on two different channels,
+  you can use channel priority to have the same effect for these
+  channels as input priority would have for whole inputs.
+
+  For example, say CNN is on analog channel 20 and there is an HD CNN on
+  750.  You may not want to tie up the HD input for news originating in
+  standard definition. Under TV Settings->Recording Priorities->Channel
+  Priorities you could set channel 750 to -1. The scheduler would then
+  prefer to record CNN shows on any analog channel 20 before considering
+  using 750 only when there are no analog inputs available.
+
+
+  [1m12.6.7.  Preferred Input[0m
+
+  For an even finer grain of control, there is a per rule option to
+  specify which input should be preferred for showings that match the
+  rule. By default, this adds +2 to the priority for showings on the
+  specified input.
+
+  For illustration, let's say there will be a Space Shuttle launch on
+  CNN that will be broadcast in high definition. Adding a rule to record
+  the launch with priority "0" should default to channel 20 on input 2.
+  Channel 750 would have this at -1 due to the channel priority set in
+  the previous example. If on the recording options page for this rule,
+  the "Scheduling Options" had the input set to prefer the HD input on
+  card 1, then the showing on channel 750 for this input would be
+  increased in value by +2 for a total of +1 and would be the best
+  choice for this launch coverage.  While this one rule would prefer the
+  HD input with channel 750, all other rules that match shows on CNN
+  would still prefer channel 20.
+
+  Note that this will not work properly if the preferred input priority
+  does not out weigh differences in input and channel priorities.  The
+  value of the priority boost when this option is chosen defaults to +2
+  but can be modified in TV Settings->Recording Priorities->Set
+  Recording Priorities.
+
+
+  [1m12.6.8.  HDTV Priority[0m
+
+  In the preceeding fictious example, the Space Shuttle launch is
+  broadcast in high definition and a preferred input is selected to give
+  preference to the HD input. However, TV listings from zap2it.com
+  through the DataDirect service may allow this to work without having
+  to use this per rule option.
+
+  In Settings->Recording Priorities->Set Recording Priorities there is
+  an option for "HDTV Recording Priority". This value will be added
+  automatically if the listings for the show have the "hdtv" flag set.
+  DataDirect will set this flag for shows known to be broadcast in HDTV
+  on HD channels. However, the flag is not set for standard definition
+  channels. This is another example of the listings being different for
+  the same station on a different channel. If the HDTV priority is set
+  to +2, the shuttle launch would automatically have a total priority of
+  +1 so that channel 750 would be preferred over channel 20 for this
+  HDTV broadcast.
+
+
   [1m13.  MythPlugins.[0m
 
   MythTV has a rich set of plugins available.  Once you have downloaded
@@ -5116,52 +5437,52 @@
 
 
 
-       $ tar -xjf mythplugins-0.20.tar.bz2
-       $ cd mythplugins-0.20
-       $ ./configure --help
+  $ tar -xjf mythplugins-0.20.tar.bz2
+  $ cd mythplugins-0.20
+  $ ./configure --help
 
-       Usage:   configure [options]
-       Options: [defaults in brackets after descriptions]
-       NB:      all --enable-* options can be reversed with --disable-*
+  Usage:   configure [options]
+  Options: [defaults in brackets after descriptions]
+  NB:      all --enable-* options can be reversed with --disable-*
 
-       Generic options:
-         --help                   print this message
-         --enable-all             Enable all options
-         --enable-opengl          enable OpenGL (Music and Gallery) [default=no]
+  Generic options:
+    --help                   print this message
+    --enable-all             Enable all options
+    --enable-opengl          enable OpenGL (Music and Gallery) [default=no]
 
-       MythBrowser related options:
-         --enable-mythbrowser     build the mythbrowser plugin [default=yes]
+  MythBrowser related options:
+    --enable-mythbrowser     build the mythbrowser plugin [default=yes]
 
-       MythDVD related options:
-         --enable-mythdvd         build the mythdvd plugin [default=yes]
-         --enable-transcode       enable DVD ripping and transcoding [default=no]
-         --enable-vcd             enable VCD playing [default=no]
+  MythDVD related options:
+    --enable-mythdvd         build the mythdvd plugin [default=yes]
+    --enable-transcode       enable DVD ripping and transcoding [default=no]
+    --enable-vcd             enable VCD playing [default=no]
 
-       MythGallery related options:
-         --enable-mythgallery     build the mythgallery plugin [default=yes]
-         --enable-exif            enable reading of EXIF headers [default=no]
+  MythGallery related options:
+    --enable-mythgallery     build the mythgallery plugin [default=yes]
+    --enable-exif            enable reading of EXIF headers [default=no]
 
-       MythGame related options:
-         --enable-mythgame        build the mythgame plugin [default=yes]
+  MythGame related options:
+    --enable-mythgame        build the mythgame plugin [default=yes]
 
-       MythMusic related options:
-         --enable-mythmusic       build the mythmusic plugin [default=yes]
-         --enable-fftw            enable fftw visualizers [default=no]
-         --enable-sdl             use SDL for the synaesthesia output [default=no]
-         --enable-aac             enable AAC/MP4 audio file decompression [default=no]
+  MythMusic related options:
+    --enable-mythmusic       build the mythmusic plugin [default=yes]
+    --enable-fftw            enable fftw visualizers [default=no]
+    --enable-sdl             use SDL for the synaesthesia output [default=no]
+    --enable-aac             enable AAC/MP4 audio file decompression [default=no]
 
-       MythNews related options:
-         --enable-mythnews        build the mythnews plugin [default=yes]
+  MythNews related options:
+    --enable-mythnews        build the mythnews plugin [default=yes]
 
-       MythPhone related options:
-         --enable-mythphone       build the mythphone plugin [default=yes]
-         --enable-festival        enable festival TTS Engine [default=no]
+  MythPhone related options:
+    --enable-mythphone       build the mythphone plugin [default=yes]
+    --enable-festival        enable festival TTS Engine [default=no]
 
-       MythVideo related options:
-         --enable-mythvideo       build the mythvideo plugin [default=yes]
+  MythVideo related options:
+    --enable-mythvideo       build the mythvideo plugin [default=yes]
 
-       MythWeather related options:
-         --enable-mythweather     build the mythweather plugin [default=yes]
+  MythWeather related options:
+    --enable-mythweather     build the mythweather plugin [default=yes]
 
 
 
@@ -5174,13 +5495,12 @@
   not have the prerequisites, the simplest course of action is to go
   through the various sections below, satisfying the prerequisites, and
   then compile all modules at once.
+
   For example, you would only like to compile and install MythGallery
   and MythMusic.  For MythGallery, you would like to use the EXIF data
   in the .JPG file to present additional information onscreen.  For
   MythMusic, you would like to enable support for the opengl and FFT
   visualizations.  The command line would look like:
-
-
 
        $ cd ~/mythplugins-0.20
        $ ./configure --disable-all --enable-opengl --enable-mythgallery --enable-exif --enable-mythmusic --enable-fft
@@ -5232,12 +5552,12 @@
 
 
 
-  $ cd ~/mythplugins-0.20/mythweb
-  $ su
-  # mkdir /var/www/html/mythweb
-  # cp -r . /var/www/html/mythweb
-  # exit
-  $
+       $ cd ~/mythplugins-0.20/mythweb
+       $ su
+       # mkdir /var/www/html/mythweb
+       # cp -r . /var/www/html/mythweb
+       # exit
+       $
 
 
 
@@ -5289,8 +5609,6 @@
   separate application, but it's dependent on MythTV being installed and
   operational.
 
-
-
   [1m15.1.  Installation and prerequisites[0m
 
   MythGallery is a part of the [1mmythplugins [22mpackage.  See ``MythPlugins''
@@ -5302,7 +5620,6 @@
 
 
        # urpmi libtiff3-devel
-
 
 
   Once you have satisfied the prerequisites for your distribution,
@@ -5431,6 +5748,8 @@
 
   6. Hints
 
+
+
   [1m16.1.  Setup Directory Structure[0m
 
   To keep things organized, create the following directories for [1mxmame[0m
@@ -5491,9 +5810,6 @@
   possibly even older versions of xmame, it's convenient to keep all of
   your [1mxmame [22mbinaries and to rename them to include the version number.
   MythGame allows you to match individual roms to preferred binaries.
-
-
-
        $ su
        (enter password)
        # mv /usr/local/bin/xmame.x11 /usr/local/bin/xmame-0.103.x11
@@ -5537,17 +5853,16 @@
   Some basic [1mmame [22mkeyboard commands:
 
 
-
-  5 = Insert coin
-  1 = Player 1 start
-  arrow keys = movement
-  left control = button 1
-  left alt = button 2
-  SPACE = button 3
-  ESC = exit
-  TAB - menu
-  ~ to adjust Volume
-       < and >
+       5 = Insert coin
+       1 = Player 1 start
+       arrow keys = movement
+       left control = button 1
+       left alt = button 2
+       SPACE = button 3
+       ESC = exit
+       TAB - menu
+       ~ to adjust Volume
+            < and >
 
 
 
@@ -5683,8 +5998,6 @@
   <http://www.underbit.com/products/mad/> Follow the link to download
   via FTP and save the files to a directory you can find later.
 
-
-
        $ tar -xzf mad-0.15.1b.tar.gz
        $ cd mad-0.15.1b
        $ ./configure
@@ -5724,15 +6037,14 @@
   install:
 
 
-
-  $ tar -xzf libcdaudio-0.99.12p2.tar.gz
-  $ cd libcdaudio-0.99.12p2
-  $ ./configure
-  $ make
-  $ su
-  # make install
-  # exit
-  $
+       $ tar -xzf libcdaudio-0.99.12p2.tar.gz
+       $ cd libcdaudio-0.99.12p2
+       $ ./configure
+       $ make
+       $ su
+       # make install
+       # exit
+       $
 
 
 
@@ -5741,17 +6053,18 @@
   alpha9.8.src.tgz>.
 
 
-       $ tar -xzf cdparanoia-III-alpha9.8.src.tgz
-       $ cd cdparanoia-III-alpha9.8
-       $ ./configure
-       $ make
-       $ su
-       # make install
-       # cd /usr/lib
-       # ln -sf libcdda_interface.so.0.9.8 libcdda_interface.so
-       # ln -sf libcdda_paranoia.so.0.9.8 libcdda_paranoia.so
-       # exit
-       $
+
+  $ tar -xzf cdparanoia-III-alpha9.8.src.tgz
+  $ cd cdparanoia-III-alpha9.8
+  $ ./configure
+  $ make
+  $ su
+  # make install
+  # cd /usr/lib
+  # ln -sf libcdda_interface.so.0.9.8 libcdda_interface.so
+  # ln -sf libcdda_paranoia.so.0.9.8 libcdda_paranoia.so
+  # exit
+  $
 
 
 
@@ -5803,8 +6116,6 @@
 
        # urpmi libfftw2 libfftw2-devel
 
-
-
   OpenGL should be installed on practically all distributions.  However,
   you will need the devel module.  In Mandriva it may be installed by
   typing:
@@ -5845,6 +6156,7 @@
   because it will cause an error, so use the source package instead.
 
 
+
   [1mNOTE[22m: you can use the instructions given at the ``automated
         installation section'' to install all of MythMusic in one
   step.
@@ -5856,13 +6168,13 @@
 
 
 
-       $ cd ~/mythplugins-0.20
-       $ ./configure --disable-all --enable-mythmusic --enable-fftw --enable-sdl --enable-aac
-       $ qmake mythplugins.pro
-       $ make
-       $ su
-       # make install
-       # exit
+  $ cd ~/mythplugins-0.20
+  $ ./configure --disable-all --enable-mythmusic --enable-fftw --enable-sdl --enable-aac
+  $ qmake mythplugins.pro
+  $ make
+  $ su
+  # make install
+  # exit
 
 
 
@@ -5975,8 +6287,9 @@
   If you get this message, you should go to the home directory of
   whatever user MythMusic is running as and type:
 
-  rm .cdserverrc
-  rm -rf .cddb/
+
+       rm .cdserverrc
+       rm -rf .cddb/
 
 
 
@@ -6048,8 +6361,6 @@
   You may also force mythweather to re-run the configuration by starting
   it on the command line as mythweather --configure.  These two options
   are mutually exclusive.
-
-
   [1m19.  MythVideo.[0m
 
   MythVideo is a part of the [1mmythplugins [22mpackage.  See ``MythPlugins''
@@ -6113,12 +6424,12 @@
   VCD playing.  You may remove these options if you don't need them.
 
 
-       $ cd ~/mythplugins-0.20
-       $ ./configure --disable-all --enable-mythdvd --enable-transcode --enable-vcd
-       $ qmake mythplugins.pro
-       $ make
-       $ su
-       # make install
+  $ cd ~/mythplugins-0.20
+  $ ./configure --disable-all --enable-mythdvd --enable-transcode --enable-vcd
+  $ qmake mythplugins.pro
+  $ make
+  $ su
+  # make install
 
 
 
@@ -6163,12 +6474,12 @@
   reader.
 
 
-  $ cd ~/mythplugins-0.20
-  $ ./configure --disable-all --enable-mythnews
-  $ qmake mythplugins.pro
-  $ make
-  $ su
-  # make install
+       $ cd ~/mythplugins-0.20
+       $ ./configure --disable-all --enable-mythnews
+       $ qmake mythplugins.pro
+       $ make
+       $ su
+       # make install
 
 
 
@@ -6221,7 +6532,6 @@
   root cause of the issue, which is that your distribution didn't create
   the symlink for you when the qt3 package was installed.  The first
   choice is the better solution.
-
 
 
   [1m22.1.3.  make: *** No rule to make target[0m
@@ -6301,8 +6611,6 @@
        This GDB was configured as "i386-linux".Using host libthread_db library "/lib/tls/libthread_db.so.1".
        [Thread debugging using libthread_db enabled]
 
-
-
   [1mgdb [22mwill automatically read the commands that you've placed in the
   gdbcommands file and begin running the program you specified on the
   command line.
@@ -6368,8 +6676,6 @@
 
   You didn't add /usr/local/lib to /etc/ld.so.conf.  See the section on
   modifying ``/etc/ld.so.conf''.
-
-
   [1m22.4.  Using[0m
 
   [1m22.4.1.  No programs are displayed in "Watch Recordings"[0m
@@ -6415,7 +6721,6 @@
   you attempt to repair it.  Make sure that all backend and frontend
   programs have exited.
 
-
   mysqlcheck -r -umythtv -p<password> mythconverg
 
 
@@ -6432,6 +6737,7 @@
   default capture profiles may need to be edited for your setup.  Go to
   Settings->TV Settings->Recording Profiles and adjust the [1mDefault [22mand
   [1mLive TV [22moptions to 480 or 576 from their defaults.
+
 
 
   [1m22.4.6.  Screen goes blank but returns when mouse is moved or keyboard[0m
@@ -6487,23 +6793,24 @@
   Finally, check:
 
 
-       Section "Monitor"
-           Identifier "monitor1"
-           VendorName "Plug'n Play"
-           HorizSync 30-85
-           VertRefresh 50-160
 
-           # Sony Vaio C1(X,XS,VE,VN)?
-           # 1024x480 @ 85.6 Hz, 48 kHz hsync
-           ModeLine "1024x480"    65.00 1024 1032 1176 1344   480  488  494  563 -hsync -vsync
+  Section "Monitor"
+      Identifier "monitor1"
+      VendorName "Plug'n Play"
+      HorizSync 30-85
+      VertRefresh 50-160
 
-           # TV fullscreen mode or DVD fullscreen output.
-           # 768x576 @ 79 Hz, 50 kHz hsync
-           ModeLine "768x576"     50.00  768  832  846 1000   576  590  595  630
+      # Sony Vaio C1(X,XS,VE,VN)?
+      # 1024x480 @ 85.6 Hz, 48 kHz hsync
+      ModeLine "1024x480"    65.00 1024 1032 1176 1344   480  488  494  563 -hsync -vsync
 
-           # 768x576 @ 100 Hz, 61.6 kHz hsync
-           ModeLine "768x576"     63.07  768  800  960 1024   576  578  590  616
-       EndSection
+      # TV fullscreen mode or DVD fullscreen output.
+      # 768x576 @ 79 Hz, 50 kHz hsync
+      ModeLine "768x576"     50.00  768  832  846 1000   576  590  595  630
+
+      # 768x576 @ 100 Hz, 61.6 kHz hsync
+      ModeLine "768x576"     63.07  768  800  960 1024   576  578  590  616
+  EndSection
 
 
 
@@ -6542,6 +6849,7 @@
 
   If mythfilldatabase suddenly appears to be failing, there are at least
   two things to check.
+
   First, if you are in North America, ensure that your DataDirect
   subscription is still valid, otherwise, check to see what version of
   XMLTV you're running and that it's the latest version.
@@ -6604,6 +6912,8 @@
 
   This may occur when MythTV doesn't have an accurate seek table.  Run
   [1mmythcommflag --rebuild[0m
+
+
   [1m22.5.5.  Troubleshooting audio[0m
 
 
@@ -6665,7 +6975,6 @@
   being used, hasn't already been grabbed by another process, like [1mesd[0m
   or [1martsd[22m.  If the device file isn't available, then MythTV won't work.
   You may wish to run [1mconfigure [22mand enable support for these.
-
 
   If you wish to see what application is grabbing a resource, you can
   use the fuser command:
@@ -6731,7 +7040,6 @@
   The following window managers are known to work correctly:
 
 
-
   +o  fvwm
 
   +o  blackbox  (using "Sloppy Focus" and "Focus New Windows")
@@ -6739,6 +7047,7 @@
   [1mNOTE[22m:  You do not need to use [1mirxevent [22mif you are using MythTV's
   native LIRC support, so the window manager focus issue does not apply
   in that case.
+
 
 
   [1m22.5.9.  Where's "canada-cable"?[0m
@@ -6797,13 +7106,13 @@
   log file.
 
 
-
   [1m22.5.16.  Poor performance with NVidia cards and XvMC[0m
 
   XvMC is a NVidia driver feature which is supposed to help with
   decoding video.  Users have reported that rather than speeding up
   their video it appears to be doing the opposite.  You may want to
   check that your color depth is set for 24bpp.
+
 
 
   [1m22.5.17.  Computer is loading a media player application when you[0m
@@ -6863,6 +7172,8 @@
        $ mythtranscode --chanid 1036 --starttime 2003-10-20T15:30:00 --profile \
        autodetect --fifodir . &
 
+
+
   When [1mmythtranscode [22mbegins executing, it will create two FIFOs
   ("audout" and "vidout") in the directory specified (in this case ".",
   meaning the current directory) and will print out information about
@@ -6914,7 +7225,6 @@
   MythTV is not dependent on any particular window manager.  If you wish
   to run a lightweight window manager, the contrib/configfiles/
   directory has an example of a .twmrc and .fvwmrc file you may use.
-
 
 
   [1m23.3.  What capture resolution should I use?  How does video work?[0m
@@ -6982,13 +7292,13 @@
   <http://www.vcdhelp.com/forum/userguides/94382.php>.
 
 
-
   [1m23.4.  MythTV GUI and X Display Sizes[0m
 
   MythTV is designed to be run as dedicated full screen TV application
   but can also be run as a desktop application on a computer monitor.
   Here are a few consideration for configuring sizes to best suit you
   needs.
+
 
 
   [1m23.4.1.  X Dimensions[0m
@@ -7046,6 +7356,7 @@
   screen.  This is called "overscan". Underscan is fitting the entire
   image inside the screen. Underscan is useful for computer monitors so
   that toolbars and scrollbars at the edges can be seen.
+
   For best results, match the X display area as close as possible to the
   edges of the physical screen. This can only be adjusted by your tv-out
   device or by the settings for the television set. Many sets have these
@@ -7111,11 +7422,14 @@
   Next, you will extract only the data that is relevant to the programs:
 
 
-       $ grep "INSERT INTO record "         mythtv_backup.sql > restore.sql
-       $ grep "INSERT INTO recorded "       mythtv_backup.sql >> restore.sql
-       $ grep "INSERT INTO oldrecorded "    mythtv_backup.sql >> restore.sql
-       $ grep "INSERT INTO recordedmarkup " mythtv_backup.sql >> restore.sql
-       $ grep "INSERT INTO recordedseek "   mythtv_backup.sql >> restore.sql
+
+  $ grep "INSERT INTO record "          mythtv_backup.sql > restore.sql
+  $ grep "INSERT INTO recorded "        mythtv_backup.sql >> restore.sql
+  $ grep "INSERT INTO oldrecorded "     mythtv_backup.sql >> restore.sql
+  $ grep "INSERT INTO recordedprogram " mythtv_backup.sql >> restore.sql
+  $ grep "INSERT INTO recordedrating "  mythtv_backup.sql >> restore.sql
+  $ grep "INSERT INTO recordedmarkup "  mythtv_backup.sql >> restore.sql
+  $ grep "INSERT INTO recordedseek "    mythtv_backup.sql >> restore.sql
 
 
 
@@ -7129,11 +7443,13 @@
   like this:
 
 
-       $ grep "INSERT INTO \`record\` "         mythtv_backup.sql > restore.sql
-       $ grep "INSERT INTO \`recorded\` "       mythtv_backup.sql >> restore.sql
-       $ grep "INSERT INTO \`oldrecorded\` "    mythtv_backup.sql >> restore.sql
-       $ grep "INSERT INTO \`recordedmarkup\` " mythtv_backup.sql >> restore.sql
-       $ grep "INSERT INTO \`recordedseek\` "   mythtv_backup.sql >> restore.sql
+       $ grep "INSERT INTO \`record\` "          mythtv_backup.sql > restore.sql
+       $ grep "INSERT INTO \`recorded\` "        mythtv_backup.sql >> restore.sql
+       $ grep "INSERT INTO \`oldrecorded\` "     mythtv_backup.sql >> restore.sql
+       $ grep "INSERT INTO \`recordedprogram\` " mythtv_backup.sql >> restore.sql
+       $ grep "INSERT INTO \`recordedrating\` "  mythtv_backup.sql >> restore.sql
+       $ grep "INSERT INTO \`recordedmarkup\` "  mythtv_backup.sql >> restore.sql
+       $ grep "INSERT INTO \`recordedseek\` "    mythtv_backup.sql >> restore.sql
 
 
 

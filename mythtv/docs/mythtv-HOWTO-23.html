@@ -285,11 +285,13 @@ section.</P>
 <P>Next, you will extract only the data that is relevant to the programs:
 <BLOCKQUOTE><CODE>
 <PRE>
-$ grep "INSERT INTO record "         mythtv_backup.sql > restore.sql
-$ grep "INSERT INTO recorded "       mythtv_backup.sql >> restore.sql
-$ grep "INSERT INTO oldrecorded "    mythtv_backup.sql >> restore.sql
-$ grep "INSERT INTO recordedmarkup " mythtv_backup.sql >> restore.sql
-$ grep "INSERT INTO recordedseek "   mythtv_backup.sql >> restore.sql
+$ grep "INSERT INTO record "          mythtv_backup.sql > restore.sql
+$ grep "INSERT INTO recorded "        mythtv_backup.sql >> restore.sql
+$ grep "INSERT INTO oldrecorded "     mythtv_backup.sql >> restore.sql
+$ grep "INSERT INTO recordedprogram " mythtv_backup.sql >> restore.sql
+$ grep "INSERT INTO recordedrating "  mythtv_backup.sql >> restore.sql
+$ grep "INSERT INTO recordedmarkup "  mythtv_backup.sql >> restore.sql
+$ grep "INSERT INTO recordedseek "    mythtv_backup.sql >> restore.sql
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
@@ -302,11 +304,13 @@ to interpret the backticks, make sure you use a \ before each one.</P>
 commands like this:
 <BLOCKQUOTE><CODE>
 <PRE>
-$ grep "INSERT INTO \`record\` "         mythtv_backup.sql > restore.sql
-$ grep "INSERT INTO \`recorded\` "       mythtv_backup.sql >> restore.sql
-$ grep "INSERT INTO \`oldrecorded\` "    mythtv_backup.sql >> restore.sql
-$ grep "INSERT INTO \`recordedmarkup\` " mythtv_backup.sql >> restore.sql
-$ grep "INSERT INTO \`recordedseek\` "   mythtv_backup.sql >> restore.sql
+$ grep "INSERT INTO \`record\` "          mythtv_backup.sql > restore.sql
+$ grep "INSERT INTO \`recorded\` "        mythtv_backup.sql >> restore.sql
+$ grep "INSERT INTO \`oldrecorded\` "     mythtv_backup.sql >> restore.sql
+$ grep "INSERT INTO \`recordedprogram\` " mythtv_backup.sql >> restore.sql
+$ grep "INSERT INTO \`recordedrating\` "  mythtv_backup.sql >> restore.sql
+$ grep "INSERT INTO \`recordedmarkup\` "  mythtv_backup.sql >> restore.sql
+$ grep "INSERT INTO \`recordedseek\` "    mythtv_backup.sql >> restore.sql
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
@@ -1164,7 +1168,8 @@ Detection jobs", thereby preventing any commercial flagging jobs from
 running on this machine.</P>
 <P>Next, make sure that "Run Jobs only on original recording host" is turned
 OFF so that new jobs are allowed to run anywhere.</P>
-<P>Restart <B>mythbackend</B> since it only reads this setting when it starts up.</P>
+<P>Restart <B>mythbackend</B> since it only reads this setting when it starts
+up.</P>
 <P>On the faster machine:</P>
 <P>Start the <B>mythtv-setup</B> program.  Advance through the pages until
 you get to the Job Queue page.  Ensure that "Allow Commercial Detection

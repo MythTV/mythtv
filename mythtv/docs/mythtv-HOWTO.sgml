@@ -7467,7 +7467,7 @@ skip-networking stuff.  Add new icon "Add" from
 http://www.famfamfam.com/lab/icons/silk/ by Mark James for features that are
 new in .21 (but where the docs are for .20).  Tweak Storage Directory section.
 v0.20.11, 2007-01-05.  Added the "Add" document convention.  Add
---with-bindings=perl to the compile section.  Clarify SMP compile
+with-bindings=perl to the compile section.  Clarify SMP compile
 instructions.  Add Bruce's section on explaining how the scheduler deals
 with multiple recording options.  Update database backup commands.  Closes #2869.
 Add crappy diagram for Bruce's scheduler explanation.
