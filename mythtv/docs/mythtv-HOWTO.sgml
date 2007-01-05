@@ -3,7 +3,7 @@
 <title>Installing and using MythTV
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com"
 name="mailto:rkulagow@rocketmail.com">
-<date>2006-12-29, v0.20.10
+<date>2007-01-05, v0.20.11
 <abstract>
 Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -4359,12 +4359,19 @@ name="http://www.mythtv.org/"> .
 
 <sect1>Scheduling with more than one Input
 <p>
-
 MythTV is designed to allow recording television programs from one or more
-service provider, or video source, on one or more video input from each
+service providers, or video source, on one or more video input from each
 provider. A single TV capture card may have video connections to more than
-one of it's input and each input may be from a different service although
+one of its input and each input may be from a different service although
 the card may only be allowed to record from one of these inputs at one time.
+
+<figure loc="here">
+<eps file="BlockDiagramofavideocapturedevice.eps" height="1cm">
+<img src="BlockDiagramofavideocapturedevice.png">
+<caption>
+Block Diagram of a Video Capture Device.
+</caption>
+</figure>
 
 A television station may be broadcast on more than one channel from one
 provider or may be available on channels from two or more providers. If a TV
@@ -6314,11 +6321,13 @@ section.
 
 Next, you will extract only the data that is relevant to the programs:
 <tscreen><verb>
-$ grep "INSERT INTO record "         mythtv_backup.sql > restore.sql
-$ grep "INSERT INTO recorded "       mythtv_backup.sql >> restore.sql
-$ grep "INSERT INTO oldrecorded "    mythtv_backup.sql >> restore.sql
-$ grep "INSERT INTO recordedmarkup " mythtv_backup.sql >> restore.sql
-$ grep "INSERT INTO recordedseek "   mythtv_backup.sql >> restore.sql
+$ grep "INSERT INTO record "          mythtv_backup.sql > restore.sql
+$ grep "INSERT INTO recorded "        mythtv_backup.sql >> restore.sql
+$ grep "INSERT INTO oldrecorded "     mythtv_backup.sql >> restore.sql
+$ grep "INSERT INTO recordedprogram " mythtv_backup.sql >> restore.sql
+$ grep "INSERT INTO recordedrating "  mythtv_backup.sql >> restore.sql
+$ grep "INSERT INTO recordedmarkup "  mythtv_backup.sql >> restore.sql
+$ grep "INSERT INTO recordedseek "    mythtv_backup.sql >> restore.sql
 </verb></tscreen>
 
 <bf>NOTE</bf>:  Newer versions of <bf>mysqldump</bf> place backticks around
@@ -6330,11 +6339,13 @@ to interpret the backticks, make sure you use a \ before each one.
 If your <tt>restore.sql</tt> file is empty, you'll need to re-run the
 commands like this:
 <tscreen><verb>
-$ grep "INSERT INTO \`record\` "         mythtv_backup.sql > restore.sql
-$ grep "INSERT INTO \`recorded\` "       mythtv_backup.sql >> restore.sql
-$ grep "INSERT INTO \`oldrecorded\` "    mythtv_backup.sql >> restore.sql
-$ grep "INSERT INTO \`recordedmarkup\` " mythtv_backup.sql >> restore.sql
-$ grep "INSERT INTO \`recordedseek\` "   mythtv_backup.sql >> restore.sql
+$ grep "INSERT INTO \`record\` "          mythtv_backup.sql > restore.sql
+$ grep "INSERT INTO \`recorded\` "        mythtv_backup.sql >> restore.sql
+$ grep "INSERT INTO \`oldrecorded\` "     mythtv_backup.sql >> restore.sql
+$ grep "INSERT INTO \`recordedprogram\` " mythtv_backup.sql >> restore.sql
+$ grep "INSERT INTO \`recordedrating\` "  mythtv_backup.sql >> restore.sql
+$ grep "INSERT INTO \`recordedmarkup\` "  mythtv_backup.sql >> restore.sql
+$ grep "INSERT INTO \`recordedseek\` "    mythtv_backup.sql >> restore.sql
 </verb></tscreen>
 
 Note the space after the table name and the ">>" to append to the file for
@@ -7455,10 +7466,11 @@ v0.20.10, 2006-12-29.  Update MySQL portion to incorporate the
 skip-networking stuff.  Add new icon "Add" from
 http://www.famfamfam.com/lab/icons/silk/ by Mark James for features that are
 new in .21 (but where the docs are for .20).  Tweak Storage Directory section.
-v0.20.11, 2007-01-03.  Added the "Add" document convention.  Add
+v0.20.11, 2007-01-05.  Added the "Add" document convention.  Add
 --with-bindings=perl to the compile section.  Clarify SMP compile
 instructions.  Add Bruce's section on explaining how the scheduler deals
-with multiple recording options.
+with multiple recording options.  Update database backup commands.  Closes #2869.
+Add crappy diagram for Bruce's scheduler explanation.
 
 -->
 
