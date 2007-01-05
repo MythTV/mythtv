@@ -15,7 +15,7 @@
 #include "frame.h"
 #include "../../libs/libavcodec/libpostproc/postprocess.h"
 
-static const char FILTER_NAME[] = "PostProcess";
+//static const char FILTER_NAME[] = "PostProcess";
 
 typedef struct ThisFilter
 {

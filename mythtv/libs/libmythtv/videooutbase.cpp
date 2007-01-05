@@ -44,9 +44,11 @@ static float fix_aspect(float raw);
  *        "codec_id".
  * \return instance of VideoOutput if successful, NULL otherwise.
  */
-VideoOutput *VideoOutput::InitVideoOut(VideoOutputType type, MythCodecID codec_id)
+VideoOutput *VideoOutput::InitVideoOut(
+    VideoOutputType type, MythCodecID codec_id)
 {
-    (void)type;
+    (void) type;
+    (void) codec_id;
 
 #ifdef USING_IVTV
     if (type == kVideoOutput_IVTV)

@@ -85,7 +85,7 @@ struct QuartzData
 
     // Pixel storage for the media stream:
     ImageDescriptionHandle imgDesc;       // source description header
-    void *             pixelData;         // storage for one frame
+    char *             pixelData;         // storage for one frame
     size_t             pixelSize;         // size of one frame
     QMutex             pixelLock;         // to update pixels safely
 

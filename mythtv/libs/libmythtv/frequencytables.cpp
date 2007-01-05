@@ -7,7 +7,7 @@ freq_table_map_t frequencies;
 static void init_freq_tables(freq_table_map_t&);
 
 TransportScanItem::TransportScanItem()
-    : mplexid(-1),        FriendlyName(""),
+    : mplexid((uint)-1),  FriendlyName(""),
       friendlyNum(0),     SourceID(0),          UseTimer(false),
       scanning(false),    timeoutTune(1000)
 { 

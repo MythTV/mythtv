@@ -86,6 +86,8 @@ class ScanProgressPopup : public ConfigurationPopupDialog
 
 class ScannerEvent : public QCustomEvent
 {
+    friend class QObject; // quiet OSX gcc warning
+
   public:
     enum TYPE 
     {

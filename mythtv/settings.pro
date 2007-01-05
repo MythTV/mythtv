@@ -44,6 +44,7 @@ QMAKE_CXXFLAGS_SHLIB = -DPIC -fPIC
 
 # Allow compilation with Qt Embedded, if Qt is compiled without "-fno-rtti"
 QMAKE_CXXFLAGS -= -fno-exceptions -fno-rtti
+macx:QMAKE_CXXFLAGS += -Wno-long-double
 
 QMAKE_CXXFLAGS_RELEASE = $$OPTFLAGS $$ECXXFLAGS -fomit-frame-pointer
 release:contains( TARGET_ARCH_POWERPC, yes ) {

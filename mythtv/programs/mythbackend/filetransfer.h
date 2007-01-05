@@ -17,6 +17,8 @@ class MythSocket;
 
 class FileTransfer
 {
+    friend class QObject; // quiet OSX gcc warning
+
   public:
     FileTransfer(QString &filename, MythSocket *remote);
     FileTransfer(QString &filename, MythSocket *remote,

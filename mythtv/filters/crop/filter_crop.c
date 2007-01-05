@@ -25,7 +25,7 @@
 #include "i386/mmx.h"
 #endif
 
-static const char FILTER_NAME[] = "crop";
+//static const char FILTER_NAME[] = "crop";
 
 typedef struct ThisFilter
 {

@@ -21,6 +21,8 @@ using namespace std;
 
 VolumeControl::VolumeControl(bool setstartingvolume)
 {
+    (void) setstartingvolume;
+
     mixerfd = -1;
     volume = 0;
 
@@ -101,6 +103,8 @@ int VolumeControl::GetCurrentVolume(void)
 
 void VolumeControl::SetCurrentVolume(int value)
 {
+    (void) value;
+
 #ifdef USING_OSS
     volume = value;
 
@@ -138,6 +142,8 @@ void VolumeControl::AdjustCurrentVolume(int change)
 
 void VolumeControl::SetMute(bool on)
 {
+    (void) on;
+
 #ifdef USING_OSS
     int realvol;
 
@@ -199,8 +205,7 @@ kMuteState VolumeControl::IterateMutedChannels(void)
         if (ret < 0)
             perror("IterateMutedChannels:");
     }
+#endif // USING_OSS
 
-    return (current_mute_state);
-
-#endif
+    return current_mute_state;
 }

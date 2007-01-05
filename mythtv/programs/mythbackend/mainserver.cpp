@@ -1532,7 +1532,7 @@ void MainServer::DoDeleteThread(const DeleteStruct *ds)
     QFileInfo fInfo( ds->filename );
     QDir      dir  ( fInfo.dirPath(), fInfo.fileName() + "*.png" );
 
-    for ( int nIdx = 0; nIdx < dir.count(); nIdx++ )
+    for (uint nIdx = 0; nIdx < dir.count(); nIdx++)
     {
         QString sFileName = QString( "%1/%2" )
                                .arg( fInfo.dirPath() )

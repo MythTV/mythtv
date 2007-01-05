@@ -40,7 +40,7 @@
 
 //#define QUICKDNR_DEBUG
 
-static const char FILTER_NAME[] = "quickdnr";
+//static const char FILTER_NAME[] = "quickdnr";
 
 typedef struct ThisFilter
 {
@@ -453,6 +453,7 @@ VideoFilter *new_filter(VideoFrameType inpixfmt, VideoFrameType outpixfmt,
 
     (void) width;
     (void) height;
+    (void) i;
 
     if (inpixfmt != FMT_YV12 || outpixfmt != FMT_YV12)
     {
