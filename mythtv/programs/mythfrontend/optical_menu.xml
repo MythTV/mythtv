@@ -135,6 +135,7 @@
       <text lang="SV">Mata ut</text>
       <text lang="ES">Expulsar medios</text>
       <text lang="RU">Достать диск</text>
+      <text lang="DK">Skub ud</text>
       <action>EJECT</action>
    </button>
 

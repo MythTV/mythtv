@@ -7,7 +7,7 @@
      <text lang="FR">Musique</text>
      <text lang="CA">Configurar Música</text>
      <text lang="DE">Musik</text>
-     <text lang="DK">Musik indstillinger</text>
+     <text lang="DK">Musikindstillinger</text>
      <text lang="IS">Stillingar tónlistar</text>
      <text lang="NL">Muziek Instellingen</text>
      <text lang="PT">Configurar Música</text>
@@ -31,7 +31,7 @@
        <text lang="CA">Configurar Videos</text>
        <text lang="FR">Vidéos</text>
        <text lang="DE">Videos</text>
-       <text lang="DK">Video indstillinger</text>
+       <text lang="DK">Videoindstillinger</text>
        <text lang="IS">Stillingar kvikmynda</text>
        <text lang="NL">Films Instellingen</text>
        <text lang="PT">Configurar Filmes</text>
@@ -55,7 +55,7 @@
       <text lang="CA">Configurar Imatges</text>
       <text lang="FR">Images</text>
       <text lang="DE">Bilder</text>
-      <text lang="DK">Billed indstillinger</text>
+      <text lang="DK">Billedindstillinger</text>
       <text lang="IS">Stillingar ljósmynda</text>
       <text lang="NL">Foto's Instellingen</text>
       <text lang="PT">Configurar Fotos</text>
@@ -79,7 +79,7 @@
      <text lang="CA">Configurar Jocs</text>
      <text lang="DE">Spiele</text>
      <text lang="FR">Jeux</text>
-     <text lang="DK">Spil indstillinger</text>
+     <text lang="DK">Spilindstillinger</text>
      <text lang="IS">Stillingar leikja</text>
      <text lang="NL">Spelen Instellingen</text>
      <text lang="PT">Configurar Jogos</text>
@@ -127,6 +127,7 @@
       <text lang="ET">DVD kirjutamise sätted</text>
       <text lang="SV">DVD-bränning</text>
       <text lang="RU">Настройки прожига DVD</text>
+      <text lang="DK">DVD-brænding</text>
       <action>CONFIGPLUGIN mythburn</action>
       <depends>mythburn</depends>
    </button>
@@ -138,6 +139,7 @@
       <text lang="SV">Filarkivering</text>
       <text lang="ES">Archivado Ficheros</text>
       <text lang="RU">Настройки архива</text>
+      <text lang="DK">Filarkivering</text>
       <action>CONFIGPLUGIN mytharchive</action>
       <depends>mytharchive</depends>
    </button>

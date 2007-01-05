@@ -9,7 +9,7 @@
       <text lang="NL">Programmagids</text>
       <text lang="FR">Grille des programmes</text>
       <text lang="DE">Programmübersicht</text>
-      <text lang="DK">Program Guide</text>
+      <text lang="DK">Programguide</text>
       <text lang="IS">Dagskrá sjónvarps</text>
       <text lang="PT">Guia de Programação</text>
       <text lang="SV">Programguide</text>
@@ -50,7 +50,7 @@
       <text lang="NL">Programma's Zoeken</text>
       <text lang="FR">Recherche d'émission</text>
       <text lang="DE">Alphabetische Suche</text>
-      <text lang="DK">Program Finder</text>
+      <text lang="DK">Find program</text>
       <text lang="IS">Dagsskrár leit</text>
       <text lang="PT">Procurar Programa</text>
       <text lang="SV">Programletaren</text>
@@ -68,7 +68,7 @@
       <alttext lang="ES">Buscar</alttext>
       <alttext lang="CA">Cercar</alttext>
       <alttext lang="DE">ABC Suche</alttext>
-      <alttext lang="DK">Finder</alttext>
+      <alttext lang="DK">Find</alttext>
       <alttext lang="IS">Leit</alttext>
       <alttext lang="NL">Zoek A-Z</alttext>
       <alttext lang="PT">Procurar</alttext>
@@ -96,7 +96,7 @@
       <text lang="SI">Iskanje besed</text>
       <text lang="ET">Sõnade otsimine</text>
       <text lang="NB">Søk etter ord</text>
-      <text lang="DK">Søg ord</text>
+      <text lang="DK">Søg efter ord</text>
       <text lang="ES">Buscar Palabras</text>
       <text lang="PT">Pesquisar Palavras</text>
       <text lang="CZ">Hledat slova</text>
@@ -161,7 +161,7 @@
       <text lang="NL">Instant Opname</text>
       <text lang="FR">Enregistrement manuel</text>
       <text lang="DE">Sofortige Aufnahme</text>
-      <text lang="DK">Optag lige nu</text>
+      <text lang="DK">jeblikkelig optagelse</text>
       <text lang="PT">Gravação Imediata</text>
       <text lang="SV">Omedelbar inspelning</text>
       <text lang="JA">簡単録画</text>
