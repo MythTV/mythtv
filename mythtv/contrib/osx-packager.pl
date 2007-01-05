@@ -917,6 +917,11 @@ chomp $VERS;
 $VERS =~ s/^.*\-(.*)\.dylib$/$1/s;
 $VERS .= '.' . $OPT{'version'} if $OPT{'version'};
 
+### Program which creates bundles:
+our @bundler = "$svndir/mythtv/contrib/OSX/osx-bundler.pl";
+if ( $OPT{'verbose'} )
+{   push @bundler, '--verbose'   }
+
 ### Create each package.
 ### Note that this is a bit of a waste of disk space,
 ### because there are now multiple copies of each library.
@@ -931,32 +936,42 @@ if ( $backend )
 foreach my $target ( @targets )
 {
   my $finalTarget = "$SCRIPTDIR/$target.app";
-  my $builtTarget = $target;
-  $builtTarget =~ tr/[A-Z]/[a-z]/;
 
-  # Get a fresh copy of the app
+  # Get a fresh copy of the binary
   &Verbose("Building self-contained $target");
   &Syscall([ 'rm', '-fr', $finalTarget ]) or die;
-  &RecursiveCopy("$PREFIX/bin/$builtTarget.app", $finalTarget);
-  
-  # write a custom Info.plist
-  &GeneratePlist($target, $builtTarget, $finalTarget, $VERS);
-  
-  # Make frameworks from Myth libraries
-  &Verbose("Installing frameworks into $target");
-  &PackagedExecutable($finalTarget, $builtTarget);
-  
+  &Syscall([ 'cp',  "$svndir/mythtv/programs/$target/$target",
+             "$SCRIPTDIR/$target" ]) or die;
+
+  # Convert it to a bundled .app
+  &Syscall([ @bundler, "$SCRIPTDIR/$target",
+             "$PREFIX/lib/", "$PREFIX/lib/mysql", "$SRCDIR/$qt_vers/lib" ])
+      or die;
+
+
+  # Remove copy of binary
+  unlink "$SCRIPTDIR/$target" or die;
+
  if ( $target eq "MythFrontend" or $target =~ m/^MythTV/ )
  {
+  my $res  = "$finalTarget/Contents/Resources";
+  my $libs = "$res/lib";
+
   # Install themes, filters, etc.
   &Verbose("Installing resources into $target");
-  mkdir "$finalTarget/Contents/Resources";
-  mkdir "$finalTarget/Contents/Resources/lib";
-  &RecursiveCopy("$PREFIX/lib/mythtv",
-                 "$finalTarget/Contents/Resources/lib");
-  mkdir "$finalTarget/Contents/Resources/share";
-  &RecursiveCopy("$PREFIX/share/mythtv",
-                 "$finalTarget/Contents/Resources/share");
+  mkdir $res; mkdir $libs;
+  &RecursiveCopy("$PREFIX/lib/mythtv", $libs);
+  mkdir "$res/share";
+  &RecursiveCopy("$PREFIX/share/mythtv", "$res/share");
+
+  # Correct the library paths for the filters and plugins
+  foreach my $lib ( glob "$libs/mythtv/*/*" )
+  {   &Syscall([ @bundler, $lib ]) or die   }
+
+  # The icon
+  &Syscall([ 'cp',  "$svndir/mythtv/programs/mythfrontend/mythfrontend.icns",
+             "$res/application.icns" ]) or die;
+  &Syscall([ '/Developer/Tools/SetFile', '-a', 'C', $finalTarget ]) or die;
  }
 
   if ( $target eq "MythFrontend" )
@@ -966,7 +981,9 @@ foreach my $target ( @targets )
      {
        &Verbose("Installing $mtd into $target");
        &Syscall([ 'cp', $mtd, "$finalTarget/Contents/MacOS" ]) or die;
-       &PackagedExecutable($finalTarget, 'mtd');
+
+       &Verbose("Updating lib paths of $finalTarget/Contents/MacOS/mtd");
+       &Syscall([ @bundler, "$finalTarget/Contents/MacOS/mtd" ]) or die;
        &AddFakeBinDir($finalTarget);
      }
   }
@@ -979,15 +996,17 @@ if ( $backend )
   # The backend gets all the useful binaries it might call:
   foreach my $binary ( 'mythjobqueue', 'mythcommflag', 'mythtranscode' )
   {
-    my $SRC  = "$PREFIX/bin/$binary.app/Contents/MacOS/$binary";
+    my $SRC  = "$PREFIX/bin/$binary";
     if ( -e $SRC )
     {
       &Verbose("Installing $SRC into $BE");
       &Syscall([ '/bin/cp', $SRC, "$BE/Contents/MacOS" ]) or die;
-      &PackagedExecutable($BE, $binary);
-      &AddFakeBinDir($BE);
+
+      &Verbose("Updating lib paths of $BE/Contents/MacOS/$binary");
+      &Syscall([ @bundler, "$BE/Contents/MacOS/$binary" ]) or die;
     }
   }
+  &AddFakeBinDir($BE);
 }
 
 if ( $jobtools )
@@ -995,18 +1014,20 @@ if ( $jobtools )
   # JobQueue also gets some binaries it might call:
   my $JQ   = "$SCRIPTDIR/MythJobQueue.app";
   my $DEST = "$JQ/Contents/MacOS";
-  my $SRC  = "$PREFIX/bin/mythcommflag.app/Contents/MacOS/mythcommflag";
+  my $SRC  = "$PREFIX/bin/mythcommflag";
 
   &Syscall([ '/bin/cp', $SRC, $DEST ]) or die;
-  &PackagedExecutable($JQ, 'mythcommflag');
+  &AddFakeBinDir($JQ);
+  &Verbose("Updating lib paths of $DEST/mythcommflag");
+  &Syscall([ @bundler, "$DEST/mythcommflag" ]) or die;
 
   $SRC  = "$PREFIX/bin/mythtranscode.app/Contents/MacOS/mythtranscode";
   if ( -e $SRC )
   {
       &Verbose("Installing $SRC into $JQ");
       &Syscall([ '/bin/cp', $SRC, $DEST ]) or die;
-      &PackagedExecutable($JQ, 'mythtranscode');
-      &AddFakeBinDir($JQ);
+      &Verbose("Updating lib paths of $DEST/mythtranscode");
+      &Syscall([ @bundler, "$DEST/mythtranscode" ]) or die;
   }
 }
 
@@ -1048,276 +1069,6 @@ sub RecursiveCopy
         &Syscall([ 'ranlib', '-s', @libs ]);
     }
 }
-
-######################################
-## Given an application package $finalTarget and an executable
-## $builtTarget that has been copied into it, PackagedExecutable
-## makes sure the package contains all the library dependencies as
-## frameworks and that all the paths internal to the executable have
-## been adjusted appropriately.
-######################################
-
-sub PackagedExecutable($$)
-{
-    my ($finalTarget, $builtTarget) = @_;
-
-    my $fw_dir = "$finalTarget/Contents/Frameworks";
-    mkdir $fw_dir;
-
-    my $dephash
-        = &ProcessDependencies("$finalTarget/Contents/MacOS/$builtTarget",
-                               glob "$PREFIX/lib/mythtv/*/*.dylib");
-    my @deps = values %$dephash;
-    while (scalar @deps)
-    {
-        my $dep = shift @deps;
-
-        my $file = &MakeFramework(&FindLibraryFile($dep), $fw_dir);
-        if ( $file )
-        {
-            my $newhash = &ProcessDependencies($file);
-            foreach my $base (keys %$newhash)
-            {
-                next if exists $dephash->{$base};
-                $dephash->{$base} = $newhash->{$base};
-                push(@deps, $newhash->{$base});
-            }
-        }
-    }
-}
-
-
-######################################
-## MakeFramework copies a dylib into a
-## framework bundle.
-######################################
-
-sub MakeFramework
-{
-  my ($dylib, $dest) = @_;
-  
-  my ($base, $vers) = &BaseVers($dylib);
-  $vers .= '.' . $OPT{'version'} if ($OPT{'version'} && $base =~ /myth/);
-  my $fw_dir = $dest . '/' . $base . '.framework';
-
-  return '' if ( -e $fw_dir );
-
-  &Verbose("Building $base framework");
-  
-  &Syscall([ '/bin/mkdir',
-             '-p',
-             "$fw_dir/Versions/A/Resources" ]) or die;
-  &Syscall([ '/bin/cp',
-             $dylib,
-             "$fw_dir/Versions/A/$base" ]) or die;
-
-  &Syscall([ '/usr/bin/install_name_tool',
-             '-id',
-             $base,
-             "$fw_dir/Versions/A/$base" ]) or die;
-  
-  symlink('A', "$fw_dir/Versions/Current") or die;
-  symlink('Versions/Current/Resources', "$fw_dir/Resources") or die;
-  symlink("Versions/A/$base", "$fw_dir/$base") or die;
-  
-  &Verbose("Writing Info.plist for $base framework");
-  my $plist;
-  unless (open($plist, '>' . "$fw_dir/Versions/A/Resources/Info.plist"))
-  {
-    &Complain("Failed to open $base framework's plist for writing");
-    die;
-  }
-  print $plist <<END;
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-<plist version="1.0">
-<dict>
-  <key>CFBundleName</key>
-  <string>$base</string>
-  <key>CFBundleIdentifier</key>
-  <string>org.mythtv.macx.$base</string>
-  <key>CFBundleVersion</key>
-  <string>$vers</string>
-  <key>CFBundleSignature</key>
-  <string>Myth</string>
-  <key>CFBundlePackageType</key>
-  <string>FMWK</string>
-  <key>NSHumanReadableCopyright</key>
-  <string>Packaged for the MythTV project, www.mythtv.org</string>
-  <key>CFBundleGetInfoString</key>
-  <string>lib$base-$vers.dylib, packaged for the MythTV project, www.mythtv.org</string>
-</dict>
-</plist>
-END
-  close($plist);
-  
-  return "$fw_dir/Versions/A/$base";
-} # end MakeFramework
-
-
-######################################
-## GeneratePlist .
-######################################
-
-sub GeneratePlist
-{
-  my ($name, $binary, $path, $vers) = @_;
-  
-  &Verbose("Writing Info.plist for $name");
-  my $plist;
-  $path .= '/Contents/Info.plist';
-  unless (open($plist, ">$path"))
-  {
-    &Complain("Could not open $path for writing");
-    die;
-  }
-  print $plist <<END;
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-<plist version="1.0">
-<dict>
-  <key>CFBundleExecutable</key>
-  <string>$binary</string>
-  <key>CFBundleIconFile</key>
-  <string>application.icns</string>
-  <key>CFBundleIdentifier</key>
-  <string>org.mythtv.macx.$binary</string>
-  <key>CFBundleInfoDictionaryVersion</key>
-  <string>6.0</string>
-  <key>CFBundlePackageType</key>
-  <string>APPL</string>
-  <key>CFBundleShortVersionString</key>
-  <string>$vers</string>
-  <key>CFBundleSignature</key>
-  <string>Myth</string>
-  <key>CFBundleVersion</key>
-  <string>$vers</string>
-  <key>NSAppleScriptEnabled</key>
-  <string>NO</string>
-  <key>CFBundleGetInfoString</key>
-  <string>$vers, MythTV project, www.mythtv.org</string>
-  <key>CFBundleName</key>
-  <string>$name</string>
-  <key>NSHumanReadableCopyright</key>
-  <string>MythTV project, www.mythtv.org</string>
-</dict>
-</plist>
-END
-  close($plist);
-  
-  $path =~ s/Info\.plist$/PkgInfo/;
-  unless (open($plist, ">$path"))
-  {
-    &Complain("Could not open $path for writing");
-    die;
-  }
-  print $plist <<END;
-APPLMyth
-END
-  close($plist);
-}
-
-######################################
-## FindLibraryFile locates a dylib.
-######################################
-
-sub FindLibraryFile
-{
-  my ($dylib) = @_;
-  
-  return Cwd::abs_path($dylib) if (-e $dylib);
-  return Cwd::abs_path("$PREFIX/lib/$dylib") if (-e "$PREFIX/lib/$dylib");
-  return Cwd::abs_path("$ENV{'QTDIR'}/lib/$dylib") if (-e "$ENV{'QTDIR'}/lib/$dylib");
-  my @sublibs = glob("$PREFIX/lib/*/$dylib");
-  return Cwd::abs_path($sublibs[0]) if (scalar @sublibs);
-  &Complain("Could not find $dylib");
-  die;
-} # end FindLibraryFile
-
-
-######################################
-## ProcessDependencies catalogs and
-## rewrites dependencies that will be
-## packaged into our app bundle.
-######################################
-
-sub ProcessDependencies
-{
-  my (%depfiles);
-  
-  foreach my $file (@_)
-  {
-    &Verbose("Processing shared library dependencies for $file");
-    my ($filebase) = &BaseVers($file);
-    
-    my $cmd = "otool -L $file";
-    &Verbose($cmd);
-    my @deps = `$cmd`;
-    shift @deps;  # first line just repeats filename
-    &Verbose("Dependencies for $file = @deps");
-    foreach my $dep (@deps)
-    {
-      chomp $dep;
-
-      # otool returns lines like:
-      #    libblah-7.dylib   (compatibility version 7, current version 7)
-      # but we only want the file part
-      $dep =~ s/\s+(.*) \(.*\)$/$1/;
-
-      # Paths like /usr/lib/libstdc++ contain quantifiers that must be escaped
-      $dep =~ s/([+*?])/\\$1/;
-      
-      # otool sometimes lists the framework as depending on itself
-      next if ($file =~ m,/Versions/A/$dep,);
-
-      # Any dependency which is already package relative can be ignored
-      next if $dep =~ m/\@executable_path/;
-
-      # skip system library locations
-      next if ($dep =~ m|^/System|  ||
-               $dep =~ m|^/usr/lib|);
-      
-      my ($base) = &BaseVers($dep);
-      $depfiles{$base} = $dep;
-      
-      # Change references while we're here
-      &Syscall([ '/usr/bin/install_name_tool',
-                 '-change',
-                 $dep,
-                 "\@executable_path/../Frameworks/$base.framework/$base",
-                 $file ]) or die;
-    }
-  }
-  return \%depfiles;
-} # end ProcessDependencies
-
-
-######################################
-## BaseVers splits up a dylib file
-## name for framework naming.
-######################################
-
-sub BaseVers
-{
-  my ($filename) = @_;
-  
-  if ($filename =~ m|^(?:.*/)?lib(.*)\-(\d.*)\.dylib$|)
-  {
-    return ($1, $2);
-  }
-  elsif ($filename =~ m|^(?:.*/)?lib(.*?)\.(\d.*)\.dylib$|)
-  {
-    return ($1, $2);
-  }
-  elsif ($filename =~ m|^(?:.*/)?lib(.*?)\.dylib$|)
-  {
-    return ($1, undef);
-  }
-  
-  &Verbose("Not a library file: $filename");
-  return $filename;
-} # end BaseVers
-  
 
 ######################################
 ## CleanMakefiles removes every
@@ -1494,6 +1245,7 @@ sub AddFakeBinDir($)
 {
   my ($target) = @_;
 
+  &Syscall("mkdir -p $target/Contents/Resources");
   &Syscall(['ln', '-sf', '../MacOS', "$target/Contents/Resources/bin"]);
 }
 
