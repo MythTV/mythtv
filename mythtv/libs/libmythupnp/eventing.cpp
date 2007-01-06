@@ -196,10 +196,6 @@ void Eventing::HandleSubscribe( HTTPRequest *pRequest )
     
     if (pInfo != NULL)
     {
-        pRequest->m_mapRespHeaders[ "SERVER" ] = QString( "%1, UPnP/1.0, MythTv %2")
-                                                    .arg( UPnp::g_sPlatform   )
-                                                    .arg( MYTH_BINARY_VERSION );
-
         pRequest->m_mapRespHeaders[ "SID"    ] = QString( "uuid:%1" )
                                                     .arg( pInfo->sUUID );
 

@@ -60,7 +60,7 @@ void UPnpNotifyTask::SendNotifyMsg( QMulticastSocket *pSocket,
     else
         sUSN = sNT;
 
-    QString sData = QString ( "SERVER: %1, UPnP/1.0, MythTv %2\r\n"
+    QString sData = QString ( "Server: %1, UPnP/1.0, MythTv %2\r\n"
                               "NTS: %3\r\n"
                               "NT: %4\r\n"
                               "USN: %5\r\n"

@@ -70,7 +70,7 @@ void UPnpSearchTask::SendMsg( QSocketDevice  *pSocket,
     QString sData = QString ( "CACHE-CONTROL: max-age=%1\r\n"
                               "DATE: %2\r\n"
                               "EXT:\r\n"
-                              "SERVER: %3, UPnP/1.0, MythTv %4\r\n"
+                              "Server: %3, UPnP/1.0, MythTv %4\r\n"
                               "ST: %5\r\n"
                               "USN: %6\r\n"
                               "Content-Length: 0\r\n\r\n" )

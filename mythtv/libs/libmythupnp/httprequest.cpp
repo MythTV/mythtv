@@ -415,9 +415,6 @@ void HTTPRequest::FormatErrorReponse( long nCode, const QString &sDesc )
     if (m_bSOAPRequest)
     {
         m_mapRespHeaders[ "EXT" ] = "";
-        m_mapRespHeaders[ "SERVER" ] = QString( "%1, UPnP/1.0, MythTv %2" )
-                                          .arg( UPnp::g_sPlatform )
-                                          .arg( MYTH_BINARY_VERSION );
 
         m_response <<  "<s:Fault>"
                        "<faultcode>s:Client</faultcode>"
@@ -455,9 +452,6 @@ void HTTPRequest::FormatActionReponse( NameValueList *pArgs )
     if (m_bSOAPRequest)
     {
         m_mapRespHeaders[ "EXT" ] = "";
-        m_mapRespHeaders[ "SERVER" ] = QString( "%1, UPnP/1.0, MythTv %2" )
-                                          .arg( UPnp::g_sPlatform )
-                                          .arg( MYTH_BINARY_VERSION );
 
         m_response << SOAP_ENVELOPE_BEGIN 
                    << "<u:" << m_sMethod << "Response xmlns:u=\"" << m_sNameSpace << "\">\r\n";
