@@ -45,11 +45,7 @@ package MythTV::StorageGroup;
         my $basename = shift;
 
         my $dir = $self->FindRecordingDir($basename);
-        if ($dir ne '') {
-            return $dir.'/'.$basename;
-        }
-
-        return '';
+        return $dir ? "$dir/$basename" : '';
     }
 
 # Find the directory which contains the given file
@@ -58,10 +54,8 @@ package MythTV::StorageGroup;
         my $basename = shift;
 
         foreach my $dir ( @{$self->{'dirs'}} ) {
-            my $filename = $dir.'/'.$basename;
-            if (-e $filename) {
-                return $dir;
-            }
+            next unless (-e "$dir/$basename");
+            return $dir;
         }
 
         return '';
@@ -70,11 +64,7 @@ package MythTV::StorageGroup;
 # Get the first directory in the list
     sub GetFirstStorageDir {
         my $self = shift;
-
-        if (scalar @{$self->{'dirs'}} > 0) {
-            return @{$self->{'dirs'}}[0];
-        }
-        return '';
+        return ($self->{'dirs'}->[0] or '');
     }
 
 # Get the list of all recording directories
@@ -82,22 +72,22 @@ package MythTV::StorageGroup;
         my $self = shift;
 
         my @recdirs;
-        my $dir;
+        my @params;
         my $query = 'SELECT DISTINCT dirname FROM storagegroup';
 
-        if (defined($self->{'groupname'}) && $self->{'groupname'} ne "")
-        {
-            $query .= " WHERE groupname = '" . $self->{'groupname'} . "'";
-            if (defined($self->{'hostname'}) && $self->{'hostname'} ne "")
-            {
-                $query .= " AND hostname = '" . $self->{'hostname'} . "'";
+        if ($self->{'groupname'}) {
+            $query .= ' WHERE groupname = ?';
+            push @params, $self->{'groupname'};
+            if ($self->{'hostname'}) {
+                $query .= ' AND hostname = ?';
+                push @params, $self->{'hostname'};
             }
         }
 
         my $sh = $self->{'_mythtv'}{'dbh'}->prepare($query);
 
         $sh->execute(@params);
-        while (($dir) = $sh->fetchrow_array) {
+        while ((my $dir) = $sh->fetchrow_array) {
             $dir =~ s/\/+$//;
             push(@recdirs, $dir);
         }

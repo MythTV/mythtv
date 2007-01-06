@@ -112,6 +112,7 @@ package MythTV::Recording;
 
     # File exists locally
         my $sgroup = new MythTV::StorageGroup();
+        print $sgroup->GetFirstStorageDir(), "\n";
         $self->{'local_path'} = $sgroup->FindRecordingFile($self->{'basename'});
 
     # Return

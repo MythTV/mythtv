@@ -612,12 +612,11 @@ package MythTV;
         my $self = shift;
 
         my @recdirs;
-        my $dir;
-        my $query = 'SELECT DISTINCT dirname FROM storagegroup;';
-        my $sh = $self->{'dbh'}->prepare($query);
+        my $sh = $self->{'dbh'}->prepare('SELECT DISTINCT dirname
+                                            FROM storagegroup');
 
-        $sh->execute(@params);
-        while (($dir) = $sh->fetchrow_array) {
+        $sh->execute();
+        while ((my $dir) = $sh->fetchrow_array) {
             $dir =~ s/\/+$//;
             push(@recdirs, $dir);
         }
