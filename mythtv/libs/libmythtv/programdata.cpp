@@ -240,13 +240,15 @@ void ProgramData::fixProgramList(QValueList<ProgInfo> *fixlist)
             if (!quiet)
             {
                 cerr << "removing conflicting program: "
+                     << (*todelete).start.toString(Qt::ISODate) << "-"
+                     << (*todelete).end.toString(Qt::ISODate) << " "
                      << (*todelete).channel << " "
-                     << (*todelete).title.local8Bit() << " "
-                     << (*todelete).startts << "-" << (*todelete).endts << endl;
+                     << (*todelete).title.local8Bit() << endl;
                 cerr << "conflicted with             : "
+                     << (*tokeep).start.toString(Qt::ISODate) << "-"
+                     << (*tokeep).end.toString(Qt::ISODate) << " "
                      << (*tokeep).channel << " "
-                     << (*tokeep).title.local8Bit() << " "
-                     << (*tokeep).startts << "-" <<   (*tokeep).endts << endl;
+                     << (*tokeep).title.local8Bit() << endl;
                 cerr << endl;
             }
 
@@ -310,7 +312,8 @@ void ProgramData::handlePrograms(
                               "subtitle=:SUBTITLE AND description=:DESC AND "
                               "category=:CATEGORY AND "
                               "category_type=:CATEGORY_TYPE AND "
-                              "airdate=:AIRDATE AND stars=:STARS AND "
+                              "airdate=:AIRDATE AND "
+                              "stars >= (:STARS - 0.001) AND stars <= (:STARS + 0.001) AND "
                               "previouslyshown=:PREVIOUSLYSHOWN AND "
                               "title_pronounce=:TITLE_PRONOUNCE AND "
                               "stereo=:STEREO AND subtitled=:SUBTITLED AND "
@@ -369,17 +372,17 @@ void ProgramData::handlePrograms(
                         while (query.next())
                         {
                             cerr << "removing existing program: "
-                                 << (*i).channel.local8Bit() << " "
-                                 << QString::fromUtf8(query.value(0).toString()).local8Bit() << " "
                                  << query.value(1).toDateTime().toString(Qt::ISODate) << " - "
-                                 << query.value(2).toDateTime().toString(Qt::ISODate) << endl;
+                                 << query.value(2).toDateTime().toString(Qt::ISODate) << " "
+                                 << (*i).channel.local8Bit() << " "
+                                 << QString::fromUtf8(query.value(0).toString()).local8Bit()  << endl;
                         }
 
                         cerr << "inserting new program    : "
+                             << (*i).start.toString(Qt::ISODate) << " - " 
+                             << (*i).end.toString(Qt::ISODate) << " "
                              << (*i).channel.local8Bit() << " "
-                             << (*i).title.local8Bit() << " "
-                             << (*i).start.toString() << " - " 
-                             << (*i).end.toString() << endl << endl;
+                             << (*i).title.local8Bit() << endl << endl;
                     }
 
                     MSqlQuery subquery(MSqlQuery::InitCon());
