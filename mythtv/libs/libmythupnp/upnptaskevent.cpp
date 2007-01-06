@@ -56,6 +56,8 @@ void UPnpEventTask::Execute( TaskQueue * /*pQueue*/ )
     QSocketDevice        *pSockDev = new QSocketDevice( QSocketDevice::Stream );
     BufferedSocketDevice *pSock    = new BufferedSocketDevice( pSockDev );
 
+    pSockDev->setBlocking( true );
+
     if (pSock->Connect( m_PeerAddress, m_nPeerPort ))
     {
         // ------------------------------------------------------------------

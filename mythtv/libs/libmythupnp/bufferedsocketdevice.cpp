@@ -21,13 +21,13 @@ BufferedSocketDevice::BufferedSocketDevice( int nSocket  )
     m_pSocket = new QSocketDevice();
 
     m_pSocket->setSocket         ( nSocket, QSocketDevice::Stream );
-    m_pSocket->setBlocking       ( false ); // true );
+    m_pSocket->setBlocking       ( false );
     m_pSocket->setAddressReusable( true );
-    
+
     struct linger ling = {1, 1};
 
-    //if ( setsockopt( socket(), SOL_SOCKET, SO_LINGER, &ling, sizeof( ling )) < 0) 
-    //    VERBOSE(VB_IMPORTANT, QString( "BufferedSocketDevice: setsockopt - SO_LINGER Error" ));
+    if ( setsockopt( socket(), SOL_SOCKET, SO_LINGER, &ling, sizeof( ling )) < 0) 
+        VERBOSE(VB_IMPORTANT, QString( "BufferedSocketDevice: setsockopt - SO_LINGER Error" ));
 
     m_bufWrite.setAutoDelete( TRUE );
 

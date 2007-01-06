@@ -233,7 +233,7 @@ QString  UPnpDeviceDesc::GetValidXML( const QString &sBaseAddress )
 //
 /////////////////////////////////////////////////////////////////////////////
 
-void UPnpDeviceDesc::GetValidXML( const QString &sBaseAddress, QTextStream &os )
+void UPnpDeviceDesc::GetValidXML( const QString &sBaseAddress, QTextStream &os, const QString &sUserAgent )
 {
     int nStatusPort = gContext->GetNumSetting("BackendStatusPort", 6544 );
 
@@ -247,7 +247,7 @@ void UPnpDeviceDesc::GetValidXML( const QString &sBaseAddress, QTextStream &os )
             "</specVersion>"
             "<URLBase>http://" << sBaseAddress << ":" << nStatusPort << "/</URLBase>";
 
-    OutputDevice( os, &m_rootDevice );
+    OutputDevice( os, &m_rootDevice, sUserAgent );
 
     os << "</root>";
 }
@@ -256,7 +256,9 @@ void UPnpDeviceDesc::GetValidXML( const QString &sBaseAddress, QTextStream &os )
 //
 /////////////////////////////////////////////////////////////////////////////
 
-void UPnpDeviceDesc::OutputDevice( QTextStream &os, UPnpDevice *pDevice )
+void UPnpDeviceDesc::OutputDevice( QTextStream &os, 
+                                   UPnpDevice *pDevice, 
+                                   const QString &sUserAgent )
 {
     if (pDevice == NULL)
         return;
@@ -271,12 +273,29 @@ void UPnpDeviceDesc::OutputDevice( QTextStream &os, UPnpDevice *pDevice )
     else
         os << FormatValue( "friendlyName" , pDevice->m_sFriendlyName    );
 
-    os << FormatValue( "manufacturer"     , pDevice->m_sManufacturer    );
+    // ----------------------------------------------------------------------
+    // XBox 360 needs specific values in the Device Description.
+    //
+    // -=>TODO: This should be externalized in a more generic/extension 
+    //          kind of way.
+    // ----------------------------------------------------------------------
+
+    if (sUserAgent.startsWith( "Xbox/2.0", false ))
+    {
+        os << FormatValue( "manufacturer" , "Microsoft"                    );
+        os << FormatValue( "modelName"    , "Windows Media Player Sharing" );
+        os << FormatValue( "modelURL"     , "http://www.microsoft.com/"    );
+    }
+    else
+    {
+        os << FormatValue( "manufacturer" , pDevice->m_sManufacturer    );
+        os << FormatValue( "modelName"    , pDevice->m_sModelName       );
+        os << FormatValue( "modelURL"     , pDevice->m_sModelURL        );
+    }
+
     os << FormatValue( "manufacturerURL"  , pDevice->m_sManufacturerURL );
     os << FormatValue( "modelDescription" , pDevice->m_sModelDescription);
-    os << FormatValue( "modelName"        , pDevice->m_sModelName       );
     os << FormatValue( "modelNumber"      , pDevice->m_sModelNumber     );
-    os << FormatValue( "modelURL"         , pDevice->m_sModelURL        );
     os << FormatValue( "serialNumber"     , pDevice->m_sSerialNumber    );
     os << FormatValue( "UDN"              , pDevice->GetUDN()           );
     os << FormatValue( "UPC"              , pDevice->m_sUPC             );

@@ -118,7 +118,9 @@ class UPnpDeviceDesc
         void     ProcessIconList   ( QDomNode oListNode, UPnpDevice *pDevice );
         void     ProcessServiceList( QDomNode oListNode, UPnpDevice *pDevice );
 
-        void     OutputDevice( QTextStream &os, UPnpDevice *pDevice    );
+        void     OutputDevice( QTextStream &os, 
+                               UPnpDevice *pDevice, 
+                               const QString &sUserAgent = "" );
 
         void     SetStrValue ( const QDomNode &n, QString &sValue );
         void     SetNumValue ( const QDomNode &n, int     &nValue );
@@ -133,7 +135,7 @@ class UPnpDeviceDesc
 
         bool     Load       ();
 
-        void     GetValidXML( const QString &sBaseAddress, QTextStream &os  );
+        void     GetValidXML( const QString &sBaseAddress, QTextStream &os, const QString &sUserAgent = "" );
         QString  GetValidXML( const QString &sBaseAddress );
 
         QString  FindDeviceUDN( UPnpDevice *pDevice, QString sST );

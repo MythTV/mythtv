@@ -149,6 +149,39 @@ RequestType HTTPRequest::SetRequestType( const QString &sType )
 //  
 /////////////////////////////////////////////////////////////////////////////
 
+QString HTTPRequest::BuildHeader( long long nSize )
+{
+    QString sHeader;
+    QString sContentType = (m_eResponseType == ResponseTypeOther) ? 
+                            m_sResponseTypeText : GetResponseType();
+
+    sHeader = QString( "HTTP/%1.%2 %3\r\n"
+                       "Date: %4\r\n"
+                       "Server: %5, UPnP/1.0, MythTv %6\r\n" )
+                 .arg( m_nMajor )
+                 .arg( m_nMinor )
+                 .arg( GetResponseStatus() )
+                 .arg( QDateTime::currentDateTime().toString( "d MMM yyyy hh:mm:ss" ) )
+                 .arg( UPnp::g_sPlatform )
+                 .arg( MYTH_BINARY_VERSION );
+
+    sHeader += GetAdditionalHeaders();
+
+    sHeader += QString( "Connection: %1\r\n"
+                        "Content-Type: %2\r\n"
+                        "Content-Length: %3\r\n" )
+                        .arg( GetKeepAlive() ? "Keep-Alive" : "Close" )
+                        .arg( sContentType )
+                        .arg( nSize );
+    sHeader += "\r\n";
+
+    return sHeader;
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//  
+/////////////////////////////////////////////////////////////////////////////
+
 long HTTPRequest::SendResponse( void )
 {
     long      nBytes    = 0;
@@ -173,59 +206,39 @@ long HTTPRequest::SendResponse( void )
         case ResponseTypeXML: 
         case ResponseTypeHTML:
         case ResponseTypeOther:
-        {
-            QString sContentType = (m_eResponseType == ResponseTypeOther) ? 
-                                    m_sResponseTypeText : GetResponseType();
-
-            QString sDate        = QDateTime::currentDateTime()
-                                        .toString( "d MMM yyyy hh:mm:ss" );  
-
-            sHeader   = QString("HTTP/1.1 %1\r\n"
-                                "DATE: %2\r\n" )
-                                .arg( GetResponseStatus())
-                                .arg( sDate ).utf8();
-
-            QString sAddlHeaders = GetAdditionalHeaders();
-
-            sHeader += sAddlHeaders.utf8();
-            
-            sHeader += QString( "Content-Type: %1\r\n"
-                                "Content-Length: %2\r\n" )
-                                .arg( sContentType )
-                                .arg( m_aBuffer.size()).utf8();
-             
-             sHeader += QString("\r\n").utf8();
-
-            // Write out Header.
-
-//            VERBOSE(VB_UPNP,QString("HTTPRequest::SendResponse(xml/html) :%1 -> %2:")
-//                            .arg(GetResponseStatus())
-//                            .arg(GetPeerAddress()));
-
-            // --------------------------------------------------------------
-            // Make it so the header is sent with the data
-            // --------------------------------------------------------------
-
-#if !defined(CONFIG_DARWIN) && !defined(CONFIG_CYGWIN)
-            // Never send out partially complete segments
-            setsockopt( getSocketHandle(), SOL_TCP, TCP_CORK,
-                        &g_on, sizeof( g_on ));
-#endif
-
-            nBytes = WriteBlockDirect( sHeader.data(), sHeader.length() );
-
-            break;
-        }
         default:
             break;
     }
 
+    // VERBOSE(VB_UPNP,QString("HTTPRequest::SendResponse(xml/html) :%1 -> %2:")
+    //                    .arg(GetResponseStatus())
+    //                    .arg(GetPeerAddress()));
+
+    // ----------------------------------------------------------------------
+    // Make it so the header is sent with the data
+    // ----------------------------------------------------------------------
+
+#if !defined(CONFIG_DARWIN) && !defined(CONFIG_CYGWIN)
+    // Never send out partially complete segments
+    setsockopt( getSocketHandle(), SOL_TCP, TCP_CORK, &g_on, sizeof( g_on ));
+#endif
+
+    // ----------------------------------------------------------------------
+    // Write out Header.
+    // ----------------------------------------------------------------------
+
+    sHeader = BuildHeader     ( m_aBuffer.size() ).utf8();
+    nBytes  = WriteBlockDirect( sHeader.data(), sHeader.length() );
+
+    // ----------------------------------------------------------------------
     // Write out Response buffer.
+    // ----------------------------------------------------------------------
 
     if (( m_eType != RequestTypeHead ) && ( m_aBuffer.size() > 0 ))
     {
         //VERBOSE(VB_UPNP,QString("HTTPRequest::SendResponse : DATA : %1 : ")
         //                .arg(m_aBuffer.data()));
+        
         nBytes += WriteBlockDirect( m_aBuffer.data(), m_aBuffer.size() );
     }
 
@@ -246,12 +259,14 @@ long HTTPRequest::SendResponse( void )
 
 long HTTPRequest::SendResponseFile( QString sFileName )
 {
-    QCString    sHeader,
-                sContentType = "text/plain";
+    QCString    sHeader;
     long        nBytes  = 0;
     long long   llSize  = 0;
     long long   llStart = 0;
     long long   llEnd   = 0;
+
+    m_eResponseType     = ResponseTypeOther;
+    m_sResponseTypeText = "text/plain";
 
     /*
         Dump request header
@@ -276,7 +291,7 @@ long HTTPRequest::SendResponseFile( QString sFileName )
     {
         QFileInfo info( sFileName );
 
-        sContentType = GetMimeType( info.extension( FALSE ).lower() );
+        m_sResponseTypeText = GetMimeType( info.extension( FALSE ).lower() );
 
         // ------------------------------------------------------------------
         // Get File size
@@ -302,33 +317,30 @@ long HTTPRequest::SendResponseFile( QString sFileName )
 
         if ( sUserAgent.contains( "Syabas", false ) == 0 )
         {
-            // ------------------------------------------------------------------
+            // --------------------------------------------------------------
             // Process any Range Header
-            // ------------------------------------------------------------------
+            // --------------------------------------------------------------
 
-            QString sRange = GetHeaderValue( "RANGE", "" ); //range
+            QString sRange = GetHeaderValue( "range", "" ); 
 
             if (sRange.length() > 0)
             {
                 if ( bRange = ParseRange( sRange, llSize, &llStart, &llEnd ) )
                 {
                     m_nResponseStatus = 206;
-                    m_mapRespHeaders[ "Content-Range" ] = QString("%1-%2/%3")
+                    m_mapRespHeaders[ "Content-Range" ] = QString("bytes %1-%2/%3")
                                                                   .arg( llStart )
                                                                   .arg( llEnd   )
                                                                   .arg( llSize  );
-
                     llSize = (llEnd - llStart) + 1;
                 }
             }
         }
         
-        if (bRange == false)
-        {
-            // DSM-?20 specific response headers
+        // DSM-?20 specific response headers
 
+        if (bRange == false)
             m_mapRespHeaders[ "User-Agent"    ] = "redsonic";
-        }
 
         // ------------------------------------------------------------------
         //
@@ -338,28 +350,18 @@ long HTTPRequest::SendResponseFile( QString sFileName )
     else
         m_nResponseStatus = 404;
 
-    QString sDate = QDateTime::currentDateTime().toString( "d MMM yyyy hh:mm:ss" );  
-
-    sHeader   = QString("HTTP/%1.%2 %3\r\n"
-                        "Date: %4\r\n"
-                        "Content-Type: %5\r\n"
-                        "Content-Length: %6\r\n" )
-                        .arg( m_nMajor )
-                        .arg( m_nMinor )
-                        .arg( GetResponseStatus())
-                        .arg( sDate )
-                        .arg( sContentType )
-                        .arg( llSize       ).utf8();
-
     // -=>TODO: Should set "Content-Length: *" if file is still recording
 
-    sHeader += GetAdditionalHeaders() + "\r\n";
-
+    // ----------------------------------------------------------------------
     // Write out Header.
+    // ----------------------------------------------------------------------
 
+    sHeader  = BuildHeader( llSize ).utf8();
     nBytes = WriteBlockDirect( sHeader.data(), sHeader.length() );
 
+    // ----------------------------------------------------------------------
     // Write out File.
+    // ----------------------------------------------------------------------
 
     if (( m_eType != RequestTypeHead ) && (llSize != 0))
     {
@@ -367,19 +369,12 @@ long HTTPRequest::SendResponseFile( QString sFileName )
         int       file   = open( sFileName.ascii(), O_RDONLY | O_LARGEFILE );
         ssize_t   sent   = 0;  
 
-        bool bBlocking = IsBlocking();
-
-        SetBlocking( true );
-
-        //sent = sendfile64( getSocketHandle(), file, &offset, llSize ); 
-
         do 
         {  
             // SSIZE_MAX should work in kernels 2.6.16 and later.  
             // The loop is needed in any case.  
 
             sent = sendfile64( getSocketHandle(), file, &offset, 
-//                                (size_t)(llSize > 65536 ? 65536 : llSize));  
                                 (size_t)(llSize > INT_MAX ? INT_MAX : llSize));  
 
             llSize  = llEnd - offset;  
@@ -387,14 +382,9 @@ long HTTPRequest::SendResponseFile( QString sFileName )
         while (( sent >= 0 ) && ( llSize > 0 ));  
 
         if (sent < 0)
-        {
             nBytes = sent;
-            //cerr << getSocketHandle() <<" SendFile64 errno = " << errno << endl;
-        }
 
         close( file );
-
-        SetBlocking( bBlocking );
     }
 
     // ----------------------------------------------------------------------

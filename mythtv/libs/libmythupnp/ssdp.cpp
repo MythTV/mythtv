@@ -126,6 +126,7 @@ void SSDP::run()
                     switch( pRequest->m_eType )
                     {
                         case  RequestTypeMSearch:  ProcessSearchRequest( pRequest, peerAddress, peerPort ); break;
+                        case  RequestTypeNotify :  ProcessNotify       ( pRequest                        ); break;
                         default: break;
                     }
                 }
@@ -245,6 +246,21 @@ bool SSDP::ProcessSearchRequest( HTTPRequest  *pRequest,
 }
 
 /////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
+bool SSDP::ProcessNotify( HTTPRequest  *pRequest )
+{
+    QString sDescURL = pRequest->GetHeaderValue( "LOCATION"     , "" );
+    QString sNTS     = pRequest->GetHeaderValue( "NTS"          , "" );
+    QString sNT      = pRequest->GetHeaderValue( "NT"           , "" );
+    QString sUSN     = pRequest->GetHeaderValue( "USN"          , "" );
+    QString sCache   = pRequest->GetHeaderValue( "CACHE-CONTROL", "" );
+
+    return true;
+}
+
+/////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////
 //
 // SSDPExtension Implemenation
@@ -318,7 +334,11 @@ void SSDPExtension::GetDeviceDesc( HTTPRequest *pRequest )
 {
     pRequest->m_eResponseType = ResponseTypeXML;
 
-    UPnp::g_UPnpDeviceDesc.GetValidXML( pRequest->GetHostAddress(), pRequest->m_response );
+    QString sUserAgent = pRequest->GetHeaderValue( "User-Agent", "" );
+
+    UPnp::g_UPnpDeviceDesc.GetValidXML( pRequest->GetHostAddress(), 
+                                        pRequest->m_response,
+                                        sUserAgent  );
 }
 
 /////////////////////////////////////////////////////////////////////////////

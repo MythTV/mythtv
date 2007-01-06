@@ -145,6 +145,7 @@ class SSDP : public QThread
         bool    ProcessSearchRequest( HTTPRequest *pRequest,
                                       QHostAddress  peerAddress,
                                       Q_UINT16      peerPort );
+        bool    ProcessNotify       ( HTTPRequest *pRequest );
         bool    IsTermRequested     ();
 
     public:

@@ -173,6 +173,8 @@ class HTTPRequest
                                               long long *pllStart, 
                                               long long *pllEnd   );
 
+        QString         BuildHeader         ( long long nSize );
+
     public:
         
                         HTTPRequest     ();
