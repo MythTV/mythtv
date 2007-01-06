@@ -303,11 +303,15 @@ class SRDupIn : public SRSelectSetting
         SRDupIn(ScheduledRecording *_parent, ManagedList* _list, ManagedListGroup* _group)
             : SRSelectSetting(_parent, "dupInList", "[ Check for duplicates in ]", _group, "dupin", _list )
         {
-            if (gContext->GetNumSetting("HaveRepeats", 0))
-                addSelection(QObject::tr("Record new episodes only"), kDupsNewEpi);
             addSelection(QObject::tr("Look for duplicates in current and previous recordings"), kDupsInAll);
             addSelection(QObject::tr("Look for duplicates in current recordings only"), kDupsInRecorded);
             addSelection(QObject::tr("Look for duplicates in previous recordings only"), kDupsInOldRecorded);
+            addSelection(QObject::tr("Exclude unidentified episodes"), kDupsExGeneric | kDupsInAll);
+            if (gContext->GetNumSetting("HaveRepeats", 0))
+            {
+                addSelection(QObject::tr("Exclude old episodes"), kDupsExRepeats | kDupsInAll);
+                addSelection(QObject::tr("Record new episodes only"), kDupsNewEpi | kDupsInAll);
+            }
             setValue(kDupsInAll);
             _parent->setDupInObj(this);
         }

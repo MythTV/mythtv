@@ -1981,7 +1981,11 @@ void Scheduler::UpdateMatches(int recordid) {
 " IF(search = %1, recordid, 0) ").arg(kManualSearch) + QString(
 "FROM (RECTABLE, program INNER JOIN channel "
 "      ON channel.chanid = program.chanid) ") + fromclauses[clause] + QString(
-" WHERE ") + whereclauses[clause] + QString(" AND channel.visible = 1 AND "
+" WHERE ") + whereclauses[clause] + 
+    QString(" AND (NOT ((RECTABLE.dupin & %1) AND program.previouslyshown)) "
+            " AND (NOT ((RECTABLE.dupin & %2) AND program.generic > 0)) ")
+            .arg(kDupsExRepeats).arg(kDupsExGeneric) +
+    QString(" AND channel.visible = 1 AND "
 "((RECTABLE.type = %1 " // allrecord
 "OR RECTABLE.type = %2 " // findonerecord
 "OR RECTABLE.type = %3 " // finddailyrecord
@@ -2404,15 +2408,13 @@ void Scheduler::AddNewRecords(void)
                  !p->reactivate &&
                  !(p->dupmethod & kDupCheckNone))
         {
-            if (p->dupin == kDupsNewEpi && p->repeat)
+            if ((p->dupin & kDupsNewEpi) && p->repeat)
                 p->recstatus = rsRepeat;
 
-            if (((p->dupin & kDupsInOldRecorded) || (p->dupin == kDupsNewEpi)) &&
-                result.value(10).toInt())
+            if ((p->dupin & kDupsInOldRecorded) && result.value(10).toInt())
                 p->recstatus = rsPreviousRecording;
 
-            if (((p->dupin & kDupsInRecorded) || (p->dupin == kDupsNewEpi)) &&
-                result.value(14).toInt())
+            if ((p->dupin & kDupsInRecorded) && result.value(14).toInt())
                 p->recstatus = rsCurrentRecording;
         }
 

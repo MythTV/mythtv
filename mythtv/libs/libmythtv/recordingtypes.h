@@ -24,9 +24,10 @@ enum RecordingDupInType
 {
     kDupsInRecorded     = 0x01,
     kDupsInOldRecorded  = 0x02,
-    kDupsInBoth         = 0x03,
-    kDupsNewEpi         = 0x04,
-    kDupsInAll          = 0x0F
+    kDupsInAll          = 0x0F,
+    kDupsNewEpi         = 0x10,
+    kDupsExRepeats      = 0x20,
+    kDupsExGeneric      = 0x40
 };
 
 
