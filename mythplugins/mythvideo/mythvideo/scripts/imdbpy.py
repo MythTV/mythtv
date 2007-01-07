@@ -188,7 +188,7 @@ def metadata_search(imdb_id):
 	if 'director' in movie.keys():
 		directors = movie['director']
 		if directors is not None:
-			metadata += "Director:%s" % directors[0] + "\n"
+			metadata += "Director:%s" % unicode(directors[0]) + "\n"
 			
 	if 'plot' in movie.keys():
 		plots = movie['plot']

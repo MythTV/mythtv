@@ -29,8 +29,6 @@ or a DVD directory) the file name is video.metadata.
 Includes an interactive mode which makes the script ask user for input in case there are
 titles for which IMDb queries cannot be done unambiguously.
 
-Changes:
-2006-11-26:[PJ] The first version.
 """  
 
 import sys
@@ -59,6 +57,10 @@ videoExtensions = ["avi", "mpg", "wmv"]
 # directory and might consist of multiple video files for the same
 # title (basically, DVD backups in its several forms)
 dirMetadataFileName = "video.metadata"
+
+# Directories to skip in the recursive scan (matched to the rightmost
+# part of the directory).
+skipDirs = ["/Sample", "/Sub"]
 
 def print_verbose(string):
 	global verbose
@@ -339,6 +341,7 @@ def scan(pathName):
 	if os.path.isdir(pathName):
 		if recursive:
 			for root, dirs, files in os.walk(pathName):
+				if should_be_skipped(root): continue
 				scan_directory(root)
 		else:
 			scan_directory(pathName)
@@ -367,7 +370,7 @@ def main():
 	options, arguments = p.parse_args()
 	
 	if options.version: 
-		print "MythVideo Metadata Finder v1.0 (c) Pekka J√§√§skel√§inen 2006"
+		print "MythVideo Metadata Finder (c) Pekka J‰‰skel‰inen 2006-2007"
 		sys.exit(0)
 			
 	verbose = options.wordy
