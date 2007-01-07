@@ -94,6 +94,7 @@ class SIScan : public QObject,
     // DVB Main
     void HandleNIT(const NetworkInformationTable*);
     void HandleSDT(uint tsid, const ServiceDescriptionTable*);
+    void HandleTDT(const TimeDateTable*) {}
 
   private slots:
     void HandleAllGood(void);

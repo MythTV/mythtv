@@ -8,7 +8,8 @@
 #include "dvbdescriptors.h"
 
 QDateTime dvbdate2qt(const unsigned char*);
-uint dvbdate2key(const unsigned char *);
+time_t dvbdate2unix(const unsigned char*);
+uint32_t dvbdate2key(const unsigned char*);
 
 /** \class NetworkInformationTable
  *  \brief This table tells the decoder on which PIDs to find other tables.
@@ -249,11 +250,11 @@ class DVBEventInformationTable : public PSIPTable
         { return _ptrs[i]+2; }
     QDateTime StartTimeUTC(uint i) const
         { return dvbdate2qt(StartTime(i)); }
-    uint StartTimeUnixUTC(uint i) const;
-    uint EndTimeUnixUTC(uint i) const
+    time_t StartTimeUnixUTC(uint i) const
+        { return dvbdate2unix(StartTime(i)); }
+    time_t EndTimeUnixUTC(uint i) const
         { return StartTimeUnixUTC(i) + DurationInSeconds(i); }
-    /// Returns 32 bit key representing time
-    uint StartTimeKey(uint i) const
+    uint32_t StartTimeKey(uint i) const
         { return dvbdate2key(StartTime(i)); }
     //   duration              24   7.0+x
     const unsigned char *Duration(uint i) const
@@ -286,5 +287,30 @@ class DVBEventInformationTable : public PSIPTable
     mutable vector<const unsigned char*> _ptrs; // used to parse
 };
 
+/** \class TimeDateTable
+ *  \brief This table gives the current DVB stream time
+ */
+class TimeDateTable : public PSIPTable
+{
+  public:
+    TimeDateTable(const PSIPTable& table)
+        : PSIPTable(table)
+    {
+        assert(TableID::TDT == TableID());
+    }
+    ~TimeDateTable() { ; }
+
+    // table_id                 8   0.0       0x70
+    // section_syntax_indicator 1   1.0          0
+    // reserved_future_use      1   1.1          1
+    // reserved                 2   1.2          3
+    // section_length          12   1.4         40
+    // UTC_time                40   3.0          0
+    const unsigned char *UTCdata(void) const
+        { return pesdata() + 3; }
+
+    QDateTime UTC(void)  const { return dvbdate2qt(UTCdata());   }
+    time_t UTCUnix(void) const { return dvbdate2unix(UTCdata()); }
+};
 
 #endif // _DVB_TABLES_H_

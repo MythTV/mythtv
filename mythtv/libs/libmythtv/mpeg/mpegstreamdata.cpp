@@ -1,5 +1,9 @@
 // -*- Mode: c++ -*-
 // Copyright (c) 2003-2004, Daniel Thor Kristjansson
+
+// POSIX headers
+#include <sys/time.h> // for gettimeofday
+
 #include "mpegstreamdata.h"
 #include "mpegtables.h"
 #include "RingBuffer.h"
@@ -46,7 +50,10 @@ const unsigned char MPEGStreamData::bit_sel[8] =
  */
 MPEGStreamData::MPEGStreamData(int desiredProgram, bool cacheTables)
     : _sistandard("mpeg"),
-      _have_CRC_bug(false), _eit_helper(NULL), _eit_rate(0.0f),
+      _have_CRC_bug(false),
+      _local_utc_offset(0), _si_time_offset_cnt(0),
+      _si_time_offset_indx(0),
+      _eit_helper(NULL), _eit_rate(0.0f),
       _listener_lock(true),
       _cache_tables(cacheTables), _cache_lock(true),
       // Single program stuff
@@ -58,6 +65,9 @@ MPEGStreamData::MPEGStreamData(int desiredProgram, bool cacheTables)
       _pat_single_program(NULL), _pmt_single_program(NULL),
       _invalid_pat_seen(false), _invalid_pat_warning(false)
 {
+    _local_utc_offset = calc_utc_offset();
+    bzero(_si_time_offsets, sizeof(_si_time_offsets));
+
     AddListeningPID(MPEG_PAT_PID);
 }
 
@@ -627,6 +637,39 @@ void MPEGStreamData::ProcessPMT(const ProgramMapTable *pmt)
     }
 }
 
+double MPEGStreamData::TimeOffset(void) const
+{
+    QMutex locker(&_si_time_lock);
+    if (!_si_time_offset_cnt)
+        return 0.0;
+
+    double avg_offset = 0.0;
+    double mult = 1.0 / _si_time_offset_cnt;
+    for (uint i = 0; i < _si_time_offset_cnt; i++)
+        avg_offset += _si_time_offsets[i] * mult;
+
+    return avg_offset;
+}
+
+void MPEGStreamData::UpdateTimeOffset(uint64_t _si_utc_time)
+{
+    struct timeval tm;
+    if (gettimeofday(&tm, NULL) != 0)
+        return;
+
+    double utc_time = tm.tv_sec + (tm.tv_usec * 0.000001);
+    double si_time  = _si_utc_time;
+
+    QMutex locker(&_si_time_lock);
+    _si_time_offsets[_si_time_offset_indx] = si_time - utc_time;
+
+    if (_si_time_offset_indx + 1 > _si_time_offset_cnt)
+        _si_time_offset_cnt = _si_time_offset_indx + 1;
+
+    _si_time_offset_indx = (_si_time_offset_indx + 1) & 0xf;
+
+}
+
 #define DONE_WITH_PES_PACKET() { if (psip) delete psip; \
     if (morePSIPPackets) goto HAS_ANOTHER_PES; else return; }
 
@@ -641,6 +684,13 @@ void MPEGStreamData::HandleTSTables(const TSPacket* tspacket)
     PSIPTable *psip = AssemblePSIP(tspacket, morePSIPPackets);
     if (!psip)
        return;
+
+    // Don't do the usual checks on TDT - it has no CRC, etc...
+    if (TableID::TDT == psip->TableID())
+    {
+        HandleTables(tspacket->PID(), *psip);
+        DONE_WITH_PES_PACKET();
+    }
 
     // drop stuffing packets
     if ((TableID::ST       == psip->TableID()) ||

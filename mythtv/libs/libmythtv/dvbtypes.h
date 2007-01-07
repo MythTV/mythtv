@@ -14,22 +14,18 @@
 #include <stdint.h>
 #include <unistd.h>
 
-// C++ headers
-#include <vector>
-using namespace std;
-
 // DVB headers
 #include <linux/dvb/version.h>
+#include <linux/dvb/frontend.h>
+#include <linux/dvb/dmx.h>
+
 #if (DVB_API_VERSION != 3)
-#error "DVB driver includes with API version 3 not found!"
+#    error "DVB driver includes with API version 3 not found!"
 #endif
 
 #ifndef DVB_API_VERSION_MINOR
-#define DVB_API_VERSION_MINOR 0
+#    define DVB_API_VERSION_MINOR 0
 #endif
-
-#include <linux/dvb/frontend.h>
-#include <linux/dvb/dmx.h>
 
 #if (DVB_API_VERSION >= 3 && DVB_API_VERSION_MINOR >= 1)
 #    define USE_ATSC
@@ -43,11 +39,6 @@ using namespace std;
 #    define VSB_16        (fe_modulation)(QAM_AUTO+2)
 #endif
 
-#define MPEG_TS_PKT_SIZE 188
-#define DEF_DMX_BUF_SIZE  64 * 1024
-#define MAX_SECTION_SIZE 4096
-#define DMX_DONT_FILTER 0x2000
-
 #ifdef FE_GET_EXTENDED_INFO
   #define dvb_fe_params dvb_frontend_parameters_new
 #else
@@ -56,10 +47,5 @@ using namespace std;
 
 class QString;
 QString toString(fe_status);
-
-typedef vector<uint16_t> dvb_pid_t;
-// needs to add provider id so dvbcam doesnt require parsing
-// of the pmt and or the pmtcache
-typedef vector<uint16_t> dvb_caid_t;
 
 #endif // DVB_TYPES_H

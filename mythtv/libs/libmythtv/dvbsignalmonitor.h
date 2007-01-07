@@ -27,6 +27,15 @@ class DVBSignalMonitor: public DTVSignalMonitor
 
     virtual void SetRotorTarget(float target);
 
+    // MPEG
+    virtual void HandlePMT(uint, const ProgramMapTable*);
+
+    // ATSC Main
+    virtual void HandleSTT(const SystemTimeTable*);
+
+    // DVB Main
+    virtual void HandleTDT(const TimeDateTable*);
+
   public slots:
     void deleteLater(void);
 
@@ -52,6 +61,7 @@ class DVBSignalMonitor: public DTVSignalMonitor
     bool RemovePIDFilter(uint pid);
 
     int GetDVBCardNum(void) const;
+    DVBChannel *GetDVBChannel(void);
 
     bool SupportsTSMonitoring(void);
   protected:

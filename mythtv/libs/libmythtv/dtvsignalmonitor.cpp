@@ -341,6 +341,11 @@ void DTVSignalMonitor::HandlePMT(uint, const ProgramMapTable *pmt)
     }
 }
 
+void DTVSignalMonitor::HandleSTT(const SystemTimeTable*)
+{
+    VERBOSE(VB_CHANNEL, LOC + "Time Offset: "<<GetStreamData()->TimeOffset());
+}
+
 void DTVSignalMonitor::HandleMGT(const MasterGuideTable* mgt)
 {
     AddFlags(kDTVSigMon_MGTSeen);
@@ -403,6 +408,11 @@ void DTVSignalMonitor::HandleCVCT(uint, const CableVirtualChannelTable* cvct)
 
     SetProgramNumber(cvct->ProgramNumber(idx));
     AddFlags(kDTVSigMon_VCTMatch | kDTVSigMon_CVCTMatch);
+}
+
+void DTVSignalMonitor::HandleTDT(const TimeDateTable*)
+{
+    VERBOSE(VB_CHANNEL, LOC + "Time Offset: "<<GetStreamData()->TimeOffset());
 }
 
 void DTVSignalMonitor::HandleNIT(const NetworkInformationTable *nit)

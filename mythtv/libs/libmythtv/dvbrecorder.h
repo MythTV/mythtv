@@ -55,9 +55,12 @@ typedef vector<uint>        uint_vec_t;
  *
  *  \sa DTVRecorder, HDTVRecorder
  */
-class DVBRecorder : public DTVRecorder,
-                    private ReaderPausedCB,
-                    public MPEGStreamListener
+class DVBRecorder :
+    public DTVRecorder,
+    public MPEGStreamListener,
+    public DVBMainStreamListener,
+    public ATSCMainStreamListener,
+    private ReaderPausedCB
 {
   public:
     DVBRecorder(TVRec *rec, DVBChannel* dvbchannel);
@@ -81,6 +84,16 @@ class DVBRecorder : public DTVRecorder,
     void HandlePAT(const ProgramAssociationTable*);
     void HandleCAT(const ConditionalAccessTable*) {}
     void HandlePMT(uint pid, const ProgramMapTable*);
+
+    // ATSC Main
+    void HandleSTT(const SystemTimeTable*);
+    void HandleVCT(uint /*tsid*/, const VirtualChannelTable*) {}
+    void HandleMGT(const MasterGuideTable*) {}
+
+    // DVBMainStreamListener
+    void HandleTDT(const TimeDateTable*);
+    void HandleNIT(const NetworkInformationTable*) {}
+    void HandleSDT(uint /*tsid*/, const ServiceDescriptionTable*) {}
 
     void SetStreamData(MPEGStreamData*);
     MPEGStreamData* GetStreamData(void) { return _stream_data; }

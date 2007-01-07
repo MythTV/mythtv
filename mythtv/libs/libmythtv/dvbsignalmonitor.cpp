@@ -14,6 +14,7 @@
 #include "mythdbcon.h"
 #include "dvbsignalmonitor.h"
 #include "dvbchannel.h"
+#include "dvbstreamdata.h"
 #include "atscstreamdata.h"
 #include "mpegtables.h"
 #include "atsctables.h"
@@ -553,6 +554,29 @@ void DVBSignalMonitor::RetuneMonitor(void)
             rotorPosition.SetValue(100);
         }
     }
+}
+
+void DVBSignalMonitor::HandlePMT(uint program_num, const ProgramMapTable *pmt)
+{
+    DTVSignalMonitor::HandlePMT(program_num, pmt);
+    GetDVBChannel()->SetPMT(pmt);
+}
+
+void DVBSignalMonitor::HandleSTT(const SystemTimeTable *stt)
+{
+    DTVSignalMonitor::HandleSTT(stt);
+    GetDVBChannel()->SetTimeOffset(GetStreamData()->TimeOffset());
+}
+
+void DVBSignalMonitor::HandleTDT(const TimeDateTable *tdt)
+{
+    DTVSignalMonitor::HandleTDT(tdt);
+    GetDVBChannel()->SetTimeOffset(GetStreamData()->TimeOffset());
+}
+
+DVBChannel *DVBSignalMonitor::GetDVBChannel(void)
+{
+    return dynamic_cast<DVBChannel*>(channel);
 }
 
 void DVBSignalMonitor::RunTableMonitor(void)

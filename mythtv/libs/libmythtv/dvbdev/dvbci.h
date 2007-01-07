@@ -153,6 +153,7 @@ public:
   virtual cCiEnquiry *GetEnquiry(void) = 0;
   virtual const unsigned short *GetCaSystemIds(int Slot) = 0;
   virtual bool SetCaPmt(cCiCaPmt &CaPmt, int Slot) = 0;
+  virtual void SetTimeOffset(double /*offset_in_seconds*/) { }
   };
 
 class cLlCiHandler : public cCiHandler {
@@ -188,6 +189,7 @@ public:
   bool SetCaPmt(cCiCaPmt &CaPmt);
   const unsigned short *GetCaSystemIds(int Slot);
   bool SetCaPmt(cCiCaPmt &CaPmt, int Slot);
+  void SetTimeOffset(double offset_in_seconds);
   bool Reset(int Slot);
   bool connected() const;
   };

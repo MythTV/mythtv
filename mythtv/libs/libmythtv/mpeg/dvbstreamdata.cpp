@@ -19,6 +19,7 @@ DVBStreamData::DVBStreamData(uint desired_netid,  uint desired_tsid,
     SetVersionNITo(-1,0);
     AddListeningPID(DVB_NIT_PID);
     AddListeningPID(DVB_SDT_PID);
+    AddListeningPID(DVB_TDT_PID);
 }
 
 DVBStreamData::~DVBStreamData()
@@ -88,6 +89,9 @@ bool DVBStreamData::IsRedundant(uint pid, const PSIPTable &psip) const
             return false;
         return SDTSectionSeen(psip.TableIDExtension(), psip.Section());
     }
+
+    if (TableID::TDT == table_id)
+        return false;
 
     bool is_eit = false;
     if (DVB_EIT_PID == pid)
@@ -183,6 +187,7 @@ void DVBStreamData::Reset(uint desired_netid, uint desired_tsid,
     }
     AddListeningPID(DVB_NIT_PID);
     AddListeningPID(DVB_SDT_PID);
+    AddListeningPID(DVB_TDT_PID);
 }
 
 /** \fn DVBStreamData::HandleTables(uint pid, const PSIPTable&)
@@ -241,6 +246,18 @@ bool DVBStreamData::HandleTables(uint pid, const PSIPTable &psip)
                 ServiceDescriptionTable sdt(psip);
                 ProcessSDT(tsid, &sdt);
             }
+
+            return true;
+        }
+        case TableID::TDT:
+        {
+            TimeDateTable tdt(psip);
+
+            UpdateTimeOffset(tdt.UTCUnix());
+
+            QMutexLocker locker(&_listener_lock);
+            for (uint i = 0; i < _dvb_main_listeners.size(); i++)
+                _dvb_main_listeners[i]->HandleTDT(&tdt);
 
             return true;
         }

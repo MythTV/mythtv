@@ -39,6 +39,7 @@ class MPUBLIC MythTimer
 };
 
 MPUBLIC QDateTime mythCurrentDateTime();
+MPUBLIC int calc_utc_offset(void);
 
 // This is necessary for GCC 3.3, which has llabs(long long)
 // but not abs(long long) or std::llabs(long long)

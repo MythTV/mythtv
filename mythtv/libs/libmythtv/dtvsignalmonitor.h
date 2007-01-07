@@ -88,7 +88,7 @@ class DTVSignalMonitor : public SignalMonitor,
     void HandlePMT(uint, const ProgramMapTable*);
 
     // ATSC Main
-    void HandleSTT(const SystemTimeTable*) {}
+    void HandleSTT(const SystemTimeTable*);
     void HandleVCT(uint /*tsid*/, const VirtualChannelTable*) {}
     void HandleMGT(const MasterGuideTable*);
 
@@ -101,6 +101,7 @@ class DTVSignalMonitor : public SignalMonitor,
         const DirectedChannelChangeSelectionCodeTable*) {}
 
     // DVB Main
+    void HandleTDT(const TimeDateTable*);
     void HandleNIT(const NetworkInformationTable*);
     void HandleSDT(uint, const ServiceDescriptionTable*);
 

@@ -308,12 +308,16 @@ bool ATSCStreamData::HandleTables(uint pid, const PSIPTable &psip)
         {
             SystemTimeTable stt(psip);
 
+            UpdateTimeOffset(stt.UTCUnix());
+
             // only update internal offset if it changes
             if (stt.GPSOffset() != _GPS_UTC_offset)
                 _GPS_UTC_offset = stt.GPSOffset();
 
+            _listener_lock.lock();
             for (uint i = 0; i < _atsc_main_listeners.size(); i++)
                 _atsc_main_listeners[i]->HandleSTT(&stt);
+            _listener_lock.unlock();
 
             if (_eit_helper && GPSOffset() != _eit_helper->GetGPSOffset())
                 _eit_helper->SetGPSOffset(GPSOffset());

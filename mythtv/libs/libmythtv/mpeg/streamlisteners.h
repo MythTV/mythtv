@@ -31,6 +31,7 @@ class DirectedChannelChangeSelectionCodeTable;
 
 class NetworkInformationTable;
 class ServiceDescriptionTable;
+class TimeDateTable;
 class DVBEventInformationTable;
 
 class MPEGStreamListener
@@ -89,6 +90,7 @@ class DVBMainStreamListener
   protected:
     virtual ~DVBMainStreamListener() {}
   public:
+    virtual void HandleTDT(const TimeDateTable*) = 0;
     virtual void HandleNIT(const NetworkInformationTable*) = 0;
     virtual void HandleSDT(uint tsid, const ServiceDescriptionTable*) = 0;
 };

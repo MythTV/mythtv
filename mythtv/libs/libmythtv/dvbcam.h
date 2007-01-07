@@ -23,6 +23,7 @@ class DVBCam
     bool Stop();
     bool IsRunning() const { return ciThreadRunning; }
     void SetPMT(const ProgramMapTable *pmt);
+    void SetTimeOffset(double offset_in_seconds);
 
   private:
     static void *CiHandlerThreadHelper(void*);

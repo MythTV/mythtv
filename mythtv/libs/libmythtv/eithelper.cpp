@@ -635,24 +635,10 @@ static void init_fixup(QMap<uint64_t,uint> &fix)
 static int calc_eit_utc_offset(void)
 {
     QString config_offset = gContext->GetSetting("EITTimeOffset", "Auto");
+
     if (config_offset == "Auto")
-    {
-        QDateTime loc = QDateTime::currentDateTime(Qt::LocalTime);
-        QDateTime utc = QDateTime::currentDateTime(Qt::UTC);
+        return calc_utc_offset();
 
-        int utc_offset = MythSecsTo(utc, loc);
-
-        // clamp to nearest minute if within 10 seconds
-        int off = utc_offset % 60;
-        if (abs(off) < 10)
-            utc_offset -= off;
-        if (off < -50 && off > -60)
-            utc_offset -= 60 + off;
-        if (off > +50 && off < +60)
-            utc_offset += 60 - off;
-
-        return utc_offset;
-    }
     if (config_offset == "None")
         return 0;
 

@@ -169,25 +169,8 @@ bool DVBEventInformationTable::IsEIT(uint table_id)
     return is_eit;
 }
 
-uint DVBEventInformationTable::StartTimeUnixUTC(uint i) const
-{
-    const unsigned char *buf = StartTime(i);
-
-    // Modified Julian date as number of days since 17th November 1858.
-    // The unix epoch, 1st Jan 1970, was day 40587.
-    uint mjd = (buf[0] << 8) | buf[1];
-    if (mjd < 40587)
-        return 0; // we don't handle pre-unix dates..
-
-    uint secsSince1970 = (mjd - 40587)   * 86400;
-    secsSince1970 += byteBCD2int(buf[2]) * 3600;
-    secsSince1970 += byteBCD2int(buf[3]) * 60;
-    secsSince1970 += byteBCD2int(buf[4]);
-    return secsSince1970;
-}
-
 /** \fn dvbdate2qt(const unsigned char*)
- *  \return UTC time
+ *  \return UTC time as QDateTime
  */
 QDateTime dvbdate2qt(const unsigned char *buf)
 {
@@ -228,7 +211,28 @@ QDateTime dvbdate2qt(const unsigned char *buf)
     return QDateTime(date, time);
 }
 
-uint dvbdate2key(const unsigned char *buf)
+/** \fn dvbdate2unix(const unsigned char*)
+ *  \return UTC time as time_t
+ */
+time_t dvbdate2unix(const unsigned char *buf)
+{
+    // Modified Julian date as number of days since 17th November 1858.
+    // The unix epoch, 1st Jan 1970, was day 40587.
+    uint mjd = (buf[0] << 8) | buf[1];
+    if (mjd < 40587)
+        return 0; // we don't handle pre-unix dates..
+
+    uint secsSince1970 = (mjd - 40587)   * 86400;
+    secsSince1970 += byteBCD2int(buf[2]) * 3600;
+    secsSince1970 += byteBCD2int(buf[3]) * 60;
+    secsSince1970 += byteBCD2int(buf[4]);
+    return secsSince1970;
+}
+
+/** \fn dvbdate2key(const unsigned char*)
+ *  \return UTC time as 32 bit key
+ */
+uint32_t dvbdate2key(const unsigned char *buf)
 {
     uint dt = (((uint)buf[0]) << 24) | (((uint)buf[1]) << 16); // 16 bits
     uint tm = ((byteBCD2int(buf[2]) * 3600) +

@@ -50,6 +50,9 @@ class MPEGStreamData : public EITSource
     void SetCaching(bool cacheTables) { _cache_tables = cacheTables; }
     virtual void Reset(int desiredProgram);
 
+    /// \brief Current Offset from computer time to DVB time in seconds
+    double TimeOffset(void) const;
+
     // EIT Source
     virtual void SetEITHelper(EITHelper *eit_helper);
     virtual void SetEITRate(float rate);
@@ -217,6 +220,8 @@ class MPEGStreamData : public EITSource
 
     static int ResyncStream(unsigned char *buffer, int curr_pos, int len);
 
+    void UpdateTimeOffset(uint64_t si_utc_time);
+
     // Caching
     void IncrementRefCnt(const PSIPTable *psip) const;
     virtual void DeleteCachedTable(PSIPTable *psip) const;
@@ -227,6 +232,13 @@ class MPEGStreamData : public EITSource
     QString                   _sistandard;
 
     bool                      _have_CRC_bug;
+
+    int                       _local_utc_offset;
+
+    mutable QMutex            _si_time_lock;
+    uint                      _si_time_offset_cnt;
+    uint                      _si_time_offset_indx;
+    double                    _si_time_offsets[16];
 
     // Generic EIT stuff used for ATSC and DVB
     EITHelper                *_eit_helper;

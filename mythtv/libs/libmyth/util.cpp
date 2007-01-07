@@ -62,6 +62,25 @@ QDateTime mythCurrentDateTime()
     return rettime;
 }
 
+int calc_utc_offset(void)
+{
+    QDateTime loc = QDateTime::currentDateTime(Qt::LocalTime);
+    QDateTime utc = QDateTime::currentDateTime(Qt::UTC);
+
+    int utc_offset = MythSecsTo(utc, loc);
+
+    // clamp to nearest minute if within 10 seconds
+    int off = utc_offset % 60;
+    if (abs(off) < 10)
+        utc_offset -= off;
+    if (off < -50 && off > -60)
+        utc_offset -= 60 + off;
+    if (off > +50 && off < +60)
+        utc_offset += 60 - off;
+
+    return utc_offset;
+}
+
 /** \fn encodeLongLong(QStringList&,long long)
  *  \brief Encodes a long for streaming in the MythTV protocol.
  *

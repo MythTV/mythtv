@@ -58,6 +58,7 @@ using namespace std;
 #include "programinfo.h"
 #include "mpegtables.h"
 #include "iso639.h"
+#include "dvbstreamdata.h"
 #include "atscstreamdata.h"
 #include "atsctables.h"
 #include "cardutil.h"
@@ -243,6 +244,16 @@ void DVBRecorder::HandlePMT(uint progNum, const ProgramMapTable *_pmt)
     }
 }
 
+void DVBRecorder::HandleSTT(const SystemTimeTable*)
+{
+    dvbchannel->SetTimeOffset(GetStreamData()->TimeOffset());
+}
+
+void DVBRecorder::HandleTDT(const TimeDateTable*)
+{
+    dvbchannel->SetTimeOffset(GetStreamData()->TimeOffset());
+}
+
 bool DVBRecorder::Open(void)
 {
     if (IsOpen())
@@ -300,6 +311,10 @@ void DVBRecorder::SetStreamData(MPEGStreamData *data)
     if (data)
     {
         data->AddMPEGListener(this);
+
+        DVBStreamData *dvb = dynamic_cast<DVBStreamData*>(data);
+        if (dvb)
+            dvb->AddDVBMainListener(this);
 
         ATSCStreamData *atsc = dynamic_cast<ATSCStreamData*>(data);
 
@@ -511,6 +526,10 @@ bool DVBRecorder::AdjustFilters(void)
     add_pid.push_back(MPEG_PAT_PID);
     add_stream_type.push_back(StreamID::PrivSec);
     _stream_data->AddListeningPID(MPEG_PAT_PID);
+
+    add_pid.push_back(DVB_TDT_PID);
+    add_stream_type.push_back(StreamID::PrivSec);
+    _stream_data->AddListeningPID(DVB_TDT_PID);
 
     // Record the streams in the PMT...
     bool need_pcr_pid = true;

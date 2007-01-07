@@ -1017,10 +1017,12 @@ class cCiDateTime : public cCiSession {
 private:
   int interval;
   time_t lastTime;
+  int timeOffset;
   bool SendDateTime(void);
 public:
   cCiDateTime(int SessionId, cCiTransportConnection *Tc);
   virtual bool Process(int Length = 0, const uint8_t *Data = NULL);
+  void SetTimeOffset(double offset);
   };
 
 cCiDateTime::cCiDateTime(int SessionId, cCiTransportConnection *Tc)
@@ -1028,7 +1030,14 @@ cCiDateTime::cCiDateTime(int SessionId, cCiTransportConnection *Tc)
 {
   interval = 0;
   lastTime = 0;
+  timeOffset = 0;
   dbgprotocol("New Date Time (session id %d)\n", SessionId);
+}
+
+void cCiDateTime::SetTimeOffset(double offset)
+{
+    timeOffset = (int) offset;
+    dbgprotocol("New Time Offset: %i secs\n", timeOffset);
 }
 
 bool cCiDateTime::SendDateTime(void)
@@ -1036,6 +1045,13 @@ bool cCiDateTime::SendDateTime(void)
   time_t t = time(NULL);
   struct tm tm_gmt;
   struct tm tm_loc;
+
+  // Avoid using signed time_t types
+  if (timeOffset < 0)
+      t -= (time_t)(-timeOffset);
+  else
+      t += (time_t)(timeOffset);
+
   if (gmtime_r(&t, &tm_gmt) && localtime_r(&t, &tm_loc)) {
      int Y = tm_gmt.tm_year;
      int M = tm_gmt.tm_mon + 1;
@@ -1732,6 +1748,19 @@ bool cLlCiHandler::SetCaPmt(cCiCaPmt &CaPmt, int Slot)
   cMutexLock MutexLock(&mutex);
   cCiConditionalAccessSupport *cas = (cCiConditionalAccessSupport *)GetSessionByResourceId(RI_CONDITIONAL_ACCESS_SUPPORT, Slot);
   return cas && cas->SendPMT(CaPmt);
+}
+
+void cLlCiHandler::SetTimeOffset(double offset_in_seconds)
+{
+    cMutexLock MutexLock(&mutex);
+    cCiDateTime *dt = NULL;
+
+    for (uint i = 0; i < (uint) NumSlots(); i++)
+    {
+        dt = (cCiDateTime*) GetSessionByResourceId(RI_DATE_TIME, i);
+        if (dt)
+            dt->SetTimeOffset(offset_in_seconds);
+    }
 }
 
 bool cLlCiHandler::Reset(int Slot)

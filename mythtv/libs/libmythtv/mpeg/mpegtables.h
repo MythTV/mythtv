@@ -182,7 +182,7 @@ enum
     DVB_SDT_PID   = 0x0011,
     DVB_EIT_PID   = 0x0012,
     DVB_RST_PID   = 0x0013,
-    DVB_TOT_PID   = 0x0013,
+    DVB_TDT_PID   = 0x0014,
 
     // Dishnet longterm EIT is on pid 0x300
     DVB_DNLONG_EIT_PID = 0x0300,

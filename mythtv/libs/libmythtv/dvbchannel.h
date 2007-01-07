@@ -32,6 +32,7 @@ class DVBChannel : public DTVChannel
 
     // Sets
     void SetPMT(const ProgramMapTable*);
+    void SetTimeOffset(double offset);
     void SetSlowTuning(uint how_slow_in_ms)
         { tuning_delay = how_slow_in_ms; }
 

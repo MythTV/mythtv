@@ -651,14 +651,22 @@ class SystemTimeTable : public PSIPTable
     // protocol_version         8   8.0       0x00 for now
 
     // system_time             32   9.0
-    QDateTime SystemTimeGPS() const
+    uint32_t GPSRaw(void) const
     {
-        uint t = ((pesdata()[9]<<24)  | (pesdata()[10]<<16) |
-                  (pesdata()[11]<< 8) |  pesdata()[12]);
+        return ((pesdata()[9] <<24) | (pesdata()[10]<<16) |
+                (pesdata()[11]<< 8) |  pesdata()[12]);
+    }
+    QDateTime SystemTimeGPS(void) const
+    {
         QDateTime dt;
-        dt.setTime_t(secs_Between_1Jan1970_6Jan1980 + t);
+        dt.setTime_t(secs_Between_1Jan1970_6Jan1980 + GPSRaw());
         return dt;
     }
+    time_t GPSUnix(void) const
+        { return secs_Between_1Jan1970_6Jan1980 + GPSRaw(); }
+    time_t UTCUnix(void) const
+        { return GPSUnix() - GPSOffset(); }
+
     // GPS_UTC_offset           8  13.0 
     uint GPSOffset() const { return pesdata()[13]; }
     // daylight_savings        16  14.0

@@ -534,6 +534,16 @@ void DVBChannel::SetPMT(const ProgramMapTable *pmt)
         dvbcam->SetPMT(pmt);
 }
 
+/** \fn DVBChannel::SetTimeOffset(double)
+ *  \brief Tells the Conditional Access Module the offset
+ *         from the computers utc time to dvb time.
+ */
+void DVBChannel::SetTimeOffset(double offset)
+{
+    if (dvbcam->IsRunning())
+        dvbcam->SetTimeOffset(offset);
+}
+
 /*****************************************************************************
            Tuning functions for each of the four types of cards.
  *****************************************************************************/
