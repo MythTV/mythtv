@@ -127,6 +127,8 @@ LameEncoder::~LameEncoder()
 {
     addSamples(0, 0); //flush
 
+    if (gf && out)
+        lame_mp3_tags_fid (gf, out);
     if (gf)
         lame_close(gf);
     if (mp3buf)
