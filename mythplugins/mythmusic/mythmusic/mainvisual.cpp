@@ -64,9 +64,6 @@ static void checkVisFactories(void)
 VisualBase::VisualBase(bool screensaverenable)
     : xscreensaverenable(screensaverenable)
 {
-    if (!gContext->GetScreensaverEnabled())
-        return;
-
     if (!xscreensaverenable)
         gContext->DoDisableScreensaver();
 }
@@ -139,6 +136,12 @@ MainVisual::~MainVisual()
 
 void MainVisual::setVisual( const QString &visualname )
 {
+    if (vis)
+    {
+        delete vis;
+        vis = NULL;
+    }
+
     VisualBase *newvis = 0;
 
     allowed_modes = QStringList::split(",", visualname);
@@ -176,6 +179,7 @@ void MainVisual::setVisual( const QString &visualname )
 
         current_visual_name = allowed_modes[vis_mode_index].stripWhiteSpace();
     }
+
     newvis = createVis(current_visual_name, this, winId());
     setVis( newvis );
 }
