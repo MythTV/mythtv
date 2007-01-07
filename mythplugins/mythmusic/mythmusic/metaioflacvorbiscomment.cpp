@@ -288,7 +288,10 @@ QString MetaIOFLACVorbisComment::getComment(FLAC__StreamMetadata* pBlock,
 	    delete [] fieldname;
         int loc;
 
+        // we need to make sure the '=' comes immediately after
+        // the desired label
         if ((loc = entrytext.find("=")) && 
+            (loc == (int)qlabel.length()) && 
             entrytext.lower().left(qlabel.length()) == qlabel.lower())
         {
             return QString::fromUtf8(entrytext.right(entrytext.length() - loc - 1));
