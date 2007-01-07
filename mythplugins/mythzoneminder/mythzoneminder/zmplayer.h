@@ -26,13 +26,7 @@
 #include <GL/glu.h>
 
 // zm
-#include "zmevents.h"
-
-typedef struct
-{
-    QString type;
-    double delta;
-} Frame;
+#include "zmdefines.h"
 
 class ZMPlayer : public MythThemedDialog
 {
@@ -53,12 +47,12 @@ public:
     void nextPressed(void);
 
   private:
-
     void wireUpTheme(void);
     UITextType* getTextType(QString name);
     void keyPressEvent(QKeyEvent *e);
     void getEventInfo(void);
-    void loadFrame(void);
+    void displayFrame(void);
+    void getFrame(void);
 
     bool initPlayer(void);
     void stopPlayer(void);

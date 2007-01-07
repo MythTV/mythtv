@@ -15,22 +15,14 @@
 #ifndef ZMEVENTS_H
 #define ZMEVENTS_H
 
-
+// mythtv
 #include <mythtv/uitypes.h>
 #include <mythtv/uilistbtntype.h>
 #include <mythtv/xmlparse.h>
 #include <mythtv/mythdialogs.h>
 
-
-typedef struct
-{
-    int monitorID;
-    int eventID;
-    QString eventName;
-    QString monitorName;
-    QString startTime;
-    QString length;
-} Event;
+// zm
+#include <zmdefines.h>
 
 class ZMEvents : public MythThemedDialog
 {
@@ -43,7 +35,7 @@ public:
     ~ZMEvents();
 
   private slots:
-    void getEventList();
+    void getEventList(void);
     void playPressed(void);
     void deletePressed(void);
     void setCamera(int item);

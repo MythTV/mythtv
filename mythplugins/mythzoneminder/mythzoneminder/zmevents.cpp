@@ -28,7 +28,7 @@
 // zoneminder
 #include "zmevents.h"
 #include "zmplayer.h"
-#include "zmutils.h"
+#include "zmclient.h"
 
 const int EVENTS_UPDATE_TIME = 1000 * 5; // update the events list every 5 seconds
 
@@ -39,19 +39,22 @@ ZMEvents::ZMEvents(MythMainWindow *parent,
 {
     m_eventListSize = 0;
     m_currentEvent = 0;
-    m_eventList = NULL;
+    m_eventList = new vector<Event*>;
 
     wireUpTheme();
-    getEventList();
-    getCameraList();
+//    getEventList();
+//    getCameraList();
 
-    updateUIList();
+//    updateUIList();
 
     m_updateTimer = new QTimer(this);
 
     connect(m_updateTimer, SIGNAL(timeout()), this,
             SLOT(updateTimeout()));
     m_updateTimer->start(EVENTS_UPDATE_TIME);
+
+    getCameraList();
+    updateTimeout();
 }
 
 ZMEvents::~ZMEvents()
@@ -203,49 +206,20 @@ void ZMEvents::wireUpTheme()
     assignFirstFocus();
 }
 
-void ZMEvents::getEventList()
+void ZMEvents::getEventList(void)
 {
-    if (!m_eventList)
-        m_eventList = new vector<Event*>;
-
-    m_eventList->clear();
-
-    QSqlQuery query(g_ZMDatabase);
-    QString sql = "SELECT E.Id, E.Name, E.StartTime, M.Id AS MonitorID, M.Name AS MonitorName, "
-                  "M.Width, M.Height, M.DefaultRate, M.DefaultScale, E.Length "
-                  "from Events as E inner join Monitors as M on E.MonitorId = M.Id ";
-
-    if (m_cameraSelector && m_cameraSelector->getCurrentString() != tr("All Cameras") && 
-        m_cameraSelector->getCurrentString() != "")
+    if (class ZMClient *zm = ZMClient::get())
     {
-        sql += "WHERE M.Name = :NAME ";
-        sql += "ORDER BY E.StartTime";
-        query.prepare(sql);
-        query.bindValue(":NAME", m_cameraSelector->getCurrentString());
-    }
-    else
-    {
-        sql += "ORDER BY E.StartTime";
-        query.prepare(sql);
-    }
+        QString monitorName = "<ANY>";
 
-    query.exec();
-    if (query.isActive())
-    {
-        while (query.next())
+        if (m_cameraSelector && m_cameraSelector->getCurrentString() != tr("All Cameras") && 
+            m_cameraSelector->getCurrentString() != "")
         {
-            Event *item = new Event;
-            item->eventID = query.value(0).toInt();
-            item->eventName = query.value(1).toString();
-            item->monitorName = QString("%2").arg(query.value(4).toString());
-            item->startTime = query.value(2).toDateTime().toString("ddd - dd/MM hh:mm:ss");
-            item->monitorID = query.value(3).toInt();
-            item->length = query.value(9).toString();
-            m_eventList->push_back(item);
+            monitorName = m_cameraSelector->getCurrentString();
         }
+
+        zm->getEventList(monitorName, m_eventList);
     }
-    else
-        VERBOSE(VB_IMPORTANT, "ERROR: Failed to run get monitors query");
 }
 
 void ZMEvents::updateUIList()
@@ -319,12 +293,15 @@ void ZMEvents::eventListUp(bool page)
 
 void ZMEvents::playPressed(void)
 {
+    m_updateTimer->stop();
+
     Event *event = m_eventList->at(m_currentEvent);
     if (event)
     {
-        ZMPlayer player(m_eventList, m_currentEvent, gContext->GetMainWindow(),
-                        "zmplayer", "zoneminder-", "zmplayer");
-        player.exec();
+        ZMPlayer *player = new ZMPlayer(m_eventList, m_currentEvent, 
+                gContext->GetMainWindow(), "zmplayer", "zoneminder-", "zmplayer");
+        player->exec();
+        player->deleteLater();
 
         // update the event list incase some events where deleted in the player
         if (m_currentEvent > (int)m_eventList->size() - 1)
@@ -332,6 +309,8 @@ void ZMEvents::playPressed(void)
 
         updateUIList();
     }
+
+    m_updateTimer->start(EVENTS_UPDATE_TIME);
 }
 
 void ZMEvents::deletePressed(void)
@@ -339,7 +318,9 @@ void ZMEvents::deletePressed(void)
     Event *event = m_eventList->at(m_currentEvent);
     if (event)
     {
-        deleteEvent(event->eventID);
+        if (class ZMClient *zm = ZMClient::get())
+            zm->deleteEvent(event->eventID);
+
         getEventList();
 
         if (m_currentEvent > (int)m_eventList->size() - 1)
@@ -351,40 +332,28 @@ void ZMEvents::deletePressed(void)
 
 void ZMEvents::getCameraList(void)
 {
-    QStringList cameras;
-    Event *e;
-
-    if (m_eventList && m_eventList->size() > 0)
+    if (class ZMClient *zm = ZMClient::get())
     {
-        vector<Event *>::iterator i = m_eventList->begin();
-        for ( ; i != m_eventList->end(); i++)
-        {
-            e = *i;
-            if (cameras.find(e->monitorName) == cameras.end())
-                cameras.append(e->monitorName);
-        }
-    }
+        QStringList cameraList;
+        zm->getCameraList(cameraList);
+        if (!m_cameraSelector)
+            return;
 
-    // sort and add cameras to selector
-    cameras.sort();
-
-    if (m_cameraSelector)
-    {
         m_cameraSelector->addItem(0, tr("All Cameras"));
         m_cameraSelector->setToItem(0);
-    }
 
-    for (uint x = 1; x <= cameras.count(); x++)
-    {
-        if (m_cameraSelector)
-            m_cameraSelector->addItem(x, cameras[x-1]); 
+        for (uint x = 1; x <= cameraList.count(); x++)
+        {
+            m_cameraSelector->addItem(x, cameraList[x-1]);
+        }
+
     }
 }
 
 void ZMEvents::setCamera(int item)
 {
     (void) item;
-    cout << "setCamera(): " << item << endl;
+    updateTimeout();
     getEventList();
     updateUIList();
 }
@@ -392,9 +361,7 @@ void ZMEvents::setCamera(int item)
 void ZMEvents::updateTimeout(void)
 {
     m_updateTimer->stop();
-
     getEventList();
     updateUIList();
-
     m_updateTimer->start(EVENTS_UPDATE_TIME);
 }

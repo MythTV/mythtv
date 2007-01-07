@@ -26,9 +26,12 @@
 
 // zoneminder
 #include "zmliveplayer.h"
-#include "zmutils.h"
+#include "zmclient.h"
 
-const int FRAME_UPDATE_TIME = 1000 / 25;  // try to update the frame 25 times a second
+// the maximum image size we are ever likely to get from ZM
+#define MAX_IMAGE_SIZE  (2048*1536*3)
+
+const int FRAME_UPDATE_TIME = 1000 / 10;  // try to update the frame 25 times a second
 const int STATUS_UPDATE_TIME = 1000 / 2;  // update the monitor status 2 times a second
 
 ZMLivePlayer::ZMLivePlayer(int monitorID, int eventID, MythMainWindow *parent, 
@@ -149,15 +152,15 @@ void ZMLivePlayer::changePlayerMonitor(int playerNo)
     if (playerNo > (int)m_players->size())
         return;
 
-    MONITOR *mon = m_players->at(playerNo - 1)->getMonitor();
-    int oldMonID = mon->mon_id;
+    Monitor *mon = m_players->at(playerNo - 1)->getMonitor();
+    int oldMonID = mon->id;
 
     // find the old monID in the list of available monitors
-    vector<MONITOR*>::iterator i = m_monitors->begin();
+    vector<Monitor*>::iterator i = m_monitors->begin();
     for (; i != m_monitors->end(); i++)
     {
         mon = *i;
-        if (oldMonID == mon->mon_id)
+        if (oldMonID == mon->id)
         {
             break;
         }
@@ -172,7 +175,7 @@ void ZMLivePlayer::changePlayerMonitor(int playerNo)
         i = m_monitors->begin();
 
     mon = *i;
-    int newMonID = mon->mon_id;
+    int newMonID = mon->id;
     m_players->at(playerNo - 1)->setMonitor(newMonID, winId());
 
     UITextType *text = getUITextType(QString("name%1-%2").arg(m_monitorLayout).arg(playerNo));
@@ -192,6 +195,7 @@ void ZMLivePlayer::wireUpTheme()
 
 void ZMLivePlayer::updateFrame()
 {
+    static unsigned char buffer[MAX_IMAGE_SIZE];
     m_frameTimer->stop();
 
     if (m_players)
@@ -200,8 +204,18 @@ void ZMLivePlayer::updateFrame()
         vector<Player*>::iterator i = m_players->begin();
         for (; i != m_players->end(); i++)
         {
+            QString status;
             p = *i;
-            p->updateScreen();
+            if (class ZMClient *zm = ZMClient::get())
+            {
+                int frameSize = zm->getLiveFrame(p->getMonitor()->id, status, buffer, sizeof(buffer));
+
+                if (frameSize > 0 && !status.startsWith("ERROR"))
+                {
+                    p->getMonitor()->status = status;
+                    p->updateScreen(buffer);
+                }
+            }
         }
     }
 
@@ -246,7 +260,7 @@ void ZMLivePlayer::setMonitorLayout(int layout)
 
     for (int x = 1; x <= m_monitorCount; x++)
     {
-        MONITOR *monitor = m_monitors->at(monitorNo-1);
+        Monitor *monitor = m_monitors->at(monitorNo-1);
 
         UIImageType *frameImage = getUIImageType(QString("frame%1-%2").arg(layout).arg(x));
         if (frameImage)
@@ -278,33 +292,12 @@ void ZMLivePlayer::setMonitorLayout(int layout)
 void ZMLivePlayer::getMonitorList(void)
 {
     if (!m_monitors)
-        m_monitors = new vector<MONITOR *>;
+        m_monitors = new vector<Monitor *>;
 
     m_monitors->clear();
 
-    QSqlQuery query(g_ZMDatabase);
-    query.prepare("SELECT Id, Name, Width, Height, ImageBufferCount, MaxFPS "
-                  "FROM Monitors");
-    query.exec();
-
-    if (query.isActive() && query.numRowsAffected())
-    {
-        while (query.next())
-        {
-            MONITOR *m = new MONITOR;
-            m->mon_id = query.value(0).toInt();
-            m->name = query.value(1).toString();
-            m->width = query.value(2).toInt();
-            m->height = query.value(3).toInt();
-            m->image_buffer_count = query.value(4).toInt();
-
-            m_monitors->push_back(m);
-        }
-    }
-    else
-    {
-        VERBOSE(VB_IMPORTANT, "ERROR: No monitors found!");
-    }
+    if (class ZMClient *zm = ZMClient::get())
+        zm->getMonitorList(m_monitors);
 }
 
 void ZMLivePlayer::updateMonitorStatus()
@@ -313,7 +306,7 @@ void ZMLivePlayer::updateMonitorStatus()
 
     for (int x = 1; x <= (int) m_players->size(); x++)
     {
-        MONITOR *monitor = m_players->at(x-1)->getMonitor();
+        Monitor *monitor = m_players->at(x-1)->getMonitor();
 
         UITextType *text = getUITextType(QString("status%1-%2").arg(m_monitorLayout).arg(x));
         if (text)
@@ -350,76 +343,17 @@ Player::~Player()
 void Player::setMonitor(int monID, Window winID)
 {
     stopPlaying();
-    m_monitor.mon_id = monID;
+    m_monitor.id = monID;
     startPlayer(&m_monitor, winID);
 }
 
-int Player::getMonitorData(int id, MONITOR &mon)
-{
-    QSqlQuery query(QSqlDatabase::database("zm"));
-    query.prepare("SELECT Name, Width, Height, ImageBufferCount, MaxFPS "
-            "FROM Monitors WHERE Id = :ID");
-    query.bindValue(":ID", id);
-    query.exec();
-
-    if (query.isActive() && query.numRowsAffected())
-    {
-        query.first();
-        mon.name = query.value(0).toString();
-        mon.width = query.value(1).toInt();
-        mon.height = query.value(2).toInt();
-        mon.image_buffer_count = query.value(3).toInt();
-    }
-    else
-    {
-        VERBOSE(VB_IMPORTANT, "ERROR: specified monitor does not exist in database");
-        VERBOSE(VB_IMPORTANT, query.lastQuery());
-        VERBOSE(VB_IMPORTANT, query.lastError().text());
-    }
-    return 0;
-}
-
-bool Player::startPlayer(MONITOR *mon, Window winID)
+bool Player::startPlayer(Monitor *mon, Window winID)
 {
     m_initalized = false;
 
     m_monitor = *mon;
 
-    // before we do anything make sure we can read from zm's shared memory
-    long long shm_key = 0x7a6d2000;
-    void *shm_ptr;
-    int shared_data_size = sizeof(SharedData) +
-            sizeof(TriggerData) +
-            ((m_monitor.image_buffer_count) * (sizeof(struct timeval))) +
-            ((m_monitor.image_buffer_count) * (m_monitor.width) * (m_monitor.height) * 3);
-    int shmid;
-
-    if ((shmid = shmget((shm_key & 0xffffff00) | m_monitor.mon_id,
-         shared_data_size, SHM_R)) == -1)
-    {
-        VERBOSE(VB_IMPORTANT, "MythZoneMinder: Failed to shmget");
-        m_monitor.status = "Error";
-        return false;
-    }
-    shm_ptr = shmat(shmid, 0, SHM_RDONLY);
-
-
-    if (shm_ptr == NULL)
-    {
-        VERBOSE(VB_IMPORTANT, "MythZoneMinder: Failed to shmat");
-        m_monitor.status = "Error";
-        return false;
-    }
-
-    m_monitor.shared_data = (SharedData*)shm_ptr;
-
-    m_monitor.shared_images = (unsigned char*) shm_ptr +
-            sizeof(SharedData) +
-            sizeof(TriggerData) +
-            ((m_monitor.image_buffer_count) * sizeof(struct timeval));
-
     int screen_number;
-
     Window parent = winID;
 
     m_dis = XOpenDisplay(NULL);
@@ -516,25 +450,14 @@ void Player::stopPlaying(void)
     XCloseDisplay(m_dis);
 }
 
-void Player::updateScreen(void)
+void Player::updateScreen(const unsigned char* buffer)
 {
     if (!m_initalized)
         return;
 
     glXMakeCurrent(m_dis, m_win, m_cx);
-
-    unsigned char *data;
-
-    if (m_monitor.shared_data->last_write_index == m_monitor.last_read)
-        return;
-
-    m_monitor.last_read = m_monitor.shared_data->last_write_index;
-
-    data = m_monitor.shared_images + 
-            (m_monitor.width) * (m_monitor.height) * 3 * m_monitor.last_read;
-
     glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, m_monitor.width, m_monitor.height,
-                    GL_RGB, GL_UNSIGNED_BYTE, data);
+                    GL_RGB, GL_UNSIGNED_BYTE, buffer);
 
     glViewport(0, 0, m_monitor.displayRect.width(), m_monitor.displayRect.height());
 
@@ -549,26 +472,4 @@ void Player::updateScreen(void)
     glTexCoord2f(1.0,0.0); glVertex2f(2,0);
     glEnd();
     glXSwapBuffers(m_dis,m_win);
-
-    switch (m_monitor.shared_data->state)
-    {
-        case IDLE:
-            m_monitor.status = "Idle";
-            break;
-        case PREALARM:
-            m_monitor.status = "Pre Alarm";
-            break;
-        case ALARM:
-            m_monitor.status = "Alarm";
-            break;
-        case ALERT:
-            m_monitor.status = "Alert";
-            break;
-        case TAPE:
-            m_monitor.status = "Tape";
-            break;
-        default:
-            m_monitor.status = "Unknown";
-            break;
-    }
 }

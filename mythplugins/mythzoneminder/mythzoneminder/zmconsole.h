@@ -21,16 +21,7 @@
 #include <mythtv/xmlparse.h>
 #include <mythtv/mythdialogs.h>
 
-class QProcess;
-
-typedef struct
-{
-    QString name;
-    QString zmcStatus;
-    QString zmaStatus;
-    int events;
-} Monitor;
-
+#include "zmdefines.h"
 
 class ZMConsole : public MythThemedDialog
 {
@@ -46,10 +37,8 @@ public:
   private slots:
     void updateTime();
     void updateStatus();
-    void readFromStdout();
-    void processExited();
     void getDaemonStatus();
-    void getMonitorList();
+    void getMonitorStatus(void);
 
   private:
     void wireUpTheme(void);
@@ -58,35 +47,29 @@ public:
     void updateMonitorList();
     void monitorListDown(bool page);
     void monitorListUp(bool page);
-    void runCommand(QString command);
-    void getMonitorStatus(int id, QString type, QString device, QString channel,
-                          QString function, QString &zmcStatus, QString &zmaStatus);
-    void getStats(void);
 
-    int                  m_currentMonitor;
-    int                  m_monitorListSize;
-    vector<Monitor *>   *m_monitorList;
-    UIListType          *m_monitor_list;
+    int                m_currentMonitor;
+    int                m_monitorListSize;
+    vector<Monitor *> *m_monitorList;
+    UIListType        *m_monitor_list;
 
-    UITextType          *m_status_text;
-    UITextType          *m_time_text;
-    UITextType          *m_date_text;
-    UITextType          *m_load_text;
-    UITextType          *m_disk_text;
+    UITextType        *m_status_text;
+    UITextType        *m_time_text;
+    UITextType        *m_date_text;
+    UITextType        *m_load_text;
+    UITextType        *m_disk_text;
 
-    fontProp             *m_runningFont;
-    fontProp             *m_stoppedFont;
+    fontProp          *m_runningFont;
+    fontProp          *m_stoppedFont;
 
-    QTimer              *m_timeTimer;
-    QString              m_timeFormat;
+    QTimer            *m_timeTimer;
+    QString            m_timeFormat;
 
-    QProcess            *m_process;
-    QString              m_status;
-    bool                 m_processRunning;
+    QString            m_daemonStatus;
+    QString            m_cpuStat;
+    QString            m_diskStat;
 
-    QString              m_daemonStatus;
-
-    QTimer              *m_updateTimer;
+    QTimer            *m_updateTimer;
 };
 
 #endif

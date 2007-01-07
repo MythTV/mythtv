@@ -26,67 +26,7 @@
 #include <GL/glu.h>
 
 // mythzoneminder
-#include "config.h"
-
-typedef enum 
-{ 
-    IDLE,
-    PREALARM,
-    ALARM,
-    ALERT,
-    TAPE
-} State;
-
-typedef struct
-{
-    int size;
-    bool valid;
-    bool active;
-    bool signal;
-    State state;
-    int last_write_index;
-    int last_read_index;
-    time_t last_image_time;
-    int last_event;
-    int action;
-    int brightness;
-    int hue;
-    int colour;
-    int contrast;
-    int alarm_x;
-    int alarm_y;
-    char control_state[256];
-} SharedData; 
-
-typedef enum { TRIGGER_CANCEL, TRIGGER_ON, TRIGGER_OFF } TriggerState;
-
-typedef struct
-{
-    int size;
-    TriggerState trigger_state;
-    int trigger_score;
-    char trigger_cause[32];
-    char trigger_text[256];
-#ifdef ZMVERSION_1_22_2
-    char trigger_showtext[32];
-#else
-    char trigger_showtext[256];
-#endif
-} TriggerData;
-
-typedef struct
-{
-    QString name;
-    int image_buffer_count;
-    QRect displayRect;
-    int width;
-    int height;
-    int mon_id;
-    SharedData *shared_data;
-    unsigned char *shared_images;
-    int last_read;
-    QString status;
-} MONITOR;
+#include "zmdefines.h"
 
 class Player
 {
@@ -94,18 +34,16 @@ class Player
     Player(void);
     ~Player(void);
 
-    bool startPlayer(MONITOR *mon, Window winID);
+    bool startPlayer(Monitor *mon, Window winID);
     void stopPlaying(void);
-    void updateScreen(void);
+    void updateScreen(const uchar* buffer);
     void setMonitor(int monID, Window winID);
-    MONITOR *getMonitor(void) { return &m_monitor; }
+    Monitor *getMonitor(void) { return &m_monitor; }
 
   private:
-    int  getMonitorData(int id, MONITOR &monitor);
     void getMonitorList(void);
-    void loadZMConfig(void);
 
-    MONITOR     m_monitor;
+    Monitor     m_monitor;
     bool        m_initalized;
     GLXContext  m_cx;
     Display    *m_dis;
@@ -129,12 +67,13 @@ public:
     void updateFrame(void);
     void updateMonitorStatus(void);
     void initMonitorLayout(void);
+    void receivedLiveFrame(int minitorID, QString& status, const uchar* buffer, int frameSize);
+    void getMonitorList(void);
 
   private:
     void wireUpTheme(void);
     UITextType* getTextType(QString name);
     void keyPressEvent(QKeyEvent *e);
-    void getMonitorList(void);
     void stopPlayers(void);
     void changePlayerMonitor(int playerNo);
 
@@ -147,7 +86,7 @@ public:
     int                   m_monitorCount;
 
     vector<Player *>     *m_players;
-    vector<MONITOR *>    *m_monitors;
+    vector<Monitor *>    *m_monitors;
 
     fontProp             *m_idleFont;
     fontProp             *m_alarmFont;

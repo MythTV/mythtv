@@ -19,8 +19,11 @@ installimages.files = images/*.png
 INSTALLS += menufiles uifiles installimages #installfiles 
 
 # Input
-HEADERS += zmconsole.h zmplayer.h zmevents.h zmliveplayer.h zmutils.h zmsettings.h
-SOURCES += main.cpp zmconsole.cpp zmplayer.cpp zmevents.cpp zmliveplayer.cpp zmutils.cpp zmsettings.cpp
+HEADERS += zmconsole.h zmplayer.h zmevents.h zmliveplayer.h zmdefines.h 
+HEADERS += zmsettings.h zmclient.h
+
+SOURCES += main.cpp zmconsole.cpp zmplayer.cpp zmevents.cpp zmliveplayer.cpp 
+SOURCES += zmsettings.cpp zmclient.cpp
 
 macx {
     QMAKE_LFLAGS += -flat_namespace -undefined suppress

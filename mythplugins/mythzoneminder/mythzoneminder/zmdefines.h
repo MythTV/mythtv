@@ -12,32 +12,45 @@
  *
  * ============================================================ */
 
-#ifndef ZMUTILS_H
-#define ZMUTILS_H
+#ifndef ZMDEFINES_H
+#define ZMDEFINES_H
 
-class QSqlDatabase;
+// qt
+#include <qstring.h>
+#include <qrect.h>
+
+// event details
+typedef struct
+{
+    int monitorID;
+    int eventID;
+    QString eventName;
+    QString monitorName;
+    QString startTime;
+    QString length;
+} Event;
+
+// event frame details
+typedef struct
+{
+    QString type;
+    double delta;
+} Frame;
 
 typedef struct
 {
-    QString binPath;
-
-    QString webUser;
-    QString webGroup;
-    QString webPath;
-
-    QString DBHost;
-    QString DBDatabase;
-    QString DBUser;
-    QString DBPassword;
-} ZMConfig;
-
-// global database connection to the zm database
-extern QSqlDatabase *g_ZMDatabase;
-// global zm settings
-extern ZMConfig     *g_ZMConfig;
-
-extern bool openZMDatabase(void);
-extern bool loadZMConfig(void);
-extern void deleteEvent(int eventID);
+    // used by console view
+    int     id;
+    QString name;
+    QString zmcStatus;
+    QString zmaStatus;
+    int events;
+    // used by live view
+    QString status;
+    QRect displayRect;
+    int width;
+    int height;
+    int palette;
+} Monitor;
 
 #endif

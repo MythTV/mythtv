@@ -30,8 +30,9 @@
 #include "zmplayer.h"
 #include "zmevents.h"
 #include "zmliveplayer.h"
-#include "zmutils.h"
+//#include "zmutils.h"
 #include "zmsettings.h"
+#include "zmclient.h"
 
 using namespace std;
 
@@ -119,45 +120,10 @@ void runMenu(QString which_menu)
 
 int mythplugin_run(void)
 {
-    // try to load some settings from ZM's config file
-    if (!g_ZMConfig)
+    // setup a connection to the mythzmserver
+    if (!ZMClient::setupZMClient())
     {
-        if (!loadZMConfig())
-        {
-            MythPopupBox::showOkPopup(gContext->GetMainWindow(), "Myth ZoneMinder",
-                    QObject::tr("Cannot load ZM's configuration file.\n\n"
-                                "Is ZM Installed? \n\n"
-                                "Have you updated MythZoneMinder's settings to point to "
-                                "the correct location?"));
-            return -1;
-        }
-    }
-
-    // open a connection to ZM's database
-    if (!g_ZMDatabase)
-    {
-        if (!openZMDatabase())
-        {
-            MythPopupBox::showOkPopup(gContext->GetMainWindow(), "Myth ZoneMinder",
-                    QObject::tr(QString("Could not open a connection to "
-                                        "ZoneMinder's database!\n\n"
-                            "Error was: %1").arg(g_ZMDatabase->lastError().text())));
-            return -1;
-        }
-    }
-    else
-    {
-        if (!g_ZMDatabase->isOpen())
-        {
-            if (!g_ZMDatabase->open())
-            {
-                MythPopupBox::showOkPopup(gContext->GetMainWindow(), "Myth ZoneMinder",
-                        QObject::tr(QString("Could not open a connection to "
-                                            "ZoneMinder's database!\n\n"
-                                "Error was: %1").arg(g_ZMDatabase->lastError().text())));
-                return -1;
-            }
-        }
+        return -1;
     }
 
     runMenu("zonemindermenu.xml");

@@ -1,0 +1,53 @@
+README for mythzmserver
+-----------------------
+mythzmserver is a daemon that acts as a server receiving requests for information
+from mythfrontend's running the MythZoneMinder plugin and passing it back to the
+clients. The server should be run on the machine where ZM is running.
+
+How to compile standalone
+-------------------------
+The server will be compiled and created along with the frontend plugin and if you 
+are lucky you will be able to just copy the mythzmserver executable to your server
+machine and it will work OK.
+
+If the server machine is using different version of the required libs then you will
+have to copy the source to your server and compile it standalone there.
+
+The server is designed to be as lean as possible and doesn't require Myth or QT to
+be installed in order to compile or run. It does require the mysql client library but
+that must already be installed for ZM to run.
+
+It's best to run ./configure in the mythplugins directory before copying the source to 
+the server machine to make sure the config.h is created properly.
+
+Copy the mythzmserver directory to the machine where you want to run the server.
+
+run :- 'make -f Makefile.standalone'
+
+then copy the resulting mythzmserver executable to somewhere in your path.
+
+Command line options
+--------------------
+
+-p or --port number        A port number to listen on (default is 6548)
+-d or --daemon             Runs mythzmserver as a daemon
+-n or --nodaemon           Does not run mythzmserver as a daemon (default)
+-c or --zmconfig           Location of zoneminders config file (default is /etc/zm.conf)
+-l or --logfile filename   Writes STDERR and STDOUT messages to filename
+-v or --verbose            Prints more debug output
+
+Starting mythzmserver
+---------------------
+
+The server is designed to be run as a service on start up. It should be started
+after ZoneMinder has been started and should be run as either root or as the 
+same user that ZM uses which is usually the same as the apache user.
+
+If you are using the defaults for the port and location of the zm.config file you would
+start it something like this:-
+
+mythzmserver -d
+
+That would start the server as a daemon, listening on port 6548 and using /etc/zm.config for
+the ZM config file.
+

@@ -29,7 +29,7 @@
 
 // zoneminder
 #include "zmconsole.h"
-#include "zmutils.h"
+#include "zmclient.h"
 
 const int STATUS_UPDATE_TIME = 1000 * 10; // update the status every 10 seconds
 const int TIME_UPDATE_TIME = 1000 * 1;    // update the time every 1 second
@@ -43,8 +43,6 @@ ZMConsole::ZMConsole(MythMainWindow *parent,
     m_currentMonitor = 0;
     wireUpTheme();
 
-    m_status = "";
-    m_process = NULL;
     m_monitorList = NULL;
 
     m_timeFormat = gContext->GetSetting("TimeFormat", "h:mm AP");
@@ -66,9 +64,6 @@ ZMConsole::~ZMConsole()
 {
     delete m_timeTimer;
 
-    if (m_process)
-        delete m_process;
-
     if (m_monitorList)
         delete m_monitorList;
 }
@@ -84,84 +79,48 @@ void ZMConsole::updateTime(void)
 
     if (s != m_date_text->GetText())
         m_date_text->SetText(s);
-
-    if (m_daemonStatus.left(7) == "running")
-    {
-        m_status_text->SetText(tr("Running"));
-        m_status_text->SetFont(m_runningFont);
-    }
-    else
-    {
-        m_status_text->SetText(tr("Stopped"));
-        m_status_text->SetFont(m_stoppedFont);
-    }
 }
 
 void ZMConsole::updateStatus()
 {
     m_updateTimer->stop();
-    getStats();
     getDaemonStatus();
-    getMonitorList();
-    updateMonitorList();
+    getMonitorStatus();
     m_updateTimer->start(STATUS_UPDATE_TIME);
 }
 
-void ZMConsole::getDaemonStatus()
+void ZMConsole::getDaemonStatus(void)
 {
-    runCommand("sudo -u apache zmdc.pl check");
-    m_daemonStatus = m_status;
-}
-
-void ZMConsole::getMonitorStatus(int id, QString type, QString device, QString channel,
-                                 QString function, QString &zmcStatus, QString &zmaStatus)
-{
-    zmaStatus = "";
-    zmcStatus = "";
-
-    runCommand("sudo -u apache zmdc.pl status");
-
-    if (m_status.contains(QString("'zma -m %1' running").arg(id)))
-        zmaStatus = QString("%1 (%2) [R]").arg(device).arg(channel);
-    else
-        zmaStatus = QString("%1 (%2) [S]").arg(device).arg(channel);
-
-    if (type == "Local")
+    if (class ZMClient *zm = ZMClient::get())
     {
-        if (m_status.contains(QString("'zmc -d %1' running").arg(device)))
-            zmcStatus = function + " [R]";
+        zm->getServerStatus(m_daemonStatus, m_cpuStat, m_diskStat);
+
+        if (m_daemonStatus.left(7) == "running")
+        {
+            m_status_text->SetText(tr("Running"));
+            m_status_text->SetFont(m_runningFont);
+        }
         else
-            zmcStatus = function + " [S]";
-    }
-    else
-    {
-        if (m_status.contains(QString("'zmc -m %1' running").arg(id)))
-            zmcStatus = function + " [R]";
-        else
-            zmcStatus = function + " [S]";
+        {
+            m_status_text->SetText(tr("Stopped"));
+            m_status_text->SetFont(m_stoppedFont);
+        }
+
+        m_load_text->SetText("Load: " + m_cpuStat);
+        m_disk_text->SetText("Disk: " + m_diskStat);
     }
 }
 
-void ZMConsole::getStats()
+void ZMConsole::getMonitorStatus(void)
 {
-    // get load averages
-    double loads[3];
-    if (getloadavg(loads, 3) == -1)
-        m_load_text->SetText("Load: Unknown");
-    else
-    {
-        char buf[30];
-        sprintf(buf, "Load: %0.2lf", loads[0]);
-        m_load_text->SetText(QString(buf));
-    }
+    if (!m_monitorList)
+        m_monitorList = new vector<Monitor*>;
 
-    // get free space on the disk where the events are stored
-    char buf[15];
-    long long total, used;
-    QString eventsDir = g_ZMConfig->webPath + "/events/";
-    getDiskSpace(eventsDir, total, used);
-    sprintf(buf, "Disk: %d%%", (int) ((100.0 / ((float) total / used))));
-    m_disk_text->SetText(QString(buf));
+    if (class ZMClient *zm = ZMClient::get())
+    {
+        zm->getMonitorStatus(m_monitorList);
+        updateMonitorList();
+    }
 }
 
 void ZMConsole::keyPressEvent(QKeyEvent *e)
@@ -215,8 +174,7 @@ void ZMConsole::keyPressEvent(QKeyEvent *e)
         }
         else if (action == "ESCAPE")
         {
-            if (!m_process->isRunning())
-                handled = false;
+            handled = false;
         }
         else
             handled = false;
@@ -258,47 +216,6 @@ void ZMConsole::wireUpTheme()
         m_monitorListSize = m_monitor_list->GetItems();
         m_monitor_list->SetItemCurrent(0);
     }
-}
-
-void ZMConsole::getMonitorList()
-{
-    if (!m_monitorList)
-        m_monitorList = new vector<Monitor*>;
-
-    m_monitorList->clear();
-
-    QSqlQuery query("SELECT id, name, type, device, channel, function "
-                    "FROM Monitors;", g_ZMDatabase);
-    if (query.isActive())
-    {
-        while (query.next())
-        {
-            Monitor *item = new Monitor;
-            int id = query.value(0).toInt();
-            QString type = query.value(2).toString();
-            QString device = query.value(3).toString();
-            QString channel = query.value(4).toString();
-            QString function = query.value(5).toString();
-            item->name = query.value(1).toString();
-            getMonitorStatus(id, type, device, channel, function,
-                             item->zmcStatus, item->zmaStatus);
-            item->events = 1;
-
-            QString queryStr = "SELECT count(if(Archived=0,1,NULL)) AS EventCount "
-                            "FROM Events AS E "
-                            "WHERE MonitorId = " + QString::number(id);
-            QSqlQuery query2(queryStr, g_ZMDatabase);
-            if (query2.isActive())
-            {
-                query2.next();
-                item->events = query2.value(0).toInt();
-            }
-
-            m_monitorList->push_back(item);
-        }
-    }
-    else
-        VERBOSE(VB_IMPORTANT, "ERROR: Failed to run get monitors query");
 }
 
 void ZMConsole::updateMonitorList()
@@ -364,44 +281,5 @@ void ZMConsole::monitorListUp(bool page)
             m_currentMonitor = 0;
 
         updateMonitorList();
-    }
-}
-
-void ZMConsole::readFromStdout()
-{
-    m_status += m_process->readStdout();
-}
-
-void ZMConsole::processExited()
-{
-    m_processRunning = false;
-}
-
-void ZMConsole::runCommand(QString command)
-{
-    QStringList args = QStringList::split(" ", command);
-
-    if (m_process)
-        delete m_process;
-
-    m_process = new QProcess(args, this);
-
-    connect(m_process, SIGNAL(readyReadStdout()), this, SLOT(readFromStdout()));
-    connect(m_process, SIGNAL(processExited()), this, SLOT(processExited()));
-
-    m_status = "";
-    m_processRunning = true;
-
-    if (!m_process->start())
-    {
-        VERBOSE(VB_IMPORTANT, QString("ZoneMinder: Failed to run command - %1")
-                .arg(command));
-        m_status = "";
-    }
-
-    while (m_processRunning)
-    {
-        usleep(500);
-        qApp->processEvents();
     }
 }

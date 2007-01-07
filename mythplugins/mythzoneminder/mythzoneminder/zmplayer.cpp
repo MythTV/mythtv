@@ -27,7 +27,7 @@
 
 // zoneminder
 #include "zmplayer.h"
-#include "zmutils.h"
+#include "zmclient.h"
 
 ZMPlayer::ZMPlayer(vector<Event *> *eventList, int currentEvent, MythMainWindow *parent, 
                 const QString &window_name, const QString &theme_filename, 
@@ -39,16 +39,15 @@ ZMPlayer::ZMPlayer(vector<Event *> *eventList, int currentEvent, MythMainWindow 
 
     wireUpTheme();
 
-    m_frameList = NULL;
+    m_frameList = new vector<Frame*>;
     m_initalized = false;
-
-    getEventInfo();
+    m_paused = false;
 
     m_frameTimer = new QTimer(this);
     connect(m_frameTimer, SIGNAL(timeout()), this,
             SLOT(updateFrame()));
-    m_frameTimer->start(1000 / 25); // 25 frames/sec
-    m_paused = false;
+
+    getEventInfo();
 
     m_bFullScreen = false;
     setContext(1);
@@ -58,7 +57,7 @@ ZMPlayer::~ZMPlayer()
 {
     stopPlayer();
 
-    delete m_frameTimer;
+    m_frameTimer->deleteLater();
 
     if (!m_frameList)
         delete m_frameList;
@@ -66,6 +65,9 @@ ZMPlayer::~ZMPlayer()
 
 void ZMPlayer::getEventInfo()
 {
+    if (m_frameTimer)
+        m_frameTimer->stop();
+
     if (m_currentEvent == -1)
     {
         if (m_noEventsText)
@@ -91,52 +93,25 @@ void ZMPlayer::getEventInfo()
     if (!event)
         return;
 
-    m_curFrame = 1;
-    m_lastFrame = 1;
-
-    QSqlQuery query(QString("SELECT Frames, Length FROM Events WHERE Id = %2")
-                    .arg(event->eventID), g_ZMDatabase);
-    if (query.isActive())
-    {
-        query.next();
-        m_lastFrame = query.value(0).toInt();
-    }
-
-    m_eventDir = QString("%1/events/%2/%3")
-            .arg(g_ZMConfig->webPath).arg(event->monitorID).arg(event->eventID);
+    m_curFrame = 0;
+    m_lastFrame = 0;
 
     m_eventText->SetText(QString(event->eventName + " (%1/%2)")
             .arg(m_currentEvent + 1)
             .arg(m_eventList->size()));
     m_cameraText->SetText(event->monitorName);
-    m_frameText->SetText(QString("%1/%2").arg(m_curFrame).arg(m_lastFrame));
     m_dateText->SetText(event->startTime);
 
     // get frames data
-    if (!m_frameList)
-        m_frameList = new vector<Frame*>;
-
     m_frameList->clear();
-
-    QString sql = "SELECT Type, Delta FROM Frames "
-                  "WHERE EventID = :EVENTID "
-                  "ORDER BY FrameID";
-    query.prepare(sql);
-    query.bindValue(":EVENTID", event->eventID);
-    query.exec();
-
-    if (query.isActive())
+    if (class ZMClient *zm = ZMClient::get())
     {
-        while (query.next())
-        {
-            Frame *item = new Frame;
-            item->type = query.value(0).toString();
-            item->delta = query.value(1).toDouble();
-            m_frameList->push_back(item);
-        }
+        zm->getFrameList(event->eventID, m_frameList);
+        m_curFrame = 1;
+        m_lastFrame = m_frameList->size();
+        m_frameText->SetText(QString("%1/%2").arg(m_curFrame).arg(m_lastFrame));
+        getFrame();
     }
-    else
-        VERBOSE(VB_IMPORTANT, "ERROR: Failed to run query to get frames list");
 }
 
 UITextType* ZMPlayer::getTextType(QString name)
@@ -180,7 +155,7 @@ void ZMPlayer::keyPressEvent(QKeyEvent *e)
             {
                 if (m_curFrame > 1)
                     m_curFrame--;
-                loadFrame();
+                getFrame();
             }
         }
         else if (action == "RIGHT")
@@ -189,7 +164,7 @@ void ZMPlayer::keyPressEvent(QKeyEvent *e)
             {
                 if (m_curFrame < m_lastFrame)
                     m_curFrame++;
-                loadFrame();
+                getFrame();
             }
         }
         else if (action == "PAGEUP")
@@ -224,7 +199,7 @@ void ZMPlayer::keyPressEvent(QKeyEvent *e)
                 m_displayRect.setRect(pos.x(), pos.y(), size.width(), size.height());
                 stopPlayer();
                 initPlayer();
-                loadFrame();
+                displayFrame();
             }
             else
             {
@@ -236,7 +211,7 @@ void ZMPlayer::keyPressEvent(QKeyEvent *e)
                 m_displayRect.setRect(pos.x(), pos.y(), size.width(), size.height());
                 stopPlayer();
                 initPlayer();
-                loadFrame();
+                displayFrame();
             }
 
             updateForeground();
@@ -339,7 +314,8 @@ void ZMPlayer::deletePressed()
     {
         m_frameTimer->stop();
 
-        deleteEvent(event->eventID);
+        if (class ZMClient *zm = ZMClient::get())
+            zm->deleteEvent(event->eventID);
 
         m_eventList->erase(m_eventList->begin() + m_currentEvent);
         if (m_currentEvent > (int)m_eventList->size() - 1)
@@ -359,13 +335,12 @@ void ZMPlayer::nextPressed()
     if (m_currentEvent >= (int) m_eventList->size() - 1)
         return;
 
-    m_frameTimer->stop();
-
     m_currentEvent++;
 
     getEventInfo();
-    m_frameTimer->start(1000 / 25);
-    m_paused = false;
+
+    if (m_paused)
+        playPressed();
 }
 
 void ZMPlayer::prevPressed()
@@ -379,18 +354,19 @@ void ZMPlayer::prevPressed()
     if (m_currentEvent > (int) m_eventList->size())
         m_currentEvent = m_eventList->size();
 
-    m_frameTimer->stop();
-
     m_currentEvent--;
 
     getEventInfo();
-    m_frameTimer->start(1000 / 25);
-    m_paused = false;
+
+    if (m_paused)
+        playPressed();
 }
 
-
-void ZMPlayer::updateFrame()
+void ZMPlayer::updateFrame(void)
 {
+    if (!m_lastFrame)
+        return;
+
     m_frameTimer->stop();
 
     m_curFrame++;
@@ -403,20 +379,35 @@ void ZMPlayer::updateFrame()
         return;
     }
 
-    loadFrame();
+    getFrame();
+}
 
-    if (m_curFrame < (int) m_frameList->size())
+void ZMPlayer::getFrame(void)
+{
+    Event *event = m_eventList->at(m_currentEvent);
+    if (event)
     {
-        double delta = m_frameList->at(m_curFrame)->delta - m_frameList->at(m_curFrame - 1)->delta;
+        if (class ZMClient *zm = ZMClient::get())
+            zm->getEventFrame(event->monitorID, event->eventID, m_curFrame, m_image);
 
-        // FIXME: this is a bit of a hack to try to not swamp the cpu
-        if (delta < 0.1)
-            delta = 0.1;
+        displayFrame();
 
-        m_frameTimer->start((int) (1000 * delta));
+        if (!m_paused)
+        {
+            if (m_curFrame < (int) m_frameList->size())
+            {
+                double delta = m_frameList->at(m_curFrame)->delta - m_frameList->at(m_curFrame - 1)->delta;
+
+            // FIXME: this is a bit of a hack to try to not swamp the cpu
+                if (delta < 0.1)
+                    delta = 0.1;
+
+                m_frameTimer->start((int) (1000 * delta));
+            }
+            else
+                m_frameTimer->start(1000 / 100);
+        }
     }
-    else
-        m_frameTimer->start(1000 / 100);
 }
 
 #define TEXTURE_WIDTH 1024
@@ -515,29 +506,32 @@ bool ZMPlayer::initPlayer(void)
 
 void ZMPlayer::stopPlayer(void)
 {
+    m_frameTimer->stop();
+
     if (!m_initalized)
         return;
+
+    m_initalized = false;
 
     glXDestroyContext(m_dis, m_cx);
     XDestroyWindow(m_dis, m_win);
     XCloseDisplay(m_dis);
 }
 
-void ZMPlayer::loadFrame(void)
+void ZMPlayer::displayFrame(void)
 {
     if (m_eventList->size() == 0)
         return;
 
     if (!m_initalized)
         if (!initPlayer())
+            return;
+
+    if (m_image.isNull())
         return;
 
     glXMakeCurrent(m_dis, m_win, m_cx);
 
-    QString imageFile;
-    imageFile.sprintf("/%03d-capture.jpg", m_curFrame);
-
-    m_image.load(m_eventDir + imageFile);
     m_image = m_image.swapRGB();
     unsigned char *data = m_image.bits();
 

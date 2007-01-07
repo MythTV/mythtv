@@ -1,0 +1,17 @@
+# Makefile for mythzmserver 
+#
+
+mythzmserver_objects =  main.o zmserver.o
+
+
+all : mythzmserver 
+
+mythzmserver: $(mythzmserver_objects)
+	g++ -o mythzmserver $(mythzmserver_objects) -lmysqlclient
+
+
+main: main.cpp
+zmserver: zmserver.cpp
+
+clean:
+	rm -f *.o mythzmserver
