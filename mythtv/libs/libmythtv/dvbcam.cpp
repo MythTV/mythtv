@@ -254,7 +254,7 @@ void DVBCam::CiHandlerLoop()
             if (handle_pmt)
                 HandlePMT();
         }
-        usleep(250);
+        usleep(10 * 1000);
     }
     
     ciThreadRunning = false;

@@ -33,6 +33,7 @@
 #include <poll.h>
 #include <string.h>
 #include <sys/ioctl.h>
+#include <sys/time.h>
 #include <time.h>
 #include <unistd.h>
 #include <fcntl.h>
@@ -361,6 +362,7 @@ private:
   uint8_t tcid;
   eState state;
   cTPDU *tpdu;
+  struct timeval last_poll;
   int lastResponse;
   bool dataAvailable;
   void Init(int Fd, uint8_t Slot, uint8_t Tcid);
@@ -384,6 +386,8 @@ public:
 cCiTransportConnection::cCiTransportConnection(void)
 {
   tpdu = NULL;
+  last_poll.tv_sec = 0;
+  last_poll.tv_usec = 0;
   Init(-1, 0, 0);
 }
 
@@ -526,13 +530,30 @@ int cCiTransportConnection::CreateConnection(void)
   return ERROR;
 }
 
+// Polls can be done with a 100ms interval (EN50221 - A.4.1.12)
+#define POLL_INTERVAL 100
+
 int cCiTransportConnection::Poll(void)
 {
-  if (state == stACTIVE) {
-     if (SendTPDU(T_DATA_LAST) == OK)
-        return RecvTPDU();
-     }
-  return ERROR;
+  struct timeval curr_time;
+
+  if (state != stACTIVE)
+    return ERROR;
+
+  gettimeofday(&curr_time, 0);
+  uint64_t msdiff = (curr_time.tv_sec * 1000) + (curr_time.tv_usec / 1000) -
+                    (last_poll.tv_sec * 1000) - (last_poll.tv_usec / 1000);
+
+  if (msdiff < POLL_INTERVAL)
+    return OK;
+
+  last_poll.tv_sec = curr_time.tv_sec;
+  last_poll.tv_usec = curr_time.tv_usec;
+
+  if (SendTPDU(T_DATA_LAST) != OK)
+    return ERROR;
+
+  return RecvTPDU();
 }
 
 // --- cCiTransportLayer -----------------------------------------------------
