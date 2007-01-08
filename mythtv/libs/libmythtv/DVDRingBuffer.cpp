@@ -1186,7 +1186,7 @@ void DVDRingBufferPriv::SetDVDSpeed(const char *device, int speed)
         return;
     }
 
-    if (speed < 100)
+    if (speed > 0 && speed < 100)
         speed *= 1350;
 
     switch(speed)
