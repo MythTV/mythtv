@@ -6,6 +6,7 @@
 #include "mpegtables.h"
 #include "atscdescriptors.h"
 #include <qstring.h>
+#include <stdint.h>  // uint32_t
 
 // Some sample code is in pcHDTV's dtvscan.c,
 // accum_sect/dequeue_buf/atsc_tables.  We should stuff

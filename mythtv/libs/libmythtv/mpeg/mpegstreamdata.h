@@ -7,6 +7,7 @@
 using namespace std;
 
 #include <qmap.h>
+#include <stdint.h>  // uint64_t
 #include "tspacket.h"
 #include "util.h"
 #include "streamlisteners.h"
