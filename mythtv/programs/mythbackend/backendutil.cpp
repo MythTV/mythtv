@@ -166,8 +166,9 @@ void BackendQueryDiskSpace(QStringList &strlist,
         {
             // Sometimes the space reported for an NFS mounted dir is slightly
             // different than when it is locally mounted because of block sizes
-            if ((abs(it1->totalSpaceKB - it2->totalSpaceKB) <= 16 ) &&
-                (abs(it1->usedSpaceKB - it2->usedSpaceKB) < maxWriteFiveSec))
+            if ((absLongLong(it1->totalSpaceKB - it2->totalSpaceKB) <= 16 ) &&
+                (absLongLong(it1->usedSpaceKB - it2->usedSpaceKB)
+                 < maxWriteFiveSec))
             {
                 if (!it1->hostname.contains(it2->hostname))
                     it1->hostname = it1->hostname + "," + it2->hostname;
@@ -247,8 +248,9 @@ void GetFilesystemInfos(QMap<int, EncoderLink*> *tvList,
             // Sometimes the space reported for an NFS mounted dir is slightly
             // different than when it is locally mounted because of block sizes
             if ((it2->fsID == -1) &&
-                ((abs(it1->totalSpaceKB - it2->totalSpaceKB) <= 16 ) &&
-                 (abs(it1->usedSpaceKB - it2->usedSpaceKB) < maxWriteFiveSec)))
+                ((absLongLong(it1->totalSpaceKB - it2->totalSpaceKB) <= 16 ) &&
+                 (absLongLong(it1->usedSpaceKB - it2->usedSpaceKB)
+                  < maxWriteFiveSec)))
                 it2->fsID = it1->fsID;
         }
     }
