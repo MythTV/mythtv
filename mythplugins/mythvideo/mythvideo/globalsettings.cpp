@@ -3,6 +3,8 @@
 #include "globalsettings.h"
 #include "globals.h"
 
+#include <qdir.h>
+
 namespace
 {
 // General Settings
