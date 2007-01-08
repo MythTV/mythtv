@@ -3,7 +3,7 @@
 <title>Installing and using MythTV
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com"
 name="mailto:rkulagow@rocketmail.com">
-<date>2007-01-05, v0.20.11
+<date>2007-01-08, v0.20.12
 <abstract>
 Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -4369,7 +4369,6 @@ the card may only be allowed to record from one of these inputs at one time.
 <eps file="BlockDiagramofavideocapturedevice.eps" height="1cm">
 <img src="BlockDiagramofavideocapturedevice.png">
 <caption>
-Block Diagram of a Video Capture Device.
 </caption>
 </figure>
 
@@ -4423,8 +4422,8 @@ inputs.
 Let's say that this user also has one digital cable set top box. The digital
 cable service carries channels that are not available over basic cable. The
 user would create another source called "Digital". This set top box is
-connected to the second card by s-video so under "Input connections",
-"Digital" is associated with the s-video input of card 2. The system would
+connected to the second card by S-Video so under "Input connections",
+"Digital" is associated with the S-Video input of card 2. The system would
 then know that programs on channels from the Digital source can only be
 recorded from this input. Further, the scheduler understands that it can
 only record one show at a time from card 2 so it can assign Cable or Digital
@@ -4514,7 +4513,7 @@ considered before the showings with lower priority.
 <p>
 "Input Connections" in mythtv-setup includes a box to set "Input priority"
 which defaults to "0". If a value is set, that amount will be added to the
-'total priority' for showings on that input. This can be used to influence
+total priority" for showings on that input. This can be used to influence
 using favored cards or not using less favored cards unless necessary.
 
 Let's say the "The Apprentice" is on at 8:00pm with a priority of 3. "Who
@@ -4529,6 +4528,13 @@ choice for "Who Cares" would be card 2 at 8pm with the priority -3.
 
 Card 1 and 2 have input priority "0":
 
+<figure loc="here">
+<eps file="Card1 Pri 0 Card2 Pri 0.eps" height="1cm">
+<img src="Card1 Pri 0 Card2 Pri 0.png">
+<caption>
+</caption>
+</figure>
+
 <tscreen><verb>
  Time  Title     Priority  Card  Status
  8:00  The Apprentice  +3  1     Will Record
@@ -4537,6 +4543,12 @@ Card 1 and 2 have input priority "0":
 </verb></tscreen>
 
 Card 2 with input priority "-1":
+<figure loc="here">
+<eps file="Card1 Pri 0 Card2 Pri -1.eps" height="1cm">
+<img src="Card1 Pri 0 Card2 Pri -1.png">
+<caption>
+</caption>
+</figure>
 
 <tscreen><verb>
  Time  Title     Priority  Card  Status
@@ -4546,6 +4558,12 @@ Card 2 with input priority "-1":
 </verb></tscreen>
 
 Card 2 at "-1" but higher priority shows at both 8 and 11:
+<figure loc="here">
+<eps file="Card1 Pri 0 Card2 Pri -1-TDS.eps" height="1cm">
+<img src="Card1 Pri 0 Card2 Pri -1-TDS.png">
+<caption>
+</caption>
+</figure>
 
 <tscreen><verb>
  Time  Title     Priority  Card  Status
@@ -7471,7 +7489,7 @@ with-bindings=perl to the compile section.  Clarify SMP compile
 instructions.  Add Bruce's section on explaining how the scheduler deals
 with multiple recording options.  Update database backup commands.  Closes #2869.
 Add crappy diagram for Bruce's scheduler explanation.
-
+v0.20.12, 2007-01-08.  Additional diagrams for the scheduler part.
 -->
 
 <!--

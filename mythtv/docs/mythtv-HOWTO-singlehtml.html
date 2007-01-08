@@ -8,7 +8,7 @@
 <H1>Installing and using MythTV</H1>
 
 <H2>Robert Kulagowski, 
-<A HREF="mailto:rkulagow@rocketmail.com">mailto:rkulagow@rocketmail.com</A></H2>2007-01-05, v0.20.11
+<A HREF="mailto:rkulagow@rocketmail.com">mailto:rkulagow@rocketmail.com</A></H2>2007-01-08, v0.20.12
 <HR>
 <EM>Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -4767,7 +4767,7 @@ the card may only be allowed to record from one of these inputs at one time.</P>
 <FIGURE>
 <EPS FILE="BlockDiagramofavideocapturedevice.eps">
 <IMG SRC="BlockDiagramofavideocapturedevice.png">
-<CAPTION>Block Diagram of a Video Capture Device.</CAPTION>
+<CAPTION></CAPTION>
 </FIGURE>
 </P>
 <P>A television station may be broadcast on more than one channel from one
@@ -4817,8 +4817,8 @@ inputs.</P>
 <P>Let's say that this user also has one digital cable set top box. The digital
 cable service carries channels that are not available over basic cable. The
 user would create another source called "Digital". This set top box is
-connected to the second card by s-video so under "Input connections",
-"Digital" is associated with the s-video input of card 2. The system would
+connected to the second card by S-Video so under "Input connections",
+"Digital" is associated with the S-Video input of card 2. The system would
 then know that programs on channels from the Digital source can only be
 recorded from this input. Further, the scheduler understands that it can
 only record one show at a time from card 2 so it can assign Cable or Digital
@@ -4902,7 +4902,7 @@ considered before the showings with lower priority.</P>
 
 <P>"Input Connections" in mythtv-setup includes a box to set "Input priority"
 which defaults to "0". If a value is set, that amount will be added to the
-'total priority' for showings on that input. This can be used to influence
+total priority" for showings on that input. This can be used to influence
 using favored cards or not using less favored cards unless necessary.</P>
 <P>Let's say the "The Apprentice" is on at 8:00pm with a priority of 3. "Who
 Cares" is -2 and an episode is shown at 8:00pm then repeated at 11:00pm. The
@@ -4915,6 +4915,13 @@ available. If there was another higher priority show at 11pm, the next best
 choice for "Who Cares" would be card 2 at 8pm with the priority -3.</P>
 <P>Card 1 and 2 have input priority "0":</P>
 <P>
+<FIGURE>
+<EPS FILE="Card1 Pri 0 Card2 Pri 0.eps">
+<IMG SRC="Card1 Pri 0 Card2 Pri 0.png">
+<CAPTION></CAPTION>
+</FIGURE>
+</P>
+<P>
 <BLOCKQUOTE><CODE>
 <PRE>
  Time  Title     Priority  Card  Status
@@ -4924,7 +4931,13 @@ choice for "Who Cares" would be card 2 at 8pm with the priority -3.</P>
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
-<P>Card 2 with input priority "-1":</P>
+<P>Card 2 with input priority "-1":
+<FIGURE>
+<EPS FILE="Card1 Pri 0 Card2 Pri -1.eps">
+<IMG SRC="Card1 Pri 0 Card2 Pri -1.png">
+<CAPTION></CAPTION>
+</FIGURE>
+</P>
 <P>
 <BLOCKQUOTE><CODE>
 <PRE>
@@ -4935,7 +4948,13 @@ choice for "Who Cares" would be card 2 at 8pm with the priority -3.</P>
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
-<P>Card 2 at "-1" but higher priority shows at both 8 and 11:</P>
+<P>Card 2 at "-1" but higher priority shows at both 8 and 11:
+<FIGURE>
+<EPS FILE="Card1 Pri 0 Card2 Pri -1-TDS.eps">
+<IMG SRC="Card1 Pri 0 Card2 Pri -1-TDS.png">
+<CAPTION></CAPTION>
+</FIGURE>
+</P>
 <P>
 <BLOCKQUOTE><CODE>
 <PRE>

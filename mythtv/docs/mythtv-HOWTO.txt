@@ -1,7 +1,7 @@
   Installing and using MythTV
   Robert Kulagowski, mailto:rkulagow@rocketmail.com
   <mailto:rkulagow@rocketmail.com>
-  2007-01-05, v0.20.11
+  2007-01-08, v0.20.12
 
   Initially, installation of MythTV seems like a huge task.  There are
   lots of dependencies, and various distributions seem to do the same
@@ -5156,8 +5156,6 @@
 
 
 
-                 Block Diagram of a Video Capture Device.
-
   A television station may be broadcast on more than one channel from
   one provider or may be available on channels from two or more
   providers. If a TV station is available from more than one source, the
@@ -5208,11 +5206,12 @@
   connection to that service should be associated with the video source
   for that service so the system will know which set of channels are
   available for each of your active inputs.
+
   Let's say that this user also has one digital cable set top box. The
   digital cable service carries channels that are not available over
   basic cable. The user would create another source called "Digital".
-  This set top box is connected to the second card by s-video so under
-  "Input connections", "Digital" is associated with the s-video input of
+  This set top box is connected to the second card by S-Video so under
+  "Input connections", "Digital" is associated with the S-Video input of
   card 2. The system would then know that programs on channels from the
   Digital source can only be recorded from this input. Further, the
   scheduler understands that it can only record one show at a time from
@@ -5311,8 +5310,9 @@
 
   "Input Connections" in mythtv-setup includes a box to set "Input
   priority" which defaults to "0". If a value is set, that amount will
-  be added to the using favored cards or not using less favored cards
-  unless necessary.
+  be added to the total priority" for showings on that input. This can
+  be used to influence using favored cards or not using less favored
+  cards unless necessary.
 
   Let's say the "The Apprentice" is on at 8:00pm with a priority of 3.
   "Who Cares" is -2 and an episode is shown at 8:00pm then repeated at
@@ -5329,14 +5329,15 @@
 
 
 
-        Time  Title     Priority  Card  Status
-        8:00  The Apprentice  +3  1     Will Record
-        8:00  Who Cares       -2  2     Will Record
-       11:00  Who Cares       -2  1     Earlier Showing
+   Time  Title     Priority  Card  Status
+   8:00  The Apprentice  +3  1     Will Record
+   8:00  Who Cares       -2  2     Will Record
+  11:00  Who Cares       -2  1     Earlier Showing
 
 
 
   Card 2 with input priority "-1":
+
 
 
         Time  Title     Priority  Card  Status
