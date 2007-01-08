@@ -777,6 +777,7 @@ audio_arts="no"
 audio_jack="no"
 dv1394="no"
 ffserver="no"
+backend="yes"
 SHFLAGS="-dynamiclib -Wl,-single_module -Wl,-install_name,\$(libdir)/\$(SLIBNAME),-current_version,\$(SPPVERSION),-compatibility_version,\$(SPPVERSION)"
 VHOOKFLAGS='-dynamiclib -Wl,-single_module -flat_namespace -undefined suppress -Wl,-install_name,$(libdir)/vhook/$@'
 extralibs=""
