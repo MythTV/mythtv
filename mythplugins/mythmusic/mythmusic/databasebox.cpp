@@ -143,6 +143,9 @@ DatabaseBox::~DatabaseBox()
         delete cd_reader_thread;
     }
 
+    all_music->cleanOutThreads();
+    the_playlists->cleanOutThreads();
+
     all_music->resetListings();
     
     the_playlists->getActive()->removeAllWidgets();
