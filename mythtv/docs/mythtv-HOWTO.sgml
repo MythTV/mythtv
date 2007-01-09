@@ -3,7 +3,7 @@
 <title>Installing and using MythTV
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com"
 name="mailto:rkulagow@rocketmail.com">
-<date>2007-01-08, v0.20.12
+<date>2007-01-09, v0.20.13
 <abstract>
 Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -4543,6 +4543,7 @@ Card 1 and 2 have input priority "0":
 </verb></tscreen>
 
 Card 2 with input priority "-1":
+
 <figure loc="here">
 <eps file="Card1 Pri 0 Card2 Pri -1.eps" height="1cm">
 <img src="Card1 Pri 0 Card2 Pri -1.png">
@@ -4558,6 +4559,7 @@ Card 2 with input priority "-1":
 </verb></tscreen>
 
 Card 2 at "-1" but higher priority shows at both 8 and 11:
+
 <figure loc="here">
 <eps file="Card1 Pri 0 Card2 Pri -1-TDS.eps" height="1cm">
 <img src="Card1 Pri 0 Card2 Pri -1-TDS.png">
@@ -4633,6 +4635,14 @@ example of the listings being different for the same station on a different
 channel. If the HDTV priority is set to +2, the shuttle launch would
 automatically have a total priority of +1 so that channel 750 would be
 preferred over channel 20 for this HDTV broadcast.
+
+<figure loc="here">
+<eps file="Card1 HDTV Card2 Cable.eps" height="1cm">
+<img src="Card1 HDTV Card2 Cable.png">
+<caption>
+</caption>
+</figure>
+
 
 <sect>MythPlugins. <label id="mythplugins_">
 <p>MythTV has a rich set of plugins available.  Once you have downloaded
@@ -7490,6 +7500,7 @@ instructions.  Add Bruce's section on explaining how the scheduler deals
 with multiple recording options.  Update database backup commands.  Closes #2869.
 Add crappy diagram for Bruce's scheduler explanation.
 v0.20.12, 2007-01-08.  Additional diagrams for the scheduler part.
+v0.20.13, 2007-01-09.  Additional tweaks.
 -->
 
 <!--

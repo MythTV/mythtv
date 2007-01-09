@@ -1,7 +1,7 @@
   Installing and using MythTV
   Robert Kulagowski, mailto:rkulagow@rocketmail.com
   <mailto:rkulagow@rocketmail.com>
-  2007-01-08, v0.20.12
+  2007-01-09, v0.20.13
 
   Initially, installation of MythTV seems like a huge task.  There are
   lots of dependencies, and various distributions seem to do the same
@@ -5429,6 +5429,7 @@
   to +2, the shuttle launch would automatically have a total priority of
   +1 so that channel 750 would be preferred over channel 20 for this
   HDTV broadcast.
+
 
 
   [1m13.  MythPlugins.[0m
