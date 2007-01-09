@@ -75,19 +75,19 @@ int main(int argc, char **argv)
             return FRONTEND_EXIT_INVALID_CMDLINE;
         }
     }
-    
-    gContext->LoadQtConfig();
 
     LanguageSettings::load("mythfrontend");
+
+    gContext->LoadQtConfig();
 
     MythMainWindow *mainWindow = GetMythMainWindow();
     mainWindow->Init();
     gContext->SetMainWindow(mainWindow);
-    
+
     initKeys();
 
-    if (bShowSettings)        
-    {        
+    if (bShowSettings)
+    {
         MythShutdownSettings settings;
         settings.exec();
     }
