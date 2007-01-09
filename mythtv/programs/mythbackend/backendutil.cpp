@@ -56,13 +56,24 @@ void BackendQueryDiskSpace(QStringList &strlist,
     QString localStr = "1";
     struct statfs statbuf;
     MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare("SELECT dirname "
+    query.prepare("SELECT DISTINCT dirname "
                   "FROM storagegroup "
                   "WHERE hostname = :HOSTNAME;");
     query.bindValue(":HOSTNAME", gContext->GetHostName());
 
-    if (query.exec() && query.isActive() && query.size())
+    if (query.exec() && query.isActive())
     {
+        // If we don't have any dirs of our own, fallback to list of Default
+        // dirs since that is what StorageGroup::Init() does.
+        if (!query.size())
+        {
+            query.prepare("SELECT DISTINCT dirname "
+                          "FROM storagegroup "
+                          "WHERE groupname = :GROUP;");
+            query.bindValue(":GROUP", "Default");
+            query.exec();
+        }
+
         QDir checkDir("");
         QString currentDir;
         while (query.next())
