@@ -524,6 +524,7 @@ void ViewScheduleDiff::updateList(QPainter *p)
                 else if (p->recstatus == rsWillRecord)
                     ltype->EnableForcedFont(i, "record");
                 else if (p->recstatus == rsRepeat ||
+                         p->recstatus == rsOtherShowing ||
                          (p->recstatus != rsDontRecord &&
                           p->recstatus <= rsEarlierShowing))
                     ltype->EnableForcedFont(i, "disabledrecording"); 

@@ -3071,6 +3071,8 @@ QString ProgramInfo::RecStatusChar(void) const
         return QObject::tr("V", "RecStatusChar rsNeverRecord");
     case rsOffLine:
         return QObject::tr("F", "RecStatusChar rsOffLine");
+    case rsOtherShowing:
+        return QObject::tr("O", "RecStatusChar rsOtherShowing");
     default:
         return "-";
     }
@@ -3129,6 +3131,8 @@ QString ProgramInfo::RecStatusText(void) const
             return QObject::tr("Never Record");
         case rsOffLine:
             return QObject::tr("Recorder Off-Line");
+        case rsOtherShowing:
+            return QObject::tr("Other Showing");
         default:
             return QObject::tr("Unknown");
         }
@@ -3237,6 +3241,10 @@ QString ProgramInfo::RecStatusDesc(void) const
             break;            
         case rsOffLine:
             message += QObject::tr("the backend recorder is off-line.");
+            break;
+        case rsOtherShowing:
+            message += QObject::tr("this episode will be recorded on a "
+                                   "different channel at this time.");
             break;
         default:
             message += QObject::tr("you should never see this.");
@@ -4288,6 +4296,7 @@ void ProgramInfo::ShowNotRecordingDialog(void)
              recstatus == rsPreviousRecording ||
              recstatus == rsCurrentRecording ||
              recstatus == rsEarlierShowing ||
+             recstatus == rsOtherShowing ||
              recstatus == rsRepeat ||
              recstatus == rsInactive ||
              recstatus == rsLaterShowing))
@@ -4565,7 +4574,7 @@ bool ProgramList::FromProgram(const QString &sql, MSqlBindings &bindings,
                     }
                     else if (p->chanid != s->chanid)
                     {
-                        p->recstatus = rsEarlierShowing;
+                        p->recstatus = rsOtherShowing;
                     }
                 }
             }
