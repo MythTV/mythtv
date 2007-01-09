@@ -5347,7 +5347,7 @@
 
 
 
-  Card 2 at "-1" but higher priority shows at both 8 and 11:
+  Card 2 at "-1" but higher priority shows at both 8 P.M. and 11 P.M.:
 
 
 
@@ -5426,9 +5426,12 @@
   on HD channels. However, the flag is not set for standard definition
   channels. This is another example of the listings being different for
   the same station on a different channel. If the HDTV priority is set
-  to +2, the shuttle launch would automatically have a total priority of
-  +1 so that channel 750 would be preferred over channel 20 for this
+  to "+2", the shuttle launch would automatically have a total priority
+  of +1 so that channel 750 would be preferred over channel 20 for this
   HDTV broadcast.
+
+  Channel "750 CNN" at priority "-1" and HDTV broadcast priority at
+  "+2":
 
 
 
@@ -5438,53 +5441,52 @@
   the tarball, untar it and run the [1mconfigure [22mscript:
 
 
+       $ tar -xjf mythplugins-0.20.tar.bz2
+       $ cd mythplugins-0.20
+       $ ./configure --help
 
-  $ tar -xjf mythplugins-0.20.tar.bz2
-  $ cd mythplugins-0.20
-  $ ./configure --help
+       Usage:   configure [options]
+       Options: [defaults in brackets after descriptions]
+       NB:      all --enable-* options can be reversed with --disable-*
 
-  Usage:   configure [options]
-  Options: [defaults in brackets after descriptions]
-  NB:      all --enable-* options can be reversed with --disable-*
+       Generic options:
+         --help                   print this message
+         --enable-all             Enable all options
+         --enable-opengl          enable OpenGL (Music and Gallery) [default=no]
 
-  Generic options:
-    --help                   print this message
-    --enable-all             Enable all options
-    --enable-opengl          enable OpenGL (Music and Gallery) [default=no]
+       MythBrowser related options:
+         --enable-mythbrowser     build the mythbrowser plugin [default=yes]
 
-  MythBrowser related options:
-    --enable-mythbrowser     build the mythbrowser plugin [default=yes]
+       MythDVD related options:
+         --enable-mythdvd         build the mythdvd plugin [default=yes]
+         --enable-transcode       enable DVD ripping and transcoding [default=no]
+         --enable-vcd             enable VCD playing [default=no]
 
-  MythDVD related options:
-    --enable-mythdvd         build the mythdvd plugin [default=yes]
-    --enable-transcode       enable DVD ripping and transcoding [default=no]
-    --enable-vcd             enable VCD playing [default=no]
+       MythGallery related options:
+         --enable-mythgallery     build the mythgallery plugin [default=yes]
+         --enable-exif            enable reading of EXIF headers [default=no]
 
-  MythGallery related options:
-    --enable-mythgallery     build the mythgallery plugin [default=yes]
-    --enable-exif            enable reading of EXIF headers [default=no]
+       MythGame related options:
+         --enable-mythgame        build the mythgame plugin [default=yes]
 
-  MythGame related options:
-    --enable-mythgame        build the mythgame plugin [default=yes]
+       MythMusic related options:
+         --enable-mythmusic       build the mythmusic plugin [default=yes]
+         --enable-fftw            enable fftw visualizers [default=no]
+         --enable-sdl             use SDL for the synaesthesia output [default=no]
+         --enable-aac             enable AAC/MP4 audio file decompression [default=no]
 
-  MythMusic related options:
-    --enable-mythmusic       build the mythmusic plugin [default=yes]
-    --enable-fftw            enable fftw visualizers [default=no]
-    --enable-sdl             use SDL for the synaesthesia output [default=no]
-    --enable-aac             enable AAC/MP4 audio file decompression [default=no]
+       MythNews related options:
+         --enable-mythnews        build the mythnews plugin [default=yes]
 
-  MythNews related options:
-    --enable-mythnews        build the mythnews plugin [default=yes]
+       MythPhone related options:
+         --enable-mythphone       build the mythphone plugin [default=yes]
+         --enable-festival        enable festival TTS Engine [default=no]
 
-  MythPhone related options:
-    --enable-mythphone       build the mythphone plugin [default=yes]
-    --enable-festival        enable festival TTS Engine [default=no]
+       MythVideo related options:
+         --enable-mythvideo       build the mythvideo plugin [default=yes]
 
-  MythVideo related options:
-    --enable-mythvideo       build the mythvideo plugin [default=yes]
-
-  MythWeather related options:
-    --enable-mythweather     build the mythweather plugin [default=yes]
+       MythWeather related options:
+         --enable-mythweather     build the mythweather plugin [default=yes]
 
 
 

@@ -4558,7 +4558,7 @@ Card 2 with input priority "-1":
 11:00  Who Cares       -2  1     Will Record
 </verb></tscreen>
 
-Card 2 at "-1" but higher priority shows at both 8 and 11:
+Card 2 at "-1" but higher priority shows at both 8 P.M. and 11 P.M.:
 
 <figure loc="here">
 <eps file="Card1 Pri 0 Card2 Pri -1-TDS.eps" height="1cm">
@@ -4632,9 +4632,11 @@ if the listings for the show have the "hdtv" flag set. DataDirect will set
 this flag for shows known to be broadcast in HDTV on HD channels. However,
 the flag is not set for standard definition channels. This is another
 example of the listings being different for the same station on a different
-channel. If the HDTV priority is set to +2, the shuttle launch would
+channel. If the HDTV priority is set to "+2", the shuttle launch would
 automatically have a total priority of +1 so that channel 750 would be
 preferred over channel 20 for this HDTV broadcast.
+
+Channel "750 CNN" at priority "-1" and HDTV broadcast priority at "+2":
 
 <figure loc="here">
 <eps file="Card1 HDTV Card2 Cable.eps" height="1cm">
@@ -4642,7 +4644,6 @@ preferred over channel 20 for this HDTV broadcast.
 <caption>
 </caption>
 </figure>
-
 
 <sect>MythPlugins. <label id="mythplugins_">
 <p>MythTV has a rich set of plugins available.  Once you have downloaded
