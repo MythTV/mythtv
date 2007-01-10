@@ -6,6 +6,7 @@
 #include <sys/stat.h>
 #include <sys/ioctl.h>
 #include <fcntl.h>
+#include <unistd.h>
 #endif
 
 
@@ -63,11 +64,11 @@ DVDRingBufferPriv::DVDRingBufferPriv()
 
 DVDRingBufferPriv::~DVDRingBufferPriv()
 {
-    close();
+    CloseDVD();
     ClearMenuSPUParameters();
 }
 
-void DVDRingBufferPriv::close(void)
+void DVDRingBufferPriv::CloseDVD(void)
 {
     if (dvdnav)
     {
@@ -1241,7 +1242,8 @@ void DVDRingBufferPriv::SetDVDSpeed(const char *device, int speed)
 
     if (ioctl(fd, SG_IO, &sghdr) < 0)
         VERBOSE(VB_PLAYBACK, LOC_ERR + "Limit DVD Speed Failed");
-    
+   
+    close(fd);
     VERBOSE(VB_PLAYBACK, LOC + "Limiting DVD Speed Successful");
 #else
     (void)speed;
