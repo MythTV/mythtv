@@ -282,7 +282,6 @@ class MPUBLIC ProgramInfo
     int chancommfree;
 
     QString pathname;
-    QString playbackurl;
     long long filesize;
     QString hostname;
     QString storagegroup;

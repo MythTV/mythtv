@@ -86,7 +86,6 @@ ProgramInfo::ProgramInfo(void)
     availableStatus = asAvailable;    
 
     pathname = "";
-    playbackurl = "";
     storagegroup = QString("Default");
     filesize = 0;
     hostname = "";
@@ -183,7 +182,6 @@ ProgramInfo &ProgramInfo::clone(const ProgramInfo &other)
     
     pathname = QDeepCopy<QString>(other.pathname);
     storagegroup = QDeepCopy<QString>(other.storagegroup);
-    playbackurl = QDeepCopy<QString>(other.playbackurl);
     filesize = other.filesize;
     hostname = QDeepCopy<QString>(other.hostname);
 
@@ -1506,9 +1504,6 @@ QString ProgramInfo::GetRecordBasename(bool fromDB) const
  */
 QString ProgramInfo::GetPlaybackURL(bool checkMaster, bool forceCheckLocal)
 {
-    if (playbackurl != "")
-        return playbackurl;
-
     QString tmpURL;
     QString basename = GetRecordBasename(true);
 
@@ -1526,7 +1521,6 @@ QString ProgramInfo::GetPlaybackURL(bool checkMaster, bool forceCheckLocal)
         {
             VERBOSE(VB_FILE, LOC +
                     QString("GetPlaybackURL: File is local: '%1'").arg(tmpURL));
-            playbackurl = tmpURL;
             return tmpURL;
         }
         else if (hostname == gContext->GetHostName())
