@@ -1854,11 +1854,9 @@ void JobQueue::DoTranscodeThread(void)
         {
             if (status == JOB_FINISHED)
             {
+                ChangeJobStatus(jobID, JOB_FINISHED, "Finished.");
                 retry = false;
 
-                // Clear the pathname to force rechecking the DB in case 
-                // mythtranscode renamed the file.
-                program_info->pathname = "";
                 filename = program_info->GetPlaybackURL(false, true);
 
                 if (stat(filename.ascii(), &st) == 0)
@@ -1869,7 +1867,7 @@ void JobQueue::DoTranscodeThread(void)
                                             .arg(transcoderName)
                                             .arg(PrettyPrint(origfilesize))
                                             .arg(PrettyPrint(filesize));
-                    ChangeJobStatus(jobID, JOB_FINISHED, comment);
+                    ChangeJobComment(jobID, comment);
 
                     if (filesize > 0)
                         program_info->SetFilesize(filesize);
