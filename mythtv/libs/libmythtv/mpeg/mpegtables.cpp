@@ -281,6 +281,19 @@ bool ProgramMapTable::IsAudio(uint i, QString sistandard) const
  */
 bool ProgramMapTable::IsEncrypted(void) const
 {
+    bool encrypted = IsProgramEncrypted();
+
+    for (uint i = 0; !encrypted && i < StreamCount(); i++)
+        encrypted |= IsStreamEncrypted(i);
+
+    return encrypted;
+}
+
+/** \fn ProgramMapTable::IsProgramEncrypted(void) const
+ *  \brief Returns true iff PMT's ProgramInfo contains CA descriptor.
+ */
+bool ProgramMapTable::IsProgramEncrypted(void) const
+{
     desc_list_t descs = MPEGDescriptor::ParseOnlyInclude(
         ProgramInfo(), ProgramInfoLength(), DescriptorID::conditional_access);
 
@@ -295,20 +308,28 @@ bool ProgramMapTable::IsEncrypted(void) const
         //VERBOSE(VB_IMPORTANT, "DTVsm: "<<cad.toString());
     }
 
-    for (uint i = 0; i < StreamCount(); i++)
+    return encrypted;
+}
+
+/** \fn ProgramMapTable::IsStreamEncrypted(uint i) const
+ *  \brief Returns true iff PMT contains CA descriptor.
+ *
+ *  \param i index of stream
+ */
+bool ProgramMapTable::IsStreamEncrypted(uint i) const
+{
+    desc_list_t descs = MPEGDescriptor::ParseOnlyInclude(
+        StreamInfo(i), StreamInfoLength(i), DescriptorID::conditional_access);
+
+    bool encrypted = false;
+    QMap<uint,uint> encryption_system;
+    for (uint j = 0; j < descs.size(); j++)
     {
-        desc_list_t descs = MPEGDescriptor::ParseOnlyInclude(
-            StreamInfo(i), StreamInfoLength(i),
-            DescriptorID::conditional_access);
+        ConditionalAccessDescriptor cad(descs[j]);
+        encryption_system[cad.PID()] = cad.SystemID();
+        encrypted |= cad.SystemID();
 
-        for (uint j = 0; j < descs.size(); j++)
-        {
-            ConditionalAccessDescriptor cad(descs[j]);
-            encryption_system[cad.PID()] = cad.SystemID();
-            encrypted |= cad.SystemID();
-
-            //VERBOSE(VB_IMPORTANT, "DTVsm: "<<cad.toString());
-        }
+        //VERBOSE(VB_IMPORTANT, "DTVsm: "<<cad.toString());
     }
 
     return encrypted;

@@ -85,6 +85,7 @@ class SIScan : public QObject,
     void HandlePAT(const ProgramAssociationTable*);
     void HandleCAT(const ConditionalAccessTable*) { }
     void HandlePMT(uint, const ProgramMapTable*) { }
+    void HandleEncryptionStatus(uint /*pnum*/, bool /*encrypted*/) { }
 
     // ATSC Main
     void HandleSTT(const SystemTimeTable*) {}

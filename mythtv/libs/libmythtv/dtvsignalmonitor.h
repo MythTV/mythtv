@@ -47,9 +47,6 @@ class DTVSignalMonitor : public SignalMonitor,
     uint GetDetectedNetworkID(void)   const  { return detectedNetworkID; }
     uint GetDetectedTransportID(void) const  { return detectedTransportID; }
 
-    void SetFTAOnly(bool fta)    { ignoreEncrypted = fta;  }
-    bool GetFTAOnly() const      { return ignoreEncrypted; }
-
     /// Sets rotor target pos from 0.0 to 1.0
     virtual void SetRotorTarget(float) {}
 
@@ -86,6 +83,7 @@ class DTVSignalMonitor : public SignalMonitor,
     void HandlePAT(const ProgramAssociationTable*);
     void HandleCAT(const ConditionalAccessTable*) {}
     void HandlePMT(uint, const ProgramMapTable*);
+    void HandleEncryptionStatus(uint, bool enc_status);
 
     // ATSC Main
     void HandleSTT(const SystemTimeTable*);
@@ -119,12 +117,14 @@ class DTVSignalMonitor : public SignalMonitor,
     SignalMonitorValue seenVCT;
     SignalMonitorValue seenNIT;
     SignalMonitorValue seenSDT;
+    SignalMonitorValue seenCrypt;
     SignalMonitorValue matchingPAT;
     SignalMonitorValue matchingPMT;
     SignalMonitorValue matchingMGT;
     SignalMonitorValue matchingVCT;
     SignalMonitorValue matchingNIT;
     SignalMonitorValue matchingSDT;
+    SignalMonitorValue matchingCrypt;
 
     // ATSC tuning info
     int                majorChannel;
@@ -138,7 +138,6 @@ class DTVSignalMonitor : public SignalMonitor,
     // MPEG/DVB/ATSC tuning info
     int                programNumber;
 
-    bool               ignoreEncrypted;
     QString            error;
 };
 

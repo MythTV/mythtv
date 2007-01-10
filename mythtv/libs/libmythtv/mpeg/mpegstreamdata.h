@@ -40,6 +40,31 @@ typedef QMap<uint, sections_t>          sections_map_t;
 typedef vector<MPEGStreamListener*>     mpeg_listener_vec_t;
 typedef vector<MPEGSingleProgramStreamListener*> mpeg_sp_listener_vec_t;
 
+typedef enum
+{
+    kEncUnknown   = 0,
+    kEncDecrypted = 1,
+    kEncEncrypted = 2,
+} CryptStatus;
+
+class CryptInfo
+{
+  public:
+    CryptInfo() :
+        status(kEncUnknown), encrypted_packets(0), decrypted_packets(0),
+        encrypted_min(1000), decrypted_min(8) { }
+    CryptInfo(uint e, uint d) :
+        status(kEncUnknown), encrypted_packets(0), decrypted_packets(0),
+        encrypted_min(e), decrypted_min(d) { }
+
+  public:
+    CryptStatus status;
+    uint encrypted_packets;
+    uint decrypted_packets;
+    uint encrypted_min;
+    uint decrypted_min;
+};
+
 void init_sections(sections_t &sect, uint last_section);
 
 class MPEGStreamData : public EITSource
@@ -158,6 +183,17 @@ class MPEGStreamData : public EITSource
     virtual void ReturnCachedPMTTables(pmt_vec_t&) const;
     virtual void ReturnCachedPMTTables(pmt_map_t&) const;
 
+    // Encryption Monitoring
+    void AddEncryptionTestPID(uint pnum, uint pid, bool isvideo);
+    void RemoveEncryptionTestPIDs(uint pnum);
+    bool IsEncryptionTestPID(uint pid) const;
+
+    void TestDecryption(const ProgramMapTable* pmt);
+    void ResetDecryptionMonitoringState(void);
+
+    bool IsProgramDecrypted(uint pnum) const;
+    bool IsProgramEncrypted(uint pnum) const;
+
     // "signals"
     void AddMPEGListener(MPEGStreamListener*);
     void RemoveMPEGListener(MPEGStreamListener*);
@@ -218,6 +254,7 @@ class MPEGStreamData : public EITSource
     void DeletePartialPES(uint pid);
     void ProcessPAT(const ProgramAssociationTable *pat);
     void ProcessPMT(const ProgramMapTable *pmt);
+    void ProcessEncryptedPacket(const TSPacket&);
 
     static int ResyncStream(unsigned char *buffer, int curr_pos, int len);
 
@@ -250,6 +287,13 @@ class MPEGStreamData : public EITSource
     QMap<uint, bool>          _pids_notlistening;
     QMap<uint, bool>          _pids_writing;
     QMap<uint, bool>          _pids_audio;
+
+    // Encryption monitoring
+    mutable QMutex            _encryption_lock;
+    QMap<uint, CryptInfo>     _encryption_pid_to_info;
+    QMap<uint, uint_vec_t>    _encryption_pnum_to_pids;
+    QMap<uint, uint_vec_t>    _encryption_pid_to_pnums;
+    QMap<uint, CryptStatus>   _encryption_pnum_to_status;
 
     // Signals
     mutable QMutex            _listener_lock;

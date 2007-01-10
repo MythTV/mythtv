@@ -4686,7 +4686,7 @@ void TV::UpdateOSDSignal(const QStringList& strlist)
     float snr  = 0.0f;
     uint  ber  = 0xffffffff;
     int   pos  = -1;
-    QString pat(""), pmt(""), mgt(""), vct(""), nit(""), sdt("");
+    QString pat(""), pmt(""), mgt(""), vct(""), nit(""), sdt(""), crypt("");
     QString err = QString::null, msg = QString::null;
     for (it = slist.begin(); it != slist.end(); ++it)
     {
@@ -4736,6 +4736,10 @@ void TV::UpdateOSDSignal(const QStringList& strlist)
             sdt = it->IsGood() ? "s" : "_";
         else if ("matching_sdt" == it->GetShortName())
             sdt = it->IsGood() ? "S" : sdt;
+        else if ("seen_crypt" == it->GetShortName())
+            crypt = it->IsGood() ? "c" : "_";
+        else if ("matching_crypt" == it->GetShortName())
+            crypt = it->IsGood() ? "C" : crypt;
     }
     if (sig)
         infoMap["signal"] = QString::number(sig); // use normalized value
@@ -4753,9 +4757,9 @@ void TV::UpdateOSDSignal(const QStringList& strlist)
     if ((pos >= 0) && (pos < 100))
         sigDesc += " | " + tr("Rotor %1\%").arg(pos,2);
 
-    sigDesc = sigDesc + QString(" | (%1%2%3%4%5%6%7) %8")
+    sigDesc = sigDesc + QString(" | (%1%2%3%4%5%6%7%8) %9")
         .arg(slock).arg(pat).arg(pmt).arg(mgt).arg(vct)
-        .arg(nit).arg(sdt).arg(sigMsg);
+        .arg(nit).arg(sdt).arg(crypt).arg(sigMsg);
 
     if (!err.isEmpty())
         sigDesc = err;

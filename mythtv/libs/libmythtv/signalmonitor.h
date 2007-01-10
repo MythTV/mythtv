@@ -148,6 +148,8 @@ class SignalMonitor : public QObject
     static const uint64_t kDTVSigMon_SDTSeen    = 0x0000000080ULL;
     /// We've seen the FireWire STB power state
     static const uint64_t kFWSigMon_PowerSeen   = 0x0000000100ULL;
+    /// We can encrypt the stream
+    static const uint64_t kDTVSigMon_CryptSeen  = 0x0000000200ULL;
 
     /// We've seen a PAT matching our requirements
     static const uint64_t kDTVSigMon_PATMatch   = 0x0000001000ULL;
@@ -167,6 +169,8 @@ class SignalMonitor : public QObject
     static const uint64_t kDTVSigMon_SDTMatch   = 0x0000080000ULL;
     /// We've seen a FireWire STB power state matching our requirements
     static const uint64_t kFWSigMon_PowerMatch  = 0x0000100000ULL;
+    /// We can encrypt the stream
+    static const uint64_t kDTVSigMon_CryptMatch = 0x0000200000ULL;
 
     static const uint64_t kDTVSigMon_WaitForPAT = 0x0001000000ULL;
     static const uint64_t kDTVSigMon_WaitForPMT = 0x0002000000ULL;
@@ -176,17 +180,18 @@ class SignalMonitor : public QObject
     static const uint64_t kDTVSigMon_WaitForSDT = 0x0020000000ULL;
     static const uint64_t kDTVSigMon_WaitForSig = 0x0040000000ULL;
     static const uint64_t kFWSigMon_WaitForPower= 0x0080000000ULL;
+    static const uint64_t kDTVSigMon_WaitForCrypt=0x0100000000ULL;
 
-    static const uint64_t kDTVSigMon_WaitForAll = 0x00FF000000ULL;
+    static const uint64_t kDTVSigMon_WaitForAll = 0x01FF000000ULL;
 
     /// Wait for the Signal to Noise Ratio to rise above a threshhold
-    static const uint64_t kDVBSigMon_WaitForSNR = 0x0100000000ULL;
+    static const uint64_t kDVBSigMon_WaitForSNR = 0x1000000000ULL;
     /// Wait for the Bit Error Rate to fall below a threshhold
-    static const uint64_t kDVBSigMon_WaitForBER = 0x0200000000ULL;
+    static const uint64_t kDVBSigMon_WaitForBER = 0x2000000000ULL;
     /// Wait for uncorrected FEC blocks to fall below a threshhold
-    static const uint64_t kDVBSigMon_WaitForUB  = 0x0400000000ULL;
+    static const uint64_t kDVBSigMon_WaitForUB  = 0x4000000000ULL;
     /// Wait for rotor to complete turning the antenna
-    static const uint64_t kDVBSigMon_WaitForPos = 0x0800000000ULL;
+    static const uint64_t kDVBSigMon_WaitForPos = 0x8000000000ULL;
 
   protected:
     pthread_t    monitor_thread;
@@ -228,6 +233,8 @@ inline QString sm_flags_to_string(uint64_t flags)
         str += "SDT,";
     if (SignalMonitor::kFWSigMon_PowerSeen   & flags)
         str += "STB,";
+    if (SignalMonitor::kDTVSigMon_CryptSeen  & flags)
+        str += "Crypt,";
 
     str += ") Match(";
     if (SignalMonitor::kDTVSigMon_PATMatch   & flags)
@@ -248,6 +255,8 @@ inline QString sm_flags_to_string(uint64_t flags)
         str += "SDT,";
     if (SignalMonitor::kFWSigMon_PowerMatch  & flags)
         str += "STB,";
+    if (SignalMonitor::kDTVSigMon_CryptMatch & flags)
+        str += "Crypt,";
 
     str += ") Wait(";
     if (SignalMonitor::kDTVSigMon_WaitForPAT & flags)
@@ -266,6 +275,8 @@ inline QString sm_flags_to_string(uint64_t flags)
         str += "Sig,";
     if (SignalMonitor::kFWSigMon_WaitForPower& flags)
         str += "STB,";
+    if (SignalMonitor::kDTVSigMon_WaitForCrypt & flags)
+        str += "Crypt,";
 
     if (SignalMonitor::kDVBSigMon_WaitForSNR & flags)
         str += "SNR,";

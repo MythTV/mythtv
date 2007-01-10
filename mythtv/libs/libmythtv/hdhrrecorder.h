@@ -46,6 +46,7 @@ class HDHRRecorder : public DTVRecorder,
     void HandlePAT(const ProgramAssociationTable*);
     void HandleCAT(const ConditionalAccessTable*) {}
     void HandlePMT(uint pid, const ProgramMapTable*);
+    void HandleEncryptionStatus(uint /*pnum*/, bool /*encrypted*/) { }
 
     // MPEG Single Program Stream Listener
     void HandleSingleProgramPAT(ProgramAssociationTable *pat);

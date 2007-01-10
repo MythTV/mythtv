@@ -1,6 +1,7 @@
 #include <unistd.h>
 
 #include "dtvchannel.h"
+#include "dvbchannel.h"
 #include "dtvsignalmonitor.h"
 #include "scanstreamdata.h"
 #include "mpegtables.h"
@@ -30,17 +31,19 @@ DTVSignalMonitor::DTVSignalMonitor(int db_cardnum,
       seenVCT(tr("Seen")+" VCT", "seen_vct", 1, true, 0, 1, 0),
       seenNIT(tr("Seen")+" NIT", "seen_nit", 1, true, 0, 1, 0),
       seenSDT(tr("Seen")+" SDT", "seen_sdt", 1, true, 0, 1, 0),
+      seenCrypt(tr("Seen")+" Crypt", "seen_crypt", 1, true, 0, 1, 0),
       matchingPAT(tr("Matching")+" PAT", "matching_pat", 1, true, 0, 1, 0),
       matchingPMT(tr("Matching")+" PMT", "matching_pmt", 1, true, 0, 1, 0),
       matchingMGT(tr("Matching")+" MGT", "matching_mgt", 1, true, 0, 1, 0),
       matchingVCT(tr("Matching")+" VCT", "matching_vct", 1, true, 0, 1, 0),
       matchingNIT(tr("Matching")+" NIT", "matching_nit", 1, true, 0, 1, 0),
       matchingSDT(tr("Matching")+" SDT", "matching_sdt", 1, true, 0, 1, 0),
+      matchingCrypt(tr("Matching")+" Crypt", "matching_crypt",
+                    1, true, 0, 1, 0),
       majorChannel(-1), minorChannel(-1),
       networkID(0), transportID(0),
       detectedNetworkID(0), detectedTransportID(0),
       programNumber(-1),
-      ignoreEncrypted(true),
       error("")
 {
 }
@@ -112,6 +115,11 @@ QStringList DTVSignalMonitor::GetStatusList(bool kick)
         list<<seenSDT.GetName()<<seenSDT.GetStatus();
         list<<matchingSDT.GetName()<<matchingSDT.GetStatus();
     }
+    if (flags & kDTVSigMon_WaitForCrypt)
+    {
+        list<<seenCrypt.GetName()<<seenCrypt.GetStatus();
+        list<<matchingCrypt.GetName()<<matchingCrypt.GetStatus();
+    }
     if (error != "")
     {
         list<<"error"<<error;
@@ -140,12 +148,14 @@ void DTVSignalMonitor::UpdateMonitorValues(void)
     seenVCT.SetValue(    (flags & kDTVSigMon_VCTSeen)  ? 1 : 0);
     seenNIT.SetValue(    (flags & kDTVSigMon_NITSeen)  ? 1 : 0);
     seenSDT.SetValue(    (flags & kDTVSigMon_SDTSeen)  ? 1 : 0);
+    seenCrypt.SetValue(  (flags & kDTVSigMon_CryptSeen)? 1 : 0);
     matchingPAT.SetValue((flags & kDTVSigMon_PATMatch) ? 1 : 0);
     matchingPMT.SetValue((flags & kDTVSigMon_PMTMatch) ? 1 : 0);
     matchingMGT.SetValue((flags & kDTVSigMon_MGTMatch) ? 1 : 0);
     matchingVCT.SetValue((flags & kDTVSigMon_VCTMatch) ? 1 : 0);
     matchingNIT.SetValue((flags & kDTVSigMon_NITMatch) ? 1 : 0);
     matchingSDT.SetValue((flags & kDTVSigMon_SDTMatch) ? 1 : 0);
+    matchingCrypt.SetValue((flags & kDTVSigMon_CryptMatch) ? 1 : 0);
 }
 
 void DTVSignalMonitor::UpdateListeningForEIT(void)
@@ -177,9 +187,10 @@ void DTVSignalMonitor::SetChannel(int major, int minor)
     DBG_SM(QString("SetChannel(%1, %2)").arg(major).arg(minor), "");
     if (GetATSCStreamData() && (majorChannel != major || minorChannel != minor))
     {
-        RemoveFlags(kDTVSigMon_PATSeen | kDTVSigMon_PATMatch |
-                    kDTVSigMon_PMTSeen | kDTVSigMon_PMTMatch |
-                    kDTVSigMon_VCTSeen | kDTVSigMon_VCTMatch);
+        RemoveFlags(kDTVSigMon_PATSeen   | kDTVSigMon_PATMatch |
+                    kDTVSigMon_PMTSeen   | kDTVSigMon_PMTMatch |
+                    kDTVSigMon_VCTSeen   | kDTVSigMon_VCTMatch |
+                    kDTVSigMon_CryptSeen | kDTVSigMon_CryptMatch);
         majorChannel = major;
         minorChannel = minor;
         GetATSCStreamData()->SetDesiredChannel(major, minor);
@@ -192,7 +203,8 @@ void DTVSignalMonitor::SetProgramNumber(int progNum)
     DBG_SM(QString("SetProgramNumber(%1)").arg(progNum), "");
     if (programNumber != progNum)
     {
-        RemoveFlags(kDTVSigMon_PMTSeen | kDTVSigMon_PMTMatch);
+        RemoveFlags(kDTVSigMon_PMTSeen   | kDTVSigMon_PMTMatch |
+                    kDTVSigMon_CryptSeen | kDTVSigMon_CryptMatch);
         programNumber = progNum;
         if (GetStreamData())
             GetStreamData()->SetDesiredProgram(programNumber);
@@ -211,8 +223,9 @@ void DTVSignalMonitor::SetDVBService(uint netid, uint tsid, int serviceid)
         return;
     }
 
-    RemoveFlags(kDTVSigMon_PMTSeen | kDTVSigMon_PMTMatch |
-                kDTVSigMon_SDTSeen | kDTVSigMon_SDTMatch);
+    RemoveFlags(kDTVSigMon_PMTSeen   | kDTVSigMon_PMTMatch |
+                kDTVSigMon_SDTSeen   | kDTVSigMon_SDTMatch |
+                kDTVSigMon_CryptSeen | kDTVSigMon_CryptMatch);
 
     transportID   = tsid;
     networkID     = netid;
@@ -309,11 +322,8 @@ void DTVSignalMonitor::HandlePMT(uint, const ProgramMapTable *pmt)
         return; // Not the PMT we are looking for...
     }
 
-    if (ignoreEncrypted && pmt->IsEncrypted())
-    {
-        VERBOSE(VB_IMPORTANT, LOC + "Ignoring encrypted program");
-        return;
-    }
+    if (pmt->IsEncrypted())
+        GetStreamData()->TestDecryption(pmt);
 
     // if PMT contains audio and/or video stream set as matching.
     uint hasAudio = 0;
@@ -328,6 +338,9 @@ void DTVSignalMonitor::HandlePMT(uint, const ProgramMapTable *pmt)
     if ((hasVideo >= GetStreamData()->GetVideoStreamsRequired()) &&
         (hasAudio >= GetStreamData()->GetAudioStreamsRequired()))
     {
+        if (pmt->IsEncrypted())
+            AddFlags(kDTVSigMon_WaitForCrypt);
+
         AddFlags(kDTVSigMon_PMTMatch);
     }
     else
@@ -442,6 +455,13 @@ void DTVSignalMonitor::HandleSDT(uint, const ServiceDescriptionTable *sdt)
     }
 }
 
+void DTVSignalMonitor::HandleEncryptionStatus(uint, bool enc_status)
+{
+    AddFlags(kDTVSigMon_CryptSeen);
+    if (!enc_status)
+        AddFlags(kDTVSigMon_CryptMatch);
+}
+
 ATSCStreamData *DTVSignalMonitor::GetATSCStreamData()
 {
     return dynamic_cast<ATSCStreamData*>(stream_data);
@@ -488,6 +508,8 @@ bool DTVSignalMonitor::IsAllGood(void) const
     if ((flags & kDTVSigMon_WaitForNIT) && !matchingNIT.IsGood())
             return false;
     if ((flags & kDTVSigMon_WaitForSDT) && !matchingSDT.IsGood())
+            return false;
+    if ((flags & kDTVSigMon_WaitForCrypt) && !matchingCrypt.IsGood())
             return false;
 
     return true;

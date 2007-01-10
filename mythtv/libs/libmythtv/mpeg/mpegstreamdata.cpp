@@ -1,6 +1,9 @@
 // -*- Mode: c++ -*-
 // Copyright (c) 2003-2004, Daniel Thor Kristjansson
 
+#include <algorithm> // for find
+using namespace std;
+
 // POSIX headers
 #include <sys/time.h> // for gettimeofday
 
@@ -54,7 +57,7 @@ MPEGStreamData::MPEGStreamData(int desiredProgram, bool cacheTables)
       _local_utc_offset(0), _si_time_offset_cnt(0),
       _si_time_offset_indx(0),
       _eit_helper(NULL), _eit_rate(0.0f),
-      _listener_lock(true),
+      _encryption_lock(true), _listener_lock(true),
       _cache_tables(cacheTables), _cache_lock(true),
       // Single program stuff
       _desired_program(desiredProgram),
@@ -171,6 +174,8 @@ void MPEGStreamData::Reset(int desiredProgram)
             DeleteCachedTable(*it2);
         _cached_pmts.clear();
     }
+
+    ResetDecryptionMonitoringState();
 
     AddListeningPID(MPEG_PAT_PID);
 }
@@ -777,11 +782,18 @@ int MPEGStreamData::ProcessData(unsigned char *buffer, int len)
 bool MPEGStreamData::ProcessTSPacket(const TSPacket& tspacket)
 {
     bool ok = !tspacket.TransportError();
+
+    if (IsEncryptionTestPID(tspacket.PID()))
+    {
+        ProcessEncryptedPacket(tspacket);
+    }
+    else
     if (ok && !tspacket.ScramplingControl() && tspacket.HasPayload() &&
         IsListeningPID(tspacket.PID()))
     {
         HandleTSTables(&tspacket);
     }
+
     return ok;
 }
 
@@ -1238,4 +1250,211 @@ void MPEGStreamData::RemoveMPEGSPListener(MPEGSingleProgramStreamListener *val)
             return;
         }
     }
+}
+
+void MPEGStreamData::AddEncryptionTestPID(uint pnum, uint pid, bool isvideo)
+{
+    QMutexLocker locker(&_encryption_lock);
+
+    //VERBOSE(VB_IMPORTANT, "AddEncryptionTestPID("<<pnum
+    //        <<", 0x"<<hex<<pid<<dec<<")");
+
+    AddListeningPID(pid);
+
+    _encryption_pid_to_info[pid] = CryptInfo((isvideo) ? 10000 : 500, 8);
+    
+    _encryption_pid_to_pnums[pid].push_back(pnum);
+    _encryption_pnum_to_pids[pnum].push_back(pid);
+    _encryption_pnum_to_status[pnum] = kEncUnknown;
+}
+
+void MPEGStreamData::RemoveEncryptionTestPIDs(uint pnum)
+{
+    QMutexLocker locker(&_encryption_lock);
+
+    //VERBOSE(VB_RECORD,
+    //        QString("Tearing down up decryption monitoring "
+    //                "for program %1").arg(pnum));
+
+    QMap<uint, uint_vec_t>::iterator list;
+    uint_vec_t::iterator it;
+
+    uint_vec_t pids = _encryption_pnum_to_pids[pnum];
+    for (uint i = 0; i < pids.size(); i++)
+    {
+        uint pid = pids[i];
+
+        //VERBOSE(VB_IMPORTANT, QString("Removing 0x%1 PID Enc monitoring")
+        //        .arg(pid,0,16));
+
+        RemoveListeningPID(pid);
+
+        list = _encryption_pid_to_pnums.find(pid);
+        if (list != _encryption_pid_to_pnums.end())
+        {
+            it = find((*list).begin(), (*list).end(), pnum);
+
+            if (it != (*list).end())
+                (*list).erase(it);
+
+            if ((*list).empty())
+            {
+                _encryption_pid_to_pnums.erase(pid);
+                _encryption_pid_to_info.erase(pid);
+            }
+        }
+    }
+
+    _encryption_pnum_to_pids.erase(pnum);
+}
+
+bool MPEGStreamData::IsEncryptionTestPID(uint pid) const
+{
+    QMutexLocker locker(&_encryption_lock);
+
+    QMap<uint, CryptInfo>::const_iterator it =
+        _encryption_pid_to_info.find(pid);
+
+    return it != _encryption_pid_to_info.end();
+}
+
+void MPEGStreamData::TestDecryption(const ProgramMapTable *pmt)
+{
+    QMutexLocker locker(&_encryption_lock);
+
+    //VERBOSE(VB_RECORD,
+    //        QString("Setting up decryption monitoring "
+    //                "for program %1").arg(pmt->ProgramNumber()));
+
+    bool encrypted = pmt->IsProgramEncrypted();
+    for (uint i = 0; i < pmt->StreamCount(); i++)
+    {
+        if (!encrypted && !pmt->IsStreamEncrypted(i))
+            continue;
+
+        bool is_vid = pmt->IsVideo(i, _sistandard);
+        bool is_aud = pmt->IsAudio(i, _sistandard);
+        if (is_vid || is_aud)
+        {
+            AddEncryptionTestPID(
+                pmt->ProgramNumber(), pmt->StreamPID(i), is_vid);
+        }
+    }
+}
+
+void MPEGStreamData::ResetDecryptionMonitoringState(void)
+{
+    QMutexLocker locker(&_encryption_lock);
+
+    _encryption_pid_to_info.clear();
+    _encryption_pid_to_pnums.clear();
+    _encryption_pnum_to_pids.clear();
+}
+
+bool MPEGStreamData::IsProgramDecrypted(uint pnum) const
+{
+    QMutexLocker locker(&_encryption_lock);
+    return _encryption_pnum_to_status[pnum] == kEncDecrypted;
+}
+
+bool MPEGStreamData::IsProgramEncrypted(uint pnum) const
+{
+    QMutexLocker locker(&_encryption_lock);
+    return _encryption_pnum_to_status[pnum] == kEncEncrypted;
+}
+
+static QString toString(CryptStatus status)
+{
+    if (kEncDecrypted == status)
+        return "Decrypted";
+    else if (kEncEncrypted == status)
+        return "Encrypted";
+    else
+        return "Unknown";
+}
+
+/** \fn MPEGStreamData::ProcessEncryptedPacket(const TSPacket& tspacket)
+ *  \brief counts en/decrypted packets to decide if a stream is en/decrypted
+ */
+void MPEGStreamData::ProcessEncryptedPacket(const TSPacket& tspacket)
+{
+    QMutexLocker locker(&_encryption_lock);
+
+    const uint pid = tspacket.PID();
+    CryptInfo &info = _encryption_pid_to_info[pid];
+
+    CryptStatus status = kEncUnknown;
+
+    if (tspacket.ScramplingControl())
+    {
+        info.decrypted_packets = 0;
+
+        // If a fair amount of encrypted packets is passed assume that
+        // the stream is not decryptable
+        if (++info.encrypted_packets >= info.encrypted_min)
+            status = kEncEncrypted;
+    }
+    else
+    {
+        info.encrypted_packets = 0;
+        if (++info.decrypted_packets > info.decrypted_min)
+            status = kEncDecrypted;
+    }
+
+    if (status == info.status)
+        return; // pid encryption status unchanged
+
+    info.status = status;
+
+    VERBOSE(VB_IMPORTANT, QString("PID 0x%1 status: %2")
+            .arg(pid,0,16).arg(status));
+
+    uint_vec_t pnum_del_list;
+    const uint_vec_t &pnums = _encryption_pid_to_pnums[pid];
+    for (uint i = 0; i < pnums.size(); i++)
+    {
+        CryptStatus status = _encryption_pnum_to_status[pnums[i]];
+
+        const uint_vec_t &pids = _encryption_pnum_to_pids[pnums[i]];
+        if (!pids.empty())
+        {
+            uint enc_cnt[3] = { 0, 0, 0 };
+            for (uint j = 0; j < pids.size(); j++)
+            {
+                CryptStatus stat = _encryption_pid_to_info[pids[j]].status;
+                enc_cnt[stat]++;
+
+                //VERBOSE(VB_IMPORTANT,
+                //        QString("\tpnum %1 PID 0x%2 status: %3")
+                //        .arg(pnums[i]).arg(pids[j],0,16)
+                //        .arg(toString(stat)));
+            }
+            status = kEncUnknown;
+
+            if (enc_cnt[kEncEncrypted])
+                status = kEncEncrypted;
+            else if (enc_cnt[kEncDecrypted] >= min((size_t) 2, pids.size()))
+                status = kEncDecrypted;
+        }
+
+        if (status == _encryption_pnum_to_status[pnums[i]])
+            continue; // program encryption status unchanged
+
+        VERBOSE(VB_RECORD, QString("Program %1 status: %2")
+                .arg(pnums[i]).arg(toString(status)));
+
+        _encryption_pnum_to_status[pnums[i]] = status;
+
+        bool encrypted = kEncUnknown == status || kEncEncrypted == status;
+        _listener_lock.lock();
+        for (uint j = 0; j < _mpeg_listeners.size(); j++)
+            _mpeg_listeners[j]->HandleEncryptionStatus(pnums[i], encrypted);
+        _listener_lock.unlock();
+
+        if (kEncDecrypted == status)
+            pnum_del_list.push_back(pnums[i]);
+    }
+
+    for (uint i = 0; i < pnum_del_list.size(); i++)
+        RemoveEncryptionTestPIDs(pnums[i]);
 }
