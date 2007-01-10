@@ -1407,7 +1407,7 @@ void MPEGStreamData::ProcessEncryptedPacket(const TSPacket& tspacket)
     info.status = status;
 
     VERBOSE(VB_IMPORTANT, QString("PID 0x%1 status: %2")
-            .arg(pid,0,16).arg(status));
+            .arg(pid,0,16).arg(toString(status)));
 
     uint_vec_t pnum_del_list;
     const uint_vec_t &pnums = _encryption_pid_to_pnums[pid];
