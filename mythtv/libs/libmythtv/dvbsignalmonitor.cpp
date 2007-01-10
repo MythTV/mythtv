@@ -559,7 +559,9 @@ void DVBSignalMonitor::RetuneMonitor(void)
 void DVBSignalMonitor::HandlePMT(uint program_num, const ProgramMapTable *pmt)
 {
     DTVSignalMonitor::HandlePMT(program_num, pmt);
-    GetDVBChannel()->SetPMT(pmt);
+
+    if (pmt->ProgramNumber() == (uint)programNumber)
+        GetDVBChannel()->SetPMT(pmt);
 }
 
 void DVBSignalMonitor::HandleSTT(const SystemTimeTable *stt)
