@@ -7,7 +7,7 @@ target.path = $${PREFIX}/bin
 
 INSTALLS = target
 
-LIBS = -lmysqlclient
+LIBS = -lmysqlclient -L$${LIBDIR}/mysql
 
 # Input
 HEADERS += zmserver.h
