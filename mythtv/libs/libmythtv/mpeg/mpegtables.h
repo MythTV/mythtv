@@ -229,11 +229,72 @@ class TableID
         DIT      = 0x7e, // always on pid 0x1e
         SIT      = 0x7f, // always on pid 0x1f
 
+        // DVB Conditional Access
+        DVBCAbeg = 0x80,
+        DVBCAend = 0x8f,
+
         // Dishnet Longterm EIT data
         DN_EITbego = 0x80, // always on pid 0x300
         DN_EITendo = 0xfe, // always on pid 0x300
 
-        // ATSC
+        // ARIB
+        ARIBbeg  = 0x80,
+        ARIBend  = 0x8f,
+
+        // SCTE
+        PIM      = 0xC0, // Program Information Message (57 2003) PMT PID
+        PNM      = 0xC1, // Program Name Message (57 2003) PMT PID
+        NIM      = 0xC2, // Network Information Message (57 2003)
+                         // on Network PID (per PAT)
+        NITscte  = 0xC2, // Network Information Table (NIT) (65 2002) on 0x1FFC
+        NTM      = 0xC3, // Network Text Message (57 2003) on 0x1FFC
+                         // (terrestrial only, Map Name Table only) or
+                         // Network PID (per PAT)
+        NTT      = 0xC3, // Network Text Table (NTT) (65 2002) on 0x1FFC
+        VCM      = 0xC4, // Virtual Channel Message (57 2003) on 0x1FFC
+                         // (terrestrial only) or Network PID (per PAT)
+        SVCTscte = 0xC4, // Short Virtual Channel Table (65 2002) on 0x1FFC
+        STM      = 0xC5, // System Time Message (57 2003)
+                         // on Network PID (per PAT)
+        STTscte  = 0xC5, // System Time Table (STT) (65 2002) on 0x1FFC
+        SM       = 0xC6, // subtitle_message (27 2003)
+        MGTscte  = 0xC7, // Master Guide Table (57 2003) on 0x1ffc
+        LVCT     = 0xC9, // Long-form Virtual Channel Table (57 2003) on 0x1ffc
+        RRTscte  = 0xCA, // Region Rating Table (57 2003) on 0x1ffc
+
+        CEA      = 0xD8, // Cable Emergency Alert (18 2002)
+        ADET     = 0xD9, // Aggregate Data Event Table (80 2002)
+
+        // ATSC Conditional Access (A/70)
+        ECM0     = 0x80,
+        ECM1     = 0x81,
+        ECMbeg   = 0x82, // ECM begin private data
+        ECMend   = 0x8f, // ECM end private data
+
+        // ATSC main
+        MGT      = 0xC7, // Master Guide Table A/65 on 0x1ffb
+        TVCT     = 0xC8, // Terrestrial Virtual Channel Table A/65 on 0x1ffb
+        CVCT     = 0xC9, // Cable Virtual Channel Table A/65 on 0x1ffb
+        RRT      = 0xCA, // Region Rating Table A/65 on 0x1ffb
+        EIT      = 0xCB, // Event Information Table A/65 (per MGT)
+        ETT      = 0xCC, // Extended Text Table A/65 (per MGT)
+        STT      = 0xCD, // System Time Table A/65
+        DET      = 0xCE, // Data Event Table A/90 (per MGT)
+        DST      = 0xCF, // Data Service Table A/90
+
+        PIT      = 0xD0, // Program ID Table ???
+        NRT      = 0xD1, // Network Resources Table A/90
+        LTST     = 0xD2, // Long Term Service Table A/90
+        DCCT     = 0xD3, // Directed Channel Change Table A/57 on 0x1ffb
+        DCCSCT   = 0xD4, // DCC Selection Code Table A/57 on 0x1ffb
+        SITatsc  = 0xD5, // Selection Information Table (EIA-775.2 2000)
+        AEIT     = 0xD6, // Aggregate Event Information Table A/81
+        AETT     = 0xD7, // Aggregate Extended Text Table A/81
+        SVCT     = 0xDA, // Satellite VCT A/81
+
+        SRM      = 0xE0, // System Renewability Message (ATSC TSG-717r0)
+
+        // Unknown
         STUFFING = 0x80,
         CAPTION  = 0x86,
         CENSOR   = 0x87,
@@ -242,17 +303,6 @@ class TableID
         SRVLOC   = 0xA1,
         TSS      = 0xA2,
         CMPNAME  = 0xA3,
-
-        MGT      = 0xC7, // always on pid 0x1ffb
-        TVCT     = 0xC8,
-        CVCT     = 0xC9,
-        RRT      = 0xCA,
-        EIT      = 0xCB,
-        ETT      = 0xCC,
-        STT      = 0xCD,
-
-        DCCT     = 0xD3,
-        DCCSCT   = 0xD4,
     };
 };
 
@@ -358,6 +408,10 @@ class PSIPTable : public PESPacket
 
     // only for real ATSC PSIP tables, not similar MPEG2 tables
     void SetProtocolVersion(int ver) { pesdata()[8] = ver; }
+
+    bool HasCRC(void) const;
+
+    bool VerifyPSIP(bool verify_crc) const;
 
     const QString toString(void) const;
 
@@ -627,7 +681,7 @@ class ConditionalAccessTable : public PSIPTable
     // for (i = 0; i < N; i++)      8.0      64
     //   { descriptor() }
     uint DescriptorsLength(void) const
-        { return SectionLength() - PSIP_OFFSET - (HasCRC() ? 4 : 0); }
+        { return SectionLength() - PSIP_OFFSET; }
     const unsigned char *Descriptors(void) const { return psipdata(); }
 
     // CRC_32 32 rpchof

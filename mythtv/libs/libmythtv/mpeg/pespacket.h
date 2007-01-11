@@ -182,7 +182,7 @@ class PESPacket
     /// 1 bit  Additional Copy Info field is present
     bool HasACI()             const { return (_pesdata[4] & 0x4) >> 2; }
     /// 1 bit  Cyclic Redundancy Check present
-    bool HasCRC()             const { return (_pesdata[4] & 0x2) >> 1; }
+    virtual bool HasCRC()     const { return (_pesdata[4] & 0x2) >> 1; }
     /// 1 bit  Extension flags are present
     bool HasExtensionFlags()  const { return _pesdata[4] & 0x1; }
 
@@ -249,7 +249,7 @@ class PESPacket
 
     unsigned char *_pesdata;    ///< Pointer to PES data in full buffer
     unsigned char *_fullbuffer; ///< Pointer to allocated data
-  private:
+
     uint _psiOffset;    ///< AFCOffset + StartOfFieldPointer
     uint _ccLast;       ///< Continuity counter of last inserted TS Packet
     uint _pesdataSize;  ///< Number of data bytes (TS header + PES data)

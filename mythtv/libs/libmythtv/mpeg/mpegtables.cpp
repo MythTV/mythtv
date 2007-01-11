@@ -66,6 +66,176 @@ uint StreamID::Normalize(uint stream_id, const desc_list_t &desc,
     return stream_id;
 }
 
+bool PSIPTable::HasCRC(void) const
+{
+    bool has_crc = false;
+
+    switch (TableID())
+    {
+        // MPEG
+        case TableID::PAT:
+        case TableID::CAT:
+        case TableID::PMT:
+            has_crc = true;
+            break;
+//      case TableID::TSDT
+
+        // DVB manditory
+        case TableID::NIT:
+        case TableID::SDT:
+        case TableID::PF_EIT:
+            has_crc = true;
+            break;
+        case TableID::TDT:
+            has_crc = false;
+            break;
+
+        // DVB optional
+        case TableID::NITo:
+        case TableID::SDTo:
+        case TableID::BAT:
+        case TableID::PF_EITo:
+            has_crc = true;
+            break;
+        case TableID::RST:
+        case TableID::ST:
+            has_crc = false;
+            break;
+        case TableID::TOT:
+            has_crc = true;
+            break;
+//      case TableID::RNT:
+//      case TableID::CT:
+//      case TableID::RCT:
+//      case TableID::CIT:
+//      case TableID::MPEFEC:
+        case TableID::DIT:
+            has_crc = false;
+            break;
+        case TableID::SIT:
+            has_crc = true;
+            break;
+
+        // ATSC
+        case TableID::MGT:
+        case TableID::TVCT:
+        case TableID::CVCT:
+        case TableID::RRT:
+        case TableID::EIT:
+        case TableID::ETT:
+        case TableID::STT:
+        case TableID::DET:
+        case TableID::DST:
+
+        //case TableID::PIT:
+        case TableID::NRT:
+        case TableID::LTST:
+        case TableID::DCCT:
+        case TableID::DCCSCT:
+        //case TableID::SITatsc:
+        case TableID::AEIT:
+        case TableID::AETT:
+        case TableID::SVCT:
+            has_crc = true;
+            break;
+
+        default:
+        {
+            // DVB Longterm EIT data
+            if (TableID::SC_EITbeg <= TableID() &&
+                TableID() <= TableID::SC_EITendo)
+            {
+                has_crc = true;
+            }
+
+            // Dishnet Longterm EIT data
+            if (TableID::DN_EITbego <= TableID() &&
+                TableID() <= TableID::DN_EITendo)
+            {
+                has_crc = true;
+            }
+        }
+        break;
+    }
+
+    return has_crc;
+}
+
+bool PSIPTable::VerifyPSIP(bool verify_crc) const
+{
+    if (verify_crc && (CalcCRC() != CRC()))
+    {
+        VERBOSE(VB_SIPARSER,
+                QString("PSIPTable: Failed CRC check 0x%1 != 0x%2 "
+                        "for StreamID = 0x%3")
+                .arg(CRC(),0,16).arg(CalcCRC(),0,16).arg(StreamID(),0,16));
+        return false;
+    }
+
+    unsigned char *bufend = _fullbuffer + _allocSize;
+
+    if ((_pesdata + 2) >= bufend)
+        return false; // can't query length
+
+    if (psipdata() >= bufend)
+        return false; // data outside buffer
+
+    if (TableID::PAT == TableID())
+    {
+        uint pcnt = (SectionLength() - PSIP_OFFSET - 2) >> 2;
+        return (psipdata() + (pcnt << 2) + 3 < bufend);
+    }
+
+    if (TableID::PMT == TableID())
+    {
+        if (psipdata() + 3 >= bufend)
+        {
+            VERBOSE(VB_SIPARSER, "can't query program info length");
+            return false; // can't query program info length
+        }
+
+        if (psipdata() + Length() - 9 > bufend)
+        {
+            VERBOSE(VB_SIPARSER, "reported length to large");
+            return false; // reported length to large
+        }
+
+        uint proginfolen = ((psipdata()[2]<<8) | psipdata()[3]) & 0x0fff;
+        const unsigned char *proginfo = psipdata() + 4;
+        const unsigned char *cpos = proginfo + proginfolen;
+        if (cpos > bufend)
+        {
+            VERBOSE(VB_SIPARSER, "program info extends past end of buffer");
+            return false;
+        }
+
+        vector<unsigned char*> _ptrs;
+        const unsigned char *pos = cpos;
+        uint i = 0;
+        for (; pos < psipdata() + Length() - 9; i++)
+        {
+            const unsigned char *ptr = pos;
+            if (pos + 4 > bufend)
+            {
+                VERBOSE(VB_SIPARSER, QString("stream info %1 extends past "
+                                             "end of buffer").arg(i));
+                return false;
+            }
+            pos += 5 + ((ptr[3] << 8) | ptr[4]) & 0x0fff;
+        }
+        if (pos > bufend)
+        {
+            VERBOSE(VB_SIPARSER, QString("last stream info %1 extends past "
+                                         "end of buffer").arg(i));
+            return false;
+        }
+
+        return true;
+    }
+
+    return true;
+}
+
 ProgramAssociationTable* ProgramAssociationTable::CreateBlank(bool small)
 {
     (void) small; // currently always a small packet..

@@ -22,7 +22,7 @@ void init_sections(sections_t &sect, uint last_section)
     uint endz = last_section >> 3;
     if (endz)
         sect.resize(endz, 0x00);
-    sect.resize(33 - endz, 0xff);
+    sect.resize(32, 0xff);
     sect[endz] = init_bits[last_section & 0x7];
 
 #if 0
@@ -725,6 +725,12 @@ void MPEGStreamData::HandleTSTables(const TSPacket* tspacket)
         DONE_WITH_PES_PACKET();
     }
 
+    if (!psip->VerifyPSIP(!_have_CRC_bug))
+    {
+        VERBOSE(VB_RECORD, "PSIP table is invalid");
+        DONE_WITH_PES_PACKET();
+    }
+
     // Don't decode redundant packets,
     // but if it is a desired PAT or PMT emit a "heartbeat" signal.
     if (IsRedundant(tspacket->PID(), *psip))
@@ -748,6 +754,7 @@ void MPEGStreamData::HandleTSTables(const TSPacket* tspacket)
     }
 
     HandleTables(tspacket->PID(), *psip);
+
     DONE_WITH_PES_PACKET();
 }
 #undef DONE_WITH_PES_PACKET
