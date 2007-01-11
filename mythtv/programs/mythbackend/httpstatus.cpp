@@ -2368,15 +2368,15 @@ int HttpStatus::PrintMachineInfo( QTextStream &os, QDomElement info )
                 }
                 else
                 {
+                    os << "        <li>MythTV Drive #" << tokens[i] << ":"
+                       << "\r\n<br />\r\n";
 
                     if (nDirs.contains(","))
-                        os << "        <li>Directories: ";
+                        os << "          <ul><li>Directories: ";
                     else
-                        os << "        <li>Directory: ";
+                        os << "          <ul><li>Directory: ";
 
-                    os << nDirs << "<br />\r\n"
-                       << "          <ul><li>MythTV Drive #"
-                       << tokens[i] << "\r\n";
+                    os << nDirs << "\r\n";
                 }
 
                 os << "            <li>Total Space: ";
