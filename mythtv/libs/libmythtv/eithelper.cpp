@@ -566,6 +566,18 @@ static void init_fixup(QMap<uint64_t,uint> &fix)
     fix[  1089LL << 32 |     1  << 16] = EITFixUp::kFixRTL;// DVB-S
     fix[   773LL << 32 |  8468U << 16] = EITFixUp::kFixRTL;// DVB-T Berlin
 
+    // Premiere EIT processing
+    fix[   1LL << 32 |  133 << 16] = EITFixUp::kFixPremiere;
+    fix[   2LL << 32 |  133 << 16] = EITFixUp::kFixPremiere;
+    fix[   3LL << 32 |  133 << 16] = EITFixUp::kFixPremiere;
+    fix[   4LL << 32 |  133 << 16] = EITFixUp::kFixPremiere;
+    fix[   5LL << 32 |  133 << 16] = EITFixUp::kFixPremiere;
+    fix[   6LL << 32 |  133 << 16] = EITFixUp::kFixPremiere;
+    fix[  17LL << 32 |  133 << 16] = EITFixUp::kFixPremiere;
+    // Mark Premiere HD and Discovery HD as HDTV
+    fix[   6LL << 32 |  133 << 16 | 129] = EITFixUp::kFixHDTV;
+    fix[   6LL << 32 |  133 << 16 | 130] = EITFixUp::kFixHDTV;
+
     ///////////////////////////////////////////////////////////////////////////
     // Special Early fixups for providers that break DVB EIT spec.
     // transport_id<<32 | netword_id<<16 | service_id

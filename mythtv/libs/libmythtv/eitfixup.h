@@ -30,6 +30,8 @@ class EITFixUp
         kFixMCA        = 0x0080,
         kFixRTL        = 0x0100,
         kFixFI         = 0x0200,
+        kFixPremiere   = 0x0400,
+        kFixHDTV       = 0x0800,
 
         // Early fixups
         kEFixForceISO8859_1  = 0x1000,
@@ -58,6 +60,7 @@ class EITFixUp
     void FixMCA(DBEvent &event) const;        // MultiChoice Africa DVB-S
     void FixRTL(DBEvent &event) const;        // RTL group DVB
     void FixFI(DBEvent &event) const;            // Finland DVB-T
+    void FixPremiere(DBEvent &event) const;   // german pay-tv Premiere
 
     const QRegExp m_bellYear;
     const QRegExp m_bellActors;
@@ -106,6 +109,8 @@ class EITFixUp
     const QRegExp m_RTLEpisodeNo2;
     const QRegExp m_fiRerun;
     const QRegExp m_Stereo;
+    const QRegExp m_dePremiereInfos;
+    const QRegExp m_dePremiereOTitle;
 };
 
 #endif // EITFIXUP_H

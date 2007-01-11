@@ -57,7 +57,10 @@ EITFixUp::EITFixUp()
       m_RTLEpisodeNo1("^(Folge\\s\\d{1,4})\\.*\\s*"),
       m_RTLEpisodeNo2("^(\\d{1,2}\\/[IVX]+)\\.*\\s*"),
       m_fiRerun("Uusinta.?"),
-      m_Stereo("(Stereo)")
+      m_Stereo("(Stereo)"),
+      m_dePremiereInfos("([^.]+)?\\s?([0-9]{4})\\.\\s[0-9]+\\sMin\\.(?:\\sVon"
+                        "\\s([^,]+)(?:,|\\su\\.\\sa\\.)\\smit\\s(.+)\\.)?"),
+      m_dePremiereOTitle("\\s*\\(([^\\)]*)\\)$")
 {
 }
 
@@ -74,6 +77,9 @@ void EITFixUp::Fix(DBEvent &event) const
             event.subtitle = QString::null;
         }
     }
+
+    if (kFixHDTV & event.fixup)
+        event.flags |= DBEvent::kHDTV;
 
     if (kFixBell & event.fixup)
         FixBellExpressVu(event);
@@ -98,6 +104,9 @@ void EITFixUp::Fix(DBEvent &event) const
 
     if (kFixFI & event.fixup)
         FixFI(event);
+
+    if (kFixPremiere & event.fixup)
+        FixPremiere(event);
 
     if (event.fixup)
     {
@@ -852,3 +861,32 @@ void EITFixUp::FixFI(DBEvent &event) const
     }
 }
 
+/** \fn EITFixUp::FixPremiere(DBEvent&) const
+ *  \brief Use this to standardize DVB-C guide in Germany
+ *         for the providers Kabel Deutschland and Premiere.
+ */
+void EITFixUp::FixPremiere(DBEvent &event) const
+{
+    QString country = "";
+
+    // Find infos about country and year, regisseur and actors
+    QRegExp tmpInfos =  m_dePremiereInfos;
+    if (tmpInfos.search(event.description) != -1)
+    {
+        country = tmpInfos.cap(1).stripWhiteSpace();
+        event.airdate = tmpInfos.cap(2);
+        event.AddPerson(DBPerson::kDirector, tmpInfos.cap(3));
+        QStringList actors = QStringList::split(", ", tmpInfos.cap(4));
+        for(QStringList::size_type j=0;j<actors.count();j++)
+            event.AddPerson(DBPerson::kActor, actors[j]);
+        event.description = event.description.replace(tmpInfos.cap(0), "");
+    }
+
+    // move the original titel from the title to subtitle
+    QRegExp tmpOTitle = m_dePremiereOTitle;
+    if (tmpOTitle.search(event.title) != -1)
+    {
+        event.subtitle = QString("%1, %2").arg(tmpOTitle.cap(1)).arg(country);
+        event.title = event.title.replace(tmpOTitle.cap(0), "");
+    }
+}
