@@ -64,6 +64,12 @@ class EITFixUp
 
     const QRegExp m_bellYear;
     const QRegExp m_bellActors;
+    const QRegExp m_bellPPVTitleAllDay;
+    const QRegExp m_bellPPVTitleHD;
+    const QRegExp m_bellPPVSubtitleAllDay;
+    const QRegExp m_bellPPVDescriptionAllDay;
+    const QRegExp m_bellPPVDescriptionAllDay2;
+    const QRegExp m_bellPPVDescriptionEventId;
     const QRegExp m_ukSubtitle;
     const QRegExp m_ukThen;
     const QRegExp m_ukNew;

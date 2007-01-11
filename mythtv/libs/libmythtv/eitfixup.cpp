@@ -9,6 +9,12 @@
 EITFixUp::EITFixUp()
     : m_bellYear("[\\(]{1}[0-9]{4}[\\)]{1}"),
       m_bellActors("\\set\\s|,"),
+      m_bellPPVTitleAllDay("\\s*\\(All Day.*\\)\\s*$"),
+      m_bellPPVTitleHD("^HD\\s?-\\s?"),
+      m_bellPPVSubtitleAllDay("^All Day \\(.*\\sEastern\\)$"),
+      m_bellPPVDescriptionAllDay("^\\(.*\\sEastern\\)"),
+      m_bellPPVDescriptionAllDay2("^\\([0-9].*am-[0-9].*am\\sET\\)"),
+      m_bellPPVDescriptionEventId("\\([0-9]{5}\\)"),
       m_ukSubtitle("\\[.*S\\]"),
       m_ukThen("\\s*(Then|Followed by) 60 Seconds\\.", false),
       m_ukNew("\\s*(Brand New|New) Series\\s*[:\\.\\-]"),
@@ -207,6 +213,50 @@ void EITFixUp::FixBellExpressVu(DBEvent &event) const
         event.flags |= DBEvent::kStereo;
         event.description = event.description.replace("(Stereo)", "");
     }
+
+    // Check for "title (All Day)" in the title
+    position = event.title.find(m_bellPPVTitleAllDay);
+    if (position != -1)
+    {
+        event.title = event.title.replace(m_bellPPVTitleAllDay, "");
+    }
+
+    // Check for "HD - title" in the title
+    position = event.title.find(m_bellPPVTitleHD);
+    if (position != -1)
+    {
+        event.title = event.title.replace(m_bellPPVTitleHD, "");
+        event.flags |= DBEvent::kHDTV;
+    }
+
+    // Check for subtitle "All Day (... Eastern)" in the subtitle
+    position = event.subtitle.find(m_bellPPVSubtitleAllDay);
+    if (position != -1)
+    {
+        event.subtitle = event.subtitle.replace(m_bellPPVSubtitleAllDay, "");
+    }
+
+    // Check for description "(... Eastern)" in the description
+    position = event.description.find(m_bellPPVDescriptionAllDay);
+    if (position != -1)
+    {
+        event.description = event.description.replace(m_bellPPVDescriptionAllDay, "");
+    }
+
+    // Check for description "(... ET)" in the description
+    position = event.description.find(m_bellPPVDescriptionAllDay2);
+    if (position != -1)
+    {
+        event.description = event.description.replace(m_bellPPVDescriptionAllDay2, "");
+    }
+
+    // Check for description "(nnnnn)" in the description
+    position = event.description.find(m_bellPPVDescriptionEventId);
+    if (position != -1)
+    {
+        event.description = event.description.replace(m_bellPPVDescriptionEventId, "");
+    }
+
 }
 
 /** \fn EITFixUp::FixUK(DBEvent&) const
