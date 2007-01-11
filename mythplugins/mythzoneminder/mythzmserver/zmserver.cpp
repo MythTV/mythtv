@@ -893,7 +893,7 @@ void ZMServer::getMonitorList(void)
 {
     m_monitors.clear();
 
-    string sql("SELECT Id, Name, Width, Height, ImageBufferCount, MaxFPS "
+    string sql("SELECT Id, Name, Width, Height, ImageBufferCount, MaxFPS, Palette "
                "FROM Monitors");
 
     MYSQL_RES *res;
@@ -922,7 +922,7 @@ void ZMServer::getMonitorList(void)
             m->width = atoi(row[2]);
             m->height = atoi(row[3]);
             m->image_buffer_count = atoi(row[4]);
-
+            m->palette = atoi(row[6]);
             m_monitors[m->mon_id] = m;
 
             initMonitor(m);
@@ -941,15 +941,30 @@ void ZMServer::initMonitor(MONITOR *monitor)
 {
     long long shm_key = 0x7a6d2000; // FIXME hard coded shm_key
     void *shm_ptr;
-    int shared_data_size = sizeof(SharedData) +
-            sizeof(TriggerData) +
-            ((monitor->image_buffer_count) * (sizeof(struct timeval))) +
-            ((monitor->image_buffer_count) * (monitor->width) * (monitor->height) * 3);
-    int shmid;
 
     monitor->shared_data = NULL;
     monitor->shared_images = NULL;
-    monitor->frame_size = monitor->width * monitor->height * 3;
+
+    switch (monitor->palette)
+    {
+        case 1:
+            monitor->frame_size = monitor->width * monitor->height;
+            break;
+        case 4:
+            monitor->frame_size = monitor->width * monitor->height * 3;
+            break;
+        default:
+            cout << "Unsupported palette: " << monitor->palette 
+                 << " used on monitor: " << monitor->mon_id << endl;
+            monitor->status = "Error";
+            return;
+    }
+
+    int shared_data_size = sizeof(SharedData) +
+            sizeof(TriggerData) +
+            ((monitor->image_buffer_count) * (sizeof(struct timeval))) +
+            ((monitor->image_buffer_count) * monitor->frame_size);
+    int shmid;
 
     if ((shmid = shmget((shm_key & 0xffffff00) | monitor->mon_id,
          shared_data_size, SHM_R)) == -1)
@@ -958,6 +973,7 @@ void ZMServer::initMonitor(MONITOR *monitor)
         monitor->status = "Error";
         return;
     }
+
     shm_ptr = shmat(shmid, 0, SHM_RDONLY);
 
 
@@ -1008,8 +1024,8 @@ int ZMServer::getFrame(unsigned char *buffer, int bufferSize, MONITOR *monitor)
             break;
     }
 
-    unsigned char *data = monitor->shared_images + 
-            (monitor->width) * (monitor->height) * 3 * monitor->last_read;
+    unsigned char *data = monitor->shared_images +
+            monitor->frame_size * monitor->last_read;
 
     // FIXME: should do some sort of compression JPEG??
     // just copy the data to our buffer for now

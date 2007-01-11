@@ -99,6 +99,7 @@ typedef struct
     int last_read;
     string status;
     int frame_size;
+    int palette;
 } MONITOR;
 
 class ZMServer

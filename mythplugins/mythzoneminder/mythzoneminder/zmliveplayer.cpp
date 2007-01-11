@@ -455,9 +455,17 @@ void Player::updateScreen(const unsigned char* buffer)
     if (!m_initalized)
         return;
 
+    if (m_monitor.palette != MP_RGB24 && m_monitor.palette != MP_GREY)
+        return;
+
     glXMakeCurrent(m_dis, m_win, m_cx);
-    glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, m_monitor.width, m_monitor.height,
+
+    if (m_monitor.palette == MP_RGB24)
+        glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, m_monitor.width, m_monitor.height,
                     GL_RGB, GL_UNSIGNED_BYTE, buffer);
+    else
+        glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, m_monitor.width, m_monitor.height,
+                    GL_LUMINANCE, GL_UNSIGNED_BYTE, buffer);
 
     glViewport(0, 0, m_monitor.displayRect.width(), m_monitor.displayRect.height());
 

@@ -37,6 +37,12 @@ typedef struct
     double delta;
 } Frame;
 
+enum MonitorPalette
+{
+    MP_GREY = 1,
+    MP_RGB24 = 4
+};
+
 typedef struct
 {
     // used by console view
