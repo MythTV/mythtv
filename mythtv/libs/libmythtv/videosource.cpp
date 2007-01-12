@@ -518,11 +518,11 @@ XMLTVConfig::XMLTVConfig(const VideoSource &parent) :
     if ( find_grabber_proc.start() ) {
 
         int i=0;
-        // Assume it shouldn't take more than 5 seconds
+        // Assume it shouldn't take more than 25 seconds
         // Broken versions of QT cause QProcess::start
         // and QProcess::isRunning to return true even
         // when the executable doesn't exist
-        while (find_grabber_proc.isRunning() && i < 50)
+        while (find_grabber_proc.isRunning() && i < 250)
         {
             usleep(100000);
             ++i;
