@@ -191,8 +191,8 @@ bool XvMCSurfaceTypes::has(Display *pdisp,
 QString XvImageFormatToString(const XvImageFormatValues &fmt)
 {
     QString id = QString("0x%1").arg(fmt.id,0,16);
-    id = (fmt.id == GUID_IA44) ? "IA44" : id;
-    id = (fmt.id == GUID_AI44) ? "AI44" : id;
+    id = (fmt.id == GUID_IA44_PACKED) ? "IA44" : id;
+    id = (fmt.id == GUID_AI44_PACKED) ? "AI44" : id;
 
     QString type = "UNK";
     type = (XvRGB == fmt.type) ? "RGB" : type;

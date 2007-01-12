@@ -8,15 +8,13 @@
 #include "mythcontext.h"
 #include <X11/extensions/XvMC.h>
 #include "util-x11.h"
+#include "fourcc.h"
 
 #include "../libavcodec/xvmc_render.h"
 
 #ifndef XVMC_VLD
 #define XVMC_VLD 0x0020000
 #endif
-
-#define GUID_IA44 0x34344941
-#define GUID_AI44 0x34344149
 
 // This is for an nVidia only feature
 #define XVMC_COPY_TO_PBUFFER 0x00000010

@@ -37,7 +37,7 @@ XvMCOSD::XvMCOSD(Display *disp, int port, int surface_type_id,
 
     for (int i = (xvfmv) ? 0 : num; i < num; i++)
     {
-        if (GUID_IA44 == xvfmv[i].id || GUID_AI44 == xvfmv[i].id)
+        if (GUID_IA44_PACKED == xvfmv[i].id || GUID_AI44_PACKED == xvfmv[i].id)
         {
             osd_subpict_info  = xvfmv[i];
             bool be = (XVMC_BACKEND_SUBPICTURE & xvmc_surf_flags);

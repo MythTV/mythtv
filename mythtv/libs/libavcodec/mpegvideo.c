@@ -393,7 +393,11 @@ static int alloc_picture(MpegEncContext *s, Picture *pic, int shared){
         }
 
         if(s->linesize && (s->linesize != pic->linesize[0] || s->uvlinesize != pic->linesize[1])){
-            av_log(s->avctx, AV_LOG_ERROR, "get_buffer() failed (stride changed)\n");
+            av_log(s->avctx, AV_LOG_ERROR,
+                   "get_buffer() failed (stride changed)\n"
+                   "             expected %i,%i got %i,%i",
+                   s->linesize, s->uvlinesize,
+                   pic->linesize[0], pic->linesize[1]);
             return -1;
         }
 

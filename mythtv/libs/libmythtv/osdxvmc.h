@@ -28,7 +28,7 @@ class XvMCOSD
     VideoFrame *OSDFrame()
     {
         tmpframe.codec =
-            (GUID_IA44 == osd_subpict_info.id) ? FMT_IA44 : FMT_AI44;
+            (GUID_IA44_PACKED == osd_subpict_info.id) ? FMT_IA44 : FMT_AI44;
         tmpframe.buf   = (unsigned char*) (osd_xv_image->data);
         return &tmpframe;
     }
