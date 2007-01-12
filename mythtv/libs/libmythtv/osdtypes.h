@@ -44,8 +44,8 @@ class OSDSet : public QObject
 {
     Q_OBJECT
   public:
-    OSDSet(const QString &name, bool cache, int screenwidth, int screenheight, 
-           float wmult, float hmult, int frint);
+    OSDSet(const QString &name, bool cache, int screenwidth, int screenheight,
+           float wmult, float hmult, int frint, int xoff=0, int yoff=0);
     OSDSet(const OSDSet &other);
    ~OSDSet();
 

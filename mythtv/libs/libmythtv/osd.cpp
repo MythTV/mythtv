@@ -2237,15 +2237,16 @@ void OSD::ShowEditArrow(long long number, long long totalframes, int type)
     char name[128];
     sprintf(name, "%lld-%d", number, type);
 
-    int xtmp = (int)((editarrowRect.width() * 1.0 / totalframes) * number);
-    int xpos = (int) round((editarrowRect.left() + xtmp) * wmult);
+    int pos  = number * 1000 / totalframes;
+    int xtmp = (int)(round(editarrowRect.width() * wmult) / 1000.0 * pos);
+    int xpos = xtmp + (int)(editarrowRect.left() * wmult);
     int ypos = (int) round(editarrowRect.top() * hmult);
 
     osdlock.lock();
 
     OSDSet *set = new OSDSet(name, false,
                              osdBounds.width(), osdBounds.height(),
-                             wmult, hmult, frameint);
+                             wmult, hmult, frameint, xoffset, yoffset);
     set->SetAllowFade(false);
     OSDSet *container = GetSet("editmode");
     if (container)
@@ -2257,14 +2258,14 @@ void OSD::ShowEditArrow(long long number, long long totalframes, int type)
 
     OSDTypeImage *image;
     if (type == 0)
-    {
         image = new OSDTypeImage(*editarrowleft);
-        xpos -= image->ImageSize().width();
-    }
     else
-    {
         image = new OSDTypeImage(*editarrowright);
-    }
+
+    // Reinit needed since in the cache is onle an unscaled version
+    image->Reinit(wmult, hmult);
+
+    xpos -= image->ImageSize().width()/2;
 
     image->SetPosition(QPoint(xpos, ypos), wmult, hmult);
 

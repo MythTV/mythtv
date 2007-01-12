@@ -207,21 +207,21 @@
 
   <container name="editmode">
     <slider name="editslider" type="edit">
-      <area>40,405,560,65</area>
+      <area>40,405,560,22</area>
       <filename>fill-blue.png</filename>
       <altfilename>red.png</altfilename>
     </slider>
     <slider name="editposition" type="position">
-      <area>40,395,560,65</area>
+      <area>40,396,560,40</area>
       <filename>position-indicator.png</filename>
     </slider>
     <editarrow name="left">
       <filename>cut-end.png</filename>
-      <area>40,380,560,65</area>
+      <area>40,404,560,24</area>
     </editarrow>
     <editarrow name="right">
       <filename>cut-start.png</filename>
-      <area>40,380,560,65</area>
+      <area>40,404,560,24</area>
     </editarrow>
     <textarea name="timedisplay" align="right">
       <area>255,30,330,30</area>

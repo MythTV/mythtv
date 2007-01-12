@@ -19,8 +19,10 @@ using namespace std;
 /// Shared OSD image cache
 OSDImageCache OSDTypeImage::c_cache;
 
-OSDSet::OSDSet(const QString &name, bool cache, int screenwidth, 
-               int screenheight, float wmult, float hmult, int frint)
+
+OSDSet::OSDSet(const QString &name, bool cache, int screenwidth,
+               int screenheight, float wmult, float hmult,
+               int frint, int xoff, int yoff)
       : QObject()
 {
     m_wantsupdates = false;
@@ -43,8 +45,8 @@ OSDSet::OSDSet(const QString &name, bool cache, int screenwidth,
     m_screenheight = screenheight;
     m_wmult = wmult;
     m_hmult = hmult;
-    m_xoffsetbase = 0;
-    m_yoffsetbase = 0;
+    m_xoffsetbase = xoff;
+    m_yoffsetbase = yoff;
 
     m_notimeout = false;
     m_fadetime = -1;
