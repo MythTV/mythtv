@@ -661,14 +661,17 @@ void VideoOutputXv::CreatePauseFrame(VOSType subtype)
             delete [] av_pause_frame.buf;
             av_pause_frame.buf = NULL;
         }
-        av_pause_frame.height       = vbuffers.GetScratchFrame()->height;
-        av_pause_frame.width        = vbuffers.GetScratchFrame()->width;
-        av_pause_frame.bpp          = vbuffers.GetScratchFrame()->bpp;
-        av_pause_frame.size         = vbuffers.GetScratchFrame()->size;
-        av_pause_frame.frameNumber  = vbuffers.GetScratchFrame()->frameNumber;
-        av_pause_frame.buf          = new unsigned char[av_pause_frame.size];
-        av_pause_frame.qscale_table = NULL;
-        av_pause_frame.qstride      = 0;
+
+        init(&av_pause_frame, FMT_YV12,
+             new unsigned char[vbuffers.GetScratchFrame()->size + 128],
+             vbuffers.GetScratchFrame()->width,
+             vbuffers.GetScratchFrame()->height,
+             vbuffers.GetScratchFrame()->bpp,
+             vbuffers.GetScratchFrame()->size);
+
+        av_pause_frame.frameNumber = vbuffers.GetScratchFrame()->frameNumber;
+
+        clear(&av_pause_frame, xv_chroma);
 
         vbuffers.UnlockFrame(&av_pause_frame, "CreatePauseFrame");
     }

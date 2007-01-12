@@ -1301,17 +1301,7 @@ QString VideoBuffers::GetStatus(int n) const
 
 void VideoBuffers::Clear(uint i, int fourcc)
 {
-    if ((GUID_I420_PLANAR == fourcc) ||
-        (GUID_YV12_PLANAR == fourcc))
-    {
-        VideoFrame *vf = at(i);
-        uint ysize  = vf->width * vf->height;
-        uint uvsize = ysize >> 2;
-
-        bzero( vf->buf + vf->offsets[0], ysize);
-        memset(vf->buf + vf->offsets[1], 127, uvsize);
-        memset(vf->buf + vf->offsets[2], 127, uvsize);
-    }
+    clear(at(i), fourcc);
 }
 
 void VideoBuffers::Clear(int fourcc)

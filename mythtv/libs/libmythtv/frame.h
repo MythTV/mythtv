@@ -2,6 +2,7 @@
 #define _FRAME_H 
 
 #include <string.h>
+#include "fourcc.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -58,6 +59,7 @@ static inline void init(
     VideoFrameType _codec, unsigned char *_buf,
     int _width, int _height, int _bpp, int _size,
     const int *p = 0, const int *o = 0) __attribute__ ((unused));
+static void clear(VideoFrame *vf, int fourcc);
 
 static inline void init(
     VideoFrame *vf,
@@ -125,6 +127,23 @@ static inline void init(
         {
             vf->offsets[0] = vf->offsets[1] = vf->offsets[2] = 0;
         }
+    }
+}
+
+static void clear(VideoFrame *vf, int fourcc)
+{
+    if (!vf)
+        return;
+
+    if ((GUID_I420_PLANAR == fourcc) || (GUID_IYUV_PLANAR == fourcc) ||
+        (GUID_YV12_PLANAR == fourcc))
+    {
+        unsigned int ysize  = vf->width * vf->height;
+        unsigned int uvsize = ysize >> 2;
+
+        bzero( vf->buf + vf->offsets[0], ysize);
+        memset(vf->buf + vf->offsets[1], 127, uvsize);
+        memset(vf->buf + vf->offsets[2], 127, uvsize);
     }
 }
 
