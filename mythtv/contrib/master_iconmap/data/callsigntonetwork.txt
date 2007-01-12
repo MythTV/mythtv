@@ -32,6 +32,7 @@ BLOOM       BLOOM
 Bloomberg   BloombergTV
 BRAVO       BRAVO
 BRAVOP      BRAVO
+C-SPAN      CSPAN
 C3-02       TLC
 C3-07       CSPAN
 C3-12       HISTORY
@@ -211,6 +212,7 @@ HISI        HISTORY_INT
 HISTORY     HISTORY
 HISTP       HISTORY
 HSN         HOMESHOPPINGNETWORK
+I           I
 IFC         IFC
 INHD        INHD
 INHD2       INHD
@@ -734,6 +736,8 @@ KYMA        NBC
 KYOU        FOX
 KYTV        NBC
 KYUS        NBC
+KYW         CBS-KYW
+KYW-DT      CBS-KYW
 KZOU        UPN
 KZWB        WB
 LIFE        LIFETIME
@@ -852,7 +856,9 @@ TVLANDP     TVLAND
 TVONE       TVONE
 TVSN        TVSNau
 TWC         WEATHERCHANNEL
+UHD         UNIVERSALHD
 UNIP        UNIVISION
+UNIVERSALHD UNIVERSALHD
 USA         USA
 USAP        USA
 UW2TV       UWTV
@@ -964,7 +970,9 @@ WBXH        UPN
 WBXX        WB
 WBZ         CBS
 WBZL        WB
-WCAU        NBC
+WCAU        NBC-WCAU
+WCAU-DT     NBC-WCAU
+WCAU-WX     NBC-WCAU-WEATHERPLUS
 WCBB        PBS-WCBB
 WCBD        NBC
 WCBIDT      UPN
@@ -1054,6 +1062,7 @@ WFLI        WB
 WFLX        FOX
 WFMJ        NBC
 WFOX        UPN
+WFPA        TELEFUTURA
 WFQX        FOX
 WFSU        PBS-WFSU
 WFTC        UPN
@@ -1098,6 +1107,12 @@ WGSA        UPN
 WGTE        PBS-WGTE
 WGTU        ABC
 WGTV        PBS-WGTV
+WGTW        TBN-WGTW
+WGTW-D1     TBN-WGTW
+WGTW-D2     CHURCHCHANNEL
+WGTW-D3     JCTV
+WGTW-D4     ENLACEUS
+WGTW-D5     SMILEOFACHILD
 WGVU        PBS-WGVU
 WGWB        WB
 WGXA        FOX
@@ -1119,6 +1134,7 @@ WHTM        ABC
 WHTV        UPN
 WHUT        PBS-WHUT
 WHYY        PBS-WHYY
+WHYY-1      PBS-WHYY
 WICD        NBC
 WICS        NBC
 WICU        NBC
@@ -1208,6 +1224,8 @@ WMAQ        NBC
 WMAR        ABC
 WMBB        ABC
 WMC         NBC
+WMCN        SHOPNBC-WMCN
+WMCN-DT     SHOPNBC-WMCN
 WMDN        UPN
 WMDT        ABC
 WMEC        PBS-WMEC
@@ -1242,6 +1260,7 @@ WNGT        UPN
 WNIN        PBS-WNIN
 WNIT        PBS-WNIT
 WNJN        PBS
+WNJS        PBS-WNJS
 WNJT        PBS-WNJT
 WNJU        TELEMUNDO
 WNKY        NBC
@@ -1290,7 +1309,9 @@ WPFO        FOX
 WPGA        ABC
 WPGH        FOX
 WPGX        FOX
-WPHL        WB
+WPHL        MYTV-WPHL
+WPHL-D1     MYTV-WPHL
+WPHL-D2     TUBE
 WPIX        CW-WPIX
 WPLG        ABC
 WPME        UPN
@@ -1298,15 +1319,18 @@ WPMI        NBC
 WPMT        FOX
 WPNE        PBS-WPNE
 WPNY        UPN
+WPPX        I-WPPX
 WPSD        NBC
-WPSG        UPN
+WPSG        CW-WPSG
+WPSG-DT     CW-WPSG
 WPSX        PBS-WPSX
 WPTA        ABC
 WPTD        PBS-WPTD
 WPTV        NBC
 WPTY        ABC
 WPTZ        NBC
-WPVI        ABC
+WPVI        ABC-WPVI
+WPVI-HD     ABC-WPVI
 WPWR        UPN
 WPXD        PAX
 WPXI        NBC
@@ -1420,7 +1444,8 @@ WTVZ        WB
 WTWB        WB
 WTWC        NBC
 WTWO        NBC
-WTXF        FOX
+WTXF        FOX-WTXF
+WTXFDT      FOX-WTXF
 WTXL        ABC
 WTXX        WB
 WUAB        UPN
@@ -1438,6 +1463,8 @@ WUSI        PBS-WUSI
 WUTB        UPN
 WUTR        ABC
 WUTV        FOX
+WUVP        UNIVISION
+WUVP-DT     UNIVISION
 WUXP        UPN
 WVAG        UPN
 WVAH        FOX
@@ -1488,6 +1515,8 @@ WXXA        FOX
 WXXI        PBS-WXXI
 WXXV        FOX
 WXYZ        ABC
+WYBE        IND-WYBE
+WYBE-DT     IND-WYBE
 WYCC        PBS-WYCC
 WYDC        FOX
 WYES        PBS-WYES
