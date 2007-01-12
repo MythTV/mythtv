@@ -47,6 +47,7 @@ const QString kPluginLibSuffix = ".so";
 
 MythContext *gContext = NULL;
 QMutex MythContext::verbose_mutex(true);
+QString MythContext::x11_display = QString::null;
 
 unsigned int print_verbose_messages = VB_IMPORTANT | VB_GENERAL;
 QString verboseString = QString(" important general");
@@ -218,8 +219,6 @@ class MythContextPrivate
 
     MythMainWindow *mainWindow;
 
-    QString m_x11_display;
-
     float m_wmult, m_hmult;
 
     // The part of the screen(s) allocated for the GUI. Unless
@@ -278,7 +277,6 @@ MythContextPrivate::MythContextPrivate(MythContext *lparent)
       attemptingToConnect(false),
       language(""),
       mainWindow(NULL),
-      m_x11_display(QString::null),
       m_wmult(1.0), m_hmult(1.0),
       m_screenxbase(0), m_screenybase(0), m_screenwidth(0), m_screenheight(0),
       m_geometry_x(0), m_geometry_y(0), m_geometry_w(0), m_geometry_h(0),
@@ -2935,14 +2933,16 @@ bool MythContext::GetScreenIsAsleep(void)
     return d->screensaver->Asleep();
 }
 
+/// This needs to be set before MythContext is initialized so
+/// that the MythContext::Init() can detect Xinerama setups.
 void MythContext::SetX11Display(const QString &display)
 {
-    d->m_x11_display = QDeepCopy<QString>(display);
+    x11_display = QDeepCopy<QString>(display);
 }
 
-QString MythContext::GetX11Display(void) const
+QString MythContext::GetX11Display(void)
 {
-    return QDeepCopy<QString>(d->m_x11_display);
+    return QDeepCopy<QString>(x11_display);
 }
 
 void MythContext::dispatch(MythEvent &event)

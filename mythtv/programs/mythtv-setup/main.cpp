@@ -86,14 +86,20 @@ void SetupMenu(void)
 
 int main(int argc, char *argv[])
 {
-    QString geometry = "";
+    QString geometry = QString::null;
+    QString display  = QString::null;
     QString verboseString = QString(" important general");
 
 #ifdef Q_WS_X11
-    // Remember any -geometry argument which QApplication init will remove
+    // Remember any -display or -geometry argument
+    // which QApplication init will remove.
     for(int argpos = 1; argpos + 1 < argc; ++argpos)
+    {
         if (!strcmp(argv[argpos],"-geometry"))
             geometry = argv[argpos+1];
+        else if (!strcmp(argv[argpos],"-display"))
+            display = argv[argpos+1];
+    }
 #endif
 
 #ifdef Q_WS_MACX
@@ -107,23 +113,45 @@ int main(int argc, char *argv[])
 
     for(int argpos = 1; argpos < a.argc(); ++argpos)
     {
-        if (!strcmp(a.argv()[argpos],"-geometry") ||
-            !strcmp(a.argv()[argpos],"--geometry"))      
+        if (!strcmp(a.argv()[argpos],"-display") ||
+            !strcmp(a.argv()[argpos],"--display"))
+        {
+            if (a.argc()-1 > argpos)
+            {
+                display = a.argv()[argpos+1];
+                if (display.startsWith("-"))
+                {
+                    cerr << "Invalid or missing argument to -display option\n";
+                    return BACKEND_EXIT_INVALID_CMDLINE;
+                }
+                else
+                    ++argpos;
+            }
+            else
+            {
+                cerr << "Missing argument to -display option\n";
+                return BACKEND_EXIT_INVALID_CMDLINE;
+            }
+        }
+        else if (!strcmp(a.argv()[argpos],"-geometry") ||
+                 !strcmp(a.argv()[argpos],"--geometry"))      
         {
             if (a.argc()-1 > argpos)
             {
                 geometry = a.argv()[argpos+1];
                 if (geometry.startsWith("-"))
                 {
-                    cerr << "Invalid or missing argument to --geometry option\n";                    return -1;
+                    cerr << "Invalid or missing argument to "
+                        "-geometry option\n";
+                    return BACKEND_EXIT_INVALID_CMDLINE;
                 }                      
                 else
                     ++argpos;
             }            
             else
             {            
-                cerr << "Missing argument to --geometry option\n"; 
-                return -1;
+                cerr << "Missing argument to -geometry option\n"; 
+                return BACKEND_EXIT_INVALID_CMDLINE;
             }            
         }
         else if (!strcmp(a.argv()[argpos],"-v") ||
@@ -184,12 +212,19 @@ int main(int argc, char *argv[])
 #ifdef Q_WS_X11 
                  <<"-display X-server              Create GUI on X-server, not localhost"<<endl
 #endif          
-                 <<"--geometry WxH                 Override window size settings"<<endl
+                 <<"-geometry or --geometry WxH    Override window size settings"<<endl
                  <<"-geometry WxH+X+Y              Override window size and position"<<endl
+                 <<"-O or "<<endl
+                 <<"  --override-setting KEY=VALUE Force the setting named 'KEY' to value 'VALUE'"<<endl
                  <<"-v or --verbose debug-level    Use '-v help' for level info"<<endl 
                  <<endl;
             return -1;
         }
+    }
+
+    if (!display.isEmpty())
+    {
+        MythContext::SetX11Display(display);
     }
 
     gContext = NULL;

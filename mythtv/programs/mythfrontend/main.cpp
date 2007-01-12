@@ -778,6 +778,35 @@ int main(int argc, char **argv)
     if (binname.lower() != "mythfrontend")
         pluginname = binname;
 
+    for (int argpos = 1; argpos < a.argc(); ++argpos)
+    {
+        if (!strcmp(a.argv()[argpos],"-display") ||
+            !strcmp(a.argv()[argpos],"--display"))
+        {
+            if (a.argc()-1 > argpos)
+            {
+                display = a.argv()[argpos+1];
+                if (display.startsWith("-"))
+                {
+                    cerr << "Invalid or missing argument to -display option\n";
+                    return FRONTEND_EXIT_INVALID_CMDLINE;
+                }
+                else
+                    ++argpos;
+            }
+            else
+            {
+                cerr << "Missing argument to -display option\n";
+                return FRONTEND_EXIT_INVALID_CMDLINE;
+            }
+        }
+    }
+
+    if (!display.isEmpty())
+    {
+        MythContext::SetX11Display(display);
+    }
+
     gContext = new MythContext(MYTH_BINARY_VERSION);
     if (!gContext->Init())
     {   
@@ -911,26 +940,6 @@ int main(int argc, char **argv)
 
             ++argpos;
         }
-        else if (!strcmp(a.argv()[argpos],"-display") ||
-                 !strcmp(a.argv()[argpos],"--display"))
-        {
-            if (a.argc()-1 > argpos)
-            {
-                display = a.argv()[argpos+1];
-                if (display.startsWith("-"))
-                {
-                    cerr << "Invalid or missing argument to -display option\n";
-                    return FRONTEND_EXIT_INVALID_CMDLINE;
-                }
-                else
-                    ++argpos;
-            }
-            else
-            {
-                cerr << "Missing argument to -display option\n";
-                return FRONTEND_EXIT_INVALID_CMDLINE;
-            }
-        }
         else if (!strcmp(a.argv()[argpos],"-geometry") ||
                  !strcmp(a.argv()[argpos],"--geometry"))
         {
@@ -967,7 +976,7 @@ int main(int argc, char **argv)
                     "-display X-server              Create GUI on X-server, not localhost\n" <<
 #endif
                     "-geometry or --geometry WxH    Override window size settings\n" <<
-                    "--geometry WxH+X+Y             Override window size and position\n" <<
+                    "-geometry WxH+X+Y              Override window size and position\n" <<
                     "-l or --logfile filename       Writes STDERR and STDOUT messages to filename" << endl <<
                     "-r or --reset                  Resets frontend appearance settings and language" << endl <<
                     "-w or --windowed               Run in windowed mode" << endl <<
@@ -1035,11 +1044,6 @@ int main(int argc, char **argv)
        query.exec();
 
        return FRONTEND_EXIT_OK;
-    }
-
-    if (!display.isEmpty())
-    {
-        gContext->SetX11Display(display);
     }
 
     if (!geometry.isEmpty() && !gContext->ParseGeometryOverride(geometry))

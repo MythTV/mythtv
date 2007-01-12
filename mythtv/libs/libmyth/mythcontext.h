@@ -201,7 +201,7 @@ class MPUBLIC MythPrivRequest
 
 /// Update this whenever the plug-in API changes.
 /// Including changes in the libmythtv class methods used by plug-ins.
-#define MYTH_BINARY_VERSION "0.20.20061228-1"
+#define MYTH_BINARY_VERSION "0.20.20070111-1"
 
 /** \brief Increment this whenever the MythTV network protocol changes.
  *
@@ -392,13 +392,14 @@ class MPUBLIC MythContext : public QObject, public MythObservable,
     QString removeCurrentLocation(void);
     QString getCurrentLocation(void);
 
-    void SetX11Display(const QString &display);
-    QString GetX11Display(void) const;
-
     void dispatch(MythEvent &event);
     void dispatchNow(MythEvent &event);
 
+    static void SetX11Display(const QString &display);
+    static QString GetX11Display(void);
+
     static QMutex verbose_mutex;
+    static QString x11_display;
 
   private:
     void SetPalette(QWidget *widget);

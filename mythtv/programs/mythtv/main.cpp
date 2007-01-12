@@ -166,6 +166,26 @@ int main(int argc, char *argv[])
                 return FRONTEND_EXIT_INVALID_CMDLINE;
             }
         }
+        else if (!strcmp(a.argv()[argpos],"-geometry") ||
+                 !strcmp(a.argv()[argpos],"--geometry"))
+        {
+            if (a.argc()-1 > argpos)
+            {
+                geometry = a.argv()[argpos+1];
+                if (geometry.startsWith("-"))
+                {
+                    cerr << "Invalid or missing argument to -geometry option\n";
+                    return FRONTEND_EXIT_INVALID_CMDLINE;
+                }
+                else
+                    ++argpos;
+            }
+            else
+            {
+                cerr << "Missing argument to -geometry option\n";
+                return FRONTEND_EXIT_INVALID_CMDLINE;
+            }
+        }
         else if (a.argv()[argpos][0] != '-')
         {
             filename = a.argv()[argpos];
@@ -174,17 +194,17 @@ int main(int argc, char *argv[])
         ++argpos;
     }
 
+    if (!display.isEmpty())
+    {
+        gContext->SetX11Display(display);
+    }
+
     gContext = NULL;
     gContext = new MythContext(MYTH_BINARY_VERSION);
     if (!gContext->Init())
     {
         VERBOSE(VB_IMPORTANT, "Failed to init MythContext, exiting.");
         return TV_EXIT_NO_MYTHCONTEXT;
-    }
-
-    if (!display.isEmpty())
-    {
-        gContext->SetX11Display(display);
     }
 
     if (!geometry.isEmpty() && !gContext->ParseGeometryOverride(geometry))

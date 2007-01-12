@@ -54,7 +54,7 @@ int GetNumberOfXineramaScreens(void)
 #ifdef Q_WS_X11
 Display *MythXOpenDisplay(void)
 {
-    QString dispStr = gContext->GetX11Display();
+    QString dispStr = MythContext::GetX11Display();
     const char *dispCStr = NULL;
     if (!dispStr.isEmpty())
         dispCStr = dispStr.ascii();
