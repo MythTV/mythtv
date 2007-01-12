@@ -32,9 +32,11 @@ CBC-CBLFT               [zap2it2]/cbc.gif
 CBC-CBNEW               [ls-logo]/cc/cbc_newsworld.jpg
 CBS                     [zap2it]/cbs.jpg
 CBS-KCTV                [ls-logo]/kk/kctv_tv5_kansas_city.jpg
+CBS-KYW                 [ls-logo]/kk/kyw_cbs3_philadelphia.jpg
 CBS-WIBW                [ls-logo]/ww/wibw_cbs13_topeka.jpg
 CBS-WKMG                [ls-logo]/ww/wkmg_orlando.jpg
 ChannelVAustralia       [ls-logo]/cc/channel_v_au.jpg
+CHURCHCHANNEL           [ls-logo]/cc/church_channel.jpg
 CINEMAX                 [zap2it]/max.jpg
 CITY-TORONTO            [ls-logo]/cc/city_city_tv_toronto.jpg
 CMTPURECOUNTRY          [ls-logo]/cc/cmt_pure_country.jpg
@@ -76,6 +78,7 @@ Encore_Love             [ls-logo]/ee/encore_love.jpg
 Encore_Mystery          [ls-logo]/ee/encore_mystery.jpg
 Encore_WAM              [ls-logo]/ee/encore_wam.jpg
 Encore_Westerns         [ls-logo]/ee/encore_westerns.jpg
+ENLACEUS                [ls-logo]/tt/tbn_enlace_us.jpg
 ESPN                    [zap2it]/espn.jpg
 ESPN2                   [zap2it]/espn2.jpg
 ESPNCL                  [zap2it]/espncl.jpg
@@ -93,6 +96,7 @@ FOX                     [zap2it]/fox.jpg
 FOX-KTMJ                [ls-logo]/kk/ktmj_fox43_topeka.jpg
 FOX-WDAF                [ls-logo]/ww/wdaf_kansascity.jpg
 FOX-WOFL                [ls-logo]/ww/wofl_fox35_orlando.jpg
+FOX-WTXF                [ls-logo]/ww/wtxf_fox29_philadelphia.jpg
 Fox8                    [ls-logo]/ff/fox8_aus.jpg
 FoxClassicsau           [ls-logo]/ff/foxclassics_au.jpg
 FOXMOVIE                [ls-icon]/ff/fox_moviechannel.gif
@@ -163,6 +167,7 @@ MUCH-MORE               [ls-logo]/mm/muchmoremusic.jpg
 MUCH-RETRO              [ls-logo]/mm/much_more_retro.jpg
 MUCH-VIBE               [ls-logo]/mm/much_vibe.jpg
 MUSIQUEPLUS             [ls-logo]/mm/musiqueplus.jpg
+MYTV-WPHL               [ls-logo]/ww/wphl_my17_philadelphia.jpg
 MYTV-WRBW               [ls-logo]/ww/wrbw_my65_orlando.jpg
 MYTV-WWOR               [ls-logo]/ww/wwor_my9_secaucus.jpg
 NASA                    [ls-icon]/nn/nasatv_us.gif
@@ -171,6 +176,8 @@ NBC                     [zap2it]/nbc.jpg
 NBC-KMCI                [ls-logo]/kk/kmci38_kansascity.jpg
 NBC-KSHB                [ls-logo]/kk/kshb41_kansas.jpg
 NBC-KSNT                [ls-logo]/kk/ksnt_nbc27_topeka.jpg
+NBC-WCAU                [ls-logo]/ww/wcau_nbc10_philadelphia.jpg 
+NBC-WCAU-WEATHERPLUS    [ls-logo]/ww/wcau_weather_plus.jpg
 NBC-WESH                [ls-logo]/ww/wesh_nbc2_daytona_beach.jpg
 NEWSENG                 [zap2it]/necn.gif
 NFL                     [ls-icon]/nn/nfl.gif
