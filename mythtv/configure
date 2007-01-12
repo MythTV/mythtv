@@ -2381,12 +2381,21 @@ fi
 
 if test x"$dts" = x"yes"; then
     dts="no"
+    dtslib=""
     if has_library libdts_pic ; then
-        dts="yes"
         dtslib="-ldts_pic"
     elif has_library libdts ; then
-        dts="yes"
         dtslib="-ldts"
+    else
+        echo "Warning: DTS library not found."
+    fi
+
+    if test x"$dtslib" != x"" ; then
+        if has_header dts.h ; then
+            dts="yes"
+        else
+            echo "Warning: DTS header not found."
+        fi
     fi
 fi
 
