@@ -231,7 +231,7 @@ void InputSelector::load(void)
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare(
         "SELECT capturecard.cardid, cardinput.childcardid, "
-        "       cardtype, videodevice, inputname "
+        "       cardtype, videodevice, inputname, capturecard.parentid "
         "FROM capturecard, cardinput, videosource "
         "WHERE cardinput.sourceid = videosource.sourceid AND "
         "      hostname           = :HOSTNAME            AND "
@@ -256,6 +256,9 @@ void InputSelector::load(void)
     {
         uint parent_cardid = query.value(0).toUInt();
         uint child_cardid  = query.value(1).toUInt();
+        if (child_cardid)
+            parent_cardid = query.value(5).toUInt();
+
         QString inputname  = query.value(4).toString();
 
         QString desc = CardUtil::GetDeviceLabel(
