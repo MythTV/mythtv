@@ -1808,8 +1808,13 @@ void MythContext::SaveSettingOnHost(const QString &key, const QString &newValue,
     MSqlQuery query(MSqlQuery::InitCon());
     if (query.isConnected())
     {
-        query.prepare("DELETE FROM settings WHERE value = :KEY "
-                      "AND hostname = :HOSTNAME ;");
+        if (host)
+            query.prepare("DELETE FROM settings WHERE value = :KEY "
+                          "AND hostname = :HOSTNAME ;");
+        else
+                        query.prepare("DELETE FROM settings WHERE value = :KEY "
+                          "AND hostname is NULL;");
+
         query.bindValue(":KEY", key);
         query.bindValue(":HOSTNAME", host);
 
