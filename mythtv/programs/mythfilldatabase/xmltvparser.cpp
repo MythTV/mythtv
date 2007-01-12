@@ -56,33 +56,9 @@ ChanInfo *XMLTVParser::parseChannel(QDomElement &element, QUrl baseUrl)
     QString xmltvid = element.attribute("id", "");
     QStringList split = QStringList::split(" ", xmltvid);
 
-    bool xmltvisjunk = false;
-
-    if (isNorthAmerica)
-    {
-        if (xmltvid.contains("zap2it"))
-        {
-            xmltvisjunk = true;
-            chaninfo->chanstr = "";
-            chaninfo->xmltvid = xmltvid;
-            chaninfo->callsign = "";
-        }
-        else
-        {
-            chaninfo->xmltvid = split[0];
-            chaninfo->chanstr = split[0];
-            if (split.size() > 1)
-                chaninfo->callsign = split[1];
-            else
-                chaninfo->callsign = "";
-        }
-    }
-    else
-    {
-        chaninfo->callsign = "";
-        chaninfo->chanstr = "";
-        chaninfo->xmltvid = xmltvid;
-    }
+    chaninfo->callsign = "";
+    chaninfo->chanstr = "";
+    chaninfo->xmltvid = xmltvid;
 
     chaninfo->iconpath = "";
     chaninfo->name = "";
@@ -105,26 +81,6 @@ ChanInfo *XMLTVParser::parseChannel(QDomElement &element, QUrl baseUrl)
                 if (chaninfo->name.length() == 0)
                 {
                     chaninfo->name = info.text();
-                    if (xmltvisjunk)
-                    {
-                        QStringList split = QStringList::split(" ", 
-                                                               chaninfo->name);
-          
-                        if (split[0] == "Channel")
-                        { 
-                            chaninfo->old_xmltvid = split[1];
-                            chaninfo->chanstr = split[1];
-                            if (split.size() > 2)
-                                chaninfo->callsign = split[2];
-                        }
-                        else
-                        {
-                            chaninfo->old_xmltvid = split[0];
-                            chaninfo->chanstr = split[0];
-                            if (split.size() > 1)
-                                chaninfo->callsign = split[1];
-                        }
-                    }
                 }
                 else if (isJapan && chaninfo->callsign.length() == 0)
                 {
@@ -377,7 +333,7 @@ ProgInfo *XMLTVParser::parseProgram(
             else if (info.tagName() == "category")
             {
                 QString cat = getFirstText(info);
-                
+
                 if (cat == "movie" || cat == "series" || 
                     cat == "sports" || cat == "tvshow")
                 {
@@ -389,11 +345,11 @@ ProgInfo *XMLTVParser::parseProgram(
                     pginfo->category = cat;
                 }
 
-                if ((cat == "Film" || cat == "film") && !isNorthAmerica)
-                {
-                    // Hack for tv_grab_uk_rt
-                    pginfo->catType = "movie";
-                }
+//                 if ((cat == "Film" || cat == "film") && !isNorthAmerica)
+//                 {
+//                     // Hack for tv_grab_uk_rt
+//                     pginfo->catType = "movie";
+//                 }
             }
             else if (info.tagName() == "date" && pginfo->airdate == "")
             {
@@ -517,14 +473,6 @@ ProgInfo *XMLTVParser::parseProgram(
 
     if (pginfo->category.isEmpty() && !pginfo->catType.isEmpty())
         pginfo->category = pginfo->catType;
-
-    /* Do what MythWeb does and assume that programmes with
-       star-rating in America are movies. This allows us to
-       unify app code with grabbers which explicitly deliver that
-       info. */
-    if (isNorthAmerica && pginfo->catType == "" &&
-        pginfo->stars != "" && pginfo->airdate != "")
-        pginfo->catType = "movie";
     
     /* Hack for teveblad grabber to do something with the content tag*/
     if (pginfo->content != "")

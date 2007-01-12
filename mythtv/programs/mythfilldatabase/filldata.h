@@ -22,6 +22,10 @@ struct Source
     QString userid;
     QString password;
     QString lineupid;
+    bool    xmltvgrabber_baseline;
+    bool    xmltvgrabber_manualconfig;
+    bool    xmltvgrabber_cache;
+    QString xmltvgrabber_prefmethod;
 };
 
 class FillData
@@ -31,7 +35,7 @@ class FillData
         logged_in(""),
         lastdduserid(QString::null),    graboptions(""),
         raw_lineup(0),                  maxDays(0),
-        interrupted(false),
+        interrupted(false),             endofdata(false),
         refresh_today(false),           refresh_tomorrow(true),
         refresh_second(false),          refresh_all(false),
         refresh_tba(true),              dd_grab_all(false),
@@ -73,6 +77,7 @@ class FillData
     int     maxDays;
 
     bool    interrupted;
+    bool    endofdata;
     bool    refresh_today;
     bool    refresh_tomorrow;
     bool    refresh_second;

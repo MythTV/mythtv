@@ -16,6 +16,7 @@ using namespace std;
 #include <qdatetime.h>
 #include <qdir.h>
 #include <qfile.h>
+#include <qprocess.h>
 
 // libmyth headers
 #include "exitcodes.h"
@@ -215,7 +216,14 @@ bool FillData::grabDataFromFile(int id, QString &filename)
 
     chan_data.handleChannels(id, &chanlist);
     icon_data.UpdateSourceIcons(id);
-    prog_data.handlePrograms(id, &proglist);
+    if (proglist.count() == 0) {
+        VERBOSE(VB_GENERAL,
+                QString("No programs found in data."));
+        endofdata = true;
+    }
+    else {
+        prog_data.handlePrograms(id, &proglist);
+    }
     return true;
 }
 
@@ -241,12 +249,7 @@ bool FillData::grabData(Source source, int offset, QDate *qCurrentDate)
 
     if (xmltv_grabber == "datadirect")
         return grabDDData(source, offset, *qCurrentDate, DD_ZAP2IT);
-    else if (xmltv_grabber == "technovera")
-    {
-        VERBOSE(VB_ALL, "This grabber is no longer supported");
-        exit(FILLDB_EXIT_INVALID_CMDLINE);
-    }
-        
+
     char tempfilename[] = "/tmp/mythXXXXXX";
     if (mkstemp(tempfilename) == -1)
     {
@@ -261,124 +264,27 @@ bool FillData::grabData(Source source, int offset, QDate *qCurrentDate)
     QString home = QDir::homeDirPath();
     QString configfile = QString("%1/%2.xmltv").arg(MythContext::GetConfDir())
                                                        .arg(source.name);
-    QString command;
 
-    if (xmltv_grabber == "tv_grab_uk")
-        command.sprintf("nice %s --days 7 --config-file '%s' --output %s",
-                        xmltv_grabber.ascii(), configfile.ascii(), 
-                        filename.ascii());
-    else if (xmltv_grabber == "tv_grab_uk_rt")
-        command.sprintf("nice %s --days 14 --config-file '%s' --output %s",
-                        xmltv_grabber.ascii(),
-                        configfile.ascii(), filename.ascii());
-    else if (xmltv_grabber == "tv_grab_au")
-        command.sprintf("nice %s --days 7 --config-file '%s' --output %s",
-                        xmltv_grabber.ascii(), configfile.ascii(),
-                        filename.ascii());
-    else if (xmltv_grabber == "tv_grab_de_tvtoday")
-        command.sprintf("nice %s --slow --days 1 --config-file '%s' --offset %d --output %s",
-                        xmltv_grabber.ascii(), configfile.ascii(),
-                        offset, filename.ascii());
-    else if (xmltv_grabber == "tv_grab_fr")
-        command.sprintf("nice %s --days 7 --config-file '%s' --output %s",
-                        xmltv_grabber.ascii(), configfile.ascii(),
-                        filename.ascii());
-    else if (xmltv_grabber == "tv_grab_nl")
-        command.sprintf("nice %s --output %s",
-                        xmltv_grabber.ascii(),
-                        filename.ascii());
-    else if (xmltv_grabber == "tv_grab_fi")
-        // Use the default of 10 days for Finland's grabber
-        command.sprintf("nice %s --config-file '%s' --output %s",
-                        xmltv_grabber.ascii(), configfile.ascii(),
-                        filename.ascii());
-    else if (xmltv_grabber == "tv_grab_es" ||
-             xmltv_grabber == "tv_grab_es_laguiatv")
-        // Use fixed interval of 3 days for Spanish grabber
-        command.sprintf("nice %s --days=4  --config-file '%s' --output %s",
-                        xmltv_grabber.ascii(), 
-                        configfile.ascii(), filename.ascii());
-    else if (xmltv_grabber == "tv_grab_jp")
+    QString command  = QString("nice %1 --config-file '%2' --output %3")
+                            .arg(xmltv_grabber.ascii())
+                            .arg(configfile.ascii())
+                            .arg(filename.ascii());
+
+    // The one concession to grabber specific behaviour.
+    // Will be removed when the grabber allows.
+    if (xmltv_grabber == "tv_grab_jp")
     {
-         // Use fixed interval of 7 days for Japanese grabber
-         command.sprintf("nice %s --days 7 --enable-readstr --config-file '%s' --output %s",
-                         xmltv_grabber.ascii(), configfile.ascii(),
-                         filename.ascii());
-         xmltv_parser.isJapan = true;
+        command += QString(" --enable-readstr");
+        xmltv_parser.isJapan = true;
     }
-    else if (xmltv_grabber == "tv_grab_no")
-        command.sprintf("nice %s --days 1 --offset %d --config-file '%s' --output %s",
-                        xmltv_grabber.ascii(), offset, configfile.ascii(),
-                        filename.ascii());
-    else if (xmltv_grabber == "tv_grab_se_swedb")
-         command.sprintf("nice %s --days 1 --offset %d --config-file '%s' --output %s",
-                         xmltv_grabber.ascii(), offset, configfile.ascii(),
-                         filename.ascii());
-    else if (xmltv_grabber == "tv_grab_dk")
-        // Use fixed interval of 7 days for Danish grabber
-        command.sprintf("nice %s --days 7 --config-file '%s' --output %s",
-                        xmltv_grabber.ascii(), configfile.ascii(),
-                        filename.ascii());
-    else if (xmltv_grabber == "tv_grab_pt")
-        // Use fixed interval of 3 days for Portuguese grabber
-        command.sprintf("nice %s --days=4  --config-file '%s' --output %s",
-                        xmltv_grabber.ascii(), 
-                        configfile.ascii(), filename.ascii());
-    else if (xmltv_grabber == "tv_grab_be_tvb")
-        command.sprintf("nice %s --days 1 --offset %d --config-file '%s' --output %s",
-                        xmltv_grabber.ascii(), offset, configfile.ascii(),
-                        filename.ascii());
-    else if (xmltv_grabber == "tv_grab_be_tlm")
-        command.sprintf("nice %s --days 1 --offset %d --config-file '%s' --output %s",
-                        xmltv_grabber.ascii(), offset, configfile.ascii(),
-                        filename.ascii());
-    else if (xmltv_grabber == "tv_grab_ee")
-        // Estonian grabber returns all known data by default
-        command.sprintf("nice %s --output %s",
-                        xmltv_grabber.ascii(),
-                        filename.ascii());
-    else if (xmltv_grabber == "tv_grab_il")
-        // Israeli grabber returns all known data by default
-        command.sprintf("nice %s --config-file '%s' --output %s",
-                        xmltv_grabber.ascii(), configfile.ascii(),
-                        filename.ascii());
-    else if (xmltv_grabber == "tv_grab_ru")
-        // Russian grabber returns all known data by default
-        command.sprintf("nice %s --config-file '%s' --output %s",
-                        xmltv_grabber.ascii(), configfile.ascii(),
-                        filename.ascii());
-    else
+    else if (source.xmltvgrabber_prefmethod != "allatonce")
     {
-        xmltv_parser.isNorthAmerica = true;
-        command.sprintf("nice %s --days 1 --offset %d --config-file '%s' "
-                        "--output %s", xmltv_grabber.ascii(),
-                        offset, configfile.ascii(), filename.ascii());
+        // XMLTV Docs don't recommend grabbing one day at a
+        // time but the current myth code is heavily geared
+        // that way so until it is re-written behave as
+        // we always have done.
+        command += QString(" --days 1 --offset %1").arg(offset);
     }
-
-    if (((print_verbose_messages & VB_GENERAL) == 0) &&
-        (xmltv_grabber == "tv_grab_na" ||
-         xmltv_grabber == "tv_grab_de_tvtoday" ||
-         xmltv_grabber == "tv_grab_fi" ||
-         xmltv_grabber == "tv_grab_es" ||
-         xmltv_grabber == "tv_grab_es_laguiatv" ||
-         xmltv_grabber == "tv_grab_se_swedb" ||
-         xmltv_grabber == "tv_grab_no" ||
-         xmltv_grabber == "tv_grab_dk" ||
-         xmltv_grabber == "tv_grab_uk" ||
-         xmltv_grabber == "tv_grab_uk_rt" ||
-         xmltv_grabber == "tv_grab_nl" ||
-         xmltv_grabber == "tv_grab_fr" ||
-         xmltv_grabber == "tv_grab_fi" ||
-         xmltv_grabber == "tv_grab_jp" ||
-         xmltv_grabber == "tv_grab_pt" ||
-         xmltv_grabber == "tv_grab_be_tvb" ||
-         xmltv_grabber == "tv_grab_be_tlm" ||
-         xmltv_grabber == "tv_grab_ee" ||
-         xmltv_grabber == "tv_grab_ru"))
-         command += " --quiet";
-
-
-    command += graboptions;
 
     VERBOSE(VB_GENERAL,
             "----------------- Start of XMLTV output -----------------");
@@ -491,14 +397,16 @@ bool FillData::fillData(QValueList<Source> &sourcelist)
                                   .arg((*it).xmltvgrabber));
 
         query.prepare(
-            "SELECT COUNT(chanid) FROM channel WHERE sourceid = :SRCID");
+            "SELECT COUNT(chanid) FROM channel WHERE sourceid = "
+             ":SRCID AND xmltvid != ''");
         query.bindValue(":SRCID", (*it).id);
         query.exec();
 
         if (query.isActive() && query.numRowsAffected() > 0) {
             query.next();
             source_channels = query.value(0).toInt();
-            VERBOSE(VB_GENERAL, QString("Found %1 channels for source %2")
+            VERBOSE(VB_GENERAL, QString("Found %1 channels for source %2 "
+                                        "which use grabber")
                                         .arg(source_channels).arg((*it).id));
         } else {
             source_channels = 0;
@@ -510,20 +418,131 @@ bool FillData::fillData(QValueList<Source> &sourcelist)
         QString xmltv_grabber = (*it).xmltvgrabber;
         need_post_grab_proc |= (xmltv_grabber != "datadirect");
 
-        if (xmltv_grabber == "tv_grab_uk" || xmltv_grabber == "tv_grab_uk_rt" ||
-            xmltv_grabber == "tv_grab_fi" || xmltv_grabber == "tv_grab_es" ||
-            xmltv_grabber == "tv_grab_es_laguiatv" ||
-            xmltv_grabber == "tv_grab_nl" || xmltv_grabber == "tv_grab_au" ||
-            xmltv_grabber == "tv_grab_fr" || xmltv_grabber == "tv_grab_jp" ||
-            xmltv_grabber == "tv_grab_pt" || xmltv_grabber == "tv_grab_ee" ||
-            xmltv_grabber == "tv_grab_dk")
+        if (xmltv_grabber == "eitonly")
         {
-            // These don't support the --offset option, so just grab the max.
-            // TODO: tv_grab_fi/dk/is seems to support --offset, maybe more. Needs verification.
-            if (!grabData(*it, 0))
-                ++failures;
+            VERBOSE(VB_IMPORTANT, "Source configured to use only the "
+                    "broadcasted guide data. Skipping.");
+            externally_handled++;
+            query.exec(QString("UPDATE settings SET data ='%1' "
+                               "WHERE value='mythfilldatabaseLastRunStart' OR "
+                               "value = 'mythfilldatabaseLastRunEnd'")
+                       .arg(QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm")));
+            continue;
         }
-        else if ((xmltv_grabber == "datadirect") && dd_grab_all)
+        else if (xmltv_grabber == "/bin/true" ||
+                 xmltv_grabber == "none" ||
+                 xmltv_grabber == "")
+        {
+            VERBOSE(VB_IMPORTANT,
+                    "Source configured with no grabber. Nothing to do.");
+            externally_handled++;
+            query.exec(QString("UPDATE settings SET data ='%1' "
+                               "WHERE value='mythfilldatabaseLastRunStart' OR "
+                               "value = 'mythfilldatabaseLastRunEnd'")
+                       .arg(QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm")));
+            continue;
+        }
+
+        bool hasprefmethod = false;
+
+        if (xmltv_grabber != "datadirect") {
+
+            QProcess grabber_capabilities_proc(xmltv_grabber);
+            grabber_capabilities_proc.addArgument(QString("--capabilities"));
+            if ( grabber_capabilities_proc.start() )
+            {
+
+                int i=0;
+                // Assume it shouldn't take more than 10 seconds
+                // Broken versions of QT cause QProcess::start
+                // and QProcess::isRunning to return true even
+                // when the executable doesn't exist
+                while (grabber_capabilities_proc.isRunning() && i < 100)
+                {
+                    usleep(100000);
+                    ++i;
+                }
+
+                if (grabber_capabilities_proc.normalExit())
+                {
+                    QString capabilites = "";
+
+                    while (grabber_capabilities_proc.canReadLineStdout())
+                    {
+                        QString capability
+                            = grabber_capabilities_proc.readLineStdout();
+                        capabilites += capability + " ";
+
+                        if (capability == "baseline")
+                            (*it).xmltvgrabber_baseline = true;
+
+                        if (capability == "manualconfig")
+                            (*it).xmltvgrabber_manualconfig = true;
+
+                        if (capability == "cache")
+                            (*it).xmltvgrabber_cache = true;
+
+                        if (capability == "preferredmethod")
+                            hasprefmethod = true;
+                    }
+
+                    VERBOSE(VB_GENERAL, QString("Grabber has capabilities: %1")
+                        .arg(capabilites));
+                }
+                else {
+                    VERBOSE(VB_IMPORTANT, "%1  --capabilities failed or we "
+                        "timed out waiting. You may need to upgrade your "
+                        "xmltv grabber");
+                }
+            }
+            else {
+                QString error = grabber_capabilities_proc.readLineStdout();
+                VERBOSE(VB_IMPORTANT, QString("Failed to run %1 "
+                        "--capabilities").arg(xmltv_grabber));
+            }
+        }
+
+
+        if (hasprefmethod)
+        {
+
+            QProcess grabber_method_proc(xmltv_grabber);
+            grabber_method_proc.addArgument("--preferredmethod");
+            if ( grabber_method_proc.start() )
+            {
+                int i=0;
+                // Assume it shouldn't take more than 10 seconds
+                // Broken versions of QT cause QProcess::start
+                // and QProcess::isRunning to return true even
+                // when the executable doesn't exist
+                while (grabber_method_proc.isRunning() && i < 100)
+                {
+                    usleep(100000);
+                    ++i;
+                }
+
+                if (grabber_method_proc.normalExit())
+                {
+                    (*it).xmltvgrabber_prefmethod =
+                        grabber_method_proc.readLineStdout();
+                }
+                else {
+                    VERBOSE(VB_IMPORTANT, "%1  --preferredmethod failed or we "
+                    "timed out waiting. You may need to upgrade your "
+                    "xmltv grabber");
+                }
+
+                VERBOSE(VB_GENERAL, QString("Grabber prefers method: %1")
+                .arg((*it).xmltvgrabber_prefmethod));
+            }
+            else {
+                QString error = grabber_method_proc.readLineStdout();
+                VERBOSE(VB_IMPORTANT, QString("Failed to run %1 --preferredmethod")
+                        .arg(xmltv_grabber));
+            }
+        }
+
+        if ((xmltv_grabber == "datadirect") && dd_grab_all)
         {
             if (only_update_channels)
                 DataDirectUpdateChannels(*it);
@@ -533,40 +552,25 @@ bool FillData::fillData(QValueList<Source> &sourcelist)
                 grabData(*it, 0, &qCurrentDate);
             }
         }
-        else if (xmltv_grabber == "datadirect" ||
-                 xmltv_grabber == "tv_grab_se_swedb" ||
-                 xmltv_grabber == "tv_grab_no" ||
-                 xmltv_grabber == "tv_grab_de_tvtoday" ||
-                 xmltv_grabber == "tv_grab_be_tvb" ||
-                 xmltv_grabber == "tv_grab_be_tlm" ||
-                 xmltv_grabber == "tv_grab_is" ||
-                 xmltv_grabber == "tv_grab_br" ||
-                 xmltv_grabber == "tv_grab_cz" ||
-                 xmltv_grabber == "tv_grab_ru")
+        else if ((*it).xmltvgrabber_prefmethod == "allatonce")
         {
-            // Grabbers supporting the --offset option
-
-            if (xmltv_grabber == "tv_grab_no")
-                prog_data.listing_wrap_offset = 6 * 3600;
+            if (!grabData(*it, 0))
+                ++failures;
+        }
+        else if ((*it).xmltvgrabber_baseline || xmltv_grabber == "datadirect")
+        {
 
             QDate qCurrentDate = QDate::currentDate();
 
-            int grabdays = 9;
+            // We'll keep grabbing until it returns nothing
+            // Max days currently supported is 21
+            int grabdays = 21;
 
-            // Grab different amount of days for the different grabbers,
-            // often decided by the person maintaining the grabbers.
             if (maxDays > 0) // passed with --max-days
                 grabdays = maxDays;
-            else if (xmltv_grabber == "datadirect")
+            else if (xmltv_grabber == "datadirect") {
                 grabdays = 14;
-            else if (xmltv_grabber == "tv_grab_se_swedb")
-                grabdays = 10;
-            else if (xmltv_grabber == "tv_grab_no" ||
-                     xmltv_grabber == "tv_grab_de_tvtoday")
-                grabdays = 7;
-            else if (xmltv_grabber == "tv_grab_be_tvb" ||
-                     xmltv_grabber == "tv_grab_be_tlm")
-                grabdays = 5;
+            }
 
             grabdays = (only_update_channels) ? 1 : grabdays;
 
@@ -612,15 +616,18 @@ bool FillData::fillData(QValueList<Source> &sourcelist)
                          (i == 2 && refresh_second))
                 {
                     // Always refresh if the user specified today/tomorrow/second.
-                    download_needed = true;
-                }
-                else if (xmltv_grabber == "tv_grab_se_swedb")
-                {
-                    // Since tv_grab_se_swedb handles caching internally,
-                    // let it do its job and always grab new data.
-                    VERBOSE(VB_GENERAL,
-                            "Data Refresh needed because the grabber relies on "
-                            "internal caching.");
+                    if (refresh_today) {
+                        VERBOSE(VB_GENERAL,
+                            "Data Refresh needed because user specified --refresh-today");
+                    }
+                    else if (refresh_second) {
+                        VERBOSE(VB_GENERAL,
+                            "Data Refresh needed because user specified --refresh-second");
+                    }
+                    else {
+                        VERBOSE(VB_GENERAL,
+                            "Data Refresh always needed for tomorrow");
+                    }
                     download_needed = true;
                 }
                 else
@@ -639,9 +646,9 @@ bool FillData::fillData(QValueList<Source> &sourcelist)
                                    "INTERVAL '%1' DAY), INTERVAL '20' HOUR) "
                                "  AND starttime < DATE_ADD(CURRENT_DATE(), "
                                    "INTERVAL '%2' DAY) "
-                               "WHERE c.sourceid = %3 "
+                               "WHERE c.sourceid = %3 AND c.xmltvid != '' "
                                "GROUP BY c.chanid;";
-  
+
                     if (query.exec(querystr.arg(i-1).arg(i).arg((*it).id)) &&
                         query.isActive()) 
                     {
@@ -751,7 +758,7 @@ bool FillData::fillData(QValueList<Source> &sourcelist)
                                 "offset day %2.").arg(i-1).arg(i));
                         download_needed = true;
                     }
-                } 
+                }
 
                 if (download_needed)
                 {
@@ -765,6 +772,12 @@ bool FillData::fillData(QValueList<Source> &sourcelist)
                             break;
                         }
                     }
+
+                    if (endofdata) {
+                        VERBOSE(VB_GENERAL,
+                            QString("Grabber is no longer returning program data, finishing"));
+                        break;
+                    }
                 }
                 else
                 {
@@ -774,33 +787,12 @@ bool FillData::fillData(QValueList<Source> &sourcelist)
                 }
             }
         }
-        else if (xmltv_grabber == "eitonly")
-        {
-            VERBOSE(VB_IMPORTANT, "Source configured to use only the "
-                    "broadcasted guide data. Skipping.");
-            externally_handled++;
-            query.exec(QString("UPDATE settings SET data ='%1' "
-                               "WHERE value='mythfilldatabaseLastRunStart' OR "
-                               "value = 'mythfilldatabaseLastRunEnd'")
-                       .arg(QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm")));
-        }
-        else if (xmltv_grabber == "/bin/true" ||
-                 xmltv_grabber == "none" ||
-                 xmltv_grabber == "")
-        {
-            VERBOSE(VB_IMPORTANT,
-                    "Source configured with no grabber. Nothing to do.");
-            externally_handled++;
-            query.exec(QString("UPDATE settings SET data ='%1' "
-                               "WHERE value='mythfilldatabaseLastRunStart' OR "
-                               "value = 'mythfilldatabaseLastRunEnd'")
-                       .arg(QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm")));
-        }
         else
         {
             VERBOSE(VB_IMPORTANT,
                     QString("Grabbing XMLTV data using ") + xmltv_grabber +
-                            " is not verified as working.");
+                            " is not supported. You may need to upgrade to"
+                            " the latest version of XMLTV.");
         }
 
         if (interrupted)

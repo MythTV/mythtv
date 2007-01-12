@@ -399,7 +399,7 @@ int main(int argc, char *argv[])
             cout << "--refresh-today\n";
             cout << "--refresh-second\n";
             cout << "--refresh-all\n";
-            cout << "   (Only valid for grabbers: DataDirect, se_swedb, no, ee, de_tvtoday)\n";
+            cout << "   (Only valid for selected grabbers: e.g. DataDirect)\n";
             cout << "   Force a refresh today or two days (or every day) from now,\n";
             cout << "   to catch the latest changes\n";
             cout << "--dont-refresh-tomorrow\n";
@@ -548,7 +548,7 @@ int main(int argc, char *argv[])
                                    "FROM videosource ") + where +
                                    QString(" ORDER BY sourceid;");
         sourcequery.exec(querystr);
-        
+
         if (sourcequery.isActive())
         {
              if (sourcequery.size() > 0)
@@ -556,13 +556,18 @@ int main(int argc, char *argv[])
                   while (sourcequery.next())
                   {
                        Source newsource;
-            
+
                        newsource.id = sourcequery.value(0).toInt();
                        newsource.name = sourcequery.value(1).toString();
                        newsource.xmltvgrabber = sourcequery.value(2).toString();
                        newsource.userid = sourcequery.value(3).toString();
                        newsource.password = sourcequery.value(4).toString();
                        newsource.lineupid = sourcequery.value(5).toString();
+
+                       newsource.xmltvgrabber_baseline = false;
+                       newsource.xmltvgrabber_manualconfig = false;
+                       newsource.xmltvgrabber_cache = false;
+                       newsource.xmltvgrabber_prefmethod = "";
 
                        sourcelist.append(newsource);
                        if (newsource.xmltvgrabber == "datadirect")

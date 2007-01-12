@@ -14,7 +14,7 @@ class ChanInfo;
 class XMLTVParser
 {
   public:
-    XMLTVParser() : isNorthAmerica(false), isJapan(false) {}
+    XMLTVParser() : isJapan(false) {}
 
     ChanInfo *parseChannel(QDomElement &element, QUrl baseUrl);
     ProgInfo *parseProgram(QDomElement &element, int localTimezoneOffset);
@@ -24,7 +24,6 @@ class XMLTVParser
 
 
   public:
-    bool isNorthAmerica;
     bool isJapan;
 };
 
