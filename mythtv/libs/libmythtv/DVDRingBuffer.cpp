@@ -136,7 +136,6 @@ bool DVDRingBufferPriv::OpenFile(const QString &filename)
 {
     dvdFilename = filename.ascii();
     int dvdDriveSpeed = gContext->GetNumSetting("DVDDriveSpeed", 2);
-    SetDVDSpeed(dvdFilename, dvdDriveSpeed);
     dvdnav_status_t dvdRet = dvdnav_open(&dvdnav, filename.local8Bit());
     if (dvdRet == DVDNAV_STATUS_ERR)
     {
@@ -190,7 +189,9 @@ bool DVDRingBufferPriv::OpenFile(const QString &filename)
         dvdnav_get_serial_number(dvdnav, &serialnum);
         dvdname = QString(name);
         serialnumber = QString(serialnum);
-            
+    
+        SetDVDSpeed(dvdFilename, dvdDriveSpeed);
+
         return true;
     }
 }
