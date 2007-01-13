@@ -8,6 +8,7 @@
 #include "uitypes.h"
 #include "xmlparse.h"
 #include "programinfo.h"
+#include "channeleditor.h"
 
 class ChannelInfo;
 
@@ -29,6 +30,7 @@ class ChannelRecPriority : public MythDialog
     void cursorUp(bool page = false);
     void pageDown() { cursorDown(true); }
     void pageUp() { cursorUp(true); }
+    void edit();
     void changeRecPriority(int howMuch);
     void applyChannelRecPriorityChange(QString, const QString&);
 

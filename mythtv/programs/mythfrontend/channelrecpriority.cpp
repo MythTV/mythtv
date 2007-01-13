@@ -125,6 +125,9 @@ void ChannelRecPriority::keyPressEvent(QKeyEvent *e)
                 pageUp();
             else if (action == "PAGEDOWN")
                 pageDown();
+            else if (action == "SELECT" || action == "MENU" ||
+                     action == "INFO" || action == "CUSTOMEDIT")
+                edit();
             else if (action == "RANKINC")
                 changeRecPriority(1);
             else if (action == "RANKDEC")
@@ -697,4 +700,44 @@ void ChannelRecPriority::updateInfo(QPainter *p)
 
     tmp.end();
     p->drawPixmap(pr.topLeft(), pix);
+}
+
+void ChannelRecPriority::edit()
+{
+    int cnt;
+    QMap<QString, ChannelInfo>::Iterator it;
+    ChannelInfo *chanInfo;
+
+    // iterate through channelData till we hit the line where
+    // the cursor currently is
+    for (cnt=0, it = channelData.begin(); cnt < inList+inData; cnt++, ++it);
+
+    chanInfo = &(it.data());
+
+    ChannelWizard cw(chanInfo->chanid, chanInfo->sourceid);
+    cw.exec();
+
+    // Make sure that any changes are reflected in channelData.
+    MSqlQuery result(MSqlQuery::InitCon());
+    result.prepare("SELECT chanid, channum, sourceid, callsign, "
+                   "icon, recpriority, name FROM channel "
+                   "WHERE chanid = :CHANID;");
+    result.bindValue(":CHANID", chanInfo->chanid);
+
+    if (result.exec() && result.isActive() && result.size() > 0)
+    {
+        result.next();
+        chanInfo->chanid = result.value(0).toInt();
+        chanInfo->chanstr = result.value(1).toString();
+        chanInfo->sourceid = result.value(2).toInt();
+        chanInfo->callsign = QString::fromUtf8(result.value(3).toString());
+        chanInfo->iconpath = result.value(4).toString();
+        chanInfo->recpriority = result.value(5).toString();
+        chanInfo->channame = QString::fromUtf8(result.value(6).toString());
+    }
+    else if (!result.isActive())
+        MythContext::DBError("Get channel priorities update", result);
+
+    SortList();
+    update(fullRect);
 }
