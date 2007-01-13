@@ -168,7 +168,8 @@ void RingBuffer::OpenFile(const QString &lfilename, uint retryCount)
     bool is_dvd = false;
     (void) is_dvd; // not used when frontend is disabled.
 
-    if (filename.left(1) == "/")
+    if ((filename.left(1) == "/") ||
+        (QFile::exists(filename)))
         is_local = true;
 #ifdef USING_FRONTEND
     else if (filename.left(4) == "dvd:")
