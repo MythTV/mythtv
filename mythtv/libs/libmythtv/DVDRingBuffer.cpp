@@ -107,7 +107,7 @@ long long DVDRingBufferPriv::Seek(long long time)
         VERBOSE(VB_PLAYBACK, LOC_ERR + 
                 QString("Seek() to time %1 failed").arg(time));
     }
-    else
+    else if (!IsInMenu())
     {
         gotStop = false;
         if (time > 0 && ffrewSkip == 1)
