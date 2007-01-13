@@ -707,6 +707,9 @@ MythBusyDialog::~MythBusyDialog()
         timer->deleteLater();
         timer = NULL;
     }
+
+    if (LCD *lcddev = LCD::Get())
+        lcddev->switchToTime();
 }
 
 void MythBusyDialog::start(int interval)
