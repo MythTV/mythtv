@@ -936,11 +936,12 @@ if ( $backend )
 foreach my $target ( @targets )
 {
   my $finalTarget = "$SCRIPTDIR/$target.app";
+  my $builtTarget = lc $target;
 
   # Get a fresh copy of the binary
   &Verbose("Building self-contained $target");
   &Syscall([ 'rm', '-fr', $finalTarget ]) or die;
-  &Syscall([ 'cp',  "$svndir/mythtv/programs/$target/$target",
+  &Syscall([ 'cp',  "$svndir/mythtv/programs/$builtTarget/$builtTarget",
              "$SCRIPTDIR/$target" ]) or die;
 
   # Convert it to a bundled .app
