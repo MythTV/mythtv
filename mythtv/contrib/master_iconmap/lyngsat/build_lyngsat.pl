@@ -43,38 +43,8 @@
     my ($scan, $output, $usage);
     GetOptions('scan|rescan'    => \$scan,
                'output:s'       => \$output,
-               'usage|help'     => \$usage,
+               'usage|help'     => \&print_usage,
               );
-
-# Print the help
-    if ($usage) {
-        print <<EOF;
-
-usage:  $0
-options:
-
-    --scan
-
-        Scan lyngsat for updated station info
-
-    --output
-
-        Display the traditional breakdown of station, icon and log URLs.
-        Use with the shell's > operator to store into a file like
-        lingsat_stations.txt.
-
-    --output missing
-
-        Prints the ID and name fields for every lyngsat station that does not
-        have any matching callsign entries.
-
-    --usage
-
-        Display this message
-
-EOF
-        exit;
-    }
 
 # Figure out what we're doing
     if ($scan) {
@@ -83,7 +53,7 @@ EOF
     }
 
 # Output
-    if (defined $output) {
+    elsif (defined $output) {
         if ($output =~ /miss/i) {
             my $sh = $dbh->prepare('SELECT stations.station_id, stations.name
                                       FROM stations
@@ -104,6 +74,11 @@ EOF
             }
             $sh->finish;
         }
+    }
+
+# Otherwise, just print the usage message
+    else {
+        print_usage();
     }
 
 # Done
@@ -254,3 +229,32 @@ EOF
         }
     }
 
+# Print the usage message
+    sub print_usage {
+        print <<EOF;
+
+usage:  $0
+options:
+
+    --scan
+
+        Scan lyngsat for updated station info
+
+    --output
+
+        Display the traditional breakdown of station, icon and log URLs.
+        Use with the shell's > operator to store into a file like
+        lingsat_stations.txt.
+
+    --output missing
+
+        Prints the ID and name fields for every lyngsat station that does not
+        have any matching callsign entries.
+
+    --usage
+
+        Display this message
+
+EOF
+        exit;
+    }
