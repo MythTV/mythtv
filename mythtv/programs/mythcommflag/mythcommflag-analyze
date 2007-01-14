@@ -1,0 +1,203 @@
+#!/usr/local/bin/perl -w
+
+use strict;
+use Cwd;
+use File::Basename;
+
+sub convert($$)
+{
+	my ($from, $to) = @_;
+	my $cmd = "convert -quality 50 -resize 192x144 $from $to";
+	system($cmd);
+}
+
+sub header($)
+{
+	my ($debugdir) = @_;
+	return <<EOM;
+<html>
+
+<head>
+
+<title>$debugdir</title>
+
+<style type="text/css">
+<!--
+body { background-color: #999; }
+.block * { vertical-align: middle; }
+img { margin: 1px; padding: 1px 10px 1px 10px; }
+-->
+</style>
+
+</head>
+
+<body>
+
+EOM
+}
+
+sub templatefinder()
+{
+	if (-f "template.pgm") {
+		my $pgmmtime = (stat("template.pgm"))[9];
+		my $jpgmtime = (stat("template.jpg"))[9];
+		if (!-f "template.jpg" || $pgmmtime > $jpgmtime) {
+			convert("template.pgm", "template.jpg");
+		}
+	}
+
+	my @output;
+	foreach my $file qw(tf-scores.jpg tf-edgecounts.jpg template.jpg) {
+		if (-f $file) {
+			if (!@output) {
+				push @output, <<EOM;
+<h2>TemplateFinder</h2>
+EOM
+			}
+			push @output, <<EOM;
+<img src="$file" title="$file" />
+EOM
+		}
+	}
+
+=cut
+	opendir(DIR, ".") or die "opendir $debugdir: $!\n";
+	my @frames = sort grep(/^tf-\d+\.jpg$/, readdir(DIR));
+	closedir(DIR) or die "closedir $debugdir: $!\n";
+=cut
+
+	@output;
+}
+
+sub templatematcher()
+{
+	sub histogram($)
+	{
+		my ($tmfile) = @_;
+		my %freq;
+		my $nframes = 0;
+		open(TMFILE, $tmfile) or die "open $tmfile: $!\n";
+		while (<TMFILE>) {
+			my $matchcnt = $_;
+			chomp $matchcnt;
+			$freq{$matchcnt}++;
+			$nframes++;
+		}
+		close(TMFILE) or die "close $tmfile: $!\n";
+
+		my %histo;
+		my @freqkeys = sort { $a <=> $b } keys %freq;
+		my ($minmatch, $maxmatch) = @freqkeys[0, $#freqkeys];
+		my $matchrange = $maxmatch - $minmatch;
+		foreach my $matchcnt (@freqkeys) {
+			my $pctile = $matchrange ?
+				($matchcnt - $minmatch) / $matchrange :
+				0;
+			$histo{$pctile} = $freq{$matchcnt} / $nframes;
+		}
+
+		\%histo;
+	}
+
+	sub gnuplot($$)
+	{
+		my ($tmfile, $histogram) = @_;
+
+		my $histfile = $tmfile;
+		$histfile =~ s#\.txt$#.histogram#;
+		open(HIST, ">$histfile") or die "open $histfile: $!\n";
+		foreach my $matchcnt (sort { $a <=> $b } keys %$histogram) {
+			printf HIST "%12.6f %12.6f\n",
+				$matchcnt, $histogram->{$matchcnt};
+		}
+		close(HIST) or die "close $histfile: $!\n";
+
+		my $pngfile = $tmfile;
+		$pngfile =~ s#\.txt$#.png#;
+		open(GNUPLOT, "| gnuplot") or die "open gnuplot: $!\n";
+		print GNUPLOT <<EOM;
+set key off
+set style fill solid 1.0 noborder
+set terminal png transparent small size 400,144
+set output "$pngfile"
+
+set xtics rotate
+set ylabel "Fraction of Frames"
+
+set xlabel "Percentile of Template Edge Pixels Matched"
+set format x
+plot "$histfile" using 1:2 with points pointtype 7 pointsize 0.5
+EOM
+		close(GNUPLOT) or die "close gnuplot: $!\n";
+
+#		unlink $histfile;
+
+		return $pngfile;
+	}
+
+	my $tmfile = "";
+	foreach my $testfile qw(TemplateMatcher-pgm.txt
+			TemplateMatcher-yuv.txt) {
+		if (-f $testfile) {
+			$tmfile = $testfile;
+			last;
+		}
+	}
+	return "" if !$tmfile;
+
+	my $tmgraphic = gnuplot($tmfile, histogram($tmfile));
+	my @output;
+	if (-f $tmgraphic) {
+		push @output, <<EOM;
+<h2>TemplateMatcher</h2>
+<img src="$tmgraphic" title="$tmgraphic" />
+EOM
+	}
+	@output;
+}
+
+sub footer()
+{
+	return <<EOM;
+
+</body>
+
+</html>
+EOM
+}
+
+sub analyze($)
+{
+	my ($debugdir) = @_;
+
+	chdir($debugdir) or die "chdir $debugdir: $!\n";
+	my @output;
+	push @output, header($debugdir);
+	push @output, templatefinder();
+	push @output, templatematcher();
+	push @output, footer();
+
+	my $output = "index.html";
+	open(OUTPUT, ">$output") or die "open $output: $!\n";
+	print OUTPUT @output or die "print $output: $!\n";
+	close(OUTPUT) or die "close $output: $!\n";
+}
+
+if (!@ARGV) {
+	my $basename = basename($0);
+	print <<EOM;
+Usage: $0 <debugdir> [debugdir...]
+Generates an index.html file with graphical report on mythcommflag analysis
+Requires ImageMagick and Gnuplot
+
+Example: $basename /media/myth/recordedtv/1051_20061214210000-debug
+EOM
+}
+
+umask(022);
+my $cwd = getcwd();
+foreach my $debugdir (@ARGV) {
+	print "$debugdir\n";
+	analyze($debugdir);
+	chdir($cwd) or die "chdir $cwd: $!\n";
+}

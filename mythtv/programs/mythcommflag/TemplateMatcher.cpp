@@ -412,6 +412,143 @@ blankMapSearchBackwards(const FrameAnalyzer::FrameMap *blankMap,
     return blankMap->constEnd();
 }
 
+struct histogram {
+    float           pctile;
+    unsigned int    framecnt;
+};
+
+float
+range_area(const struct histogram *histogram, int nhist, int iihist,
+        float start, float end)
+{
+    /* Return the integrated area under the curve of the plotted histogram. */
+    const float     width = end - start;
+    unsigned int    sum, nsamples;
+
+    sum = 0;
+    nsamples = 0;
+    if (end <= histogram[iihist].pctile)
+    {
+        iihist--;
+        for (;;)
+        {
+            if (iihist < 0)
+                break;
+            if (histogram[iihist].pctile < start)
+                break;
+            sum += histogram[iihist].framecnt;
+            iihist--;
+            nsamples++;
+        }
+    }
+    else
+    {
+        for (;;)
+        {
+            if (iihist >= nhist)
+                break;
+            if (histogram[iihist].pctile >= end)
+                break;
+            sum += histogram[iihist].framecnt;
+            iihist++;
+            nsamples++;
+        }
+    }
+    if (!nsamples)
+        return 0;
+    return sum / nsamples * width;
+}
+
+unsigned short
+matches_threshold(const unsigned short *matches, long long nframes,
+        float *ppctile)
+{
+    /*
+     * Most frames either match the template very well, or don't match
+     * very well at all. This allows us to assume a bimodal
+     * distribution of the values in a frequency histogram of the
+     * "matches" array.
+     *
+     * Return a local minima between the two modes representing the
+     * threshold value that decides whether or not a frame matches the
+     * template.
+     *
+     * See "mythcommflag-analyze" and its output.
+     */
+
+    /*
+     * TUNABLE:
+     *
+     * Given a point to test, require the integrated area to the left
+     * of the point to be greater than some (larger) area to the right
+     * of the point.
+     */
+    static const float  LEFTWINDOW  = 0.025;   /* locality of local minimum. */
+    static const float  RIGHTWINDOW = 0.100;   /* locality of local minimum. */
+    unsigned short      *sorted, minmatch, maxmatch, *freq, mintmpledges;
+    int                 matchrange, nfreq, nhist, iihist;
+    struct histogram    *histogram;
+
+    sorted = new unsigned short[nframes];
+    memcpy(sorted, matches, nframes * sizeof(*matches));
+    qsort(sorted, nframes, sizeof(*sorted), sort_ascending);
+    minmatch = sorted[0];
+    maxmatch = sorted[nframes - 1];
+    matchrange = maxmatch - minmatch;
+
+    nfreq = maxmatch + 1;
+    freq = new unsigned short[nfreq];
+    memset(freq, 0, nfreq * sizeof(*freq));
+    for (long long frameno = 0; frameno < nframes; frameno++)
+        freq[matches[frameno]]++;   /* freq[<matchcnt>] = <framecnt> */
+
+    nhist = maxmatch - minmatch + 1;
+    histogram = new struct histogram[nhist];
+    memset(histogram, 0, nhist * sizeof(*histogram));
+
+    for (int matchcnt = minmatch, iihist = 0;
+            matchcnt <= maxmatch;
+            matchcnt++, iihist++)
+    {
+        histogram[iihist].pctile = (float)(matchcnt - minmatch) / matchrange;
+        histogram[iihist].framecnt = freq[matchcnt];
+    }
+
+    /* Initialize "iihist" to accommodate the RIGHTWINDOW. */
+    for (iihist = nhist - 2; iihist >= 0; iihist--)
+    {
+        if (histogram[iihist].pctile < 1 - RIGHTWINDOW)
+            break;
+    }
+
+    for (;;)
+    {
+        float left, right;
+        if (iihist < 0)
+        {
+            iihist = 0;
+            break;
+        }
+        if (histogram[iihist].pctile < LEFTWINDOW)
+            break;
+        left = range_area(histogram, nhist, iihist,
+                histogram[iihist].pctile - LEFTWINDOW,
+                histogram[iihist].pctile);
+        right = range_area(histogram, nhist, iihist,
+                histogram[iihist].pctile,
+                histogram[iihist].pctile + RIGHTWINDOW);
+        if (left > right)
+            break;
+        iihist--;
+    }
+
+    *ppctile = histogram[iihist].pctile;
+    mintmpledges = sorted[(int)(*ppctile * nframes)];
+    delete []freq;
+    delete []sorted;
+    return mintmpledges;
+}
+
 };  /* namespace */
 
 TemplateMatcher::TemplateMatcher(PGMConverter *pgmc, EdgeDetector *ed,
@@ -607,20 +744,11 @@ TemplateMatcher::finished(long long nframes, bool final)
      * Higher values could eliminate real breaks or segments entirely.
      * Lower values can yield more false "short" breaks or segments.
      */
-    const int       MINBREAKLEN = (int)roundf(35 * fps);  /* frames */
-    const int       MINSEGLEN = (int)roundf(35 * fps);    /* frames */
+    const int       MINBREAKLEN = (int)roundf(45 * fps);  /* frames */
+    const int       MINSEGLEN = (int)roundf(120 * fps);    /* frames */
 
-    /*
-     * TUNABLE:
-     *
-     * The percentile of template matching frames to mark as "matching".
-     *
-     * Higher values require closer matches, and could miss true matches.
-     * Lower values can yield false content.
-     */
-    static const float  MATCHPCTILE = 0.47;
-
-    int                                 tmpledges, mintmpledges, ii;
+    int                                 tmpledges, mintmpledges;
+    float                               matchpctile;
     long long                           brkb;
     FrameAnalyzer::FrameMap::Iterator   bb;
 
@@ -635,23 +763,14 @@ TemplateMatcher::finished(long long nframes, bool final)
     }
 
     tmpledges = pgm_set(tmpl, tmplheight);
-    memcpy(tmatches, matches, nframes * sizeof(*matches));
-    qsort(tmatches, nframes, sizeof(*tmatches), sort_ascending);
-    ii = (int)((nframes - 1) * MATCHPCTILE);
-    mintmpledges = tmatches[ii];
-    for (; ii > 0; ii--) {
-        if (tmatches[ii - 1] != mintmpledges)
-            break;
-    }
+    mintmpledges = matches_threshold(matches, nframes, &matchpctile);
 
-    VERBOSE(VB_COMMFLAG, QString("TemplateMatcher::finished "
-                "%1x%2@(%3,%4), %5 edge pixels "
-                "(want %6 pctile=%7, got pctile=%8)")
+    VERBOSE(VB_COMMFLAG, QString("TemplateMatcher::finished %1x%2@(%3,%4),"
+                " %5 edge pixels, want %6 (pctile=%7)")
             .arg(tmplwidth).arg(tmplheight).arg(tmplcol).arg(tmplrow)
-            .arg(tmpledges).arg(mintmpledges).arg(MATCHPCTILE, 0, 'f', 6)
-            .arg((float)ii / nframes, 0, 'f', 6));
+            .arg(tmpledges).arg(mintmpledges).arg(matchpctile, 0, 'f', 6));
 
-    for (ii = 0; ii < nframes; ii++)
+    for (long long ii = 0; ii < nframes; ii++)
         match[ii] = matches[ii] >= mintmpledges ? 1 : 0;
 
     if (debugLevel >= 2)
