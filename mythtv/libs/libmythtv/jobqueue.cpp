@@ -1810,8 +1810,8 @@ void JobQueue::DoTranscodeThread(void)
         QString details = QString("%1%2: %3 (%4)")
                             .arg(program_info->title.local8Bit())
                             .arg(subtitle.local8Bit())
-                            .arg(PrettyPrint(origfilesize))
-                            .arg(transcoderName);
+                            .arg(transcoderName)
+                            .arg(PrettyPrint(origfilesize));
 
         VERBOSE(VB_GENERAL, LOC + QString("%1 for %2").arg(msg).arg(details));
         gContext->LogEntry("transcode", LP_NOTICE, msg, details);
@@ -1838,9 +1838,6 @@ void JobQueue::DoTranscodeThread(void)
             VERBOSE(VB_IMPORTANT,
                     LOC_ERR + QString("%1 for %2").arg(msg).arg(details));
             gContext->LogEntry("transcode", LP_WARNING, msg, details);
-
-            retry = false;
-            break;
         }
         else if (result == TRANSCODE_EXIT_RESTART && retrylimit > 0)
         {
@@ -1878,8 +1875,8 @@ void JobQueue::DoTranscodeThread(void)
                     details = QString("%1%2: %3 (%4)")
                                       .arg(program_info->title)
                                       .arg(subtitle)
-                                      .arg(PrettyPrint(filesize))
-                                      .arg(transcoderName);
+                                      .arg(transcoderName)
+                                      .arg(PrettyPrint(filesize));
                 }
                 else
                 {
@@ -1901,16 +1898,25 @@ void JobQueue::DoTranscodeThread(void)
             }
             else
             {
-                ChangeJobStatus(jobID, JOB_ERRORED, QString("Transcode failed "
-                                "with status: %1").arg(result));
-                details = QString("%1%2: (%3)")
-                          .arg(program_info->title).arg(subtitle)
-                          .arg(transcoderName);
+                program_info->SetTranscoded(TRANSCODING_NOT_TRANSCODED);
+
+                QString comment =
+                    QString("exit status %1, job status was \"%2\"")
+                    .arg(result)
+                    .arg(StatusText(status));
+
+                ChangeJobStatus(jobID, JOB_ERRORED, comment);
+
+                details = QString("%1%2: %3 (%4)")
+                          .arg(program_info->title)
+                          .arg(subtitle)
+                          .arg(transcoderName)
+                          .arg(comment);
             }
 
             msg = QString("Transcode %1").arg(StatusText(GetJobStatus(jobID)));
-            VERBOSE(VB_GENERAL, LOC + msg + ": " + details);
             gContext->LogEntry("transcode", LP_NOTICE, msg, details);
+            VERBOSE(VB_GENERAL, LOC + msg + ": " + details);
         }
     }
 
@@ -2003,73 +2009,40 @@ void JobQueue::DoFlagCommercialsThread(void)
     VERBOSE(VB_JOBQUEUE, LOC + QString("Running command: '%1'").arg(command));
 
     breaksFound = myth_system(command.ascii());
+    int priority = LP_NOTICE;
+    QString comment = "";
 
     controlFlagsLock.lock();
+
     if ((breaksFound == MYTHSYSTEM__EXIT__EXECL_ERROR) ||
         (breaksFound == MYTHSYSTEM__EXIT__CMD_NOT_FOUND))
     {
-        msg = QString("Commercial Flagging failed for %1, %2 does not exist "
-                      "or is not executable")
-                      .arg(logDesc).arg(path);
-        VERBOSE(VB_IMPORTANT, LOC_ERR + msg);
-
-        gContext->LogEntry("commflag", LP_WARNING,
-                           "Commercial Flagging Errored", msg);
-
-        ChangeJobStatus(jobID, JOB_ERRORED,
-            "ERROR: Unable to find mythcommflag, check backend logs.");
-        msg = ""; // reset msg so we don't reprint it later
+        comment = "unable to find mythcommflag";
+        ChangeJobStatus(jobID, JOB_ERRORED, comment);
+        priority = LP_WARNING;
     }
-    else if ((*(jobControlFlags[key]) == JOB_STOP) ||
-             (breaksFound >= COMMFLAG_EXIT_START))
+    else if ((*(jobControlFlags[key]) == JOB_STOP))
     {
-        msg = QString("ABORTED Commercial Flagging for %1.")
-                      .arg(logDesc);
-
-        gContext->LogEntry("commflag", LP_WARNING,
-                           "Commercial Flagging Aborted", msg);
-
-        ChangeJobStatus(jobID, JOB_ABORTED,
-                        "Job aborted by user.");
+        comment = "aborted by user";
+        ChangeJobStatus(jobID, JOB_ABORTED, comment);
+        priority = LP_WARNING;
     }
-    else if (breaksFound ==  COMMFLAG_EXIT_NO_PROGRAM_DATA)
+    else if (breaksFound == COMMFLAG_EXIT_NO_PROGRAM_DATA)
     {
-        msg = QString("ERROR in Commercial Flagging for %1, problem opening "
-                      "file or initting decoder, check backend log.")
-                      .arg(logDesc);
-
-        gContext->LogEntry("commflag", LP_WARNING,
-                           "Commercial Flagging ERRORED", msg);
-
-        ChangeJobStatus(jobID, JOB_ERRORED,
-                        "Job ERRORED, unable to open file or init decoder.");
+        comment = "unable to open file or init decoder";
+        ChangeJobStatus(jobID, JOB_ERRORED, comment);
+        priority = LP_WARNING;
     }
     else if (breaksFound >= COMMFLAG_EXIT_START)
     {
-        msg = QString("Commercial Flagging ERRORED for %1 with result %2.")
-                      .arg(logDesc).arg(breaksFound);
-
-        gContext->LogEntry("commflag", LP_WARNING,
-                           "Commercial Flagging Errored", msg);
-
-        ChangeJobStatus(jobID, JOB_ERRORED,
-                        QString("Job aborted with Error %1.").arg(breaksFound));
+        comment = QString("failed with exit status %1").arg(breaksFound);
+        ChangeJobStatus(jobID, JOB_ERRORED, comment);
+        priority = LP_WARNING;
     }
     else
     {
-        msg = "Commercial Flagging Finished";
-
-        QString details = QString("%1: %2 commercial break(s)")
-                                .arg(logDesc)
-                                .arg(breaksFound);
-
-        gContext->LogEntry("commflag", LP_NOTICE, msg, details);
-
-        msg = QString("Finished, %1 break(s) found.").arg(breaksFound);
-        ChangeJobStatus(jobID, JOB_FINISHED, msg);
-
-        VERBOSE(VB_GENERAL, LOC + QString("Commercial Flagging %1").arg(msg));
-        msg = "";
+        comment = QString("%1 commercial break(s)").arg(breaksFound);
+        ChangeJobStatus(jobID, JOB_FINISHED, comment);
 
         MythEvent me("RECORDING_LIST_CHANGE");
         gContext->dispatch(me);
@@ -2078,8 +2051,16 @@ void JobQueue::DoFlagCommercialsThread(void)
         (new PreviewGenerator(program_info, true))->Run();
     }
 
-    if (msg != "")
-        VERBOSE(VB_IMPORTANT, LOC + msg);
+    msg = QString("Commercial Flagging %1")
+        .arg(StatusText(GetJobStatus(jobID)));
+
+    if (comment != "")
+        logDesc += QString(" (%1)").arg(comment);
+
+    gContext->LogEntry("commflag", priority, msg, logDesc);
+
+    if (priority <= LP_WARNING)
+        VERBOSE(VB_IMPORTANT, LOC_ERR + msg + ": " + logDesc);
 
     jobControlFlags.erase(key);
     runningJobIDs.erase(key);
