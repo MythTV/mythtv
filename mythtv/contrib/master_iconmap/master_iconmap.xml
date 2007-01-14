@@ -149,6 +149,10 @@
         <network>BRAVO</network>
     </callsigntonetwork>
     <callsigntonetwork>
+        <callsign>BYUTV</callsign>
+        <network>BYUTV</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
         <callsign>Bloomberg</callsign>
         <network>BloombergTV</network>
     </callsigntonetwork>
@@ -279,6 +283,10 @@
     <callsigntonetwork>
         <callsign>CMT</callsign>
         <network>CMTPURECOUNTRY</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>CMTV</callsign>
+        <network>CMTV</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>CMTVP</callsign>
@@ -1725,6 +1733,10 @@
         <network>NBC</network>
     </callsigntonetwork>
     <callsigntonetwork>
+        <callsign>KJZZ</callsign>
+        <network>KJZZ</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
         <callsign>KKCO</callsign>
         <network>NBC</network>
     </callsigntonetwork>
@@ -2681,6 +2693,10 @@
         <network>PBS-KUAT</network>
     </callsigntonetwork>
     <callsigntonetwork>
+        <callsign>KUCW</callsign>
+        <network>WUCW</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
         <callsign>KUED</callsign>
         <network>PBS-KUED</network>
     </callsigntonetwork>
@@ -2705,6 +2721,10 @@
         <network>UPN</network>
     </callsigntonetwork>
     <callsigntonetwork>
+        <callsign>KUPX</callsign>
+        <network>KUPX</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
         <callsign>KUSA</callsign>
         <network>NBC</network>
     </callsigntonetwork>
@@ -2719,6 +2739,10 @@
     <callsigntonetwork>
         <callsign>KUTP</callsign>
         <network>UPN</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>KUTV</callsign>
+        <network>CBS</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>KUVI</callsign>
@@ -3611,6 +3635,10 @@
     <callsigntonetwork>
         <callsign>UWTV</callsign>
         <network>UWTV</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>VERSUS</callsign>
+        <network>VERSUS</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>VH1</callsign>
@@ -6417,6 +6445,10 @@
         <url>[ls-logo]/bb/bravo_ca.jpg</url>
     </networktourl>
     <networktourl>
+        <network>BYUTV</network>
+        <url>[ls-logo]/bb/byu_tv.jpg</url>
+    </networktourl>
+    <networktourl>
         <network>BloombergTV</network>
         <url>[ls-logo]/bb/bloomberg.jpg</url>
     </networktourl>
@@ -6889,6 +6921,10 @@
         <url>[ls-icon]/kk/kiro_cbs7_seattle.gif</url>
     </networktourl>
     <networktourl>
+        <network>KJZZ</network>
+        <url>[ls-logo]/kk/kjzz_saltlake.jpg</url>
+    </networktourl>
+    <networktourl>
         <network>KMEX</network>
         <url>[zap2it]/uni.gif</url>
     </networktourl>
@@ -6903,6 +6939,10 @@
     <networktourl>
         <network>KSTW</network>
         <url>[ls-icon]/kk/kstw_cw11_seattle.gif</url>
+    </networktourl>
+    <networktourl>
+        <network>KUPX</network>
+        <url>[ls-logo]/kk/kupx_i16_salt_lake_city.jpg</url>
     </networktourl>
     <networktourl>
         <network>KWOG</network>
@@ -7022,7 +7062,7 @@
     </networktourl>
     <networktourl>
         <network>NBC-WCAU</network>
-        <url>[ls-logo]/ww/wcau_nbc10_philadelphia.jpg </url>
+        <url>[ls-logo]/ww/wcau_nbc10_philadelphia.jpg</url>
     </networktourl>
     <networktourl>
         <network>NBC-WCAU-WEATHERPLUS</network>
@@ -8053,6 +8093,10 @@
         <url>[ls-icon]/uu/uwtv_washington.gif</url>
     </networktourl>
     <networktourl>
+        <network>VERSUS</network>
+        <url>[ls-logo]/vv/versus.jpg</url>
+    </networktourl>
+    <networktourl>
         <network>VH1</network>
         <url>[ls-logo]/vv/vh1.jpg</url>
     </networktourl>
@@ -8091,6 +8135,10 @@
     <networktourl>
         <network>WRNN</network>
         <url>[zap2it]/rnn.gif</url>
+    </networktourl>
+    <networktourl>
+        <network>WUCW</network>
+        <url>[ls-logo]/ww/wucw_cw23_minneapolis.jpg</url>
     </networktourl>
     <networktourl>
         <network>WeatherChannelau</network>

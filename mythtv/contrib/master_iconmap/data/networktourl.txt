@@ -25,6 +25,7 @@ BLOOM                   [zap2it]/bloom.jpg
 BloombergTV             [ls-logo]/bb/bloomberg.jpg
 BRAVO                   [zap2it]/bravo.jpg
 BRAVOCA                 [ls-logo]/bb/bravo_ca.jpg
+BYUTV                   [ls-logo]/bb/byu_tv.jpg
 CARTOONNETWORK          [zap2it]/toon.gif
 CartoonNetworkls        [ls-logo]/cc/cartoonnet.jpg
 CBC                     [zap2it2]/cbc.gif
@@ -142,10 +143,12 @@ JCTV                    [ls-logo]/jj/jc_tv.jpg
 KBCB                    [ls-icon]/kk/kbcb_24_world_tv_seattle.gif
 KHCV                    [ls-icon]/kk/khcv45_seattle.gif
 KIRO                    [ls-icon]/kk/kiro_cbs7_seattle.gif
+KJZZ                    [ls-logo]/kk/kjzz_saltlake.jpg
 KMEX                    [zap2it]/uni.gif
 KOMO                    [ls-icon]/kk/komo.gif
 KONG                    [ls-icon]/kk/kong6_16_seattle.gif
 KSTW                    [ls-icon]/kk/kstw_cw11_seattle.gif
+KUPX                    [ls-logo]/kk/kupx_i16_salt_lake_city.jpg
 KWOG                    [ls-icon]/kk/kwog_nbc51_seattle.gif
 LIFENETWORK             [ls-logo]/ll/life_network.jpg
 Lifestyle               [ls-logo]/ll/lifestyle.jpg
@@ -176,7 +179,7 @@ NBC                     [zap2it]/nbc.jpg
 NBC-KMCI                [ls-logo]/kk/kmci38_kansascity.jpg
 NBC-KSHB                [ls-logo]/kk/kshb41_kansas.jpg
 NBC-KSNT                [ls-logo]/kk/ksnt_nbc27_topeka.jpg
-NBC-WCAU                [ls-logo]/ww/wcau_nbc10_philadelphia.jpg 
+NBC-WCAU                [ls-logo]/ww/wcau_nbc10_philadelphia.jpg
 NBC-WCAU-WEATHERPLUS    [ls-logo]/ww/wcau_weather_plus.jpg
 NBC-WESH                [ls-logo]/ww/wesh_nbc2_daytona_beach.jpg
 NEWSENG                 [zap2it]/necn.gif
@@ -433,6 +436,7 @@ UPN                     [zap2it]/upn.jpg
 UPN-KCWE                [ls-logo]/kk/kcwe_cw29_kansas_city.jpg
 USA                     [zap2it]/usa.jpg
 UWTV                    [ls-icon]/uu/uwtv_washington.gif
+VERSUS                  [ls-logo]/vv/versus.jpg
 VH1                     [ls-logo]/vv/vh1.jpg
 VH1_Classic             [ls-logo]/vv/vh1_classic.jpg
 VISIONCA                [ls-logo]/vv/visiontv.jpg
@@ -446,3 +450,4 @@ WeatherChannelau        [ls-logo]/ww/weatherchannel_aus.jpg
 WorldMoviesChannel      [ls-logo]/ww/worldmovies.jpg
 WRNN                    [zap2it]/rnn.gif
 YOUTHTV                 [ls-logo]/yy/youth_tv.jpg
+WUCW                    [ls-logo]/ww/wucw_cw23_minneapolis.jpg

@@ -36,6 +36,7 @@ Bloomberg   BloombergTV
 BRAVO       BRAVO
 BRAVOC      BRAVOCA
 BRAVOP      BRAVO
+BYUTV       BYUTV
 C-SPAN      CSPAN
 C3-02       TLC
 C3-07       CSPAN
@@ -62,6 +63,7 @@ CBLFT       CBC-CBLFT
 CBNEW       CBC-CBNEW
 CBOT        CBC
 CBUT        CBC
+CMTV        CMTV
 CFTM        IND-CFTM
 Channel[V]  ChannelVAustralia
 CICA        TVO-CICA
@@ -429,6 +431,7 @@ KJTL        FOX
 KJTV        FOX
 KJUD        ABC
 KJVY        NBC
+KJZZ        KJZZ
 KKCO        NBC
 KKFX        FOX
 KKPX        PAX
@@ -668,16 +671,19 @@ KTXT        PBS-KTXT
 KUAC        PBS-KUAC
 KUAM        NBC
 KUAT        PBS-KUAT
+KUCW        WUCW
 KUED        PBS-KUED
 KUHT        PBS-KUHT
 KUIL        UPN
 KULR        NBC
 KUMV        NBC
 KUPT        UPN
+KUPX        KUPX
 KUSA        NBC
 KUSD        PBS-KUSD
 KUSM        PBS-KUSM
 KUTP        UPN
+KUTV        CBS
 KUVI        UPN
 KUWB        WB
 KVBC        NBC
@@ -902,6 +908,7 @@ USA         USA
 USAP        USA
 UW2TV       UWTV
 UWTV        UWTV
+VERSUS      VERSUS
 VH1         VH1
 VH1CL       VH1_Classic
 VH1CNTRY    VH1
