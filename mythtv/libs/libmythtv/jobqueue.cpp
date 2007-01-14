@@ -1822,22 +1822,22 @@ void JobQueue::DoTranscodeThread(void)
         int result = myth_system(command.ascii());
         int status = GetJobStatus(jobID);
  
-        details = "";
-
         if ((result == MYTHSYSTEM__EXIT__EXECL_ERROR) ||
             (result == MYTHSYSTEM__EXIT__CMD_NOT_FOUND))
         {
-            msg = QString("Transcoding failed for %1, %2 does not exist or "
-                          "is not executable")
-                          .arg(details).arg(path);
-            VERBOSE(VB_IMPORTANT, LOC_ERR + msg);
-
-            gContext->LogEntry("transcode", LP_WARNING,
-                               "Transcoding Errored", msg);
-
             ChangeJobStatus(jobID, JOB_ERRORED,
                 "ERROR: Unable to find mythtranscode, check backend logs.");
             program_info->SetTranscoded(TRANSCODING_NOT_TRANSCODED);
+
+            msg = QString("Transcode %1").arg(StatusText(GetJobStatus(jobID)));
+            details = QString("%1%2: %3 does not exist or is not executable")
+                            .arg(program_info->title.local8Bit())
+                            .arg(subtitle.local8Bit())
+                            .arg(path);
+
+            VERBOSE(VB_IMPORTANT,
+                    LOC_ERR + QString("%1 for %2").arg(msg).arg(details));
+            gContext->LogEntry("transcode", LP_WARNING, msg, details);
 
             retry = false;
             break;
@@ -1849,6 +1849,9 @@ void JobQueue::DoTranscodeThread(void)
             retrylimit--;
 
             program_info->SetTranscoded(TRANSCODING_NOT_TRANSCODED);
+
+            msg = QString("Transcode restarting");
+            gContext->LogEntry("transcode", LP_NOTICE, msg, details);
         }
         else
         {
@@ -1877,6 +1880,18 @@ void JobQueue::DoTranscodeThread(void)
                                       .arg(subtitle)
                                       .arg(PrettyPrint(filesize))
                                       .arg(transcoderName);
+                }
+                else
+                {
+                    int saved = errno;
+                    QString comment = QString("couldn't stat \"%1\": %2")
+                        .arg(filename.ascii()).arg(strerror(saved));
+                    ChangeJobStatus(jobID, JOB_FINISHED, comment);
+
+                    details = QString("%1%2: %3")
+                                      .arg(program_info->title)
+                                      .arg(subtitle)
+                                      .arg(comment);
                 }
 
                 MythEvent me("RECORDING_LIST_CHANGE");
