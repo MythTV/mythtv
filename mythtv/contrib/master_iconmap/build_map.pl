@@ -34,17 +34,28 @@
         chomp;
         next if (/^\s*#/ || /^\s*$/);
         my ($callsign, $network) = split(/\s+/, $_, 2);
+        if ($callsigns{"\U$callsign"}) {
+            die "Multiple entries for callsign:  $callsign\n";
+        }
         $callsigns{$callsign} = $network;
     }
     close DATA;
 
 # Load the networks
     my %networks;
+    my %cache;  # Cache used for catching multiple instances of certain things
     open(DATA, $networktourl) or die "Can't open $networktourl:  $!\n";
     while (<DATA>) {
         chomp;
         next if (/^\s*#/ || /^\s*$/);
         my ($network, $url) = split(/\s+/, $_, 2);
+        if ($networks{$network}) {
+            die "Multiple entries for network:  $network\n";
+        }
+        if ($cache{$url}) {
+            print STDERR "WARNING:  Multiple entries for network URL:  $url\n";
+        }
+        $cache{$url}        = 1;
         $networks{$network} = $url;
     }
     close DATA;
