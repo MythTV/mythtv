@@ -46,7 +46,7 @@
             print "wget: http://www.lyngsat-logo.com/tv/${letter}_$num.html\n";
             $page = wget("http://www.lyngsat-logo.com/tv/${letter}_$num.html",
                          "http://www.lyngsat-logo.com/tv/$letter.html");
-            while ($page =~ m#<font\b[^>]*><b>([^<]+?)</b></font><br><img src="([^"]+)"[^>]*>#gs) {
+            while ($page =~ m#<font\b[^>]*><b>\s*([^<]+?)\s*</b></font><br><img src="([^"]+)"[^>]*>#gs) {
                 $stations{$1}{'large'} = $2;
             }
         }
