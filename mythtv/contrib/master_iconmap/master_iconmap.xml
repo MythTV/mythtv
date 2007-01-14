@@ -29,6 +29,10 @@
         <network>Encore_Action</network>
     </callsigntonetwork>
     <callsigntonetwork>
+        <callsign>AETV</callsign>
+        <network>AE</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
         <callsign>AETVP</callsign>
         <network>AE</network>
     </callsigntonetwork>
@@ -383,6 +387,10 @@
     <callsigntonetwork>
         <callsign>DTIMES</callsign>
         <network>DISCOVERY</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>DTVFX</callsign>
+        <network>FX</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>Discovery</callsign>
@@ -4621,6 +4629,10 @@
         <network>NBC</network>
     </callsigntonetwork>
     <callsigntonetwork>
+        <callsign>WHAM</callsign>
+        <network>ABC</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
         <callsign>WHAS</callsign>
         <network>ABC</network>
     </callsigntonetwork>
@@ -5579,6 +5591,10 @@
     <callsigntonetwork>
         <callsign>WRNN</callsign>
         <network>WRNN</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>WROC</callsign>
+        <network>CBS</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>WRSP</callsign>

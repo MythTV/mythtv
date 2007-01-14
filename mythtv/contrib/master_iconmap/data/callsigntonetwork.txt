@@ -5,6 +5,7 @@ ACC         AustralianChristianCh
 ACMAXP      CINEMAX
 ACTON       Encore_Action
 ACTONP      Encore_Action
+AETV        AE
 AETVP       AE
 AMC         AMC
 AMCP        AMC
@@ -96,6 +97,7 @@ DIY         DIY
 DSC         DISCOVERY
 DSCP        DISCOVERY
 DTIMES      DISCOVERY
+DTVFX       FX
 EACT        Encore_Action
 EDRA        Encore_Drama
 ELOVE       Encore_Love
@@ -1156,6 +1158,7 @@ WGVU        PBS-WGVU
 WGWB        WB
 WGXA        FOX
 WHAG        NBC
+WHAM        ABC
 WHAS        ABC
 WHBQ        FOX
 WHCP        WB
@@ -1397,6 +1400,7 @@ WRJM        UPN
 WRLH        FOX
 WRLK        PBS-WRLK
 WRNN        WRNN
+WROC        CBS
 WRSP        FOX
 WRTV        ABC
 WRWB        WB
