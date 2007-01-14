@@ -5,13 +5,13 @@
 
   <font name="active" face="Trebuchet MS">
    <color>#ffffff</color>
-   <size>14</size>
+   <size>18</size>
    <bold>yes</bold>
   </font>
 
   <font name="inactive" face="Trebuchet MS">
    <color>#9999cc</color>
-   <size>14</size>
+   <size>18</size>
    <bold>yes</bold>
   </font>
 
@@ -31,13 +31,13 @@
 
   <font name="options" face="Trebuchet MS">
    <color>#ffffff</color>
-   <size>14</size>
+   <size>18</size>
    <bold>yes</bold>
   </font>
 
   <font name="infotitle" face="Trebuchet MS">
    <color>#ffffff</color>
-   <size>20</size>
+   <size>18</size>
    <shadow>10,10</shadow>
    <bold>yes</bold>
   </font>

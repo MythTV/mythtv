@@ -4,7 +4,7 @@
 
     <font name="active" face="Trebuchet MS">
       <color>#ffffff</color>
-      <size>17</size>
+      <size>18</size>
       <bold>yes</bold>
     </font>
 
@@ -17,32 +17,32 @@
 
     <font name="selected" face="Trebuchet MS">
       <color>#33ff33</color>
-      <size>17</size>
+      <size>18</size>
       <bold>yes</bold>
       <shadow>2,1</shadow>
     </font>
 
     <font name="status" face="Trebuchet MS">
       <color>#ffffff</color>
-      <size>14</size>
+      <size>18</size>
       <bold>yes</bold>
     </font>
 
     <font name="status_selected" face="Trebuchet MS">
       <color>#33ff33</color>
-      <size>14</size>
+      <size>18</size>
       <bold>yes</bold>
     </font>
 
     <font name="status_error" face="Trebuchet MS">
       <color>#ff0000</color>
-      <size>14</size>
+      <size>18</size>
       <bold>yes</bold>
     </font>
 
     <font name="status_warning" face="Trebuchet MS">
       <color>#ff8429</color>
-      <size>14</size>
+      <size>18</size>
       <bold>yes</bold>
     </font>
 

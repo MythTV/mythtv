@@ -4,19 +4,19 @@
 
     <font name="active" face="Trebuchet MS">
       <color>#ffffff</color>
-      <size>17</size>
+      <size>18</size>
       <bold>yes</bold>
     </font>
 
     <font name="inactive" face="Trebuchet MS">
       <color>#9999cc</color>
-      <size>17</size>
+      <size>18</size>
       <bold>yes</bold>
     </font>
 
     <font name="title" face="Trebuchet MS">
       <color>#ffffff</color>
-      <size>20</size>
+      <size>18</size>
       <bold>yes</bold>
     </font>
 

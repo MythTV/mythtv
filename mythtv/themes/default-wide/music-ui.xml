@@ -11,13 +11,13 @@
     <window name="music_select">
       <font name="active" face="Trebuchet MS">
          <color>#ffffff</color>
-         <size>17</size>
+         <size>18</size>
          <bold>no</bold>
       </font>
 
       <font name="inactive" face="Trebuchet MS">
         <color>#9999cc</color>
-        <size>17</size>
+        <size>18</size>
         <bold>no</bold>
       </font>
 
@@ -94,43 +94,43 @@
         -->
         <font name="active" face="Trebuchet MS">
             <color>#ffffff</color>
-            <size>16</size>
+            <size>18</size>
             <bold>yes</bold>
         </font>
 
         <font name="inactive" face="Trebuchet MS">
             <color>#9999cc</color>
-            <size>16</size>
+            <size>18</size>
             <bold>yes</bold>
         </font>
   
         <font name="selected" face="Trebuchet MS">
             <color>#ffffff</color>
-            <size>16</size>
+            <size>18</size>
             <bold>yes</bold>
         </font>
 
         <font name="currenttitle" face="Trebuchet MS">
             <color>#ffffff</color>
-            <size>20</size>
+            <size>18</size>
             <bold>yes</bold>
         </font>
 
         <font name="currentartist" face="Trebuchet MS">
             <color>#ffffff</color>
-            <size>16</size>
+            <size>18</size>
             <bold>yes</bold>
         </font>
 
         <font name="infotext" face="Trebuchet MS">
             <color>#ffffff</color>
-            <size>12</size>
+            <size>18</size>
             <bold>yes</bold>
         </font>
 
         <font name="buttons" face="Trebuchet MS">
             <color>#ffffff</color>
-            <size>12</size>
+            <size>18</size>
             <bold>yes</bold>
         </font>
 
@@ -266,7 +266,7 @@
             <area>0,340,1136,200</area>
 
             <blackhole name="visual_blackhole">
-                <area>216,33,138,136</area>
+                <area>216,33,138,134</area>
             </blackhole>
 
             <textarea name="title_text" draworder="1" align="left">

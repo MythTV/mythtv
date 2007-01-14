@@ -4,19 +4,19 @@
 
     <font name="active" face="Trebuchet MS">
       <color>#ffffff</color>
-      <size>16</size>
+      <size>18</size>
       <bold>yes</bold>
     </font>
 
     <font name="inactive" face="Trebuchet MS">
       <color>#9999cc</color>
-      <size>16</size>
+      <size>18</size>
       <bold>yes</bold>
     </font>
 
     <font name="header" face="Trebuchet MS">
       <color>#ffffff</color>
-      <size>28</size>
+      <size>24</size>
       <bold>yes</bold>
       <shadow>1,1</shadow>
     </font>
@@ -24,7 +24,7 @@
     <font name="timedate" face="Trebuchet MS">
       <color>#ffffff</color>
       <dropcolor>#000000</dropcolor>
-      <size>20</size>
+      <size>18</size>
       <shadow>2,2</shadow>
       <bold>yes</bold>
     </font>
@@ -37,25 +37,25 @@
 
     <font name="label" face="Trebuchet MS">
       <color>#ffffff</color>
-      <size>14</size>
+      <size>18</size>
       <bold>yes</bold>
     </font>
 
     <font name="label2" face="Trebuchet MS">
       <color>#ffffff</color>
-      <size>11</size>
+      <size>12</size>
       <bold>yes</bold>
     </font>
 
     <font name="footer" face="Trebuchet MS">
       <color>#ffffff</color>
-      <size>17</size>
+      <size>18</size>
       <bold>yes</bold>
     </font>
 
     <font name="lohifont" face="Trebuchet MS">
       <color>#33ff33</color>
-      <size>17</size>
+      <size>18</size>
       <bold>yes</bold>
     </font>
 
@@ -67,13 +67,13 @@
   
     <font name="todayfont" face="Trebuchet MS">
       <color>#ffffff</color> 
-      <size>26</size>
+      <size>24</size>
       <bold>yes</bold>
     </font>
 
     <font name="temp" face="Trebuchet MS">
       <color>#ffffff</color>
-      <size>50</size>
+      <size>48</size>
       <bold>yes</bold>
     </font>
   
