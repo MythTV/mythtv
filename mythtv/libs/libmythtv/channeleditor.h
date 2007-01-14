@@ -35,7 +35,7 @@ private:
 
 class ChannelID;
 
-class ChannelWizard : public QObject, public ConfigurationWizard
+class MPUBLIC ChannelWizard : public QObject, public ConfigurationWizard
 {
     Q_OBJECT
 public:
