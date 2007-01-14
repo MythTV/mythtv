@@ -1797,18 +1797,10 @@ bool PlaybackBox::FillList(bool useCachedData)
             // add points for how close the recorded time of day is to 'now'
             p->recpriority2 += abs((hrs % 24) - 12);
 
-            // Single
-            if (recType[recid] == kSingleRecord || 
-                recType[recid] == kFindOneRecord)
-            {
-                // add points for a new Singles that decrease over 2 days
-                if (hrs < 48)
-                    p->recpriority2 += maxAge * (48 - hrs) / 48;
-            }
             // Daily 
-            else if (spanHours[recid] < 50 ||
-                     recType[recid] == kTimeslotRecord ||
-                     recType[recid] == kFindDailyRecord)
+            if (spanHours[recid] < 50 ||
+                recType[recid] == kTimeslotRecord ||
+                recType[recid] == kFindDailyRecord)
             {
                 if (delHours[recid] < watchListBlackOut * 4)
                 {
@@ -1870,6 +1862,10 @@ bool PlaybackBox::FillList(bool useCachedData)
                 }
                 else
                 {
+                    // add points for a new Single or final episode
+                    if (hrs < 48)
+                        p->recpriority2 += maxAge * (48 - hrs) / 48;
+
                     if (p->startts.daysTo(now) < maxAge)
                         p->recpriority2 += p->startts.daysTo(now);
                     else
