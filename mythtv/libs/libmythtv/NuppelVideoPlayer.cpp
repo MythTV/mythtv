@@ -6557,7 +6557,9 @@ void NuppelVideoPlayer::GoToDVDMenu(QString str)
         return;
 
     textDisplayMode = kDisplayNone;
-    ringBuffer->DVD()->GoToMenu(str);
+    bool ret = ringBuffer->DVD()->GoToMenu(str);
+    if (!ret && osd)
+        osd->SetSettingsText(QObject::tr("%1 DVD Menu Not Available").arg(str), 1);
 }
 
 /** \fn NuppelVideoPlayer::GoToDVDProgram(bool direction)

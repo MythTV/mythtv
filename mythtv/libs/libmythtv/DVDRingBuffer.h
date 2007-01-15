@@ -82,7 +82,7 @@ class MPUBLIC DVDRingBufferPriv
     long long NormalSeek(long long time);
     void SkipStillFrame(void);
     void WaitSkip(void);
-    void GoToMenu(const QString str);
+    bool GoToMenu(const QString str);
     void GoToNextProgram(void);
     void GoToPreviousProgram(void);
     void MoveButtonLeft(void);

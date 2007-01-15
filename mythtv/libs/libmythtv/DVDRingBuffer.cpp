@@ -594,7 +594,7 @@ void DVDRingBufferPriv::WaitSkip(void)
     dvdWaiting = false;
 }
 
-void DVDRingBufferPriv::GoToMenu(const QString str)
+bool DVDRingBufferPriv::GoToMenu(const QString str)
 {
     DVDMenuID_t menuid;
     if (str.compare("chapter") == 0)
@@ -604,7 +604,7 @@ void DVDRingBufferPriv::GoToMenu(const QString str)
         if (partMenuSupported == DVDNAV_STATUS_OK)
             menuid = DVD_MENU_Part;
         else
-            menuid = DVD_MENU_Root;
+            return false;
     }
     else if (str.compare("menu") == 0)
     {
@@ -616,9 +616,12 @@ void DVDRingBufferPriv::GoToMenu(const QString str)
             menuid = DVD_MENU_Root;
     }
     else
-        return;
+        return false;
 
-    dvdnav_menu_call(dvdnav, menuid);
+    dvdnav_status_t ret = dvdnav_menu_call(dvdnav, menuid);
+    if (ret == DVDNAV_STATUS_OK)
+        return true;
+    return false;
 }
 
 void DVDRingBufferPriv::GoToNextProgram(void)
