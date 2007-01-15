@@ -1887,6 +1887,7 @@ static HostComboBox *MythTimeFormat()
     gc->addSelection(samptime.toString("hh:mm ap"), "hh:mm ap");
     gc->addSelection(samptime.toString("h:mm"), "h:mm");
     gc->addSelection(samptime.toString("hh:mm"), "hh:mm");
+    gc->addSelection(samptime.toString("hh.mm"), "hh.mm");
     gc->setHelpText(QObject::tr("Your preferred time format.  You must choose "
                     "a format with \"AM\" or \"PM\" in it, otherwise your "
                     "time display will be 24-hour or \"military\" time."));
