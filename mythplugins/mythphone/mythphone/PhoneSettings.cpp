@@ -95,11 +95,12 @@ static HostLineEdit *TransmitBandwidth()
 
 static HostSpinBox *TimeToAnswer()
 {
-    HostSpinBox *gc = new HostSpinBox("TimeToAnswer", 1, 30, 1);
+    HostSpinBox *gc = new HostSpinBox("TimeToAnswer", 0, 30, 1);
     gc->setLabel(QObject::tr("Time to Answer"));
     gc->setValue(10);
     gc->setHelpText(QObject::tr("The time in seconds a call rings before being "
-                    "automatically answered and diverted to a VXML script."));
+                    "automatically answered and diverted to a VXML script."
+                    "  Set to 0 to disable this feature."));
     return gc;
 };
 
