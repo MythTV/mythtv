@@ -179,7 +179,8 @@ void MythUIImage::Reset(void)
 
 void MythUIImage::Pulse(void)
 {
-    if (m_Delay > 0 && m_LastDisplay.msecsTo(QTime::currentTime()) > m_Delay)
+    if (m_Delay > 0 && 
+        abs(m_LastDisplay.msecsTo(QTime::currentTime())) > m_Delay)
     {
         m_CurPos++;
         if (m_CurPos >= m_Images.size())
