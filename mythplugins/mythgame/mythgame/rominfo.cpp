@@ -28,7 +28,7 @@ void RomInfo::edit_rominfo()
 
         MSqlQuery query(MSqlQuery::InitCon());
         QString thequery = QString("SELECT gamename,genre,year,country,publisher FROM gamemetadata "
-                                   " WHERE gametype = \"%1\" AND romname = \"%2\"; ")
+                                   " WHERE gametype = '%1' AND romname = '%2'; ")
                                    .arg(GameType())
                                    .arg(Romname());
 
@@ -48,7 +48,7 @@ void RomInfo::edit_rominfo()
             if ((t_gamename != Gamename()) || (t_genre != Genre()) || (t_year != Year()) 
                || (t_country != Country()) || (t_publisher != Publisher()))
             {
-                thequery = QString("UPDATE gamemetadata SET version = \"%1\" WHERE gametype = \"%2\" AND romname = \"%3\";")
+                thequery = QString("UPDATE gamemetadata SET version = '%1' WHERE gametype = '%2' AND romname = '%3';")
                                    .arg(QString("CUSTOM"))
                                    .arg(GameType())
                                    .arg(Romname());
@@ -77,7 +77,7 @@ int romInDB(QString rom, QString gametype)
 
     int count = 0;
 
-    thequery = QString("SELECT count(*) FROM gamemetadata WHERE gametype = \"%1\" AND romname = \"%2\";")
+    thequery = QString("SELECT count(*) FROM gamemetadata WHERE gametype = '%1' AND romname = '%2';")
                         .arg(gametype)
                         .arg(rom);
     query.exec(thequery);
@@ -156,8 +156,8 @@ void RomInfo::setFavorite()
 {
     favorite = 1 - favorite;
 
-    QString thequery = QString("UPDATE gamemetadata SET favorite=\"%1\" WHERE "
-                               "romname=\"%2\";").arg(favorite).arg(romname);
+    QString thequery = QString("UPDATE gamemetadata SET favorite='%1' WHERE "
+                               "romname='%2';").arg(favorite).arg(romname);
     MSqlQuery query(MSqlQuery::InitCon());
     query.exec(thequery);
 }
@@ -184,11 +184,11 @@ void RomInfo::fillData()
 
     QString thequery = "SELECT system,gamename,genre,year,romname,favorite,"
                        "rompath,country,crc_value,diskcount,gametype,publisher,"
-                       "version FROM gamemetadata WHERE gamename=\"" 
-                       + gamename + "\"";
+                       "version FROM gamemetadata WHERE gamename='" 
+                       + gamename + "'";
 
     if (system != "")
-        thequery += " AND system=\"" + system + "\"";
+        thequery += " AND system='" + system + "'";
 
     // added order by to get the (first) disk with the accurate diskcount
     thequery += " ORDER BY diskcount DESC";
@@ -217,7 +217,7 @@ void RomInfo::fillData()
         setVersion(query.value(12).toString());
     }
 
-    thequery = "SELECT screenshots FROM gameplayers WHERE playername = \"" + system + "\";";
+    thequery = "SELECT screenshots FROM gameplayers WHERE playername = '" + system + "';";
 
     query.exec(thequery);
 
@@ -240,7 +240,7 @@ void RomInfo::fillData()
     // systems available to play it.
     if (RomCount() > 1) 
     {
-        thequery = "SELECT DISTINCT system FROM gamemetadata WHERE romname = \"" + Romname() + "\";";
+        thequery = "SELECT DISTINCT system FROM gamemetadata WHERE romname = '" + Romname() + "';";
 
         query.exec(thequery);
 

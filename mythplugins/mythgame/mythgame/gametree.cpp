@@ -34,7 +34,7 @@ QString GameTreeItem::getFillSql(QString layer) const
                     : "romname";
 
         if (m_showHashed)
-            filter += " and romname like \"" + layer + "%\"";
+            filter += " and romname like '" + layer + "%'";
 
     }
     else if ((childLevel == "gamename") && (layer.length() == 1)) {
@@ -43,7 +43,7 @@ QString GameTreeItem::getFillSql(QString layer) const
                     : childLevel;
 
         if (m_showHashed) 
-            filter += " and gamename like \"" + layer + "%\"";
+            filter += " and gamename like '" + layer + "%'";
 
     }
     else if (childLevel == "hash") {

@@ -64,7 +64,7 @@ GameHandler* GameHandler::getHandler(uint i)
 void GameHandler::updateSettings(GameHandler *handler)
 {
     MSqlQuery query(MSqlQuery::InitCon());
-    query.exec("SELECT rompath, workingpath, commandline, screenshots, gameplayerid, gametype, extensions, spandisks  FROM gameplayers WHERE playername = \"" + handler->SystemName() + "\";");
+    query.exec("SELECT rompath, workingpath, commandline, screenshots, gameplayerid, gametype, extensions, spandisks  FROM gameplayers WHERE playername = '" + handler->SystemName() + "';");
 
     query.next();
     handler->rompath = query.value(0).toString();
@@ -104,7 +104,7 @@ void GameHandler::InitMetaDataMap(QString GameType)
     MSqlQuery query(MSqlQuery::InitCon());
     QString thequery = QString("SELECT crc, category, year, country, name, "
                                "description, publisher, platform, version, "
-                               "binfile FROM romdb WHERE platform = \"%1\";")
+                               "binfile FROM romdb WHERE platform = '%1';")
                               .arg(GameType);
     query.exec(thequery);
 
@@ -182,8 +182,8 @@ void purgeGameDB(QString filename, QString RomPath)
     // This should have the added benefit of removing the rom from
     // other games of the same gametype so we wont be asked to remove it
     // more than once.
-    QString thequery = QString("DELETE FROM gamemetadata WHERE romname = \"%1\" AND "
-                                " rompath = \"%2\"; ")
+    QString thequery = QString("DELETE FROM gamemetadata WHERE romname = '%1' AND "
+                                " rompath = '%2'; ")
                               .arg(filename)
                               .arg(RomPath);
     query.exec(thequery);
@@ -230,8 +230,8 @@ void GameHandler::promptForRemoval(QString filename, QString RomPath)
 void updateDisplayRom(QString romname, int display, QString Systemname)
 {
     MSqlQuery query(MSqlQuery::InitCon());
-    QString thequery = QString("UPDATE gamemetadata SET display = %1 WHERE romname = \"%2\" AND "
-                                " system = \"%3\"; ")
+    QString thequery = QString("UPDATE gamemetadata SET display = %1 WHERE romname = '%2' AND "
+                                " system = '%3'; ")
                               .arg(display)
                               .arg(romname)
                               .arg(Systemname);
@@ -242,8 +242,8 @@ void updateDisplayRom(QString romname, int display, QString Systemname)
 void updateDiskCount(QString romname, int diskcount, QString GameType)
 {
     MSqlQuery query(MSqlQuery::InitCon());
-    QString thequery = QString("UPDATE gamemetadata SET diskcount = %1 WHERE romname = \"%2\" AND "
-                                " gametype = \"%3\"; ")
+    QString thequery = QString("UPDATE gamemetadata SET diskcount = %1 WHERE romname = '%2' AND "
+                                " gametype = '%3'; ")
                               .arg(diskcount)
                               .arg(romname)
                               .arg(GameType);
@@ -254,8 +254,8 @@ void updateDiskCount(QString romname, int diskcount, QString GameType)
 void updateGameName(QString romname, QString GameName, QString Systemname)
 {
     MSqlQuery query(MSqlQuery::InitCon());
-    QString thequery = QString("UPDATE gamemetadata SET GameName = \"%1\" WHERE romname = \"%2\" AND "
-                                " system = \"%3\"; ")
+    QString thequery = QString("UPDATE gamemetadata SET GameName = '%1' WHERE romname = '%2' AND "
+                                " system = '%3'; ")
                               .arg(GameName)
                               .arg(romname) 
                               .arg(Systemname);
@@ -281,7 +281,7 @@ static void UpdateGameCounts(QStringList updatelist)
         diskcount = 0;
         QString GameType = *it;
         cerr << "Update gametype " << GameType << endl;
-        QString romquery = QString("SELECT romname,system,spandisks,gamename FROM gamemetadata,gameplayers WHERE gamemetadata.gametype = \"%1\" AND playername = system ORDER BY romname").arg(GameType);
+        QString romquery = QString("SELECT romname,system,spandisks,gamename FROM gamemetadata,gameplayers WHERE gamemetadata.gametype = '%1' AND playername = system ORDER BY romname").arg(GameType);
         query.exec(romquery);
         if (query.isActive() && query.size() > 0)
         {   
@@ -404,7 +404,7 @@ void GameHandler::UpdateGameDB(GameHandler *handler)
             thequery = QString("INSERT INTO gamemetadata "
                                "(system, romname, gamename, genre, year, gametype, rompath, country, crc_value,"
                                " diskcount, display, publisher, version) ");
-            queryvalues = QString ("VALUES (\"%1\", \"%2\", \"%3\", \"%4\", \"%5\", \"%6\",")
+            queryvalues = QString ("VALUES ('%1', '%2', '%3', '%4', '%5', '%6',")
                 .arg(handler->SystemName())
                 .arg(iter.data().Rom().latin1())
                 .arg(GameName.latin1())
@@ -412,7 +412,7 @@ void GameHandler::UpdateGameDB(GameHandler *handler)
                 .arg(Year.latin1())
                 .arg(handler->GameType());
 
-            queryvalues.append( QString("\"%1\", \"%2\", \"%3\", 1 ,\"1\", \"%4\", \"%5\");")
+            queryvalues.append( QString("'%1', '%2', '%3', 1 ,'1', '%4', '%5');")
                 .arg(iter.data().RomPath().latin1())
                 .arg(Country.latin1())
                 .arg(CRC32)
@@ -440,7 +440,7 @@ void GameHandler::VerifyGameDB(GameHandler *handler)
     GameScanMap::Iterator iter;
 
     MSqlQuery query(MSqlQuery::InitCon());
-    query.exec("SELECT romname,rompath,gamename FROM gamemetadata WHERE system = \"" + handler->SystemName() + "\";");
+    query.exec("SELECT romname,rompath,gamename FROM gamemetadata WHERE system = '" + handler->SystemName() + "';");
 
     MythProgressDialog progressDlg(QObject::tr("Verifying " + handler->SystemName() + " files"),
                                    query.numRowsAffected());
@@ -629,8 +629,8 @@ void GameHandler::processGames(GameHandler *handler)
         thequery = QString("INSERT INTO gamemetadata "
                            "(system, romname, gamename, genre, year, gametype, country, "
                            "diskcount, display, publisher, version) "
-                           "VALUES (\"%1\", \"%2\", \"%3\", \"UnknownPC\", \"19xx\" , \"%4\", "
-                           "\"Unknown\",1,1,\"Unknown\", \"0\");")
+                           "VALUES ('%1', '%2', '%3', 'UnknownPC', '19xx' , '%4', "
+                           "'Unknown',1,1,'Unknown', '0');")
                            .arg(handler->SystemName())
                            .arg(handler->SystemName())
                            .arg(handler->SystemName())
