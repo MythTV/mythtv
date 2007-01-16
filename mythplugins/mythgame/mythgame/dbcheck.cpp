@@ -14,41 +14,12 @@ const QString currentDatabaseVersion = "1012";
 
 static bool UpdateDBVersionNumber(const QString &newnumber)
 {
-    // delete old schema version
-    MSqlQuery query(MSqlQuery::InitCon());
 
-    QString thequery = "DELETE FROM settings WHERE value='GameDBSchemaVer';";
-    query.prepare(thequery);
-    query.exec();
-
-    if (query.lastError().type() != QSqlError::None)
+    if (!gContext->SaveSettingOnHost("GameDBSchemaVer",newnumber,NULL)) 
     {
-        QString msg =
-            QString("DB Error (Deleting old DB version number): \n"
-                    "Query was: %1 \nError was: %2 \nnew version: %3")
-            .arg(thequery)
-            .arg(MythContext::DBErrorMessage(query.lastError()))
-            .arg(newnumber);
-        VERBOSE(VB_IMPORTANT, msg);
-        return false;
-    }
+        VERBOSE(VB_IMPORTANT, QString("DB Error (Setting new DB version number): %1\n")
+                              .arg(newnumber));
 
-    // set new schema version
-    thequery = QString("INSERT INTO settings (value, data, hostname) "
-                          "VALUES ('GameDBSchemaVer', %1, NULL);")
-                         .arg(newnumber);
-    query.prepare(thequery);
-    query.exec();
-
-    if (query.lastError().type() != QSqlError::None)
-    {
-        QString msg =
-            QString("DB Error (Setting new DB version number): \n"
-                    "Query was: %1 \nError was: %2 \nnew version: %3")
-            .arg(thequery)
-            .arg(MythContext::DBErrorMessage(query.lastError()))
-            .arg(newnumber);
-        VERBOSE(VB_IMPORTANT, msg);
         return false;
     }
 
@@ -318,9 +289,6 @@ bool UpgradeGameDatabaseSchema(void)
         if (!performActualUpdate(updates, "1012", dbver))
             return false;
     }
-
-
-
 
 
     return true;

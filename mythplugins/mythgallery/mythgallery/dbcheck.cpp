@@ -10,14 +10,18 @@ using namespace std;
 
 const QString currentDatabaseVersion = "1000";
 
-static void UpdateDBVersionNumber(const QString &newnumber)
+static bool UpdateDBVersionNumber(const QString &newnumber)
 {
-    MSqlQuery query(MSqlQuery::InitCon());
 
-    query.exec("DELETE FROM settings WHERE value='GalleryDBSchemaVer';");
-    query.exec(QString("INSERT INTO settings (value, data, hostname) "
-                          "VALUES ('GalleryDBSchemaVer', %1, NULL);")
-                         .arg(newnumber));
+    if (!gContext->SaveSettingOnHost("GalleryDBSchemaVer",newnumber,NULL))
+    {
+        VERBOSE(VB_IMPORTANT, QString("DB Error (Setting new DB version number): %1\n")
+                              .arg(newnumber));
+
+        return false;
+    }
+
+    return true;
 }
 
 static void performActualUpdate(const QString updates[], QString version,
