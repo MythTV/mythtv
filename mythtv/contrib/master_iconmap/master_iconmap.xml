@@ -6686,7 +6686,7 @@
     </networktourl>
     <networktourl>
         <network>ABC-WLS</network>
-        <url>[ls-logo]/ww/wls_chicago_ch7.jpg</url>
+        <url>[ls-logo]/tv/ww/wls_chicago_ch7.jpg</url>
     </networktourl>
     <networktourl>
         <network>ABC-WPVI</network>
@@ -6854,7 +6854,7 @@
     </networktourl>
     <networktourl>
         <network>CBS-WBBM</network>
-        <url>[ls-logo]/ww/wbbm_cbs2_chicago.jpg</url>
+        <url>[ls-logo]/tv/ww/wbbm_cbs2_chicago.jpg</url>
     </networktourl>
     <networktourl>
         <network>CBS-WIBW</network>
@@ -6926,7 +6926,7 @@
     </networktourl>
     <networktourl>
         <network>CSNCH</network>
-        <url>[ls-logo]/cc/comcast_sportsnet_baltimore.jpg</url>
+        <url>[ls-logo]/tv/cc/comcast_sportsnet_baltimore.jpg</url>
     </networktourl>
     <networktourl>
         <network>CSPAN</network>
@@ -7066,7 +7066,7 @@
     </networktourl>
     <networktourl>
         <network>EWTN</network>
-        <url>[ls-logo]/ee/ewtn.jpg</url>
+        <url>[ls-logo]/tv/ee/ewtn.jpg</url>
     </networktourl>
     <networktourl>
         <network>Encore</network>
@@ -7142,7 +7142,7 @@
     </networktourl>
     <networktourl>
         <network>FOX-WFLD</network>
-        <url>[ls-logo]/ww/wfld_fox32_chicago.jpg</url>
+        <url>[ls-logo]/tv/ww/wfld_fox32_chicago.jpg</url>
     </networktourl>
     <networktourl>
         <network>FOX-WOFL</network>
@@ -7206,7 +7206,7 @@
     </networktourl>
     <networktourl>
         <network>GALAVISION</network>
-        <url>[ls-logo]/gg/galavision_us.jpg</url>
+        <url>[ls-logo]/tv/gg/galavision_us.jpg</url>
     </networktourl>
     <networktourl>
         <network>GAMESHOWNETWORK</network>
@@ -7310,11 +7310,11 @@
     </networktourl>
     <networktourl>
         <network>IND-WCIU</network>
-        <url>[ls-logo]/ww/wciu_cbs26_chicago.jpg</url>
+        <url>[ls-logo]/tv/ww/wciu_cbs26_chicago.jpg</url>
     </networktourl>
     <networktourl>
         <network>IND-WJYS</network>
-        <url>[ls-logo]/ww/wjys62_chicago.jpg</url>
+        <url>[ls-logo]/tv/ww/wjys62_chicago.jpg</url>
     </networktourl>
     <networktourl>
         <network>IND-WLCB</network>
@@ -7350,7 +7350,7 @@
     </networktourl>
     <networktourl>
         <network>ITV</network>
-        <url>[ls-logo]/tv/kk/kwpx_i33_seattle.jp</url>
+        <url>[ls-logo]/tv/kk/kwpx_i33_seattle.jpg</url>
     </networktourl>
     <networktourl>
         <network>JCTV</network>
@@ -7474,7 +7474,7 @@
     </networktourl>
     <networktourl>
         <network>MYTV-WPWR</network>
-        <url>[ls-logo]/ww/wpwr_my50_chicago.jpg</url>
+        <url>[ls-logo]/tv/ww/wpwr_my50_chicago.jpg</url>
     </networktourl>
     <networktourl>
         <network>MYTV-WRBW</network>
@@ -7542,7 +7542,7 @@
     </networktourl>
     <networktourl>
         <network>NBC-WMAQ</network>
-        <url>[ls-logo]/ww/wmaq_nbc5_chicago.jpg</url>
+        <url>[ls-logo]/tv/ww/wmaq_nbc5_chicago.jpg</url>
     </networktourl>
     <networktourl>
         <network>NEWSENG</network>
@@ -8538,7 +8538,7 @@
     </networktourl>
     <networktourl>
         <network>TELEMUNDO-WSNS</network>
-        <url>[ls-logo]/ww/wsns_telemundo44_chicago.jpg</url>
+        <url>[ls-logo]/tv/ww/wsns_telemundo44_chicago.jpg</url>
     </networktourl>
     <networktourl>
         <network>TELETOON-CA</network>
@@ -8594,7 +8594,7 @@
     </networktourl>
     <networktourl>
         <network>TVGUIDE</network>
-        <url>[ls-logo]/tt/tv_guide_channel.jpg</url>
+        <url>[ls-logo]/tv/tt/tv_guide_channel.jpg</url>
     </networktourl>
     <networktourl>
         <network>TVLAND</network>
@@ -8622,7 +8622,7 @@
     </networktourl>
     <networktourl>
         <network>TeleLatino</network>
-        <url>[ls-logo]/tt/tln_telelatino.jpg</url>
+        <url>[ls-logo]/tv/tt/tln_telelatino.jpg</url>
     </networktourl>
     <networktourl>
         <network>UNIVERSALHD</network>
@@ -8638,7 +8638,7 @@
     </networktourl>
     <networktourl>
         <network>UNIVISION-WGBO</network>
-        <url>[ls-logo]/uu/univision.jpg</url>
+        <url>[ls-logo]/tv/uu/univision.jpg</url>
     </networktourl>
     <networktourl>
         <network>UPN</network>
