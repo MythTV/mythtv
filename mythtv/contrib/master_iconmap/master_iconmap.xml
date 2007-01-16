@@ -417,6 +417,10 @@
         <network>CPAC</network>
     </callsigntonetwork>
     <callsigntonetwork>
+        <callsign>CSNCH</callsign>
+        <network>CSNCH</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
         <callsign>CSPAN</callsign>
         <network>CSPAN</network>
     </callsigntonetwork>
@@ -595,6 +599,10 @@
     <callsigntonetwork>
         <callsign>EWST</callsign>
         <network>Encore_WAM</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>EWTN</callsign>
+        <network>EWTN</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>Expo</callsign>
@@ -971,6 +979,10 @@
     <callsigntonetwork>
         <callsign>G7-07</callsign>
         <network>GOLF</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>GALA</callsign>
+        <network>GALAVISION</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>GLOBO</callsign>
@@ -3753,6 +3765,10 @@
         <network>TLC</network>
     </callsigntonetwork>
     <callsigntonetwork>
+        <callsign>TLN</callsign>
+        <network>TeleLatino</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
         <callsign>TMC</callsign>
         <network>TMC</network>
     </callsigntonetwork>
@@ -3851,6 +3867,10 @@
     <callsigntonetwork>
         <callsign>TVAW</callsign>
         <network>IND-CFTM</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>TVGC</callsign>
+        <network>TVGUIDE</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>TVLAND</callsign>
@@ -4166,7 +4186,7 @@
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>WBBM</callsign>
-        <network>CBS</network>
+        <network>CBS-WBBM</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>WBCC</callsign>
@@ -4411,6 +4431,10 @@
     <callsigntonetwork>
         <callsign>WCHS</callsign>
         <network>ABC</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>WCIU</callsign>
+        <network>IND-WCIU</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>WCIV</callsign>
@@ -4702,7 +4726,7 @@
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>WFLD</callsign>
-        <network>FOX</network>
+        <network>FOX-WFLD</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>WFLI</callsign>
@@ -4823,6 +4847,10 @@
     <callsigntonetwork>
         <callsign>WGBH</callsign>
         <network>PBS-WGBH</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>WGBO</callsign>
+        <network>UNIVISION-WGBO</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>WGBX</callsign>
@@ -5161,6 +5189,10 @@
         <network>ABC</network>
     </callsigntonetwork>
     <callsigntonetwork>
+        <callsign>WJYS</callsign>
+        <network>IND-WJYS</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
         <callsign>WJZY</callsign>
         <network>UPN</network>
     </callsigntonetwork>
@@ -5318,7 +5350,7 @@
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>WLS</callsign>
-        <network>ABC</network>
+        <network>ABC-WLS</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>WLSDT</callsign>
@@ -5358,7 +5390,7 @@
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>WMAQ</callsign>
-        <network>NBC</network>
+        <network>NBC-WMAQ</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>WMAR</callsign>
@@ -5802,7 +5834,7 @@
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>WPWR</callsign>
-        <network>UPN</network>
+        <network>MYTV-WPWR</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>WPXD</callsign>
@@ -5998,7 +6030,7 @@
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>WSNS</callsign>
-        <network>TELEMUNDO</network>
+        <network>TELEMUNDO-WSNS</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>WSOC</callsign>
@@ -6489,6 +6521,10 @@
         <network>PBS-WXEL</network>
     </callsigntonetwork>
     <callsigntonetwork>
+        <callsign>WXFT</callsign>
+        <network>TELEFUTURA</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
         <callsign>WXIA</callsign>
         <network>NBC</network>
     </callsigntonetwork>
@@ -6649,6 +6685,10 @@
         <url>[ls-logo]/tv/ww/wftv.jpg</url>
     </networktourl>
     <networktourl>
+        <network>ABC-WLS</network>
+        <url>[ls-logo]/ww/wls_chicago_ch7.jpg</url>
+    </networktourl>
+    <networktourl>
         <network>ABC-WPVI</network>
         <url>[ls-logo]/tv/ww/wpvi_abc6_philadelphia.jpg</url>
     </networktourl>
@@ -6782,7 +6822,7 @@
     </networktourl>
     <networktourl>
         <network>CBC-CBLFT</network>
-        <url>[ls-logo]/tv/cc/cbc_tv.jpg</url>
+        <url>[ls-logo]/tv/cc/cblt_toronto.gif </url>
     </networktourl>
     <networktourl>
         <network>CBC-CBXFT</network>
@@ -6811,6 +6851,10 @@
     <networktourl>
         <network>CBS-KYW</network>
         <url>[ls-logo]/tv/kk/kyw_cbs3_philadelphia.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>CBS-WBBM</network>
+        <url>[ls-logo]/ww/wbbm_cbs2_chicago.jpg</url>
     </networktourl>
     <networktourl>
         <network>CBS-WIBW</network>
@@ -6879,6 +6923,10 @@
     <networktourl>
         <network>CPAC</network>
         <url>[ls-logo]/tv/cc/cpac.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>CSNCH</network>
+        <url>[ls-logo]/cc/comcast_sportsnet_baltimore.jpg</url>
     </networktourl>
     <networktourl>
         <network>CSPAN</network>
@@ -7017,6 +7065,10 @@
         <url>[zap2it]/etv.jpg</url>
     </networktourl>
     <networktourl>
+        <network>EWTN</network>
+        <url>[ls-logo]/ee/ewtn.jpg</url>
+    </networktourl>
+    <networktourl>
         <network>Encore</network>
         <url>[ls-logo]/tv/ee/encore_us.jpg</url>
     </networktourl>
@@ -7089,6 +7141,10 @@
         <url>[ls-logo]/tv/ww/wdaf_kansascity.jpg</url>
     </networktourl>
     <networktourl>
+        <network>FOX-WFLD</network>
+        <url>[ls-logo]/ww/wfld_fox32_chicago.jpg</url>
+    </networktourl>
+    <networktourl>
         <network>FOX-WOFL</network>
         <url>[ls-logo]/tv/ww/wofl_fox35_orlando.jpg</url>
     </networktourl>
@@ -7147,6 +7203,10 @@
     <networktourl>
         <network>G4</network>
         <url>[ls-icon]/tv/gg/g4_video_game_tv.gif</url>
+    </networktourl>
+    <networktourl>
+        <network>GALAVISION</network>
+        <url>[ls-logo]/gg/galavision_us.jpg</url>
     </networktourl>
     <networktourl>
         <network>GAMESHOWNETWORK</network>
@@ -7247,6 +7307,14 @@
     <networktourl>
         <network>IND-WACX</network>
         <url>[ls-logo]/tv/ww/wacx_tv55_orlando.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>IND-WCIU</network>
+        <url>[ls-logo]/ww/wciu_cbs26_chicago.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>IND-WJYS</network>
+        <url>[ls-logo]/ww/wjys62_chicago.jpg</url>
     </networktourl>
     <networktourl>
         <network>IND-WLCB</network>
@@ -7405,6 +7473,10 @@
         <url>[ls-logo]/tv/ww/wphl_my17_philadelphia.jpg</url>
     </networktourl>
     <networktourl>
+        <network>MYTV-WPWR</network>
+        <url>[ls-logo]/ww/wpwr_my50_chicago.jpg</url>
+    </networktourl>
+    <networktourl>
         <network>MYTV-WRBW</network>
         <url>[ls-logo]/tv/ww/wrbw_my65_orlando.jpg</url>
     </networktourl>
@@ -7467,6 +7539,10 @@
     <networktourl>
         <network>NBC-WESH</network>
         <url>[ls-logo]/tv/ww/wesh_nbc2_daytona_beach.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>NBC-WMAQ</network>
+        <url>[ls-logo]/ww/wmaq_nbc5_chicago.jpg</url>
     </networktourl>
     <networktourl>
         <network>NEWSENG</network>
@@ -8461,6 +8537,10 @@
         <url>[zap2it2]/telemundo.gif</url>
     </networktourl>
     <networktourl>
+        <network>TELEMUNDO-WSNS</network>
+        <url>[ls-logo]/ww/wsns_telemundo44_chicago.jpg</url>
+    </networktourl>
+    <networktourl>
         <network>TELETOON-CA</network>
         <url>[ls-logo]/tv/tt/teletoon_ca.jpg</url>
     </networktourl>
@@ -8513,6 +8593,10 @@
         <url>[ls-logo]/tv/tt/tv5_quebec.jpg</url>
     </networktourl>
     <networktourl>
+        <network>TVGUIDE</network>
+        <url>[ls-logo]/tt/tv_guide_channel.jpg</url>
+    </networktourl>
+    <networktourl>
         <network>TVLAND</network>
         <url>[zap2it]/tvland.jpg</url>
     </networktourl>
@@ -8537,6 +8621,10 @@
         <url>[ls-logo]/tv/tt/tv_senado_br.jpg</url>
     </networktourl>
     <networktourl>
+        <network>TeleLatino</network>
+        <url>[ls-logo]/tt/tln_telelatino.jpg</url>
+    </networktourl>
+    <networktourl>
         <network>UNIVERSALHD</network>
         <url>[ls-logo]/tv/uu/universal_hd.jpg</url>
     </networktourl>
@@ -8547,6 +8635,10 @@
     <networktourl>
         <network>UNIVISION</network>
         <url>[zap2it]/uni.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>UNIVISION-WGBO</network>
+        <url>[ls-logo]/uu/univision.jpg</url>
     </networktourl>
     <networktourl>
         <network>UPN</network>

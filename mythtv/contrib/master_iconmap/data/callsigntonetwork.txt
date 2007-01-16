@@ -102,6 +102,7 @@ COMEDYP     COMEDYCENTRAL
 COURT       COURT
 COURTP      COURT
 CPAC        CPAC
+CSNCH       CSNCH
 CSPAN       CSPAN
 CSPAN2      CSPAN2
 CULTU       CULTURA-BR
@@ -147,6 +148,7 @@ ETV         ETV
 ETVP        ETV
 EWAM        Encore_WAM
 EWST        Encore_WAM
+EWTN	     EWTN
 Expo        ExpoChannel
 F4-01       AMC
 FAM         ABCFAMILY
@@ -241,6 +243,7 @@ G5-23       AE
 G5-24       SHOWTIME
 G7-06       GAMESHOWNETWORK
 G7-07       GOLF
+GALA        GALAVISION
 GLOBO       GLOBO-BR
 GLONE       GLOBO_NEWS-BR
 GNT         GNT-BR
@@ -936,6 +939,7 @@ TFO         IND-TFO
 THMAXP      CINEMAX
 TLC         TLC
 TLCP        TLC
+TLN	     TeleLatino
 TMC         TMC
 TMCP        TMC
 TMCX        TMC
@@ -961,6 +965,7 @@ TV1         TV1au
 TV1+2       TV1au
 TV5         TV5
 TVAW        IND-CFTM
+TVGC        TVGUIDE
 TVLAND      TVLAND
 TVLANDP     TVLAND
 TVONE       TVONE
@@ -1039,7 +1044,7 @@ WBAN        WB
 WBAY        ABC
 WBBH        NBC
 WBBJ        ABC
-WBBM        CBS
+WBBM        CBS-WBBM
 WBCC        PBS-WBCC
 WBCZ        WB
 WBDC        WB
@@ -1101,6 +1106,7 @@ WCFE        PBS-WCFE
 WCFN        UPN
 WCGV        UPN
 WCHS        ABC
+WCIU	     IND-WCIU
 WCIV        ABC
 WCJB        ABC
 WCKD        UPN
@@ -1173,7 +1179,7 @@ WFFF        FOX
 WFFT        FOX
 WFIE        NBC
 WFLA        NBC
-WFLD        FOX
+WFLD        FOX-WFLD
 WFLI        WB
 WFLX        FOX
 WFMJ        NBC
@@ -1204,6 +1210,7 @@ WGAL        NBC
 WGBA        NBC
 WGBC        NBC
 WGBH        PBS-WGBH
+WGBO	     UNIVISION-WGBO
 WGBX        PBS
 WGBY        PBS-WGBY
 WGCL        CBS
@@ -1288,6 +1295,7 @@ WJTC        UPN
 WJW         FOX
 WJWB        WB
 WJXX        ABC
+WJYS	     IND-WJYS
 WJZY        UPN
 WKAR        PBS-WKAR
 WKBD        UPN
@@ -1327,7 +1335,7 @@ WLOV        FOX
 WLOX        ABC
 WLPB        PBS-WLPB
 WLRN        PBS-WLRN
-WLS         ABC
+WLS         ABC-WLS
 WLSDT       ABC
 WLTZ        NBC
 WLUC        NBC
@@ -1337,7 +1345,7 @@ WLVT        PBS-WLVT
 WLWC        WB
 WLWT        NBC
 WLYH        UPN
-WMAQ        NBC
+WMAQ        NBC-WMAQ
 WMAR        ABC
 WMBB        ABC
 WMC         NBC
@@ -1448,7 +1456,7 @@ WPTY        ABC
 WPTZ        NBC
 WPVI        ABC-WPVI
 WPVI-HD     ABC-WPVI
-WPWR        UPN
+WPWR        MYTV-WPWR
 WPXD        ITV
 WPXI        NBC
 WPXN        ITV
@@ -1497,7 +1505,7 @@ WSKG        PBS-WSKG
 WSLS        NBC
 WSMH        FOX
 WSMV        NBC
-WSNS        TELEMUNDO
+WSNS        TELEMUNDO-WSNS
 WSOC        ABC
 WSRE        PBS-WSRE
 WSTM        NBC
@@ -1620,6 +1628,7 @@ WWSB        ABC
 WWTI        ABC
 WWWB        WB
 WXEL        PBS-WXEL
+WXFT	     TELEFUTURA
 WXIA        NBC
 WXII        NBC
 WXIN        FOX

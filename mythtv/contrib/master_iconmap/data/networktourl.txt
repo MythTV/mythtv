@@ -2,6 +2,7 @@ ABC                     [zap2it]/abc.jpg
 ABC-KMBC                [ls-logo]/tv/kk/kmbc_kansascity.jpg
 ABC-KTKA                [ls-logo]/tv/kk/ktka_abc49_topeka.jpg
 ABC-WFTV                [ls-logo]/tv/ww/wftv.jpg
+ABC-WLS                 [ls-logo]/ww/wls_chicago_ch7.jpg
 ABC-WPVI                [ls-logo]/tv/ww/wpvi_abc6_philadelphia.jpg
 ABC2au                  [ls-logo]/tv/aa/abc2_au.jpg
 ABCFAMILY               [zap2it]/fam.jpg
@@ -35,7 +36,7 @@ CANAL_BRASIL-BR         [ls-logo]/tv/cc/canalbrasil.jpg
 CANAL_RURAL-BR          [ls-logo]/tv/cc/canal_rural_brasil.jpg
 CARTOONNETWORK          [zap2it]/toon.gif
 CBC                     [ls-logo]/tv/cc/cbc_tv.jpg
-CBC-CBLFT               [ls-logo]/tv/cc/cbc_tv.jpg
+CBC-CBLFT               [ls-logo]/tv/cc/cblt_toronto.gif 
 CBC-CBXFT               [ls-logo]/tv/cc/cbc_src.jpg
 CBC-CBXT                [ls-logo]/tv/cc/cbc_edmonton.jpg
 CBC-NewsWorld           [ls-logo]/tv/cc/cbc_newsworld.jpg
@@ -43,6 +44,7 @@ CBS                     [zap2it]/cbs.jpg
 CBS-KCTV                [ls-logo]/tv/kk/kctv_tv5_kansas_city.jpg
 CBS-KREM                [ls-logo]/tv/kk/krem_cbs2_spokane.jpg
 CBS-KYW                 [ls-logo]/tv/kk/kyw_cbs3_philadelphia.jpg
+CBS-WBBM                [ls-logo]/ww/wbbm_cbs2_chicago.jpg
 CBS-WIBW                [ls-logo]/tv/ww/wibw_cbs13_topeka.jpg
 CBS-WKMG                [ls-logo]/tv/ww/wkmg_orlando.jpg
 CHURCHCHANNEL           [ls-logo]/tv/cc/church_channel.jpg
@@ -60,6 +62,7 @@ COMEDYCENTRAL           [zap2it]/comedy.jpg
 COMEDYNETWORK           [ls-logo]/tv/cc/comedynetwork.jpg
 COURT                   [zap2it]/court.jpg
 CPAC                    [ls-logo]/tv/cc/cpac.jpg
+CSNCH                   [ls-logo]/cc/comcast_sportsnet_baltimore.jpg
 CSPAN                   [zap2it]/cspan.jpg
 CSPAN2                  [zap2it]/cspan2.jpg
 CTV-CFRN                [ls-logo]/tv/cc/cfrn_edmonton.jpg
@@ -103,6 +106,7 @@ Encore_Love             [ls-logo]/tv/ee/encore_love.jpg
 Encore_Mystery          [ls-logo]/tv/ee/encore_mystery.jpg
 Encore_WAM              [ls-logo]/tv/ee/encore_wam.jpg
 Encore_Westerns         [ls-logo]/tv/ee/encore_westerns.jpg
+EWTN                    [ls-logo]/ee/ewtn.jpg
 ExpoChannel             [ls-logo]/tv/ee/expo_channel.jpg
 FITV                    [zap2it]/thn.gif
 FLIVING                 [ls-icon]/tv/ff/fineliving.gif
@@ -112,6 +116,7 @@ FOOD-CA                 [ls-logo]/tv/ff/foodnetwork_ca.jpg
 FOX                     [zap2it]/fox.jpg
 FOX-KTMJ                [ls-logo]/tv/kk/ktmj_fox43_topeka.jpg
 FOX-WDAF                [ls-logo]/tv/ww/wdaf_kansascity.jpg
+FOX-WFLD                [ls-logo]/ww/wfld_fox32_chicago.jpg
 FOX-WOFL                [ls-logo]/tv/ww/wofl_fox35_orlando.jpg
 FOX-WTXF                [ls-logo]/tv/ww/wtxf_fox29_philadelphia.jpg
 FOXMOVIE                [ls-icon]/tv/ff/fox_moviechannel.gif
@@ -127,6 +132,7 @@ FoxClassicsau           [ls-logo]/tv/ff/foxclassics_au.jpg
 FoxNewsChannel          [ls-logo]/tv/ff/foxnews.jpg
 FoxSportsNetwork        [ls-logo]/tv/ff/fsn.jpg
 G4                      [ls-icon]/tv/gg/g4_video_game_tv.gif
+GALAVISION              [ls-logo]/gg/galavision_us.jpg
 GAMESHOWNETWORK         [zap2it]/gameshownetwork.jpg
 GLOBAL-CHCA             [ls-logo]/tv/cc/chca_red_deer.jpg
 GLOBAL-CITV             [ls-logo]/tv/gg/global_edmonton.jpg
@@ -152,6 +158,8 @@ IFC                     [ls-icon]/tv/ii/ifc_us.gif
 IND-CFTM                [ls-logo]/tv/cc/cftm_montreal.jpg
 IND-TFO                 [ls-logo]/tv/tt/tfo.jpg
 IND-WACX                [ls-logo]/tv/ww/wacx_tv55_orlando.jpg
+IND-WCIU                [ls-logo]/ww/wciu_cbs26_chicago.jpg
+IND-WJYS                [ls-logo]/ww/wjys62_chicago.jpg
 IND-WLCB                [ls-logo]/tv/ww/wlcb_45_leesburg.jpg
 IND-WRDQ                [ls-logo]/tv/ww/wrdq_action27_orlando.jpg
 IND-WSBK                [ls-logo]/tv/ww/wsbk_tv38_boston.jpg
@@ -191,6 +199,7 @@ MUCHMUSIC               [ls-logo]/tv/mm/muchmusic.jpg
 MULTISHOW-BR            [ls-logo]/tv/mm/multishow.jpg
 MUSIQUEPLUS             [ls-logo]/tv/mm/musiqueplus.jpg
 MYTV-WPHL               [ls-logo]/tv/ww/wphl_my17_philadelphia.jpg
+MYTV-WPWR               [ls-logo]/ww/wpwr_my50_chicago.jpg
 MYTV-WRBW               [ls-logo]/tv/ww/wrbw_my65_orlando.jpg
 MYTV-WWOR               [ls-logo]/tv/ww/wwor_my9_secaucus.jpg
 MainEventPPV            [ls-logo]/tv/mm/mainevent_ppv.jpg
@@ -207,6 +216,7 @@ NBC-KSNT                [ls-logo]/tv/kk/ksnt_nbc27_topeka.jpg
 NBC-WCAU                [ls-logo]/tv/ww/wcau_nbc10_philadelphia.jpg
 NBC-WCAU-WEATHERPLUS    [ls-logo]/tv/ww/wcau_weather_plus.jpg
 NBC-WESH                [ls-logo]/tv/ww/wesh_nbc2_daytona_beach.jpg
+NBC-WMAQ                [ls-logo]/ww/wmaq_nbc5_chicago.jpg
 NEWSENG                 [zap2it]/necn.gif
 NFL                     [ls-icon]/tv/nn/nfl.gif
 NWCN                    [ls-icon]/tv/nn/nw_cablenews_can.gif
@@ -454,7 +464,9 @@ TELECINE_EMOTION-BR     [ls-logo]/tv/tt/telecine_emotion.jpg
 TELECINE_PIPOCA-BR      [ls-logo]/tv/tt/telecine_pipoca.jpg
 TELECINE_PREMIUM-BR     [ls-logo]/tv/tt/telecine_premium.jpg
 TELEFUTURA              [ls-logo]/tv/tt/telefutura.jpg
+TeleLatino              [ls-logo]/tt/tln_telelatino.jpg
 TELEMUNDO               [zap2it2]/telemundo.gif
+TELEMUNDO-WSNS          [ls-logo]/ww/wsns_telemundo44_chicago.jpg
 TELETOON-CA             [ls-logo]/tv/tt/teletoon_ca.jpg
 TFC-West                [ls-logo]/tv/ff/family.jpg
 THESCORE                [ls-logo]/tv/tt/the_score.jpg
@@ -468,6 +480,7 @@ TSN                     [ls-logo]/tv/tt/tsn.jpg
 TUBE                    [ls-logo]/tv/tt/the_tube.jpg
 TV1au                   [ls-logo]/tv/tt/tv1_aus.jpg
 TV5                     [ls-logo]/tv/tt/tv5_quebec.jpg
+TVGUIDE                 [ls-logo]/tt/tv_guide_channel.jpg
 TVLAND                  [zap2it]/tvland.jpg
 TVO-CICA                [ls-logo]/tv/cc/cica_tv_ontario.jpg
 TVONE                   [ls-logo]/tv/tt/tv_one_us.jpg
@@ -477,6 +490,7 @@ TV_SENADO-BR            [ls-logo]/tv/tt/tv_senado_br.jpg
 UNIVERSALHD             [ls-logo]/tv/uu/universal_hd.jpg
 UNIVERSAL_CHANNEL       [ls-logo]/tv/uu/universal_channel.jpg
 UNIVISION               [zap2it]/uni.jpg
+UNIVISION-WGBO          [ls-logo]/uu/univision.jpg
 UPN                     [zap2it]/upn.jpg
 UPN-KCWE                [ls-logo]/tv/kk/kcwe_cw29_kansas_city.jpg
 USA                     [zap2it]/usa.jpg
