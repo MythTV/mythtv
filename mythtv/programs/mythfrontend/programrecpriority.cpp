@@ -303,6 +303,11 @@ void ProgramRecPriority::keyPressEvent(QKeyEvent *e)
                 saveRecPriority();
                 customEdit();
             }
+            else if (action == "DELETE")
+            {
+                saveRecPriority();
+                remove();
+            }
             else if (action == "UPCOMING")
             {
                 saveRecPriority();
@@ -580,31 +585,43 @@ void ProgramRecPriority::edit(void)
             }
             else
             {
-                // empty query means this recordid no longer exists
-                // in record so it was deleted
-                // remove it from programData
-                int cnt;
-                QMap<QString, ProgramRecPriorityInfo>::Iterator it;
-                for (cnt = 0, it = programData.begin(); cnt < inList+inData; 
-                     cnt++, ++it);
-                programData.remove(it);
-                SortList();
-                delete curitem;
-                curitem = NULL;
-                dataCount--;
-
-                if (cnt >= dataCount)
-                    cnt = dataCount - 1;
-                if (dataCount <= listsize || cnt <= listsize / 2)
-                    inData = 0;
-                else if (cnt >= dataCount - listsize + listsize / 2)
-                    inData = dataCount - listsize;
-                else
-                    inData = cnt - listsize / 2;
-                inList = cnt - inData;
+                RemoveCurItemFromList();
             }
         else
             MythContext::DBError("Get new recording priority query", query);
+
+        countMatches();
+        update(fullRect);
+    }
+}
+
+void ProgramRecPriority::remove(void)
+{
+    if (!curitem)
+        return;
+
+    QString tempSubTitle = curitem->title;
+    if ((curitem->rectype == kSingleRecord ||
+         curitem->rectype == kOverrideRecord ||
+         curitem->rectype == kDontRecord) &&
+        (curitem->subtitle).stripWhiteSpace().length() > 0)
+        tempSubTitle = tempSubTitle + " - \"" + 
+                       curitem->subtitle + "\"";
+
+    QString message =
+        tr("Delete '%1' Recording Schedule?").arg(curitem->title);
+
+    bool ok = MythPopupBox::showOkCancelPopup(gContext->GetMainWindow(), "",
+                                              message, false);
+
+    if (ok)
+    {
+        ScheduledRecording *record = new ScheduledRecording();
+        record->loadByID(curitem->recordid);
+        record->remove();
+        record->deleteLater();
+
+        RemoveCurItemFromList();
 
         countMatches();
         update(fullRect);
@@ -1197,6 +1214,32 @@ void ProgramRecPriority::SortList()
     }
 }
 
+void ProgramRecPriority::RemoveCurItemFromList(void)
+{
+    // empty query means this recordid no longer exists
+    // in record so it was deleted
+    // remove it from programData
+    int cnt;
+    QMap<QString, ProgramRecPriorityInfo>::Iterator it;
+    for (cnt = 0, it = programData.begin(); cnt < inList+inData; 
+         cnt++, ++it);
+    programData.remove(it);
+    SortList();
+    delete curitem;
+    curitem = NULL;
+    dataCount--;
+
+    if (cnt >= dataCount)
+        cnt = dataCount - 1;
+    if (dataCount <= listsize || cnt <= listsize / 2)
+        inData = 0;
+    else if (cnt >= dataCount - listsize + listsize / 2)
+        inData = dataCount - listsize;
+    else
+        inData = cnt - listsize / 2;
+    inList = cnt - inData;
+}
+
 void ProgramRecPriority::updateList(QPainter *p)
 {
     QRect pr = listRect;
@@ -1476,3 +1519,5 @@ void ProgramRecPriority::updateInfo(QPainter *p)
     tmp.end();
     p->drawPixmap(pr.topLeft(), pix);
 }
+
+/* vim: set expandtab tabstop=4 shiftwidth=4: */

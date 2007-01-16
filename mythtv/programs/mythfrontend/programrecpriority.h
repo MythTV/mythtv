@@ -51,6 +51,7 @@ class ProgramRecPriority : public MythDialog
     void changeRecPriority(int howMuch);
     void saveRecPriority(void);
     void edit();
+    void remove();
     void customEdit();
     void deactivate();
     void upcoming();
@@ -62,6 +63,7 @@ class ProgramRecPriority : public MythDialog
   private:
     void FillList(void);
     void SortList(void);
+    void RemoveCurItemFromList(void);
     QMap<QString, ProgramRecPriorityInfo> programData;
     QMap<int, int> origRecPriorityData;
 
