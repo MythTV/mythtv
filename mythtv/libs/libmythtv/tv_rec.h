@@ -351,6 +351,9 @@ class MPUBLIC TVRec : public QObject
     QWaitCondition triggerEventLoop;
     QWaitCondition triggerEventSleep;
 
+    // Previous recording pointer (do not dereference)
+    ProgramInfo *lastRecording;
+
     // Current recording info
     ProgramInfo *curRecording;
     QDateTime    recordEndTime;

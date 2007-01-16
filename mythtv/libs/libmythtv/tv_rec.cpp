@@ -125,6 +125,8 @@ TVRec::TVRec(int capturecardnum)
       internalState(kState_None), desiredNextState(kState_None),
       changeState(false), pauseNotify(true),
       stateFlags(0), lastTuningRequest(0),
+      // Previous recording info
+      lastRecording(NULL),
       // Current recording info
       curRecording(NULL), autoRunJobs(JOB_NONE),
       // Pending recording info
@@ -1268,11 +1270,6 @@ void TVRec::RunTV(void)
         // Check for the end of the current program..
         if (GetState() == kState_WatchingLiveTV)
         {
-#define LIVETV_END (now >= curRecording->endts)
-// use the following instead to test ringbuffer switching
-//static QDateTime last = QDateTime::currentDateTime(); 
-//#define LIVETV_END ((now >= curRecording->recstartts.addSecs(20)) && (now > last))
-
             QDateTime now   = QDateTime::currentDateTime();
             bool has_finish = HasFlags(kFlagFinishRecording);
             bool has_rec    = pseudoLiveTVRecording;
@@ -1300,19 +1297,26 @@ void TVRec::RunTV(void)
 
                 SetPseudoLiveTVRecording(NULL);
             }
-            else if (!has_rec && !rec_soon && curRecording && LIVETV_END)
+            else if (!has_rec && !rec_soon && curRecording &&
+                     (now >= curRecording->endts))
             {
-                SwitchLiveTVRingBuffer();
+                if (lastRecording != curRecording)
+                {
+                    lastRecording = curRecording;
 
-                QDateTime starttime; starttime.setTime_t(0);
-                if (curRecording)
-                    starttime = curRecording->recstartts;
-                VERBOSE(VB_RECORD, LOC 
-                        <<"!has_rec("<<!has_rec<<") "
-                        <<"!rec_soon("<<!rec_soon<<") "
-                        <<"curRec("<<curRecording<<") "
-                        <<"starttm("<<starttime.toString(Qt::ISODate)<<")");
-//                last = QDateTime::currentDateTime().addSecs(20); 
+                    SwitchLiveTVRingBuffer(false, true);
+
+                    QDateTime starttime; starttime.setTime_t(0);
+                    if (curRecording)
+                        starttime = curRecording->recstartts;
+
+                    VERBOSE(VB_RECORD, LOC 
+                            <<"!has_rec("<<!has_rec<<") "
+                            <<"!rec_soon("<<!rec_soon<<") "
+                            <<"curRec("<<curRecording<<") "
+                            <<"starttm("
+                            <<starttime.toString(Qt::ISODate)<<")");
+                }
             }
             else
                 enable_ui = false;
