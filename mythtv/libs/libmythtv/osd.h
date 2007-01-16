@@ -29,6 +29,7 @@ enum OSDFunctionalType
 struct StatusPosInfo
 {
     QString desc;
+    QString extdesc;
     int position;
     bool progBefore;
     bool progAfter;

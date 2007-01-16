@@ -1756,6 +1756,10 @@ void OSD::ShowStatus(struct StatusPosInfo posInfo,
         if (type)
             type->SetText(posInfo.desc);
 
+        OSDTypeText *exttext = (OSDTypeText *)container->GetType("extendedslidertext");
+        if (exttext)
+            exttext->SetText(posInfo.extdesc);
+
         OSDTypeFillSlider *slider = 
                       (OSDTypeFillSlider *)container->GetType("statusslider");
         if (slider)
@@ -1799,6 +1803,17 @@ void OSD::UpdateStatus(struct StatusPosInfo posInfo)
             if (type->GetText() != posInfo.desc)
             {
                 type->SetText(posInfo.desc);
+                m_setsvisible = true;
+                changed = true;
+            }
+        }
+
+        OSDTypeText *exttext = (OSDTypeText *)container->GetType("extendedslidertext");
+        if (exttext)
+        {
+            if (exttext->GetText() != posInfo.extdesc)
+            {
+                exttext->SetText(posInfo.extdesc);
                 m_setsvisible = true;
                 changed = true;
             }

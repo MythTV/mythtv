@@ -5512,6 +5512,7 @@ int NuppelVideoPlayer::GetSecondsBehind(void) const
 void NuppelVideoPlayer::calcSliderPos(struct StatusPosInfo &posInfo,
                                       bool paddedFields)
 {
+    bool islive = false;
     posInfo.desc = "";
     posInfo.position = 0;
     posInfo.progBefore = false;
@@ -5521,7 +5522,7 @@ void NuppelVideoPlayer::calcSliderPos(struct StatusPosInfo &posInfo,
     {
         long long rPos = ringBuffer->GetReadPosition();
         long long tPos = 1;//ringBuffer->GetTotalReadPosition();
-        
+
         ringBuffer->DVD()->GetDescForPos(posInfo.desc);
 
         if (rPos)
@@ -5531,16 +5532,20 @@ void NuppelVideoPlayer::calcSliderPos(struct StatusPosInfo &posInfo,
     }
 
     int playbackLen = totalLength;
-    
+
     if (livetv && livetvchain)
     {
         posInfo.progBefore = livetvchain->HasPrev();
         posInfo.progAfter = livetvchain->HasNext();
         playbackLen = livetvchain->GetLengthAtCurPos();
+        islive = true;
     }
     else if (watchingrecording && nvr_enc && nvr_enc->IsValidRecorder())
+    {
         playbackLen =
             (int)(((float)nvr_enc->GetFramesWritten() / video_frame_rate));
+        islive = true;
+    }
 
     float secsplayed;
     if (ringBuffer->isDVD())
@@ -5569,11 +5574,17 @@ void NuppelVideoPlayer::calcSliderPos(struct StatusPosInfo &posInfo,
     int smins = (playbackLen - shours * 3600) / 60;
     int ssecs = (playbackLen - shours * 3600 - smins * 60);
 
-    QString text1, text2;
+    int secsbehind = max((playbackLen - (int) secsplayed), 0); 
+    int sbhours = secsbehind / 3600; 
+    int sbmins = (secsbehind - sbhours * 3600) / 60; 
+    int sbsecs = (secsbehind - sbhours * 3600 - sbmins * 60);
+
+    QString text1, text2, text3;
     if (paddedFields)
     {
         text1.sprintf("%02d:%02d:%02d", phours, pmins, psecs);
         text2.sprintf("%02d:%02d:%02d", shours, smins, ssecs);
+        text3.sprintf("%02d:%02d:%02d", sbhours, sbmins, sbsecs);
     }
     else
     {
@@ -5587,9 +5598,31 @@ void NuppelVideoPlayer::calcSliderPos(struct StatusPosInfo &posInfo,
             text1.sprintf("%d:%02d", pmins, psecs);
             text2.sprintf("%d:%02d", smins, ssecs);
         }
+
+        if (sbhours > 0) 
+        {
+            text3.sprintf("%d:%02d:%02d", sbhours, sbmins, sbsecs); 
+        }
+        else if (sbmins > 0) 
+        {
+            text3.sprintf("%d:%02d", sbmins, sbsecs); 
+        }
+        else 
+        {
+            text3.sprintf("%d seconds", sbsecs); 
+        }
     }
 
     posInfo.desc = QObject::tr("%1 of %2").arg(text1).arg(text2);
+
+    if (islive)
+    {
+        posInfo.extdesc = QObject::tr("(%3 behind)").arg(text3); 
+    }
+    else
+    {
+        posInfo.extdesc = QObject::tr("(%3 remaining)").arg(text3); 
+    }
 }
 
 void NuppelVideoPlayer::AutoCommercialSkip(void)
