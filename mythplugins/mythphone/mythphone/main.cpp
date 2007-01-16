@@ -245,7 +245,12 @@ int mythplugin_init(const char *libversion)
     }
 
     gContext->ActivateSettingsCache(false);
-    UpgradePhoneDatabaseSchema();
+    if (!UpgradePhoneDatabaseSchema())
+    {
+        VERBOSE(VB_IMPORTANT,
+                "Couldn't upgrade database to new schema, exiting.");
+        return -1;
+    }
     gContext->ActivateSettingsCache(true);
 
     MythPhoneSettings mpSettings;

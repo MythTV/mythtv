@@ -11,44 +11,65 @@ using namespace std;
 
 const QString currentDatabaseVersion = "1007";
 
-static void UpdateDBVersionNumber(const QString &newnumber)
-{
-    MSqlQuery query(MSqlQuery::InitCon());
+static bool UpdateDBVersionNumber(const QString &newnumber)
+{   
 
-    query.exec("DELETE FROM settings WHERE value='MusicDBSchemaVer';");
-    query.exec(QString("INSERT INTO settings (value, data, hostname) "
-                          "VALUES ('MusicDBSchemaVer', %1, NULL);")
-                         .arg(newnumber));
+    if (!gContext->SaveSettingOnHost("MusicDBSchemaVer",newnumber,NULL))
+    {   
+        VERBOSE(VB_IMPORTANT, QString("DB Error (Setting new DB version number): %1\n")
+                              .arg(newnumber));
+
+        return false;
+    }
+
+    return true;
 }
 
-static void performActualUpdate(const QString updates[], QString version,
+static bool performActualUpdate(const QString updates[], QString version,
                                 QString &dbver)
 {
+    MSqlQuery query(MSqlQuery::InitCon());
+
     VERBOSE(VB_IMPORTANT, QString("Upgrading to MythMusic schema version ") + 
             version);
-
-    MSqlQuery query(MSqlQuery::InitCon());
 
     int counter = 0;
     QString thequery = updates[counter];
 
     while (thequery != "")
     {
-        query.exec(thequery);
+        query.prepare(thequery);
+        query.exec();
+
+        if (query.lastError().type() != QSqlError::None)
+        {
+            QString msg =
+                QString("DB Error (Performing database upgrade): \n"
+                        "Query was: %1 \nError was: %2 \nnew version: %3")
+                .arg(thequery)
+                .arg(MythContext::DBErrorMessage(query.lastError()))
+                .arg(version);
+            VERBOSE(VB_IMPORTANT, msg);
+            return false;
+        }
+
         counter++;
         thequery = updates[counter];
     }
 
-    UpdateDBVersionNumber(version);
+    if (!UpdateDBVersionNumber(version))
+        return false;
+
     dbver = version;
+    return true;
 }
 
-void UpgradeMusicDatabaseSchema(void)
+bool UpgradeMusicDatabaseSchema(void)
 {
     QString dbver = gContext->GetSetting("MusicDBSchemaVer");
     
     if (dbver == currentDatabaseVersion)
-        return;
+        return true;
 
     if (dbver == "")
     {
@@ -81,7 +102,8 @@ void UpgradeMusicDatabaseSchema(void)
 ");",
 ""
 };
-        performActualUpdate(updates, "1000", dbver);
+        if (!performActualUpdate(updates, "1000", dbver))
+            return false;
     }
 
     if (dbver == "1000")
@@ -125,7 +147,8 @@ void UpgradeMusicDatabaseSchema(void)
         const QString updates[] = {
 ""
 };
-        performActualUpdate(updates, "1001", dbver);
+        if (!performActualUpdate(updates, "1001", dbver))
+            return false;
     }
 
     if (dbver == "1001")
@@ -152,8 +175,8 @@ void UpgradeMusicDatabaseSchema(void)
 "ALTER TABLE musicmetadata ADD INDEX (mythdigest);",
 ""
 };
-
-        performActualUpdate(updates, "1002", dbver);
+        if (!performActualUpdate(updates, "1002", dbver))
+            return false;
     }
     
     if (dbver == "1002")
@@ -219,7 +242,8 @@ void UpgradeMusicDatabaseSchema(void)
         const QString updates[] = {
 ""
 };
-        performActualUpdate(updates, "1003", dbver);
+        if (!performActualUpdate(updates, "1003", dbver))
+            return false;
     }
     
     if (dbver == "1003")
@@ -310,7 +334,9 @@ void UpgradeMusicDatabaseSchema(void)
 
 ""
 };
-        performActualUpdate(updates, "1004", dbver);
+
+        if (!performActualUpdate(updates, "1004", dbver))
+            return false;
     }
 
     if (dbver == "1004")
@@ -321,7 +347,8 @@ void UpgradeMusicDatabaseSchema(void)
 ""
 };
 
-        performActualUpdate(updates, "1005", dbver);
+        if (!performActualUpdate(updates, "1005", dbver))
+            return false;
     }
 
 
@@ -436,7 +463,8 @@ void UpgradeMusicDatabaseSchema(void)
 "    AND playlist_name<>'backup_playlist_storage';",
 ""
 };
-        performActualUpdate(updates, "1006", dbver);
+        if (!performActualUpdate(updates, "1006", dbver))
+            return false;
     }
 
     if (dbver == "1006")
@@ -445,13 +473,15 @@ void UpgradeMusicDatabaseSchema(void)
 "ALTER TABLE music_genres MODIFY genre VARCHAR(255) NOT NULL default '';",
 ""
 };
-
-        performActualUpdate(updates, "1007", dbver);
+        if (!performActualUpdate(updates, "1007", dbver))
+            return false;
     }
 
 /* in 0.21 */
 //"DROP TABLE musicmetadata;",
 //"DROP TABLE musicplaylist;",
 
+
+    return true;
 }
 

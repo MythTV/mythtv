@@ -14,44 +14,65 @@
 
 const QString currentDatabaseVersion = "1000";
 
-static void UpdateDBVersionNumber(const QString &newnumber)
+static bool UpdateDBVersionNumber(const QString &newnumber)
 {
-    MSqlQuery query(MSqlQuery::InitCon());
 
-    query.exec("DELETE FROM settings WHERE value='ArchiveDBSchemaVer';");
-    query.exec(QString("INSERT INTO settings (value, data, hostname) "
-                          "VALUES ('ArchiveDBSchemaVer', %1, NULL);")
-                         .arg(newnumber));
+    if (!gContext->SaveSettingOnHost("ArchiveDBSchemaVer",newnumber,NULL)) 
+    {
+        VERBOSE(VB_IMPORTANT, QString("DB Error (Setting new DB version number): %1\n")
+                              .arg(newnumber));
+
+        return false;
+    }
+
+    return true;
 }
 
-static void performActualUpdate(const QString updates[], QString version,
+static bool performActualUpdate(const QString updates[], QString version,
                                 QString &dbver)
 {
+    MSqlQuery query(MSqlQuery::InitCon());
+
     VERBOSE(VB_IMPORTANT, QString("Upgrading to MythArchive schema version ") + 
             version);
-
-    MSqlQuery query(MSqlQuery::InitCon());
 
     int counter = 0;
     QString thequery = updates[counter];
 
     while (thequery != "")
     {
-        query.exec(thequery);
+        query.prepare(thequery);
+        query.exec();
+
+        if (query.lastError().type() != QSqlError::None)
+        {
+            QString msg =
+                QString("DB Error (Performing database upgrade): \n"
+                        "Query was: %1 \nError was: %2 \nnew version: %3")
+                .arg(thequery)
+                .arg(MythContext::DBErrorMessage(query.lastError()))
+                .arg(version);
+            VERBOSE(VB_IMPORTANT, msg);
+            return false;
+        }
+
         counter++;
         thequery = updates[counter];
     }
 
-    UpdateDBVersionNumber(version);
+    if (!UpdateDBVersionNumber(version))
+        return false;
+
     dbver = version;
+    return true;
 }
 
-void UpgradeArchiveDatabaseSchema(void)
+bool UpgradeArchiveDatabaseSchema(void)
 {
     QString dbver = gContext->GetSetting("ArchiveDBSchemaVer");
 
     if (dbver == currentDatabaseVersion)
-        return;
+        return true;
 
     if (dbver == "")
     {
@@ -76,7 +97,10 @@ void UpgradeArchiveDatabaseSchema(void)
 ");",
 ""
 };
-        performActualUpdate(updates, "1000", dbver);
+        if (!performActualUpdate(updates, "1000", dbver))
+            return false;
     }
+
+    return true;
 }
 

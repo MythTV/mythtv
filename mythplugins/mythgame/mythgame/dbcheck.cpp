@@ -64,7 +64,7 @@ static bool performActualUpdate(const QString updates[], QString version,
     dbver = version;
     return true;
 }
-
+ 
 bool InitializeDatabase(void)
 {
     VERBOSE(VB_IMPORTANT, "Inserting MythGame initial database information.");

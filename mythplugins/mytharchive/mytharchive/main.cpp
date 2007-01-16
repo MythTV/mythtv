@@ -487,7 +487,12 @@ int mythplugin_init(const char *libversion)
     }
 
     gContext->ActivateSettingsCache(false);
-    UpgradeArchiveDatabaseSchema();
+    if (!UpgradeArchiveDatabaseSchema())
+    {
+        VERBOSE(VB_IMPORTANT,
+                "Couldn't upgrade database to new schema, exiting.");
+        return -1;
+    }
     gContext->ActivateSettingsCache(false);
 
     ArchiveSettings mpSettings;

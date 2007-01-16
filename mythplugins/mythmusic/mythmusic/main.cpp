@@ -532,15 +532,22 @@ int mythplugin_init(const char *libversion)
         return -1;
 
     gContext->ActivateSettingsCache(false);
-    UpgradeMusicDatabaseSchema();
+    if (!UpgradeMusicDatabaseSchema())
+    {
+        VERBOSE(VB_IMPORTANT,
+                "Couldn't upgrade database to new schema, exiting.");
+        return -1;
+    }
     gContext->ActivateSettingsCache(true);
 
     MusicGeneralSettings general;
     general.load();
     general.save();
+
     MusicPlayerSettings settings;
     settings.load();
     settings.save();
+
     MusicRipperSettings ripper;
     ripper.load();
     ripper.save();

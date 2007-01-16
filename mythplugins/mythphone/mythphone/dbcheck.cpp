@@ -10,17 +10,20 @@ using namespace std;
 
 const QString currentDatabaseVersion = "1001";
 
-static void UpdateDBVersionNumber(const QString &newnumber)
+static bool UpdateDBVersionNumber(const QString &newnumber)
 {
-    MSqlQuery query(MSqlQuery::InitCon());
+    if (!gContext->SaveSettingOnHost("PhoneDBSchemaVer",newnumber,NULL))
+    {
+        VERBOSE(VB_IMPORTANT, QString("DB Error (Setting new DB version number): %1\n")
+                              .arg(newnumber));
 
-    query.exec("DELETE FROM settings WHERE value='PhoneDBSchemaVer';");
-    query.exec(QString("INSERT INTO settings (value, data, hostname) "
-                          "VALUES ('PhoneDBSchemaVer', %1, NULL);")
-                         .arg(newnumber));
+        return false;
+    }
+
+    return true;
 }
 
-static void performActualUpdate(const QString updates[], QString version,
+static bool performActualUpdate(const QString updates[], QString version,
                                 QString &dbver)
 {
     MSqlQuery query(MSqlQuery::InitCon());
@@ -33,21 +36,38 @@ static void performActualUpdate(const QString updates[], QString version,
 
     while (thequery != "")
     {
-        query.exec(thequery);
+        query.prepare(thequery);
+        query.exec();
+
+        if (query.lastError().type() != QSqlError::None)
+        {
+            QString msg =
+                QString("DB Error (Performing database upgrade): \n"
+                        "Query was: %1 \nError was: %2 \nnew version: %3")
+                .arg(thequery)
+                .arg(MythContext::DBErrorMessage(query.lastError()))
+                .arg(version);
+            VERBOSE(VB_IMPORTANT, msg);
+            return false;
+        }
+
         counter++;
         thequery = updates[counter];
     }
 
-    UpdateDBVersionNumber(version);
+    if (!UpdateDBVersionNumber(version))
+        return false;
+
     dbver = version;
+    return true;
 }
 
-void UpgradePhoneDatabaseSchema(void)
+bool UpgradePhoneDatabaseSchema(void)
 {
     QString dbver = gContext->GetSetting("PhoneDBSchemaVer");
     
     if (dbver == currentDatabaseVersion)
-        return;
+        return true;
 
     if (dbver == "")
     {
@@ -75,7 +95,8 @@ void UpgradePhoneDatabaseSchema(void)
 ");",
 ""
 };
-        performActualUpdate(updates, "1000", dbver);
+        if (!performActualUpdate(updates, "1000", dbver))
+            return false;
     }
 
     if (dbver == "1000")
@@ -85,9 +106,10 @@ void UpgradePhoneDatabaseSchema(void)
 ,
 ""
 };
-        performActualUpdate(updates, "1001", dbver);
+        if (!performActualUpdate(updates, "1001", dbver))
+            return false;
     }
 
-
+    return true;
 }
 
