@@ -14,6 +14,7 @@ sub convert($$)
 sub header($)
 {
 	my ($debugdir) = @_;
+	$debugdir = basename(getcwd());
 	return <<EOM;
 <html>
 
@@ -32,7 +33,6 @@ img { margin: 1px; padding: 1px 10px 1px 10px; }
 </head>
 
 <body>
-
 EOM
 }
 
@@ -51,11 +51,14 @@ sub templatefinder()
 		if (-f $file) {
 			if (!@output) {
 				push @output, <<EOM;
+
 <h2>TemplateFinder</h2>
+
 EOM
 			}
 			push @output, <<EOM;
-<img src="$file" title="$file" />
+<img src="$file"
+	title="$file" />
 EOM
 		}
 	}
@@ -99,40 +102,39 @@ sub templatematcher()
 		\%histo;
 	}
 
-	sub gnuplot($$)
+	sub gnuplot_templatematcher($$)
 	{
 		my ($tmfile, $histogram) = @_;
 
-		my $histfile = $tmfile;
-		$histfile =~ s#\.txt$#.histogram#;
-		open(HIST, ">$histfile") or die "open $histfile: $!\n";
+		my $tmplot = $tmfile;
+		$tmplot =~ s#\.txt$#.plot#;
+		open(PLOT, ">$tmplot") or die "open $tmplot: $!\n";
 		foreach my $matchcnt (sort { $a <=> $b } keys %$histogram) {
-			printf HIST "%12.6f %12.6f\n",
+			printf PLOT "%12.6f %12.6f\n",
 				$matchcnt, $histogram->{$matchcnt};
 		}
-		close(HIST) or die "close $histfile: $!\n";
+		close(PLOT) or die "close $tmplot: $!\n";
 
-		my $pngfile = $tmfile;
-		$pngfile =~ s#\.txt$#.png#;
+		my $tmpng = $tmfile;
+		$tmpng =~ s#\.txt$#.png#;
 		open(GNUPLOT, "| gnuplot") or die "open gnuplot: $!\n";
 		print GNUPLOT <<EOM;
 set key off
 set style fill solid 1.0 noborder
-set terminal png transparent small size 400,144
-set output "$pngfile"
+set terminal png transparent small size 640,256
+set output "$tmpng"
 
 set xtics rotate
 set ylabel "Fraction of Frames"
 
 set xlabel "Percentile of Template Edge Pixels Matched"
 set format x
-plot "$histfile" using 1:2 with points pointtype 7 pointsize 0.5
+plot "$tmplot" using 1:2 with points pointtype 7 pointsize 0.5
 EOM
 		close(GNUPLOT) or die "close gnuplot: $!\n";
+		unlink $tmplot;
 
-#		unlink $histfile;
-
-		return $pngfile;
+		return $tmpng;
 	}
 
 	my $tmfile = "";
@@ -145,13 +147,171 @@ EOM
 	}
 	return "" if !$tmfile;
 
-	my $tmgraphic = gnuplot($tmfile, histogram($tmfile));
+	my $tmgraphic = gnuplot_templatematcher($tmfile, histogram($tmfile));
 	my @output;
 	if (-f $tmgraphic) {
 		push @output, <<EOM;
+
 <h2>TemplateMatcher</h2>
-<img src="$tmgraphic" title="$tmgraphic" />
+
+<img src="$tmgraphic"
+	title="$tmgraphic" />
 EOM
+	}
+	@output;
+}
+
+sub histogramanalyzer()
+{
+	sub gnuplot_histogramanalyzer($)
+	{
+		my ($hafile) = @_;
+
+		my $halineno = 0;
+
+		my $blankpng = $hafile;
+		$blankpng =~ s#\.txt$#-blanks.png#;
+		open(GNUPLOT, "| gnuplot") or die "open gnuplot: $!\n";
+		print GNUPLOT <<EOM;
+set key off
+set style fill solid 1.0 noborder
+set terminal png transparent small size 640,256
+set output "$blankpng"
+
+set xtics rotate
+set ylabel "Blank"
+
+set xlabel "Frame Number"
+set format x
+plot "$hafile" using 1 with points pointtype 7 pointsize 0.3
+EOM
+		close(GNUPLOT) or die "close gnuplot: $!\n";
+
+		my $greypng = $hafile;
+		$greypng =~ s#\.txt$#-greylevels.png#;
+		open(GNUPLOT, "| gnuplot") or die "open gnuplot: $!\n";
+		print GNUPLOT <<EOM;
+set key off
+set style fill solid 1.0 noborder
+set terminal png transparent small size 640,256
+set output "$greypng"
+
+set xtics rotate
+set ylabel "Median Grey Level"
+set yrange [0:225]
+
+set xlabel "Frame Number"
+set format x
+plot "$hafile" using 3 with points pointtype 7 pointsize 0.3
+EOM
+		close(GNUPLOT) or die "close gnuplot: $!\n";
+
+		my $columnsplot = $hafile;
+		$columnsplot =~ s#\.txt$#-columns.plot#;
+		open(HAFILE, $hafile) or die "open $hafile: $!\n";
+		open(PLOT, ">$columnsplot") or die "open $columnsplot: $!\n";
+		$halineno = 0;
+		while (<HAFILE>) {
+			my ($min, $width) = (split)[6,4];
+			my $max = $min + $width;
+			my $mid = ($min + $max) / 2;
+			my $delta = $mid - $min;
+			print PLOT "$halineno\t$mid\t$delta\n";
+			$halineno++;
+		}
+		close(PLOT) or die "close $columnsplot: $!\n";
+		close(HAFILE) or die "close $hafile: $!\n";
+
+		my $columnspng = $hafile;
+		$columnspng =~ s#\.txt$#-columns.png#;
+		open(GNUPLOT, "| gnuplot") or die "open gnuplot: $!\n";
+		print GNUPLOT <<EOM;
+set key off
+set style fill solid 1.0 noborder
+set terminal png transparent small size 640,256
+set output "$columnspng"
+
+set xtics rotate
+set ylabel "Border Min/Max Column"
+
+set xlabel "Frame Number"
+set format x
+plot "$columnsplot" with yerrorbars
+EOM
+		close(GNUPLOT) or die "close gnuplot: $!\n";
+		unlink $columnsplot;
+
+		my $rowsplot = $hafile;
+		$rowsplot =~ s#\.txt$#-rows.plot#;
+		open(HAFILE, $hafile) or die "open $hafile: $!\n";
+		open(PLOT, ">$rowsplot") or die "open $rowsplot: $!\n";
+		$halineno = 0;
+		while (<HAFILE>) {
+			my ($min, $width) = (split)[7,5];
+			my $max = $min + $width;
+			my $mid = ($min + $max) / 2;
+			my $delta = $mid - $min;
+			print PLOT "$halineno\t$mid\t$delta\n";
+			$halineno++;
+		}
+		close(PLOT) or die "close $rowsplot: $!\n";
+		close(HAFILE) or die "close $hafile: $!\n";
+
+		my $rowspng = $hafile;
+		$rowspng =~ s#\.txt$#-rows.png#;
+		open(GNUPLOT, "| gnuplot") or die "open gnuplot: $!\n";
+		print GNUPLOT <<EOM;
+set key off
+set style fill solid 1.0 noborder
+set terminal png transparent small size 640,256
+set output "$rowspng"
+
+set xtics rotate
+set ylabel "Border Min/Max Row"
+
+set xlabel "Frame Number"
+set format x
+plot "$rowsplot" with yerrorbars
+EOM
+		close(GNUPLOT) or die "close gnuplot: $!\n";
+		unlink $rowsplot;
+
+		return ($blankpng, $greypng, $columnspng, $rowspng);
+	}
+
+	my $hafile = "";
+	foreach my $testfile qw(HistogramAnalyzer-pgm.txt
+			HistogramAnalyzer-yuv.txt) {
+		if (-f $testfile) {
+			$hafile = $testfile;
+			last;
+		}
+	}
+	return "" if !$hafile;
+
+	my @histographs = gnuplot_histogramanalyzer($hafile);
+	my @output;
+	if (@histographs) {
+		push @output, <<EOM;
+
+<h2>HistogramAnalyzer</h2>
+
+EOM
+		my $first = 1;
+		foreach my $histograph (@histographs) {
+			if (-f $histograph) {
+				if (!$first) {
+					push @output, <<EOM;
+<br />
+EOM
+				}
+				push @output, <<EOM;
+<img src="$histograph"
+	title="$histograph" />
+EOM
+				$first = 0;
+			}
+		}
 	}
 	@output;
 }
@@ -175,6 +335,7 @@ sub analyze($)
 	push @output, header($debugdir);
 	push @output, templatefinder();
 	push @output, templatematcher();
+	push @output, histogramanalyzer();
 	push @output, footer();
 
 	my $output = "index.html";
