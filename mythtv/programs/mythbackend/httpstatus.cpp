@@ -370,31 +370,15 @@ void HttpStatus::PutSetting( HTTPRequest *pRequest )
 
     if (sKey.length() > 0)
     {
-        // -=>TODO: MythContext::SaveSettingOnHost does not handle NULL hostnames.
-        //          This code should be removed when fixed in MythContext.
 
-        if (sHostName.length() == 0)
-        {
+        if ( gContext->SaveSettingOnHost( sKey, sValue, sHostName ) )
+            pRequest->m_response <<  "<Success/>";
+        else
+            pRequest->m_response <<  "<Error>SaveSetting Failed</Error>";
 
-            MSqlQuery query(MSqlQuery::InitCon());
-
-            query.prepare("DELETE FROM settings WHERE value = :KEY "
-                      "AND hostname IS NULL;");
-            query.bindValue(":KEY", sKey);
-
-            if (!query.exec() || !query.isActive())
-                MythContext::DBError("Clear setting", query);
-        }
-
-        // End hack.
-
-        gContext->SaveSettingOnHost( sKey, sValue, sHostName );
-
-        pRequest->m_response <<  "<Success/>";
     }
     else
         pRequest->m_response <<  "<Error>Key Required</Error>";
-
 }
 
 /////////////////////////////////////////////////////////////////////////////

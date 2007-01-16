@@ -316,7 +316,7 @@ class MPUBLIC MythContext : public QObject, public MythObservable,
     void SaveSetting(const QString &key, int newValue);
     void SaveSetting(const QString &key, const QString &newValue);
     QString GetSetting(const QString &key, const QString &defaultval = "");
-    void SaveSettingOnHost(const QString &key, const QString &newValue,
+    bool SaveSettingOnHost(const QString &key, const QString &newValue,
                            const QString &host);
 
     // Convenience setting query methods

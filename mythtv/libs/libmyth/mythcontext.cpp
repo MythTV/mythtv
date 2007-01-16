@@ -1794,41 +1794,51 @@ Settings *MythContext::qtconfig(void)
 
 void MythContext::SaveSetting(const QString &key, int newValue)
 {
-    SaveSettingOnHost(key, QString::number(newValue), d->m_localhostname);
+    (void) SaveSettingOnHost(key, QString::number(newValue), d->m_localhostname);
 }
 
 void MythContext::SaveSetting(const QString &key, const QString &newValue)
 {
-    SaveSettingOnHost(key, newValue, d->m_localhostname);
+    (void) SaveSettingOnHost(key, newValue, d->m_localhostname);
 }
 
-void MythContext::SaveSettingOnHost(const QString &key, const QString &newValue,
+bool MythContext::SaveSettingOnHost(const QString &key, const QString &newValue,
                                     const QString &host)
 {
+    bool success = false;
+
     MSqlQuery query(MSqlQuery::InitCon());
     if (query.isConnected())
     {
-        if (host)
+
+        if ((host) && (host != ""))
             query.prepare("DELETE FROM settings WHERE value = :KEY "
                           "AND hostname = :HOSTNAME ;");
         else
-                        query.prepare("DELETE FROM settings WHERE value = :KEY "
+            query.prepare("DELETE FROM settings WHERE value = :KEY "
                           "AND hostname is NULL;");
 
         query.bindValue(":KEY", key);
         query.bindValue(":HOSTNAME", host);
 
         if (!query.exec() || !query.isActive())
-                MythContext::DBError("Clear setting", query);
+            MythContext::DBError("Clear setting", query);
 
-        query.prepare("INSERT INTO settings ( value, data, hostname ) "
-                      "VALUES ( :VALUE, :DATA, :HOSTNAME );");
+        if ((host) && (host != ""))
+            query.prepare("INSERT INTO settings (value,data,hostname) "
+                          "VALUES ( :VALUE, :DATA, :HOSTNAME );");
+        else
+            query.prepare("INSERT INTO settings (value,data,hostname ) "
+                          "VALUES ( :VALUE, :DATA, NULL );");
+
         query.bindValue(":VALUE", key);
         query.bindValue(":DATA", newValue);
         query.bindValue(":HOSTNAME", host);
 
         if (!query.exec() || !query.isActive())
-                MythContext::DBError("Save new setting on host", query);
+            MythContext::DBError("SaveSettingOnHost query failure: ", query);
+        else
+            success = true;
     }
     else
     {
@@ -1839,6 +1849,8 @@ void MythContext::SaveSettingOnHost(const QString &key, const QString &newValue,
 
     ClearSettingsCache(key, newValue);
     ClearSettingsCache(host + " " + key, newValue);
+
+    return success;
 }
 
 QString MythContext::GetSetting(const QString &key, const QString &defaultval)

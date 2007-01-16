@@ -3313,9 +3313,11 @@ void MainServer::HandleSetSetting(QStringList &tokens,
     QString svalue = tokens[3];
     QStringList retlist;
 
-    gContext->SaveSettingOnHost(setting, svalue, hostname);
+    if (gContext->SaveSettingOnHost(setting, svalue, hostname))
+        retlist << "OK";
+    else
+        retlist << "ERROR";
 
-    retlist << "OK";
     if (pbssock)
         SendResponse(pbssock, retlist);
 
