@@ -59,7 +59,7 @@ static inline void init(
     VideoFrameType _codec, unsigned char *_buf,
     int _width, int _height, int _bpp, int _size,
     const int *p = 0, const int *o = 0) __attribute__ ((unused));
-static void clear(VideoFrame *vf, int fourcc);
+static inline void clear(VideoFrame *vf, int fourcc);
 
 static inline void init(
     VideoFrame *vf,
@@ -130,7 +130,7 @@ static inline void init(
     }
 }
 
-static void clear(VideoFrame *vf, int fourcc)
+static inline void clear(VideoFrame *vf, int fourcc)
 {
     if (!vf)
         return;
