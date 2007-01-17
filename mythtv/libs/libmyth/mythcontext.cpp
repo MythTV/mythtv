@@ -314,7 +314,8 @@ MythContextPrivate::MythContextPrivate(MythContext *lparent)
     else if (prefixDir.path().contains(".app/Contents/MacOS"))
     {
         prefixDir.cd("../Resources");
-        if (QDir(prefixDir.canonicalPath() + "/share").exists())
+        if (QDir(prefixDir.canonicalPath() + "/bin").exists() ||
+            QDir(prefixDir.canonicalPath() + "/share").exists())
             m_installprefix = prefixDir.canonicalPath();
         if (QDir(prefixDir.canonicalPath() + "/lib").exists())
             m_installlibdir = prefixDir.canonicalPath() + "/lib";
