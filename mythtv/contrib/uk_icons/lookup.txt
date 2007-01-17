@@ -81,11 +81,11 @@ Discovery Travel and Living|http://www.lyngsat-logo.com/logo/tv/dd/discovery_tra
 Discovery Wings|http://www.lyngsat-logo.com/logo/tv/dd/discoverywings_euro.jpg
 DiscoveryRTime|http://www.lyngsat-logo.com/logo/tv/dd/discovery_real_time.jpg
 Discovery|http://www.lyngsat-logo.com/logo/tv/dd/discovery.jpg
-Disney Channel +1|http://www.lyngsat-logo.com/logo/tv/dd/disney_channel.jpg
+Disney Channel +1|http://www.lyngsat-logo.com/logo/tv/dd/disney_plus1.jpg
 Disney Channel|http://www.lyngsat-logo.com/logo/tv/dd/disney_channel.jpg
 Disney Cinemagic +1|http://www.lyngsat-logo.com/logo/tv/dd/disney_cinemagic.jpg
 Disney Cinemagic|http://www.lyngsat-logo.com/logo/tv/dd/disney_cinemagic.jpg
-E! Entertainment|http://www.lyngsat-logo.com/logo/tv/ee/e.jpg
+E! Entertainment|http://www.lyngsat-logo.com/logo/tv/ee/e_entertainment_tv.jpg
 E4|http://www.lyngsat-logo.com/logo/tv/ee/e4_uk.jpg
 E4 +1|http://www.lyngsat-logo.com/logo/tv/ee/e4_plus1.jpg
 E4+1|http://www.lyngsat-logo.com/logo/tv/ee/e4_plus1.jpg
@@ -166,7 +166,6 @@ PremPlus|http://www.lyngsat-logo.com/logo/tv/pp/prem_plus.jpg
 Premier Radio|http://www.lyngsat-logo.com/logo/radio/or/premier_christian_radio.jpg
 Pricedrop TV|http://www.lyngsat-logo.com/logo/tv/pp/price_drop_tv.jpg
 QVC|http://www.lyngsat-logo.com/logo/tv/qq/qvc.jpg
-Quiz Call|http://www.lyngsat-logo.com/logo/tv/qq/quiz_call.jpg
 Q|http://www.lyngsat-logo.com/logo/tv/qq/qtv_uk.jpg
 RTE ONE|http://www.lyngsat-logo.com/logo/tv/rr/rte_one.jpg
 RTE TWO|http://www.lyngsat-logo.com/logo/tv/rr/rte_two.jpg
@@ -213,11 +212,11 @@ Sky Travel|http://www.lyngsat-logo.com/logo/tv/ss/sky_travel.jpg
 Sky Two|http://www.lyngsat-logo.com/logo/tv/ss/sky_two.jpg
 Smash Hits!|http://www.lyngsat-logo.com/logo/tv/ss/smashhits_uk.jpg
 Smash Hits|http://www.lyngsat-logo.com/logo/tv/ss/smashhits_uk.jpg
-Sony Entertainment TV Asia |http://www.lyngsat-logo.com/logo/tv/ss/settv_int.jpg
+Sony Entertainment TV Asia |http://www.lyngsat-logo.com/logo/tv/ss/sonytv_international.jpg
 Star News|http://www.lyngsat-logo.com/logo/tv/ss/star_news.jpg
 Star Plus|http://www.lyngsat-logo.com/logo/tv/ss/star_plus.jpg
 Stop and Shop|http://www.lyngsat-logo.com/logo/tv/tt/thane_int.jpg
-TCM|http://www.lyngsat-logo.com/logo/tv/tt/tcm_us.jpg
+TCM|http://www.lyngsat-logo.com/logo/tv/tt/tcm.jpg
 TG4|http://www.lyngsat-logo.com/logo/tv/tt/tg4.jpg
 TMF|http://www.lyngsat-logo.com/logo/tv/tt/tmf.jpg
 TV Polonia|http://www.lyngsat-logo.com/logo/tv/tt/tvp_polonia.jpg
