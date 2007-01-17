@@ -625,6 +625,8 @@ void ProgramRecPriority::remove(void)
 
         countMatches();
         update(fullRect);
+
+        ScheduledRecording::signalChange(0);
     }
 }
 
