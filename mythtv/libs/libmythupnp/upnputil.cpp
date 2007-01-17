@@ -49,7 +49,7 @@ QString LookupUDN( QString sDeviceType )
 
 /////////////////////////////////////////////////////////////////////////////
 
-#ifdef HAVE_GETIFADDRS_N
+#ifdef HAVE_GETIFADDRS
 
 long GetIPAddressList(QStringList &sStrList)
 {
