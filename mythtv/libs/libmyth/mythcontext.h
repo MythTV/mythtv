@@ -279,6 +279,7 @@ class MPUBLIC MythContext : public QObject, public MythObservable,
     bool ParseGeometryOverride(const QString geometry);
 
     QString FindThemeDir(const QString &themename);
+    QString FindMenuThemeDir(const QString &menuname);
     QString GetThemeDir(void);
     QValueList<QString> GetThemeSearchPath(void);
 

@@ -1280,7 +1280,7 @@ void MythContext::LoadQtConfig(void)
     d->m_backgroundimage = NULL;
 
     themename = GetSetting("MenuTheme");
-    d->m_menuthemepathname = FindThemeDir(themename) +"/";
+    d->m_menuthemepathname = FindMenuThemeDir(themename) +"/";
 
     d->bigfontsize    = GetNumSetting("QtFontBig",    25);
     d->mediumfontsize = GetNumSetting("QtFontMedium", 16);
@@ -1682,6 +1682,14 @@ bool MythContext::ParseGeometryOverride(const QString geometry)
     return true;
 }
 
+/** \fn FindThemeDir(const QString &themename)
+ *  \brief Returns the full path to the theme denoted by themename
+ *
+ *   If the theme cannot be found falls back to the G.A.N.T. theme.
+ *   If the G.A.N.T. theme doesn't exist then returns an empty string.
+ *  \param themename The theme name.
+ *  \return Path to theme or empty string.
+ */
 QString MythContext::FindThemeDir(const QString &themename)
 {
     QString testdir = MythContext::GetConfDir() + "/themes/" + themename;
@@ -1694,21 +1702,6 @@ QString MythContext::FindThemeDir(const QString &themename)
     dir.setPath(testdir);
     if (dir.exists())
         return testdir;
-
-    testdir = "../menutest/" + themename;
-    dir.setPath(testdir);
-    if (dir.exists())
-        return testdir;
-
-
-    // Don't complain about the "default" theme being missing
-    if (themename == QObject::tr("Default"))
-    {
-        testdir = GetShareDir();
-        dir.setPath(testdir);
-        if (dir.exists())
-            return testdir;
-    }
 
     testdir = GetThemesParentDir() + "G.A.N.T.";
     dir.setPath(testdir);
@@ -1723,6 +1716,55 @@ QString MythContext::FindThemeDir(const QString &themename)
     VERBOSE(VB_IMPORTANT, QString("Could not find theme: %1").arg(themename));
     return "";
 }
+
+/** \fn FindMenuThemeDir(const QString &menuname)
+ *  \brief Returns the full path to the menu theme denoted by menuname
+ *
+ *   If the theme cannot be found falls back to the default menu.
+ *   If the default menu theme doesn't exist then returns an empty string.
+ *  \param menuname The menutheme name.
+ *  \return Path to theme or empty string.
+ */
+QString MythContext::FindMenuThemeDir(const QString &menuname)
+{
+    QString testdir;
+    QDir dir;
+
+    if (menuname == "default")
+    {
+        testdir = GetShareDir();
+        dir.setPath(testdir);
+        if (dir.exists())
+            return testdir;
+    }
+
+    testdir = MythContext::GetConfDir() + "/themes/" + menuname;
+
+    dir.setPath(testdir);
+    if (dir.exists())
+        return testdir;
+
+    testdir = GetThemesParentDir() + menuname;
+    dir.setPath(testdir);
+    if (dir.exists())
+        return testdir;
+
+    testdir = GetShareDir();
+    dir.setPath(testdir);
+    if (dir.exists())
+    {
+        VERBOSE(VB_IMPORTANT, QString("Could not find theme: %1 - "
+                "Switching to default").arg(menuname));
+        SaveSetting("MenuTheme", "default");
+        return testdir;
+    }
+    else {
+        VERBOSE(VB_IMPORTANT, QString("Could not find menu theme: %1 - Fallback to default failed.").arg(menuname));
+    }
+
+    return "";
+}
+
 QString MythContext::GetMenuThemeDir(void)
 {
     return d->m_menuthemepathname;

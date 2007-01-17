@@ -809,7 +809,7 @@ static HostComboBox *MenuTheme()
     QDir themes(gContext->GetThemesParentDir());
     themes.setFilter(QDir::Dirs);
     themes.setSorting(QDir::Name | QDir::IgnoreCase);
-    gc->addSelection(QObject::tr("Default"));
+    gc->addSelection(QObject::tr("Default"), "default");
     const QFileInfoList *fil = themes.entryInfoList(QDir::Dirs);
     if (!fil)
         return gc;
