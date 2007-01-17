@@ -51,7 +51,7 @@ QString UPnpCDSExtensionResults::GetResultXML()
 //
 /////////////////////////////////////////////////////////////////////////////
 
-UPnpCDS::UPnpCDS() : Eventing( "UPnpCDS", "_CDS_1-0_event" )
+UPnpCDS::UPnpCDS( UPnpDevice *pDevice ) : Eventing( "UPnpCDS", "CDS_Event" )
 {
     m_extensions.setAutoDelete( true );
 
@@ -68,7 +68,17 @@ UPnpCDS::UPnpCDS() : Eventing( "UPnpCDS", "_CDS_1-0_event" )
     AddVariable( new StateVariable< unsigned short >( "SystemUpdateID"    , true ) );
 
     SetValue< unsigned short >( "SystemUpdateID", 1 );
-    
+
+    QString sSharePath    = gContext->GetShareDir();
+    QString sUPnpDescPath = gContext->GetSetting("upnpDescXmlPath", sSharePath);
+
+    m_sServiceDescFileName = sUPnpDescPath + "CDS_scpd.xml";
+    m_sControlUrl          = "/CDS_Control";
+
+
+    // Add our Service Definition to the device.
+
+    RegisterService( pDevice );
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -85,11 +95,12 @@ UPnpCDS::~UPnpCDS()
 
 UPnpCDSMethod UPnpCDS::GetMethod( const QString &sURI )
 {
-    if (sURI == "Browse"                ) return( CDSM_Browse               );              
-    if (sURI == "Search"                ) return( CDSM_Search               );
-    if (sURI == "GetSearchCapabilities" ) return( CDSM_GetSearchCapabilities); 
-    if (sURI == "GetSortCapabilities"   ) return( CDSM_GetSortCapabilities  );  
-    if (sURI == "GetSystemUpdateID"     ) return( CDSM_GetSystemUpdateID    );    
+    if (sURI == "GetServDesc"           ) return CDSM_GetServiceDescription;
+    if (sURI == "Browse"                ) return CDSM_Browse               ;
+    if (sURI == "Search"                ) return CDSM_Search               ;
+    if (sURI == "GetSearchCapabilities" ) return CDSM_GetSearchCapabilities;
+    if (sURI == "GetSortCapabilities"   ) return CDSM_GetSortCapabilities  ;
+    if (sURI == "GetSystemUpdateID"     ) return CDSM_GetSystemUpdateID    ;
 
     return(  CDSM_Unknown );
 }
@@ -137,7 +148,7 @@ bool UPnpCDS::ProcessRequest( HttpWorkerThread *pThread, HTTPRequest *pRequest )
         if (Eventing::ProcessRequest( pThread, pRequest ))
             return true;
 
-        if ( pRequest->m_sBaseUrl != "/_CDS_1-0_control" )
+        if ( pRequest->m_sBaseUrl != m_sControlUrl )
         {
 //            VERBOSE( VB_UPNP, QString("UPnpCDS::ProcessRequest - BaseUrl (%1) not ours...").arg(pRequest->m_sBaseUrl ));
             return false;
@@ -149,11 +160,12 @@ bool UPnpCDS::ProcessRequest( HttpWorkerThread *pThread, HTTPRequest *pRequest )
 
         switch( GetMethod( pRequest->m_sMethod ) )
         {
-            case CDSM_Browse               : HandleBrowse               ( pRequest ); break;
-            case CDSM_Search               : HandleSearch               ( pRequest ); break;
-            case CDSM_GetSearchCapabilities: HandleGetSearchCapabilities( pRequest ); break;
-            case CDSM_GetSortCapabilities  : HandleGetSortCapabilities  ( pRequest ); break;
-            case CDSM_GetSystemUpdateID    : HandleGetSystemUpdateID    ( pRequest ); break;
+            case CDSM_GetServiceDescription : pRequest->FormatFileResponse( m_sServiceDescFileName ); break;
+            case CDSM_Browse                : HandleBrowse                ( pRequest ); break;
+            case CDSM_Search                : HandleSearch                ( pRequest ); break;
+            case CDSM_GetSearchCapabilities : HandleGetSearchCapabilities ( pRequest ); break;
+            case CDSM_GetSortCapabilities   : HandleGetSortCapabilities   ( pRequest ); break;
+            case CDSM_GetSystemUpdateID     : HandleGetSystemUpdateID     ( pRequest ); break;
             default:
                 pRequest->FormatErrorReponse( 401, "Invalid Action" );
                 pRequest->m_nResponseStatus = 401; //501;

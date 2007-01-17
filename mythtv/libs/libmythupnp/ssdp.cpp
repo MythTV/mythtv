@@ -12,6 +12,8 @@
 
 #include "upnptasknotify.h"
 #include "upnptasksearch.h"
+#include "upnptaskcache.h"
+
 #include "mythcontext.h"
 
 #include <unistd.h>
@@ -257,7 +259,32 @@ bool SSDP::ProcessNotify( HTTPRequest  *pRequest )
     QString sUSN     = pRequest->GetHeaderValue( "USN"          , "" );
     QString sCache   = pRequest->GetHeaderValue( "CACHE-CONTROL", "" );
 
-    return true;
+    if (sNTS.contains( "ssdp:alive"))
+    {
+        int nPos = sCache.find( "max-age", 0, false );
+
+        if (nPos < 0)
+            return false;
+
+        if ((nPos = sCache.find( "=", nPos, false )) < 0)
+            return false;
+
+        int nSecs = sCache.mid( nPos+1 ).toInt();
+
+        UPnp::g_SSDPCache.Add( sNT, sUSN, sDescURL, nSecs );
+
+        return true;
+    }
+
+
+    if ( sNTS.contains( "ssdp:byebye" ) )
+    {
+        UPnp::g_SSDPCache.Remove( sNT, sUSN );
+
+        return true;
+    }
+
+    return false;
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -293,10 +320,11 @@ SSDPExtension::~SSDPExtension( )
 
 SSDPMethod SSDPExtension::GetMethod( const QString &sURI )
 {
-    if (sURI == "getDeviceDesc") return( SSDPM_GetDeviceDesc );
-    if (sURI == "getCMGRDesc"  ) return( SSDPM_GetCMGRDesc   );
-    if (sURI == "getCDSDesc"   ) return( SSDPM_GetCDSDesc    );
-    if (sURI == "getMSRRDesc"  ) return( SSDPM_GetMSRRDesc   );
+    if (sURI == "getDeviceDesc"     ) return( SSDPM_GetDeviceDesc    );
+    if (sURI == "getCMGRDesc"       ) return( SSDPM_GetCMGRDesc      );
+    if (sURI == "getCDSDesc"        ) return( SSDPM_GetCDSDesc       );
+    if (sURI == "getMSRRDesc"       ) return( SSDPM_GetMSRRDesc      );
+    if (sURI == "getMythProtoDesc"  ) return( SSDPM_GetMythProtoDesc );
 
     return( SSDPM_Unknown );
 }
@@ -314,10 +342,11 @@ bool SSDPExtension::ProcessRequest( HttpWorkerThread *, HTTPRequest *pRequest )
 
         switch( GetMethod( pRequest->m_sMethod ))
         {
-            case SSDPM_GetDeviceDesc: GetDeviceDesc( pRequest ); return( true );
-            case SSDPM_GetCDSDesc   : GetFile( pRequest, "CDS_scpd.xml" );  return( true );
-            case SSDPM_GetCMGRDesc  : GetFile( pRequest, "CMGR_scpd.xml" ); return( true );
-            case SSDPM_GetMSRRDesc  : GetFile( pRequest, "MSRR_scpd.xml" ); return( true );
+            case SSDPM_GetDeviceDesc    : GetDeviceDesc( pRequest ); return( true );
+            case SSDPM_GetCDSDesc       : GetFile( pRequest, "CDS_scpd.xml"  ); return( true );
+            case SSDPM_GetCMGRDesc      : GetFile( pRequest, "CMGR_scpd.xml" ); return( true );
+            case SSDPM_GetMSRRDesc      : GetFile( pRequest, "MSRR_scpd.xml" ); return( true );
+            case SSDPM_GetMythProtoDesc : GetFile( pRequest, "MXML_scpd.xml" ); return( true );
 
             default: break;
         }

@@ -20,7 +20,8 @@
 #include <qptrlist.h>
 #include <qdict.h>
 
-#include "upnpglobal.h"
+#include "upnpimpl.h"
+#include "upnputil.h"
 #include "httpserver.h"
 #include "mythcontext.h"
         
@@ -257,8 +258,8 @@ typedef QDictIterator< StateVariableBase >  StateVariableIterator;
 
 class Eventing : public HttpServerExtension,
                  public StateVariables,
-                 public IPostProcess
-                 
+                 public IPostProcess,
+                 public UPnpServiceImpl
 {
 
     protected:
@@ -282,6 +283,10 @@ class Eventing : public HttpServerExtension,
 
         void         HandleSubscribe  ( HTTPRequest *pRequest ); 
         void         HandleUnsubscribe( HTTPRequest *pRequest ); 
+
+        // Implement UPnpServiceImpl methods that we can
+
+        virtual QString GetServiceEventURL  () { return m_sEventMethodName; }
 
     public:
                  Eventing      ( const QString &sExtensionName, const QString &sEventMethodName ); 

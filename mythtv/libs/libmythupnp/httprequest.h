@@ -17,6 +17,7 @@
 using namespace std;
 
 #include <qsocket.h>
+#include "upnputil.h"
 #include "bufferedsocketdevice.h"
 
 #define SOAP_ENVELOPE_BEGIN  "<s:Envelope xmlns:s=\"http://schemas.xmlsoap.org/soap/envelope/\" " \
@@ -38,7 +39,8 @@ typedef enum
     RequestTypeMSearch      = 0x0008,
     RequestTypeSubscribe    = 0x0010,
     RequestTypeUnsubscribe  = 0x0020,
-    RequestTypeNotify       = 0x0040
+    RequestTypeNotify       = 0x0040,
+    RequestTypeResponse     = 0x0080
 
 } RequestType;                
 
@@ -70,28 +72,6 @@ typedef struct
     char *pszType;
 
 } MIMETypes;
-
-/////////////////////////////////////////////////////////////////////////////
-
-typedef struct _NameValue
-{   
-    QString sName;
-    QString sValue;
-
-    _NameValue( const QString &name, const QString value ) 
-        : sName( name ), sValue( value ) { }
-
-} NameValue;
-
-class NameValueList : public QPtrList< NameValue > 
-{
-    public:
-
-        NameValueList()
-        {
-            setAutoDelete( true );
-        }       
-};
 
 /////////////////////////////////////////////////////////////////////////////
 
@@ -186,6 +166,7 @@ class HTTPRequest
 
         void            FormatErrorReponse ( long nCode, const QString &sDesc );
         void            FormatActionReponse( NameValueList *pArgs );
+        void            FormatFileResponse ( const QString &sFileName );
 
         long            SendResponse    ( void );
         long            SendResponseFile( QString sFileName );

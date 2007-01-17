@@ -24,8 +24,6 @@
 #include "taskqueue.h"
 #include "httpserver.h"
 #include "ssdp.h"
-#include "upnpcds.h"
-#include "upnpcmgr.h"
 
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
@@ -35,14 +33,11 @@
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
 
-class UPnp : public QObject
+class UPnp
 {
-    Q_OBJECT
 
     protected:
-        
-        UPnpCDS                *m_pUPnpCDS;      // Do not delete (auto deleted)
-        UPnpCMGR               *m_pUPnpCMGR;     // Do not delete (auto deleted)
+
         HttpServer             *m_pHttpServer;
 
     public:
@@ -53,17 +48,17 @@ class UPnp : public QObject
         static TaskQueue       *g_pTaskQueue;
         static SSDP            *g_pSSDP;
         static SSDP            *g_pSSDPBroadcast;
+        static SSDPCache        g_SSDPCache;
 
     public:
-                 UPnp( bool bMaster, HttpServer *pHttpServer );
+                 UPnp( HttpServer *pHttpServer );
         virtual ~UPnp();
 
-        void     CleanUp( void );
+        virtual void Start();
 
-        void     customEvent( QCustomEvent *e );
+        void CleanUp( void );
 
-        void     RegisterExtension  ( UPnpCDSExtension    *pExtension );
-        void     UnregisterExtension( UPnpCDSExtension    *pExtension );
+        UPnpDevice *RootDevice() { return &(g_UPnpDeviceDesc.m_rootDevice); }
 
 };
 

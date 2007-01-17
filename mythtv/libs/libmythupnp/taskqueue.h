@@ -20,7 +20,7 @@
 #include <arpa/inet.h>
 #include <map>
 
-#include "upnpglobal.h"
+#include "upnputil.h"
 #include "refcounted.h"
 
 class Task;

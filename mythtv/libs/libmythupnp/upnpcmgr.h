@@ -18,9 +18,10 @@
 typedef enum 
 {
     CMGRM_Unknown                  = 0,
-    CMGRM_GetProtocolInfo          = 1,
-    CMGRM_GetCurrentConnectionInfo = 2,
-    CMGRM_GetCurrentConnectionIDs  = 3
+    CMGRM_GetServiceDescription    = 1,
+    CMGRM_GetProtocolInfo          = 2,
+    CMGRM_GetCurrentConnectionInfo = 3,
+    CMGRM_GetCurrentConnectionIDs  = 4
 
 } UPnpCMGRMethod;
 
@@ -48,14 +49,26 @@ class UPnpCMGR : public Eventing
 {
     private:
 
+        QString         m_sServiceDescFileName;
+        QString         m_sControlUrl;
+
         UPnpCMGRMethod  GetMethod                     ( const QString &sURI );
 
         void            HandleGetProtocolInfo         ( HTTPRequest *pRequest );
         void            HandleGetCurrentConnectionInfo( HTTPRequest *pRequest );
         void            HandleGetCurrentConnectionIDs ( HTTPRequest *pRequest );
 
+    protected:
+
+        // Implement UPnpServiceImpl methods that we can
+
+        virtual QString GetServiceType      () { return "urn:schemas-upnp-org:service:ConnectionManager:1"; }
+        virtual QString GetServiceId        () { return "urn:upnp-org:serviceId:CMGR_1-0"; }
+        virtual QString GetServiceControlURL() { return m_sControlUrl.mid( 1 ); }
+        virtual QString GetServiceDescURL   () { return m_sControlUrl.mid( 1 ) + "/GetServDesc"; }
+
     public:
-                 UPnpCMGR(); 
+                 UPnpCMGR(  UPnpDevice *pDevice ); 
         virtual ~UPnpCMGR();
 
         virtual bool     ProcessRequest( HttpWorkerThread *pThread, HTTPRequest *pRequest );

@@ -11,9 +11,11 @@
 #ifndef __UPNPDEVICE_H__
 #define __UPNPDEVICE_H__
 
-#include "upnpglobal.h"
+#include "upnputil.h"
 
 #include <qdom.h>
+
+extern const char *myth_source_version;
 
 class UPnpDevice;
 class UPnpService;
@@ -53,7 +55,7 @@ class UPnpService
         QString     m_sServiceId;
         QString     m_sSCPDURL;
         QString     m_sControlURL;
-        QString     m_sEventSubURL;        
+        QString     m_sEventSubURL;
 
         UPnpService() {}        
 };
@@ -76,6 +78,8 @@ class UPnpDevice
         QString         m_sUPC;
         QString         m_sPresentationURL;
 
+        NameValueList   m_lstExtra;
+
         UPnpIconList    m_listIcons;
         UPnpServiceList m_listServices;
         UPnpDeviceList  m_listDevices;
@@ -84,6 +88,9 @@ class UPnpDevice
 
         UPnpDevice()
         {
+            m_sModelNumber  = MYTH_BINARY_VERSION;
+            m_sSerialNumber = myth_source_version;
+
             m_listIcons   .setAutoDelete( true );
             m_listServices.setAutoDelete( true );
             m_listDevices .setAutoDelete( true );
@@ -108,7 +115,6 @@ class UPnpDeviceDesc
 {
     public:
 
-        QString         m_sUPnpDescPath;
         UPnpDevice      m_rootDevice;
 
     protected: 
@@ -117,6 +123,7 @@ class UPnpDeviceDesc
 
         void     ProcessIconList   ( QDomNode oListNode, UPnpDevice *pDevice );
         void     ProcessServiceList( QDomNode oListNode, UPnpDevice *pDevice );
+        void     ProcessDeviceList ( QDomNode oListNode, UPnpDevice *pDevice );
 
         void     OutputDevice( QTextStream &os, 
                                UPnpDevice *pDevice, 
@@ -133,7 +140,7 @@ class UPnpDeviceDesc
                  UPnpDeviceDesc();
         virtual ~UPnpDeviceDesc();
 
-        bool     Load       ();
+        bool     Load       ( const QString &sFileName );
 
         void     GetValidXML( const QString &sBaseAddress, QTextStream &os, const QString &sUserAgent = "" );
         QString  GetValidXML( const QString &sBaseAddress );

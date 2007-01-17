@@ -121,8 +121,16 @@ void TaskQueue::run( )
 
         if ((pTask = GetNextExpiredTask( ttNow )) != NULL)
         {
-            pTask->Execute( this );
-            pTask->Release();
+            try
+            {
+                pTask->Execute( this );
+                pTask->Release();
+            }
+            catch( ... )
+            {
+                cerr << "TaskQueue::run - Call to Execute threw an exception.";
+            }
+
         }
         // Make sure to throttle our processing.
 

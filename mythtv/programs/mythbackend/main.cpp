@@ -35,7 +35,7 @@ using namespace std;
 #include "libmythtv/dbcheck.h"
 #include "libmythtv/jobqueue.h"
 #include "libmythtv/storagegroup.h"
-#include "libmythupnp/upnp.h"
+#include "libmythupnp/mediaserver.h"
 
 #include "upnpcdstv.h"
 #include "upnpcdsmusic.h"
@@ -50,8 +50,8 @@ QString pidfile;
 HouseKeeper *housekeeping = NULL;
 QString logfile = "";
 
-HttpServer *g_pHttpServer = NULL;
-UPnp       *g_pUPnp       = NULL;
+HttpServer  *g_pHttpServer = NULL;
+MediaServer *g_pUPnp       = NULL;
 
 bool setupTVs(bool ismaster, bool &error)
 {
@@ -662,26 +662,31 @@ int main(int argc, char **argv)
     g_pHttpServer->RegisterExtension(new HttpStatus(&tvList, sched, expirer, ismaster ));
 
     // Start UPnP Services For Master Backends Only
-    if (ismaster && noupnp)
+    if (noupnp)
+    {
         cerr << "********* The UPNP service has been DISABLED with the "
                 "--noupnp option *********\n";
-
-    if (ismaster && !noupnp)
+    }
+    else
     {
-        g_pUPnp = new UPnp(ismaster, g_pHttpServer);
+        g_pUPnp = new MediaServer( ismaster, g_pHttpServer );
 
-        VERBOSE(VB_UPNP, "Main::Registering UPnpCDSTv Extension");
+        if (ismaster)
+        {
+            VERBOSE(VB_UPNP, "Main::Registering UPnpCDSTv Extension");
 
-        g_pUPnp->RegisterExtension(new UPnpCDSTv());
+            g_pUPnp->RegisterExtension(new UPnpCDSTv());
 
-        VERBOSE(VB_UPNP, "Main::Registering UPnpCDSMusic Extension");
+            VERBOSE(VB_UPNP, "Main::Registering UPnpCDSMusic Extension");
 
-        g_pUPnp->RegisterExtension(new UPnpCDSMusic());
+            g_pUPnp->RegisterExtension(new UPnpCDSMusic());
 
-        VERBOSE(VB_UPNP, "Main::Registering UPnpCDSVideo Extension");
+            VERBOSE(VB_UPNP, "Main::Registering UPnpCDSVideo Extension");
 
-        g_pUPnp->RegisterExtension(new UPnpCDSVideo());
+            g_pUPnp->RegisterExtension(new UPnpCDSVideo());
+        }
 
+        g_pUPnp->Start();
     }
     // End uPnP &  Mini HttpServer Initialization
 

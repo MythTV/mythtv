@@ -139,6 +139,8 @@ RequestType HTTPRequest::SetRequestType( const QString &sType )
     if (sType == "UNSUBSCRIBE") return( m_eType = RequestTypeUnsubscribe );
     if (sType == "NOTIFY"     ) return( m_eType = RequestTypeNotify      );
 
+    if (sType.startsWith( "HTTP/" )) return( m_eType = RequestTypeResponse );
+
     VERBOSE( VB_UPNP, QString( "HTTPRequest::SentRequestType( %1 ) - returning Unknown." )
                          .arg( sType ) );
 
@@ -476,6 +478,26 @@ void HTTPRequest::FormatActionReponse( NameValueList *pArgs )
 }
 
 /////////////////////////////////////////////////////////////////////////////
+//                  
+/////////////////////////////////////////////////////////////////////////////
+
+void HTTPRequest::FormatFileResponse( const QString &sFileName )
+{
+    m_eResponseType   = ResponseTypeHTML;
+    m_nResponseStatus = 404;
+
+    m_sFileName = sFileName;
+
+    if (QFile::exists( m_sFileName ))
+    {
+
+        m_eResponseType                     = ResponseTypeFile;
+        m_nResponseStatus                   = 200;
+        m_mapRespHeaders[ "Cache-Control" ] = "no-cache=\"Ext\", max-age = 5000";
+    }
+}
+
+/////////////////////////////////////////////////////////////////////////////
 //
 /////////////////////////////////////////////////////////////////////////////
 
@@ -794,40 +816,63 @@ bool HTTPRequest::ParseRequest()
 
 void HTTPRequest::ProcessRequestLine( const QString &sLine )
 {
+
     m_sRawRequest = sLine;
 
+    QString     sToken;
     QStringList tokens = QStringList::split(QRegExp("[ \r\n][ \r\n]*"), sLine );
+    int         nCount = tokens.count();
 
-    for (unsigned int nIdx = 0; nIdx < tokens.count(); nIdx++)
+    // ----------------------------------------------------------------------
+
+    if ( sLine.startsWith( "HTTP/" )) 
+        m_eType = RequestTypeResponse;
+    else
+        m_eType = RequestTypeUnknown;
+
+    // ----------------------------------------------------------------------
+    // if this is actually a response, then sLine's format will be:
+    //      HTTP/m.n <response code> <response text>
+    // otherwise:
+    //      <method> <Resource URI> HTTP/m.n
+    // ----------------------------------------------------------------------
+
+    if (m_eType != RequestTypeResponse)
     {
-        switch( nIdx )
+        // ------------------------------------------------------------------
+        // Process as a request
+        // ------------------------------------------------------------------
+
+        if (nCount > 0)
+            SetRequestType( tokens[0].stripWhiteSpace() );
+
+        if (nCount > 1)
         {
-            case 0: 
-            {
-                SetRequestType( tokens[0].stripWhiteSpace()  ); 
-                break;
-            }
+            m_sBaseUrl = tokens[1].section( '?', 0, 0).stripWhiteSpace();
 
-            case 1: 
-            {
-                m_sBaseUrl = tokens[1].section( '?', 0, 0).stripWhiteSpace();
+            // Process any Query String Parameters
 
-                // Process any Query String Parameters
+            QString sQueryStr = tokens[1].section( '?', 1, 1   );
 
-                QString sQueryStr = tokens[1].section( '?', 1, 1   );
+            if (sQueryStr.length() > 0)
+                GetParameters( sQueryStr, m_mapParams );
 
-                if (sQueryStr.length() > 0)
-                    GetParameters( sQueryStr, m_mapParams );
-
-                break;
-            }
-
-            case 2:
-            {
-                SetRequestProtocol( tokens[2].stripWhiteSpace() );
-                break;
-            }
         }
+
+        if (nCount > 2)
+            SetRequestProtocol( tokens[2].stripWhiteSpace() );
+    }
+    else
+    {
+        // ------------------------------------------------------------------
+        // Process as a Response
+        // ------------------------------------------------------------------
+
+        if (nCount > 0)
+            SetRequestProtocol( tokens[0].stripWhiteSpace() );
+
+        if (nCount > 1)
+            m_nResponseStatus = tokens[1].toInt();
     }
 }
 

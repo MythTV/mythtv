@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Program Name: upnpglobal.h
+// Program Name: upnputil.h
 //                                                                            
 // Purpose - 
 //                                                                            
@@ -8,8 +8,8 @@
 //                                                                            
 //////////////////////////////////////////////////////////////////////////////
 
-#ifndef __UPNPGLOBAL_H__
-#define __UPNPGLOBAL_H__
+#ifndef __UPNPUTIL_H__
+#define __UPNPUTIL_H__
 
 #include "mythcontext.h"
 
@@ -26,6 +26,28 @@ typedef int32_t __suseconds_t;
 
 typedef struct timeval                   TaskTime;
 
+/////////////////////////////////////////////////////////////////////////////
+
+typedef struct _NameValue
+{   
+    QString sName;
+    QString sValue;
+
+    _NameValue( const QString &name, const QString value ) 
+        : sName( name ), sValue( value ) { }
+
+} NameValue;
+
+class NameValueList : public QPtrList< NameValue > 
+{
+    public:
+
+        NameValueList()
+        {
+            setAutoDelete( true );
+        }       
+};
+
 //////////////////////////////////////////////////////////////////////////////
 // Global Function Prototypes
 //////////////////////////////////////////////////////////////////////////////
@@ -37,5 +59,6 @@ bool operator<            ( TaskTime t1, TaskTime t2 );
 bool operator==           ( TaskTime t1, TaskTime t2 );
 
 void AddMicroSecToTaskTime( TaskTime &t, __suseconds_t uSecs );
+void AddSecondsToTaskTime ( TaskTime &t, long nSecs );
 
 #endif

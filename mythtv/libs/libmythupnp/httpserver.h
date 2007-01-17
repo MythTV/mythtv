@@ -26,7 +26,7 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 
-#include "upnpglobal.h"
+#include "upnputil.h"
 #include "httprequest.h"
 #include "threadpool.h"
 #include "refcounted.h"
@@ -76,6 +76,7 @@ class HttpServer : public QServerSocket,
 
     protected:
 
+        QMutex                  m_mutex;
         HttpServerExtensionList m_extensions;
 
         virtual WorkerThread *CreateWorkerThread( ThreadPool *, const QString &sName );

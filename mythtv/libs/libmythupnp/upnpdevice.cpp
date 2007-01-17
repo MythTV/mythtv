@@ -40,19 +40,14 @@ UPnpDeviceDesc::~UPnpDeviceDesc()
 //
 /////////////////////////////////////////////////////////////////////////////
 
-bool UPnpDeviceDesc::Load()
+bool UPnpDeviceDesc::Load( const QString &sFileName )
 {
-    QString sSharePath = gContext->GetShareDir();
-
-    m_sUPnpDescPath  = gContext->GetSetting("upnpDescXmlPath", sSharePath);
-    m_sUPnpDescPath += "upnpavcd.xml";
-
     // ----------------------------------------------------------------------
     // Open Supplied XML uPnp Description file.
     // ----------------------------------------------------------------------
 
     QDomDocument doc ( "upnp" );
-    QFile        file( m_sUPnpDescPath );
+    QFile        file( sFileName );
 
     if ( !file.open( IO_ReadOnly ) )
         return false;
@@ -69,7 +64,7 @@ bool UPnpDeviceDesc::Load()
         VERBOSE(VB_IMPORTANT, QString("UPnpDeviceDesc::Load - "
                                       "Error parsing: %1 "
                                       "at line: %2  column: %3")
-                                .arg( m_sUPnpDescPath )
+                                .arg( sFileName )
                                 .arg( nErrLine )
                                 .arg( nErrCol  ));
 
@@ -115,14 +110,15 @@ void UPnpDeviceDesc::_InternalLoad( QDomNode oNode, UPnpDevice *pCurDevice )
 
             if ( e.tagName() == "iconList"         ) { ProcessIconList   ( oNode, pCurDevice ); continue; }
             if ( e.tagName() == "serviceList"      ) { ProcessServiceList( oNode, pCurDevice ); continue; }
+            if ( e.tagName() == "deviceList"       ) { ProcessDeviceList ( oNode, pCurDevice ); continue; }
 
-            if ( e.tagName() == "device")
-            {
-                UPnpDevice *pDevice = new UPnpDevice();
-                pCurDevice->m_listDevices.append( pDevice );
+            // Not one of the expected element names... add to extra list.
 
-                _InternalLoad( e, pDevice );
-            }
+            QString sValue = "";
+
+            SetStrValue( e, sValue );
+
+            pCurDevice->m_lstExtra.append( new NameValue( e.tagName(), sValue ));
         }
     }
 }
@@ -180,6 +176,29 @@ void UPnpDeviceDesc::ProcessServiceList( QDomNode oListNode, UPnpDevice *pDevice
                 VERBOSE(VB_UPNP,QString("ProcessServiceList adding service : %1 : %2 :")
                                 .arg(pService->m_sServiceType)
                                 .arg(pService->m_sServiceId ));
+            }
+        }
+    }
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
+void UPnpDeviceDesc::ProcessDeviceList( QDomNode oListNode, UPnpDevice *pDevice )
+{
+    for ( QDomNode oNode = oListNode.firstChild(); !oNode.isNull(); oNode = oNode.nextSibling() )
+    {
+        QDomElement e = oNode.toElement();
+
+        if (!e.isNull())
+        {
+            if ( e.tagName() == "device")
+            {
+                UPnpDevice *pNewDevice = new UPnpDevice();
+                pDevice->m_listDevices.append( pNewDevice );
+
+                _InternalLoad( e, pNewDevice );
             }
         }
     }
@@ -266,12 +285,16 @@ void UPnpDeviceDesc::OutputDevice( QTextStream &os,
     os << "<device>";
     os << FormatValue( "deviceType"       , pDevice->m_sDeviceType      );
 
-    QString sFriendlyName = gContext->GetSetting( "upnpFriendlyName", "" );
+    QString sFriendlyName = pDevice->m_sFriendlyName;
 
-    if (sFriendlyName.length() > 0)
-        os << FormatValue( "friendlyName" , sFriendlyName               );
-    else
-        os << FormatValue( "friendlyName" , pDevice->m_sFriendlyName    );
+    // ----------------------------------------------------------------------
+    // Only override the root device
+    // ----------------------------------------------------------------------
+
+    if (pDevice == &m_rootDevice)
+        sFriendlyName = gContext->GetSetting( "upnpFriendlyName", sFriendlyName );
+    
+    os << FormatValue( "friendlyName" , sFriendlyName );
 
     // ----------------------------------------------------------------------
     // XBox 360 needs specific values in the Device Description.
@@ -300,6 +323,19 @@ void UPnpDeviceDesc::OutputDevice( QTextStream &os,
     os << FormatValue( "UDN"              , pDevice->GetUDN()           );
     os << FormatValue( "UPC"              , pDevice->m_sUPC             );
     os << FormatValue( "presentationURL"  , pDevice->m_sPresentationURL );
+
+    for (NameValue *pNV  = pDevice->m_lstExtra.first(); 
+                    pNV != NULL; 
+                    pNV  = pDevice->m_lstExtra.next() )
+    {
+        // -=>TODO: Hack to handle one element with attributes... need to 
+        //          handle attributes in a more generic way.
+
+        if (pNV->sName == "dlna:X_DLNADOC")
+            os << QString( "<dlna:X_DLNADOC xmlns:dlna=\"urn:schemas-dlna-org:device-1-0\">%1</dlna:X_DLNADOC>" ).arg( pNV->sValue);
+        else
+            os << FormatValue( pNV->sName, pNV->sValue );
+    }
 
     // ----------------------------------------------------------------------
     // Output Any Icons.

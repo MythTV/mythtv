@@ -10,7 +10,7 @@
 
 #include "util.h"
 #include "bufferedsocketdevice.h"
-#include "upnpglobal.h"
+#include "upnputil.h"
 
 /////////////////////////////////////////////////////////////////////////////
 //

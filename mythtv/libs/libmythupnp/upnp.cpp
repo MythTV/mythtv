@@ -9,20 +9,9 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include "upnp.h"
+#include "upnptaskcache.h"
 
-#include <quuid.h>
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <sys/ioctl.h>
-#include <net/if.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
 #include <sys/utsname.h> 
-#include <sys/time.h>
-
-#include "upnpcds.h"
-#include "upnpcmgr.h"
-#include "upnpmsrr.h"
 
 //////////////////////////////////////////////////////////////////////////////
 // Global/Class Static variables
@@ -33,6 +22,7 @@ UPnpDeviceDesc   UPnp::g_UPnpDeviceDesc;
 TaskQueue       *UPnp::g_pTaskQueue     = NULL;
 SSDP            *UPnp::g_pSSDP          = NULL;
 SSDP            *UPnp::g_pSSDPBroadcast = NULL;
+SSDPCache        UPnp::g_SSDPCache;
 
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
@@ -46,9 +36,9 @@ SSDP            *UPnp::g_pSSDPBroadcast = NULL;
 //
 //////////////////////////////////////////////////////////////////////////////
 
-UPnp::UPnp( bool /*bIsMaster */, HttpServer *pHttpServer ) 
+UPnp::UPnp( HttpServer *pHttpServer ) 
 {
-    VERBOSE(VB_UPNP, QString("UPnp::UPnp:Begin"));
+    VERBOSE(VB_UPNP, QString("UPnp::Begin"));
 
     if ((m_pHttpServer = pHttpServer) == NULL)
     {
@@ -77,54 +67,39 @@ UPnp::UPnp( bool /*bIsMaster */, HttpServer *pHttpServer )
     // Initialize & Start the global Task Queue Processing Thread
     // ----------------------------------------------------------------------
 
-    VERBOSE(VB_UPNP, QString( "UPnp::UPnp:Starting TaskQueue" ));
+    VERBOSE(VB_UPNP, QString( "UPnp::Starting TaskQueue" ));
 
     g_pTaskQueue = new TaskQueue();
     g_pTaskQueue->start();
 
     // ----------------------------------------------------------------------
-    // Make sure our device Description is loaded.
-    // ----------------------------------------------------------------------
-
-    VERBOSE(VB_UPNP, QString( "UPnp::UPnp:Loading UPnp Description" ));
-
-    g_UPnpDeviceDesc.Load();
-
-    // ----------------------------------------------------------------------
     // Register any HttpServerExtensions
     // ----------------------------------------------------------------------
 
-    m_pHttpServer->RegisterExtension(              new SSDPExtension());
-    m_pHttpServer->RegisterExtension(              new UPnpMSRR     ());
-    m_pHttpServer->RegisterExtension( m_pUPnpCMGR= new UPnpCMGR     ());
-    m_pHttpServer->RegisterExtension( m_pUPnpCDS = new UPnpCDS      ());
+    m_pHttpServer->RegisterExtension( new SSDPExtension());
 
     // ----------------------------------------------------------------------
-    // Start up the SSDP (Upnp Discovery) Thread.
+    // Add Task to keep SSDPCache purged of stale entries.  
     // ----------------------------------------------------------------------
 
-    VERBOSE(VB_UPNP, QString(  "UPnp::UPnp:Starting SSDP Thread (Multicast)" ));
+    UPnp::g_pTaskQueue->AddTask( new SSDPCacheTask() );
+
+    // ----------------------------------------------------------------------
+    // Create the SSDP (Upnp Discovery) Thread.
+    // ----------------------------------------------------------------------
+
+    VERBOSE(VB_UPNP, QString(  "UPnp::Creating SSDP Thread (Multicast)" ));
 
     g_pSSDP = new SSDP( new QMulticastSocket( SSDP_GROUP, SSDP_PORT ) );
-    g_pSSDP->start();
 
     if (bBroadcastSupport)
     {
-        VERBOSE(VB_UPNP, QString(  "UPnp::UPnp:Starting SSDP Thread (Broadcast)" ));
+        VERBOSE(VB_UPNP, QString(  "UPnp::Creating SSDP Thread (Broadcast)" ));
 
         g_pSSDPBroadcast = new SSDP( new QBroadcastSocket( "255.255.255.255", SSDP_PORT ), false );
-        g_pSSDPBroadcast->start();
     }
 
-    // ----------------------------------------------------------------------
-    //
-    // ----------------------------------------------------------------------
-
-    VERBOSE(VB_UPNP, QString( "UPnp::UPnp:Adding Context Listener" ));
-
-    gContext->addListener( this );
-
-    VERBOSE(VB_UPNP, QString( "UPnp::UPnp:End" ));
+    VERBOSE(VB_UPNP, QString( "UPnp::End" ));
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -137,15 +112,30 @@ UPnp::~UPnp()
 }
 
 //////////////////////////////////////////////////////////////////////////////
+// Delay startup of Discovery Threads until all Extensions are registered.
+//////////////////////////////////////////////////////////////////////////////
+
+void UPnp::Start()
+{
+    if (g_pSSDP != NULL)
+    {
+        VERBOSE(VB_UPNP, QString(  "UPnp::UPnp:Starting SSDP Thread (Multicast)" ));
+        g_pSSDP->start();
+    }
+
+    if (g_pSSDPBroadcast != NULL)
+    {
+        VERBOSE(VB_UPNP, QString(  "UPnp::UPnp:Starting SSDP Thread (Broadcast)" ));
+        g_pSSDPBroadcast->start();
+    }
+}
+
+//////////////////////////////////////////////////////////////////////////////
 //
 //////////////////////////////////////////////////////////////////////////////
 
 void UPnp::CleanUp( void )
 {
-
-    // -=>TODO: Need to check to see if calling this more than once is ok.
-
-    gContext->removeListener(this);
 
     if (g_pSSDP)
     {
@@ -177,176 +167,4 @@ void UPnp::CleanUp( void )
     }
 
 } 
-    
-//////////////////////////////////////////////////////////////////////////////
-//
-//////////////////////////////////////////////////////////////////////////////
-
-void UPnp::customEvent( QCustomEvent *e )
-{
-    if (MythEvent::Type(e->type()) == MythEvent::MythEventMessage)
-    {
-        MythEvent *me = (MythEvent *)e;
-        QString message = me->Message();
-
-        //-=>TODO: Need to handle events to notify clients of changes
-    }
-}
-
-//////////////////////////////////////////////////////////////////////////////
-//
-//////////////////////////////////////////////////////////////////////////////
-
-void UPnp::RegisterExtension( UPnpCDSExtension *pExtension )
-{
-    m_pUPnpCDS->RegisterExtension( pExtension );
-}
-
-//////////////////////////////////////////////////////////////////////////////
-//
-//////////////////////////////////////////////////////////////////////////////
-
-void UPnp::UnregisterExtension( UPnpCDSExtension *pExtension )
-{
-    m_pUPnpCDS->UnregisterExtension( pExtension );
-}
-
-//////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////
-//
-// Global Helper Methods... 
-// 
-// -=>TODO: Should these functions go someplace else?
-//
-//////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////
-
-/////////////////////////////////////////////////////////////////////////////
-//
-/////////////////////////////////////////////////////////////////////////////
-
-QString LookupUDN( QString sDeviceType )
-{
-    sDeviceType = "upnp:UDN:" + sDeviceType;
-    
-    QString sUDN = gContext->GetSetting( sDeviceType, "" );
-
-    if ( sUDN.length() == 0) 
-    {
-        sUDN = QUuid::createUuid().toString();
-
-        sUDN = sUDN.mid( 1, sUDN.length() - 2);
-
-        gContext->SaveSetting   ( sDeviceType, sUDN );
-    }
-
-    return( sUDN );
-}
-
-/////////////////////////////////////////////////////////////////////////////
-
-long GetIPAddressList( QStringList &sStrList )
-{
-    sStrList.clear();
-
-    QSocketDevice socket( QSocketDevice::Datagram );
-
-    struct ifreq  ifReqs[ 16 ];
-    struct ifreq  ifReq;
-    struct ifconf ifConf;
-
-    // ----------------------------------------------------------------------
-    // Get Configuration information...
-    // ----------------------------------------------------------------------
-
-    ifConf.ifc_len           = sizeof( struct ifreq ) * sizeof( ifReqs );
-    ifConf.ifc_ifcu.ifcu_req = ifReqs;
-
-    if ( ioctl( socket.socket(), SIOCGIFCONF, &ifConf ) < 0)
-        return( 0 );
-
-    long nCount = ifConf.ifc_len / sizeof( struct ifreq );
-
-    // ----------------------------------------------------------------------
-    // Loop through looking for IP addresses.
-    // ----------------------------------------------------------------------
-
-    for (long nIdx = 0; nIdx < nCount; nIdx++ )
-    {
-        // ------------------------------------------------------------------
-        // Is this an interface we want?
-        // ------------------------------------------------------------------
-
-        strcpy ( ifReq.ifr_name, ifReqs[ nIdx ].ifr_name );
-
-        if (ioctl ( socket.socket(), SIOCGIFFLAGS, &ifReq ) < 0)
-            continue;
-
-        // ------------------------------------------------------------------
-        // Skip loopback and down interfaces
-        // ------------------------------------------------------------------
-
-        if ((ifReq.ifr_flags & IFF_LOOPBACK) || (!(ifReq.ifr_flags & IFF_UP)))
-            continue;
-
-        if ( ifReqs[ nIdx ].ifr_addr.sa_family == AF_INET)
-        {
-            struct sockaddr_in addr;
-
-            // --------------------------------------------------------------
-            // Get a pointer to the address
-            // --------------------------------------------------------------
-
-            memcpy (&addr, &(ifReqs[ nIdx ].ifr_addr), sizeof( ifReqs[ nIdx ].ifr_addr ));
-
-            if (addr.sin_addr.s_addr != htonl( INADDR_LOOPBACK ))
-            {
-                QHostAddress address( htonl( addr.sin_addr.s_addr ));
-
-                sStrList.append( address.toString() ); 
-            }
-        }
-    }
-
-    return( sStrList.count() );
-}
-
-/////////////////////////////////////////////////////////////////////////////
-//           
-/////////////////////////////////////////////////////////////////////////////
-
-bool operator< ( TaskTime t1, TaskTime t2 )
-{
-    if ( (t1.tv_sec  < t2.tv_sec) or 
-        ((t1.tv_sec == t2.tv_sec) && (t1.tv_usec < t2.tv_usec)))
-    {
-        return true;
-    }
-
-    return false;
-}
-
-/////////////////////////////////////////////////////////////////////////////
-//           
-/////////////////////////////////////////////////////////////////////////////
-
-bool operator== ( TaskTime t1, TaskTime t2 )
-{
-    if ((t1.tv_sec == t2.tv_sec) && (t1.tv_usec == t2.tv_usec))
-        return true;
-
-    return false;
-}
-
-/////////////////////////////////////////////////////////////////////////////
-//           
-/////////////////////////////////////////////////////////////////////////////
-
-void AddMicroSecToTaskTime( TaskTime &t, __suseconds_t uSecs )
-{
-    uSecs += t.tv_usec;
-
-    t.tv_sec  += (uSecs / 1000000);
-    t.tv_usec  = (uSecs % 1000000);
-}
 

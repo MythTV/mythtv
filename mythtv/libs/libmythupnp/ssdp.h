@@ -20,6 +20,8 @@
 #include "httpserver.h"
 #include "taskqueue.h"
 
+#include "ssdpcache.h"
+
 #define SSDP_GROUP  "239.255.255.250"
 #define SSDP_PORT   1900
 
@@ -29,7 +31,8 @@ typedef enum
     SSDPM_GetDeviceDesc   = 1,
     SSDPM_GetCDSDesc      = 2,
     SSDPM_GetCMGRDesc     = 3,
-    SSDPM_GetMSRRDesc     = 4
+    SSDPM_GetMSRRDesc     = 4,
+    SSDPM_GetMythProtoDesc= 5
 
 } SSDPMethod;
 

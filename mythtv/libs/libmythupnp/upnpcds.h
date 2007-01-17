@@ -24,11 +24,12 @@ class UPnpCDS;
 typedef enum 
 {
     CDSM_Unknown                = 0,
-    CDSM_Browse                 = 1,
-    CDSM_Search                 = 2,
-    CDSM_GetSearchCapabilities  = 3,
-    CDSM_GetSortCapabilities    = 4,
-    CDSM_GetSystemUpdateID      = 5
+    CDSM_GetServiceDescription  = 1,
+    CDSM_Browse                 = 2,
+    CDSM_Search                 = 3,
+    CDSM_GetSearchCapabilities  = 4,
+    CDSM_GetSortCapabilities    = 5,
+    CDSM_GetSystemUpdateID      = 6
 
 } UPnpCDSMethod;
 
@@ -153,6 +154,9 @@ class UPnpCDS : public Eventing
         UPnpCDSExtensionList   m_extensions;
         CDSObject              m_root;
 
+        QString                m_sServiceDescFileName;
+        QString                m_sControlUrl;
+
     private:
 
         UPnpCDSMethod       GetMethod              ( const QString &sURI  );
@@ -166,8 +170,17 @@ class UPnpCDS : public Eventing
 
         QString        &Encode                     ( QString &sStr );
 
+    protected:
+
+        // Implement UPnpServiceImpl methods that we can
+
+        virtual QString GetServiceType      () { return "urn:schemas-upnp-org:service:ContentDirectory:1"; }
+        virtual QString GetServiceId        () { return "urn:upnp-org:serviceId:CDS_1-0"; }
+        virtual QString GetServiceControlURL() { return m_sControlUrl.mid( 1 ); }
+        virtual QString GetServiceDescURL   () { return m_sControlUrl.mid( 1 ) + "/GetServDesc"; }
+
     public:
-                 UPnpCDS(); 
+                 UPnpCDS( UPnpDevice *pDevice ); 
         virtual ~UPnpCDS();
 
         void     RegisterExtension  ( UPnpCDSExtension *pExtension );

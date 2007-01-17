@@ -19,7 +19,7 @@
 #include <sys/time.h>
 
 #include "httpserver.h"
-#include "upnpglobal.h"
+#include "upnputil.h"
 
 /////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////
@@ -82,7 +82,11 @@ void HttpServer::newConnection(int nSocket)
 void HttpServer::RegisterExtension( HttpServerExtension *pExtension )
 {
     if (pExtension != NULL )
+    {
+        m_mutex.lock();
         m_extensions.append( pExtension );
+        m_mutex.unlock();
+    }
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -92,7 +96,11 @@ void HttpServer::RegisterExtension( HttpServerExtension *pExtension )
 void HttpServer::UnregisterExtension( HttpServerExtension *pExtension )
 {
     if (pExtension != NULL )
+    {
+        m_mutex.lock();
         m_extensions.remove( pExtension );
+        m_mutex.unlock();
+    }
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -102,6 +110,8 @@ void HttpServer::UnregisterExtension( HttpServerExtension *pExtension )
 void HttpServer::DelegateRequest( HttpWorkerThread *pThread, HTTPRequest *pRequest )
 {
     bool bProcessed = false;
+
+    m_mutex.lock();
 
     HttpServerExtension *pExtension = m_extensions.first();
 
@@ -118,6 +128,8 @@ void HttpServer::DelegateRequest( HttpWorkerThread *pThread, HTTPRequest *pReque
 
         pExtension = m_extensions.next();
     }
+
+    m_mutex.unlock();
 
     if (!bProcessed)
     {
@@ -190,9 +202,9 @@ void HttpWorkerThread::StartWork( int nSocket )
 
 void  HttpWorkerThread::ProcessWork()
 {
-    VERBOSE( VB_UPNP, QString( "HttpWorkerThread::ProcessWork:Begin( %1 ) socket=%2" )
-                                    .arg( (long)QThread::currentThread() )
-                                    .arg( m_nSocket ));
+//    VERBOSE( VB_UPNP, QString( "HttpWorkerThread::ProcessWork:Begin( %1 ) socket=%2" )
+//                                    .arg( (long)QThread::currentThread() )
+//                                    .arg( m_nSocket ));
 
     bool                    bTimeout   = false;
     bool                    bKeepAlive = true;
@@ -303,8 +315,8 @@ void  HttpWorkerThread::ProcessWork()
     delete pSocket;
     m_nSocket = 0;
 
-    VERBOSE( VB_UPNP, QString( "HttpWorkerThread::ProcessWork:End( %1 )")
-                                    .arg( (long)QThread::currentThread() ));
+//    VERBOSE( VB_UPNP, QString( "HttpWorkerThread::ProcessWork:End( %1 )")
+//                                    .arg( (long)QThread::currentThread() ));
 }
 
 
