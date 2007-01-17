@@ -595,9 +595,10 @@ class ProgramMapTable : public PSIPTable
     /// Returns the cannonical language if we find the iso639 descriptor
     QString GetLanguage(uint i) const;
 
-    uint FindPIDs(uint type, vector<uint>& pids, QString sistandard) const;
-    uint FindPIDs(uint type, vector<uint>& pids, vector<uint>& types,
-                  QString sistandard) const;
+    uint FindPIDs(uint type, vector<uint> &pids,
+                  const QString &sistandard) const;
+    uint FindPIDs(uint type, vector<uint> &pids, vector<uint> &types,
+                  const QString &sistandard, bool normalize) const;
 
     /// \brief Locates stream index of pid.
     /// \return stream index if successful, -1 otherwise

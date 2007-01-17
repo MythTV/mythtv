@@ -422,12 +422,12 @@ bool MPEGStreamData::CreatePMTSingleProgram(const ProgramMapTable& pmt)
     pmt.Parse();
 
     vector<uint> videoPIDs, audioPIDs;
-    vector<uint> videoTypes, audioTypes;
+    vector<uint> videoTypes;
     vector<uint> pids, types;
 
     // Video
     uint video_cnt = pmt.FindPIDs(StreamID::AnyVideo, videoPIDs,
-                                  videoTypes, _sistandard);
+                                  videoTypes, _sistandard, true);
     if (video_cnt < _pmt_single_program_num_video) 
     {
         VERBOSE(VB_RECORD, "Only "<<video_cnt<<" video streams seen in PMT, "
@@ -449,7 +449,7 @@ bool MPEGStreamData::CreatePMTSingleProgram(const ProgramMapTable& pmt)
     }
 
     // Audio
-    pmt.FindPIDs(StreamID::AnyAudio, audioPIDs, audioTypes, _sistandard);
+    pmt.FindPIDs(StreamID::AnyAudio, audioPIDs, _sistandard);
     if (audioPIDs.size() < _pmt_single_program_num_audio)
     {
         VERBOSE(VB_RECORD, "Only "<<audioPIDs.size()
@@ -473,7 +473,7 @@ bool MPEGStreamData::CreatePMTSingleProgram(const ProgramMapTable& pmt)
     uint programNumber = 1;
 
     // Construct
-    pmt.FindPIDs(StreamID::AnyAudio, pids, types, _sistandard);
+    pmt.FindPIDs(StreamID::AnyAudio, pids, types, _sistandard, true);
     ProgramMapTable *pmt2 = ProgramMapTable::
         Create(programNumber, _pid_pmt_single_program,
                pmt.PCRPID(), pmt.Version(), pids, types);
