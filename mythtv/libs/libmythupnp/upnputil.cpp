@@ -8,6 +8,7 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
+#include "mythconfig.h"
 #include "mythcontext.h"
 #include "upnputil.h"
 
@@ -20,6 +21,9 @@
 #include <arpa/inet.h>
 #include <sys/utsname.h> 
 #include <sys/time.h>
+#ifdef HAVE_GETIFADDRS
+#include <ifaddrs.h>
+#endif
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -44,6 +48,56 @@ QString LookupUDN( QString sDeviceType )
 }
 
 /////////////////////////////////////////////////////////////////////////////
+
+#ifdef HAVE_GETIFADDRS_N
+
+long GetIPAddressList(QStringList &sStrList)
+{
+    struct ifaddrs *list, *ifa;
+
+
+    sStrList.clear();
+
+    if (getifaddrs(&list) == -1)
+    {
+        VERBOSE(VB_UPNP, QString("GetIPAddressList() - getifaddrs failed: ")
+                         + strerror(errno));
+        return 0;
+    }
+
+    for (ifa=list; ifa; ifa=ifa->ifa_next)
+    {
+        if (ifa->ifa_addr->sa_family != AF_INET)
+            continue;
+        if (ifa->ifa_flags & IFF_LOOPBACK)
+            continue;
+        if (!(ifa->ifa_flags & IFF_UP))
+            continue;
+
+
+        char  address[15];
+
+        if (inet_ntop(ifa->ifa_addr->sa_family,
+                      &((struct sockaddr_in *)ifa->ifa_addr)->sin_addr,
+                      address, sizeof(address)) == NULL)
+        {
+            VERBOSE(VB_UPNP, QString("GetIPAddressList() - inet_ntop failed: ")
+                             + strerror(errno));
+            continue;
+        }
+
+        sStrList.append(address);
+        //VERBOSE(VB_UPNP, QString("GetIPAddressList() - Added %1 as %2")
+        //                 .arg(ifa->ifa_name).arg(address));
+    }
+
+    return(sStrList.count());
+}
+
+#else // HAVE_GETIFADDRS
+
+// On some Unixes (e.g. Darwin), this implementation is buggy because
+// struct ifreq is variable size. Luckily, most of them have getifaddrs()
 
 long GetIPAddressList( QStringList &sStrList )
 {
@@ -110,6 +164,8 @@ long GetIPAddressList( QStringList &sStrList )
 
     return( sStrList.count() );
 }
+
+#endif // HAVE_GETIFADDRS
 
 /////////////////////////////////////////////////////////////////////////////
 //           

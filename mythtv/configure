@@ -1982,6 +1982,13 @@ check_ld << EOF && gettimeofday=yes || gettimeofday=no
 int main( void ) { gettimeofday(0, 0); }
 EOF
 
+check_ld <<EOF && getifaddrs=yes || getifaddrs=no
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <ifaddrs.h>
+int main( void ) { struct ifaddrs *p; getifaddrs(&p); }
+EOF
+
 check_func localtime_r && localtime_r=yes || localtime_r=no
 enabled zlib && check_lib zlib.h zlibVersion -lz || zlib="no"
 
@@ -2941,6 +2948,9 @@ if test "$ftime" = "yes" ; then
 fi
 if test "$gettimeofday" = "yes" ; then
   echo "#define HAVE_GETTIMEOFDAY 1" >> $TMPH
+fi
+if test "$getifaddrs" = "yes" ; then
+  echo "#define HAVE_GETIFADDRS 1" >> $TMPH
 fi
 if test "$localtime_r" = "yes" ; then
   echo "#define HAVE_LOCALTIME_R 1" >> $TMPH
