@@ -4,7 +4,12 @@ QMAKE_CLEAN += filethatdoesntexist ; [ -f Makefile.perl ] && make -f Makefile.pe
 
 mythperlbindings.target = Makefile.perl
 mythperlbindings.depends = Makefile.PL
-mythperlbindings.commands = perl Makefile.PL MAKEFILE=Makefile.perl PREFIX=$${PREFIX}
+contains(PREFIX, ^/usr(/local)?/?$) {
+    mythperlbindings.commands = perl Makefile.PL MAKEFILE=Makefile.perl
+}
+else {
+    mythperlbindings.commands = perl Makefile.PL MAKEFILE=Makefile.perl PREFIX=$${PREFIX}
+}
 
 mythperbindingsbuild.target = perl_build
 mythperbindingsbuild.depends = Makefile.perl
