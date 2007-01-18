@@ -200,6 +200,7 @@ class HttpStatus : public HttpServerExtension
         int     PrintScheduled    ( QTextStream &os, QDomElement scheduled );
         int     PrintJobQueue     ( QTextStream &os, QDomElement jobs );
         int     PrintMachineInfo  ( QTextStream &os, QDomElement info );
+        QMutex  tempSettingLock;
 
     public:
                  HttpStatus( QMap<int, EncoderLink *> *tvList, Scheduler *sched, AutoExpire *expirer, bool bIsMaster );

@@ -1533,7 +1533,8 @@ void HttpStatus::FillStatusXML( QDomDocument *pDoc )
         acpiTempFile.close(); 
     }                                                  
 
-#ifdef HAVE_LMSENSORS 
+#ifdef HAVE_LMSENSORS
+    tempSettingLock.lock();
     if (!found_acpi) 
     { 
         int chip_nr, a, b; 
@@ -1567,6 +1568,7 @@ void HttpStatus::FillStatusXML( QDomDocument *pDoc )
         }  
         sensors_cleanup(); 
     } 
+    tempSettingLock.unlock();
 #endif 
 
     // Guide Data ---------------------
