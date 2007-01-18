@@ -1323,7 +1323,7 @@ void TVRec::RunTV(void)
 
             if (enable_ui)
             {
-                VERBOSE(VB_IMPORTANT, LOC + "Enabling Full LiveTV UI.");
+                VERBOSE(VB_RECORD, LOC + "Enabling Full LiveTV UI.");
                 QString message = QString("LIVETV_WATCH %1 0").arg(cardid);
                 MythEvent me(message);
                 gContext->dispatch(me);
