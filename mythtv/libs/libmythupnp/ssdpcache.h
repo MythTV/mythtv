@@ -142,8 +142,8 @@ class SSDPCache
         SSDPCacheEntriesMap::Iterator Begin() { return m_cache.begin(); }
         SSDPCacheEntriesMap::Iterator End  () { return m_cache.end();   }
 
+        int  Count      () { return m_cache.count(); }
         void Clear      ();
-
         void Add        ( const QString &sURI,
                           const QString &sUSN,
                           const QString &sLocation,

@@ -325,6 +325,7 @@ SSDPMethod SSDPExtension::GetMethod( const QString &sURI )
     if (sURI == "getCDSDesc"        ) return( SSDPM_GetCDSDesc       );
     if (sURI == "getMSRRDesc"       ) return( SSDPM_GetMSRRDesc      );
     if (sURI == "getMythProtoDesc"  ) return( SSDPM_GetMythProtoDesc );
+    if (sURI == "getDeviceList"     ) return( SSDPM_GetDeviceList    );
 
     return( SSDPM_Unknown );
 }
@@ -347,6 +348,7 @@ bool SSDPExtension::ProcessRequest( HttpWorkerThread *, HTTPRequest *pRequest )
             case SSDPM_GetCMGRDesc      : GetFile( pRequest, "CMGR_scpd.xml" ); return( true );
             case SSDPM_GetMSRRDesc      : GetFile( pRequest, "MSRR_scpd.xml" ); return( true );
             case SSDPM_GetMythProtoDesc : GetFile( pRequest, "MXML_scpd.xml" ); return( true );
+            case SSDPM_GetDeviceList    : GetDeviceList( pRequest ); return( true );
 
             default: break;
         }
@@ -388,5 +390,78 @@ void SSDPExtension::GetFile( HTTPRequest *pRequest, QString sFileName )
         pRequest->m_nResponseStatus                   = 200;
         pRequest->m_mapRespHeaders[ "Cache-Control" ] = "no-cache=\"Ext\", max-age = 5000";
     }
+
+}
+
+/////////////////////////////////////////////////////////////////////////////
+// Tempory Method to help debug/test the SSDPCache.
+/////////////////////////////////////////////////////////////////////////////
+
+void SSDPExtension::GetDeviceList( HTTPRequest *pRequest )
+{
+    SSDPCache    &cache  = UPnp::g_SSDPCache;
+    int           nCount = 0;
+    NameValueList list;
+
+    cache.Lock();
+
+    QString     sXML;
+    QTextStream os( sXML, IO_WriteOnly );
+
+    for (SSDPCacheEntriesMap::Iterator it  = cache.Begin();
+                                       it != cache.End();
+                                     ++it )
+    {
+        SSDPCacheEntries *pEntries = (SSDPCacheEntries *)it.data();
+
+        if (pEntries != NULL)
+        {
+            os << "<Device uri='" << it.key() << "'>" << endl;
+
+            pEntries->Lock();
+
+            EntryMap *pMap = pEntries->GetEntryMap();
+
+            for (EntryMap::Iterator itEntry  = pMap->begin();
+                                    itEntry != pMap->end();
+                                  ++itEntry )
+            {
+
+                SSDPCacheEntry *pEntry = (SSDPCacheEntry *)itEntry.data();
+
+                if (pEntry != NULL)
+                {
+                    nCount++;
+
+                    pEntry->AddRef();
+
+                    os << "<Service usn='" << pEntry->m_sUSN 
+                       << "' expiresInSecs='" << pEntry->ExpiresInSecs()
+                       << "' url='" << pEntry->m_sLocation << "' />" << endl;
+
+                    pEntry->Release();
+                }
+            }
+
+            os << "</Device>" << endl;
+
+            pEntries->Unlock();
+        }
+    }
+
+    list.append( new NameValue( "DeviceCount"          , QString::number( cache.Count() )));
+    list.append( new NameValue( "DevicesAllocated"     , QString::number( SSDPCacheEntries::g_nAllocated )));
+
+    list.append( new NameValue( "CacheEntriesFound"    , QString::number( nCount )));
+    list.append( new NameValue( "CacheEntriesAllocated", QString::number( SSDPCacheEntry::g_nAllocated )));
+
+    list.append( new NameValue( "DeviceList"           , sXML));
+
+    cache.Unlock();
+
+    pRequest->FormatActionReponse( &list );
+
+    pRequest->m_eResponseType   = ResponseTypeXML;
+    pRequest->m_nResponseStatus = 200;
 
 }

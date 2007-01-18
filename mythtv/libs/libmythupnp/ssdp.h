@@ -32,7 +32,8 @@ typedef enum
     SSDPM_GetCDSDesc      = 2,
     SSDPM_GetCMGRDesc     = 3,
     SSDPM_GetMSRRDesc     = 4,
-    SSDPM_GetMythProtoDesc= 5
+    SSDPM_GetMythProtoDesc= 5,
+    SSDPM_GetDeviceList   = 6
 
 } SSDPMethod;
 
@@ -180,6 +181,7 @@ class SSDPExtension : public HttpServerExtension
 
         void       GetDeviceDesc( HTTPRequest *pRequest );
         void       GetFile      ( HTTPRequest *pRequest, QString sFileName );
+        void       GetDeviceList( HTTPRequest *pRequest );
 
     public:
                  SSDPExtension( );
