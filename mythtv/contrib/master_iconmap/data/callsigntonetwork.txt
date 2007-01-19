@@ -45,7 +45,7 @@ BRAVO       BRAVO
 BRAVOC      BRAVO-CA
 BRAVOP      BRAVO
 BYUTV       BYUTV
-Bloomberg   BloombergTV
+Bloomberg   BLOOM
 C-SPAN      CSPAN
 C3-02       TLC
 C3-07       CSPAN
@@ -70,7 +70,7 @@ CANBR       CANAL_BRASIL-BR
 CANRU       CANAL_RURAL-BR
 CARNE       CARTOONNETWORK
 CBC         CBC
-CBLFT       CBC-CBLFT
+CBLFT       CBC
 CBNEW       CBC-NewsWorld
 CBOT        CBC
 CBUT        CBC
@@ -88,8 +88,8 @@ CKEM        CITYTV-CKEM
 CKWS        CBC
 CLT         CLT
 CMT         CMT
-CMTV        CMTV
-CMTVP       CMTV
+CMTV        CMT
+CMTVP       CMT
 CNBC        CNBC
 CNBCC       CNBC
 CNN         CNN
@@ -202,7 +202,7 @@ Fox8        Fox8
 Fox8+2      Fox8
 FoxClassics FoxClassicsau
 FoxClassics+2 FoxClassicsau
-FoxNews     FoxNewsChannel
+FoxNews     FOXNEWS
 FoxSportsNews FoxSportsNetwork
 G0-04       STARZ
 G0-08       STARZ
@@ -503,7 +503,7 @@ KMBCDT      ABC
 KMBH        PBS-KMBH
 KMCI        NBC-KMCI
 KMEG        UPN
-KMEX        KMEX
+KMEX        UNIVISION
 KMGH        ABC
 KMID        ABC
 KMIR        NBC
@@ -886,10 +886,10 @@ SCIFIP      SCIFI
 SCR         THESCORE
 SHCASEC     SHOWCASE-CA
 SHCASEP     SHOWCASE-CA
-SHOCSE      SHOWTIME3
-SHOCSEP     SHOWTIME3
-SHOTOO      SHOWTIME2
-SHOTOOP     SHOWTIME2
+SHOCSE      SHOWCASE
+SHOCSEP     SHOWCASE
+SHOTOO      SHOWTIMETOO
+SHOTOOP     SHOWTIMETOO
 SHOW        SHOWTIME
 SHOWB       SHOWTIME
 SHOWBP      SHOWTIME
@@ -1210,7 +1210,7 @@ WGAL        NBC
 WGBA        NBC
 WGBC        NBC
 WGBH        PBS-WGBH
-WGBO	     UNIVISION-WGBO
+WGBO        UNIVISION
 WGBX        PBS
 WGBY        PBS-WGBY
 WGCL        CBS
