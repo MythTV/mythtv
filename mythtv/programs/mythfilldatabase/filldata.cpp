@@ -197,7 +197,7 @@ bool FillData::grabDDData(Source source, int poffset,
                                   .arg(tolocaldt.toString()));
     ProgramData::clearDataBySource(source.id, fromlocaldt,tolocaldt);
     VERBOSE(VB_GENERAL, "Data for source cleared.");
-    
+
     VERBOSE(VB_GENERAL, "Updating programs.");
     DataDirectProcessor::DataDirectProgramUpdate();
     VERBOSE(VB_GENERAL, "Program table update complete.");
@@ -286,8 +286,8 @@ bool FillData::grabData(Source source, int offset, QDate *qCurrentDate)
         command += QString(" --days 1 --offset %1").arg(offset);
     }
 
-    VERBOSE(VB_GENERAL,
-            "----------------- Start of XMLTV output -----------------");
+    if (! (print_verbose_messages & VB_XMLTV))
+        command += " --quiet";
 
     QDateTime qdtNow = QDateTime::currentDateTime();
     MSqlQuery query(MSqlQuery::InitCon());
@@ -301,9 +301,15 @@ bool FillData::grabData(Source source, int offset, QDate *qCurrentDate)
                        "WHERE value='mythfilldatabaseLastRunStatus'")
                        .arg(status));
 
+    VERBOSE(VB_GENERAL,
+            "----------------- Start of XMLTV output -----------------");
+
     int systemcall_status = system(command.ascii());
     bool succeeded = WIFEXITED(systemcall_status) &&
          WEXITSTATUS(systemcall_status) == 0;
+
+    VERBOSE(VB_GENERAL,
+            "------------------ End of XMLTV output ------------------");
 
     qdtNow = QDateTime::currentDateTime();
     query.exec(QString("UPDATE settings SET data ='%1' "
@@ -316,17 +322,18 @@ bool FillData::grabData(Source source, int offset, QDate *qCurrentDate)
     {
         status = QString("FAILED:  xmltv returned error code %1.")
                          .arg(systemcall_status);
-
         query.exec(QString("UPDATE settings SET data ='%1' "
                            "WHERE value='mythfilldatabaseLastRunStatus'")
                            .arg(status));
+
+        VERBOSE(VB_GENERAL, status);
+
         if (WIFSIGNALED(systemcall_status) &&
             (WTERMSIG(systemcall_status) == SIGINT || WTERMSIG(systemcall_status) == SIGQUIT))
             interrupted = true;
     }
- 
-    VERBOSE(VB_GENERAL,
-            "------------------ End of XMLTV output ------------------");
+
+    
 
     grabDataFromFile(source.id, filename);
 
