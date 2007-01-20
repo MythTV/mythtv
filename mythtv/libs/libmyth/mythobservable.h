@@ -2,6 +2,7 @@
 #define MYTHOBSERVABLE_H_
 
 #include <qptrlist.h>
+#include <qmutex.h>
 #include "mythexp.h"
 #include "mythevent.h"
 
@@ -36,6 +37,8 @@ class QObject;
     the observers as listeners (ie. addListener), however,
     MythListenable just doesn't sound right, and fixing all the calls
     to addListener was too big a patch.
+    
+    All public methods in MythObservable are reentrant.
 */
 class MPUBLIC MythObservable
 {
@@ -61,57 +64,6 @@ class MPUBLIC MythObservable
     */
     void removeListener(QObject *listener);
 
-    /** \brief Begin iteration across listeners
-
-        If you simply need to iterate across the listeners, use \p
-        firstListener and \p nextListener to iterate across the
-        listeners. Ie. instead of 
-
-        \code
-        {
-            QPtrList<QObject> listeners = getListeners();
-            QObject *listener = listeners.first();
-            while (listener) {
-                // use listener...
-                listener = listeners.next();
-            }
-        }
-        \endcode
-
-        you can avoid the copy and just do
-
-        \code
-        {
-            QObject *listener = firstListener();
-            while (listener) {
-                // use listener...
-                listener = nextListener();
-            }
-        } 
-        \endcode
-
-        \returns pointer to the first listener, NULL if there are no listeners
-    */
-    QObject* firstListener();
-
-    /** \brief Continue iteration to the next listener
-
-        See firstListener. Returns NULL if there are no more listeners.
-
-        \returns pointer to the next listener, NULL if there are no more listeners
-    */
-    QObject* nextListener();
-
-    /** \brief Get a copy of the list of listener
-
-        If you need access to more than just iteration via
-        firstListener/nextListerner, you can call this to obtain a
-        QPtrList with all the listeners.
-
-        \returns a copy of the list of listener
-    */
-    QPtrList<QObject> getListeners(void);
-
     /** \brief Dispatch an event to all listeners 
                        
         Makes a copy of the event on the heap by calling
@@ -134,7 +86,9 @@ class MPUBLIC MythObservable
     void dispatchNow(MythEvent &event);
 
   private:
+
     QPtrList<QObject> m_listeners;
+    QMutex mutex;
 };
 
 #endif /* MYTHOBSERVABLE_H */

@@ -12,48 +12,37 @@ MythObservable::~MythObservable()
 
 void MythObservable::addListener(QObject *listener)
 {
+    QMutexLocker locked (&mutex);
     if (m_listeners.find(listener) == -1)
         m_listeners.append(listener);
 }
 
 void MythObservable::removeListener(QObject *listener)
 {
+    QMutexLocker locked (&mutex);
     if (m_listeners.find(listener) != -1)
         m_listeners.remove(listener);
 }
 
-QObject* MythObservable::firstListener()
-{
-    return m_listeners.first();
-}
-
-QObject* MythObservable::nextListener()
-{
-    return m_listeners.next();
-}
-
-QPtrList<QObject> MythObservable::getListeners()
-{
-    return m_listeners;
-}
-
 void MythObservable::dispatch(MythEvent &event)
 {
-    QObject *listener = firstListener();
+    QMutexLocker locked (&mutex);
+    QObject *listener = m_listeners.first();
     while (listener)
     {
         QApplication::postEvent(listener, event.clone());
-        listener = nextListener();
+        listener = m_listeners.next();
     }
 }
 
 void MythObservable::dispatchNow(MythEvent &event)
 {
-    QObject *listener = firstListener();
+    QMutexLocker locked (&mutex);
+    QObject *listener = m_listeners.first();
     while (listener)
     {
         QApplication::sendEvent(listener, event.clone());
-        listener = nextListener();
+        listener = m_listeners.next();
     }
 }
 
