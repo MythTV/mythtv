@@ -598,6 +598,8 @@ static void init_fixup(QMap<uint64_t,uint> &fix)
 
     // DVB-T Berlin Germany
     fix[   769LL << 32 |  8468U << 16] = EITFixUp::kEFixForceISO8859_15;
+    // DVB-T Hamburg Germany
+    fix[  3074LL << 32 |  8468U << 16] = EITFixUp::kEFixForceISO8859_15;
     // DVB-T Bremen Germany
     fix[  3075LL << 32 |  8468U << 16] = EITFixUp::kEFixForceISO8859_15;
     // DVB-T Hessen Germany
