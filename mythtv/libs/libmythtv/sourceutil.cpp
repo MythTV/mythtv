@@ -148,7 +148,7 @@ bool SourceUtil::IsEncoder(uint sourceid)
 
 bool SourceUtil::IsUnscanable(uint sourceid)
 {
-    bool unscanable = false;
+    bool unscanable = true;
     QStringList types = get_cardtypes(sourceid);
     QStringList::const_iterator it = types.begin();
     for (; it != types.end(); ++it)
