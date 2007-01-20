@@ -415,8 +415,8 @@ int shutdown()
             QString nvramCommand = gContext->GetSetting("MythShutdownNvramCmd",
                      "/usr/bin/nvram-wakeup --settime $time");
 
-            QString wakeup_timeformat = gContext->GetSetting("WakeupTimeFormat");
-        
+            QString wakeup_timeformat = gContext->GetSetting("MythShutdownWakeupTimeFmt", "time_t");
+
             if (wakeup_timeformat == "time_t")
             {
                 QString time_ts;
@@ -424,7 +424,6 @@ int shutdown()
             }
             else
                 nvramCommand.replace("$time", dtWakeupTime.toString(wakeup_timeformat));
-            
 
             VERBOSE(VB_IMPORTANT, QString("sending command to set time in bios\n\t\t\t%1")
                             .arg(nvramCommand));

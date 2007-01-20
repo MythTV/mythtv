@@ -122,7 +122,7 @@ static HostLineEdit *MythShutdownNvramCmd()
 
 static HostComboBox *WakeupTimeFormat()
 {
-    HostComboBox *gc = new HostComboBox("WakeupTimeFormat", true);
+    HostComboBox *gc = new HostComboBox("MythShutdownWakeupTimeFmt", true);
     gc->setLabel(QObject::tr("Wakeup time format"));
     gc->addSelection("time_t");
     gc->addSelection("yyyy-MM-dd hh:mm:ss");
