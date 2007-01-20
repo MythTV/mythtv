@@ -2767,10 +2767,16 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
                     if (GetNVP() && GetNVP()->getVideoOutput())
                     {
                         if (ringBuffer->InDVDMenuOrStillFrame())
+                        {
                             GetNVP()->getVideoOutput()->SetPrebuffering(false);
+                            GetNVP()->getVideoOutput()->SetDeinterlacingEnabled(false);
+                        }
                         else
+                        {
                             GetNVP()->getVideoOutput()->SetPrebuffering(true);
-                    }   
+                            GetNVP()->getVideoOutput()->SetDeinterlacingEnabled(true);
+                        }
+                    }
                 }
                 UpdateDVDFramesPlayed();
                 VERBOSE(VB_PLAYBACK, QString(LOC + "DVD Cell Changed. "

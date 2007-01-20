@@ -2624,7 +2624,6 @@ void NuppelVideoPlayer::OutputVideoLoop(void)
                     }
                     if (!pausevideo && nbframes == 1)
                     {
-                        videoOutput->SetDeinterlacingEnabled(false);
                         indvdstillframe = true;
                         PauseVideo(false);
                     }
