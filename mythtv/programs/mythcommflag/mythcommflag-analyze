@@ -3,6 +3,13 @@
 use strict;
 use Cwd;
 use File::Basename;
+use POSIX qw(strftime);
+
+sub timestamp($)
+{
+	my ($now) = @_;
+	strftime("%a %b %e %H:%M:%S %Z %Y", localtime($now));
+}
 
 sub convert($$)
 {
@@ -76,6 +83,8 @@ sub templatematcher()
 {
 	sub histogram($)
 	{
+		print "\t", timestamp(time), ": histogram\n";
+
 		my ($tmfile) = @_;
 		my %freq;
 		my $nframes = 0;
@@ -92,10 +101,10 @@ sub templatematcher()
 		my @freqkeys = sort { $a <=> $b } keys %freq;
 		my ($minmatch, $maxmatch) = @freqkeys[0, $#freqkeys];
 		my $matchrange = $maxmatch - $minmatch;
+		my $nsamples = 0;
 		foreach my $matchcnt (@freqkeys) {
-			my $pctile = $matchrange ?
-				($matchcnt - $minmatch) / $matchrange :
-				0;
+			my $pctile = $matchrange ? $nsamples / $nframes : 0;
+			$nsamples += $freq{$matchcnt};
 			$histo{$pctile} = $freq{$matchcnt} / $nframes;
 		}
 
@@ -106,35 +115,67 @@ sub templatematcher()
 	{
 		my ($tmfile, $histogram) = @_;
 
-		my $tmplot = $tmfile;
-		$tmplot =~ s#\.txt$#.plot#;
-		open(PLOT, ">$tmplot") or die "open $tmplot: $!\n";
-		foreach my $matchcnt (sort { $a <=> $b } keys %$histogram) {
-			printf PLOT "%12.6f %12.6f\n",
-				$matchcnt, $histogram->{$matchcnt};
-		}
-		close(PLOT) or die "close $tmplot: $!\n";
-
-		my $tmpng = $tmfile;
-		$tmpng =~ s#\.txt$#.png#;
+		my $tmmatchpng = $tmfile;
+		$tmmatchpng =~ s#\.txt$#-match.png#;
+		print "\t", timestamp(time), ": $tmmatchpng\n";
 		open(GNUPLOT, "| gnuplot") or die "open gnuplot: $!\n";
 		print GNUPLOT <<EOM;
 set key off
 set style fill solid 1.0 noborder
-set terminal png transparent small size 640,256
-set output "$tmpng"
+set terminal png transparent small size 640,192
+set output "$tmmatchpng"
+
+set xtics rotate
+set ylabel "Matching Pixels"
+
+set xlabel "Frame Number"
+set format x
+plot "$tmfile" using 1 with points pointtype 7 pointsize 0.3
+EOM
+		close(GNUPLOT) or die "close gnuplot: $!\n";
+
+		my $tmhistplot = $tmfile;
+		$tmhistplot =~ s#\.txt$#-hist.plot#;
+		print "\t", timestamp(time), ": $tmhistplot\n";
+		my %freq;
+		my $nframes = 0;
+		open(TMFILE, $tmfile) or die "open $tmfile: $!\n";
+		while (<TMFILE>) {
+			my $matchcnt = $_;
+			chomp $matchcnt;
+			$freq{$matchcnt}++;
+			$nframes++;
+		}
+		close(TMFILE) or die "close $tmfile: $!\n";
+
+		open(PLOT, ">$tmhistplot") or die "open $tmhistplot: $!\n";
+		foreach my $matchcnt (keys %freq) {
+			printf PLOT "%6u %12.6f\n",
+			       $matchcnt, $freq{$matchcnt} / $nframes;
+		}
+		close(PLOT) or die "close $tmhistplot: $!\n";
+
+		my $tmhistpng = $tmfile;
+		$tmhistpng =~ s#\.txt$#-hist.png#;
+		print "\t", timestamp(time), ": $tmhistpng\n";
+		open(GNUPLOT, "| gnuplot") or die "open gnuplot: $!\n";
+		print GNUPLOT <<EOM;
+set key off
+set style fill solid 1.0 noborder
+set terminal png transparent small size 640,192
+set output "$tmhistpng"
 
 set xtics rotate
 set ylabel "Fraction of Frames"
 
-set xlabel "Percentile of Template Edge Pixels Matched"
+set xlabel "Template Edge Pixels Matched"
 set format x
-plot "$tmplot" using 1:2 with points pointtype 7 pointsize 0.5
+plot "$tmhistplot" using 1:2 with points pointtype 7 pointsize 0.5
 EOM
 		close(GNUPLOT) or die "close gnuplot: $!\n";
-		unlink $tmplot;
+		unlink $tmhistplot;
 
-		return $tmpng;
+		return ($tmmatchpng, $tmhistpng);
 	}
 
 	my $tmfile = "";
@@ -147,16 +188,31 @@ EOM
 	}
 	return "" if !$tmfile;
 
-	my $tmgraphic = gnuplot_templatematcher($tmfile, histogram($tmfile));
+	my $histo = histogram($tmfile);
+	my @tmgraphs = gnuplot_templatematcher($tmfile, $histo);
 	my @output;
-	if (-f $tmgraphic) {
+	if (@tmgraphs) {
 		push @output, <<EOM;
 
 <h2>TemplateMatcher</h2>
 
-<img src="$tmgraphic"
-	title="$tmgraphic" />
 EOM
+
+		my $first = 1;
+		foreach my $tmgraph (@tmgraphs) {
+			if (-f $tmgraph) {
+				if (!$first) {
+					push @output, <<EOM;
+<br />
+EOM
+				}
+				push @output, <<EOM;
+<img src="$tmgraph"
+	title="$tmgraph" />
+EOM
+				$first = 0;
+			}
+		}
 	}
 	@output;
 }
@@ -169,13 +225,88 @@ sub histogramanalyzer()
 
 		my $halineno = 0;
 
-		my $blankpng = $hafile;
-		$blankpng =~ s#\.txt$#-blanks.png#;
+		my $columnsplot = $hafile;
+		$columnsplot =~ s#\.txt$#-columns.plot#;
+		open(HAFILE, $hafile) or die "open $hafile: $!\n";
+		print "\t", timestamp(time), ": $columnsplot\n";
+		open(PLOT, ">$columnsplot") or die "open $columnsplot: $!\n";
+		$halineno = 0;
+		while (<HAFILE>) {
+			my ($mincol, $width) = (split)[6,4];
+			my $maxcol = $mincol + $width;
+			my $midcol = ($mincol + $maxcol) / 2;
+			print PLOT "$halineno\t$midcol\t$mincol\t$maxcol\n";
+			$halineno++;
+		}
+		close(PLOT) or die "close $columnsplot: $!\n";
+		close(HAFILE) or die "close $hafile: $!\n";
+
+		my $columnspng = $hafile;
+		$columnspng =~ s#\.txt$#-columns.png#;
+		print "\t", timestamp(time), ": $columnspng\n";
 		open(GNUPLOT, "| gnuplot") or die "open gnuplot: $!\n";
 		print GNUPLOT <<EOM;
 set key off
 set style fill solid 1.0 noborder
-set terminal png transparent small size 640,256
+set terminal png transparent small size 640,192
+set output "$columnspng"
+
+set xtics rotate
+set ylabel "Border Min/Max Column"
+
+set xlabel "Frame Number"
+set format x
+set bars 0
+plot "$columnsplot" with yerrorbars
+EOM
+		close(GNUPLOT) or die "close gnuplot: $!\n";
+		unlink $columnsplot;
+
+		my $rowsplot = $hafile;
+		$rowsplot =~ s#\.txt$#-rows.plot#;
+		open(HAFILE, $hafile) or die "open $hafile: $!\n";
+		print "\t", timestamp(time), ": $rowsplot\n";
+		open(PLOT, ">$rowsplot") or die "open $rowsplot: $!\n";
+		$halineno = 0;
+		while (<HAFILE>) {
+			my ($minrow, $height) = (split)[7,5];
+			my $maxrow = $minrow + $height;
+			my $midrow = ($minrow + $maxrow) / 2;
+			print PLOT "$halineno\t$midrow\t$minrow\t$maxrow\n";
+			$halineno++;
+		}
+		close(PLOT) or die "close $rowsplot: $!\n";
+		close(HAFILE) or die "close $hafile: $!\n";
+
+		my $rowspng = $hafile;
+		$rowspng =~ s#\.txt$#-rows.png#;
+		print "\t", timestamp(time), ": $rowspng\n";
+		open(GNUPLOT, "| gnuplot") or die "open gnuplot: $!\n";
+		print GNUPLOT <<EOM;
+set key off
+set style fill solid 1.0 noborder
+set terminal png transparent small size 640,192
+set output "$rowspng"
+
+set xtics rotate
+set ylabel "Border Min/Max Row"
+
+set xlabel "Frame Number"
+set format x
+set bars 0
+plot "$rowsplot" with yerrorbars
+EOM
+		close(GNUPLOT) or die "close gnuplot: $!\n";
+		unlink $rowsplot;
+
+		my $blankpng = $hafile;
+		$blankpng =~ s#\.txt$#-blanks.png#;
+		print "\t", timestamp(time), ": $blankpng\n";
+		open(GNUPLOT, "| gnuplot") or die "open gnuplot: $!\n";
+		print GNUPLOT <<EOM;
+set key off
+set style fill solid 1.0 noborder
+set terminal png transparent small size 640,192
 set output "$blankpng"
 
 set xtics rotate
@@ -189,11 +320,12 @@ EOM
 
 		my $greypng = $hafile;
 		$greypng =~ s#\.txt$#-greylevels.png#;
+		print "\t", timestamp(time), ": $greypng\n";
 		open(GNUPLOT, "| gnuplot") or die "open gnuplot: $!\n";
 		print GNUPLOT <<EOM;
 set key off
 set style fill solid 1.0 noborder
-set terminal png transparent small size 640,256
+set terminal png transparent small size 640,192
 set output "$greypng"
 
 set xtics rotate
@@ -206,77 +338,7 @@ plot "$hafile" using 3 with points pointtype 7 pointsize 0.3
 EOM
 		close(GNUPLOT) or die "close gnuplot: $!\n";
 
-		my $columnsplot = $hafile;
-		$columnsplot =~ s#\.txt$#-columns.plot#;
-		open(HAFILE, $hafile) or die "open $hafile: $!\n";
-		open(PLOT, ">$columnsplot") or die "open $columnsplot: $!\n";
-		$halineno = 0;
-		while (<HAFILE>) {
-			my ($min, $width) = (split)[6,4];
-			my $max = $min + $width;
-			my $mid = ($min + $max) / 2;
-			my $delta = $mid - $min;
-			print PLOT "$halineno\t$mid\t$delta\n";
-			$halineno++;
-		}
-		close(PLOT) or die "close $columnsplot: $!\n";
-		close(HAFILE) or die "close $hafile: $!\n";
-
-		my $columnspng = $hafile;
-		$columnspng =~ s#\.txt$#-columns.png#;
-		open(GNUPLOT, "| gnuplot") or die "open gnuplot: $!\n";
-		print GNUPLOT <<EOM;
-set key off
-set style fill solid 1.0 noborder
-set terminal png transparent small size 640,256
-set output "$columnspng"
-
-set xtics rotate
-set ylabel "Border Min/Max Column"
-
-set xlabel "Frame Number"
-set format x
-plot "$columnsplot" with yerrorbars
-EOM
-		close(GNUPLOT) or die "close gnuplot: $!\n";
-		unlink $columnsplot;
-
-		my $rowsplot = $hafile;
-		$rowsplot =~ s#\.txt$#-rows.plot#;
-		open(HAFILE, $hafile) or die "open $hafile: $!\n";
-		open(PLOT, ">$rowsplot") or die "open $rowsplot: $!\n";
-		$halineno = 0;
-		while (<HAFILE>) {
-			my ($min, $width) = (split)[7,5];
-			my $max = $min + $width;
-			my $mid = ($min + $max) / 2;
-			my $delta = $mid - $min;
-			print PLOT "$halineno\t$mid\t$delta\n";
-			$halineno++;
-		}
-		close(PLOT) or die "close $rowsplot: $!\n";
-		close(HAFILE) or die "close $hafile: $!\n";
-
-		my $rowspng = $hafile;
-		$rowspng =~ s#\.txt$#-rows.png#;
-		open(GNUPLOT, "| gnuplot") or die "open gnuplot: $!\n";
-		print GNUPLOT <<EOM;
-set key off
-set style fill solid 1.0 noborder
-set terminal png transparent small size 640,256
-set output "$rowspng"
-
-set xtics rotate
-set ylabel "Border Min/Max Row"
-
-set xlabel "Frame Number"
-set format x
-plot "$rowsplot" with yerrorbars
-EOM
-		close(GNUPLOT) or die "close gnuplot: $!\n";
-		unlink $rowsplot;
-
-		return ($blankpng, $greypng, $columnspng, $rowspng);
+		return ($columnspng, $rowspng, $blankpng, $greypng);
 	}
 
 	my $hafile = "";
@@ -358,7 +420,7 @@ EOM
 umask(022);
 my $cwd = getcwd();
 foreach my $debugdir (@ARGV) {
-	print "$debugdir\n";
+	print timestamp(time), ": $debugdir\n";
 	analyze($debugdir);
 	chdir($cwd) or die "chdir $cwd: $!\n";
 }

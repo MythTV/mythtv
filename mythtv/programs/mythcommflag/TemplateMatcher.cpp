@@ -255,32 +255,11 @@ removeShortSegments(FrameAnalyzer::FrameMap *breakMap, long long nframes,
 
     removed = false;
 
-    /* Handle initial segment. */
+    /* Never remove initial segment (beginning at frame 0). */
     bb = breakMap->begin();
     if (bb != breakMap->end() && bb.key() != 0 && bb.key() < minseglen)
-    {
-        bbnext = bb;
-        ++bbnext;
-        if (verbose)
-        {
-            long long remove1 = bb.key();
-            long long remove2 = remove1 + bb.data() - 1;
-            long long insert1 = 0;
-            long long insert2 = remove2;
-            VERBOSE(VB_COMMFLAG, QString("Removing segment %1-%2 (%3-%4),"
-                " inserting %5-%6 (%7-%8)")
-                .arg(frameToTimestamp(remove1, fps))
-                .arg(frameToTimestamp(remove2, fps))
-                .arg(remove1).arg(remove2)
-                .arg(frameToTimestamp(insert1, fps))
-                .arg(frameToTimestamp(insert2, fps))
-                .arg(insert1).arg(insert2));
-        }
-        breakMap->remove(bb);
-        breakMap->insert(0, bb.key() + bb.data() - 1);
-        bb = bbnext;
-        removed = true;
-    }
+        ++bb;
+
     for (; bb != breakMap->end(); bb = bbnext)
     {
         bbnext = bb;
@@ -412,56 +391,28 @@ blankMapSearchBackwards(const FrameAnalyzer::FrameMap *blankMap,
     return blankMap->constEnd();
 }
 
-struct histogram {
-    float           pctile;
-    unsigned int    framecnt;
-};
-
-float
-range_area(const struct histogram *histogram, int nhist, int iihist,
-        float start, float end)
+unsigned int
+range_area(const unsigned short *freq, unsigned short start, unsigned short end)
 {
     /* Return the integrated area under the curve of the plotted histogram. */
-    const float     width = end - start;
-    unsigned int    sum, nsamples;
+    const unsigned short    width = end - start;
+    unsigned short          matchcnt;
+    unsigned int            sum, nsamples;
 
     sum = 0;
     nsamples = 0;
-    if (end <= histogram[iihist].pctile)
+    for (matchcnt = start; matchcnt < end; matchcnt++)
     {
-        iihist--;
-        for (;;)
-        {
-            if (iihist < 0)
-                break;
-            if (histogram[iihist].pctile < start)
-                break;
-            sum += histogram[iihist].framecnt;
-            iihist--;
-            nsamples++;
-        }
-    }
-    else
-    {
-        for (;;)
-        {
-            if (iihist >= nhist)
-                break;
-            if (histogram[iihist].pctile >= end)
-                break;
-            sum += histogram[iihist].framecnt;
-            iihist++;
-            nsamples++;
-        }
+        sum += freq[matchcnt];
+        nsamples++;
     }
     if (!nsamples)
         return 0;
-    return sum / nsamples * width;
+    return sum * width / nsamples;  /* sum / nsamples * width */
 }
 
 unsigned short
-matches_threshold(const unsigned short *matches, long long nframes,
-        float *ppctile)
+matches_threshold(const unsigned short *matches, long long nframes)
 {
     /*
      * Most frames either match the template very well, or don't match
@@ -483,70 +434,51 @@ matches_threshold(const unsigned short *matches, long long nframes,
      * of the point to be greater than some (larger) area to the right
      * of the point.
      */
-    static const float  LEFTWINDOW  = 0.025;   /* locality of local minimum. */
-    static const float  RIGHTWINDOW = 0.100;   /* locality of local minimum. */
-    unsigned short      *sorted, minmatch, maxmatch, *freq, mintmpledges;
-    int                 matchrange, nfreq, nhist, iihist;
-    struct histogram    *histogram;
+    static const float  LEFTFRAC  = (float)0.04;
+    static const float  RIGHTFRAC = (float)0.08;
+
+    unsigned short      leftwidth, rightwidth;
+    unsigned short      *sorted, minmatch, maxmatch, *freq;
+    int                 nfreq, found_leftmode, matchcnt;
 
     sorted = new unsigned short[nframes];
     memcpy(sorted, matches, nframes * sizeof(*matches));
     qsort(sorted, nframes, sizeof(*sorted), sort_ascending);
     minmatch = sorted[0];
     maxmatch = sorted[nframes - 1];
-    matchrange = maxmatch - minmatch;
+    /* degenerate minmatch==maxmatch case is gracefully handled */
 
+    leftwidth = (unsigned short)(LEFTFRAC * maxmatch);
+    rightwidth = (unsigned short)(RIGHTFRAC * maxmatch);
     nfreq = maxmatch + 1;
     freq = new unsigned short[nfreq];
     memset(freq, 0, nfreq * sizeof(*freq));
     for (long long frameno = 0; frameno < nframes; frameno++)
         freq[matches[frameno]]++;   /* freq[<matchcnt>] = <framecnt> */
 
-    nhist = maxmatch - minmatch + 1;
-    histogram = new struct histogram[nhist];
-    memset(histogram, 0, nhist * sizeof(*histogram));
-
-    for (int matchcnt = minmatch, iihist = 0;
-            matchcnt <= maxmatch;
-            matchcnt++, iihist++)
+    found_leftmode = 0;
+    for (matchcnt = minmatch + leftwidth;
+            matchcnt < maxmatch - rightwidth;
+            matchcnt++)
     {
-        histogram[iihist].pctile = (float)(matchcnt - minmatch) / matchrange;
-        histogram[iihist].framecnt = freq[matchcnt];
-    }
+        unsigned int    left, right;
 
-    /* Initialize "iihist" to accommodate the RIGHTWINDOW. */
-    for (iihist = nhist - 2; iihist >= 0; iihist--)
-    {
-        if (histogram[iihist].pctile < 1 - RIGHTWINDOW)
-            break;
-    }
-
-    for (;;)
-    {
-        float left, right;
-        if (iihist < 0)
+        left = range_area(freq, matchcnt - leftwidth, matchcnt);
+        right = range_area(freq, matchcnt, matchcnt + rightwidth);
+        if (left < right)
         {
-            iihist = 0;
-            break;
+            if (found_leftmode)
+                break;  /* Found local minima. */
         }
-        if (histogram[iihist].pctile < LEFTWINDOW)
-            break;
-        left = range_area(histogram, nhist, iihist,
-                histogram[iihist].pctile - LEFTWINDOW,
-                histogram[iihist].pctile);
-        right = range_area(histogram, nhist, iihist,
-                histogram[iihist].pctile,
-                histogram[iihist].pctile + RIGHTWINDOW);
-        if (left > right)
-            break;
-        iihist--;
+        else
+        {
+            found_leftmode = 1;
+        }
     }
 
-    *ppctile = histogram[iihist].pctile;
-    mintmpledges = sorted[(int)(*ppctile * nframes)];
     delete []freq;
     delete []sorted;
-    return mintmpledges;
+    return found_leftmode ? matchcnt : minmatch;
 }
 
 };  /* namespace */
@@ -748,7 +680,7 @@ TemplateMatcher::finished(long long nframes, bool final)
     const int       MINSEGLEN = (int)roundf(120 * fps);    /* frames */
 
     int                                 tmpledges, mintmpledges;
-    float                               matchpctile;
+    int                                 minbreaklen, minseglen;
     long long                           brkb;
     FrameAnalyzer::FrameMap::Iterator   bb;
 
@@ -763,12 +695,12 @@ TemplateMatcher::finished(long long nframes, bool final)
     }
 
     tmpledges = pgm_set(tmpl, tmplheight);
-    mintmpledges = matches_threshold(matches, nframes, &matchpctile);
+    mintmpledges = matches_threshold(matches, nframes);
 
     VERBOSE(VB_COMMFLAG, QString("TemplateMatcher::finished %1x%2@(%3,%4),"
-                " %5 edge pixels, want %6 (pctile=%7)")
+                " %5 edge pixels, want %6")
             .arg(tmplwidth).arg(tmplheight).arg(tmplcol).arg(tmplrow)
-            .arg(tmpledges).arg(mintmpledges).arg(matchpctile, 0, 'f', 6));
+            .arg(tmpledges).arg(mintmpledges));
 
     for (long long ii = 0; ii < nframes; ii++)
         match[ii] = matches[ii] >= mintmpledges ? 1 : 0;
@@ -796,14 +728,28 @@ TemplateMatcher::finished(long long nframes, bool final)
     }
 
     /* Clean up the "noise". */
+    minbreaklen = 1;
+    minseglen = 1;
     for (;;)
     {
-        bool f1 = removeShortBreaks(&breakMap, fps, MINBREAKLEN,
-            debug_removerunts);
-        bool f2 = removeShortSegments(&breakMap, nframes, fps, MINSEGLEN,
-            debug_removerunts);
-        if (!f1 && !f2)
+        bool f1 = false;
+        bool f2 = false;
+        if (minbreaklen <= MINBREAKLEN)
+        {
+            f1 = removeShortBreaks(&breakMap, fps, minbreaklen,
+                    debug_removerunts);
+            minbreaklen++;
+        }
+        if (minseglen <= MINSEGLEN)
+        {
+            f2 = removeShortSegments(&breakMap, nframes, fps, minseglen,
+                    debug_removerunts);
+            minseglen++;
+        }
+        if (minbreaklen > MINBREAKLEN && minseglen > MINSEGLEN)
             break;
+        if (debug_removerunts && (f1 || f2))
+            frameAnalyzerReportMap(&breakMap, fps, "** TM Break");
     }
 
     /*
