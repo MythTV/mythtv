@@ -76,7 +76,7 @@ ManualSchedule::ManualSchedule(MythMainWindow *parent, const char *name)
     QString longChannelFormat = gContext->GetSetting("LongChannelFormat",
                                                      "<num> <name>");
     QString chanorder = gContext->GetSetting("ChannelOrdering", "channum");
-    DBChanList channels = ChannelUtil::GetChannels(0, false, "callsign");
+    DBChanList channels = ChannelUtil::GetChannels(0, false, "channum,callsign");
     ChannelUtil::SortChannels(channels, chanorder);
 
     for (uint i = 0; i < channels.size(); i++)
