@@ -130,27 +130,35 @@ static void dvd_read_name(char *name, char *serial, const char *device) {
      */
     off_t off;
     int fd, i;
+    char *pos;
     uint8_t data[DVD_VIDEO_LB_LEN];
 
+    *name = 0;
     /* Read DVD name */
     fd = open(device, O_RDONLY);
     if (fd > 0) { 
       off = lseek( fd, 32 * (off_t) DVD_VIDEO_LB_LEN, SEEK_SET );
       if( off == ( 32 * (off_t) DVD_VIDEO_LB_LEN ) ) {
         off = read( fd, data, DVD_VIDEO_LB_LEN ); 
-        close(fd);
         if (off == ( (off_t) DVD_VIDEO_LB_LEN )) {
           fprintf(MSG_OUT, "libdvdnav: DVD Title: ");
-          for(i=25; i < 73; i++ ) {
-            if((data[i] == 0)) break;
-            if((data[i] > 32) && (data[i] < 127)) {
-              fprintf(MSG_OUT, "%c", data[i]);
-            } else {
-              fprintf(MSG_OUT, " ");
+          if (data[24] == 8) { 
+            // Only use this title if 8bit encoded title - some are 16bit...
+            for(i = 25; i < 73; i++) {
+              if((data[i] == 0)) break;
+              if((data[i] > 32) && (data[i] < 127)) {
+                fprintf(MSG_OUT, "%c", data[i]);
+              } else {
+                fprintf(MSG_OUT, " ");
+              }
             }
+            // Strip spaces from end...
+            strncpy(name, &data[25], 48);
+            name[48] = 0;
+            pos = name + strlen(name);
+            while (pos >= name && *--pos == ' ');
+            *++pos = '\0';
           }
-          strncpy(name, &data[25], 48);
-          name[48] = 0;
           fprintf(MSG_OUT, "\nlibdvdnav: DVD Serial Number: ");
           for(i=73; i < 89; i++ ) {
             if((data[i] == 0)) break;
@@ -176,6 +184,28 @@ static void dvd_read_name(char *name, char *serial, const char *device) {
         }
       } else {
         fprintf(MSG_OUT, "libdvdnav: Can't seek to block %u\n", 32 );
+      }
+      if (strlen(name) == 0) {
+        // Try another location - the one used by lsdvd
+        // Seems to be 8bit...
+        off = lseek( fd, 16 * (off_t) DVD_VIDEO_LB_LEN, SEEK_SET );
+        if( off == ( 16 * (off_t) DVD_VIDEO_LB_LEN ) ) {
+          off = read( fd, data, DVD_VIDEO_LB_LEN ); 
+          if (off == ( (off_t) DVD_VIDEO_LB_LEN )) {
+            // Then this location potentially has a longer name...
+            name[49] = 0;
+            strncpy(name, data + 39, 49);
+            pos = name + strlen(name);
+            while (pos >= name && *--pos == ' ');
+            *++pos = '\0';
+          }
+        }
+      }
+      // Underscores seem to be the order of the day instead of spaces...
+      if (strlen(name)) {
+        for (pos = name; pos < strlen(name) + name; pos++) {
+          if (*pos == '_') *pos = ' ';
+        }
       }
       close(fd);
     } else {
