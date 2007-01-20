@@ -536,6 +536,7 @@ static void init_fixup(QMap<uint64_t,uint> &fix)
     fix[ 4096 << 16] = EITFixUp::kFixAUStar;
 
     fix[  769LL << 32 | 8468 << 16] = EITFixUp::kEFixPro7Sat; // DVB-T Berlin
+    fix[ 3074LL << 32 | 8468 << 16] = EITFixUp::kEFixPro7Sat; // DVB-T Hamburg
     fix[ 3075LL << 32 | 8468 << 16] = EITFixUp::kEFixPro7Sat; // DVB-T Bremen
     fix[ 8705LL << 32 | 8468 << 16] = EITFixUp::kEFixPro7Sat; // DVB-T Hessen
     fix[13057LL << 32 | 8468 << 16] = EITFixUp::kEFixPro7Sat; // DVB-T Munich
