@@ -374,7 +374,7 @@ bool MpegRecorder::OpenV4L2DeviceAsInput(void)
                 "If you are using an AverMedia M179 card this is normal.");
     }
 
-    if (!SetIVTVDeviceOptions(chanfd) && !SetV4L2DeviceOptions(chanfd))
+    if (!SetV4L2DeviceOptions(chanfd) && !SetIVTVDeviceOptions(chanfd))
         return false;
 
     readfd = open(videodevice.ascii(), O_RDWR | O_NONBLOCK);
