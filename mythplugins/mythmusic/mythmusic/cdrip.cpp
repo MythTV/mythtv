@@ -22,22 +22,14 @@ using namespace std;
 // Qt includes
 #include <qapplication.h>
 #include <qdir.h>
-#include <qdialog.h>
-#include <qlayout.h>
-#include <qlabel.h>
-#include <qcursor.h>
-#include <qcheckbox.h>
-#include <qpushbutton.h>
 #include <qregexp.h>
-#include <qvbox.h>
-#include <qprogressbar.h>
-#include <qradiobutton.h>
 
 // MythTV plugin includes
 #include <mythtv/mythcontext.h>
 #include <mythtv/mythdbcon.h>
 #include <mythtv/mythwidgets.h>
 #include <mythtv/lcddevice.h>
+#include <mythtv/dialogbox.h>
 
 // MythMusic includes
 #include "cdrip.h"
@@ -46,583 +38,33 @@ using namespace std;
 #include "vorbisencoder.h"
 #include "lameencoder.h"
 #include "flacencoder.h"
+#include "genres.h"
+#include "editmetadata.h"
 
-Ripper::Ripper(MythMainWindow *parent, const char *name)
-      : MythDialog(parent, name)
+
+CDScannerThread::CDScannerThread(Ripper *ripper)
 {
-
-    // Set this to false so we can tell if the ripper has done anything
-    // (i.e. we can tell if the user quit prior to ripping)
-    somethingwasripped = false;
-
-    QString cddevice = gContext->GetSetting("CDDevice");
-
-    int cdrom_fd = cd_init_device((char*)cddevice.ascii());
-    if (cdrom_fd == -1)
-    {
-        perror("Could not open cdrom_fd");
-        return;
-    }
-
-    cd_close(cdrom_fd);  //Close the CD tray
-
-    cd_finish(cdrom_fd);
-    
-    bigvb = new QVBoxLayout(this, 0);
-
-    firstdiag = new QFrame(this);
-    firstdiag->setPalette(palette());
-    firstdiag->setFont(font());
-    bigvb->addWidget(firstdiag, 1);
-
-    QVBoxLayout *vbox = new QVBoxLayout(firstdiag, (int)(24 * wmult));
-
-    QLabel *inst = new QLabel(tr("Please select a quality level and check the "
-                                 "album information below:"), firstdiag);
-    inst->setBackgroundOrigin(WindowOrigin);
-    vbox->addWidget(inst);
-
-    QLabel *quality = new QLabel(tr("Quality: "), firstdiag);
-    quality->setBackgroundOrigin(WindowOrigin);
-
-    qualchooser = new MythComboBox(false, firstdiag);
-    qualchooser->insertItem(tr("Low"));
-    qualchooser->insertItem(tr("Medium"));
-    qualchooser->insertItem(tr("High"));
-    qualchooser->insertItem(tr("Perfect"));
-    qualchooser->setCurrentItem(gContext->GetNumSetting("DefaultRipQuality", 1));
-    qualchooser->setMaximumWidth(screenwidth / 2);
-
-    QGridLayout *grid = new QGridLayout(vbox, 1, 1, 20);
-    
-    QLabel *artistl = new QLabel(tr("Artist: "), firstdiag);
-    artistl->setBackgroundOrigin(WindowOrigin);
-    artistedit = new MythComboBox(true, firstdiag);
-
-    // Quick and dirty hack: Find a better way of calc'ing a max width!!
-    // Large artist lists will create a massively wide listbox here
-    // which totally messes up the rest of the page.
-    artistedit->setMaximumWidth((int)(0.7 * screenwidth));
-
-    QStringList strlist = Metadata::fillFieldList("artist");
-    artistedit->insertStringList(strlist);
-    
-    QLabel *albuml = new QLabel(tr("Album: "), firstdiag);
-    albuml->setBackgroundOrigin(WindowOrigin);
-    albumedit = new MythLineEdit(firstdiag);
-    albumedit->setRW();
-
-    QLabel *genrelabel = new QLabel(tr("Genre: "), firstdiag);
-    genrelabel->setBackgroundOrigin(WindowOrigin);
-    genreedit = new MythComboBox(true, firstdiag);
-    strlist = Metadata::fillFieldList("genre");
-    genreedit->insertStringList(strlist);
-
-
-    compilation = new MythCheckBox(firstdiag);
-    compilation->setBackgroundOrigin(WindowOrigin);
-    compilation->setText(tr("Multi-Artist?"));
-
-
-    // Create a button for swapping the names of the artist and the track title.
-    switchtitleartist = new MythPushButton(tr("Switch Titles && Artists"), firstdiag);
-
-    connect(switchtitleartist, SIGNAL(clicked()), this, SLOT(switchTitlesAndArtists())); 
-    
-
-    grid->addMultiCellWidget(quality, 0, 0, 0, 0);
-    grid->addMultiCellWidget(qualchooser,  0, 0, 1, 2);
-    grid->addMultiCellWidget(artistl, 1, 1, 0, 0);
-    grid->addMultiCellWidget(artistedit,  1, 1, 1, 2);
-    grid->addMultiCellWidget(albuml, 2, 2, 0, 0);
-    grid->addMultiCellWidget(albumedit,  2, 2, 1, 2);
-    grid->addMultiCellWidget(genrelabel, 3, 3, 0, 0);
-    grid->addMultiCellWidget(genreedit, 3, 3, 1, 2);
-    grid->addMultiCellWidget(compilation, 4, 4, 0, 0);
-    grid->addMultiCellWidget(switchtitleartist, 4, 4, 1, 2);
-
-    table = new MythTable(firstdiag);
-    grid->addMultiCellWidget(table, 5, 5, 0, 2);
-    table->setNumCols(4);
-    table->setLeftMargin(0);
-    table->setNumRows(1);
-    table->setTopMargin(36);    
-    table->horizontalHeader()->setLabel(0, "#");
-    table->horizontalHeader()->setLabel(1, tr("Title"));
-    table->horizontalHeader()->setLabel(2, tr("Artist"));
-    table->horizontalHeader()->setLabel(3, tr("Length"));
-    table->setColumnReadOnly(0, true);
-    table->setColumnReadOnly(3, true);
-    table->setColumnStretchable(1, true);
-    table->setColumnStretchable(2, true);
-    table->setCurrentCell(0, 1);
-
-
-    // Set the values of the widgets.
-
-    bool iscompilation = false;
-
-    CdDecoder *decoder = new CdDecoder("cda", NULL, NULL, NULL);
-    bool newTune = true;
-    int row = 0;
-    if (decoder)
-    {
-
-        QString label;
-        int length, min, sec;
-        Metadata *track;
-
-        for (int trackno = 0; trackno < decoder->getNumTracks(); trackno++)
-        {
-            track = decoder->getMetadata(trackno + 1);
-            if (track)
-            {
-                if (track->Compilation())
-                {
-                    iscompilation = true;
-                    artistname = track->CompilationArtist();
-                }
-                else if ("" == artistname)
-                {
-                    artistname = track->Artist();
-                }
-
-                if ("" == albumname)
-                    albumname = track->Album();
-
-                if ("" == genrename 
-                    && "" != track->Genre())
-                {
-                    genrename = track->Genre();
-                }
-
-                length = track->Length() / 1000;
-
-                QString title = track->Title();
-                newTune = isNewTune(artistname, albumname, title);
-
-                if (newTune)
-                {
-                    min = length / 60;
-                    sec = length % 60;
-
-                    table->setNumRows(row + 1);
-
-                    table->setRowHeight(row, (int)(30 * hmult));
-
-                    label.sprintf("%d", trackno + 1);
-                    table->setText(row, 0, label);
-
-                    table->setText(row, 1, track->Title());
-
-                    table->setText(row, 2, track->Artist());
-
-                    label.sprintf("%02d:%02d", min, sec);
-                    table->setText(row, 3, label);
-
-                    row++;
-                }
-                delete track;
-            }
-        }
-        
-        artistedit->setCurrentText(artistname);
-        albumedit->setText(albumname);
-        genreedit->setCurrentText(genrename);
-        compilation->setChecked(iscompilation);
-
-        if (!iscompilation)
-        {
-          switchtitleartist->hide();
-          table->hideColumn(2);
-        }
-
-        totaltracks = decoder->getNumCDAudioTracks();
-
-        
-        delete decoder;
-    }
-
-
-
-    // Now that all defualt values are set, let's connect some events...
-    connect(artistedit, SIGNAL(activated(const QString &)),
-            artistedit, SIGNAL(textChanged(const QString &)));
-    connect(artistedit, SIGNAL(textChanged(const QString &)),
-            this, SLOT(artistChanged(const QString &)));
-
-    
-    connect(albumedit, SIGNAL(textChanged(const QString &)), 
-            this, SLOT(albumChanged(const QString &))); 
-
-    connect(genreedit, SIGNAL(activated(const QString &)),
-            genreedit, SIGNAL(textChanged(const QString &)));
-    connect(genreedit, SIGNAL(textChanged(const QString &)),
-            this, SLOT(genreChanged(const QString &)));
- 
-    connect(compilation, SIGNAL(toggled(bool)),
-            this, SLOT(compilationChanged(bool)));
-
-    connect(table, SIGNAL(valueChanged(int, int)), this, 
-            SLOT(tableChanged(int, int)));
-
-
-
-    MythPushButton *ripit = new MythPushButton(tr("Import this CD"), firstdiag);
-    ripit->setFocus ();
-    vbox->addWidget(ripit);
-    if (row != 0)
-    {
-        connect(ripit, SIGNAL(clicked()), this, SLOT(ripthedisc())); 
-    }
+    m_parent = ripper;
 }
 
-Ripper::~Ripper(void)
-{   
-}       
-
-bool Ripper::isNewTune(QString& artist, QString& album, QString& title)
+void CDScannerThread::run()
 {
-    if (gContext->GetNumSetting("OnlyImportNewMusic",1))
-    {
-        MSqlQuery query(MSqlQuery::InitCon());
-        QString queryString("SELECT filename, artist_name, album_name, name, song_id "
-                            "FROM music_songs "
-                            "LEFT JOIN music_artists ON music_songs.artist_id=music_artists.artist_id "
-                            "LEFT JOIN music_albums ON music_songs.album_id=music_albums.album_id "
-                            "WHERE artist_name REGEXP \'");      
-        QString token = artist;
-        token.replace(QRegExp("(/|\\\\|:|\'|\\,|\\!|\\(|\\)|\"|\\?|\\|)"), QString("."));
-      
-        queryString += token + "\' AND " + "album_name REGEXP \'";
-        token = album;
-        token.replace(QRegExp("(/|\\\\|:|\'|\\,|\\!|\\(|\\)|\"|\\?|\\|)"), QString("."));
-        queryString += token + "\' AND " + "name    REGEXP \'";
-        token = title;
-        token.replace(QRegExp("(/|\\\\|:|\'|\\,|\\!|\\(|\\)|\"|\\?|\\|)"), QString("."));
-        queryString += token + "\' ORDER BY artist_name, album_name, name, song_id, filename";      
-        query.prepare(queryString);
-        
-        bool has_entries = true;     
-        if (!query.exec() || !query.isActive())
-        {
-            MythContext::DBError("Search music database", query);
-            has_entries = false;
-        }
-        if (query.numRowsAffected() > 0)
-        {
-            return false;
-        }
-    }       
-    return true;
+    m_parent->scanCD();
 }
 
+///////////////////////////////////////////////////////////////////////////////
 
-QSizePolicy Ripper::sizePolicy(void)
+CDEjectorThread::CDEjectorThread(Ripper *ripper)
 {
-    return QSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+    m_parent = ripper;
 }
 
-bool Ripper::somethingWasRipped()
+void CDEjectorThread::run()
 {
-    return somethingwasripped;
+    m_parent->ejectCD();
 }
 
-void Ripper::artistChanged(const QString &newartist)
-{
-    CdDecoder *decoder = new CdDecoder("cda", NULL, NULL, NULL);
-    Metadata *data = decoder->getMetadata(1);
-    
-    if (!decoder || !data)
-        return;
-
-    if (compilation->isChecked())
-    {
-      data->setCompilationArtist(newartist);
-      decoder->commitMetadata(data);
-    }
-    else
-    {
-        data->setArtist(newartist);
-        data->setCompilationArtist("");
-        decoder->commitMetadata(data);
-    }
-
-    artistname = newartist;
-
-    delete data;
-    delete decoder;
-}
-
-void Ripper::albumChanged(const QString &newalbum)
-{
-    CdDecoder *decoder = new CdDecoder("cda", NULL, NULL, NULL);
-    Metadata *data = decoder->getMetadata(1);
-
-    if (!decoder || !data)
-        return;
-
-    data->setAlbum(newalbum);
-    decoder->commitMetadata(data);
-
-    albumname = newalbum;
-
-    delete data;
-    delete decoder;
-}
-
-void Ripper::genreChanged(const QString &newgenre)
-{
-    CdDecoder *decoder = new CdDecoder("cda", NULL, NULL, NULL);
-    Metadata *data = decoder->getMetadata(1);
-
-    if (!decoder || !data)
-        return;
-
-    data->setGenre(newgenre);
-    decoder->commitMetadata(data);
-
-    genrename = newgenre;
-
-    delete data;
-    delete decoder;
-} 
-
-void Ripper::compilationChanged(bool state)
-{
-    CdDecoder *decoder = new CdDecoder("cda", NULL, NULL, NULL);
-    Metadata *data;
-  
-    if (!decoder)
-        return;
-
-    if (!state)
-    {
-        // Update artist MetaData of each track on the ablum...
-        for (int trackno = 1; trackno <= totaltracks; ++trackno)
-        {
-            data = decoder->getMetadata(trackno);
-
-            //  Metadata will be NULL for non-audio tracks
-            if(data)
-            {
-                // Make metadata appear to be just a normal track.
-                data->setCompilationArtist("");
-                data->setArtist(artistname);
-                data->setCompilation(false);
-                decoder->commitMetadata(data);
-                delete data;
-            }
-        }
-        
-        // Visual updates
-        table->hideColumn(2);
-        switchtitleartist->hide();
-    }
-    else
-    {
-        // Update artist MetaData of each track on the ablum...
-        for (int trackno = 1; trackno <= totaltracks; ++trackno)
-        {
-            data = decoder->getMetadata(trackno);
-
-            //  Metadata will be NULL for non-audio tracks
-            if(data)
-            {
-                // Make metadata appear to be just a normal track.
-                data->setCompilationArtist(artistname);
-                data->setArtist(table->text(trackno - 1, 2));
-                data->setCompilation(true);
-                decoder->commitMetadata(data);
-                delete data;
-            }
-        }
-
-        // Visual updates
-        table->showColumn(2);
-        switchtitleartist->show();
-    }
-
-    delete decoder;
-
-}
-
-void Ripper::tableChanged(int row, int col)
-{
-    CdDecoder *decoder = new CdDecoder("cda", NULL, NULL, NULL);
-    Metadata *data = decoder->getMetadata(row + 1 );
-
-    if (!decoder || !data)
-        return;
-
-    // We only update the title if col 1 is edited...
-    if (1 == col)
-    {
-        data->setTitle(table->text(row, 1));
-    }
-    else if (2 == col
-             && compilation->isChecked())
-    {
-        if ("" == table->text(row, 2))
-        {
-            // This is a compilation layout, but the user has put a blank
-            // into the artist column. This probably means this track is 
-            // also performed by the person who is also the album artist.
-            data->setArtist(artistname);
-        }
-        else
-        {
-            data->setArtist(table->text(row, 2));
-        }
-    }
-
-    decoder->commitMetadata(data);
-
-    delete data;
-    delete decoder;
-}
-
-void Ripper::switchTitlesAndArtists()
-{
-    if (!compilation->isChecked())
-        return;
-
-    CdDecoder *decoder = new CdDecoder("cda", NULL, NULL, NULL);
-    Metadata *data;
-  
-    if (!decoder)
-        return;
-
-    // Switch title and artist for each track
-    QString tmp;
-    for (int row = 0; row < totaltracks; ++row)
-    {
-        data = decoder->getMetadata(row + 1);
-      
-        if (data)
-        {
-            // Switch the columns first
-            tmp = table->text(row, 2);
-            table->setText(row, 2, table->text(row, 1));
-            table->setText(row, 1, tmp);
-
-            // Just set both title and artist
-            data->setTitle(table->text(row, 1));
-
-            if ("" == table->text(row, 2))
-            {
-                // This is a compilation layout, but the user has put a blank
-                // into the artist column. This probably means this track is 
-                // also performed by the person who is also the album artist.
-                data->setArtist(artistname);
-            }
-            else
-            {
-                data->setArtist(table->text(row, 2));
-            }
-
-            decoder->commitMetadata(data);
-            delete data;
-        }
-    }
-
-    delete decoder;
-}
-
-void Ripper::handleFileTokens(QString &filename, Metadata *track)
-{
-    QString original = filename;
-
-    QString fntempl = gContext->GetSetting("FilenameTemplate");
-    bool no_ws = gContext->GetNumSetting("NoWhitespace", 0);
-
-    QRegExp rx_ws("\\s{1,}");
-    QRegExp rx("(?:\\s?)(GENRE|ARTIST|ALBUM|TRACK|TITLE|YEAR)(?:\\s?)/");
-
-    int i = 0;
-    while (i >= 0)
-    {
-        i = rx.search(fntempl, i);
-        if (i >= 0)
-        {
-            i += rx.matchedLength();
-            if ((rx.capturedTexts()[1] == "GENRE") && (track->Genre() != ""))
-                filename += fixFileToken(track->Genre()) + "/";
-            if ((rx.capturedTexts()[1] == "ARTIST") && (track->FormatArtist() != ""))
-                filename += fixFileToken(track->FormatArtist()) + "/";
-            if ((rx.capturedTexts()[1] == "ALBUM") && (track->Album() != ""))
-                filename += fixFileToken(track->Album()) + "/";
-            if ((rx.capturedTexts()[1] == "TRACK") && (track->Track() >= 0))
-                filename += fixFileToken(QString::number(track->Track(), 10)) + "/";
-            if ((rx.capturedTexts()[1] == "TITLE") && (track->FormatTitle() != ""))
-                filename += fixFileToken(track->FormatTitle()) + "/";
-            if ((rx.capturedTexts()[1] == "YEAR") && (track->Year() >= 0))
-                filename += fixFileToken(QString::number(track->Year(), 10)) + "/";
-
-            if (no_ws)
-                filename.replace(rx_ws, "_");
-
-            mkdir(filename.local8Bit(), 0775);
-        }
-    }
-
-    // remove the dir part and other cruft
-    fntempl.replace(QRegExp("(.*/)|\\s*"), "");
-    QString tagsep = gContext->GetSetting("TagSeparator");
-    QStringList tokens = QStringList::split("-", fntempl);
-    QStringList fileparts;
-    QString filepart;
-
-    for (unsigned i = 0; i < tokens.size(); i++)
-    {
-        if ((tokens[i] == "GENRE") && (track->Genre() != ""))
-            fileparts += track->Genre();
-        else if ((tokens[i] == "ARTIST") && (track->FormatArtist() != ""))
-            fileparts += track->FormatArtist();
-        else if ((tokens[i] == "ALBUM") && (track->Album() != ""))
-            fileparts += track->Album();
-        else if ((tokens[i] == "TRACK") && (track->Track() >= 0))
-        {
-            QString tempstr = QString::number(track->Track(), 10);
-            if (track->Track() < 10)
-                tempstr.prepend('0');
-            fileparts += tempstr;
-        }
-        else if ((tokens[i] == "TITLE") && (track->FormatTitle() != ""))
-            fileparts += track->FormatTitle();
-        else if ((tokens[i] == "YEAR") && (track->Year() >= 0))
-            fileparts += QString::number(track->Year(), 10);
-    }
-
-    filepart = fileparts.join( tagsep );
-    filename += fixFileToken(filepart);
-    
-    if (filename == original || filename.length() > FILENAME_MAX)
-    {
-        QString tempstr = QString::number(track->Track(), 10);
-        tempstr += " - " + track->FormatTitle();
-        filename += fixFileToken(tempstr);
-        VERBOSE(VB_GENERAL, QString("Invalid file storage definition."));
-    }
-
-    if (no_ws)
-        filename.replace(rx_ws, "_");
-}
-
-inline QString Ripper::fixFileToken(QString token)
-{
-    token.replace(QRegExp("(/|\\\\|:|\'|\"|\\?|\\|)"), QString("_"));
-    return token;
-}
-
-void Ripper::reject() 
-{
-    QString cddevice = gContext->GetSetting("CDDevice");
-    bool EjectCD = gContext->GetNumSetting("EjectCDAfterRipping",1);
-    if (EjectCD) 
-        ejectCD(cddevice);	
-    done(Rejected);
-}
+///////////////////////////////////////////////////////////////////////////////
 
 static long int getSectorCount (QString &cddevice, int tracknum)
 {
@@ -644,160 +86,171 @@ static long int getSectorCount (QString &cddevice, int tracknum)
         long int start = cdda_track_firstsector(device, tracknum);
         long int end   = cdda_track_lastsector( device, tracknum);
         cdda_close(device);
-        return end - start + 1;        
+        return end - start + 1;
     }
 
     cdda_close(device);
     return 0;
 }
 
-void Ripper::ripthedisc(void)
+static void paranoia_cb(long inpos, int function)
 {
-    firstdiag->hide();
+    inpos = inpos; function = function;
+}
 
-    QString tots = tr("Importing CD:\n") + artistname + "\n" + albumname;
+CDRipperThread::CDRipperThread(RipStatus *parent, vector<Metadata*> *tracks, int quality)
+{
+    m_parent = parent;
+    m_tracks = tracks;
+    m_quality = quality;
+    m_quit = false;
+    m_totalTracks = m_tracks->size();
+}
 
-    int screenwidth = 0, screenheight = 0;
-    float wmult = 0, hmult = 0;
+CDRipperThread::~CDRipperThread(void)
+{
+    cancel();
+    wait();
+}
 
-    gContext->GetScreenSettings(screenwidth, wmult, screenheight, hmult);
+void CDRipperThread::cancel(void)
+{
+    m_mutex.lock();
+    m_quit = true;
+    m_mutex.unlock();
+}
 
-    MythDialog *newdiag = new MythDialog(gContext->GetMainWindow(), 
-                                         tr("Ripping..."));
-    
-    newdiag->setFont(gContext->GetBigFont());
+bool CDRipperThread::isCancelled(void)
+{
+    bool res;
+    m_mutex.lock();
+    res = m_quit;
+    m_mutex.unlock();
+    return res;
+}
 
-    QVBoxLayout *vb = new QVBoxLayout(newdiag, 20);
+void CDRipperThread::sendEvent(int eventType, const QString &value)
+{
+    StatusData *sd = new StatusData;
+    sd->type  = eventType;
+    sd->text = value;
+    sd->value = 0;
+    QApplication::postEvent(m_parent, new QCustomEvent(QEvent::User, sd));
+}
 
-    QLabel *totallabel = new QLabel(tots, newdiag);
-    totallabel->setBackgroundOrigin(WindowOrigin);
-    totallabel->setAlignment(AlignAuto | AlignVCenter | ExpandTabs | WordBreak);
-    vb->addWidget(totallabel);
+void CDRipperThread::sendEvent(int eventType, int value)
+{
+    StatusData *sd = new StatusData;
+    sd->type  = eventType;
+    sd->text = "";
+    sd->value = value;
+    QApplication::postEvent(m_parent, new QCustomEvent(QEvent::User, sd));
+}
 
-    overall = new QProgressBar(totaltracks, newdiag);
-    overall->setBackgroundOrigin(WindowOrigin);
-    overall->setProgress(0);
-    vb->addWidget(overall);
+void CDRipperThread::run(void)
+{
+    Metadata *track = m_tracks->at(0);
+    QString tots;
 
-    statusline = new QLabel(" ", newdiag);
-    statusline->setBackgroundOrigin(WindowOrigin);
-    statusline->setAlignment(AlignAuto | AlignVCenter | ExpandTabs | WordBreak);
-    vb->addWidget(statusline);
-    
-    current = new QProgressBar(1, newdiag);
-    current->setBackgroundOrigin(WindowOrigin);
-    current->setProgress(0);
-    vb->addWidget(current);
+    if (track->Compilation())
+    {
+        tots = track->CompilationArtist() + " ~ " + track->Album();
+    }
+    else
+    {
+        tots = track->Artist() + " ~ " + track->Album();
+    }
 
-    newdiag->show();
-
-    qApp->processEvents(5);
-    qApp->processEvents();
+    sendEvent(ST_OVERALL_TEXT, tots);
+    sendEvent(ST_OVERALL_PROGRESS, 0);
+    sendEvent(ST_TRACK_PROGRESS, 0);
 
     QString textstatus;
     QString cddevice = gContext->GetSetting("CDDevice");
     QString encodertype = gContext->GetSetting("EncoderType");
-    int encodequal = qualchooser->currentItem();
     bool mp3usevbr = gContext->GetNumSetting("Mp3UseVBR", 0);
 
-    CdDecoder *decoder = new CdDecoder("cda", NULL, NULL, NULL);
-
-    QString musicdir = gContext->GetSetting("MusicLocation");
-    musicdir = QDir::cleanDirPath(musicdir);
-    if (!musicdir.endsWith("/"))
-        musicdir += "/";
-
-    totalSectors = 0;
-    totalSectorsDone = 0;
-    for (int trackno = 0; trackno < decoder->getNumTracks(); trackno++)
+    m_totalSectors = 0;
+    m_totalSectorsDone = 0;
+    for (int trackno = 0; trackno < m_totalTracks; trackno++)
     {
-        totalSectors += getSectorCount (cddevice, trackno + 1);
+        m_totalSectors += getSectorCount(cddevice, trackno + 1);
     }
-    overall->setTotalSteps (totalSectors);
+
+    sendEvent(ST_OVERALL_START, m_totalSectors);
 
     if (class LCD * lcd = LCD::Get()) 
     {
-        QString lcd_tots = tr("Importing ") + artistname + " - " + albumname;
+        QString lcd_tots = QObject::tr("Importing ") + tots;
         QPtrList<LCDTextItem> textItems;
         textItems.setAutoDelete(true);
         textItems.append(new LCDTextItem(1, ALIGN_CENTERED, lcd_tots, "Generic", false));
         lcd->switchToGeneric(&textItems);
     }
 
-    for (int trackno = 0; trackno < decoder->getNumTracks(); trackno++)
+    for (int trackno = 0; trackno < m_totalTracks; trackno++)
     {
+        if (isCancelled())
+            return;
+
+        sendEvent(ST_STATUS_TEXT, QString("Track %1 of %2").arg(trackno + 1).arg(m_totalTracks));
+
         Encoder *encoder;
 
-        current->setProgress(0);
-        current->reset();
+        sendEvent(ST_TRACK_PROGRESS, 0);
 
-        Metadata *track = decoder->getMetadata(trackno + 1);
+        track = m_tracks->at(trackno);
 
         if (track)
         {
-            QString outfile = musicdir;
+            QString outfile;
 
-            //
-            // cddb_genre from cdda structure is just an enum that
-            // gets mapped to a string -- kind of useless for custom
-            // genres.  Override the value here with the value from
-            // the Genre combo box.
-            //
-            
-            track->setGenre(genreedit->currentText());
+            textstatus = track->Title();
+            sendEvent(ST_TRACK_TEXT, textstatus);
 
-            textstatus = tr("Copying from CD:\n") + track->Title();       
-            statusline->setText(textstatus);
+            sendEvent(ST_TRACK_PROGRESS, 0);
+            sendEvent(ST_TRACK_PERCENT, 0);
 
-            current->setProgress(0);
-            current->reset();
+            outfile = Ripper::filenameFromMetadata(track);
 
-            qApp->processEvents();
-
-            handleFileTokens(outfile, track);
-
-            if (encodequal < 3)
+            if (m_quality < 3)
             {
                 if (encodertype == "mp3")
                 {
                     outfile += ".mp3";
-                    encoder = new LameEncoder(outfile, encodequal, track, 
+                    encoder = new LameEncoder(outfile, m_quality, track,
                                               mp3usevbr);
                 }
                 else // ogg
                 {
                     outfile += ".ogg";
-                    encoder = new VorbisEncoder(outfile, encodequal, track); 
+                    encoder = new VorbisEncoder(outfile, m_quality, track);
                 }
             }
             else
             {
                 outfile += ".flac";
-                encoder = new FlacEncoder(outfile, encodequal, track); 
+                encoder = new FlacEncoder(outfile, m_quality, track);
             }
 
             if (!encoder->isValid()) 
             {
                 delete encoder;
-                delete track;
                 break;
             }
 
             ripTrack(cddevice, encoder, trackno + 1);
 
-            // Set the flag to show that we have ripped new files
-            somethingwasripped = true;
+            if (isCancelled())
+                return;
 
-            qApp->processEvents();
+            // save the metadata to the DB
+            track->setFilename(outfile);
+            track->dumpToDatabase();
 
             delete encoder;
-            delete track;
         }
     }
-
-    bool EjectCD = gContext->GetNumSetting("EjectCDAfterRipping",1);
-    if (EjectCD) 
-        ejectCD(cddevice);
 
     QString PostRipCDScript = gContext->GetSetting("PostCDRipScript");
 
@@ -817,32 +270,10 @@ void Ripper::ripthedisc(void)
         }
     }
 
-    delete newdiag;
-
-    hide();
+    sendEvent(ST_FINISHED, "");
 }
 
-
-void Ripper::ejectCD(QString& cddev)
-{
-    int cdrom_fd;
-    cdrom_fd = cd_init_device((char*)cddev.ascii());
-    if (cdrom_fd != -1)
-    {
-        if (cd_eject(cdrom_fd) == -1) 
-            perror("Failed on cd_eject");
-        cd_finish(cdrom_fd);              
-    } 
-    else  
-        perror("Failed on cd_init_device");
-}
-
-static void paranoia_cb(long inpos, int function)
-{
-    inpos = inpos; function = function;
-}
-
-int Ripper::ripTrack(QString &cddevice, Encoder *encoder, int tracknum)
+int CDRipperThread::ripTrack(QString &cddevice, Encoder *encoder, int tracknum)
 {
     cdrom_drive *device = cdda_identify(cddevice.ascii(), 0, NULL);
 
@@ -862,7 +293,7 @@ int Ripper::ripTrack(QString &cddevice, Encoder *encoder, int tracknum)
     cdrom_paranoia *paranoia = paranoia_init(device);
     if (gContext->GetSetting("ParanoiaLevel") == "full")
         paranoia_modeset(paranoia, PARANOIA_MODE_FULL | 
-                                   PARANOIA_MODE_NEVERSKIP);
+                PARANOIA_MODE_NEVERSKIP);
     else
         paranoia_modeset(paranoia, PARANOIA_MODE_OVERLAP);
 
@@ -871,9 +302,9 @@ int Ripper::ripTrack(QString &cddevice, Encoder *encoder, int tracknum)
     long int curpos = start;
     int16_t *buffer;
 
-    current->setTotalSteps(end - start + 1);
-
-    qApp->processEvents();
+    sendEvent(ST_TRACK_START, end - start + 1);
+    m_lastTrackPct = -1;
+    m_lastOverallPct = -1;
 
     int every15 = 15;
     while (curpos < end)
@@ -886,27 +317,1121 @@ int Ripper::ripTrack(QString &cddevice, Encoder *encoder, int tracknum)
         curpos++;
 
         every15--;
- 
+
         if (every15 <= 0) 
         {
             every15 = 15;
-            current->setProgress(curpos - start);           
-            overall->setProgress(totalSectorsDone + (curpos - start));
+
+            // updating the UITypes can be slow so only update them if we need to
+            int newOverallPct = (int) (100.0 /  (double) ((double) m_totalSectors /
+                    (double) (m_totalSectorsDone + curpos - start)));
+            if (newOverallPct != m_lastOverallPct)
+            {
+                m_lastOverallPct = newOverallPct;
+                sendEvent(ST_OVERALL_PERCENT, newOverallPct);
+                sendEvent(ST_OVERALL_PROGRESS, m_totalSectorsDone + curpos - start);
+            }
+
+            int newTrackPct = (int) (100.0 / (double) ((double) (end - start + 1) /
+                    (double) (curpos - start)));
+            if (newTrackPct != m_lastTrackPct)
+            {
+                m_lastTrackPct = newTrackPct;
+                sendEvent(ST_TRACK_PERCENT, newTrackPct);
+                sendEvent(ST_TRACK_PROGRESS, curpos - start);
+            }
+
             if (class LCD * lcd = LCD::Get()) 
             {
-                float fProgress = (float)(totalSectorsDone + (curpos - start))/totalSectors;
+                float fProgress = (float)(m_totalSectorsDone + (curpos - start)) / m_totalSectors;
                 lcd->setGenericProgress(fProgress);
             }
-            qApp->processEvents();
+        }
+
+        if (isCancelled())
+        {
+            break;
         }
     }
 
-    totalSectorsDone += end - start + 1;
-    current->setProgress(end);
-    qApp->processEvents();
-        
+    m_totalSectorsDone += end - start + 1;
+
     paranoia_free(paranoia);
     cdda_close(device);
 
     return (curpos - start + 1) * CD_FRAMESIZE_RAW;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+Ripper::Ripper(MythMainWindow *parent, const char *name)
+      : MythThemedDialog(parent, "cdripper", "music-", name, true)
+{
+    // Set this to false so we can tell if the ripper has done anything
+    // (i.e. we can tell if the user quit prior to ripping)
+    m_somethingwasripped = false;
+    wireupTheme();
+    m_decoder = NULL;
+    m_tracks = new vector<Metadata*>;
+
+    QTimer::singleShot(500, this, SLOT(startScanCD()));
+}
+
+Ripper::~Ripper(void)
+{
+    if (m_decoder)
+        delete m_decoder;
+}
+
+void Ripper::wireupTheme(void)
+{
+    m_qualitySelector = getUISelectorType("quality_selector");
+    if (m_qualitySelector)
+    {
+        m_qualitySelector->addItem(0, tr("Low"));
+        m_qualitySelector->addItem(1, tr("Medium"));
+        m_qualitySelector->addItem(2, tr("High"));
+        m_qualitySelector->addItem(3, tr("Perfect"));
+        m_qualitySelector->setToItem(gContext->GetNumSetting("DefaultRipQuality", 1));
+    }
+
+    m_artistEdit = getUIRemoteEditType("artist_edit");
+    if (m_artistEdit)
+    {
+        m_artistEdit->createEdit(this);
+        connect(m_artistEdit, SIGNAL(textChanged(QString)), this, SLOT(artistChanged(QString)));
+    }
+
+    m_searchArtistButton = getUIPushButtonType("searchartist_button");
+    if (m_searchArtistButton)
+    {
+        connect(m_searchArtistButton, SIGNAL(pushed()), this, SLOT(searchArtist()));
+    }
+
+    m_albumEdit = getUIRemoteEditType("album_edit");
+    if (m_albumEdit)
+    {
+        m_albumEdit->createEdit(this);
+        connect(m_albumEdit, SIGNAL(textChanged(QString)), this, SLOT(albumChanged(QString)));
+    }
+
+    m_searchAlbumButton = getUIPushButtonType("searchalbum_button");
+    if (m_searchAlbumButton)
+    {
+        connect(m_searchAlbumButton, SIGNAL(pushed()), this, SLOT(searchAlbum()));
+    }
+
+    m_genreEdit = getUIRemoteEditType("genre_edit");
+    if (m_genreEdit)
+    {
+        m_genreEdit->createEdit(this);
+        connect(m_genreEdit, SIGNAL(textChanged(QString)), this, SLOT(genreChanged(QString)));
+    }
+
+    m_yearEdit = getUIRemoteEditType("year_edit");
+    if (m_yearEdit)
+    {
+        m_yearEdit->createEdit(this);
+        connect(m_yearEdit, SIGNAL(textChanged(QString)), this, SLOT(yearChanged(QString)));
+    }
+
+    m_searchGenreButton = getUIPushButtonType("searchgenre_button");
+    if (m_searchGenreButton)
+    {
+        connect(m_searchGenreButton, SIGNAL(pushed()), this, SLOT(searchGenre()));
+    }
+
+    m_compilation = getUICheckBoxType("compilation_check");
+    if (m_compilation)
+    {
+        connect(m_compilation, SIGNAL(pushed(bool)),
+                this, SLOT(compilationChanged(bool)));
+    }
+
+    m_switchTitleArtist = getUITextButtonType("switch_text");
+    if (m_switchTitleArtist)
+    {
+        m_switchTitleArtist->setText(tr("Switch Titles"));
+        connect(m_switchTitleArtist, SIGNAL(pushed()), this, 
+                SLOT(switchTitlesAndArtists()));
+    }
+
+    m_scanButton = getUITextButtonType("scan_button");
+    if (m_scanButton)
+    {
+        m_scanButton->setText(tr("Scan CD"));
+        connect(m_scanButton, SIGNAL(pushed()), this, 
+                SLOT(startScanCD()));
+    }
+
+    m_ripButton = getUITextButtonType("rip_button");
+    if (m_ripButton)
+    {
+        m_ripButton->setText(tr("Rip CD"));
+        connect(m_ripButton, SIGNAL(pushed()), this, 
+                SLOT(startRipper()));
+    }
+
+    m_switchTitleArtist = getUITextButtonType("switch_button");
+    {
+        m_switchTitleArtist->setText("Switch Titles");
+        connect(m_switchTitleArtist, SIGNAL(pushed()), this, 
+                SLOT(switchTitlesAndArtists()));
+        m_switchTitleArtist->hide();
+    }
+
+    m_trackList = (UIListType*) getUIObject("track_list");
+
+    buildFocusList();
+    assignFirstFocus();
+}
+
+void Ripper::keyPressEvent(QKeyEvent *e)
+{
+    bool handled = false;
+
+    QStringList actions;
+    gContext->GetMainWindow()->TranslateKeyPress("Global", e, actions);
+
+    for (unsigned int i = 0; i < actions.size() && !handled; i++)
+    {
+        QString action = actions[i];
+        handled = true;
+
+        if (action == "SELECT")
+        {
+            if (getCurrentFocusWidget() == m_trackList)
+                showEditMetadataDialog();
+            else
+                activateCurrent();
+        }
+        else if (action == "UP")
+        {
+            if (getCurrentFocusWidget() == m_trackList)
+            {
+                trackListUp(false);
+            }
+            else
+                nextPrevWidgetFocus(false);
+        }
+        else if (action == "DOWN")
+        {
+            if (getCurrentFocusWidget() == m_trackList)
+            {
+                trackListDown(false);
+            }
+            else
+                nextPrevWidgetFocus(true);
+        }
+        else if (action == "LEFT")
+        {
+            if (getCurrentFocusWidget() == m_qualitySelector)
+            {
+                m_qualitySelector->push(false);
+            }
+            else
+                nextPrevWidgetFocus(false);
+        }
+        else if (action == "RIGHT")
+        {
+            if (getCurrentFocusWidget() == m_qualitySelector)
+            {
+                m_qualitySelector->push(true);
+            }
+            else
+                nextPrevWidgetFocus(true);
+        }
+        else if (action == "PAGEUP")
+        {
+            if (getCurrentFocusWidget() == m_trackList)
+            {
+                trackListUp(true);
+            }
+        }
+        else if (action == "PAGEDOWN")
+        {
+            if (getCurrentFocusWidget() == m_trackList)
+            {
+                trackListDown(true);
+            }
+        }
+        else if (action == "1")
+            m_scanButton->push();
+        else if (action == "2")
+            m_ripButton->push();
+        else
+            handled = false;
+    }
+
+    if (!handled)
+        MythThemedDialog::keyPressEvent(e);
+}
+
+void Ripper::startScanCD(void)
+{
+    MythBusyDialog *busy = new MythBusyDialog("Scanning CD. Please Wait ...");
+    CDScannerThread *scanner = new CDScannerThread(this);
+    busy->start();
+    scanner->start();
+
+    while (!scanner->finished())
+    {
+        usleep(500);
+        qApp->processEvents();
+    }
+
+    delete scanner;
+
+    m_tracks->clear();
+
+    bool isCompilation = false;
+    bool newTune = true;
+    if (m_decoder)
+    {
+        QString label;
+        Metadata *track;
+
+        m_artistName = "";
+        m_albumName = "";
+        m_genreName = "";
+        m_year = "";
+        bool yesToAll = false;
+        bool noToAll = false;
+
+        for (int trackno = 0; trackno < m_decoder->getNumTracks(); trackno++)
+        {
+            track = m_decoder->getMetadata(trackno + 1);
+            if (track)
+            {
+                if (track->Compilation())
+                {
+                    isCompilation = true;
+                    m_artistName = track->CompilationArtist();
+                }
+                else if ("" == m_artistName)
+                {
+                    m_artistName = track->Artist();
+                }
+
+                if ("" == m_albumName)
+                    m_albumName = track->Album();
+
+                if ("" == m_genreName 
+                    && "" != track->Genre())
+                {
+                    m_genreName = track->Genre();
+                }
+
+                if ("" == m_year 
+                    && 0 != track->Year())
+                {
+                    m_year = QString::number(track->Year());
+                }
+
+                QString title = track->Title();
+                newTune = isNewTune(m_artistName, m_albumName, title);
+
+                if (newTune)
+                {
+                    m_tracks->push_back(track);
+                }
+                else
+                {
+                    if (yesToAll)
+                    {
+                        deleteTrack(m_artistName, m_albumName, title);
+                        m_tracks->push_back(track);
+                    }
+                    else if (noToAll)
+                    {
+                        continue;
+                    }
+                    else
+                    {
+                        DialogBox dialog(gContext->GetMainWindow(),
+                                         tr("Artist: %1\n"
+                                         "Album: %2\n"
+                                         "Track: %3\n\n"
+                                         "This track is already in the database. \n"
+                                         "Do you want to remove the existing track?")
+                                         .arg(m_artistName).arg(m_albumName).arg(title));
+                        dialog.AddButton("No");
+                        dialog.AddButton("No To All");
+                        dialog.AddButton("Yes");
+                        dialog.AddButton("Yes To All");
+                        int res = dialog.exec();
+
+                        if (res == 1)
+                        {
+                        }
+                        else if (res == 2)
+                        {
+                            noToAll = true;
+                        }
+                        else if (res == 3)
+                        {
+                            deleteTrack(m_artistName, m_albumName, title);
+                            m_tracks->push_back(track);
+                        }
+                        else if (res == 4)
+                        {
+                            yesToAll = true;
+                            deleteTrack(m_artistName, m_albumName, title);
+                            m_tracks->push_back(track);
+                        }
+                    }
+                }
+            }
+        }
+
+        m_artistEdit->setText(m_artistName);
+        m_albumEdit->setText(m_albumName);
+        m_genreEdit->setText(m_genreName);
+        m_yearEdit->setText(m_year);
+        m_compilation->setState(isCompilation);
+
+        if (!isCompilation)
+            m_switchTitleArtist->hide();
+        else
+            m_switchTitleArtist->show();
+
+        m_totalTracks = m_tracks->size();
+    }
+
+    m_currentTrack = 0;
+
+    buildFocusList();
+    updateTrackList();
+
+    delete busy;
+}
+
+void Ripper::scanCD(void)
+{
+    QString cddevice = gContext->GetSetting("CDDevice");
+
+    int cdrom_fd = cd_init_device((char*)cddevice.ascii());
+    if (cdrom_fd == -1)
+    {
+        perror("Could not open cdrom_fd");
+        return;
+    }
+    cd_close(cdrom_fd);  //Close the CD tray
+    cd_finish(cdrom_fd);
+
+    if (m_decoder)
+        delete m_decoder;
+
+    m_decoder = new CdDecoder("cda", NULL, NULL, NULL);
+}
+
+bool Ripper::isNewTune(QString& artist, QString& album, QString& title)
+{
+    MSqlQuery query(MSqlQuery::InitCon());
+    QString queryString("SELECT filename, artist_name, album_name, name, song_id "
+                        "FROM music_songs "
+                        "LEFT JOIN music_artists ON music_songs.artist_id=music_artists.artist_id "
+                        "LEFT JOIN music_albums ON music_songs.album_id=music_albums.album_id "
+                        "WHERE artist_name REGEXP \'");      
+    QString token = artist;
+    token.replace(QRegExp("(/|\\\\|:|\'|\\,|\\!|\\(|\\)|\"|\\?|\\|)"), QString("."));
+
+    queryString += token + "\' AND " + "album_name REGEXP \'";
+    token = album;
+    token.replace(QRegExp("(/|\\\\|:|\'|\\,|\\!|\\(|\\)|\"|\\?|\\|)"), QString("."));
+    queryString += token + "\' AND " + "name    REGEXP \'";
+    token = title;
+    token.replace(QRegExp("(/|\\\\|:|\'|\\,|\\!|\\(|\\)|\"|\\?|\\|)"), QString("."));
+    queryString += token + "\' ORDER BY artist_name, album_name, name, song_id, filename";      
+    query.prepare(queryString);
+
+    if (!query.exec() || !query.isActive())
+    {
+        MythContext::DBError("Search music database", query);
+        return true;
+    }
+
+    if (query.numRowsAffected() > 0)
+    {
+        return false;
+    }
+
+    return true;
+}
+
+void Ripper::deleteTrack(QString& artist, QString& album, QString& title)
+{
+    MSqlQuery query(MSqlQuery::InitCon());
+    QString queryString("SELECT song_id, filename "
+            "FROM music_songs "
+            "LEFT JOIN music_artists ON music_songs.artist_id=music_artists.artist_id "
+            "LEFT JOIN music_albums ON music_songs.album_id=music_albums.album_id "
+            "WHERE artist_name REGEXP \'");      
+    QString token = artist;
+    token.replace(QRegExp("(/|\\\\|:|\'|\\,|\\!|\\(|\\)|\"|\\?|\\|)"), QString("."));
+
+    queryString += token + "\' AND " + "album_name REGEXP \'";
+    token = album;
+    token.replace(QRegExp("(/|\\\\|:|\'|\\,|\\!|\\(|\\)|\"|\\?|\\|)"), QString("."));
+    queryString += token + "\' AND " + "name    REGEXP \'";
+    token = title;
+    token.replace(QRegExp("(/|\\\\|:|\'|\\,|\\!|\\(|\\)|\"|\\?|\\|)"), QString("."));
+    queryString += token + "\' ORDER BY artist_name, album_name, name, song_id, filename";      
+    query.prepare(queryString);
+
+    if (!query.exec() || !query.isActive())
+    {
+        MythContext::DBError("Search music database", query);
+        return;
+    }
+
+    if (query.numRowsAffected() > 0)
+    {
+        while (query.next())
+        {
+            int trackID = query.value(0).toInt();
+            QString filename = query.value(1).toString();
+
+            // delete file
+            QString musicdir = gContext->GetSetting("MusicLocation");
+            musicdir = QDir::cleanDirPath(musicdir);
+            if (!musicdir.endsWith("/"))
+                musicdir += "/";
+            QFile::remove(musicdir + filename);
+
+            // remove database entry
+            MSqlQuery deleteQuery(MSqlQuery::InitCon());
+            deleteQuery.prepare("DELETE FROM music_songs WHERE song_id = :SONG_ID");
+            deleteQuery.bindValue(":SONG_ID", trackID);
+            if (!deleteQuery.exec())
+                MythContext::DBError("Delete Track", deleteQuery);
+        }
+    }
+}
+
+// static function to create a filename based on the metadata information
+QString Ripper::filenameFromMetadata(Metadata *track)
+{
+    QString musicdir = gContext->GetSetting("MusicLocation");
+    musicdir = QDir::cleanDirPath(musicdir);
+    if (!musicdir.endsWith("/"))
+        musicdir += "/";
+
+    QDir directoryQD(musicdir);
+    QString filename = "";
+    QString fntempl = gContext->GetSetting("FilenameTemplate");
+    bool no_ws = gContext->GetNumSetting("NoWhitespace", 0);
+
+    QRegExp rx_ws("\\s{1,}");
+    QRegExp rx("(GENRE|ARTIST|ALBUM|TRACK|TITLE|YEAR)");
+    int i = 0;
+    int old_i = 0;
+    while (i >= 0)
+    {
+        i = rx.search(fntempl, i);
+        if (i >= 0)
+        {
+            if (i > 0) 
+                filename += fixFileToken_sl(fntempl.mid(old_i,i-old_i));
+            i += rx.matchedLength();
+            old_i = i;
+
+            if ((rx.capturedTexts()[1] == "GENRE") && (track->Genre() != ""))
+                filename += fixFileToken(track->Genre());
+
+            if ((rx.capturedTexts()[1] == "ARTIST") && (track->FormatArtist() != ""))
+                filename += fixFileToken(track->FormatArtist());
+
+            if ((rx.capturedTexts()[1] == "ALBUM") && (track->Album() != ""))
+                filename += fixFileToken(track->Album());
+
+            if ((rx.capturedTexts()[1] == "TRACK") && (track->Track() >= 0))
+            {
+                QString tempstr = QString::number(track->Track(), 10); 
+                if (track->Track() < 10) 
+                    tempstr.prepend('0'); 
+                filename += fixFileToken(tempstr);
+            }
+
+            if ((rx.capturedTexts()[1] == "TITLE") && (track->FormatTitle() != ""))
+                filename += fixFileToken(track->FormatTitle());
+
+            if ((rx.capturedTexts()[1] == "YEAR") && (track->Year() >= 0))
+                filename += fixFileToken(QString::number(track->Year(), 10));
+        }
+    }
+
+    if (no_ws) 
+        filename.replace(rx_ws, "_");
+
+    if (filename == musicdir || filename.length() > FILENAME_MAX) 
+    {
+        QString tempstr = QString::number(track->Track(), 10);
+        tempstr += " - " + track->FormatTitle();
+        filename = musicdir + fixFileToken(tempstr);
+        VERBOSE(VB_GENERAL, QString("Invalid file storage definition."));
+    }
+
+    filename = filename.local8Bit();
+    QStringList directoryList = QStringList::split("/", filename);
+    for (unsigned i = 0; i < (directoryList.size() - 1); i++)
+    {
+        musicdir += "/" + directoryList[i];
+        umask(022);
+        directoryQD.mkdir(musicdir, true);
+        directoryQD.cd(musicdir, true);
+    }
+
+    filename = directoryQD.absPath() + "/" + directoryList.last();
+
+    return filename;
+}
+
+inline QString Ripper::fixFileToken(QString token)
+{
+    token.replace(QRegExp("(/|\\\\|:|\'|\"|\\?|\\|)"), QString("_"));
+    return token;
+}
+
+inline QString Ripper::fixFileToken_sl(QString token)
+{
+    // this version doesn't remove fwd-slashes so we can pick them up later and create directories as required
+    token.replace(QRegExp("(\\\\|:|\'|\"|\\?|\\|)"), QString("_"));
+    return token;
+}
+
+
+bool Ripper::somethingWasRipped()
+{
+    return m_somethingwasripped;
+}
+
+void Ripper::artistChanged(QString newartist)
+{
+    Metadata *data;
+
+    for (int trackno = 0; trackno < m_totalTracks; ++trackno)
+    {
+        data = m_tracks->at(trackno);
+
+        if (data)
+        {
+            if (m_compilation->getState())
+            {
+                data->setCompilationArtist(newartist);
+            }
+            else
+            {
+                data->setArtist(newartist);
+                data->setCompilationArtist("");
+            }
+        }
+    }
+
+    updateTrackList();
+    m_artistName = newartist;
+}
+
+void Ripper::albumChanged(QString newalbum)
+{
+    Metadata *data;
+
+    for (int trackno = 0; trackno < m_totalTracks; ++trackno)
+    {
+        data = m_tracks->at(trackno);
+
+        if (data)
+            data->setAlbum(newalbum);
+    }
+
+    m_albumName = newalbum;
+}
+
+void Ripper::genreChanged(QString newgenre)
+{
+    Metadata *data;
+
+    for (int trackno = 0; trackno < m_totalTracks; ++trackno)
+    {
+        data = m_tracks->at(trackno);
+
+        if (data)
+            data->setGenre(newgenre);
+    }
+
+    m_genreName = newgenre;
+} 
+
+void Ripper::yearChanged(QString newyear)
+{
+    Metadata *data;
+
+    for (int trackno = 0; trackno < m_totalTracks; ++trackno)
+    {
+        data = m_tracks->at(trackno);
+
+        if (data)
+            data->setYear(newyear.toInt());
+    }
+
+    m_year = newyear;
+} 
+
+void Ripper::compilationChanged(bool state)
+{
+    if (!state)
+    {
+        Metadata *data;
+
+        // Update artist MetaData of each track on the ablum...
+        for (int trackno = 0; trackno < m_totalTracks; ++trackno)
+        {
+            data = m_tracks->at(trackno);
+
+            if (data)
+            {
+                data->setCompilationArtist("");
+                data->setArtist(m_artistName);
+                data->setCompilation(false);
+            }
+        }
+
+        m_switchTitleArtist->hide();
+    }
+    else
+    {
+        // Update artist MetaData of each track on the album...
+        for (int trackno = 0; trackno < m_totalTracks; ++trackno)
+        {
+            Metadata *data;
+            data = m_tracks->at(trackno);
+
+            if (data)
+            {
+                data->setCompilationArtist(m_artistName);
+                data->setCompilation(true);
+            }
+        }
+
+        m_switchTitleArtist->show();
+    }
+
+    buildFocusList();
+    updateTrackList();
+}
+
+void Ripper::switchTitlesAndArtists()
+{
+    if (!m_compilation->getState())
+        return;
+
+    Metadata *data;
+
+    // Switch title and artist for each track
+    QString tmp;
+
+    for (int track = 0; track < m_totalTracks; ++track)
+    {
+        data = m_tracks->at(track);
+
+        if (data)
+        {
+            tmp = data->Artist();
+            data->setArtist(data->Title());
+            data->setTitle(tmp);
+        }
+    }
+
+    updateTrackList();
+}
+
+void Ripper::reject() 
+{
+    startEjectCD();
+    done(Rejected);
+}
+
+void Ripper::startRipper(void)
+{
+    if (m_tracks->size() == 0)
+    {
+        MythPopupBox::showOkPopup(gContext->GetMainWindow(), tr("No tracks"),
+                                  tr("There are no tracks to rip?"));
+        return;
+    }
+
+    RipStatus statusDialog(m_tracks, m_qualitySelector->getCurrentInt(),
+                           gContext->GetMainWindow(), "edit metadata");
+    int res = statusDialog.exec();
+    if (res == Accepted)
+    {
+        bool EjectCD = gContext->GetNumSetting("EjectCDAfterRipping", 1);
+        if (EjectCD) 
+            startEjectCD();
+
+        MythPopupBox::showOkPopup(gContext->GetMainWindow(), tr("Success"),
+                                  tr("Rip completed successfully."));
+    }
+}
+
+
+void Ripper::startEjectCD()
+{
+    MythBusyDialog *busy = new MythBusyDialog(tr("Ejecting CD. Please Wait ..."));
+    CDEjectorThread *ejector = new CDEjectorThread(this);
+    busy->start();
+    ejector->start();
+
+    while (!ejector->finished())
+    {
+        usleep(500);
+        qApp->processEvents();
+    }
+
+    delete ejector;
+    delete busy;
+}
+
+void Ripper::ejectCD()
+{
+    QString cddevice = gContext->GetSetting("CDDevice");
+    bool bEjectCD = gContext->GetNumSetting("EjectCDAfterRipping",1);
+    if (bEjectCD)
+    {
+        int cdrom_fd;
+        cdrom_fd = cd_init_device((char*)cddevice.ascii());
+        if (cdrom_fd != -1)
+        {
+            if (cd_eject(cdrom_fd) == -1) 
+                perror("Failed on cd_eject");
+
+            cd_finish(cdrom_fd);
+        }
+        else
+            perror("Failed on cd_init_device");
+    }
+}
+
+void Ripper::updateTrackList(void)
+{
+    QString tmptitle;
+    if (m_trackList)
+    {
+        int trackListSize = m_trackList->GetItems();
+        m_trackList->ResetList();
+        if (m_trackList->isFocused())
+            m_trackList->SetActive(true);
+
+        int skip;
+        if (m_totalTracks <= trackListSize || m_currentTrack <= trackListSize / 2)
+            skip = 0;
+        else if (m_currentTrack >= m_totalTracks - trackListSize + trackListSize / 2)
+            skip = m_totalTracks - trackListSize;
+        else
+            skip = m_currentTrack - trackListSize / 2;
+        m_trackList->SetUpArrow(skip > 0);
+        m_trackList->SetDownArrow(skip + trackListSize < m_totalTracks);
+
+        int i;
+        for (i = 0; i < trackListSize; i++)
+        {
+            if (i + skip >= m_totalTracks)
+                break;
+
+            Metadata *track = m_tracks->at(i + skip);
+
+            m_trackList->SetItemText(i, 1, QString::number(track->Track()));
+            m_trackList->SetItemText(i, 2, track->Title());
+            m_trackList->SetItemText(i, 3, track->Artist());
+            int length = track->Length() / 1000;
+            int min, sec;
+            min = length / 60;
+            sec = length % 60;
+            QString s;
+            s.sprintf("%02d:%02d", min, sec);
+            m_trackList->SetItemText(i, 4, s);
+
+            if (i + skip == m_currentTrack)
+            {
+                m_trackList->SetItemCurrent(i);
+            }
+        }
+
+        m_trackList->refresh();
+    }
+}
+
+void Ripper::trackListDown(bool page)
+{
+    if (m_currentTrack < m_totalTracks - 1)
+    {
+        int trackListSize = m_trackList->GetItems();
+
+        m_currentTrack += (page ? trackListSize : 1);
+        if (m_currentTrack > m_totalTracks - 1)
+            m_currentTrack = m_totalTracks - 1;
+
+        updateTrackList();
+    }
+}
+
+void Ripper::trackListUp(bool page)
+{
+    if (m_currentTrack > 0)
+    {
+        int trackListSize = m_trackList->GetItems();
+
+        m_currentTrack -= (page ? trackListSize : 1);
+        if (m_currentTrack < 0)
+            m_currentTrack = 0;
+
+        updateTrackList();
+    }
+}
+
+void Ripper::searchArtist()
+{
+    QString s;
+
+    m_searchList = Metadata::fillFieldList("artist");
+
+    s = m_artistEdit->getText();
+    if (showList(tr("Select an Artist"), s))
+    {
+        m_artistEdit->setText(s);
+        artistChanged(s);
+        updateTrackList();
+    }
+}
+
+void Ripper::searchAlbum()
+{
+    QString s;
+
+    m_searchList = Metadata::fillFieldList("album");
+
+    s = m_albumEdit->getText();
+    if (showList(tr("Select an Album"), s))
+    {
+        m_albumEdit->setText(s);
+        albumChanged(s);
+    }
+}
+
+void Ripper::searchGenre()
+{
+    QString s;
+
+    // load genre list
+    m_searchList.clear();
+    for (int x = 0; x < genre_table_size; x++)
+        m_searchList.push_back(QString(genre_table[x]));
+    m_searchList.sort();
+
+    s = m_genreEdit->getText();
+    if (showList(tr("Select a Genre"), s))
+    {
+        m_genreEdit->setText(s);
+        genreChanged(s);
+    }
+}
+
+bool Ripper::showList(QString caption, QString &value)
+{
+    bool res = false;
+
+    MythSearchDialog *searchDialog = new MythSearchDialog(gContext->GetMainWindow(), "");
+    searchDialog->setCaption(caption);
+    searchDialog->setSearchText(value);
+    searchDialog->setItems(m_searchList);
+    if (searchDialog->ExecPopupAtXY(-1, 8) == 0)
+    {
+        value = searchDialog->getResult();
+        res = true;
+    }
+
+    delete searchDialog;
+    setActiveWindow();
+
+    return res;
+}
+
+void Ripper::showEditMetadataDialog()
+{
+    Metadata *editMeta = m_tracks->at(m_currentTrack);
+
+    EditMetadataDialog editDialog(editMeta, gContext->GetMainWindow(),
+                                  "edit_metadata", "music-", "edit metadata");
+    editDialog.setSaveMetadataOnly();
+
+    if (editDialog.exec())
+    {
+        updateTrackList();
+    }
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+RipStatus::RipStatus(vector<Metadata*> *tracks, int quality, MythMainWindow *parent, const char *name)
+    : MythThemedDialog(parent, "ripstatus", "music-", name, true)
+{
+    m_tracks = tracks;
+    m_quality = quality;
+    m_ripperThread = NULL;
+
+    wireupTheme();
+    QTimer::singleShot(500, this, SLOT(startRip()));
+}
+
+RipStatus::~RipStatus(void)
+{
+    if (m_ripperThread)
+        delete m_ripperThread;
+}
+
+void RipStatus::wireupTheme(void)
+{
+    m_overallText = getUITextType("overall_text");
+    m_trackText = getUITextType("track_text");
+    m_statusText = getUITextType("status_text");
+    m_trackPctText = getUITextType("trackpct_text");
+    m_overallPctText = getUITextType("overallpct_text");
+
+    m_overallProgress = getUIStatusBarType("overall_progress");
+    if (m_overallProgress)
+    {
+        m_overallProgress->SetUsed(0);
+        m_overallProgress->SetTotal(1);
+    }
+
+    m_trackProgress = getUIStatusBarType("track_progress");
+    if (m_trackProgress)
+    {
+        m_trackProgress->SetUsed(0);
+        m_trackProgress->SetTotal(1);
+    }
+
+    buildFocusList();
+    assignFirstFocus();
+}
+
+void RipStatus::keyPressEvent(QKeyEvent *e)
+{
+    bool handled = false;
+
+    QStringList actions;
+    gContext->GetMainWindow()->TranslateKeyPress("Global", e, actions);
+
+    for (unsigned int i = 0; i < actions.size() && !handled; i++)
+    {
+        QString action = actions[i];
+        handled = true;
+
+        if (action == "ESCAPE")
+        {
+            if (m_ripperThread && m_ripperThread->running())
+            {
+                if (MythPopupBox::showOkCancelPopup(gContext->GetMainWindow(), tr("Stop Rip?"),
+                    tr("Are you sure you want to cancel ripping the CD?"), false))
+                {
+                    m_ripperThread->cancel();
+                    m_ripperThread->wait();
+                    done(Rejected);
+                }
+            }
+        }
+        else
+            handled = false;
+    }
+
+    if (!handled)
+        MythThemedDialog::keyPressEvent(e);
+}
+
+void RipStatus::customEvent(QCustomEvent *e)
+{
+    if (!e || (e->type() != QEvent::User))
+        return;
+
+    StatusData *sd = (StatusData*) (e->data());
+
+    if (!sd) return;
+
+    switch(sd->type)
+    {
+        case ST_TRACK_TEXT:
+        {
+            m_trackText->SetText(sd->text);
+            break;
+        }
+
+        case ST_OVERALL_TEXT:
+        {
+            m_overallText->SetText(sd->text);
+            break;
+        }
+
+        case ST_STATUS_TEXT:
+        {
+            m_statusText->SetText(sd->text);
+            break;
+        }
+
+        case ST_TRACK_PROGRESS:
+        {
+            m_trackProgress->SetUsed(sd->value);
+            break;
+        }
+
+        case ST_TRACK_PERCENT:
+        {
+            m_trackPctText->SetText(QString("%1%").arg(sd->value));
+            break;
+        }
+
+        case ST_TRACK_START:
+        {
+            m_trackProgress->SetTotal(sd->value);
+            break;
+        }
+
+        case ST_OVERALL_PROGRESS:
+        {
+            m_overallProgress->SetUsed(sd->value);
+            break;
+        }
+
+        case ST_OVERALL_START:
+        {
+            m_overallProgress->SetTotal(sd->value);
+            break;
+        }
+
+        case ST_OVERALL_PERCENT:
+        {
+            m_overallPctText->SetText(QString("%1%").arg(sd->value));
+            break;
+        }
+
+        case ST_FINISHED:
+        {
+            done(Accepted);
+            break;
+        }
+
+        default:
+            cout << "Received an unknown event type!" << endl;
+            break;
+    }
+
+    delete sd;
+}
+
+void RipStatus::startRip(void)
+{
+    if (m_ripperThread)
+        delete m_ripperThread;
+
+    m_ripperThread = new CDRipperThread(this, m_tracks, m_quality);
+    m_ripperThread->start();
 }

@@ -16,6 +16,7 @@ EditMetadataDialog::EditMetadataDialog(Metadata *source_metadata,
     // make a copy so we can abandon changes
     m_metadata = new Metadata(*source_metadata);
     m_sourceMetadata = source_metadata;
+    metadataOnly = false;
     wireUpTheme();
     fillWidgets();
     assignFirstFocus();
@@ -441,18 +442,29 @@ void EditMetadataDialog::showSaveMenu()
 
     QLabel *label = popup->addLabel(tr("Save Changes?"), MythPopupBox::Large, false);
     label->setAlignment(Qt::AlignCenter | Qt::WordBreak);
+    QButton *topButton;
 
-    QButton *topButton = popup->addButton(tr("Save to Database Only"), this,
-                         SLOT(saveToDatabase()));
-    if (!m_metadata->Filename().contains("://"))
+    if (metadataOnly)
     {
-        popup->addButton(tr("Save to File Only"), this,
-                             SLOT(saveToFile()));
-        popup->addButton(tr("Save to File and Database"), this,
-                             SLOT(saveAll()));
+        topButton = popup->addButton(tr("Save Changes"), this,
+                                        SLOT(saveToMetadata()));
     }
+    else
+    {
+        topButton = popup->addButton(tr("Save to Database Only"), this,
+                                     SLOT(saveToDatabase()));
+        if (!m_metadata->Filename().contains("://"))
+        {
+            popup->addButton(tr("Save to File Only"), this,
+                                SLOT(saveToFile()));
+            popup->addButton(tr("Save to File and Database"), this,
+                                SLOT(saveAll()));
+        }
+    }
+
     popup->addButton(tr("Exit/Do Not Save"), this,
-                         SLOT(closeDialog()));
+                            SLOT(closeDialog()));
+
     popup->addButton(tr("Cancel"), this, SLOT(cancelPopup()));
 
     popup->ShowPopup(this, SLOT(cancelPopup()));
@@ -470,6 +482,14 @@ void EditMetadataDialog::cancelPopup()
   delete popup;
   popup = NULL;
   setActiveWindow();
+}
+
+void EditMetadataDialog::saveToMetadata()
+{
+    cancelPopup();
+
+    *m_sourceMetadata = m_metadata;
+    done(1);
 }
 
 void EditMetadataDialog::saveToDatabase()

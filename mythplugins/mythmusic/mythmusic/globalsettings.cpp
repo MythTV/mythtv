@@ -113,15 +113,6 @@ static HostCheckBox *IgnoreID3Tags()
     return gc;
 };
 
-static HostCheckBox *OnlyImportNewMusic()
-{
-    HostCheckBox *gc = new HostCheckBox("OnlyImportNewMusic");
-    gc->setLabel(QObject::tr("Only Import new music."));
-    gc->setValue(false);
-    gc->setHelpText(QObject::tr("Checks the database for duplicates when importing/ripping CDs."));
-    return gc;
-};
-
 static HostCheckBox *AutoLookupCD()
 {
     HostCheckBox *gc = new HostCheckBox("AutoLookupCD");
@@ -198,18 +189,7 @@ static HostLineEdit *FilenameTemplate()
     gc->setValue("ARTIST/ALBUM/TRACK-TITLE"); // Don't translate
     gc->setHelpText(QObject::tr("Defines the location/name for new songs. "
                     "Valid tokens are: GENRE, ARTIST, ALBUM, "
-                    "TRACK, TITLE, YEAR, / and -. '-' will be replaced "
-                    "by the Token separator"));
-    return gc;
-};
-
-static HostLineEdit *TagSeparator()
-{
-    HostLineEdit *gc = new HostLineEdit("TagSeparator");
-    gc->setLabel(QObject::tr("Token separator"));
-    gc->setValue(" - ");
-    gc->setHelpText(QObject::tr("Filename tokens will be separated by "
-                    "this string."));
+                    "TRACK, TITLE, YEAR"));
     return gc;
 };
 
@@ -578,11 +558,9 @@ MusicRipperSettings::MusicRipperSettings(void)
     rippersettings->setLabel(QObject::tr("CD Ripper Settings"));
     rippersettings->addChild(ParanoiaLevel());
     rippersettings->addChild(FilenameTemplate());
-    rippersettings->addChild(TagSeparator());
     rippersettings->addChild(NoWhitespace());
     rippersettings->addChild(PostCDRipScript());
     rippersettings->addChild(EjectCD());
-    rippersettings->addChild(OnlyImportNewMusic());
     addChild(rippersettings);
 
     VerticalConfigurationGroup* encodersettings = new VerticalConfigurationGroup(false);

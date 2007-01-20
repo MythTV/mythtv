@@ -365,7 +365,7 @@ bool startRipper(void)
 
     if (rip.somethingWasRipped())
       return true;
-    
+
     return false;
 }
 
@@ -410,8 +410,6 @@ void MusicCallback(void *data, QString &selection)
         {
             // If startRipper returns true, then new data should be present
 
-            //  Reconcile with the database
-            SearchDir(mdata->startdir);
             //  Tell the metadata to reset itself
             RebuildMusicTree(mdata);
         }

@@ -27,6 +27,7 @@ class EditMetadataDialog : public MythThemedDialog
     void keyPressEvent(QKeyEvent *e);
     void wireUpTheme();
     void fillWidgets();
+    void setSaveMetadataOnly() { metadataOnly = true; }
 
   public slots:
 
@@ -39,14 +40,17 @@ class EditMetadataDialog : public MythThemedDialog
     void showSaveMenu();
     void saveToDatabase();
     void saveToFile();
+    void saveToMetadata();
     void saveAll();
     void cancelPopup();
     void editLostFocus();
     void checkClicked(bool state);
+
   private:
 
     bool showList(QString caption, QString &value);
-    
+
+    bool                   metadataOnly;
     Metadata *m_metadata, *m_sourceMetadata ;
     MythPopupBox *popup;
     //
