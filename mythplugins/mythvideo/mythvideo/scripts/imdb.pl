@@ -141,6 +141,10 @@ sub getMovieData {
       my $name_link_pat = qr!<a href="/name/[^"]*">([^<]*)</a>!m;
       $plot =~ s/$name_link_pat/$1/g;
 
+      # replace title links
+      my $title_link_pat = qr!<a href="/title/[^"]*">([^<]*)</a>!m;
+      $plot =~ s/$title_link_pat/$1/g;
+
       # plot ends at first remaining link
       my $plot_end = index($plot, "<a href=\"");
       if ($plot_end != -1) {
