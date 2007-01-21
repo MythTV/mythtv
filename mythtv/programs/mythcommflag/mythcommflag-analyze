@@ -148,8 +148,8 @@ set format x
 plot "$recordedmarkupplot" using 1:2 with steps linewidth 5
 EOM
 		close(GNUPLOT) or die "close gnuplot: $!\n";
-		unlink $recordedmarkupplot;
 	}
+	unlink $recordedmarkupplot;
 
 	my @output;
 	foreach my $file ($recordedmarkuppng) {
@@ -265,9 +265,10 @@ EOM
 
 		my $tmhistpng = $tmfile;
 		$tmhistpng =~ s#\.txt$#-hist.png#;
-		print "\t", timestamp(time), ": $tmhistpng\n";
-		open(GNUPLOT, "| gnuplot") or die "open gnuplot: $!\n";
-		print GNUPLOT <<EOM;
+		if (-s $tmhistplot) {
+			print "\t", timestamp(time), ": $tmhistpng\n";
+			open(GNUPLOT, "| gnuplot") or die "open gnuplot: $!\n";
+			print GNUPLOT <<EOM;
 set key off
 set style fill solid 1.0 noborder
 set terminal png transparent small size 640,192
@@ -280,7 +281,8 @@ set xlabel "Template Edge Pixels Matched"
 set format x
 plot "$tmhistplot" using 1:2 with points pointtype 7 pointsize 0.5
 EOM
-		close(GNUPLOT) or die "close gnuplot: $!\n";
+			close(GNUPLOT) or die "close gnuplot: $!\n";
+		}
 		unlink $tmhistplot;
 
 		return ($tmmatchpng, $tmhistpng);
@@ -350,9 +352,10 @@ sub histogramanalyzer(;)
 
 		my $columnspng = $hafile;
 		$columnspng =~ s#\.txt$#-columns.png#;
-		print "\t", timestamp(time), ": $columnspng\n";
-		open(GNUPLOT, "| gnuplot") or die "open gnuplot: $!\n";
-		print GNUPLOT <<EOM;
+		if (-s $columnsplot) {
+			print "\t", timestamp(time), ": $columnspng\n";
+			open(GNUPLOT, "| gnuplot") or die "open gnuplot: $!\n";
+			print GNUPLOT <<EOM;
 set key off
 set style fill solid 1.0 noborder
 set terminal png transparent small size 640,192
@@ -366,7 +369,8 @@ set format x
 set bars 0
 plot "$columnsplot" with yerrorlines
 EOM
-		close(GNUPLOT) or die "close gnuplot: $!\n";
+			close(GNUPLOT) or die "close gnuplot: $!\n";
+		}
 		unlink $columnsplot;
 
 		my $rowsplot = $hafile;
@@ -387,9 +391,10 @@ EOM
 
 		my $rowspng = $hafile;
 		$rowspng =~ s#\.txt$#-rows.png#;
-		print "\t", timestamp(time), ": $rowspng\n";
-		open(GNUPLOT, "| gnuplot") or die "open gnuplot: $!\n";
-		print GNUPLOT <<EOM;
+		if (-s $rowsplot) {
+			print "\t", timestamp(time), ": $rowspng\n";
+			open(GNUPLOT, "| gnuplot") or die "open gnuplot: $!\n";
+			print GNUPLOT <<EOM;
 set key off
 set style fill solid 1.0 noborder
 set terminal png transparent small size 640,192
@@ -403,7 +408,8 @@ set format x
 set bars 0
 plot "$rowsplot" with yerrorlines
 EOM
-		close(GNUPLOT) or die "close gnuplot: $!\n";
+			close(GNUPLOT) or die "close gnuplot: $!\n";
+		}
 		unlink $rowsplot;
 
 		my $blankpng = $hafile;
