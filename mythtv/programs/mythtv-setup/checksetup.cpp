@@ -3,7 +3,8 @@
 // Some functions to do simple sanity checks on the MythTV setup.
 // CheckSetup() is currently meant for the mythtv-setup program,
 // but the other functions could probably be called from anywhere.
-// They all return true if any problems are found.
+// They all return true if any problems are found, and add to a
+// caller-supplied QString a message describing the problem.
 
 #include <qstring.h>
 #include <qdir.h>
@@ -11,6 +12,7 @@
 #include "libmyth/mythcontext.h"
 #include "libmyth/util.h"
 
+/// Check that a directory path exists and is writable
 
 static bool checkPath(QString path, QString *probs)
 {
@@ -39,8 +41,8 @@ static bool checkPath(QString path, QString *probs)
     return false;
 }
 
-// Do the recording and Live TV filesystem paths exist? Are they writable?
-// Is the Live TV filesystem large enough?
+/// Do the Storage Group filesystem paths exist? Are they writable?
+/// Is the Live TV filesystem large enough?
 
 bool checkStoragePaths(QString *probs)
 {
@@ -60,13 +62,14 @@ bool checkStoragePaths(QString *probs)
     query.next();
     if (query.value(0).toInt() == 0)
     {
-        VERBOSE(VB_IMPORTANT, "No Storage Group directories are defined. You "
-                "must add at least one directory to the Default Storage Group "
-                "where new recordings will be stored.");
-        *probs = QObject::tr("No Storage Group directories are defined.  You "
+        QString trMesg;
+
+        trMesg = QObject::tr("No Storage Group directories are defined.  You "
                              "must add at least one directory to the Default "
                              "Storage Group where new recordings will be "
-                             "stored.") + "\n";
+                             "stored.");
+        probs->append(trMesg + "\n");
+        VERBOSE(VB_IMPORTANT, trMesg);
         return true;
     }
 
@@ -159,6 +162,8 @@ bool checkChannelPresets(QString *probs)
     return problemFound;
 }
 
+/// Build up a string of common problems that the
+/// user should correct in the MythTV-Setup program
 
 bool CheckSetup(QString *problems)
 {
