@@ -22,8 +22,11 @@ OutputListeners::~OutputListeners()
 
 
 void OutputListeners::error(const QString &e) {
-    OutputEvent ev (e);
-    dispatch (ev);
+    QObject *object = firstListener();
+    while (object) {
+	QApplication::postEvent(object, new OutputEvent(e));
+	object = nextListener();
+    }
 }
 
 void OutputListeners::addVisual(MythTV::Visual *v)
