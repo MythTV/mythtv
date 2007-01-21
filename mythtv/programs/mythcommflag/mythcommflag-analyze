@@ -131,9 +131,10 @@ sub recordedmarkup($)
 
 	my $recordedmarkuppng = $recordedmarkupplot;
 	$recordedmarkuppng =~ s#\.plot$#.png#;
-	print "\t", timestamp(time), ": $recordedmarkuppng\n";
-	open(GNUPLOT, "| gnuplot") or die "open gnuplot: $!\n";
-	print GNUPLOT <<EOM;
+	if (-s $recordedmarkupplot) {
+		print "\t", timestamp(time), ": $recordedmarkuppng\n";
+		open(GNUPLOT, "| gnuplot") or die "open gnuplot: $!\n";
+		print GNUPLOT <<EOM;
 set key off
 set style fill solid 1.0 noborder
 set terminal png transparent small size 640,192
@@ -146,12 +147,13 @@ set xlabel "Frame Number"
 set format x
 plot "$recordedmarkupplot" using 1:2 with steps linewidth 5
 EOM
-	close(GNUPLOT) or die "close gnuplot: $!\n";
-	unlink $recordedmarkupplot;
+		close(GNUPLOT) or die "close gnuplot: $!\n";
+		unlink $recordedmarkupplot;
+	}
 
 	my @output;
 	foreach my $file ($recordedmarkuppng) {
-		if (-f $file) {
+		if (-s $file) {
 			if (!@output) {
 				push @output, <<EOM;
 
@@ -180,7 +182,7 @@ sub templatefinder(;)
 
 	my @output;
 	foreach my $file qw(tf-scores.jpg tf-edgecounts.jpg template.jpg) {
-		if (-f $file) {
+		if (-s $file) {
 			if (!@output) {
 				push @output, <<EOM;
 
@@ -287,7 +289,7 @@ EOM
 	my $tmfile = "";
 	foreach my $testfile qw(TemplateMatcher-pgm.txt
 			TemplateMatcher-yuv.txt) {
-		if (-f $testfile) {
+		if (-s $testfile) {
 			$tmfile = $testfile;
 			last;
 		}
@@ -305,7 +307,7 @@ EOM
 
 		my $first = 1;
 		foreach my $tmgraph (@tmgraphs) {
-			if (-f $tmgraph) {
+			if (-s $tmgraph) {
 				if (!$first) {
 					push @output, <<EOM;
 <br />
@@ -449,7 +451,7 @@ EOM
 	my $hafile = "";
 	foreach my $testfile qw(HistogramAnalyzer-pgm.txt
 			HistogramAnalyzer-yuv.txt) {
-		if (-f $testfile) {
+		if (-s $testfile) {
 			$hafile = $testfile;
 			last;
 		}
@@ -466,7 +468,7 @@ EOM
 EOM
 		my $first = 1;
 		foreach my $histograph (@histographs) {
-			if (-f $histograph) {
+			if (-s $histograph) {
 				if (!$first) {
 					push @output, <<EOM;
 <br />
