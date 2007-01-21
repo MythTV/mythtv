@@ -4,6 +4,7 @@ use strict;
 use Cwd;
 use File::Basename;
 use POSIX qw(strftime);
+use DBI;
 
 sub timestamp($)
 {
@@ -43,7 +44,131 @@ img { margin: 1px; padding: 1px 10px 1px 10px; }
 EOM
 }
 
-sub templatefinder()
+sub recordedmarkup($)
+{
+	sub mysql_params(;)
+	{
+		my @search = (
+			"mysql.txt",
+			"$ENV{HOME}/.mythtv/mysql.txt",
+			"/etc/mythtv/mysql.txt",
+			"/usr/share/mythtv/mysql.txt",
+			"/usr/local/share/mythtv/mysql.txt",
+			"/usr/local/etc/mythtv/mysql.txt",
+			);
+
+		my $file = undef;
+		foreach my $try (@search) {
+			next if !-e $try;
+			$file = $try;
+			last;
+		}
+		die "Couldn't find mysql.txt\n" if !$file;
+
+		my %params;
+		open(CONF, $file) or die "open $file: $!\n";
+		while (<CONF>){ 
+			chomp;
+			s/#.*$//;
+			next if !/\S/;
+			my ($key, $value) = m#^(.*?)\s*=\s*(.*)$#;
+			next if !$key || !$value;
+			$params{$key} = $value;
+		}
+		close(CONF);
+		\%params;
+	}
+
+	sub recordedmarkupdb($$)
+	{
+		my ($chanid, $starttime) = @_;
+
+		my $params = mysql_params();
+
+		my ($dbname, $dbhost, $dbuser, $dbpassword) =
+			@{%$params}{qw(DBName DBHostName DBUserName
+					DBPassword)};
+
+		my $dbh = DBI->connect(
+			"dbi:mysql:database=$dbname:host=$dbhost",
+			$dbuser, $dbpassword) or
+			die "Cannot connect to database: $DBI::errstr\n";
+
+		my $sql = qq{SELECT mark,type
+			FROM recordedmarkup
+			WHERE chanid = $chanid
+				AND starttime = '$starttime'
+				AND type IN (4,5)
+			ORDER BY mark,type
+		};
+		my $sth = $dbh->prepare($sql);
+		$sth->execute() or die "Execute \"$sql\": $sth->errstr\n";
+		my %type;
+		while (my $row = $sth->fetchrow_hashref) {
+			my ($frameno, $type) = @{%$row}{qw(mark type)};
+			$type{$frameno} = $type == 4 ? 0 : 1;
+		}
+		$sth->finish() or die "Finish \"$sql\": $sth->errstr\n";
+		\%type;
+	}
+
+	my ($debugdir) = @_;
+	$debugdir = basename($debugdir);
+
+	my ($chanid, $starttime) = $debugdir =~ m#^(\d+)_(\d+)-debug$#;
+	$starttime =~ s#^(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})$#
+		$1-$2-$3T$4:$5:$6#x;
+
+	my $marks = recordedmarkupdb($chanid, $starttime);
+
+	my $recordedmarkupplot = "recordedmarkup.plot";
+	open(PLOT, ">$recordedmarkupplot") or
+		die "open $recordedmarkupplot: $!\n";
+	foreach my $frameno (sort { $a <=> $b } keys %$marks) {
+		printf PLOT "%7u\t%3u\n", $frameno, $marks->{$frameno};
+	}
+	close(PLOT) or die "close $recordedmarkupplot: $!\n";
+
+	my $recordedmarkuppng = $recordedmarkupplot;
+	$recordedmarkuppng =~ s#\.plot$#.png#;
+	print "\t", timestamp(time), ": $recordedmarkuppng\n";
+	open(GNUPLOT, "| gnuplot") or die "open gnuplot: $!\n";
+	print GNUPLOT <<EOM;
+set key off
+set style fill solid 1.0 noborder
+set terminal png transparent small size 640,192
+set output "$recordedmarkuppng"
+
+set xtics rotate
+set ylabel "Content"
+
+set xlabel "Frame Number"
+set format x
+plot "$recordedmarkupplot" using 1:2 with steps linewidth 5
+EOM
+	close(GNUPLOT) or die "close gnuplot: $!\n";
+	unlink $recordedmarkupplot;
+
+	my @output;
+	foreach my $file ($recordedmarkuppng) {
+		if (-f $file) {
+			if (!@output) {
+				push @output, <<EOM;
+
+<h2>RecordedMarkup</h2>
+
+EOM
+			}
+			push @output, <<EOM;
+<img src="$file"
+	title="$file" />
+EOM
+		}
+	}
+	@output;
+}
+
+sub templatefinder(;)
 {
 	if (-f "template.pgm") {
 		my $pgmmtime = (stat("template.pgm"))[9];
@@ -79,41 +204,11 @@ EOM
 	@output;
 }
 
-sub templatematcher()
+sub templatematcher(;)
 {
-	sub histogram($)
+	sub gnuplot_templatematcher($)
 	{
-		print "\t", timestamp(time), ": histogram\n";
-
 		my ($tmfile) = @_;
-		my %freq;
-		my $nframes = 0;
-		open(TMFILE, $tmfile) or die "open $tmfile: $!\n";
-		while (<TMFILE>) {
-			my $matchcnt = $_;
-			chomp $matchcnt;
-			$freq{$matchcnt}++;
-			$nframes++;
-		}
-		close(TMFILE) or die "close $tmfile: $!\n";
-
-		my %histo;
-		my @freqkeys = sort { $a <=> $b } keys %freq;
-		my ($minmatch, $maxmatch) = @freqkeys[0, $#freqkeys];
-		my $matchrange = $maxmatch - $minmatch;
-		my $nsamples = 0;
-		foreach my $matchcnt (@freqkeys) {
-			my $pctile = $matchrange ? $nsamples / $nframes : 0;
-			$nsamples += $freq{$matchcnt};
-			$histo{$pctile} = $freq{$matchcnt} / $nframes;
-		}
-
-		\%histo;
-	}
-
-	sub gnuplot_templatematcher($$)
-	{
-		my ($tmfile, $histogram) = @_;
 
 		my $tmmatchpng = $tmfile;
 		$tmmatchpng =~ s#\.txt$#-match.png#;
@@ -148,10 +243,21 @@ EOM
 		}
 		close(TMFILE) or die "close $tmfile: $!\n";
 
+		my @freqkeys = sort { $a <=> $b } keys %freq;
+		my ($minmatchcnt, $maxmatchcnt) = @freqkeys[0, $#freqkeys];
+		my $matchrange = $maxmatchcnt - $minmatchcnt;
+		my $matchstart = $minmatchcnt + $matchrange * 0.05;
+		my $matchend = $minmatchcnt + $matchrange * 0.95;
+
 		open(PLOT, ">$tmhistplot") or die "open $tmhistplot: $!\n";
-		foreach my $matchcnt (keys %freq) {
-			printf PLOT "%6u %12.6f\n",
-			       $matchcnt, $freq{$matchcnt} / $nframes;
+		foreach my $matchcnt (@freqkeys) {
+			# Don't plot outliers that tend to lie at edges of the
+			# graphed domain
+			if ($matchcnt >= $matchstart && $matchcnt < $matchend)
+			{
+				printf PLOT "%6u %12.6f\n",
+				       $matchcnt, $freq{$matchcnt} / $nframes;
+			}
 		}
 		close(PLOT) or die "close $tmhistplot: $!\n";
 
@@ -188,8 +294,7 @@ EOM
 	}
 	return "" if !$tmfile;
 
-	my $histo = histogram($tmfile);
-	my @tmgraphs = gnuplot_templatematcher($tmfile, $histo);
+	my @tmgraphs = gnuplot_templatematcher($tmfile);
 	my @output;
 	if (@tmgraphs) {
 		push @output, <<EOM;
@@ -217,7 +322,7 @@ EOM
 	@output;
 }
 
-sub histogramanalyzer()
+sub histogramanalyzer(;)
 {
 	sub gnuplot_histogramanalyzer($)
 	{
@@ -257,7 +362,7 @@ set ylabel "Border Min/Max Column"
 set xlabel "Frame Number"
 set format x
 set bars 0
-plot "$columnsplot" with yerrorbars
+plot "$columnsplot" with yerrorlines
 EOM
 		close(GNUPLOT) or die "close gnuplot: $!\n";
 		unlink $columnsplot;
@@ -294,7 +399,7 @@ set ylabel "Border Min/Max Row"
 set xlabel "Frame Number"
 set format x
 set bars 0
-plot "$rowsplot" with yerrorbars
+plot "$rowsplot" with yerrorlines
 EOM
 		close(GNUPLOT) or die "close gnuplot: $!\n";
 		unlink $rowsplot;
@@ -378,7 +483,7 @@ EOM
 	@output;
 }
 
-sub footer()
+sub footer(;)
 {
 	return <<EOM;
 
@@ -395,6 +500,7 @@ sub analyze($)
 	chdir($debugdir) or die "chdir $debugdir: $!\n";
 	my @output;
 	push @output, header($debugdir);
+	push @output, recordedmarkup($debugdir);
 	push @output, templatefinder();
 	push @output, templatematcher();
 	push @output, histogramanalyzer();

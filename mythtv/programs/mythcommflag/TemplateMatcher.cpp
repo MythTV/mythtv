@@ -232,7 +232,7 @@ removeShortBreaks(FrameAnalyzer::FrameMap *breakMap, float fps, int minbreaklen,
             VERBOSE(VB_COMMFLAG, QString("Removing break %1-%2 (%3-%4)")
                 .arg(frameToTimestamp(start, fps))
                 .arg(frameToTimestamp(end, fps))
-                .arg(start).arg(end));
+                .arg(start + 1).arg(end + 1));
         }
         breakMap->remove(bb1);
         removed = true;
@@ -255,13 +255,14 @@ removeShortSegments(FrameAnalyzer::FrameMap *breakMap, long long nframes,
 
     removed = false;
 
-    /* Never remove initial segment (beginning at frame 0). */
-    bb = breakMap->begin();
-    if (bb != breakMap->end() && bb.key() != 0 && bb.key() < minseglen)
-        ++bb;
 
-    for (; bb != breakMap->end(); bb = bbnext)
+    for (bb = breakMap->begin(); bb != breakMap->end(); bb = bbnext)
     {
+        /* Never remove initial segment (beginning at frame 0). */
+        if (bb == breakMap->begin() && bb != breakMap->end() &&
+                bb.key() != 0 && bb.key() < minseglen)
+            ++bb;
+
         bbnext = bb;
         ++bbnext;
         long long brkb = bb.key();
@@ -284,14 +285,19 @@ removeShortSegments(FrameAnalyzer::FrameMap *breakMap, long long nframes,
                     long long new1 = brkb;
                     long long new2 = nframes - 1;
                     VERBOSE(VB_COMMFLAG,
-                        QString("Replacing segment %1-%2 (%3-%4)"
+                        QString("Removing segment %1-%2 (%3-%4)")
+                        .arg(frameToTimestamp(segb + 1, fps))
+                        .arg(frameToTimestamp(sege + 1, fps))
+                        .arg(segb + 1).arg(sege + 1));
+                    VERBOSE(VB_COMMFLAG,
+                        QString("Replacing break %1-%2 (%3-%4)"
                         " with %5-%6 (%7-%8, EOF)")
-                        .arg(frameToTimestamp(old1, fps))
-                        .arg(frameToTimestamp(old2, fps))
-                        .arg(old1).arg(old2)
-                        .arg(frameToTimestamp(new1, fps))
-                        .arg(frameToTimestamp(new2, fps))
-                        .arg(new1).arg(new2));
+                        .arg(frameToTimestamp(old1 + 1, fps))
+                        .arg(frameToTimestamp(old2 + 1, fps))
+                        .arg(old1 + 1).arg(old2 + 1)
+                        .arg(frameToTimestamp(new1 + 1, fps))
+                        .arg(frameToTimestamp(new2 + 1, fps))
+                        .arg(new1 + 1).arg(new2 + 1));
                 }
                 breakMap->replace(brkb, nframes - brkb);
                 removed = true;
@@ -307,28 +313,35 @@ removeShortSegments(FrameAnalyzer::FrameMap *breakMap, long long nframes,
                 long long new1 = brkb;
                 long long new2 = bbnext.key() + bbnext.data() - 1;
                 VERBOSE(VB_COMMFLAG,
-                    QString("Replacing segment %1-%2 (%3-%4)"
+                    QString("Removing segment %1-%2 (%3-%4)")
+                    .arg(frameToTimestamp(segb + 1, fps))
+                    .arg(frameToTimestamp(sege + 1, fps))
+                    .arg(segb + 1).arg(sege + 1));
+                VERBOSE(VB_COMMFLAG,
+                    QString("Replacing break %1-%2 (%3-%4)"
                     " with %5-%6 (%7-%8)")
-                    .arg(frameToTimestamp(old1, fps))
-                    .arg(frameToTimestamp(old2, fps))
-                    .arg(old1).arg(old2)
-                    .arg(frameToTimestamp(new1, fps))
-                    .arg(frameToTimestamp(new2, fps))
-                    .arg(new1).arg(new2));
+                    .arg(frameToTimestamp(old1 + 1, fps))
+                    .arg(frameToTimestamp(old2 + 1, fps))
+                    .arg(old1 + 1).arg(old2 + 1)
+                    .arg(frameToTimestamp(new1 + 1, fps))
+                    .arg(frameToTimestamp(new2 + 1, fps))
+                    .arg(new1 + 1).arg(new2 + 1));
             }
             breakMap->replace(brkb, bbnext.key() + bbnext.data() - brkb);
+
             bb = bbnext;
             ++bbnext;
             if (verbose)
             {
                 long long start = bb.key();
                 long long end = start + bb.data() - 1;
-                VERBOSE(VB_COMMFLAG, QString("Removing segment %1-%2 (%3-%4)")
-                    .arg(frameToTimestamp(start, fps))
-                    .arg(frameToTimestamp(end, fps))
-                    .arg(start).arg(end));
+                VERBOSE(VB_COMMFLAG, QString("Removing break %1-%2 (%3-%4)")
+                    .arg(frameToTimestamp(start + 1, fps))
+                    .arg(frameToTimestamp(end + 1, fps))
+                    .arg(start + 1).arg(end + 1));
             }
             breakMap->remove(bb);
+
             removed = true;
         }
     }
@@ -412,7 +425,7 @@ range_area(const unsigned short *freq, unsigned short start, unsigned short end)
 }
 
 unsigned short
-matches_threshold(const unsigned short *matches, long long nframes)
+first_minimum(const unsigned short *matches, long long nframes)
 {
     /*
      * Most frames either match the template very well, or don't match
@@ -434,10 +447,12 @@ matches_threshold(const unsigned short *matches, long long nframes)
      * of the point to be greater than some (larger) area to the right
      * of the point.
      */
-    static const float  LEFTFRAC  = (float)0.04;
-    static const float  RIGHTFRAC = (float)0.08;
+    static const float  LEFTWIDTH  = 0.04;
+    static const float  RIGHTWIDTH = 0.08;
+    static const float  MATCHSTART = 0.05;
+    static const float  MATCHEND = 0.95;
 
-    unsigned short      leftwidth, rightwidth;
+    unsigned short      matchrange, leftwidth, rightwidth, matchstart, matchend;
     unsigned short      *sorted, minmatch, maxmatch, *freq;
     int                 nfreq, found_leftmode, matchcnt;
 
@@ -446,20 +461,25 @@ matches_threshold(const unsigned short *matches, long long nframes)
     qsort(sorted, nframes, sizeof(*sorted), sort_ascending);
     minmatch = sorted[0];
     maxmatch = sorted[nframes - 1];
+    matchrange = maxmatch - minmatch;
     /* degenerate minmatch==maxmatch case is gracefully handled */
 
-    leftwidth = (unsigned short)(LEFTFRAC * maxmatch);
-    rightwidth = (unsigned short)(RIGHTFRAC * maxmatch);
+    leftwidth = (unsigned short)(LEFTWIDTH * matchrange);
+    rightwidth = (unsigned short)(RIGHTWIDTH * matchrange);
     nfreq = maxmatch + 1;
     freq = new unsigned short[nfreq];
     memset(freq, 0, nfreq * sizeof(*freq));
     for (long long frameno = 0; frameno < nframes; frameno++)
         freq[matches[frameno]]++;   /* freq[<matchcnt>] = <framecnt> */
 
+    matchstart = minmatch + (unsigned short)(MATCHSTART * matchrange) +
+        leftwidth;
+    matchend = minmatch + (unsigned short)(MATCHEND * matchrange) - rightwidth;
+    VERBOSE(VB_COMMFLAG, QString("first_minimum considering %1-%2")
+            .arg(matchstart).arg(matchend));
+
     found_leftmode = 0;
-    for (matchcnt = minmatch + leftwidth;
-            matchcnt < maxmatch - rightwidth;
-            matchcnt++)
+    for (matchcnt = matchstart; matchcnt <  matchend; matchcnt++)
     {
         unsigned int    left, right;
 
@@ -677,7 +697,7 @@ TemplateMatcher::finished(long long nframes, bool final)
      * Lower values can yield more false "short" breaks or segments.
      */
     const int       MINBREAKLEN = (int)roundf(45 * fps);  /* frames */
-    const int       MINSEGLEN = (int)roundf(120 * fps);    /* frames */
+    const int       MINSEGLEN = (int)roundf(105 * fps);    /* frames */
 
     int                                 tmpledges, mintmpledges;
     int                                 minbreaklen, minseglen;
@@ -695,7 +715,7 @@ TemplateMatcher::finished(long long nframes, bool final)
     }
 
     tmpledges = pgm_set(tmpl, tmplheight);
-    mintmpledges = matches_threshold(matches, nframes);
+    mintmpledges = first_minimum(matches, nframes);
 
     VERBOSE(VB_COMMFLAG, QString("TemplateMatcher::finished %1x%2@(%3,%4),"
                 " %5 edge pixels, want %6")
