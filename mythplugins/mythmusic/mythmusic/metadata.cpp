@@ -345,7 +345,7 @@ void Metadata::dumpToDatabase()
                   "VALUES "
                   "  (:ARTIST,   :ALBUM,       :TITLE,"
                   "   :GENRE,    :YEAR,        :TRACKNUM,            :LENGTH,"
-                  "   :FILENAME, :DATE_ADDED,  :DATE_MOD,"
+                  "   :FILENAME, :DATE_ADD,  :DATE_MOD,"
                   "   :FORMAT,   :FILESIZE,    :BITRATE)"
                   );
     */
@@ -362,7 +362,7 @@ void Metadata::dumpToDatabase()
     query.bindValue(":DATE_MOD", QDateTime::currentDateTime());
 
     if (id < 1)
-        query.bindValue(":DATE_ADDED",  QDateTime::currentDateTime());
+        query.bindValue(":DATE_ADD",  QDateTime::currentDateTime());
     else
         query.bindValue(":ID", id);
 
