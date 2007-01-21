@@ -17,6 +17,7 @@
 
 #include <iostream>
 
+#include "libmyth/mythconfig.h"
 #include "libmyth/mythcontext.h"
 #include "libmyth/mythdbcon.h"
 #include "libmyth/langsettings.h"
@@ -360,8 +361,13 @@ int main(int argc, char *argv[])
 
 bool is_backend_running(void)
 {
+#if defined(CONFIG_DARWIN) || (__FreeBSD__) || defined(__OpenBSD__)
+    char    *command = "ps -ax | grep -i mythbackend | grep -v grep > ";
+#else
+    char    *command = "ps -ae | grep mythbackend > ";
+#endif
     QString tmp_file = "/tmp/backendrunning";
-    myth_system("ps -ae | grep mythbackend > " + tmp_file,
+    myth_system(command + tmp_file,
                 MYTH_SYSTEM_DONT_BLOCK_LIRC |
                 MYTH_SYSTEM_DONT_BLOCK_JOYSTICK_MENU);
 
