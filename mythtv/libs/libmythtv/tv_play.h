@@ -164,6 +164,9 @@ class MPUBLIC TV : public QObject
     bool IsErrored(void)         const { return errored; }
     /// true if dialog is either videoplayexit, playexit or askdelete dialog
     bool IsVideoExitDialog(void);
+    /// true if NVP is near the end
+    bool IsNearEnd(void) { return isnearend; }
+
     
     // Other queries
     int GetLastRecorderNum(void) const;
@@ -528,6 +531,7 @@ class MPUBLIC TV : public QObject
     
     bool         inPlaylist; ///< show is part of a playlist
     bool         underNetworkControl; ///< initial show started via by the network control interface
+    bool         isnearend;
 
     // Recording to play next, after LiveTV
     ProgramInfo *pseudoLiveTVRec[2];

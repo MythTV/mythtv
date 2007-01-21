@@ -461,6 +461,7 @@ TV::TV(void)
       playbackinfo(NULL), playbackLen(0),
       lastProgram(NULL), jumpToProgram(false),
       inPlaylist(false), underNetworkControl(false),
+      isnearend(false),
       // Video Players
       nvp(NULL), pipnvp(NULL), activenvp(NULL),
       // Remote Encoders
@@ -1773,24 +1774,28 @@ void TV::RunTV(void)
                     nvp->SetWatched();
                 VERBOSE(VB_PLAYBACK, LOC_ERR + "nvp->IsPlaying() timed out");
             }
+
+            if (nvp->IsNearEnd())
+                isnearend = true;
+            else
+                isnearend = false;
+            
+            if (isnearend && IsEmbedding() && !paused)
+                DoPause();
         }
 
         if (!endOfRecording)
         {
-
-           
-            if (jumped_back && !nvp->IsNearEnd())
+            if (jumped_back && !isnearend)
                 jumped_back = false;
             
             if (internalState == kState_WatchingPreRecorded && !inPlaylist &&
-                dialogname == "" && nvp->IsNearEnd() && !exitPlayer && !underNetworkControl &&
+                dialogname == "" && isnearend && !exitPlayer 
+                && !underNetworkControl &&
                 (gContext->GetNumSetting("EndOfRecordingExitPrompt") == 1) &&
-                !jumped_back && !editmode)
+                !jumped_back && !editmode && !IsEmbedding() && !paused)
             {
-                if (IsEmbedding())
-                    StopEmbeddingOutput();
-                else
-                    PromptDeleteRecording(tr("End Of Recording"));
+                PromptDeleteRecording(tr("End Of Recording"));
             }
             
                 
@@ -2315,7 +2320,7 @@ void TV::ProcessKeypress(QKeyEvent *e)
                 else
                     DoSeek(-rewtime, tr("Skip Back"));
             }
-            else if (action == "ESCAPE" && activenvp->IsNearEnd())
+            else if (action == "ESCAPE" && isnearend)
             {
                 requestDelete = false;
                 exitPlayer    = true;
@@ -2406,7 +2411,7 @@ void TV::ProcessKeypress(QKeyEvent *e)
                             wantsToQuit = true;
                             break;
                         default:
-                            if (activenvp->IsNearEnd())
+                            if (isnearend)
                             {
                                 exitPlayer = true;
                                 wantsToQuit = true;

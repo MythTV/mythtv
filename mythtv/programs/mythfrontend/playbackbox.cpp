@@ -3705,12 +3705,6 @@ void PlaybackBox::togglePlayListItem(ProgramInfo *pginfo)
 
 void PlaybackBox::timeout(void)
 {
-    if (m_player && !m_player->IsEmbedding() &&
-        playbackVideoContainer)
-    {
-        exitWin();
-    }
-
     if (titleList.count() <= 1)
         return;
 
