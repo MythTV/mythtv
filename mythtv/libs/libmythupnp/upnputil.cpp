@@ -67,6 +67,8 @@ long GetIPAddressList(QStringList &sStrList)
 
     for (ifa=list; ifa; ifa=ifa->ifa_next)
     {
+        if (!ifa->ifa_addr)
+            continue;
         if (ifa->ifa_addr->sa_family != AF_INET)
             continue;
         if (ifa->ifa_flags & IFF_LOOPBACK)
