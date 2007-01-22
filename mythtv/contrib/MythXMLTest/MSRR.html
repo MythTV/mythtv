@@ -1,0 +1,314 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+	<title>MS Media Receiver Registrar Service</title>
+	<LINK href="MythXMLTest.css " rel="stylesheet" type="text/css">
+	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+
+<script type="text/javascript" src="script.js"></script>
+
+<script type="text/javascript" />
+<!--
+function OnLoad( sPath )
+{
+	sRootPath   = sPath;
+	curElement  = FindObject( "li0" );
+	curMethodId = "DescriptionPanel"; 
+}
+// -->
+</script>
+</head>
+
+<body onLoad="OnLoad('/MSRR_Control')" >
+<table class="fullHeight" width="100%" align='center' cellpadding="0" cellspacing="0" border="0">
+	<tr valign="top" >
+		<td width='15%'>
+			<div id="NavList" >
+				<ul>
+					<li class="heading">Info -</a></li>
+					<ul>
+						<li id="li0" class="selected" onclick="MenuClick( event,'DescriptionPanel'  )"><a href="#">Discription</a></li>
+						<li id="li1" class="menu"     onclick="MenuClick( event,'GetServDescPanel')"><a href="#">GetServDesc</a></li>
+					</ul>
+					<li class="heading">Methods -</a></li>
+					<ul>
+						<li id="li2" class="menu" onclick="MenuClick( event,'IsAuthorizedPanel'  )"><a href="#">IsAuthorized</a></li>
+						<li id="li3" class="menu" onclick="MenuClick( event,'IsValidatedPanel'   )"><a href="#">IsValidated</a></li>
+						<li id="li4" class="menu" onclick="MenuClick( event,'RegisterDevicePanel')"><a href="#">RegisterDevice</a></li>
+					</ul>
+				</ul>
+			</div>
+		</td>
+		<td height="100%">
+			<table class="fullHeight" cellspacing=0 cellpadding=0 width="100%" border="0" >
+
+<!-- Description -->
+
+				<TBODY id='DescriptionPanel' style="">
+				<tr valign='top' >
+					<td width="2%">&nbsp;</td>
+					<td width="98%" height="1px"> 
+						<div id="divDescription" class="panel" > 
+							<table cellspacing=0 cellpadding=0 class="panel">
+								<tr> 
+									<td> 
+										<table cellspacing=0 cellpadding=0 class="mnuBar" id="mnuBar1" >
+											<tr> 
+												<td nowrap><span tabindex=0 class="menu"><B>uPnp MS Media Receiver Registrar Service</B></span></td>
+											</tr>
+										</table>
+									</td>
+								</tr>
+								<tr>
+									<td> 
+										<div class="panelArea"> 
+											<P>
+											<Center>-=>TODO: Describe what this collection of methods are for. <=-</Center>
+											<P>
+										</div>
+									</td>
+								</tr>
+							</table>
+						</div>
+					</td>
+				</tr>
+
+<!-- getServDesc -->
+
+				<TBODY id='GetServDescPanel' style="display:none;">
+				<tr valign='top' >
+					<td width="2%">&nbsp;</td>
+					<td width="98%" height="1px"> 
+						<div id="divGetServDesc" class="panel" > 
+							<table cellspacing=0 cellpadding=0 class="panel">
+								<tr> 
+									<td> 
+										<table cellspacing=0 cellpadding=0 class="mnuBar" id="mnuBar1" >
+											<tr> 
+												<td nowrap><span tabindex=0 class="menu"><B>GetServDesc - </B>Retrieve the uPnp MS Media Receiver Registrar Service Description XML.</span></td>
+											</tr>
+										</table>
+									</td>
+								</tr>
+								<tr>
+									<td> 
+										<div class="panelArea"> 
+											<table cellpadding=5 cellspacing=5 border=0 width='100%' >
+												<tr> 
+													<td width='40%' align="center"> 
+														<input name="button" type="button" class="formButton" onClick="UpdateIFrame( 'GetServDesc') " value="GetServDesc"/> 
+													</td>
+													<td valign="top"> 
+														<table border="0" cellpadding="0" cellspacing="1" cols="5"  width="100%" >
+															<tr> 
+																<td width="13%" class="label" align="right">Params:</td>
+																<td width="10%" class="param">none</td>
+																<td width="7%" >&nbsp;</td>
+																<td width="70%" class="desc">&nbsp;</td>
+															</tr>
+														</table>
+													</td>
+												</tr>
+											</table>
+										</div>
+									</td>
+								</tr>
+							</table>
+						</div>
+					</td>
+				</tr>
+
+<!-- IsAuthorized --> 
+
+				<TBODY id='IsAuthorizedPanel' style="display:none;">
+				<tr valign='top'  >
+					<td width="2%">&nbsp;</td>
+					<td width="98%" height="1px"> 
+						<div id="divIsAuthorized" class="panel" > 
+							<table cellspacing=0 cellpadding=0 class="panel">
+								<tr> 
+									<td>
+										<table cellspacing=0 cellpadding=0 class="mnuBar" id="mnuBar1" >
+											<tr> 
+												<td nowrap><span tabindex=0 class="menu"><B>IsAuthorized</B></span></td>
+											</tr>
+										</table>
+									</td>
+								</tr>
+								<tr>
+									<td> 
+										<div class="panelArea"> 
+											<table cellpadding=4 cellspacing=4 border=0 width='100%' >
+												<tr> 
+													<td width='40%' align="left" valign="top"> 
+														<form id="IsAuthorized" name="frmIsAuthorized" method="post" action="" target="fraResults" onSubmit="SetFormAddress( 'IsAuthorized' )">
+															<table border="0" cellpadding="0" cellspacing="1" align="left" width="100%">
+																<tr>
+																	<td width="40%"class="param">DeviceID:</td>
+																	<td width="60%"><input class="inputfields" type="text" name="DeviceID" ></td>
+																	<td align="right"><input name="IsAuthorized" type="submit" class="formButton" value="IsAuthorized"/></td>                          
+																</tr>
+															</table>
+														</form>
+													</td>
+													<td valign="top"> 
+														<table border="0" cellpadding="0" cellspacing="1" cols="5"  width="100%" >
+															<tr> 
+																<td width="10%" class="label" colspan="2" align="right">Params:</td>
+																<td width="15%" class="param">DeviceID</td>
+																<td width="7%">&nbsp;</td>
+																<td width="65%" class="desc"></td>
+															</tr>
+														</table>
+													</td>
+												</tr>
+											</table>
+										</div>
+									</td>
+								</tr>
+							</table>
+						</div>
+					</td>
+				</tr>
+
+<!-- IsValidated --> 
+
+				<TBODY id='IsValidatedPanel' style="display:none;">
+				<tr valign='top'  >
+					<td width="2%">&nbsp;</td>
+					<td width="98%" height="1px"> 
+						<div id="divIsValidated" class="panel" > 
+							<table cellspacing=0 cellpadding=0 class="panel">
+								<tr> 
+									<td>
+										<table cellspacing=0 cellpadding=0 class="mnuBar" id="mnuBar1" >
+											<tr> 
+												<td nowrap><span tabindex=0 class="menu"><B>IsValidated</B></span></td>
+											</tr>
+										</table>
+									</td>
+								</tr>
+								<tr>
+									<td> 
+										<div class="panelArea"> 
+											<table cellpadding=4 cellspacing=4 border=0 width='100%' >
+												<tr> 
+													<td width='40%' align="left" valign="top"> 
+														<form id="IsValidated" name="frmIsValidated" method="post" action="" target="fraResults" onSubmit="SetFormAddress( 'IsValidated' )">
+															<table border="0" cellpadding="0" cellspacing="1" align="left" width="100%">
+																<tr>
+																	<td width="40%" class="param">DeviceID:</td>
+																	<td width="60%"><input class="inputfields" type="text" name="DeviceID" ></td>
+																	<td align="right"><input name="IsValidated" type="submit" class="formButton" value="IsValidated"/></td>                          
+																</tr>
+															</table>
+														</form>
+													</td>
+													<td valign="top"> <table border="0" cellpadding="0" cellspacing="1" cols="5"  width="100%" >
+															<tr> 
+																<td width="10%" class="label" colspan="2" align="right">Params:</td>
+																<td width="15%" class="param">DeviceID</td>
+																<td width="7%">&nbsp;</td>
+																<td width="65%" class="desc"></td>
+															</tr>
+														</table>
+													</td>
+												</tr>
+											</table>
+										</div>
+									</td>
+								</tr>
+							</table>
+						</div>
+					</td>
+				</tr>
+
+<!-- RegisterDevice -->
+
+				<TBODY id='RegisterDevicePanel' style="display:none;">
+				<tr valign='top' >
+					<td width="2%">&nbsp;</td>
+					<td width="98%" height="1px"> 
+						<div id="divRegisterDevice" class="panel" > 
+							<table cellspacing=0 cellpadding=0 class="panel">
+								<tr> 
+									<td>
+										<table cellspacing=0 cellpadding=0 class="mnuBar" id="mnuBar1" >
+											<tr> 
+												<td nowrap><span tabindex=0 class="menu"><B>RegisterDevice</B></span></td>
+											</tr>
+										</table>
+									</td>
+								</tr>
+								<tr>
+									<td> 
+										<div class="panelArea"> 
+											<table cellpadding=4 cellspacing=4 border=0 width='100%' >
+												<tr> 
+													<td width='40%' align="left" valign="top"> 
+														<form id="RegisterDevice" name="frmRegisterDevice" method="post" action="" target="fraResults" onSubmit="SetFormAddress( 'RegisterDevice' )">
+															<table border="0" cellpadding="0" cellspacing="1" align="left" width="100%">
+																<tr>
+																	<td width="40%" class="param">RegistrationReqMsg:</td>
+																	<td width="60%"><input class="inputfields" type="text" name="RegistrationReqMsg" ></td>
+																	<td align="right"><input name="RegisterDevice" type="submit" class="formButton" value="RegisterDevice"/></td>                          
+																</tr>
+															</table>
+														</form>
+													</td>
+													<td valign="top"> <table border="0" cellpadding="0" cellspacing="1" cols="5"  width="100%" >
+															<tr> 
+																<td width="10%" class="label" colspan="2" align="right">Params:</td>
+																<td width="15%" class="param">RegistrationReqMsg</td>
+																<td width="7%">&nbsp;</td>
+																<td width="65%" class="desc"></td>
+															</tr>
+														</table>
+													</td>
+												</tr>
+											</table>
+										</div>
+									</td>
+								</tr>
+							</table>
+						</div>
+					</td>
+				</tr>
+
+<!--  Results -->
+
+				<TBODY id='tbBlank'>
+				<tr><td height="10px" colspan=2>&nbsp;</td></tr>
+				</TBODY>
+
+				<TBODY id='tbResults' style="">
+				<tr valign="top">
+					<td width="2%">&nbsp;</td>
+					<td height="80%" width="98%">
+						<table class="panel fullHeight" width="100%" cellspacing=0 cellpadding=0 border=0 >
+							<tr valign="top"> 
+								<td height="23px"> 
+									<table cellspacing=0 cellpadding=0 class="mnuBar" id="mnuBar1" >
+										<tr> 
+											<td class="icMenu" noWrap><span tabIndex=0 class="menu">Results</span></td>
+											<td align="right"><span id="MinMaxId" onClick="MinMax()" direction="up"><img src="arr_up.gif" width="17" height="17"></span></td>
+										</tr>
+									</table>
+								</td>
+							</tr>
+							<tr> 
+								<td height="100%"> 
+								<iframe id='fraResults' name='fraResults' width='100%' height='100%' frameborder="0"></iframe> 
+								</td>
+							</tr>
+						</table>
+					</td>
+				</tr>
+				</TBODY>
+			</table>
+		</td>
+	</tr>
+</table>
+</body>
+</html>

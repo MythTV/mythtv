@@ -1,0 +1,90 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+  <title>MythTv XML Protocol Test</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <link href="MythXMLTest.css" rel="stylesheet" type="text/css">
+
+<script type="text/javascript" src="script.js"></script>	
+
+<script type="text/javascript">
+<!--
+var curTabId;
+var bMax = false;
+
+function GetMasterBackend( sRootPath, sStr )
+{
+	var objServer = FindObject( "server" );
+	var objPort   = FindObject( "port"   );
+
+	var sURL = "http://" + objServer.value + ":" + objPort.value + sRootPath + "/" + sStr;
+	
+	return( sURL );
+}
+
+function ChangeTab( szDivID, iState) // 1 Selected, 0 not
+{
+	var obj = FindObject( szDivID );
+	if (obj != null)
+	{	
+		obj.className = iState ? "selected" : "not_selected";
+  }
+}
+
+function SelectTab( tabId )
+{
+	if ( tabId != curTabId)
+	{
+		ChangeTab( "tab" + curTabId, 0 )
+		ChangeTab( "tab" + tabId   , 1 );
+		curTabId = tabId;
+
+		window.parent.frames[ "mainFrame" ].location = tabId + ".html"; 
+	}
+}
+
+function OnLoad()
+{
+	SelectTab( 'Home' );
+}
+										    
+// -->
+</script>
+  
+</head>
+<body onLoad="OnLoad()">
+<table width='100%' height="100%" align='center' cellpadding="0" cellspacing="0" border="0">
+	<tr>
+		<td  colspan="3">
+			<table>
+				<tr>
+			 		<td width="10%">Server:</td>
+					<td width="20%"><input class="inputfields" type="text" id="server" /></td>
+					<td width="1%" >&nbsp;</td>
+    	 			<td width="8%" >Port:</td>
+					<td width="10%"><input class="inputfields" type="text" id="port" size="6" value="6544"/></td>
+					<td>&nbsp;</td>
+				</tr>
+			</table>
+		</td>
+	</tr>
+	<tr>
+		<td height="50px" colspan="3">
+			<div id="header">
+			  <ul>
+				<li id="tabHome"     class='not_selected'  onClick="SelectTab( 'Home'    )"><a href="#">Home</a></li>
+				<li id="tabMythXML"  class='not_selected'  onClick="SelectTab( 'MythXML' )"><a href="#">Myth XML</a></li>
+				<li id="tabCDS"      class='not_selected'  onClick="SelectTab( 'CDS'     )"><a href="#">CDS</a></li>
+				<li id="tabCMGR"     class='not_selected'  onClick="SelectTab( 'CMGR'    )"><a href="#">CMGR</a></li>
+				<li id="tabMSRR"     class='not_selected'  onClick="SelectTab( 'MSRR'    )"><a href="#">MSRR</a></li>
+			  </ul>
+			</div>
+		</td>
+	</tr>
+	<tr>
+		<td height="1px" colspan=3>&nbsp;</td>
+	</tr>
+</table>
+<body>
+</body>
+</html>

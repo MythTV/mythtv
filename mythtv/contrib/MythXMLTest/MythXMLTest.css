@@ -1,31 +1,48 @@
-body {
+html, body 
+{
    font-family: tahoma, Arial;
    font-size: 8pt;
-   margin:   0px;
-   border: 0px;
+   margin:    0px;
+   padding:   0px;
+   border:    0px;
    background-color: #F2F1EB;
    cursor: default;
+   height:    100%;
 }
 
-#header {
+table.fullHeight
+{
+   height:    100%; 
+   margin:    0px;
+   padding:   0px;
+}
+
+#header 
+{
   float:left;
   width:100%;
   background:#DAE0D2 url("bg.gif") repeat-x bottom;
   font-size:10pt;
   line-height:normal;
-  }
-#header ul {
+}
+
+#header ul 
+{
   margin:0;
   padding:10px 10px 0;
   list-style:none;
-  }
-#header li {
+}
+
+#header li 
+{
   float:left;
   background: url("left.gif") no-repeat left top;
   margin:0;
   padding:0 0 0 9px;
-  }
-#header a {
+}
+
+#header a 
+{
   float:left;
   display:block;
   background: url("right.gif") no-repeat right top;
@@ -33,24 +50,28 @@ body {
   text-decoration:none;
   font-weight:bold;
   color:#765;
-  }
+}
+
 /* Commented Backslash Hack
    hides rule from IE5-Mac \*/
 #header a {float:none;}
 /* End IE5-Mac hack */
-#header a:hover {
-  color:#333;
-  }
+#header a:hover 
+{
+  color: #333;
+}
   
-#header li.selected {
+#header li.selected 
+{
   background-image: url("left_on.gif");
 }
 
-#header li.selected a {
+#header li.selected a 
+{
   background-image: url("right_on.gif");
   color:#333;
   padding-bottom:5px;
-  }
+}
 
 table.mnuBar
 {
@@ -65,6 +86,31 @@ table.mnuBar
    border: #abc0e7 1px solid;
    border-right: #00377a 1px solid;
    border-bottom: #00377a 1px solid;
+}
+
+span.menu
+{
+   height: 100%;
+   padding: 0px;
+   padding-left: 5px;
+   padding-right: 5px;
+   border: 1px solid #7288AC;
+}
+
+td.mnuTitle
+{
+   font-size: 9pt;
+   font-weight: bold;
+   letter-spacing: 1px;
+   cursor: default;
+   color: #ffff00;
+}
+
+td.mnuRight
+{
+   width: 100%;
+   text-align: right;
+   padding-right: 5px;
 }
 
 div.panel {
@@ -198,13 +244,6 @@ TD.radioLabel
    padding-right:      10px;
 }
 
-TABLE.layout
-{
-   table-layout:      fixed;
-   width:            100%;
-   height:            100%;
-}
-
 div.tab
 {
    width: 100%;
@@ -219,29 +258,93 @@ a
    color: #0000ff;
    font-weight: bold;
 }
-
-
-span.menu
+/*
+#NavList a
 {
-   height: 100%;
-   padding: 0px;
-   padding-left: 5px;
-   padding-right: 5px;
-   border: 1px solid #7288AC;
+	display: block;  
+	color  : white; 
+	text-decoration: none;
+	width: 100%;
 }
 
-td.mnuTitle
-{
-   font-size: 9pt;
-   font-weight: bold;
-   letter-spacing: 1px;
-   cursor: default;
-   color: #ffff00;
-}
-
-td.mnuRight
+#NavList div.menu
 {
    width: 100%;
-   text-align: right;
-   padding-right: 5px;
+   height: 100%;
+   border: 1px solid #949e9c;
+   background-color: #fffbff;
+   display: none;
 }
+*/
+
+#NavList 
+{
+  float:left;
+  width:100%;
+  font-size:8pt;
+  line-height:normal;
+}
+
+#NavList ul 
+{
+	list-style: none;
+	margin: 0;
+	padding-left: 5px;
+	padding-top: 3px;
+}
+
+#NavList li.heading
+{
+	padding-bottom: 3px;
+	font-weight: bold; 
+	color: #333;
+}
+
+#NavList li.menu 
+{
+	background-image: url( arr_right_empty.gif );
+	background-repeat: no-repeat;
+	background-position: 0 .4em;
+	padding-left: .8em;
+	padding-bottom: 3px;
+	font-weight: normal; 
+}
+
+#NavList li.selected 
+{
+	background-image: url( arr_right.gif );
+	background-repeat: no-repeat;
+	background-position: 0 .4em;
+	padding-left: .8em;
+	padding-bottom: 3px;
+	font-weight: bold; 
+	color: white;
+}
+
+#NavList a 
+{
+  float:left;
+  display:block;
+  padding:5px 15px 4px 6px;
+  text-decoration:none;
+  font-weight:bold;
+  color:#765;
+}
+/* Commented Backslash Hack
+   hides rule from IE5-Mac \*/
+#NavList a {float:none;}
+/* End IE5-Mac hack */
+
+#NavList a:hover 
+{
+  color:#333;
+	font-weight: bold;
+}
+  
+#NavList li.selected {
+}
+
+#NavList li.selected a {
+  color:#333;
+  padding-bottom:5px;
+  }

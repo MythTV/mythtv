@@ -1,0 +1,1190 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+	<title>MythTv XML Protocol</title>
+	<LINK href="MythXMLTest.css " rel="stylesheet" type="text/css">
+	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+
+<script type="text/javascript" src="script.js"></script>
+
+<script type="text/javascript" />
+<!--
+function OnLoad( sPath )
+{
+	sRootPath   = sPath;
+	curElement  = FindObject( "li0" );
+	curMethodId = "DescriptionPanel"; 
+}
+
+/*
+function GetRecording( )
+{
+	var oForm = FindObject( "GetRecording" );
+
+	var sQuery = GetMasterBackend( "getRecording" ) + "?ChanId=" + oForm.ChanId.value + "&StartTime=" + oForm.StartTime.value;
+
+	oForm.action = sQuery;
+}
+*/
+
+// -->
+</script>
+</head>
+
+<body onLoad="OnLoad('')" >
+<table class="fullHeight" width="100%" align='center' cellpadding="0" cellspacing="0" border="0">
+	<tr valign="top" >
+		<td width='15%'>
+			<div id="NavList" >
+				<ul>
+					<li class="heading">Info -</a></li>
+					<ul>
+						<li id="li0" class="selected" onclick="MenuClick( event,'DescriptionPanel'  )"><a href="#">Discription</a></li>
+						<li id="li1" class="menu"     onclick="MenuClick( event,'getDeviceDescPanel')"><a href="#">getDeviceDesc</a></li>
+					</ul>
+					<li class="heading">Status -</a></li>
+					<ul>
+						<li id="li2" class="menu" onclick="MenuClick( event,'getStatusHTMLPanel')"><a href="#">getStatusHTML</a></li>
+						<li id="li3" class="menu" onclick="MenuClick( event,'getStatusXMLPanel' )"><a href="#">getStatus</a></li>
+					</ul>
+					<li class="heading">Settings -</a></li>
+					<ul>
+						<li id="li4" class="menu" onclick="MenuClick( event,'getHostsPanel'  )"><a href="#">getHosts</a></li>
+						<li id="li5" class="menu" onclick="MenuClick( event,'getKeysPanel'   )"><a href="#">getKeys</a></li>
+						<li id="li6" class="menu" onclick="MenuClick( event,'getSettingPanel')"><a href="#">getSetting</a></li>
+						<li id="li7" class="menu" onclick="MenuClick( event,'putSettingPanel')"><a href="#">putSetting</a></li>
+					</ul>
+					<li class="heading">Program Guide -</a></li>
+					<ul>
+						<li id="li8"  class="menu" onclick="MenuClick( event,'getProgramGuidePanel'  )"><a href="#">getProgramGuide</a></li>
+						<li id="li9"  class="menu" onclick="MenuClick( event,'getProgramDetailsPanel')"><a href="#">getProgramDetails</a></li>
+						<li id="li10" class="menu" onclick="MenuClick( event,'getChannelIconPanel'   )"><a href="#">getChannelIcon</a></li>
+					</ul>
+					<li class="heading">Recorded -</a></li>
+					<ul>
+						<li id="li11" class="menu" onclick="MenuClick( event,'getRecordedPanel'    )"><a href="#">getRecorded</a></li>
+						<li id="li12" class="menu" onclick="MenuClick( event,'getExpiringPanel'    )"><a href="#">getExpiring</a></li>
+						<li id="li13" class="menu" onclick="MenuClick( event,'getPreviewImagePanel')"><a href="#">getPreviewImage</a></li>
+						<li id="li14" class="menu" onclick="MenuClick( event,'delRecordingPanel'   )"><a href="#">delRecording</a></li>
+					</ul>
+					<li class="heading">Media Retrieval -</a></li>
+					<ul>
+						<li id="li15" class="menu" onclick="MenuClick( event,'getRecordingPanel')"><a href="#">getRecording</a></li>
+						<li id="li16" class="menu" onclick="MenuClick( event,'getVideoPanel'    )"><a href="#">getVideo</a></li>
+						<li id="li17" class="menu" onclick="MenuClick( event,'getMusicPanel'    )"><a href="#">getMusic</a></li>
+					</ul>
+				</ul>
+			</div>
+		</td>
+		<td height="100%">
+			<table class="fullHeight" cellspacing=0 cellpadding=0 width="100%" border="0" >
+
+<!-- Description -->
+
+				<TBODY id='DescriptionPanel' style="">
+				<tr valign='top' >
+					<td width="2%">&nbsp;</td>
+					<td width="98%" height="1px"> 
+						<div id="divDescription" class="panel" > 
+							<table cellspacing=0 cellpadding=0 class="panel">
+								<tr> 
+									<td> 
+										<table cellspacing=0 cellpadding=0 class="mnuBar" id="mnuBar1" >
+											<tr> 
+												<td nowrap><span tabindex=0 class="menu"><B>MythXML - </B>Description.</span></td>
+											</tr>
+										</table>
+									</td>
+								</tr>
+								<tr>
+									<td> 
+										<div class="panelArea"> 
+											<P>
+											<Center>-=>TODO: Describe what this collection of methods are for. <=-</Center>
+											<P>
+										</div>
+									</td>
+								</tr>
+							</table>
+						</div>
+					</td>
+				</tr>
+
+<!-- getDeviceDesc -->
+
+				<TBODY id='getDeviceDescPanel' style="display:none;">
+				<tr valign='top' >
+					<td width="2%">&nbsp;</td>
+					<td width="98%" height="1px"> 
+						<div id="divGetDeviceDesc" class="panel" > 
+							<table cellspacing=0 cellpadding=0 class="panel">
+								<tr> 
+									<td> 
+										<table cellspacing=0 cellpadding=0 class="mnuBar" id="mnuBar1" >
+											<tr> 
+												<td nowrap><span tabindex=0 class="menu"><B>getDeviceDesc - </B>Retrieve MythBackend's uPnp Device Description xml.</span></td>
+											</tr>
+										</table>
+									</td>
+								</tr>
+								<tr>
+									<td> 
+										<div class="panelArea"> 
+											<table cellpadding=5 cellspacing=5 border=0 width='100%' >
+												<tr> 
+													<td width='40%' align="center"> 
+														<input name="button" type="button" class="formButton" onClick="UpdateIFrame( 'getDeviceDesc') " value="getDeviceDesc"/> 
+													</td>
+													<td valign="top"> 
+														<table border="0" cellpadding="0" cellspacing="1" cols="5"  width="100%" >
+															<tr> 
+																<td width="13%" class="label" align="right">Params:</td>
+																<td width="10%" class="param">none</td>
+																<td width="7%" >&nbsp;</td>
+																<td width="70%" class="desc">&nbsp;</td>
+															</tr>
+														</table>
+													</td>
+												</tr>
+											</table>
+										</div>
+									</td>
+								</tr>
+							</table>
+						</div>
+					</td>
+				</tr>
+
+<!-- getStatusHTML -->
+
+				<TBODY id='getStatusHTMLPanel' style="display:none;">
+				<tr valign='top' >
+					<td width="2%">&nbsp;</td>
+					<td width="98%" height="1px"> 
+						<div id="divGetStatusHTML" class="panel" > 
+							<table cellspacing=0 cellpadding=0 class="panel">
+								<tr> 
+									<td> 
+										<table cellspacing=0 cellpadding=0 class="mnuBar" id="mnuBar1" >
+											<tr> 
+												<td nowrap><span tabindex=0 class="menu"><B>getStatusHTML -</B> Retrieve MythBackend's Status as an HTML page.</span></td>
+											</tr>
+										</table>
+									</td>
+								</tr>
+								<tr>
+									<td> 
+										<div class="panelArea"> 
+											<table cellpadding=5 cellspacing=5 border=0 width='100%' >
+												<tr> 
+													<td width='40%' align="center"> 
+														<input name="button" type="button" class="formButton" onClick="UpdateIFrame( 'getStatusHTML') " value="HTML Status"/> 
+													</td>
+													<td valign="top"> 
+														<table border="0" cellpadding="0" cellspacing="1" cols="5"  width="100%" >
+															<tr> 
+																<td width="13%" class="label" align="right">Params:</td>
+																<td width="10%" class="param">none</td>
+																<td width="7%" >&nbsp;</td>
+																<td width="70%" class="desc">&nbsp;</td>
+															</tr>
+															<tr> 
+																<td >&nbsp;</td>
+																<td colspan="3" class="desc"><em>* Note: if no method is given to server:[status port] then HTML status is returned</em></td>
+															</tr>
+														</table>
+													</td>
+												</tr>
+											</table>
+										</div>
+									</td>
+								</tr>
+							</table>
+						</div>
+					</td>
+				</tr>
+
+<!-- getStatus -->
+
+				<TBODY id='getStatusXMLPanel' style="display:none;">
+				<tr valign='top'  >
+					<td width="2%">&nbsp;</td>
+					<td width="98%" height="1px"> 
+						<div id="divGetStatusXML" class="panel" > 
+							<table cellspacing=0 cellpadding=0 class="panel">
+								<tr> 
+									<td>
+										<table cellspacing=0 cellpadding=0 class="mnuBar" id="mnuBar1" >
+											<tr> 
+												<td nowrap><span tabindex=0 class="menu"><B>getStatus - </B>Retrieve MythBackend's Status as an XML Document.</span></td>
+											</tr>
+										</table>
+									</td>
+								</tr>
+								<tr>
+									<td> 
+										<div class="panelArea"> 
+											<table cellpadding=5 cellspacing=5 border=0 width='100%' >
+												<tr> 
+													<td width='40%' align="center"> 
+														<input name="button2" type="button" class="formButton" onClick="UpdateIFrame( 'getStatus' )" value="XML Status"/> 
+													</td>
+													<td valign="top"> 
+														<table border="0" cellpadding="0" cellspacing="1" cols="5"  width="100%" >
+															<tr> 
+																<td width="13%" class="label" align="right">Params:</td>
+																<td width="10%" class="param">none</td>
+																<td width="7%" >&nbsp;</td>
+																<td width="70%" class="desc">&nbsp;</td>
+															</tr>
+														</table>
+													</td>
+												</tr>
+											</table>
+										</div>
+									</td>
+								</tr>
+							</table>
+						</div>
+					</td>
+				</tr>
+
+<!-- getHosts --> 
+
+				<TBODY id='getHostsPanel' style="display:none;">
+				<tr valign='top'  >
+					<td width="2%">&nbsp;</td>
+					<td width="98%" height="1px"> 
+						<div id="divGetHosts" class="panel" > 
+							<table cellspacing=0 cellpadding=0 class="panel">
+								<tr> 
+									<td>
+										<table cellspacing=0 cellpadding=0 class="mnuBar" id="mnuBar1" >
+											<tr> 
+												<td nowrap><span tabindex=0 class="menu"><B>getHosts - </B>Retrieves a list of unique Host Names from the settings table.</span></td>
+											</tr>
+										</table>
+									</td>
+								</tr>
+								<tr>
+									<td> 
+										<div class="panelArea"> 
+											<table cellpadding=4 cellspacing=4 border=0 width='100%' >
+												<tr> 
+													<td width='40%' align="center">
+														<input name="button2" type="button" class="formButton" onClick="UpdateIFrame( 'getHosts' )" value="getHosts"/> 
+													</td>
+													<td valign="top"> 
+														<table border="0" cellpadding="0" cellspacing="1" cols="5"  width="100%" >
+															<tr> 
+																<td width="13%" class="label" align="right">Params:</td>
+																<td width="10%" class="param">none</td>
+																<td width="7%" >&nbsp;</td>
+																<td width="70%" class="desc">&nbsp;</td>
+															</tr>
+														</table>
+													</td>
+												</tr>
+											</table>
+										</div>
+									</td>
+								</tr>
+							</table>
+						</div>
+					</td>
+				</tr>
+
+<!-- getKeys --> 
+
+				<TBODY id='getKeysPanel' style="display:none;">
+				<tr valign='top'  >
+					<td width="2%">&nbsp;</td>
+					<td width="98%" height="1px"> 
+						<div id="divGetKeys" class="panel" > 
+							<table cellspacing=0 cellpadding=0 class="panel">
+								<tr> 
+									<td>
+										<table cellspacing=0 cellpadding=0 class="mnuBar" id="mnuBar1" >
+											<tr> 
+												<td nowrap><span tabindex=0 class="menu"><B>getKeys - </B>Retrieves a list of unique Key Names available in the settings table.</span></td>
+											</tr>
+										</table>
+									</td>
+								</tr>
+								<tr>
+									<td> 
+										<div class="panelArea"> 
+											<table cellpadding=5 cellspacing=5 border=0 width='100%' >
+												<tr> 
+													<td width='40%' align="center">
+														<input name="button2" type="button" class="formButton" onClick="UpdateIFrame( 'getKeys' )" value="getKeys"/> 
+													</td>
+													<td valign="top"> 
+														<table border="0" cellpadding="0" cellspacing="1" cols="5"  width="100%" >
+															<tr> 
+																<td width="13%" class="label" align="right">Params:</td>
+																<td width="10%" class="param">none</td>
+																<td width="7%" >&nbsp;</td>
+																<td width="70%" class="desc">&nbsp;</td>
+															</tr>
+														</table>
+													</td>
+												</tr>
+											</table>
+										</div>
+									</td>
+								</tr>
+							</table>
+						</div>
+					</td>
+				</tr>
+
+<!-- getSetting --> 
+
+				<TBODY id='getSettingPanel' style="display:none;">
+				<tr valign='top'  >
+					<td width="2%">&nbsp;</td>
+					<td width="98%" height="1px"> 
+						<div id="divGetSetting" class="panel" > 
+							<table cellspacing=0 cellpadding=0 class="panel">
+								<tr> 
+									<td>
+										<table cellspacing=0 cellpadding=0 class="mnuBar" id="mnuBar1" >
+											<tr> 
+												<td nowrap><span tabindex=0 class="menu"><B>getSetting - </B>Retrieves a Setting from the backend.</span></td>
+											</tr>
+										</table>
+									</td>
+								</tr>
+								<tr>
+									<td> 
+										<div class="panelArea"> 
+											<table cellpadding=4 cellspacing=4 border=0 width='100%' >
+												<tr> 
+													<td width='40%' align="left"> 
+														<form id="getSetting" name="frmGetSetting" method="post" action="" target="fraResults" onSubmit="SetFormAddress( 'getSetting' )">
+															<table border="0" cellpadding="0" cellspacing="1"  cols="5" align="center">
+																<tr>
+																	<td width="20%" class="param">Key:</td>
+																	<td width="70%"><input class="inputfields" type="text" name="Key"></td>
+																	<td width="10%">&nbsp;</td>
+																</tr>
+																<tr>
+																	<td class="param">HostName:</td>
+																	<td><input class="inputfields" type="text" name="HostName"></td>
+																	<td>&nbsp;</td>
+																</tr>
+																<tr>
+																	<td class="param">Default:</td>
+																	<td><input class="inputfields" type="text" name="Default"></td>
+																	<td align="right"><input name="getSetting" type="submit" class="formButton" value="getSetting"/></td>
+																</tr>
+															</table>
+														</form>
+													</td>
+													<td valign="top"> 
+														<table border="0" cellpadding="0" cellspacing="1" cols="5"  width="100%" >
+															<tr> 
+																<td width="13%" class="label" colspan="2" align="right">Params:</td>
+																<td width="10%" class="param">Key</td>
+																<td width="7%" >&nbsp;</td>
+																<td width="70%" class="desc">Name of setting to access (all Keys if not supplied)</td>
+															</tr>
+															<tr> 
+																<td colspan="2">&nbsp;</td>
+																<td class="param">HostName</td>
+																<td>&nbsp;</td>
+																<td class="desc">Name of Host for setting (null if not supplied)</td>
+															</tr>
+															<tr> 
+																<td colspan="2">&nbsp;</td>
+																<td class="param">Default</td>
+																<td>&nbsp;</td>
+																<td class="desc">Default value to return if not found</td>
+															</tr>
+														</table>
+													</td>
+												</tr>
+											</table>
+										</div>
+									</td>
+								</tr>
+							</table>
+						</div>
+					</td>
+				</tr>
+
+<!-- putSetting --> 
+
+				<TBODY id='putSettingPanel' style="display:none;">
+				<tr valign='top'  >
+					<td width="2%">&nbsp;</td>
+					<td width="98%" height="1px"> 
+						<div id="divPutSetting" class="panel" > 
+							<table cellspacing=0 cellpadding=0 class="panel">
+								<tr> 
+									<td>
+										<table cellspacing=0 cellpadding=0 class="mnuBar" id="mnuBar1" >
+											<tr> 
+												<td nowrap><span tabindex=0 class="menu"><B>putSetting - </B>Sets a Setting on the backend.</span></td>
+											</tr>
+										</table>
+									</td>
+								</tr>
+								<tr>
+									<td> 
+										<div class="panelArea"> 
+											<table cellpadding=4 cellspacing=4 border=0 width='100%' >
+												<tr> 
+													<td width='40%' align="left"> 
+														<form id="putSetting" name="frmPutSetting" method="post" action="" OnSubmit="SetFormAddress( 'putSetting' )" target="fraResults">
+															<table border="0" cellpadding="0" cellspacing="1"  cols="5" align="center">
+																<tr>
+																	<td class="param" width="20%">Key:</td>
+																	<td width="70%"><input class="inputfields" type="text" name="Key"></td>
+																	<td>&nbsp;</td>
+																</tr>
+																<tr>
+																	<td class="param">HostName:</td>
+																	<td><input class="inputfields" type="text" name="HostName"></td>
+																	<td>&nbsp;</td>
+																</tr>
+																<tr>
+																	<td class="param">Value:</td>
+																	<td><input class="inputfields" type="text" name="Value"></td>
+																	<td align="right"><input name="putSetting" type="submit" class="formButton" value="putSetting"/></td>
+																</tr>
+															</table>
+														</form></td>
+													<td valign="top"> <table border="0" cellpadding="0" cellspacing="1" cols="5"  width="100%" >
+															<tr> 
+																<td width="13%" class="label" colspan="2" align="right">Params:</td>
+																<td width="10%" class="param">Key</td>
+																<td width="7%">&nbsp;</td>
+																<td width="70%"class="desc">Name of setting to save. &lt;required&gt;</td>
+															</tr>
+															<tr> 
+																<td colspan="2">&nbsp;</td>
+																<td class="param">HostName</td>
+																<td>&nbsp;</td>
+																<td class="desc">Name of Host for setting (null if not 
+																	supplied)</td>
+															</tr>
+															<tr> 
+																<td colspan="2">&nbsp;</td>
+																<td class="param">Value</td>
+																<td>&nbsp;</td>
+																<td class="desc">Value to set.</td>
+															</tr>
+														</table>
+													</td>
+												</tr>
+											</table>
+										</div>
+									</td>
+								</tr>
+							</table>
+						</div>
+					</td>
+				</tr>
+
+<!-- getProgramGuide --> 
+
+				<TBODY id='getProgramGuidePanel' style="display:none;">
+				<tr valign='top'  >
+					<td width="2%">&nbsp;</td>
+					<td width="98%" height="1px"> 
+						<div id="divGetProgramGuide" class="panel" > 
+							<table cellspacing=0 cellpadding=0 class="panel">
+								<tr> 
+									<td>
+										<table cellspacing=0 cellpadding=0 class="mnuBar" id="mnuBar1" >
+											<tr> 
+												<td nowrap><span tabindex=0 class="menu"><B>getProgramGuide - </B>Retrieves the Program Guide for a given time frame.</span></td>
+											</tr>
+										</table>
+									</td>
+								</tr>
+								<tr>
+									<td> 
+										<div class="panelArea"> 
+											<table cellpadding=4 cellspacing=4 border=0 width='100%' >
+												<tr> 
+													<td width='40%' align="left" valign="top"> 
+														<form id="getProgramGuide" name="frmGetProgramGuide" method="post" action="" target="fraResults" onSubmit="SetFormAddress( 'getProgramGuide' )">
+															<table border="0" cellpadding="0" cellspacing="1" align="left" width="100%">
+																<tr>
+																	<td width="40%" class="param">StartTime:</td>
+																	<td width="60%"><input class="inputfields" type="text" name="StartTime"></td>
+																	<td>&nbsp;</td>
+																</tr>
+																<tr>
+																	<td class="param">EndTime:</td>
+																	<td><input class="inputfields" type="text" name="EndTime"></td>
+																	<td>&nbsp;</td>
+																</tr>
+																<tr>
+																	<td class="param" >StartChanId:</td>
+																	<td ><input class="inputfields" type="text" name="StartChanId"></td>
+																	<td>&nbsp;</td>
+																</tr>
+																<tr>
+																	<td class="param">NumOfChannels:</td>
+																	<td><input class="inputfields" type="text" name="NumOfChannels"></td>
+																	<td>&nbsp;</td>
+																</tr>
+																<tr>
+																	<td class="param">Details:</td>
+																	<td class="param" width="70%"><input type="radio" name="Details" value='1' checked >True
+																									<input type="radio" name="Details" value='0'>False</td>
+																	<td align="right"><input type="submit" class="formButton" value="getProgramGuide"/></td>
+																</tr>
+															<tr> 
+																<td colspan="3" class="desc"><em>* Note: maximum of 1000 programs returned per call</em></td>
+															</tr>
+															</table>
+														</form>
+													</td>
+													<td valign="top"> <table border="0" cellpadding="0" cellspacing="1" cols="5"  width="100%" >
+															<tr> 
+																<td width="10%" class="label" colspan="2" align="right">Params:</td>
+																<td width="15%" class="param">StartTime</td>
+																<td width="7%">&nbsp;</td>
+																<td width="65%" class="desc">Starting Time (CCYY-MM-DDTHH:MM) &lt;required&gt;</td>
+															</tr>
+															<tr> 
+																<td colspan="2">&nbsp;</td>
+																<td class="param">EndTime</td>
+																<td>&nbsp;</td>
+																<td class="desc">EndTime must be after StartTime &lt;required&gt;</td>
+															</tr>
+															<tr> 
+																<td colspan="2">&nbsp;</td>
+																<td class="param">StartChanId</td>
+																<td>&nbsp;</td>
+																<td class="desc">Return guide from the provided Channel Id, if omitted, return from beginning.</td>
+															</tr>
+															<tr> 
+																<td colspan="2">&nbsp;</td>
+																<td class="param">NumOfChannels</td>
+																<td>&nbsp;</td>
+																<td class="desc">Number of sequencal channels to return 
+																	for requested time period. If omitted, 1 channel is 
+																	returned. -1 returns all channels.</td>
+															</tr>
+															<tr> 
+																<td colspan="2">&nbsp;</td>
+																<td class="param">Details</td>
+																<td>&nbsp;</td>
+																<td class="desc">Should all attributes be returned</td>
+															</tr>
+														</table>
+													</td>
+												</tr>
+											</table>
+										</div>
+									</td>
+								</tr>
+							</table>
+						</div>
+					</td>
+				</tr>
+
+<!-- getProgramDetails -->
+
+				<TBODY id='getProgramDetailsPanel' style="display:none;">
+				<tr valign='top'  >
+					<td width="2%">&nbsp;</td>
+					<td width="98%" height="1px"> 
+						<div id="divGetProgramDetails" class="panel" > 
+							<table cellspacing=0 cellpadding=0 class="panel">
+								<tr> 
+									<td>
+										<table cellspacing=0 cellpadding=0 class="mnuBar" id="mnuBar1" >
+											<tr> 
+												<td nowrap><span tabindex=0 class="menu"><B>getProgramDetails - </B>Retrieves Details about a specific program.</span></td>
+											</tr>
+										</table>
+									</td>
+								</tr>
+								<tr>
+									<td> 
+										<div class="panelArea"> 
+											<table cellpadding=4 cellspacing=4 border=0 width='100%' >
+												<tr>
+													<td width='40%' align="center"> 
+														<form id="getProgramDetails" name="frmGetProgramDetails" method="post" action="" OnSubmit="SetFormAddress( 'getProgramDetails' )" target="fraResults">
+															<table border="0" cellpadding="0" cellspacing="1"  cols="5" align="left">
+																<tr>
+																	<td class="param" width="20%">ChanId:</td>
+																	<td width="65%"><input class="inputfields" type="text" name="ChanId"></td>
+																	<td width="15%">&nbsp;</td>
+																</tr>
+																<tr>
+																	<td class="param">StartTime:</td>
+																	<td ><input class="inputfields" type="text" name="StartTime"></td>
+																	<td align="right"><input name="getProgramDetails" type="submit" class="formButton" value="getProgramDetails"/></td>                          
+																</tr>
+															</table>
+														</form>
+													</td>
+													<td valign="top"> <table border="0" cellpadding="0" cellspacing="1" width="100%" >
+															<tr> 
+																<td width="13%" class="label" colspan="2" align="right">Params:</td>
+																<td width="10%" class="param">ChanId</td>
+																<td width="7%">&nbsp;</td>
+																<td width="70%" class="desc">ChannelId of program. &lt;required&gt;</td>
+															</tr>
+															<tr> 
+																<td colspan="2">&nbsp;</td>
+																<td class="param">StartTime</td>
+																<td>&nbsp;</td>
+																<td class="desc">StartTime of program (CCYY-MM-DDTHH:MM). &lt;required&gt;</td>
+															</tr>
+														</table>
+													</td>
+												</tr>
+											</table>
+										</div>
+									</td>
+								</tr>
+							</table>
+						</div>
+					</td>
+				</tr>
+
+<!-- getChannelIcon --> 
+
+				<TBODY id='getChannelIconPanel' style="display:none;">
+				<tr valign='top'  >
+					<td width="2%">&nbsp;</td>
+					<td width="98%" height="1px"> 
+						<div id="divGetChannelIcon" class="panel" > 
+							<table cellspacing=0 cellpadding=0 class="panel">
+								<tr> 
+									<td>
+										<table cellspacing=0 cellpadding=0 class="mnuBar" id="mnuBar1" >
+											<tr> 
+												<td nowrap><span tabindex=0 class="menu"><B>getChannelIcon - </B>Retrieves the Channel Icon for a given Channel Id.</span></td>
+											</tr>
+										</table>
+									</td>
+								</tr>
+								<tr>
+									<td> 
+										<div class="panelArea"> 
+											<table cellpadding=4 cellspacing=4 border=0 width='100%' >
+												<tr> 
+													<td width='40%' align="center" valign="top"> 
+														<form id="getChannelIcon" name="frmGetChannelIcon" method="post" action="" target="fraResults" onSubmit="SetFormAddress( 'getChannelIcon' )">
+															<table border="0" cellpadding="0" cellspacing="1" align="left" width="100%">
+																<tr>
+																	<td width="40%" class="param">ChanId:</td>
+																	<td width="60%"><input class="inputfields" type="text" name="ChanId"></td>
+																	<td align="right"><input type="submit" class="formButton" value="getChannelIcon"/></td>
+																</tr>
+															</table>
+														</form>
+													</td>
+													<td valign="top"> 
+														<table border="0" cellpadding="0" cellspacing="1" cols="5"  width="100%" >
+															<tr> 
+																<td width="13%" class="label" colspan="2" align="right">Params:</td>
+																<td width="15%" class="param">ChanId</td>
+																<td width="7%">&nbsp;</td>
+																<td width="65%" class="desc">Channel Id to retrieve Icon for &lt;required&gt;</td>
+															</tr>
+														</table>
+													</td>
+												</tr>
+											</table>
+										</div>
+									</td>
+								</tr>
+							</table>
+						</div>
+					</td>
+				</tr>
+
+<!-- getRecorded --> 
+
+				<TBODY id='getRecordedPanel' style="display:none;">
+				<tr valign='top'  >
+					<td width="2%">&nbsp;</td>
+					<td width="98%" height="1px"> 
+						<div id="divGetRecorded" class="panel" > 
+							<table cellspacing=0 cellpadding=0 class="panel">
+								<tr> 
+									<td>
+										<table cellspacing=0 cellpadding=0 class="mnuBar" id="mnuBar1" >
+											<tr> 
+												<td nowrap><span tabindex=0 class="menu"><B>getRecorded - </B>Retrieves the list of Recorded Shows from the backend.</span></td>
+											</tr>
+										</table>
+									</td>
+								</tr>
+								<tr>
+									<td> 
+										<div class="panelArea"> 
+											<table cellpadding=4 cellspacing=4 border=0 width='100%'>
+												<tr valign="top"> 
+													<td width='40%' align="center"> 
+														<form id="getRecorded" name="frmGetRecorded" method="post" action="" target="fraResults" onSubmit="SetFormAddress( 'getRecorded' )">
+															<table border="0" cellpadding="0" cellspacing="1"  cols="5" align="center">
+																<tr>
+																	<td class="param" width="20%">Descending:</td>
+																	<td class="param" width="70%">
+																		<input type="radio" name="Descending" value='1' checked >True
+																		<input type="radio" name="Descending" value='0'>False
+																	</td>
+																	<td>&nbsp;</td>
+																	<td align="center">
+																		<input name="getRecorded" type="submit" class="formButton" value="getRecorded"/>
+																	</td>
+																</tr>
+															</table>
+														</form>
+													</td>
+													<td valign="top"> 
+														<table border="0" cellpadding="0" cellspacing="1" cols="5"  width="100%" >
+															<tr> 
+																<td width="13%" class="label" colspan="2" align="right">Params:</td>
+																<td width="10%" class="param">Descending</td>
+																<td width="7%">&nbsp;</td>
+																<td width="70%" class="desc">NON-ZERO = Descending, 0 = Ascending</td>
+															</tr>
+														</table>
+													</td>
+												</tr>
+											</table>
+										</div>
+									</td>
+								</tr>
+							</table>
+						</div>
+					</td>
+				</tr>
+
+<!-- getExpiring --> 
+
+				<TBODY id='getExpiringPanel' style="display:none;">
+				<tr valign='top'  >
+					<td width="2%">&nbsp;</td>
+					<td width="98%" height="1px"> 
+						<div id="divGetExpiring" class="panel" > 
+							<table cellspacing=0 cellpadding=0 class="panel">
+								<tr> 
+									<td>
+										<table cellspacing=0 cellpadding=0 class="mnuBar" id="mnuBar1" >
+											<tr> 
+												<td nowrap><span tabindex=0 class="menu"><B>getExpiring - </B>Gets the full list of programs that can expire in expiration order.</span></td>
+											</tr>
+										</table>
+									</td>
+								</tr>
+								<tr>
+									<td> 
+										<div class="panelArea"> 
+											<table cellpadding=4 cellspacing=4 border=0 width='100%'>
+												<tr> 
+													<td width='40%' align="center"> 
+														<input name="button2" type="button" class="formButton" onClick="UpdateIFrame( 'getExpiring' )" value="getExpiring"/> 
+													</td>
+													<td valign="top"> 
+														<table border="0" cellpadding="0" cellspacing="1" cols="5"  width="100%" >
+															<tr> 
+																<td width="13%" class="label" colspan="2" align="right">Params:</td>
+																<td width="10%" class="param">none</td>
+																<td width="7%">&nbsp;</td>
+																<td width="70%" class="desc">&nbsp;</td>
+															</tr>
+														</table>
+													</td>
+												</tr>
+											</table>
+										</div>
+									</td>
+								</tr>
+							</table>
+						</div>
+					</td>
+				</tr>
+
+<!-- getPreviewImage --> 
+
+				<TBODY id='getPreviewImagePanel' style="display:none;">
+				<tr valign='top'  >
+					<td width="2%">&nbsp;</td>
+					<td width="98%" height="1px"> 
+						<div id="divGetPreviewImage" class="panel" > 
+							<table cellspacing=0 cellpadding=0 class="panel">
+								<tr> 
+									<td>
+										<table cellspacing=0 cellpadding=0 class="mnuBar" id="mnuBar1" >
+											<tr> 
+												<td nowrap><span tabindex=0 class="menu"><B>getPreviewImage - </B>Retrieves a Preview Image of a recording.</span></td>
+											</tr>
+										</table>
+									</td>
+								</tr>
+								<tr>
+									<td> 
+										<div class="panelArea"> 
+											<table cellpadding=4 cellspacing=4 border=0 width='100%'>
+												<tr> 
+													<td width="40%"> 
+														<form id="getPreviewImage" name="frmGetPreviewImage" method="post" action="" OnSubmit="SetFormAddress( 'getPreviewImage' )" target="fraResults">
+															<table border="0" cellpadding="0" cellspacing="1"  cols="5" align="center">
+																<tr>
+																	<td class="param" width="20%">ChanId:</td>
+																	<td width="65%"><input class="inputfields" type="text" name="ChanId"></td>
+																	<td width="15%">&nbsp;</td>
+																</tr>
+																<tr>
+																	<td class="param" width="20%">StartTime:</td>
+																	<td width="65%"><input class="inputfields" type="text" name="StartTime"></td>
+																	<td width="15%">&nbsp;</td>
+																</tr>
+																<tr>
+																	<td class="param" width="20%">Width:</td>
+																	<td width="65%"><input class="inputfields" type="text" name="Width"></td>
+																	<td width="15%">&nbsp;</td>
+																</tr>
+																<tr>
+																	<td class="param" width="20%">Height:</td>
+																	<td width="65%"><input class="inputfields" type="text" name="Height"></td>
+																	<td width="15%">&nbsp;</td>
+																</tr>
+																<tr>
+																	<td class="param">SecsIn:</td>
+																	<td ><input class="inputfields" type="text" name="SecsIn"></td>
+																	<td align="right"><input name="getPreviewImage" type="submit" class="formButton" value="getPreviewImage"/></td>                          
+																</tr>
+															</table>
+														</form>
+													</td>
+													<td valign="top"> <table border="0" cellpadding="0" cellspacing="1" width="100%" >
+															<tr> 
+																<td width="13%" class="label" colspan="2" align="right">Params:</td>
+																<td width="10%" class="param">ChanId</td>
+																<td width="7%">&nbsp;</td>
+																<td width="70%" class="desc">ChannelId of recording. &lt;required&gt;</td>
+															</tr>
+															<tr> 
+																<td colspan="2">&nbsp;</td>
+																<td class="param">StartTime</td>
+																<td>&nbsp;</td>
+																<td class="desc">StartTime of recording (CCYY-MM-DDTHH:MM). &lt;required&gt;</td>
+															</tr>
+															<tr> 
+																<td colspan="2">&nbsp;</td>
+																<td class="param">Width</td>
+																<td>&nbsp;</td>
+																<td class="desc">Width of image (optional)</td>
+															</tr>
+															<tr> 
+																<td colspan="2">&nbsp;</td>
+																<td class="param">Height</td>
+																<td>&nbsp;</td>
+																<td class="desc">Height of image (optional)</td>
+															</tr>
+															<tr> 
+																<td colspan="2">&nbsp;</td>
+																<td class="param">SecsIn</td>
+																<td>&nbsp;</td>
+																<td class="desc">Number of Seconds into video to extract image (optional)</td>
+															</tr>
+														</table>
+													</td>
+												</tr>
+											</table>
+										</div>
+									</td>
+								</tr>
+							</table>
+						</div>
+					</td>
+				</tr>
+
+<!-- delRecording --> 
+
+				<TBODY id='delRecordingPanel' style="display:none;">
+				<tr valign='top'  >
+					<td width="2%">&nbsp;</td>
+					<td width="98%" height="1px"> 
+						<div id="divDelRecordingPanel" class="panel" > 
+							<table cellspacing=0 cellpadding=0 class="panel">
+								<tr> 
+									<td>
+										<table cellspacing=0 cellpadding=0 class="mnuBar" id="mnuBar1" >
+											<tr> 
+												<td nowrap><span tabindex=0 class="menu"><B>delRecording - </B>Deletes a recording.</span></td>
+											</tr>
+										</table>
+									</td>
+								</tr>
+								<tr>
+									<td> 
+										<div class="panelArea"> 
+											<table cellpadding=4 cellspacing=4 border=0 width='100%'>
+												<tr> 
+													<td width='40%' align="center"> 
+														<form id="delRecording" name="frmDelRecording" method="post" action="" OnSubmit="SetFormAddress( 'delRecording' )" target="fraResults">
+															<table border="0" cellpadding="0" cellspacing="1"  cols="5" align="center">
+																<tr>
+																	<td class="param" width="20%">ChanId:</td>
+																	<td width="65%"><input class="inputfields" type="text" name="ChanId"></td>
+																	<td>&nbsp;</td>
+																</tr>
+																<tr>
+																	<td class="param">StartTime:</td>
+																	<td ><input class="inputfields" type="text" name="StartTime"></td>
+																	<td>&nbsp;</td>
+																</tr>
+																<tr>
+																	<td class="param" width="20%">ForgetOld:</td>
+																	<td align="center" width="70%"><input type="checkbox" name="ForgetOld"></td>
+																	<td align="right"><input name="delRecordingBtn" type="submit" class="formButton" value="delRecording"/></td>
+																</tr>
+															</table>
+														</form>
+													</td>
+													<td valign="top"> 
+														<table border="0" cellpadding="0" cellspacing="1" cols="5"  width="100%" >
+															<tr> 
+																<td width="13%" class="label" colspan="2" align="right">Params:</td>
+																<td width="10%" class="param">ChanId</td>
+																<td width="7%">&nbsp;</td>
+																<td width="70%" class="desc">ChannelId of recording to delete. &lt;required&gt;</td>
+															</tr>
+															<tr> 
+																<td colspan="2">&nbsp;</td>
+																<td class="param">StartTime</td>
+																<td>&nbsp;</td>
+																<td class="desc">StartTime of recording to delete (CCYY-MM-DDTHH:MM). &lt;required&gt;</td>
+															</tr>
+															<tr> 
+																<td colspan="2">&nbsp;</td>
+																<td class="param">ForgetOld</td>
+																<td>&nbsp;</td>
+																<td class="desc">NON-ZERO = Remove from OldRecordings.  Default is 0</td>
+															</tr>
+														</table>
+													</td>
+												</tr>
+											</table>
+										</div>
+									</td>
+								</tr>
+							</table>
+						</div>
+					</td>
+				</tr>
+
+<!-- getRecording --> 
+
+				<TBODY id='getRecordingPanel' style="display:none;">
+				<tr valign='top'  >
+					<td width="2%">&nbsp;</td>
+					<td width="98%" height="1px"> 
+						<div id="divGetRecording" class="panel" > 
+							<table cellspacing=0 cellpadding=0 class="panel">
+								<tr> 
+									<td>
+										<table cellspacing=0 cellpadding=0 class="mnuBar" id="mnuBar1" >
+											<tr> 
+												<td nowrap><span tabindex=0 class="menu"><B>getRecording - </B>Retrieves the actual recording.</span></td>
+											</tr>
+										</table>
+									</td>
+								</tr>
+								<tr>
+									<td> 
+										<div class="panelArea"> 
+											<table cellpadding=4 cellspacing=4 border=0 width='100%'>
+												<tr> 
+													<td width="40%"> 
+														<form id="getRecording" name="frmGetRecording" method="post" action="" OnSubmit="SetFormAddress( 'getRecording' )" target="fraResults">
+															<table border="0" cellpadding="0" cellspacing="1"  cols="5" align="center">
+																<tr>
+																	<td class="param" width="20%">ChanId:</td>
+																	<td width="65%"><input class="inputfields" type="text" name="ChanId"></td>
+																	<td width="15%">&nbsp;</td>
+																</tr>
+																<tr>
+																	<td class="param">StartTime:</td>
+																	<td ><input class="inputfields" type="text" name="StartTime"></td>
+																	<td align="right"><input name="getRecordingBtn" type="submit" class="formButton" value="getRecording"/></td>                          
+																</tr>
+															</table>
+														</form>
+													</td>
+													<td valign="top"> 
+														<table border="0" cellpadding="0" cellspacing="1" width="100%" >
+															<tr> 
+																<td width="13%" class="label" colspan="2" align="right">Params:</td>
+																<td width="10%" class="param">ChanId</td>
+																<td width="7%">&nbsp;</td>
+																<td width="70%" class="desc">ChannelId of recording. &lt;required&gt;</td>
+															</tr>
+															<tr> 
+																<td colspan="2">&nbsp;</td>
+																<td class="param">StartTime</td>
+																<td>&nbsp;</td>
+																<td class="desc">StartTime of recording (CCYY-MM-DDTHH:MM). &lt;required&gt;</td>
+															</tr>
+														</table>
+													</td>
+												</tr>
+											</table>
+										</div>
+									</td>
+								</tr>
+							</table>
+						</div>
+					</td>
+				</tr>
+
+<!-- getVideo -->
+
+				<TBODY id='getVideoPanel' style="display:none;">
+				<tr valign='top'  >
+					<td width="2%">&nbsp;</td>
+					<td width="98%" height="1px"> 
+						<div id="divGetVideo" class="panel" > 
+							<table cellspacing=0 cellpadding=0 class="panel">
+								<tr> 
+									<td>
+										<table cellspacing=0 cellpadding=0 class="mnuBar" id="mnuBar1" >
+											<tr> 
+												<td nowrap><span tabindex=0 class="menu"><B>getVideo - </B>Retrieves Video.</span></td>
+											</tr>
+										</table>
+									</td>
+								</tr>
+								<tr>
+									<td> 
+										<div class="panelArea"> 
+											<table cellpadding=4 cellspacing=4 border=0 width='100%' >
+												<tr> 
+													<td width='40%' align="center" valign="top"> 
+														<form id="getVideo" name="frmGetVideo" method="post" action="" target="fraResults" onSubmit="SetFormAddress( 'getVideo' )">
+															<table border="0" cellpadding="0" cellspacing="1" align="left" width="100%">
+																<tr>
+																	<td width="40%" class="param">VideoID:</td>
+																	<td width="60%"><input class="inputfields" type="text" name="VideoID"></td>
+																	<td align="right"><input type="submit" class="formButton" value="getVideo"/></td>
+																</tr>
+															</table>
+														</form>
+													</td>
+													<td valign="top"> 
+														<table border="0" cellpadding="0" cellspacing="1" cols="5"  width="100%" >
+															<tr> 
+																<td width="13%" class="label" colspan="2" align="right">Params:</td>
+																<td width="15%" class="param">VideoID</td>
+																<td width="7%">&nbsp;</td>
+																<td width="65%" class="desc">Id of the video to retrieve &lt;required&gt;</td>
+															</tr>
+														</table>
+													</td>
+												</tr>
+											</table>
+										</div>
+									</td>
+								</tr>
+							</table>
+						</div>
+					</td>
+				</tr>
+
+<!-- getMusic -->
+
+				<TBODY id='getMusicPanel' style="display:none;">
+				<tr valign='top'  >
+					<td width="2%">&nbsp;</td>
+					<td width="98%" height="1px"> 
+						<div id="divGetMusic" class="panel" > 
+							<table cellspacing=0 cellpadding=0 class="panel">
+								<tr> 
+									<td>
+										<table cellspacing=0 cellpadding=0 class="mnuBar" id="mnuBar1" >
+											<tr> 
+												<td nowrap><span tabindex=0 class="menu"><B>getMusic - </B>Retrieves actual song.</span></td>
+											</tr>
+										</table>
+									</td>
+								</tr>
+								<tr>
+									<td> 
+										<div class="panelArea"> 
+											<table cellpadding=4 cellspacing=4 border=0 width='100%' >
+												<tr> 
+													<td width='40%' align="center" valign="top"> 
+														<form id="getMusic" name="frmGetMusic" method="post" action="" target="fraResults" onSubmit="SetFormAddress( 'getMusic' )">
+															<table border="0" cellpadding="0" cellspacing="1" align="left" width="100%">
+																<tr>
+																	<td width="40%" class="param">Id:</td>
+																	<td width="60%"><input class="inputfields" type="text" name="Id"></td>
+																	<td align="right"><input type="submit" class="formButton" value="getMusic"/></td>
+																</tr>
+															</table>
+														</form>
+													</td>
+													<td valign="top"> 
+														<table border="0" cellpadding="0" cellspacing="1" cols="5"  width="100%" >
+															<tr> 
+																<td width="13%" class="label" colspan="2" align="right">Params:</td>
+																<td width="15%" class="param">Id</td>
+																<td width="7%">&nbsp;</td>
+																<td width="65%" class="desc">Id of the Song to retrieve &lt;required&gt;</td>
+															</tr>
+														</table>
+													</td>
+												</tr>
+											</table>
+										</div>
+									</td>
+								</tr>
+							</table>
+						</div>
+					</td>
+				</tr>
+
+<!--  Results -->
+
+				<TBODY id='tbBlank'>
+				<tr><td height="10px" colspan=2>&nbsp;</td></tr>
+				</TBODY>
+
+				<TBODY id='tbResults' style="">
+				<tr valign="top">
+					<td width="2%">&nbsp;</td>
+					<td height="80%" width="98%">
+						<table class="panel fullHeight" width="100%" cellspacing=0 cellpadding=0 border=0 >
+							<tr valign="top"> 
+								<td height="23px"> 
+									<table cellspacing=0 cellpadding=0 class="mnuBar" id="mnuBar1" >
+										<tr> 
+											<td class="icMenu" noWrap><span tabIndex=0 class="menu">Results</span></td>
+											<td align="right"><span id="MinMaxId" onClick="MinMax()" direction="up"><img src="arr_up.gif" width="17" height="17"></span></td>
+										</tr>
+									</table>
+								</td>
+							</tr>
+							<tr> 
+								<td height="100%"> 
+									<iframe id='fraResults' name='fraResults' width='100%' height='100%' frameborder="0"></iframe> 
+								</td>
+							</tr>
+						</table>
+					</td>
+				</tr>
+				</TBODY>
+			</table>
+		</td>
+	</tr>
+</table>
+</body>
+</html>

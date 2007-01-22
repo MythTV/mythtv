@@ -1,0 +1,505 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+	<title>Content Directory Service</title>
+	<LINK href="MythXMLTest.css " rel="stylesheet" type="text/css">
+	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+
+<script type="text/javascript" src="script.js"></script>
+
+<script type="text/javascript" />
+<!--
+function OnLoad( sPath )
+{
+	sRootPath   = sPath;
+	curElement  = FindObject( "li0" );
+	curMethodId = "DescriptionPanel"; 
+}
+// -->
+</script>
+</head>
+
+<body onLoad="OnLoad('/CDS_Control')" >
+<table class="fullHeight" width="100%" align='center' cellpadding="0" cellspacing="0" border="0">
+	<tr valign="top" >
+		<td width='15%'>
+			<div id="NavList" >
+				<ul>
+					<li class="heading">Info -</a></li>
+					<ul>
+						<li id="li0" class="selected" onclick="MenuClick( event,'DescriptionPanel'  )"><a href="#">Discription</a></li>
+						<li id="li1" class="menu"     onclick="MenuClick( event,'GetServDescPanel')"><a href="#">GetServDesc</a></li>
+					</ul>
+					<li class="heading">Methods -</a></li>
+					<ul>
+						<li id="li2" class="menu" onclick="MenuClick( event,'BrowsePanel'               )"><a href="#">Browse</a></li>
+						<li id="li3" class="menu" onclick="MenuClick( event,'SearchPanel'               )"><a href="#">Search</a></li>
+						<li id="li4" class="menu" onclick="MenuClick( event,'GetSearchCapabilitiesPanel')"><a href="#">GetSearchCapabilities</a></li>
+						<li id="li5" class="menu" onclick="MenuClick( event,'GetSortCapabilitiesPanel'  )"><a href="#">GetSortCapabilities</a></li>
+						<li id="li6" class="menu" onclick="MenuClick( event,'GetSystemUpdateIDPanel'    )"><a href="#">GetSystemUpdateID</a></li>
+					</ul>
+				</ul>
+			</div>
+		</td>
+		<td height="100%">
+			<table class="fullHeight" cellspacing=0 cellpadding=0 width="100%" border="0" >
+
+<!-- Description -->
+
+				<TBODY id='DescriptionPanel' style="">
+				<tr valign='top' >
+					<td width="2%">&nbsp;</td>
+					<td width="98%" height="1px"> 
+						<div id="divDescription" class="panel" > 
+							<table cellspacing=0 cellpadding=0 class="panel">
+								<tr> 
+									<td> 
+										<table cellspacing=0 cellpadding=0 class="mnuBar" id="mnuBar1" >
+											<tr> 
+												<td nowrap><span tabindex=0 class="menu"><B>uPnp Content Directory Service</B></span></td>
+											</tr>
+										</table>
+									</td>
+								</tr>
+								<tr>
+									<td> 
+										<div class="panelArea"> 
+											<P>
+											<Center>-=>TODO: Describe what this collection of methods are for. <=-</Center>
+											<P>
+										</div>
+									</td>
+								</tr>
+							</table>
+						</div>
+					</td>
+				</tr>
+
+<!-- getServDesc -->
+
+				<TBODY id='GetServDescPanel' style="display:none;">
+				<tr valign='top' >
+					<td width="2%">&nbsp;</td>
+					<td width="98%" height="1px"> 
+						<div id="divGetServDesc" class="panel" > 
+							<table cellspacing=0 cellpadding=0 class="panel">
+								<tr> 
+									<td> 
+										<table cellspacing=0 cellpadding=0 class="mnuBar" id="mnuBar1" >
+											<tr> 
+												<td nowrap><span tabindex=0 class="menu"><B>GetServDesc - </B>Retrieve the uPnp Content Directory Service Description XML.</span></td>
+											</tr>
+										</table>
+									</td>
+								</tr>
+								<tr>
+									<td> 
+										<div class="panelArea"> 
+											<table cellpadding=5 cellspacing=5 border=0 width='100%' >
+												<tr> 
+													<td width='40%' align="center"> 
+														<input name="button" type="button" class="formButton" onClick="UpdateIFrame( 'GetServDesc') " value="GetServDesc"/> 
+													</td>
+													<td valign="top"> 
+														<table border="0" cellpadding="0" cellspacing="1" cols="5"  width="100%" >
+															<tr> 
+																<td width="13%" class="label" align="right">Params:</td>
+																<td width="10%" class="param">none</td>
+																<td width="7%" >&nbsp;</td>
+																<td width="70%" class="desc">&nbsp;</td>
+															</tr>
+														</table>
+													</td>
+												</tr>
+											</table>
+										</div>
+									</td>
+								</tr>
+							</table>
+						</div>
+					</td>
+				</tr>
+
+<!-- Browse --> 
+
+				<TBODY id='BrowsePanel' style="display:none;">
+				<tr valign='top'  >
+					<td width="2%">&nbsp;</td>
+					<td width="98%" height="1px"> 
+						<div id="divBrowse" class="panel" > 
+							<table cellspacing=0 cellpadding=0 class="panel">
+								<tr> 
+									<td>
+										<table cellspacing=0 cellpadding=0 class="mnuBar" id="mnuBar1" >
+											<tr> 
+												<td nowrap><span tabindex=0 class="menu"><B>Browse - </B>Browse the Content Directory.</span></td>
+											</tr>
+										</table>
+									</td>
+								</tr>
+								<tr>
+									<td> 
+										<div class="panelArea"> 
+											<table cellpadding=4 cellspacing=4 border=0 width='100%' >
+												<tr> 
+													<td width='40%' align="left" valign="top"> 
+														<form id="Browse" name="frmBrowse" method="post" action="" target="fraResults" onSubmit="SetFormAddress( 'Browse' )">
+															<table border="0" cellpadding="0" cellspacing="1" align="left" width="100%">
+																<tr>
+																	<td width="40%" class="param">ObjectID:</td>
+																	<td width="60%"><input class="inputfields" type="text" name="ObjectID" value="0"></td>
+																	<td>&nbsp;</td>
+																</tr>
+																<tr>
+																	<td class="param">BrowseFlag:</td>
+																	<td>
+																		<select class="inputfields" name="BrowseFlag">
+																			<option value="BrowseMetadata" selected="selected">BrowseMetadata</option>
+																			<option value="BrowseDirectChildren" >BrowseDirectChildren</option>
+																		</select>
+																	</td>
+																	<td>&nbsp;</td>
+																</tr>
+																<tr>
+																	<td class="param" >Filter:</td>
+																	<td ><input class="inputfields" type="text" name="Filter" value="*"></td>
+																	<td>&nbsp;</td>
+																</tr>
+																<tr>
+																	<td class="param">StartIndex:</td>
+																	<td><input class="inputfields" type="text" name="StartIndex" value="0"></td>
+																	<td>&nbsp;</td>
+																</tr>
+																<tr>
+																	<td class="param">RequestedCount:</td>
+																	<td><input class="inputfields" type="text" name="RequestedCount" value="0"></td>
+																	<td align="right"><input name="Browse" type="submit" class="formButton" value="Browse"/></td>                          
+																</tr>
+															</table>
+														</form>
+													</td>
+													<td valign="top"> <table border="0" cellpadding="0" cellspacing="1" cols="5"  width="100%" >
+															<tr> 
+																<td width="10%" class="label" colspan="2" align="right">Params:</td>
+																<td width="15%" class="param">ObjectID</td>
+																<td width="7%">&nbsp;</td>
+																<td width="65%" class="desc">ObjectId to start browse at (0 = root) &lt;required&gt;</td>
+															</tr>
+															<tr> 
+																<td colspan="2">&nbsp;</td>
+																<td class="param">BrowseFlag</td>
+																<td>&nbsp;</td>
+																<td class="desc">Type of browse &lt;required&gt;</td>
+															</tr>
+															<tr> 
+																<td colspan="2">&nbsp;</td>
+																<td class="param">Filter</td>
+																<td>&nbsp;</td>
+																<td class="desc">Comma-seperated list of properties to return in xml (* == all) &lt;required&gt;</td>
+															</tr>
+															<tr> 
+																<td colspan="2">&nbsp;</td>
+																<td class="param">StartIndex</td>
+																<td>&nbsp;</td>
+																<td class="desc">The 0 based offset to start returning data. &lt;required&gt; </td>
+															</tr>
+															<tr> 
+																<td colspan="2">&nbsp;</td>
+																<td class="param">RequestedCount</td>
+																<td>&nbsp;</td>
+																<td class="desc">Number of Items to return (0 = all) &lt;required&gt;</td>
+															</tr>
+														</table>
+													</td>
+												</tr>
+											</table>
+										</div>
+									</td>
+								</tr>
+							</table>
+						</div>
+					</td>
+				</tr>
+
+<!-- Search --> 
+
+				<TBODY id='SearchPanel' style="display:none;">
+				<tr valign='top'  >
+					<td width="2%">&nbsp;</td>
+					<td width="98%" height="1px"> 
+						<div id="divSearch" class="panel" > 
+							<table cellspacing=0 cellpadding=0 class="panel">
+								<tr> 
+									<td>
+										<table cellspacing=0 cellpadding=0 class="mnuBar" id="mnuBar1" >
+											<tr> 
+												<td nowrap><span tabindex=0 class="menu"><B>Search - </B>Search the Content Directory.</span></td>
+											</tr>
+										</table>
+									</td>
+								</tr>
+								<tr>
+									<td> 
+										<div class="panelArea"> 
+											<table cellpadding=4 cellspacing=4 border=0 width='100%' >
+												<tr> 
+													<td width='40%' align="left" valign="top"> 
+														<form id="Search" name="frmSearch" method="post" action="" target="fraResults" onSubmit="SetFormAddress( 'Search' )">
+															<table border="0" cellpadding="0" cellspacing="1" align="left" width="100%">
+																<tr>
+																	<td width="40%" class="param">ContainerID:</td>
+																	<td width="60%"><input class="inputfields" type="text" name="ContainerID" value="0"></td>
+																	<td>&nbsp;</td>
+																</tr>
+																<tr>
+																	<td class="param">SearchCriteria:</td>
+																	<td><input class="inputfields" type="text" name="SearchCriteria"></td>
+																	<td>&nbsp;</td>
+																</tr>
+																<tr>
+																	<td class="param">SortCriteria:</td>
+																	<td><input class="inputfields" type="text" name="SortCriteria" value="0"></td>
+																	<td>&nbsp;</td>
+																</tr>
+																<tr>
+																	<td class="param" >Filter:</td>
+																	<td ><input class="inputfields" type="text" name="Filter" value="*"></td>
+																	<td>&nbsp;</td>
+																</tr>
+																<tr>
+																	<td class="param">StartIndex:</td>
+																	<td><input class="inputfields" type="text" name="StartIndex" value="0"></td>
+																	<td>&nbsp;</td>
+																</tr>
+																<tr>
+																	<td class="param">RequestedCount:</td>
+																	<td><input class="inputfields" type="text" name="RequestedCount" value="0"></td>
+																	<td align="right"><input name="Search" type="submit" class="formButton" value="Search"/></td>                          
+																</tr>
+															</table>
+														</form>
+													</td>
+													<td valign="top"> <table border="0" cellpadding="0" cellspacing="1" cols="5"  width="100%" >
+															<tr> 
+																<td width="10%" class="label" colspan="2" align="right">Params:</td>
+																<td width="15%" class="param">ContainerID</td>
+																<td width="7%">&nbsp;</td>
+																<td width="65%" class="desc">Container Id to start search at (0 = root) &lt;required&gt;</td>
+															</tr>
+															<tr> 
+																<td colspan="2">&nbsp;</td>
+																<td class="param">SearchCriteria</td>
+																<td>&nbsp;</td>
+																<td class="desc">See <a href="www.upnp.org">www.upnp.org</a> &lt;required&gt;</td>
+															</tr>
+															<tr> 
+																<td colspan="2">&nbsp;</td>
+																<td class="param">SortCriteria</td>
+																<td>&nbsp;</td>
+																<td class="desc">See <a href="www.upnp.org">www.upnp.org</a> &lt;required&gt;</td>
+															</tr>
+															<tr> 
+																<td colspan="2">&nbsp;</td>
+																<td class="param">Filter</td>
+																<td>&nbsp;</td>
+																<td class="desc">Comma-seperated list of properties to return in xml (* == all) &lt;required&gt;</td>
+															</tr>
+															<tr> 
+																<td colspan="2">&nbsp;</td>
+																<td class="param">StartIndex</td>
+																<td>&nbsp;</td>
+																<td class="desc">The 0 based offset to start returning data. &lt;required&gt; </td>
+															</tr>
+															<tr> 
+																<td colspan="2">&nbsp;</td>
+																<td class="param">RequestedCount</td>
+																<td>&nbsp;</td>
+																<td class="desc">Number of Items to return (0 = all) &lt;required&gt;</td>
+															</tr>
+														</table>
+													</td>
+												</tr>
+											</table>
+										</div>
+									</td>
+								</tr>
+							</table>
+						</div>
+					</td>
+				</tr>
+
+<!-- GetSearchCapabilities -->
+
+				<TBODY id='GetSearchCapabilitiesPanel' style="display:none;">
+				<tr valign='top' >
+					<td width="2%">&nbsp;</td>
+					<td width="98%" height="1px"> 
+						<div id="divGetSearchCapabilities" class="panel" > 
+							<table cellspacing=0 cellpadding=0 class="panel">
+								<tr> 
+									<td> 
+										<table cellspacing=0 cellpadding=0 class="mnuBar" id="mnuBar1" >
+											<tr> 
+												<td nowrap><span tabindex=0 class="menu"><B>GetSearchCapabilities - </B>Returns the searching capabilities that are supported by the device.</span></td>
+											</tr>
+										</table>
+									</td>
+								</tr>
+								<tr>
+									<td> 
+										<div class="panelArea"> 
+											<table cellpadding=5 cellspacing=5 border=0 width='100%' >
+												<tr> 
+													<td width='40%' align="center"> 
+														<input name="button" type="button" class="formButton" onClick="UpdateIFrame( 'GetSearchCapabilities') " value="GetSearchCapabilities"/> 
+													</td>
+													<td valign="top"> 
+														<table border="0" cellpadding="0" cellspacing="1" cols="5"  width="100%" >
+															<tr> 
+																<td width="13%" class="label" align="right">Params:</td>
+																<td width="10%" class="param">none</td>
+																<td width="7%" >&nbsp;</td>
+																<td width="70%" class="desc">&nbsp;</td>
+															</tr>
+														</table>
+													</td>
+												</tr>
+											</table>
+										</div>
+									</td>
+								</tr>
+							</table>
+						</div>
+					</td>
+				</tr>
+
+<!-- GetSortCapabilities -->
+
+				<TBODY id='GetSortCapabilitiesPanel' style="display:none;">
+				<tr valign='top' >
+					<td width="2%">&nbsp;</td>
+					<td width="98%" height="1px"> 
+						<div id="divGetSortCapabilities" class="panel" > 
+							<table cellspacing=0 cellpadding=0 class="panel">
+								<tr> 
+									<td> 
+										<table cellspacing=0 cellpadding=0 class="mnuBar" id="mnuBar1" >
+											<tr> 
+												<td nowrap><span tabindex=0 class="menu"><B>GetSortCapabilities - </B>Returns the CSV list of meta-data tags that can be used in sortCriteria.</span></td>
+											</tr>
+										</table>
+									</td>
+								</tr>
+								<tr>
+									<td> 
+										<div class="panelArea"> 
+											<table cellpadding=5 cellspacing=5 border=0 width='100%' >
+												<tr> 
+													<td width='40%' align="center"> 
+														<input name="button" type="button" class="formButton" onClick="UpdateIFrame( 'GetSortCapabilities') " value="GetSortCapabilities"/> 
+													</td>
+													<td valign="top"> 
+														<table border="0" cellpadding="0" cellspacing="1" cols="5"  width="100%" >
+															<tr> 
+																<td width="13%" class="label" align="right">Params:</td>
+																<td width="10%" class="param">none</td>
+																<td width="7%" >&nbsp;</td>
+																<td width="70%" class="desc">&nbsp;</td>
+															</tr>
+														</table>
+													</td>
+												</tr>
+											</table>
+										</div>
+									</td>
+								</tr>
+							</table>
+						</div>
+					</td>
+				</tr>
+
+<!-- GetSystemUpdateID -->
+
+				<TBODY id='GetSystemUpdateIDPanel' style="display:none;">
+				<tr valign='top' >
+					<td width="2%">&nbsp;</td>
+					<td width="98%" height="1px"> 
+						<div id="divGetSystemUpdateID" class="panel" > 
+							<table cellspacing=0 cellpadding=0 class="panel">
+								<tr> 
+									<td> 
+										<table cellspacing=0 cellpadding=0 class="mnuBar" id="mnuBar1" >
+											<tr> 
+												<td nowrap><span tabindex=0 class="menu"><B>GetSystemUpdateID - </B>Returns the current value of state variable SystemUpdateID.</span></td>
+											</tr>
+										</table>
+									</td>
+								</tr>
+								<tr>
+									<td> 
+										<div class="panelArea"> 
+											<table cellpadding=5 cellspacing=5 border=0 width='100%' >
+												<tr> 
+													<td width='40%' align="center"> 
+														<input name="button" type="button" class="formButton" onClick="UpdateIFrame( 'GetSystemUpdateID') " value="GetSystemUpdateID"/> 
+													</td>
+													<td valign="top"> 
+														<table border="0" cellpadding="0" cellspacing="1" cols="5"  width="100%" >
+															<tr> 
+																<td width="13%" class="label" align="right">Params:</td>
+																<td width="10%" class="param">none</td>
+																<td width="7%" >&nbsp;</td>
+																<td width="70%" class="desc">&nbsp;</td>
+															</tr>
+														</table>
+													</td>
+												</tr>
+												<tr align="center">
+												 	<td colspan='2'>Can be used by clients that want to ‘poll’ for any changes in the Content Directory (as opposed to subscribing to events).
+												</tr>
+											</table>
+										</div>
+									</td>
+								</tr>
+							</table>
+						</div>
+					</td>
+				</tr>
+
+<!--  Results -->
+
+				<TBODY id='tbBlank'>
+				<tr><td height="10px" colspan=2>&nbsp;</td></tr>
+				</TBODY>
+
+				<TBODY id='tbResults' style="">
+				<tr valign="top">
+					<td width="2%">&nbsp;</td>
+					<td height="80%" width="98%">
+						<table class="panel fullHeight" width="100%" cellspacing=0 cellpadding=0 border=0 >
+							<tr valign="top"> 
+								<td height="23px"> 
+									<table cellspacing=0 cellpadding=0 class="mnuBar" id="mnuBar1" >
+										<tr> 
+											<td class="icMenu" noWrap><span tabIndex=0 class="menu">Results</span></td>
+											<td align="right"><span id="MinMaxId" onClick="MinMax()" direction="up"><img src="arr_up.gif" width="17" height="17"></span></td>
+										</tr>
+									</table>
+								</td>
+							</tr>
+							<tr> 
+								<td height="100%"> 
+									<iframe id='fraResults' name='fraResults' width='100%' height='100%' frameborder="0"></iframe> 
+								</td>
+							</tr>
+						</table>
+					</td>
+				</tr>
+				</TBODY>
+			</table>
+		</td>
+	</tr>
+</table>
+</body>
+</html>
