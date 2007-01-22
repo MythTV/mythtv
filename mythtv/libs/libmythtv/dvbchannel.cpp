@@ -239,13 +239,12 @@ bool DVBChannel::SetChannelByString(const QString &channum)
 
     VERBOSE(VB_CHANNEL, loc);
 
-    ClearDTVInfo();
-
     if (fd_frontend < 0)
     {
         VERBOSE(VB_IMPORTANT, loc_err + "Channel object "
                 "will not open, can not change channels.");
 
+        ClearDTVInfo();
         return false;
     }
 
@@ -254,6 +253,8 @@ bool DVBChannel::SetChannelByString(const QString &channum)
         VERBOSE(VB_CHANNEL, loc + "Already on channel");
         return true;
     }
+
+    ClearDTVInfo();
 
     QString inputName;
     if (!CheckChannel(channum, inputName))
