@@ -448,6 +448,27 @@ bool CardUtil::IsInNeedOfExternalInputConf(uint cardid)
     return needsConf;
 }
 
+uint CardUtil::GetQuickTuning(uint cardid, const QString &input_name)
+{
+    uint quicktune = 0;
+
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare(
+        "SELECT quicktune "
+        "FROM cardinput "
+        "WHERE cardid    = :CARDID AND "
+        "      inputname = :INPUTNAME");
+    query.bindValue(":CARDID",    cardid);
+    query.bindValue(":INPUTNAME", input_name);
+
+    if (!query.exec() || !query.isActive())
+        MythContext::DBError("CardUtil::GetQuickTuning()", query);
+    else if (query.next())
+        quicktune = query.value(0).toUInt();
+
+    return quicktune;
+}
+
 bool CardUtil::hasV4L2(int videofd)
 {
     (void) videofd;

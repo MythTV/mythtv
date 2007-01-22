@@ -26,6 +26,8 @@ using namespace std;
 #include "channelutil.h"
 #include "frequencytables.h"
 
+#define DEBUG_PID_FILTERS
+
 #define LOC QString("HDHRChan(%1): ").arg(GetDevice())
 #define LOC_ERR QString("HDHRChan(%1), Error: ").arg(GetDevice())
 
@@ -83,6 +85,11 @@ void HDHRChannel::Close(void)
     }
 }
 
+bool HDHRChannel::EnterPowerSavingMode(void)
+{
+    return QString::null != TunerSet("channel", "none", false);
+}
+
 bool HDHRChannel::FindDevice(void)
 {
     if (!_device_id)
@@ -134,7 +141,7 @@ bool HDHRChannel::Connect(void)
     return true;
 }
 
-QString HDHRChannel::DeviceGet(const QString &name)
+QString HDHRChannel::DeviceGet(const QString &name, bool report_error_return)
 {
     QMutexLocker locker(&_lock);
 
@@ -152,15 +159,19 @@ QString HDHRChannel::DeviceGet(const QString &name)
         return QString::null;
     }
 
-    if (error) {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + QString("DeviceGet(%1): %2").arg(name).arg(error));
+    if (report_error_return && error)
+    {
+        VERBOSE(VB_IMPORTANT, LOC_ERR +
+                QString("DeviceGet(%1): %2").arg(name).arg(error));
+
         return QString::null;
     }
 
     return QString(value);
 }
 
-QString HDHRChannel::DeviceSet(const QString &name, const QString &val)
+QString HDHRChannel::DeviceSet(const QString &name, const QString &val,
+                               bool report_error_return)
 {
     QMutexLocker locker(&_lock);
 
@@ -175,25 +186,32 @@ QString HDHRChannel::DeviceSet(const QString &name, const QString &val)
     if (hdhomerun_control_set(_control_socket, name, val, &value, &error) < 0)
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR + "Set request failed" + ENO);
+
         return QString::null;
     }
 
-    if (error) {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + QString("DeviceSet(%1 %2): %3").arg(name).arg(val).arg(error));
+    if (report_error_return && error)
+    {
+        VERBOSE(VB_IMPORTANT, LOC_ERR +
+                QString("DeviceSet(%1 %2): %3").arg(name).arg(val).arg(error));
+
         return QString::null;
     }
 
     return QString(value);
 }
 
-QString HDHRChannel::TunerGet(const QString &name)
+QString HDHRChannel::TunerGet(const QString &name, bool report_error_return)
 {
-    return DeviceGet(QString("/tuner%1/%2").arg(_tuner).arg(name));
+    return DeviceGet(QString("/tuner%1/%2").arg(_tuner).arg(name),
+                     report_error_return);
 }
 
-QString HDHRChannel::TunerSet(const QString &name, const QString &value)
+QString HDHRChannel::TunerSet(const QString &name, const QString &value,
+                              bool report_error_return)
 {
-    return DeviceSet(QString("/tuner%1/%2").arg(_tuner).arg(name), value);
+    return DeviceSet(QString("/tuner%1/%2").arg(_tuner).arg(name), value,
+                     report_error_return);
 }
 
 bool HDHRChannel::DeviceSetTarget(unsigned short localPort)
@@ -257,7 +275,8 @@ bool HDHRChannel::SetChannelByString(const QString &channum)
     if (!inputName.isEmpty())
         return SwitchToInput(inputName, channum);
 
-    SetCachedATSCInfo("");
+    ClearDTVInfo();
+    _ignore_filters = false;
 
     InputMap::const_iterator it = inputs.find(currentInputID);
     if (it == inputs.end())
@@ -312,15 +331,18 @@ bool HDHRChannel::SetChannelByString(const QString &channum)
     curchannelname = QDeepCopy<QString>(channum);
 
     // Set the major and minor channel for any additional multiplex tuning
-    if (atsc_major || atsc_minor)
-        SetCachedATSCInfo(QString("%1_%2").arg(atsc_major).arg(atsc_minor));
-    else if (mpeg_prog_num >= 0)
-        SetCachedATSCInfo(QString("0-%1").arg(mpeg_prog_num));
-    else
-        SetCachedATSCInfo(QString("%1_0").arg(channum));
+    SetDTVInfo(atsc_major, atsc_minor, netid, tsid, mpeg_prog_num);
 
     // Set this as the future start channel for this source
-    inputs[currentInputID]->startChanNum = curchannelname;
+    inputs[currentInputID]->startChanNum = QDeepCopy<QString>(curchannelname);
+
+    // Turn on the HDHomeRun program filtering if it is supported
+    // and we are tuning to an MPEG program number.
+    if (mpeg_prog_num && (GetTuningMode() == "mpeg"))
+    {
+        QString pnum = QString::number(mpeg_prog_num);
+        _ignore_filters = QString::null != TunerSet("program", pnum, false);
+    }
 
     return true;
 }
@@ -423,13 +445,17 @@ bool HDHRChannel::AddPID(uint pid, bool do_update)
     it = lower_bound(_pids.begin(), _pids.end(), pid);
     if (it != _pids.end() && *it == pid)
     {
+#ifdef DEBUG_PID_FILTERS
         VERBOSE(VB_CHANNEL, "AddPID(0x"<<hex<<pid<<dec<<") NOOP");
+#endif // DEBUG_PID_FILTERS
         return true;
     }
 
     _pids.insert(it, pid);
 
+#ifdef DEBUG_PID_FILTERS
     VERBOSE(VB_CHANNEL, "AddPID(0x"<<hex<<pid<<dec<<")");
+#endif // DEBUG_PID_FILTERS
 
     if (do_update)
         return UpdateFilters();
@@ -444,18 +470,25 @@ bool HDHRChannel::DelPID(uint pid, bool do_update)
     it = lower_bound(_pids.begin(), _pids.end(), pid);
     if (it == _pids.end())
     {
+#ifdef DEBUG_PID_FILTERS
         VERBOSE(VB_CHANNEL, "DelPID(0x"<<hex<<pid<<dec<<") NOOP");
-        return true;
+#endif // DEBUG_PID_FILTERS
+
+       return true;
     }
 
     if (*it == pid)
     {
+#ifdef DEBUG_PID_FILTERS
         VERBOSE(VB_CHANNEL, "DelPID(0x"<<hex<<pid<<dec<<") -- found");
+#endif // DEBUG_PID_FILTERS
         _pids.erase(it);
     }
     else
     {
+#ifdef DEBUG_PID_FILTERS
         VERBOSE(VB_CHANNEL, "DelPID(0x"<<hex<<pid<<dec<<") -- failed");
+#endif // DEBUG_PID_FILTERS
     }
 
     if (do_update)
@@ -467,7 +500,10 @@ bool HDHRChannel::DelAllPIDs(void)
 {
     QMutexLocker locker(&_lock);
 
+#ifdef DEBUG_PID_FILTERS
     VERBOSE(VB_CHANNEL, "DelAllPID()");
+#endif // DEBUG_PID_FILTERS
+
     _pids.clear();
 
     return UpdateFilters();
@@ -492,6 +528,9 @@ bool HDHRChannel::UpdateFilters(void)
 
     vector<uint> range_min;
     vector<uint> range_max;
+
+    if (_ignore_filters)
+        return true;
 
     for (uint i = 0; i < _pids.size(); i++)
     {
@@ -528,11 +567,13 @@ bool HDHRChannel::UpdateFilters(void)
 
     QString new_filter = TunerSet("filter", filter);
 
+#ifdef DEBUG_PID_FILTERS
     QString msg = QString("Filter: '%1'").arg(filter);
     if (filter != new_filter)
         msg += QString("\n\t\t\t\t'%2'").arg(new_filter);
 
     VERBOSE(VB_CHANNEL, msg);
+#endif // DEBUG_PID_FILTERS
 
     return filter == new_filter;
 }

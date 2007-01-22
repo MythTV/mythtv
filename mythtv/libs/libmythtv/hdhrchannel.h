@@ -29,6 +29,7 @@ class HDHRChannel : public DTVChannel
 
     bool Open(void);
     void Close(void);
+    bool EnterPowerSavingMode(void);
 
     // Sets
     bool SetChannelByString(const QString &chan);
@@ -62,17 +63,20 @@ class HDHRChannel : public DTVChannel
     bool DeviceSetTarget(unsigned short localPort);
     bool DeviceClearTarget(void);
 
-    QString DeviceGet(const QString &name);
-    QString DeviceSet(const QString &name, const QString &value);
+    QString DeviceGet(const QString &name, bool report_error_return = true);
+    QString DeviceSet(const QString &name, const QString &value,
+                      bool report_error_return = true);
 
-    QString TunerGet(const QString &name);
-    QString TunerSet(const QString &name, const QString &value);
+    QString TunerGet(const QString &name, bool report_error_return = true);
+    QString TunerSet(const QString &name, const QString &value,
+                     bool report_error_return = true);
 
   private:
     hdhr_socket_t  *_control_socket;
     uint            _device_id;
     uint            _device_ip;
     uint            _tuner;
+    bool            _ignore_filters;
     vector<uint>    _pids;
     mutable QMutex  _lock;
 };

@@ -1609,6 +1609,24 @@ class RadioServices : public CheckBoxSetting, public CardInputDBStorage
     };
 };
 
+class QuickTune : public ComboBoxSetting, public CardInputDBStorage
+{
+  public:
+    QuickTune(const CardInput &parent) :
+        ComboBoxSetting(this), CardInputDBStorage(this, parent, "quicktune")
+    {
+        setLabel(QObject::tr("Use quick tuning"));
+        addSelection(QObject::tr("Never"),        "0", true);
+        //addSelection(QObject::tr("Live TV only"), "1", true);
+        addSelection(QObject::tr("Always"),       "2", false);
+        setHelpText(QObject::tr(
+                        "If enabled MythTV will tune using only the "
+                        "MPEG program number. The program numbers "
+                        "change more often than DVB or ATSC tuning "
+                        "parameters, so this is slightly less reliable."));
+    };
+};
+
 class ExternalChannelCommand :
     public LineEditSetting, public CardInputDBStorage
 {
@@ -1748,7 +1766,8 @@ CardInput::CardInput(bool isDTVcard,  bool isDVBcard,
     group->addChild(ci);
     group->addChild(new InputDisplayName(*this));
     group->addChild(sourceid);
-    if (!isDVBcard)
+
+    if (!isDTVcard)
     {
         group->addChild(new ExternalChannelCommand(*this));
         group->addChild(new PresetTuner(*this));
@@ -1758,7 +1777,8 @@ CardInput::CardInput(bool isDTVcard,  bool isDVBcard,
     {
         // we place this in a group just so the margins match the DVB ones.
         ConfigurationGroup *chgroup = 
-            new HorizontalConfigurationGroup(false, false, true, true);
+            new VerticalConfigurationGroup(false, false, true, true);
+        chgroup->addChild(new QuickTune(*this));
         chgroup->addChild(new FreeToAir(*this));
         group->addChild(chgroup);
     }

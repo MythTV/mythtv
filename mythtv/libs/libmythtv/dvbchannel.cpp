@@ -238,6 +238,9 @@ bool DVBChannel::SetChannelByString(const QString &channum)
     QString loc_err = LOC_ERR + tmp;
 
     VERBOSE(VB_CHANNEL, loc);
+
+    ClearDTVInfo();
+
     if (fd_frontend < 0)
     {
         VERBOSE(VB_IMPORTANT, loc_err + "Channel object "
@@ -272,22 +275,46 @@ bool DVBChannel::SetChannelByString(const QString &channum)
     if (it == inputs.end())
         return false;
 
-    // Initialize all the tuning parameters
-    DTVMultiplex tuning;
-    if (!InitChannelParams(tuning, (*it)->sourceid, channum))
+    // Get the input data for the channel
+    QString tvformat, modulation, freqtable, freqid, si_std;
+    int finetune;
+    uint64_t frequency;
+    int mpeg_prog_num;
+    uint atsc_major, atsc_minor, mplexid, tsid, netid;
+
+    if (!ChannelUtil::GetChannelData(
+        (*it)->sourceid, channum,
+        tvformat, modulation, freqtable, freqid,
+        finetune, frequency,
+        si_std, mpeg_prog_num, atsc_major, atsc_minor, tsid, netid,
+        mplexid, commfree))
     {
         VERBOSE(VB_IMPORTANT, loc_err +
-                "Failed to initialize channel options");
+                "Unable to find channel in database.");
 
         return false;
     }
 
+    // Initialize basic the tuning parameters
+    DTVMultiplex tuning;
+    if (!mplexid || !tuning.FillFromDB(card_type, mplexid))
+    {
+        VERBOSE(VB_IMPORTANT, loc_err +
+                "Failed to initialize multiplex options");
+
+        return false;
+    }
+
+    SetDTVInfo(atsc_major, atsc_minor, netid, tsid, mpeg_prog_num);
+
+    // Try to fix any problems with the multiplex
     CheckOptions(tuning);
 
     if (!Tune(tuning, ""))
     {
         VERBOSE(VB_IMPORTANT, loc_err + "Tuning to frequency.");
 
+        ClearDTVInfo();
         return false;
     }
 
@@ -330,42 +357,6 @@ bool DVBChannel::SwitchToInput(int newInputNum, bool setstarting)
 
     nextInputID = newInputNum;
     return SetChannelByString((*it)->startChanNum);
-}
-
-/** \fn DVBChannel::InitChannelParams(DTVMultiplex&,uint,const QString&)
- *  \brief Initializes all variables pertaining to a channel.
- *
- *  \return true on success and false on failure
- */
-bool DVBChannel::InitChannelParams(DTVMultiplex  &tuning,
-                                   uint           sourceid,
-                                   const QString &channum)
-{
-    QString tvformat, modulation, freqtable, freqid, si_std;
-    int finetune;
-    uint64_t frequency;
-    uint mplexid;
-
-    if (!ChannelUtil::GetChannelData(
-            sourceid,   channum,
-            tvformat,   modulation,   freqtable,   freqid,
-            finetune,   frequency,
-            si_std,                   currentProgramNum,
-            currentATSCMajorChannel,  currentATSCMinorChannel,
-            currentTransportID,       currentOriginalNetworkID,
-            mplexid,    commfree))
-    {
-        return false;
-    }
-
-    if (currentATSCMinorChannel)
-        currentProgramNum = -1;
-
-    if (mplexid)
-        return tuning.FillFromDB(card_type, mplexid);
-
-    VERBOSE(VB_IMPORTANT, LOC_ERR + "Unable to find channel in database.");
-    return false;
 }
 
 /** \fn DVBChannel::CheckOptions(DTVMultiplex&) const

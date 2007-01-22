@@ -762,7 +762,8 @@ void TVRec::HandleStateChange(void)
     changeState = false;
 
     eitScanStartTime = QDateTime::currentDateTime();    
-    if ((internalState == kState_None) && (genOpt.cardtype == "DVB"))
+    if ((internalState == kState_None) &&
+        CardUtil::IsEITCapable(genOpt.cardtype))
     {
         // Add some randomness to avoid all cards starting
         // EIT scanning at nearly the same time.
@@ -977,7 +978,10 @@ void TVRec::TeardownRecorder(bool killFile)
     MythEvent me("RECORDING_LIST_CHANGE");
     gContext->dispatch(me);
     pauseNotify = true;
-}    
+
+    if (GetDTVChannel())
+        GetDTVChannel()->EnterPowerSavingMode();
+}
 
 DVBRecorder *TVRec::GetDVBRecorder(void)
 {
@@ -1050,6 +1054,9 @@ void TVRec::InitChannel(const QString &inputname, const QString &startchannel)
         }
         VERBOSE(VB_IMPORTANT, LOC_ERR + msg1 + "\n\t\t\t" + msg2);
     }
+
+    if (GetDTVChannel())
+        GetDTVChannel()->EnterPowerSavingMode();
 }
 
 void TVRec::CloseChannel(void)
@@ -1653,12 +1660,25 @@ bool TVRec::SetupDTVSignalMonitor(void)
         sd->SetCaching(true);
     }
 
-    QString sistandard = dtvchan->GetSIStandard();
+    uint neededVideo = 0;
+    uint neededAudio = 0;
+
+    ProgramInfo *rec = lastTuningRequest.program;
+    RecordingProfile profile;
+    load_profile(genOpt.cardtype, tvchain, rec, profile);
+    const Setting *setting = profile.byName("recordingtype");
+    if (setting)
+    {
+        neededVideo = (setting->getValue() == "tv") ? 1 : 0;
+        neededAudio = (setting->getValue() == "audio") ? 1 : 0;
+    }
+
+    const QString tuningmode = dtvchan->GetTuningMode();
 
     // Check if this is an ATSC Channel
     int major = dtvchan->GetMajorChannel();
     int minor = dtvchan->GetMinorChannel();
-    if ((minor > 0) && (sistandard == "atsc"))
+    if ((minor > 0) && (tuningmode == "atsc"))
     {
         QString msg = QString("ATSC channel: %1_%2").arg(major).arg(minor);
         VERBOSE(VB_RECORD, LOC + msg);
@@ -1675,7 +1695,8 @@ bool TVRec::SetupDTVSignalMonitor(void)
         asd->Reset(major, minor);
         sm->SetStreamData(sd);
         sm->SetChannel(major, minor);
-        sd->SetVideoStreamsRequired(1);
+        sd->SetVideoStreamsRequired(neededVideo);
+        sd->SetAudioStreamsRequired(neededAudio);
 
         // Try to get pid of VCT from cache and
         // require MGT if we don't have VCT pid.
@@ -1689,13 +1710,10 @@ bool TVRec::SetupDTVSignalMonitor(void)
     // Check if this is an DVB channel
     int progNum = dtvchan->GetProgramNumber();
 #ifdef USING_DVB
-    if ((progNum >= 0) && (sistandard == "dvb"))
+    if ((progNum >= 0) && (tuningmode == "dvb"))
     {
         int netid   = dtvchan->GetOriginalNetworkID();
         int tsid    = dtvchan->GetTransportID();
-
-        uint neededVideo = 0;
-        uint neededAudio = 0;
 
         DVBStreamData *dsd = dynamic_cast<DVBStreamData*>(sd);
         if (!dsd)
@@ -1704,16 +1722,6 @@ bool TVRec::SetupDTVSignalMonitor(void)
             sd->SetCaching(true);
             if (GetDTVRecorder())
                 GetDTVRecorder()->SetStreamData(dsd);
-        }
-
-        ProgramInfo *rec = lastTuningRequest.program;
-        RecordingProfile profile;
-        load_profile(genOpt.cardtype, tvchain, rec, profile);
-        const Setting *setting = profile.byName("recordingtype");
-        if (setting)
-        {
-            neededVideo = (setting->getValue() == "tv") ? 1 : 0;
-            neededAudio = (setting->getValue() == "audio") ? 1 : 0;
         }
 
         VERBOSE(VB_RECORD, LOC +
@@ -1767,7 +1775,9 @@ bool TVRec::SetupDTVSignalMonitor(void)
         sd->Reset(progNum);
         sm->SetStreamData(sd);
         sm->SetProgramNumber(progNum);
-        sd->SetVideoStreamsRequired(1);
+        sd->SetVideoStreamsRequired(neededVideo);
+        sd->SetAudioStreamsRequired(neededAudio);
+
         sm->AddFlags(SignalMonitor::kDTVSigMon_WaitForPAT |
                      SignalMonitor::kDTVSigMon_WaitForPMT |
                      SignalMonitor::kDVBSigMon_WaitForPos);
@@ -1778,7 +1788,7 @@ bool TVRec::SetupDTVSignalMonitor(void)
     }
 
     QString msg = "No valid DTV info, ATSC maj(%1) min(%2), MPEG pn(%3)";
-    VERBOSE(VB_RECORD, LOC_ERR + msg.arg(major).arg(minor).arg(progNum));
+    VERBOSE(VB_IMPORTANT, LOC_ERR + msg.arg(major).arg(minor).arg(progNum));
     return false;
 }
 
@@ -2306,11 +2316,9 @@ long long TVRec::GetMaxBitrate(void)
     long long bitrate;
     if (genOpt.cardtype == "MPEG")
         bitrate = 10080000LL; // use DVD max bit rate
-    else if (genOpt.cardtype == "HDTV")
-        bitrate = 19400000LL; // 1080i
-    else if (genOpt.cardtype == "FIREWIRE")
-        bitrate = 19400000LL; // 1080i
-    else if (genOpt.cardtype == "DVB")
+    else if (genOpt.cardtype == "DBOX2")
+        bitrate = 10080000LL; // use DVD max bit rate
+    else if (!CardUtil::IsEncoder(genOpt.cardtype))
         bitrate = 19400000LL; // 1080i
     else // frame grabber
         bitrate = 10080000LL; // use DVD max bit rate, probably too big
@@ -3377,19 +3385,38 @@ void TVRec::TuningShutdowns(const TuningRequest &request)
  */
 void TVRec::TuningFrequency(const TuningRequest &request)
 {
-    if (request.minorChan)
+    DTVChannel *dtvchan = GetDTVChannel();
+    if (dtvchan)
     {
-        MPEGStreamData *mpeg = GetDTVRecorder()->GetStreamData();
-        ATSCStreamData *atsc = dynamic_cast<ATSCStreamData*>(mpeg);
-        channel->SetChannelByString(request.channel);
-        atsc->SetDesiredChannel(request.majorChan, request.minorChan);
+        MPEGStreamData *mpeg = NULL;
+
+        if (GetDTVRecorder())
+            mpeg = GetDTVRecorder()->GetStreamData();
+
+        const QString tuningmode = (HasFlags(kFlagEITScannerRunning)) ?
+            dtvchan->GetSIStandard() :
+            dtvchan->GetSuggestedTuningMode(
+                kState_WatchingLiveTV == internalState);
+
+        dtvchan->SetTuningMode(tuningmode);
+
+        if (request.minorChan && (tuningmode == "atsc"))
+        {
+            channel->SetChannelByString(request.channel);
+
+            ATSCStreamData *atsc = dynamic_cast<ATSCStreamData*>(mpeg);
+            if (atsc)
+                atsc->SetDesiredChannel(request.majorChan, request.minorChan);
+        }
+        else if (request.progNum >= 0)
+        {
+            channel->SetChannelByString(request.channel);
+
+            if (mpeg)
+                mpeg->SetDesiredProgram(request.progNum);
+        }
     }
-    else if (request.progNum >= 0)
-    {
-        MPEGStreamData *mpeg = GetDTVRecorder()->GetStreamData();
-        channel->SetChannelByString(request.channel);
-        mpeg->SetDesiredProgram(request.progNum);
-    }
+
     if (request.IsOnSameMultiplex())
     {
         QStringList slist;

@@ -72,8 +72,6 @@ class DVBChannel : public DTVChannel
 
   private:
     int  GetChanID(void) const;
-    bool InitChannelParams(DTVMultiplex &t,
-                           uint sourceid, const QString &channum);
 
     void CheckOptions(DTVMultiplex &t) const;
     bool CheckModulation(DTVModulation modulation) const;

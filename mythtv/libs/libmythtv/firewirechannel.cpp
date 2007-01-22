@@ -62,7 +62,11 @@ bool FirewireChannel::SetChannelByString(const QString &channum)
 
     bool ok = false;
     if (!(*it)->externalChanger.isEmpty())
+    {
         ok = ChangeExternalChannel(freqid);
+        SetSIStandard("mpeg");
+        SetDTVInfo(0,0,0,0,1);
+    }
     else
     {
         uint ichan = freqid.toUInt(&ok);
@@ -199,7 +203,7 @@ bool FirewireChannel::SetChannelByNumber(int channel)
                 "STB is turned off, must be on to set channel.");
 
         SetSIStandard("mpeg");
-        SetCachedATSCInfo(QString("%1-1").arg(channel));
+        SetDTVInfo(0,0,0,0,1);
 
         return true; // signal monitor will call retune later...
     }
@@ -208,7 +212,7 @@ bool FirewireChannel::SetChannelByNumber(int channel)
         return false;
 
     SetSIStandard("mpeg");
-    SetCachedATSCInfo(QString("%1-1").arg(channel));
+    SetDTVInfo(0,0,0,0,1);
 
     return true;
 }

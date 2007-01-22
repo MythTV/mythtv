@@ -41,6 +41,8 @@ class DTVChannel : public ChannelBase
     virtual bool TuneMultiplex(uint mplexid, QString inputname) = 0;
     /// \brief To be used by the channel scanner and possibly the EIT scanner.
     virtual bool Tune(const DTVMultiplex &tuning, QString inputname) = 0;
+    /// \brief Enters power saving mode if the card supports it
+    virtual bool EnterPowerSavingMode(void) { return true; }
 
     // Gets
 
@@ -67,6 +69,12 @@ class DTVChannel : public ChannelBase
     /// \brief Returns PSIP table standard: MPEG, DVB, ATSC, or OpenCable
     QString GetSIStandard(void) const;
 
+    /// \brief Returns suggested tuning mode: "mpeg", "dvb", or "atsc"
+    QString GetSuggestedTuningMode(bool is_live_tv) const;
+
+    /// \brief Returns tuning mode last set by SetTuningMode().
+    QString GetTuningMode(void) const;
+
     /** \brief Returns cached MPEG PIDs for last tuned channel.
      *  \param pid_cache List of PIDs with their TableID
      *                   types is returned in pid_cache.
@@ -75,6 +83,9 @@ class DTVChannel : public ChannelBase
         { (void) pid_cache; }
 
     // Sets
+
+    /// \brief Sets tuning mode: "mpeg", "dvb", "atsc", etc.
+    void SetTuningMode(const QString &tuningmode);
 
     /** \brief Saves MPEG PIDs to cache to database
      * \param pid_cache List of PIDs with their TableID types to be saved.
@@ -85,7 +96,10 @@ class DTVChannel : public ChannelBase
   protected:
     /// \brief Sets PSIP table standard: MPEG, DVB, ATSC, or OpenCable
     void SetSIStandard(const QString&);
-    void SetCachedATSCInfo(const QString &chan);
+    void SetDTVInfo(uint atsc_major, uint atsc_minor,
+                    uint dvb_orig_netid,
+                    uint mpeg_tsid, int mpeg_pnum);
+    void ClearDTVInfo(void) { SetDTVInfo(0, 0, 0, 0, -1); }
 
     static void GetCachedPids(int chanid, pid_cache_t&);
     static void SaveCachedPids(int chanid, const pid_cache_t&);
@@ -94,6 +108,7 @@ class DTVChannel : public ChannelBase
     mutable QMutex dtvinfo_lock;
 
     QString sistandard; ///< PSIP table standard: MPEG, DVB, ATSC, OpenCable
+    QString tuningMode;
     int     currentProgramNum;
     uint    currentATSCMajorChannel;
     uint    currentATSCMinorChannel;

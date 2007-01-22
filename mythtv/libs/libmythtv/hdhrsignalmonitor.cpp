@@ -98,6 +98,8 @@ bool HDHRSignalMonitor::UpdateFiltersFromStreamData(void)
     if (!GetStreamData())
         return false;
 
+    UpdateListeningForEIT();
+
     const QMap<uint, bool> &listening = GetStreamData()->ListeningPIDs();
 
     // PIDs that need to be added..

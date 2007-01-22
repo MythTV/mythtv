@@ -441,7 +441,7 @@ bool Channel::SetChannelByString(const QString &channum)
     if (!inputName.isEmpty())
         return ChannelBase::SwitchToInput(inputName, channum);
 
-    SetCachedATSCInfo("");
+    ClearDTVInfo();
 
     InputMap::const_iterator it = inputs.find(currentInputID);
     if (it == inputs.end())
@@ -516,13 +516,10 @@ bool Channel::SetChannelByString(const QString &channum)
     InitPictureAttributes();
 
     // Set the major and minor channel for any additional multiplex tuning
-    if (atsc_major || atsc_minor)
-        SetCachedATSCInfo(QString("%1_%2").arg(atsc_major).arg(atsc_minor));
-    else
-        SetCachedATSCInfo(QString("%1_0").arg(channum));
+    SetDTVInfo(atsc_major, atsc_minor, netid, tsid, mpeg_prog_num);
 
     // Set this as the future start channel for this source
-    inputs[currentInputID]->startChanNum = curchannelname;
+    inputs[currentInputID]->startChanNum = QDeepCopy<QString>(curchannelname);
 
     return true;
 }

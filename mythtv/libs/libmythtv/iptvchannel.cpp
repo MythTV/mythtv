@@ -129,9 +129,13 @@ bool IPTVChannel::SetChannelByString(const QString &channum)
         return false;
     }
 
-    // Set the channel..
-    curchannelname = channum;
-    currentProgramNum = 1;
+    // Set the current channum to the new channel's channum
+    curchannelname = QDeepCopy<QString>(channum);
+
+    // Set the dtv channel info for any additional multiplex tuning
+    SetDTVInfo(/*atsc_major*/ 0, /*atsc_minor*/ 0,
+               /*netid*/ 0,
+               /*tsid*/ 0, /*mpeg_prog_num*/ 1);
 
     VERBOSE(VB_CHANNEL, LOC + "SetChannelByString() -- end");
     return true;

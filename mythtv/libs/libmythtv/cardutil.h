@@ -164,6 +164,7 @@ class MPUBLIC CardUtil
     static bool         IgnoreEncrypted(uint cardid, const QString &inputname);
     static bool         TVOnly(uint cardid, const QString &inputname);
     static bool         IsInNeedOfExternalInputConf(uint cardid);
+    static uint         GetQuickTuning(uint cardid, const QString &inputname);
 
     // DVB info
     static bool         IsDVB(uint cardid, const QString &_inputname);
