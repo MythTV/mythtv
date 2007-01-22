@@ -50,9 +50,6 @@ class AnalogPane;
 class STPane;
 class DVBUtilsImportPane;
 
-/// Max range of the ScanProgressPopup progress bar
-#define PROGRESS_MAX  1000
-
 class ScanSignalMeter: public ProgressSetting, public TransientStorage
 {
   public:
@@ -63,25 +60,38 @@ class ScanProgressPopup : public ConfigurationPopupDialog
 {
     Q_OBJECT
 
-  protected:
+    friend class QObject; // quiet OSX gcc warning
+
+  public:
+    ScanProgressPopup(bool lock, bool strength, bool snr);
+    virtual void deleteLater(void);
+
+    virtual int exec(void);
+
+    void SetStatusSignalToNoise(int value);
+    void SetStatusSignalStrength(int value);
+    void SetStatusLock(int value);
+    void SetScanProgress(double value)
+        { progressBar->setValue((uint)(value * 65535));}
+
+    void SetStatusText(const QString &value);
+    void SetStatusTitleText(const QString &value);
+
+  private slots:
+    void Done(void);
+
+  private:
+    ~ScanProgressPopup();
+
+    bool               done;
+    QWaitCondition     wait;
+
     ScanSignalMeter   *ss;
     ScanSignalMeter   *sn;
     ScanSignalMeter   *progressBar;
 
     TransLabelSetting *sl;
     TransLabelSetting *sta;
-
-  public:
-    ScanProgressPopup(ScanWizardScanner *parent, bool signalmonitors = true);
-    ~ScanProgressPopup();
-    void exec(ScanWizardScanner *parent);
-    void signalToNoise(int value);
-    void signalStrength(int value);
-    void dvbLock(int value);
-    void status(const QString& value);
-
-    void progress(int value) { progressBar->setValue(value);}
-    void incrementProgress() { progress(progressBar->getValue().toInt()+1);}
 };
 
 class ScannerEvent : public QCustomEvent
@@ -91,13 +101,15 @@ class ScannerEvent : public QCustomEvent
   public:
     enum TYPE 
     {
-        ServiceScanComplete,
-        Update,
-        TableLoaded,
-        ServicePct,
-        DVBSNR,
-        DVBSignalStrength,
-        DVBLock,
+        ScanComplete,
+        ScanShutdown,
+        AppendTextToLog,
+        SetStatusText,
+        SetStatusTitleText,
+        SetPercentComplete,
+        SetStatusSignalToNoise,
+        SetStatusSignalStrength,
+        SetStatusSignalLock,
     };
 
     ScannerEvent(TYPE t) : QCustomEvent(t + QEvent::User) { ; }
