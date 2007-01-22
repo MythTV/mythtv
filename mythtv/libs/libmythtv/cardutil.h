@@ -51,7 +51,6 @@ class MPUBLIC CardUtil
         HDTV,
         FIREWIRE,
         HDHOMERUN,
-        CRC_IP,
         FREEBOX,
     };
 
@@ -81,8 +80,6 @@ class MPUBLIC CardUtil
             return FIREWIRE;
         if ("HDHOMERUN" == name)
             return HDHOMERUN;
-        if ("CRC_IP" == name)
-            return CRC_IP;
         if ("FREEBOX" == name)
             return FREEBOX;
         return ERROR_UNKNOWN;
@@ -93,15 +90,13 @@ class MPUBLIC CardUtil
         return
             (rawtype != "DVB")       && (rawtype != "HDTV")    &&
             (rawtype != "FIREWIRE")  && (rawtype != "DBOX2")   &&
-            (rawtype != "HDHOMERUN") && (rawtype != "FREEBOX") &&
-            (rawtype != "CRC_IP");
+            (rawtype != "HDHOMERUN") && (rawtype != "FREEBOX");
     }
 
     static bool         IsUnscanable(const QString &rawtype)
     {
         return
-            (rawtype == "FIREWIRE")  || (rawtype == "DBOX2") ||
-            (rawtype == "CRC_IP");
+            (rawtype == "FIREWIRE")  || (rawtype == "DBOX2");
     }
 
     static bool         IsEITCapable(const QString &rawtype)
