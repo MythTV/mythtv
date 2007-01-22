@@ -76,6 +76,7 @@ class GuideGrid : public MythDialog
     void editRecording();
     void editScheduled();
     void customEdit();
+    void remove();
     void upcoming();
     void details();
 

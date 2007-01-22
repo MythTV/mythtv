@@ -49,6 +49,7 @@ class MPUBLIC ProgLister : public MythDialog
     void select(void);
     void edit(void);
     void customEdit(void);
+    void remove(void);
     void upcoming(void);
     void details(void);
     void chooseView(void);

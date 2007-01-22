@@ -170,6 +170,8 @@ void ProgLister::keyPressEvent(QKeyEvent *e)
             edit();
         else if (action == "CUSTOMEDIT")
             customEdit();
+        else if (action == "DELETE")
+            remove();
         else if (action == "UPCOMING")
             upcoming();
         else if (action == "DETAILS")
@@ -1163,6 +1165,32 @@ void ProgLister::customEdit()
                                     "customedit", pi);
     ce->exec();
     delete ce;
+}
+
+void ProgLister::remove()
+{
+    ProgramInfo *pi = itemList.at(curItem);
+
+    if (!pi || pi->recordid <= 0)
+        return;
+
+    ScheduledRecording *record = new ScheduledRecording();
+    int recid = pi->recordid;
+    record->loadByID(recid);
+
+    QString message =
+        tr("Delete '%1' %2 rule?").arg(record->getRecordTitle())
+                                  .arg(pi->RecTypeText());
+
+    bool ok = MythPopupBox::showOkCancelPopup(gContext->GetMainWindow(), "",
+                                              message, false);
+
+    if (ok)
+    {
+        record->remove();
+        ScheduledRecording::signalChange(recid);
+    }
+    record->deleteLater();
 }
 
 void ProgLister::upcoming()

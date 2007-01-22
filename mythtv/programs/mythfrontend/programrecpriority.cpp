@@ -595,41 +595,6 @@ void ProgramRecPriority::edit(void)
     }
 }
 
-void ProgramRecPriority::remove(void)
-{
-    if (!curitem)
-        return;
-
-    QString tempSubTitle = curitem->title;
-    if ((curitem->rectype == kSingleRecord ||
-         curitem->rectype == kOverrideRecord ||
-         curitem->rectype == kDontRecord) &&
-        (curitem->subtitle).stripWhiteSpace().length() > 0)
-        tempSubTitle = tempSubTitle + " - \"" + 
-                       curitem->subtitle + "\"";
-
-    QString message =
-        tr("Delete '%1' Recording Schedule?").arg(curitem->title);
-
-    bool ok = MythPopupBox::showOkCancelPopup(gContext->GetMainWindow(), "",
-                                              message, false);
-
-    if (ok)
-    {
-        ScheduledRecording *record = new ScheduledRecording();
-        record->loadByID(curitem->recordid);
-        record->remove();
-        record->deleteLater();
-
-        RemoveCurItemFromList();
-
-        countMatches();
-        update(fullRect);
-
-        ScheduledRecording::signalChange(0);
-    }
-}
-
 void ProgramRecPriority::customEdit(void)
 {
     if (!curitem)
@@ -645,6 +610,30 @@ void ProgramRecPriority::customEdit(void)
                                         "customedit", curitem);
     ce->exec();
     delete ce;
+}
+
+void ProgramRecPriority::remove(void)
+{
+    if (!curitem)
+        return;
+
+    ScheduledRecording *record = new ScheduledRecording();
+    int recid = curitem->recordid;
+    record->loadByID(recid);
+
+    QString message =
+        tr("Delete '%1' %2 rule?").arg(record->getRecordTitle())
+                                  .arg(curitem->RecTypeText());
+
+    bool ok = MythPopupBox::showOkCancelPopup(gContext->GetMainWindow(), "",
+                                              message, false);
+
+    if (ok)
+    {
+        record->remove();
+        ScheduledRecording::signalChange(recid);
+    }
+    record->deleteLater();
 }
 
 void ProgramRecPriority::deactivate(void)

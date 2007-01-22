@@ -23,6 +23,7 @@ using namespace std;
 #include "guidegrid.h"
 #include "infostructs.h"
 #include "programinfo.h"
+#include "scheduledrecording.h"
 #include "oldsettings.h"
 #include "tv_play.h"
 #include "tv_rec.h"
@@ -417,6 +418,8 @@ void GuideGrid::keyPressEvent(QKeyEvent *e)
                 editScheduled();
             else if (action == "CUSTOMEDIT")
                 customEdit();
+            else if (action == "DELETE")
+                remove();
             else if (action == "UPCOMING")
                 upcoming();
             else if (action == "DETAILS")
@@ -1722,6 +1725,32 @@ void GuideGrid::customEdit()
                                     "customedit", pginfo);
     ce->exec();
     delete ce;
+}
+
+void GuideGrid::remove()
+{
+    ProgramInfo *pginfo = m_programInfos[m_currentRow][m_currentCol];
+
+    if (!pginfo || pginfo->recordid <= 0)
+        return;
+
+    ScheduledRecording *record = new ScheduledRecording();
+    int recid = pginfo->recordid;
+    record->loadByID(recid);
+
+    QString message =
+        tr("Delete '%1' %2 rule?").arg(record->getRecordTitle())
+                                  .arg(pginfo->RecTypeText());
+
+    bool ok = MythPopupBox::showOkCancelPopup(gContext->GetMainWindow(), "",
+                                              message, false);
+
+    if (ok)
+    {
+        record->remove();
+        ScheduledRecording::signalChange(recid);
+    }
+    record->deleteLater();
 }
 
 void GuideGrid::upcoming()
