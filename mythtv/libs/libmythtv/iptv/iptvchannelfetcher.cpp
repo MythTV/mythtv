@@ -228,9 +228,12 @@ static uint estimate_number_of_channels(const QString &rawdata)
 }
 
 fbox_chan_map_t IPTVChannelFetcher::ParsePlaylist(
-    const QString &rawdata, IPTVChannelFetcher *fetcher)
+    const QString &reallyrawdata, IPTVChannelFetcher *fetcher)
 {
     fbox_chan_map_t chanmap;
+
+    QString rawdata = reallyrawdata;
+    rawdata.replace("\r\n", "\n");
 
     // Verify header is ok
     QString header = rawdata.section("\n", 0, 0);
