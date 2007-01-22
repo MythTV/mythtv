@@ -582,8 +582,10 @@ void ScanWizardScanner::PreScanCommon(int scantype,
                 SLOT(  dvbSignalStrength(   const SignalMonitorValue&)));
     }
 
+    DVBSignalMonitor *dvbm = NULL;
+
 #ifdef USING_DVB
-    DVBSignalMonitor *dvbm = scanner->GetDVBSignalMonitor();
+    dvbm = scanner->GetDVBSignalMonitor();
     if (dvbm)
     {
         connect(dvbm,
