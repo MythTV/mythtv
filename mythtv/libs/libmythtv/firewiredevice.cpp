@@ -374,10 +374,12 @@ static void fw_init(QMap<uint64_t,QString> &id_to_model)
     id_to_model[0x11e6ULL << 32 | 0x0be0] = "SA3250HD";
     id_to_model[0x14f8ULL << 32 | 0x0be0] = "SA3250HD";
     id_to_model[0x1692ULL << 32 | 0x0be0] = "SA3250HD";
+    id_to_model[0x1947ULL << 32 | 0x0be0] = "SA3250HD";
 
     id_to_model[0x11e6ULL << 32 | 0x1072] = "SA4200HD";
     id_to_model[0x14f8ULL << 32 | 0x1072] = "SA4200HD";
     id_to_model[0x1692ULL << 32 | 0x1072] = "SA4200HD";
+    id_to_model[0x1947ULL << 32 | 0x1072] = "SA4200HD";
 
     const uint64_t motorolla_vendor_ids[] =
     {   /* 6200 */
