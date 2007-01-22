@@ -1226,6 +1226,9 @@ void TV::HandleStateChange(void)
                                       .arg(tr(playbackinfo->playgroup)), 3);
         ITVRestart(false);
     }
+    if (prbuffer && prbuffer->isDVD()) {
+        UpdateLCD();
+    }
     if (recorder)
         recorder->FrontendReady();
 }
@@ -1934,11 +1937,18 @@ void TV::RunTV(void)
                 continue;
 
             float progress = 0.0;
+            bool  showProgress = true;
 
             if (StateIsLiveTV(GetState()))
                 ShowLCDChannelInfo();
 
-            if (activenvp)
+            if (activerbuffer && activerbuffer->isDVD())
+            {
+                ShowLCDDVDInfo();
+                showProgress = !activerbuffer->InDVDMenuOrStillFrame();
+            }
+
+            if (activenvp && showProgress)
             {
                 struct StatusPosInfo posInfo;
                 nvp->calcSliderPos(posInfo);
@@ -4880,6 +4890,49 @@ static void format_time(int seconds, QString &tMin, QString &tHrsMin)
     tMin = QString("%1 %2").arg(minutes).arg(TV::tr("minutes"));
     tHrsMin.sprintf("%d:%02d", hours, min);
 }
+
+
+void TV::ShowLCDDVDInfo(void)
+{
+    class LCD * lcd = LCD::Get();
+
+    if (lcd == NULL || activerbuffer == NULL || !activerbuffer->isDVD())
+        return;
+
+    DVDRingBufferPriv *dvd = activerbuffer->DVD(); 
+    QString dvdName, dvdSerial;
+    QString mainStatus, subStatus; 
+
+    if (!dvd->GetNameAndSerialNum(dvdName, dvdSerial))
+    {
+        dvdName = tr("DVD");
+    }
+    if (dvd->IsInMenu()) 
+        mainStatus = tr("Menu");
+    else if (dvd->InStillFrame())
+        mainStatus = tr("Still Frame");
+    else
+    {
+        QString timeMins, timeHrsMin;
+        int playingTitle, playingPart, totalParts; 
+
+        dvd->GetPartAndTitle(playingPart, playingTitle);
+        totalParts = dvd->NumPartsInTitle();
+        format_time(dvd->GetTotalTimeOfTitle(), timeMins, timeHrsMin); 
+
+        mainStatus = tr("Title: %1 (%2)").arg(playingTitle).arg(timeHrsMin);
+        subStatus = tr("Chapter: %1/%2").arg(playingPart).arg(totalParts);
+    }
+    if ((dvdName != lcdCallsign) || (mainStatus != lcdTitle) || 
+                                    (subStatus != lcdSubtitle))
+    {
+        lcd->switchToChannel(dvdName, mainStatus, subStatus);
+        lcdCallsign = dvdName;
+        lcdTitle = mainStatus;
+        lcdSubtitle = subStatus;
+    }
+}
+
 
 /** \fn TV::GetNextProgram(RemoteEncoder*,int,InfoMap&)
  *  \brief Fetches information on the desired program from the backend.

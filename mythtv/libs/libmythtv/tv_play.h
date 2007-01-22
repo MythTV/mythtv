@@ -357,6 +357,7 @@ class MPUBLIC TV : public QObject
 
     void UpdateLCD(void);
     void ShowLCDChannelInfo(void);
+    void ShowLCDDVDInfo(void);
 
     QString PlayMesg(void);
 
