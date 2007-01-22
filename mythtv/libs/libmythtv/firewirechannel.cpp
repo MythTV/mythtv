@@ -26,13 +26,16 @@ FirewireChannel::FirewireChannel(TVRec *parent, const QString &_videodevice,
 {
     uint64_t guid = string_to_guid(videodevice);
     uint subunitid = 0; // we only support first tuner on STB...
+
 #ifdef USING_LINUX_FIREWIRE
     device = new LinuxFirewireDevice(
         guid, subunitid, fw_opts.speed,
         LinuxFirewireDevice::kConnectionP2P == (uint) fw_opts.connection);
-#elif USING_OSX_FIREWIRE
+#endif // USING_LINUX_FIREWIRE
+
+#ifdef USING_OSX_FIREWIRE
     device = new DarwinFirewireDevice(guid, subunitid, fw_opts.speed);
-#endif
+#endif // USING_OSX_FIREWIRE
 
     InitializeInputs();
 }
