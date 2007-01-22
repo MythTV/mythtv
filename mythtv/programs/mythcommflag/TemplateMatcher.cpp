@@ -475,8 +475,9 @@ first_minimum(const unsigned short *matches, long long nframes)
     matchstart = minmatch + (unsigned short)(MATCHSTART * matchrange) +
         leftwidth;
     matchend = minmatch + (unsigned short)(MATCHEND * matchrange) - rightwidth;
-    VERBOSE(VB_COMMFLAG, QString("first_minimum considering %1-%2")
-            .arg(matchstart).arg(matchend));
+    VERBOSE(VB_COMMFLAG, QString("first_minimum considering %1-%2;"
+                " leftwidth=%3 rightwidth=%4")
+            .arg(matchstart).arg(matchend).arg(leftwidth).arg(rightwidth));
 
     found_leftmode = 0;
     for (matchcnt = matchstart; matchcnt <  matchend; matchcnt++)
