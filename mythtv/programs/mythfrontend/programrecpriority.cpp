@@ -631,6 +631,12 @@ void ProgramRecPriority::remove(void)
     if (ok)
     {
         record->remove();
+
+        RemoveCurItemFromList(); 
+
+        countMatches(); 
+        update(fullRect); 
+
         ScheduledRecording::signalChange(recid);
     }
     record->deleteLater();
