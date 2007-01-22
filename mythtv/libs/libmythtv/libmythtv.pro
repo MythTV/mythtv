@@ -131,7 +131,7 @@ SOURCES += minilzo.cpp              RTjpegN.cpp
 # Misc. needed by backend/frontend
 HEADERS += programinfo.h            proglist.h
 HEADERS += storagegroup.h
-HEADERS += RingBuffer.h
+HEADERS += RingBuffer.h             avfringbuffer.h
 HEADERS += ThreadedFileWriter.h     previouslist.h
 HEADERS += dbcheck.h                customedit.h
 HEADERS += remoteutil.h             tv.h
@@ -151,7 +151,7 @@ HEADERS += previewgenerator.h       transporteditor.h
 
 SOURCES += programinfo.cpp          proglist.cpp
 SOURCES += storagegroup.cpp
-SOURCES += RingBuffer.cpp
+SOURCES += RingBuffer.cpp           avfringbuffer.cpp
 SOURCES += ThreadedFileWriter.cpp   previouslist.cpp
 SOURCES += dbcheck.cpp              customedit.cpp
 SOURCES += remoteutil.cpp           tv.cpp

@@ -269,6 +269,7 @@ AvFormatDecoder::AvFormatDecoder(NuppelVideoPlayer *parent,
       h264_kf_seq(new H264::KeyframeSequencer()),
       ic(NULL),
       frame_decoded(0),             decoded_video_frame(NULL),
+      avfRingBuffer(NULL),
       directrendering(false),       drawband(false),
       gopset(false),                seen_gop(false),
       seq_count(0),                 firstgoppos(0),
@@ -331,6 +332,9 @@ AvFormatDecoder::~AvFormatDecoder()
     delete h264_kf_seq;
     if (audioSamples)
         delete [] audioSamples;
+
+    if (avfRingBuffer)
+        delete avfRingBuffer;
 }
 
 void AvFormatDecoder::CloseCodecs()
@@ -631,80 +635,13 @@ bool AvFormatDecoder::CanHandle(char testbuf[kDecoderProbeBufferSize],
     return false;
 }
 
-int open_avf(URLContext *h, const char *filename, int flags)
-{
-    (void)h;
-    (void)filename;
-    (void)flags;
-    return 0;
-}
-
-int read_avf(URLContext *h, uint8_t *buf, int buf_size)
-{
-    AvFormatDecoder *dec = (AvFormatDecoder *)h->priv_data;
-
-    return dec->getRingBuf()->Read(buf, buf_size);
-}
-
-int write_avf(URLContext *h, uint8_t *buf, int buf_size)
-{
-    (void)h;
-    (void)buf;
-    (void)buf_size;
-    return 0;
-}
-
-offset_t seek_avf(URLContext *h, offset_t offset, int whence)
-{
-    AvFormatDecoder *dec = (AvFormatDecoder *)h->priv_data;
-
-    if (whence == SEEK_END)
-        return dec->getRingBuf()->GetRealFileSize() + offset;
-
-    return dec->getRingBuf()->Seek(offset, whence);
-}
-
-int close_avf(URLContext *h)
-{
-    (void)h;
-    return 0;
-}
-
-URLProtocol rbuffer_protocol = {
-    "rbuffer",
-    open_avf,
-    read_avf,
-    write_avf,
-    seek_avf,
-    close_avf,
-    NULL
-};
-
-static int avf_write_packet(void *opaque, uint8_t *buf, int buf_size)
-{
-    URLContext *h = (URLContext *)opaque;
-    return url_write(h, buf, buf_size);
-}
-
-static int avf_read_packet(void *opaque, uint8_t *buf, int buf_size)
-{
-    URLContext *h = (URLContext *)opaque;
-    return url_read(h, buf, buf_size);
-}
-
-static offset_t avf_seek_packet(void *opaque, int64_t offset, int whence)
-{
-    URLContext *h = (URLContext *)opaque;
-    return url_seek(h, offset, whence);
-}
-
 void AvFormatDecoder::InitByteContext(void)
 {
-    readcontext.prot = &rbuffer_protocol;
+    readcontext.prot = &AVF_RingBuffer_Protocol;
     readcontext.flags = 0;
     readcontext.is_streamed = 0;
     readcontext.max_packet_size = 0;
-    readcontext.priv_data = this;
+    readcontext.priv_data = avfRingBuffer;
 
     if (ringBuffer->isDVD())
         ic->pb.buffer_size = 2048;
@@ -716,9 +653,9 @@ void AvFormatDecoder::InitByteContext(void)
     ic->pb.write_flag = 0;
     ic->pb.buf_end = ic->pb.buffer;
     ic->pb.opaque = &readcontext;
-    ic->pb.read_packet = avf_read_packet;
-    ic->pb.write_packet = avf_write_packet;
-    ic->pb.seek = avf_seek_packet;
+    ic->pb.read_packet = AVF_Read_Packet;
+    ic->pb.write_packet = AVF_Write_Packet;
+    ic->pb.seek = AVF_Seek_Packet;
     ic->pb.pos = 0;
     ic->pb.must_flush = 0;
     ic->pb.eof_reached = 0;
@@ -757,6 +694,10 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
     CloseContext();
 
     ringBuffer = rbuffer;
+
+    if (avfRingBuffer)
+        delete avfRingBuffer;
+    avfRingBuffer = new AVFRingBuffer(rbuffer);
 
     AVInputFormat *fmt = NULL;
     char *filename = (char *)(rbuffer->GetFilename().ascii());

@@ -16,6 +16,8 @@ extern "C" {
 #include "../libavformat/avformat.h"
 }
 
+#include "avfringbuffer.h"
+
 class TeletextDecoder;
 class CC608Decoder;
 class CC708Decoder;
@@ -202,6 +204,7 @@ class AvFormatDecoder : public DecoderBase
 
     int frame_decoded;
     VideoFrame *decoded_video_frame;
+    AVFRingBuffer *avfRingBuffer;
 
     bool directrendering;
     bool drawband;
