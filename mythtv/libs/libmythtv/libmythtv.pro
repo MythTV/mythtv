@@ -377,23 +377,28 @@ using_backend {
     }
 
     # Support for cable boxes that provide Firewire out
-    using_firewire  {
-        HEADERS += firewirechannelbase.h       firewirerecorderbase.h
-        SOURCES += firewirechannelbase.cpp     firewirerecorderbase.cpp
+    using_firewire {
+        HEADERS += firewirechannel.h           firewirerecorder.h
+        HEADERS += firewiresignalmonitor.h     firewiredevice.h
+        HEADERS += avcinfo.h
+        SOURCES += firewirechannel.cpp         firewirerecorder.cpp
+        SOURCES += firewiresignalmonitor.cpp   firewiredevice.cpp
+        SOURCES += avcinfo.cpp
 
         macx {
-            HEADERS += darwinfirewirechannel.h       darwinfirewirerecorder.h
-            SOURCES += darwinfirewirechannel.cpp     darwinfirewirerecorder.cpp
-            HEADERS += selectavcdevice.h
-            SOURCES += selectavcdevice.cpp
+            HEADERS += darwinfirewiredevice.h   darwinavcinfo.h
+            SOURCES += darwinfirewiredevice.cpp darwinavcinfo.cpp
+            DEFINES += USING_OSX_FIREWIRE
         }
         
         !macx {
-            HEADERS += firewirechannel.h       firewirerecorder.h
-            SOURCES += firewirechannel.cpp     firewirerecorder.cpp
+            HEADERS += linuxfirewiredevice.h   linuxavcinfo.h
+            SOURCES += linuxfirewiredevice.cpp linuxavcinfo.cpp
+            DEFINES += USING_LINUX_FIREWIRE
         }
 
         DEFINES += USING_FIREWIRE
+        using_libavc_5_3:DEFINES += USING_LIBAVC_5_3
     }
 
     # Support for set top boxes (Nokia DBox2 etc.)
@@ -406,7 +411,7 @@ using_backend {
         HEADERS += iptvchannel.h              iptvrecorder.h
         HEADERS += iptvsignalmonitor.h
         HEADERS += iptv/iptvchannelfetcher.h  iptv/iptvchannelinfo.h
-        HEADERS += iptv/iptvmediasink.h       iptv/iptvlistener.h
+        HEADERS += iptv/iptvmediasink.h
         HEADERS += iptv/iptvfeeder.h          iptv/iptvfeederwrapper.h
         HEADERS += iptv/iptvfeederrtsp.h      iptv/iptvfeederudp.h
         HEADERS += iptv/iptvfeederfile.h      iptv/iptvfeederlive.h

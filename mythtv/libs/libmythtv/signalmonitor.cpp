@@ -34,6 +34,11 @@
 #   include "iptvchannel.h"
 #endif
 
+#ifdef USING_FIREWIRE
+#   include "firewiresignalmonitor.h"
+#   include "firewirechannel.h"
+#endif
+
 #undef DBG_SM
 #define DBG_SM(FUNC, MSG) VERBOSE(VB_CHANNEL, \
     "SM("<<channel->GetDevice()<<")::"<<FUNC<<": "<<MSG);
@@ -114,6 +119,15 @@ SignalMonitor *SignalMonitor::Init(QString cardtype, int db_cardnum,
         IPTVChannel *fbc = dynamic_cast<IPTVChannel*>(channel);
         if (fbc)
             signalMonitor = new IPTVSignalMonitor(db_cardnum, fbc);
+    }
+#endif
+
+#ifdef USING_FIREWIRE
+    if (cardtype.upper() == "FIREWIRE")
+    {
+        FirewireChannel *fc = dynamic_cast<FirewireChannel*>(channel);
+        if (fc)
+            signalMonitor = new FirewireSignalMonitor(db_cardnum, fc);
     }
 #endif
 

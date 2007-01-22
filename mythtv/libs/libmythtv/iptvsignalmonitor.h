@@ -4,11 +4,10 @@
 #define _IPTVSIGNALMONITOR_H_
 
 #include "dtvsignalmonitor.h"
-#include "iptvlistener.h"
 
 class IPTVChannel;
 
-class IPTVSignalMonitor : public DTVSignalMonitor, public IPTVListener
+class IPTVSignalMonitor : public DTVSignalMonitor, public TSDataListener
 {
     Q_OBJECT
 
@@ -19,9 +18,8 @@ class IPTVSignalMonitor : public DTVSignalMonitor, public IPTVListener
 
     void Stop(void);
 
-    // implements IPTVListener
-    void AddData(unsigned char *data,
-                 unsigned int   dataSize);
+    // implements TSDataListener
+    void AddData(const unsigned char *data, unsigned int dataSize);
 
   public slots:
     void deleteLater(void);

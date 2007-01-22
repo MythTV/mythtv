@@ -48,6 +48,7 @@ using namespace std;
 #include "dbox2channel.h"
 #include "hdhrchannel.h"
 #include "iptvchannel.h"
+#include "firewirechannel.h"
 
 #include "recorderbase.h"
 #include "NuppelVideoRecorder.h"
@@ -57,19 +58,10 @@ using namespace std;
 #include "dbox2recorder.h"
 #include "hdhrrecorder.h"
 #include "iptvrecorder.h"
+#include "firewirerecorder.h"
 
 #ifdef USING_V4L
 #include "channel.h"
-#endif
-
-#ifdef USING_FIREWIRE
-#ifdef CONFIG_DARWIN
-#include "darwinfirewirerecorder.h"
-#include "darwinfirewirechannel.h"
-#else 
-#include "firewirerecorder.h"
-#include "firewirechannel.h"
-#endif 
 #endif
 
 #define DEBUG_CHANNEL_PREFIX 0 /**< set to 1 to channel prefixing */
@@ -160,11 +152,7 @@ bool TVRec::CreateChannel(const QString &startchannel)
     else if (genOpt.cardtype == "FIREWIRE")
     {
 #ifdef USING_FIREWIRE
-# ifdef CONFIG_DARWIN
-        channel = new DarwinFirewireChannel(fwOpt, this);
-# else 
-        channel = new FirewireChannel(fwOpt, this);
-# endif
+        channel = new FirewireChannel(this, genOpt.videodev, fwOpt);
         if (!channel->Open())
             return false;
         InitChannel(genOpt.defaultinput, startchannel);
@@ -833,16 +821,7 @@ bool TVRec::SetupRecorder(RecordingProfile &profile)
     else if (genOpt.cardtype == "FIREWIRE")
     {
 #ifdef USING_FIREWIRE
-# ifdef CONFIG_DARWIN
-        recorder = new DarwinFirewireRecorder(this, this->channel);
-# else 
-        recorder = new FirewireRecorder(this);
-        recorder->SetOption("port",       fwOpt.port);
-        recorder->SetOption("node",       fwOpt.node);
-        recorder->SetOption("speed",      fwOpt.speed);
-        recorder->SetOption("model",      fwOpt.model);
-        recorder->SetOption("connection", fwOpt.connection);
-# endif // !CONFIG_DARWIN 
+        recorder = new FirewireRecorder(this, GetFirewireChannel());
 #endif // USING_FIREWIRE
     }
     else if (genOpt.cardtype == "DBOX2")
@@ -1114,6 +1093,15 @@ DVBChannel *TVRec::GetDVBChannel(void)
 #else
     return NULL;
 #endif // USING_DVB
+}
+
+FirewireChannel *TVRec::GetFirewireChannel(void)
+{
+#ifdef USING_FIREWIRE
+    return dynamic_cast<FirewireChannel*>(channel);
+#else
+    return NULL;
+#endif // USING_FIREWIRE
 }
 
 Channel *TVRec::GetV4LChannel(void)
@@ -1422,8 +1410,7 @@ bool TVRec::GetDevices(int cardid,
         ""
         "       dvb_on_demand,    dvb_tuning_delay, "
         ""
-        "       firewire_port,    firewire_node,       firewire_speed,  "
-        "       firewire_model,   firewire_connection,                  "
+        "       firewire_speed,   firewire_model,      firewire_connection, "
         ""
         "       dbox2_port,       dbox2_host,          dbox2_httpport   "
         ""
@@ -1483,18 +1470,16 @@ bool TVRec::GetDevices(int cardid,
 
     // Firewire options
     uint fireoff = dvboff + 2;
-    firewire_opts.port        = query.value(fireoff + 0).toUInt();
-    firewire_opts.node        = query.value(fireoff + 1).toUInt(); 
-    firewire_opts.speed       = query.value(fireoff + 2).toUInt();
+    firewire_opts.speed       = query.value(fireoff + 0).toUInt();
 
-    test = query.value(fireoff + 3).toString();
+    test = query.value(fireoff + 1).toString();
     if (test != QString::null)
         firewire_opts.model = QString::fromUtf8(test);
 
-    firewire_opts.connection  = query.value(fireoff + 4).toUInt();
+    firewire_opts.connection  = query.value(fireoff + 2).toUInt();
 
     // DBOX2/HDHomeRun options
-    uint dbox2off = fireoff + 5;
+    uint dbox2off = fireoff + 3;
     dbox2_opts.port = query.value(dbox2off + 0).toUInt();
 
     test = query.value(dbox2off + 1).toString();

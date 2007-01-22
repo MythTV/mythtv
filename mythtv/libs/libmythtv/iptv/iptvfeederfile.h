@@ -10,7 +10,7 @@
 // MythTV headers
 #include "iptvfeederlive.h"
 
-class IPTVListener;
+class TSDataListener;
 class ByteStreamFileSource;
 class IPTVMediaSink;
 
@@ -27,8 +27,8 @@ class IPTVFeederFile : public IPTVFeederLive
     bool Open(const QString &url);
     void Close(void);
 
-    void AddListener(IPTVListener*);
-    void RemoveListener(IPTVListener*);
+    void AddListener(TSDataListener*);
+    void RemoveListener(TSDataListener*);
 
     static bool IsFile(const QString &url);
 

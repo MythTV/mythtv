@@ -107,7 +107,7 @@ bool IPTVFeederRTP::Open(const QString &url)
     }
 
     _sink->startPlaying(*_source, NULL, NULL);
-    vector<IPTVListener*>::iterator it = _listeners.begin();
+    vector<TSDataListener*>::iterator it = _listeners.begin();
     for (; it != _listeners.end(); ++it)
         _sink->AddListener(*it);
         
@@ -143,7 +143,7 @@ void IPTVFeederRTP::Close(void)
     VERBOSE(VB_RECORD, LOC + "Close() -- end");
 }
 
-void IPTVFeederRTP::AddListener(IPTVListener *item)
+void IPTVFeederRTP::AddListener(TSDataListener *item)
 {
     VERBOSE(VB_RECORD, LOC + "AddListener("<<item<<") -- begin");
     if (!item)
@@ -165,11 +165,11 @@ void IPTVFeederRTP::AddListener(IPTVListener *item)
     VERBOSE(VB_RECORD, LOC + "AddListener("<<item<<") -- end");
 }
 
-void IPTVFeederRTP::RemoveListener(IPTVListener *item)
+void IPTVFeederRTP::RemoveListener(TSDataListener *item)
 {
     VERBOSE(VB_RECORD, LOC + "RemoveListener("<<item<<") -- begin");
     QMutexLocker locker(&_lock);
-    vector<IPTVListener*>::iterator it =
+    vector<TSDataListener*>::iterator it =
         find(_listeners.begin(), _listeners.end(), item);
 
     if (it == _listeners.end())

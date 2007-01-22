@@ -35,6 +35,7 @@ class ChannelBase;
 class DBox2Channel;
 class DTVChannel;
 class DVBChannel;
+class FirewireChannel;
 class Channel;
 class HDHRChannel;
 
@@ -85,11 +86,8 @@ class DVBDBOptions
 class FireWireDBOptions
 {
   public:
-    FireWireDBOptions() :
-        port(-1), node(-1), speed(-1), connection(-1), model("") {;}
-        
-    int port;
-    int node;
+    FireWireDBOptions() : speed(-1), connection(-1), model("") {;}
+
     int speed;
     int connection;
     QString model;
@@ -261,6 +259,7 @@ class MPUBLIC TVRec : public QObject
     DTVChannel   *GetDTVChannel(void);
     HDHRChannel  *GetHDHRChannel(void);
     DVBChannel   *GetDVBChannel(void);
+    FirewireChannel *GetFirewireChannel(void);
     Channel      *GetV4LChannel(void);
 
     bool SetupSignalMonitor(bool enable_table_monitoring, bool notify);

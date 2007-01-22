@@ -153,8 +153,7 @@ static int IPTVRecorder_findTSHeader(const unsigned char *data,
 // ===================================================
 // AddData : feed data from RTSP flow to mythtv
 // ===================================================
-void IPTVRecorder::AddData(unsigned char *data,
-                              unsigned       dataSize)
+void IPTVRecorder::AddData(const unsigned char *data, unsigned int dataSize)
 {
     unsigned int readIndex = 0;
 

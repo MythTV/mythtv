@@ -218,7 +218,7 @@ bool IPTVFeederRTSP::Open(const QString &url)
                     .arg(_live_env->getResultMsg()));
         }
 
-        vector<IPTVListener*>::iterator it = _listeners.begin();
+        vector<TSDataListener*>::iterator it = _listeners.begin();
         for (; it != _listeners.end(); ++it)
             iptvMediaSink->AddListener(*it);
 
@@ -289,7 +289,7 @@ void IPTVFeederRTSP::Close(void)
     VERBOSE(VB_RECORD, LOC + "Close() -- end");
 }
 
-void IPTVFeederRTSP::AddListener(IPTVListener *item)
+void IPTVFeederRTSP::AddListener(TSDataListener *item)
 {
     VERBOSE(VB_RECORD, LOC + "AddListener("<<item<<") -- begin");
     if (!item)
@@ -323,11 +323,11 @@ void IPTVFeederRTSP::AddListener(IPTVListener *item)
     VERBOSE(VB_RECORD, LOC + "AddListener("<<item<<") -- end 2");
 }
 
-void IPTVFeederRTSP::RemoveListener(IPTVListener *item)
+void IPTVFeederRTSP::RemoveListener(TSDataListener *item)
 {
     VERBOSE(VB_RECORD, LOC + "RemoveListener("<<item<<") -- begin");
     QMutexLocker locker(&_lock);
-    vector<IPTVListener*>::iterator it =
+    vector<TSDataListener*>::iterator it =
         find(_listeners.begin(), _listeners.end(), item);
 
     if (it == _listeners.end())

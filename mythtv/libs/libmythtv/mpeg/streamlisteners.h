@@ -35,6 +35,16 @@ class ServiceDescriptionTable;
 class TimeDateTable;
 class DVBEventInformationTable;
 
+class TSDataListener
+{
+  public:
+    /// Callback function to add MPEG2 TS data
+    virtual void AddData(const unsigned char *data, uint dataSize) = 0;
+
+  protected:
+    virtual ~TSDataListener() { }
+};
+
 class MPEGStreamListener
 {
   protected:

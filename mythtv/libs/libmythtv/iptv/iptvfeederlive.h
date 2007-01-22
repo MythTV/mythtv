@@ -19,7 +19,7 @@ using namespace std;
 #include "iptvfeeder.h"
 
 class QString;
-class IPTVListener;
+class TSDataListener;
 class UsageEnvironment;
 
 
@@ -43,7 +43,7 @@ class IPTVFeederLive : public IPTVFeeder
   protected:
     UsageEnvironment       *_live_env;
     mutable QMutex          _lock;
-    vector<IPTVListener*>   _listeners;
+    vector<TSDataListener*> _listeners;
 
   private:
     char                    _abort;

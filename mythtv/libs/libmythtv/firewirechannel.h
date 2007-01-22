@@ -1,50 +1,52 @@
 /**
  *  FirewireChannel
- *  Copyright (c) 2005 by Jim Westfall
- *  SA3250HD support Copyright (c) 2005 by Matt Porter
+ *  Copyright (c) 2005 by Jim Westfall and Dave Abrahams
  *  Distributed as part of MythTV under GPL v2 and later.
  */
 
+#ifndef _FIREWIRECHANNEL_H_
+#define _FIREWIRECHANNEL_H_
 
-#ifndef FIREWIRECHANNEL_H
-#define FIREWIRECHANNEL_H
-
-#include <qstring.h>
 #include "tv_rec.h"
-#include "firewirechannelbase.h"
-#include <libavc1394/avc1394.h>
+#include "dtvchannel.h"
+#include "firewiredevice.h"
 
-using namespace std;
-
-class FirewireChannel : public FirewireChannelBase
+class FirewireChannel : public DTVChannel
 {
   public:
-    enum PowerState {
-        On,
-        Off,
-        Failed
-    };
+    FirewireChannel(TVRec *parent, const QString &videodevice,
+                    const FireWireDBOptions &firewire_opts);
+    ~FirewireChannel() { Close(); }
 
-    FirewireChannel(FireWireDBOptions firewire_opts, TVRec *parent);
-    ~FirewireChannel(void);
+    // Commands
+    virtual bool Open(void);
+    virtual void Close(void);
+    virtual bool SwitchToInput(const QString &inputname, const QString &chan);
+    virtual bool SwitchToInput(int newcapchannel, bool setstarting);
 
-    bool OpenFirewire(void); 
-    void CloseFirewire(void); 
+    virtual bool TuneMultiplex(uint /*mplexid*/, QString /*inputname*/)
+        { return false; }
+    virtual bool Tune(const DTVMultiplex &/*tuning*/, QString /*inputname*/)
+        { return false; }
+    virtual bool Retune(void);
 
     // Sets
-    void SetExternalChanger(void);
-    bool SetChannelByNumber(int channel);
+    virtual bool SetChannelByString(const QString &chan);
+    virtual bool SetChannelByNumber(int channel);
+    virtual bool SetPowerState(bool on);
 
     // Gets
-    bool IsOpen(void) const { return isopen; }
-    QString GetDevice(void) const
-        { return QString("%1:%2").arg(fw_opts.port).arg(fw_opts.node); }
-    PowerState GetPowerState(void);
+    virtual bool IsOpen(void) const { return isopen; }
+    virtual FirewireDevice::PowerState GetPowerState(void) const;
+    virtual QString GetDevice(void) const;
+    virtual FirewireDevice *GetFirewireDevice(void) { return device; }
 
-  private:
+  protected:
+    QString            videodevice;
     FireWireDBOptions  fw_opts;
-    nodeid_t           fwnode;
-    raw1394handle_t    fwhandle;
+    FirewireDevice    *device;
+    uint               current_channel;
+    bool               isopen;
 };
 
-#endif
+#endif // _FIREWIRECHANNEL_H_

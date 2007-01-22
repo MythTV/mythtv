@@ -112,9 +112,9 @@ void IPTVSignalMonitor::RunTableMonitor(void)
 }
 
 void IPTVSignalMonitor::AddData(
-    unsigned char *data, unsigned int dataSize)
+    const unsigned char *data, unsigned int dataSize)
 {
-    GetStreamData()->ProcessData(data, dataSize);
+    GetStreamData()->ProcessData((unsigned char*)data, dataSize);
 }
 
 /** \fn IPTVSignalMonitor::UpdateValues(void)

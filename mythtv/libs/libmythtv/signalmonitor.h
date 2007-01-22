@@ -296,6 +296,7 @@ inline bool SignalMonitor::IsRequired(const QString &cardtype)
     return (CardUtil::IsDVBCardType(cardtype) ||
             (cardtype.upper() == "HDTV")      ||
             (cardtype.upper() == "HDHOMERUN") ||
+            (cardtype.upper() == "FIREWIRE")  ||
             (cardtype.upper() == "FREEBOX"));
 }
 

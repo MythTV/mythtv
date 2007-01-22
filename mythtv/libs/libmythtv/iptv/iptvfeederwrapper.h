@@ -14,7 +14,7 @@ using namespace std;
 #include <qstring.h>
 
 class IPTVFeeder;
-class IPTVListener;
+class TSDataListener;
 
 /** \class IPTVFeederWrapper
  *  \brief Helper class for dealing with IPTVFeeder instances.
@@ -34,17 +34,17 @@ class IPTVFeederWrapper
     void Run(void);
     void Stop(void);
 
-    void AddListener(IPTVListener*);
-    void RemoveListener(IPTVListener*);
+    void AddListener(TSDataListener*);
+    void RemoveListener(TSDataListener*);
     
   private:
     bool InitFeeder(const QString &url);
 
   private:
-    IPTVFeeder         *_feeder;
-    QString                _url;
-    mutable QMutex         _lock; ///< Lock  used to coordinate threads
-    vector<IPTVListener*>  _listeners;
+    IPTVFeeder              *_feeder;
+    QString                  _url;
+    mutable QMutex           _lock; ///< Lock  used to coordinate threads
+    vector<TSDataListener*>  _listeners;
 
   private:
     IPTVFeederWrapper &operator=(const IPTVFeederWrapper&);

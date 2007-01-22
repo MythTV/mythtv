@@ -11,14 +11,13 @@
 #include <qwaitcondition.h>
 
 #include "dtvrecorder.h"
-#include "iptvlistener.h"
 #include "streamlisteners.h"
 
 class IPTVChannel;
 
 /** \brief Processes data from a IPTVFeeder and writes it to disk.
  */
-class IPTVRecorder : public DTVRecorder, public IPTVListener,
+class IPTVRecorder : public DTVRecorder, public TSDataListener,
                      public MPEGSingleProgramStreamListener
 {
     friend class IPTVMediaSink;
@@ -45,9 +44,8 @@ class IPTVRecorder : public DTVRecorder, public IPTVListener,
   private:
     void ProcessTSPacket(const TSPacket& tspacket);
 
-    // implements IPTVListener
-    void AddData(unsigned char *data,
-                 unsigned int   dataSize);
+    // implements TSDataListener
+    void AddData(const unsigned char *data, unsigned int dataSize);
 
     // implements MPEGSingleProgramStreamListener
     void HandleSingleProgramPAT(ProgramAssociationTable *pat);

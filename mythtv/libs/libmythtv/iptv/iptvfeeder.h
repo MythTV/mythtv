@@ -8,7 +8,7 @@
 #define _IPTV_FEEDER_H_
 
 class QString;
-class IPTVListener;
+class TSDataListener;
 
 /** \class IPTVFeeder
  *  \brief Base class for UDP and RTSP data sources for IPTVRecorder.
@@ -37,7 +37,7 @@ class IPTVFeeder
     virtual bool Open(const QString &url) = 0;
     /// \brief Closes the stream and frees resources allocated in Open()
     virtual void Close(void) = 0;
-    /** \brief Reads the stream and sends data to its IPTVListener. This
+    /** \brief Reads the stream and sends data to its TSDataListener. This
      *         is a blocking call : it should not exit until Stop() is called.
      *  \sa Stop(void)
      */
@@ -50,8 +50,8 @@ class IPTVFeeder
      */
     virtual void Stop(void) = 0;
 
-    virtual void AddListener(IPTVListener*) = 0;
-    virtual void RemoveListener(IPTVListener*) = 0;
+    virtual void AddListener(TSDataListener*) = 0;
+    virtual void RemoveListener(TSDataListener*) = 0;
 };
 
 #endif // _IPTV_FEEDER_H_

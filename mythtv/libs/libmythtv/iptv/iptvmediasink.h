@@ -14,7 +14,7 @@ using namespace std;
 
 #include <MediaSink.hh>
 
-class IPTVListener;
+class TSDataListener;
 
 // ============================================================================
 // IPTVMediaSink : Helper class use to receive RTSP data from socket.
@@ -25,8 +25,8 @@ class IPTVMediaSink : public MediaSink
     static IPTVMediaSink *CreateNew(UsageEnvironment &env,
                                        unsigned          bufferSize);
 
-    void AddListener(IPTVListener*);
-    void RemoveListener(IPTVListener*);
+    void AddListener(TSDataListener*);
+    void RemoveListener(TSDataListener*);
 
   protected:
     IPTVMediaSink(UsageEnvironment &env,
@@ -46,11 +46,11 @@ class IPTVMediaSink : public MediaSink
     virtual Boolean continuePlaying(void);
 
   private:
-    unsigned char         *_buf;
-    unsigned int           _buf_size;
-    UsageEnvironment      &_env;
-    vector<IPTVListener*>  _listeners;
-    mutable QMutex         _lock;
+    unsigned char           *_buf;
+    unsigned int             _buf_size;
+    UsageEnvironment        &_env;
+    vector<TSDataListener*>  _listeners;
+    mutable QMutex           _lock;
 
   private:
     // avoid default contructors & operator=

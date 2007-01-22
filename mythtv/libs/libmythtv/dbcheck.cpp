@@ -10,7 +10,7 @@ using namespace std;
 #include "mythdbcon.h"
 
 /// This is the DB schema version expected by the running MythTV instance.
-const QString currentDatabaseVersion = "1175";
+const QString currentDatabaseVersion = "1176";
 
 static bool UpdateDBVersionNumber(const QString &newnumber);
 static bool performActualUpdate(const QString updates[], QString version,
@@ -2803,6 +2803,50 @@ thequery,
             return false;
     }
 
+    if (dbver == "1175")
+    {
+        QString thequery =
+            "SELECT cardid "
+            "FROM capturecard "
+            "WHERE cardtype='FIREWIRE'";
+
+        MSqlQuery query(MSqlQuery::InitCon());
+        query.prepare(thequery);
+        if (!query.exec())
+        {
+            QString msg =
+                QString("DB Error (Performing database upgrade): \n"
+                        "Query was: %1 \nError was: %2 \nnew version: %3")
+                .arg(thequery)
+                .arg(MythContext::DBErrorMessage(query.lastError()))
+                .arg("1176");
+            VERBOSE(VB_IMPORTANT, msg);
+            return false;
+        }
+
+        QString in = "(";
+
+        while (query.next())
+            in += query.value(0).toString() + ",";
+
+        thequery = "";
+        if (in.length() > 2)
+        {
+            in.truncate(in.length() - 1);
+            thequery =
+                "DELETE FROM cardinput "
+                "WHERE cardid IN " + in + ")";
+        }
+
+        const QString updates[] = {
+"DELETE FROM capturecard WHERE cardtype = 'FIREWIRE';",
+thequery,
+""
+};
+        if (!performActualUpdate(updates, "1176", dbver))
+            return false;
+    }
+
 //"ALTER TABLE cardinput DROP COLUMN preference;" in 0.22
 //"ALTER TABLE channel DROP COLUMN atscsrcid;" in 0.22
 //"ALTER TABLE recordedmarkup DROP COLUMN offset;" in 0.22
@@ -2811,6 +2855,8 @@ thequery,
 //"ALTER TABLE cardinput DROP lnb_lof_switch;" in 0.22
 //"ALTER TABLE cardinput DROP lnb_lof_hi;" in 0.22
 //"ALTER TABLE cardinput DROP lnb_lof_lo;" in 0.22
+//"ALTER TABLE capturecard DROP firewire_port;" in 0.22
+//"ALTER TABLE capturecard DROP firewire_node;" in 0.22
 
     return true;
 }

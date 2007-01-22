@@ -8,7 +8,8 @@
 #include <sys/stat.h>
 
 // C++ headers
-#include <iostream>
+#include <algorithm>
+using namespace std;
 
 // Qt headers
 #include <qapplication.h>
@@ -33,6 +34,7 @@
 #include "channelutil.h"
 #include "frequencies.h"
 #include "diseqcsettings.h"
+#include "firewiredevice.h"
 
 #ifdef USING_DVB
 #include "dvbtypes.h"
@@ -943,25 +945,74 @@ class DVBTuningDelay : public SpinBoxSetting, public CaptureCardDBStorage
     };
 };
 
-class FirewireModel : public ComboBoxSetting, public CaptureCardDBStorage
+class FirewireGUID : public ComboBoxSetting, public CaptureCardDBStorage
 {
   public:
-    FirewireModel(const CaptureCard &parent) :
+    FirewireGUID(const CaptureCard &parent) :
         ComboBoxSetting(this),
-        CaptureCardDBStorage(this, parent, "firewire_model")
+        CaptureCardDBStorage(this, parent, "videodevice")
     {
-        setLabel(QObject::tr("Cable box model"));
-        addSelection(QObject::tr("Other"));
-        addSelection("DCT-6200");
-        addSelection("SA3250HD");
-	addSelection("SA4200HD");
-        QString help = QObject::tr(
-            "Choose the model that most closely resembles your set top box. "
-            "Depending on firmware revision SA4200HD may work better for a "
-            "SA3250HD box.");
-        setHelpText(help);
+        setLabel(QObject::tr("GUID"));
+#ifdef USING_FIREWIRE
+        vector<AVCInfo> list = FirewireDevice::GetSTBList();
+        for (uint i = 0; i < list.size(); i++)
+        {
+            QString guid = list[i].GetGUIDString();
+            guid_to_avcinfo[guid] = list[i];
+            addSelection(guid);
+        }
+#endif // USING_FIREWIRE
     }
+
+    AVCInfo GetAVCInfo(const QString &guid) const
+        { return guid_to_avcinfo[guid]; }
+
+  private:
+    QMap<QString,AVCInfo> guid_to_avcinfo;
 };
+
+FirewireModel::FirewireModel(const CaptureCard  &parent,
+                             const FirewireGUID *_guid) :
+    ComboBoxSetting(this),
+    CaptureCardDBStorage(this, parent, "firewire_model"),
+    guid(_guid)
+{
+    setLabel(QObject::tr("Cable box model"));
+    addSelection(QObject::tr("Generic"), "GENERIC");
+    addSelection("DCT-6200");
+    addSelection("DCT-6212");
+    addSelection("DCT-6216");
+    addSelection("SA3250HD");
+    addSelection("SA4200HD");
+    QString help = QObject::tr(
+        "Choose the model that most closely resembles your set top box. "
+        "Depending on firmware revision SA4200HD may work better for a "
+        "SA3250HD box.");
+    setHelpText(help);
+}
+
+void FirewireModel::SetGUID(const QString &_guid)
+{
+#ifdef USING_FIREWIRE
+    AVCInfo info = guid->GetAVCInfo(_guid);
+    QString model = FirewireDevice::GetModelName(info.vendorid, info.modelid);
+    setValue(max(getValueIndex(model), 0));
+#endif // USING_FIREWIRE
+}
+
+void FirewireDesc::SetGUID(const QString &_guid)
+{
+    setLabel(tr("Description"));
+
+#ifdef USING_FIREWIRE
+    QString name = guid->GetAVCInfo(_guid).product_name;
+    name.replace("Scientific-Atlanta", "SA");
+    name.replace(", Inc.", "");
+    name.replace("Explorer(R)", "");
+    name = name.simplifyWhiteSpace();
+    setValue((name.isEmpty()) ? "" : name);
+#endif // USING_FIREWIRE
+}
 
 class FirewireConnection : public ComboBoxSetting, public CaptureCardDBStorage
 {
@@ -976,32 +1027,6 @@ class FirewireConnection : public ComboBoxSetting, public CaptureCardDBStorage
     }
 };
 
-class FirewirePort : public SpinBoxSetting, public CaptureCardDBStorage
-{
-  public:
-    FirewirePort(const CaptureCard &parent) :
-        SpinBoxSetting(this, 0, 63, 1),
-        CaptureCardDBStorage(this, parent, "firewire_port")
-    {
-        setValue(0);
-        setLabel(QObject::tr("IEEE-1394 Port"));
-        setHelpText(QObject::tr("Firewire port on your firewire card."));
-    }
-};
-
-class FirewireNode : public SpinBoxSetting, public CaptureCardDBStorage
-{
-  public:
-    FirewireNode(const CaptureCard &parent) :
-        SpinBoxSetting(this, 0, 63, 1),
-        CaptureCardDBStorage(this, parent, "firewire_node")
-    {
-        setValue(2);
-        setLabel(QObject::tr("Node"));
-        setHelpText(QObject::tr("Firewire node is the remote device."));
-    }
-};
-
 class FirewireSpeed : public ComboBoxSetting, public CaptureCardDBStorage
 {
   public:
@@ -1013,6 +1038,7 @@ class FirewireSpeed : public ComboBoxSetting, public CaptureCardDBStorage
         addSelection(QObject::tr("100Mbps"),"0");
         addSelection(QObject::tr("200Mbps"),"1");
         addSelection(QObject::tr("400Mbps"),"2");
+        addSelection(QObject::tr("800Mbps"),"3");
     }
 };
 
@@ -1021,23 +1047,37 @@ class FirewireConfigurationGroup : public VerticalConfigurationGroup
   public:
     FirewireConfigurationGroup(CaptureCard& a_parent) :
         VerticalConfigurationGroup(false, true, false, false),
-        parent(a_parent)
+        parent(a_parent),
+        dev(new FirewireGUID(parent)),
+        desc(new FirewireDesc(dev)),
+        model(new FirewireModel(parent, dev))
     {
-        HorizontalConfigurationGroup *hg0 =
-            new HorizontalConfigurationGroup(false, false, true, true);
-        hg0->addChild(new FirewireModel(parent));
-        hg0->addChild(new FirewireConnection(parent));
-        addChild(hg0);
-        HorizontalConfigurationGroup *hg1 =
-            new HorizontalConfigurationGroup(false, false, true, true);
-        hg1->addChild(new FirewirePort(parent));
-        hg1->addChild(new FirewireNode(parent));
-        hg1->addChild(new FirewireSpeed(parent));
-        addChild(hg1);
+        addChild(dev);
+        addChild(desc);
+        addChild(model);
+
+#ifdef USING_LINUX_FIREWIRE
+        addChild(new FirewireConnection(parent));
+        addChild(new FirewireSpeed(parent));
+#endif // USING_LINUX_FIREWIRE
+
+        addChild(new SignalTimeout(parent, 2000, 1000));
+        addChild(new ChannelTimeout(parent, 9000, 1750));
         addChild(new SingleCardInput(parent));
+
+        model->SetGUID(dev->getValue());
+        desc->SetGUID(dev->getValue());
+        connect(dev,   SIGNAL(valueChanged(const QString&)),
+                model, SLOT(  SetGUID(     const QString&)));
+        connect(dev,   SIGNAL(valueChanged(const QString&)),
+                desc,  SLOT(  SetGUID(     const QString&)));
     };
+
   private:
-    CaptureCard &parent;
+    CaptureCard   &parent;
+    FirewireGUID  *dev;
+    FirewireDesc  *desc;
+    FirewireModel *model;
 };
 
 class DBOX2Port : public LineEditSetting, public CaptureCardDBStorage

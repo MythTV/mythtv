@@ -1,314 +1,214 @@
 /**
  *  FirewireChannel
- *  Copyright (c) 2005 by Jim Westfall
- *  SA3250HD support Copyright (c) 2005 by Matt Porter
- *  SA4200HD/Alternate 3250 support Copyright (c) 2006 by Chris Ingrassia
+ *  Copyright (c) 2005 by Jim Westfall, Dave Abrahams
+ *  Copyright (c) 2006 by Daniel Kristjansson
  *  Distributed as part of MythTV under GPL v2 and later.
  */
 
-
-#include <iostream>
 #include "mythcontext.h"
+#include "tv_rec.h"
+#include "linuxfirewiredevice.h"
+#include "darwinfirewiredevice.h"
 #include "firewirechannel.h"
 
-class TVRec;
+#define LOC QString("FireChan(%1): ").arg(GetDevice())
+#define LOC_WARN QString("FireChan(%1), Warning: ").arg(GetDevice())
+#define LOC_ERR QString("FireChan(%1), Error: ").arg(GetDevice())
 
-#define LOC QString("FireChan: ")
-#define LOC_ERR QString("FireChan, Error: ")
-
-#ifndef AVC1394_PANEL_COMMAND_PASS_THROUGH
-#define AVC1394_PANEL_COMMAND_PASS_THROUGH     0x000007C00
+FirewireChannel::FirewireChannel(TVRec *parent, const QString &_videodevice,
+                                 const FireWireDBOptions &firewire_opts) :
+    DTVChannel(parent),
+    videodevice(_videodevice),
+    fw_opts(firewire_opts),
+    device(NULL),
+    current_channel(0),
+    isopen(false)
+{
+    uint64_t guid = string_to_guid(videodevice);
+    uint subunitid = 0; // we only support first tuner on STB...
+#ifdef USING_LINUX_FIREWIRE
+    device = new LinuxFirewireDevice(
+        guid, subunitid, fw_opts.speed,
+        LinuxFirewireDevice::kConnectionP2P == (uint) fw_opts.connection);
+#elif USING_OSX_FIREWIRE
+    device = new DarwinFirewireDevice(guid, subunitid, fw_opts.speed);
 #endif
 
-#ifndef AVC1394_PANEL_OPERATION_0
-#define AVC1394_PANEL_OPERATION_0              0x000000020
-#endif
-
-#define DCT6200_CMD0  (AVC1394_CTYPE_CONTROL | \
-                       AVC1394_SUBUNIT_TYPE_PANEL | \
-                       AVC1394_SUBUNIT_ID_0 | \
-                       AVC1394_PANEL_COMMAND_PASS_THROUGH | \
-                       AVC1394_PANEL_OPERATION_0)
-
-// SA3250HD defines
-#define AVC1394_SA3250_OPERAND_KEY_PRESS	0xE7
-#define AVC1394_SA3250_OPERAND_KEY_RELEASE	0x67
-
-#define SA3250_CMD0   (AVC1394_CTYPE_CONTROL | \
-                       AVC1394_SUBUNIT_TYPE_PANEL | \
-                       AVC1394_SUBUNIT_ID_0 | \
-                       AVC1394_PANEL_COMMAND_PASS_THROUGH)
-#define SA3250_CMD1   (0x04 << 24)
-#define SA3250_CMD2    0xff000000
-
-// power defines
-#define AVC1394_CMD_OPERAND_POWER_STATE        0x7F
-#define STB_POWER_STATE   (AVC1394_CTYPE_STATUS | \
-                           AVC1394_SUBUNIT_TYPE_UNIT | \
-                           AVC1394_SUBUNIT_ID_IGNORE | \
-                           AVC1394_COMMAND_POWER | \
-                           AVC1394_CMD_OPERAND_POWER_STATE)
-
-#define STB_POWER_ON      (AVC1394_CTYPE_CONTROL | \
-                           AVC1394_SUBUNIT_TYPE_UNIT | \
-                           AVC1394_SUBUNIT_ID_IGNORE | \
-                           AVC1394_COMMAND_POWER | \
-                           AVC1394_CMD_OPERAND_POWER_ON)
-
-static bool is_supported(const QString &model)
-{
-    return ((model == "DCT-6200") ||
-            (model == "SA3250HD") ||
-	    (model == "SA4200HD"));
+    InitializeInputs();
 }
 
-FirewireChannel::FirewireChannel(FireWireDBOptions firewire_opts,
-                                 TVRec *parent)
-    : FirewireChannelBase(parent), fw_opts(firewire_opts), fwhandle(NULL)
+bool FirewireChannel::SetChannelByString(const QString &channum)
 {
+    InputMap::const_iterator it = inputs.find(currentInputID);
+    if (it == inputs.end())
+        return false;
+
+    // Fetch tuning data from the database.
+    QString tvformat, modulation, freqtable, freqid, dtv_si_std;
+    int finetune;
+    uint64_t frequency;
+    int mpeg_prog_num;
+    uint atsc_major, atsc_minor, mplexid, tsid, netid;
+
+    if (!ChannelUtil::GetChannelData(
+        (*it)->sourceid, channum,
+        tvformat, modulation, freqtable, freqid,
+        finetune, frequency,
+        dtv_si_std, mpeg_prog_num, atsc_major, atsc_minor, tsid, netid,
+        mplexid, commfree))
+    {
+        return false;
+    }
+
+    bool ok = false;
+    if (!(*it)->externalChanger.isEmpty())
+        ok = ChangeExternalChannel(freqid);
+    else
+    {
+        uint ichan = freqid.toUInt(&ok);
+        ok = ok && isopen && SetChannelByNumber(ichan);
+    }
+
+    if (ok)
+    {
+        // Set the current channum to the new channel's channum
+        curchannelname = QDeepCopy<QString>(channum);
+        (*it)->startChanNum = QDeepCopy<QString>(channum);
+    }
+
+    return ok;
 }
 
-FirewireChannel::~FirewireChannel(void)
+bool FirewireChannel::Open(void)
 {
-    Close();
+    VERBOSE(VB_CHANNEL, LOC + "Open()");
+
+    if (inputs.find(currentInputID) == inputs.end())
+        return false;
+
+    if (!device)
+        return false;
+
+    if (isopen)
+        return true;
+
+    InputMap::const_iterator it = inputs.find(currentInputID);
+    if (!FirewireDevice::IsSTBSupported(fw_opts.model) &&
+        (*it)->externalChanger.isEmpty())
+    {
+        VERBOSE(VB_IMPORTANT, LOC_ERR +
+                QString("Model: '%1' is not supported.").arg(fw_opts.model));
+
+        return false;
+    }
+
+    if (!device->OpenPort())
+        return false;
+
+    isopen = true;
+
+    return true;
+}
+
+void FirewireChannel::Close(void)
+{
+    VERBOSE(VB_CHANNEL, LOC + "Close()");
+    if (isopen)
+    {
+        device->ClosePort();
+        isopen = false;
+    }
+}
+
+bool FirewireChannel::SwitchToInput(const QString &input, const QString &chan)
+{
+    int inputNum = GetInputByName(input);
+    if (inputNum < 0)
+        return false;
+
+    return SetChannelByString(chan);
+}
+
+bool FirewireChannel::SwitchToInput(int newInputNum, bool setstarting)
+{
+    (void) setstarting;
+
+    InputMap::const_iterator it = inputs.find(newInputNum);
+    if (it == inputs.end() || (*it)->startChanNum.isEmpty())
+        return false;
+
+    return SetChannelByString((*it)->startChanNum);
+}
+
+QString FirewireChannel::GetDevice(void) const
+{
+    return videodevice;
+}
+
+bool FirewireChannel::SetPowerState(bool on)
+{
+    if (!isopen)
+    {
+        VERBOSE(VB_IMPORTANT, LOC_ERR +
+                "SetPowerState() called on closed FirewireChannel.");
+
+        return false;
+    }
+
+    return device->SetPowerState(on);
+}
+
+FirewireDevice::PowerState FirewireChannel::GetPowerState(void) const
+{
+    if (!isopen)
+    {
+        VERBOSE(VB_IMPORTANT, LOC_ERR +
+                "GetPowerState() called on closed FirewireChannel.");
+
+        return FirewireDevice::kAVCPowerQueryFailed;
+    }
+
+    return device->GetPowerState();
+}
+
+bool FirewireChannel::Retune(void)
+{
+    VERBOSE(VB_CHANNEL, LOC + "Retune()");
+
+    if (FirewireDevice::kAVCPowerOff == GetPowerState())
+    {
+        VERBOSE(VB_IMPORTANT, LOC_ERR +
+                "STB is turned off, must be on to retune.");
+
+        return false;
+    }
+
+    if (current_channel)
+        return SetChannelByNumber(current_channel);
+
+    return false;
 }
 
 bool FirewireChannel::SetChannelByNumber(int channel)
 {
-    // Change channel using internal changer
+    current_channel = channel;
 
-    if (!is_supported(fw_opts.model))
+    if (FirewireDevice::kAVCPowerOff == GetPowerState())
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR +
-                QString("Model: '%1' ").arg(fw_opts.model) +
-                "is not supported by internal channel changer.");
+        VERBOSE(VB_IMPORTANT, LOC_WARN +
+                "STB is turned off, must be on to set channel.");
+
+        SetSIStandard("mpeg");
+        SetCachedATSCInfo(QString("%1-1").arg(channel));
+
+        return true; // signal monitor will call retune later...
+    }
+
+    if (!device->SetChannel(fw_opts.model, 0, channel))
         return false;
-    }
 
-    int dig[3];
-    dig[0] = (channel % 1000) / 100;
-    dig[1] = (channel % 100)  / 10;
-    dig[2] = (channel % 10);
-
-    if (fw_opts.model == "DCT-6200")
-    {
-        VERBOSE(VB_CHANNEL, LOC +
-                QString("Channel1: %1%2%3 cmds: 0x%4, 0x%5, 0x%6")
-                .arg(dig[0]).arg(dig[1])
-                .arg(dig[2]).arg(DCT6200_CMD0 | dig[0], 0, 16)
-                .arg(DCT6200_CMD0 | dig[1], 0, 16)
-                .arg(DCT6200_CMD0 | dig[2], 0, 16));
-
-        for (uint i = 0; i < 3 ;i++)
-        {
-            quadlet_t cmd[2] =  { DCT6200_CMD0 | dig[i], 0x0, };
-            if (!avc1394_transaction_block(fwhandle, fw_opts.node, cmd, 2, 1))
-            {
-                 VERBOSE(VB_IMPORTANT, "AVC transaction failed.");
-                 return false;
-            }
-            usleep(500000);
-        }
-    }
-    else if (fw_opts.model == "SA3250HD")
-    {
-        dig[0] |= 0x30;
-        dig[1] |= 0x30;
-        dig[2] |= 0x30;
-
-        quadlet_t cmd[3] =
-        {
-            SA3250_CMD0 | AVC1394_SA3250_OPERAND_KEY_PRESS, 
-            SA3250_CMD1 | (dig[2] << 16) | (dig[1] << 8) | dig[0],
-            SA3250_CMD2,
-        };
-
-        VERBOSE(VB_CHANNEL, LOC +
-                QString("Channel2: %1%2%3 cmds: 0x%4, 0x%5, 0x%6")
-                .arg(dig[0] & 0xf).arg(dig[1] & 0xf)
-                .arg(dig[2] & 0xf)
-                .arg(cmd[0], 0, 16).arg(cmd[1], 0, 16)
-                .arg(cmd[2], 0, 16));
-
-        if(!avc1394_transaction_block(fwhandle, fw_opts.node, cmd, 3, 1))
-        {
-            VERBOSE(VB_IMPORTANT, "AVC transaction failed.");
-            return false;
-        }
-
-        cmd[0] = SA3250_CMD0 | AVC1394_SA3250_OPERAND_KEY_RELEASE;
-        cmd[1] = SA3250_CMD1 | (dig[0] << 16) | (dig[1] << 8) | dig[2];
-        cmd[2] = SA3250_CMD2;
-
-        VERBOSE(VB_CHANNEL, LOC +
-                QString("Channel3: %1%2%3 cmds: 0x%4, 0x%5, 0x%6")
-                .arg(dig[0] & 0xf).arg(dig[1] & 0xf)
-                .arg(dig[2] & 0xf)
-                .arg(cmd[0], 0, 16).arg(cmd[1], 0, 16)
-                .arg(cmd[2], 0, 16));
-
-        if (!avc1394_transaction_block(fwhandle, fw_opts.node, cmd, 3, 1))
-        {
-            VERBOSE(VB_IMPORTANT, "AVC transaction failed.");
-            return false;
-        }
-    }
-    else if (fw_opts.model == "SA4200HD")
-    {
-        quadlet_t cmd[3] =
-        {
-            SA3250_CMD0 | AVC1394_SA3250_OPERAND_KEY_PRESS,
-            SA3250_CMD1 | (channel << 8),
-            SA3250_CMD2,
-        };
-
-        VERBOSE(VB_CHANNEL, LOC +
-                QString("SA4200Channel: %1 cmds: 0x%2 0x%3 0x%4")
-                .arg(channel).arg(cmd[0], 0, 16)
-                .arg(cmd[1], 0, 16)
-                .arg(cmd[2], 0, 16));
-
-        if (!avc1394_transaction_block(fwhandle, fw_opts.node, cmd, 3, 1))
-        {
-            VERBOSE(VB_IMPORTANT, "AVC transaction failed.");
-            return false;
-        }
-    }
+    SetSIStandard("mpeg");
+    SetCachedATSCInfo(QString("%1-1").arg(channel));
 
     return true;
-}
-
-bool FirewireChannel::OpenFirewire(void)
-{
-    if (!is_supported(fw_opts.model))
-    {
-        VERBOSE(VB_IMPORTANT, LOC_ERR +
-                QString("Model: '%1' ").arg(fw_opts.model) +
-                "is not supported by internal channel changer.");
-        return false;
-    }
-
-    // Open channel
-    fwhandle = raw1394_new_handle_on_port(fw_opts.port);
-    if (!fwhandle)
-    {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "Unable to get handle " +
-                QString("for port: %1").arg(fw_opts.port));
-        return false;
-    }
-
-    VERBOSE(VB_CHANNEL, LOC + "Allocated raw1394 handle " +
-            QString("for port %1").arg(fw_opts.port));
-
-    // verify node looks like a stb
-    if (!avc1394_check_subunit_type(fwhandle, fw_opts.node,
-                                    AVC1394_SUBUNIT_TYPE_TUNER))
-    {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + QString("node %1 is not subunit "
-                "type tuner.").arg(fw_opts.node));
-        CloseFirewire();
-        return false;
-    }
-
-    if (!avc1394_check_subunit_type(fwhandle, fw_opts.node, 
-                                    AVC1394_SUBUNIT_TYPE_PANEL))
-    {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + QString("node %1 is not subunit "
-                "type panel.").arg(fw_opts.node));
-        CloseFirewire();
-        return false;
-    }
-
-    // check power, power on if off
-    if (GetPowerState() == Off)
-    {
-        quadlet_t *rval, response, cmd = STB_POWER_ON;
-        VERBOSE(VB_IMPORTANT, LOC + QString("Powering on (cmd: 0x%1)")
-                                            .arg(cmd, 0, 16));
-        rval = avc1394_transaction_block(fwhandle, fw_opts.node, &cmd, 1, 1);
-        if (rval)
-        {
-            response = rval[0];
-
-            if (AVC1394_MASK_RESPONSE(response) == AVC1394_RESPONSE_ACCEPTED)
-            {
-                VERBOSE(VB_IMPORTANT, LOC + QString("Power on cmd successful "
-                                                    "(0x%1)")
-                                                    .arg(response, 0, 16));
-                // allow some time for the stb to power on
-                sleep(3);
-                if (GetPowerState() == Off)
-                {
-                    VERBOSE(VB_IMPORTANT, LOC + "STB is still off!?");
-                    return false;
-                }
-                return true;
-            }
-            else
-            {
-                VERBOSE(VB_IMPORTANT, LOC + QString("Power on cmd failed "
-                                                    "(0x%1)")
-                                                    .arg(response, 0, 16));
-                return false;
-            }
-        }
-        else
-        {
-            VERBOSE(VB_IMPORTANT, LOC + "Power on cmd failed (no response)");
-            return false;
-        }
-    }
-    return true;
-}
-
-void FirewireChannel::CloseFirewire(void)
-{
-    VERBOSE(VB_CHANNEL, LOC + "Releasing raw1394 handle");
-    raw1394_destroy_handle(fwhandle);
-}
-
-FirewireChannel::PowerState FirewireChannel::GetPowerState(void)
-{
-    quadlet_t *rval, response, cmd = STB_POWER_STATE;
-
-    VERBOSE(VB_CHANNEL, LOC + QString("Requesting STB Power State (cmd: 0x%1)")
-                                      .arg(STB_POWER_STATE, 0, 16));
-    rval = avc1394_transaction_block(fwhandle, fw_opts.node, &cmd, 1, 1);
-
-    if (rval)
-    {
-        response = rval[0];
-
-        if (AVC1394_MASK_RESPONSE(response) == AVC1394_RESPONSE_IMPLEMENTED)
-        {
-            if ((response & 0xFF) == AVC1394_CMD_OPERAND_POWER_ON)
-            {
-                VERBOSE(VB_CHANNEL, LOC + QString("STB Power State: ON (0x%1)")
-                                                  .arg(response, 0, 16));
-                return On;
-            }
-            else if ((response & 0xFF) == AVC1394_CMD_OPERAND_POWER_OFF)
-            {
-                VERBOSE(VB_IMPORTANT, LOC + QString("STB Power State: OFF " 
-                                                    "(0x%1)")
-                                                    .arg(response, 0, 16));
-                return Off;
-            }
-            else
-            {
-                VERBOSE(VB_CHANNEL, LOC + QString("STB Power State: "
-                                                  "Unknown Response (0x%1)")
-                                                  .arg(response, 0, 16));
-                return Failed;
-            }
-        }
-        else
-        {
-            VERBOSE(VB_CHANNEL, LOC + QString("STB Power State: Failed (0x%1)")
-                                              .arg(response, 0, 16));
-            return Failed;
-        }
-    }
-    VERBOSE(VB_CHANNEL, LOC + "Failed to get STB Power State");
-    return Failed;
 }

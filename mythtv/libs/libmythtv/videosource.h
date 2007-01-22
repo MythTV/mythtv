@@ -413,6 +413,36 @@ private:
     DiSEqCDevTree      *diseqc_tree;
 };
 
+class FirewireGUID;
+class FirewireModel : public ComboBoxSetting, public CaptureCardDBStorage
+{
+    Q_OBJECT
+
+  public:
+    FirewireModel(const CaptureCard &parent, const FirewireGUID*);
+
+  public slots:
+    void SetGUID(const QString&);
+
+  private:
+    const FirewireGUID *guid;
+};
+
+class FirewireDesc : public TransLabelSetting
+{
+    Q_OBJECT
+
+  public:
+    FirewireDesc(const FirewireGUID *_guid) :
+        TransLabelSetting(), guid(_guid) { }
+
+  public slots:
+    void SetGUID(const QString&);
+
+  private:
+    const FirewireGUID *guid;
+};
+
 class CaptureCardGroup : public TriggeredConfigurationGroup
 {
     Q_OBJECT

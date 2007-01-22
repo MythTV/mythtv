@@ -680,24 +680,7 @@ QString CardUtil::GetDeviceLabel(uint cardid,
 {
     QString label = QString::null;
 
-    if (cardtype == "FIREWIRE")
-    {
-        MSqlQuery query(MSqlQuery::InitCon());
-        query.prepare(
-            "SELECT firewire_port, firewire_node "
-            "FROM capturecard "
-            "WHERE cardid = :CARDID");
-        query.bindValue(":CARDID", cardid);
-
-        if (!query.exec() || !query.isActive() || !query.next())
-            label = "[ DB ERROR ]";
-        else
-            label = QString("[ FIREWIRE : Port %2 Node %3 ]")
-                .arg(query.value(0).toString())
-                .arg(query.value(1).toString());
- 
-    }
-    else if (cardtype == "DBOX2")
+    if (cardtype == "DBOX2")
     {
         MSqlQuery query(MSqlQuery::InitCon());
         query.prepare(

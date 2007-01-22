@@ -4,64 +4,69 @@
  *  Distributed as part of MythTV under GPL v2 and later.
  */
 
-#ifndef FIREWIRERECORDER_H_
-#define FIREWIRERECORDER_H_
+#ifndef _FIREWIRERECORDER_H_
+#define _FIREWIRERECORDER_H_
 
-#include "firewirerecorderbase.h"
-#include "tsstats.h"
-#include <libraw1394/raw1394.h>
-#include <libiec61883/iec61883.h>
+// MythTV headers
+#include "dtvrecorder.h"
+#include "tspacket.h"
+#include "streamlisteners.h"
+
+class TVRec;
+class FirewireChannel;
 
 /** \class FirewireRecorder
- *  \brief Linux FirewireRFecorder
+ *  \brief This is a specialization of DTVRecorder used to
+ *         handle DVB and ATSC streams from a firewire input.
  *
- *  \sa FirewireRecorderBase
+ *  \sa DTVRecorder
  */
-class FirewireRecorder : public FirewireRecorderBase
+class FirewireRecorder : public DTVRecorder,
+                         public MPEGSingleProgramStreamListener,
+                         public TSDataListener
 {
-    friend int fw_tspacket_handler(unsigned char*,int,uint,void*);
+    friend class MPEGStreamData;
+    friend class TSPacketProcessor;
 
   public:
-    FirewireRecorder(TVRec *rec) 
-        : FirewireRecorderBase(rec),
-        fwport(-1),     fwchannel(-1), fwspeed(-1),   fwbandwidth(-1), 
-        fwfd(-1),       fwconnection(kConnectionP2P), 
-        fwoplug(-1),    fwiplug(-1),   fwmodel(""),   fwnode(0), 
-        fwhandle(NULL), fwmpeg(NULL),  isopen(false) { } 
-   ~FirewireRecorder() { Close(); }
+    FirewireRecorder(TVRec *rec, FirewireChannel *chan);
+    virtual ~FirewireRecorder();
 
     // Commands
-    bool Open(void); 
+    bool Open(void);
+    void Close(void);
+
+    void StartStreaming(void);
+    void StopStreaming(void);
+
+    void StartRecording(void);
+    bool PauseAndWait(int timeout = 100);
+
+    void AddData(const unsigned char *data, uint dataSize);
+    void ProcessTSPacket(const TSPacket &tspacket);
 
     // Sets
-    void SetOption(const QString &name, const QString &value);
-    void SetOption(const QString &name, int value);
+    void SetOptionsFromProfile(RecordingProfile *profile,
+                               const QString &videodev,
+                               const QString &audiodev,
+                               const QString &vbidev);
+    void SetStreamData(MPEGStreamData*);
+
+    // Gets
+    MPEGStreamData *GetStreamData(void) { return _mpeg_stream_data; }
+
+    // MPEG Single Program
+    void HandleSingleProgramPAT(ProgramAssociationTable*);
+    void HandleSingleProgramPMT(ProgramMapTable*);
+
+  protected:
+    FirewireRecorder(TVRec *rec);
 
   private:
-    void Close(void);
-    void start() { iec61883_mpeg2_recv_start(fwmpeg, fwchannel); } 
-    void stop() { iec61883_mpeg2_recv_stop(fwmpeg); } 
-    bool grab_frames();
-
-  private:
-    int              fwport;
-    int              fwchannel;
-    int              fwspeed;
-    int              fwbandwidth;
-    int              fwfd;
-    int              fwconnection;
-    int              fwoplug;
-    int              fwiplug;
-    QString          fwmodel;
-    nodeid_t         fwnode;
-    raw1394handle_t  fwhandle;
-    iec61883_mpeg2_t fwmpeg;
-    bool             isopen;
-
-    static const int kBroadcastChannel;
-    static const int kConnectionP2P;
-    static const int kConnectionBroadcast;
-    static const uint kMaxBufferedPackets;
+    MPEGStreamData        *_mpeg_stream_data;
+    FirewireChannel       *channel;
+    bool                   isopen;
+    vector<unsigned char>  buffer;
 };
 
-#endif
+#endif //  _FIREWIRERECORDER_H_
