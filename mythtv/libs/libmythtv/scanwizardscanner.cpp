@@ -601,6 +601,10 @@ void ScanWizardScanner::PreScanCommon(int scantype,
 void ScanWizardScanner::ImportM3U(uint cardid, const QString &inputname,
                                   uint sourceid)
 {
+    (void) cardid;
+    (void) inputname;
+    (void) sourceid;
+
 #ifdef USING_IPTV
     //Create an analog scan object
     freeboxScanner = new IPTVChannelFetcher(cardid, inputname, sourceid);

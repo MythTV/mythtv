@@ -993,6 +993,8 @@ FirewireModel::FirewireModel(const CaptureCard  &parent,
 
 void FirewireModel::SetGUID(const QString &_guid)
 {
+    (void) _guid;
+
 #ifdef USING_FIREWIRE
     AVCInfo info = guid->GetAVCInfo(_guid);
     QString model = FirewireDevice::GetModelName(info.vendorid, info.modelid);
@@ -1002,6 +1004,8 @@ void FirewireModel::SetGUID(const QString &_guid)
 
 void FirewireDesc::SetGUID(const QString &_guid)
 {
+    (void) _guid;
+
     setLabel(tr("Description"));
 
 #ifdef USING_FIREWIRE
