@@ -5,6 +5,8 @@
 #include <vector>
 using namespace std;
 
+#include <stdint.h>
+
 // Qt headers
 #include <qstring.h>
 
