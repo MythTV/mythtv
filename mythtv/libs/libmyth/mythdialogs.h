@@ -70,8 +70,6 @@ class MPUBLIC MythDialog : public QFrame
    
     virtual bool onMediaEvent(MythMediaDevice * mediadevice); 
     
-    void setResult(int r) { rescode = r; }
-
   signals:
     void menuButtonPressed();
 
@@ -84,6 +82,7 @@ class MPUBLIC MythDialog : public QFrame
     virtual void reject();
 
   protected:
+    void setResult(int r) { rescode = r; }
     void keyPressEvent(QKeyEvent *e);
 
     float wmult, hmult;
@@ -140,10 +139,6 @@ class MPUBLIC MythPopupBox : public MythDialog
 
     static bool showGetTextPopup(MythMainWindow *parent, QString title,
                                  QString message, QString& text);
-
-    virtual void accept(void);
-    virtual void reject(void);
-
   signals:
     void popupDone();
 

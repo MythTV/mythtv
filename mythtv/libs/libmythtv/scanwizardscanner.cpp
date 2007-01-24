@@ -95,21 +95,16 @@ void post_event(QObject *dest, ScannerEvent::TYPE type, int val)
 
 ScanWizardScanner::ScanWizardScanner(void)
     : VerticalConfigurationGroup(false, true, false, false),
-      log(new LogList()), channel(NULL), popupProgress(NULL),
-      scanner(NULL), freeboxScanner(NULL), nVideoSource(0)
+      log(new LogList()),
+      channel(NULL),                popupProgress(NULL),
+      scanner(NULL),                analogScanner(NULL),
+      freeboxScanner(NULL),
+      frequency(0),                 modulation("8vsb")
 {
     init_statics();
 
     setLabel(kTitle);
     addChild(log);
-}
-
-ScanWizardScanner::~ScanWizardScanner()
-{
-    Teardown();
-
-    QMutexLocker locker(&popupLock);
-    StopPopup();
 }
 
 void ScanWizardScanner::Teardown()
@@ -135,87 +130,68 @@ void ScanWizardScanner::Teardown()
         freeboxScanner = NULL;
     }
 #endif
+
+    if (popupProgress)
+    {
+        delete popupProgress; // TODO we should use deleteLater...
+        popupProgress = NULL;
+    }
 }
 
 void ScanWizardScanner::customEvent(QCustomEvent *e)
 {
     ScannerEvent *scanEvent = (ScannerEvent*) e;
-
-    switch (scanEvent->eventType())
+    if ((popupProgress == NULL) &&
+        (scanEvent->eventType() != ScannerEvent::Update))
     {
-        case ScannerEvent::ScanComplete:
-        {
-            QMutexLocker locker(&popupLock);
-            if (popupProgress)
-            {
-                popupProgress->SetScanProgress(1.0);
-                popupProgress->accept();
-            }
-        }
-        break;
-
-        case ScannerEvent::ScanShutdown:
-        {
-            Teardown();
-        }
-        break;
-
-        case ScannerEvent::AppendTextToLog:
-        {
-            log->updateText(scanEvent->strValue());
-        }
-        break;
-
-        default:
-            break;
+        return;
     }
 
-    QMutexLocker locker(&popupLock);
-    if (!popupProgress)
-        return;
-
     switch (scanEvent->eventType())
     {
-        case ScannerEvent::SetStatusText:
-            popupProgress->SetStatusText(scanEvent->strValue());
+        case ScannerEvent::ServiceScanComplete:
+            popupProgress->progress(PROGRESS_MAX);
+            Teardown();
             break;
-        case ScannerEvent::SetStatusTitleText:
-            popupProgress->SetStatusTitleText(scanEvent->strValue());
+        case ScannerEvent::Update:
+            log->updateText(scanEvent->strValue());
             break;
-        case ScannerEvent::SetPercentComplete:
-            popupProgress->SetScanProgress(scanEvent->intValue() * 0.01);
+        case ScannerEvent::TableLoaded:
+            popupProgress->incrementProgress();
             break;
-        case ScannerEvent::SetStatusSignalLock:
-            popupProgress->SetStatusLock(scanEvent->intValue());
+        case ScannerEvent::ServicePct:
+            popupProgress->progress(
+                (scanEvent->intValue() * PROGRESS_MAX) / 100);
             break;
-        case ScannerEvent::SetStatusSignalToNoise:
-            popupProgress->SetStatusSignalToNoise(scanEvent->intValue());
+        case ScannerEvent::DVBLock:
+            popupProgress->dvbLock(scanEvent->intValue());
             break;
-        case ScannerEvent::SetStatusSignalStrength:
-            popupProgress->SetStatusSignalStrength(scanEvent->intValue());
+        case ScannerEvent::DVBSNR:
+            popupProgress->signalToNoise(scanEvent->intValue());
             break;
-        default:
+        case ScannerEvent::DVBSignalStrength:
+            popupProgress->signalStrength(scanEvent->intValue());
             break;
     }
 }
 
 void ScanWizardScanner::scanComplete()
 {
-    ScannerEvent::TYPE se = ScannerEvent::ScanComplete;
+    ScannerEvent::TYPE se = ScannerEvent::ServiceScanComplete;
     QApplication::postEvent(this, new ScannerEvent(se));
 }
 
 void ScanWizardScanner::transportScanComplete()
 {
     scanner->ScanServicesSourceID(nVideoSource);
-    ScannerEvent* e = new ScannerEvent(ScannerEvent::SetPercentComplete);
+    ScannerEvent* e = new ScannerEvent(ScannerEvent::ServicePct);
     e->intValue(TRANSPORT_PCT);
     QApplication::postEvent(this, e);
 }
 
 void ScanWizardScanner::serviceScanPctComplete(int pct)
 {
-    ScannerEvent* e = new ScannerEvent(ScannerEvent::SetPercentComplete);
+    ScannerEvent* e = new ScannerEvent(ScannerEvent::ServicePct);
     int tmp = TRANSPORT_PCT + ((100 - TRANSPORT_PCT) * pct)/100;
     e->intValue(tmp);
     QApplication::postEvent(this, e);
@@ -225,20 +201,17 @@ void ScanWizardScanner::updateText(const QString &str)
 {
     if (str.isEmpty())
         return;
-    ScannerEvent* e = new ScannerEvent(ScannerEvent::AppendTextToLog);
+    ScannerEvent* e = new ScannerEvent(ScannerEvent::Update);
     e->strValue(str);
     QApplication::postEvent(this, e);
 }
 
 void ScanWizardScanner::updateStatusText(const QString &str)
 {
-    QString msg = tr("Scanning");
-    if (!str.isEmpty())
-        msg = QString("%1 %2").arg(msg).arg(str);
-
-    ScannerEvent* e = new ScannerEvent(ScannerEvent::SetStatusText);
-    e->strValue(msg);
-    QApplication::postEvent(this, e);
+    if (str.isEmpty())
+        return;
+    if (popupProgress)
+        popupProgress->status(tr("Scanning")+" "+str);
 }
 
 void ScanWizardScanner::dvbLock(const SignalMonitorValue &val)
@@ -258,21 +231,21 @@ void ScanWizardScanner::dvbSignalStrength(const SignalMonitorValue &val)
 
 void ScanWizardScanner::dvbLock(int locked)
 {
-    ScannerEvent* e = new ScannerEvent(ScannerEvent::SetStatusSignalLock);
+    ScannerEvent* e = new ScannerEvent(ScannerEvent::DVBLock);
     e->intValue(locked);
     QApplication::postEvent(this, e);
 }
 
 void ScanWizardScanner::dvbSNR(int i)
 {
-    ScannerEvent* e = new ScannerEvent(ScannerEvent::SetStatusSignalToNoise);
+    ScannerEvent* e = new ScannerEvent(ScannerEvent::DVBSNR);
     e->intValue(i);
     QApplication::postEvent(this, e);
 }
 
 void ScanWizardScanner::dvbSignalStrength(int i)
 {
-    ScannerEvent* e = new ScannerEvent(ScannerEvent::SetStatusSignalStrength);
+    ScannerEvent* e = new ScannerEvent(ScannerEvent::DVBSignalStrength);
     e->intValue(i);
     QApplication::postEvent(this, e);
 }
@@ -310,7 +283,9 @@ void ScanWizardScanner::Scan(
     }
 
     scanner->StartScanner();
-    updateStatusText("");
+
+    popupProgress->status(tr("Scanning"));
+    popupProgress->progress( (TUNED_PCT * PROGRESS_MAX) / 100 );
 
     bool ok = false;
 
@@ -379,7 +354,8 @@ void ScanWizardScanner::Scan(
         ok = scanner->ScanServicesSourceID(sourceid);
         if (ok)
         {
-            serviceScanPctComplete(0);
+            post_event(this, ScannerEvent::ServicePct,
+                       TRANSPORT_PCT);
         }
         else
         {
@@ -414,7 +390,8 @@ void ScanWizardScanner::Scan(
         }
         if (ok)
         {
-            serviceScanPctComplete(0);
+            post_event(this, ScannerEvent::ServicePct,
+                       TRANSPORT_PCT);
         }
         else
         {
@@ -582,10 +559,8 @@ void ScanWizardScanner::PreScanCommon(int scantype,
                 SLOT(  dvbSignalStrength(   const SignalMonitorValue&)));
     }
 
-    DVBSignalMonitor *dvbm = NULL;
-
 #ifdef USING_DVB
-    dvbm = scanner->GetDVBSignalMonitor();
+    DVBSignalMonitor *dvbm = scanner->GetDVBSignalMonitor();
     if (dvbm)
     {
         connect(dvbm,
@@ -595,7 +570,9 @@ void ScanWizardScanner::PreScanCommon(int scantype,
     }
 #endif // USING_DVB
 
-    MonitorProgress(monitor, monitor, dvbm);
+    popupProgress = new ScanProgressPopup(this);
+    popupProgress->progress(0);
+    popupProgress->exec(this);
 }
 
 void ScanWizardScanner::ImportM3U(uint cardid, const QString &inputname,
@@ -608,6 +585,7 @@ void ScanWizardScanner::ImportM3U(uint cardid, const QString &inputname,
 #ifdef USING_IPTV
     //Create an analog scan object
     freeboxScanner = new IPTVChannelFetcher(cardid, inputname, sourceid);
+    popupProgress  = new ScanProgressPopup(this, false);
 
     connect(freeboxScanner, SIGNAL(ServiceScanComplete(void)),
             this,           SLOT(  scanComplete(void)));
@@ -616,54 +594,15 @@ void ScanWizardScanner::ImportM3U(uint cardid, const QString &inputname,
     connect(freeboxScanner, SIGNAL(ServiceScanPercentComplete(int)),
             this,           SLOT(  serviceScanPctComplete(int)));
 
-    MonitorProgress(false, false, false);
+    popupProgress->progress(0);
+    popupProgress->exec(this);
 
     if (!freeboxScanner->Scan())
     {
         MythPopupBox::showOkPopup(gContext->GetMainWindow(),
                                   tr("ScanWizard"),
                                   tr("Error starting scan"));
+        Teardown();
     }
 #endif // USING_IPTV
-}
-
-void *spawn_popup(void *tmp)
-{
-    ((ScanWizardScanner*)(tmp))->RunPopup();
-    return NULL;
-}
-
-void ScanWizardScanner::RunPopup(void)
-{
-    int ret = popupProgress->exec();
-
-    popupLock.lock();
-    popupProgress->deleteLater();
-    popupProgress = NULL;
-    popupLock.unlock();
-
-    post_event(this, ScannerEvent::ScanShutdown, ret);
-}
-
-void ScanWizardScanner::StopPopup(void)
-{
-    if (popupProgress)
-    {
-        popupProgress->reject();
-        popupLock.unlock();
-        pthread_join(popup_thread, NULL);
-        popupLock.lock();
-    }
-}
-
-void ScanWizardScanner::MonitorProgress(bool lock, bool strength, bool snr)
-{
-    QMutexLocker locker(&popupLock);
-    StopPopup();
-    popupProgress = new ScanProgressPopup(lock, strength, snr);
-    if (pthread_create(&popup_thread, NULL, spawn_popup, this) != 0)
-    {
-        popupProgress->deleteLater();
-        popupProgress = NULL;
-    }
 }

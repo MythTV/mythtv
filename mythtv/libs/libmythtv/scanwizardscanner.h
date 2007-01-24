@@ -58,8 +58,6 @@ class ScanWizardScanner : public VerticalConfigurationGroup
 {
     Q_OBJECT
 
-    friend void *spawn_popup(void*);
-
   public:
     ScanWizardScanner(void);
     virtual void deleteLater(void)
@@ -98,7 +96,7 @@ class ScanWizardScanner : public VerticalConfigurationGroup
     void serviceScanPctComplete(int pct);
 
   protected:
-    ~ScanWizardScanner();
+    ~ScanWizardScanner() { Teardown(); }
     void Teardown(void);
 
     void PreScanCommon(int scantype, uint parent_cardid, uint child_cardid,
@@ -110,25 +108,23 @@ class ScanWizardScanner : public VerticalConfigurationGroup
     void dvbSignalStrength(int);
     void customEvent(QCustomEvent *e);
 
-    void MonitorProgress(bool lock, bool strength, bool snr);
-    void RunPopup(void);
-    void StopPopup(void);
-
   public:
     static QString kTitle;
 
   private:
     LogList           *log;
     ChannelBase       *channel;
+    ScanProgressPopup *popupProgress;
 
-    ScanProgressPopup  *popupProgress;
-    pthread_t           popup_thread;
-    mutable QMutex      popupLock;
-
-    SIScan             *scanner;
+    SIScan            *scanner;
+    AnalogScan        *analogScanner;
     IPTVChannelFetcher *freeboxScanner;
 
     uint               nVideoSource;
+
+    // tranport info
+    uint               frequency;
+    QString            modulation;
 
     // dvb-utils imported channels
     DTVChannelList channels;

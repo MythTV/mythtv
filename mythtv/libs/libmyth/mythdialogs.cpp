@@ -447,18 +447,6 @@ void MythPopupBox::keyPressEvent(QKeyEvent *e)
         MythDialog::keyPressEvent(e);
 }
 
-void MythPopupBox::accept(void)
-{
-    MythDialog::done(Accepted);
-    emit popupDone();
-}
-
-void MythPopupBox::reject(void)
-{
-    MythDialog::done(Rejected);
-    emit popupDone();
-}
-
 int MythPopupBox::ExecPopup(QObject *target, const char *slot)
 {
     if (!target)
