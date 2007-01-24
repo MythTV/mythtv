@@ -449,7 +449,7 @@ first_minimum(const unsigned short *matches, long long nframes)
      */
     static const float  LEFTWIDTH  = 0.04;
     static const float  RIGHTWIDTH = 0.08;
-    static const float  MATCHSTART = 0.05;
+    static const float  MATCHSTART = 0.13;
     static const float  MATCHEND = 0.95;
 
     unsigned short      matchrange, leftwidth, rightwidth, matchstart, matchend;
@@ -475,9 +475,6 @@ first_minimum(const unsigned short *matches, long long nframes)
     matchstart = minmatch + (unsigned short)(MATCHSTART * matchrange) +
         leftwidth;
     matchend = minmatch + (unsigned short)(MATCHEND * matchrange) - rightwidth;
-    VERBOSE(VB_COMMFLAG, QString("first_minimum considering %1-%2;"
-                " leftwidth=%3 rightwidth=%4")
-            .arg(matchstart).arg(matchend).arg(leftwidth).arg(rightwidth));
 
     found_leftmode = 0;
     for (matchcnt = matchstart; matchcnt <  matchend; matchcnt++)
@@ -496,6 +493,12 @@ first_minimum(const unsigned short *matches, long long nframes)
             found_leftmode = 1;
         }
     }
+
+    VERBOSE(VB_COMMFLAG, QString("first_minimum considering %1-%2;"
+                " minmatch=%3 maxmatch=%4 leftwidth=%5 rightwidth=%6"
+                " found_leftmode=%7 matchcnt=%8")
+            .arg(matchstart).arg(matchend).arg(minmatch).arg(maxmatch)
+            .arg(leftwidth).arg(rightwidth).arg(found_leftmode).arg(matchcnt));
 
     delete []freq;
     delete []sorted;
