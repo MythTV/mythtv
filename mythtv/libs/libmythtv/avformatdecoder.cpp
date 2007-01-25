@@ -3098,7 +3098,7 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
                     GetNVP()->AddAudioData((char *)audioSamples, data_size,
                                            temppts);
 
-                    if (ringBuffer->isDVD())
+                    if (ringBuffer->InDVDMenuOrStillFrame())
                         allowedquit = true;
 
                     break;

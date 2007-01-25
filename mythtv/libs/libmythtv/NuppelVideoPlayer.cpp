@@ -1128,7 +1128,7 @@ VideoFrame *NuppelVideoPlayer::GetNextVideoFrame(bool allow_unsafe)
 void NuppelVideoPlayer::ReleaseNextVideoFrame(VideoFrame *buffer,
                                               long long timecode)
 {
-    if (!ringBuffer->isDVD())
+    if (!ringBuffer->InDVDMenuOrStillFrame())
         WrapTimecode(timecode, TC_VIDEO);
     buffer->timecode = timecode;
 
@@ -3545,7 +3545,7 @@ void NuppelVideoPlayer::WrapTimecode(long long &timecode, TCTypes tc_type)
  */
 void NuppelVideoPlayer::AddAudioData(char *buffer, int len, long long timecode)
 {
-    if (!ringBuffer->isDVD())
+    if (!ringBuffer->InDVDMenuOrStillFrame())
         WrapTimecode(timecode, TC_AUDIO);
 
     int samplesize = (audio_channels * audio_bits) / 8; // bytes per sample
