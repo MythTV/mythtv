@@ -47,3 +47,6 @@
 # NOTE: If you are running as non-root take care to ensure the myth user
 # has permission to write to this log file.
 # MBE_LOGFILE="/var/tmp/mythbackend.log"
+
+# Startup options for mythbackend (see 'mythbackend --help' for a list)
+# MBE_OPTIONS=""

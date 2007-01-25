@@ -36,6 +36,8 @@ MBE_LOCATION="/usr/local/bin/"
 MBE_PROG="mythbackend"
 # Full path to mythbackend log file
 MBE_LOGFILE="/var/tmp/mythbackend.log"
+# Startup options for mythbackend 
+MBE_OPTIONS=""
 
 # Source function library.
 . /etc/init.d/functions
@@ -58,7 +60,8 @@ start() {
 	if [ ! -f /var/lock/subsys/${MBE_PROG} ]; then
 	    echo -n "Starting ${MBE_PROG}: "
 	    # /usr/local/bin/mythbackend -d -l /some/log/file
-	    daemon --user ${MBE_USER} ${MBE_LOCATION}${MBE_PROG} -d -l ${MBE_LOGFILE}
+	    daemon --user ${MBE_USER} ${MBE_LOCATION}${MBE_PROG} \
+                                      -d -l ${MBE_LOGFILE} ${MBE_OPTIONS}
 	    RETVAL=$?
 	    [ $RETVAL -eq 0 ] && touch /var/lock/subsys/${MBE_PROG}
 	    echo
