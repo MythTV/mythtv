@@ -109,6 +109,10 @@ sub recordedmarkup($)
 			$type{$frameno} = $type == 4 ? 0 : 1;
 		}
 		$sth->finish() or die "Finish \"$sql\": $sth->errstr\n";
+		my @framenos = sort { $a <=> $b } keys %type;
+		if ($framenos[0] != 0) {
+			$type{0} = 1 - $type{$framenos[0]};
+		}
 		\%type;
 	}
 
