@@ -2,18 +2,20 @@
  * Unbuffered io for ffmpeg system
  * Copyright (c) 2001 Fabrice Bellard
  *
- * This library is free software; you can redistribute it and/or
+ * This file is part of FFmpeg.
+ *
+ * FFmpeg is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
- * version 2 of the License, or (at your option) any later version.
+ * version 2.1 of the License, or (at your option) any later version.
  *
- * This library is distributed in the hope that it will be useful,
+ * FFmpeg is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
+ * License along with FFmpeg; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 #include "avformat.h"
@@ -68,11 +70,14 @@ int url_open(URLContext **puc, const char *filename, int flags)
     err = -ENOENT;
     goto fail;
  found:
-    uc = av_malloc(sizeof(URLContext) + strlen(filename));
+    uc = av_malloc(sizeof(URLContext) + strlen(filename) + 1);
     if (!uc) {
         err = -ENOMEM;
         goto fail;
     }
+#if LIBAVFORMAT_VERSION_INT >= (52<<16)
+    uc->filename = (char *) &uc[1];
+#endif
     strcpy(uc->filename, filename);
     uc->prot = up;
     uc->flags = flags;
@@ -146,9 +151,12 @@ offset_t url_filesize(URLContext *h)
 {
     offset_t pos, size;
 
-    pos = url_seek(h, 0, SEEK_CUR);
-    size = url_seek(h, -1, SEEK_END)+1;
-    url_seek(h, pos, SEEK_SET);
+    size= url_seek(h, 0, AVSEEK_SIZE);
+    if(size<0){
+        pos = url_seek(h, 0, SEEK_CUR);
+        size = url_seek(h, -1, SEEK_END)+1;
+        url_seek(h, pos, SEEK_SET);
+    }
     return size;
 }
 

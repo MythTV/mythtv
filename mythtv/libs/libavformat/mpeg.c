@@ -1,19 +1,21 @@
 /*
- * MPEG1/2 mux/demux
+ * MPEG1/2 muxer and demuxer
  * Copyright (c) 2000, 2001, 2002 Fabrice Bellard.
  *
- * This library is free software; you can redistribute it and/or
+ * This file is part of FFmpeg.
+ *
+ * FFmpeg is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
- * version 2 of the License, or (at your option) any later version.
+ * version 2.1 of the License, or (at your option) any later version.
  *
- * This library is distributed in the hope that it will be useful,
+ * FFmpeg is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
+ * License along with FFmpeg; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 #include "avformat.h"
@@ -1303,7 +1305,7 @@ static int mpegps_probe(AVProbeData *p)
 }
 
 typedef struct MpegDemuxContext {
-    int header_state;
+    int32_t header_state;
     unsigned char psm_es_type[256];
 } MpegDemuxContext;
 
@@ -1334,7 +1336,7 @@ static int64_t get_pts(ByteIOContext *pb, int c)
 }
 
 static int find_next_start_code(ByteIOContext *pb, int *size_ptr,
-                                uint32_t *header_state)
+                                int32_t *header_state)
 {
     unsigned int state, v;
     int val, n;
@@ -1438,15 +1440,18 @@ static int mpegps_read_pes_header(AVFormatContext *s,
 {
     MpegDemuxContext *m = s->priv_data;
     int len, size, startcode, c, flags, header_len;
-    int64_t pts, dts, last_pos;
+    int64_t pts, dts;
+    int64_t last_sync= url_ftell(&s->pb);
 
-    last_pos = -1;
+ error_redo:
+        url_fseek(&s->pb, last_sync, SEEK_SET);
  redo:
         /* next start code (should be immediately after) */
         m->header_state = 0xff;
         size = MAX_SYNC_SIZE;
         startcode = find_next_start_code(&s->pb, &size, &m->header_state);
-    //printf("startcode=%x pos=0x%Lx\n", startcode, url_ftell(&s->pb));
+        last_sync = url_ftell(&s->pb);
+    //printf("startcode=%x pos=0x%"PRIx64"\n", startcode, url_ftell(&s->pb));
     if (startcode < 0)
         return AVERROR_IO;
     if (startcode == PACK_START_CODE)
@@ -1474,12 +1479,12 @@ static int mpegps_read_pes_header(AVFormatContext *s,
         *ppos = url_ftell(&s->pb) - 4;
     }
     len = get_be16(&s->pb);
-    pts = AV_NOPTS_VALUE;
+    pts =
     dts = AV_NOPTS_VALUE;
     /* stuffing */
     for(;;) {
         if (len < 1)
-            goto redo;
+            goto error_redo;
         c = get_byte(&s->pb);
         len--;
         /* XXX: for mpeg1, should test only bit 7 */
@@ -1488,23 +1493,17 @@ static int mpegps_read_pes_header(AVFormatContext *s,
     }
     if ((c & 0xc0) == 0x40) {
         /* buffer scale & size */
-        if (len < 2)
-            goto redo;
         get_byte(&s->pb);
         c = get_byte(&s->pb);
         len -= 2;
     }
-    if ((c & 0xf0) == 0x20) {
-        if (len < 4)
-            goto redo;
+    if ((c & 0xe0) == 0x20) {
         dts = pts = get_pts(&s->pb, c);
         len -= 4;
-    } else if ((c & 0xf0) == 0x30) {
-        if (len < 9)
-            goto redo;
-        pts = get_pts(&s->pb, c);
-        dts = get_pts(&s->pb, -1);
-        len -= 9;
+        if (c & 0x10){
+            dts = get_pts(&s->pb, -1);
+            len -= 5;
+        }
     } else if ((c & 0xc0) == 0x80) {
         /* mpeg 2 PES */
 #if 0 /* some streams have this field set for no apparent reason */
@@ -1517,45 +1516,36 @@ static int mpegps_read_pes_header(AVFormatContext *s,
         header_len = get_byte(&s->pb);
         len -= 2;
         if (header_len > len)
-            goto redo;
-        if ((flags & 0xc0) == 0x80) {
-            dts = pts = get_pts(&s->pb, -1);
-            if (header_len < 5)
-                goto redo;
-            header_len -= 5;
-            len -= 5;
-        } if ((flags & 0xc0) == 0xc0) {
-            pts = get_pts(&s->pb, -1);
-            dts = get_pts(&s->pb, -1);
-            if (header_len < 10)
-                goto redo;
-            header_len -= 10;
-            len -= 10;
-        }
+            goto error_redo;
         len -= header_len;
-        while (header_len > 0) {
-            get_byte(&s->pb);
-            header_len--;
+        if (flags & 0x80) {
+            dts = pts = get_pts(&s->pb, -1);
+            header_len -= 5;
+            if (flags & 0x40) {
+                dts = get_pts(&s->pb, -1);
+                header_len -= 5;
+            }
         }
+        if(header_len < 0)
+            goto error_redo;
+        url_fskip(&s->pb, header_len);
     }
     else if( c!= 0xf )
         goto redo;
 
     if (startcode == PRIVATE_STREAM_1 && !m->psm_es_type[startcode & 0xff]) {
-        if (len < 1)
-            goto redo;
         startcode = get_byte(&s->pb);
         len--;
         if (startcode >= 0x80 && startcode <= 0xbf) {
             /* audio: skip header */
-            if (len < 3)
-                goto redo;
             get_byte(&s->pb);
             get_byte(&s->pb);
             get_byte(&s->pb);
             len -= 3;
         }
     }
+    if(len<0)
+        goto error_redo;
     if(dts != AV_NOPTS_VALUE && ppos && s->build_index){
         int i;
         for(i=0; i<s->nb_streams; i++){
@@ -1712,7 +1702,7 @@ static int64_t mpegps_read_dts(AVFormatContext *s, int stream_index,
 
     pos = *ppos;
 #ifdef DEBUG_SEEK
-    printf("read_dts: pos=0x%llx next=%d -> ", pos, find_next);
+    printf("read_dts: pos=0x%"PRIx64" next=%d -> ", pos, find_next);
 #endif
     url_fseek(&s->pb, pos, SEEK_SET);
     for(;;) {
@@ -1730,7 +1720,7 @@ static int64_t mpegps_read_dts(AVFormatContext *s, int stream_index,
         url_fskip(&s->pb, len);
     }
 #ifdef DEBUG_SEEK
-    printf("pos=0x%llx dts=0x%llx %0.3f\n", pos, dts, dts / 90000.0);
+    printf("pos=0x%"PRIx64" dts=0x%"PRIx64" %0.3f\n", pos, dts, dts / 90000.0);
 #endif
     *ppos = pos;
     return dts;

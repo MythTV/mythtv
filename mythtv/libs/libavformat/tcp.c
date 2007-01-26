@@ -2,18 +2,20 @@
  * TCP protocol
  * Copyright (c) 2002 Fabrice Bellard.
  *
- * This library is free software; you can redistribute it and/or
+ * This file is part of FFmpeg.
+ *
+ * FFmpeg is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
- * version 2 of the License, or (at your option) any later version.
+ * version 2.1 of the License, or (at your option) any later version.
  *
- * This library is distributed in the hope that it will be useful,
+ * FFmpeg is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
+ * License along with FFmpeg; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 #include "avformat.h"
@@ -21,14 +23,7 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
-#if defined(__BEOS__) || defined(__INNOTEK_LIBC__)
-typedef int socklen_t;
-#endif
-#ifndef __BEOS__
-# include <arpa/inet.h>
-#else
-# include "barpainet.h"
-#endif
+#include <arpa/inet.h>
 #include <netdb.h>
 #include <sys/time.h>
 #include <fcntl.h>
@@ -125,7 +120,7 @@ static int tcp_open(URLContext *h, const char *uri, int flags)
     ret = AVERROR_IO;
  fail1:
     if (fd >= 0)
-        close(fd);
+        closesocket(fd);
     av_free(s);
     return ret;
 }
@@ -147,11 +142,7 @@ static int tcp_read(URLContext *h, uint8_t *buf, int size)
         tv.tv_usec = 100 * 1000;
         ret = select(fd_max + 1, &rfds, NULL, NULL, &tv);
         if (ret > 0 && FD_ISSET(s->fd, &rfds)) {
-#ifdef __BEOS__
             len = recv(s->fd, buf, size, 0);
-#else
-            len = read(s->fd, buf, size);
-#endif
             if (len < 0) {
                 if (errno != EINTR && errno != EAGAIN)
 #ifdef __BEOS__
@@ -184,11 +175,7 @@ static int tcp_write(URLContext *h, uint8_t *buf, int size)
         tv.tv_usec = 100 * 1000;
         ret = select(fd_max + 1, NULL, &wfds, NULL, &tv);
         if (ret > 0 && FD_ISSET(s->fd, &wfds)) {
-#ifdef __BEOS__
             len = send(s->fd, buf, size, 0);
-#else
-            len = write(s->fd, buf, size);
-#endif
             if (len < 0) {
                 if (errno != EINTR && errno != EAGAIN) {
 #ifdef __BEOS__
@@ -211,11 +198,7 @@ static int tcp_write(URLContext *h, uint8_t *buf, int size)
 static int tcp_close(URLContext *h)
 {
     TCPContext *s = h->priv_data;
-#ifdef CONFIG_BEOS_NETSERVER
     closesocket(s->fd);
-#else
-    close(s->fd);
-#endif
     av_free(s);
     return 0;
 }

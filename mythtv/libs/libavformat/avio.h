@@ -2,18 +2,20 @@
  * unbuffered io for ffmpeg system
  * copyright (c) 2001 Fabrice Bellard
  *
- * This library is free software; you can redistribute it and/or
+ * This file is part of FFmpeg.
+ *
+ * FFmpeg is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
- * version 2 of the License, or (at your option) any later version.
+ * version 2.1 of the License, or (at your option) any later version.
  *
- * This library is distributed in the hope that it will be useful,
+ * FFmpeg is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
+ * License along with FFmpeg; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 #ifndef AVIO_H
@@ -31,7 +33,11 @@ struct URLContext {
     int is_streamed;  /* true if streamed (no seek possible), default = false */
     int max_packet_size;  /* if non zero, the stream is packetized with this max packet size */
     void *priv_data;
+#if LIBAVFORMAT_VERSION_INT >= (52<<16)
+    char *filename; /* specified filename */
+#else
     char filename[1]; /* specified filename */
+#endif
 };
 
 typedef struct URLContext URLContext;
@@ -66,6 +72,13 @@ void url_set_interrupt_cb(URLInterruptCB *interrupt_cb);
 
 /* not implemented */
 int url_poll(URLPollEntry *poll_table, int n, int timeout);
+
+/**
+ * passing this as the "whence" parameter to a seek function causes it to
+ * return the filesize without seeking anywhere, supporting this is optional
+ * if its not supprted then the seek function will return <0
+ */
+#define AVSEEK_SIZE 0x10000
 
 typedef struct URLProtocol {
     const char *name;

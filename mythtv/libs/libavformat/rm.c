@@ -1,19 +1,21 @@
 /*
- * "Real" compatible mux and demux.
+ * "Real" compatible muxer and demuxer.
  * Copyright (c) 2000, 2001 Fabrice Bellard.
  *
- * This library is free software; you can redistribute it and/or
+ * This file is part of FFmpeg.
+ *
+ * FFmpeg is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
- * version 2 of the License, or (at your option) any later version.
+ * version 2.1 of the License, or (at your option) any later version.
  *
- * This library is distributed in the hope that it will be useful,
+ * FFmpeg is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
+ * License along with FFmpeg; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 #include "avformat.h"
@@ -545,8 +547,8 @@ static int rm_read_audio_stream_info(AVFormatContext *s, AVStream *st,
             buf[3] = get_byte(pb);
             buf[4] = 0;
         } else {
-        get_str8(pb, buf, sizeof(buf)); /* desc */
-        get_str8(pb, buf, sizeof(buf)); /* desc */
+            get_str8(pb, buf, sizeof(buf)); /* desc */
+            get_str8(pb, buf, sizeof(buf)); /* desc */
         }
         st->codec->codec_type = CODEC_TYPE_AUDIO;
         if (!strcmp(buf, "dnet")) {
@@ -645,7 +647,7 @@ static int rm_read_header(AVFormatContext *s, AVFormatParameters *ap)
     unsigned int tag, v;
     int tag_size, size, codec_data_size, i;
     int64_t codec_pos;
-    unsigned int h263_hack_version, start_time, duration;
+    unsigned int start_time, duration;
     char buf[128];
     int flags = 0;
 
@@ -761,14 +763,7 @@ static int rm_read_header(AVFormatContext *s, AVFormatParameters *ap)
 
 //                av_log(NULL, AV_LOG_DEBUG, "fps= %d fps2= %d\n", fps, fps2);
                 st->codec->time_base.den = fps * st->codec->time_base.num;
-                /* modification of h263 codec version (!) */
-#ifdef WORDS_BIGENDIAN
-                h263_hack_version = ((uint32_t*)st->codec->extradata)[1];
-#else
-                h263_hack_version = bswap_32(((uint32_t*)st->codec->extradata)[1]);
-#endif
-                st->codec->sub_id = h263_hack_version;
-                switch((h263_hack_version>>28)){
+                switch(((uint8_t*)st->codec->extradata)[4]>>4){
                 case 1: st->codec->codec_id = CODEC_ID_RV10; break;
                 case 2: st->codec->codec_id = CODEC_ID_RV20; break;
                 case 3: st->codec->codec_id = CODEC_ID_RV30; break;
@@ -1027,7 +1022,7 @@ resync:
         if (st->codec->codec_type == CODEC_TYPE_VIDEO) {
             if(st->codec->codec_id == CODEC_ID_RV20){
                 int seq= 128*(pkt->data[2]&0x7F) + (pkt->data[3]>>1);
-                av_log(NULL, AV_LOG_DEBUG, "%d %Ld %d\n", timestamp, timestamp*512LL/25, seq);
+                av_log(NULL, AV_LOG_DEBUG, "%d %"PRId64" %d\n", timestamp, timestamp*512LL/25, seq);
 
                 seq |= (timestamp&~0x3FFF);
                 if(seq - timestamp >  0x2000) seq -= 0x4000;
@@ -1110,7 +1105,7 @@ static int64_t rm_read_dts(AVFormatContext *s, int stream_index,
         }
 
         if((flags&2) && (seq&0x7F) == 1){
-//            av_log(s, AV_LOG_DEBUG, "%d %d-%d %Ld %d\n", flags, stream_index2, stream_index, dts, seq);
+//            av_log(s, AV_LOG_DEBUG, "%d %d-%d %"PRId64" %d\n", flags, stream_index2, stream_index, dts, seq);
             av_add_index_entry(st, pos, dts, 0, 0, AVINDEX_KEYFRAME);
             if(stream_index2 == stream_index)
                 break;

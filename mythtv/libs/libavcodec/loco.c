@@ -2,18 +2,20 @@
  * LOCO codec
  * Copyright (c) 2005 Konstantin Shishkov
  *
- * This library is free software; you can redistribute it and/or
+ * This file is part of FFmpeg.
+ *
+ * FFmpeg is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
- * version 2 of the License, or (at your option) any later version.
+ * version 2.1 of the License, or (at your option) any later version.
  *
- * This library is distributed in the hope that it will be useful,
+ * FFmpeg is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
+ * License along with FFmpeg; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  *
  */
@@ -235,20 +237,20 @@ static int decode_init(AVCodecContext *avctx){
                avctx->extradata_size);
         return -1;
     }
-    version = LE_32(avctx->extradata);
+    version = AV_RL32(avctx->extradata);
     switch(version) {
     case 1:
         l->lossy = 0;
         break;
     case 2:
-        l->lossy = LE_32(avctx->extradata + 8);
+        l->lossy = AV_RL32(avctx->extradata + 8);
         break;
     default:
-        l->lossy = LE_32(avctx->extradata + 8);
+        l->lossy = AV_RL32(avctx->extradata + 8);
         av_log(avctx, AV_LOG_INFO, "This is LOCO codec version %i, please upload file for study\n", version);
     }
 
-    l->mode = LE_32(avctx->extradata + 4);
+    l->mode = AV_RL32(avctx->extradata + 4);
     switch(l->mode) {
     case LOCO_CYUY2: case LOCO_YUY2: case LOCO_UYVY:
         avctx->pix_fmt = PIX_FMT_YUV422P;

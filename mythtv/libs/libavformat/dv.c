@@ -11,18 +11,20 @@
  * 50 Mbps (DVCPRO50) support
  * Copyright (c) 2006 Daniel Maas <dmaas@maasdigital.com>
  *
- * This library is free software; you can redistribute it and/or
+ * This file is part of FFmpeg.
+ *
+ * FFmpeg is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
- * version 2 of the License, or (at your option) any later version.
+ * version 2.1 of the License, or (at your option) any later version.
  *
- * This library is distributed in the hope that it will be useful,
+ * FFmpeg is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
+ * License along with FFmpeg; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 #include <time.h>
@@ -356,8 +358,13 @@ static int64_t dv_frame_offset(AVFormatContext *s, DVDemuxContext *c,
     return offset;
 }
 
-void dv_flush_audio_packets(DVDemuxContext *c)
+void dv_offset_reset(DVDemuxContext *c, int64_t frame_offset)
 {
+    c->frames= frame_offset;
+    if (c->ach)
+        c->abytes= av_rescale(c->frames,
+                          c->ast[0]->codec->bit_rate * (int64_t)c->sys->frame_rate_base,
+                          8*c->sys->frame_rate);
     c->audio_pkt[0].size = c->audio_pkt[1].size = 0;
 }
 
@@ -417,13 +424,8 @@ static int dv_read_seek(AVFormatContext *s, int stream_index,
     DVDemuxContext *c = r->dv_demux;
     int64_t offset= dv_frame_offset(s, c, timestamp, flags);
 
-    c->frames= offset / c->sys->frame_size;
-    if (c->ach)
-        c->abytes= av_rescale(c->frames,
-                          c->ast[0]->codec->bit_rate * (int64_t)c->sys->frame_rate_base,
-                          8*c->sys->frame_rate);
+    dv_offset_reset(c, offset / c->sys->frame_size);
 
-    dv_flush_audio_packets(c);
     return url_fseek(&s->pb, offset, SEEK_SET);
 }
 

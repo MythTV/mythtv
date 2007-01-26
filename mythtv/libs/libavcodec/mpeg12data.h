@@ -3,18 +3,20 @@
  * copyright (c) 2000,2001 Fabrice Bellard
  * copyright (c) 2002-2004 Michael Niedermayer <michaelni@gmx.at>
  *
- * This library is free software; you can redistribute it and/or
+ * This file is part of FFmpeg.
+ *
+ * FFmpeg is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
- * version 2 of the License, or (at your option) any later version.
+ * version 2.1 of the License, or (at your option) any later version.
  *
- * This library is distributed in the hope that it will be useful,
+ * FFmpeg is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
+ * License along with FFmpeg; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
@@ -23,7 +25,7 @@
  * MPEG1/2 tables.
  */
 
-const int16_t ff_mpeg1_default_intra_matrix[64] = {
+const uint16_t ff_mpeg1_default_intra_matrix[64] = {
         8, 16, 19, 22, 26, 27, 29, 34,
         16, 16, 22, 24, 27, 29, 34, 37,
         19, 22, 26, 27, 29, 34, 34, 38,
@@ -34,7 +36,7 @@ const int16_t ff_mpeg1_default_intra_matrix[64] = {
         27, 29, 35, 38, 46, 56, 69, 83
 };
 
-const int16_t ff_mpeg1_default_non_intra_matrix[64] = {
+const uint16_t ff_mpeg1_default_non_intra_matrix[64] = {
     16, 16, 16, 16, 16, 16, 16, 16,
     16, 16, 16, 16, 16, 16, 16, 16,
     16, 16, 16, 16, 16, 16, 16, 16,
@@ -52,10 +54,10 @@ static const unsigned char vlc_dc_lum_bits[12] = {
     3, 2, 2, 3, 3, 4, 5, 6, 7, 8, 9, 9,
 };
 
-const uint16_t vlc_dc_chroma_code[12] = {
+static const uint16_t vlc_dc_chroma_code[12] = {
     0x0, 0x1, 0x2, 0x6, 0xe, 0x1e, 0x3e, 0x7e, 0xfe, 0x1fe, 0x3fe, 0x3ff,
 };
-const unsigned char vlc_dc_chroma_bits[12] = {
+static const unsigned char vlc_dc_chroma_bits[12] = {
     2, 2, 2, 3, 4, 5, 6, 7, 8, 9, 10, 10,
 };
 

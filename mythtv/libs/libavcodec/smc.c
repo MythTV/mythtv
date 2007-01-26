@@ -2,18 +2,20 @@
  * Quicktime Graphics (SMC) Video Decoder
  * Copyright (C) 2003 the ffmpeg project
  *
- * This library is free software; you can redistribute it and/or
+ * This file is part of FFmpeg.
+ *
+ * FFmpeg is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
- * version 2 of the License, or (at your option) any later version.
+ * version 2.1 of the License, or (at your option) any later version.
  *
- * This library is distributed in the hope that it will be useful,
+ * FFmpeg is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
+ * License along with FFmpeg; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  *
  */
@@ -118,7 +120,7 @@ static void smc_decode_stream(SmcContext *s)
         s->avctx->palctrl->palette_changed = 0;
     }
 
-    chunk_size = BE_32(&s->buf[stream_ptr]) & 0x00FFFFFF;
+    chunk_size = AV_RB32(&s->buf[stream_ptr]) & 0x00FFFFFF;
     stream_ptr += 4;
     if (chunk_size != s->size)
         av_log(s->avctx, AV_LOG_INFO, "warning: MOV chunk size != encoded chunk size (%d != %d); using MOV chunk size\n",
@@ -276,7 +278,7 @@ static void smc_decode_stream(SmcContext *s)
                 color_table_index = CPAIR * s->buf[stream_ptr++];
 
             while (n_blocks--) {
-                color_flags = BE_16(&s->buf[stream_ptr]);
+                color_flags = AV_RB16(&s->buf[stream_ptr]);
                 stream_ptr += 2;
                 flag_mask = 0x8000;
                 block_ptr = row_ptr + pixel_ptr;
@@ -319,7 +321,7 @@ static void smc_decode_stream(SmcContext *s)
                 color_table_index = CQUAD * s->buf[stream_ptr++];
 
             while (n_blocks--) {
-                color_flags = BE_32(&s->buf[stream_ptr]);
+                color_flags = AV_RB32(&s->buf[stream_ptr]);
                 stream_ptr += 4;
                 /* flag mask actually acts as a bit shift count here */
                 flag_mask = 30;

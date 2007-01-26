@@ -2,18 +2,20 @@
  * PNG image format
  * Copyright (c) 2003 Fabrice Bellard.
  *
- * This library is free software; you can redistribute it and/or
+ * This file is part of FFmpeg.
+ *
+ * FFmpeg is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
- * version 2 of the License, or (at your option) any later version.
+ * version 2.1 of the License, or (at your option) any later version.
  *
- * This library is distributed in the hope that it will be useful,
+ * FFmpeg is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
+ * License along with FFmpeg; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 #include "avcodec.h"
@@ -23,7 +25,6 @@
  * - use filters when generating a png (better compression)
  */
 
-#ifdef CONFIG_ZLIB
 #include <zlib.h>
 
 //#define DEBUG
@@ -90,12 +91,14 @@ static unsigned int get32(uint8_t **b){
     return ((*b)[-4]<<24) + ((*b)[-3]<<16) + ((*b)[-2]<<8) + (*b)[-1];
 }
 
+#ifdef CONFIG_ENCODERS
 static void put32(uint8_t **b, unsigned int v){
     *(*b)++= v>>24;
     *(*b)++= v>>16;
     *(*b)++= v>>8;
     *(*b)++= v;
 }
+#endif
 
 static const uint8_t pngsig[8] = {137, 80, 78, 71, 13, 10, 26, 10};
 
@@ -233,6 +236,7 @@ static void png_put_interlaced_row(uint8_t *dst, int width,
     }
 }
 
+#ifdef CONFIG_ENCODERS
 static void png_get_interlaced_row(uint8_t *dst, int row_size,
                                    int bits_per_pixel, int pass,
                                    const uint8_t *src, int width)
@@ -270,6 +274,7 @@ static void png_get_interlaced_row(uint8_t *dst, int row_size,
         break;
     }
 }
+#endif
 
 /* XXX: optimize */
 /* NOTE: 'dst' can be equal to 'last' */
@@ -338,6 +343,7 @@ static void png_filter_row(uint8_t *dst, int filter_type,
     }
 }
 
+#ifdef CONFIG_ENCODERS
 static void convert_from_rgba32(uint8_t *dst, const uint8_t *src, int width)
 {
     uint8_t *d;
@@ -354,7 +360,9 @@ static void convert_from_rgba32(uint8_t *dst, const uint8_t *src, int width)
         d += 4;
     }
 }
+#endif
 
+#ifdef CONFIG_DECODERS
 static void convert_to_rgba32(uint8_t *dst, const uint8_t *src, int width)
 {
     int j;
@@ -558,6 +566,9 @@ static int decode_frame(AVCodecContext *avctx,
                 } else if (s->bit_depth == 8 &&
                            s->color_type == PNG_COLOR_TYPE_GRAY) {
                     avctx->pix_fmt = PIX_FMT_GRAY8;
+                } else if (s->bit_depth == 16 &&
+                           s->color_type == PNG_COLOR_TYPE_GRAY) {
+                    avctx->pix_fmt = PIX_FMT_GRAY16BE;
                 } else if (s->bit_depth == 1 &&
                            s->color_type == PNG_COLOR_TYPE_GRAY) {
                     avctx->pix_fmt = PIX_FMT_MONOBLACK;
@@ -684,7 +695,9 @@ static int decode_frame(AVCodecContext *avctx,
     ret = -1;
     goto the_end;
 }
+#endif
 
+#ifdef CONFIG_ENCODERS
 static void png_write_chunk(uint8_t **f, uint32_t tag,
                             const uint8_t *buf, int length)
 {
@@ -736,6 +749,7 @@ static int png_write_row(PNGContext *s, const uint8_t *data, int size)
     }
     return 0;
 }
+#endif /* CONFIG_ENCODERS */
 
 static int common_init(AVCodecContext *avctx){
     PNGContext *s = avctx->priv_data;
@@ -747,6 +761,7 @@ static int common_init(AVCodecContext *avctx){
     return 0;
 }
 
+#ifdef CONFIG_ENCODERS
 static int encode_frame(AVCodecContext *avctx, unsigned char *buf, int buf_size, void *data){
     PNGContext *s = avctx->priv_data;
     AVFrame *pict = data;
@@ -837,7 +852,7 @@ static int encode_frame(AVCodecContext *avctx, unsigned char *buf, int buf_size,
         for(i = 0; i < 256; i++) {
             v = palette[i];
             alpha = v >> 24;
-            if (alpha != 0xff)
+            if (alpha && alpha != 0xff)
                 has_alpha = 1;
             *alpha_ptr++ = alpha;
             ptr[0] = v >> 16;
@@ -920,7 +935,9 @@ static int encode_frame(AVCodecContext *avctx, unsigned char *buf, int buf_size,
     ret = -1;
     goto the_end;
 }
+#endif
 
+#ifdef CONFIG_PNG_DECODER
 AVCodec png_decoder = {
     "png",
     CODEC_TYPE_VIDEO,
@@ -933,6 +950,7 @@ AVCodec png_decoder = {
     0 /*CODEC_CAP_DR1*/ /*| CODEC_CAP_DRAW_HORIZ_BAND*/,
     NULL
 };
+#endif
 
 #ifdef CONFIG_PNG_ENCODER
 AVCodec png_encoder = {
@@ -946,4 +964,3 @@ AVCodec png_encoder = {
     .pix_fmts= (enum PixelFormat[]){PIX_FMT_RGB24, PIX_FMT_RGBA32, PIX_FMT_PAL8, PIX_FMT_GRAY8, PIX_FMT_MONOBLACK, -1},
 };
 #endif // CONFIG_PNG_ENCODER
-#endif

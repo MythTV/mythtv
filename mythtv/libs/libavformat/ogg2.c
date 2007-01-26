@@ -90,6 +90,7 @@ ogg_save (AVFormatContext * s)
     ost->pos = url_ftell (&s->pb);;
     ost->curidx = ogg->curidx;
     ost->next = ogg->state;
+    ost->nstreams = ogg->nstreams;
     memcpy(ost->streams, ogg->streams, ogg->nstreams * sizeof(*ogg->streams));
 
     for (i = 0; i < ogg->nstreams; i++){
@@ -123,8 +124,9 @@ ogg_restore (AVFormatContext * s, int discard)
 
         url_fseek (bc, ost->pos, SEEK_SET);
         ogg->curidx = ost->curidx;
-        memcpy (ogg->streams, ost->streams,
-        ogg->nstreams * sizeof (*ogg->streams));
+        ogg->nstreams = ost->nstreams;
+        memcpy(ogg->streams, ost->streams,
+               ost->nstreams * sizeof(*ogg->streams));
     }
 
     av_free (ost);
@@ -235,7 +237,7 @@ ogg_read_page (AVFormatContext * s, int *str)
     uint32_t seq;
     uint32_t crc;
     int size, idx;
-    char sync[4];
+    uint8_t sync[4];
     int sp = 0;
 
     if (get_buffer (bc, sync, 4) < 4)
@@ -307,7 +309,6 @@ ogg_read_page (AVFormatContext * s, int *str)
 
     if (os->bufsize - os->bufpos < size){
         uint8_t *nb = av_malloc (os->bufsize *= 2);
-        memset (nb, 0, os->bufsize);
         memcpy (nb, os->buf, os->bufpos);
         av_free (os->buf);
         os->buf = nb;
@@ -483,7 +484,8 @@ ogg_get_length (AVFormatContext * s)
     url_fseek (&s->pb, end, SEEK_SET);
 
     while (!ogg_read_page (s, &i)){
-        if (ogg->streams[i].granule != -1 && ogg->streams[i].granule != 0)
+        if (ogg->streams[i].granule != -1 && ogg->streams[i].granule != 0 &&
+            ogg->streams[i].codec)
             idx = i;
     }
 
@@ -495,7 +497,7 @@ ogg_get_length (AVFormatContext * s)
     ogg->size = size;
     ogg_restore (s, 0);
     ogg_save (s);
-    while (ogg_read_page (s, &i)) {
+    while (!ogg_read_page (s, &i)) {
         if (i == idx && ogg->streams[i].granule != -1 && ogg->streams[i].granule != 0)
             break;
     }
@@ -606,7 +608,7 @@ ogg_read_seek (AVFormatContext * s, int stream_index, int64_t target_ts,
         pts = ogg_gptopts (s, i, ogg->streams[i].granule);
         p = url_ftell (bc);
 
-        if (ABS (pts - target_ts) * st->time_base.num < st->time_base.den)
+        if (FFABS (pts - target_ts) * st->time_base.num < st->time_base.den)
             break;
 
         if (pts > target_ts){
@@ -634,7 +636,7 @@ ogg_read_seek (AVFormatContext * s, int stream_index, int64_t target_ts,
         }
     }
 
-    if (ABS (pts - target_ts) * st->time_base.num < st->time_base.den){
+    if (FFABS (pts - target_ts) * st->time_base.num < st->time_base.den){
         ogg_restore (s, 1);
         ogg_reset (ogg);
     }else{

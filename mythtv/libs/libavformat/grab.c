@@ -2,18 +2,20 @@
  * Linux video grab interface
  * Copyright (c) 2000,2001 Fabrice Bellard.
  *
- * This library is free software; you can redistribute it and/or
+ * This file is part of FFmpeg.
+ *
+ * FFmpeg is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
- * version 2 of the License, or (at your option) any later version.
+ * version 2.1 of the License, or (at your option) any later version.
  *
- * This library is distributed in the hope that it will be useful,
+ * FFmpeg is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
+ * License along with FFmpeg; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 #include "avformat.h"
@@ -172,12 +174,13 @@ static int grab_read_header(AVFormatContext *s1, AVFormatParameters *ap)
                 pict.palette=VIDEO_PALETTE_RGB24;
                 pict.depth=24;
                 ret = ioctl(video_fd, VIDIOCSPICT, &pict);
-                if (ret < 0)
+                if (ret < 0) {
                     pict.palette=VIDEO_PALETTE_GREY;
                     pict.depth=8;
                     ret = ioctl(video_fd, VIDIOCSPICT, &pict);
                     if (ret < 0)
                         goto fail1;
+                }
             }
         }
     }
@@ -217,8 +220,11 @@ static int grab_read_header(AVFormatContext *s1, AVFormatParameters *ap)
     } else {
         s->video_buf = mmap(0,s->gb_buffers.size,PROT_READ|PROT_WRITE,MAP_SHARED,video_fd,0);
         if ((unsigned char*)-1 == s->video_buf) {
-            perror("mmap");
-            goto fail;
+            s->video_buf = mmap(0,s->gb_buffers.size,PROT_READ|PROT_WRITE,MAP_PRIVATE,video_fd,0);
+            if ((unsigned char*)-1 == s->video_buf) {
+                perror("mmap");
+                goto fail;
+            }
         }
         s->gb_frame = 0;
         s->time_frame = av_gettime() * s->frame_rate / s->frame_rate_base;
@@ -319,16 +325,16 @@ static int grab_read_packet(AVFormatContext *s1, AVPacket *pkt)
     struct timespec ts;
 
     /* Calculate the time of the next frame */
-    s->time_frame += int64_t_C(1000000);
+    s->time_frame += INT64_C(1000000);
 
     /* wait based on the frame rate */
     for(;;) {
         curtime = av_gettime();
         delay = s->time_frame  * s->frame_rate_base / s->frame_rate - curtime;
         if (delay <= 0) {
-            if (delay < int64_t_C(-1000000) * s->frame_rate_base / s->frame_rate) {
+            if (delay < INT64_C(-1000000) * s->frame_rate_base / s->frame_rate) {
                 /* printf("grabbing is %d frames late (dropping)\n", (int) -(delay / 16666)); */
-                s->time_frame += int64_t_C(1000000);
+                s->time_frame += INT64_C(1000000);
             }
             break;
         }
@@ -758,7 +764,7 @@ static int aiw_read_picture(VideoData *s, uint8_t *data)
         movq_m2r(rounder,mm6);
         pxor_r2r(mm7,mm7);
 #else
-        uint8_t *cm = cropTbl + MAX_NEG_CROP;
+        uint8_t *cm = ff_cropTbl + MAX_NEG_CROP;
 #endif
 
         /* read two fields and deinterlace them */

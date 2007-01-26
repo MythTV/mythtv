@@ -2,18 +2,20 @@
  * FLAC audio encoder
  * Copyright (c) 2006  Justin Ruggles <jruggle@earthlink.net>
  *
- * This library is free software; you can redistribute it and/or
+ * This file is part of FFmpeg.
+ *
+ * FFmpeg is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
- * version 2 of the License, or (at your option) any later version.
+ * version 2.1 of the License, or (at your option) any later version.
  *
- * This library is distributed in the hope that it will be useful,
+ * FFmpeg is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
+ * License along with FFmpeg; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
@@ -1030,10 +1032,10 @@ static int estimate_stereo_mode(int32_t *left_ch, int32_t *right_ch, int n)
     for(i=2; i<n; i++) {
         lt = left_ch[i] - 2*left_ch[i-1] + left_ch[i-2];
         rt = right_ch[i] - 2*right_ch[i-1] + right_ch[i-2];
-        sum[2] += ABS((lt + rt) >> 1);
-        sum[3] += ABS(lt - rt);
-        sum[0] += ABS(lt);
-        sum[1] += ABS(rt);
+        sum[2] += FFABS((lt + rt) >> 1);
+        sum[3] += FFABS(lt - rt);
+        sum[0] += FFABS(lt);
+        sum[1] += FFABS(rt);
     }
     /* estimate bit counts */
     for(i=0; i<4; i++) {
@@ -1120,20 +1122,8 @@ static void put_sbits(PutBitContext *pb, int bits, int32_t val)
 
 static void write_utf8(PutBitContext *pb, uint32_t val)
 {
-    int bytes, shift;
-
-    if(val < 0x80){
-        put_bits(pb, 8, val);
-        return;
-    }
-
-    bytes= (av_log2(val)+4) / 5;
-    shift = (bytes - 1) * 6;
-    put_bits(pb, 8, (256 - (256>>bytes)) | (val >> shift));
-    while(shift >= 6){
-        shift -= 6;
-        put_bits(pb, 8, 0x80 | ((val >> shift) & 0x3F));
-    }
+    uint8_t tmp;
+    PUT_UTF8(val, tmp, put_bits(pb, 8, tmp);)
 }
 
 static void output_frame_header(FlacEncodeContext *s)

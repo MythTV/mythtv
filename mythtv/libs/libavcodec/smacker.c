@@ -2,18 +2,20 @@
  * Smacker decoder
  * Copyright (c) 2006 Konstantin Shishkov
  *
- * This library is free software; you can redistribute it and/or
+ * This file is part of FFmpeg.
+ *
+ * FFmpeg is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
- * version 2 of the License, or (at your option) any later version.
+ * version 2.1 of the License, or (at your option) any later version.
  *
- * This library is distributed in the hope that it will be useful,
+ * FFmpeg is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
+ * License along with FFmpeg; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  *
  */
@@ -275,10 +277,10 @@ static int decode_header_trees(SmackVContext *smk) {
     GetBitContext gb;
     int mmap_size, mclr_size, full_size, type_size;
 
-    mmap_size = LE_32(smk->avctx->extradata);
-    mclr_size = LE_32(smk->avctx->extradata + 4);
-    full_size = LE_32(smk->avctx->extradata + 8);
-    type_size = LE_32(smk->avctx->extradata + 12);
+    mmap_size = AV_RL32(smk->avctx->extradata);
+    mclr_size = AV_RL32(smk->avctx->extradata + 4);
+    full_size = AV_RL32(smk->avctx->extradata + 8);
+    type_size = AV_RL32(smk->avctx->extradata + 12);
 
     init_get_bits(&gb, smk->avctx->extradata + 16, (smk->avctx->extradata_size - 16) * 8);
 
@@ -318,12 +320,12 @@ static int decode_header_trees(SmackVContext *smk) {
     return 0;
 }
 
-static always_inline void last_reset(int *recode, int *last) {
+static av_always_inline void last_reset(int *recode, int *last) {
     recode[last[0]] = recode[last[1]] = recode[last[2]] = 0;
 }
 
 /* get code and update history */
-static always_inline int smk_get_code(GetBitContext *gb, int *recode, int *last) {
+static av_always_inline int smk_get_code(GetBitContext *gb, int *recode, int *last) {
     register int *table = recode;
     int v, b;
 
@@ -520,7 +522,7 @@ static int decode_init(AVCodecContext *avctx)
 
     c->pic.data[0] = NULL;
 
-    if (avcodec_check_dimensions(avctx, avctx->height, avctx->width) < 0) {
+    if (avcodec_check_dimensions(avctx, avctx->width, avctx->height) < 0) {
         return 1;
     }
 
@@ -582,7 +584,7 @@ static int smka_decode_frame(AVCodecContext *avctx, void *data, int *data_size, 
     int bits, stereo;
     int pred[2] = {0, 0};
 
-    unp_size = LE_32(buf);
+    unp_size = AV_RL32(buf);
 
     init_get_bits(&gb, buf + 4, (buf_size - 4) * 8);
 

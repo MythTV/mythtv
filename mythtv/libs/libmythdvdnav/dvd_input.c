@@ -48,12 +48,7 @@ char *      (*dvdinput_error) (dvd_input_t);
 #else
 
 /* dlopening libdvdcss */
-#ifdef CONFIG_HAVE_DLFCN
 #include <dlfcn.h>
-#else
-/* Only needed on MINGW at the moment */
-#include "../../msvc/contrib/dlfcn.c"
-#endif
 
 typedef struct dvdcss_s *dvdcss_handle;
 static dvdcss_handle (*DVDcss_open)  (const char *);

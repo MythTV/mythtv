@@ -2,18 +2,20 @@
  * Sony Playstation (PSX) STR File Demuxer
  * Copyright (c) 2003 The ffmpeg Project
  *
- * This library is free software; you can redistribute it and/or
+ * This file is part of FFmpeg.
+ *
+ * FFmpeg is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
- * version 2 of the License, or (at your option) any later version.
+ * version 2.1 of the License, or (at your option) any later version.
  *
- * This library is distributed in the hope that it will be useful,
+ * FFmpeg is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
+ * License along with FFmpeg; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
@@ -90,8 +92,8 @@ static int str_probe(AVProbeData *p)
     if (p->buf_size < 0x38)
         return 0;
 
-    if ((LE_32(&p->buf[0]) == RIFF_TAG) &&
-        (LE_32(&p->buf[8]) == CDXA_TAG)) {
+    if ((AV_RL32(&p->buf[0]) == RIFF_TAG) &&
+        (AV_RL32(&p->buf[8]) == CDXA_TAG)) {
 
         /* RIFF header seen; skip 0x2C bytes */
         start = RIFF_HEADER_SIZE;
@@ -141,7 +143,7 @@ static int str_read_header(AVFormatContext *s,
     /* skip over any RIFF header */
     if (get_buffer(pb, sector, RIFF_HEADER_SIZE) != RIFF_HEADER_SIZE)
         return AVERROR_IO;
-    if (LE_32(&sector[0]) == RIFF_TAG)
+    if (AV_RL32(&sector[0]) == RIFF_TAG)
         start = RIFF_HEADER_SIZE;
     else
         start = 0;
@@ -166,12 +168,12 @@ static int str_read_header(AVFormatContext *s,
             /* check if this channel gets to be the dominant video channel */
             if (str->video_channel == -1) {
                 /* qualify the magic number */
-                if (LE_32(&sector[0x18]) != STR_MAGIC)
+                if (AV_RL32(&sector[0x18]) != STR_MAGIC)
                     break;
                 str->video_channel = channel;
                 str->channels[channel].type = STR_VIDEO;
-                str->channels[channel].width = LE_16(&sector[0x28]);
-                str->channels[channel].height = LE_16(&sector[0x2A]);
+                str->channels[channel].width = AV_RL16(&sector[0x28]);
+                str->channels[channel].height = AV_RL16(&sector[0x2A]);
 
                 /* allocate a new AVStream */
                 st = av_new_stream(s, 0);
@@ -271,9 +273,9 @@ static int str_read_packet(AVFormatContext *s,
             /* check if this the video channel we care about */
             if (channel == str->video_channel) {
 
-                int current_sector = LE_16(&sector[0x1C]);
-                int sector_count   = LE_16(&sector[0x1E]);
-                int frame_size = LE_32(&sector[0x24]);
+                int current_sector = AV_RL16(&sector[0x1C]);
+                int sector_count   = AV_RL16(&sector[0x1E]);
+                int frame_size = AV_RL32(&sector[0x24]);
                 int bytes_to_copy;
 //        printf("%d %d %d\n",current_sector,sector_count,frame_size);
                 /* if this is the first sector of the frame, allocate a pkt */

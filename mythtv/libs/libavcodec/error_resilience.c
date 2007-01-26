@@ -3,18 +3,20 @@
  *
  * Copyright (c) 2002-2004 Michael Niedermayer <michaelni@gmx.at>
  *
- * This library is free software; you can redistribute it and/or
+ * This file is part of FFmpeg.
+ *
+ * FFmpeg is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
- * version 2 of the License, or (at your option) any later version.
+ * version 2.1 of the License, or (at your option) any later version.
  *
- * This library is distributed in the hope that it will be useful,
+ * FFmpeg is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
+ * License along with FFmpeg; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
@@ -197,7 +199,7 @@ static void guess_dc(MpegEncContext *s, int16_t *dc, int w, int h, int stride, i
  */
 static void h_block_filter(MpegEncContext *s, uint8_t *dst, int w, int h, int stride, int is_luma){
     int b_x, b_y;
-    uint8_t *cm = cropTbl + MAX_NEG_CROP;
+    uint8_t *cm = ff_cropTbl + MAX_NEG_CROP;
 
     for(b_y=0; b_y<h; b_y++){
         for(b_x=0; b_x<w-1; b_x++){
@@ -215,7 +217,7 @@ static void h_block_filter(MpegEncContext *s, uint8_t *dst, int w, int h, int st
             if(!(left_damage||right_damage)) continue; // both undamaged
 
             if(   (!left_intra) && (!right_intra)
-               && ABS(left_mv[0]-right_mv[0]) + ABS(left_mv[1]+right_mv[1]) < 2) continue;
+               && FFABS(left_mv[0]-right_mv[0]) + FFABS(left_mv[1]+right_mv[1]) < 2) continue;
 
             for(y=0; y<8; y++){
                 int a,b,c,d;
@@ -224,7 +226,7 @@ static void h_block_filter(MpegEncContext *s, uint8_t *dst, int w, int h, int st
                 b= dst[offset + 8 + y*stride] - dst[offset + 7 + y*stride];
                 c= dst[offset + 9 + y*stride] - dst[offset + 8 + y*stride];
 
-                d= ABS(b) - ((ABS(a) + ABS(c) + 1)>>1);
+                d= FFABS(b) - ((FFABS(a) + FFABS(c) + 1)>>1);
                 d= FFMAX(d, 0);
                 if(b<0) d= -d;
 
@@ -257,7 +259,7 @@ static void h_block_filter(MpegEncContext *s, uint8_t *dst, int w, int h, int st
  */
 static void v_block_filter(MpegEncContext *s, uint8_t *dst, int w, int h, int stride, int is_luma){
     int b_x, b_y;
-    uint8_t *cm = cropTbl + MAX_NEG_CROP;
+    uint8_t *cm = ff_cropTbl + MAX_NEG_CROP;
 
     for(b_y=0; b_y<h-1; b_y++){
         for(b_x=0; b_x<w; b_x++){
@@ -275,7 +277,7 @@ static void v_block_filter(MpegEncContext *s, uint8_t *dst, int w, int h, int st
             if(!(top_damage||bottom_damage)) continue; // both undamaged
 
             if(   (!top_intra) && (!bottom_intra)
-               && ABS(top_mv[0]-bottom_mv[0]) + ABS(top_mv[1]+bottom_mv[1]) < 2) continue;
+               && FFABS(top_mv[0]-bottom_mv[0]) + FFABS(top_mv[1]+bottom_mv[1]) < 2) continue;
 
             for(x=0; x<8; x++){
                 int a,b,c,d;
@@ -284,7 +286,7 @@ static void v_block_filter(MpegEncContext *s, uint8_t *dst, int w, int h, int st
                 b= dst[offset + x + 8*stride] - dst[offset + x + 7*stride];
                 c= dst[offset + x + 9*stride] - dst[offset + x + 8*stride];
 
-                d= ABS(b) - ((ABS(a) + ABS(c)+1)>>1);
+                d= FFABS(b) - ((FFABS(a) + FFABS(c)+1)>>1);
                 d= FFMAX(d, 0);
                 if(b<0) d= -d;
 
@@ -493,22 +495,22 @@ int score_sum=0;
                         if(mb_x>0 && fixed[mb_xy-1]){
                             int k;
                             for(k=0; k<16; k++)
-                                score += ABS(src[k*s->linesize-1 ]-src[k*s->linesize   ]);
+                                score += FFABS(src[k*s->linesize-1 ]-src[k*s->linesize   ]);
                         }
                         if(mb_x+1<mb_width && fixed[mb_xy+1]){
                             int k;
                             for(k=0; k<16; k++)
-                                score += ABS(src[k*s->linesize+15]-src[k*s->linesize+16]);
+                                score += FFABS(src[k*s->linesize+15]-src[k*s->linesize+16]);
                         }
                         if(mb_y>0 && fixed[mb_xy-mb_stride]){
                             int k;
                             for(k=0; k<16; k++)
-                                score += ABS(src[k-s->linesize   ]-src[k               ]);
+                                score += FFABS(src[k-s->linesize   ]-src[k               ]);
                         }
                         if(mb_y+1<mb_height && fixed[mb_xy+mb_stride]){
                             int k;
                             for(k=0; k<16; k++)
-                                score += ABS(src[k+s->linesize*15]-src[k+s->linesize*16]);
+                                score += FFABS(src[k+s->linesize*15]-src[k+s->linesize*16]);
                         }
 
                         if(score <= best_score){ // <= will favor the last MV

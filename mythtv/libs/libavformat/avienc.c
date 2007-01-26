@@ -1,19 +1,21 @@
 /*
- * AVI encoder.
+ * AVI muxer
  * Copyright (c) 2000 Fabrice Bellard.
  *
- * This library is free software; you can redistribute it and/or
+ * This file is part of FFmpeg.
+ *
+ * FFmpeg is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
- * version 2 of the License, or (at your option) any later version.
+ * version 2.1 of the License, or (at your option) any later version.
  *
- * This library is distributed in the hope that it will be useful,
+ * FFmpeg is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
+ * License along with FFmpeg; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 #include "avformat.h"
@@ -73,8 +75,7 @@ static offset_t avi_start_new_riff(AVIContext *avi, ByteIOContext *pb,
     return loff;
 }
 
-static unsigned char* avi_stream2fourcc(unsigned char* tag, int index,
-                                        enum CodecType type)
+static char* avi_stream2fourcc(char* tag, int index, enum CodecType type)
 {
     tag[0] = '0';
     tag[1] = '0' + index;
@@ -162,7 +163,7 @@ static int avi_write_header(AVFormatContext *s)
     nb_frames = 0;
 
     if(video_enc){
-        put_le32(pb, (uint32_t)(int64_t_C(1000000) * video_enc->time_base.num / video_enc->time_base.den));
+        put_le32(pb, (uint32_t)(INT64_C(1000000) * video_enc->time_base.num / video_enc->time_base.den));
     } else {
         put_le32(pb, 0);
     }
@@ -338,8 +339,8 @@ static int avi_write_ix(AVFormatContext *s)
 {
     ByteIOContext *pb = &s->pb;
     AVIContext *avi = s->priv_data;
-    unsigned char tag[5];
-    unsigned char ix_tag[] = "ix00";
+    char tag[5];
+    char ix_tag[] = "ix00";
     int i, j;
 
     assert(!url_is_streamed(pb));
@@ -397,7 +398,7 @@ static int avi_write_idx1(AVFormatContext *s)
     AVIContext *avi = s->priv_data;
     offset_t idx_chunk;
     int i;
-    unsigned char tag[5];
+    char tag[5];
 
     if (!url_is_streamed(pb)) {
         AVIIentry* ie = 0, *tie;
@@ -446,7 +447,7 @@ static int avi_write_packet(AVFormatContext *s, AVPacket *pkt)
     AVCodecContext *enc= s->streams[stream_index]->codec;
     int size= pkt->size;
 
-//    av_log(s, AV_LOG_DEBUG, "%lld %d %d\n", pkt->dts, avi->packet_count[stream_index], stream_index);
+//    av_log(s, AV_LOG_DEBUG, "%"PRId64" %d %d\n", pkt->dts, avi->packet_count[stream_index], stream_index);
     while(enc->block_align==0 && pkt->dts != AV_NOPTS_VALUE && pkt->dts > avi->packet_count[stream_index]){
         AVPacket empty_packet;
 
@@ -455,7 +456,7 @@ static int avi_write_packet(AVFormatContext *s, AVPacket *pkt)
         empty_packet.data= NULL;
         empty_packet.stream_index= stream_index;
         avi_write_packet(s, &empty_packet);
-//        av_log(s, AV_LOG_DEBUG, "dup %lld %d\n", pkt->dts, avi->packet_count[stream_index]);
+//        av_log(s, AV_LOG_DEBUG, "dup %"PRId64" %d\n", pkt->dts, avi->packet_count[stream_index]);
     }
     avi->packet_count[stream_index]++;
 
@@ -518,38 +519,37 @@ static int avi_write_trailer(AVFormatContext *s)
     int i, j, n, nb_frames;
     offset_t file_size;
 
-    if (!url_is_streamed(pb))
-    {
-    if (avi->riff_id == 1) {
-        end_tag(pb, avi->movi_list);
-        res = avi_write_idx1(s);
-        end_tag(pb, avi->riff_start);
-    } else {
-        avi_write_ix(s);
-        end_tag(pb, avi->movi_list);
-        end_tag(pb, avi->riff_start);
+    if (!url_is_streamed(pb)){
+        if (avi->riff_id == 1) {
+            end_tag(pb, avi->movi_list);
+            res = avi_write_idx1(s);
+            end_tag(pb, avi->riff_start);
+        } else {
+            avi_write_ix(s);
+            end_tag(pb, avi->movi_list);
+            end_tag(pb, avi->riff_start);
 
-        file_size = url_ftell(pb);
-        url_fseek(pb, avi->odml_list - 8, SEEK_SET);
-        put_tag(pb, "LIST"); /* Making this AVI OpenDML one */
-        url_fskip(pb, 16);
+            file_size = url_ftell(pb);
+            url_fseek(pb, avi->odml_list - 8, SEEK_SET);
+            put_tag(pb, "LIST"); /* Making this AVI OpenDML one */
+            url_fskip(pb, 16);
 
-        for (n=nb_frames=0;n<s->nb_streams;n++) {
-             AVCodecContext *stream = s->streams[n]->codec;
-             if (stream->codec_type == CODEC_TYPE_VIDEO) {
-                 if (nb_frames < avi->packet_count[n])
-                     nb_frames = avi->packet_count[n];
-             } else {
-                 if (stream->codec_id == CODEC_ID_MP2 || stream->codec_id == CODEC_ID_MP3) {
-                     nb_frames += avi->packet_count[n];
+            for (n=nb_frames=0;n<s->nb_streams;n++) {
+                AVCodecContext *stream = s->streams[n]->codec;
+                if (stream->codec_type == CODEC_TYPE_VIDEO) {
+                    if (nb_frames < avi->packet_count[n])
+                        nb_frames = avi->packet_count[n];
+                } else {
+                    if (stream->codec_id == CODEC_ID_MP2 || stream->codec_id == CODEC_ID_MP3) {
+                        nb_frames += avi->packet_count[n];
+                    }
                 }
             }
-        }
-        put_le32(pb, nb_frames);
-        url_fseek(pb, file_size, SEEK_SET);
+            put_le32(pb, nb_frames);
+            url_fseek(pb, file_size, SEEK_SET);
 
-        avi_write_counters(s, avi->riff_id);
-    }
+            avi_write_counters(s, avi->riff_id);
+        }
     }
     put_flush_packet(pb);
 
@@ -575,5 +575,6 @@ AVOutputFormat avi_muxer = {
     avi_write_header,
     avi_write_packet,
     avi_write_trailer,
+    .codec_tag= (const AVCodecTag*[]){codec_bmp_tags, codec_wav_tags, 0},
 };
 #endif //CONFIG_AVI_MUXER

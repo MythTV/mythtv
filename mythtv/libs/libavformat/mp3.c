@@ -1,19 +1,21 @@
 /*
- * MP3 encoder and decoder
+ * MP3 muxer and demuxer
  * Copyright (c) 2003 Fabrice Bellard.
  *
- * This library is free software; you can redistribute it and/or
+ * This file is part of FFmpeg.
+ *
+ * FFmpeg is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
- * version 2 of the License, or (at your option) any later version.
+ * version 2.1 of the License, or (at your option) any later version.
  *
- * This library is distributed in the hope that it will be useful,
+ * FFmpeg is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
+ * License along with FFmpeg; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 #include "avformat.h"
@@ -245,7 +247,7 @@ static void id3_create_tag(AVFormatContext *s, uint8_t *buf)
 static int mp3_read_probe(AVProbeData *p)
 {
     int max_frames, first_frames;
-    int fsize, frames;
+    int fsize, frames, sample_rate;
     uint32_t header;
     uint8_t *buf, *buf2, *end;
     AVCodecContext avctx;
@@ -254,7 +256,7 @@ static int mp3_read_probe(AVProbeData *p)
         return 0;
 
     if(id3_match(p->buf))
-        return AVPROBE_SCORE_MAX;
+        return AVPROBE_SCORE_MAX/2+1; // this must be less then mpeg-ps because some retards put id3 tage before mpeg-ps files
 
     max_frames = 0;
     buf = p->buf;
@@ -265,7 +267,7 @@ static int mp3_read_probe(AVProbeData *p)
 
         for(frames = 0; buf2 < end; frames++) {
             header = (buf2[0] << 24) | (buf2[1] << 16) | (buf2[2] << 8) | buf2[3];
-            fsize = mpa_decode_header(&avctx, header);
+            fsize = mpa_decode_header(&avctx, header, &sample_rate);
             if(fsize < 0)
                 break;
             buf2 += fsize;
@@ -399,7 +401,7 @@ AVOutputFormat mp2_muxer = {
     "mp2",
     "MPEG audio layer 2",
     "audio/x-mpeg",
-#ifdef CONFIG_MP3LAME
+#ifdef CONFIG_LIBMP3LAME
     "mp2,m2a",
 #else
     "mp2,mp3,m2a",

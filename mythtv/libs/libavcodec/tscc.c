@@ -2,18 +2,20 @@
  * TechSmith Camtasia decoder
  * Copyright (c) 2004 Konstantin Shishkov
  *
- * This library is free software; you can redistribute it and/or
+ * This file is part of FFmpeg.
+ *
+ * FFmpeg is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
- * version 2 of the License, or (at your option) any later version.
+ * version 2.1 of the License, or (at your option) any later version.
  *
- * This library is distributed in the hope that it will be useful,
+ * FFmpeg is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
+ * License along with FFmpeg; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  *
  */
@@ -119,14 +121,14 @@ static int decode_rle(CamtasiaContext *c, unsigned int srcsize)
                 }
             } else if (c->bpp == 16) {
                 for(i = 0; i < p2; i++) {
-                    pix16 = LE_16(src);
+                    pix16 = AV_RL16(src);
                     src += 2;
                     *(uint16_t*)output = pix16;
                     output += 2;
                 }
             } else if (c->bpp == 32) {
                 for(i = 0; i < p2; i++) {
-                    pix32 = LE_32(src);
+                    pix32 = AV_RL32(src);
                     src += 4;
                     *(uint32_t*)output = pix32;
                     output += 4;
@@ -138,7 +140,7 @@ static int decode_rle(CamtasiaContext *c, unsigned int srcsize)
             switch(c->bpp){
             case  8: pix[0] = *src++;
                      break;
-            case 16: pix16 = LE_16(src);
+            case 16: pix16 = AV_RL16(src);
                      src += 2;
                      *(uint16_t*)pix = pix16;
                      break;
@@ -146,7 +148,7 @@ static int decode_rle(CamtasiaContext *c, unsigned int srcsize)
                      pix[1] = *src++;
                      pix[2] = *src++;
                      break;
-            case 32: pix32 = LE_32(src);
+            case 32: pix32 = AV_RL32(src);
                      src += 4;
                      *(uint32_t*)pix = pix32;
                      break;
@@ -264,7 +266,7 @@ static int decode_init(AVCodecContext *avctx)
     c->pic.data[0] = NULL;
     c->height = avctx->height;
 
-    if (avcodec_check_dimensions(avctx, avctx->height, avctx->width) < 0) {
+    if (avcodec_check_dimensions(avctx, avctx->width, avctx->height) < 0) {
         return 1;
     }
 

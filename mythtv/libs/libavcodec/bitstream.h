@@ -1,18 +1,20 @@
 /*
  * copyright (c) 2004 Michael Niedermayer <michaelni@gmx.at>
  *
- * This library is free software; you can redistribute it and/or
+ * This file is part of FFmpeg.
+ *
+ * FFmpeg is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
- * version 2 of the License, or (at your option) any later version.
+ * version 2.1 of the License, or (at your option) any later version.
  *
- * This library is distributed in the hope that it will be useful,
+ * FFmpeg is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
+ * License along with FFmpeg; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
@@ -45,7 +47,7 @@
 
 extern const uint8_t ff_reverse[256];
 
-#if defined(ARCH_X86) || defined(ARCH_X86_64)
+#if defined(ARCH_X86)
 // avoid +32 for shift optimization (gcc should do that ...)
 static inline  int32_t NEG_SSR32( int32_t a, int8_t s){
     asm ("sarl %1, %0\n\t"
@@ -169,7 +171,7 @@ typedef struct RL_VLC_ELEM {
 #endif
 
 /* used to avoid missaligned exceptions on some archs (alpha, ...) */
-#if defined(ARCH_X86) || defined(ARCH_X86_64)
+#if defined(ARCH_X86)
 #    define unaligned16(a) (*(const uint16_t*)(a))
 #    define unaligned32(a) (*(const uint32_t*)(a))
 #    define unaligned64(a) (*(const uint64_t*)(a))
@@ -185,12 +187,12 @@ static inline uint##x##_t unaligned##x(const void *v) { \
 }
 #    elif defined(__DECC)
 #    define unaligned(x)                                        \
-static inline uint##x##_t unaligned##x##(const void *v) {       \
+static inline uint##x##_t unaligned##x(const void *v) {         \
     return *(const __unaligned uint##x##_t *) v;                \
 }
 #    else
 #    define unaligned(x)                                        \
-static inline uint##x##_t unaligned##x##(const void *v) {       \
+static inline uint##x##_t unaligned##x(const void *v) {         \
     return *(const uint##x##_t *) v;                            \
 }
 #    endif
@@ -198,7 +200,7 @@ unaligned(16)
 unaligned(32)
 unaligned(64)
 #undef unaligned
-#endif //!ARCH_X86
+#endif /* defined(ARCH_X86) */
 
 #ifndef ALT_BITSTREAM_WRITER
 static inline void put_bits(PutBitContext *s, int n, unsigned int value)
@@ -245,7 +247,7 @@ static inline void put_bits(PutBitContext *s, int n, unsigned int value)
 static inline void put_bits(PutBitContext *s, int n, unsigned int value)
 {
 #    ifdef ALIGNED_BITSTREAM_WRITER
-#        if defined(ARCH_X86) || defined(ARCH_X86_64)
+#        if defined(ARCH_X86)
     asm volatile(
         "movl %0, %%ecx                 \n\t"
         "xorl %%eax, %%eax              \n\t"
@@ -276,7 +278,7 @@ static inline void put_bits(PutBitContext *s, int n, unsigned int value)
     s->index= index;
 #        endif
 #    else //ALIGNED_BITSTREAM_WRITER
-#        if defined(ARCH_X86) || defined(ARCH_X86_64)
+#        if defined(ARCH_X86)
     asm volatile(
         "movl $7, %%ecx                 \n\t"
         "andl %0, %%ecx                 \n\t"
@@ -458,13 +460,16 @@ static inline int unaligned32_le(const void *v)
 # ifdef ALT_BITSTREAM_READER_LE
 #   define SHOW_UBITS(name, gb, num)\
         ((name##_cache) & (NEG_USR32(0xffffffff,num)))
+
+#   define SHOW_SBITS(name, gb, num)\
+        NEG_SSR32((name##_cache)<<(32-(num)), num)
 # else
 #   define SHOW_UBITS(name, gb, num)\
         NEG_USR32(name##_cache, num)
-# endif
 
 #   define SHOW_SBITS(name, gb, num)\
         NEG_SSR32(name##_cache, num)
+# endif
 
 #   define GET_CACHE(name, gb)\
         ((uint32_t)name##_cache)
@@ -575,7 +580,7 @@ static inline void skip_bits_long(GetBitContext *s, int n){
         name##_bit_count-= 32;\
     }\
 
-#if defined(ARCH_X86) || defined(ARCH_X86_64)
+#if defined(ARCH_X86)
 #   define SKIP_CACHE(name, gb, num)\
         asm(\
             "shldl %2, %1, %0          \n\t"\
@@ -872,7 +877,7 @@ void free_vlc(VLC *vlc);
  *                  read the longest vlc code
  *                  = (max_vlc_length + bits - 1) / bits
  */
-static always_inline int get_vlc2(GetBitContext *s, VLC_TYPE (*table)[2],
+static av_always_inline int get_vlc2(GetBitContext *s, VLC_TYPE (*table)[2],
                                   int bits, int max_depth)
 {
     int code;

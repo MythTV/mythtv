@@ -23,14 +23,15 @@ HEADERS += riff.h
 
 SOURCES += 4xm.c allformats.c asf.c au.c avidec.c avienc.c avio.c aviobuf.c 
 SOURCES += crc.c cutils.c dv.c ffm.c file.c flvdec.c flvenc.c idcin.c idroq.c
-SOURCES += img.c ipmovie.c mov.c movenc.c mp3.c mpeg.c mpegts.c mpegtsenc.c 
+SOURCES += ipmovie.c mov.c movenc.c mp3.c mpeg.c mpegts.c mpegtsenc.c 
 SOURCES += mpjpeg.c nut.c os_support.c rm.c psxstr.c raw.c flic.c audio.c
 SOURCES += segafilm.c swf.c utils.c wav.c wc3movie.c westwood.c yuv4mpeg.c
 SOURCES += sierravmd.c asf-enc.c matroska.c img2.c electronicarts.c sol.c
 SOURCES += nsvdec.c ogg2.c oggparsevorbis.c oggparsetheora.c oggparseflac.c
-SOURCES += mmf.c gif.c gifdec.c jpeg.c png.c pnm.c sgi.c yuv.c daud.c adtsenc.c
+SOURCES += mmf.c gif.c gifdec.c daud.c adtsenc.c vocdec.c vocenc.c rtp_h264.c
 SOURCES += aiff.c avs.c mm.c tta.c voc.c smacker.c oggparseogm.c nuv.c wv.c
-SOURCES += gxf.c gxfenc.c riff.c amr.c mxf.c isom.c dvenc.c
+SOURCES += gxf.c gxfenc.c riff.c amr.c mxf.c isom.c dvenc.c base64.c 
+SOURCES += dsicin.c mpc.c mtv.c tiertexseq.c x11grab.c
 
 # not using:  barpainet.* beosaudio.cpp, dv1394.*, dc1394.c, framehook.*
 # not using:  grab.c v4l2.c

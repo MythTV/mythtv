@@ -1,18 +1,20 @@
 /* Electronic Arts Multimedia File Demuxer
  * Copyright (c) 2004  The ffmpeg Project
  *
- * This library is free software; you can redistribute it and/or
+ * This file is part of FFmpeg.
+ *
+ * FFmpeg is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
- * version 2 of the License, or (at your option) any later version.
+ * version 2.1 of the License, or (at your option) any later version.
  *
- * This library is distributed in the hope that it will be useful,
+ * FFmpeg is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
+ * License along with FFmpeg; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
@@ -166,7 +168,7 @@ static int ea_probe(AVProbeData *p)
     if (p->buf_size < 4)
         return 0;
 
-    if (LE_32(&p->buf[0]) != SCHl_TAG)
+    if (AV_RL32(&p->buf[0]) != SCHl_TAG)
         return 0;
 
     return AVPROBE_SCORE_MAX;
@@ -228,8 +230,8 @@ static int ea_read_packet(AVFormatContext *s,
 
         if (get_buffer(pb, preamble, EA_PREAMBLE_SIZE) != EA_PREAMBLE_SIZE)
             return AVERROR_IO;
-        chunk_type = LE_32(&preamble[0]);
-        chunk_size = LE_32(&preamble[4]) - EA_PREAMBLE_SIZE;
+        chunk_type = AV_RL32(&preamble[0]);
+        chunk_size = AV_RL32(&preamble[4]) - EA_PREAMBLE_SIZE;
 
         switch (chunk_type) {
         /* audio data */

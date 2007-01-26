@@ -4,18 +4,20 @@
  *
  * copyright (c) 2001-2003 BERO <bero@geocities.co.jp>
  *
- * This library is free software; you can redistribute it and/or
+ * This file is part of FFmpeg.
+ *
+ * FFmpeg is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
- * version 2 of the License, or (at your option) any later version.
+ * version 2.1 of the License, or (at your option) any later version.
  *
- * This library is distributed in the hope that it will be useful,
+ * FFmpeg is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
+ * License along with FFmpeg; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
@@ -562,76 +564,9 @@ H264_CHROMA_MC(avg_       , op_avg)
 #undef op_avg
 #undef op_put
 
-/* not yet optimized */
-static inline void copy_block4(uint8_t *dst, uint8_t *src, int dstStride, int srcStride, int h)
-{
-    int i;
-    for(i=0; i<h; i++)
-    {
-        ST32(dst   , LD32(src   ));
-        dst+=dstStride;
-        src+=srcStride;
-    }
-}
-
-static inline void copy_block8(uint8_t *dst, uint8_t *src, int dstStride, int srcStride, int h)
-{
-    int i;
-    for(i=0; i<h; i++)
-    {
-        ST32(dst   , LD32(src   ));
-        ST32(dst+4 , LD32(src+4 ));
-        dst+=dstStride;
-        src+=srcStride;
-    }
-}
-
-static inline void copy_block16(uint8_t *dst, uint8_t *src, int dstStride, int srcStride, int h)
-{
-    int i;
-    for(i=0; i<h; i++)
-    {
-        ST32(dst   , LD32(src   ));
-        ST32(dst+4 , LD32(src+4 ));
-        ST32(dst+8 , LD32(src+8 ));
-        ST32(dst+12, LD32(src+12));
-        dst+=dstStride;
-        src+=srcStride;
-    }
-}
-
-static inline void copy_block17(uint8_t *dst, uint8_t *src, int dstStride, int srcStride, int h)
-{
-    int i;
-    for(i=0; i<h; i++)
-    {
-        ST32(dst   , LD32(src   ));
-        ST32(dst+4 , LD32(src+4 ));
-        ST32(dst+8 , LD32(src+8 ));
-        ST32(dst+12, LD32(src+12));
-        dst[16]= src[16];
-        dst+=dstStride;
-        src+=srcStride;
-    }
-}
-
-static inline void copy_block9(uint8_t *dst, uint8_t *src, int dstStride, int srcStride, int h)
-{
-    int i;
-    for(i=0; i<h; i++)
-    {
-        ST32(dst   , LD32(src   ));
-        ST32(dst+4 , LD32(src+4 ));
-        dst[8]= src[8];
-        dst+=dstStride;
-        src+=srcStride;
-    }
-}
-/* end not optimized */
-
 #define QPEL_MC(r, OPNAME, RND, OP) \
 static void OPNAME ## mpeg4_qpel8_h_lowpass(uint8_t *dst, uint8_t *src, int dstStride, int srcStride, int h){\
-    uint8_t *cm = cropTbl + MAX_NEG_CROP;\
+    uint8_t *cm = ff_cropTbl + MAX_NEG_CROP;\
     do {\
         uint8_t *s = src; \
         int src0,src1,src2,src3,src4,src5,src6,src7,src8;\
@@ -658,7 +593,7 @@ static void OPNAME ## mpeg4_qpel8_h_lowpass(uint8_t *dst, uint8_t *src, int dstS
 }\
 \
 static void OPNAME ## mpeg4_qpel8_v_lowpass(uint8_t *dst, uint8_t *src, int dstStride, int srcStride){\
-    uint8_t *cm = cropTbl + MAX_NEG_CROP;\
+    uint8_t *cm = ff_cropTbl + MAX_NEG_CROP;\
     int w=8;\
     do{\
         uint8_t *s = src, *d=dst;\
@@ -686,7 +621,7 @@ static void OPNAME ## mpeg4_qpel8_v_lowpass(uint8_t *dst, uint8_t *src, int dstS
 }\
 \
 static void OPNAME ## mpeg4_qpel16_h_lowpass(uint8_t *dst, uint8_t *src, int dstStride, int srcStride, int h){\
-    uint8_t *cm = cropTbl + MAX_NEG_CROP;\
+    uint8_t *cm = ff_cropTbl + MAX_NEG_CROP;\
     do {\
         uint8_t *s = src;\
         int src0,src1,src2,src3,src4,src5,src6,src7,src8;\
@@ -730,7 +665,7 @@ static void OPNAME ## mpeg4_qpel16_h_lowpass(uint8_t *dst, uint8_t *src, int dst
 }\
 \
 static void OPNAME ## mpeg4_qpel16_v_lowpass(uint8_t *dst, uint8_t *src, int dstStride, int srcStride){\
-    uint8_t *cm = cropTbl + MAX_NEG_CROP;\
+    uint8_t *cm = ff_cropTbl + MAX_NEG_CROP;\
     int w=16;\
     do {\
         uint8_t *s = src, *d=dst;\
@@ -1156,7 +1091,7 @@ QPEL_MC(0, avg_       , _       , op_avg)
 #if 1
 #define H264_LOWPASS(OPNAME, OP, OP2) \
 static inline void OPNAME ## h264_qpel_h_lowpass(uint8_t *dst, uint8_t *src, int dstStride, int srcStride,int w,int h){\
-    uint8_t *cm = cropTbl + MAX_NEG_CROP;\
+    uint8_t *cm = ff_cropTbl + MAX_NEG_CROP;\
     do {\
         int srcB,srcA,src0,src1,src2,src3,src4,src5,src6;\
         uint8_t *s = src-2;\
@@ -1209,7 +1144,7 @@ static inline void OPNAME ## h264_qpel_h_lowpass(uint8_t *dst, uint8_t *src, int
 }\
 \
 static inline void OPNAME ## h264_qpel_v_lowpass(uint8_t *dst, uint8_t *src, int dstStride, int srcStride,int w,int h){\
-    uint8_t *cm = cropTbl + MAX_NEG_CROP;\
+    uint8_t *cm = ff_cropTbl + MAX_NEG_CROP;\
     do{\
         int srcB,srcA,src0,src1,src2,src3,src4,src5,src6;\
         uint8_t *s = src-2*srcStride,*d=dst;\
@@ -1262,7 +1197,7 @@ static inline void OPNAME ## h264_qpel_v_lowpass(uint8_t *dst, uint8_t *src, int
 }\
 \
 static inline void OPNAME ## h264_qpel_hv_lowpass(uint8_t *dst, int16_t *tmp, uint8_t *src, int dstStride, int tmpStride, int srcStride,int w,int h){\
-    uint8_t *cm = cropTbl + MAX_NEG_CROP;\
+    uint8_t *cm = ff_cropTbl + MAX_NEG_CROP;\
     int i;\
     src -= 2*srcStride;\
     i= h+5; \
@@ -1557,7 +1492,7 @@ H264_MC(avg_, 16)
 #endif
 
 static void wmv2_mspel8_h_lowpass(uint8_t *dst, uint8_t *src, int dstStride, int srcStride, int h){
-    uint8_t *cm = cropTbl + MAX_NEG_CROP;
+    uint8_t *cm = ff_cropTbl + MAX_NEG_CROP;
 
     do{
         int src_1,src0,src1,src2,src3,src4,src5,src6,src7,src8,src9;
@@ -1587,7 +1522,7 @@ static void wmv2_mspel8_h_lowpass(uint8_t *dst, uint8_t *src, int dstStride, int
 }
 
 static void wmv2_mspel8_v_lowpass(uint8_t *dst, uint8_t *src, int dstStride, int srcStride, int w){
-    uint8_t *cm = cropTbl + MAX_NEG_CROP;
+    uint8_t *cm = ff_cropTbl + MAX_NEG_CROP;
 
     do{
         int src_1,src0,src1,src2,src3,src4,src5,src6,src7,src8,src9;

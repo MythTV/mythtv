@@ -4,18 +4,20 @@
  *
  * Copyright (C) 2006  Aurelien Jacobs <aurel@gnuage.org>
  *
- * This library is free software; you can redistribute it and/or
+ * This file is part of FFmpeg.
+ *
+ * FFmpeg is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 2.1 of the License, or (at your option) any later version.
  *
- * This library is distributed in the hope that it will be useful,
+ * FFmpeg is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
+ * License along with FFmpeg; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
@@ -460,16 +462,16 @@ static int vp56_size_changed(AVCodecContext *avctx, vp56_context_t *s)
     int stride = s->frames[VP56_FRAME_CURRENT].linesize[0];
     int i;
 
-    s->plane_width[0] = s->avctx->width;
-    s->plane_width[1] = s->plane_width[2] = s->avctx->width/2;
-    s->plane_height[0] = s->avctx->height;
-    s->plane_height[1] = s->plane_height[2] = s->avctx->height/2;
+    s->plane_width[0] = s->avctx->coded_width;
+    s->plane_width[1] = s->plane_width[2] = s->avctx->coded_width/2;
+    s->plane_height[0] = s->avctx->coded_height;
+    s->plane_height[1] = s->plane_height[2] = s->avctx->coded_height/2;
 
     for (i=0; i<3; i++)
         s->stride[i] = s->flip * s->frames[VP56_FRAME_CURRENT].linesize[i];
 
-    s->mb_width = (s->avctx->width+15) / 16;
-    s->mb_height = (s->avctx->height+15) / 16;
+    s->mb_width = (s->avctx->coded_width+15) / 16;
+    s->mb_height = (s->avctx->coded_height+15) / 16;
 
     if (s->mb_width > 1000 || s->mb_height > 1000) {
         av_log(avctx, AV_LOG_ERROR, "picture too big\n");

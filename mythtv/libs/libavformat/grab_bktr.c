@@ -7,36 +7,33 @@
  * and
  *           simple_grab.c Copyright (c) 1999 Roger Hardiman
  *
- * This library is free software; you can redistribute it and/or
+ * This file is part of FFmpeg.
+ *
+ * FFmpeg is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
- * version 2 of the License, or (at your option) any later version.
+ * version 2.1 of the License, or (at your option) any later version.
  *
- * This library is distributed in the hope that it will be useful,
+ * FFmpeg is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
+ * License along with FFmpeg; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 #include "avformat.h"
-#if defined(__FreeBSD__)
-# if __FreeBSD__ >= 502100
-#  include <dev/bktr/ioctl_meteor.h>
-#  include <dev/bktr/ioctl_bt848.h>
-# else
-#  include <machine/ioctl_meteor.h>
-#  include <machine/ioctl_bt848.h>
-# endif
-#elif defined(__FreeBSD_kernel__)
+#if defined (HAVE_DEV_BKTR_IOCTL_METEOR_H) && defined (HAVE_DEV_BKTR_IOCTL_BT848_H)
 # include <dev/bktr/ioctl_meteor.h>
 # include <dev/bktr/ioctl_bt848.h>
-#elif defined(__DragonFly__)
+#elif defined (HAVE_MACHINE_IOCTL_METEOR_H) && defined (HAVE_MACHINE_IOCTL_BT848_H)
+# include <machine/ioctl_meteor.h>
+# include <machine/ioctl_bt848.h>
+#elif defined (HAVE_DEV_VIDEO_METEOR_IOCTL_METEOR_H) && defined (HAVE_DEV_VIDEO_METEOR_IOCTL_BT848_H)
 # include <dev/video/meteor/ioctl_meteor.h>
 # include <dev/video/bktr/ioctl_bt848.h>
-#else
+#elif HAVE_DEV_IC_BT8XX_H
 # include <dev/ic/bt8xx.h>
 #endif
 #include <unistd.h>

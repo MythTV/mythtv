@@ -3,18 +3,20 @@
  * Copyright (c) 2005 David Hammerton
  * All rights reserved.
  *
- * This library is free software; you can redistribute it and/or
+ * This file is part of FFmpeg.
+ *
+ * FFmpeg is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
- * version 2 of the License, or (at your option) any later version.
+ * version 2.1 of the License, or (at your option) any later version.
  *
- * This library is distributed in the hope that it will be useful,
+ * FFmpeg is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
+ * License along with FFmpeg; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
@@ -108,11 +110,11 @@ static int alac_set_info(ALACContext *alac)
     ptr += 4; /* alac */
     ptr += 4; /* 0 ? */
 
-    if(BE_32(ptr) >= UINT_MAX/4){
+    if(AV_RB32(ptr) >= UINT_MAX/4){
         av_log(alac->avctx, AV_LOG_ERROR, "setinfo_max_samples_per_frame too large\n");
         return -1;
     }
-    alac->setinfo_max_samples_per_frame = BE_32(ptr); /* buffer size / 2 ? */
+    alac->setinfo_max_samples_per_frame = AV_RB32(ptr); /* buffer size / 2 ? */
     ptr += 4;
     alac->setinfo_7a = *ptr++;
     alac->setinfo_sample_size = *ptr++;
@@ -120,13 +122,13 @@ static int alac_set_info(ALACContext *alac)
     alac->setinfo_rice_initialhistory = *ptr++;
     alac->setinfo_rice_kmodifier = *ptr++;
     alac->setinfo_7f = *ptr++; // channels?
-    alac->setinfo_80 = BE_16(ptr);
+    alac->setinfo_80 = AV_RB16(ptr);
     ptr += 2;
-    alac->setinfo_82 = BE_32(ptr); // max coded frame size
+    alac->setinfo_82 = AV_RB32(ptr); // max coded frame size
     ptr += 4;
-    alac->setinfo_86 = BE_32(ptr); // bitrate ?
+    alac->setinfo_86 = AV_RB32(ptr); // bitrate ?
     ptr += 4;
-    alac->setinfo_8a_rate = BE_32(ptr); // samplerate
+    alac->setinfo_8a_rate = AV_RB32(ptr); // samplerate
     ptr += 4;
 
     allocate_buffers(alac);
@@ -470,7 +472,10 @@ static int alac_decode_frame(AVCodecContext *avctx,
                 ALAC_EXTRADATA_SIZE);
             return input_buffer_size;
         }
-        alac_set_info(alac);
+        if (alac_set_info(alac)) {
+            av_log(avctx, AV_LOG_ERROR, "alac: set_info failed\n");
+            return input_buffer_size;
+        }
         alac->context_initialized = 1;
     }
 

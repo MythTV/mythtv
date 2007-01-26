@@ -3,18 +3,20 @@
  *
  * Copyright (c) 2002-2004 Michael Niedermayer <michaelni@gmx.at>
  *
- * This library is free software; you can redistribute it and/or
+ * This file is part of FFmpeg.
+ *
+ * FFmpeg is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
- * version 2 of the License, or (at your option) any later version.
+ * version 2.1 of the License, or (at your option) any later version.
  *
- * This library is distributed in the hope that it will be useful,
+ * FFmpeg is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
+ * License along with FFmpeg; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
@@ -25,7 +27,9 @@
 
 #include "avcodec.h"
 #include "dsputil.h"
+#include "ratecontrol.h"
 #include "mpegvideo.h"
+#include "eval.h"
 
 #undef NDEBUG // allways check asserts, the speed effect is far too small to disable them
 #include <assert.h>
@@ -44,11 +48,69 @@ void ff_write_pass1_stats(MpegEncContext *s){
             s->f_code, s->b_code, s->current_picture.mc_mb_var_sum, s->current_picture.mb_var_sum, s->i_count, s->skip_count, s->header_bits);
 }
 
+static inline double qp2bits(RateControlEntry *rce, double qp){
+    if(qp<=0.0){
+        av_log(NULL, AV_LOG_ERROR, "qp<=0.0\n");
+    }
+    return rce->qscale * (double)(rce->i_tex_bits + rce->p_tex_bits+1)/ qp;
+}
+
+static inline double bits2qp(RateControlEntry *rce, double bits){
+    if(bits<0.9){
+        av_log(NULL, AV_LOG_ERROR, "bits<0.9\n");
+    }
+    return rce->qscale * (double)(rce->i_tex_bits + rce->p_tex_bits+1)/ bits;
+}
+
 int ff_rate_control_init(MpegEncContext *s)
 {
     RateControlContext *rcc= &s->rc_context;
     int i;
+    char *error = NULL;
+    static const char *const_names[]={
+        "PI",
+        "E",
+        "iTex",
+        "pTex",
+        "tex",
+        "mv",
+        "fCode",
+        "iCount",
+        "mcVar",
+        "var",
+        "isI",
+        "isP",
+        "isB",
+        "avgQP",
+        "qComp",
+/*        "lastIQP",
+        "lastPQP",
+        "lastBQP",
+        "nextNonBQP",*/
+        "avgIITex",
+        "avgPITex",
+        "avgPPTex",
+        "avgBPTex",
+        "avgTex",
+        NULL
+    };
+    static double (*func1[])(void *, double)={
+        (void *)bits2qp,
+        (void *)qp2bits,
+        NULL
+    };
+    static const char *func1_names[]={
+        "bits2qp",
+        "qp2bits",
+        NULL
+    };
     emms_c();
+
+    rcc->rc_eq_eval = ff_parse(s->avctx->rc_eq, const_names, func1, func1_names, NULL, NULL, &error);
+    if (!rcc->rc_eq_eval) {
+        av_log(s->avctx, AV_LOG_ERROR, "Error parsing rc_eq \"%s\": %s\n", s->avctx->rc_eq, error? error : "");
+        return -1;
+    }
 
     for(i=0; i<5; i++){
         rcc->pred[i].coeff= FF_QP2LAMBDA * 7.0;
@@ -191,26 +253,13 @@ void ff_rate_control_uninit(MpegEncContext *s)
     RateControlContext *rcc= &s->rc_context;
     emms_c();
 
+    ff_eval_free(rcc->rc_eq_eval);
     av_freep(&rcc->entry);
 
 #ifdef CONFIG_XVID
     if((s->flags&CODEC_FLAG_PASS2) && s->avctx->rc_strategy == FF_RC_STRATEGY_XVID)
         ff_xvid_rate_control_uninit(s);
 #endif
-}
-
-static inline double qp2bits(RateControlEntry *rce, double qp){
-    if(qp<=0.0){
-        av_log(NULL, AV_LOG_ERROR, "qp<=0.0\n");
-    }
-    return rce->qscale * (double)(rce->i_tex_bits + rce->p_tex_bits+1)/ qp;
-}
-
-static inline double bits2qp(RateControlEntry *rce, double bits){
-    if(bits<0.9){
-        av_log(NULL, AV_LOG_ERROR, "bits<0.9\n");
-    }
-    return rce->qscale * (double)(rce->i_tex_bits + rce->p_tex_bits+1)/ bits;
 }
 
 int ff_vbv_update(MpegEncContext *s, int frame_size){
@@ -287,47 +336,10 @@ static double get_qscale(MpegEncContext *s, RateControlEntry *rce, double rate_f
         (rcc->i_cplx_sum[pict_type] + rcc->p_cplx_sum[pict_type]) / (double)rcc->frame_count[pict_type],
         0
     };
-    static const char *const_names[]={
-        "PI",
-        "E",
-        "iTex",
-        "pTex",
-        "tex",
-        "mv",
-        "fCode",
-        "iCount",
-        "mcVar",
-        "var",
-        "isI",
-        "isP",
-        "isB",
-        "avgQP",
-        "qComp",
-/*        "lastIQP",
-        "lastPQP",
-        "lastBQP",
-        "nextNonBQP",*/
-        "avgIITex",
-        "avgPITex",
-        "avgPPTex",
-        "avgBPTex",
-        "avgTex",
-        NULL
-    };
-    static double (*func1[])(void *, double)={
-        (void *)bits2qp,
-        (void *)qp2bits,
-        NULL
-    };
-    static const char *func1_names[]={
-        "bits2qp",
-        "qp2bits",
-        NULL
-    };
 
-    bits= ff_eval(s->avctx->rc_eq, const_values, const_names, func1, func1_names, NULL, NULL, rce);
+    bits= ff_parse_eval(rcc->rc_eq_eval, const_values, rce);
     if (isnan(bits)) {
-        av_log(s->avctx, AV_LOG_ERROR, "Unable to parse rc_eq \"%s\".\n", s->avctx->rc_eq);
+        av_log(s->avctx, AV_LOG_ERROR, "Error evaluating rc_eq \"%s\"\n", s->avctx->rc_eq);
         return -1;
     }
 
@@ -367,7 +379,7 @@ static double get_diff_limited_q(MpegEncContext *s, RateControlEntry *rce, doubl
     const double last_non_b_q= rcc->last_qscale_for[rcc->last_non_b_pict_type];
 
     if     (pict_type==I_TYPE && (a->i_quant_factor>0.0 || rcc->last_non_b_pict_type==P_TYPE))
-        q= last_p_q    *ABS(a->i_quant_factor) + a->i_quant_offset;
+        q= last_p_q    *FFABS(a->i_quant_factor) + a->i_quant_offset;
     else if(pict_type==B_TYPE && a->b_quant_factor>0.0)
         q= last_non_b_q*    a->b_quant_factor  + a->b_quant_offset;
 
@@ -398,11 +410,11 @@ static void get_qminmax(int *qmin_ret, int *qmax_ret, MpegEncContext *s, int pic
     assert(qmin <= qmax);
 
     if(pict_type==B_TYPE){
-        qmin= (int)(qmin*ABS(s->avctx->b_quant_factor)+s->avctx->b_quant_offset + 0.5);
-        qmax= (int)(qmax*ABS(s->avctx->b_quant_factor)+s->avctx->b_quant_offset + 0.5);
+        qmin= (int)(qmin*FFABS(s->avctx->b_quant_factor)+s->avctx->b_quant_offset + 0.5);
+        qmax= (int)(qmax*FFABS(s->avctx->b_quant_factor)+s->avctx->b_quant_offset + 0.5);
     }else if(pict_type==I_TYPE){
-        qmin= (int)(qmin*ABS(s->avctx->i_quant_factor)+s->avctx->i_quant_offset + 0.5);
-        qmax= (int)(qmax*ABS(s->avctx->i_quant_factor)+s->avctx->i_quant_offset + 0.5);
+        qmin= (int)(qmin*FFABS(s->avctx->i_quant_factor)+s->avctx->i_quant_offset + 0.5);
+        qmax= (int)(qmax*FFABS(s->avctx->i_quant_factor)+s->avctx->i_quant_offset + 0.5);
     }
 
     qmin= clip(qmin, 1, FF_LAMBDA_MAX);

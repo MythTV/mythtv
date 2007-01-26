@@ -2,18 +2,20 @@
  * GXF demuxer.
  * Copyright (c) 2006 Reimar Doeffinger.
  *
- * This library is free software; you can redistribute it and/or
+ * This file is part of FFmpeg.
+ *
+ * FFmpeg is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
- * version 2 of the License, or (at your option) any later version.
+ * version 2.1 of the License, or (at your option) any later version.
  *
- * This library is distributed in the hope that it will be useful,
+ * FFmpeg is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
+ * License along with FFmpeg; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 #include "avformat.h"
@@ -128,11 +130,13 @@ static int get_sindex(AVFormatContext *s, int id, int format) {
         case 20:
             st->codec->codec_type = CODEC_TYPE_VIDEO;
             st->codec->codec_id = CODEC_ID_MPEG2VIDEO;
+            st->need_parsing = 2; // get keyframe flag etc.
             break;
         case 22:
         case 23:
             st->codec->codec_type = CODEC_TYPE_VIDEO;
             st->codec->codec_id = CODEC_ID_MPEG1VIDEO;
+            st->need_parsing = 2; // get keyframe flag etc.
             break;
         case 9:
             st->codec->codec_type = CODEC_TYPE_AUDIO;
@@ -157,6 +161,13 @@ static int get_sindex(AVFormatContext *s, int id, int format) {
             st->codec->codec_id = CODEC_ID_AC3;
             st->codec->channels = 2;
             st->codec->sample_rate = 48000;
+            break;
+        // timecode tracks:
+        case 7:
+        case 8:
+        case 24:
+            st->codec->codec_type = CODEC_TYPE_DATA;
+            st->codec->codec_id = CODEC_ID_NONE;
             break;
         default:
             st->codec->codec_type = CODEC_TYPE_UNKNOWN;
@@ -486,7 +497,7 @@ static int gxf_seek(AVFormatContext *s, int stream_index, int64_t timestamp, int
     maxlen = FFMAX(maxlen, 200 * 1024);
     url_fseek(&s->pb, pos, SEEK_SET);
     found = gxf_resync_media(s, maxlen, -1, timestamp);
-    if (ABS(found - timestamp) > 4)
+    if (FFABS(found - timestamp) > 4)
         return -1;
     return 0;
 }

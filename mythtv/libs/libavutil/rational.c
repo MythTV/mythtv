@@ -2,18 +2,20 @@
  * Rational numbers
  * Copyright (c) 2003 Michael Niedermayer <michaelni@gmx.at>
  *
- * This library is free software; you can redistribute it and/or
+ * This file is part of FFmpeg.
+ *
+ * FFmpeg is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
- * version 2 of the License, or (at your option) any later version.
+ * version 2.1 of the License, or (at your option) any later version.
  *
- * This library is distributed in the hope that it will be useful,
+ * FFmpeg is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
+ * License along with FFmpeg; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  *
  */
@@ -34,11 +36,11 @@
 int av_reduce(int *dst_nom, int *dst_den, int64_t nom, int64_t den, int64_t max){
     AVRational a0={0,1}, a1={1,0};
     int sign= (nom<0) ^ (den<0);
-    int64_t gcd= ff_gcd(ABS(nom), ABS(den));
+    int64_t gcd= ff_gcd(FFABS(nom), FFABS(den));
 
     if(gcd){
-        nom = ABS(nom)/gcd;
-        den = ABS(den)/gcd;
+        nom = FFABS(nom)/gcd;
+        den = FFABS(den)/gcd;
     }
     if(nom<=max && den<=max){
         a1= (AVRational){nom, den};
@@ -46,12 +48,19 @@ int av_reduce(int *dst_nom, int *dst_den, int64_t nom, int64_t den, int64_t max)
     }
 
     while(den){
-        int64_t x       = nom / den;
+        uint64_t x      = nom / den;
         int64_t next_den= nom - den*x;
         int64_t a2n= x*a1.num + a0.num;
         int64_t a2d= x*a1.den + a0.den;
 
-        if(a2n > max || a2d > max) break;
+        if(a2n > max || a2d > max){
+            if(a1.num) x= (max - a0.num) / a1.num;
+            if(a1.den) x= FFMIN(x, (max - a0.den) / a1.den);
+
+            if (den*(2*x*a1.den + a0.den) > nom*a1.den)
+                a1 = (AVRational){x*a1.num + a0.num, x*a1.den + a0.den};
+            break;
+        }
 
         a0= a1;
         a1= (AVRational){a2n, a2d};

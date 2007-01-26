@@ -357,11 +357,13 @@ void AvFormatDecoder::CloseContext()
     {
         CloseCodecs();
         
+        AVInputFormat *fmt = ic->iformat;
         ic->iformat->flags |= AVFMT_NOFILE;
 
         av_free(ic->pb.buffer);
         av_close_input_file(ic);
         ic = NULL;
+        fmt->flags &= ~AVFMT_NOFILE;
     }
         
     d->DestroyMPEG2();

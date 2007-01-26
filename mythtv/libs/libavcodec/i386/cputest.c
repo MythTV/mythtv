@@ -3,23 +3,27 @@
  * (c)1997-99 by H. Dietz and R. Fisher
  * Converted to C and improved by Fabrice Bellard.
  *
- * This library is free software; you can redistribute it and/or
+ * This file is part of FFmpeg.
+ *
+ * FFmpeg is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
- * version 2 of the License, or (at your option) any later version.
+ * version 2.1 of the License, or (at your option) any later version.
  *
- * This library is distributed in the hope that it will be useful,
+ * FFmpeg is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
+ * License along with FFmpeg; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
 #include <stdlib.h>
 #include "../dsputil.h"
+
+#undef printf
 
 #ifdef ARCH_X86_64
 #  define REG_b "rbx"
@@ -83,6 +87,8 @@ int mm_support(void)
             rval |= MM_SSE2;
         if (ecx & 1)
             rval |= MM_SSE3;
+        if (ecx & 0x00000200 )
+            rval |= MM_SSSE3;
     }
 
     cpuid(0x80000000, max_ext_level, ebx, ecx, edx);
@@ -100,11 +106,13 @@ int mm_support(void)
     }
 
 #if 0
-    av_log(NULL, AV_LOG_DEBUG, "%s%s%s%s%s%s\n",
+    av_log(NULL, AV_LOG_DEBUG, "%s%s%s%s%s%s%s%s\n",
         (rval&MM_MMX) ? "MMX ":"",
         (rval&MM_MMXEXT) ? "MMX2 ":"",
         (rval&MM_SSE) ? "SSE ":"",
         (rval&MM_SSE2) ? "SSE2 ":"",
+        (rval&MM_SSE3) ? "SSE3 ":"",
+        (rval&MM_SSSE3) ? "SSSE3 ":"",
         (rval&MM_3DNOW) ? "3DNow ":"",
         (rval&MM_3DNOWEXT) ? "3DNowExt ":"");
 #endif

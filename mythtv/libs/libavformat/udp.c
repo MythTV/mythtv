@@ -2,18 +2,20 @@
  * UDP prototype streaming system
  * Copyright (c) 2000, 2001, 2002 Fabrice Bellard.
  *
- * This library is free software; you can redistribute it and/or
+ * This file is part of FFmpeg.
+ *
+ * FFmpeg is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
- * version 2 of the License, or (at your option) any later version.
+ * version 2.1 of the License, or (at your option) any later version.
  *
- * This library is distributed in the hope that it will be useful,
+ * FFmpeg is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
+ * License along with FFmpeg; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 #include "avformat.h"
@@ -21,11 +23,7 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
-#ifndef __BEOS__
-# include <arpa/inet.h>
-#else
-# include "barpainet.h"
-#endif
+#include <arpa/inet.h>
 #include <netdb.h>
 
 #ifndef IPV6_ADD_MEMBERSHIP
@@ -38,6 +36,7 @@ typedef struct {
     int ttl;
     int is_multicast;
     int local_port;
+    int reuse_socket;
 #ifndef CONFIG_IPV6
     struct ip_mreq mreq;
     struct sockaddr_in dest_addr;
@@ -211,11 +210,7 @@ static int udp_ipv6_set_local(URLContext *h) {
 
  fail:
     if (udp_fd >= 0)
-#ifdef CONFIG_BEOS_NETSERVER
         closesocket(udp_fd);
-#else
-        close(udp_fd);
-#endif
     if(res0)
         freeaddrinfo(res0);
     return -1;
@@ -234,6 +229,7 @@ static int udp_ipv6_set_local(URLContext *h) {
  *         'ttl=n'       : set the ttl value (for multicast only)
  *         'localport=n' : set the local port
  *         'pkt_size=n'  : set max packet size
+ *         'reuse=1'     : enable reusing the socket
  *
  * @param s1 media file context
  * @param uri of the remote server
@@ -309,9 +305,11 @@ static int udp_open(URLContext *h, const char *uri, int flags)
     s->ttl = 16;
     s->is_multicast = 0;
     s->local_port = 0;
+    s->reuse_socket = 0;
     p = strchr(uri, '?');
     if (p) {
         s->is_multicast = find_info_tag(buf, sizeof(buf), "multicast", p);
+        s->reuse_socket = find_info_tag(buf, sizeof(buf), "reuse", p);
         if (find_info_tag(buf, sizeof(buf), "ttl", p)) {
             s->ttl = strtol(buf, NULL, 10);
         }
@@ -349,6 +347,10 @@ static int udp_open(URLContext *h, const char *uri, int flags)
         my_addr.sin_port = htons(s->local_port);
     }
 
+    if (s->reuse_socket)
+        if (setsockopt (udp_fd, SOL_SOCKET, SO_REUSEADDR, &(s->reuse_socket), sizeof(s->reuse_socket)) != 0)
+            goto fail;
+
     /* the bind is needed to give a port to the socket now */
     if (bind(udp_fd,(struct sockaddr *)&my_addr, sizeof(my_addr)) < 0)
         goto fail;
@@ -357,7 +359,7 @@ static int udp_open(URLContext *h, const char *uri, int flags)
     getsockname(udp_fd, (struct sockaddr *)&my_addr1, &len);
     s->local_port = ntohs(my_addr1.sin_port);
 
-#ifndef CONFIG_BEOS_NETSERVER
+#ifdef IP_MULTICAST_TTL
     if (s->is_multicast) {
         if (h->flags & URL_WRONLY) {
             /* output */
@@ -385,7 +387,6 @@ static int udp_open(URLContext *h, const char *uri, int flags)
     udp_fd = udp_ipv6_set_local(h);
     if (udp_fd < 0)
         goto fail;
-#ifndef CONFIG_BEOS_NETSERVER
     if (s->is_multicast) {
         if (h->flags & URL_WRONLY) {
             if (udp_ipv6_set_multicast_ttl(udp_fd, s->ttl, (struct sockaddr *)&s->dest_addr) < 0)
@@ -395,7 +396,6 @@ static int udp_open(URLContext *h, const char *uri, int flags)
                 goto fail;
         }
     }
-#endif
 #endif
 
     if (is_output) {
@@ -411,11 +411,7 @@ static int udp_open(URLContext *h, const char *uri, int flags)
     return 0;
  fail:
     if (udp_fd >= 0)
-#ifdef CONFIG_BEOS_NETSERVER
         closesocket(udp_fd);
-#else
-        close(udp_fd);
-#endif
     av_free(s);
     return AVERROR_IO;
 }
@@ -428,7 +424,8 @@ static int udp_read(URLContext *h, uint8_t *buf, int size)
 #else
     struct sockaddr_storage from;
 #endif
-    int from_len, len;
+    socklen_t from_len;
+    int len;
 
     for(;;) {
         from_len = sizeof(from);
@@ -471,22 +468,20 @@ static int udp_close(URLContext *h)
 {
     UDPContext *s = h->priv_data;
 
-#ifndef CONFIG_BEOS_NETSERVER
 #ifndef CONFIG_IPV6
+#ifdef IP_DROP_MEMBERSHIP
     if (s->is_multicast && !(h->flags & URL_WRONLY)) {
         if (setsockopt(s->udp_fd, IPPROTO_IP, IP_DROP_MEMBERSHIP,
                        &s->mreq, sizeof(s->mreq)) < 0) {
             perror("IP_DROP_MEMBERSHIP");
         }
     }
+#endif
 #else
     if (s->is_multicast && !(h->flags & URL_WRONLY))
         udp_ipv6_leave_multicast_group(s->udp_fd, (struct sockaddr *)&s->dest_addr);
 #endif
-    close(s->udp_fd);
-#else
     closesocket(s->udp_fd);
-#endif
     av_free(s);
     return 0;
 }

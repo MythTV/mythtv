@@ -2,18 +2,20 @@
  * Raw Video Codec
  * Copyright (c) 2001 Fabrice Bellard.
  *
- * This library is free software; you can redistribute it and/or
+ * This file is part of FFmpeg.
+ *
+ * FFmpeg is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
- * version 2 of the License, or (at your option) any later version.
+ * version 2.1 of the License, or (at your option) any later version.
  *
- * This library is distributed in the hope that it will be useful,
+ * FFmpeg is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
+ * License along with FFmpeg; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
@@ -35,7 +37,7 @@ typedef struct PixelFormatTag {
     unsigned int fourcc;
 } PixelFormatTag;
 
-const PixelFormatTag pixelFormatTags[] = {
+static const PixelFormatTag pixelFormatTags[] = {
     { PIX_FMT_YUV420P, MKTAG('I', '4', '2', '0') }, /* Planar formats */
     { PIX_FMT_YUV420P, MKTAG('I', 'Y', 'U', 'V') },
     { PIX_FMT_YUV420P, MKTAG('Y', 'V', '1', '2') },
@@ -50,6 +52,10 @@ const PixelFormatTag pixelFormatTags[] = {
     { PIX_FMT_YUV422,  MKTAG('Y', '4', '2', '2') },
     { PIX_FMT_UYVY422, MKTAG('U', 'Y', 'V', 'Y') },
     { PIX_FMT_GRAY8,   MKTAG('G', 'R', 'E', 'Y') },
+    { PIX_FMT_RGB555,  MKTAG('R', 'G', 'B', 15) },
+    { PIX_FMT_BGR555,  MKTAG('B', 'G', 'R', 15) },
+    { PIX_FMT_RGB565,  MKTAG('R', 'G', 'B', 16) },
+    { PIX_FMT_BGR565,  MKTAG('B', 'G', 'R', 16) },
 
     /* quicktime */
     { PIX_FMT_UYVY422, MKTAG('2', 'v', 'u', 'y') },
@@ -91,7 +97,7 @@ static int raw_init_decoder(AVCodecContext *avctx)
         switch(avctx->bits_per_sample){
         case  8: avctx->pix_fmt= PIX_FMT_PAL8  ; break;
         case 15: avctx->pix_fmt= PIX_FMT_RGB555; break;
-        case 16: avctx->pix_fmt= PIX_FMT_RGB565; break;
+        case 16: avctx->pix_fmt= PIX_FMT_RGB555; break;
         case 24: avctx->pix_fmt= PIX_FMT_BGR24 ; break;
         case 32: avctx->pix_fmt= PIX_FMT_RGBA32; break;
         }
@@ -164,7 +170,7 @@ static int raw_close_decoder(AVCodecContext *avctx)
 }
 
 /* RAW Encoder Implementation */
-
+#ifdef CONFIG_RAWVIDEO_ENCODER
 static int raw_init_encoder(AVCodecContext *avctx)
 {
     avctx->coded_frame = (AVFrame *)avctx->priv_data;
@@ -182,7 +188,6 @@ static int raw_encode(AVCodecContext *avctx,
                                                avctx->height, frame, buf_size);
 }
 
-#ifdef CONFIG_RAWVIDEO_ENCODER
 AVCodec rawvideo_encoder = {
     "rawvideo",
     CODEC_TYPE_VIDEO,

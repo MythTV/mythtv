@@ -4,18 +4,20 @@
  * copyright (c) 2001 Juan J. Sierralta P.
  * copyright (c) 2002-2004 Michael Niedermayer <michaelni@gmx.at>
  *
- * This library is free software; you can redistribute it and/or
+ * This file is part of FFmpeg.
+ *
+ * FFmpeg is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
- * version 2 of the License, or (at your option) any later version.
+ * version 2.1 of the License, or (at your option) any later version.
  *
- * This library is distributed in the hope that it will be useful,
+ * FFmpeg is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
+ * License along with FFmpeg; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
@@ -86,7 +88,7 @@ static const int h263_mb_type_b_map[15]= {
     MB_TYPE_INTRA4x4                | MB_TYPE_CBP | MB_TYPE_QUANT,
 };
 
-const uint8_t cbpc_b_tab[4][2] = {
+static const uint8_t cbpc_b_tab[4][2] = {
 {0, 1},
 {2, 2},
 {7, 3},
@@ -178,7 +180,7 @@ static RLTable rl_inter = {
     inter_level,
 };
 
-const uint16_t intra_vlc_aic[103][2] = {
+static const uint16_t intra_vlc_aic[103][2] = {
 {  0x2,  2 }, {  0x6,  3 }, {  0xe,  4 }, {  0xc,  5 },
 {  0xd,  5 }, { 0x10,  6 }, { 0x11,  6 }, { 0x12,  6 },
 { 0x16,  7 }, { 0x1b,  8 }, { 0x20,  9 }, { 0x21,  9 },
@@ -207,7 +209,7 @@ const uint16_t intra_vlc_aic[103][2] = {
 { 0x59, 12 }, { 0x5a, 12 }, {  0x3,  7 },
 };
 
-const int8_t intra_run_aic[102] = {
+static const int8_t intra_run_aic[102] = {
  0,  0,  0,  0,  0,  0,  0,  0,
  0,  0,  0,  0,  0,  0,  0,  0,
  0,  0,  0,  0,  0,  0,  0,  0,
@@ -223,7 +225,7 @@ const int8_t intra_run_aic[102] = {
 18, 19, 20, 21, 22, 23,
 };
 
-const int8_t intra_level_aic[102] = {
+static const int8_t intra_level_aic[102] = {
  1,  2,  3,  4,  5,  6,  7,  8,
  9, 10, 11, 12, 13, 14, 15, 16,
 17, 18, 19, 20, 21, 22, 23, 24,

@@ -1,19 +1,21 @@
 /*
- * NSV decoder.
+ * NSV demuxer
  * Copyright (c) 2004 The FFmpeg Project.
  *
- * This library is free software; you can redistribute it and/or
+ * This file is part of FFmpeg.
+ *
+ * FFmpeg is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
- * version 2 of the License, or (at your option) any later version.
+ * version 2.1 of the License, or (at your option) any later version.
  *
- * This library is distributed in the hope that it will be useful,
+ * FFmpeg is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
+ * License along with FFmpeg; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 #include "avformat.h"
@@ -38,6 +40,8 @@
  * seems someone came to the same conclusions as me, and updated it:
  * (2) http://www.stud.ktu.lt/~vitslav/nsv/nsv-format.txt
  *     http://www.stud.ktu.lt/~vitslav/nsv/
+ * official docs
+ * (3) http://ultravox.aol.com/NSVFormat.rtf
  * Sample files:
  * (S1) http://www.nullsoft.com/nsv/samples/
  * http://www.nullsoft.com/nsv/samples/faster.nsv
@@ -175,43 +179,35 @@ typedef struct {
     int64_t duration;
     uint32_t vtag, atag;
     uint16_t vwidth, vheight;
+    int16_t avsync;
     //DVDemuxContext* dv_demux;
 } NSVContext;
 
-static const CodecTag nsv_codec_video_tags[] = {
+static const AVCodecTag nsv_codec_video_tags[] = {
     { CODEC_ID_VP3, MKTAG('V', 'P', '3', ' ') },
     { CODEC_ID_VP3, MKTAG('V', 'P', '3', '0') },
     { CODEC_ID_VP3, MKTAG('V', 'P', '3', '1') },
     { CODEC_ID_VP5, MKTAG('V', 'P', '5', ' ') },
     { CODEC_ID_VP5, MKTAG('V', 'P', '5', '0') },
+    { CODEC_ID_VP6, MKTAG('V', 'P', '6', ' ') },
+    { CODEC_ID_VP6, MKTAG('V', 'P', '6', '0') },
+    { CODEC_ID_VP6, MKTAG('V', 'P', '6', '1') },
     { CODEC_ID_VP6, MKTAG('V', 'P', '6', '2') },
 /*
     { CODEC_ID_VP4, MKTAG('V', 'P', '4', ' ') },
     { CODEC_ID_VP4, MKTAG('V', 'P', '4', '0') },
-    { CODEC_ID_VP6, MKTAG('V', 'P', '6', ' ') },
-    { CODEC_ID_VP6, MKTAG('V', 'P', '6', '0') },
-    { CODEC_ID_VP6, MKTAG('V', 'P', '6', '1') },
 */
     { CODEC_ID_XVID, MKTAG('X', 'V', 'I', 'D') }, /* cf sample xvid decoder from nsv_codec_sdk.zip */
     { CODEC_ID_RAWVIDEO, MKTAG('R', 'G', 'B', '3') },
     { 0, 0 },
 };
 
-static const CodecTag nsv_codec_audio_tags[] = {
+static const AVCodecTag nsv_codec_audio_tags[] = {
     { CODEC_ID_MP3, MKTAG('M', 'P', '3', ' ') },
     { CODEC_ID_AAC, MKTAG('A', 'A', 'C', ' ') },
     { CODEC_ID_AAC, MKTAG('A', 'A', 'C', 'P') }, /* _CUTTED__MUXED_2 Heads - Out Of The City.nsv */
     { CODEC_ID_PCM_U16LE, MKTAG('P', 'C', 'M', ' ') },
     { 0, 0 },
-};
-
-static const AVRational nsv_framerate_table[] = {
-    {30,1},
-    {30000,1001},
-    {25,1},
-    {24000,1001},
-    {30,1},
-    {15000,1001},
 };
 
 //static int nsv_load_index(AVFormatContext *s);
@@ -403,7 +399,6 @@ static int nsv_parse_NSVs_header(AVFormatContext *s, AVFormatParameters *ap)
     uint16_t vwidth, vheight;
     AVRational framerate;
     int i;
-    uint16_t unknown;
     AVStream *st;
     NSVStream *nst;
     PRINT(("%s()\n", __FUNCTION__));
@@ -413,12 +408,26 @@ static int nsv_parse_NSVs_header(AVFormatContext *s, AVFormatParameters *ap)
     vwidth = get_le16(pb);
     vheight = get_le16(pb);
     i = get_byte(pb);
-    /* XXX how big must the table be ? */
-    /* seems there is more to that... */
+
     PRINT(("NSV NSVs framerate code %2x\n", i));
-    if(i&0x80) framerate= nsv_framerate_table[i & 0x7F];
-    else       framerate= (AVRational){i, 1};
-    unknown = get_le16(pb);
+    if(i&0x80) { /* odd way of giving native framerates from docs */
+        int t=(i & 0x7F)>>2;
+        if(t<16) framerate = (AVRational){1, t+1};
+        else     framerate = (AVRational){t-15, 1};
+
+        if(i&1){
+            framerate.num *= 1000;
+            framerate.den *= 1001;
+        }
+
+        if((i&3)==3)      framerate.num *= 24;
+        else if((i&3)==2) framerate.num *= 25;
+        else              framerate.num *= 30;
+    }
+    else
+        framerate= (AVRational){i, 1};
+
+    nsv->avsync = get_le16(pb);
 #ifdef DEBUG
     print_tag("NSV NSVs vtag", vtag, 0);
     print_tag("NSV NSVs atag", atag, 0);
@@ -464,15 +473,13 @@ static int nsv_parse_NSVs_header(AVFormatContext *s, AVFormatParameters *ap)
             st->codec->codec_type = CODEC_TYPE_AUDIO;
             st->codec->codec_tag = atag;
             st->codec->codec_id = codec_get_id(nsv_codec_audio_tags, atag);
-            st->start_time = 0;
-//            st->duration = nsv->duration; //FIXME
 
             st->need_parsing = 1; /* for PCM we will read a chunk later and put correct info */
-            /* XXX:FIXME */
-            //st->codec->channels = 2; //XXX:channels;
-            //st->codec->sample_rate = 1000;
-            //av_set_pts_info(st, 64, 1, st->codec->sample_rate);
 
+            /* set timebase to common denominator of ms and framerate */
+            av_set_pts_info(st, 64, 1, framerate.num*1000);
+            st->start_time = 0;
+            st->duration = (int64_t)nsv->duration * framerate.num;
 #endif
         }
 #ifdef CHECK_SUBSEQUENT_NSVS
@@ -596,7 +603,7 @@ null_chunk_retry:
         av_get_packet(pb, pkt, vsize);
         pkt->stream_index = st[NSV_ST_VIDEO]->index;//NSV_ST_VIDEO;
         pkt->dts = nst->frame_offset++;
-        pkt->flags |= PKT_FLAG_KEY; /* stupid format has no way to tell XXX: try the index */
+        pkt->flags |= nsv->state == NSV_HAS_READ_NSVS ? PKT_FLAG_KEY : 0; /* keyframe only likely on a sync frame */
 /*
         for (i = 0; i < MIN(8, vsize); i++)
             PRINT(("NSV video: [%d] = %02x\n", i, pkt->data[i]));
@@ -628,20 +635,22 @@ null_chunk_retry:
                 channels = 1;
                 st[NSV_ST_AUDIO]->codec->channels = channels;
                 st[NSV_ST_AUDIO]->codec->sample_rate = samplerate;
-                av_set_pts_info(st[NSV_ST_AUDIO], 64, 1,
-                                st[NSV_ST_AUDIO]->codec->sample_rate);
                 PRINT(("NSV RAWAUDIO: bps %d, nchan %d, srate %d\n", bps, channels, samplerate));
             }
         }
         av_get_packet(pb, pkt, asize);
         pkt->stream_index = st[NSV_ST_AUDIO]->index;//NSV_ST_AUDIO;
-        //pkt->dts = nst->frame_offset;
-        //if (nst->sample_size)
-        //    pkt->dts /= nst->sample_size;
-        nst->frame_offset += asize; // XXX: that's valid only for PCM !?
+        pkt->flags |= nsv->state == NSV_HAS_READ_NSVS ? PKT_FLAG_KEY : 0; /* keyframe only likely on a sync frame */
+        if( nsv->state == NSV_HAS_READ_NSVS && st[NSV_ST_VIDEO] ) {
+            /* on a nsvs frame we have new information on a/v sync */
+            pkt->dts = (((NSVStream*)st[NSV_ST_VIDEO]->priv_data)->frame_offset-1);
+            pkt->dts *= (int64_t)1000 * st[NSV_ST_VIDEO]->time_base.num;
+            pkt->dts += (int64_t)nsv->avsync * st[NSV_ST_VIDEO]->time_base.den;
+            PRINT(("NSV AUDIO: sync:%d, dts:%"PRId64, nsv->avsync, pkt->dts));
+        }
+        nst->frame_offset++;
     }
 
-    //pkt->flags |= PKT_FLAG_KEY;
     nsv->state = NSV_UNSYNC;
     return 0;
 }

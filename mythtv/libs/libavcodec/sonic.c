@@ -2,18 +2,20 @@
  * Simple free lossless/lossy audio codec
  * Copyright (c) 2004 Alex Beregszaszi
  *
- * This library is free software; you can redistribute it and/or
+ * This file is part of FFmpeg.
+ *
+ * FFmpeg is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
- * version 2 of the License, or (at your option) any later version.
+ * version 2.1 of the License, or (at your option) any later version.
  *
- * This library is distributed in the hope that it will be useful,
+ * FFmpeg is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
+ * License along with FFmpeg; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 #include "avcodec.h"
@@ -406,6 +408,7 @@ static int predictor_calc_error(int *k, int *state, int order, int error)
     return x;
 }
 
+#ifdef CONFIG_ENCODERS
 // Heavily modified Levinson-Durbin algorithm which
 // copes better with quantization, and calculates the
 // actual whitened result as it goes.
@@ -476,6 +479,7 @@ static void modified_levinson_durbin(int *window, int window_entries,
 
     av_free(state);
 }
+#endif /* CONFIG_ENCODERS */
 
 static int samplerate_table[] =
     { 44100, 22050, 11025, 96000, 48000, 32000, 24000, 16000, 8000 };
@@ -746,6 +750,7 @@ static int sonic_encode_frame(AVCodecContext *avctx,
 }
 #endif //CONFIG_ENCODERS
 
+#ifdef CONFIG_DECODERS
 static int sonic_decode_init(AVCodecContext *avctx)
 {
     SonicContext *s = avctx->priv_data;
@@ -936,6 +941,7 @@ static int sonic_decode_frame(AVCodecContext *avctx,
 
     return (get_bits_count(&gb)+7)/8;
 }
+#endif
 
 #ifdef CONFIG_ENCODERS
 AVCodec sonic_encoder = {

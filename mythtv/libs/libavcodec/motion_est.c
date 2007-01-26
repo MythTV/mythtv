@@ -4,18 +4,20 @@
  * Copyright (c) 2002-2004 Michael Niedermayer
  *
  *
- * This library is free software; you can redistribute it and/or
+ * This file is part of FFmpeg.
+ *
+ * FFmpeg is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
- * version 2 of the License, or (at your option) any later version.
+ * version 2.1 of the License, or (at your option) any later version.
  *
- * This library is distributed in the hope that it will be useful,
+ * FFmpeg is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
+ * License along with FFmpeg; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  *
  * new Motion Estimation (X1/EPZS) by Michael Niedermayer <michaelni@gmx.at>
@@ -101,7 +103,7 @@ static int get_flags(MotionEstContext *c, int direct, int chroma){
            + (chroma ? FLAG_CHROMA : 0);
 }
 
-static always_inline int cmp(MpegEncContext *s, const int x, const int y, const int subx, const int suby,
+static av_always_inline int cmp(MpegEncContext *s, const int x, const int y, const int subx, const int suby,
                       const int size, const int h, int ref_index, int src_index,
                       me_cmp_func cmp_func, me_cmp_func chroma_cmp_func, const int flags){
     MotionEstContext * const c= &s->me;
@@ -117,6 +119,7 @@ static always_inline int cmp(MpegEncContext *s, const int x, const int y, const 
     int d;
     //FIXME check chroma 4mv, (no crashes ...)
     if(flags&FLAG_DIRECT){
+        assert(x >= c->xmin && hx <= c->xmax<<(qpel+1) && y >= c->ymin && hy <= c->ymax<<(qpel+1));
         if(x >= c->xmin && hx <= c->xmax<<(qpel+1) && y >= c->ymin && hy <= c->ymax<<(qpel+1)){
             const int time_pp= s->pp_time;
             const int time_pb= s->pb_time;
@@ -228,7 +231,13 @@ static void zero_hpel(uint8_t *a, const uint8_t *b, int stride, int h){
 
 void ff_init_me(MpegEncContext *s){
     MotionEstContext * const c= &s->me;
+    int cache_size= FFMIN(ME_MAP_SIZE>>ME_MAP_SHIFT, 1<<ME_MAP_SHIFT);
+    int dia_size= FFMAX(FFABS(s->avctx->dia_size)&255, FFABS(s->avctx->pre_dia_size)&255);
     c->avctx= s->avctx;
+
+    if(cache_size < 2*dia_size && !c->stride){
+        av_log(s->avctx, AV_LOG_INFO, "ME_MAP size may be a little small for the selected diamond size\n");
+    }
 
     ff_set_cmp(&s->dsp, s->dsp.me_pre_cmp, c->avctx->me_pre_cmp);
     ff_set_cmp(&s->dsp, s->dsp.me_cmp, c->avctx->me_cmp);
@@ -294,14 +303,14 @@ static int pix_dev(uint8_t * pix, int line_size, int mean)
     s = 0;
     for (i = 0; i < 16; i++) {
         for (j = 0; j < 16; j += 8) {
-            s += ABS(pix[0]-mean);
-            s += ABS(pix[1]-mean);
-            s += ABS(pix[2]-mean);
-            s += ABS(pix[3]-mean);
-            s += ABS(pix[4]-mean);
-            s += ABS(pix[5]-mean);
-            s += ABS(pix[6]-mean);
-            s += ABS(pix[7]-mean);
+            s += FFABS(pix[0]-mean);
+            s += FFABS(pix[1]-mean);
+            s += FFABS(pix[2]-mean);
+            s += FFABS(pix[3]-mean);
+            s += FFABS(pix[4]-mean);
+            s += FFABS(pix[5]-mean);
+            s += FFABS(pix[6]-mean);
+            s += FFABS(pix[7]-mean);
             pix += 8;
         }
         pix += line_size - 16;
@@ -687,6 +696,7 @@ static inline void set_p_mv_tables(MpegEncContext * s, int mx, int my, int mv4)
 static inline void get_limits(MpegEncContext *s, int x, int y)
 {
     MotionEstContext * const c= &s->me;
+    int range= c->avctx->me_range >> (1 + !!(c->flags&FLAG_QPEL));
 /*
     if(c->avctx->me_range) c->range= c->avctx->me_range >> 1;
     else                   c->range= 16;
@@ -707,6 +717,12 @@ static inline void get_limits(MpegEncContext *s, int x, int y)
         c->ymin = - y;
         c->xmax = - x + s->mb_width *16 - 16;
         c->ymax = - y + s->mb_height*16 - 16;
+    }
+    if(range){
+        c->xmin = FFMAX(c->xmin,-range);
+        c->xmax = FFMIN(c->xmax, range);
+        c->ymin = FFMAX(c->ymin,-range);
+        c->ymax = FFMIN(c->ymax, range);
     }
 }
 
@@ -1143,7 +1159,9 @@ void ff_estimate_p_frame_motion(MpegEncContext * s,
 {
     MotionEstContext * const c= &s->me;
     uint8_t *pix, *ppix;
-    int sum, varc, vard, mx, my, dmin;
+    int sum, mx, my, dmin;
+    int varc;            ///< the variance of the block (sum of squared (p[y][x]-average))
+    int vard;            ///< sum of squared differences with the estimated motion vector
     int P[10][2];
     const int shift= 1+s->quarter_sample;
     int mb_type=0;
@@ -1176,13 +1194,11 @@ void ff_estimate_p_frame_motion(MpegEncContext * s,
         vard= check_input_motion(s, mb_x, mb_y, 1);
 
         if((vard+128)>>8 < c->avctx->me_threshold){
+            int p_score= FFMIN(vard, varc-500+(s->lambda2>>FF_LAMBDA_SHIFT)*100);
+            int i_score= varc-500+(s->lambda2>>FF_LAMBDA_SHIFT)*20;
             pic->mc_mb_var[s->mb_stride * mb_y + mb_x] = (vard+128)>>8;
             c->mc_mb_var_sum_temp += (vard+128)>>8;
-            if (vard <= 64<<8 || vard < varc) { //FIXME
-                c->scene_change_score+= ff_sqrt(vard) - ff_sqrt(varc);
-            }else{
-                c->scene_change_score+= s->qscale * s->avctx->scenechange_factor;
-            }
+            c->scene_change_score+= ff_sqrt(p_score) - ff_sqrt(i_score);
             return;
         }
         if((vard+128)>>8 < c->avctx->mb_threshold)
@@ -1269,10 +1285,9 @@ void ff_estimate_p_frame_motion(MpegEncContext * s,
            varc, s->avg_mb_var, sum, vard, mx - xx, my - yy);
 #endif
     if(mb_type){
-        if (vard <= 64<<8 || vard < varc)
-            c->scene_change_score+= ff_sqrt(vard) - ff_sqrt(varc);
-        else
-            c->scene_change_score+= s->qscale * s->avctx->scenechange_factor;
+        int p_score= FFMIN(vard, varc-500+(s->lambda2>>FF_LAMBDA_SHIFT)*100);
+        int i_score= varc-500+(s->lambda2>>FF_LAMBDA_SHIFT)*20;
+        c->scene_change_score+= ff_sqrt(p_score) - ff_sqrt(i_score);
 
         if(mb_type == CANDIDATE_MB_TYPE_INTER){
             c->sub_motion_search(s, &mx, &my, dmin, 0, 0, 0, 16);
@@ -1290,14 +1305,14 @@ void ff_estimate_p_frame_motion(MpegEncContext * s,
             interlaced_search(s, 0, s->p_field_mv_table, s->p_field_select_table, mx, my, 1);
         }
     }else if(c->avctx->mb_decision > FF_MB_DECISION_SIMPLE){
-        if (vard <= 64<<8 || vard < varc)
-            c->scene_change_score+= ff_sqrt(vard) - ff_sqrt(varc);
-        else
-            c->scene_change_score+= s->qscale * s->avctx->scenechange_factor;
+        int p_score= FFMIN(vard, varc-500+(s->lambda2>>FF_LAMBDA_SHIFT)*100);
+        int i_score= varc-500+(s->lambda2>>FF_LAMBDA_SHIFT)*20;
+        c->scene_change_score+= ff_sqrt(p_score) - ff_sqrt(i_score);
 
         if (vard*2 + 200*256 > varc)
             mb_type|= CANDIDATE_MB_TYPE_INTRA;
-        if (varc*2 + 200*256 > vard){
+        if (varc*2 + 200*256 > vard || s->qscale > 24){
+//        if (varc*2 + 200*256 + 50*(s->lambda2>>FF_LAMBDA_SHIFT) > vard){
             mb_type|= CANDIDATE_MB_TYPE_INTER;
             c->sub_motion_search(s, &mx, &my, dmin, 0, 0, 0, 16);
             if(s->flags&CODEC_FLAG_MV0)
@@ -1396,10 +1411,10 @@ void ff_estimate_p_frame_motion(MpegEncContext * s,
         }else
             s->current_picture.mb_type[mb_y*s->mb_stride + mb_x]= 0;
 
-        if (vard <= 64<<8 || vard < varc) { //FIXME
-            c->scene_change_score+= ff_sqrt(vard) - ff_sqrt(varc);
-        }else{
-            c->scene_change_score+= s->qscale * s->avctx->scenechange_factor;
+        {
+            int p_score= FFMIN(vard, varc-500+(s->lambda2>>FF_LAMBDA_SHIFT)*100);
+            int i_score= varc-500+(s->lambda2>>FF_LAMBDA_SHIFT)*20;
+            c->scene_change_score+= ff_sqrt(p_score) - ff_sqrt(i_score);
         }
     }
 
@@ -1787,7 +1802,7 @@ static inline int direct_search(MpegEncContext * s, int mb_x, int mb_y)
     P_LEFT[1]        = clip(mv_table[mot_xy - 1][1], ymin<<shift, ymax<<shift);
 
     /* special case for first line */
-    if (!s->first_slice_line) { //FIXME maybe allow this over thread boundary as its cliped
+    if (!s->first_slice_line) { //FIXME maybe allow this over thread boundary as its clipped
         P_TOP[0]      = clip(mv_table[mot_xy - mot_stride             ][0], xmin<<shift, xmax<<shift);
         P_TOP[1]      = clip(mv_table[mot_xy - mot_stride             ][1], ymin<<shift, ymax<<shift);
         P_TOPRIGHT[0] = clip(mv_table[mot_xy - mot_stride + 1         ][0], xmin<<shift, xmax<<shift);
@@ -1808,8 +1823,8 @@ static inline int direct_search(MpegEncContext * s, int mb_x, int mb_y)
 
     get_limits(s, 16*mb_x, 16*mb_y); //restore c->?min/max, maybe not needed
 
-    s->b_direct_mv_table[mot_xy][0]= mx;
-    s->b_direct_mv_table[mot_xy][1]= my;
+    mv_table[mot_xy][0]= mx;
+    mv_table[mot_xy][1]= my;
     c->flags     &= ~FLAG_DIRECT;
     c->sub_flags &= ~FLAG_DIRECT;
 
@@ -1829,6 +1844,18 @@ void ff_estimate_b_frame_motion(MpegEncContext * s,
     get_limits(s, 16*mb_x, 16*mb_y);
 
     c->skip=0;
+
+    if(s->codec_id == CODEC_ID_MPEG4 && s->next_picture.mbskip_table[xy]){
+        int score= direct_search(s, mb_x, mb_y); //FIXME just check 0,0
+
+        score= ((unsigned)(score*score + 128*256))>>16;
+        c->mc_mb_var_sum_temp += score;
+        s->current_picture.mc_mb_var[mb_y*s->mb_stride + mb_x] = score; //FIXME use SSE
+        s->mb_type[mb_y*s->mb_stride + mb_x]= CANDIDATE_MB_TYPE_DIRECT0;
+
+        return;
+    }
+
     if(c->avctx->me_threshold){
         int vard= check_input_motion(s, mb_x, mb_y, 0);
 
@@ -1951,6 +1978,8 @@ void ff_estimate_b_frame_motion(MpegEncContext * s,
         }
          //FIXME something smarter
         if(dmin>256*256*16) type&= ~CANDIDATE_MB_TYPE_DIRECT; //dont try direct mode if its invalid for this MB
+        if(s->codec_id == CODEC_ID_MPEG4 && type&CANDIDATE_MB_TYPE_DIRECT && s->flags&CODEC_FLAG_MV0 && *(uint32_t*)s->b_direct_mv_table[xy])
+            type |= CANDIDATE_MB_TYPE_DIRECT0;
 #if 0
         if(s->out_format == FMT_MPEG1)
             type |= CANDIDATE_MB_TYPE_INTRA;

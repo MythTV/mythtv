@@ -2,18 +2,20 @@
  * Copyright (C) 2006 Michael Niedermayer (michaelni@gmx.at)
  * Copyright (C) 2003-2005 by Christopher R. Hertel (crh@ubiqx.mn.org)
  *
- * This library is free software; you can redistribute it and/or
+ * This file is part of FFmpeg.
+ *
+ * FFmpeg is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
- * version 2 of the License, or (at your option) any later version.
+ * version 2.1 of the License, or (at your option) any later version.
  *
- * This library is distributed in the hope that it will be useful,
+ * FFmpeg is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
+ * License along with FFmpeg; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  *
  * References:
@@ -174,11 +176,11 @@ main(){
     uint8_t in[1000];
 
     for(i=0; i<1000; i++) in[i]= i*i;
-    av_md5_sum( (uint8_t*)&md5val, in,  1000); printf("%lld\n", md5val);
-    av_md5_sum( (uint8_t*)&md5val, in,  63); printf("%lld\n", md5val);
-    av_md5_sum( (uint8_t*)&md5val, in,  64); printf("%lld\n", md5val);
-    av_md5_sum( (uint8_t*)&md5val, in,  65); printf("%lld\n", md5val);
+    av_md5_sum( (uint8_t*)&md5val, in,  1000); printf("%"PRId64"\n", md5val);
+    av_md5_sum( (uint8_t*)&md5val, in,  63); printf("%"PRId64"\n", md5val);
+    av_md5_sum( (uint8_t*)&md5val, in,  64); printf("%"PRId64"\n", md5val);
+    av_md5_sum( (uint8_t*)&md5val, in,  65); printf("%"PRId64"\n", md5val);
     for(i=0; i<1000; i++) in[i]= i % 127;
-    av_md5_sum( (uint8_t*)&md5val, in,  999); printf("%lld\n", md5val);
+    av_md5_sum( (uint8_t*)&md5val, in,  999); printf("%"PRId64"\n", md5val);
 }
 #endif

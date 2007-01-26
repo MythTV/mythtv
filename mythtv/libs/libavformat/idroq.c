@@ -2,18 +2,20 @@
  * Id RoQ (.roq) File Demuxer
  * Copyright (c) 2003 The ffmpeg Project
  *
- * This library is free software; you can redistribute it and/or
+ * This file is part of FFmpeg.
+ *
+ * FFmpeg is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
- * version 2 of the License, or (at your option) any later version.
+ * version 2.1 of the License, or (at your option) any later version.
  *
- * This library is distributed in the hope that it will be useful,
+ * FFmpeg is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
+ * License along with FFmpeg; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
@@ -59,8 +61,8 @@ static int roq_probe(AVProbeData *p)
     if (p->buf_size < 6)
         return 0;
 
-    if ((LE_16(&p->buf[0]) != RoQ_MAGIC_NUMBER) ||
-        (LE_32(&p->buf[2]) != 0xFFFFFFFF))
+    if ((AV_RL16(&p->buf[0]) != RoQ_MAGIC_NUMBER) ||
+        (AV_RL32(&p->buf[2]) != 0xFFFFFFFF))
         return 0;
 
     return AVPROBE_SCORE_MAX;
@@ -81,7 +83,7 @@ static int roq_read_header(AVFormatContext *s,
     if (get_buffer(pb, preamble, RoQ_CHUNK_PREAMBLE_SIZE) !=
         RoQ_CHUNK_PREAMBLE_SIZE)
         return AVERROR_IO;
-    roq->framerate = LE_16(&preamble[6]);
+    roq->framerate = AV_RL16(&preamble[6]);
     roq->frame_pts_inc = 90000 / roq->framerate;
 
     /* init private context parameters */
@@ -94,8 +96,8 @@ static int roq_read_header(AVFormatContext *s,
             RoQ_CHUNK_PREAMBLE_SIZE)
             return AVERROR_IO;
 
-        chunk_type = LE_16(&preamble[0]);
-        chunk_size = LE_32(&preamble[2]);
+        chunk_type = AV_RL16(&preamble[0]);
+        chunk_size = AV_RL32(&preamble[2]);
 
         switch (chunk_type) {
 
@@ -104,8 +106,8 @@ static int roq_read_header(AVFormatContext *s,
             if (get_buffer(pb, preamble, RoQ_CHUNK_PREAMBLE_SIZE) !=
                 RoQ_CHUNK_PREAMBLE_SIZE)
                 return AVERROR_IO;
-            roq->width = LE_16(&preamble[0]);
-            roq->height = LE_16(&preamble[2]);
+            roq->width = AV_RL16(&preamble[0]);
+            roq->height = AV_RL16(&preamble[2]);
             break;
 
         case RoQ_QUAD_CODEBOOK:
@@ -125,7 +127,7 @@ static int roq_read_header(AVFormatContext *s,
             break;
 
         default:
-            av_log(s, AV_LOG_ERROR, " unknown RoQ chunk type (%04X)\n", LE_16(&preamble[0]));
+            av_log(s, AV_LOG_ERROR, " unknown RoQ chunk type (%04X)\n", AV_RL16(&preamble[0]));
             return AVERROR_INVALIDDATA;
             break;
         }
@@ -194,8 +196,8 @@ static int roq_read_packet(AVFormatContext *s,
             RoQ_CHUNK_PREAMBLE_SIZE)
             return AVERROR_IO;
 
-        chunk_type = LE_16(&preamble[0]);
-        chunk_size = LE_32(&preamble[2]);
+        chunk_type = AV_RL16(&preamble[0]);
+        chunk_size = AV_RL32(&preamble[2]);
         if(chunk_size > INT_MAX)
             return AVERROR_INVALIDDATA;
 
@@ -214,7 +216,7 @@ static int roq_read_packet(AVFormatContext *s,
             if (get_buffer(pb, preamble, RoQ_CHUNK_PREAMBLE_SIZE) !=
                 RoQ_CHUNK_PREAMBLE_SIZE)
                 return AVERROR_IO;
-            chunk_size = LE_32(&preamble[2]) + RoQ_CHUNK_PREAMBLE_SIZE * 2 +
+            chunk_size = AV_RL32(&preamble[2]) + RoQ_CHUNK_PREAMBLE_SIZE * 2 +
                 codebook_size;
 
             /* rewind */

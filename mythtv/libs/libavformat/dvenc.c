@@ -11,21 +11,24 @@
  * 50 Mbps (DVCPRO50) support
  * Copyright (c) 2006 Daniel Maas <dmaas@maasdigital.com>
  *
- * This library is free software; you can redistribute it and/or
+ * This file is part of FFmpeg.
+ *
+ * FFmpeg is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
- * version 2 of the License, or (at your option) any later version.
+ * version 2.1 of the License, or (at your option) any later version.
  *
- * This library is distributed in the hope that it will be useful,
+ * FFmpeg is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
+ * License along with FFmpeg; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 #include <time.h>
+#include <stdarg.h>
 #include "avformat.h"
 #include "dvdata.h"
 #include "dv.h"
@@ -64,15 +67,12 @@ static int dv_audio_frame_size(const DVprofile* sys, int frame)
                                             sizeof(sys->audio_samples_dist[0]))];
 }
 
-static int dv_write_pack(enum dv_pack_type pack_id, DVMuxContext *c, uint8_t* buf)
+static int dv_write_pack(enum dv_pack_type pack_id, DVMuxContext *c, uint8_t* buf, ...)
 {
     struct tm tc;
     time_t ct;
     int ltc_frame;
-
-    /* Its hard to tell what SMPTE requires w.r.t. APT, but Quicktime needs it.
-     * We set it based on pix_fmt value but it really should be per DV profile */
-    int apt = (c->sys->pix_fmt == PIX_FMT_YUV422P ? 1 : 0);
+    va_list ap;
 
     buf[0] = (uint8_t)pack_id;
     switch (pack_id) {
@@ -101,7 +101,8 @@ static int dv_write_pack(enum dv_pack_type pack_id, DVMuxContext *c, uint8_t* bu
                    (tc.tm_hour % 10);         /* Units of hours */
           break;
     case dv_audio_source:  /* AAUX source pack */
-          buf[1] = (0 << 7) | /* locked mode       */
+          va_start(ap, buf);
+          buf[1] = (1 << 7) | /* locked mode -- SMPTE only supports locked mode */
                    (1 << 6) | /* reserved -- always 1 */
                    (dv_audio_frame_size(c->sys, c->frames) -
                     c->sys->audio_min_samples[0]);
@@ -109,15 +110,16 @@ static int dv_write_pack(enum dv_pack_type pack_id, DVMuxContext *c, uint8_t* bu
           buf[2] = (0 << 7) | /* multi-stereo      */
                    (0 << 5) | /* #of audio channels per block: 0 -- 1 channel */
                    (0 << 4) | /* pair bit: 0 -- one pair of channels */
-                    0;        /* audio mode        */
+                   !!va_arg(ap, int); /* audio mode        */
           buf[3] = (1 << 7) | /* res               */
                    (1 << 6) | /* multi-language flag */
                    (c->sys->dsf << 5) | /*  system: 60fields/50fields */
-                   (apt << 1);/* definition: 0 -- 25Mbps, 2 -- 50Mbps */
+                   (c->sys->n_difchan & 2); /* definition: 0 -- 25Mbps, 2 -- 50Mbps */
           buf[4] = (1 << 7) | /* emphasis: 1 -- off */
                    (0 << 6) | /* emphasis time constant: 0 -- reserved */
                    (0 << 3) | /* frequency: 0 -- 48Khz, 1 -- 44,1Khz, 2 -- 32Khz */
                     0;        /* quantization: 0 -- 16bit linear, 1 -- 12bit nonlinear */
+          va_end(ap);
           break;
     case dv_audio_control:
           buf[1] = (0 << 6) | /* copy protection: 0 -- unrestricted */
@@ -129,7 +131,8 @@ static int dv_write_pack(enum dv_pack_type pack_id, DVMuxContext *c, uint8_t* bu
                    (1 << 3) | /* recording mode: 1 -- original */
                     7;
           buf[3] = (1 << 7) | /* direction: 1 -- forward */
-                    0x20;     /* speed */
+                   (c->sys->pix_fmt == PIX_FMT_YUV420P ? 0x20 : /* speed */
+                                                         c->sys->ltc_divisor*4);
           buf[4] = (1 << 7) | /* reserved -- always 1 */
                     0x7f;     /* genre category */
           break;
@@ -180,7 +183,7 @@ static void dv_inject_audio(DVMuxContext *c, int channel, uint8_t* frame_ptr)
     for (i = 0; i < c->sys->difseg_size; i++) {
        frame_ptr += 6 * 80; /* skip DIF segment header */
        for (j = 0; j < 9; j++) {
-          dv_write_pack(dv_aaux_packs_dist[i][j], c, &frame_ptr[3]);
+          dv_write_pack(dv_aaux_packs_dist[i][j], c, &frame_ptr[3], i >= c->sys->difseg_size/2);
           for (d = 8; d < 80; d+=2) {
              of = c->sys->audio_shuffle[i][j] + (d - 8)/2 * c->sys->audio_stride;
              if (of*2 >= size)
@@ -280,16 +283,12 @@ int dv_assemble_frame(DVMuxContext *c, AVStream* st,
 
 DVMuxContext* dv_init_mux(AVFormatContext* s)
 {
-    DVMuxContext *c;
+    DVMuxContext *c = (DVMuxContext *)s->priv_data;
     AVStream *vst = NULL;
     int i;
 
     /* we support at most 1 video and 2 audio streams */
     if (s->nb_streams > 3)
-        return NULL;
-
-    c = av_mallocz(sizeof(DVMuxContext));
-    if (!c)
         return NULL;
 
     c->n_ast = 0;
@@ -346,7 +345,6 @@ DVMuxContext* dv_init_mux(AVFormatContext* s)
     return c;
 
 bail_out:
-    av_free(c);
     return NULL;
 }
 
@@ -360,8 +358,7 @@ void dv_delete_mux(DVMuxContext *c)
 #ifdef CONFIG_MUXERS
 static int dv_write_header(AVFormatContext *s)
 {
-    s->priv_data = dv_init_mux(s);
-    if (!s->priv_data) {
+    if (!dv_init_mux(s)) {
         av_log(s, AV_LOG_ERROR, "Can't initialize DV format!\n"
                     "Make sure that you supply exactly two streams:\n"
                     "     video: 25fps or 29.97fps, audio: 2ch/48Khz/PCM\n"

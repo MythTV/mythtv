@@ -14,7 +14,9 @@ DEFINES += HAVE_AV_CONFIG_H _LARGEFILE_SOURCE
 # Debug mode on x86 must compile without -fPIC and with -O, 
 # otherwise gcc runs out of registers.
 debug:contains(TARGET_ARCH_X86, yes) {
-    QMAKE_CFLAGS_SHLIB = 
+    !contains(TARGET_ARCH_X86_64, yes) {
+        QMAKE_CFLAGS_SHLIB = 
+    }
 }
 
 cygwin:LIBS += -lz
@@ -24,15 +26,15 @@ QMAKE_CFLAGS_DEBUG += -O
 QMAKE_CLEAN += $(TARGET) $(TARGETA) $(TARGETD) $(TARGET0) $(TARGET1) $(TARGET2)
 
 # Input
-SOURCES += bitstream.c utils.c allcodecs.c mpegvideo.c jrevdct.c 
-SOURCES += jfdctfst.c jfdctint.c mpegaudio.c ac3enc.c mjpeg.c audresample.c
-SOURCES += resample2.c dsputil.c motion_est.c imgconvert.c imgresample.c
-SOURCES += mpeg12.c mpegaudiodec.c pcm.c simple_idct.c ratecontrol.c adpcm.c
+SOURCES += bitstream.c utils.c allcodecs.c mpegvideo.c jrevdct.c jfdctfst.c
+SOURCES += jfdctint.c mjpeg.c audresample.c resample2.c dsputil.c motion_est.c
+SOURCES += imgconvert.c mpeg12.c mpegaudiodec.c simple_idct.c ratecontrol.c
 SOURCES += eval.c error_resilience.c fft.c mdct.c raw.c golomb.c cabac.c
-SOURCES += dpcm.c adx.c faandct.c parser.c g726.c vp3dsp.c bitstream_filter.c
-SOURCES += h264idct.c rangecoder.c pnm.c h263.c msmpeg4.c h263dec.c dvdsub.c 
-SOURCES += dvbsub.c dvbsubdec.c dvdsubenc.c opt.c lzo.c myth_utils.c
-SOURCES += audioconvert.c
+SOURCES += faandct.c parser.c vp3dsp.c h264idct.c rangecoder.c pnm.c h263.c
+SOURCES += msmpeg4.c h263dec.c  opt.c bitstream_filter.c audioconvert.c
+SOURCES += imgresample.c myth_utils.c
+SOURCES += dvbsub.c dvbsubdec.c dvdsubdec.c dvdsubenc.c lzo.c
+SOURCES += pcm.c adpcm.c dpcm.c adx.c
 
 inc.path = $${PREFIX}/include/mythtv/ffmpeg/
 inc.files = avcodec.h i386/mmx.h opt.h
@@ -80,6 +82,11 @@ contains( CONFIG_CYUV_DECODER, yes ) {
     SOURCES += cyuv.c
 }
 
+DO_DSICIN = $$CONFIG_DSICINVIDEO_DECODER $$CONFIG_DSICINAUDIO_DECODER
+contains( DO_DSICIN, yes ) {
+    SOURCES += dsicinav.c
+}
+
 DO_DV = $$CONFIG_DVVIDEO_DECODER $$CONFIG_DVVIDEO_ENCODER
 contains( DO_DV, yes ) {
     SOURCES += dv.c
@@ -106,6 +113,10 @@ contains( CONFIG_FLASHSV_DECODER, yes ) {
     SOURCES += flashsv.c
 }
 
+contains( CONFIG_FLASHSV_ENCODER, yes ) {
+    SOURCES += flashsvenc.c
+}
+
 contains( CONFIG_FLIC_DECODER, yes ) {
     SOURCES += flicvideo.c
 }
@@ -118,6 +129,18 @@ contains( CONFIG_FRAPS_DECODER, yes ) {
     SOURCES += fraps.c
 }
 
+DO_ADPCM_G726 = $$CONFIG_ADPCM_G726_DECODER $$CONFIG_ADPCM_G726_DECODER
+contains( DO_ADPCM_G726, yes ) {
+    SOURCES += g726.c
+}
+contains( CONFIG_GIF_DECODER, yes ) {
+    SOURCES += gifdec.c
+}
+
+contains( CONFIG_GIF_ENCODER, yes ) {
+    SOURCES += gif.c 
+}
+
 DO_H261 = $$CONFIG_H261_DECODER $$CONFIG_H261_ENCODER
 contains( DO_H261, yes ) {
     SOURCES += h261.c
@@ -128,6 +151,10 @@ contains( DO_H264, yes ) {
     SOURCES += h264.c
 }
 
+contains( CONFIG_H264_ENCODER, yes ) {
+    SOURCES += h264enc.c h264dsp.c
+}
+
 DO_HUFFYUV = $$CONFIG_HUFFYUV_DECODER $$CONFIG_HUFFYUV_ENCODER $$CONFIG_FFVHUFF_DECODER $$CONFIG_FFVHUFF_ENCODER
 contains( DO_HUFFYUV, yes ) {
     SOURCES += huffyuv.c
@@ -135,6 +162,10 @@ contains( DO_HUFFYUV, yes ) {
 
 contains( CONFIG_IDCIN_DECODER, yes ) {
     SOURCES += idcinvideo.c
+}
+
+contains( CONFIG_IMC_DECODER, yes ) {
+    SOURCES += imc.c
 }
 
 contains( CONFIG_INDEO2_DECODER, yes ) {
@@ -158,6 +189,11 @@ contains( DO_LCL, yes ) {
     SOURCES += lcl.c
 }
 
+DO_LZW = $$CONFIG_GIF_DECODER $$CONFIG_TIFF_DECODER
+contains( DO_LZW, yes ) {
+    SOURCES += lzw.c
+}
+
 contains( CONFIG_LOCO_DECODER, yes ) {
     SOURCES += loco.c
 }
@@ -165,6 +201,14 @@ contains( CONFIG_LOCO_DECODER, yes ) {
 DO_MACE = $$CONFIG_MACE3_DECODER $$CONFIG_MACE6_DECODER
 contains( DO_MACE, yes ) {
     SOURCES += mace.c
+}
+
+contains( CONFIG_MP2_ENCODER, yes ) {
+    SOURCES += mpegaudio.c
+}
+
+contains( CONFIG_MPC7_DECODER, yes ) {
+    SOURCES += mpc.c
 }
 
 contains( CONFIG_MSRLE_DECODER, yes ) {
@@ -245,6 +289,18 @@ contains( DO_SVQ1, yes ) {
     SOURCES += svq1.c
 }
 
+contains( CONFIG_TARGA_DECODER, yes ) {
+    SOURCES += targa.c
+}
+
+contains( CONFIG_TIERTEXSEQVIDEO_DECODER, yes ) {
+    SOURCES += tiertexseqv.c
+}
+
+contains( CONFIG_TIFF_DECODER, yes ) {
+    SOURCES += tiff.c
+}
+
 contains( CONFIG_TRUEMOTION1_DECODER, yes ) {
     SOURCES += truemotion1.c
 }
@@ -297,7 +353,14 @@ contains( CONFIG_VMNC_DECODER, yes ) {
 }
 
 contains( CONFIG_VORBIS_DECODER, yes ) {
-    SOURCES += vorbis.c
+    SOURCES += vorbis.c vorbis_data.c
+}
+
+contains( CONFIG_VORBIS_ENCODER, yes ) {
+    SOURCES += vorbis_enc.c
+    !contains( CONFIG_VORBIS_DECODER, yes ) {
+        SOURCES += vorbis.c vorbis_data.c
+    }
 }
 
 DO_VP3 = $$CONFIG_VP3_DECODER $$CONFIG_THEORA_DECODER
@@ -358,6 +421,10 @@ contains( CONFIG_ZMBV_DECODER, yes ) {
     SOURCES += zmbv.c
 }
 
+contains( CONFIG_ZMBV_ENCODER, yes ) {
+    SOURCES += zmbvenc.c
+}
+
 contains( HAVE_PTHREADS, yes ) {
     SOURCES += pthread.c
 }
@@ -370,15 +437,19 @@ contains( HAVE_BEOSTHREADS, yes ) {
     SOURCES += beosthread.c
 }
 
-contains( CONFIG_AC3, yes ) {
+contains( CONFIG_AC3_DECODER, yes ) {
     SOURCES += a52dec.c
-    !contains( CONFIG_A52BIN, yes ) {
+    contains( CONFIG_LIBA52, yes ) {
         SOURCES += liba52/bit_allocate.c liba52/a52_bitstream.c liba52/downmix.c
         SOURCES += liba52/imdct.c liba52/parse.c liba52/crc.c liba52/resample.c
     }
 }
 
-contains( CONFIG_DTS, yes ) {
+contains( CONFIG_AC3_ENCODER, yes ) {
+    SOURCES += ac3enc.c
+}
+
+contains( CONFIG_LIBDTS, yes ) {
     SOURCES += dtsdec.c
     LIBS += $$CONFIG_DTSLIB
 }
@@ -397,19 +468,19 @@ contains( AMR_NB, yes) {
     SOURCES += amr.c
 }
 
-contains( CONFIG_MP3LAME, yes ) {
+contains( CONFIG_LIBMP3LAME, yes ) {
     SOURCES += mp3lameaudio.c
     LIBS += -lmp3lame
 }
 
-contains( CONFIG_FAAD, yes ) {
+contains( CONFIG_LIBFAAD, yes ) {
     SOURCES += faad.c
     !contains( CONFIG_FAADBIN, yes) {
         LIBS += -lfaad
     }
 }
 
-contains( CONFIG_FAAC, yes ) {
+contains( CONFIG_LIBFAAC, yes ) {
     SOURCES += faac.c
     LIBS += -lfaac
 }
@@ -445,8 +516,8 @@ contains( TARGET_GPROF, yes ) {
 contains( TARGET_MMX, yes ) {
     SOURCES += i386/fdct_mmx.c i386/cputest.c i386/dsputil_mmx.c
     SOURCES += i386/mpegvideo_mmx.c i386/idct_mmx.c i386/motion_est_mmx.c
-    SOURCES += i386/simple_idct_mmx.c i386/fft_sse.c i386/vp3dsp_mmx.c
-    SOURCES += i386/vp3dsp_sse2.c i386/idct_mmx_xvid.c i386/fft_3dn.c
+    SOURCES += i386/simple_idct_mmx.c i386/idct_mmx_xvid.c i386/fft_sse.c
+    SOURCES += i386/vp3dsp_mmx.c i386/vp3dsp_sse2.c i386/fft_3dn.c
     SOURCES += i386/fft_3dn2.c #i386/snowdsp_mmx.c
     SOURCES += i386/cavsdsp_mmx.c
 #    contains( TARGET_BUILTIN_VECTOR, yes ) {

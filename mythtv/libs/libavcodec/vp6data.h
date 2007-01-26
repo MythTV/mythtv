@@ -4,25 +4,26 @@
  *
  * Copyright (C) 2006  Aurelien Jacobs <aurel@gnuage.org>
  *
- * This library is free software; you can redistribute it and/or
+ * This file is part of FFmpeg.
+ *
+ * FFmpeg is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 2.1 of the License, or (at your option) any later version.
  *
- * This library is distributed in the hope that it will be useful,
+ * FFmpeg is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
+ * License along with FFmpeg; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
 #ifndef VP6DATA_H
 #define VP6DATA_H
 
-#include <inttypes.h>
 #include "vp56data.h"
 
 static const uint8_t vp6_def_fdv_vector_model[2][8] = {
@@ -143,7 +144,7 @@ static const uint8_t vp6_coeff_groups[] = {
     5, 5, 5, 5, 5, 5, 5, 5,
 };
 
-static const int16_t vp6_block_copy_filter[16][8][4] = {
+static const int16_t vp6_block_copy_filter[17][8][4] = {
   { {   0, 128,   0,   0  },  /* 0 */
     {  -3, 122,   9,   0  },
     {  -4, 109,  24,  -1  },
@@ -272,9 +273,17 @@ static const int16_t vp6_block_copy_filter[16][8][4] = {
     { -11,  59,  99, -19  },
     {  -6,  38, 114, -18  },
     {  -2,  18, 124, -12  } },
+  { {   0, 128,   0,   0  },  /* 16 */
+    {  -4, 118,  16,  -2  },
+    {  -7, 106,  34,  -5  },
+    {  -8,  90,  53,  -7  },
+    {  -8,  72,  72,  -8  },
+    {  -7,  53,  90,  -8  },
+    {  -5,  34, 106,  -7  },
+    {  -2,  16, 118,  -4  } },
 };
 
-const vp56_tree_t vp6_pcr_tree[] = {
+static const vp56_tree_t vp6_pcr_tree[] = {
     { 8, 0},
     { 4, 1},
     { 2, 2}, {-1}, {-2},

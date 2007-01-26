@@ -3,18 +3,20 @@
  * Copyright (c) 2000, 2001 Fabrice Bellard.
  * Copyright (c) 2002-2004 Michael Niedermayer <michaelni@gmx.at>
  *
- * This library is free software; you can redistribute it and/or
+ * This file is part of FFmpeg.
+ *
+ * FFmpeg is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
- * version 2 of the License, or (at your option) any later version.
+ * version 2.1 of the License, or (at your option) any later version.
  *
- * This library is distributed in the hope that it will be useful,
+ * FFmpeg is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
+ * License along with FFmpeg; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  *
  * MMX optimization by Nick Kurshev <nickols_k@mail.ru>
@@ -56,6 +58,8 @@ static const uint64_t ff_pb_1  attribute_used __attribute__ ((aligned(8))) = 0x0
 static const uint64_t ff_pb_3  attribute_used __attribute__ ((aligned(8))) = 0x0303030303030303ULL;
 static const uint64_t ff_pb_7  attribute_used __attribute__ ((aligned(8))) = 0x0707070707070707ULL;
 static const uint64_t ff_pb_3F attribute_used __attribute__ ((aligned(8))) = 0x3F3F3F3F3F3F3F3FULL;
+static const uint64_t ff_pb_A1 attribute_used __attribute__ ((aligned(8))) = 0xA1A1A1A1A1A1A1A1ULL;
+static const uint64_t ff_pb_5F attribute_used __attribute__ ((aligned(8))) = 0x5F5F5F5F5F5F5F5FULL;
 static const uint64_t ff_pb_FC attribute_used __attribute__ ((aligned(8))) = 0xFCFCFCFCFCFCFCFCULL;
 
 #define JUMPALIGN() __asm __volatile (ASMALIGN(3)::)
@@ -1187,8 +1191,8 @@ static int nsse16_mmx(void *p, uint8_t * pix1, uint8_t * pix2, int line_size, in
     else  score1 = sse16_mmx(c, pix1, pix2, line_size, h);
     score2= hf_noise16_mmx(pix1, line_size, h) - hf_noise16_mmx(pix2, line_size, h);
 
-    if(c) return score1 + ABS(score2)*c->avctx->nsse_weight;
-    else  return score1 + ABS(score2)*8;
+    if(c) return score1 + FFABS(score2)*c->avctx->nsse_weight;
+    else  return score1 + FFABS(score2)*8;
 }
 
 static int nsse8_mmx(void *p, uint8_t * pix1, uint8_t * pix2, int line_size, int h) {
@@ -1196,8 +1200,8 @@ static int nsse8_mmx(void *p, uint8_t * pix1, uint8_t * pix2, int line_size, int
     int score1= sse8_mmx(c, pix1, pix2, line_size, h);
     int score2= hf_noise8_mmx(pix1, line_size, h) - hf_noise8_mmx(pix2, line_size, h);
 
-    if(c) return score1 + ABS(score2)*c->avctx->nsse_weight;
-    else  return score1 + ABS(score2)*8;
+    if(c) return score1 + FFABS(score2)*c->avctx->nsse_weight;
+    else  return score1 + FFABS(score2)*8;
 }
 
 static int vsad_intra16_mmx(void *v, uint8_t * pix, uint8_t * dummy, int line_size, int h) {
@@ -2405,6 +2409,53 @@ QPEL_OP(put_       , ff_pw_16, _       , PUT_OP, mmx2)
 QPEL_OP(avg_       , ff_pw_16, _       , AVG_MMX2_OP, mmx2)
 QPEL_OP(put_no_rnd_, ff_pw_15, _no_rnd_, PUT_OP, mmx2)
 
+/***********************************/
+/* bilinear qpel: not compliant to any spec, only for -lavdopts fast */
+
+#define QPEL_2TAP_XY(OPNAME, SIZE, MMX, XY, HPEL)\
+static void OPNAME ## 2tap_qpel ## SIZE ## _mc ## XY ## _ ## MMX(uint8_t *dst, uint8_t *src, int stride){\
+    OPNAME ## pixels ## SIZE ## HPEL(dst, src, stride, SIZE);\
+}
+#define QPEL_2TAP_L3(OPNAME, SIZE, MMX, XY, S0, S1, S2)\
+static void OPNAME ## 2tap_qpel ## SIZE ## _mc ## XY ## _ ## MMX(uint8_t *dst, uint8_t *src, int stride){\
+    OPNAME ## 2tap_qpel ## SIZE ## _l3_ ## MMX(dst, src+S0, stride, SIZE, S1, S2);\
+}
+
+#define QPEL_2TAP(OPNAME, SIZE, MMX)\
+QPEL_2TAP_XY(OPNAME, SIZE, MMX, 20, _x2_ ## MMX)\
+QPEL_2TAP_XY(OPNAME, SIZE, MMX, 02, _y2_ ## MMX)\
+QPEL_2TAP_XY(OPNAME, SIZE, MMX, 22, _xy2_mmx)\
+static const qpel_mc_func OPNAME ## 2tap_qpel ## SIZE ## _mc00_ ## MMX =\
+                          OPNAME ## qpel ## SIZE ## _mc00_ ## MMX;\
+static const qpel_mc_func OPNAME ## 2tap_qpel ## SIZE ## _mc21_ ## MMX =\
+                          OPNAME ## 2tap_qpel ## SIZE ## _mc20_ ## MMX;\
+static const qpel_mc_func OPNAME ## 2tap_qpel ## SIZE ## _mc12_ ## MMX =\
+                          OPNAME ## 2tap_qpel ## SIZE ## _mc02_ ## MMX;\
+static void OPNAME ## 2tap_qpel ## SIZE ## _mc32_ ## MMX(uint8_t *dst, uint8_t *src, int stride){\
+    OPNAME ## pixels ## SIZE ## _y2_ ## MMX(dst, src+1, stride, SIZE);\
+}\
+static void OPNAME ## 2tap_qpel ## SIZE ## _mc23_ ## MMX(uint8_t *dst, uint8_t *src, int stride){\
+    OPNAME ## pixels ## SIZE ## _x2_ ## MMX(dst, src+stride, stride, SIZE);\
+}\
+QPEL_2TAP_L3(OPNAME, SIZE, MMX, 10, 0,         1,       0)\
+QPEL_2TAP_L3(OPNAME, SIZE, MMX, 30, 1,        -1,       0)\
+QPEL_2TAP_L3(OPNAME, SIZE, MMX, 01, 0,         stride,  0)\
+QPEL_2TAP_L3(OPNAME, SIZE, MMX, 03, stride,   -stride,  0)\
+QPEL_2TAP_L3(OPNAME, SIZE, MMX, 11, 0,         stride,  1)\
+QPEL_2TAP_L3(OPNAME, SIZE, MMX, 31, 1,         stride, -1)\
+QPEL_2TAP_L3(OPNAME, SIZE, MMX, 13, stride,   -stride,  1)\
+QPEL_2TAP_L3(OPNAME, SIZE, MMX, 33, stride+1, -stride, -1)\
+
+QPEL_2TAP(put_, 16, mmx2)
+QPEL_2TAP(avg_, 16, mmx2)
+QPEL_2TAP(put_,  8, mmx2)
+QPEL_2TAP(avg_,  8, mmx2)
+QPEL_2TAP(put_, 16, 3dnow)
+QPEL_2TAP(avg_, 16, 3dnow)
+QPEL_2TAP(put_,  8, 3dnow)
+QPEL_2TAP(avg_,  8, 3dnow)
+
+
 #if 0
 static void just_return() { return; }
 #endif
@@ -2536,10 +2587,11 @@ static void gmc_mmx(uint8_t *dst, uint8_t *src, int stride, int h, int ox, int o
     }
 }
 
+#ifdef CONFIG_ENCODERS
 static int try_8x8basis_mmx(int16_t rem[64], int16_t weight[64], int16_t basis[64], int scale){
     long i=0;
 
-    assert(ABS(scale) < 256);
+    assert(FFABS(scale) < 256);
     scale<<= 16 + 1 - BASIS_SHIFT + RECON_SHIFT;
 
     asm volatile(
@@ -2587,7 +2639,7 @@ static int try_8x8basis_mmx(int16_t rem[64], int16_t weight[64], int16_t basis[6
 static void add_8x8basis_mmx(int16_t rem[64], int16_t basis[64], int scale){
     long i=0;
 
-    if(ABS(scale) < 256){
+    if(FFABS(scale) < 256){
         scale<<= 16 + 1 - BASIS_SHIFT + RECON_SHIFT;
         asm volatile(
                 "pcmpeqw %%mm6, %%mm6   \n\t" // -1w
@@ -2621,9 +2673,10 @@ static void add_8x8basis_mmx(int16_t rem[64], int16_t basis[64], int scale){
         }
     }
 }
+#endif /* CONFIG_ENCODERS */
 
 #define PREFETCH(name, op) \
-void name(void *mem, int stride, int h){\
+static void name(void *mem, int stride, int h){\
     const uint8_t *p= mem;\
     do{\
         asm volatile(#op" %0" :: "m"(*p));\
@@ -2662,6 +2715,7 @@ void ff_vp3_dsp_init_mmx(void);
 
 /* XXX: those functions should be suppressed ASAP when all IDCTs are
    converted */
+#ifdef CONFIG_GPL
 static void ff_libmpeg2mmx_idct_put(uint8_t *dest, int line_size, DCTELEM *block)
 {
     ff_mmx_idct (block);
@@ -2682,6 +2736,7 @@ static void ff_libmpeg2mmx2_idct_add(uint8_t *dest, int line_size, DCTELEM *bloc
     ff_mmxext_idct (block);
     add_pixels_clamped_mmx(block, dest, line_size);
 }
+#endif
 static void ff_vp3_idct_put_sse2(uint8_t *dest, int line_size, DCTELEM *block)
 {
     ff_vp3_idct_sse2(block);
@@ -2702,7 +2757,6 @@ static void ff_vp3_idct_add_mmx(uint8_t *dest, int line_size, DCTELEM *block)
     ff_vp3_idct_mmx(block);
     add_pixels_clamped_mmx(block, dest, line_size);
 }
-#ifdef CONFIG_GPL
 static void ff_idct_xvid_mmx_put(uint8_t *dest, int line_size, DCTELEM *block)
 {
     ff_idct_xvid_mmx (block);
@@ -2723,7 +2777,6 @@ static void ff_idct_xvid_mmx2_add(uint8_t *dest, int line_size, DCTELEM *block)
     ff_idct_xvid_mmx2 (block);
     add_pixels_clamped_mmx(block, dest, line_size);
 }
-#endif
 
 static void vorbis_inverse_coupling_3dnow(float *mag, float *ang, int blocksize)
 {
@@ -2963,7 +3016,7 @@ static void vector_fmul_add_add_sse(float *dst, const float *src0, const float *
         ff_vector_fmul_add_add_c(dst, src0, src1, src2, src3, len, step);
 }
 
-void float_to_int16_3dnow(int16_t *dst, const float *src, int len){
+static void float_to_int16_3dnow(int16_t *dst, const float *src, int len){
     // not bit-exact: pf2id uses different rounding than C and SSE
     int i;
     for(i=0; i<len; i+=4) {
@@ -2978,7 +3031,7 @@ void float_to_int16_3dnow(int16_t *dst, const float *src, int len){
     }
     asm volatile("femms");
 }
-void float_to_int16_sse(int16_t *dst, const float *src, int len){
+static void float_to_int16_sse(int16_t *dst, const float *src, int len){
     int i;
     for(i=0; i<len; i+=4) {
         asm volatile(
@@ -3083,7 +3136,6 @@ void dsputil_init_mmx(DSPContext* c, AVCodecContext *avctx)
 #endif
             }else if(idct_algo==FF_IDCT_CAVS){
                     c->idct_permutation_type= FF_TRANSPOSE_IDCT_PERM;
-#ifdef CONFIG_GPL
             }else if(idct_algo==FF_IDCT_XVIDMMX){
                 if(mm_flags & MM_MMXEXT){
                     c->idct_put= ff_idct_xvid_mmx2_put;
@@ -3094,7 +3146,6 @@ void dsputil_init_mmx(DSPContext* c, AVCodecContext *avctx)
                     c->idct_add= ff_idct_xvid_mmx_add;
                     c->idct    = ff_idct_xvid_mmx;
                 }
-#endif
             }
         }
 
@@ -3285,6 +3336,11 @@ void dsputil_init_mmx(DSPContext* c, AVCodecContext *avctx)
             dspfunc(avg_h264_qpel, 0, 16);
             dspfunc(avg_h264_qpel, 1, 8);
             dspfunc(avg_h264_qpel, 2, 4);
+
+            dspfunc(put_2tap_qpel, 0, 16);
+            dspfunc(put_2tap_qpel, 1, 8);
+            dspfunc(avg_2tap_qpel, 0, 16);
+            dspfunc(avg_2tap_qpel, 1, 8);
 #undef dspfunc
 
             c->avg_h264_chroma_pixels_tab[0]= avg_h264_chroma_mc8_mmx2;
@@ -3407,6 +3463,11 @@ void dsputil_init_mmx(DSPContext* c, AVCodecContext *avctx)
             dspfunc(avg_h264_qpel, 0, 16);
             dspfunc(avg_h264_qpel, 1, 8);
             dspfunc(avg_h264_qpel, 2, 4);
+
+            dspfunc(put_2tap_qpel, 0, 16);
+            dspfunc(put_2tap_qpel, 1, 8);
+            dspfunc(avg_2tap_qpel, 0, 16);
+            dspfunc(avg_2tap_qpel, 1, 8);
 
             c->avg_h264_chroma_pixels_tab[0]= avg_h264_chroma_mc8_3dnow;
             c->avg_h264_chroma_pixels_tab[1]= avg_h264_chroma_mc4_3dnow;

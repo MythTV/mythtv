@@ -2,18 +2,20 @@
  * Buffered I/O for ffmpeg system
  * Copyright (c) 2000,2001 Fabrice Bellard
  *
- * This library is free software; you can redistribute it and/or
+ * This file is part of FFmpeg.
+ *
+ * FFmpeg is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
- * version 2 of the License, or (at your option) any later version.
+ * version 2.1 of the License, or (at your option) any later version.
  *
- * This library is distributed in the hope that it will be useful,
+ * FFmpeg is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
+ * License along with FFmpeg; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 #include "avformat.h"
@@ -52,6 +54,10 @@ int init_put_byte(ByteIOContext *s,
     s->is_streamed = 0;
     s->max_packet_size = 0;
     s->update_checksum= NULL;
+    if(!read_packet && !write_flag){
+        s->pos = buffer_size;
+        s->buf_end = s->buffer + buffer_size;
+    }
     return 0;
 }
 
@@ -130,12 +136,12 @@ offset_t url_fseek(ByteIOContext *s, offset_t offset, int whence)
             fill_buffer(s);
         s->buf_ptr = s->buf_end + offset - s->pos;
     } else {
-#ifdef CONFIG_MUXERS
+#if defined(CONFIG_MUXERS) || defined(CONFIG_NETWORK)
         if (s->write_flag) {
             flush_buffer(s);
             s->must_flush = 1;
         } else
-#endif //CONFIG_MUXERS
+#endif /* defined(CONFIG_MUXERS) || defined(CONFIG_NETWORK) */
         {
             s->buf_end = s->buffer;
         }
@@ -170,8 +176,11 @@ offset_t url_fsize(ByteIOContext *s)
 
     if (!s->seek)
         return -EPIPE;
-    size = s->seek(s->opaque, -1, SEEK_END) + 1;
-    s->seek(s->opaque, s->pos, SEEK_SET);
+    size = s->seek(s->opaque, 0, AVSEEK_SIZE);
+    if(size<0){
+        size = s->seek(s->opaque, -1, SEEK_END) + 1;
+        s->seek(s->opaque, s->pos, SEEK_SET);
+    }
     return size;
 }
 
@@ -185,7 +194,6 @@ int url_ferror(ByteIOContext *s)
     return s->error;
 }
 
-#if defined(CONFIG_MUXERS) || defined(CONFIG_PROTOCOLS)
 void put_le32(ByteIOContext *s, unsigned int val)
 {
     put_byte(s, val);
@@ -252,7 +260,6 @@ void put_tag(ByteIOContext *s, const char *tag)
         put_byte(s, *tag++);
     }
 }
-#endif //CONFIG_MUXERS || CONFIG_PROTOCOLS
 
 /* Input stream */
 
@@ -622,7 +629,9 @@ int url_fget_max_packet_size(ByteIOContext *s)
     return s->max_packet_size;
 }
 
-#ifdef CONFIG_MUXERS
+/* url_open_dyn_buf and url_close_dyn_buf are used in rtp.c to send a response
+ * back to the server even if CONFIG_MUXERS is not set. */
+#if defined(CONFIG_MUXERS) || defined(CONFIG_NETWORK)
 /* buffer handling */
 int url_open_buf(ByteIOContext *s, uint8_t *buf, int buf_size, int flags)
 {
@@ -785,4 +794,4 @@ int url_close_dyn_buf(ByteIOContext *s, uint8_t **pbuffer)
     av_free(d);
     return size;
 }
-#endif //CONFIG_MUXERS
+#endif /* CONFIG_MUXERS || CONFIG_NETWORK */

@@ -2,18 +2,20 @@
  * Wing Commander/Xan Video Decoder
  * Copyright (C) 2003 the ffmpeg project
  *
- * This library is free software; you can redistribute it and/or
+ * This file is part of FFmpeg.
+ *
+ * FFmpeg is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
- * version 2 of the License, or (at your option) any later version.
+ * version 2.1 of the License, or (at your option) any later version.
  *
- * This library is distributed in the hope that it will be useful,
+ * FFmpeg is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
+ * License along with FFmpeg; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  *
  */
@@ -294,10 +296,10 @@ static void xan_wc3_decode_frame(XanContext *s) {
     unsigned char *vector_segment;
     unsigned char *imagedata_segment;
 
-    huffman_segment =   s->buf + LE_16(&s->buf[0]);
-    size_segment =      s->buf + LE_16(&s->buf[2]);
-    vector_segment =    s->buf + LE_16(&s->buf[4]);
-    imagedata_segment = s->buf + LE_16(&s->buf[6]);
+    huffman_segment =   s->buf + AV_RL16(&s->buf[0]);
+    size_segment =      s->buf + AV_RL16(&s->buf[2]);
+    vector_segment =    s->buf + AV_RL16(&s->buf[4]);
+    imagedata_segment = s->buf + AV_RL16(&s->buf[6]);
 
     xan_huffman_decode(opcode_buffer, huffman_segment, opcode_buffer_size);
 
@@ -348,7 +350,7 @@ static void xan_wc3_decode_frame(XanContext *s) {
 
         case 10:
         case 20:
-            size = BE_16(&size_segment[0]);
+            size = AV_RB16(&size_segment[0]);
             size_segment += 2;
             break;
 

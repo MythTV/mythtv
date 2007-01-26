@@ -2,18 +2,20 @@
  * AVOptions
  * copyright (c) 2005 Michael Niedermayer <michaelni@gmx.at>
  *
- * This library is free software; you can redistribute it and/or
+ * This file is part of FFmpeg.
+ *
+ * FFmpeg is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
- * version 2 of the License, or (at your option) any later version.
+ * version 2.1 of the License, or (at your option) any later version.
  *
- * This library is distributed in the hope that it will be useful,
+ * FFmpeg is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
+ * License along with FFmpeg; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
@@ -66,15 +68,15 @@ typedef struct AVOption {
 } AVOption;
 
 
-AVOption *av_set_string(void *obj, const char *name, const char *val);
-AVOption *av_set_double(void *obj, const char *name, double n);
-AVOption *av_set_q(void *obj, const char *name, AVRational n);
-AVOption *av_set_int(void *obj, const char *name, int64_t n);
-double av_get_double(void *obj, const char *name, AVOption **o_out);
-AVRational av_get_q(void *obj, const char *name, AVOption **o_out);
-int64_t av_get_int(void *obj, const char *name, AVOption **o_out);
-const char *av_get_string(void *obj, const char *name, AVOption **o_out, char *buf, int buf_len);
-AVOption *av_next_option(void *obj, AVOption *last);
+const AVOption *av_set_string(void *obj, const char *name, const char *val);
+const AVOption *av_set_double(void *obj, const char *name, double n);
+const AVOption *av_set_q(void *obj, const char *name, AVRational n);
+const AVOption *av_set_int(void *obj, const char *name, int64_t n);
+double av_get_double(void *obj, const char *name, const AVOption **o_out);
+AVRational av_get_q(void *obj, const char *name, const AVOption **o_out);
+int64_t av_get_int(void *obj, const char *name, const AVOption **o_out);
+const char *av_get_string(void *obj, const char *name, const AVOption **o_out, char *buf, int buf_len);
+const AVOption *av_next_option(void *obj, const AVOption *last);
 int av_opt_show(void *obj, void *av_log_obj);
 void av_opt_set_defaults(void *s);
 

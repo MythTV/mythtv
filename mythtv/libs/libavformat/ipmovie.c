@@ -2,18 +2,20 @@
  * Interplay MVE File Demuxer
  * Copyright (c) 2003 The ffmpeg Project
  *
- * This library is free software; you can redistribute it and/or
+ * This file is part of FFmpeg.
+ *
+ * FFmpeg is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
- * version 2 of the License, or (at your option) any later version.
+ * version 2.1 of the License, or (at your option) any later version.
  *
- * This library is distributed in the hope that it will be useful,
+ * FFmpeg is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
+ * License along with FFmpeg; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
@@ -154,7 +156,7 @@ static int load_ipmovie_packet(IPMVEContext *s, ByteIOContext *pb,
             s->audio_frame_count +=
                 (s->audio_chunk_size - 6) / s->audio_channels;
 
-        debug_ipmovie("sending audio frame with pts %lld (%d audio frames)\n",
+        debug_ipmovie("sending audio frame with pts %"PRId64" (%d audio frames)\n",
             audio_pts, s->audio_frame_count);
 
         chunk_type = CHUNK_VIDEO;
@@ -188,7 +190,7 @@ static int load_ipmovie_packet(IPMVEContext *s, ByteIOContext *pb,
         pkt->stream_index = s->video_stream_index;
         pkt->pts = s->video_pts;
 
-        debug_ipmovie("sending video frame with pts %lld\n",
+        debug_ipmovie("sending video frame with pts %"PRId64"\n",
             pkt->pts);
 
         s->video_pts += s->frame_pts_inc;
@@ -234,8 +236,8 @@ static int process_ipmovie_chunk(IPMVEContext *s, ByteIOContext *pb,
     if (get_buffer(pb, chunk_preamble, CHUNK_PREAMBLE_SIZE) !=
         CHUNK_PREAMBLE_SIZE)
         return CHUNK_BAD;
-    chunk_size = LE_16(&chunk_preamble[0]);
-    chunk_type = LE_16(&chunk_preamble[2]);
+    chunk_size = AV_RL16(&chunk_preamble[0]);
+    chunk_type = AV_RL16(&chunk_preamble[2]);
 
     debug_ipmovie("chunk type 0x%04X, 0x%04X bytes: ", chunk_type, chunk_size);
 
@@ -285,7 +287,7 @@ static int process_ipmovie_chunk(IPMVEContext *s, ByteIOContext *pb,
             break;
         }
 
-        opcode_size = LE_16(&opcode_preamble[0]);
+        opcode_size = AV_RL16(&opcode_preamble[0]);
         opcode_type = opcode_preamble[2];
         opcode_version = opcode_preamble[3];
 
@@ -323,10 +325,10 @@ static int process_ipmovie_chunk(IPMVEContext *s, ByteIOContext *pb,
                 chunk_type = CHUNK_BAD;
                 break;
             }
-            s->fps = 1000000.0 / (LE_32(&scratch[0]) * LE_16(&scratch[4]));
+            s->fps = 1000000.0 / (AV_RL32(&scratch[0]) * AV_RL16(&scratch[4]));
             s->frame_pts_inc = 90000 / s->fps;
             debug_ipmovie("  %.2f frames/second (timer div = %d, subdiv = %d)\n",
-                s->fps, LE_32(&scratch[0]), LE_16(&scratch[4]));
+                s->fps, AV_RL32(&scratch[0]), AV_RL16(&scratch[4]));
             break;
 
         case OPCODE_INIT_AUDIO_BUFFERS:
@@ -341,8 +343,8 @@ static int process_ipmovie_chunk(IPMVEContext *s, ByteIOContext *pb,
                 chunk_type = CHUNK_BAD;
                 break;
             }
-            s->audio_sample_rate = LE_16(&scratch[4]);
-            audio_flags = LE_16(&scratch[2]);
+            s->audio_sample_rate = AV_RL16(&scratch[4]);
+            audio_flags = AV_RL16(&scratch[2]);
             /* bit 0 of the flags: 0 = mono, 1 = stereo */
             s->audio_channels = (audio_flags & 1) + 1;
             /* bit 1 of the flags: 0 = 8 bit, 1 = 16 bit */
@@ -379,8 +381,8 @@ static int process_ipmovie_chunk(IPMVEContext *s, ByteIOContext *pb,
                 chunk_type = CHUNK_BAD;
                 break;
             }
-            s->video_width = LE_16(&scratch[0]) * 8;
-            s->video_height = LE_16(&scratch[2]) * 8;
+            s->video_width = AV_RL16(&scratch[0]) * 8;
+            s->video_height = AV_RL16(&scratch[2]) * 8;
             debug_ipmovie("video resolution: %d x %d\n",
                 s->video_width, s->video_height);
             break;
@@ -440,8 +442,8 @@ static int process_ipmovie_chunk(IPMVEContext *s, ByteIOContext *pb,
             }
 
             /* load the palette into internal data structure */
-            first_color = LE_16(&scratch[0]);
-            last_color = first_color + LE_16(&scratch[2]) - 1;
+            first_color = AV_RL16(&scratch[0]);
+            last_color = first_color + AV_RL16(&scratch[2]) - 1;
             /* sanity check (since they are 16 bit values) */
             if ((first_color > 0xFF) || (last_color > 0xFF)) {
                 debug_ipmovie("demux_ipmovie: set_palette indices out of range (%d -> %d)\n",
@@ -540,7 +542,7 @@ static int ipmovie_read_header(AVFormatContext *s,
     if (get_buffer(pb, chunk_preamble, CHUNK_PREAMBLE_SIZE) !=
         CHUNK_PREAMBLE_SIZE)
         return AVERROR_IO;
-    chunk_type = LE_16(&chunk_preamble[2]);
+    chunk_type = AV_RL16(&chunk_preamble[2]);
     url_fseek(pb, -CHUNK_PREAMBLE_SIZE, SEEK_CUR);
 
     if (chunk_type == CHUNK_VIDEO)

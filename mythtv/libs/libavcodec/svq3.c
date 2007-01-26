@@ -1,18 +1,20 @@
 /*
  * Copyright (c) 2003 The FFmpeg Project.
  *
- * This library is free software; you can redistribute it and/or
+ * This file is part of FFmpeg.
+ *
+ * FFmpeg is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
- * version 2 of the License, or (at your option) any later version.
+ * version 2.1 of the License, or (at your option) any later version.
  *
- * This library is distributed in the hope that it will be useful,
+ * FFmpeg is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
+ * License along with FFmpeg; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  *
  *
@@ -145,7 +147,7 @@ static void svq3_luma_dc_dequant_idct_c(DCTELEM *block, int qp){
 static void svq3_add_idct_c (uint8_t *dst, DCTELEM *block, int stride, int qp, int dc){
     const int qmul= svq3_dequant_coeff[qp];
     int i;
-    uint8_t *cm = cropTbl + MAX_NEG_CROP;
+    uint8_t *cm = ff_cropTbl + MAX_NEG_CROP;
 
     if (dc) {
         dc = 13*13*((dc == 1) ? 1538*block[0] : ((qmul*(block[0] >> 3)) / 2));
@@ -828,7 +830,7 @@ static int svq3_decode_frame (AVCodecContext *avctx,
 
       GetBitContext gb;
 
-      size = BE_32(&extradata[4]);
+      size = AV_RB32(&extradata[4]);
       init_get_bits (&gb, extradata + 8, size*8);
 
       /* 'frame size code' and optional 'width, height' */

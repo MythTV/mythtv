@@ -2,18 +2,20 @@
  * Id Quake II CIN File Demuxer
  * Copyright (c) 2003 The ffmpeg Project
  *
- * This library is free software; you can redistribute it and/or
+ * This file is part of FFmpeg.
+ *
+ * FFmpeg is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
- * version 2 of the License, or (at your option) any later version.
+ * version 2.1 of the License, or (at your option) any later version.
  *
- * This library is distributed in the hope that it will be useful,
+ * FFmpeg is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
+ * License along with FFmpeg; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
@@ -107,27 +109,27 @@ static int idcin_probe(AVProbeData *p)
         return 0;
 
     /* check the video width */
-    number = LE_32(&p->buf[0]);
+    number = AV_RL32(&p->buf[0]);
     if ((number == 0) || (number > 1024))
        return 0;
 
     /* check the video height */
-    number = LE_32(&p->buf[4]);
+    number = AV_RL32(&p->buf[4]);
     if ((number == 0) || (number > 1024))
        return 0;
 
     /* check the audio sample rate */
-    number = LE_32(&p->buf[8]);
+    number = AV_RL32(&p->buf[8]);
     if ((number != 0) && ((number < 8000) | (number > 48000)))
         return 0;
 
     /* check the audio bytes/sample */
-    number = LE_32(&p->buf[12]);
+    number = AV_RL32(&p->buf[12]);
     if (number > 2)
         return 0;
 
     /* check the audio channels */
-    number = LE_32(&p->buf[16]);
+    number = AV_RL32(&p->buf[16]);
     if (number > 2)
         return 0;
 

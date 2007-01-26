@@ -2,18 +2,20 @@
  * VMware Screen Codec (VMnc) decoder
  * Copyright (c) 2006 Konstantin Shishkov
  *
- * This library is free software; you can redistribute it and/or
+ * This file is part of FFmpeg.
+ *
+ * FFmpeg is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
- * version 2 of the License, or (at your option) any later version.
+ * version 2.1 of the License, or (at your option) any later version.
  *
- * This library is distributed in the hope that it will be useful,
+ * FFmpeg is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
+ * License along with FFmpeg; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  *
  */
@@ -70,14 +72,14 @@ typedef struct VmncContext {
 } VmncContext;
 
 /* read pixel value from stream */
-static always_inline int vmnc_get_pixel(uint8_t* buf, int bpp, int be) {
+static av_always_inline int vmnc_get_pixel(uint8_t* buf, int bpp, int be) {
     switch(bpp * 2 + be) {
     case 2:
     case 3: return *buf;
-    case 4: return LE_16(buf);
-    case 5: return BE_16(buf);
-    case 8: return LE_32(buf);
-    case 9: return BE_32(buf);
+    case 4: return AV_RL16(buf);
+    case 5: return AV_RB16(buf);
+    case 8: return AV_RL32(buf);
+    case 9: return AV_RB32(buf);
     default: return 0;
     }
 }
@@ -115,7 +117,7 @@ static void load_cursor(VmncContext *c, uint8_t *src)
 
 static void put_cursor(uint8_t *dst, int stride, VmncContext *c, int dx, int dy)
 {
-    int i, j, t;
+    int i, j;
     int w, h, x, y;
     w = c->cur_w;
     if(c->width < c->cur_x + c->cur_w) w = c->width - c->cur_x;
@@ -170,7 +172,7 @@ static void put_cursor(uint8_t *dst, int stride, VmncContext *c, int dx, int dy)
 }
 
 /* fill rectangle with given colour */
-static always_inline void paint_rect(uint8_t *dst, int dx, int dy, int w, int h, int color, int bpp, int stride)
+static av_always_inline void paint_rect(uint8_t *dst, int dx, int dy, int w, int h, int color, int bpp, int stride)
 {
     int i, j;
     dst += dx * bpp + dy * stride;
@@ -200,7 +202,7 @@ static always_inline void paint_rect(uint8_t *dst, int dx, int dy, int w, int h,
     }
 }
 
-static always_inline void paint_raw(uint8_t *dst, int w, int h, uint8_t* src, int bpp, int be, int stride)
+static av_always_inline void paint_raw(uint8_t *dst, int w, int h, uint8_t* src, int bpp, int be, int stride)
 {
     int i, j, p;
     for(j = 0; j < h; j++) {
@@ -326,13 +328,13 @@ static int decode_frame(AVCodecContext *avctx, void *data, int *data_size, uint8
         }
     }
     src += 2;
-    chunks = BE_16(src); src += 2;
+    chunks = AV_RB16(src); src += 2;
     while(chunks--) {
-        dx = BE_16(src); src += 2;
-        dy = BE_16(src); src += 2;
-        w  = BE_16(src); src += 2;
-        h  = BE_16(src); src += 2;
-        enc = BE_32(src); src += 4;
+        dx = AV_RB16(src); src += 2;
+        dy = AV_RB16(src); src += 2;
+        w  = AV_RB16(src); src += 2;
+        h  = AV_RB16(src); src += 2;
+        enc = AV_RB32(src); src += 4;
         outptr = c->pic.data[0] + dx * c->bpp2 + dy * c->pic.linesize[0];
         size_left = buf_size - (src - buf);
         switch(enc) {
@@ -467,7 +469,7 @@ static int decode_init(AVCodecContext *avctx)
     c->width = avctx->width;
     c->height = avctx->height;
 
-    if (avcodec_check_dimensions(avctx, avctx->height, avctx->width) < 0) {
+    if (avcodec_check_dimensions(avctx, avctx->width, avctx->height) < 0) {
         return 1;
     }
     c->bpp = avctx->bits_per_sample;

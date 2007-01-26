@@ -2,18 +2,20 @@
  * Zip Motion Blocks Video (ZMBV) decoder
  * Copyright (c) 2006 Konstantin Shishkov
  *
- * This library is free software; you can redistribute it and/or
+ * This file is part of FFmpeg.
+ *
+ * FFmpeg is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
- * version 2 of the License, or (at your option) any later version.
+ * version 2.1 of the License, or (at your option) any later version.
  *
- * This library is distributed in the hope that it will be useful,
+ * FFmpeg is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
+ * License along with FFmpeg; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  *
  */
@@ -543,7 +545,7 @@ static int decode_frame(AVCodecContext *avctx, void *data, int *data_size, uint8
         case ZMBV_FMT_15BPP:
             for(j = 0; j < c->height; j++) {
                 for(i = 0; i < c->width; i++) {
-                    uint16_t tmp = LE_16(src);
+                    uint16_t tmp = AV_RL16(src);
                     src += 2;
                     out[i * 3 + 0] = (tmp & 0x7C00) >> 7;
                     out[i * 3 + 1] = (tmp & 0x03E0) >> 2;
@@ -555,7 +557,7 @@ static int decode_frame(AVCodecContext *avctx, void *data, int *data_size, uint8
         case ZMBV_FMT_16BPP:
             for(j = 0; j < c->height; j++) {
                 for(i = 0; i < c->width; i++) {
-                    uint16_t tmp = LE_16(src);
+                    uint16_t tmp = AV_RL16(src);
                     src += 2;
                     out[i * 3 + 0] = (tmp & 0xF800) >> 8;
                     out[i * 3 + 1] = (tmp & 0x07E0) >> 3;
@@ -576,7 +578,7 @@ static int decode_frame(AVCodecContext *avctx, void *data, int *data_size, uint8
         case ZMBV_FMT_32BPP:
             for(j = 0; j < c->height; j++) {
                 for(i = 0; i < c->width; i++) {
-                    uint32_t tmp = LE_32(src);
+                    uint32_t tmp = AV_RL32(src);
                     src += 4;
                     out[i * 3 + 0] = tmp >> 16;
                     out[i * 3 + 1] = tmp >> 8;
@@ -616,7 +618,7 @@ static int decode_init(AVCodecContext *avctx)
     c->width = avctx->width;
     c->height = avctx->height;
 
-    if (avcodec_check_dimensions(avctx, avctx->height, avctx->width) < 0) {
+    if (avcodec_check_dimensions(avctx, avctx->width, avctx->height) < 0) {
         return 1;
     }
     c->bpp = avctx->bits_per_sample;

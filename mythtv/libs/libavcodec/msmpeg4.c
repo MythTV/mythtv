@@ -3,18 +3,20 @@
  * Copyright (c) 2001 Fabrice Bellard.
  * Copyright (c) 2002-2004 Michael Niedermayer <michaelni@gmx.at>
  *
- * This library is free software; you can redistribute it and/or
+ * This file is part of FFmpeg.
+ *
+ * FFmpeg is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
- * version 2 of the License, or (at your option) any later version.
+ * version 2.1 of the License, or (at your option) any later version.
  *
- * This library is distributed in the hope that it will be useful,
+ * FFmpeg is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
+ * License along with FFmpeg; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  *
  * msmpeg4v1 & v2 stuff by Michael Niedermayer <michaelni@gmx.at>
@@ -65,10 +67,10 @@ static inline int msmpeg4_decode_block(MpegEncContext * s, DCTELEM * block,
 static int msmpeg4_decode_dc(MpegEncContext * s, int n, int *dir_ptr);
 static int msmpeg4_decode_motion(MpegEncContext * s,
                                  int *mx_ptr, int *my_ptr);
-static void msmpeg4v2_encode_motion(MpegEncContext * s, int val);
 static void init_h263_dc_for_msmpeg4(void);
 static inline void msmpeg4_memsetw(short *tab, int val, int n);
 #ifdef CONFIG_ENCODERS
+static void msmpeg4v2_encode_motion(MpegEncContext * s, int val);
 static int get_size_of_code(MpegEncContext * s, RLTable *rl, int last, int run, int level, int intra);
 #endif //CONFIG_ENCODERS
 static int msmpeg4v12_decode_mb(MpegEncContext *s, DCTELEM block[6][64]);
@@ -627,7 +629,7 @@ static int get_dc(uint8_t *src, int stride, int scale)
 
 /* dir = 0: left, dir = 1: top prediction */
 static inline int msmpeg4_pred_dc(MpegEncContext * s, int n,
-                             uint16_t **dc_val_ptr, int *dir_ptr)
+                             int16_t **dc_val_ptr, int *dir_ptr)
 {
     int a, b, c, wrap, pred, scale;
     int16_t *dc_val;
@@ -657,7 +659,7 @@ static inline int msmpeg4_pred_dc(MpegEncContext * s, int n,
        necessitate to modify mpegvideo.c. The problem comes from the
        fact they decided to store the quantized DC (which would lead
        to problems if Q could vary !) */
-#if (defined(ARCH_X86) || defined(ARCH_X86_64)) && !defined PIC
+#if (defined(ARCH_X86)) && !defined PIC
     asm volatile(
         "movl %3, %%eax         \n\t"
         "shrl $1, %%eax         \n\t"
@@ -673,7 +675,7 @@ static inline int msmpeg4_pred_dc(MpegEncContext * s, int n,
         "mull %4                \n\t"
         "movl %%edx, %2         \n\t"
         : "+b" (a), "+c" (b), "+D" (c)
-        : "g" (scale), "S" (inverse[scale])
+        : "g" (scale), "S" (ff_inverse[scale])
         : "%eax", "%edx"
     );
 #else
@@ -787,7 +789,7 @@ static void msmpeg4_encode_dc(MpegEncContext * s, int level, int n, int *dir_ptr
         /* update predictor */
         *dc_val= level;
     }else{
-        uint16_t *dc_val;
+        int16_t *dc_val;
         pred = msmpeg4_pred_dc(s, n, &dc_val, dir_ptr);
 
         /* update predictor */
@@ -1343,6 +1345,7 @@ static inline void msmpeg4_memsetw(short *tab, int val, int n)
         tab[i] = val;
 }
 
+#ifdef CONFIG_ENCODERS
 static void msmpeg4v2_encode_motion(MpegEncContext * s, int val)
 {
     int range, bit_size, sign, code, bits;
@@ -1375,6 +1378,7 @@ static void msmpeg4v2_encode_motion(MpegEncContext * s, int val)
         }
     }
 }
+#endif
 
 /* this is identical to h263 except that its range is multiplied by 2 */
 static int msmpeg4v2_decode_motion(MpegEncContext * s, int pred, int f_code)
@@ -1712,7 +1716,7 @@ static inline int msmpeg4_decode_block(MpegEncContext * s, DCTELEM * block,
 //printf("level: %d, run: %d at %d %d\n", level, run, s->mb_x, s->mb_y);
 #if 0 // waste of time / this will detect very few errors
                     {
-                        const int abs_level= ABS(level);
+                        const int abs_level= FFABS(level);
                         const int run1= run - rl->max_run[last][abs_level] - run_diff;
                         if(abs_level<=MAX_LEVEL && run<=MAX_RUN){
                             if(abs_level <= rl->max_level[last][run]){
@@ -1873,7 +1877,7 @@ static int msmpeg4_decode_dc(MpegEncContext * s, int n, int *dir_ptr)
         /* update predictor */
         *dc_val= level;
     }else{
-        uint16_t *dc_val;
+        int16_t *dc_val;
         pred = msmpeg4_pred_dc(s, n, &dc_val, dir_ptr);
         level += pred;
 

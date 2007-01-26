@@ -1,18 +1,20 @@
 /*
  * Copyright (C) 2004 the ffmpeg project
  *
- * This library is free software; you can redistribute it and/or
+ * This file is part of FFmpeg.
+ *
+ * FFmpeg is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
- * version 2 of the License, or (at your option) any later version.
+ * version 2.1 of the License, or (at your option) any later version.
  *
- * This library is distributed in the hope that it will be useful,
+ * FFmpeg is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
+ * License along with FFmpeg; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
@@ -37,10 +39,10 @@
 
 #define M(a,b) (((a) * (b))>>16)
 
-static always_inline void idct(uint8_t *dst, int stride, int16_t *input, int type)
+static av_always_inline void idct(uint8_t *dst, int stride, int16_t *input, int type)
 {
     int16_t *ip = input;
-    uint8_t *cm = cropTbl + MAX_NEG_CROP;
+    uint8_t *cm = ff_cropTbl + MAX_NEG_CROP;
 
     int A, B, C, D, Ad, Bd, Cd, Dd, E, F, G, H;
     int Ed, Gd, Add, Bdd, Fd, Hd;

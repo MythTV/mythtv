@@ -1,19 +1,21 @@
 /*
- * FFM (ffserver live feed) encoder and decoder
+ * FFM (ffserver live feed) muxer and demuxer
  * Copyright (c) 2001 Fabrice Bellard.
  *
- * This library is free software; you can redistribute it and/or
+ * This file is part of FFmpeg.
+ *
+ * FFmpeg is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
- * version 2 of the License, or (at your option) any later version.
+ * version 2.1 of the License, or (at your option) any later version.
  *
- * This library is distributed in the hope that it will be useful,
+ * FFmpeg is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
+ * License along with FFmpeg; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 #include "avformat.h"
@@ -436,7 +438,7 @@ static void adjust_write_index(AVFormatContext *s)
         ffm->write_index += pos_max;
     }
 
-    //printf("Adjusted write index from %lld to %lld: pts=%0.6f\n", orig_write_index, ffm->write_index, pts / 1000000.);
+    //printf("Adjusted write index from %"PRId64" to %"PRId64": pts=%0.6f\n", orig_write_index, ffm->write_index, pts / 1000000.);
     //printf("pts range %0.6f - %0.6f\n", get_pts(s, 0) / 1000000. , get_pts(s, ffm->file_size - 2 * FFM_PACKET_SIZE) / 1000000. );
 
  end:
@@ -467,7 +469,7 @@ static int ffm_read_header(AVFormatContext *s, AVFormatParameters *ap)
         ffm->file_size = url_fsize(pb);
         adjust_write_index(s);
     } else {
-        ffm->file_size = (uint64_t_C(1) << 63) - 1;
+        ffm->file_size = (UINT64_C(1) << 63) - 1;
     }
 
     nb_streams = get_be32(pb);
@@ -580,7 +582,7 @@ static int ffm_read_packet(AVFormatContext *s, AVPacket *pkt)
             return -EAGAIN;
         }
 #if 0
-        printf("pos=%08Lx spos=%Lx, write_index=%Lx size=%Lx\n",
+        printf("pos=%08"PRIx64" spos=%"PRIx64", write_index=%"PRIx64" size=%"PRIx64"\n",
                url_ftell(&s->pb), s->pb.pos, ffm->write_index, ffm->file_size);
 #endif
         if (ffm_read_data(s, ffm->header, FRAME_HEADER_SIZE, 1) !=
@@ -641,7 +643,7 @@ static void ffm_seek1(AVFormatContext *s, offset_t pos1)
     if (pos >= ffm->file_size)
         pos -= (ffm->file_size - FFM_PACKET_SIZE);
 #ifdef DEBUG_SEEK
-    printf("seek to %Lx -> %Lx\n", pos1, pos);
+    printf("seek to %"PRIx64" -> %"PRIx64"\n", pos1, pos);
 #endif
     url_fseek(pb, pos, SEEK_SET);
 }

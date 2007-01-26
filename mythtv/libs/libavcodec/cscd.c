@@ -2,18 +2,20 @@
  * CamStudio decoder
  * Copyright (c) 2006 Reimar Doeffinger
  *
- * This library is free software; you can redistribute it and/or
+ * This file is part of FFmpeg.
+ *
+ * FFmpeg is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
- * version 2 of the License, or (at your option) any later version.
+ * version 2.1 of the License, or (at your option) any later version.
  *
- * This library is distributed in the hope that it will be useful,
+ * FFmpeg is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
+ * License along with FFmpeg; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 #include <stdio.h>
@@ -218,12 +220,12 @@ static int decode_init(AVCodecContext *avctx) {
     }
     avctx->has_b_frames = 0;
     switch (avctx->bits_per_sample) {
-        case 16: avctx->pix_fmt = PIX_FMT_RGB565; break;
+        case 16: avctx->pix_fmt = PIX_FMT_RGB555; break;
         case 24: avctx->pix_fmt = PIX_FMT_BGR24; break;
         case 32: avctx->pix_fmt = PIX_FMT_RGBA32; break;
         default:
             av_log(avctx, AV_LOG_ERROR,
-                   "CamStudio codec error: unvalid depth %i bpp\n",
+                   "CamStudio codec error: invalid depth %i bpp\n",
                    avctx->bits_per_sample);
              return 1;
     }

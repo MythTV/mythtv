@@ -2,18 +2,20 @@
  * H.264 encoding using the x264 library
  * Copyright (C) 2005  Mans Rullgard <mru@inprovide.com>
  *
- * This library is free software; you can redistribute it and/or
+ * This file is part of FFmpeg.
+ *
+ * FFmpeg is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
- * version 2 of the License, or (at your option) any later version.
+ * version 2.1 of the License, or (at your option) any later version.
  *
- * This library is distributed in the hope that it will be useful,
+ * FFmpeg is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
+ * License along with FFmpeg; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
@@ -64,7 +66,7 @@ encode_nals(uint8_t *buf, int size, x264_nal_t *nals, int nnal)
     return p - buf;
 }
 
-extern int
+static int
 X264_frame(AVCodecContext *ctx, uint8_t *buf, int bufsize, void *data)
 {
     X264Context *x4 = ctx->priv_data;
@@ -76,15 +78,18 @@ X264_frame(AVCodecContext *ctx, uint8_t *buf, int bufsize, void *data)
     x4->pic.img.i_csp = X264_CSP_I420;
     x4->pic.img.i_plane = 3;
 
-    for(i = 0; i < 3; i++){
-        x4->pic.img.plane[i] = frame->data[i];
-        x4->pic.img.i_stride[i] = frame->linesize[i];
+    if (frame) {
+        for(i = 0; i < 3; i++){
+            x4->pic.img.plane[i] = frame->data[i];
+            x4->pic.img.i_stride[i] = frame->linesize[i];
+        }
+
+        x4->pic.i_pts = frame->pts;
+        x4->pic.i_type = X264_TYPE_AUTO;
     }
 
-    x4->pic.i_pts = frame->pts;
-    x4->pic.i_type = X264_TYPE_AUTO;
-
-    if(x264_encoder_encode(x4->enc, &nal, &nnal, &x4->pic, &pic_out))
+    if(x264_encoder_encode(x4->enc, &nal, &nnal, frame? &x4->pic: NULL,
+                           &pic_out))
         return -1;
 
     bufsize = encode_nals(buf, bufsize, nal, nnal);
@@ -125,7 +130,7 @@ X264_close(AVCodecContext *avctx)
     return 0;
 }
 
-extern int
+static int
 X264_init(AVCodecContext *avctx)
 {
     X264Context *x4 = avctx->priv_data;
@@ -144,7 +149,7 @@ X264_init(AVCodecContext *avctx)
     else{
         if(avctx->crf){
             x4->params.rc.i_rc_method = X264_RC_CRF;
-            x4->params.rc.i_rf_constant = avctx->crf;
+            x4->params.rc.f_rf_constant = avctx->crf;
         }else if(avctx->cqp > -1){
             x4->params.rc.i_rc_method = X264_RC_CQP;
             x4->params.rc.i_qp_constant = avctx->cqp;
@@ -220,6 +225,7 @@ X264_init(AVCodecContext *avctx)
     x4->params.analyse.i_me_range = avctx->me_range;
     x4->params.analyse.i_subpel_refine = avctx->me_subpel_quality;
 
+    x4->params.analyse.b_bidir_me = (avctx->bidir_refine > 0);
     x4->params.analyse.b_bframe_rdo = (avctx->flags2 & CODEC_FLAG2_BRDO);
     x4->params.analyse.b_mixed_references =
         (avctx->flags2 & CODEC_FLAG2_MIXED_REFS);
@@ -289,5 +295,6 @@ AVCodec x264_encoder = {
     .init = X264_init,
     .encode = X264_frame,
     .close = X264_close,
+    .capabilities = CODEC_CAP_DELAY,
     .pix_fmts = (enum PixelFormat[]) { PIX_FMT_YUV420P, -1 }
 };

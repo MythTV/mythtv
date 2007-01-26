@@ -2,18 +2,20 @@
  * American Laser Games MM Format Demuxer
  * Copyright (c) 2006 Peter Ross
  *
- * This library is free software; you can redistribute it and/or
+ * This file is part of FFmpeg.
+ *
+ * FFmpeg is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
- * version 2 of the License, or (at your option) any later version.
+ * version 2.1 of the License, or (at your option) any later version.
  *
- * This library is distributed in the hope that it will be useful,
+ * FFmpeg is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
+ * License along with FFmpeg; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
@@ -59,9 +61,9 @@ static int mm_probe(AVProbeData *p)
     /* the first chunk is always the header */
     if (p->buf_size < MM_PREAMBLE_SIZE)
         return 0;
-    if (LE_16(&p->buf[0]) != MM_TYPE_HEADER)
+    if (AV_RL16(&p->buf[0]) != MM_TYPE_HEADER)
         return 0;
-    if (LE_32(&p->buf[2]) != MM_HEADER_LEN_V && LE_32(&p->buf[2]) != MM_HEADER_LEN_AV)
+    if (AV_RL32(&p->buf[2]) != MM_HEADER_LEN_V && AV_RL32(&p->buf[2]) != MM_HEADER_LEN_AV)
         return 0;
 
     /* only return half certainty since this check is a bit sketchy */
@@ -139,8 +141,8 @@ static int mm_read_packet(AVFormatContext *s,
             return AVERROR_IO;
         }
 
-        type = LE_16(&preamble[0]);
-        length = LE_16(&preamble[2]);
+        type = AV_RL16(&preamble[0]);
+        length = AV_RL16(&preamble[2]);
 
         switch(type) {
         case MM_TYPE_PALETTE :

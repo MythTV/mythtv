@@ -4,25 +4,25 @@
  *
  * Copyright (C) 2006  Aurelien Jacobs <aurel@gnuage.org>
  *
- * This library is free software; you can redistribute it and/or
+ * This file is part of FFmpeg.
+ *
+ * FFmpeg is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 2.1 of the License, or (at your option) any later version.
  *
- * This library is distributed in the hope that it will be useful,
+ * FFmpeg is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
+ * License along with FFmpeg; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
 #ifndef VP56_H
 #define VP56_H
-
-#include <stdint.h>
 
 #include "vp56data.h"
 #include "dsputil.h"
@@ -76,6 +76,9 @@ struct vp56_context {
     uint8_t *edge_emu_buffer_alloc;
     uint8_t *edge_emu_buffer;
     vp56_range_coder_t c;
+    vp56_range_coder_t cc;
+    vp56_range_coder_t *ccp;
+    int sub_version;
 
     /* frame info */
     int plane_width[3];
@@ -107,6 +110,7 @@ struct vp56_context {
     int vector_candidate_pos;
 
     /* filtering hints */
+    int filter_header;               /* used in vp6 only */
     int deblock_filtering;
     int filter_selection;
     int filter_mode;

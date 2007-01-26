@@ -2,18 +2,20 @@
  * WavPack demuxer
  * Copyright (c) 2006 Konstantin Shishkov.
  *
- * This library is free software; you can redistribute it and/or
+ * This file is part of FFmpeg.
+ *
+ * FFmpeg is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
- * version 2 of the License, or (at your option) any later version.
+ * version 2.1 of the License, or (at your option) any later version.
  *
- * This library is distributed in the hope that it will be useful,
+ * FFmpeg is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
+ * License along with FFmpeg; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
@@ -90,7 +92,7 @@ static int wv_read_block_header(AVFormatContext *ctx, ByteIOContext *pb)
     get_le32(pb); // total samples in file
     get_le32(pb); // offset in samples of current block
     get_buffer(pb, wc->extra, WV_EXTRA_SIZE);
-    wc->flags = LE_32(wc->extra + 4);
+    wc->flags = AV_RL32(wc->extra + 4);
     //parse flags
     if(wc->flags & WV_FLOAT){
         av_log(ctx, AV_LOG_ERROR, "Floating point data is not supported\n");
@@ -116,15 +118,15 @@ static int wv_read_block_header(AVFormatContext *ctx, ByteIOContext *pb)
     if(!wc->chan) wc->chan = chan;
     if(!wc->rate) wc->rate = rate;
 
-    if(bpp != wc->bpp){
+    if(wc->flags && bpp != wc->bpp){
         av_log(ctx, AV_LOG_ERROR, "Bits per sample differ, this block: %i, header block: %i\n", bpp, wc->bpp);
         return -1;
     }
-    if(chan != wc->chan){
+    if(wc->flags && chan != wc->chan){
         av_log(ctx, AV_LOG_ERROR, "Channels differ, this block: %i, header block: %i\n", chan, wc->chan);
         return -1;
     }
-    if(rate != wc->rate){
+    if(wc->flags && rate != wc->rate){
         av_log(ctx, AV_LOG_ERROR, "Sampling rate differ, this block: %i, header block: %i\n", rate, wc->rate);
         return -1;
     }
@@ -160,7 +162,7 @@ static int wv_read_packet(AVFormatContext *s,
                           AVPacket *pkt)
 {
     WVContext *wc = s->priv_data;
-    int ret, samples;
+    int ret;
 
     if (url_feof(&s->pb))
         return -EIO;
@@ -169,12 +171,6 @@ static int wv_read_packet(AVFormatContext *s,
             return -1;
     }
 
-    samples = LE_32(wc->extra);
-    /* should not happen but who knows */
-    if(samples * 2 * wc->chan > AVCODEC_MAX_AUDIO_FRAME_SIZE){
-        av_log(s, AV_LOG_ERROR, "Packet size is too big to be handled in lavc!\n");
-        return -EIO;
-    }
     if(av_new_packet(pkt, wc->blksize + WV_EXTRA_SIZE) < 0)
         return AVERROR_NOMEM;
     memcpy(pkt->data, wc->extra, WV_EXTRA_SIZE);
@@ -203,5 +199,4 @@ AVInputFormat wv_demuxer = {
     wv_read_header,
     wv_read_packet,
     wv_read_close,
-    pcm_read_seek,
 };

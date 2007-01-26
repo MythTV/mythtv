@@ -1,18 +1,20 @@
 /*
  * Copyright (c) 2006 Luca Barbato <lu_zero@gentoo.org>
  *
- * This library is free software; you can redistribute it and/or
+ * This file is part of FFmpeg.
+ *
+ * FFmpeg is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
- * version 2 of the License, or (at your option) any later version.
+ * version 2.1 of the License, or (at your option) any later version.
  *
- * This library is distributed in the hope that it will be useful,
+ * FFmpeg is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
+ * License along with FFmpeg; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
@@ -74,7 +76,6 @@ static void vector_fmul_add_add_altivec(float *dst, const float *src0,
     vector unsigned char align = vec_lvsr(0,dst),
                          mask = vec_lvsl(0, dst);
 
-    t0 = vec_ld(0, dst);
 #if 0 //FIXME: there is still something wrong
     if (step == 2) {
         int y;
@@ -132,6 +133,7 @@ static void vector_fmul_add_add_altivec(float *dst, const float *src0,
     #endif
     if (step == 1 && src3 == 0)
         for (i=0; i<len-3; i+=4) {
+            t0 = vec_ld(0, dst+i);
             t1 = vec_ld(15, dst+i);
             s0 = vec_ld(0, src0+i);
             s1 = vec_ld(0, src1+i);
@@ -142,7 +144,6 @@ static void vector_fmul_add_add_altivec(float *dst, const float *src0,
             t0 = vec_perm(edges, d, align);
             vec_st(t1, 15, dst+i);
             vec_st(t0, 0, dst+i);
-            t0 = t1;
         }
     else
         ff_vector_fmul_add_add_c(dst, src0, src1, src2, src3, len, step);

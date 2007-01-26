@@ -2,18 +2,20 @@
  * Duck/ON2 TrueMotion 2 Decoder
  * Copyright (c) 2005 Konstantin Shishkov
  *
- * This library is free software; you can redistribute it and/or
+ * This file is part of FFmpeg.
+ *
+ * FFmpeg is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
- * version 2 of the License, or (at your option) any later version.
+ * version 2.1 of the License, or (at your option) any later version.
  *
- * This library is distributed in the hope that it will be useful,
+ * FFmpeg is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
+ * License along with FFmpeg; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  *
  */
@@ -206,7 +208,7 @@ static inline int tm2_read_header(TM2Context *ctx, uint8_t *buf)
 
     obuf = buf;
 
-    magic = LE_32(buf);
+    magic = AV_RL32(buf);
     buf += 4;
 
     if(magic == 0x00000100) { /* old header */
@@ -215,7 +217,7 @@ static inline int tm2_read_header(TM2Context *ctx, uint8_t *buf)
     } else if(magic == 0x00000101) { /* new header */
         int w, h, size, flags, xr, yr;
 
-        length = LE_32(buf);
+        length = AV_RL32(buf);
         buf += 4;
 
         init_get_bits(&ctx->gb, buf, 32 * 8);
@@ -268,17 +270,17 @@ static int tm2_read_stream(TM2Context *ctx, uint8_t *buf, int stream_id) {
     TM2Codes codes;
 
     /* get stream length in dwords */
-    len = BE_32(buf); buf += 4; cur += 4;
+    len = AV_RB32(buf); buf += 4; cur += 4;
     skip = len * 4 + 4;
 
     if(len == 0)
         return 4;
 
-    toks = BE_32(buf); buf += 4; cur += 4;
+    toks = AV_RB32(buf); buf += 4; cur += 4;
     if(toks & 1) {
-        len = BE_32(buf); buf += 4; cur += 4;
+        len = AV_RB32(buf); buf += 4; cur += 4;
         if(len == TM2_ESCAPE) {
-            len = BE_32(buf); buf += 4; cur += 4;
+            len = AV_RB32(buf); buf += 4; cur += 4;
         }
         if(len > 0) {
             init_get_bits(&ctx->gb, buf, (skip - cur) * 8);
@@ -289,7 +291,7 @@ static int tm2_read_stream(TM2Context *ctx, uint8_t *buf, int stream_id) {
         }
     }
     /* skip unused fields */
-    if(BE_32(buf) == TM2_ESCAPE) {
+    if(AV_RB32(buf) == TM2_ESCAPE) {
         buf += 4; cur += 4; /* some unknown length - could be escaped too */
     }
     buf += 4; cur += 4;
@@ -310,7 +312,7 @@ static int tm2_read_stream(TM2Context *ctx, uint8_t *buf, int stream_id) {
     }
     ctx->tokens[stream_id] = av_realloc(ctx->tokens[stream_id], toks * sizeof(int));
     ctx->tok_lens[stream_id] = toks;
-    len = BE_32(buf); buf += 4; cur += 4;
+    len = AV_RB32(buf); buf += 4; cur += 4;
     if(len > 0) {
         init_get_bits(&ctx->gb, buf, (skip - cur) * 8);
         for(i = 0; i < toks; i++)
@@ -822,7 +824,7 @@ static int decode_init(AVCodecContext *avctx){
     TM2Context * const l = avctx->priv_data;
     int i;
 
-    if (avcodec_check_dimensions(avctx, avctx->height, avctx->width) < 0) {
+    if (avcodec_check_dimensions(avctx, avctx->width, avctx->height) < 0) {
         return -1;
     }
     if((avctx->width & 3) || (avctx->height & 3)){

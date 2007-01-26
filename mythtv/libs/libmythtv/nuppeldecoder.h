@@ -90,7 +90,7 @@ class NuppelDecoder : public DecoderBase
 #endif
 
     int ffmpeg_extradatasize;
-    char *ffmpeg_extradata;
+    uint8_t *ffmpeg_extradata;
 
     struct extendeddata extradata;
     bool usingextradata;

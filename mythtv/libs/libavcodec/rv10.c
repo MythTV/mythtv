@@ -3,18 +3,20 @@
  * Copyright (c) 2000,2001 Fabrice Bellard.
  * Copyright (c) 2002-2004 Michael Niedermayer
  *
- * This library is free software; you can redistribute it and/or
+ * This file is part of FFmpeg.
+ *
+ * FFmpeg is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
- * version 2 of the License, or (at your option) any later version.
+ * version 2.1 of the License, or (at your option) any later version.
  *
- * This library is distributed in the hope that it will be useful,
+ * FFmpeg is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
+ * License along with FFmpeg; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
@@ -383,8 +385,9 @@ static int rv20_decode_picture_header(MpegEncContext *s)
     av_log(s->avctx, AV_LOG_DEBUG, "\n");
 #endif
 #if 0
+    av_log(s->avctx, AV_LOG_DEBUG, "%3dx%03d/%02Xx%02X ", s->width, s->height, s->width/4, s->height/4);
     for(i=0; i<s->avctx->extradata_size; i++){
-        av_log(s->avctx, AV_LOG_DEBUG, "%2X ", ((uint8_t*)s->avctx->extradata)[i]);
+        av_log(s->avctx, AV_LOG_DEBUG, "%02X ", ((uint8_t*)s->avctx->extradata)[i]);
         if(i%4==3) av_log(s->avctx, AV_LOG_DEBUG, " ");
     }
     av_log(s->avctx, AV_LOG_DEBUG, "\n");
@@ -431,17 +434,32 @@ static int rv20_decode_picture_header(MpegEncContext *s)
     }
 
     if(s->avctx->has_b_frames){
-        int f=9;
-        int v= s->avctx->extradata_size >= 4 ? ((uint8_t*)s->avctx->extradata)[1] : 0;
+        int f, new_w, new_h;
+        int v= s->avctx->extradata_size >= 4 ? 7&((uint8_t*)s->avctx->extradata)[1] : 0;
 
         if (get_bits(&s->gb, 1)){
             av_log(s->avctx, AV_LOG_ERROR, "unknown bit3 set\n");
 //            return -1;
         }
-        seq= get_bits(&s->gb, 14)<<1;
+        seq= get_bits(&s->gb, 13)<<2;
 
-        if(v)
-            f= get_bits(&s->gb, av_log2(v));
+        f= get_bits(&s->gb, av_log2(v)+1);
+
+        if(f){
+            new_w= 4*((uint8_t*)s->avctx->extradata)[6+2*f];
+            new_h= 4*((uint8_t*)s->avctx->extradata)[7+2*f];
+        }else{
+            new_w= s->width; //FIXME wrong we of course must save the original in the context
+            new_h= s->height;
+        }
+        if(new_w != s->width || new_h != s->height){
+            av_log(s->avctx, AV_LOG_DEBUG, "attempting to change resolution to %dx%d\n", new_w, new_h);
+            MPV_common_end(s);
+            s->width  = s->avctx->width = new_w;
+            s->height = s->avctx->height= new_h;
+            if (MPV_common_init(s) < 0)
+                return -1;
+        }
 
         if(s->avctx->debug & FF_DEBUG_PICT_INFO){
             av_log(s->avctx, AV_LOG_DEBUG, "F %d/%d\n", f, v);
@@ -473,6 +491,7 @@ static int rv20_decode_picture_header(MpegEncContext *s)
                 av_log(s->avctx, AV_LOG_DEBUG, "messed up order, possible from seeking? skipping current b frame\n");
                 return FRAME_SKIPPED;
             }
+            ff_mpeg4_init_direct_mv(s);
         }
     }
 //    printf("%d %d %d %d %d\n", seq, (int)s->time, (int)s->last_non_b_time, s->pp_time, s->pb_time);
@@ -515,26 +534,25 @@ static int rv10_decode_init(AVCodecContext *avctx)
     s->width = avctx->width;
     s->height = avctx->height;
 
+    s->h263_long_vectors= ((uint8_t*)avctx->extradata)[3] & 1;
+    avctx->sub_id= AV_RB32((uint8_t*)avctx->extradata + 4);
+
     switch(avctx->sub_id){
     case 0x10000000:
         s->rv10_version= 0;
-        s->h263_long_vectors=0;
         s->low_delay=1;
         break;
     case 0x10002000:
         s->rv10_version= 3;
-        s->h263_long_vectors=1;
         s->low_delay=1;
         s->obmc=1;
         break;
     case 0x10003000:
         s->rv10_version= 3;
-        s->h263_long_vectors=1;
         s->low_delay=1;
         break;
     case 0x10003001:
         s->rv10_version= 3;
-        s->h263_long_vectors= !!(*(uint32_t*)avctx->extradata & 0x1000000);
         s->low_delay=1;
         break;
     case 0x20001000: /* real rv20 decoder fail on this id */

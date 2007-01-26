@@ -3,18 +3,20 @@
  * Copyright (c) 2003 Zdenek Kabelac.
  * Copyright (c) 2004 Thomas Raivio.
  *
- * This library is free software; you can redistribute it and/or
+ * This file is part of FFmpeg.
+ *
+ * FFmpeg is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
- * version 2 of the License, or (at your option) any later version.
+ * version 2.1 of the License, or (at your option) any later version.
  *
- * This library is distributed in the hope that it will be useful,
+ * FFmpeg is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
+ * License along with FFmpeg; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
@@ -33,12 +35,12 @@
 #endif
 
 /*
- * when CONFIG_FAADBIN is defined the libfaad will be opened at runtime
+ * when CONFIG_LIBFAADBIN is defined the libfaad will be opened at runtime
  */
-//#undef CONFIG_FAADBIN
-//#define CONFIG_FAADBIN
+//#undef CONFIG_LIBFAADBIN
+//#define CONFIG_LIBFAADBIN
 
-#ifdef CONFIG_FAADBIN
+#ifdef CONFIG_LIBFAADBIN
 #include <dlfcn.h>
 static const char* libfaadname = "libfaad.so.0";
 #else
@@ -206,7 +208,7 @@ static int faac_decode_init(AVCodecContext *avctx)
     FAACContext *s = (FAACContext *) avctx->priv_data;
     faacDecConfigurationPtr faac_cfg;
 
-#ifdef CONFIG_FAADBIN
+#ifdef CONFIG_LIBFAADBIN
     const char* err = 0;
 
     s->handle = dlopen(libfaadname, RTLD_LAZY);
@@ -220,9 +222,9 @@ static int faac_decode_init(AVCodecContext *avctx)
     do { static const char* n = "faacDec" #a; \
     if ((s->faacDec ## a = b dlsym( s->handle, n )) == NULL) { err = n; break; } } while(0)
     for(;;) {
-#else  /* !CONFIG_FAADBIN */
+#else  /* !CONFIG_LIBFAADBIN */
 #define dfaac(a, b)     s->faacDec ## a = faacDec ## a
-#endif /* CONFIG_FAADBIN */
+#endif /* CONFIG_LIBFAADBIN */
 
         // resolve all needed function calls
         dfaac(Open, (faacDecHandle FAADAPI (*)(void)));
@@ -254,7 +256,7 @@ static int faac_decode_init(AVCodecContext *avctx)
 #endif
 #undef dfacc
 
-#ifdef CONFIG_FAADBIN
+#ifdef CONFIG_LIBFAADBIN
         break;
     }
     if (err) {
@@ -324,7 +326,9 @@ AVCodec name ## _decoder = {    \
 
 // FIXME - raw AAC files - maybe just one entry will be enough
 AAC_CODEC(CODEC_ID_AAC, aac);
+#if LIBAVCODEC_VERSION_INT < ((52<<16)+(0<<8)+0)
 // If it's mp4 file - usually embeded into Qt Mov
 AAC_CODEC(CODEC_ID_MPEG4AAC, mpeg4aac);
+#endif
 
 #undef AAC_CODEC

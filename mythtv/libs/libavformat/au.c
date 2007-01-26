@@ -1,19 +1,21 @@
 /*
- * AU encoder and decoder
+ * AU muxer and demuxer
  * Copyright (c) 2001 Fabrice Bellard.
  *
- * This library is free software; you can redistribute it and/or
+ * This file is part of FFmpeg.
+ *
+ * FFmpeg is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
- * version 2 of the License, or (at your option) any later version.
+ * version 2.1 of the License, or (at your option) any later version.
  *
- * This library is distributed in the hope that it will be useful,
+ * FFmpeg is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
+ * License along with FFmpeg; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
@@ -33,7 +35,7 @@
 #define AU_UNKOWN_SIZE ((uint32_t)(~0))
 
 /* The ffmpeg codecs we support, and the IDs they have in the file */
-static const CodecTag codec_au_tags[] = {
+static const AVCodecTag codec_au_tags[] = {
     { CODEC_ID_PCM_MULAW, 1 },
     { CODEC_ID_PCM_S16BE, 3 },
     { CODEC_ID_PCM_ALAW, 27 },
@@ -44,8 +46,6 @@ static const CodecTag codec_au_tags[] = {
 /* AUDIO_FILE header */
 static int put_au_header(ByteIOContext *pb, AVCodecContext *enc)
 {
-    if(!enc->codec_tag)
-       enc->codec_tag = codec_get_tag(codec_au_tags, enc->codec_id);
     if(!enc->codec_tag)
         return -1;
     put_tag(pb, ".snd");       /* magic number */
@@ -188,6 +188,7 @@ AVInputFormat au_demuxer = {
     au_read_packet,
     au_read_close,
     pcm_read_seek,
+    .codec_tag= (const AVCodecTag*[]){codec_au_tags, 0},
 };
 #endif
 
@@ -203,5 +204,6 @@ AVOutputFormat au_muxer = {
     au_write_header,
     au_write_packet,
     au_write_trailer,
+    .codec_tag= (const AVCodecTag*[]){codec_au_tags, 0},
 };
 #endif //CONFIG_AU_MUXER

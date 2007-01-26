@@ -2,19 +2,21 @@
  * GXF muxer.
  * Copyright (c) 2006 SmartJog S.A., Baptiste Coudurier <baptiste dot coudurier at smartjog dot com>.
  *
- * This library is free software; you can redistribute it and/or modify
+ * This file is part of FFmpeg.
+ *
+ * FFmpeg is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
  *
- * This library is distributed in the hope that it will be useful,
+ * FFmpeg is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+ * along with FFmpeg; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
 #include "avformat.h"
@@ -43,6 +45,7 @@ typedef struct GXFStreamContext {
     int b_per_gop;
     int first_gop_closed;
     int64_t current_dts;
+    int dts_delay;
 } GXFStreamContext;
 
 typedef struct GXFContext {
@@ -82,7 +85,7 @@ static const GXF_Lines gxf_lines_tab[] = {
     { 720,  6 },
 };
 
-static const CodecTag gxf_media_types[] = {
+static const AVCodecTag gxf_media_types[] = {
     { CODEC_ID_MJPEG     ,   3 }, /* NTSC */
     { CODEC_ID_MJPEG     ,   4 }, /* PAL */
     { CODEC_ID_PCM_S24LE ,   9 },
@@ -403,6 +406,7 @@ static int gxf_write_umf_track_description(ByteIOContext *pb, GXFContext *ctx)
         case CODEC_ID_PCM_S16LE:  id= 'A'; break;
         case CODEC_ID_DVVIDEO:    id= sc->track_type == 6 ? 'E' : 'D'; break;
         case CODEC_ID_MJPEG:      id= 'V'; break;
+        default:                  break;
         }
         sc->media_info= id << 8;
         /* FIXME first 10 audio tracks are 0 to 9 next 22 are A to V */
@@ -642,7 +646,7 @@ static int gxf_write_header(AVFormatContext *s)
                 }
                 break;
             default:
-                av_log(NULL, AV_LOG_ERROR, "video codec not supported\n");
+                av_log(s, AV_LOG_ERROR, "video codec not supported\n");
                 return -1;
             }
         }
@@ -782,18 +786,27 @@ static int gxf_interleave_packet(AVFormatContext *s, AVPacket *out, AVPacket *pk
     int i;
 
     for (i = 0; i < s->nb_streams; i++) {
-        if (s->streams[i]->codec->codec_type == CODEC_TYPE_AUDIO) {
-            GXFStreamContext *sc = &gxf->streams[i];
+        AVStream *st = s->streams[i];
+        GXFStreamContext *sc = &gxf->streams[i];
+        if (st->codec->codec_type == CODEC_TYPE_AUDIO) {
             if (pkt && pkt->stream_index == i) {
                 av_fifo_write(&sc->audio_buffer, pkt->data, pkt->size);
                 pkt = NULL;
             }
             if (flush || av_fifo_size(&sc->audio_buffer) >= GXF_AUDIO_PACKET_SIZE) {
-                if (gxf_new_audio_packet(gxf, sc, &new_pkt, flush) > 0) {
+                if (!pkt && gxf_new_audio_packet(gxf, sc, &new_pkt, flush) > 0) {
                     pkt = &new_pkt;
                     break; /* add pkt right now into list */
                 }
             }
+        } else if (pkt) {
+            /* adjust dts if negative */
+            if (pkt->dts < 0 && !sc->dts_delay) {
+                /* XXX: rescale if codec time base is different from stream time base */
+                sc->dts_delay = av_rescale_q(pkt->dts, st->codec->time_base, st->time_base);
+                pkt->dts = sc->dts_delay; /* set to 0 */
+            }
+            pkt->dts -= sc->dts_delay;
         }
     }
     return av_interleave_packet_per_dts(s, out, pkt, flush);

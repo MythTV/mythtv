@@ -2,18 +2,20 @@
  * Westwood Studios Multimedia Formats Demuxer (VQA, AUD)
  * Copyright (c) 2003 The ffmpeg Project
  *
- * This library is free software; you can redistribute it and/or
+ * This file is part of FFmpeg.
+ *
+ * FFmpeg is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
- * version 2 of the License, or (at your option) any later version.
+ * version 2.1 of the License, or (at your option) any later version.
  *
- * This library is distributed in the hope that it will be useful,
+ * FFmpeg is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
+ * License along with FFmpeg; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
@@ -42,6 +44,7 @@
 #define VQHD_TAG MKBETAG('V', 'Q', 'H', 'D')
 #define FINF_TAG MKBETAG('F', 'I', 'N', 'F')
 #define SND0_TAG MKBETAG('S', 'N', 'D', '0')
+#define SND1_TAG MKBETAG('S', 'N', 'D', '1')
 #define SND2_TAG MKBETAG('S', 'N', 'D', '2')
 #define VQFR_TAG MKBETAG('V', 'Q', 'F', 'R')
 
@@ -52,6 +55,7 @@
 #define PINF_TAG MKBETAG('P', 'I', 'N', 'F')
 #define PINH_TAG MKBETAG('P', 'I', 'N', 'H')
 #define PIND_TAG MKBETAG('P', 'I', 'N', 'D')
+#define CMDS_TAG MKBETAG('C', 'M', 'D', 'S')
 
 #define VQA_HEADER_SIZE 0x2A
 #define VQA_FRAMERATE 15
@@ -97,7 +101,7 @@ static int wsaud_probe(AVProbeData *p)
         return 0;
 
     /* check sample rate */
-    field = LE_16(&p->buf[0]);
+    field = AV_RL16(&p->buf[0]);
     if ((field < 8000) || (field > 48000))
         return 0;
 
@@ -120,7 +124,7 @@ static int wsaud_read_header(AVFormatContext *s,
 
     if (get_buffer(pb, header, AUD_HEADER_SIZE) != AUD_HEADER_SIZE)
         return AVERROR_IO;
-    wsaud->audio_samplerate = LE_16(&header[0]);
+    wsaud->audio_samplerate = AV_RL16(&header[0]);
     if (header[11] == 99)
         wsaud->audio_type = CODEC_ID_ADPCM_IMA_WS;
     else
@@ -166,10 +170,10 @@ static int wsaud_read_packet(AVFormatContext *s,
         return AVERROR_IO;
 
     /* validate the chunk */
-    if (LE_32(&preamble[4]) != AUD_CHUNK_SIGNATURE)
+    if (AV_RL32(&preamble[4]) != AUD_CHUNK_SIGNATURE)
         return AVERROR_INVALIDDATA;
 
-    chunk_size = LE_16(&preamble[0]);
+    chunk_size = AV_RL16(&preamble[0]);
     ret= av_get_packet(pb, pkt, chunk_size);
     if (ret != chunk_size)
         return AVERROR_IO;
@@ -198,8 +202,8 @@ static int wsvqa_probe(AVProbeData *p)
         return 0;
 
     /* check for the VQA signatures */
-    if ((BE_32(&p->buf[0]) != FORM_TAG) ||
-        (BE_32(&p->buf[8]) != WVQA_TAG))
+    if ((AV_RB32(&p->buf[0]) != FORM_TAG) ||
+        (AV_RB32(&p->buf[8]) != WVQA_TAG))
         return 0;
 
     return AVPROBE_SCORE_MAX;
@@ -220,7 +224,7 @@ static int wsvqa_read_header(AVFormatContext *s,
     st = av_new_stream(s, 0);
     if (!st)
         return AVERROR_NOMEM;
-    av_set_pts_info(st, 33, 1, 90000);
+    av_set_pts_info(st, 33, 1, VQA_FRAMERATE);
     wsvqa->video_stream_index = st->index;
     st->codec->codec_type = CODEC_TYPE_VIDEO;
     st->codec->codec_id = CODEC_ID_WS_VQA;
@@ -238,20 +242,27 @@ static int wsvqa_read_header(AVFormatContext *s,
         av_free(st->codec->extradata);
         return AVERROR_IO;
     }
-    st->codec->width = LE_16(&header[6]);
-    st->codec->height = LE_16(&header[8]);
+    st->codec->width = AV_RL16(&header[6]);
+    st->codec->height = AV_RL16(&header[8]);
 
-    /* initialize the audio decoder stream is sample rate is non-zero */
-    if (LE_16(&header[24])) {
+    /* initialize the audio decoder stream for VQA v1 or nonzero samplerate */
+    if (AV_RL16(&header[24]) || (AV_RL16(&header[0]) == 1 && AV_RL16(&header[2]) == 1)) {
         st = av_new_stream(s, 0);
         if (!st)
             return AVERROR_NOMEM;
-        av_set_pts_info(st, 33, 1, 90000);
+        av_set_pts_info(st, 33, 1, VQA_FRAMERATE);
         st->codec->codec_type = CODEC_TYPE_AUDIO;
-        st->codec->codec_id = CODEC_ID_ADPCM_IMA_WS;
+        if (AV_RL16(&header[0]) == 1)
+            st->codec->codec_id = CODEC_ID_WESTWOOD_SND1;
+        else
+            st->codec->codec_id = CODEC_ID_ADPCM_IMA_WS;
         st->codec->codec_tag = 0;  /* no tag */
-        st->codec->sample_rate = LE_16(&header[24]);
+        st->codec->sample_rate = AV_RL16(&header[24]);
+        if (!st->codec->sample_rate)
+            st->codec->sample_rate = 22050;
         st->codec->channels = header[26];
+        if (!st->codec->channels)
+            st->codec->channels = 1;
         st->codec->bits_per_sample = 16;
         st->codec->bit_rate = st->codec->channels * st->codec->sample_rate *
             st->codec->bits_per_sample / 4;
@@ -270,8 +281,8 @@ static int wsvqa_read_header(AVFormatContext *s,
             av_free(st->codec->extradata);
             return AVERROR_IO;
         }
-        chunk_tag = BE_32(&scratch[0]);
-        chunk_size = BE_32(&scratch[4]);
+        chunk_tag = AV_RB32(&scratch[0]);
+        chunk_size = AV_RB32(&scratch[4]);
 
         /* catch any unknown header tags, for curiousity */
         switch (chunk_tag) {
@@ -282,6 +293,7 @@ static int wsvqa_read_header(AVFormatContext *s,
         case PINH_TAG:
         case PIND_TAG:
         case FINF_TAG:
+        case CMDS_TAG:
             break;
 
         default:
@@ -304,48 +316,55 @@ static int wsvqa_read_packet(AVFormatContext *s,
 {
     WsVqaDemuxContext *wsvqa = (WsVqaDemuxContext *)s->priv_data;
     ByteIOContext *pb = &s->pb;
-    int ret = 0;
+    int ret = -1;
     unsigned char preamble[VQA_PREAMBLE_SIZE];
     unsigned int chunk_type;
     unsigned int chunk_size;
     int skip_byte;
 
-    if (get_buffer(pb, preamble, VQA_PREAMBLE_SIZE) != VQA_PREAMBLE_SIZE)
-        return AVERROR_IO;
+    while (get_buffer(pb, preamble, VQA_PREAMBLE_SIZE) == VQA_PREAMBLE_SIZE) {
+        chunk_type = AV_RB32(&preamble[0]);
+        chunk_size = AV_RB32(&preamble[4]);
+        skip_byte = chunk_size & 0x01;
 
-    chunk_type = BE_32(&preamble[0]);
-    chunk_size = BE_32(&preamble[4]);
-    skip_byte = chunk_size & 0x01;
+        if ((chunk_type == SND1_TAG) || (chunk_type == SND2_TAG) || (chunk_type == VQFR_TAG)) {
 
-    if ((chunk_type == SND2_TAG) || (chunk_type == VQFR_TAG)) {
+            if (av_new_packet(pkt, chunk_size))
+                return AVERROR_IO;
+            ret = get_buffer(pb, pkt->data, chunk_size);
+            if (ret != chunk_size) {
+                av_free_packet(pkt);
+                return AVERROR_IO;
+            }
 
-        av_get_packet(pb, pkt, chunk_size);
-        if (ret != chunk_size) {
-            ret = AVERROR_IO;
-        }
+            if (chunk_type == SND2_TAG) {
+                pkt->stream_index = wsvqa->audio_stream_index;
+                /* 2 samples/byte, 1 or 2 samples per frame depending on stereo */
+                wsvqa->audio_frame_counter += (chunk_size * 2) / wsvqa->audio_channels;
+            } else if(chunk_type == SND1_TAG) {
+                pkt->stream_index = wsvqa->audio_stream_index;
+                /* unpacked size is stored in header */
+                wsvqa->audio_frame_counter += AV_RL16(pkt->data) / wsvqa->audio_channels;
+            } else {
+                pkt->stream_index = wsvqa->video_stream_index;
+                wsvqa->video_pts += VQA_VIDEO_PTS_INC;
+            }
+            /* stay on 16-bit alignment */
+            if (skip_byte)
+                url_fseek(pb, 1, SEEK_CUR);
 
-        if (chunk_type == SND2_TAG) {
-            pkt->stream_index = wsvqa->audio_stream_index;
-
-            pkt->pts = 90000;
-            pkt->pts *= wsvqa->audio_frame_counter;
-            pkt->pts /= wsvqa->audio_samplerate;
-
-            /* 2 samples/byte, 1 or 2 samples per frame depending on stereo */
-            wsvqa->audio_frame_counter += (chunk_size * 2) /
-                wsvqa->audio_channels;
+            return ret;
         } else {
-            pkt->stream_index = wsvqa->video_stream_index;
-            pkt->pts = wsvqa->video_pts;
-            wsvqa->video_pts += VQA_VIDEO_PTS_INC;
+            switch(chunk_type){
+            case CMDS_TAG:
+            case SND0_TAG:
+                break;
+            default:
+                av_log(s, AV_LOG_INFO, "Skipping unknown chunk 0x%08X\n", chunk_type);
+            }
+            url_fseek(pb, chunk_size + skip_byte, SEEK_CUR);
         }
-
-    } else
-        return AVERROR_INVALIDDATA;
-
-    /* stay on 16-bit alignment */
-    if (skip_byte)
-        url_fseek(pb, 1, SEEK_CUR);
+    }
 
     return ret;
 }

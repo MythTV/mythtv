@@ -2,18 +2,20 @@
  * Assorted DPCM codecs
  * Copyright (c) 2003 The ffmpeg Project.
  *
- * This library is free software; you can redistribute it and/or
+ * This file is part of FFmpeg.
+ *
+ * FFmpeg is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
- * version 2 of the License, or (at your option) any later version.
+ * version 2.1 of the License, or (at your option) any later version.
  *
- * This library is distributed in the hope that it will be useful,
+ * FFmpeg is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
+ * License along with FFmpeg; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
@@ -177,7 +179,7 @@ static int dpcm_decode_frame(AVCodecContext *avctx,
 
     case CODEC_ID_ROQ_DPCM:
         if (s->channels == 1)
-            predictor[0] = LE_16(&buf[6]);
+            predictor[0] = AV_RL16(&buf[6]);
         else {
             predictor[0] = buf[7] << 8;
             predictor[1] = buf[6] << 8;
@@ -198,12 +200,12 @@ static int dpcm_decode_frame(AVCodecContext *avctx,
 
     case CODEC_ID_INTERPLAY_DPCM:
         in = 6;  /* skip over the stream mask and stream length */
-        predictor[0] = LE_16(&buf[in]);
+        predictor[0] = AV_RL16(&buf[in]);
         in += 2;
         SE_16BIT(predictor[0])
         output_samples[out++] = predictor[0];
         if (s->channels == 2) {
-            predictor[1] = LE_16(&buf[in]);
+            predictor[1] = AV_RL16(&buf[in]);
             in += 2;
             SE_16BIT(predictor[1])
             output_samples[out++] = predictor[1];
@@ -223,11 +225,11 @@ static int dpcm_decode_frame(AVCodecContext *avctx,
     case CODEC_ID_XAN_DPCM:
         in = 0;
         shift[0] = shift[1] = 4;
-        predictor[0] = LE_16(&buf[in]);
+        predictor[0] = AV_RL16(&buf[in]);
         in += 2;
         SE_16BIT(predictor[0]);
         if (s->channels == 2) {
-            predictor[1] = LE_16(&buf[in]);
+            predictor[1] = AV_RL16(&buf[in]);
             in += 2;
             SE_16BIT(predictor[1]);
         }

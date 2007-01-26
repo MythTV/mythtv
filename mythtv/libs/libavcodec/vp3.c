@@ -1,18 +1,20 @@
 /*
  * Copyright (C) 2003-2004 the ffmpeg project
  *
- * This library is free software; you can redistribute it and/or
+ * This file is part of FFmpeg.
+ *
+ * FFmpeg is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
- * version 2 of the License, or (at your option) any later version.
+ * version 2.1 of the License, or (at your option) any later version.
  *
- * This library is distributed in the hope that it will be useful,
+ * FFmpeg is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
+ * License along with FFmpeg; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  *
  */
@@ -315,7 +317,7 @@ typedef struct Vp3DecodeContext {
     int last_coded_c_fragment;
 
     uint8_t edge_emu_buffer[9*2048]; //FIXME dynamic alloc
-    uint8_t qscale_table[2048]; //FIXME dynamic alloc (width+15)/16
+    int8_t qscale_table[2048]; //FIXME dynamic alloc (width+15)/16
 
     /* Huffman decode */
     int hti;
@@ -607,7 +609,7 @@ static void init_dequantizer(Vp3DecodeContext *s)
 {
     int ac_scale_factor = s->coded_ac_scale_factor[s->quality_index];
     int dc_scale_factor = s->coded_dc_scale_factor[s->quality_index];
-    int i, j, plane, inter, qri, bmi, bmj, qistart;
+    int i, plane, inter, qri, bmi, bmj, qistart;
 
     debug_vp3("  vp3: initializing dequantization tables\n");
 
@@ -1327,7 +1329,7 @@ static void reverse_dc_prediction(Vp3DecodeContext *s,
     int x, y;
     int i = first_fragment;
 
-    short predicted_dc;
+    int predicted_dc;
 
     /* DC values for the left, up-left, up, and up-right fragments */
     int vl, vul, vu, vur;
@@ -1453,11 +1455,11 @@ static void reverse_dc_prediction(Vp3DecodeContext *s,
                     /* check for outranging on the [ul u l] and
                      * [ul u ur l] predictors */
                     if ((transform == 13) || (transform == 15)) {
-                        if (ABS(predicted_dc - vu) > 128)
+                        if (FFABS(predicted_dc - vu) > 128)
                             predicted_dc = vu;
-                        else if (ABS(predicted_dc - vl) > 128)
+                        else if (FFABS(predicted_dc - vl) > 128)
                             predicted_dc = vl;
-                        else if (ABS(predicted_dc - vul) > 128)
+                        else if (FFABS(predicted_dc - vul) > 128)
                             predicted_dc = vul;
                     }
 
@@ -1525,7 +1527,7 @@ static void render_slice(Vp3DecodeContext *s, int slice)
         if (!s->flipped_image) stride = -stride;
 
 
-        if(ABS(stride) > 2048)
+        if(FFABS(stride) > 2048)
             return; //various tables are fixed size
 
         /* for each fragment row in the slice (both of them)... */
@@ -2641,7 +2643,6 @@ AVCodec vp3_decoder = {
     NULL
 };
 
-#ifndef CONFIG_LIBTHEORA
 AVCodec theora_decoder = {
     "theora",
     CODEC_TYPE_VIDEO,
@@ -2654,4 +2655,3 @@ AVCodec theora_decoder = {
     0,
     NULL
 };
-#endif

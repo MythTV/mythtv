@@ -2,18 +2,20 @@
  * DVB subtitle decoding for ffmpeg
  * Copyright (c) 2005 Ian Caulfield.
  *
- * This library is free software; you can redistribute it and/or
+ * This file is part of FFmpeg.
+ *
+ * FFmpeg is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
- * version 2 of the License, or (at your option) any later version.
+ * version 2.1 of the License, or (at your option) any later version.
  *
- * This library is distributed in the hope that it will be useful,
+ * FFmpeg is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
+ * License along with FFmpeg; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 #include "avcodec.h"
@@ -342,7 +344,7 @@ static int dvbsub_init_decoder(AVCodecContext *avctx)
     int i, r, g, b, a = 0;
     DVBSubContext *ctx = (DVBSubContext*) avctx->priv_data;
 
-    cm = cropTbl + MAX_NEG_CROP;
+    cm = ff_cropTbl + MAX_NEG_CROP;
 
     memset(avctx->priv_data, 0, sizeof(DVBSubContext));
 
@@ -864,7 +866,7 @@ static void dvbsub_parse_object_segment(AVCodecContext *avctx,
 
     int coding_method, non_modifying_colour;
 
-    object_id = BE_16(buf);
+    object_id = AV_RB16(buf);
     buf += 2;
 
     object = get_object(ctx, object_id);
@@ -876,9 +878,9 @@ static void dvbsub_parse_object_segment(AVCodecContext *avctx,
     non_modifying_colour = ((*buf++) >> 1) & 1;
 
     if (coding_method == 0) {
-        top_field_len = BE_16(buf);
+        top_field_len = AV_RB16(buf);
         buf += 2;
-        bottom_field_len = BE_16(buf);
+        bottom_field_len = AV_RB16(buf);
         buf += 2;
 
         if (buf + top_field_len + bottom_field_len > buf_end) {
@@ -1060,9 +1062,9 @@ static void dvbsub_parse_region_segment(AVCodecContext *avctx,
 
     fill = ((*buf++) >> 3) & 1;
 
-    region->width = BE_16(buf);
+    region->width = AV_RB16(buf);
     buf += 2;
-    region->height = BE_16(buf);
+    region->height = AV_RB16(buf);
     buf += 2;
 
     if (region->width * region->height != region->buf_size) {
@@ -1104,7 +1106,7 @@ static void dvbsub_parse_region_segment(AVCodecContext *avctx,
     delete_region_display_list(ctx, region);
 
     while (buf + 5 < buf_end) {
-        object_id = BE_16(buf);
+        object_id = AV_RB16(buf);
         buf += 2;
 
         object = get_object(ctx, object_id);
@@ -1124,9 +1126,9 @@ static void dvbsub_parse_region_segment(AVCodecContext *avctx,
         display->object_id = object_id;
         display->region_id = region_id;
 
-        display->x_pos = BE_16(buf) & 0xfff;
+        display->x_pos = AV_RB16(buf) & 0xfff;
         buf += 2;
-        display->y_pos = BE_16(buf) & 0xfff;
+        display->y_pos = AV_RB16(buf) & 0xfff;
         buf += 2;
 
         if ((object->type == 1 || object->type == 2) && buf+1 < buf_end) {
@@ -1189,9 +1191,9 @@ static void dvbsub_parse_page_segment(AVCodecContext *avctx,
 
         display->region_id = region_id;
 
-        display->x_pos = BE_16(buf);
+        display->x_pos = AV_RB16(buf);
         buf += 2;
-        display->y_pos = BE_16(buf);
+        display->y_pos = AV_RB16(buf);
         buf += 2;
 
         *tmp_ptr = display->next;
@@ -1423,9 +1425,9 @@ static int dvbsub_decode(AVCodecContext *avctx,
     {
         p += 1;
         segment_type = *p++;
-        page_id = BE_16(p);
+        page_id = AV_RB16(p);
         p += 2;
-        segment_length = BE_16(p);
+        segment_length = AV_RB16(p);
         p += 2;
 
         if (page_id == ctx->composition_id || page_id == ctx->ancillary_id) {
@@ -1511,7 +1513,7 @@ static int dvbsub_parse(AVCodecParserContext *s,
     int len, buf_pos = 0;
 
 #ifdef DEBUG
-    av_log(avctx, AV_LOG_INFO, "DVB parse packet pts=%Lx, lpts=%Lx, cpts=%Lx:\n",
+    av_log(avctx, AV_LOG_INFO, "DVB parse packet pts=%"PRIx64", lpts=%"PRIx64", cpts=%"PRIx64":\n",
             s->pts, s->last_pts, s->cur_frame_pts[s->cur_frame_start_index]);
 #endif
 
@@ -1594,7 +1596,7 @@ static int dvbsub_parse(AVCodecParserContext *s,
         {
             if (p + 6 <= p_end)
             {
-                len = BE_16(p + 4);
+                len = AV_RB16(p + 4);
 
                 if (p + len + 6 <= p_end)
                 {

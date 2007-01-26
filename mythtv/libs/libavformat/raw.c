@@ -1,20 +1,22 @@
 /*
- * RAW encoder and decoder
+ * RAW muxer and demuxer
  * Copyright (c) 2001 Fabrice Bellard.
  * Copyright (c) 2005 Alex Beregszaszi
  *
- * This library is free software; you can redistribute it and/or
+ * This file is part of FFmpeg.
+ *
+ * FFmpeg is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
- * version 2 of the License, or (at your option) any later version.
+ * version 2.1 of the License, or (at your option) any later version.
  *
- * This library is distributed in the hope that it will be useful,
+ * FFmpeg is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
+ * License along with FFmpeg; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 #include "avformat.h"
@@ -181,26 +183,11 @@ int pcm_read_seek(AVFormatContext *s,
     int64_t pos;
 
     st = s->streams[0];
-    switch(st->codec->codec_id) {
-    case CODEC_ID_PCM_S16LE:
-    case CODEC_ID_PCM_S16BE:
-    case CODEC_ID_PCM_U16LE:
-    case CODEC_ID_PCM_U16BE:
-        block_align = 2 * st->codec->channels;
-        byte_rate = block_align * st->codec->sample_rate;
-        break;
-    case CODEC_ID_PCM_S8:
-    case CODEC_ID_PCM_U8:
-    case CODEC_ID_PCM_MULAW:
-    case CODEC_ID_PCM_ALAW:
-        block_align = st->codec->channels;
-        byte_rate = block_align * st->codec->sample_rate;
-        break;
-    default:
-        block_align = st->codec->block_align;
-        byte_rate = st->codec->bit_rate / 8;
-        break;
-    }
+
+    block_align = st->codec->block_align ? st->codec->block_align :
+        (av_get_bits_per_sample(st->codec->codec_id) * st->codec->channels) >> 3;
+    byte_rate = st->codec->bit_rate ? st->codec->bit_rate >> 3 :
+        block_align * st->codec->sample_rate;
 
     if (block_align <= 0 || byte_rate <= 0)
         return -1;
@@ -356,6 +343,36 @@ static int mpegvideo_probe(AVProbeData *p)
     }
     if(seq && seq*9<=pic*10 && pic*9<=slice*10 && !pspack && !pes)
         return AVPROBE_SCORE_MAX/2+1; // +1 for .mpg
+    return 0;
+}
+
+#define VIDEO_OBJECT_START_CODE        0x00000100
+#define VIDEO_OBJECT_LAYER_START_CODE  0x00000120
+#define VISUAL_OBJECT_START_CODE       0x000001b5
+#define VOP_START_CODE                 0x000001b6
+
+static int mpeg4video_probe(AVProbeData *probe_packet)
+{
+    uint32_t temp_buffer= -1;
+    int VO=0, VOL=0, VOP = 0, VISO = 0;
+    int i;
+
+    for(i=0; i<probe_packet->buf_size; i++){
+        temp_buffer = (temp_buffer<<8) + probe_packet->buf[i];
+        if ((temp_buffer & 0xffffff00) == 0x100) {
+            switch(temp_buffer){
+            case VOP_START_CODE:             VOP++; break;
+            case VISUAL_OBJECT_START_CODE:  VISO++; break;
+            }
+            switch(temp_buffer & 0xfffffff0){
+            case VIDEO_OBJECT_START_CODE:            VO++; break;
+            case VIDEO_OBJECT_LAYER_START_CODE:     VOL++; break;
+            }
+        }
+    }
+
+    if ( VOP >= VISO && VOP >= VOL && VO >= VOL && VOL > 0)
+        return AVPROBE_SCORE_MAX/2;
     return 0;
 }
 
@@ -536,7 +553,7 @@ AVInputFormat m4v_demuxer = {
     "m4v",
     "raw MPEG4 video format",
     0,
-    NULL /*mpegvideo_probe*/,
+    mpeg4video_probe, /** probing for mpeg4 data */
     video_read_header,
     raw_read_partial_packet,
     raw_read_close,

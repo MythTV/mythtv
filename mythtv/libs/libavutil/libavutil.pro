@@ -15,7 +15,9 @@ DEFINES += HAVE_AV_CONFIG_H _LARGEFILE_SOURCE
 # Debug mode on x86 must compile without -fPIC and with -O, 
 # otherwise gcc runs out of registers.
 debug:contains(TARGET_ARCH_X86, yes) {
-    QMAKE_CFLAGS_SHLIB = 
+    !contains(TARGET_ARCH_X86_64, yes) {
+        QMAKE_CFLAGS_SHLIB = 
+    }
 }
 
 QMAKE_CFLAGS_DEBUG += -O
@@ -25,6 +27,7 @@ QMAKE_CLEAN += $(TARGET) $(TARGETA) $(TARGETD) $(TARGET0) $(TARGET1) $(TARGET2)
 # Input
 SOURCES += adler32.c mathematics.c integer.c lls.c log.c mem.c 
 SOURCES += rational.c intfloat_readwrite.c crc.c md5.c fifo.c
+SOURCES += aes.c aes128.c tree.c
 
 inc.path = $${PREFIX}/include/mythtv/ffmpeg/
 inc.files  = adler32.h avutil.h common.h mathematics.h integer.h internal.h 

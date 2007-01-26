@@ -37,10 +37,6 @@ extern "C" {
 #define SWS_SPLINE   0x400
 
 #define SwsFilter void
-struct SwsContext {
-    struct ImgReSampleContext *resampling_ctx;
-    enum PixelFormat src_pix_fmt, dst_pix_fmt;
-};
 
 struct SwsContext *sws_getContext(int srcW, int srcH, int srcFormat,
                                   int dstW, int dstH, int dstFormat,

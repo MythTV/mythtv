@@ -3,18 +3,20 @@
  * Copyright (c) 2001 Fabrice Bellard.
  * Copyright (c) 2002-2004 Michael Niedermayer <michaelni@gmx.at>
  *
- * This library is free software; you can redistribute it and/or
+ * This file is part of FFmpeg.
+ *
+ * FFmpeg is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
- * version 2 of the License, or (at your option) any later version.
+ * version 2.1 of the License, or (at your option) any later version.
  *
- * This library is distributed in the hope that it will be useful,
+ * FFmpeg is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
+ * License along with FFmpeg; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
@@ -175,6 +177,8 @@ void avcodec_align_dimensions(AVCodecContext *s, int *width, int *height){
     case PIX_FMT_YUV422P:
     case PIX_FMT_YUV444P:
     case PIX_FMT_GRAY8:
+    case PIX_FMT_GRAY16BE:
+    case PIX_FMT_GRAY16LE:
     case PIX_FMT_YUVJ420P:
     case PIX_FMT_YUVJ422P:
     case PIX_FMT_YUVJ444P:
@@ -420,7 +424,7 @@ static const char* context_to_name(void* ptr) {
 
 static const AVOption options[]={
 {"b", "set video bitrate (in bits/s)", OFFSET(bit_rate), FF_OPT_TYPE_INT, AV_CODEC_DEFAULT_BITRATE, INT_MIN, INT_MAX, V|A|E},
-{"bt", "set video bitrate tolerance (in bits/s)", OFFSET(bit_rate_tolerance), FF_OPT_TYPE_INT, AV_CODEC_DEFAULT_BITRATE*20, INT_MIN, INT_MAX, V|E},
+{"bt", "set video bitrate tolerance (in bits/s)", OFFSET(bit_rate_tolerance), FF_OPT_TYPE_INT, AV_CODEC_DEFAULT_BITRATE*20, 1, INT_MAX, V|E},
 {"flags", NULL, OFFSET(flags), FF_OPT_TYPE_FLAGS, DEFAULT, INT_MIN, INT_MAX, V|A|E|D, "flags"},
 {"mv4", "use four motion vector by macroblock (mpeg4)", 0, FF_OPT_TYPE_CONST, CODEC_FLAG_4MV, INT_MIN, INT_MAX, V|E, "flags"},
 {"obmc", "use overlapped block motion compensation (h263+)", 0, FF_OPT_TYPE_CONST, CODEC_FLAG_OBMC, INT_MIN, INT_MAX, V|E, "flags"},
@@ -440,7 +444,7 @@ static const AVOption options[]={
 {"truncated", NULL, 0, FF_OPT_TYPE_CONST, CODEC_FLAG_TRUNCATED, INT_MIN, INT_MAX, 0, "flags"},
 {"naq", "normalize adaptive quantization", 0, FF_OPT_TYPE_CONST, CODEC_FLAG_NORMALIZE_AQP, INT_MIN, INT_MAX, V|E, "flags"},
 {"ildct", "use interlaced dct", 0, FF_OPT_TYPE_CONST, CODEC_FLAG_INTERLACED_DCT, INT_MIN, INT_MAX, V|E, "flags"},
-{"low_delay", "force low delay", 0, FF_OPT_TYPE_CONST, CODEC_FLAG_LOW_DELAY, INT_MIN, INT_MAX, V|D, "flags"},
+{"low_delay", "force low delay", 0, FF_OPT_TYPE_CONST, CODEC_FLAG_LOW_DELAY, INT_MIN, INT_MAX, V|D|E, "flags"},
 {"alt", "enable alternate scantable (mpeg2/mpeg4)", 0, FF_OPT_TYPE_CONST, CODEC_FLAG_ALT_SCAN, INT_MIN, INT_MAX, V|E, "flags"},
 {"trell", "use trellis quantization", 0, FF_OPT_TYPE_CONST, CODEC_FLAG_TRELLIS_QUANT, INT_MIN, INT_MAX, V|E, "flags"},
 {"global_header", "place global headers in extradata instead of every keyframe", 0, FF_OPT_TYPE_CONST, CODEC_FLAG_GLOBAL_HEADER, INT_MIN, INT_MAX, 0, "flags"},
@@ -463,7 +467,7 @@ static const AVOption options[]={
 {"extradata_size", NULL, OFFSET(extradata_size), FF_OPT_TYPE_INT, DEFAULT, INT_MIN, INT_MAX},
 {"time_base", NULL, OFFSET(time_base), FF_OPT_TYPE_RATIONAL, DEFAULT, INT_MIN, INT_MAX},
 {"g", "set the group of picture size", OFFSET(gop_size), FF_OPT_TYPE_INT, 12, INT_MIN, INT_MAX, V|E},
-{"rate_emu", NULL, OFFSET(rate_emu), FF_OPT_TYPE_INT, DEFAULT, INT_MIN, INT_MAX},
+{"rate_emu", "frame rate emulation", OFFSET(rate_emu), FF_OPT_TYPE_INT, DEFAULT, INT_MIN, INT_MAX},
 {"ar", "set audio sampling rate (in Hz)", OFFSET(sample_rate), FF_OPT_TYPE_INT, DEFAULT, INT_MIN, INT_MAX},
 {"ac", "set number of audio channels", OFFSET(channels), FF_OPT_TYPE_INT, 0, INT_MIN, INT_MAX},
 {"cutoff", "set cutoff bandwidth", OFFSET(cutoff), FF_OPT_TYPE_INT, DEFAULT, INT_MIN, INT_MAX, A|E},
@@ -471,15 +475,15 @@ static const AVOption options[]={
 {"frame_number", NULL, OFFSET(frame_number), FF_OPT_TYPE_INT, DEFAULT, INT_MIN, INT_MAX},
 {"real_pict_num", NULL, OFFSET(real_pict_num), FF_OPT_TYPE_INT, DEFAULT, INT_MIN, INT_MAX},
 {"delay", NULL, OFFSET(delay), FF_OPT_TYPE_INT, DEFAULT, INT_MIN, INT_MAX},
-{"qcomp", "video quantiser scale compression (VBR)", OFFSET(qcompress), FF_OPT_TYPE_FLOAT, 0.5, FLT_MIN, FLT_MAX, V|E},
-{"qblur", "video quantiser scale blur (VBR)", OFFSET(qblur), FF_OPT_TYPE_FLOAT, 0.5, FLT_MIN, FLT_MAX, V|E},
-{"qmin", "min video quantiser scale (VBR)", OFFSET(qmin), FF_OPT_TYPE_INT, 2, 1, 51, V|E},
-{"qmax", "max video quantiser scale (VBR)", OFFSET(qmax), FF_OPT_TYPE_INT, 31, 1, 51, V|E},
+{"qcomp", "video quantizer scale compression (VBR)", OFFSET(qcompress), FF_OPT_TYPE_FLOAT, 0.5, FLT_MIN, FLT_MAX, V|E},
+{"qblur", "video quantizer scale blur (VBR)", OFFSET(qblur), FF_OPT_TYPE_FLOAT, 0.5, FLT_MIN, FLT_MAX, V|E},
+{"qmin", "min video quantizer scale (VBR)", OFFSET(qmin), FF_OPT_TYPE_INT, 2, 1, 51, V|E},
+{"qmax", "max video quantizer scale (VBR)", OFFSET(qmax), FF_OPT_TYPE_INT, 31, 1, 51, V|E},
 {"qdiff", "max difference between the quantiser scale (VBR)", OFFSET(max_qdiff), FF_OPT_TYPE_INT, 3, INT_MIN, INT_MAX, V|E},
 {"bf", "use 'frames' B frames", OFFSET(max_b_frames), FF_OPT_TYPE_INT, DEFAULT, 0, FF_MAX_B_FRAMES, V|E},
 {"b_qfactor", "qp factor between p and b frames", OFFSET(b_quant_factor), FF_OPT_TYPE_FLOAT, 1.25, FLT_MIN, FLT_MAX, V|E},
-{"rc_strategy", NULL, OFFSET(rc_strategy), FF_OPT_TYPE_INT, DEFAULT, INT_MIN, INT_MAX, V|E},
-{"b_strategy", NULL, OFFSET(b_frame_strategy), FF_OPT_TYPE_INT, 0, INT_MIN, INT_MAX, V|E},
+{"rc_strategy", "ratecontrol method", OFFSET(rc_strategy), FF_OPT_TYPE_INT, DEFAULT, INT_MIN, INT_MAX, V|E},
+{"b_strategy", "strategy to choose between I/P/B-frames", OFFSET(b_frame_strategy), FF_OPT_TYPE_INT, 0, INT_MIN, INT_MAX, V|E},
 {"hurry_up", NULL, OFFSET(hurry_up), FF_OPT_TYPE_INT, DEFAULT, INT_MIN, INT_MAX, V|D},
 {"rtp_mode", NULL, OFFSET(rtp_mode), FF_OPT_TYPE_INT, DEFAULT, INT_MIN, INT_MAX},
 {"rtp_payload_size", NULL, OFFSET(rtp_payload_size), FF_OPT_TYPE_INT, DEFAULT, INT_MIN, INT_MAX},
@@ -495,30 +499,30 @@ static const AVOption options[]={
 {"codec_tag", NULL, OFFSET(codec_tag), FF_OPT_TYPE_INT, DEFAULT, INT_MIN, INT_MAX},
 {"bug", "workaround not auto detected encoder bugs", OFFSET(workaround_bugs), FF_OPT_TYPE_FLAGS, FF_BUG_AUTODETECT, INT_MIN, INT_MAX, V|D, "bug"},
 {"autodetect", NULL, 0, FF_OPT_TYPE_CONST, FF_BUG_AUTODETECT, INT_MIN, INT_MAX, V|D, "bug"},
-{"old_msmpeg4", NULL, 0, FF_OPT_TYPE_CONST, FF_BUG_OLD_MSMPEG4, INT_MIN, INT_MAX, V|D, "bug"},
-{"xvid_ilace", NULL, 0, FF_OPT_TYPE_CONST, FF_BUG_XVID_ILACE, INT_MIN, INT_MAX, V|D, "bug"},
-{"ump4", NULL, 0, FF_OPT_TYPE_CONST, FF_BUG_UMP4, INT_MIN, INT_MAX, V|D, "bug"},
-{"no_padding", NULL, 0, FF_OPT_TYPE_CONST, FF_BUG_NO_PADDING, INT_MIN, INT_MAX, V|D, "bug"},
+{"old_msmpeg4", "some old lavc generated msmpeg4v3 files (no autodetection)", 0, FF_OPT_TYPE_CONST, FF_BUG_OLD_MSMPEG4, INT_MIN, INT_MAX, V|D, "bug"},
+{"xvid_ilace", "Xvid interlacing bug (autodetected if fourcc==XVIX)", 0, FF_OPT_TYPE_CONST, FF_BUG_XVID_ILACE, INT_MIN, INT_MAX, V|D, "bug"},
+{"ump4", "(autodetected if fourcc==UMP4)", 0, FF_OPT_TYPE_CONST, FF_BUG_UMP4, INT_MIN, INT_MAX, V|D, "bug"},
+{"no_padding", "padding bug (autodetected)", 0, FF_OPT_TYPE_CONST, FF_BUG_NO_PADDING, INT_MIN, INT_MAX, V|D, "bug"},
 {"amv", NULL, 0, FF_OPT_TYPE_CONST, FF_BUG_AMV, INT_MIN, INT_MAX, V|D, "bug"},
-{"ac_vlc", NULL, 0, FF_OPT_TYPE_CONST, FF_BUG_AC_VLC, INT_MIN, INT_MAX, V|D, "bug"},
+{"ac_vlc", "illegal vlc bug (autodetected per fourcc)", 0, FF_OPT_TYPE_CONST, FF_BUG_AC_VLC, INT_MIN, INT_MAX, V|D, "bug"},
 {"qpel_chroma", NULL, 0, FF_OPT_TYPE_CONST, FF_BUG_QPEL_CHROMA, INT_MIN, INT_MAX, V|D, "bug"},
-{"std_qpel", NULL, 0, FF_OPT_TYPE_CONST, FF_BUG_STD_QPEL, INT_MIN, INT_MAX, V|D, "bug"},
+{"std_qpel", "old standard qpel (autodetected per fourcc/version)", 0, FF_OPT_TYPE_CONST, FF_BUG_STD_QPEL, INT_MIN, INT_MAX, V|D, "bug"},
 {"qpel_chroma2", NULL, 0, FF_OPT_TYPE_CONST, FF_BUG_QPEL_CHROMA2, INT_MIN, INT_MAX, V|D, "bug"},
-{"direct_blocksize", NULL, 0, FF_OPT_TYPE_CONST, FF_BUG_DIRECT_BLOCKSIZE, INT_MIN, INT_MAX, V|D, "bug"},
-{"edge", NULL, 0, FF_OPT_TYPE_CONST, FF_BUG_EDGE, INT_MIN, INT_MAX, V|D, "bug"},
+{"direct_blocksize", "direct-qpel-blocksize bug (autodetected per fourcc/version)", 0, FF_OPT_TYPE_CONST, FF_BUG_DIRECT_BLOCKSIZE, INT_MIN, INT_MAX, V|D, "bug"},
+{"edge", "edge padding bug (autodetected per fourcc/version)", 0, FF_OPT_TYPE_CONST, FF_BUG_EDGE, INT_MIN, INT_MAX, V|D, "bug"},
 {"hpel_chroma", NULL, 0, FF_OPT_TYPE_CONST, FF_BUG_HPEL_CHROMA, INT_MIN, INT_MAX, V|D, "bug"},
 {"dc_clip", NULL, 0, FF_OPT_TYPE_CONST, FF_BUG_DC_CLIP, INT_MIN, INT_MAX, V|D, "bug"},
-{"ms", NULL, 0, FF_OPT_TYPE_CONST, FF_BUG_MS, INT_MIN, INT_MAX, V|D, "bug"},
+{"ms", "workaround various bugs in microsofts broken decoders", 0, FF_OPT_TYPE_CONST, FF_BUG_MS, INT_MIN, INT_MAX, V|D, "bug"},
 {"lelim", "single coefficient elimination threshold for luminance (negative values also consider dc coefficient)", OFFSET(luma_elim_threshold), FF_OPT_TYPE_INT, DEFAULT, INT_MIN, INT_MAX, V|E},
 {"celim", "single coefficient elimination threshold for chrominance (negative values also consider dc coefficient)", OFFSET(chroma_elim_threshold), FF_OPT_TYPE_INT, DEFAULT, INT_MIN, INT_MAX, V|E},
-{"strict", "how strictly to follow the standards", OFFSET(strict_std_compliance), FF_OPT_TYPE_INT, DEFAULT, INT_MIN, INT_MAX, V|E, "strict"},
-{"very", NULL, 0, FF_OPT_TYPE_CONST, FF_COMPLIANCE_VERY_STRICT, INT_MIN, INT_MAX, V|E, "strict"},
-{"strict", NULL, 0, FF_OPT_TYPE_CONST, FF_COMPLIANCE_STRICT, INT_MIN, INT_MAX, V|E, "strict"},
+{"strict", "how strictly to follow the standards", OFFSET(strict_std_compliance), FF_OPT_TYPE_INT, DEFAULT, INT_MIN, INT_MAX, A|V|D, "strict"},
+{"very", "strictly conform to a older more strict version of the spec or reference software", 0, FF_OPT_TYPE_CONST, FF_COMPLIANCE_VERY_STRICT, INT_MIN, INT_MAX, V|E, "strict"},
+{"strict", "strictly conform to all the things in the spec no matter what consequences", 0, FF_OPT_TYPE_CONST, FF_COMPLIANCE_STRICT, INT_MIN, INT_MAX, V|E, "strict"},
 {"normal", NULL, 0, FF_OPT_TYPE_CONST, FF_COMPLIANCE_NORMAL, INT_MIN, INT_MAX, V|E, "strict"},
-{"inofficial", NULL, 0, FF_OPT_TYPE_CONST, FF_COMPLIANCE_INOFFICIAL, INT_MIN, INT_MAX, V|E, "strict"},
-{"experimental", NULL, 0, FF_OPT_TYPE_CONST, FF_COMPLIANCE_EXPERIMENTAL, INT_MIN, INT_MAX, V|E, "strict"},
+{"inofficial", "allow inofficial extensions", 0, FF_OPT_TYPE_CONST, FF_COMPLIANCE_INOFFICIAL, INT_MIN, INT_MAX, V|E, "strict"},
+{"experimental", "allow non standarized experimental things", 0, FF_OPT_TYPE_CONST, FF_COMPLIANCE_EXPERIMENTAL, INT_MIN, INT_MAX, V|E, "strict"},
 {"b_qoffset", "qp offset between p and b frames", OFFSET(b_quant_offset), FF_OPT_TYPE_FLOAT, 1.25, FLT_MIN, FLT_MAX, V|E},
-{"er", NULL, OFFSET(error_resilience), FF_OPT_TYPE_INT, FF_ER_CAREFUL, INT_MIN, INT_MAX, V|D, "er"},
+{"er", "set error resilience strategy", OFFSET(error_resilience), FF_OPT_TYPE_INT, FF_ER_CAREFUL, INT_MIN, INT_MAX, A|V|D, "er"},
 {"careful", NULL, 0, FF_OPT_TYPE_CONST, FF_ER_CAREFUL, INT_MIN, INT_MAX, V|D, "er"},
 {"compliant", NULL, 0, FF_OPT_TYPE_CONST, FF_ER_COMPLIANT, INT_MIN, INT_MAX, V|D, "er"},
 {"aggressive", NULL, 0, FF_OPT_TYPE_CONST, FF_ER_AGGRESSIVE, INT_MIN, INT_MAX, V|D, "er"},
@@ -526,36 +530,36 @@ static const AVOption options[]={
 {"has_b_frames", NULL, OFFSET(has_b_frames), FF_OPT_TYPE_INT, DEFAULT, INT_MIN, INT_MAX},
 {"block_align", NULL, OFFSET(block_align), FF_OPT_TYPE_INT, DEFAULT, INT_MIN, INT_MAX},
 {"parse_only", NULL, OFFSET(parse_only), FF_OPT_TYPE_INT, DEFAULT, INT_MIN, INT_MAX},
-{"mpeg_quant", NULL, OFFSET(mpeg_quant), FF_OPT_TYPE_INT, DEFAULT, INT_MIN, INT_MAX, V|E},
+{"mpeg_quant", "use MPEG quantizers instead of H.263", OFFSET(mpeg_quant), FF_OPT_TYPE_INT, DEFAULT, INT_MIN, INT_MAX, V|E},
 {"stats_out", NULL, OFFSET(stats_out), FF_OPT_TYPE_STRING, DEFAULT, CHAR_MIN, CHAR_MAX},
 {"stats_in", NULL, OFFSET(stats_in), FF_OPT_TYPE_STRING, DEFAULT, CHAR_MIN, CHAR_MAX},
-{"qsquish", "how to keep quantiser between qmin and qmax (0 = clip, 1 = use differentiable function)", OFFSET(rc_qsquish), FF_OPT_TYPE_FLOAT, DEFAULT, 0, 99, V|E},
-{"rc_qmod_amp", NULL, OFFSET(rc_qmod_amp), FF_OPT_TYPE_FLOAT, DEFAULT, -FLT_MAX, FLT_MAX, V|E},
-{"rc_qmod_freq", NULL, OFFSET(rc_qmod_freq), FF_OPT_TYPE_INT, DEFAULT, INT_MIN, INT_MAX, V|E},
+{"qsquish", "how to keep quantizer between qmin and qmax (0 = clip, 1 = use differentiable function)", OFFSET(rc_qsquish), FF_OPT_TYPE_FLOAT, DEFAULT, 0, 99, V|E},
+{"rc_qmod_amp", "experimental quantizer modulation", OFFSET(rc_qmod_amp), FF_OPT_TYPE_FLOAT, DEFAULT, -FLT_MAX, FLT_MAX, V|E},
+{"rc_qmod_freq", "experimental quantizer modulation", OFFSET(rc_qmod_freq), FF_OPT_TYPE_INT, DEFAULT, INT_MIN, INT_MAX, V|E},
 {"rc_override_count", NULL, OFFSET(rc_override_count), FF_OPT_TYPE_INT, DEFAULT, INT_MIN, INT_MAX},
 {"rc_eq", "set rate control equation", OFFSET(rc_eq), FF_OPT_TYPE_STRING, DEFAULT, CHAR_MIN, CHAR_MAX, V|E},
 {"maxrate", "set max video bitrate tolerance (in bits/s)", OFFSET(rc_max_rate), FF_OPT_TYPE_INT, DEFAULT, INT_MIN, INT_MAX, V|E},
 {"minrate", "set min video bitrate tolerance (in bits/s)", OFFSET(rc_min_rate), FF_OPT_TYPE_INT, DEFAULT, INT_MIN, INT_MAX, V|E},
 {"bufsize", "set ratecontrol buffer size (in bits)", OFFSET(rc_buffer_size), FF_OPT_TYPE_INT, DEFAULT, INT_MIN, INT_MAX, V|E},
-{"rc_buf_aggressivity", NULL, OFFSET(rc_buffer_aggressivity), FF_OPT_TYPE_FLOAT, 1.0, FLT_MIN, FLT_MAX, V|E},
+{"rc_buf_aggressivity", "currently useless", OFFSET(rc_buffer_aggressivity), FF_OPT_TYPE_FLOAT, 1.0, FLT_MIN, FLT_MAX, V|E},
 {"i_qfactor", "qp factor between p and i frames", OFFSET(i_quant_factor), FF_OPT_TYPE_FLOAT, -0.8, -FLT_MAX, FLT_MAX, V|E},
 {"i_qoffset", "qp offset between p and i frames", OFFSET(i_quant_offset), FF_OPT_TYPE_FLOAT, 0.0, -FLT_MAX, FLT_MAX, V|E},
 {"rc_init_cplx", "initial complexity for 1-pass encoding", OFFSET(rc_initial_cplx), FF_OPT_TYPE_FLOAT, DEFAULT, -FLT_MAX, FLT_MAX, V|E},
-{"dct", NULL, OFFSET(dct_algo), FF_OPT_TYPE_INT, DEFAULT, 0, INT_MAX, V|E, "dct"},
-{"auto", NULL, 0, FF_OPT_TYPE_CONST, FF_DCT_AUTO, INT_MIN, INT_MAX, V|E, "dct"},
-{"fastint", NULL, 0, FF_OPT_TYPE_CONST, FF_DCT_FASTINT, INT_MIN, INT_MAX, V|E, "dct"},
-{"int", NULL, 0, FF_OPT_TYPE_CONST, FF_DCT_INT, INT_MIN, INT_MAX, V|E, "dct"},
+{"dct", "DCT algorithm", OFFSET(dct_algo), FF_OPT_TYPE_INT, DEFAULT, 0, INT_MAX, V|E, "dct"},
+{"auto", "autoselect a good one (default)", 0, FF_OPT_TYPE_CONST, FF_DCT_AUTO, INT_MIN, INT_MAX, V|E, "dct"},
+{"fastint", "fast integer", 0, FF_OPT_TYPE_CONST, FF_DCT_FASTINT, INT_MIN, INT_MAX, V|E, "dct"},
+{"int", "accurate integer", 0, FF_OPT_TYPE_CONST, FF_DCT_INT, INT_MIN, INT_MAX, V|E, "dct"},
 {"mmx", NULL, 0, FF_OPT_TYPE_CONST, FF_DCT_MMX, INT_MIN, INT_MAX, V|E, "dct"},
 {"mlib", NULL, 0, FF_OPT_TYPE_CONST, FF_DCT_MLIB, INT_MIN, INT_MAX, V|E, "dct"},
 {"altivec", NULL, 0, FF_OPT_TYPE_CONST, FF_DCT_ALTIVEC, INT_MIN, INT_MAX, V|E, "dct"},
-{"faan", NULL, 0, FF_OPT_TYPE_CONST, FF_DCT_FAAN, INT_MIN, INT_MAX, V|E, "dct"},
-{"lumi_mask", "lumimasking", OFFSET(lumi_masking), FF_OPT_TYPE_FLOAT, 0, -FLT_MAX, FLT_MAX, V|E},
+{"faan", "floating point AAN DCT", 0, FF_OPT_TYPE_CONST, FF_DCT_FAAN, INT_MIN, INT_MAX, V|E, "dct"},
+{"lumi_mask", "compresses bright areas stronger than medium ones", OFFSET(lumi_masking), FF_OPT_TYPE_FLOAT, 0, -FLT_MAX, FLT_MAX, V|E},
 {"tcplx_mask", "temporal complexity masking", OFFSET(temporal_cplx_masking), FF_OPT_TYPE_FLOAT, 0, -FLT_MAX, FLT_MAX, V|E},
 {"scplx_mask", "spatial complexity masking", OFFSET(spatial_cplx_masking), FF_OPT_TYPE_FLOAT, 0, -FLT_MAX, FLT_MAX, V|E},
 {"p_mask", "inter masking", OFFSET(p_masking), FF_OPT_TYPE_FLOAT, 0, -FLT_MAX, FLT_MAX, V|E},
-{"dark_mask", "darkness masking", OFFSET(dark_masking), FF_OPT_TYPE_FLOAT, 0, -FLT_MAX, FLT_MAX, V|E},
+{"dark_mask", "compresses dark areas stronger than medium ones", OFFSET(dark_masking), FF_OPT_TYPE_FLOAT, 0, -FLT_MAX, FLT_MAX, V|E},
 {"unused", NULL, OFFSET(unused), FF_OPT_TYPE_INT, DEFAULT, INT_MIN, INT_MAX},
-{"idct", NULL, OFFSET(idct_algo), FF_OPT_TYPE_INT, DEFAULT, 0, INT_MAX, V|E|D, "idct"},
+{"idct", "select IDCT implementation", OFFSET(idct_algo), FF_OPT_TYPE_INT, DEFAULT, 0, INT_MAX, V|E|D, "idct"},
 {"auto", NULL, 0, FF_OPT_TYPE_CONST, FF_IDCT_AUTO, INT_MIN, INT_MAX, V|E|D, "idct"},
 {"int", NULL, 0, FF_OPT_TYPE_CONST, FF_IDCT_INT, INT_MIN, INT_MAX, V|E|D, "idct"},
 {"simple", NULL, 0, FF_OPT_TYPE_CONST, FF_IDCT_SIMPLE, INT_MIN, INT_MAX, V|E|D, "idct"},
@@ -573,63 +577,63 @@ static const AVOption options[]={
 {"ipp", NULL, 0, FF_OPT_TYPE_CONST, FF_IDCT_IPP, INT_MIN, INT_MAX, V|E|D, "idct"},
 {"xvidmmx", NULL, 0, FF_OPT_TYPE_CONST, FF_IDCT_XVIDMMX, INT_MIN, INT_MAX, V|E|D, "idct"},
 {"slice_count", NULL, OFFSET(slice_count), FF_OPT_TYPE_INT, DEFAULT, INT_MIN, INT_MAX},
-{"ec", NULL, OFFSET(error_concealment), FF_OPT_TYPE_FLAGS, 3, INT_MIN, INT_MAX, V|D, "ec"},
-{"guess_mvs", NULL, 0, FF_OPT_TYPE_CONST, FF_EC_GUESS_MVS, INT_MIN, INT_MAX, V|D, "ec"},
-{"deblock", NULL, 0, FF_OPT_TYPE_CONST, FF_EC_DEBLOCK, INT_MIN, INT_MAX, V|D, "ec"},
+{"ec", "set error concealment strategy", OFFSET(error_concealment), FF_OPT_TYPE_FLAGS, 3, INT_MIN, INT_MAX, V|D, "ec"},
+{"guess_mvs", "iterative motion vector (MV) search (slow)", 0, FF_OPT_TYPE_CONST, FF_EC_GUESS_MVS, INT_MIN, INT_MAX, V|D, "ec"},
+{"deblock", "use strong deblock filter for damaged MBs", 0, FF_OPT_TYPE_CONST, FF_EC_DEBLOCK, INT_MIN, INT_MAX, V|D, "ec"},
 {"bits_per_sample", NULL, OFFSET(bits_per_sample), FF_OPT_TYPE_INT, DEFAULT, INT_MIN, INT_MAX},
 {"pred", "prediction method", OFFSET(prediction_method), FF_OPT_TYPE_INT, DEFAULT, INT_MIN, INT_MAX, V|E, "pred"},
 {"left", NULL, 0, FF_OPT_TYPE_CONST, FF_PRED_LEFT, INT_MIN, INT_MAX, V|E, "pred"},
 {"plane", NULL, 0, FF_OPT_TYPE_CONST, FF_PRED_PLANE, INT_MIN, INT_MAX, V|E, "pred"},
 {"median", NULL, 0, FF_OPT_TYPE_CONST, FF_PRED_MEDIAN, INT_MIN, INT_MAX, V|E, "pred"},
-{"aspect", NULL, OFFSET(sample_aspect_ratio), FF_OPT_TYPE_RATIONAL, DEFAULT, 0, 10, V|E},
+{"aspect", "sample aspect ratio", OFFSET(sample_aspect_ratio), FF_OPT_TYPE_RATIONAL, DEFAULT, 0, 10, V|E},
 {"debug", "print specific debug info", OFFSET(debug), FF_OPT_TYPE_FLAGS, DEFAULT, 0, INT_MAX, V|A|S|E|D, "debug"},
-{"pict", NULL, 0, FF_OPT_TYPE_CONST, FF_DEBUG_PICT_INFO, INT_MIN, INT_MAX, V|D, "debug"},
-{"rc", NULL, 0, FF_OPT_TYPE_CONST, FF_DEBUG_RC, INT_MIN, INT_MAX, V|E, "debug"},
+{"pict", "picture info", 0, FF_OPT_TYPE_CONST, FF_DEBUG_PICT_INFO, INT_MIN, INT_MAX, V|D, "debug"},
+{"rc", "rate control", 0, FF_OPT_TYPE_CONST, FF_DEBUG_RC, INT_MIN, INT_MAX, V|E, "debug"},
 {"bitstream", NULL, 0, FF_OPT_TYPE_CONST, FF_DEBUG_BITSTREAM, INT_MIN, INT_MAX, V|D, "debug"},
-{"mb_type", NULL, 0, FF_OPT_TYPE_CONST, FF_DEBUG_MB_TYPE, INT_MIN, INT_MAX, V|D, "debug"},
-{"qp", NULL, 0, FF_OPT_TYPE_CONST, FF_DEBUG_QP, INT_MIN, INT_MAX, V|D, "debug"},
-{"mv", NULL, 0, FF_OPT_TYPE_CONST, FF_DEBUG_MV, INT_MIN, INT_MAX, V|D, "debug"},
+{"mb_type", "macroblock (MB) type", 0, FF_OPT_TYPE_CONST, FF_DEBUG_MB_TYPE, INT_MIN, INT_MAX, V|D, "debug"},
+{"qp", "per-block quantization parameter (QP)", 0, FF_OPT_TYPE_CONST, FF_DEBUG_QP, INT_MIN, INT_MAX, V|D, "debug"},
+{"mv", "motion vector", 0, FF_OPT_TYPE_CONST, FF_DEBUG_MV, INT_MIN, INT_MAX, V|D, "debug"},
 {"dct_coeff", NULL, 0, FF_OPT_TYPE_CONST, FF_DEBUG_DCT_COEFF, INT_MIN, INT_MAX, V|D, "debug"},
 {"skip", NULL, 0, FF_OPT_TYPE_CONST, FF_DEBUG_SKIP, INT_MIN, INT_MAX, V|D, "debug"},
 {"startcode", NULL, 0, FF_OPT_TYPE_CONST, FF_DEBUG_STARTCODE, INT_MIN, INT_MAX, V|D, "debug"},
 {"pts", NULL, 0, FF_OPT_TYPE_CONST, FF_DEBUG_PTS, INT_MIN, INT_MAX, V|D, "debug"},
-{"er", NULL, 0, FF_OPT_TYPE_CONST, FF_DEBUG_ER, INT_MIN, INT_MAX, V|D, "debug"},
-{"mmco", NULL, 0, FF_OPT_TYPE_CONST, FF_DEBUG_MMCO, INT_MIN, INT_MAX, V|D, "debug"},
+{"er", "error resilience", 0, FF_OPT_TYPE_CONST, FF_DEBUG_ER, INT_MIN, INT_MAX, V|D, "debug"},
+{"mmco", "memory management control operations (H.264)", 0, FF_OPT_TYPE_CONST, FF_DEBUG_MMCO, INT_MIN, INT_MAX, V|D, "debug"},
 {"bugs", NULL, 0, FF_OPT_TYPE_CONST, FF_DEBUG_BUGS, INT_MIN, INT_MAX, V|D, "debug"},
-{"vis_qp", NULL, 0, FF_OPT_TYPE_CONST, FF_DEBUG_VIS_QP, INT_MIN, INT_MAX, V|D, "debug"},
-{"vis_mb_type", NULL, 0, FF_OPT_TYPE_CONST, FF_DEBUG_VIS_MB_TYPE, INT_MIN, INT_MAX, V|D, "debug"},
-{"vismv", "visualize motion vectors", OFFSET(debug_mv), FF_OPT_TYPE_INT, DEFAULT, 0, INT_MAX, V|D, "debug_mv"},
-{"pf", NULL, 0, FF_OPT_TYPE_CONST, FF_DEBUG_VIS_MV_P_FOR, INT_MIN, INT_MAX, V|D, "debug_mv"},
-{"bf", NULL, 0, FF_OPT_TYPE_CONST, FF_DEBUG_VIS_MV_B_FOR, INT_MIN, INT_MAX, V|D, "debug_mv"},
-{"bb", NULL, 0, FF_OPT_TYPE_CONST, FF_DEBUG_VIS_MV_B_BACK, INT_MIN, INT_MAX, V|D, "debug_mv"},
-{"mb_qmin", NULL, OFFSET(mb_qmin), FF_OPT_TYPE_INT, DEFAULT, INT_MIN, INT_MAX, V|E},
-{"mb_qmax", NULL, OFFSET(mb_qmax), FF_OPT_TYPE_INT, DEFAULT, INT_MIN, INT_MAX, V|E},
+{"vis_qp", "visualize quantization parameter (QP), lower QP are tinted greener", 0, FF_OPT_TYPE_CONST, FF_DEBUG_VIS_QP, INT_MIN, INT_MAX, V|D, "debug"},
+{"vis_mb_type", "visualize block types", 0, FF_OPT_TYPE_CONST, FF_DEBUG_VIS_MB_TYPE, INT_MIN, INT_MAX, V|D, "debug"},
+{"vismv", "visualize motion vectors (MVs)", OFFSET(debug_mv), FF_OPT_TYPE_INT, DEFAULT, 0, INT_MAX, V|D, "debug_mv"},
+{"pf", "forward predicted MVs of P-frames", 0, FF_OPT_TYPE_CONST, FF_DEBUG_VIS_MV_P_FOR, INT_MIN, INT_MAX, V|D, "debug_mv"},
+{"bf", "forward predicted MVs of B-frames", 0, FF_OPT_TYPE_CONST, FF_DEBUG_VIS_MV_B_FOR, INT_MIN, INT_MAX, V|D, "debug_mv"},
+{"bb", "backward predicted MVs of B-frames", 0, FF_OPT_TYPE_CONST, FF_DEBUG_VIS_MV_B_BACK, INT_MIN, INT_MAX, V|D, "debug_mv"},
+{"mb_qmin", "obsolete, use qmin", OFFSET(mb_qmin), FF_OPT_TYPE_INT, DEFAULT, INT_MIN, INT_MAX, V|E},
+{"mb_qmax", "obsolete, use qmax", OFFSET(mb_qmax), FF_OPT_TYPE_INT, DEFAULT, INT_MIN, INT_MAX, V|E},
 {"cmp", "full pel me compare function", OFFSET(me_cmp), FF_OPT_TYPE_INT, DEFAULT, INT_MIN, INT_MAX, V|E, "cmp_func"},
 {"subcmp", "sub pel me compare function", OFFSET(me_sub_cmp), FF_OPT_TYPE_INT, DEFAULT, INT_MIN, INT_MAX, V|E, "cmp_func"},
 {"mbcmp", "macroblock compare function", OFFSET(mb_cmp), FF_OPT_TYPE_INT, DEFAULT, INT_MIN, INT_MAX, V|E, "cmp_func"},
 {"ildctcmp", "interlaced dct compare function", OFFSET(ildct_cmp), FF_OPT_TYPE_INT, FF_CMP_VSAD, INT_MIN, INT_MAX, V|E, "cmp_func"},
-{"dia_size", NULL, OFFSET(dia_size), FF_OPT_TYPE_INT, DEFAULT, INT_MIN, INT_MAX, V|E},
-{"last_pred", NULL, OFFSET(last_predictor_count), FF_OPT_TYPE_INT, DEFAULT, INT_MIN, INT_MAX, V|E},
+{"dia_size", "diamond type & size for motion estimation", OFFSET(dia_size), FF_OPT_TYPE_INT, DEFAULT, INT_MIN, INT_MAX, V|E},
+{"last_pred", "amount of motion predictors from the previous frame", OFFSET(last_predictor_count), FF_OPT_TYPE_INT, DEFAULT, INT_MIN, INT_MAX, V|E},
 {"preme", "pre motion estimation", OFFSET(pre_me), FF_OPT_TYPE_INT, DEFAULT, INT_MIN, INT_MAX, V|E},
 {"precmp", "pre motion estimation compare function", OFFSET(me_pre_cmp), FF_OPT_TYPE_INT, DEFAULT, INT_MIN, INT_MAX, V|E, "cmp_func"},
-{"sad", NULL, 0, FF_OPT_TYPE_CONST, FF_CMP_SAD, INT_MIN, INT_MAX, V|E, "cmp_func"},
-{"sse", NULL, 0, FF_OPT_TYPE_CONST, FF_CMP_SSE, INT_MIN, INT_MAX, V|E, "cmp_func"},
-{"satd", NULL, 0, FF_OPT_TYPE_CONST, FF_CMP_SATD, INT_MIN, INT_MAX, V|E, "cmp_func"},
-{"dct", NULL, 0, FF_OPT_TYPE_CONST, FF_CMP_DCT, INT_MIN, INT_MAX, V|E, "cmp_func"},
-{"psnr", NULL, 0, FF_OPT_TYPE_CONST, FF_CMP_PSNR, INT_MIN, INT_MAX, V|E, "cmp_func"},
-{"bit", NULL, 0, FF_OPT_TYPE_CONST, FF_CMP_BIT, INT_MIN, INT_MAX, V|E, "cmp_func"},
-{"rd", NULL, 0, FF_OPT_TYPE_CONST, FF_CMP_RD, INT_MIN, INT_MAX, V|E, "cmp_func"},
-{"zero", NULL, 0, FF_OPT_TYPE_CONST, FF_CMP_ZERO, INT_MIN, INT_MAX, V|E, "cmp_func"},
-{"vsad", NULL, 0, FF_OPT_TYPE_CONST, FF_CMP_VSAD, INT_MIN, INT_MAX, V|E, "cmp_func"},
-{"vsse", NULL, 0, FF_OPT_TYPE_CONST, FF_CMP_VSSE, INT_MIN, INT_MAX, V|E, "cmp_func"},
-{"nsse", NULL, 0, FF_OPT_TYPE_CONST, FF_CMP_NSSE, INT_MIN, INT_MAX, V|E, "cmp_func"},
+{"sad", "sum of absolute differences, fast (default)", 0, FF_OPT_TYPE_CONST, FF_CMP_SAD, INT_MIN, INT_MAX, V|E, "cmp_func"},
+{"sse", "sum of squared errors", 0, FF_OPT_TYPE_CONST, FF_CMP_SSE, INT_MIN, INT_MAX, V|E, "cmp_func"},
+{"satd", "sum of absolute Hadamard transformed differences", 0, FF_OPT_TYPE_CONST, FF_CMP_SATD, INT_MIN, INT_MAX, V|E, "cmp_func"},
+{"dct", "sum of absolute DCT transformed differences", 0, FF_OPT_TYPE_CONST, FF_CMP_DCT, INT_MIN, INT_MAX, V|E, "cmp_func"},
+{"psnr", "sum of squared quantization errors (avoid, low quality)", 0, FF_OPT_TYPE_CONST, FF_CMP_PSNR, INT_MIN, INT_MAX, V|E, "cmp_func"},
+{"bit", "number of bits needed for the block", 0, FF_OPT_TYPE_CONST, FF_CMP_BIT, INT_MIN, INT_MAX, V|E, "cmp_func"},
+{"rd", "rate distortion optimal, slow", 0, FF_OPT_TYPE_CONST, FF_CMP_RD, INT_MIN, INT_MAX, V|E, "cmp_func"},
+{"zero", "0", 0, FF_OPT_TYPE_CONST, FF_CMP_ZERO, INT_MIN, INT_MAX, V|E, "cmp_func"},
+{"vsad", "sum of absolute vertical differences", 0, FF_OPT_TYPE_CONST, FF_CMP_VSAD, INT_MIN, INT_MAX, V|E, "cmp_func"},
+{"vsse","sum of squared vertical differences", 0, FF_OPT_TYPE_CONST, FF_CMP_VSSE, INT_MIN, INT_MAX, V|E, "cmp_func"},
+{"nsse", "noise preserving sum of squared differences", 0, FF_OPT_TYPE_CONST, FF_CMP_NSSE, INT_MIN, INT_MAX, V|E, "cmp_func"},
 #ifdef CONFIG_SNOW_ENCODER
-{"w53", NULL, 0, FF_OPT_TYPE_CONST, FF_CMP_W53, INT_MIN, INT_MAX, V|E, "cmp_func"},
-{"w97", NULL, 0, FF_OPT_TYPE_CONST, FF_CMP_W97, INT_MIN, INT_MAX, V|E, "cmp_func"},
+{"w53", "5/3 wavelet, only used in snow", 0, FF_OPT_TYPE_CONST, FF_CMP_W53, INT_MIN, INT_MAX, V|E, "cmp_func"},
+{"w97", "9/7 wavelet, only used in snow", 0, FF_OPT_TYPE_CONST, FF_CMP_W97, INT_MIN, INT_MAX, V|E, "cmp_func"},
 #endif
 {"dctmax", NULL, 0, FF_OPT_TYPE_CONST, FF_CMP_DCTMAX, INT_MIN, INT_MAX, V|E, "cmp_func"},
 {"chroma", NULL, 0, FF_OPT_TYPE_CONST, FF_CMP_CHROMA, INT_MIN, INT_MAX, V|E, "cmp_func"},
-{"pre_dia_size", NULL, OFFSET(pre_dia_size), FF_OPT_TYPE_INT, DEFAULT, INT_MIN, INT_MAX, V|E},
+{"pre_dia_size", "diamond type & size for motion estimation pre-pass", OFFSET(pre_dia_size), FF_OPT_TYPE_INT, DEFAULT, INT_MIN, INT_MAX, V|E},
 {"subq", "sub pel motion estimation quality", OFFSET(me_subpel_quality), FF_OPT_TYPE_INT, 8, INT_MIN, INT_MAX, V|E},
 {"dtg_active_format", NULL, OFFSET(dtg_active_format), FF_OPT_TYPE_INT, DEFAULT, INT_MIN, INT_MAX},
 {"me_range", "limit motion vectors range (1023 for DivX player)", OFFSET(me_range), FF_OPT_TYPE_INT, DEFAULT, INT_MIN, INT_MAX, V|E},
@@ -644,20 +648,20 @@ static const AVOption options[]={
 {"context", "context model", OFFSET(context_model), FF_OPT_TYPE_INT, DEFAULT, INT_MIN, INT_MAX, V|E},
 {"slice_flags", NULL, OFFSET(slice_flags), FF_OPT_TYPE_INT, DEFAULT, INT_MIN, INT_MAX},
 {"xvmc_acceleration", NULL, OFFSET(xvmc_acceleration), FF_OPT_TYPE_INT, DEFAULT, INT_MIN, INT_MAX},
-{"mbd", NULL, OFFSET(mb_decision), FF_OPT_TYPE_INT, DEFAULT, INT_MIN, INT_MAX, V|E, "mbd"},
-{"simple", NULL, 0, FF_OPT_TYPE_CONST, FF_MB_DECISION_SIMPLE, INT_MIN, INT_MAX, V|E, "mbd"},
-{"bits", NULL, 0, FF_OPT_TYPE_CONST, FF_MB_DECISION_BITS, INT_MIN, INT_MAX, V|E, "mbd"},
-{"rd", NULL, 0, FF_OPT_TYPE_CONST, FF_MB_DECISION_RD, INT_MIN, INT_MAX, V|E, "mbd"},
+{"mbd", "macroblock decision algorithm (high quality mode)", OFFSET(mb_decision), FF_OPT_TYPE_INT, DEFAULT, INT_MIN, INT_MAX, V|E, "mbd"},
+{"simple", "use mbcmp (default)", 0, FF_OPT_TYPE_CONST, FF_MB_DECISION_SIMPLE, INT_MIN, INT_MAX, V|E, "mbd"},
+{"bits", "use fewest bits", 0, FF_OPT_TYPE_CONST, FF_MB_DECISION_BITS, INT_MIN, INT_MAX, V|E, "mbd"},
+{"rd", "use best rate distortion", 0, FF_OPT_TYPE_CONST, FF_MB_DECISION_RD, INT_MIN, INT_MAX, V|E, "mbd"},
 {"stream_codec_tag", NULL, OFFSET(stream_codec_tag), FF_OPT_TYPE_INT, DEFAULT, INT_MIN, INT_MAX},
 {"sc_threshold", "scene change threshold", OFFSET(scenechange_threshold), FF_OPT_TYPE_INT, DEFAULT, INT_MIN, INT_MAX, V|E},
 {"lmin", "min lagrange factor (VBR)", OFFSET(lmin), FF_OPT_TYPE_INT,  2*FF_QP2LAMBDA, 0, INT_MAX, V|E},
 {"lmax", "max lagrange factor (VBR)", OFFSET(lmax), FF_OPT_TYPE_INT, 31*FF_QP2LAMBDA, 0, INT_MAX, V|E},
 {"nr", "noise reduction", OFFSET(noise_reduction), FF_OPT_TYPE_INT, DEFAULT, INT_MIN, INT_MAX, V|E},
-{"rc_init_occupancy", NULL, OFFSET(rc_initial_buffer_occupancy), FF_OPT_TYPE_INT, DEFAULT, INT_MIN, INT_MAX, V|E},
+{"rc_init_occupancy", "number of bits which should be loaded into the rc buffer before decoding starts", OFFSET(rc_initial_buffer_occupancy), FF_OPT_TYPE_INT, DEFAULT, INT_MIN, INT_MAX, V|E},
 {"inter_threshold", NULL, OFFSET(inter_threshold), FF_OPT_TYPE_INT, DEFAULT, INT_MIN, INT_MAX, V|E},
 {"flags2", NULL, OFFSET(flags2), FF_OPT_TYPE_FLAGS, CODEC_FLAG2_FASTPSKIP, INT_MIN, INT_MAX, V|A|E|D, "flags2"},
 {"error", NULL, OFFSET(error_rate), FF_OPT_TYPE_INT, DEFAULT, INT_MIN, INT_MAX, V|E},
-{"antialias", NULL, OFFSET(antialias_algo), FF_OPT_TYPE_INT, DEFAULT, INT_MIN, INT_MAX, V|D, "aa"},
+{"antialias", "MP3 antialias algorithm", OFFSET(antialias_algo), FF_OPT_TYPE_INT, DEFAULT, INT_MIN, INT_MAX, V|D, "aa"},
 {"auto", NULL, 0, FF_OPT_TYPE_CONST, FF_AA_AUTO, INT_MIN, INT_MAX, V|D, "aa"},
 {"fastint", NULL, 0, FF_OPT_TYPE_CONST, FF_AA_FASTINT, INT_MIN, INT_MAX, V|D, "aa"},
 {"int", NULL, 0, FF_OPT_TYPE_CONST, FF_AA_INT, INT_MIN, INT_MAX, V|D, "aa"},
@@ -668,59 +672,62 @@ static const AVOption options[]={
 {"mb_threshold", "macroblock threshold", OFFSET(mb_threshold), FF_OPT_TYPE_INT, DEFAULT, INT_MIN, INT_MAX, V|E},
 {"dc", "intra_dc_precision", OFFSET(intra_dc_precision), FF_OPT_TYPE_INT, 0, INT_MIN, INT_MAX, V|E},
 {"nssew", "nsse weight", OFFSET(nsse_weight), FF_OPT_TYPE_INT, 8, INT_MIN, INT_MAX, V|E},
-{"skip_top", NULL, OFFSET(skip_top), FF_OPT_TYPE_INT, DEFAULT, INT_MIN, INT_MAX, V|D},
-{"skip_bottom", NULL, OFFSET(skip_bottom), FF_OPT_TYPE_INT, DEFAULT, INT_MIN, INT_MAX, V|D},
+{"skip_top", "number of macroblock rows at the top which are skipped", OFFSET(skip_top), FF_OPT_TYPE_INT, DEFAULT, INT_MIN, INT_MAX, V|D},
+{"skip_bottom", "number of macroblock rows at the bottom which are skipped", OFFSET(skip_bottom), FF_OPT_TYPE_INT, DEFAULT, INT_MIN, INT_MAX, V|D},
 {"profile", NULL, OFFSET(profile), FF_OPT_TYPE_INT, FF_PROFILE_UNKNOWN, INT_MIN, INT_MAX, V|A|E, "profile"},
 {"unknown", NULL, 0, FF_OPT_TYPE_CONST, FF_PROFILE_UNKNOWN, INT_MIN, INT_MAX, V|A|E, "profile"},
 {"level", NULL, OFFSET(level), FF_OPT_TYPE_INT, FF_LEVEL_UNKNOWN, INT_MIN, INT_MAX, V|A|E, "level"},
 {"unknown", NULL, 0, FF_OPT_TYPE_CONST, FF_LEVEL_UNKNOWN, INT_MIN, INT_MAX, V|A|E, "level"},
-{"lowres", NULL, OFFSET(lowres), FF_OPT_TYPE_INT, 0, 0, INT_MAX, V|D},
+{"lowres", "decode at 1= 1/2, 2=1/4, 3=1/8 resolutions", OFFSET(lowres), FF_OPT_TYPE_INT, 0, 0, INT_MAX, V|D},
 {"skip_threshold", "frame skip threshold", OFFSET(frame_skip_threshold), FF_OPT_TYPE_INT, DEFAULT, INT_MIN, INT_MAX, V|E},
 {"skip_factor", "frame skip factor", OFFSET(frame_skip_factor), FF_OPT_TYPE_INT, DEFAULT, INT_MIN, INT_MAX, V|E},
 {"skip_exp", "frame skip exponent", OFFSET(frame_skip_exp), FF_OPT_TYPE_INT, DEFAULT, INT_MIN, INT_MAX, V|E},
 {"skipcmp", "frame skip compare function", OFFSET(frame_skip_cmp), FF_OPT_TYPE_INT, FF_CMP_DCTMAX, INT_MIN, INT_MAX, V|E, "cmp_func"},
-{"border_mask", NULL, OFFSET(border_masking), FF_OPT_TYPE_FLOAT, DEFAULT, -FLT_MAX, FLT_MAX, V|E},
-{"mblmin", "min macroblock quantiser scale (VBR)", OFFSET(mb_lmin), FF_OPT_TYPE_INT, FF_QP2LAMBDA * 2, INT_MIN, INT_MAX, V|E},
-{"mblmax", "max macroblock quantiser scale (VBR)", OFFSET(mb_lmax), FF_OPT_TYPE_INT, FF_QP2LAMBDA * 31, INT_MIN, INT_MAX, V|E},
+{"border_mask", "increases the quantizer for macroblocks close to borders", OFFSET(border_masking), FF_OPT_TYPE_FLOAT, DEFAULT, -FLT_MAX, FLT_MAX, V|E},
+{"mblmin", "min macroblock lagrange factor (VBR)", OFFSET(mb_lmin), FF_OPT_TYPE_INT, FF_QP2LAMBDA * 2, 1, FF_LAMBDA_MAX, V|E},
+{"mblmax", "max macroblock lagrange factor (VBR)", OFFSET(mb_lmax), FF_OPT_TYPE_INT, FF_QP2LAMBDA * 31, 1, FF_LAMBDA_MAX, V|E},
 {"mepc", "motion estimation bitrate penalty compensation (1.0 = 256)", OFFSET(me_penalty_compensation), FF_OPT_TYPE_INT, 256, INT_MIN, INT_MAX, V|E},
-{"bidir_refine", NULL, OFFSET(bidir_refine), FF_OPT_TYPE_INT, DEFAULT, 0, 4, V|E},
-{"brd_scale", NULL, OFFSET(brd_scale), FF_OPT_TYPE_INT, DEFAULT, 0, 10, V|E},
-{"crf", NULL, OFFSET(crf), FF_OPT_TYPE_INT, DEFAULT, INT_MIN, INT_MAX, V|E},
-{"cqp", NULL, OFFSET(cqp), FF_OPT_TYPE_INT, -1, INT_MIN, INT_MAX, V|E},
-{"keyint_min", NULL, OFFSET(keyint_min), FF_OPT_TYPE_INT, 25, INT_MIN, INT_MAX, V|E},
-{"refs", NULL, OFFSET(refs), FF_OPT_TYPE_INT, 1, INT_MIN, INT_MAX, V|E},
-{"chromaoffset", NULL, OFFSET(chromaoffset), FF_OPT_TYPE_INT, DEFAULT, INT_MIN, INT_MAX, V|E},
-{"bframebias", NULL, OFFSET(bframebias), FF_OPT_TYPE_INT, DEFAULT, INT_MIN, INT_MAX, V|E},
-{"trellis", NULL, OFFSET(trellis), FF_OPT_TYPE_INT, DEFAULT, INT_MIN, INT_MAX, V|A|E},
-{"directpred", NULL, OFFSET(directpred), FF_OPT_TYPE_INT, 2, INT_MIN, INT_MAX, V|E},
-{"bpyramid", NULL, 0, FF_OPT_TYPE_CONST, CODEC_FLAG2_BPYRAMID, INT_MIN, INT_MAX, V|E, "flags2"},
-{"wpred", NULL, 0, FF_OPT_TYPE_CONST, CODEC_FLAG2_WPRED, INT_MIN, INT_MAX, V|E, "flags2"},
-{"mixed_refs", NULL, 0, FF_OPT_TYPE_CONST, CODEC_FLAG2_MIXED_REFS, INT_MIN, INT_MAX, V|E, "flags2"},
-{"8x8dct", NULL, 0, FF_OPT_TYPE_CONST, CODEC_FLAG2_8X8DCT, INT_MIN, INT_MAX, V|E, "flags2"},
-{"fastpskip", NULL, 0, FF_OPT_TYPE_CONST, CODEC_FLAG2_FASTPSKIP, INT_MIN, INT_MAX, V|E, "flags2"},
-{"aud", NULL, 0, FF_OPT_TYPE_CONST, CODEC_FLAG2_AUD, INT_MIN, INT_MAX, V|E, "flags2"},
-{"brdo", NULL, 0, FF_OPT_TYPE_CONST, CODEC_FLAG2_BRDO, INT_MIN, INT_MAX, V|E, "flags2"},
-{"complexityblur", NULL, OFFSET(complexityblur), FF_OPT_TYPE_FLOAT, 20.0, FLT_MIN, FLT_MAX, V|E},
-{"deblockalpha", NULL, OFFSET(deblockalpha), FF_OPT_TYPE_INT, DEFAULT, INT_MIN, INT_MAX, V|E},
-{"deblockbeta", NULL, OFFSET(deblockbeta), FF_OPT_TYPE_INT, DEFAULT, INT_MIN, INT_MAX, V|E},
-{"partitions", NULL, OFFSET(partitions), FF_OPT_TYPE_FLAGS, DEFAULT, INT_MIN, INT_MAX, V|E, "partitions"},
+{"bidir_refine", "refine the two motion vectors used in bidirectional macroblocks", OFFSET(bidir_refine), FF_OPT_TYPE_INT, DEFAULT, 0, 4, V|E},
+{"brd_scale", "downscales frames for dynamic B-frame decision", OFFSET(brd_scale), FF_OPT_TYPE_INT, DEFAULT, 0, 10, V|E},
+{"crf", "enables constant quality mode, and selects the quality (x264)", OFFSET(crf), FF_OPT_TYPE_FLOAT, DEFAULT, 0, 51, V|E},
+{"cqp", "constant quantization parameter rate control method", OFFSET(cqp), FF_OPT_TYPE_INT, -1, INT_MIN, INT_MAX, V|E},
+{"keyint_min", "minimum interval between IDR-frames (x264)", OFFSET(keyint_min), FF_OPT_TYPE_INT, 25, INT_MIN, INT_MAX, V|E},
+{"refs", "reference frames to consider for motion compensation (Snow)", OFFSET(refs), FF_OPT_TYPE_INT, 1, INT_MIN, INT_MAX, V|E},
+{"chromaoffset", "chroma qp offset from luma", OFFSET(chromaoffset), FF_OPT_TYPE_INT, DEFAULT, INT_MIN, INT_MAX, V|E},
+{"bframebias", "influences how often B-frames are used", OFFSET(bframebias), FF_OPT_TYPE_INT, DEFAULT, INT_MIN, INT_MAX, V|E},
+{"trellis", "rate-distortion optimal quantization", OFFSET(trellis), FF_OPT_TYPE_INT, DEFAULT, INT_MIN, INT_MAX, V|A|E},
+{"directpred", "direct mv prediction mode - 0 (none), 1 (spatial), 2 (temporal)", OFFSET(directpred), FF_OPT_TYPE_INT, 2, INT_MIN, INT_MAX, V|E},
+{"bpyramid", "allows B-frames to be used as references for predicting", 0, FF_OPT_TYPE_CONST, CODEC_FLAG2_BPYRAMID, INT_MIN, INT_MAX, V|E, "flags2"},
+{"wpred", "weighted biprediction for b-frames (H.264)", 0, FF_OPT_TYPE_CONST, CODEC_FLAG2_WPRED, INT_MIN, INT_MAX, V|E, "flags2"},
+{"mixed_refs", "one reference per partition, as opposed to one reference per macroblock", 0, FF_OPT_TYPE_CONST, CODEC_FLAG2_MIXED_REFS, INT_MIN, INT_MAX, V|E, "flags2"},
+{"8x8dct", "high profile 8x8 transform (H.264)", 0, FF_OPT_TYPE_CONST, CODEC_FLAG2_8X8DCT, INT_MIN, INT_MAX, V|E, "flags2"},
+{"fastpskip", "fast pskip (H.264)", 0, FF_OPT_TYPE_CONST, CODEC_FLAG2_FASTPSKIP, INT_MIN, INT_MAX, V|E, "flags2"},
+{"aud", "access unit delimiters (H.264)", 0, FF_OPT_TYPE_CONST, CODEC_FLAG2_AUD, INT_MIN, INT_MAX, V|E, "flags2"},
+{"brdo", "b-frame rate-distortion optimization", 0, FF_OPT_TYPE_CONST, CODEC_FLAG2_BRDO, INT_MIN, INT_MAX, V|E, "flags2"},
+{"skiprd", "RD optimal MB level residual skiping", 0, FF_OPT_TYPE_CONST, CODEC_FLAG2_SKIP_RD, INT_MIN, INT_MAX, V|E, "flags2"},
+{"complexityblur", "reduce fluctuations in qp (before curve compression)", OFFSET(complexityblur), FF_OPT_TYPE_FLOAT, 20.0, FLT_MIN, FLT_MAX, V|E},
+{"deblockalpha", "in-loop deblocking filter alphac0 parameter", OFFSET(deblockalpha), FF_OPT_TYPE_INT, DEFAULT, -6, 6, V|E},
+{"deblockbeta", "in-loop deblocking filter beta parameter", OFFSET(deblockbeta), FF_OPT_TYPE_INT, DEFAULT, -6, 6, V|E},
+{"partitions", "macroblock subpartition sizes to consider", OFFSET(partitions), FF_OPT_TYPE_FLAGS, DEFAULT, INT_MIN, INT_MAX, V|E, "partitions"},
 {"parti4x4", NULL, 0, FF_OPT_TYPE_CONST, X264_PART_I4X4, INT_MIN, INT_MAX, V|E, "partitions"},
 {"parti8x8", NULL, 0, FF_OPT_TYPE_CONST, X264_PART_I8X8, INT_MIN, INT_MAX, V|E, "partitions"},
 {"partp4x4", NULL, 0, FF_OPT_TYPE_CONST, X264_PART_P4X4, INT_MIN, INT_MAX, V|E, "partitions"},
 {"partp8x8", NULL, 0, FF_OPT_TYPE_CONST, X264_PART_P8X8, INT_MIN, INT_MAX, V|E, "partitions"},
 {"partb8x8", NULL, 0, FF_OPT_TYPE_CONST, X264_PART_B8X8, INT_MIN, INT_MAX, V|E, "partitions"},
-{"sc_factor", NULL, OFFSET(scenechange_factor), FF_OPT_TYPE_INT, 6, 0, INT_MAX, V|E},
+{"sc_factor", "multiplied by qscale for each frame and added to scene_change_score", OFFSET(scenechange_factor), FF_OPT_TYPE_INT, 6, 0, INT_MAX, V|E},
 {"mv0_threshold", NULL, OFFSET(mv0_threshold), FF_OPT_TYPE_INT, 256, 0, INT_MAX, V|E},
 {"ivlc", "intra vlc table", 0, FF_OPT_TYPE_CONST, CODEC_FLAG2_INTRA_VLC, INT_MIN, INT_MAX, V|E, "flags2"},
-{"b_sensitivity", NULL, OFFSET(b_sensitivity), FF_OPT_TYPE_INT, 40, 1, INT_MAX, V|E},
+{"b_sensitivity", "adjusts sensitivity of b_frame_strategy 1", OFFSET(b_sensitivity), FF_OPT_TYPE_INT, 40, 1, INT_MAX, V|E},
 {"compression_level", NULL, OFFSET(compression_level), FF_OPT_TYPE_INT, FF_COMPRESSION_DEFAULT, INT_MIN, INT_MAX, V|A|E},
-{"use_lpc", NULL, OFFSET(use_lpc), FF_OPT_TYPE_INT, -1, INT_MIN, INT_MAX, A|E},
-{"lpc_coeff_precision", NULL, OFFSET(lpc_coeff_precision), FF_OPT_TYPE_INT, DEFAULT, 0, INT_MAX, A|E},
+{"use_lpc", "sets whether to use LPC mode (FLAC)", OFFSET(use_lpc), FF_OPT_TYPE_INT, -1, INT_MIN, INT_MAX, A|E},
+{"lpc_coeff_precision", "LPC coefficient precision (FLAC)", OFFSET(lpc_coeff_precision), FF_OPT_TYPE_INT, DEFAULT, 0, INT_MAX, A|E},
 {"min_prediction_order", NULL, OFFSET(min_prediction_order), FF_OPT_TYPE_INT, -1, INT_MIN, INT_MAX, A|E},
 {"max_prediction_order", NULL, OFFSET(max_prediction_order), FF_OPT_TYPE_INT, -1, INT_MIN, INT_MAX, A|E},
-{"prediction_order_method", NULL, OFFSET(prediction_order_method), FF_OPT_TYPE_INT, -1, INT_MIN, INT_MAX, A|E},
+{"prediction_order_method", "search method for selecting prediction order", OFFSET(prediction_order_method), FF_OPT_TYPE_INT, -1, INT_MIN, INT_MAX, A|E},
 {"min_partition_order", NULL, OFFSET(min_partition_order), FF_OPT_TYPE_INT, -1, INT_MIN, INT_MAX, A|E},
 {"max_partition_order", NULL, OFFSET(max_partition_order), FF_OPT_TYPE_INT, -1, INT_MIN, INT_MAX, A|E},
+{"timecode_frame_start", "GOP timecode frame start number, in non drop frame format", OFFSET(timecode_frame_start), FF_OPT_TYPE_INT, 0, 0, INT_MAX, V|E},
+{"drop_frame_timecode", NULL, 0, FF_OPT_TYPE_CONST, CODEC_FLAG2_DROP_FRAME_TIMECODE, INT_MIN, INT_MAX, V|E, "flags2"},
 {NULL},
 };
 
@@ -746,8 +753,6 @@ void avcodec_get_context_defaults(AVCodecContext *s){
     s->release_buffer= avcodec_default_release_buffer;
     s->get_format= avcodec_default_get_format;
     s->execute= avcodec_default_execute;
-    s->lmin= FF_QP2LAMBDA * s->qmin;
-    s->lmax= FF_QP2LAMBDA * s->qmax;
     s->sample_aspect_ratio= (AVRational){0,1};
     s->pix_fmt= PIX_FMT_NONE;
     s->sample_fmt= SAMPLE_FMT_S16; // FIXME: set to NONE
@@ -917,21 +922,43 @@ int avcodec_decode_video(AVCodecContext *avctx, AVFrame *picture,
    *number of bytes used. If no frame could be decompressed,
    *frame_size_ptr is zero. Otherwise, it is the decompressed frame
    *size in BYTES. */
-int avcodec_decode_audio(AVCodecContext *avctx, int16_t *samples,
+int avcodec_decode_audio2(AVCodecContext *avctx, int16_t *samples,
                          int *frame_size_ptr,
                          uint8_t *buf, int buf_size)
 {
     int ret;
 
-    *frame_size_ptr= 0;
+    //FIXME remove the check below _after_ ensuring that all audio check that the available space is enough
+    if(*frame_size_ptr < AVCODEC_MAX_AUDIO_FRAME_SIZE){
+        av_log(avctx, AV_LOG_ERROR, "buffer smaller then AVCODEC_MAX_AUDIO_FRAME_SIZE\n");
+        return -1;
+    }
+    if(*frame_size_ptr < FF_MIN_BUFFER_SIZE ||
+       *frame_size_ptr < avctx->channels * avctx->frame_size * sizeof(int16_t) ||
+       *frame_size_ptr < buf_size){
+        av_log(avctx, AV_LOG_ERROR, "buffer too small\n");
+        return -1;
+    }
     if((avctx->codec->capabilities & CODEC_CAP_DELAY) || buf_size){
         ret = avctx->codec->decode(avctx, samples, frame_size_ptr,
                                 buf, buf_size);
         avctx->frame_number++;
-    }else
+    }else{
         ret= 0;
+        *frame_size_ptr=0;
+    }
     return ret;
 }
+
+#if LIBAVCODEC_VERSION_INT < ((52<<16)+(0<<8)+0)
+int avcodec_decode_audio(AVCodecContext *avctx, int16_t *samples,
+                         int *frame_size_ptr,
+                         uint8_t *buf, int buf_size){
+    *frame_size_ptr= AVCODEC_MAX_AUDIO_FRAME_SIZE;
+    return avcodec_decode_audio2(avctx, samples, frame_size_ptr, buf, buf_size);
+}
+#endif
+
 
 /* decode a subtitle message. return -1 if error, otherwise return the
    *number of bytes used. If no subtitle could be decompressed,

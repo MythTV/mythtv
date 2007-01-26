@@ -3,18 +3,20 @@
  * Copyright (c) 2000, 2001, 2002 Fabrice Bellard.
  * Copyright (c) 2002-2004 Michael Niedermayer
  *
- * This library is free software; you can redistribute it and/or
+ * This file is part of FFmpeg.
+ *
+ * FFmpeg is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
- * version 2 of the License, or (at your option) any later version.
+ * version 2.1 of the License, or (at your option) any later version.
  *
- * This library is distributed in the hope that it will be useful,
+ * FFmpeg is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
+ * License along with FFmpeg; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
@@ -28,6 +30,8 @@
 
 #include "dsputil.h"
 #include "bitstream.h"
+#include "ratecontrol.h"
+#include "parser.h"
 
 #define FRAME_SKIPPED 100 ///< return value for header parsers if frame is not coded
 
@@ -71,60 +75,6 @@ enum OutputFormat {
 #define MAX_MB_BYTES (30*16*16*3/8 + 120)
 
 #define INPLACE_OFFSET 16
-
-typedef struct Predictor{
-    double coeff;
-    double count;
-    double decay;
-} Predictor;
-
-typedef struct RateControlEntry{
-    int pict_type;
-    float qscale;
-    int mv_bits;
-    int i_tex_bits;
-    int p_tex_bits;
-    int misc_bits;
-    int header_bits;
-    uint64_t expected_bits;
-    int new_pict_type;
-    float new_qscale;
-    int mc_mb_var_sum;
-    int mb_var_sum;
-    int i_count;
-    int skip_count;
-    int f_code;
-    int b_code;
-}RateControlEntry;
-
-/**
- * rate control context.
- */
-typedef struct RateControlContext{
-    FILE *stats_file;
-    int num_entries;              ///< number of RateControlEntries
-    RateControlEntry *entry;
-    double buffer_index;          ///< amount of bits in the video/audio buffer
-    Predictor pred[5];
-    double short_term_qsum;       ///< sum of recent qscales
-    double short_term_qcount;     ///< count of recent qscales
-    double pass1_rc_eq_output_sum;///< sum of the output of the rc equation, this is used for normalization
-    double pass1_wanted_bits;     ///< bits which should have been outputed by the pass1 code (including complexity init)
-    double last_qscale;
-    double last_qscale_for[5];    ///< last qscale for a specific pict type, used for max_diff & ipb factor stuff
-    int last_mc_mb_var_sum;
-    int last_mb_var_sum;
-    uint64_t i_cplx_sum[5];
-    uint64_t p_cplx_sum[5];
-    uint64_t mv_bits_sum[5];
-    uint64_t qscale_sum[5];
-    int frame_count[5];
-    int last_non_b_pict_type;
-
-    void *non_lavc_opaque;        ///< context for non lavc rc code (for example xvid)
-    float dry_run_qscale;         ///< for xvid rc
-    int last_picture_number;      ///< for xvid rc
-}RateControlContext;
 
 /**
  * Scantable.
@@ -192,17 +142,6 @@ typedef struct Picture{
     int32_t *mb_cmp_score;      ///< Table for MB cmp scores, for mb decision FIXME remove
     int b_frame_score;          /* */
 } Picture;
-
-typedef struct ParseContext{
-    uint8_t *buffer;
-    int index;
-    int last_index;
-    unsigned int buffer_size;
-    uint32_t state;             ///< contains the last few bytes in MSB order
-    int frame_start_found;
-    int overread;               ///< the number of bytes which where irreversibly read from the next frame
-    int overread_index;         ///< the index into ParseContext.buffer of the overreaded bytes
-} ParseContext;
 
 struct MpegEncContext;
 
@@ -286,6 +225,8 @@ typedef struct MpegEncContext {
     int chroma_elim_threshold;
     int strict_std_compliance; ///< strictly follow the std (MPEG4, ...)
     int workaround_bugs;       ///< workaround bugs in encoders which cannot be detected automatically
+    int codec_tag;             ///< internal codec_tag upper case converted from avctx codec_tag
+    int stream_codec_tag;      ///< internal stream_codec_tag upper case converted from avctx stream_codec_tag
     /* the following fields are managed internally by the encoder */
 
     /** bit output */
@@ -372,8 +313,8 @@ typedef struct MpegEncContext {
 
     int qscale;                 ///< QP
     int chroma_qscale;          ///< chroma QP
-    int lambda;                 ///< lagrange multipler used in rate distortion
-    int lambda2;                ///< (lambda*lambda) >> FF_LAMBDA_SHIFT
+    unsigned int lambda;        ///< lagrange multipler used in rate distortion
+    unsigned int lambda2;       ///< (lambda*lambda) >> FF_LAMBDA_SHIFT
     int *lambda_table;
     int adaptive_quant;         ///< use adaptive quantization
     int dquant;                 ///< qscale difference to prev qscale
@@ -383,6 +324,7 @@ typedef struct MpegEncContext {
     int dropable;
     int frame_rate_index;
     int last_lambda_for[5];     ///< last lambda for a specific pict type
+    int skipdct;                ///< skip dct and code zero residual
 
     /* motion compensation */
     int unrestricted_mv;        ///< mv can point outside of the coded picture
@@ -461,6 +403,8 @@ typedef struct MpegEncContext {
 #define CANDIDATE_MB_TYPE_BACKWARD_I 0x400
 #define CANDIDATE_MB_TYPE_BIDIR_I    0x800
 
+#define CANDIDATE_MB_TYPE_DIRECT0    0x1000
+
     int block_index[6]; ///< index to current MB in block based arrays with edges
     int block_wrap[6];
     uint8_t *dest[3];
@@ -512,6 +456,7 @@ typedef struct MpegEncContext {
     int64_t wanted_bits;
     int64_t total_bits;
     int frame_bits;                ///< bits used for the current frame
+    int next_lambda;               ///< next lambda used for retrying to encode a frame
     RateControlContext rc_context; ///< contains stuff only accessed in ratecontrol.c
 
     /* statistics, used for 2-pass encoding */
@@ -780,13 +725,10 @@ void ff_init_scantable(uint8_t *, ScanTable *st, const uint8_t *src_scantable);
 void ff_draw_horiz_band(MpegEncContext *s, int y, int h);
 void ff_emulated_edge_mc(uint8_t *buf, uint8_t *src, int linesize, int block_w, int block_h,
                                     int src_x, int src_y, int w, int h);
-#define END_NOT_FOUND -100
-int ff_combine_frame(ParseContext *pc, int next, uint8_t **buf, int *buf_size);
-void ff_parse_close(AVCodecParserContext *s);
 void ff_mpeg_flush(AVCodecContext *avctx);
 void ff_mpegcontext_flush(MpegEncContext *s);
 void ff_print_debug_info(MpegEncContext *s, AVFrame *pict);
-void ff_write_quant_matrix(PutBitContext *pb, int16_t *matrix);
+void ff_write_quant_matrix(PutBitContext *pb, uint16_t *matrix);
 int ff_find_unused_picture(MpegEncContext *s, int shared);
 void ff_denoise_dct(MpegEncContext *s, DCTELEM *block);
 void ff_update_duplicate_context(MpegEncContext *dst, MpegEncContext *src);
@@ -838,12 +780,12 @@ int ff_pre_estimate_p_frame_motion(MpegEncContext * s, int mb_x, int mb_y);
 inline int ff_epzs_motion_search(MpegEncContext * s, int *mx_ptr, int *my_ptr,
                              int P[10][2], int src_index, int ref_index, int16_t (*last_mv)[2],
                              int ref_mv_scale, int size, int h);
-int inline ff_get_mb_score(MpegEncContext * s, int mx, int my, int src_index,
+inline int ff_get_mb_score(MpegEncContext * s, int mx, int my, int src_index,
                                int ref_index, int size, int h, int add_rate);
 
 /* mpeg12.c */
-extern const int16_t ff_mpeg1_default_intra_matrix[64];
-extern const int16_t ff_mpeg1_default_non_intra_matrix[64];
+extern const uint16_t ff_mpeg1_default_intra_matrix[64];
+extern const uint16_t ff_mpeg1_default_non_intra_matrix[64];
 extern const uint8_t ff_mpeg1_dc_scale_table[128];
 
 void mpeg1_encode_picture_header(MpegEncContext *s, int picture_number);
@@ -853,7 +795,6 @@ void mpeg1_encode_mb(MpegEncContext *s,
 void ff_mpeg1_encode_init(MpegEncContext *s);
 void ff_mpeg1_encode_slice_header(MpegEncContext *s);
 void ff_mpeg1_clean_buffers(MpegEncContext *s);
-int ff_mpeg1_find_frame_end(ParseContext *pc, const uint8_t *buf, int buf_size);
 
 
 /** RLTable. */
@@ -900,6 +841,7 @@ void ff_h261_encode_mb(MpegEncContext *s,
                     int motion_x, int motion_y);
 void ff_h261_encode_picture_header(MpegEncContext * s, int picture_number);
 void ff_h261_encode_init(MpegEncContext *s);
+int ff_h261_get_picture_format(int width, int height);
 
 
 /* h263.c, h263dec.c */
@@ -956,10 +898,10 @@ int ff_mpeg4_decode_partitions(MpegEncContext *s);
 int ff_mpeg4_get_video_packet_prefix_length(MpegEncContext *s);
 int ff_h263_resync(MpegEncContext *s);
 int ff_h263_get_gob_height(MpegEncContext *s);
+void ff_mpeg4_init_direct_mv(MpegEncContext *s);
 int ff_mpeg4_set_direct_mv(MpegEncContext *s, int mx, int my);
 int ff_h263_round_chroma(int x);
 void ff_h263_encode_motion(MpegEncContext * s, int val, int f_code);
-int ff_mpeg4_find_frame_end(ParseContext *pc, const uint8_t *buf, int buf_size);
 
 
 /* rv10.c */
@@ -999,21 +941,5 @@ void mjpeg_picture_header(MpegEncContext *s);
 void mjpeg_picture_trailer(MpegEncContext *s);
 void ff_mjpeg_stuffing(PutBitContext * pbc);
 
-
-/* rate control */
-int ff_rate_control_init(MpegEncContext *s);
-float ff_rate_estimate_qscale(MpegEncContext *s, int dry_run);
-void ff_write_pass1_stats(MpegEncContext *s);
-void ff_rate_control_uninit(MpegEncContext *s);
-double ff_eval(char *s, double *const_value, const char **const_name,
-               double (**func1)(void *, double), const char **func1_name,
-               double (**func2)(void *, double, double), char **func2_name,
-               void *opaque);
-int ff_vbv_update(MpegEncContext *s, int frame_size);
-void ff_get_2pass_fcode(MpegEncContext *s);
-
-int ff_xvid_rate_control_init(MpegEncContext *s);
-void ff_xvid_rate_control_uninit(MpegEncContext *s);
-float ff_xvid_rate_estimate_qscale(MpegEncContext *s, int dry_run);
-
 #endif /* AVCODEC_MPEGVIDEO_H */
+

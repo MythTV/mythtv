@@ -2,18 +2,20 @@
  * VC-1 and WMV3 decoder - DSP functions
  * Copyright (c) 2006 Konstantin Shishkov
  *
- * This library is free software; you can redistribute it and/or
+ * This file is part of FFmpeg.
+ *
+ * FFmpeg is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
- * version 2 of the License, or (at your option) any later version.
+ * version 2.1 of the License, or (at your option) any later version.
  *
- * This library is distributed in the hope that it will be useful,
+ * FFmpeg is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
+ * License along with FFmpeg; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  *
  */
@@ -27,43 +29,53 @@
 #include "dsputil.h"
 
 
-/** Apply overlap transform to vertical edge
+/** Apply overlap transform to horizontal edge
 */
-static void vc1_v_overlap_c(uint8_t* src, int stride, int rnd)
+static void vc1_v_overlap_c(uint8_t* src, int stride)
 {
     int i;
     int a, b, c, d;
+    int d1, d2;
+    int rnd = 1;
     for(i = 0; i < 8; i++) {
         a = src[-2*stride];
         b = src[-stride];
         c = src[0];
         d = src[stride];
+        d1 = (a - d + 3 + rnd) >> 3;
+        d2 = (a - d + b - c + 4 - rnd) >> 3;
 
-        src[-2*stride] = clip_uint8((7*a + d + 4 - rnd) >> 3);
-        src[-stride] = clip_uint8((-a + 7*b + c + d + 3 + rnd) >> 3);
-        src[0] = clip_uint8((a + b + 7*c - d + 4 - rnd) >> 3);
-        src[stride] = clip_uint8((a + 7*d + 3 + rnd) >> 3);
+        src[-2*stride] = a - d1;
+        src[-stride] = b - d2;
+        src[0] = c + d2;
+        src[stride] = d + d1;
         src++;
+        rnd = !rnd;
     }
 }
 
-/** Apply overlap transform to horizontal edge
+/** Apply overlap transform to vertical edge
 */
-static void vc1_h_overlap_c(uint8_t* src, int stride, int rnd)
+static void vc1_h_overlap_c(uint8_t* src, int stride)
 {
     int i;
     int a, b, c, d;
+    int d1, d2;
+    int rnd = 1;
     for(i = 0; i < 8; i++) {
         a = src[-2];
         b = src[-1];
         c = src[0];
         d = src[1];
+        d1 = (a - d + 3 + rnd) >> 3;
+        d2 = (a - d + b - c + 4 - rnd) >> 3;
 
-        src[-2] = clip_uint8((7*a + d + 4 - rnd) >> 3);
-        src[-1] = clip_uint8((-a + 7*b + c + d + 3 + rnd) >> 3);
-        src[0] = clip_uint8((a + b + 7*c - d + 4 - rnd) >> 3);
-        src[1] = clip_uint8((a + 7*d + 3 + rnd) >> 3);
+        src[-2] = a - d1;
+        src[-1] = b - d2;
+        src[0] = c + d2;
+        src[1] = d + d1;
         src += stride;
+        rnd = !rnd;
     }
 }
 
@@ -314,7 +326,7 @@ static void vc1_inv_trans_4x4_c(DCTELEM block[64], int n)
 
 /** Filter used to interpolate fractional pel values
  */
-static always_inline int vc1_mspel_filter(const uint8_t *src, int stride, int mode, int r)
+static av_always_inline int vc1_mspel_filter(const uint8_t *src, int stride, int mode, int r)
 {
     switch(mode){
     case 0: //no shift

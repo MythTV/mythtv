@@ -3,18 +3,20 @@
  * Copyright (C) 2002 the xine project
  * Copyright (C) 2002 the ffmpeg project
  *
- * This library is free software; you can redistribute it and/or
+ * This file is part of FFmpeg.
+ *
+ * FFmpeg is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
- * version 2 of the License, or (at your option) any later version.
+ * version 2.1 of the License, or (at your option) any later version.
  *
- * This library is distributed in the hope that it will be useful,
+ * FFmpeg is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
+ * License along with FFmpeg; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  *
  * (SVQ1 Decoder)
@@ -617,6 +619,7 @@ static uint16_t svq1_component_checksum (uint16_t *pixels, int pitch,
 }
 #endif
 
+#ifdef CONFIG_DECODERS
 static void svq1_parse_string (GetBitContext *bitbuf, uint8_t *out) {
   uint8_t seed;
   int     i;
@@ -655,9 +658,9 @@ static int svq1_decode_frame_header (GetBitContext *bitbuf,MpegEncContext *s) {
     }
 
     if ((s->f_code ^ 0x10) >= 0x50) {
-      char msg[256];
+      uint8_t msg[256];
 
-      svq1_parse_string (bitbuf, (char *) msg);
+      svq1_parse_string (bitbuf, msg);
 
       av_log(s->avctx, AV_LOG_INFO, "embedded message: \"%s\"\n", (char *) msg);
     }
@@ -879,7 +882,9 @@ static int svq1_decode_end(AVCodecContext *avctx)
     MPV_common_end(s);
     return 0;
 }
+#endif /* CONFIG_DECODERS */
 
+#ifdef CONFIG_ENCODERS
 static void svq1_write_header(SVQ1Context *s, int frame_type)
 {
     int i;
@@ -900,7 +905,7 @@ static void svq1_write_header(SVQ1Context *s, int frame_type)
         /* no embedded string either */
 
         /* output 5 unknown bits (2 + 2 + 1) */
-        put_bits(&s->pb, 5, 0);
+        put_bits(&s->pb, 5, 2); /* 2 needed by quicktime decoder */
 
         for (i = 0; i < 7; i++)
         {
@@ -1081,7 +1086,6 @@ static int encode_block(SVQ1Context *s, uint8_t *src, uint8_t *ref, uint8_t *dec
     return best_score;
 }
 
-#ifdef CONFIG_ENCODERS
 
 static int svq1_encode_plane(SVQ1Context *s, int plane, unsigned char *src_plane, unsigned char *ref_plane, unsigned char *decoded_plane,
     int width, int height, int src_stride, int stride)
@@ -1351,7 +1355,7 @@ static int svq1_encode_frame(AVCodecContext *avctx, unsigned char *buf,
     init_put_bits(&s->pb, buf, buf_size);
 
     *p = *pict;
-    p->pict_type = avctx->frame_number % avctx->gop_size ? P_TYPE : I_TYPE;
+    p->pict_type = avctx->gop_size && avctx->frame_number % avctx->gop_size ? P_TYPE : I_TYPE;
     p->key_frame = p->pict_type == I_TYPE;
 
     svq1_write_header(s, p->pict_type);
@@ -1395,6 +1399,7 @@ static int svq1_encode_end(AVCodecContext *avctx)
 
 #endif //CONFIG_ENCODERS
 
+#ifdef CONFIG_DECODERS
 AVCodec svq1_decoder = {
     "svq1",
     CODEC_TYPE_VIDEO,
@@ -1408,6 +1413,7 @@ AVCodec svq1_decoder = {
     .flush= ff_mpeg_flush,
     .pix_fmts= (enum PixelFormat[]){PIX_FMT_YUV410P, -1},
 };
+#endif
 
 #ifdef CONFIG_ENCODERS
 

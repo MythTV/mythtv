@@ -2,18 +2,20 @@
  * LCL (LossLess Codec Library) Codec
  * Copyright (c) 2002-2004 Roberto Togni
  *
- * This library is free software; you can redistribute it and/or
+ * This file is part of FFmpeg.
+ *
+ * FFmpeg is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
- * version 2 of the License, or (at your option) any later version.
+ * version 2.1 of the License, or (at your option) any later version.
  *
- * This library is distributed in the hope that it will be useful,
+ * FFmpeg is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
+ * License along with FFmpeg; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  *
  */
@@ -190,7 +192,7 @@ static unsigned int mszh_decomp(unsigned char * srcptr, int srclen, unsigned cha
 
 
 
-
+#ifdef CONFIG_DECODERS
 /*
  *
  * Decode a frame
@@ -544,9 +546,9 @@ static int decode_frame(AVCodecContext *avctx, void *data, int *data_size, uint8
     /* always report that the buffer was completely consumed */
     return buf_size;
 }
+#endif
 
-
-
+#ifdef CONFIG_ENCODERS
 /*
  *
  * Encode a frame
@@ -605,9 +607,9 @@ static int encode_frame(AVCodecContext *avctx, unsigned char *buf, int buf_size,
     return c->zstream.total_out;
 #endif
 }
+#endif /* CONFIG_ENCODERS */
 
-
-
+#ifdef CONFIG_DECODERS
 /*
  *
  * Init lcl decoder
@@ -769,9 +771,9 @@ static int decode_init(AVCodecContext *avctx)
 
     return 0;
 }
+#endif /* CONFIG_DECODERS */
 
-
-
+#ifdef CONFIG_ENCODERS
 /*
  *
  * Init lcl encoder
@@ -839,11 +841,11 @@ static int encode_init(AVCodecContext *avctx)
     return 0;
 #endif
 }
+#endif /* CONFIG_ENCODERS */
 
 
 
-
-
+#ifdef CONFIG_DECODERS
 /*
  *
  * Uninit lcl decoder
@@ -861,9 +863,9 @@ static int decode_end(AVCodecContext *avctx)
 
         return 0;
 }
+#endif
 
-
-
+#ifdef CONFIG_ENCODERS
 /*
  *
  * Uninit lcl encoder
@@ -881,7 +883,9 @@ static int encode_end(AVCodecContext *avctx)
 
     return 0;
 }
+#endif
 
+#ifdef CONFIG_MSZH_DECODER
 AVCodec mszh_decoder = {
         "mszh",
         CODEC_TYPE_VIDEO,
@@ -893,8 +897,9 @@ AVCodec mszh_decoder = {
         decode_frame,
         CODEC_CAP_DR1,
 };
+#endif
 
-
+#ifdef CONFIG_ZLIB_DECODER
 AVCodec zlib_decoder = {
         "zlib",
         CODEC_TYPE_VIDEO,
@@ -906,6 +911,7 @@ AVCodec zlib_decoder = {
         decode_frame,
         CODEC_CAP_DR1,
 };
+#endif
 
 #ifdef CONFIG_ENCODERS
 

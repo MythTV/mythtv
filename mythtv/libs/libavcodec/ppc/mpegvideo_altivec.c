@@ -4,18 +4,20 @@
  * dct_unquantize_h263_altivec:
  * Copyright (c) 2003 Romain Dolbeau <romain@dolbeau.org>
  *
- * This library is free software; you can redistribute it and/or
+ * This file is part of FFmpeg.
+ *
+ * FFmpeg is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
- * version 2 of the License, or (at your option) any later version.
+ * version 2.1 of the License, or (at your option) any later version.
  *
- * This library is distributed in the hope that it will be useful,
+ * FFmpeg is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
+ * License along with FFmpeg; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
@@ -48,39 +50,6 @@ do { \
   b = vec_mergel(_trans_ach, _trans_bdh); \
   c = vec_mergeh(_trans_acl, _trans_bdl); \
   d = vec_mergel(_trans_acl, _trans_bdl); \
-} while (0)
-
-#define TRANSPOSE8(a,b,c,d,e,f,g,h) \
-do { \
-    __typeof__(a)  _A1, _B1, _C1, _D1, _E1, _F1, _G1, _H1; \
-    __typeof__(a)  _A2, _B2, _C2, _D2, _E2, _F2, _G2, _H2; \
- \
-    _A1 = vec_mergeh (a, e); \
-    _B1 = vec_mergel (a, e); \
-    _C1 = vec_mergeh (b, f); \
-    _D1 = vec_mergel (b, f); \
-    _E1 = vec_mergeh (c, g); \
-    _F1 = vec_mergel (c, g); \
-    _G1 = vec_mergeh (d, h); \
-    _H1 = vec_mergel (d, h); \
- \
-    _A2 = vec_mergeh (_A1, _E1); \
-    _B2 = vec_mergel (_A1, _E1); \
-    _C2 = vec_mergeh (_B1, _F1); \
-    _D2 = vec_mergel (_B1, _F1); \
-    _E2 = vec_mergeh (_C1, _G1); \
-    _F2 = vec_mergel (_C1, _G1); \
-    _G2 = vec_mergeh (_D1, _H1); \
-    _H2 = vec_mergel (_D1, _H1); \
- \
-    a = vec_mergeh (_A2, _E2); \
-    b = vec_mergel (_A2, _E2); \
-    c = vec_mergeh (_B2, _F2); \
-    d = vec_mergel (_B2, _F2); \
-    e = vec_mergeh (_C2, _G2); \
-    f = vec_mergel (_C2, _G2); \
-    g = vec_mergeh (_D2, _H2); \
-    h = vec_mergel (_D2, _H2); \
 } while (0)
 
 
@@ -552,19 +521,6 @@ POWERPC_PERF_START_COUNT(altivec_dct_unquantize_h263_num, 1);
         nCoeffs= s->intra_scantable.raster_end[ s->block_last_index[n] ];
     }
 
-#ifdef ALTIVEC_USE_REFERENCE_C_CODE
-    for(;i<=nCoeffs;i++) {
-        level = block[i];
-        if (level) {
-            if (level < 0) {
-                level = level * qmul - qadd;
-            } else {
-                level = level * qmul + qadd;
-            }
-            block[i] = level;
-        }
-    }
-#else /* ALTIVEC_USE_REFERENCE_C_CODE */
     {
       register const_vector signed short vczero = (const_vector signed short)vec_splat_s16(0);
       short __attribute__ ((aligned(16))) qmul8[] =
@@ -643,7 +599,5 @@ POWERPC_PERF_START_COUNT(altivec_dct_unquantize_h263_num, 1);
         block[0] = backup_0;
       }
     }
-#endif /* ALTIVEC_USE_REFERENCE_C_CODE */
-
 POWERPC_PERF_STOP_COUNT(altivec_dct_unquantize_h263_num, nCoeffs == 63);
 }

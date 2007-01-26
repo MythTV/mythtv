@@ -2,28 +2,31 @@
  * RIFF codec tags
  * Copyright (c) 2000 Fabrice Bellard.
  *
- * This library is free software; you can redistribute it and/or
+ * This file is part of FFmpeg.
+ *
+ * FFmpeg is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
- * version 2 of the License, or (at your option) any later version.
+ * version 2.1 of the License, or (at your option) any later version.
  *
- * This library is distributed in the hope that it will be useful,
+ * FFmpeg is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
+ * License along with FFmpeg; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
 #include "avformat.h"
 #include "avcodec.h"
 #include "riff.h"
+#include "allformats.h" // for asf_muxer
 
 /* Note: when encoding, the first matching tag is used, so order is
    important if multiple tags possible for a given codec. */
-const CodecTag codec_bmp_tags[] = {
+const AVCodecTag codec_bmp_tags[] = {
     { CODEC_ID_H264, MKTAG('H', '2', '6', '4') },
     { CODEC_ID_H264, MKTAG('h', '2', '6', '4') },
     { CODEC_ID_H264, MKTAG('X', '2', '6', '4') },
@@ -40,10 +43,10 @@ const CodecTag codec_bmp_tags[] = {
     { CODEC_ID_H263P, MKTAG('U', '2', '6', '3') },
     { CODEC_ID_H263P, MKTAG('v', 'i', 'v', '1') },
 
-    { CODEC_ID_MPEG4, MKTAG('F', 'M', 'P', '4')},
-    { CODEC_ID_MPEG4, MKTAG('D', 'I', 'V', 'X'), .invalid_asf = 1 },
-    { CODEC_ID_MPEG4, MKTAG('D', 'X', '5', '0'), .invalid_asf = 1 },
-    { CODEC_ID_MPEG4, MKTAG('X', 'V', 'I', 'D'), .invalid_asf = 1 },
+    { CODEC_ID_MPEG4, MKTAG('F', 'M', 'P', '4') },
+    { CODEC_ID_MPEG4, MKTAG('D', 'I', 'V', 'X') },
+    { CODEC_ID_MPEG4, MKTAG('D', 'X', '5', '0') },
+    { CODEC_ID_MPEG4, MKTAG('X', 'V', 'I', 'D') },
     { CODEC_ID_MPEG4, MKTAG('M', 'P', '4', 'S') },
     { CODEC_ID_MPEG4, MKTAG('M', '4', 'S', '2') },
     { CODEC_ID_MPEG4, MKTAG(0x04, 0, 0, 0) }, /* some broken avi use this */
@@ -58,7 +61,7 @@ const CodecTag codec_bmp_tags[] = {
 
     { CODEC_ID_MPEG4, MKTAG('R', 'M', 'P', '4') },
 
-    { CODEC_ID_MSMPEG4V3, MKTAG('D', 'I', 'V', '3'), .invalid_asf = 1 }, /* default signature when using MSMPEG4 */
+    { CODEC_ID_MSMPEG4V3, MKTAG('D', 'I', 'V', '3') }, /* default signature when using MSMPEG4 */
     { CODEC_ID_MSMPEG4V3, MKTAG('M', 'P', '4', '3') },
 
     /* added based on MPlayer */
@@ -116,6 +119,8 @@ const CodecTag codec_bmp_tags[] = {
     { CODEC_ID_VP3, MKTAG('V', 'P', '3', '1') },
     { CODEC_ID_VP3, MKTAG('V', 'P', '3', '0') },
     { CODEC_ID_VP5, MKTAG('V', 'P', '5', '0') },
+    { CODEC_ID_VP6, MKTAG('V', 'P', '6', '0') },
+    { CODEC_ID_VP6, MKTAG('V', 'P', '6', '1') },
     { CODEC_ID_VP6, MKTAG('V', 'P', '6', '2') },
     { CODEC_ID_ASV1, MKTAG('A', 'S', 'V', '1') },
     { CODEC_ID_ASV2, MKTAG('A', 'S', 'V', '2') },
@@ -164,7 +169,7 @@ const CodecTag codec_bmp_tags[] = {
     { CODEC_ID_NONE, 0 },
 };
 
-const CodecTag codec_wav_tags[] = {
+const AVCodecTag codec_wav_tags[] = {
     { CODEC_ID_MP2, 0x50 },
     { CODEC_ID_MP3, 0x55 },
     { CODEC_ID_AC3, 0x2000 },
@@ -184,21 +189,25 @@ const CodecTag codec_wav_tags[] = {
     { CODEC_ID_WMAV1, 0x160 },
     { CODEC_ID_WMAV2, 0x161 },
     { CODEC_ID_AAC, 0x706d },
-    { CODEC_ID_MPEG4AAC, 0xff },
+    { CODEC_ID_AAC, 0xff },
     { CODEC_ID_VORBIS, ('V'<<8)+'o' }, //HACK/FIXME, does vorbis in WAV/AVI have an (in)official id?
     { CODEC_ID_SONIC, 0x2048 },
     { CODEC_ID_SONIC_LS, 0x2048 },
     { CODEC_ID_ADPCM_CT, 0x200 },
     { CODEC_ID_ADPCM_SWF, ('S'<<8)+'F' },
     { CODEC_ID_TRUESPEECH, 0x22 },
+    { CODEC_ID_FLAC, 0xF1AC },
+    { CODEC_ID_IMC, 0x401 },
 
+    /* FIXME: All of the IDs below are not 16 bit and thus illegal. */
     // for NuppelVideo (nuv.c)
     { CODEC_ID_PCM_S16LE, MKTAG('R', 'A', 'W', 'A') },
     { CODEC_ID_MP3, MKTAG('L', 'A', 'M', 'E') },
+    { CODEC_ID_MP3, MKTAG('M', 'P', '3', ' ') },
     { 0, 0 },
 };
 
-unsigned int codec_get_tag(const CodecTag *tags, int id)
+unsigned int codec_get_tag(const AVCodecTag *tags, int id)
 {
     while (tags->id != CODEC_ID_NONE) {
         if (tags->id == id)
@@ -208,17 +217,7 @@ unsigned int codec_get_tag(const CodecTag *tags, int id)
     return 0;
 }
 
-unsigned int codec_get_asf_tag(const CodecTag *tags, unsigned int id)
-{
-    while (tags->id != CODEC_ID_NONE) {
-        if (!tags->invalid_asf && tags->id == id)
-            return tags->tag;
-        tags++;
-    }
-    return 0;
-}
-
-enum CodecID codec_get_id(const CodecTag *tags, unsigned int tag)
+enum CodecID codec_get_id(const AVCodecTag *tags, unsigned int tag)
 {
     while (tags->id != CODEC_ID_NONE) {
         if(   toupper((tag >> 0)&0xFF) == toupper((tags->tag >> 0)&0xFF)
@@ -227,6 +226,26 @@ enum CodecID codec_get_id(const CodecTag *tags, unsigned int tag)
            && toupper((tag >>24)&0xFF) == toupper((tags->tag >>24)&0xFF))
             return tags->id;
         tags++;
+    }
+    return CODEC_ID_NONE;
+}
+
+unsigned int av_codec_get_tag(const AVCodecTag *tags[4], enum CodecID id)
+{
+    int i;
+    for(i=0; tags && tags[i]; i++){
+        int tag= codec_get_tag(tags[i], id);
+        if(tag) return tag;
+    }
+    return 0;
+}
+
+enum CodecID av_codec_get_id(const AVCodecTag *tags[4], unsigned int tag)
+{
+    int i;
+    for(i=0; tags && tags[i]; i++){
+        enum CodecID id= codec_get_id(tags[i], tag);
+        if(id!=CODEC_ID_NONE) return id;
     }
     return CODEC_ID_NONE;
 }
@@ -277,8 +296,6 @@ int put_wav_header(ByteIOContext *pb, AVCodecContext *enc)
     int hdrsize = 18;
 
     if(!enc->codec_tag || enc->codec_tag > 0xffff)
-       enc->codec_tag = codec_get_tag(codec_wav_tags, enc->codec_id);
-    if(!enc->codec_tag)
         return -1;
 
     put_le16(pb, enc->codec_tag);
@@ -359,7 +376,7 @@ int put_wav_header(ByteIOContext *pb, AVCodecContext *enc)
 }
 
 /* BITMAPINFOHEADER header */
-void put_bmp_header(ByteIOContext *pb, AVCodecContext *enc, const CodecTag *tags, int for_asf)
+void put_bmp_header(ByteIOContext *pb, AVCodecContext *enc, const AVCodecTag *tags, int for_asf)
 {
     put_le32(pb, 40 + enc->extradata_size); /* size */
     put_le32(pb, enc->width);
@@ -368,7 +385,7 @@ void put_bmp_header(ByteIOContext *pb, AVCodecContext *enc, const CodecTag *tags
 
     put_le16(pb, enc->bits_per_sample ? enc->bits_per_sample : 24); /* depth */
     /* compression type */
-    put_le32(pb, for_asf ? (enc->codec_tag ? enc->codec_tag : codec_get_asf_tag(tags, enc->codec_id)) : enc->codec_tag); //
+    put_le32(pb, enc->codec_tag);
     put_le32(pb, enc->width * enc->height * 3);
     put_le32(pb, 0);
     put_le32(pb, 0);

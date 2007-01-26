@@ -2,18 +2,20 @@
  * Chinese AVS video (AVS1-P2, JiZhun profile) decoder.
  * Copyright (c) 2006  Stefan Gehrer <stefan.gehrer@gmx.de>
  *
- * This library is free software; you can redistribute it and/or
+ * This file is part of FFmpeg.
+ *
+ * FFmpeg is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
- * version 2 of the License, or (at your option) any later version.
+ * version 2.1 of the License, or (at your option) any later version.
  *
- * This library is distributed in the hope that it will be useful,
+ * FFmpeg is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
+ * License along with FFmpeg; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
@@ -129,6 +131,7 @@ enum mv_loc_t {
   MV_BWD_X3
 };
 
+#ifdef CONFIG_CAVS_DECODER
 static const uint8_t partition_flags[30] = {
   0,                                 //I_8X8
   0,                                 //P_SKIP
@@ -637,3 +640,4 @@ static const int_fast8_t left_modifier_l[8] = { 0,-1, 6,-1,-1, 7, 6, 7};
 static const int_fast8_t top_modifier_l[8]  = {-1, 1, 5,-1,-1, 5, 7, 7};
 static const int_fast8_t left_modifier_c[7] = { 5,-1, 2,-1, 6, 5, 6};
 static const int_fast8_t top_modifier_c[7]  = { 4, 1,-1,-1, 4, 6, 6};
+#endif /* CONFIG_CAVS_DECODER */

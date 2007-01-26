@@ -2,18 +2,20 @@
  * VC-1 and WMV3 decoder - DSP functions AltiVec-optimized
  * Copyright (c) 2006 Konstantin Shishkov
  *
- * This library is free software; you can redistribute it and/or
+ * This file is part of FFmpeg.
+ *
+ * FFmpeg is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
- * version 2 of the License, or (at your option) any later version.
+ * version 2.1 of the License, or (at your option) any later version.
  *
- * This library is distributed in the hope that it will be useful,
+ * FFmpeg is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
+ * License along with FFmpeg; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  *
  */
@@ -23,40 +25,6 @@
 #include "gcc_fixes.h"
 
 #include "dsputil_altivec.h"
-
-// Transpose 8x8 matrix of 16-bit elements. Borrowed from mpegvideo_altivec.c
-#define TRANSPOSE8(a,b,c,d,e,f,g,h) \
-do { \
-    vector signed short A1, B1, C1, D1, E1, F1, G1, H1; \
-    vector signed short A2, B2, C2, D2, E2, F2, G2, H2; \
- \
-    A1 = vec_mergeh (a, e); \
-    B1 = vec_mergel (a, e); \
-    C1 = vec_mergeh (b, f); \
-    D1 = vec_mergel (b, f); \
-    E1 = vec_mergeh (c, g); \
-    F1 = vec_mergel (c, g); \
-    G1 = vec_mergeh (d, h); \
-    H1 = vec_mergel (d, h); \
- \
-    A2 = vec_mergeh (A1, E1); \
-    B2 = vec_mergel (A1, E1); \
-    C2 = vec_mergeh (B1, F1); \
-    D2 = vec_mergel (B1, F1); \
-    E2 = vec_mergeh (C1, G1); \
-    F2 = vec_mergel (C1, G1); \
-    G2 = vec_mergeh (D1, H1); \
-    H2 = vec_mergel (D1, H1); \
- \
-    a = vec_mergeh (A2, E2); \
-    b = vec_mergel (A2, E2); \
-    c = vec_mergeh (B2, F2); \
-    d = vec_mergel (B2, F2); \
-    e = vec_mergeh (C2, G2); \
-    f = vec_mergel (C2, G2); \
-    g = vec_mergeh (D2, H2); \
-    h = vec_mergel (D2, H2); \
-} while (0)
 
 // main steps of 8x8 transform
 #define STEP8(s0, s1, s2, s3, s4, s5, s6, s7, vec_rnd) \

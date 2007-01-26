@@ -233,7 +233,7 @@ int NuppelDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
         ffmpeg_extradatasize = frameheader.packetlength;
         if (ffmpeg_extradatasize > 0)
         {
-            ffmpeg_extradata = new char[ffmpeg_extradatasize];
+            ffmpeg_extradata = new uint8_t[ffmpeg_extradatasize];
             if (frameheader.packetlength != ringBuffer->Read(ffmpeg_extradata,
                                                      frameheader.packetlength))
             {

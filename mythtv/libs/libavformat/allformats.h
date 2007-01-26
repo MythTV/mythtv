@@ -2,18 +2,20 @@
  * Register all the formats and protocols.
  * copyright (c) 2000, 2001, 2002 Fabrice Bellard
  *
- * This library is free software; you can redistribute it and/or
+ * This file is part of FFmpeg.
+ *
+ * FFmpeg is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
- * version 2 of the License, or (at your option) any later version.
+ * version 2.1 of the License, or (at your option) any later version.
  *
- * This library is distributed in the hope that it will be useful,
+ * FFmpeg is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
+ * License along with FFmpeg; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
@@ -41,6 +43,7 @@ extern AVOutputFormat crc_muxer;
 extern AVOutputFormat framecrc_muxer;
 extern AVInputFormat daud_demuxer;
 extern AVInputFormat dc1394_demuxer;
+extern AVInputFormat dsicin_demuxer;
 extern AVInputFormat dv1394_demuxer;
 extern AVInputFormat dv_demuxer;
 extern AVOutputFormat dv_muxer;
@@ -79,6 +82,7 @@ extern AVOutputFormat tg2_muxer;
 extern AVInputFormat mp3_demuxer;
 extern AVOutputFormat mp2_muxer;
 extern AVOutputFormat mp3_muxer;
+extern AVInputFormat mpc_demuxer;
 extern AVOutputFormat mpeg1system_muxer;
 extern AVOutputFormat mpeg1vcd_muxer;
 extern AVOutputFormat mpeg2vob_muxer;
@@ -88,6 +92,7 @@ extern AVInputFormat mpegps_demuxer;
 extern AVInputFormat mpegts_demuxer;
 extern AVOutputFormat mpegts_muxer;
 extern AVOutputFormat mpjpeg_muxer;
+extern AVInputFormat mtv_demuxer;
 extern AVInputFormat mxf_demuxer;
 extern AVInputFormat nsv_demuxer;
 extern AVInputFormat nut_demuxer;
@@ -158,6 +163,8 @@ extern AVInputFormat wsvqa_demuxer;
 extern AVInputFormat wv_demuxer;
 extern AVOutputFormat yuv4mpegpipe_muxer;
 extern AVInputFormat yuv4mpegpipe_demuxer;
+extern AVInputFormat tiertexseq_demuxer;
+extern AVInputFormat x11_grab_device_demuxer;
 
 /* raw.c */
 int pcm_read_seek(AVFormatContext *s,
@@ -165,21 +172,7 @@ int pcm_read_seek(AVFormatContext *s,
 
 /* rtsp.c */
 int redir_open(AVFormatContext **ic_ptr, ByteIOContext *f);
-
-#if 0
-extern AVImageFormat pnm_image_format;
-extern AVImageFormat pbm_image_format;
-extern AVImageFormat pgm_image_format;
-extern AVImageFormat ppm_image_format;
-extern AVImageFormat pam_image_format;
-extern AVImageFormat pgmyuv_image_format;
-extern AVImageFormat yuv_image_format;
-#ifdef CONFIG_ZLIB
-extern AVImageFormat png_image_format;
-#endif
-extern AVImageFormat jpeg_image_format;
-#endif
-extern AVImageFormat gif_image_format;
-//extern AVImageFormat sgi_image_format; //broken in itself
+/* rtp.c */
+void av_register_rtp_dynamic_payload_handlers();
 
 #endif

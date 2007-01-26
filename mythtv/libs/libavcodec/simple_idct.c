@@ -3,18 +3,20 @@
  *
  * Copyright (c) 2001 Michael Niedermayer <michaelni@gmx.at>
  *
- * This library is free software; you can redistribute it and/or
+ * This file is part of FFmpeg.
+ *
+ * FFmpeg is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
- * version 2 of the License, or (at your option) any later version.
+ * version 2.1 of the License, or (at your option) any later version.
  *
- * This library is distributed in the hope that it will be useful,
+ * FFmpeg is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
+ * License along with FFmpeg; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
@@ -182,7 +184,7 @@ static inline void idctSparseColPut (uint8_t *dest, int line_size,
                                      DCTELEM * col)
 {
         int a0, a1, a2, a3, b0, b1, b2, b3;
-        uint8_t *cm = cropTbl + MAX_NEG_CROP;
+        uint8_t *cm = ff_cropTbl + MAX_NEG_CROP;
 
         /* XXX: I did that only to give same values as previous code */
         a0 = W4 * (col[8*0] + ((1<<(COL_SHIFT-1))/W4));
@@ -254,7 +256,7 @@ static inline void idctSparseColAdd (uint8_t *dest, int line_size,
                                      DCTELEM * col)
 {
         int a0, a1, a2, a3, b0, b1, b2, b3;
-        uint8_t *cm = cropTbl + MAX_NEG_CROP;
+        uint8_t *cm = ff_cropTbl + MAX_NEG_CROP;
 
         /* XXX: I did that only to give same values as previous code */
         a0 = W4 * (col[8*0] + ((1<<(COL_SHIFT-1))/W4));
@@ -429,7 +431,7 @@ void simple_idct(DCTELEM *block)
 static inline void idct4col(uint8_t *dest, int line_size, const DCTELEM *col)
 {
     int c0, c1, c2, c3, a0, a1, a2, a3;
-    const uint8_t *cm = cropTbl + MAX_NEG_CROP;
+    const uint8_t *cm = ff_cropTbl + MAX_NEG_CROP;
 
     a0 = col[8*0];
     a1 = col[8*2];
@@ -509,7 +511,7 @@ void simple_idct248_put(uint8_t *dest, int line_size, DCTELEM *block)
 static inline void idct4col_add(uint8_t *dest, int line_size, const DCTELEM *col)
 {
     int c0, c1, c2, c3, a0, a1, a2, a3;
-    const uint8_t *cm = cropTbl + MAX_NEG_CROP;
+    const uint8_t *cm = ff_cropTbl + MAX_NEG_CROP;
 
     a0 = col[8*0];
     a1 = col[8*1];
@@ -537,7 +539,7 @@ static inline void idct4col_add(uint8_t *dest, int line_size, const DCTELEM *col
 static inline void idct4row(DCTELEM *row)
 {
     int c0, c1, c2, c3, a0, a1, a2, a3;
-    //const uint8_t *cm = cropTbl + MAX_NEG_CROP;
+    //const uint8_t *cm = ff_cropTbl + MAX_NEG_CROP;
 
     a0 = row[0];
     a1 = row[1];

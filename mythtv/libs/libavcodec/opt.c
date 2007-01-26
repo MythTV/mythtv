@@ -2,18 +2,20 @@
  * AVOptions
  * Copyright (c) 2005 Michael Niedermayer <michaelni@gmx.at>
  *
- * This library is free software; you can redistribute it and/or
+ * This file is part of FFmpeg.
+ *
+ * FFmpeg is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
- * version 2 of the License, or (at your option) any later version.
+ * version 2.1 of the License, or (at your option) any later version.
  *
- * This library is distributed in the hope that it will be useful,
+ * FFmpeg is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
+ * License along with FFmpeg; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  *
  */
@@ -26,79 +28,12 @@
 
 #include "avcodec.h"
 #include "opt.h"
-
-static int8_t si_prefixes['z' - 'E' + 1]={
-    ['y'-'E']= -24,
-    ['z'-'E']= -21,
-    ['a'-'E']= -18,
-    ['f'-'E']= -15,
-    ['p'-'E']= -12,
-    ['n'-'E']= - 9,
-    ['u'-'E']= - 6,
-    ['m'-'E']= - 3,
-    ['c'-'E']= - 2,
-    ['d'-'E']= - 1,
-    ['h'-'E']=   2,
-    ['k'-'E']=   3,
-    ['K'-'E']=   3,
-    ['M'-'E']=   6,
-    ['G'-'E']=   9,
-    ['T'-'E']=  12,
-    ['P'-'E']=  15,
-    ['E'-'E']=  18,
-    ['Z'-'E']=  21,
-    ['Y'-'E']=  24,
-};
-
-/** strtod() function extended with 'k', 'M', 'G', 'ki', 'Mi', 'Gi' and 'B'
- * postfixes.  This allows using f.e. kB, MiB, G and B as a postfix. This
- * function assumes that the unit of numbers is bits not bytes.
- */
-double av_strtod(const char *name, char **tail) {
-    double d;
-    int p = 0;
-    char *next;
-    d = strtod(name, &next);
-    /* if parsing succeeded, check for and interpret postfixes */
-    if (next!=name) {
-
-        if(*next >= 'E' && *next <= 'z'){
-            int e= si_prefixes[*next - 'E'];
-            if(e){
-                if(next[1] == 'i'){
-                    d*= pow( 2, e/0.3);
-                    next+=2;
-                }else{
-                    d*= pow(10, e);
-                    next++;
-                }
-            }
-        }
-
-        if(*next=='B') {
-            d*=8;
-            *next++;
-        }
-    }
-    /* if requested, fill in tail with the position after the last parsed
-       character */
-    if (tail)
-        *tail = next;
-    return d;
-}
-
-static double av_parse_num(const char *name, char **tail){
-    double d;
-    d= av_strtod(name, tail);
-    if(*tail>name && (**tail=='/' || **tail==':'))
-        d/=av_strtod((*tail)+1, tail);
-    return d;
-}
+#include "eval.h"
 
 //FIXME order them and do a bin search
-static AVOption *find_opt(void *v, const char *name, const char *unit){
+static const AVOption *find_opt(void *v, const char *name, const char *unit){
     AVClass *c= *(AVClass**)v; //FIXME silly way of storing AVClass
-    AVOption *o= c->option;
+    const AVOption *o= c->option;
 
     for(;o && o->name; o++){
         if(!strcmp(o->name, name) && (!unit || !strcmp(o->unit, unit)) )
@@ -107,14 +42,14 @@ static AVOption *find_opt(void *v, const char *name, const char *unit){
     return NULL;
 }
 
-AVOption *av_next_option(void *obj, AVOption *last){
+const AVOption *av_next_option(void *obj, const AVOption *last){
     if(last && last[1].name) return ++last;
     else if(last)            return NULL;
     else                     return (*(AVClass**)obj)->option;
 }
 
-static AVOption *av_set_number(void *obj, const char *name, double num, int den, int64_t intnum){
-    AVOption *o= find_opt(obj, name, NULL);
+static const AVOption *av_set_number(void *obj, const char *name, double num, int den, int64_t intnum){
+    const AVOption *o= find_opt(obj, name, NULL);
     void *dst;
     if(!o || o->offset<=0)
         return NULL;
@@ -141,10 +76,10 @@ static AVOption *av_set_number(void *obj, const char *name, double num, int den,
     return o;
 }
 
-static AVOption *set_all_opt(void *v, const char *unit, double d){
+static const AVOption *set_all_opt(void *v, const char *unit, double d){
     AVClass *c= *(AVClass**)v; //FIXME silly way of storing AVClass
-    AVOption *o= c->option;
-    AVOption *ret=NULL;
+    const AVOption *o= c->option;
+    const AVOption *ret=NULL;
 
     for(;o && o->name; o++){
         if(o->type != FF_OPT_TYPE_CONST && o->unit && !strcmp(o->unit, unit)){
@@ -159,9 +94,22 @@ static AVOption *set_all_opt(void *v, const char *unit, double d){
     return ret;
 }
 
-//FIXME use eval.c maybe?
-AVOption *av_set_string(void *obj, const char *name, const char *val){
-    AVOption *o= find_opt(obj, name, NULL);
+static double const_values[]={
+    M_PI,
+    M_E,
+    FF_QP2LAMBDA,
+    0
+};
+
+static const char *const_names[]={
+    "PI",
+    "E",
+    "QP2LAMBDA",
+    0
+};
+
+const AVOption *av_set_string(void *obj, const char *name, const char *val){
+    const AVOption *o= find_opt(obj, name, NULL);
     if(o && o->offset==0 && o->type == FF_OPT_TYPE_CONST && o->unit){
         return set_all_opt(obj, o->unit, o->default_val);
     }
@@ -170,9 +118,10 @@ AVOption *av_set_string(void *obj, const char *name, const char *val){
     if(o->type != FF_OPT_TYPE_STRING){
         for(;;){
             int i;
-            char buf[256], *tail;
+            char buf[256];
             int cmd=0;
             double d;
+            char *error = NULL;
 
             if(*val == '+' || *val == '-')
                 cmd= *(val++);
@@ -182,15 +131,19 @@ AVOption *av_set_string(void *obj, const char *name, const char *val){
             buf[i]=0;
             val+= i;
 
-            d= av_parse_num(buf, &tail);
-            if(tail <= buf){
-                AVOption *o_named= find_opt(obj, buf, o->unit);
+            d = ff_eval2(buf, const_values, const_names, NULL, NULL, NULL, NULL, NULL, &error);
+            if(isnan(d)) {
+                const AVOption *o_named= find_opt(obj, buf, o->unit);
                 if(o_named && o_named->type == FF_OPT_TYPE_CONST)
                     d= o_named->default_val;
                 else if(!strcmp(buf, "default")) d= o->default_val;
                 else if(!strcmp(buf, "max"    )) d= o->max;
                 else if(!strcmp(buf, "min"    )) d= o->min;
-                else return NULL;
+                else {
+                    if (!error)
+                        av_log(NULL, AV_LOG_ERROR, "Unable to parse option value \"%s\": %s\n", val, error);
+                    return NULL;
+                }
             }
             if(o->type == FF_OPT_TYPE_FLAGS){
                 if     (cmd=='+') d= av_get_int(obj, name, NULL) | (int64_t)d;
@@ -209,15 +162,15 @@ AVOption *av_set_string(void *obj, const char *name, const char *val){
     return o;
 }
 
-AVOption *av_set_double(void *obj, const char *name, double n){
+const AVOption *av_set_double(void *obj, const char *name, double n){
     return av_set_number(obj, name, n, 1, 1);
 }
 
-AVOption *av_set_q(void *obj, const char *name, AVRational n){
+const AVOption *av_set_q(void *obj, const char *name, AVRational n){
     return av_set_number(obj, name, n.num, n.den, 1);
 }
 
-AVOption *av_set_int(void *obj, const char *name, int64_t n){
+const AVOption *av_set_int(void *obj, const char *name, int64_t n){
     return av_set_number(obj, name, 1, 1, n);
 }
 
@@ -226,8 +179,8 @@ AVOption *av_set_int(void *obj, const char *name, int64_t n){
  * @param buf a buffer which is used for returning non string values as strings, can be NULL
  * @param buf_len allocated length in bytes of buf
  */
-const char *av_get_string(void *obj, const char *name, AVOption **o_out, char *buf, int buf_len){
-    AVOption *o= find_opt(obj, name, NULL);
+const char *av_get_string(void *obj, const char *name, const AVOption **o_out, char *buf, int buf_len){
+    const AVOption *o= find_opt(obj, name, NULL);
     void *dst;
     if(!o || o->offset<=0)
         return NULL;
@@ -252,8 +205,8 @@ const char *av_get_string(void *obj, const char *name, AVOption **o_out, char *b
     return buf;
 }
 
-static int av_get_number(void *obj, const char *name, AVOption **o_out, double *num, int *den, int64_t *intnum){
-    AVOption *o= find_opt(obj, name, NULL);
+static int av_get_number(void *obj, const char *name, const AVOption **o_out, double *num, int *den, int64_t *intnum){
+    const AVOption *o= find_opt(obj, name, NULL);
     void *dst;
     if(!o || o->offset<=0)
         goto error;
@@ -277,7 +230,7 @@ error:
     return -1;
 }
 
-double av_get_double(void *obj, const char *name, AVOption **o_out){
+double av_get_double(void *obj, const char *name, const AVOption **o_out){
     int64_t intnum=1;
     double num=1;
     int den=1;
@@ -286,7 +239,7 @@ double av_get_double(void *obj, const char *name, AVOption **o_out){
     return num*intnum/den;
 }
 
-AVRational av_get_q(void *obj, const char *name, AVOption **o_out){
+AVRational av_get_q(void *obj, const char *name, const AVOption **o_out){
     int64_t intnum=1;
     double num=1;
     int den=1;
@@ -298,7 +251,7 @@ AVRational av_get_q(void *obj, const char *name, AVOption **o_out){
         return av_d2q(num*intnum/den, 1<<24);
 }
 
-int64_t av_get_int(void *obj, const char *name, AVOption **o_out){
+int64_t av_get_int(void *obj, const char *name, const AVOption **o_out){
     int64_t intnum=1;
     double num=1;
     int den=1;
@@ -307,19 +260,28 @@ int64_t av_get_int(void *obj, const char *name, AVOption **o_out){
     return num*intnum/den;
 }
 
-int av_opt_show(void *obj, void *av_log_obj){
-    AVOption *opt=NULL;
-
-    if(!obj)
-        return -1;
-
-    av_log(av_log_obj, AV_LOG_INFO, "%s AVOptions:\n", (*(AVClass**)obj)->class_name);
+static void opt_list(void *obj, void *av_log_obj, const char *unit)
+{
+    const AVOption *opt=NULL;
 
     while((opt= av_next_option(obj, opt))){
         if(!(opt->flags & (AV_OPT_FLAG_ENCODING_PARAM|AV_OPT_FLAG_DECODING_PARAM)))
             continue;
 
-        av_log(av_log_obj, AV_LOG_INFO, "-%-17s ", opt->name);
+        /* Don't print CONST's on level one.
+         * Don't print anything but CONST's on level two.
+         * Only print items from the requested unit.
+         */
+        if (!unit && opt->type==FF_OPT_TYPE_CONST)
+            continue;
+        else if (unit && opt->type!=FF_OPT_TYPE_CONST)
+            continue;
+        else if (unit && opt->type==FF_OPT_TYPE_CONST && strcmp(unit, opt->unit))
+            continue;
+        else if (unit && opt->type == FF_OPT_TYPE_CONST)
+            av_log(av_log_obj, AV_LOG_INFO, "   %-15s ", opt->name);
+        else
+            av_log(av_log_obj, AV_LOG_INFO, "-%-17s ", opt->name);
 
         switch( opt->type )
         {
@@ -358,7 +320,20 @@ int av_opt_show(void *obj, void *av_log_obj){
         if(opt->help)
             av_log(av_log_obj, AV_LOG_INFO, " %s", opt->help);
         av_log(av_log_obj, AV_LOG_INFO, "\n");
+        if (opt->unit && opt->type != FF_OPT_TYPE_CONST) {
+            opt_list(obj, av_log_obj, opt->unit);
+        }
     }
+}
+
+int av_opt_show(void *obj, void *av_log_obj){
+    if(!obj)
+        return -1;
+
+    av_log(av_log_obj, AV_LOG_INFO, "%s AVOptions:\n", (*(AVClass**)obj)->class_name);
+
+    opt_list(obj, av_log_obj, NULL);
+
     return 0;
 }
 
@@ -370,7 +345,7 @@ int av_opt_show(void *obj, void *av_log_obj){
  */
 void av_opt_set_defaults(void *s)
 {
-    AVOption *opt = NULL;
+    const AVOption *opt = NULL;
     while ((opt = av_next_option(s, opt)) != NULL) {
         switch(opt->type) {
             case FF_OPT_TYPE_CONST:

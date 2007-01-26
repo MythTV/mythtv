@@ -2,18 +2,20 @@
  * QuickDraw (qdrw) codec
  * Copyright (c) 2004 Konstantin Shishkov
  *
- * This library is free software; you can redistribute it and/or
+ * This file is part of FFmpeg.
+ *
+ * FFmpeg is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
- * version 2 of the License, or (at your option) any later version.
+ * version 2.1 of the License, or (at your option) any later version.
  *
- * This library is distributed in the hope that it will be useful,
+ * FFmpeg is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
+ * License along with FFmpeg; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  *
  */
@@ -56,7 +58,7 @@ static int decode_frame(AVCodecContext *avctx,
     outdata = a->pic.data[0];
 
     buf += 0x68; /* jump to palette */
-    colors = BE_32(buf);
+    colors = AV_RB32(buf);
     buf += 4;
 
     if(colors < 0 || colors > 256) {
@@ -66,7 +68,7 @@ static int decode_frame(AVCodecContext *avctx,
 
     for (i = 0; i <= colors; i++) {
         unsigned int idx;
-        idx = BE_16(buf); /* color index */
+        idx = AV_RB16(buf); /* color index */
         buf += 2;
 
         if (idx > 255) {
@@ -91,7 +93,7 @@ static int decode_frame(AVCodecContext *avctx,
 
         /* decode line */
         out = outdata;
-        size = BE_16(buf); /* size of packed line */
+        size = AV_RB16(buf); /* size of packed line */
         buf += 2;
         left = size;
         next = buf + size;
@@ -136,7 +138,7 @@ static int decode_frame(AVCodecContext *avctx,
 static int decode_init(AVCodecContext *avctx){
 //    QdrawContext * const a = avctx->priv_data;
 
-    if (avcodec_check_dimensions(avctx, avctx->height, avctx->width) < 0) {
+    if (avcodec_check_dimensions(avctx, avctx->width, avctx->height) < 0) {
         return 1;
     }
 

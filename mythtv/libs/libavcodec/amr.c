@@ -2,18 +2,20 @@
  * AMR Audio decoder stub
  * Copyright (c) 2003 the ffmpeg project
  *
- * This library is free software; you can redistribute it and/or
+ * This file is part of FFmpeg.
+ *
+ * FFmpeg is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
- * version 2 of the License, or (at your option) any later version.
+ * version 2.1 of the License, or (at your option) any later version.
  *
- * This library is distributed in the hope that it will be useful,
+ * FFmpeg is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
+ * License along with FFmpeg; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
  /*
@@ -107,6 +109,23 @@ static enum Mode getBitrateMode(int bitrate)
     return(MR122);
 }
 
+static void amr_decode_fix_avctx(AVCodecContext * avctx)
+{
+    const int is_amr_wb = 1 + (avctx->codec_id == CODEC_ID_AMR_WB);
+
+    if(avctx->sample_rate == 0)
+    {
+        avctx->sample_rate = 8000 * is_amr_wb;
+    }
+
+    if(avctx->channels == 0)
+    {
+        avctx->channels = 1;
+    }
+
+    avctx->frame_size = 160 * is_amr_wb;
+}
+
 #ifdef CONFIG_AMR_NB_FIXED
 /* fixed point version*/
 /* frame size in serial bitstream file (frame type + serial stream + flags) */
@@ -143,6 +162,15 @@ static int amr_nb_decode_init(AVCodecContext * avctx)
         av_log(avctx, AV_LOG_ERROR, "Speech_Decode_Frame_init error\n");
         return -1;
     }
+
+    amr_decode_fix_avctx(avctx);
+
+    if(avctx->channels > 1)
+    {
+        av_log(avctx, AV_LOG_ERROR, "amr_nb: multichannel decoding not supported\n");
+        return -1;
+    }
+
     return 0;
 }
 
@@ -158,19 +186,13 @@ static int amr_nb_encode_init(AVCodecContext * avctx)
 
     if(avctx->sample_rate!=8000)
     {
-        if(avctx->debug)
-        {
-            av_log(avctx, AV_LOG_DEBUG, "Only 8000Hz sample rate supported\n");
-        }
+        av_log(avctx, AV_LOG_ERROR, "Only 8000Hz sample rate supported\n");
         return -1;
     }
 
     if(avctx->channels!=1)
     {
-        if(avctx->debug)
-        {
-            av_log(avctx, AV_LOG_DEBUG, "Only mono supported\n");
-        }
+        av_log(avctx, AV_LOG_ERROR, "Only mono supported\n");
         return -1;
     }
 
@@ -179,10 +201,7 @@ static int amr_nb_encode_init(AVCodecContext * avctx)
 
     if(Speech_Encode_Frame_init(&s->enstate, 0, "encoder") || sid_sync_init (&s->sidstate))
     {
-        if(avctx->debug)
-        {
-            av_log(avctx, AV_LOG_DEBUG, "Speech_Encode_Frame_init error\n");
-        }
+        av_log(avctx, AV_LOG_ERROR, "Speech_Encode_Frame_init error\n");
         return -1;
     }
 
@@ -345,6 +364,15 @@ static int amr_nb_decode_init(AVCodecContext * avctx)
         av_log(avctx, AV_LOG_ERROR, "Decoder_Interface_init error\r\n");
         return -1;
     }
+
+    amr_decode_fix_avctx(avctx);
+
+    if(avctx->channels > 1)
+    {
+        av_log(avctx, AV_LOG_ERROR, "amr_nb: multichannel decoding not supported\n");
+        return -1;
+    }
+
     return 0;
 }
 
@@ -355,19 +383,13 @@ static int amr_nb_encode_init(AVCodecContext * avctx)
 
     if(avctx->sample_rate!=8000)
     {
-        if(avctx->debug)
-        {
-            av_log(avctx, AV_LOG_DEBUG, "Only 8000Hz sample rate supported\n");
-        }
+        av_log(avctx, AV_LOG_ERROR, "Only 8000Hz sample rate supported\n");
         return -1;
     }
 
     if(avctx->channels!=1)
     {
-        if(avctx->debug)
-        {
-            av_log(avctx, AV_LOG_DEBUG, "Only mono supported\n");
-        }
+        av_log(avctx, AV_LOG_ERROR, "Only mono supported\n");
         return -1;
     }
 
@@ -377,10 +399,7 @@ static int amr_nb_encode_init(AVCodecContext * avctx)
     s->enstate=Encoder_Interface_init(0);
     if(!s->enstate)
     {
-        if(avctx->debug)
-        {
-            av_log(avctx, AV_LOG_DEBUG, "Encoder_Interface_init error\n");
-        }
+        av_log(avctx, AV_LOG_ERROR, "Encoder_Interface_init error\n");
         return -1;
     }
 
@@ -444,6 +463,8 @@ static int amr_nb_encode_frame(AVCodecContext *avctx,
 {
     AMRContext *s = (AMRContext*)avctx->priv_data;
     int written;
+
+    s->enc_bitrate=getBitrateMode(avctx->bit_rate);
 
     written = Encoder_Interface_Encode(s->enstate,
         s->enc_bitrate,
@@ -548,19 +569,13 @@ static int amr_wb_encode_init(AVCodecContext * avctx)
 
     if(avctx->sample_rate!=16000)
     {
-        if(avctx->debug)
-        {
-            av_log(avctx, AV_LOG_DEBUG, "Only 16000Hz sample rate supported\n");
-        }
+        av_log(avctx, AV_LOG_ERROR, "Only 16000Hz sample rate supported\n");
         return -1;
     }
 
     if(avctx->channels!=1)
     {
-        if(avctx->debug)
-        {
-            av_log(avctx, AV_LOG_DEBUG, "Only mono supported\n");
-        }
+        av_log(avctx, AV_LOG_ERROR, "Only mono supported\n");
         return -1;
     }
 
@@ -586,8 +601,11 @@ static int amr_wb_encode_close(AVCodecContext * avctx)
 static int amr_wb_encode_frame(AVCodecContext *avctx,
                             unsigned char *frame/*out*/, int buf_size, void *data/*in*/)
 {
-    AMRWBContext *s = (AMRWBContext*) avctx->priv_data;
-    int size = E_IF_encode(s->state, s->mode, data, frame, s->allow_dtx);
+    AMRWBContext *s;
+    int size;
+    s = (AMRWBContext*) avctx->priv_data;
+    s->mode=getWBBitrateMode(avctx->bit_rate);
+    size = E_IF_encode(s->state, s->mode, data, frame, s->allow_dtx);
     return size;
 }
 
@@ -596,6 +614,15 @@ static int amr_wb_decode_init(AVCodecContext * avctx)
     AMRWBContext *s = (AMRWBContext *)avctx->priv_data;
     s->frameCount=0;
     s->state = D_IF_init();
+
+    amr_decode_fix_avctx(avctx);
+
+    if(avctx->channels > 1)
+    {
+        av_log(avctx, AV_LOG_ERROR, "amr_wb: multichannel decoding not supported\n");
+        return -1;
+    }
+
     return 0;
 }
 

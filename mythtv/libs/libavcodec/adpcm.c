@@ -2,18 +2,20 @@
  * ADPCM codecs
  * Copyright (c) 2001-2003 The ffmpeg Project
  *
- * This library is free software; you can redistribute it and/or
+ * This file is part of FFmpeg.
+ *
+ * FFmpeg is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
- * version 2 of the License, or (at your option) any later version.
+ * version 2.1 of the License, or (at your option) any later version.
  *
- * This library is distributed in the hope that it will be useful,
+ * FFmpeg is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
+ * License along with FFmpeg; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 #include "avcodec.h"
@@ -1098,19 +1100,19 @@ static int adpcm_decode_frame(AVCodecContext *avctx,
         }
         break;
     case CODEC_ID_ADPCM_EA:
-        samples_in_chunk = LE_32(src);
+        samples_in_chunk = AV_RL32(src);
         if (samples_in_chunk >= ((buf_size - 12) * 2)) {
             src += buf_size;
             break;
         }
         src += 4;
-        current_left_sample = (int16_t)LE_16(src);
+        current_left_sample = (int16_t)AV_RL16(src);
         src += 2;
-        previous_left_sample = (int16_t)LE_16(src);
+        previous_left_sample = (int16_t)AV_RL16(src);
         src += 2;
-        current_right_sample = (int16_t)LE_16(src);
+        current_right_sample = (int16_t)AV_RL16(src);
         src += 2;
-        previous_right_sample = (int16_t)LE_16(src);
+        previous_right_sample = (int16_t)AV_RL16(src);
         src += 2;
 
         for (count1 = 0; count1 < samples_in_chunk/28;count1++) {

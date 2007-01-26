@@ -2,30 +2,26 @@
  * Buffered file io for ffmpeg system
  * Copyright (c) 2001 Fabrice Bellard
  *
- * This library is free software; you can redistribute it and/or
+ * This file is part of FFmpeg.
+ *
+ * FFmpeg is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
- * version 2 of the License, or (at your option) any later version.
+ * version 2.1 of the License, or (at your option) any later version.
  *
- * This library is distributed in the hope that it will be useful,
+ * FFmpeg is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
+ * License along with FFmpeg; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 #include "avformat.h"
 #include <fcntl.h>
-#ifndef __MINGW32__
 #include <unistd.h>
-#include <sys/ioctl.h>
 #include <sys/time.h>
-#else
-#include <io.h>
-#define open(fname,oflag,pmode) _open(fname,oflag,pmode)
-#endif /* __MINGW32__ */
 
 
 /* standard file protocol */
@@ -70,11 +66,7 @@ static int file_write(URLContext *h, unsigned char *buf, int size)
 static offset_t file_seek(URLContext *h, offset_t pos, int whence)
 {
     int fd = (size_t)h->priv_data;
-#if defined(__MINGW32__)
-    return _lseeki64(fd, pos, whence);
-#else
     return lseek(fd, pos, whence);
-#endif
 }
 
 static int file_close(URLContext *h)

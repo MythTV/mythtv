@@ -2,18 +2,20 @@
  * SGI image format
  * Todd Kirby <doubleshot@pacbell.net>
  *
- * This library is free software; you can redistribute it and/or
+ * This file is part of FFmpeg.
+ *
+ * FFmpeg is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
- * version 2 of the License, or (at your option) any later version.
+ * version 2.1 of the License, or (at your option) any later version.
  *
- * This library is distributed in the hope that it will be useful,
+ * FFmpeg is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
+ * License along with FFmpeg; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
@@ -48,7 +50,7 @@ typedef struct SGIInfo{
 static int sgi_probe(AVProbeData *pd)
 {
     /* test for sgi magic */
-    if (pd->buf_size >= 2 && BE_16(&pd->buf[0]) == SGI_MAGIC) {
+    if (pd->buf_size >= 2 && AV_RB16(&pd->buf[0]) == SGI_MAGIC) {
         return AVPROBE_SCORE_MAX;
     } else {
         return 0;
@@ -195,7 +197,7 @@ static int read_rle_sgi(const SGIInfo *sgi_info,
         for (y = 0; y < ysize; y++) {
             dest_row = pict->data[0] + (ysize - 1 - y) * (xsize * zsize);
 
-            start_offset = BE_32(&start_table[y + z * ysize]);
+            start_offset = AV_RB32(&start_table[y + z * ysize]);
 
             /* don't seek if already at the next rle start offset */
             if (url_ftell(f) != start_offset) {

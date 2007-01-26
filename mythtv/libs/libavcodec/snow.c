@@ -1,18 +1,20 @@
 /*
  * Copyright (C) 2004 Michael Niedermayer <michaelni@gmx.at>
  *
- * This library is free software; you can redistribute it and/or
+ * This file is part of FFmpeg.
+ *
+ * FFmpeg is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
- * version 2 of the License, or (at your option) any later version.
+ * version 2.1 of the License, or (at your option) any later version.
  *
- * This library is distributed in the hope that it will be useful,
+ * FFmpeg is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
+ * License along with FFmpeg; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
@@ -437,6 +439,7 @@ typedef struct SnowContext{
     int always_reset;
     int version;
     int spatial_decomposition_type;
+    int last_spatial_decomposition_type;
     int temporal_decomposition_type;
     int spatial_decomposition_count;
     int temporal_decomposition_count;
@@ -450,15 +453,19 @@ typedef struct SnowContext{
     int chroma_v_shift;
     int spatial_scalability;
     int qlog;
+    int last_qlog;
     int lambda;
     int lambda2;
     int pass1_rc;
     int mv_scale;
+    int last_mv_scale;
     int qbias;
+    int last_qbias;
 #define QBIAS_SHIFT 3
     int b_width;
     int b_height;
     int block_max_depth;
+    int last_block_max_depth;
     Plane plane[MAX_PLANES];
     BlockNode *block;
 #define ME_CACHE_SIZE 1024
@@ -588,7 +595,7 @@ static inline void put_symbol(RangeCoder *c, uint8_t *state, int v, int is_signe
     int i;
 
     if(v){
-        const int a= ABS(v);
+        const int a= FFABS(v);
         const int e= av_log2(a);
 #if 1
         const int el= FFMIN(e, 10);
@@ -707,7 +714,7 @@ static inline int get_symbol2(RangeCoder *c, uint8_t *state, int log2){
     return v;
 }
 
-static always_inline void lift(DWTELEM *dst, DWTELEM *src, DWTELEM *ref, int dst_step, int src_step, int ref_step, int width, int mul, int add, int shift, int highpass, int inverse){
+static av_always_inline void lift(DWTELEM *dst, DWTELEM *src, DWTELEM *ref, int dst_step, int src_step, int ref_step, int width, int mul, int add, int shift, int highpass, int inverse){
     const int mirror_left= !highpass;
     const int mirror_right= (width&1) ^ highpass;
     const int w= (width>>1) - 1 + (highpass & width);
@@ -730,7 +737,7 @@ static always_inline void lift(DWTELEM *dst, DWTELEM *src, DWTELEM *ref, int dst
 }
 
 #ifndef lift5
-static always_inline void lift5(DWTELEM *dst, DWTELEM *src, DWTELEM *ref, int dst_step, int src_step, int ref_step, int width, int mul, int add, int shift, int highpass, int inverse){
+static av_always_inline void lift5(DWTELEM *dst, DWTELEM *src, DWTELEM *ref, int dst_step, int src_step, int ref_step, int width, int mul, int add, int shift, int highpass, int inverse){
     const int mirror_left= !highpass;
     const int mirror_right= (width&1) ^ highpass;
     const int w= (width>>1) - 1 + (highpass & width);
@@ -762,7 +769,7 @@ static always_inline void lift5(DWTELEM *dst, DWTELEM *src, DWTELEM *ref, int ds
 #endif
 
 #ifndef liftS
-static always_inline void liftS(DWTELEM *dst, DWTELEM *src, DWTELEM *ref, int dst_step, int src_step, int ref_step, int width, int mul, int add, int shift, int highpass, int inverse){
+static av_always_inline void liftS(DWTELEM *dst, DWTELEM *src, DWTELEM *ref, int dst_step, int src_step, int ref_step, int width, int mul, int add, int shift, int highpass, int inverse){
     const int mirror_left= !highpass;
     const int mirror_right= (width&1) ^ highpass;
     const int w= (width>>1) - 1 + (highpass & width);
@@ -1664,7 +1671,7 @@ static int encode_subband_c0run(SnowContext *s, SubBand *b, DWTELEM *src, DWTELE
                         p= parent[px + py*2*stride];
                 }
                 if(/*ll|*/l|lt|t|rt|p){
-                    int context= av_log2(/*ABS(ll) + */3*ABS(l) + ABS(lt) + 2*ABS(t) + ABS(rt) + ABS(p));
+                    int context= av_log2(/*FFABS(ll) + */3*FFABS(l) + FFABS(lt) + 2*FFABS(t) + FFABS(rt) + FFABS(p));
 
                     put_rac(&s->c, &b->state[0][context], !!v);
                 }else{
@@ -1680,11 +1687,11 @@ static int encode_subband_c0run(SnowContext *s, SubBand *b, DWTELEM *src, DWTELE
                     }
                 }
                 if(v){
-                    int context= av_log2(/*ABS(ll) + */3*ABS(l) + ABS(lt) + 2*ABS(t) + ABS(rt) + ABS(p));
-                    int l2= 2*ABS(l) + (l<0);
-                    int t2= 2*ABS(t) + (t<0);
+                    int context= av_log2(/*FFABS(ll) + */3*FFABS(l) + FFABS(lt) + 2*FFABS(t) + FFABS(rt) + FFABS(p));
+                    int l2= 2*FFABS(l) + (l<0);
+                    int t2= 2*FFABS(t) + (t<0);
 
-                    put_symbol2(&s->c, b->state[context + 2], ABS(v)-1, context-4);
+                    put_symbol2(&s->c, b->state[context + 2], FFABS(v)-1, context-4);
                     put_rac(&s->c, &b->state[0][16 + 1 + 3 + quant3bA[l2&0xFF] + 3*quant3bA[t2&0xFF]], v<0);
                 }
             }
@@ -1747,7 +1754,7 @@ static inline void unpack_coeffs(SnowContext *s, SubBand *b, SubBand * parent, i
                     }
                 }
                 if(/*ll|*/l|lt|t|rt|p){
-                    int context= av_log2(/*ABS(ll) + */3*(l>>1) + (lt>>1) + (t&~1) + (rt>>1) + (p>>1));
+                    int context= av_log2(/*FFABS(ll) + */3*(l>>1) + (lt>>1) + (t&~1) + (rt>>1) + (p>>1));
 
                     v=get_rac(&s->c, &b->state[0][context]);
                     if(v){
@@ -1847,7 +1854,7 @@ static inline void decode_subband_slice_buffered(SnowContext *s, SubBand *b, sli
     return;
 }
 
-static void reset_contexts(SnowContext *s){
+static void reset_contexts(SnowContext *s){ //FIXME better initial contexts
     int plane_index, level, orientation;
 
     for(plane_index=0; plane_index<3; plane_index++){
@@ -1900,7 +1907,7 @@ static int pix_sum(uint8_t * pix, int line_size, int w)
 static int pix_norm1(uint8_t * pix, int line_size, int w)
 {
     int s, i, j;
-    uint32_t *sq = squareTbl + 256;
+    uint32_t *sq = ff_squareTbl + 256;
 
     s = 0;
     for (i = 0; i < w; i++) {
@@ -2014,8 +2021,8 @@ static int encode_q_branch(SnowContext *s, int level, int x, int y){
     const int shift= 1+qpel;
     MotionEstContext *c= &s->m.me;
     int ref_context= av_log2(2*left->ref) + av_log2(2*top->ref);
-    int mx_context= av_log2(2*ABS(left->mx - top->mx));
-    int my_context= av_log2(2*ABS(left->my - top->my));
+    int mx_context= av_log2(2*FFABS(left->mx - top->mx));
+    int my_context= av_log2(2*FFABS(left->my - top->my));
     int s_context= 2*left->level + 2*top->level + tl->level + tr->level;
     int ref, best_ref, ref_score, ref_mx, ref_my;
 
@@ -2044,10 +2051,10 @@ static int encode_q_branch(SnowContext *s, int level, int x, int y){
     s->m.mb_stride=2;
     s->m.mb_x=
     s->m.mb_y= 0;
-    s->m.me.skip= 0;
+    c->skip= 0;
 
-    assert(s->m.me.  stride ==   stride);
-    assert(s->m.me.uvstride == uvstride);
+    assert(c->  stride ==   stride);
+    assert(c->uvstride == uvstride);
 
     c->penalty_factor    = get_penalty_factor(s->lambda, s->lambda2, c->avctx->me_cmp);
     c->sub_penalty_factor= get_penalty_factor(s->lambda, s->lambda2, c->avctx->me_sub_cmp);
@@ -2091,7 +2098,7 @@ static int encode_q_branch(SnowContext *s, int level, int x, int y){
         assert(ref_my >= c->ymin);
         assert(ref_my <= c->ymax);
 
-        ref_score= s->m.me.sub_motion_search(&s->m, &ref_mx, &ref_my, ref_score, 0, 0, level-LOG2_MB_SIZE+4, block_w);
+        ref_score= c->sub_motion_search(&s->m, &ref_mx, &ref_my, ref_score, 0, 0, level-LOG2_MB_SIZE+4, block_w);
         ref_score= ff_get_mb_score(&s->m, ref_mx, ref_my, 0, 0, level-LOG2_MB_SIZE+4, block_w, 0);
         ref_score+= 2*av_log2(2*ref)*c->penalty_factor;
         if(s->ref_mvs[ref]){
@@ -2204,7 +2211,7 @@ static int encode_q_branch(SnowContext *s, int level, int x, int y){
     }
 }
 
-static always_inline int same_block(BlockNode *a, BlockNode *b){
+static av_always_inline int same_block(BlockNode *a, BlockNode *b){
     if((a->type&BLOCK_INTRA) && (b->type&BLOCK_INTRA)){
         return !((a->color[0] - b->color[0]) | (a->color[1] - b->color[1]) | (a->color[2] - b->color[2]));
     }else{
@@ -2227,8 +2234,8 @@ static void encode_q_branch2(SnowContext *s, int level, int x, int y){
     int pcr= left->color[2];
     int pmx, pmy;
     int ref_context= av_log2(2*left->ref) + av_log2(2*top->ref);
-    int mx_context= av_log2(2*ABS(left->mx - top->mx)) + 16*!!b->ref;
-    int my_context= av_log2(2*ABS(left->my - top->my)) + 16*!!b->ref;
+    int mx_context= av_log2(2*FFABS(left->mx - top->mx)) + 16*!!b->ref;
+    int my_context= av_log2(2*FFABS(left->my - top->my)) + 16*!!b->ref;
     int s_context= 2*left->level + 2*top->level + tl->level + tr->level;
 
     if(s->keyframe){
@@ -2283,16 +2290,14 @@ static void decode_q_branch(SnowContext *s, int level, int x, int y){
     }
 
     if(level==s->block_max_depth || get_rac(&s->c, &s->block_state[4 + s_context])){
-        int type;
+        int type, mx, my;
         int l = left->color[0];
         int cb= left->color[1];
         int cr= left->color[2];
-        int mx= mid_pred(left->mx, top->mx, tr->mx);
-        int my= mid_pred(left->my, top->my, tr->my);
         int ref = 0;
         int ref_context= av_log2(2*left->ref) + av_log2(2*top->ref);
-        int mx_context= av_log2(2*ABS(left->mx - top->mx)) + 0*av_log2(2*ABS(tr->mx - top->mx));
-        int my_context= av_log2(2*ABS(left->my - top->my)) + 0*av_log2(2*ABS(tr->my - top->my));
+        int mx_context= av_log2(2*FFABS(left->mx - top->mx)) + 0*av_log2(2*FFABS(tr->mx - top->mx));
+        int my_context= av_log2(2*FFABS(left->my - top->my)) + 0*av_log2(2*FFABS(tr->my - top->my));
 
         type= get_rac(&s->c, &s->block_state[1 + left->type + top->type]) ? BLOCK_INTRA : 0;
 
@@ -2551,7 +2556,7 @@ void ff_snow_inner_add_yblock(uint8_t *obmc, const int obmc_stride, uint8_t * * 
 }
 
 //FIXME name clenup (b_w, block_w, b_width stuff)
-static always_inline void add_yblock(SnowContext *s, int sliced, slice_buffer *sb, DWTELEM *dst, uint8_t *dst8, const uint8_t *obmc, int src_x, int src_y, int b_w, int b_h, int w, int h, int dst_stride, int src_stride, int obmc_stride, int b_x, int b_y, int add, int offset_dst, int plane_index){
+static av_always_inline void add_yblock(SnowContext *s, int sliced, slice_buffer *sb, DWTELEM *dst, uint8_t *dst8, const uint8_t *obmc, int src_x, int src_y, int b_w, int b_h, int w, int h, int dst_stride, int src_stride, int obmc_stride, int b_x, int b_y, int add, int offset_dst, int plane_index){
     const int b_width = s->b_width  << s->block_max_depth;
     const int b_height= s->b_height << s->block_max_depth;
     const int b_stride= b_width;
@@ -2710,7 +2715,7 @@ assert(src_stride > 2*MB_SIZE + 5);
 #endif
 }
 
-static always_inline void predict_slice_buffered(SnowContext *s, slice_buffer * sb, DWTELEM * old_buffer, int plane_index, int add, int mb_y){
+static av_always_inline void predict_slice_buffered(SnowContext *s, slice_buffer * sb, DWTELEM * old_buffer, int plane_index, int add, int mb_y){
     Plane *p= &s->plane[plane_index];
     const int mb_w= s->b_width  << s->block_max_depth;
     const int mb_h= s->b_height << s->block_max_depth;
@@ -2777,7 +2782,7 @@ static always_inline void predict_slice_buffered(SnowContext *s, slice_buffer * 
     STOP_TIMER("predict_slice")
 }
 
-static always_inline void predict_slice(SnowContext *s, DWTELEM *buf, int plane_index, int add, int mb_y){
+static av_always_inline void predict_slice(SnowContext *s, DWTELEM *buf, int plane_index, int add, int mb_y){
     Plane *p= &s->plane[plane_index];
     const int mb_w= s->b_width  << s->block_max_depth;
     const int mb_h= s->b_height << s->block_max_depth;
@@ -2834,7 +2839,7 @@ static always_inline void predict_slice(SnowContext *s, DWTELEM *buf, int plane_
     STOP_TIMER("predict_slice")
 }
 
-static always_inline void predict_plane(SnowContext *s, DWTELEM *buf, int plane_index, int add){
+static av_always_inline void predict_plane(SnowContext *s, DWTELEM *buf, int plane_index, int add){
     const int mb_h= s->b_height << s->block_max_depth;
     int mb_y;
     for(mb_y=0; mb_y<=mb_h; mb_y++)
@@ -2906,8 +2911,8 @@ static inline int get_block_bits(SnowContext *s, int x, int y, int w){
     BlockNode *tl    = y && x ? &s->block[index-b_stride-1] : left;
     BlockNode *tr    = y && x+w<b_stride ? &s->block[index-b_stride+w] : tl;
     int dmx, dmy;
-//  int mx_context= av_log2(2*ABS(left->mx - top->mx));
-//  int my_context= av_log2(2*ABS(left->my - top->my));
+//  int mx_context= av_log2(2*FFABS(left->mx - top->mx));
+//  int my_context= av_log2(2*FFABS(left->my - top->my));
 
     if(x<0 || x>=b_stride || y>=b_height)
         return 0;
@@ -2921,15 +2926,15 @@ static inline int get_block_bits(SnowContext *s, int x, int y, int w){
 //FIXME try accurate rate
 //FIXME intra and inter predictors if surrounding blocks arent the same type
     if(b->type & BLOCK_INTRA){
-        return 3+2*( av_log2(2*ABS(left->color[0] - b->color[0]))
-                   + av_log2(2*ABS(left->color[1] - b->color[1]))
-                   + av_log2(2*ABS(left->color[2] - b->color[2])));
+        return 3+2*( av_log2(2*FFABS(left->color[0] - b->color[0]))
+                   + av_log2(2*FFABS(left->color[1] - b->color[1]))
+                   + av_log2(2*FFABS(left->color[2] - b->color[2])));
     }else{
         pred_mv(s, &dmx, &dmy, b->ref, left, top, tr);
         dmx-= b->mx;
         dmy-= b->my;
-        return 2*(1 + av_log2(2*ABS(dmx)) //FIXME kill the 2* can be merged in lambda
-                    + av_log2(2*ABS(dmy))
+        return 2*(1 + av_log2(2*FFABS(dmx)) //FIXME kill the 2* can be merged in lambda
+                    + av_log2(2*FFABS(dmy))
                     + av_log2(2*b->ref));
     }
 }
@@ -2938,7 +2943,6 @@ static int get_block_rd(SnowContext *s, int mb_x, int mb_y, int plane_index, con
     Plane *p= &s->plane[plane_index];
     const int block_size = MB_SIZE >> s->block_max_depth;
     const int block_w    = plane_index ? block_size/2 : block_size;
-    const uint8_t *obmc  = plane_index ? obmc_tab[s->block_max_depth+1] : obmc_tab[s->block_max_depth];
     const int obmc_stride= plane_index ? block_size : 2*block_size;
     const int ref_stride= s->current_picture.linesize[plane_index];
     uint8_t *dst= s->current_picture.data[plane_index];
@@ -3041,7 +3045,6 @@ static int get_4block_rd(SnowContext *s, int mb_x, int mb_y, int plane_index){
     uint8_t *src= s-> input_picture.data[plane_index];
     static const DWTELEM zero_dst[4096]; //FIXME
     const int b_stride = s->b_width << s->block_max_depth;
-    const int b_height = s->b_height<< s->block_max_depth;
     const int w= p->width;
     const int h= p->height;
     int distortion= 0;
@@ -3094,7 +3097,7 @@ static int get_4block_rd(SnowContext *s, int mb_x, int mb_y, int plane_index){
     return distortion + rate*penalty_factor;
 }
 
-static always_inline int check_block(SnowContext *s, int mb_x, int mb_y, int p[3], int intra, const uint8_t *obmc_edged, int *best_rd){
+static av_always_inline int check_block(SnowContext *s, int mb_x, int mb_y, int p[3], int intra, const uint8_t *obmc_edged, int *best_rd){
     const int b_stride= s->b_width << s->block_max_depth;
     BlockNode *block= &s->block[mb_x + mb_y * b_stride];
     BlockNode backup= *block;
@@ -3133,12 +3136,12 @@ static always_inline int check_block(SnowContext *s, int mb_x, int mb_y, int p[3
 }
 
 /* special case for int[2] args we discard afterward, fixes compilation prob with gcc 2.95 */
-static always_inline int check_block_inter(SnowContext *s, int mb_x, int mb_y, int p0, int p1, const uint8_t *obmc_edged, int *best_rd){
+static av_always_inline int check_block_inter(SnowContext *s, int mb_x, int mb_y, int p0, int p1, const uint8_t *obmc_edged, int *best_rd){
     int p[2] = {p0, p1};
     return check_block(s, mb_x, mb_y, p, 0, obmc_edged, best_rd);
 }
 
-static always_inline int check_4block_inter(SnowContext *s, int mb_x, int mb_y, int p0, int p1, int ref, int *best_rd){
+static av_always_inline int check_4block_inter(SnowContext *s, int mb_x, int mb_y, int p0, int p1, int ref, int *best_rd){
     const int b_stride= s->b_width << s->block_max_depth;
     BlockNode *block= &s->block[mb_x + mb_y * b_stride];
     BlockNode backup[4]= {block[0], block[1], block[b_stride], block[b_stride+1]};
@@ -3603,8 +3606,14 @@ static void encode_header(SnowContext *s){
     memset(kstate, MID_STATE, sizeof(kstate));
 
     put_rac(&s->c, kstate, s->keyframe);
-    if(s->keyframe || s->always_reset)
+    if(s->keyframe || s->always_reset){
         reset_contexts(s);
+        s->last_spatial_decomposition_type=
+        s->last_qlog=
+        s->last_qbias=
+        s->last_mv_scale=
+        s->last_block_max_depth= 0;
+    }
     if(s->keyframe){
         put_symbol(&s->c, s->header_state, s->version, 0);
         put_rac(&s->c, s->header_state, s->always_reset);
@@ -3627,11 +3636,17 @@ static void encode_header(SnowContext *s){
             }
         }
     }
-    put_symbol(&s->c, s->header_state, s->spatial_decomposition_type, 0);
-    put_symbol(&s->c, s->header_state, s->qlog, 1);
-    put_symbol(&s->c, s->header_state, s->mv_scale, 0);
-    put_symbol(&s->c, s->header_state, s->qbias, 1);
-    put_symbol(&s->c, s->header_state, s->block_max_depth, 0);
+    put_symbol(&s->c, s->header_state, s->spatial_decomposition_type - s->last_spatial_decomposition_type, 1);
+    put_symbol(&s->c, s->header_state, s->qlog            - s->last_qlog    , 1);
+    put_symbol(&s->c, s->header_state, s->mv_scale        - s->last_mv_scale, 1);
+    put_symbol(&s->c, s->header_state, s->qbias           - s->last_qbias   , 1);
+    put_symbol(&s->c, s->header_state, s->block_max_depth - s->last_block_max_depth, 1);
+
+    s->last_spatial_decomposition_type= s->spatial_decomposition_type;
+    s->last_qlog                      = s->qlog;
+    s->last_qbias                     = s->qbias;
+    s->last_mv_scale                  = s->mv_scale;
+    s->last_block_max_depth           = s->block_max_depth;
 }
 
 static int decode_header(SnowContext *s){
@@ -3641,8 +3656,14 @@ static int decode_header(SnowContext *s){
     memset(kstate, MID_STATE, sizeof(kstate));
 
     s->keyframe= get_rac(&s->c, kstate);
-    if(s->keyframe || s->always_reset)
+    if(s->keyframe || s->always_reset){
         reset_contexts(s);
+        s->spatial_decomposition_type=
+        s->qlog=
+        s->qbias=
+        s->mv_scale=
+        s->block_max_depth= 0;
+    }
     if(s->keyframe){
         s->version= get_symbol(&s->c, s->header_state, 0);
         if(s->version>0){
@@ -3673,16 +3694,16 @@ static int decode_header(SnowContext *s){
         }
     }
 
-    s->spatial_decomposition_type= get_symbol(&s->c, s->header_state, 0);
+    s->spatial_decomposition_type+= get_symbol(&s->c, s->header_state, 1);
     if(s->spatial_decomposition_type > 2){
         av_log(s->avctx, AV_LOG_ERROR, "spatial_decomposition_type %d not supported", s->spatial_decomposition_type);
         return -1;
     }
 
-    s->qlog= get_symbol(&s->c, s->header_state, 1);
-    s->mv_scale= get_symbol(&s->c, s->header_state, 0);
-    s->qbias= get_symbol(&s->c, s->header_state, 1);
-    s->block_max_depth= get_symbol(&s->c, s->header_state, 0);
+    s->qlog           += get_symbol(&s->c, s->header_state, 1);
+    s->mv_scale       += get_symbol(&s->c, s->header_state, 1);
+    s->qbias          += get_symbol(&s->c, s->header_state, 1);
+    s->block_max_depth+= get_symbol(&s->c, s->header_state, 1);
     if(s->block_max_depth > 1 || s->block_max_depth < 0){
         av_log(s->avctx, AV_LOG_ERROR, "block_max_depth= %d is too large", s->block_max_depth);
         s->block_max_depth= 0;
@@ -3876,7 +3897,7 @@ static int ratecontrol_1pass(SnowContext *s, AVFrame *pict)
 
     pict->quality= ff_rate_estimate_qscale(&s->m, 1);
     if (pict->quality < 0)
-        return -1;
+        return INT_MIN;
     s->lambda= pict->quality * 3/2;
     delta_qlog= qscale2qlog(pict->quality) - s->qlog;
     s->qlog+= delta_qlog;
@@ -4170,7 +4191,6 @@ redo_frame:
             pict->pict_type= FF_I_TYPE;
             s->keyframe=1;
             s->current_picture.key_frame=1;
-            reset_contexts(s);
             goto redo_frame;
         }
 
@@ -4186,7 +4206,7 @@ redo_frame:
 
         if(s->pass1_rc && plane_index==0){
             int delta_qlog = ratecontrol_1pass(s, pict);
-            if (delta_qlog < 0)
+            if (delta_qlog <= INT_MIN)
                 return -1;
             if(delta_qlog){
                 //reordering qlog in the bitstream would eliminate this reset
@@ -4279,6 +4299,10 @@ STOP_TIMER("pred-conv")}
     if(avctx->flags&CODEC_FLAG_PASS1)
         ff_write_pass1_stats(&s->m);
     s->m.last_pict_type = s->m.pict_type;
+    avctx->frame_bits = s->m.frame_bits;
+    avctx->mv_bits = s->m.mv_bits;
+    avctx->misc_bits = s->m.misc_bits;
+    avctx->p_tex_bits = s->m.p_tex_bits;
 
     emms_c();
 
@@ -4563,7 +4587,7 @@ int main(){
     ff_spatial_idwt(buffer[0], width, height, width, s.spatial_decomposition_type, s.spatial_decomposition_count);
 
     for(i=0; i<width*height; i++)
-        if(ABS(buffer[0][i] - buffer[1][i])>20) printf("fsck: %d %d %d\n",i, buffer[0][i], buffer[1][i]);
+        if(FFABS(buffer[0][i] - buffer[1][i])>20) printf("fsck: %d %d %d\n",i, buffer[0][i], buffer[1][i]);
 
 #if 0
     printf("testing AC coder\n");
@@ -4573,7 +4597,7 @@ int main(){
 
     for(i=-256; i<256; i++){
 START_TIMER
-        put_symbol(&s.c, s.header_state, i*i*i/3*ABS(i), 1);
+        put_symbol(&s.c, s.header_state, i*i*i/3*FFABS(i), 1);
 STOP_TIMER("put_symbol")
     }
     ff_rac_terminate(&s.c);
@@ -4587,7 +4611,7 @@ STOP_TIMER("put_symbol")
 START_TIMER
         j= get_symbol(&s.c, s.header_state, 1);
 STOP_TIMER("get_symbol")
-        if(j!=i*i*i/3*ABS(i)) printf("fsck: %d != %d\n", i, j);
+        if(j!=i*i*i/3*FFABS(i)) printf("fsck: %d != %d\n", i, j);
     }
 #endif
 {
@@ -4616,9 +4640,9 @@ int64_t g=0;
                 for(x=0; x<width; x++){
                     int64_t d= buffer[0][x + y*width];
                     error += d*d;
-                    if(ABS(width/2-x)<9 && ABS(height/2-y)<9 && level==2) printf("%8lld ", d);
+                    if(FFABS(width/2-x)<9 && FFABS(height/2-y)<9 && level==2) printf("%8"PRId64" ", d);
                 }
-                if(ABS(height/2-y)<9 && level==2) printf("\n");
+                if(FFABS(height/2-y)<9 && level==2) printf("\n");
             }
             error= (int)(sqrt(error)+0.5);
             errors[level][orientation]= error;
@@ -4630,7 +4654,7 @@ int64_t g=0;
     for(level=0; level<s.spatial_decomposition_count; level++){
         printf("  {");
         for(orientation=0; orientation<4; orientation++){
-            printf("%8lld,", errors[level][orientation]/g);
+            printf("%8"PRId64",", errors[level][orientation]/g);
         }
         printf("},\n");
     }
@@ -4669,9 +4693,9 @@ int64_t g=0;
                 for(x=0; x<width; x++){
                     int64_t d= buffer[0][x + y*width];
                     error += d*d;
-                    if(ABS(width/2-x)<9 && ABS(height/2-y)<9) printf("%8lld ", d);
+                    if(FFABS(width/2-x)<9 && FFABS(height/2-y)<9) printf("%8"PRId64" ", d);
                 }
-                if(ABS(height/2-y)<9) printf("\n");
+                if(FFABS(height/2-y)<9) printf("\n");
             }
     }
 
