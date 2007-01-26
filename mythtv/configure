@@ -766,7 +766,7 @@ case "$cpu" in
   x86)
     if is_x86_cmov_cpu "$cpu_raw" ; then
         cmov="yes"
-        if !is_x86_slow_cmov_cpu "$cpu_raw" ; then
+        if ! is_x86_slow_cmov_cpu "$cpu_raw" ; then
             cmov_is_fast="yes"
         fi
     fi
