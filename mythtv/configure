@@ -544,6 +544,7 @@ fi
 flashsv_decoder_deps="zlib"
 flashsv_encoder_deps="zlib"
 mpeg_xvmc_decoder_deps="xvmc"
+mpeg_xvmc_vld_decoder_deps="xvmc_vld"
 png_decoder_deps="zlib"
 png_encoder_deps="zlib"
 x264_encoder_deps="x264"
