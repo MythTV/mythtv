@@ -8,7 +8,7 @@
 <H1>Installing and using MythTV</H1>
 
 <H2>Robert Kulagowski, 
-<A HREF="mailto:rkulagow@rocketmail.com">mailto:rkulagow@rocketmail.com</A></H2>2007-01-09, v0.20.13
+<A HREF="mailto:rkulagow@rocketmail.com">mailto:rkulagow@rocketmail.com</A></H2>2007-01-26, v0.20.14
 <HR>
 <EM>Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -3493,13 +3493,16 @@ the frontend should poll the backend to determine if the status has changed.</P>
 <FIGURE>
 <EPS FILE="stop.eps">
 <IMG SRC="stop.png">
-<CAPTION><B>NOTE to Red Hat/Fedora users</B>: Red Hat Linux and Fedora Core
-ship with Gnome as
-the default desktop environment.  However, Gnome seems to have issues with
-window focus and window switching which sometimes cause mythfrontend to
-obscure the video. KDE does not seem to have any such issues. Therefore you
-will need to switch to KDE by selecting RedHatMenu>Extras>System
-Settings>Desktop Switching Tool and choose "KDE".</CAPTION>
+<CAPTION><B>NOTE to Red Hat/Fedora 4 users</B>: Red Hat Linux and Fedora Core ship
+with Gnome as the default desktop environment.  However, Gnome seems to have
+issues with window focus and window switching which sometimes cause
+mythfrontend to obscure the video. KDE does not seem to have any such
+issues. Therefore you will need to switch to KDE by selecting
+RedHatMenu>Extras>System Settings>Desktop Switching Tool and choose "KDE".
+<B>NOTE to Fedora Core 5 and 6 users</B>:  Fedora 5 and 6 no longer have
+this tool in the Menu. Use "switchdesk KDE" from a command line. Read "man
+switchdesk" for further information about changing to other desktop
+environments.</CAPTION>
 </FIGURE>
 </P>
 <H2><A NAME="ss11.1">11.1</A> <A HREF="#toc11.1">Keyboard commands</A>

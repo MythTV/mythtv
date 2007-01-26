@@ -3,7 +3,7 @@
 <title>Installing and using MythTV
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com"
 name="mailto:rkulagow@rocketmail.com">
-<date>2007-01-09, v0.20.13
+<date>2007-01-26, v0.20.14
 <abstract>
 Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -3109,15 +3109,19 @@ the frontend should poll the backend to determine if the status has changed.
 <p><figure loc="here">
 <eps file="stop.eps" height="1cm">
 <img src="stop.png">
-<caption><bf>NOTE to Red Hat/Fedora users</bf>: Red Hat Linux and Fedora Core
-ship with Gnome as
-the default desktop environment.  However, Gnome seems to have issues with
-window focus and window switching which sometimes cause mythfrontend to
-obscure the video. KDE does not seem to have any such issues. Therefore you
-will need to switch to KDE by selecting RedHatMenu>Extras>System
-Settings>Desktop Switching Tool and choose "KDE".
-</caption>
-</figure>
+<caption>
+<bf>NOTE to Red Hat/Fedora 4 users</bf>: Red Hat Linux and Fedora Core ship
+with Gnome as the default desktop environment.  However, Gnome seems to have
+issues with window focus and window switching which sometimes cause
+mythfrontend to obscure the video. KDE does not seem to have any such
+issues. Therefore you will need to switch to KDE by selecting
+RedHatMenu>Extras>System Settings>Desktop Switching Tool and choose "KDE".
+
+<bf>NOTE to Fedora Core 5 and 6 users</bf>:  Fedora 5 and 6 no longer have
+this tool in the Menu. Use "switchdesk KDE" from a command line. Read "man
+switchdesk" for further information about changing to other desktop
+environments.
+</caption></figure>
 <sect1>Keyboard commands
 <p>The <tt>keys.txt</tt> file describes what the various keyboard commands are.
 If you have loaded mythweb, you may change the default keys to your liking.
@@ -7502,6 +7506,9 @@ with multiple recording options.  Update database backup commands.  Closes #2869
 Add crappy diagram for Bruce's scheduler explanation.
 v0.20.12, 2007-01-08.  Additional diagrams for the scheduler part.
 v0.20.13, 2007-01-09.  Additional tweaks.
+v0.20.14, 2007-01-26.  Fedora uses a different way to switch window managers
+now.  (R.G. Newbury)
+
 -->
 
 <!--

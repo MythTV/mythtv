@@ -1,7 +1,7 @@
   Installing and using MythTV
   Robert Kulagowski, mailto:rkulagow@rocketmail.com
   <mailto:rkulagow@rocketmail.com>
-  2007-01-09, v0.20.13
+  2007-01-26, v0.20.14
 
   Initially, installation of MythTV seems like a huge task.  There are
   lots of dependencies, and various distributions seem to do the same
@@ -3799,13 +3799,16 @@
 
 
 
-       [1mNOTE to Red Hat/Fedora users[22m: Red Hat Linux and Fedora Core
-  ship with Gnome as the default desktop environment.  However, Gnome
-  seems to have issues with window focus and window switching which
-  sometimes cause mythfrontend to obscure the video. KDE does not seem
-  to have any such issues. Therefore you will need to switch to KDE by
-  selecting RedHatMenu>Extras>System Settings>Desktop Switching Tool and
-  choose "KDE".
+    [1mNOTE to Red Hat/Fedora 4 users[22m: Red Hat Linux and Fedora Core ship
+  with Gnome as the default desktop environment.  However, Gnome seems
+  to have issues with window focus and window switching which sometimes
+  cause mythfrontend to obscure the video. KDE does not seem to have any
+  such issues. Therefore you will need to switch to KDE by selecting
+  RedHatMenu>Extras>System Settings>Desktop Switching Tool and choose
+  "KDE".  [1mNOTE to Fedora Core 5 and 6 users[22m:  Fedora 5 and 6 no longer
+  have this tool in the Menu. Use "switchdesk KDE" from a command line.
+  Read "man switchdesk" for further information about changing to other
+  desktop environments.
 
   [1m11.1.  Keyboard commands[0m
 
@@ -3841,15 +3844,10 @@
   [1m11.1.4.  LiveTV Browse Mode[0m
 
 
-             Left     browse program prior to current listed program
-            Right     browse program following current listed program
-               Up     browse program on channel above current listed channel/program
-             Down     browse program on channel below current listed channel/program
-                /     browse program on next favorite channel
-              0-9     enter a channel number to browse
-  Space/Enter         change channel to channel of current listed program
-              R/r     Toggle recording of current program (cycles through types)
-            ESC/O     Exit Browse mode
+  [1m11.1.5.  Playback Recording Zoom Mode[0m
+
+
+  [1m11.1.6.  If you have two or more tuner cards[0m
 
 
 
@@ -3909,11 +3907,22 @@
             Right     advance 1 frame
                 >     advance 1 second
 
-  [1m11.1.5.  Playback Recording Zoom Mode[0m
+  [1m11.1.7.  Watching a recording only[0m
 
 
-  [1m11.1.6.  If you have two or more tuner cards[0m
+  [1m11.1.8.  EPG[0m
 
+
+
+             Left     browse program prior to current listed program
+            Right     browse program following current listed program
+               Up     browse program on channel above current listed channel/program
+             Down     browse program on channel below current listed channel/program
+                /     browse program on next favorite channel
+              0-9     enter a channel number to browse
+  Space/Enter         change channel to channel of current listed program
+              R/r     Toggle recording of current program (cycles through types)
+            ESC/O     Exit Browse mode
 
 
              Left     Move video to Left
@@ -3929,8 +3938,6 @@
   V           toggle Picture-in-picture on or off
   B           toggles the window focus (lets you change channels on the PiP window)
   N           swaps the two channels by changing channels on both cards
-
-  [1m11.1.7.  Watching a recording only[0m
 
 
       Space/Enter     set a bookmark at that point. Next time you start the recording, you will automatically jump forward to this point and clear the bookmark.
@@ -3951,9 +3958,6 @@
                 I     Inverts the cutlist
 
 
-  [1m11.1.8.  EPG[0m
-
-
            Arrows     are used to move the highlighted program point around
        A, D, S, W     perform the same as left, right, down and up
   PageUp/PageDown     move the channel list up or down a page
@@ -3970,14 +3974,7 @@
                 ?     mark/unmark the current channel as a "favorite"
            / or 4     toggle the guide listing between all channels and filtered "favorites"
 
-
   [1m11.1.9.  Setting Program or Channel Recording Priorities[0m
-
-
-  [1m11.1.10.  Viewing Scheduled Recordings/Resolving Conflicts[0m
-
-
-  [1m11.1.11.  Viewing Search Listings[0m
 
 
 
@@ -3989,6 +3986,8 @@
                        I     edit recording options
                      ESC     commits changes and exits
 
+  [1m11.1.10.  Viewing Scheduled Recordings/Resolving Conflicts[0m
+
 
                       1     show all recordings
                       2     show only important recordings
@@ -3997,9 +3996,13 @@
         Space/Enter         resolve conflict or override
 
 
+  [1m11.1.11.  Viewing Search Listings[0m
+
+
   Home        change to the previous view if applicable
   End         change to the next view if applicable
   M           select another view if applicable. In the title and description search popup, press M again to edit or delete the selected view.
+
 
   [1m11.1.12.  Recording Profiles Setup Screen[0m
 
@@ -4042,8 +4045,6 @@
   more keys then you can access all of the features.  With only 16 keys
   most features are usable.
 
-
-
       REMOTE CONTROL     LIRC KEYSTROKE     FUNCTION
                0 - 9     0 - 9              channel selection, EPG navigation, ff/rew speed setting (with stickykeys)
           Left Arrow     Left               scroll left, rewind
@@ -4056,6 +4057,8 @@
                Pause     p                  Pause
          Other key 1     i                  Information
          Other key 2     c                  Change tuner card input
+
+
 
   [1m11.2.  Using themes with MythTV[0m
 
@@ -4171,9 +4174,6 @@
   first and will wakeup the Slave backends using the "Wake command for
   slaves". At this time, there is no support for starting only the
   required Slave backend, so all Slave backends will startup.
-
-
-
   [1m11.5.2.  Setting up the MythTV side of this extension.[0m
 
   There are a number of options that are used to control the Shutdown /
