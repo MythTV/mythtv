@@ -4649,7 +4649,7 @@ bool ProgramList::FromRecorded( bool bDescending, ProgramList *pSchedList )
         " ( recorded.chanid    = recordedprogram.chanid AND "
         "   recorded.starttime = recordedprogram.starttime ) "
         "WHERE ( recorded.deletepending = 0 OR "
-        "        DATE_ADD(recorded.lastmodified,  INTERVAL 5 MINUTE) <= NOW() "
+        "        recorded.lastmodified <= DATE_SUB(NOW(), INTERVAL 5 MINUTE) "
         "      ) "
         "ORDER BY recorded.starttime";
 
