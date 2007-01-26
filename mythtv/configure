@@ -2059,7 +2059,7 @@ fi
 
 if test x"$proc_opt" = x"no"; then
     optimize="yes"
-    if x"$cpu_cmov" = x"yes" -a x"$ARCHFLAGS" != x"-march=k8"; then
+    if test x"$cpu_cmov" = x"yes" -a x"$ARCHFLAGS" != x"-march=k8"; then
         ARCHFLAGS="-march=pentiumpro";
     fi
 fi
@@ -3141,6 +3141,10 @@ echo "#define ARCH_${ucarch} 1" >> $TMPH
 
 # special cases
 case "$cpu" in
+    x86)
+        echo "TARGET_ARCH_X86_32=yes" >> $MYTH_CONFIG_MAK
+        echo "#define ARCH_X86_32 1" >> $TMPH
+        ;;
     x86_32|x86_64)
         echo "TARGET_ARCH_X86=yes" >> $MYTH_CONFIG_MAK
         echo "#define ARCH_X86 1" >> $TMPH
