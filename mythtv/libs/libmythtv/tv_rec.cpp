@@ -2089,7 +2089,7 @@ bool TVRec::CheckChannelPrefix(const QString &prefix,
     QString basequery = QString(
         "SELECT channel.chanid, channel.channum, cardinput.cardid "
         "FROM channel, capturecard, cardinput "
-        "WHERE channel.channum LIKE '%1%%'           AND "
+        "WHERE channel.channum LIKE '%1%'            AND "
         "      channel.sourceid = cardinput.sourceid AND "
         "      cardinput.cardid = capturecard.cardid");
 
