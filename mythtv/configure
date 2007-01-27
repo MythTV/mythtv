@@ -2941,6 +2941,10 @@ fi
 
 echo "# Basic Settings"
 echo "Compile type     $compile_type"
+if test x"$compile_type" = x"debug" -a $cpu = "x86" -a \
+        x"$GCC_MAJOR" != x"" -a $GCC_MAJOR -lt "4"; then
+    echo "WARNING: backtraces involving libavcodec are not supported for gcc < 4.0"
+fi
 echo "Compiler cache   $ccache"
 echo "DistCC           $distcc"
 echo "Install prefix   $PREFIX"

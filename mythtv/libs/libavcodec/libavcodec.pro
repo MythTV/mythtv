@@ -13,9 +13,13 @@ DEFINES += HAVE_AV_CONFIG_H _LARGEFILE_SOURCE
 
 # Debug mode on x86 must compile without -fPIC and with -O, 
 # otherwise gcc runs out of registers.
+# libavcodec rev 7671 needs another register
+# -fomit-frame-pointer frees it. gcc-4 enables "location lists"
+# which allows debugging without frame pointer
 debug:contains(TARGET_ARCH_X86, yes) {
     !contains(TARGET_ARCH_X86_64, yes) {
         QMAKE_CFLAGS_SHLIB = 
+        QMAKE_CFLAGS_DEBUG += -fomit-frame-pointer
     }
 }
 
