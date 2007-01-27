@@ -1907,7 +1907,7 @@ if test x"$tune" = x"generic" -a x"$cpu_overide" != x"yes"; then
 # P4
    if expr "$processor" : "pentium4" > /dev/null ; then
        ARCHFLAGS="-march=pentium4"
-   elif expr "$processor" : ".*Pentium(R) [4MD]" > /dev/null ; then
+   elif expr "$processor" : ".*Pentium(R) [4D]" > /dev/null ; then
        ARCHFLAGS="-march=pentium4"
    elif expr "$processor" : ".*Xeon(TM) CPU" > /dev/null ; then
        ARCHFLAGS="-march=pentium4"
@@ -1922,10 +1922,7 @@ if test x"$tune" = x"generic" -a x"$cpu_overide" != x"yes"; then
    elif expr "$processor" : ".*Genuine.*Intel.*CPU" > /dev/null ; then
        ARCHFLAGS="-march=pentium4"
    elif expr "$processor" : ".*Intel(R).*Core(TM)2.*CPU" > /dev/null ; then
-       ARCHFLAGS="-march=pentium4"
-   elif expr "$processor" : ".*Celeron(R) M processor" > /dev/null ; then
-       ARCHFLAGS="-march=pentium4"
-       optimize="small"
+       ARCHFLAGS="-march=k8" # this would be pentium4 on 32 bit systems
    elif expr "$processor" : ".*Celeron(R) CPU" > /dev/null ; then
        ARCHFLAGS="-march=pentium4"
        optimize="small"
@@ -1944,6 +1941,11 @@ if test x"$tune" = x"generic" -a x"$cpu_overide" != x"yes"; then
    elif expr "$processor" : ".*Celeron(TM) CPU" > /dev/null ; then
        ARCHFLAGS="-march=pentium3"
        optimize="small"
+   elif expr "$processor" : ".*Pentium(R) M" > /dev/null ; then
+       ARCHFLAGS="-march=pentium3"
+   elif expr "$processor" : ".*Celeron(R) M processor" > /dev/null ; then
+       ARCHFLAGS="-march=pentium3"
+       #optimize="small"
 # P2
    elif expr "$processor" : "pentium2" > /dev/null ; then
        ARCHFLAGS="-march=pentium2"
@@ -2956,7 +2958,7 @@ fi
 #    echo "Build suffix     $BUILDSUF"
 #fi
 echo "big-endian       $bigendian"
-if test $cpu = "x86_32" -o $cpu = "x86_64"; then
+if test $cpu = "x86" -o $cpu = "x86_32" -o $cpu = "x86_64"; then
     echo "MMX enabled      $mmx"
     echo "CMOV enabled     $cmov"
     echo "CMOV is fast     $cmov_is_fast"
