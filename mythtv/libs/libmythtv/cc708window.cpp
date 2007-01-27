@@ -178,13 +178,26 @@ void CC708Window::DefineWindow(int _priority,         int _visible,
 
 CC708Window::~CC708Window()
 {
+    QMutexLocker locker(&lock);
+
+    exists = false;
+    true_row_count    = 0;
+    true_column_count = 0;
+
     if (text)
+    {
         delete [] text;
+        text = NULL; 
+    }
 }
 
 void CC708Window::Clear(void)
 {
     QMutexLocker locker(&lock);
+
+    if (!exists || !text)
+        return;
+
     for (uint i = 0; i < true_row_count * true_column_count; i++)
     {
         text[i].character = QChar(' ');
