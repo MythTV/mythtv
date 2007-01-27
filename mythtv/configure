@@ -3243,6 +3243,19 @@ if test "$lshared" = "yes" ; then
   echo "BUILD_SHARED=yes" >> $MYTH_CONFIG_MAK
   echo "PIC=-fPIC -DPIC" >> $MYTH_CONFIG_MAK
 fi
+if test x"$libdts" = x"yes" ; then
+  echo "#define CONFIG_DTS 1" >> $TMPH
+  echo "CONFIG_DTS=yes" >> $MYTH_CONFIG_MAK
+  echo "CONFIG_DTSLIB=$dtslib" >>  $MYTH_CONFIG_MAK
+fi
+if test x"$pthreads" = x"yes" ; then
+  CCONFIG="$CCONFIG using_ffmpeg_threads"
+  echo "#define HAVE_THREADS 1" >> $TMPH
+  echo "HAVE_PTHREADS=yes" >> $MYTH_CONFIG_MAK
+  if test $targetos != FreeBSD -a $targetos != OpenBSD ; then
+     extralibs="$extralibs -lpthread"
+  fi
+fi
 echo "" >>$MYTH_CONFIG_MAK
 
 enabled_any $ENCODER_LIST && enable encoders
