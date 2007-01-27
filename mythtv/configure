@@ -1742,7 +1742,7 @@ if test $targetos = Darwin; then
     fi
 fi
 
-if test $optimize != "no"; then
+if test x"$optimize" != x"no"; then
     add_cflags "-fomit-frame-pointer"
 fi
 
@@ -2960,8 +2960,8 @@ fi
 echo "big-endian       $bigendian"
 if test $cpu = "x86" -o $cpu = "x86_32" -o $cpu = "x86_64"; then
     echo "MMX enabled      $mmx"
-    echo "CMOV enabled     $cmov"
-    echo "CMOV is fast     $cmov_is_fast"
+    #echo "CMOV enabled     $cmov"
+    #echo "CMOV is fast     $cmov_is_fast"
 fi
 if test $cpu = "armv4l"; then
     echo "ARMv5TE enabled           $armv5te"
