@@ -98,7 +98,6 @@ FX|http://www.lyngsat-logo.com/logo/tv/ff/fx_us.jpg
 Film4 +1|http://www.lyngsat-logo.com/logo/tv/ff/film4.jpg
 Film4+1|http://www.lyngsat-logo.com/logo/tv/ff/film4.jpg
 Film4|http://www.lyngsat-logo.com/logo/tv/ff/film4.jpg
-FilmFour Weekly|http://www.lyngsat-logo.com/logo/tv/ff/film4.jpg
 Five Life|http://www.lyngsat-logo.com/logo/tv/ff/five_life.jpg
 Five US|http://www.lyngsat-logo.com/logo/tv/ff/five_us.jpg
 Five|http://www.lyngsat-logo.com/logo/tv/ff/five.jpg
