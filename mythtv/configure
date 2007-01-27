@@ -2271,7 +2271,7 @@ for thread in pthreads beosthreads os2threads w32threads; do
 done
 
 # these are off by default, so fail if requested and not available
-#enabled libdts     && require libdts dts.h dts_init -ldts
+#enabled libdts  && require libdts dts.h dts_init -ldts
 enabled libgsm  && require libgsm gsm.h gsm_create -lgsm
 enabled libmp3lame && require LAME lame/lame.h lame_init -lmp3lame
 enabled libvorbis && require libvorbis vorbis/vorbisenc.h vorbis_info_init -lvorbis -lvorbisenc -logg
@@ -2681,7 +2681,7 @@ if test x"$mandir" = x""; then
 fi
 
 if test x"$libdts" = x"yes"; then
-    dts="no"
+    libdts="no"
     dtslib=""
     if has_library libdts_pic ; then
         dtslib="-ldts_pic"
@@ -2693,7 +2693,7 @@ if test x"$libdts" = x"yes"; then
 
     if test x"$dtslib" != x"" ; then
         if has_header dts.h ; then
-            dts="yes"
+            libdts="yes"
         else
             echo "Warning: DTS header not found."
         fi
