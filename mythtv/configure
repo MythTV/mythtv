@@ -503,6 +503,7 @@ HAVE_LIST='
     imlib2
     inet_aton
     localtime_r
+    lrint
     lrintf
     machine_ioctl_bt848_h
     machine_ioctl_meteor_h
@@ -2317,7 +2318,7 @@ _stdint_h=yes
 check_header stdint.h || _stdint_h=no
 
 # test for lrint in math.h
-check_exec <<EOF && have_lrint=yes || have_lrint=no
+check_exec <<EOF && lrint=yes || lrint=no
 #define _ISOC9X_SOURCE  1
 #include <math.h>
 int main( void ) { return (lrint(3.999f) > 0)?0:1; }
