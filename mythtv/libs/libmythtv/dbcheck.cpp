@@ -2860,27 +2860,30 @@ thequery,
     if (dbver == "1177")
     {
         const QString updates[] = {
-"ALTER TABLE channel        DROP INDEX sourceid;",
-"ALTER TABLE channel        ADD INDEX (sourceid, xmltvid, chanid);",
-"ALTER TABLE channel        ADD INDEX (visible);",
-"ALTER TABLE inuseprograms  ADD INDEX (recusage, lastupdatetime);",
-"ALTER TABLE mythlog        ADD INDEX (module);",
-"ALTER TABLE profilegroups  ADD INDEX (cardtype);",
-"ALTER TABLE program        DROP INDEX programid;",
-"ALTER TABLE program        ADD INDEX (previouslyshown);",
-"ALTER TABLE program        ADD INDEX (programid,starttime);",
-"ALTER TABLE program        ADD INDEX (starttime);",
-"ALTER TABLE record         ADD INDEX (maxepisodes);",
-"ALTER TABLE record         ADD INDEX (search);",
-"ALTER TABLE record         ADD INDEX (type);",
-"ALTER TABLE recorded       ADD INDEX (deletepending, lastmodified);",
-"ALTER TABLE recorded       ADD INDEX (recgroup, endtime);",
-"ALTER TABLE storagegroup   ADD INDEX (hostname);",
+"ALTER TABLE channel           DROP INDEX sourceid;",
+"ALTER TABLE channel           ADD INDEX (sourceid, xmltvid, chanid);",
+"ALTER TABLE channel           ADD INDEX (visible);",
+"ALTER TABLE inuseprograms     ADD INDEX (recusage, lastupdatetime);",
+"ALTER TABLE mythlog           ADD INDEX (module);",
+"ALTER TABLE profilegroups     ADD INDEX (cardtype);",
+"ALTER TABLE program           DROP INDEX programid;",
+"ALTER TABLE program           ADD INDEX (previouslyshown);",
+"ALTER TABLE program           ADD INDEX (programid,starttime);",
+"ALTER TABLE program           ADD INDEX (starttime);",
+"ALTER TABLE record            ADD INDEX (maxepisodes);",
+"ALTER TABLE record            ADD INDEX (search);",
+"ALTER TABLE record            ADD INDEX (type);",
+"ALTER TABLE recorded          ADD INDEX (deletepending, lastmodified);",
+"ALTER TABLE recorded          ADD INDEX (recgroup, endtime);",
+"ALTER TABLE recordingprofiles ADD INDEX (profilegroup);",
+"ALTER TABLE storagegroup      ADD INDEX (hostname);",
 ""
 };
         if (!performActualUpdate(updates, "1178", dbver))
             return false;
     }
+
+
 
 //"ALTER TABLE cardinput DROP COLUMN preference;" in 0.22
 //"ALTER TABLE channel DROP COLUMN atscsrcid;" in 0.22
