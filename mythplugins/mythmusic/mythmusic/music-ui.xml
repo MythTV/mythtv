@@ -764,9 +764,9 @@
            <selector name="quality_selector" draworder="0">
                <area>195,50,300,40</area>
                <font>display</font>
-               <image function="on" filename="ma_leftright_on.png"></image>
-               <image function="off" filename="ma_leftright_off.png"></image>
-               <image function="pushed" filename="ma_leftright_pushed.png"></image>
+               <image function="on" filename="mm_leftright_on.png"></image>
+               <image function="off" filename="mm_leftright_off.png"></image>
+               <image function="pushed" filename="mm_leftright_pushed.png"></image>
            </selector> 
 
            <remoteedit name="artist_edit" draworder="1" align="left">
@@ -868,7 +868,7 @@
                <column number="3" width="200" context="-1"></column>
                <column number="4" width="100" context="-1"></column>
                <items>7</items>
-               <image function="selectionbar" filename="ma_selectbar.png" location="-2,0"></image>
+               <image function="selectionbar" filename="mm_selectbar.png" location="-2,0"></image>
                <image function="uparrow" filename="uparrow.png" location="735,290"></image>
                <image function="downarrow" filename="downarrow.png" location="735,465"></image>
            </listarea>
