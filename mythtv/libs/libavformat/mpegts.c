@@ -1,5 +1,5 @@
 /*
- * MPEG2 transport stream (aka DVB) demuxer
+ * MPEG2 transport stream (aka ATSC/DVB/Cable) demuxer
  * Copyright (c) 2002-2003 Fabrice Bellard.
  *
  * This file is part of FFmpeg.

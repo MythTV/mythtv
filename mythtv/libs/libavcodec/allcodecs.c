@@ -240,7 +240,7 @@ void avcodec_register_all(void)
     REGISTER_ENCDEC (DVBSUB, dvbsub);
     REGISTER_ENCDEC (DVDSUB, dvdsub);
 
-      /* parsers */
+    /* parsers */
     REGISTER_PARSER (AAC, aac);
     REGISTER_PARSER (AC3, ac3);
     REGISTER_PARSER (CAVSVIDEO, cavsvideo);
