@@ -675,7 +675,7 @@ frontend="yes"
 backend="no"
 opengl="no"
 
-bindings_perl="no"
+bindings_perl="yes"
 
 if test x"$CC" != x"" ; then
     cc="$CC"
