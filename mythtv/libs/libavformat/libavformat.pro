@@ -31,10 +31,10 @@ SOURCES += nsvdec.c ogg2.c oggparsevorbis.c oggparsetheora.c oggparseflac.c
 SOURCES += mmf.c gif.c gifdec.c daud.c adtsenc.c vocdec.c vocenc.c rtp_h264.c
 SOURCES += aiff.c avs.c mm.c tta.c voc.c smacker.c oggparseogm.c nuv.c wv.c
 SOURCES += gxf.c gxfenc.c riff.c amr.c mxf.c isom.c dvenc.c base64.c 
-SOURCES += dsicin.c mpc.c mtv.c tiertexseq.c x11grab.c
+SOURCES += dsicin.c mpc.c mtv.c tiertexseq.c
 
 # not using:  barpainet.* beosaudio.cpp, dv1394.*, dc1394.c, framehook.*
-# not using:  grab.c v4l2.c
+# not using:  grab.c v4l2.c x11grab.c
 
 contains( CONFIG_VORBIS, yes ) {
     SOURCES += ogg.c
