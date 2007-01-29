@@ -2860,7 +2860,6 @@ thequery,
     if (dbver == "1177")
     {
         const QString updates[] = {
-"ALTER TABLE channel           DROP INDEX sourceid;",
 "ALTER TABLE channel           ADD INDEX (sourceid, xmltvid, chanid);",
 "ALTER TABLE channel           ADD INDEX (visible);",
 "ALTER TABLE inuseprograms     ADD INDEX (recusage, lastupdatetime);",
