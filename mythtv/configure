@@ -1880,7 +1880,7 @@ if test $cpu = "powerpc"; then
     fi
 fi
 
-check_header altivec.h
+check_header altivec.h $ARCHFLAGS
 
 # check if our compiler supports Motorola AltiVec C API
 if test $altivec = "yes"; then
