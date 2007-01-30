@@ -451,12 +451,6 @@ RecStatusType TVRec::StartRecording(const ProgramInfo *rcinfo)
         return retval;
     }
 
-    if (pendingRecording)
-    {
-        delete pendingRecording;
-        pendingRecording = NULL;
-    }
-
     ClearFlags(kFlagAskAllowRecording);
 
     // Flush out events...
@@ -528,6 +522,12 @@ RecStatusType TVRec::StartRecording(const ProgramInfo *rcinfo)
         VERBOSE(VB_IMPORTANT, LOC + msg);
 
         retval = rsTunerBusy;
+    }
+
+    if (pendingRecording)
+    {
+        delete pendingRecording;
+        pendingRecording = NULL;
     }
 
     WaitForEventThreadSleep();
