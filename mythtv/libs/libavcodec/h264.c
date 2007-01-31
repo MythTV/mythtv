@@ -5982,7 +5982,8 @@ static int inline get_cabac_cbf_ctx( H264Context *h, int cat, int idx ) {
     return ctx + 4 * cat;
 }
 
-static const __attribute((used)) uint8_t last_coeff_flag_offset_8x8[63] = {
+// diabled static for now since cabac.c needs this symbol under certain conditions (it's working in ffmpeg)
+/*static*/ const __attribute((used)) uint8_t last_coeff_flag_offset_8x8[63] = {
     0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
     2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
     3, 3, 3, 3, 3, 3, 3, 3, 4, 4, 4, 4, 4, 4, 4, 4,
