@@ -2069,7 +2069,7 @@ if test x"$proc_error_msg" = x"yes"; then
 fi
 
 if test x"$proc_opt" = x"no"; then
-    optimize="yes"
+    test x"$optimize" = X"no" && optimize="yes"
     if test x"$cpu_cmov" = x"yes" -a x"$ARCHFLAGS" != x"-march=k8"; then
         ARCHFLAGS="-march=pentiumpro";
     fi
@@ -2638,7 +2638,9 @@ if test x"$symbol_visibility" = x"yes"; then
 fi
 
 # not all compilers support -Os
-test "$optimize" = "small" && check_cflags -Os
+#test "$optimize" = "small" && check_cflags -Os
+# disabling -Os for now (2007-01-31) since it has build problems after ffmpeg sync [12645]
+test "$optimize" = "small" && check_cflags -O2
 
 if enabled optimize; then
     if test -n "`$cc -v 2>&1 | grep xlc`"; then
