@@ -3,8 +3,9 @@
 <sites>
 
 <category name="Arts"> 
-   <item> 
-        <title>BBC - Entertainment</title> 
+
+    <item> 
+        <title>BBC News - Entertainment</title> 
 <url>http://newsrss.bbc.co.uk/rss/newsonline_world_edition/entertainment/rss.xml</url> 
     </item> 
 
@@ -20,13 +21,13 @@
         <ico>http://efilmcritic.com/favicon.ico</ico> 
     </item> 
 
-      <item> 
+    <item> 
         <title>Reuters Entertainment</title> 
         <url>http://www.microsite.reuters.com/rss/Entertainment</url> 
         <ico>http://www.reuters.com/favicon.ico</ico> 
     </item>        
 
-      <item> 
+    <item> 
         <title>Scotsman.com Entertainment News</title> 
         <url>http://news.scotsman.com/entertainment.cfm?format=rss</url> 
         <ico>http://www.scotsman.com/favicon.ico</ico> 
@@ -37,13 +38,12 @@
         <url>http://rss.news.yahoo.com/rss/entertainment</url> 
     </item> 
 
-    </category> 
-
+</category> 
 
 <category name="Business"> 
 
     <item> 
-        <title>BBC - Business</title> 
+        <title>BBC News - Business</title> 
         <url>http://newsrss.bbc.co.uk/rss/newsonline_world_edition/business/rss.xml</url> 
     </item> 
 
@@ -71,7 +71,6 @@
 
 </category> 
 
-
 <category name="Computers"> 
 
     <item> 
@@ -86,7 +85,7 @@
     </item> 
 
     <item> 
-        <title>BBC - Technology</title> 
+        <title>BBC News - Technology</title> 
         <url>http://newsrss.bbc.co.uk/rss/newsonline_world_edition/technology/rss.xml</url> 
     </item> 
     
@@ -110,6 +109,11 @@
     <item> 
         <title>Digg - Technology</title> 
         <url>http://www.digg.com/rss/containertechnology.xml</url> 
+    </item> 
+
+    <item> 
+        <title>FedoraNEWS</title> 
+        <url>http://fedoranews.org/cms/node/feed</url> 
     </item> 
 
     <item> 
@@ -146,6 +150,11 @@
         <url>http://www.heise.de/newsticker/heise.rdf</url> 
         <ico>http://www.heise.de/favicon.ico</ico> 
     </item> 
+
+    <item>
+        <title>I, Cringely</title>
+        <url>http://www.pbs.org/cringely/pulpit/rss2.xml</url>
+    </item>
 
     <item> 
         <title>KDE Deutschland</title> 
@@ -203,7 +212,12 @@
         <url>http://planet.ubuntu.com/rss10.xml</url> 
         <ico>http://www.ubuntu.com/favicon.ico</ico> 
     </item> 
-    
+
+    <item>
+        <title>Red Hat Magazine</title>
+        <url>http://www.redhat.com/magazine/rss20.xml</url>
+    </item>
+
     <item> 
         <title>Reuters Technology</title> 
         <url>http://www.microsite.reuters.com/rss/technologyNews</url> 
@@ -277,109 +291,131 @@
 </category>
 
 <category name="G4TV">
+
     <item>
         <title>G4TV X-Play Daily Video Podcast</title>
         <url>http://www.g4tv.com/xplay/podcasts/6/XPlay_Daily_Video_Podcast.xml</url>
         <ico>http://www.g4tv.com/favicon.ico</ico>
     </item> 
+
     <item>
         <title>G4TV Attack of the Show Daily Video Podcast</title>
         <url>http://www.g4tv.com/attackoftheshow/podcasts/5/Attack_of_the_Show_Daily_Video_Podcast.xml</url>
         <ico>http://www.g4tv.com/favicon.ico</ico>
     </item> 
+
     <item>
         <title>G4TV The Daily Feed Video Podcast</title>
         <url>http://www.g4tv.com/thefeed/podcasts/19/The_Daily_Feed_Video_Podcast.xml</url>
         <ico>http://www.g4tv.com/favicon.ico</ico>
     </item> 
+
     <item>
         <title>G4TV Cheat! Video Podcast</title>
         <url>http://www.g4tv.com/cheat/podcasts/7/Cheat_Video_Podcast.xml</url>
         <ico>http://www.g4tv.com/favicon.ico</ico>
     </item> 
+
     <item>
         <title>G4TV The Daily Nut</title>
         <url>http://www.g4tv.com/dailynut/podcasts/15/The_Daily_Nut.xml</url>
         <ico>http://www.g4tv.com/favicon.ico</ico>
     </item> 
+
     <item>
         <title>G4TV ICONS Video Podcast</title>
         <url>http://www.g4tv.com/icons/podcasts/17/ICONS_Video_Podcast.xml</url>
         <ico>http://www.g4tv.com/favicon.ico</ico>
     </item> 
+
     <item>
         <title>G4TV Formula D Video Podcast</title>
         <url>http://www.g4tv.com/formulad/podcasts/18/Formula_D_Video_Podcast.xml</url>
         <ico>http://www.g4tv.com/favicon.ico</ico>
     </item> 
+
     <item>
         <title>G4TV Street Fury Video Podcast</title>
         <url>http://www.g4tv.com/streetfury/podcasts/11/Street_Fury_Video_Podcast.xml</url>
         <ico>http://www.g4tv.com/favicon.ico</ico>
     </item> 
+
     <item>
         <title>G4TV The Man Show Video Podcast</title>
         <url>http://www.g4tv.com/themanshow/podcasts/14/The_Man_Show_Video_Podcast.xml</url>
         <ico>http://www.g4tv.com/favicon.ico</ico>
     </item> 
+
     <item>
         <title>G4TV Cinematech Video Podcast</title>
         <url>http://www.g4tv.com/cinematech/podcasts/8/Cinematech_Video_Podcast.xml</url>
         <ico>http://www.g4tv.com/favicon.ico</ico>
     </item> 
+
     <item>
         <title>G4TV Cinematech: Nocturnal Emissions Video Podcast</title>
         <url>http://www.g4tv.com/cinematechnocturnalemissions/podcasts/9/Cinematech_Nocturnal_Emissions_Video_Podcast.xml</url>
         <ico>http://www.g4tv.com/favicon.ico</ico>
     </item> 
+
     <item>
         <title>G4TV Filter Video Podcast</title>
         <url>http://www.g4tv.com/filter/podcasts/10/Filter_Video_Podcast.xml</url>
         <ico>http://www.g4tv.com/favicon.ico</ico>
     </item> 
+
 </category>
 
 <category name="GoogleVideo">
+
     <item>
         <title>Google Video Top 100 New Videos</title>
         <url>http://video.google.com/videofeed?type=search&amp;q=type:gpick&amp;output=rss</url>
         <ico>http://video.google.com/favicon.ico</ico>
     </item> 
+
     <item>
         <title>Google Video Google Picks</title>
         <url>http://video.google.com/videofeed?type=gpickw&amp;output=rss</url>
         <ico>http://video.google.com/favicon.ico</ico>
     </item> 
+
     <item>
         <title>Google Video Comedy</title>
         <url>http://video.google.com/videofeed?type=search&amp;q=genre:comedy&amp;so=1</url>
         <ico>http://video.google.com/favicon.ico</ico>
     </item> 
+
     <item>
         <title>Google Video Music</title>
         <url>http://video.google.com/videofeed?type=search&amp;q=type:music_video&amp;so=1</url>
         <ico>http://video.google.com/favicon.ico</ico>
     </item> 
+
     <item>
         <title>Google Video Movie Trailers</title>
         <url>http://video.google.com/videofeed?type=search&amp;q=type:movie_trailer&amp;so=1</url>
         <ico>http://video.google.com/favicon.ico</ico>
     </item> 
+
     <item>
         <title>Google Video TV Shows</title>
         <url>http://video.google.com/videofeed?type=search&amp;q=type:tvshow&amp;so=1</url>
         <ico>http://video.google.com/favicon.ico</ico>
     </item> 
+
     <item>
         <title>Google Video TV Sports</title>
         <url>http://video.google.com/videofeed?type=search&amp;q=type:sports%20OR%20genre:sports&amp;so=1</url>
         <ico>http://video.google.com/favicon.ico</ico>
     </item> 
+
     <item>
         <title>Google Video TV Educational</title>
         <url>http://video.google.com/videofeed?type=search&amp;q=genre:educational&amp;so=1</url>
         <ico>http://video.google.com/favicon.ico</ico>
     </item> 
+
 </category>
 
 <category name="Health">
@@ -415,13 +451,17 @@
         <ico>http://www.fark.com/favicon.ico</ico>
     </item>
 
-</category>
+    <item>
+        <title>The Onion</title>
+        <url>http://www.theonion.com/content/feeds/weekly</url>
+    </item>
 
+</category>
 
 <category name="International">
 
     <item>
-        <title>BBC (World Edition)</title>
+        <title>BBC News (World Edition)</title>
         <url>http://newsrss.bbc.co.uk/rss/newsonline_world_edition/front_page/rss.xml</url>
     </item>
 
@@ -486,6 +526,21 @@
 
 <category name="Magazines">
 
+    <item>
+        <title>Linux Format</title>
+        <url>http://www.linuxformat.co.uk/backend.php</url>
+    </item>
+    
+    <item>
+        <title>Linux Journal</title>
+        <url>http://www.linuxjournal.com/node/feed</url>
+    </item>
+
+    <item>
+        <title>Make</title>
+        <url>http://makezine.com/blog/index.rss</url>
+    </item>
+
 </category>
 
 <category name="Miscellaneous">
@@ -494,6 +549,7 @@
         <title>CNN - Education</title>
         <url>http://feeds.feedburner.com/cnn/education</url>
     </item>
+
     <item>
         <title>CNN - Law</title>
         <url>http://feeds.feedburner.com/cnn/law</url>
@@ -504,7 +560,7 @@
         <url>http://feeds.feedburner.com/cnn/most_popular</url>
     </item>
 
-        <item>
+    <item>
         <title>CNN - Most Recent</title>
         <url>http://rss.cnn.com/rss/cnn_latest.rss</url>
     </item>
@@ -534,169 +590,231 @@
         <title>CNN - Entertainment</title>
         <url>http://feeds.feedburner.com/cnn/entertainment</url>
     </item>
+
     <item>
         <title>Digital Spy - Broadcasting</title>
         <url>http://syndication.digitalspy.co.uk/xmlcache/dsbroadcast.xml</url>
     </item>
+
     <item>
         <title>Digital Spy - Cable</title>
         <url>http://syndication.digitalspy.co.uk/xmlcache/dscable.xml</url>
     </item>
+
     <item>
-        <title>Digital Spy - Film and DVD</title>
-        <url>http://syndication.digitalspy.co.uk/xmlcache/dsfilm.xml</url>
+        <title>Digital Spy - Cult</title>
+        <url>http://syndication.digitalspy.co.uk/xmlcache/dscult.xml</url>
     </item>
+
+    <item>
+        <title>Digital Spy - Entertainment Headlines</title>
+        <url>http://syndication.digitalspy.co.uk/xmlcache/dseznews.xml</url>
+    </item>
+
     <item>
         <title>Digital Spy - Gaydar</title>
         <url>http://syndication.digitalspy.co.uk/xmlcache/dsgaydar.xml</url>
     </item>
+
     <item>
         <title>Digital Spy - Headlines</title>
         <url>http://syndication.digitalspy.co.uk/xmlcache/dsukstd.xml</url>
     </item>
+
+    <item>
+        <title>Digital Spy - Media Headlines</title>
+        <url>http://syndication.digitalspy.co.uk/xmlcache/dsmznews.xml</url>
+    </item>
+
+    <item>
+        <title>Digital Spy - Movies</title>
+        <url>http://syndication.digitalspy.co.uk/xmlcache/dsfilm.xml</url>
+    </item>
+
+    <item>
+        <title>Digital Spy - Programming</title>
+        <url>http://syndication.digitalspy.co.uk/xmlcache/dsprogramming.xml</url>
+    </item>
+
+    <item>
+        <title>Digital Spy - Radio</title>
+        <url>http://syndication.digitalspy.co.uk/xmlcache/dsradio.xml</url>
+    </item>
+
     <item>
         <title>Digital Spy - Reality TV</title>
         <url>http://syndication.digitalspy.co.uk/xmlcache/dsreality.xml</url>
     </item>
+
     <item>
         <title>Digital Spy - Satellite</title>
         <url>http://syndication.digitalspy.co.uk/xmlcache/dssatellite.xml</url>
     </item>
+
     <item>
         <title>Digital Spy - Showbiz</title>
         <url>http://syndication.digitalspy.co.uk/xmlcache/dsshowbiz.xml</url>
     </item>
+
     <item>
         <title>Digital Spy - Television</title>
         <url>http://syndication.digitalspy.co.uk/xmlcache/dstv.xml</url>
     </item>
-    
+
     <item>
         <title>Digital Spy - Terrestrial</title>
         <url>http://syndication.digitalspy.co.uk/xmlcache/dsterrestrial.xml</url>
     </item>
-        <item>
+
+    <item>
         <title>Digital Spy - US Television</title>
-        <url>http://syndication.digitalspy.co.uk/xmlcache/dsusa.xml</url>
+        <url>http://syndication.digitalspy.co.uk/xmlcache/dsustv.xml</url>
     </item>
 
 </category>
 
 <category name="News Video">
+
     <item>
         <title>CNET TV</title>
         <url>http://reviews.cnet.com/html/xml/2001-12839_7-0.xml</url>
         <ico>http://www.cnet.com/favicon.ico</ico>
     </item>
+
     <item>
         <title>Reuters Video Top News</title>
         <url>http://today.reuters.com/tv/rss/default.aspx?channelId=3fe70fe45a9e09f79818a5848a0a6039e8e2a37b</url>
         <ico>http://www.reuters.com/favicon.ico</ico>
     </item> 
+
     <item>
         <title>Reuters Video In Depth</title>
         <url>http://today.reuters.com/tv/rss/default.aspx?channelId=9784d2e333d72cb34b52f788c6e44bb63d086ef0</url>
         <ico>http://www.reuters.com/favicon.ico</ico>
     </item> 
+
     <item>
         <title>Reuters Video In Depth</title>
         <url>http://today.reuters.com/tv/rss/default.aspx?channelId=9784d2e333d72cb34b52f788c6e44bb63d086ef0</url>
         <ico>http://www.reuters.com/favicon.ico</ico>
     </item> 
+
     <item>
         <title>Reuters Video Entertainment</title>
         <url>http://today.reuters.com/tv/rss/default.aspx?channelId=189f8813eb619acad6694531e1004d4fcae3c097</url>
         <ico>http://www.reuters.com/favicon.ico</ico>
     </item> 
+
     <item>
         <title>Reuters Video Oddly Enough</title>
         <url>http://today.reuters.com/tv/rss/default.aspx?channelId=4ccf1d535d893e464710e92b6722e47e8a3524df</url>
         <ico>http://www.reuters.com/favicon.ico</ico>
     </item> 
+
     <item>
         <title>Reuters Video Business</title>
         <url>http://today.reuters.com/tv/rss/default.aspx?channelId=6ffc0233e09c26943b265ef3abd575b2d872818b</url>
         <ico>http://www.reuters.com/favicon.ico</ico>
     </item> 
+
     <item>
         <title>Reuters Video Technology</title>
         <url>http://today.reuters.com/tv/rss/default.aspx?channelId=d45538fb92ef02a065c15e16d3dd6a297c2ae7d7</url>
         <ico>http://www.reuters.com/favicon.ico</ico>
     </item> 
+
     <item>
         <title>Reuters Video Archive</title>
         <url>http://today.reuters.com/tv/rss/default.aspx?channelId=2ec8a55340373e6476cf68c0942c4a804b8abd47</url>
         <ico>http://www.reuters.com/favicon.ico</ico>
     </item> 
+
     <item>
         <title>CNN Daily Video Podcast</title>
         <url>http://rss.cnn.com/services/podcasting/cnnnewsroom/rss.xml</url>
         <ico>http://rss.cnn.com/favicon.ico</ico>
     </item> 
+
     <item>
         <title>CNN Now in the News Commuter Edition Daily Video Podcast</title>
         <url>http://rss.cnn.com/services/podcasting/nitn/rss.xml</url>
         <ico>http://rss.cnn.com/favicon.ico</ico>
     </item> 
+
     <item>
         <title>CNN In Case You Missed It Daily Video Podcast</title>
         <url>http://rss.cnn.com/services/podcasting/incaseyoumissed/rss.xml</url>
         <ico>http://rss.cnn.com/favicon.ico</ico>
     </item> 
+
     <item>
         <title>CNN All Access - Backstage Pass Weekly Video Podcast</title>
         <url>http://rss.cnn.com/services/podcasting/allaccess/rss.xml</url>
         <ico>http://rss.cnn.com/favicon.ico</ico>
     </item> 
+
     <item>
         <title>CNN The Glenn Beck Show Weekly Video Podcast</title>
         <url>http://rss.cnn.com/services/podcasting/askglenn/rss.xml</url>
         <ico>http://rss.cnn.com/favicon.ico</ico>
     </item> 
+
     <item>
         <title>CNN The Gryst Weekly Video Podcast</title>
         <url>http://rss.cnn.com/services/podcasting/thegrist/rss.xml</url>
         <ico>http://rss.cnn.com/favicon.ico</ico>
     </item> 
+
     <item>
         <title>CNN SHOWandTELL Weekly Video Podcast</title>
         <url>http://rss.cnn.com/services/podcasting/showandtell/rss.xml</url>
         <ico>http://rss.cnn.com/favicon.ico</ico>
     </item> 
+
     <item>
         <title>CNN Paging Dr. Gupta Weekly Video Podcast</title>
         <url>http://rss.cnn.com/services/podcasting/doctalk/rss.xml</url>
         <ico>http://rss.cnn.com/favicon.ico</ico>
     </item> 
+
     <item>
         <title>CNN Reliable Sources Weekly Video Podcast</title>
         <url>http://www.cnn.com/services/podcasting/reliablesources/rss.xml</url>
         <ico>http://rss.cnn.com/favicon.ico</ico>
     </item> 
+
     <item>
         <title>CNN Late Edition with Wolf Blitzer Weekly Video Podcast</title>
         <url>http://www.cnn.com/services/podcasting/lateedition/rss.xml</url>
         <ico>http://rss.cnn.com/favicon.ico</ico>
     </item> 
+
     <item>
         <title>CNN The Scene Weekly Video Podcast</title>
         <url>http://rss.cnn.com/services/podcasting/thescene/rss.xml</url>
         <ico>http://rss.cnn.com/favicon.ico</ico>
     </item> 
+
     <item>
         <title>CNN Student News Daily Video Podcast</title>
         <url>http://rss.cnn.com/services/podcasting/studentnews/rss.xml</url>
         <ico>http://rss.cnn.com/favicon.ico</ico>
     </item> 
+
     <item>
         <title>CNN Special Programming Weekly Video Podcast</title>
         <url>http://rss.cnn.com/rss/cnn_bestinlife.rss</url>
         <ico>http://rss.cnn.com/favicon.ico</ico>
     </item> 
+
 </category>
 
-
 <category name="Offbeat">
+
+    <item>
+        <title>Boing Boing</title>
+        <url>http://feeds.feedburner.com/boingboing/iBag</url>
+    </item>
 
     <item>
         <title>CNN - Offbeat</title>
@@ -726,7 +844,7 @@
 <category name="OpEd">
 
     <item>
-        <title>BBC - Talking Point</title>
+        <title>BBC News - Talking Point</title>
         <url>http://newsrss.bbc.co.uk/rss/newsonline_world_edition/talking_point/rss.xml</url>
     </item>
 
@@ -985,7 +1103,6 @@
         <ico>http://www.topix.net/favicon.ico</ico>
     </item>
 
-
     <item>
         <title>Topix: Italy</title>
         <url>http://www.topix.net/rss/world/italy.xml</url>
@@ -1044,7 +1161,6 @@
 
 <category name="Regional (US)">
 
-
     <item>
         <title>CNN - US Edition</title>
         <url>http://rss.cnn.com/rss/cnn_us.rss</url>
@@ -1078,12 +1194,12 @@
         <url>http://www.topix.net/rss/state/ak.xml</url>
         <ico>http://www.topix.net/favicon.ico</ico>
     </item>
+
     <item>
         <title>Topix: Arizona</title>
         <url>http://www.topix.net/rss/state/az.xml</url>
         <ico>http://www.topix.net/favicon.ico</ico>
     </item>
-
 
     <item>
         <title>Topix: Arkansas</title>
@@ -1325,7 +1441,6 @@
         <ico>http://www.topix.net/favicon.ico</ico>
     </item>
 
-
     <item>
         <title>Topix: Utah</title>
         <url>http://www.topix.net/rss/state/ut.xml</url>
@@ -1343,7 +1458,6 @@
         <url>http://www.topix.net/rss/state/va.xml</url>
         <ico>http://www.topix.net/favicon.ico</ico>
     </item>
-
 
     <item>
         <title>Topix: Washington DC</title>
@@ -1378,7 +1492,6 @@
 </category>
 
 <category name="Science">
-
 
     <item>
         <title>BBC News - Science</title>
@@ -1420,6 +1533,11 @@
     </item>
 
     <item>
+        <title>BBC News - Sport</title>
+<url>http://newsrss.bbc.co.uk/rss/sportonline_world_edition/front_page/rss.xml</url>
+    </item>
+
+    <item>
         <title>DN sport (SE)</title>
         <url>http://www.dn.se/DNet/jsp/polopoly.jsp?d=1402</url>
     </item>
@@ -1433,6 +1551,12 @@
         <title>Expressen sport (SE)</title>
         <url>http://expressen.se/rss/sport</url>
     </item>
+
+    <item>
+        <title>Reuters Sports</title>
+        <url>http://www.microsite.reuters.com/rss/sportsNews</url>
+        <ico>http://www.reuters.com/favicon.ico</ico>
+    </item>
     
     <item>
         <title>Sportbladet (SE)</title>
@@ -1442,11 +1566,6 @@
     <item>
         <title>Sydsvenskan sport (SE)</title>
         <url>http://sydsvenskan.se/rss/sport</url>
-    </item>
-    <item>
-        <title>Reuters Sports</title>
-        <url>http://www.microsite.reuters.com/rss/sportsNews</url>
-        <ico>http://www.reuters.com/favicon.ico</ico>
     </item>
 
     <item>
@@ -1467,7 +1586,6 @@
         <ico>http://www.topix.net/favicon.ico</ico>
     </item>
 
-
     <item>
         <title>Topix: World Soccer</title>
         <url>http://www.topix.net/rss/world-soccer/world-soccer.xml</url>
@@ -1477,32 +1595,37 @@
 </category>
 
 <category name="YouTube">
+
     <item>
         <title>YouTube Recently Featured</title>
         <url>http://youtube.com/rss/global/recently_featured.rss</url>
         <ico>http://youtube.com/favicon.ico</ico>
     </item> 
+
     <item>
         <title>YouTube Recently Added</title>
         <url>http://youtube.com/rss/global/recently_added.rss</url>
         <ico>http://youtube.com/favicon.ico</ico>
     </item> 
+
     <item>
         <title>YouTube Top Favorites</title>
         <url>http://youtube.com/rss/global/top_favorites.rss</url>
         <ico>http://youtube.com/favicon.ico</ico>
     </item> 
+
     <item>
         <title>YouTube Top Rated</title>
         <url>http://youtube.com/rss/global/top_rated.rss</url>
         <ico>http://youtube.com/favicon.ico</ico>
     </item> 
+
     <item>
         <title>YouTube MythTV Channel</title>
         <url>http://www.youtube.com/rss/tag/mythtv.rss</url>
         <ico>http://youtube.com/favicon.ico</ico>
     </item> 
+
 </category>
 
 </sites>
-
