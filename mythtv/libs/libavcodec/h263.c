@@ -3217,7 +3217,7 @@ static inline int mpeg4_is_resync(MpegEncContext *s){
     }
 
 // disabling the while lopp since it causes playback issues #3001
-#ifdef 0
+#if 0
     while(v<=0xFF){
         if(s->pict_type==B_TYPE || (v>>(8-s->pict_type)!=1) || s->partitioned_frame)
             break;
