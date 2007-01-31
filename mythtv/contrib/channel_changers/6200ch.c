@@ -27,8 +27,14 @@
 #include <stdlib.h>
 #include <unistd.h> // for usleep
 
-// Motorola DCT-6200 IDs
-// Note: there are at least eleven different vendor IDs for the 6200
+// Vendor and Model IDs.
+// NOTE: Some Models have more than one possible Vendor ID
+#define DCT3412_VENDOR_ID1 0x0000159a
+#define DCT3412_MODEL_ID1  0x000034cb
+
+#define DCT5100_VENDOR_ID1 0x000017ee
+#define DCT5100_MODEL_ID1  0x0000620a
+
 #define DCT6200_VENDOR_ID1 0x00000ce5
 #define DCT6200_VENDOR_ID2 0x00000e5c
 #define DCT6200_VENDOR_ID3 0x00001225
@@ -44,10 +50,12 @@
 #define DCT6200_SW_VERSION 0x00010101
 #define DCT6200_MODEL_ID1  0x0000620a
 #define DCT6200_MODEL_ID2  0x00006200
+
 #define DCT6412_VENDOR_ID1 0x00000f9f
 #define DCT6412_VENDOR_ID2 0x0000152f
 #define DCT6412_MODEL_ID1  0x000064ca
 #define DCT6412_MODEL_ID2  0x000064cb
+
 #define DCT6416_VENDOR_ID1 0x000017ee
 #define DCT6416_MODEL_ID1  0x0000646b
 
@@ -166,7 +174,9 @@ int main (int argc, char *argv[])
          printf("node %d: vendor_id = 0x%08x model_id = 0x%08x\n", 
                  i, dir.vendor_id, dir.model_id); 
 
-      if ( ((dir.vendor_id == DCT6200_VENDOR_ID1) || 
+      if ( ((dir.vendor_id == DCT3412_VENDOR_ID1) || 
+            (dir.vendor_id == DCT5100_VENDOR_ID1) ||
+            (dir.vendor_id == DCT6200_VENDOR_ID1) ||
             (dir.vendor_id == DCT6200_VENDOR_ID2) ||
             (dir.vendor_id == DCT6200_VENDOR_ID3) ||
             (dir.vendor_id == DCT6200_VENDOR_ID4) ||
@@ -180,7 +190,9 @@ int main (int argc, char *argv[])
             (dir.vendor_id == DCT6412_VENDOR_ID1) ||
             (dir.vendor_id == DCT6412_VENDOR_ID2) ||
             (dir.vendor_id == DCT6416_VENDOR_ID1)) &&
-           ((dir.model_id == DCT6200_MODEL_ID1) ||
+           ((dir.model_id == DCT3412_MODEL_ID1) ||
+            (dir.model_id == DCT5100_MODEL_ID1) ||
+            (dir.model_id == DCT6200_MODEL_ID1) ||
             (dir.model_id == DCT6200_MODEL_ID2) ||
             (dir.model_id == DCT6412_MODEL_ID1) ||
             (dir.model_id == DCT6412_MODEL_ID2) ||
