@@ -3216,6 +3216,8 @@ static inline int mpeg4_is_resync(MpegEncContext *s){
         return 0;
     }
 
+// disabling the while lopp since it causes playback issues #3001
+#ifdef 0
     while(v<=0xFF){
         if(s->pict_type==B_TYPE || (v>>(8-s->pict_type)!=1) || s->partitioned_frame)
             break;
@@ -3223,6 +3225,7 @@ static inline int mpeg4_is_resync(MpegEncContext *s){
         bits_count+= 8+s->pict_type;
         v= show_bits(&s->gb, 16);
     }
+#endif
 
     if(bits_count + 8 >= s->gb.size_in_bits){
         v>>=8;
