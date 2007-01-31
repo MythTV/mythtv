@@ -2292,6 +2292,15 @@ The next question will ask you if you wish to clear out your video source
 information.  You should answer "YES" to this as well.
 
 Once the graphical setup starts, you'll see that there are six choices
+
+<figure loc="here">
+<eps file="add.eps" height="1cm">
+<img src="add.png">
+<caption>
+The Storage Directories feature is available only in the SVN version of MythTV.
+</caption>
+</figure>
+
 <enum>
 <item>General
 <item>Capture Cards
@@ -7513,7 +7522,7 @@ v0.20.12, 2007-01-08.  Additional diagrams for the scheduler part.
 v0.20.13, 2007-01-09.  Additional tweaks.
 v0.20.14, 2007-01-26.  Fedora uses a different way to switch window managers
 now.  (R.G. Newbury)
-v0.20.15, 2007-01-27.  v4l might have the audio out muted.
+v0.20.15, 2007-01-27.  v4l might have the audio out muted.  Storage Groups is only in SVN.
 -->
 
 <!--
