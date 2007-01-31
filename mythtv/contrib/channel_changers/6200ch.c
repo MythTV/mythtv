@@ -108,8 +108,8 @@ int main (int argc, char *argv[])
            verbose = 1;
            break;
        case 's':
-	   single_packet = 1;
-	   break;
+           single_packet = 1;
+           break;
        case 'n':
            starting_node = atoi(optarg);
            break;
@@ -159,13 +159,13 @@ int main (int argc, char *argv[])
       if (rom1394_get_directory(handle, i, &dir) < 0) {
          fprintf(stderr,"error reading config rom directory for node %d\n", i);
          raw1394_destroy_handle(handle);
-    	 exit(1);
+         exit(1);
       }
 
       if (verbose) 
          printf("node %d: vendor_id = 0x%08x model_id = 0x%08x\n", 
                  i, dir.vendor_id, dir.model_id); 
-		
+
       if ( ((dir.vendor_id == DCT6200_VENDOR_ID1) || 
             (dir.vendor_id == DCT6200_VENDOR_ID2) ||
             (dir.vendor_id == DCT6200_VENDOR_ID3) ||
@@ -247,3 +247,5 @@ void set_chan_fast(raw1394handle_t handle, int device, int verbose, int chn)
  
     avc1394_transaction_block(handle, device, cmd, 3, RETRY_COUNT_FAST);
 }
+
+/* vim: set expandtab tabstop=4 shiftwidth=4: */
