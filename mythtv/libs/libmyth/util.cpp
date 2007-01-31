@@ -250,7 +250,7 @@ uint myth_system(const QString &command, int flags)
             close(fd);
 
         /* Run command */
-        execl("/bin/sh", "sh", "-c", command.ascii(), NULL);
+        execl("/bin/sh", "sh", "-c", QString(command.utf8()).ascii(), NULL);
         if (errno)
         {
             VERBOSE(VB_IMPORTANT,

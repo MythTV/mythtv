@@ -1819,7 +1819,7 @@ void JobQueue::DoTranscodeThread(void)
         VERBOSE(VB_JOBQUEUE, LOC + QString("Running command: '%1'")
                                            .arg(command));
 
-        int result = myth_system(command.ascii());
+        int result = myth_system(command);
         int status = GetJobStatus(jobID);
  
         if ((result == MYTHSYSTEM__EXIT__EXECL_ERROR) ||
@@ -2008,7 +2008,7 @@ void JobQueue::DoFlagCommercialsThread(void)
 
     VERBOSE(VB_JOBQUEUE, LOC + QString("Running command: '%1'").arg(command));
 
-    breaksFound = myth_system(command.ascii());
+    breaksFound = myth_system(command);
     int priority = LP_NOTICE;
     QString comment = "";
 
@@ -2117,7 +2117,7 @@ void JobQueue::DoUserJobThread(void)
     VERBOSE(VB_JOBQUEUE, LOC + QString("Running command: '%1'")
                                        .arg(runningJobCommands[key]));
 
-    int result = myth_system(runningJobCommands[key].ascii());
+    int result = myth_system(runningJobCommands[key]);
 
     if ((result == MYTHSYSTEM__EXIT__EXECL_ERROR) ||
         (result == MYTHSYSTEM__EXIT__CMD_NOT_FOUND))
