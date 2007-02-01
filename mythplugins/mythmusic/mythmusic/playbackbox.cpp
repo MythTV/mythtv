@@ -48,7 +48,6 @@ PlaybackBoxMusic::PlaybackBoxMusic(MythMainWindow *parent, QString window_name,
     playlist_popup = NULL;    
     progress = NULL;
     
-    lcd_volume_visible = false; 
     isplaying = false;
     tree_is_done = false;
     first_playlist_check = true;
@@ -1015,18 +1014,15 @@ void PlaybackBoxMusic::showVolume(bool on_or_off)
     {
         if (volume_status)
         {
-            if(on_or_off)
+            if (on_or_off)
             {
                 volume_status->SetUsed(output->GetCurrentVolume());
                 volume_status->SetOrder(0);
                 volume_status->refresh();
                 volume_display_timer->changeInterval(2000);
-                if (!lcd_volume_visible)
-                {
-                    lcd_volume_visible = true;
-                    if (class LCD *lcd = LCD::Get())
-                        lcd->switchToVolume("Music");
-                }
+                if (class LCD *lcd = LCD::Get())
+                    lcd->switchToVolume("Music");
+
                 if (output->GetMute())
                     volume_level = 0.0;
                 else

@@ -147,7 +147,6 @@ class PlaybackBoxMusic : public MythThemedDialog
     unsigned int repeatmode;
 
     bool isplaying;
-    bool lcd_volume_visible;
 
     bool menufilters;
 
