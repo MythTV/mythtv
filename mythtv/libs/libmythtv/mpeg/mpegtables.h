@@ -168,7 +168,7 @@ class StreamID
                 (StreamID::DSMCC_D == type));
     }
     static uint Normalize(uint stream_id, const desc_list_t &desc,
-                          const QString sistandard);
+                          const QString &sistandard);
     static const char* toString(uint streamID);
 };
 

@@ -40,7 +40,7 @@ static const uint len_for_alloc[] =
 };
 
 uint StreamID::Normalize(uint stream_id, const desc_list_t &desc,
-                         const QString sistandard)
+                         const QString &sistandard)
 {
     if ((sistandard != "dvb") && (OpenCableVideo == stream_id))
         return MPEG2Video;
