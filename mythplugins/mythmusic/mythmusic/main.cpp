@@ -185,6 +185,9 @@ bool HasFileChanged(const QString &filename, const QString &date_modified)
             return true;
         }
     }
+    else {
+        VERBOSE(VB_IMPORTANT, QString("Failed to stat file: %1").arg(filename.ascii()));
+    }
     return false;
 }
 
