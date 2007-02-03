@@ -184,8 +184,24 @@ void Metadata::dumpToDatabase()
     query.bindValue(":LENGTH", length);
     query.bindValue(":FORMAT", format);
 
-    if (query.exec() && query.isActive() && query.size() > 0)
-        return;
+    if (query.exec() && query.isActive() && query.size() > 0 )
+    {
+        if (id > 0)
+        {
+            query.prepare("UPDATE music_songs SET "
+                "date_modified = :DATE_MOD WHERE filename = :FILENAME;");
+            query.bindValue(":DATE_MOD", QDateTime::currentDateTime());
+            query.bindValue(":FILENAME", sqlfilename.utf8());
+            if (!query.exec() || !query.isActive())
+            {
+                MythContext::DBError("update modification date", query);
+                return;
+            }
+        }
+        else {
+            return;
+        }
+    }
 
     // Load the artist id or insert it and get the id
     unsigned int artistId;
