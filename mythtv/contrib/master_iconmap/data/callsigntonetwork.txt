@@ -178,6 +178,7 @@ FSFL        FOXSPORTS
 FSM3        FOXSPORTS
 FSN         FOXSPORTS
 FSN1        FOXSPORTS
+FSNE        FOXSPORTS
 FSNE1       FOXSPORTS
 FSNY        FOXSPORTS
 FSO         FOXSPORTS
@@ -244,6 +245,7 @@ G5-24       SHOWTIME
 G7-06       GAMESHOWNETWORK
 G7-07       GOLF
 GALA        GALAVISION
+GAC         GAC
 GLOBO       GLOBO-BR
 GLONE       GLOBO_NEWS-BR
 GNT         GNT-BR
@@ -843,8 +845,10 @@ MovieOne    MovieOne
 MovieOne+2  MovieOne
 NASA        NASA
 NATGE       National_Geographic
+NESN        NESN
 NET1        PBS-KUON
 NEWSENG     NEWSENG
+NECN        NEWSENG
 NEWSNET     CTV-NEWSNET
 NEXTP       SHOWTIME
 NFL         NFL
@@ -898,6 +902,7 @@ SHOWX       SHOWTIMEEXTREME
 SHOWXP      SHOWTIMEEXTREME
 SITV        SITV
 SONY        SONY
+SOAP        SOAP
 SPACEC      SPACE
 SPCCAN      SPACE
 SPEED       SPEED
@@ -1220,6 +1225,7 @@ WGFL        UPN
 WGGB        ABC
 WGHP        FOX
 WGMB        FOX
+WGME        CBS
 WGN         CW-WGN
 WGNM        UPN
 WGNO        ABC
@@ -1588,6 +1594,7 @@ WUPW        FOX
 WUSF        PBS-WUSF
 WUSI        PBS-WUSI
 WUTB        UPN
+WUTF        TELEFUTURA
 WUTR        ABC
 WUTV        FOX
 WUVP        UNIVISION
@@ -1654,6 +1661,7 @@ WYIN        PBS-WYIN
 WYTV        ABC
 WYZZ        FOX
 WZDX        FOX
+WZMY        IND-WZMY
 WZPX        WB
 WZTV        FOX
 WZVN        ABC

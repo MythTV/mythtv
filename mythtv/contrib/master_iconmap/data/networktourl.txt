@@ -129,6 +129,7 @@ Fox8                    [ls-logo]/tv/ff/fox8_aus.jpg
 FoxClassicsau           [ls-logo]/tv/ff/foxclassics_au.jpg
 FoxSportsNetwork        [ls-logo]/tv/ff/fsn.jpg
 G4                      [ls-logo]/tv/gg/g4_video_game_tv.jpg
+GAC			[ls-logo]/tv/gg/great_american_country.jpg
 GALAVISION              [ls-logo]/tv/gg/galavision_us.jpg
 GAMESHOWNETWORK         [ls-logo]/tv/gg/gameshownetwork.jpg
 GLOBAL-CHCA             [ls-logo]/tv/cc/chca_red_deer.jpg
@@ -162,6 +163,7 @@ IND-WRDQ                [ls-logo]/tv/ww/wrdq_action27_orlando.jpg
 IND-WSBK                [ls-logo]/tv/ww/wsbk_tv38_boston.jpg
 IND-WTGL                [ls-logo]/tv/ww/wtgl_52_cocoa.jpg
 IND-WYBE                [ls-logo]/tv/ww/wybe_philadelphia.jpg
+IND-WZMY		[ls-logo]/tv/ww/wzmy_my50_derry.jpg
 IND-YTVP                [ls-logo]/tv/yy/youth_tv.jpg
 INHD                    [ls-logo]/tv/ii/inhd.jpg
 IPLEX                   [ls-logo]/tv/ee/encore_indieplex.jpg
@@ -213,6 +215,7 @@ NBC-WCAU                [ls-logo]/tv/ww/wcau_nbc10_philadelphia.jpg
 NBC-WCAU-WEATHERPLUS    [ls-logo]/tv/ww/wcau_weather_plus.jpg
 NBC-WESH                [ls-logo]/tv/ww/wesh_nbc2_daytona_beach.jpg
 NBC-WMAQ                [ls-logo]/tv/ww/wmaq_nbc5_chicago.jpg
+NESN                    [ls-logo]/tv/nn/nesn_us.jpg
 NEWSENG                 [ls-logo]/tv/nn/new_england_cable_news.jpg
 NFL                     [ls-logo]/tv/nn/nfl.jpg
 NWCN                    [ls-logo]/tv/nn/nw_cablenews_can.jpg
@@ -434,6 +437,7 @@ SHOWTIMETOO             [ls-logo]/tv/ss/showtime_too.jpg
 SITV                    [ls-logo]/tv/ss/sitv_los_angeles.jpg
 SMILEOFACHILD           [ls-logo]/tv/ss/smile_of_a_child.jpg
 SONY                    [ls-logo]/tv/ss/sonytv.jpg
+SOAP                    [ls-logo]/tv/ss/soapnet_us.jpg
 SPACE                   [ls-logo]/tv/ss/space_arg.jpg
 SPEED                   [ls-logo]/tv/ss/speed_channel_us.jpg
 SPIKE                   [ls-logo]/tv/ss/spike_tv.jpg
