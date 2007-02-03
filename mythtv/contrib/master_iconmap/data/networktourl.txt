@@ -35,7 +35,7 @@ CANAL_BRASIL-BR         [ls-logo]/tv/cc/canalbrasil.jpg
 CANAL_RURAL-BR          [ls-logo]/tv/cc/canal_rural_brasil.jpg
 CARTOONNETWORK          [ls-logo]/tv/cc/cartoon_network.jpg
 CBC                     [ls-logo]/tv/cc/cbc_tv.jpg
-CBC-CBLFT               [ls-logo]/tv/cc/cblt_toronto.gif
+CBC-CBLFT               [ls-logo]/tv/cc/cblt_toronto.jpg
 CBC-CBXFT               [ls-logo]/tv/cc/cbc_src.jpg
 CBC-CBXT                [ls-logo]/tv/cc/cbc_edmonton.jpg
 CBC-NewsWorld           [ls-logo]/tv/cc/cbc_newsworld.jpg
@@ -163,11 +163,13 @@ IND-WRDQ                [ls-logo]/tv/ww/wrdq_action27_orlando.jpg
 IND-WSBK                [ls-logo]/tv/ww/wsbk_tv38_boston.jpg
 IND-WTGL                [ls-logo]/tv/ww/wtgl_52_cocoa.jpg
 IND-WYBE                [ls-logo]/tv/ww/wybe_philadelphia.jpg
-IND-WZMY		[ls-logo]/tv/ww/wzmy_my50_derry.jpg
+IND-WZMY                [ls-logo]/tv/ww/wzmy_my50_derry.jpg
 IND-YTVP                [ls-logo]/tv/yy/youth_tv.jpg
 INHD                    [ls-logo]/tv/ii/inhd.jpg
 IPLEX                   [ls-logo]/tv/ee/encore_indieplex.jpg
 ITV                     [ls-logo]/tv/kk/kwpx_i33_seattle.jpg
+ITV-KWPX                [ls-logo]/tv/kk/kwpx_i33_seattle.jpg
+ITV-WCPX                [ls-logo]/tv/ww/wcpx_i38_chicago.jpg
 JCTV                    [ls-logo]/tv/jj/jc_tv.jpg
 JETIX                   [ls-logo]/tv/jj/jetix.jpg
 KBCB                    [ls-logo]/tv/kk/kbcb_24_world_tv_seattle.jpg

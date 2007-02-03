@@ -772,7 +772,7 @@ KWKB        WB
 KWKT        FOX
 KWNB        ABC
 KWOG        KWOG
-KWPX        ITV
+KWPX        ITV-KWPX
 KWQC        NBC
 KWSD        WB
 KWSU        PBS-KWSU
@@ -1121,7 +1121,7 @@ WCNC        NBC
 WCNY        PBS-WCNY
 WCOV        FOX
 WCPO        ABC
-WCPX        ITV
+WCPX        ITV-WCPX
 WCSH        NBC
 WCTE        PBS-WCTE
 WCTI        ABC
