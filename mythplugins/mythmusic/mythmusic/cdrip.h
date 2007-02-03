@@ -145,6 +145,7 @@ class Ripper : public MythThemedDialog
     QString            m_albumName, m_artistName, m_genreName, m_year;
     QStringList        m_searchList;
     bool               m_somethingwasripped;
+    bool               m_mediaMonitorActive;
 };
 
 

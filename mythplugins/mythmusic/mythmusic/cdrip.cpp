@@ -30,6 +30,7 @@ using namespace std;
 #include <mythtv/mythwidgets.h>
 #include <mythtv/lcddevice.h>
 #include <mythtv/dialogbox.h>
+#include <mythtv/mythmediamonitor.h>
 
 // MythMusic includes
 #include "cdrip.h"
@@ -367,6 +368,17 @@ int CDRipperThread::ripTrack(QString &cddevice, Encoder *encoder, int tracknum)
 Ripper::Ripper(MythMainWindow *parent, const char *name)
       : MythThemedDialog(parent, "cdripper", "music-", name, true)
 {
+#ifndef _WIN32
+    // if the MediaMonitor is running stop it
+    m_mediaMonitorActive = false;
+    MediaMonitor *mon = MediaMonitor::GetMediaMonitor();
+    if (mon && mon->IsActive())
+    {
+        m_mediaMonitorActive = true;
+        mon->StopMonitoring();
+    }
+#endif
+
     // Set this to false so we can tell if the ripper has done anything
     // (i.e. we can tell if the user quit prior to ripping)
     m_somethingwasripped = false;
@@ -381,6 +393,16 @@ Ripper::~Ripper(void)
 {
     if (m_decoder)
         delete m_decoder;
+
+#ifndef _WIN32
+    // if the MediaMonitor was active when we started then restart it
+    if (m_mediaMonitorActive)
+    {
+        MediaMonitor *mon = MediaMonitor::GetMediaMonitor();
+        if (mon)
+            mon->StartMonitoring();
+    }
+#endif
 }
 
 void Ripper::wireupTheme(void)
