@@ -35,7 +35,7 @@ CANAL_BRASIL-BR         [ls-logo]/tv/cc/canalbrasil.jpg
 CANAL_RURAL-BR          [ls-logo]/tv/cc/canal_rural_brasil.jpg
 CARTOONNETWORK          [ls-logo]/tv/cc/cartoon_network.jpg
 CBC                     [ls-logo]/tv/cc/cbc_tv.jpg
-CBC-CBLFT               [ls-logo]/tv/cc/cblt_toronto.gif 
+CBC-CBLFT               [ls-logo]/tv/cc/cblt_toronto.gif
 CBC-CBXFT               [ls-logo]/tv/cc/cbc_src.jpg
 CBC-CBXT                [ls-logo]/tv/cc/cbc_edmonton.jpg
 CBC-NewsWorld           [ls-logo]/tv/cc/cbc_newsworld.jpg
@@ -213,7 +213,7 @@ NBC-WCAU                [ls-logo]/tv/ww/wcau_nbc10_philadelphia.jpg
 NBC-WCAU-WEATHERPLUS    [ls-logo]/tv/ww/wcau_weather_plus.jpg
 NBC-WESH                [ls-logo]/tv/ww/wesh_nbc2_daytona_beach.jpg
 NBC-WMAQ                [ls-logo]/tv/ww/wmaq_nbc5_chicago.jpg
-NEWSENG                 [zap2it]/necn.gif
+NEWSENG                 [ls-logo]/tv/nn/new_england_cable_news.jpg
 NFL                     [ls-logo]/tv/nn/nfl.jpg
 NWCN                    [ls-logo]/tv/nn/nw_cablenews_can.jpg
 National_Geographic     [ls-logo]/tv/nn/natgeochannel.jpg
