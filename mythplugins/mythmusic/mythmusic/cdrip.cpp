@@ -244,11 +244,11 @@ void CDRipperThread::run(void)
             if (isCancelled())
                 return;
 
+            delete encoder;
+
             // save the metadata to the DB
             track->setFilename(outfile);
             track->dumpToDatabase();
-
-            delete encoder;
         }
     }
 
