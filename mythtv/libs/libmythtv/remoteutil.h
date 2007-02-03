@@ -63,7 +63,7 @@ MPUBLIC int RemoteGetFreeRecorderCount(void);
 MPUBLIC int RemoteCheckForRecording(ProgramInfo *pginfo);
 MPUBLIC int RemoteGetRecordingStatus(ProgramInfo *pginfo, int overrecsecs,
                                      int underrecsecs);
-
+MPUBLIC vector<ProgramInfo *> *RemoteGetCurrentlyRecordingList(void);
 #endif
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

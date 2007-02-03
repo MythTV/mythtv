@@ -103,10 +103,65 @@ bool TV::StartTV (ProgramInfo *tvrec, bool startInGuide,
 
     while (!quitAll)
     {
+        int freeRecorders = RemoteGetFreeRecorderCount();
         if (curProgram)
         {
             if (!tv->Playback(curProgram))
                 quitAll = true;
+        }
+        else if (!freeRecorders)
+        {
+            vector<ProgramInfo *> *reclist;
+            reclist = RemoteGetCurrentlyRecordingList();
+            if (reclist->empty())
+            {
+                VERBOSE(VB_PLAYBACK, LOC_ERR + 
+                        "Failed to get recording show list");
+                quitAll = true;
+            }
+
+            int numrecordings = reclist->size();
+            if (numrecordings > 0)
+            {
+                if (numrecordings == 1)
+                {
+                    curProgram = new ProgramInfo(*reclist->at(0));
+                }
+                else
+                {
+                    ProgramInfo *p = NULL;
+                    QStringList recTitles;
+                    QString buttonTitle;
+                    vector<ProgramInfo *>::iterator it = reclist->begin();
+                    while (it != reclist->end())
+                    {
+                        p = *it;
+                        buttonTitle = tr("Chan %1: %2")
+                            .arg(p->chanstr).arg(p->title);
+                        recTitles.append(buttonTitle);
+                        it++;
+                    }
+                    int ret = MythPopupBox::showButtonPopup(
+                                    gContext->GetMainWindow(),
+                                    "",
+                                    tr("All Tuners are Busy.\n"
+                                       "Select a Current Recording"),
+                                    recTitles, 1);
+                    if (ret == -1)
+                    {
+                        quitAll = true;
+                    }
+                    else
+                    {
+                        p = reclist->at(ret);
+                        curProgram = new ProgramInfo(*p);
+                    }
+                }
+            }
+
+            if (reclist)
+                delete reclist;
+            continue;
         }
         else
         {

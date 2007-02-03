@@ -1099,8 +1099,13 @@ void MainServer::HandleQueryRecordings(QString type, PlaybackSock *pbs)
         "  recorded.starttime = recordedprogram.starttime ) "
         "WHERE ( recorded.deletepending = 0 OR "
         "        DATE_ADD(recorded.lastmodified, INTERVAL 5 MINUTE) <= NOW() "
-        "      ) "
-        "ORDER BY recorded.starttime";
+        "      ) ";
+
+    if (type == "Recording")
+        thequery += "AND recorded.endtime >= NOW() AND "
+            "recorded.starttime <= NOW()";
+
+    thequery += "ORDER BY recorded.starttime";
 
     if (type == "Delete")
         thequery += " DESC";

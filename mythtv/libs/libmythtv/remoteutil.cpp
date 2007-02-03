@@ -426,4 +426,38 @@ int RemoteGetRecordingStatus(ProgramInfo *pginfo, int overrecsecs,
     return retval;
 }
 
+/*
+ * \brief return list of currently recording shows
+ */
+vector<ProgramInfo *> *RemoteGetCurrentlyRecordingList(void)
+{
+    QString str = "QUERY_RECORDINGS ";
+    str += "Recording";
+    QStringList strlist = str;
+
+    vector<ProgramInfo *> *reclist = new vector<ProgramInfo *>;
+    vector<ProgramInfo *> *info = new vector<ProgramInfo *>;
+    if (!RemoteGetRecordingList(info, strlist))
+    {
+        if (info)
+            delete info;
+        return reclist;
+    }
+
+    ProgramInfo *p = NULL;
+    vector<ProgramInfo *>::iterator it = info->begin();
+    // make sure whatever remotegetrecordinglist returned
+    // only has rsRecording shows
+    for ( ; it != info->end(); it++)
+    {
+        p = *it;
+        if (p->recstatus == rsRecording)
+            reclist->push_back(new ProgramInfo(*p));
+    }
+    
+    if (info)
+        delete info;
+
+    return reclist; 
+}
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
