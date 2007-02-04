@@ -499,10 +499,7 @@ void ImportMusicDialog::addPressed()
             return;
         }
 
-        // update the database
         meta->setFilename(saveFilename);
-        meta->dumpToDatabase();
-        m_somethingWasImported = true;
 
         // do we need to update the tags?
         if (m_tracks->at(m_currentTrack)->metadataHasChanged)
@@ -514,6 +511,10 @@ void ImportMusicDialog::addPressed()
                 delete decoder;
             }
         }
+
+        // update the database
+        meta->dumpToDatabase();
+        m_somethingWasImported = true;
 
         m_tracks->at(m_currentTrack)->isNewTune = Ripper::isNewTune(
                 meta->Artist(), meta->Album(), meta->Title());
