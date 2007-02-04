@@ -281,6 +281,7 @@ HSN         HOMESHOPPINGNETWORK
 IFC         IFC
 INHD        INHD
 INHD2       INHD
+INHDCOM     INHD
 IPLEX       IPLEX
 JETIX       JETIX
 KAAL        ABC
@@ -815,6 +816,8 @@ LIFE        LIFETIME
 LIFENET     LIFENETWORK
 LIFEP       LIFETIME
 LMN         LIFETIMEMOVIE
+LOGOP       Logo
+LOGO        Logo
 LOVE        Encore_Love
 LOVEP       Encore_Love
 Lifestyle   Lifestyle

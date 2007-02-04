@@ -186,6 +186,7 @@ LIFENETWORK             [ls-logo]/tv/ll/life_network.jpg
 LIFETIME                [ls-logo]/tv/ll/lifetime.jpg
 LIFETIMEMOVIE           [ls-logo]/tv/ll/lifetime_movie.jpg
 Lifestyle               [ls-logo]/tv/ll/lifestyle.jpg
+Logo                    [ls-logo]/tv/ll/logo_us.jpg
 MNTV                    [ls-logo]/corp/ln/my_network_tv.jpg
 MSNBC                   [ls-logo]/tv/mm/msnbc.jpg
 MTV                     [ls-logo]/tv/mm/mtv.jpg
