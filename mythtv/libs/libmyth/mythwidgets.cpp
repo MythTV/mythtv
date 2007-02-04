@@ -33,7 +33,7 @@ void MythComboBox::keyPressEvent(QKeyEvent *e)
     bool handled = false;
     QStringList actions;
     if ((!popup || !popup->isShown()) &&
-        (gContext->GetMainWindow()->TranslateKeyPress("qt", e, actions)))
+        (gContext->GetMainWindow()->TranslateKeyPress("qt", e, actions, !allowVirtualKeyboard)))
     {
         for (unsigned int i = 0; i < actions.size() && !handled; i++)
         {
