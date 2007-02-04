@@ -577,6 +577,10 @@ void Ripper::keyPressEvent(QKeyEvent *e)
                 trackListDown(true);
             }
         }
+        else if (action == "INFO")
+        {
+            showEditMetadataDialog();
+        }
         else if (action == "1")
             m_scanButton->push();
         else if (action == "2")
@@ -651,7 +655,7 @@ void Ripper::startScanCD(void)
                 }
 
                 QString title = track->Title();
-                newTune = isNewTune(m_artistName, m_albumName, title);
+                newTune = Ripper::isNewTune(m_artistName, m_albumName, title);
 
                 if (newTune)
                 {
@@ -747,7 +751,8 @@ void Ripper::scanCD(void)
     m_decoder = new CdDecoder("cda", NULL, NULL, NULL);
 }
 
-bool Ripper::isNewTune(QString& artist, QString& album, QString& title)
+// static function to determin if there is already a similar track in the database
+bool Ripper::isNewTune(const QString& artist, const QString& album, const QString& title)
 {
     MSqlQuery query(MSqlQuery::InitCon());
     QString queryString("SELECT filename, artist_name, album_name, name, song_id "
@@ -832,7 +837,8 @@ void Ripper::deleteTrack(QString& artist, QString& album, QString& title)
 }
 
 // static function to create a filename based on the metadata information
-QString Ripper::filenameFromMetadata(Metadata *track)
+// if createDir is true then the directory structure will be created
+QString Ripper::filenameFromMetadata(Metadata *track, bool createDir)
 {
     QString musicdir = gContext->GetSetting("MusicLocation");
     musicdir = QDir::cleanDirPath(musicdir);
@@ -895,16 +901,20 @@ QString Ripper::filenameFromMetadata(Metadata *track)
     }
 
     filename = filename.local8Bit();
+
     QStringList directoryList = QStringList::split("/", filename);
     for (unsigned i = 0; i < (directoryList.size() - 1); i++)
     {
         musicdir += "/" + directoryList[i];
-        umask(022);
-        directoryQD.mkdir(musicdir, true);
-        directoryQD.cd(musicdir, true);
+        if (createDir)
+        {
+            umask(022);
+            directoryQD.mkdir(musicdir, true);
+            directoryQD.cd(musicdir, true);
+        }
     }
 
-    filename = directoryQD.absPath() + "/" + directoryList.last();
+    filename = QDir::cleanDirPath(musicdir) + "/" + directoryList.last();
 
     return filename;
 }

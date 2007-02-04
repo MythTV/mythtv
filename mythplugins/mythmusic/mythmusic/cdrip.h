@@ -93,7 +93,9 @@ class Ripper : public MythThemedDialog
     bool somethingWasRipped();
     void scanCD(void);
     void ejectCD(void);
-    static QString filenameFromMetadata(Metadata *track);
+
+    static QString filenameFromMetadata(Metadata *track, bool createDir = true);
+    static bool isNewTune(const QString &artist, const QString &album, const QString &title);
 
   protected slots:
     void startRipper(void);
@@ -113,7 +115,6 @@ class Ripper : public MythThemedDialog
   private:
     void wireupTheme(void);
     void keyPressEvent(QKeyEvent *e);
-    bool isNewTune(QString &artist, QString &album, QString &title);
     void deleteTrack(QString& artist, QString& album, QString& title);
     void updateTrackList(void);
     void trackListDown(bool page);

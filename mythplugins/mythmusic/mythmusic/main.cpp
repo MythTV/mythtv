@@ -21,6 +21,7 @@ using namespace std;
 #include "playlist.h"
 #include "globalsettings.h"
 #include "dbcheck.h"
+#include "importmusic.h"
 
 #include <mythtv/mythcontext.h>
 #include <mythtv/mythplugin.h>
@@ -372,6 +373,20 @@ bool startRipper(void)
     return false;
 }
 
+bool startImport(void)
+{
+    ImportMusicDialog import(gContext->GetMainWindow(), "import music");
+
+    qApp->unlock();
+    import.exec();
+    qApp->lock();
+
+    if (import.somethingWasImported())
+        return true;
+
+    return false;
+}
+
 struct MusicData
 {
     QString paths;
@@ -416,6 +431,11 @@ void MusicCallback(void *data, QString &selection)
             //  Tell the metadata to reset itself
             RebuildMusicTree(mdata);
         }
+    }
+    else if (sel == "music_import")
+    {
+        if (startImport())
+            RebuildMusicTree(mdata);
     }
     else if (sel == "settings_scan")
     {

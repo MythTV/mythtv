@@ -61,6 +61,12 @@
    </button>
 
    <button>
+       <type>MUSIC_IMPORT</type>
+       <text>Import Files</text>
+       <action>MUSIC_IMPORT</action>
+   </button>
+
+   <button>
       <type>MUSIC_SCAN</type>
       <text>Scan for New Music</text>
       <text lang="IT">Rileggi lista brani</text>
