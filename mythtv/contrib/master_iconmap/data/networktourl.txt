@@ -167,7 +167,7 @@ IND-WZMY                [ls-logo]/tv/ww/wzmy_my50_derry.jpg
 IND-YTVP                [ls-logo]/tv/yy/youth_tv.jpg
 INHD                    [ls-logo]/tv/ii/inhd.jpg
 IPLEX                   [ls-logo]/tv/ee/encore_indieplex.jpg
-ITV                     [ls-logo]/tv/kk/kwpx_i33_seattle.jpg
+ITV                     [ls-logo]/corp/gk/ion_media_networks.jpg
 ITV-KWPX                [ls-logo]/tv/kk/kwpx_i33_seattle.jpg
 ITV-WCPX                [ls-logo]/tv/ww/wcpx_i38_chicago.jpg
 JCTV                    [ls-logo]/tv/jj/jc_tv.jpg
