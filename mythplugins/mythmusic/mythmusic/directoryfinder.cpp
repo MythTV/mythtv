@@ -49,7 +49,7 @@ void DirectoryFinder::keyPressEvent(QKeyEvent *e)
             if (getCurrentFocusWidget() == m_fileList)
             {
                 UIListBtnTypeItem *item = m_fileList->GetItemCurrent();
-                int index = (int)item->getData();
+                int index = reinterpret_cast<int>(item->getData());
                 if (m_directoryList[index] == "..")
                 {
                     // move up on directory
@@ -211,7 +211,7 @@ void DirectoryFinder::homePressed()
 void DirectoryFinder::OKPressed()
 {
     UIListBtnTypeItem *item = m_fileList->GetItemCurrent();
-    int index  = (int) item->getData();
+    int index  = reinterpret_cast<int>(item->getData());
 
     if (m_directoryList[index] != "..")
     {
