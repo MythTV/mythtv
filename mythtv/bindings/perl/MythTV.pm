@@ -532,12 +532,12 @@ package MythTV;
     sub channel {
         my $self   = shift;
         my $chanid = shift;
-        $self->_load_channels() unless ($self->{'channels'}{$chanid});
+        $self->load_channels() unless ($self->{'channels'}{$chanid});
         return $self->{'channels'}{$chanid};
     }
 
 # Load all of the known channels for this connection
-    sub _load_channels {
+    sub load_channels {
         my $self = shift;
         return if (%{$self->{'channels'}});
     # Load the channels
