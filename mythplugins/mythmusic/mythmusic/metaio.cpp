@@ -30,7 +30,7 @@ MetaIO::~MetaIO()
 /*!
  * \brief Reads Metadata based on the folder/filename.
  *
- * \param filename The filename to try and determin metadata for.
+ * \param filename The filename to try and determine metadata for.
  * \returns Metadata Pointer, or NULL on error.
  */
 void MetaIO::readFromFilename(QString filename,
@@ -67,14 +67,15 @@ void MetaIO::readFromFilename(QString filename,
             title = part_str;
         else if ( *fmt_it == "TRACK_TITLE" ) 
         {
-            part_str.replace(QRegExp(QString("-")), QString(" "));
-            QString s_tmp = part_str;
-            s_tmp.replace(QRegExp(QString(" .*"), FALSE), QString(""));
-            tracknum = s_tmp.toInt();
-            title = part_str;
-            title.replace(QRegExp(QString("^[0-9][0-9]? "), FALSE),
-                          QString(""));
-            title = title.simplifyWhiteSpace();
+            QStringList tracktitle_list = QStringList::split("-", part_str);
+            tracknum = tracktitle_list[0].toInt();
+            title = tracktitle_list[1].simplifyWhiteSpace();
+        }
+        else if ( *fmt_it == "ARTIST_TITLE" ) 
+        {
+            QStringList artisttitle_list = QStringList::split("-", part_str);
+            artist = artisttitle_list[0].simplifyWhiteSpace();
+            title = artisttitle_list[1].simplifyWhiteSpace();
         }
     }
 }

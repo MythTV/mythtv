@@ -96,7 +96,9 @@ static HostLineEdit *NonID3FileNameFormat()
     gc->setLabel(QObject::tr("Filename Format"));
     gc->setValue("GENRE/ARTIST/ALBUM/TRACK_TITLE");
     gc->setHelpText(QObject::tr("Directory and filename Format used to grab "
-                    "information if no ID3 information is found."));
+                    "information if no ID3 information is found. Accepts "
+                    "GENRE, ARTIST, ALBUM, TITLE, ARTIST_TITLE and "
+                    "TRACK_TITLE."));
     return gc;
 };
 
