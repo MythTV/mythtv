@@ -234,30 +234,37 @@ void Metadata::dumpToDatabase()
 
     // Compilation Artist
     unsigned int compilationArtistId;
-    query.prepare("SELECT artist_id FROM music_artists "
-                  "WHERE artist_name = :ARTIST ;");
-    query.bindValue(":ARTIST", compilation_artist.utf8());
-    if (!query.exec() || !query.isActive())
+    if (artist == compilation_artist)
     {
-        MythContext::DBError("music select compilation artist id", query);
-        return;
-    }
-    if (query.size() > 0)
-    {
-        query.next();
-        compilationArtistId = query.value(0).toInt();
+        compilationArtistId = artistId;
     }
     else
     {
-        query.prepare("INSERT INTO music_artists (artist_name) VALUES (:ARTIST);");
+        query.prepare("SELECT artist_id FROM music_artists "
+                    "WHERE artist_name = :ARTIST ;");
         query.bindValue(":ARTIST", compilation_artist.utf8());
-
-        if (!query.exec() || !query.isActive() || query.numRowsAffected() <= 0)
+        if (!query.exec() || !query.isActive())
         {
-            MythContext::DBError("music insert compilation artist", query);
+            MythContext::DBError("music select compilation artist id", query);
             return;
         }
-        compilationArtistId = query.lastInsertId().toInt();
+        if (query.size() > 0)
+        {
+            query.next();
+            compilationArtistId = query.value(0).toInt();
+        }
+        else
+        {
+            query.prepare("INSERT INTO music_artists (artist_name) VALUES (:ARTIST);");
+            query.bindValue(":ARTIST", compilation_artist.utf8());
+    
+            if (!query.exec() || !query.isActive() || query.numRowsAffected() <= 0)
+            {
+                MythContext::DBError("music insert compilation artist", query);
+                return;
+            }
+            compilationArtistId = query.lastInsertId().toInt();
+        }
     }
 
     // Album
