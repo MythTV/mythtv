@@ -1,3 +1,13 @@
+/** \file metaio_libid3hack.c
+    \brief Full featured id3_file_update implementation.
+
+    libid3tag (0.15.1b) id3_file_update doesn't handle ID3V2 tags that
+    are longer than then existing tag, this includes adding ID3v2
+    tags. Hence this file which is a cut'n'paste job of libid3tags
+    file.c, with the extra feaures and some tweaks like always
+    removing id3v1 tags.
+   
+ */
 #include <id3tag.h>
 
 #include <assert.h>
@@ -40,6 +50,7 @@ int myth_v2_write(struct id3_file *file,
 {
   int result = 0;
   int file_size, overlap;
+  size_t location, data_start;
   char *buffer = NULL;
   int buffersize;
   
@@ -48,20 +59,20 @@ int myth_v2_write(struct id3_file *file,
 
   assert(!data || length > 0);
 
-  if (!data
-      || (!(file->ntags == 1 && !(file->flags & ID3_FILE_FLAG_ID3V1))
-          && !(file->ntags == 2 &&  (file->flags & ID3_FILE_FLAG_ID3V1)))) {
-    /* no v2 tag. we should create one */
-    
-    /* ... */
-    
-    goto done;
+  if ((file->ntags == 1 && !(file->flags & ID3_FILE_FLAG_ID3V1)) || file->ntags >= 2) {
+      overlap = length - file->tags[0].length;
+      location = file->tags[0].location;
+      data_start = file->tags[0].location + file->tags[0].length;
+  } else {
+      overlap = length;
+      location = 0;
+      data_start = 0;
   }
 
-  if (file->tags[0].length == length) {
+  if (overlap == 0) {
     /* easy special case: rewrite existing tag in-place */
 
-    if (fseek(file->iofile, file->tags[0].location, SEEK_SET) == -1 ||
+    if (fseek(file->iofile, location, SEEK_SET) == -1 ||
         fwrite(data, length, 1, file->iofile) != 1 ||
         fflush(file->iofile) == EOF)
       return -1;
@@ -75,8 +86,7 @@ int myth_v2_write(struct id3_file *file,
   /* calculate the difference in tag sizes.
    * we'll need at least double this difference to write the file again using 
    * optimal memory allocation, but avoiding a temporary file.
-   */
-  overlap = length - file->tags[0].length;
+   */  
   
   if (overlap > 0) {
     buffersize = overlap*2;
@@ -97,8 +107,7 @@ int myth_v2_write(struct id3_file *file,
   file_size = ftell(file->iofile);
   
   /* Seek to start of data */
-  if (-1 == fseek(file->iofile, file->tags[0].location + file->tags[0].length,
-                  SEEK_SET))
+  if (-1 == fseek(file->iofile, data_start, SEEK_SET))
     goto fail;
   
   /* fill our buffer, if needed */
@@ -108,7 +117,7 @@ int myth_v2_write(struct id3_file *file,
   }
   
   /* write the tag where the old one was */
-  if (-1 == fseek(file->iofile, file->tags[0].location, SEEK_SET)
+  if (-1 == fseek(file->iofile, location, SEEK_SET)
       || 1 != fwrite(data, length, 1, file->iofile))
     goto fail;
   
@@ -190,7 +199,7 @@ int myth_v2_write(struct id3_file *file,
   /* truncate if required */
   if (ftell(file->iofile) < file_size)
     ftruncate(fileno(file->iofile), ftell(file->iofile));
-     
+
   if (0) {
   fail:
     if (buffer) free(buffer);
@@ -214,7 +223,7 @@ int myth_id3_file_update(struct id3_file *file)
   assert(file);
 
   if (file->mode != ID3_FILE_MODE_READWRITE)
-    return -1;
+    return -1;  
 
   options = id3_tag_options(file->primary, 0, 0);
 
@@ -224,7 +233,7 @@ int myth_id3_file_update(struct id3_file *file)
 
   v2size = id3_tag_render(file->primary, 0);
   if (v2size) {
-    id3v2 = malloc(v2size);
+      id3v2 = (id3_byte_t*)malloc(v2size);
     if (id3v2 == 0)
       goto fail;
 
@@ -239,6 +248,19 @@ int myth_id3_file_update(struct id3_file *file)
 
   if (myth_v2_write(file, id3v2, v2size) == -1)
     goto fail;
+
+  /* If ID3v1 tag present (flag set and 'TAG' at size-128 bytes),
+   * remove it by truncating.
+   */
+  if (file->flags & ID3_FILE_FLAG_ID3V1) {
+      char tag[3];
+      if (fseek (file->iofile, -128, SEEK_END) != 0 ||
+          fread (tag, sizeof(tag), 1, file->iofile) != 1)
+          goto fail;
+      if (memcmp (tag, "TAG", sizeof (tag)) == 0)
+          ftruncate (fileno (file->iofile), ftell (file->iofile) - 3);
+      file->flags ^= ID3_FILE_FLAG_ID3V1;
+  }
 
   rewind(file->iofile);
 
