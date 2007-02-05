@@ -59,8 +59,8 @@
      <text lang="CZ">Programy kin</text>
      <text lang="JA">ムービータイム</text>
      <text lang="RU">Афиша кино</text>
-     <action>PLUGIN mythmovietime</action>
-     <depends>mythmovietime</depends>
+     <action>PLUGIN mythmovies</action>
+     <depends>mythmovies</depends>
    </button>
    
    <button>

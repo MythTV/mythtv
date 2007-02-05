@@ -60,8 +60,8 @@
      <text lang="NL">Bioscoop Tijden</text>
      <text lang="CZ">Nastavení programů kin</text>
      <text lang="RU">Настройки афиши кино</text>
-     <action>CONFIGPLUGIN mythmovietime</action>
-     <depends>mythmovietime</depends>
+     <action>CONFIGPLUGIN mythmovies</action>
+     <depends>mythmovies</depends>
    </button>
 
    <button>

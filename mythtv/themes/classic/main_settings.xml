@@ -298,8 +298,8 @@
      <text lang="NL">Bioscoop Instellingen</text>
      <text lang="PL">Konfiguracja MovieTime</text>
      <text lang="RU">Настройка афиши кино</text>
-     <action>CONFIGPLUGIN mythmovietime</action>
-     <depends>mythmovietime</depends>
+     <action>CONFIGPLUGIN mythmovies</action>
+     <depends>mythmovies</depends>
    </button>
 
    <button>
