@@ -1281,6 +1281,7 @@ void ProgFinder::whereClauseGetSearchData(int charNum, QString &where,
                    "title NOT REGEXP '^[A-Z0-9]' AND "
                    "title NOT REGEXP '^The [A-Z0-9]' AND "
                    "title NOT REGEXP '^A [A-Z0-9]' AND "
+                   "title NOT REGEXP '^An [A-Z0-9]' AND "
                    "starttime > :STARTTIME ) ORDER BY title;";
         bindings[":STARTTIME"] = progStart.toString("yyyy-MM-ddThh:mm:50");
     }
@@ -1289,15 +1290,18 @@ void ProgFinder::whereClauseGetSearchData(int charNum, QString &where,
         QString one = searchData[charNum] + "%";
         QString two = QString("The ") + one;
         QString three = QString("A ") + one;
+        QString four = QString("An ") + one;
         where = "SELECT DISTINCT title "
                 "FROM program "
                 "WHERE ( title LIKE :ONE OR title LIKE :TWO "
-                "        OR title LIKE :THREE ) "
+                "        OR title LIKE :THREE "
+                "        OR title LIKE :FOUR ) "
                 "AND starttime > :STARTTIME "
                 "ORDER BY title;";
         bindings[":ONE"] = one.utf8();
         bindings[":TWO"] = two.utf8();
         bindings[":THREE"] = three.utf8();
+        bindings[":FOUR"] = four.utf8();
         bindings[":STARTTIME"] = progStart.toString("yyyy-MM-ddThh:mm:50");
     }
 }
@@ -1316,6 +1320,8 @@ bool ProgFinder::formatSelectedData(QString& data)
             data = data.mid(2) + ", A";
         else if (data.left(3) == "A A" && searchData[curSearch] == "A")
              data = data.mid(2) + ", A";
+        else if (data.left(4) == "An A" && searchData[curSearch] == "A")
+             data = data.mid(3) + ", An";
         else if (data.left(4) != "The " && data.left(2) != "A ")
         {
              // nothing, use as is
@@ -1332,6 +1338,8 @@ bool ProgFinder::formatSelectedData(QString& data)
             data = data.mid(4) + ", The";
         if (data.left(2) == "A ")
             data = data.mid(2) + ", A";
+        if (data.left(3) == "An ")
+            data = data.mid(3) + ", An";
     }
 
     return retval;
@@ -1351,6 +1359,8 @@ bool ProgFinder::formatSelectedData(QString& data, int charNum)
             data = data.mid(2) + ", A";
         else if (data.left(3) == "A A" && charNum == 10)
             data = data.mid(2) + ", A";
+        else if (data.left(4) == "An A" && charNum == 10)
+             data = data.mid(3) + ", An";
         else if (data.left(4) != "The " && data.left(2) != "A ")
         {
             // use as is
@@ -1367,6 +1377,8 @@ bool ProgFinder::formatSelectedData(QString& data, int charNum)
             data = data.mid(4) + ", The";
         if (data.left(2) == "A ")
             data = data.mid(2) + ", A";
+        if (data.left(3) == "An ")
+            data = data.mid(3) + ", An";
     }
 
     return retval;
