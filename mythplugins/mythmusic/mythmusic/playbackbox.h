@@ -110,6 +110,7 @@ class PlaybackBoxMusic : public MythThemedDialog
     void openOutputDevice(void);
     void postUpdate();
     void playFirstTrack();
+    void bannerEnable(QString text, int millis);
     void bannerEnable(Metadata *mdata);
     void bannerToggle(Metadata *mdata);
 
