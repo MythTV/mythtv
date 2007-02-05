@@ -1147,14 +1147,19 @@ void PlaybackBoxMusic::visEnable()
     }
 }
 
-void PlaybackBoxMusic::bannerEnable(Metadata *mdata)
+void PlaybackBoxMusic::bannerEnable(QString text, int millis)
 {
     if (visualizer_status != 2) 
         return;
-    
-    banner_timer->start(8000);
-    mainvisual->addInformation("\"" + mdata->Title() + "\"\n" + 
-                               mdata->Artist() + " - " + mdata->Album());
+
+    banner_timer->start(millis);
+    mainvisual->addInformation(text);
+}
+
+void PlaybackBoxMusic::bannerEnable(Metadata *mdata)
+{
+    bannerEnable("\"" + mdata->Title() + "\"\n" +
+                        mdata->Artist() + " - " + mdata->Album(), 8000);
 }
 
 void PlaybackBoxMusic::bannerToggle(Metadata *mdata) 
@@ -1229,6 +1234,8 @@ void PlaybackBoxMusic::CycleVisualizer()
         mainvisual->setVisual("Blank");
         mainvisual->setVisual(new_visualizer);
     }
+
+    bannerEnable(tr("Visualization: ") + new_visualizer, 4000);
 }
 
 void PlaybackBoxMusic::setTrackOnLCD(Metadata *mdata)
@@ -1440,6 +1447,8 @@ void PlaybackBoxMusic::setShuffleMode(unsigned int mode)
 
             if (class LCD *lcd = LCD::Get())
                 lcd->setMusicShuffle(LCD::MUSIC_SHUFFLE_SMART);
+
+            bannerEnable(tr("Shuffle: Smart"), 4000);
             break;
         case SHUFFLE_RANDOM:
             if(shuffle_button)
@@ -1453,6 +1462,8 @@ void PlaybackBoxMusic::setShuffleMode(unsigned int mode)
 
             if (class LCD *lcd = LCD::Get())
                 lcd->setMusicShuffle(LCD::MUSIC_SHUFFLE_RAND);
+
+            bannerEnable(tr("Shuffle: Rand"), 4000);
             break;
         case SHUFFLE_ALBUM:
             if(shuffle_button)
@@ -1466,6 +1477,8 @@ void PlaybackBoxMusic::setShuffleMode(unsigned int mode)
 
             if (class LCD *lcd = LCD::Get())
                 lcd->setMusicShuffle(LCD::MUSIC_SHUFFLE_ALBUM);
+
+            bannerEnable(tr("Shuffle: Album"), 4000);
             break;
         default:
             if(shuffle_button)
@@ -1479,6 +1492,8 @@ void PlaybackBoxMusic::setShuffleMode(unsigned int mode)
 
             if (class LCD *lcd = LCD::Get())
                 lcd->setMusicShuffle(LCD::MUSIC_SHUFFLE_NONE);
+
+            bannerEnable(tr("Shuffle: None"), 4000);
             break;
     }
     music_tree_list->setTreeOrdering(shufflemode + 1);
@@ -1543,6 +1558,8 @@ void PlaybackBoxMusic::setRepeatMode(unsigned int mode)
 
             if (class LCD *lcd = LCD::Get())
                 lcd->setMusicRepeat (LCD::MUSIC_REPEAT_ALL);
+
+            bannerEnable(tr("Repeat: All"), 4000);
             break;
         case REPEAT_TRACK:
             if (keyboard_accelerators)
@@ -1552,6 +1569,8 @@ void PlaybackBoxMusic::setRepeatMode(unsigned int mode)
 
             if (class LCD *lcd = LCD::Get())
                 lcd->setMusicRepeat (LCD::MUSIC_REPEAT_TRACK);
+
+            bannerEnable(tr("Repeat: Track"), 4000);
             break;
         default:
             if (keyboard_accelerators)
@@ -1561,6 +1580,8 @@ void PlaybackBoxMusic::setRepeatMode(unsigned int mode)
 
             if (class LCD *lcd = LCD::Get())
                 lcd->setMusicRepeat (LCD::MUSIC_REPEAT_NONE);
+
+            bannerEnable(tr("Repeat: None"), 4000);
             break;
     }
 }
