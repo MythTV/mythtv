@@ -84,19 +84,12 @@ our %depend_order = (
         'lame',
         'mysqlclient',
         'qt-mt',
-        # Not needed since SVN -r8965. Kept here for 0.19 builds
-        #'dvdnav'
       ],
   'mythplugins'
   =>  [
-        # 10.4 already has a TIFF library, which can clash with this one.
-        # If that happens, comment this out:
         'tiff',
         'exif',
         'dvdcss',
-        # MythDVD used to use this to build mtd.
-        # Not needed since SVN -r8965. Kept here for 0.19 builds
-        # 'dvdread',
 # MythMusic needs these seven things:
 #        'libmad',
 #        'libid3tag',
@@ -117,12 +110,6 @@ our %depend = (
   {
     'url'
     =>  "$sourceforge/sourceforge/freetype/freetype-2.1.10.tar.gz",
-  },
-
-  # SVN head doesn't need this, but 0.19-fixes and earlier do
-  'dvdnav' =>
-  {
-    'url' => "$sourceforge/sourceforge/dvd/libdvdnav-0.1.10.tar.gz",
   },
 
   'lame'
@@ -178,18 +165,6 @@ our %depend = (
     =>  'ftp://ftp.fu-berlin.de/unix/linux/mirrors/gentoo/distfiles/libdvdcss-1.2.9.tar.bz2',
   },
 
-  'dvdread'
-  =>
-  {
-    'url'
-    =>  'http://www.dtek.chalmers.se/groups/dvd/dist/libdvdread-0.9.4.tar.gz',
-    'conf'
-    =>  [
-          '--with-libdvdcss',
-        ],
-  },
-
- 
   'mysqlclient'
   =>
   {
