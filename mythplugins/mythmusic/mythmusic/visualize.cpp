@@ -328,8 +328,10 @@ bool AlbumArt::needsUpdate() {
 
     if (filename != pParent->decoder()->getFilename()) {
         QString curdir = QUrl(pParent->decoder()->getFilename()).dirPath();
-        if (directory != curdir)
+        if (directory != curdir) {
+            directory = curdir;
             return true;
+        }
     }
 
     return false;
