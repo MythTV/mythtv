@@ -1120,7 +1120,8 @@ static int get_v4l2_attribute_value(int videofd, int v4l2_attrib)
         return -1;
     }
 
-    return (int)(65535.0 / (qctrl.maximum - qctrl.minimum) * ctrl.value);
+    float mult = 65535.0 / (qctrl.maximum - qctrl.minimum);
+    return min(max((int)(mult * (ctrl.value - qctrl.minimum)), 0), 65525);
 }
 
 static int get_v4l1_attribute_value(int videofd, int v4l2_attrib)
