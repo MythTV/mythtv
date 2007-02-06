@@ -122,6 +122,7 @@ class SampleRate : public ComboBoxSetting, public CodecParamStorage
         else
         {
             addSelection("48000");
+            setEnabled(false);
             //addSelection("44100");
             //addSelection("32000");
         }
@@ -134,12 +135,66 @@ class SampleRate : public ComboBoxSetting, public CodecParamStorage
 class MPEG2audType : public ComboBoxSetting, public CodecParamStorage
 {
   public:
-    MPEG2audType(const RecordingProfile &parent) :
-        ComboBoxSetting(this), CodecParamStorage(this, parent, "mpeg2audtype")
+    MPEG2audType(const RecordingProfile &parent,
+                 bool layer1, bool layer2, bool layer3) :
+        ComboBoxSetting(this), CodecParamStorage(this, parent, "mpeg2audtype"),
+        allow_layer1(layer1), allow_layer2(layer2), allow_layer3(layer3)
     {
         setLabel(QObject::tr("Type"));
+
+        if (allow_layer1)
+            addSelection("Layer I");
+        if (allow_layer2)
+            addSelection("Layer II");
+        if (allow_layer3)
+            addSelection("Layer III");
+
+        uint allowed_cnt = 0;
+        allowed_cnt += ((allow_layer1) ? 1 : 0);
+        allowed_cnt += ((allow_layer2) ? 1 : 0);
+        allowed_cnt += ((allow_layer3) ? 1 : 0);
+
+        if (1 == allowed_cnt)
+            setEnabled(false);
+
         setHelpText(QObject::tr("Sets the audio type"));
     }
+
+    void load(void)
+    {
+        CodecParamStorage::load();
+        QString val = getValue();
+
+        if ((val == "Layer I") && !allow_layer1)
+        {
+            val = (allow_layer2) ? "Layer II" :
+                ((allow_layer3) ? "Layer III" : val);
+        }
+
+        if ((val == "Layer II") && !allow_layer2)
+        {
+            val = (allow_layer3) ? "Layer III" :
+                ((allow_layer1) ? "Layer I" : val);
+        }
+
+        if ((val == "Layer III") && !allow_layer3)
+        {
+            val = (allow_layer2) ? "Layer II" :
+                ((allow_layer1) ? "Layer I" : val);
+        }
+
+        if (getValue() != val)
+        {
+            int which = getValueIndex(val);
+            if (which >= 0)
+                setValue(which);
+        }
+    }
+
+  private:
+    bool allow_layer1;
+    bool allow_layer2;
+    bool allow_layer3;
 };
 
 class MPEG2audBitrateL1 : public ComboBoxSetting, public CodecParamStorage
@@ -198,6 +253,34 @@ class MPEG2audBitrateL2 : public ComboBoxSetting, public CodecParamStorage
     };
 };
 
+class MPEG2audBitrateL3 : public ComboBoxSetting, public CodecParamStorage
+{
+  public:
+    MPEG2audBitrateL3(const RecordingProfile &parent) :
+        ComboBoxSetting(this),
+        CodecParamStorage(this, parent, "mpeg2audbitratel3")
+    {
+        setLabel(QObject::tr("Bitrate"));
+
+        addSelection("32 kbps", "32");
+        addSelection("40 kbps", "40");
+        addSelection("48 kbps", "48");
+        addSelection("56 kbps", "56");
+        addSelection("64 kbps", "64");
+        addSelection("80 kbps", "80");
+        addSelection("96 kbps", "96");
+        addSelection("112 kbps", "112");
+        addSelection("128 kbps", "128");
+        addSelection("160 kbps", "160");
+        addSelection("192 kbps", "192");
+        addSelection("224 kbps", "224");
+        addSelection("256 kbps", "256");
+        addSelection("320 kbps", "320");
+        setValue(10);
+        setHelpText(QObject::tr("Sets the audio bitrate"));
+    };
+};
+
 class MPEG2audVolume : public SliderSetting, public CodecParamStorage
 {
   public:
@@ -215,28 +298,30 @@ class MPEG2audVolume : public SliderSetting, public CodecParamStorage
 class MPEG2AudioBitrateSettings : public TriggeredConfigurationGroup
 {
   public:
-    MPEG2AudioBitrateSettings(const RecordingProfile &parent) :
+    MPEG2AudioBitrateSettings(const RecordingProfile &parent,
+                              bool layer1, bool layer2, bool layer3,
+                              uint default_layer) :
         TriggeredConfigurationGroup(false, true, true, true)
     {
+        const QString layers[3] = { "Layer I", "Layer II", "Layer III", };
+
         SetVertical(false);
         setLabel(QObject::tr("Bitrate Settings"));
-        MPEG2audType* audType = new MPEG2audType(parent);
+
+        MPEG2audType *audType = new MPEG2audType(
+            parent, layer1, layer2, layer3);
+
         addChild(audType);
         setTrigger(audType);
 
-        ConfigurationGroup *audbr =
-            new VerticalConfigurationGroup(false, true, true, true);
-        audbr->addChild(new MPEG2audBitrateL1(parent));
-        audbr->setLabel("Layer I");
-        addTarget("Layer I", audbr);
-        audType->addSelection("Layer I");
+        addTarget(layers[0], new MPEG2audBitrateL1(parent));
+        addTarget(layers[1], new MPEG2audBitrateL2(parent));
+        addTarget(layers[2], new MPEG2audBitrateL3(parent));
 
-        audbr = new VerticalConfigurationGroup(false, true, true, true);
-        audbr->addChild(new MPEG2audBitrateL2(parent));
-        audbr->setLabel("Layer II");
-        addTarget("Layer II", audbr);
-        audType->addSelection("Layer II");
-        audType->setValue(1);
+        uint desired_layer = max(min(3U, default_layer), 1U) - 1;
+        int which = audType->getValueIndex(layers[desired_layer]);
+        if (which >= 0)
+            audType->setValue(which);
     };
 };
 
@@ -288,7 +373,8 @@ class AudioCompressionSettings : public TriggeredConfigurationGroup
         params = new VerticalConfigurationGroup(false, false, true, true);
         params->setLabel("MPEG-2 Hardware Encoder");
         params->addChild(new SampleRate(parent, false));
-        params->addChild(new MPEG2AudioBitrateSettings(parent));
+        params->addChild(new MPEG2AudioBitrateSettings(
+                             parent, false, true, false, 2));
         params->addChild(new MPEG2Language(parent));
         params->addChild(new MPEG2audVolume(parent));
         addTarget("MPEG-2 Hardware Encoder", params);
@@ -847,7 +933,8 @@ class ImageSize : public VerticalConfigurationGroup
     class Width : public SpinBoxSetting, public CodecParamStorage
     {
       public:
-        Width(const RecordingProfile &parent, int maxwidth = 704,
+        Width(const RecordingProfile &parent,
+              uint defaultwidth, uint maxwidth,
               bool transcoding = false) :
             SpinBoxSetting(this, transcoding ? 0 : 160,
                            maxwidth, 16, false,
@@ -855,18 +942,26 @@ class ImageSize : public VerticalConfigurationGroup
             CodecParamStorage(this, parent, "width")
         {
             setLabel(QObject::tr("Width"));
-            setValue(480);
-            if (transcoding)
-                setHelpText(QObject::tr("If the width is set to 'Auto', "
-                            "the width will be calculated based on the height "
-                            "and the recording's physical aspect ratio."));
+            setValue(defaultwidth);
+
+            QString help = (transcoding) ?
+                QObject::tr("If the width is set to 'Auto', the width "
+                            "will be calculated based on the height and "
+                            "the recording's physical aspect ratio.") :
+                QObject::tr("Width to use for encoding. "
+                            "Note: PVR-x50 cards may produce ghosting if "
+                            "this is not set to 720 or 768 for NTSC and "
+                            "PAL, respectively.");
+
+            setHelpText(help);
         };
     };
 
     class Height: public SpinBoxSetting, public CodecParamStorage
     {
       public:
-        Height(const RecordingProfile &parent, int maxheight=576,
+        Height(const RecordingProfile &parent,
+               uint defaultheight, uint maxheight,
                bool transcoding = false):
             SpinBoxSetting(this, transcoding ? 0 : 160,
                            maxheight, 16, false,
@@ -874,11 +969,18 @@ class ImageSize : public VerticalConfigurationGroup
             CodecParamStorage(this, parent, "height")
         {
             setLabel(QObject::tr("Height"));
-            setValue(480);
-            if (transcoding)
-                setHelpText(QObject::tr("If the height is set to 'Auto', "
-                            "the height will be calculated based on the width "
-                            "and the recording's physical aspect ratio."));
+            setValue(defaultheight);
+
+            QString help = (transcoding) ?
+                QObject::tr("If the height is set to 'Auto', the height "
+                            "will be calculated based on the width and "
+                            "the recording's physical aspect ratio.") :
+                QObject::tr("Height to use for encoding. "
+                            "Note: PVR-x50 cards may produce ghosting if "
+                            "this is not set to 480 or 576 for NTSC and "
+                            "PAL, respectively.");
+
+            setHelpText(help);
         };
     };
 
@@ -894,27 +996,36 @@ class ImageSize : public VerticalConfigurationGroup
             labelName = profName + "->" + QObject::tr("Image size");
         setLabel(labelName);
 
-        QString fullsize, halfsize;
-        int maxwidth, maxheight;
-        bool transcoding = false;
-        if (profName.left(11) == "Transcoders") {
-            maxwidth = 1920;
-            maxheight = 1088;
-            transcoding = true;
-        } else if ((tvFormat.lower() == "ntsc") ||
-                   (tvFormat.lower() == "ntsc-jp")) {
-            maxwidth = 720;
-            maxheight = 480;
-        } else if (tvFormat.lower() == "atsc") {
-            maxwidth = 1920;
-            maxheight = 1088;
-        } else {
-            maxwidth = 768;
-            maxheight = 576;
+        QSize defaultsize(768, 576), maxsize(768, 576);
+        bool transcoding = profName.left(11) == "Transcoders";
+        bool ivtv = profName.left(34) == "MPEG-2 Encoders (PVR-x50, PVR-500)";
+
+        if (transcoding)
+        {
+            maxsize     = QSize(1920, 1088);
+            defaultsize = QSize(480, 480);
+        }
+        else if (tvFormat.lower().left(4) == "ntsc")
+        {
+            maxsize     = QSize(720, 480);
+            defaultsize = (ivtv) ? QSize(720, 480) : QSize(480, 480);
+        }
+        else if (tvFormat.lower() == "atsc")
+        {
+            maxsize     = QSize(1920, 1088);
+            defaultsize = QSize(1920, 1088);
+        }
+        else
+        {
+            maxsize     = QSize(768, 576);
+            defaultsize = (ivtv) ? QSize(720, 576) : QSize(480, 576);
         }
 
-        imgSize->addChild(new Width(parent, maxwidth, transcoding));
-        imgSize->addChild(new Height(parent, maxheight, transcoding));
+        imgSize->addChild(new Width(parent, defaultsize.width(),
+                                    maxsize.width(), transcoding));
+        imgSize->addChild(new Height(parent, defaultsize.height(),
+                                     maxsize.height(), transcoding));
+
         addChild(imgSize);
     };
 };
@@ -1001,7 +1112,7 @@ void RecordingProfile::loadByID(int profileId)
 {
     MSqlQuery result(MSqlQuery::InitCon());
     result.prepare(
-        "SELECT cardtype "
+        "SELECT cardtype, profilegroups.name "
         "FROM profilegroups, recordingprofiles "
         "WHERE profilegroups.id     = recordingprofiles.profilegroup AND "
         "      recordingprofiles.id = :PROFILEID");
@@ -1013,6 +1124,8 @@ void RecordingProfile::loadByID(int profileId)
     else if (result.next())
     {
         type = result.value(0).toString();
+        if (profileName.isEmpty())
+            profileName = result.value(1).toString();
         isEncoder = CardUtil::IsEncoder(type);
     }
 

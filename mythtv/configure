@@ -145,7 +145,6 @@ show_help(){
   echo "  --disable-hdhomerun      disable support for HDHomeRun boxes"
   echo "  --disable-v4l            disable Video4Linux support"
   echo "  --disable-ivtv           disable ivtv support (PVR-x50) req. v4l support"
-  #echo "  --enable-ivtv-sys-header use ivtv system headers instead of myth headers"
   echo "  --enable-dvb             enable DVB support (must supply header directory)"
   echo "  --dvb-path=HDRLOC        location of directory containing"
   echo "                           'linux/dvb/frontend.h', not the"
@@ -647,7 +646,6 @@ audio_alsa="default"
 audio_arts="default"
 audio_jack="default"
 ivtv="yes"
-ivtv_header="no"
 dvb="no"
 dvb_path="/usr/include"
 lirc="yes"
@@ -1388,10 +1386,6 @@ for opt do
   --enable-ivtv) ivtv="yes"
   ;;
   --disable-ivtv) ivtv="no"
-  ;;
-  --enable-ivtv-sys-header) ivtv_header="yes"
-  ;;
-  --disable-ivtv-sys-header) ivtv_header="no"
   ;;
   --enable-lirc) lirc="yes"
   ;;
@@ -3048,9 +3042,6 @@ fi
 if test x"$backend" = x"yes" ; then
   echo "Video4Linux sup. $video4linux"
   echo "ivtv support     $ivtv"
-  if test x"$ivtv_header" = x"yes" ; then
-    echo "ivtv sys headers $ivtv_header"
-  fi
   echo "FireWire support $firewire_cable_box"
   echo "DVB support      $dvb [$dvb_path]"
   echo "DBox2 support    $dbox2_dvb_box"
@@ -3387,7 +3378,6 @@ if test x"$backend" = x"no" ; then
     echo "WARNING: --disable-backend is only intended to aid porting."
     echo "WARNING: You are on your own now."
     ivtv="no"
-    ivtv_header="no"
     dbox2_dvb_box="no"
     hdhomerun_box="no"
     iptv="no"
@@ -3417,10 +3407,6 @@ fi
 
 if test x"$ivtv" = x"yes" ; then
   CCONFIG="$CCONFIG using_ivtv"
-fi
-
-if test x"$ivtv_header" = x"yes" ; then
-  CCONFIG="$CCONFIG using_ivtv_header"
 fi
 
 if test x"$firewire_cable_box" = x"yes" ; then

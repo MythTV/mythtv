@@ -33,15 +33,14 @@ using namespace std;
 #include "tv_rec.h"
 #include "videodev_myth.h"
 #include "util.h"
+#include "cardutil.h"
 
 // ivtv header
 extern "C" {
-#ifdef USING_IVTV_HEADER
-#include <linux/ivtv.h>
-#else
 #include "ivtv_myth.h"
-#endif
 }
+
+#define IVTV_KERNEL_VERSION(a,b,c) (((a) << 16) + ((b) << 8) + (c))
 
 #define LOC QString("MPEGRec(%1): ").arg(videodevice)
 #define LOC_WARN QString("MPEGRec(%1) Warning: ").arg(videodevice)
@@ -55,6 +54,11 @@ const int MpegRecorder::audRateL1[] =
 const int MpegRecorder::audRateL2[] =
 {
     32, 48, 56, 64, 80, 96, 112, 128, 160, 192, 224, 256, 320, 384, 0
+};
+
+const int MpegRecorder::audRateL3[] =
+{
+    32, 40, 48, 56, 64, 80, 96, 112, 128, 160, 192, 224, 256, 320, 0
 };
 
 const char* MpegRecorder::streamType[] =
@@ -77,6 +81,10 @@ MpegRecorder::MpegRecorder(TVRec *rec) :
     // Debugging variables
     deviceIsMpegFile(false),
     bufferSize(4096),
+    // Driver info
+    card(QString::null),      driver(QString::null),
+    version(0),               usingv4l2(false),
+    has_buggy_vbi(true),      has_v4l2_vbi(false),
     // State
     recording(false),         encoding(false),
     errored(false),
@@ -90,6 +98,7 @@ MpegRecorder::MpegRecorder(TVRec *rec) :
     streamtype(0),            aspectratio(2),
     audtype(2),               audsamplerate(48000),
     audbitratel1(14),         audbitratel2(14),
+    audbitratel3(10),
     audvolume(80),            language(0),
     // Input file descriptors
     chanfd(-1),               readfd(-1),
@@ -125,9 +134,19 @@ void MpegRecorder::TeardownAll(void)
     }
 }
 
+static int find_index(const int *audio_rate, int value)
+{
+    for (uint i = 0; audio_rate[i] != 0; i++)
+    {
+        if (audio_rate[i] == value)
+            return i;
+    }
+
+    return -1;
+}
+
 void MpegRecorder::SetOption(const QString &opt, int value)
 {
-    bool found = false;
     if (opt == "width")
         width = value;
     else if (opt == "height")
@@ -140,17 +159,10 @@ void MpegRecorder::SetOption(const QString &opt, int value)
         audsamplerate = value;
     else if (opt == "mpeg2audbitratel1")
     {
-        for (int i = 0; audRateL1[i] != 0; i++)
-        {
-            if (audRateL1[i] == value)
-            {
-                audbitratel1 = i + 1;
-                found = true;
-                break;
-            }
-        }
-
-        if (!found)
+        int index = find_index(audRateL1, value);
+        if (index >= 0)
+            audbitratel1 = index + 1;
+        else
         {
             VERBOSE(VB_IMPORTANT, LOC_ERR + "Audiorate(L1): " +
                     QString("%1 is invalid").arg(value));
@@ -158,17 +170,21 @@ void MpegRecorder::SetOption(const QString &opt, int value)
     }
     else if (opt == "mpeg2audbitratel2")
     {
-        for (int i = 0; audRateL2[i] != 0; i++)
+        int index = find_index(audRateL2, value);
+        if (index >= 0)
+            audbitratel2 = index + 1;
+        else
         {
-            if (audRateL2[i] == value)
-            {
-                audbitratel2 = i + 1;
-                found = true;
-                break;
-            }
+            VERBOSE(VB_IMPORTANT, LOC_ERR + "Audiorate(L2): " +
+                    QString("%1 is invalid").arg(value));
         }
-
-        if (!found)
+    }
+    else if (opt == "mpeg2audbitratel3")
+    {
+        int index = find_index(audRateL3, value);
+        if (index >= 0)
+            audbitratel3 = index + 1;
+        else
         {
             VERBOSE(VB_IMPORTANT, LOC_ERR + "Audiorate(L2): " +
                     QString("%1 is invalid").arg(value));
@@ -236,6 +252,8 @@ void MpegRecorder::SetOption(const QString &opt, const QString &value)
             audtype = 1;
         else if (value == "Layer II")
             audtype = 2;
+        else if (value == "Layer III")
+            audtype = 3;
         else
         {
             VERBOSE(VB_IMPORTANT, LOC_ERR + "MPEG2 audio layer: " +
@@ -282,6 +300,7 @@ void MpegRecorder::SetOptionsFromProfile(RecordingProfile *profile,
     SetStrOption(profile, "mpeg2audtype");
     SetIntOption(profile, "mpeg2audbitratel1");
     SetIntOption(profile, "mpeg2audbitratel2");
+    SetIntOption(profile, "mpeg2audbitratel3");
     SetIntOption(profile, "mpeg2audvolume");
 
     SetIntOption(profile, "width");
@@ -310,6 +329,26 @@ bool MpegRecorder::OpenV4L2DeviceAsInput(void)
         VERBOSE(VB_IMPORTANT, LOC_ERR + "Can't open video device. " + ENO);
         return false;
     }
+
+    if (CardUtil::GetV4LInfo(chanfd, card, driver, version))
+    {
+        if (driver == "ivtv")
+        {
+            usingv4l2     = (version >= IVTV_KERNEL_VERSION(0, 8, 0));
+            has_v4l2_vbi  = (version >= IVTV_KERNEL_VERSION(0, 3, 8));
+            has_buggy_vbi = (version <  IVTV_KERNEL_VERSION(0, 10, 0));
+        }
+        else
+        {
+            VERBOSE(VB_IMPORTANT, "\n\nNot ivtv driver??\n\n");
+            usingv4l2 = has_v4l2_vbi = true;
+            has_buggy_vbi = false;
+        }
+    }
+
+    VERBOSE(VB_RECORD, LOC + QString("usingv4l2(%1) has_v4l2_vbi(%2) "
+                                     "has_buggy_vbi(%3)")
+            .arg(usingv4l2).arg(has_v4l2_vbi).arg(has_buggy_vbi));
 
     struct v4l2_format vfmt;
     bzero(&vfmt, sizeof(vfmt));
@@ -350,7 +389,8 @@ bool MpegRecorder::OpenV4L2DeviceAsInput(void)
     language = (language > 2) ? 0 : language;
     vt.audmode = v4l2_lang[language];
 
-    if (do_audmode_set && (2 == language) && (1 == audtype))
+    int audio_layer = GetFilteredAudioLayer();
+    if (do_audmode_set && (2 == language) && (1 == audio_layer))
     {
         VERBOSE(VB_GENERAL, "Dual audio mode incompatible with Layer I audio."
                 "\n\t\t\tFalling back to Main Language");
@@ -374,8 +414,20 @@ bool MpegRecorder::OpenV4L2DeviceAsInput(void)
                 "If you are using an AverMedia M179 card this is normal.");
     }
 
-    if (!SetV4L2DeviceOptions(chanfd) && !SetIVTVDeviceOptions(chanfd))
+    bool ok = true;
+    if (usingv4l2)
+        ok = SetV4L2DeviceOptions(chanfd);
+    else
+    {
+        ok = SetIVTVDeviceOptions(chanfd);
+        if (!ok)
+            usingv4l2 = ok = SetV4L2DeviceOptions(chanfd);
+    }
+
+    if (!ok)
         return false;
+
+    SetVBIOptions(chanfd);
 
     readfd = open(videodevice.ascii(), O_RDWR | O_NONBLOCK);
     if (readfd < 0)
@@ -385,6 +437,83 @@ bool MpegRecorder::OpenV4L2DeviceAsInput(void)
     }
 
     return true;
+}
+
+uint MpegRecorder::GetFilteredStreamType(void) const
+{
+    uint st = (uint) streamtype;
+
+    if (driver == "ivtv")
+    {
+        switch (st)
+        {
+            case 2:  st = 2;  break;
+            case 10:
+            case 13:
+            case 14: st = 10; break;
+            case 11: st = 11; break;
+            case 12: st = 12; break;
+            default: st = 0;  break;   
+        }
+    }
+
+    if (st != (uint) streamtype)
+    {
+        VERBOSE(VB_IMPORTANT, LOC_WARN +
+                QString("Stream type '%1'\n\t\t\t"
+                        "is not supported by %2 driver, using '%3' instead.")
+                .arg(streamType[streamtype]).arg(driver).arg(streamType[st]));
+    }
+
+    return st;
+}
+
+uint MpegRecorder::GetFilteredAudioSampleRate(void) const
+{
+    uint sr = (uint) audsamplerate;
+
+    sr = (driver == "ivtv") ? 48000 : sr; // only 48kHz works properly.
+
+    if (sr != (uint) audsamplerate)
+    {
+        VERBOSE(VB_IMPORTANT, LOC_WARN +
+                QString("Audio sample rate %1 Hz\n\t\t\t"
+                        "is not supported by %2 driver, using %3 Hz instead.")
+                .arg(audsamplerate).arg(driver).arg(sr));
+    }
+
+    switch (sr)
+    {
+        case 32000: return V4L2_MPEG_AUDIO_SAMPLING_FREQ_32000;
+        case 44100: return V4L2_MPEG_AUDIO_SAMPLING_FREQ_44100;
+        case 48000: return V4L2_MPEG_AUDIO_SAMPLING_FREQ_48000;
+        default:    return V4L2_MPEG_AUDIO_SAMPLING_FREQ_48000;
+    }
+}
+
+uint MpegRecorder::GetFilteredAudioLayer(void) const
+{
+    uint layer = (uint) audtype;
+
+    layer = max(min(layer, 3U), 1U);
+
+    layer = (driver == "ivtv") ? 2 : layer;
+
+    if (layer != (uint) audtype)
+    {
+        VERBOSE(VB_IMPORTANT, LOC_WARN +
+                QString("MPEG layer %1 does not work properly\n\t\t\t"
+                        "with %2 driver. Using MPEG layer %3 audio instead.")
+                .arg(audtype).arg(driver).arg(layer));
+    }
+
+    return layer;
+}
+
+uint MpegRecorder::GetFilteredAudioBitRate(uint audio_layer) const
+{
+    return ((2 == audio_layer) ? max(audbitratel2, 10) :
+            ((3 == audio_layer) ? audbitratel3 : max(audbitratel1, 6)));
 }
 
 bool MpegRecorder::SetIVTVDeviceOptions(int chanfd)
@@ -403,19 +532,17 @@ bool MpegRecorder::SetIVTVDeviceOptions(int chanfd)
         return false;
     }
 
-    audbitratel1 = max(audbitratel1, 6);
-    audbitratel2 = max(audbitratel2, 10);
+    uint audio_rate  = GetFilteredAudioSampleRate();
+    uint audio_layer = GetFilteredAudioLayer();
+    uint audbitrate  = GetFilteredAudioBitRate(audio_layer);
 
-    int audio_rate = 1; // only 48kHz works properly.
-    int audbitrate = (2 == audtype) ? audbitratel2 : audbitratel1;
-
-    ivtvcodec.audio_bitmask  = audio_rate | (audtype << 2);
+    ivtvcodec.audio_bitmask  = audio_rate | (audio_layer << 2);
     ivtvcodec.audio_bitmask |= audbitrate << 4;
     ivtvcodec.aspect         = aspectratio;
     ivtvcodec.bitrate        = min(bitrate, maxbitrate) * 1000;
     ivtvcodec.bitrate_peak   = maxbitrate * 1000;
     ivtvcodec.framerate      = ntsc_framerate ? 0 : 1; // 1->25fps, 0->30fps
-    ivtvcodec.stream_type    = streamtype;
+    ivtvcodec.stream_type    = GetFilteredStreamType();
 
     if (ioctl(chanfd, IVTV_IOC_S_CODEC, &ivtvcodec) < 0)
     {
@@ -425,82 +552,59 @@ bool MpegRecorder::SetIVTVDeviceOptions(int chanfd)
 
     keyframedist = (ivtvcodec.framerate) ? 12 : keyframedist;
 
-    if (vbimode)
-    {
-#ifdef IVTV_IOC_S_VBI_MODE
-        struct ivtv_sliced_vbi_format vbifmt;
-        bzero(&vbifmt, sizeof(struct ivtv_sliced_vbi_format));
-        vbifmt.service_set = (1 == vbimode) ? VBI_TYPE_TELETEXT : VBI_TYPE_CC;
-
-        if (ioctl(chanfd, IVTV_IOC_S_VBI_MODE, &vbifmt) < 0) 
-#endif // IVTV_IOC_S_VBI_MODE
-        {
-#ifdef V4L2_CAP_SLICED_VBI_CAPTURE
-            struct v4l2_format vbi_fmt;
-            bzero(&vbi_fmt, sizeof(struct v4l2_format));
-            vbi_fmt.type = V4L2_BUF_TYPE_SLICED_VBI_CAPTURE;
-            vbi_fmt.fmt.sliced.service_set = (1 == vbimode) ?
-                V4L2_SLICED_VBI_625 : V4L2_SLICED_VBI_525;
-
-            if (ioctl(chanfd, VIDIOC_S_FMT, &vbi_fmt) < 0)
-#endif // V4L2_CAP_SLICED_VBI_CAPTURE
-            {
-                VERBOSE(VB_IMPORTANT, "Can't enable VBI recording" + ENO);
-            }
-        }
-
-#ifdef IVTV_IOC_S_VBI_EMBED
-        int embedon = 1;
-        if (ioctl(chanfd, IVTV_IOC_S_VBI_EMBED, &embedon) < 0)
-#endif // IVTV_IOC_S_VBI_EMBED
-        {
-            VERBOSE(VB_IMPORTANT, LOC + "Can't enable VBI recording (2)"+ENO);
-        }
-
-#ifdef IVTV_IOC_G_VBI_MODE
-        ioctl(chanfd, IVTV_IOC_G_VBI_MODE, &vbifmt);
-
-        VERBOSE(VB_RECORD, LOC + QString(
-                    "VBI service:%1, packet size:%2, io size:%3")
-                .arg(vbifmt.service_set).arg(vbifmt.packet_size)
-                .arg(vbifmt.io_size));
-#endif // IVTV_IOC_G_VBI_MODE
-    }
-
     return true;
+}
+
+static int streamtype_ivtv_to_v4l2(int st)
+{
+    switch (st)
+    {
+        case 0:  return V4L2_MPEG_STREAM_TYPE_MPEG2_PS;
+        case 1:  return V4L2_MPEG_STREAM_TYPE_MPEG2_TS;
+        case 2:  return V4L2_MPEG_STREAM_TYPE_MPEG1_VCD;
+        case 3:  return V4L2_MPEG_STREAM_TYPE_MPEG2_PS;  /* PES A/V    */
+        case 5:  return V4L2_MPEG_STREAM_TYPE_MPEG2_PS;  /* PES V      */
+        case 7:  return V4L2_MPEG_STREAM_TYPE_MPEG2_PS;  /* PES A      */
+        case 10: return V4L2_MPEG_STREAM_TYPE_MPEG2_DVD;
+        case 11: return V4L2_MPEG_STREAM_TYPE_MPEG1_VCD; /* VCD */
+        case 12: return V4L2_MPEG_STREAM_TYPE_MPEG2_SVCD;
+        case 13: return V4L2_MPEG_STREAM_TYPE_MPEG2_DVD; /* DVD-Special 1 */
+        case 14: return V4L2_MPEG_STREAM_TYPE_MPEG2_DVD; /* DVD-Special 2 */
+        default: return V4L2_MPEG_STREAM_TYPE_MPEG2_TS;
+    }
 }
 
 bool MpegRecorder::SetV4L2DeviceOptions(int chanfd)
 {
-    static const int kNumControls = 7;
+    static const uint kNumControls = 7;
     struct v4l2_ext_controls ctrls;
     struct v4l2_ext_control ext_ctrl[kNumControls];
+    QString control_description[kNumControls] =
+    {
+        "Audio Sampling Frequency",
+        "Video Aspect ratio",
+        "Audio Encoding",
+        "Audio L2 Bitrate",
+        "Video Average Bitrate",
+        "Video Peak Bitrate",
+        "MPEG Stream type",
+    };
 
     // Set controls
     bzero(&ctrls,    sizeof(struct v4l2_ext_controls));
     bzero(&ext_ctrl, sizeof(struct v4l2_ext_control) * kNumControls);
 
-    audbitratel1 = max(audbitratel1, 6);
-    audbitratel2 = max(audbitratel2, 10);
+    uint audio_layer = GetFilteredAudioLayer();
+    uint audbitrate  = GetFilteredAudioBitRate(audio_layer);
 
-    int audbitrate = (2 == audtype) ? audbitratel2 : audbitratel1;
-
-    if (audtype != 2)
-    {
-        VERBOSE(VB_IMPORTANT, LOC_WARN +
-                "MPEG Layer1 does not work properly with ivtv driver. "
-                "\n\t\t\tUsing MPEG layer 2 audio instead.");
-    }
-
-    // only 48kHz works properly.
     ext_ctrl[0].id    = V4L2_CID_MPEG_AUDIO_SAMPLING_FREQ;
-    ext_ctrl[0].value = V4L2_MPEG_AUDIO_SAMPLING_FREQ_48000;
+    ext_ctrl[0].value = GetFilteredAudioSampleRate();
 
     ext_ctrl[1].id    = V4L2_CID_MPEG_VIDEO_ASPECT;
     ext_ctrl[1].value = aspectratio - 1;
 
     ext_ctrl[2].id    = V4L2_CID_MPEG_AUDIO_ENCODING;
-    ext_ctrl[2].value = audtype - 1;
+    ext_ctrl[2].value = audio_layer - 1;
 
     ext_ctrl[3].id    = V4L2_CID_MPEG_AUDIO_L2_BITRATE;
     ext_ctrl[3].value = audbitrate - 1;
@@ -512,27 +616,22 @@ bool MpegRecorder::SetV4L2DeviceOptions(int chanfd)
     ext_ctrl[5].value = maxbitrate * 1000;
 
     ext_ctrl[6].id    = V4L2_CID_MPEG_STREAM_TYPE;
-    ext_ctrl[6].value = V4L2_MPEG_STREAM_TYPE_MPEG2_PS;
+    ext_ctrl[6].value = streamtype_ivtv_to_v4l2(GetFilteredStreamType());
 
-    ctrls.ctrl_class  = V4L2_CTRL_CLASS_MPEG;
-    ctrls.count       = kNumControls;
-    ctrls.controls    = ext_ctrl;
-
-    if (ioctl(chanfd, VIDIOC_S_EXT_CTRLS, &ctrls) < 0)
+    for (uint i = 0; i < kNumControls; i++)
     {
-        if (ctrls.error_idx >= ctrls.count)
+        int value = ext_ctrl[i].value;
+
+        ctrls.ctrl_class  = V4L2_CTRL_CLASS_MPEG;
+        ctrls.count       = 1;
+        ctrls.controls    = ext_ctrl + i;
+
+        if (ioctl(chanfd, VIDIOC_S_EXT_CTRLS, &ctrls) < 0)
         {
             VERBOSE(VB_IMPORTANT, LOC_ERR +
-                    "Could not set MPEG controls" + ENO);
+                    QString("Could not set %1 to %2")
+                    .arg(control_description[i]).arg(value) + ENO);
         }
-        else
-        {
-            VERBOSE(VB_IMPORTANT, LOC_ERR +
-                    QString("Could not set MPEG controls %1 through %2.")
-                    .arg(ctrls.error_idx)
-                    .arg(ext_ctrl[ctrls.error_idx].value) + ENO);
-        }
-        return false;
     }
 
     // Get controls
@@ -552,43 +651,117 @@ bool MpegRecorder::SetV4L2DeviceOptions(int chanfd)
 
     keyframedist = ext_ctrl[0].value;
 
-    // VBI is not yet working as of July 11th, 2006 with IVTV driver.
-    // V4L2_CID_MPEG_STREAM_VBI_FMT needs to be finished/supported first.
-    if (vbimode)
+    return true;
+}
+
+bool MpegRecorder::SetVBIOptions(int chanfd)
+{
+    if (!vbimode)
+        return true;
+
+    if (has_buggy_vbi)
+    {
+        VERBOSE(VB_IMPORTANT, LOC_WARN + "VBI recording with broken drivers."
+                "\n\t\t\tUpgrade to ivtv 0.10.0 if you experience problems.");
+    }
+
+    /****************************************************************/
+    /** First tell driver which services we want to capture.       **/
+
+#ifdef IVTV_IOC_S_VBI_EMBED
+    // used for ivtv driver versions 0.2.0-0.3.7
+    if (!has_v4l2_vbi)
+    {
+        struct ivtv_sliced_vbi_format vbifmt;
+        bzero(&vbifmt, sizeof(struct ivtv_sliced_vbi_format));
+        vbifmt.service_set = (1 == vbimode) ? VBI_TYPE_TELETEXT : VBI_TYPE_CC;
+
+        if (ioctl(chanfd, IVTV_IOC_S_VBI_MODE, &vbifmt) < 0)
+        {
+            VERBOSE(VB_IMPORTANT, LOC_WARN +
+                    "Can't enable VBI recording (1)" + ENO);
+
+            return false;
+        }
+
+        if (ioctl(chanfd, IVTV_IOC_G_VBI_MODE, &vbifmt) >= 0)
+        {
+            VERBOSE(VB_RECORD, LOC + QString(
+                        "VBI service:%1, packet size:%2, io size:%3")
+                    .arg(vbifmt.service_set).arg(vbifmt.packet_size)
+                    .arg(vbifmt.io_size));
+        }
+    }
+#endif // IVTV_IOC_S_VBI_EMBED
+
+#ifdef V4L2_CAP_SLICED_VBI_CAPTURE
+    // used for ivtv driver versions 0.3.8+
+    if (has_v4l2_vbi)
     {
         struct v4l2_format vbifmt;
         bzero(&vbifmt, sizeof(struct v4l2_format));
         vbifmt.type = V4L2_BUF_TYPE_SLICED_VBI_CAPTURE;
-        /* vbifmt.fmt.sliced.service_set = (1==vbimode) ?
-                                           VBI_TYPE_TELETEXT : VBI_TYPE_CC; */
-        if (1 == vbimode)
-            vbifmt.fmt.sliced.service_set |= V4L2_SLICED_VBI_625;
-        else
-            vbifmt.fmt.sliced.service_set |= V4L2_SLICED_VBI_525;
+        vbifmt.fmt.sliced.service_set |= (1 == vbimode) ?
+            V4L2_SLICED_VBI_625 : V4L2_SLICED_VBI_525;
 
         if (ioctl(chanfd, VIDIOC_S_FMT, &vbifmt) < 0)
         {
-            VERBOSE(VB_IMPORTANT, "Can't enable VBI recording" + ENO);
+            VERBOSE(VB_IMPORTANT, LOC_WARN +
+                    "Can't enable VBI recording (3)" + ENO);
+
+            return false;
         }
 
-        struct v4l2_ext_control vbi_fmt;
-        vbi_fmt.id    = V4L2_CID_MPEG_STREAM_VBI_FMT;
-        vbi_fmt.value = V4L2_MPEG_STREAM_VBI_FMT_IVTV;
+        if (ioctl(chanfd, VIDIOC_G_FMT, &vbifmt) >= 0)
+        {
+            VERBOSE(VB_RECORD, LOC + QString("VBI service: %1, io size: %2")
+                    .arg(vbifmt.fmt.sliced.service_set)
+                    .arg(vbifmt.fmt.sliced.io_size));
+        }
+    }
+#endif // V4L2_CAP_SLICED_VBI_CAPTURE
+
+    /****************************************************************/
+    /** Second, tell driver to embed the captions in the stream.   **/
+
+#ifdef IVTV_IOC_S_VBI_EMBED
+    // used for ivtv driver versions 0.2.0-0.7.x
+    if (!usingv4l2)
+    {
+        int embedon = 1;
+        if (ioctl(chanfd, IVTV_IOC_S_VBI_EMBED, &embedon) < 0)
+        {
+            VERBOSE(VB_IMPORTANT, LOC_WARN +
+                    "Can't enable VBI recording (4)" + ENO);
+
+            return false;
+        }
+    }
+#endif // IVTV_IOC_S_VBI_EMBED
+
+#ifdef V4L2_CAP_SLICED_VBI_CAPTURE
+    // used for ivtv driver versions 0.8.0+
+    if (usingv4l2)
+    {
+        struct v4l2_ext_control vbi_ctrl;
+        vbi_ctrl.id      = V4L2_CID_MPEG_STREAM_VBI_FMT;
+        vbi_ctrl.value   = V4L2_MPEG_STREAM_VBI_FMT_IVTV;
+
+        struct v4l2_ext_controls ctrls;
+        bzero(&ctrls, sizeof(struct v4l2_ext_controls));
         ctrls.ctrl_class = V4L2_CTRL_CLASS_MPEG;
         ctrls.count      = 1;
-        ctrls.controls   = &vbi_fmt;
+        ctrls.controls   = &vbi_ctrl;
+
         if (ioctl(chanfd, VIDIOC_S_EXT_CTRLS, &ctrls) < 0)
         {
-            VERBOSE(VB_IMPORTANT, LOC + "Can't enable VBI recording (2)"+ENO);
+            VERBOSE(VB_IMPORTANT, LOC_WARN +
+                    "Can't enable VBI recording (5)" + ENO);
+
+            return false;
         }
-
-        ioctl(chanfd, VIDIOC_G_FMT, &vbifmt);
-
-        VERBOSE(VB_RECORD, LOC + QString(
-                "VBI service:%1, io size:%3")
-                .arg(vbifmt.fmt.sliced.service_set)
-                .arg(vbifmt.fmt.sliced.io_size));
     }
+#endif // V4L2_CAP_SLICED_VBI_CAPTURE
 
     return true;
 }

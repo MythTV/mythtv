@@ -455,7 +455,6 @@ using_backend {
     using_ivtv:HEADERS += mpegrecorder.h
     using_ivtv:SOURCES += mpegrecorder.cpp
     using_ivtv:DEFINES += USING_IVTV
-    using_ivtv_header:DEFINES += USING_IVTV_HEADER
 
     # Support for Linux DVB drivers
     using_dvb {

@@ -173,7 +173,10 @@ class MPUBLIC CardUtil
 
     // V4L info
     static bool         hasV4L2(int videofd);
-    static bool         GetV4LInfo(int videofd, QString &card,QString &driver);
+    static bool         GetV4LInfo(int videofd, QString &card, QString &driver,
+                                   uint32_t &version);
+    static bool         GetV4LInfo(int videofd, QString &card, QString &driver)
+        { uint32_t dummy; return GetV4LInfo(videofd, card, driver, dummy); }
     static InputNames   probeV4LInputs(int videofd, bool &ok);
 
   private:

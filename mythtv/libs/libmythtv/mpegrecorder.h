@@ -55,11 +55,24 @@ class MpegRecorder : public RecorderBase
     bool OpenV4L2DeviceAsInput(void);
     bool SetIVTVDeviceOptions(int chanfd);
     bool SetV4L2DeviceOptions(int chanfd);
+    bool SetVBIOptions(int chanfd);
+    uint GetFilteredStreamType(void) const;
+    uint GetFilteredAudioSampleRate(void) const;
+    uint GetFilteredAudioLayer(void) const;
+    uint GetFilteredAudioBitRate(uint audio_layer) const;
 
     void ResetForNewFile(void);
 
     bool deviceIsMpegFile;
     int bufferSize;
+
+    // Driver info
+    QString  card;
+    QString  driver;
+    uint32_t version;
+    bool     usingv4l2;
+    bool     has_buggy_vbi;
+    bool     has_v4l2_vbi;
 
     // State
     bool recording;
@@ -75,7 +88,7 @@ class MpegRecorder : public RecorderBase
     // Encoding info
     int width, height;
     int bitrate, maxbitrate, streamtype, aspectratio;
-    int audtype, audsamplerate, audbitratel1, audbitratel2;
+    int audtype, audsamplerate, audbitratel1, audbitratel2, audbitratel3;
     int audvolume;
     unsigned int language; ///< 0 is Main Lang; 1 is SAP Lang; 2 is Dual
 
@@ -102,6 +115,7 @@ class MpegRecorder : public RecorderBase
 
     static const int   audRateL1[];
     static const int   audRateL2[];
+    static const int   audRateL3[];
     static const char *streamType[];
     static const char *aspectRatio[];
     static const unsigned int kBuildBufferMaxSize;
