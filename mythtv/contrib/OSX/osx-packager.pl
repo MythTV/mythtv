@@ -12,10 +12,9 @@ use Cwd ();
 ### Configuration settings (stuff that might change more often)
 
 # We try to auto-locate the Subversion client binaries.
-# If they are not in your path, you should use the second line.
+# If they are not in your path, we build them from source
 #
 our $svn = `which svn`; chomp $svn;
-#our $svn = '/Volumes/Users/nigel/bin/svn';
 
 # This script used to always delete the installed include and lib dirs.
 # That probably ensures a safe build, but when rebuilding adds minutes to
@@ -104,6 +103,29 @@ our %depend_order = (
 );
 
 our %depend = (
+
+  'svndeps' =>
+  {
+    'url'
+    => 'http://subversion.tigris.org/downloads/subversion-deps-1.4.3.tar.bz2',
+    'skip'
+    => 'yes'   # Don't actually untarr/configure/make.
+  },
+
+  'svn' =>
+  {
+    'url'
+    => 'http://subversion.tigris.org/downloads/subversion-1.4.3.tar.bz2',
+    'pre-conf'
+    => 'tar -xjf subversion-deps-1.4.3.tar.bz2',
+    'conf'
+    =>  [
+           "MAKEFLAGS=\$parallel_make_flags"   # For builds of deps
+        ],
+    # For some reason, this dies when the neon sub-make ends
+    #'parallel-make'
+    #=> 'yes'
+  },
 
   'freetype'
   =>
@@ -507,6 +529,7 @@ $ENV{'QTDIR'} = "$SRCDIR/$qt_vers";
 # If environment is setup to use distcc, take advantage of it
 our $standard_make = '/usr/bin/make';
 our $parallel_make = $standard_make;
+our $parallel_make_flags = '';
 
 if ( $ENV{'DISTCC_HOSTS'} )
 {
@@ -514,7 +537,7 @@ if ( $ENV{'DISTCC_HOSTS'} )
   my $numhosts = $#hosts + 1;
   &Verbose("Using ", $numhosts * 2, " DistCC jobs on $numhosts build hosts:",
            join ', ', @hosts);
-  $parallel_make .= ' -j' . $numhosts * 2;
+  $parallel_make_flags = '-j' . $numhosts * 2;
 }
 
 # Ditto for multi-cpu setups:
@@ -525,8 +548,10 @@ $cpus =~ s/.*, (\d+) processors$/$1/;
 if ( $cpus gt 1 )
 {
   &Verbose("Using $cpus parallel CPUs");
-  $parallel_make .= " -j$cpus";
+  $parallel_make_flags = "-j$cpus";
 }
+
+$parallel_make .= " $parallel_make_flags";
 
 ### Distclean?
 if ($OPT{'distclean'})
@@ -555,6 +580,13 @@ END
 my (@build_depends, %seen_depends);
 my @comps = ('mythtv', @components);
 &Verbose("Including components:", @comps);
+
+if ( $svn =~ m/no svn in / )
+{
+  $svn = "$PREFIX/bin/svn";
+  #@build_depends = ('apr', 'aprutil', 'neon', 'svn');
+  @build_depends = ('svndeps', 'svn');
+}
 
 foreach my $comp (@comps)
 {
@@ -596,6 +628,9 @@ foreach my $sw (@build_depends)
     &Verbose("Using previously downloaded $sw");
   }
   
+  if ($pkg->{'skip'})
+  { next }
+
   if ( -d $dirname )
   {
    if ( $OPT{'thirdclean'} )
@@ -623,8 +658,18 @@ foreach my $sw (@build_depends)
     {
       &Syscall([ '/usr/bin/tar', '-xjf', $filename ]) or die;
     }
+    else
+    {
+      &Complain("Cannot unpack file $filename");
+      exit;
+    }
   }
   
+  if ($pkg->{'pre-conf'})
+  { 
+    &Syscall([ $pkg->{'pre-conf'} ], 'munge' => 1) or die;
+  }
+
   # Configure
   chdir($dirname);
   unless (-e '.osx-config')
@@ -666,9 +711,10 @@ foreach my $sw (@build_depends)
     &Verbose("Making $sw");
     my (@make);
     
-    # I would like to use $parallel_make here, but several
-    # of the packages don't compile correctly then.
     push(@make, $standard_make);
+    if ($pkg->{'parallel-make'})
+    { push(@make, $parallel_make_flags) }
+
     if ($pkg->{'make'})
     {
       push(@make, @{ $pkg->{'make'} });
@@ -1084,6 +1130,7 @@ sub Syscall
     foreach my $arg (@$arglist)
     {
       $arg =~ s/\$PREFIX/$PREFIX/ge;
+      $arg =~ s/\$parallel_make_flags/$parallel_make_flags/ge;
       push(@args, $arg);
     }
     $arglist = \@args;
