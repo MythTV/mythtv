@@ -412,8 +412,10 @@ void Metadata::dumpToDatabase()
     query.bindValue(":DATE_MOD", QDateTime::currentDateTime());
 
     if (m_id < 1)
+    {
         query.bindValue(":DATE_ADD",  QDateTime::currentDateTime());
         query.bindValue(":LASTPLAY",  QDateTime::currentDateTime());
+    }
     else
         query.bindValue(":ID", m_id);
 
