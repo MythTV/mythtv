@@ -489,7 +489,7 @@ bool UpgradeMusicDatabaseSchema(void)
 "DELETE FROM music_songs;",
 "ALTER TABLE music_songs ADD COLUMN directory_id int(20) NOT NULL DEFAULT '0';",
 "INSERT INTO music_songs SELECT * FROM tmp_songs;",
-"ALTER TABLE music_songs ADD INDEX (directory_id)",
+"ALTER TABLE music_songs ADD INDEX (directory_id);",
 ""
 };
 
