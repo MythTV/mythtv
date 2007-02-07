@@ -341,7 +341,7 @@ void AvFormatDecoder::CloseCodecs()
 {
     if (ic)
     {
-        for (int i = 0; i < ic->nb_streams; i++)
+        for (uint i = 0; i < ic->nb_streams; i++)
         {
             QMutexLocker locker(&avcodeclock);
             AVStream *st = ic->streams[i];
@@ -403,8 +403,7 @@ bool AvFormatDecoder::DoFastForward(long long desiredFrame, bool discardFrames)
     getrawframes = false;
 
     AVStream *st = NULL;
-    int i;
-    for (i = 0; i < ic->nb_streams; i++)
+    for (uint i = 0; i < ic->nb_streams; i++)
     {
         AVStream *st1 = ic->streams[i];
         if (st1 && st1->codec->codec_type == CODEC_TYPE_VIDEO)
@@ -508,7 +507,7 @@ void AvFormatDecoder::SeekReset(long long newKey, uint skipFrames,
 
         // Flush the avcodec buffers
         VERBOSE(VB_PLAYBACK, LOC + "SeekReset() flushing");
-        for (int i = 0; i < ic->nb_streams; i++)
+        for (uint i = 0; i < ic->nb_streams; i++)
         {
             AVCodecContext *enc = ic->streams[i]->codec;
             if (enc->codec)
@@ -1276,7 +1275,7 @@ int AvFormatDecoder::ScanStreams(bool novideo)
     map<int,uint> lang_sub_cnt;
     map<int,uint> lang_aud_cnt;
 
-    for (int i = 0; i < ic->nb_streams; i++)
+    for (uint i = 0; i < ic->nb_streams; i++)
     {
         AVCodecContext *enc = ic->streams[i]->codec;
         VERBOSE(VB_PLAYBACK, LOC +
@@ -1381,7 +1380,8 @@ int AvFormatDecoder::ScanStreams(bool novideo)
                     selectedVideoIndex = i;
                 }
 
-                InitVideoCodec(ic->streams[i], enc, selectedVideoIndex == i);
+                InitVideoCodec(ic->streams[i], enc,
+                               selectedVideoIndex == (int) i);
 
                 ScanATSCCaptionStreams(i);
 
@@ -2390,7 +2390,7 @@ bool AvFormatDecoder::SetAudioByComponentTag(int tag)
 
 bool AvFormatDecoder::SetVideoByComponentTag(int tag)
 {
-    for (int i = 0; i < ic->nb_streams; i++)
+    for (uint i = 0; i < ic->nb_streams; i++)
     {
         AVStream *s  = ic->streams[i];
         if (s)
@@ -2780,7 +2780,7 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
                 pkt->pos -= readAdjust;
         }
 
-        if (pkt->stream_index > ic->nb_streams)
+        if (pkt->stream_index > (int) ic->nb_streams)
         {
             VERBOSE(VB_IMPORTANT, LOC_ERR + "Bad stream");
             av_free_packet(pkt);
@@ -3413,7 +3413,8 @@ bool AvFormatDecoder::SetupAudioStream(void)
     AudioInfo old_out = audioOut;
 
     if ((currentTrack[kTrackTypeAudio] >= 0) &&
-        (selectedTrack[kTrackTypeAudio].av_stream_index <= ic->nb_streams) &&
+        (selectedTrack[kTrackTypeAudio].av_stream_index <=
+         (int) ic->nb_streams) &&
         (curstream = ic->streams[selectedTrack[kTrackTypeAudio]
                                  .av_stream_index]))
     {
