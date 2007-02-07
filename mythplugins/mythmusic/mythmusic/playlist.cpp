@@ -619,6 +619,7 @@ void Playlist::fillSonglistFromQuery(QString whereClause,
     QString theQuery;
 
     theQuery = "SELECT song_id FROM music_songs "
+               "LEFT JOIN music_directories ON music_songs.directory_id=music_directories.directory_id "
                "LEFT JOIN music_artists ON music_songs.artist_id=music_artists.artist_id "
                "LEFT JOIN music_albums ON music_songs.album_id=music_albums.album_id "
                "LEFT JOIN music_genres ON music_songs.genre_id=music_genres.genre_id "

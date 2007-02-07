@@ -22,6 +22,7 @@ using namespace std;
 #include "globalsettings.h"
 #include "dbcheck.h"
 #include "importmusic.h"
+#include "filescanner.h"
 
 #include <mythtv/mythcontext.h>
 #include <mythtv/mythplugin.h>
@@ -62,136 +63,6 @@ void CheckFreeDBServerFile(void)
     }
 }
 
-Decoder *getDecoder(const QString &filename)
-{
-    Decoder *decoder = Decoder::create(filename, NULL, NULL, true);
-    return decoder;
-}
-
-void AddFileToDB(const QString &filename)
-{
-    Decoder *decoder = getDecoder(filename);
-
-    if (decoder)
-    {
-        Metadata *data = decoder->getMetadata();
-        if (data) {
-            data->dumpToDatabase();
-            delete data;
-        }
-
-        delete decoder;
-    }
-}
-
-// Remove a file from the database
-void RemoveFileFromDB (const QString &directory, const QString &filename)
-{
-    QString sqlfilename(filename);
-    // We know that the filename will not contain :// as the SQL limits this
-    sqlfilename.remove(0, directory.length());
-    MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare("DELETE FROM music_songs WHERE "
-                  "filename = :NAME ;");
-    query.bindValue(":NAME", sqlfilename.utf8());
-    query.exec();
-}
-
-void UpdateFileInDB(const QString &filename)
-{
-    Decoder *decoder = getDecoder(filename);
-
-    if (decoder)
-    {
-        Metadata *db_meta   = decoder->getMetadata();
-        Metadata *disk_meta = decoder->readMetadata();
-
-        if (db_meta && disk_meta)
-        {
-            disk_meta->setID(db_meta->ID());
-            disk_meta->setRating(db_meta->Rating());
-            disk_meta->dumpToDatabase();
-        }
-
-        if (disk_meta)
-            delete disk_meta;
-
-        if (db_meta)
-            delete db_meta;
-
-        delete decoder;
-    }
-}
-
-enum MusicFileLocation
-{
-    kFileSystem,
-    kDatabase,
-    kNeedUpdate,
-    kBoth
-};
-
-typedef QMap <QString, MusicFileLocation> MusicLoadedMap;
-
-void BuildFileList(QString &directory, MusicLoadedMap &music_files)
-{
-    QDir d(directory);
-
-    if (!d.exists())
-        return;
-
-    const QFileInfoList *list = d.entryInfoList();
-    if (!list)
-        return;
-
-    QFileInfoListIterator it(*list);
-    QFileInfo *fi;
-
-    /* Recursively traverse directory, calling QApplication::processEvents()
-       every now and then to ensure the UI updates */
-    int update_interval = 0;
-    while ((fi = it.current()) != 0)
-    {
-        ++it;
-        if (fi->fileName() == "." || fi->fileName() == "..")
-            continue;
-        QString filename = fi->absFilePath();
-        if (fi->isDir())
-        {
-            BuildFileList(filename, music_files);
-            qApp->processEvents ();
-        }
-        else
-        {
-            if (++update_interval > 100)
-            {
-                qApp->processEvents();
-                update_interval = 0;
-            }
-            music_files[filename] = kFileSystem;
-        }
-    }
-}
-
-bool HasFileChanged(const QString &filename, const QString &date_modified)
-{
-    struct stat sbuf;
-    if (stat(filename.ascii(), &sbuf) == 0)
-    {
-        if (date_modified.isEmpty() ||
-            sbuf.st_mtime >
-            (time_t)QDateTime::fromString(date_modified,
-                                          Qt::ISODate).toTime_t())
-        {
-            return true;
-        }
-    }
-    else {
-        VERBOSE(VB_IMPORTANT, QString("Failed to stat file: %1").arg(filename.ascii()));
-    }
-    return false;
-}
-
 void SavePending(int pending)
 {
     //  Temporary Hack until mythmusic
@@ -212,7 +83,7 @@ void SavePending(int pending)
         query.bindValue(":LASTPUSH", "LastMusicPlaylistPush");
         query.bindValue(":DATA", pending);
         query.bindValue(":HOST", gContext->GetHostName());
-       
+
         query.exec(); 
     }
     else if (query.size() == 1)
@@ -226,7 +97,7 @@ void SavePending(int pending)
         query.bindValue(":HOST", gContext->GetHostName());
 
         query.exec();
-    }                       
+    }
     else
     {
         //  correct thor's diabolical plot to 
@@ -238,7 +109,7 @@ void SavePending(int pending)
         query.bindValue(":LASTPUSH", "LastMusicPlaylistPush");
         query.bindValue(":HOST", gContext->GetHostName());
         query.exec(); 
-        
+
         query.prepare("INSERT INTO settings (value,data,hostname) VALUES "
                          "(:LASTPUSH, :DATA, :HOST );");
         query.bindValue(":LASTPUSH", "LastMusicPlaylistPush");
@@ -247,90 +118,6 @@ void SavePending(int pending)
 
         query.exec();
     }
-}
-
-void SearchDir(QString &directory)
-{
-    MusicLoadedMap music_files;
-    MusicLoadedMap::Iterator iter;
-
-    MythBusyDialog *busy = new MythBusyDialog(
-        QObject::tr("Searching for music files"));
-
-    busy->start();
-    BuildFileList(directory, music_files);
-    busy->Close();
-    delete busy;
-
-    MSqlQuery query(MSqlQuery::InitCon());
-    query.exec("SELECT filename, date_modified "
-               "FROM music_songs "
-               "WHERE filename NOT LIKE ('%://%')");
-
-    int counter = 0;
-
-    MythProgressDialog *file_checking;
-    file_checking = new MythProgressDialog(
-        QObject::tr("Scanning music files"), query.numRowsAffected());
-
-    if (query.isActive() && query.size() > 0)
-    {
-        while (query.next())
-        {
-            QString name = directory +
-                QString::fromUtf8(query.value(0).toString());
-
-            if (name != QString::null)
-            {
-                if ((iter = music_files.find(name)) != music_files.end())
-                {
-                    if (HasFileChanged(name, query.value(1).toString()))
-                        music_files[name] = kNeedUpdate;
-                    else
-                        music_files.remove(iter);
-                }
-                else
-                {
-                    music_files[name] = kDatabase;
-                }
-            }
-            file_checking->setProgress(++counter);
-        }
-    }
-
-    file_checking->Close();
-    delete file_checking;
-
-    file_checking = new MythProgressDialog(
-        QObject::tr("Updating music database"), music_files.size());
-
-     /*
-       This can be optimised quite a bit by consolidating all commands
-       via a lot of refactoring.
-       
-       1) group all files of the same decoder type, and don't
-       create/delete a Decoder pr. AddFileToDB. Or make Decoders be
-       singletons, it should be a fairly simple change.
-       
-       2) RemoveFileFromDB should group the remove into one big SQL.
-       
-       3) UpdateFileInDB, same as 1.
-     */
-
-    counter = 0;
-    for (iter = music_files.begin(); iter != music_files.end(); iter++)
-    {
-        if (*iter == kFileSystem)
-            AddFileToDB(iter.key());
-        else if (*iter == kDatabase)
-            RemoveFileFromDB(directory, iter.key ());
-        else if (*iter == kNeedUpdate)
-            UpdateFileInDB(iter.key());
-
-        file_checking->setProgress(++counter);
-    }
-    file_checking->Close();
-    delete file_checking;
 }
 
 void startPlayback(PlaylistsContainer *all_playlists, AllMusic *all_music)
@@ -441,7 +228,8 @@ void MusicCallback(void *data, QString &selection)
     {
         if ("" != mdata->startdir)
         {
-            SearchDir(mdata->startdir);
+            FileScanner *fscan = new FileScanner();
+            fscan->SearchDir(mdata->startdir);
             RebuildMusicTree(mdata);
         }
     }
@@ -614,7 +402,10 @@ static void preMusic(MusicData *mdata)
     // is no data in the database yet (first run).  Otherwise, user
     // can choose "Setup" option from the menu to force it.
     if (startdir != "" && !musicdata_exists)
-        SearchDir(startdir);
+    {
+        FileScanner *fscan = new FileScanner();
+        fscan->SearchDir(startdir);
+    }
 
     QString paths = gContext->GetSetting("TreeLevels");
 
@@ -715,7 +506,8 @@ void runRipCD(void)
     {
         // if startRipper returns true, then new files should be present
         // so we should look for them.
-        SearchDir(mdata.startdir);
+        FileScanner *fscan = new FileScanner();
+        fscan->SearchDir(mdata.startdir);
         RebuildMusicTree(&mdata);
     }
     postMusic(&mdata);
@@ -730,7 +522,8 @@ void runScan(void)
 
     if ("" != mdata.startdir)
     {
-        SearchDir(mdata.startdir);
+        FileScanner *fscan = new FileScanner();
+        fscan->SearchDir(mdata.startdir);
         RebuildMusicTree(&mdata);
     }
 
