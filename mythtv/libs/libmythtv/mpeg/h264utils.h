@@ -161,13 +161,6 @@ class KeyframeSequencer
     uint32_t AddBytes(const uint8_t *bytes, const uint32_t byte_count,
                       const int64_t stream_offset); /* throw() */
 
-    /**
-     *  This function returns true when the sequencer read the first data
-     *  byte (past the start code) of a new NAL unit.
-     */
-    inline bool DidReadNALHeaderByte(void) const /* throw() */
-        { return read_first_NAL_byte; }
-
     /// This function returns the NAL unit type of the last synced unit.
     inline uint8_t LastSyncedType(void) const /* throw() */
         { return first_NAL_byte & 0x1f; }
@@ -185,12 +178,9 @@ class KeyframeSequencer
     bool    errored;
     bool    state_changed;
 
-    bool    synced;
-    uint8_t sync_accumulator[3];
-    uint8_t sync_accumulator_index;
-    int64_t sync_stream_offset;
+    uint32_t sync_accumulator;
+    int64_t  sync_stream_offset;
 
-    bool    read_first_NAL_byte;
     uint8_t first_NAL_byte;
 
     bool    saw_AU_delimiter;

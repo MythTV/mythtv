@@ -13,6 +13,11 @@ using namespace std;
 #include "dtvrecorder.h"
 #include "tv_rec.h"
 
+extern "C" {
+// from libavcodec
+extern const uint8_t *ff_find_start_code(const uint8_t * restrict p, const uint8_t *end, uint32_t * restrict state);
+}
+
 #define LOC QString("DTVRec(%1): ").arg(tvrec->GetCaptureCardNum())
 #define LOC_ERR QString("DTVRec(%1) Error: ").arg(tvrec->GetCaptureCardNum())
 
@@ -37,7 +42,7 @@ DTVRecorder::DTVRecorder(TVRec *rec) :
     _stream_fd(-1),
     _recording_type("all"),
     // used for scanning pes headers for keyframes
-    _header_pos(0),                 _first_keyframe(-1),
+    _start_code(0xffffffff),        _first_keyframe(-1),
     _last_gop_seen(0),              _last_seq_seen(0),
     _last_keyframe_seen(0),
     // H.264 support
@@ -136,7 +141,7 @@ void DTVRecorder::Reset(void)
 {
     QMutexLocker locker(&_position_map_lock);
 
-    _header_pos                 = 0;
+    _start_code                 = 0xffffffff;
     _first_keyframe             =-1;
     _last_keyframe_seen         = 0;
     _last_gop_seen              = 0;
@@ -218,7 +223,7 @@ bool DTVRecorder::FindMPEG2Keyframes(const TSPacket* tspacket)
     // looking for first byte of MPEG start code (3 bytes 0 0 1)
     // otherwise, pick up search where we left off.
     const bool payloadStart = tspacket->PayloadStart();
-    _header_pos = (payloadStart) ? 0 : _header_pos;
+    _start_code = (payloadStart) ? 0xffffffff : _start_code;
 
     // Just make these local for efficiency reasons (gcc not so smart..)
     const uint maxKFD = kMaxKeyFrameDistance;
@@ -231,22 +236,17 @@ bool DTVRecorder::FindMPEG2Keyframes(const TSPacket* tspacket)
     //   00 00 01 B8: group_start_code
     //   00 00 01 B3: seq_start_code
     //   (there are others that we don't care about)
-    uint i = tspacket->AFCOffset();
-    for (; i < TSPacket::SIZE; i++)
+    const uint8_t *bufptr = tspacket->data() + tspacket->AFCOffset();
+    const uint8_t *bufend = tspacket->data() + TSPacket::SIZE;
+
+    while (bufptr < bufend)
     {
-        const unsigned char k = tspacket->data()[i];
-        if (0 == _header_pos)
-            _header_pos = (k == 0x00) ? 1 : 0;
-        else if (1 == _header_pos)
-            _header_pos = (k == 0x00) ? 2 : 0;
-        else if (2 == _header_pos)
-            _header_pos = (k == 0x00) ? 2 : ((k == 0x01) ? 3 : 0);
-        else if (3 == _header_pos)
+        bufptr = ff_find_start_code(bufptr, bufend, &_start_code);
+        if ((_start_code & 0xffffff00) == 0x00000100)
         {
-            _header_pos = 0;
             // At this point we have seen the start code 0 0 1
             // the next byte will be the PES packet stream id.
-            const int stream_id = k;
+            const int stream_id = _start_code & 0x000000ff;
             if (PESStreamID::PictureStartCode == stream_id)
                 hasFrame = true;
             else if (PESStreamID::GOPStartCode == stream_id)
@@ -257,7 +257,7 @@ bool DTVRecorder::FindMPEG2Keyframes(const TSPacket* tspacket)
             else if (PESStreamID::SequenceStartCode == stream_id)
             {
                 _last_seq_seen  = _frames_seen_count;
-                hasKeyFrame    |=(_last_gop_seen + maxKFD)<_frames_seen_count;
+                hasKeyFrame    |= (_last_gop_seen + maxKFD)<_frames_seen_count;
             }
         }
     }
@@ -386,7 +386,7 @@ bool DTVRecorder::FindH264Keyframes(const TSPacket* tspacket)
     {
         // reset PES sync state
         _pes_synced = false;
-        _header_pos = 0;
+        _start_code = 0xffffffff;
     }
 
     bool hasFrame = false;
@@ -463,7 +463,7 @@ bool DTVRecorder::FindH264Keyframes(const TSPacket* tspacket)
         // special handling when we've synced to a NAL unit
         if (_h264_kf_seq.HasStateChanged())
         {
-            if (_h264_kf_seq.DidReadNALHeaderByte() && _h264_kf_seq.LastSyncedType() == H264::NALUnitType::SPS)
+            if (_h264_kf_seq.LastSyncedType() == H264::NALUnitType::SPS)
                 _seen_sps = true;
 
             if (_h264_kf_seq.IsOnKeyframe())

@@ -221,7 +221,7 @@ class AvFormatDecoder : public DecoderBase
 
     bool gotvideo;
 
-    unsigned char prvpkt[3];
+    uint32_t  start_code_state;
 
     long long lastvpts;
     long long lastapts;

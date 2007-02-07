@@ -66,7 +66,7 @@ class DTVRecorder: public RecorderBase
     QString _recording_type;
 
     // used for scanning pes headers for keyframes
-    uint      _header_pos;
+    uint32_t  _start_code;
     int       _first_keyframe;
     unsigned long long _last_gop_seen;
     unsigned long long _last_seq_seen;

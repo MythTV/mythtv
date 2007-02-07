@@ -36,6 +36,8 @@ extern "C" {
 #include "libavcodec/liba52/a52.h"
 #include "../libmythmpeg2/mpeg2.h"
 #include "ivtv_myth.h"
+// from libavcodec
+extern const uint8_t *ff_find_start_code(const uint8_t * restrict p, const uint8_t *end, uint32_t * restrict state);
 }
 
 #define LOC QString("AFD: ")
@@ -274,6 +276,7 @@ AvFormatDecoder::AvFormatDecoder(NuppelVideoPlayer *parent,
       gopset(false),                seen_gop(false),
       seq_count(0),                 firstgoppos(0),
       prevgoppos(0),                gotvideo(false),
+      start_code_state(0xffffffff),
       lastvpts(0),                  lastapts(0),
       lastccptsu(0),
       using_null_videoout(use_null_videoout),
@@ -296,7 +299,6 @@ AvFormatDecoder::AvFormatDecoder(NuppelVideoPlayer *parent,
       dvd_xvmc_enabled(false), dvd_video_codec_changed(false)
 {
     bzero(&params, sizeof(AVFormatParameters));
-    bzero(prvpkt, 3 * sizeof(char));
     bzero(audioSamples, AVCODEC_MAX_AUDIO_FRAME_SIZE * sizeof(short int));
     ccd608->SetIgnoreTimecode(true);
 
@@ -1985,38 +1987,29 @@ void AvFormatDecoder::HandleGopStart(AVPacket *pkt)
 void AvFormatDecoder::MpegPreProcessPkt(AVStream *stream, AVPacket *pkt)
 {
     AVCodecContext *context = stream->codec;
-    unsigned char *bufptr = pkt->data;
-    //unsigned char *bufend = pkt->data + pkt->size;
-    unsigned int state = 0xFFFFFFFF, v = 0;
-    int prvcount = -1;
+    const uint8_t *bufptr = pkt->data;
+    const uint8_t *bufend = pkt->data + pkt->size;
 
-    while (bufptr < pkt->data + pkt->size)
+    while (bufptr < bufend)
     {
-        if (++prvcount < 3)
-            v = prvpkt[prvcount];
-        else
-            v = *bufptr++;
-
-        unsigned int last_state = state;
-        state = ((state << 8) | v) & 0xFFFFFF;
-
+        bufptr = ff_find_start_code(bufptr, bufend, &start_code_state);
+        
         if (ringBuffer->isDVD() && pkt->size == 4 &&
-            state == SEQ_END_CODE && !dvdvideopause)
+            start_code_state == SEQ_END_CODE && !dvdvideopause)
         {
             dvdvideopause = true;
             d->ResetMPEG2();
             return;
         }
 
-        if (last_state != 0x000001)
+        if (start_code_state >= SLICE_MIN && start_code_state <= SLICE_MAX)
             continue;
-        else if (state >= SLICE_MIN && state <= SLICE_MAX)
-            continue;
-        else if (SEQ_START == state)
+        else if (SEQ_START == start_code_state)
         {
             if (bufptr + 11 >= pkt->data + pkt->size)
                 continue; // not enough valid data...
-            SequenceHeader *seq = reinterpret_cast<SequenceHeader*>(bufptr);
+            SequenceHeader *seq = reinterpret_cast<SequenceHeader*>(
+                const_cast<uint8_t*>(bufptr));
 
             uint  width  = seq->width();
             uint  height = seq->height();
@@ -2066,15 +2059,13 @@ void AvFormatDecoder::MpegPreProcessPkt(AVStream *stream, AVPacket *pkt)
                 pkt->flags |= PKT_FLAG_KEY;
             }
         }
-        else if (GOP_START == state)
+        else if (GOP_START == start_code_state)
         {
             HandleGopStart(pkt);
             seen_gop = true;
             pkt->flags |= PKT_FLAG_KEY;
         }
     }
-
-    memcpy(prvpkt, pkt->data + pkt->size - 3, 3);
 }
 
 void AvFormatDecoder::H264PreProcessPkt(AVStream *stream, AVPacket *pkt)

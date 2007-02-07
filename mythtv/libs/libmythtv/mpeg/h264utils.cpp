@@ -39,6 +39,11 @@
 // MythTV headers
 #include "h264utils.h"
 
+extern "C" {
+// from libavcodec
+extern const uint8_t *ff_find_start_code(const uint8_t * p, const uint8_t *end, uint32_t * state);
+}
+
 namespace H264
 {
 
@@ -52,13 +57,10 @@ void KeyframeSequencer::Reset(void) /* throw() */
     errored = false;
     state_changed = false;
 
-    synced = false;
-    memset(sync_accumulator, 0, sizeof(sync_accumulator));
-    sync_accumulator_index = 0;
+    sync_accumulator = 0xffffffff;
     sync_stream_offset = 0;
 
-    read_first_NAL_byte = false;
-    first_NAL_byte = 0;
+    first_NAL_byte = H264::NALUnitType::UNKNOWN;
 
     saw_AU_delimiter = false;
     saw_first_VCL_NAL_unit = false;
@@ -142,50 +144,24 @@ uint32_t KeyframeSequencer::AddBytes(
     const uint8_t *local_bytes = bytes;
     const uint8_t *local_bytes_end = bytes + byte_count;
 
-    if (!synced)
-    {
-        while (local_bytes < local_bytes_end)
-        {
-            if (sync_accumulator_index == 3)
-            {
-                if (sync_accumulator[0] == 0x00 && 
-                    sync_accumulator[1] == 0x00 && 
-                    sync_accumulator[2] == 0x01)
-                {
-                    synced = true;
-                    sync_accumulator_index = 0;
-                    sync_stream_offset = stream_offset;
-
-                    read_first_NAL_byte = false;
-                    keyframe = false;
-
-                    return local_bytes - bytes;
-                }
-                else
-                {
-                    sync_accumulator_index = 2;
-                    sync_accumulator[0] = sync_accumulator[1];
-                    sync_accumulator[1] = sync_accumulator[2];
-                }
-            }
-
-            sync_accumulator[sync_accumulator_index++] = *local_bytes;
-            local_bytes++;
-        }
-    }
-
     state_changed = false;
-    if (synced && !read_first_NAL_byte && local_bytes < local_bytes_end)
+
+    while (local_bytes < local_bytes_end)
     {
-        KeyframePredicate(*local_bytes);
+        local_bytes = ff_find_start_code(local_bytes, local_bytes_end,
+                                         &sync_accumulator);
 
-        first_NAL_byte = *local_bytes;
-        local_bytes++;
+        if ((sync_accumulator & 0xffffff00) == 0x00000100)
+        {
+            uint8_t k = *(local_bytes-1);
+            sync_stream_offset = stream_offset;
+            keyframe = false;
 
-        synced = false;
-        read_first_NAL_byte = true;
+            KeyframePredicate(k);
+            first_NAL_byte = k;
 
-        return local_bytes - bytes;
+            return local_bytes - bytes;
+        }
     }
 
     return local_bytes - bytes;
