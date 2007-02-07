@@ -199,8 +199,6 @@ class MPUBLIC ChannelUtil
     static QString GetServiceName(int chanid);
     static int     GetSourceID(int mplexid);
     static int     GetInputID(int sourceid, int cardid);
-    static QString GetDTVPrivateType(uint networkid, const QString &key,
-                                     const QString sitype = "dvb");
 
     // Misc sets
     static bool    SetChannelValue(const QString &field_name,

@@ -1199,35 +1199,7 @@ int ChannelUtil::GetServiceVersion(int mplexid)
     }
     return -1;
 }
-
-QString ChannelUtil::GetDTVPrivateType(uint network_id,
-                                       const QString &key,
-                                       const QString table_standard)
-{
-    MSqlQuery query(MSqlQuery::InitCon());
-
-    QString theQuery = QString(
-        "SELECT private_value "
-        "FROM dtv_privatetypes "
-        "WHERE networkid = %1 AND sitype = '%2' AND private_type = '%3'")
-        .arg(network_id).arg(table_standard).arg(key);
-
-    query.prepare(theQuery);
-
-    if (!query.exec() && !query.isActive())
-    {
-        MythContext::DBError(
-            QString("Error loading DTV private type %1").arg(key), query);
-
-        return QString::null;
-    }
-
-    if (query.size() <= 0)
-        return QString::null;
-
-    return query.value(0).toString();
-}
-                    
+                   
 bool ChannelUtil::GetATSCChannel(uint sourceid, const QString &channum,
                                  uint &major,   uint          &minor)
 {
