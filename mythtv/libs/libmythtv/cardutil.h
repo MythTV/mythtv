@@ -5,6 +5,7 @@
 #include "libmyth/settings.h"
 
 // C++ headers
+#include <stdint.h>
 #include <vector>
 using namespace std;
 
