@@ -2709,7 +2709,10 @@ void TV::ProcessKeypress(QKeyEvent *e)
             if (HasQueuedInput())
                 DoArbSeek(ARBSEEK_END);
             else if (paused)
-                DoSeek(1.0, tr("Forward"));
+            {
+                if (!activerbuffer->isDVD())
+                    DoSeek(1.0, tr("Forward"));
+            }
             else
                 ChangeFFRew(1);
         }
@@ -2736,7 +2739,10 @@ void TV::ProcessKeypress(QKeyEvent *e)
             if (HasQueuedInput())
                 DoArbSeek(ARBSEEK_SET);
             else if (paused)
-                DoSeek(-1.0, tr("Rewind"));
+            {
+                if (!activerbuffer->isDVD())
+                    DoSeek(-1.0, tr("Rewind"));
+            }
             else
                 ChangeFFRew(-1);
         }
