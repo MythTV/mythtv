@@ -1440,6 +1440,17 @@ void SIScan::UpdateSDTinDB(int /*mplexid*/, const ServiceDescriptionTable *sdt,
             continue;
         }
 
+        // Default authority
+        QString default_authority = "";
+        desc_list_t parsed =
+            MPEGDescriptor::Parse(sdt->ServiceDescriptors(i),
+                                  sdt->ServiceDescriptorsLength(i));
+        const unsigned char *def_auth =
+            MPEGDescriptor::Find(parsed, DescriptorID::default_authority);
+        if (def_auth)
+            default_authority =
+                QString::fromAscii((const char*)def_auth+2, def_auth[1]);
+
         QString common_status_info = service_name;
 
         if (!CheckImportedList(channels, sdt->ServiceID(i),
@@ -1468,7 +1479,9 @@ void SIScan::UpdateSDTinDB(int /*mplexid*/, const ServiceDescriptionTable *sdt,
                     sdt->HasEITSchedule(i) ||
                     sdt->HasEITPresentFollowing(i) ||
                     force_guide_present,
-                    false, false, QString::null);
+                    false, false, QString::null,
+                    QString::null, "Default", QString::null,
+                    default_authority);
             }
         }
         else if (force_update || (desc && have_uk_chan_num))
@@ -1490,7 +1503,9 @@ void SIScan::UpdateSDTinDB(int /*mplexid*/, const ServiceDescriptionTable *sdt,
                 sdt->HasEITSchedule(i) ||
                 sdt->HasEITPresentFollowing(i) ||
                 force_guide_present,
-                false, false, QString::null);
+                false, false, QString::null,
+                QString::null, QString::null, QString::null,
+                default_authority);
         }
         else
         {

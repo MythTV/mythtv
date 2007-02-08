@@ -349,6 +349,24 @@ void EITHelper::AddEIT(const DVBEventInformationTable *eit)
             category_type = content.GetMythCategory(0);
         }
 
+        desc_list_t contentIds =
+            MPEGDescriptor::FindAll(list, DescriptorID::dvb_content_identifier);
+        QString programId = "", seriesId = "";
+        for (uint j = 0; j < contentIds.size(); j++)
+        {
+            DVBContentIdentifierDescriptor desc(contentIds[j]);
+            if (desc.ContentEncoding() == 0)
+            {
+                // The CRID is a URI.  It could contain UTF8 sequences encoded
+                // as %XX but there's no advantage in decoding them.
+                // The BBC currently uses private types 0x31 and 0x32.
+                if (desc.ContentType() == 0x01 || desc.ContentType() == 0x31)
+                    programId = desc.ContentId();
+                else if (desc.ContentType() == 0x02 || desc.ContentType() == 0x32)
+                    seriesId = desc.ContentId();
+            }
+        }
+
         uint chanid = GetChanID(
             eit->ServiceID(), eit->OriginalNetworkID(), eit->TSID());
 
@@ -364,7 +382,8 @@ void EITHelper::AddEIT(const DVBEventInformationTable *eit)
                                      category,  category_type,
                                      starttime, endtime,       fix,
                                      false,     subtitled,
-                                     stereo,    hdtv);
+                                     stereo,    hdtv,
+                                     seriesId,  programId);
         db_events.enqueue(event);
     }
 }

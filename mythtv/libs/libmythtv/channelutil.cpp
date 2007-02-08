@@ -1034,7 +1034,8 @@ bool ChannelUtil::CreateChannel(uint db_mplexid,
                                 const QString &freqid,
                                 QString icon,
                                 QString format,
-                                QString xmltvid)
+                                QString xmltvid,
+                                QString default_authority)
 {
     MSqlQuery query(MSqlQuery::InitCon());
 
@@ -1047,13 +1048,13 @@ bool ChannelUtil::CreateChannel(uint db_mplexid,
         "   name,          mplexid,    serviceid,             "
         "   atsc_major_chan,           atsc_minor_chan,       "
         "   useonairguide, visible,    freqid,     tvformat,  "
-        "   icon,          xmltvid) "
+        "   icon,          xmltvid,    default_authority) "
         "VALUES "
         "  (:CHANID,       :CHANNUM,   :SOURCEID,  :CALLSIGN,  "
         "   :NAME,         :MPLEXID,   :SERVICEID,             "
         "   :MAJORCHAN,                :MINORCHAN,             "
         "   :USEOAG,       :VISIBLE,   :FREQID,    :TVFORMAT,  "
-        "   :ICON,         :XMLTVID)");
+        "   :ICON,         :XMLTVID,   :AUTHORITY)");
 
     query.bindValue(":CHANID",    new_channel_id);
     query.bindValue(":CHANNUM",   chanNum);
@@ -1083,6 +1084,9 @@ bool ChannelUtil::CreateChannel(uint db_mplexid,
     xmltvid = (xmltvid.isEmpty()) ? "" : xmltvid;
     query.bindValue(":XMLTVID",   xmltvid);
 
+    default_authority = (default_authority.isEmpty()) ? "" : default_authority;
+    query.bindValue(":AUTHORITY",   default_authority);
+
     if (!query.exec() || !query.isActive())
     {
         MythContext::DBError("Adding Service", query);
@@ -1106,7 +1110,8 @@ bool ChannelUtil::UpdateChannel(uint db_mplexid,
                                 QString freqid,
                                 QString icon,
                                 QString format,
-                                QString xmltvid)
+                                QString xmltvid,
+                                QString default_authority)
 {
     MSqlQuery query(MSqlQuery::InitCon());
 
@@ -1119,7 +1124,8 @@ bool ChannelUtil::UpdateChannel(uint db_mplexid,
         "    tvformat        = :TVFORMAT,  sourceid        = :SOURCEID,  "
         "    useonairguide   = :USEOAG,    visible         = :VISIBLE,   "
         "    tvformat        = :TVFORMAT,  icon            = :ICON,      "
-        "    xmltvid         = :XMLTVID,   channum         = :CHANNUM    "
+        "    xmltvid         = :XMLTVID,   channum         = :CHANNUM,   "
+        "    default_authority = :AUTHORITY "
         "WHERE chanid=:CHANID");
 
     if (channel_id > 0)
@@ -1152,6 +1158,8 @@ bool ChannelUtil::UpdateChannel(uint db_mplexid,
         query.bindValue(":ICON",      icon);
     if (!xmltvid.isEmpty())
         query.bindValue(":XMLTVID",   xmltvid);
+    if (!default_authority.isEmpty())
+        query.bindValue(":AUTHORITY",   default_authority);
 
     if (!query.exec() || !query.isActive())
     {

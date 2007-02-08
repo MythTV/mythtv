@@ -59,7 +59,8 @@ class DBEvent
             const QDateTime &_start,     const QDateTime &_end,
             uint             _fixup,
             bool             _captioned, bool _subtitled,
-            bool             _stereo,    bool _hdtv) :
+            bool             _stereo,    bool _hdtv,
+            const QString   &_seriesId,  const QString   &_programId) :
         title(_title),           subtitle(_subtitle),
         description(_desc),
         category(_category),
@@ -70,7 +71,9 @@ class DBEvent
         partnumber(0),           parttotal(0),
         syndicatedepisodenumber(QString::null),
         fixup(_fixup),           flags(0),
-        category_type(_category_type)
+        category_type(_category_type),
+        seriesId(_seriesId),
+        programId(_programId)
     {
         flags |= (_captioned) ? kCaptioned : 0;
         flags |= (_subtitled) ? kSubtitled : 0;
@@ -118,6 +121,7 @@ class DBEvent
     uint UpdateDB(MSqlQuery&, const DBEvent &match) const;
     bool MoveOutOfTheWayDB(MSqlQuery&, const DBEvent &nonmatch) const;
     uint InsertDB(MSqlQuery&) const;
+    QString AddAuthority(const QString &, MSqlQuery &) const;
 
   public:
     QString       title;
@@ -136,6 +140,8 @@ class DBEvent
     uint32_t      fixup;
     unsigned char flags;
     unsigned char category_type;
+    QString       seriesId;
+    QString       programId;
 
     static const unsigned char kCaptioned = 0x1;
     static const unsigned char kSubtitled = 0x2;

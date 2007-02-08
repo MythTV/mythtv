@@ -135,7 +135,8 @@ uint DBEvent::GetOverlappingPrograms(MSqlQuery &query,
         "       closecaptioned, subtitled,     stereo,      hdtv, "
         "       partnumber,     parttotal, "
         "       syndicatedepisodenumber, "
-        "       airdate,        originalairdate "
+        "       airdate,        originalairdate, "
+        "       seriesid,       programid "
         "FROM program "
         "WHERE chanid   = :CHANID AND "
         "      manualid = 0       AND "
@@ -167,7 +168,10 @@ uint DBEvent::GetOverlappingPrograms(MSqlQuery &query,
                      query.value(5).toDateTime(), query.value(6).toDateTime(),
                      fixup,
                      query.value(7).toBool(),     query.value(8).toBool(),
-                     query.value(9).toBool(),     query.value(10).toBool());
+                     query.value(9).toBool(),     query.value(10).toBool(),
+                     QString::fromUtf8(query.value(16).toString()),
+                     QString::fromUtf8(query.value(17).toString())
+                     );
 
         prog.partnumber = query.value(11).toUInt();
         prog.parttotal  = query.value(12).toUInt();
@@ -286,6 +290,8 @@ uint DBEvent::UpdateDB(MSqlQuery &query, const DBEvent &match) const
     QString ldesc     = description;
     QString lcategory = category;
     QString lairdate  = airdate;
+    QString lprogramId = AddAuthority(programId, query);
+    QString lseriesId = AddAuthority(seriesId, query);
     QDate loriginalairdate = originalairdate;
 
     if (match.title.length() >= ltitle.length())
@@ -305,6 +311,12 @@ uint DBEvent::UpdateDB(MSqlQuery &query, const DBEvent &match) const
 
     if (!loriginalairdate.isValid() && match.originalairdate.isValid())
         loriginalairdate = match.originalairdate;
+
+    if (lprogramId.isEmpty() && !match.programId.isEmpty())
+        lprogramId = match.programId;
+
+    if (lseriesId.isEmpty() && !match.seriesId.isEmpty())
+        lseriesId = match.seriesId;
 
     uint tmp = category_type;
     if (!category_type && match.category_type)
@@ -338,7 +350,8 @@ uint DBEvent::UpdateDB(MSqlQuery &query, const DBEvent &match) const
         "    partnumber     = :PARTNO,    parttotal     = :PARTTOTAL, "
         "    syndicatedepisodenumber = :SYNDICATENO, "
         "    airdate        = :AIRDATE,   originalairdate=:ORIGAIRDATE, "
-        "    listingsource  = :LSOURCE "
+        "    listingsource  = :LSOURCE, "
+        "    seriesid       = :SERIESID,  programid     = :PROGRAMID "
         "WHERE chanid    = :CHANID AND "
         "      starttime = :OLDSTART ");
 
@@ -361,6 +374,8 @@ uint DBEvent::UpdateDB(MSqlQuery &query, const DBEvent &match) const
     query.bindValue(":AIRDATE",     lairdate.isEmpty() ? "0000" : lairdate);
     query.bindValue(":ORIGAIRDATE", loriginalairdate);
     query.bindValue(":LSOURCE",     1);
+    query.bindValue(":SERIESID",    lseriesId.utf8());
+    query.bindValue(":PROGRAMID",   lprogramId.utf8());
 
     if (!query.exec())
     {
@@ -475,6 +490,9 @@ bool DBEvent::MoveOutOfTheWayDB(MSqlQuery &query, const DBEvent &prog) const
 
 uint DBEvent::InsertDB(MSqlQuery &query) const
 {
+    QString lprogramId = AddAuthority(programId, query);
+    QString lseriesId  = AddAuthority(seriesId, query);
+
     query.prepare(
         "REPLACE INTO program ("
         "  chanid,         title,          subtitle,        description, "
@@ -483,7 +501,8 @@ uint DBEvent::InsertDB(MSqlQuery &query) const
         "  closecaptioned, subtitled,      stereo,          hdtv, "
         "  partnumber,     parttotal, "
         "  syndicatedepisodenumber, "
-        "  airdate,        originalairdate,listingsource ) "
+        "  airdate,        originalairdate,listingsource, "
+        "  seriesid,       programid ) "
         "VALUES ("
         " :CHANID,        :TITLE,         :SUBTITLE,       :DESCRIPTION, "
         " :CATEGORY,      :CATTYPE, "
@@ -491,7 +510,8 @@ uint DBEvent::InsertDB(MSqlQuery &query) const
         " :CC,            :SUBTITLED,     :STEREO,         :HDTV, "
         " :PARTNUMBER,    :PARTTOTAL, "
         " :SYNDICATENO, "
-        " :AIRDATE,       :ORIGAIRDATE,   :LSOURCE ) ");
+        " :AIRDATE,       :ORIGAIRDATE,   :LSOURCE, "
+        " :SERIESID,      :PROGRAMID ) ");
 
     QString cattype = myth_category_type_to_string(category_type);
 
@@ -513,6 +533,8 @@ uint DBEvent::InsertDB(MSqlQuery &query) const
     query.bindValue(":AIRDATE",     airdate.isEmpty() ? "0000" : airdate);
     query.bindValue(":ORIGAIRDATE", originalairdate);
     query.bindValue(":LSOURCE",     1);
+    query.bindValue(":SERIESID",    lseriesId.utf8());
+    query.bindValue(":PROGRAMID",   lprogramId.utf8());
 
     if (!query.exec())
     {
@@ -527,4 +549,28 @@ uint DBEvent::InsertDB(MSqlQuery &query) const
     }
 
     return 1;
+}
+
+// If a series id or program id does not have an authority add the default.
+QString DBEvent::AddAuthority(const QString& id, MSqlQuery &query) const
+{
+    if (id.length() == 0 || id[0] != '/')
+        return id;
+
+    query.prepare("SELECT default_authority "
+        "FROM channel "
+        "WHERE chanid    = :CHANID");
+
+    query.bindValue(":CHANID",      chanid);
+
+    if (!query.exec())
+    {
+        MythContext::DBError("AddAuthority", query);
+        return id;
+    }
+
+    if (query.next())
+        return query.value(0).toString() + id;
+    else
+        return id;
 }

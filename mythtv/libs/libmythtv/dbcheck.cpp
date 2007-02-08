@@ -10,7 +10,7 @@ using namespace std;
 #include "mythdbcon.h"
 
 /// This is the DB schema version expected by the running MythTV instance.
-const QString currentDatabaseVersion = "1178";
+const QString currentDatabaseVersion = "1179";
 
 static bool UpdateDBVersionNumber(const QString &newnumber);
 static bool performActualUpdate(const QString updates[], QString version,
@@ -2882,7 +2882,27 @@ thequery,
             return false;
     }
 
-
+    if (dbver == "1178")
+    {
+        const QString updates[] = {
+"ALTER TABLE program         CHANGE seriesid  seriesid  VARCHAR(40) NOT NULL DEFAULT '';",
+"ALTER TABLE program         CHANGE programid programid VARCHAR(40) NOT NULL DEFAULT '';",
+"ALTER TABLE record          CHANGE seriesid  seriesid  VARCHAR(40) NOT NULL DEFAULT '';",
+"ALTER TABLE record          CHANGE programid programid VARCHAR(40) NOT NULL DEFAULT '';",
+"ALTER TABLE record_tmp      CHANGE seriesid  seriesid  VARCHAR(40) NOT NULL DEFAULT '';",
+"ALTER TABLE record_tmp      CHANGE programid programid VARCHAR(40) NOT NULL DEFAULT '';",
+"ALTER TABLE recorded        CHANGE seriesid  seriesid  VARCHAR(40) NOT NULL DEFAULT '';",
+"ALTER TABLE recorded        CHANGE programid programid VARCHAR(40) NOT NULL DEFAULT '';",
+"ALTER TABLE recordedprogram CHANGE seriesid  seriesid  VARCHAR(40) NOT NULL DEFAULT '';",
+"ALTER TABLE recordedprogram CHANGE programid programid VARCHAR(40) NOT NULL DEFAULT '';",
+"ALTER TABLE oldrecorded     CHANGE seriesid  seriesid  VARCHAR(40) NOT NULL DEFAULT '';",
+"ALTER TABLE oldrecorded     CHANGE programid programid VARCHAR(40) NOT NULL DEFAULT '';",
+"ALTER TABLE channel ADD COLUMN default_authority VARCHAR(32) NOT NULL DEFAULT '';",
+""
+};
+        if (!performActualUpdate(updates, "1179", dbver))
+            return false;
+    }
 
 //"ALTER TABLE cardinput DROP COLUMN preference;" in 0.22
 //"ALTER TABLE channel DROP COLUMN atscsrcid;" in 0.22

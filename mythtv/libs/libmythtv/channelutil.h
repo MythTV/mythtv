@@ -114,7 +114,8 @@ class MPUBLIC ChannelUtil
                                  const QString &freqid,
                                  QString icon    = QString::null,
                                  QString format  = "Default",
-                                 QString xmltvid = QString::null);
+                                 QString xmltvid = QString::null,
+                                 QString default_authority = QString::null);
 
     static bool    UpdateChannel(uint db_mplexid,
                                  uint source_id,
@@ -131,7 +132,8 @@ class MPUBLIC ChannelUtil
                                  QString freqid  = QString::null,
                                  QString icon    = QString::null,
                                  QString format  = QString::null,
-                                 QString xmltvid = QString::null);
+                                 QString xmltvid = QString::null,
+                                 QString default_authority = QString::null);
 
     static bool    SetServiceVersion(int mplexid, int version);
 

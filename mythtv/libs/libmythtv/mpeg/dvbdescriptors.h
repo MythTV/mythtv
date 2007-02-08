@@ -1651,4 +1651,27 @@ class UKChannelListDescriptor : public MPEGDescriptor
     QString toString() const { return QString("UKChannelListDescriptor(stub)"); }
 };
 
+class DVBContentIdentifierDescriptor : public MPEGDescriptor
+{
+  public:
+    DVBContentIdentifierDescriptor(const unsigned char* data) : MPEGDescriptor(data)
+    {
+    //       Name             bits  loc  expected value
+    // descriptor_tag           8   0.0       0x76
+        assert(DescriptorID::dvb_content_identifier == DescriptorTag());
+    // descriptor_length        8   1.0
+    }
+
+    uint ContentType() const { return _data[2] >> 2; }
+
+    uint ContentEncoding() const { return _data[2] & 0x03; }
+
+    // A content identifier is a URI.  It may contain UTF-8 encoded using %XX.
+    QString ContentId() const
+        { return QString::fromAscii((const char *)_data+4, _data[3]); }
+
+    QString toString() const { return QString("DVBContentIdentifierDescriptor(stub)"); }
+};
+
+
 #endif
