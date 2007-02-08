@@ -230,6 +230,18 @@ void Metadata::dumpToDatabase()
     {
         directoryId = query.value(0).toInt();
     }
+    else
+    {
+        query.prepare("INSERT INTO music_directories (path) VALUES (:DIRECTORY);");
+        query.bindValue(":DIRECTORY", sqldir.utf8());
+
+        if (!query.exec() || !query.isActive() || query.numRowsAffected() <= 0)
+        {
+            MythContext::DBError("music insert directory", query);
+            return;
+        }
+        directoryId = query.lastInsertId().toInt();
+    }
 
     // Load the artist id or insert it and get the id
     unsigned int artistId;
