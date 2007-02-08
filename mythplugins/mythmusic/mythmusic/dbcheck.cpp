@@ -483,9 +483,9 @@ bool UpgradeMusicDatabaseSchema(void)
 "ALTER TABLE music_songs MODIFY lastplay DATETIME DEFAULT NULL;",
 "CREATE TABLE music_directories (directory_id int(20) NOT NULL AUTO_INCREMENT PRIMARY KEY, path TEXT NOT NULL DEFAULT '', parent_id INT(20) NOT NULL DEFAULT '0') ;",
 "INSERT IGNORE INTO music_directories (path) SELECT DISTINCT"
-" SUBSTRING(filename FROM 1 FOR INSTR(filename, SUBSTRING_INDEX(filename, '/', -1))-1) FROM music_songs;",
+" SUBSTRING(filename FROM 1 FOR INSTR(filename, SUBSTRING_INDEX(filename, '/', -1))-2) FROM music_songs;",
 "CREATE TEMPORARY TABLE tmp_songs SELECT music_songs.*, directory_id FROM music_songs, music_directories WHERE music_directories.path=SUBSTRING(filename FROM 1 FOR INSTR(filename, SUBSTRING_INDEX(filename, '/', -1))-2);",
-"UPDATE music_songs SET filename=SUBSTRING_INDEX(filename, '/', -1);",
+"UPDATE tmp_songs SET filename=SUBSTRING_INDEX(filename, '/', -1);",
 "DELETE FROM music_songs;",
 "ALTER TABLE music_songs ADD COLUMN directory_id int(20) NOT NULL DEFAULT '0';",
 "INSERT INTO music_songs SELECT * FROM tmp_songs;",
