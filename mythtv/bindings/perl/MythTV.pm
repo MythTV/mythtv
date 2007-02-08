@@ -541,7 +541,32 @@ package MythTV;
         my $self = shift;
         return if (%{$self->{'channels'}});
     # Load the channels
-        my $sh = $self->{'dbh'}->prepare('SELECT * FROM channel');
+        my $sh = $self->{'dbh'}->prepare('SELECT channel.*,
+                                                 dtv_multiplex.bandwidth         AS dtv_bandwidth,
+                                                 dtv_multiplex.constellation     AS dtv_constellation,
+                                                 dtv_multiplex.fec               AS dtv_fec,
+                                                 dtv_multiplex.frequency         AS dtv_frequency,
+                                                 dtv_multiplex.guard_interval    AS dtv_guard_interval,
+                                                 dtv_multiplex.hierarchy         AS dtv_hierarchy,
+                                                 dtv_multiplex.hp_code_rate      AS dtv_hp_code_rate,
+                                                 dtv_multiplex.inversion         AS dtv_inversion,
+                                                 dtv_multiplex.lp_code_rate      AS dtv_lp_code_rate,
+                                                 dtv_multiplex.modulation        AS dtv_modulation,
+                                                 dtv_multiplex.mplexid           AS dtv_mplexid,
+                                                 dtv_multiplex.networkid         AS dtv_networkid,
+                                                 dtv_multiplex.polarity          AS dtv_polarity,
+                                                 dtv_multiplex.serviceversion    AS dtv_serviceversion,
+                                                 dtv_multiplex.sistandard        AS dtv_sistandard,
+                                                 dtv_multiplex.sourceid          AS dtv_sourceid,
+                                                 dtv_multiplex.symbolrate        AS dtv_symbolrate,
+                                                 dtv_multiplex.transmission_mode AS dtv_transmission_mode,
+                                                 dtv_multiplex.transportid       AS dtv_transportid,
+                                                 dtv_multiplex.updatetimestamp   AS dtv_updatetimestamp,
+                                                 dtv_multiplex.visible           AS dtv_visible
+                                            FROM channel
+                                                 LEFT JOIN dtv_multiplex
+                                                        ON channel.mplexid = dtv_multiplex.mplexid
+                                         ');
         $sh->execute();
         while (my $row = $sh->fetchrow_hashref) {
             $self->{'channels'}{$row->{'chanid'}} = new MythTV::Channel($row);
