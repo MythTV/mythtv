@@ -498,13 +498,14 @@ template_alloc(const unsigned int *scores, int width, int height,
         unsigned int maxscore = sortedscores[nn - 1];
         for (ii = 0; ii < nn; ii++)
             scored.data[0][ii] = scores[ii] * UCHAR_MAX / maxscore;
-        int error = writeJPG(debugdir + "/tf-scores", &scored, height);
+        int error = writeJPG(debugdir + "/TemplateFinder-scores", &scored,
+                height);
         avpicture_free(&scored);
         if (error)
             goto free_thresh;
 
         /* Thresholded scores. */
-        if (writeJPG(debugdir + "/tf-edgecounts", &thresh, height))
+        if (writeJPG(debugdir + "/TemplateFinder-edgecounts", &thresh, height))
             goto free_thresh;
     }
 
@@ -576,7 +577,7 @@ analyzeFrameDebug(long long frameno, const AVPicture *pgm, int pgmheight,
     if (debug_frames)
     {
         QString base;
-        base.sprintf("%s/tf-%05lld", debugdir.ascii(), frameno);
+        base.sprintf("%s/TemplateFinder-%05lld", debugdir.ascii(), frameno);
 
         /* PGM greyscale image of frame. */
         if (writeJPG(base, pgm, pgmheight))
@@ -691,7 +692,7 @@ TemplateFinder::TemplateFinder(PGMConverter *pgmc, BorderDetector *bd,
     , debugLevel(0)
     , debugdir(debugdir)
     , debugdata(debugdir + "/TemplateFinder.txt")
-    , debugtmpl(debugdir + "/template.pgm")
+    , debugtmpl(debugdir + "/TemplateFinder.pgm")
     , debug_template(false)
     , debug_edgecounts(false)
     , debug_frames(false)

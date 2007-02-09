@@ -110,7 +110,7 @@ sub recordedmarkup($)
 		}
 		$sth->finish() or die "Finish \"$sql\": $sth->errstr\n";
 		my @framenos = sort { $a <=> $b } keys %type;
-		if ($framenos[0] != 0) {
+		if (@framenos && $framenos[0] != 0) {
 			$type{0} = 1 - $type{$framenos[0]};
 		}
 		\%type;
@@ -176,16 +176,18 @@ EOM
 
 sub templatefinder(;)
 {
-	if (-f "template.pgm") {
-		my $pgmmtime = (stat("template.pgm"))[9];
-		my $jpgmtime = (stat("template.jpg"))[9];
-		if (!-f "template.jpg" || $pgmmtime > $jpgmtime) {
-			convert("template.pgm", "template.jpg");
+	if (-f "TemplateFinder.pgm") {
+		my $pgmmtime = (stat("TemplateFinder.pgm"))[9];
+		my $jpgmtime = (stat("TemplateFinder.jpg"))[9];
+		if (!-f "TemplateFinder.jpg" || $pgmmtime > $jpgmtime) {
+			convert("TemplateFinder.pgm", "TemplateFinder.jpg");
+			print "\t", timestamp(time), ": TemplateFinder.pgm\n";
 		}
 	}
 
 	my @output;
-	foreach my $file qw(tf-scores.jpg tf-edgecounts.jpg template.jpg) {
+	foreach my $file qw(TemplateFinder-scores.jpg
+			TemplateFinder-edgecounts.jpg TemplateFinder.jpg) {
 		if (-s $file) {
 			if (!@output) {
 				push @output, <<EOM;
@@ -194,6 +196,7 @@ sub templatefinder(;)
 
 EOM
 			}
+			print "\t", timestamp(time), ": $file\n";
 			push @output, <<EOM;
 <img src="$file"
 	title="$file" />
@@ -203,7 +206,7 @@ EOM
 
 =cut
 	opendir(DIR, ".") or die "opendir $debugdir: $!\n";
-	my @frames = sort grep(/^tf-\d+\.jpg$/, readdir(DIR));
+	my @frames = sort grep(/^TemplateFinder-\d+\.jpg$/, readdir(DIR));
 	closedir(DIR) or die "closedir $debugdir: $!\n";
 =cut
 
