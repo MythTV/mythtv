@@ -137,9 +137,11 @@ static int createCodeToCanonicalCodeMap(QMap<int, int>& canonical)
     canonical[iso639_str3_to_key("sqi")] = iso639_str3_to_key("alb");
     canonical[iso639_str3_to_key("hye")] = iso639_str3_to_key("arm");
     canonical[iso639_str3_to_key("eus")] = iso639_str3_to_key("baq");
+    canonical[iso639_str3_to_key("mya")] = iso639_str3_to_key("bur");
     canonical[iso639_str3_to_key("zho")] = iso639_str3_to_key("chi");
     canonical[iso639_str3_to_key("ces")] = iso639_str3_to_key("cze");
     canonical[iso639_str3_to_key("nld")] = iso639_str3_to_key("dut");
+    canonical[iso639_str3_to_key("fra")] = iso639_str3_to_key("fre");
     canonical[iso639_str3_to_key("kat")] = iso639_str3_to_key("geo");
     canonical[iso639_str3_to_key("deu")] = iso639_str3_to_key("ger");
     canonical[iso639_str3_to_key("ell")] = iso639_str3_to_key("gre");
@@ -148,6 +150,7 @@ static int createCodeToCanonicalCodeMap(QMap<int, int>& canonical)
     canonical[iso639_str3_to_key("mri")] = iso639_str3_to_key("mao");
     canonical[iso639_str3_to_key("msa")] = iso639_str3_to_key("may");
     canonical[iso639_str3_to_key("fas")] = iso639_str3_to_key("per");
+    canonical[iso639_str3_to_key("ron")] = iso639_str3_to_key("rum");
     canonical[iso639_str3_to_key("srp")] = iso639_str3_to_key("scc");
     canonical[iso639_str3_to_key("hrv")] = iso639_str3_to_key("scr");
     canonical[iso639_str3_to_key("slk")] = iso639_str3_to_key("slo");
