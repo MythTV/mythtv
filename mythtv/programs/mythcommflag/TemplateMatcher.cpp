@@ -416,12 +416,15 @@ range_area(const unsigned short *freq, unsigned short start, unsigned short end)
     nsamples = 0;
     for (matchcnt = start; matchcnt < end; matchcnt++)
     {
-        sum += freq[matchcnt];
-        nsamples++;
+        if (freq[matchcnt])
+        {
+            sum += freq[matchcnt];
+            nsamples++;
+        }
     }
     if (!nsamples)
         return 0;
-    return sum * width / nsamples;  /* sum / nsamples * width */
+    return width * sum / nsamples;
 }
 
 unsigned short
@@ -447,8 +450,8 @@ first_minimum(const unsigned short *matches, long long nframes)
      * of the point to be greater than some (larger) area to the right
      * of the point.
      */
-    static const float  LEFTWIDTH  = 0.04;
-    static const float  RIGHTWIDTH = 0.08;
+    static const float  LEFTWIDTH  = 0.08;
+    static const float  RIGHTWIDTH = 0.16;
     static const float  MATCHSTART = 0.13;
     static const float  MATCHEND = 0.95;
 
@@ -502,7 +505,7 @@ first_minimum(const unsigned short *matches, long long nframes)
 
     delete []freq;
     delete []sorted;
-    return found_leftmode ? matchcnt : minmatch;
+    return found_leftmode ? matchcnt : matchstart;
 }
 
 };  /* namespace */
