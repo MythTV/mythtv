@@ -223,9 +223,8 @@ QString debugDirectory(int chanid, const QDateTime& recstartts)
     if (pburl.left(1) != "/")
         return "";
 
-    QFileInfo baseinfo(query.value(0).toString());
-    QString debugdir = pburl.section('/',0,-2) + "/" + baseinfo.baseName(TRUE) +
-        "-debug";
+    QString basename(query.value(0).toString());
+    QString debugdir = pburl.section('/',0,-2) + "/" + basename + "-debug";
 
     return debugdir;
 }
