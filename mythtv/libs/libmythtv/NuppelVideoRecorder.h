@@ -17,7 +17,9 @@
 #include "filter.h"
 #include "minilzo.h"
 #undef HAVE_AV_CONFIG_H
+extern "C" {
 #include "../libavcodec/avcodec.h"
+}
 
 // C++ std headers
 #include <vector>

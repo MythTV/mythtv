@@ -22,7 +22,9 @@ using namespace std;
 #include <qregexp.h>
 
 // avlib headers
+extern "C" {
 #include "../libavcodec/avcodec.h"
+}
 
 // MythTV headers
 #include "mpegrecorder.h"

@@ -14,7 +14,9 @@
 #include <X11/extensions/Xvlib.h>
 
 #undef HAVE_AV_CONFIG_H
+extern "C" {
 #include "../libavcodec/avcodec.h"
+}
 
 class NuppelVideoPlayer;
 class ChromaKeyOSD;

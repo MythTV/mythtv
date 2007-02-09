@@ -54,8 +54,6 @@ extern "C" {
                                       int, int, XShmSegmentInfo*);
 }
 
-#include "../libavcodec/avcodec.h"
-
 #ifndef HAVE_ROUND
 #define round(x) ((int) ((x) + 0.5))
 #endif

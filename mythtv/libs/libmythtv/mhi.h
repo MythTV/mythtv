@@ -27,7 +27,9 @@
 #include "mythdbcon.h"
 #include "NuppelVideoPlayer.h"
 
+extern "C" {
 #include "../libavcodec/avcodec.h" // to decode single MPEG I-frames
+}
 
 class OSDSet;
 class DSMCCPacket;

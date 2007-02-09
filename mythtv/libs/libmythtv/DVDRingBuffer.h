@@ -9,7 +9,9 @@
 #include <qobject.h>
 #include <qmutex.h>
 #include "util.h"
+extern "C" {
 #include "../libavcodec/avcodec.h"
+}
 
 #define DVDNAV_COMPILE
 #include "../libmythdvdnav/dvdnav.h"
