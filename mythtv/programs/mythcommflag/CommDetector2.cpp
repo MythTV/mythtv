@@ -578,12 +578,6 @@ bool CommDetector2::go(void)
                     &deadAnalyzers, nvp, nframes))
             return false;
 
-        /*
-         * Each pass starts at beginning. VideoFrame.frameNumber appears to be
-         * a cumulative counter of total frames "played" rather than an actual
-         * index into the file, so maintain the frame index in
-         * currentFrameNumber.
-         */
         nvp->DiscardVideoFrame(nvp->GetRawVideoFrame(0));
         long long nextFrame = -1;
         currentFrameNumber = 0;
@@ -603,9 +597,22 @@ bool CommDetector2::go(void)
 
             (void)gettimeofday(&start, NULL);
             VideoFrame *currentFrame = nvp->GetRawVideoFrame(nextFrame);
+            long long lastFrameNumber = currentFrameNumber;
+            currentFrameNumber = currentFrame->frameNumber;
             (void)gettimeofday(&end, NULL);
             timersub(&end, &start, &elapsedtv);
             timeradd(&getframetime, &elapsedtv, &getframetime);
+
+            if (nextFrame != -1 && nextFrame == lastFrameNumber + 1 &&
+                    currentFrameNumber != nextFrame)
+            {
+                /*
+                 * Don't log "Jumped" when we know we're skipping frames (e.g.,
+                 * logo detection).
+                 */
+                VERBOSE(VB_COMMFLAG, QString("Jumped from frame %1 to frame %2")
+                        .arg(lastFrameNumber).arg(currentFrameNumber));
+            }
 
             if (stopForBreath(isRecording, currentFrameNumber))
             {
@@ -692,8 +699,6 @@ bool CommDetector2::go(void)
             }
 
             nvp->DiscardVideoFrame(currentFrame);
-
-            currentFrameNumber = nextFrame;
         }
 
         QPtrListIterator<FrameAnalyzer> iifa(finishedAnalyzers);
