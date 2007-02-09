@@ -60,7 +60,6 @@ private:
     /* Per-frame info. */
     unsigned short          *matches;               /* matching pixels */
     unsigned char           *match;                 /* boolean result: 1/0 */
-    unsigned short          *tmatches;              /* temporary buffer */
 
     float                   fps;
     AVPicture               cropped;                /* pre-allocated buffer */

@@ -518,7 +518,6 @@ TemplateMatcher::TemplateMatcher(PGMConverter *pgmc, EdgeDetector *ed,
     , templateFinder(tf)
     , matches(NULL)
     , match(NULL)
-    , tmatches(NULL)
     , debugLevel(0)
     , debugdir(debugdir)
 #ifdef PGM_CONVERT_GREYSCALE
@@ -554,8 +553,6 @@ TemplateMatcher::TemplateMatcher(PGMConverter *pgmc, EdgeDetector *ed,
 
 TemplateMatcher::~TemplateMatcher(void)
 {
-    if (tmatches)
-        delete []tmatches;
     if (matches)
         delete []matches;
     if (match)
@@ -590,7 +587,6 @@ TemplateMatcher::nuppelVideoPlayerInited(NuppelVideoPlayer *_nvp,
         goto free_cropped;
 
     matches = new unsigned short[nframes];
-    tmatches = new unsigned short[nframes];
     memset(matches, 0, nframes * sizeof(*matches));
 
     match = new unsigned char[nframes];
