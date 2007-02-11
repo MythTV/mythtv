@@ -1326,7 +1326,6 @@ bool MythThemedMenuPrivate::parseMenu(const QString &menuname)
     {
         titleText = "MYTH-";
         titleText += menumode;
-        updateLCD();
     }
 
     selection = "";
@@ -1828,9 +1827,6 @@ bool MythThemedMenuPrivate::keyHandler(QStringList &actions,
         }
         else if (action == "SELECT")
         {
-            if (LCD *lcddev = LCD::Get())
-                lcddev->switchToTime();
-
             lastbutton = activebutton;
             activebutton = NULL;
 
@@ -1897,7 +1893,9 @@ bool MythThemedMenuPrivate::keyHandler(QStringList &actions,
         activebutton->SetActive(true);
     }
 
-    updateLCD();
+    // only update the LCD if we are still on the top of the stack
+    if (parent->GetScreenStack()->GetTopScreen() == (MythScreenType*) parent)
+        updateLCD();
 
     return true;
 } 
@@ -2293,3 +2291,8 @@ void MythThemedMenu::gestureEvent(MythUIType *origtype, MythGestureEvent *ge)
         MythScreenType::gestureEvent(origtype, ge);
 }
 
+void MythThemedMenu::aboutToShow()
+{
+    MythScreenType::aboutToShow();
+    d->updateLCD();
+}

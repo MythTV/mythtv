@@ -25,6 +25,7 @@ class MythThemedMenu : public MythScreenType
 
     void ReloadTheme(void);
     void ReloadExitKey(void);
+    virtual void aboutToShow(void);
 
   protected:
     virtual bool keyPressEvent(QKeyEvent *e);
