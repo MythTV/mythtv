@@ -721,6 +721,10 @@
         <network>FOXSPORTS</network>
     </callsigntonetwork>
     <callsigntonetwork>
+        <callsign>FSNE</callsign>
+        <network>FOXSPORTS</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
         <callsign>FSNE1</callsign>
         <network>FOXSPORTS</network>
     </callsigntonetwork>
@@ -981,6 +985,10 @@
         <network>GOLF</network>
     </callsigntonetwork>
     <callsigntonetwork>
+        <callsign>GAC</callsign>
+        <network>GAC</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
         <callsign>GALA</callsign>
         <network>GALAVISION</network>
     </callsigntonetwork>
@@ -1122,6 +1130,10 @@
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>INHD2</callsign>
+        <network>INHD</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>INHDCOM</callsign>
         <network>INHD</network>
     </callsigntonetwork>
     <callsigntonetwork>
@@ -3090,7 +3102,7 @@
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>KWPX</callsign>
-        <network>ITV</network>
+        <network>ITV-KWPX</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>KWQC</callsign>
@@ -3261,6 +3273,14 @@
         <network>LIFETIMEMOVIE</network>
     </callsigntonetwork>
     <callsigntonetwork>
+        <callsign>LOGO</callsign>
+        <network>Logo</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>LOGOP</callsign>
+        <network>Logo</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
         <callsign>LOVE</callsign>
         <network>Encore_Love</network>
     </callsigntonetwork>
@@ -3381,8 +3401,12 @@
         <network>National_Geographic</network>
     </callsigntonetwork>
     <callsigntonetwork>
-        <callsign>NET1</callsign>
-        <network>PBS-KUON</network>
+        <callsign>NECN</callsign>
+        <network>NEWSENG</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>NESN</callsign>
+        <network>NESN</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>NEWSENG</callsign>
@@ -3595,6 +3619,10 @@
     <callsigntonetwork>
         <callsign>SITV</callsign>
         <network>SITV</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>SOAP</callsign>
+        <network>SOAP</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>SONY</callsign>
@@ -4474,7 +4502,7 @@
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>WCPX</callsign>
-        <network>ITV</network>
+        <network>ITV-WCPX</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>WCSH</callsign>
@@ -4887,6 +4915,10 @@
     <callsigntonetwork>
         <callsign>WGMB</callsign>
         <network>FOX</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>WGME</callsign>
+        <network>CBS</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>WGN</callsign>
@@ -6361,6 +6393,10 @@
         <network>UPN</network>
     </callsigntonetwork>
     <callsigntonetwork>
+        <callsign>WUTF</callsign>
+        <network>TELEFUTURA</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
         <callsign>WUTR</callsign>
         <network>ABC</network>
     </callsigntonetwork>
@@ -6625,6 +6661,10 @@
         <network>FOX</network>
     </callsigntonetwork>
     <callsigntonetwork>
+        <callsign>WZMY</callsign>
+        <network>IND-WZMY</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
         <callsign>WZPX</callsign>
         <network>WB</network>
     </callsigntonetwork>
@@ -6818,7 +6858,7 @@
     </networktourl>
     <networktourl>
         <network>CBC-CBLFT</network>
-        <url>[ls-logo]/tv/cc/cblt_toronto.gif </url>
+        <url>[ls-logo]/tv/cc/cblt_toronto.jpg</url>
     </networktourl>
     <networktourl>
         <network>CBC-CBXFT</network>
@@ -7193,6 +7233,10 @@
         <url>[ls-logo]/tv/gg/g4_video_game_tv.jpg</url>
     </networktourl>
     <networktourl>
+        <network>GAC</network>
+        <url>[ls-logo]/tv/gg/great_american_country.jpg</url>
+    </networktourl>
+    <networktourl>
         <network>GALAVISION</network>
         <url>[ls-logo]/tv/gg/galavision_us.jpg</url>
     </networktourl>
@@ -7238,7 +7282,7 @@
     </networktourl>
     <networktourl>
         <network>HBOCOMEDY</network>
-        <url>[ls-logo]/tv/hh/hbo_comedy.jpg</url>
+        <url>[ls-logo]/tv/hh/hbo_comedy_us.jpg</url>
     </networktourl>
     <networktourl>
         <network>HBOFAMILY</network>
@@ -7270,7 +7314,7 @@
     </networktourl>
     <networktourl>
         <network>HISTORY</network>
-        <url>[ls-logo]/tv/hh/historychannel.jpg</url>
+        <url>[ls-logo]/tv/hh/history_channel.jpg</url>
     </networktourl>
     <networktourl>
         <network>HISTORY_INT</network>
@@ -7325,6 +7369,10 @@
         <url>[ls-logo]/tv/ww/wybe_philadelphia.jpg</url>
     </networktourl>
     <networktourl>
+        <network>IND-WZMY</network>
+        <url>[ls-logo]/tv/ww/wzmy_my50_derry.jpg</url>
+    </networktourl>
+    <networktourl>
         <network>IND-YTVP</network>
         <url>[ls-logo]/tv/yy/youth_tv.jpg</url>
     </networktourl>
@@ -7338,7 +7386,15 @@
     </networktourl>
     <networktourl>
         <network>ITV</network>
+        <url>[ls-logo]/corp/gk/ion_media_networks.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>ITV-KWPX</network>
         <url>[ls-logo]/tv/kk/kwpx_i33_seattle.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>ITV-WCPX</network>
+        <url>[ls-logo]/tv/ww/wcpx_i38_chicago.jpg</url>
     </networktourl>
     <networktourl>
         <network>JCTV</network>
@@ -7403,6 +7459,10 @@
     <networktourl>
         <network>Lifestyle</network>
         <url>[ls-logo]/tv/ll/lifestyle.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>Logo</network>
+        <url>[ls-logo]/tv/ll/logo_us.jpg</url>
     </networktourl>
     <networktourl>
         <network>MNTV</network>
@@ -7529,8 +7589,12 @@
         <url>[ls-logo]/tv/ww/wmaq_nbc5_chicago.jpg</url>
     </networktourl>
     <networktourl>
+        <network>NESN</network>
+        <url>[ls-logo]/tv/nn/nesn_us.jpg</url>
+    </networktourl>
+    <networktourl>
         <network>NEWSENG</network>
-        <url>[zap2it]/necn.gif</url>
+        <url>[ls-logo]/tv/nn/new_england_cable_news.jpg</url>
     </networktourl>
     <networktourl>
         <network>NFL</network>
@@ -7835,10 +7899,6 @@
     <networktourl>
         <network>PBS-KUHT</network>
         <url>[pbs]/KUHT.gif</url>
-    </networktourl>
-    <networktourl>
-        <network>PBS-KUON</network>
-        <url>[pbs]/KUON.gif</url>
     </networktourl>
     <networktourl>
         <network>PBS-KUSD</network>
@@ -8409,6 +8469,10 @@
         <url>[ls-logo]/tv/ss/smile_of_a_child.jpg</url>
     </networktourl>
     <networktourl>
+        <network>SOAP</network>
+        <url>[ls-logo]/tv/ss/soapnet_us.jpg</url>
+    </networktourl>
+    <networktourl>
         <network>SONY</network>
         <url>[ls-logo]/tv/ss/sonytv.jpg</url>
     </networktourl>
@@ -8707,9 +8771,5 @@
     <baseurl>
         <stub>pbs</stub>
         <url>http://www.pbs.org/images/stations/standard</url>
-    </baseurl>
-    <baseurl>
-        <stub>zap2it</stub>
-        <url>http://images.zap2it.com/station_logo</url>
     </baseurl>
 </iconmappings>

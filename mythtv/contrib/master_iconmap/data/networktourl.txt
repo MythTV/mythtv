@@ -129,7 +129,7 @@ Fox8                    [ls-logo]/tv/ff/fox8_aus.jpg
 FoxClassicsau           [ls-logo]/tv/ff/foxclassics_au.jpg
 FoxSportsNetwork        [ls-logo]/tv/ff/fsn.jpg
 G4                      [ls-logo]/tv/gg/g4_video_game_tv.jpg
-GAC			[ls-logo]/tv/gg/great_american_country.jpg
+GAC                     [ls-logo]/tv/gg/great_american_country.jpg
 GALAVISION              [ls-logo]/tv/gg/galavision_us.jpg
 GAMESHOWNETWORK         [ls-logo]/tv/gg/gameshownetwork.jpg
 GLOBAL-CHCA             [ls-logo]/tv/cc/chca_red_deer.jpg
@@ -141,7 +141,7 @@ GNT-BR                  [ls-logo]/tv/gg/gnt_brasil.jpg
 GOLF                    [ls-logo]/tv/gg/golf_channel.jpg
 HALMRK                  [ls-logo]/tv/hh/hallmark_channel.jpg
 HBO                     [ls-logo]/tv/hh/hbo.jpg
-HBOCOMEDY               [ls-logo]/tv/hh/hbo_comedy.jpg
+HBOCOMEDY               [ls-logo]/tv/hh/hbo_comedy_us.jpg
 HBOFAMILY               [ls-logo]/tv/hh/hbo_family.jpg
 HBOPLUS                 [ls-logo]/tv/hh/hbo_plus.jpg
 HBOSIGNATURE            [ls-logo]/tv/hh/hbo_signature.jpg
@@ -149,7 +149,7 @@ HBOZONE                 [ls-logo]/tv/hh/hbo_zone.jpg
 HBO_HD                  [ls-logo]/tv/hh/hbo_hdtv.jpg
 HGTV                    [ls-logo]/tv/hh/hgtv.jpg
 HGTV-CA                 [ls-logo]/tv/hh/hgtvcanada.jpg
-HISTORY                 [ls-logo]/tv/hh/historychannel.jpg
+HISTORY                 [ls-logo]/tv/hh/history_channel.jpg
 HISTORY_INT             [ls-logo]/tv/hh/history_int.jpg
 HOMESHOPPINGNETWORK     [ls-logo]/tv/hh/hsn.jpg
 IFC                     [ls-logo]/tv/ii/ifc_us.jpg
@@ -296,7 +296,6 @@ PBS-KUAC                [pbs]/KUAC.gif
 PBS-KUAT                [pbs]/KUAT.gif
 PBS-KUED                [pbs]/KUED.gif
 PBS-KUHT                [pbs]/KUHT.gif
-PBS-KUON                [pbs]/KUON.gif
 PBS-KUSD                [pbs]/KUSD.gif
 PBS-KUSM                [pbs]/KUSM.gif
 PBS-KVCR                [pbs]/KVCR.gif

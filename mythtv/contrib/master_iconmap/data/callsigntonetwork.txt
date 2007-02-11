@@ -849,7 +849,6 @@ MovieOne+2  MovieOne
 NASA        NASA
 NATGE       National_Geographic
 NESN        NESN
-NET1        PBS-KUON
 NEWSENG     NEWSENG
 NECN        NEWSENG
 NEWSNET     CTV-NEWSNET
