@@ -23,7 +23,7 @@
 
     <item> 
         <title>Reuters Entertainment</title> 
-        <url>http://www.microsite.reuters.com/rss/Entertainment</url> 
+        <url>http://feeds.reuters.com/reuters/Entertainment/</url> 
         <ico>http://www.reuters.com/favicon.ico</ico> 
     </item>        
 
@@ -49,7 +49,7 @@
 
     <item> 
         <title>Reuters Business</title> 
-        <url>http://www.microsite.reuters.com/rss/businessNews</url> 
+        <url>http://feeds.reuters.com/reuters/businessNews/</url> 
         <ico>http://www.reuters.com/favicon.ico</ico> 
     </item> 
 
@@ -130,7 +130,7 @@
 
     <item> 
         <title>FreshPorts - the place for ports</title> 
-        <url>http://www.freshports.org/news.php</url> 
+        <url>http://www.freshports.org/backend/rss2.0.php</url> 
         <ico>http://www.freshports.org/favicon.ico</ico> 
     </item> 
 
@@ -220,7 +220,7 @@
 
     <item> 
         <title>Reuters Technology</title> 
-        <url>http://www.microsite.reuters.com/rss/technologyNews</url> 
+        <url>http://feeds.reuters.com/reuters/technologyNews/</url> 
         <ico>http://www.reuters.com/favicon.ico</ico> 
     </item> 
 
@@ -427,12 +427,12 @@
     
     <item>
         <title>CNN - Health</title>
-        <url>http://feeds.feedburner.com/cnn/health</url>
+        <url>	http://rss.cnn.com/rss/cnn_health.rss</url>
     </item>
 
     <item>
         <title>Reuters Health</title>
-        <url>http://www.microsite.reuters.com/rss/healthNews</url>
+        <url>	http://feeds.reuters.com/reuters/healthNews/</url>
         <ico>http://www.reuters.com/favicon.ico</ico>
     </item>
 
@@ -477,7 +477,7 @@
      
     <item>
         <title>Reuters World News</title>
-        <url>http://www.microsite.reuters.com/rss/worldNews</url>
+        <url>http://feeds.reuters.com/reuters/worldNews/</url>
         <ico>http://www.reuters.com/favicon.ico</ico>
     </item>
 
@@ -493,35 +493,6 @@
         <ico>http://www.topix.net/favicon.ico</ico>
     </item>
 
-</category>
-
-<category name="KnoppMyth">
-
-    <item>
-        <title>KnoppMyth Wiki</title>
-        <url>http://www.knoppmythwiki.org/index.php?page=rss/KnoppMythWiki</url>
-    </item>
-
-    <item>
-        <title>mysettopbox.tv</title>
-        <url>http://www.mysettopbox.tv/index.xml</url>
-    </item>
-
-    <item>
-        <title>MythTV - Commits</title>
-        <url>http://www.gossamer-threads.com/lists/mythtv/commits.xml</url>
-    </item>
-
-    <item>
-        <title>MythTV - Dev</title>
-        <url>http://www.gossamer-threads.com/lists/mythtv/dev.xml</url>
-    </item>
-
-    <item>
-        <title>MythTV - Users</title>
-        <url>http://www.gossamer-threads.com/lists/mythtv/users.xml</url>
-    </item>
-  
 </category>
 
 <category name="Magazines">
@@ -547,17 +518,17 @@
 
     <item>
         <title>CNN - Education</title>
-        <url>http://feeds.feedburner.com/cnn/education</url>
+        <url>http://rss.cnn.com/rss/cnn_education.rss</url>
     </item>
 
     <item>
         <title>CNN - Law</title>
-        <url>http://feeds.feedburner.com/cnn/law</url>
+        <url>http://rss.cnn.com/rss/cnn_law.rss</url>
     </item>
     
     <item>
         <title>CNN - Most Popular</title>
-        <url>http://feeds.feedburner.com/cnn/most_popular</url>
+        <url>http://rss.cnn.com/rss/cnn_mostpopular.rss</url>
     </item>
 
     <item>
@@ -567,12 +538,12 @@
     
     <item>
         <title>CNN - Travel</title>
-        <url>http://feeds.feedburner.com/cnn/travel</url>
+        <url>http://rss.cnn.com/rss/cnn_travel.rss</url>
     </item>
     
     <item>
         <title>The Register</title>
-        <url>http://www.theregister.co.uk/tonys/slashdot.rdf</url>
+        <url>http://www.theregister.co.uk/headlines.rss</url>
         <ico>http://www.theregister.co.uk/favicon.ico</ico>
     </item>
 
@@ -588,7 +559,7 @@
 
     <item>
         <title>CNN - Entertainment</title>
-        <url>http://feeds.feedburner.com/cnn/entertainment</url>
+        <url>http://rss.cnn.com/rss/cnn_showbiz.rss</url>
     </item>
 
     <item>
@@ -671,6 +642,46 @@
         <url>http://syndication.digitalspy.co.uk/xmlcache/dsustv.xml</url>
     </item>
 
+</category>
+
+<category name="MythTV">
+
+    <item>
+        <title>KnoppMyth Wiki</title>
+        <url>http://www.knoppmythwiki.org/index.php?page=rss/KnoppMythWiki</url>
+    </item>
+
+    <item>
+        <title>KnoppMyth</title>
+        <url>http://www.mysettopbox.tv/index.xml</url>
+    </item>
+
+    <item>
+        <title>MythDora</title>
+        <url>http://g-ding.tv/?q=node/feed</url>
+    </item>
+
+    <item>
+        <title>MythPVR</title>
+        <url>http://www.mythpvr.com/mythtv/rss.xml</url>
+    </item>
+
+
+    <item>
+        <title>MythTV - Commits</title>
+        <url>http://www.gossamer-threads.com/lists/mythtv/commits.xml</url>
+    </item>
+
+    <item>
+        <title>MythTV - Dev</title>
+        <url>http://www.gossamer-threads.com/lists/mythtv/dev.xml</url>
+    </item>
+
+    <item>
+        <title>MythTV - Users</title>
+        <url>http://www.gossamer-threads.com/lists/mythtv/users.xml</url>
+    </item>
+  
 </category>
 
 <category name="News Video">
@@ -818,7 +829,7 @@
 
     <item>
         <title>CNN - Offbeat</title>
-        <url>http://feeds.feedburner.com/cnn/offbeat</url>
+        <url>http://rss.cnn.com/rss/cnn_offbeat.rss</url>
     </item>
 
     <item>
@@ -829,7 +840,7 @@
 
     <item>
         <title>Reuters Oddly Enough</title>
-        <url>http://www.microsite.reuters.com/rss/oddlyEnoughNews</url>
+        <url>http://feeds.reuters.com/reuters/oddlyEnoughNews/</url>
         <ico>http://www.reuters.com/favicon.ico</ico>
     </item>
 
@@ -881,7 +892,7 @@
 
     <item>
         <title>Reuters Politics</title>
-        <url>http://www.microsite.reuters.com/rss/ElectionCoverage</url>
+        <url>http://feeds.reuters.com/reuters/politicsNews/</url>
         <ico>http://www.reuters.com/favicon.ico</ico>
     </item>
     
@@ -891,7 +902,7 @@
 
     <item>
         <title>Reuters Life and Leisure</title>
-        <url>http://www.microsite.reuters.com/rss/lifeAndLeisureNews</url>
+        <url>http://feeds.reuters.com/reuters/lifeAndLeisureNews/</url>
         <ico>http://www.reuters.com/favicon.ico</ico>
     </item>
 
@@ -1168,7 +1179,7 @@
 
     <item>
         <title>Reuters US News</title>
-        <url>http://www.microsite.reuters.com/rss/domesticNews</url>
+        <url>http://feeds.reuters.com/reuters/domesticNews/</url>
         <ico>http://www.reuters.com/favicon.ico</ico>
     </item>
 
@@ -1500,12 +1511,12 @@
     
     <item>
         <title>CNN - Science &amp; Space</title>
-        <url>http://feeds.feedburner.com/cnn/science_space</url>
+        <url>http://rss.cnn.com/rss/cnn_space.rss</url>
     </item>
 
     <item>
         <title>CNN - Technology</title>
-        <url>http://feeds.feedburner.com/cnn/technology</url>
+        <url>http://rss.cnn.com/rss/cnn_tech.rss</url>
     </item>
 
     <item>
@@ -1515,7 +1526,7 @@
 
     <item>
         <title>Reuters Science</title>
-        <url>http://www.microsite.reuters.com/rss/scienceNews</url>
+        <url>http://feeds.reuters.com/reuters/scienceNews/</url>
         <ico>http://www.reuters.com/favicon.ico</ico>
     </item>
     
@@ -1554,7 +1565,7 @@
 
     <item>
         <title>Reuters Sports</title>
-        <url>http://www.microsite.reuters.com/rss/sportsNews</url>
+        <url>http://feeds.reuters.com/reuters/sportsNews/</url>
         <ico>http://www.reuters.com/favicon.ico</ico>
     </item>
     
