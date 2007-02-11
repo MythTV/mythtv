@@ -81,6 +81,8 @@ void SearchDialog::runQuery(QString searchText)
     bool isNumber = false;
     searchText.toULongLong(&isNumber);
 
+    searchText.replace("'", "''");
+
     if (!isNumber)
     {
         QString testString = searchText;
@@ -174,6 +176,7 @@ void SearchDialog::runQuery(QString searchText)
                 for (uint i = 0; i < list.count(); i++) 
                 {
                     QString stxt = list[i];
+                    stxt.replace("''", "'");
                     int index = -1;
                     while( (index = text.findRev(stxt, index, false)) != -1 ) 
                     {
