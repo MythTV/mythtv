@@ -379,5 +379,9 @@ void NewsSite::ReplaceHtmlChar(QString &s)
     s.replace("&#233;",QChar(233));
     s.replace("&mdash;", QChar(8212));
     s.replace("&nbsp;", " ");
+    s.replace("&#160;", QChar(160));
+    s.replace("&#225;", QChar(225));
+    s.replace("&#8216;", QChar(8216));
+    s.replace("&#8217;", QChar(8217));
 }
 
