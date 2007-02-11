@@ -1661,7 +1661,7 @@ void Scheduler::ShutdownServer(int prerollseconds)
     if (recIter != reclist.end())
     {
         ProgramInfo *nextRecording = (*recIter);
-        QDateTime restarttime = nextRecording->startts.addSecs((-1) * 
+        QDateTime restarttime = nextRecording->recstartts.addSecs((-1) * 
                                                                prerollseconds);
 
         int add = gContext->GetNumSetting("StartupSecsBeforeRecording", 240);
