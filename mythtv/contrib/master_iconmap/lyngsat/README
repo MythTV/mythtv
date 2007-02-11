@@ -1,9 +1,0 @@
-This script downloads the complete station icon list from lyngsat-logo.com and
-stores it in the sqlite3 database file named station_info.sqlite.  This
-database will eventually contain xmltvid and callsign lookups to match
-mythtv stations with the appropriate lynsat logo.
-
-The format from --output (currently also stored in lyngsat_stations.txt)
-contains each station name, followed by two indented lines containing the
-small and large logo URLs in a format ready to be inserted into
-networktourl.txt for build_map.pl
