@@ -428,7 +428,7 @@ range_area(const unsigned short *freq, unsigned short start, unsigned short end)
 }
 
 unsigned short
-first_minimum(const unsigned short *matches, long long nframes)
+pick_mintmpledges(const unsigned short *matches, long long nframes)
 {
     /*
      * Most frames either match the template very well, or don't match
@@ -450,14 +450,14 @@ first_minimum(const unsigned short *matches, long long nframes)
      * of the point to be greater than some (larger) area to the right
      * of the point.
      */
-    static const float  LEFTWIDTH  = 0.08;
-    static const float  RIGHTWIDTH = 0.16;
-    static const float  MATCHSTART = 0.13;
+    static const float  WIDTH = 0.04;
+    static const float  MATCHSTART = 0.20;
     static const float  MATCHEND = 0.95;
 
-    unsigned short      matchrange, leftwidth, rightwidth, matchstart, matchend;
+    unsigned short      matchrange, width, matchstart, matchend;
     unsigned short      *sorted, minmatch, maxmatch, *freq;
-    int                 nfreq, found_leftmode, matchcnt;
+    int                 nfreq, matchcnt, local_minimum;
+    unsigned int        maxdelta;
 
     sorted = new unsigned short[nframes];
     memcpy(sorted, matches, nframes * sizeof(*matches));
@@ -467,45 +467,53 @@ first_minimum(const unsigned short *matches, long long nframes)
     matchrange = maxmatch - minmatch;
     /* degenerate minmatch==maxmatch case is gracefully handled */
 
-    leftwidth = (unsigned short)(LEFTWIDTH * matchrange);
-    rightwidth = (unsigned short)(RIGHTWIDTH * matchrange);
+    width = (unsigned short)(WIDTH * matchrange);
     nfreq = maxmatch + 1;
     freq = new unsigned short[nfreq];
     memset(freq, 0, nfreq * sizeof(*freq));
     for (long long frameno = 0; frameno < nframes; frameno++)
         freq[matches[frameno]]++;   /* freq[<matchcnt>] = <framecnt> */
 
-    matchstart = minmatch + (unsigned short)(MATCHSTART * matchrange) +
-        leftwidth;
-    matchend = minmatch + (unsigned short)(MATCHEND * matchrange) - rightwidth;
+    matchstart = minmatch + (unsigned short)(MATCHSTART * matchrange);
+    matchend = minmatch + (unsigned short)(MATCHEND * matchrange);
 
-    found_leftmode = 0;
-    for (matchcnt = matchstart; matchcnt <  matchend; matchcnt++)
+    local_minimum = matchstart;
+    maxdelta = 0;
+    for (matchcnt = matchstart + 3 * width / 2;
+            matchcnt < matchend - 3 * width / 2;
+            matchcnt++)
     {
-        unsigned int    left, right;
+        unsigned short  p0, p1, p2, p3;
+        unsigned int    leftscore, middlescore, rightscore;
 
-        left = range_area(freq, matchcnt - leftwidth, matchcnt);
-        right = range_area(freq, matchcnt, matchcnt + rightwidth);
-        if (left < right)
+        p0 = matchcnt - 3 * width / 2;
+        p1 = p0 + width;
+        p2 = p1 + width;
+        p3 = p2 + width;
+
+        leftscore = range_area(freq, p0, p1);
+        middlescore = range_area(freq, p1, p2);
+        rightscore = range_area(freq, p2, p3);
+        if (middlescore < leftscore && middlescore < rightscore)
         {
-            if (found_leftmode)
-                break;  /* Found local minima. */
-        }
-        else
-        {
-            found_leftmode = 1;
+            unsigned int delta = (leftscore - middlescore) +
+                (rightscore - middlescore);
+            if (delta > maxdelta)
+            {
+                local_minimum = matchcnt;
+                maxdelta = delta;
+            }
         }
     }
 
-    VERBOSE(VB_COMMFLAG, QString("first_minimum considering %1-%2;"
-                " minmatch=%3 maxmatch=%4 leftwidth=%5 rightwidth=%6"
-                " found_leftmode=%7 matchcnt=%8")
+    VERBOSE(VB_COMMFLAG, QString("pick_mintmpledges considering %1-%2;"
+                " minmatch=%3 maxmatch=%4 width=%5 local_minimum=%6")
             .arg(matchstart).arg(matchend).arg(minmatch).arg(maxmatch)
-            .arg(leftwidth).arg(rightwidth).arg(found_leftmode).arg(matchcnt));
+            .arg(width).arg(local_minimum));
 
     delete []freq;
     delete []sorted;
-    return found_leftmode ? matchcnt : matchstart;
+    return local_minimum;
 }
 
 };  /* namespace */
@@ -718,7 +726,7 @@ TemplateMatcher::finished(long long nframes, bool final)
     }
 
     tmpledges = pgm_set(tmpl, tmplheight);
-    mintmpledges = first_minimum(matches, nframes);
+    mintmpledges = pick_mintmpledges(matches, nframes);
 
     VERBOSE(VB_COMMFLAG, QString("TemplateMatcher::finished %1x%2@(%3,%4),"
                 " %5 edge pixels, want %6")
