@@ -541,7 +541,7 @@ class ProgramMapTable : public PSIPTable
     QString GetLanguage(uint i) const;
 
     uint FindPIDs(uint type, vector<uint>& pids) const;
-    uint FindPIDs(uint type, vector<uint>& pids, vector<uint>& types) const;
+    uint FindPIDs(uint type, vector<uint>& pids, vector<uint>& types, bool normalize) const;
 
     /// \brief Locates stream index of pid.
     /// \return stream index if successful, -1 otherwise

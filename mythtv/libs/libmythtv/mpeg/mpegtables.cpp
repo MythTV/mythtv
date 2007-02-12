@@ -310,6 +310,8 @@ bool ProgramMapTable::IsStillPicture(void) const
  */
 uint ProgramMapTable::FindPIDs(uint type, vector<uint>& pids) const
 {
+    uint pids_start = pids.size();
+
     if ((StreamID::AnyMask & type) != StreamID::AnyMask)
     {
         for (uint i=0; i < StreamCount(); i++)
@@ -337,11 +339,14 @@ uint ProgramMapTable::FindPIDs(uint type, vector<uint>& pids) const
  *  \param type  StreamType to match
  *  \param pids  vector pids will be added to
  *  \param types vector types will be added to
+ *  \param normalize if set, types will be normalized
  *  \return number of items in pids and types lists.
  */
 uint ProgramMapTable::FindPIDs(uint type, vector<uint>& pids,
-                               vector<uint>& types) const
+                               vector<uint>& types, bool normalize) const
 {
+    uint pids_start = pids.size();
+
     if ((StreamID::AnyMask & type) != StreamID::AnyMask)
     {
         for (uint i=0; i < StreamCount(); i++)
@@ -351,6 +356,7 @@ uint ProgramMapTable::FindPIDs(uint type, vector<uint>& pids,
                 types.push_back(StreamType(i));
             }
     }
+
     else if (StreamID::AnyVideo == type)
     {
         for (uint i=0; i < StreamCount(); i++)
@@ -368,6 +374,20 @@ uint ProgramMapTable::FindPIDs(uint type, vector<uint>& pids,
                 pids.push_back(StreamPID(i));
                 types.push_back(StreamType(i));
             }
+    }
+
+    if (!normalize)
+        return pids.size();
+
+    for (uint i = pids_start; i < pids.size(); i++)
+    {
+        int index = FindPID(pids[i]);
+        if (index >= 0)
+        {
+            desc_list_t desc = MPEGDescriptor::Parse(
+                StreamInfo(i), StreamInfoLength(i));
+            types[i] = StreamID::Normalize(types[i], desc);
+        }
     }
 
     return pids.size();
