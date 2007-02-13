@@ -275,7 +275,8 @@ int main(int argc, char *argv[])
 
     ProgramInfo *pginfo = NULL;
 
-    if (filename != "")
+    if ((filename != "") &&
+        ((pginfo = ProgramInfo::GetProgramFromBasename(filename)) == NULL))
     {
         pginfo = new ProgramInfo();
         pginfo->endts = QDateTime::currentDateTime().addSecs(-180);

@@ -403,31 +403,36 @@ int main(int argc, char *argv[])
     else
     {
         QFileInfo inf(infile);
-        QString base = inf.baseName();
-        QRegExp r("(\\d*)_(\\d\\d\\d\\d)(\\d\\d)(\\d\\d)(\\d\\d)(\\d\\d)(\\d\\d)");
-        int pos = r.search(base);
-        if (pos > -1)
+        pginfo = ProgramInfo::GetProgramFromBasename(inf.fileName());
+        if (!pginfo)
         {
-            
-            chanid = r.cap(1);
-            QDateTime startts(QDate(r.cap(2).toInt(), r.cap(3).toInt(), r.cap(4).toInt()),
-                              QTime(r.cap(5).toInt(), r.cap(6).toInt(), r.cap(7).toInt()));
-            pginfo = ProgramInfo::GetProgramFromRecorded(chanid, startts);
-            
-            if (!pginfo)
+            QString base = inf.baseName();
+            QRegExp r(
+               "(\\d*)_(\\d\\d\\d\\d)(\\d\\d)(\\d\\d)(\\d\\d)(\\d\\d)(\\d\\d)");
+            int pos = r.search(base);
+            if (pos > -1)
             {
-                VERBOSE(VB_IMPORTANT, QString("Couldn't find a recording on channel %1 "
-                                              "starting at %2 in the database.")
-                                              .arg(chanid).arg(startts.toString()));
+                chanid = r.cap(1);
+                QDateTime startts(
+                   QDate(r.cap(2).toInt(), r.cap(3).toInt(), r.cap(4).toInt()),
+                   QTime(r.cap(5).toInt(), r.cap(6).toInt(), r.cap(7).toInt()));
+                pginfo = ProgramInfo::GetProgramFromRecorded(chanid, startts);
+            
+                if (!pginfo)
+                {
+                    VERBOSE(VB_IMPORTANT,
+                        QString("Couldn't find a recording on channel %1 "
+                                "starting at %2 in the database.")
+                                .arg(chanid).arg(startts.toString()));
+                }
+            }            
+            else
+            {
+                VERBOSE(VB_IMPORTANT,
+                        QString("Couldn't deduce channel and start time from "
+                                "%1 ").arg(base));
             }
-        }            
-        else
-        {
-            VERBOSE(VB_IMPORTANT, QString("Couldn't deduce channel and start time from %1 ")
-                                          .arg(base));
-        }
-        
-        
+        }       
     }
 
     if (infile.left(7) == "myth://") {

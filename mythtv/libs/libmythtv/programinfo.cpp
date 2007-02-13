@@ -796,11 +796,13 @@ QString ProgramInfo::toString(void) const
  */
 ProgramInfo *ProgramInfo::GetProgramFromBasename(const QString filename)
 {
+    QFileInfo inf(filename);
+
     MSqlQuery query(MSqlQuery::InitCon());
 
     query.prepare("SELECT chanid, starttime FROM recorded "
                   "WHERE basename = :BASENAME;");
-    query.bindValue(":BASENAME", filename);
+    query.bindValue(":BASENAME", inf.fileName());
 
     if (query.exec() && query.isActive() && query.size() > 0)
     {
