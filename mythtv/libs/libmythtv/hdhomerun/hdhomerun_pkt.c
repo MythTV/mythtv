@@ -182,7 +182,7 @@ static void hdhomerun_write_header_length(unsigned char *ptr, unsigned long leng
 	hdhomerun_write_u16(&ptr, length);
 }
 
-static void hdhomerun_write_crc(unsigned char **pptr, unsigned char *start)
+void hdhomerun_write_crc(unsigned char **pptr, unsigned char *start)
 {
 	unsigned char *ptr = *pptr;
 	unsigned long crc = hdhomerun_calc_crc(start, ptr);

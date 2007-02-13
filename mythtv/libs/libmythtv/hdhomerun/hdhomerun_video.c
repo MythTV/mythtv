@@ -129,6 +129,11 @@ int hdhomerun_video_get_state(struct hdhomerun_video_sock_t *vs)
 	return 1;
 }
 
+int hdhomerun_video_get_sock(struct hdhomerun_video_sock_t *vs)
+{
+	return vs->sock;
+}
+
 static void *hdhomerun_video_thread(void *arg)
 {
 	struct hdhomerun_video_sock_t *vs = (struct hdhomerun_video_sock_t *)arg;
@@ -181,6 +186,18 @@ static void hdhomerun_copy_and_advance_tail(struct hdhomerun_video_sock_t *vs, u
 
 	/* Atomic update. */
 	vs->tail = tail;
+}
+
+unsigned long hdhomerun_video_available_length(struct hdhomerun_video_sock_t *vs)
+{
+	unsigned long head = vs->head;
+	unsigned long tail = vs->tail;
+
+	if (head >= tail) {
+		return head - tail - vs->advance;
+	} else {
+		return head + vs->buffer_size - tail - vs->advance;
+	}
 }
 
 unsigned long hdhomerun_video_recv_memcpy(struct hdhomerun_video_sock_t *vs, unsigned char *buffer, unsigned long size)

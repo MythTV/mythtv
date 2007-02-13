@@ -1,14 +1,19 @@
 
-HDHOMERUN_CONFIG_SRCS += hdhomerun_pkt.c
-HDHOMERUN_CONFIG_SRCS += hdhomerun_discover.c
-HDHOMERUN_CONFIG_SRCS += hdhomerun_control.c
-HDHOMERUN_CONFIG_SRCS += hdhomerun_config.c
+SRCS += hdhomerun_pkt.c
+SRCS += hdhomerun_discover.c
+SRCS += hdhomerun_control.c
+SRCS += hdhomerun_config.c
 
 CFLAGS += -Wall -O2
 
-hdhomerun_config : $(HDHOMERUN_CONFIG_SRCS)
-	gcc $(CFLAGS) $(HDHOMERUN_CONFIG_SRCS) -o hdhomerun_config
-	strip hdhomerun_config
+hdhomerun_config : $(SRCS)
+	gcc $(CFLAGS) $(SRCS) -o $@
+	strip $@
+
+hdhomerun_config.exe : $(SRCS)
+	gcc $(CFLAGS) $(SRCS) -liphlpapi -o $@
+	strip $@
 
 clean :
 	rm -f hdhomerun_config
+	rm -f hdhomerun_config.exe
