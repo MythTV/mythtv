@@ -128,7 +128,7 @@
     <name>CaptureCardSetting</name>
     <message>
         <source>Capture Card</source>
-        <translation>Salvestuskaart</translation>
+        <translation type="obsolete">Salvestuskaart</translation>
     </message>
 </context>
 <context>
@@ -155,11 +155,11 @@
     </message>
     <message>
         <source>DVB-S</source>
-        <translation>DVB-S</translation>
+        <translation type="obsolete">DVB-S</translation>
     </message>
     <message>
         <source>Input and satellite settings.</source>
-        <translation>Sisendite ning satelliidi sätted.</translation>
+        <translation type="obsolete">Sisendite ning satelliidi sätted.</translation>
     </message>
 </context>
 <context>
@@ -617,7 +617,7 @@
     <message>
         <source>Analog child card settings.
 WARNING: Do not press button if you are using an Air2PC HD-5000 card!!!! This card does not support analog tuning, but the DVB drivers do not yet allow us to detect this problem.</source>
-        <translation>Analoogalamkaardi seaded.
+        <translation type="obsolete">Analoogalamkaardi seaded.
 HOIATUS: Air2PC HD-5000 kasutamisel ära nupule vajuta!!!! See kaart ei toeta analooghäälestust kuid ajurid ei võimalda seda probleemi veel avastada.</translation>
     </message>
     <message>
@@ -631,6 +631,11 @@ HOIATUS: Air2PC HD-5000 kasutamisel ära nupule vajuta!!!! See kaart ei toeta an
     <message>
         <source>Could not get card info for card #%1</source>
         <translation>Ei saa infot kaardi nr %1 kohta</translation>
+    </message>
+    <message>
+        <source>Analog child card settings.
+WARNING: Do not press button if you are using an Air2PC HD-5000 or Avermedia A180 card. These cards do not support analog tuning, but the DVB drivers do not yet allow us to detect this problem.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -975,7 +980,7 @@ HOIATUS: Air2PC HD-5000 kasutamisel ära nupule vajuta!!!! See kaart ei toeta an
     </message>
     <message>
         <source>The longitude of the satellite you are aiming at, in degrees. In the Western hemisphere use &apos;W&apos; as the suffix. In the Eastern hemisphere use &apos;E&apos; as the suffix. </source>
-        <translation>Satelliidi pikkuskraad (kraadides). Läänepoolkera jaoks lisa lõppu &quot;Ẅ́&quot;, idapoolkera puhul &quot;̈́E&quot;. </translation>
+        <translation type="obsolete">Satelliidi pikkuskraad (kraadides). Läänepoolkera jaoks lisa lõppu &quot;Ẅ́&quot;, idapoolkera puhul &quot;̈́E&quot;. </translation>
     </message>
     <message>
         <source>DTV Device Configuration</source>
@@ -996,6 +1001,40 @@ HOIATUS: Air2PC HD-5000 kasutamisel ära nupule vajuta!!!! See kaart ei toeta an
     <message>
         <source>This defines whether the signal reaching the LNB is reversed from normal polarization. This happens to circular signals bouncing twice on a toroidal dish.</source>
         <translation>Juhul kui paraboolantenni ees on veel teinegi peegel peegeldub signaal kaks korda ning ringpolarisatsiooni kasutamise korral muutub polarisatsiooni suund.</translation>
+    </message>
+    <message>
+        <source>Locates the satelite you wish to point to with the longitude along the Clarke Belt ofthe satellite [-180..180] and its hemisphere.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Longitude (degrees)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Hemisphere</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Eastern</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Western</source>
+        <translation type="unfinished">Vestern</translation>
+    </message>
+</context>
+<context>
+    <name>FirewireDesc</name>
+    <message>
+        <source>Description</source>
+        <translation type="unfinished">Kirjeldus</translation>
+    </message>
+</context>
+<context>
+    <name>GuideGrid</name>
+    <message>
+        <source>Delete &apos;%1&apos; %2 rule?</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1047,6 +1086,13 @@ HOIATUS: Air2PC HD-5000 kasutamisel ära nupule vajuta!!!! See kaart ei toeta an
     <message>
         <source>To see a list of all up-coming showings of this program, press &apos;5&apos;</source>
         <translation>Selle programmi kõigi tulevaste saadete vaatamiseks vajuta &apos;5&apos;</translation>
+    </message>
+</context>
+<context>
+    <name>InputSelector</name>
+    <message>
+        <source>Input</source>
+        <translation type="unfinished">Sisend</translation>
     </message>
 </context>
 <context>
@@ -1356,7 +1402,7 @@ Tagasipöördumine eelmisesse menüüsse.</translation>
     </message>
     <message>
         <source>You have finished watching:</source>
-        <translation>Sa oled lõpetanud vaatamise:</translation>
+        <translation type="obsolete">Sa oled lõpetanud vaatamise:</translation>
     </message>
     <message>
         <source>Are you sure you want to delete:</source>
@@ -1372,7 +1418,7 @@ Tagasipöördumine eelmisesse menüüsse.</translation>
     </message>
     <message>
         <source>Delete it, but allow it to re-record</source>
-        <translation>Kustuta see kuid luba üle salvestada</translation>
+        <translation type="obsolete">Kustuta see kuid luba üle salvestada</translation>
     </message>
     <message>
         <source>Yes, and allow re-record</source>
@@ -1380,7 +1426,7 @@ Tagasipöördumine eelmisesse menüüsse.</translation>
     </message>
     <message>
         <source>Delete it</source>
-        <translation>Kustuta see</translation>
+        <translation type="obsolete">Kustuta see</translation>
     </message>
     <message>
         <source>Yes, delete it</source>
@@ -1396,7 +1442,7 @@ Tagasipöördumine eelmisesse menüüsse.</translation>
     </message>
     <message>
         <source>Save it so I can watch it again</source>
-        <translation>Salvesta nii, et saaksin uuesti vaadata</translation>
+        <translation type="obsolete">Salvesta nii, et saaksin uuesti vaadata</translation>
     </message>
     <message>
         <source>No, keep it, I changed my mind</source>
@@ -2050,6 +2096,10 @@ Tagasipöördumine eelmisesse menüüsse.</translation>
         <source>(Any Genre)</source>
         <translation>(Iga žanr)</translation>
     </message>
+    <message>
+        <source>Delete &apos;%1&apos; %2 rule?</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ProgramRecPriority</name>
@@ -2120,6 +2170,10 @@ Tagasipöördumine eelmisesse menüüsse.</translation>
     <message>
         <source>Any</source>
         <translation type="obsolete">Iga</translation>
+    </message>
+    <message>
+        <source>Delete &apos;%1&apos; %2 rule?</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2688,11 +2742,11 @@ Tagasipöördumine eelmisesse menüüsse.</translation>
     </message>
     <message>
         <source>DVB</source>
-        <translation type="obsolete">DigiTV (DVB)</translation>
+        <translation type="unfinished">DigiTV (DVB)</translation>
     </message>
     <message>
         <source>ATSC</source>
-        <translation type="obsolete">ATSC</translation>
+        <translation type="unfinished">ATSC</translation>
     </message>
     <message>
         <source>Frequency</source>
@@ -2784,7 +2838,7 @@ Enamus kaarte suudab selle automaatselt tuvastada. Muuda vaid juhul, kui see mui
     </message>
     <message>
         <source>Bandwidth (Default: Auto)</source>
-        <translation type="obsolete">Ribalauis (vaikimisi automaatne)</translation>
+        <translation type="unfinished">Ribalauis (vaikimisi automaatne)</translation>
     </message>
     <message>
         <source>6 MHz</source>
@@ -2868,7 +2922,7 @@ Enamus kaarte suudab selle automaatselt tuvastada. Muuda vaid juhul, kui see mui
     </message>
     <message>
         <source>Transport Options</source>
-        <translation type="obsolete">Transpordi sätted</translation>
+        <translation type="unfinished">Transpordi sätted</translation>
     </message>
     <message>
         <source>Power Search</source>
@@ -2926,7 +2980,7 @@ Enamus kaarte suudab selle automaatselt tuvastada. Muuda vaid juhul, kui see mui
     </message>
     <message>
         <source>Scanning</source>
-        <translation>Skaneerimine</translation>
+        <translation type="obsolete">Skaneerimine</translation>
     </message>
     <message>
         <source>Status</source>
@@ -3064,11 +3118,11 @@ Sinu tõmbaja ei sisalda kanalite numbreid, pead need käsitsi panema.</translat
     </message>
     <message>
         <source>Firewire port on your firewire card.</source>
-        <translation>Firewire port sinu firewire kaardil.</translation>
+        <translation type="obsolete">Firewire port sinu firewire kaardil.</translation>
     </message>
     <message>
         <source>Firewire node is the remote device.</source>
-        <translation>Firewire sõlm on kaugseade.</translation>
+        <translation type="obsolete">Firewire sõlm on kaugseade.</translation>
     </message>
     <message>
         <source>100Mbps</source>
@@ -3088,7 +3142,7 @@ Sinu tõmbaja ei sisalda kanalite numbreid, pead need käsitsi panema.</translat
     </message>
     <message>
         <source>Only MPEG2TS is supported at this time.</source>
-        <translation>Praegusel hetkel on toetatud vaid MPEG2TS.</translation>
+        <translation type="obsolete">Praegusel hetkel on toetatud vaid MPEG2TS.</translation>
     </message>
     <message>
         <source>Capture Card Setup</source>
@@ -3674,7 +3728,7 @@ Sinu tõmbaja ei sisalda kanalite numbreid, pead need käsitsi panema.</translat
     </message>
     <message>
         <source>Store in the &quot;%1&quot; recording group</source>
-        <translation>Säilita salvestusgrupis &quot;%1&quot;</translation>
+        <translation type="obsolete">Säilita salvestusgrupis &quot;%1&quot;</translation>
     </message>
     <message>
         <source>Go Back</source>
@@ -3834,11 +3888,11 @@ Sinu tõmbaja ei sisalda kanalite numbreid, pead need käsitsi panema.</translat
     </message>
     <message>
         <source>Directory to hold recordings</source>
-        <translation>Salvestiste hoidmise kataloog</translation>
+        <translation type="obsolete">Salvestiste hoidmise kataloog</translation>
     </message>
     <message>
         <source>All recordings get stored in this directory.</source>
-        <translation>Kõik salvestised säilitatakse selles kataloogis.</translation>
+        <translation type="obsolete">Kõik salvestised säilitatakse selles kataloogis.</translation>
     </message>
     <message>
         <source>TV format</source>
@@ -4122,11 +4176,11 @@ Sinu tõmbaja ei sisalda kanalite numbreid, pead need käsitsi panema.</translat
     </message>
     <message>
         <source>Host-specific Backend Setup</source>
-        <translation>Masinaspetsiifilised taustaserveri sätted</translation>
+        <translation type="obsolete">Masinaspetsiifilised taustaserveri sätted</translation>
     </message>
     <message>
         <source>Global Backend Setup</source>
-        <translation>Üldised taustaserveri seaded</translation>
+        <translation type="obsolete">Üldised taustaserveri seaded</translation>
     </message>
     <message>
         <source>Shutdown/Wakeup Options</source>
@@ -5503,16 +5557,16 @@ Sinu tõmbaja ei sisalda kanalite numbreid, pead need käsitsi panema.</translat
         <translation>mythfilldatabase käivitamise algus</translation>
     </message>
     <message>
-        <source>This setting and the following one define a time period when the mythfilldatabase process is allowed to run.  For example, setting Start to 11 and End to 13 would mean that the process would only run between 11 AM and 1 PM.</source>
-        <translation>See ning järgmine säte määravad ajavahemiku, mil on lubatud mythfilldatabase käivitamine.  Näiteks seades alguse 11 ja lõpu 13 peale käivitatakse mythfilldatabase ainult kella 11:00 ja 13:00 vahel.</translation>
+        <source>This setting and the following one define a time period when the mythfilldatabase process is allowed to run.  For example, setting Start to 11 and End to 13 would mean that the process would only run between 11:00 AM and 1:59 PM.</source>
+        <translation type="obsolete">See ning järgmine säte määravad ajavahemiku, mil on lubatud mythfilldatabase käivitamine.  Näiteks seades alguse 11 ja lõpu 13 peale käivitatakse mythfilldatabase ainult kella 11:00 ja 13:00 vahel.</translation>
     </message>
     <message>
         <source>mythfilldatabase Execution End</source>
         <translation>mythfilldatabase käivitamise lõpp</translation>
     </message>
     <message>
-        <source>This setting and the preceding one define a time period when the mythfilldatabase process is allowed to run.  For example, setting Start to 11 and End to 13 would mean that the process would only run between 11 AM and 1 PM.</source>
-        <translation>See ning eelmine säte määravad ajavahemiku, mil on lubatud mythfilldatabase käivitamine.  Näiteks seades alguse 11 ja lõpu 13 peale käivitatakse mythfilldatabase ainult kella 11:00 ja 13:00 vahel.</translation>
+        <source>This setting and the preceding one define a time period when the mythfilldatabase process is allowed to run.  For example, setting Start to 11 and End to 13 would mean that the process would only run between 11:00 AM and 1:59 PM.</source>
+        <translation type="obsolete">See ning eelmine säte määravad ajavahemiku, mil on lubatud mythfilldatabase käivitamine.  Näiteks seades alguse 11 ja lõpu 13 peale käivitatakse mythfilldatabase ainult kella 11:00 ja 13:00 vahel.</translation>
     </message>
     <message>
         <source>mythfilldatabase Path</source>
@@ -6385,7 +6439,7 @@ Sinu tõmbaja ei sisalda kanalite numbreid, pead need käsitsi panema.</translat
     </message>
     <message>
         <source>Channel Separator</source>
-        <translation>Kanali eraldaja</translation>
+        <translation type="obsolete">Kanali eraldaja</translation>
     </message>
     <message>
         <source>What to use to separate ATSC major and minor channels.</source>
@@ -6437,7 +6491,7 @@ Sinu tõmbaja ei sisalda kanalite numbreid, pead need käsitsi panema.</translat
     </message>
     <message>
         <source>Automatically transcode when a recording is made using this profile and the recording&apos;s schedule is configurd to allow transcoding.</source>
-        <translation>Transkodeeri automaatselt, kui salvestamiseks kasutatakse seda profiili ning salvestuskavale on seatud transkodeerimise lubamine.</translation>
+        <translation type="obsolete">Transkodeeri automaatselt, kui salvestamiseks kasutatakse seda profiili ning salvestuskavale on seatud transkodeerimise lubamine.</translation>
     </message>
     <message>
         <source>Autodetect</source>
@@ -6561,7 +6615,7 @@ Sinu tõmbaja ei sisalda kanalite numbreid, pead need käsitsi panema.</translat
     </message>
     <message>
         <source>Default group filter to apply on the View Recordings screen.</source>
-        <translation>Vaikimisi salvestiste vaatamise ekraanil lisatav grupifilter.</translation>
+        <translation type="obsolete">Vaikimisi salvestiste vaatamise ekraanil lisatav grupifilter.</translation>
     </message>
     <message>
         <source>Always prompt for initial group filter</source>
@@ -6975,7 +7029,7 @@ MythTV lõpetab töö.</translation>
     </message>
     <message>
         <source>Disk usage on %1:</source>
-        <translation>%1 kõvaketta kasutus:</translation>
+        <translation type="obsolete">%1 kõvaketta kasutus:</translation>
     </message>
     <message>
         <source>Save original files after transcoding (globally)</source>
@@ -7087,11 +7141,11 @@ MythTV lõpetab töö.</translation>
     </message>
     <message>
         <source>ATSC Modulation</source>
-        <translation>ATSC modulatsioon</translation>
+        <translation type="obsolete">ATSC modulatsioon</translation>
     </message>
     <message>
         <source>ATSC modulation, 8-VSB, QAM-256, etc.</source>
-        <translation>ATSC modulatsioon. 8-VSB, QAM-256, jne.</translation>
+        <translation type="obsolete">ATSC modulatsioon. 8-VSB, QAM-256, jne.</translation>
     </message>
     <message>
         <source>Most cable systems in the United States use QAM-256 or QAM-64, but some mixed systems may use 8-VSB for over-the-air channels.</source>
@@ -7115,11 +7169,11 @@ MythTV lõpetab töö.</translation>
     </message>
     <message>
         <source>IEEE-1394 Port</source>
-        <translation>IEEE-1394 port</translation>
+        <translation type="obsolete">IEEE-1394 port</translation>
     </message>
     <message>
         <source>Node</source>
-        <translation>Seade</translation>
+        <translation type="obsolete">Seade</translation>
     </message>
     <message>
         <source>Speed</source>
@@ -7175,7 +7229,7 @@ MythTV lõpetab töö.</translation>
     </message>
     <message>
         <source>nvram-wakeup Command</source>
-        <translation>nvram-äratuse käks</translation>
+        <translation type="obsolete">nvram-äratuse käks</translation>
     </message>
     <message>
         <source>Command to set the wakeup time in the BIOS. See the README file for more examples.</source>
@@ -8475,11 +8529,11 @@ MythTV lõpetab töö.</translation>
     </message>
     <message>
         <source>URL</source>
-        <translation>URL</translation>
+        <translation type="obsolete">URL</translation>
     </message>
     <message>
         <source>URL of the incoming stream (ex.: udp://?localport=1234)</source>
-        <translation>Sissetuleva voo URL (nt. udp://?localport=1234)</translation>
+        <translation type="obsolete">Sissetuleva voo URL (nt. udp://?localport=1234)</translation>
     </message>
     <message>
         <source>CRC IP Network Recorder</source>
@@ -8640,7 +8694,7 @@ Kontrolli, kas video on olemas</translation>
     </message>
     <message>
         <source>Some filesystems use a lot of resources when deleting large recording files.  This option makes Myth delete the file slowly to lessen the impact.</source>
-        <translation>Suurte failide kustutamine võib mõne failisüsteemi puhul nõuda palju ressursse.  Aeglaselt kustutamine vähendab sellest koormusest tingitud negatiivset mõju.</translation>
+        <translation type="obsolete">Suurte failide kustutamine võib mõne failisüsteemi puhul nõuda palju ressursse.  Aeglaselt kustutamine vähendab sellest koormusest tingitud negatiivset mõju.</translation>
     </message>
     <message>
         <source>Make the dvb-recording will drop packets from the card until a sequence start header is seen.</source>
@@ -8944,6 +8998,236 @@ Kontrolli, kas video on olemas</translation>
         <source>Schedule Status shows current statistics from the scheduler.</source>
         <translation>Planeerija olek näitab planeerija hetkestatistikat.</translation>
     </message>
+    <message>
+        <source>Analog</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This section lists each transport that MythTV currently knows about. The display fields are video source, modulation, frequency, and when relevant symbol rate, network id, and transport id.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sorry, the Transport Editor can only be used to edit transports which are connected to a card input.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failed to probe a capture card connected to this transport&apos;s video source. Please make sure the backend is not running.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The Video Sources to which this Transport is connected are incompatible, please create seperate video sources for these cards. </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Digital TV Standard</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Guiding standard to use for making sense of the data streams after they have been demodulated, error corrected and demultiplexed.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>OpenCable</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>MPEG</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Frequency (Option has no default).
+The frequency for this channel in</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Modulation, aka Constellation</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>QAM Auto</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>seconds</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>(%3 behind)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>(%3 remaining)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>DVD Menu Not Available</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>O</source>
+        <comment>RecStatusChar rsOtherShowing</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Other Showing</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>this episode will be recorded on a different channel at this time.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Storage Group</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Automatically transcode when a recording is made using this profile and the recording&apos;s schedule is configured to allow transcoding.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Width to use for encoding. Note: PVR-x50 cards may produce ghosting if this is not set to 720 or 768 for NTSC and PAL, respectively.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Height to use for encoding. Note: PVR-x50 cards may produce ghosting if this is not set to 480 or 576 for NTSC and PAL, respectively.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Modulation, 8-VSB, QAM-256, etc.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>ATSC Channel Separator</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Include in the &quot;%1&quot; recording group</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Exclude unidentified episodes</source>
+        <translation type="unfinished">Jäta välja identifitseerimata episoodid</translation>
+    </message>
+    <message>
+        <source>Exclude old episodes</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select Storage Group</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Store in the &quot;%1&quot; storage group</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>LiveTV</source>
+        <translation type="unfinished">Otse-eetris</translation>
+    </message>
+    <message>
+        <source>GUID</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Generic</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>800Mbps</source>
+        <translation type="unfinished">800 Mbps</translation>
+    </message>
+    <message>
+        <source>Use quick tuning</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Never</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Always</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If enabled MythTV will tune using only the MPEG program number. The program numbers change more often than DVB or ATSC tuning parameters, so this is slightly less reliable.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Default group filter to apply on the Watch Recordings screen.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Always stream recordings from the backend</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enable this setting if you want MythTV to always stream files from a remote backend instead of directly reading a recording file if it is accessible locally.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Jump to Program OSD</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Set the choice between viewing the current recording group in the OSD, or showing the &apos;Watch Recording&apos; screen when &apos;Jump to Program&apos; is activated. If set, the recordings are shown in the OSD</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Start from the Watch List view</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If set, the &apos;Watch List&apos; will be the initial view each time you enter the Watch Recordings screen</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This setting and the following one define a time period when the mythfilldatabase process is allowed to run.  For example, setting Start to 11 and End to 13 would mean that the process would only run between 11 AM and 1 PM.</source>
+        <translation type="unfinished">See ning järgmine säte määravad ajavahemiku, mil on lubatud mythfilldatabase käivitamine.  Näiteks seades alguse 11 ja lõpu 13 peale käivitatakse mythfilldatabase ainult kella 11 ja 13:00 vahel. {1?}</translation>
+    </message>
+    <message>
+        <source>This setting and the preceding one define a time period when the mythfilldatabase process is allowed to run.  For example, setting Start to 11 and End to 13 would mean that the process would only run between 11 AM and 1 PM.</source>
+        <translation type="unfinished">See ning eelmine säte määravad ajavahemiku, mil on lubatud mythfilldatabase käivitamine.  Näiteks seades alguse 11 ja lõpu 13 peale käivitatakse mythfilldatabase ainult kella 11 ja 13:00 vahel. {1?}</translation>
+    </message>
+    <message>
+        <source>Decoder Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Total Disk Space:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>MythTV Drive #%1:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Directories:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Directory:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Some filesystems use a lot of resources when deleting large recording files.  This option makes Myth delete the file slowly on this backend to lessen the impact.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Backend Setup</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No Storage Group directories are defined.  You must add at least one directory to the Default Storage Group where new recordings will be stored.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Command to Set Wakeup Time</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The format of the time string passed to the &apos;Set Wakeup Time Command&apos; as $time. See QT::QDateTime.toString() for details. Set to &apos;time_t&apos; for seconds since epoch (use time_t for nvram_wakeup).</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>RecordingType</name>
@@ -9034,10 +9318,28 @@ Kontrolli, kas video on olemas</translation>
     </message>
 </context>
 <context>
+    <name>ScanWizard</name>
+    <message>
+        <source>ScanWizard</source>
+        <translation type="unfinished">Skaneerimise nõustaja</translation>
+    </message>
+    <message>
+        <source>Error parsing parameters</source>
+        <translation type="unfinished">Parameetrite parsimise viga</translation>
+    </message>
+</context>
+<context>
+    <name>ScanWizardConfig</name>
+    <message>
+        <source>Scan Configuration</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>ScanWizardScanType</name>
     <message>
         <source>Scan Type</source>
-        <translation>Skaneerimise tüüp</translation>
+        <translation type="obsolete">Skaneerimise tüüp</translation>
     </message>
 </context>
 <context>
@@ -9056,7 +9358,7 @@ Kontrolli, kas video on olemas</translation>
     </message>
     <message>
         <source>Error parsing parameters</source>
-        <translation>Parameetrite parsimise viga</translation>
+        <translation type="obsolete">Parameetrite parsimise viga</translation>
     </message>
     <message>
         <source>Error starting scan</source>
@@ -9232,7 +9534,7 @@ Rohkem andmeid pole</translation>
     </message>
     <message>
         <source>You are exiting this recording</source>
-        <translation>Sa väljud sellest salvestisest</translation>
+        <translation type="obsolete">Sa väljud sellest salvestisest</translation>
     </message>
     <message>
         <source>Save this position and go to the menu</source>
@@ -9951,6 +10253,39 @@ Rohkem andmeid pole</translation>
         <source>Password Failed</source>
         <translation>Vale parool</translation>
     </message>
+    <message>
+        <source>Chan %1: %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>All Tuners are Busy.
+Select a Current Recording</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>DVD</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Menu</source>
+        <translation type="unfinished">Menüü</translation>
+    </message>
+    <message>
+        <source>Still Frame</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Title: %1 (%2)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Chapter: %1/%2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>You are exiting this %1</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ThemeUI</name>
@@ -10152,6 +10487,40 @@ Rohkem andmeid pole</translation>
     </message>
 </context>
 <context>
+    <name>TransportList</name>
+    <message>
+        <source>New Transport</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>TransportListEditor</name>
+    <message>
+        <source>Are you sure you would like to delete this transport?</source>
+        <translation type="unfinished">Oled sa kindel, et soovid selle transpordi kustutada?</translation>
+    </message>
+    <message>
+        <source>Yes, delete the transport</source>
+        <translation type="unfinished">Jah, kustuta transport</translation>
+    </message>
+    <message>
+        <source>No, don&apos;t</source>
+        <translation type="unfinished">Ei, ära kustuta</translation>
+    </message>
+    <message>
+        <source>Transport Menu</source>
+        <translation type="unfinished">Transpordimenüü</translation>
+    </message>
+    <message>
+        <source>Edit..</source>
+        <translation type="unfinished">Redigeeri..</translation>
+    </message>
+    <message>
+        <source>Delete..</source>
+        <translation type="unfinished">Kustuta..</translation>
+    </message>
+</context>
+<context>
     <name>UIManagedTreeListType</name>
     <message>
         <source>Search</source>
@@ -10263,6 +10632,10 @@ Rohkem andmeid pole</translation>
     <message>
         <source>Important</source>
         <translation>Tähtsad</translation>
+    </message>
+    <message>
+        <source>Delete &apos;%1&apos; %2 rule?</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

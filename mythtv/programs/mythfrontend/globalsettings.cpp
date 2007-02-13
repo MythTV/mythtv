@@ -2913,27 +2913,27 @@ static GlobalSpinBox *MythFillPeriod()
 
 static GlobalSpinBox *MythFillMinHour()
 {
-    GlobalSpinBox *bs = new GlobalSpinBox("MythFillMinHour", 0, 24, 1);
+    GlobalSpinBox *bs = new GlobalSpinBox("MythFillMinHour", 0, 23, 1);
     bs->setLabel(QObject::tr("mythfilldatabase Execution Start"));
     bs->setValue(2);
     bs->setHelpText(QObject::tr("This setting and the following one define a "
                     "time period when the mythfilldatabase process is "
                     "allowed to run.  For example, setting Start to 11 and "
                     "End to 13 would mean that the process would only "
-                    "run between 11 AM and 1 PM."));
+                    "run between 11:00 AM and 1:59 PM."));
     return bs;
 }
 
 static GlobalSpinBox *MythFillMaxHour()
 {
-    GlobalSpinBox *bs = new GlobalSpinBox("MythFillMaxHour", 0, 24, 1);
+    GlobalSpinBox *bs = new GlobalSpinBox("MythFillMaxHour", 0, 23, 1);
     bs->setLabel(QObject::tr("mythfilldatabase Execution End"));
     bs->setValue(5);
     bs->setHelpText(QObject::tr("This setting and the preceding one define a "
                     "time period when the mythfilldatabase process is "
                     "allowed to run.  For example, setting Start to 11 and "
                     "End to 13 would mean that the process would only "
-                    "run between 11 AM and 1 PM."));
+                    "run between 11:00 AM and 1:59 PM."));
     return bs;
 }
 

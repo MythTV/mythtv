@@ -66,7 +66,7 @@
     <name>CaptureCard</name>
     <message>
         <source>Analog Options for</source>
-        <translation>Opciones Analógicas para</translation>
+        <translation type="obsolete">Opciones Analógicas para</translation>
     </message>
 </context>
 <context>
@@ -143,19 +143,22 @@
         <translation>Esto puede tardar mucho en completarse.</translation>
     </message>
     <message>
-        <source>DVB-S</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Input and satellite settings.</source>
-        <translation>Ajustes de entrada y satélite.</translation>
+        <translation type="obsolete">Ajustes de entrada y satélite.</translation>
+    </message>
+</context>
+<context>
+    <name>CardInputEditor</name>
+    <message>
+        <source>Input connections</source>
+        <translation type="unfinished">Conexiones de entrada</translation>
     </message>
 </context>
 <context>
     <name>ChannelEditor</name>
     <message>
         <source>Channels</source>
-        <translation>Canales</translation>
+        <translation type="obsolete">Canales</translation>
     </message>
     <message>
         <source>Are you sure you would like to delete this channel?</source>
@@ -591,7 +594,7 @@
     <message>
         <source>Analog child card settings.
 WARNING: Do not press button if you are using an Air2PC HD-5000 card!!!! This card does not support analog tuning, but the DVB drivers do not yet allow us to detect this problem.</source>
-        <translation>Ajustes tarjeta hija analógica.
+        <translation type="obsolete">Ajustes tarjeta hija analógica.
 AVISO: ¡¡¡No pulse el botón si usa una tarjeta Air2PC HD-5000!!! Esta tarjeta no soporta sintonizado analógico, pero los drivers DVB aún no nos permiten detectarlo.</translation>
     </message>
     <message>
@@ -605,6 +608,11 @@ AVISO: ¡¡¡No pulse el botón si usa una tarjeta Air2PC HD-5000!!! Esta tarjet
     <message>
         <source>Could not get card info for card #%1</source>
         <translation>No se ha podido obtener información de la tarjeta #%1</translation>
+    </message>
+    <message>
+        <source>Analog child card settings.
+WARNING: Do not press button if you are using an Air2PC HD-5000 or Avermedia A180 card. These cards do not support analog tuning, but the DVB drivers do not yet allow us to detect this problem.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -630,31 +638,42 @@ AVISO: ¡¡¡No pulse el botón si usa una tarjeta Air2PC HD-5000!!! Esta tarjet
     <name>DVBTransportsEditor</name>
     <message>
         <source>DVB Transport Editor</source>
-        <translation>DVB Editor de Transporte</translation>
+        <translation type="obsolete">DVB Editor de Transporte</translation>
     </message>
     <message>
         <source>Are you sure you would like to delete this transport?</source>
-        <translation>¿Está seguro de borrar este transporte?</translation>
+        <translation type="obsolete">¿Está seguro de borrar este transporte?</translation>
     </message>
     <message>
         <source>Yes, delete the transport</source>
-        <translation>Sí, borrar este transporte</translation>
+        <translation type="obsolete">Sí, borrar este transporte</translation>
     </message>
     <message>
         <source>No, don&apos;t</source>
-        <translation>No</translation>
+        <translation type="obsolete">No</translation>
     </message>
     <message>
         <source>Transport Menu</source>
-        <translation>Menú de transportes</translation>
+        <translation type="obsolete">Menú de transportes</translation>
     </message>
     <message>
         <source>Edit..</source>
-        <translation>Editar..</translation>
+        <translation type="obsolete">Editar..</translation>
     </message>
     <message>
         <source>Delete..</source>
-        <translation>Borrar..</translation>
+        <translation type="obsolete">Borrar..</translation>
+    </message>
+</context>
+<context>
+    <name>DVBUtilsImportPane</name>
+    <message>
+        <source>File location</source>
+        <translation type="unfinished">Localización del fichero</translation>
+    </message>
+    <message>
+        <source>Location of the channels.conf file.</source>
+        <translation type="unfinished">Localización del fichero channels.conf.</translation>
     </message>
 </context>
 <context>
@@ -814,7 +833,7 @@ AVISO: ¡¡¡No pulse el botón si usa una tarjeta Air2PC HD-5000!!! Esta tarjet
     </message>
     <message>
         <source>Rotor Position Map</source>
-        <translation>Mapa Posición Rotor</translation>
+        <translation type="obsolete">Mapa Posición Rotor</translation>
     </message>
     <message>
         <source>Rotor Configuration</source>
@@ -922,7 +941,7 @@ AVISO: ¡¡¡No pulse el botón si usa una tarjeta Air2PC HD-5000!!! Esta tarjet
     </message>
     <message>
         <source>DiSEqC Device Tree</source>
-        <translation>Árbol Dispositivos DiSEqC</translation>
+        <translation type="obsolete">Árbol Dispositivos DiSEqC</translation>
     </message>
     <message>
         <source>Choose a port to use for this switch.</source>
@@ -938,11 +957,61 @@ AVISO: ¡¡¡No pulse el botón si usa una tarjeta Air2PC HD-5000!!! Esta tarjet
     </message>
     <message>
         <source>The longitude of the satellite you are aiming at, in degrees. In the Western hemisphere use &apos;W&apos; as the suffix. In the Eastern hemisphere use &apos;E&apos; as the suffix. </source>
-        <translation>La longitud del satélite al que está apuntando. En el hemisferio occidental use &apos;W&apos; como sufijo. En el hemisferio oriental use &apos;E&apos; como sufijo. </translation>
+        <translation type="obsolete">La longitud del satélite al que está apuntando. En el hemisferio occidental use &apos;W&apos; como sufijo. En el hemisferio oriental use &apos;E&apos; como sufijo. </translation>
     </message>
     <message>
         <source>DTV Device Configuration</source>
         <translation>Configuración Dispositivo DTV</translation>
+    </message>
+    <message>
+        <source>Repeat Count</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Number of times to repeat DiSEqC commands sent to this device. Larger values may help with less reliable devices.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>LNB Reversed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This defines whether the signal reaching the LNB is reversed from normal polarization. This happens to circular signals bouncing twice on a toroidal dish.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Locates the satelite you wish to point to with the longitude along the Clarke Belt ofthe satellite [-180..180] and its hemisphere.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Longitude (degrees)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Hemisphere</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Eastern</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Western</source>
+        <translation type="unfinished">Western</translation>
+    </message>
+</context>
+<context>
+    <name>FirewireDesc</name>
+    <message>
+        <source>Description</source>
+        <translation type="unfinished">Descripción</translation>
+    </message>
+</context>
+<context>
+    <name>GuideGrid</name>
+    <message>
+        <source>Delete &apos;%1&apos; %2 rule?</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -994,6 +1063,13 @@ AVISO: ¡¡¡No pulse el botón si usa una tarjeta Air2PC HD-5000!!! Esta tarjet
     <message>
         <source>Record one showing of this title</source>
         <translation>Grabar un programa con este título</translation>
+    </message>
+</context>
+<context>
+    <name>InputSelector</name>
+    <message>
+        <source>Input</source>
+        <translation type="unfinished">Entrada</translation>
     </message>
 </context>
 <context>
@@ -1117,6 +1193,13 @@ AVISO: ¡¡¡No pulse el botón si usa una tarjeta Air2PC HD-5000!!! Esta tarjet
     </message>
 </context>
 <context>
+    <name>MultiplexSetting</name>
+    <message>
+        <source>Transport</source>
+        <translation type="unfinished">Transporte</translation>
+    </message>
+</context>
+<context>
     <name>MythContext</name>
     <message>
         <source>Could not connect to the master backend server -- is it running?  Is the IP address set for it in the setup program correct?</source>
@@ -1210,7 +1293,7 @@ Volviendo al menú anterior.</translation>
     <name>PlayGroup</name>
     <message>
         <source>Group</source>
-        <translation>Grupo</translation>
+        <translation type="obsolete">Grupo</translation>
     </message>
 </context>
 <context>
@@ -1260,7 +1343,7 @@ Volviendo al menú anterior.</translation>
     </message>
     <message>
         <source>You have finished watching:</source>
-        <translation>Ha acabado de ver:</translation>
+        <translation type="obsolete">Ha acabado de ver:</translation>
     </message>
     <message>
         <source>Are you sure you want to delete:</source>
@@ -1272,11 +1355,11 @@ Volviendo al menú anterior.</translation>
     </message>
     <message>
         <source>Allow this program to AutoExpire?</source>
-        <translation>¿Permitir que esta grabación autoexpire?</translation>
+        <translation type="obsolete">¿Permitir que esta grabación autoexpire?</translation>
     </message>
     <message>
         <source>Yes, AutoExpire</source>
-        <translation>Si, autoexpira</translation>
+        <translation type="obsolete">Si, autoexpira</translation>
     </message>
     <message>
         <source>Are you sure you want to stop:</source>
@@ -1288,7 +1371,7 @@ Volviendo al menú anterior.</translation>
     </message>
     <message>
         <source>No, do not AutoExpire</source>
-        <translation>No, no autoexpirar</translation>
+        <translation type="obsolete">No, no autoexpirar</translation>
     </message>
     <message>
         <source>No, continue recording it</source>
@@ -1516,15 +1599,15 @@ Volviendo al menú anterior.</translation>
     </message>
     <message>
         <source>Delete it, but allow it to re-record</source>
-        <translation>Borrar, pero permitir regrabarlo</translation>
+        <translation type="obsolete">Borrar, pero permitir regrabarlo</translation>
     </message>
     <message>
         <source>Delete it</source>
-        <translation>Borrarlo</translation>
+        <translation type="obsolete">Borrarlo</translation>
     </message>
     <message>
         <source>Save it so I can watch it again</source>
-        <translation>Guardarlo para poder verlo de nuevo</translation>
+        <translation type="obsolete">Guardarlo para poder verlo de nuevo</translation>
     </message>
     <message>
         <source>Password:</source>
@@ -1544,31 +1627,31 @@ Volviendo al menú anterior.</translation>
     </message>
     <message>
         <source>Show Titles only</source>
-        <translation>Mostrar sólo Títulos</translation>
+        <translation type="obsolete">Mostrar sólo Títulos</translation>
     </message>
     <message>
         <source>Show Titles and Categories</source>
-        <translation>Mostrar Títulos y Categorías</translation>
+        <translation type="obsolete">Mostrar Títulos y Categorías</translation>
     </message>
     <message>
         <source>Show Titles, Categories, and Recording Groups</source>
-        <translation>Mostrar Títulos, Categorías y Grupos Grabación</translation>
+        <translation type="obsolete">Mostrar Títulos, Categorías y Grupos Grabación</translation>
     </message>
     <message>
         <source>Show Titles and Recording Groups</source>
-        <translation>Mostrar Títulos y Grupos Grabación</translation>
+        <translation type="obsolete">Mostrar Títulos y Grupos Grabación</translation>
     </message>
     <message>
         <source>Show Categories only</source>
-        <translation>Mostrar sólo Categorías</translation>
+        <translation type="obsolete">Mostrar sólo Categorías</translation>
     </message>
     <message>
         <source>Show Categories and Recording Groups</source>
-        <translation>Mostrar Categorías y Grupos Grabación</translation>
+        <translation type="obsolete">Mostrar Categorías y Grupos Grabación</translation>
     </message>
     <message>
         <source>Show Recording Groups only</source>
-        <translation>Mostrar sólo Grupos Grabación</translation>
+        <translation type="obsolete">Mostrar sólo Grupos Grabación</translation>
     </message>
     <message>
         <source>Select Group Filter</source>
@@ -1677,6 +1760,58 @@ Volviendo al menú anterior.</translation>
     <message>
         <source>Low Quality</source>
         <translation>Calidad Baja</translation>
+    </message>
+    <message>
+        <source>Watch List</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>There are no recordings in your current view</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>There are no recordings available</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Mark as Unwatched</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Mark as Watched</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recording is preserved</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show Titles</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show Categories</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show Recording Groups</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show Watch List</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show Searches</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Save Current View</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1938,6 +2073,10 @@ Volviendo al menú anterior.</translation>
         <source>(Any Genre)</source>
         <translation>(Cualquier Género)</translation>
     </message>
+    <message>
+        <source>Delete &apos;%1&apos; %2 rule?</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ProgramRecPriority</name>
@@ -2008,6 +2147,10 @@ Volviendo al menú anterior.</translation>
     <message>
         <source>Recording %1 of %2</source>
         <translation>Grabando %1 de %2</translation>
+    </message>
+    <message>
+        <source>Delete &apos;%1&apos; %2 rule?</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2242,7 +2385,7 @@ Volviendo al menú anterior.</translation>
     </message>
     <message>
         <source>List Newest Recording First</source>
-        <translation>La grabación más reciente primero</translation>
+        <translation type="obsolete">La grabación más reciente primero</translation>
     </message>
     <message>
         <source>Sticky keys</source>
@@ -3160,7 +3303,7 @@ Volviendo al menú anterior.</translation>
     </message>
     <message>
         <source>Channel Options</source>
-        <translation>Opciónes de canal</translation>
+        <translation type="obsolete">Opciónes de canal</translation>
     </message>
     <message>
         <source>Video Source</source>
@@ -3380,7 +3523,7 @@ Su grabber no proporciona números de canal, así que debe establecerlos manualm
     </message>
     <message>
         <source>XMLTV listings grabber</source>
-        <translation>Recolector de listados XMLTV (grabber)</translation>
+        <translation type="obsolete">Recolector de listados XMLTV (grabber)</translation>
     </message>
     <message>
         <source>Channel frequency table</source>
@@ -3484,7 +3627,7 @@ Su grabber no proporciona números de canal, así que debe establecerlos manualm
     </message>
     <message>
         <source>Input connections</source>
-        <translation>Conexiones de entrada</translation>
+        <translation type="obsolete">Conexiones de entrada</translation>
     </message>
     <message>
         <source>IP address for</source>
@@ -3524,11 +3667,11 @@ Su grabber no proporciona números de canal, así que debe establecerlos manualm
     </message>
     <message>
         <source>Directory to hold recordings</source>
-        <translation>Directorio donde se guardarán las grabaciones</translation>
+        <translation type="obsolete">Directorio donde se guardarán las grabaciones</translation>
     </message>
     <message>
         <source>All recordings get stored in this directory.</source>
-        <translation>Todas las grabaciones se almacenarán en este directorio.</translation>
+        <translation type="obsolete">Todas las grabaciones se almacenarán en este directorio.</translation>
     </message>
     <message>
         <source>TV format</source>
@@ -3644,11 +3787,11 @@ Su grabber no proporciona números de canal, así que debe establecerlos manualm
     </message>
     <message>
         <source>Host-specific Backend Setup</source>
-        <translation>Ajuste específico del backend</translation>
+        <translation type="obsolete">Ajuste específico del backend</translation>
     </message>
     <message>
         <source>Global Backend Setup</source>
-        <translation>Configuración global backend</translation>
+        <translation type="obsolete">Configuración global backend</translation>
     </message>
     <message>
         <source>Shutdown/Wakeup Options</source>
@@ -3924,11 +4067,11 @@ Su grabber no proporciona números de canal, así que debe establecerlos manualm
     </message>
     <message>
         <source>mythfilldatabase Path</source>
-        <translation>Ruta a mythfilldatabase</translation>
+        <translation type="obsolete">Ruta a mythfilldatabase</translation>
     </message>
     <message>
         <source>Path (including executable) of the mythfilldatabase program.</source>
-        <translation>Ruta (incluido ejecutable) de mythfilldatabase.</translation>
+        <translation type="obsolete">Ruta (incluido ejecutable) de mythfilldatabase.</translation>
     </message>
     <message>
         <source>mythfilldatabase Arguments</source>
@@ -4291,7 +4434,7 @@ Su grabber no proporciona números de canal, así que debe establecerlos manualm
     </message>
     <message>
         <source>Store in the &quot;%1&quot; recording group</source>
-        <translation>Guardar en el grupo de grabado &quot;%1&quot;</translation>
+        <translation type="obsolete">Guardar en el grupo de grabado &quot;%1&quot;</translation>
     </message>
     <message>
         <source>Select Recording Schedule</source>
@@ -4419,7 +4562,7 @@ Su grabber no proporciona números de canal, así que debe establecerlos manualm
     </message>
     <message>
         <source>When enabled, the most recent recording will be listed first in the &apos;Watch Recordings&apos; screen, otherwise the oldest recording will be listed first.</source>
-        <translation>Si está activado, la grabación más reciente será listado al principio en &apos;Ver grabaciones&apos;, sino se mostrará primero la grabación más vieja.</translation>
+        <translation type="obsolete">Si está activado, la grabación más reciente será listado al principio en &apos;Ver grabaciones&apos;, sino se mostrará primero la grabación más vieja.</translation>
     </message>
     <message>
         <source>If enabled, fast forward and rewind continue after the key is released.  Pressing the key again increases the fast forward or rewind speed.  The alternate fast forward and rewind keys always behave in this way.</source>
@@ -4626,12 +4769,12 @@ Su grabber no proporciona números de canal, así que debe establecerlos manualm
         <translation>El número de días entre limpiezas del log.</translation>
     </message>
     <message>
-        <source>This setting and the following one define a time period when the mythfilldatabase process is allowed to run.  For example, setting Start to 11 and End to 13 would mean that the process would only run between 11 AM and 1 PM.</source>
-        <translation>Este ajuste y el siguiente definen un periodo de tiempo en el que permite ejecutarse a mythfilldatabase.  Por ejemplo, fijando el comienzo a las 11 y el fin a las 13 significaría que el proceso sólo podría ejecutarse entre las 11 AM y la 1 PM.</translation>
+        <source>This setting and the following one define a time period when the mythfilldatabase process is allowed to run.  For example, setting Start to 11 and End to 13 would mean that the process would only run between 11:00 AM and 1:59 PM.</source>
+        <translation type="obsolete">Este ajuste y el siguiente definen un periodo de tiempo en el que permite ejecutarse a mythfilldatabase.  Por ejemplo, fijando el comienzo a las 11 y el fin a las 13 significaría que el proceso sólo podría ejecutarse entre las 11:00 AM y la 1:59 PM.</translation>
     </message>
     <message>
-        <source>This setting and the preceding one define a time period when the mythfilldatabase process is allowed to run.  For example, setting Start to 11 and End to 13 would mean that the process would only run between 11 AM and 1 PM.</source>
-        <translation>Este ajuste y el anterior definen un periodo de tiempo en el que permite ejecutarse a mythfilldatabase.  Por ejemplo, fijando el comienzo a las 11 y el fin a las 13 significaría que el proceso sólo podría ejecutarse entre las 11 AM y la 1 PM.</translation>
+        <source>This setting and the preceding one define a time period when the mythfilldatabase process is allowed to run.  For example, setting Start to 11 and End to 13 would mean that the process would only run between 11:00 AM and 1:59 PM.</source>
+        <translation type="obsolete">Este ajuste y el anterior definen un periodo de tiempo en el que permite ejecutarse a mythfilldatabase.  Por ejemplo, fijando el comienzo a las 11 y el fin a las 13 significaría que el proceso sólo podría ejecutarse entre las 11:00 AM y la 1:59 PM.</translation>
     </message>
     <message>
         <source>This starts the program guide immediately upon starting to watch Live TV.</source>
@@ -5517,15 +5660,15 @@ Su grabber no proporciona números de canal, así que debe establecerlos manualm
     </message>
     <message>
         <source>Transport</source>
-        <translation>Transporte</translation>
+        <translation type="obsolete">Transporte</translation>
     </message>
     <message>
         <source>Capture Card</source>
-        <translation>Capturadora</translation>
+        <translation type="obsolete">Capturadora</translation>
     </message>
     <message>
         <source>Scanning</source>
-        <translation type="unfinished">Exploración</translation>
+        <translation type="obsolete">Exploración</translation>
     </message>
     <message>
         <source>Record one showing of this title</source>
@@ -5573,11 +5716,11 @@ Su grabber no proporciona números de canal, así que debe establecerlos manualm
     </message>
     <message>
         <source>Free to air channels only.</source>
-        <translation>Sólo canales en abierto.</translation>
+        <translation type="obsolete">Sólo canales en abierto.</translation>
     </message>
     <message>
         <source>If set, only free to air channels will be used.</source>
-        <translation>Si está activado, sólo se usarán canales sin encriptar.</translation>
+        <translation type="obsolete">Si está activado, sólo se usarán canales sin encriptar.</translation>
     </message>
     <message>
         <source>All</source>
@@ -5734,11 +5877,11 @@ Su grabber no proporciona números de canal, así que debe establecerlos manualm
     </message>
     <message>
         <source>Firewire port on your firewire card.</source>
-        <translation>Puerto Firewire en su tarjeta.</translation>
+        <translation type="obsolete">Puerto Firewire en su tarjeta.</translation>
     </message>
     <message>
         <source>Firewire node is the remote device.</source>
-        <translation>Nodo Firewire es el dispositivo remoto.</translation>
+        <translation type="obsolete">Nodo Firewire es el dispositivo remoto.</translation>
     </message>
     <message>
         <source>100Mbps</source>
@@ -5758,7 +5901,7 @@ Su grabber no proporciona números de canal, así que debe establecerlos manualm
     </message>
     <message>
         <source>Only MPEG2TS is supported at this time.</source>
-        <translation>Sólo se soporta MPEG2TS actualmente.</translation>
+        <translation type="obsolete">Sólo se soporta MPEG2TS actualmente.</translation>
     </message>
     <message>
         <source>Allow channel jumping in guide</source>
@@ -5951,7 +6094,7 @@ La mayoría de las tarjetas pueden autodetectar, así que déjelo en Auto a no s
     </message>
     <message>
         <source>This section lists each transport that MythTV currently knows about. The display fields are Frequency, SymbolRate, NetworkID, and TransportID </source>
-        <translation>Esta sección lista cada transporte que conoce MythTV. Los campos mostrados son Frecuencia, SymbolRate, IDRed, e IDTransporte </translation>
+        <translation type="obsolete">Esta sección lista cada transporte que conoce MythTV. Los campos mostrados son Frecuencia, SymbolRate, IDRed, e IDTransporte </translation>
     </message>
     <message>
         <source>Standard</source>
@@ -5960,7 +6103,7 @@ La mayoría de las tarjetas pueden autodetectar, así que déjelo en Auto a no s
     <message>
         <source>Digital TV standard.
 </source>
-        <translation>Estándar TV digital.
+        <translation type="obsolete">Estándar TV digital.
 </translation>
     </message>
     <message>
@@ -5973,19 +6116,19 @@ La mayoría de las tarjetas pueden autodetectar, así que déjelo en Auto a no s
     </message>
     <message>
         <source>Modulation Used</source>
-        <translation>Modulación usada</translation>
+        <translation type="obsolete">Modulación usada</translation>
     </message>
     <message>
         <source>8VSB</source>
-        <translation>8VSB</translation>
+        <translation type="obsolete">8VSB</translation>
     </message>
     <message>
         <source>QAM64</source>
-        <translation>QAM64</translation>
+        <translation type="obsolete">QAM64</translation>
     </message>
     <message>
         <source>QAM256</source>
-        <translation>QAM256</translation>
+        <translation type="obsolete">QAM256</translation>
     </message>
     <message>
         <source>Bandwidth (Default: Auto)</source>
@@ -5993,7 +6136,7 @@ La mayoría de las tarjetas pueden autodetectar, así que déjelo en Auto a no s
     </message>
     <message>
         <source>DVB Transport</source>
-        <translation>Transporte DVB</translation>
+        <translation type="obsolete">Transporte DVB</translation>
     </message>
     <message>
         <source>Transport Options</source>
@@ -6151,11 +6294,11 @@ La mayoría de las tarjetas pueden autodetectar, así que déjelo en Auto a no s
     </message>
     <message>
         <source>File location</source>
-        <translation>Localización del fichero</translation>
+        <translation type="obsolete">Localización del fichero</translation>
     </message>
     <message>
         <source>Location of the channels.conf file.</source>
-        <translation>Localización del fichero channels.conf.</translation>
+        <translation type="obsolete">Localización del fichero channels.conf.</translation>
     </message>
     <message>
         <source>Scan Type</source>
@@ -6171,7 +6314,7 @@ La mayoría de las tarjetas pueden autodetectar, así que déjelo en Auto a no s
     </message>
     <message>
         <source>Automatically transcode when a recording is made using this profile and the recording&apos;s schedule is configurd to allow transcoding.</source>
-        <translation>Recodificar automáticamente cuando una grabación se haga con este perfil y la programación lo permita.</translation>
+        <translation type="obsolete">Recodificar automáticamente cuando una grabación se haga con este perfil y la programación lo permita.</translation>
     </message>
     <message>
         <source>Autodetect</source>
@@ -6211,7 +6354,7 @@ La mayoría de las tarjetas pueden autodetectar, así que déjelo en Auto a no s
     </message>
     <message>
         <source>Default group filter to apply on the View Recordings screen.</source>
-        <translation>Grupo filtros por defecto a aplicar en la ventana de Ver Grabaciones</translation>
+        <translation type="obsolete">Grupo filtros por defecto a aplicar en la ventana de Ver Grabaciones</translation>
     </message>
     <message>
         <source>Save current group filter when changed</source>
@@ -6223,39 +6366,39 @@ La mayoría de las tarjetas pueden autodetectar, así que déjelo en Auto a no s
     </message>
     <message>
         <source>Default View</source>
-        <translation>Vista por defecto</translation>
+        <translation type="obsolete">Vista por defecto</translation>
     </message>
     <message>
         <source>Show Titles only</source>
-        <translation>Mostrar solo Títulos</translation>
+        <translation type="obsolete">Mostrar solo Títulos</translation>
     </message>
     <message>
         <source>Show Titles and Categories</source>
-        <translation>Mostrar Títulos y Categorías</translation>
+        <translation type="obsolete">Mostrar Títulos y Categorías</translation>
     </message>
     <message>
         <source>Show Titles, Categories, and Recording Groups</source>
-        <translation>Mostrar Títulos, Categorías y Grupos Grabación</translation>
+        <translation type="obsolete">Mostrar Títulos, Categorías y Grupos Grabación</translation>
     </message>
     <message>
         <source>Show Titles and Recording Groups</source>
-        <translation>Mostrar Títulos y Grupos Grabación</translation>
+        <translation type="obsolete">Mostrar Títulos y Grupos Grabación</translation>
     </message>
     <message>
         <source>Show Categories only</source>
-        <translation>Mostrar sólo Categorías</translation>
+        <translation type="obsolete">Mostrar sólo Categorías</translation>
     </message>
     <message>
         <source>Show Categories and Recording Groups</source>
-        <translation>Mostrar Categorías y Grupos Grabación</translation>
+        <translation type="obsolete">Mostrar Categorías y Grupos Grabación</translation>
     </message>
     <message>
         <source>Show Recording Groups only</source>
-        <translation>Mostrar sólo Grupos Grabación</translation>
+        <translation type="obsolete">Mostrar sólo Grupos Grabación</translation>
     </message>
     <message>
         <source>Select what type of grouping to show on the Watch Recordings screen by default.</source>
-        <translation>Seleccione el tipo de agrupado a mostrar en la pantalla Ver Grabaciones por defecto.</translation>
+        <translation type="obsolete">Seleccione el tipo de agrupado a mostrar en la pantalla Ver Grabaciones por defecto.</translation>
     </message>
     <message>
         <source>Show filter name instead of &quot;All Programs&quot;</source>
@@ -6465,7 +6608,7 @@ Myth saldrá ahora.</translation>
     </message>
     <message>
         <source>Disk usage on %1:</source>
-        <translation>Uso de disco en %1:</translation>
+        <translation type="obsolete">Uso de disco en %1:</translation>
     </message>
     <message>
         <source>Adjust the relative timezone of the XMLTV EPG data read by mythfilldatabase.  &apos;Auto&apos; converts the XMLTV time to local time using your computer&apos;s timezone.  &apos;None&apos; ignores the XMLTV timezone, interpreting times as local.</source>
@@ -6554,7 +6697,7 @@ Myth saldrá ahora.</translation>
     </message>
     <message>
         <source>Channel Separator</source>
-        <translation>Separador canales</translation>
+        <translation type="obsolete">Separador canales</translation>
     </message>
     <message>
         <source>What to use to separate ATSC major and minor channels.</source>
@@ -7008,11 +7151,11 @@ Myth saldrá ahora.</translation>
     </message>
     <message>
         <source>ATSC Modulation</source>
-        <translation>Modulación ATSC</translation>
+        <translation type="obsolete">Modulación ATSC</translation>
     </message>
     <message>
         <source>ATSC modulation, 8-VSB, QAM-256, etc.</source>
-        <translation>Modulación ATSC. 8-VSB, QAM-256, etc.</translation>
+        <translation type="obsolete">Modulación ATSC. 8-VSB, QAM-256, etc.</translation>
     </message>
     <message>
         <source>Most cable systems in the United States use QAM-256 or QAM-64, but some mixed systems may use 8-VSB for over-the-air channels.</source>
@@ -7044,11 +7187,11 @@ Myth saldrá ahora.</translation>
     </message>
     <message>
         <source>IEEE-1394 Port</source>
-        <translation>Puerto IEE-1394</translation>
+        <translation type="obsolete">Puerto IEE-1394</translation>
     </message>
     <message>
         <source>Node</source>
-        <translation>Nodo</translation>
+        <translation type="obsolete">Nodo</translation>
     </message>
     <message>
         <source>Speed</source>
@@ -7112,7 +7255,7 @@ Myth saldrá ahora.</translation>
     </message>
     <message>
         <source>nvram-wakeup Command</source>
-        <translation>Comando nvram-wakeup</translation>
+        <translation type="obsolete">Comando nvram-wakeup</translation>
     </message>
     <message>
         <source>Command to set the wakeup time in the BIOS. See the README file for more examples.</source>
@@ -7576,11 +7719,11 @@ Myth saldrá ahora.</translation>
     </message>
     <message>
         <source>Radio channels.</source>
-        <translation>Canales de Radio.</translation>
+        <translation type="obsolete">Canales de Radio.</translation>
     </message>
     <message>
         <source>If set, radio channels will also be included.</source>
-        <translation>Si está activado, los canales de radio se incluirán.</translation>
+        <translation type="obsolete">Si está activado, los canales de radio se incluirán.</translation>
     </message>
     <message>
         <source>All Available Methods</source>
@@ -8200,11 +8343,11 @@ Myth saldrá ahora.</translation>
     </message>
     <message>
         <source>URL</source>
-        <translation>URL</translation>
+        <translation type="obsolete">URL</translation>
     </message>
     <message>
         <source>URL of the incoming stream (ex.: udp://?localport=1234)</source>
-        <translation>URL del stream entrante (ej.: udp://?localport=1234)</translation>
+        <translation type="obsolete">URL del stream entrante (ej.: udp://?localport=1234)</translation>
     </message>
     <message>
         <source>HDHomeRun DTV tuner box</source>
@@ -8212,7 +8355,7 @@ Myth saldrá ahora.</translation>
     </message>
     <message>
         <source>CRC IP Network Recorder</source>
-        <translation>CRC Grabador IP</translation>
+        <translation type="obsolete">CRC Grabador IP</translation>
     </message>
     <message>
         <source>This defines the offset (in Hz) the frequency coming from the LNB will be in high setting.</source>
@@ -8481,19 +8624,19 @@ Myth saldrá ahora.</translation>
     </message>
     <message>
         <source>Freebox MRL</source>
-        <translation>MRL Freebox</translation>
+        <translation type="obsolete">MRL Freebox</translation>
     </message>
     <message>
         <source>The FreeBox Media Resource Locator (MRL).</source>
-        <translation>La Media Resource Locator (MRL) del FreeBox.</translation>
+        <translation type="obsolete">La Media Resource Locator (MRL) del FreeBox.</translation>
     </message>
     <message>
         <source>Freebox Network Recorder</source>
-        <translation>Grabador Freebox</translation>
+        <translation type="obsolete">Grabador Freebox</translation>
     </message>
     <message>
         <source>DVB options</source>
-        <translation>Opciones DVB</translation>
+        <translation type="obsolete">Opciones DVB</translation>
     </message>
     <message>
         <source>channel number</source>
@@ -8572,19 +8715,7 @@ Compruebe que el video existe</translation>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Device ID from the back of the HDHomeRun unit.  You may use &apos;FFFFFFFF&apos; if there is only one unit on your your network.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Experimental</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Use Vector-enhanced color space conversion</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>If checked, YUV 4:2:0 will be converted to UYVY 4:2:2 in an Altivec/MMX enabled routine.  If unchecked, QuickTime will handle the conversion instead.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -8596,7 +8727,459 @@ Compruebe que el video existe</translation>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Some filesystems use a lot of resources when deleting large recording files.  This option makes Myth delete the file slowly to lessen the impact.</source>
+        <source>Host Port</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The port number the database is running on, if it&apos;s not the default database port.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Analog</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This section lists each transport that MythTV currently knows about. The display fields are video source, modulation, frequency, and when relevant symbol rate, network id, and transport id.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sorry, the Transport Editor can only be used to edit transports which are connected to a card input.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failed to probe a capture card connected to this transport&apos;s video source. Please make sure the backend is not running.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The Video Sources to which this Transport is connected are incompatible, please create seperate video sources for these cards. </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Digital TV Standard</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Guiding standard to use for making sense of the data streams after they have been demodulated, error corrected and demultiplexed.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>OpenCable</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>MPEG</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Frequency (Option has no default).
+The frequency for this channel in</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Modulation, aka Constellation</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>QAM Auto</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>seconds</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>(%3 behind)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>(%3 remaining)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>DVD Menu Not Available</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Group</source>
+        <comment>Play Group</comment>
+        <translation type="unfinished">Grupo</translation>
+    </message>
+    <message>
+        <source>f</source>
+        <comment>RecStatusChar rsFailed</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>O</source>
+        <comment>RecStatusChar rsOtherShowing</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recorder Failed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Other Showing</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>the recording failed.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>this episode will be recorded on a different channel at this time.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Last Recorded</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Next Recording</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Watch List Score</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Auto-expire off</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Marked as &apos;watched&apos;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Not the earliest episode</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recently deleted episode</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Watch List Status</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Storage Group</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>SAP/Bilingual</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Main Language</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>SAP Language</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Dual</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Chooses the language(s) to record when two languages are broadcast. Only Layer II supports the recording of two languages (Dual).Requires ivtv 0.4.0 or later.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Automatically transcode when a recording is made using this profile and the recording&apos;s schedule is configured to allow transcoding.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Width to use for encoding. Note: PVR-x50 cards may produce ghosting if this is not set to 720 or 768 for NTSC and PAL, respectively.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Height to use for encoding. Note: PVR-x50 cards may produce ghosting if this is not set to 480 or 576 for NTSC and PAL, respectively.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Modulation, 8-VSB, QAM-256, etc.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>ATSC Channel Separator</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Include in the &quot;%1&quot; recording group</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Exclude unidentified episodes</source>
+        <translation type="unfinished">Excluir episodios sin identificar</translation>
+    </message>
+    <message>
+        <source>Exclude old episodes</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select Storage Group</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Store in the &quot;%1&quot; storage group</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>LiveTV</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Listings grabber</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>GUID</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Generic</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>800Mbps</source>
+        <translation type="unfinished">800Mbps</translation>
+    </message>
+    <message>
+        <source>IP address or Device ID from the bottom of the HDHomeRun.  You may use &apos;FFFFFFFF&apos; if there is only one unit on your your network.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>M3U URL</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>URL of M3U containing IPTV channel URLs.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Network Recorder</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unencrypted channels only</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If set, only unencrypted channels will be tuned to by MythTV or not be ignored by the MythTV channel scanner.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Allow audio only channels</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If set, audio only channels will not be ignored by the MythTV channel scanner.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use quick tuning</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Never</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Always</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If enabled MythTV will tune using only the MPEG program number. The program numbers change more often than DVB or ATSC tuning parameters, so this is slightly less reliable.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Default group filter to apply on the Watch Recordings screen.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Auto Expire watched programs before unwatched</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If set, programs that have been marked as watched will be expired first</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Re-record watched programs</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If set, programs that have been marked as watched and are auto-expired will be re-recorded if they are shown again.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sort all sub-titles/multi-titles Ascending</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sort all sub-titles/multi-titles Descending</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sort sub-titles Descending, multi-titles Ascending</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sort sub-titles Ascending, multi-titles Descending</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Selects how to sort show episodes. Sub-titles refers to the episodes listed under a specific show title. Multi-title refers to sections (e.g. &quot;All Programs&quot;) which list multiple titles. Sections in parentheses are not affected.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Episode sort orderings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Theme cache size</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Maximum number of prescaled themes to cache.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Always stream recordings from the backend</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enable this setting if you want MythTV to always stream files from a remote backend instead of directly reading a recording file if it is accessible locally.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Jump to Program OSD</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Set the choice between viewing the current recording group in the OSD, or showing the &apos;Watch Recording&apos; screen when &apos;Jump to Program&apos; is activated. If set, the recordings are shown in the OSD</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Automatically mark a record watched</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If set, when you exit near the end of a recording it will be marked as watched. The automatic detection is not foolproof, so do not enable this setting if you don&apos;t want an unwatched recording marked as watched.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sets the Title sorting order when the view is set to Titles only.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Include the &apos;Watch List&apos; group</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The &apos;Watch List&apos; is an abbreviated list of recordings sorted to highlight series and shows that need attention in order to keep up to date.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Start from the Watch List view</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If set, the &apos;Watch List&apos; will be the initial view each time you enter the Watch Recordings screen</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Exclude recordings not set for Auto-Expire</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Set this if you turn off auto-expire only for recordings that you&apos;ve seen and intend to keep. This option will exclude these recordings from the &apos;Watch List&apos;.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Maximum days counted in the score</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The &apos;Watch List&apos; scores are based on 1 point equals one day since recording. This option limits the maximum score due to age and affects other weighting factors.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Days to exclude weekly episodes after delete</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>When an episode is deleted or marked as watched, other episodes of the series are excluded from the &apos;Watch List&apos; for this interval of time. Daily shows also have a smaller interval based on this setting.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This setting and the following one define a time period when the mythfilldatabase process is allowed to run.  For example, setting Start to 11 and End to 13 would mean that the process would only run between 11 AM and 1 PM.</source>
+        <translation type="unfinished">Este ajuste y el siguiente definen un periodo de tiempo en el que permite ejecutarse a mythfilldatabase.  Por ejemplo, fijando el comienzo a las 11 y el fin a las 13 significaría que el proceso sólo podría ejecutarse entre las 11 AM y la 1 PM.</translation>
+    </message>
+    <message>
+        <source>This setting and the preceding one define a time period when the mythfilldatabase process is allowed to run.  For example, setting Start to 11 and End to 13 would mean that the process would only run between 11 AM and 1 PM.</source>
+        <translation type="unfinished">Este ajuste y el anterior definen un periodo de tiempo en el que permite ejecutarse a mythfilldatabase.  Por ejemplo, fijando el comienzo a las 11 y el fin a las 13 significaría que el proceso sólo podría ejecutarse entre las 11 AM y la 1 PM.</translation>
+    </message>
+    <message>
+        <source>mythfilldatabase Program</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use &apos;mythfilldatabase&apos; or the name of a custom script that will populate the program guide info for all your video sources.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>View Recordings (Views)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Decoder Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Schedule Status</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Schedule Status shows current statistics from the scheduler.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Total Disk Space:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>MythTV Drive #%1:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Directories:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Directory:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Some filesystems use a lot of resources when deleting large recording files.  This option makes Myth delete the file slowly on this backend to lessen the impact.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Backend Setup</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No Storage Group directories are defined.  You must add at least one directory to the Default Storage Group where new recordings will be stored.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Command to Set Wakeup Time</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The format of the time string passed to the &apos;Set Wakeup Time Command&apos; as $time. See QT::QDateTime.toString() for details. Set to &apos;time_t&apos; for seconds since epoch (use time_t for nvram_wakeup).</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -8674,10 +9257,28 @@ Compruebe que el video existe</translation>
     </message>
 </context>
 <context>
+    <name>ScanWizard</name>
+    <message>
+        <source>ScanWizard</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Error parsing parameters</source>
+        <translation type="unfinished">Error analizando parámetros</translation>
+    </message>
+</context>
+<context>
+    <name>ScanWizardConfig</name>
+    <message>
+        <source>Scan Configuration</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>ScanWizardScanType</name>
     <message>
         <source>Scan Type</source>
-        <translation>Tipo de exploración</translation>
+        <translation type="obsolete">Tipo de exploración</translation>
     </message>
 </context>
 <context>
@@ -8696,7 +9297,7 @@ Compruebe que el video existe</translation>
     </message>
     <message>
         <source>Error parsing parameters</source>
-        <translation type="unfinished">Error analizando parámetros</translation>
+        <translation type="obsolete">Error analizando parámetros</translation>
     </message>
     <message>
         <source>Error starting scan</source>
@@ -8803,6 +9404,14 @@ Sin más detalles</translation>
         <source>is unavailable</source>
         <translation>no está disponible</translation>
     </message>
+    <message>
+        <source>standard rules are defined</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>search rules are defined</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>TV</name>
@@ -8828,7 +9437,7 @@ Sin más detalles</translation>
     </message>
     <message>
         <source>You are exiting this recording</source>
-        <translation>Está saliendo de la grabación</translation>
+        <translation type="obsolete">Está saliendo de la grabación</translation>
     </message>
     <message>
         <source>Save this position and go to the menu</source>
@@ -9140,11 +9749,11 @@ Sin más detalles</translation>
     </message>
     <message>
         <source>You are exiting this video</source>
-        <translation>Está saliendo del video</translation>
+        <translation type="obsolete">Está saliendo del video</translation>
     </message>
     <message>
         <source>Exit to the menu</source>
-        <translation>Salir al menú</translation>
+        <translation type="obsolete">Salir al menú</translation>
     </message>
     <message>
         <source>Brightness</source>
@@ -9531,6 +10140,75 @@ Sin más detalles</translation>
         <source>Rotor %1%</source>
         <translation>Rotor %1%</translation>
     </message>
+    <message>
+        <source>Chan %1: %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>All Tuners are Busy.
+Select a Current Recording</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>End Of Recording</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Last Program: %1 Doesn&apos;t Exist</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Delete this recording?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>DVD</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Menu</source>
+        <translation type="unfinished">Menú</translation>
+    </message>
+    <message>
+        <source>Still Frame</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Title: %1 (%2)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Chapter: %1/%2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>DVD Chapter Menu</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>You are exiting this %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>You are exiting this Video/DVD</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Keep Watching</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Exit Video</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&apos;%1&apos; Group Password:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Password Failed</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ThemeUI</name>
@@ -9732,6 +10410,40 @@ Sin más detalles</translation>
     </message>
 </context>
 <context>
+    <name>TransportList</name>
+    <message>
+        <source>New Transport</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>TransportListEditor</name>
+    <message>
+        <source>Are you sure you would like to delete this transport?</source>
+        <translation type="unfinished">¿Está seguro de borrar este transporte?</translation>
+    </message>
+    <message>
+        <source>Yes, delete the transport</source>
+        <translation type="unfinished">Sí, borrar este transporte</translation>
+    </message>
+    <message>
+        <source>No, don&apos;t</source>
+        <translation type="unfinished">No</translation>
+    </message>
+    <message>
+        <source>Transport Menu</source>
+        <translation type="unfinished">Menú de transportes</translation>
+    </message>
+    <message>
+        <source>Edit..</source>
+        <translation type="unfinished">Editar..</translation>
+    </message>
+    <message>
+        <source>Delete..</source>
+        <translation type="unfinished">Borrar..</translation>
+    </message>
+</context>
+<context>
     <name>UIManagedTreeListType</name>
     <message>
         <source>Search</source>
@@ -9805,6 +10517,13 @@ Sin más detalles</translation>
     </message>
 </context>
 <context>
+    <name>VideoSourceSelector</name>
+    <message>
+        <source>Video Source</source>
+        <translation type="unfinished">Fuente de video</translation>
+    </message>
+</context>
+<context>
     <name>ViewScheduleDiff</name>
     <message>
         <source>All</source>
@@ -9836,6 +10555,10 @@ Sin más detalles</translation>
     <message>
         <source>Important</source>
         <translation>Importantes</translation>
+    </message>
+    <message>
+        <source>Delete &apos;%1&apos; %2 rule?</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
