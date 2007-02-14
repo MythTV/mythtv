@@ -95,9 +95,9 @@ show_help(){
   #echo "  --extra-ldflags=ELDFLAGS add ELDFLAGS to LDFLAGS [$LDFLAGS]"
   #echo "  --extra-libs=ELIBS       add ELIBS [$ELIBS]"
   #echo "  --build-suffix=SUFFIX    suffix for application specific build []"
-  echo "  --cpu=CPU                only use instructions available on CPU [$cpu]"
+  echo "  --arch=CPU               only use instructions available on ARCH [$arch]"
   echo "  --tune=CPU               tune instruction usage for a particular CPU [$tune]"
-  echo "  --arch=CPU               equivalent to \"--cpu=CPU --tune=CPU\""
+  echo "  --cpu=CPU                equivalent to \"--arch=CPU --tune=CPU\""
   #echo "  --powerpc-perf-enable    enable performance report on PPC (requires enabling PMC)"
   echo "  --enable-proc-opt        enable processor specific compilation"
   echo "  --disable-mmx            disable mmx usage"
@@ -627,8 +627,8 @@ ar="ar"
 ranlib="ranlib"
 make="make"
 strip="strip"
-cpu=`uname -m`
-cpu_raw="$cpu"
+arch=`uname -m`
+arch_raw="$cpu"
 processor=`uname -p 2>/dev/null`
 processor_flags=""
 tune="generic"
@@ -692,7 +692,7 @@ if test x"$CXX" != x"" ; then
 fi
 
 if test -f /proc/cpuinfo ; then
-    if test x"$processor" = x"" -o x"$processor" = x"$cpu_raw" -o \
+    if test x"$processor" = x"" -o x"$processor" = x"$arch_raw" -o \
             x"$processor" = x"unknown" ; then
         processor=`cat /proc/cpuinfo | grep "model name" | head -n 1`
     fi
@@ -701,7 +701,7 @@ fi
 
 # Mac OS X equivalent
 if test -f /usr/bin/hostinfo ; then 
-    if test x"$processor" = x"" -o x"$processor" = x"$cpu_raw" -o \
+    if test x"$processor" = x"" -o x"$processor" = x"$arch_raw" -o \
             x"$processor" = x"unknown" -o x"$processor" = x"powerpc" ; then 
         processor=`/usr/bin/hostinfo | grep "Processor type:"` 
         processor=${processor#Processor type: *} 
@@ -720,9 +720,9 @@ fi
 cpu_overide="no"
 for opt do
   case "$opt" in
-  --cpu=*)
-          cpu=`echo $opt | cut -d '=' -f 2`
-          cpu_raw="$cpu"
+  --arch=*)
+          arch=`echo $opt | cut -d '=' -f 2`
+          arch_raw="$arch"
           processor=""
           processor_flags=""
           cpu_overide="yes"
@@ -733,15 +733,15 @@ for opt do
           processor=""
           processor_flags=""
   ;;
-  --arch=*)
+  --cpu=*)
           arch=`echo $opt | cut -d '=' -f 2`
-          cpu_overide="yes"
+          arch_raw="$arch"
           cpu="$arch"
-          cpu_raw="$arch"
           tune="$arch"
           tune_raw="$arch"
           processor=""
           processor_flags=""
+          cpu_overide="yes"
   ;;
   esac
 done
@@ -750,16 +750,16 @@ is_x86_cpu() {
     expr ",${x86_cpus}," : ".*,$1," > /dev/null
 }
 
-if is_x86_cpu "$cpu" ; then
-    cpu="x86"
+if is_x86_cpu "$arch" ; then
+    arch="x86_32"
 fi
 
 is_x86_64_cpu() {
     expr ",${x86_64_cpus}," : ".*,$1," > /dev/null
 }
 
-if is_x86_64_cpu "$cpu" ; then
-    cpu="x86_64"
+if is_x86_64_cpu "$arch" ; then
+    arch="x86_64"
 fi
 
 is_x86_cmov_cpu() {
@@ -770,64 +770,64 @@ is_x86_slow_cmov_cpu() {
     expr ",${x86_slow_cmov_cpus}," : ".*,$1," > /dev/null
 }
 
-case "$cpu" in
-  x86)
-    if is_x86_cmov_cpu "$cpu_raw" ; then
+case "$arch" in
+  x86_32)
+    if is_x86_cmov_cpu "$arch_raw" ; then
         cmov="yes"
-        if ! is_x86_slow_cmov_cpu "$cpu_raw" ; then
+        if ! is_x86_slow_cmov_cpu "$arch_raw" ; then
             cmov_is_fast="yes"
         fi
     fi
   ;;
   x86_64)
-    cpu="x86"
+    arch="x86_32"
     canon_arch="`$cc -dumpmachine | sed -e 's,\([^-]*\)-.*,\1,'`"
     if [ x"$canon_arch" = x"x86_64" -o x"$canon_arch" = x"amd64" ]; then
       if [ -z "`echo $CFLAGS | grep -- -m32`"  ]; then
-        cpu="x86_64"
+        arch="x86_64"
       fi
     fi
     cmov="yes"
-    if ! is_x86_slow_cmov_cpu "$cpu_raw" ; then
+    if ! is_x86_slow_cmov_cpu "$arch_raw" ; then
         cmov_is_fast="yes"
     fi
   ;;
   # armv4l is a subset of armv5tel
   armv4l|armv5tel)
-    cpu="armv4l"
+    arch="armv4l"
   ;;
   alpha)
-    cpu="alpha"
+    arch="alpha"
   ;;
   "Power Macintosh"|ppc|ppc64|powerpc)
-    cpu="powerpc"
+    arch="powerpc"
   ;;
   mips|mipsel|IP*)
-    cpu="mips"
+    arch="mips"
   ;;
   sun4u|sparc64)
-    cpu="sparc64"
+    arch="sparc64"
   ;;
   sparc)
-    cpu="sparc"
+    arch="sparc"
   ;;
   sh4)
-    cpu="sh4"
+    arch="sh4"
   ;;
   parisc|parisc64)
-    cpu="parisc"
+    arch="parisc"
   ;;
   s390|s390x)
-    cpu="s390"
+    arch="s390"
   ;;
   m68k)
-    cpu="m68k"
+    arch="m68k"
   ;;
   ia64)
-    cpu="ia64"
+    arch="ia64"
   ;;
   *)
-    cpu="unknown"
+    arch="unknown"
   ;;
 esac
 
@@ -1699,14 +1699,14 @@ is_x86_mmx() {
 # compute mmx state
 if test x"$mmx" = x"default"; then
     mmx="no"
-    if test x"$cpu" = x"x86_64"; then
+    if test x"$arch" = x"x86_64"; then
         mmx="yes"
     fi
-    if is_x86_mmx "$cpu_raw"; then
+    if is_x86_mmx "$arch_raw"; then
         mmx="yes"
     fi
 
-    # if !cpu && !tune && !arch & processor_flags, then...
+    # if !arch && !tune && !cpu & processor_flags, then...
     if test x"$cpu_overide" != x"yes" -a x"$tune_raw" = x"" -a \
             x"$processor_flags" != x"" ; then
         mmx="no"
@@ -1751,7 +1751,7 @@ fi
 
 # Can only do AltiVec on PowerPC
 if test $altivec = "default"; then
-    if test $cpu = "powerpc"; then
+    if test $arch = "powerpc"; then
         altivec="yes"
     else
         altivec="no"
@@ -1815,7 +1815,7 @@ if test $tune != "generic"; then
 fi
 
 if test x"$cpu_overide" = x"yes"; then
-    ARCHFLAGS="-mcpu=$cpu_raw $ARCHFLAGS"
+    ARCHFLAGS="-mcpu=$arch_raw $ARCHFLAGS"
 fi
 
 # make sure we can execute files in $TMPDIR
@@ -1850,7 +1850,7 @@ fi
 
 # check for assembler specific support
 
-if test $cpu = "powerpc"; then
+if test $arch = "powerpc"; then
 check_cc <<EOF && dcbzl=yes
 int main(void) {
     register long zero = 0;
@@ -1864,7 +1864,7 @@ fi
 # check for SIMD availability
 #
 # AltiVec flags: The FSF version of GCC differs from the Apple version
-if test $cpu = "powerpc"; then
+if test $arch = "powerpc"; then
     if test $altivec = "yes"; then
         if test -n "`$cc -v 2>&1 | grep version | grep Apple`"; then
             ARCHFLAGS="$ARCHFLAGS -faltivec"
@@ -1894,8 +1894,8 @@ EOF
 fi
 
 # if either tune or cpu is c3 or c3-2 optimize for smallness
-if test x"$cpu_raw" = x"c3" -o x"$cpu_raw" = x"c3-2"; then
-    ARCHFLAGS="-march=$cpu"
+if test x"$arch_raw" = x"c3" -o x"$arch_raw" = x"c3-2"; then
+    ARCHFLAGS="-march=$arch"
     optimize="small"
 fi
 if test x"$tune" = x"c3" -o x"$tune" = x"c3-2"; then
@@ -1932,7 +1932,7 @@ if test x"$tune" = x"generic" -a x"$cpu_overide" != x"yes"; then
 # P6, which includes Intel Core
    elif expr "$processor" : ".*Intel P6 Family" > /dev/null ; then 
        ARCHFLAGS="-march=pentium4" 
-       #cpu_raw="i686" 
+       #arch_raw="i686" 
 # P3
    elif expr "$processor" : "pentium3" > /dev/null ; then
        ARCHFLAGS="-march=pentium3"
@@ -2000,45 +2000,45 @@ if test x"$tune" = x"generic" -a x"$cpu_overide" != x"yes"; then
    elif expr "$processor" : ".*VIA Esther" > /dev/null ; then
        ARCHFLAGS="-march=c3-2"
        optimize="small"
-       cpu_raw="c3-2"
+       arch_raw="c3-2"
    elif expr "$processor" : ".*VIA Nehemiah" > /dev/null ; then
        ARCHFLAGS="-march=c3-2"
        optimize="small"
-       cpu_raw="c3-2"
+       arch_raw="c3-2"
 # c3
    elif expr "$processor" : ".*VIA.*Ezra" > /dev/null ; then
        ARCHFLAGS="-march=c3"
        optimize="small"
-       cpu_raw="c3"
+       arch_raw="c3"
    elif expr "$processor" : ".*VIA Samuel" > /dev/null ; then
        ARCHFLAGS="-march=c3"
        optimize="small"
-       cpu_raw="c3"
+       arch_raw="c3"
 
-# if no known processor info, tune base on cpu_raw info
-   elif test x"$cpu_raw" = x"i686" -a x"$mmx" = x"yes" ; then
+# if no known processor info, tune base on arch_raw info
+   elif test x"$arch_raw" = x"i686" -a x"$mmx" = x"yes" ; then
        ARCHFLAGS="-march=pentium2"
        proc_error_msg="yes"
-   elif test x"$cpu_raw" = x"i686" -a x"$mmx" = x"no" ; then
+   elif test x"$arch_raw" = x"i686" -a x"$mmx" = x"no" ; then
        ARCHFLAGS="-march=pentiumpro"
        proc_error_msg="yes"
-   elif test x"$cpu_raw" = x"i586" -a x"$mmx" = x"yes" ; then
+   elif test x"$arch_raw" = x"i586" -a x"$mmx" = x"yes" ; then
        ARCHFLAGS="-march=pentium-mmx"
        proc_error_msg="yes"
-   elif test x"$cpu_raw" = x"i586" -a x"$mmx" = x"no" ; then
+   elif test x"$arch_raw" = x"i586" -a x"$mmx" = x"no" ; then
        ARCHFLAGS="-march=i586"
        proc_error_msg="yes"
-   elif test x"$cpu_raw" = x"i486"; then
+   elif test x"$arch_raw" = x"i486"; then
        ARCHFLAGS="-march=i486"
        proc_error_msg="yes"
-   elif test x"$cpu_raw" = x"i386"; then
+   elif test x"$arch_raw" = x"i386"; then
        ARCHFLAGS="-march=i386"
        proc_error_msg="yes"
    fi
 fi
-if test x"$tune" = x"generic" -a x"$cpu" = x"x86_64" -a x"$cpu_overide" != x"yes"; then
+if test x"$tune" = x"generic" -a x"$arch" = x"x86_64" -a x"$cpu_overide" != x"yes"; then
    ARCHFLAGS="-march=k8"
-elif test x"$tune" = x"generic" -a x"$cpu" = x"sparc64" -a x"$cpu_overide" != x"yes"; then
+elif test x"$tune" = x"generic" -a x"$arch" = x"sparc64" -a x"$cpu_overide" != x"yes"; then
    ARCHFLAGS="-mcpu=ultrasparc -mvis"
 fi
 
@@ -2069,9 +2069,9 @@ if test x"$proc_opt" = x"no"; then
     fi
 fi
 
-# if arch flag is present ignore tune and cpu and just use arch
-if test x"$arch" != x""; then
-    ARCHFLAGS="-march=$arch"
+# if cpu flag is present ignore tune and arch and just use cpu
+if test x"$cpu" != x""; then
+    ARCHFLAGS="-march=$cpu"
 fi
 
 # if architecture specific flags don't work blank them
@@ -2087,7 +2087,7 @@ if test x"$ARCHFLAGS" = x""; then
 fi
 
 # check armv5te instructions support
-if test $armv5te = "default" -a $cpu = "armv4l"; then
+if test $armv5te = "default" -a $arch = "armv4l"; then
     armv5te=no
     check_cc <<EOF && armv5te=yes
         int main(void) {
@@ -2097,7 +2097,7 @@ EOF
 fi
 
 # check iwmmxt support
-if test $iwmmxt = "default" -a $cpu = "armv4l"; then
+if test $iwmmxt = "default" -a $arch = "armv4l"; then
     iwmmxt=no
     check_cc <<EOF && iwmmxt=yes
         int main(void) {
@@ -2108,7 +2108,7 @@ fi
 
 # mmi only available on mips
 if test $mmi = "default"; then
-    if test $cpu = "mips"; then
+    if test $arch = "mips"; then
         mmi="yes"
     else
         mmi="no"
@@ -2208,7 +2208,7 @@ int main(int argc, char ** argv){
 EOF
 else
     # programs cannot be launched if cross compiling, so make a static guess
-    if test "$cpu" = "powerpc" -o "$cpu" = "mips" ; then
+    if test "$arch" = "powerpc" -o "$arch" = "mips" ; then
         bigendian="yes"
     fi
 fi
@@ -2649,7 +2649,7 @@ fi
 if test "$lshared" = "yes" ; then
     # LIBOBJFLAGS may have already been set in the OS configuration
     if test -z "$LIBOBJFLAGS" ; then
-        case "$cpu" in
+        case "$arch" in
             x86_64|ia64|alpha|sparc*) LIBOBJFLAGS="\$(PIC)" ;;
         esac
     fi
@@ -2946,7 +2946,7 @@ fi
 
 echo "# Basic Settings"
 echo "Compile type     $compile_type"
-if test x"$compile_type" = x"debug" -a $cpu = "x86" -a \
+if test x"$compile_type" = x"debug" -a $arch = "x86_32" -a \
         x"$GCC_MAJOR" != x"" -a $GCC_MAJOR -lt "4"; then
     echo "WARNING: backtraces involving libavcodec are not supported for gcc < 4.0"
 fi
@@ -2957,29 +2957,29 @@ echo "Install prefix   $PREFIX"
 #echo "C compiler       $cc"
 #echo "make             $make"
 if test x"$processor" != x"" ; then
-    echo "CPU              $cpu ($processor)"
-elif test x"$cpu_raw" != x"" ; then
-    echo "CPU              $cpu ($cpu_raw)"
+    echo "CPU              $arch ($processor)"
+elif test x"$arch_raw" != x"" ; then
+    echo "CPU              $arch ($arch_raw)"
 else
-    echo "CPU              $cpu"
+    echo "CPU              $arch"
 fi
 #if test "$BUILDSUF" != ""; then
 #    echo "Build suffix     $BUILDSUF"
 #fi
 echo "big-endian       $bigendian"
-if test $cpu = "x86" -o $cpu = "x86_32" -o $cpu = "x86_64"; then
+if test $arch = "x86_32" -o $arch = "x86_64"; then
     echo "MMX enabled      $mmx"
     #echo "CMOV enabled     $cmov"
     #echo "CMOV is fast     $cmov_is_fast"
 fi
-if test $cpu = "armv4l"; then
+if test $arch = "armv4l"; then
     echo "ARMv5TE enabled           $armv5te"
     echo "IWMMXT enabled            $iwmmxt"
 fi
-if test $cpu = "mips"; then
+if test $arch = "mips"; then
     echo "MMI enabled               $mmi"
 fi
-if test $cpu = "powerpc"; then
+if test $arch = "powerpc"; then
     echo "AltiVec enabled           $altivec"
     echo "dcbzl available           $dcbzl"
 fi
@@ -3145,16 +3145,12 @@ echo "ECXXFLAGS=$ECXXFLAGS" >> $MYTH_CONFIG_MAK
 #echo "EXESUF=\${BUILDSUF}$EXESUF" >> $MYTH_CONFIG_MAK
 echo "TARGET_OS=$targetos" >> $MYTH_CONFIG_MAK
 
-ucarch=`toupper $cpu`
+ucarch=`toupper $arch`
 echo "TARGET_ARCH_${ucarch}=yes" >> $MYTH_CONFIG_MAK
 echo "#define ARCH_${ucarch} 1" >> $TMPH
 
 # special cases
-case "$cpu" in
-    x86)
-        echo "TARGET_ARCH_X86_32=yes" >> $MYTH_CONFIG_MAK
-        echo "#define ARCH_X86_32 1" >> $TMPH
-        ;;
+case "$arch" in
     x86_32|x86_64)
         echo "TARGET_ARCH_X86=yes" >> $MYTH_CONFIG_MAK
         echo "#define ARCH_X86 1" >> $TMPH
@@ -3400,7 +3396,7 @@ echo # add a newline after any warnings.
 
 if test x"$mmx" = x"yes"; then
   CONFIG_DEFINES="$CONFIG_DEFINES MMX"
-  if test x"$cpu" != x"x86_64" ; then
+  if test x"$arch" != x"x86_64" ; then
     CONFIG_DEFINES="$CONFIG_DEFINES i386"
   fi
 fi
