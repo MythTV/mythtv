@@ -446,7 +446,10 @@ CONFIG_LIST='
     amr_nb
     amr_nb_fixed
     amr_wb
+    audio_alsa
+    audio_arts
     audio_beos
+    audio_jack
     audio_oss
     avisynth
     beos_netserver
@@ -508,6 +511,7 @@ HAVE_LIST='
     gprof
     imlib2
     inet_aton
+    lmsensors
     localtime_r
     lrint
     lrintf
@@ -527,6 +531,16 @@ HAVE_LIST='
     sys_soundcard_h
     threads
     w32threads
+'
+
+MYTHTV_LIST='
+    dbox2_dvb_box
+    dvb
+    firewire_cable_box
+    iptv
+    ivtv
+    hdhomerun_box
+    video4linux
 '
 
 x86_mmx_cpus="pentium-mmx,pentium2,pentium3,pentium3m,pentium-m"
@@ -590,6 +604,15 @@ v4l2_demuxer_deps="video4linux2"
 video_grab_device_demuxer_deps_any="video4linux bktr"
 x11_grab_device_demuxer_deps="x11grab"
 
+# mythtv dependencies
+dbox2_dvb_box="backend"
+dvb="backend"
+firewire_cable_box="backend"
+iptv="backend"
+ivtv="backend video4linux"
+hdhomerun_box="backend"
+video4linux="backend"
+
 # set temporary file name
 if test ! -z "$TMPDIR" ; then
     TMPDIR1="${TMPDIR}"
@@ -650,7 +673,7 @@ dvb="no"
 dvb_path="/usr/include"
 lirc="yes"
 appleremote="no"
-joystick_menu="yes"
+joystick_menu="no"
 firewire_cable_box="yes"
 dbox2_dvb_box="yes"
 hdhomerun_box="yes"
@@ -680,7 +703,6 @@ symbol_visibility="no"
 frontend="yes"
 backend="no"
 opengl="no"
-
 bindings_perl="yes"
 
 if test x"$CC" != x"" ; then
@@ -943,7 +965,6 @@ extralibs="-lnet"
 fi ;;
 SunOS)
 video4linux="no"
-video4linux2="no"
 audio_oss="no"
 dv1394="no"
 make="gmake"
@@ -955,7 +976,6 @@ extralibs="$extralibs -lsocket -lnsl"
 ;;
 NetBSD)
 video4linux="no"
-video4linux2="no"
 bktr="yes"
 audio_oss="yes"
 dv1394="no"
@@ -964,10 +984,8 @@ extralibs="$extralibs -lossaudio"
 ;;
 OpenBSD)
 video4linux="no"
-video4linux2="no"
 bktr="yes"
 audio_oss="yes"
-joystick_menu="no"
 audio_alsa="no"
 audio_arts="no"
 audio_jack="no"
@@ -976,7 +994,6 @@ ivtv="no"
 dbox2_dvb_box="no"
 hdhomerun_box="yes"
 dvb="no"
-backend="no"
 need_memalign="no"
 make="gmake"
 LIBOBJFLAGS="\$(PIC)"
@@ -989,21 +1006,17 @@ extralibs="$extralibs -lossaudio"
 CCONFIG="$CCONFIG openbsd"
 ;;
 FreeBSD)
-joystick_menu="no"
-video4linux2="no"
 bktr="yes"
 audio_oss="yes"
 dv1394="no"
 make="gmake"
 need_memalign="no"
 backend="yes"
-video4linux="yes"
 CFLAGS="$CFLAGS -pthread"
 CCONFIG="$CCONFIG freebsd"
 ;;
 GNU/kFreeBSD)
 video4linux="no"
-video4linux2="no"
 bktr="yes"
 audio_oss="yes"
 dv1394="no"
@@ -1011,8 +1024,6 @@ CFLAGS="$CFLAGS -pthread"
 ;;
 BSD/OS)
 video4linux="no"
-joystick_menu="no"
-video4linux2="no"
 bktr="yes"
 audio_oss="yes"
 dv1394="no"
@@ -1029,7 +1040,6 @@ dvb="no"
 x11="no"
 lirc="no"
 appleremote="yes"
-joystick_menu="no"
 audio_oss="no"
 audio_alsa="no"
 audio_arts="no"
@@ -1062,7 +1072,6 @@ video4linux="no"
 ivtv="no"
 dvb="no"
 x11="no"
-joystick_menu="no"
 audio_oss="no"
 audio_alsa="no"
 audio_arts="no"
@@ -1080,14 +1089,12 @@ Linux)
 LDLATEFLAGS="-Wl,--as-needed $LDLATEFLAGS"
 CCONFIG="$CCONFIG linux"
 backend="yes"
-video4linux="yes"
-video4linux2="no"
+joystick_menu="yes"
 ;;
 IRIX*)
 targetos=IRIX
 ranlib="echo ignoring ranlib"
 video4linux="no"
-video4linux2="no"
 audio_oss="no"
 make="gmake"
 ;;
@@ -1108,7 +1115,6 @@ EXESUF=".exe"
 extralibs=""
 pkg_requires=""
 video4linux="no"
-video4linux2="no"
 audio_oss="no"
 dv1394="no"
 ffserver="no"
@@ -1520,9 +1526,7 @@ for opt do
   esac
 done
 
-if test x"$video4linux" = x"no" ; then
-  ivtv="no"
-fi
+check_deps $MYTH_LIST
 
 has_library()
 {
@@ -2273,8 +2277,20 @@ for thread in pthreads beosthreads os2threads w32threads; do
     fi
 done
 
+
+if test x"$libdts" = x"yes"; then
+    dtslib=""
+    if has_library libdts_pic ; then
+        dtslib="-ldts_pic"
+    elif has_library libdts ; then
+        dtslib="-ldts"
+    else
+        echo "Warning: DTS library not found."
+    fi
+fi
+
 # these are off by default, so fail if requested and not available
-#enabled libdts  && require libdts dts.h dts_init -ldts
+enabled libdts  && require libdts dts.h dts_init $dtslib
 enabled libgsm  && require libgsm gsm.h gsm_create -lgsm
 enabled libmp3lame && require LAME lame/lame.h lame_init -lmp3lame
 enabled libvorbis && require libvorbis vorbis/vorbisenc.h vorbis_info_init -lvorbis -lvorbisenc -logg
@@ -2683,26 +2699,6 @@ fi
 
 if test x"$mandir" = x""; then
     mandir="${PREFIX}/man"
-fi
-
-if test x"$libdts" = x"yes"; then
-    libdts="no"
-    dtslib=""
-    if has_library libdts_pic ; then
-        dtslib="-ldts_pic"
-    elif has_library libdts ; then
-        dtslib="-ldts"
-    else
-        echo "Warning: DTS library not found."
-    fi
-
-    if test x"$dtslib" != x"" ; then
-        if has_header dts.h ; then
-            libdts="yes"
-        else
-            echo "Warning: DTS header not found."
-        fi
-    fi
 fi
 
 if test x"$dvb" = x"yes" ; then
@@ -3215,7 +3211,6 @@ if test "$freetype2" = "yes" ; then
 fi
 if test "$lmsensors" = "yes" ; then
   CCONFIG="$CCONFIG using_lmsensors"
-  echo "#define HAVE_LMSENSORS 1" >> $TMPH
 fi
 if test "$sdl" = "yes" ; then
   echo "CONFIG_SDL=yes" >> $MYTH_CONFIG_MAK
@@ -3232,14 +3227,10 @@ if test "$lshared" = "yes" ; then
   echo "PIC=-fPIC -DPIC" >> $MYTH_CONFIG_MAK
 fi
 if test x"$libdts" = x"yes" ; then
-  echo "#define CONFIG_DTS 1" >> $TMPH
-  echo "CONFIG_DTS=yes" >> $MYTH_CONFIG_MAK
   echo "CONFIG_DTSLIB=$dtslib" >>  $MYTH_CONFIG_MAK
 fi
 if test x"$pthreads" = x"yes" ; then
   CCONFIG="$CCONFIG using_ffmpeg_threads"
-  echo "#define HAVE_THREADS 1" >> $TMPH
-  echo "HAVE_PTHREADS=yes" >> $MYTH_CONFIG_MAK
   if test $targetos != FreeBSD -a $targetos != OpenBSD ; then
      extralibs="$extralibs -lpthread"
   fi
@@ -3265,25 +3256,21 @@ fi
 
 if test "$audio_oss" = "yes" ; then
     CCONFIG="$CCONFIG using_oss"
-  echo "#define CONFIG_AUDIO_OSS 1" >> $TMPH
 fi
 
 if test "$audio_alsa" = "yes" ; then
     CCONFIG="$CCONFIG using_alsa"
-  echo "#define CONFIG_AUDIO_ALSA 1" >> $TMPH
   echo "CONFIG_AUDIO_ALSA_LIBS=$audio_alsa_libs" >> $MYTH_CONFIG_MAK
 fi
 
 if test "$audio_arts" = "yes" ; then
     CCONFIG="$CCONFIG using_arts"
-  echo "#define CONFIG_AUDIO_ARTS 1" >> $TMPH
   echo "CONFIG_AUDIO_ARTS_LIBS=$audio_arts_libs" >> $MYTH_CONFIG_MAK
   echo "CONFIG_AUDIO_ARTS_CFLAGS=$audio_arts_cflags" >> $MYTH_CONFIG_MAK
 fi
 
 if test "$audio_jack" = "yes" ; then
     CCONFIG="$CCONFIG using_jack"
-  echo "#define CONFIG_AUDIO_JACK 1" >> $TMPH
   echo "CONFIG_AUDIO_JACK_LIBS=$audio_jack_libs" >> $MYTH_CONFIG_MAK
 fi
 
@@ -3373,11 +3360,6 @@ if test x"$backend" = x"no" ; then
     echo
     echo "WARNING: --disable-backend is only intended to aid porting."
     echo "WARNING: You are on your own now."
-    ivtv="no"
-    dbox2_dvb_box="no"
-    hdhomerun_box="no"
-    iptv="no"
-    dvb="no"
 fi
 
 if test x"$proc_opt" = x"yes"; then
