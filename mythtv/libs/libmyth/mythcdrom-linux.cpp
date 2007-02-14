@@ -167,10 +167,12 @@ MediaStatus MythCDROMLinux::checkMedia()
                                       .arg(this->m_VolumeID)
                                       .arg(QString(buf.creation_date).left(16));
 
-                        // attempt to mount the disc
                         // the base class's onDeviceMounted will do fine
                         // grained detection of the type of data on this disc
-                        mount();
+                        if (isMounted(true))
+                            onDeviceMounted();
+                        else
+                            mount();  // onDeviceMounted() called as side-effect
 
                         if (isMounted(true))
                         {

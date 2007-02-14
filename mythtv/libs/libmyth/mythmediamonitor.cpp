@@ -165,8 +165,9 @@ void MediaMonitor::ChooseAndEjectMedia(void)
     if (!selected)
         return;
 
-    int status = selected->getStatus();
-    QString dev = selected->getVolumeID();
+    bool doEject = false;
+    int   status = selected->getStatus();
+    QString  dev = selected->getVolumeID();
 
     if (dev == "")
         dev = selected->getDevicePath();
@@ -185,8 +186,13 @@ void MediaMonitor::ChooseAndEjectMedia(void)
                                       "eject unmount fail",
                                       tr("Failed to unmount %1").arg(dev));
         }
+        else
+            doEject = true;
     }
     else
+        doEject = true;
+
+    if (doEject)
     {
         selected->unlock();
 
