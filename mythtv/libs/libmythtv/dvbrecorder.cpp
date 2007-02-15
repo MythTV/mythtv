@@ -70,12 +70,9 @@ using namespace std;
 #include "dvbrecorder.h"
 
 // AVLib/FFMPEG includes
-extern "C" {
 #include "../libavcodec/avcodec.h"
 #include "../libavformat/avformat.h"
 #include "../libavformat/mpegts.h"
-extern const uint8_t *ff_find_start_code(const uint8_t * restrict p, const uint8_t *end, uint32_t * restrict state);
-}
 
 const int DVBRecorder::TSPACKETS_BETWEEN_PSIP_SYNC = 2000;
 const int DVBRecorder::POLL_INTERVAL        =  50; // msec
@@ -370,7 +367,6 @@ int DVBRecorder::OpenFilterFd(uint pid, int pes_type, uint stream_type)
     if (fd_tmp < 0)
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR + "Could not open demux device." + ENO);
-        _max_pid_filters = _open_pid_filters;
         return -1;
     }
 
@@ -1196,35 +1192,27 @@ void DVBRecorder::ProcessTSPacket2(const TSPacket& tspacket)
 void DVBRecorder::GetTimeStamp(const TSPacket& tspacket)
 {
     const uint pid = tspacket.PID();
-    if (pid != _audio_pid || tspacket.PayloadStart())
-    {
+    if (pid != _audio_pid)
         _audio_header_pos = 0;
-        _audio_start_code = 0xffffffff;
-    }
 
-    const uint8_t *bufptr = tspacket.data() + tspacket.AFCOffset();
-    const uint8_t *bufend = tspacket.data() + TSPacket::SIZE;
-    
-    while (bufptr < bufend)
+    // Find the current audio time stamp.  This code is based on
+    // DTVRecorder::FindMPEG2Keyframes.
+    if (tspacket.PayloadStart())
+        _audio_header_pos = 0;
+    for (uint i = tspacket.AFCOffset(); i < TSPacket::SIZE; i++)
     {
-        if (!_audio_header_pos)
-            bufptr = ff_find_start_code(bufptr, bufend, &_audio_start_code);
-
-        if ((_audio_start_code & 0xffffff00) != 0x00000100)
-        {
-            _audio_header_pos = 0;
-            continue;
-        }
-        else
-        {
-            _audio_header_pos = _audio_header_pos ? _audio_header_pos : 3;
-            bufptr++;
-        }
-
-        const unsigned char k = *(bufptr - 2);
-
+        const unsigned char k = tspacket.data()[i];
         switch (_audio_header_pos)
         {
+            case 0:
+                _audio_header_pos = (k == 0x00) ? 1 : 0;
+                break;
+            case 1:
+                _audio_header_pos = (k == 0x00) ? 2 : 0;
+                break;
+            case 2:
+                _audio_header_pos = (k == 0x00) ? 2 : ((k == 0x01) ? 3 : 0);
+                break;
             case 3:
                 if ((k >= PESStreamID::MPEGAudioStreamBegin) &&
                     (k <= PESStreamID::MPEGAudioStreamEnd))
@@ -1470,29 +1458,21 @@ void DVBRecorder::CreateVideoFrame(void)
             _video_header_pos = 0;
         }
 
-        const unsigned char* bufptr = buffer + pkt->AFCOffset();
-        const unsigned char* bufend = buffer + TSPacket::SIZE;
-
-        while (bufptr < bufend)
+        for (uint i = pkt->AFCOffset(); i < TSPacket::SIZE; i++)
         {
-            if (!_video_header_pos)
-                bufptr = ff_find_start_code(bufptr, bufend, &_video_start_code);
-
-            if ((_video_start_code & 0xffffff00) != 0x00000100)
-            {
-                _video_header_pos = 0;
-                continue;
-            }
-            else
-            {
-                _video_header_pos = _video_header_pos ? _video_header_pos : 3;
-                bufptr++;
-            }
-
-            const unsigned char k = *(bufptr - 2);
-
+            const unsigned char k = buffer[i];
             switch (_video_header_pos)
             {
+                case 0:
+                    _video_header_pos = (k == 0x00) ? 1 : 0;
+                    break;
+                case 1:
+                    _video_header_pos = (k == 0x00) ? 2 : 0;
+                    break;
+                case 2:
+                    _video_header_pos =
+                        (k == 0x00) ? 2 : ((k == 0x01) ? 3 : 0);
+                    break;
                 case 3:
                     if (k >= PESStreamID::MPEGVideoStreamBegin &&
                         k <= PESStreamID::MPEGVideoStreamEnd)
