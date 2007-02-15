@@ -33,6 +33,10 @@ MediaStatus MythHDD::checkMedia(void)
 {
     if (isMounted(true))
     {
+        // A lazy way to present volume name for the user to eject.
+        // Hotplug devices are usually something like /media/VOLUME
+        m_VolumeID = m_MountPath;
+
         // device is mounted, trigger event
         return setStatus(MEDIASTAT_MOUNTED);
     }
