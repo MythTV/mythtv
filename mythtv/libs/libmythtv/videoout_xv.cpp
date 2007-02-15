@@ -7,7 +7,9 @@
 #include <ctime>
 #include <cerrno>
 
+#ifdef __linux__
 #include <malloc.h>
+#endif
 #include <fcntl.h>
 #include <unistd.h>
 #include <sys/time.h>

@@ -18,9 +18,10 @@
 #include <qfileinfo.h>
 
 #include "mythconfig.h"
-#if defined CONFIG_DARWIN || defined CONFIG_CYGWIN
+#if defined CONFIG_DARWIN || defined CONFIG_CYGWIN || defined(__FreeBSD__)
 #include "darwin-sendfile.h"
 #else
+#define USE_SETSOCKOPT
 #include <sys/sendfile.h>
 #endif
 #include <sys/socket.h>
@@ -220,7 +221,7 @@ long HTTPRequest::SendResponse( void )
     // Make it so the header is sent with the data
     // ----------------------------------------------------------------------
 
-#if !defined(CONFIG_DARWIN) && !defined(CONFIG_CYGWIN)
+#ifdef USE_SETSOCKOPT
     // Never send out partially complete segments
     setsockopt( getSocketHandle(), SOL_TCP, TCP_CORK, &g_on, sizeof( g_on ));
 #endif
@@ -248,7 +249,7 @@ long HTTPRequest::SendResponse( void )
     // Turn off the option so any small remaining packets will be sent
     // ----------------------------------------------------------------------
 
-#if !defined(CONFIG_DARWIN) && !defined(CONFIG_CYGWIN)
+#ifdef USE_SETSOCKOPT
     setsockopt( getSocketHandle(), SOL_TCP, TCP_CORK, &g_off, sizeof( g_off ));
 #endif
 
@@ -284,7 +285,7 @@ long HTTPRequest::SendResponseFile( QString sFileName )
     // Make it so the header is sent with the data
     // ----------------------------------------------------------------------
 
-#if !defined(CONFIG_DARWIN) && !defined(CONFIG_CYGWIN)
+#ifdef USE_SETSOCKOPT
     // Never send out partially complete segments
     setsockopt( getSocketHandle(), SOL_TCP, TCP_CORK, &g_on, sizeof( g_on ));
 #endif
@@ -393,7 +394,7 @@ long HTTPRequest::SendResponseFile( QString sFileName )
     // Turn off the option so any small remaining packets will be sent
     // ----------------------------------------------------------------------
     
-#if !defined(CONFIG_DARWIN) && !defined(CONFIG_CYGWIN)
+#ifdef USE_SETSOCKOPT
     setsockopt( getSocketHandle(), SOL_TCP, TCP_CORK, &g_off, sizeof( g_off ));
 #endif
 

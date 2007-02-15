@@ -828,6 +828,9 @@ void MpegRecorder::StartRecording(void)
         FD_ZERO(&rdset);
         FD_SET(readfd, &rdset);
 
+#if defined(__FreeBSD__)
+        // HACK. FreeBSD PVR150/500 driver doesn't currently support select()
+#else
         switch (select(readfd + 1, &rdset, NULL, NULL, &tv))
         {
             case -1:
@@ -851,6 +854,7 @@ void MpegRecorder::StartRecording(void)
 
            default: break;
         }
+#endif
 
         ret = read(readfd, buffer, bufferSize);
 

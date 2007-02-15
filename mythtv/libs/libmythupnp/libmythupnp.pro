@@ -70,6 +70,9 @@ INSTALLS += inc
 cygwin:HEADERS += darwin-sendfile.h
 cygwin:SOURCES += darwin-sendfile.c
 
+freebsd:HEADERS += darwin-sendfile.h 
+freebsd:SOURCES += darwin-sendfile.c 
+
 macx {
     HEADERS += darwin-sendfile.h
     SOURCES += darwin-sendfile.c

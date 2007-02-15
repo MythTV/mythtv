@@ -15,6 +15,10 @@
 
 // __suseconds_t doesn't exist on some older Unixes. e.g. Darwin/Mac OS X
 
+#if defined(__FreeBSD__) 
+#define __suseconds_t_defined  // It exists on FreeBSD, but doesn't define this
+#endif
+
 #ifndef __suseconds_t_defined
 #define __suseconds_t_defined
 typedef int32_t __suseconds_t;

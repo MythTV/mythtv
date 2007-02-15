@@ -12,6 +12,14 @@
 #include <limits.h>
 #include <qmap.h>
 
+/*  
+ * At least FreeBSD doesn't define LONG_LONG_MAX, but it does define  
+ * __LONG_LONG_MAX__.  Who knows what other systems do the same?  
+ */  
+#ifndef LONG_LONG_MAX  
+#define LONG_LONG_MAX  __LONG_LONG_MAX__  
+#endif
+
 typedef struct VideoFrame_ VideoFrame;
 class NuppelVideoPlayer;
 
