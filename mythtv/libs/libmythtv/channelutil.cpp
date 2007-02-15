@@ -151,11 +151,11 @@ static uint insert_dtv_multiplex(
 
     if (!modulation.isNull())
         query.bindValue(":MODULATION",    modulation);
-    if (transport_id > 0)
+    if (sistandard.lower() == "dvb")
+    {
         query.bindValue(":TRANSPORTID",   transport_id);
-    if (network_id > 0)
         query.bindValue(":NETWORKID",     network_id);
-
+    }
     if (symbol_rate >= 0)
         query.bindValue(":SYMBOLRATE",    symbol_rate);
     if (bandwidth >= 0)
