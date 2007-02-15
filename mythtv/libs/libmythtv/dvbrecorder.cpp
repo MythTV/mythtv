@@ -367,6 +367,7 @@ int DVBRecorder::OpenFilterFd(uint pid, int pes_type, uint stream_type)
     if (fd_tmp < 0)
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR + "Could not open demux device." + ENO);
+        _max_pid_filters = _open_pid_filters;
         return -1;
     }
 
