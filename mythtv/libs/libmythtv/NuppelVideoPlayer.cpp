@@ -2323,6 +2323,14 @@ bool NuppelVideoPlayer::PrebufferEnoughFrames(void)
     prebuffering_lock.lock();
     if (prebuffering)
     {
+        if (ringBuffer->InDVDMenuOrStillFrame() && prebuffer_tries > 3)
+        {
+            prebuffering = false;
+            prebuffer_tries = 0;
+            prebuffering_lock.unlock();
+            return true;
+        }
+
         if (!audio_paused && audioOutput)
         {
            if (prebuffering)
