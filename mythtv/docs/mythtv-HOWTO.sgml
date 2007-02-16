@@ -3,7 +3,7 @@
 <title>Installing and using MythTV
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com"
 name="mailto:rkulagow@rocketmail.com">
-<date>2007-01-27, v0.20.15
+<date>2007-02-16, v0.20.16
 <abstract>
 Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -601,6 +601,14 @@ service. This limitation is independent of the bandwidth you have purchased.
 <item>Hauppauge WinTV-USB series
 <item>Hauppauge WinTV-PVR-usb (model 602), or WinTV-PVR-PCI (model 880) cards (no driver - this is not the PVR-250/350
 series of cards supported by the IvyTV driver)
+<item>Hauppauge HVR-1600.  (no driver).  <bf>NOTE</bf>:  There have been
+reports that Hauppauge is putting the HVR-1600 inside of the PVR-150 box; if
+you're purchasing a retail PVR-150, carefully examine the box - there should
+be some indication that the hardware inside is actually a HVR-1600 and not a
+PVR-150.  Check the Supported Hardware (<url
+url="http://www.ivtvdriver.org/index.php/Supported_hardware"
+name="http://www.ivtvdriver.org/index.php/Supported_hardware">) page of the
+ivtv driver for updated support information.
 <item>ATI All-in-Wonder series
 </itemize>
 
@@ -7523,6 +7531,8 @@ v0.20.13, 2007-01-09.  Additional tweaks.
 v0.20.14, 2007-01-26.  Fedora uses a different way to switch window managers
 now.  (R.G. Newbury)
 v0.20.15, 2007-01-27.  v4l might have the audio out muted.  Storage Groups is only in SVN.
+v0.20.16, 2007-02-16.  Hauppuage is putting the HVR-1600 inside PVR-150
+boxes.  Not supported by ivtv driver at this time.
 -->
 
 <!--

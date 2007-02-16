@@ -1,7 +1,7 @@
   Installing and using MythTV
   Robert Kulagowski, mailto:rkulagow@rocketmail.com
   <mailto:rkulagow@rocketmail.com>
-  2007-01-27, v0.20.15
+  2007-02-16, v0.20.16
 
   Initially, installation of MythTV seems like a huge task.  There are
   lots of dependencies, and various distributions seem to do the same
@@ -993,6 +993,15 @@
      cards (no driver - this is not the PVR-250/350 series of cards
      supported by the IvyTV driver)
 
+  +o  Hauppauge HVR-1600.  (no driver).  [1mNOTE[22m:  There have been reports
+     that Hauppauge is putting the HVR-1600 inside of the PVR-150 box;
+     if you're purchasing a retail PVR-150, carefully examine the box -
+     there should be some indication that the hardware inside is
+     actually a HVR-1600 and not a PVR-150.  Check the Supported
+     Hardware (http://www.ivtvdriver.org/index.php/Supported_hardware
+     <http://www.ivtvdriver.org/index.php/Supported_hardware>) page of
+     the ivtv driver for updated support information.
+
   +o  ATI All-in-Wonder series
 
 
@@ -1031,6 +1040,8 @@
   card, you will be getting Mono sound.  See the Linux MP3 HOWTO at
   http://www.tldp.org/HOWTO/MP3-HOWTO.html
   <http://www.tldp.org/HOWTO/MP3-HOWTO.html> for additional information.
+
+
   [1m3.1.8.  Video Display Card[0m
 
   MythTV will work with just about any video card.  However, it is
@@ -1155,7 +1166,6 @@
   +o  Averkey lite, powered by a USB port, has Composite, SVideo, YPbPr
      outputs; pan, brightness, overscan/underscan controls; supports up
      to 1024x768 outputs; and supports PAL and NTSC.
-
   +o  ADS TV Elite XGA
 
   +o  AverKey iMicro (comments are generally favorable)
@@ -1279,7 +1289,7 @@
   have added
 
 
-       deb-src http://www.debian-multimedia.org sid main
+  deb-src http://www.debian-multimedia.org sid main
 
 
 
@@ -1336,6 +1346,7 @@
 
   This section details the various methods for installing prerequisites
   from the command line.
+
 
 
   [1m3.2.3.1.  Mandriva[0m
@@ -1400,7 +1411,7 @@
   described in the Gentoo section then you also need to install lame.
 
 
-       # emerge lame mysql qt
+  # emerge lame mysql qt
 
 
 
@@ -1408,6 +1419,8 @@
   default installation doesn't include MySQL support, a requirement for
   MythTV.  To enable SQL support, add "mysql" to your USE variable in
   /etc/make.conf and rebuild Qt by running
+
+
        # emerge qt
 
 
@@ -1468,7 +1481,6 @@
   The reference compilation system for MythTV is Ubuntu.
 
 
-
   [1m4.2.  Shared-Library requirements for MythTV[0m
 
   [1m4.2.1.  Modifying /etc/ld.so.conf[0m
@@ -1524,7 +1536,6 @@
 
   For Gentoo, you should see a value like /usr/qt/3 for QTDIR and
   /usr/qt/3/bin should be in $PATH.
-
   If you don't, do not proceed past this step until you have resolved
   this error. You may need to manually specify the QTDIR and PATH at the
   shell prompt before compiling.
@@ -1533,6 +1544,7 @@
   (/usr/share/qt3/mkspecs for Debian) called default. If not, you'll get
   errors during the compile. See the Troubleshooting Section for more
   information.
+
   [1m4.3.2.  Distribution-Specific Notes[0m
 
   [1m4.3.2.1.  Mandriva[0m
@@ -1653,13 +1665,13 @@
   Open a shell and switch to the directory where you saved lame.
 
 
-  $ tar -xzf lame-3.96.1.tar.gz
-  $ cd lame-3.96.1
-  $ ./configure
-  $ make
-  $ make test
-  $ su
-  # make install
+       $ tar -xzf lame-3.96.1.tar.gz
+       $ cd lame-3.96.1
+       $ ./configure
+       $ make
+       $ make test
+       $ su
+       # make install
 
 
 
@@ -1704,7 +1716,8 @@
   "contrib".  If you have added a contrib mirror, try installing [1mXMLTV[22m:
 
 
-       # urpmi xmltv xmltv-grabbers
+
+  # urpmi xmltv xmltv-grabbers
 
 
 
@@ -1713,8 +1726,7 @@
   sites by typing:
 
 
-
-  # urpmi perl-xml-twig perl-xml-writer perl-datemanip perl-libwww-perl
+       # urpmi perl-xml-twig perl-xml-writer perl-datemanip perl-libwww-perl
 
 
 
@@ -1763,11 +1775,12 @@
   not work correctly.
 
 
-       $ make
-       $ make test
-       $ su
-       # make install
-       # exit
+
+  $ make
+  $ make test
+  $ su
+  # make install
+  # exit
 
 
 
@@ -1826,10 +1839,9 @@
 
   If you are using the tarball, then unpack it:
 
-
-       $ tar -xjf mythtv-0.20.tar.bz2
-       $ cd mythtv-0.20
-       $ ./configure
+  $ tar -xjf mythtv-0.20.tar.bz2
+  $ cd mythtv-0.20
+  $ ./configure
 
 
 
@@ -1886,9 +1898,10 @@
   Once the compile is done, switch to superuser:
 
 
-       $ su
-       # make install
-       # exit
+
+  $ su
+  # make install
+  # exit
 
 
 
@@ -1942,8 +1955,6 @@
 
 
        $ grep audio /etc/group
-
-
 
   If the number printed out from the grep was 18, you can now load this
   module as root before starting [1mmythfrontend[22m:
@@ -2064,8 +2075,9 @@
   This can be done from the command line by typing:
 
 
-       # /sbin/chkconfig mysqld on
-       # /sbin/service mysqld start
+
+  # /sbin/chkconfig mysqld on
+  # /sbin/service mysqld start
 
 
 
@@ -2116,6 +2128,8 @@
   [1mNOTE[22m: It is good practice to set a root password for MySQL. Instruc-
   tions for doing so can be found on MySQL's web site at
   http://www.mysql.com/doc/en/Security.html <http://www.mysql.com/doc/en/Security.html>.
+
+
 
   [1m6.2.4.  Modifying access to the MySQL database for multiple systems[0m
 
@@ -2191,7 +2205,6 @@
   information if you're having issues with sound.  Also, ensure that no
   other programs are grabbing the audio output, like [1marts [22mor [1mesd[22m.
 
-
   What you need to do is to mute the "line-in" of your sound card and
   also set it as the recording source.
 
@@ -2243,20 +2256,21 @@
   does and you don't set it then MythTV will not capture audio.
 
 
+
   ______________________________________________________________________
   Note the spelling in the following commands.
   ______________________________________________________________________
 
 
 
-  $ amixer set Master,0 100%,100% unmute
-  $ amixer set PCM,0 100%,100% unmute
-  $ amixer set Line,0 75%,75% mute captur
-  $ amixer set Capture,0 100%,100% captur
-  $ su
-  # alsactl store
-  # exit
-  $
+       $ amixer set Master,0 100%,100% unmute
+       $ amixer set PCM,0 100%,100% unmute
+       $ amixer set Line,0 75%,75% mute captur
+       $ amixer set Capture,0 100%,100% captur
+       $ su
+       # alsactl store
+       # exit
+       $
 
 
 
@@ -2366,15 +2380,14 @@
        # make install
        # chmod 666 /dev/lircd
 
-
-
   At this point, if you're using a serial receiver, check that there's a
   lirc device in /dev:
 
-  $ ls -l /dev/li*
-  lr-xr-xr-x    1 root     root            5 Jan 27 09:00 /dev/lirc -> ttyS0
-  srw-rw-rw-    1 root     root            0 Jan 27 15:01 /dev/lircd=
-  prw-r--r--    1 root     root            0 Jan 27 09:00 /dev/lircm|
+
+       $ ls -l /dev/li*
+       lr-xr-xr-x    1 root     root            5 Jan 27 09:00 /dev/lirc -> ttyS0
+       srw-rw-rw-    1 root     root            0 Jan 27 15:01 /dev/lircd=
+       prw-r--r--    1 root     root            0 Jan 27 09:00 /dev/lircm|
 
 
 
@@ -2424,10 +2437,10 @@
   See the lirc documentation for additional information.  The lirc
   installation [4mshould[24m create this for you, so manually creating it
   indicates that your lirc installation may have other issues.
-
   The second option is to post your issue to the [4mlirc[24m list, not the
   mythtv-users list.  The lirc programmers will be the ones that can
   assist you best.
+
   The third option is to dispense with lirc altogether by purchasing an
   IR keyboard (various options exist, although Chicony appears to work
   for some people) and a learning remote control.  The IR keyboard
@@ -2484,9 +2497,9 @@
   of pulses may correlate to "Channel Up".  The lircd.conf file will
   then contain a line that looks something like this:
 
-
-
                  ChannelUp                0x0000000000001020
+
+
 
   The lircd.conf file can have multiple remote controls defined.
 
@@ -2546,17 +2559,16 @@
        # exit
 
 
-
   All other distributions:
 
 
-  # cd /etc/rc.d
-  # cat >> rc.local
-  echo "Starting lircd"
-  /usr/local/sbin/lircd
-  ^D
-  # exit
-  $
+       # cd /etc/rc.d
+       # cat >> rc.local
+       echo "Starting lircd"
+       /usr/local/sbin/lircd
+       ^D
+       # exit
+       $
 
 
 
@@ -2606,7 +2618,6 @@
 
 
        $ irxevent &
-
 
 
   If [1mirxevent [22misn't running, then MythTV will not respond to your remote
@@ -2672,7 +2683,6 @@
   tional buttons, and how to debug potential button name conflicts
   between the lircrc.example file and how [1myour [22mremote defines the button
   names.
-
   By examining the button names defined in /etc/lircd.conf and using the
   [1mirw [22mprogram to make sure that your remote is working, you can create
   the appropriate mappings in .lircrc to get excellent remote
