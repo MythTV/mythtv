@@ -326,6 +326,7 @@ class SRDupMethod: public SRSelectSetting
                               "dupmethod", _list)
         {
             addSelection(QObject::tr("Match duplicates using subtitle & description"), kDupCheckSubDesc);
+            addSelection(QObject::tr("Match duplicates using subtitle then description"), kDupCheckSubThenDesc);
             addSelection(QObject::tr("Match duplicates using subtitle"), kDupCheckSub);
             addSelection(QObject::tr("Match duplicates using description"), kDupCheckDesc);
             addSelection(QObject::tr("Don't match duplicates"), kDupCheckNone);

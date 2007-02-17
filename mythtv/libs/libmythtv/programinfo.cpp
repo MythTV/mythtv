@@ -1390,6 +1390,12 @@ bool ProgramInfo::IsSameProgram(const ProgramInfo& other) const
          (description.lower() != other.description.lower())))
         return false;
 
+    if ((dupmethod & kDupCheckSubThenDesc) &&
+        ((subtitle == "" && other.subtitle == "" && description.lower() != other.description.lower()) ||
+         (subtitle.lower() != other.subtitle.lower()) ||
+         (description == "" && subtitle == "")))
+        return false;
+
     return true;
 }
 
