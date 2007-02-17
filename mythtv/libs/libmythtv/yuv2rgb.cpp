@@ -389,6 +389,13 @@ yuv2rgb_fun yuv2rgb_init_mmx (int bpp, int mode)
 #define C_GU (13954 >> (16 - SCALE_BITS))
 #define C_GV (34903 >> (16 - SCALE_BITS))
 
+#if defined(__FreeBSD__) 
+// HACK: this is actually only needed on AMD64 at the moment,
+//       but is doesn't hurt the other architectures. 
+#undef  UCHAR_MAX 
+#define UCHAR_MAX  (int)__UCHAR_MAX 
+#endif 
+
 #define RGBOUT(r, g, b, y1)\
 {\
     y = (y1 - 16) * C_Y;\

@@ -1,10 +1,9 @@
 #include <cstdlib> // for llabs
 
 #include "mythconfig.h"
-#ifdef CONFIG_DARWIN
+#if defined(CONFIG_DARWIN) || defined(__FreeBSD__)
 #include <sys/param.h>
 #include <sys/mount.h>
-static inline long long int abs(long long int v) { return llabs(v); }
 #elif __linux__
 #include <sys/vfs.h>
 #endif
