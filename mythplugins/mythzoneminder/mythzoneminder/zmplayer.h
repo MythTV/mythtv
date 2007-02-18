@@ -25,6 +25,13 @@
 #include <GL/glx.h>
 #include <GL/glu.h>
 
+// xlib
+#include <X11/Xlib.h>
+
+// xv stuff
+#include <X11/extensions/Xvlib.h>
+#define RGB24 0x3
+
 // zm
 #include "zmdefines.h"
 
@@ -52,11 +59,16 @@ public:
     void keyPressEvent(QKeyEvent *e);
     void getEventInfo(void);
     void displayFrame(void);
+    void displayFrameGl(void);
+    void displayFrameXv(void);
     void getFrame(void);
+    int  getXvPortId(Display *dpy);
 
     bool initPlayer(void);
+    bool initPlayerGl(void);
+    bool initPlayerXv(void);
+
     void stopPlayer(void);
-    //void updateScreen(void);
 
     UIImageType          *m_frameImage;
     UIImageType          *m_frameFSImage;
@@ -85,11 +97,19 @@ public:
     bool                  m_bFullScreen;
 
     bool                  m_initalized;
+    bool                  m_useGL;
     GLXContext            m_cx;
     Display              *m_dis;
     Window                m_win;
+    int                   m_screenNum;
     QImage                m_image;
     QRect                 m_displayRect;
+    GC                    m_gc;
+    XImage               *m_XImage;
+    XvImage              *m_XvImage;
+    char                 *m_rgba;
+    int                   m_XVport;
+    bool                  m_haveXV;
 };
 
 #endif

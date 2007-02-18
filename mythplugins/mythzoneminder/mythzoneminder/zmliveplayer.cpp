@@ -334,6 +334,14 @@ void ZMLivePlayer::updateMonitorStatus()
 Player::Player()
 {
     m_initalized = false;
+    m_useGL = (gContext->GetNumSetting("ZoneMinderUseOpenGL", 1) == 1);
+    m_XvImage = NULL;
+    m_XImage = NULL;
+
+    if (m_useGL)
+        VERBOSE(VB_GENERAL, "MythZoneMinder: Using openGL for display");
+    else
+        VERBOSE(VB_GENERAL, "MythZoneMinder: Using Xv for display");
 }
 
 Player::~Player()
@@ -349,11 +357,22 @@ void Player::setMonitor(int monID, Window winID)
 
 bool Player::startPlayer(Monitor *mon, Window winID)
 {
+    bool res;
+
+    if (m_useGL)
+        res = startPlayerGL(mon, winID);
+    else
+        res = startPlayerXv(mon, winID);
+
+    return res;
+}
+
+bool Player::startPlayerGL(Monitor *mon, Window winID)
+{
     m_initalized = false;
 
     m_monitor = *mon;
 
-    int screen_number;
     Window parent = winID;
 
     m_dis = XOpenDisplay(NULL);
@@ -364,7 +383,7 @@ bool Player::startPlayer(Monitor *mon, Window winID)
         return false;
     }
 
-    screen_number = DefaultScreen(m_dis);
+    m_screenNum = DefaultScreen(m_dis);
 
     if (!glXQueryExtension(m_dis, NULL, NULL))
     {
@@ -376,7 +395,7 @@ bool Player::startPlayer(Monitor *mon, Window winID)
     int configuration[] = {GLX_DOUBLEBUFFER,GLX_RGBA,GLX_DEPTH_SIZE, 24, None};
     XVisualInfo *vi;
 
-    vi = glXChooseVisual(m_dis,screen_number,configuration);
+    vi = glXChooseVisual(m_dis, m_screenNum, configuration);
     if (vi==NULL)
     {
         VERBOSE(VB_IMPORTANT, "MythZoneMinder: No appropriate RGB visual with depth buffer");
@@ -440,17 +459,167 @@ bool Player::startPlayer(Monitor *mon, Window winID)
     return true;
 }
 
+bool Player::startPlayerXv(Monitor *mon, Window winID)
+{
+    bool useXV = true;   // set to false to force a fall back to using ximage
+    m_initalized = false;
+
+    m_monitor = *mon;
+
+    Window parent = winID;
+
+    m_dis = XOpenDisplay(NULL);
+    if (m_dis == NULL)
+    {
+        VERBOSE(VB_IMPORTANT, "MythZoneMinder: Unable to open display\n");
+        m_monitor.status = "Error";
+        return false;
+    }
+
+    m_screenNum = DefaultScreen(m_dis);
+
+    m_win = XCreateSimpleWindow (m_dis, parent, 
+                                 m_monitor.displayRect.x(), m_monitor.displayRect.y(),
+                                 m_monitor.displayRect.width(), m_monitor.displayRect.height(),
+                                 2, 0, 0);
+
+    if (m_win == None)
+    {
+        VERBOSE(VB_IMPORTANT, "MythZoneMinder: Unable to create window\n");
+        m_monitor.status = "Error";
+        return false;
+    }
+
+    XMapWindow (m_dis, m_win);
+    XMoveWindow(m_dis, m_win, m_monitor.displayRect.x(), m_monitor.displayRect.y());
+
+    m_XVport = -1;
+
+    m_gc = XCreateGC(m_dis, m_win, 0, NULL);
+    if (m_gc ==NULL)
+    {
+        VERBOSE(VB_IMPORTANT, "MythZoneMinder: Unable to create gc");
+        m_monitor.status = "Error";
+        return false; 
+    }
+
+    m_rgba = (char *) malloc(m_monitor.displayRect.width() * m_monitor.displayRect.height() * 4);
+
+    m_haveXV = useXV;
+
+    if (useXV)
+    {
+        m_XVport = getXvPortId(m_dis);
+        if (m_XVport == -1)
+        {
+            VERBOSE(VB_GENERAL, "WARNING: Couldn't find free Xv adaptor with RGB XvImage support");
+            VERBOSE(VB_GENERAL, "Falling back to XImage - slow and ugly rescaling");
+            m_haveXV = false;
+        }
+        else
+            VERBOSE(VB_GENERAL, "MythZoneMinder: Using Xv for scaling");
+    }
+    else
+        VERBOSE(VB_GENERAL, "MythZoneMinder: Forcing use of software scaling");
+
+    m_initalized = true;
+    return true;
+}
+
+int Player::getXvPortId(Display *dpy)
+{
+    int portNum, numImages;
+    unsigned int i, j, k, numAdapt;
+    XvImageFormatValues *formats;
+    XvAdaptorInfo *info;
+
+    portNum = -1;
+
+    if (Success != XvQueryAdaptors(dpy, DefaultRootWindow(dpy), &numAdapt, &info))
+    {
+        VERBOSE(VB_IMPORTANT, "No Xv adaptors found!");
+        return -1;
+    }
+
+    VERBOSE(VB_GENERAL, QString("Found %1 Xv adaptors").arg(numAdapt));
+
+    for (i = 0; i < numAdapt; i++)
+    {
+        if (info[i].type & XvImageMask)
+        {
+            // Adaptor has XvImage support
+            formats = XvListImageFormats(dpy, info[i].base_id, &numImages);
+
+            for (j = 0; j < (unsigned int) numImages; j++)
+            {
+                if (formats[j].id == RGB24)
+                {
+                    // It supports our format
+                    for (k = 0; k < info[i].num_ports; k++)
+                    {
+                        /* try to grab a port */
+                        if (Success == XvGrabPort(dpy, info[i].base_id + k, CurrentTime))
+                        {
+                            portNum = info[i].base_id + k;
+                            break;
+                        }
+                    }
+                }
+                if (portNum != -1) 
+                    break;
+            }
+            XFree(formats);
+        }
+        if (portNum != -1) 
+            break;
+    }
+
+    XvFreeAdaptorInfo(info);
+    return portNum;
+}
+
 void Player::stopPlaying(void)
 {
     if (!m_initalized)
         return;
 
-    glXDestroyContext(m_dis, m_cx);
+    if (m_useGL)
+        glXDestroyContext(m_dis, m_cx);
+    else
+    {
+        if (m_XVport != -1)
+            XvUngrabPort(m_dis, m_XVport, CurrentTime);
+        XFreeGC(m_dis, m_gc);
+
+        if (m_XImage)
+        {
+            XDestroyImage(m_XImage);
+            m_XImage = NULL;
+        }
+
+        if (m_XvImage)
+        {
+            XFree(m_XvImage);
+            m_XvImage = NULL;
+        }
+
+        //free(m_rgba);
+        //m_rgba = NULL;
+    }
+
     XDestroyWindow(m_dis, m_win);
     XCloseDisplay(m_dis);
 }
 
 void Player::updateScreen(const unsigned char* buffer)
+{
+    if (m_useGL)
+        updateScreenGL(buffer);
+    else
+        updateScreenXv(buffer);
+}
+
+void Player::updateScreenGL(const unsigned char* buffer)
 {
     if (!m_initalized)
         return;
@@ -480,4 +649,111 @@ void Player::updateScreen(const unsigned char* buffer)
     glTexCoord2f(1.0,0.0); glVertex2f(2,0);
     glEnd();
     glXSwapBuffers(m_dis,m_win);
+}
+
+void Player::updateScreenXv(const unsigned char* buffer)
+{
+    if (!m_initalized)
+        return;
+
+    if (m_monitor.palette != MP_RGB24 && m_monitor.palette != MP_GREY)
+        return;
+
+    if (m_haveXV && !m_XvImage)
+    {
+        m_XvImage = XvCreateImage(m_dis, m_XVport, RGB24, m_rgba,
+                                  m_monitor.width,  m_monitor.height);
+        if (m_XvImage == NULL)
+        {
+            VERBOSE(VB_GENERAL, "WARNING: Unable to create XVImage");
+            VERBOSE(VB_GENERAL, "Falling back to XImage - slow and ugly rescaling");
+            m_haveXV = false;
+        }
+    }
+
+    if (!m_haveXV && !m_XImage)
+    {
+        m_XImage = XCreateImage(m_dis, XDefaultVisual(m_dis, m_screenNum), 24, ZPixmap, 0,
+                                m_rgba, m_monitor.displayRect.width(), m_monitor.displayRect.height(),
+                                32, 4 * m_monitor.displayRect.width());
+        if (m_XImage == NULL)
+        {
+            VERBOSE(VB_IMPORTANT, "ERROR: Unable to create XImage");
+            return;
+        }
+    }
+
+    unsigned int pos_data;
+    unsigned int pos_rgba = 0;
+    unsigned int r,g,b;
+
+    if (m_haveXV)
+    {
+        if (m_monitor.palette == MP_RGB24)
+        {
+            for (pos_data = 0; pos_data < (unsigned int) (m_monitor.width * m_monitor.height * 3); )
+            {
+                r = buffer[pos_data++];
+                g = buffer[pos_data++];
+                b = buffer[pos_data++];
+                m_rgba[pos_rgba++] = b;
+                m_rgba[pos_rgba++] = g;
+                m_rgba[pos_rgba++] = r;
+                pos_rgba++;
+            }
+        }
+        else
+        {
+            // grey palette
+            for (pos_data = 0; pos_data < (unsigned int) (m_monitor.width * m_monitor.height); )
+            {
+                m_rgba[pos_rgba++] = buffer[pos_data];   //b
+                m_rgba[pos_rgba++] = buffer[pos_data];   //g
+                m_rgba[pos_rgba++] = buffer[pos_data++]; //r
+                pos_rgba++;                              //a
+            }
+        }
+
+        XvPutImage(m_dis, m_XVport, m_win, m_gc, m_XvImage, 0, 0, 
+                   m_monitor.width, m_monitor.height,
+                   0, 0, m_monitor.displayRect.width(), m_monitor.displayRect.height());
+    }
+    else
+    {
+        //software scaling
+        for (int y = 0; y < m_monitor.displayRect.height(); y++)
+        {
+            for (int x = 0; x < m_monitor.displayRect.width(); x++)
+            {
+
+                pos_data = y * m_monitor.height / m_monitor.displayRect.height();
+                pos_data = pos_data * m_monitor.width;
+                pos_data = pos_data + x * m_monitor.width / m_monitor.displayRect.width();
+
+                if (m_monitor.palette == MP_GREY)
+                {
+                    m_rgba[pos_rgba++] = buffer[pos_data];
+                    m_rgba[pos_rgba++] = buffer[pos_data];
+                    m_rgba[pos_rgba++] = buffer[pos_data++];
+                    m_rgba[pos_rgba++] = 0;
+                }
+
+                if (m_monitor.palette == MP_RGB24)
+                {
+
+                    pos_data = pos_data * 3;
+                    r = buffer[pos_data++];
+                    g = buffer[pos_data++];
+                    b = buffer[pos_data++];
+                    m_rgba[pos_rgba++] = b;
+                    m_rgba[pos_rgba++] = g;
+                    m_rgba[pos_rgba++] = r;
+                    m_rgba[pos_rgba++] = 0;
+                }
+            }
+        }
+
+        XPutImage(m_dis, m_win, m_gc, m_XImage, 0, 0, 0, 0, 
+                  m_monitor.displayRect.width(), m_monitor.displayRect.height());
+    }
 }

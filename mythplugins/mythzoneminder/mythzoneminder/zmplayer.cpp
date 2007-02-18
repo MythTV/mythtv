@@ -42,6 +42,14 @@ ZMPlayer::ZMPlayer(vector<Event *> *eventList, int currentEvent, MythMainWindow 
     m_frameList = new vector<Frame*>;
     m_initalized = false;
     m_paused = false;
+    m_useGL = (gContext->GetNumSetting("ZoneMinderUseOpenGL", 1) == 1);
+    m_XvImage = NULL;
+    m_XImage = NULL;
+
+    if (m_useGL)
+        VERBOSE(VB_GENERAL, "MythZoneMinder: Using openGL for display");
+    else
+        VERBOSE(VB_GENERAL, "MythZoneMinder: Using Xv for display");
 
     m_frameTimer = new QTimer(this);
     connect(m_frameTimer, SIGNAL(timeout()), this,
@@ -415,41 +423,51 @@ void ZMPlayer::getFrame(void)
 
 bool ZMPlayer::initPlayer(void)
 {
-    m_initalized = false;
+    bool res;
 
-    int screen_number;
+    if (m_useGL)
+        res = initPlayerGl();
+    else
+        res = initPlayerXv();
+
+    return res;
+}
+
+bool ZMPlayer::initPlayerGl(void)
+{
+    m_initalized = false;
 
     Window parent = winId();
 
     m_dis = XOpenDisplay(NULL);
     if (m_dis == NULL)
     {
-        fprintf(stderr,"ERROR: Unable to open display\n");
+        VERBOSE(VB_IMPORTANT, "ERROR: Unable to open display");
         return false;
     }
 
-    screen_number = DefaultScreen(m_dis);
+    m_screenNum = DefaultScreen(m_dis);
 
     if (!glXQueryExtension(m_dis, NULL, NULL))
     {
-        fprintf(stderr,"ERROR: X server has no OpenGL GLX extension");
+        VERBOSE(VB_IMPORTANT, "ERROR: X server has no OpenGL GLX extension");
         return false;
     }
 
     int configuration[] = {GLX_DOUBLEBUFFER,GLX_RGBA,GLX_DEPTH_SIZE, 24, None};
     XVisualInfo *vi;
 
-    vi = glXChooseVisual(m_dis, screen_number, configuration);
+    vi = glXChooseVisual(m_dis, m_screenNum, configuration);
     if (vi == NULL)
     {
-        fprintf(stderr,"ERROR: no appropriate RGB visual with depth buffer");
+        VERBOSE(VB_IMPORTANT, "ERROR: no appropriate RGB visual with depth buffer");
         return false;
     }
 
     m_cx = glXCreateContext(m_dis, vi, NULL, GL_TRUE);
     if (m_cx == NULL)
     {
-        fprintf(stderr,"ERROR: couldn't create rendering context");
+        VERBOSE(VB_IMPORTANT, "ERROR: couldn't create rendering context");
         return false;
     }
 
@@ -479,7 +497,7 @@ bool ZMPlayer::initPlayer(void)
 
     if (m_win == None)
     {
-        fprintf(stderr,"ERROR: Unable to create window\n");
+        VERBOSE(VB_IMPORTANT, "ERROR: Unable to create window\n");
         return false;
     }
 
@@ -504,6 +522,121 @@ bool ZMPlayer::initPlayer(void)
     return true;
 }
 
+bool ZMPlayer::initPlayerXv(void)
+{
+    bool useXV = true;   // set to false to force a fall back to using ximage
+
+    m_initalized = false;
+
+    Window parent = winId();
+
+    m_dis = XOpenDisplay(NULL);
+    if (m_dis == NULL)
+    {
+        VERBOSE(VB_IMPORTANT, "ERROR: Unable to open display\n");
+        return false;
+    }
+
+    m_screenNum = DefaultScreen(m_dis);
+
+    m_win = XCreateSimpleWindow (m_dis, parent, 
+                                 m_displayRect.x(), m_displayRect.y(),
+                                 m_displayRect.width(), m_displayRect.height(),
+                                 2, 0, 0);
+
+    if (m_win == None)
+    {
+        VERBOSE(VB_IMPORTANT, "ERROR: Unable to create window");
+        return false;
+    }
+
+    XMapWindow (m_dis, m_win);
+    XMoveWindow(m_dis, m_win, m_displayRect.x(), m_displayRect.y());
+
+    m_XVport = -1;
+
+    m_gc = XCreateGC(m_dis, m_win, 0, NULL);
+    if (m_gc ==NULL)
+    {
+        VERBOSE(VB_GENERAL, "ERROR: Unable to create gc");
+        return false; 
+    }
+
+    m_rgba = (char *) malloc(m_displayRect.width() *  m_displayRect.height() * 4);
+
+    m_haveXV = useXV;
+
+    if (useXV)
+    {
+        m_XVport = getXvPortId(m_dis);
+        if (m_XVport == -1)
+        {
+            VERBOSE(VB_GENERAL, "WARNING: Couldn't find free Xv adaptor with RGB XvImage support");
+            VERBOSE(VB_GENERAL, "Falling back to XImage - slow and ugly rescaling");
+            m_haveXV = false;
+        }
+        else
+            VERBOSE(VB_GENERAL, "MythZoneMinder: Using Xv for scaling");
+    }
+    else
+        VERBOSE(VB_GENERAL, "MythZoneMinder: Forcing use of software scaling");
+
+    m_initalized = true;
+    return true;
+}
+
+int ZMPlayer::getXvPortId(Display *dpy)
+{
+    int portNum, numImages;
+    unsigned int i, j, k, numAdapt;
+    XvImageFormatValues *formats;
+    XvAdaptorInfo *info;
+
+    portNum = -1;
+
+    if (Success != XvQueryAdaptors(dpy, DefaultRootWindow(dpy), &numAdapt, &info))
+    {
+        VERBOSE(VB_IMPORTANT, "No Xv adaptors found!");
+        return -1;
+    }
+
+    VERBOSE(VB_GENERAL, QString("Found %1 Xv adaptors").arg(numAdapt));
+
+    for (i = 0; i < numAdapt; i++)
+    {
+        if (info[i].type & XvImageMask)
+        {
+            // Adaptor has XvImage support
+            formats = XvListImageFormats(dpy, info[i].base_id, &numImages);
+
+            for (j = 0; j < (unsigned int) numImages; j++)
+            {
+                if (formats[j].id == RGB24)
+                {
+                    // It supports our format
+                    for (k = 0; k < info[i].num_ports; k++)
+                    {
+                        /* try to grab a port */
+                        if (Success == XvGrabPort(dpy, info[i].base_id + k, CurrentTime))
+                        {
+                            portNum = info[i].base_id + k;
+                            break;
+                        }
+                    }
+                }
+                if (portNum != -1) 
+                    break;
+            }
+            XFree(formats);
+        }
+        if (portNum != -1) 
+            break;
+    }
+
+    XvFreeAdaptorInfo(info);
+    return portNum;
+}
+
 void ZMPlayer::stopPlayer(void)
 {
     m_frameTimer->stop();
@@ -513,12 +646,28 @@ void ZMPlayer::stopPlayer(void)
 
     m_initalized = false;
 
-    glXDestroyContext(m_dis, m_cx);
+    if (m_useGL)
+        glXDestroyContext(m_dis, m_cx);
+    else
+    {
+        if (m_XVport != -1)
+            XvUngrabPort(m_dis, m_XVport, CurrentTime);
+        XFreeGC(m_dis, m_gc);
+    }
+
     XDestroyWindow(m_dis, m_win);
     XCloseDisplay(m_dis);
 }
 
 void ZMPlayer::displayFrame(void)
+{
+    if (m_useGL)
+        displayFrameGl();
+    else
+        displayFrameXv();
+}
+
+void ZMPlayer::displayFrameGl(void)
 {
     if (m_eventList->size() == 0)
         return;
@@ -553,4 +702,65 @@ void ZMPlayer::displayFrame(void)
     glTexCoord2f(1.0,0.0); glVertex2f(2,0);
     glEnd();
     glXSwapBuffers(m_dis, m_win);
+}
+
+void ZMPlayer::displayFrameXv(void)
+{
+    if (m_eventList->size() == 0)
+        return;
+
+    if (!m_initalized)
+        if (!initPlayer())
+            return;
+
+    if (m_image.isNull())
+        return;
+
+    if (m_haveXV && !m_XvImage)
+    {
+        m_XvImage = XvCreateImage(m_dis, m_XVport, RGB24, m_rgba,
+                                  m_image.width(),  m_image.height());
+        if (m_XvImage == NULL)
+        {
+            VERBOSE(VB_GENERAL, "WARNING: Unable to create XVImage");
+            VERBOSE(VB_GENERAL, "Falling back to XImage - slow and ugly rescaling");
+            m_haveXV = false;
+        }
+    }
+
+    if (!m_haveXV && !m_XImage)
+    {
+        m_XImage = XCreateImage(m_dis, XDefaultVisual(m_dis, m_screenNum), 24, ZPixmap, 0, 
+                               m_rgba, m_displayRect.width(), m_displayRect.height(), 
+                               32, 4 * m_displayRect.width());
+        if (m_XImage == NULL)
+        {
+            VERBOSE(VB_IMPORTANT, "ERROR: Unable to create XImage");
+            return;
+        }
+    }
+
+    if (m_haveXV)
+    {
+        unsigned char *data = m_image.bits();
+        memcpy(m_rgba, data, m_image.width() * m_image.height() * 4);
+
+        m_frameText->SetText(QString("%1/%2").arg(m_curFrame).arg(m_lastFrame));
+
+        XvPutImage(m_dis, m_XVport, m_win, m_gc, m_XvImage, 0, 0, 
+                   m_image.width(), m_image.height(), 
+                   0, 0, m_displayRect.width(), m_displayRect.height());
+    }
+    else
+    {
+        //software scaling
+        m_image = m_image.scale(m_displayRect.width(), m_displayRect.height());
+        unsigned char *data = m_image.bits();
+        memcpy(m_rgba, data, m_image.width() * m_image.height() * 4);
+
+        m_frameText->SetText(QString("%1/%2").arg(m_curFrame).arg(m_lastFrame));
+
+        XPutImage(m_dis, m_win, m_gc, m_XImage, 0, 0, 0, 0, 
+                  m_displayRect.width(), m_displayRect.height());
+    }
 }
