@@ -383,5 +383,6 @@ void NewsSite::ReplaceHtmlChar(QString &s)
     s.replace("&#225;", QChar(225));
     s.replace("&#8216;", QChar(8216));
     s.replace("&#8217;", QChar(8217));
+    s.replace("&#039;", "\'");
 }
 
