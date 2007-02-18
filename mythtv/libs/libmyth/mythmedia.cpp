@@ -86,13 +86,20 @@ bool MythMediaDevice::isDeviceOpen() const
 
 bool MythMediaDevice::performMountCmd(bool DoMount)
 {
-    QString MountCommand;
-    
+    if (DoMount && isMounted(true))
+    {
+        VERBOSE(VB_GENERAL, "MythMediaDevice::performMountCmd(true)"
+                            " - Logic Error? Device already mounted.");
+        return true;
+    }
+
     if (isDeviceOpen())
         closeDevice();
 
     if (!m_SuperMount) 
     {
+        QString MountCommand;
+
         // Build a command line for mount/unmount and execute it...
         // Is there a better way to do this?
         if (QFile(PATHTO_PMOUNT).exists() && QFile(PATHTO_PUMOUNT).exists())
