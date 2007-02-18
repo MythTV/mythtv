@@ -43,15 +43,15 @@ FlacEncoder::FlacEncoder(const QString &outfile, int qualitylevel,
     int rice_parameter_search_dist = 0;
 
     encoder = encoder_new();
-    encoder_setup(encoder, streamable_subset, \
-                  do_mid_side, loose_mid_side, \
-                  NUM_CHANNELS, bits_per_sample, \
-                  sample_rate, blocksize, \
-                  max_lpc_order, qlp_coeff_precision, \
-                  qlp_coeff_prec_search, do_escape_coding, \
-                  do_exhaustive_model_search, \
-                  min_residual_partition_order, \
-                  max_residual_partition_order, \
+    encoder_setup(encoder, streamable_subset,
+                  do_mid_side, loose_mid_side,
+                  NUM_CHANNELS, bits_per_sample,
+                  sample_rate, blocksize,
+                  max_lpc_order, qlp_coeff_precision,
+                  qlp_coeff_prec_search, do_escape_coding,
+                  do_exhaustive_model_search,
+                  min_residual_partition_order,
+                  max_residual_partition_order,
                   rice_parameter_search_dist);
 
 #if !defined(NEWFLAC)
