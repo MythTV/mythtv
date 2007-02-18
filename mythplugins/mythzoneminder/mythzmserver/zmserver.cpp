@@ -81,11 +81,11 @@ void loadZMConfig(const string &configfile)
     {
         char *line_ptr = line;
         // Trim off any cr/lf line endings
-        int chomp_len = strcspn( line_ptr, "\r\n" );
+        size_t chomp_len = strcspn( line_ptr, "\r\n" );
         line_ptr[chomp_len] = '\0';
 
         // Remove leading white space
-        int white_len = strspn( line_ptr, " \t" );
+        size_t white_len = strspn( line_ptr, " \t" );
         line_ptr += white_len;
 
         // Check for comment or empty line
@@ -178,8 +178,8 @@ void ZMServer::tokenize(const string &command, vector<string> &tokens)
 {
     string token = "";
     tokens.clear();
-    uint startPos = 0;
-    uint endPos = 0;
+    string::size_type startPos = 0;
+    string::size_type endPos = 0;
 
     while((endPos = command.find("[]:[]", startPos)) != string::npos)
     {
