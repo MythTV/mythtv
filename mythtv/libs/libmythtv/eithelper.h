@@ -76,7 +76,9 @@ class EITHelper
     void AddEIT(const DVBEventInformationTable*) {}
 #endif // !USING_BACKEND
 
-    void PruneCache(uint timestamp);
+    // EIT cache handling
+    void PruneEITCache(uint timestamp);
+    void WriteEITCache(void);
 
   private:
     uint GetChanID(uint atsc_major, uint atsc_minor);

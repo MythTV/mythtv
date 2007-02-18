@@ -388,9 +388,14 @@ void EITHelper::AddEIT(const DVBEventInformationTable *eit)
     }
 }
 
-void EITHelper::PruneCache(uint timestamp)
+void EITHelper::PruneEITCache(uint timestamp)
 {
     eitcache->PruneOldEntries(timestamp);
+}
+
+void EITHelper::WriteEITCache(void)
+{
+    eitcache->WriteToDB();
 }
 
 //////////////////////////////////////////////////////////////////////

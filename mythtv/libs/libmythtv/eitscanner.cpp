@@ -129,6 +129,7 @@ void EITScanner::RunEventLoop(void)
  
             if (!(*activeScanNextChan).isEmpty())
             {
+                eitHelper->WriteEITCache();
                 rec->SetChannel(*activeScanNextChan, TVRec::kFlagEITScan);
                 VERBOSE(VB_GENERAL, LOC + 
                         QString("Now looking for EIT data on "
@@ -141,7 +142,7 @@ void EITScanner::RunEventLoop(void)
             activeScanNextChan++;
 
             // 24 hours ago
-            eitHelper->PruneCache(activeScanNextTrig.toTime_t() - 86400);
+            eitHelper->PruneEITCache(activeScanNextTrig.toTime_t() - 86400);
         }
 
         exitThreadCond.wait(400); // sleep up to 400 ms.
@@ -210,6 +211,7 @@ void EITScanner::StopPassiveScan(void)
     }
     channel = NULL;
 
+    eitHelper->WriteEITCache();
     eitHelper->SetSourceID(0);
 }
 

@@ -20,6 +20,8 @@ using namespace std;
 
 #include "programdata.h"
 
+#include "libmythtv/eitcache.h"
+
 static bool HouseKeeper_filldb_running = false;
 
 HouseKeeper::HouseKeeper(bool runthread, bool master)
@@ -148,6 +150,8 @@ void HouseKeeper::RunHouseKeeping(void)
     QString dbTag;
     // wait a little for main server to come up and things to settle down
     sleep(10);
+
+    RunStartupTasks();
 
     while (1)
     {
@@ -404,6 +408,14 @@ void HouseKeeper::CleanupProgramListings(void)
         delete prog_data;
     }
 }
+
+
+void HouseKeeper::RunStartupTasks(void)
+{
+    if (isMaster)
+        EITCache::ClearChannelLocks();
+}
+
 
 void *HouseKeeper::doHouseKeepingThread(void *param)
 {

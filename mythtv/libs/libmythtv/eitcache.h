@@ -27,6 +27,7 @@ class EITCache
                   uint eventid,   uint endtime);
 
     uint PruneOldEntries(uint utc_timestamp);
+    void WriteToDB(void);
 
     void ResetStatistics(void);
     QString GetStatistics(void) const;
@@ -34,7 +35,6 @@ class EITCache
   private:
     event_map_t * LoadChannel(uint networkid, uint tsid, uint serviceid);
     void DropChannel(uint64_t channel);
-    void WriteToDB(void);
 
     // event key cache
     key_map_t   channelMap;
@@ -53,6 +53,9 @@ class EITCache
     uint        wrongChannelHitCnt;
 
     static const uint kVersionMax;
+
+  public:
+    static void ClearChannelLocks(void);
 };
 
 #endif // _EIT_CACHE_H

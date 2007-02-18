@@ -174,12 +174,101 @@ static void delete_in_db(uint endtime)
     return;
 }
 
+#define EITDATA      0
+#define CHANNEL_LOCK 1
+#define STATISTIC    2
+
+static bool lock_channel(int chanid, uint lastPruneTime)
+{
+    int lock = 1;
+    MSqlQuery query(MSqlQuery::InitCon());
+
+    QString qstr = "SELECT COUNT(*) "
+                   "FROM eit_cache "
+                   "WHERE chanid  = :CHANID   AND "
+                   "      endtime > :ENDTIME  AND "
+                   "      status  = :STATUS";
+
+    query.prepare(qstr);
+    query.bindValue(":CHANID",   chanid);
+    query.bindValue(":ENDTIME",  lastPruneTime);
+    query.bindValue(":STATUS",   CHANNEL_LOCK);
+
+    if (!query.exec() || !query.isActive())
+    {
+        MythContext::DBError("Error checking for channel lock", query);
+        return false;
+    }
+
+    if (query.next())
+        lock = query.value(0).toInt();
+
+    if (lock)
+    {
+        VERBOSE(VB_EIT, LOC + QString("Ignoring channel %1 since it is locked.")
+                .arg(chanid));
+        return false;
+    }
+    else
+    {
+        uint now = QDateTime::currentDateTime().toTime_t();
+        qstr = "INSERT INTO eit_cache "
+               "       ( chanid,  endtime,  status) "
+               "VALUES (:CHANID, :ENDTIME, :STATUS)";
+
+        query.prepare(qstr);
+        query.bindValue(":CHANID",   chanid);
+        query.bindValue(":ENDTIME",  now);
+        query.bindValue(":STATUS",   CHANNEL_LOCK);
+
+        if (!query.exec())
+        {
+            MythContext::DBError("Error inserting channel lock", query);
+            return false;
+        }
+    }
+
+    return true;
+}
+
+static void unlock_channel(int chanid, uint updated)
+{
+    MSqlQuery query(MSqlQuery::InitCon());
+
+    QString qstr =
+        "DELETE FROM eit_cache "
+        "WHERE chanid  = :CHANID   AND "
+        "      status  = :STATUS";
+
+    query.prepare(qstr);
+    query.bindValue(":CHANID",  chanid);
+    query.bindValue(":STATUS",  CHANNEL_LOCK);
+
+    if (!query.exec())
+        MythContext::DBError("Error deleting channel lock", query);
+
+    // inserting statistics
+    uint now = QDateTime::currentDateTime().toTime_t();
+    qstr = "REPLACE INTO eit_cache "
+           "       ( chanid,  eventid,  endtime,  status) "
+           "VALUES (:CHANID, :EVENTID, :ENDTIME, :STATUS)";
+
+    query.prepare(qstr);
+    query.bindValue(":CHANID",   chanid);
+    query.bindValue(":EVENTID",  updated);
+    query.bindValue(":ENDTIME",  now);
+    query.bindValue(":STATUS",   STATISTIC);
+
+    if (!query.exec())
+        MythContext::DBError("Error inserting eit statistics", query);
+}
+
 
 event_map_t * EITCache::LoadChannel(uint networkid, uint tsid, uint serviceid)
 {
     int chanid = get_chanid_from_db(networkid, tsid, serviceid);
 
-    if (chanid < 1)
+    if (chanid < 0 || !lock_channel(chanid, lastPruneTime))
         return NULL;
 
     MSqlQuery query(MSqlQuery::InitCon());
@@ -188,11 +277,14 @@ event_map_t * EITCache::LoadChannel(uint networkid, uint tsid, uint serviceid)
         "SELECT eventid,tableid,version,endtime "
         "FROM eit_cache "
         "WHERE chanid        = :CHANID   AND "
-        "      endtime       > :ENDTIME";
+        "      endtime       > :ENDTIME  AND "
+        "      status        = :STATUS";
 
     query.prepare(qstr);
     query.bindValue(":CHANID",   chanid);
     query.bindValue(":ENDTIME",  lastPruneTime);
+    query.bindValue(":STATUS",   EITDATA);
+
 
     if (!query.exec() || !query.isActive())
     {
@@ -230,8 +322,11 @@ void EITCache::DropChannel(uint64_t channel)
 
     event_map_t * eventMap = channelMap[channel];
 
+    if (!eventMap)
+        return;
+
     uint size    = eventMap->size();
-    uint written = 0;
+    uint updated = 0;
 
     event_map_t::iterator it = eventMap->begin();
     while (it != eventMap->end())
@@ -239,7 +334,7 @@ void EITCache::DropChannel(uint64_t channel)
         if (modified(*it) && extract_endtime(*it) > lastPruneTime)
         {
             replace_in_db(chanid, it.key(), *it);
-            written++;
+            updated++;
         }
 
         event_map_t::iterator tmp = it;
@@ -249,11 +344,13 @@ void EITCache::DropChannel(uint64_t channel)
     }
     delete eventMap;
     channelMap.erase(channel);
+    entryCnt -= size;
+
+    unlock_channel(chanid, updated);
 
     VERBOSE(VB_EIT, LOC + QString("Wrote %1 modified entries of %2 "
                                   "for channel %3 to database.")
-            .arg(written).arg(size).arg(chanid));
-    entryCnt -= size;
+            .arg(updated).arg(size).arg(chanid));
 }
 
 void EITCache::WriteToDB(void)
@@ -360,6 +457,25 @@ uint EITCache::PruneOldEntries(uint timestamp)
     delete_in_db(timestamp);
 
     return 0;
+}
+
+
+/** \fn EITCache::ClearChannelLocks(void)
+ *  \brief removes old channel locks, use it only at master b<ackend start
+ */
+void EITCache::ClearChannelLocks(void)
+{
+    MSqlQuery query(MSqlQuery::InitCon());
+
+    QString qstr =
+        "DELETE FROM eit_cache "
+        "WHERE status  = :STATUS";
+
+    query.prepare(qstr);
+    query.bindValue(":STATUS",  CHANNEL_LOCK);
+
+    if (!query.exec())
+        MythContext::DBError("Error clearing channel locks", query);
 }
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
