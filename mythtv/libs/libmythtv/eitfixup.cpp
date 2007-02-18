@@ -266,7 +266,6 @@ void EITFixUp::FixUK(DBEvent &event) const
 {
     const uint SUBTITLE_PCT = 30; //% of description to allow subtitle up to
     const uint SUBTITLE_MAX_LEN = 128; // max length of subtitle field in db.
-    int airdateposition;
     int position = event.description.find("New Series");
     if (position != -1)
     {
@@ -295,19 +294,19 @@ void EITFixUp::FixUK(DBEvent &event) const
         QString Full = event.title.replace(m_ukPEnd, "") + " " +
             event.description.replace(m_ukPStart, "");
 
-        if ((position = Full.find(m_ukEPQ)) != -1)
+        if ((position = Full.find(m_ukYear)) != -1)
+        {
+            // Looks like they are using the airdate as a delimiter
+            event.description = Full.mid(position);
+            event.title = Full.left(position);
+        }
+        else if ((position = Full.find(m_ukEPQ)) != -1)
         {
             if (Full[position] == '!' || Full[position] == '?' ||
                 Full[position] == '.')
                 position++;
             event.title = Full.left(position);
             event.description = Full.mid(position + 1);
-        }
-        if ((airdateposition = event.title.find(m_ukYear)) != -1)
-        {
-            // Looks like they are using the airdate as a delimiter
-            event.description = event.title.mid(airdateposition);
-            event.title = event.title.left(airdateposition);
         }
     }
 
@@ -339,7 +338,7 @@ void EITFixUp::FixUK(DBEvent &event) const
             event.description = event.description.mid(position + 1);
         }
     }
-    else if (!((airdateposition != -1) && (airdateposition < 3))
+    else if (!(((position = event.description.find(m_ukYear)) != -1) && (position < 3))
             && ((position = event.description.find(m_ukEPQ)) != -1))
     {
         // only move stuff into the subtitle if the airdate isn't at
