@@ -294,19 +294,19 @@ void EITFixUp::FixUK(DBEvent &event) const
         QString Full = event.title.replace(m_ukPEnd, "") + " " +
             event.description.replace(m_ukPStart, "");
 
-        if ((position = Full.find(m_ukYear)) != -1)
-        {
-            // Looks like they are using the airdate as a delimiter
-            event.description = Full.mid(position);
-            event.title = Full.left(position);
-        }
-        else if ((position = Full.find(m_ukEPQ)) != -1)
+        if ((position = Full.find(m_ukEPQ)) != -1)
         {
             if (Full[position] == '!' || Full[position] == '?' ||
                 Full[position] == '.')
                 position++;
             event.title = Full.left(position);
             event.description = Full.mid(position + 1);
+        }
+        if ((position = event.title.find(m_ukYear)) != -1)
+        {
+            // Looks like they are using the airdate as a delimiter
+            event.description = event.title.mid(position);
+            event.title = event.title.left(position);
         }
     }
 
