@@ -1978,6 +1978,9 @@ if test x"$tune" = x"generic" -a x"$cpu_overide" != x"yes"; then
 # Athlon 64
    elif expr "$processor" : ".*AMD Athlon(tm) 64" > /dev/null ; then
        ARCHFLAGS="-march=k8"
+# AMD Opteron
+   elif expr "$processor" : ".*AMD Opteron(tm)" >/dev/null ; then 
+       ARCHFLAGS="-march=k8"
 # Athlon XP
    elif expr "$processor" : "athlon-xp" > /dev/null ; then
        ARCHFLAGS="-march=pentiumpro -mmmx"
