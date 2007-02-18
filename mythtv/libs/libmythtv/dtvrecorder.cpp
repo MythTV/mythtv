@@ -331,6 +331,8 @@ void DTVRecorder::HandleKeyframe(void)
     if (!_position_map.contains(frameNum))
     {
         long long startpos = ringBuffer->GetWritePosition();
+        // FIXME: handle keyframes with start code spanning over two ts packets
+        startpos += _payload_buffer.size();
         _position_map_delta[frameNum] = startpos;
         _position_map[frameNum]       = startpos;
         save_map = true;
