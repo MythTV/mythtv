@@ -1789,6 +1789,8 @@ bool PlaybackBox::FillList(bool useCachedData)
                 p->recpriority2 += (maxAge * 2 - nextHours[recid]) / 2;
 
             int hrs = p->endts.secsTo(now) / 3600;
+            if (hrs < 1)
+                hrs = 1;
 
             // add points for a new recording that decrease each hour
             if (hrs < 24)
@@ -1817,10 +1819,9 @@ bool PlaybackBox::FillList(bool useCachedData)
                                              .arg(p->title));
 
                     if (maxEpisodes[recid] > 0)
-                        p->recpriority2 += maxAge / 2 + p->startts.daysTo(now);
+                        p->recpriority2 += (maxAge / 2) + (hrs / 24);
                     else
-                        p->recpriority2 += maxAge / 3 + 
-                                          (p->startts.secsTo(now) / 1800);
+                        p->recpriority2 += (maxAge / 3) + (hrs * 2);
                 }
             }
             // Weekly
@@ -1844,10 +1845,10 @@ bool PlaybackBox::FillList(bool useCachedData)
                                              .arg(p->title));
 
                     if (maxEpisodes[recid] > 0)
-                        p->recpriority2 += maxAge / 2 + p->startts.daysTo(now);
+                        p->recpriority2 += (maxAge / 2) + (hrs / 24);
                     else
                         p->recpriority2 += 
-                            maxAge / 3 + (p->startts.daysTo(now) * maxAge / 4);
+                            (maxAge / 3) + (maxAge * hrs / 24 / 4);
                 }
             }
             // Not recurring
@@ -1866,8 +1867,8 @@ bool PlaybackBox::FillList(bool useCachedData)
                     if (hrs < 48)
                         p->recpriority2 += maxAge * (48 - hrs) / 48;
 
-                    if (p->startts.daysTo(now) < maxAge)
-                        p->recpriority2 += p->startts.daysTo(now);
+                    if ((hrs / 24) < maxAge)
+                        p->recpriority2 += hrs / 24;
                     else
                         p->recpriority2 += maxAge;
                 }
