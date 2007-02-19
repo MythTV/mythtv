@@ -318,9 +318,8 @@ bool Scheduler::FillRecordList(void)
 void Scheduler::FillRecordListFromDB(int recordid)
 {
     struct timeval fillstart, fillend;
+    float matchTime, placeTime;
 
-    gettimeofday(&fillstart, NULL);
-    
     MSqlQuery query(dbConn);
     QString thequery;
     QString where = "";
@@ -351,8 +350,17 @@ void Scheduler::FillRecordListFromDB(int recordid)
         return;
     }
 
+    gettimeofday(&fillstart, NULL);
     UpdateMatches(recordid);
+    gettimeofday(&fillend, NULL);
+    matchTime = ((fillend.tv_sec - fillstart.tv_sec ) * 1000000 +
+                 (fillend.tv_usec - fillstart.tv_usec)) / 1000000.0;
+
+    gettimeofday(&fillstart, NULL);
     FillRecordList();
+    gettimeofday(&fillend, NULL);
+    placeTime = ((fillend.tv_sec - fillstart.tv_sec ) * 1000000 +
+                 (fillend.tv_usec - fillstart.tv_usec)) / 1000000.0;
 
     MSqlQuery queryDrop(dbConn);
     queryDrop.prepare("DROP TABLE recordmatch;");
@@ -363,14 +371,10 @@ void Scheduler::FillRecordListFromDB(int recordid)
         return;
     }
 
-    gettimeofday(&fillend, NULL);
-
-    double schedTime = (fillend.tv_sec - fillstart.tv_sec ) +
-                         (fillend.tv_usec - fillstart.tv_usec) / 1000000.0;
     QString msg;
     msg.sprintf("Speculative scheduled %d items in "
-                "%.2f", (int)reclist.size(),
-                schedTime);
+                "%.1f = %.2f match + %.2f place", (int)reclist.size(),
+                matchTime + placeTime, matchTime, placeTime);
     VERBOSE(VB_GENERAL, msg);
 }
 
