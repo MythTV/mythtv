@@ -12,7 +12,7 @@ namespace
     const QString lastMythDVDDBVersion = "1002";
     const QString lastMythVideoVersion = "1010";
 
-    const QString currentDatabaseVersion = "1011";
+    const QString currentDatabaseVersion = "1012";
 
     const QString OldMythVideoVersionName = "VideoDBSchemaVer";
     const QString OldMythDVDVersionName = "DVDDBSchemaVer";
@@ -584,7 +584,16 @@ namespace
         if (dbver == currentDatabaseVersion)
             return;
 
-        // future schema updates go here
+        if (dbver == "1011")
+        {
+            const QString updates[] = {
+"ALTER TABLE filemarkup MODIFY mark MEDIUMINT UNSIGNED NOT NULL DEFAULT 0, "
+                       "MODIFY offset BIGINT UNSIGNED, "
+                       "MODIFY type TINYINT NOT NULL DEFAULT 0;",
+""
+};
+            performActualUpdate(updates, "1012", dbver, MythVideoVersionName);
+        }
     }
 }
 

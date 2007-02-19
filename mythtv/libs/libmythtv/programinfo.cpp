@@ -2473,10 +2473,6 @@ void ProgramInfo::SetMarkupMap(frm_dir_map_t &marks,
         long long frame = i.key();
         int mark_type;
         QString querystr;
-        QString frame_str;
-        char tempc[128];
-        sprintf(tempc, "%lld", frame );
-        frame_str += tempc;
        
         if ((min_frame >= 0) && (frame < min_frame))
             continue;
@@ -2503,7 +2499,7 @@ void ProgramInfo::SetMarkupMap(frm_dir_map_t &marks,
             query.bindValue(":CHANID", chanid);
             query.bindValue(":STARTTIME", recstartts);
         }
-        query.bindValue(":MARK", frame_str);
+        query.bindValue(":MARK", frame);
         query.bindValue(":TYPE", mark_type);
        
         if (!query.exec() || !query.isActive())
@@ -2542,8 +2538,7 @@ void ProgramInfo::GetMarkupMap(frm_dir_map_t &marks,
     if (query.exec() && query.isActive() && query.size() > 0)
     {
         while(query.next())
-            marks[stringToLongLong(query.value(0).toString())] =
-                  query.value(1).toInt();
+            marks[query.value(0).toLongLong()] = query.value(1).toInt();
     }
 }
 
@@ -2596,8 +2591,7 @@ void ProgramInfo::GetPositionMap(frm_pos_map_t &posMap,
     if (query.exec() && query.isActive() && query.size() > 0)
     {
         while (query.next())
-            posMap[stringToLongLong(query.value(0).toString())] =
-                   stringToLongLong(query.value(1).toString());
+            posMap[query.value(0).toLongLong()] = query.value(1).toLongLong();
     }
 }
 
@@ -2636,18 +2630,9 @@ void ProgramInfo::SetPositionMap(frm_pos_map_t &posMap, int type,
     QString comp = "";
 
     if (min_frame >= 0)
-    {
-        char tempc[128];
-        sprintf(tempc, " AND mark >= %lld ", min_frame);
-        comp += tempc;
-    }
-
+        comp += " AND mark >= :MIN_FRAME ";
     if (max_frame >= 0)
-    {
-        char tempc[128];
-        sprintf(tempc, " AND mark <= %lld ", max_frame);
-        comp += tempc;
-    }
+        comp += " AND mark <= :MAX_FRAME ";
 
     if (isVideo)
     {
@@ -2668,6 +2653,10 @@ void ProgramInfo::SetPositionMap(frm_pos_map_t &posMap, int type,
         query.bindValue(":STARTTIME", recstartts);
     }
     query.bindValue(":TYPE", type);
+    if (min_frame >= 0)
+        query.bindValue(":MIN_FRAME", min_frame);
+    if (max_frame >= 0)
+        query.bindValue(":MAX_FRAME", max_frame);
     
     if (!query.exec() || !query.isActive())
         MythContext::DBError("position map clear", 
@@ -2676,8 +2665,6 @@ void ProgramInfo::SetPositionMap(frm_pos_map_t &posMap, int type,
     for (i = posMap.begin(); i != posMap.end(); ++i)
     {
         long long frame = i.key();
-        char tempc[128];
-        sprintf(tempc, "%lld", frame);
 
         if ((min_frame >= 0) && (frame < min_frame))
             continue;
@@ -2685,13 +2672,8 @@ void ProgramInfo::SetPositionMap(frm_pos_map_t &posMap, int type,
         if ((max_frame >= 0) && (frame > max_frame))
             continue;
 
-        QString frame_str = tempc;
-
         long long offset = i.data();
-        sprintf(tempc, "%lld", offset);
        
-        QString offset_str = tempc;
-
         if (isVideo)
         {
             query.prepare("INSERT INTO filemarkup"
@@ -2709,9 +2691,9 @@ void ProgramInfo::SetPositionMap(frm_pos_map_t &posMap, int type,
             query.bindValue(":CHANID", chanid);
             query.bindValue(":STARTTIME", recstartts);
         }
-        query.bindValue(":MARK", frame_str);
+        query.bindValue(":MARK", frame);
         query.bindValue(":TYPE", type);
-        query.bindValue(":OFFSET", offset_str);
+        query.bindValue(":OFFSET", offset);
         
         if (!query.exec() || !query.isActive())
             MythContext::DBError("position map insert", 
@@ -2728,15 +2710,7 @@ void ProgramInfo::SetPositionMapDelta(frm_pos_map_t &posMap,
     for (i = posMap.begin(); i != posMap.end(); ++i)
     {
         long long frame = i.key();
-        char tempc[128];
-        sprintf(tempc, "%lld", frame);
-
-        QString frame_str = tempc;
-
         long long offset = i.data();
-        sprintf(tempc, "%lld", offset);
-       
-        QString offset_str = tempc;
 
         if (isVideo)
         {
@@ -2755,9 +2729,9 @@ void ProgramInfo::SetPositionMapDelta(frm_pos_map_t &posMap,
             query.bindValue(":CHANID", chanid);
             query.bindValue(":STARTTIME", recstartts);
         }
-        query.bindValue(":MARK", frame_str);
+        query.bindValue(":MARK", frame);
         query.bindValue(":TYPE", type);
-        query.bindValue(":OFFSET", offset_str);
+        query.bindValue(":OFFSET", offset);
         
         if (!query.exec() || !query.isActive())
             MythContext::DBError("delta position map insert", 
