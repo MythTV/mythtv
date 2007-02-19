@@ -2859,9 +2859,7 @@ void VideoOutputXv::ProcessFrameXvMC(VideoFrame *frame, OSD *osd)
         VideoFrame *osdframe = NULL;
         int ret = DisplayOSD(xvmc_osd->OSDFrame(), osd, -1,
                              xvmc_osd->GetRevision());
-        OSDSurface *osdsurf = osd->Display();
-        if (osdsurf)
-            xvmc_osd->SetRevision(osdsurf->GetRevision());
+        xvmc_osd->SetRevision(osd->GetRevision());
         if (ret >= 0 && xvmc_osd->NeedFrame())
         {
             // If there are no available buffer, try to toss old

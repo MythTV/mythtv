@@ -24,6 +24,7 @@ class OSDSurface
 
     void Clear(void);
     void ClearUsed(void);
+    bool IsClear(void) const;
 
     bool IntersectsDrawn(QRect &newrect);
     void AddRect(QRect &newrect);
@@ -35,7 +36,7 @@ class OSDSurface
         if (change) 
             ++revision;
     }
-    int GetRevision() { return revision; }
+    int GetRevision(void) const { return revision; }
 
     void BlendToYV12(unsigned char *yptr,
                      unsigned char *uptr,

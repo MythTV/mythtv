@@ -60,6 +60,8 @@ class OSD : public QObject
 
     OSDSurface *Display(void);
 
+    int  GetRevision(void) const;
+
     void ClearAll(const QString &name);
     void ClearAllText(const QString &name);
     void SetText(const QString &name, QMap<QString, QString> &infoMap,

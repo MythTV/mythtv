@@ -2474,6 +2474,13 @@ void OSD::DisableFade(void)
     totalfadetime = 0;
 }
 
+int OSD::GetRevision(void) const
+{
+    if (drawSurface)
+        return drawSurface->GetRevision();
+    return 0;
+}
+
 OSDSurface *OSD::Display(void)
 {
     bool anytodisplay = false;
@@ -2545,7 +2552,7 @@ OSDSurface *OSD::Display(void)
 
     m_setsvisible = anytodisplay;
 
-    if (m_setsvisible)
+    if (m_setsvisible && !drawSurface->IsClear())
         return drawSurface;
 
     return NULL;
