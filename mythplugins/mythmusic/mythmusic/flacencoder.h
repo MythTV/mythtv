@@ -18,21 +18,21 @@
             min_residual_partition_order, max_residual_partition_order, \
             rice_parameter_search_dist) \
             { \
-              FLAC__file_encoder_set_streamable_subset(enc, streamable_subset) \
-              FLAC__file_encoder_set_do_mid_side_stereo(enc, do_mid_side_stereo) \
-              FLAC__file_encoder_set_loose_mid_side_stereo(enc, loose_mid_side_stereo) \
-              FLAC__file_encoder_set_channels(enc, channels) \
-              FLAC__file_encoder_set_bits_per_sample(enc, bits_per_sample) \
-              FLAC__file_encoder_set_sample_rate(enc, sample_rate) \
-              FLAC__file_encoder_set_blocksize(enc, blocksize) \
-              FLAC__file_encoder_set_max_lpc_order(enc, max_lpc_order) \
-              FLAC__file_encoder_set_qlp_coeff_precision(enc, qlp_coeff_precision) \
-              FLAC__file_encoder_set_do_qlp_coeff_prec_search(enc, do_qlp_coeff_prec_search) \
-              FLAC__file_encoder_set_do_escape_coding(enc, do_escape_coding) \
-              FLAC__file_encoder_set_do_exhaustive_model_search(enc, do_exhaustive_model_search) \
-              FLAC__file_encoder_set_min_residual_partition_order(enc, min_residual_partition_order) \
-              FLAC__file_encoder_set_max_residual_partition_order(enc, max_residual_partition_order) \
-              FLAC__file_encoder_set_rice_parameter_search_dist(enc, rice_parameter_search_dist) \
+              FLAC__file_encoder_set_streamable_subset(enc, streamable_subset); \
+              FLAC__file_encoder_set_do_mid_side_stereo(enc, do_mid_side_stereo); \
+              FLAC__file_encoder_set_loose_mid_side_stereo(enc, loose_mid_side_stereo); \
+              FLAC__file_encoder_set_channels(enc, channels); \
+              FLAC__file_encoder_set_bits_per_sample(enc, bits_per_sample); \
+              FLAC__file_encoder_set_sample_rate(enc, sample_rate); \
+              FLAC__file_encoder_set_blocksize(enc, blocksize); \
+              FLAC__file_encoder_set_max_lpc_order(enc, max_lpc_order); \
+              FLAC__file_encoder_set_qlp_coeff_precision(enc, qlp_coeff_precision); \
+              FLAC__file_encoder_set_do_qlp_coeff_prec_search(enc, do_qlp_coeff_prec_search); \
+              FLAC__file_encoder_set_do_escape_coding(enc, do_escape_coding); \
+              FLAC__file_encoder_set_do_exhaustive_model_search(enc, do_exhaustive_model_search); \
+              FLAC__file_encoder_set_min_residual_partition_order(enc, min_residual_partition_order); \
+              FLAC__file_encoder_set_max_residual_partition_order(enc, max_residual_partition_order); \
+              FLAC__file_encoder_set_rice_parameter_search_dist(enc, rice_parameter_search_dist); \
             }
   #define encoder_finish(enc) FLAC__file_encoder_finish(enc)
   #define encoder_delete(enc) FLAC__file_encoder_delete(enc)
