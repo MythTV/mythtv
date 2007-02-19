@@ -506,7 +506,7 @@ RecStatusType TVRec::StartRecording(const ProgramInfo *rcinfo)
 
         retval = rsRecording;
     }
-    else if (!HasFlags(kFlagCancelNextRecording))
+    else
     {
         msg = QString("Wanted to record: %1 %2 %3 %4\n"
             "\t\t\tBut the current state is: %5")
@@ -521,7 +521,10 @@ RecStatusType TVRec::StartRecording(const ProgramInfo *rcinfo)
                 .arg(curRecording->recendts.toString());
         VERBOSE(VB_IMPORTANT, LOC + msg);
 
-        retval = rsTunerBusy;
+        if (HasFlags(kFlagCancelNextRecording))
+            retval = rsCancelled;
+        else
+            retval = rsTunerBusy;
     }
 
     if (pendingRecording)
