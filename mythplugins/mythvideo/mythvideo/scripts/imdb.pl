@@ -80,6 +80,13 @@ sub help {
    usage();
 }
 
+sub trim {
+   my ($str) = @_;
+   $str =~ s/^\s+//;
+   $str =~ s/\s+$//;
+   return $str;
+}
+
 # returns text within 'data' between 'beg' and 'end' matching strings
 sub parseBetween {
    my ($data, $beg, $end)=@_; # grab parameters
@@ -102,6 +109,8 @@ sub getMovieData {
    my ($movieid)=@_; # grab movieid parameter
    if (defined $opt_d) { printf("# looking for movie id: '%s'\n", $movieid);}
 
+   my $name_link_pat = qr'<a href="/name/[^"]*">([^<]*)</a>'m;
+
    # get the search results  page
    my $request = "http://www.imdb.com/title/tt" . $movieid . "/";
    if (defined $opt_d) { printf("# request: '%s'\n", $request); }
@@ -122,23 +131,22 @@ sub getMovieData {
    }
 
    # parse director 
-   my $director = parseBetween($response, ">Directed by</b>", "/a><br>");
+   my $director = parseBetween($response, ">Directed by</h5>", "/a><br/>");
    $director = parseBetween($director, "/\">", "<");
 
    # parse writer 
    # (Note: this takes the 'first' writer, may want to include others)
-   my $writer = parseBetween($response, ">Writing credits</b>", "</table>");
-   $writer = parseBetween($writer, "/\">", "</");
+   my $data = parseBetween($response, ">Writing credits <a href=\"/wga\">(WGA)</a></h5>", "\n<br/>");
+   my $writer = join(",", ($data =~ m/$name_link_pat/g));
 
    # parse plot
-   my $plot = parseBetween($response, ">Plot Outline:</b> ", "<br>");
+   my $plot = parseBetween($response, ">Plot Outline:</h5> ", "</div>");
    if (!$plot) {
       $plot = parseBetween($response, ">Plot Summary:</b> ", "<br>");
    }
 
    if ($plot) {
       # replace name links in plot (example 0388795)
-      my $name_link_pat = qr!<a href="/name/[^"]*">([^<]*)</a>!m;
       $plot =~ s/$name_link_pat/$1/g;
 
       # replace title links
@@ -146,10 +154,11 @@ sub getMovieData {
       $plot =~ s/$title_link_pat/$1/g;
 
       # plot ends at first remaining link
-      my $plot_end = index($plot, "<a href=\"");
+      my $plot_end = index($plot, "<a ");
       if ($plot_end != -1) {
          $plot = substr($plot, 0, $plot_end);
       }
+      $plot = trim($plot);
    }
 
    # parse user rating
@@ -158,79 +167,40 @@ sub getMovieData {
 
    # parse MPAA rating
    my $ratingcountry = "USA";
-   my $movierating = parseBetween($response, ">MPAA</a>:</b> ", "<br>");
+   my $movierating = trim(parseBetween($response, ">MPAA</a>:</h5>", "</div>"));
    if (!$movierating) {
-       $movierating = parseBetween($response, ">Certification:</b>", "<br>");
+       $movierating = parseBetween($response, ">Certification:</h5>", "</div>");
        $movierating = parseBetween($movierating, "certificates=$ratingcountry",
                                    "/a>");
        $movierating = parseBetween($movierating, ">", "<");
    }
 
    # parse movie length
-   my $runtime = parseBetween($response, ">Runtime:</b>\n", " min");
+   my $runtime = trim(parseBetween($response, ">Runtime:</h5>", " min"));
 
    # parse cast 
    #  Note: full cast would be from url: 
    #    www.imdb.com/title/<movieid>/fullcredits
-   my @actors;
    my $cast = "";
-   my $count = 0;
-   my $data = parseBetween($response, "Cast overview, first billed only:",
+   $data = parseBetween($response, "Cast overview, first billed only",
                                "/table>"); 
    if ($data) {
-      my $beg = "/\">"; 
-      my $end = "</a>";
-      my $start = index($data, $beg);
-      my $finish = index($data, $end, $start);
-      my $actor;
-      while ($start != -1) {
-         $start += length($beg);
-         $actor = substr($data, $start, $finish - $start);
-         # add to array
-         $actors[$count++] = $actor;
-
-         # advance data to next movie
-         $data = substr($data, - (length($data) - $finish));
-         $start = index($data, $beg);
-         $finish = index($data, $end, $start + 1); 
-      }
-      $cast = join(',', @actors);
+      $cast = join(',', ($data =~ m/$name_link_pat/g));
    }
    
    
    # parse genres 
    my $lgenres = "";
-   $count = 0;
-   $data = parseBetween($response, "<b class=\"ch\">Genre:</b>","<b class=\"ch\">User Comments:</b>"); 
+   $data = parseBetween($response, "<h5>Genre:</h5>","</div>"); 
    if ($data) {
       my $genre_pat = qr'/Sections/Genres/(?:[a-z ]+/)*">([^<]+)<'im;
       $lgenres = join(',', ($data =~ /$genre_pat/g));
    }
    
    # parse countries 
-   my @countries;
-   my $lcountries = "";
-   $count = 0;
-   $data = parseBetween($response, "<b class=\"ch\">Country:</b>","<br>"); 
-   if ($data) {
-      my $beg = "/\">"; 
-      my $end = "</a>";
-      my $start = index($data, $beg);
-      my $finish = index($data, $end, $start);
-      my $country;
-      while ($start != -1) {
-         $start += length($beg);
-         $country = substr($data, $start, $finish - $start);
-         # add to array
-         $countries[$count++] = $country;
-
-         # advance data to next movie
-         $data = substr($data, - (length($data) - $finish));
-         $start = index($data, $beg);
-         $finish = index($data, $end, $start + 1); 
-      }
-      $lcountries = join(',', @countries);
-   }
+   $data = parseBetween($response, "Country:</h5>","</div>"); 
+   my $country_pat = qr'/Sections/Countries/[A-Z]+/">([^<]+)</a>'i;
+   my $lcountries = join(",", ($data =~ m/$country_pat/g));
 
    # output fields (these field names must match what MythVideo is looking for)
    print "Title:$title\n";
@@ -276,17 +246,16 @@ sub getMoviePoster {
       if (defined $opt_d) { printf("# got %i bytes\n", length($impres)); }
       if (defined $opt_r) { printf("%s", $impres); }      
 
-	# making sure it isnt redirect
-	$uri = parseBetween($impres, "0;URL=..", "\">");
-	if ($uri ne "") {
-		if (defined $opt_d) { printf("# processing redirect to %s\n",$uri); }
-		# this was redirect
-                $impsite = $site . $uri;
-                $impres = get $impsite;
-	}
-
+      # making sure it isnt redirect
+      $uri = parseBetween($impres, "0;URL=..", "\">");
+      if ($uri ne "") {
+         if (defined $opt_d) { printf("# processing redirect to %s\n",$uri); }
+         # this was redirect
+         $impsite = $site . $uri;
+         $impres = get $impsite;
+      }
       
-      # do stuff normally	
+      # do stuff normally
       $uri = parseBetween($impres, "<img SRC=\"posters/", "\" ALT");
       # uri here is relative... patch it up to make a valid uri
       if (!($uri =~ /http:(.*)/ )) {
@@ -371,10 +340,7 @@ sub getMoviePoster {
 
       # now we get all other possible movie titles and store them in the titles array
       while($response =~ m/>([^>^\(]*)([ ]{0,1}\([^\)]*\)[^\(^\)]*[ ]{0,1}){0,1}\(informal title\)/g) {
-         $movie_titles[$k++] = $1;
-         chomp($movie_titles[$k-1]);
-         $movie_titles[$k-1] =~ s/^\s+//;
-         $movie_titles[$k-1] =~ s/\s+$//;
+         $movie_titles[$k++] = trim($1);
          if (defined $opt_d) { print "# Title: ".$movie_titles[$k-1]."\n"; }
       }
        
@@ -437,7 +403,7 @@ sub getMovieList {
    # check to see if we got a results page or a movie page
    #    looking for 'add=<movieid>" target=' which only exists
    #    in a movie description page 
-   my $movienum = parseBetween($response, "add=", "\" target=");
+   my $movienum = parseBetween($response, "add=", "\">");
    if ($movienum) {
        if (defined $opt_d) { printf("# redirected to movie page\n"); }
        my $movietitle = parseBetween($response, "<title>", "</title>"); 
