@@ -223,16 +223,18 @@ void EITHelper::AddEIT(const DVBEventInformationTable *eit)
 		 (uint64_t)eit->ServiceID()];
     fix |= EITFixUp::kFixGenericDVB;
 
-    uint networkid = eit->OriginalNetworkID();
-    uint tsid      = eit->TSID();
-    uint serviceid = eit->ServiceID();
+    uint chanid = GetChanID(eit->ServiceID(), eit->OriginalNetworkID(),
+                            eit->TSID());
+    if (!chanid)
+        return;
+
     uint tableid   = eit->TableID();
     uint version   = eit->Version();
     for (uint i = 0; i < eit->EventCount(); i++)
     {
         // Skip event if we have already processed it before...
-        if (!eitcache->IsNewEIT(networkid, tsid, serviceid, tableid, version,
-                                eit->EventID(i), eit->EndTimeUnixUTC(i)))
+        if (!eitcache->IsNewEIT(chanid, tableid, version, eit->EventID(i),
+                              eit->EndTimeUnixUTC(i)))
         {
             continue;
         }
@@ -366,12 +368,6 @@ void EITHelper::AddEIT(const DVBEventInformationTable *eit)
                     seriesId = desc.ContentId();
             }
         }
-
-        uint chanid = GetChanID(
-            eit->ServiceID(), eit->OriginalNetworkID(), eit->TSID());
-
-        if (!chanid)
-            continue;
 
         QDateTime starttime = MythUTCToLocal(eit->StartTimeUTC(i));
         EITFixUp::TimeFix(starttime);

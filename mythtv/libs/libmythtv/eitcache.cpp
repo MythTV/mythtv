@@ -56,28 +56,6 @@ QString EITCache::GetStatistics(void) const
         .arg((hitCnt+prunedHitCnt+wrongChannelHitCnt)/(double)accessCnt);
 }
 
-static inline uint64_t construct_channel(uint networkid,
-                                         uint tsid, uint serviceid)
-{
-    return (((uint64_t) networkid << 32) | ((uint64_t) tsid    << 16) |
-            ((uint64_t) serviceid));
-}
-
-static inline uint extract_onid(uint64_t channel)
-{
-    return (channel >> 32) & 0xffff;
-}
-
-static inline uint extract_tsid(uint64_t channel)
-{
-    return (channel >> 16) & 0xffff;
-}
-
-static inline uint extrac_sid(uint64_t channel)
-{
-    return channel & 0xffff;
-}
-
 static inline uint64_t construct_sig(uint tableid, uint version,
                                      uint endtime, bool modified)
 {
@@ -103,34 +81,6 @@ static inline uint extract_endtime(uint64_t sig)
 static inline bool modified(uint64_t sig)
 {
     return sig >> 63;
-}
-
-static int get_chanid_from_db(uint networkid, uint tsid, uint serviceid)
-{
-    MSqlQuery query(MSqlQuery::InitCon());
-
-    // DVB Link to chanid
-    QString qstr =
-        "SELECT chanid, useonairguide "
-        "FROM channel, dtv_multiplex "
-        "WHERE serviceid        = :SERVICEID   AND "
-        "      networkid        = :NETWORKID   AND "
-        "      transportid      = :TRANSPORTID AND "
-        "      channel.mplexid  = dtv_multiplex.mplexid";
-
-    query.prepare(qstr);
-    query.bindValue(":SERVICEID",   serviceid);
-    query.bindValue(":NETWORKID",   networkid);
-    query.bindValue(":TRANSPORTID", tsid);
-
-    if (!query.exec() || !query.isActive())
-        MythContext::DBError("Looking up chanID", query);
-    else if (query.next())
-    {
-        bool useOnAirGuide = query.value(1).toBool();
-        return (useOnAirGuide) ? query.value(0).toInt() : -1;
-    }
-    return -1;
 }
 
 static void replace_in_db(int chanid, uint eventid, uint64_t sig)
@@ -264,11 +214,9 @@ static void unlock_channel(int chanid, uint updated)
 }
 
 
-event_map_t * EITCache::LoadChannel(uint networkid, uint tsid, uint serviceid)
+event_map_t * EITCache::LoadChannel(uint chanid)
 {
-    int chanid = get_chanid_from_db(networkid, tsid, serviceid);
-
-    if (chanid < 0 || !lock_channel(chanid, lastPruneTime))
+    if (!lock_channel(chanid, lastPruneTime))
         return NULL;
 
     MSqlQuery query(MSqlQuery::InitCon());
@@ -311,19 +259,15 @@ event_map_t * EITCache::LoadChannel(uint networkid, uint tsid, uint serviceid)
     return eventMap;
 }
 
-void EITCache::DropChannel(uint64_t channel)
+void EITCache::DropChannel(uint chanid)
 {
-    int chanid = get_chanid_from_db(extract_onid(channel),
-                                    extract_tsid(channel),
-                                    extrac_sid(channel));
-
-    if (chanid < 1)
-        return;
-
-    event_map_t * eventMap = channelMap[channel];
+    event_map_t * eventMap = channelMap[chanid];
 
     if (!eventMap)
+    {
+        channelMap.erase(chanid);
         return;
+    }
 
     uint size    = eventMap->size();
     uint updated = 0;
@@ -343,7 +287,7 @@ void EITCache::DropChannel(uint64_t channel)
         it = tmp;
     }
     delete eventMap;
-    channelMap.erase(channel);
+    channelMap.erase(chanid);
     entryCnt -= size;
 
     unlock_channel(chanid, updated);
@@ -370,9 +314,8 @@ void EITCache::WriteToDB(void)
 
 
 
-bool EITCache::IsNewEIT(uint networkid, uint tsid,    uint serviceid,
-                        uint tableid,   uint version,
-                        uint eventid,   uint endtime)
+bool EITCache::IsNewEIT(uint chanid,  uint tableid,   uint version,
+                        uint eventid, uint endtime)
 {
     accessCnt++;
 
@@ -389,21 +332,19 @@ bool EITCache::IsNewEIT(uint networkid, uint tsid,    uint serviceid,
         return false;
     }
 
-    uint64_t channel = construct_channel(networkid, tsid, serviceid);
-
     QMutexLocker locker(&eventMapLock);
-    if (!channelMap.contains(channel))
+    if (!channelMap.contains(chanid))
     {
-        channelMap[channel] = LoadChannel(networkid, tsid, serviceid);
+        channelMap[chanid] = LoadChannel(chanid);
     }
 
-    if (!channelMap[channel])
+    if (!channelMap[chanid])
     {
         wrongChannelHitCnt++;
         return false;
     }
 
-    event_map_t * eventMap = channelMap[channel];
+    event_map_t * eventMap = channelMap[chanid];
     event_map_t::iterator it = eventMap->find(eventid);
     if (it != eventMap->end())
     {

@@ -14,7 +14,7 @@
 #include <qstring.h>
 
 typedef QMap<uint, uint64_t> event_map_t;
-typedef QMap<uint64_t, event_map_t*> key_map_t;
+typedef QMap<uint, event_map_t*> key_map_t;
 
 class EITCache
 {
@@ -22,8 +22,7 @@ class EITCache
     EITCache();
    ~EITCache();
 
-    bool IsNewEIT(uint networkid, uint tsid,    uint serviceid,
-                  uint tableid,   uint version,
+    bool IsNewEIT(uint chanid, uint tableid,   uint version,
                   uint eventid,   uint endtime);
 
     uint PruneOldEntries(uint utc_timestamp);
@@ -33,8 +32,8 @@ class EITCache
     QString GetStatistics(void) const;
 
   private:
-    event_map_t * LoadChannel(uint networkid, uint tsid, uint serviceid);
-    void DropChannel(uint64_t channel);
+    event_map_t * LoadChannel(uint chanid);
+    void DropChannel(uint chanid);
 
     // event key cache
     key_map_t   channelMap;
