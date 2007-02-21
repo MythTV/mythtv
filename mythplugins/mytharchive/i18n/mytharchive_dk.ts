@@ -49,7 +49,7 @@
     </message>
     <message>
         <source>The selected item is not a directory!</source>
-        <translation>Den valgte ting er ikke en mappe!</translation>
+        <translation>Det valgte objekt er ikke en mappe!</translation>
     </message>
 </context>
 <context>
@@ -68,11 +68,11 @@
     </message>
     <message>
         <source>Update</source>
-        <translation>Updatér</translation>
+        <translation>Opdatér</translation>
     </message>
     <message>
         <source>Exit</source>
-        <translation>Exit</translation>
+        <translation>Afslut</translation>
     </message>
 </context>
 <context>
@@ -118,7 +118,7 @@
     </message>
     <message>
         <source>You need to select at least one item to archive!</source>
-        <translation>Du behøver mindst en ting for at arkivere!</translation>
+        <translation>Du skal vælge mindst et objekt for at arkivere!</translation>
     </message>
     <message>
         <source>Finish</source>
@@ -126,21 +126,23 @@
     </message>
     <message>
         <source>All Archive Items</source>
-        <translation>Alle arkiverede ting</translation>
+        <translation>Alle arkiverede objekter</translation>
     </message>
     <message>
         <source>Myth Burn</source>
-        <translation>Myth Burn</translation>
+        <translation>Brænd</translation>
     </message>
     <message>
         <source>You don&apos;t have any items to archive!
 
 Click OK</source>
-        <translation>Du har ingenting at arkivere! Tryk Ok</translation>
+        <translation>Du har ingenting at arkivere!
+
+Tryk OK</translation>
     </message>
     <message>
         <source>Edit Details</source>
-        <translation>Ændre detailjer</translation>
+        <translation>Redigér detaljer</translation>
     </message>
     <message>
         <source>Remove Item</source>
@@ -148,11 +150,11 @@ Click OK</source>
     </message>
     <message>
         <source>Use SL DVD (4489Mb)</source>
-        <translation>Brug SL DVD (4489Mb)</translation>
+        <translation>Brug enkeltlags-DVD (4489Mb)</translation>
     </message>
     <message>
         <source>Use DL DVD (8978Mb)</source>
-        <translation>Brug DL DVD (8978Mb)</translation>
+        <translation>Brug dobbeltlags-DVD (8978Mb)</translation>
     </message>
 </context>
 <context>
@@ -183,7 +185,7 @@ Click OK</source>
     </message>
     <message>
         <source>You need to select at least one item to archive!</source>
-        <translation>Du behøver mindst en ting for at arkivere!</translation>
+        <translation>Du skal vælge mindst et objekt for at arkivere!</translation>
     </message>
     <message>
         <source>Finish</source>
@@ -191,21 +193,23 @@ Click OK</source>
     </message>
     <message>
         <source>All Archive Items</source>
-        <translation>Alle arkiverede ting</translation>
+        <translation>Alle arkiverede objekter</translation>
     </message>
     <message>
         <source>Myth Burn</source>
-        <translation>Myth Burn</translation>
+        <translation>Brænd</translation>
     </message>
     <message>
         <source>You don&apos;t have any items to archive!
 
 Click OK</source>
-        <translation>Du har ingenting at arkivere! Tryk Ok</translation>
+        <translation>Du har ingenting at arkivere!
+
+Tryk OK</translation>
     </message>
     <message>
         <source>Edit Details</source>
-        <translation>Ændre detailjer</translation>
+        <translation>Redigér detaljer</translation>
     </message>
     <message>
         <source>Remove Item</source>
@@ -213,11 +217,11 @@ Click OK</source>
     </message>
     <message>
         <source>Use SL DVD (4489Mb)</source>
-        <translation>Brug SL DVD (4489Mb)</translation>
+        <translation>Brug enkeltlags-DVD (4489Mb)</translation>
     </message>
     <message>
         <source>Use DL DVD (8978Mb)</source>
-        <translation>Brug DL DVD (8978Mb)</translation>
+        <translation>Brug dobbeltlags-DVD (8978Mb)</translation>
     </message>
 </context>
 <context>
@@ -256,35 +260,35 @@ Click OK</source>
     </message>
     <message>
         <source>Location of DVD</source>
-        <translation type="unfinished"></translation>
+        <translation>Sti til DVD</translation>
     </message>
     <message>
         <source>Which DVD drive to use when burning discs.</source>
-        <translation type="unfinished"></translation>
+        <translation>Hvilket DVD-drev der skal bruges ved brænding</translation>
     </message>
     <message>
         <source>ffmpeg Command</source>
-        <translation type="unfinished"></translation>
+        <translation>ffmpeg-kommando</translation>
     </message>
     <message>
         <source>Command to run ffmpeg.</source>
-        <translation type="unfinished"></translation>
+        <translation>Kommandoen for at køre ffmpeg</translation>
     </message>
     <message>
         <source>mplex Command</source>
-        <translation type="unfinished"></translation>
+        <translation>mplex-kommando</translation>
     </message>
     <message>
         <source>Command to run mplex</source>
-        <translation type="unfinished"></translation>
+        <translation>Kommandoen for at køre mplex</translation>
     </message>
     <message>
         <source>dvdauthor command</source>
-        <translation type="unfinished"></translation>
+        <translation>dvdauthor-kommando</translation>
     </message>
     <message>
         <source>Command to run dvdauthor.</source>
-        <translation type="unfinished"></translation>
+        <translation>Kommandoen for at køre dvdauthor</translation>
     </message>
     <message>
         <source>mkisofs command</source>
@@ -292,7 +296,7 @@ Click OK</source>
     </message>
     <message>
         <source>Command to run mkisofs. (Used to create ISO images)</source>
-        <translation type="unfinished"></translation>
+        <translation>Kommandoen for at køre mkisofs (bruges til at oprette ISO images)</translation>
     </message>
     <message>
         <source>growisofs command</source>
@@ -392,7 +396,7 @@ This may take a few minutes.</source>
     </message>
     <message>
         <source>You need to select at least one recording!</source>
-        <translation>Du behøver mindst en fil!</translation>
+        <translation>Du skal vælge mindst en fil!</translation>
     </message>
     <message>
         <source>All Recordings</source>
@@ -408,7 +412,7 @@ This may take a few minutes.</source>
 Click OK</source>
         <translation>Du har ingen optagelser!
 
-Tryk Ok</translation>
+Tryk OK</translation>
     </message>
 </context>
 <context>
@@ -435,7 +439,7 @@ Tryk Ok</translation>
     </message>
     <message>
         <source>You need to select at least one video file!</source>
-        <translation>Du skal vælge mindst en video fil!</translation>
+        <translation>Du skal vælge mindst en videofil!</translation>
     </message>
     <message>
         <source>All Videos</source>
@@ -443,7 +447,7 @@ Tryk Ok</translation>
     </message>
     <message>
         <source>Video Selector</source>
-        <translation>Video vælger</translation>
+        <translation>Video-vælger</translation>
     </message>
     <message>
         <source>You don&apos;t have any videos!
