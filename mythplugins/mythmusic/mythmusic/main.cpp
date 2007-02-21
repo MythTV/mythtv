@@ -36,7 +36,7 @@ void CheckFreeDBServerFile(void)
     char filename[1024];
     if (getenv("HOME") == NULL)
     {
-        cerr << "main.o: You don't have a HOME environment variable. CD lookup will almost certainly not work." << endl;
+        VERBOSE(VB_IMPORTANT, "main.o: You don't have a HOME environment variable. CD lookup will almost certainly not work.");
         return;
     }
     sprintf(filename, "%s/.cdserverrc", getenv("HOME"));
@@ -250,9 +250,12 @@ void MusicCallback(void *data, QString &selection)
     }
     else if (sel == "exiting_menu")
     {
-        if (mdata->runPost)
-            postMusic(mdata);
-        delete mdata;
+        if (mdata)
+        {
+            if (mdata->runPost)
+                postMusic(mdata);
+            delete mdata;
+        }
     }
 }
 
@@ -277,7 +280,7 @@ void runMenu(MusicData *mdata, QString which_menu)
     }
     else
     {
-        cerr << "Couldn't find theme " << themedir << endl;
+        VERBOSE(VB_IMPORTANT, QString("Couldn't find theme %1").arg(themedir));
         delete diag;
     }
 }
@@ -374,7 +377,6 @@ static void preMusic(MusicData *mdata)
 
     CheckFreeDBServerFile();
 
-
     MSqlQuery count_query(MSqlQuery::InitCon());
     count_query.exec("SELECT COUNT(*) FROM music_songs;");
 
@@ -411,7 +413,7 @@ static void preMusic(MusicData *mdata)
 
     // Set the various track formatting modes
     Metadata::setArtistAndTrackFormats();
-    
+
     AllMusic *all_music = new AllMusic(paths, startdir);
 
     //  Load all playlists into RAM (once!)
@@ -449,7 +451,6 @@ int mythplugin_run(void)
 
     preMusic(mdata);
     runMenu(mdata, "musicmenu.xml");
-    //postMusic(&mdata);
 
     return 0;
 }
