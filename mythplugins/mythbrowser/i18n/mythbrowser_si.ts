@@ -3,82 +3,82 @@
     <name>Bookmarks</name>
     <message>
         <source>MythBrowser: Select group or single site to view</source>
-        <translation>MythBrskalnik: Izberite si skupino ali posamezno stran za pogled</translation>
+        <translation type="obsolete">MythBrskalnik: Izberite si skupino ali posamezno stran za pogled</translation>
     </message>
 </context>
 <context>
     <name>BookmarksConfig</name>
     <message>
         <source>MythBrowser Bookmarks Settings</source>
-        <translation>Nastavitve priljubljenih MythBrskalnika</translation>
+        <translation type="obsolete">Nastavitve priljubljenih MythBrskalnika</translation>
     </message>
     <message>
         <source>Press the &apos;New Bookmark&apos; button to add a new site/group.
 Pressing SPACE/Enter on a selected entry removes it from the listview.</source>
-        <translation>Pritisnite gumb &apos;Nova Priljubljena&apos; za dodajanje nove strani/skupine.
+        <translation type="obsolete">Pritisnite gumb &apos;Nova Priljubljena&apos; za dodajanje nove strani/skupine.
 Z pritiskom na PRESLEDNICO/ENTER nad izbranim vnosom, se le ta izbriše. </translation>
     </message>
     <message>
         <source>Zoom [%]:</source>
-        <translation>Povečava [%]:</translation>
+        <translation type="obsolete">Povečava [%]:</translation>
     </message>
     <message>
         <source>Browser:</source>
-        <translation>Brskalnik:</translation>
+        <translation type="obsolete">Brskalnik:</translation>
     </message>
     <message>
         <source>Hide Scrollbars</source>
-        <translation>Skrij drsnike</translation>
+        <translation type="obsolete">Skrij drsnike</translation>
     </message>
     <message>
         <source>Scroll Page</source>
-        <translation>Zarolaj stran</translation>
+        <translation type="obsolete">Zarolaj stran</translation>
     </message>
     <message>
         <source>Scroll Speed:</source>
-        <translation>Hitrost rolanja:</translation>
+        <translation type="obsolete">Hitrost rolanja:</translation>
     </message>
     <message>
         <source>&amp;New Bookmark</source>
-        <translation>&amp;Nova priljubljena</translation>
+        <translation type="obsolete">&amp;Nova priljubljena</translation>
     </message>
     <message>
         <source>Add a new Website</source>
-        <translation>Dodaj novo spletno stran</translation>
+        <translation type="obsolete">Dodaj novo spletno stran</translation>
     </message>
     <message>
         <source>&amp;Finish</source>
-        <translation>&amp;Konec</translation>
+        <translation type="obsolete">&amp;Konec</translation>
     </message>
 </context>
 <context>
     <name>PopupBox</name>
     <message>
         <source>Add New Website</source>
-        <translation>Dodaj novo spletno stran</translation>
+        <translation type="obsolete">Dodaj novo spletno stran</translation>
     </message>
     <message>
         <source>Group:</source>
-        <translation>Skupina:</translation>
+        <translation type="obsolete">Skupina:</translation>
     </message>
     <message>
         <source>Description:</source>
-        <translation>Opis:</translation>
+        <translation type="obsolete">Opis:</translation>
     </message>
     <message>
         <source>URL:</source>
-        <translation>URL:</translation>
+        <translation type="obsolete">URL:</translation>
     </message>
     <message>
         <source>&amp;Ok</source>
-        <translation>&amp;OK</translation>
+        <translation type="obsolete">&amp;OK</translation>
     </message>
 </context>
 <context>
     <name>TabView</name>
     <message>
         <source>MythBrowser Menu</source>
-        <translation>Menu MythBrskalnika</translation>
+        <translation type="obsolete">Menu MythBrskalnika</translation>
     </message>
     <message>
         <source>         Back         </source>
@@ -94,7 +94,7 @@ Z pritiskom na PRESLEDNICO/ENTER nad izbranim vnosom, se le ta izbriše. </trans
     </message>
     <message>
         <source>Save Link in Bookmarks</source>
-        <translation>Shrani povezavo v priljubljene</translation>
+        <translation type="obsolete">Shrani povezavo v priljubljene</translation>
     </message>
     <message>
         <source>       zoom Out       </source>
@@ -106,15 +106,15 @@ Z pritiskom na PRESLEDNICO/ENTER nad izbranim vnosom, se le ta izbriše. </trans
     </message>
     <message>
         <source>Enter URL</source>
-        <translation>Vnesi URL</translation>
+        <translation type="obsolete">Vnesi URL</translation>
     </message>
     <message>
         <source>OK</source>
-        <translation>Vredu</translation>
+        <translation type="obsolete">Vredu</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation>Prekliči</translation>
+        <translation type="obsolete">Prekliči</translation>
     </message>
     <message>
         <source>      Remove Tab      </source>
@@ -130,43 +130,43 @@ Z pritiskom na PRESLEDNICO/ENTER nad izbranim vnosom, se le ta izbriše. </trans
     </message>
     <message>
         <source>Back</source>
-        <translation type="unfinished"></translation>
+        <translation type="obsolete">Nazaj</translation>
     </message>
     <message>
         <source>Next Tab</source>
-        <translation type="unfinished"></translation>
+        <translation type="obsolete">Naslednji zavihek</translation>
     </message>
     <message>
         <source>Prev Tab</source>
-        <translation type="unfinished"></translation>
+        <translation type="obsolete">Prejšnji zavihek</translation>
     </message>
     <message>
         <source>Remove Tab</source>
-        <translation type="unfinished"></translation>
+        <translation type="obsolete">Odstrani zavihek</translation>
     </message>
     <message>
         <source>Zoom Out</source>
-        <translation type="unfinished"></translation>
+        <translation type="obsolete">Pomanjšaj</translation>
     </message>
     <message>
         <source>Zoom In</source>
-        <translation type="unfinished"></translation>
+        <translation type="obsolete">Povečaj</translation>
     </message>
     <message>
         <source>Add New Bookmark</source>
-        <translation type="unfinished"></translation>
+        <translation type="obsolete">Dodaj novo bližnjico</translation>
     </message>
     <message>
         <source>Group:</source>
-        <translation type="unfinished">Skupina:</translation>
+        <translation type="obsolete">Skupina:</translation>
     </message>
     <message>
         <source>Description:</source>
-        <translation type="unfinished">Opis:</translation>
+        <translation type="obsolete">Opis:</translation>
     </message>
     <message>
         <source>URL:</source>
-        <translation type="unfinished">URL:</translation>
+        <translation type="obsolete">URL:</translation>
     </message>
 </context>
 </TS>

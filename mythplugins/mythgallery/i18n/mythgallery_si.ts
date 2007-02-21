@@ -102,7 +102,7 @@
     </message>
     <message>
         <source>Delete</source>
-        <translation type="unfinished"></translation>
+        <translation>Odstrani</translation>
     </message>
     <message>
         <source>MythGallery Directory &apos;%1&apos; does not exist or is unreadable.</source>
@@ -273,27 +273,27 @@
     </message>
     <message>
         <source>Store thumbnails in image directory</source>
-        <translation type="unfinished"></translation>
+        <translation>Shrani ikone v mapo s slikami</translation>
     </message>
     <message>
         <source>If set, thumbnails are stored in &apos;.thumbcache&apos; directories within the above directory. If cleared, they are stored in your home directory.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ikone bodo shranjene v mapo &apos;.thumbcache&apos; znotraj zgornje mape. Drugače bodo ikone shranjene v vaši domači mapi.</translation>
     </message>
     <message>
         <source>Recurse into directories</source>
-        <translation type="unfinished"></translation>
+        <translation>V vse mape</translation>
     </message>
     <message>
         <source>Check this to let the slideshow recurse into sub-directories.</source>
-        <translation type="unfinished"></translation>
+        <translation>Če omogočeno, se bodo predvajale slike iz vseh podmap.</translation>
     </message>
     <message>
         <source>Overlay caption</source>
-        <translation type="unfinished"></translation>
+        <translation>Ime čez sliko</translation>
     </message>
     <message>
         <source>This is the number of seconds to show a caption on top of a full size picture.</source>
-        <translation type="unfinished"></translation>
+        <translation>Za koliko sekund se bo pojavilo ime datoteke čez celozaslonsko sliko.</translation>
     </message>
     <message>
         <source>Sort order when browsing</source>

@@ -295,19 +295,19 @@
     </message>
     <message>
         <source>Playout Delay Min/Avg/Max:            </source>
-        <translation type="unfinished"></translation>
+        <translation>Zakasnitev Min/Povpr/Max:            </translation>
     </message>
     <message>
         <source>Packets Lost by Peer:                 </source>
-        <translation type="unfinished"></translation>
+        <translation>Izgubljeni paketi:                 </translation>
     </message>
     <message>
         <source>Packets Lost by Peer: </source>
-        <translation type="unfinished"></translation>
+        <translation>Izgubljeni paketi: </translation>
     </message>
     <message>
         <source>Playout Delay Min/Avg/Max: </source>
-        <translation type="unfinished"></translation>
+        <translation>Zakasnitev Min/Povpr/Max: </translation>
     </message>
 </context>
 <context>
@@ -550,27 +550,27 @@
     </message>
     <message>
         <source>Jitter Buffer (Audio Call)</source>
-        <translation type="unfinished"></translation>
+        <translation>Medpolnilnik (zvočni klic)</translation>
     </message>
     <message>
         <source>Size of the playout buffer in ms for an audio call. </source>
-        <translation type="unfinished"></translation>
+        <translation>Velikost medpolnilnika za zvočni klic v ms. </translation>
     </message>
     <message>
         <source>Jitter Buffer (Video Call)</source>
-        <translation type="unfinished"></translation>
+        <translation>Medpolnilnik (video klic)</translation>
     </message>
     <message>
         <source>Size of the playout buffer in ms for a video call. This should be bigger than for an audio call because CPU usage causes jitter and to sync video &amp; audio.</source>
-        <translation type="unfinished"></translation>
+        <translation>Velikost medpolnilnika za video klic v ms. Naj ne bi bil večji kot je pri zvočnem klicu, ker uporaba CPE povzroči izgube pri sinhronizaciji slike &amp; zvoka.</translation>
     </message>
     <message>
         <source>IP Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>IP nastavitve</translation>
     </message>
     <message>
         <source>AUDIO Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>ZVOČNE nastavitve</translation>
     </message>
 </context>
 </TS>
