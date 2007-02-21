@@ -4705,11 +4705,11 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>This setting and the following one define a time period when the mythfilldatabase process is allowed to run.  For example, setting Start to 11 and End to 13 would mean that the process would only run between 11:00 AM and 1:59 PM.</source>
-        <translation type="obsolete">この設定と次の設定で実行する時間帯を指定します。例えば、開始&quot;11&quot;、終了&quot;13&quot;と設定した場合は、午前11時から午後1時の間に実行されます。</translation>
+        <translation type="unfinished">この設定と次の設定で実行する時間帯を指定します。例えば、開始&quot;11&quot;、終了&quot;13&quot;と設定した場合は、午前11時から午後1時の間に実行されます。</translation>
     </message>
     <message>
         <source>This setting and the preceding one define a time period when the mythfilldatabase process is allowed to run.  For example, setting Start to 11 and End to 13 would mean that the process would only run between 11:00 AM and 1:59 PM.</source>
-        <translation type="obsolete">この設定と前の設定で実行する時間帯を指定します。例えば、開始&quot;11&quot;、終了&quot;13&quot;と設定した場合は、午前11時から午後1時の間に実行されます。</translation>
+        <translation type="unfinished">この設定と前の設定で実行する時間帯を指定します。例えば、開始&quot;11&quot;、終了&quot;13&quot;と設定した場合は、午前11時から午後1時の間に実行されます。</translation>
     </message>
     <message>
         <source>This starts the program guide immediately upon starting to watch Live TV.</source>
@@ -8887,11 +8887,11 @@ The frequency for this channel in</source>
     </message>
     <message>
         <source>This setting and the following one define a time period when the mythfilldatabase process is allowed to run.  For example, setting Start to 11 and End to 13 would mean that the process would only run between 11 AM and 1 PM.</source>
-        <translation type="unfinished">この設定と次の設定で実行する時間帯を指定します。例えば、開始&quot;11&quot;、終了&quot;13&quot;と設定した場合は、午前11時から午後1時の間に実行されます。 {11?} {1?}</translation>
+        <translation type="obsolete">この設定と次の設定で実行する時間帯を指定します。例えば、開始&quot;11&quot;、終了&quot;13&quot;と設定した場合は、午前11時から午後1時の間に実行されます。 {11?} {1?}</translation>
     </message>
     <message>
         <source>This setting and the preceding one define a time period when the mythfilldatabase process is allowed to run.  For example, setting Start to 11 and End to 13 would mean that the process would only run between 11 AM and 1 PM.</source>
-        <translation type="unfinished">この設定と前の設定で実行する時間帯を指定します。例えば、開始&quot;11&quot;、終了&quot;13&quot;と設定した場合は、午前11時から午後1時の間に実行されます。 {11?} {1?}</translation>
+        <translation type="obsolete">この設定と前の設定で実行する時間帯を指定します。例えば、開始&quot;11&quot;、終了&quot;13&quot;と設定した場合は、午前11時から午後1時の間に実行されます。 {11?} {1?}</translation>
     </message>
     <message>
         <source>mythfilldatabase Program</source>
@@ -8951,6 +8951,10 @@ The frequency for this channel in</source>
     </message>
     <message>
         <source>The format of the time string passed to the &apos;Set Wakeup Time Command&apos; as $time. See QT::QDateTime.toString() for details. Set to &apos;time_t&apos; for seconds since epoch (use time_t for nvram_wakeup).</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Match duplicates using subtitle then description</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

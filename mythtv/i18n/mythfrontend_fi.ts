@@ -63,9 +63,6 @@
     </message>
 </context>
 <context>
-    <name>CaptureCard</name>
-</context>
-<context>
     <name>CaptureCardEditor</name>
     <message>
         <source>Capture cards</source>
@@ -4729,11 +4726,11 @@ Käyttämäsi ohjelmahaku ei tue kanavanumeroita, joten ne on asetettava manuaal
     </message>
     <message>
         <source>This setting and the following one define a time period when the mythfilldatabase process is allowed to run.  For example, setting Start to 11 and End to 13 would mean that the process would only run between 11:00 AM and 1:59 PM.</source>
-        <translation type="obsolete">Määrittävät kellonajan ja päivät jolloin mythfilldatabase hakee ohjelmatiedot. Esimerkiksi Min. 11 ja Max. 13 tarkoittaa, että suoritus tapahtuu kello 11 ja 13 välillä.</translation>
+        <translation type="unfinished">Määrittävät kellonajan ja päivät jolloin mythfilldatabase hakee ohjelmatiedot. Esimerkiksi Min. 11 ja Max. 13 tarkoittaa, että suoritus tapahtuu kello 11 ja 13 välillä.</translation>
     </message>
     <message>
         <source>This setting and the preceding one define a time period when the mythfilldatabase process is allowed to run.  For example, setting Start to 11 and End to 13 would mean that the process would only run between 11:00 AM and 1:59 PM.</source>
-        <translation type="obsolete">Määrittävät kellonajan ja päivät jolloin mythfilldatabase hakee ohjelmatiedot. Esimerkiksi Min. 11 ja Max. 13 tarkoittaa, että suoritus tapahtuu kello 11 ja 13 välillä.</translation>
+        <translation type="unfinished">Määrittävät kellonajan ja päivät jolloin mythfilldatabase hakee ohjelmatiedot. Esimerkiksi Min. 11 ja Max. 13 tarkoittaa, että suoritus tapahtuu kello 11 ja 13 välillä.</translation>
     </message>
     <message>
         <source>This starts the program guide immediately upon starting to watch Live TV.</source>
@@ -8935,11 +8932,11 @@ The frequency for this channel in</source>
     </message>
     <message>
         <source>This setting and the following one define a time period when the mythfilldatabase process is allowed to run.  For example, setting Start to 11 and End to 13 would mean that the process would only run between 11 AM and 1 PM.</source>
-        <translation type="unfinished">Määrittävät kellonajan ja päivät jolloin mythfilldatabase hakee ohjelmatiedot. Esimerkiksi Min. 11 ja Max. 13 tarkoittaa, että suoritus tapahtuu kello 11 ja 13 välillä. {11?} {1?}</translation>
+        <translation type="obsolete">Määrittävät kellonajan ja päivät jolloin mythfilldatabase hakee ohjelmatiedot. Esimerkiksi Min. 11 ja Max. 13 tarkoittaa, että suoritus tapahtuu kello 11 ja 13 välillä. {11?} {1?}</translation>
     </message>
     <message>
         <source>This setting and the preceding one define a time period when the mythfilldatabase process is allowed to run.  For example, setting Start to 11 and End to 13 would mean that the process would only run between 11 AM and 1 PM.</source>
-        <translation type="unfinished">Määrittävät kellonajan ja päivät jolloin mythfilldatabase hakee ohjelmatiedot. Esimerkiksi Min. 11 ja Max. 13 tarkoittaa, että suoritus tapahtuu kello 11 ja 13 välillä. {11?} {1?}</translation>
+        <translation type="obsolete">Määrittävät kellonajan ja päivät jolloin mythfilldatabase hakee ohjelmatiedot. Esimerkiksi Min. 11 ja Max. 13 tarkoittaa, että suoritus tapahtuu kello 11 ja 13 välillä. {11?} {1?}</translation>
     </message>
     <message>
         <source>mythfilldatabase Program</source>
@@ -8999,6 +8996,10 @@ The frequency for this channel in</source>
     </message>
     <message>
         <source>The format of the time string passed to the &apos;Set Wakeup Time Command&apos; as $time. See QT::QDateTime.toString() for details. Set to &apos;time_t&apos; for seconds since epoch (use time_t for nvram_wakeup).</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Match duplicates using subtitle then description</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

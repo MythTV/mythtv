@@ -63,9 +63,6 @@
     </message>
 </context>
 <context>
-    <name>CaptureCard</name>
-</context>
-<context>
     <name>CaptureCardEditor</name>
     <message>
         <source>Capture cards</source>
@@ -5425,11 +5422,11 @@ Votre carte d&apos;acquisition n&apos;a pas fourni de canaux. Vous devez les sai
     </message>
     <message>
         <source>This setting and the following one define a time period when the mythfilldatabase process is allowed to run.  For example, setting Start to 11 and End to 13 would mean that the process would only run between 11:00 AM and 1:59 PM.</source>
-        <translation type="obsolete">Ce paramètre et le suivant définissent la période d&apos;activation du programme \&quot;mythfilldatabase\&quot;. Par exemple, fixer le démarrage à 11 et la fin à 13 signifie que le programme ne s&apos;exécutera qu&apos;entre 11 heures du matin et 1 heure de l&apos;après midi.</translation>
+        <translation type="unfinished">Ce paramètre et le suivant définissent la période d&apos;activation du programme \&quot;mythfilldatabase\&quot;. Par exemple, fixer le démarrage à 11 et la fin à 13 signifie que le programme ne s&apos;exécutera qu&apos;entre 11 heures du matin et 1 heure de l&apos;après midi.</translation>
     </message>
     <message>
         <source>This setting and the preceding one define a time period when the mythfilldatabase process is allowed to run.  For example, setting Start to 11 and End to 13 would mean that the process would only run between 11:00 AM and 1:59 PM.</source>
-        <translation type="obsolete">Ce paramètre et le précédent définissent la période d&apos;activation du programme \&quot;mythfilldatabase\&quot;. Par exemple, fixer le démarrage à 11 et la fin à 13 signifie que le programme ne s&apos;exécutera qu&apos;entre 11 heures du matin et 1 heure de l&apos;après midi.</translation>
+        <translation type="unfinished">Ce paramètre et le précédent définissent la période d&apos;activation du programme \&quot;mythfilldatabase\&quot;. Par exemple, fixer le démarrage à 11 et la fin à 13 signifie que le programme ne s&apos;exécutera qu&apos;entre 11 heures du matin et 1 heure de l&apos;après midi.</translation>
     </message>
     <message>
         <source>Any arguments you want passed to the mythfilldatabase program.</source>
@@ -9015,11 +9012,11 @@ The frequency for this channel in</source>
     </message>
     <message>
         <source>This setting and the following one define a time period when the mythfilldatabase process is allowed to run.  For example, setting Start to 11 and End to 13 would mean that the process would only run between 11 AM and 1 PM.</source>
-        <translation type="unfinished">Ce paramètre et le suivant définissent la période d&apos;activation du programme \&quot;mythfilldatabase\&quot;. Par exemple, fixer le démarrage à 11 et la fin à 13 signifie que le programme ne s&apos;exécutera qu&apos;entre 11 heures du matin et 1 heure de l&apos;après midi. {11?} {1?}</translation>
+        <translation type="obsolete">Ce paramètre et le suivant définissent la période d&apos;activation du programme \&quot;mythfilldatabase\&quot;. Par exemple, fixer le démarrage à 11 et la fin à 13 signifie que le programme ne s&apos;exécutera qu&apos;entre 11 heures du matin et 1 heure de l&apos;après midi. {11?} {1?}</translation>
     </message>
     <message>
         <source>This setting and the preceding one define a time period when the mythfilldatabase process is allowed to run.  For example, setting Start to 11 and End to 13 would mean that the process would only run between 11 AM and 1 PM.</source>
-        <translation type="unfinished">Ce paramètre et le précédent définissent la période d&apos;activation du programme \&quot;mythfilldatabase\&quot;. Par exemple, fixer le démarrage à 11 et la fin à 13 signifie que le programme ne s&apos;exécutera qu&apos;entre 11 heures du matin et 1 heure de l&apos;après midi. {11?} {1?}</translation>
+        <translation type="obsolete">Ce paramètre et le précédent définissent la période d&apos;activation du programme \&quot;mythfilldatabase\&quot;. Par exemple, fixer le démarrage à 11 et la fin à 13 signifie que le programme ne s&apos;exécutera qu&apos;entre 11 heures du matin et 1 heure de l&apos;après midi. {11?} {1?}</translation>
     </message>
     <message>
         <source>mythfilldatabase Program</source>
@@ -9079,6 +9076,10 @@ The frequency for this channel in</source>
     </message>
     <message>
         <source>The format of the time string passed to the &apos;Set Wakeup Time Command&apos; as $time. See QT::QDateTime.toString() for details. Set to &apos;time_t&apos; for seconds since epoch (use time_t for nvram_wakeup).</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Match duplicates using subtitle then description</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

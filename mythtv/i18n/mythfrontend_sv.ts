@@ -4491,11 +4491,11 @@ som du startade detta programmet ifrån.</translation>
     </message>
     <message>
         <source>This setting and the following one define a time period when the mythfilldatabase process is allowed to run.  For example, setting Start to 11 and End to 13 would mean that the process would only run between 11:00 AM and 1:59 PM.</source>
-        <translation type="obsolete">Denna och följande inställning avgör när mythfilldatabase tillåts köra. Exempelvis genom att sätta Min till 11 och Max till 13 kommer programmet endast tillåtas att köras mellan 11 och 13.</translation>
+        <translation type="unfinished">Denna och följande inställning avgör när mythfilldatabase tillåts köra. Exempelvis genom att sätta Min till 11 och Max till 13 kommer programmet endast tillåtas att köras mellan 11 och 13.</translation>
     </message>
     <message>
         <source>This setting and the preceding one define a time period when the mythfilldatabase process is allowed to run.  For example, setting Start to 11 and End to 13 would mean that the process would only run between 11:00 AM and 1:59 PM.</source>
-        <translation type="obsolete">Denna och föregående inställning avgör när mythfilldatabase tillåts köra. Exempelvis genom att sätta Min till 11 och Max till 13 kommer programmet endast tillåtas att köras mellan 11 och 13.</translation>
+        <translation type="unfinished">Denna och föregående inställning avgör när mythfilldatabase tillåts köra. Exempelvis genom att sätta Min till 11 och Max till 13 kommer programmet endast tillåtas att köras mellan 11 och 13.</translation>
     </message>
     <message>
         <source>(Unassigned)</source>
@@ -8716,11 +8716,11 @@ The frequency for this channel in</source>
     </message>
     <message>
         <source>This setting and the following one define a time period when the mythfilldatabase process is allowed to run.  For example, setting Start to 11 and End to 13 would mean that the process would only run between 11 AM and 1 PM.</source>
-        <translation type="unfinished">Denna och följande inställning avgör när mythfilldatabase tillåts köra. Exempelvis genom att sätta Min till 11 och Max till 13 kommer programmet endast tillåtas att köras mellan 11 och 13. {11?} {1?}</translation>
+        <translation type="obsolete">Denna och följande inställning avgör när mythfilldatabase tillåts köra. Exempelvis genom att sätta Min till 11 och Max till 13 kommer programmet endast tillåtas att köras mellan 11 och 13. {11?} {1?}</translation>
     </message>
     <message>
         <source>This setting and the preceding one define a time period when the mythfilldatabase process is allowed to run.  For example, setting Start to 11 and End to 13 would mean that the process would only run between 11 AM and 1 PM.</source>
-        <translation type="unfinished">Denna och föregående inställning avgör när mythfilldatabase tillåts köra. Exempelvis genom att sätta Min till 11 och Max till 13 kommer programmet endast tillåtas att köras mellan 11 och 13. {11?} {1?}</translation>
+        <translation type="obsolete">Denna och föregående inställning avgör när mythfilldatabase tillåts köra. Exempelvis genom att sätta Min till 11 och Max till 13 kommer programmet endast tillåtas att köras mellan 11 och 13. {11?} {1?}</translation>
     </message>
     <message>
         <source>mythfilldatabase Program</source>
@@ -8780,6 +8780,10 @@ The frequency for this channel in</source>
     </message>
     <message>
         <source>The format of the time string passed to the &apos;Set Wakeup Time Command&apos; as $time. See QT::QDateTime.toString() for details. Set to &apos;time_t&apos; for seconds since epoch (use time_t for nvram_wakeup).</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Match duplicates using subtitle then description</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

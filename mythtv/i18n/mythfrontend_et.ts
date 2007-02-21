@@ -5558,7 +5558,7 @@ Sinu tõmbaja ei sisalda kanalite numbreid, pead need käsitsi panema.</translat
     </message>
     <message>
         <source>This setting and the following one define a time period when the mythfilldatabase process is allowed to run.  For example, setting Start to 11 and End to 13 would mean that the process would only run between 11:00 AM and 1:59 PM.</source>
-        <translation type="obsolete">See ning järgmine säte määravad ajavahemiku, mil on lubatud mythfilldatabase käivitamine.  Näiteks seades alguse 11 ja lõpu 13 peale käivitatakse mythfilldatabase ainult kella 11:00 ja 13:00 vahel.</translation>
+        <translation type="unfinished">See ning järgmine säte määravad ajavahemiku, mil on lubatud mythfilldatabase käivitamine.  Näiteks seades alguse 11 ja lõpu 13 peale käivitatakse mythfilldatabase ainult kella 11:00 ja 13:00 vahel.</translation>
     </message>
     <message>
         <source>mythfilldatabase Execution End</source>
@@ -5566,7 +5566,7 @@ Sinu tõmbaja ei sisalda kanalite numbreid, pead need käsitsi panema.</translat
     </message>
     <message>
         <source>This setting and the preceding one define a time period when the mythfilldatabase process is allowed to run.  For example, setting Start to 11 and End to 13 would mean that the process would only run between 11:00 AM and 1:59 PM.</source>
-        <translation type="obsolete">See ning eelmine säte määravad ajavahemiku, mil on lubatud mythfilldatabase käivitamine.  Näiteks seades alguse 11 ja lõpu 13 peale käivitatakse mythfilldatabase ainult kella 11:00 ja 13:00 vahel.</translation>
+        <translation type="unfinished">See ning eelmine säte määravad ajavahemiku, mil on lubatud mythfilldatabase käivitamine.  Näiteks seades alguse 11 ja lõpu 13 peale käivitatakse mythfilldatabase ainult kella 11:00 ja 13:00 vahel.</translation>
     </message>
     <message>
         <source>mythfilldatabase Path</source>
@@ -9182,11 +9182,11 @@ The frequency for this channel in</source>
     </message>
     <message>
         <source>This setting and the following one define a time period when the mythfilldatabase process is allowed to run.  For example, setting Start to 11 and End to 13 would mean that the process would only run between 11 AM and 1 PM.</source>
-        <translation type="unfinished">See ning järgmine säte määravad ajavahemiku, mil on lubatud mythfilldatabase käivitamine.  Näiteks seades alguse 11 ja lõpu 13 peale käivitatakse mythfilldatabase ainult kella 11 ja 13:00 vahel. {1?}</translation>
+        <translation type="obsolete">See ning järgmine säte määravad ajavahemiku, mil on lubatud mythfilldatabase käivitamine.  Näiteks seades alguse 11 ja lõpu 13 peale käivitatakse mythfilldatabase ainult kella 11 ja 13:00 vahel. {1?}</translation>
     </message>
     <message>
         <source>This setting and the preceding one define a time period when the mythfilldatabase process is allowed to run.  For example, setting Start to 11 and End to 13 would mean that the process would only run between 11 AM and 1 PM.</source>
-        <translation type="unfinished">See ning eelmine säte määravad ajavahemiku, mil on lubatud mythfilldatabase käivitamine.  Näiteks seades alguse 11 ja lõpu 13 peale käivitatakse mythfilldatabase ainult kella 11 ja 13:00 vahel. {1?}</translation>
+        <translation type="obsolete">See ning eelmine säte määravad ajavahemiku, mil on lubatud mythfilldatabase käivitamine.  Näiteks seades alguse 11 ja lõpu 13 peale käivitatakse mythfilldatabase ainult kella 11 ja 13:00 vahel. {1?}</translation>
     </message>
     <message>
         <source>Decoder Settings</source>
@@ -9226,6 +9226,10 @@ The frequency for this channel in</source>
     </message>
     <message>
         <source>The format of the time string passed to the &apos;Set Wakeup Time Command&apos; as $time. See QT::QDateTime.toString() for details. Set to &apos;time_t&apos; for seconds since epoch (use time_t for nvram_wakeup).</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Match duplicates using subtitle then description</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

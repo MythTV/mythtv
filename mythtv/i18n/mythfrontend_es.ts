@@ -4770,11 +4770,11 @@ Su grabber no proporciona números de canal, así que debe establecerlos manualm
     </message>
     <message>
         <source>This setting and the following one define a time period when the mythfilldatabase process is allowed to run.  For example, setting Start to 11 and End to 13 would mean that the process would only run between 11:00 AM and 1:59 PM.</source>
-        <translation type="obsolete">Este ajuste y el siguiente definen un periodo de tiempo en el que permite ejecutarse a mythfilldatabase.  Por ejemplo, fijando el comienzo a las 11 y el fin a las 13 significaría que el proceso sólo podría ejecutarse entre las 11:00 AM y la 1:59 PM.</translation>
+        <translation type="unfinished">Este ajuste y el siguiente definen un periodo de tiempo en el que permite ejecutarse a mythfilldatabase.  Por ejemplo, fijando el comienzo a las 11 y el fin a las 13 significaría que el proceso sólo podría ejecutarse entre las 11:00 AM y la 1:59 PM.</translation>
     </message>
     <message>
         <source>This setting and the preceding one define a time period when the mythfilldatabase process is allowed to run.  For example, setting Start to 11 and End to 13 would mean that the process would only run between 11:00 AM and 1:59 PM.</source>
-        <translation type="obsolete">Este ajuste y el anterior definen un periodo de tiempo en el que permite ejecutarse a mythfilldatabase.  Por ejemplo, fijando el comienzo a las 11 y el fin a las 13 significaría que el proceso sólo podría ejecutarse entre las 11:00 AM y la 1:59 PM.</translation>
+        <translation type="unfinished">Este ajuste y el anterior definen un periodo de tiempo en el que permite ejecutarse a mythfilldatabase.  Por ejemplo, fijando el comienzo a las 11 y el fin a las 13 significaría que el proceso sólo podría ejecutarse entre las 11:00 AM y la 1:59 PM.</translation>
     </message>
     <message>
         <source>This starts the program guide immediately upon starting to watch Live TV.</source>
@@ -9116,11 +9116,11 @@ The frequency for this channel in</source>
     </message>
     <message>
         <source>This setting and the following one define a time period when the mythfilldatabase process is allowed to run.  For example, setting Start to 11 and End to 13 would mean that the process would only run between 11 AM and 1 PM.</source>
-        <translation type="unfinished">Este ajuste y el siguiente definen un periodo de tiempo en el que permite ejecutarse a mythfilldatabase.  Por ejemplo, fijando el comienzo a las 11 y el fin a las 13 significaría que el proceso sólo podría ejecutarse entre las 11 AM y la 1 PM.</translation>
+        <translation type="obsolete">Este ajuste y el siguiente definen un periodo de tiempo en el que permite ejecutarse a mythfilldatabase.  Por ejemplo, fijando el comienzo a las 11 y el fin a las 13 significaría que el proceso sólo podría ejecutarse entre las 11 AM y la 1 PM.</translation>
     </message>
     <message>
         <source>This setting and the preceding one define a time period when the mythfilldatabase process is allowed to run.  For example, setting Start to 11 and End to 13 would mean that the process would only run between 11 AM and 1 PM.</source>
-        <translation type="unfinished">Este ajuste y el anterior definen un periodo de tiempo en el que permite ejecutarse a mythfilldatabase.  Por ejemplo, fijando el comienzo a las 11 y el fin a las 13 significaría que el proceso sólo podría ejecutarse entre las 11 AM y la 1 PM.</translation>
+        <translation type="obsolete">Este ajuste y el anterior definen un periodo de tiempo en el que permite ejecutarse a mythfilldatabase.  Por ejemplo, fijando el comienzo a las 11 y el fin a las 13 significaría que el proceso sólo podría ejecutarse entre las 11 AM y la 1 PM.</translation>
     </message>
     <message>
         <source>mythfilldatabase Program</source>
@@ -9180,6 +9180,10 @@ The frequency for this channel in</source>
     </message>
     <message>
         <source>The format of the time string passed to the &apos;Set Wakeup Time Command&apos; as $time. See QT::QDateTime.toString() for details. Set to &apos;time_t&apos; for seconds since epoch (use time_t for nvram_wakeup).</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Match duplicates using subtitle then description</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

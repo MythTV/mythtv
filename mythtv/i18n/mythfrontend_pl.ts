@@ -63,9 +63,6 @@
     </message>
 </context>
 <context>
-    <name>CaptureCard</name>
-</context>
-<context>
     <name>CaptureCardEditor</name>
     <message>
         <source>Capture Card Menu</source>
@@ -1061,9 +1058,6 @@ Returning to the previous menu.</source>
         <source>&amp;Finish</source>
         <translation type="unfinished"></translation>
     </message>
-</context>
-<context>
-    <name>PlayGroup</name>
 </context>
 <context>
     <name>PlayGroupEditor</name>
@@ -8302,14 +8296,6 @@ The frequency for this channel in</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>This setting and the following one define a time period when the mythfilldatabase process is allowed to run.  For example, setting Start to 11 and End to 13 would mean that the process would only run between 11 AM and 1 PM.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>This setting and the preceding one define a time period when the mythfilldatabase process is allowed to run.  For example, setting Start to 11 and End to 13 would mean that the process would only run between 11 AM and 1 PM.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>mythfilldatabase Program</source>
         <translation type="unfinished"></translation>
     </message>
@@ -8367,6 +8353,18 @@ The frequency for this channel in</source>
     </message>
     <message>
         <source>The format of the time string passed to the &apos;Set Wakeup Time Command&apos; as $time. See QT::QDateTime.toString() for details. Set to &apos;time_t&apos; for seconds since epoch (use time_t for nvram_wakeup).</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Match duplicates using subtitle then description</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This setting and the following one define a time period when the mythfilldatabase process is allowed to run.  For example, setting Start to 11 and End to 13 would mean that the process would only run between 11:00 AM and 1:59 PM.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This setting and the preceding one define a time period when the mythfilldatabase process is allowed to run.  For example, setting Start to 11 and End to 13 would mean that the process would only run between 11:00 AM and 1:59 PM.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -8460,9 +8458,6 @@ The frequency for this channel in</source>
         <source>Scan Configuration</source>
         <translation type="unfinished"></translation>
     </message>
-</context>
-<context>
-    <name>ScanWizardScanType</name>
 </context>
 <context>
     <name>ScanWizardScanner</name>
