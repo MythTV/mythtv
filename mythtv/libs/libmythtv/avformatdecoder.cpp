@@ -2644,7 +2644,7 @@ static void extract_mono_channel(uint channel, AudioInfo *audioInfo,
 bool AvFormatDecoder::GetFrame(int onlyvideo)
 {
     AVPacket *pkt = NULL;
-    int len, ret = 0;
+    int len;
     unsigned char *ptr;
     int data_size = 0;
     long long pts;
@@ -2951,6 +2951,7 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
 
         while (!have_err && len > 0)
         {
+            int ret = 0;
             switch (ctype)
             {
                 case CODEC_TYPE_AUDIO:
@@ -3019,7 +3020,6 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
                     }
 
                     avcodeclock.lock();
-                    ret = len;
                     data_size = 0;
                     if (audioOut.do_passthru)
                     {
