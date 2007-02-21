@@ -155,7 +155,7 @@
     <name>CardInputEditor</name>
     <message>
         <source>Input connections</source>
-        <translation type="unfinished">Anslutningar</translation>
+        <translation>Anslutningar</translation>
     </message>
 </context>
 <context>
@@ -506,11 +506,11 @@ WARNING: Do not press button if you are using an Air2PC HD-5000 or Avermedia A18
     <name>DVBUtilsImportPane</name>
     <message>
         <source>File location</source>
-        <translation type="unfinished">Sökväg</translation>
+        <translation>Sökväg</translation>
     </message>
     <message>
         <source>Location of the channels.conf file.</source>
-        <translation type="unfinished">Sökväg till filen channels.conf.</translation>
+        <translation>Sökväg till filen channels.conf.</translation>
     </message>
 </context>
 <context>
@@ -833,14 +833,14 @@ WARNING: Do not press button if you are using an Air2PC HD-5000 or Avermedia A18
     <name>FirewireDesc</name>
     <message>
         <source>Description</source>
-        <translation type="unfinished">Beskrivning</translation>
+        <translation>Beskrivning</translation>
     </message>
 </context>
 <context>
     <name>GuideGrid</name>
     <message>
         <source>Delete &apos;%1&apos; %2 rule?</source>
-        <translation type="unfinished"></translation>
+        <translation>Radera &apos;%1&apos; %2 regel?</translation>
     </message>
 </context>
 <context>
@@ -898,7 +898,7 @@ WARNING: Do not press button if you are using an Air2PC HD-5000 or Avermedia A18
     <name>InputSelector</name>
     <message>
         <source>Input</source>
-        <translation type="unfinished">Ingång</translation>
+        <translation>Ingång</translation>
     </message>
 </context>
 <context>
@@ -1025,7 +1025,7 @@ WARNING: Do not press button if you are using an Air2PC HD-5000 or Avermedia A18
     <name>MultiplexSetting</name>
     <message>
         <source>Transport</source>
-        <translation type="unfinished">Transport</translation>
+        <translation>Transport</translation>
     </message>
 </context>
 <context>
@@ -1636,7 +1636,7 @@ Returning to the previous menu.</source>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished">Avbryt</translation>
+        <translation>Avbryt</translation>
     </message>
 </context>
 <context>
@@ -1896,7 +1896,7 @@ Returning to the previous menu.</source>
     </message>
     <message>
         <source>Delete &apos;%1&apos; %2 rule?</source>
-        <translation type="unfinished"></translation>
+        <translation>Radera &apos;%1&apos; %2 regel?</translation>
     </message>
 </context>
 <context>
@@ -1967,7 +1967,7 @@ Returning to the previous menu.</source>
     </message>
     <message>
         <source>Delete &apos;%1&apos; %2 rule?</source>
-        <translation type="unfinished"></translation>
+        <translation>Radera &apos;%1&apos; %2 regel?</translation>
     </message>
 </context>
 <context>
@@ -8300,15 +8300,15 @@ Kontrollera om videon existerar</translation>
     </message>
     <message>
         <source>Colour</source>
-        <translation type="unfinished">Färg</translation>
+        <translation>Färg</translation>
     </message>
     <message>
         <source>Volume</source>
-        <translation type="unfinished"></translation>
+        <translation>Volym</translation>
     </message>
     <message>
         <source>MAX</source>
-        <translation type="unfinished"></translation>
+        <translation>MAX</translation>
     </message>
     <message>
         <source>Enable this option for budget BT878 based DVB-T cards such as the AverTV DVB-T which require the audio volume to be left alone.</source>
@@ -8402,7 +8402,7 @@ The frequency for this channel in</source>
     <message>
         <source>Group</source>
         <comment>Play Group</comment>
-        <translation type="unfinished">Grupp</translation>
+        <translation>Grupp</translation>
     </message>
     <message>
         <source>f</source>
@@ -8512,7 +8512,7 @@ The frequency for this channel in</source>
     </message>
     <message>
         <source>Exclude unidentified episodes</source>
-        <translation type="unfinished">Exkludera oidentifierade avsnitt</translation>
+        <translation>Exkludera oidentifierade avsnitt</translation>
     </message>
     <message>
         <source>Exclude old episodes</source>
@@ -8528,7 +8528,7 @@ The frequency for this channel in</source>
     </message>
     <message>
         <source>LiveTV</source>
-        <translation type="unfinished">LiveTV</translation>
+        <translation>LiveTV</translation>
     </message>
     <message>
         <source>Listings grabber</source>
@@ -8544,7 +8544,7 @@ The frequency for this channel in</source>
     </message>
     <message>
         <source>800Mbps</source>
-        <translation type="unfinished">800Mbps</translation>
+        <translation>800Mbps</translation>
     </message>
     <message>
         <source>IP address or Device ID from the bottom of the HDHomeRun.  You may use &apos;FFFFFFFF&apos; if there is only one unit on your your network.</source>
@@ -8864,18 +8864,18 @@ The frequency for this channel in</source>
     <name>ScanWizard</name>
     <message>
         <source>ScanWizard</source>
-        <translation type="unfinished">Sökguide</translation>
+        <translation>Sökguide</translation>
     </message>
     <message>
         <source>Error parsing parameters</source>
-        <translation type="unfinished">Fel vid inläsning av parametrar</translation>
+        <translation>Fel vid inläsning av parametrar</translation>
     </message>
 </context>
 <context>
     <name>ScanWizardConfig</name>
     <message>
         <source>Scan Configuration</source>
-        <translation type="unfinished"></translation>
+        <translation>Sökkonfiguration</translation>
     </message>
 </context>
 <context>
@@ -8994,11 +8994,11 @@ Inga andra detaljer</translation>
     </message>
     <message>
         <source>standard rules are defined</source>
-        <translation type="unfinished"></translation>
+        <translation>standardregler är definierade</translation>
     </message>
     <message>
         <source>search rules are defined</source>
-        <translation type="unfinished"></translation>
+        <translation>sökregler är definierade</translation>
     </message>
 </context>
 <context>
@@ -9630,12 +9630,13 @@ Inga andra detaljer</translation>
     </message>
     <message>
         <source>Chan %1: %2</source>
-        <translation type="unfinished"></translation>
+        <translation>Kanal %1: %2</translation>
     </message>
     <message>
         <source>All Tuners are Busy.
 Select a Current Recording</source>
-        <translation type="unfinished"></translation>
+        <translation>Alla TV-kort är upptagna.
+Välj ett inspelat program</translation>
     </message>
     <message>
         <source>End Of Recording</source>
@@ -9647,27 +9648,27 @@ Select a Current Recording</source>
     </message>
     <message>
         <source>Delete this recording?</source>
-        <translation type="unfinished"></translation>
+        <translation>Radera denna inspelning?</translation>
     </message>
     <message>
         <source>DVD</source>
-        <translation type="unfinished"></translation>
+        <translation>DVD</translation>
     </message>
     <message>
         <source>Menu</source>
-        <translation type="unfinished">Meny</translation>
+        <translation>Meny</translation>
     </message>
     <message>
         <source>Still Frame</source>
-        <translation type="unfinished"></translation>
+        <translation>Stillbild</translation>
     </message>
     <message>
         <source>Title: %1 (%2)</source>
-        <translation type="unfinished"></translation>
+        <translation>Titel: %1 (%2)</translation>
     </message>
     <message>
         <source>Chapter: %1/%2</source>
-        <translation type="unfinished"></translation>
+        <translation>Kapitel: %1/%2</translation>
     </message>
     <message>
         <source>DVD Chapter Menu</source>
@@ -9683,11 +9684,11 @@ Select a Current Recording</source>
     </message>
     <message>
         <source>Keep Watching</source>
-        <translation type="unfinished"></translation>
+        <translation>Fortsätt titta</translation>
     </message>
     <message>
         <source>Exit Video</source>
-        <translation type="unfinished"></translation>
+        <translation>Avsluta video</translation>
     </message>
     <message>
         <source>&apos;%1&apos; Group Password:</source>
@@ -9901,34 +9902,34 @@ Select a Current Recording</source>
     <name>TransportList</name>
     <message>
         <source>New Transport</source>
-        <translation type="unfinished"></translation>
+        <translation>Ny transport</translation>
     </message>
 </context>
 <context>
     <name>TransportListEditor</name>
     <message>
         <source>Are you sure you would like to delete this transport?</source>
-        <translation type="unfinished">Är du säker på att du vill ta bort denna transport?</translation>
+        <translation>Är du säker på att du vill ta bort denna transport?</translation>
     </message>
     <message>
         <source>Yes, delete the transport</source>
-        <translation type="unfinished">Ja, ta bort transporten</translation>
+        <translation>Ja, ta bort transporten</translation>
     </message>
     <message>
         <source>No, don&apos;t</source>
-        <translation type="unfinished">Nej, låt bli</translation>
+        <translation>Nej, låt bli</translation>
     </message>
     <message>
         <source>Transport Menu</source>
-        <translation type="unfinished">Transportmeny</translation>
+        <translation>Transportmeny</translation>
     </message>
     <message>
         <source>Edit..</source>
-        <translation type="unfinished">Ändra..</translation>
+        <translation>Ändra..</translation>
     </message>
     <message>
         <source>Delete..</source>
-        <translation type="unfinished">Ta bort..</translation>
+        <translation>Ta bort..</translation>
     </message>
 </context>
 <context>
@@ -10008,7 +10009,7 @@ Select a Current Recording</source>
     <name>VideoSourceSelector</name>
     <message>
         <source>Video Source</source>
-        <translation type="unfinished">Videokälla</translation>
+        <translation>Videokälla</translation>
     </message>
 </context>
 <context>
@@ -10046,7 +10047,7 @@ Select a Current Recording</source>
     </message>
     <message>
         <source>Delete &apos;%1&apos; %2 rule?</source>
-        <translation type="unfinished"></translation>
+        <translation>Radera &apos;%1&apos; %2 regel?</translation>
     </message>
 </context>
 <context>
