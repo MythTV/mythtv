@@ -32,8 +32,8 @@ class VideoDialog : public MythDialog
 
     int videoExitType() { return m_exit_type; }
 
-    protected slots:
-            void slotDoCancel();
+  protected slots:
+    void slotDoCancel();
     void slotVideoTree();
     void slotVideoGallery();
     void slotVideoBrowser();
