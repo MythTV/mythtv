@@ -17,7 +17,7 @@ using namespace std;
 
 #include <qtimer.h>
 
-static StreamDecoderReadStatus flacread(const StreamDecoder *decoder, FLAC__byte bufferp[], unsigned *bytes, void *client_data)
+static StreamDecoderReadStatus flacread(const StreamDecoder *decoder, FLAC__byte bufferp[], FLAC__uint64 *bytes, void *client_data)
 {
     decoder = decoder;
 
