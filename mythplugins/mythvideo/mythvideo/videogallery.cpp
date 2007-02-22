@@ -45,6 +45,8 @@ VideoGallery::VideoGallery(MythMainWindow *lparent, const QString &lname,
 
     fetchVideos();
 
+    updateBackground();
+
     setNoErase();
 }
 
