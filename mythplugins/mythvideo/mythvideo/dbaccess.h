@@ -34,7 +34,7 @@ class MultiValue
     struct entry
     {
         int id;
-        typedef std::vector<int> values_type;
+        typedef std::vector<long> values_type;
         values_type values;
     };
     typedef std::vector<entry> entry_list;

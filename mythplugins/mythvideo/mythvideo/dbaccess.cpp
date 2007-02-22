@@ -354,7 +354,7 @@ class MultiValueImp
                         .arg(m_table_name).arg(m_id_name).arg(m_value_name);
                 query.prepare(del_query);
                 query.bindValue(":ID", p->first);
-                query.bindValue(":VALUE", *vp);
+                query.bindValue(":VALUE", int(*vp));
                 if (!query.exec() || !query.isActive())
                 {
                     MythContext::DBError("multivalue remove", query);
