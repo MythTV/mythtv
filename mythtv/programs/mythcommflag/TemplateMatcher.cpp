@@ -368,7 +368,7 @@ blankMapSearchForwards(const FrameAnalyzer::FrameMap *blankMap, long long mark,
     {
         const long long bb = blank.key();
         const long long ee = bb + blank.data();
-        if (mark <= ee)
+        if (mark < ee)
         {
             if (bb < markend)
                 return blank;
@@ -396,7 +396,7 @@ blankMapSearchBackwards(const FrameAnalyzer::FrameMap *blankMap,
         const long long ee = bb + blank.data();
         if (bb < mark)
         {
-            if (markbegin <= ee)
+            if (markbegin < ee)
                 return blank;
             break;
         }
@@ -450,11 +450,15 @@ pick_mintmpledges(const unsigned short *matches, long long nframes)
      * of the point to be greater than some (larger) area to the right
      * of the point.
      */
-    static const float  WIDTH = 0.04;
-    static const float  MATCHSTART = 0.20;
-    static const float  MATCHEND = 0.95;
+    static const float  LEFTWIDTH = 0.04;
+    static const float  MIDDLEWIDTH = 0.04;
+    static const float  RIGHTWIDTH = 0.04;
 
-    unsigned short      matchrange, width, matchstart, matchend;
+    static const float  MATCHSTART = 0.20;
+    static const float  MATCHEND = 0.80;
+
+    unsigned short      matchrange, matchstart, matchend;
+    unsigned short      leftwidth, middlewidth, rightwidth;
     unsigned short      *sorted, minmatch, maxmatch, *freq;
     int                 nfreq, matchcnt, local_minimum;
     unsigned int        maxdelta;
@@ -467,7 +471,10 @@ pick_mintmpledges(const unsigned short *matches, long long nframes)
     matchrange = maxmatch - minmatch;
     /* degenerate minmatch==maxmatch case is gracefully handled */
 
-    width = (unsigned short)(WIDTH * matchrange);
+    leftwidth = (unsigned short)(LEFTWIDTH * matchrange);
+    middlewidth = (unsigned short)(MIDDLEWIDTH * matchrange);
+    rightwidth = (unsigned short)(RIGHTWIDTH * matchrange);
+
     nfreq = maxmatch + 1;
     freq = new unsigned short[nfreq];
     memset(freq, 0, nfreq * sizeof(*freq));
@@ -479,17 +486,17 @@ pick_mintmpledges(const unsigned short *matches, long long nframes)
 
     local_minimum = matchstart;
     maxdelta = 0;
-    for (matchcnt = matchstart + 3 * width / 2;
-            matchcnt < matchend - 3 * width / 2;
+    for (matchcnt = matchstart + leftwidth + middlewidth / 2;
+            matchcnt < matchend - rightwidth - middlewidth / 2;
             matchcnt++)
     {
         unsigned short  p0, p1, p2, p3;
         unsigned int    leftscore, middlescore, rightscore;
 
-        p0 = matchcnt - 3 * width / 2;
-        p1 = p0 + width;
-        p2 = p1 + width;
-        p3 = p2 + width;
+        p0 = matchcnt - leftwidth - middlewidth / 2;
+        p1 = p0 + leftwidth;
+        p2 = p1 + middlewidth;
+        p3 = p2 + rightwidth;
 
         leftscore = range_area(freq, p0, p1);
         middlescore = range_area(freq, p1, p2);
@@ -506,10 +513,11 @@ pick_mintmpledges(const unsigned short *matches, long long nframes)
         }
     }
 
-    VERBOSE(VB_COMMFLAG, QString("pick_mintmpledges considering %1-%2;"
-                " minmatch=%3 maxmatch=%4 width=%5 local_minimum=%6")
-            .arg(matchstart).arg(matchend).arg(minmatch).arg(maxmatch)
-            .arg(width).arg(local_minimum));
+    VERBOSE(VB_COMMFLAG, QString("pick_mintmpledges minmatch=%1 maxmatch=%2"
+                " matchstart=%3 matchend=%4 widths=%5,%6,%7 local_minimum=%8")
+            .arg(minmatch).arg(maxmatch).arg(matchstart).arg(matchend)
+            .arg(leftwidth).arg(middlewidth).arg(rightwidth)
+            .arg(local_minimum));
 
     delete []freq;
     delete []sorted;
@@ -946,16 +954,16 @@ TemplateMatcher::adjustForBlanks(const BlankFrameDetector *blankFrameDetector,
     VERBOSE(VB_COMMFLAG, QString("TemplateMatcher adjusting for blanks"));
 
     FrameAnalyzer::FrameMap::Iterator ii = breakMap.begin();
+    long long prevbrke = 0;
     while (ii != breakMap.end())
     {
         FrameAnalyzer::FrameMap::Iterator iinext = ii;
         ++iinext;
 
         /*
-         * Where the template disappears, look for nearby blank frames. Prefer
-         * to assume that the template disappears early before the commercial
-         * break starts. Only adjust beginning-of-breaks that are not at the
-         * very beginning.
+         * Where the template disappears, look for nearby blank frames. Only
+         * adjust beginning-of-breaks that are not at the very beginning. Do
+         * not search into adjacent breaks.
          */
         const long long brkb = ii.key();
         const long long brke = brkb + ii.data();
@@ -963,14 +971,10 @@ TemplateMatcher::adjustForBlanks(const BlankFrameDetector *blankFrameDetector,
         if (brkb > 0)
         {
             jj = blankMapSearchForwards(blankMap,
-                max(0LL, brkb - BLANK_NEARBY),
-                min(brke, min(nframes, brkb + TEMPLATE_DISAPPEARS_EARLY)));
-        }
-        if (jj == blankMap->constEnd())
-        {
-            jj = blankMapSearchBackwards(blankMap,
-                max(0LL, brkb - TEMPLATE_DISAPPEARS_LATE),
-                min(brke, min(nframes, brkb + BLANK_NEARBY)));
+                max(prevbrke,
+                    brkb - max(BLANK_NEARBY, TEMPLATE_DISAPPEARS_LATE)),
+                min(brke,
+                    brkb + max(BLANK_NEARBY, TEMPLATE_DISAPPEARS_EARLY)));
         }
         long long newbrkb = brkb;
         if (jj != blankMap->constEnd())
@@ -981,20 +985,15 @@ TemplateMatcher::adjustForBlanks(const BlankFrameDetector *blankFrameDetector,
         }
 
         /*
-         * Where the template reappears, look for nearby blank frames. Prefer
-         * to assume that the template reappears late after the broadcast has
-         * already resumed.
+         * Where the template reappears, look for nearby blank frames. Do not
+         * search into adjacent breaks.
          */
         FrameAnalyzer::FrameMap::const_iterator kk = blankMapSearchBackwards(
             blankMap,
-            max(newbrkb, brke - TEMPLATE_REAPPEARS_LATE),
-            max(newbrkb, min(nframes, brke + BLANK_NEARBY)));
-        if (kk == blankMap->constEnd())
-        {
-            kk = blankMapSearchForwards(blankMap,
-                max(newbrkb, brke - BLANK_NEARBY),
-                max(newbrkb, min(nframes, brke + TEMPLATE_REAPPEARS_EARLY)));
-        }
+            max(newbrkb,
+                brke - max(BLANK_NEARBY, TEMPLATE_REAPPEARS_LATE)),
+            min(iinext == breakMap.end() ? nframes : iinext.key(),
+                brke + max(BLANK_NEARBY, TEMPLATE_REAPPEARS_EARLY)));
         long long newbrke = brke;
         if (kk != blankMap->constEnd())
         {
@@ -1021,6 +1020,7 @@ TemplateMatcher::adjustForBlanks(const BlankFrameDetector *blankFrameDetector,
                 breakMap.remove(ii);
         }
 
+        prevbrke = newbrke;
         ii = iinext;
     }
 
