@@ -897,11 +897,10 @@ TemplateMatcher::adjustForBlanks(const BlankFrameDetector *blankFrameDetector,
      *      can cause the broadcast to "continue" even further into the
      *      commercial break.
      *
-     * TEMPLATE_DISAPPEARS_LATE: If TEMPLATE_DISAPPEARS_EARLY doesn't find
-     * anything, handle the scenario where the template disappears "late" after
-     * having already switched to commercial (template presence extends into
-     * commercial break). Accelerate the beginning of the commercial break by
-     * searching backwards to find a blank frame.
+     * TEMPLATE_DISAPPEARS_LATE: Handle the scenario where the template
+     * disappears "late" after having already switched to commercial (template
+     * presence extends into commercial break). Accelerate the beginning of the
+     * commercial break by searching backwards to find a blank frame.
      *
      *      Setting this value too low can yield false negatives. If the
      *      template does extend deep into the commercial break, the first part
@@ -929,10 +928,9 @@ TemplateMatcher::adjustForBlanks(const BlankFrameDetector *blankFrameDetector,
      *      template reappears can cause even more of the end of the commercial
      *      break to be misidentified as the first part of the broadcast break.
      *
-     * TEMPLATE_REAPPEARS_EARLY: If TEMPLATE_REAPPEARS_LATE doesn't find
-     * anything, handle the scenario where the template reappears "early"
-     * before resuming the broadcast. Delay the beginning of the broadcast by
-     * searching forwards to find a blank frame.
+     * TEMPLATE_REAPPEARS_EARLY: Handle the scenario where the template
+     * reappears "early" before resuming the broadcast. Delay the beginning of
+     * the broadcast by searching forwards to find a blank frame.
      *
      *      Setting this value too low can yield false negatives. If the
      *      template does reappear "early", the the last part of the commercial
@@ -949,7 +947,7 @@ TemplateMatcher::adjustForBlanks(const BlankFrameDetector *blankFrameDetector,
     const int TEMPLATE_DISAPPEARS_EARLY = (int)roundf(25 * fps);
     const int TEMPLATE_DISAPPEARS_LATE = (int)roundf(0 * fps);
     const int TEMPLATE_REAPPEARS_LATE = (int)roundf(25 * fps);
-    const int TEMPLATE_REAPPEARS_EARLY = (int)roundf(0 * fps);
+    const int TEMPLATE_REAPPEARS_EARLY = (int)roundf(1.5 * fps);
 
     VERBOSE(VB_COMMFLAG, QString("TemplateMatcher adjusting for blanks"));
 
