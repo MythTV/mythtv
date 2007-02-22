@@ -17,7 +17,7 @@ using namespace std;
 
 #include <qtimer.h>
 
-static StreamDecoderReadStatus flacread(const StreamDecoder *decoder, FLAC__byte bufferp[], unsigned *bytes, void *client_data)
+static StreamDecoderReadStatus flacread(const StreamDecoder *decoder, FLAC__byte bufferp[], bytesSize *bytes, void *client_data)
 {
     decoder = decoder;
 
@@ -264,7 +264,7 @@ bool FlacDecoder::initialize()
 
     decoder = decoder_new();
     decoder_set_md5_checking(decoder, false);
-    decoder_setup(decoder, flacread, flacseek, flactell, flaclength, \
+    decoder_setup(decoder, flacread, flacseek, flactell, flaclength,
                         flaceof, flacwrite, flacmetadata, flacerror, this);
 
     freq = 0;
