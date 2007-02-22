@@ -673,7 +673,7 @@ int write_pes_header(uint8_t id, int length , uint64_t PTS, uint64_t DTS,
 	return c;
 }
 
-int write_ts_header(uint8_t *obuf, int pid, int sync, int count, 
+static int write_ts_header(uint8_t *obuf, int pid, int sync, int count, 
 		    int64_t SCR, int stuff)
 {
 	int c = 0;

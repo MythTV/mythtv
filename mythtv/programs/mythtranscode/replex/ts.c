@@ -40,7 +40,7 @@ uint16_t get_pid(uint8_t *pid)
 	return pp;
 }
 
-int write_ts_header(uint16_t pid, uint8_t *counter, int pes_start, 
+static int write_ts_header(uint16_t pid, uint8_t *counter, int pes_start, 
 		    uint8_t *buf, uint8_t length)
 {
 	int i;
