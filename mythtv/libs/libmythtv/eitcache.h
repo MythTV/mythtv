@@ -13,6 +13,8 @@
 #include <qmutex.h>
 #include <qstring.h>
 
+#include "mythexp.h"
+
 typedef QMap<uint, uint64_t> event_map_t;
 typedef QMap<uint, event_map_t*> key_map_t;
 
@@ -54,7 +56,7 @@ class EITCache
     static const uint kVersionMax;
 
   public:
-    static void ClearChannelLocks(void);
+    static MPUBLIC void ClearChannelLocks(void);
 };
 
 #endif // _EIT_CACHE_H
