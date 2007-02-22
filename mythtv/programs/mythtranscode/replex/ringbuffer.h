@@ -45,7 +45,7 @@ extern "C" {
 	} ringbuffer;
 
 
-#define DBUF_INDEX 1000
+#define DBUF_INDEX 10000
 
 	typedef struct dummy_buffer_s {
 		uint32_t size;

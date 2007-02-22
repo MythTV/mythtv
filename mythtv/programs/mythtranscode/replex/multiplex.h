@@ -39,6 +39,8 @@ typedef struct multiplex_s{
 #define REPLEX_MPEG2  0
 #define REPLEX_DVD    1
 #define REPLEX_HDTV   2
+#define REPLEX_TS_SD  3
+#define REPLEX_TS_HD  4
 	int otype;
 	int startup;
 	int finish;
@@ -57,6 +59,7 @@ typedef struct multiplex_s{
 #define TIME_IFRAME 2
 	int frame_timestamps;
 	int VBR;
+	int is_ts;
 	int reset_clocks;
 	int write_end_codes;
 	int set_broken_link;
@@ -74,6 +77,7 @@ typedef struct multiplex_s{
 	int extframes[N_AUDIO];
         int exttype[N_AUDIO];
         int exttypcnt[N_AUDIO];
+	int ext_frmperpkt[N_AUDIO];
 
 /* needed from replex */
 	int extcnt;

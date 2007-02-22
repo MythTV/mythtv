@@ -39,11 +39,11 @@ void printpts(int64_t pts)
 	}
 	pts = pts/300;
 	pts &= (MAX_PTS-1);
-	fprintf(stderr,"%2d:%02d:%02d.%03d ",
+	fprintf(stderr,"%2d:%02d:%02d.%04d ",
 		(unsigned int)(pts/90000.)/3600,
 		((unsigned int)(pts/90000.)%3600)/60,
 		((unsigned int)(pts/90000.)%3600)%60,
-		(((unsigned int)(pts/90.)%3600000)%60000)%1000
+		(((unsigned int)(pts/9.)%36000000)%600000)%10000
 		);
 }
 
@@ -673,6 +673,50 @@ int write_pes_header(uint8_t id, int length , uint64_t PTS, uint64_t DTS,
 	return c;
 }
 
+int write_ts_header(uint8_t *obuf, int pid, int sync, int count, 
+		    int64_t SCR, int stuff)
+{
+	int c = 0;
+	uint8_t *scr;
+	uint32_t lscr;
+	uint16_t scr_ext = 0;
+
+	obuf[c++] = 0x47;
+	obuf[c++] = (sync ? 0x40 : 0x00) | ((pid >> 8) & 0x1f);
+	obuf[c++] = pid & 0xff;
+	obuf[c++] = ((SCR >= 0 || stuff) ? 0x30 : 0x10) | count;
+	if (SCR >= 0|| stuff) {
+		if (stuff)
+			stuff--;
+		int size = stuff;
+		unsigned char flags = 0;
+		if(SCR >= 0) {
+			size += 7;
+			flags |= 0x10;
+		}
+		obuf[c++] = size;
+		if(size) {
+			obuf[c++] = flags;
+			size--;
+		}
+		if(SCR >= 0) {
+			lscr = htonl((uint32_t) ((SCR/300ULL) & 0xFFFFFFFFULL));
+			scr = (uint8_t *) &lscr;
+			scr_ext = (uint16_t) ((SCR%300ULL) & 0x1FFULL);
+			obuf[c++] = scr[0] >> 1;
+			obuf[c++] = scr[1] >> 1;
+			obuf[c++] = scr[2] >> 1;
+			obuf[c++] = scr[3] >> 1;
+			obuf[c++] = (scr[3] << 7) | 0x7e | (scr_ext >> 8);
+			obuf[c++] = scr_ext & 0xff;
+			size -= 6;
+		}
+		while(size-- > 0)
+			obuf[c++] = 0xff;
+	}
+	return c;
+}
+
 void write_padding_pes( int pack_size, int extcnt, 
 			uint64_t SCR, uint64_t muxr, uint8_t *buf)
 {
@@ -739,6 +783,60 @@ int write_video_pes( int pack_size, int extcnt, uint64_t vpts,
 	return pos;
 }
 
+int write_video_ts( int pack_size, int extcnt, uint64_t vpts, 
+		     uint64_t vdts, uint64_t SCR, uint64_t muxr, 
+		     uint8_t *buf, int *vlength, 
+		     uint8_t ptsdts, ringbuffer *vrbuffer)
+{
+//Unlike program streams, we only do one PES per frame
+	static int count = 0;
+	int add;
+	int pos = 0;
+	int p   = 0;
+	int stuff = 0;
+	int length = *vlength;
+
+	if (! length) return 0;
+	p = 4;
+	if ( ptsdts ) {
+		p += PES_H_MIN + 8;
+
+		if ( ptsdts == PTS_ONLY) {
+			p += 5;
+		} else if (ptsdts == PTS_DTS){
+			p += 10;
+		}
+	}
+	if ( length+p >= pack_size){
+		length = pack_size;
+	} else {
+		stuff = pack_size - length - p;
+		length = pack_size;
+	}
+	if(ptsdts) {
+//printf("SCR: %f PTS: %f DTS: %f\n", SCR/27000000.0, vpts / 27000000.0, vdts / 27000000.0);
+		pos = write_ts_header(buf, 4101, 1, count, SCR, stuff);
+		// always use length == 0 for video streams
+		pos += write_pes_header( 0xE0, 6, vpts, vdts, buf+pos, 
+					 0, ptsdts);
+	} else {
+		pos = write_ts_header(buf, 4101, 0, count, -1, stuff);
+	}
+	count = (count+1) & 0x0f;
+
+	if (length-pos > *vlength){
+		fprintf(stderr,"WHAT THE HELL  %d > %d\n", length-pos,
+			*vlength);
+	}
+
+	add = ring_read( vrbuffer, buf+pos, length-pos);
+	*vlength = add;
+	if (add < 0) return -1;
+	pos += add;
+
+	return pos;
+}
+
 int write_audio_pes(  int pack_size, int extcnt, int n, uint64_t pts, 
 		      uint64_t SCR, uint32_t muxr, uint8_t *buf, int *alength, 
 		      uint8_t ptsdts, 	ringbuffer *arbuffer)
@@ -787,7 +885,51 @@ int write_audio_pes(  int pack_size, int extcnt, int n, uint64_t pts,
 	return pos;
 }
 
+int write_audio_ts(  int pack_size, int extcnt, int n, uint64_t pts, 
+		     uint64_t SCR, uint32_t muxr, uint8_t *buf, int *alength, 
+		     uint8_t ptsdts, 	ringbuffer *arbuffer)
+{
+	static int count[32] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+	                        0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+	int add;
+	int pos = 0;
+	int p   = 0;
+	int stuff = 0;
+	int length = *alength;
 
+	if (!length) return 0;
+	p = 4;
+
+	if (ptsdts == PTS_ONLY){
+		p += PES_H_MIN + 5;
+	}
+
+	if ( length+p >= pack_size){
+		length = pack_size;
+	} else {
+		stuff = pack_size - length - p;
+		length = pack_size;
+	}
+	if(ptsdts) {
+		pos = write_ts_header(buf, 4201+n, 1, count[n], -1, stuff);
+		pos += write_pes_header( 0xC0+n, *alength + PES_H_MIN + 5, pts,
+					 0, buf+pos, 0, ptsdts);
+	} else {
+		pos = write_ts_header(buf, 4201+n, 0, count[n], -1, stuff);
+	}
+	count[n] = (count[n]+1) & 0x0f;
+	add = ring_read( arbuffer, buf+pos, length-pos);
+	*alength = add;
+	if (add < 0) return -1;
+	pos += add;
+
+	if (pos != pack_size) {
+		fprintf(stderr,"apos: %d\n",pos);
+		exit(1);
+	}
+
+	return pos;
+}
 
 int write_ac3_pes(  int pack_size, int extcnt, int n,
 		    uint64_t pts, uint64_t SCR, 
@@ -845,6 +987,59 @@ int write_ac3_pes(  int pack_size, int extcnt, int n,
 	return pos;
 }
 
+int write_ac3_ts(   int pack_size, int extcnt, int n,
+		    uint64_t pts, uint64_t SCR, 
+		    uint32_t muxr, uint8_t *buf, int *alength, uint8_t ptsdts,
+		    int nframes,int ac3_off, ringbuffer *ac3rbuffer)
+{
+	static int count[32] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+	                        0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+	int add;
+	int pos = 0;
+	int p   = 0;
+	int stuff = 0;
+	int length = *alength;
+
+	if (!length) return 0;
+	p = 4;
+
+	if (ptsdts == PTS_ONLY){
+		p += PES_H_MIN + 5 + 4; //PES header + PTS + PS1
+	}
+
+	if ( length+p >= pack_size){
+		length = pack_size;
+	} else {
+		stuff = pack_size - length - p;
+		length = pack_size;
+	}
+	if(ptsdts) {
+		pos = write_ts_header(buf, 4301+n, 1, count[n], -1, stuff);
+		pos += write_pes_header( PRIVATE_STREAM1,
+					 *alength + 4 + PES_H_MIN + 5,
+					 pts, 0, buf+pos, 0, ptsdts);
+		buf[pos] = 0x80 + n;
+		buf[pos+1] = 1;
+		buf[pos+2] = (ac3_off >> 8)& 0xFF;
+		buf[pos+3] = (ac3_off)& 0xFF;
+		pos += 4;
+	} else {
+		pos = write_ts_header(buf, 4301+n, 0, count[n], -1, stuff);
+	}
+	count[n] = (count[n]+1) & 0x0f;
+
+	add = ring_read( ac3rbuffer, buf+pos, length-pos);
+	*alength = add;
+	if (add < 0) return -1;
+	pos += add;
+
+	if (pos != pack_size) {
+		fprintf(stderr,"apos: %d\n",pos);
+		exit(1);
+	}
+
+	return pos;
+}
 
 int write_nav_pack(int pack_size, int extcnt, uint64_t SCR, uint32_t muxr, 
 		   uint8_t *buf)

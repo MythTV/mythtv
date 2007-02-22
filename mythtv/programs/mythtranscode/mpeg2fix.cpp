@@ -571,6 +571,7 @@ void MPEG2fixup::InitReplex()
         ring_init(&rx.index_extrbuf[i], INDEX_BUF);
         rx.extframe[i].set = 1;
         rx.extframe[i].bit_rate = getCodecContext(it.key())->bit_rate;
+        rx.extframe[i].framesize = it.data().first()->pkt.size;
         switch(GetStreamType(it.key()))
         {
             case CODEC_ID_MP2:
@@ -587,6 +588,8 @@ void MPEG2fixup::InitReplex()
 
     //bit_rate/400
     rx.seq_head.bit_rate = vFrame.first()->mpeg2_seq.byte_rate / 50;
+    rx.seq_head.frame_rate = (vFrame.first()->mpeg2_seq.frame_period +
+                         26999999ULL) / vFrame.first()->mpeg2_seq.frame_period;
 
     rx.ext_count = ext_count;
 }

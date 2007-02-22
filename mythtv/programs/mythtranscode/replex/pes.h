@@ -9,6 +9,7 @@
 #include <stdint.h>
 #include "ringbuffer.h"
 
+#define TS_HEADER_MIN	4
 #define PS_HEADER_L1    14
 #define PS_HEADER_L2    (PS_HEADER_L1+24)
 #define PES_MIN         7
@@ -116,6 +117,18 @@ int write_video_pes( int pack_size, int extcnt, uint64_t vpts,
 		     uint8_t ptsdts, ringbuffer *vrbuffer);
 int write_nav_pack(int pack_size, int extcnt, uint64_t SCR, uint32_t muxr, 
 		   uint8_t *buf);
+
+int write_ac3_ts(   int pack_size, int extcnt, int n, uint64_t pts, 
+		    uint64_t SCR, 
+		    uint32_t muxr, uint8_t *buf, int *alength, uint8_t ptsdts,
+		    int nframes,int ac3_off, ringbuffer *ac3rbuffer);
+int write_audio_ts(   int pack_size, int extcnt, int n, uint64_t pts, 
+		      uint64_t SCR, uint32_t muxr, uint8_t *buf, int *alength, 
+		      uint8_t ptsdts, 	ringbuffer *arbuffer);
+int write_video_ts(  int pack_size, int extcnt, uint64_t vpts, 
+		     uint64_t vdts, uint64_t SCR, uint64_t muxr, 
+		     uint8_t *buf, int *vlength, 
+		     uint8_t ptsdts, ringbuffer *vrbuffer);
 
 static inline void ptsdec(uint64_t *pts1, uint64_t pts2)
 {
