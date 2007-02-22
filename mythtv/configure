@@ -1704,9 +1704,9 @@ if test x"$mmx" = x"default"; then
     mmx="no"
     if test x"$arch" = x"x86_64"; then
         mmx="yes"
-    fi
-    if is_x86_mmx "$arch_raw"; then
-        mmx="yes"
+    else
+        is_x86_64_cpu "$arch_raw" && mmx="yes"
+        is_x86_mmx "$arch_raw" && mmx="yes"
     fi
 
     # if !arch && !tune && !cpu & processor_flags, then...
