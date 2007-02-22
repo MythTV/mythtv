@@ -1,13 +1,13 @@
 /*
  * FrameAnalyzer
  *
- * Provide a generic interface for plugging in frame analysis algorithms.
+ * Provide a generic interface for plugging in video frame analysis algorithms.
  */
 
 #ifndef __FRAMEANALYZER_H__
 #define __FRAMEANALYZER_H__
 
-/* Base class for commercial flagging frame analyzers. */
+/* Base class for commercial flagging video frame analyzers. */
 
 #include <limits.h>
 #include <qmap.h>
@@ -30,7 +30,7 @@ public:
 
     virtual const char *name(void) const = 0;
 
-    /* Analyze a frame. */
+    /* Analyze a video frame. */
     enum analyzeFrameResult {
         ANALYZE_OK,         /* Analysis OK */
         ANALYZE_ERROR,      /* Recoverable error */
@@ -76,6 +76,20 @@ void frameAnalyzerReportMapms(const FrameAnalyzer::FrameMap *frameMap,
         float fps, const char *comment);
 
 long long frameAnalyzerMapSum(const FrameAnalyzer::FrameMap *frameMap);
+
+bool removeShortBreaks(FrameAnalyzer::FrameMap *breakMap, float fps,
+        int minbreaklen, bool verbose);
+
+bool removeShortSegments(FrameAnalyzer::FrameMap *breakMap, long long nframes,
+    float fps, int minseglen, bool verbose);
+
+FrameAnalyzer::FrameMap::const_iterator frameMapSearchForwards(
+        const FrameAnalyzer::FrameMap *frameMap, long long mark,
+        long long markend);
+
+FrameAnalyzer::FrameMap::const_iterator frameMapSearchBackwards(
+        const FrameAnalyzer::FrameMap *frameMap, long long markbegin,
+        long long mark);
 
 }; /* namespace */
 
