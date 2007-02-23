@@ -177,6 +177,9 @@ sub getMovieData {
 
    # parse movie length
    my $runtime = trim(parseBetween($response, ">Runtime:</h5>", " min"));
+   unless ($runtime =~ /^-?\d/) {
+      $runtime = trim(parseBetween($response, "USA:", " min"));
+   }
 
    # parse cast 
    #  Note: full cast would be from url: 
