@@ -735,7 +735,7 @@ TemplateMatcher::adjustForBlanks(const BlankFrameDetector *blankFrameDetector,
     const int BLANK_NEARBY = (int)roundf(0.5 * fps);
     const int TEMPLATE_DISAPPEARS_EARLY = (int)roundf(25 * fps);
     const int TEMPLATE_DISAPPEARS_LATE = (int)roundf(0 * fps);
-    const int TEMPLATE_REAPPEARS_LATE = (int)roundf(25 * fps);
+    const int TEMPLATE_REAPPEARS_LATE = (int)roundf(35 * fps);
     const int TEMPLATE_REAPPEARS_EARLY = (int)roundf(1.5 * fps);
 
     VERBOSE(VB_COMMFLAG, QString("TemplateMatcher adjusting for blanks"));
