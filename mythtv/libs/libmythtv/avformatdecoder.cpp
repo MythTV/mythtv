@@ -748,8 +748,11 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
         ringBuffer->Seek(0,SEEK_SET);
         ringBuffer->DVD()->IgnoreStillOrWait(false);
         QString dec = gContext->GetSetting("PreferredMPEG2Decoder", "ffmpeg");
-        if (dec.contains("xvmc"))
+        if (dec.contains("xvmc") && 
+            !gContext->GetNumSetting("UseXvMCForHDOnly", 0))
+        {
             dvd_xvmc_enabled = true;
+        }
     }
     else
     {
