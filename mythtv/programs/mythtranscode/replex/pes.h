@@ -102,6 +102,8 @@ int ptscmp(uint64_t pts1, uint64_t pts2);
 uint64_t ptsadd(uint64_t pts1, uint64_t pts2);
 
 
+int write_pes_header(uint8_t id, int length , uint64_t PTS, uint64_t DTS, 
+		     uint8_t *obuf, int stuffing, uint8_t ptsdts);
 void write_padding_pes( int pack_size, int extcnt, 
 			uint64_t SCR, uint64_t muxr, uint8_t *buf);
 int write_ac3_pes(  int pack_size, int extcnt, int n, uint64_t pts, 
@@ -118,17 +120,6 @@ int write_video_pes( int pack_size, int extcnt, uint64_t vpts,
 int write_nav_pack(int pack_size, int extcnt, uint64_t SCR, uint32_t muxr, 
 		   uint8_t *buf);
 
-int write_ac3_ts(   int pack_size, int extcnt, int n, uint64_t pts, 
-		    uint64_t SCR, 
-		    uint32_t muxr, uint8_t *buf, int *alength, uint8_t ptsdts,
-		    int nframes,int ac3_off, ringbuffer *ac3rbuffer);
-int write_audio_ts(   int pack_size, int extcnt, int n, uint64_t pts, 
-		      uint64_t SCR, uint32_t muxr, uint8_t *buf, int *alength, 
-		      uint8_t ptsdts, 	ringbuffer *arbuffer);
-int write_video_ts(  int pack_size, int extcnt, uint64_t vpts, 
-		     uint64_t vdts, uint64_t SCR, uint64_t muxr, 
-		     uint8_t *buf, int *vlength, 
-		     uint8_t ptsdts, ringbuffer *vrbuffer);
 
 static inline void ptsdec(uint64_t *pts1, uint64_t pts2)
 {

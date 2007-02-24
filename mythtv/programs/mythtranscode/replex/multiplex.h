@@ -28,6 +28,7 @@
 
 #include "mpg_common.h"
 #include "pes.h"
+#include "ts.h"
 #include "element.h"
 
 #define N_AUDIO 32
