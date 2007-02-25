@@ -43,6 +43,8 @@ void MetaIO::readFromFilename(QString filename,
 
     static QString regext = mFileExtension + "$";
     int part_num = 0;
+    filename.replace(QRegExp(QString("_")), QString(" "));
+    filename.replace(QRegExp(regext, FALSE), QString(""));
     QStringList fmt_list = QStringList::split("/", mFilenameFormat);
     QStringList::iterator fmt_it = fmt_list.begin();
 
@@ -54,8 +56,6 @@ void MetaIO::readFromFilename(QString filename,
     for(; fmt_it != fmt_list.end(); fmt_it++, part_num++)
     {
         QString part_str = filename.section( "/", part_num, part_num);
-        part_str.replace(QRegExp(QString("_")), QString(" "));
-        part_str.replace(QRegExp(regext, FALSE), QString(""));
 
         if ( *fmt_it == "GENRE" )
             genre = part_str;
