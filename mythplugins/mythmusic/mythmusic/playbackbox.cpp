@@ -217,6 +217,12 @@ PlaybackBoxMusic::~PlaybackBoxMusic(void)
 {
     stopAll();
 
+    if (output)
+    {
+        delete output;
+        output = NULL;
+    }
+
     if (progress)
     {
         progress->Close();
@@ -1055,6 +1061,7 @@ void PlaybackBoxMusic::resetTimer()
 
 void PlaybackBoxMusic::play()
 {
+
     if (isplaying)
         stop();
 
@@ -1072,7 +1079,7 @@ void PlaybackBoxMusic::play()
 
     if (!output)
         openOutputDevice();
-   
+
     if (output->GetPause())
     {
         pause();
@@ -1255,7 +1262,7 @@ void PlaybackBoxMusic::pause(void)
     if (output) 
     {
         isplaying = !isplaying;
-        output->Pause(!isplaying); //Note pause doesn't take effet instantly
+        output->Pause(!isplaying); //Note pause doesn't take effect instantly
     }
     // wake up threads
     if (decoder) 
@@ -1289,13 +1296,17 @@ void PlaybackBoxMusic::stopDecoder(void)
 
 void PlaybackBoxMusic::stop(void)
 {
-    stopDecoder();
-
     if (output)
     {
-        delete output;
-        output = 0;
+        output->Reset();
+
+        if (output->GetPause())
+        {
+            pause();
+        }
     }
+
+    stopDecoder();
 
     mainvisual->setDecoder(0);
     mainvisual->setOutput(0);
