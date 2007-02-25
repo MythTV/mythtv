@@ -505,13 +505,14 @@ EOF
     sub print_usage {
         print <<EOF;
 
-usage:  $0
+usage:  $0 [options]
 
 options:
 
     --find-missing
 
         Scan your database and download any missing channel icons.
+        See also:  --rescan  --icon-dir
 
     --rescan
 
