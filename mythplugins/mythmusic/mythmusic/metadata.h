@@ -40,6 +40,11 @@ class Metadata
                 m_changed = false;
                 m_show = true;
                 m_format = lformat;
+
+                m_directoryid = -1;
+                m_artistid = -1;
+                m_albumid = -1;
+                m_genreid = -1;
             }
 
     Metadata(const Metadata &other)
@@ -89,9 +94,18 @@ class Metadata
     QString Genre() { return m_genre; }
     void setGenre(const QString &lgenre) { m_genre = lgenre; }
 
+    void setDirectoryId(int ldirectoryid) { m_directoryid = ldirectoryid; }
+    int getDirectoryId() { return m_directoryid; }
+    void setArtistId(int lartistid) { m_artistid = lartistid; }
+    int getArtistId() { return m_artistid; }
+    void setAlbumId(int lalbumid) { m_albumid = lalbumid; }
+    int getAlbumId() { return m_albumid; }
+    void setGenreId(int lgenreid) { m_genreid = lgenreid; }
+    int getGenreId() { return m_genreid; }
+
     int Year() { return m_year; }
     void setYear(int lyear) { m_year = lyear; }
- 
+
     int Track() { return m_tracknum; }
     void setTrack(int ltrack) { m_tracknum = ltrack; }
 
@@ -159,10 +173,15 @@ class Metadata
     int m_tracknum;
     int m_length;
     int m_rating;
+    int m_directoryid;
+    int m_artistid;
+    int m_compartistid;
+    int m_albumid;
+    int m_genreid;
     QString m_lastplay;
     int m_playcount;
     bool m_compilation;
-     
+
     unsigned int m_id;
     QString m_filename;
     bool    m_changed;
