@@ -71,13 +71,13 @@
 
 # Callsign lookup?
     elsif ($callsign) {
-        my ($url, $err) = station_lookup({'callsign' => $callsign});
+        my ($url, $err) = station_lookup('callsign', $callsign);
         print "$url\n";
     }
 
 # xmltvid lookup?
     elsif ($xmltvid) {
-        my ($url, $err) = station_lookup({'xmltvid' => $xmltvid});
+        my ($url, $err) = station_lookup('xmltvid', $xmltvid);
         print "$url\n";
     }
 
@@ -294,8 +294,8 @@ EOF
             return ($data, 1);
         }
         else {
-            my ($src) = $data =~ /<img\s+src="([^"]+)">/;
-            return ($src);
+            my ($type, $url, $id, $name) = extract_csv($data);
+            return ($url);
         }
     }
 
