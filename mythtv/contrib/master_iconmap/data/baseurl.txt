@@ -1,2 +1,0 @@
-ls-logo     http://lyngsat-logo.com/logo
-pbs         http://www.pbs.org/images/stations/standard
