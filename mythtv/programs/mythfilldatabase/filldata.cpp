@@ -2574,8 +2574,8 @@ bool grabData(Source source, int offset, QDate *qCurrentDate = 0)
                         xmltv_grabber.ascii(), configfile.ascii(),
                         filename.ascii());
     else if (xmltv_grabber == "tv_grab_nl")
-        command.sprintf("nice %s --output %s",
-                        xmltv_grabber.ascii(),
+        command.sprintf("nice %s --config-file '%s' --output %s",
+                        xmltv_grabber.ascii(), configfile.ascii(),
                         filename.ascii());
     else if (xmltv_grabber == "tv_grab_fi")
         // Use the default of 10 days for Finland's grabber
