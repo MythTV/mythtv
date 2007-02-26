@@ -142,7 +142,7 @@ sub getMovieData {
    # parse plot
    my $plot = parseBetween($response, ">Plot Outline:</h5> ", "</div>");
    if (!$plot) {
-      $plot = parseBetween($response, ">Plot Summary:</b> ", "<br>");
+      $plot = parseBetween($response, ">Plot Summary:</h5> ", "</div>");
    }
 
    if ($plot) {
