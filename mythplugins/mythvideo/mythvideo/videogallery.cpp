@@ -435,7 +435,7 @@ void VideoGallery::drawIcon(QPainter *p, GenericTree* curTreePos, int curPos,
         VERBOSE(VB_IMPORTANT, QString("Failed to get view Container"));
     }
 
-    if (icon_file.length())
+    if (icon_file.length() && !isDefaultCoverFile(icon_file))
     {
         const QPixmap *icon_image = ImageCache::getImageCache().
                 load(icon_file, int(thumbW - 2 * sw),
