@@ -112,9 +112,9 @@ MythArchive GUI theme
               <context>1</context>
               <area>60,100,300,40</area>
               <font>description</font>
-              <image function="on" filename="ma_leftright_on.png"></image>
-              <image function="off" filename="ma_leftright_off.png"></image>
-              <image function="pushed" filename="ma_leftright_pushed.png"></image>
+              <image function="on" filename="leftright_on.png"></image>
+              <image function="off" filename="leftright_off.png"></image>
+              <image function="pushed" filename="leftright_pushed.png"></image>
           </selector>
 
           <textarea name="destination_text" draworder="1">
@@ -133,9 +133,9 @@ MythArchive GUI theme
           <textbutton name="find_button" draworder="1">
               <position>1050,215</position>
               <context>1</context>
-              <image function="on" filename="ma_text_button_on.png"></image>
-              <image function="off" filename="ma_text_button_off.png"></image>
-              <image function="pushed" filename="ma_text_button_pushed.png"></image>
+              <image function="on" filename="text_button_on.png"></image>
+              <image function="off" filename="text_button_off.png"></image>
+              <image function="pushed" filename="text_button_pushed.png"></image>
               <font>buttons</font>
           </textbutton>
 
@@ -169,10 +169,10 @@ MythArchive GUI theme
           <checkbox name="makeisoimage_check" draworder="1">
               <context>1</context>
               <position>60,390</position>
-              <image function="checked" filename="ma_checked.png"></image>
-              <image function="unchecked" filename="ma_unchecked.png"></image>
-              <image function="checked_high" filename="ma_checked_high.png"></image>
-              <image function="unchecked_high" filename="ma_unchecked_high.png"></image>
+              <image function="checked" filename="checked.png"></image>
+              <image function="unchecked" filename="unchecked.png"></image>
+              <image function="checked_high" filename="checked_high.png"></image>
+              <image function="unchecked_high" filename="unchecked_high.png"></image>
           </checkbox>
 
           <textarea name="burntodvdr_text" draworder="2" align="left">
@@ -185,10 +185,10 @@ MythArchive GUI theme
           <checkbox name="burntodvdr_check" draworder="2">
               <context>1</context>
               <position>60,435</position>
-              <image function="checked" filename="ma_checked.png"></image>
-              <image function="unchecked" filename="ma_unchecked.png"></image>
-              <image function="checked_high" filename="ma_checked_high.png"></image>
-              <image function="unchecked_high" filename="ma_unchecked_high.png"></image>
+              <image function="checked" filename="checked.png"></image>
+              <image function="unchecked" filename="unchecked.png"></image>
+              <image function="checked_high" filename="checked_high.png"></image>
+              <image function="unchecked_high" filename="unchecked_high.png"></image>
           </checkbox>
 
           <textarea name="erasedvdrw_text" draworder="3" align="left">
@@ -201,10 +201,10 @@ MythArchive GUI theme
           <checkbox name="erasedvdrw_check" draworder="3">
               <context>1</context>
               <position>60,480</position>
-              <image function="checked" filename="ma_checked.png"></image>
-              <image function="unchecked" filename="ma_unchecked.png"></image>
-              <image function="checked_high" filename="ma_checked_high.png"></image>
-              <image function="unchecked_high" filename="ma_unchecked_high.png"></image>
+              <image function="checked" filename="checked.png"></image>
+              <image function="unchecked" filename="unchecked.png"></image>
+              <image function="checked_high" filename="checked_high.png"></image>
+              <image function="unchecked_high" filename="unchecked_high.png"></image>
           </checkbox>
 
           <!--
@@ -238,9 +238,9 @@ MythArchive GUI theme
               <context>2</context>
               <area>265,80,480,40</area>
               <font>description</font>
-              <image function="on" filename="ma_leftright_on.png"></image>
-              <image function="off" filename="ma_leftright_off.png"></image>
-              <image function="pushed" filename="ma_leftright_pushed.png"></image>
+              <image function="on" filename="leftright_on.png"></image>
+              <image function="off" filename="leftright_off.png"></image>
+              <image function="pushed" filename="leftright_pushed.png"></image>
           </selector>
 
           <listbtnarea name="archivelist"  draworder="1">
@@ -297,10 +297,10 @@ MythArchive GUI theme
           <checkbox name="usecutlist_check" draworder="4">
               <context>2</context>
               <position>60,550</position>
-              <image function="checked" filename="ma_checked.png"></image>
-              <image function="unchecked" filename="ma_unchecked.png"></image>
-              <image function="checked_high" filename="ma_checked_high.png"></image>
-              <image function="unchecked_high" filename="ma_unchecked_high.png"></image>
+              <image function="checked" filename="checked.png"></image>
+              <image function="unchecked" filename="unchecked.png"></image>
+              <image function="checked_high" filename="checked_high.png"></image>
+              <image function="unchecked_high" filename="unchecked_high.png"></image>
           </checkbox>
 
           <textarea name="nocutlist_text" draworder="4" align="left">
@@ -388,9 +388,9 @@ MythArchive GUI theme
               <context>3</context>
               <area>60,190,300,40</area>
               <font>description</font>
-              <image function="on" filename="ma_leftright_on.png"></image>
-              <image function="off" filename="ma_leftright_off.png"></image>
-              <image function="pushed" filename="ma_leftright_pushed.png"></image>
+              <image function="on" filename="leftright_on.png"></image>
+              <image function="off" filename="leftright_off.png"></image>
+              <image function="pushed" filename="leftright_pushed.png"></image>
           </selector>
 
           <image name="theme_image" draworder="2">
@@ -540,9 +540,9 @@ MythArchive GUI theme
               <context>4</context>
               <area>60,440,300,40</area>
               <font>description</font>
-              <image function="on" filename="ma_leftright_on.png"></image>
-              <image function="off" filename="ma_leftright_off.png"></image>
-              <image function="pushed" filename="ma_leftright_pushed.png"></image>
+              <image function="on" filename="leftright_on.png"></image>
+              <image function="off" filename="leftright_off.png"></image>
+              <image function="pushed" filename="leftright_pushed.png"></image>
           </selector>
           <textarea name="profile_text" draworder="1">
               <context>4</context>
@@ -576,25 +576,25 @@ MythArchive GUI theme
 
           <textbutton name="cancel_button" draworder="1">
               <position>55,0</position>
-              <image function="on" filename="ma_text_button_on.png"></image>
-              <image function="off" filename="ma_text_button_off.png"></image>
-              <image function="pushed" filename="ma_text_button_pushed.png"></image>
+              <image function="on" filename="text_button_on.png"></image>
+              <image function="off" filename="text_button_off.png"></image>
+              <image function="pushed" filename="text_button_pushed.png"></image>
               <font>buttons</font>
           </textbutton>
 
           <textbutton name="prev_button" draworder="1">
               <position>890,0</position>
-              <image function="on" filename="ma_text_button_on.png"></image>
-              <image function="off" filename="ma_text_button_off.png"></image>
-              <image function="pushed" filename="ma_text_button_pushed.png"></image>
+              <image function="on" filename="text_button_on.png"></image>
+              <image function="off" filename="text_button_off.png"></image>
+              <image function="pushed" filename="text_button_pushed.png"></image>
               <font>buttons</font>
           </textbutton>
 
           <textbutton name="next_button" draworder="1">
               <position>1060,0</position>
-              <image function="on" filename="ma_text_button_on.png"></image>
-              <image function="off" filename="ma_text_button_off.png"></image>
-              <image function="pushed" filename="ma_text_button_pushed.png"></image>
+              <image function="on" filename="text_button_on.png"></image>
+              <image function="off" filename="text_button_off.png"></image>
+              <image function="pushed" filename="text_button_pushed.png"></image>
               <font>buttons</font>
           </textbutton>
 
@@ -708,16 +708,16 @@ MythArchive GUI theme
           <textbutton name="ok_button" draworder="0">
               <position>350,640</position>
               <font>display</font>
-              <image function="on" filename="ma_text_button_on.png"></image>
-              <image function="off" filename="ma_text_button_off.png"></image>
-              <image function="pushed" filename="ma_text_button_pushed.png"></image>
+              <image function="on" filename="text_button_on.png"></image>
+              <image function="off" filename="text_button_off.png"></image>
+              <image function="pushed" filename="text_button_pushed.png"></image>
           </textbutton>
           <textbutton name="cancel_button" draworder="0">
               <position>850,640</position>
               <font>display</font>
-              <image function="on" filename="ma_text_button_on.png"></image>
-              <image function="off" filename="ma_text_button_off.png"></image>
-              <image function="pushed" filename="ma_text_button_pushed.png"></image>
+              <image function="on" filename="text_button_on.png"></image>
+              <image function="off" filename="text_button_off.png"></image>
+              <image function="pushed" filename="text_button_pushed.png"></image>
           </textbutton>
 
       </container>
