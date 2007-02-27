@@ -171,7 +171,7 @@
           <column number="3" width="260" context="-1"></column>
           <column number="4" width="50" context="-1"></column>
           <items>9</items>
-          <image function="selectionbar" filename="ma_selectbar.png" location="-2,0"></image>
+          <image function="selectionbar" filename="selectbar.png" location="-2,0"></image>
           <image function="uparrow" filename="uparrow.png" location="735,222"></image>
           <image function="downarrow" filename="downarrow.png" location="735,450"></image>
       </listarea>
@@ -276,9 +276,9 @@
           <selector name="camera_selector" draworder="4">
               <area>265,85,390,40</area>
               <font>description</font>
-              <image function="on" filename="ma_leftright_on.png"></image>
-              <image function="off" filename="ma_leftright_off.png"></image>
-              <image function="pushed" filename="ma_leftright_pushed.png"></image>
+              <image function="on" filename="leftright_on.png"></image>
+              <image function="off" filename="leftright_off.png"></image>
+              <image function="pushed" filename="leftright_pushed.png"></image>
           </selector>
 
           <textarea name="eventno_text" draworder="4" align="right">
@@ -328,7 +328,7 @@
                 <column number="3" width="255" context="-1"></column>
                 <column number="4" width="100" context="-1"></column>
                 <items>9</items>
-                <image function="selectionbar" filename="mz_selectbar.png" location="-2,0"></image>
+                <image function="selectionbar" filename="selectbar.png" location="-2,0"></image>
                 <image function="uparrow" filename="uparrow.png" location="735,190"></image>
                 <image function="downarrow" filename="downarrow.png" location="735,430"></image>
             </listarea>
@@ -346,17 +346,17 @@
 
             <textbutton name="play_button" draworder="1">
                 <position>35,0</position>
-                <image function="on" filename="ma_text_button_on.png"></image>
-                <image function="off" filename="ma_text_button_off.png"></image>
-                <image function="pushed" filename="ma_text_button_pushed.png"></image>
+                <image function="on" filename="text_button_on.png"></image>
+                <image function="off" filename="text_button_off.png"></image>
+                <image function="pushed" filename="text_button_pushed.png"></image>
                 <font>buttons</font>
             </textbutton>
 
             <textbutton name="delete_button" draworder="1">
                 <position>610,0</position>
-                <image function="on" filename="ma_text_button_on.png"></image>
-                <image function="off" filename="ma_text_button_off.png"></image>
-                <image function="pushed" filename="ma_text_button_pushed.png"></image>
+                <image function="on" filename="text_button_on.png"></image>
+                <image function="off" filename="text_button_off.png"></image>
+                <image function="pushed" filename="text_button_pushed.png"></image>
                 <font>buttons</font>
             </textbutton>
 
@@ -489,36 +489,36 @@
           <textbutton name="play_button" draworder="1">
               <context>1</context>
               <position>35,550</position>
-              <image function="on" filename="ma_text_button_on.png"></image>
-              <image function="off" filename="ma_text_button_off.png"></image>
-              <image function="pushed" filename="ma_text_button_pushed.png"></image>
+              <image function="on" filename="text_button_on.png"></image>
+              <image function="off" filename="text_button_off.png"></image>
+              <image function="pushed" filename="text_button_pushed.png"></image>
               <font>buttons</font>
            </textbutton>
 
            <textbutton name="delete_button" draworder="1">
                <context>1</context>
                <position>205,550</position>
-               <image function="on" filename="ma_text_button_on.png"></image>
-               <image function="off" filename="ma_text_button_off.png"></image>
-               <image function="pushed" filename="ma_text_button_pushed.png"></image>
+               <image function="on" filename="text_button_on.png"></image>
+               <image function="off" filename="text_button_off.png"></image>
+               <image function="pushed" filename="text_button_pushed.png"></image>
                <font>buttons</font>
            </textbutton>
 
            <textbutton name="prev_button" draworder="1">
                <context>1</context>
                <position>440,550</position>
-               <image function="on" filename="ma_text_button_on.png"></image>
-               <image function="off" filename="ma_text_button_off.png"></image>
-               <image function="pushed" filename="ma_text_button_pushed.png"></image>
+               <image function="on" filename="text_button_on.png"></image>
+               <image function="off" filename="text_button_off.png"></image>
+               <image function="pushed" filename="text_button_pushed.png"></image>
                <font>buttons</font>
            </textbutton>
 
            <textbutton name="next_button" draworder="1">
                <context>1</context>
                <position>610,550</position>
-               <image function="on" filename="ma_text_button_on.png"></image>
-               <image function="off" filename="ma_text_button_off.png"></image>
-               <image function="pushed" filename="ma_text_button_pushed.png"></image>
+               <image function="on" filename="text_button_on.png"></image>
+               <image function="off" filename="text_button_off.png"></image>
+               <image function="pushed" filename="text_button_pushed.png"></image>
                <font>buttons</font>
            </textbutton>
 
