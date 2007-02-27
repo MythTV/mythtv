@@ -23,5 +23,6 @@ class MediaMonitorDarwin : public MediaMonitor
 
     virtual void StartMonitoring(void);
     virtual bool AddDevice(MythMediaDevice* pDevice);
+    QStringList GetCDROMBlockDevices(void);
 };
 #endif // MYTH_MEDIA_MONITOR_DARWIN_H

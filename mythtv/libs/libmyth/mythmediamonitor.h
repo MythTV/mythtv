@@ -1,10 +1,6 @@
 #ifndef MYTH_MEDIA_MONITOR_H
 #define MYTH_MEDIA_MONITOR_H
 
-#ifndef _WIN32
-
-#include <fstab.h>
-
 #include <qvaluelist.h>
 #include <qguardedptr.h>
 #include <qthread.h>
@@ -72,24 +68,16 @@ class MPUBLIC MediaMonitor : public QObject
 
     void MonitorRegisterExtensions(uint mediaType, const QString &extensions);
 
+    virtual QStringList GetCDROMBlockDevices(void) = 0;
+
   public slots:
     void mediaStatusChanged(MediaStatus oldStatus, MythMediaDevice* pMedia);
 
   protected:
     void CheckDevices(void);
-    void CheckDeviceNotifications(void);
-    bool CheckFileSystemTable(void);
-    bool CheckMountable(void);
-    bool FindPartitions(const QString &dev, bool checkPartitions);
-
-    virtual bool AddDevice(MythMediaDevice* pDevice);
-    bool AddDevice(const char* dev);
-    bool AddDevice(struct fstab* mep);
+    virtual void CheckDeviceNotifications(void) {};
+    virtual bool AddDevice(MythMediaDevice* pDevice) = 0;
     bool RemoveDevice(const QString &dev);
-
-    QString GetDeviceFile(const QString &sysfs);
-
-    static QStringList GetCDROMBlockDevices(void);
 
   protected:
     QMutex                       m_DevicesLock;
@@ -101,12 +89,8 @@ class MPUBLIC MediaMonitor : public QObject
     MonitorThread                *m_Thread;
     unsigned long                m_MonitorPollingInterval;
     bool                         m_AllowEject;
-    int                          m_fifo;
 
-    static const QString         kUDEV_FIFO;
     static MediaMonitor         *c_monitor;
 };
-
-#endif // !_WIN32
 
 #endif // MYTH_MEDIA_MONITOR_H

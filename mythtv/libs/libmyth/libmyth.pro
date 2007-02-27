@@ -13,7 +13,7 @@ QMAKE_CLEAN += $(TARGET) $(TARGETA) $(TARGETD) $(TARGET0) $(TARGET1) $(TARGET2)
 HEADERS += dialogbox.h lcddevice.h mythcontext.h mythwidgets.h oldsettings.h  
 HEADERS += remotefile.h settings.h util.h mythwizard.h
 HEADERS += volumecontrol.h uitypes.h xmlparse.h mythplugin.h mythdbcon.h
-HEADERS += mythdialogs.h audiooutput.h httpcomms.h mythmedia.h 
+HEADERS += mythdialogs.h audiooutput.h httpcomms.h mythmedia.h mythmediamonitor.h
 HEADERS += uilistbtntype.h generictree.h screensaver.h
 HEADERS += managedlist.h DisplayRes.h volumebase.h audiooutputbase.h
 HEADERS += dbsettings.h screensaver-null.h output.h visual.h
@@ -26,7 +26,7 @@ SOURCES += dialogbox.cpp lcddevice.cpp mythcontext.cpp mythwidgets.cpp
 SOURCES += oldsettings.cpp remotefile.cpp settings.cpp
 SOURCES += util.cpp mythwizard.cpp uitypes.cpp xmlparse.cpp
 SOURCES += mythplugin.cpp mythdialogs.cpp audiooutput.cpp  
-SOURCES += httpcomms.cpp mythmedia.cpp uilistbtntype.cpp 
+SOURCES += httpcomms.cpp mythmedia.cpp mythmediamonitor.cpp uilistbtntype.cpp 
 SOURCES += generictree.cpp managedlist.cpp DisplayRes.cpp
 SOURCES += volumecontrol.cpp volumebase.cpp audiooutputbase.cpp
 SOURCES += dbsettings.cpp screensaver.cpp screensaver-null.cpp output.cpp
@@ -61,9 +61,6 @@ inc.files += exitcodes.h mythconfig.h mythconfig.mak virtualkeyboard.h
 inc.files += mythevent.h mythobservable.h mythsocket.h
 inc.files += mythexp.h mythpluginapi.h
 
-cygwin:QMAKE_LFLAGS_SHLIB += -Wl,--noinhibit-exec
-cygwin:DEFINES += _WIN32
-
 using_oss {
     DEFINES += USING_OSS
     SOURCES += audiooutputoss.cpp
@@ -71,9 +68,16 @@ using_oss {
 }
 
 unix:!cygwin {
-    SOURCES += mythhdd.cpp mythcdrom.cpp mythmediamonitor.cpp
-    HEADERS += mythhdd.h mythcdrom.h   mythmediamonitor.h
-    inc.files += mythhdd.h mythcdrom.h mythmediamonitor.h
+    SOURCES += mythhdd.cpp mythcdrom.cpp mediamonitor-unix.cpp
+    HEADERS += mythhdd.h   mythcdrom.h   mediamonitor-unix.h
+    inc.files += mythhdd.h mythcdrom.h   mediamonitor-unix.h
+}
+
+cygwin {
+    QMAKE_LFLAGS_SHLIB += -Wl,--noinhibit-exec
+    DEFINES += _WIN32
+    #HEADERS += mediamonitor-windows.h
+    #SOURCES += mediamonitor-windows.cpp
 }
 
 macx {

@@ -20,6 +20,8 @@
 #include <IOKit/storage/IOMedia.h>
 #include <IOKit/storage/IOCDMedia.h>
 #include <IOKit/storage/IODVDMedia.h>
+#include <IOKit/storage/IOBlockStorageDevice.h>
+#include <IOKit/storage/IOStorageProtocolCharacteristics.h>
 #include <DiskArbitration/DiskArbitration.h>
 #include <qapplication.h>
 
@@ -296,6 +298,7 @@ void MonitorThreadDarwin::run(void)
     CFDictionaryRef match     = kDADiskDescriptionMatchVolumeMountable;
     DASessionRef    daSession = DASessionCreate(kCFAllocatorDefault);
 
+    IOMasterPort(MACH_PORT_NULL, &sMasterPort);
 
     DARegisterDiskAppearedCallback(daSession, match,
                                    diskAppearedCallback, this);
@@ -443,4 +446,101 @@ bool MediaMonitorDarwin::AddDevice(MythMediaDevice* pDevice)
     m_UseCount[pDevice] = 0;
 
     return true;
+}
+
+/**
+ * \brief List of CD/DVD devices
+ *
+ * On Unix, this returns a list of /dev nodes which can be open()d.
+ * Darwin doesn't have fixed devices for removables/pluggables,
+ * so this method is actually useless as it stands.
+ * In the long term, this method should return both a name,
+ * and an opaque type? (for the IOKit io_object_t)
+ */
+QStringList MediaMonitorDarwin::GetCDROMBlockDevices()
+{
+    kern_return_t          kernResult;
+    CFMutableDictionaryRef devices;
+    io_iterator_t          iter;
+    QStringList            list;
+    QString                msg = QString("GetCDRomBlockDevices() - ");
+
+
+    devices = IOServiceMatching(kIOBlockStorageDeviceClass);
+    if (!devices)
+    {
+        VERBOSE(VB_IMPORTANT, msg + "No Storage Devices? Unlikely!");
+        return list;
+    }
+
+    // Create an iterator across all parents of the service object passed in.
+    kernResult = IOServiceGetMatchingServices(sMasterPort, devices, &iter);
+
+    if (KERN_SUCCESS != kernResult)
+    {
+        VERBOSE(VB_IMPORTANT, (msg + "IORegistryEntryCreateIterator"
+                                   + " returned %1").arg(kernResult));
+        return list;
+    }
+    if (!iter)
+    {
+        VERBOSE(VB_IMPORTANT, msg + "IORegistryEntryCreateIterator"
+                                  + " returned a NULL iterator");
+        return list;
+    }
+
+    io_object_t  drive;
+
+    while ((drive = IOIteratorNext(iter)))
+    {
+        CFMutableDictionaryRef  p = NULL;
+
+        IORegistryEntryCreateCFProperties(drive, &p, kCFAllocatorDefault, 0);
+        if (p)
+        {
+            const void  *type = CFDictionaryGetValue(p, CFSTR("device-type"));
+
+            if (CFEqual(type, CFSTR("DVD")) || CFEqual(type, CFSTR("CD")))
+            {
+                QString     desc;
+
+                p = (CFMutableDictionaryRef) IORegistryEntrySearchCFProperty(drive, kIOServicePlane, CFSTR(kIOPropertyProtocolCharacteristicsKey), kCFAllocatorDefault, kIORegistryIterateParents | kIORegistryIterateRecursively);
+                if (p)
+                {
+                    const void  *location = CFDictionaryGetValue(p, CFSTR(kIOPropertyPhysicalInterconnectLocationKey));
+                    if (CFEqual(location, CFSTR("Internal")))
+                        desc.append(tr("Internal"));
+                }
+
+                p = (CFMutableDictionaryRef) IORegistryEntrySearchCFProperty(drive, kIOServicePlane, CFSTR(kIOPropertyDeviceCharacteristicsKey), kCFAllocatorDefault, kIORegistryIterateParents | kIORegistryIterateRecursively);
+                if (p)
+                {
+                    const void *product = CFDictionaryGetValue(p, CFSTR(kIOPropertyProductNameKey));
+                    const void *vendor = CFDictionaryGetValue(p, CFSTR(kIOPropertyVendorNameKey));
+                    if (vendor)
+                    {
+                        desc.append(" ");
+                        desc.append(CFStringGetCStringPtr((CFStringRef)vendor, kCFStringEncodingMacRoman));
+                    }
+                    if (product)
+                    {
+                        desc.append(" ");
+                        desc.append(CFStringGetCStringPtr((CFStringRef)product, kCFStringEncodingMacRoman));
+                    }
+                }
+
+                list.append(desc);
+                VERBOSE(VB_UPNP, desc.prepend("Found CD/DVD: "));
+                CFRelease(p);
+            }
+        }
+        else
+            VERBOSE(VB_IMPORTANT, msg + "Could not retrieve drive properties");
+
+        IOObjectRelease(drive);
+    }
+
+    IOObjectRelease(iter);
+
+    return list;
 }
