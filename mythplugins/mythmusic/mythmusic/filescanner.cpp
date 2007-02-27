@@ -344,9 +344,19 @@ void FileScanner::SearchDir(QString &directory)
     {
         while (query.next())
         {
-            QString name = m_startdir +
-                QString::fromUtf8(query.value(2).toString()) + "/" +
-                QString::fromUtf8(query.value(0).toString());
+            QString name;
+
+            if (query.value(2).toString() != "")
+            {
+                name = m_startdir +
+                    QString::fromUtf8(query.value(2).toString()) + "/" +
+                    QString::fromUtf8(query.value(0).toString());
+            }
+            else
+            {
+                name = m_startdir +
+                    QString::fromUtf8(query.value(0).toString());
+            }
 
             if (name != QString::null)
             {
