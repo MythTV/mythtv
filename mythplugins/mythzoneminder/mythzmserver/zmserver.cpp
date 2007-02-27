@@ -55,6 +55,7 @@
 #define ERROR_INVALID_POINTERS "Cannot get shared memory pointers"
 
 MYSQL   g_dbConn;
+string  g_zmversion = "";
 string  g_password = "";
 string  g_server = "";
 string  g_database = "";
@@ -132,6 +133,7 @@ void loadZMConfig(const string &configfile)
         else if ( strcasecmp( name_ptr, "ZM_PATH_WEB" ) == 0 ) g_webPath = val;
         else if ( strcasecmp( name_ptr, "ZM_PATH_BIN" ) == 0 ) g_binPath = val;
         else if ( strcasecmp( name_ptr, "ZM_WEB_USER" ) == 0 ) g_webUser = val;
+        else if ( strcasecmp( name_ptr, "ZM_VERSION" ) == 0 ) g_zmversion = val;
     }
     fclose(cfg);
 }
@@ -841,6 +843,16 @@ void ZMServer::handleGetMonitorList(void)
             ADD_STR(outStr, row[2]) // Width
             ADD_STR(outStr, row[3]) // Height
             ADD_STR(outStr, row[4]) // Palette
+
+            if (m_debug)
+            {
+                cout << "id:      " << row[0] << endl;
+                cout << "name:    " << row[1] << endl;
+                cout << "width:   " << row[2] << endl;
+                cout << "height:  " << row[3] << endl;
+                cout << "palette: " << row[4] << endl;
+                cout << "-------------------" << endl;
+            }
         }
         else
         {

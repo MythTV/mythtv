@@ -32,6 +32,7 @@ extern void connectToDatabase(void);
 
 // there are shared by all ZMServer's
 extern MYSQL   g_dbConn;
+extern string  g_zmversion;
 extern string  g_password;
 extern string  g_server;
 extern string  g_database;

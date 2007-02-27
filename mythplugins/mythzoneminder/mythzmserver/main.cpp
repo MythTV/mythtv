@@ -37,6 +37,7 @@
 #define EXIT_OPENING_LOGFILE_ERROR   254
 #define EXIT_DEAMONIZING_ERROR       253
 #define EXIT_SOCKET_ERROR            252
+#define EXIT_VERSION_ERROR           251
 
 using namespace std;
 
@@ -196,8 +197,29 @@ int main(int argc, char **argv)
 
     map<int, ZMServer*> serverList; // list of ZMServers
 
-    // load the config and connect to the DB
+    // load the config 
     loadZMConfig(zmconfig);
+
+    // check we are configured for the correct ZM version
+#ifdef ZMVERSION_1_22_2
+    if (g_zmversion != "1.22.2")
+    {
+        cout << "The ZM config file says it is version '" << g_zmversion << "'" << endl
+             << "but we are configured for version '1.22.2'. Bailing out." << endl;
+        return EXIT_VERSION_ERROR;
+    }
+#else
+    if (g_zmversion != "1.22.3")
+    {
+        cout << "The ZM config file says it is version '" << g_zmversion << "'" << endl
+             << "but we are configured for version '1.22.3'. Bailing out." << endl;
+        return EXIT_VERSION_ERROR;
+    }
+#endif
+
+    cout << "ZM is version '" << g_zmversion << "'" << endl;
+
+    // connect to the DB
     connectToDatabase();
 
     // clear the master and temp sets
