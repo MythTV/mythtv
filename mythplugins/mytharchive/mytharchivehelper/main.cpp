@@ -2014,6 +2014,17 @@ int getFileInfo(QString inFile, QString outFile, int lenMethod)
 
                 stream.setAttribute("id", st->id);
 
+                if (st->start_time != AV_NOPTS_VALUE)
+                {
+                    int secs, us;
+                    secs = st->start_time / AV_TIME_BASE;
+                    us = st->start_time % AV_TIME_BASE;
+                    stream.setAttribute("start_time", QString("%1.%2")
+                            .arg(secs).arg(av_rescale(us, 1000000, AV_TIME_BASE)));
+                }
+                else
+                    stream.setAttribute("start_time", 0);
+
                 streams.appendChild(stream);
 
                 switch (lenMethod)
@@ -2078,6 +2089,17 @@ int getFileInfo(QString inFile, QString outFile, int lenMethod)
 
                 stream.setAttribute("samplerate", st->codec->sample_rate);
                 stream.setAttribute("bitrate", st->codec->bit_rate);
+
+                if (st->start_time != AV_NOPTS_VALUE)
+                {
+                    int secs, us;
+                    secs = st->start_time / AV_TIME_BASE;
+                    us = st->start_time % AV_TIME_BASE;
+                    stream.setAttribute("start_time", QString("%1.%2")
+                            .arg(secs).arg(av_rescale(us, 1000000, AV_TIME_BASE)));
+                }
+                else
+                    stream.setAttribute("start_time", 0);
 
                 streams.appendChild(stream);
 
