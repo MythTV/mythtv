@@ -12,32 +12,20 @@
 #include <qdir.h>
 #include <qfileinfo.h>
 
-// For testing
-#include <cstdio>
-#include <iostream>
-#include <cstdlib>
-#include <cerrno>
 
-using namespace std;
+// If your DVD has directories in lowercase, then it is wrongly mounted!
+// DVDs use the UDF filesystem, NOT ISO9660. Fix your /etc/fstab.
 
-// end for testing
+// This allows a warning for the above mentioned OS setup fault
+#define PATHTO_BAD_DVD_MOUNT "/video_ts"
 
-#ifndef PATHTO_DVD_DETECT
 #define PATHTO_DVD_DETECT "/VIDEO_TS"
-#endif
 
-#ifndef PATHTO_VCD_DETECT
 #define PATHTO_VCD_DETECT "/vcd"
-#endif
-
-#ifndef PATHTO_SVCD_DETECT
 #define PATHTO_SVCD_DETECT "/svcd"
-#endif
 
 // Mac OS X mounts audio CDs ready to use
-#ifndef PATHTO_AUDIO_DETECT
 #define PATHTO_AUDIO_DETECT "/.TOC.plist"
-#endif
 
 
 MythCDROM* MythCDROM::get(QObject* par, const char* devicePath, bool SuperMount,
@@ -88,6 +76,7 @@ void MythCDROM::onDeviceMounted()
     QDir        dvd = QDir(m_MountPath  + PATHTO_DVD_DETECT);
     QDir       svcd = QDir(m_MountPath  + PATHTO_SVCD_DETECT);
     QDir        vcd = QDir(m_MountPath  + PATHTO_VCD_DETECT);
+    QDir    bad_dvd = QDir(m_MountPath  + PATHTO_BAD_DVD_MOUNT);
 
     // Default is data media
     m_MediaType = MEDIATYPE_DATA;
@@ -116,6 +105,18 @@ void MythCDROM::onDeviceMounted()
         // HACK make it possible to eject a VCD/SVCD by unmounting it
         performMountCmd(false);
         m_Status = MEDIASTAT_USEABLE; 
+    }
+    else if (bad_dvd.exists())
+        VERBOSE(VB_IMPORTANT,
+                "DVD incorrectly mounted? (ISO9660 instead of UDF)");
+    else
+    {
+        VERBOSE(VB_GENERAL,
+                QString("CD/DVD '%1' contained none of\n").arg(m_MountPath) +
+                QString("\t\t\t%1, %2, %3 or %4").arg(PATHTO_DVD_DETECT)
+                .arg(PATHTO_AUDIO_DETECT).arg(PATHTO_VCD_DETECT)
+                .arg(PATHTO_SVCD_DETECT));
+        VERBOSE(VB_GENERAL, "Searching CD statistically - file by file!");
     }
 
     // If not DVD/AudioCD/VCD/SVCD, use parent's more generic version
