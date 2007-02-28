@@ -55,7 +55,7 @@ inc.files  = dialogbox.h lcddevice.h mythcontext.h mythdbcon.h
 inc.files += mythwidgets.h remotefile.h util.h oldsettings.h volumecontrol.h
 inc.files += settings.h uitypes.h xmlparse.h mythplugin.h mythdialogs.h
 inc.files += audiooutput.h inetcomms.h httpcomms.h mythmedia.h mythwizard.h
-inc.files += uilistbtntype.h generictree.h managedlist.h
+inc.files += uilistbtntype.h generictree.h managedlist.h mythmediamonitor.h
 inc.files += visual.h volumebase.h output.h langsettings.h qmdcodec.h
 inc.files += exitcodes.h mythconfig.h mythconfig.mak virtualkeyboard.h
 inc.files += mythevent.h mythobservable.h mythsocket.h
@@ -70,7 +70,6 @@ using_oss {
 unix:!cygwin {
     SOURCES += mythhdd.cpp mythcdrom.cpp mediamonitor-unix.cpp
     HEADERS += mythhdd.h   mythcdrom.h   mediamonitor-unix.h
-    inc.files += mythhdd.h mythcdrom.h   mediamonitor-unix.h
 }
 
 cygwin {
