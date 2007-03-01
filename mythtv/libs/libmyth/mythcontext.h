@@ -209,7 +209,7 @@ class MPUBLIC MythPrivRequest
  *   You must also update this value in
  *   mythplugins/mythweb/includes/mythbackend.php
  */
-#define MYTH_PROTO_VERSION "32"
+#define MYTH_PROTO_VERSION "33"
 
 /** \class MythContext
  *  \brief This class contains the runtime context for MythTV.

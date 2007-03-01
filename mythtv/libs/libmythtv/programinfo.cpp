@@ -268,6 +268,7 @@ QString ProgramInfo::MakeUniqueKey(void) const
                              INT_TO_LIST((int)((x) & 0xffffffffLL))
 
 #define STR_TO_LIST(x)       if ((x).isNull()) list << ""; else list << (x);
+#define DATE_TO_LIST(x)      STR_TO_LIST((x).toString(Qt::ISODate))
 
 #define FLOAT_TO_LIST(x)     sprintf(tmp, "%f", (x)); list << tmp;
 
@@ -318,7 +319,7 @@ void ProgramInfo::ToStringList(QStringList &list) const
     STR_TO_LIST(programid)
     DATETIME_TO_LIST(lastmodified)
     FLOAT_TO_LIST(stars)
-    DATETIME_TO_LIST(QDateTime(originalAirDate))
+    DATE_TO_LIST(originalAirDate)
     INT_TO_LIST(hasAirDate)     
     STR_TO_LIST((playgroup != "") ? playgroup : "Default")
     INT_TO_LIST(recpriority2)
@@ -354,7 +355,7 @@ bool ProgramInfo::FromStringList(QStringList &list, int offset)
 #define ENUM_FROM_LIST(x, y)   NEXT_STR() (x) = (y)atoi(ts.ascii());
 
 #define DATETIME_FROM_LIST(x)  NEXT_STR() (x).setTime_t((uint)atoi(ts.ascii()));
-#define DATE_FROM_LIST(x)      DATETIME_FROM_LIST(td); (x) = td.date();
+#define DATE_FROM_LIST(x)      NEXT_STR() (x) = QDate::fromString(ts, Qt::ISODate)
 
 #define LONGLONG_FROM_LIST(x)  INT_FROM_LIST(ti); NEXT_STR() \
                                (x) = ((long long)(ti) << 32) | \
@@ -377,7 +378,6 @@ bool ProgramInfo::FromStringList(QStringList &list, QStringList::iterator &it)
     const char* listerror = LOC + "FromStringList, not enough items in list.\n"; 
     QStringList::iterator listend = list.end();
     QString ts;
-    QDateTime td;
     int ti;
 
     STR_FROM_LIST(title)
