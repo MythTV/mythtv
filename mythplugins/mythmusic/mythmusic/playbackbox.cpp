@@ -1665,7 +1665,8 @@ void PlaybackBoxMusic::customEvent(QCustomEvent *event)
     {
         case OutputEvent::Playing:
         {
-            updateTrackInfo(curMeta);
+            if (curMeta)
+                updateTrackInfo(curMeta);
             statusString = tr("Playing stream.");
             break;
         }
