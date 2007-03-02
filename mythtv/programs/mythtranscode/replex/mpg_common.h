@@ -58,6 +58,7 @@ typedef struct extdata_s{
         int type;
         int strmnum;
 	int frmperpkt;
+	char language[4];
 	dummy_buffer dbuf;
 } extdata_t;
 

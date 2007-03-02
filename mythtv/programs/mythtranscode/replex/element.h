@@ -117,6 +117,7 @@ struct audio_frame_s{
 	uint32_t framesize;
 	uint32_t frametime;
 	uint32_t off;
+	char     language[4];
 } audio_frame_t;
 
 void pts2time(uint64_t pts, uint8_t *buf, int len);

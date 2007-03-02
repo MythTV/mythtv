@@ -567,11 +567,13 @@ void MPEG2fixup::InitReplex()
             it != aFrame.end(); it++)
     {
         int i = aud_map[it.key()];
+        char *lang = inputFC->streams[it.key()]->language;
         ring_init(&rx.extrbuf[i], memsize / 5);
         ring_init(&rx.index_extrbuf[i], INDEX_BUF);
         rx.extframe[i].set = 1;
         rx.extframe[i].bit_rate = getCodecContext(it.key())->bit_rate;
         rx.extframe[i].framesize = it.data().first()->pkt.size;
+        strncpy(rx.extframe[i].language, lang, 4);
         switch(GetStreamType(it.key()))
         {
             case CODEC_ID_MP2:

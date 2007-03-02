@@ -769,6 +769,7 @@ void init_multiplex( multiplex_t *mx, sequence_t *seq_head,
 		mx->ext[i].pts_off = 0;
 		mx->ext[i].frmperpkt = 1;
 		mx->ext[i].strmnum = exttypcnt[i];
+		strncpy(mx->ext[i].language, extframe[i].language, 4);
 		dummy_init(&mx->ext[i].dbuf, mx->audio_buffer_size);
 		data_rate += extframe[i].bit_rate;
 		mx->extcnt++;

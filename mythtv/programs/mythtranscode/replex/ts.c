@@ -374,14 +374,12 @@ void write_ts_patpmt(extdata_t *ext, int extcnt, uint8_t prog_num, uint8_t *buf)
 {
 #define PMTPID 0x20
 	static int count = 0;
-	int pos, length, i;
-	uint32_t crc;
-	uint8_t *sec_start;
+	int pos, i, pmtpos = 13;
 	//PMT Program number = 1
 	//PMT PID = 0x20
 	uint8_t pat[17] = {0x00, 0x00, 0xb0, 0x0d, 0xfe, 0xef, 0xc1, 0x00, 0x00,
 	                   0x00, 0x00, 0xe0, PMTPID, 0x00, 0x00, 0x00, 0x00};
-	uint8_t pmt[13] = {0x00, 0x02, 0xb0, 0x00, 0x00, 0x00, 0xc1, 0x00, 0x00,
+	uint8_t pmt[184] ={0x00, 0x02, 0xb0, 0x00, 0x00, 0x00, 0xc1, 0x00, 0x00,
 	                   0x00, 0x00, 0xf0, 0x00};
 
 	//PAT
@@ -394,14 +392,6 @@ void write_ts_patpmt(extdata_t *ext, int extcnt, uint8_t prog_num, uint8_t *buf)
 	pos = TS_SIZE;
 	//PMT
 	pos += write_ts_header(PMTPID, 1, count, -1, buf+pos, 0);
-	length = 5 * (extcnt + 1) + 16;
-	pmt[3] = length - 3;
-	pmt[5] = prog_num;
-	pmt[9] = 0xf0 | (0xff & (TS_VIDPID >> 8));
-	pmt[10] = 0xff & TS_VIDPID;
-	sec_start = buf+pos+1;
-	memcpy(buf+pos, pmt, 13);
-	pos += 13;
 	for(i = 0; i <= extcnt; i++) {
 		uint8_t type;
 		uint32_t pid;
@@ -419,15 +409,31 @@ void write_ts_patpmt(extdata_t *ext, int extcnt, uint8_t prog_num, uint8_t *buf)
 			type = 0xff;
 			pid = 0x1fff;
 		}
-		buf[pos++] = type;
-		buf[pos++] = 0xe0 | (0xff & (pid >> 8));
-		buf[pos++] = 0xff & pid;
-		buf[pos++] = 0xf0;
-		buf[pos++] = 0x00;
+		pmt[pmtpos++] = type;
+		pmt[pmtpos++] = 0xe0 | (0xff & (pid >> 8));
+		pmt[pmtpos++] = 0xff & pid;
+		pmt[pmtpos++] = 0xf0;
+		if(strlen(ext[i-1].language) == 3) {
+			pmt[pmtpos++] = 0x06;
+			pmt[pmtpos++] = 0x0a;
+			pmt[pmtpos++] = 0x04;
+			pmt[pmtpos++] = ext[i-1].language[0];
+			pmt[pmtpos++] = ext[i-1].language[1];
+			pmt[pmtpos++] = ext[i-1].language[2];
+			pmt[pmtpos++] = 0x00;
+		} else {
+			pmt[pmtpos++] = 0x00;
+		}
 	}
-	crc = htonl(crc32_04c11db7(sec_start, length - 4/*crc*/, 0xffffffff));
-	memcpy(buf+pos, &crc, 4);
-	pos+=4;
+	pmt[3] = pmtpos + 4/*crc*/ - 3 - 1/*pointer_field*/;
+	pmt[5] = prog_num;
+	pmt[9] = 0xf0 | (0xff & (TS_VIDPID >> 8));
+	pmt[10] = 0xff & TS_VIDPID;
+	*(uint32_t *)&pmt[pmtpos] = htonl(crc32_04c11db7(&pmt[1], pmtpos -1,
+	                                  0xffffffff));
+	pmtpos+=4;
+	memcpy(buf+pos, pmt, pmtpos);
+	pos += pmtpos;
 	memset(buf+pos, 0xff, 2*TS_SIZE - pos);
 	pos = 2*TS_SIZE;
 	count = (count+1) & 0x0f;
