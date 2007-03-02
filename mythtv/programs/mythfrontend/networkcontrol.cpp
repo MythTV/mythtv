@@ -6,12 +6,14 @@ using namespace std;
 #include <qregexp.h>
 #include <qstringlist.h>
 #include <qtextstream.h>
+#include <qdir.h>
 
 #include "libmyth/mythcontext.h"
 #include "libmyth/mythdialogs.h"
 #include "networkcontrol.h"
 #include "programinfo.h"
 #include "remoteutil.h"
+#include "previewgenerator.h"
 
 #define LOC QString("NetworkControl: ")
 #define LOC_ERR QString("NetworkControl Error: ")
@@ -610,6 +612,11 @@ QString NetworkControl::processPlay(QStringList tokens)
             return QString("ERROR: See 'help %1' for usage information")
                            .arg(tokens[0]);
     }
+    else if (is_abbrev("save", tokens[1], 2))
+    {
+        if (is_abbrev("screenshot", tokens[2], 2))
+            return saveScreenshot(tokens);
+    }
     else if (is_abbrev("stop", tokens[1], 2))
         message = QString("NETWORK_CONTROL STOP");
     else
@@ -739,6 +746,8 @@ QString NetworkControl::processHelp(QStringList tokens)
             "                      - Play program with chanid & starttime\r\n"
             "play program CHANID yyyy-mm-ddThh:mm:ss resume\r\n"
             "                      - Resume program with chanid & starttime\r\n"
+            "play save screenshot FILENAME\r\n"
+            "                      - Save screenshot from current position\r\n"
             "play seek beginning   - Seek to the beginning of the recording\r\n"
             "play seek forward     - Skip forward in the video\r\n"
             "play seek backward    - Skip backwards in the video\r\n"
@@ -915,6 +924,67 @@ QString NetworkControl::listRecordings(QString chanid, QString starttime)
         result = "ERROR: Unable to retrieve recordings list.";
 
     return result;
+}
+
+QString NetworkControl::saveScreenshot(QStringList tokens)
+{
+    QString result = "";
+    int width = -1;
+    int height = -1;
+    long long frameNumber = 150;
+
+    QString location = gContext->getCurrentLocation();
+
+    if (location != "Playback")
+    {
+        return "ERROR: Not in playback mode, unable to save screenshot";
+    }
+
+    gotAnswer = false;
+    QString message = QString("NETWORK_CONTROL QUERY POSITION");
+    MythEvent me(message);
+    gContext->dispatch(me);
+
+    QTime timer;
+    timer.start();
+    while (timer.elapsed() < 2000  && !gotAnswer)
+        usleep(10000);
+
+    ProgramInfo *pginfo = NULL;
+    if (gotAnswer)
+    {
+        QStringList results = QStringList::split(" ", answer);
+        pginfo = ProgramInfo::GetProgramFromRecorded(results[5], results[6]);
+        if (!pginfo)
+            return "ERROR: Unable to find program info for current program";
+
+        QString outFile = QDir::homeDirPath() + "/.mythtv/screenshot.png";
+
+        if (tokens.size() >= 4)
+            outFile = tokens[3];
+
+        if (tokens.size() >= 5)
+        {
+            QStringList size = QStringList::split("x", tokens[4]);
+            width  = size[0].toInt();
+            height = size[1].toInt();
+        }
+
+        frameNumber = results[7].toInt();
+
+        bool res = PreviewGenerator::SaveScreenshot(pginfo, outFile,
+                                     frameNumber, width, height);
+        delete pginfo;
+
+        if (res)
+            return QString("OK %1x%2").arg(width).arg(height);
+        else
+            return "ERROR: Unable to generate screenshot, check logs";
+    }
+    else
+        return "ERROR: Timed out waiting for reply from player";
+
+    return "ERROR: Unknown reason";
 }
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

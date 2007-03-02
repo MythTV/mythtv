@@ -7,6 +7,10 @@
 #include <unistd.h>    // for stat
 #include <sys/time.h>
 #include <sys/resource.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <unistd.h>
 
 // Qt headers
 #include <qfileinfo.h>
@@ -312,6 +316,96 @@ bool PreviewGenerator::IsLocal(void) const
     return QFileInfo(pathname).exists();
 }
 
+/** \fn PreviewGenerator::SaveScreenshot()
+ *  \brief Saves a screenshot to a file.
+ *
+ *  \param pginfo       Recording to grab from.
+ *  \param outFile      Filename to save the image to
+ *  \param frameNumber  Frame Number to capture
+ *  \param thumbWidth   Width of desired image
+ *  \param thumbHeight  Height of desired image
+ *  \return True if successful, false otherwise.
+ */
+bool PreviewGenerator::SaveScreenshot(ProgramInfo *pginfo, QString &outFile,
+        long long frameNumber, int &thumbWidth, int &thumbHeight)
+{
+    float desWidth = (float)thumbWidth;
+    float desHeight = (float)thumbHeight;
+    float frameAspect = 0.0;
+    char *retbuf = NULL;
+    int bufferLen = 0;
+    int frameWidth = 0;
+    int frameHeight = 0;
+
+    if (!pginfo)
+        return false;
+
+    QString inFile = pginfo->GetPlaybackURL();
+    RingBuffer *rbuf = new RingBuffer(inFile, false, false, 0);
+
+    if (!rbuf->IsOpen())
+    {
+        VERBOSE(VB_IMPORTANT, LOC_ERR +
+                "SaveScreenshot: Could not open file: " +
+                QString("'%1'").arg(inFile));
+        delete rbuf;
+        return false;
+    }
+
+    NuppelVideoPlayer *nvp = new NuppelVideoPlayer("Preview", pginfo);
+    nvp->SetRingBuffer(rbuf);
+
+    retbuf = nvp->GetScreenGrabAtFrame(frameNumber, true, bufferLen,
+                                       frameWidth, frameHeight, frameAspect);
+
+    if (thumbWidth == -1)
+        desWidth = frameWidth;
+    if (thumbHeight == -1)
+        desHeight = frameHeight;
+
+    delete nvp;
+    delete rbuf;
+
+    if (!retbuf || bufferLen == 0)
+        return false;
+
+    if (frameAspect <= 0)
+        frameAspect = frameWidth / frameHeight;
+
+    const QImage img((unsigned char*) retbuf,
+                     frameWidth, frameHeight, 32, NULL, 65536 * 65536,
+                     QImage::LittleEndian);
+
+    if (frameAspect > desWidth / desHeight)
+        desHeight = rint(desWidth / frameAspect);
+    else
+        desWidth = rint(desHeight * frameAspect);
+
+    QImage small_img = img.smoothScale((int) desWidth, (int) desHeight);
+    QString type = "PNG";
+
+    if (outFile.right(4).lower() == ".png")
+        type = outFile.right(3).upper();
+    else
+        VERBOSE(VB_IMPORTANT, LOC_WARN + QString("SaveScreenshot: The filename "
+                "(%1) does not end in .png, but we only support png format. "
+                "The file will contain a PNG formatted image.")
+                .arg(outFile));
+
+    if (small_img.save(outFile.ascii(), type))
+        chmod(outFile.ascii(), 0666);
+    else
+        VERBOSE(VB_IMPORTANT, LOC_ERR + QString("SaveScreenshot: unable to "
+                "open save image").arg(outFile));
+
+    delete retbuf;
+
+    thumbWidth = (int)desWidth;
+    thumbHeight = (int)desHeight;
+
+    return true;
+}
+
 /** \fn PreviewGenerator::GetScreenGrab(const ProgramInfo*,const QString&,int,int&,int&,int&,float&)
  *  \brief Returns a PIX_FMT_RGBA32 buffer containg a frame from the video.
  *
@@ -395,3 +489,5 @@ char *PreviewGenerator::GetScreenGrab(
 #endif // USING_FRONTEND
     return retbuf;
 }
+
+/* vim: set expandtab tabstop=4 shiftwidth=4: */

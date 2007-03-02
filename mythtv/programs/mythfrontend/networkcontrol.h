@@ -45,6 +45,7 @@ class NetworkControl : public QServerSocket
     void customEvent(QCustomEvent *e);
 
     QString listRecordings(QString chanid = "", QString starttime = "");
+    QString saveScreenshot(QStringList tokens);
 
     void processNetworkControlCommand(QString command);
 

@@ -215,6 +215,8 @@ class MPUBLIC NuppelVideoPlayer : public CC608Reader, public CC708Reader
     OSD         *GetOSD(void)                 { return osd; }
     VideoOutput *getVideoOutput(void)         { return videoOutput; }
     AudioOutput *getAudioOutput(void)         { return audioOutput; }
+    char        *GetScreenGrabAtFrame(long long frameNum, bool absolute,
+                                      int &buflen, int &vw, int &vh, float &ar);
     char        *GetScreenGrab(int secondsin, int &buflen,
                                int &vw, int &vh, float &ar);
     LiveTVChain *GetTVChain(void)             { return livetvchain; }
@@ -237,6 +239,7 @@ class MPUBLIC NuppelVideoPlayer : public CC608Reader, public CC708Reader
     bool Rewind(float seconds);
     bool RebuildSeekTable(bool showPercentage = true, StatusCallback cb = NULL,
                           void* cbData = NULL);
+    void JumpToFrame(long long frame);
 
     // Commercial stuff
     void SkipCommercials(int direction);
@@ -274,6 +277,7 @@ class MPUBLIC NuppelVideoPlayer : public CC608Reader, public CC708Reader
     const QImage &GetARGBFrame(QSize &size);
     const unsigned char *GetScaledFrame(QSize &size);
     void ShutdownYUVResize(void);
+    void SaveScreenshot(void);
 
     // Reinit
     void    ReinitOSD(void);
@@ -442,7 +446,6 @@ class MPUBLIC NuppelVideoPlayer : public CC608Reader, public CC708Reader
     // Private seeking stuff
     void ClearAfterSeek(bool clearvideobuffers = true);
     bool FrameIsInMap(long long frameNumber, QMap<long long, int> &breakMap);
-    void JumpToFrame(long long frame);
     void JumpToNetFrame(long long net) { JumpToFrame(framesPlayed + net); }
 
     // Private commercial skipping

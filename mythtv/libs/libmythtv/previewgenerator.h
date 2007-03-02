@@ -32,6 +32,10 @@ class MPUBLIC PreviewGenerator : public QObject
                                int &video_width, int &video_height,
                                float &video_aspect);
 
+    static bool SaveScreenshot(ProgramInfo *pginfo, QString &outFile,
+                              long long frameNumber,
+                              int &thumbWidth, int &thumbHeight);
+
     void AttachSignals(QObject*);
     void disconnectSafe(void);
 

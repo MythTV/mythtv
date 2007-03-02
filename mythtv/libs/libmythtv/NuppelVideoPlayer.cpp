@@ -5077,6 +5077,31 @@ bool NuppelVideoPlayer::FrameIsInMap(long long frameNumber,
 char *NuppelVideoPlayer::GetScreenGrab(int secondsin, int &bufflen,
                                        int &vw, int &vh, float &ar)
 {
+    long long frameNum = (long long)(secondsin * video_frame_rate);
+
+    return GetScreenGrabAtFrame(frameNum, false, bufflen, vw, vh, ar);
+}
+
+/** \fn NuppelVideoPlayer::GetScreenGrabAtFrame(int,int&,int&,int&,float&)
+ *  \brief Returns a one RGB frame grab from a video.
+ *
+ *   User is responsible for deleting the buffer with delete[].
+ *   This also tries to skip any commercial breaks for a more
+ *   useful screen grab for previews.
+ *
+ *   Warning: Don't use this on something you're playing!
+ *
+ *  \param frameNum  [in]  Frame number to capture
+ *  \param absolute  [in]  If False, make sure we aren't in cutlist or Comm brk
+ *  \param bufflen   [out] Size of buffer returned in bytes
+ *  \param vw        [out] Width of buffer returned
+ *  \param vh        [out] Height of buffer returned
+ *  \param ar        [out] Aspect of buffer returned
+ */
+char *NuppelVideoPlayer::GetScreenGrabAtFrame(long long frameNum, bool absolute,
+                                              int &bufflen, int &vw, int &vh,
+                                              float &ar)
+{
     long long      number    = 0;
     long long      oldnumber = 0;
     unsigned char *data      = NULL;
@@ -5097,9 +5122,16 @@ char *NuppelVideoPlayer::GetScreenGrab(int secondsin, int &bufflen,
 
     if (!hasFullPositionMap)
     {
-        VERBOSE(VB_IMPORTANT, LOC + "Recording does not have position map.\n" +
-                QString("\t\t\tRun 'mythcommflag --file %1 --rebuild' to fix")
+        VERBOSE(VB_IMPORTANT, LOC + "GetScreenGrabAtFrame: Recording does not "
+                "have position map so we will be unable to grab the desired "
+                "frame.\n");
+        VERBOSE(VB_IMPORTANT,
+                QString("Run 'mythcommflag --file %1 --rebuild' to fix.")
                 .arg(m_playbackinfo->GetRecordBasename()));
+        VERBOSE(VB_IMPORTANT,
+                QString("If that does not work and this is a .mpg file, try 'mythtranscode --mpeg2 --buildindex --allkeys -c %1 -s %2'.")
+                .arg(m_playbackinfo->chanid)
+                .arg(m_playbackinfo->recstartts.toString("yyyyMMddhhmmss")));
     }
 
     if ((video_width <= 0) || (video_height <= 0))
@@ -5118,38 +5150,46 @@ char *NuppelVideoPlayer::GetScreenGrab(int secondsin, int &bufflen,
 
     ClearAfterSeek();
 
-    number = (long long) (secondsin * video_frame_rate);
-    number = (number >= totalFrames) ? (totalFrames/2) : number;
+    number = frameNum;
 
-    // Only get bookmark if we have position map
-    if (hasFullPositionMap)
+    if (number >= totalFrames)
     {
-        previewFromBookmark = gContext->GetNumSetting("PreviewFromBookmark");
-        if (previewFromBookmark != 0)
-        {
-            bookmarkseek = GetBookmark();
-            if (bookmarkseek > 30)
-                number = bookmarkseek;
-        }
+        VERBOSE(VB_PLAYBACK, LOC_ERR +
+                "Screen grab requested for frame number beyond end of file.");
+
+        number = totalFrames / 2;
     }
 
-    // Only get commercial map if we have position map
-    if (hasFullPositionMap)
+    if (!absolute && hasFullPositionMap)
     {
-        oldnumber = number;
-        LoadCutList();
+        bookmarkseek = 0;
+        previewFromBookmark = gContext->GetNumSetting("PreviewFromBookmark");
+        if (previewFromBookmark != 0)
+            bookmarkseek = GetBookmark();
 
-        QMutexLocker locker(&commBreakMapLock);
-        LoadCommBreakList();
-
-        while ((FrameIsInMap(number, commBreakMap) || 
-                (FrameIsInMap(number, deleteMap))))
+        // Use the bookmark if we should, otherwise make sure we aren't in the
+        // cutlist or a commercial break
+        if (bookmarkseek > 30)
         {
-            number += (long long) (30 * video_frame_rate);
-            if (number >= totalFrames)
+            number = bookmarkseek;
+        }
+        else
+        {
+            oldnumber = number;
+            LoadCutList();
+
+            QMutexLocker locker(&commBreakMapLock);
+            LoadCommBreakList();
+
+            while ((FrameIsInMap(number, commBreakMap) || 
+                    (FrameIsInMap(number, deleteMap))))
             {
-                number = oldnumber;
-                break;
+                number += (long long) (30 * video_frame_rate);
+                if (number >= totalFrames)
+                {
+                    number = oldnumber;
+                    break;
+                }
             }
         }
     }

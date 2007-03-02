@@ -33,6 +33,7 @@
 #include "DisplayRes.h"
 #include "signalmonitorvalue.h"
 #include "scheduledrecording.h"
+#include "previewgenerator.h"
 #include "config.h"
 #include "livetvchain.h"
 #include "playgroup.h"
@@ -380,6 +381,7 @@ void TV::InitKeys(void)
     REG_KEY("TV Playback", "SIGNALMON", "Monitor Signal Quality", "F7");
     REG_KEY("TV Playback", "JUMPTODVDROOTMENU", "Jump to the DVD Root Menu", "");
     REG_KEY("TV Playback", "EXITSHOWNOPROMPTS","Exit Show without any prompts", "");
+    REG_KEY("TV Playback", "SCREENSHOT","Save screenshot of current video frame", "");
 
     /* Editing keys */
     REG_KEY("TV Editing", "CLEARMAP", "Clear editing cut points", "C,Q,Home");
@@ -2820,6 +2822,20 @@ void TV::ProcessKeypress(QKeyEvent *e)
                 sigMonMode  = !sigMonMode;
             }
         }
+        else if ((action == "SCREENSHOT") && (!activerbuffer->isDVD()))
+        {
+            long long frameNumber = nvp->GetFramesPlayed();
+            int frameWidth = -1;
+            int frameHeight = -1;
+            QString outFile =
+               QString("%1/.mythtv/%2_%3_%4.png")
+                       .arg(QDir::homeDirPath()).arg(playbackinfo->chanid)
+                       .arg(playbackinfo->recstartts.toString("yyyyMMddhhmmss"))
+                       .arg((long)frameNumber);
+
+            PreviewGenerator::SaveScreenshot(playbackinfo, outFile, frameNumber,
+                                             frameWidth, frameHeight);
+        }
         else if (action == "EXITSHOWNOPROMPTS")
         {
             if (nvp)
@@ -3303,9 +3319,12 @@ void TV::processNetworkControlCommand(QString command)
                     respDate = playbackinfo->recstartts;
             }
 
-            infoStr += QString(" %1 %2 %3 %4").arg(posInfo.desc).arg(speedStr)
-                               .arg(playbackinfo != NULL ? playbackinfo->chanid : "-1")
-                               .arg(respDate.toString(Qt::ISODate));
+            infoStr +=
+                QString(" %1 %2 %3 %4 %5").arg(posInfo.desc).arg(speedStr)
+                        .arg(playbackinfo != NULL ? playbackinfo->chanid : "-1")
+                        .arg(respDate.toString(Qt::ISODate))
+                        .arg((long)nvp->GetFramesPlayed());
+
             pbinfoLock.unlock();
 
             QString message = QString("NETWORK_CONTROL ANSWER %1")
