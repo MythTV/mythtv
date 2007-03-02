@@ -370,12 +370,10 @@ int write_ac3_ts(int n, uint64_t pts, uint8_t *buf, int *alength,
 	return pos;
 }
 
-void write_ts_patpmt(int *exttype, int *exttypcnt, int extcnt,
-		     uint8_t prog_num, uint8_t *buf)
+void write_ts_patpmt(extdata_t *ext, int extcnt, uint8_t prog_num, uint8_t *buf)
 {
 #define PMTPID 0x20
 	static int count = 0;
-	int totalext = 0;
 	int pos, length, i;
 	uint32_t crc;
 	uint8_t *sec_start;
@@ -385,9 +383,6 @@ void write_ts_patpmt(int *exttype, int *exttypcnt, int extcnt,
 	                   0x00, 0x00, 0xe0, PMTPID, 0x00, 0x00, 0x00, 0x00};
 	uint8_t pmt[13] = {0x00, 0x02, 0xb0, 0x00, 0x00, 0x00, 0xc1, 0x00, 0x00,
 	                   0x00, 0x00, 0xf0, 0x00};
-
-	for(i = 0; i < extcnt; i++)
-		totalext += exttypcnt[i]+1;
 
 	//PAT
 	pat[10] = prog_num;
@@ -399,7 +394,7 @@ void write_ts_patpmt(int *exttype, int *exttypcnt, int extcnt,
 	pos = TS_SIZE;
 	//PMT
 	pos += write_ts_header(PMTPID, 1, count, -1, buf+pos, 0);
-	length = 5 * (totalext + 1) + 16;
+	length = 5 * (extcnt + 1) + 16;
 	pmt[3] = length - 3;
 	pmt[5] = prog_num;
 	pmt[9] = 0xf0 | (0xff & (TS_VIDPID >> 8));
@@ -410,27 +405,25 @@ void write_ts_patpmt(int *exttype, int *exttypcnt, int extcnt,
 	for(i = 0; i <= extcnt; i++) {
 		uint8_t type;
 		uint32_t pid;
-		int n, typcnt = (i == 0 ? 1 : exttypcnt[i-1]+1);
-		for(n = 0; n < typcnt; n++) {
-			if(i == 0) {
-				type = 0x02;
-				pid = TS_VIDPID;
-			} else if(exttype[i-1] == MPEG_AUDIO) {
-				type = 0x04;
-				pid = TS_MP2PID + n;
-			} else if(exttype[i-1] == AC3) {
-				type = 0x81;
-				pid = TS_AC3PID + n;
-			} else {
-				type = 0xff;
-				pid = 0x1fff;
-			}
-			buf[pos++] = type;
-			buf[pos++] = 0xe0 | (0xff & (pid >> 8));
-			buf[pos++] = 0xff & pid;
-			buf[pos++] = 0xf0;
-			buf[pos++] = 0x00;
+		int n =  ext[i-1].strmnum;
+		if(i == 0) {
+			type = 0x02;
+			pid = TS_VIDPID;
+		} else if(ext[i-1].type == MPEG_AUDIO) {
+			type = 0x04;
+			pid = TS_MP2PID + n;
+		} else if(ext[i-1].type == AC3) {
+			type = 0x81;
+			pid = TS_AC3PID + n;
+		} else {
+			type = 0xff;
+			pid = 0x1fff;
 		}
+		buf[pos++] = type;
+		buf[pos++] = 0xe0 | (0xff & (pid >> 8));
+		buf[pos++] = 0xff & pid;
+		buf[pos++] = 0xf0;
+		buf[pos++] = 0x00;
 	}
 	crc = htonl(crc32_04c11db7(sec_start, length - 4/*crc*/, 0xffffffff));
 	memcpy(buf+pos, &crc, 4);

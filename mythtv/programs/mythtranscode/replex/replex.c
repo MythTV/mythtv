@@ -1901,12 +1901,11 @@ void fix_audio(struct replex *rx, multiplex_t *mx)
 			} else break;
 
 		} while (1);
-		mx->extpts_off[i] = aiu.pts;
-		mx->extframes[i] = aiu.framesize;
+		mx->ext[i].pts_off = aiu.pts;
 		
 		fprintf(stderr,"Audio%d  offset: ",i);
-		printpts(mx->extpts_off[i]);
-		printpts(rx->first_apts[i]+mx->extpts_off[i]);
+		printpts(mx->ext[i].pts_off);
+		printpts(rx->first_apts[i]+mx->ext[i].pts_off);
 		fprintf(stderr,"\n");
 	}
 			  
@@ -1927,11 +1926,11 @@ void fix_audio(struct replex *rx, multiplex_t *mx)
 				ring_skip(&rx->ac3rbuffer[i], aiu.length);
 			} else break;
 		} while (1);
-		mx->extpts_off[i] = aiu.pts;
+		mx->ext[i].pts_off = aiu.pts;
 		
 		fprintf(stderr,"AC3%d  offset: ",i);
-		printpts(mx->extpts_off[i]);
-		printpts(rx->first_ac3pts[i]+mx->extpts_off[i]);
+		printpts(mx->ext[i].pts_off);
+		printpts(rx->first_ac3pts[i]+mx->ext[i].pts_off);
 		fprintf(stderr,"\n");
 
 	}

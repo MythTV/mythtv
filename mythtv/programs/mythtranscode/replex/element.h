@@ -80,7 +80,7 @@ enum { VIDEO_NONE=0, VIDEO_PAL, VIDEO_NTSC};
 
 
 enum {
-	NONE=0,AC3, MPEG_AUDIO, LPCM
+	NONE=0,AC3, MPEG_AUDIO, LPCM, MAX_TYPES
 };
 
 typedef struct sequence_s{

@@ -28,12 +28,10 @@
 
 #include "mpg_common.h"
 #include "pes.h"
-#include "ts.h"
 #include "element.h"
 
 #define N_AUDIO 32
 #define N_AC3 8
-
 
 typedef struct multiplex_s{
 	int fd_out;
@@ -66,25 +64,15 @@ typedef struct multiplex_s{
 	int set_broken_link;
 	unsigned int vsize, extsize;
 	int64_t extra_clock;
-	uint64_t first_vpts;
-	uint64_t first_extpts[N_AUDIO];
 	uint64_t SCR;
 	uint64_t oldSCR;
 	uint64_t SCRinc;
 	index_unit viu;
-	index_unit extiu[N_AUDIO];
-	uint64_t extpts[N_AUDIO];
-	uint64_t extpts_off[N_AUDIO];
-	int extframes[N_AUDIO];
-        int exttype[N_AUDIO];
-        int exttypcnt[N_AUDIO];
-	int ext_frmperpkt[N_AUDIO];
-
-/* needed from replex */
-	int extcnt;
 
 	dummy_buffer vdbuf;
-	dummy_buffer extdbuf[N_AUDIO];
+
+	extdata_t ext[N_AUDIO];
+	int extcnt;
 
 	ringbuffer *extrbuffer;
 	ringbuffer *index_extrbuffer;

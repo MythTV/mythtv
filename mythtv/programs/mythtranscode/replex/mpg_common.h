@@ -51,6 +51,17 @@ typedef struct index_unit_s{
 	uint64_t ptsrate;
 } index_unit;
 
+typedef struct extdata_s{
+	index_unit iu;
+	uint64_t pts;
+	uint64_t pts_off;
+        int type;
+        int strmnum;
+	int frmperpkt;
+	dummy_buffer dbuf;
+} extdata_t;
+
+
 #define NO_ERR    0
 #define FRAME_ERR 1
 
