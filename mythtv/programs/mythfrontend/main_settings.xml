@@ -166,7 +166,7 @@
 
    <button>
        <type>ZONEMINDER</type>
-       <text>ZomeMinder Settings</text>
+       <text>ZoneMinder Settings</text>
        <action>CONFIGPLUGIN mythzoneminder</action>
        <depends>mythzoneminder</depends>
    </button>
