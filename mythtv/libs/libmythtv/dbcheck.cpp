@@ -10,7 +10,7 @@ using namespace std;
 #include "mythdbcon.h"
 
 /// This is the DB schema version expected by the running MythTV instance.
-const QString currentDatabaseVersion = "1181";
+const QString currentDatabaseVersion = "1182";
 
 static bool UpdateDBVersionNumber(const QString &newnumber);
 static bool performActualUpdate(const QString updates[], QString version,
@@ -2925,6 +2925,36 @@ thequery,
 };
         if (!performActualUpdate(updates, "1181", dbver))
             return false;
+    }
+
+    if (dbver == "1181")
+    {
+        MSqlQuery airdates(MSqlQuery::InitCon());
+        airdates.prepare("SELECT chanid, starttime FROM recordedprogram "
+                         "WHERE originalairdate = '0000-00-00';");
+        if (!airdates.exec())
+            return false;
+
+        if (airdates.isActive() && airdates.size() > 0)
+        {
+            MSqlQuery update(MSqlQuery::InitCon());
+            while (airdates.next())
+            {
+                update.prepare("UPDATE recorded "
+                               "SET originalairdate = '0000-00-00' "
+                               "WHERE chanid = :CHANID "
+                               "AND starttime = :STARTTIME;");
+
+                update.bindValue(":CHANID", airdates.value(0).toString());
+                update.bindValue(":STARTTIME", airdates.value(1).toDateTime());
+                update.exec();
+            }
+        }
+
+        if (!UpdateDBVersionNumber("1182"))
+            return false;
+
+        dbver = "1182";
     }
 
 //"ALTER TABLE cardinput DROP COLUMN preference;" in 0.22

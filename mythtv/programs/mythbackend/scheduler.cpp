@@ -2324,7 +2324,7 @@ void Scheduler::AddNewRecords(void)
 
         if (result.value(32).isNull())
         {
-            p->originalAirDate = p->startts.date();
+            p->originalAirDate = QDate::QDate (0, 1, 1);
             p->hasAirDate = false;
         }
         else

@@ -886,9 +886,13 @@ ProgramInfo *ProgramInfo::GetProgramFromRecorded(const QString &channel,
         }
         else
         {
-            proginfo->originalAirDate =
-                QDate::fromString(query.value(17).toString(), Qt::ISODate);
-            proginfo->hasAirDate = true;
+            proginfo->originalAirDate = 
+                QDate::fromString(query.value(17).toString(),Qt::ISODate);
+
+            if (proginfo->originalAirDate > QDate(1940, 1, 1))
+                proginfo->hasAirDate = true;
+            else
+                proginfo->hasAirDate = false;
         }
         proginfo->hostname = query.value(18).toString();
         proginfo->recstatus = rsRecorded;
@@ -1707,6 +1711,11 @@ static bool insert_program(const ProgramInfo        *pg,
     else
         query.bindValue(":RECORDID",    pg->recordid);
 
+    if (pg->hasAirDate)
+        query.bindValue(":ORIGAIRDATE", pg->originalAirDate);
+    else
+        query.bindValue(":ORIGAIRDATE", "0000-00-00");
+
     query.bindValue(":CHANID",      pg->chanid);
     query.bindValue(":STARTS",      pg->recstartts);
     query.bindValue(":ENDS",        pg->recendts);
@@ -1722,7 +1731,6 @@ static bool insert_program(const ProgramInfo        *pg,
     query.bindValue(":FINDID",      pg->findid);
     query.bindValue(":STARS",       pg->stars);
     query.bindValue(":REPEAT",      pg->repeat);
-    query.bindValue(":ORIGAIRDATE", pg->originalAirDate);
     query.bindValue(":TRANSCODER",  schd->GetTranscoder());
     query.bindValue(":PLAYGROUP",   pg->playgroup);
     query.bindValue(":RECPRIORITY", schd->getRecPriority());
@@ -4503,7 +4511,7 @@ bool ProgramList::FromProgram(const QString &sql, MSqlBindings &bindings,
         p->programid = query.value(14).toString();
         p->year = query.value(15).toString();
         p->stars = query.value(16).toString().toFloat();
-        
+
         if (query.value(17).isNull() || query.value(17).toString().isEmpty())
         {
             p->originalAirDate = QDate::QDate (0, 1, 1);
@@ -4511,9 +4519,13 @@ bool ProgramList::FromProgram(const QString &sql, MSqlBindings &bindings,
         }
         else
         {
-            p->originalAirDate = QDate::fromString(query.value(17).toString(),
-                                                   Qt::ISODate);
-            p->hasAirDate = true;
+            p->originalAirDate = 
+                QDate::fromString(query.value(17).toString(),Qt::ISODate);
+
+            if (p->originalAirDate > QDate(1940, 1, 1))
+                p->hasAirDate = true;
+            else
+                p->hasAirDate = false;
         }
         p->catType = query.value(18).toString();
         p->recordid = query.value(19).toInt();
@@ -4677,15 +4689,21 @@ bool ProgramList::FromRecorded( bool bDescending, ProgramList *pSchedList )
             proginfo->lastmodified  = QDateTime::fromString(query.value(24).toString(), Qt::ISODate);
             proginfo->findid        = query.value(25).toInt();
 
-            if (query.value(26).isNull())
+            if (query.value(26).isNull() || 
+                query.value(26).toString().isEmpty())
             {
-                proginfo->originalAirDate = proginfo->startts.date();
+                proginfo->originalAirDate = QDate::QDate (0, 1, 1);
                 proginfo->hasAirDate      = false;
             }
             else
             {
-                proginfo->originalAirDate = QDate::fromString(query.value(26).toString(),Qt::ISODate);
-                proginfo->hasAirDate      = true;
+                proginfo->originalAirDate = 
+                    QDate::fromString(query.value(26).toString(),Qt::ISODate);
+
+                if (proginfo->originalAirDate > QDate(1940, 1, 1))
+                    proginfo->hasAirDate  = true;
+                else
+                    proginfo->hasAirDate  = false;
             }
 
             proginfo->pathname = query.value(28).toString();

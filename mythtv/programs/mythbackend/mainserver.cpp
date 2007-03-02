@@ -1158,16 +1158,21 @@ void MainServer::HandleQueryRecordings(QString type, PlaybackSock *pbs)
                                             Qt::ISODate);
             proginfo->findid = query.value(25).toInt();
 
-            if (query.value(26).isNull())
+            if (query.value(26).isNull() || 
+                query.value(26).toString().isEmpty())
             {
-                proginfo->originalAirDate = proginfo->startts.date();
-                proginfo->hasAirDate = false;
+                proginfo->originalAirDate = QDate::QDate (0, 1, 1);
+                proginfo->hasAirDate      = false;
             }
             else
             {
-                proginfo->originalAirDate =
+                proginfo->originalAirDate = 
                     QDate::fromString(query.value(26).toString(),Qt::ISODate);
-                proginfo->hasAirDate = true;
+
+                if (proginfo->originalAirDate > QDate(1940, 1, 1))
+                    proginfo->hasAirDate  = true;
+                else
+                    proginfo->hasAirDate  = false;
             }
 
             proginfo->pathname = query.value(28).toString();

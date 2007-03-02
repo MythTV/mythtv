@@ -1793,8 +1793,8 @@ bool PlaybackBox::FillList(bool useCachedData)
                 hrs = 1;
 
             // add points for a new recording that decrease each hour
-            if (hrs < 24)
-                p->recpriority2 += 24 - hrs;
+            if (hrs < 36)
+                p->recpriority2 += 36 - hrs;
 
             // add points for how close the recorded time of day is to 'now'
             p->recpriority2 += abs((hrs % 24) - 12);
@@ -1864,8 +1864,8 @@ bool PlaybackBox::FillList(bool useCachedData)
                 else
                 {
                     // add points for a new Single or final episode
-                    if (hrs < 48)
-                        p->recpriority2 += maxAge * (48 - hrs) / 48;
+                    if (hrs < 36)
+                        p->recpriority2 += maxAge * (36 - hrs) / 36;
 
                     if ((hrs / 24) < maxAge)
                         p->recpriority2 += hrs / 24;
