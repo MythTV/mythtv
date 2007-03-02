@@ -29,9 +29,9 @@ const int kNetworkControlCloseEvent     = 35672;
 static bool is_abbrev(QString const& command, QString const& test, unsigned minchars = 1)
 {
     if (test.length() < minchars)
-        return command == test;
+        return command.lower() == test.lower();
     else
-        return test == command.left(test.length());
+        return test.lower() == command.left(test.length()).lower();
 }
 
 NetworkControl::NetworkControl(int port)
@@ -90,21 +90,65 @@ NetworkControl::NetworkControl(int port)
     keyMap["down"]                   = Qt::Key_Down;
     keyMap["left"]                   = Qt::Key_Left;
     keyMap["right"]                  = Qt::Key_Right;
+    keyMap["home"]                   = Qt::Key_Home;
+    keyMap["end"]                    = Qt::Key_End;
     keyMap["enter"]                  = Qt::Key_Enter;
+    keyMap["return"]                 = Qt::Key_Return;
     keyMap["pageup"]                 = Qt::Key_Prior;
     keyMap["pagedown"]               = Qt::Key_Next;
     keyMap["escape"]                 = Qt::Key_Escape;
+    keyMap["tab"]                    = Qt::Key_Tab;
+    keyMap["backtab"]                = Qt::Key_Backtab;
     keyMap["space"]                  = Qt::Key_Space;
     keyMap["backspace"]              = Qt::Key_Backspace;
+    keyMap["insert"]                 = Qt::Key_Insert;
+    keyMap["delete"]                 = Qt::Key_Delete;
+    keyMap["plus"]                   = Qt::Key_Plus;
+    keyMap["+"]                      = Qt::Key_Plus;
+    keyMap["comma"]                  = Qt::Key_Comma;
+    keyMap[","]                      = Qt::Key_Comma;
+    keyMap["minus"]                  = Qt::Key_Minus;
+    keyMap["-"]                      = Qt::Key_Minus;
+    keyMap["period"]                 = Qt::Key_Period;
+    keyMap["."]                      = Qt::Key_Period;
+    keyMap["numbersign"]             = Qt::Key_NumberSign;
+    keyMap["poundsign"]              = Qt::Key_NumberSign;
+    keyMap["#"]                      = Qt::Key_NumberSign;
     keyMap["bracketleft"]            = Qt::Key_BracketLeft;
+    keyMap["["]                      = Qt::Key_BracketLeft;
     keyMap["bracketright"]           = Qt::Key_BracketRight;
+    keyMap["]"]                      = Qt::Key_BracketRight;
     keyMap["backslash"]              = Qt::Key_Backslash;
+    keyMap["\\"]                     = Qt::Key_Backslash;
+    keyMap["dollar"]                 = Qt::Key_Dollar;
+    keyMap["$"]                      = Qt::Key_Dollar;
+    keyMap["percent"]                = Qt::Key_Percent;
+    keyMap["%"]                      = Qt::Key_Percent;
+    keyMap["ampersand"]              = Qt::Key_Ampersand;
+    keyMap["&"]                      = Qt::Key_Ampersand;
+    keyMap["parenleft"]              = Qt::Key_ParenLeft;
+    keyMap["("]                      = Qt::Key_ParenLeft;
+    keyMap["parenright"]             = Qt::Key_ParenRight;
+    keyMap[")"]                      = Qt::Key_ParenRight;
+    keyMap["asterisk"]               = Qt::Key_Asterisk;
+    keyMap["*"]                      = Qt::Key_Asterisk;
+    keyMap["question"]               = Qt::Key_Question;
+    keyMap["?"]                      = Qt::Key_Question;
     keyMap["slash"]                  = Qt::Key_Slash;
+    keyMap["/"]                      = Qt::Key_Slash;
     keyMap["colon"]                  = Qt::Key_Colon;
+    keyMap[":"]                      = Qt::Key_Colon;
     keyMap["semicolon"]              = Qt::Key_Semicolon;
+    keyMap[";"]                      = Qt::Key_Semicolon;
     keyMap["less"]                   = Qt::Key_Less;
+    keyMap["<"]                      = Qt::Key_Less;
     keyMap["equal"]                  = Qt::Key_Equal;
+    keyMap["="]                      = Qt::Key_Equal;
     keyMap["greater"]                = Qt::Key_Greater;
+    keyMap[">"]                      = Qt::Key_Greater;
+    keyMap["bar"]                    = Qt::Key_Bar;
+    keyMap["pipe"]                   = Qt::Key_Bar;
+    keyMap["|"]                      = Qt::Key_Bar;
     keyMap["f1"]                     = Qt::Key_F1;
     keyMap["f2"]                     = Qt::Key_F2;
     keyMap["f3"]                     = Qt::Key_F3;
@@ -117,6 +161,18 @@ NetworkControl::NetworkControl(int port)
     keyMap["f10"]                    = Qt::Key_F10;
     keyMap["f11"]                    = Qt::Key_F11;
     keyMap["f12"]                    = Qt::Key_F12;
+    keyMap["f13"]                    = Qt::Key_F13;
+    keyMap["f14"]                    = Qt::Key_F14;
+    keyMap["f15"]                    = Qt::Key_F15;
+    keyMap["f16"]                    = Qt::Key_F16;
+    keyMap["f17"]                    = Qt::Key_F17;
+    keyMap["f18"]                    = Qt::Key_F18;
+    keyMap["f19"]                    = Qt::Key_F19;
+    keyMap["f20"]                    = Qt::Key_F20;
+    keyMap["f21"]                    = Qt::Key_F21;
+    keyMap["f22"]                    = Qt::Key_F22;
+    keyMap["f23"]                    = Qt::Key_F23;
+    keyMap["f24"]                    = Qt::Key_F24;
 
     pthread_attr_t attr;
     pthread_attr_init(&attr);
@@ -185,8 +241,6 @@ void NetworkControl::processNetworkControlCommand(QString command)
     QString result = "";
     QStringList tokens = QStringList::split(" ", command);
 
-    tokens[0] = tokens[0].lower();
-
     if (is_abbrev("jump", tokens[0]))
         result = processJump(tokens);
     else if (is_abbrev("key", tokens[0]))
@@ -197,7 +251,7 @@ void NetworkControl::processNetworkControlCommand(QString command)
         result = processQuery(tokens);
     else if (is_abbrev("help", tokens[0]))
         result = processHelp(tokens);
-    else if ((tokens[0] == "exit") || (tokens[0] == "quit"))
+    else if ((tokens[0].lower() == "exit") || (tokens[0].lower() == "quit"))
         QApplication::postEvent(this,
                                 new QCustomEvent(kNetworkControlCloseEvent));
     else if (! tokens[0].isEmpty())
@@ -274,13 +328,11 @@ void NetworkControl::readClient(void)
     while (socket->canReadLine())
     {
         lineIn = socket->readLine();
-        lineIn.replace(QRegExp("[^-a-zA-Z0-9\\s\\.:_#/]"), "");
+        lineIn.replace(QRegExp("[^-a-zA-Z0-9\\s\\.:_#/$%&()*+,;<=>?\\[\\]\\|]"), "");
         lineIn.replace(QRegExp("[\r\n]"), "");
         lineIn.replace(QRegExp("^\\s"), "");
 
         tokens = QStringList::split(" ", lineIn);
-        if (! is_abbrev("key", tokens[0].lower()))
-            lineIn = lineIn.lower();
 
         ncLock.lock();
         networkControlCommands.push_back(lineIn);
@@ -350,9 +402,16 @@ QString NetworkControl::processKey(QStringList tokens)
         keyDest = gContext->GetMainWindow()->currentWidget()->focusWidget();
 
     unsigned int curToken = 1;
+    unsigned int tokenLen = 0;
     while (curToken < tokens.size())
     {
-        if (keyMap.contains(tokens[curToken]))
+        tokenLen = tokens[curToken].length();
+
+        if (tokens[curToken] == "sleep")
+        {
+            sleep(1);
+        }
+        else if (keyMap.contains(tokens[curToken]))
         {
             int keyCode = keyMap[tokens[curToken]];
 
@@ -362,16 +421,41 @@ QString NetworkControl::processKey(QStringList tokens)
             event = new QKeyEvent(QEvent::KeyRelease, keyCode, 0, NoButton);
             QApplication::postEvent(keyDest, event);
         }
-        else if ((tokens[curToken].length() == 1) &&
-                 (tokens[curToken][0].isLetterOrNumber()))
+        else if (((tokenLen == 1) &&
+                  (tokens[curToken][0].isLetterOrNumber())) ||
+                 ((tokenLen >= 1) &&
+                  (tokens[curToken].contains("+"))))
         {
             QKeySequence a(tokens[curToken]);
             int keyCode = a[0];
-            int ch = (tokens[curToken].ascii())[0];
+            int ch = (tokens[curToken].ascii())[tokenLen - 1];
             int buttons = NoButton;
 
-            if (tokens[curToken] == tokens[curToken].upper())
-                buttons = ShiftButton;
+            if (tokenLen > 1)
+            {
+                QStringList tokenParts =
+                    QStringList::split("+", tokens[curToken]);
+
+                unsigned int partNum = 0;
+                while (partNum < (tokenParts.size() - 1))
+                {
+                    if (tokenParts[partNum].upper() == "CTRL")
+                        buttons |= ControlButton;
+                    if (tokenParts[partNum].upper() == "SHIFT")
+                        buttons |= ShiftButton;
+                    if (tokenParts[partNum].upper() == "ALT")
+                        buttons |= AltButton;
+                    if (tokenParts[partNum].upper() == "META")
+                        buttons |= MetaButton;
+
+                    partNum++;
+                }
+            }
+            else
+            {
+                if (tokens[curToken] == tokens[curToken].upper())
+                    buttons = ShiftButton;
+            }
 
             event = new QKeyEvent(QEvent::KeyPress, keyCode, ch, buttons,
                                   tokens[curToken]);
@@ -513,6 +597,7 @@ QString NetworkControl::processPlay(QStringList tokens)
             return QString("ERROR: See 'help %1' for usage information")
                            .arg(tokens[0]);
 
+        tokens[2] = tokens[2].lower();
         if ((tokens[2].contains(QRegExp("^\\-*\\d+x$"))) ||
             (tokens[2].contains(QRegExp("^\\-*\\d+\\/\\d+x$"))) ||
             (tokens[2].contains(QRegExp("^\\d*\\.\\d+x$"))))
@@ -570,7 +655,7 @@ QString NetworkControl::processQuery(QStringList tokens)
             if (gotAnswer)
                 result += answer;
             else
-                result += "ERROR: Timed out waiting for reply from player";
+                result = "ERROR: Timed out waiting for reply from player";
         }
     }
     else if ((tokens.size() == 4) &&
@@ -578,7 +663,7 @@ QString NetworkControl::processQuery(QStringList tokens)
              (tokens[2].contains(QRegExp("^\\d+$"))) &&
              (tokens[3].contains(QRegExp(
                          "^\\d\\d\\d\\d-\\d\\d-\\d\\dt\\d\\d:\\d\\d:\\d\\d$"))))
-        return listRecordings(tokens[2], tokens[3]);
+        return listRecordings(tokens[2], tokens[3].upper());
     else if (is_abbrev("recordings", tokens[1]))
         return listRecordings();
     else
@@ -796,7 +881,7 @@ QString NetworkControl::listRecordings(QString chanid, QString starttime)
     if ((chanid != "") && (starttime != ""))
     {
         queryStr += "AND chanid = " + chanid + " "
-                    "AND starttime = '" + starttime.upper() + "' ";
+                    "AND starttime = '" + starttime + "' ";
         appendCRLF = false;
     }
 
