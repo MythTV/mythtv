@@ -973,9 +973,9 @@
             <selector name="extension_select" draworder="0">
                 <area>300,195,200,40</area>
                 <font>display</font>
-                <image function="on" filename="mv_leftright_on.png"></image>
-                <image function="off" filename="mv_leftright_off.png"></image>
-                <image function="pushed" filename="mv_leftright_pushed.png"></image>
+                <image function="on" filename="leftright_on.png"></image>
+                <image function="off" filename="leftright_off.png"></image>
+                <image function="pushed" filename="leftright_pushed.png"></image>
             </selector>
 
             <blackhole name="command_hack" draworder="0">
@@ -984,18 +984,18 @@
 
             <checkbox name="default_check" draworder="0">
                 <position>300,315</position>
-                <image function="checked" filename="mv_checked.png"></image>
-                <image function="unchecked" filename="mv_unchecked.png"></image>
-                <image function="checked_high" filename="mv_checked_high.png"></image>
-                <image function="unchecked_high" filename="mv_unchecked_high.png"></image>
+                <image function="checked" filename="checked.png"></image>
+                <image function="unchecked" filename="unchecked.png"></image>
+                <image function="checked_high" filename="checked_high.png"></image>
+                <image function="unchecked_high" filename="unchecked_high.png"></image>
             </checkbox>      
 
             <checkbox name="ignore_check" draworder="0">
                 <position>300,375</position>
-                <image function="checked" filename="mv_checked.png"></image>
-                <image function="unchecked" filename="mv_unchecked.png"></image>
-                <image function="checked_high" filename="mv_checked_high.png"></image>
-                <image function="unchecked_high" filename="mv_unchecked_high.png"></image>
+                <image function="checked" filename="checked.png"></image>
+                <image function="unchecked" filename="unchecked.png"></image>
+                <image function="checked_high" filename="checked_high.png"></image>
+                <image function="unchecked_high" filename="unchecked_high.png"></image>
             </checkbox>      
 
             <textbutton name="done_button" draworder="0">
@@ -1114,51 +1114,51 @@
                 <area>310,95,300,40</area>
             </blackhole>
 
-	    <selector name="category_select" draworder="0">
-		<area>310,145,300,40</area>
-		<font>display</font>
-		<image function="on" filename="mv_leftright_on.png"></image>
-		<image function="off" filename="mv_leftright_off.png"></image>
-		<image function="pushed" filename="mv_leftright_pushed.png"></image>
-	    </selector>
+            <selector name="category_select" draworder="0">
+                <area>310,145,300,40</area>
+                <font>display</font>
+                <image function="on" filename="leftright_on.png"></image>
+                <image function="off" filename="leftright_off.png"></image>
+                <image function="pushed" filename="leftright_pushed.png"></image>
+            </selector>
 
             <selector name="level_select" draworder="0">
                 <area>310,195,300,40</area>
                 <font>display</font>
-                <image function="on" filename="mv_leftright_on.png"></image>
-                <image function="off" filename="mv_leftright_off.png"></image>
-                <image function="pushed" filename="mv_leftright_pushed.png"></image>
+                <image function="on" filename="leftright_on.png"></image>
+                <image function="off" filename="leftright_off.png"></image>
+                <image function="pushed" filename="leftright_pushed.png"></image>
             </selector>
 
             <checkbox name="child_check" draworder="0">
                 <position>310,245</position>
-                <image function="checked" filename="mv_checked.png"></image>
-                <image function="unchecked" filename="mv_unchecked.png"></image>
-                <image function="checked_high" filename="mv_checked_high.png"></image>
-                <image function="unchecked_high" filename="mv_unchecked_high.png"></image>
+                <image function="checked" filename="checked.png"></image>
+                <image function="unchecked" filename="unchecked.png"></image>
+                <image function="checked_high" filename="checked_high.png"></image>
+                <image function="unchecked_high" filename="unchecked_high.png"></image>
             </checkbox>
 
             <selector name="child_select" draworder="0">
                 <area>310,295,250,40</area>
                 <font>display</font>
-                <image function="on" filename="mv_leftright_on.png"></image>
-                <image function="off" filename="mv_leftright_off.png"></image>
-                <image function="pushed" filename="mv_leftright_pushed.png"></image>
+                <image function="on" filename="leftright_on.png"></image>
+                <image function="off" filename="leftright_off.png"></image>
+                <image function="pushed" filename="leftright_pushed.png"></image>
             </selector>
 
             <checkbox name="browse_check" draworder="0">
                 <position>310,345</position>
-                <image function="checked" filename="mv_checked.png"></image>
-                <image function="unchecked" filename="mv_unchecked.png"></image>
-                <image function="checked_high" filename="mv_checked_high.png"></image>
-                <image function="unchecked_high" filename="mv_unchecked_high.png"></image>
-            </checkbox>      
+                <image function="checked" filename="checked.png"></image>
+                <image function="unchecked" filename="unchecked.png"></image>
+                <image function="checked_high" filename="checked_high.png"></image>
+                <image function="unchecked_high" filename="unchecked_high.png"></image>
+            </checkbox>
 
             <pushbutton name="coverart_button" draworder="0">
                 <position>310,395</position>
-                <image function="on" filename="mv_blankbutton_on.png"></image>
-                <image function="off" filename="mv_blankbutton_off.png"></image>
-                <image function="pushed" filename="mv_blankbutton_pushed.png"></image>
+                <image function="on" filename="blankbutton_on.png"></image>
+                <image function="off" filename="blankbutton_off.png"></image>
+                <image function="pushed" filename="blankbutton_pushed.png"></image>
             </pushbutton>
 
             <textarea name="coverart_text" draworder="0" align="left">
@@ -1328,73 +1328,73 @@
 		<selector name="category_select" draworder="0">
 			<area>380,70,300,34</area>
 			<font>display</font>
-			<image function="on" filename="mv_leftright_on.png"></image>
-			<image function="off" filename="mv_leftright_off.png"></image>
-			<image function="pushed" filename="mv_leftright_pushed.png"></image>
+			<image function="on" filename="leftright_on.png"></image>
+			<image function="off" filename="leftright_off.png"></image>
+			<image function="pushed" filename="leftright_pushed.png"></image>
 		</selector>
 
 		<selector name="genre_select" draworder="0">
 			<area>380,104,300,34</area>
 			<font>display</font>
-			<image function="on" filename="mv_leftright_on.png"></image>
-			<image function="off" filename="mv_leftright_off.png"></image>
-			<image function="pushed" filename="mv_leftright_pushed.png"></image>
+			<image function="on" filename="leftright_on.png"></image>
+			<image function="off" filename="leftright_off.png"></image>
+			<image function="pushed" filename="leftright_pushed.png"></image>
 		</selector>
 		<selector name="country_select" draworder="0">
 			<area>380,138,300,34</area>
 			<font>display</font>
-			<image function="on" filename="mv_leftright_on.png"></image>
-			<image function="off" filename="mv_leftright_off.png"></image>
-			<image function="pushed" filename="mv_leftright_pushed.png"></image>
+			<image function="on" filename="leftright_on.png"></image>
+			<image function="off" filename="leftright_off.png"></image>
+			<image function="pushed" filename="leftright_pushed.png"></image>
 		</selector>
 		<selector name="year_select" draworder="0">
 			<area>380,172,300,34</area>
 			<font>display</font>
-			<image function="on" filename="mv_leftright_on.png"></image>
-			<image function="off" filename="mv_leftright_off.png"></image>
-			<image function="pushed" filename="mv_leftright_pushed.png"></image>
+			<image function="on" filename="leftright_on.png"></image>
+			<image function="off" filename="leftright_off.png"></image>
+			<image function="pushed" filename="leftright_pushed.png"></image>
 		</selector>
 		<selector name="runtime_select" draworder="0">
 			<area>380,206,300,34</area>
 			<font>display</font>
-			<image function="on" filename="mv_leftright_on.png"></image>
-			<image function="off" filename="mv_leftright_off.png"></image>
-			<image function="pushed" filename="mv_leftright_pushed.png"></image>
+			<image function="on" filename="leftright_on.png"></image>
+			<image function="off" filename="leftright_off.png"></image>
+			<image function="pushed" filename="leftright_pushed.png"></image>
 		</selector>
 		<selector name="userrating_select" draworder="0">
 			<area>380,240,300,34</area>
 			<font>display</font>
-			<image function="on" filename="mv_leftright_on.png"></image>
-			<image function="off" filename="mv_leftright_off.png"></image>
-			<image function="pushed" filename="mv_leftright_pushed.png"></image>
+			<image function="on" filename="leftright_on.png"></image>
+			<image function="off" filename="leftright_off.png"></image>
+			<image function="pushed" filename="leftright_pushed.png"></image>
 		</selector>
 		<selector name="browse_select" draworder="0">
 			<area>380,274,300,34</area>
 			<font>display</font>
-			<image function="on" filename="mv_leftright_on.png"></image>
-			<image function="off" filename="mv_leftright_off.png"></image>
-			<image function="pushed" filename="mv_leftright_pushed.png"></image>
+			<image function="on" filename="leftright_on.png"></image>
+			<image function="off" filename="leftright_off.png"></image>
+			<image function="pushed" filename="leftright_pushed.png"></image>
         </selector>
 		<selector name="inetref_select" draworder="0">
 			<area>380,308,300,34</area>
 			<font>display</font>
-			<image function="on" filename="mv_leftright_on.png"></image>
-			<image function="off" filename="mv_leftright_off.png"></image>
-			<image function="pushed" filename="mv_leftright_pushed.png"></image>
+			<image function="on" filename="leftright_on.png"></image>
+			<image function="off" filename="leftright_off.png"></image>
+			<image function="pushed" filename="leftright_pushed.png"></image>
 		</selector>
 		<selector name="coverfile_select" draworder="0">
 			<area>380,342,300,34</area>
 			<font>display</font>
-			<image function="on" filename="mv_leftright_on.png"></image>
-			<image function="off" filename="mv_leftright_off.png"></image>
-			<image function="pushed" filename="mv_leftright_pushed.png"></image>
+			<image function="on" filename="leftright_on.png"></image>
+			<image function="off" filename="leftright_off.png"></image>
+			<image function="pushed" filename="leftright_pushed.png"></image>
 		</selector>
 		<selector name="orderby_select" draworder="0">
 			<area>380,376,300,34</area>
 			<font>display</font>
-			<image function="on" filename="mv_leftright_on.png"></image>
-			<image function="off" filename="mv_leftright_off.png"></image>
-			<image function="pushed" filename="mv_leftright_pushed.png"></image>
+			<image function="on" filename="leftright_on.png"></image>
+			<image function="off" filename="leftright_off.png"></image>
+			<image function="pushed" filename="leftright_pushed.png"></image>
 		</selector>
 
 		<textbutton name="done_button" draworder="0">

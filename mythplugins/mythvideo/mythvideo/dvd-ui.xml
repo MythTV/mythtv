@@ -139,18 +139,18 @@
             <textbutton name="ripscreen_button" draworder="1">
                 <context>3</context>
                 <position>175,410</position>
-                <image function="on" filename="md_text_button_on.png"></image>
-                <image function="off" filename="md_text_button_off.png"></image>
-                <image function="pushed" filename="md_text_button_pushed.png"></image>
+                <image function="on" filename="text_button_on.png"></image>
+                <image function="off" filename="text_button_off.png"></image>
+                <image function="pushed" filename="text_button_pushed.png"></image>
                 <font>buttons</font>
             </textbutton>
 
             <textbutton name="cancel_button" draworder="1">
                 <context>3</context>
                 <position>375,410</position>
-                <image function="on" filename="md_text_button_on.png"></image>
-                <image function="off" filename="md_text_button_off.png"></image>
-                <image function="pushed" filename="md_text_button_pushed.png"></image>
+                <image function="on" filename="text_button_on.png"></image>
+                <image function="off" filename="text_button_off.png"></image>
+                <image function="pushed" filename="text_button_pushed.png"></image>
                 <font>buttons</font>
             </textbutton>
 
@@ -283,10 +283,10 @@
 
             <checkbox name="ripcheck" draworder="0">
                 <position>310,70</position>
-                <image function="checked" filename="md_checked.png"></image>
-                <image function="unchecked" filename="md_unchecked.png"></image>
-                <image function="checked_high" filename="md_checked_high.png"></image>
-                <image function="unchecked_high" filename="md_unchecked_high.png"></image>
+                <image function="checked" filename="checked.png"></image>
+                <image function="unchecked" filename="unchecked.png"></image>
+                <image function="checked_high" filename="checked_high.png"></image>
+                <image function="unchecked_high" filename="unchecked_high.png"></image>
             </checkbox>      
             
             <blackhole name="editor_hack" draworder="0">
@@ -296,40 +296,40 @@
             <selector name="quality_select" draworder="0">
                 <area>310,140,300,40</area>
                 <font>display</font>
-                <image function="on" filename="md_leftright_on.png"></image>
-                <image function="off" filename="md_leftright_off.png"></image>
-                <image function="pushed" filename="md_leftright_pushed.png"></image>
+                <image function="on" filename="leftright_on.png"></image>
+                <image function="off" filename="leftright_off.png"></image>
+                <image function="pushed" filename="leftright_pushed.png"></image>
             </selector>      
             
             <selector name="audio_select" draworder="0">
                 <area>310,175,300,40</area>
                 <font>display</font>
-                <image function="on" filename="md_leftright_on.png"></image>
-                <image function="off" filename="md_leftright_off.png"></image>
-                <image function="pushed" filename="md_leftright_pushed.png"></image>
+                <image function="on" filename="leftright_on.png"></image>
+                <image function="off" filename="leftright_off.png"></image>
+                <image function="pushed" filename="leftright_pushed.png"></image>
             </selector>      
             
             <checkbox name="ripacthree" draworder="0">
                 <position>310,210</position>
-                <image function="checked" filename="md_checked.png"></image>
-                <image function="unchecked" filename="md_unchecked.png"></image>
-                <image function="checked_high" filename="md_checked_high.png"></image>
-                <image function="unchecked_high" filename="md_unchecked_high.png"></image>
+                <image function="checked" filename="checked.png"></image>
+                <image function="unchecked" filename="unchecked.png"></image>
+                <image function="checked_high" filename="checked_high.png"></image>
+                <image function="unchecked_high" filename="unchecked_high.png"></image>
             </checkbox>      
             
             <selector name="subtitle_select" draworder="0">
                 <area>310,245,300,40</area>
                 <font>display</font>
-                <image function="on" filename="md_leftright_on.png"></image>
-                <image function="off" filename="md_leftright_off.png"></image>
-                <image function="pushed" filename="md_leftright_pushed.png"></image>
+                <image function="on" filename="leftright_on.png"></image>
+                <image function="off" filename="leftright_off.png"></image>
+                <image function="pushed" filename="leftright_pushed.png"></image>
             </selector>      
             
             <pushbutton name="view_button" draworder="0">
                 <position>310,280</position>
-                <image function="on" filename="md_blankbutton_on.png"></image>
-                <image function="off" filename="md_blankbutton_off.png"></image>
-                <image function="pushed" filename="md_blankbutton_pushed.png"></image>
+                <image function="on" filename="blankbutton_on.png"></image>
+                <image function="off" filename="blankbutton_off.png"></image>
+                <image function="pushed" filename="blankbutton_pushed.png"></image>
             </pushbutton>
 
 
