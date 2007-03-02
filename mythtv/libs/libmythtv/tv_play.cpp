@@ -2835,6 +2835,8 @@ void TV::ProcessKeypress(QKeyEvent *e)
 
             PreviewGenerator::SaveScreenshot(playbackinfo, outFile, frameNumber,
                                              frameWidth, frameHeight);
+            if (activenvp == nvp && GetOSD())
+                GetOSD()->SetSettingsText(tr("Screen Shot"), 3);
         }
         else if (action == "EXITSHOWNOPROMPTS")
         {
