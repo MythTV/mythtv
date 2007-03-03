@@ -1103,7 +1103,9 @@ void MpegRecorder::SavePositionMap(bool force)
     {
         curRecording->SetPositionMapDelta(positionMapDelta,
                                           MARK_GOP_START);
-        curRecording->SetFilesize(lastpackheaderpos);
+        // Stop setting the filesize here until we get the contention issue
+        // between with this thread and the scheduler worked out.
+        //curRecording->SetFilesize(lastpackheaderpos);
         positionMapDelta.clear();
     }
 }

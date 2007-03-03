@@ -2084,7 +2084,9 @@ void NuppelVideoRecorder::SavePositionMap(bool force)
     if (curRecording && force)
     {
         curRecording->SetPositionMapDelta(positionMapDelta, MARK_KEYFRAME);
-        curRecording->SetFilesize(lastPositionMapPos);
+        // Stop setting the filesize here until we get the contention issue
+        // between with this thread and the scheduler worked out.
+        //curRecording->SetFilesize(lastPositionMapPos);
         positionMapDelta.clear();
     }
 }

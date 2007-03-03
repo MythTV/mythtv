@@ -368,8 +368,10 @@ void DTVRecorder::SavePositionMap(bool force)
                                           MARK_GOP_BYFRAME);
         _position_map_delta.clear();
 
-        if (ringBuffer)
-            curRecording->SetFilesize(ringBuffer->GetWritePosition());
+        // Stop setting the filesize here until we get the contention issue
+        // between with this thread and the scheduler worked out.
+        //if (ringBuffer)
+        //    curRecording->SetFilesize(ringBuffer->GetWritePosition());
     }
 }
 

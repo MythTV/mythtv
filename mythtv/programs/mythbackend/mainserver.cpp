@@ -1271,7 +1271,9 @@ void MainServer::HandleQueryRecordings(QString type, PlaybackSock *pbs)
                         if (stat(tmpURL.ascii(), &st) == 0)
                         {
                             proginfo->filesize = st.st_size;
-                            proginfo->SetFilesize(proginfo->filesize);
+
+                            if (proginfo->recendts < QDateTime::currentDateTime())
+                                proginfo->SetFilesize(proginfo->filesize);
                         }
                     }
                 }
@@ -1297,7 +1299,8 @@ void MainServer::HandleQueryRecordings(QString type, PlaybackSock *pbs)
                 {
                     slave->FillProgramInfo(proginfo, playbackhost);
 
-                    proginfo->SetFilesize(proginfo->filesize);
+                    if (proginfo->recendts < QDateTime::currentDateTime())
+                        proginfo->SetFilesize(proginfo->filesize);
                 }
                 else
                 {
