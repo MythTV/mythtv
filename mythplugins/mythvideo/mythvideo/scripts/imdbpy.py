@@ -8,17 +8,7 @@ The script is hosted at http://imdbpy.sourceforge.net/, you need to install
 it to make this script work.
 
 This wrapper script is written by
-Pekka Jääskeläinen (pekka jaaskelainen gmail).
-
-Changes:
-2007-02-21:[AW] Inserted plot outline as potential plot pick, now prints
-                genre and country.
-2006-11-26:[PJ] Modified some of the functions to be suitable for using as a
-                Python API (from find_meta.py).
-2006-10-05:[PJ] Improved poster searching and Runtime metadata finding for
-                TV-series episodes.
-                Better detection for a episode search.
-2006-10-04:[PJ] The first version.
+Pekka Jääskeläinen (gmail: pekka.jaaskelainen).
 """  
 
 import sys
@@ -28,8 +18,8 @@ import re
 try:
 	import imdb
 except ImportError:
-	print "You need to install the IMDbPy library from "\
-			"http://imdbpy.sourceforge.net/"
+	print "You need to install the IMDbPy library "\
+		"from (http://imdbpy.sourceforge.net/?page=download)"
 	sys.exit(1)
 	
 def detect_series_query(search_string):
@@ -66,9 +56,12 @@ def episode_search(title, season, episode):
 					# Probably indexing exception in case the episode/season
 					# is not found.
 					continue
+				# Found an exact episode match, return that match only.
+				matches = []
 				matches.append([imdb_access.get_imdbID(ep), 
 						title.title().strip() + ", S" + season + " E" +
 						episode, int(serie['year'])])
+				return matches
 			else:
 				matches.append([imdb_access.get_imdbID(serie), 
 					serie['title'], int(serie['year'])])
@@ -89,7 +82,7 @@ def title_search(search_string):
 
 	imdb_access = imdb.IMDb()
 	#print "Search:",search_string
-	movies = imdb_access.search_movie(search_string.encode("ascii", 'replace'))	
+	movies = imdb_access.search_movie(search_string.encode("ascii", 'ignore'))	
 
 	if movies is None or len(movies) == 0:
 		return None
@@ -133,22 +126,26 @@ def title_search(search_string):
 		movies.append([imdb_access.get_imdbID(m), m['title'], int(m['year'])])
 	return movies
 
-def poster_search(imdb_id):
+def find_poster_url(imdb_id):
+	
 	imdb_access = imdb.IMDb()
 	movie = imdb_access.get_movie(imdb_id)
 	imdb_access.update(movie)
 	url = None
 	if 'cover url' in movie.keys():
 		url = movie['cover url']
-	if url is not None:
-		print url
-	elif movie['kind'] == 'episode':
+	
+	if url is None and movie['kind'] == 'episode':
 		series = movie['episode of']
 		imdb_access.update(series)
 		if 'cover url' in series.keys():
 			url = series['cover url']
-		if url is not None:
-			print url
+	return url
+		
+def poster_search(imdb_id):
+	url = find_poster_url(imdb_id)
+	if url is not None:
+		print url
 
 def metadata_search(imdb_id):
 	metadata = unicode()
@@ -202,7 +199,7 @@ def metadata_search(imdb_id):
 
 	if 'plot' in movie.keys():
 		plots = movie['plot']
-		if movie['plot outline'] is not None and len(movie['plot outline']):
+		if 'plot outline' in movie and len(movie['plot outline']):
 			plots.append("Outline::" + movie['plot outline'])
 		if plots is not None:
 			# Find the shortest plot.
@@ -258,7 +255,7 @@ episodes."""
 	elif options.poster_search is not None:
 		poster_search(options.poster_search)
 	elif options.metadata_search is not None:
-		print metadata_search(options.metadata_search)
+		print metadata_search(options.metadata_search).encode("utf8")
 	else:
 		p.print_help()
 	sys.exit(0)
