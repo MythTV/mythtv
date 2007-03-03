@@ -2929,6 +2929,8 @@ thequery,
 
     if (dbver == "1181")
     {
+        VERBOSE(VB_IMPORTANT, "Upgrading to schema version 1182");
+
         MSqlQuery airdates(MSqlQuery::InitCon());
         airdates.prepare("SELECT chanid, starttime FROM recordedprogram "
                          "WHERE originalairdate = '0000-00-00';");
