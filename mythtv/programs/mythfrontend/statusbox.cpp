@@ -61,7 +61,8 @@ StatusBox::StatusBox(MythMainWindow *parent, const char *name)
     icon_list->SetItemText(item_count++, QObject::tr("Job Queue"));
     icon_list->SetItemText(item_count++, QObject::tr("Machine Status"));
     icon_list->SetItemText(item_count++, QObject::tr("AutoExpire List"));
-    icon_list->SetItemCurrent(0);
+    itemCurrent = gContext->GetNumSetting("StatusBoxItemCurrent", 0);
+    icon_list->SetItemCurrent(itemCurrent);
     icon_list->SetActive(true);
 
     QStringList strlist;
@@ -95,6 +96,7 @@ StatusBox::StatusBox(MythMainWindow *parent, const char *name)
 
 StatusBox::~StatusBox(void)
 {
+    gContext->SaveSetting("StatusBoxItemCurrent", itemCurrent);
     gContext->removeCurrentLocation();
 }
 
@@ -376,7 +378,10 @@ void StatusBox::keyPressEvent(QKeyEvent *e)
             else
             {
                 if (icon_list->GetCurrentItem() > 0)
-                    icon_list->SetItemCurrent(icon_list->GetCurrentItem()-1);
+                    itemCurrent = icon_list->GetCurrentItem()-1;
+                else
+                    itemCurrent = max_icons - 1;
+                icon_list->SetItemCurrent(itemCurrent);
                 clicked();
                 setHelpText();
                 update(SelectRect);
@@ -394,7 +399,10 @@ void StatusBox::keyPressEvent(QKeyEvent *e)
             else
             {
                 if (icon_list->GetCurrentItem() < (max_icons - 1))
-                    icon_list->SetItemCurrent(icon_list->GetCurrentItem()+1);
+                    itemCurrent = icon_list->GetCurrentItem()+1;
+                else
+                    itemCurrent = 0;
+                icon_list->SetItemCurrent(itemCurrent);
                 clicked();
                 setHelpText();
                 update(SelectRect);
