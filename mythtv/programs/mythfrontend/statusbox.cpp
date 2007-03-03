@@ -1057,7 +1057,11 @@ void StatusBox::doJobQueueStatus()
             if (it.data().status != JOB_QUEUED)
                 detail += " (" + it.data().hostname + ")";
 
-            detail += "\n" + it.data().comment;
+            if (it.data().schedruntime > QDateTime::currentDateTime())
+                detail += "\n" + tr("Scheduled Run Time:") + " " +
+                    it.data().schedruntime.toString(timeDateFormat);
+            else
+                detail += "\n" + it.data().comment;
 
             contentLines[count] = pginfo->title + " @ " +
                                   starttime.toString(timeDateFormat);

@@ -81,6 +81,7 @@ typedef struct jobqueueentry {
     int id;
     QString chanid;
     QDateTime starttime;
+    QDateTime schedruntime;
     QString startts;
     QDateTime inserttime;
     int type;

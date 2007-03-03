@@ -1414,6 +1414,7 @@ void HttpStatus::FillStatusXML( QDomDocument *pDoc )
             job.setAttribute("flags"     , it.data().flags      );
             job.setAttribute("status"    , it.data().status     );
             job.setAttribute("statusTime", it.data().statustime.toString(Qt::ISODate));
+            job.setAttribute("schedTime" , it.data().schedruntime.toString(Qt::ISODate));
             job.setAttribute("args"      , it.data().args       );
 
             if (it.data().hostname == "")
@@ -2220,6 +2221,7 @@ int HttpStatus::PrintJobQueue( QTextStream &os, QDomElement jobs )
                     QDateTime endTs        = QDateTime::fromString( p.attribute( "endTime"   ,"" ), Qt::ISODate );
                     QDateTime recStartTs   = QDateTime::fromString( r.attribute( "recStartTs","" ), Qt::ISODate );
                     QDateTime statusTime   = QDateTime::fromString( e.attribute( "statusTime","" ), Qt::ISODate );
+                    QDateTime schedRunTime = QDateTime::fromString( e.attribute( "schedTime","" ), Qt::ISODate );
                     QString   sHostname    = e.attribute( "hostname", "master" );
                     QString   sComment     = "";
 
@@ -2240,8 +2242,14 @@ int HttpStatus::PrintJobQueue( QTextStream &os, QDomElement jobs )
                     if ( !sSubTitle.isNull() && !sSubTitle.isEmpty())
                         os << "<em>" << sSubTitle << "</em><br /><br />";
 
-                    os << "Job: " << JobQueue::JobText( nType ) << "<br />"
-                       << "Status: <font" << statusColor << ">"
+                    os << "Job: " << JobQueue::JobText( nType ) << "<br />";
+
+                    if (schedRunTime > QDateTime::currentDateTime())
+                        os << "Scheduled Run Time: "
+                           << schedRunTime.toString(timeDateFormat)
+                           << "<br />";
+
+                    os << "Status: <font" << statusColor << ">"
                        << JobQueue::StatusText( nStatus )
                        << "</font><br />"
                        << "Status Time: "

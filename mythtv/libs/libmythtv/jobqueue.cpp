@@ -156,6 +156,7 @@ void JobQueue::ProcessQueue(void)
 
     QString chanid;
     QDateTime starttime;
+    QDateTime schedruntime;
     QString startts;
     int type;
     int id;
@@ -268,6 +269,7 @@ void JobQueue::ProcessQueue(void)
                 chanid = jobs[x].chanid;
                 startts = jobs[x].startts;
                 starttime = jobs[x].starttime;
+                schedruntime = jobs[x].schedruntime;
                 type = jobs[x].type;
                 cmds = jobs[x].cmds;
                 flags = jobs[x].flags;
@@ -320,6 +322,19 @@ void JobQueue::ProcessQueue(void)
                                       "backend.")
                                       .arg(JobText(type))
                                       .arg(chanid).arg(startts);
+                    VERBOSE(VB_JOBQUEUE, LOC + message);
+                    continue;
+                }
+
+                // Is this job scheduled for the future
+                if (schedruntime > QDateTime::currentDateTime())
+                {
+                    message = QString("Skipping '%1' job for chanid "
+                                      "%2 @ %3, this job is not scheduled to "
+                                      "run until %4.")
+                                      .arg(JobText(type))
+                                      .arg(chanid).arg(startts)
+                                      .arg(schedruntime.toString(Qt::ISODate));
                     VERBOSE(VB_JOBQUEUE, LOC + message);
                     continue;
                 }
@@ -559,9 +574,10 @@ bool JobQueue::QueueJob(int jobType, QString chanid, QDateTime starttime,
         return false;
 
     query.prepare("INSERT INTO jobqueue (chanid, starttime, inserttime, type, "
-                  "status, statustime, hostname, args, comment, flags) "
+                  "status, statustime, schedruntime, hostname, args, comment, "
+                  "flags) "
                   "VALUES (:CHANID, :STARTTIME, now(), :JOBTYPE, :STATUS, "
-                  "now(), :HOST, :ARGS, :COMMENT, :FLAGS);");
+                  "now(), now(), :HOST, :ARGS, :COMMENT, :FLAGS);");
 
     query.bindValue(":CHANID", chanid);
     query.bindValue(":STARTTIME", starttime);
@@ -1118,7 +1134,7 @@ int JobQueue::GetJobsInQueue(QMap<int, JobQueueEntry> &jobs, int findJobs)
 
     query.prepare("SELECT j.id, j.chanid, j.starttime, j.inserttime, j.type, "
                       "j.cmds, j.flags, j.status, j.statustime, j.hostname, "
-                      "j.args, j.comment, r.endtime "
+                      "j.args, j.comment, r.endtime, j.schedruntime "
                   "FROM jobqueue j, recorded r "
                   "WHERE j.chanid = r.chanid AND j.starttime = r.starttime "
                   "ORDER BY j.inserttime, j.chanid, j.id;");
@@ -1144,6 +1160,7 @@ int JobQueue::GetJobsInQueue(QMap<int, JobQueueEntry> &jobs, int findJobs)
 
             thisJob.chanid = query.value(1).toString();
             thisJob.starttime = query.value(2).toDateTime();
+            thisJob.schedruntime = query.value(13).toDateTime();
             thisJob.type = query.value(4).toInt();
             thisJob.status = query.value(7).toInt();
             thisJob.statustime = query.value(8).toDateTime();
