@@ -362,7 +362,12 @@ void FileScanner::SearchDir(QString &directory)
             {
                 if ((iter = music_files.find(name)) != music_files.end())
                 {
-                    if (HasFileChanged(name, query.value(1).toString()))
+                    if (music_files[name] == kDatabase)
+                    {
+                        file_checking->setProgress(++counter);
+                        continue;
+                    }
+                    else if (HasFileChanged(name, query.value(1).toString()))
                         music_files[name] = kNeedUpdate;
                     else
                         music_files.remove(iter);
