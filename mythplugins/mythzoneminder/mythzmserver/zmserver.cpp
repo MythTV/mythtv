@@ -1009,6 +1009,17 @@ void ZMServer::initMonitor(MONITOR *monitor)
     {
         cout << "Failed to shmget for monitor: " << monitor->mon_id << endl;
         monitor->status = "Error";
+        switch(errno)
+        {
+            case EACCES: cout << "EACCES - no rights to access segment\n"; break;
+            case EEXIST: cout << "EEXIST - segment already exists\n"; break;
+            case EINVAL: cout << "EINVAL - size < SHMMIN or size > SHMMAX\n"; break;
+            case ENFILE: cout << "ENFILE - limit on open files has been reached\n"; break;
+            case ENOENT: cout << "ENOENT - no segment exists for the given key\n"; break;
+            case ENOMEM: cout << "ENOMEM - couldn't reserve memory for segment\n"; break;
+            case ENOSPC: cout << "ENOSPC - shmmni or shmall limit reached\n"; break;
+        }
+
         return;
     }
 
