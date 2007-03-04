@@ -186,23 +186,41 @@ EOF
                 next;
             }
         # Interactively search through the icons
-            my $icon = search_icons($channel->{'name'},
-                                    "Found unrecognized channel:  #$channel->{'channum'} / $channel->{'callsign'} / $channel->{'name'}",
-                                    $fuzzy);
-            print "\n";
-            last unless (defined $icon);
-            next unless ($icon);
+            my ($icon, $icon_csv);
+            while (1) {
+                $icon = search_icons($channel->{'name'},
+                                     "Found unrecognized channel:  #$channel->{'channum'} / $channel->{'callsign'} / $channel->{'name'}",
+                                     $fuzzy);
+                print "\n";
+                last unless (defined $icon);
+                next unless ($icon);
+            # Build a csv string for this icon
+                $icon_csv .= join(',', escape_csv($icon->{'id'}),
+                                       escape_csv($channel->{'name'}),
+                                       escape_csv($channel->{'xmltvid'}),
+                                       escape_csv($channel->{'callsign'}),
+                                       escape_csv($channel->{'dtv_transportid'}),
+                                       escape_csv($channel->{'atsc_major_chan'}),
+                                       escape_csv($channel->{'atsc_minor_chan'}),
+                                       escape_csv($channel->{'dtv_networkid'}),
+                                       escape_csv($channel->{'serviceid'})
+                                 )."\n";
+            # Make sure that the requested choice isn't currently blocked
+                my $blocks = is_blocked($icon_csv);
+                if ($blocks) {
+                    print "This combination of channel and icon has been blocked by the MythTV admins.\n",
+                          "The most common reason for this is that there is a better match available.\n\n",
+                          "Blocked:  $blocks\n\n";
+                # Accept input
+                    print 'Are you still sure that you want to use this icon?  ';
+                    my $choice = <STDIN>;
+                    print "\n";
+                    $icon = undef unless ($choice =~ /^\s*yt1/i)
+                }
+                last if ($icon);
+            }
         # Keep track of this match so we can submit it to the server later.
-            $match_csv .= join(',', escape_csv($icon->{'id'}),
-                                    escape_csv($channel->{'name'}),
-                                    escape_csv($channel->{'xmltvid'}),
-                                    escape_csv($channel->{'callsign'}),
-                                    escape_csv($channel->{'dtv_transportid'}),
-                                    escape_csv($channel->{'atsc_major_chan'}),
-                                    escape_csv($channel->{'atsc_minor_chan'}),
-                                    escape_csv($channel->{'dtv_networkid'}),
-                                    escape_csv($channel->{'serviceid'})
-                              )."\n";
+            $match_csv .= $icon_csv;
         # Download the icon
             $data = wget($icon->{'url'});
             if ($data) {
@@ -265,6 +283,17 @@ EOF
     exit;
 
 ################################################################################
+
+# Check if a particular combination of icon and channel have been blocked
+    sub is_blocked {
+        my $csv = shift;
+        $data = wget("$data_url/checkblock", '', {'csv' => $csv});
+        if ($data =~ /\w/ && $data =~ s/\s+#\s*$//s) {
+            $data =~ s/\W+/,/s;
+            return $data;
+        }
+        return '';
+    }
 
 # Search the web for a specific icon
     sub station_lookup {
