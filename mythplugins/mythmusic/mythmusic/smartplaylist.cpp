@@ -46,7 +46,7 @@ static SmartPLField SmartPLFields[] =
     { "Comp. Artist",  "music_comp_artists.artist_name", ftString,   0,    0,    0 },
     { "Last Play",     "FROM_DAYS(TO_DAYS(music_songs.lastplay))",
                                                          ftDate,     0,    0,    0 },
-    { "Date Imported", "FROM_DAYS(TO_DAYS(music_songs.date_added))",
+    { "Date Imported", "FROM_DAYS(TO_DAYS(music_songs.date_entered))",
                                                          ftDate,     0,    0,    0 },
 };
 
