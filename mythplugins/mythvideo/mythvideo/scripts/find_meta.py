@@ -47,6 +47,8 @@ import imdbpy
 import shlex
 import socket
 import urllib
+import fetch_poster
+import distutils.file_util
 
 try:
 	# If found, we can insert data directly to MythDB
@@ -59,6 +61,12 @@ except:
 from stat import *
 
 verbose=False
+
+try:
+    # For better line editing in interactive mode. Optional.
+    import readline
+except:
+    pass
 
 interactive=False
 recursive=False
@@ -201,11 +209,8 @@ def parse_meta(variable, oldvalue, emptyvalue="", meta=""):
 	global overwrite
 	if not overwrite and oldvalue is not None and oldvalue != emptyvalue:
 		return oldvalue
-	for line in meta.split("\n"):
-		beginning = variable + ":"
-		if line.startswith(beginning):
-			return line[len(beginning):].strip()
-	return None
+	
+	return imdbpy.parse_meta(meta, variable)
 
 def detect_disc_number(allfiles, file):
 	"""
@@ -396,8 +401,15 @@ def save_video_metadata_to_mythdb(videopath, metadata, child=-1, disc=None):
 			
 	def parse_metadata(variable, oldvalue, emptyvalue="", meta=metadata):
 		return parse_meta(variable, oldvalue, emptyvalue, meta)
-			
+						
+	
 	title = parse_metadata('Title', title)
+	inetref = parse_metadata('IMDb', inetref, '00000000')
+	
+	if inetref == None:
+		inetref = '00000000'
+	
+	coverfile = find_poster_image(title, inetref)	
 	
 	if disc is not None:
 		title += " (disc " + str(disc) + ")"
@@ -432,12 +444,7 @@ def save_video_metadata_to_mythdb(videopath, metadata, child=-1, disc=None):
 		length = int(length) 
 	except:
 		length = 0
-		
-	inetref = parse_metadata('IMDb', inetref, '00000000')
-	
-	if inetref == None:
-		inetref = '00000000'
-		
+				
 	filename = videopath
 				
 	genrestring = parse_metadata('Genres', "", "")
@@ -450,18 +457,10 @@ def save_video_metadata_to_mythdb(videopath, metadata, child=-1, disc=None):
 		return
 	else:
 		# Only one genre supported?
-		category = get_genre_id(genres[0])
-		
-	coverfile = find_poster_image(inetref)
+		category = get_genre_id(genres[0])			
 	
 	if coverfile == None:
 		coverfile = "No cover"
-	else:
-		# TODO: should enter only the filename to allow reusing
-		# the same cover file from multiple hosts where the
-		# poster image directory is mounted to different directories.
-		# This needs to be fixed in MythVideo first.
-		coverfile = poster_dir + "/" + coverfile		
 		
 	c = db.cursor()
 	c.execute("""
@@ -475,43 +474,47 @@ def save_video_metadata_to_mythdb(videopath, metadata, child=-1, disc=None):
 	c.close()
 	return intid
 				
-def find_poster_image(imdb_id):
+def find_poster_image(title, imdb_id):
 	"""
 	Tries to find a poster image for the given IMDb id.
 	
 	First looks if the image already exist, if not, tries to fetch it using
-	the imdbpy.py. Returns None in case a poster image couldn't be found,
+	the fetch_poster.py. Returns None in case a poster image couldn't be found,
 	otherwise returns the base name of the poster image file.
 	"""
-	global poster_dir
+	global poster_dir,overwrite
 	image_extensions = ["png", "jpg", "bmp"]
 	
 	poster_files = []
 	for ext in image_extensions:
 		poster_files += glob.glob("%s/%s.%s" % (poster_dir, imdb_id, ext))
 	
-	if len(poster_files) == 0:
+	if len(poster_files) == 0 or overwrite:
 		# Try to fetch the poster image from the web.
-		poster_url = imdbpy.find_poster_url(imdb_id)
-		if poster_url is None:
-			return None		
-		print_verbose("Found poster at '%s', downloading it..." % poster_url)
-		filename = poster_url.split("/")[-1]
+		posters = fetch_poster.find_best_posters(\
+			title, count=1, accept_horizontal=True, imdb_id=imdb_id)
+			
+		if len(posters) == 0:
+			return None
+		
+		poster = posters[0]
+		
+		filename = os.path.basename(poster.file_name)
 		(name, extension) = os.path.splitext(filename)
 		local_filename = poster_dir + "/" + imdb_id + extension
-		urllib.urlretrieve(poster_url, local_filename)
-		poster_files.append(local_filename)
+		if os.path.exists(local_filename):
+			if overwrite:
+				os.remove(local_filename)
+			else:
+				return local_filename
+		distutils.file_util.move_file(poster.file_name, local_filename)
+		# Set enough read bits so Apache can read the cover for the MythWeb interface.
+		os.chmod(local_filename, S_IREAD | S_IRUSR | S_IRGRP | S_IROTH)
+		return local_filename
 	else:
 		print_verbose("Found existing cover image.")
-	
-	coverfile = None
-	if len(poster_files) > 0:
-		# TODO: if multiple poster images available, pick the one with largest
-		# dimensions.
-		# Now just pick the first found.		
-		coverfile = os.path.basename(poster_files[0])
-		
-	return coverfile
+		return poster_files[0]
+	return None
 		
 		
 def save_metadata_to_file(fileName, metadata):
@@ -593,7 +596,8 @@ def find_metadata_for_video_path(pathName):
 			if len(candidates) > 1:
 
 				print "Got multiple candidates for title search '%s'. " % title
-				print "Use the '-a' switch to choose the correct one."
+				if not interactive:
+					print "Use the '-a' or '-i' switch to choose the correct one."
 				for candidate in candidates:
 					print "%s) %s (%d)" % (candidate[0], candidate[1], candidate[2])
 						

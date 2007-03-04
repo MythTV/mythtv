@@ -21,7 +21,9 @@ except ImportError:
 	print "You need to install the IMDbPy library "\
 		"from (http://imdbpy.sourceforge.net/?page=download)"
 	sys.exit(1)
-	
+
+episode_title_format = '%(series_title)s S%(season)d E%(episode)d "%(episode_title)s"'
+
 def detect_series_query(search_string):
 	"""
 	Detects a series episode query.
@@ -31,19 +33,24 @@ def detect_series_query(search_string):
 	"Sopranos S1E2"
 	"Sopranos S1 E2"
 	"Sopranos 1x2"
+	"Sopranos - 1x2"
 	"""
-	m = re.match(r"(.+)\s*(s|(season)|\s)\s*(\d+)\s*(e|(episode)|x)\s*(\d+)",
-			search_string.lower())
-	if m is None or m.group(1) is None or m.group(4) is None or \
-			m.group(7) is None:
+	m = re.match(r"((?P<title>.+?)(-)?)?(\s*)"\
+		"(s|(season)|\s)\s*(?P<season>\d+)"\
+		"\s*(e|(episode)|x)\s*(?P<episode>\d+)",
+		search_string.lower())
+	if m is None or m.group('title') is None or m.group('season') is None \
+			or m.group('episode') is None:
 		return (None, None, None)
 
-	return (m.group(1), m.group(4), m.group(7))
+	return (m.group('title'), m.group('season'), m.group('episode'))
 
 def episode_search(title, season, episode):
 	matches = []
 	imdb_access = imdb.IMDb()
 	series = imdb_access.search_movie(title.encode("ascii", 'replace'))
+	season = int(season)
+	episode = int(episode)
 
 	for serie in series:
 		if serie['kind'] == 'tv series':
@@ -51,16 +58,21 @@ def episode_search(title, season, episode):
 			imdb_access.update(serie, 'episodes')
 			if serie.has_key('episodes'):
 				try:
-					ep = serie['episodes'][int(season)][int(episode)]
+					ep = serie['episodes'][season][episode]
 				except:
 					# Probably indexing exception in case the episode/season
 					# is not found.
 					continue
 				# Found an exact episode match, return that match only.
 				matches = []
-				matches.append([imdb_access.get_imdbID(ep), 
-						title.title().strip() + ", S" + season + " E" +
-						episode, int(serie['year'])])
+				episode_title = episode_title_format % \
+						{
+							'series_title': ep['series title'],
+							'season': season,
+							'episode': episode,
+							'episode_title': ep['title']
+						}
+				matches.append([imdb_access.get_imdbID(ep), episode_title ,int(ep['year'])])		
 				return matches
 			else:
 				matches.append([imdb_access.get_imdbID(serie), 
@@ -182,9 +194,13 @@ def metadata_search(imdb_id):
 
 	if movie['kind'] == 'episode':
 		# print "TV Series episode detected"
-		metadata += 'Title:%s, S%d E%d: \"%s\"' % \
-				(movie['series title'], int(movie['season']),
-		int(movie['episode']), movie['title']) + "\n"
+		metadata += 'Title:' + episode_title_format % \
+						{
+							'series_title': movie['series title'],
+							'season': int(movie['season']),
+							'episode': int(movie['episode']),
+							'episode_title': movie['title'],
+						} + '\n'
 		series = movie['episode of']
 		imdb_access.update(series)
 		metadata += createMetadataFromFirst('Runtime', 'runtimes', m=series)
@@ -199,7 +215,7 @@ def metadata_search(imdb_id):
 
 	if 'plot' in movie.keys():
 		plots = movie['plot']
-		if 'plot outline' in movie and len(movie['plot outline']):
+		if movie.has_key('plot outline') and len(movie['plot outline']):
 			plots.append("Outline::" + movie['plot outline'])
 		if plots is not None:
 			# Find the shortest plot.
@@ -218,6 +234,13 @@ def metadata_search(imdb_id):
 	metadata += createMetadataFromFirst('Countries', 'countries')
 	return metadata
 
+def parse_meta(meta, key):
+	for line in meta.split("\n"):
+		beginning = key + ":"
+		if line.startswith(beginning):
+			return line[len(beginning):].strip()
+	return None
+	
 def main():
 	p = optparse.OptionParser()
 	p.add_option('--version', '-v', action="store_true", default=False,
