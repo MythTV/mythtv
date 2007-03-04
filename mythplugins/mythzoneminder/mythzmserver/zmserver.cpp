@@ -39,7 +39,7 @@
 #include "zmserver.h"
 
 // the version of the protocol we understand
-#define ZM_PROTOCOL_VERSION "1"
+#define ZM_PROTOCOL_VERSION "2"
 
 // the maximum image size we are ever likely to get from ZM
 #define MAX_IMAGE_SIZE  (2048*1536*3)
@@ -368,13 +368,14 @@ void ZMServer::handleGetEventList(vector<string> tokens)
 {
     string outStr("");
 
-    if (tokens.size() != 2)
+    if (tokens.size() != 3)
     {
         sendError(ERROR_TOKEN_COUNT);
         return;
     }
 
     string monitor = tokens[1];
+    bool oldestFirst = (tokens[2] == "1");
 
     if (m_debug)
         cout << "Loading events for monitor: " << monitor << endl;
@@ -389,9 +390,13 @@ void ZMServer::handleGetEventList(vector<string> tokens)
             "from Events as E inner join Monitors as M on E.MonitorId = M.Id ");
 
     if (monitor != "<ANY>")
-        sql += "WHERE M.Name = '" + monitor + "'";
+        sql += "WHERE M.Name = '" + monitor + "' ";
 
-    sql += "ORDER BY E.StartTime";
+    if (oldestFirst)
+        sql += "ORDER BY E.StartTime ASC";
+    else
+        sql += "ORDER BY E.StartTime DESC";
+
     if (mysql_query(&g_dbConn, sql.c_str()))
     {
         fprintf(stderr, "%s\n", mysql_error(&g_dbConn));

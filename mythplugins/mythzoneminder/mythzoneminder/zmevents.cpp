@@ -41,11 +41,9 @@ ZMEvents::ZMEvents(MythMainWindow *parent,
     m_currentEvent = 0;
     m_eventList = new vector<Event*>;
 
-    wireUpTheme();
-//    getEventList();
-//    getCameraList();
+    m_oldestFirst = (gContext->GetNumSetting("ZoneMinderOldestFirst", 1) == 1);
 
-//    updateUIList();
+    wireUpTheme();
 
     m_updateTimer = new QTimer(this);
 
@@ -64,6 +62,9 @@ ZMEvents::~ZMEvents()
 
     if (!m_eventList)
         delete m_eventList;
+
+    // remember how the user want to display the event list
+    gContext->SetSetting("ZoneMinderOldestFirst", (m_oldestFirst ? "1" : "0"));
 }
 
 UITextType* ZMEvents::getTextType(QString name)
@@ -158,6 +159,11 @@ void ZMEvents::keyPressEvent(QKeyEvent *e)
             if (m_deleteButton)
                 m_deleteButton->push();
         }
+        else if (action == "INFO")
+        {
+            m_oldestFirst = !m_oldestFirst;
+            updateTimeout();
+        }
         else
             handled = false;
     }
@@ -217,8 +223,7 @@ void ZMEvents::getEventList(void)
         {
             monitorName = m_cameraSelector->getCurrentString();
         }
-
-        zm->getEventList(monitorName, m_eventList);
+        zm->getEventList(monitorName, m_oldestFirst, m_eventList);
     }
 }
 

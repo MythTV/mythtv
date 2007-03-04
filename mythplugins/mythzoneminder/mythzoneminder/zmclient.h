@@ -21,7 +21,7 @@ using namespace std;
 // zm
 #include "zmdefines.h"
 
-class MPUBLIC ZMClient : public QObject //, public MythSocketCBs
+class MPUBLIC ZMClient : public QObject
 {
     Q_OBJECT
 
@@ -48,7 +48,7 @@ class MPUBLIC ZMClient : public QObject //, public MythSocketCBs
 
     void getServerStatus(QString &status, QString &cpuStat, QString &diskStat);
     void getMonitorStatus(vector<Monitor*> *monitorList);
-    void getEventList(const QString &eventName, vector<Event*> *eventList);
+    void getEventList(const QString &eventName, bool oldestFirst, vector<Event*> *eventList);
     void getEventFrame(int monitorID, int eventID, int frameNo, QImage &image);
     int  getLiveFrame(int monitorID, QString &status, unsigned char* buffer, int bufferSize);
     void getFrameList(int eventID, vector<Frame*> *frameList);

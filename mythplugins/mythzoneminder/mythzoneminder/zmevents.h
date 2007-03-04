@@ -51,6 +51,7 @@ public:
     void eventListUp(bool page);
     void getCameraList(void);
 
+    bool                 m_oldestFirst;
     int                  m_currentEvent;
     int                  m_eventListSize;
     vector<Event *>     *m_eventList;
