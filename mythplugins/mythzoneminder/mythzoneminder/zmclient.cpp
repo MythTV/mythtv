@@ -534,5 +534,7 @@ void ZMClient::getMonitorList(vector<Monitor*> *monitorList)
         item->events = 0;
         item->status = "";
         monitorList->push_back(item);
+        VERBOSE(VB_IMPORTANT, QString("Monitor: %1 (%2) is using palette: %3")
+                .arg(item->name).arg(item->id).arg(item->palette));
     }
 }
