@@ -970,7 +970,7 @@ WARNING: Do not press button if you are using an Air2PC HD-5000 or Avermedia A18
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Locates the satelite you wish to point to with the longitude along the Clarke Belt ofthe satellite [-180..180] and its hemisphere.</source>
+        <source>Locates the satellite you wish to point to with the longitude along the Clarke Belt of the satellite [-180..180] and its hemisphere.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -6129,7 +6129,7 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
         <translation>Aspekt når der vises en video.</translation>
     </message>
     <message>
-        <source>Aspect ration when watching a video at a specific resolution.</source>
+        <source>Aspect Ratio when watching a video at a specific resolution.</source>
         <translation>Aspekt når der vises en video i en bestem opløsning.</translation>
     </message>
     <message>
@@ -6837,7 +6837,7 @@ Myth will now exit.</source>
         <translation>Tillader at du ændrer direkte i transporterne</translation>
     </message>
     <message>
-        <source>This is rarely required unless you are using a satelite dish and must enter an initial frequency to for the channel scanner to try.</source>
+        <source>This is rarely required unless you are using a satellite dish and must enter an initial frequency to for the channel scanner to try.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

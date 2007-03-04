@@ -269,7 +269,7 @@ ChannelEditor::ChannelEditor() : ConfigurationDialog()
     buttonTransportEditor->setHelpText(
         QObject::tr("Allows you to edit the transports directly") + " " +
         QObject::tr("This is rarely required unless you are using "
-                    "a satelite dish and must enter an initial "
+                    "a satellite dish and must enter an initial "
                     "frequency to for the channel scanner to try."));
 
     HorizontalConfigurationGroup *h = 

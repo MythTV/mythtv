@@ -1003,7 +1003,7 @@ WARNING: Do not press button if you are using an Air2PC HD-5000 or Avermedia A18
         <translation>Juhul kui paraboolantenni ees on veel teinegi peegel peegeldub signaal kaks korda ning ringpolarisatsiooni kasutamise korral muutub polarisatsiooni suund.</translation>
     </message>
     <message>
-        <source>Locates the satelite you wish to point to with the longitude along the Clarke Belt ofthe satellite [-180..180] and its hemisphere.</source>
+        <source>Locates the satellite you wish to point to with the longitude along the Clarke Belt of the satellite [-180..180] and its hemisphere.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -5001,7 +5001,7 @@ Sinu tõmbaja ei sisalda kanalite numbreid, pead need käsitsi panema.</translat
         <translation>Kuvasuhe video vaatamisel.</translation>
     </message>
     <message>
-        <source>Aspect ration when watching a video at a specific resolution.</source>
+        <source>Aspect Ratio when watching a video at a specific resolution.</source>
         <translation>Kuvasuhe erilise kuvatihedusega video vaatamisel.</translation>
     </message>
     <message>
@@ -6253,7 +6253,7 @@ Sinu tõmbaja ei sisalda kanalite numbreid, pead need käsitsi panema.</translat
         <translation>Võimaldab transporti otse muuta</translation>
     </message>
     <message>
-        <source>This is rarely required unless you are using a satelite dish and must enter an initial frequency to for the channel scanner to try.</source>
+        <source>This is rarely required unless you are using a satellite dish and must enter an initial frequency to for the channel scanner to try.</source>
         <translation>Seda on harva vaja kui ei kasutata just sat-vastuvõitjat ning pole vaja sisestada algsagedust kanali skaneerimise alustamiseks.</translation>
     </message>
     <message>

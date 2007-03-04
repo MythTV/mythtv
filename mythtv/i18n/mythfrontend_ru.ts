@@ -809,7 +809,7 @@ WARNING: Do not press button if you are using an Air2PC HD-5000 or Avermedia A18
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Locates the satelite you wish to point to with the longitude along the Clarke Belt ofthe satellite [-180..180] and its hemisphere.</source>
+        <source>Locates the satellite you wish to point to with the longitude along the Clarke Belt of the satellite [-180..180] and its hemisphere.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -2165,7 +2165,7 @@ Returning to the previous menu.</translation>
         <translation>Разрешить редактировать транспорты непосредственно</translation>
     </message>
     <message>
-        <source>This is rarely required unless you are using a satelite dish and must enter an initial frequency to for the channel scanner to try.</source>
+        <source>This is rarely required unless you are using a satellite dish and must enter an initial frequency to for the channel scanner to try.</source>
         <translation>Это очень редко используется, за исключением случаев, когда Вы используете спутниковую параболическую антенну и должны задавать начальную частоту для сканнера.</translation>
     </message>
     <message>
@@ -5409,7 +5409,7 @@ Your grabber does not provide channel numbers, so you have to set them manually.
         <translation>Соотношение сторон при просмотре видео</translation>
     </message>
     <message>
-        <source>Aspect ration when watching a video at a specific resolution.</source>
+        <source>Aspect Ratio when watching a video at a specific resolution.</source>
         <translation>Соотношение сторон при просмотре видео указанного разрешения.</translation>
     </message>
     <message>

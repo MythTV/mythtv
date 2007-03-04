@@ -1703,7 +1703,7 @@ static HostRefreshRateComboBox *TVVidModeRefreshRate(int idx=-1)
 static HostComboBox *TVVidModeForceAspect(int idx=-1)
 {
     QString dhelp = QObject::tr("Aspect ratio when watching a video.");
-    QString ohelp = QObject::tr("Aspect ration when watching a "
+    QString ohelp = QObject::tr("Aspect ratio when watching a "
                     "video at a specific resolution.");
 
     QString qstr = (idx<0) ? "TVVidModeForceAspect" :
