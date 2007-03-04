@@ -77,7 +77,7 @@ package MythTV::Program;
         $self->{'programid'}       = $_[34]; # 34 programid
         $self->{'lastmodified'}    = $_[35]; # 35 lastmodified
         $self->{'stars'}           = $_[36]; # 36 stars
-        $self->{'airdate'}         = $_[37]; # 37 originalAirDate (unix timestamp)
+        $self->{'airdate'}         = $_[37]; # 37 originalAirDate (ISO 8601 format)
         $self->{'hasairdate'}      = $_[38]; # 38 hasAirDate
         $self->{'playgroup'}       = $_[39]; # 39 playgroup
         $self->{'recpriority2'}    = $_[40]; # 40 recpriority2
@@ -248,11 +248,7 @@ package MythTV::Program;
         $ehour   = "0$ehour"   if ($ehour < 10);
         $eminute = "0$eminute" if ($eminute < 10);
     # Original airdate
-        my ($oday, $omonth, $oyear) = (localtime($self->{'airdate'}))[3,4,5];
-        $oyear += 1900;
-        $omonth++;
-        $omonth = "0$omonth" if ($omonth < 10);
-        $oday   = "0$oday"   if ($oday   < 10);
+        my ($oyear, $omonth, $oday) = split('-', $self->{'airdate'}, 3);
     # Build a list of name format options
         my %fields;
         ($fields{'T'} = ($self->{'title'}       or '')) =~ s/%/%%/g;
