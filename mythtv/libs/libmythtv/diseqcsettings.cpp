@@ -1190,8 +1190,8 @@ class USALSRotorSetting : public HorizontalConfigurationGroup
     {
         QString help =
             DeviceTree::tr(
-                "Locates the satelite you wish to point to "
-                "with the longitude along the Clarke Belt of"
+                "Locates the satellite you wish to point to "
+                "with the longitude along the Clarke Belt of "
                 "the satellite [-180..180] and its hemisphere.");
 
         numeric->setLabel(DeviceTree::tr("Longitude (degrees)"));
