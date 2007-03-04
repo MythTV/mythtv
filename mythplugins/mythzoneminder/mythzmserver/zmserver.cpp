@@ -50,7 +50,7 @@
 #define ERROR_TOKEN_COUNT      "Invalid token count"
 #define ERROR_MYSQL_QUERY      "Mysql Query Error"
 #define ERROR_MYSQL_ROW        "Mysql Get Row Error"
-#define ERROR_FILE_OPEN        "File Open Error"
+#define ERROR_FILE_OPEN        "Cannot open event file"
 #define ERROR_INVALID_MONITOR  "Invalid Monitor"
 #define ERROR_INVALID_POINTERS "Cannot get shared memory pointers"
 
@@ -617,7 +617,7 @@ void ZMServer::handleGetEventFrame(vector<string> tokens)
     else
     {
         cout << "Can't open " << filepath << ": " << strerror(errno) << endl;
-        sendError(ERROR_FILE_OPEN);
+        sendError(ERROR_FILE_OPEN + string(" - ") + filepath + " : " + strerror(errno));
         return;
     }
 

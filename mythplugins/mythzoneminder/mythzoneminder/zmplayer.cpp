@@ -381,7 +381,7 @@ void ZMPlayer::updateFrame(void)
     if (m_curFrame > m_lastFrame)
     {
         m_paused = true;
-        m_curFrame = 1;
+        m_curFrame = 0;
         if (m_playButton)
             m_playButton->setText(tr("Play"));
         return;
