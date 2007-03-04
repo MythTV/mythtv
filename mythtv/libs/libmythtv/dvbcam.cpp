@@ -111,7 +111,7 @@ bool DVBCam::Start()
 
     ciThreadRunning = true;
 
-    VERBOSE(VB_CHANNEL, LOC + "CI handler successfully initialized!");
+    VERBOSE(VB_DVBCAM, LOC + "CI handler successfully initialized!");
 
     return true;
 }
@@ -145,7 +145,7 @@ void DVBCam::HandleUserIO(void)
     if (enq != NULL)
     {
         if (enq->Text() != NULL)
-            VERBOSE(VB_CHANNEL, LOC + "CAM: Received message: " +
+            VERBOSE(VB_DVBCAM, LOC + "CAM: Received message: " +
                     enq->Text());
         delete enq;
     }
@@ -154,18 +154,18 @@ void DVBCam::HandleUserIO(void)
     if (menu != NULL)
     {
         if (menu->TitleText() != NULL)
-            VERBOSE(VB_CHANNEL, LOC + "CAM: Menu Title: " +
+            VERBOSE(VB_DVBCAM, LOC + "CAM: Menu Title: " +
                     menu->TitleText());
         if (menu->SubTitleText() != NULL)
-            VERBOSE(VB_CHANNEL, LOC + "CAM: Menu SubTitle: " +
+            VERBOSE(VB_DVBCAM, LOC + "CAM: Menu SubTitle: " +
                     menu->SubTitleText());
         if (menu->BottomText() != NULL)
-            VERBOSE(VB_CHANNEL, LOC + "CAM: Menu BottomText: " +
+            VERBOSE(VB_DVBCAM, LOC + "CAM: Menu BottomText: " +
                     menu->BottomText());
 
         for (int i=0; i<menu->NumEntries(); i++)
             if (menu->Entry(i) != NULL)
-                VERBOSE(VB_CHANNEL, LOC + "CAM: Menu Entry: " +
+                VERBOSE(VB_DVBCAM, LOC + "CAM: Menu Entry: " +
                         menu->Entry(i));
 
         if (menu->Selectable())
@@ -175,13 +175,13 @@ void DVBCam::HandleUserIO(void)
 
         if (menu->NumEntries() > 0)
         {
-            VERBOSE(VB_CHANNEL, LOC +
+            VERBOSE(VB_DVBCAM, LOC +
                     "CAM: Selecting first entry");
             menu->Select(0);
         }
         else
         {
-            VERBOSE(VB_CHANNEL, LOC + "CAM: Cancelling menu");
+            VERBOSE(VB_DVBCAM, LOC + "CAM: Cancelling menu");
         }
 
         delete menu;
@@ -190,7 +190,7 @@ void DVBCam::HandleUserIO(void)
 
 void DVBCam::HandlePMT(void)
 {
-    VERBOSE(VB_CHANNEL, LOC + "CiHandler needs CA_PMT");
+    VERBOSE(VB_DVBCAM, LOC + "CiHandler needs CA_PMT");
     QMutexLocker locker(&pmt_lock);
 
     if (pmt_sent && pmt_added && !pmt_updated)
@@ -239,7 +239,7 @@ void DVBCam::HandlePMT(void)
 
 void DVBCam::CiHandlerLoop()
 {
-    VERBOSE(VB_CHANNEL, LOC + "CI handler thread running");
+    VERBOSE(VB_DVBCAM, LOC + "CI handler thread running");
 
     while (!exitCiThread)
     {
@@ -258,12 +258,12 @@ void DVBCam::CiHandlerLoop()
     }
     
     ciThreadRunning = false;
-    VERBOSE(VB_CHANNEL, LOC + "CiHandler thread stopped");
+    VERBOSE(VB_DVBCAM, LOC + "CiHandler thread stopped");
 }
 
 void DVBCam::SetPMT(const ProgramMapTable *pmt)
 {
-    VERBOSE(VB_CHANNEL, LOC + "SetPMT() program num #"<<pmt->ProgramNumber());
+    VERBOSE(VB_DVBCAM, LOC + "SetPMT() program num #"<<pmt->ProgramNumber());
 
     QMutexLocker locker(&pmt_lock);
     PMTList.clear();
@@ -295,35 +295,40 @@ cCiCaPmt CreateCAPMT(const ProgramMapTable&, const unsigned short*, uint);
  */
 void DVBCam::SendPMT(const ProgramMapTable &pmt, uint cplm)
 {
+    bool success = false;
+
     for (uint s = 0; s < (uint)ciHandler->NumSlots(); s++)
     {
         const unsigned short *casids = ciHandler->GetCaSystemIds(s);
 
         if (!casids)
         {
-            VERBOSE(VB_IMPORTANT, LOC_ERR + "GetCaSystemIds returned NULL! " +
+            VERBOSE(success ? VB_DVBCAM : VB_IMPORTANT, LOC_ERR +
+                    "GetCaSystemIds returned NULL! " +
                     QString("(Slot #%1)").arg(s));
             continue;
         }
 
         if (!casids[0])
         {
-            VERBOSE(VB_IMPORTANT, LOC_ERR + "CAM supports no CA systems! " +
+            VERBOSE(success ? VB_DVBCAM : VB_IMPORTANT, LOC_ERR + "CAM supports no CA systems! " +
                     QString("(Slot #%1)").arg(s));
             continue;
         }
 
-        VERBOSE(VB_CHANNEL, LOC + "Creating CA_PMT, ServiceID = "
+        VERBOSE(VB_DVBCAM, LOC + "Creating CA_PMT, ServiceID = "
                 << pmt.ProgramNumber());
 
         cCiCaPmt capmt = CreateCAPMT(pmt, casids, cplm);
 
-        VERBOSE(VB_CHANNEL, LOC +
+        VERBOSE(VB_DVBCAM, LOC +
                 QString("Sending CA_PMT with %1 to CI slot #%2")
                 .arg(cplm_info[cplm]).arg(s));
 
         if (!ciHandler->SetCaPmt(capmt, s))
-            VERBOSE(VB_CHANNEL, LOC + "CA_PMT send failed!");
+            VERBOSE(success ? VB_DVBCAM : VB_IMPORTANT, LOC + "CA_PMT send failed!");
+        else
+            success = true;
     }
 }
 
@@ -340,7 +345,7 @@ void process_desc(cCiCaPmt &capmt,
             if (cad.SystemID() != casids[q])
                 continue;
 
-            VERBOSE(VB_CHANNEL,
+            VERBOSE(VB_DVBCAM,
                     QString("Adding CA descriptor: "
                             "CASID(0x%2), ECM PID(0x%3)")
                     .arg(cad.SystemID(),0,16).arg(cad.PID(),0,16));
@@ -368,7 +373,7 @@ cCiCaPmt CreateCAPMT(const ProgramMapTable &pmt,
     // Add elementary streams + CA descriptors
     for (uint i = 0; i < pmt.StreamCount(); i++)
     {
-        VERBOSE(VB_CHANNEL,
+        VERBOSE(VB_DVBCAM,
                 QString("Adding elementary stream: %1, pid(0x%2)")
                 .arg(pmt.StreamDescription(i, "dvb"))
                 .arg(pmt.StreamPID(i),0,16));

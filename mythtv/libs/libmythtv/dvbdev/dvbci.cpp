@@ -38,20 +38,20 @@
 #include <unistd.h>
 #include <fcntl.h>
 
+#include <qstring.h>
+
+#include "mythcontext.h"
+
 #ifndef MALLOC
 #define MALLOC(type, size)  (type *)malloc(sizeof(type) * (size))
 #endif
 
-#ifndef esyslog
-static int SysLogLevel = 3;
-#define esyslog(a...) void( (SysLogLevel > 0) ? void(fprintf(stderr, a)), void(fprintf(stderr, "\n")) : void() )
-#define isyslog(a...) void( (SysLogLevel > 1) ? void(fprintf(stderr, a)), void(fprintf(stderr, "\n")) : void() )
-#define dsyslog(a...) void( (SysLogLevel > 2) ? void(fprintf(stderr, a)), void(fprintf(stderr, "\n")) : void() )
+#define esyslog(a...) VERBOSE(VB_IMPORTANT, QString().sprintf(a))
+#define isyslog(a...) VERBOSE(VB_DVBCAM, QString().sprintf(a))
+#define dsyslog(a...) VERBOSE(VB_DVBCAM, QString().sprintf(a))
 
 #define LOG_ERROR         esyslog("ERROR (%s,%d): %m", __FILE__, __LINE__)
 #define LOG_ERROR_STR(s)  esyslog("ERROR: %s: %m", s)
-
-#endif
 
 
 // Set these to 'true' for debug output:
