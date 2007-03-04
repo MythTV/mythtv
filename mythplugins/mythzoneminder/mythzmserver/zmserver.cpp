@@ -167,6 +167,28 @@ ZMServer::ZMServer(int sock, bool debug)
 
     m_sock = sock;
     m_debug = debug;
+
+    // get the shared memory key
+    char buf[100];
+    m_shmKey = 0x7a6d2000;
+    string setting = getZMSetting("ZM_SHM_KEY");
+
+    if (setting != "")
+        sscanf(setting.c_str(), "%x", &m_shmKey);
+    if (m_debug)
+    {
+        snprintf(buf, sizeof(buf), "0x%x", m_shmKey);
+        cout << "Shared memory key is: " << buf << endl;
+    }
+
+    // get the event filename format
+    setting = getZMSetting("ZM_EVENT_IMAGE_DIGITS");
+    int eventDigits = atoi(setting.c_str());
+    snprintf(buf, sizeof(buf), "%%0%dd-capture.jpg", eventDigits);
+    m_eventFileFormat = buf;
+    if (m_debug)
+        cout << "Event file format is: " << m_eventFileFormat << endl;
+
     getMonitorList();
 }
 
@@ -405,16 +427,16 @@ void ZMServer::handleGetEventList(vector<string> tokens)
     }
 
     res = mysql_store_result(&g_dbConn);
-    int monitorCount = mysql_num_rows(res);
+    int eventCount = mysql_num_rows(res);
 
     if (m_debug)
-        cout << "Got " << monitorCount << " monitors" << endl;
+        cout << "Got " << eventCount << " events" << endl;
 
     char str[10];
-    sprintf(str, "%d", monitorCount);
+    sprintf(str, "%d", eventCount);
     ADD_STR(outStr, str)
 
-    for (int x = 0; x < monitorCount; x++)
+    for (int x = 0; x < eventCount; x++)
     {
         row = mysql_fetch_row(res);
         if (row)
@@ -604,7 +626,7 @@ void ZMServer::handleGetEventFrame(vector<string> tokens)
     // try to find the frame file
     string filepath("");
     filepath = g_webPath + "/events/" + monitorID + "/" + eventID + "/";
-    sprintf(str, "%03d-capture.jpg", frameNo); // FIXME: use configured capture filename format 
+    sprintf(str, m_eventFileFormat.c_str(), frameNo); 
     filepath += str;
 
     FILE *fd;
@@ -956,7 +978,6 @@ void ZMServer::getMonitorList(void)
 
 void ZMServer::initMonitor(MONITOR *monitor)
 {
-    long long shm_key = 0x7a6d2000; // FIXME hard coded shm_key
     void *shm_ptr;
 
     monitor->shared_data = NULL;
@@ -983,7 +1004,7 @@ void ZMServer::initMonitor(MONITOR *monitor)
             ((monitor->image_buffer_count) * monitor->frame_size);
     int shmid;
 
-    if ((shmid = shmget((shm_key & 0xffffff00) | monitor->mon_id,
+    if ((shmid = shmget((m_shmKey & 0xffffff00) | monitor->mon_id,
          shared_data_size, SHM_R)) == -1)
     {
         cout << "Failed to shmget for monitor: " << monitor->mon_id << endl;
@@ -1052,3 +1073,37 @@ int ZMServer::getFrame(unsigned char *buffer, int bufferSize, MONITOR *monitor)
     return monitor->frame_size;
 }
 
+string ZMServer::getZMSetting(const string &setting)
+{
+    string result;
+    string sql("SELECT Name, Value FROM Config ");
+    sql += "WHERE Name = '" + setting + "'";
+
+    MYSQL_RES *res;
+    MYSQL_ROW row;
+
+    if (mysql_query(&g_dbConn, sql.c_str()))
+    {
+        fprintf(stderr, "%s\n", mysql_error(&g_dbConn));
+        return "";
+    }
+
+    res = mysql_store_result(&g_dbConn);
+    row = mysql_fetch_row(res);
+    if (row)
+    {
+        result = row[1];
+    }
+    else
+    {
+        cout << "Failed to get mysql row" << endl;
+        result = "";
+    }
+
+    if (m_debug)
+        cout << "getZMSetting: " << setting << " Result: " << result << endl;
+
+    mysql_free_result(res);
+
+    return result;
+}

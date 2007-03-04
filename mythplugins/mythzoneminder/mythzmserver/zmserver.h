@@ -112,6 +112,7 @@ class ZMServer
     void processRequest(char* buf, int nbytes);
 
   private:
+    string getZMSetting(const string &setting);
     bool send(const string s) const;
     bool send(const string s, const unsigned char *buffer, int dataLen) const;
     void sendError(string error);
@@ -137,6 +138,8 @@ class ZMServer
     bool                 m_debug;
     int                  m_sock;
     map<int, MONITOR *>  m_monitors;
+    string               m_eventFileFormat;
+    key_t                m_shmKey;
 };
 
 
