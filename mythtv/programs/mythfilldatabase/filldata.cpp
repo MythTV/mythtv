@@ -301,6 +301,8 @@ bool FillData::grabData(Source source, int offset, QDate *qCurrentDate)
                        "WHERE value='mythfilldatabaseLastRunStatus'")
                        .arg(status));
 
+    VERBOSE(VB_XMLTV, QString("Grabber Command: %1").arg(command));
+
     VERBOSE(VB_GENERAL,
             "----------------- Start of XMLTV output -----------------");
 
@@ -332,8 +334,6 @@ bool FillData::grabData(Source source, int offset, QDate *qCurrentDate)
             (WTERMSIG(systemcall_status) == SIGINT || WTERMSIG(systemcall_status) == SIGQUIT))
             interrupted = true;
     }
-
-    
 
     grabDataFromFile(source.id, filename);
 
