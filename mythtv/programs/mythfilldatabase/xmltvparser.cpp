@@ -345,7 +345,7 @@ ProgInfo *XMLTVParser::parseProgram(
                     pginfo->category = cat;
                 }
 
-                if ((cat == "Film" || cat == "film") && !isNorthAmerica)
+                if (cat == "Film" || cat == "film")
                 {
                     // Hack for tv_grab_uk_rt
                     pginfo->catType = "movie";
