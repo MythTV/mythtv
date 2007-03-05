@@ -1503,16 +1503,14 @@ bool TVRec::GetDevices(int cardid,
 
 QString TVRec::GetStartChannel(int cardid, const QString &defaultinput)
 {
-    QString msg("");
     QString startchan = QString::null;
 
     // Get last tuned channel from database, to use as starting channel
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare(
         "SELECT startchan "
-        "FROM capturecard, cardinput "
-        "WHERE capturecard.cardid = cardinput.cardid AND "
-        "      capturecard.cardid = :CARDID          AND "
+        "FROM cardinput "
+        "WHERE cardinput.cardid   = :CARDID    AND "
         "      inputname          = :INPUTNAME");
     query.bindValue(":CARDID",    cardid);
     query.bindValue(":INPUTNAME", defaultinput);
@@ -1523,12 +1521,14 @@ QString TVRec::GetStartChannel(int cardid, const QString &defaultinput)
     }
     else if (query.next())
     {
-        QString test = query.value(0).toString();
-        if (test != QString::null)
-            startchan = QString::fromUtf8(test);
+        startchan = QString::fromUtf8(query.value(0).toString());
+        if (!startchan.isEmpty())
+        {
+            VERBOSE(VB_CHANNEL, LOC + QString("Start channel: %1.")
+                    .arg(startchan));
+            return startchan;
+        }
     }
-    if (!startchan.isEmpty())
-        return startchan;
 
     // If we failed to get the last tuned channel,
     // get a valid channel on our current input.
@@ -1546,18 +1546,16 @@ QString TVRec::GetStartChannel(int cardid, const QString &defaultinput)
     {
         MythContext::DBError("getstartchan2", query);
     }
-    else if (query.next())
+    while (query.next())
     {
-        QString test = query.value(0).toString();
-        if (test != QString::null)
+        startchan = QString::fromUtf8(query.value(0).toString());
+        if (!startchan.isEmpty())
         {
-            msg = "Start channel from DB is empty, setting to '%1' instead.";
-            VERBOSE(VB_IMPORTANT, LOC_ERR + msg.arg(test));
-            startchan = QString::fromUtf8(test);
+            VERBOSE(VB_IMPORTANT, LOC_ERR + QString("Start channel from DB is "
+                    "empty, setting to '%1' instead.").arg(startchan));
+            return startchan;
         }
     }
-    if (!startchan.isEmpty())
-        return startchan;
 
     // If we failed to get a channel on our current input,
     // widen search to any input.
@@ -1573,27 +1571,22 @@ QString TVRec::GetStartChannel(int cardid, const QString &defaultinput)
     {
         MythContext::DBError("getstartchan3", query);
     }
-    else if (query.size() > 0)
+    while (query.next())
     {
-        query.next();
-
-        QString test = query.value(0).toString();
-        if (test != QString::null)
+        startchan = QString::fromUtf8(query.value(0).toString());
+        if (!startchan.isEmpty())
         {
-            msg = QString("Start channel invalid, setting "
-                          "to '%1' on input %2 instead.")
-                .arg(test).arg(query.value(1).toString());
-            VERBOSE(VB_IMPORTANT, LOC_ERR + msg);
-            startchan = QString::fromUtf8(test);
+            VERBOSE(VB_IMPORTANT, LOC_ERR + QString("Start channel invalid, "
+                    "setting to '%1' on input %2 instead.").arg(startchan)
+                    .arg(query.value(1).toString()));
+            return startchan;
         }
     }
-    if (startchan.isEmpty())
-    {
-        // If there are no valid channels, just use a random channel
-        startchan = "3";
-        msg = "Problem finding starting channel, setting to default of '%1'.";
-        VERBOSE(VB_IMPORTANT, LOC_ERR + msg.arg(startchan));
-    }
+
+    // If there are no valid channels, just use a random channel
+    startchan = "3";
+    VERBOSE(VB_IMPORTANT, LOC_ERR + QString("Problem finding starting channel, "
+            "setting to default of '%1'.").arg(startchan));
     return startchan;
 }
 
