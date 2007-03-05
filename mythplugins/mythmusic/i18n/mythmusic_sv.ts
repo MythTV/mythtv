@@ -170,6 +170,10 @@ Nästa skärm kommer att vara tom, använd Escape för att komma tillbaka till m
         <source>Are you sure you want to save the modified metadata to the file?</source>
         <translation>Är du säker på att du vill spara ändrad metadata till filen?</translation>
     </message>
+    <message>
+        <source>Save Changes</source>
+        <translation>Spara ändringar</translation>
+    </message>
 </context>
 <context>
     <name>PlaybackBoxMusic</name>
@@ -357,6 +361,10 @@ Nästa skärm kommer att vara tom, använd Escape för att komma tillbaka till m
         <source>Shuffle: Album</source>
         <translation>Ordning: Album</translation>
     </message>
+    <message>
+        <source>Visualization: </source>
+        <translation>Visualisering: </translation>
+    </message>
 </context>
 <context>
     <name>QObject</name>
@@ -417,10 +425,6 @@ Nästa skärm kommer att vara tom, använd Escape för att komma tillbaka till m
         <translation>Filnamnsformat</translation>
     </message>
     <message>
-        <source>Directory and filename Format used to grab information if no ID3 information is found.</source>
-        <translation>Biblioteks- och filnamnsformat som används för att hämta information om ingen ID3 information hittas.</translation>
-    </message>
-    <message>
         <source>Ignore ID3 Tags</source>
         <translation>Ignorera ID3-information</translation>
     </message>
@@ -463,18 +467,6 @@ Nästa skärm kommer att vara tom, använd Escape för att komma tillbaka till m
     <message>
         <source>File storage location</source>
         <translation>Sökväg för fillagring</translation>
-    </message>
-    <message>
-        <source>Defines the location/name for new songs. Valid tokens are: GENRE, ARTIST, ALBUM, TRACK, TITLE, YEAR, / and -. &apos;-&apos; will be replaced by the Token separator</source>
-        <translation>Definierar sökväg/namn för nya låtar. Följande ord kommer att ersättas med sin motsvarande betydelse i det slutliga filnamnet: GENRE, ARTIST, ALBUM, TRACK (Spår), TITLE (Titel), YEAR (År). Dessutom kan &apos;/&apos; och &apos;-&apos; användas. &apos;-&apos; kommer att ersättas med den konfigurerade separatorn</translation>
-    </message>
-    <message>
-        <source>Token separator</source>
-        <translation>Separator</translation>
-    </message>
-    <message>
-        <source>Filename tokens will be separated by this string.</source>
-        <translation>De olika delarna av ett filnamn separeras med detta tecken.</translation>
     </message>
     <message>
         <source>Replace &apos; &apos; with &apos;_&apos;</source>
@@ -693,14 +685,6 @@ Nästa skärm kommer att vara tom, använd Escape för att komma tillbaka till m
         <translation>MPEG Lager 1/2/3 Ljud (MAD dekoder)</translation>
     </message>
     <message>
-        <source>Searching for music files</source>
-        <translation>Letar efter musikfiler</translation>
-    </message>
-    <message>
-        <source>Updating music database</source>
-        <translation>Uppdaterar musikdatabas</translation>
-    </message>
-    <message>
         <source>Unknown Artist</source>
         <translation>Okänd artist</translation>
     </message>
@@ -883,20 +867,8 @@ Nästa skärm kommer att vara tom, använd Escape för att komma tillbaka till m
         <translation>Välj SCSI- eller IDE-enhet för CD-bränning.</translation>
     </message>
     <message>
-        <source>Scanning music files</source>
-        <translation>Letar efter musikfiler</translation>
-    </message>
-    <message>
         <source>Rebuilding music tree</source>
         <translation>Återuppbygger musikträd</translation>
-    </message>
-    <message>
-        <source>Only Import new music.</source>
-        <translation>Importera endast ny musik.</translation>
-    </message>
-    <message>
-        <source>Checks the database for duplicates when importing/ripping CDs.</source>
-        <translation>Letar efter dubbletter i databasen vid import/inläsning av CD.</translation>
     </message>
     <message>
         <source>Loading Music</source>
@@ -914,13 +886,32 @@ Nästa skärm kommer att vara tom, använd Escape för att komma tillbaka till m
         <source>Unknown Title</source>
         <translation>Okänd titel</translation>
     </message>
+    <message>
+        <source>Importing </source>
+        <translation>Importerar </translation>
+    </message>
+    <message>
+        <source>Directory and filename Format used to grab information if no ID3 information is found. Accepts GENRE, ARTIST, ALBUM, TITLE, ARTIST_TITLE and TRACK_TITLE.</source>
+        <translation>Katalog och filnamnsformat för att hämta information om ID3-tagg saknas. Accepterar GENRE, ARTIST, ALBUM, TITLE, ARTIST_TITLE och TRACK_TITLE.</translation>
+    </message>
+    <message>
+        <source>Defines the location/name for new songs. Valid tokens are: GENRE, ARTIST, ALBUM, TRACK, TITLE, YEAR</source>
+        <translation>Definierar plats/namn för nya sånger. Giltiga nyckelord är: GENRE, ARTIST, ALBUM, TRACK, TITLE, YEAR</translation>
+    </message>
+</context>
+<context>
+    <name>RipStatus</name>
+    <message>
+        <source>Stop Rip?</source>
+        <translation>Stoppa kopiering?</translation>
+    </message>
+    <message>
+        <source>Are you sure you want to cancel ripping the CD?</source>
+        <translation>Är du säker på att du vill avbryta CD-kopieringen?</translation>
+    </message>
 </context>
 <context>
     <name>Ripper</name>
-    <message>
-        <source>Please select a quality level and check the album information below:</source>
-        <translation>Välj en kvalitetsnivå och kontrollera albuminformationen nedan:</translation>
-    </message>
     <message>
         <source>Low</source>
         <translation>Låg</translation>
@@ -938,64 +929,62 @@ Nästa skärm kommer att vara tom, använd Escape för att komma tillbaka till m
         <translation>Perfekt</translation>
     </message>
     <message>
-        <source>Artist: </source>
-        <translation>Artist:</translation>
+        <source>Switch Titles</source>
+        <translation>Växla titlar</translation>
     </message>
     <message>
-        <source>Album: </source>
-        <translation>Album:</translation>
+        <source>Scan CD</source>
+        <translation>Sök CD</translation>
     </message>
     <message>
-        <source>Genre: </source>
-        <translation>Genre:</translation>
+        <source>Rip CD</source>
+        <translation>Kopiera CD</translation>
     </message>
     <message>
-        <source>Import this CD</source>
-        <translation>Importera denna CD</translation>
+        <source>Artist: %1
+Album: %2
+Track: %3
+
+This track is already in the database. 
+Do you want to remove the existing track?</source>
+        <translation>Artist: %1
+Album: %2
+Spår: %3
+
+Detta spår finns redan i databasen.
+Vill du ta bort det existerande spåret?</translation>
     </message>
     <message>
-        <source>Importing CD:
-</source>
-        <translation>Importerar CD:
-</translation>
+        <source>No tracks</source>
+        <translation>Inga spår</translation>
     </message>
     <message>
-        <source>Ripping...</source>
-        <translation>Kopierar...</translation>
+        <source>There are no tracks to rip?</source>
+        <translation>Det finns inga spår att kopiera?</translation>
     </message>
     <message>
-        <source>Copying from CD:
-</source>
-        <translation>Kopierar från CD:
-</translation>
+        <source>Success</source>
+        <translation>Klar</translation>
     </message>
     <message>
-        <source>Multi-Artist?</source>
-        <translation>Flera artister?</translation>
+        <source>Rip completed successfully.</source>
+        <translation>Kopiering lyckades.</translation>
     </message>
     <message>
-        <source>Switch Titles &amp;&amp; Artists</source>
-        <translation>Växla Titlar &amp;&amp; Artister</translation>
+        <source>Ejecting CD. Please Wait ...</source>
+        <translation>Matar ut CD. Vänta...</translation>
     </message>
     <message>
-        <source>Title</source>
-        <translation>Titel</translation>
+        <source>Select an Artist</source>
+        <translation>Välj en artist</translation>
     </message>
     <message>
-        <source>Artist</source>
-        <translation>Artist</translation>
+        <source>Select an Album</source>
+        <translation>Välj ett album</translation>
     </message>
     <message>
-        <source>Length</source>
-        <translation>Längd</translation>
-    </message>
-    <message>
-        <source>Quality: </source>
-        <translation>Kvalitet: </translation>
-    </message>
-    <message>
-        <source>Importing </source>
-        <translation>Importerar </translation>
+        <source>Select a Genre</source>
+        <translation>Byt titlar</translation>
     </message>
 </context>
 <context>

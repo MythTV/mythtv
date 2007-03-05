@@ -301,6 +301,10 @@
         <source>Playout Delay Min/Avg/Max: </source>
         <translation>Uppspelningsfördröjning Min/Med/Max: </translation>
     </message>
+    <message>
+        <source>Answer</source>
+        <translation>Svar</translation>
+    </message>
 </context>
 <context>
     <name>QObject</name>
@@ -339,10 +343,6 @@
     <message>
         <source>Time to Answer</source>
         <translation>Tid till svar</translation>
-    </message>
-    <message>
-        <source>The time in seconds a call rings before being automatically answered and diverted to a VXML script.</source>
-        <translation>Tid i sekunder ett samtal ringer innan det besvaras automatiskt och dirigeras om till ett VXML-skript.</translation>
     </message>
     <message>
         <source>Default VXML URL</source>
@@ -559,6 +559,10 @@
     <message>
         <source>AUDIO Settings</source>
         <translation>Ljudinställningar</translation>
+    </message>
+    <message>
+        <source>The time in seconds a call rings before being automatically answered and diverted to a VXML script.  Set to 0 to disable this feature.</source>
+        <translation>Tid i sekunder för ett anrop innan svar sker automatiskt och dirigeras om till ett VXML-skript. Sätt till 0 för att avaktivera denna finess.</translation>
     </message>
 </context>
 </TS>

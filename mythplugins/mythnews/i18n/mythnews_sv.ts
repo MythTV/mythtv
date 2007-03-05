@@ -104,6 +104,10 @@ Minsta tillåtna värdet är 30 minuter.</translation>
 
 %1</translation>
     </message>
+    <message>
+        <source>Downloading media...</source>
+        <translation>Laddar ned media...</translation>
+    </message>
 </context>
 <context>
     <name>ThemeUI</name>

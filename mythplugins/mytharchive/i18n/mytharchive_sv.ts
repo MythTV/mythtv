@@ -173,6 +173,22 @@ Klicka på OK</translation>
         <source>Exit</source>
         <translation>Avsluta</translation>
     </message>
+    <message>
+        <source>Increase Font Size</source>
+        <translation>Öka fontstorlek</translation>
+    </message>
+    <message>
+        <source>Decrease Font Size</source>
+        <translation>Minska fontstorlek</translation>
+    </message>
+    <message>
+        <source>Show Progress Log</source>
+        <translation>Visa förloppslogg</translation>
+    </message>
+    <message>
+        <source>Show Full Log</source>
+        <translation>Visa full logg</translation>
+    </message>
 </context>
 <context>
     <name>MythburnWizard</name>
@@ -328,14 +344,6 @@ Klicka på OK</translation>
         <translation>Kommando för att köra tcrequant (den del av transcode-paketet). Valfritt - lämna blankt om du inte har transcode-paketet installerat.</translation>
     </message>
     <message>
-        <source>png2yuv command</source>
-        <translation>png2yuv -kommando</translation>
-    </message>
-    <message>
-        <source>Command to run png2yuv. Part of mjpegtools package</source>
-        <translation>Kommando för att köra png2yuv. En del av mjpegtools-paketet</translation>
-    </message>
-    <message>
         <source>spumux command</source>
         <translation>spumux-kommando</translation>
     </message>
@@ -441,6 +449,46 @@ Detta kan ta ett par minuter.</translation>
         <source>It was not possible to import the Archive.  An error occured when running &apos;mytharchivehelper&apos;</source>
         <translation>Det gick inte att importera arkivet. Ett fel inträffade vid körning av &apos;mytharchivehelper&apos;</translation>
     </message>
+    <message>
+        <source>Command to play DVD</source>
+        <translation>Kommando för att spela DVD</translation>
+    </message>
+    <message>
+        <source>Command to run when test playing a created DVD. &apos;Internal&apos; will use the internal MythTV player. %f will be replaced with the path to the created DVD structure eg. &apos;xine -pfhq --no-splash dvd:/%f&apos;.</source>
+        <translation>Kommando att köra för att testa uppspelning av en skapad DVD. &apos;Internal&apos; använder MythTVs inbyggda spelare. %f ersätts med sökvägen till den skapade DVD-strukturen dvs &apos;xine -pfhq --no-splash dvd:/%f&apos;.</translation>
+    </message>
+    <message>
+        <source>Date format</source>
+        <translation>Datumformat</translation>
+    </message>
+    <message>
+        <source>Samples are shown using today&apos;s date.</source>
+        <translation>Exempel visas med dagens datum.</translation>
+    </message>
+    <message>
+        <source>Samples are shown using tomorrow&apos;s date.</source>
+        <translation>Exempel visas med morgondagens datum.</translation>
+    </message>
+    <message>
+        <source>Your preferred date format to use on DVD menus.</source>
+        <translation>Ditt önskade datumformat att använda för DVD-menyer.</translation>
+    </message>
+    <message>
+        <source>Time format</source>
+        <translation>Tidsformat</translation>
+    </message>
+    <message>
+        <source>Your preferred time format to display on DVD menus. You must choose a format with &quot;AM&quot; or &quot;PM&quot; in it, otherwise your time display will be 24-hour or &quot;military&quot; time.</source>
+        <translation>Det tidsformat du föredrar för DVD-menyer.</translation>
+    </message>
+    <message>
+        <source>jpeg2yuv command</source>
+        <translation>jpeg2yuv-kommando</translation>
+    </message>
+    <message>
+        <source>Command to run jpeg2yuv. Part of mjpegtools package</source>
+        <translation>Kommando för att köra jpeg2yuv (en del av mjpegtools-paketet)</translation>
+    </message>
 </context>
 <context>
     <name>RecordingSelector</name>
@@ -473,16 +521,16 @@ Detta kan ta ett par minuter.</translation>
         <translation>Alla inspelningar</translation>
     </message>
     <message>
-        <source>Myth Burn</source>
-        <translation>Mythbränn</translation>
-    </message>
-    <message>
         <source>You don&apos;t have any recordings!
 
 Click OK</source>
         <translation>Du har inga inspelningar!
 
 Klicka på OK</translation>
+    </message>
+    <message>
+        <source>MythArchive</source>
+        <translation>MythArchive</translation>
     </message>
 </context>
 <context>

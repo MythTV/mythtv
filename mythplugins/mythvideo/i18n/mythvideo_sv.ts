@@ -143,10 +143,6 @@
         <translation>Videolistvyn visar alla relevanta filer som ligger under den tidigare specifierade katalogen och inte bara de filmer som har sökts upp i videohanteraren.</translation>
     </message>
     <message>
-        <source>Default Player</source>
-        <translation type="obsolete">Standardspelare</translation>
-    </message>
-    <message>
         <source>Player Settings</source>
         <translation>Inställningar för spelare</translation>
     </message>
@@ -276,14 +272,6 @@
         <translation>Videogalleriet visar alla relevanta filer som ligger under den tidigare specifierade katalogen och inte bara de filmer som har sökts upp i videohanteraren.</translation>
     </message>
     <message>
-        <source>General Settings (1/2)</source>
-        <translation type="obsolete">Generella inställningar (1/2)</translation>
-    </message>
-    <message>
-        <source>General Settings (2/2)</source>
-        <translation type="obsolete">Generella inställningar (2/2)</translation>
-    </message>
-    <message>
         <source>Video List Loads Video Meta Data</source>
         <translation>Videolistvyn laddar videometadata</translation>
     </message>
@@ -404,16 +392,8 @@ Du har ingen DVD-enhet definierad.</translation>
         <translation>DVD-enhet</translation>
     </message>
     <message>
-        <source>General Settings</source>
-        <translation type="obsolete">Generella inställningar</translation>
-    </message>
-    <message>
         <source>DVD Player Command</source>
         <translation>Kommando för DVD-avspelning</translation>
-    </message>
-    <message>
-        <source>This can be any command to launch a DVD player (e.g. MPlayer, ogle, etc.). If present, %d will be substituted for the DVD device (e.g. /dev/dvd).</source>
-        <translation type="obsolete">Detta är ett godtyckligt kommando för att starta en DVD-spelare (t ex MPlayer, ogle etc). Om tecknen &apos;%d&apos; ingår i kommandot kommer detta att ersättas med den konfigurerade DVD-enheten (t ex /dev/dvd).</translation>
     </message>
     <message>
         <source>VCD Player Command</source>
@@ -422,14 +402,6 @@ Du har ingen DVD-enhet definierad.</translation>
     <message>
         <source>This can be any command to launch a VCD player (e.g. MPlayer, xine, etc.). If present, %d will be substituted for the VCD device (e.g. /dev/cdrom).</source>
         <translation>Detta är ett godtyckligt kommando för att starta en VCD-spelare (t ex MPlayer, xine etc). Om tecknen &apos;%d&apos; ingår i kommandot kommer detta att ersättas med den konfigurerade VCD-enheten (t ex /dev/cdrom).</translation>
-    </message>
-    <message>
-        <source>DVD Player Settings</source>
-        <translation type="obsolete">Inställningar för DVD-avspelning</translation>
-    </message>
-    <message>
-        <source>VCD Player Settings</source>
-        <translation type="obsolete">Inställningar för VCD-avspelning</translation>
     </message>
     <message>
         <source>Directory to hold temporary files</source>
@@ -597,96 +569,105 @@ Du har ingen DVD-enhet definierad.</translation>
     </message>
     <message>
         <source>Default Video Player</source>
-        <translation type="unfinished"></translation>
+        <translation>Förvald videospelare</translation>
     </message>
     <message>
         <source>Remove DVD Bookmarks Older then (days)</source>
-        <translation type="unfinished"></translation>
+        <translation>Ta bort DVD-bokmärken äldre än (dagar)</translation>
     </message>
     <message>
         <source>Delete DVD Bookmarks that are older then the Number of days specified</source>
-        <translation type="unfinished"></translation>
+        <translation>Ta bort DVD-bokmärken som är äldre än detta antal dagar</translation>
     </message>
     <message>
         <source>Enable DVD Bookmark Support</source>
-        <translation type="unfinished"></translation>
+        <translation>Aktivera stöd för DVD-bokmärken</translation>
     </message>
     <message>
         <source>DVD Bookmark Prompt</source>
-        <translation type="unfinished"></translation>
+        <translation>Visa prompt för DVD-bokmärke</translation>
     </message>
     <message>
         <source>Display a prompt to choose whether to play the DVD from the beginning or from the bookmark</source>
-        <translation type="unfinished"></translation>
+        <translation>Fråga om en DVD ska spelas upp från början eller bokmärket</translation>
     </message>
     <message>
         <source>This can be any command to launch a DVD  player (e.g. MPlayer, ogle, etc.). If present, %d will be substituted for the DVD device (e.g. /dev/dvd).</source>
-        <translation type="unfinished"></translation>
+        <translation>Kommando för att spela upp en DVD (dvs mplayer, ogle, etc.). %d ersätts med DVD-enheten (/dev/dvd).</translation>
     </message>
     <message>
         <source>General Settings (%1/%2)</source>
-        <translation type="unfinished"></translation>
+        <translation>Generella inställningar (%1/%2)</translation>
     </message>
     <message>
         <source>No Cover</source>
-        <translation type="unfinished"></translation>
+        <translation>Inget omslag</translation>
     </message>
     <message>
         <source>NR</source>
-        <translation type="unfinished"></translation>
+        <translation>NR</translation>
     </message>
     <message>
         <source>No files found</source>
-        <translation type="unfinished"></translation>
+        <translation>Inga filer funna</translation>
     </message>
     <message>
         <source>Unknown Prefix</source>
-        <translation type="unfinished"></translation>
+        <translation>Okänt prefix</translation>
     </message>
     <message>
         <source>videos</source>
-        <translation type="unfinished"></translation>
+        <translation>videor</translation>
     </message>
     <message>
         <source>Searching for video files</source>
-        <translation type="unfinished"></translation>
+        <translation>Söker efter videofiler</translation>
     </message>
     <message>
         <source>No to all</source>
-        <translation type="unfinished"></translation>
+        <translation>Nej till allt</translation>
     </message>
     <message>
         <source>Yes to all</source>
-        <translation type="unfinished"></translation>
+        <translation>Ja till allt</translation>
     </message>
     <message>
         <source>File Missing</source>
-        <translation type="unfinished"></translation>
+        <translation>Fil saknas</translation>
     </message>
     <message>
         <source>%1 appears to be missing.
 Remove it from the database?</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 verkar saknas
+Ta bort den från databasen?</translation>
     </message>
     <message>
         <source>Updating video database</source>
-        <translation type="unfinished"></translation>
+        <translation>Uppdaterar videodatabas</translation>
     </message>
     <message>
         <source>Verifying video files</source>
-        <translation type="unfinished"></translation>
+        <translation>Verifierar videodatabas</translation>
     </message>
     <message>
         <source>Parental Pin:</source>
-        <translation type="unfinished"></translation>
+        <translation>Föräldra-PIN:</translation>
     </message>
     <message>
         <source>No rating available.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ingen klassificering tillgänglig.</translation>
     </message>
     <message>
         <source>minutes</source>
-        <translation type="unfinished">minuter</translation>
+        <translation>minuter</translation>
+    </message>
+    <message>
+        <source>DVD Drive Speed</source>
+        <translation>DVD-enhetshastighet</translation>
+    </message>
+    <message>
+        <source>Set DVD Drive Speed during DVD Playback. Speed is in multiples of 1350KB/sec</source>
+        <translation>Sätter DVD-enhetens hastighet under DVD-uppspelning. Hastigheten anges i multipler av 1350KB/sek</translation>
     </message>
 </context>
 <context>

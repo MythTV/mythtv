@@ -56,6 +56,10 @@ Välj en.</translation>
         <source>No, don&apos;t</source>
         <translation>Nej, avbryt</translation>
     </message>
+    <message>
+        <source>Game Players</source>
+        <translation>Spelare</translation>
+    </message>
 </context>
 <context>
     <name>QObject</name>
@@ -102,10 +106,6 @@ Välj en.</translation>
     <message>
         <source>Command</source>
         <translation>Kommando</translation>
-    </message>
-    <message>
-        <source>Path+name of binary and optional parameters. %s can be used to represent the name of any rom being launched. if not specified the rom filename will be added to the end of the command. As well %d1, %d2, %d3 and %d4 represent disks in a multidisk/game situation</source>
-        <translation>Sökväg för binärfil och valfria parametrar. %s kan användas för att representera namnet på startad rom, om %s inte anges läggs rom-filnamnet till slutet av kommandot. %d1, %d2, %d3 och %d4 representerar skivor om spelet sträcker sig över flera skivor</translation>
     </message>
     <message>
         <source>Type</source>
@@ -271,7 +271,19 @@ att du vill göra detta?</translation>
     </message>
     <message>
         <source>GAMEGEAR</source>
-        <translation type="unfinished"></translation>
+        <translation>GAMEGEAR</translation>
+    </message>
+    <message>
+        <source>Hash filenames in display</source>
+        <translation>Hasha filnamn i vy</translation>
+    </message>
+    <message>
+        <source>Enable hashing of names in the display tree. This can make navigating long lists a little faster</source>
+        <translation>Hashar filnamn i visningsträdet. Detta kan snabba upp navigering i långa listor något</translation>
+    </message>
+    <message>
+        <source>Binary and optional parameters. Multiple commands seperated with &apos;;&apos; . Use %s for the rom name. %d1, %d2, %d3 and %d4 represent disks in a multidisk/game. %s auto appended if not specified</source>
+        <translation>Binära och valfria parametrar. Flera kommando separeras med &apos;;&apos;. Använd %s för rom-namnet. %d1, %d2, %d3 och %d4 representerar skivor i flerskivespel. %s läggs till automatiskt om det inte anges</translation>
     </message>
 </context>
 <context>
