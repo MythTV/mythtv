@@ -195,7 +195,8 @@ static int write_ts_header(int pid, int payload_start, int count,
 		int size = stuff;
 		unsigned char flags = 0;
 		if(SCR >= 0) {
-			size += 7;
+			if(size < 7)
+				size = 7;
 			flags |= 0x10;
 		}
 		obuf[c++] = size;
@@ -204,14 +205,17 @@ static int write_ts_header(int pid, int payload_start, int count,
 			size--;
 		}
 		if(SCR >= 0) {
-			lscr = htonl((uint32_t) ((SCR/300ULL) & 0xFFFFFFFFULL));
+			uint8_t bit;
+			lscr = (uint32_t) ((SCR/300ULL) & 0xFFFFFFFFULL);
+			bit = (lscr & 0x01) << 7;
+			lscr = htonl(lscr >> 1);
 			scr = (uint8_t *) &lscr;
 			scr_ext = (uint16_t) ((SCR%300ULL) & 0x1FFULL);
-			obuf[c++] = scr[0] >> 1;
-			obuf[c++] = scr[1] >> 1;
-			obuf[c++] = scr[2] >> 1;
-			obuf[c++] = scr[3] >> 1;
-			obuf[c++] = (scr[3] << 7) | 0x7e | (scr_ext >> 8);
+			obuf[c++] = scr[0];
+			obuf[c++] = scr[1];
+			obuf[c++] = scr[2];
+			obuf[c++] = scr[3];
+			obuf[c++] = bit | 0x7e | (scr_ext >> 8);
 			obuf[c++] = scr_ext & 0xff;
 			size -= 6;
 		}

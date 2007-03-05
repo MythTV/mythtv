@@ -581,10 +581,10 @@ int write_ps_header(uint8_t *buf,
 }
 
 
-void get_pespts(uint8_t *spts,uint8_t *pts)
+static void get_pespts(uint8_t *spts,uint8_t *pts)
 {
-
-        pts[0] = 0x21 |
+	//Make sure to set the 1st 4 bits properly
+        pts[0] = 0x01 |
                 ((spts[0] & 0xC0) >>5);
         pts[1] = ((spts[0] & 0x3F) << 2) |
                 ((spts[1] & 0xC0) >> 6);
@@ -647,9 +647,12 @@ int write_pes_header(uint8_t id, int length , uint64_t PTS, uint64_t DTS,
 	if (ptsdts == PTS_ONLY){
 		dummy[2] += 5;
 		dummy[1] |= PTS_ONLY;
+		ppts[0] |= 0x20;
 	} else 	if (ptsdts == PTS_DTS){
 		dummy[2] += 10;
 		dummy[1] |= PTS_DTS;
+		ppts[0] |= 0x30;
+		pdts[0] |= 0x10;
 	}
 		
 
