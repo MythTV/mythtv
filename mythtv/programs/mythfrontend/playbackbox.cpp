@@ -401,7 +401,10 @@ PlaybackBox::PlaybackBox(BoxType ltype, MythMainWindow *parent,
     if (!m_player && ((!recGroupPassword.isEmpty()) ||
         ((titleList.count() <= 1) && (progsInDB > 0)) ||
         (initialFilt)))
+    {
+        recGroup = "";
         showRecGroupChooser();
+    }
 
     gContext->addCurrentLocation((type == Delete)? "DeleteBox":"PlaybackBox");
 }
@@ -477,6 +480,20 @@ PlaybackBox::~PlaybackBox(void)
         delete previewPixmap;
         previewPixmap = NULL;
     }
+}
+
+int PlaybackBox::exec(void)
+{
+    if (recGroup != "")
+        return MythDialog::exec();
+    else if (gContext->GetNumSetting("QueryInitialFilter", 0) == 0)
+    {
+        recGroup = "All Programs";
+        showRecGroupChooser();
+        return MythDialog::exec();
+    }
+
+    return 0;
 }
 
 /* blocks until playing has stopped */
@@ -4544,6 +4561,9 @@ void PlaybackBox::showRecGroupChooser(void)
 
     // select the recGroup in the dialog
     int index = recGroupListBox->index(recGroupListBox->findItem(dispGroup));
+    if (index < 0)
+        index = 0;
+
     // HACK make the selection show up by selecting a different item first.
     recGroupListBox->setCurrentItem((index + 1) % 2);
     recGroupListBox->setCurrentItem(index);
