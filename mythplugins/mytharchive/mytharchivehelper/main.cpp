@@ -53,14 +53,14 @@ class NativeArchive
 NativeArchive::NativeArchive(void)
 {
     // create the lock file so the UI knows we're running
-    QString tempDir = gContext->GetSetting("MythArchiveTempDir", "");
+    QString tempDir = getTempDirectory();
     system("echo Lock > " + tempDir + "/logs/mythburn.lck");
 }
 
 NativeArchive::~NativeArchive(void)
 {
     // remove lock file
-    QString tempDir = gContext->GetSetting("MythArchiveTempDir", "");
+    QString tempDir = getTempDirectory();
     if (QFile::exists(tempDir + "/logs/mythburn.lck"))
         QFile::remove(tempDir + "/logs/mythburn.lck");
 }
@@ -144,9 +144,7 @@ void createISOImage(QString &sourceDirectory)
 {
     VERBOSE(VB_JOBQUEUE, "Creating ISO image");
 
-    QString tempDirectory = gContext->GetSetting("MythArchiveTempDir", "");
-    if (!tempDirectory.endsWith("/"))
-        tempDirectory += "/";
+    QString tempDirectory = getTempDirectory();
 
     tempDirectory += "work/";
 
@@ -169,9 +167,7 @@ int burnISOImage(int mediaType, bool bEraseDVDRW, bool nativeFormat)
     QString dvdDrive = gContext->GetSetting("MythArchiveDVDLocation", "/dev/dvd");
     VERBOSE(VB_JOBQUEUE, "Burning ISO image to " + dvdDrive);
 
-    QString tempDirectory = gContext->GetSetting("MythArchiveTempDir", "");
-    if (!tempDirectory.endsWith("/"))
-        tempDirectory += "/";
+    QString tempDirectory = getTempDirectory();
 
     tempDirectory += "work/";
 
@@ -231,7 +227,7 @@ int doBurnDVD(int mediaType, bool bEraseDVDRW, bool nativeFormat)
 
 int NativeArchive::doNativeArchive(const QString &jobFile)
 {
-    QString tempDir = gContext->GetSetting("MythArchiveTempDir", "");
+    QString tempDir = getTempDirectory();
 
     QDomDocument doc("archivejob");
     QFile file(jobFile);

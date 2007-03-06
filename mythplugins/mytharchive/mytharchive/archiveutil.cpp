@@ -67,8 +67,12 @@ QString getTempDirectory(bool showError)
     if (tempDir == "")
         return "";
 
+    // make sure the temp directory setting ends with a trailing "/"
     if (!tempDir.endsWith("/"))
+    {
         tempDir += "/";
+        gContext->SaveSetting("MythArchiveTempDir", tempDir);
+    }
 
     return tempDir;
 }
