@@ -246,6 +246,14 @@ void RecordingSelector::wireUpTheme()
                 this, SLOT(titleChanged(UIListBtnTypeItem *)));
     }
 
+    if (!ok_button || !cancel_button || !category_selector || !title_text || !datetime_text
+         || !description_text || !filesize_text || !preview_image || !cutlist_image || !recording_list)
+    {
+        VERBOSE(VB_IMPORTANT, "One or more UI elements is missing from your theme - bailing out!");
+        QTimer::singleShot(100, this, SLOT(cancelPressed()));
+        return;
+    }
+
     updateSelectedList();
     updateRecordingList();
 
@@ -403,6 +411,9 @@ void RecordingSelector::getRecordingList(void)
             // we can't handle recordings that have to be streamed to us
             if (p->GetPlaybackURL(false, true).startsWith("myth://"))
             {
+                VERBOSE(VB_IMPORTANT,
+                        QString("MythArchive cannot handle this file because it isn't available locally - %1")
+                                .arg(p->GetPlaybackURL(false, true)));
                 recordingList->erase(i);
                 i--;
                 continue;
@@ -420,10 +431,11 @@ void RecordingSelector::getRecordingList(void)
                 categories.append(p->title);
         }
     }
-    else
+
+    if (!recordingList || recordingList->size() == 0)
     {
         MythPopupBox::showOkPopup(gContext->GetMainWindow(), tr("MythArchive"),
-                                  tr("You don't have any recordings!\n\nClick OK"));
+            tr("Either you don't have any recordings or no recordings are available locally!\n\nClick OK"));
         QTimer::singleShot(100, this, SLOT(cancelPressed()));
         return;
     }
