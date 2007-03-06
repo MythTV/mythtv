@@ -516,11 +516,9 @@ void ProgFinder::update_timeout()
 
 void ProgFinder::cursorLeft()
 {
-    inSearch--;
-    if (inSearch == -1 && arrowAccel)
-        escape();
-    else
+    if (inSearch > 0)
     {
+        inSearch--;
         if (inSearch == 0)
             showSearchList();
         else if (inSearch == 1)
@@ -529,6 +527,9 @@ void ProgFinder::cursorLeft()
             clearShowData();
         }
     }
+    else if (inSearch == 0 && arrowAccel)
+        escape();
+
     update(infoRect);
     update(listRect);
 }
