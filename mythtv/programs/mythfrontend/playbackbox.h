@@ -102,7 +102,10 @@ class PlaybackBox : public MythDialog
    ~PlaybackBox(void);
    
     void customEvent(QCustomEvent *e);
-  
+
+  public slots:
+    int exec();
+
   protected slots:
     void timeout(void);
 
