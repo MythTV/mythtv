@@ -31,7 +31,7 @@
 #******************************************************************************
 
 # version of script - change after each update
-VERSION="0.1.20061215-1"
+VERSION="0.1.20070306-1"
 
 
 ##You can use this debug flag when testing out new themes
@@ -43,6 +43,9 @@ debug_secondrunthrough = False
 
 # default encoding profile to use
 defaultEncodingProfile = "SP"
+
+# add audio sync offset when re-muxing
+useSyncOffset = False
 
 #*********************************************************************************
 #Dont change the stuff below!!
@@ -453,6 +456,31 @@ def getAspectRatioOfVideo(index):
         aspect_ratio = 1.77778; # default
     write("aspect ratio is: %s" % aspect_ratio)
     return aspect_ratio
+
+def calcSyncOffset(index):
+    """Returns the sync offset between the video and first audio stream"""
+
+    #open the XML containing information about this file
+    #infoDOM = xml.dom.minidom.parse(os.path.join(getItemTempPath(index), 'streaminfo_orig.xml'))
+    infoDOM = xml.dom.minidom.parse(os.path.join(getItemTempPath(index), 'streaminfo.xml'))
+
+    #error out if its the wrong XML
+    if infoDOM.documentElement.tagName != "file":
+        fatalError("Stream info file doesn't look right (%s)" % os.path.join(getItemTempPath(index), 'streaminfo_orig.xml'))
+
+    video = infoDOM.getElementsByTagName("file")[0].getElementsByTagName("streams")[0].getElementsByTagName("video")[0]
+    video_start = float(video.attributes["start_time"].value)
+
+    audio = infoDOM.getElementsByTagName("file")[0].getElementsByTagName("streams")[0].getElementsByTagName("audio")[0]
+    audio_start = float(audio.attributes["start_time"].value)
+
+#    write("Video start time is: %s" % video_start)
+#    write("Audio start time is: %s" % audio_start)
+
+    sync_offset = int((video_start - audio_start) * 1000)
+
+#    write("Sync offset is: %s" % sync_offset)
+    return sync_offset
 
 def getFormatedLengthOfVideo(index):
     duration = getLengthOfVideo(index)
@@ -1162,6 +1190,7 @@ def preProcessFile(file, folder):
         mediafile = file.attributes["localfilename"].value
 
     getStreamInformation(mediafile, os.path.join(folder, "streaminfo.xml"), 0)
+    copy(os.path.join(folder, "streaminfo.xml"), os.path.join(folder, "streaminfo_orig.xml"))
 
     getFileInformation(file, folder)
 
@@ -1189,10 +1218,16 @@ def encodeAudio(format, sourcefile, destinationfile, deletesourceafterencode):
     if deletesourceafterencode==True:
         os.remove(sourcefile)
 
-def multiplexMPEGStream(video, audio1, audio2, destination):
+def multiplexMPEGStream(video, audio1, audio2, destination, syncOffset):
     """multiplex one video and one or two audio streams together"""
 
     write("Multiplexing MPEG stream to %s" % destination)
+
+    if useSyncOffset == True:
+        write("Adding sync offset of %dms" % syncOffset)
+    else:
+        write("Using sync offset is disabled - it would be %dms" % syncOffset)
+        syncOffset = 0
 
     if doesFileExist(destination)==True:
         os.remove(destination)
@@ -1223,6 +1258,7 @@ def multiplexMPEGStream(video, audio1, audio2, destination):
         result=os.spawnlp(mode, path_mplex[0], path_mplex[1],
                     '-f', '8',
                     '-v', '0',
+                    '--sync-offset', '%sms' % syncOffset,
                     '-o', destination,
                     video,
                     audio1)
@@ -1231,6 +1267,7 @@ def multiplexMPEGStream(video, audio1, audio2, destination):
         result=os.spawnlp(mode, path_mplex[0], path_mplex[1],
                     '-f', '8',
                     '-v', '0',
+                    '--sync-offset', '%sms' % syncOffset,
                     '-o', destination,
                     video,
                     audio1,
@@ -1592,7 +1629,7 @@ def deMultiplexMPEG2File(folder, mediafile, video, audio1, audio2):
                 command += "-c %d " % (audio2[AUDIO_ID])
 
     else:
-        command = "mythreplex --demux  --fix_sync -o %s " % (folder + "/stream")
+        command = "mythreplex --demux --fix_sync -o %s " % (folder + "/stream")
         command += "-v %d " % (video[VIDEO_ID] & 255)
 
         if audio1[AUDIO_ID] != -1: 
@@ -3766,7 +3803,8 @@ def processJob(job):
                 pid=multiplexMPEGStream(os.path.join(folder,'stream.mv2'),
                         os.path.join(folder,'stream0'),
                         os.path.join(folder,'stream1'),
-                        os.path.join(folder,'final.mpg'))
+                        os.path.join(folder,'final.mpg'),
+                        calcSyncOffset(filecount))
 
             #Now all the files are completed and ready to be burnt
             runDVDAuthor()
@@ -3884,6 +3922,8 @@ musicpath = defaultsettings.get("MusicLocation", None)
 videomode = string.lower(defaultsettings["MythArchiveVideoFormat"])
 temppath = os.path.join(defaultsettings["MythArchiveTempDir"], "work")
 logpath = os.path.join(defaultsettings["MythArchiveTempDir"], "logs")
+write("temppath: " + temppath)
+write("logpath:  " + logpath)
 dvddrivepath = defaultsettings["MythArchiveDVDLocation"]
 dbVersion = defaultsettings["DBSchemaVer"]
 preferredlang1 = defaultsettings["ISO639Language0"]
