@@ -1896,7 +1896,8 @@ static void update_channel_basic(uint    sourceid,   bool    insert,
                   "      ( channum = :CHANNUM OR "
                   "        ( freqid  = :FREQID AND "
                   "          freqid != '0'     AND "
-                  "          freqid != '' ) OR "
+                  "          freqid != ''      AND "
+                  "          atsc_minor_chan = '0') OR "
                   "        ( atsc_major_chan = :MAJORCHAN AND "
                   "          atsc_minor_chan = :MINORCHAN ) )");
     query.bindValue(":SOURCEID",  sourceid);
