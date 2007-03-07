@@ -399,31 +399,9 @@ bool FillData::fillData(QValueList<Source> &sourcelist)
     for (it = sourcelist.begin(); it != sourcelist.end(); ++it)
     {
         channel_update_run = false;
-        VERBOSE(VB_GENERAL, sidStr.arg((*it).id)
-                                  .arg((*it).name)
-                                  .arg((*it).xmltvgrabber));
-
-        query.prepare(
-            "SELECT COUNT(chanid) FROM channel WHERE sourceid = "
-             ":SRCID AND xmltvid != ''");
-        query.bindValue(":SRCID", (*it).id);
-        query.exec();
-
-        if (query.isActive() && query.numRowsAffected() > 0) {
-            query.next();
-            source_channels = query.value(0).toInt();
-            VERBOSE(VB_GENERAL, QString("Found %1 channels for source %2 "
-                                        "which use grabber")
-                                        .arg(source_channels).arg((*it).id));
-        } else {
-            source_channels = 0;
-            VERBOSE(VB_GENERAL,
-                    QString("Can't get a channel count for source id %1")
-                            .arg((*it).id));
-        }
+        endofdata = false;
 
         QString xmltv_grabber = (*it).xmltvgrabber;
-        need_post_grab_proc |= (xmltv_grabber != "datadirect");
 
         if (xmltv_grabber == "eitonly")
         {
@@ -448,6 +426,39 @@ bool FillData::fillData(QValueList<Source> &sourcelist)
                                "value = 'mythfilldatabaseLastRunEnd'")
                        .arg(QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm")));
             continue;
+        }
+
+        VERBOSE(VB_GENERAL, sidStr.arg((*it).id)
+                                  .arg((*it).name)
+                                  .arg(xmltv_grabber));
+
+        query.prepare(
+            "SELECT COUNT(chanid) FROM channel WHERE sourceid = "
+             ":SRCID AND xmltvid != ''");
+        query.bindValue(":SRCID", (*it).id);
+        query.exec();
+
+        if (query.isActive() && query.size() > 0) {
+            query.next();
+            source_channels = query.value(0).toInt();
+            if (source_channels > 0)
+            {
+                VERBOSE(VB_GENERAL, QString("Found %1 channels for "
+                                "source %2 which use grabber")
+                                .arg(source_channels).arg((*it).id));
+            }
+            else
+            {
+                VERBOSE(VB_GENERAL, QString("No channels are "
+                    "configured to use grabber."));
+                    continue;
+            }
+        }
+        else {
+            source_channels = 0;
+            VERBOSE(VB_GENERAL,
+                    QString("Can't get a channel count for source id %1")
+                            .arg((*it).id));
         }
 
         bool hasprefmethod = false;
@@ -548,6 +559,8 @@ bool FillData::fillData(QValueList<Source> &sourcelist)
                         .arg(xmltv_grabber));
             }
         }
+
+        need_post_grab_proc |= (xmltv_grabber != "datadirect");
 
         if ((xmltv_grabber == "datadirect") && dd_grab_all)
         {
