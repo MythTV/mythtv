@@ -96,10 +96,13 @@ void ProfileGroup::fillSelections(SelectSetting* setting) {
                          it != cardtypes.end(); it++)
                    if (result.value(4).toString() == *it)
                        match = true;
-                   else if (result.value(4).toString() == "TRANSCODE")
-                       transcodeID = result.value(1).toString();
+
                if (! match)
+               {
+                   if (result.value(4).toString() == "TRANSCODE")
+                       transcodeID = result.value(1).toString();
                    continue;
+               }
             }
             QString value = QString::fromUtf8(result.value(0).toString());
             if (result.value(2).toString() != NULL &&
