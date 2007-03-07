@@ -1030,6 +1030,40 @@ class ImageSize : public VerticalConfigurationGroup
     };
 };
 
+typedef enum {
+    RPPopup_OK = 0,
+    RPPopup_CANCEL,
+    RPPopup_DELETE
+} RPPopupResult;
+
+class RecordingProfilePopup
+{
+  public:
+    static RPPopupResult showPopup(MythMainWindow *parent, QString title,
+                                   QString message, QString& text)
+    {
+        MythPopupBox popup(parent, title);
+        popup.addLabel(message);
+
+        MythLineEdit* textEdit = new MythLineEdit(&popup, "chooseEdit");
+        textEdit->setText(text);
+        popup.addWidget(textEdit);
+
+        popup.addButton(QObject::tr("OK"));
+        popup.addButton(QObject::tr("Cancel"));
+
+        textEdit->setFocus();
+
+        if (popup.ExecPopup() == 0)
+        {
+            text = textEdit->text();
+            return RPPopup_OK;
+        }
+
+        return RPPopup_CANCEL;
+    }
+};
+
 RecordingProfile::RecordingProfile(QString profName)
     : id(new ID()),        name(new Name(*this)),
       imageSize(NULL),     videoSettings(NULL),
@@ -1264,20 +1298,62 @@ int RecordingProfile::exec(void)
 
 void RecordingProfileEditor::open(int id) 
 {
-    QString profName = RecordingProfile::getName(id);
-    if (profName.isNull())
-        profName = labelName;
+    if (id)
+    {
+        QString profName = RecordingProfile::getName(id);
+        if (profName.isNull())
+            profName = labelName;
+        else
+            profName = labelName + "->" + profName;
+        RecordingProfile* profile = new RecordingProfile(profName);
+
+        profile->loadByID(id);
+        profile->setCodecTypes();
+
+        if (profile->exec() == QDialog::Accepted)
+            profile->save();
+        delete profile;
+    }
     else
-        profName = labelName + "->" + profName;
-    RecordingProfile* profile = new RecordingProfile(profName);
+    {
+        QString profName = "";
+        RPPopupResult result = RecordingProfilePopup::showPopup(
+            gContext->GetMainWindow(),
+            tr("Add Recording Profile"),
+            tr("Enter the name of the new profile"), profName);
+        if (result == RPPopup_CANCEL)
+            return;
 
-    profile->loadByID(id);
-    profile->setCodecTypes();
-
-    if (profile->exec() == QDialog::Accepted)
-        profile->save();
-    delete profile;
-};
+        MSqlQuery query(MSqlQuery::InitCon());
+        query.prepare(
+            "INSERT INTO recordingprofiles "
+                "(name, videocodec, audiocodec, profilegroup) "
+              "VALUES "
+                "(:NAME, :VIDEOCODEC, :AUDIOCODEC, :PROFILEGROUP);");
+        query.bindValue(":NAME", profName);
+        query.bindValue(":VIDEOCODEC", "MPEG-4");
+        query.bindValue(":AUDIOCODEC", "MP3");
+        query.bindValue(":PROFILEGROUP", group);
+        if (!query.exec())
+            MythContext::DBError("RecordingProfileEditor::open", query);
+        else
+        {
+            query.prepare(
+                "SELECT id "
+                  "FROM recordingprofiles "
+                  "WHERE name = :NAME AND profilegroup = :PROFILEGROUP;");
+            query.bindValue(":NAME", profName);
+            query.bindValue(":PROFILEGROUP", group);
+            if (!query.exec())
+                MythContext::DBError("RecordingProfileEditor::open", query);
+            else
+            {
+                if (query.next())
+                    open(query.value(0).toInt());
+            }
+        }
+    }
+}
 
 RecordingProfileEditor::RecordingProfileEditor(int id, QString profName) :
     listbox(new ListBoxSetting(this)), group(id), labelName(profName)
@@ -1290,7 +1366,7 @@ RecordingProfileEditor::RecordingProfileEditor(int id, QString profName) :
 void RecordingProfileEditor::load(void)
 {
     listbox->clearSelections();
-    //listbox->addSelection("(Create new profile)", "0");
+    listbox->addSelection("(Create new profile)", "0");
     RecordingProfile::fillSelections(listbox, group);
 }
 

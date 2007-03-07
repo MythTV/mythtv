@@ -9,6 +9,7 @@
 #include <qstringlist.h>
 #include <qsqldatabase.h>
 #include <qmap.h>
+#include <math.h>
 
 #include <iostream>
 using namespace std;
@@ -248,17 +249,38 @@ void Transcode::ReencoderAddKFA(long curframe, long lastkey, long num_keyframes)
     }
 }
 
-bool Transcode::GetProfile(QString profileName, QString encodingType)
+bool Transcode::GetProfile(QString profileName, QString encodingType,
+                           int height, int frameRate)
 {
     if (profileName.lower() == "autodetect")
     {
+        if (height == 1088)
+            height = 1080;
+
+        QString autoProfileName = QObject::tr("Autodetect from %1").arg(height);
+        if (frameRate == 25 || frameRate == 30)
+            autoProfileName += "i";
+        if (frameRate == 50 || frameRate == 60)
+            autoProfileName += "p";
+
         bool result = false;
-        if (encodingType == "MPEG-2")
+        VERBOSE(VB_IMPORTANT,
+                QString("Transcode: Looking for autodetect profile: %1").
+                arg(autoProfileName));
+        result = profile.loadByGroup(autoProfileName, "Transcoders");
+
+        if (!result && encodingType == "MPEG-2")
+        {
             result = profile.loadByGroup("MPEG2", "Transcoders");
-        if (encodingType == "MPEG-4" || encodingType == "RTjpeg")
+            autoProfileName = "MPEG2";
+        }
+        if (!result && (encodingType == "MPEG-4" || encodingType == "RTjpeg"))
+        {
             result = profile.loadByGroup("RTjpeg/MPEG4",
                                          "Transcoders");
-        if (! result)
+            autoProfileName = "RTjpeg/MPEG4";
+        }
+        if (!result)
         {
             VERBOSE(VB_IMPORTANT,
                     QString("Transcode: Couldn't find profile for : %1").
@@ -266,6 +288,10 @@ bool Transcode::GetProfile(QString profileName, QString encodingType)
 
             return false;
         }
+
+        VERBOSE(VB_IMPORTANT,
+                QString("Transcode: Using autodetect profile: %1").
+                arg(autoProfileName));
     }
     else
     {
@@ -427,7 +453,8 @@ int Transcode::TranscodeFile(char *inputname, char *outputname,
 
     if (fifodir == NULL)
     {
-        if (!GetProfile(profileName, encodingType)) {
+        if (!GetProfile(profileName, encodingType, video_height,
+                        (int)round(video_frame_rate))) {
             VERBOSE(VB_IMPORTANT, "Transcoding aborted, no profile found.");
             return REENCODE_ERROR;
         }

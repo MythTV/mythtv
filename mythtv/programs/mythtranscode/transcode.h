@@ -20,7 +20,8 @@ class Transcode : public QObject
                       QString fifodir);
     void ShowProgress(bool val) { showprogress = val; }
   private:
-    bool GetProfile(QString profileName, QString encodingType);
+    bool GetProfile(QString profileName, QString encodingType, int height,
+                    int frameRate);
     void ReencoderAddKFA(long curframe, long lastkey, long num_keyframes);
     ProgramInfo *m_proginfo;
     RecordingProfile profile;
