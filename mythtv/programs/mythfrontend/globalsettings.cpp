@@ -1243,7 +1243,9 @@ static HostComboBox *PlaybackExitPrompt()
     gc->setLabel(QObject::tr("Action on playback exit"));
     gc->addSelection(QObject::tr("Just exit"), "0");
     gc->addSelection(QObject::tr("Save position and exit"), "2");
-    gc->addSelection(QObject::tr("Always prompt"), "1");
+    gc->addSelection(QObject::tr("Always prompt (excluding Live TV)"), "1");
+    gc->addSelection(QObject::tr("Always prompt (including Live TV)"), "4");
+    gc->addSelection(QObject::tr("Prompt for Live TV only"), "8");
     gc->setHelpText(QObject::tr("If set to prompt, a menu will be displayed "
                     "when you exit playback mode.  The options available will "
                     "allow you to save your position, delete the "

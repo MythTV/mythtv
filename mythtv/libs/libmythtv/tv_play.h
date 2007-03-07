@@ -131,7 +131,8 @@ class MPUBLIC TV : public QObject
     void PromptStopWatchingRecording(void);
     void PromptDeleteRecording(QString title);
     bool PromptRecGroupPassword(void);
-    
+    bool BookmarkAllowed(void);
+    bool DeleteAllowed(void);
 
     // Boolean queries
 

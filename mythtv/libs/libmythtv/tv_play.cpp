@@ -2419,9 +2419,17 @@ void TV::ProcessKeypress(QKeyEvent *e)
                 {
                     int result = GetOSD()->GetDialogResponse(dialogname);
 
+                    if (result > 0)
+                    {
+                        if (!BookmarkAllowed())
+                            result++;
+                        if (result > 2 && !DeleteAllowed())
+                            result++;
+                    }
+
                     switch (result)
                     {
-                        case 0: case 3:
+                        case 0: case 4:
                             DoPause();
                             break;
                         case 1:
@@ -2429,27 +2437,12 @@ void TV::ProcessKeypress(QKeyEvent *e)
                             exitPlayer = true;
                             wantsToQuit = true;
                             break;
-                        case 4:
+                        case 3:
                             dialogname = "";
                             DoPause();
                             PromptDeleteRecording(
                                 tr("Delete this recording?")); 
                             return;
-                        default:
-                            exitPlayer = true;
-                            wantsToQuit = true;
-                            break;
-                    }
-                }
-                else if (dialogname == "videoexitplayoptions") 
-                {
-                    int result = GetOSD()->GetDialogResponse(dialogname);
-
-                    switch (result)
-                    {
-                        case 0: case 1:
-                            DoPause();
-                            break;
                         default:
                             exitPlayer = true;
                             wantsToQuit = true;
@@ -2859,16 +2852,17 @@ void TV::ProcessKeypress(QKeyEvent *e)
 
             if (StateIsLiveTV(GetState()))
             {
-                if (nvp && gContext->GetNumSetting("PlaybackExitPrompt") == 2)
-                    nvp->SetBookmark();
-                if (nvp && gContext->GetNumSetting("AutomaticSetWatched", 0))
-                    nvp->SetWatched();
-                exitPlayer = true;
-                wantsToQuit = true;
+                if (nvp && 12 & gContext->GetNumSetting("PlaybackExitPrompt"))
+                    PromptStopWatchingRecording();
+                else
+                {
+                    exitPlayer = true;
+                    wantsToQuit = true;
+                }
             }
             else 
             {
-                if (nvp && gContext->GetNumSetting("PlaybackExitPrompt") == 1 &&
+                if (nvp && 5 & gContext->GetNumSetting("PlaybackExitPrompt") &&
                     !underNetworkControl && !prbuffer->InDVDMenuOrStillFrame())
                 {
                     PromptStopWatchingRecording();
@@ -7539,6 +7533,29 @@ void TV::DVDJumpForward(void)
     }
 }
 
+/* \fn TV::BookmarkAllowed(void)
+ * \brief Returns true if bookmarks are allowed for the current player.
+ */
+bool TV::BookmarkAllowed(void)
+{
+    if ((prbuffer->isDVD() && (!gContext->GetNumSetting("EnableDVDBookmark", 0)
+        || prbuffer->DVD()->GetTotalTimeOfTitle() < 120)) ||
+        StateIsLiveTV(GetState()) ||
+        (playbackinfo->isVideo && !prbuffer->isDVD()))
+        return false;
+
+    return true;
+}
+
+/* \fn TV::DeleteAllowed(void)
+ * \brief Returns true if the delete menu option should be offered.
+ */
+bool TV::DeleteAllowed(void)
+{
+    if (prbuffer->isDVD() || StateIsLiveTV(GetState()))
+        return false;
+    return true;
+}
 
 void
 TV::PromptStopWatchingRecording(void)
@@ -7550,43 +7567,33 @@ TV::PromptStopWatchingRecording(void)
     
     dialogboxTimer.restart();
     QString message;
+    QString videotype;
     QStringList options;
-    bool allowbookmark = true;
-    bool allowdvdbookmark = gContext->GetNumSetting("EnableDVDBookmark", 0);
-    if (prbuffer->isDVD())
-    {
-        if (!allowdvdbookmark || 
-            prbuffer->DVD()->GetTotalTimeOfTitle() < 120)
-        {
-            allowbookmark = false;
-        }
-    }
-    else if (playbackinfo->isVideo)
-        allowbookmark = false;
-    
-    if (playbackinfo && allowbookmark)
-    {
-        QString videotype = (prbuffer->isDVD()) ? "DVD":"recording";
-        message = tr("You are exiting this %1").arg(videotype);
 
+    if (StateIsLiveTV(GetState()))
+        videotype = "Live TV";
+    else if (prbuffer->isDVD())
+        videotype = "this DVD";
+    else if (playbackinfo->isVideo)
+        videotype = "this Video";
+    else
+        videotype = "this recording";
+
+    message = tr("You are exiting %1").arg(videotype);
+    
+    if (playbackinfo && BookmarkAllowed())
+    {
         options += tr("Save this position and go to the menu");
         options += tr("Do not save, just exit to the menu");
-        options += tr("Keep watching");
-        if (!prbuffer->isDVD())
-            options += tr("Delete this recording");
-
-        dialogname = "exitplayoptions";
     }
     else
-    {
+        options += tr("Exit %1").arg(videotype);
 
-        message = tr("You are exiting this Video/DVD");
-       
-        options += tr("Keep Watching");
-        options += tr("Exit Video");
-        
-        dialogname = "videoexitplayoptions";
-    }
+    if (playbackinfo && DeleteAllowed())
+        options += tr("Delete this recording");
+
+    options += tr("Keep watching");
+    dialogname = "exitplayoptions";
 
     if (GetOSD())
         GetOSD()->NewDialogBox(dialogname, message, options, 0);
@@ -7643,8 +7650,7 @@ bool TV::IsVideoExitDialog(void)
         return false;
     
     return (dialogname == "askdeleterecording" ||
-            dialogname == "exitplayoptions"    ||
-            dialogname == "videoexitplayoptions");
+            dialogname == "exitplayoptions");
 }
 
 void TV::setLastProgram(ProgramInfo *rcinfo)
