@@ -219,6 +219,8 @@ EOF
                 }
                 last if ($icon);
             }
+        # Skipped icon?
+            next unless ($icon);
         # Keep track of this match so we can submit it to the server later.
             $match_csv .= $icon_csv;
         # Download the icon
