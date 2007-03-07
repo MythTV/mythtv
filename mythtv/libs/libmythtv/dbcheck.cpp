@@ -2261,8 +2261,8 @@ static bool doUpgradeTVDatabaseSchema(void)
         const QString updates[] = {
 "CREATE TABLE IF NOT EXISTS customexample ("
 "  rulename VARCHAR(64) NOT NULL PRIMARY KEY, "
-"  fromclause text NOT NULL DEFAULT '',"
-"  whereclause text NOT NULL DEFAULT ''"
+"  fromclause text NOT NULL, "
+"  whereclause text NOT NULL "
 ");",
 ""
 };
