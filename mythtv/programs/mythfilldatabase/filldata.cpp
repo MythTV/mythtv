@@ -451,7 +451,6 @@ bool FillData::fillData(QValueList<Source> &sourcelist)
             {
                 VERBOSE(VB_GENERAL, QString("No channels are "
                     "configured to use grabber."));
-                    continue;
             }
         }
         else {
