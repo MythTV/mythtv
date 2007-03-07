@@ -3843,7 +3843,6 @@ void TVRec::TuningRestartRecorder(void)
 
     SwitchLiveTVRingBuffer(true, !had_dummyrec);
 
-    recorder->Reset();
     if (had_dummyrec)
     {
         recorder->SetRingBuffer(ringBuffer);
@@ -3851,6 +3850,7 @@ void TVRec::TuningRestartRecorder(void)
         recorder->SetRecording(progInfo);
         delete progInfo;
     }
+    recorder->Reset();
 
 #ifdef USING_DVB
     if (GetDVBRecorder())
