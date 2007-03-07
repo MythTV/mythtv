@@ -3526,7 +3526,7 @@ void TV::SwapPIP(void)
         usleep(5000);
     }
     VERBOSE(VB_PLAYBACK, "PiP NVP Started -- restart");
-    pipnvp->FastForward(pip.frame/piprecorder->GetFrameRate());
+    pipnvp->FastForward(main.frame/piprecorder->GetFrameRate());
 
     if (pipnvp->IsDecoderThreadAlive())
         nvp->SetPipPlayer(pipnvp);
