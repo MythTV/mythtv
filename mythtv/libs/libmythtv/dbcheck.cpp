@@ -10,7 +10,7 @@ using namespace std;
 #include "mythdbcon.h"
 
 /// This is the DB schema version expected by the running MythTV instance.
-const QString currentDatabaseVersion = "1183";
+const QString currentDatabaseVersion = "1184";
 
 static bool UpdateDBVersionNumber(const QString &newnumber);
 static bool performActualUpdate(const QString updates[], QString version,
@@ -257,6 +257,9 @@ setting the recording frame size, etc.
 'commfree' tells us whether this is a commercial free channel, such as
 those on the BBC and CBC networks. On commercial free channels we
 do not need to run the commercial detector.
+
+'commmethod' tells us which commercial flagger to use on the channel, the
+default is to use the global setting
 
 'visible' tells us whether we should show this channel in the channel
 guide.
@@ -2969,6 +2972,17 @@ thequery,
             return false;
     }
 
+    if (dbver == "1183")
+    {
+        const QString updates[] = {
+"ALTER TABLE channel ADD COLUMN commmethod INT NOT NULL default '-1';",
+"UPDATE channel SET commmethod = -2 WHERE commfree = 1;",
+""
+};
+        if (!performActualUpdate(updates, "1184", dbver))
+            return false;
+    }
+
 //"ALTER TABLE cardinput DROP COLUMN preference;" in 0.22
 //"ALTER TABLE channel DROP COLUMN atscsrcid;" in 0.22
 //"ALTER TABLE recordedmarkup DROP COLUMN offset;" in 0.22
@@ -2980,6 +2994,7 @@ thequery,
 //"ALTER TABLE capturecard DROP firewire_port;" in 0.22
 //"ALTER TABLE capturecard DROP firewire_node;" in 0.22
 //"ALTER TABLE recordedmarkup DROP COLUMN offset;" in 0.22
+//"ALTER TABLE channel DROP COLUMN commfree;" in 0.22
 
     return true;
 }

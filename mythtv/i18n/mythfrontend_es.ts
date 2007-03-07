@@ -2344,7 +2344,7 @@ Volviendo al menú anterior.</translation>
         <translation type="obsolete">Fotogramas vacíos (por defecto)</translation>
     </message>
     <message>
-        <source>Blank Frame + Scene Change Detection</source>
+        <source>Blank Frame + Scene Change</source>
         <translation>Fotogramas vacíos + Cambio de escena</translation>
     </message>
     <message>
@@ -3839,7 +3839,7 @@ Su grabber no proporciona números de canal, así que debe establecerlos manualm
     </message>
     <message>
         <source>If set automatic commercial flagging will be skipped for this channel.  Useful for premium channels like HBO.</source>
-        <translation>Si se activa el marcado automático de anuncios no se usará en en este canal. Útil para canales de pago.</translation>
+        <translation type="obsolete">Si se activa el marcado automático de anuncios no se usará en en este canal. Útil para canales de pago.</translation>
     </message>
     <message>
         <source>Position Saved</source>
@@ -6212,7 +6212,7 @@ La mayoría de las tarjetas pueden autodetectar, así que déjelo en Auto a no s
     </message>
     <message>
         <source>Aspect Ratio when watching a video at a specific resolution.</source>
-        <translation>Relación de aspecto cuando se vea un video a una resolución específica.</translation>
+        <translation type="obsolete">Relación de aspecto cuando se vea un video a una resolución específica.</translation>
     </message>
     <message>
         <source>Aspect</source>
@@ -9186,6 +9186,37 @@ The frequency for this channel in</source>
         <source>Match duplicates using subtitle then description</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Commercial Flagging Method</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Changes the method of commercial detection used for recordings on this channel or skips detection by marking the channel as Commercial Free.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use Global Setting</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Channel Options - Filters</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Aspect ratio when watching a video at a specific resolution.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>RecordingProfileEditor</name>
+    <message>
+        <source>Add Recording Profile</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enter the name of the new profile</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ScanCountry</name>
@@ -9414,6 +9445,10 @@ Sin más detalles</translation>
     </message>
     <message>
         <source>search rules are defined</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Scheduled Run Time:</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -10211,6 +10246,10 @@ Select a Current Recording</source>
     </message>
     <message>
         <source>Password Failed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Screen Shot</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

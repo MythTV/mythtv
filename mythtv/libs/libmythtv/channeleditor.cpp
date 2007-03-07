@@ -33,6 +33,10 @@ ChannelWizard::ChannelWizard(int id, int default_sourceid)
         new ChannelOptionsCommon(*cid, default_sourceid);
     addChild(common);
 
+    ChannelOptionsFilters *filters =
+        new ChannelOptionsFilters(*cid);
+    addChild(filters);
+
     int cardtypes = countCardtypes();
     bool hasDVB = cardTypesInclude("DVB");
 

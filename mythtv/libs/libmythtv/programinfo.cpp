@@ -699,7 +699,7 @@ ProgramInfo *ProgramInfo::GetProgramAtDateTime(const QString &channel,
 
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("SELECT chanid, channum, callsign, name, "
-                  "commfree, outputfilters "
+                  "commmethod, outputfilters "
                   "FROM channel "
                   "WHERE chanid = :CHANID ;");
     query.bindValue(":CHANID", channel);
@@ -728,7 +728,7 @@ ProgramInfo *ProgramInfo::GetProgramAtDateTime(const QString &channel,
     p->chansign           = QString::fromUtf8(query.value(2).toString());
     p->channame           = QString::fromUtf8(query.value(3).toString());
     p->repeat             = 0;
-    p->chancommfree       = query.value(4).toInt();
+    p->chancommfree       = (query.value(4).toInt() == -2);
     p->chanOutputFilters  = query.value(5).toString();
     p->seriesid           = "";
     p->programid          = "";
@@ -835,7 +835,7 @@ ProgramInfo *ProgramInfo::GetProgramFromRecorded(const QString &channel,
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("SELECT recorded.chanid,starttime,endtime,title, "
                   "subtitle,description,channel.channum, "
-                  "channel.callsign,channel.name,channel.commfree, "
+                  "channel.callsign,channel.name,channel.commmethod, "
                   "channel.outputfilters,seriesid,programid,filesize, "
                   "lastmodified,stars,previouslyshown,originalairdate, "
                   "hostname,recordid,transcoder,playgroup, "
@@ -866,7 +866,7 @@ ProgramInfo *ProgramInfo::GetProgramFromRecorded(const QString &channel,
         proginfo->chanstr = query.value(6).toString();
         proginfo->chansign = QString::fromUtf8(query.value(7).toString());
         proginfo->channame = QString::fromUtf8(query.value(8).toString());
-        proginfo->chancommfree = query.value(9).toInt();
+        proginfo->chancommfree = (query.value(9).toInt() == -2);
         proginfo->chanOutputFilters = query.value(10).toString();
         proginfo->seriesid = query.value(11).toString();
         proginfo->programid = query.value(12).toString();
@@ -4446,7 +4446,7 @@ bool ProgramList::FromProgram(const QString &sql, MSqlBindings &bindings,
         "SELECT DISTINCT program.chanid, program.starttime, program.endtime, "
         "    program.title, program.subtitle, program.description, "
         "    program.category, channel.channum, channel.callsign, "
-        "    channel.name, program.previouslyshown, channel.commfree, "
+        "    channel.name, program.previouslyshown, channel.commmethod, "
         "    channel.outputfilters, program.seriesid, program.programid, "
         "    program.airdate, program.stars, program.originalairdate, "
         "    program.category_type, oldrecstatus.recordid, "
@@ -4505,7 +4505,7 @@ bool ProgramList::FromProgram(const QString &sql, MSqlBindings &bindings,
         p->chansign = QString::fromUtf8(query.value(8).toString());
         p->channame = QString::fromUtf8(query.value(9).toString());
         p->repeat = query.value(10).toInt();
-        p->chancommfree = query.value(11).toInt();
+        p->chancommfree = (query.value(11).toInt() == -2);
         p->chanOutputFilters = query.value(12).toString();
         p->seriesid = query.value(13).toString();
         p->programid = query.value(14).toString();

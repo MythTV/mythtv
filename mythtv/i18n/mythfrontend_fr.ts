@@ -2998,7 +2998,7 @@ Je reviens au menu précédent.</translation>
     </message>
     <message>
         <source>If set automatic commercial flagging will be skipped for this channel.  Useful for premium channels like HBO.</source>
-        <translation>Cette option désactive la détection des pubs pour cette chaîne.  Utile pour les chaînes de qualité comme HBO.</translation>
+        <translation type="obsolete">Cette option désactive la détection des pubs pour cette chaîne.  Utile pour les chaînes de qualité comme HBO.</translation>
     </message>
     <message>
         <source>Visible</source>
@@ -4021,7 +4021,7 @@ Votre carte d&apos;acquisition n&apos;a pas fourni de canaux. Vous devez les sai
         <translation type="obsolete">Détection d&apos;une frame vide (défaut)</translation>
     </message>
     <message>
-        <source>Blank Frame + Scene Change Detection</source>
+        <source>Blank Frame + Scene Change</source>
         <translation>Détection d&apos;une frame vide avec un changement de scène</translation>
     </message>
     <message>
@@ -6166,7 +6166,7 @@ La plupart des cartes peuvent autodétecter cela maintenant. Laisser Auto sauf s
     </message>
     <message>
         <source>Aspect Ratio when watching a video at a specific resolution.</source>
-        <translation>Rapport d&apos;aspect lors du visionnage à une résolution spécifique.</translation>
+        <translation type="obsolete">Rapport d&apos;aspect lors du visionnage à une résolution spécifique.</translation>
     </message>
     <message>
         <source>Aspect</source>
@@ -9082,6 +9082,37 @@ The frequency for this channel in</source>
         <source>Match duplicates using subtitle then description</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Commercial Flagging Method</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Changes the method of commercial detection used for recordings on this channel or skips detection by marking the channel as Commercial Free.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use Global Setting</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Channel Options - Filters</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Aspect ratio when watching a video at a specific resolution.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>RecordingProfileEditor</name>
+    <message>
+        <source>Add Recording Profile</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enter the name of the new profile</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ScanCountry</name>
@@ -9310,6 +9341,10 @@ Pas d&apos;autres informations</translation>
     </message>
     <message>
         <source>search rules are defined</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Scheduled Run Time:</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -10107,6 +10142,10 @@ Select a Current Recording</source>
     </message>
     <message>
         <source>Password Failed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Screen Shot</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

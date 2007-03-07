@@ -388,9 +388,11 @@ static GlobalComboBox *CommercialSkipMethod()
 {
     GlobalComboBox *bc = new GlobalComboBox("CommercialSkipMethod");
     bc->setLabel(QObject::tr("Commercial Skip Method"));
+
+    // need to keep this in sync with libs/libmythtv/channelsettings.cpp
     bc->addSelection(QObject::tr("All Available Methods"), "255");
     bc->addSelection(QObject::tr("Blank Frame Detection"), "1");
-    bc->addSelection(QObject::tr("Blank Frame + Scene Change Detection"), "3");
+    bc->addSelection(QObject::tr("Blank Frame + Scene Change"), "3");
     bc->addSelection(QObject::tr("Scene Change Detection"), "2");
     bc->addSelection(QObject::tr("Logo Detection"), "4");
     bc->addSelection(QObject::tr("Experimental"), "511");

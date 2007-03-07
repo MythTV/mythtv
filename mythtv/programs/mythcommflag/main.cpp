@@ -454,6 +454,32 @@ int DoFlagCommercials(bool showPercentage, bool fullSpeed, bool inJobQueue,
 int FlagCommercials(QString chanid, QString starttime)
 {
     int breaksFound = 0;
+
+    if (commDetectMethod == COMM_DETECT_UNINIT)
+    {
+        MSqlQuery query(MSqlQuery::InitCon());
+        query.prepare("SELECT commmethod FROM channel "
+                        "WHERE chanid = :CHANID;");
+        query.bindValue(":CHANID", chanid);
+
+        if (query.exec() && query.isActive() && query.size() > 0)
+        {
+            query.next();
+            commDetectMethod = (enum SkipTypes)query.value(0).toInt();
+            if (commDetectMethod == COMM_DETECT_COMMFREE)
+            {
+                commDetectMethod = COMM_DETECT_UNINIT;
+                VERBOSE(VB_COMMFLAG,
+                        QString("Chanid %1 is marked as being Commercial Free, "
+                                "we will use the default commercial detection "
+                                "method").arg(chanid));
+            }
+            else if (commDetectMethod != COMM_DETECT_UNINIT)
+                VERBOSE(VB_COMMFLAG, QString("Using method: %1 from channel %2")
+                                            .arg(commDetectMethod).arg(chanid));
+        }
+    }
+
     if (commDetectMethod == COMM_DETECT_UNINIT)
         commDetectMethod = (enum SkipTypes)gContext->GetNumSetting(
                                     "CommercialSkipMethod", COMM_DETECT_ALL);

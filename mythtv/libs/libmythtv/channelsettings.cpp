@@ -224,16 +224,27 @@ class XmltvID : public LineEditSetting, public ChannelDBStorage
     }
 };
 
-class CommFree : public CheckBoxSetting, public ChannelDBStorage
+class CommMethod : public ComboBoxSetting, public ChannelDBStorage
 {
   public:
-    CommFree(const ChannelID &id) :
-        CheckBoxSetting(this), ChannelDBStorage(this, id, "commfree")
+    CommMethod(const ChannelID &id) :
+       ComboBoxSetting(this), ChannelDBStorage(this, id, "commmethod")
     {
-        setLabel(QObject::tr("Commercial Free"));
-        setHelpText(QObject::tr("If set automatic commercial flagging will "
-                "be skipped for this channel.  Useful for "
-                "premium channels like HBO."));
+        setLabel(QObject::tr("Commercial Flagging Method"));
+        setHelpText(QObject::tr("Changes the method of "
+               "commercial detection used for recordings on this channel or "
+               "skips detection by marking the channel as Commercial Free."));
+        addSelection(QObject::tr("Use Global Setting"), "-1");
+
+        // Need to keep this in sync w/ programs/mythfrontend/globalsettings.cpp
+        addSelection(QObject::tr("All Available Methods"), "255");
+        addSelection(QObject::tr("Blank Frame Detection"), "1");
+        addSelection(QObject::tr("Blank Frame + Scene Change"), "3");
+        addSelection(QObject::tr("Scene Change Detection"), "2");
+        addSelection(QObject::tr("Logo Detection"), "4");
+        addSelection(QObject::tr("Experimental"), "511");
+        addSelection(QObject::tr("Commercial Free"), "-2");
+
     }
 };
 
@@ -349,8 +360,6 @@ ChannelOptionsCommon::ChannelOptionsCommon(const ChannelID &id,
   
     HorizontalConfigurationGroup *group1 =
         new HorizontalConfigurationGroup(false,false,true,true);
-    HorizontalConfigurationGroup *lefthoz =
-        new HorizontalConfigurationGroup(false,false,true,true);
     HorizontalConfigurationGroup *bottomhoz =
         new HorizontalConfigurationGroup(false, true);
     VerticalConfigurationGroup *left =
@@ -358,12 +367,10 @@ ChannelOptionsCommon::ChannelOptionsCommon(const ChannelID &id,
     VerticalConfigurationGroup *right =
         new VerticalConfigurationGroup(false, true);
   
-    lefthoz->addChild(new Visible(id));
-    lefthoz->addChild(new CommFree(id));
 
     left->addChild(new Channum(id));
     left->addChild(new Callsign(id));
-    left->addChild(lefthoz);
+    left->addChild(new Visible(id));
   
     right->addChild(source);
     right->addChild(new ChannelTVFormat(id));
@@ -377,9 +384,8 @@ ChannelOptionsCommon::ChannelOptionsCommon(const ChannelID &id,
     bottomhoz->addChild(new TimeOffset(id));
 
     addChild(group1);
+    addChild(new CommMethod(id));
     addChild(new Icon(id));
-    addChild(new VideoFilters(id));
-    addChild(new OutputFilters(id));
     addChild(bottomhoz);
 
     connect(onairguide, SIGNAL(valueChanged(     bool)),
@@ -441,6 +447,16 @@ void ChannelOptionsCommon::sourceChanged(const QString& sourceid)
 
     onairguide->setEnabled(supports_eit);
     xmltvID->setEnabled(!uses_eit_only);
+}
+
+ChannelOptionsFilters::ChannelOptionsFilters(const ChannelID& id) :
+    VerticalConfigurationGroup(false, true, false, false)
+{
+    setLabel(QObject::tr("Channel Options - Filters"));
+    setUseLabel(false);
+
+    addChild(new VideoFilters(id));
+    addChild(new OutputFilters(id));
 }
 
 ChannelOptionsV4L::ChannelOptionsV4L(const ChannelID& id) :

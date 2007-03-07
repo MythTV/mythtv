@@ -2027,7 +2027,7 @@ Returning to the previous menu.</source>
         <translation>Método de Salto de Anúncios</translation>
     </message>
     <message>
-        <source>Blank Frame + Scene Change Detection</source>
+        <source>Blank Frame + Scene Change</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -3443,10 +3443,6 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>(All)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>If set automatic commercial flagging will be skipped for this channel.  Useful for premium channels like HBO.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -5630,10 +5626,6 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     </message>
     <message>
         <source>Aspect ratio when watching a video.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Aspect Ratio when watching a video at a specific resolution.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -8383,6 +8375,37 @@ The frequency for this channel in</source>
         <source>This setting and the preceding one define a time period when the mythfilldatabase process is allowed to run.  For example, setting Start to 11 and End to 13 would mean that the process would only run between 11:00 AM and 1:59 PM.</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Commercial Flagging Method</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Changes the method of commercial detection used for recordings on this channel or skips detection by marking the channel as Commercial Free.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use Global Setting</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Channel Options - Filters</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Aspect ratio when watching a video at a specific resolution.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>RecordingProfileEditor</name>
+    <message>
+        <source>Add Recording Profile</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enter the name of the new profile</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ScanCountry</name>
@@ -8580,6 +8603,10 @@ No other details</source>
     </message>
     <message>
         <source>search rules are defined</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Scheduled Run Time:</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -9305,6 +9332,10 @@ Select a Current Recording</source>
     </message>
     <message>
         <source>Password Failed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Screen Shot</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

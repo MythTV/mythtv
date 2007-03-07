@@ -2151,7 +2151,7 @@ Het volgende scherm zal leeg zijn. Ga terug om het menu opnieuw weer te geven.</
         <translation>Reclame overslaan</translation>
     </message>
     <message>
-        <source>Blank Frame + Scene Change Detection</source>
+        <source>Blank Frame + Scene Change</source>
         <translation>Detectie &quot;blank frame&quot; + scèneverandering</translation>
     </message>
     <message>
@@ -3612,7 +3612,7 @@ Als er een opname start binnen deze tijdsperiode, zal de backend niet uitschakel
     </message>
     <message>
         <source>If set automatic commercial flagging will be skipped for this channel.  Useful for premium channels like HBO.</source>
-        <translation>Indien geselecteerd zal het markeren van reclameblokken overgeslagen worden voor deze zender. Bruikbaar voor zenders zonder reclame.</translation>
+        <translation type="obsolete">Indien geselecteerd zal het markeren van reclameblokken overgeslagen worden voor deze zender. Bruikbaar voor zenders zonder reclame.</translation>
     </message>
     <message>
         <source>Position Saved</source>
@@ -5925,7 +5925,7 @@ De meeste kaarten kunnen dit automatisch detecteren, dus laat op auto staan, ten
     </message>
     <message>
         <source>Aspect Ratio when watching a video at a specific resolution.</source>
-        <translation>Beeldverhouding wanneer een video op een bepaalde resolutie wordt gekeken.</translation>
+        <translation type="obsolete">Beeldverhouding wanneer een video op een bepaalde resolutie wordt gekeken.</translation>
     </message>
     <message>
         <source>Leave at &quot;Default&quot; to use ratio reported by the monitor.  Set to 16:9 or 4:3 to force a specific aspect ratio.</source>
@@ -8795,6 +8795,37 @@ The frequency for this channel in</source>
         <source>Match duplicates using subtitle then description</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Commercial Flagging Method</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Changes the method of commercial detection used for recordings on this channel or skips detection by marking the channel as Commercial Free.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use Global Setting</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Channel Options - Filters</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Aspect ratio when watching a video at a specific resolution.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>RecordingProfileEditor</name>
+    <message>
+        <source>Add Recording Profile</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enter the name of the new profile</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ScanCountry</name>
@@ -9003,6 +9034,10 @@ Geen verdere details</translation>
     </message>
     <message>
         <source>search rules are defined</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Scheduled Run Time:</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -9700,6 +9735,10 @@ Select a Current Recording</source>
     </message>
     <message>
         <source>Password Failed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Screen Shot</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

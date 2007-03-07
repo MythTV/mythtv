@@ -1258,7 +1258,7 @@ bool ChannelUtil::GetChannelData(
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare(
         "SELECT finetune, freqid, tvformat, freqtable, "
-        "       commfree, mplexid, "
+        "       commmethod, mplexid, "
         "       atsc_major_chan, atsc_minor_chan, serviceid "
         "FROM channel, videosource "
         "WHERE videosource.sourceid = channel.sourceid AND "
@@ -1285,7 +1285,7 @@ bool ChannelUtil::GetChannelData(
     freqid        = query.value(1).toString();
     tvformat      = query.value(2).toString();
     freqtable     = query.value(3).toString();
-    commfree      = query.value(4).toBool();
+    commfree      = (query.value(4).toInt() == -2);
     mplexid       = query.value(5).toUInt();
     atsc_major    = query.value(6).toUInt();
     atsc_minor    = query.value(7).toUInt();

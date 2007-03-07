@@ -3,6 +3,7 @@
 
 // This is used as a bitmask.
 enum SkipTypes {
+    COMM_DETECT_COMMFREE    = -2,
     COMM_DETECT_UNINIT      = -1,
     COMM_DETECT_OFF         = 0x00000000,
     COMM_DETECT_BLANKS      = 0x00000001,

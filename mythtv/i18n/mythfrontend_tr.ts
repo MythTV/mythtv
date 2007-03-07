@@ -2394,7 +2394,7 @@ Returning to the previous menu.</source>
     </message>
     <message>
         <source>If set automatic commercial flagging will be skipped for this channel.  Useful for premium channels like HBO.</source>
-        <translation>Bu ayarlandığında, bu kanal için otomatik reklam işaretleme atlanır.  HBO gibi özel kanallar için kullanışlıdır.</translation>
+        <translation type="obsolete">Bu ayarlandığında, bu kanal için otomatik reklam işaretleme atlanır.  HBO gibi özel kanallar için kullanışlıdır.</translation>
     </message>
     <message>
         <source>Visible</source>
@@ -4885,7 +4885,7 @@ Returning to the previous menu.</source>
         <translation type="obsolete">Boş Çerçeve Saptaması (varsayılan)</translation>
     </message>
     <message>
-        <source>Blank Frame + Scene Change Detection</source>
+        <source>Blank Frame + Scene Change</source>
         <translation>Boş Çerçeve + Sahne Değiştirme Saptaması</translation>
     </message>
     <message>
@@ -5706,7 +5706,7 @@ Returning to the previous menu.</source>
     </message>
     <message>
         <source>Aspect Ratio when watching a video at a specific resolution.</source>
-        <translation>Belirli bir çözünürlükte bir video izlediğinizdeki en boy oranı.</translation>
+        <translation type="obsolete">Belirli bir çözünürlükte bir video izlediğinizdeki en boy oranı.</translation>
     </message>
     <message>
         <source>Aspect</source>
@@ -9225,6 +9225,37 @@ The frequency for this channel in</source>
         <source>Match duplicates using subtitle then description</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Commercial Flagging Method</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Changes the method of commercial detection used for recordings on this channel or skips detection by marking the channel as Commercial Free.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use Global Setting</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Channel Options - Filters</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Aspect ratio when watching a video at a specific resolution.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>RecordingProfileEditor</name>
+    <message>
+        <source>Add Recording Profile</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enter the name of the new profile</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ScanCountry</name>
@@ -9459,6 +9490,10 @@ No other details</source>
     </message>
     <message>
         <source>search rules are defined</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Scheduled Run Time:</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -10260,6 +10295,10 @@ Select a Current Recording</source>
     </message>
     <message>
         <source>Password Failed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Screen Shot</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

@@ -127,6 +127,11 @@ class ChannelOptionsCommon: public VerticalConfigurationGroup
     XmltvID    *xmltvID;
 };
 
+class ChannelOptionsFilters: public VerticalConfigurationGroup {
+public:
+    ChannelOptionsFilters(const ChannelID& id);
+};
+
 class ChannelOptionsV4L: public VerticalConfigurationGroup {
 public:
     ChannelOptionsV4L(const ChannelID& id);

@@ -2248,7 +2248,7 @@ Tagasipöördumine eelmisesse menüüsse.</translation>
     </message>
     <message>
         <source>If set automatic commercial flagging will be skipped for this channel.  Useful for premium channels like HBO.</source>
-        <translation>Märkimisel ei tehta sellele kanalile automaatset reklaamide märgistamist.  Kasutatakse tasuliste kanalite, nagu HBO puhul.</translation>
+        <translation type="obsolete">Märkimisel ei tehta sellele kanalile automaatset reklaamide märgistamist.  Kasutatakse tasuliste kanalite, nagu HBO puhul.</translation>
     </message>
     <message>
         <source>Visible</source>
@@ -4397,7 +4397,7 @@ Sinu tõmbaja ei sisalda kanalite numbreid, pead need käsitsi panema.</translat
         <translation>Reklaamide vahelejätmise meetod</translation>
     </message>
     <message>
-        <source>Blank Frame + Scene Change Detection</source>
+        <source>Blank Frame + Scene Change</source>
         <translation>Tühja kaadri + stseeni muutuse avastamine</translation>
     </message>
     <message>
@@ -5002,7 +5002,7 @@ Sinu tõmbaja ei sisalda kanalite numbreid, pead need käsitsi panema.</translat
     </message>
     <message>
         <source>Aspect Ratio when watching a video at a specific resolution.</source>
-        <translation>Kuvasuhe erilise kuvatihedusega video vaatamisel.</translation>
+        <translation type="obsolete">Kuvasuhe erilise kuvatihedusega video vaatamisel.</translation>
     </message>
     <message>
         <source>Aspect</source>
@@ -9232,6 +9232,37 @@ The frequency for this channel in</source>
         <source>Match duplicates using subtitle then description</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Commercial Flagging Method</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Changes the method of commercial detection used for recordings on this channel or skips detection by marking the channel as Commercial Free.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use Global Setting</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Channel Options - Filters</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Aspect ratio when watching a video at a specific resolution.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>RecordingProfileEditor</name>
+    <message>
+        <source>Add Recording Profile</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enter the name of the new profile</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>RecordingType</name>
@@ -9476,6 +9507,10 @@ Rohkem andmeid pole</translation>
     <message>
         <source>search rules are defined</source>
         <translation>otsingureeglid määratletud</translation>
+    </message>
+    <message>
+        <source>Scheduled Run Time:</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -10288,6 +10323,10 @@ Select a Current Recording</source>
     </message>
     <message>
         <source>You are exiting this %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Screen Shot</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

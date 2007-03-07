@@ -2159,7 +2159,7 @@ void Scheduler::AddNewRecords(void)
 "program.starttime - INTERVAL RECTABLE.startoffset minute AS recstartts, "
 "program.endtime + INTERVAL RECTABLE.endoffset minute AS recendts, "
 "program.previouslyshown, RECTABLE.recgroup, RECTABLE.dupmethod, "
-"channel.commfree, capturecard.cardid, "
+"channel.commmethod, capturecard.cardid, "
 "cardinput.cardinputid, UPPER(cardinput.shareable) = 'Y' AS shareable, "
 "program.seriesid, program.programid, program.category_type, "
 "program.airdate, program.stars, program.originalairdate, RECTABLE.inactive, "
@@ -2311,7 +2311,7 @@ void Scheduler::AddNewRecords(void)
         p->recgroup = result.value(21).toString();
         p->storagegroup = result.value(46).toString();
         p->playgroup = result.value(36).toString();
-        p->chancommfree = result.value(23).toInt();
+        p->chancommfree = (result.value(23).toInt() == -2);
         p->hostname = result.value(47).toString();
         p->cardid = result.value(24).toInt();
         p->inputid = result.value(25).toInt();
@@ -2587,7 +2587,7 @@ void Scheduler::findAllScheduledPrograms(list<ProgramInfo *> &proglist)
 "RECTABLE.startdate, RECTABLE.endtime, RECTABLE.enddate, RECTABLE.title, "
 "RECTABLE.subtitle, RECTABLE.description, RECTABLE.recpriority, RECTABLE.type, "
 "channel.name, RECTABLE.recordid, RECTABLE.recgroup, RECTABLE.dupin, "
-"RECTABLE.dupmethod, channel.commfree, channel.channum, RECTABLE.station, "
+"RECTABLE.dupmethod, channel.commmethod, channel.channum, RECTABLE.station, "
 "RECTABLE.seriesid, RECTABLE.programid, RECTABLE.category, RECTABLE.findid, "
 "RECTABLE.playgroup "
 "FROM RECTABLE "
@@ -2659,7 +2659,7 @@ void Scheduler::findAllScheduledPrograms(list<ProgramInfo *> &proglist)
             proginfo->dupin = RecordingDupInType(result.value(13).toInt());
             proginfo->dupmethod =
                 RecordingDupMethodType(result.value(14).toInt());
-            proginfo->chancommfree = result.value(15).toInt();
+            proginfo->chancommfree = (result.value(15).toInt() == -2);
             proginfo->chanstr = result.value(16).toString();
             if (proginfo->chanstr.isNull())
                 proginfo->chanstr = "";

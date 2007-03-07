@@ -219,7 +219,7 @@ CustomEdit::CustomEdit(MythMainWindow *parent, const char *name,
 
     m_clause->insertItem(tr("Only channels marked as commercial free"));
     m_cfrom << "";
-    m_csql << "channel.commfree > 0 ";
+    m_csql << "channel.commmethod = -2 ";
 
     m_clause->insertItem(tr("Only shows marked as HDTV"));
     m_cfrom << "";
