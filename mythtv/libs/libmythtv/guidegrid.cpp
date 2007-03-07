@@ -713,6 +713,9 @@ void GuideGrid::fillProgramRowInfos(unsigned int row)
         m_programInfos[row][x] = NULL;
     }
 
+    if (m_channelInfos.size() == 0)
+        return;
+
     int chanNum = row + m_currentStartChannel;
     if (chanNum >= (int) m_channelInfos.size())
         chanNum -= (int) m_channelInfos.size();
