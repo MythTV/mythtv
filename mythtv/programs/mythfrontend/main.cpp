@@ -927,8 +927,8 @@ int main(int argc, char **argv)
                 for (unsigned int index = 0; index < pairs.size(); ++index)
                 {
                     value = gContext->GetSetting(pairs[index]);
-                    cerr << "\tSettings Value : " << pairs[index];
-                    cerr <<  " = " << value << endl;
+                    cout << "\tSettings Value : " << pairs[index];
+                    cout <<  " = " << value << endl;
                 }
                 return FRONTEND_EXIT_OK;
             }
