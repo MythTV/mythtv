@@ -1340,6 +1340,13 @@ int AvFormatDecoder::ScanStreams(bool novideo)
                         /* force_xv     */ force_xv);
                     bool vcd, idct, mc;
                     enc->codec_id = myth2av_codecid(mcid, vcd, idct, mc);
+                    if (ringBuffer->isDVD() && (mcid == video_codec_id) &&
+                            dvd_video_codec_changed)
+                    {
+                        dvd_video_codec_changed = false;
+                        dvd_xvmc_enabled = false;
+                    }
+
                     video_codec_id = mcid;
                     if (!force_xv && kCodec_NORMAL_END < mcid && kCodec_STD_XVMC_END > mcid)
                     {
@@ -2801,7 +2808,13 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
                 int video_width = GetNVP()->GetVideoWidth();
                 if (dvd_xvmc_enabled && GetNVP() && GetNVP()->getVideoOutput())
                 {
-                    bool dvd_xvmc_active = GetNVP()->getVideoOutput()->hasMCAcceleration();
+                    bool dvd_xvmc_active = false;
+                    if (video_codec_id > kCodec_NORMAL_END &&
+                        video_codec_id < kCodec_STD_XVMC_END)
+                    {
+                        dvd_xvmc_active = true;
+                    }
+
                     bool indvdmenu   = ringBuffer->InDVDMenuOrStillFrame();
                     if ((indvdmenu && dvd_xvmc_active) ||
                         ((!indvdmenu && !dvd_xvmc_active)))
