@@ -159,6 +159,8 @@ EOF
         $count = 0;
         foreach my $chanid (sort { $Myth->{'channels'}{$a}{'name'} cmp $Myth->{'channels'}{$b}{'name'} } keys %{$Myth->{'channels'}}) {
             my $channel = $Myth->{'channels'}{$chanid};
+        # Skip invisible channels
+            next unless ($channel->{'visible'});
         # Skip channels we already have icons for?
             next if ($channel->{'icon'} && !$rescan);
         # Load the fuzzy matches
