@@ -115,6 +115,17 @@ static HostCheckBox *IgnoreID3Tags()
     return gc;
 };
 
+static HostComboBox *TagEncoding()
+{
+    HostComboBox *gc = new HostComboBox("MusicTagEncoding");
+    gc->setLabel(QObject::tr("Tag Encoding"));
+    gc->addSelection(QObject::tr("UTF-16"), "utf16");
+    gc->addSelection(QObject::tr("UTF-8"), "utf8");
+    gc->addSelection(QObject::tr("Ascii"), "ascii");
+    gc->setHelpText(QObject::tr("Some mp3 players don't understand tags encoded in UTF8 or UTF16, this setting allows you to change the encoding format used. Currently applies only to ID3 tags."));
+    return gc;
+};
+
 static HostCheckBox *AutoLookupCD()
 {
     HostCheckBox *gc = new HostCheckBox("AutoLookupCD");
@@ -514,6 +525,7 @@ MusicGeneralSettings::MusicGeneralSettings(void)
     general->addChild(TreeLevels());
     general->addChild(NonID3FileNameFormat());
     general->addChild(IgnoreID3Tags());
+    general->addChild(TagEncoding());
     general->addChild(AutoLookupCD());
     general->addChild(AutoPlayCD());
     general->addChild(KeyboardAccelerators());

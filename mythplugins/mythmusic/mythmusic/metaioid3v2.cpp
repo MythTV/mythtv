@@ -542,8 +542,20 @@ bool MetaIOID3v2::setComment(id3_tag *pTag,
     if (NULL == p_frame)
       return false;
 
+    QString prefencoding = gContext->GetSetting("MusicTagEncoding");
+    enum id3_field_textencoding encoding = ID3_FIELD_TEXTENCODING_UTF_16;
+
+    if (prefencoding == "ascii")
+    {
+        encoding = ID3_FIELD_TEXTENCODING_ISO_8859_1;
+    }
+    else if (prefencoding == "utf8")
+    {
+        encoding = ID3_FIELD_TEXTENCODING_UTF_8;
+    }
+
     if (id3_field_settextencoding(&p_frame->fields[0],
-                                  ID3_FIELD_TEXTENCODING_UTF_16) != 0)
+                                  encoding) != 0)
     {
         id3_frame_delete(p_frame);
         return false;
