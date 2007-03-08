@@ -3628,8 +3628,8 @@ void ProgramInfo::showDetails(void) const
 
             while(query.next())
             {
-                role = query.value(0).toString();
-                pname = query.value(1).toString();
+                role = QString::fromUtf8(query.value(0).toString());
+                pname = QString::fromUtf8(query.value(1).toString());
 
                 if (rstr == role)
                     plist += ", " + pname;
