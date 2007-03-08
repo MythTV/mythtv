@@ -3058,21 +3058,22 @@ void MainServer::HandleRemoteEncoder(QStringList &slist, QStringList &commands,
     MythSocket *pbssock = pbs->getSocket();
 
     int recnum = commands[1].toInt();
+    QStringList retlist;
 
     QMap<int, EncoderLink *>::Iterator iter = encoderList->find(recnum);
     if (iter == encoderList->end())
     {
         VERBOSE(VB_IMPORTANT, "MainServer: " +
                 QString("HandleRemoteEncoder(cmd %1) ").arg(slist[1]) +
-                QString("Unknown encoder: %1, exiting").arg(recnum));
-        exit(BACKEND_BUGGY_EXIT_UNKNOWN_ENC);
+                QString("Unknown encoder: %1").arg(recnum));
+        retlist << QString::number((int) kState_Error);
+        SendResponse(pbssock, retlist);
+        return;
     }
 
     EncoderLink *enc = iter.data();
 
     QString command = slist[1];
-
-    QStringList retlist;
 
     if (command == "GET_STATE")
     {
@@ -3345,17 +3346,19 @@ void MainServer::HandleFileTransferQuery(QStringList &slist,
 
     int recnum = commands[1].toInt();
 
+    QStringList retlist;
     FileTransfer *ft = getFileTransferByID(recnum);
     if (!ft)
     {
         VERBOSE(VB_IMPORTANT, QString("Unknown file transfer socket: %1")
                                .arg(recnum));
-        exit(BACKEND_BUGGY_EXIT_UNKNOWN_FILE_SOCK);
+        retlist << QString("ERROR: Unknown file transfer socket: %1")
+                           .arg(recnum);
+        SendResponse(pbssock, retlist);
+        return;
     }
 
     QString command = slist[1];
-
-    QStringList retlist;
 
     ft->UpRef();
 
