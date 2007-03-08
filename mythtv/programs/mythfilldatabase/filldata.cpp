@@ -382,22 +382,28 @@ bool FillData::fillData(QValueList<Source> &sourcelist)
     int total_sources = sourcelist.size();
     int source_channels = 0;
 
-    query.exec(QString("SELECT MAX(endtime) FROM program WHERE manualid=0;"));
-    if (query.isActive() && query.size() > 0)
-    {
-        query.next();
-
-        if (!query.isNull(0))
-            GuideDataBefore = QDateTime::fromString(query.value(0).toString(),
-                                                    Qt::ISODate);
-    }
-
     QString sidStr = QString("Updating source #%1 (%2) with grabber %3");
 
     need_post_grab_proc = false;
+    int nonewdata = 0;
 
     for (it = sourcelist.begin(); it != sourcelist.end(); ++it)
     {
+
+        query.prepare("SELECT MAX(endtime) FROM program p LEFT JOIN channel c "
+                      "ON p.chanid=c.chanid WHERE c.sourceid= :SRCID "
+                      "AND manualid = 0;");
+        query.bindValue(":SRCID", (*it).id);
+        query.exec();
+        if (query.isActive() && query.size() > 0)
+        {
+            query.next();
+
+            if (!query.isNull(0))
+                GuideDataBefore = QDateTime::fromString(query.value(0).toString(),
+                                                        Qt::ISODate);
+        }
+
         channel_update_run = false;
         endofdata = false;
 
@@ -818,28 +824,37 @@ bool FillData::fillData(QValueList<Source> &sourcelist)
         {
             break;
         }
+
+        query.prepare("SELECT MAX(endtime) FROM program p LEFT JOIN channel c "
+                      "ON p.chanid=c.chanid WHERE c.sourceid= :SRCID "
+                      "AND manualid = 0;");
+        query.bindValue(":SRCID", (*it).id);
+        query.exec();
+        if (query.isActive() && query.size() > 0)
+        {
+            query.next();
+
+            if (!query.isNull(0))
+                GuideDataAfter = QDateTime::fromString(query.value(0).toString(),
+                                                    Qt::ISODate);
+        }
+
+        if (GuideDataAfter == GuideDataBefore)
+        {
+            nonewdata++;
+        }
     }
 
     if (only_update_channels && !need_post_grab_proc)
         return true;
 
-    query.exec(QString("SELECT MAX(endtime) FROM program WHERE manualid=0;"));
-    if (query.isActive() && query.size() > 0)
-    {
-        query.next();
-
-        if (!query.isNull(0))
-            GuideDataAfter = QDateTime::fromString(query.value(0).toString(),
-                                                   Qt::ISODate);
-    }
-
     if (failures == 0)
     {
-        if ((GuideDataAfter == GuideDataBefore) &&
+        if (nonewdata > 0 &&
             (total_sources != externally_handled))
-            status = "mythfilldatabase ran, but did not insert "
-                     "any new data into the Guide.  This can indicate a "
-                     "potential grabber failure."; 
+            status = QString("mythfilldatabase ran, but did not insert "
+                     "any new data into the Guide for %1 of %2 sources.  This can indicate a "
+                     "potential grabber failure.").arg(nonewdata).arg(total_sources); 
         else
             status = "Successful.";
 

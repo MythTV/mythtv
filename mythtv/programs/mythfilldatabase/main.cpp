@@ -482,7 +482,11 @@ int main(int argc, char *argv[])
                            "WHERE value='mythfilldatabaseLastRunStatus'")
                            .arg(status));
 
-        query.exec("SELECT MAX(endtime) FROM program WHERE manualid = 0;");
+        query.prepare("SELECT MAX(endtime) FROM program p LEFT JOIN channel c "
+                      "ON p.chanid=c.chanid WHERE c.sourceid= :SRCID "
+                      "AND manualid = 0;");
+        query.bindValue(":SRCID", fromfile_id);
+        query.exec();
         if (query.isActive() && query.size() > 0)
         {
             query.next();
@@ -501,7 +505,11 @@ int main(int argc, char *argv[])
                            "WHERE value='mythfilldatabaseLastRunEnd'")
                           .arg(QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm")));
 
-        query.exec("SELECT MAX(endtime) FROM program WHERE manualid = 0;");
+        query.prepare("SELECT MAX(endtime) FROM program p LEFT JOIN channel c "
+                      "ON p.chanid=c.chanid WHERE c.sourceid= :SRCID "
+                      "AND manualid = 0;");
+        query.bindValue(":SRCID", fromfile_id);
+        query.exec();
         if (query.isActive() && query.size() > 0)
         {
             query.next();
