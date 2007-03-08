@@ -219,6 +219,8 @@ EOF
                 }
                 last if ($icon);
             }
+        # Exit the program?
+            last unless (defined $icon);
         # Skipped icon?
             next unless ($icon);
         # Keep track of this match so we can submit it to the server later.
