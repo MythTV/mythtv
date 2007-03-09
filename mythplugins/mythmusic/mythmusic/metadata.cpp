@@ -171,7 +171,11 @@ void Metadata::dumpToDatabase()
 
     MSqlQuery query(MSqlQuery::InitCon());
 
-    if (m_directoryid < 0)
+    if (sqldir.isEmpty())
+    {
+        m_directoryid = 0;
+    }
+    else if (m_directoryid < 0)
     {
         // Load the directory id
         query.prepare("SELECT directory_id FROM music_directories "
@@ -745,7 +749,8 @@ void AllMusic::resync()
 
     QString aquery = "SELECT music_songs.song_id, music_artists.artist_name, music_comp_artists.artist_name AS compilation_artist, "
                      "music_albums.album_name, music_songs.name, music_genres.genre, music_songs.year, "
-                     "music_songs.track, music_songs.length, CONCAT(music_directories.path, '/', music_songs.filename) AS filename, "
+                     "music_songs.track, music_songs.length, CONCAT_WS('/', "
+                     "music_directories.path, music_songs.filename) AS filename, "
                      "music_songs.rating, music_songs.numplays, music_songs.lastplay, music_albums.compilation, "
                      "music_songs.format "
                      "FROM music_songs "
