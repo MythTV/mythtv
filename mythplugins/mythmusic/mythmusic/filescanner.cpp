@@ -128,6 +128,9 @@ void FileScanner::BuildFileList(QString &directory, MusicLoadedMap &music_files,
 
 int FileScanner::GetDirectoryId(const QString &directory, const int &parentid)
 {
+    if (directory.isEmpty())
+        return 0;
+
     MSqlQuery query(MSqlQuery::InitCon());
 
     // Load the directory id or insert it and get the id
