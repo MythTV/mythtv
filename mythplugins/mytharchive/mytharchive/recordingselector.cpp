@@ -356,7 +356,7 @@ void RecordingSelector::cancelPressed()
 
 void RecordingSelector::updateRecordingList(void)
 {
-    if (!recordingList)
+    if (!recordingList || recordingList->size() == 0)
         return;
 
     recording_list->Reset();
