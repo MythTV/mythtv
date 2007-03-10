@@ -544,10 +544,11 @@ void Metadata::setField(const QString &field, const QString &data)
         m_length = data.toInt();
     else if (field == "compilation")
         m_compilation = (data.toInt() > 0);
-    
+
     else
     {
-        cerr << "metadata.o: Something asked me to return data about a field called " << field << endl ;
+        VERBOSE(VB_IMPORTANT, QString("Something asked me to return data "
+                              "about a field called %1").arg(field));
     }
 }
 
@@ -563,7 +564,8 @@ void Metadata::getField(const QString &field, QString *data)
         *data = m_genre;
     else
     {
-        cerr << "metadata.o: Something asked me to return data about a field called " << field << endl ;
+        VERBOSE(VB_IMPORTANT, QString("Something asked me to return data "
+                              "about a field called %1").arg(field));
         *data = "I Dunno";
     }
 }
@@ -833,8 +835,9 @@ void AllMusic::resync()
     }
     else
     {
-        cerr << "metadata.o: You don't seem to have any tracks. That's ok with me if it's ok with you." << endl; 
-    }    
+         VERBOSE(VB_IMPORTANT, "You don't seem to have any tracks. "
+                               "That's ok with me if it's ok with you.");
+    }
 
     //  To find this data quickly, build a map
     //  (a map to pointers!)
@@ -1097,8 +1100,8 @@ void AllMusic::setSorting(QString a_paths)
             *it != "album"        &&
             *it != "title")
         {
-            VERBOSE(VB_IMPORTANT, "AllMusic::setSorting()" +
-                    QString("Unknown tree level '%1'").arg(*it));
+            VERBOSE(VB_IMPORTANT, QString("AllMusic::setSorting() "
+                    "Unknown tree level '%1'").arg(*it));
         }
     }
 }

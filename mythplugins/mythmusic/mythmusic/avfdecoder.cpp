@@ -253,11 +253,12 @@ void avfDecoder::run()
         // Look to see if user has requested a seek
         if (seekTime >= 0.0) 
         {
-            cerr << "avfdecoder.o: seek time " << seekTime << endl;
+            VERBOSE(VB_GENERAL, QString("avfdecoder.o: seek time %1")
+                .arg(seekTime));
             if (av_seek_frame(ic, -1, (int64_t)(seekTime * AV_TIME_BASE), 0)
                               < 0)
             {
-                cerr << "avfdecoder.o: error seeking" << endl;
+                VERBOSE(VB_IMPORTANT, "Error seeking");
             }
 
             seekTime = -1.0;
@@ -267,7 +268,7 @@ void avfDecoder::run()
         // if (av_read_packet(ic, pkt) < 0)
         if (av_read_frame(ic, pkt) < 0)
         {
-            cerr << "avfdecoder.o: read frame failed" << endl;
+            VERBOSE(VB_IMPORTANT, "Read frame failed");
             unlock();
             finish = TRUE;
             break;
@@ -323,7 +324,7 @@ void avfDecoder::run()
                 // what we sent to the output buffer
                 data_size -= mem_len;
                 s += mem_len;
-            
+
                 if (output())
                     flush();
 

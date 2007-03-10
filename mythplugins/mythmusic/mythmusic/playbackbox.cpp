@@ -124,7 +124,7 @@ PlaybackBoxMusic::PlaybackBoxMusic(MythMainWindow *parent, QString window_name,
         setRepeatMode(REPEAT_OFF);
 
     // Set some button values
-    
+
     if (!keyboard_accelerators) 
     {
         if (pledit_button)
@@ -133,11 +133,11 @@ PlaybackBoxMusic::PlaybackBoxMusic(MythMainWindow *parent, QString window_name,
             vis_button->setText(tr("Visualize"));
         if (!assignFirstFocus())
         {
-            cerr << "playbackbox.o: Could not find a button to assign focus "
-                    "to. What's in your theme?" << endl;
+            VERBOSE(VB_IMPORTANT, "playbackbox.o: Could not find a button to "
+                                  "assign focus to. What's in your theme?");
             exit(0);
         }
-    } 
+    }
     else 
     {
         if (pledit_button)
@@ -1799,7 +1799,8 @@ void PlaybackBoxMusic::customEvent(QCustomEvent *event)
 
             OutputEvent *aoe = (OutputEvent *) event;
 
-            cerr << statusString << " " << *aoe->errorMessage() << endl;
+            VERBOSE(VB_IMPORTANT, QString("%1 %2").arg(statusString)
+                .arg(*aoe->errorMessage()));
             MythPopupBox::showOkPopup(gContext->GetMainWindow(), 
                                       statusString,
                                       QString("MythMusic has encountered the following error:\n%1")
@@ -1828,8 +1829,9 @@ void PlaybackBoxMusic::customEvent(QCustomEvent *event)
             statusString = tr("Decoder error.");
 
             DecoderEvent *dxe = (DecoderEvent *) event;
- 
-            cerr << statusString << " " << *dxe->errorMessage() << endl;
+
+            VERBOSE(VB_IMPORTANT, QString("%1 %2").arg(statusString)
+                .arg(*dxe->errorMessage()));
             MythPopupBox::showOkPopup(gContext->GetMainWindow(), 
                                       statusString,
                                       QString("MythMusic has encountered the following error:\n%1")
@@ -1879,7 +1881,7 @@ void PlaybackBoxMusic::openOutputDevice(void)
         adevice = gContext->GetSetting("AudioOutputDevice");
     else
         adevice = gContext->GetSetting("MusicAudioDevice");
- 
+
     // TODO: Error checking that device is opened correctly!
     output = AudioOutput::OpenAudio(adevice, "default", 16, 2, 44100,
                                     AUDIOOUTPUT_MUSIC, true,
@@ -1895,8 +1897,8 @@ void PlaybackBoxMusic::handleTreeListSignals(int node_int, IntVector *attributes
 {
     if (attributes->size() < 4)
     {
-        cerr << "playbackbox.o: Worringly, a managed tree list is handing "
-                "back item attributes of the wrong size" << endl;
+        VERBOSE(VB_IMPORTANT, "playbackbox.o: Worringly, a managed tree "
+                "list is handing back item attributes of the wrong size");
         return;
     }
 
@@ -2012,8 +2014,8 @@ void PlaybackBoxMusic::wireUpTheme()
     music_tree_list = getUIManagedTreeListType("musictreelist");
     if (!music_tree_list)
     {
-        cerr << "playbackbox.o: Couldn't find a music tree list in your theme" 
-             << endl;
+        VERBOSE(VB_IMPORTANT, "playbackbox.o: Couldn't find a music tree list "
+                              "in your theme");
         exit(0);
     }
     connect(music_tree_list, SIGNAL(nodeSelected(int, IntVector*)), 

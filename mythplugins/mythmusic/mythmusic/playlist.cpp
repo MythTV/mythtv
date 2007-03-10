@@ -39,8 +39,8 @@ void Track::postLoad(PlaylistsContainer *grandparent)
         label = grandparent->getPlaylistName( (-1 * index_value),  bad_reference);
     else
     {
-        cerr << "playlist.o: Not sure how I got 0 as a track number, but "
-            "it ain't good" << endl;
+        VERBOSE(VB_IMPORTANT, "playlist.o: Not sure how I got 0 as a track "
+            "number, but it ain't good");
     }
 }
 
@@ -197,8 +197,8 @@ void Playlist::moveTrackUpDown(bool flag, Track *the_track)
     uint insertion_point = 0;
     int where_its_at = songs.findRef(the_track);
     if (where_its_at < 0)
-        cerr << "playlist.o: A playlist was asked to move a track, but can'd "
-                "find it\n";
+        VERBOSE(VB_IMPORTANT, "playlist.o: A playlist was asked to move a "
+                "track, but can'd find it");
     else
     {
         if (flag)
@@ -464,11 +464,10 @@ void Playlist::loadPlaylist(QString a_name, QString a_host)
     QString thequery;
     if (a_host.length() < 1)
     {
-        cerr << "playlist.o: Hey! I can't load playlists if you don't give "
-                "me a hostname!" << endl; 
+        VERBOSE(VB_IMPORTANT, "loadPlaylist() - We need a valid hostname"); 
         return;
     }
-   
+
     MSqlQuery query(MSqlQuery::InitCon());
 
     if (name == "default_playlist_storage" || name == "backup_playlist_storage")
@@ -575,8 +574,9 @@ void Playlist::fillSongsFromSonglist(bool filter)
         else
         {
             changed = true;
-            cerr << "playlist.o: Taking a 0 (zero) off a playlist" << endl;
-            cerr << "            If this happens on repeated invocations of mythmusic, then something is really wrong" << endl;
+            VERBOSE(VB_IMPORTANT, "Taking a 0 (zero) off a "
+                "playlist. If this happens on repeated invocations of "
+                "mythmusic, then something is really wrong");
         }
     }
 
@@ -805,13 +805,13 @@ void Playlist::savePlaylist(QString a_name, QString a_host)
     name = a_name.simplifyWhiteSpace();
     if (name.length() < 1)
     {
-        cerr << "playlist.o: Not going to save a playlist with no name" << endl ;
+        VERBOSE(VB_GENERAL, "Not going to save a playlist with no name");
         return;
     }
 
     if (a_host.length() < 1)
     {
-        cerr << "playlist.o: Not going to save a playlist with no hostname" << endl;
+        VERBOSE(VB_GENERAL, "Not going to save a playlist with no hostname");
         return;
     }
     if (name.length() < 1)
@@ -831,11 +831,13 @@ void Playlist::savePlaylist(QString a_name, QString a_host)
             songcount++;
             if (an_int > 0)
             {
-                query.prepare("SELECT length FROM music_songs WHERE song_id = :ID ;");
+                query.prepare("SELECT length FROM music_songs "
+                    "WHERE song_id = :ID ;");
             }
             else
             {
-                query.prepare("SELECT length FROM music_playlists WHERE playlist_id = :ID ;");
+                query.prepare("SELECT length FROM music_playlists "
+                    "WHERE playlist_id = :ID ;");
                 an_int *= -1;
             }
             query.bindValue(":ID", an_int);
@@ -848,11 +850,15 @@ void Playlist::savePlaylist(QString a_name, QString a_host)
         }
     }
 
-    bool save_host = ("default_playlist_storage" == a_name || "backup_playlist_storage" == a_name);
+    bool save_host = ("default_playlist_storage" == a_name
+        || "backup_playlist_storage" == a_name);
     if (playlistid > 0)
     {
-        QString str_query = "UPDATE music_playlists SET playlist_songs = :LIST,"
-                            " playlist_name = :NAME, songcount = :SONGCOUNT, length = :PLAYTIME";
+        QString str_query = "UPDATE music_playlists SET "
+                            "playlist_songs = :LIST, "
+                            "playlist_name = :NAME, "
+                            "songcount = :SONGCOUNT, "
+                            "length = :PLAYTIME";
         if (save_host)
             str_query += ", hostname = :HOSTNAME";
         str_query += " WHERE playlist_id = :ID ;";
@@ -929,7 +935,8 @@ int Playlist::writeTree(GenericTree *tree_to_write_to, int a_counter)
         {
             if(it->getValue() == 0)
             {
-                cerr << "playlist.o: Oh crap ... how did we get something with an ID of 0 on a playlist?" << endl ;
+                VERBOSE(VB_IMPORTANT, "Song with ID of 0 in playlist, this "
+                                      "shouldn't happen.");
             }
             if(it->getValue() > 0)
             {
@@ -966,7 +973,8 @@ int Playlist::writeTree(GenericTree *tree_to_write_to, int a_counter)
         {
             if(it->getValue() == 0)
             {
-                cerr << "playlist.o: Oh crap ... how did we get something with an ID of 0 on a playlist?" << endl ;
+                VERBOSE(VB_IMPORTANT, "Song with ID of 0 in playlist, this "
+                                      "shouldn't happen.");
             }
             if(it->getValue() > 0)
             {
@@ -1182,7 +1190,8 @@ void PlaylistsContainer::popBackPlaylist()
     Playlist *destination = getPlaylist(pending_writeback_index);
     if (!destination)
     {
-        cerr << "Unknown playlist: " << pending_writeback_index << endl;
+        VERBOSE(VB_IMPORTANT, QString("Unknown playlist: %1")
+                .arg(pending_writeback_index));
         return;
     }
     destination->removeAllTracks();
@@ -1206,14 +1215,15 @@ void PlaylistsContainer::copyToActive(int index)
     if(active_widget)
     {
         bool bad = false;
-        QString newlabel = QString(QObject::tr("Active Play Queue (%1)")).arg(getPlaylistName(index, bad));
+        QString newlabel = QString(QObject::tr("Active Play Queue (%1)"))
+            .arg(getPlaylistName(index, bad));
         active_widget->setText(newlabel);
     }    
     active_playlist->removeAllTracks();
     Playlist *copy_from = getPlaylist(index);
     if (!copy_from)
     {
-        cerr << "Unknown playlist: " << index << endl;
+        VERBOSE(VB_IMPORTANT, QString("Unknown playlist: %1").arg(index));
         return;
     }
     copy_from->copyTracks(active_playlist, true);
@@ -1233,7 +1243,8 @@ void PlaylistsContainer::renamePlaylist(int index, QString new_name)
         list_to_rename->Changed();
         if(list_to_rename->getID() == pending_writeback_index)
         {
-            QString newlabel = QString(QObject::tr("Active Play Queue (%1)")).arg(new_name);
+            QString newlabel = QString(QObject::tr("Active Play Queue (%1)"))
+                .arg(new_name);
             active_widget->setText(newlabel);
         }
     }
@@ -1244,7 +1255,7 @@ void PlaylistsContainer::deletePlaylist(int kill_me)
     Playlist *list_to_kill = getPlaylist(kill_me);
     if (!list_to_kill)
     {
-        cerr << "Unknown playlist: " << kill_me << endl;
+        VERBOSE(VB_IMPORTANT, QString("Unknown playlist: %1").arg(kill_me));
         return;
     }
     //  First, we need to take out any **track** on any other
@@ -1298,7 +1309,7 @@ QString PlaylistsContainer::getPlaylistName(int index, bool &reference)
             }
         }
     }
-    cerr << "playlist.o: Asked to getPlaylistName() with an index number I couldn't find" << endl ;
+    VERBOSE(VB_IMPORTANT, "getPlaylistName() called with unknown index number");
     reference = true;
     return QObject::tr("Something is Wrong");
 }
@@ -1307,7 +1318,8 @@ bool Playlist::containsReference(int to_check, int depth)
 {
     if(depth > 10)
     {
-        cerr << "playlist.o: I'm recursively checking playlists, and have reached a search depth over 10 " << endl ;
+        VERBOSE(VB_IMPORTANT, "Recursively checking playlists, and have "
+                              "reached a search depth over 10 ");
     }
     bool ref_exists = false;
 
@@ -1365,8 +1377,8 @@ Playlist *PlaylistsContainer::getPlaylist(int id)
             return a_list;
         }
     }
-    cerr << "playlists.o: Something asked me to find a Playlist object with an id I couldn't find" << endl ;
-    return NULL;    
+    VERBOSE(VB_IMPORTANT, "getPlaylistName() called with unknown index number");
+    return NULL;
 }
 
 void PlaylistsContainer::showRelevantPlaylists(TreeCheckItem *alllists)
@@ -1539,7 +1551,8 @@ void Playlist::computeSize(double &size_in_MB, double &size_in_sec)
 
         if (it->getValue() == 0)
         {
-            cerr << "playlist.o: Oh crap ... how did we get something with an ID of 0 on a playlist?" << endl ;
+            VERBOSE(VB_IMPORTANT, "Song with ID of 0 in playlist, this "
+                                      "shouldn't happen.");
         }
         else if (it->getValue() > 0)
         {
@@ -1550,7 +1563,8 @@ void Playlist::computeSize(double &size_in_MB, double &size_in_sec)
                 if (tmpdata->Length() > 0)
                     size_in_sec += tmpdata->Length();
                 else
-                    cerr << "playlist.o: Computing track lengths. One track <=0" <<endl ;
+                    VERBOSE(VB_GENERAL, "Computing track lengths. "
+                                        "One track <=0");
 
                 // Check tmpdata->Filename
                 QFileInfo finfo(tmpdata->Filename());
@@ -1579,14 +1593,14 @@ int Playlist::CreateCDMP3(void)
     // Check & get global settings
     if (!gContext->GetNumSetting("CDWriterEnabled")) 
     {
-        cerr << "CD Writer is not enabled.\n";
+        VERBOSE(VB_GENERAL, "CD Writer is not enabled.");
         return 1;
     }
 
     QString scsidev = gContext->GetSetting("CDWriterDevice");
     if (scsidev.isEmpty() || scsidev.isNull()) 
     {
-        cerr << "No CD Writer device defined.\n";
+        VERBOSE(VB_GENERAL, "No CD Writer device defined.");
         return 1;
     }
 
@@ -1606,7 +1620,8 @@ int Playlist::CreateCDMP3(void)
 
         if (it->getValue() == 0)
         {
-            cerr << "playlist.o: Oh crap ... how did we get something with an ID of 0 on a playlist?" << endl ;
+            VERBOSE(VB_IMPORTANT, "Song with ID of 0 in playlist, this "
+                                      "shouldn't happen.");
         }
         else if (it->getValue() > 0)
         {
@@ -1648,7 +1663,7 @@ int Playlist::CreateCDMP3(void)
 
     if (size_in_MB >= max_size)
     {
-        cerr << "MP3 CD creation aborted -- cd size too big.\n";
+        VERBOSE(VB_GENERAL, "MP3 CD creation aborted -- cd size too big.");
         return 1;
     }
 
@@ -1663,7 +1678,7 @@ int Playlist::CreateCDMP3(void)
 
     if (!reclistfile.open(IO_WriteOnly))
     {
-        cerr << "Unable to open temporary file\n";
+        VERBOSE(VB_IMPORTANT, "Unable to open temporary file");
         return 1;
     }
 
@@ -1721,7 +1736,7 @@ int Playlist::CreateCDMP3(void)
             {
                 if (!isofs.normalExit())
                 {
-                    cerr << "Unable to run 'mkisofs'\n";
+                    VERBOSE(VB_IMPORTANT, "Unable to run 'mkisofs'");
                     retval = 1;
                 }
                 break;
@@ -1730,7 +1745,7 @@ int Playlist::CreateCDMP3(void)
     }
     else
     {
-        cerr << "Unable to run 'mkisofs'\n";
+        VERBOSE(VB_IMPORTANT, "Unable to run 'mkisofs'");
         retval = 1;
     }
 
@@ -1770,7 +1785,7 @@ int Playlist::CreateCDMP3(void)
                     err == "cdrecord: Input/output error." ||
                     err == "cdrecord: No disk / Wrong disk!")
                 {
-                    cerr << err << endl;
+                    VERBOSE(VB_IMPORTANT, err);
                     burn.kill();
                     retval = 1;
                 }
@@ -1799,7 +1814,7 @@ int Playlist::CreateCDMP3(void)
             {
                 if (!burn.normalExit())
                 {
-                    cerr << "Unable to run 'cdrecord'\n";
+                    VERBOSE(VB_IMPORTANT, "Unable to run 'cdrecord'");
                     retval = 1;
                 }
                 break;
@@ -1808,7 +1823,7 @@ int Playlist::CreateCDMP3(void)
     }
     else
     {
-        cerr << "Unable to run 'cdrecord'\n";
+        VERBOSE(VB_IMPORTANT, "Unable to run 'cdrecord'");
         retval = 1;
     }
 

@@ -33,8 +33,8 @@ DatabaseBox::DatabaseBox(PlaylistsContainer *all_playlists,
 
     if (!music_ptr)
     {
-        cerr << "databasebox.o: We are not going to get very far with a null "
-                "pointer to metadata" << endl;
+        VERBOSE(VB_IMPORTANT, "We are not going to get very far with a null "
+                "pointer to metadata");
     }
     all_music = music_ptr;
 
@@ -289,8 +289,8 @@ void DatabaseBox::renamePlaylist()
         }
         else
         {
-            cerr << "databasebox.o: Trying to rename something that doesn't "
-                    "seem to be a playlist" << endl;
+            VERBOSE(VB_IMPORTANT, "Trying to rename something that doesn't "
+                    "seem to be a playlist");
         }
     }
 }
@@ -402,14 +402,14 @@ void DatabaseBox::BlankCDRW()
     // Check & get global settings
     if (!gContext->GetNumSetting("CDWriterEnabled")) 
     {
-        cerr << "playlist.o: Writer is not enabled. We cannot be here!" << endl ;
+        VERBOSE(VB_GENERAL, "Writer is not enabled. We cannot be here!");
         return;
     }
 
     QString scsidev = gContext->GetSetting("CDWriterDevice");
     if (scsidev.length()==0) 
     {
-        cerr << "playlist.o: We don't have SCSI devices" << endl ;
+        VERBOSE(VB_GENERAL, "We don't have SCSI devices");
         return;
     }
     // Begin Blanking
@@ -438,11 +438,11 @@ void DatabaseBox::deletePlaylist()
         return;
 
     //  Delete currently selected
-   
+
     closePlaylistPopup(); 
 
     UIListGenericTree *item = tree->GetCurrentPosition(); 
-    
+
     if (TreeCheckItem *check_item = dynamic_cast<TreeCheckItem*>(item) )
     {
         if (check_item->getID() < 0)
@@ -461,9 +461,9 @@ void DatabaseBox::deletePlaylist()
             return;
         }
     }
-     
-    cerr << "databasebox.o: Some crazy user managed to get a playlist popup "
-            "from a non-playlist item" << endl;
+
+    VERBOSE(VB_IMPORTANT, "deletePlaylist() - Playlist popup on a "
+                          "non-playlist item");
 }
 
 
@@ -475,7 +475,7 @@ void DatabaseBox::copyToActive()
     closePlaylistPopup();
 
     UIListGenericTree *item = tree->GetCurrentPosition();
- 
+
     if (TreeCheckItem *check_item = dynamic_cast<TreeCheckItem*>(item) )
     {
         if (check_item->getID() < 0)
@@ -488,8 +488,8 @@ void DatabaseBox::copyToActive()
             return;
         }
     }
-    cerr << "databasebox.o: Some crazy user managed to get a playlist popup "
-            "from a non-playlist item in another way" << endl;
+    VERBOSE(VB_IMPORTANT, "copyToActive() - Playlist popup on a "
+                          "non-playlist item");
 }
 
 
@@ -508,7 +508,7 @@ void DatabaseBox::fillCD(void)
             int depth = curItem->calculateDepth(0);
             while(depth--)
                 tree->MoveLeft();
-        }   
+        }
 
         // Delete anything that might be there  
 
@@ -765,8 +765,8 @@ void DatabaseBox::selected(UIListGenericTree *item)
         doActivePopup(item_ptr);
     else
     {
-        cerr << "databasebox.o: That's odd ... there's something I don't "
-                "recognize on a ListView" << endl;
+        VERBOSE(VB_IMPORTANT, "That's odd ... there's something I don't "
+                "recognize on a ListView");
     }
 }
 
@@ -922,8 +922,8 @@ void DatabaseBox::dealWithTracks(PlaylistItem *item_ptr)
     
     if (holding_track)
     {
-        cerr << "databasebox.o: Oh crap, this is not supposed to happen " 
-             << endl;
+        VERBOSE(VB_IMPORTANT, "dealWithTracks() - Holding track. This is not "
+                              "supposed to happen");
         holding_track = false;
         track_held->beMoving(false);
         releaseKeyboard();
@@ -955,7 +955,7 @@ void DatabaseBox::doSelected(UIListGenericTree *item, bool cd_flag)
             keep_going = false;
         }
     }
-    
+
     if (keep_going)
     {
         QPtrListIterator<GenericTree> it = tcitem->getFirstChildIterator();
@@ -989,7 +989,7 @@ void DatabaseBox::checkParent(UIListGenericTree *item)
     if (TreeCheckItem *tcitem = dynamic_cast<TreeCheckItem*>(item))
     {
         (void)tcitem;
-        do_check = true;   
+        do_check = true;
     }
     else if (CDCheckItem *tcitem = dynamic_cast<CDCheckItem*>(item))
     {
@@ -1008,7 +1008,7 @@ void DatabaseBox::checkParent(UIListGenericTree *item)
         bool oneon = false;
 
         QPtrListIterator<GenericTree> it = tcitem->getFirstChildIterator();
-        
+
         while ((child = (TreeCheckItem *)it.current()))
         {
             if (child->getCheck() > 0)
@@ -1029,7 +1029,7 @@ void DatabaseBox::checkParent(UIListGenericTree *item)
         if (tcitem->getParent())
             checkParent((UIListGenericTree *)tcitem->getParent());
     }
-}    
+}
 
 void DatabaseBox::deleteTrack(UIListGenericTree *item)
 {
@@ -1054,8 +1054,8 @@ void DatabaseBox::deleteTrack(UIListGenericTree *item)
         }
         else
         {
-            cerr << "databasebox.o: I don't know how to delete whatever you're "
-                    "trying to get rid of" << endl;
+            VERBOSE(VB_IMPORTANT, "deleteTrack() - I don't know how to delete "
+                    "whatever you're trying to get rid of");
         }
 
         the_playlists->refreshRelevantPlaylists(alllists);
@@ -1082,8 +1082,8 @@ void DatabaseBox::deleteTrack(UIListGenericTree *item)
         }
         else
         {
-            cerr << "databasebox.o: I don't know how to delete whatever you're "
-                    "trying to get rid of" << endl;
+            VERBOSE(VB_IMPORTANT, "deleteTrack() - I don't know how to delete "
+                    "whatever you're trying to get rid of");
         }
         the_playlists->refreshRelevantPlaylists(alllists);
         checkTree();
@@ -1278,10 +1278,10 @@ void ReadCDThread::run()
         }
         else
         {
-            cerr << "databasebox.o: The cddecoder said it had audio tracks, "
-                    "but it won't tell me about them" << endl;
+            VERBOSE(VB_IMPORTANT, "The cddecoder said it had audio tracks, "
+                    "but it won't tell me about them");
         }
-    } 
+    }
 
     int tracks = decoder->getNumTracks();
     bool setTitle = false;
@@ -1309,12 +1309,10 @@ void ReadCDThread::run()
                 else
                 {
                     parenttitle = " " + QObject::tr("Unknown");
-                    cerr << "databasebox.o: Couldn't find your CD. It may not "
-                            "be in the freedb database." << endl;
-                    cerr << "               More likely, however, is that you "
-                            "need to delete ~/.cddb and" << endl;
-                    cerr << "               ~/.cdserverrc and restart "
-                            "mythmusic. Have a nice day." << endl;
+                    VERBOSE(VB_GENERAL, "Couldn't find your "
+                    " CD. It may not be in the freedb database.\n"
+                    "    More likely, however, is that you need to delete\n"
+                    "    ~/.cddb and ~/.cdserverrc and restart mythmusic.");
                 }
                 all_music->setCDTitle(parenttitle);
                 setTitle = true;

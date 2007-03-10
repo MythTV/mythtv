@@ -435,7 +435,7 @@ static HostComboBox *CDWriterDevice()
                 else
                 {
                     if (!proc.normalExit())
-                        cerr << "Failed to run 'cdrecord --scanbus'\n";
+                        VERBOSE(VB_IMPORTANT, "Failed to run 'cdrecord --scanbus'");
                     break;
                 }
 
@@ -444,7 +444,7 @@ static HostComboBox *CDWriterDevice()
             }
         }
         else
-            cerr << "Failed to run 'cdrecord --scanbus'\n";
+            VERBOSE(VB_IMPORTANT, "Failed to run 'cdrecord --scanbus'");
 
         while (proc.canReadLineStdout())
             result += proc.readLineStdout();
