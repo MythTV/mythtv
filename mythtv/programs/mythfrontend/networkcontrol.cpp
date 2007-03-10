@@ -491,7 +491,7 @@ QString NetworkControl::processPlay(QStringList tokens)
         (is_abbrev("program", tokens[1])) &&
         (tokens[2].contains(QRegExp("^\\d+$"))) &&
         (tokens[3].contains(QRegExp(
-                         "^\\d\\d\\d\\d-\\d\\d-\\d\\dt\\d\\d:\\d\\d:\\d\\d$"))))
+                         "^\\d\\d\\d\\d-\\d\\d-\\d\\dT\\d\\d:\\d\\d:\\d\\d$"))))
     {
         if (gContext->getCurrentLocation() == "Playback")
         {
@@ -669,7 +669,7 @@ QString NetworkControl::processQuery(QStringList tokens)
              is_abbrev("recording", tokens[1]) &&
              (tokens[2].contains(QRegExp("^\\d+$"))) &&
              (tokens[3].contains(QRegExp(
-                         "^\\d\\d\\d\\d-\\d\\d-\\d\\dt\\d\\d:\\d\\d:\\d\\d$"))))
+                         "^\\d\\d\\d\\d-\\d\\d-\\d\\dT\\d\\d:\\d\\d:\\d\\d$"))))
         return listRecordings(tokens[2], tokens[3].upper());
     else if (is_abbrev("recordings", tokens[1]))
         return listRecordings();
