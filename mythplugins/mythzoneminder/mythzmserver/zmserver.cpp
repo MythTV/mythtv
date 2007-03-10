@@ -983,20 +983,10 @@ void ZMServer::initMonitor(MONITOR *monitor)
     monitor->shared_data = NULL;
     monitor->shared_images = NULL;
 
-    switch (monitor->palette)
-    {
-        case 1:
-            monitor->frame_size = monitor->width * monitor->height;
-            break;
-        case 4:
-            monitor->frame_size = monitor->width * monitor->height * 3;
-            break;
-        default:
-            cout << "Unsupported palette: " << monitor->palette 
-                 << " used on monitor: " << monitor->mon_id << endl;
-            monitor->status = "Error";
-            return;
-    }
+    if (monitor->palette == 1)
+        monitor->frame_size = monitor->width * monitor->height;
+    else
+        monitor->frame_size = monitor->width * monitor->height * 3;
 
     int shared_data_size = sizeof(SharedData) +
             sizeof(TriggerData) +

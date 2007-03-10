@@ -624,17 +624,14 @@ void Player::updateScreenGL(const unsigned char* buffer)
     if (!m_initalized)
         return;
 
-    if (m_monitor.palette != MP_RGB24 && m_monitor.palette != MP_GREY)
-        return;
-
     glXMakeCurrent(m_dis, m_win, m_cx);
 
-    if (m_monitor.palette == MP_RGB24)
+    if (m_monitor.palette == MP_GREY)
         glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, m_monitor.width, m_monitor.height,
-                    GL_RGB, GL_UNSIGNED_BYTE, buffer);
+                        GL_LUMINANCE, GL_UNSIGNED_BYTE, buffer);
     else
         glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, m_monitor.width, m_monitor.height,
-                    GL_LUMINANCE, GL_UNSIGNED_BYTE, buffer);
+                    GL_RGB, GL_UNSIGNED_BYTE, buffer);
 
     glViewport(0, 0, m_monitor.displayRect.width(), m_monitor.displayRect.height());
 
@@ -654,9 +651,6 @@ void Player::updateScreenGL(const unsigned char* buffer)
 void Player::updateScreenXv(const unsigned char* buffer)
 {
     if (!m_initalized)
-        return;
-
-    if (m_monitor.palette != MP_RGB24 && m_monitor.palette != MP_GREY)
         return;
 
     if (m_haveXV && !m_XvImage)
@@ -689,8 +683,20 @@ void Player::updateScreenXv(const unsigned char* buffer)
 
     if (m_haveXV)
     {
-        if (m_monitor.palette == MP_RGB24)
+        if (m_monitor.palette == MP_GREY)
         {
+            // grey palette
+            for (pos_data = 0; pos_data < (unsigned int) (m_monitor.width * m_monitor.height); )
+            {
+                m_rgba[pos_rgba++] = buffer[pos_data];   //b
+                m_rgba[pos_rgba++] = buffer[pos_data];   //g
+                m_rgba[pos_rgba++] = buffer[pos_data++]; //r
+                pos_rgba++;                              //a
+            }
+        }
+        else
+        {
+            // all other color palettes
             for (pos_data = 0; pos_data < (unsigned int) (m_monitor.width * m_monitor.height * 3); )
             {
                 r = buffer[pos_data++];
@@ -700,17 +706,6 @@ void Player::updateScreenXv(const unsigned char* buffer)
                 m_rgba[pos_rgba++] = g;
                 m_rgba[pos_rgba++] = r;
                 pos_rgba++;
-            }
-        }
-        else
-        {
-            // grey palette
-            for (pos_data = 0; pos_data < (unsigned int) (m_monitor.width * m_monitor.height); )
-            {
-                m_rgba[pos_rgba++] = buffer[pos_data];   //b
-                m_rgba[pos_rgba++] = buffer[pos_data];   //g
-                m_rgba[pos_rgba++] = buffer[pos_data++]; //r
-                pos_rgba++;                              //a
             }
         }
 
@@ -738,7 +733,7 @@ void Player::updateScreenXv(const unsigned char* buffer)
                     m_rgba[pos_rgba++] = 0;
                 }
 
-                if (m_monitor.palette == MP_RGB24)
+                if (m_monitor.palette != MP_GREY)
                 {
 
                     pos_data = pos_data * 3;
