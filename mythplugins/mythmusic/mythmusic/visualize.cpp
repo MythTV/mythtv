@@ -330,6 +330,7 @@ bool AlbumArt::needsUpdate() {
         QString curdir = QUrl(pParent->decoder()->getFilename()).dirPath();
         if (directory != curdir) {
             directory = curdir;
+            filename = pParent->decoder()->getFilename();
             return true;
         }
     }
@@ -368,11 +369,18 @@ bool AlbumArt::draw(QPainter *p, const QColor &back)
         QImage art(getImageFilename());
         if (art.isNull())
         {
-            drawWarning(p, back, size, QObject::tr("?"));
             cursize = size;
-            return true;
+            image = QImage();
         }
-        image = art.smoothScale(size, QImage::ScaleMin);
+        else
+        {
+            image = art.smoothScale(size, QImage::ScaleMin);
+        }
+    }
+
+    if (image.isNull()) {
+        drawWarning(p, back, size, QObject::tr("?"));
+        return true;
     }
 
     // Paint the image
