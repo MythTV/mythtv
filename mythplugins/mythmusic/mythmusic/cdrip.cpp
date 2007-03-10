@@ -754,23 +754,41 @@ void Ripper::scanCD(void)
 // static function to determin if there is already a similar track in the database
 bool Ripper::isNewTune(const QString& artist, const QString& album, const QString& title)
 {
+
+    QString matchartist = artist;
+    QString matchalbum = album;
+    QString matchtitle = title;
+
+    if (! matchartist.isEmpty())
+    {
+        matchartist.replace(QRegExp("(/|\\\\|:|\'|\\,|\\!|\\(|\\)|\"|\\?|\\|)"), QString("_"));
+    }
+
+    if (! matchalbum.isEmpty())
+    {
+        matchalbum.replace(QRegExp("(/|\\\\|:|\'|\\,|\\!|\\(|\\)|\"|\\?|\\|)"), QString("_"));
+    }
+
+    if (! matchtitle.isEmpty())
+    {
+        matchtitle.replace(QRegExp("(/|\\\\|:|\'|\\,|\\!|\\(|\\)|\"|\\?|\\|)"), QString("_"));
+    }
+
     MSqlQuery query(MSqlQuery::InitCon());
     QString queryString("SELECT filename, artist_name, album_name, name, song_id "
                         "FROM music_songs "
                         "LEFT JOIN music_artists ON music_songs.artist_id=music_artists.artist_id "
                         "LEFT JOIN music_albums ON music_songs.album_id=music_albums.album_id "
-                        "WHERE artist_name REGEXP \'");      
-    QString token = artist;
-    token.replace(QRegExp("(/|\\\\|:|\'|\\,|\\!|\\(|\\)|\"|\\?|\\|)"), QString("."));
+                        "WHERE artist_name LIKE :ARTIST "
+                        "AND album_name LIKE :ALBUM "
+                        "AND name LIKE :TITLE "
+                        "ORDER BY artist_name, album_name, name, song_id, filename");
 
-    queryString += token + "\' AND " + "album_name REGEXP \'";
-    token = album;
-    token.replace(QRegExp("(/|\\\\|:|\'|\\,|\\!|\\(|\\)|\"|\\?|\\|)"), QString("."));
-    queryString += token + "\' AND " + "name    REGEXP \'";
-    token = title;
-    token.replace(QRegExp("(/|\\\\|:|\'|\\,|\\!|\\(|\\)|\"|\\?|\\|)"), QString("."));
-    queryString += token + "\' ORDER BY artist_name, album_name, name, song_id, filename";      
     query.prepare(queryString);
+
+    query.bindValue(":ARTIST", matchartist);
+    query.bindValue(":ALBUM", matchalbum);
+    query.bindValue(":TITLE", matchtitle);
 
     if (!query.exec() || !query.isActive())
     {
