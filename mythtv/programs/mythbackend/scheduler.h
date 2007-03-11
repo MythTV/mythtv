@@ -83,7 +83,8 @@ class Scheduler : public QObject
     void PruneOverlaps(void);
     void BuildListMaps(void);
     void ClearListMaps(void);
-    bool FindNextConflict(RecList &cardlist, ProgramInfo *p, RecIter &iter);
+    bool FindNextConflict(RecList &cardlist, ProgramInfo *p, RecIter &iter,
+                          bool openEnd = false);
     void MarkOtherShowings(ProgramInfo *p);
     void MarkShowingsList(RecList &showinglist, ProgramInfo *p);
     void BackupRecStatus(void);

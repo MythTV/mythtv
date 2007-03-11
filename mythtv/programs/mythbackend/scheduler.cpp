@@ -742,7 +742,8 @@ void Scheduler::ClearListMaps(void)
     recordidlistmap.clear();
 }
 
-bool Scheduler::FindNextConflict(RecList &cardlist, ProgramInfo *p, RecIter &j)
+bool Scheduler::FindNextConflict(RecList &cardlist, ProgramInfo *p, RecIter &j,
+                                 bool openEnd)
 {
     for ( ; j != cardlist.end(); j++)
     {
@@ -754,8 +755,16 @@ bool Scheduler::FindNextConflict(RecList &cardlist, ProgramInfo *p, RecIter &j)
             continue;
         if (p->cardid != 0 && p->cardid != q->cardid)
             continue;
-        if (p->recendts <= q->recstartts || p->recstartts >= q->recendts)
-            continue;
+        if (openEnd && p->chanid != q->chanid)
+        {
+            if (p->recendts < q->recstartts || p->recstartts > q->recendts)
+                continue;
+        }
+        else
+        {
+            if (p->recendts <= q->recstartts || p->recstartts >= q->recendts)
+                continue;
+        }
         if (p->inputid == q->inputid && p->shareable)
             continue;
 
@@ -896,6 +905,8 @@ void Scheduler::SchedNewRecords(void)
 {
     VERBOSE(VB_SCHEDULE, "Scheduling:");
 
+    bool openEnd = (bool)gContext->GetNumSetting("SchedOpenEnd", 0);
+
     RecIter i = worklist.begin();
     while (i != worklist.end())
     {
@@ -906,7 +917,7 @@ void Scheduler::SchedNewRecords(void)
         {
             RecList &cardlist = cardlistmap[p->cardid];
             RecIter k = cardlist.begin();
-            if (!FindNextConflict(cardlist, p, k))
+            if (!FindNextConflict(cardlist, p, k, openEnd))
             {
                 p->recstatus = rsWillRecord;
                 MarkOtherShowings(p);

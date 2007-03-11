@@ -2214,6 +2214,19 @@ static GlobalCheckBox *GRSchedMoveHigher()
     return bc;
 }
 
+static GlobalCheckBox *GRSchedOpenEnd()
+{
+    GlobalCheckBox *bc = new GlobalCheckBox("SchedOpenEnd");
+    bc->setLabel(QObject::tr("Avoid back to back recordings from different "
+                    "channels"));
+    bc->setHelpText(QObject::tr("If set, the scheduler will avoid assigning "
+                    "shows from different channels to the same card if their "
+                    "end time and start time match. This will be allowed "
+                    "when necessary in order to resolve conflicts."));
+    bc->setValue(false);
+    return bc;
+}
+
 static GlobalSpinBox *GRDefaultStartOffset()
 {
     GlobalSpinBox *bs = new GlobalSpinBox("DefaultStartOffset",
@@ -3707,6 +3720,7 @@ GeneralRecPrioritiesSettings::GeneralRecPrioritiesSettings()
     sched->setLabel(QObject::tr("Scheduler Options"));
 
     sched->addChild(GRSchedMoveHigher());
+    sched->addChild(GRSchedOpenEnd());
     sched->addChild(GRDefaultStartOffset());
     sched->addChild(GRDefaultEndOffset());
     sched->addChild(GRComplexPriority());
