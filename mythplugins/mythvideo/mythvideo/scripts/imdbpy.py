@@ -22,11 +22,11 @@ except ImportError:
 		"from (http://imdbpy.sourceforge.net/?page=download)"
 	sys.exit(1)
 
-episode_title_format = '%(series_title)s S%(season)d E%(episode)d "%(episode_title)s"'
 
-def detect_series_query(search_string):
+
+def detect_series_title(search_string):
 	"""
-	Detects a series episode query.
+	Detects a series episode title.
 	
 	Currently the following formats are detected:
 	"Sopranos Season 1 Episode 2"
@@ -65,14 +65,13 @@ def episode_search(title, season, episode):
 					continue
 				# Found an exact episode match, return that match only.
 				matches = []
-				episode_title = episode_title_format % \
-						{
-							'series_title': ep['series title'],
-							'season': season,
-							'episode': episode,
-							'episode_title': ep['title']
-						}
-				matches.append([imdb_access.get_imdbID(ep), episode_title ,int(ep['year'])])		
+				meta = VideoMetadata()
+				meta.series_episode = True
+				meta.series_title = ep['series title']
+				meta.season = season
+				meta.episode = episode
+				meta.episode_title = ep['title']
+				matches.append([imdb_access.get_imdbID(ep), meta.toMetadataString() ,int(ep['year'])])	
 				return matches
 			else:
 				matches.append([imdb_access.get_imdbID(serie), 
@@ -84,7 +83,7 @@ def title_search(search_string):
 	Returns a list of 3-tuples [imdb id, title, year] for possible matches.
 	"""
 
-	(title, season, episode) = detect_series_query(search_string)
+	(title, season, episode) = detect_series_title(search_string)
 
 	#print title,"--", season,"--", episode
 	#return
@@ -159,80 +158,155 @@ def poster_search(imdb_id):
 	if url is not None:
 		print url
 
-def metadata_search(imdb_id):
-	metadata = unicode()
+class VideoMetadata:
+	
+	series_episode = False
+	series_title = ""
+	season = None
+	episode = None
+	
+	title = ""
+	runtime = None
+	year = None
+	directors = None
+	plot = None
+	rating = None
+	mpaa_rating = None
+	genres = None
+	countries = None
+	
+	episode_title_format = '%(series_title)s S%(season)d E%(episode)d %(episode_title)s'
+	
+	def __init__(self):
+		pass
+	
+	def toMetadataString(self):
+		
+		def createMetadataLine(keyName, value):
+			if value is not None:
+				return keyName + ":" + value + "\n"
+			else:
+				return ""
+		metadata = ""
+		if self.series_episode == True and self.season is not None and \
+			self.episode is not None:
+			metadata += 'Title:' + self.episode_title_format % \
+				{
+					'series_title': self.series_title,
+					'season': int(self.season),
+					'episode': int(self.episode),
+					'episode_title': self.episode_title,
+				} + '\n'
+		else:
+			metadata += createMetadataLine("Title", self.title).decode("utf8")
+		metadata += createMetadataLine("Runtime", self.runtime)
+		metadata += createMetadataLine('Year', self.year)
+		if self.directors is not None and len(self.directors) > 0:
+			metadata += createMetadataLine("Director", unicode(self.directors[0]))
+		metadata += createMetadataLine("Plot", self.plot)
+	
+		metadata += createMetadataLine('UserRating', self.rating)
+		metadata += createMetadataLine('MovieRating', self.mpaa_rating)
+		metadata += createMetadataLine('Runtime', self.runtime)
+		metadata += createMetadataLine('Genres', self.genres)
+		metadata += createMetadataLine('Countries', self.countries)
+		
+		return metadata
+
+def fetch_metadata(imdb_id):
+	
+	metadata = VideoMetadata()
+	
 	imdb_access = imdb.IMDb()
 	movie = imdb_access.get_movie(imdb_id)
 	imdb_access.update(movie)
 
-	def createMetadataFromField(key, searchKey=None, m=movie):
-		if searchKey == None:
-			searchKey = key.lower()
-		if searchKey not in m.keys(): return ""
+	def metadataFromField(key, default=None, m=movie):
+		
+		searchKey = key.lower()
+		if searchKey not in m.keys(): 
+			return default
 		value = unicode(m[searchKey])
 		try:
 			value = value.encode("utf8")
 		except AttributeError:
 			pass
 		if value is not None:
-			return "%s:%s\n" % (key, value)
+			return value
 		else:
-			return ""
+			return default
 
-	def createMetadataFromFirst(key, searchKey=None, m=movie):
-		if searchKey == None:
-			searchKey = key.lower()
-		if searchKey not in m.keys(): return ""
+	def metadataFromFirst(key, default=None, m=movie):
+		
+		searchKey = key.lower()
+		if searchKey not in m.keys(): 
+			return default
+		
 		value = m[searchKey]
 		if value is not None and len(value) > 0:
 			if len(value) > 1:
-				return "%s:%s\n" % (key, ','.join(value).encode("utf8"))
+				return ','.join(value).encode("utf8")
 			else:
-				return "%s:%s\n" % (key, value[0].encode("utf8"))
+				return value[0].encode("utf8")
 		else:
-			return ""
+			return default
 
 	if movie['kind'] == 'episode':
-		# print "TV Series episode detected"
-		metadata += 'Title:' + episode_title_format % \
-						{
-							'series_title': movie['series title'],
-							'season': int(movie['season']),
-							'episode': int(movie['episode']),
-							'episode_title': movie['title'],
-						} + '\n'
-		series = movie['episode of']
-		imdb_access.update(series)
-		metadata += createMetadataFromFirst('Runtime', 'runtimes', m=series)
+		# print "TV Series episode detected"		
+		metadata.series_episode = True
+		if 'series title' in movie.keys():
+			metadata.series_title = movie['series title']
+		if 'season' in movie.keys():
+			metadata.season = movie['season']
+		if 'episode' in movie.keys():
+			metadata.episode = movie['episode']
+		if 'title' in movie.keys():
+			metadata.episode_title = movie['title']
+
+		if 'episode of' in movie.keys():
+			series = movie['episode of']
+			imdb_access.update(series)
+			metadata.runtime = metadataFromFirst('runtimes', None)
 	else:
-		metadata += createMetadataFromField('Title').decode("utf8")
-	metadata += createMetadataFromField('Year')
+		metadata.title = metadataFromField('title').decode("utf8")
+	
+	metadata.year = metadataFromField('year')
 
 	if 'director' in movie.keys():
 		directors = movie['director']
 		if directors is not None:
-			metadata += "Director:%s" % unicode(directors[0]) + "\n"
+			metadata.directors = directors			
 
+	plots = []
 	if 'plot' in movie.keys():
 		plots = movie['plot']
-		if movie.has_key('plot outline') and len(movie['plot outline']):
-			plots.append("Outline::" + movie['plot outline'])
-		if plots is not None:
-			# Find the shortest plot.
-			shortest_found = None
-			#print "%d plots found" % len(plots)
-			for plot in plots:
-				text = plot.split("::")[1]
-				if shortest_found == None or len(text) < len(shortest_found):
-					shortest_found = text
-			metadata += "Plot:%s" % shortest_found + "\n"
+	if movie.has_key('plot outline') and len(movie['plot outline']):
+		plots.append("Outline::" + movie['plot outline'])
+	
+	if plots is not None:
+		# Find the shortest plot.
+		shortest_found = None
+		#print "%d plots found" % len(plots)
+		for plot in plots:
+			text = plot.split("::")[1]
+			if shortest_found == None or len(text) < len(shortest_found):
+				shortest_found = text
+		metadata.plot = shortest_found
 
-	metadata += createMetadataFromField('UserRating', 'rating')
-	metadata += createMetadataFromField('MovieRating', 'mpaa')
-	metadata += createMetadataFromFirst('Runtime', 'runtimes')
-	metadata += createMetadataFromFirst('Genres', 'genres')
-	metadata += createMetadataFromFirst('Countries', 'countries')
+	metadata.rating = metadataFromField('rating', metadata.rating)
+	metadata.mpaa_rating = metadataFromField('mpaa', metadata.mpaa_rating) 
+	metadata.runtime = metadataFromFirst('runtimes', metadata.runtime)
+	metadata.genres = metadataFromFirst('genres', metadata.genres)
+	metadata.countries = metadataFromFirst('countries', metadata.countries)
+
 	return metadata
+	
+
+def metadata_search(imdb_id):
+	meta = fetch_metadata(imdb_id)
+	if meta is not None:
+		return meta.toMetadataString()
+	
 
 def parse_meta(meta, key):
 	for line in meta.split("\n"):

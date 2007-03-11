@@ -579,9 +579,9 @@ def find_metadata_for_video_path(pathName):
 			source_nfo = nfo
 			break
 			
+	title = unicode(cleanup_title(title), "utf8", "ignore")			
 	if imdb_id is None:
-		# A title search 
-		title = unicode(cleanup_title(title), "utf8", "ignore")
+		# A title search 		
 		
 		print_verbose("Title search '%s'" % title)		
 		
@@ -617,8 +617,15 @@ def find_metadata_for_video_path(pathName):
 			return None
 			
 	print_verbose("Querying IMDb for meta data for ID %s..." % imdb_id)
-	metadata = imdbpy.metadata_search(imdb_id)
-	if metadata is not None:
+	meta = imdbpy.fetch_metadata(imdb_id)
+	if meta is not None:
+		if meta.series_episode:
+			title, season, episode = imdbpy.detect_series_title(title)			
+			if meta.season is None:
+				meta.season = season
+			if meta.episode is None:
+				meta.episode = episode
+		metadata = meta.toMetadataString()
 		metadata += "IMDb:%s" % imdb_id + "\n"
 	return metadata
 
@@ -691,7 +698,7 @@ def detect_compressed_dvd_backup_dir(dirName):
 			# Detect that the file names don't look like series episodes
 			filename_length = len(videos[0])
 			for video in videos:
-				if imdbpy.detect_series_query(cleanup_title(video)) != (None, None, None):
+				if imdbpy.detect_series_title(cleanup_title(video)) != (None, None, None):
 					print_verbose("'%s' looks like a TV-series episode." % video)
 					return False
 			
@@ -751,7 +758,15 @@ def scan_file(pathName, imdb_id = None):
 		metadata = load_metadata_file(metadata_target)
 	
 	if imdb_id is not None:
-		metadata = imdbpy.metadata_search(imdb_id)
+		meta = imdbpy.fetch_metadata(imdb_id)
+		if meta.series_episode:
+			fileName = os.path.basename(pathName)
+			t, season, episode = imdbpy.detect_series_title(fileName)			
+			if meta.season is None:
+				meta.season = season
+			if meta.episode is None:
+				meta.episode = episode
+		metadata = meta.toMetadataString()
 		metadata += "IMDb:%s" % imdb_id + "\n"
 		
 	if metadata is None:

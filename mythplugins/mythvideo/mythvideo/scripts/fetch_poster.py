@@ -190,14 +190,15 @@ class IMDbPosterFetcher(PosterFetcher):
 			return [self.download_image(poster_url, extension)]
 		return []
 			
-def find_best_posters(title, count=1, accept_horizontal=False, imdb_id=None):		
+def find_best_posters(title, count=1, accept_horizontal=False, imdb_id=None):
+		
 	fetchers = [MoviePosterPosterFetcher(), IMDbPosterFetcher()]
 	#fetchers = [IMDbPosterFetcher()]	
 	posters = []
 	
 	# If it's a series title 'Sopranos, S06E14' then use just the series
 	# name for finding the poster. Strip the episode number.
-	(series_title, season, episode) = imdbpy.detect_series_query(title)	
+	(series_title, season, episode) = imdbpy.detect_series_title(title)	
 	if series_title is not None and season is not None and episode is not None:
 		title = series_title.strip()
 		if title.endswith(","):
