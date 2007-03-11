@@ -29,5 +29,8 @@
         if ($dbh->do("OPTIMIZE TABLE $table")) {
             print "Repaired/Optimized: $table\n";
         }
+        if ($dbh->do("ANAYLIZE TABLE $table")) {
+            print "Analyzed: $table\n";
+        }
     }
 
