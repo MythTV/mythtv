@@ -2349,7 +2349,7 @@ static GlobalSpinBox *GRAllRecordRecPriority()
     GlobalSpinBox *bs = new GlobalSpinBox("AllRecordRecPriority",
                                             -99, 99, 1);
     bs->setLabel(QObject::tr("All Recordings Priority"));
-    bs->setHelpText(QObject::tr("All Recording types will receive this "
+    bs->setHelpText(QObject::tr("The 'All' Recording type will receive this "
                     "additional recording priority value."));
     bs->setValue(0);
     return bs;
