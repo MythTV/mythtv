@@ -7552,7 +7552,8 @@ bool TV::BookmarkAllowed(void)
  */
 bool TV::DeleteAllowed(void)
 {
-    if (prbuffer->isDVD() || StateIsLiveTV(GetState()))
+    if (prbuffer->isDVD() || StateIsLiveTV(GetState()) || 
+        (playbackinfo && playbackinfo->isVideo))
         return false;
     return true;
 }
