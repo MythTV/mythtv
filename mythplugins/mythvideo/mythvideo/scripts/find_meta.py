@@ -778,6 +778,7 @@ def scan_file(pathName, imdb_id = None):
 
 def scan_directory(dirName, imdb_id = None):
 	global videoExtensions
+	dirName = dirName.replace("[", "?").replace("]", "?")
 	print_verbose("Scanning directory %s..." % dirName)
 	
 	if detect_compressed_dvd_backup_dir(dirName):
