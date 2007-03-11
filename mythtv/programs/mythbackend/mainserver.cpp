@@ -1551,7 +1551,7 @@ void MainServer::DoDeleteThread(const DeleteStruct *ds)
                                .arg( fInfo.dirPath() )
                                .arg( dir[ nIdx ] );
 
-        delete_file_immediately( sFileName, followLinks, false);
+        delete_file_immediately( sFileName, followLinks, true);
     }
 
     DoDeleteInDB(ds);
