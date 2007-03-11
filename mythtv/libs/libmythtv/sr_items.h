@@ -311,6 +311,7 @@ class SRDupIn : public SRSelectSetting
             {
                 addSelection(QObject::tr("Exclude old episodes"), kDupsExRepeats | kDupsInAll);
                 addSelection(QObject::tr("Record new episodes only"), kDupsNewEpi | kDupsInAll);
+                addSelection(QObject::tr("Record new episode first showings"), kDupsFirstNew | kDupsInAll);
             }
             setValue(kDupsInAll);
             _parent->setDupInObj(this);

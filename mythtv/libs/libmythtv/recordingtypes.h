@@ -27,7 +27,8 @@ enum RecordingDupInType
     kDupsInAll          = 0x0F,
     kDupsNewEpi         = 0x10,
     kDupsExRepeats      = 0x20,
-    kDupsExGeneric      = 0x40
+    kDupsExGeneric      = 0x40,
+    kDupsFirstNew       = 0x80
 };
 
 
