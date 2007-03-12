@@ -415,6 +415,7 @@ static HostComboBox *CDWriterDevice()
         if (argadd[i].length() > 1)
             args += argadd[i];
 
+        QString  cmd = args.join(" ");
         QProcess proc(args);
 
         MythTimer totaltimer;
@@ -435,16 +436,21 @@ static HostComboBox *CDWriterDevice()
                 else
                 {
                     if (!proc.normalExit())
-                        VERBOSE(VB_IMPORTANT, "Failed to run 'cdrecord --scanbus'");
+                        VERBOSE(VB_GENERAL,
+                                QString("Failed to run '%1'").arg(cmd));
                     break;
                 }
 
                 if (totaltimer.elapsed() > 1500)
+                {
+                    //VERBOSE(VB_GENERAL, QString("Killed '%1' after %2ms")
+                    //                    .arg(cmd).arg(totaltimer.elapsed()));
                     proc.kill();
+                }
             }
         }
         else
-            VERBOSE(VB_IMPORTANT, "Failed to run 'cdrecord --scanbus'");
+            VERBOSE(VB_GENERAL, QString("Failed to run '%1'").arg(cmd));
 
         while (proc.canReadLineStdout())
             result += proc.readLineStdout();
@@ -457,9 +463,12 @@ static HostComboBox *CDWriterDevice()
             {
                 if (line[10] == ')' && line[12] != '*')
                 {
-                    gc->addSelection(line.mid(24, 16), prepend[i] + 
-                                                       line.mid(1, 5));
-cout << "adding: " << prepend[i] + line.mid(1, 5) << " -- " << line.mid(24, 16) << endl;
+                    QString dev  = prepend[i] + line.mid(1, 5);
+                    QString name = line.mid(24, 16);
+
+                    gc->addSelection(name, dev);
+                    VERBOSE(VB_GENERAL, "MythMusic adding CD-Writer: "
+                                        + dev + " -- " + name);
                 }
             }
         }
