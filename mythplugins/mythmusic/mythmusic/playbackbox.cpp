@@ -1296,17 +1296,16 @@ void PlaybackBoxMusic::stopDecoder(void)
 
 void PlaybackBoxMusic::stop(void)
 {
+    stopDecoder();
+
     if (output)
     {
-        output->Reset();
-
         if (output->GetPause())
         {
             pause();
         }
+        output->Reset();
     }
-
-    stopDecoder();
 
     mainvisual->setDecoder(0);
     mainvisual->setOutput(0);
