@@ -835,7 +835,7 @@ void AllMusic::resync()
     }
     else
     {
-         VERBOSE(VB_IMPORTANT, "You don't seem to have any tracks. "
+         VERBOSE(VB_IMPORTANT, "MythMusic hasn't found any tracks! "
                                "That's ok with me if it's ok with you.");
     }
 
