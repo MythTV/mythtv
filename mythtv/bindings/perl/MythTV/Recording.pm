@@ -112,7 +112,6 @@ package MythTV::Recording;
 
     # File exists locally
         my $sgroup = new MythTV::StorageGroup();
-        print $sgroup->GetFirstStorageDir(), "\n";
         $self->{'local_path'} = $sgroup->FindRecordingFile($self->{'basename'});
 
     # Return
@@ -470,8 +469,8 @@ package MythTV::Recording;
                                                        $self->{'file_port'});
     }
 
-# Get a the actual recording data from the backend and store it into $fh/$path
-# as appropriate.  Return values are:
+# Get the actual recording data from the backend and store it into $fh/$path as
+# appropriate.  Return values are:
 #
 # undef:  Error
 # 1:      File copied into place
@@ -489,7 +488,7 @@ package MythTV::Recording;
                                                        $seek);
     }
 
-# Find the requested program in the path
+# Find the requested program in the path.
 # This searches the path for the specified programs, and returns the
 #   lowest-index-value program found, caching the results
     sub find_program {
