@@ -333,9 +333,9 @@ void FileScanner::SearchDir(QString &directory)
 
     MSqlQuery query(MSqlQuery::InitCon());
     query.exec("SELECT filename, date_modified, path "
-               "FROM music_songs, music_directories "
-               "WHERE filename NOT LIKE ('%://%') AND "
-               "music_songs.directory_id=music_directories.directory_id");
+               "FROM music_songs LEFT JOIN music_directories "
+               "ON music_songs.directory_id=music_directories.directory_id "
+               "WHERE filename NOT LIKE ('%://%')");
 
     int counter = 0;
 
