@@ -87,6 +87,7 @@ class MPUBLIC ScheduledRecording : public ConfigurationGroup
 
     void setStart(const QDateTime& start);
     void setEnd(const QDateTime& end);
+    void setEndOffset(int endminutes);
     int getRecPriority(void) const;
     void setRecPriority(int recpriority);
     void setRecGroup(const QString& newrecgroup);

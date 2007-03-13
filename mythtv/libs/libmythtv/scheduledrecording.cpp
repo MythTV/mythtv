@@ -749,6 +749,10 @@ void ScheduledRecording::setEnd(const QDateTime& end) {
     endDate->setValue(end.date());
 }
 
+void ScheduledRecording::setEndOffset(int endminutes) {
+    endoffset->setValue(endminutes);
+}
+
 int ScheduledRecording::getRecPriority(void) const {
     return recpriority->getValue().toInt();
 }

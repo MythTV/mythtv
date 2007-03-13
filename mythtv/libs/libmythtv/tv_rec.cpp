@@ -2442,11 +2442,14 @@ void TVRec::NotifySchedulerOfRecording(ProgramInfo *rec)
 
     rec->rectype = rec->GetScheduledRecording()->getRecordingType();
 
-    if(rec->rectype == kNotRecording)
+    if (rec->rectype == kNotRecording)
     {
         rec->rectype = kSingleRecord;
         rec->GetScheduledRecording()->setRecordingType(kSingleRecord);
     }
+
+    // + remove DefaultEndOffset which would mismatch the live session
+    rec->GetScheduledRecording()->setEndOffset(0);
 
     // + save rsInactive recstatus to so that a reschedule call
     //   doesn't start recording this on another card before we
