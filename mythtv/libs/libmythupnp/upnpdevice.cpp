@@ -12,6 +12,8 @@
 #include "upnpdevice.h"
 #include "httpcomms.h"
 
+#include <unistd.h>
+
 #include <qfile.h>
 
 int DeviceLocation::g_nAllocated   = 0;       // Debugging only
