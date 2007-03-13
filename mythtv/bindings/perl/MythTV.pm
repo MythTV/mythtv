@@ -404,14 +404,14 @@ package MythTV;
     # Otherwise, we have to stream the file from the backend.
     # First, tell the backend with the file that we're about to request some
     # data.
-        my $csock = $self->new_backend_socket($self->{'file_host'},
-                                              $self->{'file_port'},
+        my $csock = $self->new_backend_socket($host,
+                                              $port,
                                               'ANN Playback '.hostname.' 0');
         $csock->read_data();
     # Announce the file transfer request to the backend, and prepare a new
     # socket to hold the data from the backend.
-        my $sock = $self->new_backend_socket($self->{'file_host'},
-                                             $self->{'file_port'},
+        my $sock = $self->new_backend_socket($host,
+                                             $port,
                                              join($MythTV::BACKEND_SEP,
                                                   'ANN FileTransfer '.hostname,
                                                   $basename));
@@ -552,7 +552,6 @@ package MythTV;
                                                  dtv_multiplex.inversion         AS dtv_inversion,
                                                  dtv_multiplex.lp_code_rate      AS dtv_lp_code_rate,
                                                  dtv_multiplex.modulation        AS dtv_modulation,
-                                                 dtv_multiplex.mplexid           AS dtv_mplexid,
                                                  dtv_multiplex.networkid         AS dtv_networkid,
                                                  dtv_multiplex.polarity          AS dtv_polarity,
                                                  dtv_multiplex.serviceversion    AS dtv_serviceversion,

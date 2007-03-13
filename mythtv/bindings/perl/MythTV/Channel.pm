@@ -62,7 +62,6 @@ package MythTV::Channel;
         $self->{'dtv_inversion'}            = $data->{'dtv_inversion'};
         $self->{'dtv_lp_code_rate'}         = $data->{'dtv_lp_code_rate'};
         $self->{'dtv_modulation'}           = $data->{'dtv_modulation'};
-        $self->{'dtv_mplexid'}              = $data->{'dtv_mplexid'};
         $self->{'dtv_networkid'}            = $data->{'dtv_networkid'};
         $self->{'dtv_polarity'}             = $data->{'dtv_polarity'};
         $self->{'dtv_serviceversion'}       = $data->{'dtv_serviceversion'};
@@ -76,6 +75,21 @@ package MythTV::Channel;
 
     # Return
         return $self;
+    }
+
+# Get the actual recording data from the backend and store it into $fh/$path
+# as appropriate.  Return values are:
+#
+# undef:  Error
+# 1:      File copied into place
+# 2:      File retrieved from the backend
+    sub get_icon {
+        my $self       = shift;
+        my $fh_or_path = shift;
+    # Now we just pass the rest to the MythTV connection to stream the file.
+        return $self->{'_mythtv'}->stream_backend_file($self->{'icon'},
+                                                       $fh_or_path,
+                                                       $self->{'icon'});
     }
 
 # Return true
