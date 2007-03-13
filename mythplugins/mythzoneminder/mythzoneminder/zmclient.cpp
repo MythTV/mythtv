@@ -307,17 +307,27 @@ void ZMClient::getEventList(const QString &eventName, bool oldestFirst, vector<E
         return;
     }
 
+    // sanity check 
+    if ((int)(strList.size() - 2) / 6 != eventCount)
+    {
+        VERBOSE(VB_IMPORTANT, "ZMClient got a mismatch between the number of events and "
+                "the expected number of stringlist items in getEventList()");
+        return;
+    }
+
+    QStringList::Iterator it = strList.begin();
+    it++; it++;
     for (int x = 0; x < eventCount; x++)
     {
         Event *item = new Event;
-        item->eventID = strList[x * 6 + 2].toInt();
-        item->eventName = strList[x * 6 + 3];
-        item->monitorID = strList[x * 6 + 4].toInt();
-        item->monitorName = strList[x * 6 + 5];
-        QString sDate = strList[x * 6 + 6];
+        item->eventID = (*it++).toInt();
+        item->eventName = *it++;
+        item->monitorID = (*it++).toInt();
+        item->monitorName = *it++;
+        QString sDate = *it++;
         QDateTime dt = QDateTime::fromString(sDate, Qt::ISODate);
         item->startTime = dt.toString("ddd - dd/MM hh:mm:ss");
-        item->length = strList[x * 6 + 7];
+        item->length = *it++;
         eventList->push_back(item);
     }
 }
@@ -339,11 +349,21 @@ void ZMClient::getFrameList(int eventID, vector<Frame*> *frameList)
         return;
     }
 
+    // sanity check
+    if ((int)(strList.size() - 2) / 2 != frameCount)
+    {
+        VERBOSE(VB_IMPORTANT, "ZMClient got a mismatch between the number of frames and "
+                "the expected number of stringlist items in getFrameList()");
+        return;
+    }
+
+    QStringList::Iterator it = strList.begin();
+    it++; it++;
     for (int x = 0; x < frameCount; x++)
     {
         Frame *item = new Frame;
-        item->type = strList[x * 2 + 2];
-        item->delta = strList[x * 2 + 3].toDouble();
+        item->type = *it++;
+        item->delta = (*it++).toDouble();
         frameList->push_back(item);
     }
 }
