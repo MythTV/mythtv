@@ -80,6 +80,7 @@ MythXMLMethod MythXML::GetMethod( const QString &sURI )
     if (sURI == "PutSetting"           ) return MXML_PutSetting;
 
     if (sURI == "GetChannelIcon"       ) return MXML_GetChannelIcon;
+    if (sURI == "GetAlbumArt"          ) return MXML_GetAlbumArt;
     if (sURI == "GetRecorded"          ) return MXML_GetRecorded;
     if (sURI == "GetExpiring"          ) return MXML_GetExpiring;
     if (sURI == "GetPreviewImage"      ) return MXML_GetPreviewImage;
@@ -126,6 +127,7 @@ bool MythXML::ProcessRequest( HttpWorkerThread *pThread, HTTPRequest *pRequest )
                 case MXML_GetVideo             : GetVideo       ( pThread, pRequest ); return true;
 
                 case MXML_GetConnectionInfo    : GetConnectionInfo( pRequest ); return true;
+                case MXML_GetAlbumArt          : GetAlbumArt    ( pRequest ); return true;
 
                 default: 
                 {
@@ -658,6 +660,104 @@ void MythXML::GetChannelIcon( HTTPRequest *pRequest )
 
         pRequest->m_sFileName       = query.value(0).toString();
     }
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
+void MythXML::GetAlbumArt( HTTPRequest *pRequest )
+{
+    bool bDefaultPixmap = false;
+
+    pRequest->m_eResponseType   = ResponseTypeFile;
+
+    int  iArtId   = pRequest->m_mapParams[ "ArtId"  ].toInt();
+
+    // Optional Parameters
+
+    int     nWidth    = pRequest->m_mapParams[ "Width"     ].toInt();
+    int     nHeight   = pRequest->m_mapParams[ "Height"    ].toInt();
+
+    // Read AlbumArt file path from database
+
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare("SELECT CONCAT_WS('/', music_directories.path, "
+                  "music_albumart.filename) FROM music_albumart "
+                  "LEFT JOIN music_directories ON "
+                  "music_directories.directory_id=music_albumart.directory_id "
+                  "WHERE music_albumart.albumart_id = :ARTID;");
+    query.bindValue(":ARTID", iArtId );
+
+    if (!query.exec() || !query.isActive())
+        MythContext::DBError("Select ArtId", query);
+
+    QString musicbasepath = gContext->GetSetting("MusicLocation", "");
+
+    if (query.size() > 0)
+    {
+        query.first();
+
+        pRequest->m_sFileName       = musicbasepath + query.value(0).toString();
+    }
+
+    if ((nWidth == 0) && (nHeight == 0))
+    {
+        bDefaultPixmap = true;
+    }
+
+    QString sFileName;
+
+// start
+    if (bDefaultPixmap)
+    {
+        return;
+    }
+    else
+        sFileName = QString( "%1.%2x%3.png" )
+                                   .arg( pRequest->m_sFileName )
+                                   .arg( nWidth    )
+                                   .arg( nHeight   );
+
+    // ----------------------------------------------------------------------
+    // check to see if albumart image is already created.
+    // ----------------------------------------------------------------------
+
+    if (QFile::exists( sFileName ))
+    {
+        pRequest->m_eResponseType   = ResponseTypeFile;
+        pRequest->m_nResponseStatus = 200;
+        pRequest->m_sFileName = sFileName;
+        return;
+    }
+
+    // ------------------------------------------------------------------
+    // Must generate Albumart Image, Generate Image and save.
+    // ------------------------------------------------------------------
+
+    float fAspect = 0.0;
+
+    QImage *pImage = new QImage(pRequest->m_sFileName);
+
+    if (!pImage)
+        return;
+
+    if (fAspect <= 0)
+           fAspect = (float)(pImage->width()) / pImage->height();
+
+    if ( nWidth == 0 )
+        nWidth = (int)rint(nHeight * fAspect);
+
+    if ( nHeight == 0 )
+        nHeight = (int)rint(nWidth / fAspect);
+
+    QImage img = pImage->smoothScale( nWidth, nHeight);
+
+    img.save( sFileName.ascii(), "PNG" );
+
+    delete pImage;
+
+    pRequest->m_sFileName = sFileName;
 }
 
 /////////////////////////////////////////////////////////////////////////////

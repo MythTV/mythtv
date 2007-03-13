@@ -50,7 +50,8 @@ typedef enum
     MXML_GetProgramDetails      = 13,
     MXML_GetVideo               = 14,
 
-    MXML_GetConnectionInfo      = 15
+    MXML_GetConnectionInfo      = 15,
+    MXML_GetAlbumArt            = 16
 
 } MythXMLMethod;
 
@@ -101,6 +102,7 @@ class MythXML : public Eventing
         void    GetPreviewImage( HTTPRequest *pRequest );
 
         void    GetConnectionInfo( HTTPRequest *pRequest );
+        void    GetAlbumArt    ( HTTPRequest *pRequest );
 
         QImage *GeneratePreviewImage( ProgramInfo   *pInfo,
                                       const QString &sFileName,
