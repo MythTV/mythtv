@@ -4469,6 +4469,7 @@ void PlaybackBox::showRecGroupChooser(void)
     MSqlQuery query(MSqlQuery::InitCon());
     QString itemStr;
     QString dispGroup;
+    QString saveRecGroup = recGroup;
     int items;
     int totalItems = 0;
     bool liveTVInAll = gContext->GetNumSetting("LiveTVInAllPrograms",0);
@@ -4611,6 +4612,9 @@ void PlaybackBox::recGroupChooserListBoxChanged(void)
 
 void PlaybackBox::setGroupFilter(void)
 {
+    QString savedPW = recGroupPassword;
+    QString savedRecGroup = recGroup;
+
     recGroup = recGroupListBox->currentText().section(" [", 0, 0);
 
     if (groupnameAsAllProg)
@@ -4637,7 +4641,11 @@ void PlaybackBox::setGroupFilter(void)
         pwd->exec();
         delete pwd;
         if (!ok)
+        {
+            recGroupPassword = savedPW;
+            recGroup = savedRecGroup;
             return;
+        }
 
         curGroupPassword = recGroupPassword;
     } else
