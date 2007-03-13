@@ -408,32 +408,39 @@ long HTTPRequest::SendResponseFile( QString sFileName )
 //
 /////////////////////////////////////////////////////////////////////////////
 
-void HTTPRequest::FormatErrorReponse( long nCode, const QString &sDesc )
+void HTTPRequest::FormatErrorResponse( long nCode, const QString &sDesc )
 {
+    QString sMsg( sDesc );
+
     m_eResponseType   = ResponseTypeXML;
     m_nResponseStatus = 500;
 
     m_response << "<?xml version=\"1.0\" encoding=\"utf-8\"?>";
 
+    QString sWhere = ((nCode >= 500) && (nCode <=599)) ? "s:Server" : "s:Client";
+
     if (m_bSOAPRequest)
     {
         m_mapRespHeaders[ "EXT" ] = "";
 
-        m_response <<  "<s:Fault>"
-                       "<faultcode>s:Client</faultcode>"
-                       "<faultstring>UPnPError</faultstring>";
+        m_response <<  SOAP_ENVELOPE_BEGIN 
+                   <<  "<s:Fault><faultcode>"
+                   <<  sWhere
+                   <<  "</faultcode><faultstring>UPnPError</faultstring>";
     }
 
     m_response << "<detail>";
 
     if (m_bSOAPRequest)     
-        m_response << "<UPnpError xmlns=\"urn:schemas-upnp-org:control-1-0\">";
+        m_response << "<UPnPError xmlns=\"urn:schemas-upnp-org:control-1-0\">";
+
+    Encode( sMsg );
 
     m_response << "<errorCode>" << nCode << "</errorCode>";
-    m_response << "<errorDescription>" << sDesc << "</errorDescription>";
+    m_response << "<errorDescription>" << sMsg << "</errorDescription>";
 
     if (m_bSOAPRequest)     
-        m_response << "</UPnpError>";
+        m_response << "</UPnPError>";
 
     m_response << "</detail>";
 
@@ -445,7 +452,7 @@ void HTTPRequest::FormatErrorReponse( long nCode, const QString &sDesc )
 //
 /////////////////////////////////////////////////////////////////////////////
 
-void HTTPRequest::FormatActionReponse( NameValueList *pArgs )
+void HTTPRequest::FormatActionResponse( NameValueList *pArgs )
 {
     m_eResponseType   = ResponseTypeXML;
     m_nResponseStatus = 200;
@@ -464,8 +471,26 @@ void HTTPRequest::FormatActionReponse( NameValueList *pArgs )
 
     for (NameValue *pNV = pArgs->first(); pNV != NULL; pNV = pArgs->next())
     {                                                               
-        m_response << "<" << pNV->sName << ">";
-        m_response << pNV->sValue;
+        m_response << "<" << pNV->sName;
+        
+        if (pNV->pAttributes != NULL)
+        {
+
+            for (NameValue *pAttr  = pNV->pAttributes->first(); 
+                            pAttr != NULL; 
+                            pAttr  = pNV->pAttributes->next())
+            {                                                               
+                m_response << " " << pAttr->sName << "='" << Encode( pAttr->sValue ) << "'";
+            }
+        }
+
+        m_response << ">";
+
+        if (m_bSOAPRequest)
+            m_response << Encode( pNV->sValue );
+        else
+            m_response << pNV->sValue;
+
         m_response << "</" << pNV->sName << ">\r\n";
     }
 

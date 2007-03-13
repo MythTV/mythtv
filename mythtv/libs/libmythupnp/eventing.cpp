@@ -25,7 +25,7 @@
 Eventing::Eventing( const QString &sExtensionName, const QString &sEventMethodName ) : HttpServerExtension( sExtensionName )
 {
     m_sEventMethodName      = sEventMethodName;
-    m_nSubscriptionDuration = gContext->GetNumSetting( "upnp:SubscriptionDuration", 1800 );
+    m_nSubscriptionDuration = UPnp::g_pConfig->GetValue( "UPnP/SubscriptionDuration", 1800 );
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -96,7 +96,7 @@ bool Eventing::ProcessRequest( HttpWorkerThread * /*pThread*/, HTTPRequest *pReq
             case RequestTypeSubscribe   : HandleSubscribe     ( pRequest ); break;
             case RequestTypeUnsubscribe : HandleUnsubscribe   ( pRequest ); break;
             default:
-                pRequest->FormatErrorReponse( 401, "Invalid Action" );
+                pRequest->FormatErrorResponse( 401, "Invalid Action" );
                 pRequest->m_nResponseStatus = 401;  //501;
                 break;
         }       

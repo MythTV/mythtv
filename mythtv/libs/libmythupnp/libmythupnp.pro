@@ -9,7 +9,6 @@ target.path = $${LIBDIR}
 INSTALLS = target
 
 setting.path = $${PREFIX}/share/mythtv/
-setting.files += devicemaster.xml deviceslave.xml 
 setting.files += CDS_scpd.xml CMGR_scpd.xml MSRR_scpd.xml MXML_scpd.xml
 
 INSTALLS += setting
@@ -22,13 +21,13 @@ HEADERS += httprequest.h upnp.h ssdp.h taskqueue.h
 HEADERS += upnpdevice.h upnptasknotify.h upnptasksearch.h threadpool.h upnputil.h
 HEADERS += httpserver.h upnpcds.h upnpcdsobjects.h bufferedsocketdevice.h upnpmsrr.h
 HEADERS += eventing.h upnpcmgr.h upnptaskevent.h upnptaskcache.h ssdpcache.h
-HEADERS += upnpimpl.h mediaserver.h
+HEADERS += upnpimpl.h multicast.h broadcast.h configuration.h
 
 SOURCES += httprequest.cpp upnp.cpp ssdp.cpp taskqueue.cpp upnputil.cpp
 SOURCES += upnpdevice.cpp upnptasknotify.cpp upnptasksearch.cpp threadpool.cpp
 SOURCES += httpserver.cpp upnpcds.cpp upnpcdsobjects.cpp bufferedsocketdevice.cpp
 SOURCES += eventing.cpp upnpcmgr.cpp upnpmsrr.cpp upnptaskevent.cpp ssdpcache.cpp
-SOURCES += mediaserver.cpp
+SOURCES += configuration.cpp
 
 INCLUDEPATH += ../libmyth
 INCLUDEPATH += ../..
@@ -63,7 +62,7 @@ inc.files  = httprequest.h upnp.h ssdp.h taskqueue.h bufferedsocketdevice.h
 inc.files += upnpdevice.h upnptasknotify.h upnptasksearch.h threadpool.h upnputil.h
 inc.files += httpserver.h httpstatus.h upnpcds.h upnpcdsobjects.h
 inc.files += eventing.h upnpcmgr.h upnptaskevent.h upnptaskcache.h ssdpcache.h
-inc.files += upnpimpl.h mediaserver.h
+inc.files += upnpimpl.h multicast.h broadcast.h configuration.h
 
 INSTALLS += inc
 

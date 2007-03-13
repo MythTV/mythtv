@@ -8,8 +8,8 @@
 //                                                                            
 //////////////////////////////////////////////////////////////////////////////
 
-#include "upnpdevice.h"
-#include "ssdp.h"
+#include "upnp.h"
+#include "mythcontext.h"
 #include "upnptasksearch.h"
 
 #include <unistd.h>
@@ -31,7 +31,8 @@
 //
 /////////////////////////////////////////////////////////////////////////////
 
-UPnpSearchTask::UPnpSearchTask( QHostAddress peerAddress,
+UPnpSearchTask::UPnpSearchTask( int          nServicePort, 
+                                QHostAddress peerAddress,
                                 int          nPeerPort,  
                                 QString      sST, 
                                 QString      sUDN )
@@ -40,6 +41,9 @@ UPnpSearchTask::UPnpSearchTask( QHostAddress peerAddress,
     m_nPeerPort   = nPeerPort;
     m_sST         = sST;
     m_sUDN        = sUDN;
+    m_nServicePort= nServicePort;
+    m_nMaxAge     = UPnp::g_pConfig->GetValue( "UPnP/SSDP/MaxAge" , 3600 );
+
 } 
 
 /////////////////////////////////////////////////////////////////////////////
@@ -85,6 +89,8 @@ void UPnpSearchTask::SendMsg( QSocketDevice  *pSocket,
 //                        .arg( sST  )
 //                        .arg( sUSN ));
 
+//cout << "UPnpSearchTask::SendMsg    m_PeerAddress = " <<  m_PeerAddress.toString() << " Port=" << m_nPeerPort << endl;
+
     for ( QStringList::Iterator it  = m_addressList.begin(); 
                                 it != m_addressList.end(); 
                               ++it ) 
@@ -92,7 +98,7 @@ void UPnpSearchTask::SendMsg( QSocketDevice  *pSocket,
         QString sHeader = QString ( "HTTP/1.1 200 OK\r\n"
                                     "LOCATION: http://%1:%2/getDeviceDesc\r\n" )
                             .arg( *it )
-                            .arg( m_nStatusPort);
+                            .arg( m_nServicePort);
 
 
         QString  sPacket  = sHeader + sData;
@@ -115,13 +121,6 @@ void UPnpSearchTask::SendMsg( QSocketDevice  *pSocket,
 
 void UPnpSearchTask::Execute( TaskQueue * /*pQueue*/ )
 {
-    // ----------------------------------------------------------------------
-    // Reload in case they have changed.
-    // ----------------------------------------------------------------------
-
-    m_nStatusPort = gContext->GetNumSetting("BackendStatusPort", 6544 );
-    m_nMaxAge     = gContext->GetNumSetting("upnpMaxAge"       , 3600 );
-
     QSocketDevice *pSocket = new QSocketDevice( QSocketDevice::Datagram );
 
     // ----------------------------------------------------------------------

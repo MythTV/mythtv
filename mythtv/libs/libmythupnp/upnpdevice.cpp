@@ -8,9 +8,13 @@
 //                                                                            
 //////////////////////////////////////////////////////////////////////////////
 
+#include "upnp.h"
 #include "upnpdevice.h"
+#include "httpcomms.h"
 
 #include <qfile.h>
+
+int DeviceLocation::g_nAllocated   = 0;       // Debugging only
 
 /////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////
@@ -26,6 +30,7 @@
 
 UPnpDeviceDesc::UPnpDeviceDesc()
 {
+    VERBOSE( VB_UPNP, "UPnpDeviceDesc - Constructor" );
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -34,6 +39,7 @@ UPnpDeviceDesc::UPnpDeviceDesc()
 
 UPnpDeviceDesc::~UPnpDeviceDesc()
 {
+    VERBOSE( VB_UPNP, "UPnpDeviceDesc - Destructor" );
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -77,7 +83,20 @@ bool UPnpDeviceDesc::Load( const QString &sFileName )
     // XML Document Loaded... now parse it into the UPnpDevice Hierarchy
     // --------------------------------------------------------------
 
-    QDomNode  oNode = doc.documentElement();
+    return Load( doc );
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
+bool UPnpDeviceDesc::Load( const QDomDocument &xmlDevDesc )
+{
+    // --------------------------------------------------------------
+    // Parse XML into the UPnpDevice Hierarchy
+    // --------------------------------------------------------------
+
+    QDomNode  oNode = xmlDevDesc.documentElement();
 
     _InternalLoad( oNode.namedItem( "device" ), &m_rootDevice );
 
@@ -238,12 +257,12 @@ void UPnpDeviceDesc::SetNumValue( const QDomNode &n, int &nValue )
 //
 /////////////////////////////////////////////////////////////////////////////
 
-QString  UPnpDeviceDesc::GetValidXML( const QString &sBaseAddress )
+QString  UPnpDeviceDesc::GetValidXML( const QString &sBaseAddress, int nPort )
 {
     QString     sXML;
     QTextStream os( sXML, IO_WriteOnly );
 
-    GetValidXML( sBaseAddress, os );
+    GetValidXML( sBaseAddress, nPort, os );
 
     return( sXML );
 }
@@ -252,10 +271,8 @@ QString  UPnpDeviceDesc::GetValidXML( const QString &sBaseAddress )
 //
 /////////////////////////////////////////////////////////////////////////////
 
-void UPnpDeviceDesc::GetValidXML( const QString &sBaseAddress, QTextStream &os, const QString &sUserAgent )
+void UPnpDeviceDesc::GetValidXML( const QString &sBaseAddress, int nPort, QTextStream &os, const QString &sUserAgent )
 {
-    int nStatusPort = gContext->GetNumSetting("BackendStatusPort", 6544 );
-
 //    os.setEncoding( QTextStream::UnicodeUTF8 );
 
     os << "<?xml version=\"1.0\" encoding=\"utf-8\"?>"
@@ -264,7 +281,7 @@ void UPnpDeviceDesc::GetValidXML( const QString &sBaseAddress, QTextStream &os, 
               "<major>1</major>"
               "<minor>0</minor>"
             "</specVersion>"
-            "<URLBase>http://" << sBaseAddress << ":" << nStatusPort << "/</URLBase>";
+            "<URLBase>http://" << sBaseAddress << ":" << nPort << "/</URLBase>";
 
     OutputDevice( os, &m_rootDevice, sUserAgent );
 
@@ -285,14 +302,16 @@ void UPnpDeviceDesc::OutputDevice( QTextStream &os,
     os << "<device>";
     os << FormatValue( "deviceType"       , pDevice->m_sDeviceType      );
 
-    QString sFriendlyName = pDevice->m_sFriendlyName;
+    QString sFriendlyName = QString( "%1 on %2" )
+                               .arg( pDevice->m_sFriendlyName   )
+                               .arg( GetHostName() );
 
     // ----------------------------------------------------------------------
     // Only override the root device
     // ----------------------------------------------------------------------
 
     if (pDevice == &m_rootDevice)
-        sFriendlyName = gContext->GetSetting( "upnpFriendlyName", sFriendlyName );
+        sFriendlyName = UPnp::g_pConfig->GetValue( "UPnP/FriendlyName", sFriendlyName  );
     
     os << FormatValue( "friendlyName" , sFriendlyName );
 
@@ -388,18 +407,24 @@ void UPnpDeviceDesc::OutputDevice( QTextStream &os,
     // Output any Embedded Devices
     // ----------------------------------------------------------------------
 
-    if (pDevice->m_listDevices.count() > 0)
-    {
-        os << "<deviceList>";
+    // -=>Note:  XBMC can't handle sub-devices, it's UserAgent is blank.
 
-        for ( UPnpDevice *pEmbeddedDevice  = pDevice->m_listDevices.first(); 
-                          pEmbeddedDevice != NULL;
-                          pEmbeddedDevice  = pDevice->m_listDevices.next() )
+    if (sUserAgent.length() > 0)
+    {
+        if (pDevice->m_listDevices.count() > 0)
         {
-            OutputDevice( os, pEmbeddedDevice );
+            os << "<deviceList>";
+
+            for ( UPnpDevice *pEmbeddedDevice  = pDevice->m_listDevices.first(); 
+                              pEmbeddedDevice != NULL;
+                              pEmbeddedDevice  = pDevice->m_listDevices.next() )
+            {
+                OutputDevice( os, pEmbeddedDevice );
+            }
+            os << "</deviceList>";
         }
-        os << "</deviceList>";
     }
+
     os << "</device>";
 }
 
@@ -463,4 +488,111 @@ QString  UPnpDeviceDesc::FindDeviceUDN( UPnpDevice *pDevice, QString sST )
     }
 
     return( "" );
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
+UPnpDevice *UPnpDeviceDesc::FindDevice( const QString &sURI )
+{
+    return FindDevice( &m_rootDevice, sURI );
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
+UPnpDevice *UPnpDeviceDesc::FindDevice( UPnpDevice *pDevice, const QString &sURI )
+
+{
+    if ( sURI == pDevice->m_sDeviceType )
+        return pDevice;
+
+    // ----------------------------------------------------------------------
+    // Check Embedded Devices for a Match
+    // ----------------------------------------------------------------------
+
+    for ( UPnpDevice *pEmbeddedDevice  = pDevice->m_listDevices.first(); 
+                      pEmbeddedDevice != NULL;
+                      pEmbeddedDevice  = pDevice->m_listDevices.next() )
+    {
+        UPnpDevice *pFound = FindDevice( pEmbeddedDevice, sURI );
+
+        if (pFound != NULL)
+            return pFound;
+    }
+
+    return NULL;
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
+UPnpDeviceDesc *UPnpDeviceDesc::Retrieve( QString &sURL, bool bInQtThread )
+{
+    UPnpDeviceDesc *pDevice = NULL;
+
+    VERBOSE( VB_UPNP, QString( "UPnpDeviceDesc::Retrieve( %1, %2 ) - Requesting Device Description." )
+                         .arg( sURL )
+                         .arg( bInQtThread ));
+
+    QString sXml = HttpComms::getHttp( sURL,
+                                       10000, // ms
+                                       3,     // retries
+                                       0,     // redirects
+                                       false, // allow gzip
+                                       NULL,  // login
+                                       bInQtThread );
+
+    if (sXml.startsWith( "<?xml" ))
+    {
+        QString sErrorMsg;
+
+        QDomDocument xml( "upnp" );
+
+        if ( xml.setContent( sXml, false, &sErrorMsg ))
+        {
+            pDevice = new UPnpDeviceDesc();
+
+            pDevice->Load( xml );
+
+            pDevice->m_HostUrl   = sURL;
+            pDevice->m_sHostName = pDevice->m_HostUrl.host();
+        }
+        else
+        {
+            VERBOSE( VB_UPNP, QString( "UPnp::Retrieve - Error parsing device description xml [%1]" )
+                                 .arg( sErrorMsg ));
+        }
+    }
+    else
+    {
+        VERBOSE( VB_UPNP, QString( "UPnp::Retrieve - Invalid response from %1" )
+                             .arg( sURL ));
+    }
+
+    return pDevice;
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
+QString UPnpDeviceDesc::GetHostName()
+{
+    if (m_sHostName.length() == 0)
+    {
+        // Get HostName
+
+        char localHostName[1024];
+
+        if (gethostname(localHostName, 1024))
+            VERBOSE(VB_IMPORTANT, "UPnpDeviceDesc: Error, could not determine host name." + ENO);
+
+        return UPnp::g_pConfig->GetValue( "Settings/HostName", QString( localHostName ));
+    }
+
+    return m_sHostName;
 }

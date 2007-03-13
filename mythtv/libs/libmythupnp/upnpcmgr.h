@@ -12,7 +12,6 @@
 #define UPnpCMGR_H_
 
 #include "httpserver.h"
-#include "mythcontext.h"
 #include "eventing.h"
               
 typedef enum 

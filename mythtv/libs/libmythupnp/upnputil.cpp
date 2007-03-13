@@ -9,8 +9,8 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include "mythconfig.h"
-#include "mythcontext.h"
 #include "upnputil.h"
+#include "upnp.h"
 
 #include <quuid.h>
 #include <sys/types.h>
@@ -31,9 +31,13 @@
 
 QString LookupUDN( QString sDeviceType )
 {
-    sDeviceType = "upnp:UDN:" + sDeviceType;
-    
-    QString sUDN = gContext->GetSetting( sDeviceType, "" );
+    QStringList sList = QStringList::split( ":", sDeviceType );
+
+    QString     sName = "UPnP/UDN/" + sList[ sList.size() - 2 ];
+
+    // cout << "lookupUDN: " << sName << endl;
+
+    QString sUDN = UPnp::g_pConfig->GetValue( sName, "" );
 
     if ( sUDN.length() == 0) 
     {
@@ -41,7 +45,9 @@ QString LookupUDN( QString sDeviceType )
 
         sUDN = sUDN.mid( 1, sUDN.length() - 2);
 
-        gContext->SaveSetting   ( sDeviceType, sUDN );
+        UPnp::g_pConfig->SetValue( sName, sUDN );
+
+        UPnp::g_pConfig->Save();
     }
 
     return( sUDN );

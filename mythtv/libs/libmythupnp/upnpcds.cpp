@@ -8,7 +8,9 @@
 //                                                                            
 //////////////////////////////////////////////////////////////////////////////
 
+#include "upnp.h"
 #include "upnpcds.h"
+#include "upnputil.h"
 
 #include "util.h"
 
@@ -69,8 +71,7 @@ UPnpCDS::UPnpCDS( UPnpDevice *pDevice ) : Eventing( "UPnpCDS", "CDS_Event" )
 
     SetValue< unsigned short >( "SystemUpdateID", 1 );
 
-    QString sSharePath    = gContext->GetShareDir();
-    QString sUPnpDescPath = gContext->GetSetting("upnpDescXmlPath", sSharePath);
+    QString sUPnpDescPath = UPnp::g_pConfig->GetValue( "UPnP/DescXmlPath", m_sSharePath );
 
     m_sServiceDescFileName = sUPnpDescPath + "CDS_scpd.xml";
     m_sControlUrl          = "/CDS_Control";
@@ -154,10 +155,6 @@ bool UPnpCDS::ProcessRequest( HttpWorkerThread *pThread, HTTPRequest *pRequest )
             return false;
         }
 
-        VERBOSE(VB_UPNP,QString("UPnpCDS::ProcessRequest : %1 : %2 :")
-                        .arg(pRequest->m_sBaseUrl)
-                        .arg(pRequest->m_sMethod));
-
         switch( GetMethod( pRequest->m_sMethod ) )
         {
             case CDSM_GetServiceDescription : pRequest->FormatFileResponse( m_sServiceDescFileName ); break;
@@ -167,7 +164,7 @@ bool UPnpCDS::ProcessRequest( HttpWorkerThread *pThread, HTTPRequest *pRequest )
             case CDSM_GetSortCapabilities   : HandleGetSortCapabilities   ( pRequest ); break;
             case CDSM_GetSystemUpdateID     : HandleGetSystemUpdateID     ( pRequest ); break;
             default:
-                pRequest->FormatErrorReponse( 401, "Invalid Action" );
+                pRequest->FormatErrorResponse( 401, "Invalid Action" );
                 pRequest->m_nResponseStatus = 401; //501;
                 break;
         }       
@@ -177,21 +174,6 @@ bool UPnpCDS::ProcessRequest( HttpWorkerThread *pThread, HTTPRequest *pRequest )
 
     return false;
 
-}
-
-/////////////////////////////////////////////////////////////////////////////
-//
-/////////////////////////////////////////////////////////////////////////////
-
-QString &UPnpCDS::Encode( QString &sStr )
-{
-    sStr.replace(QRegExp( "&"), "&amp;" ); // This _must_ come first
-    sStr.replace(QRegExp( "<"), "&lt;"  );
-    sStr.replace(QRegExp( ">"), "&gt;"  );
-//    sStr.replace(QRegExp("\""), "&quot;");
-//    sStr.replace(QRegExp( "'"), "&apos;");
-
-    return( sStr );
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -210,6 +192,12 @@ void UPnpCDS::HandleBrowse( HTTPRequest *pRequest )
     request.m_nStartingIndex    = pRequest->m_mapParams[ "StartingIndex" ].toLong();
     request.m_nRequestedCount   = pRequest->m_mapParams[ "RequestedCount"].toLong();
     request.m_sSortCriteria     = pRequest->m_mapParams[ "SortCriteria"  ];
+
+    VERBOSE(VB_UPNP,QString("UPnpCDS::ProcessRequest : %1 : %2 : %3 : %4")
+                       .arg( pRequest->m_sBaseUrl )
+                       .arg( pRequest->m_sMethod )
+                       .arg( request.m_sObjectId )
+                       .arg( request.m_eBrowseFlag ));
 
     short   nErrorCode      = 701;
     QString sErrorDesc      = "No such object";
@@ -251,13 +239,15 @@ void UPnpCDS::HandleBrowse( HTTPRequest *pRequest )
 
                 // -=>TODO: Need to handle StartingIndex & RequestedCount
 
+                short nStart = Max( request.m_nStartingIndex, short( 0 ));
+                short nCount = 0;
+
                 nErrorCode      = 0;
                 sErrorDesc      = "";
-                nNumberReturned = m_extensions.count();
                 nTotalMatches   = m_extensions.count();
                 nUpdateID       = m_root.m_nUpdateId;
 
-                UPnpCDSExtension    *pExtension = m_extensions.first();
+                UPnpCDSExtension    *pExtension = m_extensions.at( nStart );
 
                 request.m_sParentId         = "0";
                 request.m_eBrowseFlag       = CDS_BrowseMetadata;
@@ -266,7 +256,7 @@ void UPnpCDS::HandleBrowse( HTTPRequest *pRequest )
                 request.m_nRequestedCount   = 1;
                 request.m_sSortCriteria     = "";
 
-                while ( pExtension != NULL )
+                while (( pExtension != NULL ) && (nCount < request.m_nRequestedCount ))
                 {
                     request.m_sObjectId = pExtension->m_sExtensionId;
 
@@ -281,7 +271,11 @@ void UPnpCDS::HandleBrowse( HTTPRequest *pRequest )
                     }
 
                     pExtension = m_extensions.next();
+                    nCount++;
                 }
+
+                nNumberReturned = nCount;
+
                 break;
             }
             default: break;
@@ -334,15 +328,15 @@ void UPnpCDS::HandleBrowse( HTTPRequest *pRequest )
         sResults += sResultXML;
         sResults += DIDL_LITE_END;
 
-        list.append( new NameValue( "Result"        , Encode( sResults                 )));
+        list.append( new NameValue( "Result"        , sResults                          ));
         list.append( new NameValue( "NumberReturned", QString::number( nNumberReturned )));
         list.append( new NameValue( "TotalMatches"  , QString::number( nTotalMatches   )));
         list.append( new NameValue( "UpdateID"      , QString::number( nUpdateID       )));
 
-        pRequest->FormatActionReponse( &list );
+        pRequest->FormatActionResponse( &list );
     }
     else
-        pRequest->FormatErrorReponse ( nErrorCode, sErrorDesc );
+        pRequest->FormatErrorResponse ( nErrorCode, sErrorDesc );
 
 }
 
@@ -370,6 +364,12 @@ void UPnpCDS::HandleSearch( HTTPRequest *pRequest )
     request.m_sSortCriteria     = pRequest->m_mapParams[ "SortCriteria"  ];
     request.m_sSearchCriteria   = "";
     m_root.m_sClass = pRequest->m_mapParams[ "SearchCriteria"];
+
+    VERBOSE(VB_UPNP,QString("UPnpCDS::ProcessRequest : %1 : %2 : %3 : %4")
+                       .arg( pRequest->m_sBaseUrl )
+                       .arg( pRequest->m_sMethod )
+                       .arg( request.m_sContainerID )
+                       .arg( request.m_sFilter ));
 
     //pRequest->m_mapParams[ "SearchCriteria"];
 
@@ -416,15 +416,15 @@ void UPnpCDS::HandleSearch( HTTPRequest *pRequest )
         sResults += sResultXML;
         sResults += DIDL_LITE_END;
 
-        list.append( new NameValue( "Result"        , Encode( sResults                 )));
+        list.append( new NameValue( "Result"        , sResults                          ));
         list.append( new NameValue( "NumberReturned", QString::number( nNumberReturned )));
         list.append( new NameValue( "TotalMatches"  , QString::number( nTotalMatches   )));
         list.append( new NameValue( "UpdateID"      , QString::number( nUpdateID       )));
 
-        pRequest->FormatActionReponse( &list );
+        pRequest->FormatActionResponse( &list );
     }
     else
-        pRequest->FormatErrorReponse ( nErrorCode, sErrorDesc );
+        pRequest->FormatErrorResponse ( nErrorCode, sErrorDesc );
 
 }
 
@@ -436,11 +436,15 @@ void UPnpCDS::HandleGetSearchCapabilities( HTTPRequest *pRequest )
 {
     NameValueList list;
 
+    VERBOSE(VB_UPNP,QString("UPnpCDS::ProcessRequest : %1 : %2")
+                       .arg(pRequest->m_sBaseUrl)
+                       .arg(pRequest->m_sMethod));
+
     // -=>TODO: Need to implement based on CDS Extension Capabilities
 
     list.append( new NameValue( "SearchCaps", "dc:title,dc:creator,dc:date,upnp:class,res@size" ));
 
-    pRequest->FormatActionReponse( &list );
+    pRequest->FormatActionResponse( &list );
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -451,11 +455,15 @@ void UPnpCDS::HandleGetSortCapabilities( HTTPRequest *pRequest )
 {
     NameValueList list;
 
+    VERBOSE(VB_UPNP,QString("UPnpCDS::ProcessRequest : %1 : %2")
+                       .arg(pRequest->m_sBaseUrl)
+                       .arg(pRequest->m_sMethod));
+
     // -=>TODO: Need to implement based on CDS Extension Capabilities
 
     list.append( new NameValue( "SortCaps", "dc:title,dc:creator,dc:date,upnp:class,res@size" ));
 
-    pRequest->FormatActionReponse( &list );
+    pRequest->FormatActionResponse( &list );
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -466,10 +474,14 @@ void UPnpCDS::HandleGetSystemUpdateID( HTTPRequest *pRequest )
 {
     NameValueList list;
 
+    VERBOSE(VB_UPNP,QString("UPnpCDS::ProcessRequest : %1 : %2")
+                       .arg(pRequest->m_sBaseUrl)
+                       .arg(pRequest->m_sMethod));
+
     unsigned short nId = GetValue< unsigned short >( "SystemUpdateID" );
 
     list.append( new NameValue( "Id", QString::number( nId ) ));
 
-    pRequest->FormatActionReponse( &list );
+    pRequest->FormatActionResponse( &list );
 }
 

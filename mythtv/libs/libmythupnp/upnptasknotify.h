@@ -19,6 +19,7 @@
 #include <arpa/inet.h>
 
 #include "upnp.h"
+#include "multicast.h"
 
 /////////////////////////////////////////////////////////////////////////////
 // Typedefs
@@ -46,7 +47,7 @@ class UPnpNotifyTask : public Task
         QMutex          m_mutex;
 
         QString         m_sMasterIP;
-        int             m_nStatusPort;
+        int             m_nServicePort;
         int             m_nMaxAge;    
 
         UPnpNotifyNTS   m_eNTS;
@@ -60,12 +61,12 @@ class UPnpNotifyTask : public Task
 
         virtual ~UPnpNotifyTask();
 
-        void     ProcessDevice( QMulticastSocket *pSocket, UPnpDevice *pDevice );
-        void     SendNotifyMsg( QMulticastSocket *pSocket, QString sNT, QString sUDN );
+        void     ProcessDevice( QSocketDevice *pSocket, UPnpDevice *pDevice );
+        void     SendNotifyMsg( QSocketDevice *pSocket, QString sNT, QString sUDN );
 
     public:
 
-        UPnpNotifyTask();
+        UPnpNotifyTask( int nServicePort );
 
         virtual QString Name   ()               { return( "Notify" );   }
         virtual void    Execute( TaskQueue * );

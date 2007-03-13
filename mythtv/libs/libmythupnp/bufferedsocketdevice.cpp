@@ -43,7 +43,8 @@ BufferedSocketDevice::BufferedSocketDevice( int nSocket  )
 //
 /////////////////////////////////////////////////////////////////////////////
 
-BufferedSocketDevice::BufferedSocketDevice( QSocketDevice *pSocket /*= NULL*/ )
+BufferedSocketDevice::BufferedSocketDevice( QSocketDevice *pSocket /*= NULL*/, 
+                                            bool bTakeOwnership /* = false */ )
 {
 
     m_bufWrite.setAutoDelete( TRUE );
@@ -55,7 +56,7 @@ BufferedSocketDevice::BufferedSocketDevice( QSocketDevice *pSocket /*= NULL*/ )
     m_nMaxReadBufferSize = 0; 
     m_nWriteSize         = 0;
     m_nWriteIndex        = 0;
-    m_bHandleSocketDelete= false;
+    m_bHandleSocketDelete= bTakeOwnership;
 
 }
 

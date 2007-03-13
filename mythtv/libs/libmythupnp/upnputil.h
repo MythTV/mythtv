@@ -11,7 +11,8 @@
 #ifndef __UPNPUTIL_H__
 #define __UPNPUTIL_H__
 
-#include "mythcontext.h"
+#include <qptrlist.h>
+#include <qstringlist.h>
 
 // __suseconds_t doesn't exist on some older Unixes. e.g. Darwin/Mac OS X
 
@@ -24,6 +25,19 @@
 typedef int32_t __suseconds_t;
 #endif
 
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
+template <class T> inline const T& Min( const T &x, const T &y ) 
+{
+    return( ( x < y ) ? x : y );
+}
+ 
+template <class T> inline const T& Max( const T &x, const T &y ) 
+{
+    return( ( x > y ) ? x : y );
+}
 //////////////////////////////////////////////////////////////////////////////
 // Typedefs
 //////////////////////////////////////////////////////////////////////////////
@@ -32,15 +46,7 @@ typedef struct timeval                   TaskTime;
 
 /////////////////////////////////////////////////////////////////////////////
 
-typedef struct _NameValue
-{   
-    QString sName;
-    QString sValue;
-
-    _NameValue( const QString &name, const QString value ) 
-        : sName( name ), sValue( value ) { }
-
-} NameValue;
+class NameValue;
 
 class NameValueList : public QPtrList< NameValue > 
 {
@@ -50,6 +56,46 @@ class NameValueList : public QPtrList< NameValue >
         {
             setAutoDelete( true );
         }       
+};
+
+class NameValue
+{
+    public:
+
+        QString sName;
+        QString sValue;
+
+        NameValueList *pAttributes;
+
+    NameValue() 
+      : sName( NULL ), sValue( NULL ), pAttributes( NULL ) { }
+
+    NameValue( const QString &name, const QString &value ) 
+      : sName( name ), sValue( value ), pAttributes( NULL ) { }
+
+    NameValue( const QString &name, char *value ) 
+      : sName( name ), sValue( value ), pAttributes( NULL ) { }
+
+    NameValue( const QString &name, int value ) 
+      : sName( name ), sValue( QString::number( value )), pAttributes( NULL ) { }
+
+    NameValue( const QString &name, bool value ) 
+      : sName( name ), sValue( (value) ? "1" : "0" ), pAttributes( NULL ) { }
+
+    ~NameValue()
+    {
+        if (pAttributes != NULL)
+            delete pAttributes;
+    }
+
+    void AddAttribute( const QString &name, const QString &value )
+    {
+        if (pAttributes == NULL)
+            pAttributes = new NameValueList();
+
+        pAttributes->append( new NameValue( name, value ));
+    }
+
 };
 
 //////////////////////////////////////////////////////////////////////////////

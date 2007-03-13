@@ -11,73 +11,21 @@
 #ifndef __SSDPCLIENT_H__
 #define __SSDPCLIENT_H__
 
-#include "mythcontext.h"
+#include "mythobservable.h"
 
-#include "qdict.h"
-#include "qmap.h"
-#include "sys/time.h"
-#include "qdatetime.h"
+#include <qobject.h>
+#include <qdict.h>
+#include <qmap.h>
 
-/////////////////////////////////////////////////////////////////////////////
-// SSDPCacheEntry Class Definition/Implementation
-/////////////////////////////////////////////////////////////////////////////
+#include "upnpdevice.h"
 
-class SSDPCacheEntry : public RefCounted 
-{
-    public:
-
-        static int      g_nAllocated;       // Debugging only
-
-    protected:
-
-        // Destructor protected to force use of Release Method
-
-        virtual        ~SSDPCacheEntry() 
-        { 
-            // Should be atomic decrement
-            g_nAllocated--;
-        }
-
-    public:
-
-        QString     m_sURI;           // Service Type URI
-        QString     m_sUSN;           // Unique Service Name
-        QString     m_sLocation;      // URL to Device Description
-        TaskTime    m_ttExpires;
-
-    public:
-
-        SSDPCacheEntry( const QString &sURI,
-                        const QString &sUSN,
-                        const QString &sLocation,
-                        TaskTime       ttExpires ) : m_sURI     ( sURI      ),
-                                                     m_sUSN     ( sUSN      ),
-                                                     m_sLocation( sLocation ),
-                                                     m_ttExpires( ttExpires )
-        {
-            // Should be atomic increment
-            g_nAllocated++;
-        }
-
-        int ExpiresInSecs()
-        {
-            TaskTime ttNow;
-            gettimeofday( &ttNow, NULL );
-
-            return m_ttExpires.tv_sec - ttNow.tv_sec;
-        }
-
-
-};
-
-
-typedef QMap< QString, SSDPCacheEntry * > EntryMap;     // Key == Unique Service Name (USN)
+typedef QMap< QString, DeviceLocation * > EntryMap;     // Key == Unique Service Name (USN)
 
 /////////////////////////////////////////////////////////////////////////////
 // QDict Implementation that uses RefCounted pointers
 /////////////////////////////////////////////////////////////////////////////
 
-class SSDPCacheEntries : public RefCounted 
+class SSDPCacheEntries : public RefCounted
 {
     public:
 
@@ -105,8 +53,8 @@ class SSDPCacheEntries : public RefCounted
 
         int             Count      ( ) { return m_mapEntries.size(); }
 
-        SSDPCacheEntry *Find       ( const QString &sUSN );
-        void            Insert     ( const QString &sUSN, SSDPCacheEntry *pEntry );
+        DeviceLocation *Find       ( const QString &sUSN );
+        void            Insert     ( const QString &sUSN, DeviceLocation *pEntry );
         void            Remove     ( const QString &sUSN );
         int             RemoveStale( const TaskTime &ttNow );
 
@@ -124,13 +72,21 @@ typedef QMap< QString, SSDPCacheEntries * > SSDPCacheEntriesMap;   // Key == Ser
 /////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////
 
-class SSDPCache 
+class SSDPCache : public QObject,  
+                  public MythObservable
 {
+    Q_OBJECT
+
     protected:
 
         QMutex                  m_mutex;
         SSDPCacheEntriesMap     m_cache;
     
+        void NotifyAdd   ( const QString &sURI,
+                           const QString &sUSN,
+                           const QString &sLocation );
+        void NotifyRemove( const QString &sURI, const QString &sUSN );
+
     public:
 
                  SSDPCache();
@@ -155,7 +111,7 @@ class SSDPCache
         void Dump       ( );
 
         SSDPCacheEntries *Find( const QString &sURI );
-        SSDPCacheEntry   *Find( const QString &sURI, const QString &sUSN );
+        DeviceLocation   *Find( const QString &sURI, const QString &sUSN );
 };
 
 #endif

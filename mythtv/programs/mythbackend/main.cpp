@@ -35,11 +35,8 @@ using namespace std;
 #include "libmythtv/dbcheck.h"
 #include "libmythtv/jobqueue.h"
 #include "libmythtv/storagegroup.h"
-#include "libmythupnp/mediaserver.h"
 
-#include "upnpcdstv.h"
-#include "upnpcdsmusic.h"
-#include "upnpcdsvideo.h"
+#include "mediaserver.h"
 #include "httpstatus.h"
 
 QMap<int, EncoderLink *> tvList;
@@ -50,7 +47,6 @@ QString pidfile;
 HouseKeeper *housekeeping = NULL;
 QString logfile = "";
 
-HttpServer  *g_pHttpServer = NULL;
 MediaServer *g_pUPnp       = NULL;
 
 bool setupTVs(bool ismaster, bool &error)
@@ -210,9 +206,6 @@ void cleanup(void)
 
     if (g_pUPnp)
         delete g_pUPnp;
-
-    if (g_pHttpServer)
-        delete g_pHttpServer;
 
     if (pidfile != "")
         unlink(pidfile.ascii());
@@ -575,7 +568,6 @@ int main(int argc, char **argv)
     }
 
     int port = gContext->GetNumSetting("BackendServerPort", 6543);
-    int statusport = gContext->GetNumSetting("BackendStatusPort", 6544);
 
     QString myip = gContext->GetSetting("BackendServerIP");
     QString masterip = gContext->GetSetting("MasterServerIP");
@@ -646,56 +638,20 @@ int main(int argc, char **argv)
     else
         jobqueue = new JobQueue(ismaster);
 
-    // Initialize & Start the Mini HttpServer
-    VERBOSE(VB_IMPORTANT, "Main::Starting HttpServer");
+    // Start UPnP Services 
 
-    g_pHttpServer = new HttpServer(statusport);
-
-    if (!g_pHttpServer->ok())
-    { 
-        VERBOSE(VB_IMPORTANT, "Main::HttpServer Create Error");
-        // exit(BACKEND_BUGGY_EXIT_NO_BIND_STATUS);
-    }
+    g_pUPnp = new MediaServer( ismaster, noupnp );
 
     VERBOSE(VB_IMPORTANT, "Main::Registering HttpStatus Extension");
 
-    g_pHttpServer->RegisterExtension(new HttpStatus(&tvList, sched, expirer, ismaster ));
-
-    // Start UPnP Services For Master Backends Only
-    if (noupnp)
-    {
-        cerr << "********* The UPNP service has been DISABLED with the "
-                "--noupnp option *********\n";
-    }
-    else
-    {
-        g_pUPnp = new MediaServer( ismaster, g_pHttpServer );
-
-        if (ismaster)
-        {
-            VERBOSE(VB_UPNP, "Main::Registering UPnpCDSTv Extension");
-
-            g_pUPnp->RegisterExtension(new UPnpCDSTv());
-
-            VERBOSE(VB_UPNP, "Main::Registering UPnpCDSMusic Extension");
-
-            g_pUPnp->RegisterExtension(new UPnpCDSMusic());
-
-            VERBOSE(VB_UPNP, "Main::Registering UPnpCDSVideo Extension");
-
-            g_pUPnp->RegisterExtension(new UPnpCDSVideo());
-        }
-
-        g_pUPnp->Start();
-    }
-    // End uPnP &  Mini HttpServer Initialization
+    g_pUPnp->GetHttpServer()->RegisterExtension(new HttpStatus(&tvList, sched, expirer, ismaster ));
 
     VERBOSE(VB_IMPORTANT, QString("%1 version: %2 www.mythtv.org")
                             .arg(binname).arg(MYTH_BINARY_VERSION));
 
     VERBOSE(VB_IMPORTANT, QString("Enabled verbose msgs: %1").arg(verboseString));
 
-    new MainServer(ismaster, port, statusport, &tvList, sched, expirer);
+    new MainServer(ismaster, port, &tvList, sched, expirer);
 
     if (ismaster)
     {

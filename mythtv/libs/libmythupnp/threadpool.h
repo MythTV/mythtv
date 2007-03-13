@@ -17,8 +17,6 @@
 #include <qwaitcondition.h> 
 #include <qthread.h>
 
-#include "mythcontext.h"
-
 class ThreadPool;
 
 /////////////////////////////////////////////////////////////////////////////

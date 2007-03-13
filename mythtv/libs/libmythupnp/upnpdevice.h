@@ -12,11 +12,17 @@
 #define __UPNPDEVICE_H__
 
 #include "upnputil.h"
+#include "refcounted.h"
+#include "mythcontext.h"
 
 #include <qdom.h>
+#include <qurl.h>
+#include <sys/time.h>
+
 
 extern const char *myth_source_version;
 
+class UPnpDeviceDesc;
 class UPnpDevice;
 class UPnpService;
 class UPnpIcon;
@@ -28,6 +34,7 @@ class UPnpIcon;
 typedef QPtrList< UPnpDevice  >  UPnpDeviceList;
 typedef QPtrList< UPnpService >  UPnpServiceList;
 typedef QPtrList< UPnpIcon    >  UPnpIconList;
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -116,6 +123,8 @@ class UPnpDeviceDesc
     public:
 
         UPnpDevice      m_rootDevice;
+        QString         m_sHostName;
+        QUrl            m_HostUrl;
 
     protected: 
 
@@ -135,18 +144,90 @@ class UPnpDeviceDesc
         QString  FormatValue ( const QString &sName, const QString &sValue );
         QString  FormatValue ( const QString &sName, int nValue );
 
+        QString  GetHostName ();
+
     public:
 
                  UPnpDeviceDesc();
         virtual ~UPnpDeviceDesc();
 
         bool     Load       ( const QString &sFileName );
+        bool     Load       ( const QDomDocument &xmlDevDesc );
 
-        void     GetValidXML( const QString &sBaseAddress, QTextStream &os, const QString &sUserAgent = "" );
-        QString  GetValidXML( const QString &sBaseAddress );
+        void     GetValidXML( const QString &sBaseAddress, int nPort, QTextStream &os, const QString &sUserAgent = "" );
+        QString  GetValidXML( const QString &sBaseAddress, int nPort );
 
         QString  FindDeviceUDN( UPnpDevice *pDevice, QString sST );
 
+        UPnpDevice *FindDevice( const QString &sURI );
+
+        static UPnpDevice     *FindDevice( UPnpDevice *pDevice, const QString &sURI );
+        static UPnpDeviceDesc *Retrieve  ( QString &sURL, bool bInQtThread = TRUE   );
+
+};
+
+/////////////////////////////////////////////////////////////////////////////
+// DeviceLocation Class Definition/Implementation
+/////////////////////////////////////////////////////////////////////////////
+
+class DeviceLocation : public RefCounted
+{
+    public:
+
+        static int      g_nAllocated;       // Debugging only
+
+    protected:
+
+        // Destructor protected to force use of Release Method
+
+        virtual        ~DeviceLocation()
+        {
+            // Should be atomic decrement
+            g_nAllocated--;
+
+            if (m_pDeviceDesc != NULL)
+                delete m_pDeviceDesc;
+        }
+
+        UPnpDeviceDesc *m_pDeviceDesc;  // We take ownership of this pointer.
+
+    public:
+
+        QString     m_sURI;           // Service Type URI
+        QString     m_sUSN;           // Unique Service Name
+        QString     m_sLocation;      // URL to Device Description
+        TaskTime    m_ttExpires;
+
+    public:
+
+        DeviceLocation( const QString &sURI,
+                        const QString &sUSN,
+                        const QString &sLocation,
+                        TaskTime       ttExpires ) : m_pDeviceDesc( NULL      ),
+                                                     m_sURI       ( sURI      ),
+                                                     m_sUSN       ( sUSN      ),
+                                                     m_sLocation  ( sLocation ),
+                                                     m_ttExpires  ( ttExpires )
+        {
+            // Should be atomic increment
+            g_nAllocated++;
+        }
+
+        int ExpiresInSecs()
+        {
+            TaskTime ttNow;
+            gettimeofday( &ttNow, NULL );
+
+            return m_ttExpires.tv_sec - ttNow.tv_sec;
+        }
+
+        UPnpDeviceDesc *GetDeviceDesc( bool bInQtThread = TRUE )
+        {
+            if (m_pDeviceDesc == NULL)
+                m_pDeviceDesc = UPnpDeviceDesc::Retrieve( m_sLocation, bInQtThread );
+
+            return m_pDeviceDesc;
+        }
 };
 
 #endif

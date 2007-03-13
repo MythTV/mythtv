@@ -37,7 +37,8 @@ class SSDPCacheTask : public Task
         SSDPCacheTask()
         {
             m_nExecuteCount = 0;
-            m_nInterval     = gContext->GetNumSetting("upnp:SSDPCacheInterval", 30 ) * 1000;
+            m_nInterval     = UPnp::g_pConfig->GetValue( "UPnP/SSDP/CacheInterval", 30 ) * 1000;
+
         }
 
         virtual QString Name   ()
@@ -51,7 +52,8 @@ class SSDPCacheTask : public Task
 
             int nCount = UPnp::g_SSDPCache.RemoveStale();
 
-//            VERBOSE( VB_UPNP, QString( "SSDPCacheTask - Removed %1 stale entries." ).arg( nCount ));
+            if (nCount > 0)
+                VERBOSE( VB_UPNP, QString( "SSDPCacheTask - Removed %1 stale entries." ).arg( nCount ));
 
             if ((m_nExecuteCount % 60) == 0)
                 UPnp::g_SSDPCache.Dump();

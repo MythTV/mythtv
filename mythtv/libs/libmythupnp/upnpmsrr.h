@@ -5,7 +5,6 @@
 #include <qdatetime.h> 
 
 #include "httpserver.h"
-#include "mythcontext.h"
 #include "eventing.h"
               
 class UPnpMSRR;

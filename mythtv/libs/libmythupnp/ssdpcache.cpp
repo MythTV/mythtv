@@ -9,8 +9,8 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include "upnp.h"
+#include "mythevent.h"
 
-int SSDPCacheEntry::g_nAllocated   = 0;       // Debugging only
 int SSDPCacheEntries::g_nAllocated = 0;       // Debugging only
 
 /////////////////////////////////////////////////////////////////////////////
@@ -52,7 +52,7 @@ void SSDPCacheEntries::Clear()
                             it != m_mapEntries.end();
                           ++it )
     {
-        SSDPCacheEntry *pEntry = (SSDPCacheEntry *)it.data();
+        DeviceLocation *pEntry = (DeviceLocation *)it.data();
 
         if (pEntry != NULL)
             pEntry->Release();
@@ -67,15 +67,15 @@ void SSDPCacheEntries::Clear()
 //  Caller must call AddRef on returned pointer.
 /////////////////////////////////////////////////////////////////////////////
 
-SSDPCacheEntry *SSDPCacheEntries::Find( const QString &sUSN )
+DeviceLocation *SSDPCacheEntries::Find( const QString &sUSN )
 {
-    SSDPCacheEntry *pEntry = NULL;
+    DeviceLocation *pEntry = NULL;
 
     Lock();
     EntryMap::Iterator it = m_mapEntries.find( sUSN );
 
     if ( it != m_mapEntries.end() )
-        pEntry = (SSDPCacheEntry *)it.data();
+        pEntry = (DeviceLocation *)it.data();
 
     Unlock();
 
@@ -86,7 +86,7 @@ SSDPCacheEntry *SSDPCacheEntries::Find( const QString &sUSN )
 //  
 /////////////////////////////////////////////////////////////////////////////
 
-void SSDPCacheEntries::Insert( const QString &sUSN, SSDPCacheEntry *pEntry )
+void SSDPCacheEntries::Insert( const QString &sUSN, DeviceLocation *pEntry )
 {
     Lock();
 
@@ -101,7 +101,7 @@ void SSDPCacheEntries::Insert( const QString &sUSN, SSDPCacheEntry *pEntry )
     if (it != m_mapEntries.end())
     {
         if (it.data() != NULL)
-            ((SSDPCacheEntry *)it.data())->Release();
+            ((DeviceLocation *)it.data())->Release();
     }
 
     m_mapEntries.insert( sUSN, pEntry );
@@ -122,7 +122,7 @@ void SSDPCacheEntries::Remove( const QString &sUSN )
     if (it != m_mapEntries.end())
     {
         if (it.data() != NULL)
-            ((SSDPCacheEntry *)it.data())->Release();
+            ((DeviceLocation *)it.data())->Release();
 
         m_mapEntries.remove( it );
     }
@@ -149,7 +149,7 @@ int SSDPCacheEntries::RemoveStale( const TaskTime &ttNow )
                             it != m_mapEntries.end();
                           ++it )
     {
-        SSDPCacheEntry *pEntry = (SSDPCacheEntry *)it.data();
+        DeviceLocation *pEntry = (DeviceLocation *)it.data();
 
         if (pEntry != NULL)
         {
@@ -187,6 +187,7 @@ int SSDPCacheEntries::RemoveStale( const TaskTime &ttNow )
 
 SSDPCache::SSDPCache()
 {
+    VERBOSE( VB_UPNP, "SSDPCache - Constructor" );
 }      
 
 /////////////////////////////////////////////////////////////////////////////
@@ -195,6 +196,8 @@ SSDPCache::SSDPCache()
 
 SSDPCache::~SSDPCache()
 {
+    VERBOSE( VB_UPNP, "SSDPCache - Destructor" );
+
     Clear();
 }      
 
@@ -244,9 +247,9 @@ SSDPCacheEntries *SSDPCache::Find( const QString &sURI )
 //  Caller must call AddRef on returned pointer.
 /////////////////////////////////////////////////////////////////////////////
 
-SSDPCacheEntry *SSDPCache::Find( const QString &sURI, const QString &sUSN )
+DeviceLocation *SSDPCache::Find( const QString &sURI, const QString &sUSN )
 {
-    SSDPCacheEntry   *pEntry   = NULL;
+    DeviceLocation   *pEntry   = NULL;
     SSDPCacheEntries *pEntries = Find( sURI );
 
     if (pEntries != NULL)
@@ -295,15 +298,17 @@ void SSDPCache::Add( const QString &sURI,
     // See if the Entries Collection contains our USN... (Create if not found)
     // --------------------------------------------------------------
 
-    SSDPCacheEntry *pEntry = pEntries->Find( sUSN );
+    DeviceLocation *pEntry = pEntries->Find( sUSN );
 
     if (pEntry == NULL)
     {
-        pEntry = new SSDPCacheEntry( sURI, sUSN, sLocation, ttExpires );
+        pEntry = new DeviceLocation( sURI, sUSN, sLocation, ttExpires );
 
         Lock();
         pEntries->Insert( sUSN, pEntry );
         Unlock();
+
+        NotifyAdd( sURI, sUSN, sLocation );
     }
     else
     {
@@ -351,6 +356,10 @@ void SSDPCache::Remove( const QString &sURI, const QString &sUSN )
     }
 
     Unlock();
+
+    // -=>TODO: Should this only by notifued if we actually had any entry removed?
+
+    NotifyRemove( sURI, sUSN );
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -422,6 +431,41 @@ int SSDPCache::RemoveStale()
 //
 /////////////////////////////////////////////////////////////////////////////
 
+void SSDPCache::NotifyAdd( const QString &sURI,
+                           const QString &sUSN,
+                           const QString &sLocation )
+{
+    QStringList values;
+
+    values.append( sURI );
+    values.append( sUSN );
+    values.append( sLocation );
+
+    MythEvent me( "SSDP_ADD", values );
+
+    dispatch( me );
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
+void SSDPCache::NotifyRemove( const QString &sURI, const QString &sUSN )
+{
+    QStringList values;
+
+    values.append( sURI );
+    values.append( sUSN );
+
+    MythEvent me( "SSDP_REMOVE", values );
+
+    dispatch( me );
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
 void SSDPCache::Dump()
 {
     int nCount = 0;
@@ -461,7 +505,7 @@ void SSDPCache::Dump()
                                       ++itEntry )
                 {
 
-                    SSDPCacheEntry *pEntry = (SSDPCacheEntry *)itEntry.data();
+                    DeviceLocation *pEntry = (DeviceLocation *)itEntry.data();
 
                     if (pEntry != NULL)
                     {
@@ -487,7 +531,7 @@ void SSDPCache::Dump()
         VERBOSE( VB_UPNP, "-------------------------------------------------------------------------------" );
         VERBOSE( VB_UPNP, QString(  " Found: %1 Entries - %2 have been Allocated. " )
                              .arg( nCount )
-                             .arg( SSDPCacheEntry::g_nAllocated ));
+                             .arg( DeviceLocation::g_nAllocated ));
         VERBOSE( VB_UPNP, "===============================================================================" );
 
         Unlock();

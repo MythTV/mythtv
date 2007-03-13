@@ -10,6 +10,8 @@
 
 #include "upnp.h"
 #include "upnptaskcache.h"
+#include "multicast.h"
+#include "broadcast.h"
 
 #include <sys/utsname.h> 
 
@@ -21,8 +23,9 @@ QString          UPnp::g_sPlatform;
 UPnpDeviceDesc   UPnp::g_UPnpDeviceDesc;
 TaskQueue       *UPnp::g_pTaskQueue     = NULL;
 SSDP            *UPnp::g_pSSDP          = NULL;
-SSDP            *UPnp::g_pSSDPBroadcast = NULL;
 SSDPCache        UPnp::g_SSDPCache;
+
+Configuration   *UPnp::g_pConfig        = NULL;
 
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
@@ -36,21 +39,54 @@ SSDPCache        UPnp::g_SSDPCache;
 //
 //////////////////////////////////////////////////////////////////////////////
 
-UPnp::UPnp( HttpServer *pHttpServer ) 
+UPnp::UPnp()
 {
-    VERBOSE(VB_UPNP, QString("UPnp::Begin"));
+    VERBOSE( VB_UPNP, "UPnp - Constructor" );
+}
+
+//////////////////////////////////////////////////////////////////////////////
+//
+//////////////////////////////////////////////////////////////////////////////
+
+UPnp::~UPnp()
+{
+    VERBOSE( VB_UPNP, "UPnp - Destructor" );
+    CleanUp();
+}
+
+//////////////////////////////////////////////////////////////////////////////
+//
+//////////////////////////////////////////////////////////////////////////////
+
+void UPnp::SetConfiguration( Configuration *pConfig )
+{
+    if (g_pConfig)
+        delete g_pConfig;
+
+    g_pConfig = pConfig;
+}
+
+//////////////////////////////////////////////////////////////////////////////
+//
+//////////////////////////////////////////////////////////////////////////////
+
+bool UPnp::Initialize( int nServicePort, HttpServer *pHttpServer )
+{
+    VERBOSE(VB_UPNP, QString("UPnp::Initialize - Begin"));
+
+    if (g_pConfig == NULL)
+    {
+        VERBOSE(VB_IMPORTANT, QString( "UPnp::Initialize - Must call SetConfiguration." ));
+        return false;
+    }
 
     if ((m_pHttpServer = pHttpServer) == NULL)
     {
-        VERBOSE(VB_IMPORTANT, QString( "UPnp::UPnp:Invalid Parameter (pHttpServer == NULL)" ));
-        return;
+        VERBOSE(VB_IMPORTANT, QString( "UPnp::Initialize - Invalid Parameter (pHttpServer == NULL)" ));
+        return false;
     }
 
-    // ----------------------------------------------------------------------
-    // Get Settings
-    // ----------------------------------------------------------------------
-
-    bool bBroadcastSupport = (bool)gContext->GetNumSetting("upnpSSDPBroadcast", 0 );
+    m_nServicePort = nServicePort;
 
     // ----------------------------------------------------------------------
     // Build Platform String
@@ -67,7 +103,7 @@ UPnp::UPnp( HttpServer *pHttpServer )
     // Initialize & Start the global Task Queue Processing Thread
     // ----------------------------------------------------------------------
 
-    VERBOSE(VB_UPNP, QString( "UPnp::Starting TaskQueue" ));
+    VERBOSE(VB_UPNP, QString( "UPnp::Initialize - Starting TaskQueue" ));
 
     g_pTaskQueue = new TaskQueue();
     g_pTaskQueue->start();
@@ -76,7 +112,7 @@ UPnp::UPnp( HttpServer *pHttpServer )
     // Register any HttpServerExtensions
     // ----------------------------------------------------------------------
 
-    m_pHttpServer->RegisterExtension( new SSDPExtension());
+    m_pHttpServer->RegisterExtension( new SSDPExtension( m_nServicePort ));
 
     // ----------------------------------------------------------------------
     // Add Task to keep SSDPCache purged of stale entries.  
@@ -88,27 +124,13 @@ UPnp::UPnp( HttpServer *pHttpServer )
     // Create the SSDP (Upnp Discovery) Thread.
     // ----------------------------------------------------------------------
 
-    VERBOSE(VB_UPNP, QString(  "UPnp::Creating SSDP Thread (Multicast)" ));
+    VERBOSE(VB_UPNP, QString(  "UPnp::Initialize - Creating SSDP Thread" ));
 
-    g_pSSDP = new SSDP( new QMulticastSocket( SSDP_GROUP, SSDP_PORT ) );
+    g_pSSDP = new SSDP( m_nServicePort );
 
-    if (bBroadcastSupport)
-    {
-        VERBOSE(VB_UPNP, QString(  "UPnp::Creating SSDP Thread (Broadcast)" ));
+    VERBOSE(VB_UPNP, QString( "UPnp::Initialize - End" ));
 
-        g_pSSDPBroadcast = new SSDP( new QBroadcastSocket( "255.255.255.255", SSDP_PORT ), false );
-    }
-
-    VERBOSE(VB_UPNP, QString( "UPnp::End" ));
-}
-
-//////////////////////////////////////////////////////////////////////////////
-//
-//////////////////////////////////////////////////////////////////////////////
-
-UPnp::~UPnp()
-{
-	CleanUp();
+    return true;
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -121,12 +143,7 @@ void UPnp::Start()
     {
         VERBOSE(VB_UPNP, QString(  "UPnp::UPnp:Starting SSDP Thread (Multicast)" ));
         g_pSSDP->start();
-    }
-
-    if (g_pSSDPBroadcast != NULL)
-    {
-        VERBOSE(VB_UPNP, QString(  "UPnp::UPnp:Starting SSDP Thread (Broadcast)" ));
-        g_pSSDPBroadcast->start();
+        g_pSSDP->EnableNotifications();
     }
 }
 
@@ -139,18 +156,11 @@ void UPnp::CleanUp( void )
 
     if (g_pSSDP)
     {
+        g_pSSDP->DisableNotifications();
         g_pSSDP->RequestTerminate();
 
         delete g_pSSDP;
         g_pSSDP = NULL;
-    }
-
-    if (g_pSSDPBroadcast)
-    {
-        g_pSSDPBroadcast->RequestTerminate();
-
-        delete g_pSSDPBroadcast;
-        g_pSSDPBroadcast = NULL;
     }
 
     // ----------------------------------------------------------------------
@@ -166,5 +176,37 @@ void UPnp::CleanUp( void )
         g_pTaskQueue = NULL;
     }
 
+    if (g_pConfig)
+    {
+        delete g_pConfig;
+        g_pConfig = NULL;
+    }
+
 } 
+
+//////////////////////////////////////////////////////////////////////////////
+//
+//////////////////////////////////////////////////////////////////////////////
+
+SSDPCacheEntries *UPnp::Find( const QString &sURI )
+{
+    return g_SSDPCache.Find( sURI );
+}
+
+//////////////////////////////////////////////////////////////////////////////
+//
+//////////////////////////////////////////////////////////////////////////////
+DeviceLocation *UPnp::Find( const QString &sURI, const QString &sUSN )
+{
+    return g_SSDPCache.Find( sURI, sUSN );
+}
+
+//////////////////////////////////////////////////////////////////////////////
+//
+//////////////////////////////////////////////////////////////////////////////
+
+UPnpDeviceDesc *UPnp::GetDeviceDesc( QString &sURL, bool bInQtThread )
+{
+    return UPnpDeviceDesc::Retrieve( sURL, bInQtThread );
+}
 

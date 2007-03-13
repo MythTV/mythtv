@@ -118,7 +118,7 @@ class HTTPRequest
         bool                m_bSOAPRequest;
         QString             m_sNameSpace;
 
-        // Reponse
+        // Response
 
         ResponseType        m_eResponseType;
         QString             m_sResponseTypeText;    // used for ResponseTypeOther
@@ -164,8 +164,8 @@ class HTTPRequest
 
         bool            ParseRequest    ();
 
-        void            FormatErrorReponse ( long nCode, const QString &sDesc );
-        void            FormatActionReponse( NameValueList *pArgs );
+        void            FormatErrorResponse ( long nCode, const QString &sDesc );
+        void            FormatActionResponse( NameValueList *pArgs );
         void            FormatFileResponse ( const QString &sFileName );
 
         long            SendResponse    ( void );

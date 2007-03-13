@@ -50,7 +50,8 @@ class BufferedSocketDevice
     public:
 
         BufferedSocketDevice( int nSocket );
-        BufferedSocketDevice( QSocketDevice *pSocket = NULL );
+        BufferedSocketDevice( QSocketDevice *pSocket = NULL,
+                              bool    bTakeOwnership = false );
 
         virtual ~BufferedSocketDevice( );
 

@@ -26,106 +26,9 @@ typedef enum
 {
     HSM_Unknown         =  0,
     HSM_GetStatusHTML   =  1,
-    HSM_GetStatusXML    =  2,
-    HSM_GetProgramGuide =  3,
-    
-    HSM_GetHosts        =  4,
-    HSM_GetKeys         =  5,
-    HSM_GetSetting      =  6,
-    HSM_PutSetting      =  7,
-    
-    HSM_GetChannelIcon  =  8,
-    HSM_GetRecorded     =  9,
-    HSM_GetPreviewImage = 10,
-
-    HSM_GetRecording    = 11,
-    HSM_GetMusic        = 12,
-    
-    HSM_GetDeviceDesc   = 13,
-    HSM_GetCDSDesc      = 14,
-    HSM_GetCMGRDesc     = 15,
-    
-    HSM_Asterisk        = 16,
-
-    HSM_GetExpiring       = 17,
-    HSM_GetProgramDetails = 18,
-
-    HSM_GetVideo        = 19,
-    HSM_GetMSRRDesc     = 20
+    HSM_GetStatusXML    =  2
 
 } HttpStatusMethod;
-
-/////////////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////////////
-//
-// 
-//
-/////////////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////////////
-
-class ThreadData : public HttpWorkerData
-{
-    public:
-
-        typedef enum
-        {
-            DT_Unknown   = 0,
-            DT_Recording = 1,
-            DT_Music     = 2,
-            DT_Video     = 3
-
-
-        } ThreadDataType;
-        
-
-        ThreadDataType  m_eType;
-
-        QString         m_sChanId;   
-        QString         m_sStartTime;
-        QString         m_sFileName;
-        QString         m_sVideoID;
-
-        int             m_nTrackNumber;
-
-    public:
-
-        ThreadData( long nTrackNumber, const QString &sFileName )
-        {
-            m_eType        = DT_Music;
-            m_nTrackNumber = nTrackNumber;
-            m_sFileName    = sFileName;
-        }
-
-        ThreadData( const QString &sChanId,
-                    const QString &sStartTime,
-                    const QString &sFileName )
-        {
-            m_eType      = DT_Recording;
-            m_sChanId    = sChanId;
-            m_sStartTime = sStartTime;
-            m_sFileName  = sFileName;
-        }
-
-        ThreadData( const QString &sVideoID,
-                    const QString &sFileName )
-        {
-            m_eType      = DT_Video;
-            m_sVideoID   = sVideoID;
-            m_sFileName  = sFileName;
-        }
-
-
-        virtual ~ThreadData() 
-        {
-        }
-
-        bool IsSameRecording( const QString &sChanId, 
-                              const QString &sStartTime )
-        {
-            return( (sChanId == m_sChanId ) && (sStartTime == m_sStartTime ));
-        }
-};
-
 
 /////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////
@@ -144,63 +47,22 @@ class HttpStatus : public HttpServerExtension
         AutoExpire                  *m_pExpirer;
         bool                         m_bIsMaster;
         int                          m_nPreRollSeconds;
+        QMutex                       m_settingLock;
 
     private:
 
         HttpStatusMethod GetMethod( const QString &sURI );
 
-        void    GetStatusXML   ( HTTPRequest *pRequest );
-        void    GetStatusHTML  ( HTTPRequest *pRequest );
+        void    GetStatusXML      ( HTTPRequest *pRequest );
+        void    GetStatusHTML     ( HTTPRequest *pRequest );
 
-        void    GetProgramGuide( HTTPRequest *pRequest );
-        void    GetProgramDetails( HTTPRequest *pRequest );
-
-        void    GetHosts       ( HTTPRequest *pRequest );
-        void    GetKeys        ( HTTPRequest *pRequest );
-        void    GetSetting     ( HTTPRequest *pRequest );
-        void    PutSetting     ( HTTPRequest *pRequest );
-
-        void    GetChannelIcon ( HTTPRequest *pRequest );
-        void    GetRecorded    ( HTTPRequest *pRequest );
-        void    GetPreviewImage( HTTPRequest *pRequest );
-
-        QImage *GeneratePreviewImage( ProgramInfo   *pInfo,
-                                      const QString &sFileName,
-                                      int            nSecsIn,
-                                      float         &fAspect );
-
-        void    GetExpiring    ( HTTPRequest *pRequest );
-
-        void    GetRecording   ( HttpWorkerThread *pThread, 
-                                 HTTPRequest      *pRequest );
-
-        void    GetMusic       ( HttpWorkerThread *pThread, 
-                                 HTTPRequest      *pRequest );
-
-        void    GetVideo       ( HttpWorkerThread *pThread,
-                                 HTTPRequest      *pRequest );
-
-        void    GetDeviceDesc  ( HTTPRequest *pRequest ); 
-        void    GetFile        ( HTTPRequest *pRequest, QString sFileName );
-
-        void    FillProgramInfo ( QDomDocument *pDoc, 
-                                  QDomElement  &e, 
-                                  ProgramInfo  *pInfo,
-                                  bool          bIncChannel = true,
-                                  bool          bDetails    = true );
-
-        void    FillStatusXML   ( QDomDocument *pDoc);
-        void    FillChannelInfo ( QDomElement  &channel, 
-                                  ProgramInfo  *pInfo,
-                                  bool          bDetails = true );
-
+        void    FillStatusXML     ( QDomDocument *pDoc);
     
         void    PrintStatus       ( QTextStream &os, QDomDocument *pDoc );
         int     PrintEncoderStatus( QTextStream &os, QDomElement encoders );
         int     PrintScheduled    ( QTextStream &os, QDomElement scheduled );
         int     PrintJobQueue     ( QTextStream &os, QDomElement jobs );
         int     PrintMachineInfo  ( QTextStream &os, QDomElement info );
-        QMutex  tempSettingLock;
 
     public:
                  HttpStatus( QMap<int, EncoderLink *> *tvList, Scheduler *sched, AutoExpire *expirer, bool bIsMaster );

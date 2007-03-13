@@ -5,6 +5,7 @@
 //                                                                            
 //////////////////////////////////////////////////////////////////////////////
 
+#include "upnp.h"
 #include "upnpmsrr.h"
 
 #include <math.h>
@@ -26,8 +27,7 @@ UPnpMSRR::UPnpMSRR( UPnpDevice *pDevice ) : Eventing( "UPnpMSRR", "MSRR_Event" )
     SetValue< unsigned short >( "ValidationSucceededUpdateID" , 0 );
     SetValue< unsigned short >( "ValidationRevokedUpdateID"   , 0 );
 
-    QString sSharePath    = gContext->GetShareDir();
-    QString sUPnpDescPath = gContext->GetSetting("upnpDescXmlPath", sSharePath);
+    QString sUPnpDescPath = UPnp::g_pConfig->GetValue( "UPnP/DescXmlPath", m_sSharePath );
 
     m_sServiceDescFileName = sUPnpDescPath + "MSRR_scpd.xml";
     m_sControlUrl          = "/MSRR_Control";
@@ -85,7 +85,7 @@ bool UPnpMSRR::ProcessRequest( HttpWorkerThread *pThread, HTTPRequest *pRequest 
             case MSRR_IsValidated           : HandleIsValidated           ( pRequest ); break;
 
             default:
-                pRequest->FormatErrorReponse( 401, "Invalid Action" );
+                pRequest->FormatErrorResponse( 401, "Invalid Action" );
                 pRequest->m_nResponseStatus = 401; //501;
                 break;
         }       
@@ -107,7 +107,7 @@ void UPnpMSRR::HandleIsAuthorized( HTTPRequest *pRequest )
 
     list.append( new NameValue( "Result", "1"));
 
-    pRequest->FormatActionReponse( &list );
+    pRequest->FormatActionResponse( &list );
 
 }
 
@@ -123,7 +123,7 @@ void UPnpMSRR::HandleRegisterDevice( HTTPRequest *pRequest )
 
     list.append( new NameValue( "Result", "1"));
 
-    pRequest->FormatActionReponse( &list );
+    pRequest->FormatActionResponse( &list );
 
 }
 
@@ -136,7 +136,7 @@ void UPnpMSRR::HandleIsValidated( HTTPRequest *pRequest )
 
     list.append( new NameValue( "Result", "1"));
 
-    pRequest->FormatActionReponse( &list );
+    pRequest->FormatActionResponse( &list );
 
 }
 

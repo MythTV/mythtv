@@ -8,6 +8,7 @@
 //                                                                            
 //////////////////////////////////////////////////////////////////////////////
 
+#include "upnp.h"
 #include "upnpcmgr.h"
 
 /////////////////////////////////////////////////////////////////////////////
@@ -31,8 +32,7 @@ UPnpCMGR::UPnpCMGR( UPnpDevice *pDevice ) : Eventing( "UPnpCMGR", "CMGR_Event" )
                                                  "http-get:*:video/nupplevideo:*,"
                                                  "http-get:*:video/x-ms-wmv:*"     );
 
-    QString sSharePath    = gContext->GetShareDir();
-    QString sUPnpDescPath = gContext->GetSetting("upnpDescXmlPath", sSharePath);
+    QString sUPnpDescPath = UPnp::g_pConfig->GetValue( "UPnP/DescXmlPath", m_sSharePath );
 
     m_sServiceDescFileName = sUPnpDescPath + "CMGR_scpd.xml";
     m_sControlUrl          = "/CMGR_Control";
@@ -90,7 +90,7 @@ bool UPnpCMGR::ProcessRequest( HttpWorkerThread *pThread, HTTPRequest *pRequest 
             case CMGRM_GetCurrentConnectionInfo: HandleGetCurrentConnectionInfo( pRequest ); break;
             case CMGRM_GetCurrentConnectionIDs : HandleGetCurrentConnectionIDs ( pRequest ); break;
             default:
-                pRequest->FormatErrorReponse( 401, "Invalid Action" );
+                pRequest->FormatErrorResponse( 401, "Invalid Action" );
                 pRequest->m_nResponseStatus = 400; //501;
                 break;
         }       
@@ -111,7 +111,7 @@ void UPnpCMGR::HandleGetProtocolInfo( HTTPRequest *pRequest )
     list.append( new NameValue( "Source", GetValue< QString >( "SourceProtocolInfo")));
     list.append( new NameValue( "Sink"  , ""                                        ));
 
-    pRequest->FormatActionReponse( &list );
+    pRequest->FormatActionResponse( &list );
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -124,7 +124,7 @@ void UPnpCMGR::HandleGetCurrentConnectionInfo( HTTPRequest *pRequest )
 
     if ( nId != 0)
     {
-        pRequest->FormatErrorReponse( 706, "Invalid connection reference" );
+        pRequest->FormatErrorResponse( 706, "Invalid connection reference" );
         pRequest->m_nResponseStatus = 400; //500;
         return;
     }
@@ -139,7 +139,7 @@ void UPnpCMGR::HandleGetCurrentConnectionInfo( HTTPRequest *pRequest )
     list.append( new NameValue( "Direction"            , "Output"         ));
     list.append( new NameValue( "Status"               , "Unknown"        ));
     
-    pRequest->FormatActionReponse( &list );
+    pRequest->FormatActionResponse( &list );
 
 }
 
@@ -153,7 +153,7 @@ void UPnpCMGR::HandleGetCurrentConnectionIDs ( HTTPRequest *pRequest )
 
     list.append( new NameValue( "ConnectionIDs", GetValue< QString >( "CurrentConnectionIDs" )));
 
-    pRequest->FormatActionReponse( &list );
+    pRequest->FormatActionResponse( &list );
 
 }
 

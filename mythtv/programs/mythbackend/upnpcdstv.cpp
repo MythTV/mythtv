@@ -123,20 +123,6 @@ static const short g_nRootNodeLength = sizeof( g_RootNodes ) / sizeof( RootInfo 
                                    "basename, progstart, progend "       \
                              "FROM recorded "
 
-
-/////////////////////////////////////////////////////////////////////////////
-//
-/////////////////////////////////////////////////////////////////////////////
-
-template <class T> inline const T& Min( const T &x, const T &y ) 
-{
-    return( ( x < y ) ? x : y );
-}
- 
-template <class T> inline const T& Max( const T &x, const T &y ) 
-{
-    return( ( x > y ) ? x : y );
-}
                                                          
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -738,7 +724,7 @@ void UPnpCDSTv::AddVideoItem( UPnpCDSBrowseRequest    *pRequest,
 
     QString sName      = sTitle + ": " + sSubtitle;
 
-    QString sURIBase   = QString( "http://%1:%2/" )
+    QString sURIBase   = QString( "http://%1:%2/Myth/" )
                             .arg( m_mapBackendIp  [ sHostName ] ) 
                             .arg( m_mapBackendPort[ sHostName ] );
 
@@ -789,7 +775,7 @@ void UPnpCDSTv::AddVideoItem( UPnpCDSBrowseRequest    *pRequest,
 
     QString sMimeType = HTTPRequest::GetMimeType( fInfo.extension( FALSE ));
     QString sProtocol = QString( "http-get:*:%1:*" ).arg( sMimeType  );
-    QString sURI      = QString( "%1getRecording%2").arg( sURIBase   )
+    QString sURI      = QString( "%1GetRecording%2").arg( sURIBase   )
                                                     .arg( sURIParams ); 
 
     Resource *pRes = pItem->AddResource( sProtocol, sURI );
@@ -825,7 +811,7 @@ void UPnpCDSTv::AddVideoItem( UPnpCDSBrowseRequest    *pRequest,
     // Add Thumbnail Resource
     // ----------------------------------------------------------------------
 
-    sURI = QString( "%1getPreviewImage%2").arg( sURIBase   )
+    sURI = QString( "%1GetPreviewImage%2").arg( sURIBase   )
                                           .arg( sURIParams ); 
 
     pItem->AddResource( "http-get:*:image/png:*" , sURI );

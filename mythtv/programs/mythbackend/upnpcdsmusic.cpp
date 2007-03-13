@@ -133,20 +133,6 @@ static const short g_nRootNodeLength = sizeof( g_RootNodes ) / sizeof( RootInfo 
 /////////////////////////////////////////////////////////////////////////////
 //
 /////////////////////////////////////////////////////////////////////////////
-
-template <class T> inline const T& Min( const T &x, const T &y ) 
-{
-    return( ( x < y ) ? x : y );
-}
- 
-template <class T> inline const T& Max( const T &x, const T &y ) 
-{
-    return( ( x > y ) ? x : y );
-}
-
-/////////////////////////////////////////////////////////////////////////////
-//
-/////////////////////////////////////////////////////////////////////////////
                                       
 UPnpCDSExtensionResults *UPnpCDSMusic::Search( UPnpCDSSearchRequest *pRequest )
 {
@@ -785,7 +771,7 @@ void UPnpCDSMusic::AddMusicTrack( UPnpCDSBrowseRequest    *pRequest,
     // Build Support Strings
     // ----------------------------------------------------------------------
 
-    QString sURIBase   = QString( "http://%1:%2/" )
+    QString sURIBase   = QString( "http://%1:%2/Myth/" )
                             .arg( sServerIp ) 
                             .arg( sPort     );
 
@@ -847,7 +833,7 @@ void UPnpCDSMusic::AddMusicTrack( UPnpCDSBrowseRequest    *pRequest,
 
     QString sMimeType = HTTPRequest::GetMimeType( fInfo.extension( FALSE ));
     QString sProtocol = QString( "http-get:*:%1:*" ).arg( sMimeType  );
-    QString sURI      = QString( "%1getMusic%2").arg( sURIBase   )
+    QString sURI      = QString( "%1GetMusic%2").arg( sURIBase   )
                                                 .arg( sURIParams ); 
 
     Resource *pRes = pItem->AddResource( sProtocol, sURI );

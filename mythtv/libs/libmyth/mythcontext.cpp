@@ -154,6 +154,39 @@ QString safe_eno_to_string(int errnum)
     return QString("%1 (%2)").arg(strerror(errnum)).arg(errnum);
 }
 
+// Global function to retrieve InstallPrefix path
+
+void GetInstallPrefixPath( QString &sInstallPrefix, QString &sInstallLibDir )
+{
+    char *tmp_installprefix = getenv("MYTHTVDIR");
+    if (tmp_installprefix)
+        sInstallPrefix = tmp_installprefix;
+
+#if QT_VERSION >= 0x030200
+    QDir prefixDir = qApp->applicationDirPath();
+#else
+    QString appPath = QFileInfo(qApp->argv()[0]).absFilePath();
+    QDir prefixDir(appPath.left(appPath.findRev("/")));
+#endif
+
+    if (QDir( sInstallPrefix ).isRelative())
+    {
+        // If the PREFIX is relative, evaluate it relative to our
+        // executable directory. This can be fragile on Unix, so
+        // use relative PREFIX values with care.
+        prefixDir.cd( sInstallPrefix );
+        sInstallPrefix = prefixDir.canonicalPath();
+    }
+    else if (prefixDir.path().contains(".app/Contents/MacOS"))
+    {
+        prefixDir.cd("../Resources");
+        if (QDir(prefixDir.canonicalPath() + "/bin").exists() ||
+            QDir(prefixDir.canonicalPath() + "/share").exists())
+            sInstallPrefix = prefixDir.canonicalPath();
+        if (QDir(prefixDir.canonicalPath() + "/lib").exists())
+            sInstallLibDir = prefixDir.canonicalPath() + "/lib";
+    }
+}
 
 class MythContextPrivate
 {
@@ -262,7 +295,6 @@ class MythContextPrivate
 };
 
 
-
 MythContextPrivate::MythContextPrivate(MythContext *lparent)
     : parent(lparent),
       m_settings(new Settings()), m_qtThemeSettings(new Settings()),
@@ -292,34 +324,8 @@ MythContextPrivate::MythContextPrivate(MythContext *lparent)
       m_priv_mutex(new QMutex(true)),
       useSettingsCache(false)
 {
-    char *tmp_installprefix = getenv("MYTHTVDIR");
-    if (tmp_installprefix)
-        m_installprefix = tmp_installprefix;
+    GetInstallPrefixPath( m_installprefix, m_installlibdir );
 
-#if QT_VERSION >= 0x030200
-    QDir prefixDir = qApp->applicationDirPath();
-#else
-    QString appPath = QFileInfo(qApp->argv()[0]).absFilePath();
-    QDir prefixDir(appPath.left(appPath.findRev("/")));
-#endif
-
-    if (QDir(m_installprefix).isRelative())
-    {
-        // If the PREFIX is relative, evaluate it relative to our
-        // executable directory. This can be fragile on Unix, so
-        // use relative PREFIX values with care.
-        prefixDir.cd(m_installprefix);
-        m_installprefix = prefixDir.canonicalPath();
-    }
-    else if (prefixDir.path().contains(".app/Contents/MacOS"))
-    {
-        prefixDir.cd("../Resources");
-        if (QDir(prefixDir.canonicalPath() + "/bin").exists() ||
-            QDir(prefixDir.canonicalPath() + "/share").exists())
-            m_installprefix = prefixDir.canonicalPath();
-        if (QDir(prefixDir.canonicalPath() + "/lib").exists())
-            m_installlibdir = prefixDir.canonicalPath() + "/lib";
-    }
     VERBOSE(VB_IMPORTANT, QString("Using runtime prefix = %1")
             .arg(m_installprefix));
 }

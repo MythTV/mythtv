@@ -93,21 +93,6 @@ static const short g_nRootNodeLength = sizeof( g_RootNodes ) / sizeof( RootInfo 
                             "LEFT JOIN (videometadatacountry) ON " \
                             "(videometadatacountry.idvideo = videometadata.intid) " 
 
-
-/////////////////////////////////////////////////////////////////////////////
-//
-/////////////////////////////////////////////////////////////////////////////
-
-template <class T> inline const T& Min( const T &x, const T &y ) 
-{
-    return( ( x < y ) ? x : y );
-}
- 
-template <class T> inline const T& Max( const T &x, const T &y ) 
-{
-    return( ( x > y ) ? x : y );
-}
-                                                         
 /////////////////////////////////////////////////////////////////////////////
 //
 /////////////////////////////////////////////////////////////////////////////
@@ -336,7 +321,7 @@ UPnpCDSExtensionResults *UPnpCDSVideo::ProcessItem( UPnpCDSBrowseRequest    *pRe
 
         HTTPRequest::GetParameters( sParams, mapParams );
 
-        int     nVideoID    = mapParams[ "VideoID"    ].toInt();
+        int     nVideoID    = mapParams[ "Id"    ].toInt();
 
         MSqlQuery query(MSqlQuery::InitCon());
 
@@ -827,11 +812,11 @@ void UPnpCDSVideo::AddVideoItem( UPnpCDSBrowseRequest    *pRequest,
 
     QString sName      = sTitle;
 
-    QString sURIBase   = QString( "http://%1:%2/" )
+    QString sURIBase   = QString( "http://%1:%2/Myth/" )
                             .arg( sServerIp )
                             .arg( sPort     );
 
-    QString sURIParams = QString( "?VideoID=%1&amp;" )
+    QString sURIParams = QString( "?Id=%1&amp;" )
                             .arg( nVidID );
 
     QString sId        = QString( "%1/item%2")
@@ -881,7 +866,7 @@ void UPnpCDSVideo::AddVideoItem( UPnpCDSBrowseRequest    *pRequest,
 
     QString sMimeType = HTTPRequest::GetMimeType( fInfo.extension( FALSE ));
     QString sProtocol = QString( "http-get:*:%1:*" ).arg( sMimeType  );
-    QString sURI      = QString( "%1getVideo%2").arg( sURIBase   )
+    QString sURI      = QString( "%1GetVideo%2").arg( sURIBase   )
                                                     .arg( sURIParams ); 
 
     Resource *pRes = pItem->AddResource( sProtocol, sURI );

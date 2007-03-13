@@ -108,7 +108,7 @@ function SetFormAddress( sMethod )
 	return true;
 }
 
-function MenuClick( e, methodId )
+function MenuClick( e, methodId, bShowResults )
 {
 	if (curElement != null)
 		curElement.className = "menu";
@@ -130,7 +130,14 @@ function MenuClick( e, methodId )
 		var obj = FindObject( "fraResults" );
 	
 		if (obj != null)
+        {
 			obj.src = "about:blank";
+
+            if (bShowResults != null)
+                ShowBox( "tbResults", bShowResults );
+            else
+                ShowBox( "tbResults", 1 );
+        }
 
 	}
 }

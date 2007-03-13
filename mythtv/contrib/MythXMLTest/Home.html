@@ -21,7 +21,7 @@ function OnLoad()
 </script>
 </head>
 
-<body onload="OnLoad()">
+<body onload="OnLoad('/')">
 <table class="fullHeight" width="100%" align='center' cellpadding="0" cellspacing="0" border="0">
 	<tr valign="top" >
 		<td width='10%'>
@@ -29,13 +29,18 @@ function OnLoad()
 				<ul>
 					<li class="heading">Info -</a></li>
 					<ul>
-						<li id="li0" class="selected" onclick="MenuClick( event, 'DescriptionPanel')"><a href="#">Discription</a></li>
+						<li id="li0" class="selected" onclick="MenuClick( event, 'DescriptionPanel', false )"><a href="#">Discription</a></li>
+					</ul>
+					<li class="heading">Status -</a></li>
+					<ul>
+						<li id="li1" class="menu" onclick="MenuClick( event,'GetStatusHTMLPanel')"><a href="#">GetStatusHTML</a></li>
+						<li id="li2" class="menu" onclick="MenuClick( event,'GetStatusXMLPanel' )"><a href="#">GetStatus</a></li>
 					</ul>
 					<li class="heading">Request Types -</a></li>
 					<ul>
-						<li id="li1" class="menu" onclick="MenuClick( event, 'RESTPanel' );"><a href="#">Query String (REST)</a></li>
-						<li id="li2" class="menu" onclick="MenuClick( event, 'POSTPanel' )"><a href="#">Form Post</a></li>
-						<li id="li2" class="menu" onclick="MenuClick( event, 'SOAPPanel' )"><a href="#">SOAP</a></li>
+						<li id="li3" class="menu" onclick="MenuClick( event, 'RESTPanel', false );"><a href="#">Query String (REST)</a></li>
+						<li id="li4" class="menu" onclick="MenuClick( event, 'POSTPanel', false )"><a href="#">Form Post</a></li>
+						<li id="li5" class="menu" onclick="MenuClick( event, 'SOAPPanel', false )"><a href="#">SOAP</a></li>
 					</ul>
 				</ul>
 			</div>
@@ -74,6 +79,101 @@ function OnLoad()
 					</td>
 				</tr>
 				</TBODY>
+
+
+<!-- GetStatusHTML -->
+
+				<TBODY id='GetStatusHTMLPanel' style="display:none;">
+				<tr valign='top' >
+					<td width="2%">&nbsp;</td>
+					<td width="98%" height="1px"> 
+						<div id="divGetStatusHTML" class="panel" > 
+							<table cellspacing=0 cellpadding=0 class="panel">
+								<tr> 
+									<td> 
+										<table cellspacing=0 cellpadding=0 class="mnuBar" id="mnuBar1" >
+											<tr> 
+												<td nowrap><span tabindex=0 class="menu"><B>GetStatusHTML -</B> Retrieve MythBackend's Status as an HTML page.</span></td>
+											</tr>
+										</table>
+									</td>
+								</tr>
+								<tr>
+									<td> 
+										<div class="panelArea"> 
+											<table cellpadding=5 cellspacing=5 border=0 width='100%' >
+												<tr> 
+													<td width='40%' align="center"> 
+														<inPut name="button" type="button" class="formButton" onClick="UpdateIFrame( 'GetStatusHTML') " value="HTML Status"/> 
+													</td>
+													<td valign="top"> 
+														<table border="0" cellpadding="0" cellspacing="1" cols="5"  width="100%" >
+															<tr> 
+																<td width="13%" class="label" align="right">Params:</td>
+																<td width="10%" class="param">none</td>
+																<td width="7%" >&nbsp;</td>
+																<td width="70%" class="desc">&nbsp;</td>
+															</tr>
+															<tr> 
+																<td >&nbsp;</td>
+																<td colspan="3" class="desc"><em>* Note: if no method is given to server:[status port] then HTML status is returned</em></td>
+															</tr>
+														</table>
+													</td>
+												</tr>
+											</table>
+										</div>
+									</td>
+								</tr>
+							</table>
+						</div>
+					</td>
+				</tr>
+
+<!-- GetStatus -->
+
+				<TBODY id='GetStatusXMLPanel' style="display:none;">
+				<tr valign='top'  >
+					<td width="2%">&nbsp;</td>
+					<td width="98%" height="1px"> 
+						<div id="divGetStatusXML" class="panel" > 
+							<table cellspacing=0 cellpadding=0 class="panel">
+								<tr> 
+									<td>
+										<table cellspacing=0 cellpadding=0 class="mnuBar" id="mnuBar1" >
+											<tr> 
+												<td nowrap><span tabindex=0 class="menu"><B>GetStatus - </B>Retrieve MythBackend's Status as an XML Document.</span></td>
+											</tr>
+										</table>
+									</td>
+								</tr>
+								<tr>
+									<td> 
+										<div class="panelArea"> 
+											<table cellpadding=5 cellspacing=5 border=0 width='100%' >
+												<tr> 
+													<td width='40%' align="center"> 
+														<inPut name="button2" type="button" class="formButton" onClick="UpdateIFrame( 'GetStatus' )" value="XML Status"/> 
+													</td>
+													<td valign="top"> 
+														<table border="0" cellpadding="0" cellspacing="1" cols="5"  width="100%" >
+															<tr> 
+																<td width="13%" class="label" align="right">Params:</td>
+																<td width="10%" class="param">none</td>
+																<td width="7%" >&nbsp;</td>
+																<td width="70%" class="desc">&nbsp;</td>
+															</tr>
+														</table>
+													</td>
+												</tr>
+											</table>
+										</div>
+									</td>
+								</tr>
+							</table>
+						</div>
+					</td>
+				</tr>
 
 				<TBODY id='RESTPanel' style="display:none;">
 				<tr valign='top' >
@@ -165,6 +265,36 @@ function OnLoad()
 				</tr>
 				</TBODY>
 
+<!--  Results -->
+
+				<TBODY id='tbBlank'>
+				<tr><td height="10px" colspan=2>&nbsp;</td></tr>
+				</TBODY>
+
+				<TBODY id='tbResults' style="display:none;">
+				<tr valign="top">
+					<td width="2%">&nbsp;</td>
+					<td height="80%" width="98%">
+						<table class="panel fullHeight" width="100%" cellspacing=0 cellpadding=0 border=0 >
+							<tr valign="top"> 
+								<td height="23px"> 
+									<table cellspacing=0 cellpadding=0 class="mnuBar" id="mnuBar1" >
+										<tr> 
+											<td class="icMenu" noWrap><span tabIndex=0 class="menu">Results</span></td>
+											<td align="right"><span id="MinMaxId" onClick="MinMax()" direction="up"><img src="arr_up.gif" width="17" height="17"></span></td>
+										</tr>
+									</table>
+								</td>
+							</tr>
+							<tr> 
+								<td height="100%"> 
+									<iframe id='fraResults' name='fraResults' width='100%' height='100%' frameborder="0"></iframe> 
+								</td>
+							</tr>
+						</table>
+					</td>
+				</tr>
+				</TBODY>
 			</table>
 		</td>
 	</tr>

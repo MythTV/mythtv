@@ -8,9 +8,10 @@
 //                                                                            
 //////////////////////////////////////////////////////////////////////////////
 
-#include "upnpdevice.h"
-#include "ssdp.h"
-#include "upnptasknotify.h"
+#include "upnp.h"
+#include "mythcontext.h"
+#include "multicast.h"
+#include "broadcast.h"
 
 #include <unistd.h>
 #include <qstringlist.h>
@@ -18,6 +19,7 @@
 #include <qdom.h> 
 #include <qfile.h>
 #include <sys/time.h>
+
 
 /////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////
@@ -31,10 +33,12 @@
 //
 /////////////////////////////////////////////////////////////////////////////
 
-UPnpNotifyTask::UPnpNotifyTask( ) : m_nStatusPort( 0 ),
-                                    m_nMaxAge( 0 ), 
-                                    m_eNTS( NTS_alive )
+UPnpNotifyTask::UPnpNotifyTask( int nServicePort ) 
 {
+    m_nServicePort = nServicePort;
+    m_eNTS         = NTS_alive;
+
+    m_nMaxAge      = UPnp::g_pConfig->GetValue( "UPnP/SSDP/MaxAge" , 3600 );
 } 
 
 /////////////////////////////////////////////////////////////////////////////
@@ -49,9 +53,9 @@ UPnpNotifyTask::~UPnpNotifyTask()
 //
 /////////////////////////////////////////////////////////////////////////////
 
-void UPnpNotifyTask::SendNotifyMsg( QMulticastSocket *pSocket, 
-                                    QString           sNT,
-                                    QString           sUDN )
+void UPnpNotifyTask::SendNotifyMsg( QSocketDevice *pSocket, 
+                                    QString        sNT,
+                                    QString        sUDN )
 {
     QString sUSN;
 
@@ -73,7 +77,8 @@ void UPnpNotifyTask::SendNotifyMsg( QMulticastSocket *pSocket,
                             .arg( sUSN         )
                             .arg( m_nMaxAge    );
 
-//    VERBOSE(VB_UPNP, QString("UPnpNotifyTask::SendNotifyMsg : %1 : %2 ")
+//    VERBOSE(VB_UPNP, QString("UPnpNotifyTask::SendNotifyMsg : %1 : %2 : %3")
+//                        .arg( pSocket->address().toString() )
 //                        .arg( sNT  )
 //                        .arg( sUSN ));
 
@@ -84,16 +89,16 @@ void UPnpNotifyTask::SendNotifyMsg( QMulticastSocket *pSocket,
         QString sHeader = QString( "NOTIFY * HTTP/1.1\r\n"
                                    "HOST: %1:%2\r\n"    
                                    "LOCATION: http://%3:%4/getDeviceDesc\r\n" )
-                             .arg( pSocket->address().toString() )
-                             .arg( pSocket->port() )
+                             .arg( SSDP_GROUP ) // pSocket->address().toString() )
+                             .arg( SSDP_PORT )  // pSocket->port() )
                              .arg( *it )
-                             .arg( m_nStatusPort);
+                             .arg( m_nServicePort);
 
         QString  sPacket  = sHeader + sData;
         QCString scPacket = sPacket.utf8();
 
         // ------------------------------------------------------------------
-        // Send Packet to Multicast Socket (Send same packet twice)
+        // Send Packet to Socket (Send same packet twice)
         // ------------------------------------------------------------------
 
         pSocket->writeBlock( scPacket, scPacket.length(), pSocket->address(), pSocket->port() );
@@ -109,14 +114,9 @@ void UPnpNotifyTask::SendNotifyMsg( QMulticastSocket *pSocket,
 
 void UPnpNotifyTask::Execute( TaskQueue *pQueue )
 {
-    // ----------------------------------------------------------------------
-    // Reload in case they have changed.
-    // ----------------------------------------------------------------------
 
-    m_nStatusPort = gContext->GetNumSetting("BackendStatusPort", 6544 );
-    m_nMaxAge     = gContext->GetNumSetting("upnpMaxAge"       , 3600 );
-
-    QMulticastSocket *pSocket = new QMulticastSocket( SSDP_GROUP, SSDP_PORT );
+    QSocketDevice *pMulticast = new QMulticastSocket( SSDP_GROUP       , SSDP_PORT );
+//    QSocketDevice *pBroadcast = new QBroadcastSocket( "255.255.255.255", SSDP_PORT );
 
     // ----------------------------------------------------------------------
     // Refresh IP Address List in case of changes
@@ -130,20 +130,25 @@ void UPnpNotifyTask::Execute( TaskQueue *pQueue )
 
     UPnpDevice &device = UPnp::g_UPnpDeviceDesc.m_rootDevice;
 
-    SendNotifyMsg( pSocket, "upnp:rootdevice", device.GetUDN() );
+    SendNotifyMsg( pMulticast, "upnp:rootdevice", device.GetUDN() );
+//    SendNotifyMsg( pBroadcast, "upnp:rootdevice", device.GetUDN() );
 
     // ----------------------------------------------------------------------
     // Process rest of notifications
     // ----------------------------------------------------------------------
 
-    ProcessDevice( pSocket, &device );
+    ProcessDevice( pMulticast, &device );
+//    ProcessDevice( pBroadcast, &device );
 
     // ----------------------------------------------------------------------
     // Clean up and reshedule task if needed (timeout = m_nMaxAge / 2).
     // ----------------------------------------------------------------------
 
-    delete pSocket;
-    pSocket = NULL;
+    delete pMulticast;
+//    delete pBroadcast;
+
+    pMulticast = NULL;
+//    pBroadcast = NULL;
 
     m_mutex.lock();
 
@@ -158,7 +163,7 @@ void UPnpNotifyTask::Execute( TaskQueue *pQueue )
 //
 /////////////////////////////////////////////////////////////////////////////
 
-void UPnpNotifyTask::ProcessDevice( QMulticastSocket *pSocket, UPnpDevice *pDevice )
+void UPnpNotifyTask::ProcessDevice( QSocketDevice *pSocket, UPnpDevice *pDevice )
 {
     // ----------------------------------------------------------------------
     // Loop for each device and send the 2 required messages

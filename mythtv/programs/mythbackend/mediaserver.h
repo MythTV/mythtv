@@ -14,11 +14,11 @@
 #include <qobject.h>
 #include <qmutex.h>
 
-#include "upnp.h"
+#include "libmythupnp/upnp.h"
 
-#include "upnpcds.h"
-#include "upnpcmgr.h"
-#include "upnpmsrr.h"
+#include "libmythupnp/upnpcds.h"
+#include "libmythupnp/upnpcmgr.h"
+#include "libmythupnp/upnpmsrr.h"
 
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
@@ -30,13 +30,17 @@
 
 class MediaServer : public UPnp
 {
+    private:
+
+        HttpServer      *m_pHttpServer;
+
     protected:
         
-        UPnpCDS                *m_pUPnpCDS;      // Do not delete (auto deleted)
-        UPnpCMGR               *m_pUPnpCMGR;     // Do not delete (auto deleted)
+        UPnpCDS         *m_pUPnpCDS;      // Do not delete (auto deleted)
+        UPnpCMGR        *m_pUPnpCMGR;     // Do not delete (auto deleted)
 
     public:
-                 MediaServer( bool bMaster, HttpServer *pHttpServer );
+                 MediaServer( bool bMaster, bool bDisableUPnp = FALSE );
         virtual ~MediaServer();
 
 //        void     customEvent( QCustomEvent *e );

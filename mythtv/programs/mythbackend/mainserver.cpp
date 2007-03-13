@@ -156,7 +156,7 @@ class ProcessRequestThread : public QThread
     bool threadlives;
 };
 
-MainServer::MainServer(bool master, int port, int /*statusport*/, 
+MainServer::MainServer(bool master, int port, 
                        QMap<int, EncoderLink *> *tvList,
                        Scheduler *sched, AutoExpire *expirer)
 {

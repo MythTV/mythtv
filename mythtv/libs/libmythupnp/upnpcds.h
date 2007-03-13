@@ -15,7 +15,6 @@
 #include <qdatetime.h> 
 
 #include "httpserver.h"
-#include "mythcontext.h"
 #include "upnpcdsobjects.h"
 #include "eventing.h"
               
@@ -167,8 +166,6 @@ class UPnpCDS : public Eventing
         void            HandleGetSearchCapabilities( HTTPRequest *pRequest );
         void            HandleGetSortCapabilities  ( HTTPRequest *pRequest );
         void            HandleGetSystemUpdateID    ( HTTPRequest *pRequest );
-
-        QString        &Encode                     ( QString &sStr );
 
     protected:
 

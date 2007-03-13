@@ -10,11 +10,13 @@
 
 #include "upnp.h"
 
-#include "upnptasknotify.h"
 #include "upnptasksearch.h"
 #include "upnptaskcache.h"
 
-#include "mythcontext.h"
+#include "multicast.h"
+#include "broadcast.h"
+
+#include <qregexp.h>
 
 #include <unistd.h>
 #include <qstringlist.h>
@@ -32,10 +34,48 @@
 //
 /////////////////////////////////////////////////////////////////////////////
 
-SSDP::SSDP( QSocketDevice *pSocket, bool bEnableNotify ) : m_bTermRequested( false )
+SSDP::SSDP( int nServicePort ) : m_bTermRequested( false )
 {
-    m_pSSDPSocket   = pSocket;
-    m_bEnableNotify = bEnableNotify;
+
+    m_nServicePort = nServicePort;
+    m_nPort        = UPnp::g_pConfig->GetValue( "UPnP/SSDP/Port"      , SSDP_PORT       );
+    m_nSearchPort  = UPnp::g_pConfig->GetValue( "UPnP/SSDP/SearchPort", SSDP_SEARCHPORT );
+
+    m_Sockets[ SocketIdx_Search    ] = new QSocketDevice( QSocketDevice::Datagram ); 
+    m_Sockets[ SocketIdx_Multicast ] = new QMulticastSocket( SSDP_GROUP, m_nPort );
+    m_Sockets[ SocketIdx_Broadcast ] = new QBroadcastSocket( "255.255.255.255", m_nPort );
+
+
+    m_Sockets[ SocketIdx_Search    ]->setBlocking( FALSE );
+    m_Sockets[ SocketIdx_Multicast ]->setBlocking( FALSE );
+    m_Sockets[ SocketIdx_Broadcast ]->setBlocking( FALSE );
+
+    // Setup SearchSocket
+
+    m_Sockets[ SocketIdx_Search ]->bind( INADDR_ANY, m_nSearchPort ); 
+
+    m_pNotifyTask   = NULL;
+
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
+SSDP::~SSDP()
+{
+    DisableNotifications();
+
+    if (m_pNotifyTask != NULL)
+        m_pNotifyTask->Release();
+
+    for (int nIdx = 0; nIdx < (int)NumberOfSockets; nIdx++ )
+    {
+        if (m_Sockets[ nIdx ] != NULL )
+        {
+            delete m_Sockets[ nIdx ];
+        }
+    }
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -70,96 +110,46 @@ void SSDP::RequestTerminate(void)
 //
 /////////////////////////////////////////////////////////////////////////////
 
-void SSDP::run()
+void SSDP::EnableNotifications()
 {
-    BufferedSocketDevice *pSocket          = new BufferedSocketDevice( m_pSSDPSocket );
-    UPnpNotifyTask       *pNotifyTask      = NULL;
-    HTTPRequest          *pRequest         = NULL;
-
-    //-=>TODO: Should add checks for NULL pointers?
-
-    if (m_bEnableNotify)
+    if ( m_pNotifyTask == NULL )
     {
-        pNotifyTask = new UPnpNotifyTask(); 
+        m_pNotifyTask = new UPnpNotifyTask( m_nServicePort ); 
 
         // ------------------------------------------------------------------
         // Let's make sure to hold on to a reference of the NotifyTask.
         // ------------------------------------------------------------------
 
-        pNotifyTask->AddRef();
+        m_pNotifyTask->AddRef();
 
         // ------------------------------------------------------------------
         // First Send out Notification that we are leaving the network.
         // ------------------------------------------------------------------
 
-        pNotifyTask->SetNTS( NTS_byebye );
-        pNotifyTask->Execute( NULL );
-
-        // ------------------------------------------------------------------
-        // Add Announcement Task to the Queue
-        // ------------------------------------------------------------------
-
-        pNotifyTask->SetNTS( NTS_alive );
-        UPnp::g_pTaskQueue->AddTask( pNotifyTask  );
-
+        m_pNotifyTask->SetNTS( NTS_byebye );
+        m_pNotifyTask->Execute( NULL );
     }
 
-    // ----------------------------------------------------------------------
-    // Listen for new Requests
-    // ----------------------------------------------------------------------
+    // ------------------------------------------------------------------
+    // Add Announcement Task to the Queue
+    // ------------------------------------------------------------------
 
-    while (!IsTermRequested())
-    {
-        if ( pSocket->WaitForMore( 500 ) > 0)
-        {
-            QHostAddress  peerAddress = pSocket->PeerAddress();
-            Q_UINT16      peerPort    = pSocket->PeerPort   ();
+    m_pNotifyTask->SetNTS( NTS_alive );
+    UPnp::g_pTaskQueue->AddTask( m_pNotifyTask  );
+}
 
-            pSocket->SetDestAddress( peerAddress, peerPort );
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
 
-            // --------------------------------------------------------------
-            // See if this is a valid request
-            // --------------------------------------------------------------
-            if ((pRequest = new BufferedSocketDeviceRequest( pSocket )) != NULL)
-            {
-
-                if ( pRequest->ParseRequest() )
-                {
-                    switch( pRequest->m_eType )
-                    {
-                        case  RequestTypeMSearch:  ProcessSearchRequest( pRequest, peerAddress, peerPort ); break;
-                        case  RequestTypeNotify :  ProcessNotify       ( pRequest                        ); break;
-                        default: break;
-                    }
-                }
-                else 
-                {
-                    VERBOSE(VB_UPNP, "No info from ParseRequest... Clearing");
-                    pSocket->ClearReadBuffer();
-                }  
-
-                delete pRequest;
-                pRequest = NULL;
-            }
-        }
-    }
-
-    if (pNotifyTask != NULL)
+void SSDP::DisableNotifications()
+{
+    if (m_pNotifyTask != NULL)
     {
         // Send Announcement that we are leaving.
 
-        pNotifyTask->SetNTS( NTS_byebye );
-        pNotifyTask->Execute( NULL );
-        pNotifyTask->Release();
-    }
-
-    if (pSocket != NULL) 
-        delete pSocket;
-
-    if (m_pSSDPSocket != NULL)
-    {
-        delete m_pSSDPSocket;
-        m_pSSDPSocket = NULL;
+        m_pNotifyTask->SetNTS( NTS_byebye );
+        m_pNotifyTask->Execute( NULL );
     }
 }
 
@@ -167,13 +157,216 @@ void SSDP::run()
 //
 /////////////////////////////////////////////////////////////////////////////
 
-bool SSDP::ProcessSearchRequest( HTTPRequest  *pRequest,
-                                 QHostAddress  peerAddress,
-                                 Q_UINT16      peerPort )
+void SSDP::PerformSearch( const QString &sST )
 {
-    QString sMAN = pRequest->GetHeaderValue( "MAN", "" );
-    QString sST  = pRequest->GetHeaderValue(  "ST", "" );
-    QString sMX  = pRequest->GetHeaderValue(  "MX", "" );
+    QCString sRequest = QString( "M-SEARCH * HTTP/1.1\r\n"
+                                 "HOST: 239.255.255.250:1900\r\n"
+                                 "MAN: \"ssdp:discover\"\r\n"
+                                 "MX: 2\r\n"
+                                 "ST: %1\r\n"
+                                 "\r\n" )
+                           .arg( sST ).utf8();
+
+    QSocketDevice *pSocket = m_Sockets[ SocketIdx_Search ];
+
+    QHostAddress address;
+    address.setAddress( SSDP_GROUP );
+
+    int nSize = sRequest.size();
+
+    if ( pSocket->writeBlock( sRequest.data(), sRequest.size(), address, SSDP_PORT ) != nSize)
+        cerr << "SSDP::PerformSearch - did not write entire buffer." << endl;
+
+    usleep( rand() % 250000 );
+
+    if ( pSocket->writeBlock( sRequest.data(), sRequest.size(), address, SSDP_PORT ) != nSize)
+        cerr << "SSDP::PerformSearch - did not write entire buffer." << endl;
+
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
+void SSDP::run()
+{
+    fd_set          read_set;
+    struct timeval  timeout;
+
+    // ----------------------------------------------------------------------
+    // Listen for new Requests
+    // ----------------------------------------------------------------------
+
+    while (!IsTermRequested())
+    {
+        int nMaxSocket = 0;
+
+        FD_ZERO( &read_set );
+
+        for (int nIdx = 0; nIdx < (int)NumberOfSockets; nIdx++ )
+        {
+            if (m_Sockets[ nIdx ] != NULL)
+            {
+                FD_SET( m_Sockets[ nIdx ]->socket(), &read_set );
+                nMaxSocket = max( m_Sockets[ nIdx ]->socket(), nMaxSocket );
+
+/*
+                if (m_Sockets[ nIdx ]->bytesAvailable() > 0)
+                {
+	            cout << "Found Extra data before select: " << nIdx << endl;
+                    ProcessData( m_Sockets[ nIdx ] );
+                }
+*/
+
+            }
+        }
+        
+        timeout.tv_sec  = 1;
+        timeout.tv_usec = 0;
+
+        if ( select( nMaxSocket + 1, &read_set, NULL, NULL, &timeout ) != -1)
+        {
+            for (int nIdx = 0; nIdx < (int)NumberOfSockets; nIdx++ )
+            {
+                if (m_Sockets[ nIdx ] != NULL)
+                {
+                    if (FD_ISSET( m_Sockets[ nIdx ]->socket(), &read_set ))
+                    {
+                        // cout << "FD_ISSET( " << nIdx << " ) " << endl;
+
+                        ProcessData( m_Sockets[ nIdx ] );
+                    }
+                }
+            }
+        }
+    }
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
+void SSDP::ProcessData( QSocketDevice *pSocket )
+{
+    long nBytes = 0;
+    long nRead  = 0;
+
+    while ((nBytes = pSocket->bytesAvailable()) > 0)
+    {
+        QCString buffer( nBytes + 1 );
+
+        nRead = pSocket->readBlock( buffer.data(), nBytes );
+
+        QHostAddress  peerAddress = pSocket->peerAddress();
+        Q_UINT16      peerPort    = pSocket->peerPort   ();
+
+        // ------------------------------------------------------------------
+
+        QStringList lines        = QStringList::split( "\r\n", buffer );
+        QString     sRequestLine = lines[0];
+
+        lines.pop_front();
+
+        // ------------------------------------------------------------------
+        // Parse request Type
+        // ------------------------------------------------------------------
+
+        // cout << "SSDP::ProcessData - requestLine: " << sRequestLine << endl;
+
+        SSDPRequestType eType = ProcessRequestLine( sRequestLine );
+
+        // ------------------------------------------------------------------
+        // Read Headers into map
+        // ------------------------------------------------------------------
+
+        QStringMap  headers;
+
+        for ( QStringList::Iterator it = lines.begin(); it != lines.end(); ++it ) 
+        {
+            QString sLine  = *it;
+            QString sName  = sLine.section( ':', 0, 0 ).stripWhiteSpace();
+            QString sValue = sLine.section( ':', 1 );
+
+            sValue.truncate( sValue.length() );  //-2
+
+            if ((sName.length() != 0) && (sValue.length() !=0))
+                headers.insert( sName.lower(), sValue.stripWhiteSpace() );
+        }
+
+//        pSocket->SetDestAddress( peerAddress, peerPort );
+
+        // --------------------------------------------------------------
+        // See if this is a valid request
+        // --------------------------------------------------------------
+
+        switch( eType )
+        {
+            case SSDP_MSearch    :  ProcessSearchRequest ( headers, peerAddress, peerPort ); break;
+            case SSDP_MSearchResp:  ProcessSearchResponse( headers                        ); break;
+            case SSDP_Notify     :  ProcessNotify        ( headers                        ); break;
+            case SSDP_Unknown:
+            default:
+                VERBOSE(VB_UPNP, "SSPD::ProcessData - Unknown request Type.");
+                break;
+        }
+    }
+
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
+SSDPRequestType SSDP::ProcessRequestLine( const QString &sLine )
+{
+    QStringList tokens = QStringList::split(QRegExp("[ \r\n][ \r\n]*"), sLine );
+
+    // ----------------------------------------------------------------------
+    // if this is actually a response, then sLine's format will be:
+    //      HTTP/m.n <response code> <response text>
+    // otherwise:
+    //      <method> <Resource URI> HTTP/m.n
+    // ----------------------------------------------------------------------
+
+    if ( sLine.startsWith( "HTTP/" )) 
+        return SSDP_MSearchResp;
+    else
+    {
+        if (tokens.count() > 0)
+        {
+            if (tokens[0] == "M-SEARCH" ) return SSDP_MSearch;
+            if (tokens[0] == "NOTIFY"   ) return SSDP_Notify;
+        }
+    }
+
+    return SSDP_Unknown;
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
+QString SSDP::GetHeaderValue( const QStringMap &headers, const QString &sKey, const QString &sDefault )
+{
+    QStringMap::const_iterator it = headers.find( sKey.lower() );
+
+    if ( it == headers.end())
+        return( sDefault );
+
+    return( it.data() );
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
+bool SSDP::ProcessSearchRequest( const QStringMap &sHeaders, 
+                                 QHostAddress      peerAddress,
+                                 Q_UINT16          peerPort )
+{
+    QString sMAN = GetHeaderValue( sHeaders, "MAN", "" );
+    QString sST  = GetHeaderValue( sHeaders, "ST" , "" );
+    QString sMX  = GetHeaderValue( sHeaders, "MX" , "" );
     int     nMX  = 0;
 
     //cout << "*** SSDP ProcessSearchrequest : [" << sST << "] MX = " << nMX << endl;
@@ -183,9 +376,9 @@ bool SSDP::ProcessSearchRequest( HTTPRequest  *pRequest,
     // ----------------------------------------------------------------------
 
     if ( UPnp::g_pTaskQueue    == NULL                ) return false;
-    if ( pRequest->m_sMethod   != "*"                 ) return false;
-    if ( pRequest->m_sProtocol != "HTTP"              ) return false;
-    if ( pRequest->m_nMajor    != 1                   ) return false;
+//    if ( pRequest->m_sMethod   != "*"                 ) return false;
+//    if ( pRequest->m_sProtocol != "HTTP"              ) return false;
+//    if ( pRequest->m_nMajor    != 1                   ) return false;
     if ( sMAN                  != "\"ssdp:discover\"" ) return false;
     if ( sST.length()          == 0                   ) return false;
     if ( sMX.length()          == 0                   ) return false;
@@ -206,7 +399,8 @@ bool SSDP::ProcessSearchRequest( HTTPRequest  *pRequest,
 
     if ((sST == "ssdp:all") || (sST == "upnp:rootdevice"))
     {
-        UPnpSearchTask *pTask = new UPnpSearchTask( peerAddress,
+        UPnpSearchTask *pTask = new UPnpSearchTask( m_nServicePort, 
+                                                    peerAddress,
                                                     peerPort,
                                                     sST, 
                                    UPnp::g_UPnpDeviceDesc.m_rootDevice.GetUDN());
@@ -229,7 +423,8 @@ bool SSDP::ProcessSearchRequest( HTTPRequest  *pRequest,
 
     if (sUDN.length() > 0)
     {
-        UPnpSearchTask *pTask = new UPnpSearchTask( peerAddress,
+        UPnpSearchTask *pTask = new UPnpSearchTask( m_nServicePort,
+                                                    peerAddress,
                                                     peerPort,
                                                     sST, 
                                                     sUDN );
@@ -251,13 +446,39 @@ bool SSDP::ProcessSearchRequest( HTTPRequest  *pRequest,
 //
 /////////////////////////////////////////////////////////////////////////////
 
-bool SSDP::ProcessNotify( HTTPRequest  *pRequest )
+bool SSDP::ProcessSearchResponse( const QStringMap &headers )
 {
-    QString sDescURL = pRequest->GetHeaderValue( "LOCATION"     , "" );
-    QString sNTS     = pRequest->GetHeaderValue( "NTS"          , "" );
-    QString sNT      = pRequest->GetHeaderValue( "NT"           , "" );
-    QString sUSN     = pRequest->GetHeaderValue( "USN"          , "" );
-    QString sCache   = pRequest->GetHeaderValue( "CACHE-CONTROL", "" );
+    QString sDescURL = GetHeaderValue( headers, "LOCATION"      , "" );
+    QString sST      = GetHeaderValue( headers, "ST"            , "" );
+    QString sUSN     = GetHeaderValue( headers, "USN"           , "" );
+    QString sCache   = GetHeaderValue( headers, "CACHE-CONTROL" , "" );
+
+    int nPos = sCache.find( "max-age", 0, false );
+
+    if (nPos < 0)
+        return false;
+
+    if ((nPos = sCache.find( "=", nPos, false )) < 0)
+        return false;
+
+    int nSecs = sCache.mid( nPos+1 ).toInt();
+
+    UPnp::g_SSDPCache.Add( sST, sUSN, sDescURL, nSecs );
+
+    return true;
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
+bool SSDP::ProcessNotify( const QStringMap &headers )
+{
+    QString sDescURL = GetHeaderValue( headers, "LOCATION"      , "" );
+    QString sNTS     = GetHeaderValue( headers, "NTS"           , "" );
+    QString sNT      = GetHeaderValue( headers, "NT"            , "" );
+    QString sUSN     = GetHeaderValue( headers, "USN"           , "" );
+    QString sCache   = GetHeaderValue( headers, "CACHE-CONTROL" , "" );
 
     if (sNTS.contains( "ssdp:alive"))
     {
@@ -299,11 +520,10 @@ bool SSDP::ProcessNotify( HTTPRequest  *pRequest )
 //
 /////////////////////////////////////////////////////////////////////////////
 
-SSDPExtension::SSDPExtension( ) : HttpServerExtension( "SSDP" )
+SSDPExtension::SSDPExtension( int nServicePort ) : HttpServerExtension( "SSDP" )
 {
-    QString sSharePath = gContext->GetShareDir();
-
-    m_sUPnpDescPath = gContext->GetSetting("upnpDescXmlPath", sSharePath);
+    m_sUPnpDescPath = UPnp::g_pConfig->GetValue( "UPnP/DescXmlPath", m_sSharePath );
+    m_nServicePort  = nServicePort;
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -321,10 +541,6 @@ SSDPExtension::~SSDPExtension( )
 SSDPMethod SSDPExtension::GetMethod( const QString &sURI )
 {
     if (sURI == "getDeviceDesc"     ) return( SSDPM_GetDeviceDesc    );
-    if (sURI == "getCMGRDesc"       ) return( SSDPM_GetCMGRDesc      );
-    if (sURI == "getCDSDesc"        ) return( SSDPM_GetCDSDesc       );
-    if (sURI == "getMSRRDesc"       ) return( SSDPM_GetMSRRDesc      );
-    if (sURI == "getMythProtoDesc"  ) return( SSDPM_GetMythProtoDesc );
     if (sURI == "getDeviceList"     ) return( SSDPM_GetDeviceList    );
 
     return( SSDPM_Unknown );
@@ -344,10 +560,6 @@ bool SSDPExtension::ProcessRequest( HttpWorkerThread *, HTTPRequest *pRequest )
         switch( GetMethod( pRequest->m_sMethod ))
         {
             case SSDPM_GetDeviceDesc    : GetDeviceDesc( pRequest ); return( true );
-            case SSDPM_GetCDSDesc       : GetFile( pRequest, "CDS_scpd.xml"  ); return( true );
-            case SSDPM_GetCMGRDesc      : GetFile( pRequest, "CMGR_scpd.xml" ); return( true );
-            case SSDPM_GetMSRRDesc      : GetFile( pRequest, "MSRR_scpd.xml" ); return( true );
-            case SSDPM_GetMythProtoDesc : GetFile( pRequest, "MXML_scpd.xml" ); return( true );
             case SSDPM_GetDeviceList    : GetDeviceList( pRequest ); return( true );
 
             default: break;
@@ -368,6 +580,7 @@ void SSDPExtension::GetDeviceDesc( HTTPRequest *pRequest )
     QString sUserAgent = pRequest->GetHeaderValue( "User-Agent", "" );
 
     UPnp::g_UPnpDeviceDesc.GetValidXML( pRequest->GetHostAddress(), 
+                                        m_nServicePort,
                                         pRequest->m_response,
                                         sUserAgent  );
 }
@@ -394,7 +607,7 @@ void SSDPExtension::GetFile( HTTPRequest *pRequest, QString sFileName )
 }
 
 /////////////////////////////////////////////////////////////////////////////
-// Tempory Method to help debug/test the SSDPCache.
+// 
 /////////////////////////////////////////////////////////////////////////////
 
 void SSDPExtension::GetDeviceList( HTTPRequest *pRequest )
@@ -427,7 +640,7 @@ void SSDPExtension::GetDeviceList( HTTPRequest *pRequest )
                                   ++itEntry )
             {
 
-                SSDPCacheEntry *pEntry = (SSDPCacheEntry *)itEntry.data();
+                DeviceLocation *pEntry = (DeviceLocation *)itEntry.data();
 
                 if (pEntry != NULL)
                 {
@@ -453,13 +666,13 @@ void SSDPExtension::GetDeviceList( HTTPRequest *pRequest )
     list.append( new NameValue( "DevicesAllocated"     , QString::number( SSDPCacheEntries::g_nAllocated )));
 
     list.append( new NameValue( "CacheEntriesFound"    , QString::number( nCount )));
-    list.append( new NameValue( "CacheEntriesAllocated", QString::number( SSDPCacheEntry::g_nAllocated )));
+    list.append( new NameValue( "CacheEntriesAllocated", QString::number( DeviceLocation::g_nAllocated )));
 
     list.append( new NameValue( "DeviceList"           , sXML));
 
     cache.Unlock();
 
-    pRequest->FormatActionReponse( &list );
+    pRequest->FormatActionResponse( &list );
 
     pRequest->m_eResponseType   = ResponseTypeXML;
     pRequest->m_nResponseStatus = 200;

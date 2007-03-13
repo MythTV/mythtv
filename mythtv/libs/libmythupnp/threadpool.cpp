@@ -9,6 +9,7 @@
 /////////////////////////////////////////////////////////////////////////////
 
 #include "threadpool.h"
+#include "upnp.h"       // only needed for Config... remove once config is moved.
 
 /////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////
@@ -242,8 +243,8 @@ ThreadPool::ThreadPool( const QString &sName )
     m_lstThreads         .setAutoDelete( false );
     m_lstAvailableThreads.setAutoDelete( false );
 
-    m_nInitialThreadCount = gContext->GetNumSetting( "ThreadCountInitial_" + m_sName, 1 );
-    m_nMaxThreadCount     = gContext->GetNumSetting( "ThreadCountMax_"     + m_sName, 5 );
+    m_nInitialThreadCount = UPnp::g_pConfig->GetValue( "ThreadPool/" + m_sName + "/Initial", 1 );
+    m_nMaxThreadCount     = UPnp::g_pConfig->GetValue( "ThreadPool/" + m_sName + "/Max"    , 5 );
 
     m_nInitialThreadCount = min( m_nInitialThreadCount, m_nMaxThreadCount );
 

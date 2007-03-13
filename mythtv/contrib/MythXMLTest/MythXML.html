@@ -22,7 +22,7 @@ function GetRecording( )
 {
 	var oForm = FindObject( "GetRecording" );
 
-	var sQuery = GetMasterBackend( "getRecording" ) + "?ChanId=" + oForm.ChanId.value + "&StartTime=" + oForm.StartTime.value;
+	var sQuery = GetMasterBackend( "GetRecording" ) + "?ChanId=" + oForm.ChanId.value + "&StartTime=" + oForm.StartTime.value;
 
 	oForm.action = sQuery;
 }
@@ -32,7 +32,7 @@ function GetRecording( )
 </script>
 </head>
 
-<body onLoad="OnLoad('')" >
+<body onLoad="OnLoad('/Myth')" >
 <table class="fullHeight" width="100%" align='center' cellpadding="0" cellspacing="0" border="0">
 	<tr valign="top" >
 		<td width='15%'>
@@ -41,38 +41,36 @@ function GetRecording( )
 					<li class="heading">Info -</a></li>
 					<ul>
 						<li id="li0" class="selected" onclick="MenuClick( event,'DescriptionPanel'  )"><a href="#">Discription</a></li>
-						<li id="li1" class="menu"     onclick="MenuClick( event,'getDeviceDescPanel')"><a href="#">getDeviceDesc</a></li>
-					</ul>
-					<li class="heading">Status -</a></li>
-					<ul>
-						<li id="li2" class="menu" onclick="MenuClick( event,'getStatusHTMLPanel')"><a href="#">getStatusHTML</a></li>
-						<li id="li3" class="menu" onclick="MenuClick( event,'getStatusXMLPanel' )"><a href="#">getStatus</a></li>
+						<li id="li1" class="menu"     onclick="MenuClick( event,'GetServDescPanel')"><a href="#">GetServDesc</a></li>
+						<li id="li2" class="menu"     onclick="MenuClick( event,'GetConnectionInfoPanel')"><a href="#">GetConnectionInfo</a></li>
 					</ul>
 					<li class="heading">Settings -</a></li>
 					<ul>
-						<li id="li4" class="menu" onclick="MenuClick( event,'getHostsPanel'  )"><a href="#">getHosts</a></li>
-						<li id="li5" class="menu" onclick="MenuClick( event,'getKeysPanel'   )"><a href="#">getKeys</a></li>
-						<li id="li6" class="menu" onclick="MenuClick( event,'getSettingPanel')"><a href="#">getSetting</a></li>
-						<li id="li7" class="menu" onclick="MenuClick( event,'putSettingPanel')"><a href="#">putSetting</a></li>
+						<li id="li4" class="menu" onclick="MenuClick( event,'GetHostsPanel'  )"><a href="#">GetHosts</a></li>
+						<li id="li5" class="menu" onclick="MenuClick( event,'GetKeysPanel'   )"><a href="#">GetKeys</a></li>
+						<li id="li6" class="menu" onclick="MenuClick( event,'GetSettingPanel')"><a href="#">GetSetting</a></li>
+						<li id="li7" class="menu" onclick="MenuClick( event,'PutSettingPanel')"><a href="#">PutSetting</a></li>
 					</ul>
 					<li class="heading">Program Guide -</a></li>
 					<ul>
-						<li id="li8"  class="menu" onclick="MenuClick( event,'getProgramGuidePanel'  )"><a href="#">getProgramGuide</a></li>
-						<li id="li9"  class="menu" onclick="MenuClick( event,'getProgramDetailsPanel')"><a href="#">getProgramDetails</a></li>
-						<li id="li10" class="menu" onclick="MenuClick( event,'getChannelIconPanel'   )"><a href="#">getChannelIcon</a></li>
+						<li id="li8"  class="menu" onclick="MenuClick( event,'GetProgramGuidePanel'  )"><a href="#">GetProgramGuide</a></li>
+						<li id="li9"  class="menu" onclick="MenuClick( event,'GetProgramDetailsPanel')"><a href="#">GetProgramDetails</a></li>
+						<li id="li10" class="menu" onclick="MenuClick( event,'GetChannelIconPanel'   )"><a href="#">GetChannelIcon</a></li>
 					</ul>
 					<li class="heading">Recorded -</a></li>
 					<ul>
-						<li id="li11" class="menu" onclick="MenuClick( event,'getRecordedPanel'    )"><a href="#">getRecorded</a></li>
-						<li id="li12" class="menu" onclick="MenuClick( event,'getExpiringPanel'    )"><a href="#">getExpiring</a></li>
-						<li id="li13" class="menu" onclick="MenuClick( event,'getPreviewImagePanel')"><a href="#">getPreviewImage</a></li>
-						<li id="li14" class="menu" onclick="MenuClick( event,'delRecordingPanel'   )"><a href="#">delRecording</a></li>
+						<li id="li11" class="menu" onclick="MenuClick( event,'GetRecordedPanel'    )"><a href="#">GetRecorded</a></li>
+						<li id="li12" class="menu" onclick="MenuClick( event,'GetExpiringPanel'    )"><a href="#">GetExpiring</a></li>
+						<li id="li13" class="menu" onclick="MenuClick( event,'GetPreviewImagePanel')"><a href="#">GetPreviewImage</a></li>
+<!--
+						<li id="li14" class="menu" onclick="MenuClick( event,'DelRecordingPanel'   )"><a href="#">DelRecording</a></li>
+-->
 					</ul>
 					<li class="heading">Media Retrieval -</a></li>
 					<ul>
-						<li id="li15" class="menu" onclick="MenuClick( event,'getRecordingPanel')"><a href="#">getRecording</a></li>
-						<li id="li16" class="menu" onclick="MenuClick( event,'getVideoPanel'    )"><a href="#">getVideo</a></li>
-						<li id="li17" class="menu" onclick="MenuClick( event,'getMusicPanel'    )"><a href="#">getMusic</a></li>
+						<li id="li15" class="menu" onclick="MenuClick( event,'GetRecordingPanel')"><a href="#">GetRecording</a></li>
+						<li id="li16" class="menu" onclick="MenuClick( event,'GetVideoPanel'    )"><a href="#">GetVideo</a></li>
+						<li id="li17" class="menu" onclick="MenuClick( event,'GetMusicPanel'    )"><a href="#">GetMusic</a></li>
 					</ul>
 				</ul>
 			</div>
@@ -111,19 +109,19 @@ function GetRecording( )
 					</td>
 				</tr>
 
-<!-- getDeviceDesc -->
+<!-- GetServDesc -->
 
-				<TBODY id='getDeviceDescPanel' style="display:none;">
+				<TBODY id='GetServDescPanel' style="display:none;">
 				<tr valign='top' >
 					<td width="2%">&nbsp;</td>
 					<td width="98%" height="1px"> 
-						<div id="divGetDeviceDesc" class="panel" > 
+						<div id="divGetServDesc" class="panel" > 
 							<table cellspacing=0 cellpadding=0 class="panel">
 								<tr> 
 									<td> 
 										<table cellspacing=0 cellpadding=0 class="mnuBar" id="mnuBar1" >
 											<tr> 
-												<td nowrap><span tabindex=0 class="menu"><B>getDeviceDesc - </B>Retrieve MythBackend's uPnp Device Description xml.</span></td>
+												<td nowrap><span tabindex=0 class="menu"><B>GetServDesc - </B>Retrieve MythBackend's uPnp Service Description xml.</span></td>
 											</tr>
 										</table>
 									</td>
@@ -134,7 +132,7 @@ function GetRecording( )
 											<table cellpadding=5 cellspacing=5 border=0 width='100%' >
 												<tr> 
 													<td width='40%' align="center"> 
-														<input name="button" type="button" class="formButton" onClick="UpdateIFrame( 'getDeviceDesc') " value="getDeviceDesc"/> 
+														<input name="button" type="button" class="formButton" onClick="UpdateIFrame( 'GetServDesc') " value="GetServDesc"/> 
 													</td>
 													<td valign="top"> 
 														<table border="0" cellpadding="0" cellspacing="1" cols="5"  width="100%" >
@@ -156,68 +154,19 @@ function GetRecording( )
 					</td>
 				</tr>
 
-<!-- getStatusHTML -->
+<!-- GetConnectionInfo --> 
 
-				<TBODY id='getStatusHTMLPanel' style="display:none;">
-				<tr valign='top' >
-					<td width="2%">&nbsp;</td>
-					<td width="98%" height="1px"> 
-						<div id="divGetStatusHTML" class="panel" > 
-							<table cellspacing=0 cellpadding=0 class="panel">
-								<tr> 
-									<td> 
-										<table cellspacing=0 cellpadding=0 class="mnuBar" id="mnuBar1" >
-											<tr> 
-												<td nowrap><span tabindex=0 class="menu"><B>getStatusHTML -</B> Retrieve MythBackend's Status as an HTML page.</span></td>
-											</tr>
-										</table>
-									</td>
-								</tr>
-								<tr>
-									<td> 
-										<div class="panelArea"> 
-											<table cellpadding=5 cellspacing=5 border=0 width='100%' >
-												<tr> 
-													<td width='40%' align="center"> 
-														<input name="button" type="button" class="formButton" onClick="UpdateIFrame( 'getStatusHTML') " value="HTML Status"/> 
-													</td>
-													<td valign="top"> 
-														<table border="0" cellpadding="0" cellspacing="1" cols="5"  width="100%" >
-															<tr> 
-																<td width="13%" class="label" align="right">Params:</td>
-																<td width="10%" class="param">none</td>
-																<td width="7%" >&nbsp;</td>
-																<td width="70%" class="desc">&nbsp;</td>
-															</tr>
-															<tr> 
-																<td >&nbsp;</td>
-																<td colspan="3" class="desc"><em>* Note: if no method is given to server:[status port] then HTML status is returned</em></td>
-															</tr>
-														</table>
-													</td>
-												</tr>
-											</table>
-										</div>
-									</td>
-								</tr>
-							</table>
-						</div>
-					</td>
-				</tr>
-
-<!-- getStatus -->
-
-				<TBODY id='getStatusXMLPanel' style="display:none;">
+				<TBODY id='GetConnectionInfoPanel' style="display:none;">
 				<tr valign='top'  >
 					<td width="2%">&nbsp;</td>
 					<td width="98%" height="1px"> 
-						<div id="divGetStatusXML" class="panel" > 
+						<div id="divGetConnectionInfo" class="panel" > 
 							<table cellspacing=0 cellpadding=0 class="panel">
 								<tr> 
 									<td>
 										<table cellspacing=0 cellpadding=0 class="mnuBar" id="mnuBar1" >
 											<tr> 
-												<td nowrap><span tabindex=0 class="menu"><B>getStatus - </B>Retrieve MythBackend's Status as an XML Document.</span></td>
+												<td nowrap><span tabindex=0 class="menu"><B>GetConnectionInfo - </B>Retrieves Database Connection Information.</span></td>
 											</tr>
 										</table>
 									</td>
@@ -225,18 +174,26 @@ function GetRecording( )
 								<tr>
 									<td> 
 										<div class="panelArea"> 
-											<table cellpadding=5 cellspacing=5 border=0 width='100%' >
+											<table cellpadding=4 cellspacing=4 border=0 width='100%' >
 												<tr> 
-													<td width='40%' align="center"> 
-														<input name="button2" type="button" class="formButton" onClick="UpdateIFrame( 'getStatus' )" value="XML Status"/> 
+													<td width='40%' align="center" valign="top"> 
+														<form id="GetConnectionInfo" name="frmGetConnectionInfo" method="post" action="" tarGet="fraResults" onSubmit="SetFormAddress( 'GetConnectionInfo' )">
+															<table border="0" cellpadding="0" cellspacing="1" align="left" width="100%">
+																<tr>
+																	<td width="40%" class="param">Pin:</td>
+																	<td width="60%"><input class="inputfields" type="text" name="Pin"></td>
+																	<td align="right"><input type="submit" class="formButton" value="GetConnectionInfo"/></td>
+																</tr>
+															</table>
+														</form>
 													</td>
 													<td valign="top"> 
 														<table border="0" cellpadding="0" cellspacing="1" cols="5"  width="100%" >
 															<tr> 
-																<td width="13%" class="label" align="right">Params:</td>
-																<td width="10%" class="param">none</td>
-																<td width="7%" >&nbsp;</td>
-																<td width="70%" class="desc">&nbsp;</td>
+																<td width="13%" class="label" colspan="2" align="right">Params:</td>
+																<td width="15%" class="param">Pin</td>
+																<td width="7%">&nbsp;</td>
+																<td width="65%" class="desc">Security Id (only used if backend has defined a value)</td>
 															</tr>
 														</table>
 													</td>
@@ -250,9 +207,9 @@ function GetRecording( )
 					</td>
 				</tr>
 
-<!-- getHosts --> 
+<!-- GetHosts --> 
 
-				<TBODY id='getHostsPanel' style="display:none;">
+				<TBODY id='GetHostsPanel' style="display:none;">
 				<tr valign='top'  >
 					<td width="2%">&nbsp;</td>
 					<td width="98%" height="1px"> 
@@ -262,7 +219,7 @@ function GetRecording( )
 									<td>
 										<table cellspacing=0 cellpadding=0 class="mnuBar" id="mnuBar1" >
 											<tr> 
-												<td nowrap><span tabindex=0 class="menu"><B>getHosts - </B>Retrieves a list of unique Host Names from the settings table.</span></td>
+												<td nowrap><span tabindex=0 class="menu"><B>GetHosts - </B>Retrieves a list of unique Host Names from the settings table.</span></td>
 											</tr>
 										</table>
 									</td>
@@ -273,7 +230,7 @@ function GetRecording( )
 											<table cellpadding=4 cellspacing=4 border=0 width='100%' >
 												<tr> 
 													<td width='40%' align="center">
-														<input name="button2" type="button" class="formButton" onClick="UpdateIFrame( 'getHosts' )" value="getHosts"/> 
+														<input name="button2" type="button" class="formButton" onClick="UpdateIFrame( 'GetHosts' )" value="GetHosts"/> 
 													</td>
 													<td valign="top"> 
 														<table border="0" cellpadding="0" cellspacing="1" cols="5"  width="100%" >
@@ -295,9 +252,9 @@ function GetRecording( )
 					</td>
 				</tr>
 
-<!-- getKeys --> 
+<!-- GetKeys --> 
 
-				<TBODY id='getKeysPanel' style="display:none;">
+				<TBODY id='GetKeysPanel' style="display:none;">
 				<tr valign='top'  >
 					<td width="2%">&nbsp;</td>
 					<td width="98%" height="1px"> 
@@ -307,7 +264,7 @@ function GetRecording( )
 									<td>
 										<table cellspacing=0 cellpadding=0 class="mnuBar" id="mnuBar1" >
 											<tr> 
-												<td nowrap><span tabindex=0 class="menu"><B>getKeys - </B>Retrieves a list of unique Key Names available in the settings table.</span></td>
+												<td nowrap><span tabindex=0 class="menu"><B>GetKeys - </B>Retrieves a list of unique Key Names available in the settings table.</span></td>
 											</tr>
 										</table>
 									</td>
@@ -318,7 +275,7 @@ function GetRecording( )
 											<table cellpadding=5 cellspacing=5 border=0 width='100%' >
 												<tr> 
 													<td width='40%' align="center">
-														<input name="button2" type="button" class="formButton" onClick="UpdateIFrame( 'getKeys' )" value="getKeys"/> 
+														<input name="button2" type="button" class="formButton" onClick="UpdateIFrame( 'GetKeys' )" value="GetKeys"/> 
 													</td>
 													<td valign="top"> 
 														<table border="0" cellpadding="0" cellspacing="1" cols="5"  width="100%" >
@@ -340,9 +297,9 @@ function GetRecording( )
 					</td>
 				</tr>
 
-<!-- getSetting --> 
+<!-- GetSetting --> 
 
-				<TBODY id='getSettingPanel' style="display:none;">
+				<TBODY id='GetSettingPanel' style="display:none;">
 				<tr valign='top'  >
 					<td width="2%">&nbsp;</td>
 					<td width="98%" height="1px"> 
@@ -352,7 +309,7 @@ function GetRecording( )
 									<td>
 										<table cellspacing=0 cellpadding=0 class="mnuBar" id="mnuBar1" >
 											<tr> 
-												<td nowrap><span tabindex=0 class="menu"><B>getSetting - </B>Retrieves a Setting from the backend.</span></td>
+												<td nowrap><span tabindex=0 class="menu"><B>GetSetting - </B>Retrieves a Setting from the backend.</span></td>
 											</tr>
 										</table>
 									</td>
@@ -363,7 +320,7 @@ function GetRecording( )
 											<table cellpadding=4 cellspacing=4 border=0 width='100%' >
 												<tr> 
 													<td width='40%' align="left"> 
-														<form id="getSetting" name="frmGetSetting" method="post" action="" target="fraResults" onSubmit="SetFormAddress( 'getSetting' )">
+														<form id="GetSetting" name="frmGetSetting" method="post" action="" tarGet="fraResults" onSubmit="SetFormAddress( 'GetSetting' )">
 															<table border="0" cellpadding="0" cellspacing="1"  cols="5" align="center">
 																<tr>
 																	<td width="20%" class="param">Key:</td>
@@ -378,7 +335,7 @@ function GetRecording( )
 																<tr>
 																	<td class="param">Default:</td>
 																	<td><input class="inputfields" type="text" name="Default"></td>
-																	<td align="right"><input name="getSetting" type="submit" class="formButton" value="getSetting"/></td>
+																	<td align="right"><input name="GetSetting" type="submit" class="formButton" value="GetSetting"/></td>
 																</tr>
 															</table>
 														</form>
@@ -415,9 +372,9 @@ function GetRecording( )
 					</td>
 				</tr>
 
-<!-- putSetting --> 
+<!-- PutSetting --> 
 
-				<TBODY id='putSettingPanel' style="display:none;">
+				<TBODY id='PutSettingPanel' style="display:none;">
 				<tr valign='top'  >
 					<td width="2%">&nbsp;</td>
 					<td width="98%" height="1px"> 
@@ -427,7 +384,7 @@ function GetRecording( )
 									<td>
 										<table cellspacing=0 cellpadding=0 class="mnuBar" id="mnuBar1" >
 											<tr> 
-												<td nowrap><span tabindex=0 class="menu"><B>putSetting - </B>Sets a Setting on the backend.</span></td>
+												<td nowrap><span tabindex=0 class="menu"><B>PutSetting - </B>Sets a Setting on the backend.</span></td>
 											</tr>
 										</table>
 									</td>
@@ -438,7 +395,7 @@ function GetRecording( )
 											<table cellpadding=4 cellspacing=4 border=0 width='100%' >
 												<tr> 
 													<td width='40%' align="left"> 
-														<form id="putSetting" name="frmPutSetting" method="post" action="" OnSubmit="SetFormAddress( 'putSetting' )" target="fraResults">
+														<form id="PutSetting" name="frmPutSetting" method="post" action="" OnSubmit="SetFormAddress( 'PutSetting' )" tarGet="fraResults">
 															<table border="0" cellpadding="0" cellspacing="1"  cols="5" align="center">
 																<tr>
 																	<td class="param" width="20%">Key:</td>
@@ -453,7 +410,7 @@ function GetRecording( )
 																<tr>
 																	<td class="param">Value:</td>
 																	<td><input class="inputfields" type="text" name="Value"></td>
-																	<td align="right"><input name="putSetting" type="submit" class="formButton" value="putSetting"/></td>
+																	<td align="right"><input name="PutSetting" type="submit" class="formButton" value="PutSetting"/></td>
 																</tr>
 															</table>
 														</form></td>
@@ -489,9 +446,9 @@ function GetRecording( )
 					</td>
 				</tr>
 
-<!-- getProgramGuide --> 
+<!-- GetProgramGuide --> 
 
-				<TBODY id='getProgramGuidePanel' style="display:none;">
+				<TBODY id='GetProgramGuidePanel' style="display:none;">
 				<tr valign='top'  >
 					<td width="2%">&nbsp;</td>
 					<td width="98%" height="1px"> 
@@ -501,7 +458,7 @@ function GetRecording( )
 									<td>
 										<table cellspacing=0 cellpadding=0 class="mnuBar" id="mnuBar1" >
 											<tr> 
-												<td nowrap><span tabindex=0 class="menu"><B>getProgramGuide - </B>Retrieves the Program Guide for a given time frame.</span></td>
+												<td nowrap><span tabindex=0 class="menu"><B>GetProgramGuide - </B>Retrieves the Program Guide for a given time frame.</span></td>
 											</tr>
 										</table>
 									</td>
@@ -512,7 +469,7 @@ function GetRecording( )
 											<table cellpadding=4 cellspacing=4 border=0 width='100%' >
 												<tr> 
 													<td width='40%' align="left" valign="top"> 
-														<form id="getProgramGuide" name="frmGetProgramGuide" method="post" action="" target="fraResults" onSubmit="SetFormAddress( 'getProgramGuide' )">
+														<form id="GetProgramGuide" name="frmGetProgramGuide" method="post" action="" tarGet="fraResults" onSubmit="SetFormAddress( 'GetProgramGuide' )">
 															<table border="0" cellpadding="0" cellspacing="1" align="left" width="100%">
 																<tr>
 																	<td width="40%" class="param">StartTime:</td>
@@ -538,7 +495,7 @@ function GetRecording( )
 																	<td class="param">Details:</td>
 																	<td class="param" width="70%"><input type="radio" name="Details" value='1' checked >True
 																									<input type="radio" name="Details" value='0'>False</td>
-																	<td align="right"><input type="submit" class="formButton" value="getProgramGuide"/></td>
+																	<td align="right"><input type="submit" class="formButton" value="GetProgramGuide"/></td>
 																</tr>
 															<tr> 
 																<td colspan="3" class="desc"><em>* Note: maximum of 1000 programs returned per call</em></td>
@@ -591,9 +548,9 @@ function GetRecording( )
 					</td>
 				</tr>
 
-<!-- getProgramDetails -->
+<!-- GetProgramDetails -->
 
-				<TBODY id='getProgramDetailsPanel' style="display:none;">
+				<TBODY id='GetProgramDetailsPanel' style="display:none;">
 				<tr valign='top'  >
 					<td width="2%">&nbsp;</td>
 					<td width="98%" height="1px"> 
@@ -603,7 +560,7 @@ function GetRecording( )
 									<td>
 										<table cellspacing=0 cellpadding=0 class="mnuBar" id="mnuBar1" >
 											<tr> 
-												<td nowrap><span tabindex=0 class="menu"><B>getProgramDetails - </B>Retrieves Details about a specific program.</span></td>
+												<td nowrap><span tabindex=0 class="menu"><B>GetProgramDetails - </B>Retrieves Details about a specific program.</span></td>
 											</tr>
 										</table>
 									</td>
@@ -614,7 +571,7 @@ function GetRecording( )
 											<table cellpadding=4 cellspacing=4 border=0 width='100%' >
 												<tr>
 													<td width='40%' align="center"> 
-														<form id="getProgramDetails" name="frmGetProgramDetails" method="post" action="" OnSubmit="SetFormAddress( 'getProgramDetails' )" target="fraResults">
+														<form id="GetProgramDetails" name="frmGetProgramDetails" method="post" action="" OnSubmit="SetFormAddress( 'GetProgramDetails' )" tarGet="fraResults">
 															<table border="0" cellpadding="0" cellspacing="1"  cols="5" align="left">
 																<tr>
 																	<td class="param" width="20%">ChanId:</td>
@@ -624,7 +581,7 @@ function GetRecording( )
 																<tr>
 																	<td class="param">StartTime:</td>
 																	<td ><input class="inputfields" type="text" name="StartTime"></td>
-																	<td align="right"><input name="getProgramDetails" type="submit" class="formButton" value="getProgramDetails"/></td>                          
+																	<td align="right"><input name="GetProgramDetails" type="submit" class="formButton" value="GetProgramDetails"/></td>                          
 																</tr>
 															</table>
 														</form>
@@ -654,9 +611,9 @@ function GetRecording( )
 					</td>
 				</tr>
 
-<!-- getChannelIcon --> 
+<!-- GetChannelIcon --> 
 
-				<TBODY id='getChannelIconPanel' style="display:none;">
+				<TBODY id='GetChannelIconPanel' style="display:none;">
 				<tr valign='top'  >
 					<td width="2%">&nbsp;</td>
 					<td width="98%" height="1px"> 
@@ -666,7 +623,7 @@ function GetRecording( )
 									<td>
 										<table cellspacing=0 cellpadding=0 class="mnuBar" id="mnuBar1" >
 											<tr> 
-												<td nowrap><span tabindex=0 class="menu"><B>getChannelIcon - </B>Retrieves the Channel Icon for a given Channel Id.</span></td>
+												<td nowrap><span tabindex=0 class="menu"><B>GetChannelIcon - </B>Retrieves the Channel Icon for a given Channel Id.</span></td>
 											</tr>
 										</table>
 									</td>
@@ -677,12 +634,12 @@ function GetRecording( )
 											<table cellpadding=4 cellspacing=4 border=0 width='100%' >
 												<tr> 
 													<td width='40%' align="center" valign="top"> 
-														<form id="getChannelIcon" name="frmGetChannelIcon" method="post" action="" target="fraResults" onSubmit="SetFormAddress( 'getChannelIcon' )">
+														<form id="GetChannelIcon" name="frmGetChannelIcon" method="post" action="" tarGet="fraResults" onSubmit="SetFormAddress( 'GetChannelIcon' )">
 															<table border="0" cellpadding="0" cellspacing="1" align="left" width="100%">
 																<tr>
 																	<td width="40%" class="param">ChanId:</td>
 																	<td width="60%"><input class="inputfields" type="text" name="ChanId"></td>
-																	<td align="right"><input type="submit" class="formButton" value="getChannelIcon"/></td>
+																	<td align="right"><input type="submit" class="formButton" value="GetChannelIcon"/></td>
 																</tr>
 															</table>
 														</form>
@@ -707,9 +664,9 @@ function GetRecording( )
 					</td>
 				</tr>
 
-<!-- getRecorded --> 
+<!-- GetRecorded --> 
 
-				<TBODY id='getRecordedPanel' style="display:none;">
+				<TBODY id='GetRecordedPanel' style="display:none;">
 				<tr valign='top'  >
 					<td width="2%">&nbsp;</td>
 					<td width="98%" height="1px"> 
@@ -719,7 +676,7 @@ function GetRecording( )
 									<td>
 										<table cellspacing=0 cellpadding=0 class="mnuBar" id="mnuBar1" >
 											<tr> 
-												<td nowrap><span tabindex=0 class="menu"><B>getRecorded - </B>Retrieves the list of Recorded Shows from the backend.</span></td>
+												<td nowrap><span tabindex=0 class="menu"><B>GetRecorded - </B>Retrieves the list of Recorded Shows from the backend.</span></td>
 											</tr>
 										</table>
 									</td>
@@ -730,7 +687,7 @@ function GetRecording( )
 											<table cellpadding=4 cellspacing=4 border=0 width='100%'>
 												<tr valign="top"> 
 													<td width='40%' align="center"> 
-														<form id="getRecorded" name="frmGetRecorded" method="post" action="" target="fraResults" onSubmit="SetFormAddress( 'getRecorded' )">
+														<form id="GetRecorded" name="frmGetRecorded" method="post" action="" tarGet="fraResults" onSubmit="SetFormAddress( 'GetRecorded' )">
 															<table border="0" cellpadding="0" cellspacing="1"  cols="5" align="center">
 																<tr>
 																	<td class="param" width="20%">Descending:</td>
@@ -740,7 +697,7 @@ function GetRecording( )
 																	</td>
 																	<td>&nbsp;</td>
 																	<td align="center">
-																		<input name="getRecorded" type="submit" class="formButton" value="getRecorded"/>
+																		<input name="GetRecorded" type="submit" class="formButton" value="GetRecorded"/>
 																	</td>
 																</tr>
 															</table>
@@ -766,9 +723,9 @@ function GetRecording( )
 					</td>
 				</tr>
 
-<!-- getExpiring --> 
+<!-- GetExpiring --> 
 
-				<TBODY id='getExpiringPanel' style="display:none;">
+				<TBODY id='GetExpiringPanel' style="display:none;">
 				<tr valign='top'  >
 					<td width="2%">&nbsp;</td>
 					<td width="98%" height="1px"> 
@@ -778,7 +735,7 @@ function GetRecording( )
 									<td>
 										<table cellspacing=0 cellpadding=0 class="mnuBar" id="mnuBar1" >
 											<tr> 
-												<td nowrap><span tabindex=0 class="menu"><B>getExpiring - </B>Gets the full list of programs that can expire in expiration order.</span></td>
+												<td nowrap><span tabindex=0 class="menu"><B>GetExpiring - </B>Gets the full list of programs that can expire in expiration order.</span></td>
 											</tr>
 										</table>
 									</td>
@@ -789,7 +746,7 @@ function GetRecording( )
 											<table cellpadding=4 cellspacing=4 border=0 width='100%'>
 												<tr> 
 													<td width='40%' align="center"> 
-														<input name="button2" type="button" class="formButton" onClick="UpdateIFrame( 'getExpiring' )" value="getExpiring"/> 
+														<input name="button2" type="button" class="formButton" onClick="UpdateIFrame( 'GetExpiring' )" value="GetExpiring"/> 
 													</td>
 													<td valign="top"> 
 														<table border="0" cellpadding="0" cellspacing="1" cols="5"  width="100%" >
@@ -811,9 +768,9 @@ function GetRecording( )
 					</td>
 				</tr>
 
-<!-- getPreviewImage --> 
+<!-- GetPreviewImage --> 
 
-				<TBODY id='getPreviewImagePanel' style="display:none;">
+				<TBODY id='GetPreviewImagePanel' style="display:none;">
 				<tr valign='top'  >
 					<td width="2%">&nbsp;</td>
 					<td width="98%" height="1px"> 
@@ -823,7 +780,7 @@ function GetRecording( )
 									<td>
 										<table cellspacing=0 cellpadding=0 class="mnuBar" id="mnuBar1" >
 											<tr> 
-												<td nowrap><span tabindex=0 class="menu"><B>getPreviewImage - </B>Retrieves a Preview Image of a recording.</span></td>
+												<td nowrap><span tabindex=0 class="menu"><B>GetPreviewImage - </B>Retrieves a Preview Image of a recording.</span></td>
 											</tr>
 										</table>
 									</td>
@@ -834,7 +791,7 @@ function GetRecording( )
 											<table cellpadding=4 cellspacing=4 border=0 width='100%'>
 												<tr> 
 													<td width="40%"> 
-														<form id="getPreviewImage" name="frmGetPreviewImage" method="post" action="" OnSubmit="SetFormAddress( 'getPreviewImage' )" target="fraResults">
+														<form id="GetPreviewImage" name="frmGetPreviewImage" method="post" action="" OnSubmit="SetFormAddress( 'GetPreviewImage' )" tarGet="fraResults">
 															<table border="0" cellpadding="0" cellspacing="1"  cols="5" align="center">
 																<tr>
 																	<td class="param" width="20%">ChanId:</td>
@@ -859,7 +816,7 @@ function GetRecording( )
 																<tr>
 																	<td class="param">SecsIn:</td>
 																	<td ><input class="inputfields" type="text" name="SecsIn"></td>
-																	<td align="right"><input name="getPreviewImage" type="submit" class="formButton" value="getPreviewImage"/></td>                          
+																	<td align="right"><input name="GetPreviewImage" type="submit" class="formButton" value="GetPreviewImage"/></td>                          
 																</tr>
 															</table>
 														</form>
@@ -907,9 +864,9 @@ function GetRecording( )
 					</td>
 				</tr>
 
-<!-- delRecording --> 
-
-				<TBODY id='delRecordingPanel' style="display:none;">
+<!-- DelRecording --> 
+<!--
+				<TBODY id='DelRecordingPanel' style="display:none;">
 				<tr valign='top'  >
 					<td width="2%">&nbsp;</td>
 					<td width="98%" height="1px"> 
@@ -919,7 +876,7 @@ function GetRecording( )
 									<td>
 										<table cellspacing=0 cellpadding=0 class="mnuBar" id="mnuBar1" >
 											<tr> 
-												<td nowrap><span tabindex=0 class="menu"><B>delRecording - </B>Deletes a recording.</span></td>
+												<td nowrap><span tabindex=0 class="menu"><B>DelRecording - </B>Deletes a recording.</span></td>
 											</tr>
 										</table>
 									</td>
@@ -930,7 +887,7 @@ function GetRecording( )
 											<table cellpadding=4 cellspacing=4 border=0 width='100%'>
 												<tr> 
 													<td width='40%' align="center"> 
-														<form id="delRecording" name="frmDelRecording" method="post" action="" OnSubmit="SetFormAddress( 'delRecording' )" target="fraResults">
+														<form id="DelRecording" name="frmDelRecording" method="post" action="" OnSubmit="SetFormAddress( 'DelRecording' )" tarGet="fraResults">
 															<table border="0" cellpadding="0" cellspacing="1"  cols="5" align="center">
 																<tr>
 																	<td class="param" width="20%">ChanId:</td>
@@ -943,9 +900,9 @@ function GetRecording( )
 																	<td>&nbsp;</td>
 																</tr>
 																<tr>
-																	<td class="param" width="20%">ForgetOld:</td>
-																	<td align="center" width="70%"><input type="checkbox" name="ForgetOld"></td>
-																	<td align="right"><input name="delRecordingBtn" type="submit" class="formButton" value="delRecording"/></td>
+																	<td class="param" width="20%">ForGetOld:</td>
+																	<td align="center" width="70%"><input type="checkbox" name="ForGetOld"></td>
+																	<td align="right"><input name="DelRecordingBtn" type="submit" class="formButton" value="DelRecording"/></td>
 																</tr>
 															</table>
 														</form>
@@ -956,17 +913,17 @@ function GetRecording( )
 																<td width="13%" class="label" colspan="2" align="right">Params:</td>
 																<td width="10%" class="param">ChanId</td>
 																<td width="7%">&nbsp;</td>
-																<td width="70%" class="desc">ChannelId of recording to delete. &lt;required&gt;</td>
+																<td width="70%" class="desc">ChannelId of recording to Delete. &lt;required&gt;</td>
 															</tr>
 															<tr> 
 																<td colspan="2">&nbsp;</td>
 																<td class="param">StartTime</td>
 																<td>&nbsp;</td>
-																<td class="desc">StartTime of recording to delete (CCYY-MM-DDTHH:MM). &lt;required&gt;</td>
+																<td class="desc">StartTime of recording to Delete (CCYY-MM-DDTHH:MM). &lt;required&gt;</td>
 															</tr>
 															<tr> 
 																<td colspan="2">&nbsp;</td>
-																<td class="param">ForgetOld</td>
+																<td class="param">ForGetOld</td>
 																<td>&nbsp;</td>
 																<td class="desc">NON-ZERO = Remove from OldRecordings.  Default is 0</td>
 															</tr>
@@ -981,10 +938,10 @@ function GetRecording( )
 						</div>
 					</td>
 				</tr>
+-->
+<!-- GetRecording --> 
 
-<!-- getRecording --> 
-
-				<TBODY id='getRecordingPanel' style="display:none;">
+				<TBODY id='GetRecordingPanel' style="display:none;">
 				<tr valign='top'  >
 					<td width="2%">&nbsp;</td>
 					<td width="98%" height="1px"> 
@@ -994,7 +951,7 @@ function GetRecording( )
 									<td>
 										<table cellspacing=0 cellpadding=0 class="mnuBar" id="mnuBar1" >
 											<tr> 
-												<td nowrap><span tabindex=0 class="menu"><B>getRecording - </B>Retrieves the actual recording.</span></td>
+												<td nowrap><span tabindex=0 class="menu"><B>GetRecording - </B>Retrieves the actual recording.</span></td>
 											</tr>
 										</table>
 									</td>
@@ -1005,7 +962,7 @@ function GetRecording( )
 											<table cellpadding=4 cellspacing=4 border=0 width='100%'>
 												<tr> 
 													<td width="40%"> 
-														<form id="getRecording" name="frmGetRecording" method="post" action="" OnSubmit="SetFormAddress( 'getRecording' )" target="fraResults">
+														<form id="GetRecording" name="frmGetRecording" method="post" action="" OnSubmit="SetFormAddress( 'GetRecording' )" tarGet="fraResults">
 															<table border="0" cellpadding="0" cellspacing="1"  cols="5" align="center">
 																<tr>
 																	<td class="param" width="20%">ChanId:</td>
@@ -1015,7 +972,7 @@ function GetRecording( )
 																<tr>
 																	<td class="param">StartTime:</td>
 																	<td ><input class="inputfields" type="text" name="StartTime"></td>
-																	<td align="right"><input name="getRecordingBtn" type="submit" class="formButton" value="getRecording"/></td>                          
+																	<td align="right"><input name="GetRecordingBtn" type="submit" class="formButton" value="GetRecording"/></td>                          
 																</tr>
 															</table>
 														</form>
@@ -1046,9 +1003,9 @@ function GetRecording( )
 					</td>
 				</tr>
 
-<!-- getVideo -->
+<!-- GetVideo -->
 
-				<TBODY id='getVideoPanel' style="display:none;">
+				<TBODY id='GetVideoPanel' style="display:none;">
 				<tr valign='top'  >
 					<td width="2%">&nbsp;</td>
 					<td width="98%" height="1px"> 
@@ -1058,7 +1015,7 @@ function GetRecording( )
 									<td>
 										<table cellspacing=0 cellpadding=0 class="mnuBar" id="mnuBar1" >
 											<tr> 
-												<td nowrap><span tabindex=0 class="menu"><B>getVideo - </B>Retrieves Video.</span></td>
+												<td nowrap><span tabindex=0 class="menu"><B>GetVideo - </B>Retrieves Video.</span></td>
 											</tr>
 										</table>
 									</td>
@@ -1069,12 +1026,12 @@ function GetRecording( )
 											<table cellpadding=4 cellspacing=4 border=0 width='100%' >
 												<tr> 
 													<td width='40%' align="center" valign="top"> 
-														<form id="getVideo" name="frmGetVideo" method="post" action="" target="fraResults" onSubmit="SetFormAddress( 'getVideo' )">
+														<form id="GetVideo" name="frmGetVideo" method="post" action="" tarGet="fraResults" onSubmit="SetFormAddress( 'GetVideo' )">
 															<table border="0" cellpadding="0" cellspacing="1" align="left" width="100%">
 																<tr>
-																	<td width="40%" class="param">VideoID:</td>
-																	<td width="60%"><input class="inputfields" type="text" name="VideoID"></td>
-																	<td align="right"><input type="submit" class="formButton" value="getVideo"/></td>
+																	<td width="40%" class="param">Id:</td>
+																	<td width="60%"><input class="inputfields" type="text" name="Id"></td>
+																	<td align="right"><input type="submit" class="formButton" value="GetVideo"/></td>
 																</tr>
 															</table>
 														</form>
@@ -1083,7 +1040,7 @@ function GetRecording( )
 														<table border="0" cellpadding="0" cellspacing="1" cols="5"  width="100%" >
 															<tr> 
 																<td width="13%" class="label" colspan="2" align="right">Params:</td>
-																<td width="15%" class="param">VideoID</td>
+																<td width="15%" class="param">Id</td>
 																<td width="7%">&nbsp;</td>
 																<td width="65%" class="desc">Id of the video to retrieve &lt;required&gt;</td>
 															</tr>
@@ -1099,9 +1056,9 @@ function GetRecording( )
 					</td>
 				</tr>
 
-<!-- getMusic -->
+<!-- GetMusic -->
 
-				<TBODY id='getMusicPanel' style="display:none;">
+				<TBODY id='GetMusicPanel' style="display:none;">
 				<tr valign='top'  >
 					<td width="2%">&nbsp;</td>
 					<td width="98%" height="1px"> 
@@ -1111,7 +1068,7 @@ function GetRecording( )
 									<td>
 										<table cellspacing=0 cellpadding=0 class="mnuBar" id="mnuBar1" >
 											<tr> 
-												<td nowrap><span tabindex=0 class="menu"><B>getMusic - </B>Retrieves actual song.</span></td>
+												<td nowrap><span tabindex=0 class="menu"><B>GetMusic - </B>Retrieves actual song.</span></td>
 											</tr>
 										</table>
 									</td>
@@ -1122,12 +1079,12 @@ function GetRecording( )
 											<table cellpadding=4 cellspacing=4 border=0 width='100%' >
 												<tr> 
 													<td width='40%' align="center" valign="top"> 
-														<form id="getMusic" name="frmGetMusic" method="post" action="" target="fraResults" onSubmit="SetFormAddress( 'getMusic' )">
+														<form id="GetMusic" name="frmGetMusic" method="post" action="" tarGet="fraResults" onSubmit="SetFormAddress( 'GetMusic' )">
 															<table border="0" cellpadding="0" cellspacing="1" align="left" width="100%">
 																<tr>
 																	<td width="40%" class="param">Id:</td>
 																	<td width="60%"><input class="inputfields" type="text" name="Id"></td>
-																	<td align="right"><input type="submit" class="formButton" value="getMusic"/></td>
+																	<td align="right"><input type="submit" class="formButton" value="GetMusic"/></td>
 																</tr>
 															</table>
 														</form>

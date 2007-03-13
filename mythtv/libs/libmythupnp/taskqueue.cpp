@@ -8,10 +8,11 @@
 //                                                                            
 //////////////////////////////////////////////////////////////////////////////
 
-#include "mythcontext.h"
 #include "taskqueue.h"
 #include "sys/time.h"
 #include "qdatetime.h"
+
+#include <iostream.h>
 
 /////////////////////////////////////////////////////////////////////////////
 // Define Global instance 

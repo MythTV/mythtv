@@ -31,6 +31,8 @@
 #include "threadpool.h"
 #include "refcounted.h"
 
+#include "mythcontext.h"
+
 typedef struct timeval  TaskTime;
 
 class HttpWorkerThread;
@@ -49,10 +51,19 @@ class HttpServerExtension
     public:
 
         QString     m_sName;
+        QString     m_sSharePath;
 
     public:
 
-                 HttpServerExtension( const QString &sName ):m_sName( sName ){};
+        HttpServerExtension( const QString &sName ):m_sName( sName )
+        {
+            QString sInstallPrefix( PREFIX ), sLibDir;
+
+            GetInstallPrefixPath( sInstallPrefix, sLibDir );
+
+            m_sSharePath = sInstallPrefix + "/share/mythtv/"; 
+        };
+
         virtual ~HttpServerExtension() {};
 
 //        virtual bool  Initialize    ( HttpServer  *pServer  ) = 0;

@@ -21,6 +21,8 @@
 #include "httpserver.h"
 #include "upnputil.h"
 
+#include "upnp.h"       // only needed for Config... remove once config is moved.
+
 /////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -155,7 +157,7 @@ HttpWorkerThread::HttpWorkerThread( HttpServer *pParent, const QString &sName ) 
 {
     m_pHttpServer    = pParent;
     m_nSocket        = 0;                                                  
-    m_nSocketTimeout = gContext->GetNumSetting( "HTTPKeepAliveTimeoutSecs", 10 ) * 1000;
+    m_nSocketTimeout = UPnp::g_pConfig->GetValue( "HTTP/KeepAliveTimeoutSecs", 10 ) * 1000;
 
     m_pData          = NULL;
 }                  
@@ -266,35 +268,35 @@ void  HttpWorkerThread::ProcessWork()
                         }
                     }
                     */
+
+                    // ----------------------------------------------------------
+                    // Always MUST send a response.
+                    // ----------------------------------------------------------
+
+                    if (pRequest->SendResponse() < 0)
+                    {
+                        bKeepAlive = false;
+                        VERBOSE( VB_UPNP, QString( "HttpWorkerThread::ProcessWork socket(%1) - Error returned from SendResponse... Closing connection" )
+                                             .arg( m_nSocket ));
+                    }
+
+                    // ----------------------------------------------------------
+                    // Check to see if a PostProcess was registered
+                    // ----------------------------------------------------------
+
+                    if ( pRequest->m_pPostProcess != NULL )
+                        pRequest->m_pPostProcess->ExecutePostProcess();
+
+                    delete pRequest;
+                    pRequest = NULL;
+
+
                 }
                 else
                 {
                     VERBOSE( VB_IMPORTANT, QString( "HttpWorkerThread::ProcessWork - Error Creating BufferedSocketDeviceRequest" ));
-                    pRequest->m_nResponseStatus = 501;
                     bKeepAlive = false;
                 }
-
-                // ----------------------------------------------------------
-                // Always MUST send a response.
-                // ----------------------------------------------------------
-
-                if (pRequest->SendResponse() < 0)
-                {
-                    bKeepAlive = false;
-                    VERBOSE( VB_UPNP, QString( "HttpWorkerThread::ProcessWork socket(%1) - Error returned from SendResponse... Closing connection" )
-                                         .arg( m_nSocket ));
-                }
-
-                // ----------------------------------------------------------
-                // Check to see if a PostProcess was registered
-                // ----------------------------------------------------------
-
-                if ( pRequest->m_pPostProcess != NULL )
-                    pRequest->m_pPostProcess->ExecutePostProcess();
-
-                delete pRequest;
-                pRequest = NULL;
-
             }
             else
             {
