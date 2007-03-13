@@ -12,14 +12,16 @@
 #include "mythcontext.h"
 
 #include <qfile.h>
+#include <qdir.h>
 
 //////////////////////////////////////////////////////////////////////////////
 //
 //////////////////////////////////////////////////////////////////////////////
 
-XmlConfiguration::XmlConfiguration( const QString &sFileName ) : m_config( "Config" )
+XmlConfiguration::XmlConfiguration( const QString &sFileName )
 {
-    m_sPath = MythContext::GetConfDir() + "/" + sFileName;
+    m_sPath     = MythContext::GetConfDir();
+    m_sFileName = sFileName;
     
     Load();
 }
@@ -30,33 +32,44 @@ XmlConfiguration::XmlConfiguration( const QString &sFileName ) : m_config( "Conf
 
 bool XmlConfiguration::Load( void )
 {
-    QFile  file( m_sPath );
+    QString sName = m_sPath + "/" + m_sFileName;
 
-    if ( !file.open( IO_ReadOnly ) )
-        return false;
+    QFile  file( sName );
 
-    QString sErrMsg;
-    int     nErrLine = 0;
-    int     nErrCol  = 0;
-    bool    bSuccess = m_config.setContent( &file, false, &sErrMsg, &nErrLine, &nErrCol );
-
-    file.close();
-
-    if (!bSuccess)
+    if (file.exists())
     {
-        VERBOSE(VB_IMPORTANT, QString("Configuration::Load - "
-                                      "Error parsing: %1 "
-                                      "at line: %2  column: %3")
-                                 .arg( m_sPath )
-                                 .arg( nErrLine )
-                                 .arg( nErrCol  ));
 
-        VERBOSE(VB_IMPORTANT, QString("Configuration::Load - Error Msg: %1" )
-                                 .arg( sErrMsg ));
-        return false;
+        if ( !file.open( IO_ReadOnly ) )
+            return false;
+
+        QString sErrMsg;
+        int     nErrLine = 0;
+        int     nErrCol  = 0;
+        bool    bSuccess = m_config.setContent( &file, false, &sErrMsg, &nErrLine, &nErrCol );
+
+        file.close();
+
+        if (!bSuccess)
+        {
+            VERBOSE(VB_IMPORTANT, QString("Configuration::Load - "
+                                          "Error parsing: %1 "
+                                          "at line: %2  column: %3")
+                                     .arg( sName )
+                                     .arg( nErrLine )
+                                     .arg( nErrCol  ));
+
+            VERBOSE(VB_IMPORTANT, QString("Configuration::Load - Error Msg: %1" )
+                                     .arg( sErrMsg ));
+            return false;
+        }
+
+        m_rootNode = m_config.namedItem( "Configuration" );
     }
-
-    m_rootNode = m_config.namedItem( "Configuration" );
+    else
+    {
+        m_rootNode = m_config.createElement( "Configuration" );
+        m_config.appendChild( m_rootNode );
+    }
 
     return true;
 }
@@ -67,10 +80,32 @@ bool XmlConfiguration::Load( void )
 
 bool XmlConfiguration::Save( void )
 {
-    QFile file( m_sPath );
+
+    QString sName = m_sPath + "/" + m_sFileName;
+
+    QFile file( sName );
+    
+    if (!file.exists())
+    {
+        QDir createDir( m_sPath );
+
+        if (!createDir.exists())
+        {
+            if (!createDir.mkdir( m_sPath, true ))
+            {
+                VERBOSE(VB_IMPORTANT, QString("Could not create %1").arg( m_sPath ));
+                return false;
+            }
+        }
+    }
 
     if (!file.open( IO_WriteOnly | IO_Truncate ))
+    {
+        VERBOSE(VB_IMPORTANT, QString("Could not open settings file %1 "
+                                      "for writing").arg( sName ));
+
         return false;
+    }
 
     QTextStream ts( &file );
 

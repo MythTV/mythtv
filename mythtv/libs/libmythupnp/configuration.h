@@ -45,6 +45,7 @@ class XmlConfiguration : public Configuration
     protected:
 
         QString      m_sPath;
+        QString      m_sFileName;
 
         QDomDocument m_config;
         QDomNode     m_rootNode;
