@@ -26,15 +26,16 @@ class LogScale;
 class QTimer;
 class VisFactory;
 class InfoWidget;
+class Metadata;
 
 class VisualNode
 {
 public:
     VisualNode(short *l, short *r, unsigned long n, unsigned long o)
-	: left(l), right(r), length(n), offset(o)
+        : left(l), right(r), length(n), offset(o)
     {
-	// left and right are allocated and then passed to this class
-	// the code that allocated left and right should give up all ownership
+        // left and right are allocated and then passed to this class
+        // the code that allocated left and right should give up all ownership
     }
 
     ~VisualNode()
@@ -45,7 +46,7 @@ public:
 
     short *left, *right;
     long length, offset;
-    
+
 };
 
 class VisualBase
@@ -103,6 +104,10 @@ public:
     static VisualBase *createVis(const QString &name,
                                  MainVisual *parent, long int winid);
 
+    Metadata *metadata() const { return meta; }
+    void setMetadata(Metadata *&m) { meta = m; }
+    void deleteMetadata() { meta=NULL; };
+
 public slots:
     void timeout();
 
@@ -112,6 +117,7 @@ signals:
 private:
     VisualBase *vis;
     InfoWidget* info_widget;
+    Metadata *meta;
     QPixmap pixmap;
     QPtrList<VisualNode> nodes;
     QTimer *timer;

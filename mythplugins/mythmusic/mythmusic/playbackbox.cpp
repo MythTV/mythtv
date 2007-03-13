@@ -1123,7 +1123,8 @@ void PlaybackBoxMusic::play()
 
     mainvisual->setDecoder(decoder);
     mainvisual->setOutput(output);
-    
+    mainvisual->setMetadata(curMeta);
+
     if (decoder->initialize()) 
     {
         if (output)
@@ -1309,6 +1310,7 @@ void PlaybackBoxMusic::stop(void)
 
     mainvisual->setDecoder(0);
     mainvisual->setOutput(0);
+    mainvisual->deleteMetadata();
 
     delete input;
     input = 0;
@@ -1638,7 +1640,7 @@ void PlaybackBoxMusic::editPlaylist()
     {
         // No current metadata, so when we come back we'll try and play the 
         // first thing on the active queue
-        
+
         branches_to_current_node.clear();
         branches_to_current_node.append(0); //  Root node
         branches_to_current_node.append(1); //  We're on a playlist (not "My Music")
@@ -2164,5 +2166,3 @@ bool PlaybackBoxMusic::getInsertPLOptions(InsertPLOption &insertOption,
 
     return (res >= 0);
 }
-
-

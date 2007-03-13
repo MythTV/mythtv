@@ -192,15 +192,36 @@ bool FileScanner::HasFileChanged(const QString &filename, const QString &date_mo
 
 void FileScanner::AddFileToDB(const QString &filename)
 {
+    QString extension = filename.section( '.', -1 ) ;
+    QString directory = filename;
+    directory.remove(0, m_startdir.length());
+    directory = directory.section( '/', 0, -2);
+
+    QString nameFilter = gContext->GetSetting("AlbumArtFilter",
+                                              "*.png;*.jpg;*.jpeg;*.gif;*.bmp");
+
+    // If this file is an image, insert the details into the music_albumart table
+    if (nameFilter.find(extension) > -1)
+    {
+        QString name = filename.section( '/', -1);
+
+        MSqlQuery query(MSqlQuery::InitCon());
+        query.prepare("INSERT INTO music_albumart SET filename= :FILE, directory_id= :DIRID;");
+        query.bindValue(":FILE", name);
+        query.bindValue(":DIRID", m_directoryid[directory.utf8().lower()]);
+        if (!query.exec() || query.numRowsAffected() <= 0)
+        {
+                MythContext::DBError("music insert artwork", query);
+        }
+        return;
+    }
+
     Decoder *decoder = Decoder::create(filename, NULL, NULL, true);
 
     if (decoder)
     {
         Metadata *data = decoder->readMetadata();
         if (data) {
-            QString directory = filename;
-            directory.remove(0, m_startdir.length());
-            directory = directory.section( '/', 0, -2);
 
             QString album_cache_string;
 
@@ -238,13 +259,33 @@ void FileScanner::AddFileToDB(const QString &filename)
 }
 
 // Remove a file from the database
-void FileScanner::RemoveFileFromDB (const QString &directory,
-const QString &filename)
+void FileScanner::RemoveFileFromDB (const QString &filename)
 {
     QString sqlfilename(filename);
+    sqlfilename.remove(0, m_startdir.length());
     // We know that the filename will not contain :// as the SQL limits this
-    sqlfilename.remove(0, directory.length());
+    QString directory = sqlfilename.section( '/', 0, -2 ) ;
     sqlfilename = sqlfilename.section( '/', -1 ) ;
+
+    QString extension = sqlfilename.section( '.', -1 ) ;
+
+    QString nameFilter = gContext->GetSetting("AlbumArtFilter",
+                                              "*.png;*.jpg;*.jpeg;*.gif;*.bmp");
+
+    if (nameFilter.find(extension) > -1)
+    {
+        MSqlQuery query(MSqlQuery::InitCon());
+        query.prepare("DELETE FROM music_albumart WHERE filename= :FILE AND "
+                      "directory_id= :DIRID;");
+        query.bindValue(":FILE", sqlfilename);
+        query.bindValue(":DIRID", m_directoryid[directory.utf8().lower()]);
+        if (!query.exec() || query.numRowsAffected() <= 0)
+        {
+                MythContext::DBError("music delete artwork", query);
+        }
+        return;
+    }
+
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("DELETE FROM music_songs WHERE "
                   "filename = :NAME ;");
@@ -254,6 +295,10 @@ const QString &filename)
 
 void FileScanner::UpdateFileInDB(const QString &filename)
 {
+    QString directory = filename;
+    directory.remove(0, m_startdir.length());
+    directory = directory.section( '/', 0, -2);
+
     Decoder *decoder = Decoder::create(filename, NULL, NULL, true);
 
     if (decoder)
@@ -263,10 +308,6 @@ void FileScanner::UpdateFileInDB(const QString &filename)
 
         if (db_meta && disk_meta)
         {
-            QString directory = filename;
-            directory.remove(0, m_startdir.length());
-            directory = directory.section( '/', 0, -2);
-
             disk_meta->setID(db_meta->ID());
             disk_meta->setRating(db_meta->Rating());
 
@@ -331,8 +372,47 @@ void FileScanner::SearchDir(QString &directory)
     busy->Close();
     delete busy;
 
+    ScanMusic(music_files);
+    ScanArtwork(music_files);
+
+    MythProgressDialog *file_checking = new MythProgressDialog(
+        QObject::tr("Updating music database"), music_files.size());
+
+     /*
+       This can be optimised quite a bit by consolidating all commands
+       via a lot of refactoring.
+
+       1) group all files of the same decoder type, and don't
+       create/delete a Decoder pr. AddFileToDB. Or make Decoders be
+       singletons, it should be a fairly simple change.
+
+       2) RemoveFileFromDB should group the remove into one big SQL.
+
+       3) UpdateFileInDB, same as 1.
+     */
+
+    int counter = 0;
+    for (iter = music_files.begin(); iter != music_files.end(); iter++)
+    {
+        if (*iter == kFileSystem)
+            AddFileToDB(iter.key());
+        else if (*iter == kDatabase)
+            RemoveFileFromDB(iter.key ());
+        else if (*iter == kNeedUpdate)
+            UpdateFileInDB(iter.key());
+
+        file_checking->setProgress(++counter);
+    }
+    file_checking->Close();
+    delete file_checking;
+}
+
+void FileScanner::ScanMusic(MusicLoadedMap &music_files)
+{
+    MusicLoadedMap::Iterator iter;
+
     MSqlQuery query(MSqlQuery::InitCon());
-    query.exec("SELECT filename, date_modified, path "
+    query.exec("SELECT CONCAT_WS('/', path, filename), date_modified "
                "FROM music_songs LEFT JOIN music_directories "
                "ON music_songs.directory_id=music_directories.directory_id "
                "WHERE filename NOT LIKE ('%://%')");
@@ -343,23 +423,14 @@ void FileScanner::SearchDir(QString &directory)
     file_checking = new MythProgressDialog(
         QObject::tr("Scanning music files"), query.numRowsAffected());
 
+    QString name;
+
     if (query.isActive() && query.size() > 0)
     {
         while (query.next())
         {
-            QString name;
-
-            if (query.value(2).toString() != "")
-            {
-                name = m_startdir +
-                    QString::fromUtf8(query.value(2).toString()) + "/" +
-                    QString::fromUtf8(query.value(0).toString());
-            }
-            else
-            {
-                name = m_startdir +
-                    QString::fromUtf8(query.value(0).toString());
-            }
+            name = m_startdir +
+                QString::fromUtf8(query.value(0).toString());
 
             if (name != QString::null)
             {
@@ -386,35 +457,53 @@ void FileScanner::SearchDir(QString &directory)
 
     file_checking->Close();
     delete file_checking;
+}
 
+void FileScanner::ScanArtwork(MusicLoadedMap &music_files)
+{
+    MusicLoadedMap::Iterator iter;
+
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.exec("SELECT CONCAT_WS('/', path, filename) "
+               "FROM music_albumart LEFT JOIN music_directories "
+               "ON music_albumart.directory_id=music_directories.directory_id ");
+
+    int counter = 0;
+
+    MythProgressDialog *file_checking;
     file_checking = new MythProgressDialog(
-        QObject::tr("Updating music database"), music_files.size());
+        QObject::tr("Scanning Album Artwork"), query.numRowsAffected());
 
-     /*
-       This can be optimised quite a bit by consolidating all commands
-       via a lot of refactoring.
-
-       1) group all files of the same decoder type, and don't
-       create/delete a Decoder pr. AddFileToDB. Or make Decoders be
-       singletons, it should be a fairly simple change.
-
-       2) RemoveFileFromDB should group the remove into one big SQL.
-
-       3) UpdateFileInDB, same as 1.
-     */
-
-    counter = 0;
-    for (iter = music_files.begin(); iter != music_files.end(); iter++)
+    if (query.isActive() && query.size() > 0)
     {
-        if (*iter == kFileSystem)
-            AddFileToDB(iter.key());
-        else if (*iter == kDatabase)
-            RemoveFileFromDB(directory, iter.key ());
-        else if (*iter == kNeedUpdate)
-            UpdateFileInDB(iter.key());
+        while (query.next())
+        {
+            QString name;
 
-        file_checking->setProgress(++counter);
+            name = m_startdir +
+                QString::fromUtf8(query.value(0).toString());
+
+            if (name != QString::null)
+            {
+                if ((iter = music_files.find(name)) != music_files.end())
+                {
+                    if (music_files[name] == kDatabase)
+                    {
+                        file_checking->setProgress(++counter);
+                        continue;
+                    }
+                    else
+                        music_files.remove(iter);
+                }
+                else
+                {
+                    music_files[name] = kDatabase;
+                }
+            }
+            file_checking->setProgress(++counter);
+        }
     }
+
     file_checking->Close();
     delete file_checking;
 }

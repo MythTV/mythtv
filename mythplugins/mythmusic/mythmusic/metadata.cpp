@@ -643,7 +643,7 @@ QStringList Metadata::fillFieldList(QString field)
         return searchList;
     }
 
-    if (query.exec() && query.isActive() && query.size())
+    if (query.exec() && query.isActive())
     {
         while (query.next())
         {
@@ -651,6 +651,30 @@ QStringList Metadata::fillFieldList(QString field)
         }
     }
     return searchList;
+}
+
+QStringList Metadata::AlbumArtInDir(QString directory)
+{
+    QStringList paths;
+
+    directory.remove(0, m_startdir.length());
+
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare("SELECT CONCAT_WS('/', music_directories.path, "
+                  "music_albumart.filename) FROM music_albumart "
+                  "LEFT JOIN music_directories ON "
+                  "music_directories.directory_id=music_albumart.directory_id "
+                  "WHERE music_directories.path = :DIR;");
+    query.bindValue(":DIR", directory);
+    if (query.exec())
+    {
+        while (query.next())
+        {
+            paths += m_startdir + "/" +
+                QString::fromUtf8(query.value(0).toString());
+        }
+    }
+    return paths;
 }
 
 MetadataLoadingThread::MetadataLoadingThread(AllMusic *parent_ptr)

@@ -14,12 +14,14 @@
 #include "visualize.h"
 #include "inlines.h"
 #include "decoder.h"
+#include "metadata.h"
 
 #include <qpainter.h>
 #include <qpixmap.h>
 #include <qimage.h>
 #include <qdir.h>
 #include <qurl.h>
+#include <mythtv/mythdbcon.h>
 
 #include <iostream>
 using namespace std;
@@ -296,12 +298,12 @@ VisualBase *SpectrumFactory::create(MainVisual *parent, long int winid)
 
 AlbumArt::AlbumArt(MainVisual *parent)
 {
-    pParent = parent;
-    Decoder *dec = pParent->decoder();
+    m_pParent = parent;
+    Decoder *dec = m_pParent->decoder();
     if (dec)
     {
-        filename = dec->getFilename();
-        directory = QUrl(filename).dirPath();
+        m_filename = dec->getFilename();
+        m_directory = QUrl(m_filename).dirPath();
     }
 
     fps = 1;
@@ -313,7 +315,7 @@ AlbumArt::~AlbumArt()
 
 void AlbumArt::resize(const QSize &newsize)
 {
-    size = newsize;
+    m_size = newsize;
 }
 
 bool AlbumArt::process(VisualNode *node)
@@ -323,14 +325,14 @@ bool AlbumArt::process(VisualNode *node)
 }
 
 bool AlbumArt::needsUpdate() {
-    if (cursize != size)
+    if (m_cursize != m_size)
         return true;
 
-    if (filename != pParent->decoder()->getFilename()) {
-        QString curdir = QUrl(pParent->decoder()->getFilename()).dirPath();
-        if (directory != curdir) {
-            directory = curdir;
-            filename = pParent->decoder()->getFilename();
+    if (m_filename != m_pParent->decoder()->getFilename()) {
+        QString curdir = QUrl(m_pParent->decoder()->getFilename()).dirPath();
+        if (m_directory != curdir) {
+            m_directory = curdir;
+            m_filename = m_pParent->decoder()->getFilename();
             return true;
         }
     }
@@ -341,26 +343,18 @@ bool AlbumArt::needsUpdate() {
 QString AlbumArt::getImageFilename() 
 {
     QString result;
-    QString curfile = pParent->decoder()->getFilename();
-    QString curdir = QUrl(curfile).dirPath();
-    QString namefilter = gContext->GetSetting("AlbumArtFilter",
-                                              "*.png;*.jpg;*.jpeg;*.gif;*.bmp");
-    // Get directory contents based on filter
-    QDir folder(curdir, namefilter, QDir::Name | QDir::IgnoreCase, 
-                QDir::Files | QDir::Hidden);
-    
-    if (folder.count())
-        result = folder[rand() % folder.count()];
 
-    result.prepend("/");
-    result.prepend(curdir);
-    
+    QStringList paths = m_pParent->metadata()->AlbumArtInDir(m_directory);
+
+    if (paths.count())
+        result = paths[rand() % paths.count()];
+
     return result;
 }
 
 bool AlbumArt::draw(QPainter *p, const QColor &back)
 {
-    if (!pParent->decoder())
+    if (!m_pParent->decoder())
         return false;
 
     // If the directory has changed (new album) or the size, reload
@@ -369,28 +363,28 @@ bool AlbumArt::draw(QPainter *p, const QColor &back)
         QImage art(getImageFilename());
         if (art.isNull())
         {
-            cursize = size;
-            image = QImage();
+            m_cursize = m_size;
+            m_image = QImage();
         }
         else
         {
-            image = art.smoothScale(size, QImage::ScaleMin);
+            m_image = art.smoothScale(m_size, QImage::ScaleMin);
         }
     }
 
-    if (image.isNull()) {
-        drawWarning(p, back, size, QObject::tr("?"));
+    if (m_image.isNull()) {
+        drawWarning(p, back, m_size, QObject::tr("?"));
         return true;
     }
 
     // Paint the image
-    p->fillRect(0, 0, size.width(), size.height(), back);
-    p->drawPixmap((size.width() - image.width()) / 2,
-                  (size.height() - image.height()) / 2,
-                  image);
+    p->fillRect(0, 0, m_size.width(), m_size.height(), back);
+    p->drawPixmap((m_size.width() - m_image.width()) / 2,
+                  (m_size.height() - m_image.height()) / 2,
+                  m_image);
     
     // Store our new size
-    cursize = size;
+    m_cursize = m_size;
 
     return true;
 }

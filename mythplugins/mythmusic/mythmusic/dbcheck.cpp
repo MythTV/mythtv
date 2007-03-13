@@ -9,7 +9,7 @@ using namespace std;
 #include "mythtv/mythcontext.h"
 #include "mythtv/mythdbcon.h"
 
-const QString currentDatabaseVersion = "1008";
+const QString currentDatabaseVersion = "1009";
 
 static bool UpdateDBVersionNumber(const QString &newnumber)
 {   
@@ -481,10 +481,16 @@ bool UpgradeMusicDatabaseSchema(void)
     {
         const QString updates[] = {
 "ALTER TABLE music_songs MODIFY lastplay DATETIME DEFAULT NULL;",
-"CREATE TABLE music_directories (directory_id int(20) NOT NULL AUTO_INCREMENT PRIMARY KEY, path TEXT NOT NULL DEFAULT '', parent_id INT(20) NOT NULL DEFAULT '0') ;",
+"CREATE TABLE music_directories (directory_id int(20) NOT NULL AUTO_INCREMENT "
+"PRIMARY KEY, path TEXT NOT NULL DEFAULT '', "
+"parent_id INT(20) NOT NULL DEFAULT '0') ;",
 "INSERT IGNORE INTO music_directories (path) SELECT DISTINCT"
-" SUBSTRING(filename FROM 1 FOR INSTR(filename, SUBSTRING_INDEX(filename, '/', -1))-2) FROM music_songs;",
-"CREATE TEMPORARY TABLE tmp_songs SELECT music_songs.*, directory_id FROM music_songs, music_directories WHERE music_directories.path=SUBSTRING(filename FROM 1 FOR INSTR(filename, SUBSTRING_INDEX(filename, '/', -1))-2);",
+" SUBSTRING(filename FROM 1 FOR INSTR(filename, "
+"SUBSTRING_INDEX(filename, '/', -1))-2) FROM music_songs;",
+"CREATE TEMPORARY TABLE tmp_songs SELECT music_songs.*, directory_id "
+"FROM music_songs, music_directories WHERE "
+"music_directories.path=SUBSTRING(filename FROM 1 FOR "
+"INSTR(filename, SUBSTRING_INDEX(filename, '/', -1))-2);",
 "UPDATE tmp_songs SET filename=SUBSTRING_INDEX(filename, '/', -1);",
 "DELETE FROM music_songs;",
 "ALTER TABLE music_songs ADD COLUMN directory_id int(20) NOT NULL DEFAULT '0';",
@@ -494,6 +500,19 @@ bool UpgradeMusicDatabaseSchema(void)
 };
 
         if (!performActualUpdate(updates, "1008", dbver))
+            return false;
+    }
+
+    if (dbver == "1008")
+    {
+        const QString updates[] = {
+"CREATE TABLE music_albumart (albumart_id int(20) NOT NULL AUTO_INCREMENT "
+"PRIMARY KEY, filename VARCHAR(255) NOT NULL DEFAULT '', directory_id INT(20) "
+"NOT NULL DEFAULT '0');",
+""
+};
+
+        if (!performActualUpdate(updates, "1009", dbver))
             return false;
     }
 

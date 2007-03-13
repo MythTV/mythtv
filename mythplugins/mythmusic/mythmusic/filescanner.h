@@ -28,8 +28,10 @@ class FileScanner
         int  GetDirectoryId(const QString &directory, const int &parentid);
         bool HasFileChanged(const QString &filename, const QString &date_modified);
         void AddFileToDB(const QString &filename);
-        void RemoveFileFromDB (const QString &directory, const QString &filename);
+        void RemoveFileFromDB (const QString &filename);
         void UpdateFileInDB(const QString &filename);
+        void ScanMusic(MusicLoadedMap &music_files);
+        void ScanArtwork(MusicLoadedMap &music_files);
 
         QString         m_startdir;
         IdCache         m_directoryid;

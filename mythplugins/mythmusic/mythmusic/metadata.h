@@ -81,7 +81,7 @@ class Metadata
     
     QString CompilationArtist() { return m_compilation_artist; }
     void setCompilationArtist(const QString &lcompilation_artist) { m_compilation_artist = lcompilation_artist; m_formattedartist = m_formattedtitle = ""; }
-    
+
     QString Album() { return m_album; }
     void setAlbum(const QString &lalbum) { m_album = lalbum; m_formattedartist = m_formattedtitle = ""; }
 
@@ -117,13 +117,13 @@ class Metadata
 
     unsigned int ID() { return m_id; }
     void setID(int lid) { m_id = lid; }
-    
+
     QString Filename() const { return m_filename; }
     void setFilename(QString &lfilename) { m_filename = lfilename; }
-    
+
     QString Format() const { return m_format; }
     void setFormat(const QString &lformat) { m_format = lformat; }
-    
+
     int Rating() { return m_rating; }
     void decRating();
     void incRating();
@@ -156,6 +156,8 @@ class Metadata
     static void SetStartdir(const QString &dir);
 
     static QStringList fillFieldList(QString field);
+
+    QStringList AlbumArtInDir(QString directory);
 
   private:
     void setCompilationFormatting(bool cd = false);

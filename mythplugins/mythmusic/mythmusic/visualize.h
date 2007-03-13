@@ -97,11 +97,11 @@ class AlbumArt : public VisualBase
     QString getImageFilename();
 
   private:
-    QSize size, cursize;
-    QString filename;
-    QString directory;
-    MainVisual *pParent;
-    QImage image;
+    QSize m_size, m_cursize;
+    QString m_filename;
+    QString m_directory;
+    MainVisual *m_pParent;
+    QImage m_image;
 };
 
 class AlbumArtFactory : public VisFactory
