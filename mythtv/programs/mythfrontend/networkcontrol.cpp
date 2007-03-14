@@ -111,6 +111,8 @@ NetworkControl::NetworkControl(int port)
     keyMap[","]                      = Qt::Key_Comma;
     keyMap["minus"]                  = Qt::Key_Minus;
     keyMap["-"]                      = Qt::Key_Minus;
+    keyMap["underscore"]             = Qt::Key_Underscore;
+    keyMap["_"]                      = Qt::Key_Underscore;
     keyMap["period"]                 = Qt::Key_Period;
     keyMap["."]                      = Qt::Key_Period;
     keyMap["numbersign"]             = Qt::Key_NumberSign;
