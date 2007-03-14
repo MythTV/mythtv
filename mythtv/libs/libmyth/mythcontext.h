@@ -209,8 +209,16 @@ class MPUBLIC MythPrivRequest
 
 /** \brief Increment this whenever the MythTV network protocol changes.
  *
- *   You must also update this value in
- *   mythplugins/mythweb/includes/mythbackend.php
+ *   You must also update this value and any corresponding changes to the
+ *   ProgramInfo network protocol layout in the following files:
+ *
+ *   MythWeb
+ *       mythplugins/mythweb/includes/mythbackend.php (version number)
+ *       mythplugins/mythweb/modules/tv/includes/objects/Program.php (layout)
+ *
+ *   MythTV Perl Bindings
+ *       mythtv/bindings/perl/MythTV.pm (version number)
+ *       mythtv/bindings/perl/MythTV/Program.pm (layout)
  */
 #define MYTH_PROTO_VERSION "33"
 
