@@ -640,9 +640,16 @@ void MythXML::GetProgramDetails( HTTPRequest *pRequest )
 
 void MythXML::GetChannelIcon( HTTPRequest *pRequest )
 {
+    bool bDefaultPixmap = false;
+
     pRequest->m_eResponseType   = ResponseTypeFile;
 
     int  iChanId   = pRequest->m_mapParams[ "ChanId"  ].toInt();
+
+    // Optional Parameters
+
+    int     nWidth    = pRequest->m_mapParams[ "Width"     ].toInt();
+    int     nHeight   = pRequest->m_mapParams[ "Height"    ].toInt();
 
     // Read Icon file path from database
 
@@ -660,6 +667,59 @@ void MythXML::GetChannelIcon( HTTPRequest *pRequest )
 
         pRequest->m_sFileName       = query.value(0).toString();
     }
+
+    if ((nWidth == 0) && (nHeight == 0))
+    {
+        bDefaultPixmap = true;
+    }
+
+    QString sFileName;
+
+    if (bDefaultPixmap)
+    {
+        return;
+    }
+    else
+        sFileName = QString( "%1.%2x%3.png" )
+                                   .arg( pRequest->m_sFileName )
+                                   .arg( nWidth    )
+                                   .arg( nHeight   );
+
+    // ----------------------------------------------------------------------
+    // check to see if image is already created.
+    // ----------------------------------------------------------------------
+
+    if (QFile::exists( sFileName ))
+    {
+        pRequest->m_eResponseType   = ResponseTypeFile;
+        pRequest->m_nResponseStatus = 200;
+        pRequest->m_sFileName = sFileName;
+        return;
+    }
+
+    float fAspect = 0.0;
+
+    QImage *pImage = new QImage(pRequest->m_sFileName);
+
+    if (!pImage)
+        return;
+
+    if (fAspect <= 0)
+           fAspect = (float)(pImage->width()) / pImage->height();
+
+    if ( nWidth == 0 )
+        nWidth = (int)rint(nHeight * fAspect);
+
+    if ( nHeight == 0 )
+        nHeight = (int)rint(nWidth / fAspect);
+
+    QImage img = pImage->smoothScale( nWidth, nHeight);
+
+    img.save( sFileName.ascii(), "PNG" );
+
+    delete pImage;
+
+    pRequest->m_sFileName = sFileName;
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -672,7 +732,7 @@ void MythXML::GetAlbumArt( HTTPRequest *pRequest )
 
     pRequest->m_eResponseType   = ResponseTypeFile;
 
-    int  iArtId   = pRequest->m_mapParams[ "ArtId"  ].toInt();
+    int  iId   = pRequest->m_mapParams[ "Id"  ].toInt();
 
     // Optional Parameters
 
@@ -687,7 +747,7 @@ void MythXML::GetAlbumArt( HTTPRequest *pRequest )
                   "LEFT JOIN music_directories ON "
                   "music_directories.directory_id=music_albumart.directory_id "
                   "WHERE music_albumart.albumart_id = :ARTID;");
-    query.bindValue(":ARTID", iArtId );
+    query.bindValue(":ARTID", iId );
 
     if (!query.exec() || !query.isActive())
         MythContext::DBError("Select ArtId", query);
@@ -708,7 +768,6 @@ void MythXML::GetAlbumArt( HTTPRequest *pRequest )
 
     QString sFileName;
 
-// start
     if (bDefaultPixmap)
     {
         return;

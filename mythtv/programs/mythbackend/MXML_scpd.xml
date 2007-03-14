@@ -6,12 +6,42 @@
    </specVersion>
    <actionList>
       <action>
+         <name>GetAlbumArt</name>
+         <argumentList>
+            <argument>
+               <name>Id</name>
+               <direction>in</direction>
+               <relatedStateVariable>A_ARG_TYPE_Id</relatedStateVariable>
+            </argument>
+            <argument>
+               <name>Height</name>
+               <direction>in</direction>
+               <relatedStateVariable>A_ARG_TYPE_Height</relatedStateVariable>
+            </argument>
+            <argument>
+               <name>Width</name>
+               <direction>in</direction>
+               <relatedStateVariable>A_ARG_TYPE_Width</relatedStateVariable>
+            </argument>
+         </argumentList>
+      </action>
+      <action>
          <name>GetChannelIcon</name>
          <argumentList>
             <argument>
                <name>ChanId</name>
                <direction>in</direction>
                <relatedStateVariable>A_ARG_TYPE_ChanId</relatedStateVariable>
+            </argument>
+            <argument>
+               <name>Height</name>
+               <direction>in</direction>
+               <relatedStateVariable>A_ARG_TYPE_Height</relatedStateVariable>
+            </argument>
+            <argument>
+               <name>Width</name>
+               <direction>in</direction>
+               <relatedStateVariable>A_ARG_TYPE_Width</relatedStateVariable>
             </argument>
          </argumentList>
       </action>
