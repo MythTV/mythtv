@@ -1487,15 +1487,11 @@ void Scheduler::RunScheduler(void)
                 .arg(nextRecording->sourceid);
 
             if (schedulingEnabled)
-            {
                 nextRecording->recstatus =
                     nexttv->StartRecording(nextRecording);
-                nextRecording->AddHistory(false);
-            }
             else
-            {
                 nextRecording->recstatus = rsOffLine;
-            }
+            nextRecording->AddHistory(nextRecording->recstatus != rsRecording);
 
             statuschanged = true;
 
