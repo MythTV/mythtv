@@ -30,9 +30,6 @@
 
 class MediaServer : public UPnp
 {
-    private:
-
-        HttpServer      *m_pHttpServer;
 
     protected:
         
