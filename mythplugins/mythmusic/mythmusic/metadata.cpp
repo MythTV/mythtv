@@ -665,7 +665,7 @@ QStringList Metadata::AlbumArtInDir(QString directory)
                   "LEFT JOIN music_directories ON "
                   "music_directories.directory_id=music_albumart.directory_id "
                   "WHERE music_directories.path = :DIR;");
-    query.bindValue(":DIR", directory);
+    query.bindValue(":DIR", directory.utf8());
     if (query.exec())
     {
         while (query.next())
