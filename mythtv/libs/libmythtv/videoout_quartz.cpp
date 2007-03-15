@@ -1606,10 +1606,8 @@ void VideoOutputQuartz::PrepareFrame(VideoFrame *buffer, FrameScanType t)
         dvdv->DecodeFrame(buffer);
 #endif
 
-    if (!buffer)
-        buffer = vbuffers.GetScratchFrame();
-
-    framesPlayed = buffer->frameNumber + 1;
+    if (buffer)
+        framesPlayed = buffer->frameNumber + 1;
 }
 
 /** \brief
