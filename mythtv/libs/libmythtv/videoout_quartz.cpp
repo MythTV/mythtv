@@ -1615,10 +1615,8 @@ void VideoOutputQuartz::PrepareFrame(VideoFrame *buffer, FrameScanType t)
 {
     (void)t;
 
-    if (!buffer)
-        buffer = vbuffers.GetScratchFrame();
-
-    framesPlayed = buffer->frameNumber + 1;
+    if (buffer)
+        framesPlayed = buffer->frameNumber + 1;
 }
 
 void VideoOutputQuartz::Show(FrameScanType t)
