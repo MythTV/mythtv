@@ -1638,10 +1638,8 @@ void VideoOutputQuartz::PrepareFrame(VideoFrame *buffer, FrameScanType t)
         accel->DecodeFrame(buffer);
 #endif // CONFIG_MAC_ACCEL
 
-    if (!buffer)
-        buffer = vbuffers.GetScratchFrame();
-
-    framesPlayed = buffer->frameNumber + 1;
+    if (buffer)
+        framesPlayed = buffer->frameNumber + 1;
 }
 
 void VideoOutputQuartz::Show(FrameScanType t)
