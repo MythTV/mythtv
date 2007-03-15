@@ -89,6 +89,7 @@ enum VerboseMask
 #define VERBOSE_ENUM(ARG_ENUM, ARG_VALUE, ARG_STRING, ARG_ADDITIVE, ARG_HELP)\
     ARG_ENUM = ARG_VALUE ,
     VERBOSE_MAP(VERBOSE_ENUM)
+    VB_UNUSED_END // keep at end
 };
 
 /// This global variable is set at startup with the flags 
@@ -179,7 +180,7 @@ do { \
 /// Verbose helper function for ENO macro
 MPUBLIC QString safe_eno_to_string(int errnum);
 
-void GetInstallPrefixPath( QString &sInstallPrefix, QString &sInstallLibDir );
+MPUBLIC void GetInstallPrefixPath( QString &sInstallPrefix, QString &sInstallLibDir );
 
 /** \class MythPrivRequest
  *  \brief Container for requests that require privledge escalation.
