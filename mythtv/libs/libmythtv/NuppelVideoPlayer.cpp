@@ -788,10 +788,11 @@ void NuppelVideoPlayer::AutoDeint(VideoFrame *frame)
                 .arg(abs(m_scan_tracker)).arg(type));
     }
 
-    if (abs(m_scan_tracker) <= 2)
+    int min_count = (ringBuffer->isDVD()) ? 0 : 2;
+    if (abs(m_scan_tracker) <= min_count)
         return;
 
-    SetScanType((m_scan_tracker >  2) ? kScan_Interlaced : kScan_Progressive);
+    SetScanType((m_scan_tracker > min_count) ? kScan_Interlaced : kScan_Progressive);
     m_scan_locked  = false;
 }
 
