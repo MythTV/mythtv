@@ -3,7 +3,7 @@
 <title>Installing and using MythTV
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com"
 name="mailto:rkulagow@rocketmail.com">
-<date>2007-02-16, v0.20.16
+<date>2007-03-17, v0.20.18
 <abstract>
 Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -4513,7 +4513,7 @@ on input 2.
 Having two channels with the same callsign may affect how program
 information is shown in mythfrontend. If two sources have the same callsign
 and channel number, the program guide and program lists will only show one
-instance of the channel number and callsign. If the same callsing is on two
+instance of the channel number and callsign. If the same callsign is on two
 different channel numbers, both will be shown and if two sources have
 different callsigns with the same channel number, both of those will be
 shown.
@@ -6232,15 +6232,16 @@ resolution, they will cause scan lines to be repeated or dropped.
 
 From "best" to "worst", in NTSC:
 <itemize>
-<item>720x480 ("DVD" resolution. Also commonly, 704x480)
+<item>720x480 "DVD" resolution. ReplayTV High and medium resolution
+<item>704x480 DVD standalone recorder standard resolution
 <item>640x480 4:3
-<item>544x480 (TiVo high resolution)
-<item>480x480 (Video CD resolution)
-<item>352x480 (ReplayTV "Standard" quality)
+<item>544x480 TiVo Best resolution
+<item>480x480 SuperVCD (SVCD) Video CD resolution, TiVo High resolution
+<item>352x480 ReplayTV "Standard" quality, TiVo Basic and Medium resolution, DVD "LP" resolution
 <item>320x480 
 <item>544x240
 <item>480x240 
-<item>352x240 
+<item>352x240 Video CD (VCD) resolution
 <item>320x240
 </itemize>
 
@@ -7533,6 +7534,8 @@ now.  (R.G. Newbury)
 v0.20.15, 2007-01-27.  v4l might have the audio out muted.  Storage Groups is only in SVN.
 v0.20.16, 2007-02-16.  Hauppuage is putting the HVR-1600 inside PVR-150
 boxes.  Not supported by ivtv driver at this time.
+v0.20.17, 2007-03-08.  Update on capture resolution from warren at icruise dot com.
+v0.20.18, 2007-03-17.  Typo.
 -->
 
 <!--
