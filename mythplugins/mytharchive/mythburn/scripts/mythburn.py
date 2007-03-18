@@ -31,7 +31,7 @@
 #******************************************************************************
 
 # version of script - change after each update
-VERSION="0.1.20070318-1"
+VERSION="0.1.20070318-2"
 
 
 ##You can use this debug flag when testing out new themes
@@ -1480,7 +1480,7 @@ def encodeVideoToMPEG2(source, destvideofile, video, audio1, audio2, aspectratio
             fatalError("Failed while running ffmpeg (Pass 2) to re-encode video.\n"
                        "Command was %s" % command)
 
-def encodeNuvToMPEG2(chanid, starttime, destvideofile, folder, profile, usecutlist):
+def encodeNuvToMPEG2(chanid, starttime, mediafile, destvideofile, folder, profile, usecutlist):
     """Encodes a nuv video source file to MPEG2 video and AC3 audio, using mythtranscode & ffmpeg"""
 
     # make sure mythtranscode hasn't left some stale fifos hanging around
@@ -1521,22 +1521,31 @@ def encodeNuvToMPEG2(chanid, starttime, destvideofile, folder, profile, usecutli
         if name == "-s":
             outvideores = value
 
-    if (usecutlist == True):
-        PID=os.spawnlp(os.P_NOWAIT, "mythtranscode", "mythtranscode",
-                    '-p', '27',
-                    '-c', chanid,
-                    '-s', starttime,
-                    '--honorcutlist',
-                    '-f', folder)
-        write("mythtranscode started (using cut list) PID = %s" % PID)
-    else:
-        PID=os.spawnlp(os.P_NOWAIT, "mythtranscode", "mythtranscode",
-                    '-p', '27',
-                    '-c', chanid,
-                    '-s', starttime,
-                    '-f', folder)
+    if chanid != -1:
+        if (usecutlist == True):
+            PID=os.spawnlp(os.P_NOWAIT, "mythtranscode", "mythtranscode",
+                        '-p', '27',
+                        '-c', chanid,
+                        '-s', starttime,
+                        '--honorcutlist',
+                        '-f', folder)
+            write("mythtranscode started (using cut list) PID = %s" % PID)
+        else:
+            PID=os.spawnlp(os.P_NOWAIT, "mythtranscode", "mythtranscode",
+                        '-p', '27',
+                        '-c', chanid,
+                        '-s', starttime,
+                        '-f', folder)
 
-        write("mythtranscode started PID = %s" % PID)
+            write("mythtranscode started PID = %s" % PID)
+    elif mediafile != -1:
+        PID=os.spawnlp(os.P_NOWAIT, "mythtranscode", "mythtranscode",
+                '-p', '27',
+                '-i', mediafile,
+                '-f', folder)
+        write("mythtranscode started (using file) PID = %s" % PID)
+    else:
+        fatalError("no video source passed to encodeNuvToMPEG2.\n")
 
 
     samplerate, channels = getAudioParams(folder)
@@ -3550,7 +3559,7 @@ def processFile(file, folder):
     if not isFileOkayForDVD(file, folder):
         if getFileType(folder) == 'nuv':
             #file is a nuv file which ffmpeg has problems reading so use mythtranscode to pass
-            #the video and audio stream to ffmpeg to do the reencode
+            #the video and audio streams to ffmpeg to do the reencode
 
             #we need to re-encode the file, make sure we get the right video/audio streams
             #would be good if we could also split the file at the same time
@@ -3564,24 +3573,30 @@ def processFile(file, folder):
 
             write("Re-encoding audio and video from nuv file")
 
-            # Run from local file?
-            if file.hasAttribute("localfilename"):
-                mediafile = file.attributes["localfilename"].value
-
             # what encoding profile should we use
             if file.hasAttribute("encodingprofile"):
                 profile = file.attributes["encodingprofile"].value
             else:
                 profile = defaultEncodingProfile
 
-            chanid = getText(infoDOM.getElementsByTagName("chanid")[0])
-            starttime = getText(infoDOM.getElementsByTagName("starttime")[0])
-            usecutlist = (file.attributes["usecutlist"].value == "1" and 
-                          getText(infoDOM.getElementsByTagName("hascutlist")[0]) == "yes")
+            if file.hasAttribute("localfilename"):
+                mediafile = file.attributes["localfilename"].value
+                chanid = -1
+                starttime = -1
+                usecutlist = -1
+            elif file.attributes["type"].value == "recording":
+                mediafile = -1
+                chanid = getText(infoDOM.getElementsByTagName("chanid")[0])
+                starttime = getText(infoDOM.getElementsByTagName("starttime")[0])
+                usecutlist = (file.attributes["usecutlist"].value == "1" and 
+                            getText(infoDOM.getElementsByTagName("hascutlist")[0]) == "yes")
+            else:
+                chanid = -1
+                starttime = -1
+                usecutlist = -1
 
-            #do the re-encode
-            encodeNuvToMPEG2(chanid, starttime, os.path.join(folder, "newfile2.mpg"), folder,
-                             profile, usecutlist)
+            encodeNuvToMPEG2(chanid, starttime, mediafile, os.path.join(folder, "newfile2.mpg"), folder,
+                         profile, usecutlist)
             mediafile = os.path.join(folder, 'newfile2.mpg')
         else:
             #we need to re-encode the file, make sure we get the right video/audio streams
