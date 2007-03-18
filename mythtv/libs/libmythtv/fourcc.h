@@ -1,4 +1,5 @@
 #ifndef _FOURCC_H
+#define _FOURCC_H
 /******************************************************************************
  * fourcc.h - Four Character Constants
  *
@@ -16,7 +17,7 @@
 #define MKTAG(a,b,c,d) (a | (b << 8) | (c << 16) | (d << 24))
 #endif
 
-/* Probably not thread safe *
+/* Probably not thread safe */
 static inline char * fourcc_str(int i)
 {
     static char str[5];
@@ -29,7 +30,6 @@ static inline char * fourcc_str(int i)
 
     return str;
 }
-*/
 
 
 /******************************************************************************
