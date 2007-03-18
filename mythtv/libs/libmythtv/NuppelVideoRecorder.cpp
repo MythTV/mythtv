@@ -1241,16 +1241,16 @@ void NuppelVideoRecorder::DoV4L2(void)
     vfmt.fmt.pix.field = V4L2_FIELD_INTERLACED;
 
     if (go7007)
-        vfmt.fmt.pix.pixelformat = V4L2_PIX_FMT_MPEG;
+        vfmt.fmt.pix.pixelformat = FOURCC_MPEG;
     else if (inpixfmt == FMT_YUV422P)
-        vfmt.fmt.pix.pixelformat = V4L2_PIX_FMT_YUV422P;
+        vfmt.fmt.pix.pixelformat = FOURCC_422P;
     else
-        vfmt.fmt.pix.pixelformat = V4L2_PIX_FMT_YUV420;
+        vfmt.fmt.pix.pixelformat = FOURCC_YU12;
 
     if (ioctl(fd, VIDIOC_S_FMT, &vfmt) < 0)
     {
         // this is supported by the cx88 and various ati cards.
-        vfmt.fmt.pix.pixelformat = V4L2_PIX_FMT_YUYV;
+        vfmt.fmt.pix.pixelformat = FOURCC_YUYV;
 
         if (ioctl(fd, VIDIOC_S_FMT, &vfmt) < 0)
         {
@@ -1472,7 +1472,7 @@ again:
 
         if (!request_pause)
         {
-            if (vfmt.fmt.pix.pixelformat == V4L2_PIX_FMT_YUYV)
+            if (vfmt.fmt.pix.pixelformat == FOURCC_YUYV)
             {
                 // Convert YUYV to YUV420P
                 unsigned conversion_buffer_size = h * w * 3 / 2;
@@ -1908,17 +1908,17 @@ void NuppelVideoRecorder::WriteHeader(void)
         int vidfcc = 0;
         switch(mpa_codec->id)
         {
-            case CODEC_ID_MPEG4: vidfcc = MKTAG('D', 'I', 'V', 'X'); break;
-            case CODEC_ID_WMV1: vidfcc = MKTAG('W', 'M', 'V', '1'); break;
-            case CODEC_ID_MSMPEG4V3: vidfcc = MKTAG('D', 'I', 'V', '3'); break;
-            case CODEC_ID_MSMPEG4V2: vidfcc = MKTAG('M', 'P', '4', '2'); break;
-            case CODEC_ID_MSMPEG4V1: vidfcc = MKTAG('M', 'P', 'G', '4'); break;
-            case CODEC_ID_MJPEG: vidfcc = MKTAG('M', 'J', 'P', 'G'); break;
-            case CODEC_ID_H263: vidfcc = MKTAG('H', '2', '6', '3'); break;
-            case CODEC_ID_H263P: vidfcc = MKTAG('H', '2', '6', '3'); break;
-            case CODEC_ID_H263I: vidfcc = MKTAG('I', '2', '6', '3'); break;
-            case CODEC_ID_MPEG1VIDEO: vidfcc = MKTAG('M', 'P', 'E', 'G'); break;
-            case CODEC_ID_HUFFYUV: vidfcc = MKTAG('H', 'F', 'Y', 'U'); break;
+            case CODEC_ID_MPEG4:      vidfcc = FOURCC_DIVX; break;
+            case CODEC_ID_WMV1:       vidfcc = FOURCC_WMV1; break;
+            case CODEC_ID_MSMPEG4V3:  vidfcc = FOURCC_DIV3; break;
+            case CODEC_ID_MSMPEG4V2:  vidfcc = FOURCC_MP42; break;
+            case CODEC_ID_MSMPEG4V1:  vidfcc = FOURCC_MPG4; break;
+            case CODEC_ID_MJPEG:      vidfcc = FOURCC_MJPG; break;
+            case CODEC_ID_H263:       vidfcc = FOURCC_H263; break;
+            case CODEC_ID_H263P:      vidfcc = FOURCC_H263; break;
+            case CODEC_ID_H263I:      vidfcc = FOURCC_I263; break;
+            case CODEC_ID_MPEG1VIDEO: vidfcc = FOURCC_MPEG; break;
+            case CODEC_ID_HUFFYUV:    vidfcc = FOURCC_HFYU; break;
             default: break;
         }
         moredata.video_fourcc = vidfcc;
@@ -1929,7 +1929,7 @@ void NuppelVideoRecorder::WriteHeader(void)
     }
     else
     {
-        moredata.video_fourcc = MKTAG('R', 'J', 'P', 'G');
+        moredata.video_fourcc = FOURCC_RJPG;
         moredata.rtjpeg_quality = Q;
         moredata.rtjpeg_luma_filter = M1;
         moredata.rtjpeg_chroma_filter = M2;
@@ -1937,13 +1937,13 @@ void NuppelVideoRecorder::WriteHeader(void)
 
     if (compressaudio)
     {
-        moredata.audio_fourcc = MKTAG('L', 'A', 'M', 'E');
+        moredata.audio_fourcc = FOURCC_LAME;
         moredata.audio_compression_ratio = 11;
         moredata.audio_quality = mp3quality;
     }
     else
     {
-        moredata.audio_fourcc = MKTAG('R', 'A', 'W', 'A');
+        moredata.audio_fourcc = FOURCC_RAWA;
     }
 
     moredata.audio_sample_rate = audio_samplerate;
