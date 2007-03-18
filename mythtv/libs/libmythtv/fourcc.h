@@ -35,18 +35,18 @@ static inline char * fourcc_str(int i)
  *****************************************************************************/
 /* See http://www.fourcc.org/yuv.php for more info on formats */
 
- #define FOURCC_I420 MKTAG('I','4','2','0')
- #define FOURCC_IYUV MKTAG('I','Y','U','V')
- #define FOURCC_RGB2 MKTAG('R','G','B','2')
- #define FOURCC_RGBX MKTAG('R','G','B','X')
- #define FOURCC_RV15 MKTAG('R','V','1','5')
- #define FOURCC_RV16 MKTAG('R','V','1','6')
- #define FOURCC_RV24 MKTAG('R','V','2','4')
- #define FOURCC_RV32 MKTAG('R','V','3','2')
- #define FOURCC_YUNV MKTAG('Y','U','N','V')
- #define FOURCC_YUY2 MKTAG('Y','U','Y','2')
- #define FOURCC_YUYV MKTAG('Y','U','Y','V')
- #define FOURCC_YV12 MKTAG('Y','V','1','2')
+#define FOURCC_I420 MKTAG('I','4','2','0')
+#define FOURCC_IYUV MKTAG('I','Y','U','V')
+#define FOURCC_RGB2 MKTAG('R','G','B','2')
+#define FOURCC_RGBX MKTAG('R','G','B','X')
+#define FOURCC_RV15 MKTAG('R','V','1','5')
+#define FOURCC_RV16 MKTAG('R','V','1','6')
+#define FOURCC_RV24 MKTAG('R','V','2','4')
+#define FOURCC_RV32 MKTAG('R','V','3','2')
+#define FOURCC_YUNV MKTAG('Y','U','N','V')
+#define FOURCC_YUY2 MKTAG('Y','U','Y','2')
+#define FOURCC_YUYV MKTAG('Y','U','Y','V')
+#define FOURCC_YV12 MKTAG('Y','V','1','2')
 
 
 /* These should probably all be defined by */
