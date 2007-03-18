@@ -7,6 +7,7 @@ using namespace std;
 #include "mythcontext.h"
 #include "videoout_dx.h"
 #include "filtermanager.h"
+#include "fourcc.h"
 
 #include "mmsystem.h"
 #ifdef CONFIG_CYGWIN
@@ -16,8 +17,6 @@ using namespace std;
 extern "C" {
 #include "../libavcodec/avcodec.h"
 }
-
-#define PRINT_FOURCC(c) ((char) (c & 0xFF)) << ((char) ((c >> 8) & 0xFF)) << ((char) ((c >> 16) & 0xFF)) << ((char) ((c >> 24) & 0xFF))
 
 const int kNumBuffers = 31;
 const int kNeedFreeFrames = 1;
@@ -255,8 +254,7 @@ void VideoOutputDX::PrepareFrame(VideoFrame *buffer, FrameScanType t)
 
     if (DirectXLockSurface((void**) &picbuf, &stride) == 0)
     {
-        if (chroma == MAKEFOURCC('I','Y','U','V') ||
-            chroma == MAKEFOURCC('I','4','2','0'))
+        if (chroma == FOURCC_IYUV || chroma == FOURCC_I420)
         {
             for (int i = 0; i < XJ_height; i++)
                 memcpy(picbuf + (i * stride), buffer->buf + (i * XJ_width), XJ_width);
@@ -269,7 +267,7 @@ void VideoOutputDX::PrepareFrame(VideoFrame *buffer, FrameScanType t)
                         buffer->buf + XJ_height * XJ_width * 5 / 4 + (i * XJ_width / 2),
                         XJ_width / 2);
         }
-        else if (chroma == MAKEFOURCC('Y','V','1','2'))
+        else if (chroma == FOURCC_YV12)
         {
             for (int i = 0; i < XJ_height; i++)
                 memcpy(picbuf + (i * stride), buffer->buf + (i * XJ_width), XJ_width);
@@ -288,13 +286,13 @@ void VideoOutputDX::PrepareFrame(VideoFrame *buffer, FrameScanType t)
 
             switch (chroma)
             {
-                case MAKEFOURCC('Y','U','Y','2'):
-                case MAKEFOURCC('Y','U','Y','V'):
-                case MAKEFOURCC('Y','U','N','V'): av_format = PIX_FMT_YUV422; break;
-                case MAKEFOURCC('R','V','1','5'): av_format = PIX_FMT_RGB555; break;
-                case MAKEFOURCC('R','V','1','6'): av_format = PIX_FMT_RGB565; break;
-                case MAKEFOURCC('R','V','2','4'): av_format = PIX_FMT_RGB24;  break;
-                case MAKEFOURCC('R','V','3','2'): av_format = PIX_FMT_RGBA32; break;
+                case FOURCC_YUY2:
+                case FOURCC_YUYV:
+                case FOURCC_YUNV: av_format = PIX_FMT_YUV422; break;
+                case FOURCC_RV15: av_format = PIX_FMT_RGB555; break;
+                case FOURCC_RV16: av_format = PIX_FMT_RGB565; break;
+                case FOURCC_RV24: av_format = PIX_FMT_RGB24;  break;
+                case FOURCC_RV32: av_format = PIX_FMT_RGBA32; break;
                 default: 
                     VERBOSE(VB_IMPORTANT, "VODX: Non Xv mode only supports 16, 24, and 32 bpp displays");
                     errored = true;
@@ -528,17 +526,17 @@ float VideoOutputDX::GetDisplayAspect(void) const
     return width / height;
 }
 
-static const DWORD pref_chromas[] = {    MAKEFOURCC('I','Y','U','V'),
-                                        MAKEFOURCC('I','4','2','0'),
-                                        MAKEFOURCC('Y','V','1','2'),
-//                                        MAKEFOURCC('U','Y','V','Y'),
-//                                        MAKEFOURCC('U','Y','N','V'),
-//                                        MAKEFOURCC('Y','4','2','2'),
-                                        MAKEFOURCC('Y','U','Y','2'),
-                                        MAKEFOURCC('Y','U','Y','V'),
-                                        MAKEFOURCC('Y','U','N','V'),
-//                                        MAKEFOURCC('Y','V','Y','U'),
-                                        MAKEFOURCC('R','G','B','X'),
+static const DWORD pref_chromas[] = { FOURCC_IYUV,
+                                      FOURCC_I420,
+                                      FOURCC_YV12,
+//                                      FOURCC_UYVY,
+//                                      FOURCC_UYNV,
+//                                      FOURCC_Y422,
+                                      FOURCC_YUY2,
+                                      FOURCC_YUYV,
+                                      FOURCC_YUNV,
+//                                      FOURCC_YVYU,
+                                      FOURCC_RGBX,
                                         0xFFFFFFFF };
 
 void VideoOutputDX::MakeSurface()
@@ -843,27 +841,12 @@ int VideoOutputDX::DirectXCreateSurface(LPDIRECTDRAWSURFACE2 *pp_surface_final,
         ddsd.dwHeight = XJ_height;
         ddsd.dwWidth = XJ_width;
         ddsd.dwBackBufferCount = i_backbuffers;
-
-        VERBOSE(VB_IMPORTANT, "x: " << XJ_width << " y: " << XJ_height << " chrom :" << PRINT_FOURCC(i_chroma));
-
-        dxresult = IDirectDraw2_CreateSurface(ddobject, &ddsd, &p_surface, NULL );
-        if (dxresult != DD_OK)
-        {
-            VERBOSE(VB_IMPORTANT, "DD_CreateSurface failed " << hex << dxresult << dec);
-        
-            *pp_surface_final = NULL;
-            return -1;
-        }
     }
-
-    if (!b_overlay)
+    else  // !b_overlay
     {
-        bool b_rgb_surface =
-            (i_chroma == MAKEFOURCC('R','G','B','2'))
-          || (i_chroma == MAKEFOURCC('R','V','1','5'))
-           || (i_chroma == MAKEFOURCC('R','V','1','6'))
-            || (i_chroma == MAKEFOURCC('R','V','2','4'))
-             || (i_chroma == MAKEFOURCC('R','V','3','2'));
+        bool b_rgb_surface = (i_chroma == FOURCC_RGB2)
+            || (i_chroma == FOURCC_RV15) || (i_chroma == FOURCC_RV16)
+            || (i_chroma == FOURCC_RV24) || (i_chroma == FOURCC_RV32);
 
         memset(&ddsd, 0, sizeof(DDSURFACEDESC));
         ddsd.dwSize = sizeof(DDSURFACEDESC);
@@ -884,17 +867,18 @@ int VideoOutputDX::DirectXCreateSurface(LPDIRECTDRAWSURFACE2 *pp_surface_final,
             ddsd.ddpfPixelFormat.dwFlags = DDPF_FOURCC;
             ddsd.ddpfPixelFormat.dwFourCC = i_chroma;
         }
+    }
 
-        VERBOSE(VB_IMPORTANT, "x: " << XJ_width << " y: " << XJ_height << " chrom :" << PRINT_FOURCC(i_chroma));
+    VERBOSE(VB_IMPORTANT, "VideoOutputDX::DirectXCreateSurface() x: "
+                          << XJ_width << " y: " << XJ_height
+                          << " chrom: " << fourcc_str(i_chroma));
 
-        dxresult = IDirectDraw2_CreateSurface(ddobject, &ddsd, &p_surface, NULL );
-        if (dxresult != DD_OK )
-        {
-            VERBOSE(VB_IMPORTANT, "DD_CreateSurface failed " << hex << dxresult << dec);
-
-            *pp_surface_final = NULL;
-            return -1;
-        }
+    dxresult = IDirectDraw2_CreateSurface(ddobject, &ddsd, &p_surface, NULL );
+    if (dxresult != DD_OK )
+    {
+        VERBOSE(VB_IMPORTANT, "DD_CreateSurface failed " << hex << dxresult << dec);
+        *pp_surface_final = NULL;
+        return -1;
     }
 
     /* Now that the surface is created, try to get a newer DirectX interface */
@@ -1098,7 +1082,7 @@ int VideoOutputDX::NewPicture()
      * want to display it */
     if (!using_overlay )
     {
-        if (chroma != MAKEFOURCC('R','G','B','X'))
+        if (chroma != FOURCC_RGBX)
         {
             DWORD i_codes;
             DWORD *pi_codes;
@@ -1143,19 +1127,19 @@ int VideoOutputDX::NewPicture()
                 switch(ddpfPixelFormat.dwRGBBitCount)
                 {
 //                case 8: /* FIXME: set the palette */
-//                    chroma = MAKEFOURCC('R','G','B','2');
+//                    chroma = FOURCC_RGB2;
 //                    break;
                 case 15:
-                    chroma = MAKEFOURCC('R','V','1','5');
+                    chroma = FOURCC_RV15;
                     break;
                 case 16:
-                    chroma = MAKEFOURCC('R','V','1','6');
+                    chroma = FOURCC_RV16;
                     break;
                 case 24:
-                    chroma = MAKEFOURCC('R','V','2','4');
+                    chroma = FOURCC_RV24;
                     break;
                 case 32:
-                    chroma = MAKEFOURCC('R','V','3','2');
+                    chroma = FOURCC_RV32;
                     break;
                 default:
                     VERBOSE(VB_IMPORTANT, "unknown screen depth");
