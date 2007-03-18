@@ -384,5 +384,14 @@ void NewsSite::ReplaceHtmlChar(QString &s)
     s.replace("&#8216;", QChar(8216));
     s.replace("&#8217;", QChar(8217));
     s.replace("&#039;", "\'");
+    s.replace("&ndash;", QChar(8211));
+    // german umlauts
+    s.replace("&auml;", QChar(0x00e4));
+    s.replace("&ouml;", QChar(0x00f6));
+    s.replace("&uuml;", QChar(0x00fc));
+    s.replace("&Auml;", QChar(0x00c4));
+    s.replace("&Ouml;", QChar(0x00d6));
+    s.replace("&Uuml;", QChar(0x00dc));
+    s.replace("&szlig;", QChar(0x00df));
 }
 
