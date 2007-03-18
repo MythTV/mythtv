@@ -741,4 +741,166 @@ MythArchive GUI theme
       </container>
   </window>
 
+  <window name="thumbfinder">
+
+      <font name="title" face="Arial">
+          <color>#ffff00</color>
+          <dropcolor>#000000</dropcolor>
+          <size>24</size>
+          <shadow>3,3</shadow>
+          <bold>yes</bold>
+      </font>
+
+      <font name="display" face="Arial">
+          <color>#ffffff</color>
+          <dropcolor>#000000</dropcolor>
+          <size>18</size>
+          <shadow>3,3</shadow>
+          <bold>yes</bold>
+      </font>
+
+      <font name="subtitle_active" face="Arial">
+          <color>#ffffff</color>
+          <size>16</size>
+          <bold>no</bold>
+      </font>
+
+      <font name="subtitle_inactive" face="Arial">
+          <color>#9999cc</color>
+          <size>16</size>
+          <bold>no</bold>
+      </font>
+
+      <font name="subtitle_selected" face="Arial">
+          <color>#ff0000</color>
+          <size>16</size>
+          <bold>no</bold>
+      </font>
+
+      <font name="label" face="Arial">
+          <color>#ffff00</color>
+          <dropcolor>#000000</dropcolor>
+          <size>14</size>
+          <shadow>3,3</shadow>
+          <bold>yes</bold>
+      </font>
+
+      <container name="title">
+
+          <area>0,5,1280,45</area>
+          <textarea name="title" draworder="0" align="center">
+              <area>0,0,1280,45</area>
+              <font>title</font>
+              <multiline>no</multiline>
+              <value>Thumb Image Selector</value>
+          </textarea>
+
+      </container>
+
+      <container name="video">
+
+          <area>60,60,1260,250</area>
+          <textbutton name="frame_button" draworder="1">
+              <position>2,0</position>
+              <font>display</font>
+              <image function="on" filename="ma_frame_button_on.png"></image>
+              <image function="off" filename="ma_frame_button_off.png"></image>
+              <image function="pushed" filename="ma_frame_button_on.png"></image>
+          </textbutton>
+
+          <image name="frameimage" draworder="2">
+              <position>7,5</position>
+              <staticsize>360,229</staticsize>
+              <filename>ma_black.png</filename>
+          </image>
+
+          <image name="image" draworder="0">
+              <position>610,0</position>
+              <filename>trans-cr-background.png</filename>
+              <staticsize>365,80</staticsize>
+          </image>
+
+          <textarea name="label" draworder="3" align="center">
+              <area>610,10,365,20</area>
+              <font>label</font>
+              <value>Current Position</value>
+          </textarea>
+
+          <textarea name="currentpos" draworder="3" align="center">
+              <area>610,30,365,40</area>
+              <font>display</font>
+              <value>0:00:00.00</value>
+          </textarea>
+
+          <image name="image" draworder="0">
+              <position>610,120</position>
+              <filename>trans-cr-background.png</filename>
+              <staticsize>365,80</staticsize>
+          </image>
+
+          <textarea name="label" draworder="3" align="center">
+              <area>610,130,365,20</area>
+              <font>label</font>
+              <value>Seek Amount</value>
+          </textarea>
+
+          <textarea name="seekamount" draworder="3" align="center">
+              <area>610,150,365,40</area>
+              <font>display</font>
+              <value>Frame</value>
+          </textarea>
+
+          <image name="positionimage" draworder="3">
+              <position>450,85</position>
+              <filename>trans-cr-background.png</filename>
+              <staticsize>345,10</staticsize>
+          </image>
+
+          <!--
+              Push buttons
+              -->
+          <textbutton name="cancel_button" draworder="1">
+              <position>450,200</position>
+              <font>display</font>
+              <image function="on" filename="text_button_on.png"></image>
+              <image function="off" filename="text_button_off.png"></image>
+              <image function="pushed" filename="text_button_pushed.png"></image>
+          </textbutton>
+          <textbutton name="save_button" draworder="1">
+              <position>895,200</position>
+              <font>display</font>
+              <image function="on" filename="text_button_on.png"></image>
+              <image function="off" filename="text_button_off.png"></image>
+              <image function="pushed" filename="text_button_pushed.png"></image>
+          </textbutton>
+
+      </container>
+
+      <container name="list_area">
+          <area>60,360,1260,350</area>
+
+          <imagegrid name="imagegrid" draworder="0">
+              <area>0,0,1140,350</area>
+              <textposition>bottom</textposition>
+              <textheight>20</textheight>
+              <columncount>5</columncount>
+              <rowcount>2</rowcount>
+              <cutdown>yes</cutdown>
+              <showchecks>no</showchecks>
+              <showselected>no</showselected>
+              <showscrollarrows>no</showscrollarrows>
+              <align>allcenter</align>
+              <padding>10</padding>
+              <multiline>no</multiline>
+              <activefont>subtitle_active</activefont>
+              <inactivefont>subtitle_inactive</inactivefont>
+              <selectedfont>subtitle_selected</selectedfont>
+              <image function="normal" filename="ma_browser_back_reg.png"></image>
+              <image function="highlighted" filename="ma_browser_back_sel.png"></image>
+              <image function="selected" filename="ma_browser_back_sel.png"></image>
+              <image function="default" filename="ma_nothumb.png"></image>
+          </imagegrid>
+      </container>
+  </window>
+
 </mythuitheme>
