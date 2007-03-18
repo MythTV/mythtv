@@ -31,7 +31,7 @@
 #******************************************************************************
 
 # version of script - change after each update
-VERSION="0.1.20070316-1"
+VERSION="0.1.20070318-1"
 
 
 ##You can use this debug flag when testing out new themes
@@ -107,6 +107,7 @@ copyremoteFiles = False
 thumboffset = 10
 usebookmark = True
 clearArchiveTable = True
+nicelevel = 17;
 
 #main menu aspect ratio (4:3 or 16:9)
 mainmenuAspectRatio = "16:9"
@@ -305,7 +306,9 @@ def checkCancelFlag():
 
 def runCommand(command):
     checkCancelFlag()
-    result=os.system(command)
+
+    result = os.system(command)
+
     if os.WIFEXITED(result):
         result = os.WEXITSTATUS(result)
     checkCancelFlag()
@@ -596,7 +599,8 @@ def getDefaultParametersFromMythTVDB():
                         'MythArchiveTimeFormat',
                         'MythArchiveClearArchiveTable',
                         'ISO639Language0',
-                        'ISO639Language1'
+                        'ISO639Language1',
+                        'JobQueueCPU'
                         )) order by value"""
 
     #write( sqlstatement)
@@ -1626,7 +1630,6 @@ def BurnDVDISO():
     write("Finished burning ISO image")
 
 def deMultiplexMPEG2File(folder, mediafile, video, audio1, audio2):
-    checkCancelFlag()
 
     if getFileType(folder) == "mpegts":
         command = "mythreplex --demux --fix_sync -t TS -o %s " % (folder + "/stream")
@@ -1664,7 +1667,7 @@ def deMultiplexMPEG2File(folder, mediafile, video, audio1, audio2):
     command += mediafile
     write("Running: " + command)
 
-    result = os.system(command)
+    result = runCommand(command)
 
     if result<>0:
         fatalError("Failed while running mythreplex. Command was %s" % command)
@@ -3870,9 +3873,6 @@ def usage():
 
 write( "mythburn.py (%s) starting up..." % VERSION)
 
-nice=os.nice(8)
-write( "Process priority %s" % nice)
-
 #Ensure were running at least python 2.3.5
 if not hasattr(sys, "hexversion") or sys.hexversion < 0x20305F0:
     sys.stderr.write("Sorry, your Python is too old. Please upgrade at least to 2.3.5\n")
@@ -3954,6 +3954,7 @@ dateformat = defaultsettings.get("MythArchiveDateFormat", "%a %d %b %Y")
 timeformat = defaultsettings.get("MythArchiveTimeFormat", "%I:%M %p")
 if "MythArchiveClearArchiveTable" in defaultsettings:
     clearArchiveTable = (defaultsettings["MythArchiveClearArchiveTable"] == '1')
+nicelevel = defaultsettings.get("JobQueueCPU", "0")
 
 # external commands
 path_mplex = [defaultsettings["MythArchiveMplexCmd"], os.path.split(defaultsettings["MythArchiveMplexCmd"])[1]]
@@ -3965,6 +3966,16 @@ path_tcrequant = [defaultsettings["MythArchiveTcrequantCmd"], os.path.split(defa
 path_jpeg2yuv = [defaultsettings["MythArchiveJpeg2yuvCmd"], os.path.split(defaultsettings["MythArchiveJpeg2yuvCmd"])[1]]
 path_spumux = [defaultsettings["MythArchiveSpumuxCmd"], os.path.split(defaultsettings["MythArchiveSpumuxCmd"])[1]]
 path_mpeg2enc = [defaultsettings["MythArchiveMpeg2encCmd"], os.path.split(defaultsettings["MythArchiveMpeg2encCmd"])[1]]
+
+if nicelevel == '1':
+    nicelevel = 10
+elif nicelevel == '2':
+    nicelevel = 0
+else:
+    nicelevel = 17
+
+nicelevel = os.nice(nicelevel)
+write( "Setting process priority to %s" % nicelevel)
 
 try:
     try:
