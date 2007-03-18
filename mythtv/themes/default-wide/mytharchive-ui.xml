@@ -176,7 +176,7 @@ MythTV Archive GUI theme
           </textbutton>
 
           <textbutton name="ok_button" draworder="1">
-              <position>1060,0</position>
+              <position>980,0</position>
               <image function="on" filename="text_button_on.png"></image>
               <image function="off" filename="text_button_off.png"></image>
               <image function="pushed" filename="text_button_pushed.png"></image>
@@ -251,14 +251,14 @@ MythTV Archive GUI theme
           <area>0,55,1280,80</area>
 
           <textbutton name="back_button" draworder="1">
-              <position>35,0</position>
+              <position>55,0</position>
               <image function="on" filename="text_button_on.png"></image>
               <image function="off" filename="text_button_off.png"></image>
               <image function="pushed" filename="text_button_pushed.png"></image>
               <font>buttons</font>
           </textbutton>
           <textbutton name="home_button" draworder="1">
-              <position>200,0</position>
+              <position>320,0</position>
               <image function="on" filename="text_button_on.png"></image>
               <image function="off" filename="text_button_off.png"></image>
               <image function="pushed" filename="text_button_pushed.png"></image>
@@ -277,7 +277,7 @@ MythTV Archive GUI theme
       </container>
 
       <container name="file_list">
-          <area>20,140,1240,500</area>
+          <area>40,140,1200,500</area>
           <listbtnarea name="filelist"  draworder="1">
               <area>0,0,1240,500</area>
               <gradient type="unselected" start="#505050" end="#000000" alpha="100">
@@ -304,7 +304,7 @@ MythTV Archive GUI theme
               <font>buttons</font>
           </textbutton>
           <textbutton name="ok_button" draworder="1">
-              <position>1060,0</position>
+              <position>980,0</position>
               <image function="on" filename="text_button_on.png"></image>
               <image function="off" filename="text_button_off.png"></image>
               <image function="pushed" filename="text_button_pushed.png"></image>
@@ -493,7 +493,7 @@ MythTV Archive GUI theme
           </textbutton>
 
           <textbutton name="ok_button" draworder="1">
-              <position>1060,0</position>
+              <position>980,0</position>
               <image function="on" filename="text_button_on.png"></image>
               <image function="off" filename="text_button_off.png"></image>
               <image function="pushed" filename="text_button_pushed.png"></image>

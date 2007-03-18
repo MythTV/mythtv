@@ -33,9 +33,11 @@ class MythburnWizard : public MythThemedDialog
     void handleNextPage(void);
     void handlePrevPage(void);
     void handleCancel(void);
+    void handleAddRecording(void);
+    void handleAddVideo(void);
+    void handleAddFile(void);
 
     void setTheme(int);
-    void setCategory(int);
     void setProfile(int);
     void titleChanged(UIListBtnTypeItem *item);
     void selectedChanged(UIListBtnTypeItem *item);
@@ -55,7 +57,6 @@ class MythburnWizard : public MythThemedDialog
   private:
     void getThemeList(void);
     void updateArchiveList(void);
-    void toggleSelectedState(void);
     void getArchiveList(void);
     void wireUpTheme(void);
     void updateSizeBar();
@@ -66,7 +67,7 @@ class MythburnWizard : public MythThemedDialog
     void reloadSelectedList(void);
     void showEditMetadataDialog();
     QString loadFile(const QString &filename);
-    vector<ArchiveItem *>  *getArchiveListFromDB(void);
+    void getArchiveListFromDB(void);
     bool doRemoveArchiveItem(const QString &filename);
     bool isArchiveItemValid(const QString &type, const QString &filename);
     bool hasCutList(QString &type, QString &filename);
@@ -82,9 +83,7 @@ class MythburnWizard : public MythThemedDialog
     int freeSpace;
     int usedSpace;
 
-    vector<ArchiveItem *>  *archiveList;
-    QPtrList<ArchiveItem> selectedList;
-
+    vector<ArchiveItem *>    *archiveList;
     vector<EncoderProfile *> *profileList;
 
     UISelectorType   *destination_selector;
@@ -123,7 +122,6 @@ class MythburnWizard : public MythThemedDialog
     UITextButtonType *prev_button;
     UITextButtonType *cancel_button;
 
-    UISelectorType   *category_selector;
     UITextType       *title_text;
     UITextType       *datetime_text;
     UITextType       *description_text;
@@ -131,6 +129,10 @@ class MythburnWizard : public MythThemedDialog
     UICheckBoxType   *usecutlist_check;
     UITextType       *nocutlist_text;
     UITextType       *filesize_text;
+    UITextType       *nofiles_text;
+    UITextButtonType *addrecording_button;
+    UITextButtonType *addvideo_button;
+    UITextButtonType *addfile_button;
 
     // size bar
     UIStatusBarType  *size_bar;

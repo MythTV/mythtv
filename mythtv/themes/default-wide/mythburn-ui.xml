@@ -127,11 +127,11 @@ MythArchive GUI theme
 
           <remoteedit name="filename_edit" draworder="1" align="left">
               <context>1</context>
-              <area>60,220,975,35</area>
+              <area>60,220,875,35</area>
               <font>description</font>
           </remoteedit>
           <textbutton name="find_button" draworder="1">
-              <position>1050,215</position>
+              <position>950,215</position>
               <context>1</context>
               <image function="on" filename="text_button_on.png"></image>
               <image function="off" filename="text_button_off.png"></image>
@@ -227,24 +227,8 @@ MythArchive GUI theme
               <value>Select Archive Items</value>
           </textarea>
 
-          <textarea name="title" draworder="1" align="right">
-              <context>2</context>
-              <area>45,85,200,50</area>
-              <font>label</font>
-              <value>Show Items</value>
-          </textarea>
-
-          <selector name="category_selector" draworder="1">
-              <context>2</context>
-              <area>265,80,480,40</area>
-              <font>description</font>
-              <image function="on" filename="leftright_on.png"></image>
-              <image function="off" filename="leftright_off.png"></image>
-              <image function="pushed" filename="leftright_pushed.png"></image>
-          </selector>
-
           <listbtnarea name="archivelist"  draworder="1">
-              <area>60,130,1140,200</area>
+              <area>60,80,1140,200</area>
               <context>2</context>
               <gradient type="unselected" start="#505050" end="#000000" alpha="100">
               </gradient>
@@ -255,6 +239,40 @@ MythArchive GUI theme
               <showscrollarrows>yes</showscrollarrows>
               <showarrow>no</showarrow>
           </listbtnarea>
+
+          <textarea name="nofiles" draworder="2" align="allcenter">
+              <context>2</context>
+              <area>60,80,1140,200</area>
+              <font>description</font>
+              <value>No files are selected for archive</value>
+          </textarea>
+
+          <textbutton name="addrecording_button" draworder="1">
+              <position>250,290</position>
+              <context>2</context>
+              <image function="on" filename="text_button_on.png"></image>
+              <image function="off" filename="text_button_off.png"></image>
+              <image function="pushed" filename="text_button_pushed.png"></image>
+              <font>buttons</font>
+          </textbutton>
+
+          <textbutton name="addvideo_button" draworder="1">
+              <position>530,290</position>
+              <context>2</context>
+              <image function="on" filename="text_button_on.png"></image>
+              <image function="off" filename="text_button_off.png"></image>
+              <image function="pushed" filename="text_button_pushed.png"></image>
+              <font>buttons</font>
+          </textbutton>
+
+          <textbutton name="addfile_button" draworder="1">
+              <context>2</context>
+              <position>800,290</position>
+              <image function="on" filename="text_button_on.png"></image>
+              <image function="off" filename="text_button_off.png"></image>
+              <image function="pushed" filename="text_button_pushed.png"></image>
+              <font>buttons</font>
+          </textbutton>
 
           <image name="image" draworder="0">
               <context>2</context>
@@ -583,7 +601,7 @@ MythArchive GUI theme
           </textbutton>
 
           <textbutton name="prev_button" draworder="1">
-              <position>890,0</position>
+              <position>690,0</position>
               <image function="on" filename="text_button_on.png"></image>
               <image function="off" filename="text_button_off.png"></image>
               <image function="pushed" filename="text_button_pushed.png"></image>
@@ -591,7 +609,7 @@ MythArchive GUI theme
           </textbutton>
 
           <textbutton name="next_button" draworder="1">
-              <position>1060,0</position>
+              <position>960,0</position>
               <image function="on" filename="text_button_on.png"></image>
               <image function="off" filename="text_button_off.png"></image>
               <image function="pushed" filename="text_button_pushed.png"></image>

@@ -1630,6 +1630,19 @@ QString NativeArchive::findNodeText(const QDomElement &elem, const QString &node
     return res;
 }
 
+void clearArchiveTable(void)
+{
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare("DELETE FROM archiveitems;");
+
+    if (!query.exec())
+    {
+        print_verbose_messages = VB_JOBQUEUE + VB_IMPORTANT;
+        MythContext::DBError("delete archiveitems", query);
+        print_verbose_messages = VB_JOBQUEUE;
+    }
+}
+
 int doNativeArchive(const QString &jobFile)
 {
     gContext->SaveSetting("MythArchiveLastRunType", "Native Export");
@@ -1640,6 +1653,11 @@ int doNativeArchive(const QString &jobFile)
     int res = na.doNativeArchive(jobFile);
     gContext->SaveSetting("MythArchiveLastRunEnd", QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm"));
     gContext->SaveSetting("MythArchiveLastRunStatus", (res == 0 ? "Success" : "Failed"));
+
+    // clear the archiveitems table if succesful
+    if (res == 0)
+        clearArchiveTable();
+
     return res;
 }
 
@@ -1681,7 +1699,7 @@ int grabThumbnail(QString inFile, QString thumbList, QString outFile, int frameC
     int videostream = -1, width, height;
     float fps;
 
-    for (int i = 0; i < inputFC->nb_streams; i++)
+    for (uint i = 0; i < inputFC->nb_streams; i++)
     {
         AVStream *st = inputFC->streams[i];
         if (inputFC->streams[i]->codec->codec_type == CODEC_TYPE_VIDEO)
@@ -1968,7 +1986,7 @@ int getFileInfo(QString inFile, QString outFile, int lenMethod)
     streams.setAttribute("count", inputFC->nb_streams);
     int ffmpegIndex = 0;
 
-    for (int i = 0; i < inputFC->nb_streams; i++)
+    for (uint i = 0; i < inputFC->nb_streams; i++)
     {
         AVStream *st = inputFC->streams[i];
         char buf[256];
@@ -2010,7 +2028,7 @@ int getFileInfo(QString inFile, QString outFile, int lenMethod)
 
                 stream.setAttribute("id", st->id);
 
-                if (st->start_time != AV_NOPTS_VALUE)
+                if (st->start_time != (int) AV_NOPTS_VALUE)
                 {
                     int secs, us;
                     secs = st->start_time / AV_TIME_BASE;
@@ -2086,7 +2104,7 @@ int getFileInfo(QString inFile, QString outFile, int lenMethod)
                 stream.setAttribute("samplerate", st->codec->sample_rate);
                 stream.setAttribute("bitrate", st->codec->bit_rate);
 
-                if (st->start_time != AV_NOPTS_VALUE)
+                if (st->start_time != (int) AV_NOPTS_VALUE)
                 {
                     int secs, us;
                     secs = st->start_time / AV_TIME_BASE;

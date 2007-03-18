@@ -215,7 +215,7 @@ MythTV Archive GUI theme
               <context>2</context>
               <position>25,60</position>
               <filename>trans-cr-background.png</filename>
-              <staticsize>750,290</staticsize>
+              <staticsize>750,300</staticsize>
           </image>
 
           <textarea name="title" draworder="1" align="center">
@@ -225,24 +225,8 @@ MythTV Archive GUI theme
               <value>Select Archive Items</value>
           </textarea>
 
-          <textarea name="title" draworder="1" align="right">
-              <context>2</context>
-              <area>45,85,200,50</area>
-              <font>label</font>
-              <value>Show Items</value>
-          </textarea>
-
-          <selector name="category_selector" draworder="1">
-              <context>2</context>
-              <area>265,80,480,40</area>
-              <font>description</font>
-              <image function="on" filename="leftright_on.png"></image>
-              <image function="off" filename="leftright_off.png"></image>
-              <image function="pushed" filename="leftright_pushed.png"></image>
-          </selector>
-
           <listbtnarea name="archivelist"  draworder="1">
-              <area>50,130,680,175</area>
+              <area>50,80,695,175</area>
               <context>2</context>
               <gradient type="unselected" start="#505050" end="#000000" alpha="100">
               </gradient>
@@ -254,16 +238,41 @@ MythTV Archive GUI theme
               <showarrow>no</showarrow>
           </listbtnarea>
 
+          <textarea name="nofiles" draworder="2" align="allcenter">
+              <context>2</context>
+              <area>50,80,695,175</area>
+              <font>description</font>
+              <value>No files are selected for archive</value>
+          </textarea>
+
+          <textbutton name="addrecording_button" draworder="1">
+              <position>150,270</position>
+              <context>2</context>
+              <image function="on" filename="text_button_on.png"></image>
+              <image function="off" filename="text_button_off.png"></image>
+              <image function="pushed" filename="text_button_pushed.png"></image>
+              <font>buttons</font>
+          </textbutton>
+
+          <textbutton name="addvideo_button" draworder="1">
+              <context>2</context>
+              <position>490,270</position>
+              <image function="on" filename="text_button_on.png"></image>
+              <image function="off" filename="text_button_off.png"></image>
+              <image function="pushed" filename="text_button_pushed.png"></image>
+              <font>buttons</font>
+          </textbutton>
+
           <image name="image" draworder="0">
               <context>2</context>
-              <position>25,310</position>
+              <position>25,330</position>
               <filename>trans-cr-background.png</filename>
               <staticsize>650,240</staticsize>
           </image>
 
           <textarea name="progtitle" draworder="3">
               <context>2</context>
-              <area>40,320,440,30</area>
+              <area>40,340,440,30</area>
               <font>detailtitle</font>
               <value>title goes here</value>
               <multiline>no</multiline>
@@ -271,7 +280,7 @@ MythTV Archive GUI theme
 
           <textarea name="progdatetime" draworder="4" align="right">
               <context>2</context>
-              <area>490,320,165,30</area>
+              <area>490,340,165,30</area>
               <font>detailtitle</font>
               <value>sep 13, 2004 11:00 pm (1h 15m)</value>
               <multiline>no</multiline>
@@ -279,7 +288,7 @@ MythTV Archive GUI theme
 
           <textarea name="progdescription" draworder="5">
               <context>2</context>
-              <area>40,350,610,130</area>
+              <area>40,370,610,130</area>
               <font>detail</font>
               <value>description goes here.</value>
               <multiline>yes</multiline>
@@ -287,7 +296,7 @@ MythTV Archive GUI theme
 
           <textarea name="filesize" draworder="5" align="right">
               <context>2</context>
-              <area>550,485,100,40</area>
+              <area>550,505,100,40</area>
               <font>detail</font>
               <value>x.xx Gb</value>
               <multiline>yes</multiline>
@@ -297,34 +306,34 @@ MythTV Archive GUI theme
               <context>2</context>
               <container fleximage="no">ma_size_background.png</container>
               <fill>ma_size_tick.png</fill>
-              <position>670,355</position>
+              <position>670,375</position>
               <orientation>bottomtotop</orientation>
           </statusbar>
 
           <textarea name="maxsize" draworder="2">
               <context>2</context>
-              <area>710,360,100,30</area>
+              <area>710,380,100,30</area>
               <font>smallstatsfont</font>
               <value>xxxxx mb</value>
           </textarea>
 
           <textarea name="minsize" draworder="3">
               <context>2</context>
-              <area>710,500,100,30</area>
+              <area>710,520,100,30</area>
               <font>smallstatsfont</font>
               <value>0 mb</value>
           </textarea>
 
           <textarea name="currentsize" draworder="4">
               <context>2</context>
-              <area>710,425,100,30</area>
+              <area>710,445,100,30</area>
               <font>smallstatsfont</font>
               <value>xxxxx mb</value>
           </textarea>
 
           <textarea name="currentsize_error" draworder="4">
               <context>2</context>
-              <area>710,425,100,30</area>
+              <area>710,445,100,30</area>
               <font>statserror</font>
               <value>xxxxx mb</value>
           </textarea>

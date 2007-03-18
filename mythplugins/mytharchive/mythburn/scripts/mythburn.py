@@ -31,7 +31,7 @@
 #******************************************************************************
 
 # version of script - change after each update
-VERSION="0.1.20070306-1"
+VERSION="0.1.20070316-1"
 
 
 ##You can use this debug flag when testing out new themes
@@ -106,6 +106,7 @@ alwaysRunMythtranscode = False
 copyremoteFiles = False
 thumboffset = 10
 usebookmark = True
+clearArchiveTable = True
 
 #main menu aspect ratio (4:3 or 16:9)
 mainmenuAspectRatio = "16:9"
@@ -593,6 +594,7 @@ def getDefaultParametersFromMythTVDB():
                         'MythArchiveChapterMenuAR',
                         'MythArchiveDateFormat',
                         'MythArchiveTimeFormat',
+                        'MythArchiveClearArchiveTable',
                         'ISO639Language0',
                         'ISO639Language1'
                         )) order by value"""
@@ -630,6 +632,20 @@ def saveSetting(name, data):
 
     query = "INSERT INTO settings (value, data, hostname) VALUES ('" + name + "', '" + data + "', '" + configHostname + "')"
     cursor.execute(query)
+
+    db.close()
+    del db
+    del cursor
+
+def clearArchiveItems():
+    ''' Remove all archive items from the archiveitems DB table'''
+
+    write("Removing all archive items from the archiveitems DB table")
+
+    db = getDatabaseConnection()
+    cursor = db.cursor()
+
+    cursor.execute("DELETE from archiveitems;")
 
     db.close()
     del db
@@ -3936,6 +3952,8 @@ mainmenuAspectRatio = defaultsettings["MythArchiveMainMenuAR"]
 chaptermenuAspectRatio = defaultsettings["MythArchiveChapterMenuAR"]
 dateformat = defaultsettings.get("MythArchiveDateFormat", "%a %d %b %Y")
 timeformat = defaultsettings.get("MythArchiveTimeFormat", "%I:%M %p")
+if "MythArchiveClearArchiveTable" in defaultsettings:
+    clearArchiveTable = (defaultsettings["MythArchiveClearArchiveTable"] == '1')
 
 # external commands
 path_mplex = [defaultsettings["MythArchiveMplexCmd"], os.path.split(defaultsettings["MythArchiveMplexCmd"])[1]]
@@ -3981,6 +3999,10 @@ try:
             processJob(job)
 
         jobDOM.unlink()
+
+        # clear the archiveitems table
+        if clearArchiveTable == True:
+            clearArchiveItems()
 
         saveSetting("MythArchiveLastRunStatus", "Success")
         saveSetting("MythArchiveLastRunEnd", time.strftime("%Y-%m-%d %H:%M:%S "))

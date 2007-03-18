@@ -49,8 +49,9 @@ class ExportNativeWizard : public MythThemedDialog
     void handleNextPage(void);
     void handlePrevPage(void);
     void handleCancel(void);
+    void handleAddRecording(void);
+    void handleAddVideo(void);
 
-    void setCategory(int);
     void titleChanged(UIListBtnTypeItem *item);
     void toggleUseCutlist(bool state);
     void showMenu(void);
@@ -71,21 +72,16 @@ class ExportNativeWizard : public MythThemedDialog
 
     void keyPressEvent(QKeyEvent *e);
     void updateArchiveList(void);
-    void toggleSelectedState(void);
     void getArchiveList(void);
     void wireUpTheme(void);
     void updateSizeBar(void);
     void loadConfiguration(void);
     void saveConfiguration(void);
-    void updateSelectedArchiveList(void);
-    vector<NativeItem *>  *getArchiveListFromDB(void);
+    void getArchiveListFromDB(void);
     void runScript();
 
     vector<NativeItem *>  *archiveList;
-    QPtrList<NativeItem> selectedList;
-
-    UIListBtnType    *archive_list;
-    UIListBtnType    *selected_list;
+    UIListBtnType         *archive_list;
 
     bool             bCreateISO;
     bool             bDoBurn;
@@ -96,6 +92,9 @@ class ExportNativeWizard : public MythThemedDialog
     UITextButtonType *next_button;
     UITextButtonType *prev_button;
     UITextButtonType *cancel_button;
+
+    UITextButtonType *addrecording_button;
+    UITextButtonType *addvideo_button;
 
     UISelectorType   *destination_selector;
     UITextType       *destination_text;
@@ -113,6 +112,7 @@ class ExportNativeWizard : public MythThemedDialog
     UICheckBoxType   *usecutlist_check;
     UITextType       *nocutlist_text;
     UITextType       *filesize_text;
+    UITextType       *nofiles_text;
 
     UIStatusBarType  *size_bar;
 

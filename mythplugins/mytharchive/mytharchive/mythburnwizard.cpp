@@ -22,6 +22,8 @@
 #include "editmetadata.h"
 #include "fileselector.h"
 #include "thumbfinder.h"
+#include "recordingselector.h"
+#include "videoselector.h"
 
 // last page in wizard
 const int LAST_PAGE = 4;
@@ -161,8 +163,6 @@ void MythburnWizard::keyPressEvent(QKeyEvent *e)
 
             if (getCurrentFocusWidget() == theme_selector)
                 theme_selector->push(false);
-            else if (getCurrentFocusWidget() == category_selector)
-                category_selector->push(false);
             else if (getCurrentFocusWidget() == profile_selector)
                 profile_selector->push(false);
             else if (getCurrentFocusWidget() == destination_selector)
@@ -184,8 +184,6 @@ void MythburnWizard::keyPressEvent(QKeyEvent *e)
 
             if (getCurrentFocusWidget() == theme_selector)
                 theme_selector->push(true);
-            else if (getCurrentFocusWidget() == category_selector)
-                category_selector->push(true);
             else if (getCurrentFocusWidget() == profile_selector)
                 profile_selector->push(true);
             else if (getCurrentFocusWidget() == destination_selector)
@@ -195,9 +193,7 @@ void MythburnWizard::keyPressEvent(QKeyEvent *e)
         }
         else if (action == "SELECT")
         {
-            if (getCurrentFocusWidget() == archive_list)
-                toggleSelectedState();
-            else if (getCurrentFocusWidget() == selected_list)
+            if (getCurrentFocusWidget() == selected_list)
                 toggleReorderState();
             else
                 activateCurrent();
@@ -241,45 +237,6 @@ void MythburnWizard::keyPressEvent(QKeyEvent *e)
             MythThemedDialog::keyPressEvent(e);
 }
 
-void MythburnWizard::toggleSelectedState()
-{
-    UIListBtnTypeItem *item = archive_list->GetItemCurrent();
-    if (item->state() == UIListBtnTypeItem:: FullChecked)
-    {
-        //unselect item
-        if (selectedList.find((ArchiveItem *) item->getData()) != -1)
-            selectedList.remove((ArchiveItem *) item->getData());
-        item->setChecked(UIListBtnTypeItem:: NotChecked);
-    }
-    else
-    {
-        // select item
-        if (selectedList.find((ArchiveItem *) item->getData()) == -1)
-            selectedList.append((ArchiveItem *) item->getData());
-
-        item->setChecked(UIListBtnTypeItem:: FullChecked);
-
-
-        ArchiveItem *a = (ArchiveItem *) item->getData();
-
-        // get duration of this file
-        if (a->duration == 0)
-            getFileDetails(a);
-
-        // get default encoding profile if needed
-        if (a->encoderProfile == NULL)
-        {
-            a->encoderProfile = getDefaultProfile(a);
-            setProfile(a->encoderProfile, a);
-        }
-    }
-
-    archive_list->refresh();
-    updateSizeBar();
-
-    updateSelectedArchiveList();
-}
-
 void MythburnWizard::toggleReorderState()
 {
     UIListBtnTypeItem *item = selected_list->GetItemCurrent();
@@ -297,15 +254,16 @@ void MythburnWizard::toggleReorderState()
     selected_list->refresh();
 }
 
+
 void MythburnWizard::reloadSelectedList()
 {
-    selectedList.clear();
+    archiveList->clear();
 
     for (int x = 0; x < selected_list->GetCount(); x++)
     {
         UIListBtnTypeItem *item = selected_list->GetItemAt(x);
         if (item)
-            selectedList.append((ArchiveItem *) item->getData());
+            archiveList->push_back((ArchiveItem *) item->getData());
     }
 }
 
@@ -332,9 +290,10 @@ void MythburnWizard::updateSizeBar(void)
 
     long long size = 0;
     ArchiveItem *a;
-
-    for (a = selectedList.first(); a; a = selectedList.next())
+    vector<ArchiveItem *>::iterator i = archiveList->begin();
+    for ( ; i != archiveList->end(); i++)
     {
+        a = *i;
         size += a->newsize; 
     }
 
@@ -485,20 +444,13 @@ void MythburnWizard::wireUpTheme()
 
     setDestination(0);
 
-    // recordings selector
-    category_selector = getUISelectorType("category_selector");
-    if (category_selector)
-    {
-        connect(category_selector, SIGNAL(pushed(int)),
-                this, SLOT(setCategory(int)));
-    }
-
     title_text = getUITextType("progtitle");
     datetime_text = getUITextType("progdatetime");
     description_text = getUITextType("progdescription");
     filesize_text = getUITextType("filesize");
     usecutlist_text = getUITextType("usecutlist_text");
     nocutlist_text = getUITextType("nocutlist_text");;
+    nofiles_text = getUITextType("nofiles");
 
     usecutlist_check = getUICheckBoxType("usecutlist_check");
     if (usecutlist_check)
@@ -519,6 +471,30 @@ void MythburnWizard::wireUpTheme()
     {
         connect(archive_list, SIGNAL(itemSelected(UIListBtnTypeItem *)),
                 this, SLOT(titleChanged(UIListBtnTypeItem *)));
+    }
+
+    // add recording button
+    addrecording_button = getUITextButtonType("addrecording_button");
+    if (next_button)
+    {
+        addrecording_button->setText(tr("Add Recording"));
+        connect(addrecording_button, SIGNAL(pushed()), this, SLOT(handleAddRecording()));
+    }
+
+    // add video button
+    addvideo_button = getUITextButtonType("addvideo_button");
+    if (addvideo_button)
+    {
+        addvideo_button->setText(tr("Add Video"));
+        connect(addvideo_button, SIGNAL(pushed()), this, SLOT(handleAddVideo()));
+    }
+
+    // add file button
+    addfile_button = getUITextButtonType("addfile_button");
+    if (addfile_button)
+    {
+        addfile_button->setText(tr("Add File"));
+        connect(addfile_button, SIGNAL(pushed()), this, SLOT(handleAddFile()));
     }
 
     maxsize_text = getUITextType("maxsize");
@@ -762,10 +738,10 @@ void MythburnWizard::selectedChanged(UIListBtnTypeItem *item)
 
 void MythburnWizard::handleNextPage()
 {
-    if (getContext() == 2 && selectedList.count() == 0)
+    if (getContext() == 2 && archiveList->size() == 0)
     {
         MythPopupBox::showOkPopup(gContext->GetMainWindow(), tr("Myth Archive"),
-            tr("You need to select at least one item to archive!"));
+            tr("You need to add at least one item to archive!"));
         return;
     }
 
@@ -938,7 +914,33 @@ void MythburnWizard::updateArchiveList(void)
 {
     archive_list->Reset();
 
-    if (category_selector)
+    if (archiveList->size() == 0)
+    {
+        if (title_text)
+            title_text->SetText("");
+
+        if (datetime_text)
+            datetime_text->SetText("");
+
+        if (description_text)
+            description_text->SetText("");
+
+        if (filesize_text)
+            filesize_text->SetText("");
+
+        if (nofiles_text)
+            nofiles_text->show();
+
+        if (usecutlist_text) 
+            usecutlist_text->hide();
+
+        if (usecutlist_check)
+            usecutlist_check->hide();
+
+        if (nocutlist_text)
+            nocutlist_text->hide();
+    }
+    else
     {
         ArchiveItem *a;
         vector<ArchiveItem *>::iterator i = archiveList->begin();
@@ -946,29 +948,32 @@ void MythburnWizard::updateArchiveList(void)
         {
             a = *i;
 
-            if (a->type == category_selector->getCurrentString() || 
-                category_selector->getCurrentString() == tr("All Archive Items"))
-            {
-                UIListBtnTypeItem* item = new UIListBtnTypeItem(
-                        archive_list, a->title);
-                item->setCheckable(true);
-                if (selectedList.find((ArchiveItem *) a) != -1) 
-                {
-                    item->setChecked(UIListBtnTypeItem::FullChecked);
-                }
-                else 
-                {
-                    item->setChecked(UIListBtnTypeItem::NotChecked);
-                }
+            // get duration of this file
+            if (a->duration == 0)
+                getFileDetails(a);
 
-                item->setData(a);
+            // get default encoding profile if needed
+            if (a->encoderProfile == NULL)
+            {
+                a->encoderProfile = getDefaultProfile(a);
+                setProfile(a->encoderProfile, a);
             }
+
+            UIListBtnTypeItem* item = new UIListBtnTypeItem(archive_list, a->title);
+            item->setCheckable(false);
+            item->setData(a);
         }
+
+        if (nofiles_text)
+            nofiles_text->hide();
+
+        archive_list->SetItemCurrent(archive_list->GetItemFirst());
+        titleChanged(archive_list->GetItemCurrent());
     }
 
-    archive_list->SetItemCurrent(archive_list->GetItemFirst());
-    titleChanged(archive_list->GetItemCurrent());
     archive_list->refresh();
+    updateSizeBar();
+    updateSelectedArchiveList();
 }
 
 bool MythburnWizard::isArchiveItemValid(const QString &type, const QString &filename)
@@ -1042,14 +1047,17 @@ bool MythburnWizard::hasCutList(QString &type, QString &filename)
     return res;
 }
 
-vector<ArchiveItem *> *MythburnWizard::getArchiveListFromDB(void)
+void MythburnWizard::getArchiveListFromDB(void)
 {
-    vector<ArchiveItem*> *archiveList = new vector<ArchiveItem*>;
+    if (!archiveList)
+        archiveList = new vector<ArchiveItem*>;
+
+    archiveList->clear();
 
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("SELECT intid, type, title, subtitle, description, size, "
                   "startdate, starttime, filename, hascutlist "
-                  "FROM archiveitems ORDER BY title, subtitle");
+                  "FROM archiveitems ORDER BY intid");
     query.exec();
     if (query.isActive() && query.numRowsAffected())
     {
@@ -1086,13 +1094,6 @@ vector<ArchiveItem *> *MythburnWizard::getArchiveListFromDB(void)
             }
         }
     }
-    else
-    {
-        VERBOSE(VB_IMPORTANT, "MythburnWizard: Failed to get any archive items");
-        return NULL;
-    }
-
-    return archiveList;
 }
 
 EncoderProfile *MythburnWizard::getDefaultProfile(ArchiveItem *item)
@@ -1143,50 +1144,7 @@ EncoderProfile *MythburnWizard::getDefaultProfile(ArchiveItem *item)
 
 void MythburnWizard::getArchiveList(void)
 {
-    ArchiveItem *a;
-    archiveList = getArchiveListFromDB();
-    QStringList categories;
-
-    if (archiveList && archiveList->size() > 0)
-    {
-        vector<ArchiveItem *>::iterator i = archiveList->begin();
-        for ( ; i != archiveList->end(); i++)
-        {
-            a = *i;
-
-            if (categories.find(a->type) == categories.end())
-                categories.append(a->type);
-        }
-    }
-    else
-    {
-        MythPopupBox::showOkPopup(gContext->GetMainWindow(), tr("Myth Burn"),
-                                  tr("You don't have any items to archive!\n\nClick OK"));
-        QTimer::singleShot(100, this, SLOT(handleCancel()));
-        return;
-    }
-
-    // sort and add categories to selector
-    categories.sort();
-
-    if (category_selector)
-    {
-        category_selector->addItem(0, tr("All Archive Items"));
-        category_selector->setToItem(0);
-    }
-
-    for (uint x = 1; x <= categories.count(); x++)
-    {
-        if (category_selector)
-            category_selector->addItem(x, categories[x-1]); 
-    }
-
-    setCategory(0);
-}
-
-void MythburnWizard::setCategory(int item)
-{
-    (void) item;
+    getArchiveListFromDB();
     updateArchiveList();
 }
 
@@ -1207,8 +1165,11 @@ void MythburnWizard::createConfigFile(const QString &filename)
     // now loop though selected archive items and add them to the xml file
     ArchiveItem *a;
 
-    for (a = selectedList.first(); a; a = selectedList.next())
+    vector<ArchiveItem *>::iterator i = archiveList->begin();
+    for ( ; i != archiveList->end(); i++)
     {
+        a = *i;
+
         QDomElement file = doc.createElement("file");
         file.setAttribute("type", a->type.lower() );
         file.setAttribute("usecutlist", a->useCutlist);
@@ -1303,8 +1264,11 @@ void MythburnWizard::updateSelectedArchiveList(void)
 
     ArchiveItem *a;
 
-    for (a = selectedList.first(); a; a = selectedList.next())
+    vector<ArchiveItem *>::iterator i = archiveList->begin();
+    for ( ; i != archiveList->end(); i++)
     {
+        a = *i;
+
         QString s = a->title;
         if (a->subtitle != "")
             s += " ~ " + a->subtitle;
@@ -1322,7 +1286,7 @@ void MythburnWizard::updateSelectedArchiveList(void)
 
 void MythburnWizard::showMenu()
 {
-    if (popupMenu || getContext() != 2)
+    if (popupMenu || getContext() != 2 || archiveList->size() == 0)
         return;
 
     popupMenu = new MythPopupBox(gContext->GetMainWindow(),
@@ -1547,6 +1511,49 @@ void MythburnWizard::runScript()
     }
 
     done(Accepted);
+}
+
+void MythburnWizard::handleAddRecording()
+{
+    RecordingSelector selector(gContext->GetMainWindow(),
+                               "recording_selector", "mytharchive-", "recording selector");
+    selector.exec();
+
+    getArchiveList();
+}
+
+void MythburnWizard::handleAddVideo()
+{
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare("SELECT title FROM videometadata");
+    query.exec();
+    if (query.isActive() && query.numRowsAffected())
+    {
+    }
+    else
+    {
+        MythPopupBox::showOkPopup(gContext->GetMainWindow(), QObject::tr("Video Selector"),
+                                  QObject::tr("You don't have any videos!"));
+        return;
+    }
+
+    VideoSelector selector(gContext->GetMainWindow(),
+                           "video_selector", "mytharchive-", "video selector");
+    selector.exec();
+
+    getArchiveList();
+}
+
+void MythburnWizard::handleAddFile()
+{
+    QString filter = gContext->GetSetting("MythArchiveFileFilter",
+                                          "*.mpg *.mpeg *.mov *.avi *.nuv");
+
+    FileSelector selector(FSTYPE_FILELIST, "/", filter, gContext->GetMainWindow(),
+                          "file_selector", "mytharchive-", "file selector");
+    selector.exec();
+
+    getArchiveList();
 }
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

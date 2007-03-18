@@ -19,9 +19,11 @@
 #include "exportnativewizard.h"
 #include "fileselector.h"
 #include "archiveutil.h"
+#include "recordingselector.h"
+#include "videoselector.h"
 
 // last page in wizard
-const int LAST_PAGE = 3;
+const int LAST_PAGE = 2;
 
 ExportNativeWizard::ExportNativeWizard(MythMainWindow *parent, QString window_name,
                                QString theme_filename, const char *name)
@@ -40,8 +42,6 @@ ExportNativeWizard::ExportNativeWizard(MythMainWindow *parent, QString window_na
     saveFilename = "";
 
     loadConfiguration();
-
-    updateSizeBar();
 }
 
 ExportNativeWizard::~ExportNativeWizard(void)
@@ -74,11 +74,6 @@ void ExportNativeWizard::keyPressEvent(QKeyEvent *e)
                 archive_list->MoveDown(UIListBtnType::MoveItem);
                 archive_list->refresh();
             }
-            else if (getCurrentFocusWidget() == selected_list)
-            {
-                selected_list->MoveDown(UIListBtnType::MoveItem);
-                selected_list->refresh();
-            }
             else
                 nextPrevWidgetFocus(true);
         }
@@ -88,11 +83,6 @@ void ExportNativeWizard::keyPressEvent(QKeyEvent *e)
             {
                 archive_list->MoveUp(UIListBtnType::MoveItem);
                 archive_list->refresh();
-            }
-            else  if (getCurrentFocusWidget() == selected_list)
-            {
-                selected_list->MoveUp(UIListBtnType::MoveItem);
-                selected_list->refresh();
             }
             else
                 nextPrevWidgetFocus(false);
@@ -115,28 +105,21 @@ void ExportNativeWizard::keyPressEvent(QKeyEvent *e)
         }
         else if (action == "LEFT")
         {
-            if (getCurrentFocusWidget() == category_selector)
-                category_selector->push(false);
-            else if (getCurrentFocusWidget() == destination_selector)
+            if (getCurrentFocusWidget() == destination_selector)
                 destination_selector->push(false);
             else
                 nextPrevWidgetFocus(false);
         }
         else if (action == "RIGHT")
         {
-            if (getCurrentFocusWidget() == category_selector)
-                category_selector->push(true);
-            else if (getCurrentFocusWidget() == destination_selector)
+            if (getCurrentFocusWidget() == destination_selector)
                 destination_selector->push(true);
             else
                 nextPrevWidgetFocus(true);
         }
         else if (action == "SELECT")
         {
-            if (getCurrentFocusWidget() == archive_list)
-                toggleSelectedState();
-            else
-                activateCurrent();
+            activateCurrent();
         }
         else if (action == "MENU")
         {
@@ -150,36 +133,15 @@ void ExportNativeWizard::keyPressEvent(QKeyEvent *e)
             MythThemedDialog::keyPressEvent(e);
 }
 
-void ExportNativeWizard::toggleSelectedState()
-{
-    UIListBtnTypeItem *item = archive_list->GetItemCurrent();
-    if (item->state() == UIListBtnTypeItem:: FullChecked)
-    {
-        if (selectedList.find((NativeItem *) item->getData()) != -1)
-            selectedList.remove((NativeItem *) item->getData());
-        item->setChecked(UIListBtnTypeItem:: NotChecked);
-    }
-    else
-    {
-        if (selectedList.find((NativeItem *) item->getData()) == -1)
-            selectedList.append((NativeItem *) item->getData());
-
-        item->setChecked(UIListBtnTypeItem:: FullChecked);
-    }
-
-    archive_list->refresh();
-    updateSizeBar();
-
-    updateSelectedArchiveList();
-}
-
 void ExportNativeWizard::updateSizeBar()
 {
     long long size = 0;
     NativeItem *a;
 
-    for (a = selectedList.first(); a; a = selectedList.next())
+    vector<NativeItem *>::iterator i = archiveList->begin();
+    for ( ; i != archiveList->end(); i++)
     {
+        a = *i;
         size += a->size; 
     }
 
@@ -324,20 +286,13 @@ void ExportNativeWizard::wireUpTheme()
 
     setDestination(0);
 
-    // recordings selector
-    category_selector = getUISelectorType("category_selector");
-    if (category_selector)
-    {
-        connect(category_selector, SIGNAL(pushed(int)),
-                this, SLOT(setCategory(int)));
-    }
-
     title_text = getUITextType("progtitle");
     datetime_text = getUITextType("progdatetime");
     description_text = getUITextType("progdescription");
     filesize_text = getUITextType("filesize");
+    nofiles_text = getUITextType("nofiles");
 
-    selected_list = getUIListBtnType("selectedlist");
+    size_bar = getUIStatusBarType("size_bar");
 
     archive_list = getUIListBtnType("archivelist");
     if (archive_list)
@@ -347,10 +302,20 @@ void ExportNativeWizard::wireUpTheme()
                 this, SLOT(titleChanged(UIListBtnTypeItem *)));
     }
 
-    size_bar = getUIStatusBarType("size_bar");
-    if (size_bar)
+    // add recording button
+    addrecording_button = getUITextButtonType("addrecording_button");
+    if (next_button)
     {
-        updateSizeBar();
+        addrecording_button->setText(tr("Add Recording"));
+        connect(addrecording_button, SIGNAL(pushed()), this, SLOT(handleAddRecording()));
+    }
+
+    // add video button
+    addvideo_button = getUITextButtonType("addvideo_button");
+    if (addvideo_button)
+    {
+        addvideo_button->setText(tr("Add Video"));
+        connect(addvideo_button, SIGNAL(pushed()), this, SLOT(handleAddVideo()));
     }
 
     buildFocusList();
@@ -385,10 +350,10 @@ void ExportNativeWizard::titleChanged(UIListBtnTypeItem *item)
 
 void ExportNativeWizard::handleNextPage()
 {
-    if (getContext() == 2 && selectedList.count() == 0)
+    if (getContext() ==  LAST_PAGE && archiveList->size() == 0)
     {
         MythPopupBox::showOkPopup(gContext->GetMainWindow(), tr("Myth Archive"),
-            tr("You need to select at least one item to archive!"));
+            tr("You need to add at least one item to archive!"));
         return;
     }
 
@@ -436,7 +401,24 @@ void ExportNativeWizard::updateArchiveList(void)
 {
     archive_list->Reset();
 
-    if (category_selector)
+    if (archiveList->size() == 0)
+    {
+        if (title_text)
+            title_text->SetText("");
+
+        if (datetime_text)
+            datetime_text->SetText("");
+
+        if (description_text)
+            description_text->SetText("");
+
+        if (filesize_text)
+            filesize_text->SetText("");
+
+        if (nofiles_text)
+            nofiles_text->show();
+    }
+    else
     {
         NativeItem *a;
         vector<NativeItem *>::iterator i = archiveList->begin();
@@ -444,34 +426,27 @@ void ExportNativeWizard::updateArchiveList(void)
         {
             a = *i;
 
-            if (a->type == category_selector->getCurrentString() || 
-                category_selector->getCurrentString() == tr("All Archive Items"))
-            {
-                UIListBtnTypeItem* item = new UIListBtnTypeItem(
-                        archive_list, a->title);
-                item->setCheckable(true);
-                if (selectedList.find((NativeItem *) a) != -1) 
-                {
-                    item->setChecked(UIListBtnTypeItem::FullChecked);
-                }
-                else 
-                {
-                    item->setChecked(UIListBtnTypeItem::NotChecked);
-                }
-
-                item->setData(a);
-            }
+            UIListBtnTypeItem* item = new UIListBtnTypeItem(archive_list, a->title);
+            item->setCheckable(false);
+            item->setData(a);
         }
+
+        archive_list->SetItemCurrent(archive_list->GetItemFirst());
+        titleChanged(archive_list->GetItemCurrent());
+        if (nofiles_text)
+            nofiles_text->hide();
     }
 
-    archive_list->SetItemCurrent(archive_list->GetItemFirst());
-    titleChanged(archive_list->GetItemCurrent());
+    updateSizeBar();
     archive_list->refresh();
 }
 
-vector<NativeItem *> *ExportNativeWizard::getArchiveListFromDB(void)
+void ExportNativeWizard::getArchiveListFromDB(void)
 {
-    vector<NativeItem*> *archiveList = new vector<NativeItem*>;
+    if (!archiveList)
+        archiveList = new vector<NativeItem*>;
+
+    archiveList->clear();
 
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("SELECT intid, type, title, subtitle, description, size, "
@@ -501,61 +476,11 @@ vector<NativeItem *> *ExportNativeWizard::getArchiveListFromDB(void)
             archiveList->push_back(item);
         }
     }
-    else
-    {
-        cout << "ExportNativeWizard: Failed to get any archive items" << endl;
-        return NULL;
-    }
-
-    return archiveList;
 }
 
 void ExportNativeWizard::getArchiveList(void)
 {
-    NativeItem *a;
-    archiveList = getArchiveListFromDB();
-    QStringList categories;
-
-    if (archiveList && archiveList->size() > 0)
-    {
-        vector<NativeItem *>::iterator i = archiveList->begin();
-        for ( ; i != archiveList->end(); i++)
-        {
-            a = *i;
-
-            if (categories.find(a->type) == categories.end())
-                categories.append(a->type);
-        }
-    }
-    else
-    {
-        MythPopupBox::showOkPopup(gContext->GetMainWindow(), tr("Myth Burn"),
-                                  tr("You don't have any items to archive!\n\nClick OK"));
-        QTimer::singleShot(100, this, SLOT(handleCancel()));
-        return;
-    }
-
-    // sort and add categories to selector
-    categories.sort();
-
-    if (category_selector)
-    {
-        category_selector->addItem(0, tr("All Archive Items"));
-        category_selector->setToItem(0);
-    }
-
-    for (uint x = 1; x <= categories.count(); x++)
-    {
-        if (category_selector)
-            category_selector->addItem(x, categories[x-1]); 
-    }
-
-    setCategory(0);
-}
-
-void ExportNativeWizard::setCategory(int item)
-{
-    (void) item;
+    getArchiveListFromDB();
     updateArchiveList();
 }
 
@@ -581,23 +506,9 @@ void ExportNativeWizard::saveConfiguration(void)
                           (eraseDvdRw_check->getState() ? "1" : "0"));
 }
 
-void ExportNativeWizard::updateSelectedArchiveList(void)
-{
-    selected_list->Reset();
-
-    NativeItem *a;
-
-    for (a = selectedList.first(); a; a = selectedList.next())
-    {
-        QString s = a->title;
-        UIListBtnTypeItem* item = new UIListBtnTypeItem(selected_list, s);
-        item->setCheckable(true);
-    }
-}
-
 void ExportNativeWizard::showMenu()
 {
-    if (popupMenu || getContext() != 2)
+    if (popupMenu || getContext() != 2 || archiveList->size() == 0)
         return;
 
     popupMenu = new MythPopupBox(gContext->GetMainWindow(),
@@ -659,14 +570,17 @@ void ExportNativeWizard::createConfigFile(const QString &filename)
     job.appendChild(media);
 
     // now loop though selected archive items and add them to the xml file
-    NativeItem *i;
+    NativeItem *a;
 
-    for (i = selectedList.first(); i; i = selectedList.next())
+    vector<NativeItem *>::iterator i = archiveList->begin();
+    for ( ; i != archiveList->end(); i++)
     {
+        a = *i;
+
         QDomElement file = doc.createElement("file");
-        file.setAttribute("type", i->type.lower() );
-        file.setAttribute("title", i->title);
-        file.setAttribute("filename", i->filename);
+        file.setAttribute("type", a->type.lower() );
+        file.setAttribute("title", a->title);
+        file.setAttribute("filename", a->filename);
         file.setAttribute("delete", "0");
         media.appendChild(file);
     }
@@ -843,3 +757,33 @@ void ExportNativeWizard::runScript()
     done(Accepted);
 }
 
+void ExportNativeWizard::handleAddRecording()
+{
+    RecordingSelector selector(gContext->GetMainWindow(),
+                               "recording_selector", "mytharchive-", "recording selector");
+    selector.exec();
+
+    getArchiveList();
+}
+
+void ExportNativeWizard::handleAddVideo()
+{
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare("SELECT title FROM videometadata");
+    query.exec();
+    if (query.isActive() && query.numRowsAffected())
+    {
+    }
+    else
+    {
+        MythPopupBox::showOkPopup(gContext->GetMainWindow(), QObject::tr("Video Selector"),
+                                  QObject::tr("You don't have any videos!"));
+        return;
+    }
+
+    VideoSelector selector(gContext->GetMainWindow(),
+                           "video_selector", "mytharchive-", "video selector");
+    selector.exec();
+
+    getArchiveList();
+}
