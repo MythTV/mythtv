@@ -116,8 +116,7 @@ QString NuppelDecoder::GetEncodingType(void) const
         if (QString(mpa_codec->name) == "mpeg4")
             value = "MPEG-4";
     }
-    else if (usingextradata &&
-             extradata.video_fourcc == MKTAG('D', 'I', 'V', 'X'))
+    else if (usingextradata && extradata.video_fourcc == FOURCC_DIVX)
         value = "MPEG-4";
     else
         value = "RTjpeg";
@@ -544,7 +543,7 @@ int NuppelDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
     setreadahead = false;
 
     // mpeg4 encodes are small enough that this shouldn't matter
-    if (usingextradata && extradata.video_fourcc == MKTAG('D', 'I', 'V', 'X'))
+    if (usingextradata && extradata.video_fourcc == FOURCC_DIVX)
         setreadahead = true;
 
     bitrate = 0;
@@ -610,16 +609,16 @@ bool NuppelDecoder::InitAVCodec(int codec)
     {
         switch(extradata.video_fourcc)
         {
-            case MKTAG('D', 'I', 'V', 'X'): codec = CODEC_ID_MPEG4; break;
-            case MKTAG('W', 'M', 'V', '1'): codec = CODEC_ID_WMV1; break;
-            case MKTAG('D', 'I', 'V', '3'): codec = CODEC_ID_MSMPEG4V3; break;
-            case MKTAG('M', 'P', '4', '2'): codec = CODEC_ID_MSMPEG4V2; break;
-            case MKTAG('M', 'P', 'G', '4'): codec = CODEC_ID_MSMPEG4V1; break;
-            case MKTAG('M', 'J', 'P', 'G'): codec = CODEC_ID_MJPEG; break;
-            case MKTAG('H', '2', '6', '3'): codec = CODEC_ID_H263; break;
-            case MKTAG('I', '2', '6', '3'): codec = CODEC_ID_H263I; break;
-            case MKTAG('M', 'P', 'E', 'G'): codec = CODEC_ID_MPEG1VIDEO; break;
-            case MKTAG('H', 'F', 'Y', 'U'): codec = CODEC_ID_HUFFYUV; break;
+            case FOURCC_DIVX: codec = CODEC_ID_MPEG4;      break;
+            case FOURCC_WMV1: codec = CODEC_ID_WMV1;       break;
+            case FOURCC_DIV3: codec = CODEC_ID_MSMPEG4V3;  break;
+            case FOURCC_MP42: codec = CODEC_ID_MSMPEG4V2;  break;
+            case FOURCC_MPG4: codec = CODEC_ID_MSMPEG4V1;  break;
+            case FOURCC_MJPG: codec = CODEC_ID_MJPEG;      break;
+            case FOURCC_H263: codec = CODEC_ID_H263;       break;
+            case FOURCC_I263: codec = CODEC_ID_H263I;      break;
+            case FOURCC_MPEG: codec = CODEC_ID_MPEG1VIDEO; break;
+            case FOURCC_HFYU: codec = CODEC_ID_HUFFYUV;    break;
             default: codec = -1;
         }
     }
