@@ -24,7 +24,7 @@
 
 static const QString IMAGE_FILENAMES(
 	"*.jpg *.JPG *.jpeg *.JPEG *.png *.PNG "
-	"*.tiff *.TIFF *.bmp *.BMP *.gif *.GIF");
+	"*.tif *.TIF *.tiff *.TIFF *.bmp *.BMP *.gif *.GIF");
 static const QString MOVIE_FILENAMES(
 	"*.avi *.AVI *.mpg *.MPG *.mpeg *.MPEG *.mov *.MOV");
 static const QString MEDIA_FILENAMES =
