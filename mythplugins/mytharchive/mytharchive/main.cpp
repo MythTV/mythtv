@@ -40,6 +40,68 @@ using namespace std;
     #include "importnativewizard.h"
 #endif
 
+// return true if the process belonging to the lock file is still running
+// FIXME not portable
+bool checkProcess(const QString &lockFile)
+{
+    // check that the user is using procfs
+    QDir d("/proc");
+    if (!d.exists("/proc"))
+    {
+        // assume it is still running
+        return true;
+    }
+
+    // read the PID from the lock file
+    QFile file(lockFile);
+    file.open(IO_ReadOnly);
+    QString line;
+
+    file.readLine(line, 100);
+
+    bool bOK = false;
+    int pid = line.toInt(&bOK);
+
+    if (!bOK)
+    {
+        VERBOSE(VB_GENERAL, QString("Got bad PID '%1' from lock file").arg(pid));
+        return true;
+    }
+
+    VERBOSE(VB_GENERAL, QString("Checking if PID %1 is still running").arg(pid));
+
+    if (QFile::exists(QString("/proc/%1/status").arg(pid)))
+        return true;
+
+    return false;
+}
+
+// return true if a lock file is found and the owning process is still running
+bool checkLockFile(const QString &lockFile)
+{
+    QFile file(lockFile);
+
+    //is a job already running?
+    if (file.exists())
+    {
+        // Is the process that created the lock still alive?
+        if (!checkProcess(lockFile))
+        {
+            showWarningDialog(QObject::tr("Found a lock file but the owning process isn't running!\n"
+                                          "Removing stale lock file."));
+            if (!file.remove())
+                VERBOSE(VB_IMPORTANT, QString("Failed to remove stale lock file - %1")
+                        .arg(lockFile));
+        }
+        else
+        {
+            return true;
+        }
+    }
+
+    return false;
+}
+
 void runCreateDVD(void)
 {
 #ifdef CREATE_DVD 
@@ -57,12 +119,9 @@ void runCreateDVD(void)
 
     checkTempDirectory();
 
-    QFile file(logDir + "/mythburn.lck");
-
-    //Are we already building a recording?
-    if ( file.exists() )
+    if (checkLockFile(logDir + "/mythburn.lck"))
     {
-        // Yes so we just show the log viewer
+        // a job is already running so just show the log viewer
         LogViewer dialog(gContext->GetMainWindow(), "logviewer");
         dialog.setFilenames(logDir + "/progress.log", logDir + "/mythburn.log");
         dialog.exec();
@@ -109,12 +168,9 @@ void runCreateArchive(void)
 
     checkTempDirectory();
 
-    QFile file(logDir + "/mythburn.lck");
-
-    //Are we already building a recording?
-    if ( file.exists() )
+    if (checkLockFile(logDir + "/mythburn.lck"))
     {
-        // Yes so we just show the log viewer
+        // a job is already running so just show the log viewer
         LogViewer dialog(gContext->GetMainWindow(), "logviewer");
         dialog.setFilenames(logDir + "/progress.log", logDir + "/mythburn.log");
         dialog.exec();
@@ -163,12 +219,9 @@ void runImportVideo(void)
 
     checkTempDirectory();
 
-    QFile file(logDir + "/mythburn.lck");
-
-    //Are we already building a recording?
-    if ( file.exists() )
+    if (checkLockFile(logDir + "/mythburn.lck"))
     {
-        // Yes so we just show the log viewer
+        // a job is already running so just show the log viewer
         LogViewer dialog(gContext->GetMainWindow(), "logviewer");
         dialog.setFilenames(logDir + "/progress.log", logDir + "/mythburn.log");
         dialog.exec();

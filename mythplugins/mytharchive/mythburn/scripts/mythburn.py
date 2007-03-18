@@ -3973,9 +3973,9 @@ try:
             write("Lock File Exists - already running???")
             sys.exit(1)
 
-        file = open(os.path.join(logpath, "mythburn.lck"), 'w')
-        file.write("lock")
-        file.close()
+        file = os.open(os.path.join(logpath, "mythburn.lck"), os.O_WRONLY | os.O_CREAT | os.O_EXCL)
+        os.write(file, "%d" % os.getpid())
+        os.close(file)
 
         #Load XML input file from disk
         jobDOM = xml.dom.minidom.parse(jobfile)

@@ -54,7 +54,7 @@ NativeArchive::NativeArchive(void)
 {
     // create the lock file so the UI knows we're running
     QString tempDir = getTempDirectory();
-    system("echo Lock > " + tempDir + "/logs/mythburn.lck");
+    system(QString("echo %1 > " + tempDir + "/logs/mythburn.lck").arg(getpid()));
 }
 
 NativeArchive::~NativeArchive(void)
