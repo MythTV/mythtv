@@ -18,10 +18,6 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-/* DEPRECATED -- use V4L2_PIX_FMT_MPEG and then call GO7007IOC_S_MPEG_PARAMS
- * to select between MPEG1, MPEG2, and MPEG4 */
-#define V4L2_PIX_FMT_MPEG4     v4l2_fourcc('M','P','G','4') /* MPEG4         */
-
 /* These will be replaced with a better interface
  * soon, so don't get too attached to them */
 #define	GO7007IOC_S_BITRATE	_IOW('V', BASE_VIDIOC_PRIVATE + 0, int)
