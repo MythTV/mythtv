@@ -1450,10 +1450,19 @@ void MythXML::GetConnectionInfo( HTTPRequest *pRequest )
         return;
     }
 
-    //-=>TODO: Should add check for DBHostName of "localhost" 
-    //         and change to public name or IP
-
     DatabaseParams params = gContext->GetDatabaseParams();
+
+    // Check for DBHostName of "localhost" and change to public name or IP 
+
+    QString sServerIP = gContext->GetSetting( "BackendServerIP", "localhost" );
+    QString sPeerIP   = pRequest->GetPeerAddress();
+
+    if ((params.dbHostName == "localhost") && 
+        (sServerIP         != "localhost") &&
+        (sServerIP         != sPeerIP    ))
+    {
+        params.dbHostName = sServerIP;
+    }
 
     QString     sXml;
     QTextStream os( &sXml, IO_WriteOnly );
