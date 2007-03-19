@@ -76,7 +76,10 @@ void HttpComms::request(QUrl &url, int timeoutms, bool allowGzip)
 
 
 
-void HttpComms::request(QUrl &url, QHttpRequestHeader &header, int timeoutms)
+void HttpComms::request(QUrl               &url, 
+                        QHttpRequestHeader &header, 
+                        int                 timeoutms, 
+                        QIODevice          *pData /* = NULL*/ )
 {
     Q_UINT16 port = 80;
 
@@ -107,7 +110,7 @@ void HttpComms::request(QUrl &url, QHttpRequestHeader &header, int timeoutms)
         header.setValue("Cookie", m_cookie);
     }
     
-    http->request(header);
+    http->request(header, pData);
 }
 
 void HttpComms::stop()
@@ -476,6 +479,119 @@ bool HttpComms::getHttpFile(const QString& filename, QString& url, int timeoutMS
     return res;
 }
 
+/** \fn HttpComms::postHttp(QString&,QHttpRequestHeader,int,int,int,bool,Credentials*,bool)
+ *  \brief Static function for performing an http post request to a url.
+ *
+ *   This is a synchronous function, it will block according to the vars.
+ */
+QString HttpComms::postHttp(QUrl               &url         , 
+                            QHttpRequestHeader *pAddlHdr    , QIODevice *pData,
+                            int                 timeoutMS   , int        maxRetries, 
+                            int                 maxRedirects, bool       allowGzip,
+                            Credentials        *webCred     , bool       isInQtEventThread)
+{
+    int redirectCount = 0;
+    int timeoutCount = 0;
+    QString res = "";
+    HttpComms *httpGrabber = NULL; 
+    QString hostname = "";
+
+    QHttpRequestHeader header( "POST", url.encodedPathAndQuery());
+    QString userAgent = "Mozilla/9.876 (X11; U; Linux 2.2.12-20 i686, en) "
+                        "Gecko/25250101 Netscape/5.432b1";
+
+    header.setValue("Host", url.host());
+    header.setValue("User-Agent", userAgent);
+    
+    if (allowGzip)
+        header.setValue( "Accept-Encoding", "gzip");
+
+    // Merge any Additional Headers passed by caller.
+
+    if (pAddlHdr)
+    {
+        QStringList keys = pAddlHdr->keys();
+
+        for ( QStringList::Iterator it = keys.begin(); it != keys.end(); ++it )
+            header.setValue( *it, pAddlHdr->value( *it ));
+    }
+
+    while (1) 
+    {
+        if (hostname == "")
+            hostname = url.host();  // hold onto original host
+        if (!url.hasHost())        // can occur on redirects to partial paths
+            url.setHost(hostname);
+        
+        VERBOSE(VB_NETWORK, QString("postHttp: grabbing: %1").arg(url.toString()));
+
+        if (httpGrabber != NULL)
+            delete httpGrabber; 
+        
+        httpGrabber = new HttpComms;
+        
+        if (webCred)
+            httpGrabber->setCredentials(*webCred, CRED_WEB);
+            
+        httpGrabber->request(url, header, timeoutMS, pData );            
+
+        while (!httpGrabber->isDone())
+        {
+            if (isInQtEventThread)
+                qApp->processEvents();
+            usleep(10000);
+        }
+
+        // Handle timeout
+        if (httpGrabber->isTimedout())
+        {
+            VERBOSE(VB_NETWORK, QString("timeout for url: %1").arg(url.toString()));
+           
+            // Increment the counter and check were not over the limit
+            if (timeoutCount++ >= maxRetries)
+            {
+                VERBOSE(VB_IMPORTANT, QString("Failed to contact server for url: %1").arg(url.toString()));
+                break;
+            }
+
+            // Try again
+            VERBOSE(VB_NETWORK, QString("Attempt # %1/%2 for url: %3")
+                                        .arg(timeoutCount + 1)
+                                        .arg(maxRetries)
+                                        .arg(url.toString()));
+
+            continue;
+        }
+
+        // Check for redirection
+        if (!httpGrabber->getRedirectedURL().isEmpty()) 
+        {
+            VERBOSE(VB_NETWORK, QString("Redirection: %1, count: %2, max: %3")
+                                .arg(httpGrabber->getRedirectedURL().latin1())
+                                .arg(redirectCount)
+                                .arg(maxRedirects));
+            if (redirectCount++ < maxRedirects)
+                url = QUrl( httpGrabber->getRedirectedURL() );
+
+            // Try again
+            timeoutCount = 0;
+            continue;
+        }
+
+        res = httpGrabber->getData();
+        break;
+    }
+
+    delete httpGrabber;
+
+    
+    VERBOSE(VB_NETWORK, QString("Got %1 bytes from url: '%2'")
+                                .arg(res.length())
+                                .arg(url.toString()));
+    VERBOSE(VB_NETWORK, res);
+
+    return res;
+}
 
 
 bool HttpComms::createDigestAuth ( bool isForProxy, const QString& authStr, QHttpRequestHeader* request)
