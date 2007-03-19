@@ -1,4 +1,4 @@
-//////////////////////////////////////////////////////////////////////////////
+g//////////////////////////////////////////////////////////////////////////////
 // Program Name: httpstatus.cpp
 //                                                                            
 // Purpose - Html & XML status HttpServerExtension
@@ -71,7 +71,7 @@ HttpStatusMethod HttpStatus::GetMethod( const QString &sURI )
 //
 /////////////////////////////////////////////////////////////////////////////
 
-bool HttpStatus::ProcessRequest( HttpWorkerThread *pThread, HTTPRequest *pRequest )
+bool HttpStatus::ProcessRequest( HttpWorkerThread * /* pThread */, HTTPRequest *pRequest )
 {
     try
     {
