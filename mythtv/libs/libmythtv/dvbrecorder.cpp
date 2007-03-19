@@ -70,9 +70,11 @@ using namespace std;
 #include "dvbrecorder.h"
 
 // AVLib/FFMPEG includes
+extern "C" {
 #include "../libavcodec/avcodec.h"
 #include "../libavformat/avformat.h"
 #include "../libavformat/mpegts.h"
+}
 
 const int DVBRecorder::TSPACKETS_BETWEEN_PSIP_SYNC = 2000;
 const int DVBRecorder::POLL_INTERVAL        =  50; // msec
