@@ -2643,9 +2643,16 @@ Recordings" lists and a failure to locate the Video Sources defined on the
 master backend.  Modify the <tt>/usr/local/share/mythtv/mysql.txt</tt> file
 on all slave backends to ensure that the <tt>DBHostName</tt> has the address
 of the MySQL server.
+
+Caveat:  You may make a slave backend the primary MySQL server, or run a
+non-MythTV database on a slave backend as long as you have edited the
+<tt>mysql.txt</tt> file on <bf>all</bf> systems and made it consistent. 
+There can be only one authoritative MySQL database in a MythTV system -
+errors such as the one above ensue if backends and frontends have differing
+ideas of which MySQL database they should talk to.
 </caption>
 </figure>
- 
+
 Make sure that the IP addresses on the General setup screen are accurate. 
 If the slave backend can't communicate with the master backend due to IP
 address misconfiguration then MythTV will not function properly.
@@ -7535,7 +7542,7 @@ v0.20.15, 2007-01-27.  v4l might have the audio out muted.  Storage Groups is on
 v0.20.16, 2007-02-16.  Hauppuage is putting the HVR-1600 inside PVR-150
 boxes.  Not supported by ivtv driver at this time.
 v0.20.17, 2007-03-08.  Update on capture resolution from warren at icruise dot com.
-v0.20.18, 2007-03-17.  Typo.
+v0.20.18, 2007-03-17.  Typo.  Updated information on running MySQL on slave backends.
 -->
 
 <!--
