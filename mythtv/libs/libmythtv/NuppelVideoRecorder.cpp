@@ -1241,16 +1241,16 @@ void NuppelVideoRecorder::DoV4L2(void)
     vfmt.fmt.pix.field = V4L2_FIELD_INTERLACED;
 
     if (go7007)
-        vfmt.fmt.pix.pixelformat = FOURCC_MPEG;
+        vfmt.fmt.pix.pixelformat = V4L2_PIX_FMT_MPEG;
     else if (inpixfmt == FMT_YUV422P)
-        vfmt.fmt.pix.pixelformat = FOURCC_422P;
+        vfmt.fmt.pix.pixelformat = V4L2_PIX_FMT_YUV422P;
     else
-        vfmt.fmt.pix.pixelformat = FOURCC_YU12;
+        vfmt.fmt.pix.pixelformat = V4L2_PIX_FMT_YUV420;
 
     if (ioctl(fd, VIDIOC_S_FMT, &vfmt) < 0)
     {
         // this is supported by the cx88 and various ati cards.
-        vfmt.fmt.pix.pixelformat = FOURCC_YUYV;
+        vfmt.fmt.pix.pixelformat = V4L2_PIX_FMT_YUYV;
 
         if (ioctl(fd, VIDIOC_S_FMT, &vfmt) < 0)
         {
@@ -1472,7 +1472,7 @@ again:
 
         if (!request_pause)
         {
-            if (vfmt.fmt.pix.pixelformat == FOURCC_YUYV)
+            if (vfmt.fmt.pix.pixelformat == V4L2_PIX_FMT_YUYV)
             {
                 // Convert YUYV to YUV420P
                 unsigned conversion_buffer_size = h * w * 3 / 2;

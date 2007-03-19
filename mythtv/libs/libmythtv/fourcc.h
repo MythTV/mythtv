@@ -34,6 +34,10 @@ static inline char * fourcc_str(int i)
 
 /******************************************************************************
  * Bitmap formats:
+ *
+ * Note: V4L2 also defines several of these FourCCs in videodev2.h
+ *            (e.g. V4L2_PIX_FMT_YUV420, V4L2_PIX_FMT_MPEG).
+ *       Use those only where data is being read from a tuner card
  *****************************************************************************/
 /* See http://www.fourcc.org/yuv.php for more info on formats */
 
