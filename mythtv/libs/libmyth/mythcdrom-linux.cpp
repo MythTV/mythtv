@@ -11,7 +11,7 @@
 MediaError MythCDROMLinux::eject(bool open_close)
 {
     if (!isDeviceOpen())
-        openDevice()
+        openDevice();
 
     if (open_close)
         return (ioctl(m_DeviceHandle, CDROMEJECT) == 0) ? MEDIAERR_OK
