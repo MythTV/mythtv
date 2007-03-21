@@ -903,6 +903,16 @@ void PlaybackBoxMusic::showEditMetadataDialog()
                bool errorFlag;
                node->setString(all_music->getLabel(editMeta->ID(), &errorFlag));
                music_tree_list->refresh();
+
+               *curMeta = editMeta;
+               if (title_text)
+                   title_text->SetText(curMeta->FormatTitle());
+               if (artist_text)
+                   artist_text->SetText(curMeta->FormatArtist());
+               if (album_text)
+                   album_text->SetText(curMeta->Album());
+
+               setTrackOnLCD(curMeta);
            }
         }
     }
