@@ -52,7 +52,8 @@ ClassicCommDetector::ClassicCommDetector(enum SkipTypes commDetectMethod_in,
         recordingStartedAt(recordingStartedAt_in),
         recordingStopsAt(recordingStopsAt_in),
         framesProcessed(0),preRoll(0),postRoll(0),
-        logoDetector(0)
+        logoDetector(0),
+        sceneChangeDetector(0)
 {
 
     stillRecording = recordingStopsAt > QDateTime::currentDateTime();
