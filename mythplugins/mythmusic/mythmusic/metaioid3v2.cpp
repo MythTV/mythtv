@@ -12,7 +12,6 @@ using namespace std;
 
 #include "metaio_libid3hack.h"
 
-
 #include <mythtv/mythcontext.h>
 
 //==========================================================================
@@ -241,6 +240,9 @@ Metadata* MetaIOID3v2::read(QString filename)
             free(p_utf8);
         }
 
+        // If the ID3v2 tag contains the length, then use it
+        length = getComment(tag, "TLEN").toInt();
+
         id3_file_close(p_input);
     }
 
@@ -250,7 +252,8 @@ Metadata* MetaIOID3v2::read(QString filename)
         readFromFilename(filename, artist, album, title, genre, tracknum);
     }
 
-    length = getTrackLength(filename);
+    if (length <= 0)
+        length = getTrackLength(filename);
 
     // If we don't have title and artist or don't have the length return NULL
     if ((title.isEmpty() && artist.isEmpty()) || length<=0)
@@ -262,7 +265,7 @@ Metadata* MetaIOID3v2::read(QString filename)
 
     Metadata *retdata = new Metadata(filename, artist, compilation_artist, album,
                                      title, genre, year, tracknum, length);
-                                     
+
     retdata->setCompilation(compilation);
 
     return retdata;
@@ -280,6 +283,7 @@ int MetaIOID3v2::getTrackLength(QString filename)
 {
     struct mad_stream stream;
     struct mad_header header;
+    struct mad_frame frame;
     mad_timer_t timer;
 
     unsigned char buffer[8192];
@@ -287,7 +291,8 @@ int MetaIOID3v2::getTrackLength(QString filename)
 
     mad_stream_init(&stream);
     mad_header_init(&header);
-   
+    mad_frame_init(&frame);
+
     timer = mad_timer_zero;
 
     FILE *input = fopen(filename.local8Bit(), "r");
@@ -340,6 +345,40 @@ int MetaIOID3v2::getTrackLength(QString filename)
             }
             else
             {
+
+                if (amount_checked == 0)
+                {
+                    frame.header = header;
+                    if (mad_frame_decode(&frame, &stream) == -1)
+                    {
+                            if (!MAD_RECOVERABLE(stream.error))
+                            {
+                                    VERBOSE(VB_IMPORTANT, "Unrecoverable "
+                                        "libmad stream error.");
+                                    break;
+                            }
+                    }
+
+                    xing xing;
+                    xing.frames = 0;
+                    xing.bytes = 0;
+
+                    // If we find a xing header we can save time
+                    // by multiplying the frame count by the
+                    // duration of the first frame
+                    if (findXingHeader(&xing, stream.anc_ptr,
+                        stream.anc_bitlen))
+                    {
+                        unsigned long frames = xing.frames;
+                        mad_timer_t duration = header.duration;
+                        mad_timer_multiply(&duration, frames);
+                        alt_length = mad_timer_count(duration,
+                                            MAD_UNITS_MILLISECONDS);
+                        loop_de_doo = false;
+                        break;
+                    }
+                }
+
                 if(amount_checked == 0)
                 {
                     old_bitrate = header.bitrate;
@@ -357,9 +396,9 @@ int MetaIOID3v2::getTrackLength(QString filename)
                 amount_checked++;
                 mad_timer_add(&timer, header.duration);
             }
-            
+
         }
-        
+
         if (stream.error != MAD_ERROR_BUFLEN)
             break;
 
@@ -369,6 +408,7 @@ int MetaIOID3v2::getTrackLength(QString filename)
 
     mad_header_finish(&header);
     mad_stream_finish(&stream);
+    mad_frame_finish(&frame);
 
     fclose(input);
 
@@ -378,6 +418,60 @@ int MetaIOID3v2::getTrackLength(QString filename)
     return alt_length;
 }
 
+bool MetaIOID3v2::findXingHeader(xing *xing, struct mad_bitptr ptr,
+unsigned int bitlen)
+{
+    if (bitlen < 64 || mad_bit_read(&ptr, 32) != XING_MAGIC)
+        goto fail;
+
+    xing->flags = mad_bit_read(&ptr, 32);
+    bitlen -= 64;
+
+    if (xing->flags & XING_FRAMES) {
+        if (bitlen < 32)
+            goto fail;
+
+        xing->frames = mad_bit_read(&ptr, 32);
+        bitlen -= 32;
+    }
+
+    if (xing->flags & XING_BYTES) {
+        if (bitlen < 32)
+            goto fail;
+
+        xing->bytes = mad_bit_read(&ptr, 32);
+        bitlen -= 32;
+    }
+
+    if (xing->flags & XING_TOC) {
+        int i;
+
+        if (bitlen < 800)
+            goto fail;
+
+        for (i = 0; i < 100; ++i)
+            xing->toc[i] = mad_bit_read(&ptr, 8);
+
+        bitlen -= 800;
+    }
+
+    if (xing->flags & XING_SCALE) {
+        if (bitlen < 32)
+            goto fail;
+
+        xing->scale = mad_bit_read(&ptr, 32);
+        bitlen -= 32;
+    }
+
+    return true;
+
+ fail:
+    xing->flags = 0;
+    xing->frames = 0;
+    xing->bytes = 0;
+    xing->scale = 0;
+    return false;
+}
 
 inline QString MetaIOID3v2::getRawID3String(union id3_field *pField)
 {
