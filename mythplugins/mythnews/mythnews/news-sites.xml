@@ -6,7 +6,7 @@
 
     <item> 
         <title>BBC News - Entertainment</title> 
-<url>http://newsrss.bbc.co.uk/rss/newsonline_world_edition/entertainment/rss.xml</url> 
+        <url>http://newsrss.bbc.co.uk/rss/newsonline_world_edition/entertainment/rss.xml</url> 
     </item> 
 
     <item> 
@@ -25,7 +25,7 @@
         <title>Reuters Entertainment</title> 
         <url>http://feeds.reuters.com/reuters/Entertainment/</url> 
         <ico>http://www.reuters.com/favicon.ico</ico> 
-    </item>        
+    </item>
 
     <item> 
         <title>Scotsman.com Entertainment News</title> 
@@ -80,7 +80,7 @@
 
     <item> 
         <title>Arstechnica</title> 
-        <url>http://feeds.feedburner.com/arstechnica/BAaf</url> 
+        <url>http://arstechnica.com/index.ars/rss</url> 
         <ico>http://arstechnica.com/favicon.ico</ico> 
     </item> 
 
@@ -88,7 +88,7 @@
         <title>BBC News - Technology</title> 
         <url>http://newsrss.bbc.co.uk/rss/newsonline_world_edition/technology/rss.xml</url> 
     </item> 
-    
+
     <item> 
         <title>Daemon News</title> 
         <url>http://www.daemonnews.org/rss.php</url> 
@@ -133,6 +133,12 @@
         <url>http://www.freshports.org/backend/rss2.0.php</url> 
         <ico>http://www.freshports.org/favicon.ico</ico> 
     </item> 
+
+    <item>
+        <title>Gizmodo - The Gadget Guide</title>
+        <url>http://gizmodo.com/index.xml</url>
+        <ico>http://cache.gizmodo.com/assets/base/img/site/www.gizmodo.com/favicon.ico</ico>
+    </item>
 
     <item> 
         <title>GNOME News</title> 
@@ -190,6 +196,18 @@
         <url>http://www.linuxsecurity.com/static-content/linuxsecurity_articles.rss</url> 
     </item> 
 
+    <item>
+        <title>Microsoft TechNet Security Bulletin Feed</title>
+        <url>http://www.microsoft.com/technet/security/bulletin/secrss.aspx</url>
+        <ico>http://www.microsoft.com/favicon.ico</ico>
+    </item>
+
+    <item>
+        <title>Microsoft Security Advisories</title>
+        <url>http://www.microsoft.com/technet/security/advisory/RssFeed.aspx?securityadvisory</url>
+        <ico>http://www.microsoft.com/favicon.ico</ico>
+    </item>
+
     <item> 
         <title>Mozilla</title> 
         <url>http://www.mozilla.org/news.rdf</url> 
@@ -230,6 +248,11 @@
         <ico>http://www.rootprompt.org/favicon.ico</ico> 
     </item> 
 
+    <item>
+        <title>SANS Internet Storm Center</title>
+        <url>http://isc.sans.org/rssfeed.xml</url>
+    </item>
+
     <item> 
         <title>SecurityFocus News</title> 
         <url>http://www.securityfocus.com/rss/news.xml</url> 
@@ -241,30 +264,34 @@
         <url>http://www.securityfocus.com/rss/vulnerabilities.xml</url> 
         <ico>http://www.securityfocus.com/favicon.ico</ico> 
     </item> 
-    
+
     <item> 
         <title>Slashdot</title> 
         <url>http://rss.slashdot.org/Slashdot/slashdot</url> 
         <ico>http://slashdot.org/favicon.ico</ico> 
     </item> 
 
-
     <item> 
         <title>use Perl</title> 
         <url>http://use.perl.org/useperl.rdf</url> 
-    </item> 
-  
+    </item>
+
+    <item>
+        <title>US-CERT Technical Cyber Security Alerts</title>
+        <url>http://www.us-cert.gov/channels/techalerts.rdf</url>
+    </item>
+
 </category> 
 
 <category name="Electronic Frontier Foundation">
- 
+
     <item>
         <title>EFF Action Alerts</title>
         <url>http://www.eff.org/rss/action.xml</url>
         <ico>http://www.eff.org/favicon.ico</ico>
     </item>
 
-   <item>
+    <item>
         <title>EFF Breaking News</title>
         <url>http://www.eff.org/news/index.xml</url>
         <ico>http://www.eff.org/favicon.ico</ico>
@@ -275,19 +302,158 @@
         <url>http://www.eff.org/deeplinks/index.xml</url>
         <ico>http://www.eff.org/favicon.ico</ico>
     </item>
-        
+
     <item>
         <title>EFF MiniLinks</title>
         <url>http://www.eff.org/minilinks/index.xml</url>
         <ico>http://www.eff.org/favicon.ico</ico>
     </item>
-    
+
     <item>
         <title>EFF Weekly Events Calendar</title>
         <url>http://www.eff.org/calendar/rss/rss.php</url>
         <ico>http://www.eff.org/favicon.ico</ico>
-    </item>    
-    
+    </item>
+
+</category>
+
+<category name="Entertainment, Gossip, and Movies">
+
+    <item>
+        <title>E! News - Headlines</title>
+        <url>http://www.eonline.com/syndication/feeds/rssfeeds/topstories.xml</url>
+        <ico>http://www.eonline.com/images/feeds_logo.gif</ico>
+    </item>
+
+    <item>
+        <title>E! Gossip - The Awful Truth</title>
+        <url>http://www.eonline.com/syndication/feeds/rssfeeds/awful.xml</url>
+        <ico>http://www.eonline.com/images/feeds_logo.gif</ico>
+    </item>
+
+    <item>
+        <title>E! Gossip - Watch with Kristin</title>
+        <url>http://www.eonline.com/syndication/feeds/rssfeeds/kristin.xml</url>
+        <ico>http://www.eonline.com/images/feeds_logo.gif</ico>
+    </item>
+
+    <item>
+        <title>E! Gossip - Party Girl</title>
+        <url>http://www.eonline.com/syndication/feeds/rssfeeds/partygirl.xml</url>
+        <ico>http://www.eonline.com/images/feeds_logo.gif</ico>
+    </item>
+
+    <item>
+        <title>E! Gossip - Answer Bitch</title>
+        <url>http://www.eonline.com/syndication/feeds/rssfeeds/answer.xml</url>
+        <ico>http://www.eonline.com/images/feeds_logo.gif</ico>
+    </item>
+
+    <item>
+        <title>E! Gossip - The Hum</title>
+        <url>http://www.eonline.com/syndication/feeds/rssfeeds/hum.xml</url>
+        <ico>http://www.eonline.com/images/feeds_logo.gif</ico>
+    </item>
+
+    <item>
+        <title>E! Gossip - Planet Gossip</title>
+        <url>http://www.eonline.com/syndication/feeds/rssfeeds/planet.xml</url>
+        <ico>http://www.eonline.com/images/feeds_logo.gif</ico>
+    </item>
+
+    <item>
+        <title>E! Movies - Reel Girl</title>
+        <url>http://www.eonline.com/syndication/feeds/rssfeeds/reelgirl.xml</url>
+        <ico>http://www.eonline.com/images/feeds_logo.gif</ico>
+    </item>
+
+    <item>
+        <title>E! Movies - Lyons Den</title>
+        <url>http://www.eonline.com/syndication/feeds/rssfeeds/lyonsden.xml</url>
+        <ico>http://www.eonline.com/images/feeds_logo.gif</ico>
+    </item>
+
+    <item>
+        <title>E! Movies - Movie Reviews</title>
+        <url>http://www.eonline.com/syndication/feeds/rssfeeds/movies.xml</url>
+        <ico>http://www.eonline.com/images/feeds_logo.gif</ico>
+    </item>
+
+    <item>
+        <title>IMDb - News</title>
+        <url>http://rss.imdb.com/news/</url>
+        <ico>http://i.imdb.com/logo.gif</ico>
+    </item>
+
+    <item>
+        <title>Roger Ebert - Headlines and Reviews</title>
+        <url>http://rogerebert.suntimes.com/apps/pbcs.dll/section?category=RSS&amp;mime=xml</url>
+    </item>
+
+    <item>
+        <title>Rotton Tomatoes - Top Movie News</title>
+        <url>http://i.rottentomatoes.com/syndication/rss/top_news.xml</url>
+    </item>
+
+    <item>
+        <title>Rotton Tomatoes - Complete Listing of Movies</title>
+        <url>http://i.rottentomatoes.com/syndication/rss/complete_movies.xml</url>
+    </item>
+
+    <item>
+        <title>Rotton Tomatoes - In Theaters</title>
+        <url>http://i.rottentomatoes.com/syndication/rss/in_theaters.xml</url>
+    </item>
+
+    <item>
+        <title>Rotton Tomatoes - Top Movies</title>
+        <url>http://i.rottentomatoes.com/syndication/rss/top_movies.xml</url>
+    </item>
+
+    <item>
+        <title>Rotton Tomatoes - Opening Movies</title>
+        <url>http://i.rottentomatoes.com/syndication/rss/opening.xml</url>
+    </item>
+
+    <item>
+        <title>Rotton Tomatoes - Upcoming Movies</title>
+        <url>http://i.rottentomatoes.com/syndication/rss/upcoming.xml</url>
+    </item>
+
+    <item>
+        <title>Rotton Tomatoes - Certified Fresh Top Movie Pick</title>
+        <url>http://i.rottentomatoes.com/syndication/rss/movie_certified_fresh.xml</url>
+    </item>
+
+    <item>
+        <title>Rotton Tomatoes - Certified Fresh in Theaters</title>
+        <url>http://i.rottentomatoes.com/syndication/rss/in_theaters_certified_fresh.xml</url>
+    </item>
+
+    <item>
+        <title>Rotton Tomatoes - Complete Listing of DVD/Videos</title>
+        <url>http://i.rottentomatoes.com/syndication/rss/complete_dvds.xml</url>
+    </item>
+
+    <item>
+        <title>Rotton Tomatoes - Top DVDs</title>
+        <url>http://i.rottentomatoes.com/syndication/rss/top_dvds.xml</url>
+    </item>
+
+    <item>
+        <title>Rotton Tomatoes - New DVD Releases</title>
+        <url>http://i.rottentomatoes.com/syndication/rss/new_releases.xml</url>
+    </item>
+
+    <item>
+        <title>Rotton Tomatoes - Certified Fresh Top DVD/Video Pick</title>
+        <url>http://i.rottentomatoes.com/syndication/rss/video_certified_fresh.xml</url>
+    </item>
+
+    <item>
+        <title>Rotton Tomatoes - Certified Fresh on DVD/Video</title>
+        <url>http://i.rottentomatoes.com/syndication/rss/complete_certified_fresh_dvds.xml</url>
+    </item>
 </category>
 
 <category name="G4TV">
@@ -510,6 +676,12 @@
     <item>
         <title>Make</title>
         <url>http://makezine.com/blog/index.rss</url>
+    </item>
+
+    <item>
+        <title>TIME - Top Stories</title>
+        <url>http://rss.time.com/web/time/rss/top/index.xml</url>
+	<ico>http://www.time.com/favicon.ico</ico>
     </item>
 
 </category>
@@ -1556,6 +1728,7 @@
     <item>
         <title>ESPN Headlines</title>
         <url>http://sports.espn.go.com/espn/rss/news</url>
+	<ico>http://espn.go.com/favicon.ico</ico>
     </item>
 
     <item>
@@ -1632,10 +1805,384 @@
     </item> 
 
     <item>
+        <title>YouTube Most Viewed - Today</title>
+        <url>http://youtube.com/rss/global/top_viewed_today.rss</url>
+        <ico>http://youtube.com/favicon.ico</ico>
+    </item>
+
+    <item>
+        <title>YouTube Most Viewed - This Week</title>
+        <url>http://youtube.com/rss/global/top_viewed_week.rss</url>
+        <ico>http://youtube.com/favicon.ico</ico>
+    </item>
+
+    <item>
+        <title>YouTube Most Viewed - This Month</title>
+        <url>http://youtube.com/rss/global/top_viewed_month.rss</url>
+        <ico>http://youtube.com/favicon.ico</ico>
+    </item>
+
+    <item>
+        <title>YouTube Most Viewed - All Time</title>
+        <url>http://youtube.com/rss/global/top_viewed.rss</url>
+        <ico>http://youtube.com/favicon.ico</ico>
+    </item>
+    
+    <item>
         <title>YouTube MythTV Channel</title>
         <url>http://www.youtube.com/rss/tag/mythtv.rss</url>
         <ico>http://youtube.com/favicon.ico</ico>
     </item> 
+
+</category>
+
+<category name="Weather (US)">
+
+    <item>
+        <title>NOAA - Hurricane Advisories for the Atlantic</title>
+        <url>http://www.nhc.noaa.gov/index-at.xml</url>
+        <ico>http://www.weather.gov/favicon.ico</ico>
+    </item>
+
+    <item>
+        <title>NOAA - Hurricane Advisories for the Eastern Pacific</title>
+        <url>http://www.nhc.noaa.gov/index-ep.xml</url>
+        <ico>http://www.weather.gov/favicon.ico</ico>
+    </item>
+
+    <item>
+        <title>NOAA - Hurricane Advisories for the Central Pacific</title>
+        <url>http://www.prh.noaa.gov/cphc/index-cp.xml</url>
+        <ico>http://www.weather.gov/favicon.ico</ico>
+    </item>
+
+    <item>
+        <title>NOAA - Tsunami Warning System for West Coast/Alaska</title>
+        <url>http://wcatwc.arh.noaa.gov/rss/tsunamirss.xml</url>
+        <ico>http://www.weather.gov/favicon.ico</ico>
+    </item>
+
+    <item>
+        <title>NOAA - Current Observed Weather across US Airports</title>
+        <url>http://www.weather.gov/data/current_obs/index.xml</url>
+        <ico>http://www.weather.gov/favicon.ico</ico>
+    </item>
+
+    <item>
+        <title>ALL STATES - NOAA Watches, Warnings, and Advisories</title>
+        <url>http://www.weather.gov/alerts/us.rss</url>
+        <ico>http://www.weather.gov/favicon.ico</ico>
+    </item>
+
+    <item>
+        <title>Alabama - NOAA Watches, Warnings, and Advisories</title>
+        <url>http://www.weather.gov/alerts/al.rss</url>
+        <ico>http://www.weather.gov/favicon.ico</ico>
+    </item>
+
+    <item>
+        <title>Alaska - NOAA Watches, Warnings, and Advisories</title>
+        <url>http://www.weather.gov/alerts/ak.rss</url>
+        <ico>http://www.weather.gov/favicon.ico</ico>
+    </item>
+
+    <item>
+        <title>Arizona - NOAA Watches, Warnings, and Advisories</title>
+        <url>http://www.weather.gov/alerts/az.rss</url>
+        <ico>http://www.weather.gov/favicon.ico</ico>
+    </item>
+
+    <item>
+        <title>Arkansas - NOAA Watches, Warnings, and Advisories</title>
+        <url>http://www.weather.gov/alerts/ar.rss</url>
+        <ico>http://www.weather.gov/favicon.ico</ico>
+    </item>
+
+    <item>
+        <title>California - NOAA Watches, Warnings, and Advisories</title>
+        <url>http://www.weather.gov/alerts/ca.rss</url>
+        <ico>http://www.weather.gov/favicon.ico</ico>
+    </item>
+
+    <item>
+        <title>Colorado - NOAA Watches, Warnings, and Advisories</title>
+        <url>http://www.weather.gov/alerts/co.rss</url>
+        <ico>http://www.weather.gov/favicon.ico</ico>
+    </item>
+
+    <item>
+        <title>Connecticut - NOAA Watches, Warnings, and Advisories</title>
+        <url>http://www.weather.gov/alerts/ct.rss</url>
+        <ico>http://www.weather.gov/favicon.ico</ico>
+    </item>
+
+    <item>
+        <title>Delaware - NOAA Watches, Warnings, and Advisories</title>
+        <url>http://www.weather.gov/alerts/de.rss</url>
+        <ico>http://www.weather.gov/favicon.ico</ico>
+    </item>
+
+    <item>
+        <title>District of Columbia - NOAA Watches, Warnings, and Advisories</title>
+        <url>http://www.weather.gov/alerts/dc.rss</url>
+        <ico>http://www.weather.gov/favicon.ico</ico>
+    </item>
+
+    <item>
+        <title>Florida - NOAA Watches, Warnings, and Advisories</title>
+        <url>http://www.weather.gov/alerts/fl.rss</url>
+        <ico>http://www.weather.gov/favicon.ico</ico>
+    </item>
+
+    <item>
+        <title>Georgia - NOAA Watches, Warnings, and Advisories</title>
+        <url>http://www.weather.gov/alerts/ga.rss</url>
+        <ico>http://www.weather.gov/favicon.ico</ico>
+    </item>
+
+    <item>
+        <title>Hawaii - NOAA Watches, Warnings, and Advisories</title>
+        <url>http://www.weather.gov/alerts/hi.rss</url>
+        <ico>http://www.weather.gov/favicon.ico</ico>
+    </item>
+
+    <item>
+        <title>Idaho - NOAA Watches, Warnings, and Advisories</title>
+        <url>http://www.weather.gov/alerts/id.rss</url>
+        <ico>http://www.weather.gov/favicon.ico</ico>
+    </item>
+
+    <item>
+        <title>Illinois - NOAA Watches, Warnings, and Advisories</title>
+        <url>http://www.weather.gov/alerts/il.rss</url>
+        <ico>http://www.weather.gov/favicon.ico</ico>
+    </item>
+
+    <item>
+        <title>Indiana - NOAA Watches, Warnings, and Advisories</title>
+        <url>http://www.weather.gov/alerts/in.rss</url>
+        <ico>http://www.weather.gov/favicon.ico</ico>
+    </item>
+
+    <item>
+        <title>Iowa - NOAA Watches, Warnings, and Advisories</title>
+        <url>http://www.weather.gov/alerts/ia.rss</url>
+        <ico>http://www.weather.gov/favicon.ico</ico>
+    </item>
+
+    <item>
+        <title>Kansas - NOAA Watches, Warnings, and Advisories</title>
+        <url>http://www.weather.gov/alerts/ks.rss</url>
+        <ico>http://www.weather.gov/favicon.ico</ico>
+    </item>
+
+    <item>
+        <title>Kentucky - NOAA Watches, Warnings, and Advisories</title>
+        <url>http://www.weather.gov/alerts/ky.rss</url>
+        <ico>http://www.weather.gov/favicon.ico</ico>
+    </item>
+
+    <item>
+        <title>Louisiana - NOAA Watches, Warnings, and Advisories</title>
+        <url>http://www.weather.gov/alerts/la.rss</url>
+        <ico>http://www.weather.gov/favicon.ico</ico>
+    </item>
+
+    <item>
+        <title>Maine - NOAA Watches, Warnings, and Advisories</title>
+        <url>http://www.weather.gov/alerts/me.rss</url>
+        <ico>http://www.weather.gov/favicon.ico</ico>
+    </item>
+
+    <item>
+        <title>Maryland - NOAA Watches, Warnings, and Advisories</title>
+        <url>http://www.weather.gov/alerts/md.rss</url>
+        <ico>http://www.weather.gov/favicon.ico</ico>
+    </item>
+
+    <item>
+        <title>Massachusetts - NOAA Watches, Warnings, and Advisories</title>
+        <url>http://www.weather.gov/alerts/ma.rss</url>
+        <ico>http://www.weather.gov/favicon.ico</ico>
+    </item>
+
+    <item>
+        <title>Michigan - NOAA Watches, Warnings, and Advisories</title>
+        <url>http://www.weather.gov/alerts/mi.rss</url>
+        <ico>http://www.weather.gov/favicon.ico</ico>
+    </item>
+
+    <item>
+        <title>Minnesota - NOAA Watches, Warnings, and Advisories</title>
+        <url>http://www.weather.gov/alerts/mn.rss</url>
+        <ico>http://www.weather.gov/favicon.ico</ico>
+    </item>
+
+    <item>
+        <title>Mississippi - NOAA Watches, Warnings, and Advisories</title>
+        <url>http://www.weather.gov/alerts/ms.rss</url>
+        <ico>http://www.weather.gov/favicon.ico</ico>
+    </item>
+
+    <item>
+        <title>Missouri - NOAA Watches, Warnings, and Advisories</title>
+        <url>http://www.weather.gov/alerts/mo.rss</url>
+        <ico>http://www.weather.gov/favicon.ico</ico>
+    </item>
+
+    <item>
+        <title>Montana - NOAA Watches, Warnings, and Advisories</title>
+        <url>http://www.weather.gov/alerts/mt.rss</url>
+        <ico>http://www.weather.gov/favicon.ico</ico>
+    </item>
+
+    <item>
+        <title>Nevada - NOAA Watches, Warnings, and Advisories</title>
+        <url>http://www.weather.gov/alerts/nv.rss</url>
+        <ico>http://www.weather.gov/favicon.ico</ico>
+    </item>
+
+    <item>
+        <title>Nebraska - NOAA Watches, Warnings, and Advisories</title>
+        <url>http://www.weather.gov/alerts/ne.rss</url>
+        <ico>http://www.weather.gov/favicon.ico</ico>
+    </item>
+
+    <item>
+        <title>New Hampshire - NOAA Watches, Warnings, and Advisories</title>
+        <url>http://www.weather.gov/alerts/nh.rss</url>
+        <ico>http://www.weather.gov/favicon.ico</ico>
+    </item>
+
+    <item>
+        <title>New Jersey - NOAA Watches, Warnings, and Advisories</title>
+        <url>http://www.weather.gov/alerts/nj.rss</url>
+        <ico>http://www.weather.gov/favicon.ico</ico>
+    </item>
+
+    <item>
+        <title>New Mexico - NOAA Watches, Warnings, and Advisories</title>
+        <url>http://www.weather.gov/alerts/nm.rss</url>
+        <ico>http://www.weather.gov/favicon.ico</ico>
+    </item>
+
+    <item>
+        <title>New York - NOAA Watches, Warnings, and Advisories</title>
+        <url>http://www.weather.gov/alerts/ny.rss</url>
+        <ico>http://www.weather.gov/favicon.ico</ico>
+    </item>
+
+    <item>
+        <title>North Carolina - NOAA Watches, Warnings, and Advisories</title>
+        <url>http://www.weather.gov/alerts/nc.rss</url>
+        <ico>http://www.weather.gov/favicon.ico</ico>
+    </item>
+
+    <item>
+        <title>North Dakota - NOAA Watches, Warnings, and Advisories</title>
+        <url>http://www.weather.gov/alerts/nd.rss</url>
+        <ico>http://www.weather.gov/favicon.ico</ico>
+    </item>
+
+    <item>
+        <title>Ohio - NOAA Watches, Warnings, and Advisories</title>
+        <url>http://www.weather.gov/alerts/oh.rss</url>
+        <ico>http://www.weather.gov/favicon.ico</ico>
+    </item>
+
+    <item>
+        <title>Oklahoma - NOAA Watches, Warnings, and Advisories</title>
+        <url>http://www.weather.gov/alerts/ok.rss</url>
+        <ico>http://www.weather.gov/favicon.ico</ico>
+    </item>
+
+    <item>
+        <title>Oregon - NOAA Watches, Warnings, and Advisories</title>
+        <url>http://www.weather.gov/alerts/or.rss</url>
+        <ico>http://www.weather.gov/favicon.ico</ico>
+    </item>
+
+    <item>
+        <title>Pennsylvania - NOAA Watches, Warnings, and Advisories</title>
+        <url>http://www.weather.gov/alerts/pa.rss</url>
+        <ico>http://www.weather.gov/favicon.ico</ico>
+    </item>
+
+    <item>
+        <title>Rhode Island - NOAA Watches, Warnings, and Advisories</title>
+        <url>http://www.weather.gov/alerts/ri.rss</url>
+        <ico>http://www.weather.gov/favicon.ico</ico>
+    </item>
+
+    <item>
+        <title>South Carolina - NOAA Watches, Warnings, and Advisories</title>
+        <url>http://www.weather.gov/alerts/sc.rss</url>
+        <ico>http://www.weather.gov/favicon.ico</ico>
+    </item>
+
+    <item>
+        <title>South Dakota - NOAA Watches, Warnings, and Advisories</title>
+        <url>http://www.weather.gov/alerts/sd.rss</url>
+        <ico>http://www.weather.gov/favicon.ico</ico>
+    </item>
+
+    <item>
+        <title>Tennessee - NOAA Watches, Warnings, and Advisories</title>
+        <url>http://www.weather.gov/alerts/tn.rss</url>
+        <ico>http://www.weather.gov/favicon.ico</ico>
+    </item>
+
+    <item>
+        <title>Texas - NOAA Watches, Warnings, and Advisories</title>
+        <url>http://www.weather.gov/alerts/tx.rss</url>
+        <ico>http://www.weather.gov/favicon.ico</ico>
+    </item>
+
+    <item>
+        <title>Utah - NOAA Watches, Warnings, and Advisories</title>
+        <url>http://www.weather.gov/alerts/ut.rss</url>
+        <ico>http://www.weather.gov/favicon.ico</ico>
+    </item>
+
+    <item>
+        <title>Vermont - NOAA Watches, Warnings, and Advisories</title>
+        <url>http://www.weather.gov/alerts/vt.rss</url>
+        <ico>http://www.weather.gov/favicon.ico</ico>
+    </item>
+
+    <item>
+        <title>Virginia - NOAA Watches, Warnings, and Advisories</title>
+        <url>http://www.weather.gov/alerts/va.rss</url>
+        <ico>http://www.weather.gov/favicon.ico</ico>
+    </item>
+
+    <item>
+        <title>Washington - NOAA Watches, Warnings, and Advisories</title>
+        <url>http://www.weather.gov/alerts/wa.rss</url>
+        <ico>http://www.weather.gov/favicon.ico</ico>
+    </item>
+
+    <item>
+        <title>West Virginia - NOAA Watches, Warnings, and Advisories</title>
+        <url>http://www.weather.gov/alerts/wv.rss</url>
+        <ico>http://www.weather.gov/favicon.ico</ico>
+    </item>
+
+    <item>
+        <title>Wisconsin - NOAA Watches, Warnings, and Advisories</title>
+        <url>http://www.weather.gov/alerts/wi.rss</url>
+        <ico>http://www.weather.gov/favicon.ico</ico>
+    </item>
+
+    <item>
+        <title>Wyoming - NOAA Watches, Warnings, and Advisories</title>
+        <url>http://www.weather.gov/alerts/wy.rss</url>
+        <ico>http://www.weather.gov/favicon.ico</ico>
+    </item>
+
+</category>
+
+<category name="Weather (non-US)">
 
 </category>
 
