@@ -1476,6 +1476,8 @@ void NuppelVideoPlayer::DisableCaptions(uint mode, bool osd_msg)
     {
         msg += decoder->GetTrackDesc(kTrackTypeSubtitle,
                                      GetTrack(kTrackTypeSubtitle));
+        if (ringBuffer->isDVD())
+            ringBuffer->DVD()->SetTrack(kTrackTypeSubtitle, -1);
     }
     if (kDisplayTextSubtitle & mode)
     {
@@ -1507,6 +1509,9 @@ void NuppelVideoPlayer::EnableCaptions(uint mode, bool osd_msg)
     {
         msg += decoder->GetTrackDesc(kTrackTypeSubtitle,
                                      GetTrack(kTrackTypeSubtitle));
+        if (ringBuffer->isDVD())
+            ringBuffer->DVD()->SetTrack(kTrackTypeSubtitle, 
+                                        GetTrack(kTrackTypeSubtitle));
     }
     if (kDisplayTextSubtitle & mode)
     {
@@ -1609,9 +1614,6 @@ bool NuppelVideoPlayer::ToggleCaptions(uint type)
     uint origMode = textDisplayMode;
 
     QMutexLocker locker(&decoder_change_lock);
-
-    if (ringBuffer->isDVD() && GetCaptionMode() > 0)
-        ringBuffer->DVD()->SetTrack(kTrackTypeSubtitle, -1);
 
     if (textDisplayMode)
         DisableCaptions(textDisplayMode, origMode & mode);
@@ -5957,9 +5959,6 @@ int NuppelVideoPlayer::SetTrack(uint type, int trackNo)
 
     if (decoder)
         ret = decoder->SetTrack(type, trackNo);
-
-    if (ringBuffer->isDVD())
-        ringBuffer->DVD()->SetTrack(type, trackNo);
 
     if (kTrackTypeSubtitle == type)
     {
