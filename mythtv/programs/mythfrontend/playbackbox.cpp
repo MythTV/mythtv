@@ -1590,7 +1590,8 @@ bool PlaybackBox::FillList(bool useCachedData)
                    (p->recgroup != "LiveTV" || LiveTVInAllPrograms))) &&
                  (recGroupPassword == curGroupPassword)) ||
                 ((recGroupType[recGroup] == "category") &&
-                 (p->category == recGroup ) &&
+                 ((p->category == recGroup ) ||
+                  ((p->category == "") && (recGroup == tr("Unknown")))) &&
                  ( !recGroupPwCache.contains(p->recgroup))))
             {
                 if (viewMask != VIEW_NONE)
@@ -4524,19 +4525,40 @@ void PlaybackBox::showRecGroupChooser(void)
         "GROUP BY category");
     if (query.exec() && query.isActive() && query.size() > 0)
     {
+        int unknownCount = 0;
         while (query.next())
         {
-            dispGroup = QString::fromUtf8(query.value(0).toString());
             items     = query.value(1).toInt();
             itemStr   = (items == 1) ? tr("item") : tr("items");
 
-            if (!recGroupType.contains(dispGroup))
+            dispGroup = QString::fromUtf8(query.value(0).toString());
+            if (dispGroup == "")
+            {
+                unknownCount += items;
+                dispGroup = tr("Unknown");
+            }
+            else if (dispGroup == tr("Unknown"))
+                unknownCount += items;
+
+            if ((!recGroupType.contains(dispGroup)) &&
+                (dispGroup != tr("Unknown")))
             {
                 groups += QString("%1 [%2 %3]").arg(dispGroup)
                                   .arg(items).arg(itemStr);
 
                 recGroupType[dispGroup] = "category";
             }
+        }
+
+        if (unknownCount)
+        {
+            dispGroup = tr("Unknown");
+            items     = unknownCount;
+            itemStr   = (items == 1) ? tr("item") : tr("items");
+            groups += QString("%1 [%2 %3]").arg(dispGroup)
+                              .arg(items).arg(itemStr);
+
+            recGroupType[dispGroup] = "category";
         }
     }
 
