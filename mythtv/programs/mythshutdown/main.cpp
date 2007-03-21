@@ -11,6 +11,8 @@ using namespace std;
 #include <exitcodes.h>
 #include <mythcontext.h>
 #include <mythdbcon.h>
+#include "libmythtv/programinfo.h"
+#include "tv.h"
 
 void setGlobalSetting(const QString &key, const QString &value)
 {
@@ -103,7 +105,67 @@ QDateTime getDailyWakeupTime(QString sPeriod)
     return dtDateTime;
 }
 
-int getStatus()
+bool isRecording()
+{
+    bool m_isRecording = false;
+
+    if (!gContext->IsConnectedToMaster())
+    {
+        VERBOSE(VB_IMPORTANT, "isRecording: Attempting to connect to master server...");
+        if (!gContext->ConnectToMasterServer(false))
+        {
+            VERBOSE(VB_IMPORTANT, "isRecording: Could not connect to master server!");
+            return false;
+        }
+    }
+
+    QStringList strlist;
+
+    // get list of current recordings
+    QString querytext = QString("SELECT cardid FROM capturecard WHERE parentid = 0;");
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.exec(querytext);
+    QString Status = "";
+
+    if (query.isActive() && query.numRowsAffected())
+    {
+        VERBOSE(VB_IMPORTANT, "isRecording: Query active");
+        while(query.next())
+        {
+            QString status = "";
+            int cardid = query.value(0).toInt();
+            int state = kState_ChangingState;
+            QString channelName = "";
+            QString title = "";
+            QString subtitle = "";
+            QDateTime dtStart = QDateTime();
+            QDateTime dtEnd = QDateTime();
+
+            QString cmd = QString("QUERY_REMOTEENCODER %1").arg(cardid);
+
+            while (state == kState_ChangingState)
+            {
+                strlist = cmd;
+                strlist << "GET_STATE";
+                gContext->SendReceiveStringList(strlist);
+
+                state = strlist[0].toInt();
+                if (state == kState_ChangingState)
+                    usleep(500);
+            }
+            VERBOSE(VB_IMPORTANT, "isRecording: Successfully queried encoder.");
+
+            if (state == kState_RecordingOnly || state == kState_WatchingRecording)
+            {
+                VERBOSE(VB_IMPORTANT, "Recorder is recording. Returning true");
+                m_isRecording = true;
+            }
+        }
+    }
+    return m_isRecording;
+}
+
+int getStatus(bool bWantRecStatus)
 {
     VERBOSE(VB_GENERAL, "Mythshutdown: --status");
 
@@ -125,6 +187,12 @@ int getStatus()
     {
         VERBOSE(VB_IMPORTANT, "Grabbing EPG data in progress...");
         res += 4;
+    }
+
+    if (bWantRecStatus && isRecording())
+    {
+        VERBOSE(VB_IMPORTANT, "Recording in progress...");
+        res += 8;
     }
 
     if (getGlobalSetting("MythShutdownLock", "0") == "1")
@@ -202,13 +270,13 @@ int getStatus()
     return res;
 }
 
-int checkOKShutdown()
+int checkOKShutdown(bool bWantRecStatus)
 {
     // mythbackend wants 0=ok to shutdown, 1=reset idle count, 2=wait for frontend 
 
     VERBOSE(VB_GENERAL, "Mythshutdown: --check");
 
-    int res = getStatus();
+    int res = getStatus(bWantRecStatus);
 
     if (res > 0)
     {
@@ -248,6 +316,87 @@ int setWakeupTime(QString sWakeupTime)
     setGlobalSetting("MythShutdownNextScheduled", dtWakeupTime.toString(Qt::ISODate));
 
     return 0;
+}
+
+int setScheduledWakeupTime()
+{
+    typedef struct
+    {
+        QString channel, title, subtitle;
+        QDateTime startTime, endTime;
+    } ProgramDetail;
+
+    if (!gContext->IsConnectedToMaster())
+    {
+        VERBOSE(VB_IMPORTANT, "setScheduledWakeupTime: Attempting to connect to master server...");
+        if (!gContext->ConnectToMasterServer(false))
+        {
+            VERBOSE(VB_IMPORTANT, "setScheduledWakeupTime: Could not connect to master server!");
+            return false;
+        }
+    }
+
+    QDateTime m_nextRecordingStart = QDateTime();
+
+    ProgramList *progList = new ProgramList(true);
+    ProgramInfo *progInfo;
+
+    if (progList->FromScheduler())
+    {
+        if (progList->count() > 0)
+        {
+            VERBOSE(VB_IMPORTANT, "setScheduledWakeupTime: At least one scheduled recording found.");
+            // find the earliest scheduled recording
+            for (progInfo = progList->first(); progInfo; progInfo = progList->next())
+            {
+                if (progInfo->recstatus == rsWillRecord)
+                {
+                    if (m_nextRecordingStart.isNull() ||
+                            m_nextRecordingStart > progInfo->recstartts)
+                    {
+                        m_nextRecordingStart = progInfo->recstartts;
+                    }
+                }
+            }
+
+            // save the details of the earliest recording(s)
+            for (progInfo = progList->first(); progInfo; progInfo = progList->next())
+            {
+                if (progInfo->recstatus == rsWillRecord)
+                {
+                    if (progInfo->recstartts == m_nextRecordingStart)
+                    {
+                        ProgramDetail *prog = new ProgramDetail;
+                        prog->channel = progInfo->channame;
+                        prog->title = progInfo->title;
+                        prog->subtitle = progInfo->subtitle;
+                        prog->startTime = progInfo->recstartts;
+                        prog->endTime = progInfo->recendts;
+                    }
+                }
+            }
+        }
+    }
+
+    delete progList;
+
+    // set the wakeup time for the next scheduled recording
+    if (!m_nextRecordingStart.isNull())
+    {
+        int m_preRollSeconds = gContext->GetNumSetting("RecordPreRoll");
+        QDateTime restarttime = m_nextRecordingStart.addSecs((-1) * m_preRollSeconds);
+
+        int add = gContext->GetNumSetting("StartupSecsBeforeRecording", 240);
+        if (add)
+            restarttime = restarttime.addSecs((-1) * add);
+
+        QString wakeup_timeformat = gContext->GetSetting("WakeupTimeFormat",
+                                                            "yyyy-MM-ddThh:mm");
+        setWakeupTime(restarttime.toString(wakeup_timeformat));
+
+        return true;
+    }
+    return false;
 }
 
 int shutdown()
@@ -542,27 +691,35 @@ int startup()
 void showUsage()
 {
   cout << "Usage of mythshutdown\n"; 
-  cout << "-w/--setwakeup time (sets the wakeup time. time=yyyy-MM-ddThh:mm:ss.\n";
-  cout << "                     doesn't write it into nvram)\n";
-  cout << "-q/--shutdown       (set nvram-wakeup time and shutdown)\n";
-  cout << "-p/--startup        (check startup. check will return 0 if automatic\n";
-  cout << "                                                      1 for manually)\n";
-  cout << "-c/--check          (check shutdown possible returns 0 ok to shutdown\n";
-  cout << "                                                     1 reset idle check)\n";
-  cout << "-l/--lock           (disable shutdown. check will return 1.)\n";
-  cout << "-u/--unlock         (enable shutdown. check will return 0)\n";
-  cout << "-s/--status         (returns a code indicating the current status)\n";
-  cout << "         0 - Idle\n";
-  cout << "         1 - Transcoding\n";
-  cout << "         2 - Commercial Flagging\n";
-  cout << "         4 - Grabbing EPG data\n";
-  cout << "         8 - Not used\n";
-  cout << "        16 - Locked\n";
-  cout << "        32 - Not used\n";
-  cout << "        64 - In a daily wakeup/shutdown period\n";
-  cout << "       128 - Less than 15 minutes to next wakeup period\n";
-  cout << "-v/--verbose debug-level  (Use '-v help' for level info\n";
-  cout << "-h/--help                 (shows this usage)\n";
+  cout << "-w/--setwakeup time      (sets the wakeup time. time=yyyy-MM-ddThh:mm:ss\n";
+  cout << "                          doesn't write it into nvram)\n";
+  cout << "-t/--setscheduledwakeup  (sets the wakeup time to the next scheduled recording)\n";
+  cout << "-q/--shutdown            (set nvram-wakeup time and shutdown)\n";
+  cout << "-x/--safeshutdown        (equal to -c -t -q.  check shutdown possible, set\n";
+  cout <<"                           scheduled wakeup and shutdown)\n";
+  cout << "-p/--startup             (check startup. check will return 0 if automatic\n";
+  cout << "                                                           1 for manually)\n";
+  cout << "-c/--check flag          (check shutdown possible\n"; 
+  cout << "                          flag is 0 - don't check recording status\n";
+  cout << "                                  1 - do check recording status (default)\n";
+  cout << "                          returns 0 ok to shutdown\n";
+  cout << "                                  1 reset idle check)\n";
+  cout << "-l/--lock                (disable shutdown. check will return 1.)\n";
+  cout << "-u/--unlock              (enable shutdown. check will return 0)\n";
+  cout << "-s/--status flag         (returns a code indicating the current status)\n";
+  cout << "                          flag is 0 - don't check recording status\n";
+  cout << "                                  1 - do check recording status (default)\n";
+  cout << "                          0 - Idle\n";
+  cout << "                          1 - Transcoding\n";
+  cout << "                          2 - Commercial Flagging\n";
+  cout << "                          4 - Grabbing EPG data\n";
+  cout << "                          8 - Recording - only valid if flag is 1\n";
+  cout << "                         16 - Locked\n";
+  cout << "                         32 - Not used\n";
+  cout << "                         64 - In a daily wakeup/shutdown period\n";
+  cout << "                        128 - Less than 15 minutes to next wakeup period\n";
+  cout << "-v/--verbose debug-level (Use '-v help' for level info\n";
+  cout << "-h/--help                (shows this usage)\n";
 }
 
 int main(int argc, char **argv)
@@ -577,7 +734,7 @@ int main(int argc, char **argv)
     if (!gContext->Init(false))
     {
         cout << "mythshutdown: Could not initialize myth context. "
-                "Exiting." << endl;;
+                "Exiting." << endl;
         return FRONTEND_EXIT_NO_MYTHCONTEXT;
     }
 
@@ -590,6 +747,9 @@ int main(int argc, char **argv)
     bool bSetWakeupTime = false;
     QString sWakeupTime = "";
     bool bShowUsage = false;
+    bool bSetScheduledWakeupTime = false;
+    bool bCheckAndShutdown = false;
+    bool bWantRecStatus = true;
 
     //  Check command line arguments
     for (int argpos = 1; argpos < a.argc(); ++argpos)
@@ -625,11 +785,31 @@ int main(int argc, char **argv)
             !strcmp(a.argv()[argpos],"--check"))
         {
             bCheckOKShutdown = true;
+            if (a.argc() - 1 > argpos)
+            {
+                QString s = a.argv()[argpos+1];
+                if (!s.startsWith("-"))
+                {
+                    if (s == "0")
+                        bWantRecStatus = false;
+                    ++argpos;
+                }
+            }
         }
         else if (!strcmp(a.argv()[argpos],"-s") ||
             !strcmp(a.argv()[argpos],"--status"))
         {
             bGetStatus = true;
+            if (a.argc() - 1 > argpos)
+            {
+                QString s = a.argv()[argpos+1];
+                if (!s.startsWith("-"))
+                {
+                    if (s == "0")
+                        bWantRecStatus = false;
+                    ++argpos;
+                }
+            }
         }
         else if (!strcmp(a.argv()[argpos],"-w") ||
             !strcmp(a.argv()[argpos],"--setwakeup"))
@@ -663,6 +843,17 @@ int main(int argc, char **argv)
         {
             bShowUsage = true;
         }
+        else if (!strcmp(a.argv()[argpos],"-t") ||
+            !strcmp(a.argv()[argpos],"--setscheduledwakeup"))
+        {
+            bSetScheduledWakeupTime = true;
+        }
+        else if (!strcmp(a.argv()[argpos],"-x") ||
+            !strcmp(a.argv()[argpos],"--safeshutdown"))
+        {
+            bCheckAndShutdown = true;
+        }
+
         else
         {
             cout << "Invalid argument: " << a.argv()[argpos] << endl;
@@ -680,16 +871,27 @@ int main(int argc, char **argv)
     else if (bUnlockShutdown)
         res = unlockShutdown();
     else if (bCheckOKShutdown)
-        res = checkOKShutdown();
+        res = checkOKShutdown(bWantRecStatus);
+    else if (bSetScheduledWakeupTime)
+        res = setScheduledWakeupTime();
     else if (bStartup)
         res = startup();
     else if (bShutdown)
         res = shutdown();
     else if (bGetStatus)
-        res = getStatus();
+        res = getStatus(bWantRecStatus);
     else if (bSetWakeupTime)
         res = setWakeupTime(sWakeupTime);
-    else 
+    else if (bCheckAndShutdown)
+    {
+        res = checkOKShutdown(true);
+        if (res == 0)     // Nothing to stop a shutdown (eg. recording in progress).
+        {
+             res = setScheduledWakeupTime();
+             res = shutdown();
+        }
+    }
+    else
         showUsage();
 
     return res;

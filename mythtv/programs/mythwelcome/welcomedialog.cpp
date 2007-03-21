@@ -217,7 +217,7 @@ void WelcomeDialog::keyPressEvent(QKeyEvent *e)
         }
         else if (action == "0")
         {
-            int statusCode = system(m_installDir + "/bin/mythshutdown --status");
+            int statusCode = system(m_installDir + "/bin/mythshutdown --status 0");
             if (WIFEXITED(statusCode))
                 statusCode = WEXITSTATUS(statusCode);
 
@@ -621,7 +621,7 @@ void WelcomeDialog::updateStatusMessage(void)
         m_statusList.append(tr("MythTV is busy recording."));
     }
 
-    int statusCode = system(m_installDir + "/bin/mythshutdown --status");
+    int statusCode = system(m_installDir + "/bin/mythshutdown --status 0");
     if (WIFEXITED(statusCode))
         statusCode = WEXITSTATUS(statusCode);
 
@@ -679,7 +679,7 @@ void WelcomeDialog::showPopup(void)
     QLabel *label = popup->addLabel(tr("Menu"), MythPopupBox::Large, false);
     label->setAlignment(Qt::AlignCenter | Qt::WordBreak);
 
-    int statusCode = system(m_installDir + "/bin/mythshutdown --status");
+    int statusCode = system(m_installDir + "/bin/mythshutdown --status 0");
     if (WIFEXITED(statusCode))
         statusCode = WEXITSTATUS(statusCode);
 
@@ -775,7 +775,7 @@ void WelcomeDialog::shutdownNow(void)
     }
 
     // don't shutdown if we are about to start a wakeup/shutdown period
-    int statusCode = system(m_installDir + "/bin/mythshutdown --status");
+    int statusCode = system(m_installDir + "/bin/mythshutdown --status 0");
     if (WIFEXITED(statusCode))
         statusCode = WEXITSTATUS(statusCode);
 
