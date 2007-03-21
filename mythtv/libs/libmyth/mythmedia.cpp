@@ -31,6 +31,7 @@ const char* MythMediaDevice::MediaStatusStrings[] =
     "MEDIASTAT_UNKNOWN",
     "MEDIASTAT_UNPLUGGED",
     "MEDIASTAT_OPEN",
+    "MEDIASTAT_NODISK",
     "MEDIASTAT_USEABLE",
     "MEDIASTAT_NOTMOUNTED",
     "MEDIASTAT_MOUNTED"
@@ -353,6 +354,7 @@ MediaStatus MythMediaDevice::setStatus( MediaStatus NewStatus, bool CloseIt )
             // the disk is not / should not be mounted.
             case MEDIASTAT_ERROR:
             case MEDIASTAT_OPEN:
+            case MEDIASTAT_NODISK:
             case MEDIASTAT_NOTMOUNTED:
                 if (isMounted(true))
                     unmount();

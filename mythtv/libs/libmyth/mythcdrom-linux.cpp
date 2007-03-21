@@ -34,12 +34,18 @@ MythCDROM *GetMythCDROMLinux(QObject* par, const char* devicePath,
 
 MediaError MythCDROMLinux::eject(bool open_close)
 {
+    if (!isDeviceOpen())
+        openDevice();
+
     if (open_close)
         return (ioctl(m_DeviceHandle, CDROMEJECT) == 0) ? MEDIAERR_OK
                                                         : MEDIAERR_FAILED;
     else
-        return (ioctl(m_DeviceHandle, CDROMCLOSETRAY) == 0) ? MEDIAERR_OK
-                                                            : MEDIAERR_FAILED;
+    {
+        // If the tray is empty, this will fail (Input/Output error)
+        ioctl(m_DeviceHandle, CDROMCLOSETRAY);
+        return MEDIAERR_OK;
+    }
 }
 
 bool MythCDROMLinux::mediaChanged()
@@ -120,10 +126,14 @@ MediaStatus MythCDROMLinux::checkMedia()
                 // If the disk is ok but not yet mounted we'll test it further down after this switch exits.
                 break;
             case CDS_TRAY_OPEN:
-            case CDS_NO_DISC:
-                //cout << "Tray open or no disc" << endl;
+                //cout << "Tray open" << endl;
                 m_MediaType = MEDIATYPE_UNKNOWN;
                 return setStatus(MEDIASTAT_OPEN, OpenedHere);
+                break;
+            case CDS_NO_DISC:
+                //cout << "No disc" << endl;
+                m_MediaType = MEDIATYPE_UNKNOWN;
+                return setStatus(MEDIASTAT_NODISK, OpenedHere);
                 break;
             case CDS_NO_INFO:
             case CDS_DRIVE_NOT_READY:

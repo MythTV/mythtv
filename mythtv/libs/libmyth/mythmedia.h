@@ -11,7 +11,8 @@ typedef enum {
     MEDIASTAT_ERROR,
     MEDIASTAT_UNKNOWN,
     MEDIASTAT_UNPLUGGED,
-    MEDIASTAT_OPEN,
+    MEDIASTAT_OPEN,       /**< CD/DVD tray open. Meaningless for other devs? */
+    MEDIASTAT_NODISK,     /**< CD/DVD tray closed, SCSI drive unformatted? */
     MEDIASTAT_USEABLE,    
     MEDIASTAT_NOTMOUNTED,
     MEDIASTAT_MOUNTED
