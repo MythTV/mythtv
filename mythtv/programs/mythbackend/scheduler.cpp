@@ -1559,13 +1559,26 @@ void Scheduler::RunScheduler(void)
                         // is the machine already ideling the timeout time?
                         if (idleSince.addSecs(idleTimeoutSecs) < curtime)
                         {
-                            if (!m_isShuttingDown &&
+                            // are we waiting for shutdown?
+                            if (m_isShuttingDown)
+                            {
+                                // if we have been waiting more that 60secs then assume
+                                // something went wrong so reset and try again
+                                if (idleSince.addSecs(idleTimeoutSecs + 60) < curtime)
+                                {
+                                    VERBOSE(VB_IMPORTANT, "Waited more than 60" 
+                                            " seconds for shutdown to complete"
+                                            " - resetting idle time");
+                                    idleSince = QDateTime();
+                                    m_isShuttingDown = false;
+                                }
+                            }
+                            else if (!m_isShuttingDown &&
                                 CheckShutdownServer(prerollseconds, idleSince,
                                                     blockShutdown))
                             {
                                 ShutdownServer(prerollseconds);
                             }
-
                         }
                         else
                         {
@@ -1622,20 +1635,23 @@ bool Scheduler::CheckShutdownServer(int prerollseconds, QDateTime &idleSince,
     if (!preSDWUCheckCommand.isEmpty())
     {
         state = myth_system(preSDWUCheckCommand.ascii());
-                      
+
         if (GENERIC_EXIT_NOT_OK != state)
         {
             retval = false;
             switch(state)
             {
                 case 0:
+                    VERBOSE(VB_GENERAL, "CheckShutdownServer returned - OK to shutdown");
                     retval = true;
                     break;
                 case 1:
+                    VERBOSE(VB_GENERAL, "CheckShutdownServer returned - Not OK to shutdown");
                     // just reset idle'ing on retval == 1
                     idleSince = QDateTime();
                     break;
                 case 2:
+                    VERBOSE(VB_GENERAL, "CheckShutdownServer returned - Not OK to shutdown, need reconnect");
                     // reset shutdown status on retval = 2
                     // (needs a clientconnection again,
                     // before shutdown is executed)
@@ -1660,9 +1676,9 @@ bool Scheduler::CheckShutdownServer(int prerollseconds, QDateTime &idleSince,
 }
 
 void Scheduler::ShutdownServer(int prerollseconds)
-{    
+{
     m_isShuttingDown = true;
-  
+
     RecIter recIter = reclist.begin();
     for ( ; recIter != reclist.end(); recIter++)
         if ((*recIter)->recstatus == rsWillRecord)
@@ -1696,6 +1712,10 @@ void Scheduler::ShutdownServer(int prerollseconds)
             setwakeup_cmd.replace("$time", 
                                   restarttime.toString(wakeup_timeformat));
 
+        VERBOSE(VB_GENERAL, QString("Running the command to set the next "
+                                    "scheduled wakeup time :-\n\t\t\t\t\t\t") + 
+                                    setwakeup_cmd);
+
         // now run the command to set the wakeup time
         if (!setwakeup_cmd.isEmpty())
             myth_system(setwakeup_cmd.ascii());
@@ -1712,6 +1732,9 @@ void Scheduler::ShutdownServer(int prerollseconds)
     {
         // now we shut the slave backends down...
         m_mainServer->ShutSlaveBackendsDown(halt_cmd);
+
+        VERBOSE(VB_GENERAL, QString("Running the command to shutdown "
+                                    "this computer :-\n\t\t\t\t\t\t") + halt_cmd);
 
         // and now shutdown myself
         myth_system(halt_cmd.ascii());
