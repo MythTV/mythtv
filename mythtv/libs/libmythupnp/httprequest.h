@@ -64,8 +64,6 @@ typedef enum
 } ResponseType;
 
 
-typedef QMap< QString, QString >    QStringMap;
-
 typedef struct
 {
     char *pszExtension;

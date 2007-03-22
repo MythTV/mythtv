@@ -13,6 +13,7 @@
 
 #include <qptrlist.h>
 #include <qstringlist.h>
+#include <qmap.h>
 
 // __suseconds_t doesn't exist on some older Unixes. e.g. Darwin/Mac OS X
 
@@ -42,7 +43,8 @@ template <class T> inline const T& Max( const T &x, const T &y )
 // Typedefs
 //////////////////////////////////////////////////////////////////////////////
 
-typedef struct timeval                   TaskTime;
+typedef struct timeval              TaskTime;
+typedef QMap< QString, QString >    QStringMap;
 
 /////////////////////////////////////////////////////////////////////////////
 

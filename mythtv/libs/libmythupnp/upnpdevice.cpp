@@ -128,6 +128,7 @@ void UPnpDeviceDesc::_InternalLoad( QDomNode oNode, UPnpDevice *pCurDevice )
             if ( e.tagName() == "serialNumber"     ) { SetStrValue( e, pCurDevice->m_sSerialNumber    ); continue; }
             if ( e.tagName() == "UPC"              ) { SetStrValue( e, pCurDevice->m_sUPC             ); continue; }
             if ( e.tagName() == "presentationURL"  ) { SetStrValue( e, pCurDevice->m_sPresentationURL ); continue; }
+            if ( e.tagName() == "UDN"              ) { SetStrValue( e, pCurDevice->m_sUDN             ); continue; }
 
             if ( e.tagName() == "iconList"         ) { ProcessIconList   ( oNode, pCurDevice ); continue; }
             if ( e.tagName() == "serviceList"      ) { ProcessServiceList( oNode, pCurDevice ); continue; }

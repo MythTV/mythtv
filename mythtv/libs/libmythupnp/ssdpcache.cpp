@@ -124,6 +124,8 @@ void SSDPCacheEntries::Remove( const QString &sUSN )
         if (it.data() != NULL)
             ((DeviceLocation *)it.data())->Release();
 
+        // -=>TODO: Need to somehow call SSDPCache::NotifyRemove
+
         m_mapEntries.remove( it );
     }
 

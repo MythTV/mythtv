@@ -84,6 +84,7 @@ class UPnpDevice
         QString         m_sSerialNumber;
         QString         m_sUPC;
         QString         m_sPresentationURL;
+        QString         m_sUDN;
 
         NameValueList   m_lstExtra;
 
@@ -105,7 +106,10 @@ class UPnpDevice
 
         QString GetUDN()
         {
-            return( "uuid:" + LookupUDN( m_sDeviceType ));
+            if (m_sUDN.isEmpty())
+                m_sUDN = "uuid:" + LookupUDN( m_sDeviceType );
+
+            return m_sUDN;
         }
 };
 
