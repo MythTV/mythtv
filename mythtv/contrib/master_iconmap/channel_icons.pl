@@ -194,8 +194,7 @@ EOF
                                      "Found unrecognized channel:  #$channel->{'channum'} / $channel->{'callsign'} / $channel->{'name'}",
                                      $fuzzy);
                 print "\n";
-                last unless (defined $icon);
-                next unless ($icon);
+                last unless ($icon);
             # Build a csv string for this icon
                 $icon_csv .= join(',', escape_csv($icon->{'id'}),
                                        escape_csv($channel->{'name'}),
