@@ -2096,12 +2096,6 @@ void Scheduler::AddNewRecords(void)
     QMap<RecordingType, int> recTypeRecPriorityMap;
     RecList tmpList;
 
-    int complexpriority = gContext->GetNumSetting("ComplexPriority", 0);
-    int prefinputpri    = gContext->GetNumSetting("PrefInputPriority", 2);
-    int oncepriority    = gContext->GetNumSetting("OnceRecPriority", 0);
-    int hdtvpriority    = gContext->GetNumSetting("HDTVRecPriority", 0);
-    int ccpriority      = gContext->GetNumSetting("CCRecPriority", 0);
-
     QMap<int, bool> cardMap;
     QMap<int, EncoderLink *>::Iterator enciter = m_tvList->begin();
     for (; enciter != m_tvList->end(); ++enciter)
@@ -2157,6 +2151,47 @@ void Scheduler::AddNewRecords(void)
         }
     }
 
+    int complexpriority = gContext->GetNumSetting("ComplexPriority", 0);
+    int prefinputpri    = gContext->GetNumSetting("PrefInputPriority", 2);
+    int oncepriority    = gContext->GetNumSetting("OnceRecPriority", 0);
+    int hdtvpriority    = gContext->GetNumSetting("HDTVRecPriority", 0);
+    int ccpriority      = gContext->GetNumSetting("CCRecPriority", 0);
+
+    QString pwrpri = "channel.recpriority + cardinput.recpriority";
+
+    if (prefinputpri)
+        pwrpri += QString(" + "
+        "(cardinput.cardinputid = RECTABLE.prefinput) * %1").arg(prefinputpri);
+
+    if (oncepriority)
+        pwrpri += QString(" + "
+        "(program.first > 0 AND program.last > 0) * %1").arg(oncepriority);
+
+    if (hdtvpriority)
+        pwrpri += QString(" + (program.hdtv > 0) * %1").arg(hdtvpriority);
+
+    if (ccpriority)
+        pwrpri += QString(" + "
+        "(program.closecaptioned > 0) * %1").arg(ccpriority);
+
+    MSqlQuery result(dbConn);
+    result.prepare("SELECT recpriority, selectclause FROM powerpriority;");
+    result.exec();
+
+    if (!result.isActive())
+    {
+        MythContext::DBError("Power Priority", result);
+        return;
+    }
+
+    while (result.next())
+    {
+        if (result.value(0).toInt())
+            pwrpri += QString(" + (%1) * %2").arg(result.value(1).toString())
+                                             .arg(result.value(0).toInt());
+    }
+    pwrpri += QString(" AS powerpriority ");
+
     QString progfindid = QString(
 "(CASE RECTABLE.type "
 "  WHEN %1 "
@@ -2197,11 +2232,8 @@ void Scheduler::AddNewRecords(void)
 "program.airdate, program.stars, program.originalairdate, RECTABLE.inactive, "
 "RECTABLE.parentid, ") + progfindid + ", RECTABLE.playgroup, "
 "oldrecstatus.recstatus, oldrecstatus.reactivate, " 
-"channel.recpriority + cardinput.recpriority, "
-"RECTABLE.prefinput, program.hdtv, program.closecaptioned, "
-"program.first, program.last, program.stereo, RECTABLE.storagegroup, "
-"capturecard.hostname "
-+ QString(
+"program.hdtv, program.closecaptioned, program.stereo, "
+"RECTABLE.storagegroup, capturecard.hostname, " + pwrpri + QString(
 "FROM recordmatch "
 
 " INNER JOIN RECTABLE ON (recordmatch.recordid = RECTABLE.recordid) "
@@ -2294,7 +2326,6 @@ void Scheduler::AddNewRecords(void)
     VERBOSE(VB_SCHEDULE, QString(" |-- Start DB Query..."));
 
     gettimeofday(&dbstart, NULL);
-    MSqlQuery result(dbConn);
     result.prepare(query);
     result.exec();
     gettimeofday(&dbend, NULL);
@@ -2341,10 +2372,10 @@ void Scheduler::AddNewRecords(void)
         p->recendts = result.value(19).toDateTime();
         p->repeat = result.value(20).toInt();
         p->recgroup = result.value(21).toString();
-        p->storagegroup = result.value(46).toString();
+        p->storagegroup = result.value(42).toString();
         p->playgroup = result.value(36).toString();
         p->chancommfree = (result.value(23).toInt() == -2);
-        p->hostname = result.value(47).toString();
+        p->hostname = result.value(43).toString();
         p->cardid = result.value(24).toInt();
         p->inputid = result.value(25).toInt();
         p->shareable = result.value(26).toInt();
@@ -2369,32 +2400,19 @@ void Scheduler::AddNewRecords(void)
         p->parentid = result.value(34).toInt();
         p->findid = result.value(35).toInt();
 
+        if (result.value(39).toInt())
+            p->programflags |= FL_HDTV;
+        if (result.value(40).toInt())
+            p->programflags |= FL_CC;
+        if (result.value(41).toInt())
+            p->programflags |= FL_STEREO;
+
         if (!recTypeRecPriorityMap.contains(p->rectype))
             recTypeRecPriorityMap[p->rectype] = 
                 p->GetRecordingTypeRecPriority(p->rectype);
         p->recpriority += recTypeRecPriorityMap[p->rectype];
 
-        p->recpriority2 += result.value(39).toInt();
-
-        if (prefinputpri != 0 && p->inputid == result.value(40).toInt())
-            p->recpriority2 += prefinputpri;
-
-        if (hdtvpriority != 0 && result.value(41).toInt() > 0)
-            p->recpriority2 += hdtvpriority;
-
-        if (ccpriority != 0 && result.value(42).toInt() > 0)
-            p->recpriority2 += ccpriority;
-
-        if (oncepriority != 0 && result.value(43).toInt() > 0 && 
-                                 result.value(44).toInt() > 0)
-            p->recpriority2 += oncepriority;
-
-        if (result.value(41).toInt())
-            p->programflags |= FL_HDTV;
-        if (result.value(45).toInt())
-            p->programflags |= FL_STEREO;
-        if (result.value(42).toInt())
-            p->programflags |= FL_CC;
+        p->recpriority2 = result.value(44).toInt();
 
         if (complexpriority == 0)
         {
