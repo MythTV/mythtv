@@ -1579,6 +1579,9 @@ bool PlaybackBox::FillList(bool useCachedData)
             }
         }
 
+        if (!(viewMask & VIEW_WATCHLIST))
+            watchListStart = 0;
+
         sortedList[""] = "";
         vector<ProgramInfo *>::iterator i = progCache->begin();
         for ( ; i != progCache->end(); i++)
@@ -1689,10 +1692,6 @@ bool PlaybackBox::FillList(bool useCachedData)
                                                      .arg(p->title));
                         }
                     }
-                }
-                else
-                {
-                    watchListStart = 0;
                 }
             }
         }
