@@ -2132,17 +2132,15 @@ void Scheduler::AddNewRecords(void)
         {
             MSqlQuery epicnt(dbConn);
 
-            epicnt.prepare("SELECT count(*) FROM recorded "
-                           "WHERE title = :TITLE AND duplicate <> 0;");
-            epicnt.bindValue(":TITLE", qtitle.utf8());
+            epicnt.prepare("SELECT DISTINCT chanid, progstart, progend "
+                           "FROM recorded "
+                           "WHERE recordid = :RECID AND preserve = 0 "
+                               "AND recgroup <> 'LiveTV';");
+            epicnt.bindValue(":RECID", recid);
 
-            epicnt.exec();
-
-            if (epicnt.isActive() && epicnt.size() > 0)
+            if (epicnt.exec() && epicnt.isActive())
             {
-                epicnt.next();
-
-                if (epicnt.value(0).toInt() >= maxEpisodes)
+                if ((epicnt.size() > 0) && (epicnt.size() >= maxEpisodes))
                 {
                     tooManyMap[recid] = true;
                     checkTooMany = true;
