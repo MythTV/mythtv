@@ -216,7 +216,7 @@ EOF
                     print 'Are you still sure that you want to use this icon?  ';
                     my $choice = <STDIN>;
                     print "\n";
-                    $icon = undef unless ($choice =~ /^\s*yt1/i)
+                    $icon = undef unless ($choice =~ /^\s*[yt1]/i)
                 }
                 last if ($icon);
             }
