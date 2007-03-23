@@ -1603,7 +1603,11 @@ bool PlaybackBox::FillList(bool useCachedData)
                 else
                     p->availableStatus = asAvailable;
 
-                if ((viewMask & VIEW_TITLES)) // Show titles
+                if ((viewMask & VIEW_TITLES) && // Show titles
+                    ((p->recgroup != "LiveTV") ||
+                     (recGroup == "LiveTV") ||
+                     ((recGroup == "All Programs") &&
+                      ((viewMask & VIEW_LIVETVGRP) == 0))))
                 {
                     sTitle = sortTitle(p->title, viewMask, titleSort,
                             p->recpriority);
@@ -1637,6 +1641,17 @@ bool PlaybackBox::FillList(bool useCachedData)
                 {
                     QString tmpTitle = QString("(%1)")
                                                .arg(searchRule[p->recordid]);
+                    sortedList[tmpTitle] = tmpTitle;
+                    progLists[tmpTitle].prepend(p);
+                    progLists[tmpTitle].setAutoDelete(false);
+                }
+
+                if ((LiveTVInAllPrograms) &&
+                    (recGroup == "All Programs") &&
+                    (viewMask & VIEW_LIVETVGRP) &&
+                    (p->recgroup == "LiveTV"))
+                {
+                    QString tmpTitle = QString(" %1").arg(tr("LiveTV"));
                     sortedList[tmpTitle] = tmpTitle;
                     progLists[tmpTitle].prepend(p);
                     progLists[tmpTitle].setAutoDelete(false);
@@ -4422,6 +4437,17 @@ void PlaybackBox::showViewChanger(void)
     connect(checkBox, SIGNAL(toggled(bool)), this,
             SLOT(toggleSearchView(bool)));
     recGroupPopup->addWidget(checkBox, false);
+
+    if ((recGroup == "All Programs") &&
+        (gContext->GetNumSetting("LiveTVInAllPrograms",0)))
+    {
+        checkBox = new MythCheckBox(tr("Show LiveTV as a Group"),
+                                    recGroupPopup);
+        checkBox->setChecked(viewMask & VIEW_LIVETVGRP);
+        connect(checkBox, SIGNAL(toggled(bool)), this,
+                SLOT(toggleLiveTVView(bool)));
+        recGroupPopup->addWidget(checkBox, false);
+    }
 
     MythPushButton *okbutton = new MythPushButton(recGroupPopup);
     okbutton->setText(tr("Save Current View"));

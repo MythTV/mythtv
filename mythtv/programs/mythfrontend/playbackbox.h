@@ -70,6 +70,7 @@ class PlaybackBox : public MythDialog
         VIEW_RECGROUPS  =  0x04,
         VIEW_WATCHLIST  =  0x08,
         VIEW_SEARCHES   =  0x10,
+        VIEW_LIVETVGRP  =  0x20,
     } ViewMask;
 
     typedef enum
@@ -177,6 +178,7 @@ class PlaybackBox : public MythDialog
     void toggleRecGroupView(bool setOn)  { toggleView(VIEW_RECGROUPS, setOn); }
     void toggleWatchListView(bool setOn) { toggleView(VIEW_WATCHLIST, setOn); }
     void toggleSearchView(bool setOn)    { toggleView(VIEW_SEARCHES, setOn); }
+    void toggleLiveTVView(bool setOn)    { toggleView(VIEW_LIVETVGRP, setOn); }
 
     void exitWin();
 
