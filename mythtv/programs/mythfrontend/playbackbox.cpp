@@ -1657,7 +1657,7 @@ bool PlaybackBox::FillList(bool useCachedData)
                     progLists[tmpTitle].setAutoDelete(false);
                 }
 
-                if ((viewMask & VIEW_WATCHLIST))
+                if ((viewMask & VIEW_WATCHLIST) && (p->recgroup != "LiveTV"))
                 {
                     if (watchListAutoExpire && !p->GetAutoExpireFromRecorded())
                     {
