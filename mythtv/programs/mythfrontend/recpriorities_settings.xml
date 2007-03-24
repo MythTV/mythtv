@@ -59,4 +59,11 @@
       <action>SETTINGS CHANNELRECPRIORITIES</action>
    </button>
 
+   <button>
+      <type>TV_RECPRIORITIES_CUSTOM</type>
+      <text>Custom Priority</text>
+      <alttext>Custom Priority</alttext>
+      <action>SETTINGS CUSTOMPRIORITY</action>
+   </button>
+
 </mythmenu>

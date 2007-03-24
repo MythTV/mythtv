@@ -26,6 +26,7 @@ using namespace std;
 #include "viewscheduled.h"
 #include "programrecpriority.h"
 #include "channelrecpriority.h"
+#include "custompriority.h"
 #include "globalsettings.h"
 #include "profilegroup.h"
 #include "playgroup.h"
@@ -185,6 +186,15 @@ void startChannelRecPriorities(void)
 
     qApp->unlock();
     rch.exec();
+    qApp->lock();
+}
+
+void startCustomPriority(void)
+{
+    CustomPriority custom(gContext->GetMainWindow(), "custom priority");
+
+    qApp->unlock();
+    custom.exec();
     qApp->lock();
 }
 
@@ -379,6 +389,10 @@ void TVMenuCallback(void *data, QString &selection)
     else if (sel == "settings channelrecpriorities") 
     {
         startChannelRecPriorities();
+    }
+    else if (sel == "settings custompriority") 
+    {
+        startCustomPriority();
     }
     else if (xbox && sel == "settings xboxsettings")
     {

@@ -402,6 +402,12 @@
     <offset>0,0</offset>
   </buttondef>
 
+  <buttondef name="TV_RECPRIORITIES_CUSTOM">
+    <image>text-blank.png</image>
+    <watermarkimage>watermark/tv.png</watermarkimage>
+    <offset>0,0</offset>
+  </buttondef>
+
 <!-- #############################-->
 <!-- ########  setup.xml  ########-->
 <!-- #############################-->

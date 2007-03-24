@@ -25,11 +25,12 @@ QMAKE_CLEAN += $(TARGET)
 # Input
 HEADERS += manualbox.h playbackbox.h viewscheduled.h globalsettings.h
 HEADERS += manualschedule.h programrecpriority.h channelrecpriority.h
-HEADERS += statusbox.h networkcontrol.h
+HEADERS += statusbox.h networkcontrol.h custompriority.h
 
 SOURCES += main.cpp manualbox.cpp playbackbox.cpp viewscheduled.cpp
 SOURCES += globalsettings.cpp manualschedule.cpp programrecpriority.cpp 
 SOURCES += channelrecpriority.cpp statusbox.cpp networkcontrol.cpp
+SOURCES += custompriority.cpp
 
 macx {
     mac_bundle {

@@ -455,6 +455,11 @@
     <offset>20,10</offset>
   </buttondef>
 
+  <buttondef name="TV_RECPRIORITIES_CUSTOM">
+    <image>recpriorities.png</image>
+    <offset>20,10</offset>
+  </buttondef>
+
 <!-- #############################-->
 <!-- ########  setup.xml  ########-->
 <!-- #############################-->
