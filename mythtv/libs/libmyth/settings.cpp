@@ -1491,7 +1491,7 @@ QWidget* ButtonSetting::configWidget(ConfigurationGroup* cg, QWidget* parent,
     button = new MythPushButton(parent, widgetName);
 
     button->setText(getLabel());
-    //button->setHelpText(getHelpText());
+    button->setHelpText(getHelpText());
 
     connect(button, SIGNAL(pressed()), this, SIGNAL(pressed()));
     connect(button, SIGNAL(pressed()), this, SLOT(SendPressedString()));
