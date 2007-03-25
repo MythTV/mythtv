@@ -31,6 +31,7 @@ class ChannelRecPriority : public MythDialog
     void pageDown() { cursorDown(true); }
     void pageUp() { cursorUp(true); }
     void edit();
+    void upcoming();
     void changeRecPriority(int howMuch);
     void applyChannelRecPriorityChange(QString, const QString&);
 

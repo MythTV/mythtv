@@ -23,6 +23,7 @@ using namespace std;
 #include "mythcontext.h"
 #include "mythdbcon.h"
 #include "scheduledrecording.h"
+#include "proglist.h"
 #include "infostructs.h"
 
 ChannelRecPriority::ChannelRecPriority(MythMainWindow *parent, const char *name)
@@ -128,6 +129,8 @@ void ChannelRecPriority::keyPressEvent(QKeyEvent *e)
             else if (action == "SELECT" || action == "MENU" ||
                      action == "INFO" || action == "CUSTOMEDIT")
                 edit();
+            else if (action == "UPCOMING")
+                upcoming();
             else if (action == "RANKINC")
                 changeRecPriority(1);
             else if (action == "RANKDEC")
@@ -740,4 +743,26 @@ void ChannelRecPriority::edit()
 
     SortList();
     update(fullRect);
+}
+
+void ChannelRecPriority::upcoming()
+{
+    int cnt;
+    QMap<QString, ChannelInfo>::Iterator it;
+    ChannelInfo *chanInfo;
+
+    // iterate through channelData till we hit the line where
+    // the cursor currently is
+    for (cnt=0, it = channelData.begin(); cnt < inList+inData; cnt++, ++it);
+
+    chanInfo = &(it.data());
+
+    if (chanInfo->chanid < 1)
+        return;
+
+    QString chanID = QString("%1").arg(chanInfo->chanid);
+    ProgLister *pl = new ProgLister(plChannel, chanID, "",
+                                   gContext->GetMainWindow(), "proglist");
+    pl->exec();
+    delete pl;
 }
