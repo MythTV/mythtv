@@ -31,7 +31,7 @@
 // the maximum image size we are ever likely to get from ZM
 #define MAX_IMAGE_SIZE  (2048*1536*3)
 
-const int FRAME_UPDATE_TIME = 1000 / 10;  // try to update the frame 25 times a second
+const int FRAME_UPDATE_TIME = 1000 / 10;  // try to update the frame 10 times a second
 const int STATUS_UPDATE_TIME = 1000 / 2;  // update the monitor status 2 times a second
 
 ZMLivePlayer::ZMLivePlayer(int monitorID, int eventID, MythMainWindow *parent, 
@@ -147,15 +147,15 @@ void ZMLivePlayer::keyPressEvent(QKeyEvent *e)
 
 void ZMLivePlayer::changePlayerMonitor(int playerNo)
 {
-    m_frameTimer->stop();
-
     if (playerNo > (int)m_players->size())
         return;
 
-    Monitor *mon = m_players->at(playerNo - 1)->getMonitor();
-    int oldMonID = mon->id;
+    m_frameTimer->stop();
 
-    // find the old monID in the list of available monitors
+    int oldMonID = m_players->at(playerNo - 1)->getMonitor()->id;
+    Monitor *mon;
+
+    // find the old monitor ID in the list of available monitors
     vector<Monitor*>::iterator i = m_monitors->begin();
     for (; i != m_monitors->end(); i++)
     {
@@ -175,8 +175,8 @@ void ZMLivePlayer::changePlayerMonitor(int playerNo)
         i = m_monitors->begin();
 
     mon = *i;
-    int newMonID = mon->id;
-    m_players->at(playerNo - 1)->setMonitor(newMonID, winId());
+
+    m_players->at(playerNo - 1)->setMonitor(mon, winId());
 
     UITextType *text = getUITextType(QString("name%1-%2").arg(m_monitorLayout).arg(playerNo));
     if (text)
@@ -195,28 +195,45 @@ void ZMLivePlayer::wireUpTheme()
 
 void ZMLivePlayer::updateFrame()
 {
+    class ZMClient *zm = ZMClient::get();
+    if (!zm)
+        return;
+
     static unsigned char buffer[MAX_IMAGE_SIZE];
     m_frameTimer->stop();
 
-    if (m_players)
+    // get a list of monitor id's that need updating
+    QValueList<int> monList;
+    Player *p;
+    vector<Player*>::iterator i = m_players->begin();
+    for (; i != m_players->end(); i++)
     {
-        Player *p;
-        vector<Player*>::iterator i = m_players->begin();
-        for (; i != m_players->end(); i++)
-        {
-            QString status;
-            p = *i;
-            if (class ZMClient *zm = ZMClient::get())
-            {
-                int frameSize = zm->getLiveFrame(p->getMonitor()->id, status, buffer, sizeof(buffer));
+        p = *i;
+        if (!monList.contains(p->getMonitor()->id))
+            monList.append(p->getMonitor()->id);
+    }
 
-                if (frameSize > 0 && !status.startsWith("ERROR"))
+    for (uint x = 0; x < monList.count(); x++)
+    {
+        QString status;
+        int frameSize = zm->getLiveFrame(monList[x], status, buffer, sizeof(buffer));
+
+        if (frameSize > 0 && !status.startsWith("ERROR"))
+        {
+            // update each player that is displaying this monitor
+            Player *p;
+            vector<Player*>::iterator i = m_players->begin();
+            for (; i != m_players->end(); i++)
+            {
+                p = *i;
+                if (p->getMonitor()->id == monList[x])
                 {
                     p->getMonitor()->status = status;
                     p->updateScreen(buffer);
                 }
             }
         }
+
     }
 
     m_frameTimer->start(FRAME_UPDATE_TIME);
@@ -267,8 +284,8 @@ void ZMLivePlayer::setMonitorLayout(int layout)
         {
             QPoint pos = frameImage->DisplayPos();
             QSize size = frameImage->GetSize(true);
-            monitor->displayRect.setRect(pos.x(), pos.y(), size.width(), size.height());
             Player *p = new Player();
+            p->setDisplayRect(QRect(pos.x(), pos.y(), size.width(), size.height()));
             p->startPlayer(monitor, winId());
             m_players->push_back(p);
         }
@@ -285,7 +302,7 @@ void ZMLivePlayer::setMonitorLayout(int layout)
     setContext(layout);
     updateForeground();
 
-    m_frameTimer->start(FRAME_UPDATE_TIME);
+    updateFrame();
     m_statusTimer->start(STATUS_UPDATE_TIME);
 }
 
@@ -348,10 +365,10 @@ Player::~Player()
 {
 }
 
-void Player::setMonitor(int monID, Window winID)
+void Player::setMonitor(Monitor *mon, Window winID)
 {
     stopPlaying();
-    m_monitor.id = monID;
+    m_monitor = *mon;
     startPlayer(&m_monitor, winID);
 }
 
@@ -431,8 +448,8 @@ bool Player::startPlayerGL(Monitor *mon, Window winID)
     glPixelTransferi(GL_ALPHA_BIAS, 0);
 
     m_win = XCreateSimpleWindow (m_dis, parent, 
-                               m_monitor.displayRect.x(), m_monitor.displayRect.y(),
-                               m_monitor.displayRect.width(), m_monitor.displayRect.height(),
+                               m_displayRect.x(), m_displayRect.y(),
+                               m_displayRect.width(), m_displayRect.height(),
                                2, 0, 0);
 
     if (m_win == None)
@@ -443,7 +460,7 @@ bool Player::startPlayerGL(Monitor *mon, Window winID)
     }
 
     XMapWindow (m_dis, m_win);
-    XMoveWindow(m_dis, m_win, m_monitor.displayRect.x(), m_monitor.displayRect.y());
+    XMoveWindow(m_dis, m_win, m_displayRect.x(), m_displayRect.y());
 
     glXMakeCurrent(m_dis, m_win, m_cx);
 
@@ -479,8 +496,8 @@ bool Player::startPlayerXv(Monitor *mon, Window winID)
     m_screenNum = DefaultScreen(m_dis);
 
     m_win = XCreateSimpleWindow (m_dis, parent, 
-                                 m_monitor.displayRect.x(), m_monitor.displayRect.y(),
-                                 m_monitor.displayRect.width(), m_monitor.displayRect.height(),
+                                 m_displayRect.x(), m_displayRect.y(),
+                                 m_displayRect.width(), m_displayRect.height(),
                                  2, 0, 0);
 
     if (m_win == None)
@@ -491,7 +508,7 @@ bool Player::startPlayerXv(Monitor *mon, Window winID)
     }
 
     XMapWindow (m_dis, m_win);
-    XMoveWindow(m_dis, m_win, m_monitor.displayRect.x(), m_monitor.displayRect.y());
+    XMoveWindow(m_dis, m_win, m_displayRect.x(), m_displayRect.y());
 
     m_XVport = -1;
 
@@ -503,7 +520,7 @@ bool Player::startPlayerXv(Monitor *mon, Window winID)
         return false; 
     }
 
-    m_rgba = (char *) malloc(m_monitor.displayRect.width() * m_monitor.displayRect.height() * 4);
+    m_rgba = (char *) malloc(m_displayRect.width() * m_displayRect.height() * 4);
 
     m_haveXV = useXV;
 
@@ -633,7 +650,7 @@ void Player::updateScreenGL(const unsigned char* buffer)
         glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, m_monitor.width, m_monitor.height,
                     GL_RGB, GL_UNSIGNED_BYTE, buffer);
 
-    glViewport(0, 0, m_monitor.displayRect.width(), m_monitor.displayRect.height());
+    glViewport(0, 0, m_displayRect.width(), m_displayRect.height());
 
     glLoadIdentity();
     glTranslatef(-1.0,1.0,0.0);
@@ -668,8 +685,8 @@ void Player::updateScreenXv(const unsigned char* buffer)
     if (!m_haveXV && !m_XImage)
     {
         m_XImage = XCreateImage(m_dis, XDefaultVisual(m_dis, m_screenNum), 24, ZPixmap, 0,
-                                m_rgba, m_monitor.displayRect.width(), m_monitor.displayRect.height(),
-                                32, 4 * m_monitor.displayRect.width());
+                                m_rgba, m_displayRect.width(), m_displayRect.height(),
+                                32, 4 * m_displayRect.width());
         if (m_XImage == NULL)
         {
             VERBOSE(VB_IMPORTANT, "ERROR: Unable to create XImage");
@@ -711,19 +728,19 @@ void Player::updateScreenXv(const unsigned char* buffer)
 
         XvPutImage(m_dis, m_XVport, m_win, m_gc, m_XvImage, 0, 0, 
                    m_monitor.width, m_monitor.height,
-                   0, 0, m_monitor.displayRect.width(), m_monitor.displayRect.height());
+                   0, 0, m_displayRect.width(), m_displayRect.height());
     }
     else
     {
         //software scaling
-        for (int y = 0; y < m_monitor.displayRect.height(); y++)
+        for (int y = 0; y < m_displayRect.height(); y++)
         {
-            for (int x = 0; x < m_monitor.displayRect.width(); x++)
+            for (int x = 0; x < m_displayRect.width(); x++)
             {
 
-                pos_data = y * m_monitor.height / m_monitor.displayRect.height();
+                pos_data = y * m_monitor.height / m_displayRect.height();
                 pos_data = pos_data * m_monitor.width;
-                pos_data = pos_data + x * m_monitor.width / m_monitor.displayRect.width();
+                pos_data = pos_data + x * m_monitor.width / m_displayRect.width();
 
                 if (m_monitor.palette == MP_GREY)
                 {
@@ -749,6 +766,6 @@ void Player::updateScreenXv(const unsigned char* buffer)
         }
 
         XPutImage(m_dis, m_win, m_gc, m_XImage, 0, 0, 0, 0, 
-                  m_monitor.displayRect.width(), m_monitor.displayRect.height());
+                  m_displayRect.width(), m_displayRect.height());
     }
 }

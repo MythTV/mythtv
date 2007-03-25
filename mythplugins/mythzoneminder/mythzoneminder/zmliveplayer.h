@@ -44,8 +44,9 @@ class Player
     bool startPlayer(Monitor *mon, Window winID);
     void stopPlaying(void);
     void updateScreen(const uchar* buffer);
-    void setMonitor(int monID, Window winID);
+    void setMonitor(Monitor *mon, Window winID);
     Monitor *getMonitor(void) { return &m_monitor; }
+    void setDisplayRect(QRect displayRect) { m_displayRect = displayRect; }
 
   private:
     void getMonitorList(void);
@@ -62,6 +63,7 @@ class Player
     Window      m_win;
     int         m_screenNum;
 
+    QRect       m_displayRect;
     bool        m_useGL;
     GC          m_gc;
     XImage     *m_XImage;

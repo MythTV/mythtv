@@ -53,7 +53,6 @@ typedef struct
     int events;
     // used by live view
     QString status;
-    QRect displayRect;
     int width;
     int height;
     int palette;
