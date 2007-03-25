@@ -2238,35 +2238,40 @@ void MainServer::HandleQueryGuideDataThrough(PlaybackSock *pbs)
     SendResponse(pbssock, strlist);
 }
 
-void MainServer::HandleGetPendingRecordings(PlaybackSock *pbs, QString table, int recordid)
+void MainServer::HandleGetPendingRecordings(PlaybackSock *pbs, 
+                                            QString tmptable, int recordid)
 {
     MythSocket *pbssock = pbs->getSocket();
 
     QStringList strList;
 
-    if (m_sched) {
-        if (table == "") m_sched->getAllPending(strList);
-        else {
+    if (m_sched)
+    {
+        if (tmptable == "")
+            m_sched->getAllPending(strList);
+        else
+        {
             Scheduler *sched = new Scheduler(false, encoderList, 
-                                             table, m_sched);
+                                             tmptable, m_sched);
             sched->FillRecordListFromDB(recordid);
             sched->getAllPending(strList);
             delete sched;
 
-            MSqlQuery query(MSqlQuery::InitCon());
-            query.prepare("SELECT NULL FROM record WHERE recordid = :RECID;");
-            query.bindValue(":RECID", recordid);
+            if (recordid > 0)
+            {
+                MSqlQuery query(MSqlQuery::InitCon());
+                query.prepare("SELECT NULL FROM record "
+                              "WHERE recordid = :RECID;");
+                query.bindValue(":RECID", recordid);
 
-            if (query.exec() && query.isActive() && query.size())
-            {
-                ScheduledRecording *record = new ScheduledRecording();
-                record->loadByID(recordid);
-                if (record->getSearchType() == kManualSearch)
-                    HandleRescheduleRecordings(recordid, NULL);
-                record->deleteLater();
-            }
-            else if (recordid > 0)
-            {
+                if (query.exec() && query.isActive() && query.size())
+                {
+                    ScheduledRecording *record = new ScheduledRecording();
+                    record->loadByID(recordid);
+                    if (record->getSearchType() == kManualSearch)
+                        HandleRescheduleRecordings(recordid, NULL);
+                    record->deleteLater();
+                }
                 query.prepare("DELETE FROM program WHERE manualid = :RECID;");
                 query.bindValue(":RECID", recordid);
                 query.exec();

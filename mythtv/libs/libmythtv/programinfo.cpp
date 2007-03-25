@@ -4385,7 +4385,7 @@ void ProgramInfo::ShowNotRecordingDialog(void)
  *                                                                           *
  * ************************************************************************* */
 
-bool ProgramList::FromScheduler(bool &hasConflicts, QString rectable,
+bool ProgramList::FromScheduler(bool &hasConflicts, QString tmptable,
                                 int recordid)
 {
     clear();
@@ -4395,10 +4395,10 @@ bool ProgramList::FromScheduler(bool &hasConflicts, QString rectable,
         return false;
 
     QString query;
-    if (rectable != "")
+    if (tmptable != "")
     {
         query = QString("QUERY_GETALLPENDING %1 %2")
-                        .arg(rectable).arg(recordid);
+                        .arg(tmptable).arg(recordid);
     } else {
         query = QString("QUERY_GETALLPENDING");
     }

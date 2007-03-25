@@ -32,6 +32,7 @@ class MPUBLIC CustomPriority : public MythDialog
     void installClicked(void);
     void deleteClicked(void);
     void cancelClicked(void);
+    void testSchedule(void);
 
   private:
     bool checkSyntax(void);

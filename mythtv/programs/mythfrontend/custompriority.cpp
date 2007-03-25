@@ -25,6 +25,7 @@ using namespace std;
 #include "proglist.h"
 #include "scheduledrecording.h"
 #include "recordingtypes.h"
+#include "viewschdiff.h"
 #include "mythdbcon.h"
 
 CustomPriority::CustomPriority(MythMainWindow *parent, const char *name,
@@ -364,13 +365,7 @@ void CustomPriority::testClicked(void)
         m_testButton->setFocus();
         return;
     }
-
-    QString msg = tr("Success! No database errors reported.");
-    DialogBox *okdiag = new DialogBox(gContext->GetMainWindow(), msg);
-    okdiag->AddButton(QObject::tr("OK"));
-    okdiag->exec();
-
-    delete okdiag;
+    testSchedule();
     m_testButton->setFocus();
 }
 
@@ -383,15 +378,21 @@ void CustomPriority::installClicked(void)
     }
 
     MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare("REPLACE INTO powerpriority "
-                   "(priorityname, recpriority, selectclause) "
-                   "VALUES(:NAME,:VALUE,:CLAUSE);");
+    query.prepare("DELETE FROM powerpriority WHERE priorityname = :NAME;");
+    query.bindValue(":NAME", m_title->text());
+
+    if (!query.exec())
+        MythContext::DBError("Install power search delete", query);
+
+    query.prepare("INSERT INTO powerpriority "
+                  "(priorityname, recpriority, selectclause) "
+                  "VALUES(:NAME,:VALUE,:CLAUSE);");
     query.bindValue(":NAME", m_title->text());
     query.bindValue(":VALUE", m_value->value());
     query.bindValue(":CLAUSE", m_description->text());
 
     if (!query.exec())
-        MythContext::DBError("Install power search query", query);
+        MythContext::DBError("Install power search insert", query);
     else
         ScheduledRecording::signalChange(0);
 
@@ -477,4 +478,99 @@ bool CustomPriority::checkSyntax(void)
         delete errdiag;
     }
     return ret;
+}
+
+void CustomPriority::testSchedule(void)
+{
+
+    QString ttable = "powerpriority_tmp";
+
+    MSqlQueryInfo dbcon = MSqlQuery::SchedCon();
+    MSqlQuery query(dbcon);
+    QString thequery;
+
+    thequery ="SELECT GET_LOCK(:LOCK, 2);";
+    query.prepare(thequery);
+    query.bindValue(":LOCK", "DiffSchedule");
+    query.exec();
+    if (query.lastError().type() != QSqlError::None)
+    {
+        QString msg =
+            QString("DB Error (Obtaining lock in testRecording): \n"
+                    "Query was: %1 \nError was: %2 \n")
+            .arg(thequery)
+            .arg(MythContext::DBErrorMessage(query.lastError()));
+        VERBOSE(VB_IMPORTANT, msg);
+        return;
+    }
+
+    thequery = QString("DROP TABLE IF EXISTS %1;").arg(ttable);
+    query.prepare(thequery);
+    query.exec();
+    if (query.lastError().type() != QSqlError::None)
+    {
+        QString msg =
+            QString("DB Error (deleting old table in testRecording): \n"
+                    "Query was: %1 \nError was: %2 \n")
+            .arg(thequery)
+            .arg(MythContext::DBErrorMessage(query.lastError()));
+        VERBOSE(VB_IMPORTANT, msg);
+        return;
+    }
+
+    thequery = QString("CREATE TABLE %1 SELECT * FROM powerpriority;")
+                       .arg(ttable);
+    query.prepare(thequery);
+    query.exec();
+    if (query.lastError().type() != QSqlError::None)
+    {
+        QString msg =
+            QString("DB Error (create new table): \n"
+                    "Query was: %1 \nError was: %2 \n")
+            .arg(thequery)
+            .arg(MythContext::DBErrorMessage(query.lastError()));
+        VERBOSE(VB_IMPORTANT, msg);
+        return;
+    }
+
+    query.prepare(QString("DELETE FROM %1 WHERE priorityname = :NAME;")
+                          .arg(ttable));
+    query.bindValue(":NAME", m_title->text());
+
+    if (!query.exec())
+        MythContext::DBError("Test power search delete", query);
+
+    thequery = QString("INSERT INTO %1 "
+                       "(priorityname, recpriority, selectclause) "
+                       "VALUES(:NAME,:VALUE,:CLAUSE);").arg(ttable);
+    query.prepare(thequery);
+    query.bindValue(":NAME", m_title->text());
+    query.bindValue(":VALUE", m_value->value());
+    query.bindValue(":CLAUSE", m_description->text());
+
+    if (!query.exec())
+        MythContext::DBError("Test power search insert", query);
+
+    QString ltitle = tr("Power Priority");
+    if (!m_title->text().isEmpty())
+        ltitle = m_title->text();
+
+    ViewScheduleDiff vsd(gContext->GetMainWindow(), "Preview Schedule Changes",
+                         ttable, 0, ltitle);
+
+    thequery = "SELECT RELEASE_LOCK(:LOCK);";
+    query.prepare(thequery);
+    query.bindValue(":LOCK", "DiffSchedule");
+    query.exec();
+    if (query.lastError().type() != QSqlError::None)
+    {
+        QString msg =
+            QString("DB Error (free lock): \n"
+                    "Query was: %1 \nError was: %2 \n")
+            .arg(thequery)
+            .arg(MythContext::DBErrorMessage(query.lastError()));
+        VERBOSE(VB_IMPORTANT, msg);
+        return;
+    }
+    vsd.exec();
 }

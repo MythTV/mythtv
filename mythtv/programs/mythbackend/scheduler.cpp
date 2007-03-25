@@ -39,7 +39,7 @@ using namespace std;
 #define LOC_ERR QString("Scheduler, Error: ")
 
 Scheduler::Scheduler(bool runthread, QMap<int, EncoderLink *> *tvList,
-                     QString recordTbl, Scheduler *master_sched)
+                     QString tmptable, Scheduler *master_sched)
 {
     m_tvList = tvList;
     specsched = false;
@@ -59,7 +59,14 @@ Scheduler::Scheduler(bool runthread, QMap<int, EncoderLink *> *tvList,
     else
         dbConn = MSqlQuery::DDCon();
 
-    recordTable = recordTbl;
+    recordTable = tmptable;
+    priorityTable = "powerpriority";
+
+    if (tmptable == "powerpriority_tmp")
+    {
+        priorityTable = tmptable;
+        recordTable = "record";
+    }
 
     m_mainServer = NULL;
 
@@ -1971,6 +1978,9 @@ void Scheduler::BuildNewRecordsQueries(int recordid, QStringList &from,
 void Scheduler::UpdateMatches(int recordid) {
     struct timeval dbstart, dbend;
 
+    if (recordid == 0)
+        return;
+
     MSqlQuery query(dbConn);
     query.prepare("DELETE FROM recordmatch "
                   "WHERE recordid = :RECORDID OR :RECORDID = -1;");
@@ -2173,7 +2183,8 @@ void Scheduler::AddNewRecords(void)
         "(program.closecaptioned > 0) * %1").arg(ccpriority);
 
     MSqlQuery result(dbConn);
-    result.prepare("SELECT recpriority, selectclause FROM powerpriority;");
+    result.prepare(QString("SELECT recpriority, selectclause FROM %1;")
+    .arg(priorityTable));
     result.exec();
 
     if (!result.isActive())

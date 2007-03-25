@@ -336,6 +336,14 @@ static int comp_recstart(ProgramInfo *a, ProgramInfo *b)
         else
             return -1;
     }
+    if (a->recpriority != b->recpriority &&
+        (a->recstatus == rsWillRecord || b->recstatus == rsWillRecord))
+    {
+        if (a->recpriority < b->recpriority)
+            return 1;
+        else
+            return -1;
+    }
     return 0;
 }
 

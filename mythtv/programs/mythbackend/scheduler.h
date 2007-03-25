@@ -68,6 +68,7 @@ class Scheduler : public QObject
 
   private:
     QString recordTable;
+    QString priorityTable;
 
     void verifyCards(void);
 
