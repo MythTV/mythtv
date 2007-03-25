@@ -161,7 +161,7 @@ void MythCheckBox::keyPressEvent(QKeyEvent* e)
                 focusNextPrevChild(false);
             else if (action == "DOWN")
                 focusNextPrevChild(true);
-            else if (action == "LEFT" || action == "RIGHT")
+            else if (action == "LEFT" || action == "RIGHT" || action == "SELECT")
                 toggle();
             else
                 handled = false;
@@ -280,7 +280,9 @@ bool MythSpinBox::eventFilter(QObject* o, QEvent* e)
                 stepDown();
             else if (action == "PAGEDOWN")
                 stepUp();
-            else if (action == "SELECT" || action == "ESCAPE")
+            else if (action == "SELECT")
+                handled = true;
+            else if (action == "ESCAPE")
                 return FALSE;
             else
                 handled = false;
@@ -326,7 +328,7 @@ void MythSlider::keyPressEvent(QKeyEvent* e)
             else if (action == "RIGHT")
                 setValue(value() + lineStep());
             else if (action == "SELECT")
-                e->ignore();
+                handled = true;
             else
                 handled = false;
         }
@@ -1035,7 +1037,9 @@ void MythTable::keyPressEvent(QKeyEvent *e)
             }
             else if (action == "LEFT" || action == "RIGHT")
                 handled = true;
-        }
+            else if (action == "SELECT")
+                handled = true;
+         }
     }
 
     if (!handled)
