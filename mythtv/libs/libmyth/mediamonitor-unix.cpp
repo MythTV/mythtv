@@ -88,8 +88,8 @@ bool MediaMonitorUnix::CheckFileSystemTable(void)
     // Attempt to open the file system descriptor entry.
     if (!setfsent()) 
     {
-        VERBOSE(VB_IMPORTANT, QString("MediaMonitor") + 
-                "MediaMonitor::CheckFileSystemTable - Failed to open " +
+        VERBOSE(VB_IMPORTANT, QString("MediaMonitorUnix") + 
+                "::CheckFileSystemTable - Failed to open " +
                 _PATH_FSTAB + " for reading." + ENO);
         return false;
     }
@@ -316,7 +316,7 @@ bool MediaMonitorUnix::AddDevice(MythMediaDevice* pDevice)
 
         if (sb.st_rdev == new_rdev)
         {
-            VERBOSE(VB_IMPORTANT, "Mediamonitor: AddDevice() -- " +
+            VERBOSE(VB_MEDIA, "MediamonitorUnix::AddDevice() -- " +
                     QString("Not adding '%1', it appears to be a duplicate.")
                     .arg(pDevice->getDevicePath()));
 
@@ -412,8 +412,8 @@ bool MediaMonitorUnix::AddDevice(struct fstab * mep)
      if (pDevice) 
      {
          pDevice->setMountPath(mep->fs_file);
-         VERBOSE(VB_IMPORTANT, QString("Mediamonitor: Adding %1")
-                         .arg(pDevice->getDevicePath()));
+         VERBOSE(VB_MEDIA, QString("Mediamonitor: Adding %1")
+                           .arg(pDevice->getDevicePath()));
          if (pDevice->testMedia() == MEDIAERR_OK) 
          {
              if (AddDevice(pDevice))
