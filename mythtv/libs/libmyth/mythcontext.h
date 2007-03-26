@@ -81,6 +81,7 @@ class MythContextPrivate;
     F(VB_SOCKET,    0x00100000, "socket",    1, "socket debugging messages")               \
     F(VB_XMLTV,     0x00200000, "xmltv",     1, "xmltv output and related messages")       \
     F(VB_DVBCAM,    0x00400000, "dvbcam",    1, "DVB CAM debugging messages")              \
+    F(VB_MEDIA,     0x00800000, "media",     1, "Media Manager debugging messages")        \
     F(VB_TIMESTAMP, 0x80000000, "timestamp", 1, "Conditional data driven messages")        \
     F(VB_NONE,      0x00000000, "none",      0, "NO debug output")
 

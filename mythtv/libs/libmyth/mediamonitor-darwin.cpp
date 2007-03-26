@@ -1,10 +1,6 @@
 /**
  * \file     mediamonitor-darwin.cpp
  * \brief    MythMediaMonitor for Darwin/Mac OS X.
- *
- * \bug      I am using VB_UPNP for some VERBOSE messages.
- *           Should probably define another level of verbosity?
- *
  * \version  $Id$
  * \author   Andrew Kimpton, Nigel Pearson
  */
@@ -263,7 +259,7 @@ void diskAppearedCallback(DADiskRef disk, void *context)
 
     if (!BSDname)
     {
-        VERBOSE(VB_UPNP, msg + "Skipping non-local device");
+        VERBOSE(VB_MEDIA, msg + "Skipping non-local device");
         return;
     }
 
@@ -286,7 +282,7 @@ void diskAppearedCallback(DADiskRef disk, void *context)
     if (kCFBooleanFalse ==
         CFDictionaryGetValue(details, kDADiskDescriptionMediaRemovableKey))
     {
-        VERBOSE(VB_UPNP, msg + "Skipping non-removable " + BSDname);
+        VERBOSE(VB_MEDIA, msg + "Skipping non-removable " + BSDname);
         CFRelease(details);
         return;
     }
@@ -302,8 +298,8 @@ void diskAppearedCallback(DADiskRef disk, void *context)
     // We know it is removable, and have guessed the type.
     // Call a helper function to create appropriate objects and insert 
 
-    VERBOSE(VB_UPNP, QString("Found disk %1 - volume name '%2'.")
-                     .arg(BSDname).arg(volName));
+    VERBOSE(VB_MEDIA, QString("Found disk %1 - volume name '%2'.")
+                      .arg(BSDname).arg(volName));
 
     mtd->diskInsert(BSDname, volName, model, isCDorDVD);
 
@@ -388,7 +384,7 @@ void MonitorThreadDarwin::diskInsert(const char *devName,
     QString           msg = QString("MonitorThreadDarwin::diskInsert(%1,%2,%3)")
                             .arg(devName).arg(volName).arg(isCDorDVD);
 
-    VERBOSE(VB_UPNP, msg);
+    VERBOSE(VB_MEDIA, msg);
 
     if (isCDorDVD)
         media = MythCDROM::get(m_Monitor, devName, true,
@@ -420,7 +416,7 @@ void MonitorThreadDarwin::diskInsert(const char *devName,
 
 void MonitorThreadDarwin::diskRemove(QString devName)
 {
-    VERBOSE(VB_UPNP,
+    VERBOSE(VB_MEDIA,
             QString("MonitorThreadDarwin::diskRemove(%1)").arg(devName));
 
     m_Monitor->RemoveDevice(devName);
@@ -441,7 +437,7 @@ void MonitorThreadDarwin::diskRename(const char *devName, const char *volName)
         if (m_Monitor->ValidateAndLock(*i))
             if ((*i)->getDevicePath() == devName)
             {
-                VERBOSE(VB_UPNP,
+                VERBOSE(VB_MEDIA,
                         QString("MonitorThreadDarwin::diskRename(%1,%2)")
                         .arg(devName).arg(volName));
 
@@ -595,7 +591,7 @@ QStringList MediaMonitorDarwin::GetCDROMBlockDevices()
                 QString  desc = getModel(drive);
 
                 list.append(desc);
-                VERBOSE(VB_UPNP, desc.prepend("Found CD/DVD: "));
+                VERBOSE(VB_MEDIA, desc.prepend("Found CD/DVD: "));
                 CFRelease(p);
             }
         }
