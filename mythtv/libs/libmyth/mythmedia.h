@@ -54,6 +54,9 @@ class MPUBLIC MythMediaDevice : public QObject
     const QString& getDevicePath() const { return m_DevicePath; }
     void setDevicePath(const char *devPath) { m_DevicePath = devPath; }
 
+    const QString& getDeviceModel() const  { return m_DeviceModel;  }
+    void setDeviceModel(const char *model) { m_DeviceModel = model; }
+
     MediaStatus getStatus() const { return m_Status; }
 
     const QString& getVolumeID() const { return m_VolumeID; }
@@ -122,6 +125,7 @@ class MPUBLIC MythMediaDevice : public QObject
 
     QString m_MountPath;        ///< The path to this media's mount point (i.e. /mnt/cdrom). Read only.
     QString m_DevicePath;       ///< The path to this media's device (i.e. /dev/cdrom). Read/write.
+    QString m_DeviceModel;      ///< The device Manufacturer/Model. Read/write.
     MediaStatus m_Status;       ///< The status of the media as of the last call to checkMedia. Read only.
     QString m_VolumeID;         ///< The volume ID of the media. Read Only.
     QString m_KeyID;            ///< KeyID of the media. Read Only
