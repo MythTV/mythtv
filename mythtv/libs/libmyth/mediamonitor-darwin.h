@@ -10,7 +10,7 @@ class MonitorThreadDarwin : public MonitorThread
     virtual void run(void);
 
     void  diskInsert(const char *devName,
-                     const char *volName, bool isCDorDVD = 1);
+                     const char *volName, QString model, bool isCDorDVD = 1);
     void  diskRemove(QString devName);
     void  diskRename(const char *devName, const char *volName);
 };

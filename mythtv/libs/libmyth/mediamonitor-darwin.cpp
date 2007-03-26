@@ -200,6 +200,49 @@ static char * getVolName(CFDictionaryRef diskDetails)
     return volName;
 }
 
+/*
+ * Given a DA description, return a compound description to help identify it.
+ */
+static const QString getModel(CFDictionaryRef diskDetails)
+{
+    QString     desc;
+    const void  *strRef;
+
+    // Location
+    if (kCFBooleanTrue ==
+        CFDictionaryGetValue(diskDetails,
+                             kDADiskDescriptionDeviceInternalKey))
+        desc.append("Internal ");
+
+    // Manufacturer
+    strRef = CFDictionaryGetValue(diskDetails,
+                                  kDADiskDescriptionDeviceVendorKey);
+    if (strRef)
+    {
+        desc.append(CFStringGetCStringPtr((CFStringRef)strRef,
+                                          kCFStringEncodingMacRoman));
+        desc.append(' ');
+    }
+
+    // Product
+    strRef = CFDictionaryGetValue(diskDetails,
+                               kDADiskDescriptionDeviceModelKey);
+    if (strRef)
+    {
+        desc.append(CFStringGetCStringPtr((CFStringRef)strRef,
+                                          kCFStringEncodingMacRoman));
+        desc.append(' ');
+    }
+
+    // Remove the trailing space
+    desc.truncate(desc.length() - 1);
+
+    // and multiple spaces
+    desc.remove("  ");
+
+    return desc;
+}
+
 
 /*
  * Callbacks which the Disk Arbitration session invokes
@@ -212,6 +255,7 @@ void diskAppearedCallback(DADiskRef disk, void *context)
     CFDictionaryRef      details;
     bool                 isCDorDVD;
     MediaType            mediaType;
+    QString              model;
     MonitorThreadDarwin *mtd;
     QString              msg = "diskAppearedCallback() - ";
     char                *volName;
@@ -238,6 +282,7 @@ void diskAppearedCallback(DADiskRef disk, void *context)
     // Seems OK for hot-plug USB/FireWire disks (i.e. they are removable)
 
     details = DADiskCopyDescription(disk);
+
     if (kCFBooleanFalse ==
         CFDictionaryGetValue(details, kDADiskDescriptionMediaRemovableKey))
     {
@@ -246,8 +291,9 @@ void diskAppearedCallback(DADiskRef disk, void *context)
         return;
     }
 
-    // Get the volume name for more user-friendly interaction
+    // Get the volume and model name for more user-friendly interaction
     volName = getVolName(details);
+    model   = getModel(details);
 
     mediaType = MediaTypeForBSDName(BSDname);
     isCDorDVD = (mediaType == MEDIATYPE_DVD) || (mediaType == MEDIATYPE_AUDIO);
@@ -259,7 +305,7 @@ void diskAppearedCallback(DADiskRef disk, void *context)
     VERBOSE(VB_UPNP, QString("Found disk %1 - volume name '%2'.")
                      .arg(BSDname).arg(volName));
 
-    mtd->diskInsert(BSDname, volName, isCDorDVD);
+    mtd->diskInsert(BSDname, volName, model, isCDorDVD);
 
     CFRelease(details);
     free(volName);
@@ -335,7 +381,8 @@ void MonitorThreadDarwin::run(void)
  * so that we can add or remove from its list of media objects.
  */
 void MonitorThreadDarwin::diskInsert(const char *devName,
-                                     const char *volName, bool isCDorDVD)
+                                     const char *volName,
+                                     QString model, bool isCDorDVD)
 {
     MythMediaDevice  *media;
     QString           msg = QString("MonitorThreadDarwin::diskInsert(%1,%2,%3)")
@@ -359,6 +406,8 @@ void MonitorThreadDarwin::diskInsert(const char *devName,
 
     /// We store the volume name for user activities like ChooseAndEjectMedia().
     media->setVolumeID(volName);
+    /// Same for the Manufacturer and model:
+    media->setDeviceModel(model);
 
     /// Mac OS X devices are pre-mounted, but we want to use MythMedia's code
     /// to work out the mediaType. media->onDeviceMounted() is protected,
@@ -448,6 +497,47 @@ bool MediaMonitorDarwin::AddDevice(MythMediaDevice* pDevice)
     return true;
 }
 
+/*
+ * Given a device, return a compound description to help identify it.
+ * We try to find out if it is internal, its manufacturer, and model.
+ */
+static const QString getModel(io_object_t drive)
+{
+    QString                 desc;
+    CFMutableDictionaryRef  props = NULL;
+
+    props = (CFMutableDictionaryRef) IORegistryEntrySearchCFProperty(drive, kIOServicePlane, CFSTR(kIOPropertyProtocolCharacteristicsKey), kCFAllocatorDefault, kIORegistryIterateParents | kIORegistryIterateRecursively);
+CFShow(props);
+    if (props)
+    {
+        const void  *location = CFDictionaryGetValue(props, CFSTR(kIOPropertyPhysicalInterconnectLocationKey));
+        if (CFEqual(location, CFSTR("Internal")))
+            desc.append("Internal ");
+    }
+
+    props = (CFMutableDictionaryRef) IORegistryEntrySearchCFProperty(drive, kIOServicePlane, CFSTR(kIOPropertyDeviceCharacteristicsKey), kCFAllocatorDefault, kIORegistryIterateParents | kIORegistryIterateRecursively);
+    if (props)
+    {
+        const void *product = CFDictionaryGetValue(props, CFSTR(kIOPropertyProductNameKey));
+        const void *vendor  = CFDictionaryGetValue(props, CFSTR(kIOPropertyVendorNameKey));
+        if (vendor)
+        {
+            desc.append(CFStringGetCStringPtr((CFStringRef)vendor, kCFStringEncodingMacRoman));
+            desc.append(" ");
+        }
+        if (product)
+        {
+            desc.append(CFStringGetCStringPtr((CFStringRef)product, kCFStringEncodingMacRoman));
+            desc.append(" ");
+        }
+    }
+
+    // Omit the trailing space
+    desc.truncate(desc.length() - 1);
+
+    return desc;
+}
+
 /**
  * \brief List of CD/DVD devices
  *
@@ -493,7 +583,7 @@ QStringList MediaMonitorDarwin::GetCDROMBlockDevices()
 
     while ((drive = IOIteratorNext(iter)))
     {
-        CFMutableDictionaryRef  p = NULL;
+        CFMutableDictionaryRef  p = NULL;  // properties of drive
 
         IORegistryEntryCreateCFProperties(drive, &p, kCFAllocatorDefault, 0);
         if (p)
@@ -502,32 +592,7 @@ QStringList MediaMonitorDarwin::GetCDROMBlockDevices()
 
             if (CFEqual(type, CFSTR("DVD")) || CFEqual(type, CFSTR("CD")))
             {
-                QString     desc;
-
-                p = (CFMutableDictionaryRef) IORegistryEntrySearchCFProperty(drive, kIOServicePlane, CFSTR(kIOPropertyProtocolCharacteristicsKey), kCFAllocatorDefault, kIORegistryIterateParents | kIORegistryIterateRecursively);
-                if (p)
-                {
-                    const void  *location = CFDictionaryGetValue(p, CFSTR(kIOPropertyPhysicalInterconnectLocationKey));
-                    if (CFEqual(location, CFSTR("Internal")))
-                        desc.append(tr("Internal"));
-                }
-
-                p = (CFMutableDictionaryRef) IORegistryEntrySearchCFProperty(drive, kIOServicePlane, CFSTR(kIOPropertyDeviceCharacteristicsKey), kCFAllocatorDefault, kIORegistryIterateParents | kIORegistryIterateRecursively);
-                if (p)
-                {
-                    const void *product = CFDictionaryGetValue(p, CFSTR(kIOPropertyProductNameKey));
-                    const void *vendor = CFDictionaryGetValue(p, CFSTR(kIOPropertyVendorNameKey));
-                    if (vendor)
-                    {
-                        desc.append(" ");
-                        desc.append(CFStringGetCStringPtr((CFStringRef)vendor, kCFStringEncodingMacRoman));
-                    }
-                    if (product)
-                    {
-                        desc.append(" ");
-                        desc.append(CFStringGetCStringPtr((CFStringRef)product, kCFStringEncodingMacRoman));
-                    }
-                }
+                QString  desc = getModel(drive);
 
                 list.append(desc);
                 VERBOSE(VB_UPNP, desc.prepend("Found CD/DVD: "));

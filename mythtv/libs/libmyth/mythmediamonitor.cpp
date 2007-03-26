@@ -73,6 +73,28 @@ MediaMonitor* MediaMonitor::GetMediaMonitor(void)
     return c_monitor;
 }
 
+// When ejecting one of multiple devices, present a nice name to the user
+static const QString DevName(MythMediaDevice *d)
+{
+    QString str = d->getVolumeID();  // First choice, the name of the media 
+
+    if (str == "")
+    {
+        str = d->getDeviceModel();   // otherwise, the drive manufacturer/model
+
+        if (str)                     // and/or the device node
+            str += " (" + d->getDevicePath() + ')';
+        else
+            str = d->getDevicePath();
+    }
+    //     We could add even more information here, but volume names
+    //     are usually descriptively unique (i.e. usually good enough)
+    //else
+    //    str += " (" + d->getDeviceModel() + ", " + d->getDevicePath() + ')';
+
+    return str;
+}
+
 /** \fn MediaMonitor::ChooseAndEjectMedia(void)
  *  \brief Unmounts and ejects removable media devices.
  *
@@ -108,11 +130,7 @@ void MediaMonitor::ChooseAndEjectMedia(void)
             if ((*it)->getAllowEject() || (*it)->isMounted(true))
             {
                 shownDevices.append(*it);
-
-                if ((*it)->getVolumeID() != "")
-                    ejectbox.addButton((*it)->getVolumeID());
-                else
-                    ejectbox.addButton((*it)->getDevicePath());
+                ejectbox.addButton(DevName(*it));
             }
 
             it++;
@@ -137,10 +155,7 @@ void MediaMonitor::ChooseAndEjectMedia(void)
 
     bool doEject = false;
     int   status = selected->getStatus();
-    QString  dev = selected->getVolumeID();
-
-    if (dev == "")
-        dev = selected->getDevicePath();
+    QString  dev = DevName(selected);
 
     if (MEDIASTAT_OPEN == status)
     {

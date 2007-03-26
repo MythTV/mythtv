@@ -218,6 +218,65 @@ QStringList MediaMonitorUnix::GetCDROMBlockDevices(void)
     return l;
 }
 
+static void LookupModel(MythMediaDevice* device)
+{
+    QString   desc;
+    QString   devname = device->getDevicePath();
+    QFileInfo devpath(devname);
+
+
+    // Paths like /dev/cdrom usually point to something like /dev/hdc
+    if (devpath.isSymLink())
+        devname = devpath.readLink();
+
+
+    // Given something like /dev/sdb1, extract sdb
+    devname.mid(5,3);
+
+
+#ifdef linux
+    if (devname.startsWith("hd"))  // IDE drive
+    {
+        QFile  file("/proc/ide/" + devname + "/model");
+        if (file.open(IO_ReadOnly))
+        {
+            QTextStream stream(&file);
+
+            desc.append(stream.read());
+            file.close();
+        }
+    }
+
+    if (devname.startsWith("sd"))  // SATA/USB/FireWire
+    {
+        QString path = devname.prepend("/sys/block/");
+        path.append("/device/");
+
+        QFile  file(path + "vendor");
+        if (file.open(IO_ReadOnly))
+        {
+            QTextStream stream(&file);
+
+            desc.append(stream.read());
+            desc.append(' ');
+            file.close();
+        }
+
+        file.setName(path + "model");
+        if (file.open(IO_ReadOnly))
+        {
+            QTextStream stream(&file);
+
+            desc.append(stream.read());
+            desc.append(' ');
+            file.close();
+        }
+    }
+#endif
+
+    device->setDeviceModel(desc);
+}
+
 // Given a media deivce add it to our collection.
 bool MediaMonitorUnix::AddDevice(MythMediaDevice* pDevice)
 {
@@ -264,6 +323,8 @@ bool MediaMonitorUnix::AddDevice(MythMediaDevice* pDevice)
             return false;
         }
     }
+
+    LookupModel(pDevice);
 
     QMutexLocker locker(&m_DevicesLock);
 
