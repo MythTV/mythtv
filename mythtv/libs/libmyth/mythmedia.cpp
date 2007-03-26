@@ -89,8 +89,8 @@ bool MythMediaDevice::performMountCmd(bool DoMount)
 {
     if (DoMount && isMounted(true))
     {
-        VERBOSE(VB_GENERAL, "MythMediaDevice::performMountCmd(true)"
-                            " - Logic Error? Device already mounted.");
+        VERBOSE(VB_MEDIA, "MythMediaDevice::performMountCmd(true)"
+                          " - Logic Error? Device already mounted.");
         return true;
     }
 
@@ -112,7 +112,7 @@ bool MythMediaDevice::performMountCmd(bool DoMount)
                 .arg((DoMount) ? PATHTO_MOUNT : PATHTO_UNMOUNT)
                 .arg(m_DevicePath);
     
-        VERBOSE(VB_IMPORTANT,  QString("Executing '%1'").arg(MountCommand));
+        VERBOSE(VB_MEDIA, QString("Executing '%1'").arg(MountCommand));
         if (0 == myth_system(MountCommand)) 
         {
             if (DoMount)
@@ -122,7 +122,7 @@ bool MythMediaDevice::performMountCmd(bool DoMount)
                 isMounted(true);
                 m_Status = MEDIASTAT_MOUNTED;
                 onDeviceMounted();
-                VERBOSE(VB_IMPORTANT,
+                VERBOSE(VB_GENERAL,
                         QString("Detected MediaType ") + MediaTypeString());
             }
             else
@@ -137,14 +137,14 @@ bool MythMediaDevice::performMountCmd(bool DoMount)
     } 
     else 
     {
-        VERBOSE( VB_IMPORTANT,  "Disk inserted on a supermount device" );
+        VERBOSE(VB_MEDIA, "Disk inserted on a supermount device");
         // If it's a super mount then the OS will handle mounting /  unmounting.
         // We just need to give derived classes a chance to perform their 
         // mount / unmount logic.
         if (DoMount)
         {
             onDeviceMounted();
-            VERBOSE(VB_IMPORTANT,
+            VERBOSE(VB_GENERAL,
                     QString("Detected MediaType ") + MediaTypeString());
         }
         else
@@ -164,7 +164,7 @@ MediaType MythMediaDevice::DetectMediaType(void)
 
     if (!ScanMediaType(m_MountPath, ext_cnt))
     {
-        VERBOSE(VB_GENERAL, QString("No files with extensions found in '%1'")
+        VERBOSE(VB_MEDIA, QString("No files with extensions found in '%1'")
                 .arg(m_MountPath));
         return mediatype;
     }
