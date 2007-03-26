@@ -80,7 +80,7 @@ QString dvb_decode_text(const unsigned char *src, uint raw_length,
 
     // Strip formatting characters
     // Also, if a override encoding is specified copy it in front of the text
-    char dst[raw_length + encoding_override_length];
+    unsigned char dst[raw_length + encoding_override_length];
     uint length = encoding_override_length;
     if (encoding_override)
         memcpy(dst, encoding_override, encoding_override_length);
@@ -93,7 +93,7 @@ QString dvb_decode_text(const unsigned char *src, uint raw_length,
             length++;
         }
     }
-    const char *buf = dst;
+    const unsigned char *buf = dst;
 
     // Exit on empty string, sans formatting.
     if (!length)
@@ -102,11 +102,11 @@ QString dvb_decode_text(const unsigned char *src, uint raw_length,
     // Decode using the correct text codec
     if (buf[0] >= 0x20)
     {
-        return decode_iso6937((unsigned char*)buf, length);
+        return decode_iso6937(buf, length);
     }
     else if ((buf[0] >= 0x01) && (buf[0] <= 0x0B))
     {
-        return iso8859_codecs[4 + buf[0]]->toUnicode(buf + 1, length - 1);
+        return iso8859_codecs[4 + buf[0]]->toUnicode((char*)(buf + 1), length - 1);
     }
     else if (buf[0] == 0x10)
     {
@@ -118,14 +118,14 @@ QString dvb_decode_text(const unsigned char *src, uint raw_length,
 
         uint code = buf[1] << 8 | buf[2];
         if (code <= 15)
-            return iso8859_codecs[code]->toUnicode(buf + 3, length - 3);
+            return iso8859_codecs[code]->toUnicode((char*)(buf + 3), length - 3);
         else
-            return QString::fromLocal8Bit(buf + 3, length - 3);
+            return QString::fromLocal8Bit((char*)(buf + 3), length - 3);
     }
     else
     {
         // Unknown/invalid encoding - assume local8Bit
-        return QString::fromLocal8Bit(buf + 1, length - 1);
+        return QString::fromLocal8Bit((char*)(buf + 1), length - 1);
     }
 }
 
