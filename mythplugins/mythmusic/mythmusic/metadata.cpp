@@ -158,16 +158,7 @@ void Metadata::dumpToDatabase()
     QString sqldir = sqlfilepath.section( '/', 0, -2);
     QString sqlfilename = sqlfilepath.section( '/', -1 ) ;
 
-    if (m_artist == "")
-        m_artist = QObject::tr("Unknown Artist");
-    if (m_compilation_artist == "")
-        m_compilation_artist = m_artist; // This should be the same as Artist if blank.
-    if (m_album == "")
-        m_album = QObject::tr("Unknown Album");
-    if (m_title == "")
-        m_title = m_filename;
-    if (m_genre == "")
-        m_genre = QObject::tr("Unknown Genre");
+    checkEmptyFields();
 
     MSqlQuery query(MSqlQuery::InitCon());
 
@@ -460,6 +451,20 @@ inline QString Metadata::formatReplaceSymbols(const QString &format)
   return rv;
 }
 
+void Metadata::checkEmptyFields()
+{
+    if (m_artist == "")
+        m_artist = QObject::tr("Unknown Artist");
+    if (m_compilation_artist == "")
+        m_compilation_artist = m_artist; // This should be the same as Artist if blank.
+    if (m_album == "")
+        m_album = QObject::tr("Unknown Album");
+    if (m_title == "")
+        m_title = m_filename;
+    if (m_genre == "")
+        m_genre = QObject::tr("Unknown Genre");
+
+}
 
 inline void Metadata::setCompilationFormatting(bool cd)
 {

@@ -15,77 +15,67 @@ class AllMusic;
 class Metadata
 {
   public:
-    Metadata(QString lfilename = "", QString lartist = "", QString lcompilation_artist = "", 
+    Metadata(QString lfilename = "", QString lartist = "", QString lcompilation_artist = "",
              QString lalbum = "", QString ltitle = "", QString lgenre = "",
              int lyear = 0, int ltracknum = 0, int llength = 0, int lid = 0,
              int lrating = 0, int lplaycount = 0, QString llastplay = "",
              bool lcompilation = false, QString lformat="")
-            {
-                m_filename = lfilename;
-                m_artist = lartist;
-                m_compilation_artist = lcompilation_artist;
-                m_album = lalbum;
-                m_title = ltitle;
-                m_formattedartist = "";
-                m_formattedtitle = "";
-                m_genre = lgenre;
-                m_year = lyear;
-                m_tracknum = ltracknum;
-                m_length = llength;
-                m_id = lid;
-                m_rating = lrating;
-                m_playcount = lplaycount;
-                m_lastplay = llastplay;
-                m_compilation = lcompilation;
-                m_changed = false;
-                m_show = true;
-                m_format = lformat;
-
-                m_directoryid = -1;
-                m_artistid = -1;
-                m_albumid = -1;
-                m_genreid = -1;
-            }
+                : m_artist(lartist),
+                   m_compilation_artist(lcompilation_artist),
+                   m_album(lalbum),
+                   m_title(ltitle),
+                   m_formattedartist(""),
+                   m_formattedtitle(""),
+                   m_genre(lgenre),
+                   m_format(lformat),
+                   m_year(lyear),
+                   m_tracknum(ltracknum),
+                   m_length(llength),
+                   m_rating(lrating),
+                   m_directoryid(-1),
+                   m_artistid(-1),
+                   m_compartistid(-1),
+                   m_albumid(-1),
+                   m_genreid(-1),
+                   m_lastplay(llastplay),
+                   m_playcount(lplaycount),
+                   m_compilation(lcompilation),
+                   m_id(lid),
+                   m_filename(lfilename),
+                   m_changed(false),
+                   m_show(true)
+    {
+        checkEmptyFields();
+    }
 
     Metadata(const Metadata &other)
-            {
-                *this = other;
-                m_changed = false;
-                /*
-                filename = other.filename;
-                artist = other.artist;
-                compilation_artist = other.compilation_artist;
-                album = other.album;
-                title = other.title;
-                formattedartist = other.formattedartist;
-                formattedtitle = other.formattedtitle;
-                genre = other.genre;
-                year = other.year;
-                tracknum = other.tracknum;
-                length = other.length;
-                id = other.id;
-                rating = other.rating;
-                lastplay = other.lastplay;
-                playcount = other.playcount;
-                compilation = other.compilation;
-                show = other.show;
-                changed = false;
-                format = other.format;
-                */
-            }
+    {
+        *this = other;
+         m_changed = false;
+    }
 
     Metadata& operator=(Metadata *rhs);
 
-    QString Artist() { return m_artist; }
-    void setArtist(const QString &lartist) { m_artist = lartist; m_formattedartist = m_formattedtitle = ""; }
-    
-    QString CompilationArtist() { return m_compilation_artist; }
-    void setCompilationArtist(const QString &lcompilation_artist) { m_compilation_artist = lcompilation_artist; m_formattedartist = m_formattedtitle = ""; }
+    QString Artist() const { return m_artist; }
+    void setArtist(const QString &lartist)
+    {
+        m_artist = lartist; m_formattedartist = m_formattedtitle = "";
+    }
 
-    QString Album() { return m_album; }
-    void setAlbum(const QString &lalbum) { m_album = lalbum; m_formattedartist = m_formattedtitle = ""; }
+    QString CompilationArtist() const { return m_compilation_artist; }
+    void setCompilationArtist(const QString &lcompilation_artist)
+    {
+        m_compilation_artist = lcompilation_artist; 
+        m_formattedartist = m_formattedtitle = ""; 
+    }
 
-    QString Title() { return m_title; }
+    QString Album() const { return m_album; }
+    void setAlbum(const QString &lalbum)
+    {
+        m_album = lalbum; m_formattedartist = m_formattedtitle = "";
+    }
+
+    QString Title() const { return m_title; }
     void setTitle(const QString &ltitle) { m_title = ltitle; }
 
     QString FormatArtist();
@@ -95,27 +85,30 @@ class Metadata
     void setGenre(const QString &lgenre) { m_genre = lgenre; }
 
     void setDirectoryId(int ldirectoryid) { m_directoryid = ldirectoryid; }
-    int getDirectoryId() { return m_directoryid; }
+    int getDirectoryId() const { return m_directoryid; }
+
     void setArtistId(int lartistid) { m_artistid = lartistid; }
-    int getArtistId() { return m_artistid; }
+    int getArtistId() const { return m_artistid; }
+
     void setAlbumId(int lalbumid) { m_albumid = lalbumid; }
-    int getAlbumId() { return m_albumid; }
+    int getAlbumId() const { return m_albumid; }
+
     void setGenreId(int lgenreid) { m_genreid = lgenreid; }
-    int getGenreId() { return m_genreid; }
+    int getGenreId() const { return m_genreid; }
 
     int Year() { return m_year; }
     void setYear(int lyear) { m_year = lyear; }
 
-    int Track() { return m_tracknum; }
+    int Track() const { return m_tracknum; }
     void setTrack(int ltrack) { m_tracknum = ltrack; }
 
-    int Length() { return m_length; }
+    int Length() const { return m_length; }
     void setLength(int llength) { m_length = llength; }
 
-    int Playcount() { return m_playcount; }
+    int Playcount() const { return m_playcount; }
     void setPlaycount(int lplaycount) { m_playcount = lplaycount; }
 
-    unsigned int ID() { return m_id; }
+    unsigned int ID() const { return m_id; }
     void setID(int lid) { m_id = lid; }
 
     QString Filename() const { return m_filename; }
@@ -124,32 +117,35 @@ class Metadata
     QString Format() const { return m_format; }
     void setFormat(const QString &lformat) { m_format = lformat; }
 
-    int Rating() { return m_rating; }
+    int Rating() const { return m_rating; }
     void decRating();
     void incRating();
     void setRating(int lrating) { m_rating = lrating; }
 
     double LastPlay();
-    QString LastPlayStr() { return m_lastplay; }
+    QString LastPlayStr() const { return m_lastplay; }
     void setLastPlay();
 
-    int PlayCount() { return m_playcount; }
+    int PlayCount() const { return m_playcount; }
     void incPlayCount();
 
-    bool isVisible() { return m_show; }
+    bool isVisible() const { return m_show; }
     void setVisible(bool visible) { m_show = visible; }
 
     // track is part of a compilation album
-    bool Compilation() { return m_compilation; }
-    void setCompilation(bool state) { m_compilation = state; m_formattedartist = m_formattedtitle = ""; }
-    bool determineIfCompilation(bool m_cd = false);
+    bool Compilation() const { return m_compilation; }
+    void setCompilation(bool state)
+    {
+        m_compilation = state; m_formattedartist = m_formattedtitle = "";
+    }
+    bool determineIfCompilation(bool cd = false);
 
     bool isInDatabase(void);
     void dumpToDatabase(void);
     void setField(const QString &field, const QString &data);
     void getField(const QString& field, QString *data);
     void persist();
-    bool hasChanged(){return m_changed;}
+    bool hasChanged() {return m_changed;}
     int compare (Metadata *other);
     static void setArtistAndTrackFormats();
 
@@ -162,6 +158,7 @@ class Metadata
   private:
     void setCompilationFormatting(bool cd = false);
     QString formatReplaceSymbols(const QString &format);
+    void checkEmptyFields(void);
 
     QString m_artist;
     QString m_compilation_artist;
@@ -304,8 +301,8 @@ class AllMusic
     QString     getLabel(int an_id, bool *error_flag);
     Metadata*   getMetadata(int an_id);
     bool        updateMetadata(int an_id, Metadata *the_track);
-    int         count() { return m_numPcs; }
-    int         countLoaded() { return m_numLoaded; } 
+    int         count() const { return m_numPcs; }
+    int         countLoaded() const { return m_numLoaded; } 
     void        save();
     bool        startLoading(void);
     void        resync();   //  After a CD rip, for example
