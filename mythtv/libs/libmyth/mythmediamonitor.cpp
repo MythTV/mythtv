@@ -166,10 +166,13 @@ void MediaMonitor::ChooseAndEjectMedia(void)
 
     if (MEDIASTAT_OPEN == status)
     {
+        VERBOSE(VB_MEDIA,
+                QString("Disk %1's tray is OPEN. Closing tray").arg(dev));
         selected->eject(false);
     }
     else if (MEDIASTAT_MOUNTED == status)
     {
+        VERBOSE(VB_MEDIA, QString("Disk %1 is mounted? Unmounting").arg(dev));
         selected->unmount();
 
         if (selected->isMounted(true))
@@ -186,6 +189,8 @@ void MediaMonitor::ChooseAndEjectMedia(void)
 
     if (doEject)
     {
+        VERBOSE(VB_MEDIA,
+                QString("Unlocking disk %1, then eject()ing").arg(dev));
         selected->unlock();
 
         if (selected->eject() == MEDIAERR_UNSUPPORTED)
