@@ -286,6 +286,16 @@ static HostSpinBox *SetRandomWeight()
     return gc;
 };
 
+static HostSpinBox *SetSearchMaxResultsReturned()
+{
+    HostSpinBox *gc = new HostSpinBox("MaxSearchResults", 0, 20000, 100);
+    gc->setLabel(QObject::tr("Maximum Search Results"));
+    gc->setValue(300);
+    gc->setHelpText(QObject::tr("Used to limit the number of results "
+                    "returned when using the search feature."));
+    return gc;
+};
+
 static HostCheckBox *UseShowRatings()
 {
     HostCheckBox *gc = new HostCheckBox("MusicShowRatings");
@@ -560,6 +570,7 @@ MusicPlayerSettings::MusicPlayerSettings(void)
     playersettings->addChild(SetPlayCountWeight());
     playersettings->addChild(SetLastPlayWeight());
     playersettings->addChild(SetRandomWeight());
+    playersettings->addChild(SetSearchMaxResultsReturned());
     playersettings->addChild(UseShowRatings());
     playersettings->addChild(UseShowWholeTree());
     playersettings->addChild(UseListShuffled());

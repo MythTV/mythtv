@@ -80,7 +80,7 @@ void SearchDialog::runQuery(QString searchText)
     bool substringSearch = true;
     bool isNumber = false;
     searchText.toULongLong(&isNumber);
-
+    QString searchLimit = gContext->GetSetting("MaxSearchResults");
     searchText.replace("'", "''");
 
     if (!isNumber)
@@ -126,7 +126,6 @@ void SearchDialog::runQuery(QString searchText)
                     "album_name  LIKE '%" + stxt + "%' OR "
                     "name    LIKE '%" + stxt + "%')";
              }
-             VERBOSE(VB_GENERAL, QString("alpha whereClause " + whereClause ));
         }
         else // numeric
         {
@@ -140,13 +139,13 @@ void SearchDialog::runQuery(QString searchText)
                     "album_name  REGEXP '" + stxt + "' OR "
                     "name        REGEXP '" + stxt + "')";
             }
-            VERBOSE(VB_GENERAL,QString("numeric whereClause " + whereClause ));
         }
     }
 
     queryString += whereClause;
     queryString += " ORDER BY music_artists.artist_name, album_name, name, song_id, filename ";
-
+    queryString += "LIMIT ";
+    queryString += searchLimit;
     query.prepare(queryString);
 
     bool has_entries = true;
