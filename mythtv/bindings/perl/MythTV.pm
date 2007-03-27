@@ -168,6 +168,7 @@ package MythTV;
                      'dbh'         => undef,
 
                      'channels'    => {},
+                     'callsigns'   => {},
                      'scheduled'   => [],
                      'recorded'    => [],
 
@@ -528,12 +529,20 @@ package MythTV;
         return %rows;
     }
 
-# Return a channel object
+# Return a channel object, by chanid
     sub channel {
         my $self   = shift;
         my $chanid = shift;
-        $self->load_channels() unless ($self->{'channels'}{$chanid});
+        $self->load_channels() unless (%{$self->{'channels'}});
         return $self->{'channels'}{$chanid};
+    }
+
+# Return a channel object, by callsign
+    sub callsign {
+        my $self     = shift;
+        my $callsign = shift;
+        $self->load_channels() unless (%{$self->{'channels'}});
+        return $self->{'callsigns'}{lc($callsign)};
     }
 
 # Load all of the known channels for this connection
@@ -565,10 +574,12 @@ package MythTV;
                                             FROM channel
                                                  LEFT JOIN dtv_multiplex
                                                         ON channel.mplexid = dtv_multiplex.mplexid
+                                        ORDER BY chanid
                                          ');
         $sh->execute();
         while (my $row = $sh->fetchrow_hashref) {
             $self->{'channels'}{$row->{'chanid'}} = new MythTV::Channel($row);
+            $self->{'callsigns'}{lc($row->{'callsign'})} ||= \$self->{'channels'}{$row->{'chanid'}};
         }
         $sh->finish;
     }
