@@ -585,7 +585,7 @@ bool ThumbFinder::initAVCodec(const QString &inFile)
     // find the first video stream
     m_videostream = -1;
 
-    for (int i = 0; i < m_inputFC->nb_streams; i++)
+    for (uint i = 0; i < m_inputFC->nb_streams; i++)
     {
         AVStream *st = m_inputFC->streams[i];
         if (m_inputFC->streams[i]->codec->codec_type == CODEC_TYPE_VIDEO)
