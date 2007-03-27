@@ -542,7 +542,7 @@ package MythTV;
         my $self     = shift;
         my $callsign = shift;
         $self->load_channels() unless (%{$self->{'channels'}});
-        return $self->{'callsigns'}{lc($callsign)};
+        return $self->{'callsigns'}{$callsign};
     }
 
 # Load all of the known channels for this connection
@@ -579,7 +579,7 @@ package MythTV;
         $sh->execute();
         while (my $row = $sh->fetchrow_hashref) {
             $self->{'channels'}{$row->{'chanid'}} = new MythTV::Channel($row);
-            $self->{'callsigns'}{lc($row->{'callsign'})} ||= \$self->{'channels'}{$row->{'chanid'}};
+            $self->{'callsigns'}{$row->{'callsign'}} ||= \$self->{'channels'}{$row->{'chanid'}};
         }
         $sh->finish;
     }
