@@ -4117,7 +4117,44 @@ bool UIManagedTreeListType::moveUp(bool do_refresh)
         {
             if (show_whole_tree)
             {
-                for(int i = active_bin; i <= bins; i++)
+                for (int i = active_bin; i <= bins; i++)
+                {
+                    emit requestUpdate(screen_corners[i]);
+                }
+            }
+            else
+            {
+                refresh();
+            }
+        }
+        emit nodeEntered(current_node->getInt(), current_node->getAttributes());
+        current_node->becomeSelectedChild();
+        return true;
+    }
+    return false;
+}
+
+bool UIManagedTreeListType::moveUpByAmount(int number_up, bool do_refresh)
+{
+    if (!current_node)
+    {
+        return false;
+    }
+    //
+    //  Move the active node to the
+    //  current active node's previous
+    //  sibling
+    //
+
+    GenericTree *new_node = current_node->prevSibling(number_up, visual_order);
+    if (new_node)
+    {
+        current_node = new_node;
+        if (do_refresh)
+        {
+            if (show_whole_tree)
+            {
+                for (int i = active_bin; i <= bins; i++)
                 {
                     emit requestUpdate(screen_corners[i]);
                 }
@@ -4155,7 +4192,45 @@ bool UIManagedTreeListType::moveDown(bool do_refresh)
         {
             if (show_whole_tree)
             {
-                for(int i = active_bin; i <= bins; i++)
+                for (int i = active_bin; i <= bins; i++)
+                {
+                    emit requestUpdate(screen_corners[i]);
+                }
+            }
+            else
+            {
+                refresh();
+            }
+        }
+        emit nodeEntered(current_node->getInt(), current_node->getAttributes());
+        current_node->becomeSelectedChild();
+        return true;
+    }
+    return false;
+}
+
+bool UIManagedTreeListType::moveDownByAmount(int number_down, bool do_refresh)
+{
+    if (!current_node)
+    {
+        return false;
+    }
+
+    //
+    //  Move the active node to the
+    //  current active node's next
+    //  sibling
+    //
+
+    GenericTree *new_node = current_node->nextSibling(number_down, visual_order);
+    if (new_node)
+    {
+        current_node = new_node;
+        if (do_refresh)
+        {
+            if (show_whole_tree)
+            {
+                for (int i = active_bin; i <= bins; i++)
                 {
                     emit requestUpdate(screen_corners[i]);
                 }

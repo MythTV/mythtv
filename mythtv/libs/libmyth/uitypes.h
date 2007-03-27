@@ -1094,7 +1094,9 @@ class MPUBLIC UIManagedTreeListType : public UIType
     bool    popUp();
     bool    pushDown();
     bool    moveUp(bool do_refresh = true);
+    bool    moveUpByAmount(int number_up = 1, bool do_refresh = true);
     bool    moveDown(bool do_refresh = true);
+    bool    moveDownByAmount(int number_down = 1, bool do_refresh = true);
     bool    pageUp();
     bool    pageDown();
     bool    nextActive(bool wrap_around, bool traverse_up_down);
