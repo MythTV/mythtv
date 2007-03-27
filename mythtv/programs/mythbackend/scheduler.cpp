@@ -2161,9 +2161,7 @@ void Scheduler::AddNewRecords(void)
 
     int complexpriority = gContext->GetNumSetting("ComplexPriority", 0);
     int prefinputpri    = gContext->GetNumSetting("PrefInputPriority", 2);
-    int oncepriority    = gContext->GetNumSetting("OnceRecPriority", 0);
     int hdtvpriority    = gContext->GetNumSetting("HDTVRecPriority", 0);
-    int ccpriority      = gContext->GetNumSetting("CCRecPriority", 0);
 
     QString pwrpri = "channel.recpriority + cardinput.recpriority";
 
@@ -2171,20 +2169,12 @@ void Scheduler::AddNewRecords(void)
         pwrpri += QString(" + "
         "(cardinput.cardinputid = RECTABLE.prefinput) * %1").arg(prefinputpri);
 
-    if (oncepriority)
-        pwrpri += QString(" + "
-        "(program.first > 0 AND program.last > 0) * %1").arg(oncepriority);
-
     if (hdtvpriority)
         pwrpri += QString(" + (program.hdtv > 0) * %1").arg(hdtvpriority);
 
-    if (ccpriority)
-        pwrpri += QString(" + "
-        "(program.closecaptioned > 0) * %1").arg(ccpriority);
-
     MSqlQuery result(dbConn);
     result.prepare(QString("SELECT recpriority, selectclause FROM %1;")
-    .arg(priorityTable));
+                           .arg(priorityTable));
     result.exec();
 
     if (!result.isActive())

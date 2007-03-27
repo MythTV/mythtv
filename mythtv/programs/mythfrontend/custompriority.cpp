@@ -151,7 +151,7 @@ CustomPriority::CustomPriority(MythMainWindow *parent, const char *name,
     m_clause->insertItem(tr("Only channels marked as commercial free"));
     m_csql << "channel.commmethod = -2 ";
 
-    m_clause->insertItem(tr("Modify  priority for a station on an input"));
+    m_clause->insertItem(tr("Modify priority for a station on an input"));
     m_csql << "channel.callsign = 'ESPN' AND cardinput.cardinputid = 2";
 
     m_clause->insertItem(tr("Priority for all matching titles"));

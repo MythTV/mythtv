@@ -10,7 +10,7 @@ using namespace std;
 #include "mythdbcon.h"
 
 /// This is the DB schema version expected by the running MythTV instance.
-const QString currentDatabaseVersion = "1185";
+const QString currentDatabaseVersion = "1186";
 
 static bool UpdateDBVersionNumber(const QString &newnumber);
 static bool performActualUpdate(const QString updates[], QString version,
@@ -2995,6 +2995,41 @@ thequery,
 };
         if (!performActualUpdate(updates, "1185", dbver))
             return false;
+    }
+
+    if (dbver == "1185")
+    {
+        VERBOSE(VB_IMPORTANT, "Upgrading to schema version 1186");
+
+        MSqlQuery ppuq(MSqlQuery::InitCon());
+
+        int oncepriority = gContext->GetNumSetting("OnceRecPriority", 0);
+        int ccpriority   = gContext->GetNumSetting("CCRecPriority", 0);
+
+        if (oncepriority)
+        {
+            ppuq.prepare("INSERT INTO powerpriority "
+                         "(priorityname, recpriority, selectclause) "
+                         "VALUES('Priority When Shown Once', :VALUE, "
+                         "'program.first > 0 AND program.last > 0');");
+            ppuq.bindValue(":VALUE", oncepriority);
+            ppuq.exec();
+        }
+
+        if (ccpriority)
+        {
+            ppuq.prepare("INSERT INTO powerpriority "
+                         "(priorityname, recpriority, selectclause) "
+                         "VALUES('Close Captioned Priority', :VALUE, "
+                         "'program.closecaptioned > 0');");
+            ppuq.bindValue(":VALUE", ccpriority);
+            ppuq.exec();
+        }
+
+        if (!UpdateDBVersionNumber("1186"))
+            return false;
+
+        dbver = "1186";
     }
 
 //"ALTER TABLE cardinput DROP COLUMN preference;" in 0.22
