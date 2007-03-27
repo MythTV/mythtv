@@ -76,7 +76,8 @@ class PlaybackBoxMusic : public MythThemedDialog
     void wipeTrackInfo();
     void toggleFullBlankVisualizer();
     void end();
-
+    void resetScrollCount();
+    
     void occasionallyCheckCD();
 
     // popup menu
@@ -113,7 +114,8 @@ class PlaybackBoxMusic : public MythThemedDialog
     void bannerEnable(QString text, int millis);
     void bannerEnable(Metadata *mdata);
     void bannerToggle(Metadata *mdata);
-
+    
+    
     QIODevice *input;
     AudioOutput *output;
     Decoder *decoder;
@@ -136,11 +138,13 @@ class PlaybackBoxMusic : public MythThemedDialog
       SHUFFLE_ALBUM,
       MAX_SHUFFLE_MODES 
     };
-
+    
     bool listAsShuffled;
     int outputBufferSize;
     int currentTime, maxTime;
-
+    int scrollCount;
+    bool scrollingDown;
+    
     Metadata *curMeta;
 
 
@@ -163,6 +167,7 @@ class PlaybackBoxMusic : public MythThemedDialog
     QTimer *visual_mode_timer;
     QTimer *lcd_update_timer;
     QTimer *banner_timer;
+    QTimer *speed_scroll_timer;
     int visualizer_status;
 
     bool showrating;

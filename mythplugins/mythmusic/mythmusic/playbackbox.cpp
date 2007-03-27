@@ -44,23 +44,29 @@ PlaybackBoxMusic::PlaybackBoxMusic(MythMainWindow *parent, QString window_name,
     lcd_update_timer = NULL;
     banner_timer = NULL;
     waiting_for_playlists_timer = NULL;
+    speed_scroll_timer = NULL;
     playlist_tree = NULL;
-    playlist_popup = NULL;    
+    playlist_popup = NULL;
     progress = NULL;
-    
+
     isplaying = false;
     tree_is_done = false;
     first_playlist_check = true;
     outputBufferSize = 256;
     currentTime = 0;
     maxTime = 0;
+    scrollCount = 0;
+    scrollingDown = false;
     setContext(0);
     visual_mode_timer = new QTimer(this);
+    speed_scroll_timer = new QTimer(this);
+    connect(speed_scroll_timer, SIGNAL(timeout()), this, SLOT(resetScrollCount()));
+
     visualizer_status = 0;
     curMeta = NULL;
     curSmartPlaylistCategory = "";
     curSmartPlaylistName = "";
-    
+
     banner_timer = new QTimer(this);
     connect(banner_timer, SIGNAL(timeout()), this, SLOT(bannerDisable()));
 
@@ -264,6 +270,12 @@ bool PlaybackBoxMusic::onMediaEvent(MythMediaDevice*)
     return scan_for_cd;
 }
 
+void PlaybackBoxMusic::resetScrollCount()
+{
+     scrollCount = 0;
+     scrollingDown = false;
+}
+
 void PlaybackBoxMusic::keyPressEvent(QKeyEvent *e)
 {
     bool handled = false;
@@ -272,6 +284,8 @@ void PlaybackBoxMusic::keyPressEvent(QKeyEvent *e)
 
     QStringList actions;
     gContext->GetMainWindow()->TranslateKeyPress("Music", e, actions);
+
+    int scrollAmt = 1;
 
     for (unsigned int i = 0; i < actions.size() && !handled; i++)
     {
@@ -428,9 +442,43 @@ void PlaybackBoxMusic::keyPressEvent(QKeyEvent *e)
             handled = true;
 
             if (action == "UP")
-                music_tree_list->moveUp();
+            {
+                if (scrollingDown)
+                    resetScrollCount();
+
+                scrollCount++;
+                if (scrollCount > 19 && scrollCount < 30)
+                    scrollAmt = 10;
+                else if (scrollCount > 29)
+                    scrollAmt = 50;
+
+                if (!music_tree_list->moveUpByAmount(scrollAmt, true) && scrollAmt > 1)
+                    resetScrollCount();
+
+                speed_scroll_timer->stop();
+                speed_scroll_timer->start(500, true);
+
+            }
             else if (action == "DOWN")
-                music_tree_list->moveDown();
+            {
+                if (!scrollingDown)
+                {
+                    resetScrollCount();
+                    scrollingDown = true;
+                }
+
+                scrollCount++;
+                if (scrollCount > 19 && scrollCount < 30)
+                    scrollAmt = 10;
+                else if (scrollCount > 29)
+                    scrollAmt = 50;
+
+                if (!music_tree_list->moveDownByAmount(scrollAmt, true) && scrollCount > 1)
+                    resetScrollCount();
+
+                speed_scroll_timer->stop();
+                speed_scroll_timer->start(500, true);
+            }
             else if (action == "LEFT")
                 music_tree_list->popUp();
             else if (action == "RIGHT")
