@@ -820,7 +820,7 @@ void Playlist::savePlaylist(QString a_name, QString a_host)
     fillSonglistFromSongs();
     MSqlQuery query(MSqlQuery::InitCon());
 
-    int songcount = 0, playtime = 0, an_int;
+    int length = 0, songcount = 0, playtime = 0, an_int;
     QStringList list = QStringList::split(",", raw_songlist);
     QStringList::iterator it = list.begin();
     for (; it != list.end(); it++)
@@ -831,22 +831,26 @@ void Playlist::savePlaylist(QString a_name, QString a_host)
             songcount++;
             if (an_int > 0)
             {
-                query.prepare("SELECT length FROM music_songs "
-                    "WHERE song_id = :ID ;");
+                Metadata *md = all_available_music->getMetadata(an_int);
+                if(md)
+                    length = md->Length();
             }
             else
             {
                 query.prepare("SELECT length FROM music_playlists "
                     "WHERE playlist_id = :ID ;");
                 an_int *= -1;
+                query.bindValue(":ID", an_int);
+                query.exec();
+
+                if (query.size() > 0)
+                {
+                    query.next();
+                    length = query.value(0).toInt();
+                }
             }
-            query.bindValue(":ID", an_int);
-            query.exec();
-            if (query.size() > 0)
-            {
-                query.next();
-                playtime += query.value(0).toInt();
-            }
+
+            playtime += length;
         }
     }
 
