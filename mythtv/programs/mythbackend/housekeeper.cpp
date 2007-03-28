@@ -90,7 +90,7 @@ bool HouseKeeper::wantToRun(const QString &dbTag, int period, int minhour,
                 {
                     int minute = now.toString(QString("m")).toInt();
                     if ((hour == maxhour && minute > 30) ||
-                        ((random()%((maxhour-hour)*12+(60-minute)/5 - 6) == 0)))
+                        ((random()%(((maxhour-hour)*12+(60-minute)/5 - 6) + 1)) == 0))
                         runOK = true;
                 }
             }
