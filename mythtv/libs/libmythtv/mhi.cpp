@@ -327,24 +327,32 @@ bool MHIContext::OfferKey(QString key)
     int action = 0;
     QMutexLocker locker(&m_keyLock);
 
+    // This supports the UK and NZ key profile registers.
+    // The UK uses 3, 4 and 5 and NZ 13, 14 and 15.  These are
+    // similar but the NZ profile also provides an EPG key.
+
     if (key == "UP")
     {
-        if (m_keyProfile == 4 || m_keyProfile == 5)
+        if (m_keyProfile == 4 || m_keyProfile == 5 ||
+            m_keyProfile == 14 || m_keyProfile == 15)
             action = 1;
     }
     else if (key == "DOWN")
     {
-        if (m_keyProfile == 4 || m_keyProfile == 5)
+        if (m_keyProfile == 4 || m_keyProfile == 5 ||
+            m_keyProfile == 14 || m_keyProfile == 15)
             action = 2;
     }
     else if (key == "LEFT")
     {
-        if (m_keyProfile == 4 || m_keyProfile == 5)
+        if (m_keyProfile == 4 || m_keyProfile == 5 ||
+            m_keyProfile == 14 || m_keyProfile == 15)
             action = 3;
     }
     else if (key == "RIGHT")
     {
-        if (m_keyProfile == 4 || m_keyProfile == 5)
+        if (m_keyProfile == 4 || m_keyProfile == 5 ||
+            m_keyProfile == 14 || m_keyProfile == 15)
             action = 4;
     }
     else if (key == "0" || key == "1" || key == "2" ||
@@ -352,12 +360,13 @@ bool MHIContext::OfferKey(QString key)
              key == "6" || key == "7" || key == "8" ||
              key == "9")
     {
-        if (m_keyProfile == 4)
+        if (m_keyProfile == 4 || m_keyProfile == 14)
             action = key.toInt() + 5;
     }
     else if (key == "SELECT")
     {
-        if (m_keyProfile == 4 || m_keyProfile == 5)
+        if (m_keyProfile == 4 || m_keyProfile == 5 ||
+            m_keyProfile == 14 || m_keyProfile == 15)
             action = 15;
     }
     else if (key == "TEXTEXIT")
@@ -371,7 +380,9 @@ bool MHIContext::OfferKey(QString key)
     else if (key == "MENUBLUE")
         action = 103;
     else if (key == "MENUTEXT")
-        action = 104;
+        action = m_keyProfile > 12 ? 105 : 104;
+    else if (key == "MENUEPG")
+        action = m_keyProfile > 12 ? 300 : 0;
 
     if (action != 0)
     {
@@ -573,12 +584,33 @@ int MHIContext::GetChannelIndex(const QString &str)
         if (query.exec() && query.isActive() && query.next())
             return query.value(0).toInt();
     }
-    else if (str == "rec://svc/cur")
+    else if (str == "rec://svc/cur" || str == "rec://svc/def")
         return m_currentChannel;
     else if (str.startsWith("rec://"))
     {
     }
     return -1;
+}
+
+// Get netId etc from the channel index.  This is the inverse of GetChannelIndex.
+bool MHIContext::GetServiceInfo(int channelId, int &netId, int &origNetId,
+                                int &transportId, int &serviceId)
+{
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare("SELECT networkid, transportid, serviceid "
+                  "FROM channel, dtv_multiplex "
+                  "WHERE chanid           = :CHANID AND "
+                  "      channel.mplexid  = dtv_multiplex.mplexid");
+    query.bindValue(":CHANID", channelId);
+    if (query.exec() && query.isActive() && query.next())
+    {
+        netId = query.value(0).toInt();
+        origNetId = netId; // We don't have this in the database.
+        transportId = query.value(1).toInt();
+        serviceId = query.value(2).toInt();
+        return true;
+    }
+    else return false;
 }
 
 bool MHIContext::TuneTo(int channel)

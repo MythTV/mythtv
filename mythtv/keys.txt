@@ -75,10 +75,13 @@ When in Teletext Menu mode:
 - F7          Toggle Background on/off
 - F8          Reveal hidden text.
 
-When in MHEG ITV Menu mode:
+When MHEG ITV is enabled:
 - F2-F5       Menu Red, Green, Yellow, or Blue, respectively
-- F6          Exit ITV Menu
-- F7          Toggle Menu Text
+- F6          Exit key, exits from interactive mode on some channels
+- F7          Text key, enters interactive mode on some channels
+- F12         EPG key, enters EPG mode (New Zealand only).
+  The effect of these keys depends on what is being displayed.  The arrow,
+  Enter, and 0-9 keys may also be used.
 
 Without the stickykeys option selected:
 

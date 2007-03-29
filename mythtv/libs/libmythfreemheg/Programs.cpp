@@ -393,7 +393,22 @@ void MHResidentProgram::CallProgram(bool fIsFork, const MHObjectRef &success, co
             // Returns basic SI information about the service indicated by an index
             // returned by GSI.
             // Returns networkID, origNetworkID, transportStreamID, serviceID
-            MHERROR("SI_GetBasicSI ResidentProgram is not implemented");
+            if (args.Size() == 5) {
+                int channelId = GetInt(args.GetAt(0), engine);
+                int netId, origNetId, transportId, serviceId;
+                // Look the information up in the database.
+                bool res = engine->GetContext()->GetServiceInfo(channelId, netId, origNetId,
+                                transportId, serviceId);
+                if (res)
+                {
+                    engine->FindObject(*(args.GetAt(1)->GetReference()))->SetVariableValue(netId);
+                    engine->FindObject(*(args.GetAt(2)->GetReference()))->SetVariableValue(origNetId);
+                    engine->FindObject(*(args.GetAt(3)->GetReference()))->SetVariableValue(transportId);
+                    engine->FindObject(*(args.GetAt(4)->GetReference()))->SetVariableValue(serviceId);
+                }
+                SetSuccessFlag(success, res, engine);
+            }
+            else SetSuccessFlag(success, false, engine);
         }
         else if (m_Name.Equal("GBI")) { // GetBootInfo
             // Gets the NB_info field.
@@ -401,8 +416,30 @@ void MHResidentProgram::CallProgram(bool fIsFork, const MHObjectRef &success, co
         }
         else if (m_Name.Equal("CCR")) { // CheckContentRef
             // Sees if an item with a particular content reference is available
-            // in the carousel.
-            MHERROR("CheckContentRef ResidentProgram is not implemented");
+            // in the carousel.  This looks like it should block until the file
+            // is available.  The profile recommends that this should be forked
+            // rather than called.
+            if (args.Size() == 3) {
+                MHUnion un;
+                un.GetValueFrom(*(args.GetAt(0)), engine);
+                un.CheckType(MHUnion::U_ContentRef);
+                MHContentRef fileName;
+                fileName.Copy(un.m_ContentRefVal);
+                QString csPath = engine->GetPathName(fileName.m_ContentRef);
+                bool result = false;
+                QByteArray text;
+                // Try to load the object.
+                if (! csPath.isEmpty())
+                    result = engine->GetContext()->GetCarouselData(csPath, text);
+                // Set the result variable.
+                MHParameter *pResFlag = args.GetAt(1);
+                engine->FindObject(*(pResFlag->GetReference()))->SetVariableValue(result);
+                MHParameter *pResCR = args.GetAt(2);
+                // Copy the file name to the resulting content ref.
+                engine->FindObject(*(pResCR->GetReference()))->SetVariableValue(fileName);
+                SetSuccessFlag(success, true, engine);
+            }
+            else SetSuccessFlag(success, false, engine);
         }
         else if (m_Name.Equal("CGR")) { // CheckGroupIDRef
             // Sees if an application or scene with a particular group id

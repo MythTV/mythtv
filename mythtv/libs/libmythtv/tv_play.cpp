@@ -417,6 +417,7 @@ void TV::InitKeys(void)
     REG_KEY("ITV Menu", "MENUBLUE",   "Menu Blue",   "F5");
     REG_KEY("ITV Menu", "TEXTEXIT",   "Menu Exit",   "F6");
     REG_KEY("ITV Menu", "MENUTEXT",   "Menu Text",   "F7");
+    REG_KEY("ITV Menu", "MENUEPG",    "Menu EPG",    "F12");
 /*
   keys already used:
 
@@ -441,7 +442,7 @@ void TV::InitKeys(void)
   Global:   F1,
   Playback:                   F7,F8,F9,F10,F11
   Teletext     F2,F3,F4,F5,F6,F7,F8
-  ITV          F2,F3,F4,F5,F6,F7
+  ITV          F2,F3,F4,F5,F6,F7,F12
 
   Playback: Ctrl-B,Ctrl-G
 */

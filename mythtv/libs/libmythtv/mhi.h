@@ -101,6 +101,9 @@ class MHIContext : public MHContext
     void DrawImage(int x, int y, const QRect &rect, const QImage &image);
 
     virtual int GetChannelIndex(const QString &str);
+    /// Get netId etc from the channel index.
+    virtual bool GetServiceInfo(int channelId, int &netId, int &origNetId,
+                                int &transportId, int &serviceId);
     virtual bool TuneTo(int channel);
 
     /// Begin playing audio from the specified stream

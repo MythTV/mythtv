@@ -116,6 +116,9 @@ public:
 
     // Tuning.  Get the index corresponding to a given channel.
     virtual int GetChannelIndex(const QString &str) = 0;
+    // Get netId etc from the channel index.
+    virtual bool GetServiceInfo(int channelId, int &netId, int &origNetId,
+                                int &transportId, int &serviceId) = 0;
     // Tune to an index returned by GetChannelIndex
     virtual bool TuneTo(int channel) = 0;
 
