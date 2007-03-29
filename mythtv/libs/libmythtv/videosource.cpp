@@ -2438,7 +2438,8 @@ void DVBConfigurationGroup::probeCard(const QString &videodevice)
             QString short_name = remove_chaff(frontend_name);
             buttonAnalog->setVisible(
                 short_name.left(15).lower() == "zarlink zl10353" ||
-                short_name.lower() == "wintv hvr 900 m/r: 65008/a1c0");
+                short_name.lower() == "wintv hvr 900 m/r: 65008/a1c0" ||
+                short_name.left(17).lower() == "philips tda10046h");
         }
         break;
         case CardUtil::ATSC:
