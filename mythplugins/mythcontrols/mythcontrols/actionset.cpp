@@ -62,7 +62,7 @@ bool ActionSet::Add(const ActionID &id, const QString &key)
 
     ActionList &ids = m_keyToActionMap[key];
     ids.push_back(id);
-    SetModifiedFlag(id, true);	
+    SetModifiedFlag(id, true);
 
     return true;
 }
@@ -75,6 +75,9 @@ bool ActionSet::Add(const ActionID &id, const QString &key)
  *
  *  \param id The action identifier to remove from.
  *  \param key The key to remove.
+ *
+ *  \todo Remove the actionlist from the m_keyToActionMap if the key
+ *        is no longer bound to any actions.
  */
 bool ActionSet::Remove(const ActionID &id, const QString &key)
 {
@@ -87,9 +90,14 @@ bool ActionSet::Remove(const ActionID &id, const QString &key)
         return false;
 
     m_keyToActionMap[key].remove(id);
+
+    // remove the key if there isn't anything bound to it.
+    if (m_keyToActionMap[key].isEmpty())
+        m_keyToActionMap.remove(key);
+
     SetModifiedFlag(id, true);
 
-    return true;	    
+    return true;
 }
 
 /** \fn ActionSet::Replace(const ActionID&,const QString&,const QString&)
@@ -118,7 +126,7 @@ bool ActionSet::Replace(const ActionID &id,
     m_keyToActionMap[newkey].push_back(id);
     SetModifiedFlag(id, true);
 
-    return true;	    
+    return true;
 }
 
 /** \fn ActionSet::SetModifiedFlag(const ActionID&, bool)
@@ -238,6 +246,39 @@ QStringList ActionSet::GetKeys(const ActionID &id) const
         if (a)
             keys = a->GetKeys();
     }
+
+    return keys;
+}
+
+QStringList ActionSet::GetContextKeys(const QString & context_name) const
+{
+    QStringList keys;
+    Context *c = m_contexts[context_name];
+
+    QDictIterator<Action> it(*c);
+    for (;it.current(); ++it)
+    {
+        QStringList akeys = (*it)->GetKeys();
+        for (size_t i = 0; i < akeys.size(); i++)
+        {
+                keys.append(akeys[i]);
+        }
+        keys.sort();
+    }
+
+    return keys;
+}
+
+/** \brief Get all keys (from every context) to which an action is bound.
+ */
+QStringList ActionSet::GetAllKeys(void) const
+{
+    QStringList keys;
+
+    QMap<QString, ActionList>::ConstIterator it;
+
+    for (it = m_keyToActionMap.begin(); it != m_keyToActionMap.end(); ++it)
+        keys.push_back(it.key());
 
     return keys;
 }

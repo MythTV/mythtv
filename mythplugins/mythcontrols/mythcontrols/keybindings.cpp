@@ -49,13 +49,22 @@ KeyBindings::KeyBindings(const QString &hostname)
     LoadJumppoints();
 }
 
+/** \brief Returns a list of all keys bound to an action. */
+QStringList KeyBindings::GetKeys(void) const
+{
+    return m_actionSet.GetAllKeys();
+}
+
 /** \fn KeyBindings::GetContexts(void) const
  *  \brief Returns a list of the context names.
  *  \note The returned list is a copy and can be modified without side-effects.
  */
 QStringList KeyBindings::GetContexts(void) const
 {
-    return QDeepCopy<QStringList>(m_actionSet.GetContextStrings());
+    QStringList ctxts = 
+        QDeepCopy<QStringList>(m_actionSet.GetContextStrings());
+    ctxts.sort();
+    return ctxts;
 }
 
 /** \fn KeyBindings::GetActions(const QString&) const
@@ -93,6 +102,35 @@ QStringList KeyBindings::GetActionKeys(const QString &context_name,
 {
     return QDeepCopy<QStringList>
         (m_actionSet.GetKeys(ActionID(context_name, action_name)));
+}
+
+/** \fn KeyBindings::GetContextKeys(const QString &) const
+ *  \brief Get the keys within a context.
+ *  \param context The context name.
+ *  \return A list of the keys in the context.
+ */
+QStringList KeyBindings::GetContextKeys(const QString &context) const
+{
+    return m_actionSet.GetContextKeys(context);
+}
+
+/** \fn KeyBindings::GetKeyContexts(const QString &) const
+ *  \brief Get the context names in which a key is bound.
+ *  \return A list of context names in which a key is bound.
+ */
+QStringList KeyBindings::GetKeyContexts(const QString &key) const
+{
+    ActionList actions = m_actionSet.GetActions(key);
+    QStringList contexts;
+
+    for (size_t i = 0; i < actions.size(); i++)
+    {
+        QString context = actions[i].GetContext();
+        if (!contexts.contains(context))
+            contexts.push_back(context);
+    }
+
+    return contexts;
 }
 
 /** \fn KeyBindings::GetActionDescription(const QString&,const QString&) const

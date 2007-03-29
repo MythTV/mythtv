@@ -126,6 +126,7 @@ OptionsMenu::OptionsMenu(MythMainWindow *window)
 {
     addLabel(tr("Options"), Large, false);
     addButton(QObject::tr("Save"),   this, SLOT(Save()));
+    addButton(QObject::tr("Change View"), this, SLOT(ChangeView()));
     addButton(QObject::tr("Cancel"), this, SLOT(Cancel()))->setFocus();
 }
     

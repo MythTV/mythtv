@@ -94,7 +94,7 @@ class OptionsMenu : public MythPopupBox
     Q_OBJECT
 
   public:
-    enum actions { kSave, kCancel, };
+    enum actions { kSave, kChangeView, kCancel, };
 
     /// \brief Create a new action window. Does not pop-up menu.
     OptionsMenu(MythMainWindow *window);
@@ -103,8 +103,9 @@ class OptionsMenu : public MythPopupBox
     int GetOption(void) { return ExecPopup(this,SLOT(Cancel())); }
 
   public slots:
-    void Save(void)     { done(OptionsMenu::kSave);   }
-    void Cancel(void)   { done(OptionsMenu::kCancel); }
+    void Save(void)       { done(OptionsMenu::kSave);       }
+    void ChangeView(void) { done(OptionsMenu::kChangeView); }
+    void Cancel(void)     { done(OptionsMenu::kCancel);     }
 };
 
 

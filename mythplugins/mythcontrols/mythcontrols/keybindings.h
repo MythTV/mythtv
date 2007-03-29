@@ -59,11 +59,14 @@ class KeyBindings
     void        CommitChanges(void);
 
     // Gets
+    QStringList GetKeys(void) const;
     QStringList GetContexts(void) const;
     QStringList GetActions(const QString &context) const;
     void        GetKeyActions(const QString &key, ActionList &list) const;
     QStringList GetActionKeys(const QString &context_name,
                               const QString &action_name) const;
+    QStringList GetContextKeys(const QString &context) const;
+    QStringList GetKeyContexts(const QString &key) const;
     QString     GetActionDescription(const QString &context_name,
                                      const QString &action_name) const;
     bool        HasMandatoryBindings(void) const;

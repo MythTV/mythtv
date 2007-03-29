@@ -29,23 +29,31 @@
 
 #include "keybindings.h"
 
-class Binding
+
+typedef enum { kActionsByContext, kKeysByContext, kContextsByKey, } ViewType;
+
+/** \class ViewMenu
+ *  \brief Prompts the user to change the view.
+ */
+class ViewMenu : public MythPopupBox
 {
-  public:
-    Binding(const QString &_key,         const QString &_context,
-            const QString &_contextFrom, const QString &_action,
-            int            _bindlevel) :
-        key(_key), context(_context),
-        contextFrom(_contextFrom), action(_action), bindlevel(_bindlevel) {}
+    Q_OBJECT
 
   public:
-    QString key;
-    QString context;
-    QString contextFrom;
-    QString action;
-    int     bindlevel;
+    ViewMenu(MythMainWindow *window);
+
+    /// \brief Execute the option popup.
+    int GetOption(void) { return ExecPopup(this, SLOT(Cancel())); }
+
+    /// \brief The available views
+    enum actions { kContextAction, kContextKey, kKeyContext, kCancel, };
+
+  public slots:
+    void ActionsByContext(void) { done(ViewMenu::kContextAction); }
+    void KeysByContext(void)    { done(ViewMenu::kContextKey);    }
+    void ContextsByKey(void)    { done(ViewMenu::kKeyContext);    }
+    void Cancel(void)           { done(ViewMenu::kCancel);        }
 };
-typedef QPtrList<Binding> BindingList;
 
 /** \class MythControls
  *  \brief The myth controls configuration class.
@@ -77,17 +85,16 @@ class MythControls : public MythThemedDialog
     // Commands
     bool    LoadUI(void);
     void    RefreshKeyInformation(void);
-    QString RefreshKeyInformationKeyList(void);
-    void    RefreshRightList(void);
-    void    UpdateLists(void);
     void    LoadData(const QString &hostname);
     void    ChangeButtonFocus(int direction);
     void    ChangeListFocus(UIListBtnType *focus, UIListBtnType *unfocus);
-    void    AddBindings(QDict<Binding> &bindings, const QString &context,
-                        const QString &contextParent, int bindlevel);
+    void    ChangeView(void);
+    void    SetListContents(UIListBtnType *uilist,
+                            const QStringList & contents,
+                            bool arrows = false);
+    void    UpdateRightList(void);
 
     // Gets
-    BindingList *GetKeyBindings(const QString &context);
     uint         GetCurrentButton(void) const;
 
     // Functions
@@ -99,13 +106,12 @@ class MythControls : public MythThemedDialog
     void DeleteKey(void);
     void LeftSelected(UIListBtnTypeItem *item);
     void RightSelected(UIListBtnTypeItem *item);
-    void SortKeyList(QStringList &keys);
-    void RefreshKeyBindings(void);
     bool JumpTo(QKeyEvent *e);
     /// \brief Save the bindings to the Database.
     void Save(void) { m_bindings->CommitChanges(); }
 
   private:
+    ViewType           m_currentView;
     UIType            *m_focusedUIElement;
     UIListBtnType     *m_leftList;
     UIListBtnType     *m_rightList;
@@ -117,10 +123,7 @@ class MythControls : public MythThemedDialog
     KeyBindings       *m_bindings;
     LayerSet          *m_container;
     QStringList        m_sortedContexts; ///< sorted list of contexts
-    QStringList        m_sortedKeys;     ///< sorted list of keys
     QDict<QStringList> m_contexts;       ///< actions for a given context
-    QDict<BindingList> m_contextToBindingsMap;
-    QDict<BindingList> m_keyToBindingsMap;
     ListType           m_leftListType;
     ListType           m_rightListType;
 };
