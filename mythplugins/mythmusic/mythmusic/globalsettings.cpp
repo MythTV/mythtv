@@ -339,6 +339,19 @@ static HostComboBox *PlayMode()
     return gc;
 };
 
+static HostComboBox *ResumeMode()
+{
+    HostComboBox *gc = new HostComboBox("ResumeMode");
+    gc->setLabel(QObject::tr("Resume mode"));
+    gc->addSelection(QObject::tr("Off"), "off");
+    gc->addSelection(QObject::tr("Track"), "track");
+    gc->addSelection(QObject::tr("Exact"), "exact");
+    gc->setHelpText(QObject::tr("Resume playback at either the beginning of the "
+                    "active play queue, the beginning of the last track, an exact point within "
+                    "the last track."));
+    return gc;
+};
+
 static HostSlider *VisualModeDelay()
 {
     HostSlider *gc = new HostSlider("VisualModeDelay", 0, 100, 1);
@@ -566,24 +579,30 @@ MusicPlayerSettings::MusicPlayerSettings(void)
     VerticalConfigurationGroup* playersettings = new VerticalConfigurationGroup(false);
     playersettings->setLabel(QObject::tr("Playback Settings"));
     playersettings->addChild(PlayMode());
-    playersettings->addChild(SetRatingWeight());
-    playersettings->addChild(SetPlayCountWeight());
-    playersettings->addChild(SetLastPlayWeight());
-    playersettings->addChild(SetRandomWeight());
+    playersettings->addChild(ResumeMode());
     playersettings->addChild(SetSearchMaxResultsReturned());
     playersettings->addChild(UseShowRatings());
     playersettings->addChild(UseShowWholeTree());
     playersettings->addChild(UseListShuffled());
+
     addChild(playersettings);
 
     VerticalConfigurationGroup* playersettings2 = new VerticalConfigurationGroup(false);
-    playersettings2->setLabel(QObject::tr("Visualization Settings"));
-    playersettings2->addChild(VisualizationMode());
-    playersettings2->addChild(VisualCycleOnSongChange());
-    playersettings2->addChild(VisualModeDelay());
-    playersettings2->addChild(VisualScaleWidth());
-    playersettings2->addChild(VisualScaleHeight());
+    playersettings2->setLabel(QObject::tr("Playback Settings (2)"));
+    playersettings2->addChild(SetRatingWeight());
+    playersettings2->addChild(SetPlayCountWeight());
+    playersettings2->addChild(SetLastPlayWeight());
+    playersettings2->addChild(SetRandomWeight());
     addChild(playersettings2);
+
+    VerticalConfigurationGroup* playersettings3 = new VerticalConfigurationGroup(false);
+    playersettings3->setLabel(QObject::tr("Visualization Settings"));
+    playersettings3->addChild(VisualizationMode());
+    playersettings3->addChild(VisualCycleOnSongChange());
+    playersettings3->addChild(VisualModeDelay());
+    playersettings3->addChild(VisualScaleWidth());
+    playersettings3->addChild(VisualScaleHeight());
+    addChild(playersettings3);
 }
 
 MusicRipperSettings::MusicRipperSettings(void)

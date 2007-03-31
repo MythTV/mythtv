@@ -114,8 +114,9 @@ class PlaybackBoxMusic : public MythThemedDialog
     void bannerEnable(QString text, int millis);
     void bannerEnable(Metadata *mdata);
     void bannerToggle(Metadata *mdata);
-    
-    
+    void savePosition(uint position);
+    void restorePosition(void);
+
     QIODevice *input;
     AudioOutput *output;
     Decoder *decoder;
@@ -124,7 +125,7 @@ class PlaybackBoxMusic : public MythThemedDialog
     QString statusString;
     QString curSmartPlaylistCategory;
     QString curSmartPlaylistName;
-    
+
     enum RepeatMode
     { REPEAT_OFF = 0,
       REPEAT_TRACK, 
@@ -138,18 +139,25 @@ class PlaybackBoxMusic : public MythThemedDialog
       SHUFFLE_ALBUM,
       MAX_SHUFFLE_MODES 
     };
-    
+    enum ResumeMode
+    { RESUME_OFF,
+      RESUME_TRACK,
+      RESUME_EXACT,
+      MAX_RESUME_MODES
+    };
+
     bool listAsShuffled;
     int outputBufferSize;
     int currentTime, maxTime;
     int scrollCount;
     bool scrollingDown;
-    
+
     Metadata *curMeta;
 
 
     unsigned int shufflemode;
     unsigned int repeatmode;
+    unsigned int resumemode;
 
     bool isplaying;
 

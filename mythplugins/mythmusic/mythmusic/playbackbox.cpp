@@ -121,6 +121,14 @@ PlaybackBoxMusic::PlaybackBoxMusic(MythMainWindow *parent, QString window_name,
     else
         setShuffleMode(SHUFFLE_OFF);
 
+    QString resumestring = gContext->GetSetting("ResumeMode", "off");
+    if (resumestring.lower() == "off")
+        resumemode = RESUME_OFF;
+    else if (resumestring.lower() == "track")
+        resumemode = RESUME_TRACK;
+    else
+        resumemode = RESUME_EXACT;
+
     QString repeatmode = gContext->GetSetting("RepeatMode", "all");
     if (repeatmode.lower() == "track")
         setRepeatMode(REPEAT_TRACK);
@@ -221,6 +229,8 @@ PlaybackBoxMusic::PlaybackBoxMusic(MythMainWindow *parent, QString window_name,
 
 PlaybackBoxMusic::~PlaybackBoxMusic(void)
 {
+    savePosition(currentTime);
+
     stopAll();
 
     if (output)
@@ -338,11 +348,13 @@ void PlaybackBoxMusic::keyPressEvent(QKeyEvent *e)
             }
         }
         else if (action == "STOP")
-        { 
+        {
             if (stop_button)
                 stop_button->push();
             else
                 stop();
+
+            currentTime = 0;
         }
         else if (action == "THMBUP")
             increaseRating();
@@ -998,7 +1010,12 @@ void PlaybackBoxMusic::checkForPlaylists()
                 branches_to_current_node.append(0); //  Root node
                 branches_to_current_node.append(1); //  We're on a playlist (not "My Music")
                 branches_to_current_node.append(0); //  Active play Queue
-                music_tree_list->moveToNodesFirstChild(branches_to_current_node);
+
+                if (resumemode > RESUME_OFF)
+                    restorePosition();
+                else
+                    music_tree_list->moveToNodesFirstChild(branches_to_current_node);
+
                 music_tree_list->refresh();
                 if (show_whole_tree)
                     setContext(1);
@@ -1009,6 +1026,9 @@ void PlaybackBoxMusic::checkForPlaylists()
 
                 if (curMeta) 
                     updateTrackInfo(curMeta);
+
+                if (resumemode == RESUME_EXACT)
+                    seek(gContext->GetNumSetting("MusicBookmarkPosition", 0));
 
                 return;     // Do not restart Timer
             }
@@ -1656,6 +1676,63 @@ void PlaybackBoxMusic::setRepeatMode(unsigned int mode)
     }
 }
 
+void PlaybackBoxMusic::savePosition(uint position)
+{
+    QValueList <int> branches_to_current_node;
+
+    if (curMeta)
+    {
+        QValueList <int> *a_route;
+        a_route = music_tree_list->getRouteToActive();
+        branches_to_current_node = *a_route;
+    }
+    else
+    {
+        branches_to_current_node.clear();
+        branches_to_current_node.append(0); //  Root node
+        branches_to_current_node.append(1); //  We're on a playlist (not "My Music")
+        branches_to_current_node.append(0); //  Active play Queue
+        position = 0;
+    }
+
+    QString s = "";
+    QValueListIterator <int> it;
+    for (it = branches_to_current_node.begin(); it != branches_to_current_node.end(); ++it)
+        s += "," + QString::number(*it);
+
+    s.remove(0, 1);
+
+    gContext->SaveSetting("MusicBookmark", s);
+    gContext->SaveSetting("MusicBookmarkPosition", position);
+}
+
+void PlaybackBoxMusic::restorePosition()
+{
+    QValueList <int> branches_to_current_node;
+    QString s = gContext->GetSetting("MusicBookmark", "");
+
+    if (s != "")
+    {
+        QStringList list = QStringList::split(",", s);
+
+        for (QStringList::Iterator it = list.begin(); it != list.end(); ++it)
+            branches_to_current_node.append((*it).toInt());
+
+        // try to restore the saved position
+        if (music_tree_list->tryToSetActive(branches_to_current_node))
+        {
+            music_tree_list->select();
+            return;
+        }
+    }
+
+    branches_to_current_node.clear();
+    branches_to_current_node.append(0);
+    branches_to_current_node.append(1);
+    branches_to_current_node.append(0);
+    music_tree_list->moveToNodesFirstChild(branches_to_current_node);
+}
+
 void PlaybackBoxMusic::toggleRepeat()
 {
     setRepeatMode(++repeatmode % MAX_REPEAT_MODES);
@@ -1996,7 +2073,7 @@ void PlaybackBoxMusic::handleTreeListSignals(int node_int, IntVector *attributes
         if (output && output->GetPause())
         {
             stop();
-            if(play_button)
+            if (play_button)
             {
                 play_button->push();
             }

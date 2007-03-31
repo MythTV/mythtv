@@ -147,13 +147,16 @@ DatabaseBox::~DatabaseBox()
     the_playlists->cleanOutThreads();
 
     all_music->resetListings();
-    
+
     the_playlists->getActive()->removeAllWidgets();
-    
+
     if (class LCD * lcd = LCD::Get())
         lcd->switchToTime();
 
     delete rootNode;
+
+    gContext->SaveSetting("MusicBookmark", "");
+    gContext->SaveSetting("MusicBookmarkPosition", 0);
 }
 
 void DatabaseBox::showWaiting()
