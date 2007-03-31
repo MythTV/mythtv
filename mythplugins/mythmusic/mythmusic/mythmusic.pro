@@ -6,7 +6,7 @@ include (config.pro)
    error(Missing config.pro: please run the configure script)
 }
 
-INCLUDEPATH *= /usr/include/cdda
+INCLUDEPATH *= /usr/include/cdda /usr/include/taglib
 TEMPLATE = lib
 CONFIG += plugin thread
 TARGET = mythmusic
@@ -20,7 +20,7 @@ uifiles.files = music-ui.xml images/*.png
 
 INSTALLS += installfiles uifiles
 
-LIBS += -lmad -lid3tag -logg -lvorbisfile -lvorbis -lvorbisenc -lcdaudio -lFLAC
+LIBS += -lmad -ltag -logg -lvorbisfile -lvorbis -lvorbisenc -lcdaudio -lFLAC
 LIBS += -lmp3lame -lcdda_paranoia -lcdda_interface
 
 # Input
@@ -30,8 +30,8 @@ HEADERS += metadata.h playbackbox.h playlist.h polygon.h
 HEADERS += streaminput.h synaesthesia.h encoder.h visualize.h avfdecoder.h
 HEADERS += treecheckitem.h vorbisdecoder.h vorbisencoder.h polygon.h
 HEADERS += bumpscope.h globalsettings.h lameencoder.h dbcheck.h
-HEADERS += metaio.h metaioid3v2.h vcedit.h metaiooggvorbiscomment.h
-HEADERS += metaioflacvorbiscomment.h metaioavfcomment.h metaio_libid3hack.h
+HEADERS += metaio.h metaiotaglib.h vcedit.h metaiooggvorbiscomment.h
+HEADERS += metaioflacvorbiscomment.h metaioavfcomment.h
 HEADERS += goom/filters.h goom/goomconfig.h goom/goom_core.h goom/graphic.h
 HEADERS += goom/ifs.h goom/lines.h goom/mythgoom.h goom/drawmethods.h
 HEADERS += goom/mmx.h goom/mathtools.h goom/tentacle3d.h goom/v3d.h
@@ -46,8 +46,8 @@ SOURCES += streaminput.cpp encoder.cpp dbcheck.cpp
 SOURCES += synaesthesia.cpp treecheckitem.cpp vorbisdecoder.cpp lameencoder.cpp
 SOURCES += vorbisencoder.cpp visualize.cpp bumpscope.cpp globalsettings.cpp
 SOURCES += databasebox.cpp genres.cpp
-SOURCES += metaio.cpp metaioid3v2.cpp vcedit.c metaiooggvorbiscomment.cpp 
-SOURCES += metaioflacvorbiscomment.cpp metaioavfcomment.cpp metaio_libid3hack.c
+SOURCES += metaio.cpp metaiotaglib.cpp vcedit.c metaiooggvorbiscomment.cpp 
+SOURCES += metaioflacvorbiscomment.cpp metaioavfcomment.cpp
 SOURCES += goom/filters.c goom/goom_core.c goom/graphic.c goom/tentacle3d.c
 SOURCES += goom/ifs.c goom/ifs_display.c goom/lines.c goom/surf3d.c 
 SOURCES += goom/zoom_filter_mmx.c goom/zoom_filter_xmmx.c goom/mythgoom.cpp

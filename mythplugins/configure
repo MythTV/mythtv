@@ -405,10 +405,10 @@ fi
 
 if test "$music" != "no" ; then
     mad="no"
-    if has_library libmad && has_header mad.h && has_library libid3tag && has_header id3tag.h ; then
+    if has_library libmad && has_header mad.h ; then
         mad="yes"
     else
-        echo "MythMusic requires libmad and libid3tag."
+        echo "MythMusic requires libmad."
     fi 
 
     vorbis="no"
@@ -453,7 +453,14 @@ if test "$music" != "no" ; then
         echo "MythMusic requires the LAME mp3 encoder."
     fi
 
-    if test "$mad" = "no" -o "$vorbis" = "no" -o "$flac" = "no" -o "$cdaudio" = "no" -o "$paranoia" = "no" -o "$mp3lame" = "no" ; then
+    taglib="no"
+    if has_library libtag && has_header taglib/fileref.h ; then
+        taglib="yes"
+    else
+        echo "MythMusic requires taglib."
+    fi 
+
+    if test "$mad" = "no" -o "$vorbis" = "no" -o "$flac" = "no" -o "$cdaudio" = "no" -o "$paranoia" = "no" -o "$mp3lame" = "no" -o "$taglib" = "no" ; then
         echo "Disabling MythMusic due to missing dependencies."
         music="no"
     fi 

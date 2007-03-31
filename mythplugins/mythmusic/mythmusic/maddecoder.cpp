@@ -8,13 +8,12 @@
 using namespace std;
 
 #include <mad.h>
-#include <id3tag.h>
 
 #include "maddecoder.h"
 #include "metadata.h"
 #include "constants.h"
 #include <mythtv/audiooutput.h>
-#include "metaioid3v2.h"
+#include "metaiotaglib.h"
 
 #include <mythtv/mythconfig.h>
 #include <mythtv/mythcontext.h>
@@ -530,7 +529,7 @@ enum mad_flow MadDecoder::madError(struct mad_stream *stream,
 
 MetaIO *MadDecoder::doCreateTagger(void)
 {
-    return new MetaIOID3v2();
+    return new MetaIOTagLib();
 }
 
 bool MadDecoderFactory::supports(const QString &source) const

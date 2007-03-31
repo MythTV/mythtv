@@ -30,7 +30,7 @@
 
 #include "metadata.h"
 #include "lameencoder.h"
-#include "metaioid3v2.h"
+#include "metaiotaglib.h"
 
 #include <iostream>
 
@@ -146,7 +146,7 @@ LameEncoder::~LameEncoder()
     // Now write the Metadata
     if (metadata)
     {
-        MetaIOID3v2* p_tagger = new MetaIOID3v2;
+        MetaIOTagLib* p_tagger = new MetaIOTagLib;
         QString filename = metadata->Filename();
         QString tmp = *outfile;
         metadata->setFilename(tmp);
