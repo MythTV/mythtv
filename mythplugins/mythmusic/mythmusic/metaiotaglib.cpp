@@ -67,9 +67,8 @@ bool MetaIOTagLib::write(Metadata* mdata, bool exclusive)
 
     if (mdata->Rating() > 0 || mdata->PlayCount() > 0)
     {
-//         removeComment(tag, MYTH_ID3_FRAME_POPULARIMETER, "devnull@mythtv.org");
-//         int rating = (int) floor(((float)mdata->Rating() / 10 * 255) + 0.5);
-//         setPopularimeter(tag, "devnull@mythtv.org", rating, QString("%1").arg(mdata->PlayCount()));
+        // Needs to be implemented for taglib by subclassing ID3v2::Frames
+        // with one to handle POPM frames
     }
 
     if (!mdata->Genre().isEmpty())
@@ -133,12 +132,15 @@ Metadata* MetaIOTagLib::read(QString filename)
 
         // Get Track Num dealing with 1/16, 2/16 etc. format
         tracknum = tag->track();
-        //tracknum.replace(QRegExp("^([0-9]*).*"), QString("\\1")).toInt();
 
         year = tag->year();
 
         // Genre.
         genre = TStringToQString(tag->genre());
+
+        // Length
+        if(!taglib->ID3v2Tag()->frameListMap()["TLEN"].isEmpty())
+            length = taglib->ID3v2Tag()->frameListMap()["TLEN"].front()->toString().toInt();
     }
 
     // Fallback to filename reading
@@ -162,7 +164,7 @@ Metadata* MetaIOTagLib::read(QString filename)
                                      title, genre, year, tracknum, length,
                                      id, rating, playcount);
 
-    //retdata->setCompilation(compilation);
+    retdata->setCompilation(compilation);
 
     return retdata;
 }
