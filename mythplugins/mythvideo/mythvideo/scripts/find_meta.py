@@ -164,7 +164,7 @@ def strip_extension(path):
 		
 def cleanup_title(title):
 	title = title.replace("_", " ").replace(".", " ")
-	cut_point_strings = ["hdtv", "xvid", "dvd", "proper", "720p"]
+	cut_point_strings = ["hdtv", "xvid", "dvd", "proper", "720p", "limited"]
 	lowest_cutpoint = len(title)
 	for string in cut_point_strings:
 		pos = title.lower().rfind(string)
@@ -287,13 +287,12 @@ def detect_disc_number(allfiles, file):
 	else:
 		return disc
 	
-
 def save_metadata_to_mythdb(videopath, metadata):
 	"""
 	Updates the given metadata for the given video path.
 	
 	Detects if the given title is a dvd-rip dir with multiple videos and
-	adds metadata for all the videos separately, and chains the videos
+	adds metadata for all the videos separately and chains the videos
 	together.
 	"""
 	files_str = parse_meta("Files", "", "", metadata)
@@ -314,8 +313,26 @@ def save_metadata_to_mythdb(videopath, metadata):
 			return
 			
 	return save_video_metadata_to_mythdb(videopath, metadata)
+		
+def prune_mythdb_metadata():
+	global db
+	c = db.cursor()
+	c.execute("""
+		SELECT intid, filename
+		FROM videometadata""")
 	
-	
+	row = c.fetchone()
+	while row is not None:
+		intid = row[0]
+		filename = row[1]
+		if not os.path.exists(filename):
+			print_verbose("%s not exist, removing metadata..." % filename)
+			c2 = db.cursor()
+			c2.execute("""DELETE FROM videometadata WHERE intid = %s""", (intid,))
+			c2.close()
+		row = c.fetchone()
+	c.close()
+		
 def mythvideo_metadata_id(videopath):
 	"""
 	Finds the MythVideo metadata id for the given video path from the MythDB, if any.
@@ -357,7 +374,6 @@ def mythtv_setting(value, hostname = '%'):
 		return row[0]
 	else:
 		return None
-	
 	
 def save_video_metadata_to_mythdb(videopath, metadata, child=-1, disc=None):
 	"""
@@ -515,7 +531,6 @@ def find_poster_image(title, imdb_id):
 		print_verbose("Found existing cover image.")
 		return poster_files[0]
 	return None
-		
 		
 def save_metadata_to_file(fileName, metadata):
 	global overwrite
@@ -775,7 +790,6 @@ def scan_file(pathName, imdb_id = None):
 	if metadata is not None:
 		save_metadata(pathName, metadata_target, metadata)
 
-
 def scan_directory(dirName, imdb_id = None):
 	global videoExtensions
 	dirName = dirName.replace("[", "?").replace("]", "?")
@@ -890,6 +904,9 @@ def main():
 	p.add_option('--answer', '-a', action="store", type="string", dest="imdb_id",
 		help="Fetch metadata with the given IMDb ID for the path (must be a single path).")
 		
+	p.add_option('--prune', '-p', action="store_true", default=False,
+		help="Prune metadata of deleted files from MythDB.")
+		
 		
 	options, arguments = p.parse_args()
 	
@@ -904,12 +921,13 @@ def main():
 	dbimport = not options.no_dbimport
 	import_from_files = options.fromfiles and dbimport
 	metafiles = options.metafiles
+	prune = options.prune
 	
 	if not (metafiles or dbimport):
 		print "You must define writing to either MythDB import (-d) or metadata files (-m)."
 		sys.exit(1)
 			
-	if len(arguments) < 1:
+	if not prune and len(arguments) < 1:
 		print "Please give the paths to be scanned as argument."
 		sys.exit(1)
 	paths = arguments	
@@ -923,7 +941,7 @@ def main():
 			sys.exit(1)			
 		print_verbose("IMDb ID %s given manually." % options.imdb_id)		
 			
-	if dbimport:
+	if dbimport or prune:
 		if not db_support:
 			print "You must install MySQLdb module to make direct DB importing to work"
 			sys.exit(1)
@@ -932,6 +950,9 @@ def main():
 			sys.exit(1)	
 		poster_dir = mythtv_setting("VideoArtworkDir", socket.gethostname())
 		
+	
+	if prune:
+		prune_mythdb_metadata()
 	
 	for path in paths:
 	

@@ -165,13 +165,19 @@ class MoviePosterPosterFetcher(PosterFetcher):
 		urls = []
 		for div in divs:
 			links = div.findAll('a')
+			
 			if len(links) > 0:
-				link = links[0]
-				title = link['title'].lower()
-				if title.endswith("poster"):
-					title = title[0:-len(" poster")]
-				if title == search:
-					urls.append(link['href'])
+				for link in links:
+					# Skip the mailto links.
+					spl = link['href'].split(":")
+					if len(spl) > 1:
+						if spl[0].lower() == "mailto":
+							continue
+					title = link['title'].lower()
+					if title.endswith("poster"):
+						title = title[0:-len(" poster")]
+					if title == search:
+						urls.append(link['href'])
 		return urls
 				
 		
