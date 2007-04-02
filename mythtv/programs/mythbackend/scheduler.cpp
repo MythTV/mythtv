@@ -706,15 +706,15 @@ void Scheduler::PruneOverlaps(void)
             // In cases where two recording rules match the same
             // showing, one of them needs to take precedence.
             //
-            // An rsRepeat or rsInactive will not be considered for
-            // recording so we penalize these to force them to yield
+            // Any state that won't record other than a don't record
+            // override will be penalized to force them to yield
             // to a rule that may record. Otherwise, more specific
             // record type beats less specific.
-            if (lastp->recstatus == rsInactive || 
-                lastp->recstatus == rsRepeat)
+            if (lastp->recstatus != rsUnknown && 
+                lastp->recstatus != rsDontRecord)
                 lpri += 100;
-            if (p->recstatus == rsInactive || 
-                p->recstatus == rsRepeat)
+            if (p->recstatus != rsUnknown && 
+                p->recstatus != rsDontRecord)
                 cpri += 100;
 
             if (lpri > cpri)
