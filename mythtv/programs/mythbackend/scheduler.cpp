@@ -193,6 +193,21 @@ static bool comp_overlap(ProgramInfo *a, ProgramInfo *b)
         return a->chanid < b->chanid;
     if (a->inputid != b->inputid)
         return a->inputid < b->inputid;
+
+    // In cases where two recording rules match the same showing, one
+    // of them needs to take precedence.  Penalize any entry that
+    // won't record except for those from kDontRecord rules.  This
+    // will force them to yield to a rule that might record.
+    // Otherwise, more specific record type beats less specific.
+    int apri = RecTypePriority(a->rectype);
+    if (a->recstatus != rsUnknown && a->recstatus != rsDontRecord)
+        apri += 100;
+    int bpri = RecTypePriority(b->rectype);
+    if (b->recstatus != rsUnknown && b->recstatus != rsDontRecord)
+        bpri += 100;
+    if (apri != bpri)
+        return apri < bpri;
+
     if (a->findid != b->findid)
         return a->findid > b->findid;
     return a->recordid < b->recordid;
@@ -700,25 +715,6 @@ void Scheduler::PruneOverlaps(void)
         }
         else
         {
-            int lpri = RecTypePriority(lastp->rectype);
-            int cpri = RecTypePriority(p->rectype);
-
-            // In cases where two recording rules match the same
-            // showing, one of them needs to take precedence.
-            //
-            // Any state that won't record other than a don't record
-            // override will be penalized to force them to yield
-            // to a rule that may record. Otherwise, more specific
-            // record type beats less specific.
-            if (lastp->recstatus != rsUnknown && 
-                lastp->recstatus != rsDontRecord)
-                lpri += 100;
-            if (p->recstatus != rsUnknown && 
-                p->recstatus != rsDontRecord)
-                cpri += 100;
-
-            if (lpri > cpri)
-                *lastp = *p;
             delete p;
             dreciter = worklist.erase(dreciter);
         }
