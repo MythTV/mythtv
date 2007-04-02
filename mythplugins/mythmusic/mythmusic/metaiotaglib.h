@@ -19,14 +19,12 @@ public:
 
     bool write(Metadata* mdata, bool exclusive = false);
     Metadata* read(QString filename);
-    UserTextIdentificationFrame* find(TagLib::ID3v2::Tag *tag, const String &description);
 
 private:
 
      int getTrackLength(QString filename);
 
-//     bool setPopularimeter(id3_tag *pTag, const QString email, const int rating,
-//                     const QString playcount);
+     UserTextIdentificationFrame* find(TagLib::ID3v2::Tag *tag, const String &description);
 };
 
 #endif

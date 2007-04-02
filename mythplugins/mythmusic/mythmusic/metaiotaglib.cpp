@@ -34,7 +34,11 @@ bool MetaIOTagLib::write(Metadata* mdata, bool exclusive)
     Tag *tag = taglib->tag();
 
     if (!tag)
+    {
+        if (taglib)
+            delete taglib;
         return false;
+    }
 
     if (!mdata->Artist().isEmpty())
         tag->setArtist(QStringToTString(mdata->Artist()));
@@ -79,11 +83,13 @@ bool MetaIOTagLib::write(Metadata* mdata, bool exclusive)
 
     bool result = taglib->save();
 
+    if (taglib)
+        delete taglib;
+
     return (result);
 }
 
 
-//==========================================================================
 /*!
  * \brief Reads Metadata from a file.
  *
@@ -104,15 +110,26 @@ Metadata* MetaIOTagLib::read(QString filename)
     Tag *tag = taglib->tag();
 
     if (!tag)
+    {
+        if (taglib)
+            delete taglib;
         return NULL;
+    }
 
+    // Basic Tags
     if (! tag->isEmpty())
     {
-
         title = TStringToQString(tag->title());
         artist = TStringToQString(tag->artist());
         album = TStringToQString(tag->album());
+        tracknum = tag->track();
+        year = tag->year();
+        genre = TStringToQString(tag->genre());
+    }
 
+    // ID3V2 Only Tags
+    if (taglib->ID3v2Tag())
+    {
         // Compilation Artist (TPE4)
         if(!taglib->ID3v2Tag()->frameListMap()["TPE4"].isEmpty())
             compilation_artist = TStringToQString(
@@ -130,14 +147,6 @@ Metadata* MetaIOTagLib::read(QString filename)
                 == TStringToQString(musicbrainz->toString()));
         }
 
-        // Get Track Num dealing with 1/16, 2/16 etc. format
-        tracknum = tag->track();
-
-        year = tag->year();
-
-        // Genre.
-        genre = TStringToQString(tag->genre());
-
         // Length
         if(!taglib->ID3v2Tag()->frameListMap()["TLEN"].isEmpty())
             length = taglib->ID3v2Tag()->frameListMap()["TLEN"].front()->toString().toInt();
@@ -149,11 +158,19 @@ Metadata* MetaIOTagLib::read(QString filename)
         readFromFilename(filename, artist, album, title, genre, tracknum);
     }
 
-    if (length <= 0)
+    if (length <= 0 && taglib->audioProperties())
         length = taglib->audioProperties()->length() * 1000;
 
+    if (taglib)
+        delete taglib;
+
+    // If we didn't get a valid length, add the metadata but show warning.
+    if (length <= 0)
+        VERBOSE(VB_GENERAL, QString("MetaIOTagLib: Failed to read length "
+                "from '%1'. It may be corrupt.").arg(filename));
+
     // If we don't have title and artist or don't have the length return NULL
-    if ((title.isEmpty() && artist.isEmpty()) || length<=0)
+    if (title.isEmpty() && artist.isEmpty())
     {
         VERBOSE(VB_IMPORTANT, QString("MetaIOTagLib: Failed to read metadata from '%1'")
                 .arg(filename));
@@ -184,6 +201,16 @@ int MetaIOTagLib::getTrackLength(QString filename)
     return seconds;
 }
 
+/*!
+ * \brief Find the a custom comment tag by description.
+ *        This is a copy of the same function in the
+ *        TagLib::ID3v2::UserTextIdentificationFrame Class with a static
+ *        instead of dynamic cast.
+ *
+ * \param tag Pointer to TagLib::ID3v2::Tag object
+ * \param description Description of tag to search for
+ * \returns Pointer to frame
+ */
 UserTextIdentificationFrame* MetaIOTagLib::find(TagLib::ID3v2::Tag *tag, const String &description)
 {
   TagLib::ID3v2::FrameList l = tag->frameList("TXXX");
