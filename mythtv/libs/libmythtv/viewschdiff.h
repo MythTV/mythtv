@@ -15,7 +15,7 @@ struct ProgramStruct {
         ProgramInfo *after;
 };
 
-class ViewScheduleDiff : public MythDialog
+class MPUBLIC ViewScheduleDiff : public MythDialog
 {
     Q_OBJECT
   public:
