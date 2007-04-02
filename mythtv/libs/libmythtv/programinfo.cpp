@@ -1653,6 +1653,8 @@ void ProgramInfo::StartedRecording(QString ext)
     query.bindValue(":START", startts);
     if (!query.exec() || !query.isActive())
         MythContext::DBError("Copy program ratings on record", query);    
+
+    ScheduledRecording::signalChange(0);
 }
 
 static bool insert_program(const ProgramInfo        *pg,
