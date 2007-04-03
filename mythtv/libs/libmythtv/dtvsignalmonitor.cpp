@@ -233,7 +233,7 @@ void DTVSignalMonitor::SetDVBService(uint netid, uint tsid, int serviceid)
 
     if (GetDVBStreamData())
     {
-        GetDVBStreamData()->SetDesiredService(tsid, netid, programNumber);
+        GetDVBStreamData()->SetDesiredService(netid, tsid, programNumber);
         AddFlags(kDTVSigMon_WaitForPMT | kDTVSigMon_WaitForSDT);
         GetDVBStreamData()->AddListeningPID(DVB_SDT_PID);
     }
