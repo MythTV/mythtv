@@ -5705,30 +5705,26 @@ void NuppelVideoPlayer::AutoCommercialSkip(void)
             ++commBreakIter;
             if (commBreakIter == commBreakMap.end())
             {
-                commBreakMapLock.unlock();
                 VERBOSE(VB_COMMFLAG, LOC + "AutoCommercialSkip(), at "
                         "end of commercial break list, will not skip.");
-                return;
             }
-
-            if (commBreakIter.data() == MARK_COMM_START)
+            else if (commBreakIter.data() == MARK_COMM_START)
             {
-                commBreakMapLock.unlock();
                 VERBOSE(VB_COMMFLAG, LOC + "AutoCommercialSkip(), new "
                         "commBreakIter mark is another start, will not skip.");
-                return;
             }
-
-            VERBOSE(VB_COMMFLAG, LOC + QString("AutoCommercialSkip(), new "
-                    "commBreakIter frame %1").arg(commBreakIter.key()));
-
-            if (commBreakIter.key() == totalFrames)
+            else if ((totalFrames) &&
+                     ((commBreakIter.key() + (10 * video_frame_rate)) >
+                                                                   totalFrames))
             {
-                VERBOSE(VB_IMPORTANT, LOC + "Skipping commercial to end of file");
-                eof = true;
+                VERBOSE(VB_COMMFLAG, LOC + "AutoCommercialSkip(), skipping "
+                        "would take us to the end of the file, will not skip.");
             }
             else
             {
+                VERBOSE(VB_COMMFLAG, LOC + QString("AutoCommercialSkip(), new "
+                        "commBreakIter frame %1").arg(commBreakIter.key()));
+
                 if (osd)
                 {
                     QString comm_msg;
@@ -5893,7 +5889,10 @@ bool NuppelVideoPlayer::DoSkipCommercials(int direction)
         {
             commBreakIter++;
 
-            if (commBreakIter == commBreakMap.end())
+            if ((commBreakIter == commBreakMap.end()) ||
+                ((totalFrames) &&
+                 ((commBreakIter.key() + (10 * video_frame_rate)) >
+                                                                totalFrames)))
             {
                 if (osd)
                 {
