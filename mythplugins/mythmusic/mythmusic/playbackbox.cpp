@@ -1027,9 +1027,6 @@ void PlaybackBoxMusic::checkForPlaylists()
                 if (curMeta) 
                     updateTrackInfo(curMeta);
 
-                if (resumemode == RESUME_EXACT)
-                    seek(gContext->GetNumSetting("MusicBookmarkPosition", 0));
-
                 return;     // Do not restart Timer
             }
             else
@@ -1211,6 +1208,12 @@ void PlaybackBoxMusic::play()
         }
 
         decoder->start();
+
+        if (resumemode == RESUME_EXACT && gContext->GetNumSetting("MusicBookmarkPosition", 0) > 0)
+        {
+            seek(gContext->GetNumSetting("MusicBookmarkPosition", 0));
+            gContext->SaveSetting("MusicBookmarkPosition", 0);
+        }
 
         bannerEnable(curMeta);
         isplaying = true;
