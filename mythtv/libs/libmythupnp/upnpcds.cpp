@@ -164,8 +164,7 @@ bool UPnpCDS::ProcessRequest( HttpWorkerThread *pThread, HTTPRequest *pRequest )
             case CDSM_GetSortCapabilities   : HandleGetSortCapabilities   ( pRequest ); break;
             case CDSM_GetSystemUpdateID     : HandleGetSystemUpdateID     ( pRequest ); break;
             default:
-                pRequest->FormatErrorResponse( 401, "Invalid Action" );
-                pRequest->m_nResponseStatus = 401; //501;
+                UPnp::FormatErrorResponse( pRequest, UPnPResult_InvalidAction );
                 break;
         }       
 
@@ -199,12 +198,12 @@ void UPnpCDS::HandleBrowse( HTTPRequest *pRequest )
                        .arg( request.m_sObjectId )
                        .arg( request.m_eBrowseFlag ));
 
-    short   nErrorCode      = 701;
-    QString sErrorDesc      = "No such object";
-    short   nNumberReturned = 0;
-    short   nTotalMatches   = 0;
-    short   nUpdateID       = 0;
-    QString sResultXML;
+    UPnPResultCode eErrorCode      = UPnPResult_CDS_NoSuchObject;
+    QString        sErrorDesc      = "";
+    short          nNumberReturned = 0;
+    short          nTotalMatches   = 0;
+    short          nUpdateID       = 0;
+    QString        sResultXML;
 
     if (request.m_sObjectId == "0")
     {
@@ -220,8 +219,7 @@ void UPnpCDS::HandleBrowse( HTTPRequest *pRequest )
                 // Return Root Object Only
                 // ----------------------------------------------------------------------
         
-                nErrorCode      = 0;
-                sErrorDesc      = "";
+                eErrorCode      = UPnPResult_Success;
                 nNumberReturned = 1;
                 nTotalMatches   = 1;
                 nUpdateID       = m_root.m_nUpdateId;
@@ -242,8 +240,7 @@ void UPnpCDS::HandleBrowse( HTTPRequest *pRequest )
                 short nStart = Max( request.m_nStartingIndex, short( 0 ));
                 short nCount = 0;
 
-                nErrorCode      = 0;
-                sErrorDesc      = "";
+                eErrorCode      = UPnPResult_Success;
                 nTotalMatches   = m_extensions.count();
                 nUpdateID       = m_root.m_nUpdateId;
 
@@ -264,7 +261,7 @@ void UPnpCDS::HandleBrowse( HTTPRequest *pRequest )
 
                     if (pResult != NULL)
                     {
-                        if (pResult->m_nErrorCode == 0)
+                        if (pResult->m_eErrorCode == UPnPResult_Success)
                             sResultXML  += pResult->GetResultXML();
 
                         delete pResult;
@@ -301,10 +298,10 @@ void UPnpCDS::HandleBrowse( HTTPRequest *pRequest )
 
         if (pResult != NULL)
         {
-            nErrorCode  = pResult->m_nErrorCode;
+            eErrorCode  = pResult->m_eErrorCode;
             sErrorDesc  = pResult->m_sErrorDesc;
 
-            if (nErrorCode == 0)
+            if (eErrorCode == UPnPResult_Success)
             {
                 nNumberReturned = pResult->m_List.count();
                 nTotalMatches   = pResult->m_nTotalMatches;
@@ -320,7 +317,7 @@ void UPnpCDS::HandleBrowse( HTTPRequest *pRequest )
     // Output Results of Browse Method
     // ----------------------------------------------------------------------
 
-    if (nErrorCode == 0)
+    if (eErrorCode == UPnPResult_Success)
     {
         NameValueList list;
 
@@ -336,7 +333,7 @@ void UPnpCDS::HandleBrowse( HTTPRequest *pRequest )
         pRequest->FormatActionResponse( &list );
     }
     else
-        pRequest->FormatErrorResponse ( nErrorCode, sErrorDesc );
+        UPnp::FormatErrorResponse ( pRequest, eErrorCode, sErrorDesc );
 
 }
 
@@ -349,13 +346,13 @@ void UPnpCDS::HandleSearch( HTTPRequest *pRequest )
     UPnpCDSExtensionResults *pResult  = NULL;
     UPnpCDSSearchRequest     request;
 
-    QString old_sClass      = m_root.m_sClass;
-    short   nErrorCode      = 401;
-    QString sErrorDesc      = "Invalid Action";
-    short   nNumberReturned = 0;
-    short   nTotalMatches   = 0;
-    short   nUpdateID       = 0;
-    QString sResultXML;
+    QString       old_sClass      = m_root.m_sClass;
+    UPnPResultCode eErrorCode      = UPnPResult_InvalidAction;
+    QString       sErrorDesc      = "";
+    short         nNumberReturned = 0;
+    short         nTotalMatches   = 0;
+    short         nUpdateID       = 0;
+    QString       sResultXML;
 
     request.m_sContainerID      = pRequest->m_mapParams[ "ContainerID"   ];
     request.m_sFilter           = pRequest->m_mapParams[ "Filter"        ];
@@ -363,6 +360,7 @@ void UPnpCDS::HandleSearch( HTTPRequest *pRequest )
     request.m_nRequestedCount   = pRequest->m_mapParams[ "RequestedCount"].toLong();
     request.m_sSortCriteria     = pRequest->m_mapParams[ "SortCriteria"  ];
     request.m_sSearchCriteria   = "";
+
     m_root.m_sClass = pRequest->m_mapParams[ "SearchCriteria"];
 
     VERBOSE(VB_UPNP,QString("UPnpCDS::ProcessRequest : %1 : %2 : %3 : %4")
@@ -372,9 +370,6 @@ void UPnpCDS::HandleSearch( HTTPRequest *pRequest )
                        .arg( request.m_sFilter ));
 
     //pRequest->m_mapParams[ "SearchCriteria"];
-
-    nErrorCode      = 0;
-    sErrorDesc      = "";
 
     UPnpCDSExtension    *pExtension = m_extensions.first();
 
@@ -387,10 +382,10 @@ void UPnpCDS::HandleSearch( HTTPRequest *pRequest )
 
         if (pResult != NULL)
         {
-            nErrorCode  = pResult->m_nErrorCode;
+            eErrorCode  = pResult->m_eErrorCode;
             sErrorDesc  = pResult->m_sErrorDesc;
 
-            if (nErrorCode == 0)
+            if (eErrorCode == UPnPResult_Success)
             {
                 nNumberReturned = pResult->m_List.count();
                 nTotalMatches   = pResult->m_nTotalMatches;
@@ -409,7 +404,7 @@ void UPnpCDS::HandleSearch( HTTPRequest *pRequest )
     // nUpdateID       = 0;
     //VERBOSE(VB_UPNP,sResultXML);
 
-    if (nErrorCode == 0)
+    if (eErrorCode == UPnPResult_Success)
     {
         NameValueList list;
         QString sResults = DIDL_LITE_BEGIN;
@@ -424,7 +419,7 @@ void UPnpCDS::HandleSearch( HTTPRequest *pRequest )
         pRequest->FormatActionResponse( &list );
     }
     else
-        pRequest->FormatErrorResponse ( nErrorCode, sErrorDesc );
+        UPnp::FormatErrorResponse( pRequest, eErrorCode, sErrorDesc );
 
 }
 

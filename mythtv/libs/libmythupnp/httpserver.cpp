@@ -18,6 +18,8 @@
 #include <math.h>
 #include <sys/time.h>
 
+#include <sys/utsname.h> 
+
 #include "httpserver.h"
 #include "upnputil.h"
 
@@ -31,6 +33,8 @@
 /////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////
 
+QString  HttpServer::g_sPlatform;
+
 /////////////////////////////////////////////////////////////////////////////
 //
 /////////////////////////////////////////////////////////////////////////////
@@ -42,6 +46,17 @@ HttpServer::HttpServer( int nPort )
     m_extensions.setAutoDelete( true );
 
     InitializeThreads();
+
+    // ----------------------------------------------------------------------
+    // Build Platform String
+    // ----------------------------------------------------------------------
+
+    struct utsname uname_info;
+
+    uname( &uname_info );
+
+    g_sPlatform = QString( "%1 %2" ).arg( uname_info.sysname )
+                                    .arg( uname_info.release );
 
     // -=>TODO: Load Config XML
     // -=>TODO: Load & initialize - HttpServerExtensions

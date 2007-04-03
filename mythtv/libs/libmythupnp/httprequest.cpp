@@ -165,7 +165,7 @@ QString HTTPRequest::BuildHeader( long long nSize )
                  .arg( m_nMinor )
                  .arg( GetResponseStatus() )
                  .arg( QDateTime::currentDateTime().toString( "d MMM yyyy hh:mm:ss" ) )
-                 .arg( UPnp::g_sPlatform )
+                 .arg( HttpServer::g_sPlatform )
                  .arg( MYTH_BINARY_VERSION );
 
     sHeader += GetAdditionalHeaders();
@@ -408,41 +408,31 @@ long HTTPRequest::SendResponseFile( QString sFileName )
 //
 /////////////////////////////////////////////////////////////////////////////
 
-void HTTPRequest::FormatErrorResponse( long nCode, const QString &sDesc )
+void HTTPRequest::FormatErrorResponse( bool  bServerError, 
+                                       const QString &sFaultString, 
+                                       const QString &sDetails )
 {
-    QString sMsg( sDesc );
-
     m_eResponseType   = ResponseTypeXML;
     m_nResponseStatus = 500;
 
     m_response << "<?xml version=\"1.0\" encoding=\"utf-8\"?>";
 
-    QString sWhere = ((nCode >= 500) && (nCode <=599)) ? "s:Server" : "s:Client";
+    QString sWhere = ( bServerError ) ? "s:Server" : "s:Client";
 
     if (m_bSOAPRequest)
     {
         m_mapRespHeaders[ "EXT" ] = "";
 
-        m_response <<  SOAP_ENVELOPE_BEGIN 
-                   <<  "<s:Fault><faultcode>"
-                   <<  sWhere
-                   <<  "</faultcode><faultstring>UPnPError</faultstring>";
+        m_response << SOAP_ENVELOPE_BEGIN 
+                   << "<s:Fault>"
+                   << "<faultcode>"   << sWhere       << "</faultcode>"
+                   << "<faultstring>" << sFaultString << "</faultstring>";
     }
 
-    m_response << "<detail>";
-
-    if (m_bSOAPRequest)     
-        m_response << "<UPnPError xmlns=\"urn:schemas-upnp-org:control-1-0\">";
-
-    Encode( sMsg );
-
-    m_response << "<errorCode>" << nCode << "</errorCode>";
-    m_response << "<errorDescription>" << sMsg << "</errorDescription>";
-
-    if (m_bSOAPRequest)     
-        m_response << "</UPnPError>";
-
-    m_response << "</detail>";
+    if (sDetails.length() > 0)
+    {
+        m_response << "<detail>" << sDetails << "</detail>";
+    }
 
     if (m_bSOAPRequest)
         m_response << "</s:Fault>" << SOAP_ENVELOPE_END;

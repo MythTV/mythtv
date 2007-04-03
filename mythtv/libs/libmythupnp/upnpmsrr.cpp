@@ -85,8 +85,7 @@ bool UPnpMSRR::ProcessRequest( HttpWorkerThread *pThread, HTTPRequest *pRequest 
             case MSRR_IsValidated           : HandleIsValidated           ( pRequest ); break;
 
             default:
-                pRequest->FormatErrorResponse( 401, "Invalid Action" );
-                pRequest->m_nResponseStatus = 401; //501;
+                UPnp::FormatErrorResponse( pRequest, UPnPResult_InvalidAction );
                 break;
         }       
     }

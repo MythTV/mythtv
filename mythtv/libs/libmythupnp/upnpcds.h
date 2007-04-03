@@ -14,7 +14,7 @@
 #include <qdom.h>
 #include <qdatetime.h> 
 
-#include "httpserver.h"
+#include "upnp.h"
 #include "upnpcdsobjects.h"
 #include "eventing.h"
               
@@ -91,7 +91,7 @@ class UPnpCDSExtensionResults
     public:
 
         CDSObjects              m_List;
-        short                   m_nErrorCode;
+        UPnPResultCode          m_eErrorCode;
         QString                 m_sErrorDesc;
 
         short                   m_nTotalMatches;
@@ -99,7 +99,7 @@ class UPnpCDSExtensionResults
 
     public:
 
-        UPnpCDSExtensionResults() : m_nErrorCode(0),
+        UPnpCDSExtensionResults() : m_eErrorCode( UPnPResult_Success ),
                                     m_nTotalMatches(0), 
                                     m_nUpdateID(0)
         {

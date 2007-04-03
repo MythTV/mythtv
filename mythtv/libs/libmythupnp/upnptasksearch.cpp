@@ -80,7 +80,7 @@ void UPnpSearchTask::SendMsg( QSocketDevice  *pSocket,
                               "Content-Length: 0\r\n\r\n" )
                               .arg( m_nMaxAge    )
                               .arg( sDate )
-                              .arg( UPnp::g_sPlatform )
+                              .arg( HttpServer::g_sPlatform )
                               .arg( MYTH_BINARY_VERSION )
                               .arg( sST )
                               .arg( sUSN );

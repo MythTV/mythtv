@@ -67,8 +67,14 @@ class UPnpCMGR : public Eventing
         virtual QString GetServiceDescURL   () { return m_sControlUrl.mid( 1 ) + "/GetServDesc"; }
 
     public:
-                 UPnpCMGR(  UPnpDevice *pDevice ); 
+                 UPnpCMGR(  UPnpDevice *pDevice,
+                            const QString &sSourceProtocols = "",
+                            const QString &sSinkProtocols   = "" );
+
         virtual ~UPnpCMGR();
+
+        void    AddSourceProtocol( const QString &sProtocol );
+        void    AddSinkProtocol  ( const QString &sProtocol );
 
         virtual bool     ProcessRequest( HttpWorkerThread *pThread, HTTPRequest *pRequest );
 };

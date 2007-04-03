@@ -131,7 +131,7 @@ bool MythXML::ProcessRequest( HttpWorkerThread *pThread, HTTPRequest *pRequest )
 
                 default: 
                 {
-                    pRequest->FormatErrorResponse( 401, "Invalid Action" );
+                    UPnp::FormatErrorResponse( pRequest, UPnPResult_InvalidAction );
 
                     return true;
                 }
@@ -190,7 +190,7 @@ void MythXML::GetHosts( HTTPRequest *pRequest )
         }
     }
     else
-        pRequest->FormatErrorResponse( 500, "Database not open while trying to load list of hosts" );
+        UPnp::FormatErrorResponse( pRequest, UPnPResult_ActionFailed, "Database not open while trying to load list of hosts" );
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -231,8 +231,10 @@ void MythXML::GetKeys( HTTPRequest *pRequest )
         }
     }
     else
-        pRequest->FormatErrorResponse( 500, QString("Database not open while trying to load setting: %1")
-                                               .arg( pRequest->m_mapParams[ "Key" ] ));
+        UPnp::FormatErrorResponse( pRequest, 
+                                   UPnPResult_ActionFailed, 
+                                   QString("Database not open while trying to load setting: %1")
+                                      .arg( pRequest->m_mapParams[ "Key" ] ));
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -357,8 +359,10 @@ void MythXML::GetSetting( HTTPRequest *pRequest )
         pRequest->FormatActionResponse( &list );
     }
     else
-        pRequest->FormatErrorResponse( 500, QString("Database not open while trying to load setting: %1")
-                                               .arg( pRequest->m_mapParams[ "Key" ] ));
+        UPnp::FormatErrorResponse( pRequest, 
+                                   UPnPResult_ActionFailed, 
+                                   QString("Database not open while trying to load setting: %1")
+                                      .arg( pRequest->m_mapParams[ "Key" ] ));
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -385,7 +389,7 @@ void MythXML::PutSetting( HTTPRequest *pRequest )
         pRequest->FormatActionResponse( &list );
     }
     else
-        pRequest->FormatErrorResponse( 400, "Key Required");
+        UPnp::FormatErrorResponse( pRequest, UPnPResult_InvalidArgs, "Key Required" );
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -408,19 +412,19 @@ void MythXML::GetProgramGuide( HTTPRequest *pRequest )
 
     if (!dtStart.isValid()) 
     { 
-        pRequest->FormatErrorResponse( 400, "StartTime is invalid" );
+        UPnp::FormatErrorResponse( pRequest, UPnPResult_ArgumentValueInvalid, "StartTime is invalid" );
         return;
     }
         
     if (!dtEnd.isValid()) 
     { 
-        pRequest->FormatErrorResponse( 400, "EndTime is invalid" );
+        UPnp::FormatErrorResponse( pRequest, UPnPResult_ArgumentValueInvalid, "EndTime is invalid" );
         return;
     }
 
     if (dtEnd < dtStart) 
     { 
-        pRequest->FormatErrorResponse( 400, "EndTime is before StartTime" );
+        UPnp::FormatErrorResponse( pRequest, UPnPResult_ArgumentValueInvalid, "EndTime is before StartTime");
         return;
     }
 
@@ -558,7 +562,7 @@ void MythXML::GetProgramDetails( HTTPRequest *pRequest )
 
     if (!dtStart.isValid()) 
     { 
-        pRequest->FormatErrorResponse( 400, "StartTime is invalid" );
+        UPnp::FormatErrorResponse( pRequest, UPnPResult_ArgumentValueInvalid, "StartTime is invalid" );
         return;
     }
 
@@ -604,7 +608,7 @@ void MythXML::GetProgramDetails( HTTPRequest *pRequest )
 
     if (pInfo==NULL)
     { 
-        pRequest->FormatErrorResponse( 400, "Error Reading Program Info" );
+        UPnp::FormatErrorResponse( pRequest, UPnPResult_ActionFailed, "Error Reading Program Info" );
         return;
     }
 
@@ -1446,7 +1450,7 @@ void MythXML::GetConnectionInfo( HTTPRequest *pRequest )
 
     if (( sSecurityPin.length() != 0 ) && ( sPin != sSecurityPin )) 
     {
-        pRequest->FormatErrorResponse( 400, "Pin Required" );
+        UPnp::FormatErrorResponse( pRequest, UPnPResult_ActionNotAuthorized );
         return;
     }
 

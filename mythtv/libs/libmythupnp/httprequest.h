@@ -162,7 +162,10 @@ class HTTPRequest
 
         bool            ParseRequest    ();
 
-        void            FormatErrorResponse ( long nCode, const QString &sDesc );
+        void            FormatErrorResponse ( bool  bServerError, 
+                                              const QString &sFaultString, 
+                                              const QString &sDetails );
+
         void            FormatActionResponse( NameValueList *pArgs );
         void            FormatFileResponse ( const QString &sFileName );
 

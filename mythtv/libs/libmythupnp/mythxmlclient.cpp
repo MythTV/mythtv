@@ -34,10 +34,10 @@ MythXMLClient::~MythXMLClient()
 // 
 /////////////////////////////////////////////////////////////////////////////
 
-bool MythXMLClient::GetConnectionInfo( const QString &sPin, DatabaseParams *pParams )
+UPnPResultCode MythXMLClient::GetConnectionInfo( const QString &sPin, DatabaseParams *pParams )
 {
     if (pParams == NULL)
-        return false;
+        return UPnPResult_InvalidArgs;
 
     int           nErrCode = 0;
     QString       sErrDesc;
@@ -56,7 +56,8 @@ bool MythXMLClient::GetConnectionInfo( const QString &sPin, DatabaseParams *pPar
             VERBOSE( VB_UPNP, QString( "MythXMLClient::GetConnectionInfo : (%1) - %2" )
                                  .arg( nErrCode )
                                  .arg( sErrDesc ));
-            return false;
+
+            return UPnPResult_ActionFailed;
         }
 
         // --------------------------------------------------------------
@@ -83,7 +84,7 @@ bool MythXMLClient::GetConnectionInfo( const QString &sPin, DatabaseParams *pPar
             pParams->wolRetry       = GetNodeValue( wolNode, "Retry"    , 0            );
             pParams->wolCommand     = GetNodeValue( wolNode, "Command"  , QString( "" ));
 
-            return true;
+            return UPnPResult_Success;
         }
         else
         {
@@ -96,7 +97,10 @@ bool MythXMLClient::GetConnectionInfo( const QString &sPin, DatabaseParams *pPar
         VERBOSE( VB_IMPORTANT, QString( "MythXMLClient::GetConnectionInfo Failed -(%1) %2" )
                              .arg( nErrCode   )
                              .arg( sErrDesc   ));
+
+        if (nErrCode == UPnPResult_ActionNotAuthorized)
+            return UPnPResult_ActionNotAuthorized;
     }
     
-    return false;
+    return UPnPResult_ActionFailed;
 }

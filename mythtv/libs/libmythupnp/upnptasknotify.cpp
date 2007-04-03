@@ -70,7 +70,7 @@ void UPnpNotifyTask::SendNotifyMsg( QSocketDevice *pSocket,
                               "USN: %5\r\n"
                               "CACHE-CONTROL: max-age=%6\r\n"
                               "Content-Length: 0\r\n\r\n" )
-                            .arg( UPnp::g_sPlatform )
+                            .arg( HttpServer::g_sPlatform )
                             .arg( MYTH_BINARY_VERSION )
                             .arg( GetNTSString()    )
                             .arg( sNT          )

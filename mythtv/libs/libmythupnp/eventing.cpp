@@ -96,8 +96,7 @@ bool Eventing::ProcessRequest( HttpWorkerThread * /*pThread*/, HTTPRequest *pReq
             case RequestTypeSubscribe   : HandleSubscribe     ( pRequest ); break;
             case RequestTypeUnsubscribe : HandleUnsubscribe   ( pRequest ); break;
             default:
-                pRequest->FormatErrorResponse( 401, "Invalid Action" );
-                pRequest->m_nResponseStatus = 401;  //501;
+                UPnp::FormatErrorResponse( pRequest, UPnPResult_InvalidAction );
                 break;
         }       
     }

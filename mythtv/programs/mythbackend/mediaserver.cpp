@@ -106,13 +106,23 @@ MediaServer::MediaServer( bool bIsMaster, bool bDisableUPnp /* = FALSE */ )
 
         if (bIsMaster)
         {
+            QString sSourceProtocols = "http-get:*:image/gif:*,"
+                                       "http-get:*:image/jpeg:*,"
+                                       "http-get:*:image/png:*,"
+                                       "http-get:*:video/avi:*,"
+                                       "http-get:*:audio/mpeg:*,"
+                                       "http-get:*:audio/wav:*,"
+                                       "http-get:*:video/mpeg:*,"
+                                       "http-get:*:video/nupplevideo:*,"
+                                       "http-get:*:video/x-ms-wmv:*";
+
             VERBOSE(VB_UPNP, QString( "MediaServer::Registering MSRR Service." ));
 
             m_pHttpServer->RegisterExtension( new UPnpMSRR( RootDevice() ));
 
             VERBOSE(VB_UPNP, QString( "MediaServer::Registering CMGR Service." ));
 
-            m_pHttpServer->RegisterExtension( m_pUPnpCMGR= new UPnpCMGR( RootDevice() ));
+            m_pHttpServer->RegisterExtension( m_pUPnpCMGR= new UPnpCMGR( RootDevice(), sSourceProtocols ));
 
             VERBOSE(VB_UPNP, QString( "MediaServer::Registering CDS Service." ));
 

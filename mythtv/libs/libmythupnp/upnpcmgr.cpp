@@ -14,23 +14,19 @@
 /////////////////////////////////////////////////////////////////////////////
 //
 /////////////////////////////////////////////////////////////////////////////
-                                           
-UPnpCMGR::UPnpCMGR( UPnpDevice *pDevice ) : Eventing( "UPnpCMGR", "CMGR_Event" )
+
+UPnpCMGR::UPnpCMGR ( UPnpDevice *pDevice, 
+                     const QString &sSourceProtocols, 
+                     const QString &sSinkProtocols ) 
+         : Eventing( "UPnpCMGR", "CMGR_Event" )
 {
     AddVariable( new StateVariable< QString >( "SourceProtocolInfo"  , true ) );
     AddVariable( new StateVariable< QString >( "SinkProtocolInfo"    , true ) );
     AddVariable( new StateVariable< QString >( "CurrentConnectionIDs", true ) );
 
     SetValue< QString >( "CurrentConnectionIDs", "0" );
-    SetValue< QString >( "SourceProtocolInfo"  , "http-get:*:image/gif:*,"
-                                                 "http-get:*:image/jpeg:*,"
-                                                 "http-get:*:image/png:*,"
-                                                 "http-get:*:video/avi:*,"
-                                                 "http-get:*:audio/mpeg:*,"
-                                                 "http-get:*:audio/wav:*,"
-                                                 "http-get:*:video/mpeg:*,"
-                                                 "http-get:*:video/nupplevideo:*,"
-                                                 "http-get:*:video/x-ms-wmv:*"     );
+    SetValue< QString >( "SourceProtocolInfo"  , sSourceProtocols );
+    SetValue< QString >( "SinkProtocolInfo"    , sSinkProtocols   );
 
     QString sUPnpDescPath = UPnp::g_pConfig->GetValue( "UPnP/DescXmlPath", m_sSharePath );
 
@@ -49,6 +45,39 @@ UPnpCMGR::UPnpCMGR( UPnpDevice *pDevice ) : Eventing( "UPnpCMGR", "CMGR_Event" )
 UPnpCMGR::~UPnpCMGR()
 {
 }
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
+void UPnpCMGR::AddSourceProtocol( const QString &sProtocol )
+{
+    QString sValue = GetValue< QString >( "SourceProtocolInfo" );
+    
+    if (sValue.length() > 0 )
+        sValue += ",";
+
+    sValue += sProtocol;
+
+    SetValue< QString >( "SourceProtocolInfo", sValue );
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
+void UPnpCMGR::AddSinkProtocol( const QString &sProtocol )
+{
+    QString sValue = GetValue< QString >( "SinkProtocolInfo" );
+    
+    if (sValue.length() > 0 )
+        sValue += ",";
+
+    sValue += sProtocol;
+
+    SetValue< QString >( "SinkProtocolInfo", sValue );
+}
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -90,8 +119,7 @@ bool UPnpCMGR::ProcessRequest( HttpWorkerThread *pThread, HTTPRequest *pRequest 
             case CMGRM_GetCurrentConnectionInfo: HandleGetCurrentConnectionInfo( pRequest ); break;
             case CMGRM_GetCurrentConnectionIDs : HandleGetCurrentConnectionIDs ( pRequest ); break;
             default:
-                pRequest->FormatErrorResponse( 401, "Invalid Action" );
-                pRequest->m_nResponseStatus = 400; //501;
+                UPnp::FormatErrorResponse( pRequest, UPnPResult_InvalidAction );
                 break;
         }       
         return true;
@@ -109,7 +137,7 @@ void UPnpCMGR::HandleGetProtocolInfo( HTTPRequest *pRequest )
     NameValueList list;
 
     list.append( new NameValue( "Source", GetValue< QString >( "SourceProtocolInfo")));
-    list.append( new NameValue( "Sink"  , ""                                        ));
+    list.append( new NameValue( "Sink"  , GetValue< QString >( "SinkProtocolInfo"  )));
 
     pRequest->FormatActionResponse( &list );
 }
@@ -124,8 +152,7 @@ void UPnpCMGR::HandleGetCurrentConnectionInfo( HTTPRequest *pRequest )
 
     if ( nId != 0)
     {
-        pRequest->FormatErrorResponse( 706, "Invalid connection reference" );
-        pRequest->m_nResponseStatus = 400; //500;
+        UPnp::FormatErrorResponse( pRequest, UPnPResult_CMGR_InvalidConnectionRef );
         return;
     }
 
@@ -156,5 +183,3 @@ void UPnpCMGR::HandleGetCurrentConnectionIDs ( HTTPRequest *pRequest )
     pRequest->FormatActionResponse( &list );
 
 }
-
-

@@ -17,6 +17,7 @@
 #include "mythcontext.h"
 #include "httpcomms.h"
 
+#include "upnp.h"
 #include "soapclient.h"
 
 /////////////////////////////////////////////////////////////////////////////
@@ -38,7 +39,7 @@ class MythXMLClient : public SOAPClient
                  MythXMLClient( const QUrl &url, bool bInQtThread = true );
         virtual ~MythXMLClient( );
         
-        bool GetConnectionInfo( const QString &sPin, DatabaseParams *pParams );
+        UPnPResultCode GetConnectionInfo( const QString &sPin, DatabaseParams *pParams );
 
         // GetServiceDescription
         // GetProgramGuide      

@@ -401,5 +401,13 @@
          <name>A_ARG_TYPE_HostName</name>
          <dataType>string</dataType>
       </stateVariable>
+      <stateVariable sendEvents="no">
+         <name>A_ARG_TYPE_Height</name>
+         <dataType>i2</dataType>
+      </stateVariable>
+      <stateVariable sendEvents="no">
+         <name>A_ARG_TYPE_Width</name>
+         <dataType>i2</dataType>
+      </stateVariable>
    </serviceStateTable>
 </scpd>

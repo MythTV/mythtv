@@ -95,6 +95,10 @@ class HttpServer : public QServerSocket,
 
     public:
 
+        static QString      g_sPlatform;
+
+    public:
+
                  HttpServer( int nPort );
         virtual ~HttpServer();
 
