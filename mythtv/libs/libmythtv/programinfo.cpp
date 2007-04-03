@@ -4128,7 +4128,8 @@ void ProgramInfo::ShowRecordingDialog(void)
                 ((!(dupmethod & kDupCheckNone) && programid != "" && 
                   (findid != 0 || !IsFindApplicable())) ||
                  ((dupmethod & kDupCheckSub) && subtitle != "") ||
-                 ((dupmethod & kDupCheckDesc) && description != "")))
+                 ((dupmethod & kDupCheckDesc) && description != "") ||
+                 ((dupmethod & kDupCheckSubThenDesc) && (subtitle != "" || description != "")) ))
             {
                 diag.AddButton(QObject::tr("Never record"));
                 forget = button++;
