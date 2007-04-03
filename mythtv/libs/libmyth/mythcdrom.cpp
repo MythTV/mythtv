@@ -86,7 +86,7 @@ void MythCDROM::onDeviceMounted()
 
     if (dvd.exists())
     {
-        VERBOSE(VB_GENERAL, "Probable DVD detected.");
+        VERBOSE(VB_MEDIA, "Probable DVD detected.");
         m_MediaType = MEDIATYPE_DVD;
         // HACK make it possible to eject a DVD by unmounting it
         performMountCmd(false);
@@ -94,13 +94,13 @@ void MythCDROM::onDeviceMounted()
     }
     else if (audio.exists())
     {
-        VERBOSE(VB_GENERAL, "Probable Audio CD detected.");
+        VERBOSE(VB_MEDIA, "Probable Audio CD detected.");
         m_MediaType = MEDIATYPE_AUDIO;
         m_Status = MEDIASTAT_USEABLE; 
     }
     else if (vcd.exists() || svcd.exists())
     {
-        VERBOSE(VB_GENERAL, "Probable VCD/SVCD detected.");
+        VERBOSE(VB_MEDIA, "Probable VCD/SVCD detected.");
         m_MediaType = MEDIATYPE_VCD;
         // HACK make it possible to eject a VCD/SVCD by unmounting it
         performMountCmd(false);

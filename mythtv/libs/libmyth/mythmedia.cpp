@@ -314,8 +314,8 @@ bool MythMediaDevice::isMounted(bool Verify)
             
             // Extract the mount point and device name.
             stream >> DeviceName >> MountPoint;
-            //cout << "Found Device: " << DeviceName
-            //     << "  Mountpoint: " << MountPoint << endl; 
+            //VERBOSE(VB_MEDIA, "Found Device: " << DeviceName
+            //                  << "  Mountpoint: " << MountPoint);
 
             // Skip the rest of the line
             line = stream.readLine();

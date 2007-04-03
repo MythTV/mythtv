@@ -161,7 +161,15 @@ void MediaMonitor::ChooseAndEjectMedia(void)
     {
         VERBOSE(VB_MEDIA,
                 QString("Disk %1's tray is OPEN. Closing tray").arg(dev));
-        selected->eject(false);
+
+        if (selected->eject(false) != MEDIAERR_OK)
+        {
+            QString msg = "Unable to open or close the empty drive %1.\n\n";
+            msg += "You may have to use the eject button under its tray.";
+            MythPopupBox::showOkPopup(gContext->GetMainWindow(),
+                                      "eject close-tray fail",
+                                      tr(msg).arg(dev));
+        }
     }
     else if (MEDIASTAT_MOUNTED == status)
     {

@@ -44,7 +44,13 @@ MediaError MythCDROMLinux::eject(bool open_close)
     {
         // If the tray is empty, this will fail (Input/Output error)
         ioctl(m_DeviceHandle, CDROMCLOSETRAY);
-        return MEDIAERR_OK;
+
+        // This allows us to catch any drives that the OS has problems
+        // detecting the status of (some always report OPEN when empty)
+        if (ioctl(m_DeviceHandle, CDROM_DRIVE_STATUS) == CDS_TRAY_OPEN)
+            return MEDIAERR_FAILED;
+        else
+            return MEDIAERR_OK;
     }
 }
 
@@ -69,18 +75,14 @@ MediaError MythCDROMLinux::testMedia()
         //cout << "Device is not open - ";
         if (!openDevice()) 
         {
-            //cout << "failed to open device - ";
+            //VERBOSE(VB_MEDIA, "MythCDROMLinux::testMedia - failed to open "
+            //                  + getDevicePath() + ENO);
             if (errno == EBUSY)
-            {
-                //cout << "errno == EBUSY" << endl;
                 return isMounted(true) ? MEDIAERR_OK : MEDIAERR_FAILED;
-            } 
             else 
-            { 
                 return MEDIAERR_FAILED; 
-            }
         }
-        //cout << "Opened it - ";
+        //VERBOSE(VB_MEDIA, "MythCDROMLinux::testMedia - Opened device");
         OpenedHere = true;
     }
 
@@ -90,8 +92,16 @@ MediaError MythCDROMLinux::testMedia()
     // Be nice and close the device if we opened it, otherwise it might be locked when the user doesn't want it to be.
     if (OpenedHere)
         closeDevice();
-    //cout << "Stat == " << Stat << endl;
-    return (Stat >= 0) ? MEDIAERR_OK : MEDIAERR_FAILED;    
+
+    if (Stat == -1)
+    {
+        VERBOSE(VB_MEDIA,
+                "MythCDROMLinux::testMedia - Failed to get drive status of "
+                + getDevicePath() + ENO);
+        return MEDIAERR_FAILED;    
+    }
+
+    return MEDIAERR_OK;
 }
 
 MediaStatus MythCDROMLinux::checkMedia()
@@ -100,25 +110,22 @@ MediaStatus MythCDROMLinux::checkMedia()
    
     if (testMedia() != MEDIAERR_OK) 
     {
-        //cout << "MythCDROMLinux::checkMedia - ";
-        //cout << "Test Media result != MEDIAERR_OK" << endl;
         m_MediaType = MEDIATYPE_UNKNOWN;
         return setStatus(MEDIASTAT_UNKNOWN, OpenedHere);
     }
 
-    //cout << "MythCDROMLinux::checkMedia - ";
     // If it's not already open we need to at least TRY to open it for most of these checks to work.
     if (!isDeviceOpen())
         OpenedHere = openDevice();
 
     if (isDeviceOpen()) 
     {
-        //cout << "device is open - ";
+        //VERBOSE(VB_MEDIA, "MythCDROMLinux::checkMedia - Device is open...");
         int ret = ioctl(m_DeviceHandle, CDROM_DRIVE_STATUS, CDSL_CURRENT);
         switch (ret) 
         {
             case CDS_DISC_OK:
-                //cout << "disk ok - ";
+                VERBOSE(VB_MEDIA, getDevicePath() + " Disk OK...");
                 // If the disc is ok and we already know it's mediatype
                 // returns MOUNTED.
                 if (isMounted(true) && m_MediaType != MEDIATYPE_UNKNOWN)
@@ -126,47 +133,51 @@ MediaStatus MythCDROMLinux::checkMedia()
                 // If the disk is ok but not yet mounted we'll test it further down after this switch exits.
                 break;
             case CDS_TRAY_OPEN:
-                //cout << "Tray open" << endl;
+                VERBOSE(VB_MEDIA, getDevicePath() + " Tray open");
                 m_MediaType = MEDIATYPE_UNKNOWN;
                 return setStatus(MEDIASTAT_OPEN, OpenedHere);
                 break;
             case CDS_NO_DISC:
-                //cout << "No disc" << endl;
+                VERBOSE(VB_MEDIA, getDevicePath() + " No disc");
                 m_MediaType = MEDIATYPE_UNKNOWN;
                 return setStatus(MEDIASTAT_NODISK, OpenedHere);
                 break;
             case CDS_NO_INFO:
             case CDS_DRIVE_NOT_READY:
-                //cout << "No info or drive not ready" << endl;
+                VERBOSE(VB_MEDIA, getDevicePath()
+                                  + " No info or drive not ready");
                 m_MediaType = MEDIATYPE_UNKNOWN;
                 return setStatus(MEDIASTAT_UNKNOWN, OpenedHere);
             default:
-                //cout << "unknown result from ioctl (" << ret << ")" << endl;
+                VERBOSE(VB_IMPORTANT, "Failed to get drive status of "
+                                      + getDevicePath() + " : " + ENO);
                 m_MediaType = MEDIATYPE_UNKNOWN;
                 return setStatus(MEDIASTAT_UNKNOWN, OpenedHere);
         }
 
         if (mediaChanged()) 
         {
-            //cout << "media changed - ";
+            VERBOSE(VB_MEDIA, getDevicePath() + " Media changed");
             // Regardless of the actual status lie here and say
             // it's open for now, so we can cover the case of a missed open.
             return setStatus(MEDIASTAT_OPEN, OpenedHere);
         } 
         else 
         {
-            //cout << "media unchanged - ";
+            //VERBOSE(VB_MEDIA, getDevicePath() + " Media unchanged...");
             if ((m_Status == MEDIASTAT_OPEN) || 
                 (m_Status == MEDIASTAT_UNKNOWN)) 
             {
-                //cout << "Current status == " << MythMediaDevice::MediaStatusStrings[m_Status]  << endl;
-                int type = ioctl(m_DeviceHandle, CDROM_DISC_STATUS, CDSL_CURRENT);
+                VERBOSE(VB_MEDIA, getDevicePath() + " Current status " +
+                        MythMediaDevice::MediaStatusStrings[m_Status]);
+                int type = ioctl(m_DeviceHandle,
+                                 CDROM_DISC_STATUS, CDSL_CURRENT);
                 switch (type) 
                 {
                     case CDS_DATA_1:
                     case CDS_DATA_2:
                         m_MediaType = MEDIATYPE_DATA;
-                        //cout << "found a data disk" << endl;
+                        VERBOSE(VB_MEDIA, "Found a data disk");
                         //grab information from iso9660 (& udf)
                         struct iso_primary_descriptor buf;
                         lseek(this->m_DeviceHandle,(off_t) 2048*16,SEEK_SET);
@@ -202,13 +213,13 @@ MediaStatus MythCDROMLinux::checkMedia()
                             return setStatus(MEDIASTAT_NOTMOUNTED, OpenedHere);
                         break;
                     case CDS_AUDIO:
-                        //cout << "found an audio disk" << endl;
+                        VERBOSE(VB_MEDIA, "found an audio disk");
                         m_MediaType = MEDIATYPE_AUDIO;
                         return setStatus(MEDIASTAT_USEABLE, OpenedHere);
                         break;
                     case CDS_MIXED:
                         m_MediaType = MEDIATYPE_MIXED;
-                        //cout << "found a mixed CD" << endl;
+                        VERBOSE(VB_MEDIA, "found a mixed CD");
                         // Note: Mixed mode CDs require an explixit mount call since we'll usually want the audio portion.
                         //         undefine ASSUME_WANT_AUDIO to change this behavior.
                         #ifdef ASSUME_WANT_AUDIO
@@ -232,13 +243,13 @@ MediaStatus MythCDROMLinux::checkMedia()
                         break;
                     case CDS_NO_INFO:
                     case CDS_NO_DISC:
-                        //cout << "found no disk" << endl;
+                        VERBOSE(VB_MEDIA, "found no disk");
                         m_MediaType = MEDIATYPE_UNKNOWN;
                         return setStatus(MEDIASTAT_UNKNOWN, OpenedHere);
                         break;
                     default:
-                        //cout << "found unknown disk type" << endl;
-                        fprintf(stderr, "Unknown data type: %d\n", type);
+                        VERBOSE(VB_MEDIA, "found unknown disk type: "
+                                          + QString().setNum(type));
                         m_MediaType = MEDIATYPE_UNKNOWN;
                         return setStatus(MEDIASTAT_UNKNOWN, OpenedHere);
                 }            
@@ -246,7 +257,9 @@ MediaStatus MythCDROMLinux::checkMedia()
             else if (m_Status == MEDIASTAT_MOUNTED || 
                      m_Status == MEDIASTAT_NOTMOUNTED) 
             {
-                //cout << "current status == " << MythMediaDevice::MediaStatusStrings[m_Status] << " setting status to not mounted - ";
+                VERBOSE(VB_MEDIA, QString("Current status == ") +
+                        MythMediaDevice::MediaStatusStrings[m_Status]);
+                VERBOSE(VB_MEDIA, "Setting status to not mounted?");
                 if (isMounted(true))
                     setStatus(MEDIASTAT_MOUNTED, OpenedHere);
                 else
@@ -259,7 +272,7 @@ MediaStatus MythCDROMLinux::checkMedia()
     } // isDeviceOpen();
     else 
     {
-        //cout << "device not open returning unknown" << endl;
+        VERBOSE(VB_MEDIA, "Device not open - returning UNKNOWN");
         m_MediaType = MEDIATYPE_UNKNOWN;
         return setStatus(MEDIASTAT_UNKNOWN, OpenedHere);
     }
@@ -267,7 +280,8 @@ MediaStatus MythCDROMLinux::checkMedia()
     if (OpenedHere)
         closeDevice();
 
-    //cout << "returning " << MythMediaDevice::MediaStatusStrings[m_Status] << endl;
+    //VERBOSE(VB_MEDIA, QString("Returning ")
+    //                  + MythMediaDevice::MediaStatusStrings[m_Status]);
     return m_Status;
 }
 
@@ -284,7 +298,7 @@ MediaError MythCDROMLinux::unlock()
 {
     if (isDeviceOpen() || openDevice()) 
     { 
-        //cout <<  "Unlocking CDROM door" << endl;
+        //VERBOSE(VB_MEDIA, "MythCDROMLinux::unlock - Unlocking CDROM door");
         ioctl(m_DeviceHandle, CDROM_LOCKDOOR, 0);
     }
     else
