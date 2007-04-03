@@ -8,7 +8,7 @@
 using namespace std;
 
 // MythTV headers
-#include "mythconfig.h" // for CONFIG_DTS
+#include "mythconfig.h" // for CONFIG_LIBDTS
 #include "avformatdecoder.h"
 #include "RingBuffer.h"
 #include "NuppelVideoPlayer.h"
@@ -306,7 +306,7 @@ AvFormatDecoder::AvFormatDecoder(NuppelVideoPlayer *parent,
     av_log_set_level((debug) ? AV_LOG_DEBUG : AV_LOG_ERROR);
 
     allow_ac3_passthru = gContext->GetNumSetting("AC3PassThru", false);
-#ifdef CONFIG_DTS
+#ifdef CONFIG_LIBDTS
     allow_dts_passthru = gContext->GetNumSetting("DTSPassThru", false);
 #endif
 
