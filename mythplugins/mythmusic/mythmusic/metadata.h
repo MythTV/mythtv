@@ -11,6 +11,7 @@
 #include <mythtv/uitypes.h>
 
 class AllMusic;
+class CoverArt;
 
 class Metadata
 {
@@ -150,6 +151,7 @@ class Metadata
     static void setArtistAndTrackFormats();
 
     static void SetStartdir(const QString &dir);
+    static QString GetStartdir() { return m_startdir; }
 
     static QStringList fillFieldList(QString field);
 
@@ -360,5 +362,48 @@ class AllMusic
 
 };
 
+enum ImageType
+{
+    IT_UNKNOWN = 0,
+    IT_FRONTCOVER,
+    IT_BACKCOVER,
+    IT_CD,
+    IT_INLAY
+};
+
+typedef struct AlbumArtImage
+{
+    int       id;
+    QString   filename;
+    ImageType imageType;
+    QString   typeName;
+} AlbumArtImage;
+
+class AlbumArtImages: public QObject
+{
+  Q_OBJECT
+
+  public:
+    AlbumArtImages(Metadata *metadata);
+
+    uint                     getImageCount() { return m_imageList.count(); }
+    QString                  getImageFilename(ImageType type);
+    QString                  getTypeName(ImageType type);
+    QStringList              getImageFilenames();
+    QPtrList<AlbumArtImage> *getImageList() { return &m_imageList; }
+    AlbumArtImage            getImageAt(uint index);
+
+    bool isImageAvailable(ImageType type);
+
+    bool saveImageType(const QString &filename, ImageType type);
+
+    static ImageType guessImageType(const QString &filename);
+
+  private:
+    void findImages(void);
+
+    Metadata                *m_parent;
+    QPtrList<AlbumArtImage>  m_imageList;
+};
 
 #endif

@@ -5,11 +5,11 @@
 using namespace std;
 
 #include "dbcheck.h"
-
+#include "metadata.h"
 #include "mythtv/mythcontext.h"
 #include "mythtv/mythdbcon.h"
 
-const QString currentDatabaseVersion = "1009";
+const QString currentDatabaseVersion = "1010";
 
 static bool UpdateDBVersionNumber(const QString &newnumber)
 {   
@@ -515,6 +515,63 @@ bool UpgradeMusicDatabaseSchema(void)
         if (!performActualUpdate(updates, "1009", dbver))
             return false;
     }
+
+    if (dbver == "1009")
+{
+    const QString updates[] = {
+"ALTER TABLE music_albumart ADD COLUMN imagetype tinyint(3) NOT NULL DEFAULT '0';",
+        ""
+    };
+
+    if (!performActualUpdate(updates, "1010", dbver))
+        return false;
+
+    // scan though the music_albumart table and make a guess at what 
+    // each image represents from the filename
+
+    VERBOSE(VB_IMPORTANT, "Updating music_albumart image types");
+
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare("SELECT albumart_id, filename, directory_id, imagetype FROM music_albumart;");
+
+    if (query.exec())
+    {
+        while (query.next())
+        {
+            int id = query.value(0).toInt();
+            QString filename = query.value(1).toString();
+            int directoryID = query.value(2).toInt();
+            int type = IT_UNKNOWN;
+            MSqlQuery subquery(MSqlQuery::InitCon());
+
+            // guess the type from the filename
+            type = AlbumArtImages::guessImageType(filename);
+
+            // if type is still unknown check to see how many images are available in the dir
+            // and assume that if this is the only image it must be the front cover
+            if (type == IT_UNKNOWN)
+            {
+                subquery.prepare("SELECT count(directory_id) FROM music_albumart "
+                                 "WHERE directory_id = :DIR;");
+                subquery.bindValue(":DIR", directoryID);
+                if (!subquery.exec() || !subquery.isActive())
+                    MythContext::DBError("album art image count", subquery);
+                subquery.first();
+                if (query.value(0).toInt() == 1)
+                    type = IT_FRONTCOVER;
+            }
+
+            // finally set the type in the music_albumart table
+            subquery.prepare("UPDATE music_albumart "
+                    "SET imagetype = :TYPE "
+                    "WHERE albumart_id = :ID;");
+            subquery.bindValue(":TYPE", type);
+            subquery.bindValue(":ID", id);
+            if (!subquery.exec() || !subquery.isActive())
+                MythContext::DBError("album art image type update", subquery);
+        }
+    }
+}
 
 /* in 0.21 */
 //"DROP TABLE musicmetadata;",

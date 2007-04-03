@@ -1,5 +1,48 @@
 <!DOCTYPE TS><TS>
 <context>
+    <name>AlbumArtImages</name>
+    <message>
+        <source>Unknown</source>
+        <translation type="unfinished">Inconnu</translation>
+    </message>
+    <message>
+        <source>Front Cover</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Back Cover</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>CD</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Inlay</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>front</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>back</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>inlay</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>cd</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>cover</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>DatabaseBox</name>
     <message>
         <source>Copy To New Playlist</source>
@@ -122,7 +165,7 @@ L&apos;écran suivant sera vide. Il faut le quitter pour revenir au menu. </tran
     </message>
     <message>
         <source>DB Statistics</source>
-        <translation>Statistiques BDD</translation>
+        <translation type="obsolete">Statistiques BDD</translation>
     </message>
     <message>
         <source>Various Artists</source>
@@ -171,6 +214,26 @@ L&apos;écran suivant sera vide. Il faut le quitter pour revenir au menu. </tran
     <message>
         <source>Are you sure you want to save the modified metadata to the file?</source>
         <translation>Êtes vous sûr de vouloir sauver les données modifiées dans le fichie</translation>
+    </message>
+    <message>
+        <source>Track Info.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Album Art</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Statistics</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Save Changes</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Change Image Type</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -359,16 +422,20 @@ L&apos;écran suivant sera vide. Il faut le quitter pour revenir au menu. </tran
         <source>Shuffle: Album</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Visualization: </source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QObject</name>
     <message>
         <source>Searching for music files</source>
-        <translation>Recherche en cours des fichiers musicaux</translation>
+        <translation type="obsolete">Recherche en cours des fichiers musicaux</translation>
     </message>
     <message>
         <source>Updating music database</source>
-        <translation>Mise à jour de la Base de Données Musicales</translation>
+        <translation type="obsolete">Mise à jour de la Base de Données Musicales</translation>
     </message>
     <message>
         <source>BumpScope</source>
@@ -432,7 +499,7 @@ L&apos;écran suivant sera vide. Il faut le quitter pour revenir au menu. </tran
     </message>
     <message>
         <source>Directory and filename Format used to grab information if no ID3 information is found.</source>
-        <translation>Répertoire et Format de fichier utilisé pour obtenir des informations, si aucun ID3 n&apos;est trouvé.</translation>
+        <translation type="obsolete">Répertoire et Format de fichier utilisé pour obtenir des informations, si aucun ID3 n&apos;est trouvé.</translation>
     </message>
     <message>
         <source>Ignore ID3 Tags</source>
@@ -480,15 +547,15 @@ L&apos;écran suivant sera vide. Il faut le quitter pour revenir au menu. </tran
     </message>
     <message>
         <source>Defines the location/name for new songs. Valid tokens are: GENRE, ARTIST, ALBUM, TRACK, TITLE, YEAR, / and -. &apos;-&apos; will be replaced by the Token separator</source>
-        <translation>Définit le chemin/nom pour les nouvelles chansons. GENRE, ARTIST, ALBUM, TRACK, TITLE, YEAR, /  sont des valeurs possibles et -, &apos;-&apos; sera remplacé par le caractère de séparation</translation>
+        <translation type="obsolete">Définit le chemin/nom pour les nouvelles chansons. GENRE, ARTIST, ALBUM, TRACK, TITLE, YEAR, /  sont des valeurs possibles et -, &apos;-&apos; sera remplacé par le caractère de séparation</translation>
     </message>
     <message>
         <source>Token separator</source>
-        <translation>Caractére de séparation</translation>
+        <translation type="obsolete">Caractére de séparation</translation>
     </message>
     <message>
         <source>Filename tokens will be separated by this string.</source>
-        <translation>Les caractères de séparation des noms de fichiers seront remplacés par cette chaîne.</translation>
+        <translation type="obsolete">Les caractères de séparation des noms de fichiers seront remplacés par cette chaîne.</translation>
     </message>
     <message>
         <source>Replace &apos; &apos; with &apos;_&apos;</source>
@@ -891,19 +958,7 @@ L&apos;écran suivant sera vide. Il faut le quitter pour revenir au menu. </tran
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Scanning music files</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Rebuilding music tree</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Only Import new music.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Checks the database for duplicates when importing/ripping CDs.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -922,12 +977,87 @@ L&apos;écran suivant sera vide. Il faut le quitter pour revenir au menu. </tran
         <source>Unknown Title</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Importing </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Directory and filename Format used to grab information if no ID3 information is found. Accepts GENRE, ARTIST, ALBUM, TITLE, ARTIST_TITLE and TRACK_TITLE.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Tag Encoding</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>UTF-16</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>UTF-8</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Ascii</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Some mp3 players don&apos;t understand tags encoded in UTF8 or UTF16, this setting allows you to change the encoding format used. Currently applies only to ID3 tags.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Defines the location/name for new songs. Valid tokens are: GENRE, ARTIST, ALBUM, TRACK, TITLE, YEAR</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Maximum Search Results</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Used to limit the number of results returned when using the search feature.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Resume mode</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Off</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Track</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Exact</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Resume playback at either the beginning of the active play queue, the beginning of the last track, an exact point within the last track.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Playback Settings (2)</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>RipStatus</name>
+    <message>
+        <source>Stop Rip?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Are you sure you want to cancel ripping the CD?</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>Ripper</name>
     <message>
         <source>Please select a quality level and check the album information below:</source>
-        <translation>Merci de sélectionner un niveau de qualité et de vérifier les informations de l&apos;album ci dessous:</translation>
+        <translation type="obsolete">Merci de sélectionner un niveau de qualité et de vérifier les informations de l&apos;album ci dessous:</translation>
     </message>
     <message>
         <source>Low</source>
@@ -947,63 +1077,108 @@ L&apos;écran suivant sera vide. Il faut le quitter pour revenir au menu. </tran
     </message>
     <message>
         <source>Artist: </source>
-        <translation>Artiste:</translation>
+        <translation type="obsolete">Artiste:</translation>
     </message>
     <message>
         <source>Album: </source>
-        <translation>Album:</translation>
+        <translation type="obsolete">Album:</translation>
     </message>
     <message>
         <source>Import this CD</source>
-        <translation>Importer ce CD</translation>
+        <translation type="obsolete">Importer ce CD</translation>
     </message>
     <message>
         <source>Importing CD:
 </source>
-        <translation>Importation du CD:
+        <translation type="obsolete">Importation du CD:
 </translation>
     </message>
     <message>
         <source>Copying from CD:
 </source>
-        <translation>Copie en cours de ce CD:
+        <translation type="obsolete">Copie en cours de ce CD:
 </translation>
     </message>
     <message>
         <source>Genre: </source>
-        <translation>Genre: </translation>
+        <translation type="obsolete">Genre: </translation>
     </message>
     <message>
         <source>Ripping...</source>
-        <translation>Compression...</translation>
+        <translation type="obsolete">Compression...</translation>
     </message>
     <message>
         <source>Multi-Artist?</source>
-        <translation>Multi-Artiste ?</translation>
+        <translation type="obsolete">Multi-Artiste ?</translation>
     </message>
     <message>
         <source>Switch Titles &amp;&amp; Artists</source>
-        <translation>Echanger titres et Artistes</translation>
+        <translation type="obsolete">Echanger titres et Artistes</translation>
     </message>
     <message>
         <source>Title</source>
-        <translation>Titre</translation>
+        <translation type="obsolete">Titre</translation>
     </message>
     <message>
         <source>Artist</source>
-        <translation>Artiste</translation>
+        <translation type="obsolete">Artiste</translation>
     </message>
     <message>
         <source>Length</source>
-        <translation>Taille</translation>
+        <translation type="obsolete">Taille</translation>
     </message>
     <message>
-        <source>Quality: </source>
+        <source>Switch Titles</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Importing </source>
+        <source>Scan CD</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rip CD</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Artist: %1
+Album: %2
+Track: %3
+
+This track is already in the database. 
+Do you want to remove the existing track?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No tracks</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>There are no tracks to rip?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Success</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rip completed successfully.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Ejecting CD. Please Wait ...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select an Artist</source>
+        <translation type="unfinished">Choix d&apos;un Artiste</translation>
+    </message>
+    <message>
+        <source>Select an Album</source>
+        <translation type="unfinished">Choix d&apos;un Album</translation>
+    </message>
+    <message>
+        <source>Select a Genre</source>
+        <translation type="unfinished">Choix d&apos;un genre</translation>
     </message>
 </context>
 <context>

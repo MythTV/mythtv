@@ -206,9 +206,12 @@ void FileScanner::AddFileToDB(const QString &filename)
         QString name = filename.section( '/', -1);
 
         MSqlQuery query(MSqlQuery::InitCon());
-        query.prepare("INSERT INTO music_albumart SET filename= :FILE, directory_id= :DIRID;");
+        query.prepare("INSERT INTO music_albumart SET filename = :FILE, "
+                      "directory_id = :DIRID, imagetype = :TYPE;");
         query.bindValue(":FILE", name);
         query.bindValue(":DIRID", m_directoryid[directory.utf8().lower()]);
+        query.bindValue(":TYPE", AlbumArtImages::guessImageType(name));
+
         if (!query.exec() || query.numRowsAffected() <= 0)
         {
                 MythContext::DBError("music insert artwork", query);

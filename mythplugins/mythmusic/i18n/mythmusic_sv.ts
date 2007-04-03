@@ -1,5 +1,48 @@
 <!DOCTYPE TS><TS>
 <context>
+    <name>AlbumArtImages</name>
+    <message>
+        <source>Unknown</source>
+        <translation type="unfinished">Okänd</translation>
+    </message>
+    <message>
+        <source>Front Cover</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Back Cover</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>CD</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Inlay</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>front</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>back</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>inlay</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>cd</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>cover</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>DatabaseBox</name>
     <message>
         <source>Active Play Queue</source>
@@ -120,7 +163,7 @@ Nästa skärm kommer att vara tom, använd Escape för att komma tillbaka till m
     </message>
     <message>
         <source>DB Statistics</source>
-        <translation>DB-statistik</translation>
+        <translation type="obsolete">DB-statistik</translation>
     </message>
     <message>
         <source>Various Artists</source>
@@ -173,6 +216,22 @@ Nästa skärm kommer att vara tom, använd Escape för att komma tillbaka till m
     <message>
         <source>Save Changes</source>
         <translation>Spara ändringar</translation>
+    </message>
+    <message>
+        <source>Track Info.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Album Art</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Statistics</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Change Image Type</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -897,6 +956,58 @@ Nästa skärm kommer att vara tom, använd Escape för att komma tillbaka till m
     <message>
         <source>Defines the location/name for new songs. Valid tokens are: GENRE, ARTIST, ALBUM, TRACK, TITLE, YEAR</source>
         <translation>Definierar plats/namn för nya sånger. Giltiga nyckelord är: GENRE, ARTIST, ALBUM, TRACK, TITLE, YEAR</translation>
+    </message>
+    <message>
+        <source>Tag Encoding</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>UTF-16</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>UTF-8</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Ascii</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Some mp3 players don&apos;t understand tags encoded in UTF8 or UTF16, this setting allows you to change the encoding format used. Currently applies only to ID3 tags.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Maximum Search Results</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Used to limit the number of results returned when using the search feature.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Resume mode</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Off</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Track</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Exact</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Resume playback at either the beginning of the active play queue, the beginning of the last track, an exact point within the last track.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Playback Settings (2)</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

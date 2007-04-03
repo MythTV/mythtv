@@ -1,5 +1,48 @@
 <!DOCTYPE TS><TS>
 <context>
+    <name>AlbumArtImages</name>
+    <message>
+        <source>Unknown</source>
+        <translation type="unfinished">Ukendt</translation>
+    </message>
+    <message>
+        <source>Front Cover</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Back Cover</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>CD</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Inlay</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>front</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>back</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>inlay</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>cd</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>cover</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>DatabaseBox</name>
     <message>
         <source>Active Play Queue</source>
@@ -118,7 +161,7 @@
     </message>
     <message>
         <source>DB Statistics</source>
-        <translation>DB statistik</translation>
+        <translation type="obsolete">DB statistik</translation>
     </message>
     <message>
         <source>Various Artists</source>
@@ -167,6 +210,26 @@
     <message>
         <source>Are you sure you want to save the modified metadata to the file?</source>
         <translation>Er du sikker på at du vil gemme ændringerne til denne fil?</translation>
+    </message>
+    <message>
+        <source>Track Info.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Album Art</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Statistics</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Save Changes</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Change Image Type</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -355,16 +418,20 @@
         <source>Shuffle: Album</source>
         <translation>Bland: Album</translation>
     </message>
+    <message>
+        <source>Visualization: </source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QObject</name>
     <message>
         <source>Searching for music files</source>
-        <translation>Søger efter musik-filer</translation>
+        <translation type="obsolete">Søger efter musik-filer</translation>
     </message>
     <message>
         <source>Updating music database</source>
-        <translation>Opdatérer musik-databasen</translation>
+        <translation type="obsolete">Opdatérer musik-databasen</translation>
     </message>
     <message>
         <source>BumpScope</source>
@@ -428,7 +495,7 @@
     </message>
     <message>
         <source>Directory and filename Format used to grab information if no ID3 information is found.</source>
-        <translation>Formatet af underbiblioteker og filnavne, der anvendendes når der ikke er ID3-information tilgængelig.</translation>
+        <translation type="obsolete">Formatet af underbiblioteker og filnavne, der anvendendes når der ikke er ID3-information tilgængelig.</translation>
     </message>
     <message>
         <source>Ignore ID3 Tags</source>
@@ -476,11 +543,11 @@
     </message>
     <message>
         <source>Defines the location/name for new songs. Valid tokens are: GENRE, ARTIST, ALBUM, TRACK, TITLE, YEAR, / and -. &apos;-&apos; will be replaced by the Token separator</source>
-        <translation>Placeringen af nye musik-filer. Gyldige makroer er: GENRE, ARTIST, ALBUM, TRACK, TITLE, YEAR, / og -. &apos;-&apos; vil blive erstattet af makro-separatoreren.</translation>
+        <translation type="obsolete">Placeringen af nye musik-filer. Gyldige makroer er: GENRE, ARTIST, ALBUM, TRACK, TITLE, YEAR, / og -. &apos;-&apos; vil blive erstattet af makro-separatoreren.</translation>
     </message>
     <message>
         <source>Token separator</source>
-        <translation>Makro-separator</translation>
+        <translation type="obsolete">Makro-separator</translation>
     </message>
     <message>
         <source> - </source>
@@ -488,7 +555,7 @@
     </message>
     <message>
         <source>Filename tokens will be separated by this string.</source>
-        <translation>Filnavns-makroer vil blive separeret af denne streng.</translation>
+        <translation type="obsolete">Filnavns-makroer vil blive separeret af denne streng.</translation>
     </message>
     <message>
         <source>Replace &apos; &apos; with &apos;_&apos;</source>
@@ -924,7 +991,7 @@
     </message>
     <message>
         <source>Scanning music files</source>
-        <translation>Skanner musik filer</translation>
+        <translation type="obsolete">Skanner musik filer</translation>
     </message>
     <message>
         <source>Rebuilding music tree</source>
@@ -932,11 +999,11 @@
     </message>
     <message>
         <source>Only Import new music.</source>
-        <translation>Importér kun nyt musik.</translation>
+        <translation type="obsolete">Importér kun nyt musik.</translation>
     </message>
     <message>
         <source>Checks the database for duplicates when importing/ripping CDs.</source>
-        <translation>Check databasen for dubletter når der importéres/rippes cd&apos;er.</translation>
+        <translation type="obsolete">Check databasen for dubletter når der importéres/rippes cd&apos;er.</translation>
     </message>
     <message>
         <source>Loading Music</source>
@@ -954,12 +1021,87 @@
         <source>Unknown Title</source>
         <translation>Ukendt titel</translation>
     </message>
+    <message>
+        <source>Importing </source>
+        <translation type="unfinished">Importerer </translation>
+    </message>
+    <message>
+        <source>Directory and filename Format used to grab information if no ID3 information is found. Accepts GENRE, ARTIST, ALBUM, TITLE, ARTIST_TITLE and TRACK_TITLE.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Tag Encoding</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>UTF-16</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>UTF-8</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Ascii</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Some mp3 players don&apos;t understand tags encoded in UTF8 or UTF16, this setting allows you to change the encoding format used. Currently applies only to ID3 tags.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Defines the location/name for new songs. Valid tokens are: GENRE, ARTIST, ALBUM, TRACK, TITLE, YEAR</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Maximum Search Results</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Used to limit the number of results returned when using the search feature.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Resume mode</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Off</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Track</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Exact</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Resume playback at either the beginning of the active play queue, the beginning of the last track, an exact point within the last track.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Playback Settings (2)</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>RipStatus</name>
+    <message>
+        <source>Stop Rip?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Are you sure you want to cancel ripping the CD?</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>Ripper</name>
     <message>
         <source>Please select a quality level and check the album information below:</source>
-        <translation>Vælgt venligst et kvalitets-niveau og kontrollér album-informationen nedenfor:</translation>
+        <translation type="obsolete">Vælgt venligst et kvalitets-niveau og kontrollér album-informationen nedenfor:</translation>
     </message>
     <message>
         <source>Low</source>
@@ -979,63 +1121,116 @@
     </message>
     <message>
         <source>Artist: </source>
-        <translation>Kunstner: </translation>
+        <translation type="obsolete">Kunstner: </translation>
     </message>
     <message>
         <source>Album: </source>
-        <translation>Album: </translation>
+        <translation type="obsolete">Album: </translation>
     </message>
     <message>
         <source>Import this CD</source>
-        <translation>Importér denne CD</translation>
+        <translation type="obsolete">Importér denne CD</translation>
     </message>
     <message>
         <source>Importing CD:
 </source>
-        <translation>Importerer CD:
+        <translation type="obsolete">Importerer CD:
 </translation>
     </message>
     <message>
         <source>Copying from CD:
 </source>
-        <translation>Kopierer fra CD:
+        <translation type="obsolete">Kopierer fra CD:
 </translation>
     </message>
     <message>
         <source>Genre: </source>
-        <translation>Genre:</translation>
+        <translation type="obsolete">Genre:</translation>
     </message>
     <message>
         <source>Ripping...</source>
-        <translation>Kopierer...</translation>
+        <translation type="obsolete">Kopierer...</translation>
     </message>
     <message>
         <source>Multi-Artist?</source>
-        <translation>Flere Kunstnere?</translation>
+        <translation type="obsolete">Flere Kunstnere?</translation>
     </message>
     <message>
         <source>Switch Titles &amp;&amp; Artists</source>
-        <translation>Byt Titel  &amp;&amp; Kunstner</translation>
+        <translation type="obsolete">Byt Titel  &amp;&amp; Kunstner</translation>
     </message>
     <message>
         <source>Title</source>
-        <translation>Titel</translation>
+        <translation type="obsolete">Titel</translation>
     </message>
     <message>
         <source>Artist</source>
-        <translation>Kunstner</translation>
+        <translation type="obsolete">Kunstner</translation>
     </message>
     <message>
         <source>Length</source>
-        <translation>Længde</translation>
+        <translation type="obsolete">Længde</translation>
     </message>
     <message>
         <source>Quality: </source>
-        <translation>Kvalitet: </translation>
+        <translation type="obsolete">Kvalitet: </translation>
     </message>
     <message>
         <source>Importing </source>
-        <translation>Importerer </translation>
+        <translation type="obsolete">Importerer </translation>
+    </message>
+    <message>
+        <source>Switch Titles</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Scan CD</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rip CD</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Artist: %1
+Album: %2
+Track: %3
+
+This track is already in the database. 
+Do you want to remove the existing track?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No tracks</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>There are no tracks to rip?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Success</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rip completed successfully.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Ejecting CD. Please Wait ...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select an Artist</source>
+        <translation type="unfinished">Vælg en kunstner</translation>
+    </message>
+    <message>
+        <source>Select an Album</source>
+        <translation type="unfinished">Vælg et album</translation>
+    </message>
+    <message>
+        <source>Select a Genre</source>
+        <translation type="unfinished">Vælg en genre</translation>
     </message>
 </context>
 <context>

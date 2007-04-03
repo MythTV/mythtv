@@ -1,5 +1,48 @@
 <!DOCTYPE TS><TS>
 <context>
+    <name>AlbumArtImages</name>
+    <message>
+        <source>Unknown</source>
+        <translation type="unfinished">不明</translation>
+    </message>
+    <message>
+        <source>Front Cover</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Back Cover</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>CD</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Inlay</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>front</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>back</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>inlay</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>cd</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>cover</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>DatabaseBox</name>
     <message>
         <source>Copy To New Playlist</source>
@@ -118,7 +161,7 @@
     </message>
     <message>
         <source>DB Statistics</source>
-        <translation>DB統計</translation>
+        <translation type="obsolete">DB統計</translation>
     </message>
     <message>
         <source>Various Artists</source>
@@ -167,6 +210,26 @@
     <message>
         <source>Are you sure you want to save the modified metadata to the file?</source>
         <translation>変更をファイルに保存してよろしいですか?</translation>
+    </message>
+    <message>
+        <source>Track Info.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Album Art</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Statistics</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Save Changes</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Change Image Type</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -355,16 +418,20 @@
         <source>Shuffle: Album</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Visualization: </source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QObject</name>
     <message>
         <source>Searching for music files</source>
-        <translation>ミュージックファイル検索</translation>
+        <translation type="obsolete">ミュージックファイル検索</translation>
     </message>
     <message>
         <source>Updating music database</source>
-        <translation>ミュージックデータベース更新</translation>
+        <translation type="obsolete">ミュージックデータベース更新</translation>
     </message>
     <message>
         <source>BumpScope</source>
@@ -428,7 +495,7 @@
     </message>
     <message>
         <source>Directory and filename Format used to grab information if no ID3 information is found.</source>
-        <translation>ID3情報が見つからないときに使用するディレクトリとファイル名のフォーマット.</translation>
+        <translation type="obsolete">ID3情報が見つからないときに使用するディレクトリとファイル名のフォーマット.</translation>
     </message>
     <message>
         <source>Ignore ID3 Tags</source>
@@ -476,15 +543,15 @@
     </message>
     <message>
         <source>Defines the location/name for new songs. Valid tokens are: GENRE, ARTIST, ALBUM, TRACK, TITLE, YEAR, / and -. &apos;-&apos; will be replaced by the Token separator</source>
-        <translation>既定の音楽の場所。使用できるパラメータは: GENRE, ARTIST, ALBUM, TRACK, TITLE, YEAR, / と - です。&apos;-&apos;はセパレーターに置き換えられます。</translation>
+        <translation type="obsolete">既定の音楽の場所。使用できるパラメータは: GENRE, ARTIST, ALBUM, TRACK, TITLE, YEAR, / と - です。&apos;-&apos;はセパレーターに置き換えられます。</translation>
     </message>
     <message>
         <source>Token separator</source>
-        <translation>トークンセパレータ</translation>
+        <translation type="obsolete">トークンセパレータ</translation>
     </message>
     <message>
         <source>Filename tokens will be separated by this string.</source>
-        <translation>ファイル名トークンで文字を区切ります.</translation>
+        <translation type="obsolete">ファイル名トークンで文字を区切ります.</translation>
     </message>
     <message>
         <source>Replace &apos; &apos; with &apos;_&apos;</source>
@@ -887,19 +954,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Scanning music files</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Rebuilding music tree</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Only Import new music.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Checks the database for duplicates when importing/ripping CDs.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -918,12 +973,87 @@
         <source>Unknown Title</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Importing </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Directory and filename Format used to grab information if no ID3 information is found. Accepts GENRE, ARTIST, ALBUM, TITLE, ARTIST_TITLE and TRACK_TITLE.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Tag Encoding</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>UTF-16</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>UTF-8</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Ascii</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Some mp3 players don&apos;t understand tags encoded in UTF8 or UTF16, this setting allows you to change the encoding format used. Currently applies only to ID3 tags.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Defines the location/name for new songs. Valid tokens are: GENRE, ARTIST, ALBUM, TRACK, TITLE, YEAR</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Maximum Search Results</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Used to limit the number of results returned when using the search feature.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Resume mode</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Off</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Track</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Exact</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Resume playback at either the beginning of the active play queue, the beginning of the last track, an exact point within the last track.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Playback Settings (2)</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>RipStatus</name>
+    <message>
+        <source>Stop Rip?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Are you sure you want to cancel ripping the CD?</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>Ripper</name>
     <message>
         <source>Please select a quality level and check the album information below:</source>
-        <translation>クオリティレベルの選択とアルバム情報を確認してください｡</translation>
+        <translation type="obsolete">クオリティレベルの選択とアルバム情報を確認してください｡</translation>
     </message>
     <message>
         <source>Low</source>
@@ -943,63 +1073,108 @@
     </message>
     <message>
         <source>Artist: </source>
-        <translation>アーティスト:</translation>
+        <translation type="obsolete">アーティスト:</translation>
     </message>
     <message>
         <source>Album: </source>
-        <translation>アルバム:</translation>
+        <translation type="obsolete">アルバム:</translation>
     </message>
     <message>
         <source>Import this CD</source>
-        <translation>CD取り込み</translation>
+        <translation type="obsolete">CD取り込み</translation>
     </message>
     <message>
         <source>Importing CD:
 </source>
-        <translation>CD取り込み中:
+        <translation type="obsolete">CD取り込み中:
 </translation>
     </message>
     <message>
         <source>Copying from CD:
 </source>
-        <translation>CDからコピー中:
+        <translation type="obsolete">CDからコピー中:
 </translation>
     </message>
     <message>
         <source>Genre: </source>
-        <translation>ジャンル:</translation>
+        <translation type="obsolete">ジャンル:</translation>
     </message>
     <message>
         <source>Ripping...</source>
-        <translation>リッピング...</translation>
+        <translation type="obsolete">リッピング...</translation>
     </message>
     <message>
         <source>Multi-Artist?</source>
-        <translation>複数のアーチスト?</translation>
+        <translation type="obsolete">複数のアーチスト?</translation>
     </message>
     <message>
         <source>Switch Titles &amp;&amp; Artists</source>
-        <translation>タイトルとアーチストを交換</translation>
+        <translation type="obsolete">タイトルとアーチストを交換</translation>
     </message>
     <message>
         <source>Title</source>
-        <translation>タイトル</translation>
+        <translation type="obsolete">タイトル</translation>
     </message>
     <message>
         <source>Artist</source>
-        <translation>アーティスト</translation>
+        <translation type="obsolete">アーティスト</translation>
     </message>
     <message>
         <source>Length</source>
-        <translation>時間</translation>
+        <translation type="obsolete">時間</translation>
     </message>
     <message>
-        <source>Quality: </source>
+        <source>Switch Titles</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Importing </source>
+        <source>Scan CD</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rip CD</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Artist: %1
+Album: %2
+Track: %3
+
+This track is already in the database. 
+Do you want to remove the existing track?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No tracks</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>There are no tracks to rip?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Success</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rip completed successfully.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Ejecting CD. Please Wait ...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select an Artist</source>
+        <translation type="unfinished">アーチストを選択</translation>
+    </message>
+    <message>
+        <source>Select an Album</source>
+        <translation type="unfinished">アルバムを選択</translation>
+    </message>
+    <message>
+        <source>Select a Genre</source>
+        <translation type="unfinished">ジャンルを選択</translation>
     </message>
 </context>
 <context>

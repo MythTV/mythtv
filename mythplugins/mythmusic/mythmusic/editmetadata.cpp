@@ -16,10 +16,18 @@ EditMetadataDialog::EditMetadataDialog(Metadata *source_metadata,
     // make a copy so we can abandon changes
     m_metadata = new Metadata(*source_metadata);
     m_sourceMetadata = source_metadata;
+    albumArt = new AlbumArtImages(m_metadata);
     metadataOnly = false;
+    setContext(1);
     wireUpTheme();
     fillWidgets();
     assignFirstFocus();
+}
+
+EditMetadataDialog::~EditMetadataDialog()
+{
+    delete m_metadata;
+    delete albumArt;
 }
 
 void EditMetadataDialog::fillWidgets()
@@ -97,11 +105,88 @@ void EditMetadataDialog::fillWidgets()
     {
         rating_image->setRepeat(m_metadata->Rating());
     }
-    
+
     if (compilation_check)
     {
         compilation_check->setState(m_metadata->Compilation());
     }
+
+    if (coverart_grid)
+    {
+        updateImageGrid();
+    }
+}
+
+void EditMetadataDialog::gridItemChanged(ImageGridItem *item)
+{
+    if (!item)
+        return;
+
+    if (coverart_image)
+    {
+        AlbumArtImage *image = (AlbumArtImage*) item->data;
+        if (image)
+        {
+            coverart_image->SetImage(image->filename);
+            coverart_image->LoadImage();
+            if (imagetype_text)
+                imagetype_text->SetText(image->typeName);
+            if (imagefilename_text)
+            {
+                QFileInfo fi(image->filename);
+                imagefilename_text->SetText(fi.fileName());
+            }
+        }
+    }
+}
+
+void EditMetadataDialog::updateImageGrid()
+{
+    QPtrList<AlbumArtImage> *albumArtList = albumArt->getImageList();
+
+    QSize size = coverart_grid->getImageItemSize();
+
+    for (uint x = 0; x < albumArtList->count(); x++)
+    {
+        QPixmap *pixmap = createScaledPixmap(albumArtList->at(x)->filename,
+                                             size.width(), size.height(),
+                                             QImage::ScaleMin);
+
+        ImageGridItem *item = new ImageGridItem(albumArtList->at(x)->typeName,
+                pixmap, false, (void*) albumArtList->at(x));
+        coverart_grid->appendItem(item);
+    }
+
+    coverart_grid->setItemCount(albumArtList->count());
+    coverart_grid->recalculateLayout();
+
+    if (albumArtList->count() > 0)
+        gridItemChanged(coverart_grid->getItemAt(0));
+
+    coverart_grid->refresh();
+}
+
+QPixmap *EditMetadataDialog::createScaledPixmap(QString filename,
+                                         int width, int height, QImage::ScaleMode mode)
+{
+    QPixmap *pixmap = NULL;
+
+    if (filename != "")
+    {
+        QImage *img = gContext->LoadScaleImage(filename);
+        if (!img)
+        {
+            VERBOSE(VB_IMPORTANT, QString("EditMetadataDialog: Failed to load image %1").arg(filename));
+            return NULL;
+        }
+        else
+        {
+            pixmap = new QPixmap(img->smoothScale(width, height, mode));
+            delete img;
+        }
+    }
+
+    return pixmap;
 }
 
 void EditMetadataDialog::incRating(bool up_or_down)
@@ -119,7 +204,7 @@ void EditMetadataDialog::keyPressEvent(QKeyEvent *e)
     bool handled = false;
 
     QStringList actions;
-    gContext->GetMainWindow()->TranslateKeyPress("Video", e, actions);
+    gContext->GetMainWindow()->TranslateKeyPress("Global", e, actions);
 
     for (unsigned int i = 0; i < actions.size() && !handled; i++)
     {
@@ -127,9 +212,27 @@ void EditMetadataDialog::keyPressEvent(QKeyEvent *e)
         handled = true;
 
         if (action == "UP")
-            nextPrevWidgetFocus(false);
+        {
+            if (getCurrentFocusWidget() == coverart_grid)
+            {
+
+                if (coverart_grid->handleKeyPress(action))
+                    return;
+            }
+            else
+                nextPrevWidgetFocus(false);
+        }
         else if (action == "DOWN")
-            nextPrevWidgetFocus(true);
+        {
+            if (getCurrentFocusWidget() == coverart_grid)
+            {
+
+                if (coverart_grid->handleKeyPress(action))
+                    return;
+            }
+            else
+                nextPrevWidgetFocus(true);
+        }
         else if (action == "LEFT")
         {
             if (getCurrentFocusWidget() == rating_button)
@@ -137,11 +240,12 @@ void EditMetadataDialog::keyPressEvent(QKeyEvent *e)
                 rating_button->push();
                 incRating(false);
             }
-            
-            if (getCurrentFocusWidget() == compilation_check)
+            else if (getCurrentFocusWidget() == compilation_check)
             {
                 compilation_check->activate();
             }
+            else
+                nextPrevWidgetFocus(false);
         }
         else if (action == "RIGHT")
         {
@@ -150,16 +254,20 @@ void EditMetadataDialog::keyPressEvent(QKeyEvent *e)
                 rating_button->push();
                 incRating(true);
             }
-            
-            if (getCurrentFocusWidget() == compilation_check)
+            else if (getCurrentFocusWidget() == compilation_check)
             {
                 compilation_check->activate();
             }
-            
+            else
+                nextPrevWidgetFocus(true);
         }
         else if (action == "SELECT")
         {
             activateCurrent();
+        }
+        else if (action == "MENU" && getContext() == 2)
+        {
+            showMenu();
         }
         else if (action == "0")
         {
@@ -185,35 +293,35 @@ void EditMetadataDialog::wireUpTheme()
         artist_edit->createEdit(this);
         connect(artist_edit, SIGNAL(loosingFocus()), this, SLOT(editLostFocus()));
     }
-    
+
     compilation_artist_edit = getUIRemoteEditType("compilation_artist_edit");
     if (compilation_artist_edit)
     {
         compilation_artist_edit->createEdit(this);
         connect(compilation_artist_edit, SIGNAL(loosingFocus()), this, SLOT(editLostFocus()));
     }
-    
+
     album_edit = getUIRemoteEditType("album_edit");
     if (album_edit)
     {
         album_edit->createEdit(this);
         connect(album_edit, SIGNAL(loosingFocus()), this, SLOT(editLostFocus()));
     }
-    
+
     title_edit = getUIRemoteEditType("title_edit");
     if (title_edit)
     {
         title_edit->createEdit(this);
         connect(title_edit, SIGNAL(loosingFocus()), this, SLOT(editLostFocus()));
     }
-         
+
     genre_edit = getUIRemoteEditType("genre_edit");
     if (genre_edit)
     {
         genre_edit->createEdit(this);
         connect(genre_edit, SIGNAL(loosingFocus()), this, SLOT(editLostFocus()));
     }
-        
+
     year_edit = getUIRemoteEditType("year_edit");
     if (year_edit)
     {
@@ -227,18 +335,18 @@ void EditMetadataDialog::wireUpTheme()
         track_edit->createEdit(this);
         connect(track_edit, SIGNAL(loosingFocus()), this, SLOT(editLostFocus()));
     }
-            
+
     lastplay_text = getUITextType("lastplay_text");
     playcount_text = getUITextType("playcount_text");
     filename_text = getUITextType("filename_text");
     rating_image = getUIRepeatedImageType("rating_image");
-    
+
     compilation_check = getUICheckBoxType("compilation_check");
     if (compilation_check)
     {
         connect(compilation_check, SIGNAL(pushed(bool)), this, SLOT(checkClicked(bool)));
     }
-    
+
     searchartist_button = getUIPushButtonType("searchartist_button");
     if (searchartist_button)
     {
@@ -263,6 +371,27 @@ void EditMetadataDialog::wireUpTheme()
         connect(searchgenre_button, SIGNAL(pushed()), this, SLOT(searchGenre()));
     }
 
+    metadata_button = getUITextButtonType("metadata_button");
+    if (metadata_button)
+    {
+        metadata_button->setText(tr("Track Info."));
+        connect(metadata_button, SIGNAL(pushed()), this, SLOT(switchToMetadata()));
+    }
+
+    albumart_button = getUITextButtonType("albumart_button");
+    if (albumart_button)
+    {
+        albumart_button->setText(tr("Album Art"));
+        connect(albumart_button, SIGNAL(pushed()), this, SLOT(switchToAlbumArt()));
+    }
+
+    dbstatistics_button = getUITextButtonType("dbstats_button");
+    if (dbstatistics_button)
+    {
+        dbstatistics_button->setText(tr("Statistics"));
+        connect(dbstatistics_button, SIGNAL(pushed()), this, SLOT(switchToDBStats()));
+    }
+
     done_button = getUITextButtonType("done_button");
     if (done_button)
     {
@@ -270,19 +399,50 @@ void EditMetadataDialog::wireUpTheme()
         connect(done_button, SIGNAL(pushed()), this, SLOT(showSaveMenu()));
     }
 
+    coverart_image = getUIImageType("coverart_image");
+    coverart_grid = getUIImageGridType("coverart_grid");
+    if (coverart_grid)
+    {
+        connect(coverart_grid, SIGNAL(itemChanged(ImageGridItem *)),
+                this, SLOT(gridItemChanged(ImageGridItem *)));
+    }
+
+    imagetype_text = getUITextType("imagetype_text");
+    imagefilename_text = getUITextType("imagefilename_text");
+
     rating_button = getUISelectorType("rating_button");
     if (rating_button)
     {
-        
+
     }
 
-    dbStatistics_button = getUITextButtonType("dbstatistics_button");
-    if (dbStatistics_button)
-    {
-        dbStatistics_button->setText(tr("DB Statistics"));
-     }
-
     buildFocusList();
+}
+
+void EditMetadataDialog::switchToMetadata()
+{
+    setContext(1);
+
+    updateForeground();
+    buildFocusList();
+}
+
+void EditMetadataDialog::switchToAlbumArt()
+{
+    setContext(2);
+
+    updateForeground();
+    buildFocusList();
+}
+
+void EditMetadataDialog::switchToDBStats()
+{
+#if 0
+    setContext(3);
+
+    updateForeground();
+    buildFocusList();
+#endif
 }
 
 void EditMetadataDialog::editLostFocus()
@@ -546,7 +706,44 @@ void EditMetadataDialog::saveAll()
     saveToDatabase();
 }
 
-EditMetadataDialog::~EditMetadataDialog()
+void EditMetadataDialog::showMenu()
 {
-    delete m_metadata;
+    if (coverart_grid->getItemCount() == 0)
+        return;
+
+    MythPopupBox *menu = new MythPopupBox(gContext->GetMainWindow(), "menu");
+
+    QLabel *caption = menu->addLabel(tr("Change Image Type"), MythPopupBox::Medium);
+    caption->setAlignment(Qt::AlignCenter);
+
+    menu->addButton(albumArt->getTypeName(IT_UNKNOWN));
+    menu->addButton(albumArt->getTypeName(IT_FRONTCOVER));
+    menu->addButton(albumArt->getTypeName(IT_BACKCOVER));
+    menu->addButton(albumArt->getTypeName(IT_CD));
+    menu->addButton(albumArt->getTypeName(IT_INLAY));
+
+    int res = menu->ExecPopup();
+
+    if ( res != -1)
+    {
+        // get selected image in grid
+        ImageGridItem *item = coverart_grid->getCurrentItem();
+        if (item)
+        {
+            item->text = albumArt->getTypeName((ImageType) res);
+            AlbumArtImage *image = (AlbumArtImage*) item->data;
+            if (image)
+            {
+                image->imageType = (ImageType) res;
+                image->typeName = item->text;
+
+                // save the image type to the DB
+                albumArt->saveImageType(image->filename, image->imageType);
+
+                gridItemChanged(item);
+            }
+        }
+    }
+
+    delete menu;
 }

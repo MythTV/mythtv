@@ -1,5 +1,48 @@
 <!DOCTYPE TS><TS>
 <context>
+    <name>AlbumArtImages</name>
+    <message>
+        <source>Unknown</source>
+        <translation type="unfinished">Tundmatu</translation>
+    </message>
+    <message>
+        <source>Front Cover</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Back Cover</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>CD</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Inlay</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>front</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>back</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>inlay</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>cd</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>cover</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>DatabaseBox</name>
     <message>
         <source>The theme you are using does not contain a &apos;musictree&apos; element.  Please contact the theme creator and ask if they could please update it.&lt;br&gt;&lt;br&gt;The next screen will be empty.  Escape out of it to return to the menu.</source>
@@ -118,7 +161,7 @@
     </message>
     <message>
         <source>DB Statistics</source>
-        <translation>DB statistika</translation>
+        <translation type="obsolete">DB statistika</translation>
     </message>
     <message>
         <source>Various Artists</source>
@@ -167,6 +210,26 @@
     <message>
         <source>Are you sure you want to save the modified metadata to the file?</source>
         <translation>Oled sa kindel, et soovid muudetud metaandmeid faili salvestada?</translation>
+    </message>
+    <message>
+        <source>Track Info.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Album Art</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Statistics</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Save Changes</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Change Image Type</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -355,6 +418,10 @@
         <source>Remove Duplicates</source>
         <translation>Eemalda duplikaadid</translation>
     </message>
+    <message>
+        <source>Visualization: </source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QObject</name>
@@ -428,7 +495,7 @@
     </message>
     <message>
         <source>Directory and filename Format used to grab information if no ID3 information is found.</source>
-        <translation>Kataloogi ja failinime formaat, mida kasutatakse infona juhul kui puudub ID3 silt.</translation>
+        <translation type="obsolete">Kataloogi ja failinime formaat, mida kasutatakse infona juhul kui puudub ID3 silt.</translation>
     </message>
     <message>
         <source>Ignore ID3 Tags</source>
@@ -516,15 +583,15 @@
     </message>
     <message>
         <source>Defines the location/name for new songs. Valid tokens are: GENRE, ARTIST, ALBUM, TRACK, TITLE, YEAR, / and -. &apos;-&apos; will be replaced by the Token separator</source>
-        <translation>Määrab uute lugude asukoha/.nime. Märgistena saab kasutada: &quot;GENRE&quot; (žanr), &quot;ARTIST&quot; (esineja), &quot;ALBUM&quot; (album), &quot;TRACK&quot; (rada), &quot;TITLE&quot; (pealkiri), &quot;YEAR&quot; (aasta), &quot;/&quot; ja  &quot;-&quot;. &quot;-&quot; asendatakse märgiste eraldajaga</translation>
+        <translation type="obsolete">Määrab uute lugude asukoha/.nime. Märgistena saab kasutada: &quot;GENRE&quot; (žanr), &quot;ARTIST&quot; (esineja), &quot;ALBUM&quot; (album), &quot;TRACK&quot; (rada), &quot;TITLE&quot; (pealkiri), &quot;YEAR&quot; (aasta), &quot;/&quot; ja  &quot;-&quot;. &quot;-&quot; asendatakse märgiste eraldajaga</translation>
     </message>
     <message>
         <source>Token separator</source>
-        <translation>Märgiste eraldaja</translation>
+        <translation type="obsolete">Märgiste eraldaja</translation>
     </message>
     <message>
         <source>Filename tokens will be separated by this string.</source>
-        <translation>Märgised failinimes eraldatakse selle stringiga.</translation>
+        <translation type="obsolete">Märgised failinimes eraldatakse selle stringiga.</translation>
     </message>
     <message>
         <source>Replace &apos; &apos; with &apos;_&apos;</source>
@@ -796,15 +863,15 @@
     </message>
     <message>
         <source>Searching for music files</source>
-        <translation>Muusikafailide otsimine</translation>
+        <translation type="obsolete">Muusikafailide otsimine</translation>
     </message>
     <message>
         <source>Scanning music files</source>
-        <translation>Muusikafailide skaneerimine</translation>
+        <translation type="obsolete">Muusikafailide skaneerimine</translation>
     </message>
     <message>
         <source>Updating music database</source>
-        <translation>Muusikaandmebaasi uuendamine</translation>
+        <translation type="obsolete">Muusikaandmebaasi uuendamine</translation>
     </message>
     <message>
         <source>Rebuilding music tree</source>
@@ -900,11 +967,11 @@
     </message>
     <message>
         <source>Only Import new music.</source>
-        <translation>Ainult uue muusika import</translation>
+        <translation type="obsolete">Ainult uue muusika import</translation>
     </message>
     <message>
         <source>Checks the database for duplicates when importing/ripping CDs.</source>
-        <translation>Kontrollib CD importimisel või rippimisel andembaasist duplikaatide olemasolu.</translation>
+        <translation type="obsolete">Kontrollib CD importimisel või rippimisel andembaasist duplikaatide olemasolu.</translation>
     </message>
     <message>
         <source>Unknown Title</source>
@@ -914,16 +981,91 @@
         <source>Loading Music</source>
         <translation>Muusika laadimine</translation>
     </message>
+    <message>
+        <source>Importing </source>
+        <translation type="unfinished">Importimine </translation>
+    </message>
+    <message>
+        <source>Directory and filename Format used to grab information if no ID3 information is found. Accepts GENRE, ARTIST, ALBUM, TITLE, ARTIST_TITLE and TRACK_TITLE.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Tag Encoding</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>UTF-16</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>UTF-8</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Ascii</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Some mp3 players don&apos;t understand tags encoded in UTF8 or UTF16, this setting allows you to change the encoding format used. Currently applies only to ID3 tags.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Defines the location/name for new songs. Valid tokens are: GENRE, ARTIST, ALBUM, TRACK, TITLE, YEAR</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Maximum Search Results</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Used to limit the number of results returned when using the search feature.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Resume mode</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Off</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Track</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Exact</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Resume playback at either the beginning of the active play queue, the beginning of the last track, an exact point within the last track.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Playback Settings (2)</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>RipStatus</name>
+    <message>
+        <source>Stop Rip?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Are you sure you want to cancel ripping the CD?</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>Ripper</name>
     <message>
         <source>Please select a quality level and check the album information below:</source>
-        <translation>Vali kvaliteedi tase ning albumi info:</translation>
+        <translation type="obsolete">Vali kvaliteedi tase ning albumi info:</translation>
     </message>
     <message>
         <source>Quality: </source>
-        <translation>Kvaliteet: </translation>
+        <translation type="obsolete">Kvaliteet: </translation>
     </message>
     <message>
         <source>Low</source>
@@ -943,59 +1085,112 @@
     </message>
     <message>
         <source>Artist: </source>
-        <translation>Esineja: </translation>
+        <translation type="obsolete">Esineja: </translation>
     </message>
     <message>
         <source>Album: </source>
-        <translation>Album: </translation>
+        <translation type="obsolete">Album: </translation>
     </message>
     <message>
         <source>Genre: </source>
-        <translation>Žanr: </translation>
+        <translation type="obsolete">Žanr: </translation>
     </message>
     <message>
         <source>Multi-Artist?</source>
-        <translation>Mitu esinejat?</translation>
+        <translation type="obsolete">Mitu esinejat?</translation>
     </message>
     <message>
         <source>Switch Titles &amp;&amp; Artists</source>
-        <translation>Pealkirjade ja esinejate vahetamine</translation>
+        <translation type="obsolete">Pealkirjade ja esinejate vahetamine</translation>
     </message>
     <message>
         <source>Title</source>
-        <translation>Pealkiri</translation>
+        <translation type="obsolete">Pealkiri</translation>
     </message>
     <message>
         <source>Artist</source>
-        <translation>Esineja</translation>
+        <translation type="obsolete">Esineja</translation>
     </message>
     <message>
         <source>Length</source>
-        <translation>Pikkus</translation>
+        <translation type="obsolete">Pikkus</translation>
     </message>
     <message>
         <source>Import this CD</source>
-        <translation>Impordi see CD</translation>
+        <translation type="obsolete">Impordi see CD</translation>
     </message>
     <message>
         <source>Importing CD:
 </source>
-        <translation>CD importimine:
+        <translation type="obsolete">CD importimine:
 </translation>
     </message>
     <message>
         <source>Ripping...</source>
-        <translation>Rippimine...</translation>
+        <translation type="obsolete">Rippimine...</translation>
     </message>
     <message>
         <source>Importing </source>
-        <translation>Importimine </translation>
+        <translation type="obsolete">Importimine </translation>
     </message>
     <message>
         <source>Copying from CD:
 </source>
-        <translation>CD pealt kopeerimine:
+        <translation type="obsolete">CD pealt kopeerimine:
 </translation>
+    </message>
+    <message>
+        <source>Switch Titles</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Scan CD</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rip CD</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Artist: %1
+Album: %2
+Track: %3
+
+This track is already in the database. 
+Do you want to remove the existing track?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No tracks</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>There are no tracks to rip?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Success</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rip completed successfully.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Ejecting CD. Please Wait ...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select an Artist</source>
+        <translation type="unfinished">Esitaja valimine</translation>
+    </message>
+    <message>
+        <source>Select an Album</source>
+        <translation type="unfinished">Albumi valimine</translation>
+    </message>
+    <message>
+        <source>Select a Genre</source>
+        <translation type="unfinished">Žanri valimine</translation>
     </message>
 </context>
 <context>

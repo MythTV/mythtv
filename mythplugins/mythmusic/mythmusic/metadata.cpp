@@ -1361,3 +1361,143 @@ int MusicNodePtrList::compareItems (QPtrCollection::Item item1,
 
     return title1.localeAwareCompare(title2);
 }
+
+/**************************************************************************/
+
+AlbumArtImages::AlbumArtImages(Metadata *metadata)
+{
+    m_parent = metadata;
+    m_imageList.setAutoDelete(true);
+
+    findImages();
+}
+
+void AlbumArtImages::findImages(void)
+{
+    m_imageList.clear();
+
+    QFileInfo fi(m_parent->Filename());
+    QString dir = fi.dirPath(true);
+    dir.remove(0, Metadata::GetStartdir().length());
+
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare("SELECT albumart_id, CONCAT_WS('/', music_directories.path, "
+            "music_albumart.filename), music_albumart.imagetype "
+            "FROM music_albumart "
+            "LEFT JOIN music_directories ON "
+            "music_directories.directory_id=music_albumart.directory_id "
+            "WHERE music_directories.path = :DIR "
+            "ORDER BY music_albumart.imagetype;");
+    query.bindValue(":DIR", dir.utf8());
+    if (query.exec())
+    {
+        while (query.next())
+        {
+            AlbumArtImage *image = new AlbumArtImage;
+            image->id = query.value(0).toInt();
+            image->filename = Metadata::GetStartdir() + "/" + 
+                    QString::fromUtf8(query.value(1).toString());
+            image->imageType = (ImageType) query.value(2).toInt();
+            image->typeName = getTypeName(image->imageType);
+            m_imageList.append(image);
+        }
+    }
+}
+
+QString AlbumArtImages::getImageFilename(ImageType type)
+{
+    // try to find a matching image
+    AlbumArtImage *image;
+
+    for (image = m_imageList.first(); image; image = m_imageList.next())
+    {
+        if (image->imageType == type)
+            return image->filename;
+    }
+
+    return "";
+}
+
+QStringList AlbumArtImages::getImageFilenames()
+{
+    QStringList paths;
+
+    AlbumArtImage *image;
+
+    for (image = m_imageList.first(); image; image = m_imageList.next())
+    {
+        paths += image->filename;
+    }
+
+    return paths;
+}
+
+bool AlbumArtImages::isImageAvailable(ImageType type)
+{
+    // try to find a matching image
+    AlbumArtImage *image;
+
+    for (image = m_imageList.first(); image; image = m_imageList.next())
+    {
+        if (image->imageType == type)
+            return true;
+    }
+
+    return false;
+}
+
+bool AlbumArtImages::saveImageType(const QString &filename, ImageType type)
+{
+    // try to find a matching filename
+    AlbumArtImage *image;
+
+    for (image = m_imageList.first(); image; image = m_imageList.next())
+    {
+        if (image->filename == filename)
+        {
+            image->imageType = type;
+
+            MSqlQuery query(MSqlQuery::InitCon());
+            query.prepare("UPDATE music_albumart SET imagetype = :TYPE "
+                          "WHERE albumart_id = :ID");
+            query.bindValue(":TYPE", type);
+            query.bindValue(":ID", image->id);
+            return (query.exec());
+        }
+    }
+
+    return false;
+}
+
+QString AlbumArtImages::getTypeName(ImageType type)
+{
+    // these const's should match the ImageType enum's
+    static const char* type_strings[] = {
+        QT_TR_NOOP("Unknown"),            // IT_UNKNOWN
+        QT_TR_NOOP("Front Cover"),        // IT_FRONTCOVER
+        QT_TR_NOOP("Back Cover"),         // IT_BACKCOVER
+        QT_TR_NOOP("CD"),                 // IT_CD
+        QT_TR_NOOP("Inlay")               // IT_INLAY
+    };
+
+    return tr(type_strings[type]);
+}
+
+// static method to guess the image type from the filename
+ImageType AlbumArtImages::guessImageType(const QString &filename)
+{
+    ImageType type = IT_FRONTCOVER;
+
+    if (filename.contains(tr("front"), false))
+        type = IT_FRONTCOVER;
+    else if (filename.contains(tr("back"), false))
+        type = IT_BACKCOVER;
+    else if (filename.contains(tr("inlay"), false))
+        type = IT_INLAY;
+    else if (filename.contains(tr("cd"), false))
+        type = IT_CD;
+    else if (filename.contains(tr("cover"), false))
+        type = IT_FRONTCOVER;
+
+    return type;
+}

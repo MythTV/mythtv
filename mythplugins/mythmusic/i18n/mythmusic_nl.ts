@@ -1,5 +1,48 @@
 <!DOCTYPE TS><TS>
 <context>
+    <name>AlbumArtImages</name>
+    <message>
+        <source>Unknown</source>
+        <translation type="unfinished">Onbekend</translation>
+    </message>
+    <message>
+        <source>Front Cover</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Back Cover</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>CD</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Inlay</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>front</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>back</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>inlay</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>cd</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>cover</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>DatabaseBox</name>
     <message>
         <source>Copy To New Playlist</source>
@@ -118,7 +161,7 @@
     </message>
     <message>
         <source>DB Statistics</source>
-        <translation>DB statistieken</translation>
+        <translation type="obsolete">DB statistieken</translation>
     </message>
     <message>
         <source>Various Artists</source>
@@ -167,6 +210,26 @@
     <message>
         <source>Are you sure you want to save the modified metadata to the file?</source>
         <translation>Bent u zeker dat u de gewijzigde gegevens in het bestand wilt opslaan?</translation>
+    </message>
+    <message>
+        <source>Track Info.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Album Art</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Statistics</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Save Changes</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Change Image Type</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -355,16 +418,20 @@
         <source>Shuffle: Album</source>
         <translation>Shuffle: Album</translation>
     </message>
+    <message>
+        <source>Visualization: </source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QObject</name>
     <message>
         <source>Searching for music files</source>
-        <translation>Bezig met zoeken naar muziekbestanden</translation>
+        <translation type="obsolete">Bezig met zoeken naar muziekbestanden</translation>
     </message>
     <message>
         <source>Updating music database</source>
-        <translation>Bezig met bijwerken database</translation>
+        <translation type="obsolete">Bezig met bijwerken database</translation>
     </message>
     <message>
         <source>BumpScope</source>
@@ -424,7 +491,7 @@
     </message>
     <message>
         <source>Directory and filename Format used to grab information if no ID3 information is found.</source>
-        <translation>Map en bestandsnaam die gebruikt wordt om informatie te verkrijgen als er geen ID3-tag gevonden wordt.</translation>
+        <translation type="obsolete">Map en bestandsnaam die gebruikt wordt om informatie te verkrijgen als er geen ID3-tag gevonden wordt.</translation>
     </message>
     <message>
         <source>Ignore ID3 Tags</source>
@@ -472,15 +539,15 @@
     </message>
     <message>
         <source>Defines the location/name for new songs. Valid tokens are: GENRE, ARTIST, ALBUM, TRACK, TITLE, YEAR, / and -. &apos;-&apos; will be replaced by the Token separator</source>
-        <translation>Bepaalt de locatie/naam voor nieuwe nummers. Geldig zijn: GENRE, ARTIST, ALBUM, TRACK, TITLE, YEAR, / en -. &quot;-&quot; wordt vervangen door scheidingsteken.</translation>
+        <translation type="obsolete">Bepaalt de locatie/naam voor nieuwe nummers. Geldig zijn: GENRE, ARTIST, ALBUM, TRACK, TITLE, YEAR, / en -. &quot;-&quot; wordt vervangen door scheidingsteken.</translation>
     </message>
     <message>
         <source>Token separator</source>
-        <translation>Scheidingsteken</translation>
+        <translation type="obsolete">Scheidingsteken</translation>
     </message>
     <message>
         <source>Filename tokens will be separated by this string.</source>
-        <translation>Delen van de bestandsnaam worden door dit teken gescheiden.</translation>
+        <translation type="obsolete">Delen van de bestandsnaam worden door dit teken gescheiden.</translation>
     </message>
     <message>
         <source>Replace &apos; &apos; with &apos;_&apos;</source>
@@ -881,7 +948,7 @@ Kan Normaal, Willekeurig of Intelligent (willekeurig) zijn.</translation>
     </message>
     <message>
         <source>Scanning music files</source>
-        <translation>Bezig met zoeken naar muziekbestanden</translation>
+        <translation type="obsolete">Bezig met zoeken naar muziekbestanden</translation>
     </message>
     <message>
         <source>Rebuilding music tree</source>
@@ -889,11 +956,11 @@ Kan Normaal, Willekeurig of Intelligent (willekeurig) zijn.</translation>
     </message>
     <message>
         <source>Only Import new music.</source>
-        <translation>Enkel nieuwe muziek importeren</translation>
+        <translation type="obsolete">Enkel nieuwe muziek importeren</translation>
     </message>
     <message>
         <source>Checks the database for duplicates when importing/ripping CDs.</source>
-        <translation>Database wordt op dubbels gecontroleerd bij importeren van CD &apos;s.</translation>
+        <translation type="obsolete">Database wordt op dubbels gecontroleerd bij importeren van CD &apos;s.</translation>
     </message>
     <message>
         <source>Loading Music</source>
@@ -911,12 +978,87 @@ Kan Normaal, Willekeurig of Intelligent (willekeurig) zijn.</translation>
         <source>Unknown Title</source>
         <translation>Onbekende Titel</translation>
     </message>
+    <message>
+        <source>Importing </source>
+        <translation type="unfinished">Bezig met importeren </translation>
+    </message>
+    <message>
+        <source>Directory and filename Format used to grab information if no ID3 information is found. Accepts GENRE, ARTIST, ALBUM, TITLE, ARTIST_TITLE and TRACK_TITLE.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Tag Encoding</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>UTF-16</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>UTF-8</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Ascii</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Some mp3 players don&apos;t understand tags encoded in UTF8 or UTF16, this setting allows you to change the encoding format used. Currently applies only to ID3 tags.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Defines the location/name for new songs. Valid tokens are: GENRE, ARTIST, ALBUM, TRACK, TITLE, YEAR</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Maximum Search Results</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Used to limit the number of results returned when using the search feature.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Resume mode</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Off</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Track</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Exact</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Resume playback at either the beginning of the active play queue, the beginning of the last track, an exact point within the last track.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Playback Settings (2)</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>RipStatus</name>
+    <message>
+        <source>Stop Rip?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Are you sure you want to cancel ripping the CD?</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>Ripper</name>
     <message>
         <source>Please select a quality level and check the album information below:</source>
-        <translation>Gewenste kwaliteit kiezen en albuminformatie controleren:</translation>
+        <translation type="obsolete">Gewenste kwaliteit kiezen en albuminformatie controleren:</translation>
     </message>
     <message>
         <source>Low</source>
@@ -936,64 +1078,117 @@ Kan Normaal, Willekeurig of Intelligent (willekeurig) zijn.</translation>
     </message>
     <message>
         <source>Artist: </source>
-        <translation>Artiest:</translation>
+        <translation type="obsolete">Artiest:</translation>
     </message>
     <message>
         <source>Album: </source>
-        <translation>Album:</translation>
+        <translation type="obsolete">Album:</translation>
     </message>
     <message>
         <source>Import this CD</source>
-        <translation>CD importeren</translation>
+        <translation type="obsolete">CD importeren</translation>
     </message>
     <message>
         <source>Importing CD:
 </source>
-        <translation>Bezig met importeren van:
+        <translation type="obsolete">Bezig met importeren van:
 
 </translation>
     </message>
     <message>
         <source>Copying from CD:
 </source>
-        <translation>Bezig met kopiëren van:
+        <translation type="obsolete">Bezig met kopiëren van:
 </translation>
     </message>
     <message>
         <source>Genre: </source>
-        <translation>Genre:</translation>
+        <translation type="obsolete">Genre:</translation>
     </message>
     <message>
         <source>Ripping...</source>
-        <translation>Bezig met rippen...</translation>
+        <translation type="obsolete">Bezig met rippen...</translation>
     </message>
     <message>
         <source>Multi-Artist?</source>
-        <translation>Verschillende uitvoerders?</translation>
+        <translation type="obsolete">Verschillende uitvoerders?</translation>
     </message>
     <message>
         <source>Switch Titles &amp;&amp; Artists</source>
-        <translation>Titels en artiesten wisselen</translation>
+        <translation type="obsolete">Titels en artiesten wisselen</translation>
     </message>
     <message>
         <source>Title</source>
-        <translation>Titel</translation>
+        <translation type="obsolete">Titel</translation>
     </message>
     <message>
         <source>Artist</source>
-        <translation>Artiest</translation>
+        <translation type="obsolete">Artiest</translation>
     </message>
     <message>
         <source>Length</source>
-        <translation>Duur</translation>
+        <translation type="obsolete">Duur</translation>
     </message>
     <message>
         <source>Quality: </source>
-        <translation>Kwaliteit: </translation>
+        <translation type="obsolete">Kwaliteit: </translation>
     </message>
     <message>
         <source>Importing </source>
-        <translation>Bezig met importeren </translation>
+        <translation type="obsolete">Bezig met importeren </translation>
+    </message>
+    <message>
+        <source>Switch Titles</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Scan CD</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rip CD</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Artist: %1
+Album: %2
+Track: %3
+
+This track is already in the database. 
+Do you want to remove the existing track?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No tracks</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>There are no tracks to rip?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Success</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rip completed successfully.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Ejecting CD. Please Wait ...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select an Artist</source>
+        <translation type="unfinished">Artiest kiezen</translation>
+    </message>
+    <message>
+        <source>Select an Album</source>
+        <translation type="unfinished">Album kiezen</translation>
+    </message>
+    <message>
+        <source>Select a Genre</source>
+        <translation type="unfinished">Genre kiezen</translation>
     </message>
 </context>
 <context>
