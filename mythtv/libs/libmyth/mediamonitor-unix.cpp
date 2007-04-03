@@ -231,7 +231,7 @@ static void LookupModel(MythMediaDevice* device)
 
 
     // Given something like /dev/sdb1, extract sdb
-    devname.mid(5,3);
+    devname = devname.mid(5,3);
 
 
 #ifdef linux
@@ -272,6 +272,8 @@ static void LookupModel(MythMediaDevice* device)
             file.close();
         }
     }
+
+    desc.remove('\n');
 #endif
 
     device->setDeviceModel(desc);
@@ -511,6 +513,11 @@ bool MediaMonitorUnix::FindPartitions(const QString &dev, bool checkPartitions)
              pit != parts.end(); pit++)
         {
             if (*pit == "." || *pit == "..")
+                continue;
+
+            // skip some sysfs dirs that are _not_ sub-partitions
+            if (*pit == "device" || *pit == "holders" || *pit == "queue"
+                                 || *pit == "slaves"  || *pit == "subsystem")
                 continue;
 
             found_partitions |= FindPartitions(sysfs.absFilePath(*pit), false);
