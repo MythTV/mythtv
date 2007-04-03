@@ -168,7 +168,15 @@ void MediaMonitor::ChooseAndEjectMedia(void)
     {
         VERBOSE(VB_MEDIA,
                 QString("Disk %1's tray is OPEN. Closing tray").arg(dev));
-        selected->eject(false);
+
+        if (selected->eject(false))
+        {
+            QString msg = "Unable to open or close the empty drive %1.\n\n";
+            msg += "You may have to use the eject button under its tray.";
+            MythPopupBox::showOkPopup(gContext->GetMainWindow(),
+                                      "eject close-tray fail",
+                                      tr(msg).arg(dev));
+        }
     }
     else if (MEDIASTAT_MOUNTED == status)
     {
@@ -594,6 +602,11 @@ bool MediaMonitor::FindPartitions(const QString &dev, bool checkPartitions)
              pit != parts.end(); pit++)
         {
             if (*pit == "." || *pit == "..")
+                continue;
+
+            // skip some sysfs dirs that are _not_ sub-partitions
+            if (*pit == "device" || *pit == "holders" || *pit == "queue"
+                                 || *pit == "slaves"  || *pit == "subsystem")
                 continue;
 
             found_partitions |= FindPartitions(sysfs.absFilePath(*pit), false);

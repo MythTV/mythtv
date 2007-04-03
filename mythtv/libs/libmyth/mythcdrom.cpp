@@ -70,12 +70,12 @@ void MythCDROM::onDeviceMounted()
     m_Status = MEDIASTAT_MOUNTED;
 
     DetectPath.sprintf("%s%s", (const char*)m_MountPath, PATHTO_DVD_DETECT);
-    VERBOSE(VB_IMPORTANT, QString("Looking for: '%1'").arg(DetectPath));
+    VERBOSE(VB_MEDIA, QString("Looking for: '%1'").arg(DetectPath));
 
     struct stat sbuf;
     if (stat(DetectPath, &sbuf) == 0)
     {
-        VERBOSE(VB_GENERAL, "Probable DVD detected.");
+        VERBOSE(VB_MEDIA, "Probable DVD detected.");
         m_MediaType = MEDIATYPE_DVD;
         // HACK make it possible to eject a DVD by unmounting it
         performMountCmd(false);
@@ -83,14 +83,14 @@ void MythCDROM::onDeviceMounted()
     }
     
     DetectPath.sprintf("%s%s", (const char*)m_MountPath, PATHTO_VCD_DETECT);
-    VERBOSE(VB_IMPORTANT, QString("Looking for: '%1'").arg(DetectPath));
+    VERBOSE(VB_MEDIA, QString("Looking for: '%1'").arg(DetectPath));
 
     DetectPath2.sprintf("%s%s", (const char*)m_MountPath, PATHTO_SVCD_DETECT);
-    VERBOSE(VB_IMPORTANT, QString("Looking for: '%1'").arg(DetectPath2));
+    VERBOSE(VB_MEDIA, QString("Looking for: '%1'").arg(DetectPath2));
 
     if (stat(DetectPath, &sbuf) == 0 || stat(DetectPath2, &sbuf) == 0)
     {
-        VERBOSE(VB_GENERAL, "Probable VCD/SVCD detected.");
+        VERBOSE(VB_MEDIA, "Probable VCD/SVCD detected.");
         m_MediaType = MEDIATYPE_VCD;
         // HACK make it possible to eject a VCD/SVCD by unmounting it
         performMountCmd(false);

@@ -118,7 +118,7 @@ bool MythMediaDevice::performMountCmd(bool DoMount)
                 .arg((DoMount) ? PATHTO_MOUNT : PATHTO_UNMOUNT)
                 .arg(m_DevicePath);
     
-        VERBOSE(VB_IMPORTANT,  QString("Executing '%1'").arg(MountCommand));
+        VERBOSE(VB_MEDIA,  QString("Executing '%1'").arg(MountCommand));
         if (0 == myth_system(MountCommand)) 
         {
             if (DoMount)
@@ -128,7 +128,8 @@ bool MythMediaDevice::performMountCmd(bool DoMount)
                 isMounted(true);
                 m_Status = MEDIASTAT_MOUNTED;
                 onDeviceMounted();
-                VERBOSE(VB_IMPORTANT, "m_MediaType: "<<m_MediaType);
+                VERBOSE(VB_GENERAL, QString("Detected MediaType ")
+                                    + MediaTypeStrings[m_Status]);
             }
             else
                 onDeviceUnmounted();
@@ -142,14 +143,15 @@ bool MythMediaDevice::performMountCmd(bool DoMount)
     } 
     else 
     {
-        VERBOSE( VB_IMPORTANT,  "Disk inserted on a supermount device" );
+        VERBOSE(VB_MEDIA,  "Disk inserted on a supermount device" );
         // If it's a super mount then the OS will handle mounting /  unmounting.
         // We just need to give derived classes a chance to perform their 
         // mount / unmount logic.
         if (DoMount)
         {
             onDeviceMounted();
-            VERBOSE(VB_IMPORTANT, "m_MediaType: "<<m_MediaType);
+            VERBOSE(VB_GENERAL, QString("Detected MediaType ")
+                                + MediaTypeStrings[m_Status]);
         }
         else
             onDeviceUnmounted();
@@ -168,7 +170,7 @@ MediaType MythMediaDevice::DetectMediaType(void)
 
     if (!ScanMediaType(m_MountPath, ext_cnt))
     {
-        VERBOSE(VB_GENERAL, QString("No files with extensions found in '%1'")
+        VERBOSE(VB_MEDIA, QString("No files with extensions found in '%1'")
                 .arg(m_MountPath));
         return mediatype;
     }
@@ -318,8 +320,8 @@ bool MythMediaDevice::isMounted(bool Verify)
             
             // Extract the mount point and device name.
             stream >> DeviceName >> MountPoint;
-            //cout << "Found Device: " << DeviceName
-            //     << "  Mountpoint: " << MountPoint << endl; 
+            //VERBOSE(VB_MEDIA, "Found Device: " << DeviceName
+            //                  << "  Mountpoint: " << MountPoint);
 
             // Skip the rest of the line
             line = stream.readLine();
