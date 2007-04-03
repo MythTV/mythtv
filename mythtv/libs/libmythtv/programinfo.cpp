@@ -1654,7 +1654,8 @@ void ProgramInfo::StartedRecording(QString ext)
     if (!query.exec() || !query.isActive())
         MythContext::DBError("Copy program ratings on record", query);    
 
-    ScheduledRecording::signalChange(0);
+    if (recgroup != "LiveTV")
+        ScheduledRecording::signalChange(0);
 }
 
 static bool insert_program(const ProgramInfo        *pg,
