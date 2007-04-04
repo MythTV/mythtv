@@ -175,7 +175,7 @@ class VideoMetadata:
 	genres = None
 	countries = None
 	
-	episode_title_format = '%(series_title)s S%(season)d E%(episode)d %(episode_title)s'
+	episode_title_format = '%(series_title)s S%(season)02d E%(episode)02d %(episode_title)s'
 	
 	def __init__(self):
 		pass
