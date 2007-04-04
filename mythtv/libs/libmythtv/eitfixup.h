@@ -32,10 +32,11 @@ class EITFixUp
         kFixFI         = 0x0200,
         kFixPremiere   = 0x0400,
         kFixHDTV       = 0x0800,
+        kFixNL         = 0x1000,
 
         // Early fixups
-        kEFixForceISO8859_1  = 0x1000,
-        kEFixForceISO8859_15 = 0x2000,
+        kEFixForceISO8859_1  = 0x2000,
+        kEFixForceISO8859_15 = 0x4000,
     };
 
     EITFixUp();
@@ -61,6 +62,7 @@ class EITFixUp
     void FixRTL(DBEvent &event) const;        // RTL group DVB
     void FixFI(DBEvent &event) const;            // Finland DVB-T
     void FixPremiere(DBEvent &event) const;   // german pay-tv Premiere
+    void FixNL(DBEvent &event) const;            // Netherlands DVB-C
 
     const QRegExp m_bellYear;
     const QRegExp m_bellActors;
@@ -117,6 +119,21 @@ class EITFixUp
     const QRegExp m_Stereo;
     const QRegExp m_dePremiereInfos;
     const QRegExp m_dePremiereOTitle;
+    const QRegExp m_nlStereo;
+    const QRegExp m_nlTxt;
+    const QRegExp m_nlWide;
+    const QRegExp m_nlRepeat;
+    const QRegExp m_nlHD;
+    const QRegExp m_nlSub;
+    const QRegExp m_nlActors;
+    const QRegExp m_nlPres;
+    const QRegExp m_nlPersSeparator;
+    const QRegExp m_nlRub;
+    const QRegExp m_nlYear1;
+    const QRegExp m_nlYear2;
+    const QRegExp m_nlDirector;
+    const QRegExp m_nlCat;
+    const QRegExp m_nlOmroep;
 };
 
 #endif // EITFIXUP_H

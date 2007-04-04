@@ -66,7 +66,23 @@ EITFixUp::EITFixUp()
       m_Stereo("(Stereo)"),
       m_dePremiereInfos("([^.]+)?\\s?([0-9]{4})\\.\\s[0-9]+\\sMin\\.(?:\\sVon"
                         "\\s([^,]+)(?:,|\\su\\.\\sa\\.)\\smit\\s(.+)\\.)?"),
-      m_dePremiereOTitle("\\s*\\(([^\\)]*)\\)$")
+      m_dePremiereOTitle("\\s*\\(([^\\)]*)\\)$"),
+      m_nlStereo("stereo"),
+      m_nlTxt("txt"),
+      m_nlWide("breedbeeld"),
+      m_nlRepeat("herh."),
+      m_nlHD("\\sHD$"),
+      m_nlSub("\\sAfl\\.:\\s([^\\.]+)\\."),
+      m_nlActors("\\sMet:\\s.+e\\.a\\."),
+      m_nlPres("\\sPresentatie:\\s([^\\.]+)\\."),
+      m_nlPersSeparator("(, |\\sen\\s)"),
+      m_nlRub("\\s?\\({1}\\W+\\){1}\\s?"),
+      m_nlYear1("(?=\\suit\\s)([1-2]{2}[0-9]{2})"),
+      m_nlYear2("([\\s]{1}[\\(]{1}[A-Z]{0,3}/?)([1-2]{2}[0-9]{2})([\\)]{1})"),
+      m_nlDirector("(?=\\svan\\s)(([A-Z]{1}[a-z]+\\s)|([A-Z]{1}\\.\\s))"),
+      m_nlCat("^(Amusement|Muziek|Informatief|Nieuws/actualiteiten|Jeugd|Animatie|Sport|Serie/soap|Kunst/Cultuur|Documentaire|Film|Natuur|Erotiek|Comedy|Misdaad|Religieus)\\.\\s"),
+      m_nlOmroep ("\\s\\(([A-Z]+/?)+\\)$")
+
 {
 }
 
@@ -113,6 +129,9 @@ void EITFixUp::Fix(DBEvent &event) const
 
     if (kFixPremiere & event.fixup)
         FixPremiere(event);
+        
+    if (kFixNL & event.fixup)
+        FixNL(event);
 
     if (event.fixup)
     {
@@ -948,4 +967,243 @@ void EITFixUp::FixPremiere(DBEvent &event) const
         event.subtitle = QString("%1, %2").arg(tmpOTitle.cap(1)).arg(country);
         event.title = event.title.replace(tmpOTitle.cap(0), "");
     }
+}
+
+/** \fn EITFixUp::FixNL(DBEvent&) const
+ *  \brief Use this to standardize @Home DVB-C guide in the Netherlands.
+ */
+void EITFixUp::FixNL(DBEvent &event) const
+{
+    QString fullinfo = "";
+    fullinfo.append (event.subtitle);
+    fullinfo.append (event.description);
+    event.subtitle = "";
+
+    // Convert categories to Dutch categories Myth knows.
+    // nog invoegen: comedy, sport, misdaad
+
+    if (event.category == "Documentary")
+    {
+        event.category = "Documentaire";
+        event.category_type = kCategoryNone;
+    }
+    if (event.category == "News")
+    {
+        event.category = "Nieuws/actualiteiten";
+        event.category_type = kCategoryNone;
+    }
+    if (event.category == "Kids")
+    {
+        event.category = "Jeugd";
+        event.category_type = kCategoryNone;
+    }
+    if (event.category == "Show/game Show")
+    {
+        event.category = "Amusement";
+        event.category_type = kCategoryTVShow;
+    }
+    if (event.category == "Music/Ballet/Dance")
+    {
+        event.category = "Muziek";
+        event.category_type = kCategoryNone;
+    }
+    if (event.category == "News magazine")
+    {
+        event.category = "Informatief";
+        event.category_type = kCategoryNone;
+    }
+    if (event.category == "Movie")
+    {
+        event.category = "Film";
+        event.category_type = kCategoryMovie;
+    }
+    if (event.category == "Nature/animals/Environment")
+    {
+        event.category = "Natuur";
+        event.category_type = kCategoryNone;
+    }
+    if (event.category == "Movie - Adult")
+    {
+        event.category = "Erotiek";
+        event.category_type = kCategoryNone;
+    }
+    if (event.category == "Movie - Soap/melodrama/folkloric")
+    {
+        event.category = "Serie/soap";
+        event.category_type = kCategorySeries;
+    }
+    if (event.category == "Arts/Culture")
+    {
+        event.category = "Kunst/Cultuur";
+        event.category_type = kCategoryNone;
+    }
+    if (event.category == "Sports")
+    {
+        event.category = "Sport";
+        event.category_type = kCategorySports;
+    }
+    if (event.category == "Cartoons/Puppets")
+    {
+        event.category = "Animatie";
+        event.category_type = kCategoryNone;
+    }
+    if (event.category == "Movie - Comedy")
+    {
+        event.category = "Comedy";
+        event.category_type = kCategorySeries;
+    }
+    if (event.category == "Movie - Detective/Thriller")
+    {
+        event.category = "Misdaad";
+        event.category_type = kCategoryNone;
+    }
+    if (event.category == "Social/Spiritual Sciences")
+    {
+        event.category = "Religieus";
+        event.category_type = kCategoryNone;
+    }
+
+    // Get stereo info
+    int position;
+    if ((position = fullinfo.find(m_nlStereo)) != -1)
+    {
+        event.flags |= DBEvent::kStereo;
+        fullinfo = fullinfo.replace("stereo", ".");
+    }
+    
+    //Get widescreen info
+    if ((position = fullinfo.find(m_nlWide)) != -1)
+    {
+        fullinfo = fullinfo.replace("breedbeeld", ".");
+    }
+
+    // Get repeat info
+    if ((position = fullinfo.find(m_nlRepeat)) != -1)
+    {
+        fullinfo = fullinfo.replace("herh.", ".");
+    }
+
+    // Get teletext subtitle info
+    if ((position = fullinfo.find(m_nlTxt)) != -1)
+    {
+        event.flags |= DBEvent::kSubtitled;
+        fullinfo = fullinfo.replace("txt", ".");
+    }
+    
+    // Get HDTV information
+    if ((position = event.title.find(m_nlHD)) != -1)
+    {
+        event.flags |= DBEvent::kHDTV;
+        event.title = event.title.replace(m_nlHD, "");
+    }
+
+    // Try to make subtitle
+    QRegExp tmpSub = m_nlSub;
+    QString tmpSubString;
+    if (tmpSub.search(fullinfo) != -1)
+    {
+        tmpSubString = tmpSub.cap(0);
+        tmpSubString = tmpSubString.right(tmpSubString.length() - 7);
+        event.subtitle = tmpSubString.left(tmpSubString.length() -1);
+        fullinfo = fullinfo.replace(tmpSub.cap(0), "");
+    }
+    
+    // This is trying to catch the case where the subtitle is in the main title
+    // but avoid cases where it isn't a subtitle e.g cd:uk
+    if (((position = event.title.find(":")) != -1) &&
+        (event.title[position + 1].upper() == event.title[position + 1]) &&
+        (event.subtitle.isEmpty()))
+    {
+        event.subtitle = event.title.mid(position + 1);
+        event.title = event.title.left(position);
+    }
+
+    
+    // Get the actors
+    QRegExp tmpActors = m_nlActors;
+    QStringList actors;
+    QString tmpActorsString;
+    if (tmpActors.search(fullinfo) != -1)
+    {
+        tmpActorsString = tmpActors.cap(0);
+        tmpActorsString = tmpActorsString.right(tmpActorsString.length() - 6);
+        tmpActorsString = tmpActorsString.left(tmpActorsString.length() - 5);
+        actors = QStringList::split(QString(", "), tmpActorsString);
+        for (QStringList::size_type i =0; i < actors.count(); i++)
+        {
+            event.AddPerson(DBPerson::kActor, actors[i]);
+        }
+        fullinfo = fullinfo.replace(tmpActors.cap(0), "");
+    }
+
+    // Try to find presenter
+    QRegExp tmpPres = m_nlPres;
+    QStringList host;
+    QString tmpPresString;
+    if (tmpPres.search(fullinfo) != -1)
+    {
+        tmpPresString = tmpPres.cap(0);
+        tmpPresString = tmpPresString.right(tmpPresString.length() - 14);
+        tmpPresString = tmpPresString.left(tmpPresString.length() -1);
+        host = QStringList::split(m_nlPersSeparator, tmpPresString);
+        for (QStringList::size_type i =0; i < host.count(); i++)
+        {
+            event.AddPerson(DBPerson::kPresenter, host[i]);
+        }
+        fullinfo = fullinfo.replace(tmpPres.cap(0), "");
+    }
+
+    // Try to find year
+    QRegExp tmpYear1 = m_nlYear1;
+    QRegExp tmpYear2 = m_nlYear2;
+    if ((position = tmpYear1.search(fullinfo)) != -1)
+    {
+        bool ok;
+        uint y = tmpYear1.cap(0).toUInt(&ok);
+        if (ok)
+            event.originalairdate = QDate(y, 1, 1);
+    }
+    
+    if ((position = tmpYear2.search(fullinfo)) != -1)
+    {
+        bool ok;
+        uint y = tmpYear2.cap(2).toUInt(&ok);
+        if (ok)
+            event.originalairdate = QDate(y, 1, 1);
+    }
+
+    // Try to find director
+    QRegExp tmpDirector = m_nlDirector;
+    QString tmpDirectorString;
+    if ((position = fullinfo.find(m_nlDirector)) != -1)
+    {
+        tmpDirectorString = tmpDirector.cap(0);
+        event.AddPerson(DBPerson::kDirector, tmpDirectorString);
+    }
+
+    // Strip leftovers
+    if ((position = fullinfo.find(m_nlRub)) != -1)
+    {
+        fullinfo = fullinfo.replace(m_nlRub, "");
+    }
+    
+    // Strip category info from description
+    if ((position = fullinfo.find(m_nlCat)) != -1)
+    {
+        fullinfo = fullinfo.replace(m_nlCat, "");
+    }
+    
+    // Remove omroep from title
+    if ((position = event.title.find(m_nlOmroep)) != -1)
+    {
+        event.title = event.title.replace(m_nlOmroep, "");
+    }
+
+    // Put information back in description
+
+    event.description = fullinfo;
+    event.description.stripWhiteSpace();
+    event.title.stripWhiteSpace();
+    event.subtitle.stripWhiteSpace();
+
 }

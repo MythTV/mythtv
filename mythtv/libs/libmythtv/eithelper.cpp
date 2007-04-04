@@ -597,6 +597,9 @@ static void init_fixup(QMap<uint64_t,uint> &fix)
     // Mark Premiere HD and Discovery HD as HDTV
     fix[   6LL << 32 |  133 << 16 | 129] = EITFixUp::kFixHDTV;
     fix[   6LL << 32 |  133 << 16 | 130] = EITFixUp::kFixHDTV;
+    
+    // Netherlands
+    fix[ 1000U << 16] = EITFixUp::kFixNL;
 
     ///////////////////////////////////////////////////////////////////////////
     // Special Early fixups for providers that break DVB EIT spec.
