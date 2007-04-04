@@ -137,7 +137,7 @@ class UPnp
 
         static UPnpDeviceDesc *GetDeviceDesc( QString &sURL, bool bInQtThread = TRUE);
 
-        static QString         GetErrorDesc( UPnPResultCode eCode );
+        static QString         GetResultDesc( UPnPResultCode eCode );
         static void            FormatErrorResponse( HTTPRequest   *pRequest, 
                                                     UPnPResultCode  eCode, 
                                                     const QString &sMsg = "" );

@@ -34,6 +34,38 @@ SOAPClient::~SOAPClient()
 {
 }
 
+//////////////////////////////////////////////////////////////////////////////
+//
+//////////////////////////////////////////////////////////////////////////////
+
+QDomNode SOAPClient::FindNode( const QString &sName, QDomNode &baseNode )
+{
+    QStringList parts = QStringList::split( "/", sName );
+
+    return FindNode( parts, baseNode );
+
+}
+
+//////////////////////////////////////////////////////////////////////////////
+//
+//////////////////////////////////////////////////////////////////////////////
+
+QDomNode SOAPClient::FindNode( QStringList &sParts, QDomNode &curNode )
+{
+    if (sParts.empty())
+        return curNode;
+
+    QString sName = sParts.front();
+    sParts.pop_front();
+
+    QDomNode child = curNode.namedItem( sName );
+
+    if (child.isNull() )
+        sParts.clear();
+
+    return FindNode( sParts, child );
+}
+
 /////////////////////////////////////////////////////////////////////////////
 //
 /////////////////////////////////////////////////////////////////////////////
@@ -81,7 +113,7 @@ QString SOAPClient::GetNodeValue( QDomNode &node, const QString &sName, const QS
         return sDefault;
 
     QString  sValue  = "";
-    QDomNode valNode = node.namedItem( sName );
+    QDomNode valNode = FindNode( sName, node );
 
     if (!valNode.isNull())
     {
@@ -229,8 +261,8 @@ bool SOAPClient::SendSOAPRequest( const QString    &sMethod,
     // Must be a fault... parse it to return reason
     // --------------------------------------------------------------
 
-    nErrCode = GetNodeValue( doc, "errorCode"       , 500 );
-    sErrDesc = GetNodeValue( doc, "errorDescription", "Unknown" );
+    nErrCode = GetNodeValue( doc, "Envelope/Body/Fault/detail/UPnPResult/errorCode"       , 500 );
+    sErrDesc = GetNodeValue( doc, "Envelope/Body/Fault/detail/UPnPResult/errorDescription", "Unknown" );
 
     return false;
 }

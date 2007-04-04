@@ -46,6 +46,9 @@ class SOAPClient
         bool    GetNodeValue( QDomNode &node, const QString &sName, bool bDefault );
         QString GetNodeValue( QDomNode &node, const QString &sName, const QString &sDefault );
 
+        QDomNode FindNode( const QString &sName , QDomNode &baseNode );
+        QDomNode FindNode( QStringList   &sParts, QDomNode &curNode  );
+
         bool    SendSOAPRequest( const QString    &sMethod,
                                        QStringMap &list,
                                        int        &nErrCode,

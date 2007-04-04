@@ -182,7 +182,9 @@ class DeviceLocation : public RefCounted
 
     protected:
 
+        // ==================================================================
         // Destructor protected to force use of Release Method
+        // ==================================================================
 
         virtual        ~DeviceLocation()
         {
@@ -200,9 +202,12 @@ class DeviceLocation : public RefCounted
         QString     m_sURI;           // Service Type URI
         QString     m_sUSN;           // Unique Service Name
         QString     m_sLocation;      // URL to Device Description
-        TaskTime    m_ttExpires;
+        TaskTime    m_ttExpires;        
+        QString     m_sSecurityPin;   // Use for MythXML methods needed pin
 
     public:
+
+        // ==================================================================
 
         DeviceLocation( const QString &sURI,
                         const QString &sUSN,
@@ -217,6 +222,8 @@ class DeviceLocation : public RefCounted
             g_nAllocated++;
         }
 
+        // ==================================================================
+
         int ExpiresInSecs()
         {
             TaskTime ttNow;
@@ -225,6 +232,8 @@ class DeviceLocation : public RefCounted
             return m_ttExpires.tv_sec - ttNow.tv_sec;
         }
 
+        // ==================================================================
+
         UPnpDeviceDesc *GetDeviceDesc( bool bInQtThread = TRUE )
         {
             if (m_pDeviceDesc == NULL)
@@ -232,6 +241,20 @@ class DeviceLocation : public RefCounted
 
             return m_pDeviceDesc;
         }
+
+        // ==================================================================
+
+        QString GetFriendlyName( bool bInQtThread = TRUE )
+        {
+            UPnpDeviceDesc *pDevice = GetDeviceDesc( bInQtThread );
+
+            if ( pDevice != NULL)
+                return pDevice->m_rootDevice.m_sFriendlyName;
+
+            return "<Unknown>";
+        }
+
+
 };
 
 #endif
