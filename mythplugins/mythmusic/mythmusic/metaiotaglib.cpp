@@ -133,7 +133,8 @@ Metadata* MetaIOTagLib::read(QString filename)
         // Compilation Artist (TPE4)
         if(!taglib->ID3v2Tag()->frameListMap()["TPE4"].isEmpty())
             compilation_artist = TStringToQString(
-            taglib->ID3v2Tag()->frameListMap()["TPE4"].front()->toString());
+            taglib->ID3v2Tag()->frameListMap()["TPE4"].front()->toString()
+                .stripWhiteSpace());
 
         // Look for MusicBrainz Album+Artist ID in TXXX Frame
         UserTextIdentificationFrame *musicbrainz = find(taglib->ID3v2Tag(),
