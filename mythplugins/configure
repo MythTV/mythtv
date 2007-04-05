@@ -815,6 +815,10 @@ if test "$music" = "yes" ; then
     if test "$aac" = "no" ; then
         echo "        AAC            support will not be included in MythMusic"
     fi
+
+    if test "$taglib" = "yes" ; then
+        echo "INCLUDEPATH += `taglib-config --prefix`/include/taglib" >> ./mythmusic/mythmusic/config.pro
+    fi
 fi
 
 ###########################################################

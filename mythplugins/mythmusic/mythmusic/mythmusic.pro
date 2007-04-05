@@ -6,7 +6,7 @@ include (config.pro)
    error(Missing config.pro: please run the configure script)
 }
 
-INCLUDEPATH *= /usr/include/cdda /usr/include/taglib
+INCLUDEPATH *= /usr/include/cdda
 TEMPLATE = lib
 CONFIG += plugin thread
 TARGET = mythmusic
