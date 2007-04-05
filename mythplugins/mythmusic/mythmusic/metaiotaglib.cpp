@@ -119,12 +119,12 @@ Metadata* MetaIOTagLib::read(QString filename)
     // Basic Tags
     if (! tag->isEmpty())
     {
-        title = TStringToQString(tag->title());
-        artist = TStringToQString(tag->artist());
-        album = TStringToQString(tag->album());
+        title = TStringToQString(tag->title().stripWhiteSpace());
+        artist = TStringToQString(tag->artist().stripWhiteSpace());
+        album = TStringToQString(tag->album().stripWhiteSpace());
         tracknum = tag->track();
         year = tag->year();
-        genre = TStringToQString(tag->genre());
+        genre = TStringToQString(tag->genre().stripWhiteSpace());
     }
 
     // ID3V2 Only Tags
