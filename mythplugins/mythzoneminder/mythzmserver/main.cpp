@@ -19,6 +19,7 @@
 #include <map>
 #include <sys/types.h>
 #include <sys/socket.h>
+#include <sys/time.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <fcntl.h>
@@ -47,6 +48,8 @@ int main(int argc, char **argv)
     fd_set read_fds;                // temp file descriptor list for select()
     struct sockaddr_in myaddr;      // server address
     struct sockaddr_in remoteaddr;  // client address
+    struct timeval timeout;         // maximum time to wait for data
+    int res;                        // result from select()
     int fdmax;                      // maximum file descriptor number
     int listener;                   // listening socket descriptor
     int newfd;                      // newly accept()ed socket descriptor
@@ -270,11 +273,24 @@ int main(int argc, char **argv)
     // main loop
     while (!quit) 
     {
+        // the maximum time select() should wait
+        timeout.tv_sec = DB_CHECK_TIME;
+        timeout.tv_usec = 0;
+
         read_fds = master; // copy it
-        if (select(fdmax+1, &read_fds, NULL, NULL, NULL) == -1) 
+        res = select(fdmax+1, &read_fds, NULL, NULL, &timeout);
+
+        if (res == -1)
         {
             perror("select");
             return EXIT_SOCKET_ERROR;
+        }
+        else if (res == 0)
+        {
+            // select timed out
+            // just kick the DB connection to keep it alive
+            kickDatabase(debug);
+            continue;
         }
 
         // run through the existing connections looking for data to read

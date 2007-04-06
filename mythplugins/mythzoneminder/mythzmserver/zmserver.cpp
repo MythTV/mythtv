@@ -64,6 +64,7 @@ string  g_user = "";
 string  g_webUser = "";
 string  g_binPath = "";
 
+time_t  g_lastDBKick = 0;
 
 void loadZMConfig(const string &configfile)
 {
@@ -158,6 +159,31 @@ void connectToDatabase(void)
         cout << "Error: Can't select database: " << mysql_error(&g_dbConn) << endl;
         exit(mysql_errno(&g_dbConn));
     }
+}
+
+void kickDatabase(bool debug)
+{
+    if (time(NULL) < g_lastDBKick + DB_CHECK_TIME)
+        return;
+
+    if (debug)
+        cout << "Kicking database connection" << endl;
+
+    g_lastDBKick = time(NULL);
+
+    if (mysql_query(&g_dbConn, "SELECT NULL;") == 0)
+    {
+        MYSQL_RES *res = mysql_store_result(&g_dbConn);
+        if (res)
+            mysql_free_result(res);
+        return;
+    }
+
+    cout << "Lost connection to DB - trying to reconnect" << endl;
+
+    // failed so try to reconnect to the DB
+    mysql_close(&g_dbConn);
+    connectToDatabase();
 }
 
 ZMServer::ZMServer(int sock, bool debug)
@@ -658,6 +684,12 @@ void ZMServer::handleGetLiveFrame(vector<string> tokens)
 {
     static unsigned char buffer[MAX_IMAGE_SIZE];
     char str[100];
+
+    // we need to periodically kick the DB connection here to make sure it 
+    // stays alive because the user may have left the frontend on the live 
+    // view which doesn't query the DB at all and eventually the connection
+    // will timeout
+    kickDatabase(m_debug);
 
     if (tokens.size() != 2)
     {

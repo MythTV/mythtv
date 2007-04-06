@@ -29,8 +29,9 @@ using namespace std;
 
 extern void loadZMConfig(const string &configfile);
 extern void connectToDatabase(void);
+extern void kickDatabase(bool debug);
 
-// there are shared by all ZMServer's
+// these are shared by all ZMServer's
 extern MYSQL   g_dbConn;
 extern string  g_zmversion;
 extern string  g_password;
@@ -41,6 +42,8 @@ extern string  g_user;
 extern string  g_webUser;
 extern string  g_binPath;
 
+#define DB_CHECK_TIME 60
+extern time_t  g_lastDBKick;
 
 typedef enum 
 { 
