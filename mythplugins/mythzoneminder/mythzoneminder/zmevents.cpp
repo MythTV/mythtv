@@ -298,6 +298,9 @@ void ZMEvents::eventListUp(bool page)
 
 void ZMEvents::playPressed(void)
 {
+    if (!m_eventList || m_eventList->size() == 0)
+        return;
+
     m_updateTimer->stop();
 
     Event *event = m_eventList->at(m_currentEvent);
@@ -320,6 +323,9 @@ void ZMEvents::playPressed(void)
 
 void ZMEvents::deletePressed(void)
 {
+    if (!m_eventList || m_eventList->size() == 0)
+        return;
+
     Event *event = m_eventList->at(m_currentEvent);
     if (event)
     {

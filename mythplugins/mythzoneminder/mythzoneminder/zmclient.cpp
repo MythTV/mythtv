@@ -274,7 +274,7 @@ void ZMClient::getMonitorStatus(vector<Monitor*> *monitorList)
     int monitorCount = strList[1].toInt(&bOK);
     if (!bOK)
     {
-        VERBOSE(VB_IMPORTANT, "ZMClient received bad int in getMonitorList()");
+        VERBOSE(VB_IMPORTANT, "ZMClient received bad int in getMonitorStatus()");
         return;
     }
 

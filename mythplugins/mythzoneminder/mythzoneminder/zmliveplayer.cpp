@@ -66,6 +66,15 @@ ZMLivePlayer::ZMLivePlayer(int monitorID, int eventID, MythMainWindow *parent,
 
 void ZMLivePlayer::initMonitorLayout()
 {
+    // if we haven't got any monitors there's not much we can do so bail out!
+    if (m_monitors->size() == 0)
+    {
+        MythPopupBox::showOkPopup(gContext->GetMainWindow(), "No monitors",
+                                  tr("Cannot find any monitors. Bailing out!"));
+        done(0);
+        return;
+    }
+
     setMonitorLayout(1);
     m_frameTimer->start(FRAME_UPDATE_TIME);
     m_statusTimer->start(STATUS_UPDATE_TIME);
