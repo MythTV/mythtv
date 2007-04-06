@@ -75,13 +75,33 @@ void ZMLivePlayer::initMonitorLayout()
         return;
     }
 
-    setMonitorLayout(1);
+    setMonitorLayout(gContext->GetNumSetting("ZoneMinderLiveLayout", 1), true);
     m_frameTimer->start(FRAME_UPDATE_TIME);
     m_statusTimer->start(STATUS_UPDATE_TIME);
 }
 
 ZMLivePlayer::~ZMLivePlayer()
 {
+    gContext->SaveSetting("ZoneMinderLiveLayout", m_monitorLayout);
+
+    if (m_players)
+    {
+        QString s = "";
+        Player *p;
+        vector<Player*>::iterator i = m_players->begin();
+        for (; i != m_players->end(); i++)
+        {
+            p = *i;
+            if (s != "")
+                s += ",";
+            s += QString("%1").arg(p->getMonitor()->id);
+        }
+
+        gContext->SaveSetting("ZoneMinderLiveCameras", s);
+    }
+    else
+        gContext->SaveSetting("ZoneMinderLiveCameras", "");
+
     if (m_players)
     {
         stopPlayers();
@@ -262,8 +282,12 @@ void ZMLivePlayer::stopPlayers()
     }
 }
 
-void ZMLivePlayer::setMonitorLayout(int layout)
+void ZMLivePlayer::setMonitorLayout(int layout, bool restore)
 {
+    QStringList monList = QStringList::split(",",
+                          gContext->GetSetting("ZoneMinderLiveCameras", ""));
+    m_monitorLayout = layout;
+
     if (m_players)
     {
         stopPlayers();
@@ -286,7 +310,30 @@ void ZMLivePlayer::setMonitorLayout(int layout)
 
     for (int x = 1; x <= m_monitorCount; x++)
     {
-        Monitor *monitor = m_monitors->at(monitorNo-1);
+        Monitor *monitor = NULL;
+
+        if (restore)
+        {
+            if (x <= (int) monList.size())
+            {
+                QString s = *monList.at(x - 1);
+                int monID = s.toInt(); 
+
+                // try to find a monitor that matches the monID
+                vector<Monitor*>::iterator i = m_monitors->begin();
+                for (; i != m_monitors->end(); i++)
+                {
+                    if ((*i)->id == monID)
+                    {
+                        monitor = *i;
+                        break;
+                    }
+                }
+            }
+        }
+
+        if (!monitor)
+            monitor = m_monitors->at(monitorNo - 1);
 
         UIImageType *frameImage = getUIImageType(QString("frame%1-%2").arg(layout).arg(x));
         if (frameImage)

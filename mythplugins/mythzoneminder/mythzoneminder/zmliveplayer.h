@@ -84,7 +84,7 @@ public:
              const char *name = 0);
     ~ZMLivePlayer();
 
-    void setMonitorLayout(int layout);
+    void setMonitorLayout(int layout, bool restore = false);
 
   private slots:
     void updateFrame(void);
