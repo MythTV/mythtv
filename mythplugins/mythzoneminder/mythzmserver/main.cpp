@@ -190,7 +190,7 @@ int main(int argc, char **argv)
     //  Switch to daemon mode?
     if (daemon_mode)
     {
-        if (daemon(0, 1) < 0)
+        if (daemon(0, 0) < 0)
         {
             cout << "Failed to run as a daemon. Bailing out.\n";
             return EXIT_DEAMONIZING_ERROR;
