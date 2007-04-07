@@ -1607,10 +1607,10 @@ def BurnDVDISO():
     checkCancelFlag()
 
     if mediatype == DVD_RW and erasedvdrw == True:
-        command = path_growisofs[0] + " -use-the-force-luke -Z " + dvddrivepath + \
+        command = path_growisofs[0] + " -dvd-compat -use-the-force-luke -Z " + dvddrivepath + \
                   " -dvd-video -V 'MythTV DVD' " + os.path.join(getTempPath(),'dvd')
     else:
-        command = path_growisofs[0] + " -Z " + dvddrivepath + \
+        command = path_growisofs[0] + " -dvd-compat -Z " + dvddrivepath + \
                   " -dvd-video -V 'MythTV DVD' " + os.path.join(getTempPath(),'dvd')
 
     if os.system(command) != 0:
