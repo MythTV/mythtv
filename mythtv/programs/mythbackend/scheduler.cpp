@@ -1494,7 +1494,12 @@ void Scheduler::RunScheduler(void)
                     nexttv->StartRecording(nextRecording);
             else
                 nextRecording->recstatus = rsOffLine;
-            nextRecording->AddHistory(nextRecording->recstatus != rsRecording);
+            bool doSchedAfterStart = 
+                nextRecording->recstatus != rsRecording ||
+                schedAfterStartMap[nextRecording->recordid] ||
+                (nextRecording->parentid && 
+                 schedAfterStartMap[nextRecording->parentid]);
+            nextRecording->AddHistory(doSchedAfterStart);
 
             statuschanged = true;
 
@@ -2113,6 +2118,7 @@ void Scheduler::AddNewRecords(void)
 
     QMap<int, bool> tooManyMap;
     bool checkTooMany = false;
+    schedAfterStartMap.clear();
 
     MSqlQuery rlist(dbConn);
     rlist.prepare(QString("SELECT recordid,title,maxepisodes,maxnewest FROM %1;").arg(recordTable));
@@ -2133,6 +2139,7 @@ void Scheduler::AddNewRecords(void)
         int maxNewest = rlist.value(3).toInt();
 
         tooManyMap[recid] = false;
+        schedAfterStartMap[recid] = false;
 
         if (maxEpisodes && !maxNewest)
         {
@@ -2146,10 +2153,14 @@ void Scheduler::AddNewRecords(void)
 
             if (epicnt.exec() && epicnt.isActive())
             {
-                if ((epicnt.size() > 0) && (epicnt.size() >= maxEpisodes))
+                if (epicnt.size() >= maxEpisodes - 1)
                 {
-                    tooManyMap[recid] = true;
-                    checkTooMany = true;
+                    schedAfterStartMap[recid] = true;
+                    if (epicnt.size() >= maxEpisodes)
+                    {
+                        tooManyMap[recid] = true;
+                        checkTooMany = true;
+                    }
                 }
             }
         }

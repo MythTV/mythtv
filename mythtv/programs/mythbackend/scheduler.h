@@ -123,6 +123,7 @@ class Scheduler : public QObject
     bool specsched;
     bool schedMoveHigher;
     bool schedulingEnabled;
+    QMap<int, bool> schedAfterStartMap;
 
     QMap<int, EncoderLink *> *m_tvList;   
     AutoExpire *expirer;
