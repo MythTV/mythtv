@@ -31,7 +31,7 @@
 #******************************************************************************
 
 # version of script - change after each update
-VERSION="0.1.20070318-2"
+VERSION="0.1.20070407-1"
 
 
 ##You can use this debug flag when testing out new themes
@@ -3992,17 +3992,29 @@ else:
 nicelevel = os.nice(nicelevel)
 write( "Setting process priority to %s" % nicelevel)
 
+import errno
+
 try:
+    # Attempt to create a lock file so any UI knows we are running.
+    # Testing for and creation of the lock is one atomic operation.
+    lckpath = os.path.join(logpath, "mythburn.lck")
     try:
-        # create our lock file so any UI knows we are running
-        if os.path.exists(os.path.join(logpath, "mythburn.lck")):
-            write("Lock File Exists - already running???")
+        fd = os.open(lckpath, os.O_WRONLY | os.O_CREAT | os.O_EXCL)
+        try:
+            os.write(fd, "%d\n" % os.getpid())
+            os.close(fd)
+        except:
+            os.remove(lckpath)
+            raise
+    except OSError, e:
+        if e.errno == errno.EEXIST:
+            write("Lock file exists -- already running???")
             sys.exit(1)
+        else:
+            fatalError("cannot create lockfile: %s" % e)
+    # if we get here, we own the lock
 
-        file = os.open(os.path.join(logpath, "mythburn.lck"), os.O_WRONLY | os.O_CREAT | os.O_EXCL)
-        os.write(file, "%d" % os.getpid())
-        os.close(file)
-
+    try:
         #Load XML input file from disk
         jobDOM = xml.dom.minidom.parse(jobfile)
 
@@ -4035,8 +4047,7 @@ try:
         write("Finished processing jobs!!!")
     finally:
         # remove our lock file
-        if os.path.exists(os.path.join(logpath, "mythburn.lck")):
-            os.remove(os.path.join(logpath, "mythburn.lck"))
+        os.remove(lckpath)
 
         # make sure the files we created are read/writable by all 
         os.system("chmod -R a+rw-x+X %s" % defaultsettings["MythArchiveTempDir"])

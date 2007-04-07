@@ -8,6 +8,8 @@
 #include "config.h"
 
 #include <iostream>
+#include <signal.h>
+
 using namespace std;
 
 // Qt
@@ -41,17 +43,8 @@ using namespace std;
 #endif
 
 // return true if the process belonging to the lock file is still running
-// FIXME not portable
 bool checkProcess(const QString &lockFile)
 {
-    // check that the user is using procfs
-    QDir d("/proc");
-    if (!d.exists("/proc"))
-    {
-        // assume it is still running
-        return true;
-    }
-
     // read the PID from the lock file
     QFile file(lockFile);
     file.open(IO_ReadOnly);
@@ -60,7 +53,7 @@ bool checkProcess(const QString &lockFile)
     file.readLine(line, 100);
 
     bool bOK = false;
-    int pid = line.toInt(&bOK);
+    pid_t pid = line.toInt(&bOK);
 
     if (!bOK)
     {
@@ -70,10 +63,13 @@ bool checkProcess(const QString &lockFile)
 
     VERBOSE(VB_GENERAL, QString("Checking if PID %1 is still running").arg(pid));
 
-    if (QFile::exists(QString("/proc/%1/status").arg(pid)))
-        return true;
+    if (kill(pid, 0) == -1)
+    {
+        if (errno == ESRCH)
+            return false;
+    }
 
-    return false;
+    return true;
 }
 
 // return true if a lock file is found and the owning process is still running
