@@ -131,12 +131,18 @@ sub getMovieData {
    }
 
    # parse director 
-   my $director = parseBetween($response, ">Directed by</h5>", "/a><br/>");
+   my $director = parseBetween($response, ">Director:</h5>", "/a><br/>");
    $director = parseBetween($director, "/\">", "<");
 
    # parse writer 
    # (Note: this takes the 'first' writer, may want to include others)
-   my $data = parseBetween($response, ">Writing credits <a href=\"/wga\">(WGA)</a></h5>", "\n<br/>");
+   my $data = parseBetween($response, ">Writers <a href=\"/wga\">(WGA)</a>:</h5>", "</div>");
+   if (!length($data)) {
+         $data = parseBetween($response, ">Writer:</h5>", "</div>");
+   }
+   if (!length($data)) {
+         $data = parseBetween($response, ">Writers:</h5>", "</div>");
+   }
    my $writer = join(",", ($data =~ m/$name_link_pat/g));
 
    # parse plot
