@@ -2239,9 +2239,9 @@ void Scheduler::AddNewRecords(void)
 "RECTABLE.parentid, ") + progfindid + ", RECTABLE.playgroup, "
 "oldrecstatus.recstatus, oldrecstatus.reactivate, " 
 "program.hdtv, program.closecaptioned, program.stereo, "
-"RECTABLE.storagegroup, capturecard.hostname, " + pwrpri + QString(
+"RECTABLE.storagegroup, capturecard.hostname, oldrecorded.recstatus, " + 
+    pwrpri + QString(
 "FROM recordmatch "
-
 " INNER JOIN RECTABLE ON (recordmatch.recordid = RECTABLE.recordid) "
 " INNER JOIN program ON (recordmatch.chanid = program.chanid AND "
 "                        recordmatch.starttime = program.starttime AND "
@@ -2418,7 +2418,7 @@ void Scheduler::AddNewRecords(void)
                 p->GetRecordingTypeRecPriority(p->rectype);
         p->recpriority += recTypeRecPriorityMap[p->rectype];
 
-        p->recpriority2 = result.value(44).toInt();
+        p->recpriority2 = result.value(45).toInt();
 
         if (complexpriority == 0)
         {
@@ -2482,8 +2482,12 @@ void Scheduler::AddNewRecords(void)
                 p->recstatus = rsRepeat;
 
             if ((p->dupin & kDupsInOldRecorded) && result.value(10).toInt())
-                p->recstatus = rsPreviousRecording;
-
+            {
+                if (result.value(44).toInt() == rsNeverRecord)
+                    p->recstatus = rsNeverRecord;
+                else
+                    p->recstatus = rsPreviousRecording;
+            }
             if ((p->dupin & kDupsInRecorded) && result.value(14).toInt())
                 p->recstatus = rsCurrentRecording;
         }

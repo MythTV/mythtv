@@ -3697,7 +3697,8 @@ void ProgramInfo::showDetails(void) const
     p->rectype = kSingleRecord; // must be != kNotRecording
     p->recstatus = recstatus;
 
-    if (p->recstatus == rsPreviousRecording ||  p->recstatus == rsUnknown)
+    if (p->recstatus == rsPreviousRecording ||
+        p->recstatus == rsNeverRecord || p->recstatus == rsUnknown)
     {
         query.prepare("SELECT recstatus, starttime "
                       "FROM oldrecorded WHERE duplicate > 0 AND "
@@ -3720,7 +3721,7 @@ void ProgramInfo::showDetails(void) const
             if (p->recstatus == rsUnknown)
                 p->recstatus = RecStatusType(query.value(0).toInt());
             if (p->recstatus == rsPreviousRecording || 
-                p->recstatus == rsRecorded)
+                p->recstatus == rsNeverRecord || p->recstatus == rsRecorded)
                 statusDate = QDateTime::fromString(query.value(1).toString(),
                                                   Qt::ISODate);
         }
@@ -4282,13 +4283,14 @@ void ProgramInfo::ShowNotRecordingDialog(void)
              recstatus == rsCurrentRecording ||
              recstatus == rsEarlierShowing ||
              recstatus == rsOtherShowing ||
+             recstatus == rsNeverRecord ||
              recstatus == rsRepeat ||
              recstatus == rsInactive ||
              recstatus == rsLaterShowing))
         {
             diag.AddButton(QObject::tr("Record anyway"));
             addov = button++;
-            if (recstatus == rsPreviousRecording)
+            if (recstatus == rsPreviousRecording || recstatus == rsNeverRecord)
             {
                 diag.AddButton(QObject::tr("Forget Previous"));
                 forget = button++;
@@ -4300,6 +4302,7 @@ void ProgramInfo::ShowNotRecordingDialog(void)
             if (rectype != kSingleRecord &&
                 recstatus != rsPreviousRecording &&
                 recstatus != rsCurrentRecording &&
+                recstatus != rsNeverRecord &&
                 recstatus != rsNotListed)
             {
                 if (recstartts > now)
