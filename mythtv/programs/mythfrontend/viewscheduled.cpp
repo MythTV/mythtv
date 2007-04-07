@@ -283,7 +283,8 @@ void ViewScheduled::FillList(void)
              (p->recstatus == rsTooManyRecordings && 
               ++toomanycounts[p->recordid] <= 1) ||
              (p->recstatus > rsTooManyRecordings && 
-              p->recstatus != rsRepeat)))
+              p->recstatus != rsRepeat &&
+              p->recstatus != rsNeverRecord)))
         {
             cardref[p->cardid]++;
             if (p->cardid > maxcard)
