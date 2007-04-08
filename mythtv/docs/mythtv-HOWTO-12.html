@@ -799,7 +799,7 @@ on input 2.</P>
 <P>Having two channels with the same callsign may affect how program
 information is shown in mythfrontend. If two sources have the same callsign
 and channel number, the program guide and program lists will only show one
-instance of the channel number and callsign. If the same callsing is on two
+instance of the channel number and callsign. If the same callsign is on two
 different channel numbers, both will be shown and if two sources have
 different callsigns with the same channel number, both of those will be
 shown.</P>
@@ -824,7 +824,7 @@ considered before the showings with lower priority.</P>
 
 <P>"Input Connections" in mythtv-setup includes a box to set "Input priority"
 which defaults to "0". If a value is set, that amount will be added to the
-total priority" for showings on that input. This can be used to influence
+"total priority" for showings on that input. This can be used to influence
 using favored cards or not using less favored cards unless necessary.</P>
 <P>Let's say the "The Apprentice" is on at 8:00pm with a priority of 3. "Who
 Cares" is -2 and an episode is shown at 8:00pm then repeated at 11:00pm. The
@@ -954,6 +954,67 @@ preferred over channel 20 for this HDTV broadcast.</P>
 <CAPTION></CAPTION>
 </FIGURE>
 </P>
+
+<H3>Custom Priority</H3>
+
+<P>
+<FIGURE>
+<EPS FILE="add.eps">
+<IMG SRC="add.png">
+<CAPTION>New for MythTV 0.21</CAPTION>
+</FIGURE>
+</P>
+<P>While Input, Channel, and HDTV Priority can be used for indicating a
+preference for certain programs and inputs, there may be circumstances that
+cannot be resolved easily with these standard features. MythTV version 0.21
+includes a feature for "power priority". The Custom Priority editor in
+mythfrontend's "TV Settings" screen is similar to Custom Record, however,
+Custom Priority allows you to create specialized power priority factors to
+influence scheduling decisions.</P>
+<P>For example, the 'program.closecaptioned' flag can be used in a
+similar way as the 'program.hdtv' flag.</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+Priority Rule Name: Closed Captioned priority
+Priority Value: 2
+program.closecaptioned > 0
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>This will raise the priority of shows marked with "CC" over those that are
+not by applying the "Priority Value" whenever the SQL fragment evaluates to
+true. If the expression evaluates to false for a showing, the "Priority
+Value" is not applied.</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+Priority Rule Name: Priority when shown once
+Priority Value: 1
+program.first > 0 AND program.last > 0
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>The "first" and "last" flags for an episode will only be set for the
+same showing when there is only one showing of that episode in the
+current TV listings. This rule would raise the priority in these cases
+so that these shows would have an advantage to record in their only
+available time slot.</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+Priority Rule Name: Don't wait for the last
+Priority Value: -1
+program.last > 0  AND program.first = 0
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>When there is more than one showing of an episode, subtract 1 from the last
+showing. This rule would tell the scheduler to try a little harder to record
+any earlier showing. If there is a problem recording an earlier showing then
+there would be at least one more opportunity to record the program.</P>
+<P>The Custom Priority editor includes many example fragments and complete
+examples that can be used or you can create your own to suit your needs.</P>
 
 <HR>
 <A HREF="mythtv-HOWTO-13.html">Next</A>

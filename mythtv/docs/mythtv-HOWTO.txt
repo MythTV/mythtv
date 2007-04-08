@@ -1,7 +1,7 @@
   Installing and using MythTV
   Robert Kulagowski, mailto:rkulagow@rocketmail.com
   <mailto:rkulagow@rocketmail.com>
-  2007-02-16, v0.20.16
+  2007-04-07, v0.20.19
 
   Initially, installation of MythTV seems like a huge task.  There are
   lots of dependencies, and various distributions seem to do the same
@@ -201,6 +201,7 @@
         12.6.6 Channel Priority
         12.6.7 Preferred Input
         12.6.8 HDTV Priority
+        12.6.9 Custom Priority
 
   13. MythPlugins.
   14. MythWeb.
@@ -405,8 +406,10 @@
 
   +o  MythGame
 
+
   +o  MythMusic, a music playing / ripping application which supports MP3
      and FLAC
+
   +o  MythNews, a RSS news grabber
 
   +o  MythPhone, phone and videophone using SIP.
@@ -468,7 +471,6 @@
   <http://www.mythtv.org/docs/mythtv-HOWTO.pdf>.
 
   This HOWTO is for MythTV v0.20
-
 
 
   [1m1.5.  Document conventions[0m
@@ -1849,11 +1851,13 @@
   available and to override and automatically detected options.  See the
   config.log file after running [1mconfigure [22mto see previous runs.
 
+  If you're going to use the various perl scripts that are in the
+  contrib directory, make sure you add --with-bindings=perl to the
+  [1mconfigure [22mcommand.
 
 
-  If you're going to use the various perl scripts that are in the contrib
-  directory, make sure you add --with-bindings=perl to the [1mconfigure[0m
-  command.
+
+                 This is now the default in MythTV 0.21.
 
   To compile:
 
@@ -1896,8 +1900,6 @@
   [1mmake [22mdoes not significantly decrease compile time.
 
   Once the compile is done, switch to superuser:
-
-
 
   $ su
   # make install
@@ -3285,7 +3287,13 @@
   "Watch Recordings" lists and a failure to locate the Video Sources
   defined on the master backend.  Modify the
   /usr/local/share/mythtv/mysql.txt file on all slave backends to ensure
-  that the DBHostName has the address of the MySQL server.
+  that the DBHostName has the address of the MySQL server.  Caveat:  You
+  may make a slave backend the primary MySQL server, or run a non-MythTV
+  database on a slave backend as long as you have edited the mysql.txt
+  file on [1mall [22msystems and made it consistent. There can be only one
+  authoritative MySQL database in a MythTV system - errors such as the
+  one above ensue if backends and frontends have differing ideas of
+  which MySQL database they should talk to.
 
   Make sure that the IP addresses on the General setup screen are
   accurate.  If the slave backend can't communicate with the master
@@ -3355,6 +3363,8 @@
   If you have XMLTV software installed, there is a perl script in
   MythTV's contrib/ directory which will generate this file for you. Run
   the command:
+
+
        $ perl mkiconmap.pl
 
 
@@ -3408,7 +3418,6 @@
   the number of seconds to record before or after a program, which is
   useful if the broadcast network or your system clock are out of sync
   and will help prevent you missing the beginning or end of a program.
-
   To change the value, use the left and right arrow keys to increment
   and decrement the number of seconds.  When you're satisfied with the
   result, use the down arrow to put the input focus on the Next button
@@ -3540,9 +3549,6 @@
   new position with no jagged edges. However, if the display is not
   synchronous, it will cause flickering or the appearance of the picture
   moving up and down by one line.
-
-
-
          [1mNOTE[22m: This filter requires the frame rate to be doubled
   and therefore can only be used with the "Deinterlace Playback"
   checkbox.  Do not include this in your filter chain.
@@ -3610,6 +3616,8 @@
   A slower denoiser that applies a spatial and temporal low-pass filter.
   The spatial filter can remove some noise that quickdnr can't, but a
   more powerful CPU is needed.  This filter accepts 3 float parameters:
+
+
   +o  luma spatial filter strength
 
   +o  chroma spatial filter strength
@@ -3740,7 +3748,6 @@
 
   +o  Live TV
 
-
   +o  Low Quality
 
   +o  High Quality
@@ -3861,9 +3868,6 @@
   [1m11.1.4.  LiveTV Browse Mode[0m
 
 
-  [1m11.1.5.  Playback Recording Zoom Mode[0m
-
-
 
   Up or down          keys change the channel
           num pad     Type a number to enter a channel number or jump amount (HHMM format)
@@ -3921,12 +3925,10 @@
             Right     advance 1 frame
                 >     advance 1 second
 
+  [1m11.1.5.  Playback Recording Zoom Mode[0m
+
+
   [1m11.1.6.  If you have two or more tuner cards[0m
-
-
-  V           toggle Picture-in-picture on or off
-  B           toggles the window focus (lets you change channels on the PiP window)
-  N           swaps the two channels by changing channels on both cards
 
 
 
@@ -3949,6 +3951,11 @@
   PageDown            Zoom Out
   Space/Enter         Exit Zoom mode leaving picture at current size and position
               ESC     Exit Zoom mode and return to original size
+
+
+  V           toggle Picture-in-picture on or off
+  B           toggles the window focus (lets you change channels on the PiP window)
+  N           swaps the two channels by changing channels on both cards
 
   [1m11.1.7.  Watching a recording only[0m
 
@@ -3974,6 +3981,22 @@
   [1m11.1.8.  EPG[0m
 
 
+  [1m11.1.9.  Setting Program or Channel Recording Priorities[0m
+
+
+                   Right     increases priority value
+                    Left     decreases priority value
+                       1     sorts by title
+                       2     sorts by priority
+         Home/End            toggle sort priority
+                       I     edit recording options
+                     ESC     commits changes and exits
+
+
+  [1m11.1.10.  Viewing Scheduled Recordings/Resolving Conflicts[0m
+
+
+
            Arrows     are used to move the highlighted program point around
        A, D, S, W     perform the same as left, right, down and up
   PageUp/PageDown     move the channel list up or down a page
@@ -3991,27 +4014,11 @@
            / or 4     toggle the guide listing between all channels and filtered "favorites"
 
 
-  [1m11.1.9.  Setting Program or Channel Recording Priorities[0m
-
-
-
-                   Right     increases priority value
-                    Left     decreases priority value
-                       1     sorts by title
-                       2     sorts by priority
-         Home/End            toggle sort priority
-                       I     edit recording options
-                     ESC     commits changes and exits
-
-  [1m11.1.10.  Viewing Scheduled Recordings/Resolving Conflicts[0m
-
-
                       1     show all recordings
                       2     show only important recordings
         Home/End            toggle show showing all/important
                       I     edit recording options
         Space/Enter         resolve conflict or override
-
 
   [1m11.1.11.  Viewing Search Listings[0m
 
@@ -4053,6 +4060,7 @@
   Your remote control may not have the same set of keys as those named
   below, the names are only a suggestion that roughly correspond to the
   function.
+
 
   If you are adding new key bindings to the program then consideration
   of this suggested list will help users with remote controls.
@@ -4119,7 +4127,6 @@
   in the contrib/channel_changers directory for a number of programs and
   scripts which may be used to change channels.  Once you find one which
   works, copy it to /usr/local/bin/changechannel.
-
   Feel free to browse some of what sort of hardware is available at
   http://store.snapstream.com/accessories.html
   <http://store.snapstream.com/accessories.html>, or if you wish to
@@ -4186,11 +4193,12 @@
   backend, after which it will behave as described above. To disable
   this feature, unset "Block shutdown before client connected" in the
   mythfrontend Setup->Setup->General screen.
-
   Once it is time to startup the system, the Master backend is woken up
   first and will wakeup the Slave backends using the "Wake command for
   slaves". At this time, there is no support for starting only the
   required Slave backend, so all Slave backends will startup.
+
+
   [1m11.5.2.  Setting up the MythTV side of this extension.[0m
 
   There are a number of options that are used to control the Shutdown /
@@ -4257,6 +4265,7 @@
      backend needs for bootup.  Set to "0" to disable. The frontends
      will retry to connect for "Count of reconnect tries" times before
      giving up.
+
   +o  "Wake command for slaves" is the [4mone[24m command executed to wake your
      Slave backends. This should be a script that contains the calls to
      wakeup all Slave backend systems.
@@ -4312,24 +4321,25 @@
   and add the following to /etc/services:
 
 
-       mythwake        $PORT/tcp
+
+  mythwake        $PORT/tcp
 
 
 
   Finally, /usr/local/bin/mythwake looks like:
 
 
-  #! /bin/bash
-  #this should be a command to wake your server
-  WAKECMD="#!/bin/sh\n /usr/local/bin/wakeMBE"
-  #first we need to delete all wake jobs in queue
-  for JOB in atq | cut -f 1 ; do
-      atrm $JOB;
-  done
-  #now we read the date from 'nc'
-  read date;
-  #now set the atjob
-  echo -e "$WAKECMD" | at $date ;
+       #! /bin/bash
+       #this should be a command to wake your server
+       WAKECMD="#!/bin/sh\n /usr/local/bin/wakeMBE"
+       #first we need to delete all wake jobs in queue
+       for JOB in atq | cut -f 1 ; do
+           atrm $JOB;
+       done
+       #now we read the date from 'nc'
+       read date;
+       #now set the atjob
+       echo -e "$WAKECMD" | at $date ;
 
 
 
@@ -5300,7 +5310,7 @@
   information is shown in mythfrontend. If two sources have the same
   callsign and channel number, the program guide and program lists will
   only show one instance of the channel number and callsign. If the same
-  callsing is on two different channel numbers, both will be shown and
+  callsign is on two different channel numbers, both will be shown and
   if two sources have different callsigns with the same channel number,
   both of those will be shown.
 
@@ -5327,7 +5337,7 @@
 
   "Input Connections" in mythtv-setup includes a box to set "Input
   priority" which defaults to "0". If a value is set, that amount will
-  be added to the total priority" for showings on that input. This can
+  be added to the "total priority" for showings on that input. This can
   be used to influence using favored cards or not using less favored
   cards unless necessary.
 
@@ -5452,12 +5462,73 @@
 
 
 
+  [1m12.6.9.  Custom Priority[0m
+
+
+
+                           New for MythTV 0.21
+
+  While Input, Channel, and HDTV Priority can be used for indicating a
+  preference for certain programs and inputs, there may be circumstances
+  that cannot be resolved easily with these standard features. MythTV
+  version 0.21 includes a feature for "power priority". The Custom
+  Priority editor in mythfrontend's "TV Settings" screen is similar to
+  Custom Record, however, Custom Priority allows you to create
+  specialized power priority factors to influence scheduling decisions.
+
+  For example, the 'program.closecaptioned' flag can be used in a
+  similar way as the 'program.hdtv' flag.
+
+
+
+       Priority Rule Name: Closed Captioned priority
+       Priority Value: 2
+       program.closecaptioned > 0
+
+
+
+  This will raise the priority of shows marked with "CC" over those that
+  are not by applying the "Priority Value" whenever the SQL fragment
+  evaluates to true. If the expression evaluates to false for a showing,
+  the "Priority Value" is not applied.
+
+
+
+       Priority Rule Name: Priority when shown once
+       Priority Value: 1
+       program.first > 0 AND program.last > 0
+
+
+
+  The "first" and "last" flags for an episode will only be set for the
+  same showing when there is only one showing of that episode in the
+  current TV listings. This rule would raise the priority in these cases
+  so that these shows would have an advantage to record in their only
+  available time slot.
+
+
+
+       Priority Rule Name: Don't wait for the last
+       Priority Value: -1
+       program.last > 0  AND program.first = 0
+
+
+
+  When there is more than one showing of an episode, subtract 1 from the
+  last showing. This rule would tell the scheduler to try a little
+  harder to record any earlier showing. If there is a problem recording
+  an earlier showing then there would be at least one more opportunity
+  to record the program.
+
+  The Custom Priority editor includes many example fragments and
+  complete examples that can be used or you can create your own to suit
+  your needs.
+
+
   [1m13.  MythPlugins.[0m
 
   MythTV has a rich set of plugins available.  Once you have downloaded
   the tarball, untar it and run the [1mconfigure [22mscript:
-
-
        $ tar -xjf mythplugins-0.20.tar.bz2
        $ cd mythplugins-0.20
        $ ./configure --help
@@ -7273,15 +7344,18 @@
 
   From "best" to "worst", in NTSC:
 
-  +o  720x480 ("DVD" resolution. Also commonly, 704x480)
+  +o  720x480 "DVD" resolution. ReplayTV High and medium resolution
+
+  +o  704x480 DVD standalone recorder standard resolution
 
   +o  640x480 4:3
 
-  +o  544x480 (TiVo high resolution)
+  +o  544x480 TiVo Best resolution
 
-  +o  480x480 (Video CD resolution)
+  +o  480x480 SuperVCD (SVCD) Video CD resolution, TiVo High resolution
 
-  +o  352x480 (ReplayTV "Standard" quality)
+  +o  352x480 ReplayTV "Standard" quality, TiVo Basic and Medium
+     resolution, DVD "LP" resolution
 
   +o  320x480
 
@@ -7289,7 +7363,7 @@
 
   +o  480x240
 
-  +o  352x240
+  +o  352x240 Video CD (VCD) resolution
 
   +o  320x240
 
@@ -7319,9 +7393,6 @@
   but can also be run as a desktop application on a computer monitor.
   Here are a few consideration for configuring sizes to best suit you
   needs.
-
-
-
   [1m23.4.1.  X Dimensions[0m
 
   For output to a Television, common resolutions are 640x480, 800x600,

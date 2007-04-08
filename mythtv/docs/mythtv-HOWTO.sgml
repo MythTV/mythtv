@@ -3,7 +3,7 @@
 <title>Installing and using MythTV
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com"
 name="mailto:rkulagow@rocketmail.com">
-<date>2007-03-17, v0.20.18
+<date>2007-04-07, v0.20.19
 <abstract>
 Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -1348,13 +1348,15 @@ see what is available and to override and automatically detected options.
 See the <tt>config.log</tt> file after running <bf>configure</bf> to see
 previous runs.
 
+If you're going to use the various perl scripts that are in the contrib
+directory, make sure you add <tt>--with-bindings=perl</tt> to the
+<bf>configure</bf> command.
+
 <figure loc="here">
 <eps file="add.eps" height="1cm">
 <img src="add.png">
 <caption>
-If you're going to use the various perl scripts that are in the contrib
-directory, make sure you add <tt>--with-bindings=perl</tt> to the
-<bf>configure</bf> command.
+This is now the default in MythTV 0.21.
 </caption>
 </figure>
 
@@ -4546,7 +4548,7 @@ considered before the showings with lower priority.
 <p>
 "Input Connections" in mythtv-setup includes a box to set "Input priority"
 which defaults to "0". If a value is set, that amount will be added to the
-total priority" for showings on that input. This can be used to influence
+"total priority" for showings on that input. This can be used to influence
 using favored cards or not using less favored cards unless necessary.
 
 Let's say the "The Apprentice" is on at 8:00pm with a priority of 3. "Who
@@ -4677,6 +4679,63 @@ Channel "750 CNN" at priority "-1" and HDTV broadcast priority at "+2":
 <caption>
 </caption>
 </figure>
+
+<sect2>Custom Priority
+<p>
+<figure loc="here">
+<eps file="add.eps" height="1cm">
+<img src="add.png">
+<caption>
+New for MythTV 0.21</caption>
+</figure>
+
+While Input, Channel, and HDTV Priority can be used for indicating a
+preference for certain programs and inputs, there may be circumstances that
+cannot be resolved easily with these standard features. MythTV version 0.21
+includes a feature for "power priority". The Custom Priority editor in
+mythfrontend's "TV Settings" screen is similar to Custom Record, however,
+Custom Priority allows you to create specialized power priority factors to
+influence scheduling decisions.
+
+For example, the 'program.closecaptioned' flag can be used in a
+similar way as the 'program.hdtv' flag.
+
+<tscreen><verb>
+Priority Rule Name: Closed Captioned priority
+Priority Value: 2
+program.closecaptioned > 0
+</verb></tscreen>
+
+This will raise the priority of shows marked with "CC" over those that are
+not by applying the "Priority Value" whenever the SQL fragment evaluates to
+true. If the expression evaluates to false for a showing, the "Priority
+Value" is not applied.
+
+<tscreen><verb>
+Priority Rule Name: Priority when shown once
+Priority Value: 1
+program.first > 0 AND program.last > 0
+</verb></tscreen>
+
+The "first" and "last" flags for an episode will only be set for the
+same showing when there is only one showing of that episode in the
+current TV listings. This rule would raise the priority in these cases
+so that these shows would have an advantage to record in their only
+available time slot.
+
+<tscreen><verb>
+Priority Rule Name: Don't wait for the last
+Priority Value: -1
+program.last > 0  AND program.first = 0
+</verb></tscreen>
+
+When there is more than one showing of an episode, subtract 1 from the last
+showing. This rule would tell the scheduler to try a little harder to record
+any earlier showing. If there is a problem recording an earlier showing then
+there would be at least one more opportunity to record the program.
+
+The Custom Priority editor includes many example fragments and complete
+examples that can be used or you can create your own to suit your needs.
 
 <sect>MythPlugins. <label id="mythplugins_">
 <p>MythTV has a rich set of plugins available.  Once you have downloaded
@@ -7543,6 +7602,7 @@ v0.20.16, 2007-02-16.  Hauppuage is putting the HVR-1600 inside PVR-150
 boxes.  Not supported by ivtv driver at this time.
 v0.20.17, 2007-03-08.  Update on capture resolution from warren at icruise dot com.
 v0.20.18, 2007-03-17.  Typo.  Updated information on running MySQL on slave backends.
+v0.20.19, 2007-04-07.  Put in bjm's Custom Priority section.
 -->
 
 <!--

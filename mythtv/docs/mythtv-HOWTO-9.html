@@ -449,7 +449,12 @@ central database, causing unexpected behavior such as empty "Watch
 Recordings" lists and a failure to locate the Video Sources defined on the
 master backend.  Modify the <CODE>/usr/local/share/mythtv/mysql.txt</CODE> file
 on all slave backends to ensure that the <CODE>DBHostName</CODE> has the address
-of the MySQL server.</CAPTION>
+of the MySQL server.
+Caveat:  You may make a slave backend the primary MySQL server, or run a
+non-MythTV database on a slave backend as long as you have edited the
+<CODE>mysql.txt</CODE> file on <B>all</B> systems and made it consistent. There can be only one authoritative MySQL database in a MythTV system -
+errors such as the one above ensue if backends and frontends have differing
+ideas of which MySQL database they should talk to.</CAPTION>
 </FIGURE>
 </P>
 <P>Make sure that the IP addresses on the General setup screen are accurate. 
