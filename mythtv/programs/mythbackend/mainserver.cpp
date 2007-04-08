@@ -137,6 +137,9 @@ class ProcessRequestThread : public QThread
             if (!threadlives)
                 break;
 
+            if (!socket)
+                continue;
+
             parent->ProcessRequest(socket);
             socket->DownRef();
             socket = NULL;
@@ -242,18 +245,6 @@ void MainServer::readyRead(MythSocket *sock)
 
     readReadyLock.lock();
 
-    sock->Lock();
-
-    //if (socket->IsInProcess())
-    //{
-    //    VERBOSE(VB_IMPORTANT, "Overlapping calls to readSocket.");
-    //    readReadyLock.unlock();
-    //    return;
-    //}
-
-    // will be set to false after processed by worker thread.
-    //socket->SetInProcess(true);
-
     MythTimer t;
     t.start();
     ProcessRequestThread *prt = NULL;
@@ -294,17 +285,14 @@ void MainServer::readyRead(MythSocket *sock)
 
 void MainServer::ProcessRequest(MythSocket *sock)
 {
-    // locked above.
-    //sock->Lock();
+    sock->Lock();
 
-    //while (sock->bytesAvailable() > 0)
     if (sock->bytesAvailable() > 0)
     {
         ProcessRequestWork(sock);
     }
 
     sock->Unlock();
-    //sock->SetInProcess(false);
 }
 
 void MainServer::ProcessRequestWork(MythSocket *sock)
@@ -807,6 +795,8 @@ void MainServer::customEvent(QCustomEvent *e)
 
     if (sendstuff)
     {
+        readReadyLock.lock();
+
         bool sendGlobal = false;
         if (ismaster && broadcast[1].left(7) == "GLOBAL_")
         {
@@ -879,6 +869,8 @@ void MainServer::customEvent(QCustomEvent *e)
             PlaybackSock *pbs = (*iter);
             pbs->DownRef();
         }
+
+        readReadyLock.unlock();
     }
 }
 
