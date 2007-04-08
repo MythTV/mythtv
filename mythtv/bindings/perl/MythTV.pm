@@ -433,8 +433,7 @@ package MythTV;
                                    0));
             $csock->read_data();
         }
-    # We want to save RAM, so only grab the data in 96k blocks (plus, the
-    # backend barfs on larger chunks).
+    # Transfer the data.
         my $total = $recs[3];
         while ($sock && $total > 0) {
         # Attempt to read in 2M chunks, or the remaining total, whichever is
