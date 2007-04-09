@@ -324,6 +324,7 @@ void ManualSchedule::recordClicked(void)
                   p.startts.toString(timeformat);
 
     p.title += " (" + tr("Manual Record") + ")";
+    p.description = QDeepCopy<QString>(p.title);
 
     ScheduledRecording *record = new ScheduledRecording();
     record->loadByProgram(&p);
