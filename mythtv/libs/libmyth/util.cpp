@@ -38,6 +38,7 @@ using namespace std;
 #include "exitcodes.h"
 #include "util.h"
 #include "mythcontext.h"
+#include "mythmediamonitor.h"
 
 #ifdef CONFIG_DARWIN
 #include <mach/mach.h> 
@@ -502,4 +503,28 @@ bool getMemStats(int &totalMB, int &freeMB, int &totalVM, int &freeVM)
 #endif
 
     return true;
+}
+
+/**
+ * \brief Eject a disk, unmount a drive, open a tray
+ *
+ * If the Media Monitor is enabled, we use its fully-featured routine.
+ * Otherwise, we guess a drive and use a primitive OS-specific command
+ */
+void myth_eject()
+{
+    MediaMonitor *mon = MediaMonitor::GetMediaMonitor();
+    if (mon)
+        mon->ChooseAndEjectMedia();
+    else
+    {
+        VERBOSE(VB_MEDIA, "CD/DVD Monitor isn't enabled.");
+#ifdef __linux__
+        VERBOSE(VB_MEDIA, "Trying Linux 'eject -T' command");
+        myth_system("eject -T");
+#elif defined(CONFIG_DARWIN)
+        VERBOSE(VB_MEDIA, "Trying 'disktool -e disk1");
+        myth_system("disktool -e disk1");
+#endif
+    }
 }

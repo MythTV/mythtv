@@ -65,4 +65,6 @@ MPUBLIC long long getDiskSpace(const QString&,long long&,long long&);
 MPUBLIC bool getUptime(time_t &uptime);
 MPUBLIC bool getMemStats(int &totalMB, int &freeMB, int &totalVM, int &freeVM);
 
+MPUBLIC void myth_eject(void);
+
 #endif // UTIL_H_

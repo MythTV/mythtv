@@ -14,7 +14,6 @@ using namespace std;
 #include "mythfontproperties.h"
 #include "mythimage.h"
 #include "mythdialogbox.h"
-#include "mythmediamonitor.h"
 
 #include "lcddevice.h"
 #include "mythplugin.h"
@@ -1864,14 +1863,10 @@ bool MythThemedMenuPrivate::keyHandler(QStringList &actions,
             }
             lastbutton = NULL;
         }
-#ifndef _WIN32
         else if (action == "EJECT")
         {
-            MediaMonitor *mon = MediaMonitor::GetMediaMonitor();
-            if (mon)
-                mon->ChooseAndEjectMedia();
+            myth_eject();
         }
-#endif // !_WIN32
         else
             handled = false;
     }
@@ -2076,14 +2071,10 @@ bool MythThemedMenuPrivate::handleAction(const QString &action)
             wantpop = true;
         }
     }
-#ifndef _WIN32
     else if (action.left(5) == "EJECT")
     {
-        MediaMonitor *mon = MediaMonitor::GetMediaMonitor();
-        if (mon)
-            mon->ChooseAndEjectMedia();
+        myth_eject();
     }
-#endif // !_WIN32
     else if (action.left(5) == "JUMP ")
     {
         QString rest = action.right(action.length() - 5);
