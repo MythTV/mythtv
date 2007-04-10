@@ -21,6 +21,7 @@ UPnpDeviceDesc   UPnp::g_UPnpDeviceDesc;
 TaskQueue       *UPnp::g_pTaskQueue     = NULL;
 SSDP            *UPnp::g_pSSDP          = NULL;
 SSDPCache        UPnp::g_SSDPCache;
+QStringList      UPnp::g_IPAddrList;
 
 Configuration   *UPnp::g_pConfig        = NULL;
 
@@ -69,6 +70,19 @@ void UPnp::SetConfiguration( Configuration *pConfig )
 
 bool UPnp::Initialize( int nServicePort, HttpServer *pHttpServer )
 {
+    QStringList sList;
+
+    GetIPAddressList( sList );
+
+    return Initialize( sList, nServicePort, pHttpServer );
+}
+
+//////////////////////////////////////////////////////////////////////////////
+//
+//////////////////////////////////////////////////////////////////////////////
+
+bool UPnp::Initialize( QStringList &sIPAddrList, int nServicePort, HttpServer *pHttpServer )
+{
     VERBOSE(VB_UPNP, QString("UPnp::Initialize - Begin"));
 
     if (g_pConfig == NULL)
@@ -83,6 +97,7 @@ bool UPnp::Initialize( int nServicePort, HttpServer *pHttpServer )
         return false;
     }
 
+    g_IPAddrList   = sIPAddrList;
     m_nServicePort = nServicePort;
 
     // ----------------------------------------------------------------------

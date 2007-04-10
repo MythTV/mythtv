@@ -106,6 +106,7 @@ class UPnp
         static TaskQueue       *g_pTaskQueue;
         static SSDP            *g_pSSDP;
         static SSDPCache        g_SSDPCache;
+        static QStringList      g_IPAddrList;
 
     public:
                  UPnp();
@@ -114,6 +115,7 @@ class UPnp
         void SetConfiguration( Configuration *pConfig );
 
         bool Initialize( int nServicePort, HttpServer *pHttpServer );
+        bool Initialize( QStringList &sIPAddrList, int nServicePort, HttpServer *pHttpServer );
 
         virtual void Start();
 

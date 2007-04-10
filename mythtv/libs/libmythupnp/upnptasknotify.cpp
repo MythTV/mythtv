@@ -122,7 +122,7 @@ void UPnpNotifyTask::Execute( TaskQueue *pQueue )
     // Refresh IP Address List in case of changes
     // ----------------------------------------------------------------------
 
-    GetIPAddressList( m_addressList );
+    m_addressList = UPnp::g_IPAddrList;
 
     // ----------------------------------------------------------------------
     // Must send rootdevice Notification for first device.

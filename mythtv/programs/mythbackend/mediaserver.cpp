@@ -41,7 +41,15 @@ MediaServer::MediaServer( bool bIsMaster, bool bDisableUPnp /* = FALSE */ )
     // Create mini HTTP Server
     // ----------------------------------------------------------------------
 
-    int nPort = g_pConfig->GetValue( "BackendStatusPort", 6544 );
+    int     nPort = g_pConfig->GetValue( "BackendStatusPort", 6544 );
+    QString sIP   = g_pConfig->GetValue( "BackendServerIP"  , ""   );
+
+    if (sIP.isEmpty())
+    {
+        VERBOSE(VB_IMPORTANT, "MediaServer::No BackendServerIP Address defined");
+        return;
+    }
+
 
     m_pHttpServer = new HttpServer( nPort ); 
 
@@ -60,10 +68,16 @@ MediaServer::MediaServer( bool bIsMaster, bool bDisableUPnp /* = FALSE */ )
     }
 
     // ----------------------------------------------------------------------
+    // BackendServerIP is only one IP address at this time... Doing Split anyway
+    // ----------------------------------------------------------------------
+
+    QStringList sIPAddrList = QStringList::split( ";", sIP );
+
+    // ----------------------------------------------------------------------
     // Initialize UPnp Stack
     // ----------------------------------------------------------------------
 
-    if (Initialize( nPort, m_pHttpServer ))
+    if (Initialize( sIPAddrList, nPort, m_pHttpServer ))
     {
 
         QString sSharePath = gContext->GetShareDir();

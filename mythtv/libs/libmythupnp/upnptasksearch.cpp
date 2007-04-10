@@ -127,7 +127,7 @@ void UPnpSearchTask::Execute( TaskQueue * /*pQueue*/ )
     // Refresh IP Address List in case of changes
     // ----------------------------------------------------------------------
 
-    GetIPAddressList( m_addressList );
+    m_addressList = UPnp::g_IPAddrList;
 
     // ----------------------------------------------------------------------
     // Check to see if this is a rootdevice or all request.
