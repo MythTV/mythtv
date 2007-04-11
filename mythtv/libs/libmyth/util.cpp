@@ -34,6 +34,7 @@ using namespace std;
 #include "exitcodes.h"
 #include "util.h"
 #include "mythcontext.h"
+#include "mythmediamonitor.h"
 
 #ifdef CONFIG_DARWIN
 #include <mach/mach.h> 
@@ -190,6 +191,8 @@ uint myth_system(const QString &command, int flags)
     (void)flags; /* Kill warning */
 
     bool ready_to_lock = gContext && gContext->GetMainWindow();
+
+    (void) ready_to_lock;  // stop warning
 #ifdef USE_LIRC
     bool lirc_lock_flag = !(flags & MYTH_SYSTEM_DONT_BLOCK_LIRC);
     LircEventLock lirc_lock(lirc_lock_flag && ready_to_lock);
@@ -417,8 +420,8 @@ long long getDiskSpace(const QString &file_on_disk,
  */
 bool getMemStats(int &totalMB, int &freeMB, int &totalVM, int &freeVM)
 {
-    size_t MB = (1024*1024);
 #ifdef __linux__
+    size_t MB = (1024*1024);
     struct sysinfo sinfo;
     if (sysinfo(&sinfo) == -1)
     {
@@ -471,4 +474,28 @@ bool getMemStats(int &totalMB, int &freeMB, int &totalVM, int &freeVM)
 #endif
 
     return true;
+}
+
+/**
+ * \brief Eject a disk, unmount a drive, open a tray
+ *
+ * If the Media Monitor is enabled, we use its fully-featured routine.
+ * Otherwise, we guess a drive and use a primitive OS-specific command
+ */
+void myth_eject()
+{
+    MediaMonitor *mon = MediaMonitor::GetMediaMonitor();
+    if (mon)
+        mon->ChooseAndEjectMedia();
+    else
+    {
+        VERBOSE(VB_MEDIA, "CD/DVD Monitor isn't enabled.");
+#ifdef __linux__
+        VERBOSE(VB_MEDIA, "Trying Linux 'eject -T' command");
+        myth_system("eject -T");
+#elif defined(CONFIG_DARWIN)
+        VERBOSE(VB_MEDIA, "Trying 'disktool -e disk1");
+        myth_system("disktool -e disk1");
+#endif
+    }
 }

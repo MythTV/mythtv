@@ -14,7 +14,6 @@ using namespace std;
 #include "mythfontproperties.h"
 #include "mythimage.h"
 #include "mythdialogbox.h"
-#include "mythmediamonitor.h"
 
 #include "lcddevice.h"
 #include "mythplugin.h"
@@ -1870,9 +1869,7 @@ bool MythThemedMenuPrivate::keyHandler(QStringList &actions,
         }
         else if (action == "EJECT")
         {
-            MediaMonitor *mon = MediaMonitor::GetMediaMonitor();
-            if (mon)
-                mon->ChooseAndEjectMedia();
+            myth_eject();
         }
         else
             handled = false;
@@ -2078,9 +2075,7 @@ bool MythThemedMenuPrivate::handleAction(const QString &action)
     }
     else if (action.left(5) == "EJECT")
     {
-        MediaMonitor *mon = MediaMonitor::GetMediaMonitor();
-        if (mon)
-            mon->ChooseAndEjectMedia();
+        myth_eject();
     }
     else if (action.left(5) == "JUMP ")
     {
