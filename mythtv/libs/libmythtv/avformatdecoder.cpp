@@ -1553,7 +1553,6 @@ int AvFormatDecoder::ScanStreams(bool novideo)
     {
         if (tracks[kTrackTypeAudio].size() > 1)
         {
-            qBubbleSort(tracks[kTrackTypeAudio]);
             int trackNo = ringBuffer->DVD()->GetTrack(kTrackTypeAudio);
             if (trackNo >= (int)GetTrackCount(kTrackTypeAudio))
                 trackNo = GetTrackCount(kTrackTypeAudio) - 1;
