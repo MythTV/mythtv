@@ -8,7 +8,7 @@
 <H1>Installing and using MythTV</H1>
 
 <H2>Robert Kulagowski, 
-<A HREF="mailto:rkulagow@rocketmail.com">mailto:rkulagow@rocketmail.com</A></H2>2007-04-07, v0.20.19
+<A HREF="mailto:rkulagow@rocketmail.com">mailto:rkulagow@rocketmail.com</A></H2>2007-04-11, v0.20.20
 <HR>
 <EM>Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -2674,7 +2674,8 @@ have only one backend, then it will be its own master.</P>
 <P>The Master backend will always choose the first available tuner in the same
 order as you add cards through "mythtv-setup". In other words, the second
 card you add will only be used when there are two overlapping recordings, 
-the third when there are three, and so on. Therefore, you will want to have
+the third when there are three, and so on. 
+ Therefore, you will want to have
 the greatest amount of disk space on the Master backend because its tuner
 will always be the first choice. You will then want to add your 
 <A HREF="#nonmaster_backend">other backends</A> in the order of your
@@ -2914,24 +2915,46 @@ database.</P>
 <CAPTION>New in MythTV 0.21</CAPTION>
 </FIGURE>
 </P>
+<H3>Introduction.</H3>
 
 <P>Storage Groups are lists of directories that are used to hold MythTV
-recording files.  By default, there is only one Storage Group, called
-"Default".</P>
+recording files giving you a flexible way to allow you to add capacity to
+your MythTV system without having to use exotic solutions such as LVM,
+filesystem expansion or RAID Online Capacity Expansion.  You can also use
+Storage Groups to organize recordings and to put recordings of a certain
+type into one subdirectory.</P>
+<P>Storage Groups do not offer redundancy in case of hard drive failure, but
+unlike LVM, if you lose a hard drive, you only lose the recordings that were
+on that drive.  With LVM, if you lose a hard drive, you will most likely
+lose <B>everything</B>.</P>
+
+<H3>How to use Storage Groups.</H3>
+
+<P>By default, there is only one Storage Group called "Default", and it is
+used for all recordings and Live TV.</P>
 <P>
 <FIGURE>
 <EPS FILE="stop.eps">
 <IMG SRC="stop.png">
-<CAPTION><B>NOTE</B>:  You need to add at least one recording directory to the
-Default Storage Group or else you will not be able to record anything with
-MythTV.</CAPTION>
+<CAPTION><B>NOTE</B>:  You need to add at least one directory to the Default
+Storage Group or else you will not be able to record anything with MythTV.</CAPTION>
 </FIGURE>
 </P>
+<P>For example, if you have 5 hard drives in your system, your first hard drive
+could be your "boot" drive, and the remaining four could be dedicated to
+media storage. You could format the drives and mount them as
+<CODE>/mnt/store/d2</CODE>, <CODE>/mnt/store/d3</CODE>, <CODE>/mnt/store/d4</CODE> and
+<CODE>/mnt/store/d5</CODE>.</P>
+<P>You would then add the four directories specified above into the "Default"
+Storage Group.</P>
+<P>At recording time, if there were four simultaneous recordings, MythTV would
+put one recording onto each drive.</P>
+<P>Or, say that you originally installed MythTV to a 80GB hard drive, and that
+hard drive is now filling up.  You could simply add a new drive to your
+system, mount it and update the Storage Group to add additional space.</P>
 <P>You may create additional Storage Groups to store specific recordings in
-their own directories.  Storage Groups are editted via the 'Storage
-Directories' section of mythtv-setup.  You may want to add multiple
-directories (which are mounted on different hard drives) to a Storage Group
-in order to spread out filesystem I/O onto multiple filesystems.  </P>
+their own directories.  Storage Groups are edited via the 'Storage
+Directories' section of mythtv-setup.  </P>
 <P>You can also create multiple Storage Groups to group recordings together;
 recording schedules now have an option to specify which Storage Group to
 use.</P>
@@ -2944,20 +2967,56 @@ filesystem.  The balancing method is based purely on I/O, Myth does not try
 to balance out disk space unless a filesystem is too low on free disk space
 in which case it will not be used except as a last resort.</P>
 <P>Storage Groups are global, but can be overridden on a slave backend by
-creating a local Storage Group by running mythtv-setup on the slave.  If a
-problem occurs and the slave backend is unable to use the desired Storage
-Group, it will fail back and try the directories defined in the master's
-Storage Group.</P>
-<P>You can also create a special 'LiveTV' Storage Group.  If a LiveTV Storage
-Group directory exists, it will be used instead of putting LiveTV recordings
-in the Default Storage Group, allowing you to put your LiveTV recordings on
-their own filesystem.  This is similar to the old MythTV method which used a
-RingBuffer for LiveTV.</P>
+creating a local Storage Group by running <B>mythtv-setup</B> on the
+slave.  If a problem occurs and the slave backend is unable to use the
+desired Storage Group, it will fail back and try the directories defined in
+the master's Storage Group.</P>
+<P>There's also a special 'LiveTV' Storage Group, but the directory list starts
+out empty.  If you add a directory to the Storage Group, it will be used
+instead of putting LiveTV recordings in the Default Storage Group.  This
+will allow you to put your LiveTV recordings on their own filesystem, which
+is similar to the old MythTV method which used a RingBuffer for LiveTV.  Of
+course, you don't have to do anything, and Live TV recordings will just go
+into the Default Storage Group where they'll be the first programs eligible
+for expiration if the system needs free space for recordings.</P>
 <P>Usage information for all Storage Group directories is visible on the
 mythfrontend status screen as well as the mythbackend status webpage. 
 MythTV is smart enough to determine which directories are on shared
 filesystems so it should not count free or used space multiple times if you
 have more than one directory on the same filesystem.</P>
+
+<H3>Migrating to Storage Groups.</H3>
+
+<P>Migrating to Storage groups is very simple:  if you have existing
+recordings in a storage directory, then the system will automatically add
+that directory to the Default Storage Group.  If you then add additional
+directories to a storage group, the system is flexible enough to check
+<EM>all</EM> Storage Groups for a file before deciding that it can't be
+found, which means that you can use the <B>mv</B> command from the Unix
+command line to arrange files however you'd like.</P>
+
+<H3>Advanced: Algorithm used by the Storage Group</H3>
+
+<P>This section details the logic of the Storage Group allocation engine.</P>
+<P>The current load-balancing preferences (in order) are:
+<UL>
+<LI>Local filesystems over remote</LI>
+<LI>Less-busy (less weight) over more-busy (more weight)</LI>
+<LI>More Free Space over Less Free Space</LI>
+</UL>
+</P>
+<P>The 'business' of a filesystem is determined by weights. The following
+weights are added to a filesystem if it is in use for the following things:
+<UL>
+<LI>recording = +10</LI>
+<LI>playback = +5 (mythfrontend)</LI>
+<LI>comm flagging = +5 (mythcommflag)</LI>
+<LI>transcoding = +5 (mythtranscode)</LI>
+</UL>
+</P>
+<P>If a recording is due to end within 3 minutes, it is not counted against
+the weight of a filesystem. This is done to account for the pre/post-roll
+and start-early/end-late settings. </P>
 
 <H2><A NAME="ss9.2">9.2</A> <A HREF="#toc9.2">Post-configuration</A>
 </H2>
@@ -7895,6 +7954,19 @@ notes on how to use LVM to create storage space for your video files and how
 to add additional disk space in the future. There's lots more that can be
 done with LVM, so check the LVM HOWTO 
 <A HREF="http://tldp.org/HOWTO/LVM-HOWTO/">http://tldp.org/HOWTO/LVM-HOWTO/</A> document for details.</P>
+
+<P>
+<FIGURE>
+<EPS FILE="stop.eps">
+<IMG SRC="stop.png">
+<CAPTION><B>NOTE</B>:  If you are running a trunk version of MythTV after r12151,
+and you are using LVM to create one large filesystem to store your
+recordings, it's no longer recommended that you go the LVM route. the
+preferred solution is to use 
+<A HREF="#storagegroups">Storage Groups</A>. They're more flexible and less likely to lose all of your recordings if you
+have a drive failure.</CAPTION>
+</FIGURE>
+</P>
 <P>If you don't understand how to partition a drive, or how to change the
 partition type you should stop and look at documentation on how to perform
 these steps.</P>
@@ -8155,7 +8227,7 @@ even files as large as 10 gigabytes.</P>
 <P>XFS is a journaling file system originally developed by SGI for Irix, and
 later released as open source.  While not a part of the default RedHat Linux
 9 or Fedora Core installation (although it is a part of Mandriva and Fedora
-Core 2), it can be easily installed via ATrpms.  XFS provides deletion
+Core 2+), it can be easily installed via ATrpms.  XFS provides deletion
 speeds for large files only slightly slower than JFS.  According to the test
 results shown at (
 <A HREF="http://aurora.zemris.fer.hr/filesystems/big.html">http://aurora.zemris.fer.hr/filesystems/big.html</A>), XFS provide

@@ -22,6 +22,19 @@ notes on how to use LVM to create storage space for your video files and how
 to add additional disk space in the future. There's lots more that can be
 done with LVM, so check the LVM HOWTO 
 <A HREF="http://tldp.org/HOWTO/LVM-HOWTO/">http://tldp.org/HOWTO/LVM-HOWTO/</A> document for details.</P>
+
+<P>
+<FIGURE>
+<EPS FILE="stop.eps">
+<IMG SRC="stop.png">
+<CAPTION><B>NOTE</B>:  If you are running a trunk version of MythTV after r12151,
+and you are using LVM to create one large filesystem to store your
+recordings, it's no longer recommended that you go the LVM route. the
+preferred solution is to use 
+<A HREF="mythtv-HOWTO-9.html#storagegroups">Storage Groups</A>. They're more flexible and less likely to lose all of your recordings if you
+have a drive failure.</CAPTION>
+</FIGURE>
+</P>
 <P>If you don't understand how to partition a drive, or how to change the
 partition type you should stop and look at documentation on how to perform
 these steps.</P>
@@ -282,7 +295,7 @@ even files as large as 10 gigabytes.</P>
 <P>XFS is a journaling file system originally developed by SGI for Irix, and
 later released as open source.  While not a part of the default RedHat Linux
 9 or Fedora Core installation (although it is a part of Mandriva and Fedora
-Core 2), it can be easily installed via ATrpms.  XFS provides deletion
+Core 2+), it can be easily installed via ATrpms.  XFS provides deletion
 speeds for large files only slightly slower than JFS.  According to the test
 results shown at (
 <A HREF="http://aurora.zemris.fer.hr/filesystems/big.html">http://aurora.zemris.fer.hr/filesystems/big.html</A>), XFS provide
