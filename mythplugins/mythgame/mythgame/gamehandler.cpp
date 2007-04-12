@@ -386,7 +386,7 @@ void GameHandler::UpdateGameDB(GameHandler *handler)
             }
             else
             {
-                Genre = QObject::tr("Unknown");
+                Genre = QObject::tr( QString("Unknown%1").arg( handler->GameType() ));
                 Country = QObject::tr("Unknown");
                 CRC32 = "";
                 Year = QObject::tr("19xx");
@@ -626,41 +626,37 @@ void GameHandler::processGames(GameHandler *handler)
 
     if (handler->GameType() == "PC") 
     {
-        thequery = QString("INSERT INTO gamemetadata "
-                           "(system, romname, gamename, genre, year, gametype, country, "
-                           "diskcount, display, publisher, version) "
-                           "VALUES ('%1', '%2', '%3', 'UnknownPC', '19xx' , '%4', "
-                           "'Unknown',1,1,'Unknown', '0');")
-                           .arg(handler->SystemName())
-                           .arg(handler->SystemName())
-                           .arg(handler->SystemName())
-                           .arg(handler->GameType());
+        m_GameMap[handler->SystemCmdLine()] = GameScan(handler->SystemCmdLine(),
+                                                       handler->SystemCmdLine(),
+                                                       inFileSystem,
+                                                       handler->SystemName(),
+                                                       handler->SystemCmdLine().left(handler->SystemCmdLine().findRev(QRegExp("/"))));
 
-        query.exec(thequery);
 
         pdial.setProgress(maxcount);
-        // cout << "PC Game " << handler->SystemName() << endl;
+        cout << "PC Game " << handler->SystemName() << endl;
     }
     else
     {   
         int filecount = 0;
         buildFileList(handler->SystemRomPath(),handler,&pdial, &filecount);
-        VerifyGameDB(handler);
-
-	// If we still have some games in the list then update the database
-        if (!m_GameMap.empty())
-        {
-            InitMetaDataMap(handler->GameType());
-
-            UpdateGameDB(handler);
-
-            romDB.clear();
-            handler->setRebuild(true);
-        } 
-        else
-            handler->setRebuild(false);
-
     }
+
+    VerifyGameDB(handler);
+
+    // If we still have some games in the list then update the database
+    if (!m_GameMap.empty())
+    {
+        InitMetaDataMap(handler->GameType());
+
+        UpdateGameDB(handler);
+
+        romDB.clear();
+        handler->setRebuild(true);
+    } 
+    else
+        handler->setRebuild(false);
+
 
     pdial.Close();
 }
