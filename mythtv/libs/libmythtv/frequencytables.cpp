@@ -356,67 +356,96 @@ static void init_freq_tables(freq_table_map_t &fmap)
     uint    mod[]    = { VSB_8,    QAM_256,    QAM_128,    QAM_64,   };
     QString desc[]   = { "ATSC ", "QAM-256 ", "QAM-128 ", "QAM-64 ", };
 
-#define FREQ(A,B, C,D, E,F,G, H) \
+#define FREQ(A,B, C,D, E,F,G, H, I) \
     fmap[QString("atsc_%1_us%2").arg(A).arg(B)] = \
-        new FrequencyTable(C+D, E, F, G, 6000000, H);
+        new FrequencyTable(C+D, E, F, G, H, I);
 
     for (uint i = 0; i < 4; i++)
     {
         // USA Cable, ch 2 to 159 and T.7 to T.14
         FREQ(modStr[i], "cable0", desc[i], "Channel %1",
-             2,    57000000,   69000000, mod[i]); // 2-4
+             2,    57000000,   69000000, 6000000, mod[i]); // 2-4
         FREQ(modStr[i], "cable1", desc[i], "Channel %1",
-             5,    79000000,   85000000, mod[i]); // 5-6
+             5,    79000000,   85000000, 6000000, mod[i]); // 5-6
         FREQ(modStr[i], "cable2", desc[i], "Channel %1",
-             7,   177000000,  213000000, mod[i]); // 7-13
+             7,   177000000,  213000000, 6000000, mod[i]); // 7-13
         FREQ(modStr[i], "cable3", desc[i], "Channel %1",
-             14,  123000000,  171000000, mod[i]); // 14-22
+             14,  123000000,  171000000, 6000000, mod[i]); // 14-22
         FREQ(modStr[i], "cable4", desc[i], "Channel %1",
-             23,  219000000,  645000000, mod[i]); // 23-94
+             23,  219000000,  645000000, 6000000, mod[i]); // 23-94
         FREQ(modStr[i], "cable5", desc[i], "Channel %1",
-             95,   93000000,  117000000, mod[i]); // 95-99
+             95,   93000000,  117000000, 6000000, mod[i]); // 95-99
+        // The center frequency of any EIA-542 std cable channel over 99 is
+        // Frequency_MHz = ( 6 * ( 8 + channel_designation ) ) + 3
         FREQ(modStr[i], "cable6", desc[i], "Channel %1",
-             100, 651000000, 1005000000, mod[i]); // 100-159
+             100, 651000000, 1005000000, 6000000, mod[i]); // 100-159
         FREQ(modStr[i], "cable7", desc[i], "Channel T-%1",
-             7,    8750000,   50750000, mod[i]); // T7-14
+             7,    8750000,   50750000, 6000000, mod[i]); // T7-14
 
         // USA Cable, QAM 256 ch 78 to 159
         FREQ(modStr[i], "cablehigh0", desc[i], "Channel %1",
-             78,  549000000,  645000000, mod[i]); // 78-94
+             78,  549000000,  645000000, 6000000, mod[i]); // 78-94
         FREQ(modStr[i], "cablehigh1", desc[i], "Channel %1",
-             100, 651000000, 1005000000, mod[i]); // 100-159
+             100, 651000000, 1005000000, 6000000, mod[i]); // 100-159
 
-        QString std[]   = { "hrc",  "irc"   };
-        QString sdesc[] = { "HRC ", "IRC "  };
-        int     off[]   = { 0,      1250000 };
+        // USA Cable HRC, ch 1 to 125
+        FREQ(modStr[i], "hrc0", desc[i], "HRC %1",
+             1,    73753600,  73753601, 6000300, mod[i]); // 1
+        FREQ(modStr[i], "hrc1", desc[i], "HRC %1",
+             2,    55752700,  67753300, 6000300, mod[i]); // 2-4
+        FREQ(modStr[i], "hrc2", desc[i], "HRC %1",
+             5,    79753900,  85754200, 6000300, mod[i]); // 5-6
+        FREQ(modStr[i], "hrc3", desc[i], "HRC %1",
+             7,   175758700, 211760500, 6000300, mod[i]); // 7-13
+        FREQ(modStr[i], "hrc4", desc[i], "HRC %1",
+             14,  121756000, 169758400, 6000300, mod[i]); // 14-22
+        FREQ(modStr[i], "hrc5", desc[i], "HRC %1",
+             23,  217760800, 643782100, 6000300, mod[i]); // 23-94
+        FREQ(modStr[i], "hrc6", desc[i], "HRC %1",
+             95,   91754500, 115755700, 6000300, mod[i]); // 95-99
+        // The center frequency of any EIA-542 HRC cable channel over 99 is
+        // Frequency_MHz = ( 6.0003 * ( 8 + channel_designation ) ) + 1.75
+        FREQ(modStr[i], "hrc7", desc[i], "HRC %1",
+             100, 649782400, 799789900, 6000300, mod[i]); // 100-125
 
-        for (uint j = 0; j < 2; j++)
-        {
-            // USA Cable HRC/IRC, ch 1 to 125
-            FREQ(modStr[i], std[j] + "0", desc[i], sdesc[j] + "%1",
-                 1,    73750000 + off[j],  73750001 + off[j], mod[i]);
-            FREQ(modStr[i], std[j] + "1", desc[i], sdesc[j] + "%1",
-                 2,    55750000 + off[j],  67750000 + off[j], mod[i]);
-            FREQ(modStr[i], std[j] + "2", desc[i], sdesc[j] + "%1",
-                 5,    79750000 + off[j],  85750000 + off[j], mod[i]);
-            FREQ(modStr[i], std[j] + "3", desc[i], sdesc[j] + "%1",
-                 7,   175750000 + off[j], 211750000 + off[j], mod[i]);
-            FREQ(modStr[i], std[j] + "4", desc[i], sdesc[j] + "%1",
-                 14,
-                 121750000 + off[j] - (j ? 100000 : 0),
-                 169750000 + off[j] - (j ? 100000 : 0), mod[i]);
-            FREQ(modStr[i], std[j] + "5", desc[i], sdesc[j] + "%1",
-                 23,  217750000 + off[j], 643750000 + off[j], mod[i]);
-            FREQ(modStr[i], std[j] + "6", desc[i], sdesc[j] + "%1",
-                 95,   91750000 + off[j], 115750000 + off[j], mod[i]);
-            FREQ(modStr[i], std[j] + "7", desc[i], sdesc[j] + "%1",
-                 100, 649750000 + off[j], 799750000 + off[j], mod[i]);
+        // USA Cable HRC, ch 76-94 and 100-125
+        // Channels 95-99 are low frequency despite high channel numbers
+        FREQ(modStr[i], "hrchigh0", desc[i], "HRC %1",
+             76,  535776700, 643782100, 6000300, mod[i]); // 76-94
+        FREQ(modStr[i], "hrchigh1", desc[i], "HRC %1",
+             100, 649782400, 799789900, 6000300, mod[i]); // 100-125
 
-            // USA Cable HRC/IRC, ch 76-125
-            FREQ(modStr[i], std[j] + "high0", desc[i], sdesc[j] + "%1",
-                 76,  535750000 + off[j], 643750000 + off[j], mod[i]);
-            FREQ(modStr[i], std[j] + "high1", desc[i], sdesc[j] + "%1",
-                 100, 649750000 + off[j], 799750000 + off[j], mod[i]);
-        }
+        // USA Cable IRC, ch 1 to 125
+        FREQ(modStr[i], "irc0", desc[i], "IRC %1",
+             1,    75012500,  75012501, 6000000, mod[i]); // 1
+        FREQ(modStr[i], "irc1", desc[i], "IRC %1",
+             2,    57012500,  69012500, 6000000, mod[i]); // 2-4
+        FREQ(modStr[i], "irc2", desc[i], "IRC %1",
+             5,    81012500,  87012500, 6000000, mod[i]); // 5-6
+        FREQ(modStr[i], "irc3", desc[i], "IRC %1",
+             7,   177012500, 213012500, 6000000, mod[i]); // 7-13
+        FREQ(modStr[i], "irc4", desc[i], "IRC %1",
+             14,  123012500, 171012500, 6000000, mod[i]); // 14-22
+        FREQ(modStr[i], "irc5", desc[i], "IRC %1",
+             23,  219012500, 327012500, 6000000, mod[i]); // 23-41
+        FREQ(modStr[i], "irc6", desc[i], "IRC %1",
+             42,  333025000, 333025001, 6000000, mod[i]); // 42
+        FREQ(modStr[i], "irc7", desc[i], "IRC %1",
+             43,  339012500, 645012500, 6000000, mod[i]); // 43-94
+        FREQ(modStr[i], "irc8", desc[i], "IRC %1",
+             95,   93012500, 105012500, 6000000, mod[i]); // 95-97
+        FREQ(modStr[i], "irc9", desc[i], "IRC %1",
+             98,  111025000, 117025000, 6000000, mod[i]); // 98-99
+        // The center frequency of any EIA-542 IRC cable channel over 99 is
+        // Frequency_MHz = ( 6 * ( 8 + channel_designation ) ) + 3.0125
+        FREQ(modStr[i], "irc10", desc[i], "IRC %1",
+             100, 651012500, 801012500, 6000000, mod[i]); // 100-125
+
+        // USA Cable IRC, ch 76-94 and 100-125
+        // Channels 95-99 are low frequency despite high channel numbers
+        FREQ(modStr[i], "irchigh0", desc[i], "IRC %1",
+             76,  537012500, 645012500, 6000000, mod[i]); // 76-94
+        FREQ(modStr[i], "irchigh1", desc[i], "IRC %1",
+             100, 651012500, 801012500, 6000000, mod[i]); // 100-125
     }
 }
