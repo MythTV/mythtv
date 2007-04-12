@@ -603,20 +603,19 @@ bool SIScan::HasTimedOut(void)
     if (!waitingForTables)
         return true;
 
-    QString offset_str = current.offset() ?
-        QObject::tr(" offset %2").arg(current.offset()) : "";
-    QString cur_chan = QString("%1%2")
-        .arg((*current).FriendlyName).arg(offset_str);
-    QString time_out_table_str =
-        QObject::tr("Timeout Scanning %1 -- no tables").arg(cur_chan);
-    QString time_out_sig_str =
-        QObject::tr("Timeout Scanning %1 -- no signal").arg(cur_chan);
-
     // have the tables have timed out?
     if (timer.elapsed() > (int)channelTimeout)
     { 
+        QString offset_str = current.offset() ?
+            QObject::tr(" offset %2").arg(current.offset()) : "";
+        QString cur_chan = QString("%1%2")
+            .arg((*current).FriendlyName).arg(offset_str);
+        QString time_out_table_str =
+            QObject::tr("Timeout Scanning %1 -- no tables").arg(cur_chan);
+
         emit ServiceScanUpdateText(time_out_table_str);
         VERBOSE(VB_SIPARSER, LOC + time_out_table_str);
+
         return true;
     }
 
@@ -627,6 +626,13 @@ bool SIScan::HasTimedOut(void)
         SignalMonitor *sm = GetSignalMonitor();
         if (NULL == sm || sm->HasSignalLock())
             return false;
+
+        QString offset_str = current.offset() ?
+            QObject::tr(" offset %2").arg(current.offset()) : "";
+        QString cur_chan = QString("%1%2")
+            .arg((*current).FriendlyName).arg(offset_str);
+        QString time_out_sig_str =
+            QObject::tr("Timeout Scanning %1 -- no signal").arg(cur_chan);
 
         emit ServiceScanUpdateText(time_out_sig_str);
         VERBOSE(VB_SIPARSER, LOC + time_out_sig_str);
