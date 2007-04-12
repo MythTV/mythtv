@@ -230,6 +230,9 @@ void RingBuffer::OpenFile(const QString &lfilename, uint retryCount)
                 else
                 {
                     lseek(fd2, 0, SEEK_SET);
+#ifdef HAVE_POSIX_FADVISE
+                    posix_fadvise(fd2, 0, 0, POSIX_FADV_SEQUENTIAL);
+#endif
                     openAttempts = 0;
                     break;
                 }

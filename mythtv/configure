@@ -522,6 +522,7 @@ HAVE_LIST='
     mlib
     os2
     os2threads
+    posix_fadvise
     pthreads
     round
     sdl
@@ -2251,6 +2252,7 @@ check_header byteswap.h
 
 check_func inet_aton
 check_func localtime_r
+check_func posix_fadvise
 enabled zlib && check_lib zlib.h zlibVersion -lz || zlib="no"
 
 # check for some common methods of building with pthread support
