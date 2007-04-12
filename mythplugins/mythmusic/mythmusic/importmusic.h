@@ -42,7 +42,6 @@ class ImportMusicDialog : public MythThemedDialog
     void doScan(void);
 
   public slots:
-    void closeDialog();
     void editLostFocus();
     void addAllNewPressed(void);
     void playPressed(void);
