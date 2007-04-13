@@ -207,14 +207,18 @@ QStringList MediaMonitorUnix::GetCDROMBlockDevices(void)
             line = stream.readLine();
             if (line.startsWith("drive name:"))
             {
-                QString s = line.section('\t', 2, 2);
-                l.append(s);
+                QStringList  devs = QStringList::split('\t', line);
+
+                devs.pop_front();   // Remove 'drive name:' field
+                l += devs;
             }
         }
         file.close();
     }
 #endif // linux
 
+    VERBOSE(VB_MEDIA, "MediaMonitorUnix::GetCDROMBlockDevices() returning "
+                      + l.join(", "));
     return l;
 }
 
