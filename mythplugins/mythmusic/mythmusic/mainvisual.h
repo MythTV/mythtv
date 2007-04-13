@@ -18,6 +18,7 @@
 #include <qimage.h>
 #include <qptrlist.h>
 #include <qstringlist.h>
+#include <qtimer.h>
 
 class Buffer;
 class Output;
@@ -27,6 +28,7 @@ class QTimer;
 class VisFactory;
 class InfoWidget;
 class Metadata;
+class MainVisual;
 
 class VisualNode
 {
@@ -95,11 +97,14 @@ public:
     void resizeEvent( QResizeEvent * );
     void customEvent( QCustomEvent * );
     void hideEvent( QHideEvent * );
-    
+
     void setFrameRate( int newfps );
     int frameRate() const { return fps; }
 
-    void addInformation(const QString &);
+    void showBanner(const QString &text, int showTime = 8000);
+    void showBanner(Metadata *meta, bool fullScreen, int visMode, int showTime = 8000);
+    void hideBanner();
+    bool bannerIsShowing(void) {return bannerTimer->isActive(); }
 
     static void registerVisFactory(VisFactory *);
     static VisualBase *createVis(const QString &name,
@@ -111,6 +116,7 @@ public:
 
 public slots:
     void timeout();
+    void bannerTimeout();
 
 signals:
     void hidingVisualization();
@@ -122,6 +128,7 @@ private:
     QPixmap pixmap;
     QPtrList<VisualNode> nodes;
     QTimer *timer;
+    QTimer *bannerTimer;
     bool playing;
     int fps;
 
@@ -135,12 +142,15 @@ class InfoWidget : public QWidget
 
 public:
     InfoWidget(QWidget *parent = 0);
-    void addInformation(const QString &);
+    void showInformation(const QString &text);
+    void showMetadata(Metadata *meta, bool fullScreen, int visMode);
     void paintEvent(QPaintEvent *);
+    void setDisplayRect(QRect rect) { displayRect = rect; }
 
 private:
     QString info;
     QPixmap info_pixmap;
+    QRect   displayRect;
 };
 
 class VisFactory

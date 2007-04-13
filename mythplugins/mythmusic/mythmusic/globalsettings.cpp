@@ -372,6 +372,16 @@ static HostCheckBox *VisualCycleOnSongChange()
     return gc;
 };
 
+static HostCheckBox *ShowAlbumArtOnSongChange()
+{
+    HostCheckBox *gc = new HostCheckBox("VisualAlbumArtOnSongChange");
+    gc->setLabel(QObject::tr("Show Album Art at the start of each song"));
+    gc->setValue(false);
+    gc->setHelpText(QObject::tr("When the song changes and the new song has an album art "
+                                "image display it in the visualizer for a short period."));
+    return gc;
+};
+
 static HostSpinBox *VisualScaleWidth()
 {
     HostSpinBox *gc = new HostSpinBox("VisualScaleWidth", 1, 2, 1);
@@ -599,6 +609,7 @@ MusicPlayerSettings::MusicPlayerSettings(void)
     playersettings3->setLabel(QObject::tr("Visualization Settings"));
     playersettings3->addChild(VisualizationMode());
     playersettings3->addChild(VisualCycleOnSongChange());
+    playersettings3->addChild(ShowAlbumArtOnSongChange());
     playersettings3->addChild(VisualModeDelay());
     playersettings3->addChild(VisualScaleWidth());
     playersettings3->addChild(VisualScaleHeight());

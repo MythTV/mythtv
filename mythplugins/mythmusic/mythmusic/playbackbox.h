@@ -77,7 +77,7 @@ class PlaybackBoxMusic : public MythThemedDialog
     void toggleFullBlankVisualizer();
     void end();
     void resetScrollCount();
-    
+
     void occasionallyCheckCD();
 
     // popup menu
@@ -87,7 +87,7 @@ class PlaybackBoxMusic : public MythThemedDialog
     void byArtist();
     void byAlbum();
     void byGenre();
-    void byYear();    
+    void byYear();
     void fromCD();
     void showSmartPlaylistDialog();
     void showSearchDialog();
@@ -112,7 +112,7 @@ class PlaybackBoxMusic : public MythThemedDialog
     void postUpdate();
     void playFirstTrack();
     void bannerEnable(QString text, int millis);
-    void bannerEnable(Metadata *mdata);
+    void bannerEnable(Metadata *mdata, bool fullScreen = false);
     void bannerToggle(Metadata *mdata);
     void savePosition(uint position);
     void restorePosition(void);
@@ -174,7 +174,6 @@ class PlaybackBoxMusic : public MythThemedDialog
     int visual_mode_delay;
     QTimer *visual_mode_timer;
     QTimer *lcd_update_timer;
-    QTimer *banner_timer;
     QTimer *speed_scroll_timer;
     int visualizer_status;
 
@@ -182,7 +181,7 @@ class PlaybackBoxMusic : public MythThemedDialog
     bool vis_is_big;
     bool tree_is_done;
     bool first_playlist_check;
-    
+
     AllMusic *all_music;
     PlaylistsContainer *all_playlists;
 
@@ -190,8 +189,9 @@ class PlaybackBoxMusic : public MythThemedDialog
     QTimer  *volume_display_timer;
 
     GenericTree *playlist_tree;
-    
+
     bool cycle_visualizer;
+    bool show_album_art;
     bool show_whole_tree;
     bool keyboard_accelerators;
     bool volume_control;
@@ -210,7 +210,7 @@ class PlaybackBoxMusic : public MythThemedDialog
     UITextType            *time_text;
     UITextType            *info_text;
     UITextType            *current_visualization_text;
-    
+
     UIRepeatedImageType   *ratings_image;
     UIBlackHoleType       *visual_blackhole;
 

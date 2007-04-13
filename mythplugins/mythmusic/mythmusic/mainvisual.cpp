@@ -103,16 +103,18 @@ MainVisual::MainVisual(QWidget *parent, const char *name)
 {
     int screenwidth = 0, screenheight = 0;
     float wmult = 0, hmult = 0;
-   
+
     gContext->GetScreenSettings(screenwidth, wmult, screenheight, hmult);
 
     setGeometry(0, 0, parent->width(), parent->height());
-    //setFixedSize(QSize(parent->width(), parent->height()));
 
     setFont(gContext->GetBigFont());
     setCursor(QCursor(Qt::BlankCursor));
 
     info_widget = new InfoWidget(this);
+
+    bannerTimer = new QTimer(this);
+    connect(bannerTimer, SIGNAL(timeout()), this, SLOT(bannerTimeout()));
 
     timer = new QTimer(this);
     connect(timer, SIGNAL(timeout()), this, SLOT(timeout()));
@@ -121,7 +123,7 @@ MainVisual::MainVisual(QWidget *parent, const char *name)
 
 MainVisual::~MainVisual()
 {
-    if(vis)
+    if (vis)
     {
         delete vis;
         vis = 0;
@@ -129,6 +131,12 @@ MainVisual::~MainVisual()
 
     delete info_widget;
     info_widget = 0;
+
+    delete timer;
+    timer = 0;
+
+    delete bannerTimer;
+    bannerTimer = 0;
 
     nodes.setAutoDelete(TRUE);
     nodes.clear();
@@ -166,7 +174,7 @@ void MainVisual::setVisual( const QString &visualname )
         int i = 1 + (int)((double)rand() / (RAND_MAX + 1.0) * numvis);
         VisFactory *fact = visfactories->at(i);
         current_visual_name = fact->name();
-        
+
     }
     else 
     {
@@ -283,7 +291,7 @@ void MainVisual::timeout()
     }
 
     VisualNode *node = 0;
-    
+
     if (playing && output()) {
         long synctime = output()->GetAudiotime();
         mutex()->lock();
@@ -291,7 +299,7 @@ void MainVisual::timeout()
         while ((node = nodes.first())) {
             if (node->offset > synctime)
                 break;
-            
+
             delete prev;
             nodes.removeFirst();
             prev = node;
@@ -332,32 +340,35 @@ void MainVisual::resizeEvent( QResizeEvent *event )
     if ( vis )
         vis->resize( size() );
 
-    info_widget->resize((int)(pixmap.width() * 0.8), (int)(pixmap.height() * 0.15));
-    info_widget->move((int)(pixmap.width() * 0.1), (int)(pixmap.height() * 0.8));
+    info_widget->setDisplayRect(QRect((int)(pixmap.width() * 0.1), 
+                                      (int)(pixmap.height() * 0.75),
+                                      (int)(pixmap.width() * 0.8), 
+                                      (int)(pixmap.height() * 0.18)));
 }
 
 void MainVisual::customEvent(QCustomEvent *event)
 {
-    switch (event->type()) {
-    case OutputEvent::Playing:
-	playing = TRUE;
-	// fall through intended
+    switch (event->type()) 
+    {
+        case OutputEvent::Playing:
+        playing = TRUE;
+        // fall through intended
 
-    case OutputEvent::Info:
-    case OutputEvent::Buffering:
-    case OutputEvent::Paused:
-	if (! timer->isActive())
-	    timer->start(1000 / fps);
+        case OutputEvent::Info:
+        case OutputEvent::Buffering:
+        case OutputEvent::Paused:
+            if (! timer->isActive())
+                timer->start(1000 / fps);
 
-	break;
+            break;
 
-    case OutputEvent::Stopped:
-    case OutputEvent::Error:
-	playing = FALSE;
-	break;
+        case OutputEvent::Stopped:
+        case OutputEvent::Error:
+            playing = FALSE;
+            break;
 
-    default:
-	;
+        default:
+            ;
     }
 }
 
@@ -373,8 +384,27 @@ void MainVisual::registerVisFactory(VisFactory *vis)
     visfactories->append(vis);
 }
 
-void MainVisual::addInformation(const QString &new_info) {
-    info_widget->addInformation(new_info);
+void MainVisual::showBanner(const QString &text, int showTime)
+{
+    bannerTimer->start(showTime);
+    info_widget->showInformation(text);
+}
+
+void MainVisual::showBanner(Metadata *metadata, bool fullScreen, int visMode, int showTime)
+{
+    bannerTimer->start(showTime);
+    info_widget->showMetadata(metadata, fullScreen, visMode);
+}
+
+void MainVisual::hideBanner(void)
+{
+    bannerTimer->stop();
+    info_widget->showInformation("");
+}
+
+void MainVisual::bannerTimeout(void) 
+{
+    hideBanner();
 }
 
 VisualBase *MainVisual::createVis(const QString &name, MainVisual *parent,
@@ -398,70 +428,155 @@ VisualBase *MainVisual::createVis(const QString &name, MainVisual *parent,
     return vis;
 }
 
-/*
-
-VisualBase *MainVisual::randomVis(MainVisual *parent, long int winid)
-{
-    checkVisFactories();
-
-    VisualBase *vis = 0;
-
-    int numvis = visfactories->count() - 1;
-    int i = 1 + (int)((double)rand() / (RAND_MAX + 1.0) * numvis);
-
-    VisFactory *fact = visfactories->at(i);
-
-    if (fact)
-    {
-        vis = fact->create(parent, winid);
-    }    
-
-    return vis;
-}
-*/
-
 InfoWidget::InfoWidget(QWidget *parent)
     : QWidget( parent)
 {
     hide();
 }
 
-void InfoWidget::addInformation(const QString &new_info) {
-    if (new_info == info)
+void InfoWidget::showMetadata(Metadata *mdata, bool fullScreen, int visMode)
+{
+    if (!mdata)
         return;
-    
-    info = new_info;
+
+    QString  text = "\"" + mdata->Title() + "\"\n" +  mdata->Artist() + "\n" + mdata->Album();
+    QString albumArt = mdata->getAlbumArt(IT_FRONTCOVER);
+
+    if (text == info)
+        return;
+
+    info = text;
     if (info.isEmpty())
-    {        
+    {
         hide();
         return;
     }
 
-    info_pixmap = QPixmap(width(), height()/*, pixmap.depth ()*/);
+    // only show the banner in embeded mode if asked to...
+    if (visMode != 2 && !fullScreen)
+    {
+        hide();
+        return;
+    }
+
+    // ...and only then when we have an album art image to show
+    if (visMode != 2 && fullScreen && albumArt == "")
+    {
+        hide();
+        return;
+    }
+
+    if (fullScreen && albumArt != "")
+    {
+        resize(parentWidget()->width(), parentWidget()->height());
+        move(0, 0);
+    }
+    else
+    {
+        resize(displayRect.width(), displayRect.height());
+        move(displayRect.x(), displayRect.y());
+    }
+
+    info_pixmap = QPixmap(width(), height());
     QPainter p(&info_pixmap);
 
     int indent = int(info_pixmap.width() * 0.02);
 
-    p.fillRect(0, 0,
-               info_pixmap.width(), info_pixmap.height(),
-               QColor ("darkblue"));
+    p.setFont(gContext->GetMediumFont());
 
+    QFontMetrics fm(p.font());
+    int textWidth = fm.width(info);
+    int textHeight = fm.height() * (info.contains("\n") + 1);
+    int x = indent;
+    int y = indent;
+
+    if (fullScreen && albumArt != "")
+    {
+        p.fillRect(0, 0, info_pixmap.width(), info_pixmap.height(), QColor ("black"));
+
+        // draw the albumArt image
+        QImage image(albumArt);
+        image = image.smoothScale(width(), height(), QImage::ScaleMin);
+        p.drawImage(QPoint(width() / 2 - image.width() / 2, height() / 2 - image.height() / 2), image);
+
+        x += displayRect.x();
+        y += displayRect.y();
+        // only show the text box if the visualiser is actually fullscreen
+        if (visMode == 2)
+            p.fillRect(displayRect, QColor ("darkblue"));
+    }
+    else
+    {
+        p.fillRect(0, 0, info_pixmap.width(), info_pixmap.height(), QColor ("darkblue"));
+
+        if (albumArt != "")
+        {
+            // draw the albumArt image
+
+            QImage image(albumArt);
+            image = image.smoothScale(height(), height(), QImage::ScaleMin);
+            p.drawImage(QPoint(0, 0), image);
+            x += height();
+        }
+    }
+
+    // only show the text if the visualiser is in fullscreen mode
+    if (!fullScreen || visMode == 2)
+    {
+        QString info_copy = info;
+        for (int offset = 0; offset < textHeight; offset += fm.height()) 
+        {
+            QString l = info_copy.left(info_copy.find("\n"));
+            p.setPen(Qt::black);
+            p.drawText(x + 2, y + offset + 2, textWidth, textHeight, Qt::AlignLeft, l);
+            p.setPen(Qt::white);
+            p.drawText(x, y + offset, textWidth, textHeight, Qt::AlignLeft, l);
+            info_copy.remove(0, l.length () + 1);
+        }
+    }
+
+    show();
+    repaint();
+}
+
+void InfoWidget::showInformation(const QString &text)
+{
+    if (text == info)
+        return;
+
+    info = text;
+    if (info.isEmpty())
+    {
+        hide();
+        return;
+    }
+
+    resize(displayRect.width(), displayRect.height());
+    move(displayRect.x(), displayRect.y());
+
+    info_pixmap = QPixmap(width(), height());
+    QPainter p(&info_pixmap);
+
+    int indent = int(info_pixmap.width() * 0.02);
 
     p.setFont(gContext->GetMediumFont());
 
     QFontMetrics fm(p.font());
-    int width = fm.width(info);
-    int height = fm.height() * (info.contains("\n") + 1);
+    int textWidth = fm.width(info);
+    int textHeight = fm.height() * (info.contains("\n") + 1);
     int x = indent;
     int y = indent;
 
+    p.fillRect(0, 0, info_pixmap.width(), info_pixmap.height(), QColor ("darkblue"));
+
     QString info_copy = info;
-    for (int offset = 0; offset < height; offset += fm.height()) {
+    for (int offset = 0; offset < textHeight; offset += fm.height()) 
+    {
         QString l = info_copy.left(info_copy.find("\n"));
         p.setPen(Qt::black);
-        p.drawText(x + 2, y + offset + 2, width, height, Qt::AlignLeft, l);
+        p.drawText(x + 2, y + offset + 2, textWidth, textHeight, Qt::AlignLeft, l);
         p.setPen(Qt::white);
-        p.drawText(x, y + offset, width, height, Qt::AlignLeft, l);
+        p.drawText(x, y + offset, textWidth, textHeight, Qt::AlignLeft, l);
         info_copy.remove(0, l.length () + 1);
     }
 
@@ -469,9 +584,9 @@ void InfoWidget::addInformation(const QString &new_info) {
     repaint();
 }
 
-void InfoWidget::paintEvent ( QPaintEvent * ) 
+void InfoWidget::paintEvent( QPaintEvent * ) 
 {
-    bitBlt(this, 0, 0, &info_pixmap); 
+    bitBlt(this, 0, 0, &info_pixmap);
 }
 
 StereoScope::StereoScope()
