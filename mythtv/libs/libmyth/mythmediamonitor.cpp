@@ -495,6 +495,7 @@ QString MediaMonitor::defaultDevice(QString dbSetting, QString label)
                 d = NULL;
 
             if (d)
+                device = d->getDevicePath();
         }
     }
 
