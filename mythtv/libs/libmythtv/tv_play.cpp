@@ -5461,7 +5461,7 @@ void TV::EPGChannelUpdate(uint chanid, QString channum)
     {
         // hide the channel number, activated by certain signal monitors
         if (GetOSD())
-            GetOSD->HideSet("channel_number");
+            GetOSD()->HideSet("channel_number");
 
         QMutexLocker locker(&queuedInputLock);
         // we need to use deep copy bcs this can be called from another thread.
