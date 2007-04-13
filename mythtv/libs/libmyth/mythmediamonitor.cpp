@@ -95,6 +95,63 @@ static const QString DevName(MythMediaDevice *d)
     return str;
 }
 
+/**
+ * \brief Popup a dialog box for the user to select one drive.
+ *  
+ * Has to iterate through all devices to check if any are suitable,
+ * prevent drawing a list if there is only one drive, et cetera
+ */ 
+MythMediaDevice * MediaMonitor::selectDrivePopup(const QString label,
+                                                 bool          showMounted)
+{       
+    QValueList <MythMediaDevice *>           drives;
+    QValueList <MythMediaDevice *>::iterator it = m_Devices.begin();
+    QMutexLocker                             locker(&m_DevicesLock);
+
+    for (it = m_Devices.begin(); it != m_Devices.end(); ++it)
+    {
+        // We can't currently tell if a MediaMonitor device is a CD/DVD,
+        // but if the device is ejectable that's probably safe.
+        // Caller can also request mounted drives to be listed:
+
+        if ((*it)->getAllowEject() || (showMounted && (*it)->isMounted()))
+            drives.append(*it);
+    }
+
+    if (drives.count() == 0)
+    {
+        VERBOSE(VB_MEDIA, "MediaMonitor::selectDrivePopup("
+                          + label + ") - No suitable devices");
+        return NULL;
+    }
+
+    if (drives.count() == 1)
+    {
+        VERBOSE(VB_MEDIA, "MediaMonitor::selectDrivePopup("
+                          + label + ") - One suitable device");
+        return drives.front();
+    }
+
+    MythPopupBox box(gContext->GetMainWindow(), "select drive");
+    box.addLabel(label);
+    for (it = drives.begin(); it != drives.end(); ++it)
+        box.addButton(DevName(*it));
+
+    box.addButton(tr("Cancel"))->setFocus();
+
+    int ret = box.ExecPopup();
+
+    // If the user cancelled, return a special value
+    if (ret < 0)
+        return (MythMediaDevice *)-1;
+
+    if ((uint)ret < drives.count())
+        return drives[ret];
+
+    return NULL;
+}
+
+
 /** \fn MediaMonitor::ChooseAndEjectMedia(void)
  *  \brief Unmounts and ejects removable media devices.
  *
@@ -105,53 +162,22 @@ static const QString DevName(MythMediaDevice *d)
  */
 void MediaMonitor::ChooseAndEjectMedia(void)
 {
-    MythMediaDevice *selected = NULL;
+    MythMediaDevice *selected;
 
-    QMutexLocker locker(&m_DevicesLock);
 
-    if (m_Devices.count() == 1)
-    {
-        if (m_Devices.first()->getAllowEject())
-            selected = m_Devices.first();
-    }
-    else if (m_Devices.count() > 1)
-    {
-        MythPopupBox ejectbox(gContext->GetMainWindow(), "eject media");
+    selected = selectDrivePopup(tr("Select removable media to eject"), true);
 
-        ejectbox.addLabel(tr("Select removable media to eject"));
+    // If the user cancelled, no need to display or do anything more
+    if (selected == (MythMediaDevice *) -1)
+        return;
 
-        QValueList <MythMediaDevice *> shownDevices;
-        QValueList <MythMediaDevice *>::iterator it = m_Devices.begin();
-        while (it != m_Devices.end())
-        {
-            // if the device is ejectable (ie a CD or DVD device)
-            // or if it is mounted (ie a USB memory stick)
-            // then add it to the list of choices
-            if ((*it)->getAllowEject() || (*it)->isMounted(true))
-            {
-                shownDevices.append(*it);
-                ejectbox.addButton(DevName(*it));
-            }
-
-            it++;
-        }
-
-        ejectbox.addButton(tr("Cancel"))->setFocus();
-
-        int ret = ejectbox.ExecPopup();
-
-        if ((uint)ret < shownDevices.count())
-            selected = shownDevices[ret];
-    }
-    else
+    if (!selected)
     {
         MythPopupBox::showOkPopup(gContext->GetMainWindow(),
                                   "nothing to eject ",
                                   tr("No devices to eject"));
-    }
-
-    if (!selected)
         return;
+    }
 
     bool doEject = false;
     int   status = selected->getStatus();
@@ -437,4 +463,98 @@ void MediaMonitor::mediaStatusChanged(MediaStatus oldStatus,
     {
         pMedia->clearData();
     }
+}
+
+/*
+ * These methods return the user's preferred devices for playing and burning
+ * CDs and DVDs. Traditionally we had a database setting to remember this,
+ * but that is a bit wasteful when most users only have one drive.
+ *
+ * To make it a bit more beginner friendly, if no database default exists,
+ * or if it contins "default", the code tries to guess the correct drive,
+ * or put a dialog box up if there are several valid options.
+ *
+ * Ideally, these would return a MythMediaDevice * instead of a QString
+ */
+
+QString MediaMonitor::defaultDevice(QString dbSetting, QString label)
+{
+    QString device = gContext->GetSetting(dbSetting);
+
+    // No settings database defaults. Try to choose one:
+    if (device.isEmpty() || device == "default")
+    {
+        if (!c_monitor)
+            c_monitor = GetMediaMonitor();
+
+        if (c_monitor)
+        {
+            MythMediaDevice *d = c_monitor->selectDrivePopup(label);
+
+            if (d == (MythMediaDevice *) -1)    // User cancelled
+                d = NULL;
+
+            if (d)
+        }
+    }
+
+    return device;
+}
+
+/**
+ * CDDevice, user-selected drive, or /dev/cdrom
+ */
+QString MediaMonitor::defaultCDdevice()
+{
+    QString device = defaultDevice("CDDevice", tr("Select a CD drive"));
+    if (device.length())
+        return device;
+
+    // Last resort:
+    return "/dev/cdrom";
+}
+
+/**
+ * VCDDeviceLocation, user-selected drive, or /dev/cdrom
+ */
+QString MediaMonitor::defaultVCDdevice()
+{
+    QString device = defaultDevice("VCDDeviceLocation",
+                                   tr("Select a VCD drive"));
+    if (device.length())
+        return device;
+
+    // Last resort:
+    return "/dev/cdrom";
+}
+
+/**
+ * DVDDeviceLocation, user-selected drive, or /dev/dvd
+ */
+QString MediaMonitor::defaultDVDdevice()
+{
+    QString device = defaultDevice("DVDDeviceLocation",
+                                   tr("Select a DVD drive"));
+    if (device.length())
+        return device;
+
+    // Last resort:
+    return "/dev/dvd";
+}
+
+/**
+ * \brief MythArchiveDVDLocation, user-selected drive, or /dev/dvd
+ *
+ * This should also look for drives with blanks or RWs in them,
+ * but Nigel hasn't worked out how to do this tidily (yet).
+ */
+QString MediaMonitor::defaultWriter()
+{
+    QString device = defaultDevice("MythArchiveDVDLocation",
+                                   tr("Select a DVD writer"));
+    if (device.length())
+        return device;
+
+    // Last resort:
+    return "/dev/dvd";
 }

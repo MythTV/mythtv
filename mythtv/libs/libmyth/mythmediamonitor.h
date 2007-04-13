@@ -68,6 +68,12 @@ class MPUBLIC MediaMonitor : public QObject
 
     void MonitorRegisterExtensions(uint mediaType, const QString &extensions);
 
+    // Plugins should use these if they need to access optical disks:
+    static QString defaultCDdevice();
+    static QString defaultVCDdevice();
+    static QString defaultDVDdevice();
+    static QString defaultWriter();
+
     virtual QStringList GetCDROMBlockDevices(void) = 0;
 
   public slots:
@@ -78,6 +84,9 @@ class MPUBLIC MediaMonitor : public QObject
     virtual void CheckDeviceNotifications(void) {};
     virtual bool AddDevice(MythMediaDevice* pDevice) = 0;
     bool RemoveDevice(const QString &dev);
+
+    static QString   defaultDevice(const QString setting, const QString label);
+    MythMediaDevice *selectDrivePopup(const QString label, bool mounted=false);
 
   protected:
     QMutex                       m_DevicesLock;
