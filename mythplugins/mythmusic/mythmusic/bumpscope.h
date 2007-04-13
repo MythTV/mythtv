@@ -21,6 +21,7 @@ public:
     void resize(const QSize &size);
     bool process(VisualNode *node);
     bool draw(QPainter *p, const QColor &back);
+    void handleKeyPress(const QString &action) {(void) action;}
 
 private:
     void blur_8(unsigned char *ptr, int w, int h, int bpl);

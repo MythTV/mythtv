@@ -59,6 +59,7 @@ class VisualBase
     virtual bool process( VisualNode *node ) = 0;
     virtual bool draw( QPainter *, const QColor & ) = 0;
     virtual void resize( const QSize &size ) = 0;
+    virtual void handleKeyPress(const QString &action) = 0;
     virtual int getDesiredFPS(void) { return fps; }
     void drawWarning(QPainter *, const QColor &, const QSize &, QString);
 
@@ -160,6 +161,7 @@ public:
     void resize( const QSize &size );
     bool process( VisualNode *node );
     bool draw( QPainter *p, const QColor &back );
+    void handleKeyPress(const QString &action) {(void) action;}
 
 protected:
     QColor startColor, targetColor;

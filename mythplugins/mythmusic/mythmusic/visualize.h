@@ -54,6 +54,7 @@ class Spectrum : public VisualBase
     virtual void resize(const QSize &size);
     bool process(VisualNode *node);
     virtual bool draw(QPainter *p, const QColor &back = Qt::black);
+    void handleKeyPress(const QString &action) {(void) action;}
 
   protected:
     inline double clamp(double cur, double max, double min);
@@ -93,6 +94,7 @@ class AlbumArt : public VisualBase
     void resize(const QSize &size);
     bool process(VisualNode *node = 0);
     bool draw(QPainter *p, const QColor &back = Qt::black);
+    void handleKeyPress(const QString &action);
     bool needsUpdate();
     QString getImageFilename();
 
@@ -122,6 +124,7 @@ class Blank : public VisualBase
     void resize(const QSize &size);
     bool process(VisualNode *node = 0);
     bool draw(QPainter *p, const QColor &back = Qt::black);
+    void handleKeyPress(const QString &action) {(void) action;}
 
   private:
     QSize size;
@@ -140,9 +143,10 @@ class Squares : public Spectrum
   public:
     Squares();
     virtual ~Squares();
-    
+
     void resize (const QSize &newsize);
     bool draw(QPainter *p, const QColor &back = Qt::black);
+    void handleKeyPress(const QString &action) {(void) action;}
 
   private:
     void drawRect(QPainter *p, QRect *rect, int i, int c, int w, int h);
@@ -173,6 +177,7 @@ class Gears : public QGLWidget, public VisualBase
     void resize(const QSize &size);
     bool process(VisualNode *node);
     bool draw(QPainter *p, const QColor &back);
+    void handleKeyPress(const QString &action) {(void) action;}
 
   protected:
     void initializeGL();

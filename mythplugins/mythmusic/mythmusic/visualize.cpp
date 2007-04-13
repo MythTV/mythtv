@@ -324,6 +324,11 @@ bool AlbumArt::process(VisualNode *node)
     return true;
 }
 
+void AlbumArt::handleKeyPress(const QString &action)
+{
+    cout << "AlbumArt::handleKeyPress: " << action << endl;
+}
+
 bool AlbumArt::needsUpdate() {
     if (m_cursize != m_size)
         return true;

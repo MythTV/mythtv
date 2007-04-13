@@ -391,12 +391,12 @@ void PlaybackBoxMusic::keyPressEvent(QKeyEvent *e)
             changeVolume(true);
         else if (action == "MUTE")
             toggleMute();
-        else if (action == "MENU")
+        else if (action == "MENU" && visualizer_status != 2)
         {
             menufilters = false;
             showMenu();
         }
-        else if (action == "FILTER")
+        else if (action == "FILTER" && visualizer_status != 2)
         {
             menufilters = true;
             showMenu();
@@ -422,11 +422,11 @@ void PlaybackBoxMusic::keyPressEvent(QKeyEvent *e)
             {
                 visualizer_status = 1;
                 QString visual_workaround = mainvisual->getCurrentVisual();
- 
+
                 // We may have gotten to full screen by pushing 7
                 // (full screen blank). Or it may be blank because
                 // the user likes "Blank". Figure out what to do ...
-            
+
                 if (visual_workaround == "Blank" && visual_mode != "Blank")
                     visual_workaround = visual_mode;
 
@@ -443,6 +443,11 @@ void PlaybackBoxMusic::keyPressEvent(QKeyEvent *e)
 
                 if (!m_parent->IsExitingToMain())
                     handled = true;
+            }
+            else
+            {
+                // pass the key press on to the visualiser
+                mainvisual->visual()->handleKeyPress(action);
             }
         }
     }
