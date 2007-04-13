@@ -13,6 +13,24 @@
 class AllMusic;
 class CoverArt;
 
+enum ImageType
+{
+    IT_UNKNOWN = 0,
+    IT_FRONTCOVER,
+    IT_BACKCOVER,
+    IT_CD,
+    IT_INLAY,
+    IT_LAST
+};
+
+typedef struct AlbumArtImage
+{
+    int       id;
+    QString   filename;
+    ImageType imageType;
+    QString   typeName;
+} AlbumArtImage;
+
 class Metadata
 {
   public:
@@ -156,6 +174,7 @@ class Metadata
     static QStringList fillFieldList(QString field);
 
     QStringList AlbumArtInDir(QString directory);
+    QString getAlbumArt(ImageType type);
 
   private:
     void setCompilationFormatting(bool cd = false);
@@ -361,23 +380,6 @@ class AllMusic
     double                   m_lastplayMax;
 
 };
-
-enum ImageType
-{
-    IT_UNKNOWN = 0,
-    IT_FRONTCOVER,
-    IT_BACKCOVER,
-    IT_CD,
-    IT_INLAY
-};
-
-typedef struct AlbumArtImage
-{
-    int       id;
-    QString   filename;
-    ImageType imageType;
-    QString   typeName;
-} AlbumArtImage;
 
 class AlbumArtImages: public QObject
 {

@@ -14,6 +14,7 @@
 
 #include <mythtv/visual.h>
 #include "mainvisual.h"
+#include "metadata.h"
 #include "constants.h"
 #include "config.h"
 
@@ -95,13 +96,15 @@ class AlbumArt : public VisualBase
     bool process(VisualNode *node = 0);
     bool draw(QPainter *p, const QColor &back = Qt::black);
     void handleKeyPress(const QString &action);
-    bool needsUpdate();
-    QString getImageFilename();
 
   private:
+    bool needsUpdate(void);
+    QString getImageFilename(void);
+    void findFrontCover(void);
+
     QSize m_size, m_cursize;
     QString m_filename;
-    QString m_directory;
+    ImageType m_currImageType;
     MainVisual *m_pParent;
     QImage m_image;
 };

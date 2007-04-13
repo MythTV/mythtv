@@ -682,6 +682,16 @@ QStringList Metadata::AlbumArtInDir(QString directory)
     return paths;
 }
 
+QString Metadata::getAlbumArt(ImageType type)
+{
+    QString res = "";
+    AlbumArtImages albumArt(this);
+
+    res = albumArt.getImageFilename(type);
+
+    return res;
+}
+
 MetadataLoadingThread::MetadataLoadingThread(AllMusic *parent_ptr)
 {
     parent = parent_ptr;

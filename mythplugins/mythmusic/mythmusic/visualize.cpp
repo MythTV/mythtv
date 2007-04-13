@@ -299,14 +299,30 @@ VisualBase *SpectrumFactory::create(MainVisual *parent, long int winid)
 AlbumArt::AlbumArt(MainVisual *parent)
 {
     m_pParent = parent;
+
+    findFrontCover();
+
     Decoder *dec = m_pParent->decoder();
     if (dec)
-    {
         m_filename = dec->getFilename();
-        m_directory = QUrl(m_filename).dirPath();
-    }
 
     fps = 1;
+}
+
+void AlbumArt::findFrontCover(void)
+{
+    // if a front cover image is available show that first
+    AlbumArtImages albumArt(m_pParent->metadata());
+    if (albumArt.isImageAvailable(IT_FRONTCOVER))
+        m_currImageType = IT_FRONTCOVER;
+    else
+    {
+        // not available so just show the first image available
+        if (albumArt.getImageCount() > 0)
+            m_currImageType = albumArt.getImageAt(0).imageType;
+        else
+            m_currImageType = IT_UNKNOWN;
+    }
 }
 
 AlbumArt::~AlbumArt()
@@ -326,20 +342,37 @@ bool AlbumArt::process(VisualNode *node)
 
 void AlbumArt::handleKeyPress(const QString &action)
 {
-    cout << "AlbumArt::handleKeyPress: " << action << endl;
+    if (action == "SELECT")
+    {
+        AlbumArtImages albumArt(m_pParent->metadata());
+
+        int newType = m_currImageType;
+        if (albumArt.getImageCount() > 0)
+        {
+            while(!albumArt.isImageAvailable((ImageType) ++newType))
+                if (newType == IT_LAST)
+                    newType = IT_UNKNOWN;
+        }
+
+        if (newType != m_currImageType)
+        {
+            m_currImageType = (ImageType) newType;
+            // force an update
+            m_cursize = QSize(0, 0);
+        }
+    }
 }
 
-bool AlbumArt::needsUpdate() {
+bool AlbumArt::needsUpdate() 
+{
     if (m_cursize != m_size)
         return true;
 
-    if (m_filename != m_pParent->decoder()->getFilename()) {
-        QString curdir = QUrl(m_pParent->decoder()->getFilename()).dirPath();
-        if (m_directory != curdir) {
-            m_directory = curdir;
-            m_filename = m_pParent->decoder()->getFilename();
-            return true;
-        }
+    if (m_filename != m_pParent->decoder()->getFilename()) 
+    {
+        m_filename = m_pParent->decoder()->getFilename();
+        findFrontCover();
+        return true;
     }
 
     return false;
@@ -347,14 +380,7 @@ bool AlbumArt::needsUpdate() {
 
 QString AlbumArt::getImageFilename() 
 {
-    QString result;
-
-    QStringList paths = m_pParent->metadata()->AlbumArtInDir(m_directory);
-
-    if (paths.count())
-        result = paths[rand() % paths.count()];
-
-    return result;
+    return m_pParent->metadata()->getAlbumArt(m_currImageType);
 }
 
 bool AlbumArt::draw(QPainter *p, const QColor &back)
@@ -387,7 +413,7 @@ bool AlbumArt::draw(QPainter *p, const QColor &back)
     p->drawPixmap((m_size.width() - m_image.width()) / 2,
                   (m_size.height() - m_image.height()) / 2,
                   m_image);
-    
+
     // Store our new size
     m_cursize = m_size;
 
