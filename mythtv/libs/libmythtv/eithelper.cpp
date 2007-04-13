@@ -15,7 +15,9 @@ using namespace std;
 #include "mythdbcon.h"
 #include "atsctables.h"
 #include "dvbtables.h"
+#include "premieretables.h"
 #include "dishdescriptors.h"
+#include "premieredescriptors.h"
 #include "util.h"
 
 const uint EITHelper::kChunkSize = 20;
@@ -211,6 +213,88 @@ void EITHelper::AddETT(uint atsc_major, uint atsc_minor,
     }
 }
 
+static void parse_dvb_event_descriptors(desc_list_t list, uint fix,
+                                        QMap<uint,uint> languagePreferences,
+                                        QString &title, QString &subtitle,
+                                        QString &description)
+{
+    const unsigned char *bestShortEvent =
+        MPEGDescriptor::FindBestMatch(
+            list, DescriptorID::short_event, languagePreferences);
+
+    unsigned char enc_1[3]  = { 0x10, 0x00, 0x01 };
+    unsigned char enc_15[3] = { 0x10, 0x00, 0x0f };
+    int enc_len = 0;
+    const unsigned char *enc = NULL;
+
+    // Is this BellExpressVU EIT (Canada) ?
+    // Use an encoding override of ISO 8859-1 (Latin1)
+    if (fix & EITFixUp::kEFixForceISO8859_1)
+    {
+        enc = enc_1;
+        enc_len = sizeof(enc_1);
+    }
+
+    // Is this broken DVB provider in Western Europe?
+    // Use an encoding override of ISO 8859-15 (Latin6)
+    if (fix & EITFixUp::kEFixForceISO8859_15)
+    {
+        enc = enc_15;
+        enc_len = sizeof(enc_15);
+    }
+
+    if (bestShortEvent)
+    {
+        ShortEventDescriptor sed(bestShortEvent);
+        if (enc)
+        {
+            title    = sed.EventName(enc, enc_len);
+            subtitle = sed.Text(enc, enc_len);
+        }
+        else
+        {
+            title    = sed.EventName();
+            subtitle = sed.Text();
+        }
+    }
+
+    vector<const unsigned char*> bestExtendedEvents =
+        MPEGDescriptor::FindBestMatches(
+            list, DescriptorID::extended_event, languagePreferences);
+
+    description = "";
+    for (uint j = 0; j < bestExtendedEvents.size(); j++)
+    {
+        if (!bestExtendedEvents[j])
+        {
+            description = "";
+            break;
+        }
+
+        ExtendedEventDescriptor eed(bestExtendedEvents[j]);
+        if (enc)
+            description += eed.Text(enc, enc_len);
+        else
+            description += eed.Text();
+    }
+}
+
+static inline void parse_dvb_component_descriptors(desc_list_t list,
+                                                   bool &hdtv,
+                                                   bool &stereo,
+                                                   bool &subtitled)
+{
+    desc_list_t components =
+        MPEGDescriptor::FindAll(list, DescriptorID::component);
+    for (uint j = 0; j < components.size(); j++)
+    {
+        ComponentDescriptor component(components[j]);
+        hdtv      |= component.IsHDTV();
+        stereo    |= component.IsStereo();
+        subtitled |= component.IsReallySubtitled();
+    }
+}
+
 void EITHelper::AddEIT(const DVBEventInformationTable *eit)
 {
     uint descCompression = (eit->TableID() > 0x80) ? 2 : 1;
@@ -271,76 +355,11 @@ void EITHelper::AddEIT(const DVBEventInformationTable *eit)
         }
         else
         {
-            const unsigned char *bestShortEvent =
-                MPEGDescriptor::FindBestMatch(
-                    list, DescriptorID::short_event, languagePreferences);
-
-            unsigned char enc_1[3]  = { 0x10, 0x00, 0x01 };
-            unsigned char enc_15[3] = { 0x10, 0x00, 0x0f };
-            int enc_len = 0;
-            const unsigned char *enc = NULL;
-
-            // Is this BellExpressVU EIT (Canada) ?
-            // Use an encoding override of ISO 8859-1 (Latin1)
-            if (fix & EITFixUp::kEFixForceISO8859_1)
-            {
-                enc = enc_1;
-                enc_len = sizeof(enc_1);
-            }
-
-            // Is this broken DVB provider in Western Europe?
-            // Use an encoding override of ISO 8859-15 (Latin6)
-            if (fix & EITFixUp::kEFixForceISO8859_15)
-            {
-                enc = enc_15;
-                enc_len = sizeof(enc_15);
-            }
-
-            if (bestShortEvent)
-            {
-                ShortEventDescriptor sed(bestShortEvent);
-                if (enc)
-                {
-                    title    = sed.EventName(enc, enc_len);
-                    subtitle = sed.Text(enc, enc_len);
-                }
-                else
-                {
-                    title    = sed.EventName();
-                    subtitle = sed.Text();
-                }
-            }
-
-            vector<const unsigned char*> bestExtendedEvents =
-                MPEGDescriptor::FindBestMatches(
-                    list, DescriptorID::extended_event, languagePreferences);
-
-            description = "";
-            for (uint j = 0; j < bestExtendedEvents.size(); j++)
-            {
-                if (!bestExtendedEvents[j])
-                {
-                    description = "";
-                    break;
-                }
-
-                ExtendedEventDescriptor eed(bestExtendedEvents[j]);
-                if (enc)
-                    description += eed.Text(enc, enc_len);
-                else
-                    description += eed.Text();
-            }
+            parse_dvb_event_descriptors(list, fix, languagePreferences,
+                                        title, subtitle, description);
         }
 
-        desc_list_t components =
-            MPEGDescriptor::FindAll(list, DescriptorID::component);
-        for (uint j = 0; j < components.size(); j++)
-        {
-            ComponentDescriptor component(components[j]);
-            hdtv      |= component.IsHDTV();
-            stereo    |= component.IsStereo();
-            subtitled |= component.IsReallySubtitled();
-        }
+        parse_dvb_component_descriptors(list, hdtv, stereo, subtitled);
 
         const unsigned char *content_data =
             MPEGDescriptor::Find(list, DescriptorID::content);
@@ -383,6 +402,107 @@ void EITHelper::AddEIT(const DVBEventInformationTable *eit)
         db_events.enqueue(event);
     }
 }
+
+// This function gets special eit data from the german provider Premiere
+// for the option channels Premiere Sport and Premiere Direkt
+void EITHelper::AddEIT(const PremiereContentInformationTable *cit)
+{
+    // set fixup for Premiere
+    uint fix = fixup[133 << 16];
+    fix |= EITFixUp::kFixGenericDVB;
+
+    QString title         = QString::null;
+    QString subtitle      = QString::null;
+    QString description   = QString::null;
+    QString category      = QString::null;
+    MythCategoryType category_type = kCategoryNone;
+    bool hdtv = false, stereo = false, subtitled = false;
+
+    // Parse descriptors
+    desc_list_t list = MPEGDescriptor::Parse(
+        cit->Descriptors(), cit->DescriptorsLength());
+
+    parse_dvb_event_descriptors(list, fix, languagePreferences,
+                                title, subtitle, description);
+
+    parse_dvb_component_descriptors(list, hdtv, stereo, subtitled);
+
+    const unsigned char *content_data =
+        MPEGDescriptor::Find(list, DescriptorID::content);
+    if (content_data)
+    {
+        ContentDescriptor content(content_data);
+        // fix events without real content data
+        if (content.Nibble(0)==0x00){
+            if(content.UserNibble(0)==0x1)
+            {
+                category_type = kCategoryMovie;
+            }
+            else if(content.UserNibble(0)==0x0)
+            {
+                category_type = kCategorySports;
+                category = QObject::tr("Sports");
+            }
+        }
+        else
+        {
+            category_type = content.GetMythCategory(0);
+            category      = content.GetDescription(0);
+        }
+    }
+
+    uint tableid   = cit->TableID();
+    uint version   = cit->Version();
+    uint contentid = cit->ContentID();
+    // fake endtime
+    uint endtime   = QDateTime::currentDateTime().addDays(1).toTime_t();
+
+    // Find Transmissions
+    desc_list_t transmissions =
+        MPEGDescriptor::FindAll(list,
+                                DescriptorID::premiere_content_transmission);
+    for(uint j=0; j< transmissions.size(); j++)
+    {
+        PremiereContentTransmissionDescriptor transmission(transmissions[j]);
+        uint networkid = transmission.OriginalNetworkID();
+        uint tsid      = transmission.TSID();
+        uint serviceid = transmission.ServiceID();
+
+        uint chanid = GetChanID(serviceid, networkid, tsid);
+
+        if (!chanid)
+        {
+            VERBOSE(VB_EIT, LOC +
+                    QString("Premiere EIT for NIT %1, TID %2, SID %3, count %4, "
+                            "title: %5. Channel not found!")
+                    .arg(networkid).arg(tsid).arg(serviceid)
+                    .arg(transmission.TransmissionCount()).arg(title));
+        }
+
+        // Skip event if we have already processed it before...
+        if (!eitcache->IsNewEIT(chanid, tableid, version, contentid, endtime))
+        {
+            continue;
+        }
+
+        for (uint k=0; k<transmission.TransmissionCount(); ++k)
+        {
+            QDateTime starttime = transmission.StartTimeUTC(k);
+            EITFixUp::TimeFix(starttime);
+            QDateTime endtime   = starttime.addSecs(cit->DurationInSeconds());
+
+            DBEvent *event = new DBEvent(chanid,
+                                         title,     subtitle,      description,
+                                         category,  category_type,
+                                         starttime, endtime,       fix,
+                                         false,     subtitled,
+                                         stereo,    hdtv,
+                                         "",  "");
+            db_events.enqueue(event);
+        }
+    }
+}
+
 
 void EITHelper::PruneEITCache(uint timestamp)
 {

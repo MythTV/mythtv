@@ -114,6 +114,22 @@ class DVBStreamData : virtual public MPEGStreamData
         return *it;
     }
 
+    // Premiere private ContentInformationTable
+    void SetVersionCIT(uint contentid, int version)
+    {
+        if (VersionCIT(contentid) == version)
+            return;
+        _cit_version[contentid] = version;
+    }
+
+    int VersionCIT(uint contentid) const
+    {
+        const QMap<uint, int>::const_iterator it = _cit_version.find(contentid);
+        if (it == _cit_version.end())
+            return -1;
+        return *it;
+    }
+
     // Sections seen
     void SetNITSectionSeen(uint section);
     bool NITSectionSeen(uint section) const;
@@ -133,6 +149,10 @@ class DVBStreamData : virtual public MPEGStreamData
 
     void SetEITSectionSeen(uint tableid, uint serviceid, uint section);
     bool EITSectionSeen(uint tableid, uint serviceid, uint section) const;
+
+    // Premiere private ContentInformationTable
+    void SetCITSectionSeen(uint contentid, uint section);
+    bool CITSectionSeen(uint contentid, uint section) const;
 
     // Caching
     bool HasCachedAnyNIT(bool current = true) const;
@@ -184,6 +204,9 @@ class DVBStreamData : virtual public MPEGStreamData
     sections_map_t            _sdt_section_seen;
     QMap<uint, int>           _eit_version;
     sections_map_t            _eit_section_seen;
+    // Premiere private ContentInformationTable
+    QMap<uint, int>           _cit_version;
+    sections_map_t            _cit_section_seen;
 
     int                       _nito_version;
     QMap<uint, int>           _sdto_versions;

@@ -187,6 +187,10 @@ enum
     // Dishnet longterm EIT is on pid 0x300
     DVB_DNLONG_EIT_PID = 0x0300,
 
+    // Premiere EIT for Direkt/Sport PPV
+    PREMIERE_EIT_DIREKT_PID = 0x0b11,
+    PREMIERE_EIT_SPORT_PID  = 0x0b12,
+
     ATSC_PSIP_PID = 0x1ffb,
 };
 
@@ -298,6 +302,10 @@ class TableID
         STUFFING = 0x80,
         CAPTION  = 0x86,
         CENSOR   = 0x87,
+
+        // Private premiere.de
+        PREMIERE_CIT = 0xA0,
+        PREMIERE_CPT = 0xA1,
 
         ECN      = 0xA0,
         SRVLOC   = 0xA1,

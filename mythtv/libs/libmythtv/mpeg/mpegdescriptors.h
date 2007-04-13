@@ -129,6 +129,11 @@ class DescriptorID
         DCC_arriving_request        = 0xA9,
         DRM_control                 = 0xAA,
         atsc_content_identifier     = 0xB6,
+
+        // private premiere.de
+        premiere_content_order        = 0xF0,
+        premiere_parental_information = 0xF1,
+        premiere_content_transmission = 0xF2,
     };
 };
 

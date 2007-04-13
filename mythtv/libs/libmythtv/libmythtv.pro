@@ -186,11 +186,12 @@ SOURCES += teletextdecoder.cpp      vbilut.cpp
 # MPEG parsing stuff
 HEADERS += mpeg/tspacket.h          mpeg/pespacket.h
 HEADERS += mpeg/mpegtables.h        mpeg/atsctables.h
-HEADERS += mpeg/dvbtables.h
+HEADERS += mpeg/dvbtables.h         mpeg/premieretables.h
 HEADERS += mpeg/mpegstreamdata.h    mpeg/atscstreamdata.h
 HEADERS += mpeg/dvbstreamdata.h     mpeg/scanstreamdata.h
 HEADERS += mpeg/mpegdescriptors.h   mpeg/atscdescriptors.h
 HEADERS += mpeg/dvbdescriptors.h    mpeg/dishdescriptors.h
+HEADERS += mpeg/premieredescriptors.h
 HEADERS += mpeg/atsc_huffman.h      mpeg/iso639.h
 HEADERS += mpeg/iso6937tables.h
 HEADERS += mpeg/tsstats.h           mpeg/streamlisteners.h
@@ -198,11 +199,12 @@ HEADERS += mpeg/h264utils.h
 
 SOURCES += mpeg/tspacket.cpp        mpeg/pespacket.cpp
 SOURCES += mpeg/mpegtables.cpp      mpeg/atsctables.cpp
-SOURCES += mpeg/dvbtables.cpp
+SOURCES += mpeg/dvbtables.cpp       mpeg/premieretables.cpp
 SOURCES += mpeg/mpegstreamdata.cpp  mpeg/atscstreamdata.cpp
 SOURCES += mpeg/dvbstreamdata.cpp   mpeg/scanstreamdata.cpp
 SOURCES += mpeg/mpegdescriptors.cpp mpeg/atscdescriptors.cpp
 SOURCES += mpeg/dvbdescriptors.cpp  mpeg/dishdescriptors.cpp
+SOURCES += mpeg/premieredescriptors.cpp
 SOURCES += mpeg/atsc_huffman.cpp    mpeg/iso639.cpp
 SOURCES += mpeg/iso6937tables.cpp
 SOURCES += mpeg/h264utils.cpp

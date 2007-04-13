@@ -34,6 +34,7 @@ class NetworkInformationTable;
 class ServiceDescriptionTable;
 class TimeDateTable;
 class DVBEventInformationTable;
+class PremiereContentInformationTable;
 
 class TSDataListener
 {
@@ -122,6 +123,7 @@ class DVBEITStreamListener
     virtual ~DVBEITStreamListener() {}
   public:
     virtual void HandleEIT(const DVBEventInformationTable*) = 0;
+    virtual void HandleEIT(const PremiereContentInformationTable*) = 0;
 };
 
 

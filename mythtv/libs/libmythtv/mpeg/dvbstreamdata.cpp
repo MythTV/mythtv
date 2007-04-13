@@ -5,7 +5,10 @@ using namespace std;
 
 #include "dvbstreamdata.h"
 #include "dvbtables.h"
+#include "premieretables.h"
 #include "eithelper.h"
+
+#define PREMIERE_ONID 133
 
 // service_id is synonymous with the MPEG program number in the PMT.
 DVBStreamData::DVBStreamData(uint desired_netid,  uint desired_tsid,
@@ -149,6 +152,15 @@ bool DVBStreamData::IsRedundant(uint pid, const PSIPTable &psip) const
         return EITSectionSeen(table_id, service_id, psip.Section());
     }
 
+    if (PREMIERE_EIT_DIREKT_PID == pid || PREMIERE_EIT_SPORT_PID == pid
+        && TableID::PREMIERE_CIT == table_id)
+    {
+        uint content_id = PremiereContentInformationTable(psip).ContentID();
+        if (VersionCIT(content_id) != version)
+            return false;
+        return CITSectionSeen(content_id, psip.Section());
+    }
+
     return false;
 }
 
@@ -165,6 +177,8 @@ void DVBStreamData::Reset(uint desired_netid, uint desired_tsid,
     _sdt_section_seen.clear();
     _eit_version.clear();
     _eit_section_seen.clear();
+    _cit_version.clear();
+    _cit_section_seen.clear();
 
     SetVersionNITo(-1,0);
     _sdto_versions.clear();
@@ -309,6 +323,27 @@ bool DVBStreamData::HandleTables(uint pid, const PSIPTable &psip)
         return true;
     }
 
+    if (_desired_netid == PREMIERE_ONID &&
+        (PREMIERE_EIT_DIREKT_PID == pid || PREMIERE_EIT_SPORT_PID == pid) &&
+        PremiereContentInformationTable::IsEIT(psip.TableID()))
+    {
+        QMutexLocker locker(&_listener_lock);
+        if (!_dvb_eit_listeners.size() && !_eit_helper)
+            return true;
+
+        PremiereContentInformationTable cit(psip);
+        SetVersionCIT(cit.ContentID(), cit.Version());
+        SetCITSectionSeen(cit.ContentID(), cit.Section());
+
+        for (uint i = 0; i < _dvb_eit_listeners.size(); i++)
+            _dvb_eit_listeners[i]->HandleEIT(&cit);
+
+        if (_eit_helper)
+            _eit_helper->AddEIT(&cit);
+
+        return true;
+    }
+
     return false;
 }
 
@@ -354,6 +389,20 @@ bool DVBStreamData::GetEITPIDChanges(const uint_vec_t &cur_pids,
         {
             add_pids.push_back(DVB_DNLONG_EIT_PID);
         }
+
+        if (_desired_netid == PREMIERE_ONID &&
+            find(cur_pids.begin(), cur_pids.end(),
+                 (uint) PREMIERE_EIT_DIREKT_PID) == cur_pids.end())
+        {
+            add_pids.push_back(PREMIERE_EIT_DIREKT_PID);
+        }
+
+        if (_desired_netid == PREMIERE_ONID &&
+            find(cur_pids.begin(), cur_pids.end(),
+                 (uint) PREMIERE_EIT_SPORT_PID) == cur_pids.end())
+        {
+            add_pids.push_back(PREMIERE_EIT_SPORT_PID);
+        }
     }
     else
     {
@@ -368,6 +417,20 @@ bool DVBStreamData::GetEITPIDChanges(const uint_vec_t &cur_pids,
                  (uint) DVB_DNLONG_EIT_PID) != cur_pids.end())
         {
             del_pids.push_back(DVB_DNLONG_EIT_PID);
+        }
+
+        if (_desired_netid == PREMIERE_ONID &&
+            find(cur_pids.begin(), cur_pids.end(),
+                 (uint) PREMIERE_EIT_DIREKT_PID) != cur_pids.end())
+        {
+            del_pids.push_back(PREMIERE_EIT_DIREKT_PID);
+        }
+
+        if (_desired_netid == PREMIERE_ONID &&
+            find(cur_pids.begin(), cur_pids.end(),
+                 (uint) PREMIERE_EIT_SPORT_PID) != cur_pids.end())
+        {
+            del_pids.push_back(PREMIERE_EIT_SPORT_PID);
         }
     }
 
@@ -488,6 +551,25 @@ bool DVBStreamData::EITSectionSeen(uint tableid, uint serviceid,
     uint key = (tableid<<16) | serviceid;
     sections_map_t::const_iterator it = _eit_section_seen.find(key);
     if (it == _eit_section_seen.end())
+        return false;
+    return (bool) ((*it)[section>>3] & bit_sel[section & 0x7]);
+}
+
+void DVBStreamData::SetCITSectionSeen(uint contentid, uint section)
+{
+    sections_map_t::iterator it = _cit_section_seen.find(contentid);
+    if (it == _cit_section_seen.end())
+    {
+        _cit_section_seen[contentid].resize(32, 0);
+        it = _cit_section_seen.find(contentid);
+    }
+    (*it)[section>>3] |= bit_sel[section & 0x7];
+}
+
+bool DVBStreamData::CITSectionSeen(uint contentid, uint section) const
+{
+    sections_map_t::const_iterator it = _cit_section_seen.find(contentid);
+    if (it == _cit_section_seen.end())
         return false;
     return (bool) ((*it)[section>>3] & bit_sel[section & 0x7]);
 }

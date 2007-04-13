@@ -47,6 +47,7 @@ class EITCache;
 class EventInformationTable;
 class ExtendedTextTable;
 class DVBEventInformationTable;
+class PremiereContentInformationTable;
 
 class EITHelper
 {
@@ -70,10 +71,12 @@ class EITHelper
     void AddETT(uint atsc_major, uint atsc_minor,
                 const ExtendedTextTable     *ett);
     void AddEIT(const DVBEventInformationTable *eit);
+    void AddEIT(const PremiereContentInformationTable *eit);
 #else // if !USING_BACKEND
     void AddEIT(uint, uint, const EventInformationTable*) {}
     void AddETT(uint, uint, const ExtendedTextTable*) {}
     void AddEIT(const DVBEventInformationTable*) {}
+    void AddEIT(const PremiereContentInformationTable*) {}
 #endif // !USING_BACKEND
 
     // EIT cache handling
