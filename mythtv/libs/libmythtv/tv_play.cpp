@@ -1105,7 +1105,7 @@ void TV::HandleStateChange(void)
         lockTimerOn = false;
 
         SET_NEXT();
-        recorder->SpawnLiveTV(tvchain->GetID(), false);
+        recorder->SpawnLiveTV(tvchain->GetID(), false, "");
 
         tvchain->ReloadAll();
 
@@ -3350,7 +3350,7 @@ void TV::TogglePIPView(void)
 
         piptvchain = new LiveTVChain();
         piptvchain->InitializeNewChain("PIP"+gContext->GetHostName());
-        testrec->SpawnLiveTV(piptvchain->GetID(), true);
+        testrec->SpawnLiveTV(piptvchain->GetID(), true, "");
         piptvchain->ReloadAll();
         playbackinfo = piptvchain->GetProgramAt(-1);
         if (!playbackinfo)
@@ -3915,56 +3915,6 @@ void TV::DoSkipCommercials(int direction)
         muteTimer->start(kMuteTimeout, true);
 }
 
-static int get_cardinputid(uint cardid, const QString &channum,
-                           QString &inputname)
-{
-    MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare(
-        "SELECT cardinputid, inputname "
-        "FROM channel, capturecard, cardinput "
-        "WHERE channel.channum      = :CHANNUM           AND "
-        "      channel.sourceid     = cardinput.sourceid AND "
-        "      cardinput.cardid     = capturecard.cardid AND "
-        "      capturecard.cardid   = :CARDID");
-    query.bindValue(":CHANNUM", channum);
-    query.bindValue(":CARDID", cardid);
-
-    if (!query.exec() || !query.isActive())
-        MythContext::DBError("get_cardinputid", query);
-    else if (query.next())
-    {
-        inputname = query.value(1).toString();
-        return query.value(0).toInt();
-    }
-
-    return -1;    
-}
-
-static void set_startchan(uint cardinputid, const QString &channum)
-{
-    MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare("UPDATE cardinput "
-                  "SET startchan = :CHANNUM "
-                  "WHERE cardinputid = :INPUTID");
-    query.bindValue(":CHANNUM", channum);
-    query.bindValue(":INPUTID", cardinputid);
-    query.exec();
-    if (!query.exec())
-        MythContext::DBError("set_startchan", query);
-}
-
-static void set_startinput(uint cardid, const QString &inputname)
-{
-    MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare("UPDATE capturecard "
-                  "SET defaultinput = :INNAME "
-                  "WHERE cardid = :CARDID");
-    query.bindValue(":INNAME", inputname);
-    query.bindValue(":CARDID", cardid);
-    if (!query.exec())
-        MythContext::DBError("set_startinput", query);
-}
-
 void TV::SwitchCards(uint chanid, QString channum)
 {
     VERBOSE(VB_PLAYBACK, LOC +
@@ -3981,21 +3931,6 @@ void TV::SwitchCards(uint chanid, QString channum)
         // we need to find the next free recorder with that channel.
         QStringList reclist = GetValidRecorderList(chanid, channum);
         testrec = RemoteRequestFreeRecorderFromList(reclist);
-        // now we need to set our channel as the starting channel..
-        if (testrec && testrec->IsValidRecorder())
-        {
-            QString inputname("");
-            int cardid = testrec->GetRecorderNumber();
-            int cardinputid = get_cardinputid(cardid, channum, inputname);
-            VERBOSE(VB_CHANNEL, LOC + "Setting startchan: " +
-                    QString("cardid(%1) cardinputid(%2) channum(%3)")
-                    .arg(cardid).arg(cardinputid).arg(channum));
-            if (cardid >= 0 && cardinputid >= 0 && !inputname.isEmpty())
-            {
-                set_startchan(cardinputid, channum);
-                set_startinput(cardid, inputname);
-            }
-        }
     }
 
     // If we are just switching recorders find first available recorder.
@@ -4034,7 +3969,7 @@ void TV::SwitchCards(uint chanid, QString channum)
 
         activerecorder = recorder = testrec;
         recorder->Setup();
-        recorder->SpawnLiveTV(tvchain->GetID(), false);
+        recorder->SpawnLiveTV(tvchain->GetID(), false, channum);
         tvchain->ReloadAll();
         playbackinfo = tvchain->GetProgramAt(-1);
 

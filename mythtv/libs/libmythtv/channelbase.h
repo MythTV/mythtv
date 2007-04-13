@@ -124,7 +124,8 @@ class ChannelBase
 
     /// Saves current channel as the default channel for the current input.
     virtual void StoreInputChannels(void)
-        { StoreInputChannels(inputs); }
+        { StoreInputChannels(inputs);
+          StoreDefaultInput(GetCardID(), GetCurrentInput()); }
 
     // Picture attribute settings
     virtual bool InitPictureAttributes(void) { return false; }
@@ -144,6 +145,7 @@ class ChannelBase
     virtual int GetCardID(void) const;
     virtual bool ChangeExternalChannel(const QString &newchan);
     static void StoreInputChannels(const InputMap&);
+    static void StoreDefaultInput(uint cardid, const QString &input);
 
     TVRec   *pParent;
     QString  curchannelname;

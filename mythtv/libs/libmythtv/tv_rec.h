@@ -174,7 +174,7 @@ class MPUBLIC TVRec : public QObject
     long long GetFilePosition(void);
     long long GetMaxBitrate();
     long long GetKeyframePosition(long long desired);
-    void SpawnLiveTV(LiveTVChain *newchain, bool pip = false);
+    void SpawnLiveTV(LiveTVChain *newchain, bool pip, QString startchan);
     QString GetChainID(void);
     void StopLiveTV(void);
     void PauseRecorder(void);
@@ -242,7 +242,6 @@ class MPUBLIC TVRec : public QObject
                            DVBDBOptions       &dvb_opts,
                            FireWireDBOptions  &firewire_opts,
                            DBox2DBOptions     &dbox2_opts);
-
 
     static QString GetStartChannel(int cardid, const QString &defaultinput);
 
@@ -367,6 +366,7 @@ class MPUBLIC TVRec : public QObject
     ProgramInfo *pseudoLiveTVRecording;
     QString      nextLiveTVDir;
     QMutex       nextLiveTVDirLock;
+    QString      LiveTVStartChannel;
 
     // LiveTV file chain
     LiveTVChain *tvchain;

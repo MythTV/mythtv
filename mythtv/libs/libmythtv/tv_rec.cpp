@@ -2322,12 +2322,12 @@ long long TVRec::GetMaxBitrate(void)
     return bitrate;
 }
 
-/** \fn TVRec::SpawnLiveTV(LiveTVChain*,bool)
+/** \fn TVRec::SpawnLiveTV(LiveTVChain*,bool,QString)
  *  \brief Tells TVRec to spawn a "Live TV" recorder.
- *  \sa EncoderLink::SpawnLiveTV(LiveTVChain*,bool),
- *      RemoteEncoder::SpawnLiveTV(LiveTVChain*,bool)
+ *  \sa EncoderLink::SpawnLiveTV(LiveTVChain*,bool,QString),
+ *      RemoteEncoder::SpawnLiveTV(QString,bool,QSting)
  */
-void TVRec::SpawnLiveTV(LiveTVChain *newchain, bool pip)
+void TVRec::SpawnLiveTV(LiveTVChain *newchain, bool pip, QString startchan)
 {
     QMutexLocker lock(&stateChangeLock);
 
@@ -2342,6 +2342,7 @@ void TVRec::SpawnLiveTV(LiveTVChain *newchain, bool pip)
     tvchain->SetCardType(genOpt.cardtype);
 
     ispip = pip;
+    LiveTVStartChannel = startchan;
 
     // Change to WatchingLiveTV
     ChangeState(kState_WatchingLiveTV);
@@ -3093,8 +3094,13 @@ QString TVRec::TuningGetChanNum(const TuningRequest &request,
     // If this is Live TV startup, we need a channel...
     if (channum.isEmpty() && (request.flags & kFlagLiveTV))
     {
-        input   = genOpt.defaultinput;
-        channum = GetStartChannel(cardid, input);
+        if (!LiveTVStartChannel.isEmpty())
+            channum = LiveTVStartChannel;
+        else
+        {
+            input   = genOpt.defaultinput;
+            channum = GetStartChannel(cardid, input);
+        }
     }
 
     if (channel && !channum.isEmpty() && (channum.find("NextChannel") >= 0))

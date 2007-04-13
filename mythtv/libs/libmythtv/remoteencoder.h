@@ -33,7 +33,7 @@ class MPUBLIC RemoteEncoder
     void FillPositionMap(int start, int end,
                          QMap<long long, long long> &positionMap);
     void StopPlaying(void);
-    void SpawnLiveTV(QString chainid, bool pip);
+    void SpawnLiveTV(QString chainid, bool pip, QString startchan);
     void StopLiveTV(void);
     void PauseRecorder(void);
     void FinishRecording(void);

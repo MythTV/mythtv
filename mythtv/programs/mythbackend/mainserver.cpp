@@ -2778,7 +2778,7 @@ void MainServer::HandleRecorderQuery(QStringList &slist, QStringList &commands,
 
         chain->SetHostSocket(pbssock);
 
-        enc->SpawnLiveTV(chain, slist[3].toInt());
+        enc->SpawnLiveTV(chain, slist[3].toInt(), slist[4]);
         retlist << "ok";
     }
     else if (command == "STOP_LIVETV")

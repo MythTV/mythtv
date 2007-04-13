@@ -255,17 +255,18 @@ void RemoteEncoder::StopPlaying(void)
     SendReceiveStringList(strlist);
 }
 
-/** \fn RemoteEncoder::SpawnLiveTV(QString,bool)
+/** \fn RemoteEncoder::SpawnLiveTV(QString,bool,QString)
  *  \brief Tells TVRec to Spawn a "Live TV" recorder.
- *  \sa TVRec::SpawnLiveTV(LiveTVChain*,bool),
- *      EncoderLink::SpawnLiveTV(LiveTVChain*,bool)
+ *  \sa TVRec::SpawnLiveTV(LiveTVChain*,bool,QString),
+ *      EncoderLink::SpawnLiveTV(LiveTVChain*,bool,QString)
  */
-void RemoteEncoder::SpawnLiveTV(QString chainId, bool pip)
+void RemoteEncoder::SpawnLiveTV(QString chainId, bool pip, QString startchan)
 {
     QStringList strlist = QString("QUERY_RECORDER %1").arg(recordernum);
     strlist << "SPAWN_LIVETV";
     strlist << chainId;
     strlist << QString::number((int)pip);
+    strlist << startchan;
 
     SendReceiveStringList(strlist);
 }

@@ -70,7 +70,7 @@ class EncoderLink
     long long GetFramesWritten(void);
     long long GetFilePosition(void);
     long long GetKeyframePosition(long long desired);
-    void SpawnLiveTV(LiveTVChain *chain, bool pip = false);
+    void SpawnLiveTV(LiveTVChain *chain, bool pip, QString startchan);
     QString GetChainID(void);
     void StopLiveTV(void);
     void PauseRecorder(void);

@@ -496,6 +496,25 @@ void ChannelBase::StoreInputChannels(const InputMap &inputs)
     }
 }
 
+/** \fn ChannelBase::StoreDefaultInput(uint, const QString&)
+ *  \brief Sets default input for the cardid
+ *  \param cardid ChannelBase::GetCardID()
+ *  \param input  ChannelBase::GetCurrentInput()
+ */
+void ChannelBase::StoreDefaultInput(uint cardid, const QString &input)
+{
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare(
+        "UPDATE capturecard "
+        "SET defaultinput = :DEFAULTINPUT "
+        "WHERE cardid = :CARDID");
+    query.bindValue(":DEFAULTINPUT", input);
+    query.bindValue(":CARDID", cardid);
+
+    if (!query.exec() || !query.isActive())
+        MythContext::DBError("StoreDefaultInput", query);
+}
+
 bool ChannelBase::CheckChannel(const QString &channum, 
                                QString& inputName) const
 {
