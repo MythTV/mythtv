@@ -2772,10 +2772,9 @@ void ProgramInfo::ReactivateRecording(void)
 /** \fn ProgramInfo::AddHistory(bool resched)
  *  \brief Adds recording history, creating "record" it if necessary.
  */
-void ProgramInfo::AddHistory(bool resched)
+void ProgramInfo::AddHistory(bool resched, bool forcedup)
 {
-    bool dup = (recstatus == rsRecorded ||
-                recstatus == rsNeverRecord);
+    bool dup = (recstatus == rsRecorded || forcedup);
     RecStatusType rs = (recstatus == rsCurrentRecording) ?
         rsPreviousRecording : recstatus;
     oldrecstatus = recstatus;
@@ -4191,7 +4190,7 @@ void ProgramInfo::ShowRecordingDialog(void)
         recstatus = rsNeverRecord;
         startts = QDateTime::currentDateTime();
         endts = recstartts;
-        AddHistory();
+        AddHistory(true, true);
     }
     else if (ret == clearov)
         ApplyRecordStateChange(kNotRecording);
@@ -4364,7 +4363,7 @@ void ProgramInfo::ShowNotRecordingDialog(void)
         recstatus = rsNeverRecord;
         startts = QDateTime::currentDateTime();
         endts = recstartts;
-        AddHistory();
+        AddHistory(true, true);
     }
     else if (ret == clearov)
         ApplyRecordStateChange(kNotRecording);

@@ -151,7 +151,7 @@ class MPUBLIC ProgramInfo
     void ApplyRecordRecPriorityChange(int);
     void ToggleRecord(void);
     void ReactivateRecording(void);
-    void AddHistory(bool resched = true);
+    void AddHistory(bool resched = true, bool forcedup = false);
     void DeleteHistory(void);
     void ForgetHistory(void);
     void SetDupHistory(void);
