@@ -1685,6 +1685,9 @@ bool TVRec::SetupDTVSignalMonitor(void)
         sd->SetCaching(true);
     }
 
+    bool fta = CardUtil::IgnoreEncrypted(
+        GetCaptureCardNum(), channel->GetCurrentInput());
+
     // Check if this is an ATSC Channel
     int major = channel->GetMajorChannel();
     int minor = channel->GetMinorChannel();
@@ -1706,7 +1709,7 @@ bool TVRec::SetupDTVSignalMonitor(void)
         sm->SetStreamData(sd);
         sm->SetChannel(major, minor);
         sd->SetVideoStreamsRequired(1);
-        sm->SetFTAOnly(true);
+        sm->SetFTAOnly(fta);
 
         // Try to get pid of VCT from cache and
         // require MGT if we don't have VCT pid.
@@ -1756,9 +1759,6 @@ bool TVRec::SetupDTVSignalMonitor(void)
         if (GetDVBChannel())
             sd->SetIgnoreCRC(GetDVBChannel()->HasCRCBug());
 
-        bool fta = CardUtil::IgnoreEncrypted(
-            GetCaptureCardNum(), channel->GetCurrentInput());
-
         dsd->Reset(netid, tsid, progNum);
         sm->SetStreamData(sd);
         sm->SetDVBService(netid, tsid, progNum);
@@ -1796,9 +1796,6 @@ bool TVRec::SetupDTVSignalMonitor(void)
         if (GetDVBChannel())
             sd->SetIgnoreCRC(GetDVBChannel()->HasCRCBug());
 #endif // USING_DVB
-
-        bool fta = CardUtil::IgnoreEncrypted(
-            GetCaptureCardNum(), channel->GetCurrentInput());
 
         sd->Reset(progNum);
         sm->SetStreamData(sd);

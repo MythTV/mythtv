@@ -256,34 +256,37 @@ bool ProgramMapTable::IsAudio(uint i) const
 
 bool ProgramMapTable::IsEncrypted(void) const
 {
-    desc_list_t descs = MPEGDescriptor::Parse(
-        ProgramInfo(), ProgramInfoLength());
-    const unsigned char* data = MPEGDescriptor::Find(
-        descs, DescriptorID::conditional_access);
+    desc_list_t descs = MPEGDescriptor::ParseOnlyInclude(
+        ProgramInfo(), ProgramInfoLength(), DescriptorID::conditional_access);
 
-    if (data)
+    bool encrypted = false;
+    QMap<uint,uint> encryption_system;
+    for (uint i = 0; i < descs.size(); i++)
     {
-        ConditionalAccessDescriptor ca(data);
-        return 0x0 != ca.SystemID(); // System ID of 0 == no encrytion
+        ConditionalAccessDescriptor cad(descs[i]);
+        encryption_system[cad.PID()] = cad.SystemID();
+        encrypted |= cad.SystemID();
+
+        //VERBOSE(VB_IMPORTANT, "DTVsm: "<<cad.toString());
     }
 
-    return false;
-#if 0
-    QMap<uint,uint> encryption_system;
-    if (data)
+    for (uint i = 0; i < StreamCount(); i++)
     {
-        for (uint i = 0; i < descs.size(); ++i)
+        desc_list_t descs = MPEGDescriptor::ParseOnlyInclude(
+            StreamInfo(i), StreamInfoLength(i),
+            DescriptorID::conditional_access);
+
+        for (uint j = 0; j < descs.size(); j++)
         {
-            MPEGDescriptor mpegdesc(descs[i]);
-            VERBOSE(VB_IMPORTANT, "DTVsm: "<<mpegdesc.toString());
-            if (DescriptorID::conditional_access == mpegdesc.DescriptorTag())
-            {
-                ConditionalAccessDescriptor cad(descs[i]);
-                encryption_system[cad.PID()] = cad.SystemID();
-            }
+            ConditionalAccessDescriptor cad(descs[j]);
+            encryption_system[cad.PID()] = cad.SystemID();
+            encrypted |= cad.SystemID();
+
+            //VERBOSE(VB_IMPORTANT, "DTVsm: "<<cad.toString());
         }
     }
-#endif
+
+    return encrypted;
 }
 
 bool ProgramMapTable::IsStillPicture(void) const
