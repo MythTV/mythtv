@@ -42,6 +42,7 @@ class QPSKPane;
 class ATSCPane;
 class QAMPane;
 class STPane;
+class DVBUtilsImportPane;
 class ScanWizardScanType;
 class ScanWizardScanner;
 
@@ -77,6 +78,8 @@ class ScanWizard : public ConfigurationWizard
     ATSCPane     *paneATSC;
     QAMPane      *paneQAM;
     STPane       *paneSingle;
+    DVBUtilsImportPane *paneDVBUtilsImport;
+
     int           nVideoDev;
     unsigned      nCardType;
     int           nCaptureCard;

@@ -39,6 +39,7 @@ ScanWizard::ScanWizard(int sourceid)
     : paneOFDM(new OFDMPane()),     paneQPSK(new QPSKPane()),
       paneATSC(new ATSCPane()),     paneQAM(new QAMPane()),
       paneSingle(new STPane()),
+      paneDVBUtilsImport(new DVBUtilsImportPane()),
 #ifdef FE_GET_EXTENDED_INFO
       paneDVBS2(new DVBS2Pane()),
 #endif
@@ -111,7 +112,10 @@ bool ScanWizard::ignoreSignalTimeout(void) const
     bool vl1 = (configPane->scanConfig->
                 ignoreSignalTimeoutAll->getValue().toInt());
 
-    return (ts0) ? vl0 : ((ts1) ? vl1 : false);
+    bool ts2 = (ScanTypeSetting::DVBUtilsImport == scanType());
+    bool vl2 = paneDVBUtilsImport->DoIgnoreSignalTimeout();
+
+    return (ts0) ? vl0 : ((ts1) ? vl1 : (ts2) ? vl2 : false);
 }
 
 QString ScanWizard::country(void) const
@@ -121,5 +125,5 @@ QString ScanWizard::country(void) const
 
 QString ScanWizard::filename(void) const
 {
-    return configPane->scanConfig->filename->getValue();
+    return paneDVBUtilsImport->GetFilename();
 }

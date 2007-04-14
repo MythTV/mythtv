@@ -29,6 +29,7 @@ using namespace std;
 #endif // USING_DVB
 
 class FrequencyTable;
+#include "dvbconfparser.h"
 class TransportScanItem;
 
 typedef QMap<QString, const FrequencyTable*> freq_table_map_t;
@@ -130,6 +131,13 @@ class TransportScanItem
                       uint           _timeoutTune);
 #endif // USING_DVB
 
+    TransportScanItem(int                 _sourceid,
+                      const QString      &_std,
+                      const QString      &_name,
+                      const QString      &_cardtype,
+                      const DTVTransport &_tuning,
+                      uint                _timeoutTune);
+
     TransportScanItem(int sourceid,           /* source id in DB */
                       const QString &std,     /* atsc/dvb */
                       const QString &strFmt,  /* fmt for info shown to user  */
@@ -144,6 +152,7 @@ class TransportScanItem
     uint freq_offset(uint i) const;
 
     QString ModulationDB(void) const;
+    QString toString() const;
 
   private:
     int GetMultiplexIdFromDB() const;
@@ -168,7 +177,8 @@ class TransportScanItem
     uint      frequency;        ///< Tuning frequency if mplexid == -1
     uint      modulation;       ///< Tuning frequency if mplexid == -1
 #endif
-    QString toString() const;
+
+    DTVChannelInfoList expectedChannels;
 };
 
 class transport_scan_items_it_t

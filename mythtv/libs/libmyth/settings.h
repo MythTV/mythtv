@@ -719,11 +719,6 @@ protected:
     MythPushButton *button;
 };
 
-class TransButtonSetting: public ButtonSetting, public TransientStorage {
-public:
-    TransButtonSetting(QString name = "button") : ButtonSetting(name) {}
-};
-
 class ConfigPopupDialogWidget: public MythPopupBox {
     Q_OBJECT
 public:
@@ -767,16 +762,6 @@ private:
     int totalSteps;
 };
 
-class TransLabelSetting: public LabelSetting, public TransientStorage {
-public:
-    TransLabelSetting() {};
-};
-
-class TransCheckBoxSetting: public CheckBoxSetting, public TransientStorage {
-public:
-    TransCheckBoxSetting() {};
-};
-
 class HostSetting: public SimpleDBStorage, virtual public Configurable {
 public:
     HostSetting(QString name):
@@ -801,6 +786,57 @@ protected:
     virtual QString whereClause(MSqlBindings& bindings);
     virtual QString setClause(MSqlBindings& bindings);
 };
+
+///////////////////////////////////////////////////////////////////////////////
+
+class TransButtonSetting :
+    public ButtonSetting, public TransientStorage
+{
+  public:
+    TransButtonSetting(QString name = "button") : ButtonSetting(name) { }
+};
+
+class TransLabelSetting :
+    public LabelSetting, public TransientStorage
+{
+  public:
+    TransLabelSetting() { }
+};
+
+class TransLineEditSetting :
+    public LineEditSetting, public TransientStorage
+{
+  public:
+    TransLineEditSetting(bool rw = true) : LineEditSetting(rw) { }
+};
+
+class TransCheckBoxSetting :
+    public CheckBoxSetting, public TransientStorage
+{
+  public:
+    TransCheckBoxSetting() { }
+};
+
+class TransComboBoxSetting :
+    public ComboBoxSetting, public TransientStorage
+{
+  public:
+    TransComboBoxSetting(bool rw = true, int _step = 1) :
+        ComboBoxSetting(rw, _step) { }
+};
+
+class TransSpinBoxSetting :
+    public SpinBoxSetting, public TransientStorage
+{
+  public:
+    TransSpinBoxSetting(int min, int max, int step,
+                        bool allow_single_step = false,
+                        QString special_value_text = "") :
+        SpinBoxSetting(min, max, step, allow_single_step,
+                       special_value_text) { }
+};
+
+///////////////////////////////////////////////////////////////////////////////
 
 class HostSlider: public SliderSetting, public HostSetting {
   public:

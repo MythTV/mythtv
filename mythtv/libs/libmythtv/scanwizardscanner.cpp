@@ -43,6 +43,7 @@
 #include "channelbase.h"
 #include "dtvsignalmonitor.h"
 #include "siscan.h"
+#include "dvbconfparser.h"
 
 #ifdef USING_V4L
 #include "channel.h"
@@ -53,7 +54,6 @@
 #ifdef USING_DVB
 #include "dvbchannel.h"
 #include "dvbsignalmonitor.h"
-#include "dvbconfparser.h"
 #endif
 
 #ifdef USING_HDHOMERUN
@@ -302,10 +302,9 @@ void ScanWizardScanner::scan()
         do_scan = false;
         ScanAnalog(cardid, nVideoSource);
     }
-    else if (nScanType == ScanTypeSetting::Import)
+    else if (nScanType == ScanTypeSetting::DVBUtilsImport)
     {
-        do_scan = false;
-        Import(nVideoSource, parent->nCardType, parent->filename());
+        ImportDVBUtils(nVideoSource, parent->nCardType, parent->filename());
     }
     else if ((nScanType == ScanTypeSetting::FullScan_ATSC)     ||
              (nScanType == ScanTypeSetting::FullTransportScan) ||
@@ -416,49 +415,36 @@ void ScanWizardScanner::scan()
     }
 }
 
-void ScanWizardScanner::Import(uint sourceid, int cardtype,
-                               const QString &file)
+void ScanWizardScanner::ImportDVBUtils(uint sourceid, int cardtype,
+                                       const QString &file)
 {
-    (void) sourceid;
-    (void) cardtype;
-    (void) file;
+    channels.clear();
 
-#ifdef USING_DVB
-    DVBConfParser *parser = NULL;
+    DTVConfParser::cardtype_t type = DTVConfParser::UNKNOWN;
+    type = (CardUtil::OFDM == cardtype) ? DTVConfParser::OFDM : type;
+    type = (CardUtil::QPSK == cardtype) ? DTVConfParser::QPSK : type;
+    type = (CardUtil::QAM  == cardtype) ? DTVConfParser::QAM  : type;
+    type = ((CardUtil::ATSC == cardtype) || (CardUtil::HDTV == cardtype) ||
+            (CardUtil::HDHOMERUN == cardtype)) ? DTVConfParser::ATSC : type;
 
-    if (CardUtil::OFDM == cardtype)
-        parser = new DVBConfParser(DVBConfParser::OFDM, sourceid, file);
-    else if (CardUtil::QPSK == cardtype)
-        parser = new DVBConfParser(DVBConfParser::QPSK, sourceid, file);
-    else if (CardUtil::QAM == cardtype)
-        parser = new DVBConfParser(DVBConfParser::QAM, sourceid, file);
-    else if ((CardUtil::ATSC == cardtype) ||
-             (CardUtil::HDTV == cardtype))
-        parser = new DVBConfParser(DVBConfParser::ATSC, sourceid, file);
-
-    if (!parser)
+    if (type == DTVConfParser::UNKNOWN)
         return;
 
-    connect(parser, SIGNAL(updateText(const QString&)),
-            this,   SLOT(  updateText(const QString&)));
+    DTVConfParser parser(type, sourceid, file);
 
-    int ret = parser->parse();
-    parser->deleteLater();
-
-    if (DVBConfParser::ERROR_OPEN == ret)
+    DTVConfParser::return_t ret = parser.Parse();
+    if (DTVConfParser::OK != ret)
     {
-        MythPopupBox::showOkPopup(
-            gContext->GetMainWindow(), tr("ScanWizard"),
-            tr("Failed to open '%1'").arg(file));
-    }
+        QString msg = (DTVConfParser::ERROR_PARSE == ret) ?
+            tr("Failed to parse '%1'") : tr("Failed to open '%1'");
 
-    if (DVBConfParser::ERROR_PARSE == ret)
-    {
-        MythPopupBox::showOkPopup(
-            gContext->GetMainWindow(), tr("ScanWizard"),
-            tr("Failed to parse '%1'").arg(file));
+        MythPopupBox::showOkPopup(gContext->GetMainWindow(),
+                                  tr("ScanWizard"), msg.arg(file));
     }
-#endif // USING_DVB
+    else
+    {
+        channels = parser.GetChannels();
+    }
 }
 
 void ScanWizardScanner::PreScanCommon(uint cardid, uint sourceid)
@@ -723,6 +709,55 @@ void ScanWizardScanner::HandleTuneComplete(void)
         VERBOSE(VB_SIPARSER, LOC + "ScanServicesSourceID("<<nVideoSource<<")");
         scanner->SetRenameChannels(false);
         ok = scanner->ScanServicesSourceID(nVideoSource);
+        if (ok)
+        {
+            post_event(this, ScannerEvent::ServicePct,
+                       TRANSPORT_PCT);
+        }
+        else
+        {
+            post_event(this, ScannerEvent::TuneComplete,
+                       ScannerEvent::ERROR_TUNE);
+        }
+    }
+    else if (nScanType == ScanTypeSetting::DVBUtilsImport && channels.size())
+    {
+        ok = true;
+
+        VERBOSE(VB_SIPARSER, LOC + "ScanForChannels("<<nVideoSource<<")");
+
+        scanner->SetChannelFormat(parent->paneDVBUtilsImport->GetATSCFormat());
+
+        if (parent->paneDVBUtilsImport->DoDeleteChannels())
+        {
+            MSqlQuery query(MSqlQuery::InitCon());
+            query.prepare("DELETE FROM channel "
+                          "WHERE sourceid = :SOURCEID");
+            query.bindValue(":SOURCEID", nVideoSource);
+            query.exec();
+        }
+
+        scanner->SetRenameChannels(
+            parent->paneDVBUtilsImport->DoRenameChannels());
+
+        int  ccardid = parent->captureCard();
+        int  pcardid = CardUtil::GetParentCardID(ccardid);
+        int  cardid  = (pcardid) ? pcardid : ccardid;
+        QString card_type = CardUtil::GetRawCardType(cardid, nVideoSource);
+        QString sub_type = card_type;
+        if (card_type == "DVB")
+        {
+            QString device = CardUtil::GetVideoDevice(cardid, nVideoSource);
+            ok = !device.isEmpty();
+            if (ok)
+                sub_type = CardUtil::ProbeDVBType(device.toUInt()).upper();
+        }
+
+        if (ok)
+        {
+            ok = scanner->ScanForChannels(nVideoSource, std,
+                                          sub_type, channels);
+        }
         if (ok)
         {
             post_event(this, ScannerEvent::ServicePct,
