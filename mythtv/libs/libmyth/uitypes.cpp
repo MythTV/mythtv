@@ -2158,21 +2158,22 @@ void UIImageGridType::Draw(QPainter *p, int drawlayer, int context)
     if (m_debug == true)
     {
         p->setPen(Qt::red);
-        p->drawRect(QRect(0, 0, displayRect.width(), displayRect.height()));
+        p->drawRect(QRect(displayRect.x(), displayRect.y(),
+                    displayRect.width(), displayRect.height()));
     }
 
     int curPos = topRow * columnCount;
 
     for (int y = 0; y < rowCount; y++)
     {
-        int ypos = y * (padding + cellHeight);
+        int ypos = displayRect.y() + y * (padding + cellHeight);
 
         for (int x = 0; x < columnCount; x++)
         {
             if (curPos >= itemCount)
                 continue;
 
-            int xpos = x * (padding + cellWidth);
+            int xpos = displayRect.x() + x * (padding + cellWidth);
             drawCell(p, curPos, xpos, ypos);
 
             curPos++;
