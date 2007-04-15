@@ -273,7 +273,7 @@ frameMapSearchForwards(const FrameAnalyzer::FrameMap *frameMap, long long mark,
         const long long ee = bb + block.data();
         if (mark < ee)
         {
-            if (bb < markend)
+            if (mark <= bb && bb < markend)
                 return block;
             break;
         }
@@ -288,7 +288,7 @@ frameMapSearchBackwards(const FrameAnalyzer::FrameMap *frameMap,
     /*
      * Search backards to find the latest block "block" such that
      *
-     *          markbegin <= blockend < mark
+     *          markbegin < blockend <= mark
      *
      * Return frameMap->constEnd() if there is no such block.
      */
@@ -299,7 +299,7 @@ frameMapSearchBackwards(const FrameAnalyzer::FrameMap *frameMap,
         const long long ee = bb + block.data();
         if (bb < mark)
         {
-            if (markbegin < ee)
+            if (markbegin < ee && ee <= mark)
                 return block;
             break;
         }
