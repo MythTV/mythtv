@@ -387,8 +387,8 @@ void MythLineEdit::keyPressEvent(QKeyEvent *e)
                     (e->key() == Qt::Key_Enter) ||
                     (e->key() == Qt::Key_Return)))
             {
-                if ((allowVirtualKeyboard) &&
-				    (gContext->GetNumSetting("UseVirtualKeyboard", 1) == 1))
+                if ((allowVirtualKeyboard) && rw &&
+                    (gContext->GetNumSetting("UseVirtualKeyboard", 1) == 1))
                 {
                     popup = new VirtualKeyboard(gContext->GetMainWindow(), this);
                     gContext->GetMainWindow()->detach(popup);
@@ -405,7 +405,7 @@ void MythLineEdit::keyPressEvent(QKeyEvent *e)
     }
 
     if (!handled)
-        if (rw || e->key() == Key_Escape)
+        if (rw || e->key() == Key_Escape || e->key() == Key_Left || e->key() == Key_Right)
             QLineEdit::keyPressEvent(e);
 }
 
