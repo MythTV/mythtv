@@ -814,8 +814,6 @@ void MythMainWindow::RegisterKey(const QString &context, const QString &action,
         else
         {
             QString inskey = keybind;
-            inskey.replace('\\', "\\\\");
-            inskey.replace('\"', "\\\"");
 
             query.prepare("INSERT INTO keybindings (context, action, "
                           "description, keylist, hostname) VALUES "
@@ -936,8 +934,6 @@ void MythMainWindow::RegisterJump(const QString &destination,
         else
         {
             QString inskey = keybind;
-            inskey.replace('\\', "\\\\");
-            inskey.replace('\"', "\\\"");
 
             query.prepare("INSERT INTO jumppoints (destination, description, "
                           "keylist, hostname) VALUES ( :DEST, :DESC, :KEYLIST, "
