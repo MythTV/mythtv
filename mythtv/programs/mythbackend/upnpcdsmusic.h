@@ -37,32 +37,32 @@ class UPnpCDSMusic : public UPnpCDSExtension
                                      short                    nStartingIndex,
                                      short                    nRequestedCount );
 
-        void CreateMusicTracks     ( UPnpCDSBrowseRequest    *pRequest,
+        void CreateMusicTracks     ( UPnpCDSRequest          *pRequest,
                                      UPnpCDSExtensionResults *pResults,
                                      int                      nNodeIdx,
                                      const QString           &sKey, 
                                      bool                     bAddRef );
 
-        void AddMusicTrack         ( UPnpCDSBrowseRequest    *pRequest,
+        void AddMusicTrack         ( UPnpCDSRequest          *pRequest,
                                      UPnpCDSExtensionResults *pResults,
                                      bool                     bAddRef, 
                                      int                      nNodeIdx,
                                      MSqlQuery               &query );
 
-        UPnpCDSExtensionResults *ProcessRoot     ( UPnpCDSBrowseRequest    *pRequest, 
+        UPnpCDSExtensionResults *ProcessRoot     ( UPnpCDSRequest          *pRequest, 
                                                    UPnpCDSExtensionResults *pResults,
                                                    QStringList             &idPath );
-        UPnpCDSExtensionResults *ProcessAll      ( UPnpCDSBrowseRequest    *pRequest, 
+        UPnpCDSExtensionResults *ProcessAll      ( UPnpCDSRequest          *pRequest, 
                                                    UPnpCDSExtensionResults *pResults,
                                                    QStringList             &idPath, 
                                                    int                      nNodeIdx );
-        UPnpCDSExtensionResults *ProcessTrack    ( UPnpCDSBrowseRequest    *pRequest,
+        UPnpCDSExtensionResults *ProcessTrack    ( UPnpCDSRequest          *pRequest,
                                                    UPnpCDSExtensionResults *pResults,
                                                    QStringList             &idPath );
-        UPnpCDSExtensionResults *ProcessKey      ( UPnpCDSBrowseRequest    *pRequest,
+        UPnpCDSExtensionResults *ProcessKey      ( UPnpCDSRequest          *pRequest,
                                                    UPnpCDSExtensionResults *pResults,
                                                    QStringList             &idPath );
-        UPnpCDSExtensionResults *ProcessContainer( UPnpCDSBrowseRequest    *pRequest,
+        UPnpCDSExtensionResults *ProcessContainer( UPnpCDSRequest          *pRequest,
                                                    UPnpCDSExtensionResults *pResults,
                                                    int                      nNodeIdx,
                                                    QStringList             &idPath );
@@ -76,8 +76,8 @@ class UPnpCDSMusic : public UPnpCDSExtension
 
         virtual ~UPnpCDSMusic() {}
 
-        virtual UPnpCDSExtensionResults *Browse( UPnpCDSBrowseRequest *pRequest );
-        virtual UPnpCDSExtensionResults *Search( UPnpCDSSearchRequest *pRequest );
+        virtual UPnpCDSExtensionResults *Browse( UPnpCDSRequest *pRequest );
+        virtual UPnpCDSExtensionResults *Search( UPnpCDSRequest *pRequest );
 
         virtual QString GetSearchCapabilities() { return( "" ); }
         virtual QString GetSortCapabilities  () { return( "" ); }

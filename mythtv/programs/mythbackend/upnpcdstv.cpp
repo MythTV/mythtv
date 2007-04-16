@@ -128,7 +128,7 @@ static const short g_nRootNodeLength = sizeof( g_RootNodes ) / sizeof( RootInfo 
 //
 /////////////////////////////////////////////////////////////////////////////
 
-UPnpCDSExtensionResults *UPnpCDSTv::Browse( UPnpCDSBrowseRequest *pRequest )
+UPnpCDSExtensionResults *UPnpCDSTv::Browse( UPnpCDSRequest *pRequest )
 {
 
     // -=>TODO: Need to add Filter & Sorting Support.
@@ -173,11 +173,34 @@ UPnpCDSExtensionResults *UPnpCDSTv::Browse( UPnpCDSBrowseRequest *pRequest )
         if ((nNodeIdx > 0) && (nNodeIdx < g_nRootNodeLength))
             return( ProcessContainer( pRequest, pResults, nNodeIdx, idPath ));
 
-        delete pResults;
+        pResults->m_eErrorCode = UPnPResult_CDS_NoSuchObject;
+        pResults->m_sErrorDesc = "";
     }
 
-    return( NULL );        
+    return( pResults );        
 
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
+UPnpCDSExtensionResults *UPnpCDSTv::Search( UPnpCDSRequest *pRequest )
+{
+    // -=>TODO: Need to add Filter & Sorting Support.
+    // -=>TODO: Need to add Sub-Folder/Category Support!!!!!
+
+    QStringList sEmptyList;
+    QString     sClass = "object.item.videoItem";
+
+     if ( !sClass.startsWith( pRequest->m_sSearchClass ))
+        return NULL;
+
+    UPnpCDSExtensionResults *pResults = new UPnpCDSExtensionResults();
+
+    CreateVideoItems( pRequest, pResults, 0, "", false );
+
+    return pResults;
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -205,7 +228,7 @@ QString UPnpCDSTv::RemoveToken( const QString &sToken, const QString &sStr, int 
 //
 /////////////////////////////////////////////////////////////////////////////
 
-UPnpCDSExtensionResults *UPnpCDSTv::ProcessRoot( UPnpCDSBrowseRequest    *pRequest, 
+UPnpCDSExtensionResults *UPnpCDSTv::ProcessRoot( UPnpCDSRequest          *pRequest, 
                                                  UPnpCDSExtensionResults *pResults, 
                                                  QStringList             &/*idPath*/ )
 {
@@ -276,7 +299,7 @@ UPnpCDSExtensionResults *UPnpCDSTv::ProcessRoot( UPnpCDSBrowseRequest    *pReque
 //
 /////////////////////////////////////////////////////////////////////////////
 
-UPnpCDSExtensionResults *UPnpCDSTv::ProcessAll ( UPnpCDSBrowseRequest    *pRequest,
+UPnpCDSExtensionResults *UPnpCDSTv::ProcessAll ( UPnpCDSRequest          *pRequest,
                                                  UPnpCDSExtensionResults *pResults,
                                                  QStringList             &/*idPath*/ )
 {
@@ -327,7 +350,7 @@ UPnpCDSExtensionResults *UPnpCDSTv::ProcessAll ( UPnpCDSBrowseRequest    *pReque
 //
 /////////////////////////////////////////////////////////////////////////////
 
-UPnpCDSExtensionResults *UPnpCDSTv::ProcessItem( UPnpCDSBrowseRequest    *pRequest,
+UPnpCDSExtensionResults *UPnpCDSTv::ProcessItem( UPnpCDSRequest          *pRequest,
                                                  UPnpCDSExtensionResults *pResults, 
                                                  QStringList             &idPath )
 {
@@ -371,7 +394,7 @@ UPnpCDSExtensionResults *UPnpCDSTv::ProcessItem( UPnpCDSBrowseRequest    *pReque
                 {
                     pRequest->m_sObjectId = RemoveToken( "/", pRequest->m_sObjectId, 1 );
 
-                    AddVideoItem( pRequest, pResults, false, query );
+                    AddVideoItem( pRequest->m_sObjectId, pResults, false, query );
                     pResults->m_nTotalMatches = 1;
                 }
             }
@@ -385,7 +408,7 @@ UPnpCDSExtensionResults *UPnpCDSTv::ProcessItem( UPnpCDSBrowseRequest    *pReque
 //
 /////////////////////////////////////////////////////////////////////////////
 
-UPnpCDSExtensionResults *UPnpCDSTv::ProcessKey( UPnpCDSBrowseRequest    *pRequest,
+UPnpCDSExtensionResults *UPnpCDSTv::ProcessKey( UPnpCDSRequest          *pRequest,
                                                 UPnpCDSExtensionResults *pResults, 
                                                 QStringList             &idPath )
 {
@@ -467,7 +490,7 @@ UPnpCDSExtensionResults *UPnpCDSTv::ProcessKey( UPnpCDSBrowseRequest    *pReques
 //
 /////////////////////////////////////////////////////////////////////////////
 
-UPnpCDSExtensionResults *UPnpCDSTv::ProcessContainer( UPnpCDSBrowseRequest    *pRequest,
+UPnpCDSExtensionResults *UPnpCDSTv::ProcessContainer( UPnpCDSRequest          *pRequest,
                                                       UPnpCDSExtensionResults *pResults,
                                                       int                      nNodeIdx,
                                                       QStringList             &/*idPath*/ )
@@ -639,7 +662,7 @@ int UPnpCDSTv::GetCount( const QString &sColumn, const QString &sKey )
 //
 /////////////////////////////////////////////////////////////////////////////
 
-void UPnpCDSTv::CreateVideoItems( UPnpCDSBrowseRequest    *pRequest,
+void UPnpCDSTv::CreateVideoItems( UPnpCDSRequest          *pRequest,
                                   UPnpCDSExtensionResults *pResults,
                                   int                      nNodeIdx,
                                   const QString           &sKey, 
@@ -678,7 +701,7 @@ void UPnpCDSTv::CreateVideoItems( UPnpCDSBrowseRequest    *pRequest,
         if (query.isActive() && query.size() > 0)
         {
             while(query.next())
-                AddVideoItem( pRequest, pResults, bAddRef, query );
+                AddVideoItem( pRequest->m_sObjectId, pResults, bAddRef, query );
         }
     }
 }
@@ -687,7 +710,7 @@ void UPnpCDSTv::CreateVideoItems( UPnpCDSBrowseRequest    *pRequest,
 //
 /////////////////////////////////////////////////////////////////////////////
 
-void UPnpCDSTv::AddVideoItem( UPnpCDSBrowseRequest    *pRequest,
+void UPnpCDSTv::AddVideoItem( const QString           &sObjectId,
                               UPnpCDSExtensionResults *pResults,
                               bool                     bAddRef,
                               MSqlQuery               &query )
@@ -703,7 +726,6 @@ void UPnpCDSTv::AddVideoItem( UPnpCDSBrowseRequest    *pRequest,
     QString        sRecGroup    = query.value( 8).toString();
     long long      nFileSize    = stringToLongLong( query.value( 9).toString() );
     QString        sBaseName    = query.value(10).toString();
-    //VERBOSE(VB_UPNP, QString(" %1 : %2 - %3 - %4").arg(sTitle).arg(sSubtitle).arg(sBaseName).arg(nFileSize));
 
     QDateTime      dtProgStart  = query.value(11).toDateTime();
     QDateTime      dtProgEnd    = query.value(12).toDateTime();
@@ -733,12 +755,12 @@ void UPnpCDSTv::AddVideoItem( UPnpCDSBrowseRequest    *pRequest,
                             .arg( dtStartTime.toString(Qt::ISODate));
 
     QString sId        = QString( "%1/item%2")
-                            .arg( pRequest->m_sObjectId )
+                            .arg( sObjectId )
                             .arg( sURIParams );
 
     CDSObject *pItem   = CDSObject::CreateVideoItem( sId, 
                                                      sName, 
-                                                     pRequest->m_sObjectId );
+                                                     sObjectId );
     pItem->m_bRestricted  = false;
     pItem->m_bSearchable  = true;
     pItem->m_sWriteStatus = "WRITABLE";
@@ -765,6 +787,16 @@ void UPnpCDSTv::AddVideoItem( UPnpCDSBrowseRequest    *pRequest,
     //pItem->SetPropValue( "relation"       , );
     //pItem->SetPropValue( "region"         , );
 
+    // ----------------------------------------------------------------------
+    // Needed for Microsoft Media Player Compatibility 
+    // (Won't display correct Title without them)
+    // ----------------------------------------------------------------------
+
+    pItem->SetPropValue( "creator"       , "[Unknown Author]" );
+    pItem->SetPropValue( "artist"        , "[Unknown Author]" );
+    pItem->SetPropValue( "album"         , "[Unknown Series]" );
+    pItem->SetPropValue( "actor"         , "[Unknown Author]" );
+
     pResults->Add( pItem );
 
     // ----------------------------------------------------------------------
@@ -783,6 +815,7 @@ void UPnpCDSTv::AddVideoItem( UPnpCDSBrowseRequest    *pRequest,
     uint uiStart = dtProgStart.toTime_t();
     uint uiEnd   = dtProgEnd.toTime_t();
     uint uiDur   = uiEnd - uiStart;
+
 
     QString sDur = QString( "%1:%2:%3" )
                     .arg( (uiDur / 3600) % 24, 2 )

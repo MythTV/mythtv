@@ -42,30 +42,30 @@ class UPnpCDSTv : public UPnpCDSExtension
                                      short                    nStartingIndex,
                                      short                    nRequestedCount );
 
-        void CreateVideoItems      ( UPnpCDSBrowseRequest    *pRequest,
+        void CreateVideoItems      ( UPnpCDSRequest          *pRequest,
                                      UPnpCDSExtensionResults *pResults,
                                      int                      nNodeIdx,
                                      const QString           &sKey, 
                                      bool                     bAddRef );
 
-        void AddVideoItem          ( UPnpCDSBrowseRequest    *pRequest,
+        void AddVideoItem          ( const QString           &sObjectId,
                                      UPnpCDSExtensionResults *pResults,
                                      bool                     bAddRef, 
                                      MSqlQuery               &query );
 
-        UPnpCDSExtensionResults *ProcessRoot     ( UPnpCDSBrowseRequest    *pRequest, 
+        UPnpCDSExtensionResults *ProcessRoot     ( UPnpCDSRequest          *pRequest, 
                                                    UPnpCDSExtensionResults *pResults,
                                                    QStringList             &idPath );
-        UPnpCDSExtensionResults *ProcessAll      ( UPnpCDSBrowseRequest    *pRequest, 
+        UPnpCDSExtensionResults *ProcessAll      ( UPnpCDSRequest          *pRequest, 
                                                    UPnpCDSExtensionResults *pResults,
                                                    QStringList             &idPath );
-        UPnpCDSExtensionResults *ProcessItem     ( UPnpCDSBrowseRequest    *pRequest,
+        UPnpCDSExtensionResults *ProcessItem     ( UPnpCDSRequest          *pRequest,
                                                    UPnpCDSExtensionResults *pResults,
                                                    QStringList             &idPath );
-        UPnpCDSExtensionResults *ProcessKey      ( UPnpCDSBrowseRequest    *pRequest,
+        UPnpCDSExtensionResults *ProcessKey      ( UPnpCDSRequest          *pRequest,
                                                    UPnpCDSExtensionResults *pResults,
                                                    QStringList             &idPath );
-        UPnpCDSExtensionResults *ProcessContainer( UPnpCDSBrowseRequest    *pRequest,
+        UPnpCDSExtensionResults *ProcessContainer( UPnpCDSRequest          *pRequest,
                                                    UPnpCDSExtensionResults *pResults,
                                                    int                      nNodeIdx,
                                                    QStringList             &idPath );
@@ -79,11 +79,8 @@ class UPnpCDSTv : public UPnpCDSExtension
 
         virtual ~UPnpCDSTv() {}
 
-        virtual UPnpCDSExtensionResults *Browse( UPnpCDSBrowseRequest *pRequest );
-        virtual UPnpCDSExtensionResults *Search( UPnpCDSSearchRequest * /* pRequest */ )
-        { 
-            return( NULL );
-        }
+        virtual UPnpCDSExtensionResults *Browse( UPnpCDSRequest *pRequest );
+        virtual UPnpCDSExtensionResults *Search( UPnpCDSRequest *pRequest );
 
         virtual QString GetSearchCapabilities() { return( "" ); }
         virtual QString GetSortCapabilities  () { return( "" ); }

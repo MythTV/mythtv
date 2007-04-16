@@ -134,38 +134,29 @@ static const short g_nRootNodeLength = sizeof( g_RootNodes ) / sizeof( RootInfo 
 //
 /////////////////////////////////////////////////////////////////////////////
                                       
-UPnpCDSExtensionResults *UPnpCDSMusic::Search( UPnpCDSSearchRequest *pRequest )
+UPnpCDSExtensionResults *UPnpCDSMusic::Search( UPnpCDSRequest *pRequest )
 {
-    UPnpCDSBrowseRequest request;
+    // -=>TODO: Need to add Filter & Sorting Support.
+    // -=>TODO: Need to add Sub-Folder/Category Support!!!!!
 
-    VERBOSE(VB_UPNP, "UPnpCDSMusic::Search");
+    QStringList sEmptyList;
+    QString     sClass = "object.item.audioItem.musicTrack";
 
-    // Fake a browse request rather than duplicate all of that code.
+     if ( !sClass.startsWith( pRequest->m_sSearchClass ))
+        return NULL;
 
-    if (pRequest->m_sContainerID == "7" )
-        request.m_sObjectId         = "Music/2";
-    else
-        request.m_sObjectId = pRequest->m_sContainerID;
+    UPnpCDSExtensionResults *pResults = new UPnpCDSExtensionResults();
 
-    //request.m_sParentId         = "";
-    //pRequest->m_sContainerID;
+    CreateMusicTracks( pRequest, pResults, 0, "", false );
 
-    request.m_eBrowseFlag       = CDS_BrowseDirectChildren;
-    request.m_sFilter           = "*";
-    //pRequest->m_sFilter;
-    request.m_nStartingIndex    = pRequest->m_nStartingIndex;
-    request.m_nRequestedCount   = pRequest->m_nRequestedCount;
-    request.m_sSortCriteria     = "";
-    //pRequest->m_sSortCriteria;
-
-    return( Browse(  &request )  );
+    return pResults;
 }
 
 /////////////////////////////////////////////////////////////////////////////
 //
 /////////////////////////////////////////////////////////////////////////////
 
-UPnpCDSExtensionResults *UPnpCDSMusic::Browse( UPnpCDSBrowseRequest *pRequest )
+UPnpCDSExtensionResults *UPnpCDSMusic::Browse( UPnpCDSRequest *pRequest )
 {
 
     // -=>TODO: Need to add Filter & Sorting Support.
@@ -244,7 +235,7 @@ QString UPnpCDSMusic::RemoveToken( const QString &sToken, const QString &sStr, i
 //
 /////////////////////////////////////////////////////////////////////////////
 
-UPnpCDSExtensionResults *UPnpCDSMusic::ProcessRoot( UPnpCDSBrowseRequest    *pRequest, 
+UPnpCDSExtensionResults *UPnpCDSMusic::ProcessRoot( UPnpCDSRequest          *pRequest, 
                                                     UPnpCDSExtensionResults *pResults, 
                                                     QStringList             &/*idPath*/ )
 {
@@ -314,7 +305,7 @@ UPnpCDSExtensionResults *UPnpCDSMusic::ProcessRoot( UPnpCDSBrowseRequest    *pRe
 //
 /////////////////////////////////////////////////////////////////////////////
 
-UPnpCDSExtensionResults *UPnpCDSMusic::ProcessAll ( UPnpCDSBrowseRequest    *pRequest,
+UPnpCDSExtensionResults *UPnpCDSMusic::ProcessAll ( UPnpCDSRequest          *pRequest,
                                                     UPnpCDSExtensionResults *pResults,
                                                     QStringList             &/*idPath*/,
                                                     int                      nNodeIdx )
@@ -366,7 +357,7 @@ UPnpCDSExtensionResults *UPnpCDSMusic::ProcessAll ( UPnpCDSBrowseRequest    *pRe
 //
 /////////////////////////////////////////////////////////////////////////////
 
-UPnpCDSExtensionResults *UPnpCDSMusic::ProcessTrack( UPnpCDSBrowseRequest    */* pRequest */,
+UPnpCDSExtensionResults *UPnpCDSMusic::ProcessTrack( UPnpCDSRequest          */* pRequest */,
                                                      UPnpCDSExtensionResults *pResults, 
                                                      QStringList             &/* idPath */)
 {
@@ -426,7 +417,7 @@ UPnpCDSExtensionResults *UPnpCDSMusic::ProcessTrack( UPnpCDSBrowseRequest    */*
 //
 /////////////////////////////////////////////////////////////////////////////
 
-UPnpCDSExtensionResults *UPnpCDSMusic::ProcessKey( UPnpCDSBrowseRequest    *pRequest,
+UPnpCDSExtensionResults *UPnpCDSMusic::ProcessKey( UPnpCDSRequest          *pRequest,
                                                    UPnpCDSExtensionResults *pResults, 
                                                    QStringList             &idPath )
 {
@@ -510,7 +501,7 @@ UPnpCDSExtensionResults *UPnpCDSMusic::ProcessKey( UPnpCDSBrowseRequest    *pReq
 //
 /////////////////////////////////////////////////////////////////////////////
 
-UPnpCDSExtensionResults *UPnpCDSMusic::ProcessContainer( UPnpCDSBrowseRequest    *pRequest,
+UPnpCDSExtensionResults *UPnpCDSMusic::ProcessContainer( UPnpCDSRequest          *pRequest,
                                                          UPnpCDSExtensionResults *pResults,
                                                          int                      nNodeIdx,
                                                          QStringList             &/*idPath*/ )
@@ -679,7 +670,7 @@ int UPnpCDSMusic::GetCount( int nNodeIdx , const QString &sKey )
 //
 /////////////////////////////////////////////////////////////////////////////
 
-void UPnpCDSMusic::CreateMusicTracks( UPnpCDSBrowseRequest    *pRequest,
+void UPnpCDSMusic::CreateMusicTracks( UPnpCDSRequest          *pRequest,
                                       UPnpCDSExtensionResults *pResults,
                                       int                      nNodeIdx,
                                       const QString           &sKey, 
@@ -720,7 +711,7 @@ void UPnpCDSMusic::CreateMusicTracks( UPnpCDSBrowseRequest    *pRequest,
 //
 /////////////////////////////////////////////////////////////////////////////
 
-void UPnpCDSMusic::AddMusicTrack( UPnpCDSBrowseRequest    *pRequest,
+void UPnpCDSMusic::AddMusicTrack( UPnpCDSRequest          *pRequest,
                                   UPnpCDSExtensionResults *pResults,
                                   bool                     bAddRef,
                                   int                      /*nNodeIdx*/,

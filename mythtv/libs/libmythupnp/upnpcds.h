@@ -42,44 +42,33 @@ typedef enum
 
 //////////////////////////////////////////////////////////////////////////////
 
-class UPnpCDSBrowseRequest
+class UPnpCDSRequest
 {
     public:
 
-        QString           m_sParentId;
         QString           m_sObjectId;
-        UPnpCDSBrowseFlag m_eBrowseFlag;
+
         QString           m_sFilter;
         short             m_nStartingIndex;
         short             m_nRequestedCount;
         QString           m_sSortCriteria;
 
-    public:
+        // Browse specific properties
 
-        UPnpCDSBrowseRequest() : m_eBrowseFlag    ( CDS_BrowseUnknown ),
-                                 m_nStartingIndex ( 0 ),
-                                 m_nRequestedCount( 0 )
-        {
-        }
-};
+        QString           m_sParentId;
+        UPnpCDSBrowseFlag m_eBrowseFlag;
 
-//////////////////////////////////////////////////////////////////////////////
+        // Search specific properties
 
-class UPnpCDSSearchRequest
-{
-    public:
-
-        QString     m_sContainerID;
-        QString     m_sSearchCriteria;
-        QString     m_sFilter;
-        short       m_nStartingIndex;
-        short       m_nRequestedCount;
-        QString     m_sSortCriteria;
+        QString           m_sSearchCriteria;
+        QStringList       m_sSearchList;
+        QString           m_sSearchClass;
 
     public:
 
-        UPnpCDSSearchRequest() : m_nStartingIndex ( 0 ),
-                                 m_nRequestedCount( 0 )
+        UPnpCDSRequest() : m_nStartingIndex ( 0 ),
+                           m_nRequestedCount( 0 ),
+                           m_eBrowseFlag( CDS_BrowseUnknown )
         {
         }
 };
@@ -129,8 +118,8 @@ class UPnpCDSExtension
 
         virtual ~UPnpCDSExtension() {}
 
-        virtual UPnpCDSExtensionResults *Browse( UPnpCDSBrowseRequest *pRequest ) = 0;
-        virtual UPnpCDSExtensionResults *Search( UPnpCDSSearchRequest *pRequest ) = 0;
+        virtual UPnpCDSExtensionResults *Browse( UPnpCDSRequest *pRequest ) = 0;
+        virtual UPnpCDSExtensionResults *Search( UPnpCDSRequest *pRequest ) = 0;
 
         virtual QString GetSearchCapabilities() { return( "" ); }
         virtual QString GetSortCapabilities  () { return( "" ); }

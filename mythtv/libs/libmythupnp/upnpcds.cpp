@@ -182,7 +182,7 @@ bool UPnpCDS::ProcessRequest( HttpWorkerThread *pThread, HTTPRequest *pRequest )
 void UPnpCDS::HandleBrowse( HTTPRequest *pRequest )
 {
     UPnpCDSExtensionResults *pResult  = NULL;
-    UPnpCDSBrowseRequest     request;
+    UPnpCDSRequest           request;
 
     request.m_sObjectId         = pRequest->m_mapParams[ "ObjectID"      ];
     request.m_sParentId         = "0";
@@ -192,11 +192,25 @@ void UPnpCDS::HandleBrowse( HTTPRequest *pRequest )
     request.m_nRequestedCount   = pRequest->m_mapParams[ "RequestedCount"].toLong();
     request.m_sSortCriteria     = pRequest->m_mapParams[ "SortCriteria"  ];
 
-    VERBOSE(VB_UPNP,QString("UPnpCDS::ProcessRequest : %1 : %2 : %3 : %4")
-                       .arg( pRequest->m_sBaseUrl )
-                       .arg( pRequest->m_sMethod )
-                       .arg( request.m_sObjectId )
-                       .arg( request.m_eBrowseFlag ));
+/*
+    VERBOSE(VB_UPNP,QString("UPnpCDS::ProcessRequest \n"
+                            ": url            = %1 \n"
+                            ": Method         = %2 \n"
+                            ": ObjectId       = %3 \n"
+                            ": BrowseFlag     = %4 \n"
+                            ": Filter         = %5 \n"
+                            ": StartingIndex  = %6 \n"
+                            ": RequestedCount = %7 \n"
+                            ": SortCriteria   = %8 " )
+                       .arg( pRequest->m_sBaseUrl     )
+                       .arg( pRequest->m_sMethod      )
+                       .arg( request.m_sObjectId      )
+                       .arg( request.m_eBrowseFlag    )
+                       .arg( request.m_sFilter        )
+                       .arg( request.m_nStartingIndex )
+                       .arg( request.m_nRequestedCount)
+                       .arg( request.m_sSortCriteria  ));
+*/
 
     UPnPResultCode eErrorCode      = UPnPResult_CDS_NoSuchObject;
     QString        sErrorDesc      = "";
@@ -344,9 +358,8 @@ void UPnpCDS::HandleBrowse( HTTPRequest *pRequest )
 void UPnpCDS::HandleSearch( HTTPRequest *pRequest )
 {
     UPnpCDSExtensionResults *pResult  = NULL;
-    UPnpCDSSearchRequest     request;
+    UPnpCDSRequest           request;
 
-    QString       old_sClass      = m_root.m_sClass;
     UPnPResultCode eErrorCode      = UPnPResult_InvalidAction;
     QString       sErrorDesc      = "";
     short         nNumberReturned = 0;
@@ -354,22 +367,70 @@ void UPnpCDS::HandleSearch( HTTPRequest *pRequest )
     short         nUpdateID       = 0;
     QString       sResultXML;
 
-    request.m_sContainerID      = pRequest->m_mapParams[ "ContainerID"   ];
+    request.m_sObjectId         = pRequest->m_mapParams[ "ContainerID"   ];
     request.m_sFilter           = pRequest->m_mapParams[ "Filter"        ];
     request.m_nStartingIndex    = pRequest->m_mapParams[ "StartingIndex" ].toLong();
     request.m_nRequestedCount   = pRequest->m_mapParams[ "RequestedCount"].toLong();
     request.m_sSortCriteria     = pRequest->m_mapParams[ "SortCriteria"  ];
-    request.m_sSearchCriteria   = "";
+    request.m_sSearchCriteria   = pRequest->m_mapParams[ "SearchCriteria"];
 
-    m_root.m_sClass = pRequest->m_mapParams[ "SearchCriteria"];
+    // ----------------------------------------------------------------------
+    // Break the SearchCriteria into it's parts 
+    // -=>TODO: This DOES NOT handle ('s or other complex expressions
+    // ----------------------------------------------------------------------
 
-    VERBOSE(VB_UPNP,QString("UPnpCDS::ProcessRequest : %1 : %2 : %3 : %4")
-                       .arg( pRequest->m_sBaseUrl )
-                       .arg( pRequest->m_sMethod )
-                       .arg( request.m_sContainerID )
-                       .arg( request.m_sFilter ));
+    QRegExp  rMatch( "\\b(or|and)\\b" );
+             rMatch.setCaseSensitive( FALSE );
 
-    //pRequest->m_mapParams[ "SearchCriteria"];
+    request.m_sSearchList  = QStringList::split( rMatch, request.m_sSearchCriteria );
+    request.m_sSearchClass = "object";  // Default to all objects.
+
+    // ----------------------------------------------------------------------
+    // -=>TODO: Need to process all expressions in searchCriteria... for now,
+    //          Just focus on the "upnp:class derivedfrom" expression
+    // ----------------------------------------------------------------------
+
+    for ( QStringList::Iterator it  = request.m_sSearchList.begin(); 
+                                it != request.m_sSearchList.end(); 
+                              ++it ) 
+    {
+        if ( (*it).contains( "upnp:class derivedfrom", FALSE ) > 0)
+        {
+            QStringList sParts = QStringList::split( ' ', *it );
+
+            if (sParts.count() > 2)
+            {
+                request.m_sSearchClass = sParts[2].stripWhiteSpace();
+                request.m_sSearchClass.remove( '"' );
+
+                break;
+            }
+        }
+    }
+
+    // ----------------------------------------------------------------------
+
+/*
+    VERBOSE(VB_UPNP,QString("UPnpCDS::ProcessRequest \n"
+                            ": url            = %1 \n"
+                            ": Method         = %2 \n"
+                            ": ObjectId       = %3 \n"
+                            ": SearchCriteria = %4 \n"
+                            ": Filter         = %5 \n"
+                            ": StartingIndex  = %6 \n"
+                            ": RequestedCount = %7 \n"
+                            ": SortCriteria   = %8 \n"
+                            ": SearchClass    = %9" )
+                       .arg( pRequest->m_sBaseUrl     )
+                       .arg( pRequest->m_sMethod      )
+                       .arg( request.m_sObjectId      )
+                       .arg( request.m_sSearchCriteria)
+                       .arg( request.m_sFilter        )
+                       .arg( request.m_nStartingIndex )
+                       .arg( request.m_nRequestedCount)
+                       .arg( request.m_sSortCriteria  )
+                       .arg( request.m_sSearchClass   ));
+*/
 
     UPnpCDSExtension    *pExtension = m_extensions.first();
 

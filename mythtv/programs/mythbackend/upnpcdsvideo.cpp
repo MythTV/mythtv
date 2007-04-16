@@ -97,7 +97,7 @@ static const short g_nRootNodeLength = sizeof( g_RootNodes ) / sizeof( RootInfo 
 //
 /////////////////////////////////////////////////////////////////////////////
 
-UPnpCDSExtensionResults *UPnpCDSVideo::Browse( UPnpCDSBrowseRequest *pRequest )
+UPnpCDSExtensionResults *UPnpCDSVideo::Browse( UPnpCDSRequest *pRequest )
 {
 
     // -=>TODO: Need to add Filter & Sorting Support.
@@ -175,7 +175,7 @@ QString UPnpCDSVideo::RemoveToken( const QString &sToken, const QString &sStr, i
 //
 /////////////////////////////////////////////////////////////////////////////
 
-UPnpCDSExtensionResults *UPnpCDSVideo::ProcessRoot( UPnpCDSBrowseRequest    *pRequest, 
+UPnpCDSExtensionResults *UPnpCDSVideo::ProcessRoot( UPnpCDSRequest    *pRequest, 
                                                  UPnpCDSExtensionResults *pResults, 
                                                  QStringList             &/*idPath*/ )
 {
@@ -246,7 +246,7 @@ UPnpCDSExtensionResults *UPnpCDSVideo::ProcessRoot( UPnpCDSBrowseRequest    *pRe
 //
 /////////////////////////////////////////////////////////////////////////////
 
-UPnpCDSExtensionResults *UPnpCDSVideo::ProcessAll ( UPnpCDSBrowseRequest    *pRequest,
+UPnpCDSExtensionResults *UPnpCDSVideo::ProcessAll ( UPnpCDSRequest    *pRequest,
                                                  UPnpCDSExtensionResults *pResults,
                                                  QStringList             &/*idPath*/ )
 {
@@ -297,7 +297,7 @@ UPnpCDSExtensionResults *UPnpCDSVideo::ProcessAll ( UPnpCDSBrowseRequest    *pRe
 //
 /////////////////////////////////////////////////////////////////////////////
 
-UPnpCDSExtensionResults *UPnpCDSVideo::ProcessItem( UPnpCDSBrowseRequest    *pRequest,
+UPnpCDSExtensionResults *UPnpCDSVideo::ProcessItem( UPnpCDSRequest    *pRequest,
                                                  UPnpCDSExtensionResults *pResults, 
                                                  QStringList             &idPath )
 {
@@ -353,7 +353,7 @@ UPnpCDSExtensionResults *UPnpCDSVideo::ProcessItem( UPnpCDSBrowseRequest    *pRe
 //
 /////////////////////////////////////////////////////////////////////////////
 
-UPnpCDSExtensionResults *UPnpCDSVideo::ProcessKey( UPnpCDSBrowseRequest    *pRequest,
+UPnpCDSExtensionResults *UPnpCDSVideo::ProcessKey( UPnpCDSRequest    *pRequest,
                                                 UPnpCDSExtensionResults *pResults, 
                                                 QStringList             &idPath )
 {
@@ -435,7 +435,7 @@ UPnpCDSExtensionResults *UPnpCDSVideo::ProcessKey( UPnpCDSBrowseRequest    *pReq
 //
 /////////////////////////////////////////////////////////////////////////////
 
-UPnpCDSExtensionResults *UPnpCDSVideo::ProcessContainer( UPnpCDSBrowseRequest    *pRequest,
+UPnpCDSExtensionResults *UPnpCDSVideo::ProcessContainer( UPnpCDSRequest    *pRequest,
                                                       UPnpCDSExtensionResults *pResults,
                                                       int                      nNodeIdx,
                                                       QStringList             &/*idPath*/ )
@@ -723,7 +723,7 @@ void UPnpCDSVideo::FillMetaMaps(void)
 //
 /////////////////////////////////////////////////////////////////////////////
 
-void UPnpCDSVideo::CreateVideoItems( UPnpCDSBrowseRequest    *pRequest,
+void UPnpCDSVideo::CreateVideoItems( UPnpCDSRequest    *pRequest,
                                   UPnpCDSExtensionResults *pResults,
                                   int                      nNodeIdx,
                                   const QString           &sKey, 
@@ -780,7 +780,7 @@ void UPnpCDSVideo::CreateVideoItems( UPnpCDSBrowseRequest    *pRequest,
 //
 /////////////////////////////////////////////////////////////////////////////
 
-void UPnpCDSVideo::AddVideoItem( UPnpCDSBrowseRequest    *pRequest,
+void UPnpCDSVideo::AddVideoItem( UPnpCDSRequest    *pRequest,
                               UPnpCDSExtensionResults *pResults,
                               bool                     bAddRef,
                               MSqlQuery               &query )

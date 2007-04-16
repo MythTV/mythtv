@@ -422,6 +422,13 @@ CDSObject *CDSObject::CreateVideoItem( QString sId, QString sTitle, QString sPar
     pObject->AddProperty( new Property( "language"       , "dc"   ));
     pObject->AddProperty( new Property( "relation"       , "dc"   ));
 
+    // Added for Microsoft Media Player Compatibility
+
+    pObject->AddProperty( new Property( "creator"        , "dc"   ));
+    pObject->AddProperty( new Property( "artist"         , "upnp" ));
+    pObject->AddProperty( new Property( "album"          , "upnp" ));
+    pObject->AddProperty( new Property( "date"           , "dc"   ));
+
     return( pObject );
 }
 
