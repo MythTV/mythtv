@@ -102,7 +102,7 @@ void BackendQueryDiskSpace(QStringList &strlist,
                     if ((statfs(currentDir, &statbuf) == 0) &&
                         ((statbuf.f_type == 0x6969) ||     // NFS
                          (statbuf.f_type == 0x517B) ||     // SMB
-                         (statbuf.f_type == 0xFF534D42)))  // CIFS
+                         (statbuf.f_type == (long)0xFF534D42)))  // CIFS
                         localStr = "0";
 #endif
                     strlist << gContext->GetHostName();

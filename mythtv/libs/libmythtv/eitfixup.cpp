@@ -632,6 +632,11 @@ void EITFixUp::FixComHem(DBEvent &event, bool process_subtitle) const
         {
             role = DBPerson::kHost;
         }
+        else
+        {
+            event.description=event.description.replace(list[0],"");
+            continue;
+        }
 
         QStringList actors;
         actors = QStringList::split(m_comHemPersSeparator, list[2]);

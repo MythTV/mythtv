@@ -221,7 +221,6 @@ void HouseKeeper::RunHouseKeeping(void)
                             "1970-01-01T00:00:00"), Qt::ISODate);
                         QDateTime lastRun = getLastRun("MythFillDB");
                         QDateTime now = QDateTime::currentDateTime();
-                        int hour = now.toString(QString("h")).toInt();
 
                         if ((nextRun < now) &&
                             (lastRun.secsTo(now) > (3 * 60 * 60)))

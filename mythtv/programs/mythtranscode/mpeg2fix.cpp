@@ -696,7 +696,7 @@ int MPEG2fixup::AddFrame(MPEG2frame *f)
 
 int MPEG2fixup::InitAV(const char *inputfile, const char *type, int64_t offset)
 {
-    int ret, i;
+    int ret;
 
     AVInputFormat *fmt = NULL;
 
@@ -736,7 +736,7 @@ int MPEG2fixup::InitAV(const char *inputfile, const char *type, int64_t offset)
     if (SHOW_MSG(MPF_GENERAL))
         dump_format(inputFC, 0, inputfile, 0);
 
-    for (i = 0; i < inputFC->nb_streams; i++)
+    for (unsigned int i = 0; i < inputFC->nb_streams; i++)
     {
         switch (inputFC->streams[i]->codec->codec_type)
         {
