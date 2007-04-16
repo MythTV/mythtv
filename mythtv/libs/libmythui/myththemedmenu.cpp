@@ -516,6 +516,7 @@ void MythThemedMenuState::parseText(TextAttributes &attributes,
     QString fontname = "Arial";
     bool italic = false;
 
+    attributes.textflags = Qt::WordBreak;
     for (QDomNode child = element.firstChild(); !child.isNull();
          child = child.nextSibling())
     {
@@ -577,6 +578,74 @@ void MythThemedMenuState::parseText(TextAttributes &attributes,
                     }
                 }
             } 
+            // halign has three possible values: center, left, and right. //
+            else if (info.tagName() == "halign")
+            {
+                if (getFirstText(info) == "center")
+                {
+                    // Apparently Japanese is drawn along a _center_ line //
+                    if (gContext->GetLanguage() == "ja")
+                    {
+                        attributes.textflags = attributes.textflags &
+                                    ~Qt::AlignHorizontal_Mask |
+                                Qt::AlignCenter;
+                    }
+                    else
+                    {
+                        attributes.textflags = attributes.textflags &
+                                    ~Qt::AlignHorizontal_Mask |
+                                Qt::AlignHCenter;
+                    }
+                }
+                else if (getFirstText(info) == "left")
+                {
+                    attributes.textflags = attributes.textflags &
+                                ~Qt::AlignHorizontal_Mask |
+                            Qt::AlignLeft |
+                            Qt::WordBreak;
+                }
+                else if (getFirstText(info) == "right")
+                {
+                    attributes.textflags = attributes.textflags &
+                                ~Qt::AlignHorizontal_Mask |
+                            Qt::AlignRight |
+                            Qt::WordBreak;
+                }
+                else
+                {
+                            VERBOSE(VB_GENERAL,
+                    QString("MythThemedMenuPrivate: Unknown value %1 "
+                                        "for halign").arg(getFirstText(info)));
+                }
+            }
+            // valign has three possible values: center, top, and bottom. //
+            else if (info.tagName() == "valign")
+            {
+                if (getFirstText(info) == "center")
+                {
+                    attributes.textflags = attributes.textflags &
+                                ~Qt::AlignVertical_Mask |
+                            Qt::AlignVCenter;
+                }
+                else if (getFirstText(info) == "top")
+                {
+                    attributes.textflags = attributes.textflags &
+                                ~Qt::AlignVertical_Mask |
+                            Qt::AlignTop;
+                }
+                else if (getFirstText(info) == "bottom")
+                {
+                    attributes.textflags = attributes.textflags &
+                                ~Qt::AlignVertical_Mask |
+                            Qt::AlignBottom;
+                }
+                else
+                {
+                            VERBOSE(VB_GENERAL,
+                    QString("MythThemedMenuPrivate: Unknown value %1 "
+                                        "for valign").arg(getFirstText(info)));
+                }
+            }
             else if (info.tagName() == "outline")
             {
                 parseOutline(attributes, info);
@@ -587,8 +656,8 @@ void MythThemedMenuState::parseText(TextAttributes &attributes,
             }
             else
             {
-                VERBOSE(VB_GENERAL, QString("MythThemedMenuPrivate: Unknown tag %1 "
-                                            "in text").arg(info.tagName()));
+                VERBOSE(VB_GENERAL, QString("MythThemedMenuPrivate: Unknown "
+                                        "tag %1 in text").arg(info.tagName()));
                 return;
             }
         }
