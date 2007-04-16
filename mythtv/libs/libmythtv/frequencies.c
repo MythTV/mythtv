@@ -1289,6 +1289,60 @@ static struct CHANLIST argentina[] = {
 };
 
 /* --------------------------------------------------------------------- */
+/* Israel has cable (HOT) and air analog channels. Cable consists of
+   three companies that have recently joined to form HOT - matav, tevel, and
+   Golden Channels. This is the frequency table used in Matav. */
+/* Added by Max Timchenko [www.maxvt.net], 04/04/2007 */
+static struct CHANLIST israel_hot_matav[] = {
+    {  "1", 184250 },
+    {  "2", 192250 },
+    {  "3", 200250 },
+    {  "4", 208250 },
+    {  "5", 216250 },
+    {  "6", 224250 },
+    {  "7", 232250 },
+    {  "8", 248250 },
+    {  "9", 256250 },
+    { "10", 264250 },
+    { "11", 272250 },
+    { "12", 280250 },
+    { "13", 288250 },
+    { "14", 296250 },
+    { "15", 304250 },
+    { "16", 312250 },
+    { "17", 320250 },
+    { "18", 328250 },
+    { "19", 336250 },
+    { "20", 344250 },
+    { "21", 352250 },
+    { "22", 360250 },
+    { "23", 368250 },
+    { "24", 376250 },
+    { "25", 384250 },
+    { "26", 392250 },
+    { "27", 400250 },
+    { "28", 408250 },
+    { "29", 416250 },
+    { "30", 424250 },
+    { "31", 432250 },
+    { "32", 440250 },
+    { "33", 472250 },
+    { "34", 480250 },
+    { "35", 488250 },
+    { "36", 496250 },
+    { "37", 504250 },
+    { "38", 512250 },
+    { "39", 520250 },
+    { "40", 528250 },
+    { "41", 536250 },
+    { "42", 544250 },
+    { "43", 552250 },
+    { "44", 560250 },
+    { "45", 584250 },
+    { "46", 648250 },
+};
+
+/* --------------------------------------------------------------------- */
 
 struct CHANLISTS chanlists[] = {
     { "us-bcast",         ntsc_bcast,        CHAN_COUNT(ntsc_bcast)        },
@@ -1310,5 +1364,6 @@ struct CHANLISTS chanlists[] = {
     { "australia-optus",  pal_australia_optus, CHAN_COUNT(pal_australia_optus) },
     { "singapore",        pal_bcast_sg,      CHAN_COUNT(pal_bcast_sg)      },
     { "malaysia",         pal_bcast_my,	     CHAN_COUNT(pal_bcast_my)      },
+    { "israel-hot-matav", israel_hot_matav,  CHAN_COUNT(israel_hot_matav)  },
     { NULL, NULL, 0 } /* EOF */
 };
