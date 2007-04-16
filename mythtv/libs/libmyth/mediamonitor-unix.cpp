@@ -173,16 +173,21 @@ QString MediaMonitorUnix::GetDeviceFile(const QString &sysfs)
     udevinfo.addArgument("name");
     udevinfo.addArgument("-rp");
     udevinfo.addArgument(sysfs);
-    udevinfo.setCommunication(QProcess::Stdout);
+    udevinfo.setCommunication(QProcess::Stdout|QProcess::Stderr);
 
     udevinfo.start();
 
     int status;
     waitpid(udevinfo.processIdentifier(), &status, 0);
 
+    if (udevinfo.canReadLineStderr())
+        VERBOSE(VB_MEDIA, QString("MediaMonitorUnix::GetDeviceFile -- %1")
+            .arg(udevinfo.readLineStderr()));
+
     QString ret = udevinfo.readLineStdout();
     if (ret != "device not found in database")
         return ret;
+
 #endif // linux
     (void)sysfs;
     return QString::null;
