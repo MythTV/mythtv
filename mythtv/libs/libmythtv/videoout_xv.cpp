@@ -7,7 +7,7 @@
 #include <ctime>
 #include <cerrno>
 
-#ifdef __linux__
+#ifdef HAVE_MALLOC_H
 #include <malloc.h>
 #endif
 #include <fcntl.h>
