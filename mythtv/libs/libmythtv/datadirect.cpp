@@ -972,26 +972,9 @@ bool DataDirectProcessor::GrabNextSuggestedTime(void)
             NextSuggestedTime = newTime;
         }
 
-        int minhr = NextSuggestedTime.toString("h").toInt();
-        int maxhr = NextSuggestedTime.addSecs(7200).toString("h").toInt();
-
-        if (maxhr < minhr)
-        {
-            minhr = 22;
-            maxhr = 24;
-        }
-
         MSqlQuery query(MSqlQuery::DDCon());
         QString querystr =
             QString("UPDATE settings SET data = '%1' WHERE value = '%2';");
-
-        query.prepare(querystr.arg(minhr).arg("MythFillMinHour"));
-        if (!query.exec())
-            MythContext::DBError("Updating DataDirect MythFillMinHour", query);
-
-        query.prepare(querystr.arg(maxhr).arg("MythFillMaxHour"));
-        if (!query.exec())
-            MythContext::DBError("Updating DataDirect MythFillMaxHour", query);
 
         query.prepare(querystr.arg(NextSuggestedTime.toString(Qt::ISODate))
                       .arg("MythFillSuggestedRunTime"));

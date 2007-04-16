@@ -224,8 +224,7 @@ void HouseKeeper::RunHouseKeeping(void)
                         int hour = now.toString(QString("h")).toInt();
 
                         if ((nextRun < now) &&
-                            (lastRun.secsTo(now) > (3 * 60 * 60)) &&
-                            ((minhr <= hour) && (hour <= maxhr)))
+                            (lastRun.secsTo(now) > (3 * 60 * 60)))
                             runMythFill = true;
                     }
                     else if (wantToRun("MythFillDB", period, minhr, maxhr))

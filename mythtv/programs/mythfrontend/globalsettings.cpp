@@ -2940,7 +2940,9 @@ static GlobalCheckBox *MythFillGrabberSuggestsTime()
     bc->setValue(true);
     bc->setHelpText(QObject::tr("This setting allows a DataDirect guide data "
                     "provider to specify the next download time in order to "
-                    "distribute load on their servers."));
+                    "distribute load on their servers. If this setting is "
+                    "enabled, mythfilldatabase Execution Start/End times are "
+                    "ignored."));
     return bc;
 }
 
