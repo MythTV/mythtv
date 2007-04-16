@@ -1607,7 +1607,7 @@ void Scheduler::RunScheduler(void)
                                 msg = QString("%1 secs left to system "
                                               "shutdown!")
                                              .arg(idleTimeoutSecs - itime);
-                                VERBOSE(VB_IMPORTANT, msg);
+                                VERBOSE(VB_IDLE, msg);
                                 MythEvent me(QString("SHUTDOWN_COUNTDOWN %1")
                                              .arg(idleTimeoutSecs - itime));
                                 gContext->dispatch(me);
@@ -1654,12 +1654,12 @@ bool Scheduler::CheckShutdownServer(int prerollseconds, QDateTime &idleSince,
                     retval = true;
                     break;
                 case 1:
-                    VERBOSE(VB_GENERAL, "CheckShutdownServer returned - Not OK to shutdown");
+                    VERBOSE(VB_IDLE, "CheckShutdownServer returned - Not OK to shutdown");
                     // just reset idle'ing on retval == 1
                     idleSince = QDateTime();
                     break;
                 case 2:
-                    VERBOSE(VB_GENERAL, "CheckShutdownServer returned - Not OK to shutdown, need reconnect");
+                    VERBOSE(VB_IDLE, "CheckShutdownServer returned - Not OK to shutdown, need reconnect");
                     // reset shutdown status on retval = 2
                     // (needs a clientconnection again,
                     // before shutdown is executed)
