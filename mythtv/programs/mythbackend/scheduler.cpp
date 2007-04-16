@@ -420,8 +420,8 @@ void Scheduler::PrintList(RecList &list, bool onlyFutureRecordings)
     QDateTime now = QDateTime::currentDateTime();
 
     cout << "--- print list start ---\n";
-    cout << "Title - Subtitle                    Chan ChID Day Start  End   "
-        "C I  T N   Pri" << endl;
+    cout << "Title - Subtitle                    Chan ChID CallSign "
+        "Day Start  End   C I  T N   Pri" << endl;
 
     RecIter i = list.begin();
     for ( ; i != list.end(); i++)
@@ -456,8 +456,10 @@ void Scheduler::PrintRec(ProgramInfo *p, const char *prefix)
         episode = p->title.local8Bit();
 
     cout << episode.leftJustify(35, ' ', true) << " "
-         << p->chanstr.rightJustify(4, ' ') << " " << p->chanid 
-         << p->recstartts.toString("  dd hh:mm-").local8Bit()
+         << p->chanstr.rightJustify(4, ' ') << " " 
+         << p->chanid.rightJustify(4, ' ') << " "
+         << p->chansign.leftJustify(8, ' ', true) << "  "
+         << p->recstartts.toString("dd hh:mm-").local8Bit()
          << p->recendts.toString("hh:mm  ").local8Bit()
          << p->cardid << " " << p->inputid << "  " 
          << p->RecTypeChar() << " " << p->RecStatusChar() << " "
