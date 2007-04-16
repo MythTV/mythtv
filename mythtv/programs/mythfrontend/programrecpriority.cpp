@@ -313,6 +313,8 @@ void ProgramRecPriority::keyPressEvent(QKeyEvent *e)
                 saveRecPriority();
                 upcoming();
             }
+            else if (action == "DETAILS")
+                details();
             else
                 handled = false;
         }
@@ -579,7 +581,7 @@ void ProgramRecPriority::edit(void)
                 origRecPriorityData[progInfo->recordid] = 
                                                         progInfo->recpriority;
                 // also set the active/inactive state
-                progInfo->recstatus = inactive ? rsInactive : rsWillRecord;
+                progInfo->recstatus = inactive ? rsInactive : rsUnknown;
 
                 SortList();
             }
@@ -685,7 +687,7 @@ void ProgramRecPriority::deactivate(void)
                     for (cnt = 0, it = programData.begin(); cnt < inList+inData;
                          cnt++, ++it);
                     progInfo = &(it.data());
-                    progInfo->recstatus = inactive ? rsInactive : rsWillRecord;
+                    progInfo->recstatus = inactive ? rsInactive : rsUnknown;
                 } else
                     MythContext::DBError("Update recording schedule inactive query", query);
             }
@@ -705,6 +707,14 @@ void ProgramRecPriority::upcoming(void)
     record->loadByID(curitem->recordid);
     record->runRuleList();
     record->deleteLater();
+}
+
+void ProgramRecPriority::details(void)
+{
+    if (!curitem)
+        return;
+
+    curitem->showDetails();
 }
 
 void ProgramRecPriority::changeRecPriority(int howMuch) 
@@ -838,10 +848,21 @@ void ProgramRecPriority::FillList(void)
 
                     progInfo->recTypeRecPriority = recTypeRecPriority;
                     progInfo->recType = recType;
-                    progInfo->recstatus = inactive ? rsInactive : rsWillRecord;
                     progInfo->matchCount = listMatch[progInfo->recordid];
                     progInfo->recCount = recMatch[progInfo->recordid];
                     progInfo->last_record = lastrec;
+
+                    if (inactive)
+                        progInfo->recstatus = rsInactive;
+                    else if (conMatch[progInfo->recordid] > 0)
+                        progInfo->recstatus = rsConflict;
+                    else if (nowMatch[progInfo->recordid] > 0)
+                        progInfo->recstatus = rsRecording;
+                    else if (recMatch[progInfo->recordid] > 0)
+                        progInfo->recstatus = rsWillRecord;
+                    else
+                        progInfo->recstatus = rsUnknown;
+
                     break;
                 }
             }

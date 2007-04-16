@@ -3769,7 +3769,8 @@ void ProgramInfo::showDetails(void) const
                                     .toString(fullDateFormat)), msg)
         }
         if (record->getSearchType() &&
-            record->getSearchType() != kManualSearch)
+            record->getSearchType() != kManualSearch &&
+            record->getRecordDescription() != description)
             ADD_PAR(QObject::tr("Search Phrase"),
                     record->getRecordDescription().replace("<", "&lt;")
                             .replace(">", "&gt;").replace("\n", " "), msg)

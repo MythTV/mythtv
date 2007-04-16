@@ -55,6 +55,7 @@ class ProgramRecPriority : public MythDialog
     void remove();
     void deactivate();
     void upcoming();
+    void details();
 
   protected:
     void paintEvent(QPaintEvent *);
