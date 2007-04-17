@@ -92,8 +92,10 @@ macx {
     }
 
     using_appleremote {
-        HEADERS += AppleRemote.h   AppleRemoteListener.h   lircevent.h
-        SOURCES += AppleRemote.cpp AppleRemoteListener.cpp lircevent.cpp
+        HEADERS += AppleRemote.h   AppleRemoteListener.h
+        SOURCES += AppleRemote.cpp AppleRemoteListener.cpp
+        HEADERS *= lircevent.h
+        SOURCES *= lircevent.cpp
     }
 
     # Mac OS X Frameworks
