@@ -513,7 +513,7 @@ void Ripper::keyPressEvent(QKeyEvent *e)
     bool handled = false;
 
     QStringList actions;
-    gContext->GetMainWindow()->TranslateKeyPress("Global", e, actions);
+    gContext->GetMainWindow()->TranslateKeyPress("Global", e, actions, true);
 
     for (unsigned int i = 0; i < actions.size() && !handled; i++)
     {
@@ -526,6 +526,10 @@ void Ripper::keyPressEvent(QKeyEvent *e)
                 showEditMetadataDialog();
             else
                 activateCurrent();
+        }
+        else if (action == "ESCAPE")
+        {
+            reject();
         }
         else if (action == "UP")
         {
@@ -588,9 +592,6 @@ void Ripper::keyPressEvent(QKeyEvent *e)
         else
             handled = false;
     }
-
-    if (!handled)
-        MythThemedDialog::keyPressEvent(e);
 }
 
 void Ripper::startScanCD(void)
@@ -1097,7 +1098,9 @@ void Ripper::switchTitlesAndArtists()
 
 void Ripper::reject() 
 {
-    startEjectCD();
+    if (!gContext->GetMainWindow()->IsExitingToMain())
+        startEjectCD();
+
     done(Rejected);
 }
 
@@ -1370,7 +1373,7 @@ void RipStatus::keyPressEvent(QKeyEvent *e)
     bool handled = false;
 
     QStringList actions;
-    gContext->GetMainWindow()->TranslateKeyPress("Global", e, actions);
+    gContext->GetMainWindow()->TranslateKeyPress("Global", e, actions, false);
 
     for (unsigned int i = 0; i < actions.size() && !handled; i++)
     {
@@ -1393,9 +1396,6 @@ void RipStatus::keyPressEvent(QKeyEvent *e)
         else
             handled = false;
     }
-
-    if (!handled)
-        MythThemedDialog::keyPressEvent(e);
 }
 
 void RipStatus::customEvent(QCustomEvent *e)
