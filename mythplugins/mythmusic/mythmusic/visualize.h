@@ -78,14 +78,6 @@ class Spectrum : public VisualBase
 #endif
 };
 
-class SpectrumFactory : public VisFactory
-{
-  public:
-    const QString &name(void) const;
-    const QString &description(void) const;
-    VisualBase *create(MainVisual *parent, long int winid);
-};
-
 class AlbumArt : public VisualBase
 {
   public:
@@ -109,14 +101,6 @@ class AlbumArt : public VisualBase
     QImage m_image;
 };
 
-class AlbumArtFactory : public VisFactory
-{
-  public:
-    const QString &name(void) const;
-    const QString &description(void) const;
-    VisualBase *create(MainVisual *parent, long int winid);
-};
-
 class Blank : public VisualBase
 {
     // This draws ... well ... nothing	
@@ -131,14 +115,6 @@ class Blank : public VisualBase
 
   private:
     QSize size;
-};
-
-class BlankFactory : public VisFactory
-{
-  public:
-    const QString &name(void) const;
-    const QString &description(void) const;
-    VisualBase *create(MainVisual *parent, long int winid);
 };
 
 class Squares : public Spectrum
@@ -157,14 +133,6 @@ class Squares : public Spectrum
     MainVisual *pParent;
     int fake_height;
     int number_of_squares;
-};
-
-class SquaresFactory : public VisFactory
-{
-  public:
-    const QString &name(void) const;
-    const QString &description(void) const;
-    VisualBase *create(MainVisual *parent, long int winid);
 };
 
 #ifdef OPENGL_SUPPORT
@@ -206,14 +174,6 @@ class Gears : public QGLWidget, public VisualBase
     rfftw_plan plan;
     fftw_real *lin, *rin, *lout, *rout;
 #endif
-};
-
-class GearsFactory : public VisFactory
-{
-  public:
-    const QString &name(void) const;
-    const QString &description(void) const;
-    VisualBase *create(MainVisual *parent, long int winid);
 };
 
 

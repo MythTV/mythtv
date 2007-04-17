@@ -3,30 +3,36 @@
 
     (c) 2003 Thor Sigvaldason and Isaac Richards
         VERY closely based on code from mq3 by Brad Hughes
-                
+
         Part of the mythTV project
-        
+
         music visualizers
 */
 
+// c/c++
 #include <cmath>
+#include <iostream>
+
+// qt
+#include <qpainter.h>
+#include <qpixmap.h>
+#include <qimage.h>
+#include <qdir.h>
+#include <qurl.h>
+
+// mythtv
+#include <mythtv/mythdbcon.h>
+#include <mythtv/mythcontext.h>
+
+// mythmusic
 #include "mainvisual.h"
 #include "visualize.h"
 #include "inlines.h"
 #include "decoder.h"
 #include "metadata.h"
 
-#include <qpainter.h>
-#include <qpixmap.h>
-#include <qimage.h>
-#include <qdir.h>
-#include <qurl.h>
-#include <mythtv/mythdbcon.h>
-
-#include <iostream>
 using namespace std;
 
-#include <mythtv/mythcontext.h>
 
 #define FFTW_N 512
 extern "C" {
@@ -273,28 +279,33 @@ bool Spectrum::draw(QPainter *p, const QColor &back)
                 QObject::tr("Visualization requires FFT library") + "\n" + 
                 QObject::tr("Did you run configure?"));
 #endif
-    
+
     return true;
 }
 
-const QString &SpectrumFactory::name(void) const
+static class SpectrumFactory : public VisFactory
 {
-    static QString name("Spectrum");
-    return name;
-}
+  public:
+    const QString &name(void) const
+    {
+        static QString name("Spectrum");
+        return name;
+    }
 
-const QString &SpectrumFactory::description(void) const
-{
-    static QString name(QObject::tr("Spectrum"));
-    return name;
-}
+    uint plugins(QStringList *list) const
+    {
+        *list << name();
+        return 1;
+    }
 
-VisualBase *SpectrumFactory::create(MainVisual *parent, long int winid)
-{
-    (void)parent;
-    (void)winid;
-    return new Spectrum();
-}
+    VisualBase *create(MainVisual *parent, long int winid, const QString &pluginName) const
+    {
+        (void)parent;
+        (void)winid;
+        (void)pluginName;
+        return new Spectrum();
+    }
+}SpectrumFactory;
 
 AlbumArt::AlbumArt(MainVisual *parent)
 {
@@ -420,24 +431,28 @@ bool AlbumArt::draw(QPainter *p, const QColor &back)
     return true;
 }
 
-const QString &AlbumArtFactory::name(void) const
+static class AlbumArtFactory : public VisFactory
 {
-    static QString name("AlbumArt");
-    return name;
-}
+  public:
+    const QString &name(void) const
+    {
+        static QString name("AlbumArt");
+        return name;
+    }
 
-const QString &AlbumArtFactory::description(void) const
-{
-    static QString name("Displays album art from .folder.png during playback");
-    return name;
-}
+    uint plugins(QStringList *list) const
+    {
+        *list << name();
+        return 1;
+    }
 
-VisualBase *AlbumArtFactory::create(MainVisual *parent, long int winid)
-{
-    (void)winid;
-    return new AlbumArt(parent);
-}
-
+    VisualBase *create(MainVisual *parent, long int winid, const QString &pluginName) const
+    {
+        (void)winid;
+        (void)pluginName;
+        return new AlbumArt(parent);
+    }
+}AlbumArtFactory;
 
 Blank::Blank()
     : VisualBase(true)
@@ -468,24 +483,29 @@ bool Blank::draw(QPainter *p, const QColor &back)
     return true;
 }
 
-const QString &BlankFactory::name(void) const
+static class BlankFactory : public VisFactory
 {
-    static QString name("Blank");
-    return name;
-}
+  public:
+    const QString &name(void) const
+    {
+        static QString name("Blank");
+        return name;
+    }
 
-const QString &BlankFactory::description(void) const
-{
-    static QString name(QObject::tr("Blank"));
-    return name;
-}
+    uint plugins(QStringList *list) const
+    {
+        *list << name();
+        return 1;
+    }
 
-VisualBase *BlankFactory::create(MainVisual *parent, long int winid)
-{
-    (void)parent;
-    (void)winid;
-    return new Blank();
-}
+    VisualBase *create(MainVisual *parent, long int winid, const QString &pluginName) const
+    {
+        (void)parent;
+        (void)winid;
+        (void)pluginName;
+        return new Blank();
+    }
+}BlankFactory;
 
 Squares::Squares()
 {
@@ -556,7 +576,7 @@ bool Squares::draw(QPainter *p, const QColor &back)
                 QObject::tr("Visualization requires FFT library") + "\n" + 
                 QObject::tr("Did you run configure?"));
 #endif
-    
+
     return true;
 
     for (int x = 0; x < size.width (); x += w) {
@@ -566,24 +586,29 @@ bool Squares::draw(QPainter *p, const QColor &back)
     return true;
 }
 
-const QString &SquaresFactory::name(void) const
+static class SquaresFactory : public VisFactory
 {
-    static QString name("Squares");
-    return name;
-}
+  public:
+    const QString &name(void) const
+    {
+        static QString name("Squares");
+        return name;
+    }
 
-const QString &SquaresFactory::description(void) const
-{
-    static QString name("Square visualizer");
-    return name;
-}
+    uint plugins(QStringList *list) const
+    {
+        *list << name();
+        return 1;
+    }
 
-VisualBase *SquaresFactory::create(MainVisual *parent, long int winid)
-{
-    (void)winid;
-    (void)parent;
-    return new Squares();
-}
+    VisualBase *create(MainVisual *parent, long int winid, const QString &pluginName) const
+    {
+        (void)parent;
+        (void)winid;
+        (void)pluginName;
+        return new Squares();
+    }
+}SquaresFactory;
 
 #ifdef OPENGL_SUPPORT
 
@@ -1010,22 +1035,28 @@ void Gears::paintGL()
     drawTheGears();
 }
 
-const QString &GearsFactory::name(void) const
+static class GearsFactory : public VisFactory
 {
-    static QString name("Gears");
-    return name;
-}
+  public:
+    const QString &name(void) const
+    {
+        static QString name("Gears");
+        return name;
+    }
 
-const QString &GearsFactory::description(void) const
-{
-    static QString name(QObject::tr("Gears"));
-    return name;
-}
+    uint plugins(QStringList *list) const
+    {
+        *list << name();
+        return 1;
+    }
 
-VisualBase *GearsFactory::create(MainVisual *parent, long int winid)
-{
-    (void)winid;
-    return new Gears(parent);
-}
+    VisualBase *create(MainVisual *parent, long int winid, const QString &pluginName) const
+    {
+        (void)winid;
+        (void)pluginName;
+        return new Gears(parent);
+    }
+}GearsFactory;
+
 
 #endif

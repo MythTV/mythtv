@@ -9,7 +9,7 @@ using namespace std;
 #include "mythtv/mythcontext.h"
 #include "mythtv/mythdbcon.h"
 
-const QString currentDatabaseVersion = "1010";
+const QString currentDatabaseVersion = "1011";
 
 static bool UpdateDBVersionNumber(const QString &newnumber)
 {   
@@ -517,11 +517,11 @@ bool UpgradeMusicDatabaseSchema(void)
     }
 
     if (dbver == "1009")
-{
-    const QString updates[] = {
+    {
+        const QString updates[] = {
 "ALTER TABLE music_albumart ADD COLUMN imagetype tinyint(3) NOT NULL DEFAULT '0';",
         ""
-    };
+};
 
     if (!performActualUpdate(updates, "1010", dbver))
         return false;
@@ -571,8 +571,22 @@ bool UpgradeMusicDatabaseSchema(void)
                 MythContext::DBError("album art image type update", subquery);
         }
     }
-}
+ }
 
+    if (dbver == "1010")
+    {
+        const QString updates[] = {"", ""};
+
+        // update the VisualMode setting to the new format
+        QString setting = gContext->GetSetting("VisualMode");
+        setting = setting.simplifyWhiteSpace();
+        setting = setting.replace(' ', ";");
+        gContext->SaveSetting("VisualMode", setting);
+
+        if (!performActualUpdate(updates, "1011", dbver))
+            return false;
+
+    }
 /* in 0.21 */
 //"DROP TABLE musicmetadata;",
 //"DROP TABLE musicplaylist;",
@@ -580,4 +594,3 @@ bool UpgradeMusicDatabaseSchema(void)
 
     return true;
 }
-

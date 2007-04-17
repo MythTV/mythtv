@@ -4,14 +4,13 @@
 // warranty, or liability of any kind.
 //
 
-#include "mainvisual.h"
-#include "constants.h"
-#include <mythtv/audiooutput.h>
-#include "synaesthesia.h"
-#include "bumpscope.h"
-#include "visualize.h"
-#include "goom/mythgoom.h"
+// c/c++
+#include <cmath>
+#include <cstdio>
+#include <algorithm>
+#include <iostream>
 
+// qt
 #include <qtimer.h>
 #include <qpainter.h>
 #include <qevent.h>
@@ -22,44 +21,23 @@
 #include <qstring.h>
 #include <qregexp.h>
 
-#include <cmath>
-#include <cstdio>
+// mythtv
+#include <mythtv/audiooutput.h>
+#include <mythtv/mythcontext.h>
+#include <mythtv/mythdialogs.h>
+
+// mythmusic
+#include "visualize.h"
+#include "mainvisual.h"
+#include "constants.h"
 
 // fast inlines
 #include "inlines.h"
 
-#include <mythtv/mythcontext.h>
-#include <mythtv/mythdialogs.h>
 
-#include <algorithm>
-#include <iostream>
 using namespace std;
 
-static QPtrList<VisFactory> *visfactories = 0;
-
-static void checkVisFactories(void)
-{
-    if (!visfactories)
-    {
-        visfactories = new QPtrList<VisFactory>;
-
-        MainVisual::registerVisFactory(new BlankFactory);
-
-        MainVisual::registerVisFactory(new MonoScopeFactory);
-        MainVisual::registerVisFactory(new StereoScopeFactory);
-        MainVisual::registerVisFactory(new SynaesthesiaFactory);
-        MainVisual::registerVisFactory(new SpectrumFactory);
-        MainVisual::registerVisFactory(new AlbumArtFactory);
-        MainVisual::registerVisFactory(new SquaresFactory);
-#ifdef OPENGL_SUPPORT
-        MainVisual::registerVisFactory(new GearsFactory);
-#endif
-#ifdef SDL_SUPPORT
-        MainVisual::registerVisFactory(new BumpScopeFactory);
-        MainVisual::registerVisFactory(new GoomFactory);
-#endif
-    }
-}
+VisFactory* VisFactory::g_pVisFactories = 0;
 
 VisualBase::VisualBase(bool screensaverenable)
     : xscreensaverenable(screensaverenable)
@@ -142,98 +120,42 @@ MainVisual::~MainVisual()
     nodes.clear();
 }
 
-void MainVisual::setVisual( const QString &visualname )
+void MainVisual::setVisual(const QString &name)
 {
+    QString visName, pluginName;
+
+    if (name.contains("-"))
+    {
+        visName = name.section('-', 0, 0);
+        pluginName = name.section('-', 1, 1);
+    }
+    else
+    {
+        visName = name;
+        pluginName = "";
+    }
+
     if (vis)
     {
         delete vis;
         vis = NULL;
     }
 
-    VisualBase *newvis = 0;
-
-    allowed_modes = QStringList::split(",", visualname);
-
-    if (allowed_modes[0].stripWhiteSpace().endsWith("*"))
+    for (const VisFactory* pVisFactory = VisFactory::VisFactories();
+         pVisFactory; pVisFactory = pVisFactory->next())
     {
-        // User has a favorite
-        // The asterisk should only be passed in at startup, so start with
-        // the user's favorite
-
-        current_visual_name = allowed_modes[0].stripWhiteSpace();
-        current_visual_name.truncate(current_visual_name.length() - 1);
-    }
-    else if (allowed_modes.contains("Random"))
-    {
-        //
-        //  Pick anything from compile time options
-        //
-
-        checkVisFactories();
-        int numvis = visfactories->count() - 1;
-        int i = 1 + (int)((double)rand() / (RAND_MAX + 1.0) * numvis);
-        VisFactory *fact = visfactories->at(i);
-        current_visual_name = fact->name();
-
-    }
-    else 
-    {
-        //
-        //  Pick anything from run time options
-        //
-        int vis_mode_index = 0;
-        if (allowed_modes.size() > 1)
-            vis_mode_index = rand() % allowed_modes.size();
-
-        current_visual_name = allowed_modes[vis_mode_index].stripWhiteSpace();
-    }
-
-    newvis = createVis(current_visual_name, this, winId());
-    setVis( newvis );
-}
-
-void MainVisual::setVis( VisualBase *newvis )
-{
-    if (vis)
-    {
-        delete vis;
-    }
-
-    vis = newvis;
-    if ( vis )
-    {
-        vis->resize( size() );
-        fps = vis->getDesiredFPS();
+        if (pVisFactory->name() == visName)
+        {
+            vis = pVisFactory->create(this, winId(), pluginName);
+            vis->resize(size());
+            fps = vis->getDesiredFPS();
+            break;
+        }
     }
 
     // force an update
     timer->stop();
     timer->start( 1000 / fps );
-}
-
-int MainVisual::numVisualizers( void ) const
-{
-    QString visualname = gContext->GetSetting("VisualMode");
-    visualname.simplifyWhiteSpace();
-    visualname.replace(QRegExp("\\s"), ",");
-    QStringList visualizers = QStringList::split(",", visualname);
-
-    if (visualizers.contains("Random"))
-        return visfactories->count() - 1;
-    else
-        return visualizers.size();
-}
-
-QString MainVisual::getCurrentVisual(void) const
-{
-    return current_visual_name;
-}
-
-QString MainVisual::getCurrentVisualDesc(void) const
-{
-    /* XXX This should be changed to a real call to visual->description() 
-     * it works as long as ::name and ::desc uses the same string */
-    return QObject::tr(current_visual_name);
 }
 
 void MainVisual::prepare()
@@ -250,7 +172,7 @@ void MainVisual::add(uchar *b, unsigned long b_len, unsigned long w, int c, int 
 
     len /= c;
     len /= (p / 8);
-    
+
     if (len > 512)
         len = 512;
 
@@ -374,14 +296,10 @@ void MainVisual::customEvent(QCustomEvent *event)
 
 void MainVisual::hideEvent(QHideEvent *e)
 {
-    setVis(0);
+    delete vis;
+    vis = 0;
     emit hidingVisualization();
     QWidget::hideEvent(e);
-}
-
-void MainVisual::registerVisFactory(VisFactory *vis)
-{
-    visfactories->append(vis);
 }
 
 void MainVisual::showBanner(const QString &text, int showTime)
@@ -407,25 +325,17 @@ void MainVisual::bannerTimeout(void)
     hideBanner();
 }
 
-VisualBase *MainVisual::createVis(const QString &name, MainVisual *parent,
-                                  long int winid)
+// static member function 
+QStringList MainVisual::Visualizations()
 {
-    checkVisFactories();
-
-    VisualBase *vis = 0;
-
-    VisFactory *fact = visfactories->first();
-    while (fact)
+    QStringList visualizations;
+    for (const VisFactory* pVisFactory = VisFactory::VisFactories();
+         pVisFactory; pVisFactory = pVisFactory->next())
     {
-        if (fact->name() == name)
-        {
-            vis = fact->create(parent, winid);
-            break;
-        }
-        fact = visfactories->next();
+        pVisFactory->plugins(&visualizations);
     }
 
-    return vis;
+    return visualizations; 
 }
 
 InfoWidget::InfoWidget(QWidget *parent)
@@ -953,43 +863,54 @@ bool MonoScope::draw( QPainter *p, const QColor &back )
     return true;
 }
 
-const QString &StereoScopeFactory::name(void) const
+static class StereoScopeFactory : public VisFactory
 {
-    static QString name("StereoScope");
-    return name;
-}
+  public:
+    const QString &name(void) const
+    {
+        static QString name("StereoScope");
+        return name;
+    }
 
-const QString &StereoScopeFactory::description(void) const
-{
-    static QString name(QObject::tr("StereoScope"));
-    return name;
-}
+    uint plugins(QStringList *list) const
+    {
+        *list << name();
+        return 1;
+    }
 
-VisualBase *StereoScopeFactory::create(MainVisual *parent, long int winid)
-{
-    (void)parent;
-    (void)winid;
-    return new StereoScope();
-}
+    VisualBase *create(MainVisual *parent, long int winid, const QString &pluginName) const
+    {
+        (void)parent;
+        (void)winid;
+        (void)pluginName;
+        return new StereoScope();
+    }
+}StereoScopeFactory;
 
-const QString &MonoScopeFactory::name(void) const
-{
-    static QString name("MonoScope");
-    return name;
-}
 
-const QString &MonoScopeFactory::description(void) const
+static class MonoScopeFactory : public VisFactory
 {
-    static QString name(QObject::tr("MonoScope"));
-    return name;
-}
+  public:
+    const QString &name(void) const
+    {
+        static QString name("MonoScope");
+        return name;
+    }
 
-VisualBase *MonoScopeFactory::create(MainVisual *parent, long int winid)
-{
-    (void)parent;
-    (void)winid;
-    return new MonoScope();
-}
+    uint plugins(QStringList *list) const
+    {
+        *list << name();
+        return 1;
+    }
+
+    VisualBase *create(MainVisual *parent, long int winid, const QString &pluginName) const
+    {
+        (void)parent;
+        (void)winid;
+        (void)pluginName;
+        return new MonoScope();
+    }
+}MonoScopeFactory;
 
 LogScale::LogScale(int maxscale, int maxrange)
     : indices(0), s(0), r(0)

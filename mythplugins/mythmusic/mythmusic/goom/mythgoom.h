@@ -29,14 +29,6 @@ private:
     int scalew, scaleh;
 };
 
-class GoomFactory : public VisFactory
-{
-  public:
-    const QString &name(void) const;
-    const QString &description(void) const;
-    VisualBase *create(MainVisual *parent, long int winid);
-};
+#endif //SDL_SUPPORT
 
-#endif
-
-#endif // __mainvisual_h
+#endif //MYTHGOOM

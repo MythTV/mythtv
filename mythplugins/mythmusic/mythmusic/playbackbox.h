@@ -170,7 +170,9 @@ class PlaybackBoxMusic : public MythThemedDialog
 
     MainVisual *mainvisual;
 
-    QString visual_mode;
+    bool fullscreen_blank; 
+    QStringList visual_modes; 
+    unsigned int current_visual;
     int visual_mode_delay;
     QTimer *visual_mode_timer;
     QTimer *lcd_update_timer;
@@ -191,6 +193,7 @@ class PlaybackBoxMusic : public MythThemedDialog
     GenericTree *playlist_tree;
 
     bool cycle_visualizer;
+    bool random_visualizer;
     bool show_album_art;
     bool show_whole_tree;
     bool keyboard_accelerators;

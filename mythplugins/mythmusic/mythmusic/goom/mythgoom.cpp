@@ -174,22 +174,28 @@ bool Goom::draw(QPainter *p, const QColor &back)
     return false;
 }
 
-const QString &GoomFactory::name(void) const
+static class GoomFactory : public VisFactory
 {
-    static QString name("Goom");
-    return name;
-}
+  public:
+    const QString &name(void) const
+    {
+        static QString name("Goom");
+        return name;
+    }
 
-const QString &GoomFactory::description(void) const
-{
-    static QString name(QObject::tr("Goom"));
-    return name;
-}
+    uint plugins(QStringList *list) const
+    {
+        *list << name();
+        return 1;
+    }
 
-VisualBase *GoomFactory::create(MainVisual *parent, long int winid)
-{
-    (void)parent;
-    return new Goom(winid);
-}
+    VisualBase *create(MainVisual *parent, long int winid, const QString &pluginName) const
+    {
+        (void)parent;
+        (void)pluginName;
+        return new Goom(winid);
+    }
+}GoomFactory;
+
 
 #endif

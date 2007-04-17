@@ -25,7 +25,6 @@ class Output;
 class VisualNode;
 class LogScale;
 class QTimer;
-class VisFactory;
 class InfoWidget;
 class Metadata;
 class MainVisual;
@@ -70,6 +69,21 @@ class VisualBase
     bool xscreensaverenable;
 };
 
+class VisFactory
+{
+  public:
+    VisFactory() {m_pNextVisFactory = g_pVisFactories; g_pVisFactories = this;}
+    const VisFactory* next() const {return m_pNextVisFactory;}
+    virtual const QString &name(void) const = 0;
+    virtual VisualBase* create(MainVisual *parent, long int winid,
+                               const QString &pluginName) const = 0;
+    virtual uint plugins(QStringList *list) const = 0;
+    static const VisFactory* VisFactories() {return g_pVisFactories;}
+  protected:
+    static VisFactory* g_pVisFactories;
+    VisFactory*        m_pNextVisFactory;
+};
+
 // base class to handle things like frame rate...
 class MainVisual : public QWidget, public MythTV::Visual
 {
@@ -80,12 +94,7 @@ public:
     virtual ~MainVisual();
 
     VisualBase *visual() const { return vis; }
-    void setVis( VisualBase *newvis );
-    void setVisual( const QString &visualname );
-
-    QString getCurrentVisual() const;
-    QString getCurrentVisualDesc() const;
-    int numVisualizers() const;
+    void setVisual(const QString &name);
 
     void add(uchar *, unsigned long, unsigned long, int, int);
     void prepare();
@@ -106,9 +115,7 @@ public:
     void hideBanner();
     bool bannerIsShowing(void) {return bannerTimer->isActive(); }
 
-    static void registerVisFactory(VisFactory *);
-    static VisualBase *createVis(const QString &name,
-                                 MainVisual *parent, long int winid);
+    static QStringList Visualizations();
 
     Metadata *metadata() const { return meta; }
     void setMetadata(Metadata *&m) { meta = m; }
@@ -133,7 +140,6 @@ private:
     int fps;
 
     QString current_visual_name;
-    QStringList allowed_modes;
 };
 
 class InfoWidget : public QWidget
@@ -151,15 +157,6 @@ private:
     QString info;
     QPixmap info_pixmap;
     QRect   displayRect;
-};
-
-class VisFactory
-{
-  public:
-    virtual const QString &name(void) const = 0;
-    virtual const QString &description(void) const = 0;
-    virtual VisualBase *create(MainVisual *parent, long int winid) = 0;
-    virtual ~VisFactory() {}
 };
 
 class StereoScope : public VisualBase
@@ -186,25 +183,9 @@ class MonoScope : public StereoScope
 public:
    MonoScope();
    virtual ~MonoScope();
-			    
+
    bool process( VisualNode *node );
    bool draw( QPainter *p, const QColor &back );
-};  
-
-class StereoScopeFactory : public VisFactory
-{
-  public:
-    const QString &name(void) const;
-    const QString &description(void) const;
-    VisualBase *create(MainVisual *parent, long int winid);
-};
-
-class MonoScopeFactory : public VisFactory
-{
-  public:
-    const QString &name(void) const;
-    const QString &description(void) const;
-    VisualBase *create(MainVisual *parent, long int winid);
 };
 
 class LogScale

@@ -581,22 +581,27 @@ bool BumpScope::draw(QPainter *p, const QColor &back)
     return false;
 }
 
-const QString &BumpScopeFactory::name(void) const
+static class BumpScopeFactory : public VisFactory
 {
-    static QString name("BumpScope");
-    return name;
-}
+  public:
+    const QString &name(void) const
+    {
+        static QString name("BumpScope");
+        return name;
+    }
 
-const QString &BumpScopeFactory::description(void) const
-{
-    static QString name(QObject::tr("BumpScope"));
-    return name;
-}
+    uint plugins(QStringList *list) const
+    {
+        *list << name();
+        return 1;
+    }
 
-VisualBase *BumpScopeFactory::create(MainVisual *parent, long int winid)
-{
-    (void)parent;
-    return new BumpScope(winid);
-}
+    VisualBase *create(MainVisual *parent, long int winid, const QString &pluginName) const
+    {
+        (void)parent;
+        (void)pluginName;
+        return new BumpScope(winid);
+    }
+}BumpScopeFactory;
 
 #endif

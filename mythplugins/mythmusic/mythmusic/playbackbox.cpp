@@ -88,6 +88,7 @@ PlaybackBoxMusic::PlaybackBoxMusic(MythMainWindow *parent, QString window_name,
     listAsShuffled = gContext->GetNumSetting("ListAsShuffled", 0);
     cycle_visualizer = gContext->GetNumSetting("VisualCycleOnSongChange", 0);
     show_album_art = gContext->GetNumSetting("VisualAlbumArtOnSongChange", 0);
+    random_visualizer = gContext->GetNumSetting("VisualRandomize", 0);
 
     // Through the magic of themes, our "GUI" already exists we just need to 
     // wire up it
@@ -95,7 +96,7 @@ PlaybackBoxMusic::PlaybackBoxMusic(MythMainWindow *parent, QString window_name,
     wireUpTheme();
 
     // Possibly (user-defined) control the volume
-    
+
     volume_control = false;
     volume_display_timer = new QTimer(this);
     if (gContext->GetNumSetting("MythControlsVolume", 0))
@@ -180,17 +181,21 @@ PlaybackBoxMusic::PlaybackBoxMusic(MythMainWindow *parent, QString window_name,
     waiting_for_playlists_timer->start(50, TRUE);
 
     // Warm up the visualizer
-    
+
     mainvisual = new MainVisual(this);
     if (visual_blackhole)
         mainvisual->setGeometry(visual_blackhole->getScreenArea());
     else
         mainvisual->setGeometry(screenwidth + 10, screenheight + 10, 160, 160);
-    mainvisual->show();   
- 
-    visual_mode = gContext->GetSetting("VisualMode");
-    visual_mode.simplifyWhiteSpace();
-    visual_mode.replace(QRegExp("\\s"), ",");
+    mainvisual->show();
+
+    fullscreen_blank = false; 
+
+    visual_modes = QStringList::split(';', gContext->GetSetting("VisualMode"));
+    if (!visual_modes.count())
+        visual_modes.push_front("Blank");
+
+    current_visual = random_visualizer ? rand() % visual_modes.count() : 0;
 
     QString visual_delay = gContext->GetSetting("VisualModeDelay");
     bool delayOK;
@@ -211,7 +216,7 @@ PlaybackBoxMusic::PlaybackBoxMusic(MythMainWindow *parent, QString window_name,
     //
     // Suspicion: in most modes, SDL is not happy if the
     // window doesn't fully exist yet  (????)
-    
+
     mainvisual->setVisual("Blank");
 
     // Ready to go. Let's update the foreground just to be safe.
@@ -418,14 +423,6 @@ void PlaybackBoxMusic::keyPressEvent(QKeyEvent *e)
             if (action == "ESCAPE" || action == "4")
             {
                 visualizer_status = 1;
-                QString visual_workaround = mainvisual->getCurrentVisual();
-
-                // We may have gotten to full screen by pushing 7
-                // (full screen blank). Or it may be blank because
-                // the user likes "Blank". Figure out what to do ...
-
-                if (visual_workaround == "Blank" && visual_mode != "Blank")
-                    visual_workaround = visual_mode;
 
                 mainvisual->setVisual("Blank");
                 if (visual_blackhole)
@@ -435,7 +432,7 @@ void PlaybackBoxMusic::keyPressEvent(QKeyEvent *e)
                                             screenheight + 10, 
                                             160, 160);
                 setUpdatesEnabled(true);
-                mainvisual->setVisual(visual_workaround);
+                mainvisual->setVisual(visual_modes[current_visual]);
                 bannerDisable();
 
                 if (!m_parent->IsExitingToMain())
@@ -1024,7 +1021,7 @@ void PlaybackBoxMusic::checkForPlaylists()
                 else
                     setContext(2);
                 updateForeground();
-                mainvisual->setVisual(visual_mode);
+                mainvisual->setVisual(visual_modes[current_visual]);
 
                 if (curMeta) 
                     updateTrackInfo(curMeta);
@@ -1264,64 +1261,43 @@ void PlaybackBoxMusic::bannerDisable()
 
 void PlaybackBoxMusic::CycleVisualizer()
 {
-    QString new_visualizer;
-
     // Only change the visualizer if there is more than 1 visualizer
     // and the user currently has a visualizer active
-    if (mainvisual->numVisualizers() > 1 && visualizer_status > 0)
+    if (visual_modes.count() > 1 && visualizer_status > 0)
     {
-        QStringList allowed_modes = QStringList::split(",", visual_mode);
-        if (allowed_modes[0].stripWhiteSpace().endsWith("*"))
+        if (random_visualizer)
         {
-            //User has a favorite, but requested the next in the list
-            //Find the current position in the list
-            QString current_visual = mainvisual->getCurrentVisual();
-            unsigned int index = 0;
-            while ((index < allowed_modes.size()) &&
-                   (!allowed_modes[index++].stripWhiteSpace().startsWith(current_visual))) { }
-            // index is 1 greater than the current visualizer's index
-            if (index >= allowed_modes.size()) {
-                index = 0;
-            }
-            new_visualizer = allowed_modes[index].stripWhiteSpace();
-            // Make sure the asterisk isn't passed through
-            if (new_visualizer.endsWith("*")) {
-                new_visualizer.truncate(new_visualizer.length() - 1);
-            }
-        }
-        else if (visual_mode != "Random")
-        {
+            unsigned int next_visualizer;
+            
             //Find a visual thats not like the previous visual
             do
-            {
-                new_visualizer =  allowed_modes[rand() % allowed_modes.size()];
-            } 
-            while (new_visualizer == mainvisual->getCurrentVisual() &&
-                   allowed_modes.count() > 1);
+                next_visualizer = rand() % visual_modes.count();
+            while (next_visualizer == current_visual);
+            current_visual = next_visualizer;
         }
         else
         {
-            new_visualizer = visual_mode;
+            //Change to the next selected visual 
+            current_visual = (current_visual + 1) % visual_modes.count();
         }
 
         //Change to the new visualizer
         visual_mode_timer->stop();
         mainvisual->setVisual("Blank");
-        mainvisual->setVisual(new_visualizer);
+        mainvisual->setVisual(visual_modes[current_visual]);
     } 
-    else if (mainvisual->numVisualizers() == 1 && visual_mode == "AlbumArt" && 
+    else if (visual_modes.count() == 1 && visual_modes[current_visual] == "AlbumArt" && 
              visualizer_status > 0) 
     {
         // If only the AlbumArt visualization is selected, then go ahead and
         // restart the visualization.  This will give AlbumArt the opportunity
         // to change images if there are multiple images available.
-        new_visualizer = visual_mode;
         visual_mode_timer->stop();
         mainvisual->setVisual("Blank");
-        mainvisual->setVisual(new_visualizer);
+        mainvisual->setVisual(visual_modes[current_visual]);
     }
 
-    bannerEnable(tr("Visualization: ") + new_visualizer, 4000);
+    bannerEnable(tr("Visualization: ") + visual_modes[current_visual], 4000);
 }
 
 void PlaybackBoxMusic::setTrackOnLCD(Metadata *mdata)
@@ -1592,7 +1568,7 @@ void PlaybackBoxMusic::setShuffleMode(unsigned int mode)
     else
         music_tree_list->setVisualOrdering(1);
     music_tree_list->refresh();
-    
+
     if (isplaying)
         setTrackOnLCD(curMeta);
 }
@@ -1859,17 +1835,17 @@ void PlaybackBoxMusic::customEvent(QCustomEvent *event)
             es = ts % 60;
 
             QString time_string;
-            
+
             int maxh = maxTime / 3600;
             int maxm = (maxTime / 60) % 60;
             int maxs = maxTime % 60;
-            
+
             if (maxTime <= 0) 
             {
                 if (eh > 0) 
                     time_string.sprintf("%d:%02d:%02d", eh, em, es);
                 else 
-                    time_string.sprintf("%02d:%02d", em, es);                   
+                    time_string.sprintf("%02d:%02d", em, es);
             } 
             else
             {
@@ -1880,7 +1856,7 @@ void PlaybackBoxMusic::customEvent(QCustomEvent *event)
                     time_string.sprintf("%02d:%02d / %02d:%02d", em, es, maxm, 
                                         maxs);
             }
-            
+
             if (curMeta)
             {
                 if (class LCD *lcd = LCD::Get())
@@ -1913,7 +1889,7 @@ void PlaybackBoxMusic::customEvent(QCustomEvent *event)
                                    float(oe->frequency()) / 1000.0,
                                    oe->channels() > 1 ? "2" : "1");
             }
-        
+
             if (curMeta)
             {
                 if (time_text)
@@ -1922,7 +1898,7 @@ void PlaybackBoxMusic::customEvent(QCustomEvent *event)
                     info_text->SetText(info_string);
                 if (current_visualization_text)
                 {
-                    current_visualization_text->SetText(mainvisual->getCurrentVisualDesc());
+                    current_visualization_text->SetText(visual_modes[current_visual]);
                     current_visualization_text->refresh();
                 }
             }
@@ -2005,7 +1981,7 @@ void PlaybackBoxMusic::updateTrackInfo(Metadata *mdata)
         artist_text->SetText(mdata->FormatArtist());
     if (album_text)
         album_text->SetText(mdata->Album());
-    
+
     setTrackOnLCD(mdata);
 }
 
@@ -2095,9 +2071,10 @@ void PlaybackBoxMusic::handleTreeListSignals(int node_int, IntVector *attributes
 
 void PlaybackBoxMusic::toggleFullBlankVisualizer()
 {
-    if( mainvisual->getCurrentVisual() == "Blank" &&
-        visualizer_status == 2)
+    if (fullscreen_blank)
     {
+        fullscreen_blank = false;
+
         //
         //  If we are already full screen and 
         //  blank, go back to regular dialog
@@ -2108,7 +2085,7 @@ void PlaybackBoxMusic::toggleFullBlankVisualizer()
         else
             mainvisual->setGeometry(screenwidth + 10, screenheight + 10, 
                                     160, 160);
-        mainvisual->setVisual(visual_mode);
+        mainvisual->setVisual(visual_modes[current_visual]);
         bannerDisable();
         visualizer_status = 1;
         if(visual_mode_delay > 0)
@@ -2117,7 +2094,7 @@ void PlaybackBoxMusic::toggleFullBlankVisualizer()
         }
         if (current_visualization_text)
         {
-            current_visualization_text->SetText(mainvisual->getCurrentVisualDesc());
+            current_visualization_text->SetText(visual_modes[current_visual]);
             current_visualization_text->refresh();
         }
         setUpdatesEnabled(true);
@@ -2128,6 +2105,7 @@ void PlaybackBoxMusic::toggleFullBlankVisualizer()
         //  Otherwise, go full screen blank
         //
 
+        fullscreen_blank = true;
         mainvisual->setVisual("Blank");
         mainvisual->setGeometry(0, 0, screenwidth, screenheight);
         visualizer_status = 2;

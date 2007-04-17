@@ -679,25 +679,30 @@ bool Synaesthesia::draw(QPainter *p, const QColor &back)
     }
 
     p->drawImage(QRect(0, 0, 800, 600), *outputImage);
-   
+
     return true;
 #endif
 }
 
-const QString &SynaesthesiaFactory::name(void) const
+static class SynaesthesiaFactory : public VisFactory
 {
-    static QString name("Synaesthesia");
-    return name;
-}
+  public:
+    const QString &name(void) const
+    {
+        static QString name("Synaesthesia");
+        return name;
+    }
 
-const QString &SynaesthesiaFactory::description(void) const
-{
-    static QString name(QObject::tr("Synaesthesia"));
-    return name;
-}
+    uint plugins(QStringList *list) const
+    {
+        *list << name();
+        return 1;
+    }
 
-VisualBase *SynaesthesiaFactory::create(MainVisual *parent, long int winid)
-{
-    (void)parent;
-    return new Synaesthesia(winid);
-}
+    VisualBase *create(MainVisual *parent, long int winid, const QString &pluginName) const
+    {
+        (void)parent;
+        (void)pluginName;
+        return new Synaesthesia(winid);
+    }
+} SynaesthesiaFactory;
