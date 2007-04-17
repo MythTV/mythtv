@@ -26,6 +26,7 @@ zoneminder="yes"
 cc="gcc"
 
 opengl="yes"
+visual="yes"
 fftw_lib="yes"
 fftw_lib3="yes"
 sdl="yes"
@@ -86,6 +87,7 @@ MythGame related options:
 
 MythMusic related options:
   --enable-mythmusic       build the mythmusic plugin [$music]
+  --enable-libvisual       enable libvisual visualizers [$visual]
   --enable-fftw            enable fftw visualizers [$fftw_lib]
   --enable-sdl             use SDL for the synaesthesia output [$sdl]
   --enable-aac             enable AAC/MP4 audio file decompression [$aac]
@@ -212,6 +214,10 @@ for opt do
   ;;
   --disable-opengl) opengl="no"
   ;;
+  --enable-libvisual) visual="yes"
+  ;;
+  --disable-libvisual) visual="no"
+  ;;
   --enable-fftw) fftw_lib="yes"
   ;;
   --disable-fftw) fftw_lib="no"
@@ -250,6 +256,7 @@ for opt do
                  flix="yes";
                  sdl="yes";
                  opengl="yes";
+                 visual="yes";
                  fftw_lib="yes";
                  aac="yes";
                  exif="yes";
@@ -272,6 +279,7 @@ for opt do
                  flix="no";
                  sdl="no";  
                  opengl="no"; 
+                 visual="no"; 
                  fftw_lib="no"; 
                  aac="no"; 
                  exif="no";
@@ -351,6 +359,15 @@ if test "$opengl" != "no" ; then
     fi
     if test -f /System/Library/Frameworks/AGL.framework/Versions/A/AGL ; then
         opengl="yes"
+    fi
+fi
+
+if test "$visual" != "no" ; then
+    visual="no"
+    if has_library libvisual-0.4 ; then
+        if has_header libvisual-0.4/libvisual/libvisual.h ; then
+            visual="yes"
+        fi
     fi
 fi
 
@@ -776,6 +793,21 @@ if test "$music" = "yes" ; then
 
     if test "$opengl" = "no" ; then
         echo "        OpenGL         support will not be included in MythMusic"
+    fi
+
+    if test "$visual" = "yes" ; then
+        if test "$sdl" = "yes" ; then
+            echo "        libvisual      support will be included in MythMusic"
+            echo "#define LIBVISUAL_SUPPORT 1" >> ./mythmusic/mythmusic/config.h
+            echo "INCLUDEPATH += /usr/include/libvisual-0.4" >> ./mythmusic/mythmusic/config.pro
+            echo "LIBS += -lvisual-0.4" >> ./mythmusic/mythmusic/config.pro
+        else
+            echo "        libvisual      support will not be included in MythMusic (requires SDL support)"
+        fi
+    fi
+
+    if test "$visual" = "no" ; then
+        echo "        libvisual      support will not be included in MythMusic"
     fi
 
     if test "$fftw_lib3" = "yes" ; then

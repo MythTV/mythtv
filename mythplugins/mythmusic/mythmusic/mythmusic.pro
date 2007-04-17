@@ -37,7 +37,7 @@ HEADERS += goom/ifs.h goom/lines.h goom/mythgoom.h goom/drawmethods.h
 HEADERS += goom/mmx.h goom/mathtools.h goom/tentacle3d.h goom/v3d.h
 HEADERS += editmetadata.h smartplaylist.h search.h genres.h
 HEADERS += treebuilders.h importmusic.h directoryfinder.h
-HEADERS += filescanner.h
+HEADERS += filescanner.h libvisualplugin.h
 
 SOURCES += cddecoder.cpp cdrip.cpp decoder.cpp 
 SOURCES += flacdecoder.cpp flacencoder.cpp maddecoder.cpp main.cpp
@@ -53,4 +53,4 @@ SOURCES += goom/ifs.c goom/ifs_display.c goom/lines.c goom/surf3d.c
 SOURCES += goom/zoom_filter_mmx.c goom/zoom_filter_xmmx.c goom/mythgoom.cpp
 SOURCES += avfdecoder.cpp editmetadata.cpp smartplaylist.cpp search.cpp
 SOURCES += treebuilders.cpp importmusic.cpp directoryfinder.cpp
-SOURCES += filescanner.cpp
+SOURCES += filescanner.cpp libvisualplugin.cpp
