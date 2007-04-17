@@ -49,6 +49,8 @@ ZMLivePlayer::ZMLivePlayer(int monitorID, int eventID, MythMainWindow *parent,
     m_monitors = NULL;
     m_monitorLayout = 1;
 
+    gContext->DoDisableScreensaver();
+
     m_frameTimer = new QTimer(this);
     connect(m_frameTimer, SIGNAL(timeout()), this,
             SLOT(updateFrame()));
@@ -83,6 +85,8 @@ void ZMLivePlayer::initMonitorLayout()
 ZMLivePlayer::~ZMLivePlayer()
 {
     gContext->SaveSetting("ZoneMinderLiveLayout", m_monitorLayout);
+
+    gContext->DoRestoreScreensaver();
 
     if (m_players)
     {
