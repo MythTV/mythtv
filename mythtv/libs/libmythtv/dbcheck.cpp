@@ -3035,7 +3035,7 @@ thequery,
     if (dbver == "1186")
     {
         const QString updates[] = {
-"ALTER TABLE eit_cache MODIFY eventid INT UNSIGNED default 0;",
+"ALTER TABLE eit_cache MODIFY eventid INT UNSIGNED NOT NULL default 0;",
 ""
 };
         if (!performActualUpdate(updates, "1187", dbver))
