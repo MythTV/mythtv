@@ -26,6 +26,9 @@ offset_t AVF_Seek(URLContext *h, offset_t offset, int whence)
 {
     AVFRingBuffer *avfr = (AVFRingBuffer *)h->priv_data;
 
+    if (whence == AVSEEK_SIZE)
+        return avfr->GetRingBuffer()->GetRealFileSize(); 
+
     if (whence == SEEK_END)
         return avfr->GetRingBuffer()->GetRealFileSize() + offset;
 
