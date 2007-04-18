@@ -29,6 +29,8 @@
 
 // Vendor and Model IDs.
 // NOTE: Some Models have more than one possible Vendor ID
+// WARNING: Please update firewiredevice.cpp when adding to this list.
+
 #define DCT3412_VENDOR_ID1 0x0000159a
 #define DCT3412_MODEL_ID1  0x000034cb
 
@@ -175,6 +177,7 @@ int main (int argc, char *argv[])
          printf("node %d: vendor_id = 0x%08x model_id = 0x%08x\n", 
                  i, dir.vendor_id, dir.model_id); 
 
+      // WARNING: Please update firewiredevice.cpp when adding to this list.
       if ( ((dir.vendor_id == DCT3412_VENDOR_ID1) || 
             (dir.vendor_id == DCT5100_VENDOR_ID1) ||
             (dir.vendor_id == DCT6200_VENDOR_ID1) ||

@@ -31,6 +31,7 @@
 #include <string.h>
 
 /* SA3250HD IDs */
+/* WARNING: Please update firewiredevice.cpp when adding to this list. */
 #define SA3250HD_VENDOR_ID1     0x000011e6
 #define SA3250HD_VENDOR_ID2     0x000014f8
 #define SA3250HD_VENDOR_ID3     0x00001692
@@ -127,6 +128,7 @@ int main (int argc, char *argv[])
          printf("node %d: vendor_id = 0x%08x model_id = 0x%08x\n", 
                  i, dir.vendor_id, dir.model_id); 
 		
+      /* WARNING: Please update firewiredevice.cpp when adding to this list. */
       if ((((dir.vendor_id == SA4200HD_VENDOR_ID1) ||
             (dir.vendor_id == SA4200HD_VENDOR_ID2)) &&
 	    (dir.model_id == SA4200HD_MODEL_ID1))  ||
