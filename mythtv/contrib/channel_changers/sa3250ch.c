@@ -35,6 +35,7 @@
 #define SA3250HD_VENDOR_ID2     0x000014f8
 #define SA3250HD_VENDOR_ID3     0x00001692
 #define SA3250HD_VENDOR_ID4     0x00001947
+#define SA3250HD_VENDOR_ID5     0x00000f21
 #define SA3250HD_MODEL_ID1      0x00000be0
 #define SA4200HD_VENDOR_ID1     0x000014f8
 #define SA4200HD_VENDOR_ID2     0x00001692
@@ -132,7 +133,8 @@ int main (int argc, char *argv[])
           (((dir.vendor_id == SA3250HD_VENDOR_ID1) ||
             (dir.vendor_id == SA3250HD_VENDOR_ID2) ||
             (dir.vendor_id == SA3250HD_VENDOR_ID3) ||
-            (dir.vendor_id == SA3250HD_VENDOR_ID4)) &&
+            (dir.vendor_id == SA3250HD_VENDOR_ID4) ||
+            (dir.vendor_id == SA3250HD_VENDOR_ID5)) &&
             (dir.model_id == SA3250HD_MODEL_ID1)))
       {
             device = i;
