@@ -57,8 +57,8 @@ ProgLister::ProgLister(ProgListType pltype,
     allowUpdates = true;
     updateAll = false;
     refillAll = false;
-    titleSort = false;
-    reverseSort = false;
+    titleSort = gContext->GetNumSetting("ProgListTitleSort", false);
+    reverseSort = gContext->GetNumSetting("ProgListReverseSort", false);
 
     fullRect = QRect(0, 0, size().width(), size().height());
     viewRect = QRect(0, 0, 0, 0);
@@ -127,6 +127,8 @@ ProgLister::ProgLister(ProgListType pltype,
 ProgLister::~ProgLister()
 {
     itemList.clear();
+    gContext->SaveSetting("ProgListTitleSort", titleSort);
+    gContext->SaveSetting("ProgListReverseSort", reverseSort);
     gContext->removeListener(this);
     gContext->removeCurrentLocation();
     delete theme;
