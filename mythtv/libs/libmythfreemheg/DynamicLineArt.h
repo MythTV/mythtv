@@ -45,13 +45,9 @@ public:
     // Get the opaque area.  This is only opaque if the background is.
     virtual QRegion GetOpaqueArea();
 
-    // These actions also have the effect of clearing the drawing.
+    // This action also has the effect of clearing the drawing.
     virtual void SetBoxSize(int nWidth, int nHeight, MHEngine *engine);
-    virtual void SetPosition(int nXPosition, int nYPosition, MHEngine *engine);
-    virtual void BringToFront(MHEngine *engine);
-    virtual void SendToBack(MHEngine *engine);
-    virtual void PutBefore(const MHRoot *pRef, MHEngine *engine);
-    virtual void PutBehind(const MHRoot *pRef, MHEngine *engine);
+
     // Actions
     virtual void Clear();
     // These actions set the properties for subsequent drawing but don't affect anything drawn so far.

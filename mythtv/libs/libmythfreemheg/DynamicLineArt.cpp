@@ -82,7 +82,7 @@ void MHDynamicLineArt::Clear()
     m_picture->Clear();
 }
 
-// As well as their general action these actions also clear the drawing.
+// As well as the general action this also clears the drawing.
 void MHDynamicLineArt::SetBoxSize(int nWidth, int nHeight, MHEngine *engine)
 {
     MHLineArt::SetBoxSize(nWidth, nHeight, engine);
@@ -90,11 +90,8 @@ void MHDynamicLineArt::SetBoxSize(int nWidth, int nHeight, MHEngine *engine)
     Clear();
 }
 
-void MHDynamicLineArt::SetPosition(int nXPos, int nYPos, MHEngine *engine) { MHLineArt::SetPosition(nXPos, nYPos, engine); Clear(); }
-void MHDynamicLineArt::BringToFront(MHEngine *engine) { MHVisible::BringToFront(engine); Clear(); }
-void MHDynamicLineArt::SendToBack(MHEngine *engine) { MHVisible::SendToBack(engine); Clear(); }
-void MHDynamicLineArt::PutBefore(const MHRoot *pRef, MHEngine *engine) { MHVisible::PutBefore(pRef, engine); Clear(); }
-void MHDynamicLineArt::PutBehind(const MHRoot *pRef, MHEngine *engine) { MHVisible::PutBehind(pRef, engine); Clear(); }
+// SetPosition, BringToFront, SendToBack, PutBefore and PutBehind were defined in the original
+// MHEG standard to clear the drawing.  This was removed in the MHEG Corrigendum.
 
 void MHDynamicLineArt::SetFillColour(const MHColour &colour, MHEngine *)
 {
