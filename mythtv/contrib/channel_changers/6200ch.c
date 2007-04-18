@@ -57,6 +57,7 @@
 #define DCT6412_MODEL_ID2  0x000064cb
 
 #define DCT6416_VENDOR_ID1 0x000017ee
+#define DCT6416_VENDOR_ID2 0x00001a66 
 #define DCT6416_MODEL_ID1  0x0000646b
 
 #define AVC1394_SUBUNIT_TYPE_6200 (9 << 19)  /* uses a reserved subunit type */ 
@@ -189,7 +190,8 @@ int main (int argc, char *argv[])
             (dir.vendor_id == DCT6200_VENDOR_ID11) ||
             (dir.vendor_id == DCT6412_VENDOR_ID1) ||
             (dir.vendor_id == DCT6412_VENDOR_ID2) ||
-            (dir.vendor_id == DCT6416_VENDOR_ID1)) &&
+            (dir.vendor_id == DCT6416_VENDOR_ID1) || 
+            (dir.vendor_id == DCT6416_VENDOR_ID2)) &&
            ((dir.model_id == DCT3412_MODEL_ID1) ||
             (dir.model_id == DCT5100_MODEL_ID1) ||
             (dir.model_id == DCT6200_MODEL_ID1) ||
