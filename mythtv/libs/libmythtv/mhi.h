@@ -283,6 +283,7 @@ class MHIDLA : public MHDLADisplay
 
   protected:
     void DrawRect(int x, int y, int width, int height, MHRgba colour);
+    void DrawLineSub(int x1, int y1, int x2, int y2, bool swapped);
 
   protected:
     MHIContext *m_parent;

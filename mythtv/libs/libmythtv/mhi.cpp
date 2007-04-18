@@ -1,4 +1,6 @@
 #include <unistd.h>
+#include <qpointarray.h>
+#include <qbitarray.h>
 
 #include "mhi.h"
 #include "osd.h"
@@ -1085,14 +1087,104 @@ void MHIDLA::Draw(int x, int y)
 // The UK MHEG profile defines exactly how transparency is supposed to work.
 // The drawings are made using possibly transparent ink with any crossings
 // just set to that ink and then the whole drawing is alpha-merged with the
-// underlying graphics.  Since DynamicLineArt is hardly used in practice,
-// the only example I've seen so far is in the YooGames' Tetris and
-// that only uses opaque rectangles, there's no point in doing very much here.
+// underlying graphics.
+// DynamicLineArt no longer seems to be used in transmissions in the UK
+// although it appears that DrawPoly is used in New Zealand.  These are
+// very basic implementations of the functions.
 
 // Lines
-void MHIDLA::DrawLine(int /*x1*/, int /*y1*/, int /*x2*/, int /*y2*/)
+void MHIDLA::DrawLine(int x1, int y1, int x2, int y2)
 {
-    VERBOSE(VB_IMPORTANT, "Dynamic Line Art: DrawLinel not implemented");
+    // Get the arguments so that the lower x comes first and the
+    // absolute gradient is less than one.
+    if (abs(y2-y1) > abs(x2-x1))
+    {
+        if (y2 > y1)
+            DrawLineSub(y1, x1, y2, x2, true);
+        else
+            DrawLineSub(y2, x2, y1, x1, true);
+    }
+    else
+    {
+        if (x2 > x1)
+            DrawLineSub(x1, y1, x2, y2, false);
+        else
+            DrawLineSub(x2, y2, x1, y1, false);
+    }
+}
+
+// Based on the Bresenham line drawing algorithm but extended to draw
+// thick lines.
+void MHIDLA::DrawLineSub(int x1, int y1, int x2, int y2, bool swapped)
+{
+    QRgb colour = qRgba(m_lineColour.red(), m_lineColour.green(),
+                         m_lineColour.blue(), m_lineColour.alpha());
+    int dx = x2-x1, dy = abs(y2-y1);
+    int yStep = y2 >= y1 ? 1 : -1;
+    // Adjust the starting positions to take account of the
+    // line width.
+    int error2 = dx/2;
+    for (int k = 0; k < m_lineWidth/2; k++)
+    {
+        y1--;
+        y2--;
+        error2 += dy;
+        if (error2*2 > dx)
+        {
+            error2 -= dx;
+            x1 += yStep;
+            x2 += yStep;
+        }
+    }
+    // Main loop
+    int y = y1;
+    int error = dx/2;
+    for (int x = x1; x <= x2; x++) // Include both endpoints
+    {
+        error2 = dx/2;
+        int j = 0;
+        // Inner loop also uses the Bresenham algorithm to draw lines
+        // perpendicular to the principal direction.
+        for (int i = 0; i < m_lineWidth; i++)
+        {
+            if (swapped)
+            {
+                if (x+j >= 0 && y+i >= 0 && y+i < m_width && x+j < m_height)
+                    m_image.setPixel(y+i, x+j, colour);
+            }
+            else
+            {
+                if (x+j >= 0 && y+i >= 0 && x+j < m_width && y+i < m_height)
+                    m_image.setPixel(x+j, y+i, colour);
+            }
+            error2 += dy;
+            if (error2*2 > dx)
+            {
+                error2 -= dx;
+                j -= yStep;
+                if (i < m_lineWidth-1)
+                {
+                    // Add another pixel in this case.
+                    if (swapped)
+                    {
+                        if (x+j >= 0 && y+i >= 0 && y+i < m_width && x+j < m_height)
+                            m_image.setPixel(y+i, x+j, colour);
+                    }
+                    else
+                    {
+                        if (x+j >= 0 && y+i >= 0 && x+j < m_width && y+i < m_height)
+                            m_image.setPixel(x+j, y+i, colour);
+                    }
+                }
+            }
+        }
+        error += dy;
+        if (error*2 > dx)
+        {
+            error -= dx;
+            y += yStep;
+        }
+    }
 }
 
 // Rectangles
@@ -1128,23 +1220,169 @@ void MHIDLA::DrawBorderedRectangle(int x, int y, int width, int height)
 }
 
 // Ovals (ellipses)
-void MHIDLA::DrawOval(int /*x*/, int /*y*/, int /*width*/, int /*height*/)
+void MHIDLA::DrawOval(int x, int y, int width, int height)
 {
-    VERBOSE(VB_IMPORTANT, "Dynamic Line Art: DrawOval not implemented");
+    // Simple but inefficient way of drawing a ellipse.
+    QPointArray ellipse;
+    ellipse.makeEllipse(x, y, width, height);
+    DrawPoly(true, ellipse);
 }
 
 // Arcs and sectors
-void MHIDLA::DrawArcSector(int /*x*/, int /*y*/,
-                           int /*width*/, int /*height*/,
-                           int /*start*/, int /*arc*/, bool /*isSector*/)
+void MHIDLA::DrawArcSector(int x, int y, int width, int height,
+                           int start, int arc, bool isSector)
 {
-    VERBOSE(VB_IMPORTANT, "Dynamic Line Art: DrawArcSector not implemented");
+    QPointArray points;
+    // MHEG and Qt both measure arcs as angles anticlockwise from
+    // the 3 o'clock position but MHEG uses 64ths of a degree
+    // whereas Qt uses 16ths.
+    points.makeArc(x, y, width, height, start/4, arc/4);
+    if (isSector)
+    {
+        // Have to add the centre as a point and fill the figure.
+        if (arc != 360*64)
+            points.putPoints(points.size(), 1, x+width/2, y+height/2);
+        DrawPoly(true, points);
+    }
+    else
+        DrawPoly(false, points);
 }
 
-// Polygons
-void MHIDLA::DrawPoly(bool/* isFilled*/, const QPointArray &/*points*/)
+// Polygons.  This is used directly and also to draw other figures.
+// The UK profile says that MHEG should not contain concave or
+// self-crossing polygons but we can get the former at least as
+// a result of rounding when drawing ellipses.
+void MHIDLA::DrawPoly(bool isFilled, const QPointArray &points)
 {
-    VERBOSE(VB_IMPORTANT, "Dynamic Line Art: DrawPoly not implemented");
+    int nPoints = points.size();
+    if (nPoints < 2)
+        return;
+
+    if (isFilled)
+    {
+        // Polygon filling is done by sketching the outline of
+        // the polygon in a separate bitmap and then raster scanning
+        // across this to generate the fill.  There are some special
+        // cases that have to be considered when doing this.  Maximum
+        // and minimum points have to be removed otherwise they will
+        // turn the scan on but not off again.  Horizontal lines are
+        // suppressed and their ends handled specially.
+        QRect bounds = points.boundingRect();
+        int width = bounds.width()+1, height = bounds.height()+1;
+        QBitArray boundsMap(width*height);
+        boundsMap.fill(0);
+        // Draw the boundaries in the bounds map.  This is
+        // the Bresenham algorithm if the absolute gradient is
+        // greater than 1 but puts only the centre of each line
+        // (so there is only one point for each y value) if less.
+        QPoint last = points[nPoints-1]; // Last point
+        for (int i = 0; i < nPoints; i++)
+        {
+            QPoint thisPoint = points[i];
+            int x1 = last.x() - bounds.x();
+            int y1 = last.y() - bounds.y();
+            int x2 = thisPoint.x() - bounds.x();
+            int y2 = thisPoint.y() - bounds.y();
+            int x, xEnd, y, yEnd;
+            if (y2 > y1)
+            {
+                x = x1;
+                y = y1;
+                xEnd = x2;
+                yEnd = y2;
+            }
+            else
+            {
+                x = x2;
+                y = y2;
+                xEnd = x1;
+                yEnd = y1;
+            }
+            int dx = abs(xEnd-x), dy = yEnd-y;
+            int xStep = xEnd >= x ? 1 : -1;
+            if (abs(y2-y1) > abs(x2-x1))
+            {
+                int error = dy/2;
+                y++;
+                for (; y < yEnd; y++) // Exclude endpoints
+                {
+                    boundsMap.toggleBit(x+y*width);
+                    error += dx;
+                    if (error*2 > dy)
+                    {
+                        error -= dy;
+                        x += xStep;
+                    }
+                }
+            }
+            else
+            {
+                int error = 0;
+                y++;
+                for (; y < yEnd; y++)
+                {
+                    boundsMap.toggleBit(x+y*width);
+                    error += dx;
+                    while (error > dy)
+                    {
+                        x += xStep;
+                        error -= dy;
+                    }
+                }
+            }
+            QPoint nextPoint = points[(i+1) % nPoints];
+            int nextY = nextPoint.y() - bounds.y();
+            int turn = (y2 - y1) * (nextY - y2);
+            if (turn > 0) // Not a max or min
+                boundsMap.toggleBit(x2+y2*width);
+            else if (turn == 0) // Previous or next line is horizontal
+            {
+                // We only draw a point at the beginning or end of a horizontal
+                // line if it turns clockwise.  This means that the fill
+                // will be different depending on the direction the polygon was
+                // drawn but that will be tidied up when we draw the lines round.
+                if (y1 == y2)
+                {
+                    if ((x2-x1) * (nextY - y2) > 0)
+                       boundsMap.toggleBit(x2+y2*width);
+                }
+                else if ((nextPoint.x() - bounds.x() - x2) * (y2 - y1) < 0)
+                    // Next line is horizontal -  draw point if turn is clockwise.
+                    boundsMap.toggleBit(x2+y2*width);
+            }
+            last = thisPoint;
+        }
+        QRgb fillColour = qRgba(m_fillColour.red(), m_fillColour.green(),
+                                m_fillColour.blue(), m_fillColour.alpha());
+        // Now scan the bounds map and use this to fill the polygon.
+        for (int j = 0; j < bounds.height(); j++)
+        {
+            bool penDown = false;
+            for (int k = 0; k < bounds.width(); k++)
+            {
+                if (boundsMap.testBit(k+j*width))
+                    penDown = ! penDown;
+                else if (penDown && k+bounds.x() >= 0 && j+bounds.y() >= 0 &&
+                         k+bounds.x() < m_width && j+bounds.y() < m_height)
+                    m_image.setPixel(k+bounds.x(), j+bounds.y(), fillColour);
+            }
+        }
+
+        // Draw the boundary
+        last = points[nPoints-1]; // Last point
+        for (int i = 0; i < nPoints; i++)
+        {
+            DrawLine(points[i].x(), points[i].y(), last.x(), last.y());
+            last = points[i];
+        }
+    }
+    else // PolyLine - draw lines between the points but don't close it.
+    {
+        for (int i = 1; i < nPoints; i++)
+        {
+            DrawLine(points[i].x(), points[i].y(), points[i-1].x(), points[i-1].y());
+        }
+    }
 }
 
 
