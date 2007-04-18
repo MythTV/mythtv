@@ -84,6 +84,7 @@ static HostCheckBox *SlideshowUseOpenGL()
 {
     HostCheckBox *gc = new HostCheckBox("SlideshowUseOpenGL");
     gc->setLabel(QObject::tr("Use OpenGL transitions"));
+    gc->setValue(false);
     gc->setHelpText(QObject::tr("Check this to enable OpenGL "
                                 "based slideshow transitions"));
     return gc;
@@ -188,23 +189,19 @@ class GalleryConfigurationGroup : public TriggeredConfigurationGroup
         HostCheckBox* useOpenGL = SlideshowUseOpenGL();
         addChild(useOpenGL);
         setTrigger(useOpenGL);
-    
+
         ConfigurationGroup* openGLConfig = new VerticalConfigurationGroup(false);
         openGLConfig->addChild(SlideshowOpenGLTransition());
         openGLConfig->addChild(SlideshowOpenGLTransitionLength());
         addTarget("1", openGLConfig);
+#endif
 
         ConfigurationGroup* regularConfig = new VerticalConfigurationGroup(false);
         regularConfig->addChild(MythGalleryOverlayCaption());
         regularConfig->addChild(SlideshowTransition());
         regularConfig->addChild(SlideshowBackground());
         addTarget("0", regularConfig);
-#else
-        addChild(MythGalleryOverlayCaption());
-        addChild(SlideshowTransition());
-        addChild(SlideshowBackground());
-#endif
-        
+
         addChild(SlideshowDelay());
         addChild(SlideshowRecursive());
     }
