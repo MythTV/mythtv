@@ -51,7 +51,7 @@ QString CardUtil::ProbeDVBType(uint device)
 
 #ifdef USING_DVB
     QString dvbdev = CardUtil::GetDeviceName(DVB_DEV_FRONTEND, device);
-    int fd_frontend = open(dvbdev.ascii(), O_RDWR | O_NONBLOCK);
+    int fd_frontend = open(dvbdev.ascii(), O_RDONLY | O_NONBLOCK);
     if (fd_frontend < 0)
         return "ERROR_OPEN";
 
