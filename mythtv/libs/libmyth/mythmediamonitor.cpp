@@ -115,7 +115,7 @@ MythMediaDevice * MediaMonitor::selectDrivePopup(const QString label,
         // Caller can also request mounted drives to be listed:
 
         if (typeid(**it) == typeid(MythCDROM) ||
-               (showMounted && (*it)->isMounted()))
+               (showMounted && (*it)->getAllowEject()))
             drives.append(*it);
     }
 
