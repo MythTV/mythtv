@@ -53,16 +53,20 @@ QString CardUtil::ProbeDVBType(uint device)
 
 #ifdef USING_DVB
     QString dvbdev = CardUtil::GetDeviceName(DVB_DEV_FRONTEND, device);
-    int fd_frontend = open(dvbdev.ascii(), O_RDWR | O_NONBLOCK);
+    int fd_frontend = open(dvbdev.ascii(), O_RDONLY | O_NONBLOCK);
     if (fd_frontend < 0)
-        return "ERROR_OPEN";
+    {
+        VERBOSE(VB_IMPORTANT, "Can't open DVB frontend (" + dvbdev + ").");
+        return ret;
+    }
 
     struct dvb_frontend_info info;
     int err = ioctl(fd_frontend, FE_GET_INFO, &info);
     if (err < 0)
     {
         close(fd_frontend);
-        return "ERROR_PROBE";
+        VERBOSE(VB_IMPORTANT, "FE_GET_INFO ioctl failed (" + dvbdev + ").");
+        return ret;
     }
     close(fd_frontend);
 
