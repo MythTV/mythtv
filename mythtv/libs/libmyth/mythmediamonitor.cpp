@@ -13,6 +13,7 @@ using namespace std;
 #include <qfile.h>
 
 // MythTV headers
+#include "mythcdrom.h"
 #include "mythmediamonitor.h"
 #include "mythcontext.h"
 #include "mythdialogs.h"
@@ -110,11 +111,11 @@ MythMediaDevice * MediaMonitor::selectDrivePopup(const QString label,
 
     for (it = m_Devices.begin(); it != m_Devices.end(); ++it)
     {
-        // We can't currently tell if a MediaMonitor device is a CD/DVD,
-        // but if the device is ejectable that's probably safe.
+        // By default, we only list CD/DVD devices.
         // Caller can also request mounted drives to be listed:
 
-        if ((*it)->getAllowEject() || (showMounted && (*it)->isMounted()))
+        if (typeid(**it) == typeid(MythCDROM) ||
+               (showMounted && (*it)->isMounted()))
             drives.append(*it);
     }
 
