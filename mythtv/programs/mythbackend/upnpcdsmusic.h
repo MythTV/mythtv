@@ -14,10 +14,6 @@
 #include "mainserver.h"
 #include "upnpcds.h"
               
-//using namespace UPnp;
-
-typedef QMap< QString, QString > StringMap;
-
 //////////////////////////////////////////////////////////////////////////////
 //
 //////////////////////////////////////////////////////////////////////////////
@@ -26,61 +22,31 @@ class UPnpCDSMusic : public UPnpCDSExtension
 {
     private:
 
-        QString RemoveToken ( const QString &sToken, const QString &sStr, int num );
+        static UPnpCDSRootInfo g_RootNodes[];
+        static int             g_nRootCount;
 
-        int  GetDistinctCount      ( const QString &sColumn, const QString &sWhere = "" );
-        int  GetCount              ( int nNodeIdx, const QString &sKey );
+    protected:
 
-        void BuildContainerChildren( UPnpCDSExtensionResults *pResults, 
-                                     int                      nNodeIdx,
-                                     const QString           &sParentId,
-                                     short                    nStartingIndex,
-                                     short                    nRequestedCount );
+        virtual UPnpCDSRootInfo *GetRootInfo   (int nIdx);
+        virtual int              GetRootCount  ( );
+        virtual QString          GetTableName  ( QString sColumn );
+        virtual QString          GetItemListSQL( QString sColumn = "" );
 
-        void CreateMusicTracks     ( UPnpCDSRequest          *pRequest,
-                                     UPnpCDSExtensionResults *pResults,
-                                     int                      nNodeIdx,
-                                     const QString           &sKey, 
-                                     bool                     bAddRef );
+        virtual void             BuildItemQuery( MSqlQuery        &query, 
+                                                 const QStringMap &mapParams );
 
-        void AddMusicTrack         ( UPnpCDSRequest          *pRequest,
-                                     UPnpCDSExtensionResults *pResults,
-                                     bool                     bAddRef, 
-                                     int                      nNodeIdx,
-                                     MSqlQuery               &query );
-
-        UPnpCDSExtensionResults *ProcessRoot     ( UPnpCDSRequest          *pRequest, 
-                                                   UPnpCDSExtensionResults *pResults,
-                                                   QStringList             &idPath );
-        UPnpCDSExtensionResults *ProcessAll      ( UPnpCDSRequest          *pRequest, 
-                                                   UPnpCDSExtensionResults *pResults,
-                                                   QStringList             &idPath, 
-                                                   int                      nNodeIdx );
-        UPnpCDSExtensionResults *ProcessTrack    ( UPnpCDSRequest          *pRequest,
-                                                   UPnpCDSExtensionResults *pResults,
-                                                   QStringList             &idPath );
-        UPnpCDSExtensionResults *ProcessKey      ( UPnpCDSRequest          *pRequest,
-                                                   UPnpCDSExtensionResults *pResults,
-                                                   QStringList             &idPath );
-        UPnpCDSExtensionResults *ProcessContainer( UPnpCDSRequest          *pRequest,
-                                                   UPnpCDSExtensionResults *pResults,
-                                                   int                      nNodeIdx,
-                                                   QStringList             &idPath );
-
-
+        virtual void             AddItem( const QString           &sObjectId,
+                                          UPnpCDSExtensionResults *pResults,
+                                          bool                     bAddRef, 
+                                          MSqlQuery               &query );
     public:
 
-        UPnpCDSMusic( ) : UPnpCDSExtension( "Music", "Music" )
+        UPnpCDSMusic( ) : UPnpCDSExtension( "Music", "Music",
+                                            "object.item.audioItem.musicTrack" )
         {
         }
 
         virtual ~UPnpCDSMusic() {}
-
-        virtual UPnpCDSExtensionResults *Browse( UPnpCDSRequest *pRequest );
-        virtual UPnpCDSExtensionResults *Search( UPnpCDSRequest *pRequest );
-
-        virtual QString GetSearchCapabilities() { return( "" ); }
-        virtual QString GetSortCapabilities  () { return( "" ); }
 };
 
 #endif

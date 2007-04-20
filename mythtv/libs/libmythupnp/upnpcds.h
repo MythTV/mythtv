@@ -17,9 +17,10 @@
 #include "upnp.h"
 #include "upnpcdsobjects.h"
 #include "eventing.h"
-              
+#include "mythdbcon.h"
+
 class UPnpCDS;
-                          
+
 typedef enum 
 {
     CDSM_Unknown                = 0,
@@ -101,25 +102,89 @@ class UPnpCDSExtensionResults
 
 //////////////////////////////////////////////////////////////////////////////
 
+typedef struct
+{
+    char *title;
+    char *column;
+    char *sql;
+    char *where;
+
+} UPnpCDSRootInfo;
+         
 class UPnpCDSExtension
 {
     public:
 
         QString     m_sExtensionId;
         QString     m_sName;
+        QString     m_sClass;
+
+    protected:
+
+        int  GetDistinctCount      ( const QString &sColumn );
+        int  GetCount              ( const QString &sColumn, const QString &sKey );
+
+        QString RemoveToken ( const QString &sToken, const QString &sStr, int num );
+
+        UPnpCDSExtensionResults *ProcessRoot     ( UPnpCDSRequest          *pRequest, 
+                                                   UPnpCDSExtensionResults *pResults,
+                                                   QStringList             &idPath );
+        UPnpCDSExtensionResults *ProcessAll      ( UPnpCDSRequest          *pRequest, 
+                                                   UPnpCDSExtensionResults *pResults,
+                                                   QStringList             &idPath );
+        UPnpCDSExtensionResults *ProcessItem     ( UPnpCDSRequest          *pRequest,
+                                                   UPnpCDSExtensionResults *pResults,
+                                                   QStringList             &idPath );
+        UPnpCDSExtensionResults *ProcessKey      ( UPnpCDSRequest          *pRequest,
+                                                   UPnpCDSExtensionResults *pResults,
+                                                   QStringList             &idPath );
+        UPnpCDSExtensionResults *ProcessContainer( UPnpCDSRequest          *pRequest,
+                                                   UPnpCDSExtensionResults *pResults,
+                                                   int                      nNodeIdx,
+                                                   QStringList             &idPath );
+
+        void                     CreateItems     ( UPnpCDSRequest          *pRequest,
+                                                   UPnpCDSExtensionResults *pResults,
+                                                   int                      nNodeIdx,
+                                                   const QString           &sKey, 
+                                                   bool                     bAddRef );
+
+        // ------------------------------------------------------------------
+
+        virtual UPnpCDSRootInfo *GetRootInfo   ( int nIdx) = 0;
+        virtual int              GetRootCount  ( )         = 0;
+        virtual QString          GetTableName  ( QString sColumn      ) = 0;
+        virtual QString          GetItemListSQL( QString sColumn = "" ) = 0;
+        virtual void             BuildItemQuery( MSqlQuery &query, const QStringMap &mapParams ) = 0;
+
+        virtual void       AddItem( const QString           &sObjectId,
+                                    UPnpCDSExtensionResults *pResults,
+                                    bool                     bAddRef,
+                                    MSqlQuery               &query )  = 0;
+
+        virtual CDSObject *CreateContainer( const QString &sId,
+                                            const QString &sTitle,
+                                            const QString &sParentId )
+        {
+            return CDSObject::CreateContainer( sId, sTitle, sParentId );
+        }
+
 
     public:
 
-        UPnpCDSExtension( QString sName, QString sExtensionId )
+        UPnpCDSExtension( QString sName, 
+                          QString sExtensionId, 
+                          QString sClass )
         {
             m_sName        = QObject::tr( sName );
             m_sExtensionId = sExtensionId;
+            m_sClass       = sClass;
         }
 
         virtual ~UPnpCDSExtension() {}
 
-        virtual UPnpCDSExtensionResults *Browse( UPnpCDSRequest *pRequest ) = 0;
-        virtual UPnpCDSExtensionResults *Search( UPnpCDSRequest *pRequest ) = 0;
+        virtual UPnpCDSExtensionResults *Browse( UPnpCDSRequest *pRequest );
+        virtual UPnpCDSExtensionResults *Search( UPnpCDSRequest *pRequest );
 
         virtual QString GetSearchCapabilities() { return( "" ); }
         virtual QString GetSortCapabilities  () { return( "" ); }

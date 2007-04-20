@@ -251,41 +251,45 @@ void UPnpCDS::HandleBrowse( HTTPRequest *pRequest )
 
                 // -=>TODO: Need to handle StartingIndex & RequestedCount
 
-                short nStart = Max( request.m_nStartingIndex, short( 0 ));
-                short nCount = 0;
-
                 eErrorCode      = UPnPResult_Success;
                 nTotalMatches   = m_extensions.count();
                 nUpdateID       = m_root.m_nUpdateId;
 
+                if (request.m_nRequestedCount == 0)
+                    request.m_nRequestedCount = nTotalMatches;
+
+                short nStart = Max( request.m_nStartingIndex, short( 0 ));
+                short nCount = Min( nTotalMatches, request.m_nRequestedCount );
+
                 UPnpCDSExtension    *pExtension = m_extensions.at( nStart );
+                UPnpCDSRequest       childRequest;
 
-                request.m_sParentId         = "0";
-                request.m_eBrowseFlag       = CDS_BrowseMetadata;
-                request.m_sFilter           = "";
-                request.m_nStartingIndex    = 0;
-                request.m_nRequestedCount   = 1;
-                request.m_sSortCriteria     = "";
+                childRequest.m_sParentId         = "0";
+                childRequest.m_eBrowseFlag       = CDS_BrowseMetadata;
+                childRequest.m_sFilter           = "";
+                childRequest.m_nStartingIndex    = 0;
+                childRequest.m_nRequestedCount   = 1;
+                childRequest.m_sSortCriteria     = "";
 
-                while (( pExtension != NULL ) && (nCount < request.m_nRequestedCount ))
+                while (( pExtension != NULL ) && (nNumberReturned < nCount ))
                 {
-                    request.m_sObjectId = pExtension->m_sExtensionId;
+                    childRequest.m_sObjectId = pExtension->m_sExtensionId;
 
-                    pResult = pExtension->Browse( &request );
+                    pResult = pExtension->Browse( &childRequest );
 
                     if (pResult != NULL)
                     {
                         if (pResult->m_eErrorCode == UPnPResult_Success)
+                        {
                             sResultXML  += pResult->GetResultXML();
+                            nNumberReturned ++;
+                        }
 
                         delete pResult;
                     }
 
                     pExtension = m_extensions.next();
-                    nCount++;
                 }
-
-                nNumberReturned = nCount;
 
                 break;
             }
@@ -541,3 +545,628 @@ void UPnpCDS::HandleGetSystemUpdateID( HTTPRequest *pRequest )
     pRequest->FormatActionResponse( &list );
 }
 
+
+
+/////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////
+//
+// UPnpCDSExtension Implementation
+//
+/////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
+UPnpCDSExtensionResults *UPnpCDSExtension::Browse( UPnpCDSRequest *pRequest )
+{
+
+    // -=>TODO: Need to add Filter & Sorting Support.
+    // -=>TODO: Need to add Sub-Folder/Category Support!!!!!
+
+    if (! pRequest->m_sObjectId.startsWith( m_sExtensionId, true ))
+        return( NULL );
+
+    // ----------------------------------------------------------------------
+    // Parse out request object's path
+    // ----------------------------------------------------------------------
+
+    QStringList idPath = QStringList::split( "/", pRequest->m_sObjectId.section('=',0,0) );
+
+    QString key = pRequest->m_sObjectId.section('=',1);
+
+    if (idPath.count() == 0)
+        return( NULL );
+
+    // ----------------------------------------------------------------------
+    // Process based on location in hierarchy
+    // ----------------------------------------------------------------------
+
+    UPnpCDSExtensionResults *pResults = new UPnpCDSExtensionResults();
+
+    if (pResults != NULL)
+    {
+        if (key)  
+            idPath.last().append(QString("=%1").arg(key)); 
+
+        QString sLast = idPath.last();
+
+        pRequest->m_sParentId = pRequest->m_sObjectId;
+
+        if (sLast == m_sExtensionId         ) { return( ProcessRoot   ( pRequest, pResults, idPath )); }
+        if (sLast == "0"                    ) { return( ProcessAll    ( pRequest, pResults, idPath )); }
+        if (sLast.startsWith( "key" , true )) { return( ProcessKey    ( pRequest, pResults, idPath )); }
+        if (sLast.startsWith( "item", true )) { return( ProcessItem   ( pRequest, pResults, idPath )); }
+
+        int nNodeIdx = sLast.toInt();
+
+        if ((nNodeIdx > 0) && (nNodeIdx < GetRootCount()))
+            return( ProcessContainer( pRequest, pResults, nNodeIdx, idPath ));
+
+        pResults->m_eErrorCode = UPnPResult_CDS_NoSuchObject;
+        pResults->m_sErrorDesc = "";
+    }
+
+    return( pResults );        
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
+UPnpCDSExtensionResults *UPnpCDSExtension::Search( UPnpCDSRequest *pRequest )
+{
+    // -=>TODO: Need to add Filter & Sorting Support.
+    // -=>TODO: Need to add Sub-Folder/Category Support!!!!!
+
+    QStringList sEmptyList;
+
+     if ( !m_sClass.startsWith( pRequest->m_sSearchClass ))
+        return NULL;
+
+    UPnpCDSExtensionResults *pResults = new UPnpCDSExtensionResults();
+
+    CreateItems( pRequest, pResults, 0, "", false );
+
+    return pResults;
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
+QString UPnpCDSExtension::RemoveToken( const QString &sToken, const QString &sStr, int num )
+{
+    QString sResult( "" );
+    int     nPos = -1;
+
+    for (int nIdx=0; nIdx < num; nIdx++)
+    {
+        if ((nPos = sStr.findRev( sToken, nPos )) == -1)
+            break;
+    }
+
+    if (nPos > 0)
+        sResult = sStr.left( nPos );
+
+    return sResult;
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
+UPnpCDSExtensionResults *UPnpCDSExtension::ProcessRoot( UPnpCDSRequest          *pRequest, 
+                                                        UPnpCDSExtensionResults *pResults, 
+                                                        QStringList             &/*idPath*/ )
+{
+    pResults->m_nTotalMatches   = 0;
+    pResults->m_nUpdateID       = 1;
+
+    short nRootCount = GetRootCount();
+
+    switch( pRequest->m_eBrowseFlag )
+    { 
+        case CDS_BrowseMetadata:
+        {
+            // --------------------------------------------------------------
+            // Return Root Object Only
+            // --------------------------------------------------------------
+
+            pResults->m_nTotalMatches   = 1;
+            pResults->m_nUpdateID       = 1;
+
+            CDSObject *pRoot = CreateContainer( m_sExtensionId, m_sName, "0");
+
+            pRoot->SetChildCount( nRootCount );
+
+            pResults->Add( pRoot ); 
+
+            break;
+        }
+
+        case CDS_BrowseDirectChildren:
+        {
+            pResults->m_nUpdateID     = 1;
+            pResults->m_nTotalMatches = nRootCount ;
+            
+            if ( pRequest->m_nRequestedCount == 0)
+                pRequest->m_nRequestedCount = nRootCount ;
+
+            short nStart = Max( pRequest->m_nStartingIndex, short( 0 ));
+            short nEnd   = Min( nRootCount, short( nStart + pRequest->m_nRequestedCount));
+
+            if (nStart < nRootCount)
+            {
+                for (short nIdx = nStart; nIdx < nEnd; nIdx++)
+                {
+                    UPnpCDSRootInfo *pInfo = GetRootInfo( nIdx );
+
+                    if (pInfo != NULL)
+                    {
+
+                        QString sId = QString( "%1/%2" ).arg( pRequest->m_sObjectId   )
+                                                        .arg( nIdx );
+
+                        CDSObject *pItem = CreateContainer( sId,  
+                                                            QObject::tr( pInfo->title ), 
+                                                            m_sExtensionId );
+
+                        pItem->SetChildCount( GetDistinctCount( pInfo->column ) );
+
+                        pResults->Add( pItem );
+                    }
+                }
+            }
+        }
+
+        case CDS_BrowseUnknown:
+        default:
+            break;
+    }
+
+    return pResults;
+}
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
+UPnpCDSExtensionResults *UPnpCDSExtension::ProcessAll ( UPnpCDSRequest          *pRequest,
+                                                        UPnpCDSExtensionResults *pResults,
+                                                        QStringList             &/*idPath*/ )
+{
+    pResults->m_nTotalMatches   = 0;
+    pResults->m_nUpdateID       = 1;
+
+    // ----------------------------------------------------------------------
+    //
+    // ----------------------------------------------------------------------
+    
+    switch( pRequest->m_eBrowseFlag )
+    { 
+        case CDS_BrowseMetadata:
+        {
+            // --------------------------------------------------------------
+            // Return Container Object Only
+            // --------------------------------------------------------------
+
+            UPnpCDSRootInfo *pInfo = GetRootInfo( 0 );
+
+            if (pInfo != NULL)
+            {
+                pResults->m_nTotalMatches   = 1;
+                pResults->m_nUpdateID       = 1;
+
+                CDSObject *pItem = CreateContainer( pRequest->m_sObjectId,  
+                                                    QObject::tr( pInfo->title ), 
+                                                    m_sExtensionId );
+
+                pItem->SetChildCount( GetDistinctCount( pInfo->column ) );
+
+                pResults->Add( pItem ); 
+            }
+
+            break;
+        }
+
+        case CDS_BrowseDirectChildren:
+        {
+
+            CreateItems( pRequest, pResults, 0, "", false );
+
+            break;
+        }
+
+        case CDS_BrowseUnknown:
+        default:
+            break;
+
+    }
+    
+
+    return pResults;
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
+UPnpCDSExtensionResults *UPnpCDSExtension::ProcessItem( UPnpCDSRequest          *pRequest,
+                                                        UPnpCDSExtensionResults *pResults, 
+                                                        QStringList             &idPath )
+{
+    pResults->m_nTotalMatches   = 0;
+    pResults->m_nUpdateID       = 1;
+
+    // ----------------------------------------------------------------------
+    //
+    // ----------------------------------------------------------------------
+    
+    if ( pRequest->m_eBrowseFlag == CDS_BrowseMetadata )
+    {
+        // --------------------------------------------------------------
+        // Return 1 Item
+        // --------------------------------------------------------------
+
+        QStringMap  mapParams;
+        QString     sParams = idPath.last().section( '?', 1, 1 );
+            
+        sParams.replace(QRegExp( "&amp;"), "&" ); 
+
+        HTTPRequest::GetParameters( sParams, mapParams );
+
+        MSqlQuery query(MSqlQuery::InitCon());
+
+        if (query.isConnected())                                                           
+        {
+            BuildItemQuery( query, mapParams );
+
+            query.exec();
+
+            if (query.isActive() && query.size() > 0)
+            {
+                if ( query.next() )
+                {
+                    pRequest->m_sObjectId = RemoveToken( "/", pRequest->m_sObjectId, 1 );
+
+                    AddItem( pRequest->m_sObjectId, pResults, false, query );
+                    pResults->m_nTotalMatches = 1;
+                }
+            }
+        }
+    }
+
+    return pResults;
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
+UPnpCDSExtensionResults *UPnpCDSExtension::ProcessKey( UPnpCDSRequest          *pRequest,
+                                                       UPnpCDSExtensionResults *pResults, 
+                                                       QStringList             &idPath )
+{
+    pResults->m_nTotalMatches   = 0;
+    pResults->m_nUpdateID       = 1;
+
+    // ----------------------------------------------------------------------
+    //
+    // ----------------------------------------------------------------------
+    
+    QString sKey = idPath.last().section( '=', 1, 1 );
+    QUrl::decode( sKey );
+
+    if (sKey.length() > 0)
+    {
+        int nNodeIdx = idPath[ idPath.count() - 2 ].toInt();
+
+        switch( pRequest->m_eBrowseFlag )
+        { 
+
+            case CDS_BrowseMetadata:
+            {                              
+                UPnpCDSRootInfo *pInfo = GetRootInfo( nNodeIdx );
+
+                if (pInfo == NULL)
+                    return pResults;
+
+                pRequest->m_sParentId = RemoveToken( "/", pRequest->m_sObjectId, 1 );
+
+                // --------------------------------------------------------------
+                // Since Key is not always the title, we need to lookup title.
+                // --------------------------------------------------------------
+
+                MSqlQuery query(MSqlQuery::InitCon());
+
+                if (query.isConnected())
+                {
+                    QString sSQL   = QString( pInfo->sql )
+                                        .arg( pInfo->where );
+
+                    query.prepare  ( sSQL );
+                    query.bindValue( ":KEY", sKey );
+                    query.exec();
+
+                    if (query.isActive() && query.size() > 0)
+                    {
+                        if ( query.next() )
+                        {
+                            // ----------------------------------------------
+                            // Return Container Object Only
+                            // ----------------------------------------------
+
+                            pResults->m_nTotalMatches   = 1;
+                            pResults->m_nUpdateID       = 1;
+
+                            CDSObject *pItem = CreateContainer( pRequest->m_sObjectId,  
+                                                                query.value(1).toString(), 
+                                                                pRequest->m_sParentId );
+
+                            pItem->SetChildCount( GetDistinctCount( pInfo->column  ));
+
+                            pResults->Add( pItem ); 
+                        }
+                    }
+                }
+                break;
+            }
+
+            case CDS_BrowseDirectChildren:
+            {
+                CreateItems( pRequest, pResults, nNodeIdx, sKey, true );
+
+                break;
+            }
+
+            case CDS_BrowseUnknown:
+                default:
+                break;
+        }
+    }
+
+    return pResults;                                                                           
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
+UPnpCDSExtensionResults *UPnpCDSExtension::ProcessContainer( UPnpCDSRequest          *pRequest,
+                                                             UPnpCDSExtensionResults *pResults,
+                                                             int                      nNodeIdx,
+                                                             QStringList             &/*idPath*/ )
+
+{
+    pResults->m_nUpdateID     = 1;
+    pResults->m_nTotalMatches = 0;
+
+    UPnpCDSRootInfo *pInfo = GetRootInfo( nNodeIdx );
+
+    if (pInfo == NULL)
+        return pResults;
+
+    switch( pRequest->m_eBrowseFlag )
+    { 
+        case CDS_BrowseMetadata:
+        {
+            // --------------------------------------------------------------
+            // Return Container Object Only
+            // --------------------------------------------------------------
+
+            pResults->m_nTotalMatches   = 1;
+            pResults->m_nUpdateID       = 1;
+
+            CDSObject *pItem = CreateContainer( pRequest->m_sObjectId,  
+                                                QObject::tr( pInfo->title ), 
+                                                m_sExtensionId );
+
+            pItem->SetChildCount( GetDistinctCount( pInfo->column ));
+
+            pResults->Add( pItem ); 
+
+            break;
+        }
+
+        case CDS_BrowseDirectChildren:
+        {
+            pResults->m_nTotalMatches = GetDistinctCount( pInfo->column );
+            pResults->m_nUpdateID     = 1;
+
+            if (pRequest->m_nRequestedCount == 0) 
+                pRequest->m_nRequestedCount = SHRT_MAX;
+
+            MSqlQuery query(MSqlQuery::InitCon());
+
+            if (query.isConnected())
+            {
+                // Remove where clause placeholder.
+
+                QString sSQL = pInfo->sql;
+
+                sSQL.replace( "%1", "" );
+
+                sSQL += QString( " LIMIT %2, %3" )
+                           .arg( pRequest->m_nStartingIndex  )
+                           .arg( pRequest->m_nRequestedCount );
+
+                query.prepare( sSQL );
+                query.exec();
+
+                if (query.isActive() && query.size() > 0)
+                {
+
+                    while(query.next())
+                    {
+                        QString sKey   = query.value(0).toString();
+                        QString sTitle = query.value(1).toString();
+                        long    nCount = query.value(2).toInt();
+
+                        if (sTitle.length() == 0)
+                            sTitle = "(undefined)";
+
+                        QString sId = QString( "%1/key=%2" )
+                                         .arg( pRequest->m_sParentId )
+                                         .arg( sKey );
+
+                        CDSObject *pRoot = CreateContainer( sId, sTitle, pRequest->m_sParentId );
+
+                        pRoot->SetChildCount( nCount );
+
+                        pResults->Add( pRoot ); 
+                    }
+                }
+            }
+
+            break;
+        }
+
+        case CDS_BrowseUnknown:
+            break;
+
+    }
+
+    return pResults;
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
+int UPnpCDSExtension::GetDistinctCount( const QString &sColumn )
+{
+    int nCount = 0;
+
+    MSqlQuery query(MSqlQuery::InitCon());
+
+    if (query.isConnected())
+    {
+        // Note: Tried to use Bind, however it would not allow me to use it
+        //       for column & table names
+
+        QString sSQL;
+        
+        if (sColumn == "*")
+        {
+            sSQL = QString( "SELECT count( %1 ) FROM %2" )
+                      .arg( sColumn )
+                      .arg( GetTableName( sColumn ));
+        }
+        else
+        {
+            sSQL = QString( "SELECT count( DISTINCT %1 ) FROM %2" )
+                      .arg( sColumn )
+                      .arg( GetTableName( sColumn ) );
+        }
+
+        query.prepare( sSQL );
+        query.exec();
+
+        if (query.size() > 0)
+        {
+            query.next();
+
+            nCount = query.value(0).toInt();
+        }
+    }
+
+    return( nCount );
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
+int UPnpCDSExtension::GetCount( const QString &sColumn, const QString &sKey )
+{
+    int nCount = 0;
+
+    MSqlQuery query(MSqlQuery::InitCon());
+
+    if (query.isConnected())
+    {
+        // Note: Tried to use Bind, however it would not allow me to use it
+        //       for column & table names
+
+        QString sSQL;
+        
+        if (sColumn == "*")
+            sSQL = QString( "SELECT count( * ) FROM %1" ).arg( GetTableName( sColumn ) );
+        else
+            sSQL = QString( "SELECT count( %1 ) FROM %2 WHERE %3=:KEY" )
+                      .arg( sColumn )
+                      .arg( GetTableName( sColumn ) )
+                      .arg( sColumn );
+
+        query.prepare( sSQL );
+        query.bindValue( ":KEY", sKey );
+        query.exec();
+
+        if (query.size() > 0)
+        {
+            query.next();
+
+            nCount = query.value(0).toInt();
+        }
+
+    }
+
+    return( nCount );
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
+void UPnpCDSExtension::CreateItems( UPnpCDSRequest          *pRequest,
+                                    UPnpCDSExtensionResults *pResults,
+                                    int                      nNodeIdx,
+                                    const QString           &sKey, 
+                                    bool                     bAddRef )
+{
+    pResults->m_nTotalMatches = 0;
+    pResults->m_nUpdateID     = 1;
+
+    UPnpCDSRootInfo *pInfo = GetRootInfo( nNodeIdx );
+
+    if (pInfo == NULL)
+        return;
+
+    pResults->m_nTotalMatches = GetCount( pInfo->column, sKey );
+    pResults->m_nUpdateID     = 1;
+
+    if (pRequest->m_nRequestedCount == 0) 
+        pRequest->m_nRequestedCount = SHRT_MAX;
+
+    MSqlQuery query(MSqlQuery::InitCon());
+
+    if (query.isConnected())
+    {
+        QString sWhere( "" );
+
+        if ( sKey.length() > 0)
+        {
+           sWhere = QString( "WHERE %1=:KEY " )
+                       .arg( pInfo->column );
+        }
+
+        QString sSQL = QString( "%1 %2 LIMIT %3, %4" )
+                          .arg( GetItemListSQL( pInfo->column ) )
+                          .arg( sWhere )
+                          .arg( pRequest->m_nStartingIndex  )
+                          .arg( pRequest->m_nRequestedCount );
+
+        query.prepare  ( sSQL );
+        query.bindValue(":KEY", sKey );
+        query.exec();
+
+        if (query.isActive() && query.size() > 0)
+        {
+            while(query.next())
+                AddItem( pRequest->m_sObjectId, pResults, bAddRef, query );
+        }
+    }
+}
