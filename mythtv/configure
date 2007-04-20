@@ -155,7 +155,7 @@ show_help(){
   echo "  --disable-xv             disable XVideo   (X11 video output accel.)"
   echo "  --enable-xvmc            enable XvMC      (Linux/BSD MPEG accel.)"
   echo "  --enable-xvmc-pro        enable XvMC for the unichrome pro (NOT unichrome) chipset"
-  echo "  --disable-xvmc-opengl    disable nVidia XvMC OpenGL texture method"
+  echo "  --enable-xvmc-opengl     enable nVidia XvMC OpenGL texture method"
   echo "  --xvmc-lib=LIB           XvMC library override (for crosscompiling)"
   #echo "  --disable-xvmc-vld       disable XvMC-VLD (VIA Epia MPEG accel.)"
   echo "  --enable-mac-accel       enable Mac OS X MPEG acceleration"
@@ -2888,6 +2888,8 @@ fi
 
 if test x"$xvmc_opengl" = x"yes" ; then
     opengl="yes"
+    xvmc_vld="no"
+    xvmc_pro="no"
 fi
 
 if test x"$dvdv" = x"yes" ; then
