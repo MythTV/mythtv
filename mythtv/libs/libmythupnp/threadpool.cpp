@@ -9,6 +9,7 @@
 /////////////////////////////////////////////////////////////////////////////
 
 #include "threadpool.h"
+#include "util.h"
 #include "upnp.h"       // only needed for Config... remove once config is moved.
 
 /////////////////////////////////////////////////////////////////////////////
@@ -117,6 +118,9 @@ WorkerThread::WorkerThread( ThreadPool *pThreadPool, const QString &sName )
     m_bTermRequested = false;
     m_pThreadPool    = pThreadPool;
     m_sName          = sName;
+    m_nIdleTimeoutMS = 60000;
+    m_bAllowTimeout  = false;
+
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -186,6 +190,23 @@ void WorkerThread::SignalWork()
 //
 /////////////////////////////////////////////////////////////////////////////
 
+void WorkerThread::SetTimeout( long nIdleTimeout )
+{
+    // -=>NOTE: Not Thread safe... should only be called
+    //          before thread is started.
+
+    m_nIdleTimeoutMS = nIdleTimeout;
+
+    if (m_nIdleTimeoutMS == -1 )
+        m_bAllowTimeout = false;
+    else
+        m_bAllowTimeout = true;
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
 void WorkerThread::run( void )
 {
     m_mutex.lock();
@@ -194,8 +215,15 @@ void WorkerThread::run( void )
 
     m_Initialized.SetEvent();
 
+    MythTimer timer;
+
+    timer.start();
+
     while( !IsTermRequested() )
     {
+        if (m_bAllowTimeout && (timer.elapsed() > m_nIdleTimeoutMS) )
+            break;
+        
         if (m_WorkAvailable.WaitForEvent(500))
         {
             m_WorkAvailable.ResetEvent();
@@ -205,6 +233,8 @@ void WorkerThread::run( void )
                 try
                 {
                     ProcessWork();
+
+                    timer.restart();
                 }
                 catch(...)
                 {
@@ -222,6 +252,8 @@ void WorkerThread::run( void )
         m_pThreadPool->ThreadTerminating( this );
         m_pThreadPool = NULL;
     }
+
+    VERBOSE( VB_UPNP, QString( "WorkerThread:Run - Exiting: %1" ).arg( m_sName ));
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -245,6 +277,7 @@ ThreadPool::ThreadPool( const QString &sName )
 
     m_nInitialThreadCount = UPnp::g_pConfig->GetValue( "ThreadPool/" + m_sName + "/Initial", 1 );
     m_nMaxThreadCount     = UPnp::g_pConfig->GetValue( "ThreadPool/" + m_sName + "/Max"    , 5 );
+    m_nIdleTimeout        = UPnp::g_pConfig->GetValue( "ThreadPool/" + m_sName + "/Timeout", 60000 );
 
     m_nInitialThreadCount = min( m_nInitialThreadCount, m_nMaxThreadCount );
 
@@ -296,7 +329,7 @@ void ThreadPool::InitializeThreads()
     // --------------------------------------------------------------
 
     for (long nIdx = 0; nIdx < m_nInitialThreadCount; nIdx ++ )
-        AddWorkerThread( true );
+        AddWorkerThread( true, -1 );
 
 }
 
@@ -336,7 +369,7 @@ WorkerThread *ThreadPool::GetWorkerThread()
             // ----------------------------------------------------------
         
             if ( nThreadCount < m_nMaxThreadCount)
-                pThread = AddWorkerThread( false );
+                pThread = AddWorkerThread( false, m_nIdleTimeout );
             else
             {
                 if (m_threadAvail.wait( 5000 ) == false )
@@ -352,14 +385,17 @@ WorkerThread *ThreadPool::GetWorkerThread()
 //
 /////////////////////////////////////////////////////////////////////////////
 
-WorkerThread *ThreadPool::AddWorkerThread( bool bMakeAvailable )
+WorkerThread *ThreadPool::AddWorkerThread( bool bMakeAvailable, long nTimeout )
 {
     QString sName = m_sName + "_WorkerThread"; 
+
+    VERBOSE( VB_UPNP, QString( "ThreadPool:AddWorkerThread - %1" ).arg( sName ));
 
     WorkerThread *pThread = CreateWorkerThread( this, sName );
 
     if (pThread != NULL)
     {
+        pThread->SetTimeout( nTimeout );
         pThread->start();
 
         if (pThread->WaitForInitialized( 5000 ))

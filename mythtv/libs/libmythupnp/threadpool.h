@@ -69,6 +69,10 @@ class WorkerThread : public QThread
         bool                m_bTermRequested;
         QString             m_sName;
 
+        long                m_nIdleTimeoutMS;
+        bool                m_bAllowTimeout;
+
+
     protected:
 
         virtual void  run();
@@ -84,6 +88,7 @@ class WorkerThread : public QThread
         bool     WaitForInitialized( unsigned long msecs );
         void     RequestTerminate  ();
         void     SignalWork        ();
+        void     SetTimeout        ( long nIdleTimeout );
 
 };
 
@@ -114,12 +119,13 @@ class ThreadPool
 
         int                         m_nInitialThreadCount;
         int                         m_nMaxThreadCount;
+        long                        m_nIdleTimeout;
 
     protected:
 
         void            InitializeThreads();
 
-        WorkerThread   *AddWorkerThread  ( bool bMakeAvailable );
+        WorkerThread   *AddWorkerThread  ( bool bMakeAvailable, long nTimeout );
 
         void            ThreadAvailable  ( WorkerThread *pThread );
         void            ThreadTerminating( WorkerThread *pThread );
