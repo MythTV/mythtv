@@ -828,7 +828,7 @@ bool MPEG2fixup::ProcessVideo(MPEG2frame *vf, mpeg2dec_t *dec)
             {
 
                 case STATE_SEQUENCE:
-
+                case STATE_SEQUENCE_MODIFIED:
                 case STATE_SEQUENCE_REPEATED:
                     memcpy(&vf->mpeg2_seq, info->sequence,
                            sizeof(mpeg2_sequence_t));
