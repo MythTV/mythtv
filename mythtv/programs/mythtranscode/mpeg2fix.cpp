@@ -2196,6 +2196,11 @@ int MPEG2fixup::Start()
 
             while (af->count())
             {
+                // What to do if the CC is corrupt?
+                // Just wait and hope it repairs itself
+                if (CC->sample_rate == 0 || CC->frame_size == 0)
+                    break;
+
                 // The order of processing frames is critical to making
                 // everything work.  Backwards PTS discrepencies complicate
                 // the processing significantly
