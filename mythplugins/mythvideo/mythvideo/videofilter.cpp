@@ -205,6 +205,8 @@ bool VideoFilterSettings::matches_filter(const Metadata &mdata) const
 
     if (genre != kGenreFilterAll)
     {
+        matches = false;
+
         const Metadata::genre_list &gl = mdata.Genres();
         for (Metadata::genre_list::const_iterator p = gl.begin();
              p != gl.end(); ++p)
@@ -218,6 +220,8 @@ bool VideoFilterSettings::matches_filter(const Metadata &mdata) const
 
     if (matches && country != kCountryFilterAll)
     {
+        matches = false;
+
         const Metadata::country_list &cl = mdata.Countries();
         for (Metadata::country_list::const_iterator p = cl.begin();
              p != cl.end(); ++p)
