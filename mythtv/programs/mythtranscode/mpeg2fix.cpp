@@ -882,27 +882,41 @@ bool MPEG2fixup::ProcessVideo(MPEG2frame *vf, mpeg2dec_t *dec)
 
     if (SHOW_MSG(MPF_DECODE))
     {
-        QString msg = QString("unused:%1")
-                              .arg(vf->pkt.size - mpeg2_getpos(dec));
+        QString msg = QString("");
+        //msg += QString("unused:%1 ")
+        //               .arg(vf->pkt.size - mpeg2_getpos(dec));
 
-        if (info->sequence)
-            msg += QString(" %1x%2 P:%3").arg(info->sequence->width)
+        if (vf->isSequence)
+            msg += QString("%1x%2 P:%3 ").arg(info->sequence->width)
                 .arg(info->sequence->height).arg(info->sequence->frame_period);
 
         if (info->gop)
         {
             QString gop;
-            gop.sprintf(" %02d:%02d:%02d:%03d",
+            gop.sprintf("%02d:%02d:%02d:%03d ",
                         info->gop->hours, info->gop->minutes,
                         info->gop->seconds, info->gop->pictures);
             msg += gop;
         }
-        if (info->current_picture)
-            msg += QString(" #:%1 F:%2 fl:%3")
+        if (info->current_picture) {
+            int ct = info->current_picture->flags & PIC_MASK_CODING_TYPE;
+            char coding_type = (ct == PIC_FLAG_CODING_TYPE_I) ? 'I' :
+                               ((ct == PIC_FLAG_CODING_TYPE_P) ? 'P' :
+                                ((ct == PIC_FLAG_CODING_TYPE_B) ? 'B' :
+                                 ((ct == PIC_FLAG_CODING_TYPE_D) ?'D' : 'X')));
+             char top_bottom = (info->current_picture->flags & 
+                                PIC_FLAG_TOP_FIELD_FIRST) ? 'T' : 'B';
+             char progressive = (info->current_picture->flags &
+                                 PIC_FLAG_PROGRESSIVE_FRAME) ? 'P' : '_';
+            msg += QString("#%1 fl:%2%3%4%5%6 ")
                            .arg(info->current_picture->temporal_reference)
                            .arg(info->current_picture->nb_fields)
-                           .arg(info->current_picture->flags);
-        msg += QString(" pos: %1").arg(vf->pkt.pos);
+                           .arg(coding_type)
+                           .arg(top_bottom)
+                           .arg(progressive)
+                           .arg(info->current_picture->flags >> 4, 0, 16);
+        }
+        msg += QString("pos: %1").arg(vf->pkt.pos);
         VERBOSE(MPF_DECODE, msg);
     }
 
