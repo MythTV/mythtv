@@ -361,7 +361,7 @@ namespace
 #ifdef Q_OS_MAC
             gDVDdevice.prepend("/dev/r");
 #endif
-            VERBOSE(VB_UPNP, QString("Storing DVD device ") + gDVDdevice);
+            VERBOSE(VB_MEDIA, "MythVideo: Storing DVD device " + gDVDdevice);
         }
 
         switch (gContext->GetNumSetting("DVDOnInsertDVD", 1))
