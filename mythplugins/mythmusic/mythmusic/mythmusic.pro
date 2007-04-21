@@ -20,8 +20,10 @@ uifiles.files = music-ui.xml images/*.png
 
 INSTALLS += installfiles uifiles
 
-LIBS += -lmad -ltag -logg -lvorbisfile -lvorbis -lvorbisenc -lcdaudio -lFLAC
-LIBS += -lmp3lame -lcdda_paranoia -lcdda_interface
+LIBS += -lmad -ltag -logg -lvorbisfile -lvorbis -lvorbisenc -lFLAC -lmp3lame
+
+cdaudio: LIBS += -lcdaudio
+paranoia:LIBS += -lcdda_paranoia -lcdda_interface
 
 # Input
 HEADERS += cddecoder.h cdrip.h constants.h databasebox.h
@@ -54,3 +56,14 @@ SOURCES += goom/zoom_filter_mmx.c goom/zoom_filter_xmmx.c goom/mythgoom.cpp
 SOURCES += avfdecoder.cpp editmetadata.cpp smartplaylist.cpp search.cpp
 SOURCES += treebuilders.cpp importmusic.cpp directoryfinder.cpp
 SOURCES += filescanner.cpp libvisualplugin.cpp
+
+macx {
+    SOURCES -= cddecoder.cpp
+    SOURCES += cddecoder-darwin.cpp
+
+    LIBS += -lmyth-$$LIBVERSION -lmythui-$$LIBVERSION -lmythavutil-$$LIBVERSION
+    LIBS += -lmythavcodec-$$LIBVERSION -lmythavformat-$$LIBVERSION
+
+    #QMAKE_LFLAGS += -flat_namespace -undefined suppress
+    QMAKE_LFLAGS += -flat_namespace -undefined error
+}

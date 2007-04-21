@@ -445,7 +445,9 @@ if test "$music" != "no" ; then
     cdaudio="no"
     if has_header cdaudio.h && has_library libcdaudio ; then
         cdaudio="yes"
-    else
+    fi
+
+    if test "$cdaudio" = "no" -a "$targetos" != "Darwin"; then
         echo "MythMusic requires libcdaudio."
     fi
 
@@ -459,7 +461,7 @@ if test "$music" != "no" ; then
         fi
     fi
 
-    if test "$paranoia" = "no" ; then
+    if test "$paranoia" = "no" -a "$targetos" != "Darwin"; then
         echo "MythMusic requires CDDA Paranoia."
     fi
 
@@ -477,7 +479,13 @@ if test "$music" != "no" ; then
         echo "MythMusic requires taglib."
     fi 
 
-    if test "$mad" = "no" -o "$vorbis" = "no" -o "$flac" = "no" -o "$cdaudio" = "no" -o "$paranoia" = "no" -o "$mp3lame" = "no" -o "$taglib" = "no" ; then
+    if test "$targetos" != "Darwin" ; then
+        if test "$cdaudio" = "no" -o "$paranoia" = "no" ; then
+            cdlibs="no"
+        fi
+    fi
+
+    if test "$mad" = "no" -o "$vorbis" = "no" -o "$flac" = "no" -o "$mp3lame" = "no" -o "$taglib" = "no" -o "$cdlibs" = "no" ; then
         echo "Disabling MythMusic due to missing dependencies."
         music="no"
     fi 
@@ -783,6 +791,20 @@ if test "$music" = "yes" ; then
       echo "#define HAVE_STDINT_H 1" >> ./mythmusic/mythmusic/config.h
     else
       echo "#undef  HAVE_STDINT_H" >> ./mythmusic/mythmusic/config.h
+    fi
+
+    if test "$cdaudio" = "yes" ; then
+      echo "#define HAVE_CDAUDIO 1" >> ./mythmusic/mythmusic/config.h
+      echo "CONFIG += cdaudio" >> ./mythmusic/mythmusic/config.pro
+    else
+      echo "#undef  HAVE_CDAUDIO" >> ./mythmusic/mythmusic/config.h
+    fi
+
+    if test "$paranoia" = "yes" ; then
+      echo "#define HAVE_PARANOIA 1" >> ./mythmusic/mythmusic/config.h
+      echo "CONFIG += paranoia" >> ./mythmusic/mythmusic/config.pro
+    else
+      echo "#undef  HAVE_PARANOIA" >> ./mythmusic/mythmusic/config.h
     fi
 
     if test "$opengl" = "yes" ; then
