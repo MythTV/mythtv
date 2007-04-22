@@ -12,7 +12,7 @@
         <parameter name="-b"           value="9000k"/>
         <parameter name="-s"           value="720x480"/>
         <parameter name="-acodec"      value="ac3"/>
-        <parameter name="-ab"          value="192"/>
+        <parameter name="-ab"          value="192k"/>
         <parameter name="-ac"          value="2"/>
         <parameter name="-copyts"      value=""/>
         <parameter name="-aspect"      value="%aspect"/>
@@ -33,7 +33,7 @@
         <parameter name="-b"      value="4771k"/>
         <parameter name="-s"      value="720x480"/>
         <parameter name="-acodec" value="ac3"/>
-        <parameter name="-ab"     value="192"/>
+        <parameter name="-ab"     value="192k"/>
         <parameter name="-ac"     value="2"/>
         <parameter name="-copyts" value=""/>
         <parameter name="-aspect" value="%aspect"/>
@@ -52,7 +52,7 @@
         <parameter name="-b"      value="2344k"/>
         <parameter name="-s"      value="352x480"/>
         <parameter name="-acodec" value="ac3"/>
-        <parameter name="-ab"     value="192"/>
+        <parameter name="-ab"     value="192k"/>
         <parameter name="-ac"     value="2"/>
         <parameter name="-copyts" value=""/>
         <parameter name="-aspect" value="%aspect"/>
@@ -71,7 +71,7 @@
         <parameter name="-b"      value="1526k"/>
         <parameter name="-s"      value="352x240"/>
         <parameter name="-acodec" value="ac3"/>
-        <parameter name="-ab"     value="128"/>
+        <parameter name="-ab"     value="128k"/>
         <parameter name="-ac"     value="2"/>
         <parameter name="-copyts" value=""/>
         <parameter name="-aspect" value="%aspect"/>
