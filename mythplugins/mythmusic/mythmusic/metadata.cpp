@@ -1375,8 +1375,8 @@ int MusicNodePtrList::compareItems (QPtrCollection::Item item1,
 /**************************************************************************/
 
 AlbumArtImages::AlbumArtImages(Metadata *metadata)
+    : m_parent(metadata)
 {
-    m_parent = metadata;
     m_imageList.setAutoDelete(true);
 
     findImages();
@@ -1385,6 +1385,9 @@ AlbumArtImages::AlbumArtImages(Metadata *metadata)
 void AlbumArtImages::findImages(void)
 {
     m_imageList.clear();
+
+    if (m_parent == NULL)
+        return;
 
     QFileInfo fi(m_parent->Filename());
     QString dir = fi.dirPath(true);

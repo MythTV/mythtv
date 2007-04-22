@@ -77,7 +77,8 @@ void VisualBase::drawWarning(QPainter *p, const QColor &back, const QSize &size,
 }
 
 MainVisual::MainVisual(QWidget *parent, const char *name)
-    : QWidget( parent, name ), vis( 0 ), playing( FALSE ), fps( 20 )
+    : QWidget(parent, name), vis(0), meta(0), playing(FALSE), fps(20),
+      timer (0), bannerTimer(0), info_widget(0)
 {
     int screenwidth = 0, screenheight = 0;
     float wmult = 0, hmult = 0;

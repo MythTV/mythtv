@@ -130,14 +130,14 @@ signals:
 
 private:
     VisualBase *vis;
-    InfoWidget* info_widget;
     Metadata *meta;
     QPixmap pixmap;
     QPtrList<VisualNode> nodes;
-    QTimer *timer;
-    QTimer *bannerTimer;
     bool playing;
     int fps;
+    QTimer *timer;
+    QTimer *bannerTimer;
+    InfoWidget* info_widget;
 
     QString current_visual_name;
 };
