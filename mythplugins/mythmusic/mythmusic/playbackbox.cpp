@@ -1170,9 +1170,12 @@ void PlaybackBoxMusic::play()
         input = new QFile(playfile);
     
     if (decoder && !decoder->factory()->supports(sourcename))
+    {
+        decoder->removeListener(this);
         decoder = 0;
+    }
 
-    if (!decoder) 
+    if (!decoder)
     {
         decoder = Decoder::create(sourcename, input, output);
 
