@@ -123,6 +123,8 @@ MainVisual::~MainVisual()
 
 void MainVisual::setVisual(const QString &name)
 {
+    pixmap.fill(Qt::black);
+
     QString visName, pluginName;
 
     if (name.contains("-"))
