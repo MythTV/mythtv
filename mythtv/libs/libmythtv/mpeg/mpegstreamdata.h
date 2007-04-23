@@ -74,6 +74,7 @@ class MPEGStreamData : public EITSource
     virtual ~MPEGStreamData();
 
     void SetCaching(bool cacheTables) { _cache_tables = cacheTables; }
+    virtual void Reset(void) { Reset(-1); }
     virtual void Reset(int desiredProgram);
 
     /// \brief Current Offset from computer time to DVB time in seconds

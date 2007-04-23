@@ -1688,7 +1688,7 @@ bool TVRec::SetupDTVSignalMonitor(void)
                 GetDTVRecorder()->SetStreamData(asd);
         }
 
-        asd->Reset(major, minor);
+        asd->Reset();
         sm->SetStreamData(sd);
         sm->SetChannel(major, minor);
         sd->SetVideoStreamsRequired(neededVideo);
@@ -1730,7 +1730,7 @@ bool TVRec::SetupDTVSignalMonitor(void)
         if (GetDVBChannel())
             sd->SetIgnoreCRC(GetDVBChannel()->HasCRCBug());
 
-        dsd->Reset(netid, tsid, progNum);
+        dsd->Reset();
         sm->SetStreamData(sd);
         sm->SetDVBService(netid, tsid, progNum);
         sd->SetVideoStreamsRequired(neededVideo);
@@ -1768,7 +1768,7 @@ bool TVRec::SetupDTVSignalMonitor(void)
             sd->SetIgnoreCRC(GetDVBChannel()->HasCRCBug());
 #endif // USING_DVB
 
-        sd->Reset(progNum);
+        sd->Reset();
         sm->SetStreamData(sd);
         sm->SetProgramNumber(progNum);
         sd->SetVideoStreamsRequired(neededVideo);
