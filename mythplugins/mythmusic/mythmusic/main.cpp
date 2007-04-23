@@ -318,6 +318,7 @@ void setupKeys(void)
     REG_KEY("Music", "FFWD",       "Fast forward",               "PgDown");
     REG_KEY("Music", "RWND",       "Rewind",                     "PgUp");
     REG_KEY("Music", "PAUSE",      "Pause/Start playback",       "P");
+    REG_KEY("Music", "PLAY",       "Re/Start playback",          "");
     REG_KEY("Music", "STOP",       "Stop playback",              "O");
     REG_KEY("Music", "VOLUMEDOWN", "Volume down",                "[,{,F10");
     REG_KEY("Music", "VOLUMEUP",   "Volume up",                  "],},F11");

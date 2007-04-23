@@ -349,6 +349,13 @@ void PlaybackBoxMusic::keyPressEvent(QKeyEvent *e)
                     play();
             }
         }
+        else if (action == "PLAY")
+        { 
+            if (play_button)
+                play_button->push();
+            else
+                play();
+        }
         else if (action == "STOP")
         {
             if (stop_button)
