@@ -797,7 +797,7 @@ bool HTTPRequest::ParseRequest()
                 bSuccess = false;
             }
 
-            delete pszPayload;
+            delete [] pszPayload;
         }
 
         // Check to see if this is a SOAP encoded message
