@@ -53,7 +53,9 @@ StatusBox::StatusBox(MythMainWindow *parent, const char *name)
     LoadTheme();
     if (IsErrored())
         return;
-  
+
+    updateBackground();
+
     icon_list->SetItemText(item_count++, QObject::tr("Listings Status"));
     icon_list->SetItemText(item_count++, QObject::tr("Schedule Status"));
     icon_list->SetItemText(item_count++, QObject::tr("Tuner Status"));
@@ -110,6 +112,25 @@ void StatusBox::paintEvent(QPaintEvent *e)
         updateSelector();
     if (r.intersects(ContentRect))
         updateContent();
+}
+
+void StatusBox::updateBackground(void)
+{
+    QPixmap bground(size());
+    bground.fill(this, 0, 0);
+
+    QPainter tmp(&bground);
+
+    LayerSet *container = theme->GetSet("background");
+    if (container)
+    {
+        container->Draw(&tmp, 0, 0);
+    }
+
+    tmp.end();
+    m_background = bground;
+
+    setPaletteBackgroundPixmap(m_background);
 }
 
 void StatusBox::updateContent()

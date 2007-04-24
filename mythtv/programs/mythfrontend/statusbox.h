@@ -28,6 +28,7 @@ class StatusBox : public MythDialog
     void paintEvent(QPaintEvent *e);
 
   private:
+    void updateBackground();
     void updateTopBar();
     void updateSelector();
     void updateContent();
@@ -70,6 +71,8 @@ class StatusBox : public MythDialog
     vector<ProgramInfo *> expList;
 
     MythMainWindow *my_parent;
+
+    QPixmap m_background;
 
     bool isBackend;
     bool errored;
