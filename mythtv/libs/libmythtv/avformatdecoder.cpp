@@ -1577,6 +1577,11 @@ int AvFormatDecoder::ScanStreams(bool novideo)
             }
         }
     }
+    else if (m_playbackinfo && m_playbackinfo->isVideo && 
+                tracks[kTrackTypeAudio].size() > 1)
+    {
+        SetTrack(kTrackTypeAudio, 0);
+    }
 
     // Select a new track at the next opportunity.
     ResetTracks();
@@ -2453,6 +2458,8 @@ static int filter_max_ch(const AVFormatContext *ic,
 
 /** \fn AvFormatDecoder::AutoSelectAudioTrack(void)
  *  \brief Selects the best audio track.
+ *
+ *   It is primarily needed for DVB recordings
  *
  *   This function will select the best audio track available
  *   using the following criteria, in order of decreasing
