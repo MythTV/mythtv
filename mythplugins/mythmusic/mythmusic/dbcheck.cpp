@@ -609,7 +609,7 @@ bool UpgradeMusicDatabaseSchema(void)
         ""
 };
 
-        if (!performActualUpdate(updates, "1012", dbver))
+        if (!performActualUpdate(updates, "1013", dbver))
             return false;
 
     }
