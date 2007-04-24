@@ -91,7 +91,6 @@ class AlbumArt : public VisualBase
 
   private:
     bool needsUpdate(void);
-    QString getImageFilename(void);
     void findFrontCover(void);
 
     QSize m_size, m_cursize;

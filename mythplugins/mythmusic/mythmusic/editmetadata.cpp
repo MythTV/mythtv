@@ -148,6 +148,9 @@ void EditMetadataDialog::updateImageGrid()
 
     for (uint x = 0; x < albumArtList->count(); x++)
     {
+        if (albumArtList->at(x)->embedded)
+            continue;
+
         QPixmap *pixmap = createScaledPixmap(albumArtList->at(x)->filename,
                                              size.width(), size.height(),
                                              QImage::ScaleMin);
@@ -738,7 +741,7 @@ void EditMetadataDialog::showMenu()
                 image->typeName = item->text;
 
                 // save the image type to the DB
-                albumArt->saveImageType(image->filename, image->imageType);
+                albumArt->saveImageType(image->id, image->imageType);
 
                 gridItemChanged(item);
             }

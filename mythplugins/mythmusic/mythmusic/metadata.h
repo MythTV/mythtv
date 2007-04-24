@@ -4,11 +4,13 @@
 #include <qstring.h>
 #include <qstringlist.h>
 #include <qptrlist.h>
+#include <qvaluelist.h>
 #include <qmap.h>
 #include <qthread.h>
 
 #include "treecheckitem.h"
 #include <mythtv/uitypes.h>
+
 
 class AllMusic;
 class CoverArt;
@@ -23,13 +25,19 @@ enum ImageType
     IT_LAST
 };
 
+#include "metaiotaglib.h"
+
 typedef struct AlbumArtImage
 {
     int       id;
     QString   filename;
     ImageType imageType;
     QString   typeName;
+    QString   description;
+    bool      embedded;
 } AlbumArtImage;
+
+//typedef QValueList<struct AlbumArtImage> AlbumArtList;
 
 class Metadata
 {
@@ -59,6 +67,7 @@ class Metadata
                    m_lastplay(llastplay),
                    m_playcount(lplaycount),
                    m_compilation(lcompilation),
+                   m_albumart(),
                    m_id(lid),
                    m_filename(lfilename),
                    m_changed(false),
@@ -159,6 +168,8 @@ class Metadata
     }
     bool determineIfCompilation(bool cd = false);
 
+    void setEmbeddedAlbumArt(QValueList<struct AlbumArtImage> art);
+
     bool isInDatabase(void);
     void dumpToDatabase(void);
     void setField(const QString &field, const QString &data);
@@ -173,8 +184,7 @@ class Metadata
 
     static QStringList fillFieldList(QString field);
 
-    QStringList AlbumArtInDir(QString directory);
-    QString getAlbumArt(ImageType type);
+    QImage getAlbumArt(ImageType type);
 
   private:
     void setCompilationFormatting(bool cd = false);
@@ -201,6 +211,7 @@ class Metadata
     QString m_lastplay;
     int m_playcount;
     bool m_compilation;
+    QValueList<struct AlbumArtImage> m_albumart;
 
     unsigned int m_id;
     QString m_filename;
@@ -389,7 +400,7 @@ class AlbumArtImages: public QObject
     AlbumArtImages(Metadata *metadata);
 
     uint                     getImageCount() { return m_imageList.count(); }
-    QString                  getImageFilename(ImageType type);
+    AlbumArtImage            getImage(ImageType type);
     QString                  getTypeName(ImageType type);
     QStringList              getImageFilenames();
     QPtrList<AlbumArtImage> *getImageList() { return &m_imageList; }
@@ -397,7 +408,7 @@ class AlbumArtImages: public QObject
 
     bool isImageAvailable(ImageType type);
 
-    bool saveImageType(const QString &filename, ImageType type);
+    bool saveImageType(const int id, ImageType type);
 
     static ImageType guessImageType(const QString &filename);
 

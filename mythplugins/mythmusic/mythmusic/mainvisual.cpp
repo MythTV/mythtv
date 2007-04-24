@@ -353,7 +353,7 @@ void InfoWidget::showMetadata(Metadata *mdata, bool fullScreen, int visMode)
         return;
 
     QString  text = "\"" + mdata->Title() + "\"\n" +  mdata->Artist() + "\n" + mdata->Album();
-    QString albumArt = mdata->getAlbumArt(IT_FRONTCOVER);
+    QImage albumArt = mdata->getAlbumArt(IT_FRONTCOVER);
 
     if (text == info)
         return;
@@ -373,13 +373,13 @@ void InfoWidget::showMetadata(Metadata *mdata, bool fullScreen, int visMode)
     }
 
     // ...and only then when we have an album art image to show
-    if (visMode != 2 && fullScreen && albumArt == "")
+    if (visMode != 2 && fullScreen && albumArt.isNull())
     {
         hide();
         return;
     }
 
-    if (fullScreen && albumArt != "")
+    if (fullScreen && ! albumArt.isNull())
     {
         resize(parentWidget()->width(), parentWidget()->height());
         move(0, 0);
@@ -403,7 +403,7 @@ void InfoWidget::showMetadata(Metadata *mdata, bool fullScreen, int visMode)
     int x = indent;
     int y = indent;
 
-    if (fullScreen && albumArt != "")
+    if (fullScreen && ! albumArt.isNull())
     {
         p.fillRect(0, 0, info_pixmap.width(), info_pixmap.height(), QColor ("black"));
 
@@ -422,7 +422,7 @@ void InfoWidget::showMetadata(Metadata *mdata, bool fullScreen, int visMode)
     {
         p.fillRect(0, 0, info_pixmap.width(), info_pixmap.height(), QColor ("darkblue"));
 
-        if (albumArt != "")
+        if (! albumArt.isNull())
         {
             // draw the albumArt image
 

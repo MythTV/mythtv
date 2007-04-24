@@ -9,7 +9,7 @@ using namespace std;
 #include "mythtv/mythcontext.h"
 #include "mythtv/mythdbcon.h"
 
-const QString currentDatabaseVersion = "1011";
+const QString currentDatabaseVersion = "1012";
 
 static bool UpdateDBVersionNumber(const QString &newnumber)
 {   
@@ -584,6 +584,18 @@ bool UpgradeMusicDatabaseSchema(void)
         gContext->SaveSetting("VisualMode", setting);
 
         if (!performActualUpdate(updates, "1011", dbver))
+            return false;
+
+    }
+
+    if (dbver == "1011")
+    {
+        const QString updates[] = {
+"ALTER TABLE music_albumart ADD COLUMN song_id int(11) NOT NULL DEFAULT '0', ADD COLUMN embedded TINYINT(1) NOT NULL DEFAULT '0';",
+        ""
+};
+
+        if (!performActualUpdate(updates, "1012", dbver))
             return false;
 
     }

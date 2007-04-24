@@ -469,7 +469,8 @@ void FileScanner::ScanArtwork(MusicLoadedMap &music_files)
     MSqlQuery query(MSqlQuery::InitCon());
     query.exec("SELECT CONCAT_WS('/', path, filename) "
                "FROM music_albumart LEFT JOIN music_directories "
-               "ON music_albumart.directory_id=music_directories.directory_id ");
+               "ON music_albumart.directory_id=music_directories.directory_id "
+               "WHERE music_albumart.embedded=0");
 
     int counter = 0;
 

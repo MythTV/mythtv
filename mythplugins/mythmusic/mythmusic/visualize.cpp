@@ -389,11 +389,6 @@ bool AlbumArt::needsUpdate()
     return false;
 }
 
-QString AlbumArt::getImageFilename() 
-{
-    return m_pParent->metadata()->getAlbumArt(m_currImageType);
-}
-
 bool AlbumArt::draw(QPainter *p, const QColor &back)
 {
     if (!m_pParent->decoder())
@@ -402,7 +397,7 @@ bool AlbumArt::draw(QPainter *p, const QColor &back)
     // If the directory has changed (new album) or the size, reload
     if (needsUpdate())
     {
-        QImage art(getImageFilename());
+        QImage art(m_pParent->metadata()->getAlbumArt(m_currImageType));
         if (art.isNull())
         {
             m_cursize = m_size;

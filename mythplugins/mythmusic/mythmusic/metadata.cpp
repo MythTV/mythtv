@@ -381,6 +381,44 @@ void Metadata::dumpToDatabase()
 
     if (m_id < 1 && query.isActive() && 1 == query.numRowsAffected())
         m_id = query.lastInsertId().toInt();
+
+    if (! m_albumart.empty())
+    {
+        QValueList<struct AlbumArtImage>::iterator it;
+        for ( it = m_albumart.begin(); it != m_albumart.end(); ++it )
+        {
+            query.prepare("SELECT albumart_id FROM music_albumart WHERE "
+                          "song_id=:SONGID AND imagetype=:TYPE;");
+            query.bindValue(":TYPE", (*it).imageType);
+            query.bindValue(":SONGID", m_id);
+            query.exec();
+
+            if (query.next())
+            {
+                int artid = query.value(0).toInt();
+
+                query.prepare("UPDATE music_albumart SET "
+                            "filename=:FILENAME, imagetype=:TYPE, "
+                            "song_id=:SONGID, embedded=:EMBED "
+                            "WHERE albumart_id=:ARTID");
+
+                query.bindValue(":ARTID", artid);
+            }
+            else
+            {
+                query.prepare("INSERT INTO music_albumart ( filename, "
+                            "imagetype, song_id, embedded ) VALUES ( "
+                            ":FILENAME, :TYPE, :SONGID, :EMBED );");
+            }
+
+            query.bindValue(":FILENAME", (*it).description);
+            query.bindValue(":TYPE", (*it).imageType);
+            query.bindValue(":SONGID", m_id);
+            query.bindValue(":EMBED", 1);
+
+            query.exec();
+        }
+    }
 }
 
 // Default values for formats
@@ -616,6 +654,11 @@ void Metadata::incPlayCount()
     m_changed = true;
 }
 
+void Metadata::setEmbeddedAlbumArt(QValueList<struct AlbumArtImage> albumart)
+{
+    m_albumart = albumart;
+}
+
 QStringList Metadata::fillFieldList(QString field)
 {
     QStringList searchList;
@@ -658,38 +701,23 @@ QStringList Metadata::fillFieldList(QString field)
     return searchList;
 }
 
-QStringList Metadata::AlbumArtInDir(QString directory)
+QImage Metadata::getAlbumArt(ImageType type)
 {
-    QStringList paths;
-
-    directory.remove(0, m_startdir.length());
-
-    MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare("SELECT CONCAT_WS('/', music_directories.path, "
-                  "music_albumart.filename) FROM music_albumart "
-                  "LEFT JOIN music_directories ON "
-                  "music_directories.directory_id=music_albumart.directory_id "
-                  "WHERE music_directories.path = :DIR;");
-    query.bindValue(":DIR", directory.utf8());
-    if (query.exec())
-    {
-        while (query.next())
-        {
-            paths += m_startdir + "/" +
-                QString::fromUtf8(query.value(0).toString());
-        }
-    }
-    return paths;
-}
-
-QString Metadata::getAlbumArt(ImageType type)
-{
-    QString res = "";
     AlbumArtImages albumArt(this);
 
-    res = albumArt.getImageFilename(type);
+    QImage image;
 
-    return res;
+    if (albumArt.isImageAvailable(type))
+    {
+        AlbumArtImage albumart_image = albumArt.getImage(type);
+
+        if (albumart_image.embedded)
+            image = QImage(MetaIOTagLib::getAlbumArt(m_filename, type));
+        else
+            image = QImage(albumart_image.filename);
+    }
+
+    return image;
 }
 
 MetadataLoadingThread::MetadataLoadingThread(AllMusic *parent_ptr)
@@ -1389,19 +1417,24 @@ void AlbumArtImages::findImages(void)
     if (m_parent == NULL)
         return;
 
+    int trackid = m_parent->ID();
+
     QFileInfo fi(m_parent->Filename());
     QString dir = fi.dirPath(true);
     dir.remove(0, Metadata::GetStartdir().length());
 
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("SELECT albumart_id, CONCAT_WS('/', music_directories.path, "
-            "music_albumart.filename), music_albumart.imagetype "
+            "music_albumart.filename), music_albumart.imagetype, "
+            "music_albumart.embedded "
             "FROM music_albumart "
             "LEFT JOIN music_directories ON "
             "music_directories.directory_id=music_albumart.directory_id "
             "WHERE music_directories.path = :DIR "
+            "OR song_id = :SONGID "
             "ORDER BY music_albumart.imagetype;");
     query.bindValue(":DIR", dir.utf8());
+    query.bindValue(":SONGID", trackid);
     if (query.exec())
     {
         while (query.next())
@@ -1412,12 +1445,20 @@ void AlbumArtImages::findImages(void)
                     QString::fromUtf8(query.value(1).toString());
             image->imageType = (ImageType) query.value(2).toInt();
             image->typeName = getTypeName(image->imageType);
+            if (query.value(3).toInt() == 1)
+            {
+                image->description = query.value(1).toString();
+                image->embedded = true;
+            }
+            else {
+                image->embedded = false;
+            }
             m_imageList.append(image);
         }
     }
 }
 
-QString AlbumArtImages::getImageFilename(ImageType type)
+AlbumArtImage AlbumArtImages::getImage(ImageType type)
 {
     // try to find a matching image
     AlbumArtImage *image;
@@ -1425,10 +1466,10 @@ QString AlbumArtImages::getImageFilename(ImageType type)
     for (image = m_imageList.first(); image; image = m_imageList.next())
     {
         if (image->imageType == type)
-            return image->filename;
+            return *image;
     }
 
-    return "";
+    return *image;
 }
 
 QStringList AlbumArtImages::getImageFilenames()
@@ -1445,6 +1486,11 @@ QStringList AlbumArtImages::getImageFilenames()
     return paths;
 }
 
+AlbumArtImage AlbumArtImages::getImageAt(uint index)
+{
+    return *(m_imageList.at(index));
+}
+
 bool AlbumArtImages::isImageAvailable(ImageType type)
 {
     // try to find a matching image
@@ -1459,27 +1505,14 @@ bool AlbumArtImages::isImageAvailable(ImageType type)
     return false;
 }
 
-bool AlbumArtImages::saveImageType(const QString &filename, ImageType type)
+bool AlbumArtImages::saveImageType(const int id, ImageType type)
 {
-    // try to find a matching filename
-    AlbumArtImage *image;
-
-    for (image = m_imageList.first(); image; image = m_imageList.next())
-    {
-        if (image->filename == filename)
-        {
-            image->imageType = type;
-
-            MSqlQuery query(MSqlQuery::InitCon());
-            query.prepare("UPDATE music_albumart SET imagetype = :TYPE "
-                          "WHERE albumart_id = :ID");
-            query.bindValue(":TYPE", type);
-            query.bindValue(":ID", image->id);
-            return (query.exec());
-        }
-    }
-
-    return false;
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare("UPDATE music_albumart SET imagetype = :TYPE "
+                    "WHERE albumart_id = :ID");
+    query.bindValue(":TYPE", type);
+    query.bindValue(":ID", id);
+    return (query.exec());
 }
 
 QString AlbumArtImages::getTypeName(ImageType type)
