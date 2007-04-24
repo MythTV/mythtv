@@ -66,6 +66,17 @@ FileScanner::~FileScanner ()
 
 }
 
+/*!
+ * \brief Builds a list of all the files found descending recursively 
+ *        into the given directory
+ *
+ * \param directory Directory to begin search
+ * \param music_files A pointer to the MusicLoadedMap to store the results
+ * \param parentid The id of the parent directory in the music_directories
+ *                 table. The root directory should have an id of 0
+ *
+ * \returns Nothing.
+ */
 void FileScanner::BuildFileList(QString &directory, MusicLoadedMap &music_files, int parentid)
 {
     QDir d(directory);
@@ -126,6 +137,16 @@ void FileScanner::BuildFileList(QString &directory, MusicLoadedMap &music_files,
     }
 }
 
+/*!
+ * \brief Get an ID for the given directory from the database.
+ *        If it doesn't already exist in the database, insert it.
+ *
+ * \param directory Relative path to directory, from base dir
+ * \param parentid The id of the parent directory in the music_directories
+ *                 table. The root directory should have an id of 0
+ *
+ * \returns Directory id
+ */
 int FileScanner::GetDirectoryId(const QString &directory, const int &parentid)
 {
     if (directory.isEmpty())
@@ -169,6 +190,14 @@ int FileScanner::GetDirectoryId(const QString &directory, const int &parentid)
     return -1;
 }
 
+/*!
+ * \brief Check if file has been modified since given date/time
+ *
+ * \param filename File to examine
+ * \param parentid Date to use in comparison
+ *
+ * \returns True if file has been modified, otherwise false
+ */
 bool FileScanner::HasFileChanged(const QString &filename, const QString &date_modified)
 {
     struct stat stbuf;
@@ -190,6 +219,18 @@ bool FileScanner::HasFileChanged(const QString &filename, const QString &date_mo
     return false;
 }
 
+/*!
+ * \brief Insert file details into database.
+ *        If it is an audio file, read the metadata and insert
+ *        that information at the same time.
+ *
+ *        If it is an image file, just insert the filename and
+ *        type.
+ *
+ * \param filename Full path to file.
+ *
+ * \returns Nothing.
+ */
 void FileScanner::AddFileToDB(const QString &filename)
 {
     QString extension = filename.section( '.', -1 ) ;
@@ -261,6 +302,12 @@ void FileScanner::AddFileToDB(const QString &filename)
     }
 }
 
+/*!
+ * \brief Clear orphaned entries from the genre, artist, album and albumart
+ *        tables
+ *
+ * \returns Nothing.
+ */
 void FileScanner::cleanDB()
 {
     MythProgressDialog *clean_progress;
@@ -324,7 +371,13 @@ void FileScanner::cleanDB()
     delete clean_progress;
 }
 
-// Remove a file from the database
+/*!
+ * \brief Removes a file from the database.
+ *
+ * \param filename Full path to file.
+ *
+ * \returns Nothing.
+ */
 void FileScanner::RemoveFileFromDB (const QString &filename)
 {
     QString sqlfilename(filename);
@@ -359,6 +412,13 @@ void FileScanner::RemoveFileFromDB (const QString &filename)
     query.exec();
 }
 
+/*!
+ * \brief Updates a file in the database.
+ *
+ * \param filename Full path to file.
+ *
+ * \returns Nothing.
+ */
 void FileScanner::UpdateFileInDB(const QString &filename)
 {
     QString directory = filename;
@@ -422,6 +482,15 @@ void FileScanner::UpdateFileInDB(const QString &filename)
     }
 }
 
+/*!
+ * \brief Scan a directory recursively for music and albumart.
+ *        Inserts, updates and removes any files any files found in the
+ *        database.
+ *
+ * \param directory Directory to scan
+ *
+ * \returns Nothing.
+ */
 void FileScanner::SearchDir(QString &directory)
 {
 
@@ -476,6 +545,13 @@ void FileScanner::SearchDir(QString &directory)
     cleanDB();
 }
 
+/*!
+ * \brief Check a list of files against musics files already in the database
+ *
+ * \param music_files MusicLoadedMap
+ *
+ * \returns Nothing.
+ */
 void FileScanner::ScanMusic(MusicLoadedMap &music_files)
 {
     MusicLoadedMap::Iterator iter;
@@ -528,7 +604,14 @@ void FileScanner::ScanMusic(MusicLoadedMap &music_files)
     delete file_checking;
 }
 
-void FileScanner::ScanArtwork(MusicLoadedMap &music_files)
+/*!
+ * \brief Check a list of files against images already in the database
+ *
+ * \param music_files MusicLoadedMap
+ *
+ * \returns Nothing.
+ */
+void FileScanner::ScanArtwork(MusicLoadedMap &image_files)
 {
     MusicLoadedMap::Iterator iter;
 
