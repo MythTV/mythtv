@@ -32,6 +32,7 @@ class FileScanner
         void UpdateFileInDB(const QString &filename);
         void ScanMusic(MusicLoadedMap &music_files);
         void ScanArtwork(MusicLoadedMap &music_files);
+        void cleanDB();
 
         QString         m_startdir;
         IdCache         m_directoryid;

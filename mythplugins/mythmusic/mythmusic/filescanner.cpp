@@ -261,6 +261,69 @@ void FileScanner::AddFileToDB(const QString &filename)
     }
 }
 
+void FileScanner::cleanDB()
+{
+    MythProgressDialog *clean_progress;
+    clean_progress = new MythProgressDialog(
+        QObject::tr("Cleaning music database"), 4);
+
+    int counter = 0;
+
+    MSqlQueryInfo connection = MSqlQuery::InitCon();
+    MSqlQuery query(connection);
+    MSqlQuery deletequery(connection);
+
+    query.exec("SELECT g.genre_id FROM music_genres g LEFT JOIN music_songs s "
+               "ON g.genre_id=s.genre_id WHERE s.genre_id IS NULL;");
+    while (query.next())
+    {
+        int genreid = query.value(0).toInt();
+        deletequery.prepare("DELETE FROM music_genres WHERE genre_id=:GENREID");
+        deletequery.bindValue(":GENREID", genreid);
+        deletequery.exec();
+    }
+    clean_progress->setProgress(++counter);
+
+    query.exec("SELECT a.album_id FROM music_albums a LEFT JOIN music_songs s "
+               "ON a.album_id=s.album_id WHERE s.album_id IS NULL;");
+    while (query.next())
+    {
+        int albumid = query.value(0).toInt();
+        deletequery.prepare("DELETE FROM music_albums WHERE album_id=:ALBUMID");
+        deletequery.bindValue(":ALBUMID", albumid);
+        deletequery.exec();
+    }
+    clean_progress->setProgress(++counter);
+
+    query.exec("SELECT a.artist_id FROM music_artists a "
+               "LEFT JOIN music_songs s ON a.artist_id=s.artist_id "
+               "LEFT JOIN music_albums l ON a.artist_id=l.artist_id "
+               "WHERE s.artist_id IS NULL AND l.artist_id IS NULL");
+    while (query.next())
+    {
+        int artistid = query.value(0).toInt();
+        deletequery.prepare("DELETE FROM music_artists WHERE artist_id=:ARTISTID");
+        deletequery.bindValue(":ARTISTID", artistid);
+        deletequery.exec();
+    }
+    clean_progress->setProgress(++counter);
+
+    query.exec("SELECT a.albumart_id FROM music_albumart a LEFT JOIN "
+               "music_songs s ON a.song_id=s.song_id WHERE "
+               "embedded='1' AND s.song_id IS NULL;");
+    while (query.next())
+    {
+        int albumartid = query.value(0).toInt();
+        deletequery.prepare("DELETE FROM music_albumart WHERE albumart_id=:ALBUMARTID");
+        deletequery.bindValue(":ALBUMARTID", albumartid);
+        deletequery.exec();
+    }
+    clean_progress->setProgress(++counter);
+
+    clean_progress->Close();
+    delete clean_progress;
+}
+
 // Remove a file from the database
 void FileScanner::RemoveFileFromDB (const QString &filename)
 {
@@ -408,6 +471,9 @@ void FileScanner::SearchDir(QString &directory)
     }
     file_checking->Close();
     delete file_checking;
+
+    // Cleanup orphaned entries from the database
+    cleanDB();
 }
 
 void FileScanner::ScanMusic(MusicLoadedMap &music_files)
