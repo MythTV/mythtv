@@ -611,7 +611,7 @@ void FileScanner::ScanMusic(MusicLoadedMap &music_files)
  *
  * \returns Nothing.
  */
-void FileScanner::ScanArtwork(MusicLoadedMap &image_files)
+void FileScanner::ScanArtwork(MusicLoadedMap &music_files)
 {
     MusicLoadedMap::Iterator iter;
 
