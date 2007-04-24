@@ -59,6 +59,8 @@ class IconView : public MythDialog
     bool LoadViewTheme(void);
     bool LoadThemeImages(void);
 
+    void updateBackground();
+
     void LoadDirectory(const QString &dir, bool topleft);
 
     void UpdateMenu(void);
@@ -122,6 +124,7 @@ class IconView : public MythDialog
     UIListBtnType      *m_menuType;
     UIListBtnType      *m_submenuType;
 
+    QPixmap             m_background;
     QPixmap             m_backRegPix;
     QPixmap             m_backSelPix;
     QPixmap             m_folderRegPix;

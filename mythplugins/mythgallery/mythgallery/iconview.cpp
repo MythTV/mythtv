@@ -107,6 +107,8 @@ IconView::IconView(const QString   &galleryDir,
         return;
     }
 
+    updateBackground();
+
     SetupMediaMonitor();
 
     srand(time(NULL));
@@ -163,6 +165,25 @@ void IconView::paintEvent(QPaintEvent *e)
         UpdateText();
     if (e->rect().intersects(m_viewRect))
         UpdateView();
+}
+
+void IconView::updateBackground(void)
+{
+    QPixmap bground(size());
+    bground.fill(this, 0, 0);
+
+    QPainter tmp(&bground);
+
+    LayerSet *container = m_theme->GetSet("background");
+    if (container)
+    {
+        container->Draw(&tmp, 0, 0);
+    }
+
+    tmp.end();
+    m_background = bground;
+
+    setPaletteBackgroundPixmap(m_background);
 }
 
 void IconView::UpdateMenu(void)
