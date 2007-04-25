@@ -750,6 +750,8 @@ void Ripper::scanCD(void)
         delete m_decoder;
 
     m_decoder = new CdDecoder("cda", NULL, NULL, NULL);
+    if (m_decoder)
+        m_decoder->setDevice(cddevice);
 }
 
 // static function to determin if there is already a similar track in the database

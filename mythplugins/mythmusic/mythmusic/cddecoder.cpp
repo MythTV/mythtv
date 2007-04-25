@@ -39,8 +39,6 @@ CdDecoder::CdDecoder(const QString &file, DecoderFactory *d, QIODevice *i,
     paranoia = NULL;
 
     settracknum = -1;
-
-    devicename = gContext->GetSetting("CDDevice");
 }
 
 CdDecoder::~CdDecoder(void)
