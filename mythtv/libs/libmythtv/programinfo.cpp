@@ -3858,7 +3858,7 @@ int ProgramInfo::getProgramFlags(void) const
                   "hdtv, watched, preserve "
                   "FROM recorded LEFT JOIN recordedprogram ON "
                   "(recorded.chanid = recordedprogram.chanid AND "
-                  "recorded.starttime = recordedprogram.starttime) "
+                  "recorded.progstart = recordedprogram.starttime) "
                   "WHERE recorded.chanid = :CHANID AND recorded.starttime = :STARTTIME ;");
     query.bindValue(":CHANID", chanid);
     query.bindValue(":STARTTIME", recstartts);
@@ -4645,7 +4645,7 @@ bool ProgramList::FromRecorded( bool bDescending, ProgramList *pSchedList )
         "LEFT JOIN channel ON recorded.chanid = channel.chanid "
         "LEFT JOIN recordedprogram ON "
         " ( recorded.chanid    = recordedprogram.chanid AND "
-        "   recorded.starttime = recordedprogram.starttime ) "
+        "   recorded.progstart = recordedprogram.starttime ) "
         "WHERE ( recorded.deletepending = 0 OR "
         "        recorded.lastmodified <= DATE_SUB(NOW(), INTERVAL 5 MINUTE) "
         "      ) "

@@ -1088,7 +1088,7 @@ void MainServer::HandleQueryRecordings(QString type, PlaybackSock *pbs)
         "LEFT JOIN channel ON recorded.chanid = channel.chanid "
         "LEFT JOIN recordedprogram ON "
         " ( recorded.chanid = recordedprogram.chanid AND "
-        "  recorded.starttime = recordedprogram.starttime ) "
+        "  recorded.progstart = recordedprogram.starttime ) "
         "WHERE ( recorded.deletepending = 0 OR "
         "        DATE_ADD(recorded.lastmodified, INTERVAL 5 MINUTE) <= NOW() "
         "      ) ";
