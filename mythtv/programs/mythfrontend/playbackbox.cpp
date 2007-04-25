@@ -3747,7 +3747,7 @@ QDateTime PlaybackBox::getPreviewLastModified(ProgramInfo *pginfo)
  */
 bool PlaybackBox::SetPreviewGenerator(const QString &xfn, PreviewGenerator *g)
 {
-    QString fn = xfn.mid(max(xfn.findRev('/'),0));
+    QString fn = xfn.mid(max(xfn.findRev('/') + 1,0));
     if (!g)
     {
         if (previewGeneratorLock.tryLock())
@@ -3776,7 +3776,7 @@ bool PlaybackBox::IsGeneratingPreview(const QString &xfn) const
     QMap<QString, PreviewGenerator*>::const_iterator it;
     QMutexLocker locker(&previewGeneratorLock);
 
-    QString fn = xfn.mid(max(xfn.findRev('/'),0));
+    QString fn = xfn.mid(max(xfn.findRev('/') + 1,0));
     if ((it = previewGenerator.find(fn)) == previewGenerator.end())
         return false;
     return *it;
@@ -3789,7 +3789,7 @@ bool PlaybackBox::IsGeneratingPreview(const QString &xfn) const
 uint PlaybackBox::IncPreviewGeneratorAttempts(const QString &xfn)
 {
     QMutexLocker locker(&previewGeneratorLock);
-    QString fn = xfn.mid(max(xfn.findRev('/'),0));
+    QString fn = xfn.mid(max(xfn.findRev('/') + 1,0));
     return previewGeneratorAttempts[fn]++;
 }
 
