@@ -1577,11 +1577,6 @@ int AvFormatDecoder::ScanStreams(bool novideo)
             }
         }
     }
-    else if (m_playbackinfo && m_playbackinfo->isVideo && 
-                tracks[kTrackTypeAudio].size() > 1)
-    {
-        SetTrack(kTrackTypeAudio, 0);
-    }
 
     // Select a new track at the next opportunity.
     ResetTracks();
