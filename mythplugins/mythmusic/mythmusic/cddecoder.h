@@ -3,11 +3,17 @@
 
 #include "decoder.h"
 
+#include <mythtv/mythconfig.h>
+
+#ifdef CONFIG_DARWIN
+#include <vector>
+#else
 #include <cdaudio.h>
 extern "C" {
 #include <cdda_interface.h>
 #include <cdda_paranoia.h>
 }
+#endif
 
 class Metadata;
 
@@ -29,6 +35,7 @@ class CdDecoder : public Decoder
     Metadata *getMetadata(void);
     Metadata *getLastMetadata(void);
     void commitMetadata(Metadata *mdata);
+    void      setDevice(const QString &dev)  { devicename = dev; }
 
   private:
     void run();
@@ -37,6 +44,19 @@ class CdDecoder : public Decoder
     void deinit();
 
     bool inited, user_stop;
+
+
+    QString            devicename;
+
+#ifdef CONFIG_DARWIN
+    uint32_t           m_diskID;        ///< For CDDB1/FreeDB lookup
+    int                m_firstTrack,
+                       m_lastTrack,
+                       m_leadout;       ///< End of last track
+    double             m_lengthInSecs;
+    vector<int>        m_tracks;        ///< Start block offset of each track
+    vector<Metadata*>  m_mData;         ///< After lookup, details of each trk
+#else
     int stat;
     char *output_buf;
     ulong output_bytes, output_at;
@@ -48,8 +68,6 @@ class CdDecoder : public Decoder
     unsigned long output_size;
     double totalTime, seekTime;
 
-    QString devicename;
-
     int settracknum;
     int tracknum;
 
@@ -59,6 +77,7 @@ class CdDecoder : public Decoder
     long int start;
     long int end;
     long int curpos;
+#endif
 };
 
 #endif
