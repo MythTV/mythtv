@@ -48,16 +48,10 @@
       <fontsize>25</fontsize>
       <bold>yes</bold>
       <italics>no</italics>
-      <centered>no</centered>
       <outline>
          <color>black</color>
          <size>2</size>
       </outline>
-      <!--<shadow>
-         <color>black</color>
-         <offset>2,2</offset>
-         <alpha>128</alpha>
-      </shadow>-->
     </text>
     <activetext>
       <area>5,3,3,3</area>
@@ -66,16 +60,10 @@
       <fontsize>25</fontsize>
       <bold>yes</bold>
       <italics>no</italics>
-      <centered>no</centered>
       <outline>
          <color>black</color>
          <size>3</size>
       </outline>
-      <!--<shadow>
-         <color>black</color>
-         <offset>3,3</offset>
-         <alpha>128</alpha>
-      </shadow>-->
     </activetext>
   </genericbutton>
   

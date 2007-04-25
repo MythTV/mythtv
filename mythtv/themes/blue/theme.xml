@@ -142,11 +142,7 @@
       <fontsize>16</fontsize>
       <bold>yes</bold>
       <italics>no</italics>
-      <centered>yes</centered>
-<!--      <outline>
-         <color>black</color>
-         <size>2</size>
-      </outline> -->
+      <halign>center</halign>
       <shadow>
          <color>black</color>
          <offset>2,2</offset>
@@ -161,12 +157,8 @@
       <fontsize>14</fontsize>
       <bold>yes</bold>
       <italics>yes</italics>
-      <centered>yes</centered> -->
-<!--      <outline>
-         <color>black</color>
-         <size>2</size>
-      </outline> -->
-<!--      <shadow>
+      <halign>center</halign>
+      <shadow>
          <color>black</color>
          <offset>3,3</offset>
          <alpha>128</alpha>
