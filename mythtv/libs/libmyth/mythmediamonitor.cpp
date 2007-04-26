@@ -111,10 +111,10 @@ MythMediaDevice * MediaMonitor::selectDrivePopup(const QString label,
     for (it = m_Devices.begin(); it != m_Devices.end(); ++it)
     {
         // By default, we only list CD/DVD devices.
-        // Caller can also request mounted drives to be listed:
+        // Caller can also request mounted drives to be listed (e.g. USB flash)
 
         if (QString(typeid(**it).name()).contains("MythCDROM") ||
-               (showMounted && (*it)->getAllowEject()))
+               (showMounted && (*it)->isMounted()))
             drives.append(*it);
     }
 

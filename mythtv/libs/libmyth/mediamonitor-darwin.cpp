@@ -390,8 +390,7 @@ void MonitorThreadDarwin::diskInsert(const char *devName,
         media = MythCDROM::get(m_Monitor, devName, true,
                                m_Monitor->m_AllowEject);
     else
-        media = MythHDD::Get(m_Monitor, devName, true,
-                             m_Monitor->m_AllowEject);
+        media = MythHDD::Get(m_Monitor, devName, true, false);
 
     if (!media)
     {
