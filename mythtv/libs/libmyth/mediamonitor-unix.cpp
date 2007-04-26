@@ -251,7 +251,7 @@ static void LookupModel(MythMediaDevice* device)
         {
             QTextStream stream(&file);
 
-            desc.append(stream.read());
+            desc.append(stream.readLine());
             file.close();
         }
     }
@@ -266,7 +266,7 @@ static void LookupModel(MythMediaDevice* device)
         {
             QTextStream stream(&file);
 
-            desc.append(stream.read());
+            desc.append(stream.readLine());
             desc.append(' ');
             file.close();
         }
@@ -276,13 +276,11 @@ static void LookupModel(MythMediaDevice* device)
         {
             QTextStream stream(&file);
 
-            desc.append(stream.read());
+            desc.append(stream.readLine());
             desc.append(' ');
             file.close();
         }
     }
-
-    desc.remove('\n');
 #endif
 
     device->setDeviceModel(desc);
