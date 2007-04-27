@@ -86,4 +86,12 @@
       <action>SETTINGS_SCAN</action>
    </button>
 
+   <button>
+      <type>EJECT</type>
+      <text>Eject media</text>
+      <text lang="ET">Meedia väljastamine</text>
+      <text lang="RU">Достать диск</text>
+      <action>EJECT</action>
+   </button>
+
 </mythmenu>
