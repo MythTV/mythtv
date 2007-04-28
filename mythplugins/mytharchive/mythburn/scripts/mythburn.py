@@ -31,7 +31,7 @@
 #******************************************************************************
 
 # version of script - change after each update
-VERSION="0.1.20070407-1"
+VERSION="0.1.20070428-1"
 
 
 ##You can use this debug flag when testing out new themes
@@ -1226,7 +1226,7 @@ def encodeAudio(format, sourcefile, destinationfile, deletesourceafterencode):
         if cpuCount > 1:
             cmd += "-threads %d " % cpuCount
 
-        cmd += "-i '%s' -f ac3 -ab 192 -ar 48000 '%s'" % (sourcefile, destinationfile)
+        cmd += "-i '%s' -f ac3 -ab 192k -ar 48000 '%s'" % (sourcefile, destinationfile)
         result = runCommand(cmd)
 
         if result != 0:
