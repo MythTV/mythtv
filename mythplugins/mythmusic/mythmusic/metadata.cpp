@@ -79,15 +79,20 @@ int Metadata::compare(Metadata *other)
     if (m_format == "cast") 
     {
         int artist_cmp = Artist().lower().localeAwareCompare(other->Artist().lower());
-        
+
         if (artist_cmp == 0) 
             return Title().lower().localeAwareCompare(other->Title().lower());
-        
+
         return artist_cmp;
-    } 
-    else 
+    }
+    else
     {
-        return (Track() - other->Track());
+        int track_cmp = Track() - other->Track();
+
+        if (track_cmp == 0)
+            return Title().lower().localeAwareCompare(other->Title().lower());
+
+        return track_cmp;
     }
 }
 
