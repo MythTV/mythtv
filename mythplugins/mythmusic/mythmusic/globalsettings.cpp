@@ -818,7 +818,6 @@ void VisualizationsEditor::fillWidgets(const QString &currentSelection)
                 pluginName = "MythMusic";
             }
 
-            QListViewItem *item;
             item = new QListViewItem(selectedList, item, visName, pluginName);
         }
         else
