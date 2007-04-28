@@ -31,6 +31,9 @@ using namespace std;
 
 #include <mythtv/libmythui/myththemedmenu.h>
 
+// This stores the last MythMediaDevice that was detected:
+QString gCDdevice;
+
 void CheckFreeDBServerFile(void)
 {
     char filename[1024];
@@ -150,7 +153,11 @@ bool startRipper(void)
 {
     QString dev;
 
-    dev = MediaMonitor::defaultCDdevice();
+    if (gCDdevice.length())
+        dev = gCDdevice;
+    else
+        dev = MediaMonitor::defaultCDdevice();
+
     Ripper rip(dev, gContext->GetMainWindow(), "cd ripper");
 
     qApp->unlock();
@@ -300,8 +307,36 @@ void runRipCD(void);
 void runScan(void);
 
 
-void handleMedia(MythMediaDevice *) 
+void handleMedia(MythMediaDevice *cd)
 {
+    // Note that we should deal with other disks that may contain music.
+    // e.g. MEDIATYPE_MMUSIC or MEDIATYPE_MIXED
+
+    if (cd) 
+    { 
+        QString newDevice;
+
+#ifdef Q_OS_MAC 
+        newDevice = cd->getMountPath();
+#else
+        newDevice = cd->getDevicePath(); 
+#endif 
+
+        if (gCDdevice.length() && gCDdevice != newDevice))
+        {
+            // In the case of multiple audio CDs, clear the old stored device
+            // so the user has to choose (via MediaMonitor::defaultCDdevice())
+
+            gCDdevice = QString::null;
+            VERBOSE(VB_MEDIA, "MythMusic: Forgetting existing CD");
+        }
+        else
+        {
+            gCDdevice = newDevice;
+            VERBOSE(VB_MEDIA, "MythMusic: Storing CD device " + gCDdevice);
+        }
+    }
+
     if (gContext->GetNumSetting("AutoPlayCD", 0))
         runMusicPlayback();
     else
