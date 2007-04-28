@@ -473,11 +473,13 @@ void MediaMonitor::mediaStatusChanged(MediaStatus oldStatus,
  * To make it a bit more beginner friendly, if no database default exists,
  * or if it contins "default", the code tries to guess the correct drive,
  * or put a dialog box up if there are several valid options.
+ * If, still, nothing is suitable, a caller hard-coded default is used.
  *
  * Ideally, these would return a MythMediaDevice * instead of a QString
  */
 
-QString MediaMonitor::defaultDevice(QString dbSetting, QString label)
+QString MediaMonitor::defaultDevice(QString dbSetting,
+                                    QString label, char *hardCodedDefault)
 {
     QString device = gContext->GetSetting(dbSetting);
 
@@ -496,8 +498,23 @@ QString MediaMonitor::defaultDevice(QString dbSetting, QString label)
 
             if (d)
                 device = d->getDevicePath();
+            else
+                device = hardCodedDefault;
         }
     }
+
+#if 0
+    // A hack to do VERBOSE in a static method:
+    extern unsigned int print_verbose_messages;
+    if (print_verbose_messages & 0x00800000)  // VB_MEDIA
+    {
+        QDateTime dtmp = QDateTime::currentDateTime();
+        QString dtime = dtmp.toString("yyyy-MM-dd hh:mm:ss.zzz");
+        cout << dtime << " MediaMonitor::defaultDevice('" << dbSetting.ascii()
+             << "', '" << label.ascii() << "'') returning '"
+             << device.ascii() << "'" << endl;
+    }
+#endif
 
     return device;
 }
@@ -507,12 +524,7 @@ QString MediaMonitor::defaultDevice(QString dbSetting, QString label)
  */
 QString MediaMonitor::defaultCDdevice()
 {
-    QString device = defaultDevice("CDDevice", tr("Select a CD drive"));
-    if (device.length())
-        return device;
-
-    // Last resort:
-    return "/dev/cdrom";
+    return defaultDevice("CDDevice", tr("Select a CD drive"), "/dev/cdrom");
 }
 
 /**
@@ -520,13 +532,8 @@ QString MediaMonitor::defaultCDdevice()
  */
 QString MediaMonitor::defaultVCDdevice()
 {
-    QString device = defaultDevice("VCDDeviceLocation",
-                                   tr("Select a VCD drive"));
-    if (device.length())
-        return device;
-
-    // Last resort:
-    return "/dev/cdrom";
+    return defaultDevice("VCDDeviceLocation",
+                         tr("Select a VCD drive"), "/dev/cdrom");
 }
 
 /**
@@ -534,13 +541,8 @@ QString MediaMonitor::defaultVCDdevice()
  */
 QString MediaMonitor::defaultDVDdevice()
 {
-    QString device = defaultDevice("DVDDeviceLocation",
-                                   tr("Select a DVD drive"));
-    if (device.length())
-        return device;
-
-    // Last resort:
-    return "/dev/dvd";
+    return defaultDevice("DVDDeviceLocation",
+                         tr("Select a DVD drive"), "/dev/dvd");
 }
 
 /**
@@ -552,10 +554,7 @@ QString MediaMonitor::defaultDVDdevice()
 QString MediaMonitor::defaultWriter()
 {
     QString device = defaultDevice("MythArchiveDVDLocation",
-                                   tr("Select a DVD writer"));
-    if (device.length())
-        return device;
+                                   tr("Select a DVD writer"), "/dev/dvd");
 
-    // Last resort:
-    return "/dev/dvd";
+    return device;
 }
