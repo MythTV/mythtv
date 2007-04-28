@@ -322,7 +322,7 @@ void handleMedia(MythMediaDevice *cd)
         newDevice = cd->getDevicePath(); 
 #endif 
 
-        if (gCDdevice.length() && gCDdevice != newDevice))
+        if (gCDdevice.length() && gCDdevice != newDevice)
         {
             // In the case of multiple audio CDs, clear the old stored device
             // so the user has to choose (via MediaMonitor::defaultCDdevice())
