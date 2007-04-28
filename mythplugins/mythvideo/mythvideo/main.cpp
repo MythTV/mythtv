@@ -17,7 +17,7 @@
 #include <mythtv/lcddevice.h>
 #include <mythtv/libmythui/myththemedmenu.h>
 #include <mythtv/mythpluginapi.h>
-#include <mythtv/mythmedia.h>
+#include <mythtv/mythmediamonitor.h>
 #include <mythtv/util.h>
 
 #include "videomanager.h"
@@ -251,29 +251,9 @@ namespace
                 //
                 //  Need to do device substitution
                 //
-                QString vcd_device = gContext->GetSetting("VCDDeviceLocation");
-                if(vcd_device.length() < 1)
-                {
-                    //
-                    //  RTF README
-                    //
-                    DialogBox *no_device_dialog =
-                            new DialogBox(gContext->GetMainWindow(),
-                            QObject::tr("\n\nYou have no VCD Device defined."));
-                    no_device_dialog->
-                            AddButton(QObject::tr("OK, I'll go run Setup"));
-                    no_device_dialog->exec();
-
-                    delete no_device_dialog;
-                    gContext->removeCurrentLocation();
-
-                    return;
-                }
-                else
-                {
-                    command_string =
-                            command_string.replace(QRegExp("%d"), vcd_device);
-                }
+                command_string
+                    = command_string.replace(QRegExp("%d"),
+                                             MediaMonitor::defaultVCDdevice());
             }
             myth_system(command_string);
             gContext->GetMainWindow()->raise();
@@ -296,24 +276,7 @@ namespace
         QString dvd_device = gDVDdevice;
 
         if (dvd_device.isNull())
-            dvd_device = gContext->GetSetting("DVDDeviceLocation");
-
-        if(dvd_device.length() < 1)
-        {
-            //
-            //  RTF README
-            //
-            DialogBox *no_device_dialog =
-                    new DialogBox(gContext->GetMainWindow(),
-                    QObject::tr("\n\nYou have no DVD Device defined."));
-            no_device_dialog->AddButton(QObject::tr("OK, I'll go run Setup"));
-            no_device_dialog->exec();
-
-            delete no_device_dialog;
-            gContext->removeCurrentLocation();
-
-            return;
-        }
+            dvd_device = MediaMonitor::defaultDVDdevice();
 
         gContext->addCurrentLocation("playdvd");
 
@@ -357,11 +320,26 @@ namespace
     {
         if (dvd)
         {
-            gDVDdevice = dvd->getDevicePath();
+            QString newDevice = dvd->getDevicePath();
+
 #ifdef Q_OS_MAC
-            gDVDdevice.prepend("/dev/r");
+            newDevice.prepend("/dev/r");
 #endif
-            VERBOSE(VB_MEDIA, "MythVideo: Storing DVD device " + gDVDdevice);
+
+            if (gDVDdevice.length() && gDVDdevice != newDevice)
+            {
+                // Multiple DVD devices. Clear the old one so the user has to
+                // select a disk to play (in MediaMonitor::defaultDVDdevice())
+
+                gDVDdevice = QString::null;
+                VERBOSE(VB_MEDIA, "MythVideo: Forgetting existing DVD");
+            }
+            else
+            {
+                gDVDdevice = newDevice;
+                VERBOSE(VB_MEDIA,
+                        "MythVideo: Storing DVD device " + gDVDdevice);
+            }
         }
 
         switch (gContext->GetNumSetting("DVDOnInsertDVD", 1))

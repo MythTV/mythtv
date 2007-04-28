@@ -14,6 +14,7 @@
 using namespace std;
 
 #include <mythtv/mythcontext.h>
+#include <mythtv/mythmediamonitor.h>
 #include <mythtv/uitypes.h>
 
 #include "dvdripbox.h"
@@ -138,12 +139,7 @@ DVDRipBox::DVDRipBox(MythMainWindow *parent, QString window_name,
     //  timer to query whether the thread is done or not
     //
         
-    QString dvd_device = gContext->GetSetting("DVDDeviceLocation");
-    if(dvd_device.length() < 1)
-    {
-        cerr << "dvdripbox.o: Can't get a value for DVD device location. Did you run setup?" << endl;
-        exit(0);
-    }
+    QString dvd_device = MediaMonitor::defaultDVDdevice();
     dvd_info = NULL;
     disc_checking_timer = new QTimer();
     disc_checking_timer->start(600);

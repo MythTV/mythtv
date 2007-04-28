@@ -17,6 +17,7 @@ using namespace std;
 
 #include <mythtv/util.h>
 #include <mythtv/uitypes.h>
+#include <mythtv/mythmediamonitor.h>
 
 #include "titledialog.h"
 
@@ -324,13 +325,8 @@ void TitleDialog::viewTitle()
         return;
     }
 
-    QString dvd_device = gContext->GetSetting("DVDDeviceLocation");
-    if(dvd_device.length() < 1)
-    {
-        cerr << "titledialog.o: No DVD device defined" << endl;
-        return;
-    }
-    
+    QString dvd_device = MediaMonitor::defaultDVDdevice();
+
     int audio_track = 1;
     int channels = 2;
     if(current_title)
