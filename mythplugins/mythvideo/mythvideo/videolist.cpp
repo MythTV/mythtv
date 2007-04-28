@@ -1,3 +1,5 @@
+#include <qfileinfo.h>
+
 #include <mythtv/mythcontext.h>
 #include <mythtv/uitypes.h>
 #include <mythtv/mythmediamonitor.h>
@@ -1094,9 +1096,9 @@ namespace fake_unnamed
       public:
         dirhandler(smart_dir_node &directory, const QString &prefix,
                    MetadataListManager::metadata_list &metalist,
-                   free_list &dh_free_list) :
+                   free_list &dh_free_list, bool infer_title) :
             m_directory(directory), m_prefix(prefix), m_metalist(metalist),
-            m_dh_free_list(dh_free_list)
+            m_dh_free_list(dh_free_list), m_infer_title(infer_title)
         {
         }
 
@@ -1106,7 +1108,8 @@ namespace fake_unnamed
             (void)fq_dir_name;
             smart_dir_node dir = m_directory->addSubDir(dir_name);
             DirectoryHandler *dh = new dirhandler(dir, m_prefix, m_metalist,
-                                                  m_dh_free_list);
+                                                  m_dh_free_list,
+                                                  m_infer_title);
             m_dh_free_list.push_back(dh);
             return dh;
         }
@@ -1120,8 +1123,14 @@ namespace fake_unnamed
             QString file_string(fq_file_name);
 
             MetadataListManager::MetadataPtr myData(new Metadata(file_string));
-            QString title = Metadata::FilenameToTitle(file_string);
-            if (!title.length()) title = file_string.section("/", -1);
+            QFileInfo qfi(file_string);
+            QString title = qfi.baseName(true);
+            if (m_infer_title)
+            {
+                QString tmptitle(Metadata::FilenameToTitle(file_string));
+                if (tmptitle.length())
+                    title = tmptitle;
+            }
             myData->setTitle(title);
             myData->setPrefix(m_prefix);
 
@@ -1135,6 +1144,7 @@ namespace fake_unnamed
         const QString &m_prefix;
         MetadataListManager::metadata_list &m_metalist;
         free_list &m_dh_free_list;
+        const bool m_infer_title;
     };
 }
 
@@ -1145,6 +1155,6 @@ void VideoListImp::buildFileList(smart_dir_node &directory,
     FileAssociations::getFileAssociation().getExtensionIgnoreList(ext_list);
 
     dirhandler::free_list fl;
-    dirhandler dh(directory, prefix, metalist, fl);
+    dirhandler dh(directory, prefix, metalist, fl, false);
     ScanVideoDirectory(directory->getFQPath(), &dh, ext_list, m_ListUnknown);
 }
