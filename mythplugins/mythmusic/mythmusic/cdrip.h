@@ -56,7 +56,8 @@ class RipStatus;
 class CDRipperThread: public QThread
 {
     public:
-        CDRipperThread(RipStatus *parent, vector<Metadata*> *tracks, int quality);
+        CDRipperThread(RipStatus *parent,  QString device,
+                       vector<Metadata*> *tracks, int quality);
         ~CDRipperThread();
 
         void cancel(void);
@@ -72,6 +73,7 @@ class CDRipperThread: public QThread
         RipStatus         *m_parent;
         bool               m_quit;
         QMutex             m_mutex;
+        QString            m_CDdevice;
         int                m_quality;
         vector<Metadata*> *m_tracks;
 
@@ -87,7 +89,7 @@ class Ripper : public MythThemedDialog
 {
     Q_OBJECT
   public:
-    Ripper(MythMainWindow *parent, const char *name = 0);
+    Ripper(QString device, MythMainWindow *parent, const char *name = 0);
    ~Ripper(void);
 
     bool somethingWasRipped();
@@ -95,7 +97,8 @@ class Ripper : public MythThemedDialog
     void ejectCD(void);
 
     static QString filenameFromMetadata(Metadata *track, bool createDir = true);
-    static bool isNewTune(const QString &artist, const QString &album, const QString &title);
+    static bool isNewTune(const QString &artist,
+                          const QString &album, const QString &title);
 
   protected slots:
     void startRipper(void);
@@ -147,6 +150,8 @@ class Ripper : public MythThemedDialog
     QStringList        m_searchList;
     bool               m_somethingwasripped;
     bool               m_mediaMonitorActive;
+
+    QString            m_CDdevice;
 };
 
 
@@ -154,12 +159,13 @@ class RipStatus : public MythThemedDialog
 {
   Q_OBJECT
   public:
-    RipStatus(vector<Metadata*> *tracks, int quality, MythMainWindow *parent, const char *name = 0);
+    RipStatus(vector<Metadata*> *tracks, int quality,
+              MythMainWindow *parent,    const char *name = 0);
     ~RipStatus(void);
 
 
   protected slots:
-    void startRip();
+    void startRip(QString device);
 
   private:
     void wireupTheme(void);

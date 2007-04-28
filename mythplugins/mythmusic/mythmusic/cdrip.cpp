@@ -99,13 +99,15 @@ static void paranoia_cb(long inpos, int function)
     inpos = inpos; function = function;
 }
 
-CDRipperThread::CDRipperThread(RipStatus *parent, vector<Metadata*> *tracks, int quality)
+CDRipperThread::CDRipperThread(RipStatus *parent,  QString device,
+                               vector<Metadata*> *tracks, int quality)
 {
     m_parent = parent;
     m_tracks = tracks;
     m_quality = quality;
     m_quit = false;
     m_totalTracks = m_tracks->size();
+    m_CDdevice = device;
 }
 
 CDRipperThread::~CDRipperThread(void)
@@ -167,7 +169,6 @@ void CDRipperThread::run(void)
     sendEvent(ST_TRACK_PROGRESS, 0);
 
     QString textstatus;
-    QString cddevice = gContext->GetSetting("CDDevice");
     QString encodertype = gContext->GetSetting("EncoderType");
     bool mp3usevbr = gContext->GetNumSetting("Mp3UseVBR", 0);
 
@@ -175,7 +176,7 @@ void CDRipperThread::run(void)
     m_totalSectorsDone = 0;
     for (int trackno = 0; trackno < m_totalTracks; trackno++)
     {
-        m_totalSectors += getSectorCount(cddevice, trackno + 1);
+        m_totalSectors += getSectorCount(m_CDdevice, trackno + 1);
     }
 
     sendEvent(ST_OVERALL_START, m_totalSectors);
@@ -185,7 +186,8 @@ void CDRipperThread::run(void)
         QString lcd_tots = QObject::tr("Importing ") + tots;
         QPtrList<LCDTextItem> textItems;
         textItems.setAutoDelete(true);
-        textItems.append(new LCDTextItem(1, ALIGN_CENTERED, lcd_tots, "Generic", false));
+        textItems.append(new LCDTextItem(1, ALIGN_CENTERED,
+                                         lcd_tots, "Generic", false));
         lcd->switchToGeneric(&textItems);
     }
 
@@ -194,7 +196,8 @@ void CDRipperThread::run(void)
         if (isCancelled())
             return;
 
-        sendEvent(ST_STATUS_TEXT, QString("Track %1 of %2").arg(trackno + 1).arg(m_totalTracks));
+        sendEvent(ST_STATUS_TEXT, QString("Track %1 of %2")
+                                  .arg(trackno + 1).arg(m_totalTracks));
 
         Encoder *encoder;
 
@@ -240,7 +243,7 @@ void CDRipperThread::run(void)
                 break;
             }
 
-            ripTrack(cddevice, encoder, trackno + 1);
+            ripTrack(m_CDdevice, encoder, trackno + 1);
 
             if (isCancelled())
                 return;
@@ -257,7 +260,8 @@ void CDRipperThread::run(void)
 
     if (!PostRipCDScript.isEmpty()) 
     {
-        VERBOSE(VB_IMPORTANT, QString("PostCDRipScript: %1").arg(PostRipCDScript));
+        VERBOSE(VB_IMPORTANT,
+                QString("PostCDRipScript: %1").arg(PostRipCDScript));
         pid_t child = fork();
         if (child < 0)
         {
@@ -323,7 +327,7 @@ int CDRipperThread::ripTrack(QString &cddevice, Encoder *encoder, int tracknum)
         {
             every15 = 15;
 
-            // updating the UITypes can be slow so only update them if we need to
+            // updating the UITypes can be slow - only update if we need to:
             int newOverallPct = (int) (100.0 /  (double) ((double) m_totalSectors /
                     (double) (m_totalSectorsDone + curpos - start)));
             if (newOverallPct != m_lastOverallPct)
@@ -365,9 +369,11 @@ int CDRipperThread::ripTrack(QString &cddevice, Encoder *encoder, int tracknum)
 
 ///////////////////////////////////////////////////////////////////////////////
 
-Ripper::Ripper(MythMainWindow *parent, const char *name)
+Ripper::Ripper(QString device, MythMainWindow *parent, const char *name)
       : MythThemedDialog(parent, "cdripper", "music-", name, true)
 {
+    m_CDdevice = device;
+
 #ifndef _WIN32
     // if the MediaMonitor is running stop it
     m_mediaMonitorActive = false;
@@ -735,9 +741,8 @@ void Ripper::startScanCD(void)
 
 void Ripper::scanCD(void)
 {
-    QString cddevice = gContext->GetSetting("CDDevice");
-
-    int cdrom_fd = cd_init_device((char*)cddevice.ascii());
+    int cdrom_fd = cd_init_device((char*)m_CDdevice.ascii());
+    VERBOSE(VB_MEDIA, "Ripper::scanCD() - dev:" + m_CDdevice);
     if (cdrom_fd == -1)
     {
         perror("Could not open cdrom_fd");
@@ -751,7 +756,7 @@ void Ripper::scanCD(void)
 
     m_decoder = new CdDecoder("cda", NULL, NULL, NULL);
     if (m_decoder)
-        m_decoder->setDevice(cddevice);
+        m_decoder->setDevice(m_CDdevice);
 }
 
 // static function to determin if there is already a similar track in the database
@@ -1149,12 +1154,12 @@ void Ripper::startEjectCD()
 
 void Ripper::ejectCD()
 {
-    QString cddevice = gContext->GetSetting("CDDevice");
     bool bEjectCD = gContext->GetNumSetting("EjectCDAfterRipping",1);
     if (bEjectCD)
     {
         int cdrom_fd;
-        cdrom_fd = cd_init_device((char*)cddevice.ascii());
+        cdrom_fd = cd_init_device((char*)m_CDdevice.ascii());
+        VERBOSE(VB_MEDIA, "Ripper::ejectCD() - dev " + m_CDdevice);
         if (cdrom_fd != -1)
         {
             if (cd_eject(cdrom_fd) == -1) 
@@ -1335,7 +1340,7 @@ RipStatus::RipStatus(vector<Metadata*> *tracks, int quality, MythMainWindow *par
     m_ripperThread = NULL;
 
     wireupTheme();
-    QTimer::singleShot(500, this, SLOT(startRip()));
+    QTimer::singleShot(500, this, SLOT(startRip(QString)));
 }
 
 RipStatus::~RipStatus(void)
@@ -1479,11 +1484,11 @@ void RipStatus::customEvent(QCustomEvent *e)
     delete sd;
 }
 
-void RipStatus::startRip(void)
+void RipStatus::startRip(QString device)
 {
     if (m_ripperThread)
         delete m_ripperThread;
 
-    m_ripperThread = new CDRipperThread(this, m_tracks, m_quality);
+    m_ripperThread = new CDRipperThread(this, device, m_tracks, m_quality);
     m_ripperThread->start();
 }

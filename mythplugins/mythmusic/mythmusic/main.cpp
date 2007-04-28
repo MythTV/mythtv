@@ -26,7 +26,7 @@ using namespace std;
 
 #include <mythtv/mythcontext.h>
 #include <mythtv/mythplugin.h>
-#include <mythtv/mythmedia.h>
+#include <mythtv/mythmediamonitor.h>
 #include <mythtv/mythdbcon.h>
 
 #include <mythtv/libmythui/myththemedmenu.h>
@@ -148,7 +148,10 @@ void startDatabaseTree(PlaylistsContainer *all_playlists, AllMusic *all_music)
 
 bool startRipper(void)
 {
-    Ripper rip(gContext->GetMainWindow(), "cd ripper");
+    QString dev;
+
+    dev = MediaMonitor::defaultCDdevice();
+    Ripper rip(dev, gContext->GetMainWindow(), "cd ripper");
 
     qApp->unlock();
     rip.exec();
