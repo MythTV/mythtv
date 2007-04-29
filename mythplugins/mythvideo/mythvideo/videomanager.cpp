@@ -3,10 +3,13 @@
 #include <qpixmap.h>
 #include <qdir.h>
 #include <qurloperator.h>
+#include <qfileinfo.h>
 #include <qprocess.h>
 #include <qpainter.h>
 
 #include <unistd.h>
+
+#include <memory>
 
 #include <mythtv/mythcontext.h>
 #include <mythtv/mythdialogs.h>
@@ -247,6 +250,9 @@ namespace
     const unsigned int ListBehaviorManager::SKIP_MAX;
 
     QString executeExternal(const QStringList &args, const QString &purpose);
+
+    const QString NullCoverFile("<NULL>");
+    const QString LocalCoverFile("Local");
 }
 
 VideoManager::VideoManager(MythMainWindow *lparent,  const QString &lname,
@@ -445,8 +451,8 @@ QString VideoManager::GetMoviePoster(const QString &movieNum)
         }
     }
 
-    if (movieNum == "Local")
-        return(QString("<NULL>"));
+    if (movieNum == LocalCoverFile)
+        return NullCoverFile;
 
     // Obtain movie poster
     QStringList args = QStringList::split(' ',
@@ -478,26 +484,32 @@ QString VideoManager::GetMoviePoster(const QString &movieNum)
     {
         fileprefix = MythContext::GetConfDir();
 
-        dir = QDir(fileprefix);
+        dir.setPath(fileprefix);
         if (!dir.exists())
             dir.mkdir(fileprefix);
 
         fileprefix += "/MythVideo";
     }
 
-    dir = QDir(fileprefix);
+    dir.setPath(fileprefix);
     if (!dir.exists())
         dir.mkdir(fileprefix);
 
-    VERBOSE(VB_IMPORTANT,
-            QString("Copying '%1' -> '%2'...").arg(uri).arg(fileprefix));
-    QUrlOperator *op = new QUrlOperator();
-    connect(op, SIGNAL(finished(QNetworkOperation*)),
+    std::auto_ptr<QUrlOperator> op(new QUrlOperator());
+    connect(op.get(), SIGNAL(finished(QNetworkOperation*)),
           this, SLOT(copyFinished(QNetworkOperation*)) );
     iscopycomplete = false;
     iscopysuccess = false;
 
-    op->copy(uri, "file:" + fileprefix);
+    QUrl url(uri);
+
+    QString ext = QFileInfo(url.fileName()).extension(false);
+    QString dest_file =
+            QString("%1/%2.%3").arg(fileprefix).arg(movieNum).arg(ext);
+    VERBOSE(VB_IMPORTANT,
+            QString("Copying '%1' -> '%2'...").arg(uri).arg(dest_file));
+    op->copy(uri, QString("file:") + dest_file, false, false);
+    VERBOSE(VB_IMPORTANT, QString("dest_file = %1").arg(dest_file));
 
     int nTimeout = gContext->GetNumSetting("PosterDownloadTimeout", 30) * 100;
 
@@ -515,15 +527,11 @@ QString VideoManager::GetMoviePoster(const QString &movieNum)
         }
     }
 
-    QString localfile = "";
     if (iscopycomplete)
     {
         if (iscopysuccess)
         {
-            localfile = fileprefix + "/" + uri.section('/', -1);
-            QString extension = uri.right(uri.length()-uri.findRev('.'));
-            if (dir.rename (localfile, fileprefix +"/" + movieNum + extension))
-                localfile = fileprefix +"/" + movieNum + extension;
+            return dest_file;
         }
     }
     else
@@ -538,9 +546,8 @@ QString VideoManager::GetMoviePoster(const QString &movieNum)
                            "Myth could not retrieve it within a reasonable "
                            "amount of time.\n"));
     }
-    delete op;
 
-    return localfile;
+    return "";
 }
 
 void VideoManager::copyFinished(QNetworkOperation* op)
@@ -1392,8 +1399,8 @@ void VideoManager::handleIMDBList()
 
     if (movieNumber == "cancel")
     {
-        QString movieCoverFile = GetMoviePoster(QString("Local"));
-        if (movieCoverFile != "<NULL>")
+        QString movieCoverFile = GetMoviePoster(LocalCoverFile);
+        if (movieCoverFile != NullCoverFile)
         {
             curitem->setCoverFile(movieCoverFile);
             curitem->updateDatabase();
@@ -1595,8 +1602,8 @@ void VideoManager::slotResetMeta()
     cancelPopup();
 
     ResetCurrentItem();
-    QString movieCoverFile = GetMoviePoster(QString("Local"));
-    if (movieCoverFile != "<NULL>")
+    QString movieCoverFile = GetMoviePoster(LocalCoverFile);
+    if (movieCoverFile != NullCoverFile)
     {
         curitem->setCoverFile(movieCoverFile);
         curitem->updateDatabase();

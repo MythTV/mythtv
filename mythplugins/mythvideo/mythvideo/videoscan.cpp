@@ -1,6 +1,7 @@
 #include <qimage.h>
 
 #include <set>
+#include <map>
 
 #include <mythtv/mythcontext.h>
 #include <mythtv/mythdialogs.h>
