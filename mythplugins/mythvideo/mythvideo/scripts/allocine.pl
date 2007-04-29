@@ -182,7 +182,7 @@ sub getMovieData {
    
 
    # parse movie length
-   my $runtime = parseBetween($response,"Durée : ",".</h4>&nbsp;");
+   my $runtime = parseBetween($response,"Durée : ",".&nbsp;</h4>");
    my $heure;
    my $minutes;
    ($heure,$minutes)=($runtime=~/[^\d]*(\d+)[^\d]*(\d*)/);
@@ -198,7 +198,7 @@ sub getMovieData {
 
    # parse cast 
 
-   my $cast = parseBetween($response, "<h4>Avec ","</h4><br />");
+   my $cast = parseBetween($response, "<h4>Avec ","</h4>");
    $cast = removeTag($cast);
    if (defined $opt_casting){
       my $responsecasting = get "http://www.allocine.fr/film/casting_gen_cfilm=" . $movieid . ".html";
@@ -223,7 +223,7 @@ sub getMovieData {
    $genres = removeTag($genres);
    
    #countries
-   my $countries = parseBetween($response,"<h4>Film ",".</h4>&nbsp;");
+   my $countries = parseBetween($response,"<h4>Film ",".&nbsp;</h4>");
    $countries = removeTag($countries);
 
    # output fields (these field names must match what MythVideo is looking for)
