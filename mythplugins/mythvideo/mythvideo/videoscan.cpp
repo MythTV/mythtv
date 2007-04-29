@@ -13,24 +13,64 @@
 #include "dbaccess.h"
 #include "dirscan.h"
 
+class VideoScannerImp
+{
+  public:
+    VideoScannerImp();
+    ~VideoScannerImp();
+    void doScan(const QStringList &dirs);
+
+  private:
+    typedef std::vector<std::pair<unsigned int, QString> > PurgeList;
+    typedef std::map<QString, bool> FileCheckList;
+
+  private:
+    bool m_ListUnknown;
+    bool m_RemoveAll;
+    bool m_KeepAll;
+
+    MetadataListManager *m_dbmetadata;
+
+  private:
+    void promptForRemoval(unsigned int id, const QString &filename);
+    void verifyFiles(FileCheckList &files, PurgeList &remove);
+    void updateDB(const FileCheckList &add, const PurgeList &remove);
+    void buildFileList(const QString &directory,
+                       const QStringList &imageExtensions,
+                       FileCheckList &filelist);
+};
+
 VideoScanner::VideoScanner()
+{
+    m_imp = new VideoScannerImp();
+}
+
+VideoScanner::~VideoScanner()
+{
+    delete m_imp;
+}
+
+void VideoScanner::doScan(const QStringList &dirs)
+{
+    m_imp->doScan(dirs);
+}
+
+VideoScannerImp::VideoScannerImp() : m_RemoveAll(false), m_KeepAll(false)
 {
     m_dbmetadata = new MetadataListManager;
     MetadataListManager::metadata_list ml;
     MetadataListManager::loadAllFromDatabase(ml);
     m_dbmetadata->setList(ml);
 
-    m_RemoveAll = false;
-    m_KeepAll = false;
     m_ListUnknown = gContext->GetNumSetting("VideoListUnknownFileTypes", 1);
 }
 
-VideoScanner::~VideoScanner()
+VideoScannerImp::~VideoScannerImp()
 {
     delete m_dbmetadata;
 }
 
-void VideoScanner::doScan(const QStringList &dirs)
+void VideoScannerImp::doScan(const QStringList &dirs)
 {
     MythProgressDialog progressDlg(QObject::tr("Searching for video files"),
                                    dirs.size());
@@ -38,23 +78,27 @@ void VideoScanner::doScan(const QStringList &dirs)
     QStringList imageExtensions = QImage::inputFormatList();
     int counter = 0;
 
+    FileCheckList fs_files;
+
     for (QStringList::const_iterator iter = dirs.begin(); iter != dirs.end();
          ++iter)
     {
-        buildFileList(*iter, imageExtensions);
+        buildFileList(*iter, imageExtensions, fs_files);
         progressDlg.setProgress(++counter);
     }
 
     progressDlg.close();
-    verifyFiles();
-    updateDB();
+
+    PurgeList db_remove;
+    verifyFiles(fs_files, db_remove);
+    updateDB(fs_files, db_remove);
 }
 
-void VideoScanner::promptForRemoval(const QString &filename)
+void VideoScannerImp::promptForRemoval(unsigned int id, const QString &filename)
 {
     // TODO: use single DB connection for all calls
     if (m_RemoveAll)
-        m_dbmetadata->purgeByFilename(filename);
+        m_dbmetadata->purgeByID(id);
 
     if (m_KeepAll || m_RemoveAll)
         return;
@@ -76,29 +120,29 @@ void VideoScanner::promptForRemoval(const QString &filename)
             m_KeepAll = true;
             break;
         case 2:
-            m_dbmetadata->purgeByFilename(filename);
+            m_dbmetadata->purgeByID(id);
             break;
         case 3:
             m_RemoveAll = true;
-            m_dbmetadata->purgeByFilename(filename);
+            m_dbmetadata->purgeByID(id);
             break;
     };
 }
 
-
-void VideoScanner::updateDB()
+void VideoScannerImp::updateDB(const FileCheckList &add,
+                               const PurgeList &remove)
 {
     int counter = 0;
     MythProgressDialog progressDlg(QObject::tr("Updating video database"),
-                                   m_VideoFiles.size());
-    VideoLoadedMap::Iterator iter;
+                                   add.size() + remove.size());
 
-    for (iter = m_VideoFiles.begin(); iter != m_VideoFiles.end(); iter++)
+    for (FileCheckList::const_iterator p = add.begin(); p != add.end(); ++p)
     {
-        if (*iter == kFileSystem)
+        // add files not already in the DB
+        if (!p->second)
         {
-            Metadata newFile(iter.key(), VIDEO_COVERFILE_DEFAULT,
-                             Metadata::FilenameToTitle(iter.key()),
+            Metadata newFile(p->first, VIDEO_COVERFILE_DEFAULT,
+                             Metadata::FilenameToTitle(p->first),
                              VIDEO_YEAR_DEFAULT,
                              VIDEO_INETREF_DEFAULT, VIDEO_DIRECTOR_DEFAULT,
                              VIDEO_PLOT_DEFAULT, 0.0, VIDEO_RATING_DEFAULT,
@@ -107,10 +151,12 @@ void VideoScanner::updateDB()
             newFile.dumpToDatabase();
         }
 
-        if (*iter == kDatabase)
-        {
-            promptForRemoval(iter.key());
-        }
+        progressDlg.setProgress(++counter);
+    }
+
+    for (PurgeList::const_iterator p = remove.begin(); p != remove.end(); ++p)
+    {
+        promptForRemoval(p->first, p->second);
 
         progressDlg.setProgress(++counter);
     }
@@ -118,10 +164,10 @@ void VideoScanner::updateDB()
     progressDlg.Close();
 }
 
-void VideoScanner::verifyFiles()
+void VideoScannerImp::verifyFiles(FileCheckList &files, PurgeList &remove)
 {
     int counter = 0;
-    VideoLoadedMap::Iterator iter;
+    FileCheckList::iterator iter;
 
     MythProgressDialog progressDlg(QObject::tr("Verifying video files"),
                                    m_dbmetadata->getList().size());
@@ -134,18 +180,20 @@ void VideoScanner::verifyFiles()
         QString name = (*p)->Filename();
         if (name != QString::null)
         {
-            if ((iter = m_VideoFiles.find(name)) != m_VideoFiles.end())
+            iter = files.find(name);
+            if (iter != files.end())
             {
                 // If it's both on disk and in the database we're done with it.
-                m_VideoFiles.remove(iter);
+                iter->second = true;
             }
             else
             {
                 // If it's only in the database mark it as such for removal
                 // later
-                m_VideoFiles[name] = kDatabase;
+                remove.push_back(std::make_pair((*p)->ID(), name));
             }
         }
+
         progressDlg.setProgress(++counter);
     }
 
@@ -184,7 +232,7 @@ namespace
         {
             (void)file_name;
             if (m_image_ext.find(extension.lower()) == m_image_ext.end())
-                m_video_files[fq_file_name] = kFileSystem;
+                m_video_files[fq_file_name] = false;
         }
 
       private:
@@ -194,12 +242,13 @@ namespace
     };
 }
 
-void VideoScanner::buildFileList(const QString &directory,
-                                 const QStringList &imageExtensions)
+void VideoScannerImp::buildFileList(const QString &directory,
+                                    const QStringList &imageExtensions,
+                                    FileCheckList &filelist)
 {
     FileAssociations::ext_ignore_list ext_list;
     FileAssociations::getFileAssociation().getExtensionIgnoreList(ext_list);
 
-    dirhandler<VideoLoadedMap> dh(m_VideoFiles, imageExtensions);
+    dirhandler<FileCheckList> dh(filelist, imageExtensions);
     ScanVideoDirectory(directory, &dh, ext_list, m_ListUnknown);
 }

@@ -74,15 +74,17 @@ class MetadataListManagerImp
         if (metadata)
         {
             int_to_meta::iterator im = m_id_map.find(metadata->ID());
-            string_to_meta::iterator sm = m_file_map.find(metadata->Filename());
 
-            if (im != m_id_map.end() && sm != m_file_map.end())
+            if (im != m_id_map.end())
             {
                 metadata_list::iterator mdi = im->second;
                 (*mdi)->dropFromDB();
 
                 m_id_map.erase(im);
-                m_file_map.erase(sm);
+                string_to_meta::iterator sm =
+                        m_file_map.find(metadata->Filename());
+                if (sm != m_file_map.end())
+                    m_file_map.erase(sm);
                 m_meta_list.erase(mdi);
                 return true;
             }
