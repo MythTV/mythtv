@@ -750,3 +750,14 @@ void EditMetadataDialog::showMenu()
 
     delete menu;
 }
+
+void EditMetadataDialog::setSaveMetadataOnly()
+{
+    metadataOnly = true;
+
+    if (metadata_button)
+        metadata_button->hide();
+
+    if (albumart_button)
+        albumart_button->hide();
+}

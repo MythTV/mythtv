@@ -27,7 +27,7 @@ class EditMetadataDialog : public MythThemedDialog
     void keyPressEvent(QKeyEvent *e);
     void wireUpTheme();
     void fillWidgets();
-    void setSaveMetadataOnly() { metadataOnly = true; }
+    void setSaveMetadataOnly();
 
   public slots:
 
