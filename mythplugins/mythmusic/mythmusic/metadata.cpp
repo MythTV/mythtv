@@ -1424,6 +1424,9 @@ void AlbumArtImages::findImages(void)
 
     int trackid = m_parent->ID();
 
+    if (trackid == 0)
+        return;
+
     QFileInfo fi(m_parent->Filename());
     QString dir = fi.dirPath(true);
     dir.remove(0, Metadata::GetStartdir().length());
