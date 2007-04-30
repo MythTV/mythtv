@@ -367,9 +367,11 @@ void EITFixUp::FixUK(DBEvent &event) const
         {
             event.subtitle = event.description.left(position + 1);
             event.description = event.description.mid(position + 2);
-            event.subtitle.replace(m_ukPEnd, ""); // Trim trailing '.'
         }
     }
+    // Trim trailing '.'
+    event.title.replace(m_ukPEnd, "");
+    event.subtitle.replace(m_ukPEnd, "");
 
     // Work out the episode numbers (if any)
     bool    series  = false;
