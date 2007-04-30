@@ -100,7 +100,8 @@ class MPUBLIC DVDRingBufferPriv
     uint8_t GetNumAudioChannels(int id);
     void JumpToTitle(bool change) { jumptotitle = change; }
     void SeekCellStart(void);
-    void SetDVDSpeed(const char *device, int speed);
+    void SetDVDSpeed(void);
+    void SetDVDSpeed(int speed);
 
     void SetParent(NuppelVideoPlayer *p) { parent = p; }
 

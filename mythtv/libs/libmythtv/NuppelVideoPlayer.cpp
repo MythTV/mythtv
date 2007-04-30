@@ -3794,6 +3794,16 @@ void NuppelVideoPlayer::DoPlay(void)
 {
     bool skip_changed;
 
+    if (ringBuffer->isDVD())
+    {
+        if (GetDecoder())
+            GetDecoder()->UpdateDVDFramesPlayed();
+        if (play_speed != normal_speed)
+            ringBuffer->DVD()->SetDVDSpeed(-1);
+        else
+            ringBuffer->DVD()->SetDVDSpeed();
+    }
+
     if (play_speed > 0.0f && play_speed <= 3.0f)
     {
         skip_changed = (ffrew_skip != 1);

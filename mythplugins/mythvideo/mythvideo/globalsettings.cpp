@@ -329,7 +329,7 @@ HostSlider *DVDBookmarkDays()
 
 HostSlider *SetDVDDriveSpeed()
 {
-    HostSlider *gs = new HostSlider("DVDDriveSpeed",2, 12, 2);
+    HostSlider *gs = new HostSlider("DVDDriveSpeed", 2, 12, 12);
     gs->setLabel(QObject::tr("DVD Drive Speed"));
     gs->setValue(2);
     gs->setHelpText(QObject::tr("Set DVD Drive Speed during DVD Playback. "

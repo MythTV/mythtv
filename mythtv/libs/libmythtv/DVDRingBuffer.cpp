@@ -72,7 +72,7 @@ void DVDRingBufferPriv::CloseDVD(void)
 {
     if (dvdnav)
     {
-        SetDVDSpeed(dvdFilename, -1);
+        SetDVDSpeed(-1);
         dvdnav_close(dvdnav);
         dvdnav = NULL;
     }            
@@ -135,7 +135,6 @@ void DVDRingBufferPriv::GetDescForPos(QString &desc) const
 bool DVDRingBufferPriv::OpenFile(const QString &filename) 
 {
     dvdFilename = filename.ascii();
-    int dvdDriveSpeed = gContext->GetNumSetting("DVDDriveSpeed", 2);
     dvdnav_status_t dvdRet = dvdnav_open(&dvdnav, filename.local8Bit());
     if (dvdRet == DVDNAV_STATUS_ERR)
     {
@@ -189,15 +188,12 @@ bool DVDRingBufferPriv::OpenFile(const QString &filename)
         dvdnav_get_serial_number(dvdnav, &serialnum);
         dvdname = QString(name);
         serialnumber = QString(serialnum);
-    
-        SetDVDSpeed(dvdFilename, dvdDriveSpeed);
-
+        SetDVDSpeed(); 
         return true;
     }
 }
 
-/** \fn DVDRingBufferPriv::GetReadPosition()
- *  \brief returns current position in the PGC.
+/** \brief returns current position in the PGC.
  */
 long long DVDRingBufferPriv::GetReadPosition(void)
 {
@@ -1150,10 +1146,19 @@ void DVDRingBufferPriv::SeekCellStart(void)
     Seek(cellStart);
 }
 
-/*
- * \brief obtained from the mplayer project
+/** \brief set dvd speed. uses the DVDDriveSpeed Setting from the settings 
+ * table
  */
-void DVDRingBufferPriv::SetDVDSpeed(const char *device, int speed)
+void DVDRingBufferPriv::SetDVDSpeed(void)
+{
+    int dvdDriveSpeed = gContext->GetNumSetting("DVDDriveSpeed", 12);
+    SetDVDSpeed(dvdDriveSpeed);
+}
+
+/** \brief set dvd speed. obtained from mplayer project
+ *  \param dvd drive speed. example if speed is 1, then function sets dvd speed to 2048kb/s
+ */
+void DVDRingBufferPriv::SetDVDSpeed(int speed)
 {
 #if defined(__linux__) && defined(SG_IO) && defined(GPCMD_SET_STREAMING)
     int fd;
@@ -1163,12 +1168,15 @@ void DVDRingBufferPriv::SetDVDSpeed(const char *device, int speed)
     struct sg_io_hdr sghdr;
     struct stat st;
 
+    const char *device = dvdFilename;
     memset(&sghdr, 0, sizeof(sghdr));
     memset(buffer, 0, sizeof(buffer));
     memset(sense, 0, sizeof(sense));
     memset(cmd, 0, sizeof(cmd));
     memset(&st, 0, sizeof(st));
 
+    QMutexLocker lock(&seekLock);
+   
     if (stat(device, &st) == -1 ) 
     {
         VERBOSE(VB_PLAYBACK, LOC_ERR +
