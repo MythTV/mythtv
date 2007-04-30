@@ -162,6 +162,16 @@ HostSpinBox *VideoImageCacheSize()
     return hsb;
 }
 
+HostCheckBox *VideoTreeRemeber()
+{
+    HostCheckBox *gc = new HostCheckBox("mythvideo.VideoTreeRemember");
+    gc->setLabel(QObject::tr("Video Tree remembers last selected position"));
+    gc->setValue(false);
+    gc->setHelpText(QObject::tr("If set, the current position in the Video "
+                                "Tree is persistent."));
+    return gc;
+}
+
 HostLineEdit *SearchListingsCommand()
 {
     HostLineEdit *gc = new HostLineEdit("MovieListCommandLine");
@@ -550,6 +560,7 @@ VideoGeneralSettings::VideoGeneralSettings()
     general2->addChild(VideoNewBrowsable());
     general2->addChild(VideoSortIgnoresCase());
     general2->addChild(VideoDBFolderView());
+    general2->addChild(VideoTreeRemeber());
     general2->addChild(VideoImageCacheSize());
     addChild(general2);
 

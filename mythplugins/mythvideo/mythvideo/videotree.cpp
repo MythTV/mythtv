@@ -37,7 +37,9 @@ class VideoTreeImp
     UITextType *m_level;
 
     bool m_use_arrow_accel;
+    bool m_remember_position;
 
+  public:
     VideoTreeImp() :
         video_tree_list(NULL), video_title(NULL),
         video_file(NULL), video_plot(NULL), video_player(NULL),
@@ -47,6 +49,8 @@ class VideoTreeImp
         m_category(NULL), m_level(NULL)
     {
         m_use_arrow_accel = gContext->GetNumSetting("UseArrowAccels", 1);
+        m_remember_position =
+                gContext->GetNumSetting("mythvideo.VideoTreeRemember", 0);
     }
 
     void update_info(const Metadata *item)
@@ -233,10 +237,24 @@ VideoTree::VideoTree(MythMainWindow *lparent, const QString &window_name,
     m_video_list->setCurrentVideoFilter(video_filter);
 
     buildVideoList();
+
+    if (m_imp->m_remember_position)
+    {
+        QString routePath =
+                gContext->GetSetting("mythvideo.VideoTreeLastActive", "");
+        m_imp->video_tree_list->tryToSetCurrent(QStringList::split("\n",
+                                                                   routePath));
+        m_imp->video_tree_list->enter();
+    }
 }
 
 VideoTree::~VideoTree()
 {
+    if (m_imp->m_remember_position)
+    {
+        QStringList path = m_imp->video_tree_list->getRouteToCurrent();
+        gContext->SaveSetting("mythvideo.VideoTreeLastActive", path.join("\n"));
+    }
 }
 
 void VideoTree::keyPressEvent(QKeyEvent *e)
