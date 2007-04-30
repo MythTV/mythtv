@@ -193,18 +193,18 @@ namespace fake_unnamed
         void addEntry(const smart_meta_node &entry)
         {
             entry->setParent(this);
-            m_entires.push_back(entry);
+            m_entries.push_back(entry);
         }
 
         void clear()
         {
             m_subdirs.clear();
-            m_entires.clear();
+            m_entries.clear();
         }
 
         bool empty() const
         {
-            return m_subdirs.empty() && m_entires.empty();
+            return m_subdirs.empty() && m_entries.empty();
         }
 
         int subdir_count() const {
@@ -215,7 +215,7 @@ namespace fake_unnamed
         void sort(DirSort dir_sort, EntrySort entry_sort)
         {
             m_subdirs.sort(dir_sort);
-            m_entires.sort(entry_sort);
+            m_entries.sort(entry_sort);
 
             for (meta_dir_list::iterator p = m_subdirs.begin();
                  p != m_subdirs.end(); ++p)
@@ -246,29 +246,48 @@ namespace fake_unnamed
 
         entry_iterator entries_begin()
         {
-            return m_entires.begin();
+            return m_entries.begin();
         }
 
         entry_iterator entries_end()
         {
-            return m_entires.end();
+            return m_entries.end();
         }
 
         const_entry_iterator entries_begin() const
         {
-            return m_entires.begin();
+            return m_entries.begin();
         }
 
         const_entry_iterator entries_end() const
         {
-            return m_entires.end();
+            return m_entries.end();
+        }
+
+        // Returns true if this directory or any of its subdirectories
+        // have entries. TODO: cache this value
+        bool has_entries() const
+        {
+            bool ret = m_entries.size();
+
+            if (!ret)
+            {
+                for (meta_dir_list::const_iterator p = m_subdirs.begin();
+                     p != m_subdirs.end(); ++p)
+                {
+                    ret = (*p)->has_entries();
+                    if (ret) break;
+                }
+            }
+
+            return ret;
         }
 
       private:
         QString m_path;
         QString m_name;
         meta_dir_list m_subdirs;
-        meta_data_list m_entires;
+        meta_data_list m_entries;
     };
 
     /// metadata sort functor
@@ -631,14 +650,17 @@ void VideoListImp::build_generic_tree(GenericTree *dst, meta_dir_node *src,
     for (meta_dir_node::const_dir_iterator dir = src->dirs_begin();
          dir != src->dirs_end(); ++dir)
     {
-        GenericTree *t = addDirNode(dst, (*dir)->getName(), include_updirs);
-        t->setAttribute(kFolderPath, m_folder_id);
-        m_folder_id_to_path.
-                insert(id_string_map::value_type(m_folder_id,
-                                                 (*dir)->getFQPath()));
-        ++m_folder_id;
+        if ((*dir)->has_entries())
+        {
+            GenericTree *t = addDirNode(dst, (*dir)->getName(), include_updirs);
+            t->setAttribute(kFolderPath, m_folder_id);
+            m_folder_id_to_path.
+                    insert(id_string_map::value_type(m_folder_id,
+                                                     (*dir)->getFQPath()));
+            ++m_folder_id;
 
-        build_generic_tree(t, dir->get(), include_updirs);
+            build_generic_tree(t, dir->get(), include_updirs);
+        }
     }
 
     for (meta_dir_node::const_entry_iterator entry = src->entries_begin();
