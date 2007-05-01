@@ -40,7 +40,6 @@ public slots:
     void newWindowRequested(const KURL &url, const KParts::URLArgs &args, 
                                   const KParts::WindowArgs &windowArgs, 
                                   KParts::ReadOnlyPart *&part);
-
 private slots:
     void openMenu();
     void actionBack();
@@ -56,6 +55,9 @@ private slots:
     
     // new URL dialog
     void showEnterURLDialog();
+    
+    // Use page title for tabLabel
+    void pageCompleted(WebPage *page);
 
 private:
     int z,w,h;

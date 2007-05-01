@@ -38,6 +38,8 @@ signals:
   void newUrlRequested(const KURL &url, const KParts::URLArgs &args);
   void newWindowRequested(const KURL &, const KParts::URLArgs &, 
                                   const KParts::WindowArgs &, KParts::ReadOnlyPart *&);
+  void pageCompleted(WebPage *page);
+  
 private:
   QString sUrl;
 };

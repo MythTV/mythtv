@@ -38,6 +38,7 @@
 #include "mythtv/mythdbcon.h"
 #include "mythtv/mythwidgets.h"
 
+
 using namespace std;
 
 TabView::TabView(MythMainWindow *parent, const char *name, QStringList urls, 
@@ -72,20 +73,22 @@ TabView::TabView(MythMainWindow *parent, const char *name, QStringList urls,
     }
 
     widgetHistory.setAutoDelete(true);
-    
-    for (QStringList::Iterator it = urls.begin(); it != urls.end(); ++it) {
+
+    for (QStringList::Iterator it = urls.begin(); it != urls.end(); ++it) 
+    {
         WebPage *page = new WebPage(*it,z,f);
-        
+
         connect(page,SIGNAL( newUrlRequested(const KURL &,const KParts::URLArgs &)),
-           this, SLOT( newUrlRequested(const KURL &,const KParts::URLArgs &)));
-        
+                this, SLOT( newUrlRequested(const KURL &,const KParts::URLArgs &)));
+
         connect(page, SIGNAL( newWindowRequested( const KURL &, const KParts::URLArgs &, 
                               const KParts::WindowArgs &, KParts::ReadOnlyPart *&) ), 
                 this, SLOT( newWindowRequested( const KURL &, const KParts::URLArgs &, 
                                   const KParts::WindowArgs &, KParts::ReadOnlyPart *&) ) );
+        connect(page, SIGNAL( pageCompleted(WebPage *) ),
+                this, SLOT( pageCompleted(WebPage *) ) );
 
-        
-        mytab->addTab(page,*it);
+        mytab->addTab(page, tr("Loading..."));
 
 /* moved this into show event processing
         // Hide Scrollbars - Why doesn't this work??? TSH 1/20/04
@@ -99,7 +102,7 @@ TabView::TabView(MythMainWindow *parent, const char *name, QStringList urls,
         QPtrStack<QWidget> *currWidgetHistory = new QPtrStack<QWidget>;
         currWidgetHistory->setAutoDelete(true);
         widgetHistory.append(currWidgetHistory);
-        
+
         QValueStack<QString> *currUrlHistory = new QValueStack<QString>;
         urlHistory.append(currUrlHistory);
     }
@@ -114,6 +117,28 @@ TabView::TabView(MythMainWindow *parent, const char *name, QStringList urls,
 
 TabView::~TabView()
 {
+}
+
+void TabView::pageCompleted(WebPage *page)
+{
+    // Strip leading and trailing whitespace from page title
+    QString title = 
+            page->browser->htmlDocument().title().string().stripWhiteSpace();
+		
+    if (title.isEmpty())
+    {
+        // Title empty, use pretty form of url,
+        // removes passwords and usernames
+        mytab->setTabLabel(page,
+                        page->browser->toplevelURL().prettyURL(-1));
+    }
+    else
+    {
+       // Title defined, set tab text to title
+       // compress multiple whitespace
+       mytab->setTabLabel(page,
+                       title.replace( QRegExp("\\s+"), " ") );
+    }
 }
 
 void TabView::openMenu()
@@ -389,27 +414,29 @@ void TabView::showEnterURLDialog()
 void TabView::newPage(QString sURL)
 {
     int index = mytab->currentPageIndex();
-    
+
     WebPage *page = new WebPage(sURL,z,f);
-    
+
     connect(page,SIGNAL( newUrlRequested(const KURL &,const KParts::URLArgs&)),
-        this, SLOT( newUrlRequested(const KURL &,const KParts::URLArgs &)));
+            this, SLOT( newUrlRequested(const KURL &,const KParts::URLArgs &)));
 
     connect(page, SIGNAL( newWindowRequested( const KURL &, const KParts::URLArgs &, 
                   const KParts::WindowArgs &, KParts::ReadOnlyPart *&) ), 
             this, SLOT( newWindowRequested( const KURL &, const KParts::URLArgs &, 
                                   const KParts::WindowArgs &, KParts::ReadOnlyPart *&) ) );
+    connect(page, SIGNAL( pageCompleted(WebPage *) ),
+            this, SLOT( pageCompleted(WebPage *) ) );
 
-    mytab->insertTab(page, sURL, index);
+    mytab->insertTab(page, tr("Loading..."), index);
     mytab->setCurrentPage(index);
 
     QPtrStack<QWidget> *currWidgetHistory = new QPtrStack<QWidget>;
     currWidgetHistory->setAutoDelete(true);
     widgetHistory.append(currWidgetHistory);
-    
+
     QValueStack<QString> *currUrlHistory = new QValueStack<QString>;
     urlHistory.append(currUrlHistory);
-    
+
     hadFocus = page;
 }
 
@@ -422,7 +449,9 @@ void TabView::newUrlRequested(const KURL &url, const KParts::URLArgs &args)
         // if the tab title is blank then a new blank web page has already been 
         // created for a popup window just need to open the URL 
         ((WebPage*)mytab->currentPage())->openURL(url.url());
-        mytab->setTabLabel(mytab->currentPage(), url.url());
+        mytab->setTabLabel(mytab->currentPage(), tr("Loading..."));
+	connect( ((WebPage*)mytab->currentPage()), SIGNAL( pageCompleted(WebPage *) ),
+		this, SLOT( pageCompleted(WebPage *) ) );
     }
     else
     {    
@@ -435,7 +464,7 @@ void TabView::newUrlRequested(const KURL &url, const KParts::URLArgs &args)
     
         WebPage *page = new WebPage(url.url(),args,((WebPage*)curr)->zoomFactor,f);
 
-        mytab->insertTab(page,url.url(),index);
+        mytab->insertTab(page, tr("Loading..."), index);
         mytab->removePage(curr);
         mytab->setCurrentPage(index);
         
@@ -446,6 +475,8 @@ void TabView::newUrlRequested(const KURL &url, const KParts::URLArgs &args)
                               const KParts::WindowArgs &, KParts::ReadOnlyPart *&) ), 
                 this, SLOT( newWindowRequested( const KURL &, const KParts::URLArgs &, 
                                   const KParts::WindowArgs &, KParts::ReadOnlyPart *&) ) );
+	connect( page, SIGNAL( pageCompleted(WebPage *) ),
+		this, SLOT( pageCompleted(WebPage *) ) );
     }
 }
 

@@ -41,7 +41,6 @@
 #include <khtmlview.h>
 #include <kio/jobclasses.h>
 
-
 using namespace std;
 
 WebPage::WebPage (const char *location, int zoom, WFlags flags) : QWidget(NULL,NULL,flags)
@@ -67,6 +66,8 @@ WebPage::WebPage (const char *location, int zoom, WFlags flags) : QWidget(NULL,N
     connect( browser,SIGNAL(started(KIO::Job*)),
          this,SLOT(started(KIO::Job*)));
     connect( browser,SIGNAL(completed()),
+         this,SLOT(completed()));
+    connect( browser,SIGNAL(completed(bool)),
          this,SLOT(completed()));
 
     browser->setStandardFont("Arial");
@@ -108,6 +109,8 @@ WebPage::WebPage (const char *location, const KParts::URLArgs &args, int zoom, W
     connect( browser,SIGNAL(started(KIO::Job*)),
          this,SLOT(started(KIO::Job*)));
     connect( browser,SIGNAL(completed()),
+         this,SLOT(completed()));
+    connect( browser,SIGNAL(completed(bool)),
          this,SLOT(completed()));
 
     browser->setStandardFont("Arial");
@@ -206,6 +209,8 @@ void WebPage::completed()
     }
     
     setFocus();
+    
+    emit pageCompleted( this );
 }    
 
 void WebPage::timerTimeout()
