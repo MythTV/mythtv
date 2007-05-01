@@ -569,6 +569,10 @@ bool TabView::eventFilter(QObject* object, QEvent* event)
                 actionNextTab();
                 return true;
             }    
+            else if (action == "PREVTAB") {
+                actionPrevTab();
+                return true;
+            }
             else if (action == "DELETETAB") {
                 actionRemoveTab();
                 return true;
