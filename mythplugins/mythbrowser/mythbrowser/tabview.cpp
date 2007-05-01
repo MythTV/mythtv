@@ -50,13 +50,13 @@ TabView::TabView(MythMainWindow *parent, const char *name, QStringList urls,
     menu = NULL;
 
     mytab = new QTabWidget(this);
-    mytab->setGeometry(0,0,width,height);
+    mytab->setGeometry(0, 0, width, height);
     QRect rect = mytab->childrenRect();
 
-    z=zoom;
-    w=width;
-    h=height-rect.height();
-    f=flags;
+    z = zoom;
+    w = width;
+    h = height - rect.height();
+    f = flags;
 
     // Qt doesn't give you mousebutton states from QWheelEvent->state()
     // so we have to remember the last mousebutton press/release state
@@ -68,36 +68,26 @@ TabView::TabView(MythMainWindow *parent, const char *name, QStringList urls,
     scrollSpeed = gContext->GetNumSetting("WebBrowserScrollSpeed", 4);
     scrollPage = gContext->GetNumSetting("WebBrowserScrollMode", 1);
     hideScrollbars = gContext->GetNumSetting("WebBrowserHideScrollbars", 0);
-    if (scrollPage == 1) {
+    if (scrollPage == 1) 
        scrollSpeed *= -1;  // scroll page vs background
-    }
 
     widgetHistory.setAutoDelete(true);
 
-    for (QStringList::Iterator it = urls.begin(); it != urls.end(); ++it) 
+    for (QStringList::Iterator it = urls.begin(); it != urls.end(); ++it)
     {
-        WebPage *page = new WebPage(*it,z,f);
+        WebPage *page = new WebPage(*it, z, f);
 
-        connect(page,SIGNAL( newUrlRequested(const KURL &,const KParts::URLArgs &)),
-                this, SLOT( newUrlRequested(const KURL &,const KParts::URLArgs &)));
+        connect(page,SIGNAL(newUrlRequested(const KURL &,const KParts::URLArgs &)),
+                this, SLOT(newUrlRequested(const KURL &,const KParts::URLArgs &)));
 
-        connect(page, SIGNAL( newWindowRequested( const KURL &, const KParts::URLArgs &, 
-                              const KParts::WindowArgs &, KParts::ReadOnlyPart *&) ), 
-                this, SLOT( newWindowRequested( const KURL &, const KParts::URLArgs &, 
-                                  const KParts::WindowArgs &, KParts::ReadOnlyPart *&) ) );
-        connect(page, SIGNAL( pageCompleted(WebPage *) ),
-                this, SLOT( pageCompleted(WebPage *) ) );
+        connect(page, SIGNAL(newWindowRequested( const KURL &, const KParts::URLArgs &,
+                             const KParts::WindowArgs &, KParts::ReadOnlyPart *&)),
+                this, SLOT(newWindowRequested( const KURL &, const KParts::URLArgs &,
+                           const KParts::WindowArgs &, KParts::ReadOnlyPart *&)));
+        connect(page, SIGNAL(pageCompleted(WebPage *)),
+                this, SLOT(pageCompleted(WebPage *)));
 
         mytab->addTab(page, tr("Loading..."));
-
-/* moved this into show event processing
-        // Hide Scrollbars - Why doesn't this work??? TSH 1/20/04
-        if (hideScrollbars) {
-            KHTMLView* view = page->browser->view();
-            view->setVScrollBarMode(QScrollView::AlwaysOff);
-            view->setHScrollBarMode(QScrollView::AlwaysOff);
-        }
-*/
 
         QPtrStack<QWidget> *currWidgetHistory = new QPtrStack<QWidget>;
         currWidgetHistory->setAutoDelete(true);
@@ -124,7 +114,7 @@ void TabView::pageCompleted(WebPage *page)
     // Strip leading and trailing whitespace from page title
     QString title = 
             page->browser->htmlDocument().title().string().stripWhiteSpace();
-		
+
     if (title.isEmpty())
     {
         // Title empty, use pretty form of url,
@@ -147,14 +137,14 @@ void TabView::openMenu()
 
     hadFocus = qApp->focusWidget();
 
-    menu = new MythPopupBox(GetMythMainWindow(),"popupMenu");
+    menu = new MythPopupBox(GetMythMainWindow(), "popupMenu");
     menu->addLabel(tr("MythBrowser Menu"));
 
     if(mytab->count()==1) 
     {
         temp = menu->addButton(tr("Back"), this, SLOT(actionBack()));
-    } 
-    else 
+    }
+    else
     {
         temp = menu->addButton(tr("Next Tab"), this, SLOT(actionNextTab()));
         menu->addButton(tr("Prev Tab"), this, SLOT(actionPrevTab()));
@@ -172,12 +162,12 @@ void TabView::openMenu()
 
 void TabView::cancelMenu()
 {
-    if (menuIsOpen) 
+    if (menuIsOpen)
     {
         menu->hide();
         delete menu;
-        menu=NULL;
-        menuIsOpen=false;
+        menu = NULL;
+        menuIsOpen = false;
         hadFocus->setFocus();
     }
 }
@@ -188,46 +178,54 @@ void TabView::handleMouseAction(QString action)
 
     // speed up mouse movement if the same key is held down
     if (action == lastMouseAction && 
-           lastMouseActionTime.msecsTo(QTime::currentTime()) < 500) {
+           lastMouseActionTime.msecsTo(QTime::currentTime()) < 500)
+    {
         lastMouseActionTime = QTime::currentTime();
         mouseKeyCount++;
         if (mouseKeyCount > 5)
             step = 25;
     }
-    else {    
+    else
+    {
         lastMouseAction = action;
         lastMouseActionTime = QTime::currentTime();
         mouseKeyCount = 1;
     }
-    
-    if (action == "MOUSEUP") {    
+
+    if (action == "MOUSEUP") 
+    {
         QPoint curPos = QCursor::pos();
         QCursor::setPos(curPos.x(), curPos.y() - step);
-    }  
-    else if (action == "MOUSELEFT") {    
+    }
+    else if (action == "MOUSELEFT") 
+    {
         QPoint curPos = QCursor::pos();
         QCursor::setPos(curPos.x() - step, curPos.y());
     }
-    else if (action == "MOUSERIGHT") {    
+    else if (action == "MOUSERIGHT") 
+    {
         QPoint curPos = QCursor::pos();
         QCursor::setPos(curPos.x() + step, curPos.y());
     }
-    else if (action == "MOUSEDOWN") {    
+    else if (action == "MOUSEDOWN") 
+    {
         QPoint curPos = QCursor::pos();
         QCursor::setPos(curPos.x(), curPos.y() + step);
     }
-    else if (action == "MOUSELEFTBUTTON") {    
+    else if (action == "MOUSELEFTBUTTON") 
+    {
         QPoint curPos = mouse->pos();
         QWidget *widget = QApplication::widgetAt(curPos, TRUE);
-        
-        if (widget) {
+
+        if (widget) 
+        {
             curPos = widget->mapFromGlobal(curPos);
-        
-            QMouseEvent *me = new QMouseEvent(QEvent::MouseButtonPress, curPos, 
+
+            QMouseEvent *me = new QMouseEvent(QEvent::MouseButtonPress, curPos,
                                 Qt::LeftButton, Qt::LeftButton);
-            QApplication::postEvent(widget, me);                        
-                        
-            me = new QMouseEvent(QEvent::MouseButtonRelease, curPos, 
+            QApplication::postEvent(widget, me);
+
+            me = new QMouseEvent(QEvent::MouseButtonRelease, curPos,
                                 Qt::LeftButton, Qt::NoButton);
             QApplication::postEvent(widget, me); 
         }
@@ -257,22 +255,22 @@ void TabView::actionPrevTab()
 void TabView::actionRemoveTab()
 {
     cancelMenu();
-    
+
     // don't remove the last tab
     if (mytab->count() <= 1)
         return;
-        
+
     int index = mytab->currentPageIndex();
-    
+
     // delete web pages stored in history 
     widgetHistory.remove(index);
     urlHistory.remove(index);
-    
+
     // delete current web page
     QWidget *curr = mytab->currentPage();
     mytab->removePage(curr);
     delete curr;
-    
+
     // move to next/last tab
     if (index >= mytab->count())
         index = mytab->count() - 1;
@@ -334,7 +332,7 @@ void TabView::actionAddBookmark()
     }
 
     delete popup;
-    
+
     hadFocus->setFocus();
 }
 
@@ -443,45 +441,47 @@ void TabView::newPage(QString sURL)
 void TabView::newUrlRequested(const KURL &url, const KParts::URLArgs &args)
 {
     int index = mytab->currentPageIndex();
-    
+
     if (mytab->tabLabel(mytab->currentPage()) == "")
     {
         // if the tab title is blank then a new blank web page has already been 
         // created for a popup window just need to open the URL 
         ((WebPage*)mytab->currentPage())->openURL(url.url());
+
         mytab->setTabLabel(mytab->currentPage(), tr("Loading..."));
-	connect( ((WebPage*)mytab->currentPage()), SIGNAL( pageCompleted(WebPage *) ),
-		this, SLOT( pageCompleted(WebPage *) ) );
+
+        connect(((WebPage*)mytab->currentPage()), SIGNAL( pageCompleted(WebPage *)),
+                this, SLOT(pageCompleted(WebPage *)));
     }
     else
-    {    
+    {
         QPtrStack<QWidget> *curWidgetHistory = widgetHistory.at(index);
         QValueStack<QString> *curUrlHistory = urlHistory.at(index);
-    
+
         QWidget *curr = mytab->currentPage();
         curWidgetHistory->push(curr);
         curUrlHistory->push(mytab->label(index));
-    
+
         WebPage *page = new WebPage(url.url(),args,((WebPage*)curr)->zoomFactor,f);
 
         mytab->insertTab(page, tr("Loading..."), index);
         mytab->removePage(curr);
         mytab->setCurrentPage(index);
-        
+
         connect(page,SIGNAL( newUrlRequested(const KURL &,const KParts::URLArgs &)),
                 this, SLOT( newUrlRequested(const KURL &,const KParts::URLArgs &)));
-        
-        connect(page, SIGNAL( newWindowRequested( const KURL &, const KParts::URLArgs &, 
-                              const KParts::WindowArgs &, KParts::ReadOnlyPart *&) ), 
-                this, SLOT( newWindowRequested( const KURL &, const KParts::URLArgs &, 
+
+        connect(page, SIGNAL( newWindowRequested( const KURL &, const KParts::URLArgs &,
+                              const KParts::WindowArgs &, KParts::ReadOnlyPart *&) ),
+                this, SLOT( newWindowRequested( const KURL &, const KParts::URLArgs &,
                                   const KParts::WindowArgs &, KParts::ReadOnlyPart *&) ) );
-	connect( page, SIGNAL( pageCompleted(WebPage *) ),
-		this, SLOT( pageCompleted(WebPage *) ) );
+        connect( page, SIGNAL( pageCompleted(WebPage *) ),
+                this, SLOT( pageCompleted(WebPage *) ) );
     }
 }
 
-void TabView::newWindowRequested(const KURL &, const KParts::URLArgs &, 
-                                 const KParts::WindowArgs &, 
+void TabView::newWindowRequested(const KURL &, const KParts::URLArgs &,
+                                 const KParts::WindowArgs &,
                                  KParts::ReadOnlyPart *&part)
 {
     newPage("");
@@ -490,13 +490,15 @@ void TabView::newWindowRequested(const KURL &, const KParts::URLArgs &,
 
 bool TabView::eventFilter(QObject* object, QEvent* event)
 {
-    object=object;
+    object = object;
 
-    if (event->type() == QEvent::MouseButtonPress) {
+    if (event->type() == QEvent::MouseButtonPress) 
+    {
         QMouseEvent* me = (QMouseEvent*)event;
 
-        lastButtonState = me->stateAfter(); 
-        if (me->button() == Qt::RightButton) {
+        lastButtonState = me->stateAfter();
+        if (me->button() == Qt::RightButton)
+        {
             if (menuIsOpen)
                 emit closeMenu();
             else
@@ -505,17 +507,20 @@ bool TabView::eventFilter(QObject* object, QEvent* event)
         }
     }
 
-    if (event->type() == QEvent::MouseButtonRelease) {
+    if (event->type() == QEvent::MouseButtonRelease) 
+    {
         QMouseEvent* me = (QMouseEvent*)event;
-        lastButtonState = me->stateAfter(); 
+        lastButtonState = me->stateAfter();
     }
 
     QScrollView *view=((WebPage*)mytab->currentPage())->browser->view();
-    if (event->type() == QEvent::Show) {
+    if (event->type() == QEvent::Show) 
+    {
         // hide scrollbars - kind of a hack to do it on a show event but 
         // for some reason I can't get it to work upon creation of the page 
         //   - TSH
-        if (hideScrollbars) {
+        if (hideScrollbars) 
+        {
             QScrollView *view=((WebPage*)mytab->currentPage())->browser->view();
             view->setVScrollBarMode(QScrollView::AlwaysOff);
             view->setHScrollBarMode(QScrollView::AlwaysOff);
@@ -524,9 +529,10 @@ bool TabView::eventFilter(QObject* object, QEvent* event)
 
     // MouseMove while middlebutton pressed pans page
     int deltax = 0, deltay = 0;
-    if (event->type() == QEvent::MouseMove) {
+    if (event->type() == QEvent::MouseMove) 
+    {
         QMouseEvent* me = (QMouseEvent*)event;
-        lastButtonState = me->stateAfter(); 
+        lastButtonState = me->stateAfter();
         deltax = me->globalX() - lastPosX;
         deltay = me->globalY() - lastPosY;
         deltax *= scrollSpeed;
@@ -544,23 +550,28 @@ bool TabView::eventFilter(QObject* object, QEvent* event)
     }
 
     // MouseWheel scrolling while middlebutton/ctrlkey pressed to zoom in/out
-    if (event->type() == QEvent::Wheel) {
+    if (event->type() == QEvent::Wheel) 
+    {
         QWheelEvent* we = (QWheelEvent*)event;
-        if (lastButtonState & MidButton || we->state() & AltButton) {
-            if (we->delta() > 0) {
+        if (lastButtonState & MidButton || we->state() & AltButton) 
+        {
+            if (we->delta() > 0) 
+            {
                 we->accept();
                 ((WebPage*)mytab->currentPage())->zoomIn();
                 return true;
-            } else if (we->delta() < 0)  {
+            }
+            else if (we->delta() < 0)  
+            {
                 we->accept();
                 ((WebPage*)mytab->currentPage())->zoomOut();
                 return true;
             }
         }
-        else if(we->orientation()==Qt::Horizontal)
+        else if (we->orientation()==Qt::Horizontal)
         {
             // add back button
-            if(we->delta()>0)
+            if (we->delta() > 0)
             {
                 actionBack();
                 return(true);
@@ -570,64 +581,78 @@ bool TabView::eventFilter(QObject* object, QEvent* event)
 
     if (menuIsOpen)
         return false;
-    
-    if (event->type() == QEvent::KeyPress) {
+
+    if (event->type() == QEvent::KeyPress)
+    {
         QKeyEvent* ke = (QKeyEvent*)event;
 
-        QKeyEvent tabKey(ke->type(), Key_Tab, '\t', ke->state(),QString::null, ke->isAutoRepeat(), ke->count());
-        QKeyEvent shiftTabKey(ke->type(), Key_Tab, '\t', ke->state()|Qt::ShiftButton,QString::null, ke->isAutoRepeat(), ke->count());
-        QKeyEvent returnKey(ke->type(), Key_Return, '\r', ke->state(),QString::null, ke->isAutoRepeat(), ke->count());
+        QKeyEvent tabKey(ke->type(), Key_Tab, '\t', ke->state(), QString::null,
+                         ke->isAutoRepeat(), ke->count());
+
+        QKeyEvent shiftTabKey(ke->type(), Key_Tab, '\t',
+                              ke->state()|Qt::ShiftButton,QString::null,
+                              ke->isAutoRepeat(), ke->count());
+
+        QKeyEvent returnKey(ke->type(), Key_Return, '\r', ke->state(),
+                            QString::null, ke->isAutoRepeat(), ke->count());
 
         QStringList actions;
         GetMythMainWindow()->TranslateKeyPress("Browser", ke, actions);
-   
+
         bool handled = false;
         for (unsigned int i = 0; i < actions.size() && !handled; i++)
         {
             QString action = actions[i];
             handled = true;
 
-            if (action == "TOGGLEINPUT") {
+            if (action == "TOGGLEINPUT") 
+            {
                 inputToggled = !inputToggled;
-                return true;
-            }    
-            
-            // if input is toggled all input goes to the web page
-            if (inputToggled)
-                return false;
-            
-            if (action == "NEXTTAB") {
-                actionNextTab();
-                return true;
-            }    
-            else if (action == "PREVTAB") {
-                actionPrevTab();
-                return true;
-            }
-            else if (action == "DELETETAB") {
-                actionRemoveTab();
                 return true;
             }
 
-            else if (action == "BACK") {
+            // if input is toggled all input goes to the web page
+            if (inputToggled)
+                return false;
+
+            if (action == "NEXTTAB") 
+            {
+                actionNextTab();
+                return true;
+            }
+            else if (action == "PREVTAB")
+            {
+                actionPrevTab();
+                return true;
+            }
+            else if (action == "DELETETAB")
+            {
+                actionRemoveTab();
+                return true;
+            }
+            else if (action == "BACK")
+            {
                 actionBack();
                 return true;
             }
-            else if (action == "FOLLOWLINK") {
+            else if (action == "FOLLOWLINK")
+            {
                 *ke = returnKey;
             }
-            else if (action == "ZOOMIN") {
+            else if (action == "ZOOMIN")
+            {
                 actionZoomIn();
                 return true;
-            }    
-            else if (action == "ZOOMOUT") {
+            }
+            else if (action == "ZOOMOUT")
+            {
                 actionZoomOut();
                 return true;
-            }    
+            }
             else if (action == "MOUSEUP" || action == "MOUSEDOWN" || 
                      action == "MOUSELEFT" || action == "MOUSERIGHT" ||
-                     action == "MOUSELEFTBUTTON") {    
-                handleMouseAction(action);         
+                     action == "MOUSELEFTBUTTON") {
+                handleMouseAction(action);
                 return true;
             }
             else if (action == "PREVIOUSLINK")
@@ -636,11 +661,13 @@ bool TabView::eventFilter(QObject* object, QEvent* event)
                 *ke = tabKey;
             else if (action == "ESCAPE")
                 exit(0);
-            else if (action == "INFO") {
+            else if (action == "INFO")
+            {
                 showEnterURLDialog();
                 return true;
-            }    
-            else if (action == "MENU") {
+            }
+            else if (action == "MENU") 
+            {
                 emit menuPressed();
                 return true;
             }

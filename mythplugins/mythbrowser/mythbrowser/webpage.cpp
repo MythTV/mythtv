@@ -43,35 +43,38 @@
 
 using namespace std;
 
-WebPage::WebPage (const char *location, int zoom, WFlags flags) : QWidget(NULL,NULL,flags)
+WebPage::WebPage (const char *location, int zoom, WFlags flags)
+    : QWidget(NULL, NULL, flags)
 {
     setPaletteBackgroundColor(Qt::white);
-        
+
     QHBoxLayout *hbox = new QHBoxLayout(this);
     browser = new KHTMLPart(this);
     hbox->addWidget(browser->view());
-    
-    // connect signal for link clicks
-    connect( browser->browserExtension(),
-         SIGNAL( openURLRequest( const KURL &, const KParts::URLArgs & ) ), 
-         this, SLOT( openURLRequest(const KURL &, const KParts::URLArgs & ) ) );
 
-    connect( browser->browserExtension(),
-         SIGNAL( createNewWindow( const KURL &, const KParts::URLArgs &, 
-                                  const KParts::WindowArgs &, KParts::ReadOnlyPart *&) ), 
-         this, SLOT( createNewWindow( const KURL &, const KParts::URLArgs &, 
-                                  const KParts::WindowArgs &, KParts::ReadOnlyPart *&) ) );
+    // connect signal for link clicks
+    connect(browser->browserExtension(),
+         SIGNAL(openURLRequest(const KURL &, const KParts::URLArgs &)),
+         this,
+         SLOT(openURLRequest(const KURL &, const KParts::URLArgs &)));
+
+    connect(browser->browserExtension(),
+         SIGNAL( createNewWindow(const KURL &, const KParts::URLArgs &, 
+                                 const KParts::WindowArgs &, KParts::ReadOnlyPart *&)),
+         this,
+         SLOT( createNewWindow(const KURL &, const KParts::URLArgs &,
+                               const KParts::WindowArgs &, KParts::ReadOnlyPart *&)));
 
     // connect signals for download progress
-    connect( browser,SIGNAL(started(KIO::Job*)),
-         this,SLOT(started(KIO::Job*)));
-    connect( browser,SIGNAL(completed()),
-         this,SLOT(completed()));
-    connect( browser,SIGNAL(completed(bool)),
-         this,SLOT(completed()));
+    connect(browser, SIGNAL(started(KIO::Job*)),
+            this, SLOT(started(KIO::Job*)));
+    connect(browser, SIGNAL(completed()),
+            this, SLOT(completed()));
+    connect(browser, SIGNAL(completed(bool)),
+            this, SLOT(completed()));
 
     browser->setStandardFont("Arial");
-    
+
     zoom = zoom<20 ? 20:zoom;
     zoom = zoom>300 ? 300:zoom;
     browser->setZoomFactor(zoom);
@@ -81,12 +84,13 @@ WebPage::WebPage (const char *location, int zoom, WFlags flags) : QWidget(NULL,N
     browser->enableMetaRefresh(true);
     browser->setJavaEnabled(true);
     browser->enableJScript(true);
-    
+
     openURL(QString(location));
 }
 
-WebPage::WebPage (const char *location, const KParts::URLArgs &args, int zoom, WFlags flags)
-                  : QWidget(NULL,NULL,flags)
+WebPage::WebPage (const char *location, const KParts::URLArgs &args,
+                  int zoom, WFlags flags)
+        : QWidget(NULL,NULL,flags)
 {
     setPaletteBackgroundColor(Qt::white);
 
@@ -95,23 +99,25 @@ WebPage::WebPage (const char *location, const KParts::URLArgs &args, int zoom, W
     hbox->addWidget(browser->view());
 
     // connect signal for link clicks
-    connect( browser->browserExtension(),
-         SIGNAL( openURLRequest( const KURL &, const KParts::URLArgs & ) ), 
-         this, SLOT( openURLRequest(const KURL &, const KParts::URLArgs & ) ) );
+    connect(browser->browserExtension(),
+            SIGNAL(openURLRequest(const KURL &, const KParts::URLArgs &)),
+            this,
+            SLOT(openURLRequest(const KURL &, const KParts::URLArgs &)));
 
-    connect( browser->browserExtension(),
-         SIGNAL( createNewWindow( const KURL &, const KParts::URLArgs &, 
-                                  const KParts::WindowArgs &, KParts::ReadOnlyPart *&) ), 
-         this, SLOT( createNewWindow( const KURL &, const KParts::URLArgs &, 
-                                  const KParts::WindowArgs &, KParts::ReadOnlyPart *&) ) );
+    connect(browser->browserExtension(),
+            SIGNAL(createNewWindow( const KURL &, const KParts::URLArgs &,
+                   const KParts::WindowArgs &, KParts::ReadOnlyPart *&)),
+            this,
+            SLOT(createNewWindow(const KURL &, const KParts::URLArgs &,
+                                 const KParts::WindowArgs &, KParts::ReadOnlyPart *&)));
 
     // connect signals for download progress
-    connect( browser,SIGNAL(started(KIO::Job*)),
-         this,SLOT(started(KIO::Job*)));
-    connect( browser,SIGNAL(completed()),
-         this,SLOT(completed()));
-    connect( browser,SIGNAL(completed(bool)),
-         this,SLOT(completed()));
+    connect(browser,SIGNAL(started(KIO::Job*)),
+           this,SLOT(started(KIO::Job*)));
+    connect(browser,SIGNAL(completed()),
+           this,SLOT(completed()));
+    connect(browser,SIGNAL(completed(bool)),
+            this,SLOT(completed()));
 
     browser->setStandardFont("Arial");
     browser->browserExtension()->setURLArgs(args);
@@ -125,7 +131,7 @@ WebPage::WebPage (const char *location, const KParts::URLArgs &args, int zoom, W
     browser->enableMetaRefresh(true);
     browser->setJavaEnabled(true);
     browser->enableJScript(true);
-    
+
     openURL(QString(location));
 }
 
@@ -145,8 +151,8 @@ void WebPage::openURLRequest(const KURL &url, const KParts::URLArgs &args)
     emit newUrlRequested(url,args);
 }
 
-void WebPage::createNewWindow( const KURL &url, const KParts::URLArgs &args, 
-                               const KParts::WindowArgs &windowArgs, 
+void WebPage::createNewWindow( const KURL &url, const KParts::URLArgs &args,
+                               const KParts::WindowArgs &windowArgs,
                                KParts::ReadOnlyPart *&part)
 {
     emit newWindowRequested(url, args, windowArgs, part);
@@ -168,9 +174,10 @@ void WebPage::zoomIn()
 
 bool WebPage::eventFilter(QObject* object, QEvent* event)
 {
-    object=object;
+    object = object;
 
-    switch(event->type()) {
+    switch(event->type()) 
+    {
         case QEvent::KeyPress:
             printf("Key press event\n");
             break;
@@ -199,25 +206,26 @@ void WebPage::started(KIO::Job *job)
 void WebPage::completed()
 {
     setCursor(QCursor(Qt::ArrowCursor));
-    
+
     // work around a bug in the HTML widget where it doesn't scroll
     // to the correct location if the URL has a reference
     KURL url(sUrl);
-    if (url.hasRef()) {    
-        
+    if (url.hasRef()) 
+    {
         QTimer::singleShot(1, this, SLOT(timerTimeout()));
     }
-    
+
     setFocus();
-    
+
     emit pageCompleted( this );
-}    
+}
 
 void WebPage::timerTimeout()
 {
     // jump to reference if present in url
     KURL url(sUrl);
-    if (url.hasRef()) {    
+    if (url.hasRef())
+    {
         if (!browser->gotoAnchor(url.encodedHtmlRef()))
             browser->gotoAnchor(url.htmlRef());
     }
