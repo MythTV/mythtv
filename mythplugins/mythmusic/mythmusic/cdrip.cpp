@@ -1120,7 +1120,7 @@ void Ripper::startRipper(void)
         return;
     }
 
-    RipStatus statusDialog(m_tracks, m_qualitySelector->getCurrentInt(),
+    RipStatus statusDialog(m_CDdevice, m_tracks, m_qualitySelector->getCurrentInt(),
                            gContext->GetMainWindow(), "edit metadata");
     int res = statusDialog.exec();
     if (res == Accepted)
@@ -1131,6 +1131,8 @@ void Ripper::startRipper(void)
 
         MythPopupBox::showOkPopup(gContext->GetMainWindow(), tr("Success"),
                                   tr("Rip completed successfully."));
+
+        m_somethingwasripped = true;
     }
 }
 
@@ -1332,21 +1334,26 @@ void Ripper::showEditMetadataDialog()
 
 ///////////////////////////////////////////////////////////////////////////////
 
-RipStatus::RipStatus(vector<Metadata*> *tracks, int quality, MythMainWindow *parent, const char *name)
+RipStatus::RipStatus(const QString &device, vector<Metadata*> *tracks,
+                     int quality, MythMainWindow *parent, const char *name)
     : MythThemedDialog(parent, "ripstatus", "music-", name, true)
 {
+    m_CDdevice = device;
     m_tracks = tracks;
     m_quality = quality;
     m_ripperThread = NULL;
 
     wireupTheme();
-    QTimer::singleShot(500, this, SLOT(startRip(QString)));
+    QTimer::singleShot(500, this, SLOT(startRip()));
 }
 
 RipStatus::~RipStatus(void)
 {
     if (m_ripperThread)
         delete m_ripperThread;
+
+    if (class LCD * lcd = LCD::Get()) 
+        lcd->switchToTime();
 }
 
 void RipStatus::wireupTheme(void)
@@ -1484,11 +1491,11 @@ void RipStatus::customEvent(QCustomEvent *e)
     delete sd;
 }
 
-void RipStatus::startRip(QString device)
+void RipStatus::startRip(void)
 {
     if (m_ripperThread)
         delete m_ripperThread;
 
-    m_ripperThread = new CDRipperThread(this, device, m_tracks, m_quality);
+    m_ripperThread = new CDRipperThread(this, m_CDdevice, m_tracks, m_quality);
     m_ripperThread->start();
 }

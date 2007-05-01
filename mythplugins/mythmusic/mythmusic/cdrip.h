@@ -159,13 +159,13 @@ class RipStatus : public MythThemedDialog
 {
   Q_OBJECT
   public:
-    RipStatus(vector<Metadata*> *tracks, int quality,
-              MythMainWindow *parent,    const char *name = 0);
+    RipStatus(const QString &device, vector<Metadata*> *tracks, int quality,
+              MythMainWindow *parent, const char *name = 0);
     ~RipStatus(void);
 
 
   protected slots:
-    void startRip(QString device);
+    void startRip(void);
 
   private:
     void wireupTheme(void);
@@ -174,6 +174,7 @@ class RipStatus : public MythThemedDialog
 
     vector<Metadata*> *m_tracks;
     int                m_quality;
+    QString            m_CDdevice;
 
     UITextType        *m_overallText;
     UITextType        *m_trackText;
