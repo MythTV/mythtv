@@ -517,6 +517,8 @@ void MythMainWindow::Init(void)
     setGeometry(d->xbase, d->ybase, d->screenwidth, d->screenheight);
     setFixedSize(QSize(d->screenwidth, d->screenheight));
 
+    fonTweak = gContext->GetNumSetting("QtFonTweak", 0);
+
     bool hideCursor = gContext->GetNumSetting("HideMouseCursor", 1);
 #ifdef QWS
 #if QT_VERSION >= 0x030300
@@ -1454,7 +1456,7 @@ int MythMainWindow::NormalizeFontSize(int pointSize)
 {
     QPaintDeviceMetrics pdm(this);
 
-    float desired = 100.0;
+    float desired = 100.0 + fonTweak;
     pointSize = (int)(pointSize * desired / pdm.logicalDpiY());
     pointSize = (int)(pointSize * d->hmult);
 

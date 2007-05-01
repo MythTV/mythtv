@@ -110,6 +110,7 @@ class MythMainWindow : public QWidget
     QSize NormSize(const QSize &size);
     int NormX(const int x);
     int NormY(const int y);
+    int fonTweak;
  
     /* compatability functions, to go away once everything's mythui */
     void attach(QWidget *child);

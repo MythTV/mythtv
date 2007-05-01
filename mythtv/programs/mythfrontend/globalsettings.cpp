@@ -2107,6 +2107,17 @@ static HostSpinBox *QtFontSmall()
     return gs;
 }
 
+static HostSpinBox *QtFonTweak()
+{
+    HostSpinBox *gs = new HostSpinBox("QtFonTweak", -30, 30, 1);
+    gs->setLabel(QObject::tr("Fine tune font size (\%)"));
+    gs->setValue(0);
+    gs->setHelpText(QObject::tr("Fine tune all font sizes by this percentage. "
+                    "Font sizes should be the correct relative size if the "
+                    "X11 DPI (dots per inch) is set to 100."));
+    return gs;
+}
+
 // EPG settings
 static HostCheckBox *EPGScrollType()
 {
@@ -3773,6 +3784,7 @@ AppearanceSettings::AppearanceSettings()
     qttheme->addChild(QtFontSmall());
     qttheme->addChild(QtFontMedium());
     qttheme->addChild(QtFontBig());
+    qttheme->addChild(QtFonTweak());
     qttheme->addChild(PlayBoxTransparency());
     qttheme->addChild(PlayBoxShading());
     qttheme->addChild(UseVirtualKeyboard());
