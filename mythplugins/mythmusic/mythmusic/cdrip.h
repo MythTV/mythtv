@@ -51,13 +51,20 @@ typedef struct
     int value;
 } StatusData;
 
+typedef struct
+{
+    Metadata *metadata;
+    bool      active;
+    int       length;
+} RipTrack;
+
 class RipStatus;
 
 class CDRipperThread: public QThread
 {
     public:
         CDRipperThread(RipStatus *parent,  QString device,
-                       vector<Metadata*> *tracks, int quality);
+                       vector<RipTrack*> *tracks, int quality);
         ~CDRipperThread();
 
         void cancel(void);
@@ -75,7 +82,7 @@ class CDRipperThread: public QThread
         QMutex             m_mutex;
         QString            m_CDdevice;
         int                m_quality;
-        vector<Metadata*> *m_tracks;
+        vector<RipTrack*> *m_tracks;
 
         int                m_totalTracks;
         long int           m_totalSectors;
@@ -120,6 +127,9 @@ class Ripper : public MythThemedDialog
     void keyPressEvent(QKeyEvent *e);
     void deleteTrack(QString& artist, QString& album, QString& title);
     void updateTrackList(void);
+    void updateTrackLengths(void);
+    void toggleTrackActive(void);
+
     void trackListDown(bool page);
     void trackListUp(bool page);
     bool showList(QString caption, QString &value);
@@ -144,7 +154,7 @@ class Ripper : public MythThemedDialog
 
     int                m_currentTrack;
     int                m_totalTracks;
-    vector<Metadata*> *m_tracks;
+    vector<RipTrack*> *m_tracks;
 
     QString            m_albumName, m_artistName, m_genreName, m_year;
     QStringList        m_searchList;
@@ -159,7 +169,7 @@ class RipStatus : public MythThemedDialog
 {
   Q_OBJECT
   public:
-    RipStatus(const QString &device, vector<Metadata*> *tracks, int quality,
+    RipStatus(const QString &device, vector<RipTrack*> *tracks, int quality,
               MythMainWindow *parent, const char *name = 0);
     ~RipStatus(void);
 
@@ -172,7 +182,7 @@ class RipStatus : public MythThemedDialog
     void keyPressEvent(QKeyEvent *e);
     void customEvent(QCustomEvent *e);
 
-    vector<Metadata*> *m_tracks;
+    vector<RipTrack*> *m_tracks;
     int                m_quality;
     QString            m_CDdevice;
 

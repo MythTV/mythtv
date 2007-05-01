@@ -100,7 +100,7 @@ static void paranoia_cb(long inpos, int function)
 }
 
 CDRipperThread::CDRipperThread(RipStatus *parent,  QString device,
-                               vector<Metadata*> *tracks, int quality)
+                               vector<RipTrack*> *tracks, int quality)
 {
     m_parent = parent;
     m_tracks = tracks;
@@ -152,7 +152,7 @@ void CDRipperThread::sendEvent(int eventType, int value)
 
 void CDRipperThread::run(void)
 {
-    Metadata *track = m_tracks->at(0);
+    Metadata *track = m_tracks->at(0)->metadata;
     QString tots;
 
     if (track->Compilation())
@@ -191,6 +191,9 @@ void CDRipperThread::run(void)
         lcd->switchToGeneric(&textItems);
     }
 
+    Metadata *titleTrack = NULL;
+    QString outfile = "";
+
     for (int trackno = 0; trackno < m_totalTracks; trackno++)
     {
         if (isCancelled())
@@ -203,44 +206,49 @@ void CDRipperThread::run(void)
 
         sendEvent(ST_TRACK_PROGRESS, 0);
 
-        track = m_tracks->at(trackno);
+        track = m_tracks->at(trackno)->metadata;
 
         if (track)
         {
-            QString outfile;
-
             textstatus = track->Title();
             sendEvent(ST_TRACK_TEXT, textstatus);
 
             sendEvent(ST_TRACK_PROGRESS, 0);
             sendEvent(ST_TRACK_PERCENT, 0);
 
-            outfile = Ripper::filenameFromMetadata(track);
+            // do we need to start a new file?
+            if (m_tracks->at(trackno)->active)
+            {
+                titleTrack = track;
+                titleTrack->setLength(m_tracks->at(trackno)->length);
 
-            if (m_quality < 3)
-            {
-                if (encodertype == "mp3")
-                {
-                    outfile += ".mp3";
-                    encoder = new LameEncoder(outfile, m_quality, track,
-                                              mp3usevbr);
-                }
-                else // ogg
-                {
-                    outfile += ".ogg";
-                    encoder = new VorbisEncoder(outfile, m_quality, track);
-                }
-            }
-            else
-            {
-                outfile += ".flac";
-                encoder = new FlacEncoder(outfile, m_quality, track);
-            }
+                outfile = Ripper::filenameFromMetadata(track);
 
-            if (!encoder->isValid()) 
-            {
-                delete encoder;
-                break;
+                if (m_quality < 3)
+                {
+                    if (encodertype == "mp3")
+                    {
+                        outfile += ".mp3";
+                        encoder = new LameEncoder(outfile, m_quality, titleTrack,
+                                                    mp3usevbr);
+                    }
+                    else // ogg
+                    {
+                        outfile += ".ogg";
+                        encoder = new VorbisEncoder(outfile, m_quality, titleTrack);
+                    }
+                }
+                else
+                {
+                    outfile += ".flac";
+                    encoder = new FlacEncoder(outfile, m_quality, titleTrack);
+                }
+
+                if (!encoder->isValid()) 
+                {
+                    delete encoder;
+                    break;
+                }
             }
 
             ripTrack(m_CDdevice, encoder, trackno + 1);
@@ -248,11 +256,20 @@ void CDRipperThread::run(void)
             if (isCancelled())
                 return;
 
-            delete encoder;
+            // if this is the last track or the next track is active 
+            // then we need to delete the encoder
+            if (trackno == (int) m_tracks->size() - 1 ||
+                (trackno + 1 < (int) m_tracks->size() && m_tracks->at(trackno + 1)->active))
+            {
+                delete encoder;
+            }
 
             // save the metadata to the DB
-            track->setFilename(outfile);
-            track->dumpToDatabase();
+            if (m_tracks->at(trackno)->active)
+            {
+                titleTrack->setFilename(outfile);
+                titleTrack->dumpToDatabase();
+            }
         }
     }
 
@@ -390,7 +407,7 @@ Ripper::Ripper(QString device, MythMainWindow *parent, const char *name)
     m_somethingwasripped = false;
     wireupTheme();
     m_decoder = NULL;
-    m_tracks = new vector<Metadata*>;
+    m_tracks = new vector<RipTrack*>;
 
     QTimer::singleShot(500, this, SLOT(startScanCD()));
 }
@@ -529,7 +546,7 @@ void Ripper::keyPressEvent(QKeyEvent *e)
         if (action == "SELECT")
         {
             if (getCurrentFocusWidget() == m_trackList)
-                showEditMetadataDialog();
+                toggleTrackActive();
             else
                 activateCurrent();
         }
@@ -622,7 +639,7 @@ void Ripper::startScanCD(void)
     if (m_decoder)
     {
         QString label;
-        Metadata *track;
+        Metadata *metadata;
 
         m_artistName = "";
         m_albumName = "";
@@ -633,50 +650,58 @@ void Ripper::startScanCD(void)
 
         for (int trackno = 0; trackno < m_decoder->getNumTracks(); trackno++)
         {
-            track = m_decoder->getMetadata(trackno + 1);
-            if (track)
+            RipTrack *ripTrack = new RipTrack;
+
+            metadata = m_decoder->getMetadata(trackno + 1);
+            if (metadata)
             {
-                if (track->Compilation())
+                ripTrack->metadata = metadata;
+                ripTrack->length = metadata->Length();
+                ripTrack->active = true;
+
+                if (metadata->Compilation())
                 {
                     isCompilation = true;
-                    m_artistName = track->CompilationArtist();
+                    m_artistName = metadata->CompilationArtist();
                 }
                 else if ("" == m_artistName)
                 {
-                    m_artistName = track->Artist();
+                    m_artistName = metadata->Artist();
                 }
 
                 if ("" == m_albumName)
-                    m_albumName = track->Album();
+                    m_albumName = metadata->Album();
 
                 if ("" == m_genreName 
-                    && "" != track->Genre())
+                    && "" != metadata->Genre())
                 {
-                    m_genreName = track->Genre();
+                    m_genreName = metadata->Genre();
                 }
 
                 if ("" == m_year 
-                    && 0 != track->Year())
+                    && 0 != metadata->Year())
                 {
-                    m_year = QString::number(track->Year());
+                    m_year = QString::number(metadata->Year());
                 }
 
-                QString title = track->Title();
+                QString title = metadata->Title();
                 newTune = Ripper::isNewTune(m_artistName, m_albumName, title);
 
                 if (newTune)
                 {
-                    m_tracks->push_back(track);
+                    m_tracks->push_back(ripTrack);
                 }
                 else
                 {
                     if (yesToAll)
                     {
                         deleteTrack(m_artistName, m_albumName, title);
-                        m_tracks->push_back(track);
+                        m_tracks->push_back(ripTrack);
                     }
                     else if (noToAll)
                     {
+                        delete ripTrack;
+                        delete metadata;
                         continue;
                     }
                     else
@@ -696,21 +721,25 @@ void Ripper::startScanCD(void)
 
                         if (res == 1)
                         {
+                            delete ripTrack;
+                            delete metadata;
                         }
                         else if (res == 2)
                         {
                             noToAll = true;
+                            delete ripTrack;
+                            delete metadata;
                         }
                         else if (res == 3)
                         {
                             deleteTrack(m_artistName, m_albumName, title);
-                            m_tracks->push_back(track);
+                            m_tracks->push_back(ripTrack);
                         }
                         else if (res == 4)
                         {
                             yesToAll = true;
                             deleteTrack(m_artistName, m_albumName, title);
-                            m_tracks->push_back(track);
+                            m_tracks->push_back(ripTrack);
                         }
                     }
                 }
@@ -970,7 +999,7 @@ void Ripper::artistChanged(QString newartist)
 
     for (int trackno = 0; trackno < m_totalTracks; ++trackno)
     {
-        data = m_tracks->at(trackno);
+        data = m_tracks->at(trackno)->metadata;
 
         if (data)
         {
@@ -996,7 +1025,7 @@ void Ripper::albumChanged(QString newalbum)
 
     for (int trackno = 0; trackno < m_totalTracks; ++trackno)
     {
-        data = m_tracks->at(trackno);
+        data = m_tracks->at(trackno)->metadata;
 
         if (data)
             data->setAlbum(newalbum);
@@ -1011,7 +1040,7 @@ void Ripper::genreChanged(QString newgenre)
 
     for (int trackno = 0; trackno < m_totalTracks; ++trackno)
     {
-        data = m_tracks->at(trackno);
+        data = m_tracks->at(trackno)->metadata;
 
         if (data)
             data->setGenre(newgenre);
@@ -1026,7 +1055,7 @@ void Ripper::yearChanged(QString newyear)
 
     for (int trackno = 0; trackno < m_totalTracks; ++trackno)
     {
-        data = m_tracks->at(trackno);
+        data = m_tracks->at(trackno)->metadata;
 
         if (data)
             data->setYear(newyear.toInt());
@@ -1044,7 +1073,7 @@ void Ripper::compilationChanged(bool state)
         // Update artist MetaData of each track on the ablum...
         for (int trackno = 0; trackno < m_totalTracks; ++trackno)
         {
-            data = m_tracks->at(trackno);
+            data = m_tracks->at(trackno)->metadata;
 
             if (data)
             {
@@ -1062,7 +1091,7 @@ void Ripper::compilationChanged(bool state)
         for (int trackno = 0; trackno < m_totalTracks; ++trackno)
         {
             Metadata *data;
-            data = m_tracks->at(trackno);
+            data = m_tracks->at(trackno)->metadata;
 
             if (data)
             {
@@ -1090,7 +1119,7 @@ void Ripper::switchTitlesAndArtists()
 
     for (int track = 0; track < m_totalTracks; ++track)
     {
-        data = m_tracks->at(track);
+        data = m_tracks->at(track)->metadata;
 
         if (data)
         {
@@ -1200,18 +1229,29 @@ void Ripper::updateTrackList(void)
             if (i + skip >= m_totalTracks)
                 break;
 
-            Metadata *track = m_tracks->at(i + skip);
+            RipTrack *track = m_tracks->at(i + skip);
+            Metadata *metadata = track->metadata;
 
-            m_trackList->SetItemText(i, 1, QString::number(track->Track()));
-            m_trackList->SetItemText(i, 2, track->Title());
-            m_trackList->SetItemText(i, 3, track->Artist());
-            int length = track->Length() / 1000;
-            int min, sec;
-            min = length / 60;
-            sec = length % 60;
-            QString s;
-            s.sprintf("%02d:%02d", min, sec);
-            m_trackList->SetItemText(i, 4, s);
+            if (track->active)
+                m_trackList->SetItemText(i, 1, QString::number(metadata->Track()));
+            else
+                m_trackList->SetItemText(i, 1, "-");
+
+            m_trackList->SetItemText(i, 2, metadata->Title());
+            m_trackList->SetItemText(i, 3, metadata->Artist());
+
+            int length = track->length / 1000;
+            if (length > 0)
+            {
+                int min, sec;
+                min = length / 60;
+                sec = length % 60;
+                QString s;
+                s.sprintf("%02d:%02d", min, sec);
+                m_trackList->SetItemText(i, 4, s);
+            }
+            else
+                m_trackList->SetItemText(i, 4, "-");
 
             if (i + skip == m_currentTrack)
             {
@@ -1320,7 +1360,7 @@ bool Ripper::showList(QString caption, QString &value)
 
 void Ripper::showEditMetadataDialog()
 {
-    Metadata *editMeta = m_tracks->at(m_currentTrack);
+    Metadata *editMeta = m_tracks->at(m_currentTrack)->metadata;
 
     EditMetadataDialog editDialog(editMeta, gContext->GetMainWindow(),
                                   "edit_metadata", "music-", "edit metadata");
@@ -1332,9 +1372,44 @@ void Ripper::showEditMetadataDialog()
     }
 }
 
+void Ripper::toggleTrackActive()
+{
+    if (m_currentTrack == 0)
+        return;
+
+    RipTrack *track = m_tracks->at(m_currentTrack);
+
+    track->active = !track->active;
+
+    updateTrackLengths();
+    updateTrackList();
+}
+
+void Ripper::updateTrackLengths()
+{
+    vector<RipTrack*>::reverse_iterator it;
+    RipTrack *track;
+    int length = 0;
+
+    for (it = m_tracks->rbegin(); it != m_tracks->rend(); ++it)
+    {
+        track = *it;
+        if (track->active)
+        {
+            track->length = length + track->metadata->Length();
+            length = 0;
+        }
+        else
+        {
+            track->length = 0;
+            length += track->metadata->Length();
+        }
+    }
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 
-RipStatus::RipStatus(const QString &device, vector<Metadata*> *tracks,
+RipStatus::RipStatus(const QString &device, vector<RipTrack*> *tracks,
                      int quality, MythMainWindow *parent, const char *name)
     : MythThemedDialog(parent, "ripstatus", "music-", name, true)
 {
