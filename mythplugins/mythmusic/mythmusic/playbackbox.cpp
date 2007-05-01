@@ -946,7 +946,7 @@ void PlaybackBoxMusic::updatePlaylistFromSmartPlaylist()
 
 void PlaybackBoxMusic::showEditMetadataDialog()
 {
-    if(!curMeta)
+    if (!curMeta)
     {
         return;
     }
@@ -970,15 +970,19 @@ void PlaybackBoxMusic::showEditMetadataDialog()
                node->setString(all_music->getLabel(editMeta->ID(), &errorFlag));
                music_tree_list->refresh();
 
-               *curMeta = editMeta;
-               if (title_text)
-                   title_text->SetText(curMeta->FormatTitle());
-               if (artist_text)
-                   artist_text->SetText(curMeta->FormatArtist());
-               if (album_text)
-                   album_text->SetText(curMeta->Album());
+               // make sure the track hasn't changed
+               if (curMeta->ID() == editMeta->ID())
+               {
+                    *curMeta = editMeta;
+                    if (title_text)
+                        title_text->SetText(curMeta->FormatTitle());
+                    if (artist_text)
+                        artist_text->SetText(curMeta->FormatArtist());
+                    if (album_text)
+                        album_text->SetText(curMeta->Album());
 
-               setTrackOnLCD(curMeta);
+                    setTrackOnLCD(curMeta);
+               }
            }
         }
     }
