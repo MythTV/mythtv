@@ -390,6 +390,7 @@ static void fw_init(QMap<uint64_t,QString> &id_to_model)
     {   /* 6200 */
         0x0ce5,    0x0e5c,    0x1225,    0x0f9f,    0x1180,
         0x12c9,    0x11ae,    0x152f,    0x14e8,    0x16b5,    0x1371,
+       0x19a6,
         /* 6212 */
         0x0f9f,    0x152f,
         /* 6216, 2224 */
