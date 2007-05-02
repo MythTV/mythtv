@@ -151,8 +151,6 @@ class MPUBLIC DVDRingBufferPriv
     bool           cellRepeated;
     int            buttonstreamid;
     bool           gotoCellStart;
-    /// this pts is of the first video frame decoded just after reading a menu pkt. 
-    /// menu pkt pts is not reliable
     long long      menupktpts;
     int            curAudioTrack;
     int8_t         curSubtitleTrack;
@@ -178,7 +176,7 @@ class MPUBLIC DVDRingBufferPriv
     void ClearMenuSPUParameters(void);
     void ClearMenuButton(void);
     bool MenuButtonChanged(void);
-    uint ConvertLangCode(uint16_t code); /// converts 2char key to 3char key
+    uint ConvertLangCode(uint16_t code);
     void SelectDefaultButton(void);
     void ClearSubtitlesOSD(void);
     

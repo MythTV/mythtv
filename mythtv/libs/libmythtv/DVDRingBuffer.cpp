@@ -231,8 +231,6 @@ int DVDRingBufferPriv::safe_read(void *data, unsigned sz)
     {
         blockBuf = dvdBlockWriteBuf;
 
-        // Use the next_cache_block instead of the next_block
-        // to avoid a memcpy inside libdvdnav
         dvdStat = dvdnav_get_next_cache_block(
             dvdnav, &blockBuf, &dvdEvent, &dvdEventSize);
 
@@ -248,9 +246,7 @@ int DVDRingBufferPriv::safe_read(void *data, unsigned sz)
             case DVDNAV_BLOCK_OK:
                 if (!seeking)
                 {
-                    // We need at least a DVD blocks worth of data so copy it in.
                     memcpy(dest + offset, blockBuf, DVD_BLOCK_SIZE);
-                        
                     tot += DVD_BLOCK_SIZE;
                 }
                 
@@ -353,7 +349,6 @@ int DVDRingBufferPriv::safe_read(void *data, unsigned sz)
                 {
                     buttonstreamid = 32;
                     int aspect = dvdnav_get_video_aspect(dvdnav);
-                    // determine which subtitle stream id to use
                     if (aspect != 0)                           
                         buttonstreamid = spu->physical_wide + buttonstreamid;
                 }
@@ -501,7 +496,7 @@ int DVDRingBufferPriv::safe_read(void *data, unsigned sz)
                     int elapsedTime = 0;
                     if (still->length  < 0xff)
                     {
-                        elapsedTime = stillFrameTimer.elapsed() / 1000; // in seconds
+                        elapsedTime = stillFrameTimer.elapsed() / 1000; 
                         if (elapsedTime >= still->length)
                             SkipStillFrame();
                     }
@@ -568,11 +563,16 @@ void DVDRingBufferPriv::prevTrack(void)
     gotStop = false;
 }
 
+/** \brief get the total time of the title in seconds
+ * 90000 ticks = 1 sec
+ */
 uint DVDRingBufferPriv::GetTotalTimeOfTitle(void)
 {
-    return pgcLength / 90000; // 90000 ticks = 1 second
+    return pgcLength / 90000; 
 }
 
+/** \brief get the start of the cell in seconds
+ */
 uint DVDRingBufferPriv::GetCellStart(void)
 {
     return cellStart / 90000;
@@ -590,6 +590,8 @@ void DVDRingBufferPriv::WaitSkip(void)
     dvdWaiting = false;
 }
 
+/** \brief jump to a dvd root or chapter menu
+ */
 bool DVDRingBufferPriv::GoToMenu(const QString str)
 {
     DVDMenuID_t menuid;
@@ -669,6 +671,8 @@ void DVDRingBufferPriv::MoveButtonDown(void)
     }
 }
 
+/** \brief action taken when a dvd menu button is selected
+ */
 void DVDRingBufferPriv::ActivateButton(void)
 {
     if (IsInMenu() && (NumMenuButtons() > 0))
@@ -678,6 +682,8 @@ void DVDRingBufferPriv::ActivateButton(void)
     }
 }
 
+/** \brief get SPU pkt from dvd menu subtitle stream
+ */
 void DVDRingBufferPriv::GetMenuSPUPkt(uint8_t *buf, int buf_size, int stream_id)
 { 
     if (buf_size < 4)
@@ -703,6 +709,9 @@ void DVDRingBufferPriv::GetMenuSPUPkt(uint8_t *buf, int buf_size, int stream_id)
         buttonExists = DrawMenuButton(menuSpuPkt,menuBuflength);
 }
 
+/** \brief returns dvd menu button if available.
+ * used by NVP::DisplayDVDButton
+ */
 AVSubtitleRect *DVDRingBufferPriv::GetMenuButton(void)
 {
     menuBtnLock.lock();
@@ -713,11 +722,14 @@ AVSubtitleRect *DVDRingBufferPriv::GetMenuButton(void)
     return NULL;
 }
 
+
 void DVDRingBufferPriv::ReleaseMenuButton(void)
 {
     menuBtnLock.unlock();
 }
 
+/** \brief obtain dvd menu button bitmap, alpha and color palette
+ */
 bool DVDRingBufferPriv::DrawMenuButton(uint8_t *spu_pkt, int buf_size)
 {
     int gotbutton;
@@ -739,6 +751,9 @@ bool DVDRingBufferPriv::DrawMenuButton(uint8_t *spu_pkt, int buf_size)
     return false;       
 }
 
+/** \brief generate dvd subtitle bitmap or dvd menu bitmap. 
+ * code obtained from ffmpeg project
+ */
 bool DVDRingBufferPriv::DecodeSubtitles(AVSubtitle *sub, int *gotSubtitles,
                                     const uint8_t *spu_pkt, int buf_size)
 {
@@ -938,6 +953,9 @@ fail:
     return false;
 }
 
+/** \brief update the dvd menu button parameters
+ * when a user changes the dvd menu button position
+ */
 bool DVDRingBufferPriv::DVDButtonUpdate(bool b_mode)
 {
     if (!parent)
@@ -971,6 +989,8 @@ bool DVDRingBufferPriv::DVDButtonUpdate(bool b_mode)
     return false;
 }
 
+/** \brief clears the dvd menu button structures
+ */
 void DVDRingBufferPriv::ClearMenuButton(void)
 {
     if (buttonExists || dvdMenuButton.rects)
@@ -985,6 +1005,9 @@ void DVDRingBufferPriv::ClearMenuButton(void)
     }
 }
 
+/** \brief clears the menu SPU pkt and parameters.
+ * necessary action during dvd menu changes
+ */
 void DVDRingBufferPriv::ClearMenuSPUParameters(void)
 {
     if (menuBuflength == 0)
@@ -1010,6 +1033,8 @@ int DVDRingBufferPriv::NumMenuButtons(void) const
         return 0;
 }
 
+/** \brief get the audio language from the dvd
+ */
 uint DVDRingBufferPriv::GetAudioLanguage(int id)
 {
     int8_t channel = dvdnav_get_audio_logical_stream(dvdnav,id);
@@ -1019,6 +1044,8 @@ uint DVDRingBufferPriv::GetAudioLanguage(int id)
     return ConvertLangCode(lang);
 }
 
+/** \brief get the subtitle language from the dvd
+ */
 uint DVDRingBufferPriv::GetSubtitleLanguage(int id)
 {
     int8_t channel = dvdnav_get_spu_logical_stream(dvdnav,id);
@@ -1028,6 +1055,8 @@ uint DVDRingBufferPriv::GetSubtitleLanguage(int id)
     return ConvertLangCode(lang);
 }
 
+/** \brief converts the subtitle/audio lang code to iso639.
+ */
 uint DVDRingBufferPriv::ConvertLangCode(uint16_t code)
 {
     if (code == 0)
@@ -1042,6 +1071,9 @@ uint DVDRingBufferPriv::ConvertLangCode(uint16_t code)
     return 0;
 }
 
+/** \brief determines the default dvd menu button to
+ * show when you initially access the dvd menu.
+ */
 void DVDRingBufferPriv::SelectDefaultButton(void)
 {
     pci_t *pci = dvdnav_get_current_nav_pci(dvdnav);
@@ -1058,6 +1090,9 @@ void DVDRingBufferPriv::SelectDefaultButton(void)
         dvdnav_button_select(dvdnav,pci,1);    
 }
 
+/** \brief set the dvd subtitle/audio track used
+ *  \param trackNo: if -1 then autoselect the track num from the dvd IFO
+ */
 void DVDRingBufferPriv::SetTrack(uint type, int trackNo)
 {
     if (type == kTrackTypeSubtitle)
@@ -1075,6 +1110,11 @@ void DVDRingBufferPriv::SetTrack(uint type, int trackNo)
     }
 }
 
+/** \brief get the track the dvd should be playing.
+ * can either be set by the user using DVDRingBufferPriv::SetTrack
+ * or determined from the dvd IFO.
+ * \param type: use either kTrackTypeSubtitle or kTrackTypeAudio
+ */
 int DVDRingBufferPriv::GetTrack(uint type)
 {
     if (type == kTrackTypeSubtitle)
@@ -1087,12 +1127,15 @@ int DVDRingBufferPriv::GetTrack(uint type)
 
 uint8_t DVDRingBufferPriv::GetNumAudioChannels(int id)
 {
-    unsigned char channels = dvdnav_audio_get_channels(dvdnav,id);
+    unsigned char channels = dvdnav_audio_get_channels(dvdnav, id);
     if (channels == 0xff)
         return 0;
     return (uint8_t)channels + 1; 
 }
 
+/** \brief clear the currently displaying subtitles or
+ * dvd menu buttons. needed for the dvd menu.
+ */
 void DVDRingBufferPriv::ClearSubtitlesOSD(void)
 {
     if (parent && parent->GetOSD() &&
@@ -1104,7 +1147,6 @@ void DVDRingBufferPriv::ClearSubtitlesOSD(void)
 }
 
 /** \brief Get the dvd title and serial num
- *  \return false if libdvdnav is unable to return a title and serial num
  */
 bool DVDRingBufferPriv::GetNameAndSerialNum(QString& _name, QString& _serial)
 {
@@ -1115,8 +1157,8 @@ bool DVDRingBufferPriv::GetNameAndSerialNum(QString& _name, QString& _serial)
     return true;
 }
 
-/** \fn DVDRingBufferPriv::GetFrameRate()
- * \brief used by DecoderBase for the total frame number calculation for position map support and ffw/rew.
+/** \brief used by DecoderBase for the total frame number calculation 
+ * for position map support and ffw/rew.
  * FPS for a dvd is determined by AFD::normalized_fps
  */
 double DVDRingBufferPriv::GetFrameRate(void)
@@ -1131,6 +1173,9 @@ double DVDRingBufferPriv::GetFrameRate(void)
     return dvdfps;
 }
 
+/** \brief check if the current chapter is the same as
+ * the previously accessed chapter. 
+ */
 bool DVDRingBufferPriv::IsSameChapter(int tmpcellid, int tmpvobid)
 {
     if ((tmpcellid == cellid) && (tmpvobid == vobid))
@@ -1139,6 +1184,8 @@ bool DVDRingBufferPriv::IsSameChapter(int tmpcellid, int tmpvobid)
     return false;
 }
 
+/** \brief seek the beginning of a dvd cell
+ */
 void DVDRingBufferPriv::SeekCellStart(void)
 {
     QMutexLocker lock(&seekLock);
@@ -1156,7 +1203,8 @@ void DVDRingBufferPriv::SetDVDSpeed(void)
 }
 
 /** \brief set dvd speed. obtained from mplayer project
- *  \param dvd drive speed. example if speed is 1, then function sets dvd speed to 2048kb/s
+ *  \param dvd drive speed. example if speed is 2, then function 
+ *  sets dvd speed to 2048kb/s
  */
 void DVDRingBufferPriv::SetDVDSpeed(int speed)
 {
@@ -1263,8 +1311,7 @@ void DVDRingBufferPriv::SetDVDSpeed(int speed)
 #endif
 }
 
-/**
- * \brief converts palette values from YUV to RGB
+/** \brief converts palette values from YUV to RGB
  */
 void DVDRingBufferPriv::guess_palette(uint32_t *rgba_palette,uint8_t *palette,
                                         uint8_t *alpha)
@@ -1295,7 +1342,7 @@ void DVDRingBufferPriv::guess_palette(uint32_t *rgba_palette,uint8_t *palette,
 }
 
 /** \brief decodes the bitmap from the subtitle packet.
- *         copied from ffmpeg's dvdsub.c.
+ *         copied from ffmpeg's dvdsubdec.c.
  */
 int DVDRingBufferPriv::decode_rle(uint8_t *bitmap, int linesize, int w, int h, 
                                   const uint8_t *buf, int nibble_offset, int buf_size)
@@ -1336,14 +1383,13 @@ int DVDRingBufferPriv::decode_rle(uint8_t *bitmap, int linesize, int w, int h,
                 break;
             d += linesize;
             x = 0;
-            /* byte align */
             nibble_offset += (nibble_offset & 1);
        }
     }
     return 0;
 }
 
-/** copied from ffmpeg's dvdsub.c
+/** copied from ffmpeg's dvdsubdec.c
  */
 int DVDRingBufferPriv::get_nibble(const uint8_t *buf, int nibble_offset)
 {
