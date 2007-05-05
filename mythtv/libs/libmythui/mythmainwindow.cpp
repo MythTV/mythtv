@@ -999,9 +999,12 @@ void MythMainWindow::RegisterMediaHandler(const QString &destination,
     if (d->mediaHandlerMap.count(destination) == 0) 
     {
         MHData mhd = { callback, mediaType, destination, description };
+        QString msg = MythMediaDevice::MediaTypeString((MediaType)mediaType);
+        if (extensions)
+            msg += QString(", ext(%1)").arg(extensions);
 
-        VERBOSE(VB_GENERAL, QString("Registering %1 as a media handler %2")
-                .arg(destination).arg(QString("ext(%1)").arg(extensions)));
+        VERBOSE(VB_MEDIA, "Registering " + destination +
+                          " as a media handler for " + msg);
 
         d->mediaHandlerMap[destination] = mhd;
 
