@@ -1129,7 +1129,7 @@ int HttpStatus::PrintMachineInfo( QTextStream &os, QDomElement info )
                     else
                         os << "          <ul><li>Directory: ";
 
-                    os << nDirs << "\r\n";
+                    os << nDirs << "</li>\r\n";
                 }
 
                 os << "            <li>Total Space: ";
