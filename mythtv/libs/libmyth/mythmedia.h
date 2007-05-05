@@ -101,7 +101,8 @@ class MPUBLIC MythMediaDevice : public QObject
     void clearData();
 
     const char* MediaTypeString();
-    const char* MediaTypeString(MediaType type);
+
+    static const char* MediaTypeString(MediaType type);
 
  signals:
     void statusChanged(MediaStatus oldStatus, MythMediaDevice* pMedia);
