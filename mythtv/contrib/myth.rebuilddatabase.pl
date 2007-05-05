@@ -311,6 +311,7 @@ foreach my $show (@files) {
 
     # have enough to look for an past recording?
     if ($ssecond) {
+        print "Checking for a recording...\n";
         $starttime = "$syear$smonth$sday$shour$sminute$ssecond";
 
         my $guess = "select title, subtitle, description from oldrecorded where chanid=(?) and starttime=(?)";
@@ -328,6 +329,24 @@ foreach my $show (@files) {
         print "Channel:    $channel\n";
         print "Start time: $smonth/$sday/$syear - $shour:$sminute:$ssecond\n";
         print "End time:   $emonth/$eday/$eyear - $ehour:$eminute:$esecond\n";
+    }
+
+    # what about checking for guide data?
+    if($guess_description =~ /^Recovered file/) {
+        print "Checking for guide data...\n";
+        my $guess = "select title, subtitle, description from program where " .
+                    "chanid='$channel' and " .
+                    "starttime='$syear-$smonth-$sday $shour:$sminute:$ssecond'";
+        $sth = $dbh->prepare($guess);
+        $sth->execute()
+            or die "Could not execute ($guess)\n";
+
+        if (my @row = $sth->fetchrow_array) {
+            $guess_title = $row[0];
+            $guess_subtitle = $row[1];
+            $guess_description = $row[2];
+            print "Using guide data informaton for defaults\n";
+        }
     }
 
     my $newtitle = $guess_title;
