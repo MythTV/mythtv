@@ -1459,9 +1459,17 @@ int MythMainWindow::NormalizeFontSize(int pointSize)
 {
     QPaintDeviceMetrics pdm(this);
 
-    float desired = 100.0 + fonTweak;
-    pointSize = (int)(pointSize * desired / pdm.logicalDpiY());
-    pointSize = (int)(pointSize * d->hmult);
+    float floatSize = pointSize;
+    float desired = 100.0;
+
+    // adjust for screen resolution relative to 100 dpi
+    floatSize = floatSize * desired / pdm.logicalDpiY();
+    // adjust for myth GUI size relative to 800x600
+    floatSize = floatSize * d->hmult;
+    // adjust by the configurable fine tuning percentage
+    floatSize = floatSize * ((100.0 + fonTweak) / 100.0);
+    // round to the nearest point size
+    pointSize = (int)(floatSize + 0.5);
 
     return pointSize;
 }
