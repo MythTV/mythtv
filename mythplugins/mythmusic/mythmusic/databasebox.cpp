@@ -24,10 +24,11 @@ using namespace std;
 
 DatabaseBox::DatabaseBox(PlaylistsContainer *all_playlists,
                          AllMusic *music_ptr, MythMainWindow *parent, 
-                         const QString &window_name, 
+                         const QString dev, const QString &window_name, 
                          const QString &theme_filename, const char *name)
            : MythThemedDialog(parent, window_name, theme_filename, name)
 {
+    m_CDdevice = dev;
     the_playlists = all_playlists;
     active_playlist = NULL;
 
@@ -111,7 +112,8 @@ DatabaseBox::DatabaseBox(PlaylistsContainer *all_playlists,
         // Start the CD checking thread, and set up a timer to make it check 
         // occasionally
 
-        cd_reader_thread = new ReadCDThread(the_playlists, all_music);
+        cd_reader_thread = new ReadCDThread(m_CDdevice,
+                                            the_playlists, all_music);
 
         // filling initialy before thread running
         fillCD();
@@ -1229,9 +1231,11 @@ void DatabaseBox::setCDTitle(const QString& title)
         cditem->setText(title);
 }
 
-ReadCDThread::ReadCDThread(PlaylistsContainer *all_the_playlists, 
+ReadCDThread::ReadCDThread(const QString &dev,
+                           PlaylistsContainer *all_the_playlists,
                            AllMusic *all_the_music)
 {
+    m_CDdevice = dev;
     the_playlists = all_the_playlists;
     all_music = all_the_music;
     cd_status_changed = false;
@@ -1243,6 +1247,7 @@ void ReadCDThread::run()
     QMutexLocker locker(getLock());
 
     CdDecoder *decoder = new CdDecoder("cda", NULL, NULL, NULL);
+    decoder->setDevice(m_CDdevice);
     int tracknum = decoder->getNumCDAudioTracks();
 
     bool redo = false;

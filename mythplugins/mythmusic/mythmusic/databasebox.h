@@ -20,13 +20,15 @@ class ReadCDThread : public QThread
 {
   public:
 
-    ReadCDThread(PlaylistsContainer *all_the_playlist, AllMusic *all_the_music);
+    ReadCDThread(const QString &dev,
+                 PlaylistsContainer *all_the_playlist, AllMusic *all_the_music);
     virtual void run();
     bool    statusChanged(){return cd_status_changed;}
     QMutex  *getLock(){return &music_lock;}
 
   private:
 
+    QString             m_CDdevice;
     AllMusic*           all_music;
     PlaylistsContainer* the_playlists;
     bool                cd_status_changed;
@@ -39,8 +41,8 @@ class DatabaseBox : public MythThemedDialog
   public:
     DatabaseBox(PlaylistsContainer *all_playlists,
                 AllMusic *music_ptr, MythMainWindow *parent, 
-                const QString &window_name, const QString &theme_filename,
-                const char *name = 0);
+                const QString dev, const QString &window_name,
+                const QString &theme_filename, const char *name = 0);
    ~DatabaseBox();
 
     void dealWithTracks(PlaylistItem *item_ptr);
@@ -89,6 +91,7 @@ class DatabaseBox : public MythThemedDialog
     CDCheckItem         *cditem;
     PlaylistsContainer  *the_playlists;
     
+    QString             m_CDdevice;
     AllMusic            *all_music;
     bool                holding_track;
     PlaylistTrack       *track_held;

@@ -30,7 +30,8 @@ using namespace std;
 PlaybackBoxMusic::PlaybackBoxMusic(MythMainWindow *parent, QString window_name,
                                    QString theme_filename, 
                                    PlaylistsContainer *the_playlists,
-                                   AllMusic *the_music, const char *name)
+                                   AllMusic *the_music,
+                                   const QString &dev, const char *name)
 
                 : MythThemedDialog(parent, window_name, theme_filename, name)
 {
@@ -71,6 +72,7 @@ PlaybackBoxMusic::PlaybackBoxMusic(MythMainWindow *parent, QString window_name,
     cd_reader_thread = NULL;
     cd_watcher = NULL;
     scan_for_cd = gContext->GetNumSetting("AutoPlayCD", 0);
+    m_CDdevice = dev;
 
     // Set our pointers the playlists and the metadata containers
 
@@ -871,7 +873,8 @@ void PlaybackBoxMusic::updatePlaylistFromCD()
 {
     if (!cd_reader_thread)
     {
-        cd_reader_thread = new ReadCDThread(all_playlists, all_music);
+        cd_reader_thread = new ReadCDThread(m_CDdevice,
+                                            all_playlists, all_music);
         cd_reader_thread->start();
     }
 

@@ -30,8 +30,9 @@ class PlaybackBoxMusic : public MythThemedDialog
     typedef QValueVector<int> IntVector;
     
     PlaybackBoxMusic(MythMainWindow *parent, QString window_name,
-                QString theme_filename, PlaylistsContainer *the_playlists,
-                AllMusic *the_music, const char *name = 0);
+                     QString theme_filename,
+                     PlaylistsContainer *the_playlists, AllMusic *the_music,
+                     const QString &cd_device, const char *name = 0);
 
     ~PlaybackBoxMusic(void);
 
@@ -167,6 +168,7 @@ class PlaybackBoxMusic : public MythThemedDialog
     QTimer *cd_watcher;
     bool cd_checking_flag;
     bool scan_for_cd;
+    QString m_CDdevice;
 
     MainVisual *mainvisual;
 

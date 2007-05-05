@@ -34,6 +34,17 @@ using namespace std;
 // This stores the last MythMediaDevice that was detected:
 QString gCDdevice;
 
+/**
+ * \brief Work out the best CD drive to use at this time
+ */
+QString chooseCD(void)
+{
+    if (gCDdevice.length())
+        return gCDdevice;
+        
+    return MediaMonitor::defaultCDdevice();
+}   
+
 void CheckFreeDBServerFile(void)
 {
     char filename[1024];
@@ -125,10 +136,10 @@ void SavePending(int pending)
 
 void startPlayback(PlaylistsContainer *all_playlists, AllMusic *all_music)
 {
-    PlaybackBoxMusic *pbb = new PlaybackBoxMusic(gContext->GetMainWindow(),
-                                                 "music_play", "music-", 
-                                                 all_playlists, all_music,
-                                                 "music_playback");
+    PlaybackBoxMusic *pbb;
+    pbb = new PlaybackBoxMusic(gContext->GetMainWindow(),
+                               "music_play", "music-", all_playlists,
+                               all_music, chooseCD(), "music_playback");
     qApp->unlock();
     pbb->exec();
     qApp->lock();
@@ -143,7 +154,7 @@ void startPlayback(PlaylistsContainer *all_playlists, AllMusic *all_music)
 void startDatabaseTree(PlaylistsContainer *all_playlists, AllMusic *all_music)
 {
     DatabaseBox dbbox(all_playlists, all_music, gContext->GetMainWindow(),
-                      "music_select", "music-", "music database");
+                      chooseCD(), "music_select", "music-", "music database");
     qApp->unlock();
     dbbox.exec();
     qApp->lock();
@@ -151,14 +162,7 @@ void startDatabaseTree(PlaylistsContainer *all_playlists, AllMusic *all_music)
 
 bool startRipper(void)
 {
-    QString dev;
-
-    if (gCDdevice.length())
-        dev = gCDdevice;
-    else
-        dev = MediaMonitor::defaultCDdevice();
-
-    Ripper rip(dev, gContext->GetMainWindow(), "cd ripper");
+    Ripper rip(chooseCD(), gContext->GetMainWindow(), "cd ripper");
 
     qApp->unlock();
     rip.exec();
