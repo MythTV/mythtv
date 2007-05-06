@@ -1307,7 +1307,6 @@ void DVDRingBufferPriv::SetDVDSpeed(int speed)
     VERBOSE(VB_PLAYBACK, LOC + "Limiting DVD Speed Successful");
 #else
     (void)speed;
-    (void)device;
 #endif
 }
 
