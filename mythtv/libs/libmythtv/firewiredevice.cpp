@@ -75,7 +75,7 @@ bool FirewireDevice::SetPowerState(bool on)
     QString cmdStr = (on) ? "on" : "off";
     VERBOSE(VB_RECORD, LOC + QString("Powering %1").arg(cmdStr));
 
-    if (SendAVCCommand(cmd, ret, -1))
+    if (!SendAVCCommand(cmd, ret, -1))
     {
         VERBOSE(VB_IMPORTANT, LOC + "Power on cmd failed (no response)");
         return false;
