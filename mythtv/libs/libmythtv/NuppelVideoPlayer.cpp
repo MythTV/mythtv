@@ -4081,13 +4081,13 @@ bool NuppelVideoPlayer::IsNearEnd(long long margin) const
 {
     long long framesRead, framesLeft;
 
-    if (!m_playbackinfo || m_playbackinfo->isVideo)
+    if (!m_playbackinfo || m_playbackinfo->isVideo || !GetDecoder())
         return false;
     
     margin = (margin >= 0) ? margin: (long long) (video_frame_rate*2);
     margin = (long long) (margin * audio_stretchfactor);
     bool watchingTV = watchingrecording && nvr_enc && nvr_enc->IsValidRecorder();
-    
+
     framesRead = GetDecoder()->GetFramesRead();
   
     if (m_tv && m_tv->GetState() == kState_WatchingPreRecorded)
