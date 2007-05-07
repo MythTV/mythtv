@@ -189,6 +189,7 @@ class AvFormatDecoder : public DecoderBase
 
     bool SetupAudioStream(void);
     void SetupAudioStreamSubIndexes(int streamIndex);
+    void RemoveAudioStreams();
 
     /// Update our position map, keyframe distance, and the like.
     /// Called for key frame packets.
@@ -258,6 +259,7 @@ class AvFormatDecoder : public DecoderBase
     bool dvdvideopause;
     bool dvd_xvmc_enabled;
     bool dvd_video_codec_changed;
+    bool dvdTitleChanged;
 
 };
 
