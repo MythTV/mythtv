@@ -297,7 +297,7 @@ AvFormatDecoder::AvFormatDecoder(NuppelVideoPlayer *parent,
       lastdvdtitle(-1), lastcellstart(0),
       dvdmenupktseen(false), dvdvideopause(false),
       dvd_xvmc_enabled(false), dvd_video_codec_changed(false),
-      dvdTitleChanged(false)
+      dvdTitleChanged(false) 
 {
     bzero(&params, sizeof(AVFormatParameters));
     bzero(audioSamples, AVCODEC_MAX_AUDIO_FRAME_SIZE * sizeof(short int));
