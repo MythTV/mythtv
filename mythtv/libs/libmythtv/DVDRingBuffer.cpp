@@ -889,12 +889,11 @@ bool DVDRingBufferPriv::DecodeSubtitles(AVSubtitle *sub, int *gotSubtitles,
                 sub->rects = (AVSubtitleRect *)av_mallocz(sizeof(AVSubtitleRect));
                 sub->num_rects = 1;
                 sub->rects[0].rgba_palette = (uint32_t*)av_malloc(4 *4);
-                decode_rle(bitmap, w * 2, w, h / 2,
+                decode_rle(bitmap, w * 2, w, (h + 1) / 2,
                             spu_pkt, offset1 * 2, buf_size);
                 decode_rle(bitmap + w, w * 2, w, h / 2,
                             spu_pkt, offset2 * 2, buf_size);
                 guess_palette(sub->rects[0].rgba_palette, palette, alpha);
-                h = h - 1;
                 if (!IsInMenu() && y1 < 5)
                 {
                     uint8_t *tmp_bitmap;
