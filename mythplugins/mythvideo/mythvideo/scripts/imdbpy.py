@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf8 -*-
 """
-This Python script is intended to perform movie data lookups based on 
+This Python script is intended to perform movie data lookups based on
 the popular www.imdb.com website using the IMDbPy script.
 
 The script is hosted at http://imdbpy.sourceforge.net/, you need to install
@@ -32,7 +32,7 @@ except:
 def detect_series_title(search_string):
 	"""
 	Detects a series episode title.
-	
+
 	Currently the following formats are detected:
 	"Sopranos Season 1 Episode 2"
 	"Sopranos S1E2"
@@ -40,23 +40,23 @@ def detect_series_title(search_string):
 	"Sopranos 1x2"
 	"Sopranos - 1x2"
 	"Sopranos 612"
-	"""	
+	"""
 	regexps = [re.compile(r"((?P<title>.+?)(-)?)?(\s*)"\
 		"(s|(season)|\s)\s*(?P<season>\d+)"\
 		"\s*(e|(episode)|x)\s*(?P<episode>\d+)"),
 		re.compile(\
 		r"((?P<title>.+?)(-)?)?\s+"\
 		"(?P<season>\d)(?P<episode>\d\d)\s+")]
-				
+
 	for exp in regexps:
 		m = exp.match(search_string.lower())
 		if m is None or m.group('title') is None or m.group('season') is None \
-			or m.group('episode') is None:	
+			or m.group('episode') is None:
 			continue
-		
+
 		# Found a regexp that matches the title string.
 		return (m.group('title'), m.group('season'), m.group('episode'))
-		
+
 	return (None, None, None)
 
 
@@ -159,33 +159,33 @@ def title_search(search_string):
 	return movies
 
 def find_poster_url(imdb_id):
-	
+
 	imdb_access = imdb.IMDb()
 	movie = imdb_access.get_movie(imdb_id)
 	imdb_access.update(movie)
 	url = None
 	if 'cover url' in movie.keys():
 		url = movie['cover url']
-	
+
 	if url is None and movie['kind'] == 'episode':
 		series = movie['episode of']
 		imdb_access.update(series)
 		if 'cover url' in series.keys():
 			url = series['cover url']
 	return url
-		
+
 def poster_search(imdb_id):
 	url = find_poster_url(imdb_id)
 	if url is not None:
 		print url
 
 class VideoMetadata:
-	
+
 	series_episode = False
 	series_title = ""
 	season = None
 	episode = None
-	
+
 	title = ""
 	runtime = None
 	year = None
@@ -196,7 +196,7 @@ class VideoMetadata:
 	genres = None
 	countries = None
 	akas = None
-	
+
 	def __init__(self):
 		self.episode_title_format = None
 		if mythtv != None:
@@ -204,9 +204,9 @@ class VideoMetadata:
 					'VideoEpisodeTitleFormat', socket.gethostname())
 		if self.episode_title_format == None:
 			self.episode_title_format = '%(series_title)s S%(season)02d E%(episode)02d %(episode_title)s'
-	
+
 	def toMetadataString(self):
-		
+
 		def createMetadataLine(keyName, value):
 			if value is not None:
 				return keyName + ":" + value + "\n"
@@ -234,22 +234,22 @@ class VideoMetadata:
 		metadata += createMetadataLine('Runtime', self.runtime)
 		metadata += createMetadataLine('Genres', self.genres)
 		metadata += createMetadataLine('Countries', self.countries)
-		
+
 		if self.akas is not None:
 			metadata += createMetadataLine('AKA', ", ".join(self.akas))
-		
+
 		return unicode(metadata)
 
 def fetch_metadata(imdb_id):
-	
+
 	metadata = VideoMetadata()
-	
+
 	imdb_access = imdb.IMDb()
 	movie = imdb_access.get_movie(imdb_id)
 	imdb_access.update(movie)
 
 	def metadataFromField(key, default=None, m=movie):
-		
+
 		searchKey = key.lower()
 		if searchKey not in m.keys():
 			return default
@@ -264,11 +264,11 @@ def fetch_metadata(imdb_id):
 			return default
 
 	def metadataFromFirst(key, default=None, m=movie):
-		
+
 		searchKey = key.lower()
 		if searchKey not in m.keys():
 			return default
-		
+
 		value = m[searchKey]
 		if value is not None and len(value) > 0:
 			if len(value) > 1:
@@ -296,7 +296,7 @@ def fetch_metadata(imdb_id):
 			metadata.runtime = metadataFromFirst('runtimes', None)
 	else:
 		metadata.title = metadataFromField('title').decode("utf8")
-	
+
 	metadata.year = metadataFromField('year')
 
 	if 'director' in movie.keys():
@@ -309,7 +309,7 @@ def fetch_metadata(imdb_id):
 		plots = movie['plot']
 	if movie.has_key('plot outline') and len(movie['plot outline']):
 		plots.append("Outline::" + movie['plot outline'])
-	
+
 	if plots is not None:
 		# Find the shortest plot.
 		shortest_found = None
@@ -334,7 +334,7 @@ def metadata_search(imdb_id):
 	meta = fetch_metadata(imdb_id)
 	if meta is not None:
 		return meta.toMetadataString()
-	
+
 
 def parse_meta(meta, key):
 	for line in meta.split("\n"):
@@ -342,7 +342,7 @@ def parse_meta(meta, key):
 		if line.startswith(beginning):
 			return line[len(beginning):].strip()
 	return None
-	
+
 def main():
 	p = optparse.OptionParser()
 	p.add_option('--version', '-v', action="store_true", default=False,
@@ -352,7 +352,7 @@ def main():
 	p.add_option('--movie_search', '-M', metavar='QUERY_STRING',
 		help="displays a list of 'movieid:Movie Title' lines that may be "\
 			"possible matches for the query.  The lines are ranked "\
-            "by descending priority.")
+			"by descending priority.")
 	p.add_option('--poster_search', '-P', metavar='IMDB_ID',
 		help="displays a list of URL's to movie posters.  The lines are "\
 			"ranked by descending value.")
@@ -361,7 +361,7 @@ def main():
 			"for the given movie at the IMDb id.")
 	options, arguments = p.parse_args()
 
-	if options.version: 
+	if options.version:
 		print "MythVideo IMDbPy wrapper v1.0 (c) Pekka Jääskeläinen 2006"
 		sys.exit(0)
 
