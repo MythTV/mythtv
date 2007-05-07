@@ -12,7 +12,7 @@
 #include "dbcheck.h"
 
 
-const QString currentDatabaseVersion = "1000";
+const QString currentDatabaseVersion = "1001";
 
 static bool UpdateDBVersionNumber(const QString &newnumber)
 {
@@ -98,6 +98,18 @@ bool UpgradeArchiveDatabaseSchema(void)
 ""
 };
         if (!performActualUpdate(updates, "1000", dbver))
+            return false;
+    }
+
+    if (dbver == "1000")
+    {
+        const QString updates[] =
+        {
+            "ALTER TABLE archiveitems MODIFY size BIGINT UNSIGNED NOT NULL;",
+            ""
+        };
+
+        if (!performActualUpdate(updates, "1001", dbver))
             return false;
     }
 
