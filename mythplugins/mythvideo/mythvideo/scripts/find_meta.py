@@ -68,18 +68,22 @@ try:
 except:
     pass
 
-interactive=False
-recursive=False
-dbimport=False
+interactive = False
+recursive = False
+dbimport = False
+poster_search = True
+
+# The language of the title name to add to the movie's original title name.
+aka_language = None
 
 # Import metadata from .metadata files if found.
-import_from_files=False
+import_from_files = False
 
 # Overwrite the old metadata if found.
-overwrite=False
+overwrite = False
 
 # Create the *.metadata files.
-metafiles=False
+metafiles = False
 
 videoExtensions = ["avi", "mpg", "wmv", "mkv"]
 
@@ -126,8 +130,8 @@ def init_db():
 				db_password = config.get_token()
 								
 		token = config.get_token()
-	db = MySQLdb.connect(user=db_user, host=db_host, passwd=db_password, 
-		db="mythconverg")
+	db = MySQLdb.connect(user=db_user, host=db_host, passwd=db_password,
+			db="mythconverg")
 	print_verbose("Database connection successful.")
 	return True
 	
@@ -163,8 +167,10 @@ def strip_extension(path):
 		return path
 		
 def cleanup_title(title):
-	title = title.replace("_", " ").replace(".", " ")
-	cut_point_strings = ["hdtv", "xvid", "dvd", "proper", "720p", "limited"]
+	title = title.replace("_", " ").replace(".", " ").replace("-", " ")
+	cut_point_strings = [
+		"hdtv", "xvid", "dvd", "proper", "720p", "limited", 
+		"dsr", "pdtv", "cd", "disk", "disc"]
 	lowest_cutpoint = len(title)
 	for string in cut_point_strings:
 		pos = title.lower().rfind(string)
@@ -386,7 +392,7 @@ def save_video_metadata_to_mythdb(videopath, metadata, child=-1, disc=None):
 	
 	Returns the id of the inserted metadata.
 	"""
-	global overwrite, db, poster_dir
+	global overwrite, db, poster_dir, poster_search, aka_language
 	
 	# Drop the trailing '/' from the path
 	if videopath.endswith('/'):
@@ -417,31 +423,55 @@ def save_video_metadata_to_mythdb(videopath, metadata, child=-1, disc=None):
 			
 	def parse_metadata(variable, oldvalue, emptyvalue="", meta=metadata):
 		return parse_meta(variable, oldvalue, emptyvalue, meta)
-						
+							
+	if title is None:
+		title = parse_metadata('Title', title)
 	
-	title = parse_metadata('Title', title)
+	if title is None:
+		title = cleanup_title(os.path.basename(videopath))
+	
 	inetref = parse_metadata('IMDb', inetref, '00000000')
 	
 	if inetref == None:
 		inetref = '00000000'
 	
-	coverfile = find_poster_image(title, inetref)	
+	if poster_search:
+		print_verbose("Fetching a poster image...")
+		coverfile = find_poster_image(title, inetref)	
+		if coverfile is not None:
+			print_verbose("Found a poster.")
+		else:
+			print_verbose("Poster not found.")
 	
+	akas = parse_metadata('AKA', None)
+	if aka_language is not None and akas is not None:
+		for aka in akas.split(', '):
+		# Grill Point::(International: English title) 
+		# Catastrofi d'amore::(Italy)::[it]
+			akaRegexp = "(.+)::\(.*\)::\[%s\].*" % aka_language
+                	m = re.match(akaRegexp, aka)
+			if m is not None:
+				title = m.group(1) + " (" + title + ")"
+				print_verbose("Found AKA: %s" % title)				
+				break
+		
 	if disc is not None:
-		title += " (disc " + str(disc) + ")"
+		title += " [disc" + unicode(disc) + "]"
 		
 	year = parse_metadata('Year', year, 0)
 	
-	if title is None or year is None:
-		return
-	
-	
+	if year is None:
+		year = 0
+
 	director = parse_metadata('Director', director, 'Unknown')
 	
 	if director == None:
 		director = "Unknown"
 	
 	plot = parse_metadata('Plot', plot, "None")
+	if plot == None:
+		plot = ""
+	
 	userrating = parse_metadata('UserRating', userrating, 0.0)
 			
 	try:
@@ -454,12 +484,17 @@ def save_video_metadata_to_mythdb(videopath, metadata, child=-1, disc=None):
 	if rating is None:
 		rating = "Unknown"
 		
-	length = parse_metadata('Runtime', length, 0)	
+	length = parse_metadata('Runtime', length, 0)
 	try:
 		length = length.split(",")[0]
 		length = int(length) 
 	except:
-		length = 0
+		print_verbose("Chose runtime: %s" % length)
+		try:
+			length = length.split(":")[1]
+			length = int(length)
+		except:
+			length = 0
 				
 	filename = videopath
 				
@@ -470,7 +505,7 @@ def save_video_metadata_to_mythdb(videopath, metadata, child=-1, disc=None):
 	
 	if len(genres) < 1:
 		print_verbose("No genres.")
-		return
+		category = get_genre_id("Unknown")
 	else:
 		# Only one genre supported?
 		category = get_genre_id(genres[0])			
@@ -479,14 +514,16 @@ def save_video_metadata_to_mythdb(videopath, metadata, child=-1, disc=None):
 		coverfile = "No cover"
 		
 	c = db.cursor()
-	c.execute("""
-		UPDATE videometadata 
-		SET showlevel = 1, browse = 1, childid = %s, playcommand = %s, title = %s, 
-		    director = %s, plot = %s, rating = %s, inetref = %s, category = %s,
-		    year = %s, userrating = %s, length = %s, filename = %s, coverfile = %s
-		WHERE intid = %s""", 
-		(childid, playcommand, title, director, plot, rating, inetref, category,
-		 year, userrating, length, filename, coverfile, intid))
+
+	c.execute(u"""UPDATE videometadata
+                SET showlevel = 1, browse = 1, childid = %s, playcommand = %s, title = %s,
+                    director = %s, plot = %s, rating = %s, inetref = %s, category = %s,
+                    year = %s, userrating = %s, length = %s, filename = %s, coverfile = %s
+       	        WHERE intid = %s""",
+				(childid, playcommand, title.encode("utf8"),
+					director.encode("utf8"), plot.encode("utf8"), rating,
+					inetref, category, year, userrating, length, filename,
+					coverfile, intid))
 	c.close()
 	return intid
 				
@@ -614,7 +651,7 @@ def find_metadata_for_video_path(pathName):
 				if not interactive:
 					print "Use the '-a' or '-i' switch to choose the correct one."
 				for candidate in candidates:
-					print "%s) %s (%d)" % (candidate[0], candidate[1], candidate[2])
+					print "%s) %s (%d)" % (candidate[0], candidate[1].encode("utf8"), candidate[2])
 						
 				if interactive:
 					answer = raw_input("?)")
@@ -657,7 +694,7 @@ def load_metadata_file(metadata_filename):
 	metadata = None
 	try:
 		f = open(metadata_filename)
-		metadata = "".join(f.readlines())
+		metadata = unicode("", "utf8").join(f.readlines())
 		f.close()
 	except:
 		pass
@@ -713,8 +750,12 @@ def detect_compressed_dvd_backup_dir(dirName):
 			# Detect that the file names don't look like series episodes
 			filename_length = len(videos[0])
 			for video in videos:
-				if imdbpy.detect_series_title(cleanup_title(video)) != (None, None, None):
+				title, season, episode = \
+					imdbpy.detect_series_title(cleanup_title(video))
+				if title is not None and season is not None and episode is not None:
 					print_verbose("'%s' looks like a TV-series episode." % video)
+					print_verbose("title: %s season: %s episode: %s" % \
+					(title, season, episode))			
 					return False
 			
 			# Detect the disc numbers from file names. 
@@ -877,8 +918,9 @@ def scan(pathName, imdb_id = None):
 	return
 
 def main():
-	global verbose,overwrite,interactive,recursive,dbimport
-	global import_from_files,metafiles,poster_dir
+	global verbose, overwrite, interactive, recursive, dbimport
+	global import_from_files, metafiles, poster_dir, poster_search
+	global aka_language
 	
 	usage = "usage: %prog [options] videopath1 [videopath2 videopath3...]"
 	
@@ -906,7 +948,12 @@ def main():
 		
 	p.add_option('--prune', '-p', action="store_true", default=False,
 		help="Prune metadata of deleted files from MythDB.")
-		
+	p.add_option('--skip_poster_search', '-s', action="store_true", default=False,
+		help="Skip poster search.")		
+	p.add_option('--lang_code', '-l', action="store", type="string", dest="lang_code",
+		default=None,
+		help="Add the title name in the given country (two letter code, e.g., 'fi') "\
+		"to the movie title.")
 		
 	options, arguments = p.parse_args()
 	
@@ -922,6 +969,8 @@ def main():
 	import_from_files = options.fromfiles and dbimport
 	metafiles = options.metafiles
 	prune = options.prune
+	poster_search = not options.skip_poster_search
+	aka_language = options.lang_code
 	
 	if not (metafiles or dbimport):
 		print "You must define writing to either MythDB import (-d) or metadata files (-m)."

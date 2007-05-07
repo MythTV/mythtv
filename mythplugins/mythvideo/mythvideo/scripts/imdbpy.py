@@ -34,16 +34,26 @@ def detect_series_title(search_string):
 	"Sopranos S1 E2"
 	"Sopranos 1x2"
 	"Sopranos - 1x2"
-	"""
-	m = re.match(r"((?P<title>.+?)(-)?)?(\s*)"\
+	"Sopranos 612"
+	"""	
+	regexps = [re.compile(r"((?P<title>.+?)(-)?)?(\s*)"\
 		"(s|(season)|\s)\s*(?P<season>\d+)"\
-		"\s*(e|(episode)|x)\s*(?P<episode>\d+)",
-		search_string.lower())
-	if m is None or m.group('title') is None or m.group('season') is None \
-			or m.group('episode') is None:
-		return (None, None, None)
+		"\s*(e|(episode)|x)\s*(?P<episode>\d+)"),
+		re.compile(\
+		r"((?P<title>.+?)(-)?)?\s+"\
+		"(?P<season>\d)(?P<episode>\d\d)\s+")]
+				
+	for exp in regexps:
+		m = exp.match(search_string.lower())
+		if m is None or m.group('title') is None or m.group('season') is None \
+			or m.group('episode') is None:	
+			continue
+		
+		# Found a regexp that matches the title string.
+		return (m.group('title'), m.group('season'), m.group('episode'))		
+		
+	return (None, None, None)
 
-	return (m.group('title'), m.group('season'), m.group('episode'))
 
 def episode_search(title, season, episode):
 	matches = []
@@ -71,7 +81,13 @@ def episode_search(title, season, episode):
 				meta.season = season
 				meta.episode = episode
 				meta.episode_title = ep['title']
-				matches.append([imdb_access.get_imdbID(ep), meta.toMetadataString() ,int(ep['year'])])	
+				year = 0
+				try:
+					year = int(ep['year'])
+				except:
+					pass
+				matches.append([imdb_access.get_imdbID(ep),
+					meta.toMetadataString(), year])
 				return matches
 			else:
 				matches.append([imdb_access.get_imdbID(serie), 
@@ -174,6 +190,7 @@ class VideoMetadata:
 	mpaa_rating = None
 	genres = None
 	countries = None
+	akas = None
 	
 	episode_title_format = '%(series_title)s S%(season)02d E%(episode)02d %(episode_title)s'
 	
@@ -187,7 +204,7 @@ class VideoMetadata:
 				return keyName + ":" + value + "\n"
 			else:
 				return ""
-		metadata = ""
+		metadata = unicode("", "utf8")
 		if self.series_episode == True and self.season is not None and \
 			self.episode is not None:
 			metadata += 'Title:' + self.episode_title_format % \
@@ -198,20 +215,22 @@ class VideoMetadata:
 					'episode_title': self.episode_title,
 				} + '\n'
 		else:
-			metadata += createMetadataLine("Title", self.title).decode("utf8")
+			metadata += createMetadataLine("Title", unicode(self.title))
 		metadata += createMetadataLine("Runtime", self.runtime)
 		metadata += createMetadataLine('Year', self.year)
 		if self.directors is not None and len(self.directors) > 0:
 			metadata += createMetadataLine("Director", unicode(self.directors[0]))
 		metadata += createMetadataLine("Plot", self.plot)
-	
 		metadata += createMetadataLine('UserRating', self.rating)
 		metadata += createMetadataLine('MovieRating', self.mpaa_rating)
 		metadata += createMetadataLine('Runtime', self.runtime)
 		metadata += createMetadataLine('Genres', self.genres)
 		metadata += createMetadataLine('Countries', self.countries)
 		
-		return metadata
+		if self.akas is not None:
+			metadata += createMetadataLine('AKA', ", ".join(self.akas))
+		
+		return unicode(metadata)
 
 def fetch_metadata(imdb_id):
 	
@@ -261,7 +280,7 @@ def fetch_metadata(imdb_id):
 		if 'episode' in movie.keys():
 			metadata.episode = movie['episode']
 		if 'title' in movie.keys():
-			metadata.episode_title = movie['title']
+			metadata.episode_title = unicode(movie['title'])
 
 		if 'episode of' in movie.keys():
 			series = movie['episode of']
@@ -298,9 +317,10 @@ def fetch_metadata(imdb_id):
 	metadata.runtime = metadataFromFirst('runtimes', metadata.runtime)
 	metadata.genres = metadataFromFirst('genres', metadata.genres)
 	metadata.countries = metadataFromFirst('countries', metadata.countries)
+	if movie.has_key('akas'):
+		metadata.akas = movie['akas']
 
 	return metadata
-	
 
 def metadata_search(imdb_id):
 	meta = fetch_metadata(imdb_id)
