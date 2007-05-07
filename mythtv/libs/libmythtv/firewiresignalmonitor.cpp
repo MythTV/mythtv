@@ -217,17 +217,35 @@ void FirewireSignalMonitor::UpdateValues(void)
 
     if (HasFlags(kFWSigMon_WaitForPower) && !HasFlags(kFWSigMon_PowerMatch))
     {
-        FirewireDevice::PowerState power = fwchan->GetPowerState();
-        if (FirewireDevice::kAVCPowerOn == power)
+        bool retried = false;
+        while (true)
         {
-            AddFlags(kFWSigMon_PowerSeen | kFWSigMon_PowerMatch);
-        }
-        else if (FirewireDevice::kAVCPowerOff == power)
-        {
-            AddFlags(kFWSigMon_PowerSeen);
-            fwchan->SetPowerState(true);
-            stb_wait_for_power_timer.start();
-            stb_needs_to_wait_for_power = true;
+            FirewireDevice::PowerState power = fwchan->GetPowerState();
+            if (FirewireDevice::kAVCPowerOn == power)
+            {
+                AddFlags(kFWSigMon_PowerSeen | kFWSigMon_PowerMatch);
+            }
+            else if (FirewireDevice::kAVCPowerOff == power)
+            {
+                AddFlags(kFWSigMon_PowerSeen);
+                fwchan->SetPowerState(true);
+                stb_wait_for_power_timer.start();
+                stb_needs_to_wait_for_power = true;
+            }
+            else
+            {
+                bool qfailed = (FirewireDevice::kAVCPowerQueryFailed == power);
+                if (qfailed && !retried)
+                {
+                    retried = true;
+                    continue;
+                }
+
+                VERBOSE(VB_RECORD, "Can't determine if STB is power on, "
+                        "assuming it is...");
+                AddFlags(kFWSigMon_PowerSeen | kFWSigMon_PowerMatch);
+            }
+            break;
         }
     }
 
