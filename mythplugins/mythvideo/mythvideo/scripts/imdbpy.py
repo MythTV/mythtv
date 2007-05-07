@@ -9,11 +9,12 @@ it to make this script work.
 
 This wrapper script is written by
 Pekka Jääskeläinen (gmail: pekka.jaaskelainen).
-"""  
+"""
 
 import sys
 import optparse
 import re
+import socket
 
 try:
 	import imdb
@@ -22,7 +23,11 @@ except ImportError:
 		"from (http://imdbpy.sourceforge.net/?page=download)"
 	sys.exit(1)
 
-
+try:
+	from MythTV import MythTV
+	mythtv = MythTV()
+except:
+	mythtv = None
 
 def detect_series_title(search_string):
 	"""
@@ -50,7 +55,7 @@ def detect_series_title(search_string):
 			continue
 		
 		# Found a regexp that matches the title string.
-		return (m.group('title'), m.group('season'), m.group('episode'))		
+		return (m.group('title'), m.group('season'), m.group('episode'))
 		
 	return (None, None, None)
 
@@ -90,7 +95,7 @@ def episode_search(title, season, episode):
 					meta.toMetadataString(), year])
 				return matches
 			else:
-				matches.append([imdb_access.get_imdbID(serie), 
+				matches.append([imdb_access.get_imdbID(serie),
 					serie['title'], int(serie['year'])])
 	return matches
 
@@ -109,7 +114,7 @@ def title_search(search_string):
 
 	imdb_access = imdb.IMDb()
 	#print "Search:",search_string
-	movies = imdb_access.search_movie(search_string.encode("ascii", 'ignore'))	
+	movies = imdb_access.search_movie(search_string.encode("ascii", 'ignore'))
 
 	if movies is None or len(movies) == 0:
 		return None
@@ -192,10 +197,13 @@ class VideoMetadata:
 	countries = None
 	akas = None
 	
-	episode_title_format = '%(series_title)s S%(season)02d E%(episode)02d %(episode_title)s'
-	
 	def __init__(self):
-		pass
+		self.episode_title_format = None
+		if mythtv != None:
+			self.episode_title_format = mythtv.getSetting(
+					'VideoEpisodeTitleFormat', socket.gethostname())
+		if self.episode_title_format == None:
+			self.episode_title_format = '%(series_title)s S%(season)02d E%(episode)02d %(episode_title)s'
 	
 	def toMetadataString(self):
 		
@@ -243,7 +251,7 @@ def fetch_metadata(imdb_id):
 	def metadataFromField(key, default=None, m=movie):
 		
 		searchKey = key.lower()
-		if searchKey not in m.keys(): 
+		if searchKey not in m.keys():
 			return default
 		value = unicode(m[searchKey])
 		try:
@@ -258,7 +266,7 @@ def fetch_metadata(imdb_id):
 	def metadataFromFirst(key, default=None, m=movie):
 		
 		searchKey = key.lower()
-		if searchKey not in m.keys(): 
+		if searchKey not in m.keys():
 			return default
 		
 		value = m[searchKey]
@@ -271,7 +279,7 @@ def fetch_metadata(imdb_id):
 			return default
 
 	if movie['kind'] == 'episode':
-		# print "TV Series episode detected"		
+		# print "TV Series episode detected"
 		metadata.series_episode = True
 		if 'series title' in movie.keys():
 			metadata.series_title = movie['series title']
@@ -294,7 +302,7 @@ def fetch_metadata(imdb_id):
 	if 'director' in movie.keys():
 		directors = movie['director']
 		if directors is not None:
-			metadata.directors = directors			
+			metadata.directors = directors
 
 	plots = []
 	if 'plot' in movie.keys():
@@ -313,7 +321,7 @@ def fetch_metadata(imdb_id):
 		metadata.plot = shortest_found
 
 	metadata.rating = metadataFromField('rating', metadata.rating)
-	metadata.mpaa_rating = metadataFromField('mpaa', metadata.mpaa_rating) 
+	metadata.mpaa_rating = metadataFromField('mpaa', metadata.mpaa_rating)
 	metadata.runtime = metadataFromFirst('runtimes', metadata.runtime)
 	metadata.genres = metadataFromFirst('genres', metadata.genres)
 	metadata.countries = metadataFromFirst('countries', metadata.countries)
@@ -359,9 +367,9 @@ def main():
 
 	if options.info:
 		print """
-Uses the IMDbPy package to fetch the data, thus externalizes the actual 
-parsing of IMDb data to another project, hopefully reducing the maintenance 
-burden in the future, in addition supports fetching data for TV-series 
+Uses the IMDbPy package to fetch the data, thus externalizes the actual
+parsing of IMDb data to another project, hopefully reducing the maintenance
+burden in the future, in addition supports fetching data for TV-series
 episodes."""
 		sys.exit(0)
 

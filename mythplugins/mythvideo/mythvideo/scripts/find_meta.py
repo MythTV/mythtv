@@ -35,7 +35,7 @@ to MythDB every hour:
 0 * * * * find_meta.py -r /videos
 
 In which /videos is the root of your MythVideo files.
-"""  
+"""
 
 import sys
 import optparse
@@ -52,11 +52,13 @@ import distutils.file_util
 
 try:
 	# If found, we can insert data directly to MythDB
-	import MySQLdb	
-	db_support = True
+	from MythTV import MythTV, MythVideo
+	mythtv = MythTV()
+	mythvideo = MythVideo()
 except:
-	print "MySQLdb (python-mysqldb) not installed, MythDB importing disabled."
-	db_support = False
+	print "MythTV module not found, MythDB importing disabled."
+	mythtv = None
+	mythvideo = None
 
 from stat import *
 
@@ -180,29 +182,6 @@ def cleanup_title(title):
 	title = title[0:lowest_cutpoint]
 	return title.strip()
 
-def get_genre_id(genre_name):
-	"""
-	Find the id of the given genre from MythDB. 
-	
-	If the genre does not exist, insert it and return its id.
-	"""
-	global db
-	c = db.cursor()
-	c.execute("SELECT intid FROM videocategory WHERE lower(category) = %s", (genre_name,))
-	row = c.fetchone()
-	c.close()
-	
-	if row is not None:
-		return row[0]
-	
-	# Insert a new genre.
-	c = db.cursor()
-	c.execute("INSERT INTO videocategory(category) VALUES (%s)", (genre_name.capitalize(),))
-	newid = c.lastrowid
-	c.close()
-	
-	return newid
-	
 def parse_meta(variable, oldvalue, emptyvalue="", meta=""):
 	"""
 	Parses a single metadata from a metadata string (returned by the imdbpy.py, etc.).
@@ -320,67 +299,6 @@ def save_metadata_to_mythdb(videopath, metadata):
 			
 	return save_video_metadata_to_mythdb(videopath, metadata)
 		
-def prune_mythdb_metadata():
-	global db
-	c = db.cursor()
-	c.execute("""
-		SELECT intid, filename
-		FROM videometadata""")
-	
-	row = c.fetchone()
-	while row is not None:
-		intid = row[0]
-		filename = row[1]
-		if not os.path.exists(filename):
-			print_verbose("%s not exist, removing metadata..." % filename)
-			c2 = db.cursor()
-			c2.execute("""DELETE FROM videometadata WHERE intid = %s""", (intid,))
-			c2.close()
-		row = c.fetchone()
-	c.close()
-		
-def mythvideo_metadata_id(videopath):
-	"""
-	Finds the MythVideo metadata id for the given video path from the MythDB, if any.
-	
-	Returns None if no metadata was found.
-	"""
-	global db
-	c = db.cursor()
-	c.execute("""
-		SELECT intid
-		FROM videometadata
-		WHERE filename = %s""", (videopath,))
-	row = c.fetchone()
-	c.close()
-	
-	if row is not None:
-		return row[0]
-	else:
-		return None
-	
-def mythtv_setting(value, hostname = '%'):
-	"""
-	Returns the value for the given MythTV setting.
-	
-	Returns None if the settings was not found. If multiple rows are
-	found (multiple hostnames), returns the value of the first one.
-	"""
-	global db
-	c = db.cursor()
-	c.execute("""
-		SELECT data
-		FROM settings
-		WHERE value LIKE(%s) AND hostname LIKE(%s) LIMIT 1""", 
-		(value, hostname))
-	row = c.fetchone()
-	c.close()
-	
-	if row is not None:
-		return row[0]
-	else:
-		return None
-	
 def save_video_metadata_to_mythdb(videopath, metadata, child=-1, disc=None):
 	"""
 	Updates the given metadata for the given video file.
@@ -406,24 +324,20 @@ def save_video_metadata_to_mythdb(videopath, metadata, child=-1, disc=None):
 		 (None, None, 0, None, None, None, None, 
 		  0.0, None, 0, None, None, child, "")
 		 
-	intid = mythvideo_metadata_id(videopath)
+	intid = mythvideo.getMetadataId(videopath)
 	if intid is not None:
-		if not overwrite:		 
+		if not overwrite:
 			print_verbose("Metadata already exist in MythDB, not overwriting it.")
-			return None			
+			return None
 	else:
 		print_verbose("No metadata in MythDB, creating a new one.")
 		# Create a new empty entry at this point so we can use the common UPDATE code
 		# to actually insert the data.
-		c = db.cursor()
-		c.execute("""INSERT INTO videometadata(filename) VALUES(%s)""", (videopath,))
-		intid = c.lastrowid
-		c.close()
+		intid = mythvideo.setMetadata({'filename': videopath})
 	
-			
 	def parse_metadata(variable, oldvalue, emptyvalue="", meta=metadata):
 		return parse_meta(variable, oldvalue, emptyvalue, meta)
-							
+		
 	if title is None:
 		title = parse_metadata('Title', title)
 	
@@ -437,7 +351,7 @@ def save_video_metadata_to_mythdb(videopath, metadata, child=-1, disc=None):
 	
 	if poster_search:
 		print_verbose("Fetching a poster image...")
-		coverfile = find_poster_image(title, inetref)	
+		coverfile = find_poster_image(title, inetref)
 		if coverfile is not None:
 			print_verbose("Found a poster.")
 		else:
@@ -452,7 +366,7 @@ def save_video_metadata_to_mythdb(videopath, metadata, child=-1, disc=None):
                 	m = re.match(akaRegexp, aka)
 			if m is not None:
 				title = m.group(1) + " (" + title + ")"
-				print_verbose("Found AKA: %s" % title)				
+				print_verbose("Found AKA: %s" % title)
 				break
 		
 	if disc is not None:
@@ -505,26 +419,20 @@ def save_video_metadata_to_mythdb(videopath, metadata, child=-1, disc=None):
 	
 	if len(genres) < 1:
 		print_verbose("No genres.")
-		category = get_genre_id("Unknown")
+		category = mythvideo.getGenreId("Unknown")
 	else:
 		# Only one genre supported?
-		category = get_genre_id(genres[0])			
+		category = mythvideo.getGenreId(genres[0])
 	
 	if coverfile == None:
 		coverfile = "No cover"
 		
-	c = db.cursor()
-
-	c.execute(u"""UPDATE videometadata
-                SET showlevel = 1, browse = 1, childid = %s, playcommand = %s, title = %s,
-                    director = %s, plot = %s, rating = %s, inetref = %s, category = %s,
-                    year = %s, userrating = %s, length = %s, filename = %s, coverfile = %s
-       	        WHERE intid = %s""",
-				(childid, playcommand, title.encode("utf8"),
-					director.encode("utf8"), plot.encode("utf8"), rating,
-					inetref, category, year, userrating, length, filename,
-					coverfile, intid))
-	c.close()
+	mythvideo.setMetadata({'showlevel': 1, 'browse': 1, 'childid': childid,
+					'playcommand': playcommand, 'title': title.encode('utf8'),
+					'director': director.encode('utf8'), 'plot': plot.encode('utf8'),
+					'rating': rating, 'inetref': inetref, 'category': category,
+					'year': year, 'userrating': userrating, 'length': length,
+					'filename': filename, 'coverfile': coverfile}, intid)
 	return intid
 				
 def find_poster_image(title, imdb_id):
@@ -883,7 +791,7 @@ def should_be_skipped(path, meta_file = None):
 	# Check if we are not in overwrite mode and there is existing data
 	# for the wanted targets (metadata files and/or MythDB).
 	if not overwrite:		
-		need_mythdb_data = dbimport and mythvideo_metadata_id(path) is None
+		need_mythdb_data = dbimport and mythvideo.getMetadataId(path) is None
 		need_metadata_file = metafiles
 		if metafiles and meta_file is not None:
 			need_metadata_file = not os.path.exists(meta_file)
@@ -991,17 +899,14 @@ def main():
 		print_verbose("IMDb ID %s given manually." % options.imdb_id)		
 			
 	if dbimport or prune:
-		if not db_support:
-			print "You must install MySQLdb module to make direct DB importing to work"
+		if not mythtv:
+			print "You must have the MythTV module to make direct DB importing to work"
 			sys.exit(1)
-		if not init_db():
-			print "Database connection failed."
-			sys.exit(1)	
-		poster_dir = mythtv_setting("VideoArtworkDir", socket.gethostname())
+		poster_dir = mythtv.getSetting("VideoArtworkDir", socket.gethostname())
 		
 	
 	if prune:
-		prune_mythdb_metadata()
+		mythvideo.pruneMetadata()
 	
 	for path in paths:
 	
