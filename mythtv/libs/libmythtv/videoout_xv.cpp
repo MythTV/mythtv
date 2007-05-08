@@ -2480,6 +2480,12 @@ void VideoOutputXv::Show(FrameScanType scan)
 
 void VideoOutputXv::DrawUnusedRects(bool sync)
 {
+    // Unfortunately, this gets drawn in the wrong place on prebuffering
+    // pauses when embedding and this is rarely useful when embedding
+    // since the background is drawn in guidegrid so we bail here. -- dtk
+    if (embedding) 
+        return;
+
     // boboff assumes the smallest interlaced resolution is 480 lines - 5%
     bool use_bob   = (m_deinterlacing && m_deintfiltername == "bobdeint");
     int boboff_raw = (int)round(((double)display_video_rect.height()) /
