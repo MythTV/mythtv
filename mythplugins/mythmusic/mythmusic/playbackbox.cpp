@@ -21,6 +21,7 @@ using namespace std;
 #include "constants.h"
 #include "streaminput.h"
 #include "decoder.h"
+#include "cddecoder.h"
 #include "playbackbox.h"
 #include "databasebox.h"
 #include "mainvisual.h"
@@ -1199,6 +1200,8 @@ void PlaybackBoxMusic::play()
             stopAll();
             return;
         }
+        if (sourcename.contains("cda") == 1)
+            dynamic_cast<CdDecoder*>(decoder)->setDevice(m_CDdevice);
 
         decoder->setBlockSize(globalBlockSize);
         decoder->addListener(this);
