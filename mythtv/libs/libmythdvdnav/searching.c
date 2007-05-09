@@ -83,17 +83,18 @@ static dvdnav_status_t dvdnav_scan_admap(dvdnav_t *this, int32_t domain, uint32_
         } else {
           vobu_start = next_vobu;
         }
-        address ++;
+        address++;
       }
     }
     else {
       found = 0;
       first_address = 0;
       last_address  = admap->last_byte >> 2;
-      while ((!found) && first_address <= last_address)
+      while (first_address <= last_address)
       {
         address = (first_address + last_address) / 2;
         next_vobu = admap->vobu_start_sectors[address];
+        vobu_start = next_vobu;
         if (seekto_block > next_vobu)
           first_address = address + 1;
         else if (seekto_block < next_vobu)
@@ -103,7 +104,8 @@ static dvdnav_status_t dvdnav_scan_admap(dvdnav_t *this, int32_t domain, uint32_
         }
       }
       found = 1;
-      vobu_start = next_vobu;
+      if (next_vobu > seekto_block)
+        vobu_start = admap->vobu_start_sectors[last_address - 1];
     }
     if(found) {
       *vobu = vobu_start;
@@ -640,8 +642,14 @@ dvdnav_status_t dvdnav_get_position_in_title(dvdnav_t *this,
   return DVDNAV_STATUS_OK;
 }
 
+/** \brief Seeks the nearest VOBU to the relative_time within the cell
+ * relative_time is in seconds * 2. 
+ * If you want 5 seconds ahead relative time = +10. 
+ * If relative_time is negative, then 
+ * look backwards within the cell.
+ */
 dvdnav_status_t dvdnav_time_search_within_cell(dvdnav_t *this,
-                    uint relative_time)
+                    int relative_time)
 {
   if(!this) {
     printerr("Passed a NULL pointer.");
@@ -649,32 +657,83 @@ dvdnav_status_t dvdnav_time_search_within_cell(dvdnav_t *this,
   }
 
   uint32_t cur_vobu, new_vobu, start, offset;
-  int current_cell, i;
+  uint32_t first_cell_nr, last_cell_nr, cell_nr;
+  cell_playback_t *cell;
+  int i, length, scan_admap;
   
   dsi_t * dsi;
   dvd_state_t *state;
   int stime[19] = { 240, 120, 60, 20, 15, 14, 13, 12, 11,
                     10, 9, 8, 7, 6, 5, 4, 3, 2, 1};
   pthread_mutex_lock(&this->vm_lock);
+  length = relative_time;
+  state = &(this->vm->state);
+  cell_nr = state->cellN -1;
+  cell = &(state->pgc->cell_playback[cell_nr]);
   cur_vobu = this->vobu.vobu_start;
-  for (i = 0; i <= 19; i++) {
-    if (stime[i]/2.0 <= relative_time) {
-      dsi = dvdnav_get_current_nav_dsi(this);
-      offset = dsi->vobu_sri.fwda[i];
-      if (offset >> 31)
-        new_vobu = cur_vobu + (dsi->vobu_sri.fwda[i] & 0xfffff);
-      else
-        new_vobu = cur_vobu;
-      break;
+  scan_admap = 0;
+
+  if (this->pgc_based) {
+    first_cell_nr = 0;
+    last_cell_nr = state->pgc->nr_of_cells - 1;
+  } else { 
+    printerr("dvdnav_time_search_within_cell: works only if pgc_based is enabled");
+    return DVDNAV_STATUS_ERR;
+  }
+
+  if (length != 0)
+  {
+    dsi = dvdnav_get_current_nav_dsi(this);
+    if (length > 0) {
+      for (i = 0; i <= 19; i++) {
+        if (stime[i]/2.0 <= length/2.0) {
+          offset = dsi->vobu_sri.fwda[i];
+          if (offset >> 31) {
+            new_vobu = cur_vobu + (offset & 0xffff);
+          } else {
+            if (cell_nr == last_cell_nr) {
+              offset = state->pgc->cell_playback[last_cell_nr].last_sector;
+              scan_admap = 1;
+            } else {
+              cell_nr++;
+              new_vobu =  state->pgc->cell_playback[cell_nr].first_sector;
+            }
+          }
+          break;
+        }
+      }
+    } else {
+      for (i = 0; i <= 19; i++) {
+        if (stime[18 - i]/2.0 >= abs(length)/2.0)
+        {
+          offset = dsi->vobu_sri.bwda[i];
+          if (offset >> 31) {
+            new_vobu = cur_vobu - (offset & 0xffff);
+          } else {
+            if (cell_nr == first_cell_nr) {
+              new_vobu = 0;
+            } else {
+              cell_nr--;
+              offset = state->pgc->cell_playback[cell_nr].last_sector;
+              scan_admap = 1;
+            }
+          }
+          break;
+        }
+      } 
     }
   }
-  
-  state = &(this->vm->state);
-  current_cell = state->cellN;
-  start =  state->pgc->cell_playback[current_cell-1].first_sector;
-  if (vm_jump_cell_block(this->vm, state->cellN, new_vobu - start)) {
+
+  if (scan_admap)
+  {
+    if (dvdnav_scan_admap(this, state->domain, offset, &new_vobu) == DVDNAV_STATUS_ERR)
+      return DVDNAV_STATUS_ERR;
+  }
+  start =  state->pgc->cell_playback[cell_nr].first_sector;
+  if (vm_jump_cell_block(this->vm, cell_nr+1, new_vobu - start)) {
     this->vm->hop_channel += HOP_SEEK;
   }
   pthread_mutex_unlock(&this->vm_lock);
   return DVDNAV_STATUS_OK;
 }
+

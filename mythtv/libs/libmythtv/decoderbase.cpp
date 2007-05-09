@@ -549,6 +549,11 @@ bool DecoderBase::DoFastForward(long long desiredFrame, bool discardFrames)
             .arg(desiredFrame).arg(framesPlayed)
             .arg((discardFrames) ? "do" : "don't"));
 
+    if (ringBuffer->isDVD() &&
+        ringBuffer->DVD()->TitleTimeLeft() < 5)
+    {
+        return false;
+    }
     // Rewind if we have already played the desiredFrame. The +1 is for
     // MPEG4 NUV files, which need to decode an extra frame sometimes.
     // This shouldn't effect how this works in general because this is
@@ -723,8 +728,13 @@ long long DecoderBase::DVDFindPosition(long long desiredFrame)
     int diffTime = 0;
     long long desiredTimePos;
     int ffrewSkip = 1;
+    int current_speed = 0;
     if (GetNVP())
+    {
         ffrewSkip = GetNVP()->GetFFRewSkip();
+        current_speed = (int)GetNVP()->GetNextPlaySpeed();
+    }
+
     if (ffrewSkip == 1)
     {
         diffTime = (int)ceil((desiredFrame - framesPlayed) / fps);
@@ -737,10 +747,9 @@ long long DecoderBase::DVDFindPosition(long long desiredFrame)
 
         if (desiredTimePos < 0)
             desiredTimePos = 0;
+        return (desiredTimePos * 90000LL);
     }
-    else
-        desiredTimePos = (long long)ceil(desiredFrame / fps);
-    return (desiredTimePos * 90000LL);
+    return current_speed;
 } 
 
 

@@ -95,6 +95,7 @@ class MPUBLIC DVDRingBufferPriv
     int NumMenuButtons(void) const;
     void IgnoreStillOrWait(bool skip) { skipstillorwait = skip; }
     uint GetCurrentTime(void) { return (currentTime / 90000); }
+    uint TitleTimeLeft(void);
     void  SetTrack(uint type, int trackNo);
     int   GetTrack(uint type);
     uint8_t GetNumAudioChannels(int id);
@@ -162,8 +163,9 @@ class MPUBLIC DVDRingBufferPriv
     QString        dvdname;
     QString        serialnumber;
     bool           seeking;
-    uint64_t       seekTime;
+    uint64_t       seektime;
     uint           currentTime;
+    QMap<uint, uint> seekSpeedMap;
 
     NuppelVideoPlayer *parent;
 

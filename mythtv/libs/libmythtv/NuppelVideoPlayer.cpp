@@ -1238,6 +1238,9 @@ bool NuppelVideoPlayer::GetFrameFFREW(void)
 {
     bool stopFFREW = false;
 
+    if (ringBuffer->isDVD())
+        GetDecoder()->UpdateDVDFramesPlayed();
+
     if (ffrew_skip > 0)
     {
         long long delta = GetDecoder()->GetFramesRead() - framesPlayed;
@@ -1255,9 +1258,10 @@ bool NuppelVideoPlayer::GetFrameFFREW(void)
         bool      toBegin   = -curFrame > ffrew_skip;
         long long real_skip = (toBegin) ? -curFrame : ffrew_skip;
         GetDecoder()->DoRewind(curFrame + real_skip, false);
-        stopFFREW = framesPlayed <= keyframedist;
         if (ringBuffer->isDVD())
             stopFFREW = (ringBuffer->DVD()->GetCurrentTime() < 2);
+        else
+            stopFFREW = framesPlayed <= keyframedist;
     }
 
     if (stopFFREW)
@@ -3835,8 +3839,7 @@ void NuppelVideoPlayer::DoPlay(void)
 #endif
 
         GetDecoder()->setExactSeeks(exactseeks && ffrew_skip == 1);
-        if (!ringBuffer->isDVD())
-            GetDecoder()->DoRewind(framesPlayed);
+        GetDecoder()->DoRewind(framesPlayed);
         ClearAfterSeek();
     }
 
@@ -4022,13 +4025,10 @@ long long NuppelVideoPlayer::CalcMaxFFTime(long long ff, bool setjump) const
             else if (behind - ff <= maxtime * 2)
                 ret = behind - maxtime * 2;
 
-            if (ringBuffer->isDVD())
+            if (ringBuffer->isDVD() &&
+                ringBuffer->DVD()->TitleTimeLeft() < 5)
             {
-                if (ringBuffer->DVD()->GetCurrentTime() >
-                    ringBuffer->DVD()->GetTotalTimeOfTitle() - 5)
-                {
-                    ret = 0;
-                }
+                ret = 0;
             }
         }
     }

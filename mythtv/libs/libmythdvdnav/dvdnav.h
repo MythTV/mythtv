@@ -369,17 +369,13 @@ dvdnav_status_t dvdnav_sector_search(dvdnav_t *self,
 dvdnav_status_t dvdnav_time_search(dvdnav_t *self, 
 				   uint64_t time, uint search_to_nearest_cell);
 
-/* Seeks the nearest VOBU to the relative_time within the cell
- * relative_time is in seconds
- */
-dvdnav_status_t dvdnav_time_search_within_cell(dvdnav_t *self,
-                   uint relative_time);
+int dvdnav_time_search_within_cell(dvdnav_t *self,
+                   int relative_time);
 /*
  * Stop playing current position and play the "GoUp"-program chain.
  * (which generally leads to the title menu or a higer-level menu).
  */
 dvdnav_status_t dvdnav_go_up(dvdnav_t *self);
-
 /*
  * Stop playing the current position and start playback at the
  * previous program (if it exists).

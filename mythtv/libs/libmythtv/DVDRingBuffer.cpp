@@ -55,11 +55,16 @@ DVDRingBufferPriv::DVDRingBufferPriv()
       jumptotitle(true),
       seekpos(0), seekwhence(0), 
       dvdname(NULL), serialnumber(NULL),
-      seeking(false), seekTime(0),
+      seeking(false), seektime(0),
       currentTime(0),
       parent(0)
 {
     memset(&dvdMenuButton, 0, sizeof(AVSubtitle));
+    uint def[8] = { 3, 5, 10, 20, 30, 60, 120, 180 };
+    uint seekValues[8] = { 1, 2, 4, 8, 10, 15, 20, 60 };
+
+    for (uint i = 0; i < 8; i++)
+        seekSpeedMap.insert(def[i], seekValues[i]);
 }
 
 DVDRingBufferPriv::~DVDRingBufferPriv()
@@ -93,15 +98,28 @@ long long DVDRingBufferPriv::NormalSeek(long long time)
 
 long long DVDRingBufferPriv::Seek(long long time)
 {
-    seekTime = (uint64_t)time;
+    dvdnav_status_t dvdRet = DVDNAV_STATUS_OK;
+
     uint searchToCellStart = 1;
+    int seekSpeed = 0;
     int ffrewSkip = 1;
     if (parent)
         ffrewSkip = parent->GetFFRewSkip();
-    if (ffrewSkip != 1)
-        searchToCellStart = 0;
-    dvdnav_status_t dvdRet = 
-        dvdnav_time_search(this->dvdnav, seekTime, searchToCellStart);
+   
+    if (ffrewSkip != 1 && time != 0)
+    {
+        QMapConstIterator<uint, uint> it = seekSpeedMap.find(labs(time));
+        seekSpeed = it.data();
+        if (time < 0)
+            seekSpeed = -seekSpeed;
+        dvdRet = dvdnav_time_search_within_cell(this->dvdnav, seekSpeed);
+    }
+    else
+    {
+        seektime = (uint64_t)time;
+        dvdRet = dvdnav_time_search(this->dvdnav, seektime, searchToCellStart);
+    }
+
     if (dvdRet == DVDNAV_STATUS_ERR)
     {
         VERBOSE(VB_PLAYBACK, LOC_ERR + 
@@ -406,19 +424,20 @@ int DVDRingBufferPriv::safe_read(void *data, unsigned sz)
                 currentTime = cellStart +
                     (uint)(dvdnav_convert_time(&timeFromCellStart));
                 currentpos = GetReadPosition();
-                
+
                 if (seeking)
                 {
-                    uint relativeTime = (uint)((seekTime - currentTime)/ 90000);
-                    if (relativeTime == 0)
+                    
+                    int relativetime = (int)((seektime - currentTime)/ 90000);
+                    if (relativetime <= 0)
                     {
                         seeking = false;
-                        seekTime = 0;
+                        seektime = 0;
                     }
                     else
-                        dvdnav_time_search_within_cell(dvdnav, relativeTime);
+                        dvdnav_time_search_within_cell(dvdnav, relativetime * 2);
                 }
-                
+
                 if (blockBuf != dvdBlockWriteBuf)
                 {
                     dvdnav_free_cache_block(dvdnav, blockBuf);
@@ -1307,6 +1326,14 @@ void DVDRingBufferPriv::SetDVDSpeed(int speed)
 #else
     (void)speed;
 #endif
+}
+
+/**\brief returns seconds left in the title
+ */
+uint DVDRingBufferPriv::TitleTimeLeft(void)
+{
+    return (GetTotalTimeOfTitle() -
+            GetCurrentTime());
 }
 
 /** \brief converts palette values from YUV to RGB
