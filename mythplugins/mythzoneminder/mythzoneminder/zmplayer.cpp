@@ -78,6 +78,8 @@ void ZMPlayer::getEventInfo()
 
     if (m_currentEvent == -1)
     {
+        stopPlayer();
+
         if (m_noEventsText)
             m_noEventsText->show();
 
@@ -197,6 +199,9 @@ void ZMPlayer::keyPressEvent(QKeyEvent *e)
         }
         else if (action == "TOGGLEASPECT")
         {
+            if (m_eventList->size() == 0)
+                return;
+
             if (m_bFullScreen)
             {
                 m_bFullScreen = false;
@@ -221,6 +226,9 @@ void ZMPlayer::keyPressEvent(QKeyEvent *e)
                 initPlayer();
                 displayFrame();
             }
+
+            if (!m_paused)
+                m_frameTimer->start(1000 / 100);
 
             updateForeground();
         }
@@ -330,8 +338,12 @@ void ZMPlayer::deletePressed()
             m_currentEvent = m_eventList->size() - 1;
 
         getEventInfo();
-        m_frameTimer->start(1000 / 25);
-        m_paused = false;
+
+        if (m_eventList->size() > 0)
+        {
+            m_frameTimer->start(1000 / 25);
+            m_paused = false;
+        }
     }
 }
 
@@ -392,6 +404,9 @@ void ZMPlayer::updateFrame(void)
 
 void ZMPlayer::getFrame(void)
 {
+    if (m_eventList->size() == 0)
+        return;
+
     Event *event = m_eventList->at(m_currentEvent);
     if (event)
     {
