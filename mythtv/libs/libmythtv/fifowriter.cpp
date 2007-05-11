@@ -37,8 +37,9 @@ FIFOWriter::FIFOWriter(int count, bool sync)
     full_cond = new pthread_cond_t[count];
     for (int i = 0; i < count; i++)
     {
-      pthread_cond_init(&empty_cond[i], NULL);
-      pthread_cond_init(&full_cond[i], NULL);
+        pthread_cond_init(&empty_cond[i], NULL);
+        pthread_cond_init(&full_cond[i], NULL);
+        pthread_mutex_init(&fifo_lock[i], NULL);
     }
     filename = new QString [count];
     fbdesc = new QString [count];
@@ -49,8 +50,16 @@ FIFOWriter::~FIFOWriter()
     for (int i = 0; i <num_fifos; i++)
     {
         killwr[i] = 1;
+
+        pthread_mutex_lock(&fifo_lock[i]);
         pthread_cond_signal(&empty_cond[i]);
+        pthread_mutex_unlock(&fifo_lock[i]);
+
         pthread_join(fifothrds[i], NULL);
+
+        pthread_cond_destroy(&empty_cond[i]);
+        pthread_cond_destroy(&full_cond[i]);
+        pthread_mutex_destroy(&fifo_lock[i]);
     }
     delete [] maxblksize;
     delete [] fifo_buf;
@@ -59,6 +68,7 @@ FIFOWriter::~FIFOWriter()
     delete [] fifothrds;
     delete [] full_cond;
     delete [] empty_cond;
+    delete [] fifo_lock;
     delete [] filename;
     delete [] fbdesc;
     delete [] killwr;
@@ -95,7 +105,6 @@ int FIFOWriter::FIFOInit(int id, QString desc, QString name, long size,
     }
     fb_inptr[id]  = fifo_buf[id];
     fb_outptr[id] = fifo_buf[id];
-    pthread_mutex_init(&fifo_lock[id], NULL);
 
     cur_id = id;
 
@@ -214,7 +223,9 @@ void FIFOWriter::FIFODrain(void)
             if (fb_inptr[i] == fb_outptr[i])
             {
                 killwr[i] = 1;
+                pthread_mutex_lock(&fifo_lock[i]);
                 pthread_cond_signal(&empty_cond[i]);
+                pthread_mutex_unlock(&fifo_lock[i]);
                 count++;
             }
         }
