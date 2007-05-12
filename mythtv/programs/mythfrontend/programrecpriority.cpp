@@ -703,10 +703,23 @@ void ProgramRecPriority::upcoming(void)
     if (!curitem)
         return;
 
-    ScheduledRecording *record = new ScheduledRecording();
-    record->loadByID(curitem->recordid);
-    record->runRuleList();
-    record->deleteLater();
+    if (listMatch[curitem->recordid] > 0)
+    {
+        ScheduledRecording *record = new ScheduledRecording();
+        record->loadByID(curitem->recordid);
+        record->runRuleList();
+        record->deleteLater();
+    }
+    else
+    {
+        ProgLister *pl = NULL;
+        QString trimTitle = curitem->title;
+        trimTitle.remove(QRegExp(" \\(.*\\)$"));
+        pl = new ProgLister(plTitle, trimTitle, "",
+                            gContext->GetMainWindow(), "proglist");
+        pl->exec();
+        delete pl;
+    }
 }
 
 void ProgramRecPriority::details(void)
