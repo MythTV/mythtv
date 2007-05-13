@@ -398,10 +398,11 @@ void BookmarksConfig::slotWebSiteAdded(const char* group, const char* desc, cons
     QString *descStr = new QString(desc);
     QString *urlStr = new QString(url);
     urlStr->stripWhiteSpace();
-    if( urlStr->find("http://") == -1 && urlStr->find("file:/") == -1 )
+    if ( !urlStr->startsWith("http://") && !urlStr->startsWith("https://") && 
+            !urlStr->startsWith("file:/") )
         urlStr->prepend("http://");
 
-    if(groupStr->isEmpty() || urlStr->isEmpty())
+    if (groupStr->isEmpty() || urlStr->isEmpty())
         return;
 
     MSqlQuery query(MSqlQuery::InitCon());

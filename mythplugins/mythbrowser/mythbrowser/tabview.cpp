@@ -348,7 +348,8 @@ void TabView::finishAddBookmark(const char* group, const char* desc, const char*
     QString descStr = QString(desc);
     QString urlStr = QString(url);
     urlStr.stripWhiteSpace();
-    if( urlStr.find("http://") == -1 && urlStr.find("file:/") == -1)
+    if( !urlStr.startsWith("http://") && !urlStr.startsWith("https://") && 
+            !urlStr.startsWith("file:/") )
         urlStr.prepend("http://");
 
     if(groupStr.isEmpty() || urlStr.isEmpty())
@@ -399,7 +400,8 @@ void TabView::showEnterURLDialog()
     if (res == 0)
     {
         QString sURL = editor->text();
-        if (!sURL.startsWith("http://") && !sURL.startsWith("file:/"))
+        if (!sURL.startsWith("http://") && !sURL.startsWith("https://") &&
+                !sURL.startsWith("file:/"))
             sURL = "http://" + sURL;
 
         newPage(sURL);
