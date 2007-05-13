@@ -71,7 +71,7 @@ TabView::TabView(MythMainWindow *parent, const char *name, QStringList urls,
     if (scrollPage == 1) 
        scrollSpeed *= -1;  // scroll page vs background
 
-    widgetHistory.setAutoDelete(true);
+    urlHistory.setAutoDelete(true);
 
     for (QStringList::Iterator it = urls.begin(); it != urls.end(); ++it)
     {
@@ -88,10 +88,6 @@ TabView::TabView(MythMainWindow *parent, const char *name, QStringList urls,
                 this, SLOT(pageCompleted(WebPage *)));
 
         mytab->addTab(page, tr("Loading..."));
-
-        QPtrStack<QWidget> *currWidgetHistory = new QPtrStack<QWidget>;
-        currWidgetHistory->setAutoDelete(true);
-        widgetHistory.append(currWidgetHistory);
 
         QValueStack<QString> *currUrlHistory = new QValueStack<QString>;
         urlHistory.append(currUrlHistory);
@@ -133,27 +129,38 @@ void TabView::pageCompleted(WebPage *page)
 
 void TabView::openMenu()
 {
-    QButton *temp;
+    QButton *temp = NULL;
 
     hadFocus = qApp->focusWidget();
 
     menu = new MythPopupBox(GetMythMainWindow(), "popupMenu");
     menu->addLabel(tr("MythBrowser Menu"));
 
-    if(mytab->count()==1) 
+    int index = mytab->currentPageIndex();
+    QValueStack<QString> *curUrlHistory = urlHistory.at(index);
+
+    if (mytab->count() == 1)
     {
-        temp = menu->addButton(tr("Back"), this, SLOT(actionBack()));
+        if (curUrlHistory->size() > 0)
+            temp = menu->addButton(tr("Back"), this, SLOT(actionBack()));
     }
     else
     {
         temp = menu->addButton(tr("Next Tab"), this, SLOT(actionNextTab()));
         menu->addButton(tr("Prev Tab"), this, SLOT(actionPrevTab()));
         menu->addButton(tr("Remove Tab"), this, SLOT(actionRemoveTab()));
-        menu->addButton(tr("Back"), this, SLOT(actionBack()));
+        if (curUrlHistory->size() > 0)
+            menu->addButton(tr("Back"), this, SLOT(actionBack()));
     }
-    menu->addButton(tr("Save Link in Bookmarks"), this, SLOT(actionAddBookmark()));
+
+    if (temp)
+        menu->addButton(tr("Save Link in Bookmarks"), this, SLOT(actionAddBookmark()));
+    else
+        temp = menu->addButton(tr("Save Link in Bookmarks"), this, SLOT(actionAddBookmark()));
+
     menu->addButton(tr("Zoom Out"), this, SLOT(actionZoomOut()));
     menu->addButton(tr("Zoom In"), this, SLOT(actionZoomIn()));
+
     temp->setFocus();
 
     menu->ShowPopup(this, SLOT(cancelMenu()));
@@ -263,7 +270,6 @@ void TabView::actionRemoveTab()
     int index = mytab->currentPageIndex();
 
     // delete web pages stored in history 
-    widgetHistory.remove(index);
     urlHistory.remove(index);
 
     // delete current web page
@@ -363,18 +369,13 @@ void TabView::actionBack()
     cancelMenu();
 
     int index = mytab->currentPageIndex();
-    QPtrStack<QWidget> *curWidgetHistory = widgetHistory.at(index);
-    if (!curWidgetHistory->isEmpty()) {
-        QValueStack<QString> *curUrlHistory = urlHistory.at(index);
+    QValueStack<QString> *curUrlHistory = urlHistory.at(index);
 
-        QWidget *curr = mytab->currentPage();
-        mytab->insertTab(curWidgetHistory->pop(),curUrlHistory->pop(),index);
-        mytab->removePage(curr);
-        mytab->setCurrentPage(index);
+    if (curUrlHistory->size() == 0)
+        return;
 
-        // disconnect(curr,...);
-        delete curr;
-    }
+    ((WebPage*)mytab->currentPage())->openURL(curUrlHistory->pop());
+    mytab->setTabLabel(mytab->currentPage(), tr("Loading..."));
 }
 
 void TabView::showEnterURLDialog()
@@ -428,10 +429,6 @@ void TabView::newPage(QString sURL)
     mytab->insertTab(page, tr("Loading..."), index);
     mytab->setCurrentPage(index);
 
-    QPtrStack<QWidget> *currWidgetHistory = new QPtrStack<QWidget>;
-    currWidgetHistory->setAutoDelete(true);
-    widgetHistory.append(currWidgetHistory);
-
     QValueStack<QString> *currUrlHistory = new QValueStack<QString>;
     urlHistory.append(currUrlHistory);
 
@@ -440,6 +437,8 @@ void TabView::newPage(QString sURL)
 
 void TabView::newUrlRequested(const KURL &url, const KParts::URLArgs &args)
 {
+    (void) args;
+
     int index = mytab->currentPageIndex();
 
     if (mytab->tabLabel(mytab->currentPage()) == "")
@@ -455,28 +454,14 @@ void TabView::newUrlRequested(const KURL &url, const KParts::URLArgs &args)
     }
     else
     {
-        QPtrStack<QWidget> *curWidgetHistory = widgetHistory.at(index);
         QValueStack<QString> *curUrlHistory = urlHistory.at(index);
 
-        QWidget *curr = mytab->currentPage();
-        curWidgetHistory->push(curr);
-        curUrlHistory->push(mytab->label(index));
+        ((WebPage*)mytab->currentPage())->browser->toplevelURL();
+        curUrlHistory->push(((WebPage*)mytab->currentPage())->browser->toplevelURL().url());
 
-        WebPage *page = new WebPage(url.url(),args,((WebPage*)curr)->zoomFactor,f);
+        ((WebPage*)mytab->currentPage())->openURL(url.url());
 
-        mytab->insertTab(page, tr("Loading..."), index);
-        mytab->removePage(curr);
-        mytab->setCurrentPage(index);
-
-        connect(page,SIGNAL( newUrlRequested(const KURL &,const KParts::URLArgs &)),
-                this, SLOT( newUrlRequested(const KURL &,const KParts::URLArgs &)));
-
-        connect(page, SIGNAL( newWindowRequested( const KURL &, const KParts::URLArgs &,
-                              const KParts::WindowArgs &, KParts::ReadOnlyPart *&) ),
-                this, SLOT( newWindowRequested( const KURL &, const KParts::URLArgs &,
-                                  const KParts::WindowArgs &, KParts::ReadOnlyPart *&) ) );
-        connect( page, SIGNAL( pageCompleted(WebPage *) ),
-                this, SLOT( pageCompleted(WebPage *) ) );
+        mytab->setTabLabel(mytab->currentPage(), tr("Loading..."));
     }
 }
 

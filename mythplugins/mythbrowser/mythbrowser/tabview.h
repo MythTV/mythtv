@@ -52,10 +52,10 @@ private slots:
     void actionAddBookmark();
     void finishAddBookmark(const char* group, const char* desc, const char* url);
     void handleMouseAction(QString action);
-    
+
     // new URL dialog
     void showEnterURLDialog();
-    
+
     // Use page title for tabLabel
     void pageCompleted(WebPage *page);
 
@@ -75,7 +75,6 @@ private:
 
     QWidget *hadFocus;
 
-    QPtrList<WIDGET_HISTORY> widgetHistory;
     QPtrList<URL_HISTORY> urlHistory;
 
     ButtonState lastButtonState;

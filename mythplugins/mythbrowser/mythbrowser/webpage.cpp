@@ -127,7 +127,7 @@ WebPage::WebPage (const char *location, const KParts::URLArgs &args,
     browser->setZoomFactor(zoom);
     zoomFactor=zoom;
 
-    browser->setPluginsEnabled(false);
+    browser->setPluginsEnabled(true);
     browser->enableMetaRefresh(true);
     browser->setJavaEnabled(true);
     browser->enableJScript(true);
