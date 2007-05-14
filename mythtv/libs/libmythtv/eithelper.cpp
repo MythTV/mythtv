@@ -535,7 +535,6 @@ static void init_fixup(QMap<uint64_t,uint> &fix)
     fix[ 4096 << 16] = EITFixUp::kFixAUStar;
     fix[ 4096 << 16] = EITFixUp::kFixAUStar;
 
-    fix[  769LL << 32 | 8468 << 16] = EITFixUp::kEFixPro7Sat; // DVB-T Berlin
     fix[ 3074LL << 32 | 8468 << 16] = EITFixUp::kEFixPro7Sat; // DVB-T Hamburg
     fix[ 3075LL << 32 | 8468 << 16] = EITFixUp::kEFixPro7Sat; // DVB-T Bremen
     fix[ 8705LL << 32 | 8468 << 16] = EITFixUp::kEFixPro7Sat; // DVB-T Hessen
@@ -547,16 +546,40 @@ static void init_fixup(QMap<uint64_t,uint> &fix)
     fix[ 10001LL << 32 | 61441U << 16] = EITFixUp::kEFixPro7Sat;
     fix[ 10002LL << 32 | 61441U << 16] = EITFixUp::kEFixPro7Sat;
     fix[ 10003LL << 32 | 61441U << 16] = EITFixUp::kEFixPro7Sat;
-    fix[ 10004LL << 32 | 61441U << 16] = EITFixUp::kEFixPro7Sat;
     fix[ 10005LL << 32 | 61441U << 16] = EITFixUp::kEFixPro7Sat;
     fix[ 10006LL << 32 | 61441U << 16] = EITFixUp::kEFixPro7Sat;
-    fix[ 10008LL << 32 | 61441U << 16] = EITFixUp::kEFixPro7Sat;
     fix[ 10009LL << 32 | 61441U << 16] = EITFixUp::kEFixPro7Sat;
-    // on the multiplex with RTL only following channels must be fixed
-    fix[ 10007LL << 32 | 61441U << 16 | 53605] = EITFixUp::kEFixPro7Sat; //terranova
-    fix[ 10007LL << 32 | 61441U << 16 | 53607] = EITFixUp::kEFixPro7Sat; //Eurosport
-    fix[ 10007LL << 32 | 61441U << 16 | 53608] = EITFixUp::kEFixPro7Sat; //Das Vierte
-    fix[ 10007LL << 32 | 61441U << 16 | 53609] = EITFixUp::kEFixPro7Sat; //Viva
+    // On transport 10004 only DMAX needs no fixing:
+    fix[    10004LL<<32 | 61441U << 16 | 50403] = // BBC World Service
+        fix[10004LL<<32 | 61441U << 16 | 53101] = // BBC Prime (engl)
+        fix[10004LL<<32 | 61441U << 16 | 53108] = // Toon Disney (engl)
+        fix[10004LL<<32 | 61441U << 16 | 53109] = // Sky News (engl)
+        fix[10004LL<<32 | 61441U << 16 | 53406] = // BBC Prime
+        fix[10004LL<<32 | 61441U << 16 | 53407] = // Boomerang (engl)
+        fix[10004LL<<32 | 61441U << 16 | 53404] = // Boomerang
+        fix[10004LL<<32 | 61441U << 16 | 53408] = // TCM Classic Movies (engl)
+        fix[10004LL<<32 | 61441U << 16 | 53409] = // Extreme Sports
+        fix[10004LL<<32 | 61441U << 16 | 53410] = // CNBC Europe (engl)
+        fix[10004LL<<32 | 61441U << 16 | 53503] = // Detski Mir
+        fix[10004LL<<32 | 61441U << 16 | 53411] = // Sat.1 Comedy
+        fix[10004LL<<32 | 61441U << 16 | 53412] = // kabel eins classics
+        fix[10004LL<<32 | 61441U << 16 | 53112] = // Extreme Sports (engl)
+        fix[10004LL<<32 | 61441U << 16 | 53513] = // Playhouse Disney (engl)
+        fix[10004LL<<32 | 61441U << 16 | 53618] = // K1010
+        fix[10004LL<<32 | 61441U << 16 | 53619] = // GemsTV
+        EITFixUp::kEFixPro7Sat;
+    // On transport 10007 only following channels need fixing:
+    fix[    10007LL<<32| 61441U << 16 | 53605] = // terranova
+        fix[10007LL<<32| 61441U << 16 | 53607] = // Eurosport
+        fix[10007LL<<32| 61441U << 16 | 53608] = // Das Vierte
+        fix[10007LL<<32| 61441U << 16 | 53609] = // Viva
+        fix[10007LL<<32| 61441U << 16 | 53628] = // COMEDY CENTRAL
+        EITFixUp::kEFixPro7Sat;
+    // On transport 10008 only following channels need fixing:
+    fix[    10008LL<<32 | 61441U << 16 | 53002] = // Tele 5
+        fix[10008LL<<32 | 61441U << 16 | 53624] = // DSF
+        fix[10008LL<<32 | 61441U << 16 | 53630] = // HSE24
+        EITFixUp::kEFixPro7Sat;
 
     fix[ 774LL << 32 | 8468 << 16 | 16392] = EITFixUp::kEFixPro7Sat; //DVB-T Berlin dsf
     fix[1082LL << 32 |    1 << 16 | 20001] = EITFixUp::kEFixPro7Sat; //DVB-S Pro7 Swiss
