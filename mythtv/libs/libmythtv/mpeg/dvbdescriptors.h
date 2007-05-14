@@ -1193,6 +1193,7 @@ class ServiceDescriptor : public MPEGDescriptor
     }
     bool IsDTV(void) const
         { return ((ServiceType() ==  kServiceTypeDigitalTelevision) ||
+                  IsHDTV() ||
                   (ServiceType() ==  kServiceTypeEchoStarTV1) ||
                   (ServiceType() ==  kServiceTypeEchoStarTV2) ||
                   (ServiceType() ==  kServiceTypeEchoStarTV3) ||
