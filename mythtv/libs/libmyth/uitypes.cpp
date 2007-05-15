@@ -5670,10 +5670,15 @@ void UIKeyboardType::leftCursor()
         QLineEdit *par = (QLineEdit *)m_parentEdit;
         par->cursorBackward(m_shiftLKey->IsOn());
     }
-    else
+    else if (m_parentEdit->inherits("QTextEdit"))
     {
         QTextEdit *par = (QTextEdit *)m_parentEdit;
         par->moveCursor(QTextEdit::MoveBackward, false);
+    }
+    else
+    {
+        QKeyEvent *key = new QKeyEvent(QEvent::KeyPress, Qt::Key_Left, 0, 0, "", false, 1);
+        QApplication::postEvent(m_parentEdit, key);
     }
 }
 
@@ -5687,10 +5692,15 @@ void UIKeyboardType::rightCursor()
         QLineEdit *par = (QLineEdit *)m_parentEdit;
         par->cursorForward(m_shiftLKey->IsOn());
     }
-    else
+    else if (m_parentEdit->inherits("QTextEdit"))
     {
         QTextEdit *par = (QTextEdit *)m_parentEdit;
         par->moveCursor(QTextEdit::MoveForward, false);
+    }
+    else
+    {
+        QKeyEvent *key = new QKeyEvent(QEvent::KeyPress, Qt::Key_Right, 0, 0, "", false, 1);
+        QApplication::postEvent(m_parentEdit, key);
     }
 }
 
@@ -5704,10 +5714,15 @@ void UIKeyboardType::backspaceKey()
         QLineEdit *par = (QLineEdit *)m_parentEdit;
         par->backspace();
     }
-    else
+    else if (m_parentEdit->inherits("MythRemoteLineEdit"))
     {
         MythRemoteLineEdit *par = (MythRemoteLineEdit *)m_parentEdit;
         par->backspace();
+    }
+    else
+    {
+        QKeyEvent *key = new QKeyEvent(QEvent::KeyPress, Qt::Key_Backspace, 0, 0, "", false, 1);
+        QApplication::postEvent(m_parentEdit, key);
     }
 }
 
@@ -5721,10 +5736,15 @@ void UIKeyboardType::delKey()
         QLineEdit *par = (QLineEdit *)m_parentEdit;
         par->del();
     }
-    else
+    else if (m_parentEdit->inherits("MythRemoteLineEdit"))
     {
         MythRemoteLineEdit *par = (MythRemoteLineEdit *)m_parentEdit;
         par->del();
+    }
+    else
+    {
+        QKeyEvent *key = new QKeyEvent(QEvent::KeyPress, Qt::Key_Delete, 0, 0, "", false, 1);
+        QApplication::postEvent(m_parentEdit, key);
     }
 }
 
@@ -5764,10 +5784,15 @@ void UIKeyboardType::insertChar(QString c)
             QLineEdit *par = (QLineEdit *)m_parentEdit;
             par->insert(c);
         }
-        else
+        else if (m_parentEdit->inherits("MythRemoteLineEdit"))
         {
             MythRemoteLineEdit *par = (MythRemoteLineEdit *)m_parentEdit;
             par->insert(c);
+        }
+        else
+        {
+            QKeyEvent *key = new QKeyEvent(QEvent::KeyPress, 0, 0, 0, c, false, c.length());
+            QApplication::postEvent(m_parentEdit, key);
         }
     }
     else
@@ -5785,10 +5810,15 @@ void UIKeyboardType::insertChar(QString c)
                         QLineEdit *par = (QLineEdit *)m_parentEdit;
                         par->insert(comps[i][2]);
                     }
-                    else
+                    else if (m_parentEdit->inherits("MythRemoteLineEdit"))
                     {
                         MythRemoteLineEdit *par = (MythRemoteLineEdit *)m_parentEdit;
                         par->insert(comps[i][2]);
+                    }
+                    else
+                    {
+                        QKeyEvent *key = new QKeyEvent(QEvent::KeyPress, 0, 0, 0, comps[i][2], false, comps[i][2].length());
+                        QApplication::postEvent(m_parentEdit, key);
                     }
 
                     break;

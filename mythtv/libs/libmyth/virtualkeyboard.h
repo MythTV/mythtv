@@ -12,7 +12,8 @@ enum PopupPosition
     VK_POSABOVEEDIT = 1,
     VK_POSBELOWEDIT,
     VK_POSTOPDIALOG,
-    VK_POSBOTTOMDIALOG
+    VK_POSBOTTOMDIALOG,
+    VK_POSCENTERDIALOG
 };
 
 class MPUBLIC VirtualKeyboard : public MythThemedDialog
@@ -30,18 +31,14 @@ class MPUBLIC VirtualKeyboard : public MythThemedDialog
     virtual void show();
     virtual void hide();
 
-  signals:
-
-  protected:
-
   protected slots:
     virtual void keyPressEvent(QKeyEvent *e);
 
   private:
     UIKeyboardType *m_keyboard;
     QWidget        *m_parentEdit;
-    int            m_popupWidth;
-    int            m_popupHeight;
+    int             m_popupWidth;
+    int             m_popupHeight;
 };
 
 #endif

@@ -89,10 +89,14 @@ void VirtualKeyboard::switchLayout(QString language)
         MythRemoteLineEdit *par = (MythRemoteLineEdit *)m_parentEdit;
         preferredPos = par->getPopupPosition();
     }
-    else
+    else if (m_parentEdit->inherits("MythComboBox"))
     {
         MythComboBox *par = (MythComboBox *)m_parentEdit;
         preferredPos = par->getPopupPosition();
+    }
+    else
+    {
+        preferredPos = VK_POSCENTERDIALOG;
     }
 
     if (preferredPos == VK_POSBELOWEDIT)
@@ -128,6 +132,12 @@ void VirtualKeyboard::switchLayout(QString language)
     {
         newpos = QPoint(tlwg.width() / 2 - m_popupWidth / 2, 
                         tlwg.height() - 5 - m_popupHeight);
+        this->move(newpos);
+    }
+    else if (preferredPos == VK_POSCENTERDIALOG)
+    {
+        newpos = QPoint(tlwg.width() / 2 - m_popupWidth / 2, 
+                        tlwg.height() / 2 - m_popupHeight / 2);
         this->move(newpos);
     }
 
