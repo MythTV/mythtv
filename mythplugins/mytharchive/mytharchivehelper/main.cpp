@@ -1,6 +1,7 @@
 #include <iostream>
 #include <stdint.h>
 #include <sys/wait.h>  // for WIFEXITED and WEXITSTATUS
+#include <unistd.h>
 
 #include <mythtv/mythconfig.h>
 #ifdef CONFIG_DARWIN
