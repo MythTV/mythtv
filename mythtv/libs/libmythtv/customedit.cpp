@@ -47,6 +47,7 @@ CustomEdit::CustomEdit(MythMainWindow *parent, const char *name,
 
     prevItem = 0;
     maxex = 0;
+    seSuffix = QString(" (%1)").arg(tr("stored search"));
     exSuffix = QString(" (%1)").arg(tr("stored example"));
 
     QVBoxLayout *vbox = new QVBoxLayout(this, (int)(20 * wmult));
@@ -312,15 +313,21 @@ CustomEdit::CustomEdit(MythMainWindow *parent, const char *name,
 
     maxex = m_clause->count();
 
-    result.prepare("SELECT rulename,fromclause,whereclause "
+    result.prepare("SELECT rulename,fromclause,whereclause,search "
                   "FROM customexample;");
 
     if (result.exec() && result.isActive())
     {
         while (result.next())
         {
-            m_clause->insertItem(QString::fromUtf8(result.value(0).toString())
-                                 + exSuffix);
+            QString str = QString::fromUtf8(result.value(0).toString());
+
+            if (result.value(3).toInt() > 0)
+                str += seSuffix;
+            else
+                str += exSuffix;
+
+            m_clause->insertItem(str);
             m_cfrom << QString::fromUtf8(result.value(1).toString());
             m_csql << QString::fromUtf8(result.value(2).toString());
         }
@@ -562,7 +569,7 @@ void CustomEdit::storeClicked(void)
     msg += m_description->text();
 
     DialogBox *storediag = new DialogBox(gContext->GetMainWindow(), msg);
-    int button = 1, storebtn = -1, deletebtn = -1, cancelbtn = -1;
+    int button = 1, sebtn = -1, exbtn = -1, deletebtn = -1, cancelbtn = -1;
 
     QString action = QObject::tr("Store");
     if (nameExists)
@@ -572,8 +579,14 @@ void CustomEdit::storeClicked(void)
 
     if (!m_title->text().isEmpty())
     {
-        storediag->AddButton(str);
-        storebtn = button++;
+        QString str2;
+        str2 = QString("%1 %2").arg(str).arg(QObject::tr("as a search"));
+        storediag->AddButton(str2);
+        sebtn = button++;
+
+        str2 = QString("%1 %2").arg(str).arg(QObject::tr("as an example"));
+        storediag->AddButton(str2);
+        exbtn = button++;
     }
     if (m_clause->currentItem() >= maxex)
     {
@@ -589,15 +602,16 @@ void CustomEdit::storeClicked(void)
     int ret = storediag->exec();
     delete storediag;
 
-    if (ret == storebtn)
+    if (ret == sebtn || ret == exbtn)
     {
         // Store the current strings
         query.prepare("REPLACE INTO customexample "
-                       "(rulename,fromclause,whereclause) "
-                       "VALUES(:RULE,:FROMC,:WHEREC);");
+                       "(rulename,fromclause,whereclause,search) "
+                       "VALUES(:RULE,:FROMC,:WHEREC,:SEARCH);");
         query.bindValue(":RULE", m_title->text());
         query.bindValue(":FROMC", m_subtitle->text());
         query.bindValue(":WHEREC", m_description->text());
+        query.bindValue(":SEARCH", ret == sebtn);
 
         if (!query.exec())
             MythContext::DBError("Store custom example", query);
@@ -619,7 +633,10 @@ void CustomEdit::storeClicked(void)
         else
         {
             // append item
-            m_clause->insertItem(m_title->text() + exSuffix);
+            if (ret == sebtn)
+                m_clause->insertItem(m_title->text() + seSuffix);
+            else
+                m_clause->insertItem(m_title->text() + exSuffix);
             m_cfrom << m_subtitle->text();
             m_csql << m_description->text();
         }
@@ -628,8 +645,8 @@ void CustomEdit::storeClicked(void)
     {
         query.prepare("DELETE FROM customexample "
                       "WHERE rulename = :RULE;");
-        query.bindValue(":RULE", m_clause->currentText().remove(exSuffix));
-
+        query.bindValue(":RULE", m_clause->currentText().remove(seSuffix)
+                                                        .remove(exSuffix));
         if (!query.exec())
             MythContext::DBError("Delete custom example", query);
         else

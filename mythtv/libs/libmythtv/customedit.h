@@ -39,6 +39,7 @@ class MPUBLIC CustomEdit : public MythDialog
     int prevItem;
     int maxex;
 
+    QString seSuffix;
     QString exSuffix;
 
     QStringList m_recid;

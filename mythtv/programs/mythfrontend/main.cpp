@@ -112,6 +112,16 @@ void startSearchPower(void)
     qApp->lock();
 }
 
+void startSearchStored(void)
+{
+    ProgLister searchStored(plStoredSearch, "", "",
+                         gContext->GetMainWindow(), "proglist");
+
+    qApp->unlock();
+    searchStored.exec();
+    qApp->lock();
+}
+
 void startSearchChannel(void)
 {
     ProgLister searchChannel(plChannel, "", "",
@@ -324,6 +334,8 @@ void TVMenuCallback(void *data, QString &selection)
         startSearchPeople();
     else if (sel == "tv_search_power")
         startSearchPower();
+    else if (sel == "tv_search_stored")
+        startSearchStored();
     else if (sel == "tv_search_channel")
         startSearchChannel();
     else if (sel == "tv_search_category")

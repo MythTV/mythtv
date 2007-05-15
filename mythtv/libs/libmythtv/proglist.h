@@ -21,7 +21,8 @@ enum ProgListType {
     plCategory,
     plChannel,
     plTime,
-    plRecordid
+    plRecordid,
+    plStoredSearch
 };
 
 

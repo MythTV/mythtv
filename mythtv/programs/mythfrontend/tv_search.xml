@@ -89,4 +89,10 @@
       <action>TV_SEARCH_POWER</action>
    </button>
 
+   <button>
+      <type>TV_SEARCH_STORED</type>
+      <text>Stored Searches</text>
+      <action>TV_SEARCH_STORED</action>
+   </button>
+
 </mythmenu>

@@ -50,6 +50,7 @@ ProgLister::ProgLister(ProgListType pltype,
         case plPeopleSearch:  searchtype = kPeopleSearch;  break;
         case plPowerSearch:   searchtype = kPowerSearch;   break;
         case plSQLSearch:     searchtype = kPowerSearch;   break;
+        case plStoredSearch:  searchtype = kPowerSearch;   break;
         default:              searchtype = kNoSearch;      break;
     }
 
@@ -281,6 +282,7 @@ void ProgLister::updateBackground(void)
                 case plTitleSearch: value = tr("Title Search"); break;
                 case plKeywordSearch: value = tr("Keyword Search"); break;
                 case plPeopleSearch: value = tr("People Search"); break;
+                case plStoredSearch: value = tr("Stored Search"); break;
                 case plPowerSearch: value = tr("Power Search"); break;
                 case plSQLSearch: value = tr("Power Search"); break;
                 case plRecordid: value = tr("Rule Search"); break;
@@ -676,10 +678,10 @@ void ProgLister::setViewFromTime(void)
 
 void ProgLister::chooseView(void)
 {
-    if (type == plChannel || type == plCategory || 
-        type == plMovies || type == plNewListings)
+    if (type == plChannel || type == plCategory || type == plMovies ||
+        type == plNewListings || type == plStoredSearch)
     {
-        if (viewList.count() < 2)
+        if (viewList.count() < 1)
             return;
 
         choosePopup = new MythPopupBox(gContext->GetMainWindow(), "");
@@ -691,6 +693,9 @@ void ProgLister::chooseView(void)
             case plChannel: msg = tr("Select Channel"); break;
             case plCategory: msg = tr("Select Category"); break;
             case plNewListings: msg = tr("Select List"); break;
+            case plStoredSearch: msg = QString("%1\n%2")
+                    .arg(tr("Select a search stored from"))
+                    .arg(tr("Custom Record")); break;
             default: msg = tr("Select"); break;
         }
         choosePopup->addLabel(msg);
@@ -1382,6 +1387,29 @@ void ProgLister::fillViewList(const QString &view)
             }
         }
     }
+    else if (type == plStoredSearch) // stored searches
+    {
+        MSqlQuery query(MSqlQuery::InitCon()); 
+        query.prepare("SELECT rulename FROM customexample "
+                      "WHERE search > 0 ORDER BY rulename;");
+        query.exec();
+
+        if (query.isActive() && query.size())
+        {
+            while (query.next())
+            {
+                QString rulename = query.value(0).toString();
+                if (rulename <= " " || rulename == NULL)
+                    continue;
+                rulename = QString::fromUtf8(query.value(0).toString());
+                viewList << rulename;
+                viewTextList << rulename;
+            }
+        }
+        if (view != "")
+            curView = viewList.findIndex(view);
+    }
+
     if (curView >= (int)viewList.count())
         curView = viewList.count() - 1;
 }
@@ -1573,6 +1601,28 @@ void ProgLister::fillItemList(void)
                 "WHERE channel.visible = 1 "
                 "  AND program.endtime > :PGILSTART "
                 "  AND recordmatch.recordid = :PGILPHRASE ";
+    }
+    else if (type == plStoredSearch) // stored search
+    {
+        QString fromc, wherec;
+        MSqlQuery query(MSqlQuery::InitCon()); 
+        query.prepare("SELECT fromclause, whereclause FROM customexample "
+                      "WHERE rulename = :RULENAME;");
+        query.bindValue(":RULENAME", qphrase);
+        query.exec();
+
+        if (query.isActive() && query.size())
+        {
+            query.next();
+            fromc  = query.value(0).toString();
+            wherec = query.value(1).toString();
+
+            where = QString("WHERE channel.visible = 1 "
+                            "  AND program.endtime > :PGILSTART "
+                            "  AND ( %1 ) ").arg(wherec);
+            if (fromc > "")
+                where = fromc + " " + where;
+        }
     }
 
     schedList.FromScheduler();
