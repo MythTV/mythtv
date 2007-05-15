@@ -677,6 +677,19 @@ bool TabView::eventFilter(QObject* object, QEvent* event)
                 emit menuPressed();
                 return true;
             }
+            else if (action == "UP") 
+            {
+                KHTMLView *view = ((WebPage*)mytab->currentPage())->browser->view();
+                view->scrollBy(0, -view->visibleHeight() / 10);
+                return true;
+
+            }
+            else if (action == "DOWN") 
+            {
+                KHTMLView *view = ((WebPage*)mytab->currentPage())->browser->view();
+                view->scrollBy(0, view->visibleHeight() / 10);
+                return true;
+            }
         }
     }
 
