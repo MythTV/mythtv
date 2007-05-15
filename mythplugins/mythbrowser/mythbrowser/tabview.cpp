@@ -37,6 +37,7 @@
 #include "mythtv/mythcontext.h"
 #include "mythtv/mythdbcon.h"
 #include "mythtv/mythwidgets.h"
+#include "mythtv/virtualkeyboard.h"
 
 
 using namespace std;
@@ -594,7 +595,25 @@ bool TabView::eventFilter(QObject* object, QEvent* event)
 
             if (action == "TOGGLEINPUT") 
             {
-                inputToggled = !inputToggled;
+                if (gContext->GetNumSetting("UseVirtualKeyboard", 1) == 1)
+                {
+                    if (inputToggled)
+                        return true;
+
+                    inputToggled = true;
+                    VirtualKeyboard *keyboard = new VirtualKeyboard(gContext->GetMainWindow(), 
+                                    ((WebPage*)mytab->currentPage())->browser->view());
+                    gContext->GetMainWindow()->detach(keyboard);
+                    keyboard->exec();
+                    delete keyboard;
+
+                    inputToggled = false;
+                }
+                else
+                {
+                    inputToggled = !inputToggled;
+                }
+
                 return true;
             }
 
@@ -660,5 +679,6 @@ bool TabView::eventFilter(QObject* object, QEvent* event)
             }
         }
     }
+
     return false; // continue processing the event with QObject::event()
 }
