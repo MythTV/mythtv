@@ -418,8 +418,9 @@ class MPUBLIC NuppelVideoPlayer : public CC608Reader, public CC708Reader
 
     // Private pausing stuff
     void PauseVideo(bool wait = true);
-    void UnpauseVideo(void);
-    bool GetVideoPause(void) const { return video_actually_paused; }
+    void UnpauseVideo(bool wait = false);
+    void SetVideoActuallyPaused(bool val);
+    bool IsVideoActuallyPaused(void) const;
 
     // Private decoder stuff
     void  SetDecoder(DecoderBase *dec);
@@ -523,7 +524,10 @@ class MPUBLIC NuppelVideoPlayer : public CC608Reader, public CC708Reader
     // State
     QWaitCondition decoderThreadPaused;
     QWaitCondition videoThreadPaused;
-    QMutex   vidExitLock;
+    QWaitCondition videoThreadUnpaused;
+    mutable QMutex vidExitLock;
+    mutable QMutex pauseUnpauseLock;
+    mutable QMutex internalPauseLock;
     bool     eof;             ///< At end of file/ringbuffer
     bool     m_double_framerate;///< Output fps is double Video (input) rate
     bool     m_can_double;    ///< VideoOutput capable of doubling frame rate

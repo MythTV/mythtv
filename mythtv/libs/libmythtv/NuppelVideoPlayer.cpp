@@ -401,7 +401,10 @@ void NuppelVideoPlayer::Pause(bool waitvideo)
     PauseDecoder();
 
     //cout << "stopping other threads" << endl;
+    internalPauseLock.lock();
     PauseVideo(waitvideo);
+    internalPauseLock.unlock();
+
     if (audioOutput)
     {
         audio_paused = true;
@@ -428,7 +431,10 @@ bool NuppelVideoPlayer::Play(float speed, bool normal, bool unpauseaudio)
             QString("Play(%1, normal %2, unpause audio %3)")
             .arg(speed,5,'f',1).arg(normal).arg(unpauseaudio));
 
+    internalPauseLock.lock();
     UnpauseVideo();
+    internalPauseLock.unlock();
+
     if (audioOutput && unpauseaudio)
         audio_paused = false;
     if (ringBuffer)
@@ -446,28 +452,59 @@ bool NuppelVideoPlayer::GetPause(void) const
     return (actuallypaused &&
             (ringBuffer == NULL || ringBuffer->isPaused()) &&
             (audioOutput == NULL || audioOutput->GetPause()) &&
-            GetVideoPause());
+            IsVideoActuallyPaused());
 }
 
 void NuppelVideoPlayer::PauseVideo(bool wait)
 {
+    QMutexLocker locker(&pauseUnpauseLock);
     video_actually_paused = false;
     pausevideo = true;
 
-    if (wait && !video_actually_paused)
+    for (uint i = 0; wait && !video_actually_paused; i++)
     {
-        while (!videoThreadPaused.wait(1000))
-        {
-            if (eof)
-                return;
+        videoThreadPaused.wait(&pauseUnpauseLock, 250);
+
+        if (video_actually_paused || eof)
+            break;
+
+        if ((i % 10) == 9)
             VERBOSE(VB_IMPORTANT, "Waited too long for video out to pause");
-        }
     }
 }
 
-void NuppelVideoPlayer::UnpauseVideo(void)
+void NuppelVideoPlayer::UnpauseVideo(bool wait)
 {
+    QMutexLocker locker(&pauseUnpauseLock);
     pausevideo = false;
+
+    for (uint i = 0; wait && video_actually_paused; i++)
+    {
+        videoThreadUnpaused.wait(&pauseUnpauseLock, 250);
+
+        if (!video_actually_paused || eof)
+            break;
+
+        if ((i % 10) == 9)
+            VERBOSE(VB_IMPORTANT, "Waited too long for video out to unpause");
+    }
+}
+
+void NuppelVideoPlayer::SetVideoActuallyPaused(bool val)
+{
+    QMutexLocker locker(&pauseUnpauseLock);
+    video_actually_paused = val;
+
+    if (val)
+        videoThreadPaused.wakeAll();
+    else
+        videoThreadUnpaused.wakeAll();
+}
+
+bool NuppelVideoPlayer::IsVideoActuallyPaused(void) const
+{
+    QMutexLocker locker(&pauseUnpauseLock);
+    return video_actually_paused;
 }
 
 void NuppelVideoPlayer::SetPrebuffering(bool prebuffer)
@@ -2304,8 +2341,7 @@ void NuppelVideoPlayer::DisplayPauseFrame(void)
         resetvideo = false;
     }
 
-    video_actually_paused = true;
-    videoThreadPaused.wakeAll();
+    SetVideoActuallyPaused(true);
 
     if (videoOutput->IsErrored())
     {
@@ -2412,7 +2448,7 @@ bool NuppelVideoPlayer::PrebufferEnoughFrames(void)
 
 void NuppelVideoPlayer::DisplayNormalFrame(void)
 {
-    video_actually_paused = false;
+    SetVideoActuallyPaused(false);
     resetvideo = false;
 
     if (!ringBuffer->InDVDMenuOrStillFrame() ||
@@ -2696,11 +2732,10 @@ void NuppelVideoPlayer::IvtvVideoLoop(void)
         }
 
         resetvideo = false;
-        video_actually_paused = pausevideo;
+        SetVideoActuallyPaused(pausevideo);
 
         if (pausevideo)
         {
-            videoThreadPaused.wakeAll();
             videofiltersLock.lock();
             videoOutput->ProcessFrame(NULL, osd, videoFilters, pipplayer);
             videofiltersLock.unlock();
@@ -3336,13 +3371,11 @@ void NuppelVideoPlayer::StartPlaying(void)
 
             if (rewindtime >= 1)
             {
-                PauseVideo();
+                QMutexLocker locker(&internalPauseLock);
 
+                PauseVideo(true);
                 DoRewind();
-
-                UnpauseVideo();
-                while (GetVideoPause())
-                    usleep(1000);
+                UnpauseVideo(true);
             }
             rewindtime = 0;
         }
@@ -3353,7 +3386,9 @@ void NuppelVideoPlayer::StartPlaying(void)
 
             if (fftime >= 5)
             {
-                PauseVideo();
+                QMutexLocker locker(&internalPauseLock);
+
+                PauseVideo(true);
 
                 if (fftime >= 5)
                     DoFastForward();
@@ -3361,9 +3396,7 @@ void NuppelVideoPlayer::StartPlaying(void)
                 if (eof)
                     continue;
 
-                UnpauseVideo();
-                while (GetVideoPause())
-                    usleep(1000);
+                UnpauseVideo(true);
             }
 
             fftime = 0;
@@ -3371,25 +3404,22 @@ void NuppelVideoPlayer::StartPlaying(void)
 
         if (need_change_dvd_track)
         {
-            PauseVideo();
+            QMutexLocker locker(&internalPauseLock);
 
+            PauseVideo(true);
             DoChangeDVDTrack();
-
-            UnpauseVideo();
-            while (GetVideoPause())
-                usleep(1000);
+            UnpauseVideo(true);
 
             need_change_dvd_track = 0;
         }
 
         if (skipcommercials != 0 && ffrew_skip == 1)
         {
-            PauseVideo();
+            QMutexLocker locker(&internalPauseLock);
 
+            PauseVideo(true);
             DoSkipCommercials(skipcommercials);
-            UnpauseVideo();
-            while (GetVideoPause())
-                usleep(1000);
+            UnpauseVideo(true);
 
             skipcommercials = 0;
             continue;
@@ -3422,11 +3452,11 @@ void NuppelVideoPlayer::StartPlaying(void)
             }
             else
             {
-                PauseVideo();
+                QMutexLocker locker(&internalPauseLock);
+
+                PauseVideo(true);
                 JumpToFrame(deleteIter.key());
-                UnpauseVideo();
-                while (GetVideoPause())
-                    usleep(1000);
+                UnpauseVideo(true);
             }
         }
     }
@@ -5765,12 +5795,14 @@ void NuppelVideoPlayer::AutoCommercialSkip(void)
                         .arg(commBreakIter.key() - 
                         (int)(commrewindamount * video_frame_rate)));
 
-                    PauseVideo();
+                    internalPauseLock.lock();
+
+                    PauseVideo(true);
                     JumpToFrame(commBreakIter.key() -
                         (int)(commrewindamount * video_frame_rate));
-                    UnpauseVideo();
-                    while (GetVideoPause())
-                        usleep(1000);
+                    UnpauseVideo(true);
+
+                    internalPauseLock.unlock();
 
                     GetFrame(1, true);
                 }
