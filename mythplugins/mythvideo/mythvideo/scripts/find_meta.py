@@ -52,12 +52,12 @@ import distutils.file_util
 
 try:
 	# If found, we can insert data directly to MythDB
-	from MythTV import MythTV, MythVideo
-	mythtv = MythTV()
+	from MythTV import MythDB, MythVideo
+	mythdb = MythDB()
 	mythvideo = MythVideo()
 except:
-	print "MythTV module not found, MythDB importing disabled."
-	mythtv = None
+	print "MythTV module cannot be initialized, MythDB importing disabled."
+	mythdb = None
 	mythvideo = None
 
 from stat import *
@@ -362,11 +362,13 @@ def save_video_metadata_to_mythdb(videopath, metadata, child=-1, disc=None):
 		for aka in akas.split(', '):
 		# Grill Point::(International: English title)
 		# Catastrofi d'amore::(Italy)::[it]
-			akaRegexp = "(.+)::\(.*\)::\[%s\].*" % aka_language
-					m = re.match(akaRegexp, aka)
+			akaRegexp = ".+::\[%s\].*" % aka_language
+			m = re.match(akaRegexp, aka)
 			if m is not None:
-				title = m.group(1) + " (" + title + ")"
-				print_verbose("Found AKA: %s" % title)
+				aka_title = aka.split("::")[0]
+				if aka_title != title:
+					title = aka_title + " (" + title + ")"
+					print_verbose("Found AKA: %s" % title)
 				break
 
 	if disc is not None:
@@ -408,7 +410,11 @@ def save_video_metadata_to_mythdb(videopath, metadata, child=-1, disc=None):
 			length = length.split(":")[1]
 			length = int(length)
 		except:
-			length = 0
+			try:
+				length = length.split("(")[0]
+				length = int(length)
+			except:
+				length = 0
 
 	filename = videopath
 
@@ -784,7 +790,7 @@ def should_be_skipped(path, meta_file = None):
 
 	# Check the ignored filename patterns.
 	for skip in skipDirs:
-		if path.endswith(skip):
+		if path.lower().endswith(skip.lower()):
 			return True
 
 
@@ -816,12 +822,12 @@ def scan(pathName, imdb_id = None):
 				print_verbose("Skipping '%s'." % pathName)
 				return
 			scan_directory(pathName, imdb_id)
-		elif os.path.isfile(pathName):
+	elif os.path.isfile(pathName):
 		if should_be_skipped(pathName):
 			print_verbose("Skipping '%s'." % pathName)
 			return
 		scan_file(pathName, imdb_id)
-		else:
+	else:
 		raise IOError("File not found")
 	return
 
@@ -899,10 +905,10 @@ def main():
 		print_verbose("IMDb ID %s given manually." % options.imdb_id)
 
 	if dbimport or prune:
-		if not mythtv:
+		if not mythdb:
 			print "You must have the MythTV module to make direct DB importing to work"
 			sys.exit(1)
-		poster_dir = mythtv.getSetting("VideoArtworkDir", socket.gethostname())
+		poster_dir = mythdb.getSetting("VideoArtworkDir", socket.gethostname())
 
 
 	if prune:

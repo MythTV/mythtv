@@ -50,77 +50,50 @@ BACKEND_SEP = '[]:[]'
 PROTO_VERSION = 34
 PROGRAM_FIELDS = 43
 
-def get_database_connection():
-	"""
-	A connection to the mythtv database
-	"""
-	config_files = [
-		'/usr/local/share/mythtv/mysql.txt',
-		'/usr/share/mythtv/mysql.txt',
-		'/usr/local/etc/mythtv/mysql.txt',
-		'/etc/mythtv/mysql.txt',
-		os.path.expanduser('~/.mythtv/mysql.txt'),
-	]
-	if 'MYTHCONFDIR' in os.environ:
-		config_locations.append('%s/mysql.txt' % os.environ['MYTHCONFDIR'])
-
-	found_config = False
-	for config_file in config_files:
-		try:
-			config = shlex.shlex(open(config_file))
-		except:
-			continue
-
-		token = config.get_token()
-		db_host = db_user = db_password = None
-		while  token != config.eof and (db_host == None or db_user == None or db_password == None):
-			if token == "DBHostName":
-				if config.get_token() == "=":
-					db_host = config.get_token()
-			elif token == "DBUserName":
-				if config.get_token() == "=":
-					db_user = config.get_token()
-			elif token == "DBPassword":
-				if config.get_token() == "=":
-					db_password = config.get_token()
-
+class MythDB:
+	def __init__(self):
+		"""
+		A connection to the mythtv database
+		"""
+		config_files = [
+			'/usr/local/share/mythtv/mysql.txt',
+			'/usr/share/mythtv/mysql.txt',
+			'/usr/local/etc/mythtv/mysql.txt',
+			'/etc/mythtv/mysql.txt',
+			os.path.expanduser('~/.mythtv/mysql.txt'),
+		]
+		if 'MYTHCONFDIR' in os.environ:
+			config_locations.append('%s/mysql.txt' % os.environ['MYTHCONFDIR'])
+	
+		found_config = False
+		for config_file in config_files:
+			try:
+				config = shlex.shlex(open(config_file))
+			except:
+				continue
+	
 			token = config.get_token()
-		log.debug('Using config %s' % config_file)
-		found_config = True
-		break
-
-	if not found_config:
-		log.critical('Unable to find config')
-		sys.exit(1)
-	return MySQLdb.connect(user=db_user, host=db_host, passwd=db_password, db="mythconverg")
-
-class MythTV:
-	"""
-	A connection to MythTV
-	"""
-	def __init__(self, conn_type='Monitor'):
-		self.db = get_database_connection()
-		self.master_host = self.getSetting('MasterServerIP')
-		self.master_port = int(self.getSetting('MasterServerPort'))
-		
-		if not self.master_host:
-			log.critical('Unable to find MasterServerIP in database')
-			sys.exit(1)
-		if not self.master_port:
-			log.critical('Unable to find MasterServerPort in database')
-			sys.exit(1)
-		
-		self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-		self.socket.settimeout(10)
-		self.socket.connect((self.master_host, self.master_port))
-		res = self.backendCommand('MYTH_PROTO_VERSION %s' % PROTO_VERSION).split(BACKEND_SEP)
-		if res[0] == 'REJECT':
-			log.critical('Backend has version %s and we speak version %s', res[1], PROTO_VERSION)
-			sys.exit(1)
-		res = self.backendCommand('ANN %s %s 0' % (conn_type, socket.gethostname()))
-		if res != 'OK':
-			log.critical('Unexpected answer to ANN command: %s', res)
-
+			db_host = db_user = db_password = None
+			while  token != config.eof and (db_host == None or db_user == None or db_password == None):
+				if token == "DBHostName":
+					if config.get_token() == "=":
+						db_host = config.get_token()
+				elif token == "DBUserName":
+					if config.get_token() == "=":
+						db_user = config.get_token()
+				elif token == "DBPassword":
+					if config.get_token() == "=":
+						db_password = config.get_token()
+	
+				token = config.get_token()
+			log.debug('Using config %s' % config_file)
+			found_config = True
+			break
+	
+		if not found_config:
+			raise "Unable to find MythTV configuration file"
+		self.db = MySQLdb.connect(user=db_user, host=db_host, passwd=db_password, db="mythconverg")
+	
 	def getSetting(self, value, hostname=None):
 		"""
 		Returns the value for the given MythTV setting.
@@ -149,6 +122,37 @@ class MythTV:
 			return row[0]
 		else:
 			return None
+	
+	def cursor(self):
+		return self.db.cursor()
+	
+
+class MythTV:
+	"""
+	A connection to MythTV backend
+	"""
+	def __init__(self, conn_type='Monitor'):
+		self.db = get_database_connection()
+		self.master_host = self.getSetting('MasterServerIP')
+		self.master_port = int(self.getSetting('MasterServerPort'))
+		
+		if not self.master_host:
+			log.critical('Unable to find MasterServerIP in database')
+			sys.exit(1)
+		if not self.master_port:
+			log.critical('Unable to find MasterServerPort in database')
+			sys.exit(1)
+		
+		self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+		self.socket.settimeout(10)
+		self.socket.connect((self.master_host, self.master_port))
+		res = self.backendCommand('MYTH_PROTO_VERSION %s' % PROTO_VERSION).split(BACKEND_SEP)
+		if res[0] == 'REJECT':
+			log.critical('Backend has version %s and we speak version %s', res[1], PROTO_VERSION)
+			sys.exit(1)
+		res = self.backendCommand('ANN %s %s 0' % (conn_type, socket.gethostname()))
+		if res != 'OK':
+			log.critical('Unexpected answer to ANN command: %s', res)
 
 	def backendCommand(self, data):
 		"""
@@ -251,7 +255,7 @@ class MythTV:
 
 class MythVideo:
 	def __init__(self):
-		self.db = get_database_connection()
+		self.db = MythDB()
 
 	def pruneMetadata(self):
 		c = self.db.cursor()

@@ -45,8 +45,8 @@ def detect_series_title(search_string):
 		"(s|(season)|\s)\s*(?P<season>\d+)"\
 		"\s*(e|(episode)|x)\s*(?P<episode>\d+)"),
 		re.compile(\
-		r"((?P<title>.+?)(-)?)?\s+"\
-		"(?P<season>\d)(?P<episode>\d\d)\s+")]
+		r"((?P<title>.+)(-)?)?\s+"\
+		"(?P<season>\d)(?P<episode>\d\d)(?!\d)\s*")]
 
 	for exp in regexps:
 		m = exp.match(search_string.lower())
@@ -61,6 +61,12 @@ def detect_series_title(search_string):
 
 
 def episode_search(title, season, episode):
+	"""
+	Searches the IMDb for an exact TV-serie episode match.
+	
+	Returns a list of 3-tuples [imdb id, title, year] for possible matches.	
+	Rest of the data need to be fetched separately with fetch_metadata().
+	"""
 	matches = []
 	imdb_access = imdb.IMDb()
 	series = imdb_access.search_movie(title.encode("ascii", 'replace'))
@@ -80,19 +86,16 @@ def episode_search(title, season, episode):
 					continue
 				# Found an exact episode match, return that match only.
 				matches = []
-				meta = VideoMetadata()
-				meta.series_episode = True
-				meta.series_title = ep['series title']
-				meta.season = season
-				meta.episode = episode
-				meta.episode_title = ep['title']
+				series_title = ep['series title']
 				year = 0
 				try:
 					year = int(ep['year'])
 				except:
 					pass
+				
 				matches.append([imdb_access.get_imdbID(ep),
-					meta.toMetadataString(), year])
+					"%s Season %d Episode %d" % \
+						(series_title, season, episode), year])
 				return matches
 			else:
 				matches.append([imdb_access.get_imdbID(serie),
@@ -225,13 +228,12 @@ class VideoMetadata:
 		else:
 			metadata += createMetadataLine("Title", unicode(self.title))
 		metadata += createMetadataLine("Runtime", self.runtime)
-		metadata += createMetadataLine('Year', self.year)
+		metadata += createMetadataLine('Year', str(self.year))
 		if self.directors is not None and len(self.directors) > 0:
 			metadata += createMetadataLine("Director", unicode(self.directors[0]))
 		metadata += createMetadataLine("Plot", self.plot)
 		metadata += createMetadataLine('UserRating', self.rating)
 		metadata += createMetadataLine('MovieRating', self.mpaa_rating)
-		metadata += createMetadataLine('Runtime', self.runtime)
 		metadata += createMetadataLine('Genres', self.genres)
 		metadata += createMetadataLine('Countries', self.countries)
 
@@ -241,7 +243,11 @@ class VideoMetadata:
 		return unicode(metadata)
 
 def fetch_metadata(imdb_id):
-
+	"""
+	Fetches metadata for the given IMDb id.
+	
+	Returns a VideoMetadata object.
+	"""
 	metadata = VideoMetadata()
 
 	imdb_access = imdb.IMDb()
@@ -293,7 +299,7 @@ def fetch_metadata(imdb_id):
 		if 'episode of' in movie.keys():
 			series = movie['episode of']
 			imdb_access.update(series)
-			metadata.runtime = metadataFromFirst('runtimes', None)
+			metadata.runtime = metadataFromFirst('runtimes', metadata.runtime, series)
 	else:
 		metadata.title = metadataFromField('title').decode("utf8")
 

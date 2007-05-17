@@ -137,7 +137,7 @@ class MoviePosterPosterFetcher(PosterFetcher):
 		for the given title_string.
 		"""
 		params = urllib.urlencode(\
-			{'ti': title_string, 
+			{'ti': title_string.encode("ascii", 'replace'), 
 			 'pl': 'action', 
 			 'th': 'y', 
 			 'rs': '12', 
