@@ -81,6 +81,8 @@ class MPUBLIC MythMediaDevice : public QObject
     virtual MediaError  testMedia() { return MEDIAERR_UNSUPPORTED; }
     virtual bool openDevice();
     virtual bool closeDevice();
+    virtual bool isSameDevice(const QString &path);
+    virtual void setSpeed(int speed);
     virtual MediaStatus checkMedia() = 0; // Derived classes MUST implement this.
     virtual MediaError eject(bool open_close = true);
     virtual MediaError lock();

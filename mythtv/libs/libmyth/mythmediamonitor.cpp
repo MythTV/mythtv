@@ -379,6 +379,31 @@ void MediaMonitor::Unlock(MythMediaDevice *pMedia)
     }
 }
 
+/**  \fn MediaMonitor::GetMedia(const QString& path)
+ * \brief Get media device by pathname. Must be locked with ValidateAndLock().
+ *
+ *  \sa ValidateAndLock(MythMediaDevice *pMedia)
+ *  \sa Unlock(MythMediaDevice *pMedia)
+ */
+MythMediaDevice* MediaMonitor::GetMedia(const QString& path)
+{
+    QMutexLocker locker(&m_DevicesLock);
+
+    QValueList<MythMediaDevice*>::iterator it = m_Devices.begin();
+    for (;it != m_Devices.end(); it++)
+    {
+        if ((*it)->isSameDevice(path) &&
+            (((*it)->getStatus() == MEDIASTAT_USEABLE) ||
+             ((*it)->getStatus() == MEDIASTAT_MOUNTED) ||
+             ((*it)->getStatus() == MEDIASTAT_NOTMOUNTED)))
+        {
+            return(*it);
+        }
+    }
+
+    return NULL;
+}
+
 /** \fn MediaMonitor::GetMedias(MediaType mediatype)
  *  \brief Ask for available media. Must be locked with ValidateAndLock().
  *

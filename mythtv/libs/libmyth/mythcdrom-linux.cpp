@@ -2,10 +2,15 @@
 #include "mythcdrom-linux.h"
 #include <sys/ioctl.h>                // ioctls
 #include <linux/cdrom.h>        // old ioctls for cdrom
+#include <scsi/sg.h>
+#include <fcntl.h>
 #include <errno.h>
 #include "mythcontext.h"
 #include <linux/iso_fs.h>
 #include <unistd.h>
+
+#define LOC QString("mythcdrom-linux: ")
+#define LOC_ERR QString("mythcdrom-linux, Error: ")
 
 #define ASSUME_WANT_AUDIO 1
 
@@ -22,6 +27,8 @@ public:
     virtual bool checkOK(void);
     virtual MediaStatus checkMedia(void);
     virtual MediaError eject(bool open_close = true);
+    virtual void setSpeed(int speed);
+    virtual bool isSameDevice(const QString &path);
     virtual MediaError lock(void);
     virtual MediaError unlock(void);
 };
@@ -309,3 +316,139 @@ MediaError MythCDROMLinux::unlock()
 
     return MythMediaDevice::unlock();
 }
+
+bool MythCDROMLinux::isSameDevice(const QString &path)
+{
+    dev_t new_rdev;
+    struct stat sb;
+
+    if (stat(path, &sb) < 0)
+    {
+        VERBOSE(VB_IMPORTANT, "MythCDROMLinux::SameDevice() -- " +
+                QString("Failed to stat '%1'")
+                .arg(path) + ENO);
+        return false;
+    }
+    new_rdev = sb.st_rdev;
+
+    // Check against m_DevicePath...
+    if (stat(m_DevicePath, &sb) < 0)
+    {
+        VERBOSE(VB_IMPORTANT, "MythCDROMLinux::SameDevice() -- " +
+                QString("Failed to stat '%1'")
+                .arg(m_DevicePath) + ENO);
+        return false;
+    }
+    return (sb.st_rdev == new_rdev);
+}
+
+#if defined(SG_IO) && defined(GPCMD_SET_STREAMING)
+/*
+ * \brief obtained from the mplayer project
+ */
+void MythCDROMLinux::setSpeed(int speed)
+{
+    int fd;
+    unsigned char buffer[28];
+    unsigned char cmd[16];
+    unsigned char sense[16];
+    struct sg_io_hdr sghdr;
+    struct stat st;
+    int rate = 0;
+
+    memset(&sghdr, 0, sizeof(sghdr));
+    memset(buffer, 0, sizeof(buffer));
+    memset(sense, 0, sizeof(sense));
+    memset(cmd, 0, sizeof(cmd));
+    memset(&st, 0, sizeof(st));
+
+    if (stat(m_DevicePath, &st) == -1 ) 
+    {
+        VERBOSE(VB_IMPORTANT, LOC_ERR +
+                QString("setSpeed() Failed. device %1 not found")
+                .arg(m_DevicePath));
+        return;
+    }
+
+    if (!S_ISBLK(st.st_mode)) 
+    {
+        VERBOSE(VB_IMPORTANT, LOC_ERR + 
+                "MythCDROMLinux::SetSpeed() Failed. Not a block device");
+        return;
+    }
+
+    if ((fd = open(m_DevicePath, O_RDWR | O_NONBLOCK)) == -1)
+    {
+        VERBOSE(VB_IMPORTANT, LOC_ERR + 
+                "Changing CD/DVD speed needs write access");
+        return;
+    }
+
+    if (speed < 0)
+        speed = -1;
+
+    switch(speed)
+    {
+        case 0: // don't touch speed setting
+            return;
+        case -1: // restore default value
+        {
+            rate = 0;
+            buffer[0] = 4;
+            VERBOSE(VB_IMPORTANT, LOC + "Restored CD/DVD Speed");
+            break;
+        }
+        default:
+        {
+            // Speed in Kilobyte/Second. 177KB/s is the maximum data rate
+            // for standard Audio CD's.
+
+            rate = (speed > 0 && speed < 100) ? speed * 177 : speed;
+
+            VERBOSE(VB_IMPORTANT, LOC + QString("Limit CD/DVD Speed to %1KB/s")
+                    .arg(rate));
+            break;
+        }
+    }
+
+    sghdr.interface_id = 'S';
+    sghdr.timeout = 5000;
+    sghdr.dxfer_direction = SG_DXFER_TO_DEV;
+    sghdr.mx_sb_len = sizeof(sense);
+    sghdr.dxfer_len = sizeof(buffer);
+    sghdr.cmd_len = sizeof(cmd);
+    sghdr.sbp = sense;
+    sghdr.dxferp = buffer;
+    sghdr.cmdp = cmd;
+
+    cmd[0] = GPCMD_SET_STREAMING;
+    cmd[10] = sizeof(buffer);
+
+    buffer[8]  = 0xff;
+    buffer[9]  = 0xff;
+    buffer[10] = 0xff;
+    buffer[11] = 0xff;
+
+    buffer[12] = buffer[20] = (rate >> 24) & 0xff;
+    buffer[13] = buffer[21] = (rate >> 16) & 0xff;
+    buffer[14] = buffer[22] = (rate >> 8)  & 0xff;
+    buffer[15] = buffer[23] = rate & 0xff;
+
+    // Note: 0x3e8 == 1000, hence speed = data amount per 1000 milliseconds.
+    buffer[18] = buffer[26] = 0x03;
+    buffer[19] = buffer[27] = 0xe8;
+
+    // On my system (2.6.18 + ide-cd),  SG_IO succeeds without doing anything,
+    // while CDROM_SELECT_SPEED works...
+    if (ioctl(fd, CDROM_SELECT_SPEED, speed) < 0) 
+    {
+        if (ioctl(fd, SG_IO, &sghdr) < 0)
+            VERBOSE(VB_IMPORTANT, LOC_ERR + "Limit CD/DVD Speed Failed");
+    }
+    else 
+        VERBOSE(VB_IMPORTANT, LOC + "CD/DVD Speed Set Successful");
+    
+    close(fd);
+}
+#endif
+

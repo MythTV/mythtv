@@ -65,6 +65,7 @@ class MPUBLIC MediaMonitor : public QObject
     // first validate the pointer with ValidateAndLock(), if true is returned
     // it is safe to dereference the pointer. When finished call Unlock()
     QValueList<MythMediaDevice*> GetMedias(MediaType mediatype);
+    MythMediaDevice* GetMedia(const QString &path);
 
     void MonitorRegisterExtensions(uint mediaType, const QString &extensions);
 

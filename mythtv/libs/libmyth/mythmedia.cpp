@@ -273,6 +273,17 @@ MediaError MythMediaDevice::eject(bool open_close)
     return MEDIAERR_UNSUPPORTED;
 }
 
+bool MythMediaDevice::isSameDevice(const QString &path)
+{
+    return (path == m_DevicePath);
+}
+
+void MythMediaDevice::setSpeed(int speed)
+{
+    (void)speed;
+    return;
+}
+
 MediaError MythMediaDevice::lock() 
 { 
     // We just open the device here, which may or may not do the trick,

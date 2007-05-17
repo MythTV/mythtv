@@ -1,17 +1,8 @@
 #include <unistd.h>
-#ifdef __linux__
-#include <linux/cdrom.h>
-#include <scsi/sg.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <sys/ioctl.h>
-#include <fcntl.h>
-#include <unistd.h>
-#endif
-
 
 #include "DVDRingBuffer.h"
 #include "mythcontext.h"
+#include "mythmediamonitor.h"
 #include "iso639.h"
 
 #include "NuppelVideoPlayer.h"
@@ -1212,7 +1203,7 @@ void DVDRingBufferPriv::SeekCellStart(void)
 }
 
 /** \brief set dvd speed. uses the DVDDriveSpeed Setting from the settings 
- * table
+ *  table
  */
 void DVDRingBufferPriv::SetDVDSpeed(void)
 {
@@ -1220,112 +1211,20 @@ void DVDRingBufferPriv::SetDVDSpeed(void)
     SetDVDSpeed(dvdDriveSpeed);
 }
 
-/** \brief set dvd speed. obtained from mplayer project
- *  \param dvd drive speed. example if speed is 2, then function 
- *  sets dvd speed to 2048kb/s
+/** \brief set dvd speed.
  */
 void DVDRingBufferPriv::SetDVDSpeed(int speed)
 {
-#if defined(__linux__) && defined(SG_IO) && defined(GPCMD_SET_STREAMING)
-    int fd;
-    unsigned char buffer[28];
-    unsigned char cmd[16];
-    unsigned char sense[16];
-    struct sg_io_hdr sghdr;
-    struct stat st;
-
-    const char *device = dvdFilename;
-    memset(&sghdr, 0, sizeof(sghdr));
-    memset(buffer, 0, sizeof(buffer));
-    memset(sense, 0, sizeof(sense));
-    memset(cmd, 0, sizeof(cmd));
-    memset(&st, 0, sizeof(st));
-
-    QMutexLocker lock(&seekLock);
-   
-    if (stat(device, &st) == -1 ) 
+    MediaMonitor *mon = MediaMonitor::GetMediaMonitor();
+    if (mon != NULL)
     {
-        VERBOSE(VB_PLAYBACK, LOC_ERR +
-                QString("SetDVDSpeed() Failed. device %1 not found")
-                .arg(device));
-        return;
-    }
-
-    if (!S_ISBLK(st.st_mode)) 
-    {
-        VERBOSE(VB_PLAYBACK, LOC_ERR + 
-                "SetDVDSpeed() Failed. Not a block device");
-        return;
-    }
-
-    if ((fd = open(device, O_RDWR | O_NONBLOCK)) == -1)
-    {
-        VERBOSE(VB_PLAYBACK, LOC_ERR + 
-                "Changing DVD speed needs write access");
-        return;
-    }
-
-    if (speed > 0 && speed < 100)
-        speed *= 1350;
-
-    switch(speed)
-    {
-        case 0: // don't touch speed setting
-            return;
-        case -1: // restore default value
+        MythMediaDevice *pMedia = mon->GetMedia(dvdFilename);
+        if (pMedia && mon->ValidateAndLock(pMedia))
         {
-            speed = 0;
-            buffer[0] = 4;
-            VERBOSE(VB_PLAYBACK, LOC + "Restored DVD Speed");
-            break;
-        }
-        default:
-        {
-            QString msg;
-            if (speed < 0)
-                msg = "Normal";
-            else
-                msg = QString("%1Kb/s").arg(speed);
-            VERBOSE(VB_PLAYBACK, LOC + QString("Limit DVD Speed to %1")
-                    .arg(msg));
-            break;
+            pMedia->setSpeed(speed);
+            mon->Unlock(pMedia);
         }
     }
-
-    sghdr.interface_id = 'S';
-    sghdr.timeout = 5000;
-    sghdr.dxfer_direction = SG_DXFER_TO_DEV;
-    sghdr.mx_sb_len = sizeof(sense);
-    sghdr.dxfer_len = sizeof(buffer);
-    sghdr.cmd_len = sizeof(cmd);
-    sghdr.sbp = sense;
-    sghdr.dxferp = buffer;
-    sghdr.cmdp = cmd;
-
-    cmd[0] = GPCMD_SET_STREAMING;
-    cmd[10] = sizeof(buffer);
-
-    buffer[8]  = 0xff;
-    buffer[9]  = 0xff;
-    buffer[10] = 0xff;
-    buffer[11] = 0xff;
-
-    buffer[12] = buffer[20] = (speed >> 24) & 0xff;
-    buffer[13] = buffer[21] = (speed >> 16) & 0xff;
-    buffer[14] = buffer[22] = (speed >> 8)  & 0xff;
-    buffer[15] = buffer[23] = speed & 0xff;
-
-    buffer[18] = buffer[26] = 0x03;
-    buffer[19] = buffer[27] = 0xe8;
-
-    if (ioctl(fd, SG_IO, &sghdr) < 0)
-        VERBOSE(VB_PLAYBACK, LOC_ERR + "Limit DVD Speed Failed");
-   
-    close(fd);
-    VERBOSE(VB_PLAYBACK, LOC + "Limiting DVD Speed Successful");
-#else
-    (void)speed;
-#endif
 }
 
 /**\brief returns seconds left in the title
