@@ -191,7 +191,7 @@ our %depend = (
   =>
   {
     'url' 
-    => 'http://mysql.binarycompass.org/Downloads/MySQL-4.1/mysql-4.1.21.tar.gz',
+    => 'http://mysql.osuosl.org/Downloads/MySQL-4.1/mysql-4.1.22.tar.gz',
     'conf'
     =>  [
           '--without-debug',
