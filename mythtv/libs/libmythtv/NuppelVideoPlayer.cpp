@@ -2539,14 +2539,17 @@ void NuppelVideoPlayer::DisplayNormalFrame(void)
         ShowText();
 
     // handle DVB/DVD subtitles decoded by ffmpeg (in AVSubtitle format)
-    if (textDisplayMode & kDisplayAVSubtitle) 
-        DisplayAVSubtitles();
-    else if (textDisplayMode & kDisplayTextSubtitle)
-        DisplayTextSubtitles();
-    else if (osdHasSubtitles) 
-        ClearSubtitles();
-    else
-        ExpireSubtitles();
+    if (ffrew_skip == 1)
+    {
+        if (textDisplayMode & kDisplayAVSubtitle) 
+            DisplayAVSubtitles();
+        else if (textDisplayMode & kDisplayTextSubtitle)
+            DisplayTextSubtitles();
+        else if (osdHasSubtitles) 
+            ClearSubtitles();
+        else
+            ExpireSubtitles();
+    }
 
     // handle scan type changes
     AutoDeint(frame);
