@@ -132,9 +132,9 @@ class MythTV:
 	A connection to MythTV backend
 	"""
 	def __init__(self, conn_type='Monitor'):
-		self.db = get_database_connection()
-		self.master_host = self.getSetting('MasterServerIP')
-		self.master_port = int(self.getSetting('MasterServerPort'))
+		self.db = MythDB()
+		self.master_host = self.db.getSetting('MasterServerIP')
+		self.master_port = int(self.db.getSetting('MasterServerPort'))
 		
 		if not self.master_host:
 			log.critical('Unable to find MasterServerIP in database')
