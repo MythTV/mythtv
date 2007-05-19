@@ -1,3 +1,4 @@
+#include <qfile.h>
 #include <qstringlist.h>
 
 #include "util.h"
@@ -117,7 +118,13 @@ bool RemoteCheckFile(ProgramInfo *pginfo, bool checkSlaves)
         (!strlist[0].toInt()))
         return false;
 
-    pginfo->pathname = strlist[1];
+    // Only modify the pathname if the recording file is available locally on
+    // this host
+    QString localpath = strlist[1];
+    QFile checkFile(localpath);
+    if (checkFile.exists())
+        pginfo->pathname = localpath;
+
     return true;
 }
 
