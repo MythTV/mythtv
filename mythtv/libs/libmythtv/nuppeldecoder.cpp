@@ -618,6 +618,7 @@ bool NuppelDecoder::InitAVCodec(int codec)
             case FOURCC_H263: codec = CODEC_ID_H263;       break;
             case FOURCC_I263: codec = CODEC_ID_H263I;      break;
             case FOURCC_MPEG: codec = CODEC_ID_MPEG1VIDEO; break;
+            case FOURCC_MPG2: codec = CODEC_ID_MPEG2VIDEO; break;
             case FOURCC_HFYU: codec = CODEC_ID_HUFFYUV;    break;
             default: codec = -1;
         }

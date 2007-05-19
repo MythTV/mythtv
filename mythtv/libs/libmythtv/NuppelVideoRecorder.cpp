@@ -1918,6 +1918,7 @@ void NuppelVideoRecorder::WriteHeader(void)
             case CODEC_ID_H263P:      vidfcc = FOURCC_H263; break;
             case CODEC_ID_H263I:      vidfcc = FOURCC_I263; break;
             case CODEC_ID_MPEG1VIDEO: vidfcc = FOURCC_MPEG; break;
+            case CODEC_ID_MPEG2VIDEO: vidfcc = FOURCC_MPG2; break;
             case CODEC_ID_HUFFYUV:    vidfcc = FOURCC_HFYU; break;
             default: break;
         }

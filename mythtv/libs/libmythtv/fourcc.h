@@ -90,6 +90,7 @@ static inline char * fourcc_str(int i)
 #define FOURCC_MJPG MKTAG('M','J','P','G')
 #define FOURCC_MP42 MKTAG('M','P','4','2') /* MPEG4 v2 */
 #define FOURCC_MPEG MKTAG('M','P','E','G') /* MPEG1 */
+#define FOURCC_MPG2 MKTAG('M','P','G','2') /* MPEG2 */
 #define FOURCC_MPG4 MKTAG('M','P','G','4') /* MPEG4 v1 */
 #define FOURCC_RJPG MKTAG('R','J','P','G')
 #define FOURCC_WMV1 MKTAG('W','M','V','1')
