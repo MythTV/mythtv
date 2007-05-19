@@ -781,23 +781,27 @@ void AutoExpire::FillDBOrdered(pginfolist_t &expireList, int expMethod)
 {
     QString where;
     QString orderby;
+    QString msg;
 
     switch (expMethod)
     {
         default:
         case emOldestFirst:
+            msg = "Adding expirable programs in Oldest First order";
             where = "autoexpire > 0";
             if (gContext->GetNumSetting("AutoExpireWatchedPriority", 0))
                 orderby = "recorded.watched DESC, ";
             orderby += "starttime ASC";
             break;
         case emLowestPriorityFirst:
+            msg = "Adding expirable programs in Lowest Priority First order";
             where = "autoexpire > 0";
             if (gContext->GetNumSetting("AutoExpireWatchedPriority", 0))
                 orderby = "recorded.watched DESC, ";
             orderby += "recorded.recpriority ASC, starttime ASC";
             break;
         case emWeightedTimePriority:
+            msg = "Adding expirable programs in Weighted Time Priority order";
             where = "autoexpire > 0";
             if (gContext->GetNumSetting("AutoExpireWatchedPriority", 0))
                 orderby = "recorded.watched DESC, ";
@@ -806,18 +810,22 @@ void AutoExpire::FillDBOrdered(pginfolist_t &expireList, int expMethod)
                       .arg(gContext->GetNumSetting("AutoExpireDayPriority", 3));
             break;
         case emShortLiveTVPrograms:
+            msg = "Adding Short LiveTV programs in starttime order";
             where = "recgroup = 'LiveTV' "
                     "AND endtime < DATE_ADD(starttime, INTERVAL '2' MINUTE) "
                     "AND endtime <= DATE_ADD(NOW(), INTERVAL '-1' MINUTE) ";
             orderby = "starttime ASC";
             break;
         case emNormalLiveTVPrograms:
+            msg = "Adding LiveTV programs in starttime order";
             where = QString("recgroup = 'LiveTV' "
                     "AND endtime <= DATE_ADD(NOW(), INTERVAL '-%1' DAY) ")
                     .arg(gContext->GetNumSetting("AutoExpireLiveTVMaxAge", 1));
             orderby = "starttime ASC";
             break;
     }
+
+    VERBOSE(VB_FILE, LOC + "FillDBOrdered: " + msg);
 
     MSqlQuery query(MSqlQuery::InitCon());
     QString querystr = QString(
@@ -845,15 +853,15 @@ void AutoExpire::FillDBOrdered(pginfolist_t &expireList, int expMethod)
 
         if (IsInDontExpireSet(m_chanid, m_recstartts))
         {
-            VERBOSE(VB_FILE, LOC + QString("FillDBOrdered: Chanid "
-                             "%1 @ %2 is in Don't Expire List")
+            VERBOSE(VB_FILE, LOC + QString("    Skipping "
+                             "%1 @ %2 because it is in Don't Expire List")
                              .arg(m_chanid).arg(m_recstartts.toString()));
             continue;
         }
         else if (IsInExpireList(expireList, m_chanid, m_recstartts))
         {
-            VERBOSE(VB_FILE, LOC + QString("FillDBOrdered: Chanid "
-                             "%1 @ %2 is already in Expire List")
+            VERBOSE(VB_FILE, LOC + QString("    Skipping "
+                             "%1 @ %2 because it is already in Expire List")
                              .arg(m_chanid) .arg(m_recstartts.toString()));
             continue;
         }
@@ -891,8 +899,8 @@ void AutoExpire::FillDBOrdered(pginfolist_t &expireList, int expMethod)
         proginfo->storagegroup = query.value(17).toString();
         proginfo->pathname = query.value(18).toString();
 
-        VERBOSE(VB_FILE, LOC + QString("FillDBOrdered: Adding chanid "
-                                       "%1 @ %2 to expire list")
+        VERBOSE(VB_FILE, LOC + QString("    Adding   "
+                                       "%1 @ %2")
                                        .arg(proginfo->chanid)
                                        .arg(proginfo->recstartts.toString()));
         expireList.push_back(proginfo);
