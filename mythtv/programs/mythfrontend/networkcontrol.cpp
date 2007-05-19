@@ -117,6 +117,7 @@ NetworkControl::NetworkControl(int port)
     keyMap["."]                      = Qt::Key_Period;
     keyMap["numbersign"]             = Qt::Key_NumberSign;
     keyMap["poundsign"]              = Qt::Key_NumberSign;
+    keyMap["hash"]                   = Qt::Key_NumberSign;
     keyMap["#"]                      = Qt::Key_NumberSign;
     keyMap["bracketleft"]            = Qt::Key_BracketLeft;
     keyMap["["]                      = Qt::Key_BracketLeft;
