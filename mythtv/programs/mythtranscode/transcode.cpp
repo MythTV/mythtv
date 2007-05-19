@@ -664,7 +664,7 @@ int Transcode::TranscodeFile(char *inputname, char *outputname,
     VideoOutput *videoOutput = nvp->getVideoOutput();
     bool is_key = 0;
     bool first_loop = true;
-    unsigned char *newFrame = new unsigned char[newWidth * newHeight * 3 / 2];
+    unsigned char *newFrame = new unsigned char[frame.size];
 
     frame.buf = newFrame;
     AVPicture imageIn, imageOut;
@@ -853,6 +853,7 @@ int Transcode::TranscodeFile(char *inputname, char *outputname,
                 }
                 else
                 {
+                    frame.buf = newFrame;
                     avpicture_fill(&imageIn, lastDecode->buf, PIX_FMT_YUV420P,
                                    video_width, video_height);
                     avpicture_fill(&imageOut, frame.buf, PIX_FMT_YUV420P,
@@ -905,6 +906,7 @@ int Transcode::TranscodeFile(char *inputname, char *outputname,
             }
             else
             {
+                frame.buf = newFrame;
                 avpicture_fill(&imageIn, lastDecode->buf, PIX_FMT_YUV420P,
                                video_width, video_height);
                 avpicture_fill(&imageOut, frame.buf, PIX_FMT_YUV420P,
