@@ -3076,7 +3076,7 @@ void MainServer::HandleRemoteEncoder(QStringList &slist, QStringList &commands,
     {
         retlist << QString::number((int)enc->GetState());
     }
-    if (command == "IS_BUSY")
+    else if (command == "IS_BUSY")
     {
         retlist << QString::number((int)enc->IsBusy());
     }
