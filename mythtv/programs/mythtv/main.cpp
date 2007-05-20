@@ -288,7 +288,7 @@ int main(int argc, char *argv[])
             pginfo->pathname.prepend(QDir::currentDirPath() + '/');
     }
 
-    TV::StartTV(pginfo, true);
+    TV::StartTV(pginfo, false);
 
     if (pginfo)
         delete pginfo;
