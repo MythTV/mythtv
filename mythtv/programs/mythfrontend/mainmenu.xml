@@ -100,6 +100,7 @@
      <text lang="RU">Центр информации</text>
      <alttext lang="ES">Información</alttext>
      <alttext lang="DE">Infocenter</alttext>
+     <alttext lang="DK">Infocenter</alttext>
      <alttext lang="SV">Infocenter</alttext>
      <alttext lang="ET">Info</alttext>
      <alttext lang="PT">Informação</alttext>
@@ -140,7 +141,7 @@
      <text lang="CA">Configurar</text>
      <text lang="FR">Configuration</text>
      <text lang="DE">Zubehör / Konfiguration</text>
-     <text lang="DK">Konfiguration</text>
+     <text lang="DK">Tilbehør/Indstillinger</text>
      <text lang="IS">Uppsetning</text>
      <text lang="NL">Configuratie</text>
      <text lang="PT">Utensílios</text>
@@ -164,6 +165,7 @@
      <type>SHUTDOWN</type>
      <text>Shutdown</text>
      <text lang="SV">Avstängning</text>
+     <text lang="DK">Sluk</text>
      <text lang="NL">Uitschakelen</text>
      <text lang="DE">Beenden</text>
      <text lang="ET">Seiska</text>
