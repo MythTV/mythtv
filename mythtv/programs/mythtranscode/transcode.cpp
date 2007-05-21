@@ -524,7 +524,7 @@ int Transcode::TranscodeFile(char *inputname, char *outputname,
 
         if (vidsetting == "MPEG-4")
         {
-            nvr->SetOption("codec", "mpeg4");
+            nvr->SetOption("videocodec", "mpeg4");
 
             nvr->SetIntOption(&profile, "mpeg4bitrate");
             nvr->SetIntOption(&profile, "scalebitrate");
@@ -537,7 +537,7 @@ int Transcode::TranscodeFile(char *inputname, char *outputname,
         }
         else if (vidsetting == "RTjpeg")
         {
-            nvr->SetOption("codec", "rtjpeg");
+            nvr->SetOption("videocodec", "rtjpeg");
             nvr->SetIntOption(&profile, "rtjpegquality");
             nvr->SetIntOption(&profile, "rtjpegchromafilter");
             nvr->SetIntOption(&profile, "rtjpeglumafilter");
