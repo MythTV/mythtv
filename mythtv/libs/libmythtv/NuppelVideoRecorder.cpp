@@ -242,9 +242,9 @@ void NuppelVideoRecorder::SetOption(const QString &opt, int value)
         M2 = value;
     else if (opt == "rtjpegquality")
         Q = value;
-    else if (opt == "mpeg4bitrate")
+    else if ((opt == "mpeg4bitrate") || (opt == "mpeg2bitrate"))
         targetbitrate = value;
-    else if (opt == "mpeg4scalebitrate")
+    else if (opt == "scalebitrate")
         scalebitrate = value;
     else if (opt == "mpeg4maxquality")
         maxquality = value;
@@ -329,7 +329,7 @@ void NuppelVideoRecorder::SetOptionsFromProfile(RecordingProfile *profile,
         SetOption("codec", "mpeg4");
 
         SetIntOption(profile, "mpeg4bitrate");
-        SetIntOption(profile, "mpeg4scalebitrate");
+        SetIntOption(profile, "scalebitrate");
         SetIntOption(profile, "mpeg4maxquality");
         SetIntOption(profile, "mpeg4minquality");
         SetIntOption(profile, "mpeg4qualdiff");
@@ -340,6 +340,16 @@ void NuppelVideoRecorder::SetOptionsFromProfile(RecordingProfile *profile,
         SetIntOption(profile, "mpeg4option4mv");
         SetIntOption(profile, "mpeg4optionidct");
         SetIntOption(profile, "mpeg4optionime");
+    }
+    else if (setting == "MPEG-2")
+    {
+        SetOption("codec", "mpeg2video");
+
+        SetIntOption(profile, "mpeg2bitrate");
+        SetIntOption(profile, "scalebitrate");
+#ifdef USING_FFMPEG_THREADS
+        SetIntOption(profile, "encodingthreadcount");
+#endif
     }
     else if (setting == "RTjpeg")
     {
@@ -503,6 +513,21 @@ bool NuppelVideoRecorder::SetupAVCodec(void)
     mpa_ctx->time_base.den = (int)ceil(video_frame_rate * 100 *
                                     framerate_multiplier);
     mpa_ctx->time_base.num = 100;
+
+    // avcodec needs specific settings for mpeg2 compression
+    switch (mpa_ctx->time_base.den)
+    {
+        case 2397: mpa_ctx->time_base.den = 24000;
+                   mpa_ctx->time_base.num = 1001;
+                   break;
+        case 2997: mpa_ctx->time_base.den = 30000;
+                   mpa_ctx->time_base.num = 1001;
+                   break;
+        case 5994: mpa_ctx->time_base.den = 60000;
+                   mpa_ctx->time_base.num = 1001;
+                   break;
+    }
+
     mpa_ctx->bit_rate = usebitrate;
     mpa_ctx->bit_rate_tolerance = usebitrate * 100;
     mpa_ctx->qmin = maxquality;
@@ -1282,7 +1307,26 @@ void NuppelVideoRecorder::DoV4L2(void)
         memset(&comp, 0, sizeof(comp));
         comp.gop_size = keyframedist;
         comp.max_b_frames = 0;
-        comp.aspect_ratio = GO7007_ASPECT_RATIO_1_1;
+
+        if (fabs(video_aspect - 1.33333) < 0.01f)
+        {
+            if (ntsc)
+                comp.aspect_ratio = GO7007_ASPECT_RATIO_4_3_NTSC;
+            else
+                comp.aspect_ratio = GO7007_ASPECT_RATIO_4_3_PAL;
+        }
+        else if (fabs(video_aspect - 1.77777) < 0.01f)
+        {
+            if (ntsc)
+                comp.aspect_ratio = GO7007_ASPECT_RATIO_16_9_NTSC;
+            else
+                comp.aspect_ratio = GO7007_ASPECT_RATIO_16_9_PAL;
+        }
+        else
+        {
+            comp.aspect_ratio = GO7007_ASPECT_RATIO_1_1;
+        }
+
         comp.flags |= GO7007_COMP_CLOSED_GOP;
         if (ioctl(fd, GO7007IOC_S_COMP_PARAMS, &comp) < 0) 
         {
@@ -1292,7 +1336,12 @@ void NuppelVideoRecorder::DoV4L2(void)
         }
 
         memset(&mpeg, 0, sizeof(mpeg));
-        mpeg.mpeg_video_standard = GO7007_MPEG_VIDEO_MPEG4;
+
+        if (codec == "mpeg2video")
+            mpeg.mpeg_video_standard = GO7007_MPEG_VIDEO_MPEG2;
+        else
+            mpeg.mpeg_video_standard = GO7007_MPEG_VIDEO_MPEG4;
+
         if (ioctl(fd, GO7007IOC_S_MPEG_PARAMS, &mpeg) < 0)
         {
             VERBOSE(VB_IMPORTANT, LOC_ERR + "Unable to set MPEG params");

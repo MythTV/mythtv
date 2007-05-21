@@ -527,7 +527,7 @@ int Transcode::TranscodeFile(char *inputname, char *outputname,
             nvr->SetOption("codec", "mpeg4");
 
             nvr->SetIntOption(&profile, "mpeg4bitrate");
-            nvr->SetIntOption(&profile, "mpeg4scalebitrate");
+            nvr->SetIntOption(&profile, "scalebitrate");
             nvr->SetIntOption(&profile, "mpeg4maxquality");
             nvr->SetIntOption(&profile, "mpeg4minquality");
             nvr->SetIntOption(&profile, "mpeg4qualdiff");

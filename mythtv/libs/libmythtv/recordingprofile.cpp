@@ -474,17 +474,17 @@ class MPEG4bitrate : public SliderSetting, public CodecParamStorage
     };
 };
 
-class MPEG4ScaleBitrate : public CheckBoxSetting, public CodecParamStorage
+class ScaleBitrate : public CheckBoxSetting, public CodecParamStorage
 {
   public:
-    MPEG4ScaleBitrate(const RecordingProfile &parent) :
+    ScaleBitrate(const RecordingProfile &parent) :
         CheckBoxSetting(this),
-        CodecParamStorage(this, parent, "mpeg4scalebitrate")
+        CodecParamStorage(this, parent, "scalebitrate")
     {
         setLabel(QObject::tr("Scale bitrate for frame size"));
         setValue(true);
-        setHelpText(QObject::tr("If set, the MPEG4 bitrate will be used for "
-                    "640x480.  If other resolutions are used, the "
+        setHelpText(QObject::tr("If set, the bitrate specified will be used "
+                    "for 640x480.  If other resolutions are used, the "
                     "bitrate will be scaled appropriately."));
     };
 };
@@ -761,7 +761,7 @@ class VideoCompressionSettings : public TriggeredConfigurationGroup
         params->addChild(new MPEG4MaxQuality(parent));
         params->addChild(new MPEG4MinQuality(parent));
         params->addChild(new MPEG4QualDiff(parent));
-        params->addChild(new MPEG4ScaleBitrate(parent));
+        params->addChild(new ScaleBitrate(parent));
 
         HorizontalConfigurationGroup *hq;
         hq = new HorizontalConfigurationGroup(false, false);
@@ -779,14 +779,13 @@ class VideoCompressionSettings : public TriggeredConfigurationGroup
 #endif
         addTarget("MPEG-4", params);
 
-        // We'll eventually want to add MPEG2 software encoding params here
         params = new VerticalConfigurationGroup(false);
         params->setLabel(QObject::tr("MPEG-2 Parameters"));
-        //params->addChild(new MPEG4bitrate(parent));
+        params->addChild(new MPEG2bitrate(parent));
+        params->addChild(new ScaleBitrate(parent));
         //params->addChild(new MPEG4MaxQuality(parent));
         //params->addChild(new MPEG4MinQuality(parent));
         //params->addChild(new MPEG4QualDiff(parent));
-        //params->addChild(new MPEG4ScaleBitrate(parent));
         //params->addChild(new MPEG4OptionVHQ(parent));
         //params->addChild(new MPEG4Option4MV(parent));
 #ifdef USING_FFMPEG_THREADS
@@ -821,7 +820,10 @@ class VideoCompressionSettings : public TriggeredConfigurationGroup
             else if (groupType == "MJPEG")
                 codecName->addSelection("Hardware MJPEG");
             else if (groupType == "GO7007")
+            {
                 codecName->addSelection("MPEG-4");
+                //codecName->addSelection("MPEG-2");
+            }
             else
             {
                 // V4L, TRANSCODE (and any undefined types)
