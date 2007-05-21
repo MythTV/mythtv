@@ -34,502 +34,502 @@
     <name>String::WeatherType</name>
     <message>
         <source>Cloudy</source>
-        <translation type="unfinished"></translation>
+        <translation>Nuvoloso</translation>
     </message>
     <message>
         <source>Mostly Cloudy</source>
-        <translation type="unfinished"></translation>
+        <translation>Molto nuvoloso</translation>
     </message>
     <message>
         <source>Partly Cloudy</source>
-        <translation type="unfinished"></translation>
+        <translation>Parzialmente nuvoloso</translation>
     </message>
     <message>
         <source>Light Rain</source>
-        <translation type="unfinished"></translation>
+        <translation>Leggero pioggia</translation>
     </message>
     <message>
         <source>Showers</source>
-        <translation type="unfinished"></translation>
+        <translation>Aquazzone</translation>
     </message>
     <message>
         <source>Rain</source>
-        <translation type="unfinished"></translation>
+        <translation>Pioggia</translation>
     </message>
     <message>
         <source>AM Showers</source>
-        <translation type="unfinished"></translation>
+        <translation>Pioggia di mattina</translation>
     </message>
     <message>
         <source>Fog</source>
-        <translation type="unfinished"></translation>
+        <translation>Nebbia</translation>
     </message>
     <message>
         <source>Few Showers</source>
-        <translation type="unfinished"></translation>
+        <translation>Qualche pioggia</translation>
     </message>
     <message>
         <source>Mostly Sunny</source>
-        <translation type="unfinished"></translation>
+        <translation>Abbastanza soleggiato</translation>
     </message>
     <message>
         <source>Sunny</source>
-        <translation type="unfinished"></translation>
+        <translation>Soleggiato</translation>
     </message>
     <message>
         <source>Scattered Flurries</source>
-        <translation type="unfinished"></translation>
+        <translation>Turbini di neve</translation>
     </message>
     <message>
         <source>AM Clouds/PM Sun</source>
-        <translation type="unfinished"></translation>
+        <translation>Nuvoloso di mattina/Sole di pomeriggio</translation>
     </message>
     <message>
-        <source>Isolated T-Storms</source>
-        <translation type="unfinished"></translation>
+	        <source>Isolated T-Storms</source>
+        <translation>Isolati Temporali</translation>
     </message>
     <message>
         <source>Scattered Thunderstorms</source>
-        <translation type="unfinished"></translation>
+        <translation>Temporali sparso</translation>
     </message>
     <message>
         <source>PM Showers</source>
-        <translation type="unfinished"></translation>
+        <translation>Pioggia di pomeriggio</translation>
     </message>
     <message>
         <source>PM Showers/Wind</source>
-        <translation type="unfinished"></translation>
+        <translation>Pioggia di pomeriggio/Vento</translation>
     </message>
     <message>
         <source>Rain/Snow Showers</source>
-        <translation type="unfinished"></translation>
+        <translation>Pioggia/Acquazzoni della neve</translation>
     </message>
     <message>
         <source>Few Snow Showers</source>
-        <translation type="unfinished"></translation>
+        <translation>Qualche acquazzoni della neve</translation>
     </message>
     <message>
         <source>Cloudy/Wind</source>
-        <translation type="unfinished"></translation>
+        <translation>Nuvoloso/Vento</translation>
     </message>
     <message>
         <source>Flurries/Wind</source>
-        <translation type="unfinished"></translation>
+        <translation>Turbini di neve/Vento</translation>
     </message>
     <message>
         <source>Mostly Cloudy/Windy</source>
-        <translation type="unfinished"></translation>
+        <translation>Molto nuvoloso/Ventoso</translation>
     </message>
     <message>
         <source>Rain/Thunder</source>
-        <translation type="unfinished"></translation>
+        <translation>Pioggia/Tuoni</translation>
     </message>
     <message>
         <source>Partly Cloudy/Windy</source>
-        <translation type="unfinished"></translation>
+        <translation>Parzialmente nuvoloso/Ventoso</translation>
     </message>
     <message>
         <source>AM Rain/Snow Showers</source>
-        <translation type="unfinished"></translation>
+        <translation>Pioggia/Acquazzoni della neve di mattina</translation>
     </message>
     <message>
         <source>Light Rain/Wind</source>
-        <translation type="unfinished"></translation>
+        <translation>Leggero pioggia/Vento</translation>
     </message>
     <message>
         <source>Showers/Wind</source>
-        <translation type="unfinished"></translation>
+        <translation>Aquazzone/Vento</translation>
     </message>
     <message>
         <source>Mostly Sunny/Wind</source>
-        <translation type="unfinished"></translation>
+        <translation>Abbastanza soleggiato/Vento</translation>
     </message>
     <message>
         <source>Flurries</source>
-        <translation type="unfinished"></translation>
+        <translation>Turbini di neve</translation>
     </message>
     <message>
         <source>Rain/Wind</source>
-        <translation type="unfinished"></translation>
+        <translation>Pioggia/Vento</translation>
     </message>
     <message>
         <source>Sct Flurries/Wind</source>
-        <translation type="unfinished"></translation>
+        <translation>Turbini di neve/Vento sparso</translation>
     </message>
     <message>
         <source>Sct Strong Storms</source>
-        <translation type="unfinished"></translation>
+        <translation>Forte temporali sparso</translation>
     </message>
     <message>
         <source>PM T-Storms</source>
-        <translation type="unfinished"></translation>
+        <translation>Temporale di pomeriggio</translation>
     </message>
     <message>
         <source>Thunderstorms</source>
-        <translation type="unfinished"></translation>
+        <translation>Temporali</translation>
     </message>
     <message>
         <source>Sunny/Windy</source>
-        <translation type="unfinished"></translation>
+        <translation>Soleggiato/Vento</translation>
     </message>
     <message>
         <source>AM Thunderstorms</source>
-        <translation type="unfinished"></translation>
+        <translation>Temporali di mattina</translation>
     </message>
     <message>
         <source>AM Rain</source>
-        <translation type="unfinished"></translation>
+        <translation>Pioggia di mattina</translation>
     </message>
     <message>
         <source>Iso T-Storms/Wind</source>
-        <translation type="unfinished"></translation>
+        <translation>Isolati temporali/Vento</translation>
     </message>
     <message>
         <source>Rain/Snow</source>
-        <translation type="unfinished"></translation>
+        <translation>Pioggia/Neve</translation>
     </message>
     <message>
         <source>Sct T-Storms/Wind</source>
-        <translation type="unfinished"></translation>
+        <translation>Temporali/Vento sparso</translation>
     </message>
     <message>
         <source>AM Showers/Wind</source>
-        <translation type="unfinished"></translation>
+        <translation>Pioggia di mattina/Vento</translation>
     </message>
     <message>
         <source>Sct Snow Showers</source>
-        <translation type="unfinished"></translation>
+        <translation>Acquazzoni della neve</translation>
     </message>
     <message>
         <source>Snow to Ice/Wind</source>
-        <translation type="unfinished"></translation>
+        <translation>Da neve a ghiaccio/Vento</translation>
     </message>
     <message>
         <source>Snow to Rain</source>
-        <translation type="unfinished"></translation>
+        <translation>Da neve a pioggia</translation>
     </message>
     <message>
         <source>AM Light Rain</source>
-        <translation type="unfinished"></translation>
+        <translation>Leggero pioggia di mattina</translation>
     </message>
     <message>
         <source>PM Light Rain</source>
-        <translation type="unfinished"></translation>
+        <translation>Leggero pioggia di pomeriggio</translation>
     </message>
     <message>
         <source>PM Rain</source>
-        <translation type="unfinished"></translation>
+        <translation>Pioggia di pomeriggio</translation>
     </message>
     <message>
         <source>Snow Showers</source>
-        <translation type="unfinished"></translation>
+        <translation>Acquazzoni della neve</translation>
     </message>
     <message>
         <source>Rain to Snow</source>
-        <translation type="unfinished"></translation>
+        <translation>Da pioggia a neve</translation>
     </message>
     <message>
         <source>PM Rain/Snow</source>
-        <translation type="unfinished"></translation>
+        <translation>Pioggia/Neve di pomeriggio</translation>
     </message>
     <message>
         <source>Few Showers/Wind</source>
-        <translation type="unfinished"></translation>
+        <translation>Qualche pioggia/Vento</translation>
     </message>
     <message>
         <source>Snow/Wind</source>
-        <translation type="unfinished"></translation>
+        <translation>Neve/Vento</translation>
     </message>
     <message>
         <source>PM Rain/Snow Showers</source>
-        <translation type="unfinished"></translation>
+        <translation>Pioggia di pomeriggio/Acquazzoni della neve</translation>
     </message>
     <message>
         <source>PM Rain/Snow/Wind</source>
-        <translation type="unfinished"></translation>
+        <translation>Pioggia/Neve/Vento di pomeriggio</translation>
     </message>
     <message>
         <source>Rain/Snow Showers/Wind</source>
-        <translation type="unfinished"></translation>
+        <translation>Pioggia/Acquazzoni della neve/Vento</translation>
     </message>
     <message>
         <source>Rain/Snow/Wind</source>
-        <translation type="unfinished"></translation>
+        <translation>Pioggia/Neve/Vento</translation>
     </message>
     <message>
         <source>Light Snow</source>
-        <translation type="unfinished"></translation>
+        <translation>Leggero neve</translation>
     </message>
     <message>
         <source>PM Snow</source>
-        <translation type="unfinished"></translation>
+        <translation>Neve di pomeriggio</translation>
     </message>
     <message>
         <source>Few Snow Showers/Wind</source>
-        <translation type="unfinished"></translation>
+        <translation>Qualche acquazzoni della neve/Vento</translation>
     </message>
     <message>
         <source>Light Snow/Wind</source>
-        <translation type="unfinished"></translation>
+        <translation>Leggero neve/Vento</translation>
     </message>
     <message>
         <source>Wintry Mix</source>
-        <translation type="unfinished"></translation>
+        <translation>Tempo freddo</translation>
     </message>
     <message>
         <source>AM Wintry Mix</source>
-        <translation type="unfinished"></translation>
+        <translation>Tempo freddo di mattina</translation>
     </message>
     <message>
         <source>Hvy Rain/Freezing Rain</source>
-        <translation type="unfinished"></translation>
+        <translation>Forte pioggia/Pioggia gelata</translation>
     </message>
     <message>
         <source>AM Light Snow</source>
-        <translation type="unfinished"></translation>
+        <translation>Leggero Neve di mattina</translation>
     </message>
     <message>
         <source>Rain/Freezing Rain</source>
-        <translation type="unfinished"></translation>
+        <translation>Pioggia/Pioggia gelata</translation>
     </message>
     <message>
         <source>T-Storms/Wind</source>
-        <translation type="unfinished"></translation>
+        <translation>Temporali/Vento</translation>
     </message>
     <message>
         <source>Sprinkles</source>
-        <translation type="unfinished"></translation>
+        <translation>Pioggerella</translation>
     </message>
     <message>
         <source>AM Snow Showers</source>
-        <translation type="unfinished"></translation>
+        <translation>Acquazzoni della neve di mattina</translation>
     </message>
     <message>
         <source>AM Clouds/PM Sun/Wind</source>
-        <translation type="unfinished"></translation>
+        <translation>Nuvoloso di mattina/Sole di pomeriggio/Vento</translation>
     </message>
     <message>
         <source>AM Rain/Snow/Wind</source>
-        <translation type="unfinished"></translation>
+        <translation>Pioggia/Neve/Vento di mattina</translation>
     </message>
     <message>
         <source>Rain to Snow/Wind</source>
-        <translation type="unfinished"></translation>
+        <translation>Da pioggia a neve/Vento</translation>
     </message>
     <message>
         <source>Snow to Wintry Mix</source>
-        <translation type="unfinished"></translation>
+        <translation>Da Neve a tempo freddo</translation>
     </message>
     <message>
         <source>PM Snow Showers/Wind</source>
-        <translation type="unfinished"></translation>
+        <translation>Acquazzoni della neve di pomeriggio/Vento</translation>
     </message>
     <message>
         <source>Snow and Ice to Rain</source>
-        <translation type="unfinished"></translation>
+        <translation>Neve e ghiaccio a pioggia</translation>
     </message>
     <message>
         <source>Heavy Rain</source>
-        <translation type="unfinished"></translation>
+        <translation>Forte pioggia</translation>
     </message>
     <message>
         <source>AM Rain/Ice</source>
-        <translation type="unfinished"></translation>
+        <translation>Pioggia/Ghiaccio di mattina</translation>
     </message>
     <message>
         <source>AM Snow Showers/Wind</source>
-        <translation type="unfinished"></translation>
+        <translation>Acquazzoni della neve di mattina/Vento</translation>
     </message>
     <message>
         <source>AM Light Snow/Wind</source>
-        <translation type="unfinished"></translation>
+        <translation>Leggero neve da mattina/Vento</translation>
     </message>
     <message>
         <source>PM Light Rain/Wind</source>
-        <translation type="unfinished"></translation>
+        <translation>Leggero pioggia di pomeriggio/Vento</translation>
     </message>
     <message>
         <source>AM Light Wintry Mix</source>
-        <translation type="unfinished"></translation>
+        <translation>Leggero tempo freddo di mattina</translation>
     </message>
     <message>
         <source>PM Light Snow/Wind</source>
-        <translation type="unfinished"></translation>
+        <translation>Leggero neve/Vento di pomeriggio</translation>
     </message>
     <message>
         <source>Heavy Rain/Wind</source>
-        <translation type="unfinished"></translation>
+        <translation>Forte pioggia/Vento</translation>
     </message>
     <message>
         <source>PM Snow Shower</source>
-        <translation type="unfinished"></translation>
+        <translation>Acquazzoni della neve di pomeriggio</translation>
     </message>
     <message>
         <source>Snow to Rain/Wind</source>
-        <translation type="unfinished"></translation>
+        <translation>Neve a pioggia/Vento</translation>
     </message>
     <message>
         <source>PM Light Rain/Ice</source>
-        <translation type="unfinished"></translation>
+        <translation>Leggero pioggia/Ghiaccio di pomeriggio</translation>
     </message>
     <message>
         <source>AM Snow</source>
-        <translation type="unfinished"></translation>
+        <translation>Neve di mattina</translation>
     </message>
     <message>
         <source>Snow to Ice</source>
-        <translation type="unfinished"></translation>
+        <translation>Neve tra ghiaccio</translation>
     </message>
     <message>
         <source>Wintry Mix/Wind</source>
-        <translation type="unfinished"></translation>
+        <translation>Tempo freddo/Vento</translation>
     </message>
     <message>
         <source>PM Light Snow</source>
-        <translation type="unfinished"></translation>
+        <translation>Leggero neve di pomeriggio</translation>
     </message>
     <message>
         <source>AM Drizzle</source>
-        <translation type="unfinished"></translation>
+        <translation>Pioggerella di mattina</translation>
     </message>
     <message>
         <source>Strong Storms/Wind</source>
-        <translation type="unfinished"></translation>
+        <translation>Forte temporali/Vento</translation>
     </message>
     <message>
         <source>PM Drizzle</source>
-        <translation type="unfinished"></translation>
+        <translation>Pioggerella di pomeriggio</translation>
     </message>
     <message>
         <source>Drizzle</source>
-        <translation type="unfinished"></translation>
+        <translation>Pioggerella</translation>
     </message>
     <message>
         <source>AM Light Rain/Wind</source>
-        <translation type="unfinished"></translation>
+        <translation>Leggero pioggia/Vento di mattina</translation>
     </message>
     <message>
         <source>AM Rain/Wind</source>
-        <translation type="unfinished"></translation>
+        <translation>Pioggia/Vento di mattina</translation>
     </message>
     <message>
         <source>Wintry Mix to Snow</source>
-        <translation type="unfinished"></translation>
+        <translation>Da tempo freddo a neve</translation>
     </message>
     <message>
         <source>Snow Showers/Windy</source>
-        <translation type="unfinished"></translation>
+        <translation>Acquazzoni della neve/Ventoso</translation>
     </message>
     <message>
         <source>Light Rain Shower</source>
-        <translation type="unfinished"></translation>
+        <translation>Leggero acquazzone</translation>
     </message>
     <message>
         <source>Light Rain with Thunder</source>
-        <translation type="unfinished"></translation>
+        <translation>Pioggia debole con tuoni</translation>
     </message>
     <message>
         <source>Light Drizzle</source>
-        <translation type="unfinished"></translation>
+        <translation>Leggero pioggerella</translation>
     </message>
     <message>
         <source>Mist</source>
-        <translation type="unfinished"></translation>
+        <translation>Nebbiolina</translation>
     </message>
     <message>
         <source>Smoke</source>
-        <translation type="unfinished"></translation>
+        <translation>Fumo</translation>
     </message>
     <message>
         <source>Haze</source>
-        <translation type="unfinished"></translation>
+        <translation>Foschia</translation>
     </message>
     <message>
         <source>Light Snow Shower</source>
-        <translation type="unfinished"></translation>
+        <translation>Leggero acquazzone della neve</translation>
     </message>
     <message>
         <source>Light Snow Shower/ Windy</source>
-        <translation type="unfinished"></translation>
+        <translation>Leggero acquazzone della neve/Ventoso</translation>
     </message>
     <message>
         <source>Clear</source>
-        <translation type="unfinished"></translation>
+        <translation>Sereno</translation>
     </message>
     <message>
         <source>A Few Clouds</source>
-        <translation type="unfinished"></translation>
+        <translation>Qualche nuvoloso</translation>
     </message>
     <message>
         <source>Fair</source>
-        <translation type="unfinished"></translation>
+        <translation>Buona Sorte</translation>
     </message>
 </context>
 <context>
     <name>String::WindDirection</name>
     <message>
         <source>N</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Tramontana</translation>
     </message>
     <message>
         <source>NNE</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Tramontana/Grecale</translation>
     </message>
     <message>
         <source>NE</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Grecale</translation>
     </message>
     <message>
         <source>ENE</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Levante/Grecale</translation>
     </message>
     <message>
         <source>E</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Levante</translation>
     </message>
     <message>
         <source>ESE</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Levante/Scirocco</translation>
     </message>
     <message>
         <source>SE</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Scirocco</translation>
     </message>
     <message>
         <source>SSE</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Ostro/Scirocco</translation>
     </message>
     <message>
         <source>S</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Ostro</translation>
     </message>
     <message>
         <source>SSW</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Ostro/Libeccio</translation>
     </message>
     <message>
         <source>SW</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Libeccio</translation>
     </message>
     <message>
         <source>WSW</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Ponente/Libeccio</translation>
     </message>
     <message>
         <source>W</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Ponente</translation>
     </message>
     <message>
         <source>WNW</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Ponente/Maestro</translation>
     </message>
     <message>
         <source>NW</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Maestro</translation>
     </message>
     <message>
         <source>NNW</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Tramontana/Maestro</translation>
     </message>
 </context>
 <context>
@@ -636,15 +636,15 @@
     </message>
     <message>
         <source>COLD</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">FREDDO</translation>
     </message>
     <message>
         <source>COLDEST</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">MOLTO FREDDO</translation>
     </message>
     <message>
         <source>CLOUD TEMPERATURE</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">TEMPERATURA NUVOLE</translation>
     </message>
 </context>
 <context>
@@ -924,12 +924,16 @@
     <message>
         <source>Myth was unable to retrieve your weather data within the time allowed (%1 seconds).
 Press OK to try again with a larger timeout value. Press Cancel to try again without animated radar maps.</source>
-        <translation type="unfinished"></translation>
+        <translation>Myth non poteva richiamare i vostri dati del tempo nei limiti del tempo conceduto (%1 secondi). 
+Premi OK per provare ancora con un più grande valore di prespegnimento. Premi CANCEL per provare ancora senza programmi animati del radar.
+		</translation>
     </message>
     <message>
         <source>Myth was unable to retrieve your weather data within the time allowed (%1 seconds).
 Press OK to try again with a larger timeout value. Press Cancel to abort.</source>
-        <translation type="unfinished"></translation>
+        <translation>Myth non poteva richiamare i vostri dati del tempo nei limiti del tempo conceduto (%1 secondi). 
+Premi OK per provare ancora con un più grande valore di prespegnimento. Premi CANCEL per abbandonare.
+		</translation>
     </message>
 </context>
 </TS>
