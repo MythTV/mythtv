@@ -13,7 +13,7 @@ using namespace std;
 #define LOC_ERR QString("RecBase(%1) Error: ").arg(videodevice)
 
 RecorderBase::RecorderBase(TVRec *rec)
-    : tvrec(rec), ringBuffer(NULL), weMadeBuffer(true), codec("rtjpeg"),
+    : tvrec(rec), ringBuffer(NULL), weMadeBuffer(true), videocodec("rtjpeg"),
       audiodevice("/dev/dsp"), videodevice("/dev/video"), vbidevice("/dev/vbi"),
       vbimode(0), ntsc(true), ntsc_framerate(true), video_frame_rate(29.97),
       curRecording(NULL), request_pause(false), paused(false),
@@ -70,8 +70,8 @@ void RecorderBase::SetRecording(const ProgramInfo *pginfo)
 
 void RecorderBase::SetOption(const QString &name, const QString &value)
 {
-    if (name == "codec")
-        codec = value;
+    if (name == "videocodec")
+        videocodec = value;
     else if (name == "audiodevice")
         audiodevice = value;
     else if (name == "videodevice")

@@ -533,7 +533,7 @@ int Transcode::TranscodeFile(char *inputname, char *outputname,
             nvr->SetIntOption(&profile, "mpeg4qualdiff");
             nvr->SetIntOption(&profile, "mpeg4optionvhq");
             nvr->SetIntOption(&profile, "mpeg4option4mv");
-            nvr->SetupAVCodec();
+            nvr->SetupAVCodecVideo();
         }
         else if (vidsetting == "RTjpeg")
         {

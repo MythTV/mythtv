@@ -120,8 +120,8 @@ NuppelVideoRecorder::NuppelVideoRecorder(TVRec *rec, ChannelBase *channel)
 
     avcodec_register_all();
 
-    mpa_codec = 0;
-    mpa_ctx = NULL;
+    mpa_vidcodec = 0;
+    mpa_vidctx = NULL;
 
     useavcodec = false;
 
@@ -212,15 +212,15 @@ NuppelVideoRecorder::~NuppelVideoRecorder(void)
         textbuffer.pop_back();
     }
 
-    if (mpa_codec)
+    if (mpa_vidcodec)
     {
         QMutexLocker locker(&avcodeclock);
-        avcodec_close(mpa_ctx);
+        avcodec_close(mpa_vidctx);
     }
 
-    if (mpa_ctx)
-        av_free(mpa_ctx);
-    mpa_ctx = NULL;
+    if (mpa_vidctx)
+        av_free(mpa_vidctx);
+    mpa_vidctx = NULL;
 
     if (videoFilters)
         delete videoFilters;
@@ -326,7 +326,7 @@ void NuppelVideoRecorder::SetOptionsFromProfile(RecordingProfile *profile,
 
     if (setting == "MPEG-4")
     {
-        SetOption("codec", "mpeg4");
+        SetOption("videocodec", "mpeg4");
 
         SetIntOption(profile, "mpeg4bitrate");
         SetIntOption(profile, "scalebitrate");
@@ -343,7 +343,7 @@ void NuppelVideoRecorder::SetOptionsFromProfile(RecordingProfile *profile,
     }
     else if (setting == "MPEG-2")
     {
-        SetOption("codec", "mpeg2video");
+        SetOption("videocodec", "mpeg2video");
 
         SetIntOption(profile, "mpeg2bitrate");
         SetIntOption(profile, "scalebitrate");
@@ -353,7 +353,7 @@ void NuppelVideoRecorder::SetOptionsFromProfile(RecordingProfile *profile,
     }
     else if (setting == "RTjpeg")
     {
-        SetOption("codec", "rtjpeg");
+        SetOption("videocodec", "rtjpeg");
 
         SetIntOption(profile, "rtjpegquality");
         SetIntOption(profile, "rtjpegchromafilter");
@@ -361,7 +361,7 @@ void NuppelVideoRecorder::SetOptionsFromProfile(RecordingProfile *profile,
     }
     else if (setting == "Hardware MJPEG")
     {
-        SetOption("codec", "hardware-mjpeg");
+        SetOption("videocodec", "hardware-mjpeg");
 
         SetIntOption(profile, "hardwaremjpegquality");
         SetIntOption(profile, "hardwaremjpeghdecimation");
@@ -374,7 +374,7 @@ void NuppelVideoRecorder::SetOptionsFromProfile(RecordingProfile *profile,
                 "setup the four 'Software Encoders' profiles.  "
                 "Assuming RTjpeg for now.");
 
-        SetOption("codec", "rtjpeg");
+        SetOption("videocodec", "rtjpeg");
 
         SetIntOption(profile, "rtjpegquality");
         SetIntOption(profile, "rtjpegchromafilter");
@@ -456,38 +456,38 @@ int NuppelVideoRecorder::GetVideoFd(void)
     return channelfd;
 }
 
-bool NuppelVideoRecorder::SetupAVCodec(void)
+bool NuppelVideoRecorder::SetupAVCodecVideo(void)
 {
     if (!useavcodec)
         useavcodec = true;
 
-    if (mpa_codec)
+    if (mpa_vidcodec)
     {
         QMutexLocker locker(&avcodeclock);
-        avcodec_close(mpa_ctx);
+        avcodec_close(mpa_vidctx);
     }
 
-    if (mpa_ctx)
-        av_free(mpa_ctx);
-    mpa_ctx = NULL;
+    if (mpa_vidctx)
+        av_free(mpa_vidctx);
+    mpa_vidctx = NULL;
 
-    mpa_codec = avcodec_find_encoder_by_name(codec.ascii());
+    mpa_vidcodec = avcodec_find_encoder_by_name(videocodec.ascii());
 
-    if (!mpa_codec)
+    if (!mpa_vidcodec)
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + QString("Codec not found: %1")
-                .arg(codec.ascii()));
+        VERBOSE(VB_IMPORTANT, LOC_ERR + QString("Video Codec not found: %1")
+                .arg(videocodec.ascii()));
         return false;
     }
 
-    mpa_ctx = avcodec_alloc_context();
+    mpa_vidctx = avcodec_alloc_context();
  
     switch (picture_format)
     {
         case PIX_FMT_YUV420P:
         case PIX_FMT_YUV422P:
         case PIX_FMT_YUVJ420P:
-            mpa_ctx->pix_fmt = picture_format; 
+            mpa_vidctx->pix_fmt = picture_format; 
             mpa_picture.linesize[0] = w_out;
             mpa_picture.linesize[1] = w_out / 2;
             mpa_picture.linesize[2] = w_out / 2;
@@ -497,8 +497,8 @@ bool NuppelVideoRecorder::SetupAVCodec(void)
                     QString("Unknown picture format: %1").arg(picture_format));
     }
  
-    mpa_ctx->width = w_out;
-    mpa_ctx->height = (int)(h * height_multiplier);
+    mpa_vidctx->width = w_out;
+    mpa_vidctx->height = (int)(h * height_multiplier);
 
     int usebitrate = targetbitrate * 1000;
     if (scalebitrate)
@@ -510,66 +510,66 @@ bool NuppelVideoRecorder::SetupAVCodec(void)
     if (targetbitrate == -1)
         usebitrate = -1;
 
-    mpa_ctx->time_base.den = (int)ceil(video_frame_rate * 100 *
+    mpa_vidctx->time_base.den = (int)ceil(video_frame_rate * 100 *
                                     framerate_multiplier);
-    mpa_ctx->time_base.num = 100;
+    mpa_vidctx->time_base.num = 100;
 
     // avcodec needs specific settings for mpeg2 compression
-    switch (mpa_ctx->time_base.den)
+    switch (mpa_vidctx->time_base.den)
     {
-        case 2397: mpa_ctx->time_base.den = 24000;
-                   mpa_ctx->time_base.num = 1001;
+        case 2397: mpa_vidctx->time_base.den = 24000;
+                   mpa_vidctx->time_base.num = 1001;
                    break;
-        case 2997: mpa_ctx->time_base.den = 30000;
-                   mpa_ctx->time_base.num = 1001;
+        case 2997: mpa_vidctx->time_base.den = 30000;
+                   mpa_vidctx->time_base.num = 1001;
                    break;
-        case 5994: mpa_ctx->time_base.den = 60000;
-                   mpa_ctx->time_base.num = 1001;
+        case 5994: mpa_vidctx->time_base.den = 60000;
+                   mpa_vidctx->time_base.num = 1001;
                    break;
     }
 
-    mpa_ctx->bit_rate = usebitrate;
-    mpa_ctx->bit_rate_tolerance = usebitrate * 100;
-    mpa_ctx->qmin = maxquality;
-    mpa_ctx->qmax = minquality;
-    mpa_ctx->mb_qmin = maxquality;
-    mpa_ctx->mb_qmax = minquality;
-    mpa_ctx->max_qdiff = qualdiff;
-    mpa_ctx->flags = mp4opts;
-    mpa_ctx->mb_decision = mb_decision;
+    mpa_vidctx->bit_rate = usebitrate;
+    mpa_vidctx->bit_rate_tolerance = usebitrate * 100;
+    mpa_vidctx->qmin = maxquality;
+    mpa_vidctx->qmax = minquality;
+    mpa_vidctx->mb_qmin = maxquality;
+    mpa_vidctx->mb_qmax = minquality;
+    mpa_vidctx->max_qdiff = qualdiff;
+    mpa_vidctx->flags = mp4opts;
+    mpa_vidctx->mb_decision = mb_decision;
 
-    mpa_ctx->qblur = 0.5;
-    mpa_ctx->max_b_frames = 0;
-    mpa_ctx->b_quant_factor = 0;
-    mpa_ctx->rc_strategy = 2;
-    mpa_ctx->b_frame_strategy = 0;
-    mpa_ctx->gop_size = 30;
-    mpa_ctx->rc_max_rate = 0;
-    mpa_ctx->rc_min_rate = 0;
-    mpa_ctx->rc_buffer_size = 0;
-    mpa_ctx->rc_buffer_aggressivity = 1.0;
-    mpa_ctx->rc_override_count = 0;
-    mpa_ctx->rc_initial_cplx = 0;
-    mpa_ctx->dct_algo = FF_DCT_AUTO;
-    mpa_ctx->idct_algo = FF_IDCT_AUTO;
-    mpa_ctx->prediction_method = FF_PRED_LEFT;
-    if (codec.lower() == "huffyuv" || codec.lower() == "mjpeg")
-        mpa_ctx->strict_std_compliance = FF_COMPLIANCE_INOFFICIAL;
+    mpa_vidctx->qblur = 0.5;
+    mpa_vidctx->max_b_frames = 0;
+    mpa_vidctx->b_quant_factor = 0;
+    mpa_vidctx->rc_strategy = 2;
+    mpa_vidctx->b_frame_strategy = 0;
+    mpa_vidctx->gop_size = 30;
+    mpa_vidctx->rc_max_rate = 0;
+    mpa_vidctx->rc_min_rate = 0;
+    mpa_vidctx->rc_buffer_size = 0;
+    mpa_vidctx->rc_buffer_aggressivity = 1.0;
+    mpa_vidctx->rc_override_count = 0;
+    mpa_vidctx->rc_initial_cplx = 0;
+    mpa_vidctx->dct_algo = FF_DCT_AUTO;
+    mpa_vidctx->idct_algo = FF_IDCT_AUTO;
+    mpa_vidctx->prediction_method = FF_PRED_LEFT;
+    if (videocodec.lower() == "huffyuv" || videocodec.lower() == "mjpeg")
+        mpa_vidctx->strict_std_compliance = FF_COMPLIANCE_INOFFICIAL;
 
     QMutexLocker locker(&avcodeclock);
 
 #ifdef USING_FFMPEG_THREADS
     if ((encoding_thread_count > 1) &&
-        avcodec_thread_init(mpa_ctx, encoding_thread_count))
+        avcodec_thread_init(mpa_vidctx, encoding_thread_count))
     {
         VERBOSE(VB_IMPORTANT, LOC + "FFMPEG couldn't start threading...");
     }
 #endif
 
-    if (avcodec_open(mpa_ctx, mpa_codec) < 0)
+    if (avcodec_open(mpa_vidctx, mpa_vidcodec) < 0)
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR +
-                QString("Unable to open FFMPEG/%1 codec").arg(codec));
+                QString("Unable to open FFMPEG/%1 codec").arg(videocodec));
         return false;
     }
 
@@ -598,9 +598,9 @@ void NuppelVideoRecorder::Initialize(void)
         VERBOSE(VB_IMPORTANT, LOC_ERR + "Could not detect audio blocksize");
     }
  
-    if (codec == "hardware-mjpeg")
+    if (videocodec == "hardware-mjpeg")
     {
-        codec = "mjpeg";
+        videocodec = "mjpeg";
         hardware_encode = true;
 
         MJPEGInit();
@@ -1013,13 +1013,13 @@ void NuppelVideoRecorder::StartRecording(void)
     positionMapDelta.clear();
     positionMapLock.unlock();
 
-    if (codec.lower() == "rtjpeg")
+    if (videocodec.lower() == "rtjpeg")
         useavcodec = false;
     else
         useavcodec = true;
 
     if (useavcodec)
-        useavcodec = SetupAVCodec();
+        useavcodec = SetupAVCodecVideo();
 
     if (!useavcodec)
         SetupRTjpeg();
@@ -1337,7 +1337,7 @@ void NuppelVideoRecorder::DoV4L2(void)
 
         memset(&mpeg, 0, sizeof(mpeg));
 
-        if (codec == "mpeg2video")
+        if (videocodec == "mpeg2video")
             mpeg.mpeg_video_standard = GO7007_MPEG_VIDEO_MPEG2;
         else
             mpeg.mpeg_video_standard = GO7007_MPEG_VIDEO_MPEG4;
@@ -1773,7 +1773,7 @@ void NuppelVideoRecorder::KillChildren(void)
         pthread_join(vbi_tid, NULL);
 #ifdef USING_FFMPEG_THREADS
     if (useavcodec && encoding_thread_count > 1)
-        avcodec_thread_free(mpa_ctx); 
+        avcodec_thread_free(mpa_vidctx); 
 #endif
 }
 
@@ -1924,10 +1924,10 @@ void NuppelVideoRecorder::WriteHeader(void)
     if (useavcodec)
     {
         frameheader.comptype = 'F';
-        frameheader.packetlength = mpa_ctx->extradata_size;
+        frameheader.packetlength = mpa_vidctx->extradata_size;
 
         WriteFrameheader(&frameheader);
-        ringBuffer->Write(mpa_ctx->extradata, frameheader.packetlength);
+        ringBuffer->Write(mpa_vidctx->extradata, frameheader.packetlength);
     }
     else
     {
@@ -1955,7 +1955,7 @@ void NuppelVideoRecorder::WriteHeader(void)
     if (useavcodec)
     {
         int vidfcc = 0;
-        switch(mpa_codec->id)
+        switch(mpa_vidcodec->id)
         {
             case CODEC_ID_MPEG4:      vidfcc = FOURCC_DIVX; break;
             case CODEC_ID_WMV1:       vidfcc = FOURCC_WMV1; break;
@@ -1972,10 +1972,10 @@ void NuppelVideoRecorder::WriteHeader(void)
             default: break;
         }
         moredata.video_fourcc = vidfcc;
-        moredata.lavc_bitrate = mpa_ctx->bit_rate;
-        moredata.lavc_qmin = mpa_ctx->qmin;
-        moredata.lavc_qmax = mpa_ctx->qmax;
-        moredata.lavc_maxqdiff = mpa_ctx->max_qdiff;
+        moredata.lavc_bitrate = mpa_vidctx->bit_rate;
+        moredata.lavc_qmin = mpa_vidctx->qmin;
+        moredata.lavc_qmax = mpa_vidctx->qmax;
+        moredata.lavc_maxqdiff = mpa_vidctx->max_qdiff;
     }
     else
     {
@@ -2210,7 +2210,7 @@ void NuppelVideoRecorder::Reset(void)
     effectivedsp = 0;
 
     if (useavcodec)
-        SetupAVCodec();
+        SetupAVCodecVideo();
 
     if (curRecording)
         curRecording->ClearPositionMap(MARK_KEYFRAME);
@@ -3056,7 +3056,7 @@ void NuppelVideoRecorder::WriteVideo(VideoFrame *frame, bool skipsync,
         if (!hardware_encode)
         {
             QMutexLocker locker(&avcodeclock);
-            tmp = avcodec_encode_video(mpa_ctx, (unsigned char *)strm, 
+            tmp = avcodec_encode_video(mpa_vidctx, (unsigned char *)strm, 
                                        len, &mpa_picture); 
         }
     }
@@ -3124,7 +3124,7 @@ void NuppelVideoRecorder::WriteVideo(VideoFrame *frame, bool skipsync,
     // compr ends here
     if (useavcodec)
     {
-        if (mpa_codec->id == CODEC_ID_RAWVIDEO)
+        if (mpa_vidcodec->id == CODEC_ID_RAWVIDEO)
         {
             frameheader.comptype = '0';
             frameheader.packetlength = len;

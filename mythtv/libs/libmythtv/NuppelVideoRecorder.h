@@ -94,7 +94,7 @@ class MPUBLIC NuppelVideoRecorder : public RecorderBase, public CC608Reader
     void WriteKeyFrameAdjustTable(QPtrList<struct kfatable_entry> *kfa_table);
     void UpdateSeekTable(int frame_num, bool update_db = true, long offset = 0);
 
-    bool SetupAVCodec(void);
+    bool SetupAVCodecVideo(void);
     void SetupRTjpeg(void);
     int AudioInit(bool skipdevice = false);
     void SetVideoAspect(float newAspect) {video_aspect = newAspect; };
@@ -242,8 +242,8 @@ class MPUBLIC NuppelVideoRecorder : public RecorderBase, public CC608Reader
     
     bool useavcodec;
 
-    AVCodec *mpa_codec;
-    AVCodecContext *mpa_ctx;
+    AVCodec *mpa_vidcodec;
+    AVCodecContext *mpa_vidctx;
     AVFrame mpa_picture;
 
     int targetbitrate;

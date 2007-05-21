@@ -227,7 +227,7 @@ class MPUBLIC RecorderBase
     RingBuffer    *ringBuffer;
     bool           weMadeBuffer;
 
-    QString        codec;
+    QString        videocodec;
     QString        audiodevice;
     QString        videodevice;
     QString        vbidevice;
