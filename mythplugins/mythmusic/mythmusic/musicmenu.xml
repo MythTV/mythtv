@@ -63,6 +63,7 @@
    <button>
        <type>MUSIC_IMPORT</type>
        <text>Import Files</text>
+       <text lang="DK">Importér filer</text>
        <action>MUSIC_IMPORT</action>
    </button>
 
