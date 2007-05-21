@@ -41,7 +41,7 @@
     </message>
     <message>
         <source>Myth Archive</source>
-        <translation>Myth Arkiv</translation>
+        <translation>Myth Archive</translation>
     </message>
     <message>
         <source>You need to select at least one file!</source>
@@ -56,7 +56,7 @@
     <name>LogViewer</name>
     <message>
         <source>Log Viewer</source>
-        <translation>Log viser</translation>
+        <translation>Log-viser</translation>
     </message>
     <message>
         <source>Seconds</source>
@@ -114,11 +114,11 @@
     </message>
     <message>
         <source>Myth Archive</source>
-        <translation>Myth Arkiv</translation>
+        <translation>Myth Archive</translation>
     </message>
     <message>
         <source>You need to select at least one item to archive!</source>
-        <translation>Du skal vælge mindst et objekt for at arkivere!</translation>
+        <translation>Du skal vælge mindst et objekt der skal arkiveres!</translation>
     </message>
     <message>
         <source>Finish</source>
@@ -177,15 +177,15 @@ Tryk OK</translation>
     </message>
     <message>
         <source>Advanced Options</source>
-        <translation>Advanceret opsætning</translation>
+        <translation>Avanceret opsætning</translation>
     </message>
     <message>
         <source>Myth Archive</source>
-        <translation>Myth Arkiv</translation>
+        <translation>Myth Archive</translation>
     </message>
     <message>
         <source>You need to select at least one item to archive!</source>
-        <translation>Du skal vælge mindst et objekt for at arkivere!</translation>
+        <translation>Du skal vælge mindst et objekt der skal arkiveres!</translation>
     </message>
     <message>
         <source>Finish</source>
@@ -228,35 +228,36 @@ Tryk OK</translation>
     <name>QObject</name>
     <message>
         <source>Myth Archive Temp Directory</source>
-        <translation type="unfinished"></translation>
+        <translation>Myth Archive temp-mappe</translation>
     </message>
     <message>
         <source>Location where MythArchive should create its temporory work files</source>
-        <translation type="unfinished"></translation>
+        <translation>Hvor MythArchive opretter midlertidige filer</translation>
     </message>
     <message>
         <source>Myth Archive Share Directory</source>
-        <translation type="unfinished"></translation>
+        <translation>Myth Archive share-mappe</translation>
     </message>
     <message>
         <source>Location where MythArchive stores its scripts, intro movies and theme files</source>
-        <translation type="unfinished"></translation>
+        <translation>Hvor MythArchive gemmer scripts, intro-film and temafiler</translation>
     </message>
     <message>
         <source>Video format</source>
-        <translation>Video format</translation>
+        <translation>Videoformat</translation>
     </message>
     <message>
         <source>Video format for DVD recordings, PAL or NTSC.</source>
-        <translation type="unfinished"></translation>
+        <translation>Videoformat for DVD-optagelser (PAL eller NTSC).
+</translation>
     </message>
     <message>
         <source>File Selector Filter</source>
-        <translation type="unfinished"></translation>
+        <translation>Filvælger-filter</translation>
     </message>
     <message>
         <source>The file name filter to use in the file selector.</source>
-        <translation type="unfinished"></translation>
+        <translation>Filteret der bruges i filvælgeren.</translation>
     </message>
     <message>
         <source>Location of DVD</source>
@@ -292,7 +293,7 @@ Tryk OK</translation>
     </message>
     <message>
         <source>mkisofs command</source>
-        <translation type="unfinished"></translation>
+        <translation>mkisofs-kommando</translation>
     </message>
     <message>
         <source>Command to run mkisofs. (Used to create ISO images)</source>
@@ -300,76 +301,77 @@ Tryk OK</translation>
     </message>
     <message>
         <source>growisofs command</source>
-        <translation type="unfinished"></translation>
+        <translation>growisofs-kommando</translation>
     </message>
     <message>
         <source>Command to run growisofs. (Used to burn DVD&apos;s)</source>
-        <translation type="unfinished"></translation>
+        <translation>Kommandoen for at køre growisofs (bruges til at brænde DVD&apos;er)</translation>
     </message>
     <message>
         <source>tcrequant command</source>
-        <translation type="unfinished"></translation>
+        <translation>tcrequant-kommando</translation>
     </message>
     <message>
         <source>Command to run tcrequant (Part of transcode package). Optional - leave blank if you don&apos;t have the transcode package installed.</source>
-        <translation type="unfinished"></translation>
+        <translation>Kommandoen for at køre tcrequant (en del af transcode-pakken). Valgfri - udelad hvis du ikke har transcode installeret.</translation>
     </message>
     <message>
         <source>png2yuv command</source>
-        <translation type="unfinished"></translation>
+        <translation>png2yuv-kommando</translation>
     </message>
     <message>
         <source>Command to run png2yuv. Part of mjpegtools package</source>
-        <translation type="unfinished"></translation>
+        <translation>Kommandoen for at køre png2yuv. En del af mjpegtools-pakken</translation>
     </message>
     <message>
         <source>spumux command</source>
-        <translation type="unfinished"></translation>
+        <translation>spumux-kommando</translation>
     </message>
     <message>
         <source>Command to run spumux. Part of dvdauthor package</source>
-        <translation type="unfinished"></translation>
+        <translation>Kommandoen for at køre spumux. En del af dvdauthor-pakken</translation>
     </message>
     <message>
         <source>mpeg2enc command</source>
-        <translation type="unfinished"></translation>
+        <translation>mpeg2enc-kommando</translation>
     </message>
     <message>
         <source>Command to run mpeg2enc. Part of mjpegtools package</source>
-        <translation type="unfinished"></translation>
+        <translation>Kommandoen for at køre mpeg2enc. En del af mjpegtools-pakken</translation>
     </message>
     <message>
         <source>MythArchive Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>MythArchive indstillinger</translation>
     </message>
     <message>
         <source>MythArchive External Commands (1)</source>
-        <translation type="unfinished"></translation>
+        <translation>MythArchive eksterne kommandoer (1)</translation>
     </message>
     <message>
         <source>MythArchive External Commands (2)</source>
-        <translation type="unfinished"></translation>
+        <translation>MythArchive eksterne kommandoer (2)</translation>
     </message>
     <message>
         <source>Myth Burn</source>
-        <translation type="unfinished"></translation>
+        <translation>Brænd</translation>
     </message>
     <message>
         <source>Background creation has been asked to stop.
 This may take a few minutes.</source>
-        <translation type="unfinished"></translation>
+        <translation>Baggrundsprocessen stoppes.
+Dette kan tage et par minutter.</translation>
     </message>
     <message>
         <source>Myth Archive</source>
-        <translation type="unfinished"></translation>
+        <translation>Myth Archive</translation>
     </message>
     <message>
         <source>It was not possible to create the DVD.  An error occured when running the scripts</source>
-        <translation type="unfinished"></translation>
+        <translation>Det var ikke muligt at lave DVD&apos;en.  Der opstod en fejl under kørsel af scripts</translation>
     </message>
     <message>
         <source>It was not possible to create the Archive.  An error occured when running &apos;mytharchivehelper&apos;</source>
-        <translation type="unfinished"></translation>
+        <translation>Det var ikke muligt at oprette arkivet.  Der opstod en fejl under kørsel af &apos;mytharchivehelper&apos;</translation>
     </message>
 </context>
 <context>
@@ -392,11 +394,11 @@ This may take a few minutes.</source>
     </message>
     <message>
         <source>Myth Archive</source>
-        <translation>Myth Arkiv</translation>
+        <translation>Myth Archive</translation>
     </message>
     <message>
         <source>You need to select at least one recording!</source>
-        <translation>Du skal vælge mindst en fil!</translation>
+        <translation>Du skal vælge mindst en optagelse!</translation>
     </message>
     <message>
         <source>All Recordings</source>
@@ -404,7 +406,7 @@ This may take a few minutes.</source>
     </message>
     <message>
         <source>Myth Burn</source>
-        <translation>Myth Burn</translation>
+        <translation>Brænd</translation>
     </message>
     <message>
         <source>You don&apos;t have any recordings!
@@ -431,7 +433,7 @@ Tryk OK</translation>
     </message>
     <message>
         <source>OK</source>
-        <translation>Ok</translation>
+        <translation>OK</translation>
     </message>
     <message>
         <source>Myth Archive</source>
