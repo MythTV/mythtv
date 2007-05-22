@@ -21,7 +21,6 @@ package MythTV;
 
     use Sys::Hostname;
     use DBI;
-    use Date::Manip;
     use HTTP::Request;
     use LWP::UserAgent;
 
@@ -585,7 +584,7 @@ package MythTV;
 
 # Format a unix timestamp into a MythTV timestamp.  This function is exported.
     sub unix_to_myth_time {
-        my $self = shift if (ref $_[0]);
+        my $self = (ref $_[0] ? shift : $MythTV::last);
         my $time = shift;
     # Already formatted
         return $time if ($time =~ /\D/);
@@ -593,15 +592,24 @@ package MythTV;
         if ($time =~ /^(\d{4})(\d\d)(\d\d)(\d\d)(\d\d)(\d\d)$/) {
             return "$1-$2-${3}T$4:$5:$6";
         }
-    # Otherwise, format it as necessary
-        return UnixDate("epoch $time", '%O');
+    # Otherwise, format it as necessary.  We have to use MySQL here because
+    # Date::Manip is not aware of DST differences.  Yay.  Blech.
+        my $sh = $self->{'dbh'}->prepare('SELECT FROM_UNIXTIME(?)');
+        $sh->execute($time);
+        ($time) = $sh->fetchrow_array();
+        $time =~ s/\s/T/;
+        return $time;
     }
 
-# Format a unix timestamp into a MythTV timestamp.  This function is exported.
+# Format a MythTV timestamp into a unix timestamp.  This function is exported.
+# We have to use MySQL here because Date::Manip is not aware of DST.
     sub myth_to_unix_time {
-        my $self = shift if (ref $_[0]);
+        my $self = (ref $_[0] ? shift : $MythTV::last);
         my $time = shift;
-        return UnixDate($time, '%s');
+        my $sh = $self->{'dbh'}->prepare('SELECT UNIX_TIMESTAMP(?)');
+        $sh->execute($time);
+        ($time) = $sh->fetchrow_array();
+        return $time;
     }
 
 # Create a new MythTV::Program object

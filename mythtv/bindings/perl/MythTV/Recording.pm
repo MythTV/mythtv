@@ -16,9 +16,6 @@ package MythTV::Recording;
 # Required for checking byteorder when processing NuppelVideo files
     use Config;
 
-# Some other necessities
-    use Date::Manip;
-
 # Sometimes used by get_pixmap()
     use File::Copy;
     use Sys::Hostname;
@@ -416,7 +413,7 @@ package MythTV::Recording;
         if ($mod eq 'BAD') {
             return 0;
         }
-        return UnixDate($mod, '%s');
+        return myth_to_unix_time($mod);
     }
 
 # Generate a pixmap for this recording
