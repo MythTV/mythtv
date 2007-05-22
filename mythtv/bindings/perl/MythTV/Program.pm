@@ -213,11 +213,14 @@ package MythTV::Program;
                 $format = '%c %- %Y-%m-%d, %g-%i %A %- %S';
             }
         }
-    # Start/end times
-        my ($ssecond, $sminute, $shour, $sday, $smonth, $syear) = localtime($self->{'starttime'});
-        my ($esecond, $eminute, $ehour, $eday, $emonth, $eyear) = localtime($self->{'endtime'});
+    # Recording start/end times
+        my ($ssecond, $sminute, $shour, $sday, $smonth, $syear) = localtime($self->{'recstartts'});
+        my ($esecond, $eminute, $ehour, $eday, $emonth, $eyear) = localtime($self->{'recendts'});
+    # Program start/end times
+        my ($spsecond, $spminute, $sphour, $spday, $spmonth, $spyear) = localtime($self->{'recstartts'});
+        my ($epsecond, $epminute, $ephour, $epday, $epmonth, $epyear) = localtime($self->{'recendts'});
     # Format some fields we may be parsing below
-        # Start time
+        # Recording start time
         $syear += 1900;
         $smonth++;
         $smonth = "0$smonth" if ($smonth < 10);
@@ -232,7 +235,7 @@ package MythTV::Program;
         }
         $shour   = "0$shour"   if ($shour < 10);
         $sminute = "0$sminute" if ($sminute < 10);
-        # End time
+        # Recording end time
         $eyear += 1900;
         $emonth++;
         $emonth = "0$emonth" if ($emonth < 10);
@@ -247,6 +250,36 @@ package MythTV::Program;
         }
         $ehour   = "0$ehour"   if ($ehour < 10);
         $eminute = "0$eminute" if ($eminute < 10);
+        # Program start time
+        $spyear += 1900;
+        $spmonth++;
+        $spmonth = "0$spmonth" if ($spmonth < 10);
+        $spday   = "0$spday"   if ($spday   < 10);
+        my $pmeridian = ($sphour > 12) ? 'PM' : 'AM';
+        my $phour = ($sphour > 12) ? $sphour - 12 : $sphour;
+        if ($phour < 10) {
+            $phour = "0$phour";
+        }
+        elsif ($phour < 1) {
+            $phour = 12;
+        }
+        $sphour   = "0$sphour"   if ($sphour < 10);
+        $spminute = "0$spminute" if ($spminute < 10);
+        # Program end time
+        $epyear += 1900;
+        $epmonth++;
+        $epmonth = "0$epmonth" if ($epmonth < 10);
+        $epday   = "0$epday"   if ($epday   < 10);
+        my $epmeridian = ($ephour > 12) ? 'PM' : 'AM';
+        my $epthour = ($ephour > 12) ? $ephour - 12 : $ephour;
+        if ($epthour < 10) {
+            $epthour = "0$epthour";
+        }
+        elsif ($epthour < 1) {
+            $epthour = 12;
+        }
+        $ephour   = "0$ephour"   if ($ephour < 10);
+        $epminute = "0$epminute" if ($epminute < 10);
     # Original airdate
         my ($oyear, $omonth, $oday) = split('-', $self->{'airdate'}, 3);
     # Build a list of name format options
@@ -261,7 +294,7 @@ package MythTV::Program;
         ($fields{'cn'} = ($self->{'channel'}{'channum'}  or '')) =~ s/%/%%/g;
         ($fields{'cc'} = ($self->{'channel'}{'callsign'} or '')) =~ s/%/%%/g;
         ($fields{'cN'} = ($self->{'channel'}{'name'}     or '')) =~ s/%/%%/g;
-    # Start time
+    # Recording start time
         $fields{'y'} = substr($syear, 2);   # year, 2 digits
         $fields{'Y'} = $syear;              # year, 4 digits
         $fields{'n'} = int($smonth);        # month
@@ -276,7 +309,7 @@ package MythTV::Program;
         $fields{'s'} = $ssecond;            # seconds
         $fields{'a'} = lc($meridian);       # am/pm
         $fields{'A'} = $meridian;           # AM/PM
-    # End time
+    # Recording end time
         $fields{'ey'} = substr($eyear, 2);  # year, 2 digits
         $fields{'eY'} = $eyear;             # year, 4 digits
         $fields{'en'} = int($emonth);       # month
@@ -291,6 +324,36 @@ package MythTV::Program;
         $fields{'es'} = $esecond;           # seconds
         $fields{'ea'} = lc($emeridian);     # am/pm
         $fields{'eA'} = $emeridian;         # AM/PM
+    # Program start time
+        $fields{'py'} = substr($spyear, 2); # year, 2 digits
+        $fields{'pY'} = $spyear;            # year, 4 digits
+        $fields{'pn'} = int($spmonth);      # month
+        $fields{'pm'} = $spmonth;           # month, leading zero
+        $fields{'pj'} = int($spday);        # day of month
+        $fields{'pd'} = $spday;             # day of month, leading zero
+        $fields{'pg'} = int($phour);        # 12-hour hour
+        $fields{'pG'} = int($sphour);       # 24-hour hour
+        $fields{'ph'} = $phour;             # 12-hour hour, with leading zero
+        $fields{'pH'} = $sphour;            # 24-hour hour, with leading zero
+        $fields{'pi'} = $spminute;          # minutes
+        $fields{'ps'} = $spsecond;          # seconds
+        $fields{'pa'} = lc($pmeridian);     # am/pm
+        $fields{'pA'} = $pmeridian;         # AM/PM
+    # Program end time
+        $fields{'pey'} = substr($epyear, 2);# year, 2 digits
+        $fields{'peY'} = $epyear;           # year, 4 digits
+        $fields{'pen'} = int($epmonth);     # month
+        $fields{'pem'} = $epmonth;          # month, leading zero
+        $fields{'pej'} = int($epday);       # day of month
+        $fields{'ped'} = $epday;            # day of month, leading zero
+        $fields{'peg'} = int($epthour);     # 12-hour hour
+        $fields{'peG'} = int($ephour);      # 24-hour hour
+        $fields{'peh'} = $epthour;          # 12-hour hour, with leading zero
+        $fields{'peH'} = $ephour;           # 24-hour hour, with leading zero
+        $fields{'pei'} = $epminute;         # minutes
+        $fields{'pes'} = $epsecond;         # seconds
+        $fields{'pea'} = lc($epmeridian);   # am/pm
+        $fields{'peA'} = $epmeridian;       # AM/PM
     # Original Airdate
         $fields{'oy'} = substr($oyear, 2);  # year, 2 digits
         $fields{'oY'} = $oyear;             # year, 4 digits
