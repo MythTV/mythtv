@@ -102,8 +102,20 @@ options:
     \%- = separator character
     /   = directory/folder (path separator)
 
-    * For end time, prepend an "e" to the appropriate time/date format code
-      above; i.e. "\%eG" gives the 24-hour hour for the end time.
+    * The time/date format codes above represent the recording start times.
+
+    * For recording end time, prepend an "e" to the appropriate time/date
+      format code above; i.e. "\%eG" gives the 24-hour hour for the end time.
+
+    * For program start time, prepend a "p" to the appropriate time/date
+      format code above; i.e. "\%pi" gives the minutes for the program start
+      time.  The program start time is the time from the listings data and is
+      not affected by when the recording started.  Therefore, using program
+      start (or end) times may result in duplicate names.  In that case, the
+      script will append a "counter" value to the name.
+
+    * For program end time, prepend a "pe" to the appropriate time/date format
+      code above; i.e. "\%pes" gives the seconds for the program end time.
 
     * For original airdate, prepend an "o" to the year, month, or day format
       codes above; i.e. "\%oY" gives the year in which the episode was first
