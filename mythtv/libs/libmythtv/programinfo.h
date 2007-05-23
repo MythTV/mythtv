@@ -89,7 +89,8 @@ enum RecStatusType {
 enum AvailableStatusType {
     asAvailable = 0,
     asPendingDelete,
-    asFileNotFound
+    asFileNotFound,
+    asZeroByte
 };
 
 enum WatchListStatus {

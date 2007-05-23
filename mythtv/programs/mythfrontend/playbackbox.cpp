@@ -2389,6 +2389,22 @@ bool PlaybackBox::play(ProgramInfo *rec, bool inPlaylist)
         return false;
     }
 
+    if (rec->filesize == 0)
+    {
+        VERBOSE(VB_IMPORTANT,
+            QString("PlaybackBox::play(): Error, %1 is zero-bytes in size")
+            .arg(rec->pathname));
+
+        ProgramInfo *tmpItem = findMatchingProg(rec);
+        if (tmpItem)
+        {
+            tmpItem->availableStatus = asZeroByte;
+            showAvailablePopup(tmpItem);
+        }
+
+        return false;
+    }
+
     ProgramInfo *tvrec = new ProgramInfo(*rec);
 
     setEnabled(false);
@@ -2595,6 +2611,12 @@ void PlaybackBox::showAvailablePopup(ProgramInfo *rec)
                                QObject::tr("Recording Unavailable"), msg +
                                QObject::tr("The file for this recording can "
                                            "not be found"));
+                 break;
+        case asZeroByte:
+                 MythPopupBox::showOkPopup(gContext->GetMainWindow(),
+                               QObject::tr("Recording Unavailable"), msg +
+                               QObject::tr("The file for this recording is "
+                                           "empty."));
                  break;
     }
 }
