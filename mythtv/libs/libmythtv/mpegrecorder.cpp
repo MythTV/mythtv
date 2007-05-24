@@ -587,8 +587,8 @@ bool MpegRecorder::SetV4L2DeviceOptions(int chanfd)
         "Video Aspect ratio",
         "Audio Encoding",
         "Audio L2 Bitrate",
-        "Video Average Bitrate",
         "Video Peak Bitrate",
+        "Video Average Bitrate",
         "MPEG Stream type",
     };
 
@@ -611,11 +611,11 @@ bool MpegRecorder::SetV4L2DeviceOptions(int chanfd)
     ext_ctrl[3].id    = V4L2_CID_MPEG_AUDIO_L2_BITRATE;
     ext_ctrl[3].value = audbitrate - 1;
 
-    ext_ctrl[4].id    = V4L2_CID_MPEG_VIDEO_BITRATE;
-    ext_ctrl[4].value = (bitrate = min(bitrate, maxbitrate)) * 1000;
+    ext_ctrl[4].id    = V4L2_CID_MPEG_VIDEO_BITRATE_PEAK;
+    ext_ctrl[4].value = maxbitrate * 1000;
 
-    ext_ctrl[5].id    = V4L2_CID_MPEG_VIDEO_BITRATE_PEAK;
-    ext_ctrl[5].value = maxbitrate * 1000;
+    ext_ctrl[5].id    = V4L2_CID_MPEG_VIDEO_BITRATE;
+    ext_ctrl[5].value = (bitrate = min(bitrate, maxbitrate)) * 1000;
 
     ext_ctrl[6].id    = V4L2_CID_MPEG_STREAM_TYPE;
     ext_ctrl[6].value = streamtype_ivtv_to_v4l2(GetFilteredStreamType());
