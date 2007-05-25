@@ -1297,7 +1297,14 @@ int AvFormatDecoder::ScanStreams(bool novideo)
         {
             case CODEC_TYPE_VIDEO:
             {
-                assert(enc->codec_id);
+                //assert(enc->codec_id);
+                if (!enc->codec_id)
+                {
+                    VERBOSE(VB_IMPORTANT,
+                            LOC + QString("Stream #%1 has an unknown video "
+                                          "codec id, skipping.").arg(i));
+                    continue;
+                }
 
                 // HACK -- begin
                 // ffmpeg is unable to compute H.264 bitrates in mpegts?
