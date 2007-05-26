@@ -13,6 +13,7 @@ using namespace std;
 #include "metadata.h"
 
 #include <mythtv/mythcontext.h>
+#include <mythtv/mythmediamonitor.h>
 
 CdDecoder::CdDecoder(const QString &file, DecoderFactory *d, QIODevice *i, 
                      AudioOutput *o) 
@@ -139,6 +140,7 @@ bool CdDecoder::initialize()
         output()->SetSourceBitrate(44100 * 2 * 16);
     }
 
+    setCDSpeed(2);
     inited = TRUE;
     return TRUE;
 }
@@ -150,6 +152,7 @@ void CdDecoder::seek(double pos)
 
 void CdDecoder::deinit()
 {
+    setCDSpeed(-1);
     if (paranoia)
         paranoia_free(paranoia);
     if (device)
@@ -247,6 +250,12 @@ void CdDecoder::run()
     }
 
     deinit();
+}
+
+void CdDecoder::setCDSpeed(int speed)
+{
+    QMutexLocker lock(getMutex());
+    MediaMonitor::SetCDSpeed(devicename, speed);
 }
 
 int CdDecoder::getNumTracks(void)

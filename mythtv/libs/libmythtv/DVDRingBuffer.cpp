@@ -1207,6 +1207,7 @@ void DVDRingBufferPriv::SeekCellStart(void)
  */
 void DVDRingBufferPriv::SetDVDSpeed(void)
 {
+    QMutexLocker lock(&seekLock);
     int dvdDriveSpeed = gContext->GetNumSetting("DVDDriveSpeed", 12);
     SetDVDSpeed(dvdDriveSpeed);
 }
@@ -1215,16 +1216,7 @@ void DVDRingBufferPriv::SetDVDSpeed(void)
  */
 void DVDRingBufferPriv::SetDVDSpeed(int speed)
 {
-    MediaMonitor *mon = MediaMonitor::GetMediaMonitor();
-    if (mon != NULL)
-    {
-        MythMediaDevice *pMedia = mon->GetMedia(dvdFilename);
-        if (pMedia && mon->ValidateAndLock(pMedia))
-        {
-            pMedia->setSpeed(speed);
-            mon->Unlock(pMedia);
-        }
-    }
+    MediaMonitor::SetCDSpeed(dvdFilename, speed);
 }
 
 /**\brief returns seconds left in the title

@@ -36,6 +36,7 @@ class CdDecoder : public Decoder
     Metadata *getLastMetadata(void);
     void commitMetadata(Metadata *mdata);
     void      setDevice(const QString &dev)  { devicename = dev; }
+    void      setCDSpeed(int speed);
 
   private:
     void run();

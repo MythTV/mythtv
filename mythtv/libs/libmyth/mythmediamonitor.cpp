@@ -73,6 +73,20 @@ MediaMonitor* MediaMonitor::GetMediaMonitor(void)
     return c_monitor;
 }
 
+void MediaMonitor::SetCDSpeed(const char *device, int speed)
+{
+    MediaMonitor *mon = GetMediaMonitor();
+    if (mon != NULL)
+    {
+        MythMediaDevice *pMedia = mon->GetMedia(device);
+        if (pMedia && mon->ValidateAndLock(pMedia))
+        {
+            pMedia->setSpeed(speed);
+            mon->Unlock(pMedia);
+        }
+    }
+}
+
 // When ejecting one of multiple devices, present a nice name to the user
 static const QString DevName(MythMediaDevice *d)
 {

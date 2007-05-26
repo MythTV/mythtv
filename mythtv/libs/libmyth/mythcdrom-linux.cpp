@@ -364,7 +364,7 @@ void MythCDROMLinux::setSpeed(int speed)
 
     if (stat(m_DevicePath, &st) == -1 ) 
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR +
+        VERBOSE(VB_MEDIA, LOC_ERR +
                 QString("setSpeed() Failed. device %1 not found")
                 .arg(m_DevicePath));
         return;
@@ -372,14 +372,14 @@ void MythCDROMLinux::setSpeed(int speed)
 
     if (!S_ISBLK(st.st_mode)) 
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + 
+        VERBOSE(VB_MEDIA, LOC_ERR + 
                 "MythCDROMLinux::SetSpeed() Failed. Not a block device");
         return;
     }
 
     if ((fd = open(m_DevicePath, O_RDWR | O_NONBLOCK)) == -1)
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + 
+        VERBOSE(VB_MEDIA, LOC_ERR + 
                 "Changing CD/DVD speed needs write access");
         return;
     }
@@ -395,7 +395,7 @@ void MythCDROMLinux::setSpeed(int speed)
         {
             rate = 0;
             buffer[0] = 4;
-            VERBOSE(VB_IMPORTANT, LOC + "Restored CD/DVD Speed");
+            VERBOSE(VB_MEDIA, LOC + "Restored CD/DVD Speed");
             break;
         }
         default:
@@ -405,7 +405,7 @@ void MythCDROMLinux::setSpeed(int speed)
 
             rate = (speed > 0 && speed < 100) ? speed * 177 : speed;
 
-            VERBOSE(VB_IMPORTANT, LOC + QString("Limit CD/DVD Speed to %1KB/s")
+            VERBOSE(VB_MEDIA, LOC + QString("Limit CD/DVD Speed to %1KB/s")
                     .arg(rate));
             break;
         }
@@ -443,10 +443,10 @@ void MythCDROMLinux::setSpeed(int speed)
     if (ioctl(fd, CDROM_SELECT_SPEED, speed) < 0) 
     {
         if (ioctl(fd, SG_IO, &sghdr) < 0)
-            VERBOSE(VB_IMPORTANT, LOC_ERR + "Limit CD/DVD Speed Failed");
+            VERBOSE(VB_MEDIA, LOC_ERR + "Limit CD/DVD Speed Failed");
     }
     else 
-        VERBOSE(VB_IMPORTANT, LOC + "CD/DVD Speed Set Successful");
+        VERBOSE(VB_MEDIA, LOC + "CD/DVD Speed Set Successful");
     
     close(fd);
 }
