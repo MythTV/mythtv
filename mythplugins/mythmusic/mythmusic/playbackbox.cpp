@@ -1352,11 +1352,7 @@ void PlaybackBoxMusic::pause(void)
 void PlaybackBoxMusic::stopDecoder(void)
 {
     if (decoder && decoder->running()) 
-    {
-        decoder->lock();
         decoder->stop();
-        decoder->unlock();
-    }
 
     if (decoder) 
     {
