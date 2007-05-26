@@ -53,7 +53,7 @@ PROGRAM_FIELDS = 43
 class MythDB:
 	def __init__(self):
 		"""
-		A connection to the mythtv database
+		A connection to the mythtv database.
 		"""
 		config_files = [
 			'/usr/local/share/mythtv/mysql.txt',
@@ -129,7 +129,7 @@ class MythDB:
 
 class MythTV:
 	"""
-	A connection to MythTV backend
+	A connection to MythTV backend.
 	"""
 	def __init__(self, conn_type='Monitor'):
 		self.db = MythDB()
@@ -156,13 +156,13 @@ class MythTV:
 
 	def backendCommand(self, data):
 		"""
-		Sends a command via a socket to the mythbackend in
-		the format that it expects. Returns the result from
-		the backend
+		Sends a formatted command via a socket to the mythbackend.
+
+		Returns the result from the backend.
 		"""
 		def recv():
 			"""
-			Reads the data returned fomr the backend
+			Reads the data returned from the backend.
 			"""
 			# The first 8 bytes of the response gives us the length
 			data = self.socket.recv(8)
@@ -184,8 +184,7 @@ class MythTV:
 
 	def getPendingRecordings(self):
 		"""
-		Returns a list of Program objects which are scheduled to be
-		recorded
+		Returns a list of Program objects which are scheduled to be recorded.
 		"""
 		programs = []
 		res = self.backendCommand('QUERY_GETALLPENDING').split(BACKEND_SEP)
@@ -199,8 +198,7 @@ class MythTV:
 
 	def getScheduledRecordings(self):
 		"""
-		Returns a list of Program objects which are scheduled to be
-		recorded
+		Returns a list of Program objects which are scheduled to be recorded.
 		"""
 		programs = []
 		res = self.backendCommand('QUERY_GETALLSCHEDULED').split(BACKEND_SEP)
@@ -213,8 +211,10 @@ class MythTV:
 
 	def getUpcomingRecordings(self):
 		"""
-		Returns a list of Program objects for programs which are actually
-		going to be recorded.
+		Returns a list of Program objects which are scheduled to be recorded.
+
+		Sorts the list by recording start time and only returns those with
+		record status of WillRecord.
 		"""
 		def sort_programs_by_starttime(x, y):
 			if x.starttime > y.starttime:
@@ -231,24 +231,65 @@ class MythTV:
 		programs.sort(sort_programs_by_starttime)
 		return programs
 
+	def getRecorderList(self):
+		"""
+		Returns a list of recorders, or an empty list if none.
+		"""
+		recorders = []
+		c = self.db.cursor()
+		c.execute('SELECT cardid FROM capturecard')
+		row = c.fetchone()
+		while row is not None:
+			recorders.append(int(row[0]))
+			row = c.fetchone()
+		c.close()
+		return recorders
+	
 	def getFreeRecorderList(self):
 		"""
-		Returns a list of free recorders, or an empty list if none
+		Returns a list of free recorders, or an empty list if none.
 		"""
 		res = self.backendCommand('GET_FREE_RECORDER_LIST').split(BACKEND_SEP)
 		recorders = [int(d) for d in res]
-		if recorders[0]:
-			return recorders
+		return recorders
+
+	def getRecorderDetails(self, recorder_id):
+		"""
+		Returns a Recorder object with details of the recorder.
+		"""
+		c = self.db.cursor()
+		c.execute("""SELECT cardid, cardtype, videodevice, hostname
+			FROM capturecard WHERE cardid = %s""", recorder_id)
+		row = c.fetchone()
+		if row:
+			recorder = Recorder(row)
+			return recorder
 		else:
-			return []
+			return None
 
 	def getCurrentRecording(self, recorder):
+		"""
+		Returns a Program object for the current recorders recording.
+		"""
 		res = self.backendCommand('QUERY_RECORDER %s[]:[]GET_CURRENT_RECORDING' % recorder)
 		return Program(res.split(BACKEND_SEP))
 
 	def isRecording(self, recorder):
+		"""
+		Returns a boolean as to whether the given recorder is recording.
+		"""
 		res = self.backendCommand('QUERY_RECORDER %s[]:[]IS_RECORDING' % recorder)
 		if res == '1':
+			return True
+		else:
+			return False
+
+	def isActiveBackend(self, hostname):
+		"""
+		Returns a boolean as to whether the given host is an active backend
+		"""
+		res = self.backendCommand('QUERY_IS_ACTIVE_BACKEND[]:[]%s' % hostname)
+		if res == 'TRUE':
 			return True
 		else:
 			return False
@@ -258,6 +299,9 @@ class MythVideo:
 		self.db = MythDB()
 
 	def pruneMetadata(self):
+		"""
+		Removes metadata from the database for files that no longer exist.
+		"""
 		c = self.db.cursor()
 		c.execute("""
 			SELECT intid, filename
@@ -336,6 +380,9 @@ class MythVideo:
 			return None
 
 	def setMetadata(self, data, id=None):
+		"""
+		Adds or updates the metadata in the database for a video item.
+		"""
 		c = self.db.cursor()
 		if id is None:
 			fields = ', '.join(data.keys())
@@ -354,10 +401,32 @@ class MythVideo:
 			c.execute(sql, sql_values)
 			c.close()
 
-class Program:
+class Recorder:
+	def __str__(self):
+		return "Recorder %s (%s)" % (self.cardid, self.cardtype)
+	
+	def __repr__(self):
+		return "Recorder %s (%s)" % (self.cardid, self.cardtype)
+
 	def __init__(self, data):
 		"""
-		Load the list of data into the object
+		Load the list of data into the object.
+		"""
+		self.cardid = data[0]
+		self.cardtype = data[1]
+		self.videodevice = data[2]
+		self.hostname = data[3]
+
+class Program:
+	def __str__(self):
+		return "%s (%s)" % (self.title, self.starttime.strftime('%Y-%m-%d %H:%M:%S'))
+	
+	def __repr__(self):
+		return "%s (%s)" % (self.title, self.starttime.strftime('%Y-%m-%d %H:%M:%S'))
+	
+	def __init__(self, data):
+		"""
+		Load the list of data into the object.
 		"""
 		self.title = data[0]
 		self.subtitle = data[1]

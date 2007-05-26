@@ -203,7 +203,7 @@ class VideoMetadata:
 	def __init__(self):
 		self.episode_title_format = None
 		if mythtv != None:
-			self.episode_title_format = mythtv.getSetting(
+			self.episode_title_format = mythtv.db.getSetting(
 					'VideoEpisodeTitleFormat', socket.gethostname())
 		if self.episode_title_format == None:
 			self.episode_title_format = '%(series_title)s S%(season)02d E%(episode)02d %(episode_title)s'
