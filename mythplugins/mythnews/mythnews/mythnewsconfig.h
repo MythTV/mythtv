@@ -64,7 +64,7 @@ private:
     void populateSites();
     void loadTheme();
 
-
+    void updateBackground();
     void updateSites();
     void updateFreq();
     void updateBot();
@@ -82,6 +82,9 @@ private:
     MythNewsConfigPriv *m_priv;
 
     XMLParse           *m_Theme;
+
+    QPixmap             m_background;
+
     uint                m_Context;
     uint                m_InColumn;
 

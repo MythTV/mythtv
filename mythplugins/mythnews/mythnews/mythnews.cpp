@@ -104,6 +104,8 @@ MythNews::MythNews(MythMainWindow *parent, const char *name )
     setNoErase();
     loadTheme();
 
+    updateBackground();
+
     // Now do the actual work
     m_RetrieveTimer = new QTimer(this);
     connect(m_RetrieveTimer, SIGNAL(timeout()),
@@ -251,6 +253,24 @@ void MythNews::paintEvent(QPaintEvent *e)
         updateStatusView();
 }
 
+void MythNews::updateBackground(void)
+{
+    QPixmap bground(size());
+    bground.fill(this, 0, 0);
+
+    QPainter tmp(&bground);
+
+    LayerSet *container = m_Theme->GetSet("background");
+    if (container)
+    {
+        container->Draw(&tmp, 0, 0);
+    }
+
+    tmp.end();
+    m_background = bground;
+
+    setPaletteBackgroundPixmap(m_background);
+}
 
 void MythNews::updateSitesView()
 {

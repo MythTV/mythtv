@@ -64,6 +64,7 @@ private:
     void loadWindow(QDomElement &element);
     void paintEvent(QPaintEvent *e);
 
+    void updateBackground();
     void updateSitesView();
     void updateArticlesView();
     void updateInfoView();
@@ -89,6 +90,8 @@ private:
     void createProgress(QString title, int total);
 
     XMLParse      *m_Theme;
+
+    QPixmap        m_background;
 
     UIListBtnType *m_UISites;
     UIListBtnType *m_UIArticles;

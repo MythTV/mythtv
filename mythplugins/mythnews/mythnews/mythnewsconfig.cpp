@@ -132,6 +132,7 @@ MythNewsConfig::MythNewsConfig(MythMainWindow *parent,
 
     setNoErase();
     loadTheme();
+    updateBackground();
 }
 
 MythNewsConfig::~MythNewsConfig()
@@ -342,6 +343,24 @@ void MythNewsConfig::paintEvent(QPaintEvent *e)
     }
 }
 
+void MythNewsConfig::updateBackground(void)
+{
+    QPixmap bground(size());
+    bground.fill(this, 0, 0);
+
+    QPainter tmp(&bground);
+
+    LayerSet *container = m_Theme->GetSet("background");
+    if (container)
+    {
+        container->Draw(&tmp, 0, 0);
+    }
+
+    tmp.end();
+    m_background = bground;
+
+    setPaletteBackgroundPixmap(m_background);
+}
 
 void MythNewsConfig::updateSites()
 {
