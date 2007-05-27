@@ -2984,9 +2984,9 @@ static GlobalLineEdit *MythFillDatabaseLog()
     GlobalLineEdit *be = new GlobalLineEdit("MythFillDatabaseLog");
     be->setLabel(QObject::tr("mythfilldatabase Log Path"));
     be->setValue("");
-    be->setHelpText(QObject::tr("Path to use for logging output from "
-                   "the mythfilldatabase program.  Leave blank "
-                   "to disable logging."));
+    be->setHelpText(QObject::tr("File or directory to use for logging "
+                    "output from the mythfilldatabase program.  Leave blank "
+                    "to disable logging."));
     return be;
 }
 

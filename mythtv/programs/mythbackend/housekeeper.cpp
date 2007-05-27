@@ -7,6 +7,7 @@
 #include <qstring.h>
 #include <qdatetime.h>
 #include <qstringlist.h>
+#include <qfileinfo.h>
 
 #include <iostream>
 using namespace std;
@@ -295,8 +296,6 @@ void *HouseKeeper::runMFDThread(void *param)
 
 void HouseKeeper::RunMFD(void)
 {
-    QString command;
-
     QString mfpath = gContext->GetSetting("MythFillDatabasePath",
                                           "mythfilldatabase");
     QString mfarg = gContext->GetSetting("MythFillDatabaseArgs", "");
@@ -306,10 +305,36 @@ void HouseKeeper::RunMFD(void)
     if (mfpath == "mythfilldatabase")
         mfpath = gContext->GetInstallPrefix() + "/bin/mythfilldatabase";
 
-    if (mflog == "")
-        command = QString("%1 %2").arg(mfpath).arg(mfarg);
-    else
-        command = QString("%1 %2 >>%3 2>&1").arg(mfpath).arg(mfarg).arg(mflog);
+    QString command = QString("%1 %2").arg(mfpath).arg(mfarg);
+
+    if (mflog.length())
+    {
+        bool dir_writable = false;
+        QFileInfo testFile(mflog);
+        if (testFile.exists() && testFile.isDir() && testFile.isWritable())
+        {
+            mflog += "/mythfilldatabase.log";
+            testFile.setFile(mflog);
+            dir_writable = true;
+        }
+
+        if (!dir_writable && !testFile.exists())
+        {
+            dir_writable = QFileInfo(testFile.dirPath()).isWritable();
+        }
+
+        if (dir_writable || (testFile.exists() && testFile.isWritable()))
+        {
+            command = QString("%1 %2 >>%3 2>&1").arg(mfpath).arg(mfarg)
+                    .arg(mflog);
+        }
+        else
+        {
+            VERBOSE(VB_IMPORTANT,
+                    QString("Invalid mythfilldatabase log path: %1 is not "
+                            "writable.").arg(mflog));
+        }
+    }
 
     myth_system(command.ascii(), MYTH_SYSTEM_DONT_BLOCK_LIRC | 
                                  MYTH_SYSTEM_DONT_BLOCK_JOYSTICK_MENU);
