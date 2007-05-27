@@ -41,6 +41,11 @@ class AudioReencodeBuffer : public AudioOutput
         Reconfigure(audio_bits, audio_channels, 0, 0);
         bufsize = 512000;
         audiobuffer = new unsigned char[bufsize];
+
+        ab_count = 0;
+        memset(ab_len, 0, sizeof(ab_len));
+        memset(ab_offset, 0, sizeof(ab_offset));
+        memset(ab_time, 0, sizeof(ab_time));
     }
 
    ~AudioReencodeBuffer()
@@ -85,11 +90,18 @@ class AudioReencodeBuffer : public AudioOutput
             audiobuffer = tmpbuf;
         }
 
+        ab_len[ab_count] = samples * bytes_per_sample;
+        ab_offset[ab_count] = audiobuffer_len;
+
         memcpy(audiobuffer + audiobuffer_len, buffer, 
                samples * bytes_per_sample);
         audiobuffer_len += samples * bytes_per_sample;
+
         // last_audiotime is at the end of the sample
         last_audiotime = timecode + samples * 1000 / eff_audiorate;
+
+        ab_time[ab_count] = last_audiotime;
+        ab_count++;
 
         return true;
     }
@@ -108,6 +120,9 @@ class AudioReencodeBuffer : public AudioOutput
             audiobuffer = tmpbuf;
         }
 
+        ab_len[ab_count] = samples * bytes_per_sample;
+        ab_offset[ab_count] = audiobuffer_len;
+
         for (int itemp = 0; itemp < samples*audio_bytes; itemp+=audio_bytes)
         {
             for(int chan = 0; chan < channels; chan++)
@@ -120,6 +135,9 @@ class AudioReencodeBuffer : public AudioOutput
 
         // last_audiotime is at the end of the sample
         last_audiotime = timecode + samples * 1000 / eff_audiorate;
+
+        ab_time[ab_count] = last_audiotime;
+        ab_count++;
 
         return true;
     }
@@ -199,6 +217,10 @@ class AudioReencodeBuffer : public AudioOutput
     virtual int readOutputData(unsigned char*, int ){ return 0; }
 
     int bufsize;
+    int ab_count;
+    int ab_len[128];
+    int ab_offset[128];
+    long long ab_time[128];
     unsigned char *audiobuffer;
     int audiobuffer_len, channels, bits, bytes_per_sample, eff_audiorate;
     long long last_audiotime;
@@ -928,20 +950,25 @@ int Transcode::TranscodeFile(char *inputname, char *outputname,
 
             // audio is fully decoded, so we need to reencode it
             audioframesize = arb->audiobuffer_len;
-            if (audioframesize > 0)
+            if (arb->ab_count)
             {
-                nvr->SetOption("audioframesize", audioframesize);
-                int starttime = audioOutput->GetAudiotime();
-                nvr->WriteAudio(arb->audiobuffer, audioFrame++,
-                                starttime - timecodeOffset);
-                if (nvr->IsErrored()) {
-                    VERBOSE(VB_IMPORTANT, "Transcode: Encountered "
-                            "irrecoverable error in NVR::WriteAudio");
-                    delete newFrame;
-                    return REENCODE_ERROR;
+                for (int loop = 0; loop < arb->ab_count; loop++)
+                {
+                    nvr->SetOption("audioframesize", arb->ab_len[loop]);
+                    nvr->WriteAudio(arb->audiobuffer + arb->ab_offset[loop],
+                                    audioFrame++,
+                                    arb->ab_time[loop] - timecodeOffset);
+                    if (nvr->IsErrored()) {
+                        VERBOSE(VB_IMPORTANT, "Transcode: Encountered "
+                                "irrecoverable error in NVR::WriteAudio");
+                        delete newFrame;
+                        return REENCODE_ERROR;
+                    }
                 }
+                arb->ab_count = 0;
                 arb->audiobuffer_len = 0;
             }
+
             nvp->TranscodeWriteText(&TranscodeWriteText, (void *)(nvr));
 
             lasttimecode = frame.timecode;
