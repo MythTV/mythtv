@@ -301,6 +301,7 @@ void MythThemedMenuState::Reset(void)
         jt.data()->DownRef();
     }
     titleIcons.clear();
+    m_loadedImages.clear();
 
     normalAttributes = activeAttributes = TextAttributes();
     setDefaults();
