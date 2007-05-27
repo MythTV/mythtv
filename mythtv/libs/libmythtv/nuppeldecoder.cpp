@@ -38,7 +38,7 @@ NuppelDecoder::NuppelDecoder(NuppelVideoPlayer *parent, ProgramInfo *pginfo)
       ffmpeg_extradatasize(0), ffmpeg_extradata(0), usingextradata(false),
       disablevideo(false), totalLength(0), totalFrames(0), effdsp(0), 
       directframe(NULL),            decoded_video_frame(NULL),
-      mpa_codec(0), mpa_ctx(0), directrendering(false),
+      mpa_vidcodec(0), mpa_vidctx(0), directrendering(false),
       lastct('1'), strm(0), buf(0), buf2(0), 
       videosizetotal(0), videoframesread(0), setreadahead(false)
 {
@@ -96,7 +96,7 @@ NuppelDecoder::~NuppelDecoder()
         delete StoredData.first();
         StoredData.removeFirst();
     }
-    CloseAVCodec();
+    CloseAVCodecVideo();
 }
 
 bool NuppelDecoder::CanHandle(char testbuf[kDecoderProbeBufferSize],
@@ -111,9 +111,9 @@ bool NuppelDecoder::CanHandle(char testbuf[kDecoderProbeBufferSize],
 QString NuppelDecoder::GetEncodingType(void) const
 {
     QString value = "Unknown";
-    if (mpa_codec)
+    if (mpa_vidcodec)
     {
-        if (QString(mpa_codec->name) == "mpeg4")
+        if (QString(mpa_vidcodec->name) == "mpeg4")
             value = "MPEG-4";
     }
     else if (usingextradata && extradata.video_fourcc == FOURCC_DIVX)
@@ -600,10 +600,10 @@ void release_nuppel_buffer(struct AVCodecContext *c, AVFrame *pic)
         pic->data[i] = NULL;
 }
 
-bool NuppelDecoder::InitAVCodec(int codec)
+bool NuppelDecoder::InitAVCodecVideo(int codec)
 {
-    if (mpa_codec)
-        CloseAVCodec();
+    if (mpa_vidcodec)
+        CloseAVCodecVideo();
 
     if (usingextradata)
     {
@@ -623,68 +623,68 @@ bool NuppelDecoder::InitAVCodec(int codec)
             default: codec = -1;
         }
     }
-    mpa_codec = avcodec_find_decoder((enum CodecID)codec);
+    mpa_vidcodec = avcodec_find_decoder((enum CodecID)codec);
 
-    if (!mpa_codec)
+    if (!mpa_vidcodec)
     {
         if (usingextradata)
-            VERBOSE(VB_IMPORTANT, QString("couldn't find codec (%1)").arg(extradata.video_fourcc));
+            VERBOSE(VB_IMPORTANT, QString("couldn't find video codec (%1)").arg(extradata.video_fourcc));
         else
-            VERBOSE(VB_IMPORTANT, "couldn't find codec");
+            VERBOSE(VB_IMPORTANT, "couldn't find video codec");
         return false;
     }
 
-    if (mpa_codec->capabilities & CODEC_CAP_DR1 && codec != CODEC_ID_MJPEG)
+    if (mpa_vidcodec->capabilities & CODEC_CAP_DR1 && codec != CODEC_ID_MJPEG)
         directrendering = true;
 
-    if (mpa_ctx)
-        av_free(mpa_ctx);
+    if (mpa_vidctx)
+        av_free(mpa_vidctx);
 
-    mpa_ctx = avcodec_alloc_context();
+    mpa_vidctx = avcodec_alloc_context();
 
-    mpa_ctx->codec_id = (enum CodecID)codec;
-    mpa_ctx->width = video_width;
-    mpa_ctx->height = video_height;
-    mpa_ctx->error_resilience = 2;
-    mpa_ctx->bits_per_sample = 12;
+    mpa_vidctx->codec_id = (enum CodecID)codec;
+    mpa_vidctx->width = video_width;
+    mpa_vidctx->height = video_height;
+    mpa_vidctx->error_resilience = 2;
+    mpa_vidctx->bits_per_sample = 12;
 
     if (directrendering)
     {
-        mpa_ctx->flags |= CODEC_FLAG_EMU_EDGE;
-        mpa_ctx->draw_horiz_band = NULL;
-        mpa_ctx->get_buffer = get_nuppel_buffer;
-        mpa_ctx->release_buffer = release_nuppel_buffer;
-        mpa_ctx->opaque = (void *)this;
+        mpa_vidctx->flags |= CODEC_FLAG_EMU_EDGE;
+        mpa_vidctx->draw_horiz_band = NULL;
+        mpa_vidctx->get_buffer = get_nuppel_buffer;
+        mpa_vidctx->release_buffer = release_nuppel_buffer;
+        mpa_vidctx->opaque = (void *)this;
     }
     if (ffmpeg_extradatasize > 0)
     {
-        mpa_ctx->flags |= CODEC_FLAG_EXTERN_HUFF;
-        mpa_ctx->extradata = ffmpeg_extradata;
-        mpa_ctx->extradata_size = ffmpeg_extradatasize;
+        mpa_vidctx->flags |= CODEC_FLAG_EXTERN_HUFF;
+        mpa_vidctx->extradata = ffmpeg_extradata;
+        mpa_vidctx->extradata_size = ffmpeg_extradatasize;
     }
 
     QMutexLocker locker(&avcodeclock);
-    if (avcodec_open(mpa_ctx, mpa_codec) < 0)
+    if (avcodec_open(mpa_vidctx, mpa_vidcodec) < 0)
     {
-        VERBOSE(VB_IMPORTANT, LOC + "Couldn't find lavc codec");
+        VERBOSE(VB_IMPORTANT, LOC + "Couldn't find lavc video codec");
         return false;
     }
 
     return true;
 }
 
-void NuppelDecoder::CloseAVCodec(void)
+void NuppelDecoder::CloseAVCodecVideo(void)
 {
     QMutexLocker locker(&avcodeclock);
 
-    if (mpa_codec)
+    if (mpa_vidcodec)
     {
-        avcodec_close(mpa_ctx);
+        avcodec_close(mpa_vidctx);
 
-        if (mpa_ctx)
+        if (mpa_vidctx)
         {
-            av_free(mpa_ctx);
-            mpa_ctx = NULL;
+            av_free(mpa_vidctx);
+            mpa_vidctx = NULL;
         }
     }
 }
@@ -782,8 +782,8 @@ bool NuppelDecoder::DecodeFrame(struct rtframeheader *frameheader,
     }
     else
     {
-        if (!mpa_codec)
-            InitAVCodec(frameheader->comptype - '3');
+        if (!mpa_vidcodec)
+            InitAVCodecVideo(frameheader->comptype - '3');
 
         AVFrame mpa_pic;
 
@@ -791,7 +791,7 @@ bool NuppelDecoder::DecodeFrame(struct rtframeheader *frameheader,
             QMutexLocker locker(&avcodeclock);
             // if directrendering, writes into buf
             int gotpicture = 0;
-            int ret = avcodec_decode_video(mpa_ctx, &mpa_pic, &gotpicture,
+            int ret = avcodec_decode_video(mpa_vidctx, &mpa_pic, &gotpicture,
                                            lstrm, frameheader->packetlength);
             directframe = NULL;
             if (ret < 0)
@@ -833,7 +833,7 @@ bool NuppelDecoder::DecodeFrame(struct rtframeheader *frameheader,
                        video_height);
 
         img_convert(&tmppicture, PIX_FMT_YUV420P, (AVPicture *)&mpa_pic,
-                    mpa_ctx->pix_fmt, video_width, video_height);
+                    mpa_vidctx->pix_fmt, video_width, video_height);
     }
 
     return true;
@@ -1234,8 +1234,8 @@ void NuppelDecoder::SeekReset(long long newKey, uint skipFrames,
     
     DecoderBase::SeekReset(newKey, skipFrames, doFlush, discardFrames);
 
-    if (mpa_codec && doFlush)
-        avcodec_flush_buffers(mpa_ctx);
+    if (mpa_vidcodec && doFlush)
+        avcodec_flush_buffers(mpa_vidctx);
 
     if (discardFrames)
         GetNVP()->DiscardVideoFrames(doFlush);

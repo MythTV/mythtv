@@ -66,8 +66,8 @@ class NuppelDecoder : public DecoderBase
                      unsigned char *lstrm, VideoFrame *frame);
     bool isValidFrametype(char type);
 
-    bool InitAVCodec(int codec);
-    void CloseAVCodec(void);
+    bool InitAVCodecVideo(int codec);
+    void CloseAVCodecVideo(void);
     void StoreRawData(unsigned char *strm);
 
     void SeekReset(long long newKey = 0, uint skipFrames = 0,
@@ -105,8 +105,8 @@ class NuppelDecoder : public DecoderBase
     VideoFrame *directframe;
     VideoFrame *decoded_video_frame;
 
-    AVCodec *mpa_codec;
-    AVCodecContext *mpa_ctx;
+    AVCodec *mpa_vidcodec;
+    AVCodecContext *mpa_vidctx;
     AVPicture tmppicture;
 
     bool directrendering;
