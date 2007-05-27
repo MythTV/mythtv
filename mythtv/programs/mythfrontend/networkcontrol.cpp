@@ -212,31 +212,21 @@ void *NetworkControl::CommandThread(void *param)
 void NetworkControl::RunCommandThread(void)
 {
     QString command;
-    int commands = 0;
 
     for (;;)
     {
         pthread_testcancel();
 
         ncLock.lock();
-        commands = networkControlCommands.size();
+        while (!networkControlCommands.size()) {
+            ncCond.wait(&ncLock);
+            pthread_testcancel();
+        }
+        command = networkControlCommands.front(); 
+        networkControlCommands.pop_front();
         ncLock.unlock();
 
-        while (commands)
-        {
-            ncLock.lock();
-            command = networkControlCommands.front();
-            networkControlCommands.pop_front();
-            ncLock.unlock();
-
-            processNetworkControlCommand(command);
-
-            ncLock.lock();
-            commands = networkControlCommands.size();
-            ncLock.unlock();
-        }
-
-        usleep(50000);
+        processNetworkControlCommand(command);
     }
 }
 
@@ -341,6 +331,7 @@ void NetworkControl::readClient(void)
 
         ncLock.lock();
         networkControlCommands.push_back(lineIn);
+        ncCond.wakeOne();
         ncLock.unlock();
     }
 }

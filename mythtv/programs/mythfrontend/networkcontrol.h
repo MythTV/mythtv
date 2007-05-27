@@ -11,6 +11,7 @@
 #include <qmap.h>
 #include <qmutex.h>
 #include <qvaluelist.h>
+#include <qwaitcondition.h>
 
 class MainServer;
 
@@ -62,6 +63,7 @@ class NetworkControl : public QServerSocket
 
     QValueList<QString> networkControlCommands;
     QMutex ncLock;
+    QWaitCondition ncCond;
 
     QValueList<QString> networkControlReplies;
     QMutex nrLock;
