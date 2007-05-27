@@ -2550,6 +2550,7 @@ static int decode_frame(AVCodecContext * avctx,
     MPADecodeContext *s = avctx->priv_data;
     uint32_t header;
     int out_size;
+    int result;
     OUT_INT *out_samples = data;
 
 retry:
@@ -2595,15 +2596,17 @@ retry:
         av_log(avctx, AV_LOG_ERROR, "incorrect frame size\n");
     }
 
-    out_size = mp_decode_frame(s, out_samples, buf, buf_size);
+    out_size = mp_decode_frame(s, out_samples, buf, s->frame_size);
     if(out_size>=0){
         *data_size = out_size;
         avctx->sample_rate = s->sample_rate;
         //FIXME maybe move the other codec info stuff from above here too
     }else
         av_log(avctx, AV_LOG_DEBUG, "Error while decoding MPEG audio frame.\n"); //FIXME return -1 / but also return the number of bytes consumed
+
+    result = s->frame_size;
     s->frame_size = 0;
-    return buf_size;
+    return result;
 }
 
 static void flush(AVCodecContext *avctx){
