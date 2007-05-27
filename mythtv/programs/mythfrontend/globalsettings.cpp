@@ -418,7 +418,7 @@ static HostComboBox *AutoCommercialSkip()
 static GlobalCheckBox *AutoCommercialFlag()
 {
     GlobalCheckBox *bc = new GlobalCheckBox("AutoCommercialFlag");
-    bc->setLabel(QObject::tr("Commercial Flag New Recordings"));
+    bc->setLabel(QObject::tr("Run commercial flagger"));
     bc->setValue(true);
     bc->setHelpText(QObject::tr("This is the default value used for the Auto-"
                     "Commercial Flagging setting when a new scheduled "
@@ -429,7 +429,7 @@ static GlobalCheckBox *AutoCommercialFlag()
 static GlobalCheckBox *AutoTranscode()
 {
     GlobalCheckBox *bc = new GlobalCheckBox("AutoTranscode");
-    bc->setLabel(QObject::tr("Default Auto Transcode setting"));
+    bc->setLabel(QObject::tr("Run transcoder"));
     bc->setValue(false);
     bc->setHelpText(QObject::tr("This is the default value used for the Auto-"
                     "Transcode setting when a new scheduled "
@@ -449,17 +449,30 @@ static GlobalComboBox *DefaultTranscoder()
     return bc;
 }
 
+static GlobalSpinBox *DeferAutoTranscodeDays()
+{
+    GlobalSpinBox *gs = new GlobalSpinBox("DeferAutoTranscodeDays", 0, 365, 1);
+    gs->setLabel(QObject::tr("Deferral days for Auto-Transcode jobs"));
+    gs->setHelpText(QObject::tr("If non-zero, Auto-Transcode jobs will be "
+                    "scheduled to run this many days after a recording "
+                    "completes instead of immediately afterwards."));
+    gs->setValue(0);
+    return gs;
+}
+
 static GlobalCheckBox *AutoRunUserJob(uint job_num)
 {
     QString dbStr = QString("AutoRunUserJob%1").arg(job_num);
-    QString label = QObject::tr("Run User Job #%1 On New Recordings")
+    QString label = QObject::tr("Run User Job #%1")
         .arg(job_num);
     GlobalCheckBox *bc = new GlobalCheckBox(dbStr);
     bc->setLabel(label);
     bc->setValue(false);
     bc->setHelpText(QObject::tr("This is the default value used for the "
-                    "'Run User Job #%1' setting when a new scheduled "
-                    "recording is created.").arg(job_num));
+                    "'Run %1' setting when a new scheduled "
+                    "recording is created.")
+                    .arg(gContext->GetSetting(QString("UserJobDesc%1")
+                         .arg(job_num))));
     return bc;
 }
 
@@ -3658,13 +3671,31 @@ GeneralSettings::GeneralSettings()
 
     VerticalConfigurationGroup* jobs = new VerticalConfigurationGroup(false);
     jobs->setLabel(QObject::tr("General (Jobs)"));
-    jobs->addChild(AutoCommercialFlag());
     jobs->addChild(CommercialSkipMethod());
     jobs->addChild(AggressiveCommDetect());
-    jobs->addChild(AutoTranscode());
     jobs->addChild(DefaultTranscoder());
-    for (uint i=1; i<=4; ++i)
-        jobs->addChild(AutoRunUserJob(i));
+    jobs->addChild(DeferAutoTranscodeDays());
+
+    VerticalConfigurationGroup* autogrp0 =
+        new VerticalConfigurationGroup(false, false, true, true);
+    autogrp0->addChild(AutoCommercialFlag());
+    autogrp0->addChild(AutoTranscode());
+    autogrp0->addChild(AutoRunUserJob(1));
+
+    VerticalConfigurationGroup* autogrp1 =
+        new VerticalConfigurationGroup(false, false, true, true);
+    autogrp1->addChild(AutoRunUserJob(2));
+    autogrp1->addChild(AutoRunUserJob(3));
+    autogrp1->addChild(AutoRunUserJob(4));
+
+    HorizontalConfigurationGroup *autogrp =
+        new HorizontalConfigurationGroup(true, true, false, true);
+    autogrp->setLabel(
+        QObject::tr("Default JobQueue settings for new scheduled recordings"));
+    autogrp->addChild(autogrp0);
+    autogrp->addChild(autogrp1);
+    jobs->addChild(autogrp);
+
     addChild(jobs);
 
     VerticalConfigurationGroup* general2 = new VerticalConfigurationGroup(false);

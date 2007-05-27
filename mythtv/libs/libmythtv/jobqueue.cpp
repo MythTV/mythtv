@@ -524,11 +524,14 @@ bool JobQueue::QueueRecordingJobs(ProgramInfo *pinfo, int jobTypes)
 
 bool JobQueue::QueueJob(int jobType, QString chanid, QDateTime starttime, 
                         QString args, QString comment, QString host,
-                        int flags, int status)
+                        int flags, int status, QDateTime schedruntime)
 {
     int tmpStatus = JOB_UNKNOWN;
     int tmpCmd = JOB_UNKNOWN;
     int jobID = -1;
+
+    if(!schedruntime.isValid())
+        schedruntime = QDateTime::currentDateTime();
     
     MSqlQuery query(MSqlQuery::InitCon());
 
@@ -577,12 +580,13 @@ bool JobQueue::QueueJob(int jobType, QString chanid, QDateTime starttime,
                   "status, statustime, schedruntime, hostname, args, comment, "
                   "flags) "
                   "VALUES (:CHANID, :STARTTIME, now(), :JOBTYPE, :STATUS, "
-                  "now(), now(), :HOST, :ARGS, :COMMENT, :FLAGS);");
+                  "now(), :SCHEDRUNTIME, :HOST, :ARGS, :COMMENT, :FLAGS);");
 
     query.bindValue(":CHANID", chanid);
     query.bindValue(":STARTTIME", starttime);
     query.bindValue(":JOBTYPE", jobType);
     query.bindValue(":STATUS", status);
+    query.bindValue(":SCHEDRUNTIME", schedruntime);
     query.bindValue(":HOST", host);
     query.bindValue(":ARGS", args);
     query.bindValue(":COMMENT", comment);
@@ -614,7 +618,19 @@ bool JobQueue::QueueJobs(int jobTypes, QString chanid, QDateTime starttime,
         if (jobTypes & JOB_COMMFLAG)
             QueueJob(JOB_COMMFLAG, chanid, starttime, args, comment, host);
         if (jobTypes & JOB_TRANSCODE)
-            QueueJob(JOB_TRANSCODE, chanid, starttime, args, comment, host);
+        {
+            QDateTime schedruntime = QDateTime::currentDateTime();
+
+            int defer = gContext->GetNumSetting("DeferAutoTranscodeDays", 0);
+            if (defer)
+            {
+                schedruntime = schedruntime.addDays(defer);
+                schedruntime.setTime(QTime::QTime(0,0));
+            }
+
+            QueueJob(JOB_TRANSCODE, chanid, starttime, args, comment, host,
+              0, JOB_QUEUED, schedruntime);
+        }
     }
 
     if (jobTypes & JOB_USERJOB1)
