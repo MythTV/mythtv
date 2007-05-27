@@ -30,7 +30,7 @@ using namespace std;
 
 NuppelDecoder::NuppelDecoder(NuppelVideoPlayer *parent, ProgramInfo *pginfo)
     : DecoderBase(parent, pginfo),
-      gf(0), rtjd(0), video_width(0), video_height(0), video_size(0),
+      rtjd(0), video_width(0), video_height(0), video_size(0),
       video_frame_rate(0.0f), audio_samplerate(44100), 
 #ifdef WORDS_BIGENDIAN
       audio_bits_per_sample(0),
@@ -38,7 +38,9 @@ NuppelDecoder::NuppelDecoder(NuppelVideoPlayer *parent, ProgramInfo *pginfo)
       ffmpeg_extradatasize(0), ffmpeg_extradata(0), usingextradata(false),
       disablevideo(false), totalLength(0), totalFrames(0), effdsp(0), 
       directframe(NULL),            decoded_video_frame(NULL),
-      mpa_vidcodec(0), mpa_vidctx(0), directrendering(false),
+      mpa_vidcodec(0), mpa_vidctx(0), mpa_audcodec(0), mpa_audctx(0),
+      audioSamples(new short int[AVCODEC_MAX_AUDIO_FRAME_SIZE]),
+      directrendering(false),
       lastct('1'), strm(0), buf(0), buf2(0), 
       videosizetotal(0), videoframesread(0), setreadahead(false)
 {
@@ -48,6 +50,7 @@ NuppelDecoder::NuppelDecoder(NuppelVideoPlayer *parent, ProgramInfo *pginfo)
     memset(&extradata, 0, sizeof(extendeddata));
     memset(&tmppicture, 0, sizeof(AVPicture));
     planes[0] = planes[1] = planes[2] = 0;
+    bzero(audioSamples, AVCODEC_MAX_AUDIO_FRAME_SIZE * sizeof(short int));
 
     // set parent class variables
     positionMapType = MARK_KEYFRAME;
@@ -55,11 +58,6 @@ NuppelDecoder::NuppelDecoder(NuppelVideoPlayer *parent, ProgramInfo *pginfo)
     framesPlayed = 0;
     getrawframes = false;
     getrawvideo = false;
-
-    gf = lame_init();
-    lame_set_decode_only(gf, 1);
-    lame_decode_init();
-    lame_init_params(gf);
 
     rtjd = new RTjpeg();
     int format = RTJ_YUV420;
@@ -80,8 +78,6 @@ NuppelDecoder::NuppelDecoder(NuppelVideoPlayer *parent, ProgramInfo *pginfo)
 
 NuppelDecoder::~NuppelDecoder()
 {
-    if (gf)
-        lame_close(gf);
     if (rtjd)
         delete rtjd;
     if (ffmpeg_extradata)
@@ -92,11 +88,14 @@ NuppelDecoder::~NuppelDecoder()
         delete [] buf2;
     if (strm)
         delete [] strm;
+    if (audioSamples)
+        delete [] audioSamples;
     while(! StoredData.isEmpty()) {
         delete StoredData.first();
         StoredData.removeFirst();
     }
     CloseAVCodecVideo();
+    CloseAVCodecAudio();
 }
 
 bool NuppelDecoder::CanHandle(char testbuf[kDecoderProbeBufferSize],
@@ -689,6 +688,65 @@ void NuppelDecoder::CloseAVCodecVideo(void)
     }
 }
 
+bool NuppelDecoder::InitAVCodecAudio(int codec)
+{
+    if (mpa_audcodec)
+        CloseAVCodecAudio();
+
+    if (usingextradata)
+    {
+        switch(extradata.audio_fourcc)
+        {
+            case FOURCC_LAME: codec = CODEC_ID_MP3;        break;
+            case FOURCC_AC3 : codec = CODEC_ID_AC3;        break;
+            default: codec = -1;
+        }
+    }
+    mpa_audcodec = avcodec_find_decoder((enum CodecID)codec);
+
+    if (!mpa_audcodec)
+    {
+        if (usingextradata)
+            VERBOSE(VB_IMPORTANT, QString("couldn't find audio codec (%1)")
+                    .arg(extradata.audio_fourcc));
+        else
+            VERBOSE(VB_IMPORTANT, "couldn't find audio codec");
+        return false;
+    }
+
+    if (mpa_audctx)
+        av_free(mpa_audctx);
+
+    mpa_audctx = avcodec_alloc_context();
+
+    mpa_audctx->codec_id = (enum CodecID)codec;
+
+    QMutexLocker locker(&avcodeclock);
+    if (avcodec_open(mpa_audctx, mpa_audcodec) < 0)
+    {
+        VERBOSE(VB_IMPORTANT, LOC + "Couldn't find lavc audio codec");
+        return false;
+    }
+
+    return true;
+}
+
+void NuppelDecoder::CloseAVCodecAudio(void)
+{
+    QMutexLocker locker(&avcodeclock);
+
+    if (mpa_audcodec)
+    {
+        avcodec_close(mpa_audctx);
+
+        if (mpa_audctx)
+        {
+            av_free(mpa_audctx);
+            mpa_audctx = NULL;
+        }
+    }
+}
+
 static void CopyToVideo(unsigned char *buf, int video_width,
                         int video_height, VideoFrame *frame)
 {
@@ -1113,34 +1171,47 @@ bool NuppelDecoder::GetFrame(int avignore)
 
         if (frameheader.frametype=='A' && avignore == 0)
         {
-            if (frameheader.comptype=='3')
+            if ((frameheader.comptype == '3') || (frameheader.comptype == 'A'))
             {
                 if (getrawframes)
                     StoreRawData(strm);
 
-                int lameret = 0;
-                short int pcmlbuffer[audio_samplerate * 4];
-                short int pcmrbuffer[audio_samplerate * 4];
-                int packetlen = frameheader.packetlength;
-
-                do
+                if (!mpa_audcodec)
                 {
-                    lameret = lame_decode(strm, packetlen, pcmlbuffer,
-                                          pcmrbuffer);
-
-                    if (lameret > 0)
+                    if (frameheader.comptype == '3')
+                        InitAVCodecAudio(CODEC_ID_MP3);
+                    else if (frameheader.comptype == 'A')
+                        InitAVCodecAudio(CODEC_ID_AC3);
+                    else
                     {
-                        GetNVP()->AddAudioData(pcmlbuffer, pcmrbuffer,
-                                               lameret, frameheader.timecode);
-                    }
-                    else if (lameret < 0)
-                    {
-                        VERBOSE(VB_IMPORTANT, QString("lame decode error: %1, exiting").arg(lameret));
-                        errored = true;
+                        VERBOSE(VB_IMPORTANT, LOC_ERR + QString("GetFrame: "
+                                "Unknown audio comptype of '%1', skipping")
+                                .arg(frameheader.comptype));
                         return false;
                     }
-                    packetlen = 0;
-                } while (lameret > 0);
+                }
+
+                int packetlen = frameheader.packetlength;
+                int ret = 0;
+                int data_size = 0;
+                unsigned char *ptr = strm;
+
+                QMutexLocker locker(&avcodeclock);
+
+                while (packetlen > 0)
+                {
+                    data_size = 0;
+
+                    ret = avcodec_decode_audio(mpa_audctx,
+                        audioSamples, &data_size, ptr, packetlen);
+
+                    if (data_size)
+                        GetNVP()->AddAudioData((char *)audioSamples, data_size,
+                                               frameheader.timecode);
+
+                    packetlen -= ret;
+                    ptr += ret;
+                }
             }
             else
             {
@@ -1248,3 +1319,4 @@ void NuppelDecoder::SeekReset(long long newKey, uint skipFrames,
     }
 }
 
+/* vim: set expandtab tabstop=4 shiftwidth=4: */

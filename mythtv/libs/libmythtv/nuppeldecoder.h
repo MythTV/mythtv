@@ -8,15 +8,6 @@
 #include "format.h"
 #include "decoderbase.h"
 
-#ifdef MMX
-#undef MMX
-#define MMXBLAH
-#endif
-#include <lame/lame.h>
-#ifdef MMXBLAH
-#define MMX
-#endif
-
 #include "RTjpegN.h"
 
 extern "C" {
@@ -68,6 +59,8 @@ class NuppelDecoder : public DecoderBase
 
     bool InitAVCodecVideo(int codec);
     void CloseAVCodecVideo(void);
+    bool InitAVCodecAudio(int codec);
+    void CloseAVCodecAudio(void);
     void StoreRawData(unsigned char *strm);
 
     void SeekReset(long long newKey = 0, uint skipFrames = 0,
@@ -79,7 +72,6 @@ class NuppelDecoder : public DecoderBase
     struct rtfileheader fileheader;
     struct rtframeheader frameheader;
 
-    lame_global_flags *gf;
     RTjpeg *rtjd;
 
     int video_width, video_height, video_size;
@@ -107,8 +99,11 @@ class NuppelDecoder : public DecoderBase
 
     AVCodec *mpa_vidcodec;
     AVCodecContext *mpa_vidctx;
+    AVCodec *mpa_audcodec;
+    AVCodecContext *mpa_audctx;
     AVPicture tmppicture;
 
+    short int *audioSamples;
     bool directrendering;
 
     char lastct;
@@ -126,3 +121,5 @@ class NuppelDecoder : public DecoderBase
 };
 
 #endif
+
+/* vim: set expandtab tabstop=4 shiftwidth=4: */

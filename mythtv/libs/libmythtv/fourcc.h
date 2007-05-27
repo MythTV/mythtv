@@ -75,6 +75,7 @@ static inline char * fourcc_str(int i)
 
 #define FOURCC_LAME MKTAG('L','A','M','E')
 #define FOURCC_RAWA MKTAG('R','A','W','A')
+#define FOURCC_AC3  MKTAG('A','C','3',' ')
 
 
 /******************************************************************************

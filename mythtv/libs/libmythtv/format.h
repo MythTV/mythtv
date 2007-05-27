@@ -50,6 +50,7 @@ typedef struct rtframeheader
     			//    3 .. layer3 (packet)
     			//    F .. flac (lossless) [NI]
     			//    S .. shorten (lossless) [NI]
+    			//    A .. AC3 (packet)
 			//    N .. null frame loudless
 			//    L .. simply copy last frame (may sound bad) NI
 			// S: B .. Audio and Video sync point [NI]
