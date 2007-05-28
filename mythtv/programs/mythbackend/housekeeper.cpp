@@ -50,7 +50,7 @@ bool HouseKeeper::wantToRun(const QString &dbTag, int period, int minhour,
 {
     bool runOK = false;
     unsigned int oneday = 60 * 60 * 24;
-    unsigned int longEnough = 0;
+    int longEnough = 0;
 
     if (period)
         longEnough = ((period * oneday) - oneday/2);
@@ -65,11 +65,6 @@ bool HouseKeeper::wantToRun(const QString &dbTag, int period, int minhour,
         minhour = 0;
     if (maxhour > 23)
         maxhour = 23;
-    if (minhour > maxhour)
-    {
-        VERBOSE(VB_GENERAL,
-            "Housekeeping thread will not run: supplied time range is empty");
-    }
 
     MSqlQuery result(MSqlQuery::InitCon());
     if (result.isConnected())
@@ -82,14 +77,16 @@ bool HouseKeeper::wantToRun(const QString &dbTag, int period, int minhour,
             result.next();
             lastrun = result.value(0).toDateTime();
 
-            if ((now.toTime_t() - lastrun.toTime_t()) > longEnough &&
-                (now.toString(QString("d")).toInt() !=
-                     lastrun.toString(QString("d")).toInt()))
+            if ((lastrun.secsTo(now) > longEnough) &&
+                (now.date().day() != lastrun.date().day()))
             {
-                int hour = now.toString(QString("h")).toInt();
-                if ((hour >= minhour) && (hour <= maxhour))
+                int hour = now.time().hour();
+
+                if (((minhour > maxhour) &&
+                     ((hour <= maxhour) || (hour >= minhour))) ||
+                    ((hour >= minhour) && (hour <= maxhour)))
                 {
-                    int minute = now.toString(QString("m")).toInt();
+                    int minute = now.time().minute();
                     if ((hour == maxhour && minute > 30) ||
                         ((random()%(((maxhour-hour)*12+(60-minute)/5 - 6) + 1)) == 0))
                         runOK = true;
