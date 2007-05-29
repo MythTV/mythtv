@@ -43,21 +43,44 @@ bool MetaIOTagLib::write(Metadata* mdata, bool exclusive)
     if (!mdata->Artist().isEmpty())
         tag->setArtist(QStringToTString(mdata->Artist()));
 
+    // MusicBrainz ID
+    UserTextIdentificationFrame *musicbrainz = NULL;
+    musicbrainz = find(taglib->ID3v2Tag(), "MusicBrainz Album Artist Id");
+
+    // Compilation Artist (TPE4)
+    TextIdentificationFrame *tpeframe = NULL;
+    TagLib::ID3v2::FrameList tpelist = taglib->ID3v2Tag()->frameListMap()["TPE4"];
+    if (!tpelist.isEmpty())
+        tpeframe = (TextIdentificationFrame *)tpelist.front();
+
     if (mdata->Compilation())
     {
 
-        UserTextIdentificationFrame *musicbrainz =
-            new UserTextIdentificationFrame(TagLib::String::UTF8);
-        taglib->ID3v2Tag()->addFrame(musicbrainz);
-        musicbrainz->setDescription("MusicBrainz Album Artist Id");
+        if (!musicbrainz)
+        {
+            musicbrainz = new UserTextIdentificationFrame(TagLib::String::UTF8);
+            taglib->ID3v2Tag()->addFrame(musicbrainz);
+            musicbrainz->setDescription("MusicBrainz Album Artist Id");
+        }
+
         musicbrainz->setText(MYTH_MUSICBRAINZ_ALBUMARTIST_UUID);
 
         if (!mdata->CompilationArtist().isEmpty())
         {
-            // Compilation Artist (TPE4)
-            taglib->ID3v2Tag()->frameListMap()["TPE4"].front()->setText(
-                QStringToTString(mdata->CompilationArtist()));
+            if (!tpeframe) {
+                tpeframe = new TextIdentificationFrame(TagLib::ByteVector("TPE4"), TagLib::String::UTF8);
+                taglib->ID3v2Tag()->addFrame(tpeframe);
+            }
+
+            tpeframe->setText(QStringToTString(mdata->CompilationArtist()));
         }
+    }
+    else
+    {
+        if (tpeframe)
+            taglib->ID3v2Tag()->removeFrame(tpeframe);
+        if (musicbrainz)
+            taglib->ID3v2Tag()->removeFrame(musicbrainz);
     }
 
     if (!mdata->Title().isEmpty())

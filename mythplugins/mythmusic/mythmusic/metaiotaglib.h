@@ -12,6 +12,7 @@
 using TagLib::MPEG::File;
 using TagLib::Tag;
 using TagLib::ID3v2::UserTextIdentificationFrame;
+using TagLib::ID3v2::TextIdentificationFrame;
 using TagLib::ID3v2::AttachedPictureFrame;
 using TagLib::String;
 using TagLib::MPEG::Properties;
