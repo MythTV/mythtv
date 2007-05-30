@@ -497,6 +497,17 @@ HostCheckBox *MTDxvidFlag()
     return gc;
 }
 
+HostCheckBox *MTDTrustTranscodeFRDetect()
+{
+    HostCheckBox *gc = new HostCheckBox("mythvideo.TrustTranscodeFRDetect");
+    gc->setLabel(QObject::tr("Let transcode determine frame rate"));
+    gc->setValue(true);
+    gc->setHelpText(QObject::tr("If set, transcode will determine the frame "
+                                "rate automatically. If not set, 23.976 is "
+                                "assumed."));
+    return gc;
+}
+
 HostSpinBox *MTDNiceLevel()
 {
     HostSpinBox *gc = new HostSpinBox("MTDNiceLevel", 0, 20, 1);
@@ -635,5 +646,6 @@ DVDRipperSettings::DVDRipperSettings()
     mtdsettings->addChild(MTDLogFlag());
     mtdsettings->addChild(MTDac3Flag());
     mtdsettings->addChild(MTDxvidFlag());
+    mtdsettings->addChild(MTDTrustTranscodeFRDetect());
     addChild(mtdsettings);
 }

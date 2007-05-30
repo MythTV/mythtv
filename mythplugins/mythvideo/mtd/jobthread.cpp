@@ -1149,14 +1149,16 @@ bool DVDTranscodeThread::buildTranscodeCommandLine(int which_run)
     tc_arguments.append(QString("%1/vob/").arg(working_directory->path()));
     tc_arguments.append("-g");
     tc_arguments.append(QString("%1x%2").arg(input_hsize).arg(input_vsize));
-    tc_arguments.append("-f");
-    tc_arguments.append(QString("0,%1").arg(fr_code));
-                         
-                         
-                         
+
+    if (!gContext->GetNumSetting("mythvideo.TrustTranscodeFRDetect"))
+    {
+        tc_arguments.append("-f");
+        tc_arguments.append(QString("0,%1").arg(fr_code));
+    }
+
     tc_arguments.append("-M");
     tc_arguments.append(QString("%1").arg(sync_mode));
-    
+
     if(use_yv12)
     {
         tc_arguments.append("-V");
