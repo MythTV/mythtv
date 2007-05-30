@@ -939,7 +939,32 @@ void NuppelVideoPlayer::OpenDummy(void)
 
     if (!videoOutput)
     {
-        SetVideoParams(720, 576, 25.00, 15);
+        // HACK HACK HACK HACK HACK HACK HACK HACK HACK -- begin
+
+        // This uses the display's aspect ratio in pixels to guess
+        // whether the dummy video should have a 4:3 or 16:9 aspect
+        // ratio when there is no pre-existing video on screen.
+        // We don't know the actual physical aspect ratio of the
+        // display yet because these are determined in a platform
+        // specific means in the VideoOutput classes and these
+        // aren't initialized yet.
+
+        // When we add support for guessing the aspect ratio based on
+        // the channel being tuned this hack should be removed.
+
+        QWidget *widget = parentWidget;
+        float    aspect = video_aspect;
+        if (widget->height() > 0)
+        {
+            double a     = widget->width() / (double) widget->height();
+            double d43   = fabs(4.0  / 3.0 - a);
+            double d169  = fabs(16.0 / 9.0 - a);
+            aspect = (d43 > d169) ? (16.0f / 9.0f) : (4.0f / 3.0f);
+        }
+
+        // HACK HACK HACK HACK HACK HACK HACK HACK HACK -- end
+
+        SetVideoParams(720, 576, 25.00, 15, aspect);
     }
 
     SetDecoder(new DummyDecoder(this, m_playbackinfo));
