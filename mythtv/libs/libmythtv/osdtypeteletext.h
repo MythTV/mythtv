@@ -18,6 +18,7 @@ class TTFFont;
 class OSD;
 class OSDType;
 class OSDSurface;
+class OSDTypeTeletext;
 class TV;
 
 class TTColor
@@ -106,10 +107,24 @@ class TeletextMagazine
     int_to_page_t     pages;
 };
 
+class OSDUpdateLocker
+{
+  public:
+    OSDUpdateLocker(QMutex *lock, OSDTypeTeletext *parent);
+    ~OSDUpdateLocker(void);
+
+  private:
+    QMutex          *m_lock;
+    OSDTypeTeletext *m_parent;
+};
+
 class OSDTypeTeletext : public OSDType, public TeletextViewer
 {
     Q_OBJECT
+
     friend QColor color_tt2qt(int ttcolor);
+    friend class OSDUpdateLocker;
+
   public:
     OSDTypeTeletext(const QString &name, TTFFont *font,
                     QRect displayrect, float wmult, float hmult, OSD *osd);
@@ -209,6 +224,7 @@ class OSDTypeTeletext : public OSDType, public TeletextViewer
     uint8_t      m_header[40];
     mutable bool m_header_changed;
     mutable bool m_page_changed;
+    mutable bool m_osd_changed;
 
     TeletextMagazine m_magazines[8];
     unsigned char    m_bitswap[256];

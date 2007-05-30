@@ -68,7 +68,8 @@ OSDTypeTeletext::OSDTypeTeletext(const QString &name, TTFFont *font,
 
       m_transparent(false),             m_revealHidden(false),
       m_displaying(false),              m_osd(osd),
-      m_header_changed(false),          m_page_changed(false)
+      m_header_changed(false),          m_page_changed(false),
+      m_osd_changed(false)
 {
     m_unbiasedrect  = bias(m_displayrect, wmult, hmult);
 
@@ -89,7 +90,7 @@ OSDTypeTeletext::OSDTypeTeletext(const QString &name, TTFFont *font,
  */
 void OSDTypeTeletext::Reset(void)
 {
-    QMutexLocker locker(&m_lock);
+    OSDUpdateLocker locker(&m_lock, this);
 
     for (uint mag = 0; mag < 8; mag++)
     {
@@ -129,7 +130,7 @@ void OSDTypeTeletext::AddPageHeader(int page, int subpage,
                                     const unsigned char* buf,
                                     int vbimode, int lang, int flags)
 {
-    QMutexLocker locker(&m_lock);
+    OSDUpdateLocker locker(&m_lock, this);
 
     int magazine = MAGAZINE(page);
     if (magazine < 1 || magazine > 8)
@@ -207,7 +208,7 @@ void OSDTypeTeletext::AddPageHeader(int page, int subpage,
 void OSDTypeTeletext::AddTeletextData(int magazine, int row, 
                                       const unsigned char* buf, int vbimode)
 {
-    QMutexLocker locker(&m_lock);
+    OSDUpdateLocker locker(&m_lock, this);
 
     int b1, b2, b3, err;
 
@@ -322,7 +323,7 @@ void OSDTypeTeletext::PageUpdated(int page, int subpage)
         return;
 
     m_page_changed = true;
-    m_osd->UpdateTeletext();
+    m_osd_changed  = true;
 }
 
 /** \fn OSDTypeTeletext::HeaderUpdated(unsigned char*,int)
@@ -479,7 +480,7 @@ const TeletextSubPage *OSDTypeTeletext::FindSubPageInternal(
  */
 void OSDTypeTeletext::KeyPress(uint key)
 {
-    QMutexLocker locker(&m_lock);
+    OSDUpdateLocker locker(&m_lock, this);
 
     int newPage = m_curpage;
     int newSubPage = m_cursubpage;
@@ -665,7 +666,7 @@ void OSDTypeTeletext::KeyPress(uint key)
  */
 void OSDTypeTeletext::SetPage(int page, int subpage)
 {
-    QMutexLocker locker(&m_lock);
+    OSDUpdateLocker locker(&m_lock, this);
 
     if (page < 0x100 || page > 0x899)
         return;
@@ -1109,7 +1110,7 @@ void OSDTypeTeletext::DrawPage(OSDSurface *surface) const
 
 void OSDTypeTeletext::Reinit(float wmult, float hmult)
 {
-    QMutexLocker locker(&m_lock);
+    OSDUpdateLocker locker(&m_lock, this);
 
     m_displayrect = bias(m_unbiasedrect, wmult, hmult);
     m_tt_colspace = m_displayrect.width()  / kTeletextColumns;
@@ -1232,3 +1233,55 @@ void OSDTypeTeletext::DrawStatus(OSDSurface *surface) const
     }
 }
 
+/**
+ *  \class OSDUpdateLocker
+ *  \brief Helper class to the OSDTypeTeletext
+ *
+ *  This class is used to lock the m_lock semaphore when
+ *  there is a chance that the locked code will result in the
+ *  OSD::UpdateTeletext() function being called. It's purpose
+ *  is to lock the semaphore and once the locked code has
+ *  finished to check for a request to call OSD::UpdateTeletext().
+ *  If required, the m_lock is released and the required call made
+ *
+ *  This is to overcome the possible semaphore deadlock as follows:
+ *
+ * \code
+ *   - Teletext data arrives -> locks m_lock
+ *   - While the teletext data is being processed the XMV request an
+ *     OSD update display
+ *   - The OSD update display will lock the osdlock
+ *   - The OSD update can results in the Teletext:Draw method being
+ *     called and hence the OSD update is now waiting on m_lock being
+ *     released to continue it's drawing process
+ *   - If the processing of the teletext data result in the function
+ *     OSD::UpdateTeletext being called, this function will try to
+ *     get the osdlock.
+ *   - This results in the classic semaphore deadlock and hence all
+ *     OSD update cease.
+ * \endcode
+ */
+
+OSDUpdateLocker::OSDUpdateLocker(QMutex *lock, OSDTypeTeletext *parent) :
+    m_lock(lock), m_parent(parent)
+{
+    m_lock->lock();
+}
+
+OSDUpdateLocker::~OSDUpdateLocker(void)
+{
+    // see if the osd has to be requested a redraw
+    if (m_parent->m_osd_changed)
+    {
+        m_parent->m_osd_changed = false;
+        m_lock->unlock();
+
+        // now it is safe to do the OSD update
+        m_parent->m_osd->UpdateTeletext();
+    }
+    else
+    {
+        // normal exit. Will result in the m_lock being released.
+        m_lock->unlock();
+    }
+}
