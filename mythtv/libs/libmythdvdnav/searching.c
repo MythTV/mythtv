@@ -647,6 +647,9 @@ dvdnav_status_t dvdnav_get_position_in_title(dvdnav_t *this,
  * If you want 5 seconds ahead relative time = +10. 
  * If relative_time is negative, then 
  * look backwards within the cell.
+ * max seek interval is 60seconds.
+ * for some reason dvdnav seems to return an error when seeking
+ * above 60 seconds on some dvds.
  */
 dvdnav_status_t dvdnav_time_search_within_cell(dvdnav_t *this,
                     int relative_time)
@@ -685,7 +688,7 @@ dvdnav_status_t dvdnav_time_search_within_cell(dvdnav_t *this,
   {
     dsi = dvdnav_get_current_nav_dsi(this);
     if (length > 0) {
-      for (i = 0; i <= 19; i++) {
+      for (i = 1; i <= 19; i++) {
         if (stime[i]/2.0 <= length/2.0) {
           offset = dsi->vobu_sri.fwda[i];
           if (offset >> 31) {
@@ -703,7 +706,7 @@ dvdnav_status_t dvdnav_time_search_within_cell(dvdnav_t *this,
         }
       }
     } else {
-      for (i = 0; i <= 19; i++) {
+      for (i = 1; i <= 19; i++) {
         if (stime[18 - i]/2.0 >= abs(length)/2.0)
         {
           offset = dsi->vobu_sri.bwda[i];
