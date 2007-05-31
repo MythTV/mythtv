@@ -550,7 +550,8 @@ bool DecoderBase::DoFastForward(long long desiredFrame, bool discardFrames)
             .arg((discardFrames) ? "do" : "don't"));
 
     if (ringBuffer->isDVD() &&
-        ringBuffer->DVD()->TitleTimeLeft() < 5)
+        ringBuffer->DVD()->TitleTimeLeft() < 5 &&
+        !ringBuffer->InDVDMenuOrStillFrame())
     {
         return false;
     }
