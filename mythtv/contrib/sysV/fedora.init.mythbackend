@@ -1,80 +1,179 @@
 #!/bin/bash
 #
-# Startup script for mythbackend.  Originally written for the ATRPMS MythTV
-# Package.
+# Rename this file to:
 #
-# chkconfig: - 86 14
-# description: mythbackend.
+#    /etc/rc.d/init.d/mythbackend
+#
+###############################################################################
+#
+# chkconfig:   - 86 14
+# pidfile:     /var/run/mythbackend.pid
+# description: Starts the mythbackend process as a daemon after X and MySQL \
+#              have started, in runlevel 5. This allows scheduled recordings \
+#              to occur without manual intervention.
 # processname: mythbackend
-# pidfile: /var/run/mythbackend.pid
 # config:
+#
+###############################################################################
+#
+# Copyright (c) by the MythTV Development Team.
+#
+# Derived from work by:
+#
+#     Michael Thomson <linux at m-thomson dot net>
+#     Stu Tomlinson <stu at nosnilmot dot com>
+#     Axel Thimm <axel.thimm at atrpms dot net>
+#
+#  This program is free software; you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation; either version 2 of the License, or
+#  (at your option) any later version.
+#
+#  This program is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with this program; if not, write to the Free Software
+#  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+#
+###############################################################################
+
+# Default values to use if none are supplied in the config file.
+# User who should start the mythbackend processes
+    MBE_USER='root'
+
+# Name of mythbackend binary
+    MBE_PROG='mythbackend'
+
+# Full path to mythbackend log file
+    MBE_LOGFILE='/var/log/mythtv/mythbackend.log'
+
+# Startup options for mythbackend
+    MBE_OPTIONS=''
+
+# Pseudo-homedir for MythBackend
+    MYTHTV_HOME='/var/lib/mythtv'
+
+###############################################################################
+
+# Find the executable
+    if [ ! -z "$MBE_DIR" ]; then
+        MBE_BIN="$MBE_DIR/$MBE_PROG"
+    else
+        MBE_BIN=`which "$MBE_PROG"`
+        if [ ! -f "$MBE_BIN" ]; then
+            if [ -f "/usr/bin/$MBE_PROG" ]; then
+                MBE_BIN="/usr/bin/$MBE_PROG"
+            elif [ -f "/usr/local/bin/$MBE_PROG" ]; then
+                MBE_BIN="/usr/bin/$MBE_PROG"
+            fi
+        fi
+    fi
 
 # Source function library.
-. /etc/rc.d/init.d/functions
+    . /etc/init.d/functions
 
-if [ -f /etc/sysconfig/mythbackend ]; then
-        . /etc/sysconfig/mythbackend
-fi
-
-## Defaults, override them in /etc/sysconfig/mythbackend
-: ${MYTHTV_HOME=/var/lib/mythtv}
-
-prog=mythbackend
-RETVAL=0
-OPTIONS="$OPTIONS --daemon --logfile /var/log/mythtv/$prog.log --pidfile /var/run/$prog.pid"
-
-# Attempt to find non-packaged versions, too
-binary=`which "$prog"`
-if [ ! -f "$binary" ]; then
-    if [ -f "/usr/bin/$prog" ]; then
-        binary="/usr/bin/$prog"
-    elif [ -f "/usr/local/bin/$prog" ]; then
-        binary="/usr/bin/$prog"
+# Source config file if available
+    if [ -f "/etc/sysconfig/mythbackend" ]; then
+      . /etc/sysconfig/mythbackend
     fi
-fi
-if [ ! -f "$binary" ]; then
-    echo "Cannot find $prog binary"
-    exit 1
-fi
 
-start() {
-  echo -n $"Starting $prog: "
-  touch /var/run/mythbackend.pid; chown mythtv:mythtv /var/run/mythbackend.pid
-  # Does not work on Red Hat, do to to missing audio/video groups.
-#  cd $MYTHTV_HOME && daemon --user mythtv $binary $OPTIONS
-  cd $MYTHTV_HOME && daemon $binary $OPTIONS
-  RETVAL=$?
-  echo
-  [ $RETVAL = 0 ] && touch /var/lock/subsys/$prog
-  return $RETVAL
-}
-
-stop() {
-  echo -n $"Stopping $prog: "
-  killproc $binary
-  RETVAL=$?
-  echo
-  [ $RETVAL = 0 ] && rm -f /var/lock/subsys/$prog /var/run/$prog.pid
-}
-
-# See how we were called.
-case "$1" in
-  start)
-        start
-        ;;
-  stop)
-        stop
-        ;;
-  restart)
-        stop
-        start
-        ;;
-  status)
-        status $prog
-        ;;
-  *)
-        echo $"Usage: $prog {start|stop|status|restart}"
+# Error messages
+    if [ ! -f "$MBE_BIN" ]; then
+        echo "Cannot find $MBE_PROG executable"
         exit 1
+    elif [ ! -x "$MBE_USER" ]; then
+        echo "$MBE_PROG is not executable"
+        exit 1
+    fi
+
+# Initialize the return variable
+    RETVAL=0
+
+###############################################################################
+
+#
+# Start the process
+#
+    start() {
+    # Already running?
+        if [ -f "/var/lock/subsys/$MBE_PROG" ]; then
+            echo "$MBE_PROG is already running."
+            return 0
+        fi
+    # Start
+        echo -n $"Starting $MBE_PROG: "
+        touch "/var/run/$MBE_PROG.pid"
+        chown "$MBE_USER":"$MBE_USER" "/var/run/$MBE_PROG.pid"
+    # Other distros might add a --user option to daemon, but that doesn't seem
+    # to be available in Fedora.
+        cd $MYTHTV_HOME                           \
+            && daemon "$MBE_BIN"                  \
+               --daemon                           \
+               --logfile "$MBE_LOGFILE"           \
+               --pidfile "/var/run/$MBE_PROG.pid" \
+               $MBE_OPTIONS
+        RETVAL=$?
+        [ $RETVAL = 0 ] && touch /var/lock/subsys/$MBE_PROG
+        echo
+        return $RETVAL
+    }
+
+#
+# Stop the process
+#
+    stop() {
+        echo -n "Stopping $MBE_PROG: "
+        killproc "$MBE_PROG"
+        RETVAL=$?
+        [ $RETVAL -eq 0 ] && rm -f /var/lock/subsys/${MBE_PROG}
+        echo
+        return $RETVAL
+    }
+
+
+#
+# Restart
+#
+    restart() {
+        stop
+        start
+    }
+
+#
+# Mythbackend doesn't have a reload, so this should never get called
+#
+    reload() {
+        echo "Mythbackend does not support reload; please use restart"
+        exit 1
+    }
+
+###############################################################################
+
+case "$1" in
+start)
+	start
+	;;
+stop)
+	stop
+	;;
+restart)
+	restart
+	;;
+condrestart)
+	if [ -f "/var/lock/subsys/$MBE_PROG" ]; then
+	    restart
+	fi
+	;;
+status)
+	status "$MBE_BIN"
+        RETVAL=$?
+	;;
+*)
+	echo "Usage: $0 {start|stop|restart|condrestart|status}"
+	exit 1
 esac
 
 exit $RETVAL

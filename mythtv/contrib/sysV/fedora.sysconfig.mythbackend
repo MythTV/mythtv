@@ -1,9 +1,18 @@
-# /etc/sysconfig/mythbackend
-
-###########################################################################
+#!/bin/bash
 #
-# Copyright (c) by Michael Thomson <linux at m-thomson dot net>
-# With thanks to Stu Tomlinson <stu at nosnilmot dot com>
+# Rename this file to:
+#
+#    /etc/sysconfig/mythbackend
+#
+###############################################################################
+#
+# Copyright (c) by the MythTV Development Team.
+#
+# Derived from work by:
+#
+#     Michael Thomson <linux at m-thomson dot net>
+#     Stu Tomlinson <stu at nosnilmot dot com>
+#     Axel Thimm <axel.thimm at atrpms dot net>
 #
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -19,8 +28,8 @@
 #  along with this program; if not, write to the Free Software
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 #
-###########################################################################
-
+###############################################################################
+#
 # Config variables for the mythbackend startup script, which is usually
 # located in /etc/rc.d/init.d/mythbackend
 #
@@ -29,24 +38,37 @@
 #
 # Leave variables commented out to use default values in init script
 # (/etc/rc.d/init.d/mythbackend).
-# 
+#
 # To override defaults, uncomment the relevant variable definition and
 # edit as required.
+#
 
-# User who should start the mythbackend processes (Default: root)
-# MBE_USER="root"
+#
+# Name of mythbackend binary.
+#
+# MBE_PROG='mythbackend'
 
-# Directory holding the mythbackend binary (Default: /usr/local/bin/)
-# MBE_LOCATION="/usr/local/bin/"
+#
+# Directory holding the mythbackend binary (empty means autodetect).
+#
+# MBE_DIR=''
 
-# Name of mythbackend binary (Default: mythbackend)
-# MBE_PROG="mythbackend"
+#
+# Pseudo home directory for mythbackend.  This will help keep any extraneous
+# files created by the shell out of the root (/) directory.
+#
+# MYTHTV_HOME='/var/lib/mythtv'
 
-# Full path to mythbackend log file (Default: /var/tmp/mythbackend.log)
+#
+# Full path to mythbackend log file.
 #
 # NOTE: If you are running as non-root take care to ensure the myth user
 # has permission to write to this log file.
-# MBE_LOGFILE="/var/tmp/mythbackend.log"
+#
+# MBE_LOGFILE='/var/log/mythtv/mythbackend.log'
 
-# Startup options for mythbackend (see 'mythbackend --help' for a list)
-# MBE_OPTIONS=""
+#
+# Other startup options for mythbackend (see 'mythbackend --help' for a list).
+#
+# MBE_OPTIONS=''
+

@@ -2,8 +2,9 @@ This is a collection of files for various distributions.  They should all
 relate to automatic start/stop via the UNIX SysV daemon system (commonly
 known also as init.d).
 
-The "init" files should usually go into /etc/init.d/, but you should check 
-to make sure that is the correct path for your chosen distribution.
+The "init" files should usually go into /etc/init.d/ or /etc/rc.d/init.d/, but
+you should check to make sure that is the correct path for your chosen
+distribution.
 
 The "sysconfig" files should go into /etc/sysconfig/, with the same caveat.
 
