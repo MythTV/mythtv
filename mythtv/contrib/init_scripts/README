@@ -1,6 +1,6 @@
-This is a collection of files for various distributions.  They should all
-relate to automatic start/stop via the UNIX SysV daemon system (commonly
-known also as init.d).
+This is a collection of files for various distributions.  Most/all of these
+scripts are intended to work with the init.d (sometimes called SysV) or other
+similar systems used by the various distributions.
 
 The "init" files should usually go into /etc/init.d/ or /etc/rc.d/init.d/, but
 you should check to make sure that is the correct path for your chosen
