@@ -135,6 +135,7 @@ class MythThemedMenuState: public XMLParseBase
     bool buttoncenter;
 
     QMap<QString, MythImage *> titleIcons;
+    QMap<QString, MythImage *> m_loadedImages;
     QString titleText;
     QPoint titlePos;
 
@@ -300,6 +301,7 @@ void MythThemedMenuState::Reset(void)
         jt.data()->DownRef();
     }
     titleIcons.clear();
+    m_loadedImages.clear();
 
     normalAttributes = activeAttributes = TextAttributes();
     setDefaults();
@@ -765,16 +767,32 @@ void MythThemedMenuState::parseTitle(const QString &dir, QDomElement &element)
         {
             if (info.tagName() == "image")
             {
-                QString titlepath = dir + getFirstText(info);
-                QImage *tmppix = gContext->LoadScaleImage(titlepath);
 
-                if (!tmppix)
-                    continue;
+                QString titlepath = dir + getFirstText(info);
 
                 QString name = info.attribute("mode", "");
                 if (name != "")
                 {
-                    titleIcons[name] = MythImage::FromQImage(&tmppix);
+                    MythImage *icon;
+                    QImage *tmppix;
+
+                    if (m_loadedImages[titlepath])
+                    {
+                        icon = m_loadedImages[titlepath];
+                        icon->UpRef();
+                    }
+                    else
+                    {
+                        tmppix = gContext->LoadScaleImage(titlepath);
+
+                        if (!tmppix)
+                            continue;
+
+                        icon = MythImage::FromQImage(&tmppix);
+                        m_loadedImages.insert(titlepath, icon);
+                    }
+
+                    titleIcons[name] = icon;
                 }
                 else
                 {
@@ -883,9 +901,10 @@ void MythThemedMenuState::parseButton(const QString &dir, QDomElement &element)
     bool hasicon = false;
 
     QString name = "";
-    QImage *image = NULL;
-    QImage *activeimage = NULL;
-    QImage *watermark = NULL;
+    QImage *tmpimg = NULL;
+    MythImage *image = NULL;
+    MythImage *activeimage = NULL;
+    MythImage *watermark = NULL;
     QPoint offset;
 
     name = element.attribute("name", "");
@@ -894,21 +913,44 @@ void MythThemedMenuState::parseButton(const QString &dir, QDomElement &element)
 
     for (QDomNode child = element.firstChild(); !child.isNull();
          child = child.nextSibling())
-    {    
+    {
         QDomElement info = child.toElement();
         if (!info.isNull())
         {
             if (info.tagName() == "image")
             {
-                QString imagepath = dir + getFirstText(info); 
-                image = gContext->LoadScaleImage(imagepath);
+                QString imagepath = dir + getFirstText(info);
+
+                if (m_loadedImages[imagepath])
+                {
+                    image = m_loadedImages[imagepath];
+                    image->UpRef();
+                }
+                else
+                {
+                    tmpimg = gContext->LoadScaleImage(imagepath);
+                    image = MythImage::FromQImage(&tmpimg);
+                    m_loadedImages.insert(imagepath, image);
+                }
+
                 if (image)
                     hasicon = true;
             }
             else if (info.tagName() == "activeimage")
             {
                 QString imagepath = dir + getFirstText(info);
-                activeimage = gContext->LoadScaleImage(imagepath);
+
+                if (m_loadedImages[imagepath])
+                {
+                    activeimage = m_loadedImages[imagepath];
+                    activeimage->UpRef();
+                }
+                else
+                {
+                    tmpimg = gContext->LoadScaleImage(imagepath);
+                    activeimage = MythImage::FromQImage(&tmpimg);
+                    m_loadedImages.insert(imagepath, activeimage);
+                }
             }
             else if (info.tagName() == "offset")
             {
@@ -918,8 +960,19 @@ void MythThemedMenuState::parseButton(const QString &dir, QDomElement &element)
             else if (info.tagName() == "watermarkimage")
             {
                 QString imagepath = dir + getFirstText(info);
-                watermark = gContext->LoadScaleImage(imagepath);
-            }    
+
+                if (m_loadedImages[imagepath])
+                {
+                    watermark = m_loadedImages[imagepath];
+                    watermark->UpRef();
+                }
+                else
+                {
+                    tmpimg = gContext->LoadScaleImage(imagepath);
+                    watermark = MythImage::FromQImage(&tmpimg);
+                    m_loadedImages.insert(imagepath, watermark);
+                }
+            }
             else
             {
                 VERBOSE(VB_GENERAL, QString("MythThemedMenuPrivate: Unknown tag %1 "
@@ -952,9 +1005,9 @@ void MythThemedMenuState::parseButton(const QString &dir, QDomElement &element)
     ButtonIcon newbutton;
 
     newbutton.name = name;
-    newbutton.icon = MythImage::FromQImage(&image);
+    newbutton.icon = image;
     newbutton.offset = offset;
-    newbutton.activeicon = MythImage::FromQImage(&activeimage);
+    newbutton.activeicon = activeimage;
 
     if (watermark)
     {
@@ -965,9 +1018,12 @@ void MythThemedMenuState::parseButton(const QString &dir, QDomElement &element)
             watermarkRect.setHeight(watermark->height());
     }
 
-    newbutton.watermark = MythImage::FromQImage(&watermark);
+    newbutton.watermark = watermark;
 
     allButtonIcons[name] = newbutton;
+
+    if (tmpimg)
+        delete tmpimg;
 }
 
 void MythThemedMenuState::setDefaults(void)
