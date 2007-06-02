@@ -239,6 +239,7 @@ int main(int argc, char *argv[])
     mainWindow->Show();
     gContext->SetMainWindow(mainWindow);
 
+    gContext->UpdateImageCache();
     MythThemeBase *themeBase = new MythThemeBase();
     (void) themeBase;
 
