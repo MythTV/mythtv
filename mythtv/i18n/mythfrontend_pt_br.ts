@@ -3019,7 +3019,7 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
         <translation type="unfinished">este episódio é reprise.</translation>
     </message>
     <message>
-        <source>this recording schedule is inactive.</source>
+        <source>this recording rule is inactive.</source>
         <translation type="unfinished">esta agenda de gravação está inativa.</translation>
     </message>
     <message>
@@ -3743,11 +3743,11 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
         <translation type="unfinished">Não permitir auto expiração</translation>
     </message>
     <message>
-        <source>This recording schedule is inactive</source>
+        <source>This recording rule is inactive</source>
         <translation type="unfinished">Este agendamento de gravaçaõ está inativo</translation>
     </message>
     <message>
-        <source>This recording schedule is active</source>
+        <source>This recording rule is active</source>
         <translation type="unfinished">Este agendamento de gravação está ativo</translation>
     </message>
     <message>

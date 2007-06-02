@@ -5201,15 +5201,15 @@ som du startade detta programmet ifrån.</translation>
         <translation>Inaktiv</translation>
     </message>
     <message>
-        <source>this recording schedule is inactive.</source>
+        <source>this recording rule is inactive.</source>
         <translation>detta inspelningsschema är inaktivt.</translation>
     </message>
     <message>
-        <source>This recording schedule is inactive</source>
+        <source>This recording rule is inactive</source>
         <translation>Detta inspelningsschema är inaktivt</translation>
     </message>
     <message>
-        <source>This recording schedule is active</source>
+        <source>This recording rule is active</source>
         <translation>Detta inspelningsschema är aktivt</translation>
     </message>
     <message>

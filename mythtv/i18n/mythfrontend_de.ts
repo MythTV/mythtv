@@ -5611,7 +5611,7 @@ Ihr XMLTV Grabber liefert keine Kanalnummern, Sie müssen sie deshalb manuell ei
         <translation>Inaktiv</translation>
     </message>
     <message>
-        <source>this recording schedule is inactive.</source>
+        <source>this recording rule is inactive.</source>
         <translation>diese Aufnahme inaktiv ist.</translation>
     </message>
     <message>
@@ -5643,11 +5643,11 @@ Ihr XMLTV Grabber liefert keine Kanalnummern, Sie müssen sie deshalb manuell ei
         <translation type="obsolete">Scannen</translation>
     </message>
     <message>
-        <source>This recording schedule is inactive</source>
+        <source>This recording rule is inactive</source>
         <translation>Diese Aufnahme ist inaktiv</translation>
     </message>
     <message>
-        <source>This recording schedule is active</source>
+        <source>This recording rule is active</source>
         <translation>Diese Aufnahme ist aktiv</translation>
     </message>
     <message>

@@ -5574,7 +5574,7 @@ Your grabber does not provide channel numbers, so you have to set them manually.
         <translation>無効</translation>
     </message>
     <message>
-        <source>this recording schedule is inactive.</source>
+        <source>this recording rule is inactive.</source>
         <translation>この予約を停止する。</translation>
     </message>
     <message>
@@ -5618,11 +5618,11 @@ Your grabber does not provide channel numbers, so you have to set them manually.
         <translation>このタイトルの番組を毎日一回録画する</translation>
     </message>
     <message>
-        <source>This recording schedule is inactive</source>
+        <source>This recording rule is inactive</source>
         <translation>この予約を停止する</translation>
     </message>
     <message>
-        <source>This recording schedule is active</source>
+        <source>This recording rule is active</source>
         <translation>この予約を有効にする</translation>
     </message>
     <message>

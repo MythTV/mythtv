@@ -5690,7 +5690,7 @@ Votre carte d&apos;acquisition n&apos;a pas fourni de canaux. Vous devez les sai
         <translation>Inactif</translation>
     </message>
     <message>
-        <source>this recording schedule is inactive.</source>
+        <source>this recording rule is inactive.</source>
         <translation>Cette programmation d&apos;enregistrement est inactive</translation>
     </message>
     <message>
@@ -5734,11 +5734,11 @@ Votre carte d&apos;acquisition n&apos;a pas fourni de canaux. Vous devez les sai
         <translation>Enregistrer une diffusion de cette émission chaque jour</translation>
     </message>
     <message>
-        <source>This recording schedule is inactive</source>
+        <source>This recording rule is inactive</source>
         <translation>Cette programmation d&apos;enregistrement est inactive</translation>
     </message>
     <message>
-        <source>This recording schedule is active</source>
+        <source>This recording rule is active</source>
         <translation>Cette programmation d&apos;enregistrement est active</translation>
     </message>
     <message>

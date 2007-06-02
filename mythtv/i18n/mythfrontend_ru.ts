@@ -3074,7 +3074,7 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
         <translation>эта серия повторяется.</translation>
     </message>
     <message>
-        <source>this recording schedule is inactive.</source>
+        <source>this recording rule is inactive.</source>
         <translation>это расписание неактивно.</translation>
     </message>
     <message>
@@ -3903,11 +3903,11 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
         <translation>Не разрешать автоустаревание</translation>
     </message>
     <message>
-        <source>This recording schedule is inactive</source>
+        <source>This recording rule is inactive</source>
         <translation>Это расписание записи не активно</translation>
     </message>
     <message>
-        <source>This recording schedule is active</source>
+        <source>This recording rule is active</source>
         <translation>Это расписание записи активно</translation>
     </message>
     <message>

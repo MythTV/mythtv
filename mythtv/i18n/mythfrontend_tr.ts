@@ -3217,7 +3217,7 @@ Returning to the previous menu.</source>
         <translation>bu bölüm bir tekrar.</translation>
     </message>
     <message>
-        <source>this recording schedule is inactive.</source>
+        <source>this recording rule is inactive.</source>
         <translation>bu kayıt çizelgesi etkin değil.</translation>
     </message>
     <message>
@@ -4049,11 +4049,11 @@ Returning to the previous menu.</source>
         <translation>Otomatik zamanaşımına izin verme</translation>
     </message>
     <message>
-        <source>This recording schedule is inactive</source>
+        <source>This recording rule is inactive</source>
         <translation>Bu kayıt çizelgesi etkin değil</translation>
     </message>
     <message>
-        <source>This recording schedule is active</source>
+        <source>This recording rule is active</source>
         <translation>Bu kayıt çizelgesi etkin</translation>
     </message>
     <message>

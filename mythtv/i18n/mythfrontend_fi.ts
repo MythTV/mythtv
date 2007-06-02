@@ -5591,7 +5591,7 @@ Käyttämäsi ohjelmahaku ei tue kanavanumeroita, joten ne on asetettava manuaal
         <translation>Toimeton</translation>
     </message>
     <message>
-        <source>this recording schedule is inactive.</source>
+        <source>this recording rule is inactive.</source>
         <translation>tämä ohjelmoitu nauhoitus on toimeton.</translation>
     </message>
     <message>
@@ -5635,11 +5635,11 @@ Käyttämäsi ohjelmahaku ei tue kanavanumeroita, joten ne on asetettava manuaal
         <translation>Nauhoita vain yksi jakso ohjelmasta joka päivä</translation>
     </message>
     <message>
-        <source>This recording schedule is inactive</source>
+        <source>This recording rule is inactive</source>
         <translation>Tämä ohjelmoitu nauhoitus on toimeton</translation>
     </message>
     <message>
-        <source>This recording schedule is active</source>
+        <source>This recording rule is active</source>
         <translation>Tämä ohjelmoitu nauhoitus on aktiivinen</translation>
     </message>
     <message>

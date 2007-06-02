@@ -5483,7 +5483,7 @@ Dagskrárupplýsingaveitan veitir þér ekki stöðvanúmer þannig að þú ver
         <translation>Óvirkt</translation>
     </message>
     <message>
-        <source>this recording schedule is inactive.</source>
+        <source>this recording rule is inactive.</source>
         <translation>þessi upptökuáætlun er óvirk.</translation>
     </message>
     <message>
@@ -5527,11 +5527,11 @@ Dagskrárupplýsingaveitan veitir þér ekki stöðvanúmer þannig að þú ver
         <translation>Taka upp eina útsendingu með þessum titli daglega</translation>
     </message>
     <message>
-        <source>This recording schedule is inactive</source>
+        <source>This recording rule is inactive</source>
         <translation>Þessu upptökuáætlun er óvirk</translation>
     </message>
     <message>
-        <source>This recording schedule is active</source>
+        <source>This recording rule is active</source>
         <translation>Þessi upptökuáætlun er virk</translation>
     </message>
     <message>

@@ -5522,7 +5522,7 @@ Your grabber does not provide channel numbers, so you have to set them manually.
         <translation>Neaktivno</translation>
     </message>
     <message>
-        <source>this recording schedule is inactive.</source>
+        <source>this recording rule is inactive.</source>
         <translation>ta plan snemanja je neaktiven.</translation>
     </message>
     <message>
@@ -5566,11 +5566,11 @@ Your grabber does not provide channel numbers, so you have to set them manually.
         <translation>Snemaj eno oddajo tega naslova vsak dan</translation>
     </message>
     <message>
-        <source>This recording schedule is inactive</source>
+        <source>This recording rule is inactive</source>
         <translation>Ta plan snemanja je neaktiven</translation>
     </message>
     <message>
-        <source>This recording schedule is active</source>
+        <source>This recording rule is active</source>
         <translation>Ta plan snemanja je aktiven</translation>
     </message>
     <message>

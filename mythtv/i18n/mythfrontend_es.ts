@@ -5639,7 +5639,7 @@ Su grabber no proporciona números de canal, así que debe establecerlos manualm
         <translation>Inactivo</translation>
     </message>
     <message>
-        <source>this recording schedule is inactive.</source>
+        <source>this recording rule is inactive.</source>
         <translation>esta programación está inactiva.</translation>
     </message>
     <message>
@@ -5683,11 +5683,11 @@ Su grabber no proporciona números de canal, así que debe establecerlos manualm
         <translation>Grabar un programa con este título diariamente</translation>
     </message>
     <message>
-        <source>This recording schedule is inactive</source>
+        <source>This recording rule is inactive</source>
         <translation>Esta programación está inactiva</translation>
     </message>
     <message>
-        <source>This recording schedule is active</source>
+        <source>This recording rule is active</source>
         <translation>Esta programación está activa</translation>
     </message>
     <message>

@@ -2848,7 +2848,7 @@ Mesteparten av kortene kan oppdage dette automatisk, så sett dette til automati
         <translation>denne episoden er en reprise.</translation>
     </message>
     <message>
-        <source>this recording schedule is inactive.</source>
+        <source>this recording rule is inactive.</source>
         <translation>denne opptaksplanen er inaktiv.</translation>
     </message>
     <message>
@@ -3499,11 +3499,11 @@ Mesteparten av kortene kan oppdage dette automatisk, så sett dette til automati
         <translation>Ikke tillat automatisk utløping</translation>
     </message>
     <message>
-        <source>This recording schedule is inactive</source>
+        <source>This recording rule is inactive</source>
         <translation>Denne opptaksplanen er inaktiv</translation>
     </message>
     <message>
-        <source>This recording schedule is active</source>
+        <source>This recording rule is active</source>
         <translation>Denne opptaksplanen er aktiv</translation>
     </message>
     <message>

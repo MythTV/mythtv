@@ -5376,7 +5376,7 @@ Werkt mogelijk alleen wanneer uitgevoerd in een venster.</translation>
         <translation>Niet actief</translation>
     </message>
     <message>
-        <source>this recording schedule is inactive.</source>
+        <source>this recording rule is inactive.</source>
         <translation>dit opnameschema in niet actief.</translation>
     </message>
     <message>
@@ -5416,11 +5416,11 @@ Werkt mogelijk alleen wanneer uitgevoerd in een venster.</translation>
         <translation>Elke dag één aflevering van dit programma opnemen</translation>
     </message>
     <message>
-        <source>This recording schedule is inactive</source>
+        <source>This recording rule is inactive</source>
         <translation>Dit opnameschema is niet actief</translation>
     </message>
     <message>
-        <source>This recording schedule is active</source>
+        <source>This recording rule is active</source>
         <translation>Dit opnameschema is actief</translation>
     </message>
     <message>

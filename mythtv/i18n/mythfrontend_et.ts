@@ -3543,7 +3543,7 @@ Sinu tõmbaja ei sisalda kanalite numbreid, pead need käsitsi panema.</translat
         <translation>see episood on kordus.</translation>
     </message>
     <message>
-        <source>this recording schedule is inactive.</source>
+        <source>this recording rule is inactive.</source>
         <translation>see salvestuskava on mitteaktiivne.</translation>
     </message>
     <message>
@@ -6169,11 +6169,11 @@ Sinu tõmbaja ei sisalda kanalite numbreid, pead need käsitsi panema.</translat
         <translation>Ära luba automaatset aegumist</translation>
     </message>
     <message>
-        <source>This recording schedule is inactive</source>
+        <source>This recording rule is inactive</source>
         <translation>See salvestuskava on mitteaktiivne</translation>
     </message>
     <message>
-        <source>This recording schedule is active</source>
+        <source>This recording rule is active</source>
         <translation>See salvestuskava on aktiivne</translation>
     </message>
     <message>

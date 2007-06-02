@@ -3027,7 +3027,7 @@ Většina karet to dokáže automaticky detekovat, takže to nechte na Automatic
         <translation>tento díl je opakování.</translation>
     </message>
     <message>
-        <source>this recording schedule is inactive.</source>
+        <source>this recording rule is inactive.</source>
         <translation>toto plánované nahrávání není aktivní.</translation>
     </message>
     <message>
@@ -3681,11 +3681,11 @@ Většina karet to dokáže automaticky detekovat, takže to nechte na Automatic
         <translation>Nepovol automatické vypršení</translation>
     </message>
     <message>
-        <source>This recording schedule is inactive</source>
+        <source>This recording rule is inactive</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>This recording schedule is active</source>
+        <source>This recording rule is active</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
