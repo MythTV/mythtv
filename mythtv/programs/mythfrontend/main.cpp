@@ -1130,6 +1130,7 @@ int main(int argc, char **argv)
     MythMainWindow *mainWindow = GetMythMainWindow();
     gContext->SetMainWindow(mainWindow);
 
+    gContext->UpdateImageCache();
     themeBase = new MythThemeBase();
 
     LanguageSettings::prompt();
@@ -1142,8 +1143,6 @@ int main(int argc, char **argv)
 
     MythPluginManager *pmanager = new MythPluginManager();
     gContext->SetPluginManager(pmanager);
-
-    gContext->UpdateImageCache();
 
     if (gContext->GetNumSetting("EnableXbox") == 1)
     {
