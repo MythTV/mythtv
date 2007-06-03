@@ -67,7 +67,7 @@
             if [ -f "/usr/bin/$MBE_PROG" ]; then
                 MBE_BIN="/usr/bin/$MBE_PROG"
             elif [ -f "/usr/local/bin/$MBE_PROG" ]; then
-                MBE_BIN="/usr/bin/$MBE_PROG"
+                MBE_BIN="/usr/local/bin/$MBE_PROG"
             fi
         fi
     fi
