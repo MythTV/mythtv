@@ -198,6 +198,7 @@ class MPUBLIC TV : public QObject
     void KeyRepeatOK(void);
     void BrowseEndTimer(void) { BrowseEnd(false); }
     void SleepEndTimer(void);
+    void IdleDialog(void);
     void TreeMenuEntered(OSDListTreeType *tree, OSDGenericTree *item);
     void TreeMenuSelected(OSDListTreeType *tree, OSDGenericTree *item);
 
@@ -457,6 +458,7 @@ class MPUBLIC TV : public QObject
     vector<SleepTimerInfo> sleep_times;
     uint    sleep_index; ///< Index into sleep_times.
     QTimer *sleepTimer;  ///< Timer for turning off playback.
+    QTimer *idleTimer; ///< Timer for turning off playback after idle period.
 
     /// Queue of unprocessed key presses.
     QPtrList<QKeyEvent> keyList;

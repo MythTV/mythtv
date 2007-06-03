@@ -492,6 +492,8 @@ TV::TV(void)
       chanEditMapLock(true), ddMapSourceId(0), ddMapLoaderRunning(false),
       // Sleep Timer
       sleep_index(0), sleepTimer(new QTimer(this)),
+      // Idle Timer
+      idleTimer(new QTimer(this)),
       // Key processing buffer, lock, and state
       keyRepeat(true), keyrepeatTimer(new QTimer(this)),
       // Fast forward state
@@ -561,6 +563,7 @@ TV::TV(void)
     connect(muteTimer,        SIGNAL(timeout()), SLOT(UnMute()));
     connect(keyrepeatTimer,   SIGNAL(timeout()), SLOT(KeyRepeatOK()));
     connect(sleepTimer,       SIGNAL(timeout()), SLOT(SleepEndTimer()));
+    connect(idleTimer,       SIGNAL(timeout()), SLOT(IdleDialog()));
 }
 
 /** \fn TV::Init(bool)
@@ -803,6 +806,15 @@ int TV::LiveTV(bool showDialogs, bool startInGuide)
         switchToRec = NULL;
 
         GetPlayGroupSettings("Default");
+
+        // Start Idle Timer
+        int idletimeout = gContext->GetNumSetting("LiveTVIdleTimeout", 0);
+        if (idletimeout > 0)
+        {
+            idleTimer->start(idletimeout * 60 * 1000, TRUE);
+            VERBOSE(VB_GENERAL, QString("Using Idle Timer. %1 minutes")
+                                  .arg(idletimeout));
+        }
 
         if (startInGuide || gContext->GetNumSetting("WatchTVGuide", 0))
         {
@@ -2162,6 +2174,11 @@ void TV::ProcessKeypress(QKeyEvent *e)
     VERBOSE(VB_IMPORTANT, LOC + "ProcessKeypress() ignoreKeys: "<<ignoreKeys);
 #endif // DEBUG_ACTIONS
 
+    if (!GetOSD()->DialogShowing("idletimeout") && StateIsLiveTV(GetState())
+            && idleTimer->isActive())
+        idleTimer->changeInterval(gContext->GetNumSetting("LiveTVIdleTimeout",
+                                                          0) * 60 * 1000);
+
     bool was_doing_ff_rew = false;
     bool redisplayBrowseInfo = false;
     QStringList actions;
@@ -2492,6 +2509,15 @@ void TV::ProcessKeypress(QKeyEvent *e)
                         StopLiveTV();
                     else if (result == 3)
                         recorder->CancelNextRecording(true);
+                }
+                else if (dialogname == "idletimeout")
+                {
+                    int result = GetOSD()->GetDialogResponse(dialogname);
+
+                    if (result == 1)
+                        idleTimer->changeInterval(
+                                   gContext->GetNumSetting("LiveTVIdleTimeout",
+                                                           0) * 60 * 1000);
                 }
                 else if (dialogname == "channel_timed_out")
                 {
@@ -5432,6 +5458,51 @@ void TV::SleepEndTimer(void)
 {
     exitPlayer = true;
     wantsToQuit = true;
+}
+
+/*!
+ *  \brief After idleTimer has expired, display a dialogue warning the user
+ *         that we will exit LiveTV unless they take action.
+ *         We change idleTimer, to 45 seconds and when it expires for a second
+ *         time we quit the player.
+ *         If the user so decides, they may hit ok and we reset the timer
+ *         back to the default expiry period.
+ */
+void TV::IdleDialog(void)
+{
+    if (!StateIsLiveTV(GetState()))
+       return;
+
+    // Display dialogue for X seconds before exiting livetv
+    int timeuntil = 45;
+
+    if (GetOSD()->DialogShowing("idletimeout"))
+    {
+        VERBOSE(VB_GENERAL, "Idle timeout reached, leaving LiveTV");
+        exitPlayer = true;
+        wantsToQuit = true;
+        return;
+    }
+
+    QString message = QObject::tr("Mythtv has been idle for %1 minutes and "
+        "will exit in %2 seconds. Are you still watching?")
+        .arg(gContext->GetNumSetting("LiveTVIdleTimeout", 0))
+        .arg("%d");
+
+    while (!GetOSD())
+    {
+        qApp->unlock();
+        qApp->processEvents();
+        usleep(1000);
+        qApp->lock();
+    }
+
+    QStringList options;
+    options += tr("Yes");
+
+    dialogname = "idletimeout";
+    GetOSD()->NewDialogBox(dialogname, message, options, timeuntil, 0);
+    idleTimer->changeInterval(timeuntil * 1000);
 }
 
 void TV::ToggleLetterbox(int letterboxMode)
