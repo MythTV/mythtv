@@ -9,6 +9,7 @@
 #include "mythscreentype.h"
 #include "mythuiimage.h"
 #include "mythuitext.h"
+#include "mythuiclock.h"
 #include "mythlistbutton.h"
 
 QString XMLParseBase::getFirstText(QDomElement &element)
@@ -143,7 +144,8 @@ MythUIType *XMLParseBase::ParseChildren(QDomElement &element,
                      type == "textarea" ||
                      type == "buttonlist" ||
                      type == "horizontalbuttonlist" ||
-                     type == "statetype")
+                     type == "statetype" ||
+                     type == "clock")
             {
                 ret = ParseUIType(info, type, parent);
             }
@@ -215,6 +217,8 @@ MythUIType *XMLParseBase::ParseUIType(QDomElement &element, const QString &type,
         uitype = new MythUIStateType(parent, name);
     else if (type == "window" && parent == GetGlobalObjectStore())
         uitype = new MythScreenType(parent, name);
+    else if (type == "clock")
+        uitype = new MythUIClock(parent, name);
     else
     {
         VERBOSE(VB_IMPORTANT, QString("Unknown widget type: %1").arg(type));
@@ -260,7 +264,8 @@ MythUIType *XMLParseBase::ParseUIType(QDomElement &element, const QString &type,
                      info.tagName() == "textarea" || 
                      info.tagName() == "buttonlist" ||
                      info.tagName() == "horizontalbuttonlist" ||
-                     info.tagName() == "statetype")
+                     info.tagName() == "statetype" ||
+                     info.tagName() == "clock")
             {
                 ParseUIType(info, info.tagName(), uitype, screen);
             }
@@ -361,7 +366,8 @@ bool XMLParseBase::doLoad(const QString &windowname,
                          type == "buttonlist" ||
                          type == "horizontalbuttonlist" ||
                          type == "statetype" ||
-                         type == "window")
+                         type == "window" ||
+                         type == "clock")
                 {
                     ParseUIType(e, type, parent);
                 }
