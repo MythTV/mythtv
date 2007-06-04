@@ -74,6 +74,7 @@ class AudioReencodeBuffer : public AudioOutput
     virtual void Reset(void)
     {
         audiobuffer_len = 0;
+        ab_count = 0;
     }
 
     // timecode is in milliseconds.
