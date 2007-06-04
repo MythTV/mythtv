@@ -57,13 +57,8 @@ AutoExpire::AutoExpire(QMap<int, EncoderLink *> *tvList)
 
     Init();
 
-    pthread_attr_t attr;
-    pthread_attr_init(&attr);
-    pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE);
-
-    pthread_create(&expire_thread, &attr, ExpirerThread, this);
+    pthread_create(&expire_thread, NULL, ExpirerThread, this);
     gContext->addListener(this);
-
 }
 
 /** \fn AutoExpire::AutoExpire()
@@ -92,8 +87,11 @@ void AutoExpire::Init(void)
  */
 AutoExpire::~AutoExpire()
 {
+    instance_lock.lock();
     while (update_pending)
-        usleep(500);
+        instance_cond.wait(&instance_lock);
+    instance_lock.unlock();
+
     if (expire_thread_running)
     {
         gContext->removeListener(this);
@@ -920,6 +918,7 @@ void *SpawnUpdateThread(void *autoExpireInstance)
     ae->CalcParams();
     ae->instance_lock.lock();
     ae->update_pending = false;
+    ae->instance_cond.wakeAll();
     ae->instance_lock.unlock();
     return NULL;
 }
@@ -941,13 +940,8 @@ void AutoExpire::Update(bool immediately)
     // make sure there is only one update pending
     expirer->instance_lock.lock();
     while (expirer->update_pending)
-    {
-        expirer->instance_lock.unlock();
-        usleep(500);
-        expirer->instance_lock.lock();
-    }
+        expirer->instance_cond.wait(&expirer->instance_lock);
     expirer->update_pending = true;
-        
     expirer->instance_lock.unlock();
 
     // do it..
@@ -956,6 +950,7 @@ void AutoExpire::Update(bool immediately)
         expirer->CalcParams();
         expirer->instance_lock.lock();
         expirer->update_pending = false;
+        expirer->instance_cond.wakeAll();
         expirer->instance_lock.unlock();
     }
     else

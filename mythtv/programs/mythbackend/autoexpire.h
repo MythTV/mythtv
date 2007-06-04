@@ -76,11 +76,13 @@ class AutoExpire : public QObject
     // main expire info
     set<QString>  dont_expire_set;
     pthread_t     expire_thread;
-    QMutex        instance_lock;
     size_t        desired_space;
     uint          desired_freq;
     size_t        max_record_rate; // bytes/sec
     bool          expire_thread_running;
+
+    QMutex         instance_lock;
+    QWaitCondition instance_cond;
 
     // update info
     bool          update_pending;
