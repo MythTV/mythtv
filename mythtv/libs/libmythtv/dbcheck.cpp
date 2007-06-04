@@ -3104,7 +3104,8 @@ thequery,
 "    comment                 VARCHAR(255)      NOT NULL DEFAULT '',"
 "    PRIMARY KEY (chanid, starttime),"
 "    INDEX       (basename)"
-");"
+");",
+""
 };
         if (!performActualUpdate(updates, "1191", dbver))
             return false;
