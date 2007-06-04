@@ -1,7 +1,7 @@
 Table schema
 ============
 
-MythDVD uses two tables to determine what sort of transcoding the user can
+MythVideo uses two tables to determine what sort of transcoding the user can
 perform. These tables are:
 
     dvdinput
@@ -24,7 +24,7 @@ restricts which options to present to a user, as it is the input format
 for the title (i.e. the single integer identifier from the dvdinput
 table).
 
-If this seems unclear, look in ./mythdvd/dbcheck.cpp, and look at each
+If this seems unclear, look in ./mythvideo/dbcheck.cpp, and look at each
 of the SQL statements that begin "INSERT INTO dvdinput ... " (a row for
 each known title/track format) and "INSERT INTO dvdtranscode ... " (a
 row for each set of transcode options, given an input format).
