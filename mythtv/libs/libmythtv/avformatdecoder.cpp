@@ -2035,6 +2035,7 @@ void AvFormatDecoder::MpegPreProcessPkt(AVStream *stream, AVPacket *pkt)
         if (ringBuffer->isDVD() && pkt->size == 4 &&
             start_code_state == SEQ_END_CODE && !dvdvideopause)
         {
+            ringBuffer->DVD()->InStillFrame(true);
             dvdvideopause = true;
             d->ResetMPEG2();
             return;
@@ -2931,7 +2932,11 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
             }
 
             if (len == 4 && dvdvideopause)
+            {
                 dvdvideopause = false;
+                av_free_packet(pkt);
+                continue;
+            }
 
             if (framesRead == 0 && !justAfterChange &&
                 !(pkt->flags & PKT_FLAG_KEY))
@@ -3154,6 +3159,13 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
                         ptr += pkt->size;
                         len -= pkt->size;
                         continue;
+                    }
+                    
+                    if (ringBuffer->isDVD() && 
+                        ringBuffer->DVD()->InStillFrame() && 
+                        !dvdvideopause)
+                    {
+                        ringBuffer->DVD()->InStillFrame(false);
                     }
 
                     if (firstloop && pts != (int64_t) AV_NOPTS_VALUE)

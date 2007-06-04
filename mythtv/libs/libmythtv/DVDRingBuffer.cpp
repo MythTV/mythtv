@@ -278,10 +278,7 @@ int DVDRingBufferPriv::safe_read(void *data, unsigned sz)
                 {
                     if (dvdnav_get_next_still_flag(dvdnav) < 0xff)
                         stillFrameTimer.restart();
-                    cellHasStillFrame = true;
                 }
-                else
-                    cellHasStillFrame = false;
 
                 part = 0;
                 titleParts = 0;
@@ -590,7 +587,6 @@ uint DVDRingBufferPriv::GetCellStart(void)
 void DVDRingBufferPriv::SkipStillFrame(void)
 {
     dvdnav_still_skip(dvdnav);
-    cellHasStillFrame = false;
 }
 
 void DVDRingBufferPriv::WaitSkip(void)
