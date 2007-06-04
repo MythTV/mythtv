@@ -73,13 +73,13 @@ JoystickMenuClient::~JoystickMenuClient()
 
     if (axes)
     {
-        free(axes);
-        buttons = NULL;
+        delete [] axes;
+        axes = NULL;
     }
 
     if (buttons)
     {
-        free(buttons);
+        delete [] buttons;
         buttons = NULL;
     }
 }
