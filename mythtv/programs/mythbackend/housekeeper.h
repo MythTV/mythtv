@@ -34,6 +34,7 @@ class HouseKeeper
     void runFillDatabase();
     void CleanupMyOldRecordings(void);
     void CleanupAllOldInUsePrograms(void);
+    void CleanupOrphanedLivetvChains(void);
     void CleanupRecordedTables(void);
     void CleanupProgramListings(void);
     void RunStartupTasks(void);

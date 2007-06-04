@@ -243,6 +243,7 @@ void HouseKeeper::RunHouseKeeping(void)
             if (wantToRun("DailyCleanup", 1, 0, 24)) {
                 JobQueue::CleanupOldJobsInQueue();
                 CleanupAllOldInUsePrograms();
+                CleanupOrphanedLivetvChains();
                 CleanupRecordedTables();
                 CleanupProgramListings();
                 updateLastrun("DailyCleanup");
@@ -371,6 +372,42 @@ void HouseKeeper::CleanupAllOldInUsePrograms(void)
                   "WHERE lastupdatetime < :FOURHOURSAGO ;");
     query.bindValue(":FOURHOURSAGO", fourHoursAgo);
     query.exec();
+}
+
+void HouseKeeper::CleanupOrphanedLivetvChains(void)
+{
+    QDateTime fourHoursAgo = QDateTime::currentDateTime().addSecs(-4 * 60 * 60);
+    MSqlQuery query(MSqlQuery::InitCon());
+    MSqlQuery deleteQuery(MSqlQuery::InitCon());
+
+    // Keep these tvchains, they may be in use.
+    query.prepare("SELECT DISTINCT chainid FROM tvchain "
+                  "WHERE endtime > :FOURHOURSAGO ;");
+    query.bindValue(":FOURHOURSAGO", fourHoursAgo);
+
+    if (!query.exec() || !query.isActive())
+    {
+        MythContext::DBError("HouseKeeper Cleaning TVChain Table", query);
+        return;
+    }
+
+    QString msg, keepChains = "";
+    while (query.next())
+        if (keepChains == "")
+            keepChains = "'" + query.value(0).toString() + "'";
+        else
+            keepChains += ", '" + query.value(0).toString() + "'";
+ 
+    if (keepChains.isEmpty())
+        msg = "DELETE FROM tvchain WHERE endtime < now();";
+    else
+    {
+        msg = QString("DELETE FROM tvchain "
+                      "WHERE chainid NOT IN ( %1 ) AND endtime < now();")
+                      .arg(keepChains);
+    }
+    deleteQuery.prepare(msg);
+    deleteQuery.exec();
 }
 
 void HouseKeeper::CleanupRecordedTables(void)
