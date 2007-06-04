@@ -59,7 +59,7 @@ class MythListButton : public MythUIType
 
   protected:
     void Const();
-    void Init();
+    virtual void Init();
     void LoadPixmap(MythImage **pix, QDomElement &element);
 
     void InsertItem(MythListButtonItem *item);
@@ -149,6 +149,7 @@ class MythHorizListButton : public MythListButton
     virtual bool ParseElement(QDomElement &element);
     virtual void CopyFrom(MythUIType *base);
     virtual void CreateCopy(MythUIType *parent);
+    virtual void Init(void);
 
     int m_itemWidth;
 };

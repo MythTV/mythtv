@@ -872,6 +872,15 @@ MythHorizListButton::MythHorizListButton(MythUIType *parent,
     m_itemsVisible = horizontalItems;
 }
 
+void MythHorizListButton::Init(void)
+{
+    int dx = GetArea().width() - 1 - 2 * m_itemMargin -
+            (m_itemsVisible - 1) * m_itemSpacing;
+    m_itemWidth = dx / m_itemsVisible;
+
+    MythListButton::Init();
+}
+
 const QRect MythHorizListButton::PlaceArrows(const QSize &arrowSize)
 {
     int x = GetArea().width() - arrowSize.width() - 1;
