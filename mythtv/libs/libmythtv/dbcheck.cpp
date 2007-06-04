@@ -10,7 +10,7 @@ using namespace std;
 #include "mythdbcon.h"
 
 /// This is the DB schema version expected by the running MythTV instance.
-const QString currentDatabaseVersion = "1190";
+const QString currentDatabaseVersion = "1191";
 
 static bool UpdateDBVersionNumber(const QString &newnumber);
 static bool performActualUpdate(const QString updates[], QString version,
@@ -3080,6 +3080,32 @@ thequery,
 ""
 };
         if (!performActualUpdate(updates, "1190", dbver))
+            return false;
+    }
+
+    if (dbver == "1190")
+    {
+        const QString updates[] = {
+"DROP TABLE IF EXISTS recordedfile;",
+"CREATE TABLE recordedfile ("
+"    chanid                  INT(10) UNSIGNED  NOT NULL DEFAULT 0,"
+"    starttime               DATETIME          NOT NULL DEFAULT '0000-00-00 00:00:00',"
+"    basename                VARCHAR(128)      NOT NULL DEFAULT '',"
+"    filesize                BIGINT(20)        NOT NULL DEFAULT 0,"
+"    width                   SMALLINT UNSIGNED NOT NULL DEFAULT 0,"
+"    height                  SMALLINT UNSIGNED NOT NULL DEFAULT 0,"
+"    fps                     FLOAT(6,3)        NOT NULL DEFAULT 0,"
+"    aspect                  FLOAT(8,6)        NOT NULL DEFAULT 0,"
+"    audio_sample_rate       SMALLINT UNSIGNED NOT NULL DEFAULT 0,"
+"    audio_bits_per_sample   SMALLINT UNSIGNED NOT NULL DEFAULT 0,"
+"    audio_channels          TINYINT UNSIGNED  NOT NULL DEFAULT 0,"
+"    audio_type              VARCHAR(255)      NOT NULL DEFAULT '',"
+"    video_type              VARCHAR(255)      NOT NULL DEFAULT '',"
+"    comment                 VARCHAR(255)      NOT NULL DEFAULT '',"
+"    PRIMARY KEY (chanid, starttime),"
+"    INDEX       (basename)"
+");"
+        if (!performActualUpdate(updates, "1191", dbver))
             return false;
     }
 
