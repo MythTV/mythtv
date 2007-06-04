@@ -3105,6 +3105,7 @@ thequery,
 "    PRIMARY KEY (chanid, starttime),"
 "    INDEX       (basename)"
 ");"
+};
         if (!performActualUpdate(updates, "1191", dbver))
             return false;
     }
