@@ -415,21 +415,63 @@ void HouseKeeper::CleanupRecordedTables(void)
     MSqlQuery query(MSqlQuery::InitCon());
     MSqlQuery deleteQuery(MSqlQuery::InitCon());
     int tableIndex = 0;
-    QString tables[] = {
-        "recordedprogram",
-        "recordedrating",
-        "recordedcredits",
-        "" }; // This blank entry must exist, do not remove.
-    QString table = tables[tableIndex];
-   
+    // tables[tableIndex][0] is the table name
+    // tables[tableIndex][1] is the name of the column on which the join is
+    // performed
+    QString tables[][2] = {
+        { "recordedprogram", "progstart" },
+        { "recordedrating", "progstart" },
+        { "recordedcredits", "progstart" },
+        { "recordedmarkup", "starttime" },
+        { "recordedseek", "starttime" },
+        { "", "" } }; // This blank entry must exist, do not remove.
+    QString table = tables[tableIndex][0];
+    QString column = tables[tableIndex][1];
+
+    // Because recordedseek can have millions of rows, we don't want to JOIN it
+    // with recorded.  Instead, pull out DISTINCT chanid and starttime into a
+    // temporary table (resulting in tens, hundreds, or--at most--a few
+    // thousand rows) for the JOIN
+    QString querystr;
+    querystr = "CREATE TEMPORARY TABLE IF NOT EXISTS temprecordedcleanup ( "
+                   "chanid int(10) unsigned NOT NULL default '0', "
+                   "starttime datetime NOT NULL default '0000-00-00 00:00:00' "
+                   ");";
+
+    if (!query.exec(querystr))
+    {
+        MythContext::DBError("Housekeeper Creating Temporary Table", query);
+        return;
+    }
+
     while (table != "")
     {
-        query.prepare(QString("SELECT DISTINCT p.chanid, p.starttime "
-                              "FROM %1 p LEFT JOIN recorded r "
-                              "ON p.chanid = r.chanid "
-                              "AND p.starttime = r.progstart "
-                              "WHERE r.chanid IS NULL;")
+        query.prepare(QString("TRUNCATE TABLE temprecordedcleanup;"));
+        if (!query.exec() || !query.isActive())
+        {
+            MythContext::DBError("Housekeeper Truncating Temporary Table",
+                                 query);
+            return;
+        }
+
+        query.prepare(QString("INSERT INTO temprecordedcleanup "
+                              "( chanid, starttime ) "
+                              "SELECT DISTINCT chanid, starttime "
+                              "FROM %1;")
                               .arg(table));
+
+        if (!query.exec() || !query.isActive())
+        {
+            MythContext::DBError("HouseKeeper Cleaning Recorded Tables", query);
+            return;
+        }
+
+        query.prepare(QString("SELECT DISTINCT p.chanid, p.starttime "
+                              "FROM temprecordedcleanup p "
+                              "LEFT JOIN recorded r "
+                              "ON p.chanid = r.chanid "
+                              "AND p.starttime = r.%1 "
+                              "WHERE r.chanid IS NULL;").arg(column));
         if (!query.exec() || !query.isActive())
         {
             MythContext::DBError("HouseKeeper Cleaning Recorded Tables", query);
@@ -448,8 +490,13 @@ void HouseKeeper::CleanupRecordedTables(void)
         }
 
         tableIndex++;
-        table = tables[tableIndex];
+        table = tables[tableIndex][0];
+        column = tables[tableIndex][1];
     }
+
+    if (!query.exec("DROP TABLE temprecordedcleanup;"))
+        MythContext::DBError("Housekeeper Dropping Temporary Table", query);
+
 }
 
 void HouseKeeper::CleanupProgramListings(void)
