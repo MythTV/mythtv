@@ -394,7 +394,10 @@ void PlaybackBoxMusic::keyPressEvent(QKeyEvent *e)
                 editPlaylist();
         }
         else if (action == "CYCLEVIS")
+        {
             CycleVisualizer();
+            bannerEnable(tr("Visualization: ") + visual_modes[current_visual], 4000);
+        }
         else if (action == "BLANKSCR")
             toggleFullBlankVisualizer();
         else if (action == "VOLUMEDOWN") 
@@ -1288,7 +1291,7 @@ void PlaybackBoxMusic::CycleVisualizer()
         if (random_visualizer)
         {
             unsigned int next_visualizer;
-            
+
             //Find a visual thats not like the previous visual
             do
                 next_visualizer = rand() % visual_modes.count();
@@ -1305,7 +1308,7 @@ void PlaybackBoxMusic::CycleVisualizer()
         visual_mode_timer->stop();
         mainvisual->setVisual("Blank");
         mainvisual->setVisual(visual_modes[current_visual]);
-    } 
+    }
     else if (visual_modes.count() == 1 && visual_modes[current_visual] == "AlbumArt" && 
              visualizer_status > 0) 
     {
@@ -1317,7 +1320,6 @@ void PlaybackBoxMusic::CycleVisualizer()
         mainvisual->setVisual(visual_modes[current_visual]);
     }
 
-    bannerEnable(tr("Visualization: ") + visual_modes[current_visual], 4000);
 }
 
 void PlaybackBoxMusic::setTrackOnLCD(Metadata *mdata)
