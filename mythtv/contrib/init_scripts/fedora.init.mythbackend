@@ -84,7 +84,7 @@
     if [ ! -f "$MBE_BIN" ]; then
         echo "Cannot find $MBE_PROG executable"
         exit 1
-    elif [ ! -x "$MBE_USER" ]; then
+    elif [ ! -x "$MBE_BIN" ]; then
         echo "$MBE_PROG is not executable"
         exit 1
     fi
@@ -110,7 +110,7 @@
     # Other distros might add a --user option to daemon, but that doesn't seem
     # to be available in Fedora.
         cd $MYTHTV_HOME                           \
-            && daemon "$MBE_BIN"                  \
+            && daemon --user "$MBE_USER" "$MBE_BIN" \
                --daemon                           \
                --logfile "$MBE_LOGFILE"           \
                --pidfile "/var/run/$MBE_PROG.pid" \
