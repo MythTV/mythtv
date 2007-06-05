@@ -1842,12 +1842,20 @@ static HostComboBox *MythDateFormat()
     }
 
     gc->addSelection(sampdate.toString("ddd MMM d"), "ddd MMM d");
-    gc->addSelection(sampdate.toString("ddd MMMM d"), "ddd MMMM d");
-    gc->addSelection(sampdate.toString("MMM d"), "MMM d");
-    gc->addSelection(sampdate.toString("MM/dd"), "MM/dd");
-    gc->addSelection(sampdate.toString("MM.dd"), "MM.dd");
     gc->addSelection(sampdate.toString("ddd d MMM"), "ddd d MMM");
+    gc->addSelection(sampdate.toString("ddd MMMM d"), "ddd MMMM d");
+    gc->addSelection(sampdate.toString("ddd d MMMM"), "ddd d MMMM");
+    gc->addSelection(sampdate.toString("dddd MMM d"), "dddd MMM d");
+    gc->addSelection(sampdate.toString("dddd d MMM"), "dddd d MMM");
+    gc->addSelection(sampdate.toString("MMM d"), "MMM d");
+    gc->addSelection(sampdate.toString("d MMM"), "d MMM");
+    gc->addSelection(sampdate.toString("MM/dd"), "MM/dd");
+    gc->addSelection(sampdate.toString("dd/MM"), "dd/MM");
+    gc->addSelection(sampdate.toString("MM.dd"), "MM.dd");
+    gc->addSelection(sampdate.toString("dd.MM"), "dd.MM");
     gc->addSelection(sampdate.toString("M/d/yyyy"), "M/d/yyyy");
+    gc->addSelection(sampdate.toString("d/M/yyyy"), "d/M/yyyy");
+    gc->addSelection(sampdate.toString("MM.dd.yyyy"), "MM.dd.yyyy");
     gc->addSelection(sampdate.toString("dd.MM.yyyy"), "dd.MM.yyyy");
     gc->addSelection(sampdate.toString("yyyy-MM-dd"), "yyyy-MM-dd");
     gc->addSelection(sampdate.toString("ddd MMM d yyyy"), "ddd MMM d yyyy"); 
@@ -1878,14 +1886,19 @@ static HostComboBox *MythShortDateFormat()
     gc->addSelection(sampdate.toString("MM/dd"), "MM/dd");
     gc->addSelection(sampdate.toString("dd/MM"), "dd/MM");
     gc->addSelection(sampdate.toString("MM.dd"), "MM.dd");
-    gc->addSelection(sampdate.toString("d.M."), "d.M.");
     gc->addSelection(sampdate.toString("dd.MM."), "dd.MM.");
+    gc->addSelection(sampdate.toString("M.d."), "M.d.");
+    gc->addSelection(sampdate.toString("d.M."), "d.M.");
     gc->addSelection(sampdate.toString("MM-dd"), "MM-dd");
-    gc->addSelection(sampdate.toString("MMM d"), "MMM d"); 
+    gc->addSelection(sampdate.toString("dd-MM"), "dd-MM");
+    gc->addSelection(sampdate.toString("MMM d"), "MMM d");
+    gc->addSelection(sampdate.toString("d MMM"), "d MMM");
     gc->addSelection(sampdate.toString("ddd d"), "ddd d");
     gc->addSelection(sampdate.toString("d ddd"), "d ddd");
     gc->addSelection(sampdate.toString("ddd M/d"), "ddd M/d");
+    gc->addSelection(sampdate.toString("ddd d/M"), "ddd d/M");
     gc->addSelection(sampdate.toString("M/d ddd"), "M/d ddd");
+    gc->addSelection(sampdate.toString("d/M ddd"), "d/M ddd");
     gc->setHelpText(QObject::tr("Your preferred short date format.") + " " +
                     sampleStr);
     return gc;
