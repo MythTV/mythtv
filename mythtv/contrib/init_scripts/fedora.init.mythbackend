@@ -58,6 +58,14 @@
 
 ###############################################################################
 
+# Source function library.
+    . /etc/init.d/functions
+
+# Source config file if available
+    if [ -f "/etc/sysconfig/mythbackend" ]; then
+      . /etc/sysconfig/mythbackend
+    fi
+
 # Find the executable
     if [ ! -z "$MBE_DIR" ]; then
         MBE_BIN="$MBE_DIR/$MBE_PROG"
@@ -70,14 +78,6 @@
                 MBE_BIN="/usr/local/bin/$MBE_PROG"
             fi
         fi
-    fi
-
-# Source function library.
-    . /etc/init.d/functions
-
-# Source config file if available
-    if [ -f "/etc/sysconfig/mythbackend" ]; then
-      . /etc/sysconfig/mythbackend
     fi
 
 # Error messages
