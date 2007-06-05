@@ -22,6 +22,7 @@ controls="yes"
 flix="yes"
 archive="yes"
 zoneminder="yes"
+movies="yes"
 
 cc="gcc"
 
@@ -108,6 +109,9 @@ MythWeather related options:
 MythZoneMinder related options:
   --enable-mythzoneminder  build the mythzoneminder plugin [$zoneminder]
   --zm-version=VERSION     what version of ZoneMinder is in use [$zmversion]
+
+MythMovies related options:
+  --enable-mythmovies      build the mythmovies plugin [$movies]
 EOF
 exit 1
 fi
@@ -210,6 +214,10 @@ for opt do
   ;;
   --disable-mythflix) flix="no"
   ;;
+  --enable-mythmovies) movies="yes"
+  ;;
+  --disable-mythmovies) movies="no"
+  ;;
   --enable-opengl) opengl="yes"
   ;;
   --disable-opengl) opengl="no"
@@ -254,6 +262,7 @@ for opt do
                  zoneminder="yes";
                  controls="yes";
                  flix="yes";
+                 movies="yes";
                  sdl="yes";
                  opengl="yes";
                  visual="yes";
@@ -277,6 +286,7 @@ for opt do
                  zoneminder="no";
                  controls="no";
                  flix="no";
+                 movies="no";
                  sdl="no";  
                  opengl="no"; 
                  visual="no"; 
@@ -667,6 +677,12 @@ else
   echo "        MythZoneMinder plugin will not be built"
 fi
 
+if test "$movies" = "yes" ; then
+  echo "        MythMovies     plugin will be built"
+  echo "SUBDIRS += mythmovies" >> ./config.pro
+else
+    echo "      MythMovies     plugin will not be built"
+fi
 ###########################################################
 #                                                         #
 #   MythArchive related configuration options             #
