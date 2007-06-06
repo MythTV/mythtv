@@ -68,7 +68,10 @@ PreviewGenerator::PreviewGenerator(const ProgramInfo *pginfo,
 
     // Try to find a local means to access file...
     QString localFN  = programInfo.GetPlaybackURL(false, true);
-    if (!(localFN.left(1) == "/" && QFileInfo(localFN).exists()))
+    QString localFNdir = QFileInfo(localFN).dirPath();
+    if (!(localFN.left(1) == "/" &&
+          QFileInfo(localFN).exists() &&
+          QFileInfo(localFNdir).isWritable()))
         return; // didn't find file locally, must use remote backend
 
     // Found file locally, so set the new pathname..
@@ -313,7 +316,8 @@ void PreviewGenerator::LocalPreviewRun(void)
 
 bool PreviewGenerator::IsLocal(void) const
 {
-    return QFileInfo(pathname).exists();
+    QString pathdir = QFileInfo(pathname).dirPath();
+    return (QFileInfo(pathname).exists() && QFileInfo(pathdir).isWritable());
 }
 
 /** \fn PreviewGenerator::SaveScreenshot()
