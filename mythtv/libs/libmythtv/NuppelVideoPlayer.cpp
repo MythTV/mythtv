@@ -2820,6 +2820,9 @@ void NuppelVideoPlayer::ResetPlaying(void)
 {
     ClearAfterSeek();
 
+    if (ffrew_skip != 1)
+        ffrew_skip = 1;
+
     if (!ringBuffer->isDVD())
         framesPlayed = 0;
 
