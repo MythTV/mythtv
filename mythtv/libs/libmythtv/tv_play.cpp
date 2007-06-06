@@ -2390,6 +2390,8 @@ void TV::ProcessKeypress(QKeyEvent *e)
             else if (((action == "RWNDSTICKY" || action == "SEEKRWND" ||
                         action == "JUMPRWND"))
                     && IsVideoExitDialog() &&
+                    !has_action("UP", actions) &&
+                    !has_action("DOWN", actions) &&
                     !(has_action("LEFT", actions) && arrowAccel))
             {
                 DoPause(false);
