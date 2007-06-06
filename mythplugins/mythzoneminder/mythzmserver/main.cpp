@@ -36,7 +36,7 @@
 #define EXIT_OK                      0
 #define EXIT_INVALID_CMDLINE         255
 #define EXIT_OPENING_LOGFILE_ERROR   254
-#define EXIT_DEAMONIZING_ERROR       253
+#define EXIT_DAEMONIZING_ERROR       253
 #define EXIT_SOCKET_ERROR            252
 #define EXIT_VERSION_ERROR           251
 
@@ -193,7 +193,7 @@ int main(int argc, char **argv)
         if (daemon(0, 0) < 0)
         {
             cout << "Failed to run as a daemon. Bailing out.\n";
-            return EXIT_DEAMONIZING_ERROR;
+            return EXIT_DAEMONIZING_ERROR;
         }
         cout << endl;
     }

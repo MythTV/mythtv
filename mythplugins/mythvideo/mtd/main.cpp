@@ -23,7 +23,7 @@
 #include "../mythvideo/dbcheck.h"
 #include "mtd.h"
 
-#define MTD_EXIT_DEAMONIZING_ERROR                FRONTEND_EXIT_START-1
+#define MTD_EXIT_DAEMONIZING_ERROR                FRONTEND_EXIT_START-1
 
 int main(int argc, char **argv)
 {
@@ -103,7 +103,7 @@ int main(int argc, char **argv)
         if(daemon(0, 1) < 0)
         {
             cerr << "mtd: Failed to run as a daemon. Bailing out." << endl ;
-            return MTD_EXIT_DEAMONIZING_ERROR;
+            return MTD_EXIT_DAEMONIZING_ERROR;
         }
         cout << endl;
     }

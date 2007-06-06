@@ -23,7 +23,7 @@ using namespace std;
 
 #include "lcdserver.h"
 
-#define LCD_EXIT_DEAMONIZING_ERROR                FRONTEND_EXIT_START-1
+#define LCD_EXIT_DAEMONIZING_ERROR                FRONTEND_EXIT_START-1
 #define LCD_EXIT_NO_TRANSCODE_SUPPORT             FRONTEND_EXIT_START-2
 
 int main(int argc, char **argv)
@@ -222,7 +222,7 @@ int main(int argc, char **argv)
         {
             VERBOSE(VB_IMPORTANT, "lcdserver: Failed to run as a daemon. "
                             "Bailing out.");
-            return LCD_EXIT_DEAMONIZING_ERROR;
+            return LCD_EXIT_DAEMONIZING_ERROR;
         }
         cout << endl;
     }

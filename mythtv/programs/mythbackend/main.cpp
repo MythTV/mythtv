@@ -463,7 +463,7 @@ int main(int argc, char **argv)
         if (daemon(0, 1) < 0)
         {
             perror("daemon");
-            return BACKEND_EXIT_DEAMONIZING_ERROR;
+            return BACKEND_EXIT_DAEMONIZING_ERROR;
         }
 
 
