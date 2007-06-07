@@ -57,7 +57,8 @@ class MPUBLIC DVDRingBufferPriv
     uint ButtonWidth(void)  { return hl_width; }
     uint ButtonHeight(void) { return hl_height; }
     uint GetAudioLanguage(int id);
-    uint GetSubtitleLanguage(int id);
+    int  GetAudioTrackNum(uint key);
+    uint GetSubtitleLanguage(int key);
     void SetMenuPktPts(long long pts) { menupktpts = pts; }
     long long GetMenuPktPts(void) { return menupktpts; }
     bool DecodeSubtitles(AVSubtitle * sub, int * gotSubtitles, 
@@ -167,6 +168,7 @@ class MPUBLIC DVDRingBufferPriv
     uint64_t       seektime;
     uint           currentTime;
     QMap<uint, uint> seekSpeedMap;
+    QMap<uint, uint> audioTrackMap;
 
     NuppelVideoPlayer *parent;
 

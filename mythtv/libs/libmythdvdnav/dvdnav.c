@@ -927,6 +927,50 @@ unsigned char dvdnav_audio_get_channels(dvdnav_t *this, uint8_t stream){
  
 }
 
+/*
+ * \brief get dvd audio format for provided stream
+ * \return 0 - AC3, 2-MP2, 4-LPCM, 6-DTS,
+ */
+unsigned char dvdnav_audio_get_format(dvdnav_t *this, uint8_t stream){
+  audio_attr_t attr;
+
+  if(!this) {
+    printerr("Passed a NULL pointer.");
+    return 0xff;
+  }
+  if(!this->started) {
+    printerr("Virtual DVD machine not started.");
+    return 0xff;
+  }
+
+  pthread_mutex_lock(&this->vm_lock);
+  attr = vm_get_audio_attr(this->vm, stream);
+  pthread_mutex_unlock(&this->vm_lock);
+
+  return attr.audio_format;
+}
+
+/*
+ * \brief get total dvd audio stream count
+ */
+int dvdnav_audio_get_stream_count(dvdnav_t *this) {
+  int count = 0;
+  if (!this) {
+    printerr("Passed a NULL pointer.");
+    return 0;
+  }
+  if(!this->started) {
+    printerr("Virtual DVD machine not started.");
+    return 0;
+  }
+
+  pthread_mutex_lock(&this->vm_lock);
+  count = vm_get_audio_stream_count(this->vm);
+  pthread_mutex_unlock(&this->vm_lock);
+
+  return count;
+}
+
 uint16_t dvdnav_spu_stream_to_lang(dvdnav_t *this, uint8_t stream) {
   subp_attr_t  attr;
   

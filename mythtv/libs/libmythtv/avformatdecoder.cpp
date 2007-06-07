@@ -1561,6 +1561,19 @@ int AvFormatDecoder::ScanStreams(bool novideo)
     {
         if (tracks[kTrackTypeAudio].size() > 1)
         {
+            qBubbleSort(tracks[kTrackTypeAudio]);
+            sinfo_vec_t::iterator it = tracks[kTrackTypeAudio].begin();
+            int count = 0;
+            for (; it != tracks[kTrackTypeAudio].end(); ++it)
+            {
+                it->dvd_track_num = ringBuffer->DVD()->GetAudioTrackNum(count);
+                VERBOSE(VB_PLAYBACK, LOC + 
+                            QString("DVD Audio Track Map "
+                                    "Stream id #%1 track #%2 ")
+                            .arg(it->stream_id).arg(it->dvd_track_num));
+                count++;
+            }
+            qBubbleSort(tracks[kTrackTypeAudio]);
             int trackNo = ringBuffer->DVD()->GetTrack(kTrackTypeAudio);
             if (trackNo >= (int)GetTrackCount(kTrackTypeAudio))
                 trackNo = GetTrackCount(kTrackTypeAudio) - 1;
@@ -2730,6 +2743,7 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
                     RemoveAudioStreams();
                     storevideoframes = false;
                     dvdTitleChanged = false;
+                    ScanStreams(false);
                 }
                 else
                     storevideoframes = true;

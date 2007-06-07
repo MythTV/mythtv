@@ -162,9 +162,9 @@ int vm_get_subp_stream(vm_t *vm, int subpN, int mode);
 int vm_get_audio_active_stream(vm_t *vm);
 int vm_get_subp_active_stream(vm_t *vm, int mode);
 void vm_get_angle_info(vm_t *vm, int *current, int *num_avail);
+int vm_get_audio_stream_count(vm_t *vm);
 #if 0
 /* currently unused */
-void vm_get_audio_info(vm_t *vm, int *current, int *num_avail);
 void vm_get_subp_info(vm_t *vm, int *current, int *num_avail);
 void vm_get_video_res(vm_t *vm, int *width, int *height);
 #endif

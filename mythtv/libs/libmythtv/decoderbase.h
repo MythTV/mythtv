@@ -20,16 +20,19 @@ class StreamInfo
     StreamInfo() :
         av_stream_index(-1), av_substream_index(-1),
         language(-2), language_index(0),
-        stream_id(-1), easy_reader(false), wide_aspect_ratio(false) {}
+        stream_id(-1), easy_reader(false), 
+        wide_aspect_ratio(false), dvd_track_num(-1) {}
     StreamInfo(int a, int b, uint c, int d, bool e = false, bool f = false) :
         av_stream_index(a), av_substream_index(-1),
         language(b), language_index(c), stream_id(d),
-        easy_reader(e), wide_aspect_ratio(f) {}
+        easy_reader(e), wide_aspect_ratio(f),
+        dvd_track_num(-1) {}
     StreamInfo(int a, int b, uint c, int d, int e,
                bool f = false, bool g = false) :
         av_stream_index(a), av_substream_index(e),
         language(b), language_index(c), stream_id(d),
-        easy_reader(f), wide_aspect_ratio(g) {}
+        easy_reader(f), wide_aspect_ratio(g),
+        dvd_track_num(-1) {}
 
   public:
     int  av_stream_index;
@@ -40,10 +43,15 @@ class StreamInfo
     int  stream_id;
     bool easy_reader;
     bool wide_aspect_ratio;
+    int  dvd_track_num;
 
     bool operator<(const StreamInfo& b) const
-        { return (this->stream_id < b.stream_id) ; }
-};
+    { 
+        if (this->dvd_track_num >= 0)
+             return (this->dvd_track_num < b.dvd_track_num);
+        return (this->stream_id < b.stream_id); 
+    }
+};  
 typedef vector<StreamInfo> sinfo_vec_t;
 
 class DecoderBase

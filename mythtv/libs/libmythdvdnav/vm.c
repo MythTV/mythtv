@@ -812,26 +812,24 @@ void vm_get_angle_info(vm_t *vm, int *current, int *num_avail) {
   }
 }
 
-#if 0
-/* currently unused */
-void vm_get_audio_info(vm_t *vm, int *current, int *num_avail) {
+int vm_get_audio_stream_count(vm_t *vm) {
+  int count = 0;
   switch ((vm->state).domain) {
   case VTS_DOMAIN:
-    *num_avail = vm->vtsi->vtsi_mat->nr_of_vts_audio_streams;
-    *current = (vm->state).AST_REG;
+    count = vm->vtsi->vtsi_mat->nr_of_vts_audio_streams;
     break;
   case VTSM_DOMAIN:
-    *num_avail = vm->vtsi->vtsi_mat->nr_of_vtsm_audio_streams; /*  1 */
-    *current = 1;
+    count = vm->vtsi->vtsi_mat->nr_of_vtsm_audio_streams; /*  1 */
     break;
   case VMGM_DOMAIN:
   case FP_DOMAIN:
-    *num_avail = vm->vmgi->vmgi_mat->nr_of_vmgm_audio_streams; /*  1 */
-    *current = 1;
+    count = vm->vmgi->vmgi_mat->nr_of_vmgm_audio_streams; /*  1 */
     break;
   }
+  return count;
 }
 
+#if 0
 /* currently unused */
 void vm_get_subp_info(vm_t *vm, int *current, int *num_avail) {
   switch ((vm->state).domain) {

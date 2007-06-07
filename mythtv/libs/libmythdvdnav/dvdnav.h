@@ -573,6 +573,9 @@ uint16_t dvdnav_audio_stream_to_lang(dvdnav_t *self, uint8_t stream);
  */
 unsigned char dvdnav_audio_get_channels(dvdnav_t *self, uint8_t stream);
 
+unsigned char dvdnav_audio_get_format(dvdnav_t *self, uint8_t stream);
+
+int dvdnav_audio_get_stream_count(dvdnav_t *self);
 /*
  * Converts a *logical* subpicture stream id into country code 
  * (returns 0xffff if no such stream).
