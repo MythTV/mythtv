@@ -3310,6 +3310,10 @@ UIManagedTreeListType::UIManagedTreeListType(const QString & name)
     upArrowOffset.setY(0);
     downArrowOffset.setX(0);
     downArrowOffset.setY(0);
+    leftArrowOffset.setX(0);
+    leftArrowOffset.setY(0);
+    rightArrowOffset.setX(0);
+    rightArrowOffset.setY(0);
     incSearch = "";
 }
 
@@ -3616,14 +3620,14 @@ void UIManagedTreeListType::Draw(QPainter *p, int drawlayer, int context)
                     //
                     if (i == bins && hotspot_node->childCount() > 0)
                     {
-                        p->drawPixmap(x_location + (*highlight_map[i]).width() - right_arrow_image.width(),
-                                      y_location - QFontMetrics(tmpfont->face).height() + right_arrow_image.height() / 2,
+                        p->drawPixmap(x_location + (*highlight_map[i]).width() - right_arrow_image.width() + rightArrowOffset.x(),
+                                      y_location + rightArrowOffset.y() - QFontMetrics(tmpfont->face).height() + right_arrow_image.height() / 2,
                                       right_arrow_image);
                     }
                     if (i == 1 && hotspot_node->getParent()->getParent())
                     {
-                        p->drawPixmap(x_location,
-                                      y_location - QFontMetrics(tmpfont->face).height() + left_arrow_image.height() / 2,
+                        p->drawPixmap(x_location + leftArrowOffset.x(),
+                                      y_location + leftArrowOffset.y() - QFontMetrics(tmpfont->face).height() + left_arrow_image.height() / 2,
                                       left_arrow_image);
                     }
                 }

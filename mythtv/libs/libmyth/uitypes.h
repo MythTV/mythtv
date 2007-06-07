@@ -1045,6 +1045,8 @@ class MPUBLIC UIManagedTreeListType : public UIType
     ~UIManagedTreeListType();
     void    setUpArrowOffset(QPoint& pt) { upArrowOffset = pt;}    
     void    setDownArrowOffset(QPoint& pt) { downArrowOffset = pt;}    
+    void    setLeftArrowOffset(QPoint& pt) {leftArrowOffset = pt;}
+    void    setRightArrowOffset(QPoint& pt) {rightArrowOffset = pt;}
     void    setSelectPoint(QPoint& pt) { selectPoint = pt;}
     void    setSelectPadding(int pad) {selectPadding = pad;}
     void    setArea(QRect an_area) { area = an_area; }
@@ -1150,6 +1152,8 @@ class MPUBLIC UIManagedTreeListType : public UIType
     QPoint                  selectPoint;
     QPoint                  upArrowOffset;
     QPoint                  downArrowOffset;
+    QPoint                  leftArrowOffset;
+    QPoint                  rightArrowOffset;
     QString                 incSearch;
     bool                    bIncSearchContains;
 };
