@@ -8953,7 +8953,7 @@ No other details</source>
     </message>
     <message>
         <source>Commercial Auto-Skip</source>
-        <translation></translation>
+        <translation>Advert Auto-Skip</translation>
     </message>
     <message>
         <source>Auto-Skip OFF</source>
