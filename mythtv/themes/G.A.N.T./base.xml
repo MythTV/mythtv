@@ -11,6 +11,21 @@
       <position>20,170</position>
       <alphapulse min="0" max="255" change="1"/>
     </imagetype>
+
+    <font name="clock" face="Arial"> 
+       <color>#FFFFFF</color> 
+       <size>22</size> 
+       <size:small>18</size:small> 
+       <size:big>22</size:big> 
+       <bold>yes</bold> 
+    </font> 
+  
+    <clock name="clock"> 
+       <area>100,80,400,50</area> 
+       <font>clock</font> 
+       <align>left</align> 
+       <format>%DATE% %TIME%</format> 
+     </clock> 
   </window>
 
 </mythuitheme>
