@@ -22,7 +22,7 @@ instructions for manually compiling and installing the software.</P>
 <P>The prerequisites for MythMusic are:
 <UL>
 <LI>MAD</LI>
-<LI>id3tag</LI>
+<LI>taglib</LI>
 <LI>libvorbis-devel</LI>
 <LI>FLAC</LI>
 <LI>libcdaudio</LI>
@@ -35,9 +35,8 @@ instructions for manually compiling and installing the software.</P>
 
 <P>These instructions are for distributions which don't have pre-compiled
 versions of the software necessary to run MythTV.</P>
-<P>Download MAD and libid3tag from 
-<A HREF="http://www.underbit.com/products/mad/">http://www.underbit.com/products/mad/</A> Follow the link to download
-via FTP and save the files to a directory you can find later.</P>
+<P>Download MAD from 
+<A HREF="http://www.underbit.com/products/mad">http://www.underbit.com/products/mad</A> and install:</P>
 <P>
 <BLOCKQUOTE><CODE>
 <PRE>
@@ -48,15 +47,21 @@ $ make
 $ su
 # make install
 # exit
-$ cd ..
-$ tar -xzf libid3tag-0.15.1b.tar.gz
-$ cd libid3tag-0.15.1b
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>Download TagLib from 
+<A HREF="http://developer.kde.org/~wheeler/taglib.html">http://developer.kde.org/~wheeler/taglib.html</A> and install:</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+$ tar -xzf taglib-1.4.tar.gz
+$ cd taglib-1.4
 $ ./configure
 $ make
 $ su
 # make install
 # exit
-$ cd ..
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>

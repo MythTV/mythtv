@@ -3,7 +3,7 @@
 <title>Installing and using MythTV
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com"
 name="mailto:rkulagow@rocketmail.com">
-<date>2007-04-11, v0.20.20
+<date>2007-06-07, v0.20.21
 <abstract>
 Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -22,7 +22,8 @@ author/programmer of the MythTV application!  I can not give you
 personalized installation support.  If you are having issues installing
 MythTV you should examine the archives, or post your question to the
 MythTV-users mailing list.  If you send me "Does MythTV work with 'X'"?
-messages - I will simply delete your mail.
+messages - I will simply instruct you to ask your question on the
+mythtv-users mailing list.
 </caption>
 </figure>
 <sect1>What is MythTV?
@@ -122,6 +123,14 @@ at <url url="http://www.mythtv.org/docs/mythtv-HOWTO.pdf"
 name="http://www.mythtv.org/docs/mythtv-HOWTO.pdf">.
 
 This HOWTO is for MythTV v0.20
+
+<sect1>Books about MythTV
+<p>If you would like to purchase a book specifically about MythTV:
+
+<itemize>
+<item>Hacking MythTV, ISBN 978-0470037874 by Wilson, Tittel, Wright and Korelc
+<item>Practical MythTV: Building a PVR and Media Center PC, ISBN 978-1590597798 by Smith and Still
+</itemize>
 
 <sect1>Document conventions
 <p>The following conventions are used throughout this document.<newline>
@@ -602,10 +611,10 @@ service. This limitation is independent of the bandwidth you have purchased.
 <item>Hauppauge WinTV-PVR-usb (model 602), or WinTV-PVR-PCI (model 880) cards (no driver - this is not the PVR-250/350
 series of cards supported by the IvyTV driver)
 <item>Hauppauge HVR-1600.  (no driver).  <bf>NOTE</bf>:  There have been
-reports that Hauppauge is putting the HVR-1600 inside of the PVR-150 box; if
-you're purchasing a retail PVR-150, carefully examine the box - there should
-be some indication that the hardware inside is actually a HVR-1600 and not a
-PVR-150.  Check the Supported Hardware (<url
+reports (2006-12 timeframe) that Hauppauge is putting the HVR-1600 inside of
+the PVR-150 box; if you're purchasing a retail PVR-150, carefully examine
+the packaging - there should be some indication that the hardware inside is
+actually a HVR-1600 and not a PVR-150.  Check the Supported Hardware (<url
 url="http://www.ivtvdriver.org/index.php/Supported_hardware"
 name="http://www.ivtvdriver.org/index.php/Supported_hardware">) page of the
 ivtv driver for updated support information.
@@ -635,8 +644,8 @@ name="btaudio"> section for more information.
 <eps file="warning" height="1cm">
 <img src="warning.png">
 <caption><bf>NOTE</bf>:  Analog video capture cards are the only ones which
-require a soundcard for capturing audio.  DVB, HDTV, and other hardware encoder cards all provide a
-combined audio / video stream.
+require a soundcard for capturing audio.  DVB, HDTV, and other hardware
+encoder cards all provide a combined audio / video stream.
 </caption>
 </figure>
 
@@ -7683,7 +7692,7 @@ v0.20.18, 2007-03-17.  Typo.  Updated information on running MySQL on slave back
 v0.20.19, 2007-04-07.  Put in bjm's Custom Priority section.
 v0.20.20, 2007-04-11.  Update Storage Directory text, add an update to the
 LVM section that SG's are better.
-
+v0.20.21, 2007-06-07.  Add link to books on MythTV.
 -->
 
 <!--
