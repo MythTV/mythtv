@@ -142,6 +142,7 @@ class MythMainWindowPrivate
     int screenwidth, screenheight;
 
     QRect screenRect;
+    QRect uiScreenRect;
 
     int xbase, ybase;
     bool does_fill_screen;
@@ -428,7 +429,7 @@ void MythMainWindow::drawTimeout(void)
     }
 
     if (!d->painter->SupportsClipping())
-        d->repaintRegion = d->repaintRegion.unite(d->screenRect);
+        d->repaintRegion = d->repaintRegion.unite(d->uiScreenRect);
 
     d->painter->Begin(this);
 
@@ -439,7 +440,7 @@ void MythMainWindow::drawTimeout(void)
         if (rects[i].width() == 0 || rects[i].height() == 0)
             continue;
 
-        if (rects[i] != d->screenRect)
+        if (rects[i] != d->uiScreenRect)
             d->painter->SetClipRect(rects[i]);
 
         for (it = d->stackList.begin(); it != d->stackList.end(); ++it)
@@ -503,6 +504,7 @@ void MythMainWindow::Init(void)
                                 d->ybase, d->screenheight, d->hmult);
 
     d->screenRect = QRect(d->xbase, d->ybase, d->screenwidth, d->screenheight);
+    d->uiScreenRect = QRect(0, 0, d->screenwidth, d->screenheight);
 
     setGeometry(d->xbase, d->ybase, d->screenwidth, d->screenheight);
     setFixedSize(QSize(d->screenwidth, d->screenheight));
@@ -1470,6 +1472,6 @@ int MythMainWindow::NormY(const int y)
 
 QRect MythMainWindow::GetUIScreenRect(void)
 {
-    return QRect(0, 0, d->screenwidth, d->screenheight);
+    return d->uiScreenRect;
 }
 
