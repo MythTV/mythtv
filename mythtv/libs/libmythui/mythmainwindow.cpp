@@ -723,15 +723,6 @@ bool MythMainWindow::TranslateKeyPress(const QString &context,
     actions.clear();
     int keynum = d->TranslateKeyNum(e);
 
-    if (allowJumps && 
-        d->jumpMap.count(keynum) > 0 && d->exitmenucallback == NULL)
-    {
-        d->exitingtomain = true;
-        d->exitmenucallback = d->jumpMap[keynum]->callback;
-        QApplication::postEvent(this, new ExitToMainMenuEvent());
-        return false;
-    }
-
     bool retval = false;
 
     if (d->keyContexts[context])
@@ -744,6 +735,15 @@ bool MythMainWindow::TranslateKeyPress(const QString &context,
         d->keyContexts["Global"]->GetMapping(keynum, actions))
     {
         retval = true;
+    }
+
+    if (!retval && allowJumps && 
+        d->jumpMap.count(keynum) > 0 && d->exitmenucallback == NULL)
+    {
+        d->exitingtomain = true;
+        d->exitmenucallback = d->jumpMap[keynum]->callback;
+        QApplication::postEvent(this, new ExitToMainMenuEvent());
+        return false;
     }
 
     return retval;
