@@ -54,6 +54,8 @@ void usage(char *progname)
     cerr << "\t--fifosync            : Enforce fifo sync\n";
     cerr << "\t--buildindex     or -b: Build a new keyframe index\n";
     cerr << "\t                        (use only if audio and video fifos are read independantly)\n";
+    cerr << "\t--video               : Specifies that this is not a mythtv recording\n";
+    cerr << "\t                        (must be used with --infile)\n";
     cerr << "\t--showprogress        : Display status info to the stdout\n";
     cerr << "\t--verbose level  or -v: Use '-v help' for level info\n";
     cerr << "\t--help           or -h: Prints this help statement.\n";
@@ -84,6 +86,7 @@ int main(int argc, char *argv[])
     int found_chanid = 0;
     int found_infile = 0;
     int update_index = 1;
+    int isVideo = 0;
 
     for (int argpos = 1; argpos < a.argc(); ++argpos)
     {
@@ -136,6 +139,11 @@ int main(int argc, char *argv[])
                 usage(a.argv()[0]);
                 return TRANSCODE_EXIT_INVALID_CMDLINE;
             }
+        }
+        else if (!strcmp(a.argv()[argpos],"--video")) 
+        {
+            isVideo = 1;
+            //mpeg2 = true;
         }
         else if (!strcmp(a.argv()[argpos],"-o") ||
                  !strcmp(a.argv()[argpos],"--outfile"))
@@ -360,9 +368,14 @@ int main(int argc, char *argv[])
          cerr << "Must specify -i OR -c AND -s options!\n";
          return TRANSCODE_EXIT_INVALID_CMDLINE;
     }
+    if (isVideo && !found_infile)
+    {
+         cerr << "Must specify --infile to use --video\n";
+         return TRANSCODE_EXIT_INVALID_CMDLINE;
+    }
     if (jobID >= 0 && (found_infile || build_index))
     {
-         cerr << "Can't specify -j with --buildindex or --infile\n";
+         cerr << "Can't specify -j with --buildindex, --video or --infile\n";
          return TRANSCODE_EXIT_INVALID_CMDLINE;
     }
     if ((jobID >= 0) && build_index)
@@ -390,7 +403,18 @@ int main(int argc, char *argv[])
     }
 
     ProgramInfo *pginfo = NULL;
-    if (!found_infile)
+    if (isVideo)
+    {
+        // We want the absolute file path for the filemarkup table
+        QFileInfo inf(infile);
+        infile = inf.absFilePath();
+
+        // Create a new, empty ProgramInfo object
+        pginfo = new ProgramInfo;
+        pginfo->isVideo = 1;
+        pginfo->pathname = infile;
+    }
+    else if (!found_infile)
     {
         pginfo = ProgramInfo::GetProgramFromRecorded(chanid, starttime);
 
