@@ -1346,12 +1346,12 @@ void Scheduler::RunScheduler(void)
                 QString startupParam = "user";
                 
                 // have we been started automatically?
-                if ((startIter != reclist.end()) &&
-                    ((curtime.secsTo((*startIter)->startts) - prerollseconds)
-                        < (idleWaitForRecordingTime * 60)))
+                if (WasStartedAutomatically() ||
+                    ((startIter != reclist.end()) &&
+                     ((curtime.secsTo((*startIter)->startts) - prerollseconds)
+                        < (idleWaitForRecordingTime * 60))))
                 {
-                    VERBOSE(VB_IMPORTANT,
-                            "Recording starts soon, AUTO-Startup assumed");
+                    VERBOSE(VB_IMPORTANT, "AUTO-Startup assumed");
                     startupParam = "auto";
             
                     // Since we've started automatically, don't wait for
@@ -3139,6 +3139,33 @@ void Scheduler::FillDirectoryInfoCache(bool force)
             "filesystems").arg(fsMap.size()));
 
     fsInfoCacheFillTime = QDateTime::currentDateTime();
+}
+
+/* Determines if the system was started by the auto-wakeup process */
+bool Scheduler::WasStartedAutomatically()
+{
+    bool autoStart = false;
+
+    QDateTime startupTime = QDateTime();
+    QString s = gContext->GetSetting("MythShutdownWakeupTime", "");
+    if (s != "")
+        startupTime = QDateTime::fromString(s, Qt::ISODate);
+
+    // if we don't have a valid startup time assume we were started manually
+    if (startupTime.isValid())
+    {
+        // if we started within 15mins of the saved wakeup time assume we
+        // started automatically to record or for a daily wakeup/shutdown period
+
+        if (abs(startupTime.secsTo(QDateTime::currentDateTime())) < (15 * 60))
+        {
+            VERBOSE(VB_SCHEDULE,
+                    "Close to auto-start time, AUTO-Startup assumed");
+            autoStart = true;
+        }
+    }
+
+    return autoStart;
 }
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

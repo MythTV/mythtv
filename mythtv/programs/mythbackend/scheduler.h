@@ -103,6 +103,8 @@ class Scheduler : public QObject
                              bool &blockShutdown);
     void ShutdownServer(int prerollseconds);
 
+    bool WasStartedAutomatically();
+
     void FillRecordingDir(ProgramInfo *pginfo, RecList& reclist);
     void FillDirectoryInfoCache(bool force = false);
 
