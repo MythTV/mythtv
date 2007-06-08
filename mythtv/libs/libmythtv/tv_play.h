@@ -112,6 +112,7 @@ class MPUBLIC TV : public QObject
     void StopEmbeddingOutput(void);
     bool IsEmbedding(void);
     void EPGChannelUpdate(uint chanid, QString channum);
+    void DrawUnusedRects(bool sync);
    
     // Recording commands
     int  PlayFromRecorder(int recordernum);

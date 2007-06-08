@@ -1475,6 +1475,12 @@ void NuppelVideoPlayer::StopEmbedding(void)
     }
 }
 
+void NuppelVideoPlayer::DrawUnusedRects(bool sync)
+{
+    if (videoOutput)
+        videoOutput->DrawUnusedRects(sync);
+}
+
 void NuppelVideoPlayer::ResetCaptions(uint mode_override)
 {
     uint origMode   = textDisplayMode;

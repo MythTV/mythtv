@@ -261,8 +261,13 @@ GuideGrid::GuideGrid(MythMainWindow *parent,
 
     timeCheck = NULL;
     timeCheck = new QTimer(this);
-    connect(timeCheck, SIGNAL(timeout()), SLOT(timeout()) );
+    connect(timeCheck, SIGNAL(timeout()), SLOT(timeCheckTimeout()) );
     timeCheck->start(200);
+
+    videoRepaintTimer = new QTimer(this);
+    QObject::connect(videoRepaintTimer, SIGNAL(timeout()),
+                     this,              SLOT(repaintVideoTimeout()));
+    videoRepaintTimer->start(1000);
 
     selectState = false;
 
@@ -281,18 +286,46 @@ GuideGrid::~GuideGrid()
     for (int x = 0; x < MAX_DISPLAY_TIMES; x++)
     {
         if (m_timeInfos[x])
+        {
             delete m_timeInfos[x];
+            m_timeInfos[x] = NULL;
+        }
     }
 
     for (int y = 0; y < MAX_DISPLAY_CHANS; y++)
     {
         if (m_programs[y])
+        {
             delete m_programs[y];
+            m_programs[y] = NULL;
+        }
     }
 
     m_channelInfos.clear();
 
-    delete theme;
+    if (theme)
+    {
+        delete theme;
+        theme = NULL;
+    }
+
+    if (jumpToChannelTimer)
+    {
+        jumpToChannelTimer->deleteLater();
+        jumpToChannelTimer = NULL;
+    }
+
+    if (timeCheck)
+    {
+        timeCheck->deleteLater();
+        timeCheck = NULL;
+    }
+
+    if (videoRepaintTimer)
+    {
+        videoRepaintTimer->deleteLater();
+        videoRepaintTimer = NULL;
+    }
 }
 
 void GuideGrid::keyPressEvent(QKeyEvent *e)
@@ -533,7 +566,7 @@ uint GuideGrid::GetChanID(void)
     return m_channelInfos[idx].chanid;
 }
 
-void GuideGrid::timeout()
+void GuideGrid::timeCheckTimeout(void)
 {
     timeCheck->changeInterval((int)(60 * 1000));
     QTime new_time = QTime::currentTime();
@@ -559,6 +592,12 @@ void GuideGrid::timeout()
     fillProgramInfos();
     repaint(programRect, false);
     repaint(curInfoRect, false);
+}
+
+void GuideGrid::repaintVideoTimeout(void)
+{
+    timeCheck->changeInterval(1000);
+    update(videoRect);
 }
 
 void GuideGrid::fillChannelInfos(bool gotostartchannel)
@@ -974,6 +1013,7 @@ void GuideGrid::paintEvent(QPaintEvent *e)
     if (r.intersects(videoRect) && m_player)
     {
         timeCheck->changeInterval((int)(200));
+        m_player->DrawUnusedRects(false);
     }
 
     qApp->unlock();
@@ -1794,7 +1834,10 @@ void GuideGrid::channelUpdate(void)
     ChannelInfo info = m_channelInfos[idx];
 
     if (m_player)
+    {
         m_player->EPGChannelUpdate(info.chanid, info.chanstr);
+        videoRepaintTimer->start(200);
+    }
 }
 
 //

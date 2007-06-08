@@ -86,8 +86,9 @@ class GuideGrid : public MythDialog
     void paintEvent(QPaintEvent *);
 
   private slots:
-    void timeout();
-    void jumpToChannelTimeout();
+    void timeCheckTimeout(void);
+    void repaintVideoTimeout(void);
+    void jumpToChannelTimeout(void);
 
   private:
     void keyPressEvent(QKeyEvent *e);
@@ -174,6 +175,7 @@ class GuideGrid : public MythDialog
     QString currentTimeColor;
 
     QTimer *timeCheck;
+    QTimer *videoRepaintTimer;
 
     bool keyDown;
 

@@ -5063,6 +5063,12 @@ bool TV::IsEmbedding(void)
     return false;
 }
 
+void TV::DrawUnusedRects(bool sync)
+{
+    if (nvp)
+        nvp->DrawUnusedRects(sync);
+}
+
 void TV::doEditSchedule(int editType)
 {
     if (!playbackinfo)

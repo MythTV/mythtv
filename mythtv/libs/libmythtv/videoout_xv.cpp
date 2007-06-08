@@ -2465,7 +2465,7 @@ void VideoOutputXv::Show(FrameScanType scan)
     }
 
     if ((needrepaint || xv_need_bobdeint_repaint) &&
-        (VideoOutputSubType() >= XVideo))
+        (VideoOutputSubType() >= XVideo) && !embedding)
     {
         DrawUnusedRects(/* don't do a sync*/false);
     }
@@ -2480,12 +2480,6 @@ void VideoOutputXv::Show(FrameScanType scan)
 
 void VideoOutputXv::DrawUnusedRects(bool sync)
 {
-    // Unfortunately, this gets drawn in the wrong place on prebuffering
-    // pauses when embedding and this is rarely useful when embedding
-    // since the background is drawn in guidegrid so we bail here. -- dtk
-    if (embedding) 
-        return;
-
     // boboff assumes the smallest interlaced resolution is 480 lines - 5%
     bool use_bob   = (m_deinterlacing && m_deintfiltername == "bobdeint");
     int boboff_raw = (int)round(((double)display_video_rect.height()) /
@@ -2512,7 +2506,12 @@ void VideoOutputXv::DrawUnusedRects(bool sync)
 
     X11L;
 
-    if (xv_draw_colorkey && needrepaint)
+    // This is used to avoid drawing the colorkey when embedding and
+    // not using overlay. This is needed because we don't paint this
+    // in the vertical retrace period when calling this from the EPG.
+    bool clrdraw = xv_colorkey || !embedding;
+
+    if (xv_draw_colorkey && needrepaint && clrdraw)
     {
         XSetForeground(XJ_disp, XJ_gc, xv_colorkey);
         XFillRectangle(XJ_disp, XJ_curwin, XJ_gc,
@@ -2521,7 +2520,7 @@ void VideoOutputXv::DrawUnusedRects(bool sync)
                        display_visible_rect.width(),
                        display_visible_rect.height() - 2 * boboff);
     }
-    else if (xv_draw_colorkey && xv_need_bobdeint_repaint)
+    else if (xv_draw_colorkey && xv_need_bobdeint_repaint && clrdraw)
     {
         // if this is only for deinterlacing mode switching, draw
         // the border areas, presumably the main image is undamaged.
