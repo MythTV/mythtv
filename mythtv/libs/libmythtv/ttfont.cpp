@@ -651,7 +651,11 @@ void TTFFont::Init(void)
    max_descent = 0;
    max_ascent = 0;
 
-   for (i = 0; i < 256; ++i)
+   // Skip C0 control characters (0-31)
+   for (i = 32; i < 127; ++i)
+        cache_glyph(i);
+   // Skip C1 control characters (127-159)
+   for (i = 160; i < 256; ++i)
         cache_glyph(i);
 
    use_kerning = FT_HAS_KERNING(face);
