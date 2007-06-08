@@ -2004,8 +2004,8 @@ void MainServer::DoHandleDeleteRecording(ProgramInfo *pginfo, PlaybackSock *pbs,
         pthread_attr_t attr;
         pthread_attr_init(&attr);
         pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
-
         pthread_create(&deleteThread, &attr, SpawnDeleteThread, ds);
+        pthread_attr_destroy(&attr);
     }
     else
     {

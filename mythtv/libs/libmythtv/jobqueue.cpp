@@ -1598,6 +1598,7 @@ void JobQueue::StartChildJob(void *(*ChildThreadRoutine)(void *),
     pthread_attr_init(&attr);
     pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
     pthread_create(&childThread, &attr, ChildThreadRoutine, this);
+    pthread_attr_destroy(&attr);
 
     while (!childThreadStarted)
         usleep(50);

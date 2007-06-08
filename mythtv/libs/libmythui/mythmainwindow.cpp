@@ -299,8 +299,8 @@ MythMainWindow::MythMainWindow()
     pthread_attr_t attr;
     pthread_attr_init(&attr);
     pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
-
     pthread_create(&lirc_tid, &attr, SpawnLirc, this);
+    pthread_attr_destroy(&attr);
 #endif
 
 #ifdef USE_JOYSTICK_MENU
@@ -310,8 +310,8 @@ MythMainWindow::MythMainWindow()
     pthread_attr_t attr2;
     pthread_attr_init(&attr2);
     pthread_attr_setdetachstate(&attr2, PTHREAD_CREATE_DETACHED);
-
     pthread_create(&js_tid, &attr2, SpawnJoystickMenu, this);
+    pthread_attr_destroy(&attr2);
 #endif
 
 #ifdef USING_APPLEREMOTE
@@ -320,8 +320,8 @@ MythMainWindow::MythMainWindow()
     pthread_attr_t attr3;
     pthread_attr_init(&attr3);
     pthread_attr_setdetachstate(&attr3, PTHREAD_CREATE_DETACHED);
-
     pthread_create(&appleremote_tid, &attr3, SpawnAppleRemote, this);
+    pthread_attr_destroy(&attr3);
 #endif
 
     d->keyContexts.setAutoDelete(true);

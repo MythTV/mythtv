@@ -5275,6 +5275,8 @@ void TV::EditSchedule(int editType)
                 pthread_create(&tid, &attr, TV::RecordedShowMenuHandler, this);
                 break;
     }
+
+    pthread_attr_destroy(&attr);
 }
 
 void TV::ChangeVolume(bool up)

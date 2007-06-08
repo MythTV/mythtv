@@ -179,11 +179,7 @@ NetworkControl::NetworkControl(int port)
     keyMap["f23"]                    = Qt::Key_F23;
     keyMap["f24"]                    = Qt::Key_F24;
 
-    pthread_attr_t attr;
-    pthread_attr_init(&attr);
-    pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE);
-
-    pthread_create(&command_thread, &attr, CommandThread, this);
+    pthread_create(&command_thread, NULL, CommandThread, this);
 
     gContext->addListener(this);
 }
