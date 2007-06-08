@@ -168,14 +168,7 @@ void JobQueue::ProcessQueue(void)
 
     QMap<QString, int> jobStatus;
     int maxJobs;
-    QString queueStartTimeStr;
-    QString queueEndTimeStr;
-    int queueStartTime;
-    int queueEndTime;
-    QTime curQTime;
-    int curTime;
     QString message;
-    QString tmpStr;
     QMap<int, JobQueueEntry> jobs;
     bool atMax = false;
     bool inTimeWindow = true;
@@ -187,16 +180,10 @@ void JobQueue::ProcessQueue(void)
 
         startedJobAlready = false;
         sleepTime = gContext->GetNumSetting("JobQueueCheckFrequency", 30);
-        queueStartTimeStr =
-            gContext->GetSetting("JobQueueWindowStart", "00:00");
-        queueEndTimeStr =
-            gContext->GetSetting("JobQueueWindowEnd", "23:59");
-
         maxJobs = gContext->GetNumSetting("JobQueueMaxSimultaneousJobs", 3);
         VERBOSE(VB_JOBQUEUE, LOC +
-                QString("Currently set at %1 job(s) max and to run new jobs "
-                        "from %2 to %3").arg(maxJobs).arg(queueStartTimeStr)
-                                        .arg(queueEndTimeStr));
+                QString("Currently set to run up to %1 job(s) max.")
+                        .arg(maxJobs));
 
         jobStatus.clear();
 
@@ -204,24 +191,7 @@ void JobQueue::ProcessQueue(void)
         
         if (jobs.size())
         {
-            tmpStr = queueStartTimeStr;
-            queueStartTime = tmpStr.replace(QRegExp(":"), "").toInt();
-            tmpStr = queueEndTimeStr;
-            queueEndTime = tmpStr.replace(QRegExp(":"), "").toInt();
-            curQTime = QTime::currentTime();
-            curTime = curQTime.hour() * 100 + curQTime.minute();
-            inTimeWindow = false;
-
-            if ((queueStartTime <= curTime) && (curTime < queueEndTime))
-            {
-                inTimeWindow = true;
-            }
-            else if ((queueStartTime > queueEndTime) &&
-                     ((curTime < queueEndTime) || (queueStartTime <= curTime)))
-            {
-                inTimeWindow = true;
-            }
-
+            inTimeWindow = InJobRunWindow();
             jobsRunning = 0;
             for (unsigned int x = 0; x < jobs.size(); x++)
             {
@@ -241,8 +211,7 @@ void JobQueue::ProcessQueue(void)
             {
                 message += QString("  Jobs in Queue, but we are outside of the "
                                    "Job Queue time window, no new jobs can be "
-                                   "started, next window starts at %1.")
-                                   .arg(queueStartTimeStr);
+                                   "started.");
                 VERBOSE(VB_JOBQUEUE, LOC + message);
             }
             else if (jobsRunning >= maxJobs)
@@ -1136,6 +1105,133 @@ QString JobQueue::GetJobQueueKey(ProgramInfo *pginfo)
 {
     return JobQueue::GetJobQueueKey(pginfo->chanid, pginfo->recstartts);
 }
+
+bool JobQueue::InJobRunWindow(int orStartsWithinMins)
+{
+    QString queueStartTimeStr;
+    QString queueEndTimeStr;
+    QTime queueStartTime;
+    QTime queueEndTime;
+    QTime curTime = QTime::currentTime();
+    bool inTimeWindow = false;
+    orStartsWithinMins = orStartsWithinMins < 0 ? 0 : orStartsWithinMins;
+
+    queueStartTimeStr = gContext->GetSetting("JobQueueWindowStart", "00:00");
+    queueEndTimeStr = gContext->GetSetting("JobQueueWindowEnd", "23:59");
+
+    VERBOSE(VB_JOBQUEUE, LOC +
+            QString("Currently set to run new jobs from %1 to %2")
+                    .arg(queueStartTimeStr).arg(queueEndTimeStr));
+
+    queueStartTime = QTime::fromString(queueStartTimeStr);
+    if (!queueStartTime.isValid())
+    {
+        VERBOSE(VB_IMPORTANT, "Invalid JobQueueWindowStart time, using 00:00");
+        queueStartTime = QTime::QTime(0, 0);
+    }
+
+    queueEndTime = QTime::fromString(queueEndTimeStr);
+    if (!queueEndTime.isValid())
+    {
+        VERBOSE(VB_IMPORTANT, "Invalid JobQueueWindowEnd time, using 23:59");
+        queueEndTime = QTime::QTime(23, 59);
+    }
+    
+    if ((queueStartTime <= curTime) && (curTime < queueEndTime))
+    {
+        inTimeWindow = true;
+    }
+    else if ((queueStartTime > queueEndTime) &&
+             ((curTime < queueEndTime) || (queueStartTime <= curTime)))
+    {
+        inTimeWindow = true;
+    }
+    else if (orStartsWithinMins > 0)
+    {
+        // Check if the window starts soon
+        if (curTime <= queueStartTime)
+        {
+            // Start time hasn't passed yet today
+            if (queueStartTime.secsTo(curTime) <= (orStartsWithinMins * 60))
+            {
+                VERBOSE(VB_JOBQUEUE, LOC +
+                    QString("Job run window will start within %1 minutes")
+                            .arg(orStartsWithinMins));
+                inTimeWindow = true;
+            }
+        }
+        else
+        {
+            // We passed the start time for today, try tomorrow
+            QDateTime curDateTime = QDateTime::currentDateTime();
+            QDateTime startDateTime = QDateTime(QDate::currentDate(),
+                                                queueStartTime).addDays(1);
+
+            if (curDateTime.secsTo(startDateTime) <= (orStartsWithinMins * 60))
+            {
+                VERBOSE(VB_JOBQUEUE, LOC + QString("Job run window will start "
+                        "within %1 minutes (tomorrow)")
+                        .arg(orStartsWithinMins));
+                inTimeWindow = true;
+            }
+        }
+    }
+
+    return inTimeWindow;
+}
+
+bool JobQueue::HasRunningOrPendingJobs(int startingWithinMins)
+{
+    /* startingWithinMins <= 0 - look for any pending jobs
+           > 0 -  only consider pending starting within this time */
+    QMap<int, JobQueueEntry> jobs;
+    QMap<int, JobQueueEntry>::Iterator it;
+    QDateTime maxSchedRunTime = QDateTime::currentDateTime();
+    int tmpStatus = 0;
+    bool checkForQueuedJobs = (startingWithinMins <= 0 
+                                || InJobRunWindow(startingWithinMins));
+
+    if (checkForQueuedJobs && startingWithinMins > 0) {
+        maxSchedRunTime = maxSchedRunTime.addSecs(startingWithinMins * 60);
+        VERBOSE(VB_JOBQUEUE, LOC +
+            QString("HasRunningOrPendingJobs: checking for jobs "
+                    "starting before: %1").arg(maxSchedRunTime.toString()));
+    }
+
+    JobQueue::GetJobsInQueue(jobs, JOB_LIST_NOT_DONE);
+
+    if (jobs.size()) {
+        for (it = jobs.begin(); it != jobs.end(); ++it)
+        {
+            tmpStatus = it.data().status;
+            if (tmpStatus == JOB_RUNNING) {
+                VERBOSE(VB_JOBQUEUE, LOC +
+                        QString("HasRunningOrPendingJobs: found running job"));
+                return true;
+            }
+            
+            if (checkForQueuedJobs) {
+                if ((tmpStatus != JOB_UNKNOWN) && (!(tmpStatus & JOB_DONE))) {
+                    if (startingWithinMins <= 0) {
+                        VERBOSE(VB_JOBQUEUE, LOC +
+                            QString("HasRunningOrPendingJobs: " 
+                                    "found pending job"));
+                        return true;
+                    }
+                    else if (it.data().schedruntime <= maxSchedRunTime) {
+                        VERBOSE(VB_JOBQUEUE, LOC +
+                            QString("HasRunningOrPendingJobs: found pending " 
+                                    "job scheduled to start at: %1")
+                                    .arg(it.data().schedruntime.toString()));
+                        return true;
+                    }
+                }
+            }
+        }
+    }
+    return false;
+}
+
 
 int JobQueue::GetJobsInQueue(QMap<int, JobQueueEntry> &jobs, int findJobs)
 {

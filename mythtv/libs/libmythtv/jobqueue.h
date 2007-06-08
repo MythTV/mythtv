@@ -163,6 +163,8 @@ class MPUBLIC JobQueue : public QObject
     static QString JobText(int jobType);
     static QString StatusText(int status);
 
+    static bool HasRunningOrPendingJobs(int startingWithinMins = 0);
+
     static int GetJobsInQueue(QMap<int, JobQueueEntry> &jobs,
                               int findJobs = JOB_LIST_NOT_DONE);
 
@@ -179,6 +181,8 @@ class MPUBLIC JobQueue : public QObject
     void ProcessJob(int id, int jobType, QString chanid, QDateTime starttime);
 
     bool AllowedToRun(JobQueueEntry job);
+
+    static bool InJobRunWindow(int orStartingWithinMins = 0);
 
     void StartChildJob(void *(*start_routine)(void *), ProgramInfo *tmpInfo);
 

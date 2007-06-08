@@ -12,6 +12,7 @@ using namespace std;
 #include <mythcontext.h>
 #include <mythdbcon.h>
 #include "libmythtv/programinfo.h"
+#include "libmythtv/jobqueue.h"
 #include "tv.h"
 
 void setGlobalSetting(const QString &key, const QString &value)
@@ -199,6 +200,12 @@ int getStatus(bool bWantRecStatus)
     {
         VERBOSE(VB_IMPORTANT, "Shutdown is locked");
         res += 16;
+    }
+
+    if (JobQueue::HasRunningOrPendingJobs(15))
+    {
+        VERBOSE(VB_IMPORTANT, "Has queued or pending jobs");
+        res += 32;
     }
 
     QDateTime dtPeriod1Start = getDailyWakeupTime("DailyWakeupStartPeriod1");
@@ -715,7 +722,7 @@ void showUsage()
   cout << "                          4 - Grabbing EPG data\n";
   cout << "                          8 - Recording - only valid if flag is 1\n";
   cout << "                         16 - Locked\n";
-  cout << "                         32 - Not used\n";
+  cout << "                         32 - Jobs running or pending\n";
   cout << "                         64 - In a daily wakeup/shutdown period\n";
   cout << "                        128 - Less than 15 minutes to next wakeup period\n";
   cout << "-v/--verbose debug-level (Use '-v help' for level info\n";

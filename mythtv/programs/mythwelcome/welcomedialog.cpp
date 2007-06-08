@@ -633,6 +633,8 @@ void WelcomeDialog::updateStatusMessage(void)
         m_statusList.append(tr("MythTV is busy grabbing EPG data."));
     if (statusCode & 16)
         m_statusList.append(tr("MythTV is locked by a user."));
+    if (statusCode & 32)
+        m_statusList.append(tr("MythTV has running or pending jobs."));
     if (statusCode & 64)
         m_statusList.append(tr("MythTV is in a daily wakeup/shutdown period."));
     if (statusCode & 128)
