@@ -454,6 +454,7 @@ class MPUBLIC NuppelVideoPlayer : public CC608Reader, public CC708Reader
     void SkipCommercialsByBlanks(void);
     bool DoSkipCommercials(int direction);
     void AutoCommercialSkip(void);
+    void MergeShortCommercials(void);
 
     // Private edit stuff
     void SaveCutList(void);

@@ -531,6 +531,17 @@ static GlobalSpinBox *MaximumCommercialSkip()
     return bs;
 }
 
+static GlobalSpinBox *MergeShortCommBreaks()
+{
+    GlobalSpinBox *bs = new GlobalSpinBox("MergeShortCommBreaks", 0, 3600, 5);
+    bs->setLabel(QObject::tr("Merge short commercial breaks (in seconds)"));
+    bs->setHelpText(QObject::tr("Treat consecutive commercial breaks shorter "
+                    "than this as one break when skipping forward. Useful if "
+                    "you have to skip a few times during breaks. Applies to "
+                    "automatic skipping as well. Set to 0 to disable."));
+    bs->setValue(0);
+    return bs;
+}
 
 static GlobalSpinBox *AutoExpireExtraSpace()
 {
@@ -3601,6 +3612,7 @@ PlaybackSettings::PlaybackSettings()
     comms->addChild(CommRewindAmount());
     comms->addChild(CommNotifyAmount());
     comms->addChild(MaximumCommercialSkip());
+    comms->addChild(MergeShortCommBreaks());
     comms->addChild(CommSkipAllBlanks());
     addChild(comms);
 

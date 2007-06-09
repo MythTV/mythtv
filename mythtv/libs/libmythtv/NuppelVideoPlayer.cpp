@@ -5723,6 +5723,22 @@ void NuppelVideoPlayer::calcSliderPos(struct StatusPosInfo &posInfo,
     }
 }
 
+void NuppelVideoPlayer::MergeShortCommercials(void)
+{
+    double maxMerge = gContext->GetNumSetting("MergeShortCommBreaks", 0) * 
+                       video_frame_rate;
+    if (maxMerge > 0)
+    {
+        long long lastFrame = commBreakIter.key();
+        ++commBreakIter;
+        while ((commBreakIter != commBreakMap.end()) && 
+               (commBreakIter.key() - lastFrame < maxMerge)) {
+            ++commBreakIter;
+        }
+        --commBreakIter;
+    }
+}
+
 void NuppelVideoPlayer::AutoCommercialSkip(void)
 {
     if (((time(NULL) - lastSkipTime) <= 2) ||
@@ -5754,6 +5770,9 @@ void NuppelVideoPlayer::AutoCommercialSkip(void)
                     .arg(framesPlayed).arg(commBreakIter.key()));
 
             ++commBreakIter;
+
+            MergeShortCommercials();
+            
             if (commBreakIter == commBreakMap.end())
             {
                 VERBOSE(VB_COMMFLAG, LOC + "AutoCommercialSkip(), at "
@@ -5959,6 +5978,9 @@ bool NuppelVideoPlayer::DoSkipCommercials(int direction)
             }
         }
     }
+
+    if (direction > 0)
+        MergeShortCommercials();
 
     if (osd)
     {
