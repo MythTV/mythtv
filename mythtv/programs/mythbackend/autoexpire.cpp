@@ -29,6 +29,7 @@ using namespace std;
 #include "libmyth/util.h"
 #include "libmythtv/remoteutil.h"
 #include "libmythtv/remoteencoder.h"
+#include "libmythtv/storagegroup.h"
 #include "encoderlink.h"
 #include "backendutil.h"
 
@@ -444,6 +445,20 @@ void AutoExpire::ExpireRecordings(void)
                                 foundFile = el->CheckFile(p);
 
                             eit = encoderList->end();
+                        }
+                    }
+
+                    if (!foundFile && (p->hostname != myHostName))
+                    {
+                        // Wasn't found so check locally
+                        StorageGroup sgroup;
+                        QString file = sgroup.FindRecordingFile(p->pathname);
+                        
+                        if (file != "")
+                        {
+                            p->pathname = file;
+                            p->hostname = myHostName;
+                            foundFile = true;
                         }
                     }
 
