@@ -4,6 +4,7 @@
 #include <mythtv/mythcontext.h>
 #include <mythtv/uitypes.h>
 #include <qprocess.h>
+#include <unistd.h>
 
 #include "moviesui.h"
 
