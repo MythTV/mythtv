@@ -47,7 +47,6 @@ class MpegRecorder : public RecorderBase
     bool SetupRecording(void);
     void FinishRecording(void);
     void HandleKeyframe(void);
-    void SavePositionMap(bool force);
 
     void ProcessData(unsigned char *buffer, int len);
 
@@ -103,11 +102,6 @@ class MpegRecorder : public RecorderBase
     long long lastpackheaderpos;
     long long lastseqstart;
     long long numgops;
-
-    // Position map support
-    QMutex                     positionMapLock;
-    QMap<long long, long long> positionMap;
-    QMap<long long, long long> positionMapDelta;
 
     // buffer used for ...
     unsigned char *buildbuffer;

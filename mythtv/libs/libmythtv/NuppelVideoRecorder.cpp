@@ -165,6 +165,8 @@ NuppelVideoRecorder::NuppelVideoRecorder(TVRec *rec, ChannelBase *channel)
 
     go7007 = false;
     resetcapture = false;
+
+    SetPositionMapType(MARK_KEYFRAME);
 }
 
 NuppelVideoRecorder::~NuppelVideoRecorder(void)
@@ -2104,8 +2106,7 @@ void NuppelVideoRecorder::WriteKeyFrameAdjustTable(
     delete [] kfa_buf;
 }
 
-void NuppelVideoRecorder::UpdateSeekTable(int frame_num, bool update_db,
-                                          long offset)
+void NuppelVideoRecorder::UpdateSeekTable(int frame_num, long offset)
 {
     long long position = ringBuffer->GetWritePosition() + offset;
     struct seektable_entry ste;
@@ -2113,37 +2114,14 @@ void NuppelVideoRecorder::UpdateSeekTable(int frame_num, bool update_db,
     ste.keyframe_number = frame_num;
     seektable->push_back(ste);
 
-    bool save_map = false;
-
     positionMapLock.lock();
     if (!positionMap.contains(ste.keyframe_number))
     {
         positionMapDelta[ste.keyframe_number] = position;
         positionMap[ste.keyframe_number] = position;
         lastPositionMapPos = position;
-        save_map = true;
     }
     positionMapLock.unlock();
-
-    if (save_map && update_db)
-        SavePositionMap(false);
-}
-
-void NuppelVideoRecorder::SavePositionMap(bool force)
-{
-    QMutexLocker locker(&positionMapLock);
-
-    force |= (positionMap.size() < 30) && (positionMap.size() % 5 == 1);
-    force |= positionMapDelta.size() >= 30;
-
-    if (curRecording && force)
-    {
-        curRecording->SetPositionMapDelta(positionMapDelta, MARK_KEYFRAME);
-        // Stop setting the filesize here until we get the contention issue
-        // between with this thread and the scheduler worked out.
-        //curRecording->SetFilesize(lastPositionMapPos);
-        positionMapDelta.clear();
-    }
 }
 
 int NuppelVideoRecorder::CreateNuppelFile(void)
@@ -2915,6 +2893,8 @@ void NuppelVideoRecorder::SetNextRecording(const ProgramInfo *progInf,
     // First we do some of the time consuming stuff we can do now
     SavePositionMap(true);
     ringBuffer->WriterFlush();
+    if (curRecording)
+        curRecording->SetFilesize(ringBuffer->GetRealFileSize());
 
     // Then we set the next info
     QMutexLocker locker(&nextRingBufferLock);

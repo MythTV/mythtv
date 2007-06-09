@@ -108,12 +108,11 @@ MpegRecorder::MpegRecorder(TVRec *rec) :
     keyframedist(15),         gopset(false),
     leftovers(0),             lastpackheaderpos(0),
     lastseqstart(0),          numgops(0),
-    // Position map support
-    positionMapLock(false),
     // buffer used for ...
     buildbuffer(new unsigned char[kBuildBufferMaxSize + 1]),
     buildbuffersize(0)
 {
+    SetPositionMapType(MARK_GOP_START);
 }
 
 MpegRecorder::~MpegRecorder()
@@ -1048,6 +1047,8 @@ void MpegRecorder::SetNextRecording(const ProgramInfo *progInf, RingBuffer *rb)
     // First we do some of the time consuming stuff we can do now
     SavePositionMap(true);
     ringBuffer->WriterFlush();
+	if (curRecording)
+        curRecording->SetFilesize(ringBuffer->GetRealFileSize());
 
     // Then we set the next info
     {
@@ -1066,46 +1067,15 @@ void MpegRecorder::SetNextRecording(const ProgramInfo *progInf, RingBuffer *rb)
 void MpegRecorder::HandleKeyframe(void)
 {
     // Add key frame to position map
-    bool save_map = false;
     positionMapLock.lock();
     if (!positionMap.contains(numgops))
     {
         positionMapDelta[numgops] = lastpackheaderpos;
         positionMap[numgops]      = lastpackheaderpos;
-        save_map = true;
     }
     positionMapLock.unlock();
-    // Save the position map delta, but don't force a save.
-    if (save_map)
-        SavePositionMap(false);
 
     // Perform ringbuffer switch if needed.
     CheckForRingBufferSwitch();
 }
 
-/** \fn MpegRecorder::SavePositionMap(bool)
- *  \brief This saves the postition map delta to the database if force
- *         is true or there are 30 frames in the map or there are five
- *         frames in the map with less than 30 frames in the non-delta
- *         position map.
- *  \param force If true this forces a DB sync.
- */
-void MpegRecorder::SavePositionMap(bool force)
-{
-    QMutexLocker locker(&positionMapLock);
-
-    // save on every 5th key frame if in the first few frames of a recording
-    force |= (positionMap.size() < 30) && (positionMap.size() % 5 == 1);
-    // save every 30th key frame later on
-    force |= positionMapDelta.size() >= 30;
-
-    if (curRecording && force)
-    {
-        curRecording->SetPositionMapDelta(positionMapDelta,
-                                          MARK_GOP_START);
-        // Stop setting the filesize here until we get the contention issue
-        // between with this thread and the scheduler worked out.
-        //curRecording->SetFilesize(lastpackheaderpos);
-        positionMapDelta.clear();
-    }
-}

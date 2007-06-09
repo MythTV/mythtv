@@ -208,6 +208,10 @@ class MPUBLIC RecorderBase
      */
     virtual void CheckForRingBufferSwitch(void);
 
+    /** \brief Save the seektable to the DB
+     */
+    void SavePositionMap(bool force = false);
+
   protected:
     /** \brief Convenience function used to set integer options from a profile.
      *  \sa SetOption(const QString&, int)
@@ -222,6 +226,10 @@ class MPUBLIC RecorderBase
     virtual void ResetForNewFile(void) = 0;
     virtual void FinishRecording(void) = 0;
     virtual void StartNewFile(void) { }
+
+    /** \brief Set seektable type
+     */
+    void SetPositionMapType(int type) { positionMapType = type; }
 
     TVRec         *tvrec;
     RingBuffer    *ringBuffer;
@@ -249,6 +257,14 @@ class MPUBLIC RecorderBase
     QMutex         nextRingBufferLock;
     RingBuffer    *nextRingBuffer;
     ProgramInfo   *nextRecording;
+
+    // Seektable  support
+    int                        positionMapType;
+    QMutex                     positionMapLock;
+    QMap<long long, long long> positionMap;
+    QMap<long long, long long> positionMapDelta;
 };
 
 #endif
+
+/* vim: set expandtab tabstop=4 shiftwidth=4: */

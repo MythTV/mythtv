@@ -49,7 +49,6 @@ class DTVRecorder: public RecorderBase
     void ResetForNewFile(void);
 
     void HandleKeyframe();
-    void SavePositionMap(bool force);
 
     void BufferedWrite(const TSPacket &tspacket);
 
@@ -99,11 +98,6 @@ class DTVRecorder: public RecorderBase
     // statistics
     unsigned long long _frames_seen_count;
     unsigned long long _frames_written_count;
-
-    // position maps for seeking
-    QMutex                     _position_map_lock;
-    QMap<long long, long long> _position_map;
-    QMap<long long, long long> _position_map_delta;
 
     // constants
     /// If the number of regular frames detected since the last

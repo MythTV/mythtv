@@ -824,7 +824,7 @@ int Transcode::TranscodeFile(char *inputname, char *outputname,
                     //need to correct the frame# and timecode here
                     // Question:  Is it necessary to change the timecodes?
                     long sync_offset = nvp->UpdateStoredFrameNum(curFrameNum);
-                    nvr->UpdateSeekTable(num_keyframes, false, sync_offset);
+                    nvr->UpdateSeekTable(num_keyframes, sync_offset);
                     ReencoderAddKFA(curFrameNum, lastKeyFrame, num_keyframes);
                     num_keyframes++;
                     lastKeyFrame = curFrameNum;

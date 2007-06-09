@@ -17,7 +17,8 @@ RecorderBase::RecorderBase(TVRec *rec)
       audiodevice("/dev/dsp"), videodevice("/dev/video"), vbidevice("/dev/vbi"),
       vbimode(0), ntsc(true), ntsc_framerate(true), video_frame_rate(29.97),
       curRecording(NULL), request_pause(false), paused(false),
-      nextRingBuffer(NULL), nextRecording(NULL)
+      nextRingBuffer(NULL), nextRecording(NULL),
+      positionMapType(MARK_GOP_BYFRAME), positionMapLock(false)
 {
     QMutexLocker locker(&avcodeclock);
     avcodec_init(); // init CRC's
@@ -220,3 +221,36 @@ void RecorderBase::CheckForRingBufferSwitch(void)
         tvrec->RingBufferChanged(ringBuffer, curRecording);
 }
 
+/** \fn RecorderBase::SavePositionMap(bool)
+ *  \brief This saves the postition map delta to the database if force
+ *         is true or there are 30 frames in the map or there are five
+ *         frames in the map with less than 30 frames in the non-delta
+ *         position map.
+ *  \param force If true this forces a DB sync.
+ */
+void RecorderBase::SavePositionMap(bool force)
+{
+    bool needToSave = force;
+    positionMapLock.lock();
+
+    // save on every 5th key frame if in the first few frames of a recording
+    needToSave |= (positionMap.size() < 30) && (positionMap.size() % 5 == 1);
+    // save every 30th key frame later on
+    needToSave |= positionMapDelta.size() >= 30;
+
+    if (curRecording && needToSave)
+    {
+        // copy the delta map because most times we are called it will be in
+        // another thread and we don't want to lock the main recorder thread
+        // which is populating the delta map
+        QMap<long long, long long> deltaCopy(positionMapDelta);
+        positionMapDelta.clear();
+        positionMapLock.unlock();
+
+        curRecording->SetPositionMapDelta(deltaCopy, positionMapType);
+    }
+    else
+        positionMapLock.unlock();
+}
+
+/* vim: set expandtab tabstop=4 shiftwidth=4: */

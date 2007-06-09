@@ -61,6 +61,7 @@ DTVRecorder::DTVRecorder(TVRec *rec) :
     // statistics
     _frames_seen_count(0),          _frames_written_count(0)
 {
+    SetPositionMapType(MARK_GOP_BYFRAME);
 }
 
 DTVRecorder::~DTVRecorder()
@@ -119,19 +120,20 @@ void DTVRecorder::FinishRecording(void)
             curRecording->SetFilesize(ringBuffer->GetRealFileSize());
         SavePositionMap(true);
     }
-    _position_map_lock.lock();
-    _position_map.clear();
-    _position_map_lock.unlock();
+    positionMapLock.lock();
+    positionMap.clear();
+    positionMapDelta.clear();
+    positionMapLock.unlock();
 }
 
 // documented in recorderbase.h
 long long DTVRecorder::GetKeyframePosition(long long desired)
 {
-    QMutexLocker locker(&_position_map_lock);
+    QMutexLocker locker(&positionMapLock);
     long long ret = -1;
 
-    if (_position_map.find(desired) != _position_map.end())
-        ret = _position_map[desired];
+    if (positionMap.find(desired) != positionMap.end())
+        ret = positionMap[desired];
 
     return ret;
 }
@@ -139,7 +141,7 @@ long long DTVRecorder::GetKeyframePosition(long long desired)
 // documented in recorderbase.h
 void DTVRecorder::Reset(void)
 {
-    QMutexLocker locker(&_position_map_lock);
+    QMutexLocker locker(&positionMapLock);
 
     _start_code                 = 0xffffffff;
     _first_keyframe             =-1;
@@ -155,8 +157,8 @@ void DTVRecorder::Reset(void)
     _pes_synced                 = false;
     _seen_sps                   = false;
     _h264_kf_seq.Reset();
-    _position_map.clear();
-    _position_map_delta.clear();
+    positionMap.clear();
+    positionMapDelta.clear();
 }
 
 void DTVRecorder::BufferedWrite(const TSPacket &tspacket)
@@ -296,7 +298,11 @@ void DTVRecorder::SetNextRecording(const ProgramInfo *progInf, RingBuffer *rb)
     // First we do some of the time consuming stuff we can do now
     SavePositionMap(true);
     if (ringBuffer)
+    {
         ringBuffer->WriterFlush();
+        if (curRecording)
+            curRecording->SetFilesize(ringBuffer->GetRealFileSize());
+    }
 
     // Then we set the next info
     nextRingBufferLock.lock();
@@ -326,53 +332,19 @@ void DTVRecorder::HandleKeyframe(void)
     _first_keyframe = (_first_keyframe < 0) ? frameNum : _first_keyframe;
 
     // Add key frame to position map
-    bool save_map = false;
-    _position_map_lock.lock();
-    if (!_position_map.contains(frameNum))
+    positionMapLock.lock();
+    if (!positionMap.contains(frameNum))
     {
         long long startpos = ringBuffer->GetWritePosition();
         // FIXME: handle keyframes with start code spanning over two ts packets
         startpos += _payload_buffer.size();
-        _position_map_delta[frameNum] = startpos;
-        _position_map[frameNum]       = startpos;
-        save_map = true;
+        positionMapDelta[frameNum] = startpos;
+        positionMap[frameNum]      = startpos;
     }
-    _position_map_lock.unlock();
-    // Save the position map delta, but don't force a save.
-    if (save_map)
-        SavePositionMap(false);
+    positionMapLock.unlock();
 
     // Perform ringbuffer switch if needed.
     CheckForRingBufferSwitch();
-}
-
-/** \fn DTVRecorder::SavePositionMap(bool)
- *  \brief This saves the postition map delta to the database if force
- *         is true or there are 30 frames in the map or there are five
- *         frames in the map with less than 30 frames in the non-delta
- *         position map.
- *  \param force If true this forces a DB sync.
- */
-void DTVRecorder::SavePositionMap(bool force)
-{
-    QMutexLocker locker(&_position_map_lock);
-
-    // save on every 5th key frame if in the first few frames of a recording
-    force |= (_position_map.size() < 30) && (_position_map.size()%5 == 1);
-    // save every 30th key frame later on
-    force |= _position_map_delta.size() >= 30;
-
-    if (curRecording && force && _position_map_delta.size())
-    {
-        curRecording->SetPositionMapDelta(_position_map_delta, 
-                                          MARK_GOP_BYFRAME);
-        _position_map_delta.clear();
-
-        // Stop setting the filesize here until we get the contention issue
-        // between with this thread and the scheduler worked out.
-        //if (ringBuffer)
-        //    curRecording->SetFilesize(ringBuffer->GetWritePosition());
-    }
 }
 
 /** \fn DTVRecorder::FindH264Keyframes(const TSPacket*)
@@ -508,21 +480,16 @@ void DTVRecorder::HandleH264Keyframe(void)
     _first_keyframe = (_first_keyframe < 0) ? frameNum : _first_keyframe;
 
     // Add key frame to position map
-    bool save_map = false;
-    _position_map_lock.lock();
-    if (!_position_map.contains(frameNum))
+    positionMapLock.lock();
+    if (!positionMap.contains(frameNum))
     {
-        _position_map_delta[frameNum] = _h264_kf_seq.KeyframeAUStreamOffset();
-        _position_map[frameNum]       = _h264_kf_seq.KeyframeAUStreamOffset();
-        save_map = true;
+        positionMapDelta[frameNum] = _h264_kf_seq.KeyframeAUStreamOffset();
+        positionMap[frameNum]      = _h264_kf_seq.KeyframeAUStreamOffset();
     }
-    _position_map_lock.unlock();
-
-    // Save the position map delta, but don't force a save.
-    if (save_map)
-        SavePositionMap(false);
+    positionMapLock.unlock();
 
     // Perform ringbuffer switch if needed.
     CheckForRingBufferSwitch();
 }
 
+/* vim: set expandtab tabstop=4 shiftwidth=4: */

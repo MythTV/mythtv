@@ -1263,7 +1263,12 @@ void TVRec::RunTV(void)
         }
 
         if (curRecording)
+        {
             curRecording->UpdateInUseMark();
+
+            if (recorder)
+                recorder->SavePositionMap();
+        }
 
         // Check for the end of the current program..
         if (GetState() == kState_WatchingLiveTV)

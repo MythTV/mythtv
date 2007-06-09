@@ -92,7 +92,7 @@ class MPUBLIC NuppelVideoRecorder : public RecorderBase, public CC608Reader
     void WriteHeader(void);
     void WriteSeekTable(void);
     void WriteKeyFrameAdjustTable(QPtrList<struct kfatable_entry> *kfa_table);
-    void UpdateSeekTable(int frame_num, bool update_db = true, long offset = 0);
+    void UpdateSeekTable(int frame_num, long offset = 0);
 
     bool SetupAVCodecVideo(void);
     void SetupRTjpeg(void);
@@ -118,8 +118,6 @@ class MPUBLIC NuppelVideoRecorder : public RecorderBase, public CC608Reader
     inline void WriteFrameheader(rtframeheader *fh);
 
     void WriteFileHeader(void);
-
-    void SavePositionMap(bool force);
 
     void InitBuffers(void);
     void InitFilters(void);   
@@ -215,9 +213,6 @@ class MPUBLIC NuppelVideoRecorder : public RecorderBase, public CC608Reader
 
     int keyframedist;
     vector<struct seektable_entry> *seektable;
-    QMap<long long, long long> positionMap;
-    QMap<long long, long long> positionMapDelta;
-    QMutex positionMapLock;
     long long lastPositionMapPos;
 
     long long extendeddataOffset;
