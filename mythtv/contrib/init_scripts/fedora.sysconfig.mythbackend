@@ -43,6 +43,16 @@
 # edit as required.
 #
 
+# User who should start the mythbackend processes
+#
+# Running mythbackend as non-root requires you to ensure that audio/video
+# devices used for recording have suitable user permissions. One way
+# to achieve this is to modify existing or create new udev rules which
+# assign these devices to a non-root group with rw permissions and add
+# your mythbackend user to that group.
+#
+# MBE_USER='root'
+
 #
 # Name of mythbackend binary.
 #
@@ -60,15 +70,24 @@
 # MYTHTV_HOME='/var/lib/mythtv'
 
 #
-# Full path to mythbackend log file.
+# Directory holding the mythbackend log file
 #
-# NOTE: If you are running as non-root take care to ensure the myth user
+# LOG_DIR='/var/log/mythtv'
+
+#
+# Name of mythbackend log file.
+#
+# NOTE: If you are running as non-root take care to ensure the mythbackend user
 # has permission to write to this log file.
 #
-# MBE_LOGFILE='/var/log/mythtv/mythbackend.log'
+# LOG_FILE='mythbackend.log'
+
+#
+# Logging options for mythbackend (see 'mythbackend -v help' for a list)
+#
+# LOG_OPTS=''
 
 #
 # Other startup options for mythbackend (see 'mythbackend --help' for a list).
 #
 # MBE_OPTIONS=''
-

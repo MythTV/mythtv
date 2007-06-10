@@ -12,7 +12,7 @@
 #              have started, in runlevel 5. This allows scheduled recordings \
 #              to occur without manual intervention.
 # processname: mythbackend
-# config:
+# config:      /etc/sysconfig/mythbackend
 #
 ###############################################################################
 #
@@ -47,14 +47,23 @@
 # Name of mythbackend binary
     MBE_PROG='mythbackend'
 
-# Full path to mythbackend log file
-    MBE_LOGFILE='/var/log/mythtv/mythbackend.log'
+# Directory holding the mythbackend log file
+    LOG_DIR='/var/log/mythtv'
+
+# Name of mythbackend log file
+    LOG_FILE='mythbackend.log'
+
+# Logging options for mythbackend (empty means '-v important,general')
+    LOG_OPTS=''
 
 # Startup options for mythbackend
     MBE_OPTIONS=''
 
 # Pseudo-homedir for MythBackend
     MYTHTV_HOME='/var/lib/mythtv'
+
+# Directory holding the mythbackend binary (empty means autodetect)
+    MBE_DIR=''
 
 ###############################################################################
 
@@ -87,6 +96,12 @@
     elif [ ! -x "$MBE_BIN" ]; then
         echo "$MBE_PROG is not executable"
         exit 1
+    elif [ ! -d "$MYTHTV_HOME" ]; then
+        echo "mythbackend pseudo-home directory does not exist"
+        exit 1
+    elif [ ! -d "$LOG_DIR" ]; then
+        echo "Log directory does not exist"
+        exit 1
     fi
 
 # Initialize the return variable
@@ -104,16 +119,21 @@
             return 0
         fi
     # Start
+
+    # Running mythbackend as non-root requires you to ensure that audio/video
+    # devices used for recording have suitable user permissions. One way
+    # to achieve this is to modify existing or create new udev rules which
+    # assign these devices to a non-root group with rw permissions and add
+    # your mythbackend user to that group.
+
         echo -n $"Starting $MBE_PROG: "
         touch "/var/run/$MBE_PROG.pid"
         chown "$MBE_USER":"$MBE_USER" "/var/run/$MBE_PROG.pid"
-    # Other distros might add a --user option to daemon, but that doesn't seem
-    # to be available in Fedora.
-        cd $MYTHTV_HOME                           \
-            && daemon --user "$MBE_USER" "$MBE_BIN" \
-               --daemon                           \
-               --logfile "$MBE_LOGFILE"           \
-               --pidfile "/var/run/$MBE_PROG.pid" \
+        cd $MYTHTV_HOME                                   \
+            && daemon --user "$MBE_USER" "$MBE_BIN"       \
+               --daemon                                   \
+               --logfile "$LOG_DIR/$LOG_FILE" "$LOG_OPTS" \
+               --pidfile "/var/run/$MBE_PROG.pid"         \
                $MBE_OPTIONS
         RETVAL=$?
         [ $RETVAL = 0 ] && touch /var/lock/subsys/$MBE_PROG
@@ -125,10 +145,10 @@
 # Stop the process
 #
     stop() {
-        echo -n "Stopping $MBE_PROG: "
+        echo -n $"Stopping $MBE_PROG: "
         killproc "$MBE_PROG"
         RETVAL=$?
-        [ $RETVAL -eq 0 ] && rm -f /var/lock/subsys/${MBE_PROG}
+        [ $RETVAL -eq 0 ] && rm -f /var/lock/subsys/${MBE_PROG} /var/run/${MBE_PROG}.pid
         echo
         return $RETVAL
     }
@@ -140,14 +160,6 @@
     restart() {
         stop
         start
-    }
-
-#
-# Mythbackend doesn't have a reload, so this should never get called
-#
-    reload() {
-        echo "Mythbackend does not support reload; please use restart"
-        exit 1
     }
 
 ###############################################################################
