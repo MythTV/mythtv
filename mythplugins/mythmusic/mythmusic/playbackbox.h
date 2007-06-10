@@ -24,11 +24,8 @@ class PlaybackBoxMusic : public MythThemedDialog
 
   public:
 
-    //
-    // Now featuring a themed constructor ... YAH!!!
-    //
     typedef QValueVector<int> IntVector;
-    
+
     PlaybackBoxMusic(MythMainWindow *parent, QString window_name,
                      QString theme_filename,
                      PlaylistsContainer *the_playlists, AllMusic *the_music,
@@ -80,6 +77,8 @@ class PlaybackBoxMusic : public MythThemedDialog
     void end();
     void resetScrollCount();
 
+    void handlePush(QString buttonname);
+
     void occasionallyCheckCD();
 
     // popup menu
@@ -118,6 +117,8 @@ class PlaybackBoxMusic : public MythThemedDialog
     void bannerToggle(Metadata *mdata);
     void savePosition(uint position);
     void restorePosition(void);
+
+    void pushButton(UIPushButtonType *button);
 
     QIODevice *input;
     AudioOutput *output;
@@ -230,6 +231,8 @@ class PlaybackBoxMusic : public MythThemedDialog
     UIPushButtonType      *stop_button;
     UIPushButtonType      *ff_button;
     UIPushButtonType      *next_button;
+
+    UIPushButtonType      *m_pushedButton;
 
     UITextButtonType      *shuffle_button;
     UITextButtonType      *repeat_button;

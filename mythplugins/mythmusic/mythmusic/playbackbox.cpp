@@ -93,6 +93,8 @@ PlaybackBoxMusic::PlaybackBoxMusic(MythMainWindow *parent, QString window_name,
     show_album_art = gContext->GetNumSetting("VisualAlbumArtOnSongChange", 0);
     random_visualizer = gContext->GetNumSetting("VisualRandomize", 0);
 
+    m_pushedButton = NULL;
+
     // Through the magic of themes, our "GUI" already exists we just need to 
     // wire up it
 
@@ -109,7 +111,7 @@ PlaybackBoxMusic::PlaybackBoxMusic(MythMainWindow *parent, QString window_name,
         connect(volume_display_timer, SIGNAL(timeout()),
                 this, SLOT(hideVolume()));
     }
-    
+
     // Figure out the shuffle mode
 
     QString playmode = gContext->GetSetting("PlayMode", "none");
@@ -529,7 +531,9 @@ void PlaybackBoxMusic::keyPressEvent(QKeyEvent *e)
             else if (action == "PAGEUP")
                 music_tree_list->pageUp();
             else if (action == "PAGEDOWN")
+            {
                 music_tree_list->pageDown();
+            }
             else if (action == "INCSEARCH")
                 music_tree_list->incSearchStart();
             else if (action == "INCSEARCHNEXT")
@@ -561,6 +565,28 @@ void PlaybackBoxMusic::keyPressEvent(QKeyEvent *e)
 
     if (!handled)
         MythThemedDialog::keyPressEvent(e);
+}
+
+void PlaybackBoxMusic::handlePush(QString buttonname)
+{
+    if (m_pushedButton)
+        m_pushedButton->unPush();
+
+    if (buttonname == "play_button")
+    {
+        play();
+        m_pushedButton = play_button;
+    }
+    else if (buttonname == "pause_button")
+    {
+        pause();
+        m_pushedButton = pause_button;
+    }
+    else if (buttonname == "stop_button")
+    {
+        stop();
+        m_pushedButton = stop_button;
+    }
 }
 
 void PlaybackBoxMusic::showMenu()
@@ -2077,17 +2103,15 @@ void PlaybackBoxMusic::handleTreeListSignals(int node_int, IntVector *attributes
         }
 
         if (output && output->GetPause())
-        {
             stop();
-            if (play_button)
-            {
-                play_button->push();
-            }
-            else
-            {
-                play();
-            }
+
+        if (m_pushedButton && m_pushedButton->Name() == "play_button")
+        {
+            // Play button already pushed, so don't push it again.
+            play();
         }
+        else if (play_button)
+            play_button->push();
         else
             play();
     }
@@ -2193,16 +2217,22 @@ void PlaybackBoxMusic::wireUpTheme()
         connect(rew_button, SIGNAL(pushed()), this, SLOT(seekback()));
 
     pause_button = getUIPushButtonType("pause_button");
+    pause_button->setLockOn();
     if (pause_button)
-        connect(pause_button, SIGNAL(pushed()), this, SLOT(pause()));
+        connect(pause_button, SIGNAL(pushed(QString)), this,
+        SLOT(handlePush(QString)));
 
     play_button = getUIPushButtonType("play_button");
+    play_button->setLockOn();
     if (play_button)
-        connect(play_button, SIGNAL(pushed()), this, SLOT(play()));
+        connect(play_button, SIGNAL(pushed(QString)), this,
+        SLOT(handlePush(QString)));
 
     stop_button = getUIPushButtonType("stop_button");
+    stop_button->setLockOn();
     if (stop_button)
-        connect(stop_button, SIGNAL(pushed()), this, SLOT(stop()));
+        connect(stop_button, SIGNAL(pushed(QString)), this,
+        SLOT(handlePush(QString)));
 
     ff_button = getUIPushButtonType("ff_button");
     if (ff_button)
