@@ -1114,16 +1114,21 @@ bool VideoOutputXv::InitSetupBuffers(void)
         "UseChromaKeyOSD", gContext->GetHostName(), 0);
     use_chroma_key_osd &= (xv || vld || idct || mc);
 
-    xvmc_tex = XvMCTextures::Create(XJ_disp, XJ_curwin, XJ_screen_num,
-                                    video_dim, display_visible_rect.size());
-    if (xvmc_tex)
+    // Are we using XvMC?
+    QString dec = gContext->GetSetting("PreferredMPEG2Decoder", "ffmpeg");
+    if (dec == "xvmc" || dec == "xvmc-vld")
     {
-        VERBOSE(VB_IMPORTANT, LOC + "XvMCTex: Init succeeded");
-        xvmc_buf_attr->SetOSDNum(0); // disable XvMC blending OSD
-    }
-    else
-    {
-        VERBOSE(VB_IMPORTANT, LOC + "XvMCTex: Init failed");
+        xvmc_tex = XvMCTextures::Create(XJ_disp, XJ_curwin, XJ_screen_num,
+                                        video_dim, display_visible_rect.size());
+        if (xvmc_tex)
+        {
+            VERBOSE(VB_IMPORTANT, LOC + "XvMCTex: Init succeeded");
+            xvmc_buf_attr->SetOSDNum(0); // disable XvMC blending OSD
+        }
+        else
+        {
+            VERBOSE(VB_IMPORTANT, LOC + "XvMCTex: Init failed");
+        }
     }
 
     // create chroma key osd structure if needed
