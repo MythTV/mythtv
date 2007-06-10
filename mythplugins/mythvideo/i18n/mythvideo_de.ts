@@ -152,11 +152,11 @@
     </message>
     <message>
         <source>Parental Pin:</source>
-        <translation type="unfinished">Kindersicherungs-PIN:</translation>
+        <translation>Kindersicherungs-PIN:</translation>
     </message>
     <message>
         <source>No Cover</source>
-        <translation type="unfinished">Kein Cover</translation>
+        <translation>Kein Cover</translation>
     </message>
     <message>
         <source>Unknown</source>
@@ -318,27 +318,27 @@
     </message>
     <message>
         <source>Sorting ignores case</source>
-        <translation type="unfinished"></translation>
+        <translation>Sortierung ignoriert Gross-/Kleinschreibung</translation>
     </message>
     <message>
         <source>If set, case is ignored when sorting entries in a view.</source>
-        <translation type="unfinished"></translation>
+        <translation>Wenn aktiviert wird die Gross-/Kleinschreibung beim Sortieren von Einträgen in einer Ansicht ignoriert.</translation>
     </message>
     <message>
         <source>Show folders for database views</source>
-        <translation type="unfinished"></translation>
+        <translation>Zeige Verzeichnisse für Datenbankansichten</translation>
     </message>
     <message>
         <source>If set, sub folders of your video directory will be shown in supported views.</source>
-        <translation type="unfinished"></translation>
+        <translation>Wenn aktiviert werden Unterverzeichnisse des Video-Verzeichnisses angezeigt, falls dies von der Ansicht unterstützt wird.</translation>
     </message>
     <message>
         <source>Image cache size</source>
-        <translation type="unfinished"></translation>
+        <translation>Grösse des Bildercaches</translation>
     </message>
     <message>
         <source>This setting determines the number of images MythVideo will cache for views.</source>
-        <translation type="unfinished"></translation>
+        <translation>Setzt die Anzahl der Bilder welche MythVideo cachen wird.</translation>
     </message>
     <message>
         <source>^(The |A |An )</source>
@@ -346,39 +346,39 @@
     </message>
     <message>
         <source>All</source>
-        <translation type="unfinished">Alle</translation>
+        <translation>Alle</translation>
     </message>
     <message>
         <source>Yes</source>
-        <translation type="unfinished">Ja</translation>
+        <translation>Ja</translation>
     </message>
     <message>
         <source>No</source>
-        <translation type="unfinished">Nein</translation>
+        <translation>Nein</translation>
     </message>
-    <message>
+	<message>
         <source>Title</source>
-        <translation type="unfinished"></translation>
+        <translation>Titel</translation>
     </message>
     <message>
         <source>Year</source>
-        <translation type="unfinished">Jahr</translation>
+        <translation>Jahr</translation>
     </message>
     <message>
         <source>User Rating</source>
-        <translation type="unfinished">Bewertung</translation>
+        <translation>Bewertung</translation>
     </message>
     <message>
         <source>Runtime</source>
-        <translation type="unfinished">Laufzeit</translation>
+        <translation>Spielzeit</translation>
     </message>
     <message>
         <source>Filename</source>
-        <translation type="unfinished"></translation>
+        <translation>Dateiname</translation>
     </message>
     <message>
         <source>Video ID</source>
-        <translation type="unfinished"></translation>
+        <translation>Video ID</translation>
     </message>
     <message>
         <source>
@@ -390,7 +390,7 @@ Sie haben keinen Befehl zum Abspielen von VCDs definiert.</translation>
     </message>
     <message>
         <source>OK, I&apos;ll go run Setup</source>
-        <translation>Gut, Ich werde Setup starten</translation>
+        <translation>Gut, ich werde Setup starten</translation>
     </message>
     <message>
         <source>
@@ -618,88 +618,89 @@ You have no DVD Device defined.</source>
     </message>
     <message>
         <source>Default Video Player</source>
-        <translation type="unfinished"></translation>
+        <translation>Standard Videoplayer</translation>
     </message>
     <message>
         <source>Remove DVD Bookmarks Older then (days)</source>
-        <translation type="unfinished"></translation>
+        <translation>Lösche DVD Lesezeichen welche älter als X Tage sind</translation>
     </message>
     <message>
         <source>Delete DVD Bookmarks that are older then the Number of days specified</source>
-        <translation type="unfinished"></translation>
+        <translation>Lösche DVD Lesezeichen welche älter als die gewählte Anzahl Tage sind</translation>
     </message>
     <message>
         <source>Enable DVD Bookmark Support</source>
-        <translation type="unfinished"></translation>
+        <translation>Aktiviere DVD Lesezeichen</translation>
     </message>
     <message>
         <source>DVD Bookmark Prompt</source>
-        <translation type="unfinished"></translation>
+        <translation>DVD Lesezeichenaufforderung</translation>
     </message>
     <message>
         <source>Display a prompt to choose whether to play the DVD from the beginning or from the bookmark</source>
-        <translation type="unfinished"></translation>
+        <translation>Zeige eine Aufforderung zum Auswählen ob die DVD von Anfang an oder vom Lesezeichen her abgespielt werden soll</translation>
     </message>
     <message>
         <source>This can be any command to launch a DVD  player (e.g. MPlayer, ogle, etc.). If present, %d will be substituted for the DVD device (e.g. /dev/dvd).</source>
-        <translation type="unfinished"></translation>
+        <translation>Dies kann ein beliebiger Befehl zum Starten eines DVD-Players (z.B. MPlayer, ogle, etc.) sein. Wenn vorhanden wird %d mit dem DVD-Gerätenamen (z.B. /dev/dvd) ersetzt.</translation>
     </message>
     <message>
         <source>General Settings (%1/%2)</source>
-        <translation type="unfinished"></translation>
+        <translation>Allgemeine Einstellungen (%1/%2)</translation>
     </message>
     <message>
         <source>NR</source>
-        <translation type="unfinished">Unbewertet</translation>
+        <translation>Unbewertet</translation>
     </message>
     <message>
         <source>No files found</source>
-        <translation type="unfinished"></translation>
+        <translation>Keine Dateien gefunden</translation>
     </message>
     <message>
         <source>Unknown Prefix</source>
-        <translation type="unfinished"></translation>
+        <translation>Unbekannter Prefix</translation>
     </message>
     <message>
         <source>videos</source>
-        <translation type="unfinished"></translation>
+        <translation>Videos</translation>
     </message>
     <message>
         <source>Searching for video files</source>
-        <translation type="unfinished"></translation>
+        <translation>Suche Videodateien</translation>
     </message>
     <message>
         <source>No to all</source>
-        <translation type="unfinished"></translation>
+        <translation>Nein zu allen</translation>
     </message>
     <message>
         <source>Yes to all</source>
-        <translation type="unfinished"></translation>
+        <translation>Ja zu allen</translation>
     </message>
     <message>
         <source>File Missing</source>
-        <translation type="unfinished"></translation>
+        <translation>Datei fehlt</translation>
     </message>
     <message>
         <source>%1 appears to be missing.
 Remove it from the database?</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 scheint zu fehlen.
+Aus der Datenbank entfernen?</translation>
     </message>
     <message>
         <source>Updating video database</source>
-        <translation type="unfinished"></translation>
+        <translation>Aktualisiere Videodatenbank</translation>
     </message>
     <message>
         <source>Verifying video files</source>
-        <translation type="unfinished"></translation>
+        <translation>Verifiziere Videodateien</translation>
     </message>
     <message>
         <source>No rating available.</source>
-        <translation type="unfinished">Keine Altersfreigabe vorhanden.</translation>
+        <translation>Keine Altersfreigabe vorhanden.</translation>
     </message>
     <message>
         <source>minutes</source>
-        <translation type="unfinished">Minuten</translation>
+        <translation>Minuten</translation>
     </message>
 </context>
 <context>
@@ -786,11 +787,11 @@ Remove it from the database?</source>
     </message>
     <message>
         <source>Command:</source>
-        <translation>Kommando:</translation>
+        <translation>Befehl:</translation>
     </message>
     <message>
         <source>Use default player:</source>
-        <translation>Standard-Abspieler:</translation>
+        <translation>Standard-Player:</translation>
     </message>
     <message>
         <source>Ignore:</source>
@@ -814,7 +815,7 @@ Remove it from the database?</source>
     </message>
     <message>
         <source>Include while Browsing:</source>
-        <translation>Beim browsen berücksichtigen:</translation>
+        <translation>Beim Browsen berücksichtigen:</translation>
     </message>
     <message>
         <source>Cover Art:</source>
@@ -822,7 +823,7 @@ Remove it from the database?</source>
     </message>
     <message>
         <source>Unique Player Command:</source>
-        <translation>Spezielles Abspielkommando:</translation>
+        <translation>Spezieller Abspielbefehl:</translation>
     </message>
     <message>
         <source>/path/to/the/thing.jpg</source>
@@ -834,7 +835,7 @@ Remove it from the database?</source>
     </message>
     <message>
         <source>PL </source>
-        <translation>PL</translation>
+        <translation>PL </translation>
     </message>
     <message>
         <source>Category:</source>
@@ -1001,7 +1002,7 @@ Remove it from the database?</source>
     </message>
     <message>
         <source>Unknown</source>
-        <translation type="unfinished">Unbekannt</translation>
+        <translation>Unbekannt</translation>
     </message>
 </context>
 <context>
@@ -1160,7 +1161,7 @@ Remove it from the database?</source>
     </message>
     <message>
         <source>delete failed</source>
-        <translation>löschen fehlgeschlagen</translation>
+        <translation>Löschen fehlgeschlagen</translation>
     </message>
     <message>
         <source>Select action:</source>
