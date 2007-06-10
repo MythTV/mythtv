@@ -204,6 +204,16 @@ bool OSDListTreeType::HandleKeypress(QKeyEvent *e)
         GetLevel(m_levelnum)->MoveDown();
         EnterItem();
     }
+    else if (has_action("PAGEUP", actions))
+    {
+        GetLevel(m_levelnum)->MovePageUp();
+        EnterItem();
+    }
+    else if (has_action("PAGEDOWN", actions))
+    {
+        GetLevel(m_levelnum)->MovePageDown();
+        EnterItem();
+    }
     else if (has_action("LEFT", actions) && (m_levelnum > 0))
     {
         GetLevel(m_levelnum)->Reset();
@@ -523,6 +533,53 @@ void OSDListBtnType::MoveDown(void)
     m_showUpArrow = m_topIndx;
     m_showDnArrow = m_topIndx + m_itemsVisible < m_itemList.size();
     
+    emit itemSelected(m_itemList[m_selIndx]);
+}
+
+void OSDListBtnType::MovePageUp(void)
+{
+    QMutexLocker lock(&m_update);
+    if (!m_itemList.size())
+        return;
+
+    if (m_itemsVisible > m_itemList.size())
+        return;
+
+    m_selIndx = m_topIndx = m_topIndx - m_itemsVisible;
+
+    if (m_selIndx < 0)
+    {
+        int top = (int)(m_itemsVisible *
+            ceil((float)m_itemList.size()/(float)m_itemsVisible));
+        m_selIndx = m_topIndx = top - m_itemsVisible;
+    }
+
+    m_showUpArrow = m_topIndx;
+    m_showDnArrow = m_topIndx + m_itemsVisible < m_itemList.size();
+
+    emit itemSelected(m_itemList[m_selIndx]);
+}
+
+void OSDListBtnType::MovePageDown(void)
+{
+    QMutexLocker lock(&m_update);
+    if (!m_itemList.size())
+        return;
+
+    if (m_itemsVisible > m_itemList.size())
+        return;
+
+    m_selIndx = m_topIndx+m_itemsVisible;
+
+    if (m_selIndx >= (int)m_itemList.size())
+        m_selIndx = m_topIndx = 0;
+
+    bool scroll_down = m_topIndx + (int)m_itemsVisible <= m_selIndx;
+    m_topIndx = (scroll_down) ? m_topIndx + m_itemsVisible : m_topIndx;
+
+    m_showUpArrow = m_topIndx;
+    m_showDnArrow = m_topIndx + m_itemsVisible < m_itemList.size();
+
     emit itemSelected(m_itemList[m_selIndx]);
 }
 

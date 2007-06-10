@@ -194,6 +194,8 @@ class OSDListBtnType : public OSDType
     // Item Sets/Commands
     void  MoveDown(void);
     void  MoveUp(void);
+    void  MovePageDown(void);
+    void  MovePageUp(void);
 
     // General Commands
     void  Draw(OSDSurface *surface, int fade, int maxfade, int xoff, int yoff);
