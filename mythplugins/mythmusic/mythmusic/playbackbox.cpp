@@ -531,9 +531,7 @@ void PlaybackBoxMusic::keyPressEvent(QKeyEvent *e)
             else if (action == "PAGEUP")
                 music_tree_list->pageUp();
             else if (action == "PAGEDOWN")
-            {
                 music_tree_list->pageDown();
-            }
             else if (action == "INCSEARCH")
                 music_tree_list->incSearchStart();
             else if (action == "INCSEARCHNEXT")
