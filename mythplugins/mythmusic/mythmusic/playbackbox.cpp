@@ -1105,6 +1105,16 @@ void PlaybackBoxMusic::toggleMute()
     }
 }
 
+void PlaybackBoxMusic::showProgressBar()
+{
+
+    if (progress_bar) {
+
+             progress_bar->SetTotal(maxTime);
+             progress_bar->SetUsed(currentTime);
+    }
+
+}
 void PlaybackBoxMusic::showVolume(bool on_or_off)
 {
     float volume_level;
@@ -1874,7 +1884,9 @@ void PlaybackBoxMusic::customEvent(QCustomEvent *event)
                     time_string.sprintf("%02d:%02d / %02d:%02d", em, es, maxm, 
                                         maxs);
             }
-
+            
+            showProgressBar();
+            
             if (curMeta)
             {
                 if (class LCD *lcd = LCD::Get())
@@ -2162,6 +2174,7 @@ void PlaybackBoxMusic::wireUpTheme()
     album_text = getUITextType("album_text");
     ratings_image = getUIRepeatedImageType("ratings_image");
     current_visualization_text = getUITextType("current_visualization_text");
+    progress_bar = getUIStatusBarType("progress_bar");
     volume_status = getUIStatusBarType("volume_status");
     if (volume_status)
     {

@@ -74,6 +74,7 @@ class PlaybackBoxMusic : public MythThemedDialog
     void resetTimer();
     void hideVolume(){showVolume(false);}
     void showVolume(bool on_or_off);
+    void showProgressBar();
     void wipeTrackInfo();
     void toggleFullBlankVisualizer();
     void end();
@@ -220,6 +221,7 @@ class PlaybackBoxMusic : public MythThemedDialog
     UIBlackHoleType       *visual_blackhole;
 
     UIStatusBarType       *volume_status;
+    UIStatusBarType       *progress_bar;
 
     UIPushButtonType      *prev_button;
     UIPushButtonType      *rew_button;
