@@ -239,14 +239,14 @@ static void LookupModel(MythMediaDevice* device)
         devname = devpath.readLink();
 
 
-    // Given something like /dev/sdb1, extract sdb
-    devname = devname.mid(5,3);
+    // Given something like /dev/hda1, extract hda1
+    devname = devname.mid(5,5);
 
 
 #ifdef linux
     if (devname.startsWith("hd"))  // IDE drive
     {
-        QFile  file("/proc/ide/" + devname + "/model");
+        QFile  file("/proc/ide/" + devname.left(3) + "/model");
         if (file.open(IO_ReadOnly))
         {
             QTextStream stream(&file);
@@ -256,7 +256,11 @@ static void LookupModel(MythMediaDevice* device)
         }
     }
 
-    if (devname.startsWith("sd"))  // SATA/USB/FireWire
+    if (devname.startsWith("scd"))     // scd0 doesn't appear in /sys/block,
+        devname.replace("scd", "sr");  // use sr0 instead 
+
+    if (devname.startsWith("sd")       // SATA/USB/FireWire
+        || devname.startsWith("sr"))   // SCSI CD-ROM?
     {
         QString path = devname.prepend("/sys/block/");
         path.append("/device/");
