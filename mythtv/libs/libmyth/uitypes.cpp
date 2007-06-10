@@ -4728,6 +4728,7 @@ UIPushButtonType::UIPushButtonType(const QString &name, QPixmap on, QPixmap off,
     pushed_pixmap = pushed;
     currently_pushed = false;
     takes_focus = true;
+    m_lockOn = false;
     connect(&push_timer, SIGNAL(timeout()), this, SLOT(unPush()));
 }
 
@@ -4769,6 +4770,11 @@ void UIPushButtonType::Draw(QPainter *p, int drawlayer, int context)
 
 }
 
+void UIPushButtonType::setLockOn()
+{
+    m_lockOn = true;
+}
+
 void UIPushButtonType::push()
 {
     if (currently_pushed)
@@ -4776,8 +4782,17 @@ void UIPushButtonType::push()
         return;
     }
     currently_pushed = true;
-    push_timer.start(300, TRUE);
+
     refresh();
+
+    if (m_lockOn)
+    {
+        emit pushed(Name());
+        return;
+    }
+
+    push_timer.start(300, TRUE);
+
     emit pushed();
 }
 

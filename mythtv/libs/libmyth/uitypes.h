@@ -1169,6 +1169,7 @@ class MPUBLIC UIPushButtonType : public UIType
     virtual void Draw(QPainter *, int drawlayer, int context);
     void    setPosition(QPoint pos){m_displaypos = pos;}
     virtual void calculateScreenArea();
+    void    setLockOn();
 
   public slots:
 
@@ -1179,6 +1180,7 @@ class MPUBLIC UIPushButtonType : public UIType
   signals:
 
     void    pushed();
+    void    pushed(QString);
 
   protected:
 
@@ -1188,6 +1190,7 @@ class MPUBLIC UIPushButtonType : public UIType
     QPixmap pushed_pixmap;
     bool    currently_pushed;
     QTimer  push_timer;
+    bool    m_lockOn;
 
 };
 
