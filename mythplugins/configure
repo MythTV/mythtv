@@ -681,7 +681,7 @@ if test "$movies" = "yes" ; then
   echo "        MythMovies     plugin will be built"
   echo "SUBDIRS += mythmovies" >> ./config.pro
 else
-    echo "      MythMovies     plugin will not be built"
+  echo "        MythMovies     plugin will not be built"
 fi
 ###########################################################
 #                                                         #
