@@ -89,16 +89,11 @@ our %depend_order = (
         'tiff',
         'exif',
         'dvdcss',
-# MythMusic needs these seven things:
-#        'libmad',
-#        'libid3tag',
-#        'libogg',
-#        'vorbis',
-#        'flac',
-# These CD ones don't compile on OS X. I doubt that they ever will.
-# MythMusic probably needs to have native OS X code to assess CDs
-#        'cddaparanoia',
-#        'cdaudio'
+# MythMusic needs these:
+        'libmad',
+        'taglib',
+        'vorbis',
+        'flac',
       ],
 );
 
@@ -145,30 +140,17 @@ our %depend = (
         ],
   },
 
-  'cdaudio' =>
-  {
-    'url' => "$sourceforge/sourceforge/libcdaudio/libcdaudio-0.99.12.tar.gz"
-  },
-
   'libmad' =>
   {
     'url' => 'ftp://ftp.mars.org/pub/mpeg/libmad-0.15.0b.tar.gz'
   },
 
-  'libid3tag' =>
+  'taglib' =>
   {
-    'url' => 'ftp://ftp.mars.org/pub/mpeg/libid3tag-0.15.0b.tar.gz'
+    'url' => 'http://developer.kde.org/~wheeler/files/src/taglib-1.4.tar.gz',
+    # libtool in taglib has problems with -Z in LDFLAGS
+    'conf-cmd' => 'LDFLAGS="" ./configure -prefix "$PREFIX"'
   },
-
-  'cddaparanoia' =>
-  {
-    'url' => 'http://www.buserror.net/cdparanoia/cdparanoia-osx-5.tar.gz',
-  },
-
-  'libogg' =>
-  {
-    'url' => 'http://downloads.xiph.org/releases/ogg/libogg-1.1.2.tar.gz'
-  },   
 
   'vorbis' =>
   {
@@ -177,7 +159,9 @@ our %depend = (
 
   'flac' =>
   {
-    'url' => "$sourceforge/sourceforge/flac/flac-1.1.2.tar.gz"
+    'url' => "$sourceforge/sourceforge/flac/flac-1.1.4.tar.gz",
+    # Workaround Intel problem - Missing _FLAC__lpc_restore_signal_asm_ia32
+    'conf' => [ '--disable-asm-optimizations' ]
   },
 
   'dvdcss'
@@ -470,14 +454,11 @@ our %conf = (
         '--prefix=' . $PREFIX,
         '--enable-opengl',
         '--disable-mythbrowser',
-        '--enable-mythdvd',
-        '--enable-vcd',
         '--disable-transcode',
         '--enable-mythgallery',
         '--enable-exif',
         '--enable-new-exif',
         '--disable-mythgame',
-        '--disable-mythmusic', 
         '--disable-mythphone',
         '--disable-mythzoneminder',
       ],
