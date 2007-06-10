@@ -9,7 +9,10 @@ using namespace std;
 #include <sys/stat.h>
 #include <unistd.h>
 
+#include "config.h"
+#ifdef HAVE_CDAUDIO
 #include <cdaudio.h>
+#endif
 
 #include "decoder.h"
 #include "metadata.h"
@@ -59,6 +62,7 @@ void CheckFreeDBServerFile(void)
 
     if (!file.exists())
     {
+#ifdef HAVE_CDAUDIO
         struct cddb_conf cddbconf;
         struct cddb_serverlist list;
         struct cddb_host proxy_host;
@@ -74,6 +78,7 @@ void CheckFreeDBServerFile(void)
         list.list_host[0].host_protocol = CDDB_MODE_HTTP;
 
         cddb_write_serverlist(cddbconf, list, proxy_host.host_server);
+#endif
     }
 }
 

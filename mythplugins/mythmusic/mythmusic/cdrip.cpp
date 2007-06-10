@@ -9,11 +9,14 @@
 #include <fcntl.h>
 
 // Linux C includes
+#include "config.h"
+#ifdef HAVE_CDAUDIO
 #include <cdaudio.h>
 extern "C" {
 #include <cdda_interface.h>
 #include <cdda_paranoia.h>
 }
+#endif
 
 // C++ includes
 #include <iostream>
@@ -69,6 +72,7 @@ void CDEjectorThread::run()
 
 static long int getSectorCount (QString &cddevice, int tracknum)
 {
+#ifdef HAVE_CDAUDIO
     cdrom_drive *device = cdda_identify(cddevice.ascii(), 0, NULL);
 
     if (!device)
@@ -91,6 +95,7 @@ static long int getSectorCount (QString &cddevice, int tracknum)
     }
 
     cdda_close(device);
+#endif
     return 0;
 }
 
@@ -297,6 +302,7 @@ void CDRipperThread::run(void)
 
 int CDRipperThread::ripTrack(QString &cddevice, Encoder *encoder, int tracknum)
 {
+#ifdef HAVE_CDAUDIO  // && HAVE_CDPARANOIA
     cdrom_drive *device = cdda_identify(cddevice.ascii(), 0, NULL);
 
     if (!device)
@@ -382,6 +388,9 @@ int CDRipperThread::ripTrack(QString &cddevice, Encoder *encoder, int tracknum)
     cdda_close(device);
 
     return (curpos - start + 1) * CD_FRAMESIZE_RAW;
+#endif
+
+    return 0;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -770,6 +779,7 @@ void Ripper::startScanCD(void)
 
 void Ripper::scanCD(void)
 {
+#ifdef HAVE_CDAUDIO
     int cdrom_fd = cd_init_device((char*)m_CDdevice.ascii());
     VERBOSE(VB_MEDIA, "Ripper::scanCD() - dev:" + m_CDdevice);
     if (cdrom_fd == -1)
@@ -779,6 +789,7 @@ void Ripper::scanCD(void)
     }
     cd_close(cdrom_fd);  //Close the CD tray
     cd_finish(cdrom_fd);
+#endif
 
     if (m_decoder)
         delete m_decoder;
@@ -1188,6 +1199,7 @@ void Ripper::ejectCD()
     bool bEjectCD = gContext->GetNumSetting("EjectCDAfterRipping",1);
     if (bEjectCD)
     {
+#ifdef HAVE_CDAUDIO
         int cdrom_fd;
         cdrom_fd = cd_init_device((char*)m_CDdevice.ascii());
         VERBOSE(VB_MEDIA, "Ripper::ejectCD() - dev " + m_CDdevice);
@@ -1200,6 +1212,18 @@ void Ripper::ejectCD()
         }
         else
             perror("Failed on cd_init_device");
+#else
+        MediaMonitor *mon = MediaMonitor::GetMediaMonitor(); 
+        if (mon) 
+        { 
+            MythMediaDevice *pMedia = mon->GetMedia(m_CDdevice.ascii()); 
+            if (pMedia && mon->ValidateAndLock(pMedia)) 
+            { 
+                pMedia->eject();
+                mon->Unlock(pMedia); 
+            } 
+        }
+#endif
     }
 }
 
