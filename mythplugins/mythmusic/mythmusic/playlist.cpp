@@ -1044,20 +1044,16 @@ int Playlist::writeTree(GenericTree *tree_to_write_to, int a_counter)
         }
         else
         {
-            //
-            //  f'ing CD tracks to keep Isaac happy
-            //
-
             Metadata *tmpdata = all_available_music->getMetadata(it->getValue());
             if (tmpdata)
             {
-                QString a_string = QString("CD: %1 ~ %2 - %3")
-                  .arg(tmpdata->Track()).arg(tmpdata->FormatTitle()).arg(tmpdata->FormatArtist());
+                QString a_string = QString("(CD) %1 ~ %2")
+                  .arg(tmpdata->FormatArtist()).arg(tmpdata->FormatTitle());
 
                 if(tmpdata->FormatArtist().length() < 1 ||
                    tmpdata->FormatTitle().length() < 1)
                 {
-                    a_string = QString("CD Track %1").arg(tmpdata->Track());
+                    a_string = QString("(CD) Track %1").arg(tmpdata->Track());
                 }
                 GenericTree *added_node = tree_to_write_to->addNode(a_string, it->getValue(), true);
                 ++a_counter;

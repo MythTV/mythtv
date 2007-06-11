@@ -1046,7 +1046,8 @@ QString AllMusic::getLabel(int an_id, bool *error_flag)
         {
             if( (*anit).Track() == an_id * -1)
             {
-                a_label = QString("CD: %1 ~ %2 - %3").arg((*anit).FormatArtist()).arg((*anit).Track()).arg((*anit).FormatTitle());
+                a_label = QString("(CD) %1 ~ %2").arg((*anit).FormatArtist())
+                                                 .arg((*anit).FormatTitle());
                 *error_flag = false;
                 return a_label;
             }
