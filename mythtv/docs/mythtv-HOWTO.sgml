@@ -3,7 +3,7 @@
 <title>Installing and using MythTV
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com"
 name="mailto:rkulagow@rocketmail.com">
-<date>2007-06-07, v0.20.21
+<date>2007-06-11, v0.20.22
 <abstract>
 Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -521,8 +521,8 @@ of content which is available.
 <sect3>HDTV.
 <p>There are a number of HDTV cards with Linux drivers which are known to
 operate in the United States; a complete list of cards with DVB drivers can
-be found at <url url="http://www.linuxtv.org/wiki/index.php/ATSC_cards"
-name="http://www.linuxtv.org/wiki/index.php/ATSC_cards"> Some cards support
+be found at <url url="http://www.linuxtv.org/wiki/index.php/ATSC_devices"
+name="http://www.linuxtv.org/wiki/index.php/ATSC_devices"> Some cards support
 capture of unencrypted digital cable TV (utilizing QAM256), others will only
 work with Over The Air signals captured with an antenna (with 8VSB).
 
@@ -7693,6 +7693,7 @@ v0.20.19, 2007-04-07.  Put in bjm's Custom Priority section.
 v0.20.20, 2007-04-11.  Update Storage Directory text, add an update to the
 LVM section that SG's are better.
 v0.20.21, 2007-06-07.  Add link to books on MythTV.
+v0.20.22, 2006-06-11.  Update link to ATSC devices on linuxtv.org (D. Hugh Redelmeier)
 -->
 
 <!--
