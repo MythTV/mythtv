@@ -285,12 +285,12 @@ EOF
                 }
                 $name .= $suffix;
             # Update the database
-                my $rows = $sh->execute($name, $show->{'chanid'}, $show->{'starttime'});
+                my $rows = $sh->execute($name, $show->{'chanid'}, $show->{'recstartts'});
                 die "Couldn't update basename in database for ".$show->{'basename'}.":  ($q)\n" unless ($rows == 1);
                 my $ret = rename $show->{'local_path'}, "$video_dir/$name";
             # Rename failed -- Move the database back to how it was (man, do I miss transactions)
                 if (!$ret) {
-                    $rows = $sh->execute($show->{'basename'}, $show->{'chanid'}, $show->{'starttime'});
+                    $rows = $sh->execute($show->{'basename'}, $show->{'chanid'}, $show->{'recstartts'});
                     die "Couldn't restore original basename in database for ".$show->{'basename'}.":  ($q)\n" unless ($rows == 1);
                 }
                 vprint($show->{'basename'}."\t-> $name");
