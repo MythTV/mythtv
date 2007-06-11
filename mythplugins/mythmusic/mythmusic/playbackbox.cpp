@@ -956,14 +956,16 @@ void PlaybackBoxMusic::occasionallyCheckCD()
         all_playlists->clearCDList();
         all_playlists->getActive()->ripOutAllCDTracksNow();
 
-        if(all_music->getCDTrackCount()) {
+        if(all_music->getCDTrackCount())
+        {
             visual_mode_timer->stop();
 
             all_playlists->getActive()->removeAllTracks();
             all_playlists->getActive()->fillSongsFromCD();
 
-            postUpdate();
         }
+
+            postUpdate();
     }
 
     if (scan_for_cd && !cd_reader_thread->running())
