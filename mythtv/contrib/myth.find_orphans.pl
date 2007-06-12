@@ -122,9 +122,9 @@ foreach $d (split(/,/,$opt_dir)) {
 # look in recorded table, make sure we can find every file ..
 #
 
-my $q = "SELECT title, subtitle, starttime, endtime, chanid, basename FROM recorded ORDER BY starttime";
+my $q = "SELECT title, subtitle, starttime, endtime, chanid, basename FROM recorded WHERE hostname=(?) ORDER BY starttime";
 $sth = $dbh->prepare($q);
-$sth->execute || die "Could not execute ($q): $!\n";
+$sth->execute($opt_host) || die "Could not execute ($q): $!\n";
 
 while (my @row=$sth->fetchrow_array) {
 	($title, $subtitle, $starttime, $endtime, $channel, $basename) = @row;
