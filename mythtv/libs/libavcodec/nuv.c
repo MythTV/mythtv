@@ -50,7 +50,7 @@ static void copy_frame(AVFrame *f, uint8_t *src,
                        int width, int height) {
     AVPicture pic;
     avpicture_fill(&pic, src, PIX_FMT_YUV420P, width, height);
-    img_copy((AVPicture *)f, &pic, PIX_FMT_YUV420P, width, height);
+    av_picture_copy((AVPicture *)f, &pic, PIX_FMT_YUV420P, width, height);
 }
 
 /**
@@ -72,7 +72,7 @@ static int get_quant(AVCodecContext *avctx, NuvContext *c,
 
 static int decode_frame(AVCodecContext *avctx, void *data, int *data_size,
                         uint8_t *buf, int buf_size) {
-    NuvContext *c = (NuvContext *)avctx->priv_data;
+    NuvContext *c = avctx->priv_data;
     AVFrame *picture = data;
     int orig_size = buf_size;
     enum {NUV_UNCOMPRESSED = '0', NUV_RTJPEG = '1',
@@ -170,13 +170,12 @@ static int decode_frame(AVCodecContext *avctx, void *data, int *data_size,
 }
 
 static int decode_init(AVCodecContext *avctx) {
-    NuvContext *c = (NuvContext *)avctx->priv_data;
+    NuvContext *c = avctx->priv_data;
     avctx->width = (avctx->width + 1) & ~1;
     avctx->height = (avctx->height + 1) & ~1;
     if (avcodec_check_dimensions(avctx, avctx->height, avctx->width) < 0) {
         return 1;
     }
-    avctx->has_b_frames = 0;
     avctx->pix_fmt = PIX_FMT_YUV420P;
     c->pic.data[0] = NULL;
     c->width = avctx->width;
@@ -195,7 +194,7 @@ static int decode_init(AVCodecContext *avctx) {
 }
 
 static int decode_end(AVCodecContext *avctx) {
-    NuvContext *c = (NuvContext *)avctx->priv_data;
+    NuvContext *c = avctx->priv_data;
     av_freep(&c->decomp_buf);
     if (c->pic.data[0])
         avctx->release_buffer(avctx, &c->pic);

@@ -47,12 +47,11 @@ typedef struct AascContext {
 
 static int aasc_decode_init(AVCodecContext *avctx)
 {
-    AascContext *s = (AascContext *)avctx->priv_data;
+    AascContext *s = avctx->priv_data;
 
     s->avctx = avctx;
 
     avctx->pix_fmt = PIX_FMT_BGR24;
-    avctx->has_b_frames = 0;
     s->frame.data[0] = NULL;
 
     return 0;
@@ -62,7 +61,7 @@ static int aasc_decode_frame(AVCodecContext *avctx,
                               void *data, int *data_size,
                               uint8_t *buf, int buf_size)
 {
-    AascContext *s = (AascContext *)avctx->priv_data;
+    AascContext *s = avctx->priv_data;
     int stream_ptr = 4;
     unsigned char rle_code;
     unsigned char stream_byte;
@@ -154,7 +153,7 @@ static int aasc_decode_frame(AVCodecContext *avctx,
 
 static int aasc_decode_end(AVCodecContext *avctx)
 {
-    AascContext *s = (AascContext *)avctx->priv_data;
+    AascContext *s = avctx->priv_data;
 
     /* release the last frame */
     if (s->frame.data[0])

@@ -42,7 +42,6 @@ static const uint16_t mask[17] =
 };
 
 struct LZWState {
-    int eob_reached;
     uint8_t *pbuf, *ebuf;
     int bbits;
     unsigned int bbuf;
@@ -55,7 +54,7 @@ struct LZWState {
     int end_code;
     int newcodes;               ///< First available code
     int top_slot;               ///< Highest code for current size
-    int top_slot2;              ///< Highest possible code for current size (<=top_slot)
+    int extra_slot;
     int slot;                   ///< Last read code
     int fc, oc;
     uint8_t *sp;
@@ -68,35 +67,28 @@ struct LZWState {
 /* get one code from stream */
 static int lzw_get_code(struct LZWState * s)
 {
-    int c, sizbuf;
+    int c;
 
     if(s->mode == FF_LZW_GIF) {
         while (s->bbits < s->cursize) {
             if (!s->bs) {
-                sizbuf = *s->pbuf++;
-                s->bs = sizbuf;
-                if(!sizbuf) {
-                    s->eob_reached = 1;
-                }
+                s->bs = *s->pbuf++;
             }
             s->bbuf |= (*s->pbuf++) << s->bbits;
             s->bbits += 8;
             s->bs--;
         }
-        c = s->bbuf & s->curmask;
-       s->bbuf >>= s->cursize;
+        c = s->bbuf;
+        s->bbuf >>= s->cursize;
     } else { // TIFF
         while (s->bbits < s->cursize) {
-            if (s->pbuf >= s->ebuf) {
-                s->eob_reached = 1;
-            }
             s->bbuf = (s->bbuf << 8) | (*s->pbuf++);
             s->bbits += 8;
         }
-        c = (s->bbuf >> (s->bbits - s->cursize)) & s->curmask;
+        c = s->bbuf >> (s->bbits - s->cursize);
     }
     s->bbits -= s->cursize;
-    return c;
+    return c & s->curmask;
 }
 
 uint8_t* ff_lzw_cur_ptr(LZWState *p)
@@ -107,8 +99,14 @@ uint8_t* ff_lzw_cur_ptr(LZWState *p)
 void ff_lzw_decode_tail(LZWState *p)
 {
     struct LZWState *s = (struct LZWState *)p;
-    while(!s->eob_reached)
-        lzw_get_code(s);
+
+    if(s->mode == FF_LZW_GIF) {
+        while(s->pbuf < s->ebuf && s->bs>0){
+            s->pbuf += s->bs;
+            s->bs = *s->pbuf++;
+        }
+    }else
+        s->pbuf= s->ebuf;
 }
 
 void ff_lzw_decode_open(LZWState **p)
@@ -136,7 +134,6 @@ int ff_lzw_decode_init(LZWState *p, int csize, uint8_t *buf, int buf_size, int m
     if(csize < 1 || csize > LZW_MAXBITS)
         return -1;
     /* read buffer */
-    s->eob_reached = 0;
     s->pbuf = buf;
     s->ebuf = s->pbuf + buf_size;
     s->bbuf = 0;
@@ -151,20 +148,11 @@ int ff_lzw_decode_init(LZWState *p, int csize, uint8_t *buf, int buf_size, int m
     s->clear_code = 1 << s->codesize;
     s->end_code = s->clear_code + 1;
     s->slot = s->newcodes = s->clear_code + 2;
-    s->oc = s->fc = 0;
+    s->oc = s->fc = -1;
     s->sp = s->stack;
 
     s->mode = mode;
-    switch(s->mode){
-    case FF_LZW_GIF:
-        s->top_slot2 = s->top_slot;
-        break;
-    case FF_LZW_TIFF:
-        s->top_slot2 = s->top_slot - 1;
-        break;
-    default:
-        return -1;
-    }
+    s->extra_slot = s->mode == FF_LZW_TIFF;
     return 0;
 }
 
@@ -191,69 +179,48 @@ int ff_lzw_decode(LZWState *p, uint8_t *buf, int len){
     oc = s->oc;
     fc = s->fc;
 
-    while (sp > s->stack) {
-        *buf++ = *(--sp);
-        if ((--l) == 0)
-            goto the_end;
-    }
-
     for (;;) {
+        while (sp > s->stack) {
+            *buf++ = *(--sp);
+            if ((--l) == 0)
+                goto the_end;
+        }
         c = lzw_get_code(s);
         if (c == s->end_code) {
-            s->end_code = -1;
             break;
         } else if (c == s->clear_code) {
             s->cursize = s->codesize + 1;
             s->curmask = mask[s->cursize];
             s->slot = s->newcodes;
             s->top_slot = 1 << s->cursize;
-            s->top_slot2 = s->top_slot;
-            if(s->mode == FF_LZW_TIFF)
-                s->top_slot2--;
-            while ((c = lzw_get_code(s)) == s->clear_code);
-            if (c == s->end_code) {
-                s->end_code = -1;
-                break;
-            }
-            /* test error */
-            if (c >= s->slot)
-                c = 0;
-            fc = oc = c;
-            *buf++ = c;
-            if ((--l) == 0)
-                break;
+            fc= oc= -1;
         } else {
             code = c;
-            if (code >= s->slot) {
+            if (code == s->slot && fc>=0) {
                 *sp++ = fc;
                 code = oc;
-            }
+            }else if(code >= s->slot)
+                break;
             while (code >= s->newcodes) {
                 *sp++ = s->suffix[code];
                 code = s->prefix[code];
             }
             *sp++ = code;
-            if (s->slot < s->top_slot) {
-                s->suffix[s->slot] = fc = code;
+            if (s->slot < s->top_slot && oc>=0) {
+                s->suffix[s->slot] = code;
                 s->prefix[s->slot++] = oc;
-                oc = c;
             }
-            if (s->slot >= s->top_slot2) {
+            fc = code;
+            oc = c;
+            if (s->slot >= s->top_slot - s->extra_slot) {
                 if (s->cursize < LZW_MAXBITS) {
                     s->top_slot <<= 1;
-                    s->top_slot2 = s->top_slot;
-                    if(s->mode == FF_LZW_TIFF)
-                        s->top_slot2--;
                     s->curmask = mask[++s->cursize];
                 }
             }
-            while (sp > s->stack) {
-                *buf++ = *(--sp);
-                if ((--l) == 0)
-                    goto the_end;
-            }
         }
     }
+    s->end_code = -1;
   the_end:
     s->sp = sp;
     s->oc = oc;

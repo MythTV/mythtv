@@ -41,6 +41,7 @@
 #include "mpegvideo.h"
 
 #include "vp3data.h"
+#include "xiph.h"
 
 #define FRAGMENT_PIXELS 8
 
@@ -329,8 +330,6 @@ typedef struct Vp3DecodeContext {
     uint32_t filter_limit_values[64];
     int bounding_values_array[256];
 } Vp3DecodeContext;
-
-static int theora_decode_tables(AVCodecContext *avctx, GetBitContext *gb);
 
 /************************************************************************
  * VP3 specific functions
@@ -633,7 +632,7 @@ static void init_dequantizer(Vp3DecodeContext *s)
                 int qmin= 8<<(inter + !i);
                 int qscale= i ? ac_scale_factor : dc_scale_factor;
 
-                s->qmat[inter][plane][i]= clip((qscale * coeff)/100 * 4, qmin, 4096);
+                s->qmat[inter][plane][i]= av_clip((qscale * coeff)/100 * 4, qmin, 4096);
             }
         }
     }
@@ -1729,8 +1728,8 @@ static void horizontal_filter(unsigned char *first_pixel, int stride,
             (first_pixel[-2] - first_pixel[ 1])
          +3*(first_pixel[ 0] - first_pixel[-1]);
         filter_value = bounding_values[(filter_value + 4) >> 3];
-        first_pixel[-1] = clip_uint8(first_pixel[-1] + filter_value);
-        first_pixel[ 0] = clip_uint8(first_pixel[ 0] - filter_value);
+        first_pixel[-1] = av_clip_uint8(first_pixel[-1] + filter_value);
+        first_pixel[ 0] = av_clip_uint8(first_pixel[ 0] - filter_value);
     }
 }
 
@@ -1746,8 +1745,8 @@ static void vertical_filter(unsigned char *first_pixel, int stride,
             (first_pixel[2 * nstride] - first_pixel[ stride])
          +3*(first_pixel[0          ] - first_pixel[nstride]);
         filter_value = bounding_values[(filter_value + 4) >> 3];
-        first_pixel[nstride] = clip_uint8(first_pixel[nstride] + filter_value);
-        first_pixel[0] = clip_uint8(first_pixel[0] - filter_value);
+        first_pixel[nstride] = av_clip_uint8(first_pixel[nstride] + filter_value);
+        first_pixel[0] = av_clip_uint8(first_pixel[0] - filter_value);
     }
 }
 
@@ -1954,7 +1953,6 @@ static int vp3_decode_init(AVCodecContext *avctx)
     s->width = (avctx->width + 15) & 0xFFFFFFF0;
     s->height = (avctx->height + 15) & 0xFFFFFFF0;
     avctx->pix_fmt = PIX_FMT_YUV420P;
-    avctx->has_b_frames = 0;
     if(avctx->idct_algo==FF_IDCT_AUTO)
         avctx->idct_algo=FF_IDCT_VP3;
     dsputil_init(&s->dsp, avctx);
@@ -2141,28 +2139,8 @@ static int vp3_decode_frame(AVCodecContext *avctx,
 
     if (s->theora && get_bits1(&gb))
     {
-#if 1
         av_log(avctx, AV_LOG_ERROR, "Header packet passed to frame decoder, skipping\n");
         return -1;
-#else
-        int ptype = get_bits(&gb, 7);
-
-        skip_bits(&gb, 6*8); /* "theora" */
-
-        switch(ptype)
-        {
-            case 1:
-                theora_decode_comments(avctx, &gb);
-                break;
-            case 2:
-                theora_decode_tables(avctx, &gb);
-                    init_dequantizer(s);
-                break;
-            default:
-                av_log(avctx, AV_LOG_ERROR, "Unknown Theora config packet: %d\n", ptype);
-        }
-        return buf_size;
-#endif
     }
 
     s->keyframe = !get_bits1(&gb);
@@ -2389,6 +2367,7 @@ static int read_huffman_tree(AVCodecContext *avctx, GetBitContext *gb)
     return 0;
 }
 
+#ifdef CONFIG_THEORA_DECODER
 static int theora_decode_header(AVCodecContext *avctx, GetBitContext *gb)
 {
     Vp3DecodeContext *s = avctx->priv_data;
@@ -2574,8 +2553,9 @@ static int theora_decode_init(AVCodecContext *avctx)
     Vp3DecodeContext *s = avctx->priv_data;
     GetBitContext gb;
     int ptype;
-    uint8_t *p= avctx->extradata;
-    int op_bytes, i;
+    uint8_t *header_start[3];
+    int header_len[3];
+    int i;
 
     s->theora = 1;
 
@@ -2585,12 +2565,14 @@ static int theora_decode_init(AVCodecContext *avctx)
         return -1;
     }
 
-  for(i=0;i<3;i++) {
-    op_bytes = *(p++)<<8;
-    op_bytes += *(p++);
+    if (ff_split_xiph_headers(avctx->extradata, avctx->extradata_size,
+                              42, header_start, header_len) < 0) {
+        av_log(avctx, AV_LOG_ERROR, "Corrupt extradata\n");
+        return -1;
+    }
 
-    init_get_bits(&gb, p, op_bytes);
-    p += op_bytes;
+  for(i=0;i<3;i++) {
+    init_get_bits(&gb, header_start[i], header_len[i]);
 
     ptype = get_bits(&gb, 8);
     debug_vp3("Theora headerpacket type: %x\n", ptype);
@@ -2601,7 +2583,7 @@ static int theora_decode_init(AVCodecContext *avctx)
 //        return -1;
      }
 
-    // FIXME: check for this aswell
+    // FIXME: Check for this as well.
     skip_bits(&gb, 6*8); /* "theora" */
 
     switch(ptype)
@@ -2620,8 +2602,8 @@ static int theora_decode_init(AVCodecContext *avctx)
             av_log(avctx, AV_LOG_ERROR, "Unknown Theora config packet: %d\n", ptype&~0x80);
             break;
     }
-    if(8*op_bytes != get_bits_count(&gb))
-        av_log(avctx, AV_LOG_ERROR, "%d bits left in packet %X\n", 8*op_bytes - get_bits_count(&gb), ptype);
+    if(8*header_len[i] != get_bits_count(&gb))
+        av_log(avctx, AV_LOG_ERROR, "%d bits left in packet %X\n", 8*header_len[i] - get_bits_count(&gb), ptype);
     if (s->theora < 0x030200)
         break;
   }
@@ -2630,25 +2612,26 @@ static int theora_decode_init(AVCodecContext *avctx)
     return 0;
 }
 
-AVCodec vp3_decoder = {
-    "vp3",
-    CODEC_TYPE_VIDEO,
-    CODEC_ID_VP3,
-    sizeof(Vp3DecodeContext),
-    vp3_decode_init,
-    NULL,
-    vp3_decode_end,
-    vp3_decode_frame,
-    0,
-    NULL
-};
-
 AVCodec theora_decoder = {
     "theora",
     CODEC_TYPE_VIDEO,
     CODEC_ID_THEORA,
     sizeof(Vp3DecodeContext),
     theora_decode_init,
+    NULL,
+    vp3_decode_end,
+    vp3_decode_frame,
+    0,
+    NULL
+};
+#endif
+
+AVCodec vp3_decoder = {
+    "vp3",
+    CODEC_TYPE_VIDEO,
+    CODEC_ID_VP3,
+    sizeof(Vp3DecodeContext),
+    vp3_decode_init,
     NULL,
     vp3_decode_end,
     vp3_decode_frame,

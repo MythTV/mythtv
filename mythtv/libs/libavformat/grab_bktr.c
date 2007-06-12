@@ -225,7 +225,7 @@ static int grab_read_packet(AVFormatContext *s1, AVPacket *pkt)
     VideoData *s = s1->priv_data;
 
     if (av_new_packet(pkt, video_buf_size) < 0)
-        return -EIO;
+        return AVERROR(EIO);
 
     bktr_getframe(s->per_frame);
 
@@ -243,7 +243,6 @@ static int grab_read_header(AVFormatContext *s1, AVFormatParameters *ap)
     int frame_rate;
     int frame_rate_base;
     int format = -1;
-    const char *video_device;
 
     if (ap->width <= 0 || ap->height <= 0 || ap->time_base.den <= 0)
         return -1;
@@ -253,13 +252,9 @@ static int grab_read_header(AVFormatContext *s1, AVFormatParameters *ap)
     frame_rate = ap->time_base.den;
     frame_rate_base = ap->time_base.num;
 
-    video_device = ap->device;
-    if (!video_device)
-        video_device = "/dev/bktr0";
-
     st = av_new_stream(s1, 0);
     if (!st)
-        return -ENOMEM;
+        return AVERROR(ENOMEM);
     av_set_pts_info(st, 64, 1, 1000000); /* 64 bits pts in use */
 
     s->width = width;
@@ -285,9 +280,9 @@ static int grab_read_header(AVFormatContext *s1, AVFormatParameters *ap)
             format = NTSC;
     }
 
-    if (bktr_init(video_device, width, height, format,
+    if (bktr_init(s1->filename, width, height, format,
             &(s->video_fd), &(s->tuner_fd), -1, 0.0) < 0)
-        return -EIO;
+        return AVERROR(EIO);
 
     nsignals = 0;
     last_frame_time = 0;
@@ -313,11 +308,11 @@ static int grab_read_close(AVFormatContext *s1)
     return 0;
 }
 
-AVInputFormat video_grab_device_demuxer = {
+AVInputFormat video_grab_bktr_demuxer = {
     "bktr",
     "video grab",
-     sizeof(VideoData),
-     NULL,
+    sizeof(VideoData),
+    NULL,
     grab_read_header,
     grab_read_packet,
     grab_read_close,

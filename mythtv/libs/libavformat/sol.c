@@ -29,14 +29,12 @@
 #include "bswap.h"
 
 /* if we don't know the size in advance */
-#define AU_UNKOWN_SIZE ((uint32_t)(~0))
+#define AU_UNKNOWN_SIZE ((uint32_t)(~0))
 
 static int sol_probe(AVProbeData *p)
 {
     /* check file header */
     uint16_t magic;
-    if (p->buf_size <= 14)
-        return 0;
     magic=le2me_16(*((uint16_t*)p->buf));
     if ((magic == 0x0B8D || magic == 0x0C0D || magic == 0x0C8D) &&
         p->buf[2] == 'S' && p->buf[3] == 'O' &&
@@ -133,7 +131,7 @@ static int sol_read_packet(AVFormatContext *s,
     int ret;
 
     if (url_feof(&s->pb))
-        return -EIO;
+        return AVERROR(EIO);
     ret= av_get_packet(&s->pb, pkt, MAX_SIZE);
     pkt->stream_index = 0;
 

@@ -41,12 +41,8 @@
 #include "bitstream.h"
 
 #include <unistd.h>
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
+#include "network.h"
 #include <assert.h>
-#include <arpa/inet.h>
-#include <netdb.h>
 
 #include "rtp_internal.h"
 #include "rtp_h264.h"
@@ -168,7 +164,9 @@ static int h264_handle_packet(RTPDemuxContext * s,
                               const uint8_t * buf,
                               int len)
 {
-//    h264_rtp_extra_data *data = s->dynamic_protocol_context;
+#ifdef DEBUG
+    h264_rtp_extra_data *data = s->dynamic_protocol_context;
+#endif
     uint8_t nal = buf[0];
     uint8_t type = (nal & 0x1f);
     int result= 0;
@@ -314,7 +312,7 @@ static int h264_handle_packet(RTPDemuxContext * s,
 }
 
 /* ---------------- public code */
-static void *h264_new_extradata()
+static void *h264_new_extradata(void)
 {
     h264_rtp_extra_data *data =
         av_mallocz(sizeof(h264_rtp_extra_data) +

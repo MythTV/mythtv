@@ -954,9 +954,8 @@ resync:
                 len=len2;
             rm->remaining_len-= len;
             av_get_packet(pb, pkt, len);
-        }
 
-        if (st->codec->codec_type == CODEC_TYPE_AUDIO) {
+        } else if (st->codec->codec_type == CODEC_TYPE_AUDIO) {
             if ((st->codec->codec_id == CODEC_ID_RA_288) ||
                 (st->codec->codec_id == CODEC_ID_COOK)) {
                 int x;
@@ -1008,7 +1007,9 @@ resync:
                 }
             } else
                 av_get_packet(pb, pkt, len);
-        }
+
+        } else
+            av_get_packet(pb, pkt, len);
 
         if(  (st->discard >= AVDISCARD_NONKEY && !(flags&2))
            || st->discard >= AVDISCARD_ALL){
@@ -1062,8 +1063,6 @@ static int rm_read_close(AVFormatContext *s)
 static int rm_probe(AVProbeData *p)
 {
     /* check file header */
-    if (p->buf_size <= 32)
-        return 0;
     if ((p->buf[0] == '.' && p->buf[1] == 'R' &&
          p->buf[2] == 'M' && p->buf[3] == 'F' &&
          p->buf[4] == 0 && p->buf[5] == 0) ||

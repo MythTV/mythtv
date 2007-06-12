@@ -137,7 +137,7 @@ static void add_frame_32(AVFrame *f, uint8_t *src,
 
 static int decode_frame(AVCodecContext *avctx, void *data, int *data_size,
                         uint8_t *buf, int buf_size) {
-    CamStudioContext *c = (CamStudioContext *)avctx->priv_data;
+    CamStudioContext *c = avctx->priv_data;
     AVFrame *picture = data;
 
     if (buf_size < 2) {
@@ -214,15 +214,14 @@ static int decode_frame(AVCodecContext *avctx, void *data, int *data_size,
 }
 
 static int decode_init(AVCodecContext *avctx) {
-    CamStudioContext *c = (CamStudioContext *)avctx->priv_data;
+    CamStudioContext *c = avctx->priv_data;
     if (avcodec_check_dimensions(avctx, avctx->height, avctx->width) < 0) {
         return 1;
     }
-    avctx->has_b_frames = 0;
     switch (avctx->bits_per_sample) {
         case 16: avctx->pix_fmt = PIX_FMT_RGB555; break;
         case 24: avctx->pix_fmt = PIX_FMT_BGR24; break;
-        case 32: avctx->pix_fmt = PIX_FMT_RGBA32; break;
+        case 32: avctx->pix_fmt = PIX_FMT_RGB32; break;
         default:
             av_log(avctx, AV_LOG_ERROR,
                    "CamStudio codec error: invalid depth %i bpp\n",
@@ -243,7 +242,7 @@ static int decode_init(AVCodecContext *avctx) {
 }
 
 static int decode_end(AVCodecContext *avctx) {
-    CamStudioContext *c = (CamStudioContext *)avctx->priv_data;
+    CamStudioContext *c = avctx->priv_data;
     av_freep(&c->decomp_buf);
     if (c->pic.data[0])
         avctx->release_buffer(avctx, &c->pic);

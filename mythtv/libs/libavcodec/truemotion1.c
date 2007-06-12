@@ -374,10 +374,15 @@ static int truemotion1_decode_header(TrueMotion1Context *s)
 
     if (s->flags & FLAG_SPRITE) {
         av_log(s->avctx, AV_LOG_INFO, "SPRITE frame found, please report the sample to the developers\n");
+        /* FIXME header.width, height, xoffset and yoffset aren't initialized */
+#if 0
         s->w = header.width;
         s->h = header.height;
         s->x = header.xoffset;
         s->y = header.yoffset;
+#else
+        return -1;
+#endif
     } else {
         s->w = header.xsize;
         s->h = header.ysize;
@@ -412,9 +417,9 @@ static int truemotion1_decode_header(TrueMotion1Context *s)
 
     // FIXME: where to place this ?!?!
     if (compression_types[header.compression].algorithm == ALGO_RGB24H)
-        s->avctx->pix_fmt = PIX_FMT_RGBA32;
+        s->avctx->pix_fmt = PIX_FMT_RGB32;
     else
-        s->avctx->pix_fmt = PIX_FMT_RGB555; // RGB565 is supported aswell
+        s->avctx->pix_fmt = PIX_FMT_RGB555; // RGB565 is supported as well
 
     if ((header.deltaset != s->last_deltaset) || (header.vectable != s->last_vectable))
     {
@@ -460,7 +465,7 @@ static int truemotion1_decode_header(TrueMotion1Context *s)
 
 static int truemotion1_decode_init(AVCodecContext *avctx)
 {
-    TrueMotion1Context *s = (TrueMotion1Context *)avctx->priv_data;
+    TrueMotion1Context *s = avctx->priv_data;
 
     s->avctx = avctx;
 
@@ -470,7 +475,6 @@ static int truemotion1_decode_init(AVCodecContext *avctx)
 //    else
 //        avctx->pix_fmt = PIX_FMT_RGB555;
 
-    avctx->has_b_frames = 0;
     s->frame.data[0] = s->prev_frame.data[0] = NULL;
 
     /* there is a vertical predictor for each pixel in a line; each vertical
@@ -859,7 +863,7 @@ static int truemotion1_decode_frame(AVCodecContext *avctx,
                                     void *data, int *data_size,
                                     uint8_t *buf, int buf_size)
 {
-    TrueMotion1Context *s = (TrueMotion1Context *)avctx->priv_data;
+    TrueMotion1Context *s = avctx->priv_data;
 
     s->buf = buf;
     s->size = buf_size;
@@ -899,7 +903,7 @@ static int truemotion1_decode_frame(AVCodecContext *avctx,
 
 static int truemotion1_decode_end(AVCodecContext *avctx)
 {
-    TrueMotion1Context *s = (TrueMotion1Context *)avctx->priv_data;
+    TrueMotion1Context *s = avctx->priv_data;
 
     /* release the last frame */
     if (s->prev_frame.data[0])

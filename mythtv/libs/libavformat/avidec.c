@@ -82,6 +82,9 @@ static int get_riff(AVIContext *avi, ByteIOContext *pb)
     avi->riff_end = get_le32(pb);   /* RIFF chunk size */
     avi->riff_end += url_ftell(pb); /* RIFF chunk end */
     tag = get_le32(pb);
+    if(tag == MKTAG('A', 'V', 'I', 0x19))
+        av_log(NULL, AV_LOG_INFO, "file has been generated with a totally broken muxer\n");
+    else
     if (tag != MKTAG('A', 'V', 'I', ' ') && tag != MKTAG('A', 'V', 'I', 'X'))
         return -1;
 
@@ -213,7 +216,7 @@ static int avi_read_header(AVFormatContext *s, AVFormatParameters *ap)
     uint32_t tag, tag1, handler;
     int codec_type, stream_index, frame_period, bit_rate;
     unsigned int size, nb_frames;
-    int i, n;
+    int i;
     AVStream *st;
     AVIStream *ast = NULL;
     char str_track[4];
@@ -266,10 +269,22 @@ static int avi_read_header(AVFormatContext *s, AVFormatParameters *ap)
             avi->non_interleaved |= get_le32(pb) & AVIF_MUSTUSEINDEX;
 
             url_fskip(pb, 2 * 4);
-            n = get_le32(pb);
-            for(i=0;i<n;i++) {
-                AVIStream *ast;
-                st = av_new_stream(s, i);
+            get_le32(pb);
+
+            url_fskip(pb, size - 7 * 4);
+            break;
+        case MKTAG('s', 't', 'r', 'h'):
+            /* stream header */
+
+            tag1 = get_le32(pb);
+            handler = get_le32(pb); /* codec tag */
+
+            if(tag1 == MKTAG('p', 'a', 'd', 's')){
+                url_fskip(pb, size - 8);
+                break;
+            }else{
+                stream_index++;
+                st = av_new_stream(s, stream_index);
                 if (!st)
                     goto fail;
 
@@ -278,13 +293,7 @@ static int avi_read_header(AVFormatContext *s, AVFormatParameters *ap)
                     goto fail;
                 st->priv_data = ast;
             }
-            url_fskip(pb, size - 7 * 4);
-            break;
-        case MKTAG('s', 't', 'r', 'h'):
-            /* stream header */
-            stream_index++;
-            tag1 = get_le32(pb);
-            handler = get_le32(pb); /* codec tag */
+
 #ifdef DEBUG
             print_tag("strh", tag1, -1);
 #endif
@@ -333,15 +342,7 @@ static int avi_read_header(AVFormatContext *s, AVFormatParameters *ap)
                 break;
             }
 
-            if (stream_index >= s->nb_streams) {
-                url_fskip(pb, size - 8);
-                /* ignore padding stream */
-                if (tag1 == MKTAG('p', 'a', 'd', 's'))
-                    stream_index--;
-                break;
-            }
-            st = s->streams[stream_index];
-            ast = st->priv_data;
+            assert(stream_index < s->nb_streams);
             st->codec->stream_codec_tag= handler;
 
             get_le32(pb); /* flags */
@@ -384,10 +385,6 @@ static int avi_read_header(AVFormatContext *s, AVFormatParameters *ap)
                 //FIXME
                 codec_type = CODEC_TYPE_DATA; //CODEC_TYPE_SUB ?  FIXME
                 break;
-            case MKTAG('p', 'a', 'd', 's'):
-                codec_type = CODEC_TYPE_UNKNOWN;
-                stream_index--;
-                break;
             default:
                 av_log(s, AV_LOG_ERROR, "unknown stream type %X\n", tag1);
                 goto fail;
@@ -397,7 +394,7 @@ static int avi_read_header(AVFormatContext *s, AVFormatParameters *ap)
             break;
         case MKTAG('s', 't', 'r', 'f'):
             /* stream header */
-            if (stream_index >= s->nb_streams || avi->dv_demux) {
+            if (stream_index >= (unsigned)s->nb_streams || avi->dv_demux) {
                 url_fskip(pb, size);
             } else {
                 st = s->streams[stream_index];
@@ -445,7 +442,7 @@ static int avi_read_header(AVFormatContext *s, AVFormatParameters *ap)
                     st->codec->codec_type = CODEC_TYPE_VIDEO;
                     st->codec->codec_tag = tag1;
                     st->codec->codec_id = codec_get_id(codec_bmp_tags, tag1);
-                    st->need_parsing = 2; //only parse headers dont do slower repacketization, this is needed to get the pict type which is needed for generating correct pts
+                    st->need_parsing = AVSTREAM_PARSE_HEADERS; // this is needed to get the pict type which is needed for generating correct pts
 //                    url_fskip(pb, size - 5 * 4);
                     break;
                 case CODEC_TYPE_AUDIO:
@@ -455,11 +452,11 @@ static int avi_read_header(AVFormatContext *s, AVFormatParameters *ap)
                     if (size%2) /* 2-aligned (fix for Stargate SG-1 - 3x18 - Shades of Grey.avi) */
                         url_fskip(pb, 1);
                     /* Force parsing as several audio frames can be in
-                     * one packet. */
-                    st->need_parsing = 1;
+                     * one packet and timestamps refer to packet start*/
+                    st->need_parsing = AVSTREAM_PARSE_TIMESTAMPS;
                     /* ADTS header is in extradata, AAC without header must be stored as exact frames, parser not needed and it will fail */
                     if (st->codec->codec_id == CODEC_ID_AAC && st->codec->extradata_size)
-                        st->need_parsing = 0;
+                        st->need_parsing = AVSTREAM_PARSE_NONE;
                     /* AVI files with Xan DPCM audio (wrongly) declare PCM
                      * audio in the header but have Axan as stream_code_tag. */
                     if (st->codec->stream_codec_tag == ff_get_fourcc("Axan")){
@@ -506,6 +503,13 @@ static int avi_read_header(AVFormatContext *s, AVFormatParameters *ap)
             sscanf(str_track, "%d", &s->track);
             break;
         default:
+            if(size > 1000000){
+                av_log(s, AV_LOG_ERROR, "well something went wrong during header parsing, "
+                                        "ill ignore it and try to continue anyway\n");
+                avi->movi_list = url_ftell(pb) - 4;
+                avi->movi_end  = url_fsize(pb);
+                goto end_of_header;
+            }
             /* skip tag */
             size += (size & 1);
             url_fskip(pb, size);
@@ -626,21 +630,16 @@ resync:
             pkt->stream_index = avi->stream_index;
 
             if (st->codec->codec_type == CODEC_TYPE_VIDEO) {
-                if(st->index_entries){
-                    AVIndexEntry *e;
-                    int index;
+                AVIndexEntry *e;
+                int index;
+                assert(st->index_entries);
 
-                    index= av_index_search_timestamp(st, pkt->dts, 0);
-                    e= &st->index_entries[index];
+                index= av_index_search_timestamp(st, pkt->dts, 0);
+                e= &st->index_entries[index];
 
-                    if(index >= 0 && e->timestamp == ast->frame_offset){
-                        if (e->flags & AVINDEX_KEYFRAME)
-                            pkt->flags |= PKT_FLAG_KEY;
-                    }
-                } else {
-                    /* if no index, better to say that all frames
-                        are key frames */
-                    pkt->flags |= PKT_FLAG_KEY;
+                if(index >= 0 && e->timestamp == ast->frame_offset){
+                    if (e->flags & AVINDEX_KEYFRAME)
+                        pkt->flags |= PKT_FLAG_KEY;
                 }
             } else {
                 pkt->flags |= PKT_FLAG_KEY;
@@ -735,6 +734,13 @@ resync:
             avi->stream_index= n;
             ast->packet_size= size + 8;
             ast->remaining= size;
+
+            {
+                uint64_t pos= url_ftell(pb) - 8;
+                if(!st->index_entries || !st->nb_index_entries || st->index_entries[st->nb_index_entries - 1].pos < pos){
+                    av_add_index_entry(st, pos, ast->frame_offset / FFMAX(1, ast->sample_size), size, 0, AVINDEX_KEYFRAME);
+                }
+            }
             goto resync;
           }
         }
@@ -990,12 +996,10 @@ static int avi_read_close(AVFormatContext *s)
 static int avi_probe(AVProbeData *p)
 {
     /* check file header */
-    if (p->buf_size <= 32)
-        return 0;
     if (p->buf[0] == 'R' && p->buf[1] == 'I' &&
         p->buf[2] == 'F' && p->buf[3] == 'F' &&
         p->buf[8] == 'A' && p->buf[9] == 'V' &&
-        p->buf[10] == 'I' && p->buf[11] == ' ')
+        p->buf[10] == 'I' && (p->buf[11] == ' ' || p->buf[11] == 0x19))
         return AVPROBE_SCORE_MAX;
     else
         return 0;

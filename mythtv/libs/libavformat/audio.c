@@ -23,7 +23,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#ifdef __OpenBSD__
+#ifdef HAVE_SOUNDCARD_H
 #include <soundcard.h>
 #else
 #include <sys/soundcard.h>
@@ -52,14 +52,6 @@ static int audio_open(AudioData *s, int is_output, const char *audio_device)
     int audio_fd;
     int tmp, err;
     char *flip = getenv("AUDIO_FLIP_LEFT");
-
-    /* open linux audio device */
-    if (!audio_device)
-#ifdef __OpenBSD__
-        audio_device = "/dev/sound";
-#else
-        audio_device = "/dev/dsp";
-#endif
 
     if (is_output)
         audio_fd = open(audio_device, O_WRONLY);
@@ -224,12 +216,12 @@ static int audio_read_header(AVFormatContext *s1, AVFormatParameters *ap)
 
     st = av_new_stream(s1, 0);
     if (!st) {
-        return -ENOMEM;
+        return AVERROR(ENOMEM);
     }
     s->sample_rate = ap->sample_rate;
     s->channels = ap->channels;
 
-    ret = audio_open(s, 0, ap->device);
+    ret = audio_open(s, 0, s1->filename);
     if (ret < 0) {
         av_free(st);
         return AVERROR_IO;

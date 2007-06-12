@@ -68,7 +68,6 @@ static int grab_read_header(AVFormatContext *s1, AVFormatParameters *ap)
     struct video_tuner tuner;
     struct video_audio audio;
     struct video_picture pict;
-    const char *video_device;
     int j;
 
     if (ap->width <= 0 || ap->height <= 0 || ap->time_base.den <= 0) {
@@ -92,7 +91,7 @@ static int grab_read_header(AVFormatContext *s1, AVFormatParameters *ap)
 
     st = av_new_stream(s1, 0);
     if (!st)
-        return -ENOMEM;
+        return AVERROR(ENOMEM);
     av_set_pts_info(st, 64, 1, 1000000); /* 64 bits pts in us */
 
     s->width = width;
@@ -100,12 +99,9 @@ static int grab_read_header(AVFormatContext *s1, AVFormatParameters *ap)
     s->frame_rate      = frame_rate;
     s->frame_rate_base = frame_rate_base;
 
-    video_device = ap->device;
-    if (!video_device)
-        video_device = "/dev/video";
-    video_fd = open(video_device, O_RDWR);
+    video_fd = open(s1->filename, O_RDWR);
     if (video_fd < 0) {
-        perror(video_device);
+        perror(s1->filename);
         goto fail;
     }
 
@@ -124,7 +120,7 @@ static int grab_read_header(AVFormatContext *s1, AVFormatParameters *ap)
     if (ap->pix_fmt == PIX_FMT_YUV420P) {
         desired_palette = VIDEO_PALETTE_YUV420P;
         desired_depth = 12;
-    } else if (ap->pix_fmt == PIX_FMT_YUV422) {
+    } else if (ap->pix_fmt == PIX_FMT_YUYV422) {
         desired_palette = VIDEO_PALETTE_YUV422;
         desired_depth = 16;
     } else if (ap->pix_fmt == PIX_FMT_BGR24) {
@@ -260,7 +256,7 @@ static int grab_read_header(AVFormatContext *s1, AVFormatParameters *ap)
         break;
     case VIDEO_PALETTE_YUV422:
         frame_size = width * height * 2;
-        st->codec->pix_fmt = PIX_FMT_YUV422;
+        st->codec->pix_fmt = PIX_FMT_YUYV422;
         break;
     case VIDEO_PALETTE_RGB24:
         frame_size = width * height * 3;
@@ -379,7 +375,7 @@ static int grab_read_close(AVFormatContext *s1)
     return 0;
 }
 
-AVInputFormat video_grab_device_demuxer = {
+AVInputFormat video_grab_v4l_demuxer = {
     "video4linux",
     "video grab",
     sizeof(VideoData),

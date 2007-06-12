@@ -20,11 +20,7 @@
  */
 #include "avformat.h"
 #include <unistd.h>
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
-#include <netdb.h>
+#include "network.h"
 
 #ifndef IPV6_ADD_MEMBERSHIP
 #define IPV6_ADD_MEMBERSHIP IPV6_JOIN_GROUP
@@ -299,7 +295,7 @@ static int udp_open(URLContext *h, const char *uri, int flags)
 
     s = av_malloc(sizeof(UDPContext));
     if (!s)
-        return -ENOMEM;
+        return AVERROR(ENOMEM);
 
     h->priv_data = s;
     s->ttl = 16;
@@ -334,7 +330,7 @@ static int udp_open(URLContext *h, const char *uri, int flags)
     }
 
 #ifndef CONFIG_IPV6
-    udp_fd = socket(PF_INET, SOCK_DGRAM, 0);
+    udp_fd = socket(AF_INET, SOCK_DGRAM, 0);
     if (udp_fd < 0)
         goto fail;
 

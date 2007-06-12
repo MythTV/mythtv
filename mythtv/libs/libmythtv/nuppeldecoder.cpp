@@ -22,7 +22,9 @@ using namespace std;
 #include "minilzo.h"
 
 #ifdef WORDS_BIGENDIAN
-#include "bswap.h"
+extern "C" {
+#include "libavutil/bswap.h"
+}
 #endif
 
 #define LOC QString("NVD: ")

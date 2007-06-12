@@ -65,7 +65,7 @@ static VLC svq1_inter_mean;
 #define SVQ1_BLOCK_INTRA        3
 
 typedef struct SVQ1Context {
-    MpegEncContext m; // needed for motion estimation, should not be used for anything else, the idea is to make the motion estimation eventually independant of MpegEncContext, so this will be removed then (FIXME/XXX)
+    MpegEncContext m; // needed for motion estimation, should not be used for anything else, the idea is to make the motion estimation eventually independent of MpegEncContext, so this will be removed then (FIXME/XXX)
     AVCodecContext *avctx;
     DSPContext dsp;
     AVFrame picture;
@@ -992,22 +992,16 @@ static int encode_block(SVQ1Context *s, uint8_t *src, uint8_t *ref, uint8_t *dec
 
             for(i=0; i<16; i++){
                 int sum= codebook_sum[stage*16 + i];
-                int sqr=0;
-                int diff, mean, score;
+                int sqr, diff, score;
 
                 vector = codebook + stage*size*16 + i*size;
-
-                for(j=0; j<size; j++){
-                    int v= vector[j];
-                    sqr += (v - block[stage][j])*(v - block[stage][j]);
-                }
+                sqr = s->dsp.ssd_int8_vs_int16(vector, block[stage], size);
                 diff= block_sum[stage] - sum;
-                mean= (diff + (size>>1)) >> (level+3);
-                assert(mean >-300 && mean<300);
-                if(intra) mean= clip(mean, 0, 255);
-                else      mean= clip(mean, -256, 255);
                 score= sqr - ((diff*(int64_t)diff)>>(level+3)); //FIXME 64bit slooow
                 if(score < best_vector_score){
+                    int mean= (diff + (size>>1)) >> (level+3);
+                    assert(mean >-300 && mean<300);
+                    mean= av_clip(mean, intra?0:-256, 255);
                     best_vector_score= score;
                     best_vector[stage]= i;
                     best_vector_sum= sum;

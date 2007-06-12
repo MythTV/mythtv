@@ -63,7 +63,7 @@ typedef struct Msvideo1Context {
 
 static int msvideo1_decode_init(AVCodecContext *avctx)
 {
-    Msvideo1Context *s = (Msvideo1Context *)avctx->priv_data;
+    Msvideo1Context *s = avctx->priv_data;
 
     s->avctx = avctx;
 
@@ -76,7 +76,6 @@ static int msvideo1_decode_init(AVCodecContext *avctx)
         avctx->pix_fmt = PIX_FMT_RGB555;
     }
 
-    avctx->has_b_frames = 0;
     dsputil_init(&s->dsp, avctx);
 
     s->frame.data[0] = NULL;
@@ -302,7 +301,7 @@ static int msvideo1_decode_frame(AVCodecContext *avctx,
                                 void *data, int *data_size,
                                 uint8_t *buf, int buf_size)
 {
-    Msvideo1Context *s = (Msvideo1Context *)avctx->priv_data;
+    Msvideo1Context *s = avctx->priv_data;
 
     s->buf = buf;
     s->size = buf_size;
@@ -328,7 +327,7 @@ static int msvideo1_decode_frame(AVCodecContext *avctx,
 
 static int msvideo1_decode_end(AVCodecContext *avctx)
 {
-    Msvideo1Context *s = (Msvideo1Context *)avctx->priv_data;
+    Msvideo1Context *s = avctx->priv_data;
 
     if (s->frame.data[0])
         avctx->release_buffer(avctx, &s->frame);

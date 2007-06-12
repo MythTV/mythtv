@@ -48,8 +48,8 @@ static const PixelFormatTag pixelFormatTags[] = {
     { PIX_FMT_GRAY8,   MKTAG(' ', ' ', 'Y', '8') },
 
 
-    { PIX_FMT_YUV422,  MKTAG('Y', 'U', 'Y', '2') }, /* Packed formats */
-    { PIX_FMT_YUV422,  MKTAG('Y', '4', '2', '2') },
+    { PIX_FMT_YUYV422, MKTAG('Y', 'U', 'Y', '2') }, /* Packed formats */
+    { PIX_FMT_YUYV422, MKTAG('Y', '4', '2', '2') },
     { PIX_FMT_UYVY422, MKTAG('U', 'Y', 'V', 'Y') },
     { PIX_FMT_GRAY8,   MKTAG('G', 'R', 'E', 'Y') },
     { PIX_FMT_RGB555,  MKTAG('R', 'G', 'B', 15) },
@@ -59,13 +59,32 @@ static const PixelFormatTag pixelFormatTags[] = {
 
     /* quicktime */
     { PIX_FMT_UYVY422, MKTAG('2', 'v', 'u', 'y') },
+    { PIX_FMT_UYVY422, MKTAG('A', 'V', 'U', 'I') }, /* FIXME merge both fields */
 
     { -1, 0 },
 };
 
-static int findPixelFormat(unsigned int fourcc)
+static const PixelFormatTag pixelFormatBpsAVI[] = {
+    { PIX_FMT_PAL8,    8 },
+    { PIX_FMT_RGB555, 15 },
+    { PIX_FMT_RGB555, 16 },
+    { PIX_FMT_BGR24,  24 },
+    { PIX_FMT_RGB32,  32 },
+    { -1, 0 },
+};
+
+static const PixelFormatTag pixelFormatBpsMOV[] = {
+    /* FIXME fix swscaler to support those */
+    /* http://developer.apple.com/documentation/QuickTime/QTFF/QTFFChap3/chapter_4_section_2.html */
+    { PIX_FMT_PAL8,      8 },
+    { PIX_FMT_BGR555,   16 },
+    { PIX_FMT_RGB24,    24 },
+    { PIX_FMT_BGR32_1,  32 },
+    { -1, 0 },
+};
+
+static int findPixelFormat(const PixelFormatTag *tags, unsigned int fourcc)
 {
-    const PixelFormatTag * tags = pixelFormatTags;
     while (tags->pix_fmt >= 0) {
         if (tags->fourcc == fourcc)
             return tags->pix_fmt;
@@ -91,17 +110,12 @@ static int raw_init_decoder(AVCodecContext *avctx)
 {
     RawVideoContext *context = avctx->priv_data;
 
-    if (avctx->codec_tag)
-        avctx->pix_fmt = findPixelFormat(avctx->codec_tag);
-    else if (avctx->bits_per_sample){
-        switch(avctx->bits_per_sample){
-        case  8: avctx->pix_fmt= PIX_FMT_PAL8  ; break;
-        case 15: avctx->pix_fmt= PIX_FMT_RGB555; break;
-        case 16: avctx->pix_fmt= PIX_FMT_RGB555; break;
-        case 24: avctx->pix_fmt= PIX_FMT_BGR24 ; break;
-        case 32: avctx->pix_fmt= PIX_FMT_RGBA32; break;
-        }
-    }
+    if (avctx->codec_tag == MKTAG('r','a','w',' '))
+        avctx->pix_fmt = findPixelFormat(pixelFormatBpsMOV, avctx->bits_per_sample);
+    else if (avctx->codec_tag)
+        avctx->pix_fmt = findPixelFormat(pixelFormatTags,   avctx->codec_tag);
+    else if (avctx->bits_per_sample)
+        avctx->pix_fmt = findPixelFormat(pixelFormatBpsAVI, avctx->bits_per_sample);
 
     context->length = avpicture_get_size(avctx->pix_fmt, avctx->width, avctx->height);
     context->buffer = av_malloc(context->length);

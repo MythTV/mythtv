@@ -175,7 +175,7 @@ static const uint64_t ff_pb_FC attribute_used __attribute__ ((aligned(8))) = 0xF
 /* 3Dnow specific */
 
 #define DEF(x) x ## _3dnow
-/* for Athlons PAVGUSB is prefered */
+/* for Athlons PAVGUSB is preferred */
 #define PAVGB "pavgusb"
 
 #include "dsputil_mmx_avg.h"
@@ -1735,6 +1735,38 @@ static int hadamard8_diff_mmx2(void *s, uint8_t *src1, uint8_t *src2, int stride
 
 WARPER8_16_SQ(hadamard8_diff_mmx, hadamard8_diff16_mmx)
 WARPER8_16_SQ(hadamard8_diff_mmx2, hadamard8_diff16_mmx2)
+
+static int ssd_int8_vs_int16_mmx(int8_t *pix1, int16_t *pix2, int size){
+    int sum;
+    long i=size;
+    asm volatile(
+        "pxor %%mm4, %%mm4 \n"
+        "1: \n"
+        "sub $8, %0 \n"
+        "movq (%2,%0), %%mm2 \n"
+        "movq (%3,%0,2), %%mm0 \n"
+        "movq 8(%3,%0,2), %%mm1 \n"
+        "punpckhbw %%mm2, %%mm3 \n"
+        "punpcklbw %%mm2, %%mm2 \n"
+        "psraw $8, %%mm3 \n"
+        "psraw $8, %%mm2 \n"
+        "psubw %%mm3, %%mm1 \n"
+        "psubw %%mm2, %%mm0 \n"
+        "pmaddwd %%mm1, %%mm1 \n"
+        "pmaddwd %%mm0, %%mm0 \n"
+        "paddd %%mm1, %%mm4 \n"
+        "paddd %%mm0, %%mm4 \n"
+        "jg 1b \n"
+        "movq %%mm4, %%mm3 \n"
+        "psrlq $32, %%mm3 \n"
+        "paddd %%mm3, %%mm4 \n"
+        "movd %%mm4, %1 \n"
+        :"+r"(i), "=r"(sum)
+        :"r"(pix1), "r"(pix2)
+    );
+    return sum;
+}
+
 #endif //CONFIG_ENCODERS
 
 #define put_no_rnd_pixels8_mmx(a,b,c,d) put_pixels8_mmx(a,b,c,d)
@@ -3046,14 +3078,14 @@ static void float_to_int16_sse(int16_t *dst, const float *src, int len){
     asm volatile("emms");
 }
 
-#if 0
+#if 0 //#ifdef CONFIG_SNOW_DECODER
 extern void ff_snow_horizontal_compose97i_sse2(DWTELEM *b, int width);
 extern void ff_snow_horizontal_compose97i_mmx(DWTELEM *b, int width);
 extern void ff_snow_vertical_compose97i_sse2(DWTELEM *b0, DWTELEM *b1, DWTELEM *b2, DWTELEM *b3, DWTELEM *b4, DWTELEM *b5, int width);
 extern void ff_snow_vertical_compose97i_mmx(DWTELEM *b0, DWTELEM *b1, DWTELEM *b2, DWTELEM *b3, DWTELEM *b4, DWTELEM *b5, int width);
-extern void ff_snow_inner_add_yblock_sse2(uint8_t *obmc, const int obmc_stride, uint8_t * * block, int b_w, int b_h,
+extern void ff_snow_inner_add_yblock_sse2(const uint8_t *obmc, const int obmc_stride, uint8_t * * block, int b_w, int b_h,
                            int src_x, int src_y, int src_stride, slice_buffer * sb, int add, uint8_t * dst8);
-extern void ff_snow_inner_add_yblock_mmx(uint8_t *obmc, const int obmc_stride, uint8_t * * block, int b_w, int b_h,
+extern void ff_snow_inner_add_yblock_mmx(const uint8_t *obmc, const int obmc_stride, uint8_t * * block, int b_w, int b_h,
                           int src_x, int src_y, int src_stride, slice_buffer * sb, int add, uint8_t * dst8);
 #endif
 
@@ -3225,6 +3257,8 @@ void dsputil_init_mmx(DSPContext* c, AVCodecContext *avctx)
             c->try_8x8basis= try_8x8basis_mmx;
         }
         c->add_8x8basis= add_8x8basis_mmx;
+
+        c->ssd_int8_vs_int16 = ssd_int8_vs_int16_mmx;
 
 #endif //CONFIG_ENCODERS
 
@@ -3473,7 +3507,7 @@ void dsputil_init_mmx(DSPContext* c, AVCodecContext *avctx)
             c->avg_h264_chroma_pixels_tab[1]= avg_h264_chroma_mc4_3dnow;
         }
 
-#if 0
+#if 0 //#ifdef CONFIG_SNOW_DECODER
         if(mm_flags & MM_SSE2){
             c->horizontal_compose97i = ff_snow_horizontal_compose97i_sse2;
             c->vertical_compose97i = ff_snow_vertical_compose97i_sse2;

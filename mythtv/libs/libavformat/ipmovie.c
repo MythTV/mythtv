@@ -227,7 +227,7 @@ static int process_ipmovie_chunk(IPMVEContext *s, ByteIOContext *pb,
 
     /* see if there are any pending packets */
     chunk_type = load_ipmovie_packet(s, pb, pkt);
-    if ((chunk_type == CHUNK_VIDEO) && (chunk_type != CHUNK_DONE))
+    if (chunk_type != CHUNK_DONE)
         return chunk_type;
 
     /* read the next chunk, wherever the file happens to be pointing */
@@ -507,8 +507,6 @@ static int process_ipmovie_chunk(IPMVEContext *s, ByteIOContext *pb,
 
 static int ipmovie_probe(AVProbeData *p)
 {
-    if (p->buf_size < IPMOVIE_SIGNATURE_SIZE)
-        return 0;
     if (strncmp(p->buf, IPMOVIE_SIGNATURE, IPMOVIE_SIGNATURE_SIZE) != 0)
         return 0;
 
@@ -518,7 +516,7 @@ static int ipmovie_probe(AVProbeData *p)
 static int ipmovie_read_header(AVFormatContext *s,
                                AVFormatParameters *ap)
 {
-    IPMVEContext *ipmovie = (IPMVEContext *)s->priv_data;
+    IPMVEContext *ipmovie = s->priv_data;
     ByteIOContext *pb = &s->pb;
     AVPacket pkt;
     AVStream *st;
@@ -590,7 +588,7 @@ static int ipmovie_read_header(AVFormatContext *s,
 static int ipmovie_read_packet(AVFormatContext *s,
                                AVPacket *pkt)
 {
-    IPMVEContext *ipmovie = (IPMVEContext *)s->priv_data;
+    IPMVEContext *ipmovie = s->priv_data;
     ByteIOContext *pb = &s->pb;
     int ret;
 
@@ -601,15 +599,17 @@ static int ipmovie_read_packet(AVFormatContext *s,
         ret = AVERROR_IO;
     else if (ret == CHUNK_NOMEM)
         ret = AVERROR_NOMEM;
-    else
+    else if (ret == CHUNK_VIDEO)
         ret = 0;
+    else
+        ret = -1;
 
     return ret;
 }
 
 static int ipmovie_read_close(AVFormatContext *s)
 {
-//    IPMVEContext *ipmovie = (IPMVEContext *)s->priv_data;
+//    IPMVEContext *ipmovie = s->priv_data;
 
     return 0;
 }

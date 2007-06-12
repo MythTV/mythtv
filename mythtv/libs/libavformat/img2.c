@@ -54,6 +54,7 @@ static const IdStrMap img_tags[] = {
     { CODEC_ID_GIF       , "gif"},
     { CODEC_ID_TARGA     , "tga"},
     { CODEC_ID_TIFF      , "tiff"},
+    { CODEC_ID_SGI       , "sgi"},
     {0, NULL}
 };
 
@@ -177,7 +178,7 @@ static int img_read_header(AVFormatContext *s1, AVFormatParameters *ap)
 
     st = av_new_stream(s1, 0);
     if (!st) {
-        return -ENOMEM;
+        return AVERROR(ENOMEM);
     }
 
     pstrcpy(s->path, sizeof(s->path), s1->filename);
@@ -189,7 +190,7 @@ static int img_read_header(AVFormatContext *s1, AVFormatParameters *ap)
         s->is_pipe = 0;
     else{
         s->is_pipe = 1;
-        st->need_parsing= 1;
+        st->need_parsing = AVSTREAM_PARSE_FULL;
     }
 
     if (!ap->time_base.num) {

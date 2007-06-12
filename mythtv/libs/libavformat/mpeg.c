@@ -513,7 +513,7 @@ static int mpeg_mux_init(AVFormatContext *ctx)
     for(i=0;i<ctx->nb_streams;i++) {
         av_free(ctx->streams[i]->priv_data);
     }
-    return -ENOMEM;
+    return AVERROR(ENOMEM);
 }
 
 static inline void put_timestamp(ByteIOContext *pb, int id, int64_t timestamp)
@@ -1260,8 +1260,6 @@ static int mpeg_mux_end(AVFormatContext *ctx)
 static int cdxa_probe(AVProbeData *p)
 {
     /* check file header */
-    if (p->buf_size <= 32)
-        return 0;
     if (p->buf[0] == 'R' && p->buf[1] == 'I' &&
         p->buf[2] == 'F' && p->buf[3] == 'F' &&
         p->buf[8] == 'C' && p->buf[9] == 'D' &&
@@ -1440,15 +1438,19 @@ static int mpegps_read_pes_header(AVFormatContext *s,
 {
     MpegDemuxContext *m = s->priv_data;
     int len, size, startcode, c, flags, header_len;
-    int64_t pts, dts, last_pos;
+    int pes_ext, ext2_len, id_ext, skip;
+    int64_t pts, dts;
+    int64_t last_sync= url_ftell(&s->pb);
 
-    last_pos = -1;
+ error_redo:
+        url_fseek(&s->pb, last_sync, SEEK_SET);
  redo:
         /* next start code (should be immediately after) */
         m->header_state = 0xff;
         size = MAX_SYNC_SIZE;
         startcode = find_next_start_code(&s->pb, &size, &m->header_state);
-    //printf("startcode=%x pos=0x%Lx\n", startcode, url_ftell(&s->pb));
+        last_sync = url_ftell(&s->pb);
+    //printf("startcode=%x pos=0x%"PRIx64"\n", startcode, url_ftell(&s->pb));
     if (startcode < 0)
         return AVERROR_IO;
     if (startcode == PACK_START_CODE)
@@ -1470,7 +1472,7 @@ static int mpegps_read_pes_header(AVFormatContext *s,
     /* find matching stream */
     if (!((startcode >= 0x1c0 && startcode <= 0x1df) ||
           (startcode >= 0x1e0 && startcode <= 0x1ef) ||
-          (startcode == 0x1bd)))
+          (startcode == 0x1bd) || (startcode == 0x1fd)))
         goto redo;
     if (ppos) {
         *ppos = url_ftell(&s->pb) - 4;
@@ -1481,7 +1483,7 @@ static int mpegps_read_pes_header(AVFormatContext *s,
     /* stuffing */
     for(;;) {
         if (len < 1)
-            goto redo;
+            goto error_redo;
         c = get_byte(&s->pb);
         len--;
         /* XXX: for mpeg1, should test only bit 7 */
@@ -1490,23 +1492,17 @@ static int mpegps_read_pes_header(AVFormatContext *s,
     }
     if ((c & 0xc0) == 0x40) {
         /* buffer scale & size */
-        if (len < 2)
-            goto redo;
         get_byte(&s->pb);
         c = get_byte(&s->pb);
         len -= 2;
     }
-    if ((c & 0xf0) == 0x20) {
-        if (len < 4)
-            goto redo;
+    if ((c & 0xe0) == 0x20) {
         dts = pts = get_pts(&s->pb, c);
         len -= 4;
-    } else if ((c & 0xf0) == 0x30) {
-        if (len < 9)
-            goto redo;
-        pts = get_pts(&s->pb, c);
-        dts = get_pts(&s->pb, -1);
-        len -= 9;
+        if (c & 0x10){
+            dts = get_pts(&s->pb, -1);
+            len -= 5;
+        }
     } else if ((c & 0xc0) == 0x80) {
         /* mpeg 2 PES */
 #if 0 /* some streams have this field set for no apparent reason */
@@ -1519,46 +1515,65 @@ static int mpegps_read_pes_header(AVFormatContext *s,
         header_len = get_byte(&s->pb);
         len -= 2;
         if (header_len > len)
-            goto redo;
-        if ((flags & 0xc0) == 0x80) {
-            dts = pts = get_pts(&s->pb, -1);
-            if (header_len < 5)
-                goto redo;
-            header_len -= 5;
-            len -= 5;
-        } if ((flags & 0xc0) == 0xc0) {
-            pts = get_pts(&s->pb, -1);
-            dts = get_pts(&s->pb, -1);
-            if (header_len < 10)
-                goto redo;
-            header_len -= 10;
-            len -= 10;
-        }
+            goto error_redo;
         len -= header_len;
-        while (header_len > 0) {
-            get_byte(&s->pb);
-            header_len--;
+        if (flags & 0x80) {
+            dts = pts = get_pts(&s->pb, -1);
+            header_len -= 5;
+            if (flags & 0x40) {
+                dts = get_pts(&s->pb, -1);
+                header_len -= 5;
+            }
         }
+        if (flags & 0x01) { /* PES extension */
+            pes_ext = get_byte(&s->pb);
+            header_len--;
+            if (pes_ext & 0x40) { /* pack header - should be zero in PS */
+                goto error_redo;
+            }
+            /* Skip PES private data, program packet sequence counter and P-STD buffer */
+            skip = (pes_ext >> 4) & 0xb;
+            skip += skip & 0x9;
+            url_fskip(&s->pb, skip);
+            header_len -= skip;
+
+            if (pes_ext & 0x01) { /* PES extension 2 */
+                ext2_len = get_byte(&s->pb);
+                header_len--;
+                if ((ext2_len & 0x7f) > 0) {
+                    id_ext = get_byte(&s->pb);
+                    if ((id_ext & 0x80) == 0)
+                        startcode = ((startcode & 0xff) << 8) | id_ext;
+                    header_len--;
+                }
+            }
+        }
+        if(header_len < 0)
+            goto error_redo;
+        url_fskip(&s->pb, header_len);
     }
     else if( c!= 0xf )
         goto redo;
 
     if (startcode == PRIVATE_STREAM_1 && !m->psm_es_type[startcode & 0xff]) {
-        if (len < 1)
-            goto redo;
         startcode = get_byte(&s->pb);
         len--;
-        if (startcode >= 0x80 && startcode <= 0xbf) {
+        if (startcode >= 0x80 && startcode <= 0xcf) {
             /* audio: skip header */
-            if (len < 3)
-                goto redo;
             get_byte(&s->pb);
             get_byte(&s->pb);
             get_byte(&s->pb);
             len -= 3;
+            if (startcode >= 0xb0 && startcode <= 0xbf) {
+                /* MLP/TrueHD audio has a 4-byte header */
+                get_byte(&s->pb);
+                len--;
+            }
         }
     }
-    if(dts != AV_NOPTS_VALUE && ppos && s->build_index){
+    if(len<0)
+        goto error_redo;
+    if(dts != AV_NOPTS_VALUE && ppos){
         int i;
         for(i=0; i<s->nb_streams; i++){
             if(startcode == s->streams[i]->id) {
@@ -1636,18 +1651,30 @@ static int mpegps_read_packet(AVFormatContext *s,
     } else if (startcode >= 0x80 && startcode <= 0x87) {
         type = CODEC_TYPE_AUDIO;
         codec_id = CODEC_ID_AC3;
-    } else if (startcode >= 0x88 && startcode <= 0x9f) {
+    } else if ((startcode >= 0x88 && startcode <= 0x8f)
+               ||( startcode >= 0x98 && startcode <= 0x9f)) {
+        /* 0x90 - 0x97 is reserved for SDDS in DVD specs */
         type = CODEC_TYPE_AUDIO;
         codec_id = CODEC_ID_DTS;
-    } else if (startcode >= 0xa0 && startcode <= 0xbf) {
+    } else if (startcode >= 0xa0 && startcode <= 0xaf) {
         type = CODEC_TYPE_AUDIO;
         codec_id = CODEC_ID_PCM_S16BE;
+    } else if (startcode >= 0xb0 && startcode <= 0xbf) {
+        type = CODEC_TYPE_AUDIO;
+        codec_id = CODEC_ID_MLP;
+    } else if (startcode >= 0xc0 && startcode <= 0xcf) {
+        /* Used for both AC-3 and E-AC-3 in EVOB files */
+        type = CODEC_TYPE_AUDIO;
+        codec_id = CODEC_ID_AC3;
     } else if (startcode >= 0x20 && startcode <= 0x3f) {
         type = CODEC_TYPE_SUBTITLE;
         codec_id = CODEC_ID_DVD_SUBTITLE;
     } else if (startcode == 0x69 || startcode == 0x49) {
         type = CODEC_TYPE_DATA;
         codec_id = CODEC_ID_MPEG2VBI;
+    } else if (startcode >= 0xfd55 && startcode <= 0xfd5f) {
+        type = CODEC_TYPE_VIDEO;
+        codec_id = CODEC_ID_VC1;
     } else {
     skip:
         /* skip packet */
@@ -1661,7 +1688,7 @@ static int mpegps_read_packet(AVFormatContext *s,
     st->codec->codec_type = type;
     st->codec->codec_id = codec_id;
     if (codec_id != CODEC_ID_PCM_S16BE)
-        st->need_parsing = 1;
+        st->need_parsing = AVSTREAM_PARSE_FULL;
 
     /* notify the callback of the change in streams */
     if (s->streams_changed) {
@@ -1671,7 +1698,7 @@ static int mpegps_read_packet(AVFormatContext *s,
  found:
     if(st->discard >= AVDISCARD_ALL)
         goto skip;
-    if (startcode >= 0xa0 && startcode <= 0xbf) {
+    if (startcode >= 0xa0 && startcode <= 0xaf) {
         int b1, freq;
 
         /* for LPCM, we just skip the header and consider it is raw

@@ -252,9 +252,6 @@ static int mp3_read_probe(AVProbeData *p)
     uint8_t *buf, *buf2, *end;
     AVCodecContext avctx;
 
-    if(p->buf_size < ID3_HEADER_SIZE)
-        return 0;
-
     if(id3_match(p->buf))
         return AVPROBE_SCORE_MAX/2+1; // this must be less then mpeg-ps because some retards put id3 tage before mpeg-ps files
 
@@ -295,7 +292,7 @@ static int mp3_read_header(AVFormatContext *s,
 
     st->codec->codec_type = CODEC_TYPE_AUDIO;
     st->codec->codec_id = CODEC_ID_MP3;
-    st->need_parsing = 1;
+    st->need_parsing = AVSTREAM_PARSE_FULL;
 
     /* try to get the TAG */
     if (!url_is_streamed(&s->pb)) {
@@ -393,6 +390,7 @@ AVInputFormat mp3_demuxer = {
     mp3_read_header,
     mp3_read_packet,
     mp3_read_close,
+    .flags= AVFMT_GENERIC_INDEX,
     .extensions = "mp2,mp3,m2a", /* XXX: use probe */
 };
 #endif

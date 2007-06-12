@@ -1,3 +1,30 @@
+/*
+ * NUT (de)muxing via libnut
+ * copyright (c) 2006 Oded Shimon <ods15@ods15.dyndns.org>
+ *
+ * This file is part of FFmpeg.
+ *
+ * FFmpeg is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * FFmpeg is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with FFmpeg; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
+ */
+
+/**
+ * @file libnut.c
+ * NUT demuxing and muxing via libnut.
+ * @author Oded Shimon <ods15@ods15.dyndns.org>
+ */
+
 #include "avformat.h"
 #include "riff.h"
 #include <libnut.h>
@@ -56,8 +83,8 @@ static int nut_write_header(AVFormatContext * avf) {
         else fourcc = codec_get_tag(nut_tags, codec->codec_id);
 
         if (!fourcc) {
-            if (codec->codec_type == CODEC_TYPE_VIDEO) fourcc = codec_get_bmp_tag(codec->codec_id);
-            if (codec->codec_type == CODEC_TYPE_AUDIO) fourcc = codec_get_wav_tag(codec->codec_id);
+            if (codec->codec_type == CODEC_TYPE_VIDEO) fourcc = codec_get_tag(codec_bmp_tags, codec->codec_id);
+            if (codec->codec_type == CODEC_TYPE_AUDIO) fourcc = codec_get_tag(codec_wav_tags, codec->codec_id);
         }
 
         s[i].fourcc_len = 4;
@@ -123,7 +150,7 @@ static int nut_write_trailer(AVFormatContext * avf) {
     return 0;
 }
 
-AVOutputFormat nut_muxer = {
+AVOutputFormat libnut_muxer = {
     "nut",
     "nut format",
     "video/x-nut",
@@ -139,7 +166,7 @@ AVOutputFormat nut_muxer = {
 #endif //CONFIG_MUXERS
 
 static int nut_probe(AVProbeData *p) {
-    if (p->buf_size >= ID_LENGTH && !memcmp(p->buf, ID_STRING, ID_LENGTH)) return AVPROBE_SCORE_MAX;
+    if (!memcmp(p->buf, ID_STRING, ID_LENGTH)) return AVPROBE_SCORE_MAX;
 
     return 0;
 }
@@ -208,14 +235,14 @@ static int nut_read_header(AVFormatContext * avf, AVFormatParameters * ap) {
         switch(s[i].type) {
         case NUT_AUDIO_CLASS:
             st->codec->codec_type = CODEC_TYPE_AUDIO;
-            if (st->codec->codec_id == CODEC_ID_NONE) st->codec->codec_id = codec_get_wav_id(st->codec->codec_tag);
+            if (st->codec->codec_id == CODEC_ID_NONE) st->codec->codec_id = codec_get_id(codec_wav_tags, st->codec->codec_tag);
 
             st->codec->channels = s[i].channel_count;
             st->codec->sample_rate = s[i].samplerate_num / s[i].samplerate_denom;
             break;
         case NUT_VIDEO_CLASS:
             st->codec->codec_type = CODEC_TYPE_VIDEO;
-            if (st->codec->codec_id == CODEC_ID_NONE) st->codec->codec_id = codec_get_bmp_id(st->codec->codec_tag);
+            if (st->codec->codec_id == CODEC_ID_NONE) st->codec->codec_id = codec_get_id(codec_bmp_tags, st->codec->codec_tag);
 
             st->codec->width = s[i].width;
             st->codec->height = s[i].height;
@@ -270,7 +297,7 @@ static int nut_read_close(AVFormatContext *s) {
     return 0;
 }
 
-AVInputFormat nut_demuxer = {
+AVInputFormat libnut_demuxer = {
     "nut",
     "nut format",
     sizeof(NUTContext),

@@ -348,7 +348,7 @@ static av_always_inline int smk_get_code(GetBitContext *gb, int *recode, int *la
 
 static int decode_frame(AVCodecContext *avctx, void *data, int *data_size, uint8_t *buf, int buf_size)
 {
-    SmackVContext * const smk = (SmackVContext *)avctx->priv_data;
+    SmackVContext * const smk = avctx->priv_data;
     uint8_t *out;
     uint32_t *pal;
     GetBitContext gb;
@@ -515,10 +515,9 @@ static int decode_frame(AVCodecContext *avctx, void *data, int *data_size, uint8
  */
 static int decode_init(AVCodecContext *avctx)
 {
-    SmackVContext * const c = (SmackVContext *)avctx->priv_data;
+    SmackVContext * const c = avctx->priv_data;
 
     c->avctx = avctx;
-    avctx->has_b_frames = 0;
 
     c->pic.data[0] = NULL;
 
@@ -550,7 +549,7 @@ static int decode_init(AVCodecContext *avctx)
  */
 static int decode_end(AVCodecContext *avctx)
 {
-    SmackVContext * const smk = (SmackVContext *)avctx->priv_data;
+    SmackVContext * const smk = avctx->priv_data;
 
     av_freep(&smk->mmap_tbl);
     av_freep(&smk->mclr_tbl);
@@ -620,14 +619,10 @@ static int smka_decode_frame(AVCodecContext *avctx, void *data, int *data_size, 
         }
     }
     if(bits) { //decode 16-bit data
-        pred[0]  = get_bits(&gb, 8);
-        pred[0] |= get_bits(&gb, 8);
-        *samples++ = pred[0];
-        if(stereo) {
-            pred[1]  = get_bits(&gb, 8);
-            pred[1] |= get_bits(&gb, 8);
-            *samples++ = pred[1];
-        }
+        for(i = stereo; i >= 0; i--)
+            pred[i] = bswap_16(get_bits(&gb, 16));
+        for(i = 0; i < stereo; i++)
+            *samples++ = pred[i];
         for(i = 0; i < unp_size / 2; i++) {
             if(i & stereo) {
                 if(vlc[2].table)
@@ -658,12 +653,10 @@ static int smka_decode_frame(AVCodecContext *avctx, void *data, int *data_size, 
             }
         }
     } else { //8-bit data
-        pred[0] = get_bits(&gb, 8);
-        *samples++ = (pred[0] - 0x80) << 8;
-        if(stereo) {
-            pred[1] = get_bits(&gb, 8);
-            *samples++ = (pred[1] - 0x80) << 8;
-        }
+        for(i = stereo; i >= 0; i--)
+            pred[i] = get_bits(&gb, 8);
+        for(i = 0; i < stereo; i++)
+            *samples++ = (pred[i] - 0x80) << 8;
         for(i = 0; i < unp_size; i++) {
             if(i & stereo){
                 if(vlc[1].table)

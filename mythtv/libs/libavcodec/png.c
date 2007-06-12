@@ -344,7 +344,7 @@ static void png_filter_row(uint8_t *dst, int filter_type,
 }
 
 #ifdef CONFIG_ENCODERS
-static void convert_from_rgba32(uint8_t *dst, const uint8_t *src, int width)
+static void convert_from_rgb32(uint8_t *dst, const uint8_t *src, int width)
 {
     uint8_t *d;
     int j;
@@ -363,7 +363,7 @@ static void convert_from_rgba32(uint8_t *dst, const uint8_t *src, int width)
 #endif
 
 #ifdef CONFIG_DECODERS
-static void convert_to_rgba32(uint8_t *dst, const uint8_t *src, int width)
+static void convert_to_rgb32(uint8_t *dst, const uint8_t *src, int width)
 {
     int j;
     unsigned int r, g, b, a;
@@ -392,7 +392,7 @@ static void png_handle_row(PNGContext *s)
             png_filter_row(s->tmp_row, s->crow_buf[0], s->crow_buf + 1,
                            s->last_row, s->row_size, s->bpp);
             memcpy(s->last_row, s->tmp_row, s->row_size);
-            convert_to_rgba32(ptr, s->tmp_row, s->width);
+            convert_to_rgb32(ptr, s->tmp_row, s->width);
         } else {
             /* in normal case, we avoid one copy */
             if (s->y == 0)
@@ -422,7 +422,7 @@ static void png_handle_row(PNGContext *s)
                 got_line = 1;
             }
             if ((png_pass_dsp_ymask[s->pass] << (s->y & 7)) & 0x80) {
-                /* NOTE: rgba32 is handled directly in png_put_interlaced_row */
+                /* NOTE: RGB32 is handled directly in png_put_interlaced_row */
                 png_put_interlaced_row(ptr, s->width, s->bits_per_pixel, s->pass,
                                        s->color_type, s->last_row);
             }
@@ -562,7 +562,7 @@ static int decode_frame(AVCodecContext *avctx,
                     avctx->pix_fmt = PIX_FMT_RGB24;
                 } else if (s->bit_depth == 8 &&
                            s->color_type == PNG_COLOR_TYPE_RGB_ALPHA) {
-                    avctx->pix_fmt = PIX_FMT_RGBA32;
+                    avctx->pix_fmt = PIX_FMT_RGB32;
                 } else if (s->bit_depth == 8 &&
                            s->color_type == PNG_COLOR_TYPE_GRAY) {
                     avctx->pix_fmt = PIX_FMT_GRAY8;
@@ -782,7 +782,7 @@ static int encode_frame(AVCodecContext *avctx, unsigned char *buf, int buf_size,
 
     is_progressive = !!(avctx->flags & CODEC_FLAG_INTERLACED_DCT);
     switch(avctx->pix_fmt) {
-    case PIX_FMT_RGBA32:
+    case PIX_FMT_RGB32:
         bit_depth = 8;
         color_type = PNG_COLOR_TYPE_RGB_ALPHA;
         break;
@@ -882,7 +882,7 @@ static int encode_frame(AVCodecContext *avctx, unsigned char *buf, int buf_size,
                     if ((png_pass_ymask[pass] << (y & 7)) & 0x80) {
                         ptr = p->data[0] + y * p->linesize[0];
                         if (color_type == PNG_COLOR_TYPE_RGB_ALPHA) {
-                            convert_from_rgba32(tmp_buf, ptr, avctx->width);
+                            convert_from_rgb32(tmp_buf, ptr, avctx->width);
                             ptr1 = tmp_buf;
                         } else {
                             ptr1 = ptr;
@@ -900,7 +900,7 @@ static int encode_frame(AVCodecContext *avctx, unsigned char *buf, int buf_size,
         for(y = 0; y < avctx->height; y++) {
             ptr = p->data[0] + y * p->linesize[0];
             if (color_type == PNG_COLOR_TYPE_RGB_ALPHA)
-                convert_from_rgba32(crow_buf + 1, ptr, avctx->width);
+                convert_from_rgb32(crow_buf + 1, ptr, avctx->width);
             else
                 memcpy(crow_buf + 1, ptr, row_size);
             crow_buf[0] = PNG_FILTER_VALUE_NONE;
@@ -961,6 +961,6 @@ AVCodec png_encoder = {
     common_init,
     encode_frame,
     NULL, //encode_end,
-    .pix_fmts= (enum PixelFormat[]){PIX_FMT_RGB24, PIX_FMT_RGBA32, PIX_FMT_PAL8, PIX_FMT_GRAY8, PIX_FMT_MONOBLACK, -1},
+    .pix_fmts= (enum PixelFormat[]){PIX_FMT_RGB24, PIX_FMT_RGB32, PIX_FMT_PAL8, PIX_FMT_GRAY8, PIX_FMT_MONOBLACK, -1},
 };
 #endif // CONFIG_PNG_ENCODER

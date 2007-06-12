@@ -55,9 +55,6 @@ static int flic_probe(AVProbeData *p)
 {
     int magic_number;
 
-    if (p->buf_size < 6)
-        return 0;
-
     magic_number = AV_RL16(&p->buf[4]);
     if ((magic_number != FLIC_FILE_MAGIC_1) &&
         (magic_number != FLIC_FILE_MAGIC_2) &&
@@ -70,7 +67,7 @@ static int flic_probe(AVProbeData *p)
 static int flic_read_header(AVFormatContext *s,
                             AVFormatParameters *ap)
 {
-    FlicDemuxContext *flic = (FlicDemuxContext *)s->priv_data;
+    FlicDemuxContext *flic = s->priv_data;
     ByteIOContext *pb = &s->pb;
     unsigned char header[FLIC_HEADER_SIZE];
     AVStream *st;
@@ -146,8 +143,10 @@ static int flic_read_header(AVFormatContext *s,
          *  therefore, the frame pts increment = n * 90
          */
         flic->frame_pts_inc = speed * 90;
-    } else
+    } else {
+        av_log(s, AV_LOG_INFO, "Invalid or unsupported magic chunk in file\n");
         return AVERROR_INVALIDDATA;
+    }
 
     if (flic->frame_pts_inc == 0)
         flic->frame_pts_inc = FLIC_DEFAULT_PTS_INC;
@@ -158,7 +157,7 @@ static int flic_read_header(AVFormatContext *s,
 static int flic_read_packet(AVFormatContext *s,
                             AVPacket *pkt)
 {
-    FlicDemuxContext *flic = (FlicDemuxContext *)s->priv_data;
+    FlicDemuxContext *flic = s->priv_data;
     ByteIOContext *pb = &s->pb;
     int packet_read = 0;
     unsigned int size;
@@ -205,7 +204,7 @@ static int flic_read_packet(AVFormatContext *s,
 
 static int flic_read_close(AVFormatContext *s)
 {
-//    FlicDemuxContext *flic = (FlicDemuxContext *)s->priv_data;
+//    FlicDemuxContext *flic = s->priv_data;
 
     return 0;
 }

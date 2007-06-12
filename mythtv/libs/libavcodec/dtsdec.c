@@ -19,302 +19,250 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-#ifdef HAVE_AV_CONFIG_H
-#undef HAVE_AV_CONFIG_H
-#endif
-
 #include "avcodec.h"
 #include <dts.h>
 
 #include <stdlib.h>
 #include <string.h>
 
-#ifdef HAVE_MALLOC_H
-#include <malloc.h>
-#endif
-
 #define BUFFER_SIZE 18726
 #define HEADER_SIZE 14
 
-#ifdef LIBDTS_FIXED
-#define CONVERT_LEVEL (1 << 26)
-#define CONVERT_BIAS 0
-#else
 #define CONVERT_LEVEL 1
-#define CONVERT_BIAS 384
-#endif
+#define CONVERT_BIAS 0
 
-static inline
-int16_t convert (int32_t i)
+typedef struct DTSContext {
+    dts_state_t *state;
+    uint8_t buf[BUFFER_SIZE];
+    uint8_t *bufptr;
+    uint8_t *bufpos;
+} DTSContext;
+
+static inline int16_t
+convert(sample_t s)
 {
-#ifdef LIBDTS_FIXED
-    i >>= 15;
-#else
-    i -= 0x43c00000;
-#endif
-    return (i > 32767) ? 32767 : ((i < -32768) ? -32768 : i);
+    return s * 0x7fff;
 }
 
 static void
-convert2s16_2 (sample_t * _f, int16_t * s16)
+convert2s16_multi(sample_t *f, int16_t *s16, int flags)
 {
-  int i;
-  int32_t * f = (int32_t *) _f;
+    int i;
 
-  for (i = 0; i < 256; i++)
-    {
-      s16[2*i] = convert (f[i]);
-      s16[2*i+1] = convert (f[i+256]);
-    }
-}
-
-static void
-convert2s16_4 (sample_t * _f, int16_t * s16)
-{
-  int i;
-  int32_t * f = (int32_t *) _f;
-
-  for (i = 0; i < 256; i++)
-    {
-      s16[4*i] = convert (f[i]);
-      s16[4*i+1] = convert (f[i+256]);
-      s16[4*i+2] = convert (f[i+512]);
-      s16[4*i+3] = convert (f[i+768]);
-    }
-}
-
-static void
-convert2s16_5 (sample_t * _f, int16_t * s16)
-{
-  int i;
-  int32_t * f = (int32_t *) _f;
-
-  for (i = 0; i < 256; i++)
-    {
-      s16[5*i] = convert (f[i]);
-      s16[5*i+1] = convert (f[i+256]);
-      s16[5*i+2] = convert (f[i+512]);
-      s16[5*i+3] = convert (f[i+768]);
-      s16[5*i+4] = convert (f[i+1024]);
-    }
-}
-
-static void
-convert2s16_multi (sample_t * _f, int16_t * s16, int flags)
-{
-  int i;
-  int32_t * f = (int32_t *) _f;
-
-  switch (flags)
-    {
+    switch(flags & (DTS_CHANNEL_MASK | DTS_LFE)){
     case DTS_MONO:
-      for (i = 0; i < 256; i++)
-        {
-          s16[5*i] = s16[5*i+1] = s16[5*i+2] = s16[5*i+3] = 0;
-          s16[5*i+4] = convert (f[i]);
+        for(i = 0; i < 256; i++){
+            s16[5*i] = s16[5*i+1] = s16[5*i+2] = s16[5*i+3] = 0;
+            s16[5*i+4] = convert(f[i]);
         }
-      break;
     case DTS_CHANNEL:
     case DTS_STEREO:
     case DTS_DOLBY:
-      convert2s16_2 (_f, s16);
-      break;
+        for(i = 0; i < 256; i++){
+            s16[2*i] = convert(f[i]);
+            s16[2*i+1] = convert(f[i+256]);
+        }
     case DTS_3F:
-      for (i = 0; i < 256; i++)
-        {
-          s16[5*i] = convert (f[i]);
-          s16[5*i+1] = convert (f[i+512]);
-          s16[5*i+2] = s16[5*i+3] = 0;
-          s16[5*i+4] = convert (f[i+256]);
+        for(i = 0; i < 256; i++){
+            s16[5*i] = convert(f[i+256]);
+            s16[5*i+1] = convert(f[i+512]);
+            s16[5*i+2] = s16[5*i+3] = 0;
+            s16[5*i+4] = convert(f[i]);
         }
-      break;
     case DTS_2F2R:
-      convert2s16_4 (_f, s16);
-      break;
-    case DTS_3F2R:
-      convert2s16_5 (_f, s16);
-      break;
-    case DTS_MONO | DTS_LFE:
-      for (i = 0; i < 256; i++)
-        {
-          s16[6*i] = s16[6*i+1] = s16[6*i+2] = s16[6*i+3] = 0;
-          s16[6*i+4] = convert (f[i+256]);
-          s16[6*i+5] = convert (f[i]);
+        for(i = 0; i < 256; i++){
+            s16[4*i] = convert(f[i]);
+            s16[4*i+1] = convert(f[i+256]);
+            s16[4*i+2] = convert(f[i+512]);
+            s16[4*i+3] = convert(f[i+768]);
         }
-      break;
+    case DTS_3F2R:
+        for(i = 0; i < 256; i++){
+            s16[5*i] = convert(f[i+256]);
+            s16[5*i+1] = convert(f[i+512]);
+            s16[5*i+2] = convert(f[i+768]);
+            s16[5*i+3] = convert(f[i+1024]);
+            s16[5*i+4] = convert(f[i]);
+        }
+    case DTS_MONO | DTS_LFE:
+        for(i = 0; i < 256; i++){
+            s16[6*i] = s16[6*i+1] = s16[6*i+2] = s16[6*i+3] = 0;
+            s16[6*i+4] = convert(f[i]);
+            s16[6*i+5] = convert(f[i+256]);
+        }
     case DTS_CHANNEL | DTS_LFE:
     case DTS_STEREO | DTS_LFE:
     case DTS_DOLBY | DTS_LFE:
-      for (i = 0; i < 256; i++)
-        {
-          s16[6*i] = convert (f[i+256]);
-          s16[6*i+1] = convert (f[i+512]);
-          s16[6*i+2] = s16[6*i+3] = s16[6*i+4] = 0;
-          s16[6*i+5] = convert (f[i]);
+        for(i = 0; i < 256; i++){
+            s16[6*i] = convert(f[i]);
+            s16[6*i+1] = convert(f[i+256]);
+            s16[6*i+2] = s16[6*i+3] = s16[6*i+4] = 0;
+            s16[6*i+5] = convert(f[i+512]);
         }
-      break;
     case DTS_3F | DTS_LFE:
-      for (i = 0; i < 256; i++)
-        {
-          s16[6*i] = convert (f[i+256]);
-          s16[6*i+1] = convert (f[i+768]);
-          s16[6*i+2] = s16[6*i+3] = 0;
-          s16[6*i+4] = convert (f[i+512]);
-          s16[6*i+5] = convert (f[i]);
+        for(i = 0; i < 256; i++){
+            s16[6*i] = convert(f[i+256]);
+            s16[6*i+1] = convert(f[i+512]);
+            s16[6*i+2] = s16[6*i+3] = 0;
+            s16[6*i+4] = convert(f[i]);
+            s16[6*i+5] = convert(f[i+768]);
         }
-      break;
     case DTS_2F2R | DTS_LFE:
-      for (i = 0; i < 256; i++)
-        {
-          s16[6*i] = convert (f[i+256]);
-          s16[6*i+1] = convert (f[i+512]);
-          s16[6*i+2] = convert (f[i+768]);
-          s16[6*i+3] = convert (f[i+1024]);
-          s16[6*i+4] = 0;
-          s16[6*i+5] = convert (f[i]);
+        for(i = 0; i < 256; i++){
+            s16[6*i] = convert(f[i]);
+            s16[6*i+1] = convert(f[i+256]);
+            s16[6*i+2] = convert(f[i+512]);
+            s16[6*i+3] = convert(f[i+768]);
+            s16[6*i+4] = 0;
+            s16[6*i+5] = convert(f[i+1024]);
         }
-      break;
     case DTS_3F2R | DTS_LFE:
-      for (i = 0; i < 256; i++)
-        {
-          s16[6*i] = convert (f[i+256]);
-          s16[6*i+1] = convert (f[i+768]);
-          s16[6*i+2] = convert (f[i+1024]);
-          s16[6*i+3] = convert (f[i+1280]);
-          s16[6*i+4] = convert (f[i+512]);
-          s16[6*i+5] = convert (f[i]);
+        for(i = 0; i < 256; i++){
+            s16[6*i] = convert(f[i+256]);
+            s16[6*i+1] = convert(f[i+512]);
+            s16[6*i+2] = convert(f[i+768]);
+            s16[6*i+3] = convert(f[i+1024]);
+            s16[6*i+4] = convert(f[i]);
+            s16[6*i+5] = convert(f[i+1280]);
         }
-      break;
     }
 }
 
 static int
-channels_multi (int flags)
+channels_multi(int flags)
 {
-  if (flags & DTS_LFE)
-    return 6;
-  else if (flags & 1)   /* center channel */
-    return 5;
-  else if ((flags & DTS_CHANNEL_MASK) == DTS_2F2R)
-    return 4;
-  else
-    return 2;
-}
-
-static int
-dts_decode_frame (AVCodecContext *avctx, void *data, int *data_size,
-                  uint8_t *buff, int buff_size)
-{
-  uint8_t * start = buff;
-  uint8_t * end = buff + buff_size;
-  static uint8_t buf[BUFFER_SIZE];
-  static uint8_t * bufptr = buf;
-  static uint8_t * bufpos = buf + HEADER_SIZE;
-
-  static int sample_rate;
-  static int frame_length;
-  static int flags;
-  int bit_rate;
-  int len;
-  dts_state_t *state = avctx->priv_data;
-
-  *data_size = 0;
-
-  while (1)
-    {
-      len = end - start;
-      if (!len)
-        break;
-      if (len > bufpos - bufptr)
-        len = bufpos - bufptr;
-      memcpy (bufptr, start, len);
-      bufptr += len;
-      start += len;
-      if (bufptr != bufpos)
-          return start - buff;
-      if (bufpos != buf + HEADER_SIZE)
-          break;
-
-            {
-              int length;
-
-              length = dts_syncinfo (state, buf, &flags, &sample_rate,
-                                     &bit_rate, &frame_length);
-              if (!length)
-                {
-                  av_log (NULL, AV_LOG_INFO, "skip\n");
-                  for (bufptr = buf; bufptr < buf + HEADER_SIZE-1; bufptr++)
-                    bufptr[0] = bufptr[1];
-                  continue;
-                }
-              bufpos = buf + length;
-            }
+    switch(flags & (DTS_CHANNEL_MASK | DTS_LFE)){
+    case DTS_CHANNEL:
+    case DTS_STEREO:
+    case DTS_DOLBY:
+        return 2;
+    case DTS_2F2R:
+        return 4;
+    case DTS_MONO:
+    case DTS_3F:
+    case DTS_3F2R:
+        return 5;
+    case DTS_MONO | DTS_LFE:
+    case DTS_CHANNEL | DTS_LFE:
+    case DTS_STEREO | DTS_LFE:
+    case DTS_DOLBY | DTS_LFE:
+    case DTS_3F | DTS_LFE:
+    case DTS_2F2R | DTS_LFE:
+    case DTS_3F2R | DTS_LFE:
+        return 6;
     }
 
-            {
-              level_t level;
-              sample_t bias;
-              int i;
-
-              flags = 2; /* ???????????? */
-              level = CONVERT_LEVEL;
-              bias = CONVERT_BIAS;
-
-              flags |= DTS_ADJUST_LEVEL;
-              if (dts_frame (state, buf, &flags, &level, bias))
-                goto error;
-              avctx->sample_rate = sample_rate;
-              avctx->channels = channels_multi (flags);
-              avctx->bit_rate = bit_rate;
-              for (i = 0; i < dts_blocks_num (state); i++)
-                {
-                  if (dts_block (state))
-                    goto error;
-                  {
-                    int chans;
-                    chans = channels_multi (flags);
-                    convert2s16_multi (dts_samples (state), data,
-                                       flags & (DTS_CHANNEL_MASK | DTS_LFE));
-
-                    data += 256 * sizeof (int16_t) * chans;
-                    *data_size += 256 * sizeof (int16_t) * chans;
-                  }
-                }
-              bufptr = buf;
-              bufpos = buf + HEADER_SIZE;
-              return start-buff;
-            error:
-              av_log (NULL, AV_LOG_ERROR, "error\n");
-              bufptr = buf;
-              bufpos = buf + HEADER_SIZE;
-            }
-
-  return start-buff;
-}
-
-static int
-dts_decode_init (AVCodecContext *avctx)
-{
-  avctx->priv_data = dts_init (0);
-  if (avctx->priv_data == NULL)
     return -1;
-
-  return 0;
 }
 
 static int
-dts_decode_end (AVCodecContext *s)
+dts_decode_frame(AVCodecContext * avctx, void *data, int *data_size,
+                 uint8_t * buff, int buff_size)
 {
-  return 0;
+    DTSContext *s = avctx->priv_data;
+    uint8_t *start = buff;
+    uint8_t *end = buff + buff_size;
+    int16_t *out_samples = data;
+    int sample_rate;
+    int frame_length;
+    int flags;
+    int bit_rate;
+    int len;
+    level_t level;
+    sample_t bias;
+    int nblocks;
+    int i;
+
+    *data_size = 0;
+
+    while(1) {
+        int length;
+
+        len = end - start;
+        if(!len)
+            break;
+        if(len > s->bufpos - s->bufptr)
+            len = s->bufpos - s->bufptr;
+        memcpy(s->bufptr, start, len);
+        s->bufptr += len;
+        start += len;
+        if(s->bufptr != s->bufpos)
+            return start - buff;
+        if(s->bufpos != s->buf + HEADER_SIZE)
+            break;
+
+        length = dts_syncinfo(s->state, s->buf, &flags, &sample_rate,
+                              &bit_rate, &frame_length);
+        if(!length) {
+            av_log(NULL, AV_LOG_INFO, "skip\n");
+            for(s->bufptr = s->buf; s->bufptr < s->buf + HEADER_SIZE - 1; s->bufptr++)
+                s->bufptr[0] = s->bufptr[1];
+            continue;
+        }
+        s->bufpos = s->buf + length;
+    }
+
+    level = CONVERT_LEVEL;
+    bias = CONVERT_BIAS;
+
+    flags |= DTS_ADJUST_LEVEL;
+    if(dts_frame(s->state, s->buf, &flags, &level, bias)) {
+        av_log(avctx, AV_LOG_ERROR, "dts_frame() failed\n");
+        goto end;
+    }
+
+    avctx->sample_rate = sample_rate;
+    avctx->channels = channels_multi(flags);
+    avctx->bit_rate = bit_rate;
+
+    nblocks = dts_blocks_num(s->state);
+
+    for(i = 0; i < nblocks; i++) {
+        if(dts_block(s->state)) {
+            av_log(avctx, AV_LOG_ERROR, "dts_block() failed\n");
+            goto end;
+        }
+
+        convert2s16_multi(dts_samples(s->state), out_samples, flags);
+
+        out_samples += 256 * avctx->channels;
+        *data_size += 256 * sizeof(int16_t) * avctx->channels;
+    }
+
+end:
+    s->bufptr = s->buf;
+    s->bufpos = s->buf + HEADER_SIZE;
+    return start - buff;
+}
+
+static int
+dts_decode_init(AVCodecContext * avctx)
+{
+    DTSContext *s = avctx->priv_data;
+    s->bufptr = s->buf;
+    s->bufpos = s->buf + HEADER_SIZE;
+    s->state = dts_init(0);
+    if(s->state == NULL)
+        return -1;
+
+    return 0;
+}
+
+static int
+dts_decode_end(AVCodecContext * avctx)
+{
+    DTSContext *s = avctx->priv_data;
+    dts_free(s->state);
+    return 0;
 }
 
 AVCodec dts_decoder = {
-  "dts",
-  CODEC_TYPE_AUDIO,
-  CODEC_ID_DTS,
-  sizeof (dts_state_t *),
-  dts_decode_init,
-  NULL,
-  dts_decode_end,
-  dts_decode_frame,
+    "dts",
+    CODEC_TYPE_AUDIO,
+    CODEC_ID_DTS,
+    sizeof(DTSContext),
+    dts_decode_init,
+    NULL,
+    dts_decode_end,
+    dts_decode_frame,
 };

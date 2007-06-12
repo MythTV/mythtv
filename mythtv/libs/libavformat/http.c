@@ -20,16 +20,12 @@
  */
 #include "avformat.h"
 #include <unistd.h>
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
-#include <netdb.h>
+#include "network.h"
 
 #include "base64.h"
 
-/* XXX: POST protocol is not completly implemented because ffmpeg use
-   only a subset of it */
+/* XXX: POST protocol is not completely implemented because ffmpeg uses
+   only a subset of it. */
 
 //#define DEBUG
 
@@ -100,7 +96,7 @@ static int http_open_cnx(URLContext *h)
     s->hd = hd;
     if (http_connect(h, path, hoststr, auth, &location_changed) < 0)
         goto fail;
-    if (s->http_code == 303 && location_changed == 1) {
+    if ((s->http_code == 302 || s->http_code == 303) && location_changed == 1) {
         /* url moved, get next */
         url_close(hd);
         if (redirects++ >= MAX_REDIRECTS)
@@ -124,7 +120,7 @@ static int http_open(URLContext *h, const char *uri, int flags)
 
     s = av_malloc(sizeof(HTTPContext));
     if (!s) {
-        return -ENOMEM;
+        return AVERROR(ENOMEM);
     }
     h->priv_data = s;
     s->filesize = -1;
@@ -173,6 +169,9 @@ static int process_line(URLContext *h, char *line, int line_count,
 #ifdef DEBUG
         printf("http_code=%d\n", s->http_code);
 #endif
+        /* error codes are 4xx and 5xx */
+        if (s->http_code >= 400 && s->http_code < 600)
+            return -1;
     } else {
         while (*p != '\0' && *p != ':')
             p++;
@@ -211,20 +210,22 @@ static int http_connect(URLContext *h, const char *path, const char *hoststr,
     int post, err, ch;
     char line[1024], *q;
     char *auth_b64;
+    int auth_b64_len = strlen(auth)* 4 / 3 + 12;
     offset_t off = s->off;
 
 
     /* send http header */
     post = h->flags & URL_WRONLY;
-
-    auth_b64 = av_base64_encode((uint8_t *)auth, strlen(auth));
+    auth_b64 = av_malloc(auth_b64_len);
+    av_base64_encode(auth_b64, auth_b64_len, (uint8_t *)auth, strlen(auth));
     snprintf(s->buffer, sizeof(s->buffer),
              "%s %s HTTP/1.1\r\n"
              "User-Agent: %s\r\n"
              "Accept: */*\r\n"
-             "Range: bytes=%llu-\r\n"
+             "Range: bytes=%"PRId64"-\r\n"
              "Host: %s\r\n"
              "Authorization: Basic %s\r\n"
+             "Connection: close\r\n"
              "\r\n",
              post ? "POST" : "GET",
              path,
@@ -242,6 +243,7 @@ static int http_connect(URLContext *h, const char *path, const char *hoststr,
     s->buf_end = s->buffer;
     s->line_count = 0;
     s->off = 0;
+    s->filesize = -1;
     if (post) {
         sleep(1);
         return 0;

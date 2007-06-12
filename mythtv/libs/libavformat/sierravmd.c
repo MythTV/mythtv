@@ -59,9 +59,6 @@ typedef struct VmdDemuxContext {
 
 static int vmd_probe(AVProbeData *p)
 {
-    if (p->buf_size < 2)
-        return 0;
-
     /* check if the first 2 bytes of the file contain the appropriate size
      * of a VMD header chunk */
     if (AV_RL16(&p->buf[0]) != VMD_HEADER_SIZE - 2)
@@ -74,7 +71,7 @@ static int vmd_probe(AVProbeData *p)
 static int vmd_read_header(AVFormatContext *s,
                            AVFormatParameters *ap)
 {
-    VmdDemuxContext *vmd = (VmdDemuxContext *)s->priv_data;
+    VmdDemuxContext *vmd = s->priv_data;
     ByteIOContext *pb = &s->pb;
     AVStream *st, *vst;
     unsigned int toc_offset;
@@ -247,7 +244,7 @@ static int vmd_read_header(AVFormatContext *s,
 static int vmd_read_packet(AVFormatContext *s,
                            AVPacket *pkt)
 {
-    VmdDemuxContext *vmd = (VmdDemuxContext *)s->priv_data;
+    VmdDemuxContext *vmd = s->priv_data;
     ByteIOContext *pb = &s->pb;
     int ret = 0;
     vmd_frame_t *frame;
@@ -284,7 +281,7 @@ static int vmd_read_packet(AVFormatContext *s,
 
 static int vmd_read_close(AVFormatContext *s)
 {
-    VmdDemuxContext *vmd = (VmdDemuxContext *)s->priv_data;
+    VmdDemuxContext *vmd = s->priv_data;
 
     av_free(vmd->frame_table);
 

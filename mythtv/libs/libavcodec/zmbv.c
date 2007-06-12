@@ -399,7 +399,7 @@ static int zmbv_decode_intra(ZmbvContext *c)
 
 static int decode_frame(AVCodecContext *avctx, void *data, int *data_size, uint8_t *buf, int buf_size)
 {
-    ZmbvContext * const c = (ZmbvContext *)avctx->priv_data;
+    ZmbvContext * const c = avctx->priv_data;
     uint8_t *outptr;
 #ifdef CONFIG_ZLIB
     int zret = Z_OK; // Zlib return code
@@ -608,11 +608,10 @@ static int decode_frame(AVCodecContext *avctx, void *data, int *data_size, uint8
  */
 static int decode_init(AVCodecContext *avctx)
 {
-    ZmbvContext * const c = (ZmbvContext *)avctx->priv_data;
+    ZmbvContext * const c = avctx->priv_data;
     int zret; // Zlib return code
 
     c->avctx = avctx;
-    avctx->has_b_frames = 0;
 
     c->pic.data[0] = NULL;
     c->width = avctx->width;
@@ -664,7 +663,7 @@ static int decode_init(AVCodecContext *avctx)
  */
 static int decode_end(AVCodecContext *avctx)
 {
-    ZmbvContext * const c = (ZmbvContext *)avctx->priv_data;
+    ZmbvContext * const c = avctx->priv_data;
 
     av_freep(&c->decomp_buf);
 

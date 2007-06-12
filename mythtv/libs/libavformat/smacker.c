@@ -88,8 +88,6 @@ static const uint8_t smk_pal[64] = {
 
 static int smacker_probe(AVProbeData *p)
 {
-    if (p->buf_size < 4)
-        return 0;
     if(p->buf[0] == 'S' && p->buf[1] == 'M' && p->buf[2] == 'K'
         && (p->buf[3] == '2' || p->buf[3] == '4'))
         return AVPROBE_SCORE_MAX;
@@ -100,7 +98,7 @@ static int smacker_probe(AVProbeData *p)
 static int smacker_read_header(AVFormatContext *s, AVFormatParameters *ap)
 {
     ByteIOContext *pb = &s->pb;
-    SmackerContext *smk = (SmackerContext *)s->priv_data;
+    SmackerContext *smk = s->priv_data;
     AVStream *st, *ast[7];
     int i, ret;
     int tbase;
@@ -217,7 +215,7 @@ static int smacker_read_header(AVFormatContext *s, AVFormatParameters *ap)
 
 static int smacker_read_packet(AVFormatContext *s, AVPacket *pkt)
 {
-    SmackerContext *smk = (SmackerContext *)s->priv_data;
+    SmackerContext *smk = s->priv_data;
     int flags;
     int ret;
     int i;
@@ -226,7 +224,7 @@ static int smacker_read_packet(AVFormatContext *s, AVPacket *pkt)
     int pos;
 
     if (url_feof(&s->pb) || smk->cur_frame >= smk->frames)
-        return -EIO;
+        return AVERROR(EIO);
 
     /* if we demuxed all streams, pass another frame */
     if(smk->curstream < 0) {
@@ -320,7 +318,7 @@ static int smacker_read_packet(AVFormatContext *s, AVPacket *pkt)
 
 static int smacker_read_close(AVFormatContext *s)
 {
-    SmackerContext *smk = (SmackerContext *)s->priv_data;
+    SmackerContext *smk = s->priv_data;
     int i;
 
     for(i = 0; i < 7; i++)

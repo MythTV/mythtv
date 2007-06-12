@@ -70,6 +70,7 @@ typedef struct x11_grab_s
     XImage *image;           /**< X11 image holding the grab */
     int use_shm;             /**< !0 when using XShm extension */
     XShmSegmentInfo shminfo; /**< When using XShm, keeps track of XShm infos */
+    int mouse_warning_shown;
 } x11_grab_t;
 
 /**
@@ -96,25 +97,14 @@ x11grab_read_header(AVFormatContext *s1, AVFormatParameters *ap)
     int use_shm;
     char *param, *offset;
 
-    if (!ap->device) {
-        av_log(s1, AV_LOG_ERROR, "AVParameters don't specify any device. Use -vd.\n");
-        return AVERROR_IO;
-    }
-
-    param = strchr(ap->device, ':');
-    if (!param) {
-        av_free(st);
-        return AVERROR_IO;
-    }
-
-    param = av_strdup(param);
+    param = av_strdup(s1->filename);
     offset = strchr(param, '+');
     if (offset) {
         sscanf(offset, "%d,%d", &x_off, &y_off);
         *offset= 0;
     }
 
-    av_log(s1, AV_LOG_INFO, "device: %s -> display: %s x: %d y: %d width: %d height: %d\n", ap->device, param, x_off, y_off, ap->width, ap->height);
+    av_log(s1, AV_LOG_INFO, "device: %s -> display: %s x: %d y: %d width: %d height: %d\n", s1->filename, param, x_off, y_off, ap->width, ap->height);
 
     dpy = XOpenDisplay(param);
     if(!dpy) {
@@ -129,7 +119,7 @@ x11grab_read_header(AVFormatContext *s1, AVFormatParameters *ap)
 
     st = av_new_stream(s1, 0);
     if (!st) {
-        return -ENOMEM;
+        return AVERROR(ENOMEM);
     }
     av_set_pts_info(st, 64, 1, 1000000); /* 64 bits pts in us */
 
@@ -150,7 +140,7 @@ x11grab_read_header(AVFormatContext *s1, AVFormatParameters *ap)
                                         IPC_CREAT|0777);
         if (x11grab->shminfo.shmid == -1) {
             av_log(s1, AV_LOG_ERROR, "Fatal: Can't get shared memory!\n");
-            return -ENOMEM;
+            return AVERROR(ENOMEM);
         }
         x11grab->shminfo.shmaddr = image->data = shmat(x11grab->shminfo.shmid, 0, 0);
         x11grab->shminfo.readOnly = False;
@@ -220,7 +210,7 @@ x11grab_read_header(AVFormatContext *s1, AVFormatParameters *ap)
             return AVERROR_IO;
         }
 #endif
-        input_pixfmt = PIX_FMT_RGBA32;
+        input_pixfmt = PIX_FMT_RGB32;
         break;
     default:
         av_log(s1, AV_LOG_ERROR, "image depth %i not supported ... aborting\n", image->bits_per_pixel);
@@ -237,6 +227,7 @@ x11grab_read_header(AVFormatContext *s1, AVFormatParameters *ap)
     x11grab->y_off = y_off;
     x11grab->image = image;
     x11grab->use_shm = use_shm;
+    x11grab->mouse_warning_shown = 0;
 
     st->codec->codec_type = CODEC_TYPE_VIDEO;
     st->codec->codec_id = CODEC_ID_RAWVIDEO;
@@ -268,7 +259,11 @@ get_pointer_coordinates(int *x, int *y, Display *dpy, AVFormatContext *s1)
     if (XQueryPointer(dpy, mrootwindow, &mrootwindow, &childwindow,
                       x, y, &dummy, &dummy, (unsigned int*)&dummy)) {
     } else {
-        av_log(s1, AV_LOG_INFO, "couldn't find mouse pointer\n");
+        x11_grab_t *s = s1->priv_data;
+        if (!s->mouse_warning_shown) {
+            av_log(s1, AV_LOG_INFO, "couldn't find mouse pointer\n");
+            s->mouse_warning_shown = 1;
+        }
         *x = -1;
         *y = -1;
     }

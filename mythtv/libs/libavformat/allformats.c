@@ -31,7 +31,7 @@
    formats you want to support */
 
 /**
- * Initialize libavcodec and register all the codecs and formats.
+ * Initialize libavformat and register all the (de)muxers and protocols.
  */
 void av_register_all(void)
 {
@@ -49,6 +49,7 @@ void av_register_all(void)
     REGISTER_MUXER   (ADTS, adts);
     REGISTER_MUXDEMUX(AIFF, aiff);
     REGISTER_MUXDEMUX(AMR, amr);
+    REGISTER_DEMUXER (APC, apc);
     REGISTER_MUXDEMUX(ASF, asf);
     REGISTER_MUXER   (ASF_STREAM, asf_stream);
     REGISTER_MUXDEMUX(AU, au);
@@ -58,6 +59,8 @@ void av_register_all(void)
     av_register_input_format(&avisynth_demuxer);
 #endif
     REGISTER_DEMUXER (AVS, avs);
+    REGISTER_DEMUXER (BETHSOFTVID, bethsoftvid);
+    REGISTER_DEMUXER (C93, c93);
     REGISTER_MUXER   (CRC, crc);
     REGISTER_DEMUXER (DAUD, daud);
     REGISTER_DEMUXER (DC1394, dc1394);
@@ -65,6 +68,7 @@ void av_register_all(void)
     REGISTER_DEMUXER (DTS, dts);
     REGISTER_MUXDEMUX(DV, dv);
     REGISTER_DEMUXER (DV1394, dv1394);
+    REGISTER_DEMUXER (DXA, dxa);
     REGISTER_DEMUXER (EA, ea);
     REGISTER_MUXDEMUX(FFM, ffm);
     REGISTER_MUXDEMUX(FLAC, flac);
@@ -83,6 +87,8 @@ void av_register_all(void)
     REGISTER_MUXDEMUX(IMAGE2PIPE, image2pipe);
     REGISTER_DEMUXER (INGENIENT, ingenient);
     REGISTER_DEMUXER (IPMOVIE, ipmovie);
+    if (!ENABLE_NUT_DEMUXER) REGISTER_DEMUXER (LIBNUT, libnut);
+    REGISTER_MUXER   (LIBNUT, libnut);
     REGISTER_MUXDEMUX(M4V, m4v);
     REGISTER_DEMUXER (MATROSKA, matroska);
     REGISTER_MUXDEMUX(MJPEG, mjpeg);
@@ -109,7 +115,6 @@ void av_register_all(void)
     REGISTER_DEMUXER (NSV, nsv);
     REGISTER_MUXER   (NULL, null);
     REGISTER_DEMUXER (NUT, nut);
-    REGISTER_MUXER   (NUT, nut);
     REGISTER_DEMUXER (NUV, nuv);
     REGISTER_DEMUXER (OGG, ogg);
     REGISTER_MUXER   (OGG, ogg);
@@ -140,10 +145,13 @@ void av_register_all(void)
     REGISTER_MUXDEMUX(SWF, swf);
     REGISTER_MUXER   (TG2, tg2);
     REGISTER_MUXER   (TGP, tgp);
+    REGISTER_DEMUXER (THP, thp);
     REGISTER_DEMUXER (TIERTEXSEQ, tiertexseq);
     REGISTER_DEMUXER (TTA, tta);
 //    REGISTER_DEMUXER (V4L2, v4l2);
-//    REGISTER_DEMUXER (VIDEO_GRAB_DEVICE, video_grab_device);
+    REGISTER_DEMUXER (VC1, vc1);
+//    REGISTER_DEMUXER (VIDEO_GRAB_BKTR, video_grab_bktr);
+//    REGISTER_DEMUXER (VIDEO_GRAB_V4L, video_grab_v4l);
     REGISTER_DEMUXER (VMD, vmd);
     REGISTER_MUXDEMUX(VOC, voc);
     REGISTER_MUXDEMUX(WAV, wav);

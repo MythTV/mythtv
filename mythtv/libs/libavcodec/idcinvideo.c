@@ -149,13 +149,12 @@ static void huff_build_tree(IdcinContext *s, int prev) {
 
 static int idcin_decode_init(AVCodecContext *avctx)
 {
-    IdcinContext *s = (IdcinContext *)avctx->priv_data;
+    IdcinContext *s = avctx->priv_data;
     int i, j, histogram_index = 0;
     unsigned char *histograms;
 
     s->avctx = avctx;
     avctx->pix_fmt = PIX_FMT_PAL8;
-    avctx->has_b_frames = 0;
     dsputil_init(&s->dsp, avctx);
 
     /* make sure the Huffman tables make it */
@@ -217,7 +216,7 @@ static int idcin_decode_frame(AVCodecContext *avctx,
                               void *data, int *data_size,
                               uint8_t *buf, int buf_size)
 {
-    IdcinContext *s = (IdcinContext *)avctx->priv_data;
+    IdcinContext *s = avctx->priv_data;
     AVPaletteControl *palette_control = avctx->palctrl;
 
     s->buf = buf;
@@ -250,7 +249,7 @@ static int idcin_decode_frame(AVCodecContext *avctx,
 
 static int idcin_decode_end(AVCodecContext *avctx)
 {
-    IdcinContext *s = (IdcinContext *)avctx->priv_data;
+    IdcinContext *s = avctx->priv_data;
 
     if (s->frame.data[0])
         avctx->release_buffer(avctx, &s->frame);

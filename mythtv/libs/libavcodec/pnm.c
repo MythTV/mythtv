@@ -26,6 +26,7 @@ typedef struct PNMContext {
     uint8_t *bytestream_start;
     uint8_t *bytestream_end;
     AVFrame picture;
+    int maxval;                 ///< maximum value of a pixel
 } PNMContext;
 
 static inline int pnm_space(int c)
@@ -124,7 +125,7 @@ static int pnm_decode_header(AVCodecContext *avctx, PNMContext * const s){
         } else if (depth == 3) {
             avctx->pix_fmt = PIX_FMT_RGB24;
         } else if (depth == 4) {
-            avctx->pix_fmt = PIX_FMT_RGBA32;
+            avctx->pix_fmt = PIX_FMT_RGB32;
         } else {
             return -1;
         }
@@ -142,8 +143,12 @@ static int pnm_decode_header(AVCodecContext *avctx, PNMContext * const s){
         return -1;
     if (avctx->pix_fmt != PIX_FMT_MONOWHITE) {
         pnm_get(s, buf1, sizeof(buf1));
-        if(atoi(buf1) == 65535 && avctx->pix_fmt == PIX_FMT_GRAY8)
+        s->maxval = atoi(buf1);
+        if(s->maxval >= 256 && avctx->pix_fmt == PIX_FMT_GRAY8) {
             avctx->pix_fmt = PIX_FMT_GRAY16BE;
+            if (s->maxval != 65535)
+                avctx->pix_fmt = PIX_FMT_GRAY16;
+        }
     }
     /* more check if YUV420 */
     if (avctx->pix_fmt == PIX_FMT_YUV420P) {
@@ -165,7 +170,7 @@ static int pnm_decode_frame(AVCodecContext *avctx,
     PNMContext * const s = avctx->priv_data;
     AVFrame *picture = data;
     AVFrame * const p= (AVFrame*)&s->picture;
-    int i, n, linesize, h;
+    int i, n, linesize, h, upgrade = 0;
     unsigned char *ptr;
 
     s->bytestream_start=
@@ -194,9 +199,14 @@ static int pnm_decode_frame(AVCodecContext *avctx,
         goto do_read;
     case PIX_FMT_GRAY8:
         n = avctx->width;
+        if (s->maxval < 255)
+            upgrade = 1;
         goto do_read;
     case PIX_FMT_GRAY16BE:
+    case PIX_FMT_GRAY16LE:
         n = avctx->width * 2;
+        if (s->maxval < 65535)
+            upgrade = 2;
         goto do_read;
     case PIX_FMT_MONOWHITE:
     case PIX_FMT_MONOBLACK:
@@ -207,7 +217,19 @@ static int pnm_decode_frame(AVCodecContext *avctx,
         if(s->bytestream + n*avctx->height > s->bytestream_end)
             return -1;
         for(i = 0; i < avctx->height; i++) {
-            memcpy(ptr, s->bytestream, n);
+            if (!upgrade)
+                memcpy(ptr, s->bytestream, n);
+            else if (upgrade == 1) {
+                unsigned int j, f = (255*128 + s->maxval/2) / s->maxval;
+                for (j=0; j<n; j++)
+                    ptr[j] = (s->bytestream[j] * f + 64) >> 7;
+            } else if (upgrade == 2) {
+                unsigned int j, v, f = (65535*32768 + s->maxval/2) / s->maxval;
+                for (j=0; j<n/2; j++) {
+                    v = be2me_16(((uint16_t *)s->bytestream)[j]);
+                    ((uint16_t *)ptr)[j] = (v * f + 16384) >> 15;
+                }
+            }
             s->bytestream += n;
             ptr += linesize;
         }
@@ -240,7 +262,7 @@ static int pnm_decode_frame(AVCodecContext *avctx,
             }
         }
         break;
-    case PIX_FMT_RGBA32:
+    case PIX_FMT_RGB32:
         ptr = p->data[0];
         linesize = p->linesize[0];
         if(s->bytestream + avctx->width*avctx->height*4 > s->bytestream_end)
@@ -389,7 +411,7 @@ static int pam_encode_frame(AVCodecContext *avctx, unsigned char *outbuf, int bu
         maxval = 255;
         tuple_type = "RGB";
         break;
-    case PIX_FMT_RGBA32:
+    case PIX_FMT_RGB32:
         n = w * 4;
         depth = 4;
         maxval = 255;
@@ -406,7 +428,7 @@ static int pam_encode_frame(AVCodecContext *avctx, unsigned char *outbuf, int bu
     ptr = p->data[0];
     linesize = p->linesize[0];
 
-    if (avctx->pix_fmt == PIX_FMT_RGBA32) {
+    if (avctx->pix_fmt == PIX_FMT_RGB32) {
         int j;
         unsigned int v;
 
@@ -601,6 +623,6 @@ AVCodec pam_encoder = {
     pam_encode_frame,
     NULL, //encode_end,
     pnm_decode_frame,
-    .pix_fmts= (enum PixelFormat[]){PIX_FMT_RGB24, PIX_FMT_RGBA32, PIX_FMT_GRAY8, PIX_FMT_MONOWHITE, -1},
+    .pix_fmts= (enum PixelFormat[]){PIX_FMT_RGB24, PIX_FMT_RGB32, PIX_FMT_GRAY8, PIX_FMT_MONOWHITE, -1},
 };
 #endif // CONFIG_PAM_ENCODER

@@ -54,9 +54,6 @@ typedef struct MTVDemuxContext {
 
 static int mtv_probe(AVProbeData *p)
 {
-    if(p->buf_size < 3)
-        return 0;
-
     /* Magic is 'AMV' */
 
     if(*(p->buf) != 'A' || *(p->buf+1) != 'M' || *(p->buf+2) != 'V')
@@ -89,7 +86,7 @@ static int mtv_read_header(AVFormatContext *s, AVFormatParameters *ap)
 
     /* FIXME Add sanity check here */
 
-    /* first packet is allways audio*/
+    /* first packet is always audio*/
 
     mtv->audio_packet_count = 1;
 
@@ -120,7 +117,7 @@ static int mtv_read_header(AVFormatContext *s, AVFormatParameters *ap)
     st->codec->codec_type      = CODEC_TYPE_AUDIO;
     st->codec->codec_id        = CODEC_ID_MP3;
     st->codec->bit_rate        = mtv->audio_br;
-    st->need_parsing=1;
+    st->need_parsing           = AVSTREAM_PARSE_FULL;
 
     /* Jump over header */
 

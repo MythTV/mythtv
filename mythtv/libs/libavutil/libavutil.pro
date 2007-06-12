@@ -27,12 +27,13 @@ QMAKE_CLEAN += $(TARGET) $(TARGETA) $(TARGETD) $(TARGET0) $(TARGET1) $(TARGET2)
 # Input
 SOURCES += adler32.c mathematics.c integer.c lls.c log.c mem.c 
 SOURCES += rational.c intfloat_readwrite.c crc.c md5.c fifo.c
-SOURCES += aes.c aes128.c tree.c
+SOURCES += aes.c tree.c lzo.c base64.c random.c sha1.c
 
 inc.path = $${PREFIX}/include/mythtv/ffmpeg/
 inc.files  = adler32.h avutil.h common.h mathematics.h integer.h internal.h 
 inc.files += lls.h log.h rational.h intfloat_readwrite.h crc.h md5.h x86_cpu.h
-inc.files += softfloat.h fifo.h
+inc.files += softfloat.h fifo.h aes.h tree.h lzo.h base64.h random.h mem.h
+inc.files += sha1.h
 
 INSTALLS += inc
 

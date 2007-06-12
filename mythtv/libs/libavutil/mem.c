@@ -26,7 +26,7 @@
 
 #include "common.h"
 
-/* here we can use OS dependant allocation functions */
+/* here we can use OS dependent allocation functions */
 #undef malloc
 #undef free
 #undef realloc
@@ -39,11 +39,6 @@
    memory allocator. You do not need to suppress this file because the
    linker will do it automatically */
 
-/**
- * Memory allocation of size byte with alignment suitable for all
- * memory accesses (including vectors if available on the
- * CPU). av_malloc(0) must return a non NULL pointer.
- */
 void *av_malloc(unsigned int size)
 {
     void *ptr;
@@ -96,11 +91,6 @@ void *av_malloc(unsigned int size)
     return ptr;
 }
 
-/**
- * av_realloc semantics (same as glibc): if ptr is NULL and size > 0,
- * identical to malloc(size). If size is zero, it is identical to
- * free(ptr) and NULL is returned.
- */
 void *av_realloc(void *ptr, unsigned int size)
 {
 #ifdef CONFIG_MEMALIGN_HACK
@@ -121,11 +111,6 @@ void *av_realloc(void *ptr, unsigned int size)
 #endif
 }
 
-/**
- * Free memory which has been allocated with av_malloc(z)() or av_realloc().
- * NOTE: ptr = NULL is explicetly allowed
- * Note2: it is recommended that you use av_freep() instead
- */
 void av_free(void *ptr)
 {
     /* XXX: this test should not be needed on most libcs */
@@ -137,10 +122,6 @@ void av_free(void *ptr)
 #endif
 }
 
-/**
- * Frees memory and sets the pointer to NULL.
- * @param arg pointer to the pointer which should be freed
- */
 void av_freep(void *arg)
 {
     void **ptr= (void**)arg;

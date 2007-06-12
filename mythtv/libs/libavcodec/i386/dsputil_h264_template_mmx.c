@@ -184,91 +184,78 @@ static void H264_CHROMA_MC8_TMPL(uint8_t *dst/*align 8*/, uint8_t *src/*align 1*
 
 static void H264_CHROMA_MC4_TMPL(uint8_t *dst/*align 4*/, uint8_t *src/*align 1*/, int stride, int h, int x, int y)
 {
-    DECLARE_ALIGNED_8(uint64_t, AA);
-    DECLARE_ALIGNED_8(uint64_t, DD);
-    int i;
-
-    /* no special case for mv=(0,0) in 4x*, since it's much less common than in 8x*.
-     * could still save a few cycles, but maybe not worth the complexity. */
-
-    assert(x<8 && y<8 && x>=0 && y>=0);
-
-    asm volatile("movd %2, %%mm4\n\t"
-                 "movd %3, %%mm6\n\t"
-                 "punpcklwd %%mm4, %%mm4\n\t"
-                 "punpcklwd %%mm6, %%mm6\n\t"
-                 "punpckldq %%mm4, %%mm4\n\t" /* mm4 = x words */
-                 "punpckldq %%mm6, %%mm6\n\t" /* mm6 = y words */
-                 "movq %%mm4, %%mm5\n\t"
-                 "pmullw %%mm6, %%mm4\n\t"    /* mm4 = x * y */
-                 "psllw $3, %%mm5\n\t"
-                 "psllw $3, %%mm6\n\t"
-                 "movq %%mm5, %%mm7\n\t"
-                 "paddw %%mm6, %%mm7\n\t"
-                 "movq %%mm4, %1\n\t"         /* DD = x * y */
-                 "psubw %%mm4, %%mm5\n\t"     /* mm5 = B = 8x - xy */
-                 "psubw %%mm4, %%mm6\n\t"     /* mm6 = C = 8y - xy */
-                 "paddw %4, %%mm4\n\t"
-                 "psubw %%mm7, %%mm4\n\t"     /* mm4 = A = xy - (8x+8y) + 64 */
-                 "pxor %%mm7, %%mm7\n\t"
-                 "movq %%mm4, %0\n\t"
-                 : "=m" (AA), "=m" (DD) : "rm" (x), "rm" (y), "m" (ff_pw_64));
-
     asm volatile(
-        /* mm0 = src[0..3], mm1 = src[1..4] */
-        "movd %0, %%mm0\n\t"
-        "movd %1, %%mm1\n\t"
-        "punpcklbw %%mm7, %%mm0\n\t"
-        "punpcklbw %%mm7, %%mm1\n\t"
-        : : "m" (src[0]), "m" (src[1]));
+        "pxor   %%mm7, %%mm7        \n\t"
+        "movd %5, %%mm2             \n\t"
+        "movd %6, %%mm3             \n\t"
+        "movq "MANGLE(ff_pw_8)", %%mm4\n\t"
+        "movq "MANGLE(ff_pw_8)", %%mm5\n\t"
+        "punpcklwd %%mm2, %%mm2     \n\t"
+        "punpcklwd %%mm3, %%mm3     \n\t"
+        "punpcklwd %%mm2, %%mm2     \n\t"
+        "punpcklwd %%mm3, %%mm3     \n\t"
+        "psubw %%mm2, %%mm4         \n\t"
+        "psubw %%mm3, %%mm5         \n\t"
 
-    for(i=0; i<h; i++) {
-        asm volatile(
-            /* mm2 = A * src[0..3] + B * src[1..4] */
-            "movq %%mm0, %%mm2\n\t"
-            "pmullw %0, %%mm2\n\t"
-            "pmullw %%mm5, %%mm1\n\t"
-            "paddw %%mm1, %%mm2\n\t"
-            : : "m" (AA));
+        "movd  (%1), %%mm0          \n\t"
+        "movd 1(%1), %%mm6          \n\t"
+        "add %3, %1                 \n\t"
+        "punpcklbw %%mm7, %%mm0     \n\t"
+        "punpcklbw %%mm7, %%mm6     \n\t"
+        "pmullw %%mm4, %%mm0        \n\t"
+        "pmullw %%mm2, %%mm6        \n\t"
+        "paddw %%mm0, %%mm6         \n\t"
 
-        src += stride;
-        asm volatile(
-            /* mm0 = src[0..3], mm1 = src[1..4] */
-            "movd %0, %%mm0\n\t"
-            "movd %1, %%mm1\n\t"
-            "punpcklbw %%mm7, %%mm0\n\t"
-            "punpcklbw %%mm7, %%mm1\n\t"
-            : : "m" (src[0]), "m" (src[1]));
-
-        asm volatile(
-            /* mm2 += C * src[0..3] + D * src[1..4] */
-            "movq %%mm0, %%mm3\n\t"
-            "movq %%mm1, %%mm4\n\t"
-            "pmullw %%mm6, %%mm3\n\t"
-            "pmullw %0, %%mm4\n\t"
-            "paddw %%mm3, %%mm2\n\t"
-            "paddw %%mm4, %%mm2\n\t"
-            : : "m" (DD));
-
-        asm volatile(
-            /* dst[0..3] = pack((mm2 + 32) >> 6) */
-            "paddw %1, %%mm2\n\t"
-            "psrlw $6, %%mm2\n\t"
-            "packuswb %%mm7, %%mm2\n\t"
-            H264_CHROMA_OP4(%0, %%mm2, %%mm3)
-            "movd %%mm2, %0\n\t"
-            : "=m" (dst[0]) : "m" (ff_pw_32));
-        dst += stride;
-    }
+        "1:                         \n\t"
+        "movd  (%1), %%mm0          \n\t"
+        "movd 1(%1), %%mm1          \n\t"
+        "add %3, %1                 \n\t"
+        "punpcklbw %%mm7, %%mm0     \n\t"
+        "punpcklbw %%mm7, %%mm1     \n\t"
+        "pmullw %%mm4, %%mm0        \n\t"
+        "pmullw %%mm2, %%mm1        \n\t"
+        "paddw %%mm0, %%mm1         \n\t"
+        "movq %%mm1, %%mm0          \n\t"
+        "pmullw %%mm5, %%mm6        \n\t"
+        "pmullw %%mm3, %%mm1        \n\t"
+        "paddw %4, %%mm6            \n\t"
+        "paddw %%mm6, %%mm1         \n\t"
+        "psrlw $6, %%mm1            \n\t"
+        "packuswb %%mm1, %%mm1      \n\t"
+        H264_CHROMA_OP4((%0), %%mm1, %%mm6)
+        "movd %%mm1, (%0)           \n\t"
+        "add %3, %0                 \n\t"
+        "movd  (%1), %%mm6          \n\t"
+        "movd 1(%1), %%mm1          \n\t"
+        "add %3, %1                 \n\t"
+        "punpcklbw %%mm7, %%mm6     \n\t"
+        "punpcklbw %%mm7, %%mm1     \n\t"
+        "pmullw %%mm4, %%mm6        \n\t"
+        "pmullw %%mm2, %%mm1        \n\t"
+        "paddw %%mm6, %%mm1         \n\t"
+        "movq %%mm1, %%mm6          \n\t"
+        "pmullw %%mm5, %%mm0        \n\t"
+        "pmullw %%mm3, %%mm1        \n\t"
+        "paddw %4, %%mm0            \n\t"
+        "paddw %%mm0, %%mm1         \n\t"
+        "psrlw $6, %%mm1            \n\t"
+        "packuswb %%mm1, %%mm1      \n\t"
+        H264_CHROMA_OP4((%0), %%mm1, %%mm0)
+        "movd %%mm1, (%0)           \n\t"
+        "add %3, %0                 \n\t"
+        "sub $2, %2                 \n\t"
+        "jnz 1b                     \n\t"
+        : "+r"(dst), "+r"(src), "+r"(h)
+        : "r"((long)stride), "m"(ff_pw_32), "m"(x), "m"(y)
+    );
 }
 
 #ifdef H264_CHROMA_MC2_TMPL
-static void H264_CHROMA_MC2_TMPL(uint8_t *dst/*align 2*/, uint8_t *src/*align 1*/, int stride, int h, int x, int y)
+static void H264_CHROMA_MC2_TMPL(uint8_t *dst/*align 2*/, uint8_t *src/*align 1*/, long stride, int h, int x, int y)
 {
-    int CD=((1<<16)-1)*x*y + 8*y;
-    int AB=((8<<16)-8)*x + 64 - CD;
-    int i;
-
+    int tmp = ((1<<16)-1)*x + 8;
+    int CD= tmp*y;
+    int AB= (tmp<<3) - CD;
     asm volatile(
         /* mm5 = {A,B,A,B} */
         /* mm6 = {C,D,C,D} */
@@ -277,50 +264,42 @@ static void H264_CHROMA_MC2_TMPL(uint8_t *dst/*align 2*/, uint8_t *src/*align 1*
         "punpckldq %%mm5, %%mm5\n\t"
         "punpckldq %%mm6, %%mm6\n\t"
         "pxor %%mm7, %%mm7\n\t"
-        :: "r"(AB), "r"(CD));
+        /* mm0 = src[0,1,1,2] */
+        "movd %2, %%mm2\n\t"
+        "punpcklbw %%mm7, %%mm2\n\t"
+        "pshufw $0x94, %%mm2, %%mm2\n\t"
+        :: "r"(AB), "r"(CD), "m"(src[0]));
+
 
     asm volatile(
+        "1:\n\t"
+        "add %4, %1\n\t"
+        /* mm1 = A * src[0,1] + B * src[1,2] */
+        "movq    %%mm2, %%mm1\n\t"
+        "pmaddwd %%mm5, %%mm1\n\t"
         /* mm0 = src[0,1,1,2] */
-        "movd %0, %%mm0\n\t"
+        "movd (%1), %%mm0\n\t"
         "punpcklbw %%mm7, %%mm0\n\t"
         "pshufw $0x94, %%mm0, %%mm0\n\t"
-        :: "m"(src[0]));
+        /* mm1 += C * src[0,1] + D * src[1,2] */
+        "movq    %%mm0, %%mm2\n\t"
+        "pmaddwd %%mm6, %%mm0\n\t"
+        "paddw      %3, %%mm1\n\t"
+        "paddw   %%mm0, %%mm1\n\t"
+        /* dst[0,1] = pack((mm1 + 32) >> 6) */
+        "psrlw $6, %%mm1\n\t"
+        "packssdw %%mm7, %%mm1\n\t"
+        "packuswb %%mm7, %%mm1\n\t"
+        H264_CHROMA_OP4((%0), %%mm1, %%mm3)
+        "movd %%mm1, %%esi\n\t"
+        "movw %%si, (%0)\n\t"
+        "add %4, %0\n\t"
+        "sub $1, %2\n\t"
+        "jnz 1b\n\t"
+        : "+r" (dst), "+r"(src), "+r"(h)
+        : "m" (ff_pw_32), "r"(stride)
+        : "%esi");
 
-    for(i=0; i<h; i++) {
-        asm volatile(
-            /* mm1 = A * src[0,1] + B * src[1,2] */
-            "movq    %%mm0, %%mm1\n\t"
-            "pmaddwd %%mm5, %%mm1\n\t"
-            ::);
-
-        src += stride;
-        asm volatile(
-            /* mm0 = src[0,1,1,2] */
-            "movd %0, %%mm0\n\t"
-            "punpcklbw %%mm7, %%mm0\n\t"
-            "pshufw $0x94, %%mm0, %%mm0\n\t"
-            :: "m"(src[0]));
-
-        asm volatile(
-            /* mm1 += C * src[0,1] + D * src[1,2] */
-            "movq    %%mm0, %%mm2\n\t"
-            "pmaddwd %%mm6, %%mm2\n\t"
-            "paddw   %%mm2, %%mm1\n\t"
-            ::);
-
-        asm volatile(
-            /* dst[0,1] = pack((mm1 + 32) >> 6) */
-            "paddw %1, %%mm1\n\t"
-            "psrlw $6, %%mm1\n\t"
-            "packssdw %%mm7, %%mm1\n\t"
-            "packuswb %%mm7, %%mm1\n\t"
-            /* writes garbage to the right of dst.
-             * ok because partitions are processed from left to right. */
-            H264_CHROMA_OP4(%0, %%mm1, %%mm3)
-            "movd %%mm1, %0\n\t"
-            : "=m" (dst[0]) : "m" (ff_pw_32));
-        dst += stride;
-    }
 }
 #endif
 

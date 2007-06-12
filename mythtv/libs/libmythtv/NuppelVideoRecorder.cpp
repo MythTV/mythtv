@@ -28,7 +28,12 @@ using namespace std;
 #include "recordingprofile.h"
 #include "tv_rec.h"
 #include "tv_play.h"
-#include "bswap.h"
+
+#ifdef WORDS_BIGENDIAN
+extern "C" {
+#include "libavutil/bswap.h"
+}
+#endif
 
 extern "C" {
 #include "vbitext/vbi.h"
@@ -3162,6 +3167,7 @@ void NuppelVideoRecorder::WriteVideo(VideoFrame *frame, bool skipsync,
     lf = fnum;
 }
 
+#ifdef WORDS_BIGENDIAN
 static void bswap_16_buf(short int *buf, int buf_cnt, int audio_channels)
     __attribute__ ((unused)); /* <- suppress compiler warning */
 
@@ -3170,6 +3176,7 @@ static void bswap_16_buf(short int *buf, int buf_cnt, int audio_channels)
     for (int i = 0; i < audio_channels * buf_cnt; i++)
         buf[i] = bswap_16(buf[i]);
 }
+#endif
 
 void NuppelVideoRecorder::WriteAudio(unsigned char *buf, int fnum, int timecode)
 {

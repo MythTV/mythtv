@@ -1,5 +1,5 @@
 /*
- * MPEG2 transport stream (aka ATSC/DVB/Cable) demuxer
+ * MPEG2 transport stream (aka DVB) demuxer
  * Copyright (c) 2002-2003 Fabrice Bellard.
  *
  * This file is part of FFmpeg.
@@ -136,7 +136,7 @@ struct MpegTSContext {
     AVFormatContext *stream;
     /** raw packet size, including FEC if present            */
     int raw_packet_size;
-    /** if true, all pids are analyzed to find streams.      */
+    /** if true, all pids are analyzed to find streams       */
     int auto_guess;
 #if 0
     int set_service_ret;
@@ -147,9 +147,9 @@ struct MpegTSContext {
     /** compute exact PCR for each transport stream packet   */
     int mpeg2ts_compute_pcr;
 
-    int64_t cur_pcr;    /**< used to estimate the exact PCR */
-    int pcr_incr;       /**< used to estimate the exact PCR */
-    int pcr_pid;        /**< used to estimate the exact PCR */
+    int64_t cur_pcr;    /**< used to estimate the exact PCR  */
+    int pcr_incr;       /**< used to estimate the exact PCR  */
+    int pcr_pid;        /**< used to estimate the exact PCR  */
     
     /* variables used for finding initial PAT and PMT        */
 
@@ -163,7 +163,7 @@ struct MpegTSContext {
      *  number is found. */
     int pmt_scan_state;
 
-    /** packet containing Audio/Video data */
+    /** packet containing Audio/Video data                   */
     AVPacket *pkt;
 
     /******************************************/
@@ -174,9 +174,9 @@ struct MpegTSContext {
     MpegTSFilter *sdt_filter;
 #endif
 
-    /** number of PMTs in the last PAT seen */
+    /** number of PMTs in the last PAT seen                  */
     int nb_services;
-    /** list of PMTs in the last PAT seen */
+    /** list of PMTs in the last PAT seen                    */
     MpegTSService **services;
 
 #if 0
@@ -185,11 +185,11 @@ struct MpegTSContext {
     void *set_service_opaque;
 #endif
 
-    /** filter for the PAT */
+    /** filter for the PAT                                   */
     MpegTSFilter *pat_filter;
     /** filter for the PMT for the MPEG program number specified by req_sid */
     MpegTSFilter *pmt_filter;
-    /** MPEG program number of stream we want to decode */
+    /** MPEG program number of stream we want to decode      */
     int req_sid;
 
     /** filters for various streams specified by PMT + for the PAT and PMT */
@@ -303,12 +303,12 @@ MpegTSFilter *mpegts_open_section_filter(MpegTSContext *ts, unsigned int pid,
     MpegTSSectionFilter *sec;
     
 #ifdef DEBUG_SI
-    av_log(NULL, AV_LOG_DEBUG, "Opening Filter: pid=0x%x\n", pid);
+    av_log(ts->stream, AV_LOG_DEBUG, "Filter: pid=0x%x\n", pid);
 #endif
 
     if (NULL!=filter) {
 #ifdef DEBUG_SI
-	av_log(NULL, AV_LOG_DEBUG, "Filter Already Exists\n");
+	av_log(ts->stream, AV_LOG_DEBUG, "Filter Already Exists\n");
 #endif
         mpegts_close_filter(ts, filter);
     }
@@ -530,7 +530,8 @@ static MpegTSService *new_service(MpegTSContext *ts, int sid, int pid,
     MpegTSService *service;
 
 #ifdef DEBUG_SI
-    av_log(NULL, AV_LOG_DEBUG, "new_service: sid=0x%04x provider='%s' name='%s'\n", 
+    av_log(ts->stream, AV_LOG_DEBUG, "new_service: "
+           "sid=0x%04x provider='%s' name='%s'\n",
            sid, provider_name, name);
 #endif
 
@@ -600,8 +601,8 @@ static void pmt_cb(void *opaque, const uint8_t *section, int section_len)
     mpegts_cleanup_streams(mpegts_ctx); /* in case someone else removed streams.. */
 
 #ifdef DEBUG_SI
-    av_log(NULL, AV_LOG_DEBUG, "PMT: len %i\n", section_len);
-    av_hex_dump(stdout, (uint8_t *)section, section_len);
+    av_log(ts->stream, AV_LOG_DEBUG, "PMT: len %i\n", section_len);
+    av_hex_dump_log(ts->stream, AV_LOG_DEBUG, (uint8_t *)section, section_len);
 #endif
 
     if (parse_section_header(&header, &p, p_end) < 0)
@@ -663,7 +664,7 @@ static void pmt_cb(void *opaque, const uint8_t *section, int section_len)
         }
 
 #ifdef DEBUG_SI
-        av_log(NULL, AV_LOG_DEBUG, "stream_type=%d pid=0x%x\n", stream_type, pid);
+    av_log(ts->stream, AV_LOG_DEBUG, "pcr_pid=0x%x\n", pcr_pid);
 #endif
 
         if (is_desired_stream(stream_type))
@@ -725,7 +726,8 @@ static void pmt_cb(void *opaque, const uint8_t *section, int section_len)
     if (mpegts_ctx->scanning)
     {
 #ifdef DEBUG_SI
-        av_log(NULL, AV_LOG_DEBUG, "Found PMT, ending scan\n");
+            av_log(ts->stream, AV_LOG_DEBUG, "tag: 0x%02x len=%d\n",
+                   desc_tag, desc_len);
 #endif
         mpegts_ctx->pmt_scan_state = PMT_FOUND;
         mpegts_ctx->stop_parse = 1;
@@ -856,6 +858,7 @@ static int is_desired_stream(int stream_type)
         case STREAM_TYPE_VIDEO_MPEG2:
         case STREAM_TYPE_VIDEO_MPEG4:
         case STREAM_TYPE_VIDEO_H264:
+        case STREAM_TYPE_VIDEO_VC1:
         case STREAM_TYPE_AUDIO_AAC:
         case STREAM_TYPE_AUDIO_AC3:
         case STREAM_TYPE_AUDIO_DTS:
@@ -1100,8 +1103,8 @@ static void pat_cb(void *opaque, const uint8_t *section, int section_len)
     int i;
 
 #ifdef DEBUG_SI
-    av_log(NULL, AV_LOG_DEBUG, "PAT:\n");
-    av_hex_dump(stdout, (uint8_t *)section, section_len);
+    av_log(ts->stream, AV_LOG_DEBUG, "PAT:\n");
+    av_hex_dump_log(ts->stream, AV_LOG_DEBUG, (uint8_t *)section, section_len);
 #endif
     p_end = section + section_len - 4;
     p = section;
@@ -1131,7 +1134,7 @@ static void pat_cb(void *opaque, const uint8_t *section, int section_len)
         pmt_count++;
 
 #ifdef DEBUG_SI
-        av_log(NULL, AV_LOG_DEBUG,
+        av_log(ts->stream, AV_LOG_DEBUG,
                "MPEG Program Number=0x%x pid=0x%x req_sid=0x%x\n",
                pmt_pnums[i], pmt_pids[i], ts->req_sid);
 #endif
@@ -1239,8 +1242,8 @@ static void pat_scan_cb(void *opaque, const uint8_t *section, int section_len)
     char buf[256];
 
 #ifdef DEBUG_SI
-    av_log(NULL, AV_LOG_DEBUG, "PAT:\n");
-    av_hex_dump(stdout, (uint8_t *)section, section_len);
+    av_log(ts->stream, AV_LOG_DEBUG, "PAT:\n");
+    av_hex_dump_log(ts->stream, AV_LOG_DEBUG, (uint8_t *)section, section_len);
 #endif
     p_end = section + section_len - 4;
     p = section;
@@ -1257,7 +1260,7 @@ static void pat_scan_cb(void *opaque, const uint8_t *section, int section_len)
         if (pmt_pid < 0)
             break;
 #ifdef DEBUG_SI
-        av_log(NULL, AV_LOG_DEBUG, "sid=0x%x pid=0x%x\n", sid, pmt_pid);
+        av_log(ts->stream, AV_LOG_DEBUG, "sid=0x%x pid=0x%x\n", sid, pmt_pid);
 #endif
         if (sid == 0x0000) {
             /* NIT info */
@@ -1295,8 +1298,8 @@ static void sdt_cb(void *opaque, const uint8_t *section, int section_len)
     char *name, *provider_name;
 
 #ifdef DEBUG_SI
-    av_log(NULL, AV_LOG_DEBUG, "SDT:\n");
-    av_hex_dump(stdout, (uint8_t *)section, section_len);
+    av_log(ts->stream, AV_LOG_DEBUG, "SDT:\n");
+    av_hex_dump_log(ts->stream, AV_LOG_DEBUG, (uint8_t *)section, section_len);
 #endif
 
     p_end = section + section_len - 4;
@@ -1333,7 +1336,7 @@ static void sdt_cb(void *opaque, const uint8_t *section, int section_len)
             if (desc_end > desc_list_end)
                 break;
 #ifdef DEBUG_SI
-            av_log(NULL, AV_LOG_DEBUG, "tag: 0x%02x len=%d\n",
+            av_log(ts->stream, AV_LOG_DEBUG, "tag: 0x%02x len=%d\n",
                    desc_tag, desc_len);
 #endif
             switch(desc_tag) {
@@ -1419,6 +1422,10 @@ static void init_stream(AVStream *st, int stream_type, int code)
             codec_type = CODEC_TYPE_VIDEO;
             codec_id = CODEC_ID_H264;
             break;
+        case STREAM_TYPE_VIDEO_VC1:
+            codec_type = CODEC_TYPE_VIDEO;
+            codec_id = CODEC_ID_VC1;
+            break;
         case STREAM_TYPE_AUDIO_AAC:
             codec_type = CODEC_TYPE_AUDIO;
             codec_id = CODEC_ID_AAC;
@@ -1468,7 +1475,7 @@ static AVStream *new_pes_av_stream(PESContext *pes, uint32_t code)
     pes->st->codec = avcodec_alloc_context();
     init_stream(pes->st, pes->stream_type, code);  /* sets codec type and id */
     pes->st->priv_data = pes;
-    pes->st->need_parsing = 1;
+    pes->st->need_parsing = AVSTREAM_PARSE_FULL;
 
     pes->st = av_add_stream(pes->stream, pes->st, pes->pid);
 fail: /*for the CHECKED_ALLOCZ macro*/
@@ -1481,7 +1488,7 @@ static AVStream *new_section_av_stream(SectionContext *sect, uint32_t code)
     sect->st->codec = avcodec_alloc_context();
     init_stream(sect->st, sect->stream_type, code);  /* sets codec type and id */
     sect->st->priv_data = sect;
-    sect->st->need_parsing = 1;
+    sect->st->need_parsing = AVSTREAM_PARSE_FULL;
 
     sect->st = av_add_stream(sect->stream, sect->st, sect->pid);
 fail: /*for the CHECKED_ALLOCZ macro*/
@@ -1519,7 +1526,7 @@ static void mpegts_push_data(void *opaque,
                 /* we got all the PES or section header. We can now
                    decide */
 #if 0
-                av_hex_dump(pes->header, pes->data_index);
+                av_hex_dump_log(pes->stream, AV_LOG_DEBUG, pes->header, pes->data_index);
 #endif
                 if (pes->header[0] == 0x00 && pes->header[1] == 0x00 &&
                     pes->header[2] == 0x01) {
@@ -1527,7 +1534,7 @@ static void mpegts_push_data(void *opaque,
                     code = pes->header[3] | 0x100;
                     if (!((code >= 0x1c0 && code <= 0x1df) ||
                           (code >= 0x1e0 && code <= 0x1ef) ||
-                          (code == 0x1bd)))
+                          (code == 0x1bd) || (code == 0x1fd)))
                         goto skip;
                     if (!pes->st && 0 == new_pes_av_stream(pes, code)) {
                         av_log(NULL, AV_LOG_ERROR,
@@ -2017,7 +2024,7 @@ static int mpegts_read_header(AVFormatContext *s,
             {
                 service = ts->services[i];
 #ifdef DEBUG_SI
-                av_log(NULL, AV_LOG_DEBUG, "Tuning to '%s' pnum: 0x%x\n",
+                av_log(ts->stream, AV_LOG_DEBUG, "Tuning to '%s' pnum: 0x%x\n",
                        service->name, service->sid);
 #endif
             
@@ -2056,7 +2063,7 @@ static int mpegts_read_header(AVFormatContext *s,
             } 
             
 #ifdef DEBUG_SI
-            av_log(NULL, AV_LOG_DEBUG, "tuning done\n");
+            av_log(ts->stream, AV_LOG_DEBUG, "tuning done\n");
 #endif
         }
         s->ctx_flags |= AVFMTCTX_NOHEADER;
@@ -2113,7 +2120,7 @@ static int mpegts_read_header(AVFormatContext *s,
         st->codec->bit_rate = s->bit_rate;
         st->start_time = ts->cur_pcr;
 #if 0
-        av_log(NULL, AV_LOG_DEBUG, "start=%0.3f pcr=%0.3f incr=%d\n",
+        av_log(ts->stream, AV_LOG_DEBUG, "start=%0.3f pcr=%0.3f incr=%d\n",
                st->start_time / 1000000.0, pcrs[0] / 27e6, ts->pcr_incr);
 #endif
     }
@@ -2136,7 +2143,7 @@ static int mpegts_raw_read_packet(AVFormatContext *s,
     uint8_t pcr_buf[12];
 
     if (av_new_packet(pkt, TS_PACKET_SIZE) < 0)
-        return -ENOMEM;
+        return AVERROR(ENOMEM);
     ret = read_packet(&s->pb, pkt->data, ts->raw_packet_size, &position);
     if (ret < 0) {
         av_free_packet(pkt);

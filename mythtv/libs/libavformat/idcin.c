@@ -104,10 +104,6 @@ static int idcin_probe(AVProbeData *p)
      * audio channels: 0 for no audio, or 1 or 2
      */
 
-    /* cannot proceed without 20 bytes */
-    if (p->buf_size < 20)
-        return 0;
-
     /* check the video width */
     number = AV_RL32(&p->buf[0]);
     if ((number == 0) || (number > 1024))
@@ -141,7 +137,7 @@ static int idcin_read_header(AVFormatContext *s,
                              AVFormatParameters *ap)
 {
     ByteIOContext *pb = &s->pb;
-    IdcinDemuxContext *idcin = (IdcinDemuxContext *)s->priv_data;
+    IdcinDemuxContext *idcin = s->priv_data;
     AVStream *st;
     unsigned int width, height;
     unsigned int sample_rate, bytes_per_sample, channels;
@@ -218,7 +214,7 @@ static int idcin_read_packet(AVFormatContext *s,
     int ret;
     unsigned int command;
     unsigned int chunk_size;
-    IdcinDemuxContext *idcin = (IdcinDemuxContext *)s->priv_data;
+    IdcinDemuxContext *idcin = s->priv_data;
     ByteIOContext *pb = &s->pb;
     int i;
     int palette_scale;

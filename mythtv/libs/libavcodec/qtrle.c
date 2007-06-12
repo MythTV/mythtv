@@ -29,7 +29,7 @@
  * The QT RLE decoder has seven modes of operation:
  * 1, 2, 4, 8, 16, 24, and 32 bits per pixel. For modes 1, 2, 4, and 8
  * the decoder outputs PAL8 colorspace data. 16-bit data yields RGB555
- * data. 24-bit data is RGB24 and 32-bit data is RGBA32.
+ * data. 24-bit data is RGB24 and 32-bit data is RGB32.
  */
 
 #include <stdio.h>
@@ -491,7 +491,7 @@ static void qtrle_decode_32bpp(QtrleContext *s)
 
 static int qtrle_decode_init(AVCodecContext *avctx)
 {
-    QtrleContext *s = (QtrleContext *)avctx->priv_data;
+    QtrleContext *s = avctx->priv_data;
 
     s->avctx = avctx;
     switch (avctx->bits_per_sample) {
@@ -515,7 +515,7 @@ static int qtrle_decode_init(AVCodecContext *avctx)
         break;
 
     case 32:
-        avctx->pix_fmt = PIX_FMT_RGBA32;
+        avctx->pix_fmt = PIX_FMT_RGB32;
         break;
 
     default:
@@ -523,7 +523,6 @@ static int qtrle_decode_init(AVCodecContext *avctx)
             avctx->bits_per_sample);
         break;
     }
-    avctx->has_b_frames = 0;
     dsputil_init(&s->dsp, avctx);
 
     s->frame.data[0] = NULL;
@@ -535,7 +534,7 @@ static int qtrle_decode_frame(AVCodecContext *avctx,
                               void *data, int *data_size,
                               uint8_t *buf, int buf_size)
 {
-    QtrleContext *s = (QtrleContext *)avctx->priv_data;
+    QtrleContext *s = avctx->priv_data;
 
     s->buf = buf;
     s->size = buf_size;
@@ -608,7 +607,7 @@ static int qtrle_decode_frame(AVCodecContext *avctx,
 
 static int qtrle_decode_end(AVCodecContext *avctx)
 {
-    QtrleContext *s = (QtrleContext *)avctx->priv_data;
+    QtrleContext *s = avctx->priv_data;
 
     if (s->frame.data[0])
         avctx->release_buffer(avctx, &s->frame);

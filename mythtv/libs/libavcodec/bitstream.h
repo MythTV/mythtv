@@ -662,7 +662,7 @@ static inline int get_sbits(GetBitContext *s, int n){
 }
 
 /**
- * reads 0-17 bits.
+ * reads 1-17 bits.
  * Note, the alt bitstream reader can read up to 25 bits, but the libmpeg2 reader can't
  */
 static inline unsigned int get_bits(GetBitContext *s, int n){
@@ -676,7 +676,7 @@ static inline unsigned int get_bits(GetBitContext *s, int n){
 }
 
 /**
- * shows 0-17 bits.
+ * shows 1-17 bits.
  * Note, the alt bitstream reader can read up to 25 bits, but the libmpeg2 reader can't
  */
 static inline unsigned int show_bits(GetBitContext *s, int n){
@@ -873,7 +873,7 @@ void free_vlc(VLC *vlc);
  * parses a vlc code, faster then get_vlc()
  * @param bits is the number of bits which will be read at once, must be
  *             identical to nb_bits in init_vlc()
- * @param max_depth is the number of times bits bits must be readed to completly
+ * @param max_depth is the number of times bits bits must be read to completely
  *                  read the longest vlc code
  *                  = (max_vlc_length + bits - 1) / bits
  */
@@ -938,10 +938,10 @@ static inline int get_xbits_trace(GetBitContext *s, int n, char *file, const cha
 #define get_vlc(s, vlc)            get_vlc_trace(s, (vlc)->table, (vlc)->bits, 3, __FILE__, __PRETTY_FUNCTION__, __LINE__)
 #define get_vlc2(s, tab, bits, max) get_vlc_trace(s, tab, bits, max, __FILE__, __PRETTY_FUNCTION__, __LINE__)
 
-#define tprintf(...) av_log(NULL, AV_LOG_DEBUG, __VA_ARGS__)
+#define tprintf(p, ...) av_log(p, AV_LOG_DEBUG, __VA_ARGS__)
 
 #else //TRACE
-#define tprintf(...) {}
+#define tprintf(p, ...) {}
 #endif
 
 static inline int decode012(GetBitContext *gb){

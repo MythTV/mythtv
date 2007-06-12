@@ -35,10 +35,9 @@
 #include "md5.h"
 
 typedef struct AVMD5{
+    uint64_t len;
     uint8_t  block[64];
     uint32_t ABCD[4];
-    uint64_t len;
-    int      b_used;
 } AVMD5;
 
 const int av_md5_size= sizeof(AVMD5);
@@ -50,7 +49,7 @@ static const uint8_t S[4][4] = {
     { 6, 10, 15, 21 }   /* Round 4 */
 };
 
-static const uint32_t T[64] = {
+static const uint32_t T[64] = { // T[i]= fabs(sin(i+1)<<32)
     0xd76aa478, 0xe8c7b756, 0x242070db, 0xc1bdceee,   /* Round 1 */
     0xf57c0faf, 0x4787c62a, 0xa8304613, 0xfd469501,
     0x698098d8, 0x8b44f7af, 0xffff5bb1, 0x895cd7be,
@@ -76,11 +75,12 @@ static const uint32_t T[64] = {
         t = S[i>>4][i&3];\
         a += T[i];\
 \
-        switch(i>>4){\
-        case 0: a += (d ^ (b&(c^d))) + X[      i &15 ]; break;\
-        case 1: a += (c ^ (d&(c^b))) + X[ (1+5*i)&15 ]; break;\
-        case 2: a += (b^c^d)         + X[ (5+3*i)&15 ]; break;\
-        case 3: a += (c^(b|~d))      + X[ (  7*i)&15 ]; break;\
+        if(i<32){\
+            if(i<16) a += (d ^ (b&(c^d))) + X[      i &15 ];\
+            else     a += (c ^ (d&(c^b))) + X[ (1+5*i)&15 ];\
+        }else{\
+            if(i<48) a += (b^c^d)         + X[ (5+3*i)&15 ];\
+            else     a += (c^(b|~d))      + X[ (  7*i)&15 ];\
         }\
         a = b + (( a << t ) | ( a >> (32 - t) ));
 
@@ -117,7 +117,6 @@ CORE4(0) CORE4(16) CORE4(32) CORE4(48)
 
 void av_md5_init(AVMD5 *ctx){
     ctx->len    = 0;
-    ctx->b_used = 0;
 
     ctx->ABCD[0] = 0x10325476;
     ctx->ABCD[1] = 0x98badcfe;
@@ -126,35 +125,29 @@ void av_md5_init(AVMD5 *ctx){
 }
 
 void av_md5_update(AVMD5 *ctx, const uint8_t *src, const int len){
-    int i;
+    int i, j;
 
+    j= ctx->len & 63;
     ctx->len += len;
 
     for( i = 0; i < len; i++ ){
-        ctx->block[ ctx->b_used++ ] = src[i];
-        if( 64 == ctx->b_used ){
+        ctx->block[j++] = src[i];
+        if( 64 == j ){
             body(ctx->ABCD, (uint32_t*) ctx->block);
-            ctx->b_used = 0;
+            j = 0;
         }
     }
 }
 
 void av_md5_final(AVMD5 *ctx, uint8_t *dst){
     int i;
+    uint64_t finalcount= le2me_64(ctx->len<<3);
 
-    ctx->block[ctx->b_used++] = 0x80;
+    av_md5_update(ctx, "\200", 1);
+    while((ctx->len & 63)<56)
+        av_md5_update(ctx, "", 1);
 
-    memset(&ctx->block[ctx->b_used], 0, 64 - ctx->b_used);
-
-    if( 56 < ctx->b_used ){
-        body( ctx->ABCD, (uint32_t*) ctx->block );
-        memset(ctx->block, 0, 64);
-    }
-
-    for(i=0; i<8; i++)
-        ctx->block[56+i] = (ctx->len << 3) >> (i<<3);
-
-    body(ctx->ABCD, (uint32_t*) ctx->block);
+    av_md5_update(ctx, &finalcount, 8);
 
     for(i=0; i<4; i++)
         ((uint32_t*)dst)[i]= le2me_32(ctx->ABCD[3-i]);
@@ -170,6 +163,7 @@ void av_md5_sum(uint8_t *dst, const uint8_t *src, const int len){
 
 #ifdef TEST
 #include <stdio.h>
+#undef printf
 main(){
     uint64_t md5val;
     int i;

@@ -37,19 +37,17 @@
 #    include <string.h>
 #    include <ctype.h>
 #    include <limits.h>
-#    ifndef __BEOS__
-#        include <errno.h>
-#    else
-#        include "berrno.h"
-#    endif
+#    include <errno.h>
 #    include <math.h>
 #endif /* HAVE_AV_CONFIG_H */
 
 #ifndef av_always_inline
 #if defined(__GNUC__) && (__GNUC__ > 3 || __GNUC__ == 3 && __GNUC_MINOR__ > 0)
 #    define av_always_inline __attribute__((always_inline)) inline
+#    define av_noinline __attribute__((noinline))
 #else
 #    define av_always_inline inline
+#    define av_noinline
 #endif
 #endif
 
@@ -67,10 +65,7 @@
 /*#endif*/
 #endif
 
-#ifndef INT64_C
-#define INT64_C(c)     (c ## LL)
-#define UINT64_C(c)    (c ## ULL)
-#endif
+#include "mem.h"
 
 //rounded divison & shift
 #define RSHIFT(a,b) ((a) > 0 ? ((a) + ((1<<(b))>>1))>>(b) : ((a) + ((1<<(b))>>1)-1)>>(b))
@@ -167,7 +162,7 @@ static inline int mid_pred(int a, int b, int c)
  * @param amax maximum value of the clip range
  * @return clipped value
  */
-static inline int clip(int a, int amin, int amax)
+static inline int av_clip(int a, int amin, int amax)
 {
     if (a < amin)      return amin;
     else if (a > amax) return amax;
@@ -179,7 +174,7 @@ static inline int clip(int a, int amin, int amax)
  * @param a value to clip
  * @return clipped value
  */
-static inline uint8_t clip_uint8(int a)
+static inline uint8_t av_clip_uint8(int a)
 {
     if (a&(~255)) return (-a)>>31;
     else          return a;
@@ -316,7 +311,7 @@ tend= read_time();\
   static uint64_t tsum=0;\
   static int tcount=0;\
   static int tskip_count=0;\
-  if(tcount<2 || tend - tstart < 8*tsum/tcount){\
+  if(tcount<2 || tend - tstart < FFMAX(8*tsum/tcount, 2000)){\
       tsum+= tend - tstart;\
       tcount++;\
   }else\
@@ -329,22 +324,5 @@ tend= read_time();\
 #define START_TIMER
 #define STOP_TIMER(id) {}
 #endif
-
-/* memory */
-
-#ifdef __GNUC__
-  #define DECLARE_ALIGNED(n,t,v)       t v __attribute__ ((aligned (n)))
-#else
-  #define DECLARE_ALIGNED(n,t,v)      __declspec(align(n)) t v
-#endif
-
-/* memory */
-void *av_malloc(unsigned int size);
-void *av_realloc(void *ptr, unsigned int size);
-void av_free(void *ptr);
-
-void *av_mallocz(unsigned int size);
-char *av_strdup(const char *s);
-void av_freep(void *ptr);
 
 #endif /* COMMON_H */

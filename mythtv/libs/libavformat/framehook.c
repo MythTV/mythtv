@@ -57,7 +57,7 @@ int frame_hook_add(int argc, char *argv[])
 
     fhe = av_mallocz(sizeof(*fhe));
     if (!fhe) {
-        return errno;
+        return AVERROR(ENOMEM);
     }
 
     fhe->Configure = dlsym(loaded, "Configure");
@@ -66,18 +66,18 @@ int frame_hook_add(int argc, char *argv[])
 
     if (!fhe->Process) {
         av_log(NULL, AV_LOG_ERROR, "Failed to find Process entrypoint in %s\n", argv[0]);
-        return -1;
+        return AVERROR(ENOENT);
     }
 
     if (!fhe->Configure && argc > 1) {
         av_log(NULL, AV_LOG_ERROR, "Failed to find Configure entrypoint in %s\n", argv[0]);
-        return -1;
+        return AVERROR(ENOENT);
     }
 
     if (argc > 1 || fhe->Configure) {
         if (fhe->Configure(&fhe->ctx, argc, argv)) {
             av_log(NULL, AV_LOG_ERROR, "Failed to Configure %s\n", argv[0]);
-            return -1;
+            return AVERROR(EINVAL);
         }
     }
 
@@ -93,11 +93,10 @@ int frame_hook_add(int argc, char *argv[])
 #endif
 }
 
-void frame_hook_process(AVPicture *pict, enum PixelFormat pix_fmt, int width, int height)
+void frame_hook_process(AVPicture *pict, enum PixelFormat pix_fmt, int width, int height, int64_t pts)
 {
     if (first_hook) {
         FrameHookEntry *fhe;
-        int64_t pts = av_gettime();
 
         for (fhe = first_hook; fhe; fhe = fhe->next) {
             fhe->Process(fhe->ctx, pict, pix_fmt, width, height, pts);

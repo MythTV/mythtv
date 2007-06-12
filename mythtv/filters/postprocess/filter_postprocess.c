@@ -13,7 +13,7 @@
 #include "avcodec.h"
 #include "filter.h"
 #include "frame.h"
-#include "../../libs/libavcodec/libpostproc/postprocess.h"
+#include "../../libs/libpostproc/postprocess.h"
 
 //static const char FILTER_NAME[] = "PostProcess";
 

@@ -103,6 +103,9 @@ static int get_flags(MotionEstContext *c, int direct, int chroma){
            + (chroma ? FLAG_CHROMA : 0);
 }
 
+/*! \brief compares a block (either a full macroblock or a partition thereof)
+    against a proposed motion-compensated prediction of that block
+ */
 static av_always_inline int cmp(MpegEncContext *s, const int x, const int y, const int subx, const int suby,
                       const int size, const int h, int ref_index, int src_index,
                       me_cmp_func cmp_func, me_cmp_func chroma_cmp_func, const int flags){
@@ -1798,15 +1801,15 @@ static inline int direct_search(MpegEncContext * s, int mb_x, int mb_y)
     c->pred_x=0;
     c->pred_y=0;
 
-    P_LEFT[0]        = clip(mv_table[mot_xy - 1][0], xmin<<shift, xmax<<shift);
-    P_LEFT[1]        = clip(mv_table[mot_xy - 1][1], ymin<<shift, ymax<<shift);
+    P_LEFT[0]        = av_clip(mv_table[mot_xy - 1][0], xmin<<shift, xmax<<shift);
+    P_LEFT[1]        = av_clip(mv_table[mot_xy - 1][1], ymin<<shift, ymax<<shift);
 
     /* special case for first line */
     if (!s->first_slice_line) { //FIXME maybe allow this over thread boundary as its clipped
-        P_TOP[0]      = clip(mv_table[mot_xy - mot_stride             ][0], xmin<<shift, xmax<<shift);
-        P_TOP[1]      = clip(mv_table[mot_xy - mot_stride             ][1], ymin<<shift, ymax<<shift);
-        P_TOPRIGHT[0] = clip(mv_table[mot_xy - mot_stride + 1         ][0], xmin<<shift, xmax<<shift);
-        P_TOPRIGHT[1] = clip(mv_table[mot_xy - mot_stride + 1         ][1], ymin<<shift, ymax<<shift);
+        P_TOP[0]      = av_clip(mv_table[mot_xy - mot_stride             ][0], xmin<<shift, xmax<<shift);
+        P_TOP[1]      = av_clip(mv_table[mot_xy - mot_stride             ][1], ymin<<shift, ymax<<shift);
+        P_TOPRIGHT[0] = av_clip(mv_table[mot_xy - mot_stride + 1         ][0], xmin<<shift, xmax<<shift);
+        P_TOPRIGHT[1] = av_clip(mv_table[mot_xy - mot_stride + 1         ][1], ymin<<shift, ymax<<shift);
 
         P_MEDIAN[0]= mid_pred(P_LEFT[0], P_TOP[0], P_TOPRIGHT[0]);
         P_MEDIAN[1]= mid_pred(P_LEFT[1], P_TOP[1], P_TOPRIGHT[1]);

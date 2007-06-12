@@ -1,5 +1,5 @@
 /*
- * A52 decoder
+ * A52 decoder using liba52
  * Copyright (c) 2001 Fabrice Bellard.
  *
  * This file is part of FFmpeg.
@@ -21,11 +21,11 @@
 
 /**
  * @file a52dec.c
- * A52 decoder.
+ * A52 decoder using liba52
  */
 
 #include "avcodec.h"
-#include "liba52/a52.h"
+#include <a52dec/a52.h>
 
 #ifdef CONFIG_LIBA52BIN
 #include <dlfcn.h>
@@ -104,7 +104,6 @@ static int a52_decode_init(AVCodecContext *avctx)
         return -1;
     }
 #else
-    /* static linked version */
     s->handle = 0;
     s->a52_init = a52_init;
     s->a52_samples = a52_samples;
@@ -248,7 +247,7 @@ static int a52_decode_end(AVCodecContext *avctx)
     return 0;
 }
 
-AVCodec ac3_decoder = {
+AVCodec liba52_decoder = {
     "ac3",
     CODEC_TYPE_AUDIO,
     CODEC_ID_AC3,

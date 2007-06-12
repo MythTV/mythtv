@@ -104,6 +104,8 @@ static int get_packetheader(NUTContext *nut, ByteIOContext *bc, int calculate_ch
 //    start= url_ftell(bc) - 8;
 
     size= get_v(bc);
+    if(size > 4096)
+        get_be32(bc); //FIXME check this
 
     init_checksum(bc, calculate_checksum ? av_crc04C11DB7_update : NULL, 0);
 
@@ -422,11 +424,11 @@ static int decode_info_header(NUTContext *nut){
     return 0;
 }
 
-int sp_pos_cmp(syncpoint_t *a, syncpoint_t *b){
+static int sp_pos_cmp(syncpoint_t *a, syncpoint_t *b){
     return (a->pos - b->pos>>32) - (b->pos - a->pos>>32);
 }
 
-int sp_pts_cmp(syncpoint_t *a, syncpoint_t *b){
+static int sp_pts_cmp(syncpoint_t *a, syncpoint_t *b){
     return (a->ts - b->ts>>32) - (b->ts - a->ts>>32);
 }
 
@@ -735,13 +737,12 @@ static int nut_read_packet(AVFormatContext *s, AVPacket *pkt)
         uint64_t tmp= nut->next_startcode;
         nut->next_startcode=0;
 
-        if (url_feof(bc))
-            return -1;
-
         if(tmp){
             pos-=8;
         }else{
             frame_code = get_byte(bc);
+            if(url_feof(bc))
+                return -1;
             if(frame_code == 'N'){
                 tmp= frame_code;
                 for(i=1; i<8; i++)

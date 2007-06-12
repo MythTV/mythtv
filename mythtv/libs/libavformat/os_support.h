@@ -32,6 +32,7 @@
  * - floatf() (OS/2)
  * - strcasecmp() (OS/2)
  * - closesocket()
+ * - poll() (BeOS, MinGW)
  */
 
 #if defined(__BEOS__) || defined(__INNOTEK_LIBC__)
@@ -44,11 +45,7 @@ __declspec(dllimport) void __stdcall Sleep(unsigned long dwMilliseconds);
 #  define usleep(t)    Sleep((t) / 1000)
 #  include <fcntl.h>
 #  define lseek(f,p,w) _lseeki64((f), (p), (w))
-#endif
-
-/* XXX: check for Winsock here */
-#if 0
-#define HAVE_CLOSESOCKET 1
+#  define HAVE_CLOSESOCKET 1
 #endif
 
 #ifdef __BEOS__
@@ -65,6 +62,10 @@ __declspec(dllimport) void __stdcall Sleep(unsigned long dwMilliseconds);
      /* doesn't set errno but that's enough */
 #    define usleep(t)  snooze((bigtime_t)(t))
 #  endif
+#  ifndef SA_RESTART
+#    warning SA_RESTART not implemented; ffserver might misbehave.
+#    define SA_RESTART 0
+#  endif
 #endif
 
 #if defined(CONFIG_OS2)
@@ -77,5 +78,34 @@ static inline int strcasecmp(const char* s1, const char* s2) { return stricmp(s1
 #if HAVE_CLOSESOCKET != 1
 #define closesocket close
 #endif
+
+#ifdef CONFIG_FFSERVER
+#ifndef HAVE_SYS_POLL_H
+typedef unsigned long nfds_t;
+
+struct pollfd {
+    int fd;
+    short events;  /* events to look for */
+    short revents; /* events that occured */
+};
+
+/* events & revents */
+#define POLLIN     0x0001  /* any readable data available */
+#define POLLOUT    0x0002  /* file descriptor is writeable */
+#define POLLRDNORM POLLIN
+#define POLLWRNORM POLLOUT
+#define POLLRDBAND 0x0008  /* priority readable data */
+#define POLLWRBAND 0x0010  /* priority data can be written */
+#define POLLPRI    0x0020  /* high priority readable data */
+
+/* revents only */
+#define POLLERR    0x0004  /* errors pending */
+#define POLLHUP    0x0080  /* disconnected */
+#define POLLNVAL   0x1000  /* invalid file descriptor */
+
+
+extern int poll(struct pollfd *fds, nfds_t numfds, int timeout);
+#endif /* HAVE_SYS_POLL_H */
+#endif /* CONFIG_FFSERVER */
 
 #endif /* _OS_SUPPORT_H */

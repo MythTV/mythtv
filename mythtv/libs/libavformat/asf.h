@@ -76,13 +76,13 @@ typedef struct {
     int is_streamed;
     int asfid2avid[128];                 ///< conversion table from asf ID 2 AVStream ID
     ASFStream streams[128];              ///< it's max number and it's not that big
+    uint32_t stream_bitrates[128];       ///< max number of streams, bitrate for each (for streaming)
     /* non streamed additonnal info */
     uint64_t nb_packets;                 ///< how many packets are there in the file, invalid if broadcasting
     int64_t duration;                    ///< in 100ns units
     /* packet filling */
     unsigned char multi_payloads_present;
     int packet_size_left;
-    int prev_packet_sent_time;
     int packet_timestamp_start;
     int packet_timestamp_end;
     unsigned int packet_nb_payloads;
@@ -108,7 +108,7 @@ typedef struct {
     int packet_padsize;
     unsigned int packet_frag_offset;
     unsigned int packet_frag_size;
-    int packet_frag_timestamp;
+    int64_t packet_frag_timestamp;
     int packet_multi_size;
     int packet_obj_size;
     int packet_time_delta;
@@ -206,6 +206,10 @@ static const GUID ext_stream_embed_stream_header = {
 
 static const GUID ext_stream_audio_stream = {
         0x9d, 0x8c, 0x17, 0x31, 0xE1, 0x03, 0x28, 0x45, 0xb5, 0x82, 0x3d, 0xf9, 0xdb, 0x22, 0xf5, 0x03
+};
+
+static const GUID metadata_header = {
+        0xea, 0xcb, 0xf8, 0xc5, 0xaf, 0x5b, 0x77, 0x48, 0x84, 0x67, 0xaa, 0x8c, 0x44, 0xfa, 0x4c, 0xca
 };
 
 /* I am not a number !!! This GUID is the one found on the PC used to

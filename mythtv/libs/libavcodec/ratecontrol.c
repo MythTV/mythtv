@@ -31,7 +31,7 @@
 #include "mpegvideo.h"
 #include "eval.h"
 
-#undef NDEBUG // allways check asserts, the speed effect is far too small to disable them
+#undef NDEBUG // Always check asserts, the speed effect is far too small to disable them.
 #include <assert.h>
 
 #ifndef M_E
@@ -280,7 +280,7 @@ int ff_vbv_update(MpegEncContext *s, int frame_size){
         }
 
         left= buffer_size - rcc->buffer_index - 1;
-        rcc->buffer_index += clip(left, min_rate, max_rate);
+        rcc->buffer_index += av_clip(left, min_rate, max_rate);
 
         if(rcc->buffer_index > buffer_size){
             int stuffing= ceil((rcc->buffer_index - buffer_size)/8);
@@ -417,8 +417,8 @@ static void get_qminmax(int *qmin_ret, int *qmax_ret, MpegEncContext *s, int pic
         qmax= (int)(qmax*FFABS(s->avctx->i_quant_factor)+s->avctx->i_quant_offset + 0.5);
     }
 
-    qmin= clip(qmin, 1, FF_LAMBDA_MAX);
-    qmax= clip(qmax, 1, FF_LAMBDA_MAX);
+    qmin= av_clip(qmin, 1, FF_LAMBDA_MAX);
+    qmax= av_clip(qmax, 1, FF_LAMBDA_MAX);
 
     if(qmax<qmin) qmax= qmin;
 
@@ -751,7 +751,7 @@ float ff_rate_estimate_qscale(MpegEncContext *s, int dry_run)
 //printf("%f ", q);
         assert(q>0.0);
 
-        if(pict_type==P_TYPE || s->intra_only){ //FIXME type dependant blur like in 2-pass
+        if(pict_type==P_TYPE || s->intra_only){ //FIXME type dependent blur like in 2-pass
             rcc->short_term_qsum*=a->qblur;
             rcc->short_term_qcount*=a->qblur;
 
@@ -811,7 +811,7 @@ static int init_pass2(MpegEncContext *s)
     int i, toobig;
     double fps= 1/av_q2d(s->avctx->time_base);
     double complexity[5]={0,0,0,0,0};   // aproximate bits at quant=1
-    uint64_t const_bits[5]={0,0,0,0,0}; // quantizer idependant bits
+    uint64_t const_bits[5]={0,0,0,0,0}; // quantizer independent bits
     uint64_t all_const_bits;
     uint64_t all_available_bits= (uint64_t)(s->bit_rate*(double)rcc->num_entries/fps);
     double rate_factor=0;
@@ -915,7 +915,7 @@ static int init_pass2(MpegEncContext *s)
     for(i=0; i<rcc->num_entries; i++){
         /* av_log(s->avctx, AV_LOG_DEBUG, "[lavc rc] entry[%d].new_qscale = %.3f  qp = %.3f\n",
             i, rcc->entry[i].new_qscale, rcc->entry[i].new_qscale / FF_QP2LAMBDA); */
-        qscale_sum += clip(rcc->entry[i].new_qscale / FF_QP2LAMBDA, s->avctx->qmin, s->avctx->qmax);
+        qscale_sum += av_clip(rcc->entry[i].new_qscale / FF_QP2LAMBDA, s->avctx->qmin, s->avctx->qmax);
     }
     assert(toobig <= 40);
     av_log(s->avctx, AV_LOG_DEBUG,

@@ -31,7 +31,7 @@
 #include <stdio.h>
 
 #ifdef USE_FASTMEMCPY
-#include "fastmemcpy.h"
+#include "libvo/fastmemcpy.h"
 #endif
 
 #ifdef HAVE_XVMC
@@ -88,12 +88,13 @@ const int mb_block_count = 4+(1<<s->chroma_format);
     j=0;
     cbp<<= 12-mb_block_count;
     for(i=0; i<mb_block_count; i++){
-        if (cbp & (1<<11)) {
+        if(cbp & (1<<11)) {
            s->pblocks[i] = (short *)(&s->block[(j++)]);
         }else{
            s->pblocks[i] = NULL;
         }
         cbp+=cbp;
+//        printf("s->pblocks[%d]=%p ,s->block=%p cbp=%d\n",i,s->pblocks[i],s->block,cbp);
     }
 }
 

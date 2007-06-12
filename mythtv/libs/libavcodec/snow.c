@@ -422,7 +422,7 @@ typedef struct Plane{
 }Plane;
 
 typedef struct SnowContext{
-//    MpegEncContext m; // needed for motion estimation, should not be used for anything else, the idea is to make the motion estimation eventually independant of MpegEncContext, so this will be removed then (FIXME/XXX)
+//    MpegEncContext m; // needed for motion estimation, should not be used for anything else, the idea is to make the motion estimation eventually independent of MpegEncContext, so this will be removed then (FIXME/XXX)
 
     AVCodecContext *avctx;
     RangeCoder c;
@@ -473,7 +473,7 @@ typedef struct SnowContext{
     int me_cache_generation;
     slice_buffer sb;
 
-    MpegEncContext m; // needed for motion estimation, should not be used for anything else, the idea is to make the motion estimation eventually independant of MpegEncContext, so this will be removed then (FIXME/XXX)
+    MpegEncContext m; // needed for motion estimation, should not be used for anything else, the idea is to make the motion estimation eventually independent of MpegEncContext, so this will be removed then (FIXME/XXX)
 }SnowContext;
 
 typedef struct {
@@ -1810,7 +1810,7 @@ static inline void unpack_coeffs(SnowContext *s, SubBand *b, SubBand * parent, i
 static inline void decode_subband_slice_buffered(SnowContext *s, SubBand *b, slice_buffer * sb, int start_y, int h, int save_state[1]){
     const int w= b->width;
     int y;
-    const int qlog= clip(s->qlog + b->qlog, 0, QROOT*16);
+    const int qlog= av_clip(s->qlog + b->qlog, 0, QROOT*16);
     int qmul= qexp[qlog&(QROOT-1)]<<(qlog>>QSHIFT);
     int qadd= (s->qbias*qmul)>>QBIAS_SHIFT;
     int new_index = 0;
@@ -1959,18 +1959,18 @@ static inline void init_ref(MotionEstContext *c, uint8_t *src[3], uint8_t *ref[3
 }
 
 static inline void pred_mv(SnowContext *s, int *mx, int *my, int ref,
-                           BlockNode *left, BlockNode *top, BlockNode *tr){
+                           const BlockNode *left, const BlockNode *top, const BlockNode *tr){
     if(s->ref_frames == 1){
         *mx = mid_pred(left->mx, top->mx, tr->mx);
         *my = mid_pred(left->my, top->my, tr->my);
     }else{
         const int *scale = scale_mv_ref[ref];
-        *mx = mid_pred(left->mx * scale[left->ref] + 128 >>8,
-                       top ->mx * scale[top ->ref] + 128 >>8,
-                       tr  ->mx * scale[tr  ->ref] + 128 >>8);
-        *my = mid_pred(left->my * scale[left->ref] + 128 >>8,
-                       top ->my * scale[top ->ref] + 128 >>8,
-                       tr  ->my * scale[tr  ->ref] + 128 >>8);
+        *mx = mid_pred((left->mx * scale[left->ref] + 128) >>8,
+                       (top ->mx * scale[top ->ref] + 128) >>8,
+                       (tr  ->mx * scale[tr  ->ref] + 128) >>8);
+        *my = mid_pred((left->my * scale[left->ref] + 128) >>8,
+                       (top ->my * scale[top ->ref] + 128) >>8,
+                       (tr  ->my * scale[tr  ->ref] + 128) >>8);
     }
 }
 
@@ -1998,12 +1998,12 @@ static int encode_q_branch(SnowContext *s, int level, int x, int y){
     const int block_w= 1<<(LOG2_MB_SIZE - level);
     int trx= (x+1)<<rem_depth;
     int try= (y+1)<<rem_depth;
-    BlockNode *left  = x ? &s->block[index-1] : &null_block;
-    BlockNode *top   = y ? &s->block[index-w] : &null_block;
-    BlockNode *right = trx<w ? &s->block[index+1] : &null_block;
-    BlockNode *bottom= try<h ? &s->block[index+w] : &null_block;
-    BlockNode *tl    = y && x ? &s->block[index-w-1] : left;
-    BlockNode *tr    = y && trx<w && ((x&1)==0 || level==0) ? &s->block[index-w+(1<<rem_depth)] : tl; //FIXME use lt
+    const BlockNode *left  = x ? &s->block[index-1] : &null_block;
+    const BlockNode *top   = y ? &s->block[index-w] : &null_block;
+    const BlockNode *right = trx<w ? &s->block[index+1] : &null_block;
+    const BlockNode *bottom= try<h ? &s->block[index+w] : &null_block;
+    const BlockNode *tl    = y && x ? &s->block[index-w-1] : left;
+    const BlockNode *tr    = y && trx<w && ((x&1)==0 || level==0) ? &s->block[index-w+(1<<rem_depth)] : tl; //FIXME use lt
     int pl = left->color[0];
     int pcb= left->color[1];
     int pcr= left->color[2];
@@ -2225,10 +2225,10 @@ static void encode_q_branch2(SnowContext *s, int level, int x, int y){
     const int index= (x + y*w) << rem_depth;
     int trx= (x+1)<<rem_depth;
     BlockNode *b= &s->block[index];
-    BlockNode *left  = x ? &s->block[index-1] : &null_block;
-    BlockNode *top   = y ? &s->block[index-w] : &null_block;
-    BlockNode *tl    = y && x ? &s->block[index-w-1] : left;
-    BlockNode *tr    = y && trx<w && ((x&1)==0 || level==0) ? &s->block[index-w+(1<<rem_depth)] : tl; //FIXME use lt
+    const BlockNode *left  = x ? &s->block[index-1] : &null_block;
+    const BlockNode *top   = y ? &s->block[index-w] : &null_block;
+    const BlockNode *tl    = y && x ? &s->block[index-w-1] : left;
+    const BlockNode *tr    = y && trx<w && ((x&1)==0 || level==0) ? &s->block[index-w+(1<<rem_depth)] : tl; //FIXME use lt
     int pl = left->color[0];
     int pcb= left->color[1];
     int pcr= left->color[2];
@@ -2278,10 +2278,10 @@ static void decode_q_branch(SnowContext *s, int level, int x, int y){
     const int rem_depth= s->block_max_depth - level;
     const int index= (x + y*w) << rem_depth;
     int trx= (x+1)<<rem_depth;
-    BlockNode *left  = x ? &s->block[index-1] : &null_block;
-    BlockNode *top   = y ? &s->block[index-w] : &null_block;
-    BlockNode *tl    = y && x ? &s->block[index-w-1] : left;
-    BlockNode *tr    = y && trx<w && ((x&1)==0 || level==0) ? &s->block[index-w+(1<<rem_depth)] : tl; //FIXME use lt
+    const BlockNode *left  = x ? &s->block[index-1] : &null_block;
+    const BlockNode *top   = y ? &s->block[index-w] : &null_block;
+    const BlockNode *tl    = y && x ? &s->block[index-w-1] : left;
+    const BlockNode *tr    = y && trx<w && ((x&1)==0 || level==0) ? &s->block[index-w+(1<<rem_depth)] : tl; //FIXME use lt
     int s_context= 2*left->level + 2*top->level + tl->level + tr->level;
 
     if(s->keyframe){
@@ -2521,16 +2521,16 @@ static void pred_block(SnowContext *s, uint8_t *dst, uint8_t *tmp, int stride, i
     }
 }
 
-void ff_snow_inner_add_yblock(uint8_t *obmc, const int obmc_stride, uint8_t * * block, int b_w, int b_h,
+void ff_snow_inner_add_yblock(const uint8_t *obmc, const int obmc_stride, uint8_t * * block, int b_w, int b_h,
                               int src_x, int src_y, int src_stride, slice_buffer * sb, int add, uint8_t * dst8){
     int y, x;
     DWTELEM * dst;
     for(y=0; y<b_h; y++){
         //FIXME ugly missue of obmc_stride
-        uint8_t *obmc1= obmc + y*obmc_stride;
-        uint8_t *obmc2= obmc1+ (obmc_stride>>1);
-        uint8_t *obmc3= obmc1+ obmc_stride*(obmc_stride>>1);
-        uint8_t *obmc4= obmc3+ (obmc_stride>>1);
+        const uint8_t *obmc1= obmc + y*obmc_stride;
+        const uint8_t *obmc2= obmc1+ (obmc_stride>>1);
+        const uint8_t *obmc3= obmc1+ obmc_stride*(obmc_stride>>1);
+        const uint8_t *obmc4= obmc3+ (obmc_stride>>1);
         dst = slice_buffer_get_line(sb, src_y + y);
         for(x=0; x<b_w; x++){
             int v=   obmc1[x] * block[3][x + y*src_stride]
@@ -2687,10 +2687,10 @@ assert(src_stride > 2*MB_SIZE + 5);
     }else
     for(y=0; y<b_h; y++){
         //FIXME ugly missue of obmc_stride
-        uint8_t *obmc1= obmc + y*obmc_stride;
-        uint8_t *obmc2= obmc1+ (obmc_stride>>1);
-        uint8_t *obmc3= obmc1+ obmc_stride*(obmc_stride>>1);
-        uint8_t *obmc4= obmc3+ (obmc_stride>>1);
+        const uint8_t *obmc1= obmc + y*obmc_stride;
+        const uint8_t *obmc2= obmc1+ (obmc_stride>>1);
+        const uint8_t *obmc3= obmc1+ obmc_stride*(obmc_stride>>1);
+        const uint8_t *obmc4= obmc3+ (obmc_stride>>1);
         for(x=0; x<b_w; x++){
             int v=   obmc1[x] * block[3][x + y*src_stride]
                     +obmc2[x] * block[2][x + y*src_stride]
@@ -2898,18 +2898,18 @@ static int get_dc(SnowContext *s, int mb_x, int mb_y, int plane_index){
     }
     *b= backup;
 
-    return clip(((ab<<LOG2_OBMC_MAX) + aa/2)/aa, 0, 255); //FIXME we shouldnt need cliping
+    return av_clip(((ab<<LOG2_OBMC_MAX) + aa/2)/aa, 0, 255); //FIXME we shouldnt need cliping
 }
 
 static inline int get_block_bits(SnowContext *s, int x, int y, int w){
     const int b_stride = s->b_width << s->block_max_depth;
     const int b_height = s->b_height<< s->block_max_depth;
     int index= x + y*b_stride;
-    BlockNode *b     = &s->block[index];
-    BlockNode *left  = x ? &s->block[index-1] : &null_block;
-    BlockNode *top   = y ? &s->block[index-b_stride] : &null_block;
-    BlockNode *tl    = y && x ? &s->block[index-b_stride-1] : left;
-    BlockNode *tr    = y && x+w<b_stride ? &s->block[index-b_stride+w] : tl;
+    const BlockNode *b     = &s->block[index];
+    const BlockNode *left  = x ? &s->block[index-1] : &null_block;
+    const BlockNode *top   = y ? &s->block[index-b_stride] : &null_block;
+    const BlockNode *tl    = y && x ? &s->block[index-b_stride-1] : left;
+    const BlockNode *tr    = y && x+w<b_stride ? &s->block[index-b_stride+w] : tl;
     int dmx, dmy;
 //  int mx_context= av_log2(2*FFABS(left->mx - top->mx));
 //  int my_context= av_log2(2*FFABS(left->my - top->my));
@@ -3407,7 +3407,7 @@ static void quantize(SnowContext *s, SubBand *b, DWTELEM *src, int stride, int b
     const int level= b->level;
     const int w= b->width;
     const int h= b->height;
-    const int qlog= clip(s->qlog + b->qlog, 0, QROOT*16);
+    const int qlog= av_clip(s->qlog + b->qlog, 0, QROOT*16);
     const int qmul= qexp[qlog&(QROOT-1)]<<(qlog>>QSHIFT);
     int x,y, thres1, thres2;
 //    START_TIMER
@@ -3466,7 +3466,7 @@ static void quantize(SnowContext *s, SubBand *b, DWTELEM *src, int stride, int b
 
 static void dequantize_slice_buffered(SnowContext *s, slice_buffer * sb, SubBand *b, DWTELEM *src, int stride, int start_y, int end_y){
     const int w= b->width;
-    const int qlog= clip(s->qlog + b->qlog, 0, QROOT*16);
+    const int qlog= av_clip(s->qlog + b->qlog, 0, QROOT*16);
     const int qmul= qexp[qlog&(QROOT-1)]<<(qlog>>QSHIFT);
     const int qadd= (s->qbias*qmul)>>QBIAS_SHIFT;
     int x,y;
@@ -3494,7 +3494,7 @@ static void dequantize_slice_buffered(SnowContext *s, slice_buffer * sb, SubBand
 static void dequantize(SnowContext *s, SubBand *b, DWTELEM *src, int stride){
     const int w= b->width;
     const int h= b->height;
-    const int qlog= clip(s->qlog + b->qlog, 0, QROOT*16);
+    const int qlog= av_clip(s->qlog + b->qlog, 0, QROOT*16);
     const int qmul= qexp[qlog&(QROOT-1)]<<(qlog>>QSHIFT);
     const int qadd= (s->qbias*qmul)>>QBIAS_SHIFT;
     int x,y;
@@ -3547,7 +3547,7 @@ static void correlate_slice_buffered(SnowContext *s, slice_buffer * sb, SubBand 
 
 //    START_TIMER
 
-    DWTELEM * line;
+    DWTELEM * line=0; // silence silly "could be used without having been initialized" warning
     DWTELEM * prev;
 
     if (start_y != 0)
@@ -3869,7 +3869,7 @@ static int ratecontrol_1pass(SnowContext *s, AVFrame *pict)
             const int w= b->width;
             const int h= b->height;
             const int stride= b->stride;
-            const int qlog= clip(2*QROOT + b->qlog, 0, QROOT*16);
+            const int qlog= av_clip(2*QROOT + b->qlog, 0, QROOT*16);
             const int qmul= qexp[qlog&(QROOT-1)]<<(qlog>>QSHIFT);
             const int qdiv= (1<<16)/qmul;
             int x, y;
@@ -3991,7 +3991,7 @@ static int encode_init(AVCodecContext *avctx)
 //    case PIX_FMT_YUV410P:
         s->colorspace_type= 0;
         break;
-/*    case PIX_FMT_RGBA32:
+/*    case PIX_FMT_RGB32:
         s->colorspace= 1;
         break;*/
     default:

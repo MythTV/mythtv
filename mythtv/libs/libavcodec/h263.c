@@ -87,7 +87,7 @@ static uint8_t uni_DCtab_chrom_len[512];
 static uint16_t uni_DCtab_lum_bits[512];
 static uint16_t uni_DCtab_chrom_bits[512];
 
-static uint8_t (*mv_penalty)[MAX_MV*2+1]= NULL;
+static uint8_t mv_penalty[MAX_FCODE+1][MAX_MV*2+1];
 static uint8_t fcode_tab[MAX_MV*2+1];
 static uint8_t umv_fcode_tab[MAX_MV*2+1];
 
@@ -111,6 +111,8 @@ max level: 53/16
 max run: 29/41
 */
 #endif
+
+static uint8_t static_rl_table_store[5][2][2*MAX_RUN + MAX_LEVEL + 3];
 
 #if 0 //3IV1 is quite rare and it slows things down a tiny bit
 #define IS_3IV1 s->codec_tag == ff_get_fourcc("3IV1")
@@ -211,7 +213,7 @@ void h263_encode_picture_header(MpegEncContext * s, int picture_number)
         for(i=0; i<2; i++){
             int div, error;
             div= (s->avctx->time_base.num*1800000LL + 500LL*s->avctx->time_base.den) / ((1000LL+i)*s->avctx->time_base.den);
-            div= clip(1, div, 127);
+            div= av_clip(1, div, 127);
             error= FFABS(s->avctx->time_base.num*1800000LL - (1000LL+i)*s->avctx->time_base.den*div);
             if(error < best_error){
                 best_error= error;
@@ -496,7 +498,7 @@ static void ff_init_qscale_tab(MpegEncContext *s){
     for(i=0; i<s->mb_num; i++){
         unsigned int lam= s->lambda_table[ s->mb_index2xy[i] ];
         int qp= (lam*139 + FF_LAMBDA_SCALE*64) >> (FF_LAMBDA_SHIFT + 7);
-        qscale_table[ s->mb_index2xy[i] ]= clip(qp, s->avctx->qmin, s->avctx->qmax);
+        qscale_table[ s->mb_index2xy[i] ]= av_clip(qp, s->avctx->qmin, s->avctx->qmax);
     }
 }
 
@@ -1797,9 +1799,6 @@ static void init_mv_penalty_and_fcode(MpegEncContext *s)
     int f_code;
     int mv;
 
-    if(mv_penalty==NULL)
-        mv_penalty= av_mallocz( sizeof(uint8_t)*(MAX_FCODE+1)*(2*MAX_MV+1) );
-
     for(f_code=1; f_code<=MAX_FCODE; f_code++){
         for(mv=-MAX_MV; mv<=MAX_MV; mv++){
             int len;
@@ -2033,9 +2032,9 @@ void h263_encode_init(MpegEncContext *s)
 
         init_uni_dc_tab();
 
-        init_rl(&rl_inter, 1);
-        init_rl(&rl_intra, 1);
-        init_rl(&rl_intra_aic, 1);
+        init_rl(&rl_inter, static_rl_table_store[0]);
+        init_rl(&rl_intra, static_rl_table_store[1]);
+        init_rl(&rl_intra_aic, static_rl_table_store[2]);
 
         init_uni_mpeg4_rl_tab(&rl_intra, uni_mpeg4_intra_rl_bits, uni_mpeg4_intra_rl_len);
         init_uni_mpeg4_rl_tab(&rl_inter, uni_mpeg4_inter_rl_bits, uni_mpeg4_inter_rl_len);
@@ -2526,7 +2525,7 @@ void mpeg4_encode_picture_header(MpegEncContext * s, int picture_number)
 #endif //CONFIG_ENCODERS
 
 /**
- * set qscale and update qscale dependant variables.
+ * set qscale and update qscale dependent variables.
  */
 void ff_set_qscale(MpegEncContext * s, int qscale)
 {
@@ -3001,11 +3000,11 @@ void h263_decode_init_vlc(MpegEncContext *s)
         init_vlc(&mv_vlc, MV_VLC_BITS, 33,
                  &mvtab[0][1], 2, 1,
                  &mvtab[0][0], 2, 1, 1);
-        init_rl(&rl_inter, 1);
-        init_rl(&rl_intra, 1);
-        init_rl(&rvlc_rl_inter, 1);
-        init_rl(&rvlc_rl_intra, 1);
-        init_rl(&rl_intra_aic, 1);
+        init_rl(&rl_inter, static_rl_table_store[0]);
+        init_rl(&rl_intra, static_rl_table_store[1]);
+        init_rl(&rvlc_rl_inter, static_rl_table_store[3]);
+        init_rl(&rvlc_rl_intra, static_rl_table_store[4]);
+        init_rl(&rl_intra_aic, static_rl_table_store[2]);
         init_vlc_rl(&rl_inter, 1);
         init_vlc_rl(&rl_intra, 1);
         init_vlc_rl(&rvlc_rl_inter, 1);
@@ -5151,7 +5150,7 @@ int h263_decode_picture_header(MpegEncContext *s)
         if (ufep == 1) {
             /* OPPTYPE */
             format = get_bits(&s->gb, 3);
-            dprintf("ufep=1, format: %d\n", format);
+            dprintf(s->avctx, "ufep=1, format: %d\n", format);
             s->custom_pcf= get_bits1(&s->gb);
             s->umvplus = get_bits(&s->gb, 1); /* Unrestricted Motion Vector */
             if (get_bits1(&s->gb) != 0) {
@@ -5201,7 +5200,7 @@ int h263_decode_picture_header(MpegEncContext *s)
             if (format == 6) {
                 /* Custom Picture Format (CPFMT) */
                 s->aspect_ratio_info = get_bits(&s->gb, 4);
-                dprintf("aspect: %d\n", s->aspect_ratio_info);
+                dprintf(s->avctx, "aspect: %d\n", s->aspect_ratio_info);
                 /* aspect ratios:
                 0 - forbidden
                 1 - 1:1
@@ -5214,7 +5213,7 @@ int h263_decode_picture_header(MpegEncContext *s)
                 width = (get_bits(&s->gb, 9) + 1) * 4;
                 skip_bits1(&s->gb);
                 height = get_bits(&s->gb, 9) * 4;
-                dprintf("\nH.263+ Custom picture: %dx%d\n",width,height);
+                dprintf(s->avctx, "\nH.263+ Custom picture: %dx%d\n",width,height);
                 if (s->aspect_ratio_info == FF_ASPECT_EXTENDED) {
                     /* aspected dimensions */
                     s->avctx->sample_aspect_ratio.num= get_bits(&s->gb, 8);

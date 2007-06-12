@@ -59,8 +59,6 @@ typedef struct {
 static int mm_probe(AVProbeData *p)
 {
     /* the first chunk is always the header */
-    if (p->buf_size < MM_PREAMBLE_SIZE)
-        return 0;
     if (AV_RL16(&p->buf[0]) != MM_TYPE_HEADER)
         return 0;
     if (AV_RL32(&p->buf[2]) != MM_HEADER_LEN_V && AV_RL32(&p->buf[2]) != MM_HEADER_LEN_AV)
@@ -73,7 +71,7 @@ static int mm_probe(AVProbeData *p)
 static int mm_read_header(AVFormatContext *s,
                            AVFormatParameters *ap)
 {
-    MmDemuxContext *mm = (MmDemuxContext *)s->priv_data;
+    MmDemuxContext *mm = s->priv_data;
     ByteIOContext *pb = &s->pb;
     AVStream *st;
 
@@ -128,7 +126,7 @@ static int mm_read_header(AVFormatContext *s,
 static int mm_read_packet(AVFormatContext *s,
                            AVPacket *pkt)
 {
-    MmDemuxContext *mm = (MmDemuxContext *)s->priv_data;
+    MmDemuxContext *mm = s->priv_data;
     ByteIOContext *pb = &s->pb;
     unsigned char preamble[MM_PREAMBLE_SIZE];
     unsigned char pal[MM_PALETTE_SIZE];

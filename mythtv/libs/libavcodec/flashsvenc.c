@@ -68,13 +68,13 @@ typedef struct FlashSVContext {
     AVCodecContext *avctx;
     uint8_t *previous_frame;
     AVFrame frame;
-    int first_frame;
     int image_width, image_height;
     int block_width, block_height;
     uint8_t* tmpblock;
     uint8_t* encbuffer;
     int block_size;
     z_stream zstream;
+    int last_key_frame;
 } FlashSVContext;
 
 static int copy_region_enc(uint8_t *sptr, uint8_t *dptr,
@@ -100,7 +100,7 @@ static int copy_region_enc(uint8_t *sptr, uint8_t *dptr,
 
 static int flashsv_encode_init(AVCodecContext *avctx)
 {
-    FlashSVContext *s = (FlashSVContext *)avctx->priv_data;
+    FlashSVContext *s = avctx->priv_data;
 
     s->avctx = avctx;
 
@@ -112,8 +112,6 @@ static int flashsv_encode_init(AVCodecContext *avctx)
     if (avcodec_check_dimensions(avctx, avctx->width, avctx->height) < 0) {
         return -1;
     }
-
-    s->first_frame = 1;
 
     // Needed if zlib unused or init aborted before deflateInit
     memset(&(s->zstream), 0, sizeof(z_stream));
@@ -127,6 +125,8 @@ static int flashsv_encode_init(AVCodecContext *avctx)
         return -1;
     }
 */
+
+    s->last_key_frame=0;
 
     s->image_width = avctx->width;
     s->image_height = avctx->height;
@@ -232,7 +232,7 @@ static int encode_bitstream(FlashSVContext *s, AVFrame *p, uint8_t *buf, int buf
 
 static int flashsv_encode_frame(AVCodecContext *avctx, uint8_t *buf, int buf_size, void *data)
 {
-    FlashSVContext * const s = (FlashSVContext *)avctx->priv_data;
+    FlashSVContext * const s = avctx->priv_data;
     AVFrame *pict = data;
     AVFrame * const p = &s->frame;
     int res;
@@ -241,14 +241,21 @@ static int flashsv_encode_frame(AVCodecContext *avctx, uint8_t *buf, int buf_siz
 
     *p = *pict;
 
-    if (s->first_frame) {
-        s->previous_frame = av_mallocz(p->linesize[0]*s->image_height*3);
+    /* First frame needs to be a keyframe */
+    if (avctx->frame_number == 0) {
+        s->previous_frame = av_mallocz(p->linesize[0]*s->image_height);
         if (!s->previous_frame) {
             av_log(avctx, AV_LOG_ERROR, "Memory allocation failed.\n");
             return -1;
         }
         I_frame = 1;
-        s->first_frame = 0;
+    }
+
+    /* Check the placement of keyframes */
+    if (avctx->gop_size > 0) {
+        if (avctx->frame_number >= s->last_key_frame + avctx->gop_size) {
+            I_frame = 1;
+        }
     }
 
 #if 0
@@ -295,12 +302,14 @@ static int flashsv_encode_frame(AVCodecContext *avctx, uint8_t *buf, int buf_siz
     res = encode_bitstream(s, p, buf, buf_size, opt_w*16, opt_h*16, s->previous_frame, &I_frame);
 #endif
     //save the current frame
-    memcpy(s->previous_frame, p->data[0], s->image_height*p->linesize[0]*3);
+    memcpy(s->previous_frame, p->data[0], s->image_height*p->linesize[0]);
 
     //mark the frame type so the muxer can mux it correctly
     if (I_frame) {
         p->pict_type = FF_I_TYPE;
         p->key_frame = 1;
+        s->last_key_frame = avctx->frame_number;
+        av_log(avctx, AV_LOG_DEBUG, "Inserting key frame at frame %d\n",avctx->frame_number);
     } else {
         p->pict_type = FF_P_TYPE;
         p->key_frame = 0;
@@ -313,7 +322,7 @@ static int flashsv_encode_frame(AVCodecContext *avctx, uint8_t *buf, int buf_siz
 
 static int flashsv_encode_end(AVCodecContext *avctx)
 {
-    FlashSVContext *s = (FlashSVContext *)avctx->priv_data;
+    FlashSVContext *s = avctx->priv_data;
 
     deflateEnd(&(s->zstream));
 

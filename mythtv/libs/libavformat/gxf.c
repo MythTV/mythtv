@@ -87,8 +87,6 @@ static int parse_packet_header(ByteIOContext *pb, pkt_type_t *type, int *length)
 static int gxf_probe(AVProbeData *p) {
     static const uint8_t startcode[] = {0, 0, 0, 0, 1, 0xbc}; // start with map packet
     static const uint8_t endcode[] = {0, 0, 0, 0, 0xe1, 0xe2};
-    if (p->buf_size < 16)
-        return 0;
     if (!memcmp(p->buf, startcode, sizeof(startcode)) &&
         !memcmp(&p->buf[16 - sizeof(endcode)], endcode, sizeof(endcode)))
         return AVPROBE_SCORE_MAX;
@@ -130,13 +128,13 @@ static int get_sindex(AVFormatContext *s, int id, int format) {
         case 20:
             st->codec->codec_type = CODEC_TYPE_VIDEO;
             st->codec->codec_id = CODEC_ID_MPEG2VIDEO;
-            st->need_parsing = 2; // get keyframe flag etc.
+            st->need_parsing = AVSTREAM_PARSE_HEADERS; //get keyframe flag etc.
             break;
         case 22:
         case 23:
             st->codec->codec_type = CODEC_TYPE_VIDEO;
             st->codec->codec_id = CODEC_ID_MPEG1VIDEO;
-            st->need_parsing = 2; // get keyframe flag etc.
+            st->need_parsing = AVSTREAM_PARSE_HEADERS; //get keyframe flag etc.
             break;
         case 9:
             st->codec->codec_type = CODEC_TYPE_AUDIO;
@@ -360,10 +358,11 @@ static int gxf_header(AVFormatContext *s, AVFormatParameters *ap) {
         }
     }
     if (pkt_type == PKT_UMF) {
-        if (len >= 9) {
+        if (len >= 0x39) {
             AVRational fps;
-            len -= 9;
-            url_fskip(pb, 5);
+            len -= 0x39;
+            url_fskip(pb, 5); // preamble
+            url_fskip(pb, 0x30); // payload description
             fps = fps_umf2avr(get_le32(pb));
             if (!main_timebase.num || !main_timebase.den) {
                 // this may not always be correct, but simply the best we can get
@@ -375,13 +374,11 @@ static int gxf_header(AVFormatContext *s, AVFormatParameters *ap) {
     } else
         av_log(s, AV_LOG_INFO, "GXF: UMF packet missing\n");
     url_fskip(pb, len);
+    if (!main_timebase.num || !main_timebase.den)
+        main_timebase = (AVRational){1, 50}; // set some arbitrary fallback
     for (i = 0; i < s->nb_streams; i++) {
         AVStream *st = s->streams[i];
-        if (main_timebase.num && main_timebase.den)
-            st->time_base = main_timebase;
-        else {
-            st->start_time = st->duration = AV_NOPTS_VALUE;
-        }
+        av_set_pts_info(st, 32, main_timebase.num, main_timebase.den);
     }
     return 0;
 }

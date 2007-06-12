@@ -80,17 +80,19 @@ static inline int block_cmp(uint8_t *src, int stride, uint8_t *src2, int stride2
 static int zmbv_me(ZmbvEncContext *c, uint8_t *src, int sstride, uint8_t *prev, int pstride,
                     int x, int y, int *mx, int *my)
 {
-    int dx, dy, tx, ty, tv, bv;
+    int dx, dy, tx, ty, tv, bv, bw, bh;
 
     *mx = *my = 0;
-    bv = block_cmp(src, sstride, prev, pstride, ZMBV_BLOCK, ZMBV_BLOCK);
+    bw = FFMIN(ZMBV_BLOCK, c->avctx->width - x);
+    bh = FFMIN(ZMBV_BLOCK, c->avctx->height - y);
+    bv = block_cmp(src, sstride, prev, pstride, bw, bh);
     if(!bv) return 0;
-    for(ty = FFMAX(y - c->range, 0); ty < FFMIN(y + c->range, c->avctx->height - ZMBV_BLOCK); ty++){
-        for(tx = FFMAX(x - c->range, 0); tx < FFMIN(x + c->range, c->avctx->width - ZMBV_BLOCK); tx++){
+    for(ty = FFMAX(y - c->range, 0); ty < FFMIN(y + c->range, c->avctx->height - bh); ty++){
+        for(tx = FFMAX(x - c->range, 0); tx < FFMIN(x + c->range, c->avctx->width - bw); tx++){
             if(tx == x && ty == y) continue; // we already tested this block
             dx = tx - x;
             dy = ty - y;
-            tv = block_cmp(src, sstride, prev + dx + dy*pstride, pstride, ZMBV_BLOCK, ZMBV_BLOCK);
+            tv = block_cmp(src, sstride, prev + dx + dy*pstride, pstride, bw, bh);
             if(tv < bv){
                  bv = tv;
                  *mx = dx;
@@ -104,7 +106,7 @@ static int zmbv_me(ZmbvEncContext *c, uint8_t *src, int sstride, uint8_t *prev, 
 
 static int encode_frame(AVCodecContext *avctx, uint8_t *buf, int buf_size, void *data)
 {
-    ZmbvEncContext * const c = (ZmbvEncContext *)avctx->priv_data;
+    ZmbvEncContext * const c = avctx->priv_data;
     AVFrame *pict = data;
     AVFrame * const p = &c->pic;
     uint8_t *src, *prev;
@@ -237,7 +239,7 @@ static int encode_frame(AVCodecContext *avctx, uint8_t *buf, int buf_size, void 
  */
 static int encode_init(AVCodecContext *avctx)
 {
-    ZmbvEncContext * const c = (ZmbvEncContext *)avctx->priv_data;
+    ZmbvEncContext * const c = avctx->priv_data;
     int zret; // Zlib return code
     int lvl = 9;
 
@@ -303,7 +305,7 @@ static int encode_init(AVCodecContext *avctx)
  */
 static int encode_end(AVCodecContext *avctx)
 {
-    ZmbvEncContext * const c = (ZmbvEncContext *)avctx->priv_data;
+    ZmbvEncContext * const c = avctx->priv_data;
 
     av_freep(&c->comp_buf);
     av_freep(&c->work_buf);

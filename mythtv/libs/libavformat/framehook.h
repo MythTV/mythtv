@@ -22,6 +22,8 @@
 #ifndef _FRAMEHOOK_H
 #define _FRAMEHOOK_H
 
+#warning VHOOK is deprecated. Please help porting libmpcodecs or a better filter system to FFmpeg instead of wasting your time writing new filters for this crappy one.
+
 /*
  * Prototypes for interface to .so that implement a video processing hook
  */
@@ -44,7 +46,7 @@ typedef FrameHookRelease *FrameHookReleaseFn;
 extern FrameHookRelease Release;
 
 extern int frame_hook_add(int argc, char *argv[]);
-extern void frame_hook_process(struct AVPicture *pict, enum PixelFormat pix_fmt, int width, int height);
+extern void frame_hook_process(struct AVPicture *pict, enum PixelFormat pix_fmt, int width, int height, int64_t pts);
 extern void frame_hook_release(void);
 
 #endif

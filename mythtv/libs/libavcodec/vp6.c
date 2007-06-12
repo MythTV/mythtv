@@ -50,10 +50,10 @@ static int vp6_parse_header(vp56_context_t *s, uint8_t *buf, int buf_size,
     int res = 1;
     int separated_coeff = buf[0] & 1;
 
-    s->frames[VP56_FRAME_CURRENT].key_frame = !(buf[0] & 0x80);
+    s->framep[VP56_FRAME_CURRENT]->key_frame = !(buf[0] & 0x80);
     vp56_init_dequant(s, (buf[0] >> 1) & 0x3F);
 
-    if (s->frames[VP56_FRAME_CURRENT].key_frame) {
+    if (s->framep[VP56_FRAME_CURRENT]->key_frame) {
         sub_version = buf[1] >> 3;
         if (sub_version > 8)
             return 0;
@@ -205,7 +205,7 @@ static void vp6_parse_coeff_models(vp56_context_t *s)
             if (vp56_rac_get_prob(c, vp6_dccv_pct[pt][node])) {
                 def_prob[node] = vp56_rac_gets_nn(c, 7);
                 s->coeff_model_dccv[pt][node] = def_prob[node];
-            } else if (s->frames[VP56_FRAME_CURRENT].key_frame) {
+            } else if (s->framep[VP56_FRAME_CURRENT]->key_frame) {
                 s->coeff_model_dccv[pt][node] = def_prob[node];
             }
 
@@ -228,7 +228,7 @@ static void vp6_parse_coeff_models(vp56_context_t *s)
                     if (vp56_rac_get_prob(c, vp6_ract_pct[ct][pt][cg][node])) {
                         def_prob[node] = vp56_rac_gets_nn(c, 7);
                         s->coeff_model_ract[pt][ct][cg][node] = def_prob[node];
-                    } else if (s->frames[VP56_FRAME_CURRENT].key_frame) {
+                    } else if (s->framep[VP56_FRAME_CURRENT]->key_frame) {
                         s->coeff_model_ract[pt][ct][cg][node] = def_prob[node];
                     }
 
@@ -236,7 +236,7 @@ static void vp6_parse_coeff_models(vp56_context_t *s)
     for (pt=0; pt<2; pt++)
         for (ctx=0; ctx<3; ctx++)
             for (node=0; node<5; node++)
-                s->coeff_model_dcct[pt][ctx][node] = clip(((s->coeff_model_dccv[pt][node] * vp6_dccv_lc[ctx][node][0] + 128) >> 8) + vp6_dccv_lc[ctx][node][1], 1, 255);
+                s->coeff_model_dcct[pt][ctx][node] = av_clip(((s->coeff_model_dccv[pt][node] * vp6_dccv_lc[ctx][node][0] + 128) >> 8) + vp6_dccv_lc[ctx][node][1], 1, 255);
 }
 
 static void vp6_parse_vector_adjustment(vp56_context_t *s, vp56_mv_t *vect)
@@ -395,7 +395,7 @@ static void vp6_filter_hv4(uint8_t *dst, uint8_t *src, int stride,
 
     for (y=0; y<8; y++) {
         for (x=0; x<8; x++) {
-            dst[x] = clip_uint8((  src[x-delta  ] * weights[0]
+            dst[x] = av_clip_uint8((  src[x-delta  ] * weights[0]
                                  + src[x        ] * weights[1]
                                  + src[x+delta  ] * weights[2]
                                  + src[x+2*delta] * weights[3] + 64) >> 7);
@@ -434,7 +434,7 @@ static void vp6_filter_diag4(uint8_t *dst, uint8_t *src, int stride,
 
     for (y=0; y<11; y++) {
         for (x=0; x<8; x++) {
-            t[x] = clip_uint8((  src[x-1] * h_weights[0]
+            t[x] = av_clip_uint8((  src[x-1] * h_weights[0]
                                + src[x  ] * h_weights[1]
                                + src[x+1] * h_weights[2]
                                + src[x+2] * h_weights[3] + 64) >> 7);
@@ -446,7 +446,7 @@ static void vp6_filter_diag4(uint8_t *dst, uint8_t *src, int stride,
     t = tmp + 8;
     for (y=0; y<8; y++) {
         for (x=0; x<8; x++) {
-            dst[x] = clip_uint8((  t[x-8 ] * v_weights[0]
+            dst[x] = av_clip_uint8((  t[x-8 ] * v_weights[0]
                                  + t[x   ] * v_weights[1]
                                  + t[x+8 ] * v_weights[2]
                                  + t[x+16] * v_weights[3] + 64) >> 7);

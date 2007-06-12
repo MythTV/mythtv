@@ -24,11 +24,64 @@
  * tables taken directly from AC3 spec.
  */
 
+/**
+ * Possible frame sizes.
+ * from ATSC A/52 Table 5.18 Frame Size Code Table.
+ */
+const uint16_t ff_ac3_frame_sizes[38][3] = {
+    { 64,   69,   96   },
+    { 64,   70,   96   },
+    { 80,   87,   120  },
+    { 80,   88,   120  },
+    { 96,   104,  144  },
+    { 96,   105,  144  },
+    { 112,  121,  168  },
+    { 112,  122,  168  },
+    { 128,  139,  192  },
+    { 128,  140,  192  },
+    { 160,  174,  240  },
+    { 160,  175,  240  },
+    { 192,  208,  288  },
+    { 192,  209,  288  },
+    { 224,  243,  336  },
+    { 224,  244,  336  },
+    { 256,  278,  384  },
+    { 256,  279,  384  },
+    { 320,  348,  480  },
+    { 320,  349,  480  },
+    { 384,  417,  576  },
+    { 384,  418,  576  },
+    { 448,  487,  672  },
+    { 448,  488,  672  },
+    { 512,  557,  768  },
+    { 512,  558,  768  },
+    { 640,  696,  960  },
+    { 640,  697,  960  },
+    { 768,  835,  1152 },
+    { 768,  836,  1152 },
+    { 896,  975,  1344 },
+    { 896,  976,  1344 },
+    { 1024, 1114, 1536 },
+    { 1024, 1115, 1536 },
+    { 1152, 1253, 1728 },
+    { 1152, 1254, 1728 },
+    { 1280, 1393, 1920 },
+    { 1280, 1394, 1920 },
+};
+
+/**
+ * Maps audio coding mode (acmod) to number of full-bandwidth channels.
+ * from ATSC A/52 Table 5.8 Audio Coding Mode
+ */
+const uint8_t ff_ac3_channels[8] = {
+    2, 1, 2, 3, 3, 4, 4, 5
+};
+
 /* possible frequencies */
-static const uint16_t ac3_freqs[3] = { 48000, 44100, 32000 };
+const uint16_t ff_ac3_freqs[3] = { 48000, 44100, 32000 };
 
 /* possible bitrates */
-static const uint16_t ac3_bitratetab[19] = {
+const uint16_t ff_ac3_bitratetab[19] = {
     32, 40, 48, 56, 64, 80, 96, 112, 128,
     160, 192, 224, 256, 320, 384, 448, 512, 576, 640
 };
@@ -36,7 +89,7 @@ static const uint16_t ac3_bitratetab[19] = {
 /* AC3 MDCT window */
 
 /* MDCT window */
-static const int16_t ac3_window[256] = {
+const int16_t ff_ac3_window[256] = {
     4,    7,   12,   16,   21,   28,   34,   42,
    51,   61,   72,   84,   97,  111,  127,  145,
   164,  184,  207,  231,  257,  285,  315,  347,
@@ -165,27 +218,27 @@ static const uint8_t baptab[64]= {
     15, 15, 15, 15,
 };
 
-static const uint8_t sdecaytab[4]={
+const uint8_t ff_sdecaytab[4]={
     0x0f, 0x11, 0x13, 0x15,
 };
 
-static const uint8_t fdecaytab[4]={
+const uint8_t ff_fdecaytab[4]={
     0x3f, 0x53, 0x67, 0x7b,
 };
 
-static const uint16_t sgaintab[4]= {
+const uint16_t ff_sgaintab[4]= {
     0x540, 0x4d8, 0x478, 0x410,
 };
 
-static const uint16_t dbkneetab[4]= {
+const uint16_t ff_dbkneetab[4]= {
     0x000, 0x700, 0x900, 0xb00,
 };
 
-static const int16_t floortab[8]= {
+const int16_t ff_floortab[8]= {
     0x2f0, 0x2b0, 0x270, 0x230, 0x1f0, 0x170, 0x0f0, 0xf800,
 };
 
-static const uint16_t fgaintab[8]= {
+const uint16_t ff_fgaintab[8]= {
     0x080, 0x100, 0x180, 0x200, 0x280, 0x300, 0x380, 0x400,
 };
 
@@ -196,10 +249,3 @@ static const uint8_t bndsz[50]={
 };
 
 static uint8_t bndtab[51];
-
-/* fft & mdct sin cos tables */
-static int16_t costab[64];
-static int16_t sintab[64];
-static int16_t fft_rev[512];
-static int16_t xcos1[128];
-static int16_t xsin1[128];

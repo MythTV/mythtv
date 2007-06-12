@@ -74,11 +74,8 @@ static int ulaw2linear(unsigned char u_val)
 }
 
 /* 16384 entries per table */
-static uint8_t *linear_to_alaw = NULL;
-static int linear_to_alaw_ref = 0;
-
-static uint8_t *linear_to_ulaw = NULL;
-static int linear_to_ulaw_ref = 0;
+static uint8_t linear_to_alaw[16384];
+static uint8_t linear_to_ulaw[16384];
 
 static void build_xlaw_table(uint8_t *linear_to_xlaw,
                              int (*xlaw2linear)(unsigned char),
@@ -109,22 +106,10 @@ static int pcm_encode_init(AVCodecContext *avctx)
     avctx->frame_size = 1;
     switch(avctx->codec->id) {
     case CODEC_ID_PCM_ALAW:
-        if (linear_to_alaw_ref == 0) {
-            linear_to_alaw = av_malloc(16384);
-            if (!linear_to_alaw)
-                return -1;
-            build_xlaw_table(linear_to_alaw, alaw2linear, 0xd5);
-        }
-        linear_to_alaw_ref++;
+        build_xlaw_table(linear_to_alaw, alaw2linear, 0xd5);
         break;
     case CODEC_ID_PCM_MULAW:
-        if (linear_to_ulaw_ref == 0) {
-            linear_to_ulaw = av_malloc(16384);
-            if (!linear_to_ulaw)
-                return -1;
-            build_xlaw_table(linear_to_ulaw, ulaw2linear, 0xff);
-        }
-        linear_to_ulaw_ref++;
+        build_xlaw_table(linear_to_ulaw, ulaw2linear, 0xff);
         break;
     default:
         break;
@@ -170,19 +155,6 @@ static int pcm_encode_close(AVCodecContext *avctx)
 {
     av_freep(&avctx->coded_frame);
 
-    switch(avctx->codec->id) {
-    case CODEC_ID_PCM_ALAW:
-        if (--linear_to_alaw_ref == 0)
-            av_free(linear_to_alaw);
-        break;
-    case CODEC_ID_PCM_MULAW:
-        if (--linear_to_ulaw_ref == 0)
-            av_free(linear_to_ulaw);
-        break;
-    default:
-        /* nothing to free */
-        break;
-    }
     return 0;
 }
 
@@ -409,6 +381,12 @@ static int pcm_decode_frame(AVCodecContext *avctx,
 
     samples = data;
     src = buf;
+
+    n= av_get_bits_per_sample(avctx->codec_id)/8;
+    if(n && buf_size % n){
+        av_log(avctx, AV_LOG_ERROR, "invalid PCM packet\n");
+        return -1;
+    }
 
     buf_size= FFMIN(buf_size, *data_size/2);
     *data_size=0;

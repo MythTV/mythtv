@@ -24,11 +24,21 @@
  * Common code between AC3 encoder and decoder.
  */
 
+#ifndef AC3_H
+#define AC3_H
+
 #define AC3_MAX_CODED_FRAME_SIZE 3840 /* in bytes */
 #define AC3_MAX_CHANNELS 6 /* including LFE channel */
+#define FBW_CHANNELS     5
 
 #define NB_BLOCKS 6 /* number of PCM blocks inside an AC3 frame */
-#define AC3_FRAME_SIZE (NB_BLOCKS * 256)
+#define AC3_BLOCK_SIZE  256
+#define AC3_FRAME_SIZE (NB_BLOCKS * AC3_BLOCK_SIZE)
+#define DBA_SEG_MAX       8
+#define AC3_MAX_COEFS   256
+
+#define MDCT_NBITS  9
+#define N          (1 << MDCT_NBITS) /* constant for MDCT Block size */
 
 /* exponent encoding strategy */
 #define EXP_REUSE 0
@@ -38,6 +48,32 @@
 #define EXP_D25   2
 #define EXP_D45   3
 
+/* delta bit allocation strategy */
+#define DBA_NEW      0x01
+#define DBA_NONE     0x02
+#define DBA_RESERVED 0x03
+#define DBA_REUSE    0x00
+
+/** AC-3 channel mode (audio coding mode) */
+typedef enum {
+    AC3_CHANNEL_MODE_DUALMONO = 0,
+    AC3_CHANNEL_MODE_MONO,
+    AC3_CHANNEL_MODE_STEREO,
+    AC3_CHANNEL_MODE_3F,
+    AC3_CHANNEL_MODE_2F_1R,
+    AC3_CHANNEL_MODE_3F_1R,
+    AC3_CHANNEL_MODE_2F_2R,
+    AC3_CHANNEL_MODE_3F_2R
+} AC3ChannelMode;
+
+/** adjustments in dB gain */
+#define LEVEL_MINUS_3DB         (0.7071067811865476f) /* sqrt(2)/2 */
+#define LEVEL_MINUS_4POINT5DB   (0.5946035575013605f)
+#define LEVEL_MINUS_6DB         (0.5000000000000000f)
+#define LEVEL_PLUS_3DB          (1.4142135623730951f) /* sqrt(2) */
+#define LEVEL_PLUS_6DB          (2.0000000000000000f)
+#define LEVEL_ZERO              (0.0000000000000000f)
+
 typedef struct AC3BitAllocParameters {
     int fscod; /* frequency */
     int halfratecod;
@@ -45,21 +81,117 @@ typedef struct AC3BitAllocParameters {
     int cplfleak, cplsleak;
 } AC3BitAllocParameters;
 
-#if 0
-extern const uint16_t ac3_freqs[3];
-extern const uint16_t ac3_bitratetab[19];
-extern const int16_t ac3_window[256];
-extern const uint8_t sdecaytab[4];
-extern const uint8_t fdecaytab[4];
-extern const uint16_t sgaintab[4];
-extern const uint16_t dbkneetab[4];
-extern const uint16_t floortab[8];
-extern const uint16_t fgaintab[8];
-#endif
+/**
+ * @struct AC3HeaderInfo
+ * Coded AC-3 header values up to the lfeon element, plus derived values.
+ */
+typedef struct {
+    /** @defgroup coded Coded elements
+     * @{
+     */
+    uint16_t sync_word;
+    uint16_t crc1;
+    uint8_t fscod;
+    uint8_t frmsizecod;
+    uint8_t bsid;
+    uint8_t bsmod;
+    uint8_t acmod;
+    uint8_t cmixlev;
+    uint8_t surmixlev;
+    uint8_t dsurmod;
+    uint8_t lfeon;
+    /** @} */
+
+    /** @defgroup derived Derived values
+     * @{
+     */
+    uint8_t halfratecod;
+    uint16_t sample_rate;
+    uint32_t bit_rate;
+    uint8_t channels;
+    uint16_t frame_size;
+    /** @} */
+} AC3HeaderInfo;
+
+extern const uint16_t ff_ac3_frame_sizes[38][3];
+extern const uint8_t ff_ac3_channels[8];
+extern const uint16_t ff_ac3_freqs[3];
+extern const uint16_t ff_ac3_bitratetab[19];
+extern const int16_t ff_ac3_window[256];
+extern const uint8_t ff_sdecaytab[4];
+extern const uint8_t ff_fdecaytab[4];
+extern const uint16_t ff_sgaintab[4];
+extern const uint16_t ff_dbkneetab[4];
+extern const int16_t ff_floortab[8];
+extern const uint16_t ff_fgaintab[8];
 
 void ac3_common_init(void);
+
+/**
+ * Calculates the log power-spectral density of the input signal.
+ * This gives a rough estimate of signal power in the frequency domain by using
+ * the spectral envelope (exponents).  The psd is also separately grouped
+ * into critical bands for use in the calculating the masking curve.
+ * 128 units in psd = -6 dB.  The dbknee parameter in AC3BitAllocParameters
+ * determines the reference level.
+ *
+ * @param[in]  exp        frequency coefficient exponents
+ * @param[in]  start      starting bin location
+ * @param[in]  end        ending bin location
+ * @param[out] psd        signal power for each frequency bin
+ * @param[out] bndpsd     signal power for each critical band
+ */
+void ff_ac3_bit_alloc_calc_psd(int8_t *exp, int start, int end, int16_t *psd,
+                               int16_t *bndpsd);
+
+/**
+ * Calculates the masking curve.
+ * First, the excitation is calculated using parameters in \p s and the signal
+ * power in each critical band.  The excitation is compared with a predefined
+ * hearing threshold table to produce the masking curve.  If delta bit
+ * allocation information is provided, it is used for adjusting the masking
+ * curve, usually to give a closer match to a better psychoacoustic model.
+ *
+ * @param[in]  s          adjustable bit allocation parameters
+ * @param[in]  bndpsd     signal power for each critical band
+ * @param[in]  start      starting bin location
+ * @param[in]  end        ending bin location
+ * @param[in]  fgain      fast gain (estimated signal-to-mask ratio)
+ * @param[in]  is_lfe     whether or not the channel being processed is the LFE
+ * @param[in]  deltbae    delta bit allocation exists (none, reuse, or new)
+ * @param[in]  deltnseg   number of delta segments
+ * @param[in]  deltoffst  location offsets for each segment
+ * @param[in]  deltlen    length of each segment
+ * @param[in]  deltba     delta bit allocation for each segment
+ * @param[out] mask       calculated masking curve
+ */
+void ff_ac3_bit_alloc_calc_mask(AC3BitAllocParameters *s, int16_t *bndpsd,
+                                int start, int end, int fgain, int is_lfe,
+                                int deltbae, int deltnseg, uint8_t *deltoffst,
+                                uint8_t *deltlen, uint8_t *deltba,
+                                int16_t *mask);
+
+/**
+ * Calculates bit allocation pointers.
+ * The SNR is the difference between the masking curve and the signal.  AC-3
+ * uses this value for each frequency bin to allocate bits.  The \p snroffset
+ * parameter is a global adjustment to the SNR for all bins.
+ *
+ * @param[in]  mask       masking curve
+ * @param[in]  psd        signal power for each frequency bin
+ * @param[in]  start      starting bin location
+ * @param[in]  end        ending bin location
+ * @param[in]  snroffset  SNR adjustment
+ * @param[in]  floor      noise floor
+ * @param[out] bap        bit allocation pointers
+ */
+void ff_ac3_bit_alloc_calc_bap(int16_t *mask, int16_t *psd, int start, int end,
+                               int snroffset, int floor, uint8_t *bap);
+
 void ac3_parametric_bit_allocation(AC3BitAllocParameters *s, uint8_t *bap,
                                    int8_t *exp, int start, int end,
                                    int snroffset, int fgain, int is_lfe,
                                    int deltbae,int deltnseg,
                                    uint8_t *deltoffst, uint8_t *deltlen, uint8_t *deltba);
+
+#endif /* AC3_H */

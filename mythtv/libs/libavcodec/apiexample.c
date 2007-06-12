@@ -32,6 +32,8 @@
 #include <string.h>
 #include <math.h>
 
+#define PI 3.14159265358979323846
+
 #ifdef HAVE_AV_CONFIG_H
 #undef HAVE_AV_CONFIG_H
 #endif
@@ -89,7 +91,7 @@ void audio_encode_example(const char *filename)
 
     /* encode a single tone sound */
     t = 0;
-    tincr = 2 * M_PI * 440.0 / c->sample_rate;
+    tincr = 2 * PI * 440.0 / c->sample_rate;
     for(i=0;i<200;i++) {
         for(j=0;j<frame_size;j++) {
             samples[2*j] = (int)(sin(t) * 10000);
@@ -121,9 +123,6 @@ void audio_decode_example(const char *outfilename, const char *filename)
     uint8_t inbuf[INBUF_SIZE + FF_INPUT_BUFFER_PADDING_SIZE], *inbuf_ptr;
 
     printf("Audio decoding\n");
-
-    /* set end of buffer to 0 (this ensures that no overreading happens for damaged mpeg streams) */
-    memset(inbuf + INBUF_SIZE, 0, FF_INPUT_BUFFER_PADDING_SIZE);
 
     /* find the mpeg audio decoder */
     codec = avcodec_find_decoder(CODEC_ID_MP2);
@@ -225,8 +224,6 @@ void video_encode_example(const char *filename)
         fprintf(stderr, "could not open codec\n");
         exit(1);
     }
-
-    /* the codec gives us the frame size, in samples */
 
     f = fopen(filename, "wb");
     if (!f) {

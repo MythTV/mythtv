@@ -200,9 +200,11 @@ typedef struct DSPContext {
     me_cmp_func ildct_cmp[5]; //only width 16 used
     me_cmp_func frame_skip_cmp[5]; //only width 8 used
 
+    int (*ssd_int8_vs_int16)(int8_t *pix1, int16_t *pix2, int size);
+
     /**
      * Halfpel motion compensation with rounding (a+b+1)>>1.
-     * this is an array[4][4] of motion compensation funcions for 4
+     * this is an array[4][4] of motion compensation functions for 4
      * horizontal blocksizes (8,16) and the 4 halfpel positions<br>
      * *pixels_tab[ 0->16xH 1->8xH ][ xhalfpel + 2*yhalfpel ]
      * @param block destination where the result is stored
@@ -226,7 +228,7 @@ typedef struct DSPContext {
 
     /**
      * Halfpel motion compensation with no rounding (a+b)>>1.
-     * this is an array[2][4] of motion compensation funcions for 2
+     * this is an array[2][4] of motion compensation functions for 2
      * horizontal blocksizes (8,16) and the 4 halfpel positions<br>
      * *pixels_tab[ 0->16xH 1->8xH ][ xhalfpel + 2*yhalfpel ]
      * @param block destination where the result is stored
@@ -238,7 +240,7 @@ typedef struct DSPContext {
 
     /**
      * Halfpel motion compensation with no rounding (a+b)>>1.
-     * this is an array[2][4] of motion compensation funcions for 2
+     * this is an array[2][4] of motion compensation functions for 2
      * horizontal blocksizes (8,16) and the 4 halfpel positions<br>
      * *pixels_tab[ 0->16xH 1->8xH ][ xhalfpel + 2*yhalfpel ]
      * @param block destination into which the result is averaged (a+b)>>1
@@ -252,7 +254,8 @@ typedef struct DSPContext {
 
     /**
      * Thirdpel motion compensation with rounding (a+b+1)>>1.
-     * this is an array[12] of motion compensation funcions for the 9 thirdpel positions<br>
+     * this is an array[12] of motion compensation functions for the 9 thirdpe
+     * positions<br>
      * *pixels_tab[ xthirdpel + 4*ythirdpel ]
      * @param block destination where the result is stored
      * @param pixels source
@@ -269,7 +272,7 @@ typedef struct DSPContext {
     qpel_mc_func put_mspel_pixels_tab[8];
 
     /**
-     * h264 Chram MC
+     * h264 Chroma MC
      */
     h264_chroma_mc_func put_h264_chroma_pixels_tab[3];
     /* This is really one func used in VC-1 decoding */
@@ -388,7 +391,7 @@ typedef struct DSPContext {
     /* snow wavelet */
     void (*vertical_compose97i)(DWTELEM *b0, DWTELEM *b1, DWTELEM *b2, DWTELEM *b3, DWTELEM *b4, DWTELEM *b5, int width);
     void (*horizontal_compose97i)(DWTELEM *b, int width);
-    void (*inner_add_yblock)(uint8_t *obmc, const int obmc_stride, uint8_t * * block, int b_w, int b_h, int src_x, int src_y, int src_stride, slice_buffer * sb, int add, uint8_t * dst8);
+    void (*inner_add_yblock)(const uint8_t *obmc, const int obmc_stride, uint8_t * * block, int b_w, int b_h, int src_x, int src_y, int src_stride, slice_buffer * sb, int add, uint8_t * dst8);
 
     void (*prefetch)(void *mem, int stride, int h);
 

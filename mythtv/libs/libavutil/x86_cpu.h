@@ -29,7 +29,6 @@
 #  define REG_D "rdi"
 #  define REG_S "rsi"
 #  define PTR_SIZE "8"
-#  define ALIGN_MASK "$0xFFFFFFFFFFFFFFF8"
 
 #  define REG_SP "rsp"
 #  define REG_BP "rbp"
@@ -37,7 +36,6 @@
 #  define REGa    rax
 #  define REGb    rbx
 #  define REGc    rcx
-#  define REGd    rdx
 #  define REGSP   rsp
 
 #else
@@ -49,7 +47,6 @@
 #  define REG_D "edi"
 #  define REG_S "esi"
 #  define PTR_SIZE "4"
-#  define ALIGN_MASK "$0xFFFFFFF8"
 
 #  define REG_SP "esp"
 #  define REG_BP "ebp"
@@ -57,8 +54,11 @@
 #  define REGa    eax
 #  define REGb    ebx
 #  define REGc    ecx
-#  define REGd    edx
 #  define REGSP   esp
+#endif
+
+#if defined(ARCH_X86_64) || (defined(ARCH_X86_32) && defined(CONFIG_EBX_AVAILABLE) && defined(CONFIG_EBP_AVAILABLE))
+#  define CONFIG_7REGS 1
 #endif
 
 #endif /* AVUTIL_X86CPU_H */

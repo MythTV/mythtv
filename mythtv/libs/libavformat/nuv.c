@@ -35,8 +35,6 @@ typedef enum {
 } frametype_t;
 
 static int nuv_probe(AVProbeData *p) {
-    if (p->buf_size < 12)
-        return 0;
     if (!memcmp(p->buf, "NuppelVideo", 12))
         return AVPROBE_SCORE_MAX;
     if (!memcmp(p->buf, "MythTVVideo", 12))
@@ -117,7 +115,7 @@ static int get_codec_data(ByteIOContext *pb, AVStream *vst,
 }
 
 static int nuv_header(AVFormatContext *s, AVFormatParameters *ap) {
-    NUVContext *ctx = (NUVContext *)s->priv_data;
+    NUVContext *ctx = s->priv_data;
     ByteIOContext *pb = &s->pb;
     char id_string[12], version_string[5];
     double aspect, fps;
@@ -154,7 +152,7 @@ static int nuv_header(AVFormatContext *s, AVFormatParameters *ap) {
         vst->codec->height = height;
         vst->codec->bits_per_sample = 10;
         vst->codec->sample_aspect_ratio = av_d2q(aspect, 10000);
-        vst->r_frame_rate = av_d2q(1.0 / fps, 10000);
+        vst->r_frame_rate = av_d2q(fps, 60000);
         av_set_pts_info(vst, 32, 1, 1000);
     } else
         ctx->v_id = -1;
@@ -180,7 +178,7 @@ static int nuv_header(AVFormatContext *s, AVFormatParameters *ap) {
 #define HDRSIZE 12
 
 static int nuv_packet(AVFormatContext *s, AVPacket *pkt) {
-    NUVContext *ctx = (NUVContext *)s->priv_data;
+    NUVContext *ctx = s->priv_data;
     ByteIOContext *pb = &s->pb;
     uint8_t hdr[HDRSIZE];
     frametype_t frametype;

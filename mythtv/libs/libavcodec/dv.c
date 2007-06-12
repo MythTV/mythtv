@@ -75,12 +75,12 @@ static void* dv_anchor[DV_ANCHOR_SIZE];
 #endif
 
 /* XXX: also include quantization */
-static RL_VLC_ELEM *dv_rl_vlc;
+static RL_VLC_ELEM dv_rl_vlc[1184];
 /* VLC encoding lookup table */
 static struct dv_vlc_pair {
    uint32_t vlc;
    uint8_t  size;
-} (*dv_vlc_map)[DV_VLC_MAP_LEV_SIZE] = NULL;
+} dv_vlc_map[DV_VLC_MAP_RUN_SIZE][DV_VLC_MAP_LEV_SIZE];
 
 static void dv_build_unquantize_tables(DVVideoContext *s, uint8_t* perm)
 {
@@ -123,10 +123,6 @@ static int dvvideo_init(AVCodecContext *avctx)
 
         done = 1;
 
-        dv_vlc_map = av_mallocz_static(DV_VLC_MAP_LEV_SIZE*DV_VLC_MAP_RUN_SIZE*sizeof(struct dv_vlc_pair));
-        if (!dv_vlc_map)
-            return -ENOMEM;
-
         /* dv_anchor lets each thread know its Id */
         for (i=0; i<DV_ANCHOR_SIZE; i++)
             dv_anchor[i] = (void*)(size_t)i;
@@ -154,10 +150,7 @@ static int dvvideo_init(AVCodecContext *avctx)
            to accelerate the parsing of partial codes */
         init_vlc(&dv_vlc, TEX_VLC_BITS, j,
                  new_dv_vlc_len, 1, 1, new_dv_vlc_bits, 2, 2, 0);
-
-        dv_rl_vlc = av_mallocz_static(dv_vlc.table_size * sizeof(RL_VLC_ELEM));
-        if (!dv_rl_vlc)
-            return -ENOMEM;
+        assert(dv_vlc.table_size == 1184);
 
         for(i = 0; i < dv_vlc.table_size; i++){
             int code= dv_vlc.table[i][0];
@@ -845,7 +838,7 @@ static inline void dv_encode_video_segment(DVVideoContext *s,
     uint8_t*  data;
     uint8_t*  ptr;
     int       do_edge_wrap;
-    DECLARE_ALIGNED_8(DCTELEM, block[64]);
+    DECLARE_ALIGNED_16(DCTELEM, block[64]);
     EncBlockInfo  enc_blks[5*6];
     PutBitContext pbs[5*6];
     PutBitContext* pb;
@@ -853,7 +846,7 @@ static inline void dv_encode_video_segment(DVVideoContext *s,
     int       vs_bit_size = 0;
     int       qnos[5];
 
-    assert((((int)block) & 7) == 0);
+    assert((((int)block) & 15) == 0);
 
     enc_blk = &enc_blks[0];
     pb = &pbs[0];

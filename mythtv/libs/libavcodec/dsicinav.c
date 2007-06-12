@@ -88,12 +88,11 @@ static const int16_t cinaudio_delta16_table[256] = {
 
 static int cinvideo_decode_init(AVCodecContext *avctx)
 {
-    CinVideoContext *cin = (CinVideoContext *)avctx->priv_data;
+    CinVideoContext *cin = avctx->priv_data;
     unsigned int i;
 
     cin->avctx = avctx;
     avctx->pix_fmt = PIX_FMT_PAL8;
-    avctx->has_b_frames = 0;
 
     cin->frame.data[0] = NULL;
 
@@ -198,7 +197,7 @@ static int cinvideo_decode_frame(AVCodecContext *avctx,
                                  void *data, int *data_size,
                                  uint8_t *buf, int buf_size)
 {
-    CinVideoContext *cin = (CinVideoContext *)avctx->priv_data;
+    CinVideoContext *cin = avctx->priv_data;
     int i, y, palette_type, palette_colors_count, bitmap_frame_type, bitmap_frame_size;
 
     cin->frame.buffer_hints = FF_BUFFER_HINTS_VALID | FF_BUFFER_HINTS_PRESERVE | FF_BUFFER_HINTS_REUSABLE;
@@ -288,7 +287,7 @@ static int cinvideo_decode_frame(AVCodecContext *avctx,
 
 static int cinvideo_decode_end(AVCodecContext *avctx)
 {
-    CinVideoContext *cin = (CinVideoContext *)avctx->priv_data;
+    CinVideoContext *cin = avctx->priv_data;
     int i;
 
     if (cin->frame.data[0])
@@ -302,7 +301,7 @@ static int cinvideo_decode_end(AVCodecContext *avctx)
 
 static int cinaudio_decode_init(AVCodecContext *avctx)
 {
-    CinAudioContext *cin = (CinAudioContext *)avctx->priv_data;
+    CinAudioContext *cin = avctx->priv_data;
 
     cin->avctx = avctx;
     cin->initial_decode_frame = 1;
@@ -315,7 +314,7 @@ static int cinaudio_decode_frame(AVCodecContext *avctx,
                                  void *data, int *data_size,
                                  uint8_t *buf, int buf_size)
 {
-    CinAudioContext *cin = (CinAudioContext *)avctx->priv_data;
+    CinAudioContext *cin = avctx->priv_data;
     uint8_t *src = buf;
     int16_t *samples = (int16_t *)data;
 
@@ -327,7 +326,7 @@ static int cinaudio_decode_frame(AVCodecContext *avctx,
     }
     while (buf_size > 0) {
         cin->delta += cinaudio_delta16_table[*src++];
-        cin->delta = clip(cin->delta, -32768, 32767);
+        cin->delta = av_clip(cin->delta, -32768, 32767);
         *samples++ = cin->delta;
         --buf_size;
     }

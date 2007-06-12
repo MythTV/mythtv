@@ -23,11 +23,7 @@
 #include "bitstream.h"
 
 #include <unistd.h>
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
-#include <netdb.h>
+#include "network.h"
 
 #include "rtp_internal.h"
 #include "rtp_h264.h"
@@ -190,7 +186,7 @@ static void register_dynamic_payload_handler(RTPDynamicProtocolHandler *handler)
     RTPFirstDynamicPayloadHandler= handler;
 }
 
-void av_register_rtp_dynamic_payload_handlers()
+void av_register_rtp_dynamic_payload_handlers(void)
 {
     register_dynamic_payload_handler(&mp4v_es_handler);
     register_dynamic_payload_handler(&mpeg4_generic_handler);
@@ -211,7 +207,6 @@ int rtp_get_codec_info(AVCodecContext *codec, int payload_type)
     return -1;
 }
 
-/* return < 0 if unknown payload type */
 int rtp_get_payload_type(AVCodecContext *codec)
 {
     int i, payload_type;
@@ -340,11 +335,6 @@ static void rtcp_update_jitter(RTPStatistics *s, uint32_t sent_timestamp, uint32
 }
 #endif
 
-/**
- * some rtp servers assume client is dead if they don't hear from them...
- * so we send a Receiver Report to the provided ByteIO context
- * (we don't have access to the rtcp handle from here)
- */
 int rtp_check_and_send_back_rr(RTPDemuxContext *s, int count)
 {
     ByteIOContext pb;
@@ -479,7 +469,7 @@ RTPDemuxContext *rtp_parse_open(AVFormatContext *s1, AVStream *st, URLContext *r
         case CODEC_ID_MP3:
         case CODEC_ID_MPEG4:
         case CODEC_ID_H264:
-            st->need_parsing = 1;
+            st->need_parsing = AVSTREAM_PARSE_FULL;
             break;
         default:
             break;

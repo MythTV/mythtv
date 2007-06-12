@@ -33,7 +33,7 @@ extern "C" {
 #endif // USING_XVMC
 
 extern "C" {
-#include "libavcodec/liba52/a52.h"
+#include "../libavcodec/parser.h"
 #include "../libmythmpeg2/mpeg2.h"
 #include "ivtv_myth.h"
 // from libavcodec
@@ -775,7 +775,7 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
     fmt->flags &= ~AVFMT_NOFILE;
 
     if (!ringBuffer->isDVD() && !livetv)
-        av_estimate_timings(ic);
+        av_estimate_timings(ic, 0);
 
     av_read_frame_flush(ic);
 
@@ -3572,7 +3572,16 @@ static int encode_frame(bool dts, unsigned char *data, int len,
     }
     else
     {
-        enc_len = a52_syncinfo(data, &flags, &sample_rate, &bit_rate);
+        AC3HeaderInfo hdr;
+        if (!ff_ac3_parse_header(data, &hdr))
+        {
+            enc_len = hdr.frame_size;
+        }
+        else
+        {
+            // creates endless loop
+            enc_len = 0;
+        }
         block_len = MAX_AC3_FRAME_SIZE;
     }
 

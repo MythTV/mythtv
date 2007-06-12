@@ -42,7 +42,7 @@ struct dc1394_frame_format {
     int frame_size_id;
 } dc1394_frame_formats[] = {
     { 320, 240, PIX_FMT_UYVY422, MODE_320x240_YUV422 },
-    { 640, 480, PIX_FMT_UYVY411, MODE_640x480_YUV411 },
+    { 640, 480, PIX_FMT_UYYVYY411, MODE_640x480_YUV411 },
     { 640, 480, PIX_FMT_UYVY422, MODE_640x480_YUV422 },
     {   0,   0, 0, MODE_320x240_YUV422 } /* default -- gotta be the last one */
 };
@@ -118,7 +118,7 @@ static int dc1394_read_header(AVFormatContext *c, AVFormatParameters * ap)
                                    fmt->frame_size_id,
                                    SPEED_400,
                                    fps->frame_rate_id, 8, 1,
-                                   ap->device,
+                                   c->filename,
                                    &dc1394->camera);
     dc1394_free_camera_nodes(camera_nodes);
     if (res != DC1394_SUCCESS) {

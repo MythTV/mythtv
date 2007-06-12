@@ -285,8 +285,8 @@ static inline void svq3_mc_dir_part (MpegEncContext *s,
       emu = 1;
     }
 
-    mx = clip (mx, -16, (s->h_edge_pos - width  + 15));
-    my = clip (my, -16, (s->v_edge_pos - height + 15));
+    mx = av_clip (mx, -16, (s->h_edge_pos - width  + 15));
+    my = av_clip (my, -16, (s->v_edge_pos - height + 15));
   }
 
   /* form component predictions */
@@ -361,8 +361,8 @@ static inline int svq3_mc_dir (H264Context *h, int size, int mode, int dir, int 
       }
 
       /* clip motion vector prediction to frame border */
-      mx = clip (mx, extra_width - 6*x, h_edge_pos - 6*x);
-      my = clip (my, extra_width - 6*y, v_edge_pos - 6*y);
+      mx = av_clip (mx, extra_width - 6*x, h_edge_pos - 6*x);
+      my = av_clip (my, extra_width - 6*y, v_edge_pos - 6*y);
 
       /* get (optional) motion vector differential */
       if (mode == PREDICT_MODE) {
@@ -826,7 +826,7 @@ static int svq3_decode_frame (AVCodecContext *avctx,
     }
 
     /* if a match was found, parse the extra data */
-    if (!memcmp (extradata, "SEQH", 4)) {
+    if (extradata && !memcmp (extradata, "SEQH", 4)) {
 
       GetBitContext gb;
 
@@ -910,7 +910,8 @@ static int svq3_decode_frame (AVCodecContext *avctx,
       s->next_p_frame_damaged = 0;
   }
 
-  frame_start (h);
+  if (frame_start (h) < 0)
+    return -1;
 
   if (s->pict_type == B_TYPE) {
     h->frame_num_offset = (h->slice_num - h->prev_frame_num);

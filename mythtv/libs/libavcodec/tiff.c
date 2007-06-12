@@ -19,54 +19,19 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  *
  */
+
+/**
+ * TIFF image decoder
+ * @file tiff.c
+ * @author Konstantin Shishkov
+ */
 #include "avcodec.h"
 #ifdef CONFIG_ZLIB
 #include <zlib.h>
 #endif
 #include "lzw.h"
+#include "tiff.h"
 
-/* abridged list of TIFF tags */
-enum TiffTags{
-    TIFF_WIDTH = 0x100,
-    TIFF_HEIGHT,
-    TIFF_BPP,
-    TIFF_COMPR,
-    TIFF_INVERT = 0x106,
-    TIFF_STRIP_OFFS = 0x111,
-    TIFF_ROWSPERSTRIP = 0x116,
-    TIFF_STRIP_SIZE,
-    TIFF_PLANAR = 0x11C,
-    TIFF_XPOS = 0x11E,
-    TIFF_YPOS = 0x11F,
-    TIFF_PREDICTOR = 0x13D,
-    TIFF_PAL = 0x140
-};
-
-enum TiffCompr{
-    TIFF_RAW = 1,
-    TIFF_CCITT_RLE,
-    TIFF_G3,
-    TIFF_G4,
-    TIFF_LZW,
-    TIFF_JPEG,
-    TIFF_NEWJPEG,
-    TIFF_ADOBE_DEFLATE,
-    TIFF_PACKBITS = 0x8005,
-    TIFF_DEFLATE = 0x80B2
-};
-
-enum TiffTypes{
-    TIFF_BYTE = 1,
-    TIFF_STRING,
-    TIFF_SHORT,
-    TIFF_LONG,
-    TIFF_LONGLONG
-};
-
-/** sizes of various TIFF field types */
-static const int type_sizes[6] = {
-    0, 1, 100, 2, 4, 8
-};
 
 typedef struct TiffContext {
     AVCodecContext *avctx;
@@ -332,6 +297,7 @@ static int tiff_decode_tag(TiffContext *s, uint8_t *start, uint8_t *buf, uint8_t
         }else
             s->stripdata = start + off;
         s->strips = count;
+        if(s->strips == 1) s->rps = s->height;
         s->sot = type;
         if(s->stripdata > end_buf){
             av_log(s->avctx, AV_LOG_ERROR, "Tag referencing position outside the image\n");

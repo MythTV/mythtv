@@ -391,7 +391,7 @@ static int cinepak_decode (CinepakContext *s)
 
 static int cinepak_decode_init(AVCodecContext *avctx)
 {
-    CinepakContext *s = (CinepakContext *)avctx->priv_data;
+    CinepakContext *s = avctx->priv_data;
 
     s->avctx = avctx;
     s->width = (avctx->width + 3) & ~3;
@@ -407,7 +407,6 @@ static int cinepak_decode_init(AVCodecContext *avctx)
         avctx->pix_fmt = PIX_FMT_PAL8;
     }
 
-    avctx->has_b_frames = 0;
     dsputil_init(&s->dsp, avctx);
 
     s->frame.data[0] = NULL;
@@ -419,7 +418,7 @@ static int cinepak_decode_frame(AVCodecContext *avctx,
                                 void *data, int *data_size,
                                 uint8_t *buf, int buf_size)
 {
-    CinepakContext *s = (CinepakContext *)avctx->priv_data;
+    CinepakContext *s = avctx->priv_data;
 
     s->data = buf;
     s->size = buf_size;
@@ -452,7 +451,7 @@ static int cinepak_decode_frame(AVCodecContext *avctx,
 
 static int cinepak_decode_end(AVCodecContext *avctx)
 {
-    CinepakContext *s = (CinepakContext *)avctx->priv_data;
+    CinepakContext *s = avctx->priv_data;
 
     if (s->frame.data[0])
         avctx->release_buffer(avctx, &s->frame);

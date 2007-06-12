@@ -36,6 +36,14 @@
 #endif
 #include <time.h>
 
+#ifndef HAVE_SYS_POLL_H
+#if defined(__MINGW32__)
+#include <winsock2.h>
+#else
+#include <sys/select.h>
+#endif
+#endif
+
 /**
  * gets the current time in micro seconds.
  */
@@ -70,7 +78,7 @@ struct tm *localtime_r(const time_t *t, struct tm *tp)
 #if !defined(HAVE_INET_ATON) && defined(CONFIG_NETWORK)
 #include <stdlib.h>
 #include <strings.h>
-#include "barpainet.h"
+#include "network.h"
 
 int inet_aton (const char * str, struct in_addr * add)
 {
@@ -94,3 +102,66 @@ done:
     return 1;
 }
 #endif /* !defined(HAVE_INET_ATON) && defined(CONFIG_NETWORK) */
+
+#ifdef CONFIG_FFSERVER
+#ifndef HAVE_SYS_POLL_H
+int poll(struct pollfd *fds, nfds_t numfds, int timeout)
+{
+    fd_set read_set;
+    fd_set write_set;
+    fd_set exception_set;
+    nfds_t i;
+    int n;
+    int rc;
+
+    FD_ZERO(&read_set);
+    FD_ZERO(&write_set);
+    FD_ZERO(&exception_set);
+
+    n = -1;
+    for(i = 0; i < numfds; i++) {
+        if (fds[i].fd < 0)
+            continue;
+        if (fds[i].fd >= FD_SETSIZE) {
+            errno = EINVAL;
+            return -1;
+        }
+
+        if (fds[i].events & POLLIN)  FD_SET(fds[i].fd, &read_set);
+        if (fds[i].events & POLLOUT) FD_SET(fds[i].fd, &write_set);
+        if (fds[i].events & POLLERR) FD_SET(fds[i].fd, &exception_set);
+
+        if (fds[i].fd > n)
+            n = fds[i].fd;
+    };
+
+    if (n == -1)
+        /* Hey!? Nothing to poll, in fact!!! */
+        return 0;
+
+    if (timeout < 0)
+        rc = select(n+1, &read_set, &write_set, &exception_set, NULL);
+    else {
+        struct timeval    tv;
+
+        tv.tv_sec = timeout / 1000;
+        tv.tv_usec = 1000 * (timeout % 1000);
+        rc = select(n+1, &read_set, &write_set, &exception_set, &tv);
+    };
+
+    if (rc < 0)
+        return rc;
+
+    for(i = 0; i < (nfds_t) n; i++) {
+        fds[i].revents = 0;
+
+        if (FD_ISSET(fds[i].fd, &read_set))      fds[i].revents |= POLLIN;
+        if (FD_ISSET(fds[i].fd, &write_set))     fds[i].revents |= POLLOUT;
+        if (FD_ISSET(fds[i].fd, &exception_set)) fds[i].revents |= POLLERR;
+    };
+
+    return rc;
+}
+#endif /* HAVE_SYS_POLL_H */
+#endif /* CONFIG_FFSERVER */
+

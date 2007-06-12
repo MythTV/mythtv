@@ -201,6 +201,7 @@ static int ffm_write_header(AVFormatContext *s)
             put_be32(pb, codec->nsse_weight);
             put_be32(pb, codec->frame_skip_cmp);
             put_be64(pb, av_dbl2int(codec->rc_buffer_aggressivity));
+            put_be32(pb, codec->codec_tag);
             break;
         case CODEC_TYPE_AUDIO:
             put_be32(pb, codec->sample_rate);
@@ -534,6 +535,7 @@ static int ffm_read_header(AVFormatContext *s, AVFormatParameters *ap)
             codec->nsse_weight = get_be32(pb);
             codec->frame_skip_cmp = get_be32(pb);
             codec->rc_buffer_aggressivity = av_int2dbl(get_be64(pb));
+            codec->codec_tag = get_be32(pb);
             break;
         case CODEC_TYPE_AUDIO:
             codec->sample_rate = get_be32(pb);
@@ -579,7 +581,7 @@ static int ffm_read_packet(AVFormatContext *s, AVPacket *pkt)
     switch(ffm->read_state) {
     case READ_HEADER:
         if (!ffm_is_avail_data(s, FRAME_HEADER_SIZE)) {
-            return -EAGAIN;
+            return AVERROR(EAGAIN);
         }
 #if 0
         printf("pos=%08"PRIx64" spos=%"PRIx64", write_index=%"PRIx64" size=%"PRIx64"\n",
@@ -587,7 +589,7 @@ static int ffm_read_packet(AVFormatContext *s, AVPacket *pkt)
 #endif
         if (ffm_read_data(s, ffm->header, FRAME_HEADER_SIZE, 1) !=
             FRAME_HEADER_SIZE)
-            return -EAGAIN;
+            return AVERROR(EAGAIN);
 #if 0
         {
             int i;
@@ -601,7 +603,7 @@ static int ffm_read_packet(AVFormatContext *s, AVPacket *pkt)
     case READ_DATA:
         size = (ffm->header[2] << 16) | (ffm->header[3] << 8) | ffm->header[4];
         if (!ffm_is_avail_data(s, size)) {
-            return -EAGAIN;
+            return AVERROR(EAGAIN);
         }
 
         duration = (ffm->header[5] << 16) | (ffm->header[6] << 8) | ffm->header[7];
@@ -616,7 +618,7 @@ static int ffm_read_packet(AVFormatContext *s, AVPacket *pkt)
         if (ffm_read_data(s, pkt->data, size, 0) != size) {
             /* bad case: desynchronized packet. we cancel all the packet loading */
             av_free_packet(pkt);
-            return -EAGAIN;
+            return AVERROR(EAGAIN);
         }
         if (ffm->first_frame_in_packet)
         {
@@ -756,7 +758,7 @@ static int ffm_read_close(AVFormatContext *s)
 
 static int ffm_probe(AVProbeData *p)
 {
-    if (p->buf_size >= 4 &&
+    if (
         p->buf[0] == 'F' && p->buf[1] == 'F' && p->buf[2] == 'M' &&
         p->buf[3] == '1')
         return AVPROBE_SCORE_MAX + 1;
