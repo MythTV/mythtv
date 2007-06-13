@@ -1222,6 +1222,8 @@ for opt do
   ;;
   --disable-mac-accel) dvdv="no"
   ;;
+  --enable-ffmpeg-threads) enable pthreads
+  ;;
 # disabled due to abuse in Gentoo ebuild
   --disable-frontend)
   ;;
