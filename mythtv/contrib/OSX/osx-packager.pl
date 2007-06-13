@@ -773,10 +773,17 @@ elsif ( ! $OPT{'nohead'} )
   my $cmd = "$svn log $svnrepository --revision HEAD --xml | grep revision";
   &Verbose($cmd);
   my $rev = `$cmd`;
-  $rev =~ s/[^[:digit:]]//gs;
 
-  $svnrepository .= 'trunk/';
-  @svnrevision = ('--revision', $rev);
+  if ( $rev =~ m/revision="(\d+)">/ )
+  {
+    $svnrepository .= 'trunk/';
+    @svnrevision = ('--revision', $1);
+  }
+  else
+  {
+    &Complain("Cannot get head revision - Got '$rev'");
+    die;
+  }
 }
 
 # Retrieve source
