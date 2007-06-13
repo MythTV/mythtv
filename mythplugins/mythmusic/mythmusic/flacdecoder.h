@@ -42,6 +42,10 @@
   #define decoder_process_single FLAC__seekable_stream_decoder_process_single
   #define decoder_get_state FLAC__seekable_stream_decoder_get_state
   #define bytesSize unsigned
+  #define STREAM_DECODER_SEARCH_FOR_METADATA FLAC__SEEKABLE_STREAM_DECODER_OK
+  #define STREAM_DECODER_READ_METADATA FLAC__SEEKABLE_STREAM_DECODER_OK
+  #define STREAM_DECODER_SEARCH_FOR_FRAME_SYNC FLAC__SEEKABLE_STREAM_DECODER_OK
+  #define STREAM_DECODER_READ_FRAME FLAC__SEEKABLE_STREAM_DECODER_OK
 #else
   /* FLAC 1.1.3 and up */
   #define NEWFLAC
@@ -71,6 +75,10 @@
   #define decoder_process_single FLAC__stream_decoder_process_single
   #define decoder_get_state FLAC__stream_decoder_get_state
   #define bytesSize size_t
+  #define STREAM_DECODER_SEARCH_FOR_METADATA FLAC__STREAM_DECODER_SEARCH_FOR_METADATA
+  #define STREAM_DECODER_READ_METADATA FLAC__STREAM_DECODER_READ_METADATA
+  #define STREAM_DECODER_SEARCH_FOR_FRAME_SYNC FLAC__STREAM_DECODER_SEARCH_FOR_FRAME_SYNC
+  #define STREAM_DECODER_READ_FRAME FLAC__STREAM_DECODER_READ_FRAME
 #endif
 
 #include "decoder.h"
