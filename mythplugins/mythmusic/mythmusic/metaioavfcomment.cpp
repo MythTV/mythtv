@@ -139,7 +139,7 @@ int MetaIOAVFComment::getTrackLength(AVFormatContext* pContext)
     if (!pContext)
         return 0;
         
-    av_estimate_timings(pContext);
+    av_estimate_timings(pContext, 0);
     
     return (pContext->duration / AV_TIME_BASE) * 1000;
 }
