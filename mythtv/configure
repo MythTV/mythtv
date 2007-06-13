@@ -2456,7 +2456,7 @@ EOF
    if $cc -o $TMPE $TMPC > /dev/null 2>&1; then
       sys_soundcard_h=yes
       audio_oss=yes
-   elif test "$targetos" = "OpenBSD" ; then
+   elif test "$targetos" = "openbsd" ; then
       soundcard_h=yes
       audio_oss=yes
    fi
@@ -2703,6 +2703,13 @@ if test x"$x11" = x"yes" ; then
     fi
 fi
 
+if test x"$x11" = x"no" ; then 
+    xrandr="no" 
+    xv="no" 
+    xvmc="no" 
+    xvmc_vld="no"
+fi
+
 if test x"$xrandr" = x"yes" ; then
     xrandr="no"
     if has_header X11/extensions/Xrandr.h ; then
@@ -2788,14 +2795,14 @@ fi
 
 if test x"$dvdv" = x"yes" ; then
     # Can only do Mac accel on Mac platform
-    if test $targetos != Darwin; then
+    if test $targetos != darwin; then
         dvdv="no"
     fi
 fi
 
 # CoreVideo in only available on Mac OS 10.4, or on 10.3 with QuickTime 7.
 # This checks for it, and some other calls that the module needs
-if test $targetos = Darwin; then
+if test $targetos = darwin; then
     cat > $TMPC << EOF
 #include <QuartzCore/CVDisplayLink.h>
 #include <AGL/agl.h>
@@ -2832,7 +2839,7 @@ if has_header "sensors/sensors.h" && has_library libsensors ; then
     lmsensors="yes"
 fi
 
-if test x"$darwin" = x"yes" ; then
+if test $targetos = darwin; then
     # So far, only OS X 10.4 has this as a non-private framework
     if test -d /System/Library/Frameworks/DiskArbitration.framework/Headers ; then
         darwin_da="yes"
@@ -3028,7 +3035,7 @@ fi
   echo "Mac acceleration $dvdv"
   echo "OpenGL vsync     $opengl_vsync"
   echo "DirectFB         $directfb"
-  if test x"$mingw32" = x"yes" -o x"$targetos" = x"CYGWIN" ; then
+  if test x"$mingw32" = x"yes" -o x"$targetos" = x"cygwin" ; then
     echo "DirectX          $directx"
   fi
   echo
@@ -3163,7 +3170,7 @@ if enabled libdts; then
 fi
 if test x"$pthreads" = x"yes" ; then
   CCONFIG="$CCONFIG using_ffmpeg_threads"
-  if test $targetos != FreeBSD -a $targetos != OpenBSD ; then
+  if test $targetos != freebsd -a $targetos != openbsd ; then
      extralibs="$extralibs -lpthread"
   fi
 fi
@@ -3204,7 +3211,7 @@ if test "$mac_corevideo" = "yes"; then
   CCONFIG="$CCONFIG using_corevideo"
 fi
 
-if test x"$targetos" = x"CYGWIN" ; then
+if test x"$targetos" = x"cygwin" ; then
   echo "#define CONFIG_CYGWIN 1" >> $TMPH
   echo "#ifndef llrint" >> $TMPH
   echo "#define llrint llrint  // make sure not to define twice" >> $TMPH
