@@ -1518,7 +1518,7 @@ void HttpOutResponse::convertToWavAndStreamFile(MFDServiceClientSocket *which_cl
         //  craps out on us.
         //
         
-        av_estimate_timings(format_context);
+        av_estimate_timings(format_context, 0);
         double exact_time_in_micro_seconds = (format_context->duration);
         int64_t expected_file_size = 44 + ((long)
                                     (((44100 * 16 * 2)/8) * 

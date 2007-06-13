@@ -1969,7 +1969,7 @@ int getFileInfo(QString inFile, QString outFile, int lenMethod)
         return 1;
     }
 
-    av_estimate_timings(inputFC);
+    av_estimate_timings(inputFC, 0);
 
     // Dump stream information
     dump_format(inputFC, 0, inFile.ascii(), 0);

@@ -409,7 +409,7 @@ AudioMetadata* avfDecoder::getMetadata()
     if (av_find_stream_info(ic) < 0)
         return NULL;
 
-    av_estimate_timings(ic);
+    av_estimate_timings(ic, 0);
 
     artist += (char *)ic->author;
     album += (char *)ic->album;
