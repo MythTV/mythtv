@@ -1224,6 +1224,20 @@ for opt do
   ;;
   --enable-ffmpeg-threads) enable pthreads
   ;;
+# remove after 0.21
+  --enable-dts) enable libdts
+      echo "WARNING! --enable-dts will be removed, use --enable-libdts"
+  ;;
+  --enable-faad) enable libfaad
+      echo "WARNING! --enable-faad will be removed, use --enable-libfaad"
+  ;;
+  --enable-faadbin) enable libfaadbin
+      echo "WARNING! --enable-faadbin will be removed, use --enable-libfaadbin"
+  ;;
+  --enable-vorbis) enable libvorbis
+      echo "WARNING! --enable-vorbis will be removed, use --enable-libvorbis"
+  ;;
+# end of compatibility section (0.21)
 # disabled due to abuse in Gentoo ebuild
   --disable-frontend)
   ;;
