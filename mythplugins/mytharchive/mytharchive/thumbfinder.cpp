@@ -579,7 +579,7 @@ bool ThumbFinder::initAVCodec(const QString &inFile)
         m_inputFC = NULL;
         return false;
     }
-    av_estimate_timings(m_inputFC);
+    av_estimate_timings(m_inputFC, 0);
     dump_format(m_inputFC, 0, inFile.ascii(), 0);
 
     // find the first video stream
