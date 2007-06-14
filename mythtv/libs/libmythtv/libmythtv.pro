@@ -434,7 +434,7 @@ using_backend {
     }
 
     # Support for HDHomeRun box
-    using_hdhr {
+    using_hdhomerun {
         # MythTV HDHomeRun glue
         HEADERS += hdhrsignalmonitor.h   hdhrchannel.h
         HEADERS += hdhrrecorder.h

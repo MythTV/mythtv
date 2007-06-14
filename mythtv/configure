@@ -762,37 +762,48 @@ TARGET_LIST='
     mmx
 '
 
+MYTHTV_CONFIG_LIST='
+    backend
+    dbox2
+    directfb
+    directx
+    dvb
+    ffmpeg_threads
+    firewire
+    frontend
+    hdhomerun
+    iptv
+    ivtv
+    joystick_menu
+    lirc
+    lmsensors
+    opengl_vsync
+    v4l
+    valgrind
+    x11
+    xvmc
+    xvmc_opengl
+    xvmc_vld
+'
+
 MYTHTV_LIST='
     audio_alsa
     audio_arts
     audio_jack
-    backend
-    dbox2
-    darwin_da
-    directfb
-    directx
-    dvb
-    dvdv
-    firewire
-    frontend
-    iptv
-    ivtv
-    hdhomerun
-    joystick_menu
     mac_bundle
-    lirc
-    lmsensors
-    opengl_vsync
     proc_opt
     symbol_visibility
-    valgrind
-    x11
+    xvmc_pro
+'
+
+USING_LIST='
+    appleremote
+    bindings_perl
+    darwin_da
+    dvdv
+    opengl
     xrandr
     xv
-    xvmc_opengl
-    xvmc_pro
-    xvmc_vld
-    xvmc
     xvmcw
 '
 
@@ -801,6 +812,7 @@ CMDLINE_SELECT="
     $TARGET_LIST
     $THREADS_LIST
     $MYTHTV_LIST
+    $MYTHTV_CONFIG_LIST
     debug
     extra_warnings
     shared
@@ -1224,8 +1236,6 @@ for opt do
   --enable-mac-accel) dvdv="yes"
   ;;
   --disable-mac-accel) dvdv="no"
-  ;;
-  --enable-ffmpeg-threads) enable pthreads
   ;;
 # remove after 0.21
   --enable-dts) enable libdts
@@ -2249,6 +2259,8 @@ if enabled ffserver; then
     check_header sys/poll.h
 fi
 
+enabled ffmpeg_threads && enable pthreads
+
 # check for some common methods of building with pthread support
 # do this before the optional library checks as some of them require pthreads
 if enabled pthreads; then
@@ -2671,7 +2683,6 @@ if test x"$xvmc" = x"yes"; then
             xvmc_vld="no"
         fi
     elif test x"$xvmcw" = x"yes" ; then
-        CCONFIG="$CCONFIG using_xvmcw"
         VENDOR_XVMC_LIBS="-lXvMCW"
         xvmc="yes"
         if has_header X11/extensions/vldXvMC.h ; then
@@ -3073,9 +3084,6 @@ if test "$freetype2" = "yes" ; then
   echo "FREETYPE_CFLAGS=`freetype-config --cflags`" >> $MYTH_CONFIG_MAK
   echo "FREETYPE_LIBS=`freetype-config --libs`" >> $MYTH_CONFIG_MAK
 fi
-if test "$lmsensors" = "yes" ; then
-  CCONFIG="$CCONFIG using_lmsensors"
-fi
 if enabled sdl; then
     echo "SDL_LIBS=`"${SDL_CONFIG}" --libs`" >> $MYTH_CONFIG_MAK
   echo "SDL_CFLAGS=`"${SDL_CONFIG}" --cflags`" >> $MYTH_CONFIG_MAK
@@ -3092,46 +3100,41 @@ fi
 if enabled libdts; then
   echo "CONFIG_DTSLIB=$dtslib" >>  $MYTH_CONFIG_MAK
 fi
-if test x"$pthreads" = x"yes" ; then
-  CCONFIG="$CCONFIG using_ffmpeg_threads"
+if enabled pthreads; then
   if test $targetos != freebsd -a $targetos != openbsd ; then
      extralibs="$extralibs -lpthread"
   fi
 fi
 echo "" >>$MYTH_CONFIG_MAK
 
-if test x"$v4l" = x"yes" ; then
-  CCONFIG="$CCONFIG using_v4l"
-fi
-
-if test "$audio_oss" = "yes" ; then
+if enabled audio_oss; then
     CCONFIG="$CCONFIG using_oss"
 fi
-if test "$audio_alsa" = "yes" ; then
+if enabled audio_alsa; then
     CCONFIG="$CCONFIG using_alsa"
   echo "CONFIG_AUDIO_ALSA_LIBS=$audio_alsa_libs" >> $MYTH_CONFIG_MAK
 fi
 
-if test "$audio_arts" = "yes" ; then
+if enabled audio_arts; then
     CCONFIG="$CCONFIG using_arts"
   echo "CONFIG_AUDIO_ARTS_LIBS=$audio_arts_libs" >> $MYTH_CONFIG_MAK
   echo "CONFIG_AUDIO_ARTS_CFLAGS=$audio_arts_cflags" >> $MYTH_CONFIG_MAK
 fi
 
-if test "$audio_jack" = "yes" ; then
+if enabled audio_jack; then
     CCONFIG="$CCONFIG using_jack"
   echo "CONFIG_AUDIO_JACK_LIBS=$audio_jack_libs" >> $MYTH_CONFIG_MAK
 fi
 
-if test "$dvdv" = "yes" ; then
-  CCONFIG="$CCONFIG using_dvdv"
+if enabled darwin_da; then
+  CCONFIG="$CCONFIG darwin_da"
 fi
 
-if test "$mac_bundle" = "yes"; then
+if enabled mac_bundle; then
   CCONFIG="$CCONFIG mac_bundle"
 fi
 
-if test "$mac_corevideo" = "yes"; then
+if enabled mac_corevideo; then
   CCONFIG="$CCONFIG using_corevideo"
 fi
 
@@ -3150,14 +3153,11 @@ if test x"$targetos" = x"cygwin" ; then
   echo "#endif" >> $TMPH
 fi
 
-if test "$darwin_da" = "yes"; then
-  CCONFIG="$CCONFIG darwin_da"
-fi
-
 print_config HAVE_   $TMPH $MYTH_CONFIG_MAK $HAVE_LIST
 print_config CONFIG_ $TMPH $MYTH_CONFIG_MAK $CONFIG_LIST
 print_config TARGET_ $TMPH $MYTH_CONFIG_MAK $TARGET_LIST
 
+print_config CONFIG_ $TMPH $MYTH_CONFIG_MAK $MYTHTV_CONFIG_LIST
 print_config CONFIG_ $TMPH $MYTH_CONFIG_MAK $MYTHTV_LIST
 
 if test "$targetos" = darwin; then
@@ -3191,6 +3191,10 @@ for part in $DECODER_LIST $ENCODER_LIST $PARSER_LIST $DEMUXER_LIST $MUXER_LIST; 
     fi
 done
 
+for opt in $MYTHTV_CONFIG_LIST $USING_LIST; do
+    CCONFIG="$CCONFIG using_$opt"
+done
+
 # build tree in object directory if source path is different from current one
 if enabled source_path_used; then
     DIRS="libavformat libavcodec libavcodec/alpha libavcodec/armv4l libavcodec/i386 \
@@ -3205,25 +3209,25 @@ if enabled source_path_used; then
 fi
 echo "SRC_PATH='$source_path'" >> $MYTH_CONFIG_MAK
 
-if test x"$frontend" = x"no" ; then
+if disabled frontend; then
     echo
     echo "WARNING: --disable-frontend is only intended to aid porting."
     echo "WARNING: THIS WILL BREAK THINGS. You are on your own now."
 fi
 
-if test x"$backend" = x"no" ; then
+if disabled backend; then
     echo
     echo "WARNING: --disable-backend is only intended to aid porting."
     echo "WARNING: You are on your own now."
 fi
 
-if test x"$proc_opt" = x"yes"; then
+if enabled proc_opt; then
     echo
     echo "WARNING: When using --enable-proc-opt you must include the "
     echo "         output of ./configure along with any bug report."
 fi
 
-if test x"$proc_opt" = x"no" -a x"$dvb" = x"yes" ; then
+if disabled proc_opt && enabled dvb; then
     echo
     echo "WARNING: If you plan to watch HDTV recordings you probably"
     echo "         need to run ./configure with --enable-proc-opt   "
@@ -3238,12 +3242,7 @@ if test x"$mmx" = x"yes"; then
   fi
 fi
 
-if test x"$ivtv" = x"yes" ; then
-  CCONFIG="$CCONFIG using_ivtv"
-fi
-
-if test x"$firewire" = x"yes" ; then
-  CCONFIG="$CCONFIG using_firewire"
+if enabled firewire; then
   if test $targetos = darwin; then
       echo "CONFIG_MAC_AVC=$mac_avc" >>  $MYTH_CONFIG_MAK
   else
@@ -3254,64 +3253,34 @@ if test x"$firewire" = x"yes" ; then
   fi
 fi
 
-if test x"$dbox2" = x"yes" ; then
-  CCONFIG="$CCONFIG using_dbox2"
+if enabled iptv; then
+    CCONFIG="$CCONFIG using_live"
 fi
 
-if test x"$hdhomerun" = x"yes" ; then
-  CCONFIG="$CCONFIG using_hdhr"
-fi
-
-if test x"$iptv" = x"yes" ; then
-    CCONFIG="$CCONFIG using_iptv using_live"
-fi
-
-if test x"$lirc" = x"yes" ; then
-  CCONFIG="$CCONFIG using_lirc"
+if enabled lirc; then
   echo "CONFIG_LIRC_LIBS=-llirc_client" >> $MYTH_CONFIG_MAK
 fi
 
-if test x"$appleremote" = x"yes" ; then
-  CCONFIG="$CCONFIG using_appleremote"
+if enabled appleremote; then
   CONFIG_DEFINES="$CONFIG_DEFINES USING_APPLEREMOTE"
 fi
 
-if test "$joystick_menu" = "yes" ; then
-  CCONFIG="$CCONFIG using_joystick_menu"
-fi
-
-if test x"$dvb" = x"yes" ; then
-  CCONFIG="$CCONFIG using_dvb"
+if enabled dvb; then
   CONFIG_INCLUDEPATH="$CONFIG_INCLUDEPATH $dvb_path"
 fi
 
-if test x"$x11" = x"yes" ; then
-  CCONFIG="$CCONFIG using_x11"
+if enabled x11; then
   if [ -d $x11_include_path ] ; then
     CONFIG_INCLUDEPATH="$CONFIG_INCLUDEPATH $x11_include_path"
   fi
 fi
 
-if test x"$xv" = x"yes" ; then
-  CCONFIG="$CCONFIG using_xv"
+if enabled xv; then
   echo "CONFIG_XV_LIBS=-lXinerama -lXv -lX11 -lXext -lXxf86vm" >> $MYTH_CONFIG_MAK
 fi
 
-if test x"$xrandr" = x"yes" ; then
-  CCONFIG="$CCONFIG using_xrandr"
+if enabled xrandr; then
   echo "CONFIG_XRANDR_LIBS=-lXrandr" >> $MYTH_CONFIG_MAK
-fi
-
-if test x"$xvmc" = x"yes" ; then
-  CCONFIG="$CCONFIG using_xvmc"
-fi
-
-if test x"$xvmc_vld" = x"yes" ; then
-  CCONFIG="$CCONFIG using_xvmc_vld"
-fi
-
-if test x"$xvmc_opengl" = x"yes" ; then
-  CCONFIG="$CCONFIG using_xvmc_opengl"
 fi
 
 if test x"$VENDOR_XVMC_LIBS" != x"" ; then
@@ -3321,40 +3290,17 @@ if test x"$VENDOR_XVMC_LIBS" != x"" ; then
   fi
 fi
 
-if test x"$directfb" = x"yes" ; then
-  CCONFIG="$CCONFIG using_directfb"
+if enabled directfb; then
   echo "CONFIG_DIRECTFB_LIBS=$CONFIG_DIRECTFB_LIBS" >> $MYTH_CONFIG_MAK
   echo "CONFIG_DIRECTFB_CXXFLAGS=$CONFIG_DIRECTFB_CXXFLAGS" >> $MYTH_CONFIG_MAK
 fi
 
-if test x"$directx" = x"yes" ; then
-  CCONFIG="$CCONFIG using_directx"
+if enabled directx; then
   CONFIG_DEFINES="$CONFIG_DEFINES USING_DIRECTX"
 fi
 
-if test x"$opengl_vsync" = x"yes" ; then
-  CCONFIG="$CCONFIG using_opengl_vsync"
-fi
-
-if test x"$opengl" = x"yes" ; then
-  CCONFIG="$CCONFIG using_opengl"
+if enabled opengl; then
   echo "CONFIG_OPENGL_LIBS=-lGL -lGLU" >> $MYTH_CONFIG_MAK
-fi
-
-if test x"$valgrind" = x"yes" ; then
-  CCONFIG="$CCONFIG using_valgrind"
-fi
-
-if test x"$frontend" = x"yes" ; then
-  CCONFIG="$CCONFIG using_frontend"
-fi
-
-if test x"$backend" = x"yes" ; then
-  CCONFIG="$CCONFIG using_backend"
-fi
-
-if test x"${bindings_perl}" = x"yes"; then
-  CCONFIG="$CCONFIG using_bindings_perl"
 fi
 
 if test x"$CCONFIG" != x"" ; then
