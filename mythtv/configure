@@ -142,6 +142,7 @@ show_help(){
   #echo "  --disable-backend        disable backend  [breaks dependency checking]"
   echo "  --disable-lirc           disable lirc support (Infrared Remotes)"
   echo "  --disable-joystick-menu  disable joystick menu"
+  echo "  --disable-lmsensors      disable linux hw monitor support"
   echo "  --disable-firewire       disable support for FireWire cable boxes"
   echo "  --disable-iptv           disable support for recording RTSP/UDP/RTP streams"
   echo "  --disable-dbox2          disable support for Nokia DBOX2 DVB boxes (or compatibles)"
@@ -1008,6 +1009,7 @@ iptv="yes"
 ivtv="yes"
 joystick_menu="no"
 lirc="yes"
+lmsensors="no"
 mac_bundle="no"
 mac_corevideo="no"
 opengl="no"
@@ -1534,6 +1536,7 @@ EOF
     CCONFIG="$CCONFIG linux"
     backend="yes"
     joystick_menu="yes"
+    lmsensors="yes"
     LDLATEFLAGS="-Wl,--as-needed $LDLATEFLAGS"
     ;;
   irix*)
@@ -2166,26 +2169,20 @@ $TMPE && cpuclipsnegative="yes"
 fi
 
 # test for distcc
-if test x"$distcc" = x"yes"; then
-    if test x"`distcc --version 2> /dev/null`" = x""; then
-        distcc="no"
-    else
-        XYZ=`which $cc`
-        if test x"$XYZ" != x"" -a x"`ls -l $XYZ | grep distcc`" != x""; then
-            distcc="yes, using distcc symlinked $cc"
-        fi
+enabled distcc && check_cmd distcc --version || disable distcc
+if enabled distcc; then
+    XYZ=`which $cc`
+    if test x"$XYZ" != x"" -a x"`ls -l $XYZ | grep distcc`" != x""; then
+        distcc="yes, using distcc symlinked $cc"
     fi
 fi
 
 # test for ccache
-if test x"$ccache" = x"yes"; then
-    if test x"`ccache -V 2> /dev/null`" = x""; then
-        ccache="no"
-    else
-        XYZ=`which $cc`
-        if test x"$XYZ" != x"" -a x"`ls -l $XYZ | grep ccache`" != x""; then
-            ccache="yes, using ccache symlinked $cc"
-        fi
+enabled ccache && check_cmd ccache -V || disable ccache
+if enabled ccache; then
+    XYZ=`which $cc`
+    if test x"$XYZ" != x"" -a x"`ls -l $XYZ | grep ccache`" != x""; then
+        ccache="yes, using ccache symlinked $cc"
     fi
 fi
 
@@ -2237,23 +2234,9 @@ fi
 check_header byteswap.h
 check_header arpa/inet.h
 
-check_ld <<EOF && ftime=yes || ftime=no
-#include <sys/timeb.h>
-int main( void ) { ftime(0); }
-EOF
-
-check_ld << EOF && gettimeofday=yes || gettimeofday=no
-#include <sys/time.h>
-int main( void ) { gettimeofday(0, 0); }
-EOF
-
-check_ld <<EOF && getifaddrs=yes || getifaddrs=no
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <ifaddrs.h>
-int main( void ) { struct ifaddrs *p; getifaddrs(&p); }
-EOF
-
+check_func2 sys/timeb.h ftime
+check_func2 sys/time.h gettimeofday
+check_func2 "sys/types.h sys/socket.h ifaddrs.h" getifaddrs
 
 check_func inet_aton
 check_func localtime_r
@@ -2296,16 +2279,10 @@ enabled_any amr_nb amr_nb_fixed amr_wb && enable amr
 enabled_all amr_nb amr_nb_fixed &&
     die "Only one of amr_nb and amr_nb_fixed may be enabled."
 
-if test x"$libdts" = x"yes"; then
-    dtslib=""
-    if has_library libdts_pic ; then
-        dtslib="-ldts_pic"
-    elif has_library libdts ; then
-        dtslib="-ldts"
-    else
-        echo "Warning: DTS library not found."
-    fi
-fi
+enabled libdts &&
+    has_library libdts_pic && dtslib="-ldts_pic" ||
+    has_library libdts     && dtslib="-ldts" ||
+    echo "Warning: DTS library not found."
 
 # these are off by default, so fail if requested and not available
 enabled amr_nb     && require libamrnb amrnb/interf_dec.h Speech_Decode_Frame_init -lamrnb -lm
@@ -2327,7 +2304,7 @@ enabled libfaad    && require2 libfaad faad.h faacDecOpen -lfaad
 enabled avisynth   && require2 vfw32 "windows.h vfw.h" AVIFileInit -lvfw32
 
 
-check_header stdint.h && _stdint_h=yes || _stdint_h=no
+check_header stdint.h
 
 # test for lrint in math.h
 check_exec <<EOF && lrint=yes || lrint=no
@@ -2784,10 +2761,7 @@ if test x"$directfb" = x"yes" ; then
     fi
 fi
 
-lmsensors="no"
-if has_header "sensors/sensors.h" && has_library libsensors ; then
-    lmsensors="yes"
-fi
+enabled lmsensors && has_header sensors/sensors.h && has_library libsensors || disable lmsensors
 
 if test $targetos = darwin; then
     # So far, only OS X 10.4 has this as a non-private framework
