@@ -3132,7 +3132,7 @@ for part in $DECODER_LIST $ENCODER_LIST $PARSER_LIST $DEMUXER_LIST $MUXER_LIST; 
 done
 
 for opt in $MYTHTV_CONFIG_LIST $USING_LIST; do
-    CCONFIG="$CCONFIG using_$opt"
+    enabled $opt && CCONFIG="$CCONFIG using_$opt"
 done
 
 # build tree in object directory if source path is different from current one
