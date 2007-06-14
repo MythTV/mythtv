@@ -872,17 +872,19 @@ ffserver_deps="network protocols muxers"
 network_deps="protocols"
 
 # mythtv dependencies
-dbox2="backend"
-dvb="backend"
-firewire="backend"
-iptv="backend"
-ivtv="backend v4l"
-hdhomerun="backend"
-v4l="backend"
-xrandr="x11"
-xv="x11"
-xvmc="x11"
-xvmc_vld="x11"
+dbox2_deps="backend"
+dvb_deps="backend"
+firewire_deps="backend"
+iptv_deps="backend"
+ivtv_deps="backend v4l"
+hdhomerun_deps="backend"
+v4l_deps="backend"
+xrandr_deps="x11"
+xv_deps="x11"
+xvmc_deps="x11"
+xvmc_pro_deps="x11"
+xvmc_vld_deps="x11"
+xvmcw_deps="x11"
 
 
 # set temporary file name
@@ -2613,13 +2615,6 @@ if enabled firewire; then
 fi
 
 enabled x11 && has_library libX11 || disable x11
-
-if test x"$x11" = x"no" ; then 
-    xrandr="no" 
-    xv="no" 
-    xvmc="no" 
-    xvmc_vld="no"
-fi
 
 enabled xrandr && has_header X11/extensions/Xrandr.h || disable xrandr
 enabled xv && has_library libXv || disable xv
