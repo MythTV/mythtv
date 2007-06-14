@@ -781,6 +781,8 @@ MYTHTV_CONFIG_LIST='
     v4l
     valgrind
     x11
+    xrandr
+    xv
     xvmc
     xvmc_opengl
     xvmc_vld
@@ -802,8 +804,6 @@ USING_LIST='
     darwin_da
     dvdv
     opengl
-    xrandr
-    xv
     xvmcw
 '
 
