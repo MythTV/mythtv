@@ -179,6 +179,7 @@ NetworkControl::NetworkControl(int port)
     keyMap["f23"]                    = Qt::Key_F23;
     keyMap["f24"]                    = Qt::Key_F24;
 
+    stopCommandThread = false;
     pthread_create(&command_thread, NULL, CommandThread, this);
 
     gContext->addListener(this);
@@ -193,7 +194,10 @@ NetworkControl::~NetworkControl(void)
 
     notifyDataAvailable();
 
-    pthread_cancel(command_thread);
+    stopCommandThread = true;
+    ncLock.lock();
+    ncCond.wakeOne();
+    ncLock.unlock();
     pthread_join(command_thread, NULL);
 }
 
@@ -209,14 +213,16 @@ void NetworkControl::RunCommandThread(void)
 {
     QString command;
 
-    for (;;)
+    while (!stopCommandThread)
     {
-        pthread_testcancel();
-
         ncLock.lock();
         while (!networkControlCommands.size()) {
             ncCond.wait(&ncLock);
-            pthread_testcancel();
+            if (stopCommandThread)
+            {
+                ncLock.unlock();
+                return;
+            }
         }
         command = networkControlCommands.front(); 
         networkControlCommands.pop_front();

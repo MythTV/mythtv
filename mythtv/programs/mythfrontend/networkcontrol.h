@@ -69,6 +69,7 @@ class NetworkControl : public QServerSocket
     QMutex nrLock;
 
     pthread_t command_thread;
+    bool stopCommandThread;
 };
 
 #endif
