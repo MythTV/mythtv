@@ -1020,6 +1020,7 @@ hdhomerun="yes"
 iptv="yes"
 ivtv="yes"
 joystick_menu="no"
+lamemp3="yes"
 lirc="yes"
 lmsensors="no"
 mac_bundle="no"
@@ -1795,7 +1796,7 @@ if test $tune != "generic"; then
     esac
 fi
 
-if test x"$cpu_overide" = x"yes"; then
+if enabled cpu_overide; then
     ARCHFLAGS="-mcpu=$arch_raw $ARCHFLAGS"
 fi
 
@@ -2058,7 +2059,7 @@ elif test x"$tune" = x"generic" -a x"$arch" = x"sparc64" -a x"$cpu_overide" != x
    ARCHFLAGS="-mcpu=ultrasparc -mvis"
 fi
 
-if test x"$proc_error_msg" = x"yes"; then
+if enabled proc_error_msg; then
     UNAME_M_INFO=` uname -m 2> /dev/null`
     UNAME_P_INFO=` uname -p 2> /dev/null`
     PROC_INFO=`cat /proc/cpuinfo | grep "model name" | head -n 1 | sed s/"\t"//g 2>/dev/null`
@@ -2078,8 +2079,8 @@ if test x"$proc_error_msg" = x"yes"; then
     echo ""
 fi
 
-if test x"$proc_opt" = x"no"; then
-    test x"$optimize" = X"no" && optimize="yes"
+if disabled proc_opt; then
+    disabled optimize && enable optimize
     if test x"$cpu_cmov" = x"yes" -a x"$ARCHFLAGS" != x"-march=k8"; then
         ARCHFLAGS="-march=pentiumpro";
     fi
@@ -2197,18 +2198,18 @@ if enabled ccache; then
 fi
 
 # ccache should be used before distcc for better cache coherency
-if test x"$distcc" = x"yes"; then
-    if test x"$ccache" = x"no"; then
+if enabled distcc; then
+    if disabled ccache; then
         cc="distcc $cc"
         cxx="distcc $cxx"
-    elif test x"$ccache" = x"yes"; then
+    elif enabled ccache; then
         cc="ccache distcc $cc"
         cxx="ccache distcc $cxx"
     else
         distcc="not using distcc explicitly, since ccache symlink is present"
     fi
 else
-    if test x"$ccache" = x"yes"; then
+    if enabled ccache; then
         cc="ccache $cc"
         cxx="ccache $cxx"
     fi
@@ -2538,7 +2539,7 @@ if $cc $CFLAGS $TMPC -o $TMPE ; then
     GCC_MINOR=$?
 fi
 
-if test x"$symbol_visibility" = x"yes"; then
+if enabled $symbol_visibility; then
     if test x"$GCC_MAJOR" = x"4" ; then
         check_cflags -fvisibility-inlines-hidden
         ECXXFLAGS="$ECXXFLAGS -fvisibility-inlines-hidden"
@@ -2548,7 +2549,7 @@ if test x"$symbol_visibility" = x"yes"; then
     fi
 fi
 
-if test x"$dvb" = x"yes" ; then
+if enabled $dvb; then
     dvb="no"
     if test -f "$dvb_path"/linux/dvb/frontend.h ; then
         if test -f "$dvb_path"/../MAINTAINERS ; then
@@ -2573,41 +2574,13 @@ if test x"$dvb" = x"yes" ; then
     fi
 fi
 
-lamemp3="no"
-if has_library libmp3lame ; then
-    if has_header lame/lame.h ; then
-        lamemp3="yes"
-    fi
-fi
+enabled lamemp3 && check_lib lame/lame.h lame_init -lmp3lame -lm ||
+    die "ERROR! You must have the Lame MP3 encoding library installed to compile MythTV."
 
-if test x"$lamemp3" = x"no" ; then
-    echo "You must have the Lame MP3 encoding library installed to compile Myth."
-    exit 255
-fi
+#test for lirc client libraries and headers
+enabled lirc && has_library liblirc_client && check_header lirc/lirc_client.h || disable lirc
 
-#test for lirc client libraries
-if test x"$lirc" = x"yes" ; then
-    lirc="no"
-    if has_library liblirc_client ; then
-        lirc="yes"
-    fi
-fi
-
-#test for lirc client header
-if test x"$lirc" = x"yes" ; then
-   lirc="no"
-cat > $TMPC << EOF
-#include <lirc/lirc_client.h>
-int main( void ) { return 0; }
-EOF
-
-    if $cc $CFLAGS $ARCHFLAGS -o $TMPE $TMPC 2> /dev/null ; then
-        lirc="yes"
-    fi
-fi
-
-
-if test x"$firewire" = x"yes" ; then
+if enabled firewire; then
     firewire="no"
     libavc_5_3="no"
     if has_library libiec61883 -a \
@@ -2639,12 +2612,7 @@ if test x"$firewire" = x"yes" ; then
     fi
 fi
 
-if test x"$x11" = x"yes" ; then
-    x11="no"
-    if has_library libX11 ; then
-        x11="yes"
-    fi
-fi
+enabled x11 && has_library libX11 || disable x11
 
 if test x"$x11" = x"no" ; then 
     xrandr="no" 
@@ -2653,22 +2621,11 @@ if test x"$x11" = x"no" ; then
     xvmc_vld="no"
 fi
 
-if test x"$xrandr" = x"yes" ; then
-    xrandr="no"
-    if has_header X11/extensions/Xrandr.h ; then
-        xrandr="yes"
-    fi
-fi
-
-if test x"$xv" = x"yes" ; then
-    xv="no"
-    if has_library libXv ; then
-        xv="yes"
-    fi
-fi
+enabled xrandr && has_header X11/extensions/Xrandr.h || disable xrandr
+enabled xv && has_library libXv || disable xv
 
 VENDOR_XVMC_LIBS=""
-if test x"$xvmc" = x"yes"; then
+if enabled xvmc; then
     xvmc="no"
     if ! has_library libXvMCW ; then
         xvmcw="no"
@@ -2682,7 +2639,7 @@ if test x"$xvmc" = x"yes"; then
         else
             xvmc_vld="no"
         fi
-    elif test x"$xvmcw" = x"yes" ; then
+    elif enabled xvmcw; then
         VENDOR_XVMC_LIBS="-lXvMCW"
         xvmc="yes"
         if has_header X11/extensions/vldXvMC.h ; then
@@ -2693,10 +2650,10 @@ if test x"$xvmc" = x"yes"; then
     elif has_library libXvMCNVIDIA ; then
         VENDOR_XVMC_LIBS="-lXvMCNVIDIA"
         xvmc="yes"
-        if test x"$xvmc_vld" = x"yes"; then
+        if enabled xvmc_vld; then
             xvmc_vld="no"
         fi
-    elif test x"$xvmc_pro" = x"yes"; then
+    elif enabled xvmc_pro; then
         if has_library libviaXvMCPro ; then
             VENDOR_XVMC_LIBS="-lviaXvMCPro"
             xvmc="yes"
@@ -2708,7 +2665,7 @@ if test x"$xvmc" = x"yes"; then
     elif has_library libI810XvMC ; then
         VENDOR_XVMC_LIBS="-lI810XvMC"
         xvmc="yes"
-        if test x"$xvmc_vld" = x"yes"; then
+        if enabled xvmc_vld; then
             xvmc_vld="no"
         fi
     fi
@@ -2720,20 +2677,8 @@ if test x"$VENDOR_XVMC_LIBS" != x"-lXvMCNVIDIA" ; then
     xvmc_opengl="no"
 fi
 
-if ! has_library libGL ; then
-    xvmc_opengl="no"
-    opengl_vsync="no"
-fi
-
-if test x"$opengl_vsync" = x"yes" ; then
-    opengl="yes"
-fi
-
-if test x"$xvmc_opengl" = x"yes" ; then
-    opengl="yes"
-    xvmc_vld="no"
-    xvmc_pro="no"
-fi
+enabled opengl_vsync && has_library libGL && enable opengl || disable opengl_vsync
+enabled xvmc_opengl  && has_library libGL && enable opengl && disable xvmc_vld && disable xvmc_pro || disable xvmc_opengl
 
 # Can only do Mac accel on Mac platform
 enabled dvdv && test $targetos = darwin || disable dvdv
@@ -2763,7 +2708,7 @@ if test -d /usr/share/nvidia/include/GL; then
     CONFIG_INCLUDEPATH="$CONFIG_INCLUDEPATH /usr/share/nvidia/include"
 fi
 
-if test x"$directfb" = x"yes" ; then
+if enabled directfb; then
     directfb="no"
     if test x`which directfb-config 2> /dev/null` != x"" ; then
         directfb="yes"
@@ -2930,14 +2875,14 @@ fi
 #fi
 
 echo
-if test x"$frontend" = x"yes" ; then
+if enabled frontend; then
   echo "# Input Support"
   echo "Joystick menu    $joystick_menu"
   echo "lirc support     $lirc"
   echo "Apple Remote     $appleremote"
 fi
 
-if test x"$backend" = x"yes" ; then
+if enabled backend; then
   echo "Video4Linux sup. $v4l"
   echo "ivtv support     $ivtv"
   echo "FireWire support $firewire"
@@ -2947,7 +2892,7 @@ if test x"$backend" = x"yes" ; then
   echo "IPTV support     $iptv"
 fi
 
-if test x"$frontend" = x"yes" ; then
+if enabled frontend; then
   echo
   echo "# Sound Output Support"
   echo "OSS support      $audio_oss"
@@ -3069,17 +3014,17 @@ fi
 if enabled mmx; then
   echo "#define __CPU__ 586" >> $TMPH
 fi
-if test "$cpuclipspositive" = "yes"; then
+if enabled cpuclipspositive; then
   echo "#define CPU_CLIPS_POSITIVE 1" >> $TMPH
 else
   echo "#define CPU_CLIPS_POSITIVE 0" >> $TMPH
 fi
-if test "$cpuclipsnegative" = "yes"; then
+if enabled cpuclipsnegative; then
   echo "#define CPU_CLIPS_NEGATIVE 1" >> $TMPH
 else
   echo "#define CPU_CLIPS_NEGATIVE 0" >> $TMPH
 fi
-if test "$freetype2" = "yes" ; then
+if enabled freetype2; then
   echo "HAVE_FREETYPE2=yes" >> $MYTH_CONFIG_MAK
   echo "FREETYPE_CFLAGS=`freetype-config --cflags`" >> $MYTH_CONFIG_MAK
   echo "FREETYPE_LIBS=`freetype-config --libs`" >> $MYTH_CONFIG_MAK
@@ -3235,7 +3180,7 @@ fi
 
 echo # add a newline after any warnings.
 
-if test x"$mmx" = x"yes"; then
+if enabled mmx; then
   CONFIG_DEFINES="$CONFIG_DEFINES MMX"
   if test x"$arch" != x"x86_64" ; then
     CONFIG_DEFINES="$CONFIG_DEFINES i386"
@@ -3247,7 +3192,7 @@ if enabled firewire; then
       echo "CONFIG_MAC_AVC=$mac_avc" >>  $MYTH_CONFIG_MAK
   else
       echo "CONFIG_FIREWIRE_LIBS=-lraw1394 -liec61883 -lavc1394 -lrom1394" >>  $MYTH_CONFIG_MAK
-      if test x"$libavc_5_3" = x"yes" ; then
+      if enabled libavc_5_3; then
         CCONFIG="$CCONFIG using_libavc_5_3"
       fi
   fi
