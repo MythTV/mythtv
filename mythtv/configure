@@ -989,8 +989,10 @@ CONFIG_INCLUDEPATH=""
 PROFILEFLAGS=""
 appleremote="no"
 audio_alsa="default"
+audio_alsa_libs="-lasound"
 audio_arts="default"
 audio_jack="default"
+audio_jack_libs="-ljack"
 backend="no"
 bindings_perl="yes"
 dbox2="yes"
@@ -2451,94 +2453,31 @@ EOF
 enabled v4l  && check_header linux/videodev.h  || disable v4l
 enabled v4l2 && check_header linux/videodev2.h || disable v4l2
 
-##########################################
 # OSS probe
-
 enabled audio_oss &&
     check_header sys/soundcard.h ||
     check_header soundcard.h ||
     disable audio_oss
 
-if test x"$audio_oss" = x"default" -o x"$audio_oss" = x"yes" ; then
-
-cat > $TMPC << EOF
-#include <sys/ioctl.h>
-#include <sys/soundcard.h>
-int main(void) { return (int) EV_SEQ_LOCAL; }
-EOF
-
-   audio_oss=no
-   if $cc -o $TMPE $TMPC > /dev/null 2>&1; then
-      sys_soundcard_h=yes
-      audio_oss=yes
-   elif test "$targetos" = "openbsd" ; then
-      soundcard_h=yes
-      audio_oss=yes
-   fi
-fi
-
-##########################################
 # ALSA probe
+! disabled audio_alsa &&
+    check_lib alsa/asoundlib.h snd_asoundlib_version $audio_alsa_libs &&
+    enable  audio_alsa ||
+    disable audio_alsa
 
-if test x"$audio_alsa" = x"default" -o x"$audio_alsa" = x"yes" ; then
-
-cat > $TMPC << EOF
-#include <alsa/asoundlib.h>
-int main(void) { return (int) SND_LIB_MAJOR; }
-EOF
-
-audio_alsa=no
-audio_alsa_libs="-lasound"
-if $cc -o $TMPE $TMPC $audio_alsa_libs > /dev/null 2>&1; then
-audio_alsa=yes
-fi
-
-fi
-
-##########################################
 # aRts probe
+! disabled audio_arts &&
+    check_foo_config arts artsc artsc.h arts_init &&
+    audio_arts_libs=`artsc-config --libs`  &&
+    audio_arts_cflags=`artsc-config --cflags` &&
+    enable  audio_arts ||
+    disable audio_arts
 
-if test x"$audio_arts" = x"default" -o x"$audio_arts" = x"yes" ; then
-
-cat > $TMPC << EOF
-#include <artsc.h>
-int main(void) { return (int) ARTS_P_BUFFER_SIZE; }
-EOF
-
-audio_arts=no
-if (artsc-config --version) > /dev/null 2>&1; then
-    audio_arts_libs=`artsc-config --libs`
-    audio_arts_tmp=`artsc-config --cflags`
-    if $cc -o $TMPE $TMPC $audio_arts_tmp $audio_arts_libs > /dev/null 2>&1; then
-        audio_arts_cflags=`echo $audio_arts_tmp`
-        audio_arts=yes
-    else
-        audio_arts_cflags=`echo $audio_arts_tmp | sed "s/include\/artsc/include/g"`
-        if $cc -o $TMPE $TMPC $audio_arts_cflags $audio_arts_libs > /dev/null 2>&1; then
-            audio_arts=yes
-        fi
-    fi
-fi
-
-fi
-
-##########################################
 # JACK probe
-
-if test x"$audio_jack" = x"default" -o x"$audio_jack" = x"yes" ; then
-
-cat > $TMPC << EOF
-#include <jack/jack.h>
-int main(void) { return (int) JACK_MAX_FRAMES; }
-EOF
-
-audio_jack=no
-audio_jack_libs="-ljack"
-if $cc -o $TMPE $TMPC $audio_jack_libs > /dev/null 2>&1; then
-audio_jack=yes
-fi
-
-fi
+! disabled audio_jack &&
+    check_lib jack/jack.h jack_client_new $audio_jack_libs &&
+    enable  audio_jack ||
+    disable audio_jack
 
 # check for ioctl_meteor.h, ioctl_bt848.h and alternatives
 if enabled bktr; then
