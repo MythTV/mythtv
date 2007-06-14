@@ -248,9 +248,6 @@ Decoder *Decoder::create(const QString &source, QIODevice *input,
         if (fact->supports(source)) 
         {
             decoder = fact->create(source, input, output, deletable);
-            if (decoder)
-                VERBOSE(VB_IMPORTANT, QString("Unable to create decoder for %1")
-                        .arg(source));
             break;
         }
 
