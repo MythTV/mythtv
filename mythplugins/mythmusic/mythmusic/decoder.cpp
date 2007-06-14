@@ -78,14 +78,16 @@ Metadata *Decoder::readMetadata(void)
 
     if (p_tagger)
     {
-        if (ignore_id3)
-            mdata = p_tagger->readFromFilename(filename);
-        else
+        if (!ignore_id3)
             mdata = p_tagger->read(filename);
+
+        if (ignore_id3 || !mdata)
+            mdata = p_tagger->readFromFilename(filename);
 
         delete p_tagger;
     }
-    else if (!mdata)
+
+    if (!mdata)
     {
         VERBOSE(VB_IMPORTANT, "Decoder::readMetadata(): " +
                 QString("Could not read '%1'").arg(filename));
@@ -246,6 +248,9 @@ Decoder *Decoder::create(const QString &source, QIODevice *input,
         if (fact->supports(source)) 
         {
             decoder = fact->create(source, input, output, deletable);
+            if (decoder)
+                VERBOSE(VB_IMPORTANT, QString("Unable to create decoder for %1")
+                        .arg(source));
             break;
         }
 
