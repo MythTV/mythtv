@@ -464,7 +464,7 @@ contains( CONFIG_BMP_DECODER, yes ) {
 
 contains( CONFIG_BMP_ENCODER, yes) {
     SOURCES += bmpenc.c
-
+}
 
 contains( CONFIG_MMVIDEO_DECODER, yes ) {
     SOURCES += mmvideo.c
