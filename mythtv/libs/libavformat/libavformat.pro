@@ -56,6 +56,10 @@ contains( CONFIG_DXA_DEMUXER, yes) {
     SOURCES += dxa.c
 }
 
+contains( CONFIG_OGG_MUXER, yes) {
+    SOURCES += ogg.c
+}
+
 contains( CONFIG_THP_DEMUXER, yes) {
     SOURCES += thp.c
 }
