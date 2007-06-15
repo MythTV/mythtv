@@ -2090,7 +2090,7 @@ if disabled proc_opt; then
 fi
 
 # if cpu flag is present ignore tune and arch and just use cpu
-if test x"$cpu" != x""; then
+if test x"$cpu" != x"generic"; then
     ARCHFLAGS="-march=$cpu"
 fi
 
@@ -2295,10 +2295,15 @@ enabled_any amr_nb amr_nb_fixed amr_wb && enable amr
 enabled_all amr_nb amr_nb_fixed &&
     die "Only one of amr_nb and amr_nb_fixed may be enabled."
 
-enabled libdts &&
-    has_library libdts_pic && dtslib="-ldts_pic" ||
-    has_library libdts     && dtslib="-ldts" ||
-    echo "Warning: DTS library not found."
+if enabled libdts; then
+    if has_library libdts_pic; then
+        dtslib="-ldts_pic"
+    elif has_library libdts; then
+        dtslib="-ldts"
+    else
+        echo "Warning: DTS library not found."
+    fi
+fi
 
 # these are off by default, so fail if requested and not available
 enabled amr_nb     && require libamrnb amrnb/interf_dec.h Speech_Decode_Frame_init -lamrnb -lm
