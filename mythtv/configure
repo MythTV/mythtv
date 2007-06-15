@@ -135,6 +135,7 @@ show_help(){
   echo "  --disable-audio-alsa     disable ALSA audio support"
   echo "  --disable-audio-arts     disable aRts audio support"
   echo "  --disable-audio-jack     disable JACK audio support"
+  echo "  --enable-libdts          enable DTS passthrough, requires libdts"
   echo "  --enable-valgrind        disables timeouts for valgrind memory debugging"
   # Don't print disable frontend/backend options, these
   # cause breakage and people use them inappropriately. -- dtk
@@ -158,6 +159,7 @@ show_help(){
   echo "  --disable-xrandr         disable X11 resolution switching"
   echo "  --disable-xv             disable XVideo   (X11 video output accel.)"
   echo "  --enable-xvmc            enable XvMC      (Linux/BSD MPEG accel.)"
+  echo "  --enable-xvmcw           disable XvMC Wrapper, use --xvmc-lib if autodetection fails"
   echo "  --enable-xvmc-pro        enable XvMC for the unichrome pro (NOT unichrome) chipset"
   echo "  --enable-xvmc-opengl     enable nVidia XvMC OpenGL texture method"
   echo "  --xvmc-lib=LIB           XvMC library override (for crosscompiling)"
@@ -806,6 +808,7 @@ MYTHTV_CONFIG_LIST='
     xrandr
     xv
     xvmc
+    xvmcw
     xvmc_opengl
     xvmc_vld
 '
@@ -826,7 +829,6 @@ USING_LIST='
     darwin_da
     dvdv
     opengl
-    xvmcw
 '
 
 CMDLINE_SELECT="
