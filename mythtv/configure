@@ -466,9 +466,11 @@ EOF
 
 check_ecflags(){
     log check_ecflags "$@"
-    check_cc "$@" <<EOF && add_ecflags "$@"
+    for flag in $@; do
+        check_cc "$flag" <<EOF && add_ecflags "$flag" || echolog "WARNING! Ignoring unknown C compiler flag: \"$flag\""
 int x;
 EOF
+    done
 }
 
 check_optflags(){
@@ -480,10 +482,12 @@ EOF
 
 check_cppflags(){
     log check_cppflags "$@"
-    check_cpp "$@" <<EOF && add_cppflags "$@"
+    for flag in $@; do
+        check_cpp "$flag" <<EOF && add_cppflags "$flag" || echolog "WARNING! Ignoring unknown C++ compiler flag: \"$flag\""
 class X {};
 int x;
 EOF
+    done
 }
 
 check_ldflags(){
