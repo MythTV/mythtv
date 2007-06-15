@@ -2211,7 +2211,8 @@ enabled distcc && check_cmd distcc --version || disable distcc
 if enabled distcc; then
     XYZ=`which $cc`
     if test x"$XYZ" != x"" -a x"`ls -l $XYZ | grep distcc`" != x""; then
-        distcc="yes, using distcc symlinked $cc"
+        distcc="symlink"
+        distcc_txt=" $cc"
     fi
 fi
 
@@ -2220,7 +2221,8 @@ enabled ccache && check_cmd ccache -V || disable ccache
 if enabled ccache; then
     XYZ=`which $cc`
     if test x"$XYZ" != x"" -a x"`ls -l $XYZ | grep ccache`" != x""; then
-        ccache="yes, using ccache symlinked $cc"
+        ccache="symlink"
+        ccache_txt=" $cc"
     fi
 fi
 
@@ -2233,7 +2235,8 @@ if enabled distcc; then
         cc="ccache distcc $cc"
         cxx="ccache distcc $cxx"
     else
-        distcc="not using distcc explicitly, since ccache symlink is present"
+        disable distcc
+        distcc_txt="t using distcc explicitly, since ccache symlink is present"
     fi
 else
     if enabled ccache; then
@@ -2821,8 +2824,8 @@ if test x"$compile_type" = x"debug" -a $arch = "x86_32" -a \
         x"$GCC_MAJOR" != x"" -a $GCC_MAJOR -lt "4"; then
     echo "WARNING: backtraces involving libavcodec are not supported for gcc < 4.0"
 fi
-echo "Compiler cache   $ccache"
-echo "DistCC           $distcc"
+echo "Compiler cache   $ccache$ccache_txt"
+echo "DistCC           $distcc$distcc_txt"
 echo "Install prefix   $PREFIX"
 #echo "Source path      $source_path"
 #echo "C compiler       $cc"
