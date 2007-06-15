@@ -410,6 +410,14 @@ add_cflags(){
     append CFLAGS "$@"
 }
 
+add_ecflags(){
+    append ECFLAGS "$@"
+}
+
+add_optflags(){
+    append OPTFLAGS "$@"
+}
+
 add_cppflags(){
     append ECXXFLAGS "$@"
 }
@@ -431,14 +439,14 @@ check_cc(){
     log check_cc "$@"
     cat >$TMPC
     log_file $TMPC
-    check_cmd $cc $CFLAGS "$@" -c -o $TMPO $TMPC
+    check_cmd $cc $CFLAGS $ECFLAGS $OPTFLAGS "$@" -c -o $TMPO $TMPC
 }
 
 check_cpp(){
     log check_cpp "$@"
     cat >$TMPCXX
     log_file $TMPCXX
-    check_cmd $cxx $CFLAGS "$@" -E -o $TMPO $TMPCXX
+    check_cmd $cxx $CFLAGS $ECXXFLAGS "$@" -E -o $TMPO $TMPCXX
 }
 
 check_ld(){
@@ -450,6 +458,20 @@ check_ld(){
 check_cflags(){
     log check_cflags "$@"
     check_cc "$@" <<EOF && add_cflags "$@"
+int x;
+EOF
+}
+
+check_ecflags(){
+    log check_ecflags "$@"
+    check_cc "$@" <<EOF && add_ecflags "$@"
+int x;
+EOF
+}
+
+check_optflags(){
+    log check_optflags "$@"
+    check_cc "$@" <<EOF && add_optflags "$@"
 int x;
 EOF
 }
@@ -1206,9 +1228,9 @@ for opt do
   ;;
   --make=*) make="$optval"
   ;;
-  --extra-cflags=*) add_cflags "$optval"
+  --extra-cflags=*) check_ecflags "$optval"
   ;;
-  --extra-cxxflags=*) add_cppflags "$optval"
+  --extra-cxxflags=*) check_cppflags "$optval"
   ;;
   --extra-ldflags=*) add_ldflags "$optval"
   ;;
@@ -1739,7 +1761,7 @@ if test $targetos = darwin; then
     fi
 fi
 
-disabled optimize || add_cflags -fomit-frame-pointer
+disabled optimize || add_optflags -fomit-frame-pointer
 
 # Can only do AltiVec on PowerPC
 if test $altivec = "default"; then
@@ -2509,8 +2531,13 @@ check_cflags -Wno-switch
 check_cflags -Wdisabled-optimization
 check_cflags -Wpointer-arith
 check_cflags -Wredundant-decls
-#check_cflags -Wno-pointer-sign
+check_cflags -Wno-pointer-sign
 enabled extra_warnings && check_cflags -Winline
+# C++ Flags
+check_cppflags -Wall
+check_cppflags -Wno-switch
+check_cppflags -Wpointer-arith
+check_cppflags -Wredundant-decls
 check_cppflags -Wno-non-virtual-dtor
 #needed for INT64_C in libs/libavformat under g++
 check_cppflags -D__STDC_CONSTANT_MACROS
@@ -2550,7 +2577,7 @@ fi
 if enabled $symbol_visibility; then
     if test x"$GCC_MAJOR" = x"4" ; then
         check_cflags -fvisibility-inlines-hidden
-        ECXXFLAGS="$ECXXFLAGS -fvisibility-inlines-hidden"
+        check_cppflags -fvisibility-inlines-hidden
         CCONFIG="$CCONFIG use_hidesyms"
     else
         echo "Warning: --enable-symbol-visibility requires gcc 4.x"
@@ -2730,14 +2757,14 @@ fi
 # not all compilers support -Os
 #test "$optimize" = "small" && check_cflags -Os
 # disabling -Os for now (2007-01-31) since it has build problems after ffmpeg sync [12645]
-test "$optimize" = "small" && check_cflags -O2
+test "$optimize" = "small" && check_optflags -O2
 
 if enabled optimize; then
     if test -n "`$cc -v 2>&1 | grep xlc`"; then
-        add_cflags  "-O5"
+        add_optflags  "-O5"
         add_ldflags "-O5"
     else
-        add_cflags "-O3"
+        add_optflags "-O3"
     fi
 fi
 
@@ -2965,8 +2992,8 @@ echo "QMAKE_LINK=$cxx" >> $MYTH_CONFIG_MAK
 
 echo "ARCHFLAGS=$ARCHFLAGS" >> $MYTH_CONFIG_MAK
 echo "PROFILEFLAGS=$PROFILEFLAGS" >> $MYTH_CONFIG_MAK
-echo "OPTFLAGS=$CFLAGS" >> $MYTH_CONFIG_MAK
-echo "ECFLAGS=$ECFLAGS" >> $MYTH_CONFIG_MAK
+echo "OPTFLAGS=$OPTFLAGS" >> $MYTH_CONFIG_MAK
+echo "ECFLAGS=$CFLAGS $ECFLAGS" >> $MYTH_CONFIG_MAK
 echo "ECXXFLAGS=$ECXXFLAGS" >> $MYTH_CONFIG_MAK
 #echo "SHCFLAGS=$SHCFLAGS">>$MYTH_CONFIG_MAK
 #echo "LDFLAGS=$LDFLAGS" >> $MYTH_CONFIG_MAK
