@@ -1021,10 +1021,10 @@ frontend="yes"
 hdhomerun="yes"
 iptv="yes"
 ivtv="yes"
-joystick_menu="no"
+joystick_menu="default"
 lamemp3="yes"
 lirc="yes"
-lmsensors="no"
+lmsensors="default"
 mac_bundle="no"
 mac_corevideo="no"
 opengl="no"
@@ -1549,8 +1549,8 @@ EOF
   linux)
     CCONFIG="$CCONFIG linux"
     backend="yes"
-    joystick_menu="yes"
-    lmsensors="yes"
+    ! disabled joystick_menu && enable joystick_menu
+    ! disabled lmsensors && enable lmsensors
     LDLATEFLAGS="-Wl,--as-needed $LDLATEFLAGS"
     ;;
   irix*)
