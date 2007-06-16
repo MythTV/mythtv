@@ -92,6 +92,7 @@ our %depend_order = (
 # MythMusic needs these:
         'libmad',
         'taglib',
+        'libogg',
         'vorbis',
         'flac',
       ],
@@ -142,7 +143,7 @@ our %depend = (
 
   'libmad' =>
   {
-    'url' => 'ftp://ftp.mars.org/pub/mpeg/libmad-0.15.0b.tar.gz'
+    'url' => "$sourceforge/sourceforge/mad/libmad-0.15.0b.tar.gz"
   },
 
   'taglib' =>
@@ -150,6 +151,11 @@ our %depend = (
     'url' => 'http://developer.kde.org/~wheeler/files/src/taglib-1.4.tar.gz',
     # libtool in taglib has problems with -Z in LDFLAGS
     'conf-cmd' => 'LDFLAGS="" ./configure -prefix "$PREFIX"'
+  },
+
+  'libogg' =>
+  {
+    'url' => 'http://downloads.xiph.org/releases/ogg/libogg-1.1.2.tar.gz
   },
 
   'vorbis' =>
@@ -1173,7 +1179,7 @@ sub MountHDImage
     {
         if (! -e "$SCRIPTDIR/.osx-packager.dmg")
         {
-            Syscall(['hdiutil', 'create', '-size', '1300m',
+            Syscall(['hdiutil', 'create', '-size', '2048m',
                      "$SCRIPTDIR/.osx-packager.dmg", '-volname',
                      'MythTvPackagerHDImage', '-fs', 'UFS', '-quiet']);
         }
