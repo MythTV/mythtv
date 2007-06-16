@@ -155,7 +155,7 @@ our %depend = (
 
   'libogg' =>
   {
-    'url' => 'http://downloads.xiph.org/releases/ogg/libogg-1.1.2.tar.gz
+    'url' => 'http://downloads.xiph.org/releases/ogg/libogg-1.1.2.tar.gz'
   },
 
   'vorbis' =>
