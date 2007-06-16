@@ -934,7 +934,8 @@ TMPH="${TMPDIR1}/ffmpeg-conf-${RANDOM}-$$-${RANDOM}.h"
 # default parameters
 
 logging="yes"
-logfile="config.err"
+pre_logfile="config.ep"
+logfile="$pre_logfile"
 compile_type="release"
 
 # installation paths
@@ -1668,8 +1669,15 @@ fi
 
 
 if ! disabled logging ; then
+    oldlogfile="$logfile"
     enabled logging || logfile="$logging"
-    echo "# $0 $@" >$logfile
+    if [ "x$oldlogfile" = "x$pre_logfile" ]; then
+        test x"$logfile" != x"$logging" && logfile="config.err"
+        mv "$oldlogfile" "$logfile"
+    else
+        echo >"$logfile"
+    fi
+    echo "# $0 $@" >>$logfile
     set >>$logfile
 else
     logfile=/dev/null
