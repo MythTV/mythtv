@@ -663,7 +663,10 @@ void AvFormatDecoder::InitByteContext(void)
     ic->pb.pos = 0;
     ic->pb.must_flush = 0;
     ic->pb.eof_reached = 0;
-    ic->pb.is_streamed = 0;
+    if (ringBuffer->isDVD())
+        ic->pb.is_streamed = 1;
+    else 
+        ic->pb.is_streamed = 0;
     ic->pb.max_packet_size = 0;
 }
 
