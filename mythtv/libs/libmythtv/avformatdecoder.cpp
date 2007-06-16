@@ -2746,7 +2746,6 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
                     RemoveAudioStreams();
                     storevideoframes = false;
                     dvdTitleChanged = false;
-                    ScanStreams(false);
                 }
                 else
                     storevideoframes = true;
