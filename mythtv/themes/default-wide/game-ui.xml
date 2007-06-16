@@ -41,7 +41,8 @@
         </image>
         <image name="titlelines" draworder="0" fleximage="no">
             <filename>trans-titles.png</filename> <!-- 1280x326 -->
-            <position>0,48</position>
+            <position>0,50</position>
+            <staticsize>280,315</staticsize>
         </image>
         <image name="infofiller" draworder="0" fleximage="no">
             <filename>pf-top.png</filename> <!-- 1152x260 -->
@@ -59,7 +60,7 @@
             <image function="leftarrow" filename="mv_left_arrow.png"></image>
             <image function="rightarrow" filename="mv_right_arrow.png"></image>
             <bin number="1">
-		<area>56,28,288,250</area>
+		<area>56,28,288,271</area>
                 <fcnfont name="active" function="active"></fcnfont>
                 <fcnfont name="inactive" function="inactive"></fcnfont>
                 <fcnfont name="active" function="selected"></fcnfont>
@@ -76,7 +77,8 @@
 
 	<image name="showinglines" draworder="2" fleximage="yes">
             <filename>showings.png</filename>
-            <position>0,0</position>
+            <position>20,10</position>
+            <staticsize>1200,310</staticsize>
 	</image>
     </container>
 
