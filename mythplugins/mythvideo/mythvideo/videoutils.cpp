@@ -1,3 +1,5 @@
+#include <qdir.h>
+
 #include <mythtv/mythcontext.h>
 #include <mythtv/uitypes.h>
 
@@ -30,7 +32,7 @@ void PlayVideo(const QString &filename, const MetadataListManager &video_list)
         QString handler = Metadata::getPlayer(item.get(), internal_mrl);
         // See if this is being handled by a plugin..
         if (!gContext->GetMainWindow()->
-                HandleMedia(handler, internal_mrl,item->Plot(), item->Title(),
+                HandleMedia(handler, internal_mrl, item->Plot(), item->Title(),
                             item->Director(), item->Length(),
                             getDisplayYear(item->Year())))
         {
@@ -114,8 +116,13 @@ bool checkParentPassword()
 
 QStringList GetVideoDirs()
 {
-    return QStringList::split(":", gContext->GetSetting("VideoStartupDir",
-                                                DEFAULT_VIDEOSTARTUP_DIR));
+    QStringList tmp = QStringList::split(":",
+            gContext->GetSetting("VideoStartupDir", DEFAULT_VIDEOSTARTUP_DIR));
+    for (QStringList::iterator p = tmp.begin(); p != tmp.end(); ++p)
+    {
+        *p = QDir::cleanDirPath(*p);
+    }
+    return tmp;
 }
 
 QString getDisplayYear(int year)
