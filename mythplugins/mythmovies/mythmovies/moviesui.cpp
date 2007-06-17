@@ -1,4 +1,4 @@
-#include <qtimer.h>
+x#include <qtimer.h>
 #include <qapplication.h>
 
 #include <mythtv/mythcontext.h>
@@ -141,7 +141,8 @@ MoviesUI::MoviesUI(MythMainWindow *parent, QString windowName,
 
 MoviesUI::~MoviesUI()
 {
-    //do nothing, yet
+    delete query;
+    delete subQuery;
 }
 
 void MoviesUI::setupTheme(void)
