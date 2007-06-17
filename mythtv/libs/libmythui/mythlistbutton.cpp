@@ -778,7 +778,10 @@ void MythListButton::CopyFrom(MythUIType *base)
     MythListButton *lb = dynamic_cast<MythListButton *>(base);
     if (!lb)
     {
-        VERBOSE(VB_IMPORTANT, "ERROR, bad parsing");
+        VERBOSE(VB_IMPORTANT, QString("MythListButton CopyFrom ERR: "
+                                        "Copy Failed "
+                                        "base '%1' is not a mythlistbutton"
+                                        .arg(base->name())));
         return;
     }
 
@@ -937,13 +940,22 @@ void MythHorizListButton::CopyFrom(MythUIType *base)
     MythHorizListButton *hlb = dynamic_cast<MythHorizListButton *>(base);
     if (!hlb)
     {
-        VERBOSE(VB_IMPORTANT, "ERROR, bad parsing");
-        return;
+        MythListButton *lb = dynamic_cast<MythListButton *>(base);
+        if (!lb)
+        {
+            VERBOSE(VB_IMPORTANT, QString("MythHorizListButton CopyFrom ERR: "
+                                        "Copy Failed "
+                                        "base '%1' is not a mythlistbutton or "
+                                        "mythhorizlistbutton")
+                                        .arg(base->name()));
+            return;
+        }
     }
 
     MythListButton::CopyFrom(base);
 
-    m_itemWidth = hlb->m_itemWidth;
+    if (hlb)
+        m_itemWidth = hlb->m_itemWidth;
 }
 
 //////////////////////////////////////////////////////////////////////////////
