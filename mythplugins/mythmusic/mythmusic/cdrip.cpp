@@ -20,6 +20,7 @@ extern "C" {
 
 // C++ includes
 #include <iostream>
+#include <memory>
 using namespace std;
 
 // Qt includes
@@ -199,6 +200,8 @@ void CDRipperThread::run(void)
     Metadata *titleTrack = NULL;
     QString outfile = "";
 
+    std::auto_ptr<Encoder> encoder;
+
     for (int trackno = 0; trackno < m_totalTracks; trackno++)
     {
         if (isCancelled())
@@ -206,8 +209,6 @@ void CDRipperThread::run(void)
 
         sendEvent(ST_STATUS_TEXT, QString("Track %1 of %2")
                                   .arg(trackno + 1).arg(m_totalTracks));
-
-        Encoder *encoder;
 
         sendEvent(ST_TRACK_PROGRESS, 0);
 
@@ -234,40 +235,40 @@ void CDRipperThread::run(void)
                     if (encodertype == "mp3")
                     {
                         outfile += ".mp3";
-                        encoder = new LameEncoder(outfile, m_quality, titleTrack,
-                                                    mp3usevbr);
+                        encoder.reset(new LameEncoder(outfile, m_quality,
+                                                      titleTrack, mp3usevbr));
                     }
                     else // ogg
                     {
                         outfile += ".ogg";
-                        encoder = new VorbisEncoder(outfile, m_quality, titleTrack);
+                        encoder.reset(new VorbisEncoder(outfile, m_quality,
+                                                        titleTrack));
                     }
                 }
                 else
                 {
                     outfile += ".flac";
-                    encoder = new FlacEncoder(outfile, m_quality, titleTrack);
+                    encoder.reset(new FlacEncoder(outfile, m_quality,
+                                                  titleTrack));
                 }
 
-                if (!encoder->isValid()) 
+                if (!encoder->isValid())
                 {
-                    delete encoder;
                     break;
                 }
             }
 
-            ripTrack(m_CDdevice, encoder, trackno + 1);
+            if (!encoder.get())
+            {
+                // This should never happen.
+                VERBOSE(VB_IMPORTANT,
+                        QString("MythMusic: Error: No encoder, failing"));
+                return;
+            }
+            ripTrack(m_CDdevice, encoder.get(), trackno + 1);
 
             if (isCancelled())
                 return;
-
-            // if this is the last track or the next track is active 
-            // then we need to delete the encoder
-            if (trackno == (int) m_tracks->size() - 1 ||
-                (trackno + 1 < (int) m_tracks->size() && m_tracks->at(trackno + 1)->active))
-            {
-                delete encoder;
-            }
 
             // save the metadata to the DB
             if (m_tracks->at(trackno)->active)
@@ -306,7 +307,13 @@ int CDRipperThread::ripTrack(QString &cddevice, Encoder *encoder, int tracknum)
     cdrom_drive *device = cdda_identify(cddevice.ascii(), 0, NULL);
 
     if (!device)
+    {
+        VERBOSE(VB_IMPORTANT,
+                QString("Error: cdda_identify failed for device '%1', "
+                        "CDRipperThread::ripTrack(tracknum = %2) exiting.")
+                .arg(cddevice).arg(tracknum));
         return -1;
+    }
 
     if (cdda_open(device))
     {
