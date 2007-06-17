@@ -7562,8 +7562,7 @@ bool TV::BookmarkAllowed(void)
 {
     if ((prbuffer->isDVD() && (!gContext->GetNumSetting("EnableDVDBookmark", 0)
         || prbuffer->DVD()->GetTotalTimeOfTitle() < 120)) ||
-        StateIsLiveTV(GetState()) ||
-        (playbackinfo->isVideo && !prbuffer->isDVD()))
+        StateIsLiveTV(GetState()))
         return false;
 
     return true;
