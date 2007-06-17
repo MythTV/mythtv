@@ -1669,7 +1669,7 @@ if ! disabled logging ; then
     enabled logging || logfile="$logging"
     if [ "x$oldlogfile" = "x$pre_logfile" ]; then
         test x"$logfile" != x"$logging" && logfile="config.err"
-        mv "$oldlogfile" "$logfile"
+        mv "$oldlogfile" "$logfile" 2> /dev/null || echo >"$logfile"
     else
         echo >"$logfile"
     fi
