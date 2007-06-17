@@ -10,20 +10,20 @@
 
 class Metadata;
 
-class Encoder 
+class Encoder
 {
   public:
     Encoder(const QString &outfile, int qualitylevel, Metadata *metadata);
     virtual ~Encoder();
     virtual int addSamples(int16_t * bytes, unsigned int len) = 0;
 
-    virtual bool isValid() { return (out != NULL); }
+    virtual bool isValid() { return (m_out != NULL); }
 
   protected:
-    const QString *outfile;
-    FILE *out;
-    int quality;
-    Metadata *metadata;
+    const QString m_outfile;
+    FILE *m_out;
+    int m_quality;
+    Metadata *m_metadata;
 };
 
 #endif

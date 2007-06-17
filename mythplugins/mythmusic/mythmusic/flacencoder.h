@@ -80,7 +80,7 @@
 
 class Metadata;
 
-class FlacEncoder : public Encoder 
+class FlacEncoder : public Encoder
 {
   public:
     FlacEncoder(const QString &outfile, int qualitylevel, Metadata *metadata);

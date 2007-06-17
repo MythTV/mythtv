@@ -87,15 +87,12 @@ FlacEncoder::~FlacEncoder()
         encoder_delete(encoder);
     }
 
-    if (metadata)
+    if (m_metadata)
     {
-        MetaIOFLACVorbisComment *p_tagger = new MetaIOFLACVorbisComment;
-        QString filename = metadata->Filename();
-        QString tmp = *outfile;
-        metadata->setFilename(tmp);
-        p_tagger->write(metadata);
-        metadata->setFilename(filename);
-        delete p_tagger;
+        QString filename = m_metadata->Filename();
+        m_metadata->setFilename(m_outfile);
+        MetaIOFLACVorbisComment().write(m_metadata);
+        m_metadata->setFilename(filename);
     }
 }
 

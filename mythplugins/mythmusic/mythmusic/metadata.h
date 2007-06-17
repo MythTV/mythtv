@@ -140,7 +140,7 @@ class Metadata
     void setID(int lid) { m_id = lid; }
 
     QString Filename() const { return m_filename; }
-    void setFilename(QString &lfilename) { m_filename = lfilename; }
+    void setFilename(const QString &lfilename) { m_filename = lfilename; }
 
     QString Format() const { return m_format; }
     void setFormat(const QString &lformat) { m_format = lformat; }

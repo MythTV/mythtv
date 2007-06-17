@@ -8,7 +8,7 @@ class Encoder;
 
 #include <vorbis/vorbisenc.h>
 
-class VorbisEncoder : public Encoder 
+class VorbisEncoder : public Encoder
 {
   public:
     VorbisEncoder(const QString &outfile, int qualitylevel, Metadata *metadata);

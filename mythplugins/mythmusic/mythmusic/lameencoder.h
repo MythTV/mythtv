@@ -44,7 +44,7 @@ class Encoder;
 
 #include "encoder.h"
 
-class LameEncoder : public Encoder 
+class LameEncoder : public Encoder
 {
   public:
     LameEncoder(const QString &outfile, int qualitylevel, Metadata *metadata,

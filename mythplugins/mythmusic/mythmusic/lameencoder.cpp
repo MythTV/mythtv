@@ -99,13 +99,13 @@ int LameEncoder::init_encoder(lame_global_flags *gf, int quality, bool vbr)
 LameEncoder::LameEncoder(const QString &outfile, int qualitylevel,
                          Metadata *metadata, bool vbr)
            : Encoder(outfile, qualitylevel, metadata)
-{ 
+{
     channels = 2;
     bits = 16;
     samplerate = 44100;
 
     bytes_per_sample = channels * bits / 8;
-    samples_per_channel = 0; 
+    samples_per_channel = 0;
 
     mp3buf_size = (int)(1.25 * 16384 + 7200); // worst-case estimate
     mp3buf = new char[mp3buf_size];
@@ -127,32 +127,29 @@ LameEncoder::~LameEncoder()
 {
     addSamples(0, 0); //flush
 
-    if (gf && out)
-        lame_mp3_tags_fid (gf, out);
+    if (gf && m_out)
+        lame_mp3_tags_fid (gf, m_out);
     if (gf)
         lame_close(gf);
     if (mp3buf)
         delete[] mp3buf;
-        
+
     // Need to close the file here.
-    if (out)
+    if (m_out)
     {
-        fclose(out);
-        
+        fclose(m_out);
+
         // Make sure the base class doesn't do a double clear.
-        out = NULL;
+        m_out = NULL;
     }
-       
+
     // Now write the Metadata
-    if (metadata)
+    if (m_metadata)
     {
-        MetaIOTagLib* p_tagger = new MetaIOTagLib;
-        QString filename = metadata->Filename();
-        QString tmp = *outfile;
-        metadata->setFilename(tmp);
-        p_tagger->write(metadata);
-        metadata->setFilename(filename);
-        delete p_tagger;
+        QString filename = m_metadata->Filename();
+        m_metadata->setFilename(m_outfile);
+        MetaIOTagLib().write(m_metadata);
+        m_metadata->setFilename(filename);
     }
 }
 
@@ -179,9 +176,9 @@ int LameEncoder::addSamples(int16_t * bytes, unsigned int length)
     {
         VERBOSE(VB_IMPORTANT, QString("LAME encoder error."));
     } 
-    else if (lameret > 0 && out)
+    else if (lameret > 0 && m_out)
     {
-        if (write_buffer(mp3buf, lameret, out) != lameret)
+        if (write_buffer(mp3buf, lameret, m_out) != lameret)
         {
             VERBOSE(VB_GENERAL, QString("Failed to write mp3 data."
                                         " Aborting."));
