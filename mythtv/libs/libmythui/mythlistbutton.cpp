@@ -780,8 +780,8 @@ void MythListButton::CopyFrom(MythUIType *base)
     {
         VERBOSE(VB_IMPORTANT, QString("MythListButton CopyFrom ERR: "
                                         "Copy Failed "
-                                        "base '%1' is not a mythlistbutton"
-                                        .arg(base->name())));
+                                        "base '%1' is not a mythlistbutton")
+                                        .arg(base->name()));
         return;
     }
 
