@@ -31,6 +31,7 @@ using namespace std;
 #include <mythtv/mythplugin.h>
 #include <mythtv/mythmediamonitor.h>
 #include <mythtv/mythdbcon.h>
+#include <mythtv/mythpluginapi.h>
 
 #include <mythtv/libmythui/myththemedmenu.h>
 
@@ -302,12 +303,6 @@ void runMenu(MusicData *mdata, QString which_menu)
         VERBOSE(VB_IMPORTANT, QString("Couldn't find theme %1").arg(themedir));
         delete diag;
     }
-}
-
-extern "C" {
-int mythplugin_init(const char *libversion);
-int mythplugin_run(void);
-int mythplugin_config(void);
 }
 
 void runMusicPlayback(void);
