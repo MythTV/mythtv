@@ -1097,7 +1097,7 @@ xvid="no"
 zlib="yes"
 
 # configurable options
-debug="yes"
+debug="no"
 dostrip="yes"
 extra_warnings="no"
 ffmpeg="no"
@@ -1661,6 +1661,8 @@ has_header()
 CCONFIG="$CCONFIG $compile_type"
 if test x$compile_type = x"profile" ; then
     PROFILEFLAGS="-g -DNDEBUG"
+elif test x$compile_type = x"debug"; then
+    enable debug
 fi
 
 
