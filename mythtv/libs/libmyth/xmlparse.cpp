@@ -425,6 +425,16 @@ void XMLParse::parseImage(LayerSet *container, QDomElement &element)
     }
 
     image->LoadImage();
+
+    QString visible = element.attribute("visible", "");
+    if (!visible.isNull() && !visible.isEmpty())
+    {
+        if (visible.lower() == "yes")
+            image->SetVisible(true);
+        else
+            image->SetVisible(false);
+    }
+
     if (context != -1)
     {
         image->SetContext(context);
