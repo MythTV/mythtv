@@ -1,4 +1,4 @@
-x#include <qtimer.h>
+#include <qtimer.h>
 #include <qapplication.h>
 
 #include <mythtv/mythcontext.h>
