@@ -238,6 +238,10 @@ void WelcomeDialog::keyPressEvent(QKeyEvent *e)
                 system(cmd);
             }
         }
+        else if (action == "STARTSETUP")
+        {
+            system(m_installDir + "/bin/mythtv-setup");
+        }
         else
             handled = false;
     }

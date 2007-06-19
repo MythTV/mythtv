@@ -16,6 +16,7 @@ void initKeys(void)
 {
     REG_KEY("Welcome", "STARTXTERM", "Open an Xterm window", "F12");
     REG_KEY("Welcome", "SHOWSETTINGS", "Show Mythshutdown settings", "F11");
+    REG_KEY("Welcome", "STARTSETUP", "Start Mythtv-Setup", "");
 }
 
 int main(int argc, char **argv)
