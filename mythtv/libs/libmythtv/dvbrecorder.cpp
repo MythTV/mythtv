@@ -530,9 +530,13 @@ bool DVBRecorder::AdjustFilters(void)
     add_stream_type.push_back(StreamID::PrivSec);
     _stream_data->AddListeningPID(MPEG_PAT_PID);
 
-    add_pid.push_back(DVB_TDT_PID);
-    add_stream_type.push_back(StreamID::PrivSec);
-    _stream_data->AddListeningPID(DVB_TDT_PID);
+    // Listen for time table on DVB standard streams
+    if (dvbchannel && (dvbchannel->GetSIStandard() == "dvb"))
+    {
+        add_pid.push_back(DVB_TDT_PID);
+        add_stream_type.push_back(StreamID::PrivSec);
+        _stream_data->AddListeningPID(DVB_TDT_PID);
+    }
 
     // Record the streams in the PMT...
     bool need_pcr_pid = true;
