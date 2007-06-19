@@ -452,7 +452,7 @@ bool Player::startPlayerGL(Monitor *mon, Window winID)
 
     Window parent = winID;
 
-    m_dis = XOpenDisplay(NULL);
+    m_dis = XOpenDisplay(gContext->GetX11Display());
     if (m_dis == NULL)
     {
         VERBOSE(VB_IMPORTANT, "MythZoneMinder: Unable to open display\n");
@@ -545,7 +545,7 @@ bool Player::startPlayerXv(Monitor *mon, Window winID)
 
     Window parent = winID;
 
-    m_dis = XOpenDisplay(NULL);
+    m_dis = XOpenDisplay(gContext->GetX11Display());
     if (m_dis == NULL)
     {
         VERBOSE(VB_IMPORTANT, "MythZoneMinder: Unable to open display\n");

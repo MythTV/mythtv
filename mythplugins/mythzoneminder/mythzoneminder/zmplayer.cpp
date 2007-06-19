@@ -454,7 +454,7 @@ bool ZMPlayer::initPlayerGl(void)
 
     Window parent = winId();
 
-    m_dis = XOpenDisplay(NULL);
+    m_dis = XOpenDisplay(gContext->GetX11Display());
     if (m_dis == NULL)
     {
         VERBOSE(VB_IMPORTANT, "ERROR: Unable to open display");
@@ -545,7 +545,7 @@ bool ZMPlayer::initPlayerXv(void)
 
     Window parent = winId();
 
-    m_dis = XOpenDisplay(NULL);
+    m_dis = XOpenDisplay(gContext->GetX11Display());
     if (m_dis == NULL)
     {
         VERBOSE(VB_IMPORTANT, "ERROR: Unable to open display\n");
