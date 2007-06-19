@@ -21,6 +21,9 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
+#ifndef MYTH_YUV2RGB_H
+#define MYTH_YUV2RGB_H
+
 #include <inttypes.h>
 
 #define MODE_RGB  0x1
@@ -60,3 +63,5 @@ typedef void (* vuy2yuv_fun) (uint8_t * image, uint8_t * py,
                               int vuy_stride, int y_stride, int uv_stride);
 
 vuy2yuv_fun get_vuy2yuv_conv(void);
+
+#endif MYTH_YUV2RGB_H
