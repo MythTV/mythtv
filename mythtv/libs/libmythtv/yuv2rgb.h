@@ -64,4 +64,4 @@ typedef void (* vuy2yuv_fun) (uint8_t * image, uint8_t * py,
 
 vuy2yuv_fun get_vuy2yuv_conv(void);
 
-#endif MYTH_YUV2RGB_H
+#endif /* MYTH_YUV2RGB_H */
