@@ -1366,9 +1366,9 @@ def encodeVideoToMPEG2(source, destvideofile, video, audio1, audio2, aspectratio
                        "Command was %s" % command)
 
     else:
-        passLog = os.path.join(getTempPath(), 'pass.log')
+        passLog = os.path.join(getTempPath(), 'pass')
 
-        pass1 = string.replace(command, "%pass","1")
+        pass1 = string.replace(command, "%passno","1")
         pass1 = string.replace(pass1, "%passlogfile", passLog)
         write("Pass 1 - " + pass1)
         result = runCommand(pass1)
@@ -1380,7 +1380,7 @@ def encodeVideoToMPEG2(source, destvideofile, video, audio1, audio2, aspectratio
         if os.path.exists(destvideofile):
             os.remove(destvideofile)
 
-        pass2 = string.replace(command, "%pass","2")
+        pass2 = string.replace(command, "%passno","2")
         pass2 = string.replace(pass2, "%passlogfile", passLog)
         write("Pass 2 - " + pass2)
         result = runCommand(pass2)
