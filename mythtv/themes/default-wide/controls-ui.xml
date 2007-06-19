@@ -45,12 +45,6 @@
   <container name="controls">
    <area>64,36,1152,508</area>
 
-   <textarea name="options" draworder="1" align="center">
-    <font>options</font>
-    <area>0,0,1152,50</area>
-    <value>(1) Contexts/Actions      (2) Contexts/Keys      (3) Keys/Contexts</value>
-   </textarea>
-
    <textarea name="leftdesc" draworder="1" align="center">
     <font>info</font>
     <area>0,50,560,30</area>
