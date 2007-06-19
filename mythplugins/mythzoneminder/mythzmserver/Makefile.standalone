@@ -7,7 +7,7 @@ mythzmserver_objects =  main.o zmserver.o
 all : mythzmserver 
 
 mythzmserver: $(mythzmserver_objects)
-	g++ -o mythzmserver $(mythzmserver_objects) -lmysqlclient
+	g++ -o mythzmserver $(mythzmserver_objects) $(shell mysql_config --libs)
 
 
 main: main.cpp

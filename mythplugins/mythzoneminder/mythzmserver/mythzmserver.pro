@@ -10,7 +10,7 @@ target.path = $${PREFIX}/bin
 
 INSTALLS = target
 
-LIBS = -lmysqlclient -L$${LIBDIR}/mysql
+LIBS = $$system(mysql_config --libs)
 
 # Input
 HEADERS += zmserver.h
