@@ -42,8 +42,8 @@ def detect_series_title(search_string):
 	"Sopranos 612"
 	"""
 	regexps = [re.compile(r"((?P<title>.+?)(-)?)?(\s*)"\
-		"(s|(season)|\s)\s*(?P<season>\d+)"\
-		"\s*(e|(episode)|x)\s*(?P<episode>\d+)"),
+		"(s|(season\s)|\s)(?P<season>\d+)"\
+		"\s*(e|(episode\s)|x)(?P<episode>\d+)"),
 		re.compile(\
 		r"((?P<title>.+)(-)?)?\s+"\
 		"(?P<season>\d)(?P<episode>\d\d)(?!\d)\s*")]
