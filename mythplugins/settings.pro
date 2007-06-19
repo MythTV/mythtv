@@ -2,17 +2,10 @@ CONFIG += $$CCONFIG
 
 LIBVERSION = 0.20
 
-isEmpty( KDEDIR ) {
-    KDEDIR = /usr/kde/3.3
-}
-
 INCLUDEPATH += $${PREFIX}/include
 #INCLUDEPATH += /usr/include/cdda
 #INCLUDEPATH += /usr/include/FLAC
-INCLUDEPATH += $${KDEDIR}/include
 
-
-LIBPATH += $${KDEDIR}/lib
 LIBS *= -L$${PREFIX}/lib
 
 DEFINES += _GNU_SOURCE

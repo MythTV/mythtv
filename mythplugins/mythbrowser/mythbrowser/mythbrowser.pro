@@ -1,8 +1,9 @@
 include (../../mythconfig.mak )
 include (../../settings.pro )
 
-INCLUDEPATH += /usr/include/kde
-INCLUDEPATH += /opt/kde3/include
+KDEPREFIX = $$SYSTEM(kde-config --prefix)
+INCLUDEPATH += $${KDEPREFIX}/include
+INCLUDEPATH += $${KDEPREFIX}/include/kde
 
 TEMPLATE = app
 CONFIG += thread opengl
@@ -16,7 +17,7 @@ installimages.files = images/*.png
 INSTALLS += installimages
 
 LIBS += -lmyth-$$LIBVERSION -lmythui-$$LIBVERSION $$EXTRA_LIBS
-LIBS += -L/opt/kde3/lib -lkhtml
+LIBS += -L$$SYSTEM(kde-config --expandvars --install lib) -lkhtml
 
 # Input
 HEADERS += webpage.h tabview.h
