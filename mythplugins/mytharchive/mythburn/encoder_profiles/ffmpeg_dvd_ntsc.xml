@@ -16,9 +16,9 @@
         <parameter name="-ac"          value="2"/>
         <parameter name="-copyts"      value=""/>
         <parameter name="-aspect"      value="%aspect"/>
-        <parameter name=""             value="%outputfile"/>
         <parameter name="-pass"        value="%passno"/>
         <parameter name="-passlogfile" value="%passlogfile"/>
+        <parameter name=""             value="%outputfile"/>
     </profile>
 
     <profile>
