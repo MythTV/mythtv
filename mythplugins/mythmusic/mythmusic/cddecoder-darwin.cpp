@@ -4,6 +4,7 @@
 #include <string>
 #include <qobject.h>
 #include <qiodevice.h>
+#include <qdir.h>
 #include <qfile.h>
 using namespace std;
 
@@ -15,7 +16,7 @@ using namespace std;
 
 #include <mythtv/mythcontext.h>
 #include <mythtv/mythmediamonitor.h>
-//#include <mythtv/xmlparse.h>
+#include <mythtv/httpcomms.h>
 
 CdDecoder::CdDecoder(const QString &file, DecoderFactory *d, QIODevice *i, 
                      AudioOutput *o) 
@@ -42,6 +43,23 @@ static inline int addDecimalDigits(int i)
     return total;
 }
 
+/*
+ * Work out file containing a given track
+ */
+QString fileForTrack(QString path, uint track)
+{
+    QDir    disc(path);
+    QString filename;
+
+    disc.setNameFilter(QString("%1*.aiff").arg(track));
+    filename = disc.entryList()[0];  // Fortunately, this seems to sort nicely
+
+    if (filename.isNull())
+        filename = QString("%1.aiff").arg(track);
+
+    return filename;
+}
+
 /**
  * Load XML file that OS X generates for us for Audio CDs, and calc. checksum
  */
@@ -49,6 +67,7 @@ bool CdDecoder::initialize()
 {
     QFile        TOCfile(devicename + "/.TOC.plist");
     QDomDocument TOC;
+    uint         trk;
 
     if (!TOCfile.open(IO_ReadOnly))
     {
@@ -97,7 +116,7 @@ bool CdDecoder::initialize()
         {
             node = node.firstChild();    // First track's <dict>
 
-            for (int i = m_firstTrack; i <= m_lastTrack; ++i)
+            for (trk = m_firstTrack; trk <= m_lastTrack; ++trk)
             {
                 m_tracks.push_back(node.lastChild().firstChild()
                                        .toText().data().toInt());
@@ -116,32 +135,138 @@ bool CdDecoder::initialize()
     m_lengthInSecs = (m_leadout - m_tracks[0]) / 75.0;
 
     int checkSum = 0;
-    for (int i = 0; i <= m_lastTrack - m_firstTrack; ++i)
-        checkSum += addDecimalDigits(m_tracks[i] / 75);
+    for (trk = 0; trk <= m_lastTrack - m_firstTrack; ++trk)
+        checkSum += addDecimalDigits(m_tracks[trk] / 75);
 
+    uint totalTracks = 1 + m_lastTrack - m_firstTrack;
     m_diskID = ((checkSum % 255) << 24) | (int)m_lengthInSecs << 8
-                                        | (m_lastTrack - m_firstTrack + 1);
+                                        | totalTracks;
 
-    VERBOSE(VB_MEDIA, QString("CD %1, ID=%2")
-                      .arg(devicename).arg(m_diskID, 8, 16));
+    QString hexID;
+    hexID.setNum(m_diskID, 16);
+    VERBOSE(VB_MEDIA, QString("CD %1, ID=%2").arg(devicename).arg(hexID));
 
 
     // First erase any existing metadata:
-    for (unsigned int i = 0; i < m_mData.size(); ++i)
-        delete m_mData[i];
+    for (trk = 0; trk < m_mData.size(); ++trk)
+        delete m_mData[trk];
     m_mData.clear();
 
-    // Now, we need to:
-    // 1) Lookup CDDB/FreeDB and get matching disks
-    // 2) Let user select correct disk (possibly none of the looked up)
-    // 3) Store Metadata for chosen disk
+
+    // Generate empty MetaData records.
+    // We fill in the other details later (from CDDB if possible)
+
+    QString file;
+    uint    len;
+
+    m_tracks.push_back(m_leadout);  // This simplifies the loop
+
+    for (trk = 1; trk <= totalTracks; ++trk)
+    {
+        file = fileForTrack(devicename, trk);
+        len  = 1000 * (m_tracks[trk] - m_tracks[trk-1]) / 75;
+        m_mData.push_back(new Metadata(file, "", "", "", "", "", 0, trk, len));
+    }
 
 
-    // I haven't coded this up yet, so for now, just generate fake records
-    for (unsigned int i = 0; i <= m_tracks.size(); ++i)
-        m_mData.push_back(new Metadata("", "", "", "", "", "", 0, i, 1));
+    // Lookup CDDB/FreeDB and get matching disks:
+    QString helloID = getenv("USER");
+    QString queryID = "cddb+query+";
+
+    if (helloID.isNull())
+        helloID = "anon";
+    helloID += QString("+%1+MythTV+%2+")
+               .arg(gContext->GetHostName()).arg(MYTH_BINARY_VERSION);
+
+    queryID += QString("%1+%2+").arg(hexID).arg(totalTracks);
+    for (trk = 0; trk < totalTracks; ++trk)
+        queryID += QString::number(m_tracks[trk]) + '+';
+    queryID += QString::number(m_lengthInSecs);
 
 
+    // First, try HTTP:
+    QString URL  = "http://freedb.freedb.org/~cddb/cddb.cgi?cmd=";
+    QString URL2 = URL + queryID + "&hello=" + helloID + "&proto=5";
+    QString cddb = HttpComms::getHttp(URL2);
+
+    //VERBOSE(VB_MEDIA, "CDDB lookup: " + URL);
+    //VERBOSE(VB_MEDIA, "...returned: " + cddb);
+    //
+    // e.g. "200 rock 960b5e0c Nichole Nordeman / Woven & Spun"
+
+    // Extract/remove 3 digit status:
+    uint stat = cddb.left(3).toUInt();
+    cddb = cddb.mid(4);
+
+    // We should check for errors here, and possibly do a CDDB lookup
+    // (telnet 8880) if it failed, but Nigel is feeling lazy.
+
+    if (stat == 211)  // Multiple matches
+    {
+        // Parse disks, put up dialog box, select disk, prune cddb to selected
+    }
+
+    if (stat == 200)  // One unique match
+    {
+        QString album;
+        QString artist;
+        QString genre = cddb.section(' ', 0, 0);
+        int     year  = 0;
+
+        // Now we can lookup all its details:
+        URL2 = URL + "cddb+read+" + genre + "+"
+               + hexID + "&hello=" + helloID + "&proto=5";
+        cddb = HttpComms::getHttp(URL2);
+
+        cddb.replace(QRegExp(".*#"), "");  // Remove comment block
+        while (cddb.length())
+        {
+            // Lines should be of the form "FIELD=value\r\n"
+
+            QString line  = cddb.section(QRegExp("(\r|\n)+"), 0, 0);
+            QString value = line.section('=', 1, 1);
+
+            if (line.startsWith("DGENRE="))
+                genre = value;
+            else if (line.startsWith("DYEAR="))
+                year = value.toInt();
+            else if (line.startsWith("DTITLE="))
+            {
+                artist = value.section(" / ", 0, 0);
+                album  = value.section(" / ", 1, 1);
+            }
+            else if (line.startsWith("TTITLE"))
+            {
+                trk = line.remove("TTITLE").remove(QRegExp("=.*")).toUInt();
+
+                if (trk < totalTracks)
+                    m_mData[trk]->setTitle(value);
+                else
+                    VERBOSE(VB_GENERAL,
+                            QString("CDDB returned %1 on a %2 track disk!")
+                            .arg(trk+1).arg(totalTracks));
+            }
+
+            // Get next THINGY=value line:
+            cddb = cddb.section('\n', 1, 0xffffffff);
+        }
+
+        for (trk = 0; trk < totalTracks; ++trk)
+        {
+            Metadata *m = m_mData[trk];
+
+            m->setGenre(genre);
+
+            if (year)
+                m->setYear(year);
+
+            if (album)
+                m->setAlbum(album);
+
+            if (artist)
+                m->setArtist(artist);
+        }
+    }
 
     inited = true;
     return true;
@@ -203,7 +328,15 @@ Metadata* CdDecoder::getMetadata(int track)
     if (!inited)
         initialize();
 
-    return m_mData[track];
+    if (track < 1 || (uint)track > m_mData.size())
+    {
+        VERBOSE(VB_GENERAL,
+                QString("CdDecoder::getMetadata(%1) - track out of range")
+                .arg(track));
+        return NULL;
+    }
+
+    return m_mData[track-1];
 }
 
 Metadata *CdDecoder::getLastMetadata()
@@ -228,7 +361,7 @@ bool CdDecoderFactory::supports(const QString &source) const
 
 const QString &CdDecoderFactory::extension() const
 {
-    static QString ext(".cda");
+    static QString ext(".aiff");
     return ext;
 }
 
