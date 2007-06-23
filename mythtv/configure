@@ -1946,7 +1946,7 @@ fi
 
 # if either tune or cpu is c3 or c3-2 optimize for smallness
 if test x"$arch_raw" = x"c3" -o x"$arch_raw" = x"c3-2"; then
-    ARCHFLAGS="-march=$arch"
+    ARCHFLAGS="-march=$arch_raw"
     optimize="small"
 fi
 if test x"$tune" = x"c3" -o x"$tune" = x"c3-2"; then
