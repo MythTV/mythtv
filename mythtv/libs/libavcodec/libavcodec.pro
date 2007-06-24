@@ -586,7 +586,17 @@ contains( TARGET_MMX, yes ) {
 }
 
 contains( TARGET_ARCH_ARMV4L, yes ) {
-    SOURCES += armv4l/jrevdct_arm.S armv4l/dsputil_arm.c
+    SOURCES += armv4l/jrevdct_arm.S armv4l/simple_idct_arm.S armv4l/dsputil_arm.c armv4l/dsputil_arm_s.S
+    SOURCES += armv4l/mpegvideo_arm.c
+    contains( TARGET_ARMV5TE, yes ){
+        SOURCES +=  armv4l/simple_idct_armv5te.S armv4l/mpegvideo_armv5te.c
+    }
+    contains( TARGET_ARMV6, yes ){
+        SOURCES +=  armv4l/simple_idct_armv6.S
+    }
+    contains( TARGET_IWMMXT, yes ){
+        SOURCES += armv4l/dsputil_iwmmxt.c armv4l/mpegvideo_iwmmxt.c
+    }
 }
 
 contains( HAVE_MLIB, yes ) {
