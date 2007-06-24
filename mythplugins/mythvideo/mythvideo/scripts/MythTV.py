@@ -84,6 +84,9 @@ class MythDB:
 				elif token == "DBPassword":
 					if config.get_token() == "=":
 						db_password = config.get_token()
+				elif token == "DBName":
+					if config.get_token() == "=":
+						db_name = config.get_token()
 	
 				token = config.get_token()
 			log.debug('Using config %s' % config_file)
@@ -92,7 +95,7 @@ class MythDB:
 	
 		if not found_config:
 			raise "Unable to find MythTV configuration file"
-		self.db = MySQLdb.connect(user=db_user, host=db_host, passwd=db_password, db="mythconverg")
+		self.db = MySQLdb.connect(user=db_user, host=db_host, passwd=db_password, db=db_name)
 	
 	def getSetting(self, value, hostname=None):
 		"""
