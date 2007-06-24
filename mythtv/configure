@@ -2588,7 +2588,7 @@ if $cc $CFLAGS $TMPC -o $TMPE ; then
     GCC_MINOR=$?
 fi
 
-if enabled $symbol_visibility; then
+if enabled symbol_visibility; then
     if test x"$GCC_MAJOR" = x"4" ; then
         check_cflags -fvisibility-inlines-hidden
         check_cppflags -fvisibility-inlines-hidden
@@ -2598,7 +2598,7 @@ if enabled $symbol_visibility; then
     fi
 fi
 
-if enabled $dvb; then
+if enabled dvb; then
     dvb="no"
     if test -f "$dvb_path"/linux/dvb/frontend.h ; then
         if test -f "$dvb_path"/../MAINTAINERS ; then
