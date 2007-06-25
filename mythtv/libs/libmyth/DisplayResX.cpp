@@ -120,14 +120,24 @@ static XRRScreenConfiguration *GetScreenConfig(Display*& display)
     }
 
     X11L;
+
     Window root = RootWindow(display, DefaultScreen(display));
-    XRRScreenConfiguration *cfg = XRRGetScreenInfo(display, root);
+
+    XRRScreenConfiguration *cfg = NULL;
+    int event_basep = 0, error_basep = 0;
+    if (XRRQueryExtension(display, &event_basep, &error_basep))
+        cfg = XRRGetScreenInfo(display, root);
+
     if (!cfg)
     {
         if (display)
+        {
             XCloseDisplay(display);
+            display = NULL;
+        }
         cerr<<"DisplaResX: Unable to XRRgetScreenInfo"<<endl;
     }
+
     X11U;
 
     return cfg;
