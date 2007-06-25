@@ -46,6 +46,10 @@
 #define M_PI    3.14159265358979323846
 #endif
 
+#ifndef M_LN10
+#define M_LN10    2.30258509299404568402
+#endif
+
 #ifndef INT16_MIN
 #define INT16_MIN       (-0x7fff-1)
 #endif

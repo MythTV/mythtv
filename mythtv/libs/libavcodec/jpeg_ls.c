@@ -32,8 +32,6 @@ typedef struct JpeglsContext{
     AVFrame picture;
 }JpeglsContext;
 
-#undef N
-
 typedef struct JLSState{
     int T1, T2, T3;
     int A[367], B[367], C[365], N[367];

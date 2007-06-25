@@ -164,7 +164,7 @@ void avcodec_register_all(void)
     /* audio codecs */
     REGISTER_DECODER(AAC, aac);
     REGISTER_DECODER(MPEG4AAC, mpeg4aac);
-    REGISTER_ENCDEC(AC3, ac3);
+    REGISTER_ENCDEC (AC3, ac3);
     REGISTER_DECODER(ALAC, alac);
     REGISTER_ENCDEC (AMR_NB, amr_nb);
     REGISTER_ENCDEC (AMR_WB, amr_wb);
@@ -174,7 +174,7 @@ void avcodec_register_all(void)
     REGISTER_ENCODER(FAAC, faac);
     REGISTER_ENCDEC (FLAC, flac);
     REGISTER_DECODER(IMC, imc);
-    REGISTER_DECODER(LIBA52, liba52);
+    if (!ENABLE_AC3_DECODER)  REGISTER_DECODER(LIBA52, liba52);
     REGISTER_ENCDEC (LIBGSM, libgsm);
     REGISTER_ENCDEC (LIBGSM_MS, libgsm_ms);
     REGISTER_ENCODER(LIBTHEORA, libtheora);

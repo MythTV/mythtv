@@ -22,7 +22,6 @@
 #include "avcodec.h"
 #include "mpegvideo.h"
 #include "mpegaudio.h"
-#include "ac3.h"
 #include "parser.h"
 
 AVCodecParser *av_first_parser = NULL;

@@ -505,7 +505,7 @@ contains( CONFIG_AC3_ENCODER, yes ) {
 
 DO_AC3 = $$CONFIG_AC3_DECODER $$CONFIG_AC3_ENCODER $$CONFIG_AC3_PARSER
 contains( DO_AC3, yes ) {
-    SOURCES += ac3.c
+    SOURCES += ac3.c ac3tab.c
 }
 
 contains( CONFIG_LIBDTS, yes ) {

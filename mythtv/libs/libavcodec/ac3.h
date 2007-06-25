@@ -27,18 +27,13 @@
 #ifndef AC3_H
 #define AC3_H
 
+#include "ac3tab.h"
+
 #define AC3_MAX_CODED_FRAME_SIZE 3840 /* in bytes */
 #define AC3_MAX_CHANNELS 6 /* including LFE channel */
-#define FBW_CHANNELS     5
 
 #define NB_BLOCKS 6 /* number of PCM blocks inside an AC3 frame */
-#define AC3_BLOCK_SIZE  256
-#define AC3_FRAME_SIZE (NB_BLOCKS * AC3_BLOCK_SIZE)
-#define DBA_SEG_MAX       8
-#define AC3_MAX_COEFS   256
-
-#define MDCT_NBITS  9
-#define N          (1 << MDCT_NBITS) /* constant for MDCT Block size */
+#define AC3_FRAME_SIZE (NB_BLOCKS * 256)
 
 /* exponent encoding strategy */
 #define EXP_REUSE 0
@@ -48,31 +43,27 @@
 #define EXP_D25   2
 #define EXP_D45   3
 
-/* delta bit allocation strategy */
-#define DBA_NEW      0x01
-#define DBA_NONE     0x02
-#define DBA_RESERVED 0x03
-#define DBA_REUSE    0x00
-
-/** AC-3 channel mode (audio coding mode) */
+/** Delta bit allocation strategy */
 typedef enum {
-    AC3_CHANNEL_MODE_DUALMONO = 0,
-    AC3_CHANNEL_MODE_MONO,
-    AC3_CHANNEL_MODE_STEREO,
-    AC3_CHANNEL_MODE_3F,
-    AC3_CHANNEL_MODE_2F_1R,
-    AC3_CHANNEL_MODE_3F_1R,
-    AC3_CHANNEL_MODE_2F_2R,
-    AC3_CHANNEL_MODE_3F_2R
+    DBA_REUSE = 0,
+    DBA_NEW,
+    DBA_NONE,
+    DBA_RESERVED
+} AC3DeltaStrategy;
+
+/** Channel mode (audio coding mode) */
+typedef enum {
+    AC3_ACMOD_DUALMONO = 0,
+    AC3_ACMOD_MONO,
+    AC3_ACMOD_STEREO,
+    AC3_ACMOD_3F,
+    AC3_ACMOD_2F1R,
+    AC3_ACMOD_3F1R,
+    AC3_ACMOD_2F2R,
+    AC3_ACMOD_3F2R
 } AC3ChannelMode;
 
-/** adjustments in dB gain */
-#define LEVEL_MINUS_3DB         (0.7071067811865476f) /* sqrt(2)/2 */
-#define LEVEL_MINUS_4POINT5DB   (0.5946035575013605f)
-#define LEVEL_MINUS_6DB         (0.5000000000000000f)
-#define LEVEL_PLUS_3DB          (1.4142135623730951f) /* sqrt(2) */
-#define LEVEL_PLUS_6DB          (2.0000000000000000f)
-#define LEVEL_ZERO              (0.0000000000000000f)
+#define AC3_LFEON 0x8
 
 typedef struct AC3BitAllocParameters {
     int fscod; /* frequency */
@@ -113,17 +104,6 @@ typedef struct {
     /** @} */
 } AC3HeaderInfo;
 
-extern const uint16_t ff_ac3_frame_sizes[38][3];
-extern const uint8_t ff_ac3_channels[8];
-extern const uint16_t ff_ac3_freqs[3];
-extern const uint16_t ff_ac3_bitratetab[19];
-extern const int16_t ff_ac3_window[256];
-extern const uint8_t ff_sdecaytab[4];
-extern const uint8_t ff_fdecaytab[4];
-extern const uint16_t ff_sgaintab[4];
-extern const uint16_t ff_dbkneetab[4];
-extern const int16_t ff_floortab[8];
-extern const uint16_t ff_fgaintab[8];
 
 void ac3_common_init(void);
 
