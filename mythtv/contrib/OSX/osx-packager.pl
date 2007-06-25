@@ -32,9 +32,10 @@ our $jobtools = 0;
 #$ENV{'DISTCC_HOSTS'}   = "localhost 192.168.0.6";
 #$ENV{'DISTCC_VERBOSE'} = '1';
 
-# For faster downloads, change this to a local mirror.
+# Start with a generic address and let sourceforge 
+# figure out which mirror is closest to us.
 #
-our $sourceforge = 'http://umn.dl.sourceforge.net';
+our $sourceforge = 'http://downloads.sourceforge.net';
 
 # At the moment, there is mythtv plus these two
 our @components = ( 'myththemes', 'mythplugins' );
@@ -174,7 +175,7 @@ our %depend = (
   =>
   {
     'url'
-    =>  'ftp://ftp.fu-berlin.de/unix/linux/mirrors/gentoo/distfiles/libdvdcss-1.2.9.tar.bz2',
+    =>  'http://download.videolan.org/pub/videolan/libdvdcss/1.2.9/libdvdcss-1.2.9.tar.bz2'
   },
 
   'mysqlclient'
@@ -603,7 +604,7 @@ foreach my $sw (@build_depends)
   unless (-e $filename)
   {
     &Verbose("Downloading $sw");
-    unless (&Syscall([ '/usr/bin/curl', $url, '>', $filename ],
+    unless (&Syscall([ '/usr/bin/curl', '-L', $url, '>', $filename ],
                      'munge' => 1))
     {
       &Syscall([ '/bin/rm', $filename ]) if (-e $filename);
