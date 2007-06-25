@@ -53,9 +53,6 @@ using_x11 {
     SOURCES += mythpainter_ogl.cpp
     HEADERS += mythpainter_ogl.h
     inc.files += mythpainter_ogl.h
-}
-
-using_x11 {
     LIBS += $$EXTRA_LIBS
 }
 
