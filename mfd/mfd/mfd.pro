@@ -5,10 +5,6 @@ LIBS += -Wl,--export-dynamic -L../mfdlib/ -lmfdlib -L../mdcaplib/ -lmdcap
 
 include ( ../settings.pro )
 
-!exists(../config.pro ) {
-    error(Missing config.pro: please run the configure script)
-}
-
 !exists(../options.pro ) {
     error(Missing options.pro: please run the configure script)
 }

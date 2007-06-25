@@ -7,7 +7,7 @@
 #
 
 # default parameters
-
+prefix="/usr/local"
 zeroconfig="yes"
 audio="yes"
 daapserver="yes"
@@ -98,6 +98,8 @@ for opt do
       mfdclient="no"
       rtsp="no"
   ;;
+  --prefix=*) prefix=`echo $opt | cut -d '=' -f 2` 
+  ;;
   --with-livemedia-prefix=*) livemediaprefix=`echo $opt | cut -d '=' -f 2` 
   ;;
   esac
@@ -154,7 +156,8 @@ echo "#    The dummy plugin is always built " >> ./config.pro
 echo " " >> ./config.pro
 echo "SUBDIRS += ./mfd/plugins/dummy " >> ./config.pro
 echo " " >> ./config.pro
-
+echo "PREFIX=\"$prefix\"" >> ./config.pro
+echo " " >> ./config.pro
 
 echo "Creating config.h"
 echo "/*" > ./config.h

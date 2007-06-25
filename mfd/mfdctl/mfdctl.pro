@@ -1,10 +1,5 @@
 include ( ../settings.pro )
 
-!exists(../config.pro ) {
-    error(Missing config.pro: please run the configure script)
-}
-
-
 TEMPLATE = app
 CONFIG += thread
 target.path = $${PREFIX}/bin
