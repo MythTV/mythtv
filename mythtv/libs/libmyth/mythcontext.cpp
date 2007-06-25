@@ -752,6 +752,7 @@ bool MythContextPrivate::PromptForDatabaseParams(void)
         parent->LoadQtConfig();
    
         MythMainWindow *mainWindow = GetMythMainWindow();
+        mainWindow->Init();
         parent->SetMainWindow(mainWindow);
 
         // ask user for language settings
