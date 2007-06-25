@@ -24,8 +24,9 @@
 static HostComboBox *AudioOutputDevice()
 {
     HostComboBox *gc = new HostComboBox("AudioOutputDevice", true);
-
     gc->setLabel(QObject::tr("Audio output device"));
+
+#ifdef USING_OSS
     QDir dev("/dev", "dsp*", QDir::Name, QDir::System);
     gc->fillSelectionsFromDir(dev);
     dev.setNameFilter("adsp*");
@@ -39,6 +40,17 @@ static HostComboBox *AudioOutputDevice()
         dev.setNameFilter("adsp*");
         gc->fillSelectionsFromDir(dev);
     }
+#endif
+#ifdef USING_ALSA
+    gc->addSelection("ALSA:default", "ALSA:default");
+#endif
+#ifdef USING_ARTS
+    gc->addSelection("ARTS:", "ARTS:");
+#endif
+#ifdef USING_JACK
+    gc->addSelection("JACK:output", "JACK:output"); 
+#endif
+    gc->addSelection("NULL", "NULL");
 
     return gc;
 }
@@ -72,8 +84,9 @@ static HostCheckBox *MythControlsVolume()
 static HostComboBox *MixerDevice()
 {
     HostComboBox *gc = new HostComboBox("MixerDevice", true);
-
     gc->setLabel(QObject::tr("Mixer Device"));
+
+#ifdef USING_OSS
     QDir dev("/dev", "mixer*", QDir::Name, QDir::System);
     gc->fillSelectionsFromDir(dev);
 
@@ -82,6 +95,10 @@ static HostComboBox *MixerDevice()
     {
         gc->fillSelectionsFromDir(dev);
     }
+#endif
+#ifdef USING_ALSA
+    gc->addSelection("ALSA:default", "ALSA:default");
+#endif
 
     return gc;
 }

@@ -54,3 +54,8 @@ using_xvmc:DEFINES += USING_XVMC
 using_xvmc_vld:DEFINES += USING_XVMC_VLD
 using_xrandr:DEFINES += USING_XRANDR
 using_opengl_vsync:DEFINES += USING_OPENGL_VSYNC
+
+using_alsa:DEFINES += USING_ALSA
+using_arts:DEFINES += USING_ARTS
+using_jack:DEFINES += USING_JACK
+using_oss:DEFINES += USING_OSS
