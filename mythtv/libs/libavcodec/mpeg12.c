@@ -3388,14 +3388,6 @@ static int mpeg_decode_end(AVCodecContext *avctx)
     return 0;
 }
 
-static void mpeg12_flush(AVCodecContext *avctx)
-{
-    Mpeg1Context *s = avctx->priv_data;
-
-    s->save_aspect_info = -1;
-    ff_mpegcontext_flush(&s->mpeg_enc_ctx);
-}
-
 AVCodec mpeg1video_decoder = {
     "mpeg1video",
     CODEC_TYPE_VIDEO,
