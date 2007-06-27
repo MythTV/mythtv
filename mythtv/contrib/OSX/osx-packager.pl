@@ -569,10 +569,10 @@ my (@build_depends, %seen_depends);
 my @comps = ('mythtv', @components);
 &Verbose("Including components:", @comps);
 
-if ( $svn =~ m/no svn in / )
+# If no SubVersion in path, and we are checking something out, build SVN:
+if ( $svn =~ m/no svn in / && ! $OPT{'nohead'} )
 {
   $svn = "$PREFIX/bin/svn";
-  #@build_depends = ('apr', 'aprutil', 'neon', 'svn');
   @build_depends = ('svndeps', 'svn');
 }
 
@@ -1048,6 +1048,12 @@ if ( $jobtools )
   }
 }
 
+# Clean tmp files. Most of these are leftovers from configure:
+#
+&Verbose('Cleaning build tmp directory');
+&Syscall([ 'rm', '-fr', $WORKDIR . '/tmp' ]) or die;
+&Syscall([ 'mkdir',     $WORKDIR . '/tmp' ]) or die;
+
 if ($OPT{usehdimage})
 {
     Verbose("Dismounting case-sensitive build device");
@@ -1182,11 +1188,12 @@ sub MountHDImage
         {
             Syscall(['hdiutil', 'create', '-size', '2048m',
                      "$SCRIPTDIR/.osx-packager.dmg", '-volname',
-                     'MythTvPackagerHDImage', '-fs', 'UFS', '-quiet']);
+                     'MythTvPackagerHDImage', '-fs', 'UFS', '-quiet']) || die;
         }
 
-        Syscall(['hdiutil', 'mount', "$SCRIPTDIR/.osx-packager.dmg",
-                 '-mountpoint', $WORKDIR, '-quiet']);
+        &Syscall(['hdiutil', 'mount',
+                  "$SCRIPTDIR/.osx-packager.dmg",
+                  '-mountpoint', $WORKDIR, '-quiet']) || die;
     }
 
     # configure defaults to /tmp and OSX barfs when mv crosses
