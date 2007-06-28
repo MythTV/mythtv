@@ -332,8 +332,8 @@ ProgInfo *XMLTVParser::parseProgram(
             }
             else if (info.tagName() == "category")
             {
-                QString cat = getFirstText(info);
-                QString lcat = cat.lower();
+                const QString cat = getFirstText(info);
+                const QString lcat = cat.lower();
 
                 if (lcat == "movie" || lcat == "series" ||
                     lcat == "sports" || lcat == "tvshow")
