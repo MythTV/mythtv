@@ -333,19 +333,20 @@ ProgInfo *XMLTVParser::parseProgram(
             else if (info.tagName() == "category")
             {
                 QString cat = getFirstText(info);
+                QString lcat = cat.lower();
 
-                if (cat == "movie" || cat == "series" || 
-                    cat == "sports" || cat == "tvshow")
+                if (lcat == "movie" || lcat == "series" ||
+                    lcat == "sports" || lcat == "tvshow")
                 {
                     if (pginfo->catType.isEmpty())
-                        pginfo->catType = cat;
+                        pginfo->catType = lcat;
                 }
                 else if (pginfo->category.isEmpty())
                 {
                     pginfo->category = cat;
                 }
 
-                if (cat == "Film" || cat == "film")
+                if (lcat == "film")
                 {
                     // Hack for tv_grab_uk_rt
                     pginfo->catType = "movie";
