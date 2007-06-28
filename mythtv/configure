@@ -2623,7 +2623,7 @@ if enabled dvb; then
     fi
 fi
 
-enabled lamemp3 && check_lib lame/lame.h lame_init -lmp3lame -lm ||
+enabled lamemp3 && has_library libmp3lame && has_header lame/lame.h ||
     die "ERROR! You must have the Lame MP3 encoding library installed to compile MythTV."
 
 #test for lirc client libraries and headers
