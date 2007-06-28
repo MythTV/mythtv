@@ -22,6 +22,9 @@
  * 02111-1307, USA
  */
 
+#ifndef KEYGRABBER_H_
+#define KEYGRABBER_H_
+
 // MythTV headers
 #include <mythtv/mythdialogs.h>
 
@@ -173,3 +176,5 @@ class ConfirmMenu : public MythPopupBox
     void Confirm(void)  { done(ConfirmMenu::kConfirm); }
     void Cancel(void)   { done(ConfirmMenu::kCancel);  }
 };
+
+#endif // KEYGRABBER_H_

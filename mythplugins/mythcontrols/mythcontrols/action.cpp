@@ -21,8 +21,6 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
  * 02111-1307, USA
  */
-#ifndef ACTION_CPP
-#define ACTION_CPP
 
 // Qt headers
 #include <qkeysequence.h>
@@ -109,5 +107,3 @@ bool Action::ReplaceKey(const QString &newkey, const QString &oldkey)
 
     return false;
 }
-
-#endif /* ACTION_CPP */
