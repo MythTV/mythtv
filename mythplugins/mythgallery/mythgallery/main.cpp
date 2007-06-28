@@ -15,12 +15,7 @@
 #include <mythtv/mythplugin.h>
 #include <mythtv/dialogbox.h>
 #include <mythtv/mythmedia.h>
-
-extern "C" {
-int mythplugin_init(const char *libversion);
-int mythplugin_run(void);
-int mythplugin_config(void);
-}
+#include <mythtv/mythpluginapi.h>
 
 static void run(MythMediaDevice *dev)
 {

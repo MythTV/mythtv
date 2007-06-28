@@ -20,12 +20,7 @@ using namespace std;
 #include <mythtv/mythcontext.h>
 #include <mythtv/mythdialogs.h>
 #include <mythtv/mythplugin.h>
-
-extern "C" {
-int mythplugin_init(const char *libversion);
-int mythplugin_run(void);
-int mythplugin_config(void);
-}
+#include <mythtv/mythpluginapi.h>
 
 void runWeather(void);
 

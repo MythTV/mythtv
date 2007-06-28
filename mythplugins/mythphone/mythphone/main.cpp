@@ -24,6 +24,7 @@ using namespace std;
 #include <mythtv/mythplugin.h>
 #include <mythtv/dialogbox.h>
 #include <mythtv/util.h>
+#include <mythtv/mythpluginapi.h>
 
 #include "config.h"
 #include "dbcheck.h"
@@ -106,15 +107,6 @@ void runMenu(QString which_menu)
     delete diag;
 }
 #endif
-
-
-extern "C" {
-int mythplugin_init(const char *libversion);
-int mythplugin_run(void);
-int mythplugin_config(void);
-void mythplugin_destroy(void);
-}
-
 
 void initKeys(void)
 {

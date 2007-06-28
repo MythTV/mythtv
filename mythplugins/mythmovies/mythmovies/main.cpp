@@ -1,14 +1,9 @@
 #include <mythtv/mythcontext.h>
 #include <mythtv/mythdbcon.h>
+#include <mythtv/mythpluginapi.h>
 
 #include "moviesui.h"
 #include "moviessettings.h"
-
-extern "C" {
-    int mythplugin_init(const char *libversion);
-    int mythplugin_run(void);
-    int mythplugin_config(void);
-}
 
 void runMovies(void);
 int setupDatabase();

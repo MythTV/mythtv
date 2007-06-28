@@ -30,14 +30,9 @@
 #include <mythtv/mythcontext.h>
 #include <mythtv/mythdialogs.h>
 #include <mythtv/mythplugin.h>
+#include <mythtv/mythpluginapi.h>
 
 using namespace std;
-
-extern "C" {
-int mythplugin_init(const char *libversion);
-int mythplugin_run(void);
-int mythplugin_config(void);
-}
 
 void runNews(void);
 

@@ -20,12 +20,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
  * 02111-1307, USA
  */
-#ifndef MAIN_CPP
-#define MAIN_CPP
 
 // MythTV headers
 #include <mythtv/mythcontext.h> // for MYTH_BINARY_VERSION
 #include <mythtv/mythdialogs.h>
+#include <mythtv/mythpluginapi.h>
 
 // MythControls headers
 #include "mythcontrols.h"
@@ -34,7 +33,7 @@
  *  \param libversion The mythtv library version.
  *  \return 0 if all is well, otherwise -1
  */
-extern "C" int mythplugin_init(const char *libversion)
+int mythplugin_init(const char *libversion)
 {
     bool ok = gContext->TestPopupVersion(
         "mythcontrols", libversion, MYTH_BINARY_VERSION);
@@ -45,7 +44,7 @@ extern "C" int mythplugin_init(const char *libversion)
 /** \brief Runs the plugin.
  *  \return 0 if all is well, otherwise -1
  */
-extern "C" int mythplugin_run(void)
+int mythplugin_run(void)
 {
     bool ok = true;
     MythControls controls(gContext->GetMainWindow(), ok);
@@ -65,9 +64,7 @@ extern "C" int mythplugin_run(void)
 }
 
 /// \brief Plug-in config handler, does nothing.
-extern "C" int mythplugin_config(void)
+int mythplugin_config(void)
 {
     return 0;
 }
-
-#endif /* MAIN_CPP */

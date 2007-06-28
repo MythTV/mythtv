@@ -23,6 +23,7 @@ using namespace std;
 #include <mythtv/dialogbox.h>
 #include <mythtv/util.h>
 #include <mythtv/libmythui/myththemedmenu.h>
+#include <mythtv/mythpluginapi.h>
 
 // mytharchive
 #include "archivesettings.h"
@@ -512,14 +513,6 @@ void runMenu(QString which_menu)
         cerr << "Couldn't find theme " << themedir << endl;
     }
 }
-
-
-extern "C" {
-int mythplugin_init(const char *libversion);
-int mythplugin_run(void);
-int mythplugin_config(void);
-}
-
 
 void initKeys(void)
 {
