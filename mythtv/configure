@@ -792,7 +792,7 @@ MYTHTV_CONFIG_LIST='
     directfb
     directx
     dvb
-    ffmpeg_threads
+    ffmpeg_pthreads
     firewire
     frontend
     hdhomerun
@@ -2299,7 +2299,7 @@ if enabled ffserver; then
     check_header sys/poll.h
 fi
 
-enabled ffmpeg_threads && enable pthreads
+enabled ffmpeg_pthreads && enable pthreads
 
 # check for some common methods of building with pthread support
 # do this before the optional library checks as some of them require pthreads
