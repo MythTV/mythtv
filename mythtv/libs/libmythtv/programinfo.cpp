@@ -1576,7 +1576,7 @@ void ProgramInfo::StartedRecording(QString prefix, QString ext)
                  " AND title = :TITLE;");
     query.bindValue(":CHANID", chanid);
     query.bindValue(":START", startts);
-    query.bindValue(":TITLE", title);
+    query.bindValue(":TITLE", title.utf8());
     if (!query.exec() || !query.isActive())
         MythContext::DBError("Copy program data on record", query);
 
