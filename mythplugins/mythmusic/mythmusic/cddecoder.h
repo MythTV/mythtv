@@ -31,9 +31,12 @@ class CdDecoder : public Decoder
     int getNumTracks(void);
     int getNumCDAudioTracks(void);
 
+    // The following need to allocate a new Metadata object each time,
+    // because their callers (e.g. databasebox.cpp) free the returned value
     Metadata *getMetadata(int track);
     Metadata *getMetadata(void);
     Metadata *getLastMetadata(void);
+
     void commitMetadata(Metadata *mdata);
     void      setDevice(const QString &dev)  { devicename = dev; }
     void      setCDSpeed(int speed);
@@ -50,9 +53,11 @@ class CdDecoder : public Decoder
     QString            devicename;
 
 #ifdef CONFIG_DARWIN
+    void CdDecoder::lookupCDDB(const QString &hexID, uint tracks);
+
     uint32_t           m_diskID;        ///< For CDDB1/FreeDB lookup
-    int                m_firstTrack,
-                       m_lastTrack,
+    uint               m_firstTrack,    ///< First AUDIO track
+                       m_lastTrack,     ///< Last  AUDIO track
                        m_leadout;       ///< End of last track
     double             m_lengthInSecs;
     vector<int>        m_tracks;        ///< Start block offset of each track

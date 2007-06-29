@@ -61,7 +61,7 @@ QString fileForTrack(QString path, uint track)
 }
 
 /**
- * Load XML file that OS X generates for us for Audio CDs, and calc. checksum
+ * Load XML file that OS X generates for us for Audio CDs, calculate checksum
  */
 bool CdDecoder::initialize()
 {
@@ -71,15 +71,15 @@ bool CdDecoder::initialize()
 
     if (!TOCfile.open(IO_ReadOnly))
     {
-        VERBOSE(VB_GENERAL, "Unable to open Audio CD TOC file: "
-                            + TOCfile.name());
+        VERBOSE(VB_GENERAL,
+                "Unable to open Audio CD TOC file: " + TOCfile.name());
         return false;
     }
 
     if (!TOC.setContent(&TOCfile))
     {
-        VERBOSE(VB_GENERAL, "Unable to parse Audio CD TOC file: "
-                            + TOCfile.name());
+        VERBOSE(VB_GENERAL,
+                "Unable to parse Audio CD TOC file: " + TOCfile.name());
         TOCfile.close();
         return false;
     }
@@ -156,22 +156,34 @@ bool CdDecoder::initialize()
     // Generate empty MetaData records.
     // We fill in the other details later (from CDDB if possible)
 
-    QString file;
-    uint    len;
-
     m_tracks.push_back(m_leadout);  // This simplifies the loop
 
     for (trk = 1; trk <= totalTracks; ++trk)
     {
-        file = fileForTrack(devicename, trk);
-        len  = 1000 * (m_tracks[trk] - m_tracks[trk-1]) / 75;
-        m_mData.push_back(new Metadata(file, "", "", "", "", "", 0, trk, len));
+        QString file = fileForTrack(devicename, trk);
+        uint    len  = 1000 * (m_tracks[trk] - m_tracks[trk-1]) / 75;
+
+        m_mData.push_back(new Metadata(file, NULL, NULL, NULL,
+                                       NULL, NULL, 0, trk, len));
     }
 
 
-    // Lookup CDDB/FreeDB and get matching disks:
+    // Try to fill in this MetaData from CDDB lookup:
+    lookupCDDB(hexID, totalTracks);
+
+
+    inited = true;
+    return true;
+}
+
+/**
+ * Lookup FreeDB/CDDB, populate m_mData with results
+ */
+void CdDecoder::lookupCDDB(const QString &hexID, uint totalTracks)
+{
     QString helloID = getenv("USER");
     QString queryID = "cddb+query+";
+    uint    trk;
 
     if (helloID.isNull())
         helloID = "anon";
@@ -210,6 +222,7 @@ bool CdDecoder::initialize()
     {
         QString album;
         QString artist;
+        bool    compn = false;
         QString genre = cddb.section(' ', 0, 0);
         int     year  = 0;
 
@@ -217,14 +230,30 @@ bool CdDecoder::initialize()
         URL2 = URL + "cddb+read+" + genre + "+"
                + hexID + "&hello=" + helloID + "&proto=5";
         cddb = HttpComms::getHttp(URL2);
+        //VERBOSE(VB_MEDIA, "CDDB detail: " + URL2);
+        //VERBOSE(VB_MEDIA, "...returned: " + cddb);
+
+        // Successful lookup.
+        // Clear current titles (filenames), because we append to them
+        for (trk = 0; trk < totalTracks; ++trk)
+            m_mData[trk]->setTitle("");
+
+        // Parse returned data:
 
         cddb.replace(QRegExp(".*#"), "");  // Remove comment block
         while (cddb.length())
         {
             // Lines should be of the form "FIELD=value\r\n"
 
+            QString art   = "";
             QString line  = cddb.section(QRegExp("(\r|\n)+"), 0, 0);
             QString value = line.section('=', 1, 1);
+
+            if (value.contains(" / "))
+            {
+                art   = value.section(" / ", 0, 0);  // Artist in *TITLE
+                value = value.section(" / ", 1, 1);
+            }
 
             if (line.startsWith("DGENRE="))
                 genre = value;
@@ -232,15 +261,27 @@ bool CdDecoder::initialize()
                 year = value.toInt();
             else if (line.startsWith("DTITLE="))
             {
-                artist = value.section(" / ", 0, 0);
-                album  = value.section(" / ", 1, 1);
+                // Albums (and maybe artists?) can wrap over multiple lines:
+                artist += art;
+                album  += value;
             }
             else if (line.startsWith("TTITLE"))
             {
                 trk = line.remove("TTITLE").remove(QRegExp("=.*")).toUInt();
 
                 if (trk < totalTracks)
-                    m_mData[trk]->setTitle(value);
+                {
+                    Metadata *m = m_mData[trk];
+
+                    // Titles can wrap over multiple lines, so we load+store:
+                    m->setTitle(m->Title() + value);
+
+                    if (art.length())
+                    {
+                        compn = true;  // Probably a compilation
+                        m->setArtist(art);
+                    }
+                }
                 else
                     VERBOSE(VB_GENERAL,
                             QString("CDDB returned %1 on a %2 track disk!")
@@ -255,21 +296,24 @@ bool CdDecoder::initialize()
         {
             Metadata *m = m_mData[trk];
 
+            if (compn)
+                m->setCompilation(true);
+
             m->setGenre(genre);
 
             if (year)
                 m->setYear(year);
 
-            if (album)
+            if (album.length())
                 m->setAlbum(album);
 
-            if (artist)
-                m->setArtist(artist);
+            if (artist.length())
+                if (compn)
+                    m->setCompilationArtist(artist);
+                else
+                    m->setArtist(artist);
         }
     }
-
-    inited = true;
-    return true;
 }
 
 double CdDecoder::lengthInSeconds()
@@ -336,12 +380,15 @@ Metadata* CdDecoder::getMetadata(int track)
         return NULL;
     }
 
-    return m_mData[track-1];
+    return new Metadata(*(m_mData[track - 1]));
 }
 
 Metadata *CdDecoder::getLastMetadata()
 {
-    return NULL;
+    if (!inited)
+        initialize();
+
+    return new Metadata(*(m_mData[m_mData.size() - 1]));
 }
 
 Metadata *CdDecoder::getMetadata()
