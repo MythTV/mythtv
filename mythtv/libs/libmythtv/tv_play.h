@@ -190,6 +190,10 @@ class MPUBLIC TV : public QObject
 
     void SetIgnoreKeys(bool ignore) { ignoreKeys = ignore; }
 
+    // Used by EPG
+    void ChangeVolume(bool up);
+    void ToggleMute(void);
+
   public slots:
     void HandleOSDClosed(int osdType);
 
@@ -234,8 +238,6 @@ class MPUBLIC TV : public QObject
     void PauseLiveTV(void);
     void UnpauseLiveTV(void);
 
-    void ChangeVolume(bool up);
-    void ToggleMute(void);
     void ToggleLetterbox(int letterboxMode = -1);
 
     bool FillMenuTracks(OSDGenericTree*, uint type);

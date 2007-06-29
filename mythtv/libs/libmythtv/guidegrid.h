@@ -71,6 +71,8 @@ class GuideGrid : public MythDialog
 
     void showProgFinder();
     void channelUpdate();
+    void volumeUpdate(bool);
+    void toggleMute();
 
     void quickRecord();
     void editRecording();

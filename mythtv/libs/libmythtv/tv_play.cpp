@@ -271,6 +271,9 @@ void TV::InitKeys(void)
             "favorites in the program guide.", "/");
     REG_KEY("TV Frontend", "CHANUPDATE", "Switch channels without exiting "
             "guide in Live TV mode.", "X");
+    REG_KEY("TV Frontend", "VOLUMEDOWN", "Volume down", "[,{,F10");
+    REG_KEY("TV Frontend", "VOLUMEUP", "Volume up", "],},F11");
+    REG_KEY("TV Frontend", "MUTE", "Mute", "|,\\,F9");
     REG_KEY("TV Frontend", "RANKINC", "Increase program or channel rank",
             "Right");
     REG_KEY("TV Frontend", "RANKDEC", "Decrease program or channel rank",

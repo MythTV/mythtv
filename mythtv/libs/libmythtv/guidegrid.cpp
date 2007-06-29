@@ -463,6 +463,12 @@ void GuideGrid::keyPressEvent(QKeyEvent *e)
                 toggleChannelFavorite();
             else if (action == "CHANUPDATE")
                 channelUpdate();
+            else if (action == "VOLUMEUP")
+                volumeUpdate(true);
+            else if (action == "VOLUMEDOWN")
+                volumeUpdate(false);
+            else if (action == "MUTE")
+                toggleMute();
             else
                 handled = false;
         }
@@ -1838,6 +1844,18 @@ void GuideGrid::channelUpdate(void)
         m_player->EPGChannelUpdate(info.chanid, info.chanstr);
         videoRepaintTimer->start(200);
     }
+}
+
+void GuideGrid::volumeUpdate(bool up)
+{
+    if (m_player)
+        m_player->ChangeVolume(up);
+}
+
+void GuideGrid::toggleMute(void)
+{
+    if (m_player)
+        m_player->ToggleMute();
 }
 
 //
