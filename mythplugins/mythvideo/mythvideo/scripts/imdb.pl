@@ -36,7 +36,7 @@ use vars qw($opt_h $opt_r $opt_d $opt_i $opt_v $opt_D $opt_M $opt_P);
 use Getopt::Std; 
 
 $title = "IMDB Query"; 
-$version = "v1.3";
+$version = "v1.3.1";
 $author = "Tim Harvey, Andrei Rjeousski";
 
 binmode(STDOUT, ":utf8");
@@ -429,16 +429,16 @@ sub getMovieList {
    #    possible matches are grouped in several catagories:  
    #        exact, partial, and approximate
    my $popular_results = parseBetween($response, "<b>Popular Titles</b>",
-                                              "</ol>");
+                                              "</table>");
    my $exact_matches = parseBetween($response, "<b>Titles (Exact Matches)</b>",
-                                              "</ol>");
+                                              "</table>");
    my $partial_matches = parseBetween($response, "<b>Titles (Partial Matches)</b>", 
-                                              "</ol>");
-#   my $approx_matches = parseBetween($response, "<b>Approximate Matches</b>", 
-#                                               "</ol>");
+                                              "</table>");
+#   my $approx_matches = parseBetween($response, "<b>Titles (Approx Matches)</b>", 
+#                                               "</table>");
    # parse movie list from matches
-   my $beg = "<li>";
-   my $end = "</li>";
+   my $beg = "<tr>";
+   my $end = "</tr>";
    my $count = 0;
    my @movies;
 
@@ -468,27 +468,16 @@ sub getMovieList {
       my $type = "";
       my $movienum = "";
 
-      my $link_end = "</a>";
-      $fl_end = index($entry, $link_end);
-      $fl_end += length($link_end);
-      my $lhs = substr($entry, 0, $fl_end);
-      my $rhs = substr($entry, $fl_end);
-
-      if ($lhs =~ m/<a href="\/title\/tt(\d+)\/.*\">(.+)<\/a>/i) {
+      if ($entry =~ m/<a href="\/title\/tt(\d+)\/.*\">(.+)<\/a> \((\d+)\)(?: \((.+)\))?/i) {
           $movienum = $1;
           $title = $2;
+	  $year = $3;
+	  $type = $4 if ($4);
       } else {
            if (defined $opt_d) {
-               print("Unrecognized entry format\n");
+               print("Unrecognized entry format ($entry)\n");
            }
            next;
-      }
-
-      if ($rhs =~ m/\((\d+)\) \((.+)\)/) {
-          $year = $1;
-          $type = $2;
-      } elsif ($rhs =~ m/\((\d+)\)/) {
-          $year = $1;
       }
 
       my $skip = 0;
