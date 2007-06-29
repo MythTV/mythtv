@@ -96,6 +96,8 @@ static long int getSectorCount (QString &cddevice, int tracknum)
     }
 
     cdda_close(device);
+#else
+    (void)cddevice; (void)tracknum;
 #endif
     return 0;
 }
@@ -395,6 +397,8 @@ int CDRipperThread::ripTrack(QString &cddevice, Encoder *encoder, int tracknum)
     cdda_close(device);
 
     return (curpos - start + 1) * CD_FRAMESIZE_RAW;
+#else
+    (void)cddevice; (void)encoder; (void)tracknum;
 #endif
 
     return 0;
