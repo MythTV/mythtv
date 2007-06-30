@@ -471,8 +471,8 @@ sub getMovieList {
       if ($entry =~ m/<a href="\/title\/tt(\d+)\/.*\">(.+)<\/a> \((\d+)\)(?: \((.+)\))?/i) {
           $movienum = $1;
           $title = $2;
-	  $year = $3;
-	  $type = $4 if ($4);
+          $year = $3;
+          $type = $4 if ($4);
       } else {
            if (defined $opt_d) {
                print("Unrecognized entry format ($entry)\n");
