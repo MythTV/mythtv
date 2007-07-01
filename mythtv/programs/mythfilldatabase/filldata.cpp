@@ -2784,7 +2784,7 @@ void clearOldDBEntries(void)
 
     query.prepare("DELETE FROM record WHERE (type = :SINGLE "
                   "OR type = :OVERRIDE OR type = :DONTRECORD) "
-                  "AND enddate < NOW();");
+                  "AND enddate < CURDATE();");
     query.bindValue(":SINGLE", kSingleRecord);
     query.bindValue(":OVERRIDE", kOverrideRecord);
     query.bindValue(":DONTRECORD", kDontRecord);
