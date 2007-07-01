@@ -146,7 +146,7 @@ void ProgramData::clearOldDBEntries(void)
 
     query.prepare("DELETE FROM record WHERE (type = :SINGLE "
                   "OR type = :OVERRIDE OR type = :DONTRECORD) "
-                  "AND enddate < NOW();");
+                  "AND enddate < CURDATE();");
     query.bindValue(":SINGLE", kSingleRecord);
     query.bindValue(":OVERRIDE", kOverrideRecord);
     query.bindValue(":DONTRECORD", kDontRecord);
@@ -158,7 +158,7 @@ void ProgramData::clearOldDBEntries(void)
                   "WHERE type = :FINDONE AND oldfind.findid IS NOT NULL;");
     findq.bindValue(":FINDONE", kFindOneRecord);
     findq.exec();
-        
+
     if (findq.isActive() && findq.size() > 0)
     {
         while (findq.next())
