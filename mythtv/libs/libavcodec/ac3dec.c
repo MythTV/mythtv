@@ -692,7 +692,7 @@ static void ac3_downmix(float samples[AC3_MAX_CHANNELS][256], int nfchans,
 static void do_imdct_256(AC3DecodeContext *ctx, int ch)
 {
     int k;
-    float x[128];
+    DECLARE_ALIGNED_16(float, x[128]);
     FFTComplex z[2][64];
     float *o_ptr = ctx->tmp_output;
     int i;
