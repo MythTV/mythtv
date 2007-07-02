@@ -1673,7 +1673,9 @@ bool VideoOutputXv::CreateBuffers(VOSType subtype)
     {
         if (subtype == XShm)
         {
-            CreateShmImages(1, false);
+            vector<unsigned char*> bufs = CreateShmImages(1, false);
+            if (bufs.empty())
+                return false;
             XJ_non_xv_image = (XImage*) xv_buffers.begin()->second;
         }
         else
