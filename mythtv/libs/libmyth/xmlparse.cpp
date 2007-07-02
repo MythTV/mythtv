@@ -430,9 +430,9 @@ void XMLParse::parseImage(LayerSet *container, QDomElement &element)
     if (!visible.isNull() && !visible.isEmpty())
     {
         if (visible.lower() == "yes")
-            image->SetVisible(true);
+            image->show();
         else
-            image->SetVisible(false);
+            image->hide();
     }
 
     if (context != -1)

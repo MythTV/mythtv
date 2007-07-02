@@ -621,7 +621,6 @@ class MPUBLIC UIImageType : public UIType
     void SetImage(const QPixmap &imgdata) { img = imgdata; m_show = true; }
     void SetSize(int x, int y) { m_force_x = x; m_force_y = y; }
     void SetSkip(int x, int y) { m_drop_x = x; m_drop_y = y; }
-    void SetVisible(bool visible) { m_show = visible; }
 
     void ResetImage() { img = QPixmap(); }
     void LoadImage();
