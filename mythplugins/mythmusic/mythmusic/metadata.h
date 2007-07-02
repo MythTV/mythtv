@@ -347,6 +347,7 @@ class AllMusic
     void        buildTree();
     void        printTree();    // debugging
     void        sortTree();
+    inline void clearTree() { m_root_node-> clear(); }
     void        writeTree(GenericTree *tree_to_write_to);
     void        setSorting(QString a_paths);
     bool        putYourselfOnTheListView(TreeCheckItem *where);

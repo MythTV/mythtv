@@ -951,7 +951,7 @@ void AllMusic::buildTree()
 {
     //
     //  Given "paths" and loaded metadata,
-    //  build a tree (nodes, leafs, and all)
+    //  build a tree (nodes, leaves, and all)
     //  that reflects the desired structure
     //  of the metadata. This is a structure
     //  that makes it easy (and QUICK) to 

@@ -582,6 +582,7 @@ void Playlist::fillSongsFromSonglist(bool filter)
 
     if (filter)
     {
+        all_available_music->clearTree();
         all_available_music->buildTree();
         all_available_music->sortTree();
     }
@@ -946,7 +947,7 @@ int Playlist::writeTree(GenericTree *tree_to_write_to, int a_counter)
             {
                 // Normal track
                 Metadata *tmpdata = all_available_music->getMetadata(it->getValue());
-                if (tmpdata)
+                if (tmpdata && tmpdata->isVisible())
                 {
                     if (songs.at() == 0) { // first song
                         playcountMin = playcountMax = tmpdata->PlayCount();
@@ -984,7 +985,7 @@ int Playlist::writeTree(GenericTree *tree_to_write_to, int a_counter)
             {
                 // Normal track
                 Metadata *tmpdata = all_available_music->getMetadata(it->getValue());
-                if (tmpdata)
+                if (tmpdata && tmpdata->isVisible())
                 {
                     QString a_string = QString("%1 ~ %2").arg(tmpdata->FormatArtist()).arg(tmpdata->FormatTitle());
                     GenericTree *added_node = tree_to_write_to->addNode(a_string, it->getValue(), true);
@@ -1067,7 +1068,7 @@ int Playlist::writeTree(GenericTree *tree_to_write_to, int a_counter)
     return a_counter;
 }
 
-void PlaylistsContainer::writeTree(GenericTree *tree_to_write_to)
+GenericTree* PlaylistsContainer::writeTree(GenericTree *tree_to_write_to)
 {
     all_available_music->writeTree(tree_to_write_to);
 
@@ -1123,7 +1124,10 @@ void PlaylistsContainer::writeTree(GenericTree *tree_to_write_to)
         a_list->writeTree(new_node, 0);
         ++iterator;
     }
-    
+
+    GenericTree* active_playlist_node = subsub_node->findLeaf();
+    if(!active_playlist_node) active_playlist_node = subsub_node;
+    return active_playlist_node;
 }
 
 void PlaylistsContainer::save()

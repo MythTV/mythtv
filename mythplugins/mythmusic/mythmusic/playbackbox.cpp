@@ -1784,8 +1784,9 @@ void PlaybackBoxMusic::constructPlaylistTree()
     // whether a node is selectable, how it can be ordered (normal, random, 
     // intelligent, album), etc. 
 
-    all_playlists->writeTree(playlist_tree);
+    GenericTree *active_playlist_node = all_playlists->writeTree(playlist_tree);
     music_tree_list->assignTreeData(playlist_tree);
+    music_tree_list->setCurrentNode(active_playlist_node);
     tree_is_done = true;
 }
 

@@ -172,7 +172,7 @@ class PlaylistsContainer
     void            setActiveWidget(PlaylistTitle *widget);
     PlaylistTitle*  getActiveWidget(void) { return active_widget; }
 
-    void            writeTree(GenericTree *tree_to_write_to);
+    GenericTree*    writeTree(GenericTree *tree_to_write_to);
     void            clearCDList();
     void            addCDTrack(int x);
     void            removeCDTrack(int x);
