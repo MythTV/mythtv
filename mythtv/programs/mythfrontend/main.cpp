@@ -769,6 +769,7 @@ void CleanupMyOldInUsePrograms(void)
 
 int main(int argc, char **argv)
 {
+
     QString geometry = QString::null;
     QString display  = QString::null;
 #ifdef Q_WS_X11
@@ -789,6 +790,22 @@ int main(int argc, char **argv)
     QApplication::setDesktopSettingsAware(FALSE);
 #endif
     QApplication a(argc, argv);
+
+    for(int argpos = 1; argpos < a.argc(); ++argpos)
+    {
+        if (!strcmp(a.argv()[argpos],"--version"))
+        {
+            extern const char *myth_source_version;
+            cout << "Library API version     : " << MYTH_BINARY_VERSION << endl;
+            cout << "Source code version     : " << myth_source_version << endl;
+            cout << "Network Protocol Version: " << MYTH_PROTO_VERSION << endl;
+#ifdef MYTH_BUILD_CONFIG
+            cout << "Options compiled in:" <<endl;
+            cout << MYTH_BUILD_CONFIG << endl;
+#endif
+            return FRONTEND_EXIT_OK;
+        }
+    }
 
     QString logfile = "";
 
@@ -878,18 +895,6 @@ int main(int argc, char **argv)
                 cerr << "Missing argument to -v/--verbose option\n";
                 return FRONTEND_EXIT_INVALID_CMDLINE;
             }
-        }
-        else if (!strcmp(a.argv()[argpos],"--version"))
-        {
-            extern const char *myth_source_version;
-            cout << "Library API version     : " << MYTH_BINARY_VERSION << endl;
-            cout << "Source code version     : " << myth_source_version << endl;
-            cout << "Network Protocol Version: " << MYTH_PROTO_VERSION << endl;
-#ifdef MYTH_BUILD_CONFIG
-            cout << "Options compiled in:" <<endl;
-            cout << MYTH_BUILD_CONFIG << endl;
-#endif
-            return FRONTEND_EXIT_OK;
         }
         else if (!strcmp(a.argv()[argpos],"-r") ||
                  !strcmp(a.argv()[argpos],"--reset"))
