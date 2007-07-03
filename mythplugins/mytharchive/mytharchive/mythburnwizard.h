@@ -74,6 +74,7 @@ class MythburnWizard : public MythThemedDialog
     void loadEncoderProfiles(void);
     EncoderProfile *getDefaultProfile(ArchiveItem *item);
     long long recalcSize(EncoderProfile *profile, ArchiveItem *a);
+    void recalcItemSize(ArchiveItem *item);
     void setProfile(EncoderProfile *profile, ArchiveItem *item);
     void runScript();
 

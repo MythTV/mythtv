@@ -598,6 +598,33 @@ void MythburnWizard::setProfile(int itemNo)
     }
 }
 
+void MythburnWizard::recalcItemSize(ArchiveItem *item)
+{
+    if (!item)
+        return;
+
+    if (!item->encoderProfile)
+        return;
+
+    if (item->encoderProfile->name == "NONE")
+    {
+        if (item->hasCutlist && item->useCutlist)
+            item->newsize = (long long) (item->size /
+                    ((float)item->duration / (float)item->cutDuration));
+        else
+            item->newsize = item->size;
+    }
+    else
+        item->newsize = recalcSize(item->encoderProfile, item);
+
+    if (newsize_text)
+    {
+        newsize_text->SetText(tr("New Size ") + formatSize(item->newsize / 1024, 2));
+    }
+
+    updateSizeBar();
+}
+
 void MythburnWizard::setProfile(EncoderProfile *profile, ArchiveItem *item)
 {
     if (profile)
@@ -605,16 +632,8 @@ void MythburnWizard::setProfile(EncoderProfile *profile, ArchiveItem *item)
         profile_text->SetText(profile->description);
         if (item)
         {
-            if (profile->name == "NONE")
-            {
-                item->encoderProfile = profile;
-                item->newsize = item->size;
-            }
-            else
-            {
-                item->encoderProfile = profile;
-                item->newsize = recalcSize(profile, item);
-            }
+            item->encoderProfile = profile;
+            recalcItemSize(item);
 
             if (newsize_text)
             {
@@ -631,7 +650,13 @@ long long MythburnWizard::recalcSize(EncoderProfile *profile, ArchiveItem *a)
     if (a->duration == 0)
         return 0;
 
-    int length = a->duration;
+    int length;
+
+    if (a->hasCutlist && a->useCutlist)
+        length = a->cutDuration;
+    else
+        length = a->duration;
+
     float len = (float) length / 3600;
     return (long long) (len * profile->bitrate * 1024 * 1024);
 }
@@ -648,6 +673,8 @@ void MythburnWizard::toggleUseCutlist(bool state)
         return;
 
     a->useCutlist = state;
+
+    recalcItemSize(a);
 
     updateSelectedArchiveList();
 }
@@ -1085,6 +1112,7 @@ void MythburnWizard::getArchiveListFromDB(void)
                 item->useCutlist = false;
                 item->editedDetails = false;
                 item->duration = 0;
+                item->cutDuration = 0;
                 item->fileCodec = "";
                 item->videoCodec = "";
                 item->videoWidth = 0;

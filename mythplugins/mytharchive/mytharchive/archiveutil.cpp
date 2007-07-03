@@ -236,6 +236,7 @@ bool getFileDetails(ArchiveItem *a)
     QDomElement e = n.toElement();
     a->fileCodec = e.attribute("type");
     a->duration = e.attribute("duration").toInt();
+    a->cutDuration = e.attribute("cutduration").toInt();
 
     // get frame size and video codec
     nodeList = doc.elementsByTagName("video");

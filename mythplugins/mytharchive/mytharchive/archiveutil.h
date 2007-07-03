@@ -57,6 +57,7 @@ typedef struct
     long long size;
     long long newsize;
     int duration;
+    int cutDuration;
     EncoderProfile *encoderProfile;
     QString fileCodec;
     QString videoCodec;
