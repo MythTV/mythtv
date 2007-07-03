@@ -184,6 +184,54 @@ from the database automagically when used in %MythTV's window classes.
     \todo No one is working on documenting the video subsystem
  */
 
+/** \defgroup mtd                   MTD (the Myth Transcoding Daemon)
+    \todo Include sample response formats?
+
+The MTD is a simple program that is used by the MythVideo plugin.
+
+It currently \b only transcodes tracks from DVDs, but could in the
+future also rip CD tracks, transcode TV recordings, \e et \e cetera.
+
+The DVD Rip screen will offer to start MTD if it is not running.
+It does \b not currently shut it down afterwards, though.
+
+By default, the MTD listens on port 2442, for commands of this format:
+
+\verbatim
+halt
+quit
+shutdown
+\endverbatim
+Tells the MTD to wait for all jobs to finish, stop listening, and exit.
+
+\verbatim
+hello
+\endverbatim
+Send a trivial response if the \noref MTD is listening.
+
+\verbatim
+status
+\endverbatim
+Sends a response listing the status of all jobs.
+
+\verbatim
+media
+\endverbatim
+Sends a detailed list of titles/tracks on the current disk.
+
+\verbatim
+job dvd TITLE AUDIOTRK QUALITY AC3 SUBTITLETRK DESTPATH
+\endverbatim
+Starts a transcoding job. TITLE, AUDIOTRK and SUBTITLETRK are integers to
+select the track details. AC3 is 0 or 1. DESTPATH is the outut file.
+QUALITY is one of enum \ref RIP_QUALITIES
+
+\verbatim
+abort dvd job NNNN
+\endverbatim
+Aborts the job identified by the job number NNNN.
+*/
+
 /** \defgroup myth_network_protocol Myth Network Protocol
     \todo No one is working on documenting the myth network protocol
  */
