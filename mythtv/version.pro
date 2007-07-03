@@ -6,13 +6,16 @@
 ############################################################
 
 SVNTREEDIR = $$system(pwd)
+SVNREPOPATH = "$$URL$$"
 
 SOURCES += version.cpp
 
 version.target = version.cpp 
 version.commands = sh -c "echo 'const char *myth_source_version =' \
 '\"'`(svnversion $${SVNTREEDIR} 2>/dev/null) || echo Unknown`'\";' \
-> .vers.new ; diff .vers.new version.cpp > .vers.diff 2>&1 ; \
+> .vers.new ; echo 'const char *myth_source_path = \"'`echo $${SVNREPOPATH} \
+| sed -e 's,.*/svn/,,' -e 's,/mythtv/version\.pro.*,,'`'\";' \
+>> .vers.new ; diff .vers.new version.cpp > .vers.diff 2>&1 ; \
 if test -s .vers.diff ; then mv -f .vers.new version.cpp ; fi ; \
 rm -f .vers.new .vers.diff"
 version.depends = FORCE 
