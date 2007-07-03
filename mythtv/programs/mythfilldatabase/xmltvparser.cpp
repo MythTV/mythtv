@@ -552,9 +552,8 @@ bool XMLTVParser::parseFile(
 
     if (!dash_open(f, filename, IO_ReadOnly))
     {
-        cerr << QString("Error unable to open '%1' for reading.")
-                .arg(filename)
-             << endl;
+        VERBOSE(VB_IMPORTANT, QString("Error unable to open '%1' for reading.")
+                .arg(filename));
         return false;
     }
 
@@ -564,8 +563,8 @@ bool XMLTVParser::parseFile(
 
     if (!doc.setContent(&f, &errorMsg, &errorLine, &errorColumn))
     {
-        cerr << "Error in " << errorLine << ":" << errorColumn << ": "
-             << errorMsg << endl;
+        VERBOSE(VB_IMPORTANT, QString("Error in %1:%2: %3")
+            .arg(errorLine).arg(errorColumn).arg(errorMsg));
 
         f.close();
         return true;
@@ -581,14 +580,16 @@ bool XMLTVParser::parseFile(
 
     if (config_offset == "Auto")
     {
-        localTimezoneOffset = -841; // we mark auto with the -ve of the disable magic number
+        // we mark auto with the -ve of the disable magic number
+        localTimezoneOffset = -841;
     }
     else if (config_offset != "None")
     {
         localTimezoneOffset = TimezoneToInt(config_offset);
         if (abs(localTimezoneOffset) > 840)
         {
-            cerr << "Ignoring invalid TimeOffset " << config_offset << endl;
+            VERBOSE(VB_XMLTV, QString("Ignoring invalid TimeOffset %1")
+                .arg(config_offset));
             localTimezoneOffset = 841;
         }
     }
@@ -600,8 +601,8 @@ bool XMLTVParser::parseFile(
     QUrl sourceUrl(docElem.attribute("source-info-url", ""));
     if (sourceUrl.toString() == "http://labs.zap2it.com/")
     {
-        cerr << "Don't use tv_grab_na_dd, use the internal datadirect grabber."
-             << endl;
+        VERBOSE(VB_IMPORTANT, "Don't use tv_grab_na_dd, use the"
+            "internal datadirect grabber.");
         exit(FILLDB_BUGGY_EXIT_SRC_IS_DD);
     }
 
