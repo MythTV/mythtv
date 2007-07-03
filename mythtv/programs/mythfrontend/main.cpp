@@ -772,28 +772,10 @@ int main(int argc, char **argv)
 
     QString geometry = QString::null;
     QString display  = QString::null;
-#ifdef Q_WS_X11
-    // Remember any -display or -geometry argument
-    // which QApplication init will remove.
-    for(int argpos = 1; argpos + 1 < argc; ++argpos)
-    {
-        if (!strcmp(argv[argpos],"-geometry"))
-            geometry = argv[argpos+1];
-        else if (!strcmp(argv[argpos],"-display"))
-            display = argv[argpos+1];
-    }
-#endif
 
-#ifdef Q_WS_MACX
-    // Without this, we can't set focus to any of the CheckBoxSetting, and most
-    // of the MythPushButton widgets, and they don't use the themed background.
-    QApplication::setDesktopSettingsAware(FALSE);
-#endif
-    QApplication a(argc, argv);
-
-    for(int argpos = 1; argpos < a.argc(); ++argpos)
+    for(int argpos = 0; argpos < argc; ++argpos)
     {
-        if (!strcmp(a.argv()[argpos],"--version"))
+        if (!strcmp(argv[argpos],"--version"))
         {
             extern const char *myth_source_version;
             extern const char *myth_source_path;
@@ -807,7 +789,22 @@ int main(int argc, char **argv)
 #endif
             return FRONTEND_EXIT_OK;
         }
+#ifdef Q_WS_X11
+    // Remember any -display or -geometry argument
+    // which QApplication init will remove.
+        else if (!strcmp(argv[argpos],"-geometry"))
+            geometry = argv[argpos+1];
+        else if (!strcmp(argv[argpos],"-display"))
+            display = argv[argpos+1];
+#endif
     }
+
+#ifdef Q_WS_MACX
+    // Without this, we can't set focus to any of the CheckBoxSetting, and most
+    // of the MythPushButton widgets, and they don't use the themed background.
+    QApplication::setDesktopSettingsAware(FALSE);
+#endif
+    QApplication a(argc, argv);
 
     QString logfile = "";
 
