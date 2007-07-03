@@ -10,8 +10,10 @@ using namespace std;
 
 #include <mythtv/mythdialogs.h>
 #include <mythtv/uitypes.h>
-#include <ffmpeg/avcodec.h>
-#include <ffmpeg/avformat.h>
+extern "C" {
+#include <mythtv/ffmpeg/avcodec.h>
+#include <mythtv/ffmpeg/avformat.h>
+}
 
 #include "archiveutil.h"
 

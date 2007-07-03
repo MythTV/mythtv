@@ -27,9 +27,11 @@ using namespace std;
 #include <mythtv/mythcontext.h>
 #include <mythtv/exitcodes.h>
 #include <mythtv/mythdbcon.h>
-#include <ffmpeg/avcodec.h>
-#include <ffmpeg/avformat.h>
-#include <libmythtv/programinfo.h>
+#include <mythtv/libmythtv/programinfo.h>
+extern "C" {
+#include <mythtv/ffmpeg/avcodec.h>
+#include <mythtv/ffmpeg/avformat.h>
+}
 
 // mytharchive headers
 #include "../mytharchive/archiveutil.h"
