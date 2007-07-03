@@ -1745,7 +1745,6 @@ int grabThumbnail(QString inFile, QString thumbList, QString outFile, int frameC
 
     // get list of required thumbs
     QStringList list = QStringList::split(",", thumbList);
-    cout << "list.count(): " << list.count() << endl; 
     AVFrame *frame = avcodec_alloc_frame();
     AVPacket pkt;
     AVPicture orig;
@@ -1882,6 +1881,44 @@ long long getFrameCount(AVFormatContext *inputFC, int vid_id)
     }
 
     return count;
+}
+
+long long getCutFrames(const QString &filename)
+{
+    // only wont the filename
+    QString basename = filename;
+    int pos = filename.findRev('/');
+    if (pos > 0)
+        basename = filename.mid(pos + 1);
+
+    ProgramInfo *progInfo = getProgramInfoForFile(basename);
+    if (!progInfo)
+        return 0;
+
+    QMap<long long, int> cutlist;
+    QMap<long long, int>::Iterator it;
+    long long frames = 0;
+
+    progInfo->GetCutList(cutlist);
+
+    for (it = cutlist.begin(); it != cutlist.end();)
+    {
+        long long start = 0, end = 0;
+
+        if (it.data() == MARK_CUT_START)
+        {
+            start = it.key();
+            it++;
+            if (it != cutlist.end())
+            {
+                end = it.key();
+                it++;
+            }
+        }
+        frames += end - start;
+    }
+
+    return frames;
 }
 
 long long getFrameCount(const QString &filename, float fps)
@@ -2044,6 +2081,8 @@ int getFileInfo(QString inFile, QString outFile, int lenMethod)
 
                 streams.appendChild(stream);
 
+                uint duration = 0;
+
                 switch (lenMethod)
                 {
                     case 0:
@@ -2051,9 +2090,10 @@ int getFileInfo(QString inFile, QString outFile, int lenMethod)
                         // use duration guess from avformat
                         if (inputFC->duration != (uint) AV_NOPTS_VALUE)
                         {
-                            root.setAttribute("duration", (uint) inputFC->duration / AV_TIME_BASE);
+                            duration = (uint) inputFC->duration / AV_TIME_BASE;
+                            root.setAttribute("duration", duration);
                             VERBOSE(VB_JOBQUEUE, QString("duration = %1")
-                                    .arg(inputFC->duration / AV_TIME_BASE));
+                                    .arg(duration));
                         }
                         else
                             root.setAttribute("duration", "N/A");
@@ -2064,7 +2104,7 @@ int getFileInfo(QString inFile, QString outFile, int lenMethod)
                         // calc duration of the file by counting the video frames
                         long long frames = getFrameCount(inputFC, i);
                         VERBOSE(VB_JOBQUEUE, QString("frames = %1").arg(frames));
-                        int duration = (int)(frames / fps);
+                        duration = (uint)(frames / fps);
                         VERBOSE(VB_JOBQUEUE, QString("duration = %1").arg(duration));
                         root.setAttribute("duration", duration);
                         break;
@@ -2075,7 +2115,7 @@ int getFileInfo(QString inFile, QString outFile, int lenMethod)
                         // (only useful if the file is a myth recording)
                         long long frames = getFrameCount(inFile, fps);
                         VERBOSE(VB_JOBQUEUE, QString("frames = %1").arg(frames));
-                        int duration = (int)(frames / fps);
+                        duration = (uint)(frames / fps);
                         VERBOSE(VB_JOBQUEUE, QString("duration = %1").arg(duration));
                         root.setAttribute("duration", duration);
                         break;
@@ -2084,6 +2124,14 @@ int getFileInfo(QString inFile, QString outFile, int lenMethod)
                         root.setAttribute("duration", "N/A");
                         VERBOSE(VB_JOBQUEUE, QString("Unknown lenMethod (%1)").arg(lenMethod));
                 }
+
+                // add duration after all cuts are removed
+                long long frames = getCutFrames(inFile);
+                VERBOSE(VB_JOBQUEUE, QString("cutframes = %1").arg(frames));
+                int cutduration = (int)(frames / fps);
+                VERBOSE(VB_JOBQUEUE, QString("cutduration = %1").arg(cutduration));
+                root.setAttribute("cutduration", duration - cutduration);
+
                 break;
             }
 
