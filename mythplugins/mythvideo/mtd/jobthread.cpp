@@ -700,9 +700,21 @@ bool DVDISOCopyThread::copyFullDisc(void)
     off_t dvd_size = lseek(file.get(), 0, SEEK_END);
     lseek(file.get(), 0, SEEK_SET);
 
+    // Only happens on Darwin?
+    if (dvd_size < 2048)
+        sendLoggingEvent(QString("DVDISOCopyThread: bad disk size (%1 bytes)")
+                         .arg(dvd_size));
+
     const int buf_size = 1024 * 1024;
-    unsigned char buffer[buf_size];
+    unsigned char *buffer;
     long long total_bytes(0);
+
+    buffer = (unsigned char *)malloc(buf_size);
+    if (!buffer)
+    {
+        problem("DVDISOCopyThread couldn't malloc() 1MB");
+        return false;
+    }
 
     QTime job_time;
     job_time.start();
@@ -714,6 +726,7 @@ bool DVDISOCopyThread::copyFullDisc(void)
         {
             perror("read");
             problem(QString("DVDISOCopyThread dvd device read error"));
+            free(buffer);
             return false;
         }
         if(bytes_read == 0)
@@ -724,6 +737,7 @@ bool DVDISOCopyThread::copyFullDisc(void)
         if(!ripfile.writeBlocks(buffer, bytes_read))
         {
             problem(QString("DVDISOCopyThread rip file write error"));
+            free(buffer);
             return false;
         }
 
@@ -746,6 +760,7 @@ bool DVDISOCopyThread::copyFullDisc(void)
         }
     }
 
+    free(buffer);
     ripfile.close();
     sendLoggingEvent("job thread finished copying ISO image");
     return true;
