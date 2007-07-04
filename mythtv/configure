@@ -792,7 +792,6 @@ MYTHTV_CONFIG_LIST='
     directfb
     directx
     dvb
-    ffmpeg_pthreads
     firewire
     frontend
     hdhomerun
@@ -817,6 +816,7 @@ MYTHTV_LIST='
     audio_alsa
     audio_arts
     audio_jack
+    ffmpeg_pthreads
     mac_bundle
     proc_opt
     symbol_visibility
@@ -3192,8 +3192,11 @@ for part in $DECODER_LIST $ENCODER_LIST $PARSER_LIST $DEMUXER_LIST $MUXER_LIST; 
 done
 
 for opt in $MYTHTV_CONFIG_LIST $USING_LIST; do
-    enabled $opt && CCONFIG="$CCONFIG using_$opt"
+    enabled $opt && append CCONFIG "using_$opt"
 done
+  
+enabled threads && append CCONFIG "using_ffmpeg_threads"
+
 
 # build tree in object directory if source path is different from current one
 if enabled source_path_used; then
