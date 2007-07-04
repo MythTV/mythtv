@@ -706,38 +706,29 @@ bool DVDISOCopyThread::copyFullDisc(void)
                          .arg(dvd_size));
 
     const int buf_size = 1024 * 1024;
-    unsigned char *buffer;
+    std::vector<unsigned char> buffer(buf_size);
     long long total_bytes(0);
-
-    buffer = (unsigned char *)malloc(buf_size);
-    if (!buffer)
-    {
-        problem("DVDISOCopyThread couldn't malloc() 1MB");
-        return false;
-    }
 
     QTime job_time;
     job_time.start();
 
-    while( 1 )
+    while (1)
     {
-        int bytes_read = read(file.get(), buffer, buf_size);
-        if(bytes_read == -1)
+        int bytes_read = read(file.get(), &buffer[0], buf_size);
+        if (bytes_read == -1)
         {
             perror("read");
             problem(QString("DVDISOCopyThread dvd device read error"));
-            free(buffer);
             return false;
         }
-        if(bytes_read == 0)
+        if (bytes_read == 0)
         {
             break;
         }
 
-        if(!ripfile.writeBlocks(buffer, bytes_read))
+        if (!ripfile.writeBlocks(&buffer[0], bytes_read))
         {
             problem(QString("DVDISOCopyThread rip file write error"));
-            free(buffer);
             return false;
         }
 
@@ -752,15 +743,14 @@ bool DVDISOCopyThread::copyFullDisc(void)
         //  Escape out and clean up if mtd main thread
         //  tells us to
         //
-            
-        if(!keepGoing())
+
+        if (!keepGoing())
         {
             problem("abandoned job because master control said we need to shut down");
             return false;
         }
     }
 
-    free(buffer);
     ripfile.close();
     sendLoggingEvent("job thread finished copying ISO image");
     return true;
