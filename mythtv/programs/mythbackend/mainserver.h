@@ -175,6 +175,7 @@ class MainServer : public QObject, public MythSocketCBs
 
     QMutex deletelock;
     QMutex threadPoolLock;
+    QWaitCondition threadPoolCond;
     vector<ProcessRequestThread *> threadPool;
 
     bool masterBackendOverride;

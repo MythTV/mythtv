@@ -112,16 +112,16 @@ class ProcessRequestThread : public QThread
         lock.lock();
         socket = sock;
         socket->UpRef();
-        lock.unlock();
         waitCond.wakeOne();
+        lock.unlock();
     }
 
     void killit(void)
     {
         lock.lock();
         threadlives = false;
-        lock.unlock();
         waitCond.wakeOne();
+        lock.unlock();
     }
 
     virtual void run()
@@ -129,6 +129,10 @@ class ProcessRequestThread : public QThread
         threadlives = true;
 
         lock.lock();
+
+        // Signal back to the thread that created this one in case it is
+        // waiting to find out that it is up and running.
+        waitCond.wakeOne();
 
         while (1)
         {
@@ -149,13 +153,14 @@ class ProcessRequestThread : public QThread
         lock.unlock();
     }
 
+    QMutex lock;
+    QWaitCondition waitCond;
+
   private:
     MainServer *parent;
 
     MythSocket *socket;
 
-    QMutex lock;
-    QWaitCondition waitCond;
     bool threadlives;
 };
 
@@ -175,7 +180,10 @@ MainServer::MainServer(bool master, int port,
     for (int i = 0; i < PRT_STARTUP_THREAD_COUNT; i++)
     {
         ProcessRequestThread *prt = new ProcessRequestThread(this);
+        prt->lock.lock();
         prt->start();
+        prt->waitCond.wait(&prt->lock);
+        prt->lock.unlock();
         threadPool.push_back(prt);
     }
 
@@ -245,38 +253,28 @@ void MainServer::readyRead(MythSocket *sock)
 
     readReadyLock.lock();
 
-    MythTimer t;
-    t.start();
     ProcessRequestThread *prt = NULL;
-    while (!prt)
+    threadPoolLock.lock();
+    if (threadPool.empty())
     {
-        threadPoolLock.lock();
-        if (!threadPool.empty())
-        {
-            prt = threadPool.back();
-            threadPool.pop_back();
-        }
-        threadPoolLock.unlock();
-
-        if (t.elapsed() > PRT_TIMEOUT)
-            break;
-
-        if (!prt)
-        {
-            VERBOSE(VB_IMPORTANT, "Waiting for a process request thread..");
-            usleep(1000); /* 1 millisecond */
-        }
+        VERBOSE(VB_IMPORTANT, "Waiting for a process request thread..");
+        threadPoolCond.wait(&threadPoolLock, PRT_TIMEOUT);
     }
-
-    if (!prt)
+    if (!threadPool.empty())
     {
-        threadPoolLock.lock();
+        prt = threadPool.back();
+        threadPool.pop_back();
+    }
+    else
+    {
         VERBOSE(VB_IMPORTANT, "Adding a new process request thread");
         prt = new ProcessRequestThread(this);
+        prt->lock.lock();
         prt->start();
-        usleep(50000); /* Wait 50 milliseconds for start to actually run. */
-        threadPoolLock.unlock();
+        prt->waitCond.wait(&prt->lock);
+        prt->lock.unlock();
     }
+    threadPoolLock.unlock();
 
     prt->setup(sock);
 
