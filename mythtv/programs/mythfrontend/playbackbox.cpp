@@ -4161,23 +4161,25 @@ QPixmap PlaybackBox::getPixmap(ProgramInfo *pginfo)
                 .arg(!JobQueue::IsJobRunning(JOB_COMMFLAG, pginfo))
                 .arg(!IsGeneratingPreview(filename)));
 
-#ifdef USE_PREV_GEN_THREAD
         uint attempts = IncPreviewGeneratorAttempts(filename);
         if (attempts < 5)
         {
+#ifdef USE_PREV_GEN_THREAD
             SetPreviewGenerator(filename, new PreviewGenerator(pginfo, false));
+#else
+            PreviewGenerator pg(pginfo, false);
+            pg.Run();
+#endif
         }
         else if (attempts == 5)
         {
             VERBOSE(VB_IMPORTANT, LOC_ERR +
                     QString("Attempted to generate preview for '%1'")
                     .arg(filename) + " 5 times, giving up.");
-            return retpixmap;
         }
-#else
-        PreviewGenerator pg(pginfo, false);
-        pg.Run();
-#endif
+
+        if (attempts >= 5)
+            return retpixmap;
     }
 
     // Check and see if we've already tried this one.
