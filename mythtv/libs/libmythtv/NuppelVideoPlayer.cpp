@@ -642,12 +642,15 @@ void NuppelVideoPlayer::ReinitVideo(void)
     if (videoOutput->IsErrored())
     {
         VERBOSE(VB_IMPORTANT, "ReinitVideo(): videoOutput->IsErrored()");
-        qApp->lock();
-        DialogBox dialog(gContext->GetMainWindow(),
-                         QObject::tr("Failed to Reinit Video."));
-        dialog.AddButton(QObject::tr("Return to menu."));
-        dialog.exec();
-        qApp->unlock();
+        if (!using_null_videoout)
+        {
+            qApp->lock();
+            DialogBox dialog(gContext->GetMainWindow(),
+                             QObject::tr("Failed to Reinit Video."));
+            dialog.AddButton(QObject::tr("Return to menu."));
+            dialog.exec();
+            qApp->unlock();
+        }
         errored = true;
     }
     else
@@ -3076,7 +3079,7 @@ void NuppelVideoPlayer::StartPlaying(void)
     {
         QString errMsg = ReinitAudio();
         int ret = 1;
-        if ((errMsg != QString::null) &&
+        if ((errMsg != QString::null) && !using_null_videoout &&
             gContext->GetNumSetting("AudioNag", 1))
         {
             DialogBox dialog(gContext->GetMainWindow(), errMsg);
@@ -3117,14 +3120,18 @@ void NuppelVideoPlayer::StartPlaying(void)
 
     if (!InitVideo())
     {
-        qApp->lock();
-        DialogBox *dialog = new DialogBox(gContext->GetMainWindow(),
-                                   QObject::tr("Unable to initialize video."));
-        dialog->AddButton(QObject::tr("Return to menu."));
-        dialog->exec();
-        delete dialog;
-
-        qApp->unlock();
+        VERBOSE(VB_IMPORTANT, "Unable to initialize video.");
+        if (!using_null_videoout)
+        {
+            qApp->lock();
+            DialogBox *dialog = new DialogBox(
+                gContext->GetMainWindow(),
+                QObject::tr("Unable to initialize video."));
+            dialog->AddButton(QObject::tr("Return to menu."));
+            dialog->exec();
+            delete dialog;
+            qApp->unlock();
+        }
 
         if (audioOutput)
         {
@@ -3500,7 +3507,7 @@ void NuppelVideoPlayer::StartPlaying(void)
 
     playing = false;
 
-    if (IsErrored())
+    if (IsErrored() && !using_null_videoout)
     {
         qApp->lock();
         DialogBox *dialog =
