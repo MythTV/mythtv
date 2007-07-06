@@ -345,6 +345,22 @@ e.g. job dvd 1 1 -1 0 -1 /myth/video/UNTITLED
 abort dvd job NNNN
 \endverbatim
 - Stops the job identified by the job number NNNN.
+
+\verbatim
+use dvd PATH
+\endverbatim
+- Check dvd PATH is usable, and if so set the current drive to it.
+
+\verbatim
+no dvd
+\endverbatim
+- Forget about the current dvd path, ending any jobs that are trying to read it.
+
+\verbatim
+no dvd PATH
+\endverbatim
+- End any jobs that are reading from dvd PATH, and if it is the current drive,
+  forget about it.
  */
 
 /** \defgroup myth_network_protocol Myth Network Protocol
