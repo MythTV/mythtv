@@ -184,61 +184,11 @@ from the database automagically when used in %MythTV's window classes.
     \todo No one is working on documenting the video subsystem
  */
 
-/** \defgroup mtd                   MTD (the Myth Transcoding Daemon)
-    \todo Include sample response formats?
-
-The MTD is a simple program that is used by the MythVideo plugin.
-
-It currently \b only transcodes tracks from DVDs, but could in the
-future also rip CD tracks, transcode TV recordings, \e et \e cetera.
-
-The DVD Rip screen will offer to start MTD if it is not running.
-It does \b not currently shut it down afterwards, though.
-
-By default, the MTD listens on port 2442, for commands of this format:
-
-\verbatim
-halt
-quit
-shutdown
-\endverbatim
-Tells the MTD to wait for all jobs to finish, stop listening, and exit.
-
-\verbatim
-hello
-\endverbatim
-Send a trivial response if the \noref MTD is listening.
-
-\verbatim
-status
-\endverbatim
-Sends a response listing the status of all jobs.
-
-\verbatim
-media
-\endverbatim
-Sends a detailed list of titles/tracks on the current disk.
-
-\verbatim
-job dvd TITLE AUDIOTRK QUALITY AC3 SUBTITLETRK DESTPATH
-\endverbatim
-Starts a transcoding job. TITLE, AUDIOTRK and SUBTITLETRK are integers to
-select the track details. AC3 is 0 or 1. DESTPATH is the outut file.
-QUALITY is one of enum \ref RIP_QUALITIES
-
-\verbatim
-abort dvd job NNNN
-\endverbatim
-Aborts the job identified by the job number NNNN.
-*/
-
-/** \defgroup myth_network_protocol Myth Network Protocol
-    \todo No one is working on documenting the myth network protocol
- */
-
 /** \defgroup recorder_subsystem    Recorder Subsystem
+This line is filler that is ignored by Doxygen.
+
 TVRec is the main class for handling recording. 
-\todo +++It is passed a ProgramInfo for the current and next recordings IS THIS TRUE? +++,
+It is passed a ProgramInfo for the current and next recordings,
 and in turn creates three main worker classes:
 <dl>
   <dt>RecorderBase <dd>Recordings from device into RingBuffer.
@@ -288,12 +238,16 @@ is ready for commands. Finally, the "ChangingState" state
 tells us that a state change request is pending, so other
 state changing commands should not be issued.
 
+\todo Check if the TVRec is actually still passed a ProgramInfo for the current and next recordings
+
+\todo Document the massive changes Daniel has made in the Vid and MultiRec branches
  */
 
 /** \defgroup av_player_subsystem   A/V Player Subsystem
+This line is filler that is ignored by Doxygen.
 
 TV is the main class for handling playback.
-It instanciates several important classes:
+It instantiates several important classes:
 <dl>
 <dt>NuppelVideoPlayer <dd>Decodes audio and video from the RingBuffer, then plays and displays them, resp.
 <dt>RemoteEncoder     <dd>Communicates with TVRec on the backend.
@@ -330,7 +284,75 @@ state changing commands should not be issued.
 
  */
 
+/** \defgroup mtd                   MTD (the Myth Transcoding Daemon)
+This line is filler that is ignored by Doxygen.
+
+The %MTD is a simple program that is used by the MythVideo plugin.
+
+It currently \b only transcodes tracks from DVDs, but could in the
+future also rip CD/VCD tracks, transcode %TV recordings, \e et \e cetera.
+
+The DVD Rip screen will offer to start %MTD if it is not running.
+It does \b not currently shut it down afterwards, though.
+
+By default, the %MTD listens on port 2442, for commands of this format:
+
+\verbatim
+halt
+quit
+shutdown
+\endverbatim
+- Tells the %MTD to wait for all jobs to finish, stop listening, and exit.
+
+\verbatim
+hello
+\endverbatim
+- Send a trivial response if the %MTD is listening.
+
+\verbatim
+status
+\endverbatim
+<B>\verbatim
+status dvd summary 1
+status dvd job 0 overall 0.0262568 ISO copy of UNTITLED
+status dvd job 0 subjob 0.0262568 Ripping to file ~ 00:08/05:04
+status dvd complete
+\endverbatim</B>
+- Sends a response listing the status of all jobs.
+
+\verbatim
+media
+\endverbatim
+<B>\verbatim
+media dvd summary 1 UNTITLED
+media dvd title 1 1 1 0 5 27 8
+media dvd title-audio 1 1 2 nl ac3 2Ch
+media dvd complete
+\endverbatim</B>
+- Sends a detailed list of titles/tracks on the current disk.
+
+\verbatim
+job dvd TITLE AUDIOTRK QUALITY AC3 SUBTITLETRK DESTPATH
+\endverbatim
+\verbatim
+e.g. job dvd 1 1 -1 0 -1 /myth/video/UNTITLED
+\endverbatim
+- Starts a transcoding job. TITLE, AUDIOTRK and SUBTITLETRK are integers
+  to select the track details. AC3 is 0 or 1. DESTPATH is the output file.
+  QUALITY is one of enum \ref RIP_QUALITIES (-1, 0 or 1).
+
+\verbatim
+abort dvd job NNNN
+\endverbatim
+- Stops the job identified by the job number NNNN.
+ */
+
+/** \defgroup myth_network_protocol Myth Network Protocol
+    \todo No one is working on documenting the myth network protocol
+ */
+
 /** \defgroup qobject_dangers QObject is dangerous for your health
+This line is filler that is ignored by Doxygen.
 
 QObject derived classes can be quite useful, they can send and receive
 signals, get keyboard events, translate strings into another language
@@ -448,6 +470,7 @@ wrong slots.
 */
 
 /** \defgroup profiling_mythtv    Profiling MythTV
+This line is filler that is ignored by Doxygen.
 
 You can use any sampling profiler to profile %MythTV, the most
 popular GPL one is OProfile and this section tells you how to
