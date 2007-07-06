@@ -46,6 +46,9 @@ class JobThread : public QThread
     void    setSubName(const QString &new_name, uint priority);
     virtual QString getFinalFileName(){return "";}
     void    sendLoggingEvent(const QString &event_string);
+
+    virtual bool usesDevice(const QString &device)
+                 { return false; (void)device; }
     
   protected:
 
@@ -99,6 +102,8 @@ class DVDThread : public JobThread
                      
     virtual void run();
     QString getFinalFileName(){return destination_file_string;}
+    bool    usesDevice(const QString &device)
+            { return dvd_device_location.contains(device); };
 
   protected:
 

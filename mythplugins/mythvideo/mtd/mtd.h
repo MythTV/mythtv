@@ -34,12 +34,14 @@ class DiscCheckingThread : public QThread
     virtual void run();
     bool    haveDisc(){return have_disc;}
     bool    keepGoing();
+    void    cancelMe(bool yes_or_no){cancel_me = yes_or_no;}
     
   private:
   
     MTD      *parent;
     DVDProbe *dvd_probe;
     bool     have_disc;
+    bool     cancel_me;
     QMutex   *dvd_drive_access;
     QMutex   *titles_mutex;
 };
@@ -77,9 +79,14 @@ class MTD : public QObject
     void sayHi(QSocket *socket);
     void sendStatusReport(QSocket *socket);
     void sendMediaReport(QSocket *socket);
-    void startJob(const QStringList &tokens);
+    void startJob  (const QStringList &tokens);
     void startAbort(const QStringList &tokens);
-    void startDVD(const QStringList &tokens);
+    void startDVD  (const QStringList &tokens);
+    void useDrive  (const QStringList &tokens);
+    void useDVD    (const QStringList &tokens);
+    void noDrive   (const QStringList &tokens);
+    QString noDVD  (const QStringList &tokens);
+    void forgetDVD();
     void cleanThreads();
     void checkDisc();
     bool checkFinalFile(QFile *final_file, const QString &extension);
@@ -98,6 +105,7 @@ class MTD : public QObject
     QTimer              *thread_cleaning_timer;
     QTimer              *disc_checking_timer;
     DVDProbe            *dvd_probe;
+    QString             dvd_device;
     DiscCheckingThread  *disc_checking_thread;
     int                 nice_level;
     QMutex              *concurrent_transcodings_mutex;

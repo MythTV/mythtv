@@ -34,6 +34,7 @@ DiscCheckingThread::DiscCheckingThread(MTD *owner,
     //  etc.
     //
     
+    cancel_me = false;
     have_disc = false;
     dvd_probe = probe;
     dvd_drive_access = drive_access_mutex;
@@ -49,7 +50,7 @@ bool DiscCheckingThread::keepGoing()
     //  running
     //  
 
-    return parent->threadsShouldContinue();
+    return (parent->threadsShouldContinue() && ! cancel_me);
 } 
 
 void DiscCheckingThread::run()
@@ -173,12 +174,7 @@ MTD::MTD(int port, bool log_stdout)
     //  timer to query whether the thread is done or not
     //
         
-    QString dvd_device = gContext->GetSetting("DVDDeviceLocation");
-    if(dvd_device.length() < 1)
-    {
-        cerr << "dvdripbox.o: Can't get a value for DVD device location. Did you run setup?" << endl;
-        exit(0);
-    }
+    dvd_device = gContext->GetSetting("DVDDeviceLocation");  // Might be ""
     dvd_probe = new DVDProbe(dvd_device);
     disc_checking_thread = new DiscCheckingThread(this, dvd_probe, dvd_drive_access, titles_mutex);
     disc_checking_thread->start();
@@ -190,6 +186,10 @@ MTD::MTD(int port, bool log_stdout)
 
 void MTD::checkDisc()
 {
+    // forgetDVD() can delete dvd_probe
+    if (!dvd_probe)
+        return;
+
     bool had_disc = have_disc;
     QString old_name = dvd_probe->getName();
     if(disc_checking_thread->haveDisc())
@@ -352,6 +352,14 @@ void MTD::parseTokens(const QStringList &tokens, QSocket *socket)
     else if(tokens[0] == "abort")
     {
         startAbort(tokens);
+    }
+    else if (tokens[0] == "use")
+    {
+        useDrive(tokens);
+    }
+    else if (tokens[0] == "no")
+    {
+        noDrive(tokens);
     }
     else
     {
@@ -678,8 +686,6 @@ void MTD::startDVD(const QStringList &tokens)
 
     QString file_name = dir_and_file.section("/", -1, -1);
 
-
-    QString dvd_device = gContext->GetSetting("DVDDeviceLocation");
     if(dvd_device.length() < 1)
     {
         emit writeToLog("crapity crap crap - all set to launch a dvd job and you don't have a dvd device defined");
@@ -797,6 +803,136 @@ void MTD::startDVD(const QStringList &tokens)
     {
         cerr << "mtd.o: Hmmmmm. Got sent a job with a negative quality parameter. That's just plain weird." << endl;
     }
+}
+
+/**
+ * Remember the supplied device path
+ */
+void MTD::useDrive(const QStringList &tokens)
+{
+    if (tokens.count() != 3)
+    {
+        emit writeToLog("Bad usedrive request: " + tokens.join(" "));
+        return;
+    }
+
+    if (tokens[1] == "dvd")
+        useDVD(tokens);
+    else
+        emit writeToLog("I don't know how to use drives of type: " + tokens[1]);
+}
+
+/**
+ * Remember the supplied DVD device path, and create a DVDProbe & thread for it
+ */
+void MTD::useDVD(const QStringList &tokens)
+{
+    if (dvd_device == tokens[2])  // Same drive? Nothing to do.
+        return;
+
+    DVDProbe *newDrive = new DVDProbe(tokens[2]);
+    if (!newDrive->probe())
+    {
+        emit writeToLog("Drive not available: " + tokens[2]);
+        return;
+    }
+
+    forgetDVD();
+
+    dvd_device = tokens[2];
+    dvd_probe  = newDrive;
+
+    disc_checking_thread = new DiscCheckingThread(this, dvd_probe,
+                                                  dvd_drive_access,
+                                                  titles_mutex);
+    disc_checking_thread->start();
+
+    have_disc  = true;
+}
+
+/**
+ * Stop using the specified, or current, drive. Also stop any related jobs
+ */
+void MTD::noDrive(const QStringList &tokens)
+{
+    if (tokens.count() < 2 || tokens.count() > 3)
+    {
+        emit writeToLog("Bad no drive request: " + tokens.join(" "));
+        return;
+    }
+
+    QString device;
+
+    if (tokens[1] == "dvd")
+        device = noDVD(tokens);
+    else
+    {
+        emit writeToLog("I don't know how to forget drives of type: "
+                        + tokens[1]);
+        return;
+    }
+
+    for (JobThread *itr = job_threads.first(); itr; itr = job_threads.next())
+        if (itr->usesDevice(device))
+        {
+            itr->setSubProgress(0.0, 0);
+            itr->setSubName("Cancelling ...", 0);
+            itr->cancelMe(true);
+
+            emit writeToLog("Waiting for job : " + itr->getJobName());
+            itr->wait();
+
+            job_threads.remove(itr);
+        }
+}
+
+/**
+ * Stop using the specified, or current, dvd drive
+ */
+QString MTD::noDVD(const QStringList &tokens)
+{
+    QString device;
+
+    if (tokens.count() == 2)
+        device = dvd_device;
+    else
+        device = tokens[2];
+
+
+    // In multi-drive setups, the user could be ripping several.
+    // The drive we are forgetting about may not be the current one:
+    if (device == dvd_device)
+        forgetDVD();
+
+    return device;
+}
+
+/**
+ * Clear the current DVD device path, disc checking thread and DVDProbe object
+ */
+void MTD::forgetDVD()
+{
+    if (disc_checking_thread)
+    {
+        disc_checking_thread->cancelMe(true);
+        disc_checking_thread->wait(50000);
+        delete disc_checking_thread;
+        disc_checking_thread = NULL;
+    }
+
+    while (!dvd_drive_access->tryLock())
+        sleep(3);
+
+    if (dvd_probe)
+    {
+        delete dvd_probe;
+        dvd_probe = NULL;
+    }
+
+    dvd_device = "";     // Prevent new jobs
+    have_disc  = false;  // For sendMediaReport()
+
+    dvd_drive_access->unlock();
 }
 
 bool MTD::checkFinalFile(QFile *final_file, const QString &extension)
