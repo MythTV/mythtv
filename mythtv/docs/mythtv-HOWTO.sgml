@@ -5279,7 +5279,7 @@ The prerequisites for MythMusic are:
 <itemize>
 <item>MAD
 <item>taglib
-<item>libvorbis-devel
+<item>libogg and libvorbis
 <item>FLAC
 <item>libcdaudio
 <item>CDParanoia
@@ -5314,6 +5314,10 @@ $ su
 # make install
 # exit
 </verb></tscreen>
+
+Download libogg and libvorbis from <url url="http://www.xiph.org/downloads"
+name="http://www.xiph.org/downloads"> and install in a similar manner
+to the above packages.
 
 Download FLAC from <url url="http://flac.sourceforge.net"
 name="http://flac.sourceforge.net"> and install:
