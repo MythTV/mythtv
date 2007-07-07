@@ -75,6 +75,9 @@ NetworkControl::NetworkControl(int port)
     jumpMap["flixbrowse"]            = "Netflix Browser";
     jumpMap["flixqueue"]             = "Netflix Queue";
     jumpMap["flixhistory"]           = "Netflix History";
+    jumpMap["zoneminderconsole"]     = "ZoneMinder Console";
+    jumpMap["zoneminderliveview"]    = "ZoneMinder Live View";
+    jumpMap["zoneminderevents"]      = "ZoneMinder Events";
 
     // These jump point names match the (lowercased) locations from gContext
     jumpMap["channelrecpriority"]    = "Channel Recording Priorities";
