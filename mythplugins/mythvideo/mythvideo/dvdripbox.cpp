@@ -74,7 +74,7 @@ void MTDJob::setSubjob(double a_number)
 
 
 DVDRipBox::DVDRipBox(MythMainWindow *parent, QString window_name,
-                     QString theme_filename, const char *name)
+                     QString device, QString theme_filename, const char *name)
 
            : MythThemedDialog(parent, window_name, theme_filename, name)
 {
@@ -108,6 +108,7 @@ DVDRipBox::DVDRipBox(MythMainWindow *parent, QString window_name,
     first_disc_found = false;
     block_media_requests = false;
     ignore_cancels = false;
+    m_device = device;
                     
     //
     //  Set up the timer which kicks off polling
@@ -426,6 +427,7 @@ void DVDRipBox::connectionMade()
     setContext(2);
     connected = true;
     sendToServer("hello");
+    sendToServer("use dvd " + m_device);
 }
 
 void DVDRipBox::readFromServer()

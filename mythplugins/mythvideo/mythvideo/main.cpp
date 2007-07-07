@@ -207,8 +207,16 @@ namespace
     //
     void startDVDRipper()
     {
+        QString dvd_device = gDVDdevice;
+
+        if (dvd_device.isNull())
+            dvd_device = MediaMonitor::defaultDVDdevice();
+
+#ifdef Q_OS_MAC
+        dvd_device.prepend("/dev/r");
+#endif
         DVDRipBox *drb = new DVDRipBox(gContext->GetMainWindow(),
-                                       "dvd_rip", "dvd-"); 
+                                       "dvd_rip", dvd_device, "dvd-"); 
         gContext->addCurrentLocation("ripdvd");
         qApp->unlock();
         drb->exec();
@@ -278,6 +286,9 @@ namespace
         if (dvd_device.isNull())
             dvd_device = MediaMonitor::defaultDVDdevice();
 
+#ifdef Q_OS_MAC
+        dvd_device.prepend("/dev/r");
+#endif
         gContext->addCurrentLocation("playdvd");
 
         if ((command_string.find("internal", 0, false) > -1) ||
@@ -321,10 +332,6 @@ namespace
         if (dvd)
         {
             QString newDevice = dvd->getDevicePath();
-
-#ifdef Q_OS_MAC
-            newDevice.prepend("/dev/r");
-#endif
 
             if (gDVDdevice.length() && gDVDdevice != newDevice)
             {

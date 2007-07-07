@@ -84,7 +84,7 @@ class DVDRipBox : public MythThemedDialog
     typedef QValueVector<int> IntVector;
     
     DVDRipBox(MythMainWindow *parent, QString window_name,
-              QString theme_filename, const char *name = 0);
+              QString dev, QString theme_filename, const char *name = 0);
 
     ~DVDRipBox(void);
 
@@ -134,8 +134,9 @@ class DVDRipBox : public MythThemedDialog
     int              current_job;
     bool             ignore_cancels;
 
-    DVDInfo             *dvd_info;
-    QTimer              *disc_checking_timer;
+    QString          m_device;       ///> The most recent usable DVD drive
+    DVDInfo          *dvd_info;
+    QTimer           *disc_checking_timer;
 
     //
     //  Theme-related "widgets"
