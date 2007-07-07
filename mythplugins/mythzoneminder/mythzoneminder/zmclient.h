@@ -39,6 +39,7 @@ class MPUBLIC ZMClient : public QObject
 
     // Used to actually connect to an ZM server
     bool connectToHost(const QString &hostname, unsigned int port);
+    bool connected(void) { return m_bConnected; }
 
     bool checkProtoVersion(void);
 

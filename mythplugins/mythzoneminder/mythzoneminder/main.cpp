@@ -38,10 +38,25 @@
 using namespace std;
 
 void runZMConsole(void);
+void runZMLiveView(void);
+void runZMEventView(void);
 
 void setupKeys(void)
 {
+    REG_JUMP("ZoneMinder Console",    "", "", runZMConsole);
+    REG_JUMP("ZoneMinder Live View",  "", "", runZMLiveView);
+    REG_JUMP("ZoneMinder Events",     "", "", runZMEventView);
+}
 
+bool checkConnection(void)
+{
+    if (!ZMClient::get()->connected())
+    {
+        if (!ZMClient::setupZMClient())
+            return false;
+    }
+
+    return true;
 }
 
 int mythplugin_init(const char *libversion)
@@ -58,7 +73,10 @@ int mythplugin_init(const char *libversion)
 
 void runZMConsole(void)
 {
-    gContext->addCurrentLocation("mythzoneminder");
+    if (!checkConnection())
+        return;
+
+    gContext->addCurrentLocation("zoneminderconsole");
     ZMConsole console(gContext->GetMainWindow(), "zmconsole",
                       "zoneminder-", "zmconsole");
     console.exec();
@@ -67,15 +85,29 @@ void runZMConsole(void)
 
 void runZMLiveView(void)
 {
+    if (!checkConnection())
+        return;
+
+    gContext->addCurrentLocation("zoneminderliveview");
+
     ZMLivePlayer player(1, 1, gContext->GetMainWindow(), "zmliveplayer",
                         "zoneminder-", "zmplayer");
     player.exec();
+
+    gContext->removeCurrentLocation();
 }
 
 void runZMEventView(void)
 {
+    if (!checkConnection())
+        return;
+
+    gContext->addCurrentLocation("zoneminderevents");
+
     ZMEvents events(gContext->GetMainWindow(), "zmevents", "zoneminder-", "zmevents");
     events.exec();
+
+   gContext->removeCurrentLocation();
 }
 
 void ZoneMinderCallback(void *data, QString &selection)
