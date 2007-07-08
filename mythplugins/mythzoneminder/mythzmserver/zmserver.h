@@ -137,6 +137,7 @@ class ZMServer
     void handleGetLiveFrame(vector<string> tokens);
     void handleGetFrameList(vector<string> tokens);
     void handleDeleteEvent(vector<string> tokens);
+    void handleGetEventDates(vector<string> tokens);
 
     bool                 m_debug;
     int                  m_sock;

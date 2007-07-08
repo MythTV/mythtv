@@ -39,6 +39,7 @@ public:
     void playPressed(void);
     void deletePressed(void);
     void setCamera(int item);
+    void setDate(int item);
     void updateTimeout(void);
 
   private:
@@ -50,11 +51,14 @@ public:
     void eventListDown(bool page);
     void eventListUp(bool page);
     void getCameraList(void);
+    void getDateList(void);
 
     bool                 m_oldestFirst;
     int                  m_currentEvent;
     int                  m_eventListSize;
     vector<Event *>     *m_eventList;
+    QStringList          m_dateList;
+
     UIListType          *m_event_list;
     UITextType          *m_eventNoText;
 
@@ -62,6 +66,7 @@ public:
     UITextButtonType    *m_deleteButton;
 
     UISelectorType      *m_cameraSelector;
+    UISelectorType      *m_dateSelector;
 
     QTimer              *m_updateTimer;
 };

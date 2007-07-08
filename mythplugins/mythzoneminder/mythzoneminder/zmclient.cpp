@@ -21,7 +21,7 @@
 #include "zmclient.h"
 
 // the protocol version we understand
-#define ZM_PROTOCOL_VERSION "2"
+#define ZM_PROTOCOL_VERSION "3"
 
 #define BUFFER_SIZE  (2048*1536*3)
 
@@ -289,12 +289,14 @@ void ZMClient::getMonitorStatus(vector<Monitor*> *monitorList)
     }
 }
 
-void ZMClient::getEventList(const QString &eventName, bool oldestFirst, vector<Event*> *eventList)
+void ZMClient::getEventList(const QString &monitorName, bool oldestFirst, 
+                            QString date, vector<Event*> *eventList)
 {
     eventList->clear();
 
     QStringList strList = "GET_EVENT_LIST";
-    strList << eventName << (oldestFirst ? "1" : "0") ;
+    strList << monitorName << (oldestFirst ? "1" : "0") ;
+    strList << date;
 
     if (!sendReceiveStringList(strList))
         return;
@@ -315,6 +317,9 @@ void ZMClient::getEventList(const QString &eventName, bool oldestFirst, vector<E
         return;
     }
 
+    QString dateFormat = gContext->GetSetting("ZoneMinderDateFormat", "ddd - dd/MM");
+    QString timeFormat = gContext->GetSetting("ZoneMinderTimeFormat", "hh:mm:ss");
+
     QStringList::Iterator it = strList.begin();
     it++; it++;
     for (int x = 0; x < eventCount; x++)
@@ -326,9 +331,44 @@ void ZMClient::getEventList(const QString &eventName, bool oldestFirst, vector<E
         item->monitorName = *it++;
         QString sDate = *it++;
         QDateTime dt = QDateTime::fromString(sDate, Qt::ISODate);
-        item->startTime = dt.toString("ddd - dd/MM hh:mm:ss");
+        item->startTime = dt.toString(dateFormat + " " + timeFormat);
         item->length = *it++;
         eventList->push_back(item);
+    }
+}
+
+void ZMClient::getEventDates(const QString &monitorName, bool oldestFirst,
+                            QStringList &dateList)
+{
+    dateList.clear();
+
+    QStringList strList = "GET_EVENT_DATES";
+    strList << monitorName << (oldestFirst ? "1" : "0") ;
+
+    if (!sendReceiveStringList(strList))
+        return;
+
+    bool bOK;
+    int dateCount = strList[1].toInt(&bOK);
+    if (!bOK)
+    {
+        VERBOSE(VB_IMPORTANT, "ZMClient received bad int in getEventDates()");
+        return;
+    }
+
+    // sanity check 
+    if ((int)(strList.size() - 3) != dateCount)
+    {
+        VERBOSE(VB_IMPORTANT, "ZMClient got a mismatch between the number of dates and "
+                "the expected number of stringlist items in getEventDates()");
+        return;
+    }
+
+    QStringList::Iterator it = strList.begin();
+    it++; it++;
+    for (int x = 0; x < dateCount; x++)
+    {
+        dateList.append(*it++);
     }
 }
 

@@ -39,7 +39,7 @@
 #include "zmserver.h"
 
 // the version of the protocol we understand
-#define ZM_PROTOCOL_VERSION "2"
+#define ZM_PROTOCOL_VERSION "3"
 
 // the maximum image size we are ever likely to get from ZM
 #define MAX_IMAGE_SIZE  (2048*1536*3)
@@ -275,6 +275,8 @@ void ZMServer::processRequest(char* buf, int nbytes)
         handleGetMonitorStatus();
     else if (tokens[0] == "GET_EVENT_LIST")
         handleGetEventList(tokens);
+    else if (tokens[0] == "GET_EVENT_DATES")
+        handleGetEventDates(tokens);
     else if (tokens[0] == "GET_EVENT_FRAME")
         handleGetEventFrame(tokens);
     else if (tokens[0] == "GET_LIVE_FRAME")
@@ -416,7 +418,7 @@ void ZMServer::handleGetEventList(vector<string> tokens)
 {
     string outStr("");
 
-    if (tokens.size() != 3)
+    if (tokens.size() != 4)
     {
         sendError(ERROR_TOKEN_COUNT);
         return;
@@ -424,9 +426,10 @@ void ZMServer::handleGetEventList(vector<string> tokens)
 
     string monitor = tokens[1];
     bool oldestFirst = (tokens[2] == "1");
+    string date = tokens[3];
 
     if (m_debug)
-        cout << "Loading events for monitor: " << monitor << endl;
+        cout << "Loading events for monitor: " << monitor << ", date: " << date << endl;
 
     ADD_STR(outStr, "OK")
 
@@ -438,7 +441,17 @@ void ZMServer::handleGetEventList(vector<string> tokens)
             "from Events as E inner join Monitors as M on E.MonitorId = M.Id ");
 
     if (monitor != "<ANY>")
+    {
         sql += "WHERE M.Name = '" + monitor + "' ";
+
+        if (date != "<ANY>")
+            sql += "AND DATE(E.StartTime) = DATE('" + date + "') ";
+    }
+    else
+    {
+        if (date != "<ANY>")
+            sql += "WHERE DATE(E.StartTime) = DATE('" + date + "') ";
+    }
 
     if (oldestFirst)
         sql += "ORDER BY E.StartTime ASC";
@@ -474,6 +487,75 @@ void ZMServer::handleGetEventList(vector<string> tokens)
             row[4][10] = 'T';
             ADD_STR(outStr, row[4]) // start time
             ADD_STR(outStr, row[5]) // length
+        }
+        else
+        {
+            cout << "Failed to get mysql row" << endl;
+            sendError(ERROR_MYSQL_ROW);
+            return;
+        }
+    }
+
+    mysql_free_result(res);
+
+    send(outStr);
+}
+
+void ZMServer::handleGetEventDates(vector<string> tokens)
+{
+    string outStr("");
+
+    if (tokens.size() != 3)
+    {
+        sendError(ERROR_TOKEN_COUNT);
+        return;
+    }
+
+    string monitor = tokens[1];
+    bool oldestFirst = (tokens[2] == "1");
+
+    if (m_debug)
+        cout << "Loading event dates for monitor: " << monitor << endl;
+
+    ADD_STR(outStr, "OK")
+
+    MYSQL_RES *res;
+    MYSQL_ROW row;
+
+    string sql("SELECT DISTINCT DATE(E.StartTime) "
+            "from Events as E inner join Monitors as M on E.MonitorId = M.Id ");
+
+    if (monitor != "<ANY>")
+        sql += "WHERE M.Name = '" + monitor + "' ";
+
+    if (oldestFirst)
+        sql += "ORDER BY E.StartTime ASC";
+    else
+        sql += "ORDER BY E.StartTime DESC";
+
+    if (mysql_query(&g_dbConn, sql.c_str()))
+    {
+        fprintf(stderr, "%s\n", mysql_error(&g_dbConn));
+        sendError(ERROR_MYSQL_QUERY);
+        return;
+    }
+
+    res = mysql_store_result(&g_dbConn);
+    int dateCount = mysql_num_rows(res);
+
+    if (m_debug)
+        cout << "Got " << dateCount << " dates" << endl;
+
+    char str[10];
+    sprintf(str, "%d", dateCount);
+    ADD_STR(outStr, str)
+
+    for (int x = 0; x < dateCount; x++)
+    {
+        row = mysql_fetch_row(res);
+        if (row)
+        {
+            ADD_STR(outStr, row[0]) // event date
         }
         else
         {

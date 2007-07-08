@@ -262,19 +262,33 @@
           </textarea>
 
           <image name="image" draworder="0">
-              <position>25,70</position>
+              <position>25,60</position>
               <filename>trans-cr-background.png</filename>
-              <staticsize>750,80</staticsize>
+              <staticsize>750,90</staticsize>
           </image>
 
-          <textarea name="title" draworder="4" align="right">
-              <area>45,90,200,50</area>
-              <font>label</font>
-              <value>Show Events for:</value>
+          <textarea name="title" draworder="4" align="left">
+              <area>45,70,200,50</area>
+              <font>listlabel</font>
+              <value>Select Camera</value>
+          </textarea>
+
+          <textarea name="title" draworder="4" align="left">
+              <area>365,70,200,50</area>
+              <font>listlabel</font>
+              <value>Select Date</value>
           </textarea>
 
           <selector name="camera_selector" draworder="4">
-              <area>265,85,390,40</area>
+              <area>45,100,390,40</area>
+              <font>description</font>
+              <image function="on" filename="leftright_on.png"></image>
+              <image function="off" filename="leftright_off.png"></image>
+              <image function="pushed" filename="leftright_pushed.png"></image>
+          </selector>
+
+          <selector name="date_selector" draworder="4">
+              <area>365,100,390,40</area>
               <font>description</font>
               <image function="on" filename="leftright_on.png"></image>
               <image function="off" filename="leftright_off.png"></image>
@@ -282,7 +296,7 @@
           </selector>
 
           <textarea name="eventno_text" draworder="4" align="right">
-              <area>660,90,70,50</area>
+              <area>630,105,120,50</area>
               <font>label</font>
               <value>0/0</value>
           </textarea>

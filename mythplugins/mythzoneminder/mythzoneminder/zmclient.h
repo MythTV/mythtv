@@ -49,13 +49,16 @@ class MPUBLIC ZMClient : public QObject
 
     void getServerStatus(QString &status, QString &cpuStat, QString &diskStat);
     void getMonitorStatus(vector<Monitor*> *monitorList);
-    void getEventList(const QString &eventName, bool oldestFirst, vector<Event*> *eventList);
+    void getEventList(const QString &monitorName, bool oldestFirst,
+                      QString date, vector<Event*> *eventList);
     void getEventFrame(int monitorID, int eventID, int frameNo, QImage &image);
     int  getLiveFrame(int monitorID, QString &status, unsigned char* buffer, int bufferSize);
     void getFrameList(int eventID, vector<Frame*> *frameList);
     void deleteEvent(int eventID);
     void getCameraList(QStringList &cameraList);
     void getMonitorList(vector<Monitor*> *monitorList);
+    void getEventDates(const QString &monitorName, bool oldestFirst, 
+                       QStringList &dateList);
 
   private slots:
     void restartConnection(void);  // Try to re-establish the connection to 

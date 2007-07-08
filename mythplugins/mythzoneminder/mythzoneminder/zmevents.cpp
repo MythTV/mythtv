@@ -52,6 +52,7 @@ ZMEvents::ZMEvents(MythMainWindow *parent,
     m_updateTimer->start(EVENTS_UPDATE_TIME);
 
     getCameraList();
+    getDateList();
     updateTimeout();
 }
 
@@ -97,9 +98,11 @@ void ZMEvents::keyPressEvent(QKeyEvent *e)
         if (action == "UP")
         {
             if (getCurrentFocusWidget() == m_event_list)
-            {
                 eventListUp(false);
-            }
+            else if (getCurrentFocusWidget() == m_cameraSelector)
+                m_cameraSelector->push(false);
+            else if (getCurrentFocusWidget() == m_dateSelector)
+                m_dateSelector->push(false);
             else
                 nextPrevWidgetFocus(true);
         }
@@ -109,22 +112,20 @@ void ZMEvents::keyPressEvent(QKeyEvent *e)
             {
                 eventListDown(false);
             }
+            else if (getCurrentFocusWidget() == m_cameraSelector)
+                m_cameraSelector->push(true);
+            else if (getCurrentFocusWidget() == m_dateSelector)
+                m_dateSelector->push(true);
             else
                 nextPrevWidgetFocus(true);
         }
         else if (action == "LEFT")
         {
-            if (getCurrentFocusWidget() == m_cameraSelector)
-                m_cameraSelector->push(false);
-            else
-                nextPrevWidgetFocus(false);
+            nextPrevWidgetFocus(false);
         }
         else if (action == "RIGHT")
         {
-            if (getCurrentFocusWidget() == m_cameraSelector)
-                m_cameraSelector->push(true);
-            else
-                nextPrevWidgetFocus(true);
+            nextPrevWidgetFocus(true);
         }
         else if (action == "PAGEUP")
         {
@@ -208,6 +209,14 @@ void ZMEvents::wireUpTheme()
                 this, SLOT(setCamera(int)));
     }
 
+    // date selector
+    m_dateSelector = getUISelectorType("date_selector");
+    if (m_dateSelector)
+    {
+        connect(m_dateSelector, SIGNAL(pushed(int)),
+                this, SLOT(setDate(int)));
+    }
+
     buildFocusList();
     assignFirstFocus();
 }
@@ -217,13 +226,21 @@ void ZMEvents::getEventList(void)
     if (class ZMClient *zm = ZMClient::get())
     {
         QString monitorName = "<ANY>";
+        QString date = "<ANY>";
 
         if (m_cameraSelector && m_cameraSelector->getCurrentString() != tr("All Cameras") && 
             m_cameraSelector->getCurrentString() != "")
         {
             monitorName = m_cameraSelector->getCurrentString();
         }
-        zm->getEventList(monitorName, m_oldestFirst, m_eventList);
+
+        if (m_dateSelector && m_dateSelector->getCurrentString() != tr("All Dates") && 
+            m_dateSelector->getCurrentString() != "")
+        {
+            date = m_dateList[m_dateSelector->getCurrentInt() - 1];
+        }
+
+        zm->getEventList(monitorName, m_oldestFirst, date, m_eventList);
     }
 }
 
@@ -269,7 +286,11 @@ void ZMEvents::updateUIList()
     }
 
     if (m_eventNoText)
-        m_eventNoText->SetText(QString("%1/%2").arg(m_currentEvent + 1).arg(m_eventList->size()));
+        if (m_eventList->size() > 0)
+            m_eventNoText->SetText(QString("%1/%2")
+                    .arg(m_currentEvent + 1).arg(m_eventList->size()));
+        else
+            m_eventNoText->SetText("0/0");
 }
 
 void ZMEvents::eventListDown(bool page)
@@ -364,6 +385,45 @@ void ZMEvents::getCameraList(void)
 void ZMEvents::setCamera(int item)
 {
     (void) item;
+    m_currentEvent = 0;
+    updateTimeout();
+    getEventList();
+    updateUIList();
+}
+
+void ZMEvents::getDateList(void)
+{
+    if (class ZMClient *zm = ZMClient::get())
+    {
+        QString monitorName = "<ANY>";
+
+        if (m_cameraSelector && m_cameraSelector->getCurrentString() != tr("All Cameras") && 
+            m_cameraSelector->getCurrentString() != "")
+        {
+            monitorName = m_cameraSelector->getCurrentString();
+        }
+
+        zm->getEventDates(monitorName, m_oldestFirst, m_dateList);
+        if (!m_dateSelector)
+            return;
+
+        QString dateFormat = gContext->GetSetting("ZoneMinderDateFormat", "ddd - dd/MM");
+
+        m_dateSelector->addItem(0, tr("All Dates"));
+        m_dateSelector->setToItem(0);
+
+        for (uint x = 1; x <= m_dateList.count(); x++)
+        {
+            QDate date = QDate::fromString(m_dateList[x-1], Qt::ISODate);
+            m_dateSelector->addItem(x, date.toString(dateFormat));
+        }
+    }
+}
+
+void ZMEvents::setDate(int item)
+{
+    (void) item;
+    m_currentEvent = 0;
     updateTimeout();
     getEventList();
     updateUIList();
