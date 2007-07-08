@@ -1957,25 +1957,32 @@ fi
 # if no tune setting and we know cpu class look at $processor 
 if test x"$tune" = x"generic" -a x"$cpu_overide" != x"yes"; then
 # first try to tune based on processor info
+# EM64T era Intel Xeon
+   if expr "$processor" : ".*Intel(R) Xeon(R) CPU.*5110" > /dev/null ; then
+       ARCHFLAGS="-march=k8" # this would be pentium4 on 32 bit systems
+# Various Intel Duo processors (EMT64T capable)
+   elif expr "$processor" : ".*Intel(R).*Core(TM)2.*CPU" > /dev/null ; then
+       ARCHFLAGS="-march=k8" # this would be pentium4 on 32 bit systems
+   elif expr "$processor" : "*.Pentium(R) 5 CPU" > /dev/null ; then
+       ARCHFLAGS="-march=k8" # this would be pentium4 on 32 bit systems
+# EM64T compatible Intel Celeron
+   elif expr "$processor" : ".*Celeron(R) D CPU" > /dev/null ; then
+       ARCHFLAGS="-march=k8" # this would be pentium4 on 32 bit systems
+       optimize="small"
+# Reportedly Intel Duo, but we assume 32 bit P4 due to generic name
+   elif expr "$processor" : ".*Genuine.*Intel.*CPU" > /dev/null ; then
+       ARCHFLAGS="-march=pentium4"
 # P4
-   if expr "$processor" : "pentium4" > /dev/null ; then
-       ARCHFLAGS="-march=pentium4"
-   elif expr "$processor" : ".*Pentium(R) [4D]" > /dev/null ; then
-       ARCHFLAGS="-march=pentium4"
    elif expr "$processor" : ".*Xeon(TM) CPU" > /dev/null ; then
        ARCHFLAGS="-march=pentium4"
    elif expr "$processor" : ".*XEON(TM) CPU" > /dev/null ; then
        ARCHFLAGS="-march=pentium4"
-# Multiprocessor Xeon
    elif expr "$processor" : ".*XEON(TM) MP CPU" > /dev/null ; then
        ARCHFLAGS="-march=pentium4"
-   elif expr "$processor" : ".*Intel(R) Xeon(R) CPU.*5110" > /dev/null ; then
-       ARCHFLAGS="-march=k8" # this would be pentium4 on 32 bit systems
-# Various Intel Duo processors
-   elif expr "$processor" : ".*Genuine.*Intel.*CPU" > /dev/null ; then
+   elif expr "$processor" : "pentium4" > /dev/null ; then
        ARCHFLAGS="-march=pentium4"
-   elif expr "$processor" : ".*Intel(R).*Core(TM)2.*CPU" > /dev/null ; then
-       ARCHFLAGS="-march=k8" # this would be pentium4 on 32 bit systems
+   elif expr "$processor" : ".*Pentium(R) [4D]" > /dev/null ; then
+       ARCHFLAGS="-march=pentium4"
    elif expr "$processor" : ".*Celeron(R) CPU" > /dev/null ; then
        ARCHFLAGS="-march=pentium4"
        optimize="small"
