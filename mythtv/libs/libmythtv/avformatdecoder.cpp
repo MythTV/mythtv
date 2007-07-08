@@ -749,7 +749,7 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
         while (ic->nb_streams == 0)
             ret = av_read_frame(ic,&pkt1);
         av_free_packet(&pkt1);
-        ringBuffer->Seek(0,SEEK_SET);
+        ringBuffer->Seek(0, SEEK_SET);
         ringBuffer->DVD()->IgnoreStillOrWait(false);
         QString dec = gContext->GetSetting("PreferredMPEG2Decoder", "ffmpeg");
         if (dec.contains("xvmc") && 
@@ -2054,6 +2054,8 @@ void AvFormatDecoder::MpegPreProcessPkt(AVStream *stream, AVPacket *pkt)
             ringBuffer->DVD()->InStillFrame(true);
             dvdvideopause = true;
             d->ResetMPEG2();
+            if (storedPackets.isEmpty())
+                ringBuffer->DVD()->SeekCellStart();
             return;
         }
 
