@@ -346,6 +346,13 @@ PlaybackBox::PlaybackBox(BoxType ltype, MythMainWindow *parent,
 
     LoadWindow(xmldata);
 
+    if (playbackVideoContainer && m_player)
+    {
+         m_player->EmbedOutput(this->winId(), drawVideoBounds.x(), 
+                            drawVideoBounds.y(), drawVideoBounds.width(), 
+                            drawVideoBounds.height());
+    }
+
     LayerSet *container = theme->GetSet("selector");
     UIListType *listtype = NULL;
     if (container)
@@ -911,8 +918,7 @@ void PlaybackBox::updateVideo(QPainter *p)
 {
     if (playbackVideoContainer)
     {
-        m_player->EmbedOutput(this->winId(), drawVideoBounds.x(), drawVideoBounds.y(),
-                                drawVideoBounds.width(), drawVideoBounds.height());
+        m_player->DrawUnusedRects(false);
         return;
     }
     // If we're displaying group info don't update the video.
