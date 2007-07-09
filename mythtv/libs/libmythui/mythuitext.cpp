@@ -82,13 +82,12 @@ void MythUIText::SetFontProperties(const MythFontProperties &fontProps)
 
 void MythUIText::UseAlternateArea(bool useAlt)
 {
-    if (useAlt && m_AltDisplayRect.width() > 1)
-        m_Area = m_AltDisplayRect;
-    else
-        m_Area = m_OrigDisplayRect;
-
     m_CutMessage = "";
-    SetRedraw();
+
+    if (useAlt && m_AltDisplayRect.width() > 1)
+        MythUIType::SetArea(m_AltDisplayRect);
+    else
+        MythUIType::SetArea(m_OrigDisplayRect);
 }
 
 void MythUIText::SetJustification(int just)

@@ -358,6 +358,14 @@ int MythListButton::GetCount()
     return m_itemCount;
 }
 
+bool MythListButton::IsEmpty()
+{
+    if (m_itemCount > 0)
+        return false;
+    else
+        return true;
+}
+
 QPtrListIterator<MythListButtonItem> MythListButton::GetIterator(void)
 {
     return QPtrListIterator<MythListButtonItem>(m_itemList);

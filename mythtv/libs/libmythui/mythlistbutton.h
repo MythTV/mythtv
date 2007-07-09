@@ -30,6 +30,7 @@ class MythListButton : public MythUIType
     void SetDrawFromBottom(bool draw);
 
     void SetActive(bool active);
+    bool isActive() { return m_active; }
     void Reset();
 
     void SetItemCurrent(MythListButtonItem* item);
@@ -43,8 +44,10 @@ class MythListButton : public MythUIType
 
     QPtrListIterator<MythListButtonItem> GetIterator();
 
+    int GetCurrentPos() { return m_selPosition; }
     int GetItemPos(MythListButtonItem* item);
     int GetCount();
+    bool IsEmpty();
 
     enum MovementUnit { MoveItem, MovePage, MoveMax };
     void MoveDown(MovementUnit unit = MoveItem);
