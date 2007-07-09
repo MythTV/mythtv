@@ -1005,7 +1005,10 @@ class ImageSize : public VerticalConfigurationGroup
         if (transcoding)
         {
             maxsize     = QSize(1920, 1088);
-            defaultsize = QSize(480, 480);
+            if (tvFormat.lower() == "ntsc" || tvFormat.lower() == "atsc")
+                defaultsize = QSize(480, 480);
+            else
+                defaultsize = QSize(480, 576);
         }
         else if (tvFormat.lower().left(4) == "ntsc")
         {
