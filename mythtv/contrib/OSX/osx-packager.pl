@@ -220,7 +220,10 @@ our %depend = (
 #     =>  'echo "QMAKE_LFLAGS_SHLIB += -single_module" >> src/qt.pro',
 #     'make'
 #     =>  [
-#           'sub-src'
+#           'sub-src',
+#           'qmake-install',
+#           'moc-install',
+#           'src-install'
 #         ],
 #   },
   {
@@ -256,7 +259,8 @@ our %depend = (
     =>  [
           'sub-src',
           'qmake-install',
-          'moc-install'
+          'moc-install',
+          'src-install'
         ],
   },
   
@@ -443,10 +447,7 @@ if (!$OPT{usehdimage} && !CaseSensitiveFilesystem())
 }
 
 if ($OPT{usehdimage})
-{
-  Verbose("Creating a case-sensitive device for the build");
-  MountHDImage();
-}
+{  MountHDImage()  }
 
 our $PREFIX = "$WORKDIR/build";
 mkdir $PREFIX;
@@ -510,9 +511,7 @@ $ENV{'LDFLAGS'} = "-Z -F/System/Library/Frameworks -L/usr/lib -L$PREFIX/lib";
 $ENV{'PREFIX'} = $PREFIX;
 
 # set up Qt environment
-my $qt_vers = $depend{'qt-mt'}{'url'};
-$qt_vers =~ s|^.*/([^/]+)\.tar\.gz$|$1|;
-$ENV{'QTDIR'} = "$SRCDIR/$qt_vers";
+$ENV{'QTDIR'} = $PREFIX;
 
 # If environment is setup to use distcc, take advantage of it
 our $standard_make = '/usr/bin/make';
@@ -962,7 +961,7 @@ foreach my $target ( @targets )
 
   # Convert it to a bundled .app
   &Syscall([ @bundler, "$SCRIPTDIR/$target",
-             "$PREFIX/lib/", "$PREFIX/lib/mysql", "$SRCDIR/$qt_vers/lib" ])
+             "$PREFIX/lib/", "$PREFIX/lib/mysql" ])
       or die;
 
 
@@ -1184,8 +1183,13 @@ sub MountHDImage
 {
     if (!HDImageDevice())
     {
-        if (! -e "$SCRIPTDIR/.osx-packager.dmg")
+        if (-e "$SCRIPTDIR/.osx-packager.dmg")
         {
+            Verbose("Mounting existing UFS disk image for the build");
+        }
+        else
+        {
+            Verbose("Creating a case-sensitive (UFS) disk image for the build");
             Syscall(['hdiutil', 'create', '-size', '2048m',
                      "$SCRIPTDIR/.osx-packager.dmg", '-volname',
                      'MythTvPackagerHDImage', '-fs', 'UFS', '-quiet']) || die;
