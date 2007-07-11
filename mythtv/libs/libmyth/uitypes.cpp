@@ -3201,6 +3201,8 @@ UIStatusBarType::UIStatusBarType(QString &name, QPoint loc, int dorder)
     m_location = loc;
     m_order = dorder;
     m_orientation = 0;
+    m_used = 0;
+    m_total = 100;
 }
 
 UIStatusBarType::~UIStatusBarType()
