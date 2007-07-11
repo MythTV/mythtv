@@ -50,6 +50,9 @@ static HostComboBox *AudioOutputDevice()
 #ifdef USING_JACK
     gc->addSelection("JACK:output", "JACK:output"); 
 #endif
+#ifdef USING_COREAUDIO
+    gc->addSelection("CoreAudio:", "CoreAudio:"); 
+#endif
     gc->addSelection("NULL", "NULL");
 
     return gc;
