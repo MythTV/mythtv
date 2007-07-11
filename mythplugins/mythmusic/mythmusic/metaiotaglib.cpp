@@ -169,7 +169,7 @@ Metadata* MetaIOTagLib::read(QString filename)
             // If the MusicBrainz ID is the special "Various Artists" ID
             // then compilation is TRUE
             compilation = (MYTH_MUSICBRAINZ_ALBUMARTIST_UUID
-                == TStringToQString(musicbrainz->toString()));
+                == TStringToQString(musicbrainz->fieldList().front()));
         }
 
         // Length
