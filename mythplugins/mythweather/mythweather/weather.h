@@ -26,12 +26,18 @@
 #include <mythtv/oldsettings.h>
 #include <mythtv/mythwidgets.h>
 #include <mythtv/mythdialogs.h>
+#include "weatherSource.h"
+#include "sourceManager.h"
+#include "weatherScreen.h"
+#include "defs.h"
 
 class QLabel;
 class QListView;
 class QNetworkOperation;
 class Settings;
 class WeatherSock;
+class WeatherSource;
+class SourceManager;
 
 struct weatherTypes {
 	int typeNum;
@@ -39,17 +45,20 @@ struct weatherTypes {
 	QString typeIcon;
 };
 
+
 class Weather : public MythDialog
 {
     Q_OBJECT
   public:
-    Weather(int appCode, MythMainWindow *parent, const char *name = 0);
+    Weather(MythMainWindow *parent, SourceManager*, const char *name = 0);
     ~Weather();
 
     bool UpdateData();
     void processEvents();
-    QString getLocation();
-    void setLocation(QString newLocale);
+    QPixmap* getBackground() { return &realBackground; };
+  signals:
+    void clock_tick();
+    
   private slots:
     void update_timeout();
     void showtime_timeout();
@@ -57,82 +66,40 @@ class Weather : public MythDialog
     void weatherTimeout();
     void cursorLeft();
     void cursorRight();
-    void upKey();
-    void dnKey();
-    void pgupKey();
-    void pgdnKey();
     void holdPage();
     void setupPage();
-    void convertFlip();
-    void resetLocale();
-    void newLocaleX(int);
-
+    void screenReady(WeatherScreen*);
   protected:
     void paintEvent(QPaintEvent *);
     void keyPressEvent(QKeyEvent *e);
 
   private:
+    void setupScreens(QDomElement&);
+    WeatherScreen* nextScreen();
+    WeatherScreen* prevScreen();
     int timeoutCounter;
     int wantAnimated;
     bool stopProcessing;
     QString parseData(QString data, QString beg, QString end);
     void LoadWindow(QDomElement &);
-    void parseContainer(QDomElement &);
     XMLParse *theme;
     QDomElement xmldata;
-    UIAnimatedImageType* AnimatedImage;
-
-    void SetText(LayerSet *, QString, QString);
 
     void updateBackground();
     void updatePage(QPainter *);
 
-    ifstream accidFile;
-    streampos startData;
-    streampos curPos;
-    long accidBreaks[52];
-    int prevPos;
-
-    bool noACCID;
-    bool changeTemp;
-    bool changeLoc;
-    bool changeAgg;
-    int config_Units;
-    int config_Aggressiveness;
-    int curConfig;
-    int curPage;
-    bool debug;
-    bool deepSetup;
-    bool gotLetter;
-    bool inSetup;
-    bool validArea;
-    bool readReadme;
-    bool pastTime;
-    bool convertData;
+    units_t m_units;
     bool firstRun;
-    bool conError;
     int updateInterval;
     int nextpageInterval;
     int nextpageIntArrow;
-    int lastCityNum;
-    int curLetter;
-    int curCity;
-
-    QString cityNames[9];
-    QString newLocaleHold;
-    QString cfgCity;
-
-    int con_attempt;
+    QTimer *showtime_Timer;
     QTimer *nextpage_Timer;
-    QTimer *update_Timer;
-    QTimer *urlTimer;
 
-    void saveConfig();
     QString findAccidbyName(QString);
     QString findNamebyAccid(QString);
     void loadCityData(int);
     void fillList();
-    void updateLetters();
     void loadAccidBreaks();
     bool GetWeatherData();
     bool GetAnimatedRadarMap();
@@ -140,9 +107,7 @@ class Weather : public MythDialog
     bool gotDataHook;
     void setWeatherTypeIcon(QString[]);
     void setWeatherIcon(QString);
-    void backupCity(int);
-    void updateAggr();
-    void showCityName();
+    //void backupCity(int);
     void setSetting(QString, QString, bool);
 
     QString GetString(QString);
@@ -150,47 +115,33 @@ class Weather : public MythDialog
     float GetFloat(QString);
 
     void loadWeatherTypes();
-    weatherTypes *wData;
   
-    void showLayout(int);
-
-    int currentPage;
-
-    QString config_Location;
-    QString locale;
-    QString city;
-    QString state;
-    QString country;
-    QString measure;
-    QString curTemp;
-    QString curIcon;
-    QString curWind;
-    QString winddir;
-    QString barometer;  
-    QString curHumid;
-    QString curFeel;
-    QString uvIndex;
-    QString visibility;
-    QString updated;
-    QString description;
-    QString date[5];
-    QString weatherIcon[5];
-    QString weatherType[5];
-    QString highTemp[5];
-    QString lowTemp[5];
-    QString precip[5];
-
-    QString httpData;
-    QString oldhttpData;
-
-    QRect fullRect;
+    void showLayout(WeatherScreen*);
     QRect newlocRect;
+    QRect fullRect;
 
     QPixmap realBackground;
     bool allowkeys;  
-    
-    int weatherTimeoutInt;
+    SourceManager *m_srcMan;
+    QPtrList<WeatherScreen> screens; //screens in correct display order
+    /*
+     * May not be necessary, but we will keep instances around, they may be
+     * helpful when doing configuration. though if I split out config to
+     * different classes then these may not be necessary
+     * 
+     * Maybe I'll do something like I did with sources, having instance
+     * indpendent info that I load when parsing xml, then creating objects as
+     * necessary.
+     * UPDATE: Things are currently between two places, either having only one
+     * possible instance of a screen, or else having multiple instances, which
+     * would require somehow creating multiple LaySet objects, probably possibly
+     * by keeping a map of QDomElement's instead of Screens, and parsing them
+     * for each screen required.
+     */
+    QMap<QString, WeatherScreen*> all_screens; //screens parsed from xml
+    WeatherScreen* currScreen;
+    WeatherScreen* m_startup;
+    bool paused;
 };
-
 
 #endif

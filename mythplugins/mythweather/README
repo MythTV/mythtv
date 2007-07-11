@@ -1,110 +1,126 @@
-                                   MythWeather 
-			          Release 0.17
+MythWeather README - 08/2006
+Lucien Dunning
+ldunning@gmail.com
 
-BUILD/CONFIGURATION INSTRUCTIONS
---------------------------------
+New Features
+===============
+-New Screens:
+    6 day forecast
+    18 hour forecast
+    Severe Weather Alerts
+    Generic animated image screen
+    Generic static image screen
+    UI Update of 3 day forecast
 
-Requirements:
-	MythTV (v0.14 or higher) installed and working
-	Internet Access (to get the weather!)
+-External programs used to grab data.
+-Which screens are displayed, and in what order, can be configured by the
+user.
+-Multiple instances of the same screen can be displayed, showing different
+locations or units.
+-Page change intervals now user configurable.
+-Data can be retrieved as long as frontend is running, there is no longer a
+wait for the initial data to be retrieved.
+-Adding your own screen can be as simple as editing an xml file.
+-Regular expression based location searching.
+-Screens can include multiple locations.
+-New configuration screens to make it all work.
+
+Requirements
+===============
+
+Currently builds against version 0.19 of MythTV.
+
+The plugin relies on external scripts to retrieve weather data.
+Currently they are all written in perl so a current version of that is
+required (I don't know how current, I have 5.8).  Below are all of the
+external modules required, some are included with a default installation,
+others will need to be installed.  Some distros will have them in their
+package management system, for those that aren't, see
+http://cpan.org/misc/cpan-faq.html#How_install_Perl_modules 
+
+XML::Parser
+XML::SAX
+Carp
+SOAP::Lite
+Data::Dumper
+Date::Manip
+Getopt::Std
+LWP::Simple
+Exporter
+Image::Size
+
+Currently its all or nothing, if any are missing, ./configure will fail.
+    
+Installation
+===============
+
+MythWeather is now included as a part of the mythplugins packages, therefore,
+installation should be done at that level.  If any of the above perl
+requirements are not met, the configure script will disable mythweather and
+print an error message, resolve missing dependencies and rerun the script to
+enable MythWeather.
+
+Setup
+===============
+
+On all screens you press MENU to save changes and exit, or EXIT to cancel
+changes.
+
+Global Setup:
+    This screen is pretty self explanatory.  The two time values determine how
+    long to display pages.  The first is for normal operation.  The second is
+    how long to stay on a page after a manual page change.  The checkbox
+    determines whether data should be continually retrieved as long as the
+    frontend is running.  This will improve startup time of MythWeather
+    drastically since it will no longer have to wait for the initial data
+    retrieval.  Enabling this does slow down the startup of mythfrontend
+    slightly, but I have worked hard to minimize this.
+Screen Setup:
+    This is probably the most important of the setup screens.  The Screen Setup
+    screen is where you decide what screens you want displayed, what units they
+    will use, what location each screen displays, and in what order the screens
+    are displayed.  The interface should be pretty intuitive; most options will
+    be found by pressing select on the screen you want to manipulate.  Keep in
+    mind that not all screens will ask for units since the nature of some
+    sources doesn't allow them to change the units of the data.  Also, a screen
+    can be a single location screen or a multi-location screen.  To change the
+    location of a single location screen, you simply SELECT the screen in the
+    active screens list and choose Change Location.  To change the locations of
+    a multi-location screen you have to set the location of each individual data
+    item.  This may not be ideal, but it does allow for very easy screen and
+    source development, along with very customizable location setups.  The
+    location search screen searches the external sources that supply the data
+    for the screen or data item you are configuring.  How it searches depends on
+    which sources it is looking at.  Most of the sources (all of the ones I've
+    written) use regular expressions to search.  If you want to see all possible
+    locations you can search with ".*" or just a blank search term.  Once you
+    have selected valid locations for all screens and data items that are
+    active, you can press MENU to save and exit.  
+Source Setup:
+    This screen is where you configure the sources necessary to supply data to
+    the screens chosen in the previous screen.  Since it filters out the unused
+    sources, it is wise to make sure you have completed the screen setup prior
+    to entering this screen.  This will ensure that you see the sources you want
+    to.  This screen is pretty self-explanatory.  The first value is the timeout
+    for retrieving data.  When a external data retrieval program exceeds this
+    value, it will be terminated.  The second value is how long to wait between
+    retrievals.  Note that some scripts will cache data to avoid hammering sites
+    that update their data at fixed times.  Also, some scripts will report the
+    update time as a value gathered from the server that signifies the time the
+    data was generated or observed.  Others will simply use the time they were
+    last run.  Therefore, if you see update times that seem further in the past
+    than you think they should be, don't worry, chances are the scripts are
+    running fine and you have the most current data available.
+
+Use
+===============
+Once configured, using MythWeather requires little brain-power.  When the
+plugin is started it will begin cycling through the screens.  If you wish to
+pause on a screen press PAUSE (p).  If you wish to manually move between
+pages, use the left and right arrows.  If you wish to manually initiate an
+update, press 'u'.  Thats about it, to exit, press EXIT (escape).
 
 
-Once you have unzipped the data file and if you have met the requirements above,
-simply type 'qmake mythweather.pro' then 'make' in the main directory to begin 
-compiling. 
-
-
-Compiling note:  If you get an error on building this, that says something
-                 about 'mkspecs', then you don't have the QTDIR environment
-                 variable set.  On debian, this should be set to /usr/share/qt.
-                 I hear on mandrake, it's /usr/lib/qt3.  You'll need to figure
-                 out what it should be on your system, set the variable,
-                 and attempt to compile again.
-
-
-Once the make is completed, do a 'make install'.  
-
-- libmythweather.so will go into /usr/local/lib/mythtv/plugins
-- images and data files will be put into the newly created
-  /usr/local/share/mythtv/mythweather directory
-
-CONFIGURATION
--------------
-
-MythWeather configuration is now done in MythWeather...
-
-To enter the configuration section, press 'i'. From here you can select:
-
-1. Units (lets you pick between Imperial and SI)
-2. Location (pick the letter your city begins with, then find your city in the 
-   list, see below for key binding which should make this quicker).
-3. Aggressiveness Value (this is how fast MythWeather will timeout while trying
-   to get weather data).
-
-NOTE: You don't need to do anything other than pick the desired setting. Once 
-      highlighted, just hit the left arrow key to go to another setting or when
-      you are finished with the configuration, hit the 'i' key again to save. 
-      If you want to cancel your changes press the ESCAPE key.
-
-NOTE: If you keep getting "!!! 3 Failed Attempts !!!" (everytime you try), 
-      pick a city that is nearby.
-
-NOTE: If you can't find your city but you can find it at MSNBC.com's Weather 
-      Site, let me know the city name/accid.
-
-
-MYTHWEATHER KEYBOARD COMMANDS
------------------------------
-   Left Key 		Goes back one page, this also extends the time spent
-			on the page you are at. 
-   Right Key		Goes forward one page, see above.
-   'p' Key		Pause, wait on the current page until space is hit
-			again.
-   Numeric Keys		You can check other weather by keying in other ZIP 
-                        codes.
-   'm' Key		Switch between celsius and fahrenheit. Can also
-			be used a way to force a data update.
-   Enter Key		Resets the location to the database default, then 
-                        updates the data.
-
-   From within Configuration:
-   
-       Key      Action
-       ---      ------
-	1	Up 25
-	2	Up 50
-	3	Up 100
-	4	Beginning of List
-	5	Middle of List
-	6	End of List
-	7	Down 25
-	8	Down 50
-	9	Down 100
-	i       Exit & Save Configuration
-       ESC      Exit Without Saving
-
-
-OTHER INFORMATION
------------------
-Current the program cycles through the three pages. Each page is 
-shown for 10 seconds. When the user intervens and changes the page
-it waits for 20 seconds. The weather data is updated every 30 minutes
-or until the user selects a new zip code (or even the current zip code
-again). 
-
-
- TODO LIST
----------
-   - Finish list of weather types and icons
-
-KNOWN ISSUES
-------------
-I don't have all the weather descriptions and icons. If you see a '?' 
-icon or weather description as 'Unknown [XX]', please email and let
-me know the XX number, the type of weather at www.msnbc.com for that
-day. THANKS!
-
-If you have any questions, you can find me on the #mythtv channel at
-irc.freenode.net (IRC Name: moegreen)
-
-or you can email me: John Danner <johndanner@untzuntz.com>
+All questions, ideas, and flamebait can be sent to me at ldunning@gmail.com,
+receipt of email is no gurantee of reply (I'll try my best). I am also in
+#mythtv on freenode from time to time, my nick is lu.

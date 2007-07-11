@@ -1,0 +1,76 @@
+A script is any executable file used to retrieve weather data for the
+MythWeather plugin.
+
+Usage: script -v
+       script -t
+       script -T
+       script -l regex
+       script -u units [-d dir] location
+
+-v -- Information about the script in format
+name,version,author,email
+
+-T -- default timeout values specified by this script in form
+        updateTimeout,retieveTimeout
+        updateTimeout -- time between updates
+        retrieveTimeout -- timeout when trying to retrieve data
+
+-l regex -- Returns list of locations matching regex, one per line in the
+format of STRING::STRING, the first string is what will be stored in the
+database and passed to the script.  The second string is used as a display
+string when searching.
+
+-t -- return list of data items supported by this script, one per line.
+
+-d dir -- a dir with write permissions to store data.  This is guranteed to be
+the same directory everytime the script is called within a frontend run by a
+particular user (unless they change the MYTHCONFDIR env variable).  It is the
+conf dir (usually ~/.mythtv/) appended with MythWeather/SCRIPT_NAME.  This is
+technically not required to run scripts that don't write any data, i.e. they
+don't all check for it, but it is sent to all scripts.
+
+-u units -- specifies the units desired in the output, either "SI" or "ENG"
+This is passed to every script, even if the screen requesting data has the
+nounits flag set; in this case, scripts just silently ignore the flag.
+
+when run with units, a directory, and a location the script will return a list
+consisting of one item per line.  Each item will represent a data item retreived
+from the source.  Each item will consist of two tokens separated by '::' The
+first item will be the name of the item and the second will be the value.
+To return multiple lines of text as a single data item you repeat the data item.
+For example:
+
+item::This is a 
+item::multi-line 
+itme::data item
+
+These must be printed successively, behavior is undefined otherwise.
+
+Scripts are run with the scripts/ directory as the working directory.  If the
+script needs to reference any files (location lists, weather types, etc... see
+existing scripts) they should be placed into the scripts/ directory (taking care
+that they are not executable).  If the scripts wants to contain some
+configuration options outside the timeout values configurable within the
+frontend, I suggest putting them in the directory that is passed to each script
+with the -d option (see above for more info about this directory).
+
+If you change what types provided by a script, it is necessary to change the
+version number to make sure the plugin reloads the data.  To speed up execution,
+the scripts information is stored in the database.  When entering the screen
+setup screen the scripts directory is searched for scripts.  New scripts are
+added to the database and existing scripts are checked for version changes.
+
+Types are the screen items as defined in weather-ui.xml.  A data item with no
+modifiers before it is a static item and the plugin will not search for a script
+to provide data to it. A * signifies an item that is dynamic, but not required
+to display the screen, these are not provided by scripts, they are things like
+pause text or the current date and time.  A + prepending the item name signifies
+an item that is required to show the screen, these are provided by scripts.  The
+text of the name within the weather-ui.xml file (with prepending flag removed)
+must match exactly the string returned by the -T flag; as well as the token
+returned when retrieving data.
+
+If you want to see the code that controls the scripts within the plugin, look at
+weatherSource.cpp and sourceManager.cpp.  If you have any problems with the
+plugin, feel free to contact me at ldunning@gmail.com
+

@@ -1,0 +1,278 @@
+
+#include "sourceManager.h"
+#include "weatherSource.h"
+#include "weather.h"
+#include <qdir.h>
+#include <qfileinfo.h>
+#include <qstring.h>
+#include <qstringlist.h>
+#include <qvaluelist.h>
+#include <qprocess.h>
+#include <mythtv/mythcontext.h>
+#include <mythtv/mythdbcon.h>
+
+#define LOC QString("SourceManager: ")
+#define LOC_ERR QString("SourceManager Error: ")
+
+SourceManager::SourceManager() {
+    findScriptsDB();
+    setupSources();
+    m_scripts.setAutoDelete(true);
+    m_sources.setAutoDelete(true);
+
+}
+
+
+bool SourceManager::findScriptsDB() {
+    MSqlQuery db(MSqlQuery::InitCon());
+    QString query =
+	    "SELECT DISTINCT wss.sourceid, source_name, update_timeout, "
+				"retrieve_timeout, path, author, version, email, types "
+			"FROM weathersourcesettings wss "
+			"LEFT JOIN weatherdatalayout wdl "
+			"ON wss.sourceid = wdl.weathersourcesettings_sourceid "
+			"WHERE hostname = :HOST;";
+
+    db.prepare(query);
+    db.bindValue(":HOST", gContext->GetHostName());
+    if (!db.exec()) {
+        VERBOSE(VB_IMPORTANT, db.lastError().text());
+        return false;
+    }
+
+    while (db.next()) {
+        QFileInfo *fi = new QFileInfo(db.value(4).toString());
+
+        if (!fi->isExecutable()) {
+            // scripts will be deleted from db in the more robust (i.e. slower)
+            // findScripts() -- run when entering setup
+            delete fi;
+            continue;
+        }
+        struct ScriptInfo* si = new ScriptInfo;
+        si->id = db.value(0).toInt();
+        si->name = db.value(1).toString();
+        si->updateTimeout = db.value(2).toUInt() * 1000;
+        si->scriptTimeout = db.value(3).toUInt() * 1000;
+        si->file = fi;
+        si->author = db.value(5).toString();
+        si->version = db.value(6).toString();
+        si->email = db.value(7).toString();
+        si->types = QStringList::split(",",db.value(8).toString());
+            m_scripts.append(si);
+    } 
+
+    return true;
+
+}
+
+
+bool SourceManager::findScripts() {
+    QString path =  gContext->GetShareDir() + "mythweather/scripts/";
+    QDir dir(path);
+    dir.setFilter(QDir::Executable | QDir::Files);
+    // this kinda goes against idea of keeping ui separate, but oh well
+    MythProgressDialog bsydlg(tr("Searching for scripts"), dir.count());
+    int progress = 0;
+
+    if (!dir.exists()){
+        VERBOSE(VB_IMPORTANT, "MythWeather: Scripts directory not found");
+        return false;
+    }
+    
+    const QFileInfoList *files = dir.entryInfoList();
+    if(!files)
+        return false;
+    
+    QFileInfoListIterator itr(*files);
+    QFileInfo *file;
+    while ((file = itr.current())) {
+        ++itr;
+        if (file->isExecutable()) {
+            struct ScriptInfo* info = WeatherSource::probeScript(*file);
+            if (info) {
+                m_scripts.append(info);
+                VERBOSE(VB_GENERAL, "found script " + file->absFilePath());
+            }
+        }
+        bsydlg.setProgress(++progress);
+    }
+    // run through and see if any scripts have been deleted
+    MSqlQuery db(MSqlQuery::InitCon());
+    QString query = "SELECT sourceid, path FROM weathersourcesettings "
+        "WHERE hostname = :HOST;";
+    db.prepare(query);
+    db.bindValue(":HOST", gContext->GetHostName());
+    db.exec();
+    QStringList toRemove;
+    while (db.next()) {
+        QFileInfo fi(db.value(1).toString());
+        if (!fi.isExecutable()) {
+            toRemove << db.value(0).toString();
+            VERBOSE(VB_GENERAL,  fi.absFilePath() + " No longer exists");
+        }
+    }
+    query = "DELETE FROM weathersourcesettings WHERE sourceid = :ID;";
+    db.prepare(query);
+    for (uint i = 0; i < toRemove.count(); ++i) {
+        db.bindValue(":ID", toRemove[i]);
+        if (!db.exec()) {
+            VERBOSE(VB_IMPORTANT,  db.lastError().text());
+        }
+    }
+    bsydlg.Close();
+    return m_scripts.count() > 0;
+}
+
+void SourceManager::clearSources() {
+    m_scripts.clear();
+    m_sources.clear();
+}
+
+void SourceManager::setupSources() {
+
+    MSqlQuery db(MSqlQuery::InitCon());
+
+    QString query = "SELECT DISTINCT location,weathersourcesettings_sourceid,weatherscreens.units,"
+        "weatherscreens.screen_id FROM weatherdatalayout,weatherscreens "
+        "WHERE weatherscreens.screen_id = weatherscreens_screen_id AND weatherscreens.hostname = :HOST;";
+    db.prepare(query);
+    db.bindValue(":HOST", gContext->GetHostName());
+    if(!db.exec()) {
+        VERBOSE(VB_IMPORTANT, db.lastError().text());
+        return;
+    }
+    m_sourcemap.clear();
+    while (db.next()) {
+        QString loc = db.value(0).toString();
+        uint sourceid = db.value(1).toUInt();
+        units_t units = db.value(2).toUInt();
+        uint screen = db.value(3).toUInt();
+        const WeatherSource *src = needSourceFor(sourceid,loc,units);
+        m_sourcemap.insert((long)screen, src);
+    }
+}
+
+struct ScriptInfo* SourceManager::getSourceByName(QString name) {
+    struct ScriptInfo* src = 0;
+    for (src = m_scripts.first(); src; src = m_scripts.next()) {
+        if (src->name == name) {
+            return src;
+          //  src = new ScriptInfo;
+          //  src->name = m_scripts[i]->name;
+          //  src->version = m_scripts[i]->version;
+          //  src->author = m_scripts[i]->author;
+          //  src->email = m_scripts[i]->email;
+          //  src->types = m_scripts[i]->types;
+          //  src->file = new QFileInfo(*m_scripts[i]->file);
+          //  src->scriptTimeout = m_scripts[i]->scriptTimeout;
+          //  src->updateTimeout = m_scripts[i]->updateTimeout;
+          //  src->id = m_scripts[i]->id;
+        }
+    }
+
+    if (!src) {
+        VERBOSE(VB_IMPORTANT, "No Source found for " + name);
+    }
+
+    return NULL;
+}
+
+
+QStringList SourceManager::getLocationList( struct ScriptInfo* si, QString str) {
+
+    if (!m_scripts.contains(si))
+        return NULL;
+    WeatherSource* ws = new WeatherSource(si);
+    return ws->getLocationList(str);
+
+}
+
+WeatherSource* SourceManager::needSourceFor(int id, QString loc, units_t units) {
+
+    // matching source exists?
+    WeatherSource *src;
+    for (src = m_sources.first(); src; src = m_sources.next()) {
+        if (src->getId() == id && 
+                src->getLocale() == loc &&
+                src->getUnits() == units) {
+            return src;
+        }
+    }
+   
+    // no matching source, make one
+    struct ScriptInfo* si;
+    for (si = m_scripts.first(); si; si = m_scripts.next()) {
+        if (si->id == id) {
+            WeatherSource *ws = new WeatherSource(si);
+            ws->setLocale(loc);
+            ws->setUnits(units);
+            m_sources.append(ws);
+            return ws;
+
+        }
+    }
+
+	VERBOSE(VB_IMPORTANT, LOC + QString("NeedSourceFor: Unable to find source "
+            "for %1, %2, %3").arg(id).arg(loc).arg(units));
+    return NULL;
+
+}
+
+
+void SourceManager::startTimers() {
+    WeatherSource* src;
+    for (src = m_sources.first(); src; src = m_sources.next()) 
+        src->startUpdateTimer();
+}
+
+void SourceManager::stopTimers() {
+    WeatherSource* src;
+    for (src = m_sources.first(); src; src = m_sources.next()) 
+        src->stopUpdateTimer();
+}
+
+void SourceManager::doUpdate() {
+    WeatherSource *src;
+    for (src = m_sources.first(); src; src = m_sources.next())  {
+        if (src->isRunning()) {
+            VERBOSE(VB_GENERAL, tr("Script %1 is still running when trying to do update, "
+                    "Make sure it isn't hanging, make sure timeout values are sane... "
+                    "Not running this time around").arg(src->getName()));
+        }
+        else if (src->inUse()) 
+            src->startUpdate();
+    }
+}
+
+bool SourceManager::findPossibleSources(QStringList types, 
+        QPtrList<struct ScriptInfo>  &sources) {
+    struct ScriptInfo* si;
+    QPtrList<struct ScriptInfo> results;
+    bool handled;
+    for (si = m_scripts.first(); si; si = m_scripts.next()) {
+        QStringList stypes = si->types;
+        handled = true;
+        uint i;
+        for (i = 0; i < types.count() && handled; ++i) {
+            handled = stypes.contains(types[i]);
+        }
+        if (handled)
+            results.append(si);
+        
+    }
+    if (results.count()) {
+        sources = results;
+        return true;
+    } else return false;
+}
+
+void SourceManager::connectScreen(uint id, WeatherScreen *screen) {
+    WeatherSource *ws = m_sourcemap[id];
+    ws->connectScreen(screen);
+}
+
+void SourceManager::disconnectScreen(WeatherScreen *screen) {
+    WeatherSource *ws = m_sourcemap[screen->getId()];
+    ws->disconnectScreen(screen);
+}
