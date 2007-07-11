@@ -1,0 +1,19 @@
+<themeinfo>
+    <name>G.A.N.T.</name>
+
+    <author>
+        <name>Oscar Carlsson</name>
+        <email></email>
+    </author>
+
+    <version>
+        <major>1</major>
+        <minor>1</minor>
+    </version>
+
+    <detail>
+        <thumbnail name="Main Menu">preview.jpg</thumbnail>
+        <description>A Grey theme.</description>
+        <errata>N/A</errata>
+    </detail>
+</themeinfo>
