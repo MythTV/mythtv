@@ -346,12 +346,7 @@ PlaybackBox::PlaybackBox(BoxType ltype, MythMainWindow *parent,
 
     LoadWindow(xmldata);
 
-    if (playbackVideoContainer && m_player)
-    {
-         m_player->EmbedOutput(this->winId(), drawVideoBounds.x(), 
-                            drawVideoBounds.y(), drawVideoBounds.width(), 
-                            drawVideoBounds.height());
-    }
+    EmbedTVWindow();
 
     LayerSet *container = theme->GetSet("selector");
     UIListType *listtype = NULL;
@@ -3171,6 +3166,8 @@ void PlaybackBox::cancelPopup(void)
     paintSkipCount = 2;
 
     setActiveWindow();
+    
+    EmbedTVWindow();
 }
 
 void PlaybackBox::doClearPlaylist(void)
@@ -4417,6 +4414,8 @@ void PlaybackBox::closeRecGroupPopup(bool refreshList)
 
     setActiveWindow();
 
+    EmbedTVWindow();
+
     if (delitem)
     {
         delete delitem;
@@ -5194,6 +5193,16 @@ void PlaybackBox::clearProgramCache(void)
         delete *i;
     delete progCache;
     progCache = NULL;
+}
+
+void PlaybackBox::EmbedTVWindow(void)
+{
+    if (playbackVideoContainer && m_player)
+    {
+        m_player->EmbedOutput(this->winId(), drawVideoBounds.x(),
+                            drawVideoBounds.y(), drawVideoBounds.width(),
+                            drawVideoBounds.height());
+    }
 }
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

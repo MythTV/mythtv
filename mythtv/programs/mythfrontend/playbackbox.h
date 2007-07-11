@@ -303,7 +303,7 @@ class PlaybackBox : public MythDialog
                          QString cont_name = "group_info");
 
     void clearProgramCache(void);
-
+    void EmbedTVWindow(void);
     // Settings ///////////////////////////////////////////////////////////////
     /// If "Play"  this is a recording playback selection UI,
     /// if "Delete this is a recording deletion selection UI.
