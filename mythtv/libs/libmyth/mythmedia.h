@@ -11,8 +11,9 @@ typedef enum {
     MEDIASTAT_ERROR,
     MEDIASTAT_UNKNOWN,
     MEDIASTAT_UNPLUGGED,
-    MEDIASTAT_OPEN,       /**< CD/DVD tray open. Meaningless for other devs? */
-    MEDIASTAT_NODISK,     /**< CD/DVD tray closed, SCSI drive unformatted? */
+    MEDIASTAT_OPEN,         ///< CD/DVD tray open (meaningless for other devs?)
+    MEDIASTAT_NODISK,       ///< CD/DVD tray closed but empty, device unusable
+    MEDIASTAT_UNFORMATTED,  ///< For devices/media a plugin might erase/format
     MEDIASTAT_USEABLE,    
     MEDIASTAT_NOTMOUNTED,
     MEDIASTAT_MOUNTED
@@ -43,6 +44,9 @@ typedef QMap<QString,uint> ext_to_media_t;
 class MPUBLIC MythMediaDevice : public QObject
 {
     Q_OBJECT
+    friend class MediaMonitorDarwin;   // So these can call setStatus(),
+    friend class MonitorThreadDarwin;  // and trigger posting of MediaEvents
+
  public:
     MythMediaDevice(QObject* par, const char* DevicePath, bool SuperMount, 
                     bool AllowEject);
@@ -72,6 +76,14 @@ class MPUBLIC MythMediaDevice : public QObject
     int getDeviceHandle() const { return m_DeviceHandle; }
 
     bool isDeviceOpen() const;
+
+    /// Is this device "ready", for a plugin to access?
+    bool isUsable() const
+    {
+        return m_Status == MEDIASTAT_USEABLE
+            || m_Status == MEDIASTAT_MOUNTED
+            || m_Status == MEDIASTAT_NOTMOUNTED;
+    }
     
     MediaType getMediaType() const { return m_MediaType; }
 
