@@ -537,12 +537,13 @@ void CustomEdit::recordClicked(void)
         record->loadBySearch(kPowerSearch, m_title->text(),
                              m_subtitle->text(), m_description->text());
     record->exec();
-    record->deleteLater();
 
     if (record->getRecordID())
         accept();
     else
         m_recordButton->setFocus();
+
+    record->deleteLater();
 }
 
 void CustomEdit::storeClicked(void)
