@@ -202,9 +202,6 @@ namespace
     // This stores the last MythMediaDevice that was detected:
     QString gDVDdevice;
 
-    //
-    //  Transcode stuff only if we were ./configure'd for it
-    //
     void startDVDRipper()
     {
         QString dvd_device = gDVDdevice;
@@ -329,17 +326,21 @@ namespace
     /////////////////////////////////////////////////
     void handleDVDMedia(MythMediaDevice *dvd)
     {
-        if (dvd)
-        {
-            QString newDevice = dvd->getDevicePath();
+        if (!dvd)
+            return;
 
+        QString newDevice = dvd->getDevicePath();
+
+        // Device insertion. Store it for later use
+        if (dvd->isUsable())
             if (gDVDdevice.length() && gDVDdevice != newDevice)
             {
                 // Multiple DVD devices. Clear the old one so the user has to
                 // select a disk to play (in MediaMonitor::defaultDVDdevice())
 
+                VERBOSE(VB_MEDIA, "MythVideo: Multiple DVD drives? Forgetting "
+                                  + gDVDdevice);
                 gDVDdevice = QString::null;
-                VERBOSE(VB_MEDIA, "MythVideo: Forgetting existing DVD");
             }
             else
             {
@@ -347,6 +348,20 @@ namespace
                 VERBOSE(VB_MEDIA,
                         "MythVideo: Storing DVD device " + gDVDdevice);
             }
+        else
+        {
+            // Ejected/unmounted/error.
+
+            if (gDVDdevice.length() && gDVDdevice == newDevice)
+            {
+                VERBOSE(VB_MEDIA,
+                        "MythVideo: Forgetting existing DVD " + gDVDdevice);
+                gDVDdevice = QString::null;
+
+                // How do I tell the MTD to ignore this device?
+            }
+
+            return;
         }
 
         switch (gContext->GetNumSetting("DVDOnInsertDVD", 1))
@@ -368,8 +383,11 @@ namespace
         }
     }
 
-    void handleVCDMedia(MythMediaDevice *)
+    void handleVCDMedia(MythMediaDevice *vcd)
     {
+        if (!vcd || !vcd->isUsable())
+            return;
+
         switch (gContext->GetNumSetting("DVDOnInsertDVD", 1))
         {
            case 0 : // Do nothing

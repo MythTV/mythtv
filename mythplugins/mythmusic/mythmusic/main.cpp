@@ -316,7 +316,10 @@ void handleMedia(MythMediaDevice *cd)
     // Note that we should deal with other disks that may contain music.
     // e.g. MEDIATYPE_MMUSIC or MEDIATYPE_MIXED
 
-    if (cd) 
+    if (!cd) 
+        return;
+
+    if (cd->isUsable())
     { 
         QString newDevice;
 
@@ -339,6 +342,11 @@ void handleMedia(MythMediaDevice *cd)
             gCDdevice = newDevice;
             VERBOSE(VB_MEDIA, "MythMusic: Storing CD device " + gCDdevice);
         }
+    }
+    else
+    {
+        gCDdevice = QString::null;
+        return;
     }
 
     if (gContext->GetNumSetting("AutoPlayCD", 0))

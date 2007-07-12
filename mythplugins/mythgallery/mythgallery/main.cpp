@@ -40,7 +40,8 @@ void runGallery(void)
 
 void handleMedia(MythMediaDevice *dev)
 {
-    run(dev);
+    if (dev && dev->isUsable())
+        run(dev);
 }
 
 void setupKeys(void)
