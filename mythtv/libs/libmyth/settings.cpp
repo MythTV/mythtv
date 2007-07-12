@@ -100,7 +100,7 @@ void ConfigurationGroup::deleteLater(void)
         if (*it)
             (*it)->disconnect();
     }
-	Setting::deleteLater();
+    Setting::deleteLater();
 }
 
 Setting *ConfigurationGroup::byName(const QString &name)
