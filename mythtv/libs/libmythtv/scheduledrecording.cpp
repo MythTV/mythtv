@@ -76,17 +76,18 @@ ScheduledRecording::ScheduledRecording() :
     parentid = new SRParentId(this);
     search = new SRRecSearchType(this);
     rootGroup = new RootSRGroup(this);
+
+    dialog = NULL;
 }
 
 ScheduledRecording::~ScheduledRecording() 
 {
-    // rootGroup is unique among this class' member variables in
-    // that it's not self-managed
-    if (rootGroup)
-    {
+    // If we created a dialog, it took over management of rootGroup.
+    // If that is the case, delete dialog instead of rootGroup.
+    if (dialog)
+        delete dialog;
+    else if (rootGroup)
         rootGroup->deleteLater();
-        rootGroup = NULL;
-    }
 }
 
 void ScheduledRecording::load()
@@ -735,8 +736,9 @@ void ScheduledRecordingEditor::open(int id) {
 
 int ScheduledRecording::exec(bool saveOnExec, bool doLoad)
 {
-    ScheduledRecordingDialog dialog(this);
-    return dialog.exec(saveOnExec, doLoad);
+    if (!dialog)
+        dialog = new ScheduledRecordingDialog(this);
+    return dialog->exec(saveOnExec, doLoad);
 }
 
 void ScheduledRecording::setStart(const QDateTime& start) {

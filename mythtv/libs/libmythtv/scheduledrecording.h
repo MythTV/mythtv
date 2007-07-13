@@ -260,6 +260,8 @@ protected:
     QString timeFormat;
     QString dateFormat;
     QString shortDateFormat;
+
+    class ScheduledRecordingDialog* dialog;
 };
 
 class ScheduledRecordingEditor :
