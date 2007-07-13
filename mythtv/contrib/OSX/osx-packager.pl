@@ -308,8 +308,11 @@ osx-packager.pl - build OS X binary packages for MythTV
    -svntag <str>    build a specified release, instead of Subversion HEAD
    -nohead          don't update to HEAD revision of MythTV before building
    -usehdimage      perform build inside of a case-sensitive disk image
+   -leavehdimage    leave disk image mounted on exit
    -enable-backend  build the backend server as well as the frontend
    -enable-jobtools build commflag/jobqueue  as well as the frontend
+   -profile         build with compile-type=profile
+   -debug           build with compile-type=debug
    -plugins <str>   comma-separated list of plugins to include
                       Available plugins:
    mythbrowser mythcontrols mythdvd mythflix mythgallery mythgame
@@ -378,8 +381,11 @@ Getopt::Long::GetOptions(\%OPT,
                          'nocvs', # This is obsolete, but should stay a while
                          'nohead',
                          'usehdimage',
+                         'leavehdimage',
                          'enable-backend',
                          'enable-jobtools',
+                         'profile',
+                         'debug',
                          'plugins=s',
                         ) or Pod::Usage::pod2usage(2);
 Pod::Usage::pod2usage(1) if $OPT{'help'};
@@ -873,6 +879,14 @@ foreach my $comp (@comps)
     {
       push @config, '--enable-backend'
     }
+    if ( $OPT{'profile'} )
+    {
+      push @config, '--compile-type=profile'
+    }
+    if ( $OPT{'debug'} )
+    {
+      push @config, '--compile-type=debug'
+    }
     if ( $comp eq 'mythtv' && ! $ENV{'DISTCC_HOSTS'} )
     {
       push @config, '--disable-distcc'
@@ -1053,7 +1067,7 @@ if ( $jobtools )
 &Syscall([ 'rm', '-fr', $WORKDIR . '/tmp' ]) or die;
 &Syscall([ 'mkdir',     $WORKDIR . '/tmp' ]) or die;
 
-if ($OPT{usehdimage})
+if ($OPT{usehdimage} && !$OPT{leavehdimage})
 {
     Verbose("Dismounting case-sensitive build device");
     UnmountHDImage();
