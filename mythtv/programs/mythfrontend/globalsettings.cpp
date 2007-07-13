@@ -1501,7 +1501,7 @@ static HostLineEdit *SetupPinCode()
 static HostCheckBox *SetupPinCodeRequired()
 {
     HostCheckBox *gc = new HostCheckBox("SetupPinCodeRequired");
-    gc->setLabel(QObject::tr("Require Setup PIN"));
+    gc->setLabel(QObject::tr("Require Setup PIN") + "    ");
     gc->setValue(false);
     gc->setHelpText(QObject::tr("If set, you will not be able to return "
                     "to this screen and reset the Setup PIN without first "
@@ -2688,13 +2688,26 @@ static HostSpinBox *XboxCheckRec()
 static HostCheckBox *EnableMediaMon()
 {
     HostCheckBox *gc = new HostCheckBox("MonitorDrives");
-    gc->setLabel(QObject::tr("Monitor CD/DVD"));
+    gc->setLabel(QObject::tr("Monitor CD/DVD") +
+                 QObject::tr(" (and other removable devices)"));
     gc->setHelpText(QObject::tr("This enables support for monitoring "
                     "your CD/DVD drives for new disks and launching "
                     "the proper plugin to handle them."));
     gc->setValue(false);
     return gc;
 }
+
+static HostLineEdit *IgnoreMedia()
+{
+    HostLineEdit *ge = new HostLineEdit("IgnoreDevices");
+    ge->setLabel(QObject::tr("Ignore Devices"));
+    ge->setValue("");
+    ge->setHelpText(QObject::tr("If there are any devices that you do not want "
+                                "to be monitored, list them here with commas "
+                                "in-between. The plugins will ignore them"));
+    return ge;
+}
+
 
 static HostComboBox *DisplayGroupTitleSort()
 {
@@ -3537,9 +3550,19 @@ MainGeneralSettings::MainGeneralSettings()
 
     general = new VerticalConfigurationGroup(false);
     general->setLabel(QObject::tr("General"));
-    general->addChild(SetupPinCodeRequired());
-    general->addChild(SetupPinCode());
-    general->addChild(EnableMediaMon());
+
+    ConfigurationGroup *pin = new HorizontalConfigurationGroup();
+    pin->setLabel(QObject::tr("Settings Access"));
+    pin->addChild(SetupPinCodeRequired());
+    pin->addChild(SetupPinCode());
+
+    ConfigurationGroup *mediaMon = new VerticalConfigurationGroup();
+    mediaMon->setLabel(QObject::tr("Removable Media"));
+    mediaMon->addChild(EnableMediaMon());
+    mediaMon->addChild(IgnoreMedia());
+
+    general->addChild(pin);
+    general->addChild(mediaMon);
     general->addChild(EnableXbox());
     addChild(general);
 
