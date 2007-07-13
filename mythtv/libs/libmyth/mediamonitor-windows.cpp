@@ -47,6 +47,26 @@ MediaMonitorWindows::MediaMonitorWindows(QObject* par,
         }
 }
 
+/**
+ * Simplest possible device list populator. No duplicate checking
+ */
+bool MediaMonitorWindows::AddDevice(MythMediaDevice* pDevice)
+{
+    if (! pDevice)
+    {
+        VERBOSE(VB_IMPORTANT, "Error - MediaMonitorWndows::AddDevice(null)");
+        return false;
+    }
+
+    // If the user doesn't want this device to be monitored, stop now:
+    if (m_IgnoreList.contains(pDevice->getDevicePath()))
+        return false;
+
+    m_Devices.push_back(pDevice);
+    m_UseCount[pDevice] = 0;
+
+    return true;
+}
 
 QStringList MediaMonitorWindows::GetCDROMBlockDevices()
 {
