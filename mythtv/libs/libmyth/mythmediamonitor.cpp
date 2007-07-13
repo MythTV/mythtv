@@ -251,11 +251,29 @@ void MediaMonitor::ChooseAndEjectMedia(void)
     }
 }
 
+/**
+ * \brief  Lookup some settings, and do OS-specific stuff in sub-classes
+ *
+ * \bug    If the user changes the MonitorDrives or IgnoreDevices settings,
+ *         it will have no effect until the frontend is restarted.
+ */
 MediaMonitor::MediaMonitor(QObject* par, unsigned long interval, 
                            bool allowEject) 
     : QObject(par), m_Active(false), m_Thread(NULL),
       m_MonitorPollingInterval(interval), m_AllowEject(allowEject)
 {
+    // MediaMonitor is now always created (i.e. devices always monitored),
+    // but by default we don't send status changed events:
+    m_SendEvent = gContext->GetNumSetting("MonitorDrives");
+
+
+    // User can specify that some devices are not monitored
+    QString ignore = gContext->GetSetting("IgnoreDevices", "");
+
+    if (ignore.length())
+        m_IgnoreList = QStringList::split(',', ignore);
+    else
+        m_IgnoreList = QStringList::QStringList();  // Force empty list
 }
 
 MediaMonitor::~MediaMonitor()
@@ -511,6 +529,21 @@ void MediaMonitor::mediaStatusChanged(MediaStatus oldStatus,
     {
         pMedia->clearData();
     }
+}
+
+/**
+ * Check user preferences to see if this device should be monitored
+ */
+bool MediaMonitor::shouldIgnore(MythMediaDevice* device)
+{
+    if (m_IgnoreList.contains(device->getMountPath()) ||
+        m_IgnoreList.contains(device->getDevicePath()) )
+    {
+        VERBOSE(VB_MEDIA, "Ignoring device: " + device->getDevicePath());
+        return true;
+    }
+
+    return false;
 }
 
 /*

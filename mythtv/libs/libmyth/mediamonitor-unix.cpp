@@ -290,7 +290,9 @@ static void LookupModel(MythMediaDevice* device)
     device->setDeviceModel(desc);
 }
 
-// Given a media deivce add it to our collection.
+/**
+ * Given a media device, add it to our collection
+ */
 bool MediaMonitorUnix::AddDevice(MythMediaDevice* pDevice)
 {
     if ( ! pDevice )
@@ -298,6 +300,10 @@ bool MediaMonitorUnix::AddDevice(MythMediaDevice* pDevice)
         VERBOSE(VB_IMPORTANT, "Error - MediaMonitorUnix::AddDevice(null)");
         return false;
     }
+
+    // If the user doesn't want this device to be monitored, stop now:
+    if (shouldIgnore(pDevice))
+        return false;
 
     dev_t new_rdev;
     struct stat sb;

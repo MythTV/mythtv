@@ -86,6 +86,7 @@ class MPUBLIC MediaMonitor : public QObject
     virtual void CheckDeviceNotifications(void) {};
     virtual bool AddDevice(MythMediaDevice* pDevice) = 0;
     bool RemoveDevice(const QString &dev);
+    bool shouldIgnore(MythMediaDevice *device);
 
     static QString defaultDevice(const QString setting,
                                  const QString label,  char *hardCodedDefault);
@@ -97,7 +98,12 @@ class MPUBLIC MediaMonitor : public QObject
     QValueList<MythMediaDevice*> m_RemovedDevices;
     QMap<MythMediaDevice*, int>  m_UseCount;
 
+    // List of devices/mountpoints that the user doesn't want to monitor:
+    QStringList                  m_IgnoreList;
+
     bool                         m_Active;
+    bool                         m_SendEvent;
+
     MonitorThread                *m_Thread;
     unsigned long                m_MonitorPollingInterval;
     bool                         m_AllowEject;
