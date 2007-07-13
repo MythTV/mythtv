@@ -57,8 +57,6 @@ MediaMonitor* MediaMonitor::GetMediaMonitor(void)
     if (c_monitor)
         return c_monitor;
 
-    if (gContext->GetNumSetting("MonitorDrives"))
-    {
 #ifdef USING_DARWIN_DA
         c_monitor = new MediaMonitorDarwin(NULL, 500, true); 
 #else
@@ -68,7 +66,6 @@ MediaMonitor* MediaMonitor::GetMediaMonitor(void)
         c_monitor = new MediaMonitorUnix(NULL, 500, true);
   #endif
 #endif
-    }
 
     return c_monitor;
 }
@@ -509,7 +506,7 @@ void MediaMonitor::mediaStatusChanged(MediaStatus oldStatus,
     // This gets called from outside the main thread so we need
     // to post an event back to the main thread.
     // We now send events for all non-error statuses, so plugins get ejects
-    if (stat != MEDIASTAT_ERROR && stat != MEDIASTAT_UNKNOWN)
+    if (m_SendEvent && stat != MEDIASTAT_ERROR && stat != MEDIASTAT_UNKNOWN)
     {
         VERBOSE(VB_MEDIA, "Posting MediaEvent" + msg);
 
