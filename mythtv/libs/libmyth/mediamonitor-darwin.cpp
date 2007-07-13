@@ -401,8 +401,7 @@ void MonitorThreadDarwin::diskInsert(const char *devName,
 
     /// We store the volume name for user activities like ChooseAndEjectMedia().
     media->setVolumeID(volName);
-    /// Same for the Manufacturer and model:
-    media->setDeviceModel(model);
+    media->setDeviceModel(model);  // Same for the Manufacturer and model
 
     /// Mac OS X devices are pre-mounted, but we want to use MythMedia's code
     /// to work out the mediaType. media->onDeviceMounted() is protected,
@@ -418,6 +417,16 @@ void MonitorThreadDarwin::diskRemove(QString devName)
     VERBOSE(VB_MEDIA,
             QString("MonitorThreadDarwin::diskRemove(%1)").arg(devName));
 
+    if (m_Monitor->m_SendEvent)
+    {
+        MythMediaDevice *pDevice = m_Monitor->GetMedia(devName);
+
+        if (pDevice)  // Probably should ValidateAndLock() here?
+            pDevice->setStatus(MEDIASTAT_NODISK);
+        else
+            VERBOSE(VB_MEDIA, "Couldn't find MythMediaDevice: " + devName);
+    }
+
     m_Monitor->RemoveDevice(devName);
 }
 
@@ -429,22 +438,28 @@ void MonitorThreadDarwin::diskRemove(QString devName)
  */
 void MonitorThreadDarwin::diskRename(const char *devName, const char *volName)
 {
-    QValueList<MythMediaDevice*>::Iterator i;
+    VERBOSE(VB_MEDIA, QString("MonitorThreadDarwin::diskRename(%1,%2)")
+                      .arg(devName).arg(volName));
 
-    for (i = m_Monitor->m_Devices.begin(); i != m_Monitor->m_Devices.end(); ++i)
+    MythMediaDevice *pDevice = m_Monitor->GetMedia(devName);
+
+    if (m_Monitor->ValidateAndLock(pDevice))
     {
-        if (m_Monitor->ValidateAndLock(*i))
-            if ((*i)->getDevicePath() == devName)
-            {
-                VERBOSE(VB_MEDIA,
-                        QString("MonitorThreadDarwin::diskRename(%1,%2)")
-                        .arg(devName).arg(volName));
+        // Send message to plugins to ignore this drive:
+        if (m_Monitor->m_SendEvent)
+            pDevice->setStatus(MEDIASTAT_NODISK);
 
-                (*i)->setVolumeID(volName);
-                (*i)->setMountPath(QString("/Volumes/") + volName);
-            }
-        m_Monitor->Unlock(*i);
+        pDevice->setVolumeID(volName);
+        pDevice->setMountPath(QString("/Volumes/") + volName);
+
+        // Plugins can now use it again:
+        //if (m_Monitor->m_SendEvent)
+            pDevice->setStatus(MEDIASTAT_USEABLE);
+
+        m_Monitor->Unlock(pDevice);
     }
+    else
+        VERBOSE(VB_MEDIA, QString("Couldn't find MythMediaDevice: ") + devName);
 }
 
 /**
@@ -474,9 +489,9 @@ void MediaMonitorDarwin::StartMonitoring(void)
 }
 
 /**
- * \brief Simpler version of MediaMonitor::AddDevice()
+ * \brief Simpler version of MediaMonitorUnix::AddDevice()
  *
- * This doesn't do the stat(), connect() or duplicate checking.
+ * This doesn't do the stat() or duplicate checking.
  */
 bool MediaMonitorDarwin::AddDevice(MythMediaDevice* pDevice)
 {
@@ -486,14 +501,21 @@ bool MediaMonitorDarwin::AddDevice(MythMediaDevice* pDevice)
         return false;
     }
 
-    /// Devices on Mac OS X don't change status the way Linux ones do,
-    /// so we need a different way to inform plugins that a new drive
-    /// is available. I think this leaks a little memory?
-    QApplication::postEvent((QObject*)gContext->GetMainWindow(),
-                            new MediaEvent(MEDIASTAT_USEABLE, pDevice));
 
     m_Devices.push_back( pDevice );
     m_UseCount[pDevice] = 0;
+
+
+    // Devices on Mac OS X don't change status the way Linux ones do,
+    // so we force a status change for mediaStatusChanged() to send an event
+    if (m_SendEvent)
+    {
+        pDevice->setStatus(MEDIASTAT_NODISK);
+        connect(pDevice, SIGNAL(statusChanged(MediaStatus, MythMediaDevice*)),
+                this, SLOT(mediaStatusChanged(MediaStatus, MythMediaDevice*)));
+        pDevice->setStatus(MEDIASTAT_USEABLE);
+    }
+
 
     return true;
 }
