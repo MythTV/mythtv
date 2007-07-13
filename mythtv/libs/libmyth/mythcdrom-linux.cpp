@@ -141,8 +141,9 @@ MediaStatus MythCDROMLinux::checkMedia()
                 break;
             case CDS_TRAY_OPEN:
                 VERBOSE(VB_MEDIA, getDevicePath() + " Tray open");
+                setStatus(MEDIASTAT_OPEN, OpenedHere);
                 m_MediaType = MEDIATYPE_UNKNOWN;
-                return setStatus(MEDIASTAT_OPEN, OpenedHere);
+                return MEDIASTAT_OPEN;
                 break;
             case CDS_NO_DISC:
                 VERBOSE(VB_MEDIA, getDevicePath() + " No disc");

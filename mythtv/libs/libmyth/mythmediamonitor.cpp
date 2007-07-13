@@ -481,24 +481,33 @@ void MediaMonitor::mediaStatusChanged(MediaStatus oldStatus,
     // If we're not active then ignore signal.
     if (!m_Active)
         return;
-    
-    VERBOSE(VB_IMPORTANT, QString("Media status changed...  New status is: %1 "
-                                  "old status was %2")
-            .arg(MythMediaDevice::MediaStatusStrings[pMedia->getStatus()])
-            .arg(MythMediaDevice::MediaStatusStrings[oldStatus]));
+
+    MediaStatus  stat = pMedia->getStatus();
+    QString      msg  = QString(" (%1, %2 -> %3)")
+                        .arg(pMedia->MediaTypeString())
+                        .arg(MythMediaDevice::MediaStatusStrings[oldStatus])
+                        .arg(MythMediaDevice::MediaStatusStrings[stat]);
 
     // This gets called from outside the main thread so we need
     // to post an event back to the main thread.
-    // We're only going to pass up events for useable media...
-    if (pMedia->getStatus() == MEDIASTAT_USEABLE || 
-        pMedia->getStatus() == MEDIASTAT_MOUNTED) 
+    // We now send events for all non-error statuses, so plugins get ejects
+    if (stat != MEDIASTAT_ERROR && stat != MEDIASTAT_UNKNOWN)
     {
-        VERBOSE(VB_IMPORTANT, "Posting MediaEvent");
-        QApplication::postEvent((QObject*)gContext->GetMainWindow(), 
-                                new MediaEvent(oldStatus, pMedia));
+        VERBOSE(VB_MEDIA, "Posting MediaEvent" + msg);
+
+        // sendEvent() is needed here - it waits for the event to be used.
+        // postEvent() would result in pDevice's media type changing
+        // ... before the plugin's event chain would process it.
+        // Another way would be to send an exact copy of pDevice instead.
+        QApplication::sendEvent((QObject*)gContext->GetMainWindow(),
+                                new MediaEvent(stat, pMedia));
     }
-    else if (pMedia->getStatus() == MEDIASTAT_OPEN ||
-             pMedia->getStatus() == MEDIASTAT_UNPLUGGED)
+    else
+        VERBOSE(VB_IMPORTANT, "Media status changed..." + msg);
+
+
+    if (stat == MEDIASTAT_OPEN || stat == MEDIASTAT_NODISK
+                               || stat == MEDIASTAT_UNPLUGGED)
     {
         pMedia->clearData();
     }
