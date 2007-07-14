@@ -49,7 +49,7 @@
 /** \fn MythControls::MythControls(MythMainWindow*, bool&)
  *  \brief Creates a new MythControls wizard
  *  \param parent The main myth window.
- *  \param ui_ok Set if UI was correctly loaded, cleared otherwise.
+ *  \param ok Set if UI was correctly loaded, cleared otherwise.
  */
 MythControls::MythControls(MythMainWindow *parent, bool &ok)
     : MythThemedDialog(parent, "controls", "controls-", "controls"),
@@ -428,7 +428,7 @@ void MythControls::RightSelected(UIListBtnTypeItem*)
 
 
 /** \brief Set the contents of a list.
- *  \param list The list being changed.
+ *  \param uilist The list being changed.
  *  \param contents The contents of the list.
  *  \param arrows True to draw with arrows, otherwise arrows are not drawn.
  */

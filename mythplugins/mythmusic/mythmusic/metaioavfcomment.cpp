@@ -131,7 +131,7 @@ int MetaIOAVFComment::getTrackLength(QString filename)
 /*!
  * \brief Find the length of the track (in seconds)
  *
- * \param p_context The AV Format Context.
+ * \param pContext The AV Format Context.
  * \returns An integer (signed!) to represent the length in seconds.
  */
 int MetaIOAVFComment::getTrackLength(AVFormatContext* pContext)

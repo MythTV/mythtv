@@ -194,7 +194,7 @@ int FileScanner::GetDirectoryId(const QString &directory, const int &parentid)
  * \brief Check if file has been modified since given date/time
  *
  * \param filename File to examine
- * \param parentid Date to use in comparison
+ * \param date_modified Date to use in comparison
  *
  * \returns True if file has been modified, otherwise false
  */
