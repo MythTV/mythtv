@@ -526,10 +526,11 @@ int main(int argc, char *argv[])
         exitcode = TRANSCODE_EXIT_UNKNOWN_ERROR;
     }
 
+    delete transcode;
+
     if (jobID >= 0)
         CompleteJob(jobID, pginfo, useCutlist, exitcode);
 
-    delete transcode;
     delete pginfo;
     delete gContext;
     return exitcode;
