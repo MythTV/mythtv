@@ -5144,7 +5144,7 @@ char *NuppelVideoPlayer::GetScreenGrab(int secondsin, int &bufflen,
     return GetScreenGrabAtFrame(frameNum, false, bufflen, vw, vh, ar);
 }
 
-/** \fn NuppelVideoPlayer::GetScreenGrabAtFrame(int,int&,int&,int&,float&)
+/**
  *  \brief Returns a one RGB frame grab from a video.
  *
  *   User is responsible for deleting the buffer with delete[].

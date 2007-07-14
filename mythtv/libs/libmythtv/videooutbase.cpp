@@ -1216,10 +1216,9 @@ void VideoOutput::ShowPip(VideoFrame *frame, NuppelVideoPlayer *pipplayer)
 }
 
 /**
- * \fn VideoOutput::DoVideoResize(int,int)
  * \brief Sets up Picture in Picture image resampler.
- * \param pipwidth  input width
- * \param pipheight input height
+ * \param inDim  input width and height
+ * \param outDim output width and height
  * \sa ShutdownPipResize(), ShowPip(VideoFrame*,NuppelVideoPlayer*)
  */
 void VideoOutput::DoVideoResize(const QSize &inDim, const QSize &outDim)

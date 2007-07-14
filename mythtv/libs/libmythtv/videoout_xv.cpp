@@ -639,7 +639,6 @@ int VideoOutputXv::GrabSuitableXvPort(Display* disp, Window root,
 }
 
 /**
- * \fn VideoOutputXv::CreatePauseFrame(void)
  * Creates an extra frame for pause.
  *
  * This creates a pause frame by copies the scratch frame settings, a
@@ -988,8 +987,7 @@ bool VideoOutputXv::InitXlib()
     return ok;
 }
 
-/** \fn VideoOutputXv::GetBestSupportedCodec(uint,uint,uint,uint,uint,int,bool)
- *
+/**
  *  \return MythCodecID for the best supported codec on the main display.
  */
 MythCodecID VideoOutputXv::GetBestSupportedCodec(
