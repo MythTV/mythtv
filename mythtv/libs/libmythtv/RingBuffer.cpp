@@ -335,6 +335,9 @@ RingBuffer::~RingBuffer(void)
         delete dvdPriv;
     }
 #endif // USING_FRONTEND    
+
+    pthread_rwlock_unlock(&rwlock);
+    pthread_rwlock_destroy(&rwlock);
 }
 
 /** \fn RingBuffer::Start(void)
