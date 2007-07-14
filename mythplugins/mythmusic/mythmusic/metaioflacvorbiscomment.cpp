@@ -21,7 +21,7 @@ MetaIOFLACVorbisComment::~MetaIOFLACVorbisComment(void)
 
 //==========================================================================
 /*!
- * \irief Writes metadata back to a file
+ * \brief Writes metadata back to a file
  *
  * \param mdata A pointer to a Metadata object
  * \param exclusive Flag to indicate if only the data in mdata should be
@@ -127,7 +127,7 @@ bool MetaIOFLACVorbisComment::write(Metadata* mdata, bool exclusive)
 
 //==========================================================================
 /*!
- * \rief Reads Metadata from a file.
+ * \brief Reads Metadata from a file.
  *
  * \param filename The filename to read metadata from.
  * \returns Metadata pointer or NULL on error

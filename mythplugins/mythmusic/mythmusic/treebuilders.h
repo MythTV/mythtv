@@ -47,7 +47,7 @@ class MusicTreeBuilder
   public:
     virtual ~MusicTreeBuilder();
 
-    /** \fn Create a tree using the list of \p Metadata objects and add them to the given root.
+    /** \brief Create a tree using the list of \p Metadata objects and add them to the given root.
 
         This method will recurse and operate of the list the metadata
         objects in \p metas. It's implementation may and probably will
@@ -61,7 +61,7 @@ class MusicTreeBuilder
      */
     virtual void makeTree(MusicNode *root, const MetadataPtrList &metas);
 
-    /** \fn Create an \p MusicTreeBuilder for the appropriate path.
+    /** \brief Create an \p MusicTreeBuilder for the appropriate path.
 
         Returns a \p MusicTreeBuilder subclass for building directory
         based or "artist album" field based trees.
@@ -71,14 +71,14 @@ class MusicTreeBuilder
   protected:
     MusicTreeBuilder();
 
-    /** \fn Allocates and returns a new \p MusicNode.
+    /** \brief Allocates and returns a new \p MusicNode.
 
         Implemented by the subclass. This method should allocate and a
         return a \p MusicNode with the approriate "level" set.
      */
     virtual MusicNode *createNode(const QString &title) = 0;
 
-    /** \fn Determine is a \p Metadata should be track at the current depth.
+    /** \brief Determine is a \p Metadata should be track at the current depth.
  
         Ie. the directory builder will return true if the given \p
         Metadata's path at the current depth is the filename.
@@ -89,7 +89,7 @@ class MusicTreeBuilder
      */
     virtual bool isLeafDone(Metadata *m) = 0;
 
-    /** \fn Get the field value for the given \p Metadata at the current depth.
+    /** \brief Get the field value for the given \p Metadata at the current depth.
 
          Ie. the field builder will call \p Metadata::getField with
          the appropriate field name for the current dept.
@@ -100,7 +100,7 @@ class MusicTreeBuilder
      */
     virtual QString getField(Metadata *m) = 0;	
 
-    /** \fn Get the current depth during tree building.
+    /** \brief Get the current depth during tree building.
         
         While \p MusicTreeBuilder::makeTree is recursing downwards to
         build the tree, this method will return the current depth and
