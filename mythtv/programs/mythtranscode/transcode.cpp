@@ -545,6 +545,10 @@ int Transcode::TranscodeFile(char *inputname, char *outputname,
         nvr->SetOption("tvformat", gContext->GetSetting("TVFormat"));
         nvr->SetOption("vbiformat", gContext->GetSetting("VbiFormat"));
 
+        nvr->SetFrameRate(video_frame_rate);
+        nvr->SetVideoAspect(video_aspect);
+        nvr->SetTranscoding(true);
+
         if (vidsetting == "MPEG-4")
         {
             nvr->SetOption("videocodec", "mpeg4");
@@ -596,10 +600,6 @@ int Transcode::TranscodeFile(char *inputname, char *outputname,
         }
 
         nvr->AudioInit(true);
-
-        nvr->SetFrameRate(video_frame_rate);
-        nvr->SetVideoAspect(video_aspect);
-        nvr->SetTranscoding(true);
 
         outRingBuffer = new RingBuffer(outputname, true, false);
         nvr->SetRingBuffer(outRingBuffer);
