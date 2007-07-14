@@ -284,7 +284,7 @@ class MythContextPrivate
 
     DisplayRes *display_res;
 
-    QMutex *m_priv_mutex;
+    QMutex m_priv_mutex;
     queue<MythPrivRequest> m_priv_requests;
     QWaitCondition m_priv_queued;
 
@@ -321,7 +321,6 @@ MythContextPrivate::MythContextPrivate(MythContext *lparent)
       m_logenable(-1), m_logmaxcount(-1), m_logprintlevel(-1),
       screensaverEnabled(false),
       display_res(NULL),
-      m_priv_mutex(new QMutex(true)),
       useSettingsCache(false)
 {
     GetInstallPrefixPath( m_installprefix, m_installlibdir );
@@ -462,8 +461,6 @@ MythContextPrivate::~MythContextPrivate()
         serverSock->DownRef();
     if (eventSock)
         eventSock->DownRef();
-    if (m_priv_mutex)
-        delete m_priv_mutex;
     if (screensaver)
         delete screensaver;
 }
@@ -2875,24 +2872,22 @@ void MythContext::LogEntry(const QString &module, int priority,
 
 void MythContext::addPrivRequest(MythPrivRequest::Type t, void *data)
 {
-    QMutexLocker lockit(d->m_priv_mutex);
+    QMutexLocker lockit(&d->m_priv_mutex);
     d->m_priv_requests.push(MythPrivRequest(t, data));
     d->m_priv_queued.wakeAll();
 }
 
 void MythContext::waitPrivRequest() const
 {
-    while (true) 
-    {
-        d->m_priv_queued.wait();
-        if (!d->m_priv_requests.empty())
-            return;
-    }
+    d->m_priv_mutex.lock();
+    while (d->m_priv_requests.empty())
+        d->m_priv_queued.wait(&d->m_priv_mutex);
+    d->m_priv_mutex.unlock();
 }
 
 MythPrivRequest MythContext::popPrivRequest()
 {
-    QMutexLocker lockit(d->m_priv_mutex);
+    QMutexLocker lockit(&d->m_priv_mutex);
     MythPrivRequest ret_val(MythPrivRequest::PrivEnd, NULL);
     if (!d->m_priv_requests.empty()) {
         ret_val = d->m_priv_requests.front();
