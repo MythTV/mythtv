@@ -71,7 +71,6 @@ uint EITHelper::GetListSize(void) const
 /** \fn EITHelper::ProcessEvents(void)
  *  \brief Inserts events in EIT list.
  *
- *  \param mplexid multiplex we are inserting events for.
  *  \return Returns number of events inserted into DB.
  */
 uint EITHelper::ProcessEvents(void)

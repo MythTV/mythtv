@@ -125,8 +125,6 @@ public:
      * @param scale_ratio The stroke scale ratio
      * @param bin_percent The bin count percentage required
      * to add to the sequence.
-     * @param timeout The milliseconds that pass before a timout will
-     * occur.
      */
     MythGesture(size_t max_points = 10000, size_t min_points = 50,
                 size_t max_sequence = 20, size_t scale_ratio = 4,
