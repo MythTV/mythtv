@@ -136,6 +136,18 @@ ServiceDescriptor *ServiceDescriptionTable::GetServiceDescriptor(uint i) const
     return NULL;
 }
 
+bool ServiceDescriptionTable::Mutate(void)
+{
+    if (VerifyCRC())
+    {
+        SetTableID((TableID() == TableID::SDTo) ? TableID::SDT : TableID::SDTo);
+        SetCRC(CalcCRC());
+        return true;
+    }
+    else
+        return false;
+}
+
 void DVBEventInformationTable::Parse(void) const
 {
     _ptrs.clear();

@@ -294,6 +294,31 @@ bool DVBStreamData::HandleTables(uint pid, const PSIPTable &psip)
             SetSDToSectionSeen(tsid, psip.Section());
             ServiceDescriptionTable sdt(psip);
 
+            // some providers send the SDT for the current multiplex as SDTo
+            // this routine changes the TableID to SDT and recalculates the CRC
+            if (_desired_netid == sdt.OriginalNetworkID() &&
+                _desired_tsid  == tsid)
+            {
+                ServiceDescriptionTable *sdta =
+                    new ServiceDescriptionTable(psip);
+                if (!sdta->Mutate())
+                {
+                    delete sdta;
+                    return true;
+                }
+                if (_cache_tables)
+                {
+                    CacheSDT(sdta);
+                    ProcessSDT(tsid, sdta);
+                }
+                else
+                {
+                    ProcessSDT(tsid, sdta);
+                    delete sdta;
+                }
+                return true;
+            }
+
             QMutexLocker locker(&_listener_lock);
             for (uint i = 0; i < _dvb_other_listeners.size(); i++)
                 _dvb_other_listeners[i]->HandleSDTo(tsid, &sdt);

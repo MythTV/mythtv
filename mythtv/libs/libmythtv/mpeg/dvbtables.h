@@ -154,6 +154,9 @@ class ServiceDescriptionTable : public PSIPTable
     // }
     ServiceDescriptor *GetServiceDescriptor(uint i) const;
 
+    /// mutates a SDTo into a SDTa and recalculates the CRC
+    bool Mutate(void);
+
     void Parse(void) const;
     QString toString(void) const;
 
