@@ -9,41 +9,24 @@
 
 */
 
-#include <qlabel.h>
-#include <fstream>
-#include <iostream>
-#include <qlayout.h>
-#include <qdatetime.h>
-#include <qlistview.h>
-#include <qtimer.h>
-#include <qimage.h>
-#include <qregexp.h>
-#include <qnetwork.h>
 #include <qapplication.h>
-#include <qcursor.h>
-#include <qstringlist.h>
-#include <qheader.h>
-#include <qpixmap.h>
-#include <unistd.h>
-#include <qurl.h>
-#include <qdir.h>
 
-#include "weather.h"
-#include "weatherSetup.h"
+#include <unistd.h>
+
 #include <mythtv/mythcontext.h>
 #include <mythtv/mythdbcon.h>
-#include <mythtv/httpcomms.h>
 
+#include "weatherScreen.h"
+#include "sourceManager.h"
+#include "weatherSetup.h"
+#include "weather.h"
 
-using namespace std;
-
-Weather::Weather(MythMainWindow *parent, SourceManager* srcMan, const char *name)
-    : MythDialog(parent, name)
+Weather::Weather(MythMainWindow *parent, SourceManager *srcMan,
+                 const char *name) : MythDialog(parent, name)
 {
-
     allowkeys = true;
     paused = false;
-    
+
     firstRun = true;
     m_srcMan = srcMan;
 
@@ -77,7 +60,7 @@ Weather::Weather(MythMainWindow *parent, SourceManager* srcMan, const char *name
     setNoErase();
 
     setupScreens(xmldata);
-    if (! gContext->GetNumSetting("weatherbackgroundfetch",0))
+    if (!gContext->GetNumSetting("weatherbackgroundfetch", 0))
         showLayout(m_startup);
     showtime_timeout();
 }
@@ -92,13 +75,14 @@ Weather::~Weather()
     //}
 }
 
-void Weather::setupScreens(QDomElement &xml) {
-
+void Weather::setupScreens(QDomElement &xml)
+{
     // Deletes screen objects
     screens.clear();
     // it points to an element of screens, which was just deleted;
     currScreen = 0;
-    if (m_startup) {
+    if (m_startup)
+    {
         delete m_startup;
         m_startup = 0;
     }
@@ -117,18 +101,20 @@ void Weather::setupScreens(QDomElement &xml) {
             }
             else if (e.tagName() == "container")
             {
-                if (e.attribute("name") == "startup") {
+                if (e.attribute("name") == "startup")
+                {
                     QRect area;
                     QString name;
                     int context;
                     if (!theme->GetSet("startup"))
                         theme->parseContainer(e, name, context, area);
-                    else name = e.attribute("name");
-                    WeatherScreen* ws = WeatherScreen::loadScreen(this, theme->GetSet(name));
+                    else
+                        name = e.attribute("name");
+                    WeatherScreen *ws = WeatherScreen::loadScreen(this, theme->GetSet(name));
                     ws->setInUse(true);
                     m_startup = ws;
-                } 
-                else 
+                }
+                else
                     containers[e.attribute("name")] = e;
             }
             else
@@ -140,16 +126,20 @@ void Weather::setupScreens(QDomElement &xml) {
     }
 
     MSqlQuery db(MSqlQuery::InitCon());
-    QString query = "SELECT screen_id, container, units, draworder FROM weatherscreens "
-        " WHERE hostname = :HOST ORDER BY draworder;";
+    QString query =
+            "SELECT screen_id, container, units, draworder FROM weatherscreens "
+            " WHERE hostname = :HOST ORDER BY draworder;";
     db.prepare(query);
     db.bindValue(":HOST", gContext->GetHostName());
-    if (!db.exec()) {
+    if (!db.exec())
+    {
         VERBOSE(VB_IMPORTANT, db.lastError().text());
         return;
     }
-    if (!db.size()) {
-        MythPopupBox::showOkPopup(gContext->GetMainWindow(), "no screens", 
+
+    if (!db.size())
+    {
+        MythPopupBox::showOkPopup(gContext->GetMainWindow(), "no screens",
                 tr("No Screens defined; Entering Screen Setup."));
 
         m_srcMan->clearSources();
@@ -162,19 +152,24 @@ void Weather::setupScreens(QDomElement &xml) {
         m_srcMan->startTimers();
         m_srcMan->doUpdate();
     }
-    
+
     // re-execute
-    if (!db.exec()) {
+    if (!db.exec())
+    {
         VERBOSE(VB_IMPORTANT, db.lastError().text());
         return;
     }
-    while (db.next()) {
+
+    while (db.next())
+    {
         int id = db.value(0).toInt();
         QString container = db.value(1).toString();
         units_t units = db.value(2).toUInt();
         uint draworder = db.value(3).toUInt();
-        if (!containers.contains(container)) {
-            VERBOSE(VB_IMPORTANT, container + " is in database, but not theme file");
+        if (!containers.contains(container))
+        {
+            VERBOSE(VB_IMPORTANT,
+                    container + " is in database, but not theme file");
             continue;
         }
         QDomElement e = containers[container];
@@ -184,52 +179,53 @@ void Weather::setupScreens(QDomElement &xml) {
         if (!theme->GetSet(e.attribute("name")))
             theme->parseContainer(e, name, context, area);
         else name = e.attribute("name");
-        WeatherScreen* ws = WeatherScreen::loadScreen(this, theme->GetSet(name), id);
+        WeatherScreen *ws =
+                WeatherScreen::loadScreen(this, theme->GetSet(name), id);
         ws->setUnits(units);
         ws->setInUse(true);
         screens.insert(draworder, ws);
         connect(this, SIGNAL(clock_tick()), ws, SLOT(clock_tick()));
-        connect(ws, SIGNAL(screenReady(WeatherScreen*)), this, SLOT(screenReady(WeatherScreen*)));
-        m_srcMan->connectScreen(id,ws);
+        connect(ws, SIGNAL(screenReady(WeatherScreen *)), this,
+                SLOT(screenReady(WeatherScreen *)));
+        m_srcMan->connectScreen(id, ws);
     }
-
-
-
 }
 
-void Weather::screenReady(WeatherScreen* ws) {
+void Weather::screenReady(WeatherScreen *ws)
+{
+    WeatherScreen *nxt = nextScreen();
 
-    WeatherScreen* nxt = nextScreen();
-
-    if (firstRun && ws == nxt) {
+    if (firstRun && ws == nxt)
+    {
         firstRun = false;
         setPaletteBackgroundPixmap(realBackground);
         showLayout(nxt);
         nextpage_Timer->start((int)(1000 * nextpageInterval));
-
     }
-    disconnect(ws, SIGNAL(screenReady(WeatherScreen*)), this, SLOT(screenReady(WeatherScreen*)));
+    disconnect(ws, SIGNAL(screenReady(WeatherScreen *)), this,
+               SLOT(screenReady(WeatherScreen *)));
 }
 
-WeatherScreen* Weather::nextScreen() {
-    WeatherScreen* ws = screens.next();
+WeatherScreen *Weather::nextScreen()
+{
+    WeatherScreen *ws = screens.next();
     if (!ws)
         ws = screens.first();
     return ws;
-    
 }
 
-WeatherScreen* Weather::prevScreen() {
+WeatherScreen *Weather::prevScreen()
+{
     WeatherScreen *ws = screens.prev();
-    if (!ws) 
+    if (!ws)
         ws = screens.last();
     return ws;
 }
 
 void Weather::keyPressEvent(QKeyEvent *e)
 {
-    if (currScreen && currScreen->usingKeys() && 
-        currScreen->handleKey(e)) {
+    if (currScreen && currScreen->usingKeys() && currScreen->handleKey(e))
+    {
         return;
     }
 
@@ -252,16 +248,19 @@ void Weather::keyPressEvent(QKeyEvent *e)
             holdPage();
         else if (action == "MENU")
             setupPage();
-        else if (action == "UPDATE") {
+        else if (action == "UPDATE")
+        {
             m_srcMan->doUpdate();
-        } else
-            handled = false; 
+        }
+        else
+            handled = false;
     }
+
     if (!handled)
         MythDialog::keyPressEvent(e);
 }
 
-void Weather::updateBackground(void)
+void Weather::updateBackground()
 {
     QPixmap bground(size());
     bground.fill(this, 0, 0);
@@ -297,11 +296,10 @@ void Weather::updatePage(QPainter *dr)
     pix.fill(this, pr.topLeft());
     QPainter tmp(&pix);
 
-    if (currScreen) 
+    if (currScreen)
         currScreen->draw(&tmp);
     tmp.end();
     dr->drawPixmap(pr.topLeft(), pix);
-
 }
 
 void Weather::showLayout(WeatherScreen *ws)
@@ -310,10 +308,6 @@ void Weather::showLayout(WeatherScreen *ws)
     ws->showing();
     update();
 }
-
-
-
-
 
 void Weather::processEvents()
 {
@@ -330,13 +324,12 @@ void Weather::holdPage()
 {
     if (!nextpage_Timer->isActive())
         nextpage_Timer->start(1000 * nextpageInterval);
-    else nextpage_Timer->stop(); 
+    else nextpage_Timer->stop();
     paused = !paused;
-    if (currScreen) 
+    if (currScreen)
         currScreen->toggle_pause(paused);
     update(fullRect);
 }
-
 
 void Weather::setupPage()
 {
@@ -354,7 +347,7 @@ void Weather::setupPage()
     m_srcMan->startTimers();
     m_srcMan->doUpdate();
     // TODO
-#if 0 
+#if 0
     m_srcMan->stopTimers();
     nextpage_Timer->stop();
     m_srcMan->clearSources();
@@ -368,31 +361,30 @@ void Weather::setupPage()
     nextpageIntArrow = gContext->GetNumSetting("weatherHoldTimeout", 20);
     m_srcMan->startTimers();
     m_srcMan->doUpdate();
-#endif 
+#endif
 }
-
-
-
 
 void Weather::cursorRight()
 {
-    WeatherScreen* ws = nextScreen();
-    if (ws->canShowScreen()) {
-        if (currScreen) 
+    WeatherScreen *ws = nextScreen();
+    if (ws->canShowScreen())
+    {
+        if (currScreen)
             currScreen->hiding();
         currScreen = ws;
         currScreen->showing();
         currScreen->toggle_pause(paused);
         update();
         if (!paused)
-            nextpage_Timer->start((int)(1000*nextpageIntArrow));
+            nextpage_Timer->start((int)(1000 * nextpageIntArrow));
     }
 }
 
 void Weather::cursorLeft()
 {
-    WeatherScreen* ws = prevScreen();
-    if (ws->canShowScreen()) {
+    WeatherScreen *ws = prevScreen();
+    if (ws->canShowScreen())
+    {
         if (currScreen)
             currScreen->hiding();
         currScreen = ws;
@@ -400,22 +392,22 @@ void Weather::cursorLeft()
         currScreen->toggle_pause(paused);
         update();
         if (!paused)
-            nextpage_Timer->start((int)(1000*nextpageIntArrow));
+            nextpage_Timer->start((int)(1000 * nextpageIntArrow));
     }
 }
 
 void Weather::nextpage_timeout()
 {
-
     WeatherScreen *nxt = nextScreen();
 
-    if (nxt->canShowScreen()) {
+    if (nxt->canShowScreen())
+    {
         if (currScreen)
             currScreen->hiding();
        showLayout(nxt);
     }
-    else VERBOSE(VB_GENERAL, "Next screen not ready");
-   
+    else
+        VERBOSE(VB_GENERAL, "Next screen not ready");
+
     nextpage_Timer->changeInterval((int)(1000 * nextpageInterval));
 }
-

@@ -1,5 +1,3 @@
-
-
 #ifndef _WEATHERSCREEN_H_
 #define _WEATHERSCREEN_H_
 
@@ -7,119 +5,139 @@
 #include <qstringlist.h>
 #include <qstring.h>
 #include <qmap.h>
-#include <qpainter.h>
-#include "defs.h"
+
 #include <mythtv/uitypes.h>
 
-using namespace std;
+#include "defs.h"
+
 class Weather;
 
-class WeatherScreen : public QObject {
+class WeatherScreen : public QObject
+{
     Q_OBJECT
-    public:
-        static WeatherScreen* loadScreen(Weather*, LayerSet*, int id = -1);
-        static QStringList getAllDynamicTypes(LayerSet*);
 
-        WeatherScreen(Weather*, LayerSet*, int );
-        ~WeatherScreen();
-        void setValue(QString, QString); 
-        QString getValue(QString key) { return map[key]; };
-        bool containsKey(QString key) { return map.contains(key); };
-        virtual bool canShowScreen(); 
-        void pause_animation();
-        void unpause_animation();
-        virtual void hiding();
-        virtual void showing();
-        void addDataItem(QString, bool required=false);
-        void setUnits(units_t units) { m_units = units; };
-        units_t getUnits() { return m_units; };
-        LayerSet* getContainer() { return m_container; };
-        void draw(QPainter*);
-        virtual void toggle_pause(bool);
-        virtual bool usingKeys() { return false; }; 
-        bool inUse() { return m_inuse; };
-        void setInUse(bool inuse) { m_inuse = inuse; };
-        int getId() { return m_id; };
-    signals:
-        void screenReady(WeatherScreen*);
-    public slots:
-        virtual void clock_tick();
-        virtual void newData(QString, units_t,  DataMap);
-        virtual bool handleKey(QKeyEvent* e ) { (void) e; return false; };
-        
-    protected:
-        units_t m_units;
-        LayerSet* m_container;
-        virtual QString prepareDataItem(QString, QString);
-        virtual void prepareWidget(UIType*);
-        virtual void prepareScreen();
-        UIType* getType(QString);
-        Weather* m_parent;
-        QString m_name;
-    private:
-        QRect fullRect;
-        QMap<QString,QString> map;
-        UIAnimatedImageType* m_ai;
-        bool m_inuse;
-        int m_id;
+  public:
+    static WeatherScreen *loadScreen(Weather *parent, LayerSet *container,
+                                     int id = -1);
+    static QStringList getAllDynamicTypes(LayerSet *container);
+
+    WeatherScreen(Weather *parent, LayerSet *container, int id);
+    ~WeatherScreen();
+
+    void setValue(const QString &key, const QString &value);
+    QString getValue(const QString &key) { return map[key]; }
+    bool containsKey(const QString &key) { return map.contains(key); }
+    virtual bool canShowScreen();
+    void pause_animation();
+    void unpause_animation();
+    virtual void hiding();
+    virtual void showing();
+    void addDataItem(const QString &item, bool required = false);
+    void setUnits(units_t units) { m_units = units; }
+    units_t getUnits() { return m_units; }
+    LayerSet *getContainer() { return m_container; }
+    void draw(QPainter *p);
+    virtual void toggle_pause(bool paused);
+    virtual bool usingKeys() { return false; }
+    bool inUse() { return m_inuse; }
+    void setInUse(bool inuse) { m_inuse = inuse; }
+    int getId() { return m_id; }
+
+  signals:
+    void screenReady(WeatherScreen *);
+
+  public slots:
+    virtual void clock_tick();
+    virtual void newData(QString loc, units_t units, DataMap data);
+    virtual bool handleKey(QKeyEvent *e) { (void) e; return false; }
+
+  protected:
+    units_t m_units;
+    LayerSet *m_container;
+    Weather *m_parent;
+    QString m_name;
+
+  protected:
+    virtual QString prepareDataItem(const QString &key, const QString &value);
+    virtual void prepareWidget(UIType *widget);
+    virtual void prepareScreen();
+    UIType *getType(const QString &key);
+
+  private:
+    QRect fullRect;
+    QMap<QString, QString> map;
+    UIAnimatedImageType *m_ai;
+    bool m_inuse;
+    int m_id;
 };
 
-class CurrCondScreen : public WeatherScreen {
+class CurrCondScreen : public WeatherScreen
+{
     Q_OBJECT
-    public:
-        CurrCondScreen(Weather*, LayerSet*, int id);      
-    protected:
-        virtual QString prepareDataItem(QString, QString);
 
+  public:
+    CurrCondScreen(Weather *parent, LayerSet *container, int id);
+
+  protected:
+    virtual QString prepareDataItem(const QString &key, const QString &value);
 };
 
-class ThreeDayForecastScreen : public WeatherScreen {
+class ThreeDayForecastScreen : public WeatherScreen
+{
     Q_OBJECT
-    public:
-        ThreeDayForecastScreen(Weather*, LayerSet*, int id);
+
+  public:
+    ThreeDayForecastScreen(Weather *parent, LayerSet *container, int id);
 };
 
-
-class SevereWeatherScreen : public WeatherScreen {
+class SevereWeatherScreen : public WeatherScreen
+{
     Q_OBJECT
-    public:
-        SevereWeatherScreen(Weather*, LayerSet*, int id);
-        bool usingKeys() { return true; }; 
-    public slots:
-        bool handleKey(QKeyEvent* e); 
 
-    private:
-        UIRichTextType* m_text;
+  public:
+    SevereWeatherScreen(Weather *parent, LayerSet *container, int id);
+    bool usingKeys() { return true; }
 
+  public slots:
+    bool handleKey(QKeyEvent *e);
 
+  private:
+    UIRichTextType *m_text;
 };
 
-class StaticImageScreen : public WeatherScreen {
+class StaticImageScreen : public WeatherScreen
+{
     Q_OBJECT
-    public:
-        StaticImageScreen(Weather*, LayerSet*, int id);
-    protected:
-        QString prepareDataItem(QString,QString);
-        void prepareWidget(UIType*);
-    private:
-        QSize imgsize;
-        QSize max; // should match staticsize in weather-ui.xml
-        QPoint orgPos; //so the image doesn't walk across the screen
 
+  public:
+    StaticImageScreen(Weather *parent, LayerSet *container, int id);
+
+  protected:
+    QString prepareDataItem(const QString &key, const QString &value);
+    void prepareWidget(UIType *widget);
+
+  private:
+    QSize imgsize;
+    QSize max; // should match staticsize in weather-ui.xml
+    QPoint orgPos; //so the image doesn't walk across the screen
 };
 
-class AnimatedImageScreen : public WeatherScreen {
+class AnimatedImageScreen : public WeatherScreen
+{
     Q_OBJECT
-    public:
-        AnimatedImageScreen(Weather*, LayerSet*, int id);
-    protected:
-        QString prepareDataItem(QString,QString);
-        void prepareWidget(UIType*);
-    private:
-        int m_count;
-        QSize imgsize;
-        QSize max; // should match staticsize in weather-ui.xml
-        QPoint orgPos; //so the image doesn't walk across the screen
 
+  public:
+    AnimatedImageScreen(Weather *parent, LayerSet *container, int id);
+
+  protected:
+    QString prepareDataItem(const QString &key, const QString &value);
+    void prepareWidget(UIType *widget);
+
+  private:
+    int m_count;
+    QSize imgsize;
+    QSize max; // should match staticsize in weather-ui.xml
+    QPoint orgPos; //so the image doesn't walk across the screen
 };
+
 #endif

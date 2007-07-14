@@ -2,17 +2,13 @@
 #include <qdir.h>
 #include <qstringlist.h>
 
-#include <iostream>
-using namespace std;
+#include <mythtv/mythcontext.h>
+#include <mythtv/mythdbcon.h>
 
 #include "dbcheck.h"
 #include "defs.h"
 
-#include "mythtv/mythcontext.h"
-#include "mythtv/mythdbcon.h"
-
 const QString currentDatabaseVersion = "1000";
-
 
 static void UpdateDBVersionNumber(const QString &newnumber)
 {
@@ -27,20 +23,21 @@ static void UpdateDBVersionNumber(const QString &newnumber)
 static void performActualUpdate(const QStringList updates, QString version,
                                 QString &dbver)
 {
-    VERBOSE(VB_IMPORTANT, QString("Upgrading to MythWeather schema version ") + 
+    VERBOSE(VB_IMPORTANT, QString("Upgrading to MythWeather schema version ") +
             version);
 
     MSqlQuery query(MSqlQuery::InitCon());
 
-    for (size_t i = 0; i < updates.size(); ++i) {
+    for (size_t i = 0; i < updates.size(); ++i)
+    {
         if (!query.exec(updates[i]))
-            VERBOSE(VB_IMPORTANT, QObject::tr("ERROR Executing query %1").arg(updates[i]));
+            VERBOSE(VB_IMPORTANT,
+                    QObject::tr("ERROR Executing query %1").arg(updates[i]));
     }
 
     UpdateDBVersionNumber(version);
     dbver = version;
 }
-
 
 /*
  * TODO Probably the biggest change to simplify things would be to get rid of
@@ -48,16 +45,17 @@ static void performActualUpdate(const QStringList updates, QString version,
  * that way, with cascading, updating screens won't need to blow out everything
  * in the db everytime.
  */
-void InitializeDatabase(void)
+void InitializeDatabase()
 {
     QString dbver = gContext->GetSetting("WeatherDBSchemaVer");
-    
+
     if (dbver == currentDatabaseVersion)
         return;
 
     if (dbver == "")
     {
-        VERBOSE(VB_IMPORTANT, "Inserting MythWeather initial database information.");
+        VERBOSE(VB_IMPORTANT,
+                "Inserting MythWeather initial database information.");
         QStringList updates;
         updates << "CREATE TABLE IF NOT EXISTS weathersourcesettings ("
                         "sourceid INT UNSIGNED NOT NULL AUTO_INCREMENT,"
@@ -102,6 +100,4 @@ void InitializeDatabase(void)
 
         performActualUpdate(updates, "1000", dbver);
     }
-
 }
-

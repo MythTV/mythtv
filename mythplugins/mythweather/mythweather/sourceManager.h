@@ -1,43 +1,45 @@
-
 #ifndef _SOURCEMANAGER_H_
 #define _SOURCEMANAGER_H_
-#include <qthread.h>
+
+#include <qobject.h>
+#include <qintdict.h>
 #include <qstringlist.h>
-#include <qregexp.h>
-#include "weatherSource.h"
+
 #include "defs.h"
 
-class WeatherSource;
-class WeatherScreen;
+#include "weatherSource.h"
 
-class SourceManager : public QObject {
+class WeatherScreen;
+struct ScriptInfo;
+
+class SourceManager : public QObject
+{
     Q_OBJECT
 
-    public: 
-        SourceManager();
-        WeatherSource*  needSourceFor(int, QString, units_t);
-        QStringList getLocationList(struct ScriptInfo*, QString);
-        void setUnits(units_t);
-        void startTimers();
-        void stopTimers();
-        void doUpdate();
-        QString getDataItem(QString);
-        bool findPossibleSources(QStringList, QPtrList<struct ScriptInfo>&);
-        void clearSources();
-        bool findScripts();
-        bool findScriptsDB();
-        void setupSources();
-        void connectScreen(uint, WeatherScreen*);
-        void disconnectScreen(WeatherScreen*);
-        struct ScriptInfo* getSourceByName(QString);
-        
-    private slots:
-        void timeout();
-    private:
-        QPtrList<struct ScriptInfo> m_scripts; //all scripts
-        QPtrList<WeatherSource> m_sources; //in-use scripts
-        QIntDict<WeatherSource> m_sourcemap;
-        units_t m_units;
-};
-#endif
+  public:
+    SourceManager();
+    WeatherSource *needSourceFor(int id, const QString &loc, units_t units);
+    QStringList getLocationList(ScriptInfo *si, const QString &str);
+    void startTimers();
+    void stopTimers();
+    void doUpdate();
+    bool findPossibleSources(QStringList types, QPtrList<ScriptInfo> &sources);
+    void clearSources();
+    bool findScripts();
+    bool findScriptsDB();
+    void setupSources();
+    void connectScreen(uint id, WeatherScreen *screen);
+    void disconnectScreen(WeatherScreen *screen);
+    ScriptInfo *getSourceByName(const QString &name);
 
+  private slots:
+    void timeout();
+
+  private:
+    QPtrList<ScriptInfo> m_scripts; //all scripts
+    QPtrList<WeatherSource> m_sources; //in-use scripts
+    QIntDict<WeatherSource> m_sourcemap;
+    units_t m_units;
+};
+
+#endif
