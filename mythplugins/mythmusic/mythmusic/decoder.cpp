@@ -120,7 +120,7 @@ Metadata* Decoder::getMetadata(void)
 }
 
 
-/** \fn commitMetadata(Metadata*)
+/**
  *  \brief Create a \p MetaIO object for the format.
  *
  *  This method should be overwritten by subclasses to return an

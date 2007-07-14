@@ -45,7 +45,7 @@ void GLTexture::Init(const QImage &image)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 }
 
-/** \fn GLTexture::Init(void)
+/**
  *  \brief Delete the texture
  */
 void GLTexture::Deinit(void)
