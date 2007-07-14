@@ -197,6 +197,7 @@ and in turn creates three main worker classes:
 </dl>
 
 %TVRec also presents the public face of a recordings to the 
+\ref myth_network_protocol
 Myth Network Protocol, and hence the rest of %MythTV. This
 means that any call to the %RecorderBase, %RingBuffer, or
 %ChannelBase is marshalled via methods in the %TVRec.
