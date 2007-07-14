@@ -496,7 +496,7 @@ void AutoExpire::ExpireRecordings(void)
     ClearExpireList(expireList);
 }
 
-/** \fn AutoExpire::SendDeleteMessages(pginfolist_t*)
+/**
  *  \brief This sends delete message to main event thread.
  */
 void AutoExpire::SendDeleteMessages(pginfolist_t &deleteList)
@@ -938,13 +938,13 @@ void *SpawnUpdateThread(void *autoExpireInstance)
     return NULL;
 }
 
-/** \fn AutoExpire::Update(QMap<int, EncoderLink*> *, bool)
+/**
  *  \brief This is used to update the global AutoExpire instance "expirer".
  *
- *  \param encoderList These are the encoders you want "expirer" to know about.
- *  \param immediately If true CalcParams() is called directly. If false a thread
- *                     is spawned to call CalcParams(), this is for use in the
- *                     MainServer event thread where calling CalcParams() directly
+ *  \param immediately If true CalcParams() is called directly.
+ *                     If false, a thread is spawned to call CalcParams(),
+ *                     this is for use in the MainServer event thread
+ *                     where calling CalcParams() directly
  *                     would deadlock the event thread.
  */
 void AutoExpire::Update(bool immediately)

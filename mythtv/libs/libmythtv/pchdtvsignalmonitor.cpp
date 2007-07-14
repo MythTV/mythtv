@@ -26,7 +26,7 @@
  *   the threshold is initialized to the value of the
  *   "ATSCCheckSignalThreshold" setting as a percentage.
  *
- *  \param _db_cardnum     Recorder number to monitor,
+ *  \param db_cardnum      Recorder number to monitor,
  *                         if this is less than 0, SIGNAL events will not be
  *                         sent to the frontend even if SetNotifyFrontend(true)
  *                         is called.

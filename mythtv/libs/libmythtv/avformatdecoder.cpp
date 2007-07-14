@@ -1621,7 +1621,7 @@ int AvFormatDecoder::ScanStreams(bool novideo)
     return scanerror;
 }
 
-/** \fn AvFormatDecoder::SetupAudioStreamSubIndexes(bool, bool)
+/**
  *  \brief Reacts to DUAL/STEREO changes on the fly and fix streams.
  *
  *  This function should be called when a switch between dual and 
@@ -1631,7 +1631,7 @@ int AvFormatDecoder::ScanStreams(bool novideo)
  *  After this method returns, a new audio stream should be selected
  *  using AvFormatDecoder::autoSelectSubtitleTrack().
  *
- *  \param index av_stream_index of the stream that has changed
+ *  \param streamIndex av_stream_index of the stream that has changed
  */
 void AvFormatDecoder::SetupAudioStreamSubIndexes(int streamIndex)
 {

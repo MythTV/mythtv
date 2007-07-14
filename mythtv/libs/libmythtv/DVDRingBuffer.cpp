@@ -1149,7 +1149,8 @@ void DVDRingBufferPriv::SelectDefaultButton(void)
 }
 
 /** \brief set the dvd subtitle/audio track used
- *  \param trackNo: if -1 then autoselect the track num from the dvd IFO
+ *  \param type    currently kTrackTypeSubtitle or kTrackTypeAudio
+ *  \param trackNo if -1 then autoselect the track num from the dvd IFO
  */
 void DVDRingBufferPriv::SetTrack(uint type, int trackNo)
 {

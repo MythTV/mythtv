@@ -244,10 +244,10 @@ bool EncoderLink::CheckFile(ProgramInfo *pginfo)
     return false;
 }
 
-/** \fn EncoderLink::GetDiskSpace()
+/**
  *  \brief Appends total and used disk space in Kilobytes
  *
- *  \param o_strlist, list to append to
+ *  \param o_strlist list to append to
  */
 void EncoderLink::GetDiskSpace(QStringList &o_strlist)
 {
@@ -575,7 +575,7 @@ void EncoderLink::SetLiveRecording(int recording)
         VERBOSE(VB_IMPORTANT, "Should be local only query: SetLiveRecording");
 }
 
-/** \fn EncoderLink::SetNextLiveTVDir()
+/**
  *  \brief Tells TVRec where to put the next LiveTV recording.
  */
 void EncoderLink::SetNextLiveTVDir(QString dir)
