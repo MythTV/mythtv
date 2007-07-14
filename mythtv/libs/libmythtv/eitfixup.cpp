@@ -977,7 +977,7 @@ void EITFixUp::FixPremiere(DBEvent &event) const
 }
 
 /** \fn EITFixUp::FixNL(DBEvent&) const
- *  \brief Use this to standardize @Home DVB-C guide in the Netherlands.
+ *  \brief Use this to standardize \@Home DVB-C guide in the Netherlands.
  */
 void EITFixUp::FixNL(DBEvent &event) const
 {
