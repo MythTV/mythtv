@@ -26,7 +26,7 @@
 
 uint OSDImageCache::kMaximumMemoryCacheSize = 5 * 1024 * 1024;
 
-/** \fn OSDImageCacheValue::OSDImageCacheValue(unsigned char*,unsigned char*,unsighed char*,unsigned char*,unsighed char*, QRect)
+/**
  *  \brief The main constructor that takes the image data as arguments.
  *
  *   The image data becomes property of the OSDImageCacheValue 

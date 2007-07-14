@@ -875,7 +875,8 @@ DiSEqCDevDevice *DiSEqCDevDevice::CreateByType(DiSEqCDevTree &tree,
  *   Device will not actually have commands issued until next Execute() method.
  */
 
-/** \fn DiSEqCDevDevice::IsCommandNeeded(const DiSEqCDevSettings&) const
+/** \fn DiSEqCDevDevice::IsCommandNeeded(const DiSEqCDevSettings &settings,
+ *                                       const DTVMultiplex      &tuning) const
  *  \brief Determines if this device or any child will be sending a command
  *         for the given configuration chain.
  *  \param settings Configuration chain in effect.

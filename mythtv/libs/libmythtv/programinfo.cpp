@@ -790,7 +790,7 @@ QString ProgramInfo::toString(void) const
     return str;
 }
 
-/** \fn ProgramInfo::GetProgramFromBasename()
+/**
  *  \brief Returns a new ProgramInfo for an existing recording.
  *  \return Pointer to a ProgramInfo if it succeeds, NULL otherwise.
  */
@@ -1476,7 +1476,7 @@ bool ProgramInfo::SetRecordBasename(QString basename)
     return true;
 }               
 
-/** \fn ProgramInfo::GetRecordBasename() const
+/**
  *  \brief Returns a filename for a recording based on the
  *         recording channel and date.
  */
@@ -1509,7 +1509,7 @@ QString ProgramInfo::GetRecordBasename(bool fromDB) const
     return retval;
 }               
 
-/** \fn ProgramInfo::GetPlaybackURL()
+/**
  *  \brief Returns filename or URL to be used to play back this recording.
  *         If the file is accessible locally, the filename will be returned,
  *         otherwise a myth:// URL will be returned.
@@ -1569,7 +1569,7 @@ QString ProgramInfo::GetPlaybackURL(bool checkMaster, bool forceCheckLocal)
     return tmpURL;
 }
 
-/** \fn ProgramInfo::StartedRecording()
+/**
  *  \brief Inserts this ProgramInfo into the database as an existing recording.
  *  
  *  This method, of course, only works if a recording has been scheduled
@@ -2258,7 +2258,7 @@ void ProgramInfo::SetPreserveEpisode(bool preserveEpisode) const
         UpdateLastDelete(false);
 }
 
-/** \fn ProgramInfo::SetAutoExpire(int) const
+/**
  *  \brief Set "autoexpire" field in "recorded" table to "autoExpire".
  *  \param autoExpire value to set auto expire field to.
  */
@@ -2282,7 +2282,7 @@ void ProgramInfo::SetAutoExpire(int autoExpire, bool updateDelete) const
 
 /** \fn ProgramInfo::UpdateLastDelete(bool) const
  *  \brief Set or unset the record.last_delete field.
- *  \param bool setTime to set or clear the time stamp.
+ *  \param setTime to set or clear the time stamp.
  */
 void ProgramInfo::UpdateLastDelete(bool setTime) const
 {
@@ -2769,7 +2769,7 @@ void ProgramInfo::ReactivateRecording(void)
     ScheduledRecording::signalChange(0);
 }
 
-/** \fn ProgramInfo::AddHistory(bool resched)
+/**
  *  \brief Adds recording history, creating "record" it if necessary.
  */
 void ProgramInfo::AddHistory(bool resched, bool forcedup)

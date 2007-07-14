@@ -1617,7 +1617,7 @@ void MainServer::DoDeleteInDB(const DeleteStruct *ds)
     }
 }
 
-/** \fn DeleteFile(const QString&,bool)
+/**
  *  \brief Deletes links and unlinks the main file and returns the descriptor.
  *
  *  This is meant to be used with TruncateAndClose() to slowly shrink a
@@ -1698,7 +1698,7 @@ int MainServer::OpenAndUnlink(const QString &filename)
     return fd;
 }
 
-/** \fn MainServer::TruncateAndClose(ProgramInfo*,int,const QString&)
+/**
  *  \brief Repeatedly truncate an open file in small increments.
  *
  *   When the file is small enough this closes the file and returns.

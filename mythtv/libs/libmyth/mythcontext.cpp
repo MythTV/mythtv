@@ -2429,7 +2429,7 @@ void MythContext::SetSetting(const QString &key, const QString &newValue)
     ClearSettingsCache(key, newValue);
 }
 
-/** \fn MythContext::OverrideSettingForSession()
+/**
  *  \brief Overrides the given setting for the execution time of the process.
  *
  * This allows defining settings for the session only, without touching the

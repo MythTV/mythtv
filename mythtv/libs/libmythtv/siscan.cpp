@@ -81,8 +81,6 @@ QString SIScan::loc(const SIScan *siscan)
  *   HandleDVBDBInsertion() and HandleMPEGDBInsertion() are similar.
  */
 
-/** \fn SIScan::SIScan(QString,ChannelBase*,int,uint,uint,const QString&)
- */
 SIScan::SIScan(const QString &_cardtype, ChannelBase *_channel, int _sourceID,
                uint signal_timeout, uint channel_timeout,
                const QString &_inputname)
@@ -1246,8 +1244,6 @@ void SIScan::UpdatePATinDB(
     }    
 }
 
-/** \fn SIScan::UpdateVCTinDB(int,const QString&,int,const VirtualChannelTable*,bool)
- */
 void SIScan::UpdateVCTinDB(int db_mplexid,
                            const QString &friendlyName, int freqid,
                            const VirtualChannelTable *vct,
@@ -1369,7 +1365,7 @@ void SIScan::UpdateVCTinDB(int db_mplexid,
     }
 }
 
-/** \fn SIScan::UpdateSDTinDB(int,const ServiceDescriptionTable*,bool)
+/**
  *  \brief Inserts channels from service description table.
  */
 void SIScan::UpdateSDTinDB(int /*mplexid*/, const ServiceDescriptionTable *sdt,

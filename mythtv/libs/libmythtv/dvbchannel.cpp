@@ -469,7 +469,7 @@ void DVBChannel::CheckOptions(DTVMultiplex &tuning) const
     VERBOSE(VB_CHANNEL, LOC + tuning.toString());
 }
 
-/** \fn DVBChannel::CheckCodeRate(fe_code_rate_t) const
+/**
  *  \brief Return true iff rate is supported rate on the frontend
  */
 bool DVBChannel::CheckCodeRate(DTVCodeRate rate) const
@@ -488,7 +488,7 @@ bool DVBChannel::CheckCodeRate(DTVCodeRate rate) const
         ((DTVCodeRate::kFECAuto == rate) && (caps & FE_CAN_FEC_AUTO));
 }
 
-/** \fn DVBChannel::CheckModulation(fe_modulation_t) const
+/**
  *  \brief Return true iff modulation is supported modulation on the frontend
  */
 bool DVBChannel::CheckModulation(DTVModulation modulation) const

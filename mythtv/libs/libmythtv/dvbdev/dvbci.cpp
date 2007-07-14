@@ -1425,7 +1425,7 @@ void cCiCaPmt::AddElementaryStream(int type, int pid)
   capmt[length++] = 0x00;
 }
 
-/** \fn cCiCaPmt::AddCaDescriptor(int, int, int, uint8_t*)
+/**
  *  \brief Inserts an Access Control (CA) Descriptor into a PMT.
  *
  *   The format of ca_pmt is:

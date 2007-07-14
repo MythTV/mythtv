@@ -320,7 +320,7 @@ bool PreviewGenerator::IsLocal(void) const
     return (QFileInfo(pathname).exists() && QFileInfo(pathdir).isWritable());
 }
 
-/** \fn PreviewGenerator::SaveScreenshot()
+/**
  *  \brief Saves a screenshot to a file.
  *
  *  \param pginfo       Recording to grab from.

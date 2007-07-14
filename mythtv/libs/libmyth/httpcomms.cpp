@@ -479,7 +479,7 @@ bool HttpComms::getHttpFile(const QString& filename, QString& url, int timeoutMS
     return res;
 }
 
-/** \fn HttpComms::postHttp(QString&,QHttpRequestHeader,int,int,int,bool,Credentials*,bool)
+/**
  *  \brief Static function for performing an http post request to a url.
  *
  *   This is a synchronous function, it will block according to the vars.

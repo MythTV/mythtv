@@ -206,7 +206,7 @@ MediaType MythMediaDevice::DetectMediaType(void)
     return mediatype;
 }
 
-/** \fn MythMediaDevice::ScanMediaType(const QString&, ext_cnt_t)
+/**
  *  \brief Recursively scan directories and create an associative array
  *         with the number of times we've seen each extension.
  */

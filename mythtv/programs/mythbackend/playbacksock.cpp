@@ -89,7 +89,7 @@ bool PlaybackSock::SendReceiveStringList(QStringList &strlist)
     return ok;
 }
 
-/** \fn PlaybackSock::GetDiskSpace()
+/**
  *  \brief Appends host's dir's total and used space in kilobytes.
  */
 void PlaybackSock::GetDiskSpace(QStringList &o_strlist)

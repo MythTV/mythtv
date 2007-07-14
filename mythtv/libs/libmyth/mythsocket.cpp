@@ -202,7 +202,7 @@ Q_LONG MythSocket::readBlock(char *data, Q_ULONG len)
     return rval;
 }
 
-/** \fn writeBlock(char*, Q_ULONG)
+/**
  *  \brief Attempt to write 'len' bytes to socket
  *  \return actual bytes written
  */
@@ -318,7 +318,7 @@ bool MythSocket::writeStringList(QStringList &list)
     return true;
 }
 
-/** \fn writeData(char*,Q_ULONG)
+/**
  *  \brief Write len bytes to data to socket
  *  \return true if entire len of data is written
  */
@@ -571,7 +571,7 @@ void MythSocket::Unlock(void)
     WakeReadyReadThread();
 }
 
-/** \fn connect(QString &, Q_UINT16)
+/**
  *  \brief connect to host
  *  \return true on success
  */
@@ -582,7 +582,7 @@ bool MythSocket::connect(const QString &host, Q_UINT16 port)
     return MythSocket::connect(hadr, port);
 }
 
-/** \fn connect(QHostAddress &, Q_UINT16)
+/**
  *  \brief connect to host
  *  \return true on success
  */
