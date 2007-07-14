@@ -4576,6 +4576,7 @@ void PlaybackBox::showRecGroupChooser(void)
     query.prepare(
         "SELECT DISTINCT category, COUNT(title) "
         "FROM recorded "
+        "WHERE deletepending = 0 "
         "GROUP BY category");
     if (query.exec() && query.isActive() && query.size() > 0)
     {
@@ -4693,9 +4694,6 @@ void PlaybackBox::setGroupFilter(void)
 
     recGroup = recGroupListBox->currentText().section(" [", 0, 0);
 
-    if (groupnameAsAllProg)
-        groupDisplayName = recGroup;
-
     if (recGroup == tr("Default"))
         recGroup = "Default";
     else if (recGroup == tr("All Programs"))
@@ -4726,6 +4724,9 @@ void PlaybackBox::setGroupFilter(void)
         curGroupPassword = recGroupPassword;
     } else
         curGroupPassword = "";
+
+    if (groupnameAsAllProg)
+        groupDisplayName = recGroup;
 
     if (gContext->GetNumSetting("RememberRecGroup",1))
         gContext->SaveSetting("DisplayRecGroup", recGroup);
