@@ -197,8 +197,7 @@ and in turn creates three main worker classes:
 </dl>
 
 %TVRec also presents the public face of a recordings to the 
-\ref myth_network_protocol
-Myth Network Protocol, and hence the rest of %MythTV. This
+\ref myth_network_protocol, and hence the rest of %MythTV. This
 means that any call to the %RecorderBase, %RingBuffer, or
 %ChannelBase is marshalled via methods in the %TVRec.
 
@@ -362,6 +361,40 @@ no dvd PATH
 \endverbatim
 - End any jobs that are reading from dvd PATH, and if it is the current drive,
   forget about it.
+ */
+
+/** \defgroup myth_media            Myth Media Manager
+This line is filler that is ignored by Doxygen.
+
+The Myth Media Manager is a thread in the frontend which looks for any
+changes to removable media, and sends events to any Frontend Plugins
+which are interested in that media.
+
+At startup, it creates a list of MythMediaDevice objects (currently
+MythHDD or MythCDROM and its subclasses) for each removable device
+configured on the system. A runtime loop then monitors each of these
+via its checkMedia() method.
+
+When any of these devices change status, a MediaEvent object is created
+and sent to the frontmost window, which then dispatches it to the
+relevant plugin's registered media handler. The following tables show
+typical status transitions for CD/DVD and USB flash drive devices:
+
+\verbatim
+      CD/DVD                     USB/FireWire HDD
+State        Action           State         Action
+--------------------------------------------------
+NODISK                        NODISK
+             eject                          attach
+OPEN                          USEABLE
+       insert disk, close                   detach
+USEABLE                       UNPLUGGED
+             mount
+MOUNTED
+            unmount
+NOTMOUNTED
+--------------------------------------------------
+\endverbatim
  */
 
 /** \defgroup myth_network_protocol Myth Network Protocol
