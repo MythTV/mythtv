@@ -453,7 +453,7 @@ void MonitorThreadDarwin::diskRename(const char *devName, const char *volName)
         pDevice->setMountPath(QString("/Volumes/") + volName);
 
         // Plugins can now use it again:
-        //if (m_Monitor->m_SendEvent)
+        if (m_Monitor->m_SendEvent)
             pDevice->setStatus(MEDIASTAT_USEABLE);
 
         m_Monitor->Unlock(pDevice);
@@ -501,6 +501,9 @@ bool MediaMonitorDarwin::AddDevice(MythMediaDevice* pDevice)
         return false;
     }
 
+    // If the user doesn't want this device to be monitored, stop now: 
+    if (shouldIgnore(pDevice)) 
+        return false;
 
     m_Devices.push_back( pDevice );
     m_UseCount[pDevice] = 0;
