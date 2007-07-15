@@ -20,23 +20,21 @@ void RomInfo::edit_rominfo()
     QString rom_ver = Version();
 
     GameEditDialog romeditdlg(Romname().latin1());
-    romeditdlg.exec();
+    int res = romeditdlg.exec();
 
-    if (rom_ver != "CUSTOM") 
-    {
-//        cerr << "Checking to see if data changed" << endl;
-
+    if (res) {
         MSqlQuery query(MSqlQuery::InitCon());
-        QString thequery = QString("SELECT gamename,genre,year,country,publisher FROM gamemetadata "
-                                   " WHERE gametype = '%1' AND romname = '%2'; ")
-                                   .arg(GameType())
-                                   .arg(Romname());
+        QString thequery = QString("SELECT gamename,genre,year,country,publisher,favorite FROM gamemetadata "
+                                       " WHERE gametype = '%1' AND romname = '%2'; ")
+                                       .arg(GameType())
+                                       .arg(Romname());
 
         query.exec(thequery);
 
         if (query.isActive() && query.size() > 0);
         {
             QString t_gamename, t_genre, t_year, t_country, t_publisher;
+            bool t_favourite;
 
             query.next();
             t_gamename = query.value(0).toString();
@@ -44,9 +42,10 @@ void RomInfo::edit_rominfo()
             t_year = query.value(2).toString();
             t_country = query.value(3).toString();
             t_publisher = query.value(4).toString();
-
+            t_favourite = query.value(5).toBool();
+    
             if ((t_gamename != Gamename()) || (t_genre != Genre()) || (t_year != Year()) 
-               || (t_country != Country()) || (t_publisher != Publisher()))
+               || (t_country != Country()) || (t_publisher != Publisher()) || (t_favourite != Favorite()))
             {
                 thequery = QString("UPDATE gamemetadata SET version = '%1' WHERE gametype = '%2' AND romname = '%3';")
                                    .arg(QString("CUSTOM"))
@@ -54,19 +53,9 @@ void RomInfo::edit_rominfo()
                                    .arg(Romname());
 
                 query.exec(thequery);
-
-//                cerr << "Something changed, update VERSION" << endl;
-
             }
-//            else
-//                 cerr << "No Data Changed. Don't do anything" << endl;
- 
-
         }
-
-    }
-//    else
-//        cerr << "Already a Custom data set. Don't do anything" << endl;
+   }
 }
 
 // Return the count of how many times this appears in the db already

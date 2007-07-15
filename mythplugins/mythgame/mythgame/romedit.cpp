@@ -78,7 +78,7 @@ GameEditDialog::GameEditDialog(const QString &romname)
     QString title = QObject::tr("Editing Metadata - ") + romname;
 
     VerticalConfigurationGroup *group =
-        new VerticalConfigurationGroup(false, false, false, false);
+        new VerticalConfigurationGroup(false);
 
     group->setLabel(title);
     group->addChild(new Gamename(romname));

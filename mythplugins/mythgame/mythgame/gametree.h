@@ -122,6 +122,8 @@ class GameTree : public MythThemedDialog
     void keyPressEvent(QKeyEvent *e);
 
   private:
+    void updateRomInfo(RomInfo *rom);
+    void clearRomInfo(void);
     void wireUpTheme(void);
     void fillNode(GenericTree *node);
     void showInfo(void);

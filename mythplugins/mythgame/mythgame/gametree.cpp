@@ -243,6 +243,36 @@ GameTree::~GameTree()
     delete m_gameTree;
 }
 
+void GameTree::updateRomInfo(RomInfo *rom) {
+
+    m_gameTitle->SetText(rom->Gamename());
+    m_gameSystem->SetText(rom->AllSystems());
+    m_gameYear->SetText(rom->Year());
+    m_gameGenre->SetText(rom->Genre());
+
+    if (rom->Favorite())
+        m_gameFavourite->SetText("Yes");
+    else
+        m_gameFavourite->SetText("No");
+
+    if (rom->ImagePath())
+        m_gameImage->SetImage(rom->ImagePath());
+
+}
+
+void GameTree::clearRomInfo(void) {
+    m_gameTitle->SetText("");
+    m_gameSystem->SetText("");
+    m_gameYear->SetText("");
+    m_gameGenre->SetText("");
+    m_gameFavourite->SetText("");
+    m_gameImage->SetImage("");
+
+    if (m_gameImage->isShown())
+        m_gameImage->hide();
+
+}
+
 void GameTree::handleTreeListEntry(int nodeInt, IntVector *)
 {
     GameTreeItem *item = nodeInt ? m_gameTreeItems[nodeInt - 1] : 0;
@@ -268,27 +298,12 @@ void GameTree::handleTreeListEntry(int nodeInt, IntVector *)
         if (item->isLeaf() && romInfo->Romname().isEmpty())
             romInfo->fillData();
 
-        m_gameTitle->SetText(romInfo->Gamename());
-        m_gameSystem->SetText(romInfo->AllSystems());
-        m_gameYear->SetText(romInfo->Year());
-        m_gameGenre->SetText(romInfo->Genre());
+        updateRomInfo(romInfo);
 
         if (item->isLeaf())
         {
-            if (romInfo->Favorite())
-                m_gameFavourite->SetText("Yes");
-            else
-                m_gameFavourite->SetText("No");
-
-            if (romInfo->DiskCount())
-            {
-            }
-
             if (romInfo->ImagePath()) 
             {
-                m_gameImage->SetImage(romInfo->ImagePath());
-                //m_gameImage->LoadImage();
-
                 if ( timer->isActive() ) 
                     timer->changeInterval(330); 
                 else 
@@ -300,10 +315,7 @@ void GameTree::handleTreeListEntry(int nodeInt, IntVector *)
             if ( timer->isActive() )
                 timer->stop();   
 
-            m_gameFavourite->SetText("");
-            m_gameImage->SetImage("");
-            if (m_gameImage->isShown())
-                m_gameImage->hide();
+            clearRomInfo();
         }
     }
     else 
@@ -311,11 +323,7 @@ void GameTree::handleTreeListEntry(int nodeInt, IntVector *)
         if ( timer->isActive() )
             timer->stop();
 
-            m_gameFavourite->SetText("");
-            m_gameImage->SetImage("");
-            if (m_gameImage->isShown())
-                m_gameImage->hide();
-
+            clearRomInfo();
     }
 
 }
@@ -377,6 +385,8 @@ void GameTree::showInfo(void)
 
     if (curItem->isLeaf())
         curItem->showGameInfo(curItem->getRomInfo());
+
+    }
 }
 
 void GameTreeItem::showGameInfo(RomInfo *rom) 

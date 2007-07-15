@@ -43,7 +43,7 @@ class ROMDBStorage : public SimpleDBStorage
     QString romname;
 };
 
-class GameEditDialog : public QObject, public ConfigurationDialog
+class GameEditDialog : public QObject, public ConfigurationWizard
 {
   public:
     GameEditDialog(const QString &romname);
