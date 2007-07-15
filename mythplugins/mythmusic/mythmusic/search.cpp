@@ -82,6 +82,7 @@ void SearchDialog::runQuery(QString searchText)
     searchText.toULongLong(&isNumber);
     QString searchLimit = gContext->GetSetting("MaxSearchResults");
     searchText.replace("'", "''");
+    searchText = searchText.utf8();
 
     if (!isNumber)
     {
@@ -108,7 +109,7 @@ void SearchDialog::runQuery(QString searchText)
     QString queryString("SELECT filename, music_artists.artist_name, album_name, name, song_id "
                         "FROM music_songs "
                         "LEFT JOIN music_artists ON music_songs.artist_id=music_artists.artist_id "
-                        "LEFT JOIN music_albums ON music_songs.album_id=music_albums.album_id ");      
+                        "LEFT JOIN music_albums ON music_songs.album_id=music_albums.album_id ");
 
     QStringList list = QStringList::split(QRegExp("[>,]"), searchText);
     whereClause = "";
