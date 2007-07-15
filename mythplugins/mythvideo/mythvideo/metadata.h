@@ -11,6 +11,8 @@ class MetadataListManager;
 
 enum { VIDEO_YEAR_DEFAULT = 1895 };
 
+struct SortData;
+
 class Metadata
 {
   public:
@@ -20,8 +22,24 @@ class Metadata
     typedef std::vector<country_entry> country_list;
 
   public:
-    static QString GenerateDefaultSortKey(const Metadata &m,
-                                          bool ignore_case = true);
+    class SortKey
+    {
+      public:
+        SortKey();
+        SortKey(const SortData &data);
+        SortKey(const SortKey &other);
+        SortKey &operator=(const SortKey &rhs);
+        ~SortKey();
+
+        bool isSet() const;
+        void Clear();
+
+      public:
+        SortData *m_sd;
+    };
+
+  public:
+    static SortKey GenerateDefaultSortKey(const Metadata &m, bool ignore_case);
     static QString FilenameToTitle(const QString &file_name);
     static QString trimTitle(const QString &title, bool ignore_case);
     static QString getPlayer(const Metadata *item);
@@ -48,8 +66,8 @@ class Metadata
 
     // returns a string to use when sorting
     bool hasSortKey() const;
-    const QString &getSortKey() const;
-    void setSortKey(const QString &sort_key);
+    const SortKey &getSortKey() const;
+    void setSortKey(const SortKey &sort_key);
 
     // flat index
     void setFlatIndex(int index);
@@ -134,5 +152,7 @@ class Metadata
 
 bool operator==(const Metadata &a, const Metadata &b);
 bool operator!=(const Metadata &a, const Metadata &b);
+
+bool operator<(const Metadata::SortKey &lhs, const Metadata::SortKey &rhs);
 
 #endif

@@ -42,7 +42,8 @@ class VideoFilterSettings
     VideoFilterSettings &operator=(const VideoFilterSettings &rhs);
 
     bool matches_filter(const Metadata &mdata) const;
-    bool meta_less_than(const Metadata &lhs, const Metadata &rhs) const;
+    bool meta_less_than(const Metadata &lhs, const Metadata &rhs,
+                        bool sort_ignores_case) const;
 
     void saveAsDefault();
 

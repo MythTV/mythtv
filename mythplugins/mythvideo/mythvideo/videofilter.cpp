@@ -294,15 +294,16 @@ bool VideoFilterSettings::matches_filter(const Metadata &mdata) const
 
 /// Compares two Metadata instances
 bool VideoFilterSettings::meta_less_than(const Metadata &lhs,
-                                         const Metadata &rhs) const
+                                         const Metadata &rhs,
+                                         bool sort_ignores_case) const
 {
     bool ret = false;
     switch (orderby)
     {
         case kOrderByTitle:
         {
-            QString lhs_key;
-            QString rhs_key;
+            Metadata::SortKey lhs_key;
+            Metadata::SortKey rhs_key;
             if (lhs.hasSortKey() && rhs.hasSortKey())
             {
                 lhs_key = lhs.getSortKey();
@@ -310,10 +311,12 @@ bool VideoFilterSettings::meta_less_than(const Metadata &lhs,
             }
             else
             {
-                lhs_key = Metadata::GenerateDefaultSortKey(lhs);
-                rhs_key = Metadata::GenerateDefaultSortKey(rhs);
+                lhs_key = Metadata::GenerateDefaultSortKey(lhs,
+                                                           sort_ignores_case);
+                rhs_key = Metadata::GenerateDefaultSortKey(rhs,
+                                                           sort_ignores_case);
             }
-            ret = QString::localeAwareCompare(lhs_key, rhs_key) < 0;
+            ret = lhs_key < rhs_key;
             break;
         }
         case kOrderByYearDescending:
@@ -333,9 +336,11 @@ bool VideoFilterSettings::meta_less_than(const Metadata &lhs,
         }
         case kOrderByFilename:
         {
-            // TODO: honor case setting
-            ret = QString::localeAwareCompare(lhs.Filename(),
-                                              rhs.Filename()) < 0;
+            QString lhsfn(sort_ignores_case ?
+                          lhs.Filename().lower() : lhs.Filename());
+            QString rhsfn(sort_ignores_case ?
+                          rhs.Filename().lower() : rhs.Filename());
+            ret = QString::localeAwareCompare(lhsfn, rhsfn);
             break;
         }
         case kOrderByID:

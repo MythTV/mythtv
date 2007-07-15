@@ -14,6 +14,73 @@
 #include "dbaccess.h"
 #include "videoutils.h"
 
+struct SortData
+{
+    SortData(const QString &title, const QString &filename, const QString &id) :
+        m_title(title), m_filename(filename), m_id(id)
+    {
+    }
+
+    QString m_title;
+    QString m_filename;
+    QString m_id;
+};
+
+bool operator<(const SortData &lhs, const SortData &rhs)
+{
+    int ret = QString::localeAwareCompare(lhs.m_title, rhs.m_title);
+
+    if (ret == 0)
+        ret = QString::localeAwareCompare(lhs.m_filename, rhs.m_filename);
+
+    if (ret == 0)
+        ret = QString::localeAwareCompare(lhs.m_id, rhs.m_id);
+
+    return ret < 0;
+}
+
+Metadata::SortKey::SortKey() : m_sd(0)
+{
+}
+
+Metadata::SortKey::SortKey(const SortData &data)
+{
+    m_sd = new SortData(data);
+}
+
+Metadata::SortKey::SortKey(const SortKey &other)
+{
+    *this = other;
+}
+
+Metadata::SortKey &Metadata::SortKey::operator=(const SortKey &rhs)
+{
+    if (this != &rhs)
+    {
+        Clear();
+        if (rhs.m_sd)
+            m_sd = new SortData(*rhs.m_sd);
+    }
+
+    return *this;
+}
+
+Metadata::SortKey::~SortKey()
+{
+    Clear();
+}
+
+bool Metadata::SortKey::isSet() const
+{
+    return m_sd != 0;
+}
+
+void Metadata::SortKey::Clear()
+{
+    delete m_sd;
+    m_sd = 0;
+}
+
 class MetadataImp
 {
   public:
@@ -38,12 +105,12 @@ class MetadataImp
         m_filename(filename), m_coverfile(coverfile),
         m_categoryID(categoryID), m_childID(childID), m_year(year),
         m_length(length), m_showlevel(showlevel), m_browse(browse), m_id(id),
-        m_userrating(userrating), m_has_sort_key(false)
+        m_userrating(userrating)
     {
         VideoCategory::getCategory().get(m_categoryID, m_category);
     }
 
-    MetadataImp(MSqlQuery &query) : m_has_sort_key(false)
+    MetadataImp(MSqlQuery &query)
     {
         fromDBRow(query);
     }
@@ -79,7 +146,6 @@ class MetadataImp
         m_id = rhs.m_id;
         m_userrating = rhs.m_userrating;
 
-        m_has_sort_key = rhs.m_has_sort_key;
         m_sort_key = rhs.m_sort_key;
         m_prefix = rhs.m_prefix;
 
@@ -87,11 +153,10 @@ class MetadataImp
     }
 
   public:
-    bool hasSortKey() const { return m_has_sort_key; }
-    const QString &getSortKey() const { return m_sort_key; }
-    void setSortKey(const QString &sort_key)
+    bool hasSortKey() const { return m_sort_key.isSet(); }
+    const Metadata::SortKey &getSortKey() const { return m_sort_key; }
+    void setSortKey(const Metadata::SortKey &sort_key)
     {
-        m_has_sort_key = true;
         m_sort_key = sort_key;
     }
 
@@ -104,8 +169,8 @@ class MetadataImp
     const QString &getTitle() const { return m_title; }
     void setTitle(const QString& title)
     {
+        m_sort_key.Clear();
         m_title = title;
-        m_has_sort_key = false;
     }
 
     const QString &getInetRef() const { return m_inetref; }
@@ -226,8 +291,7 @@ class MetadataImp
     float m_userrating;
 
     // not in DB
-    bool m_has_sort_key;
-    QString m_sort_key;
+    Metadata::SortKey m_sort_key;
     QString m_prefix;
     int m_flat_index;
 };
@@ -567,13 +631,14 @@ void MetadataImp::updateCountries()
 ////////////////////////////////////////
 //// Metadata
 ////////////////////////////////////////
-QString Metadata::GenerateDefaultSortKey(const Metadata &m, bool ignore_case)
+Metadata::SortKey Metadata::GenerateDefaultSortKey(const Metadata &m,
+                                                   bool ignore_case)
 {
     QString title(ignore_case ? m.Title().lower() : m.Title());
     title = trimTitle(title, ignore_case);
-    QString ret(title + m.Filename() + QString().sprintf("%.7d", m.ID()));
 
-    return ret;
+    return SortKey(SortData(title, m.Filename(),
+                         QString().sprintf("%.7d", m.ID())));
 }
 
 namespace
@@ -806,12 +871,12 @@ bool Metadata::hasSortKey() const
     return m_imp->hasSortKey();
 }
 
-const QString &Metadata::getSortKey() const
+const Metadata::SortKey &Metadata::getSortKey() const
 {
     return m_imp->getSortKey();
 }
 
-void Metadata::setSortKey(const QString &sort_key)
+void Metadata::setSortKey(const Metadata::SortKey &sort_key)
 {
     m_imp->setSortKey(sort_key);
 }
@@ -1097,4 +1162,16 @@ bool operator!=(const Metadata& a, const Metadata& b)
     if (a.Filename() != b.Filename())
         return true;
     return false;
+}
+
+bool operator<(const Metadata::SortKey &lhs, const Metadata::SortKey &rhs)
+{
+    if (lhs.m_sd && rhs.m_sd)
+        return *lhs.m_sd < *rhs.m_sd;
+    else
+    {
+        VERBOSE(VB_IMPORTANT, QString("Error: Bug, Metadata item with empty "
+                                      "sort key compared"));
+        return lhs.m_sd < rhs.m_sd;
+    }
 }

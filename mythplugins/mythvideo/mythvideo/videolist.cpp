@@ -293,20 +293,23 @@ namespace fake_unnamed
     /// metadata sort functor
     struct metadata_sort
     {
-        metadata_sort(const VideoFilterSettings &vfs) : m_vfs(vfs) {}
+        metadata_sort(const VideoFilterSettings &vfs, bool sort_ignores_case) :
+            m_vfs(vfs), m_sic(sort_ignores_case) {}
 
         bool operator()(const Metadata *lhs, const Metadata *rhs)
         {
-            return m_vfs.meta_less_than(*lhs, *rhs);
+            return m_vfs.meta_less_than(*lhs, *rhs, m_sic);
         }
 
         bool operator()(const smart_meta_node &lhs, const smart_meta_node &rhs)
         {
-            return m_vfs.meta_less_than(*(lhs->getData()), *(rhs->getData()));
+            return m_vfs.meta_less_than(*(lhs->getData()), *(rhs->getData()),
+                                        m_sic);
         }
 
       private:
         const VideoFilterSettings &m_vfs;
+        bool m_sic;
     };
 
     struct metadata_path_sort
@@ -758,12 +761,13 @@ void VideoListImp::sort_view_data(bool flat_list)
     if (flat_list)
     {
         std::sort(m_metadata_view_flat.begin(), m_metadata_view_flat.end(),
-                  metadata_sort(m_video_filter));
+                  metadata_sort(m_video_filter, m_sort_ignores_case));
     }
     else
     {
         m_metadata_view_tree.sort(metadata_path_sort(m_sort_ignores_case),
-                                  metadata_sort(m_video_filter));
+                                  metadata_sort(m_video_filter,
+                                                m_sort_ignores_case));
     }
 }
 
@@ -1067,7 +1071,7 @@ void VideoListImp::update_meta_view(bool flat_list)
     {
         if (!(*si)->hasSortKey())
         {
-            QString skey =
+            Metadata::SortKey skey =
                     Metadata::GenerateDefaultSortKey(*(*si),
                                                      m_sort_ignores_case);
             (*si)->setSortKey(skey);
