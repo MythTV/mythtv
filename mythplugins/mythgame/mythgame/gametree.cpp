@@ -385,8 +385,6 @@ void GameTree::showInfo(void)
 
     if (curItem->isLeaf())
         curItem->showGameInfo(curItem->getRomInfo());
-
-    }
 }
 
 void GameTreeItem::showGameInfo(RomInfo *rom) 
@@ -397,7 +395,8 @@ void GameTreeItem::showGameInfo(RomInfo *rom)
     info_popup = new MythPopupBox(gContext->GetMainWindow(), "info_popup");
 
     //info_popup->addLabel(QObject::tr("Rom Information\n"));
-    info_popup->addLabel(QString("Name: %1 (%2)").arg(rom->Gamename()).arg(rom->GameType()));
+    info_popup->addLabel(QString("Name: %1 (%2)")
+                         .arg(rom->Gamename()).arg(rom->GameType()));
     info_popup->addLabel(QString("Rom : %1").arg(rom->Romname()));
     info_popup->addLabel(QString("CRC : %1").arg(rom->CRC_VALUE()));
     info_popup->addLabel(QString("Path: %1").arg(rom->Rompath()));
