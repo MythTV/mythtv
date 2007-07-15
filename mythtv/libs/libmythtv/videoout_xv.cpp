@@ -64,13 +64,6 @@ extern "C" {
 #define XVMC_CHROMA_FORMAT_420 0x00000001
 #endif
 
-// define the following for the ATI Proprietary driver and the Intel
-// IEGD driver for the i830M chipset (as of Oct 1st, 2006). Please
-// report the problem to the driver developers as well, the more
-// people report the bug in the driver the more likely it is to be
-// fixed.
-//#define USE_HACK_FOR_BROKEN_I420_SUPPORT_IN_DRIVER
-
 static void SetFromEnv(bool &useXvVLD, bool &useXvIDCT, bool &useXvMC,
                        bool &useXV, bool &useShm);
 static void SetFromHW(Display *d, bool &useXvMC, bool &useXV, bool& useShm);
@@ -116,6 +109,22 @@ VideoOutputXv::VideoOutputXv(MythCodecID codec_id)
 {
     VERBOSE(VB_PLAYBACK, LOC + "ctor");
     bzero(&av_pause_frame, sizeof(av_pause_frame));
+
+
+    // The following is a workaround for the ATI Proprietary driver and 
+    // the Intel IEGD driver for the i830M chipset (as of Oct 1st, 2006).
+    // Please report the problem to the driver developers as well, the more
+    // people report the bug in the driver the more likely it is to be
+    // fixed.
+
+    brokenI420Hack = gContext->GetNumSetting("BrokenI420Hack", 0);
+
+    if (brokenI420Hack)
+        VERBOSE(VB_GENERAL, LOC + "Using broken I420 workaround. Please " +
+                                  "ask your driver vendor to fix their " +
+                                  "drivers! ");
+
+
 
     // If using custom display resolutions, display_res will point
     // to a singleton instance of the DisplayRes class
@@ -862,9 +871,8 @@ bool VideoOutputXv::InitXVideo()
                 .arg(i).arg(chr[0]).arg(chr[1]).arg(chr[2]).arg(chr[3]));
     }
 
-#ifdef USE_HACK_FOR_BROKEN_I420_SUPPORT_IN_DRIVER
-    swap(ids[0], ids[2]);
-#endif // USE_HACK_FOR_BROKEN_I420_SUPPORT_IN_DRIVER
+    if (brokenI420Hack) 
+        swap(ids[0], ids[2]);
 
     for (uint i = 0; i < sizeof(ids)/sizeof(int); i++)
     {

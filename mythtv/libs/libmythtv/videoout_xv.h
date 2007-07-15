@@ -223,6 +223,8 @@ class VideoOutputXv : public VideoOutput
     buffer_map_t         xv_buffers;
     bool                 xv_need_bobdeint_repaint;
 
+    bool		 brokenI420Hack;
+
     // Chromakey OSD info
     ChromaKeyOSD        *chroma_osd;
 };
