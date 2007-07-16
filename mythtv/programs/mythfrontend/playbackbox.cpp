@@ -4372,9 +4372,19 @@ void PlaybackBox::showIconHelp(void)
     iconMap["bookmark"]    = tr("A bookmark is set");
     iconMap["inuse"]       = tr("Recording is in use");
     iconMap["transcoded"]  = tr("Recording has been transcoded");
+
+    iconMap["mono"]        = tr("Recording is in Mono");
     iconMap["stereo"]      = tr("Recording is in Stereo");
+    iconMap["surround"]    = tr("Recording is in Surround Sound");
+    iconMap["dolby"]       = tr("Recording is in Dolby Surround Sound");
+
     iconMap["cc"]          = tr("Recording is Closed Captioned");
+    iconMap["subtitle"]    = tr("Recording has Subtitles Available");
+    iconMap["onscreensub"] = tr("Recording is Subtitled");
+
     iconMap["hdtv"]        = tr("Recording is in High Definition");
+    iconMap["widescreen"]  = tr("Recording is in WideScreen");
+
     iconMap["preserved"]   = tr("Recording is preserved");
 
     for (it = iconMap.begin(); it != iconMap.end(); ++it)
