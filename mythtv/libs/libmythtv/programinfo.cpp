@@ -91,6 +91,9 @@ ProgramInfo::ProgramInfo(void)
     hostname = "";
     programflags = 0;
     transcoder = 0;
+    audioProp = 0;
+    videoProp = 0;
+    subtitleType = 0;
 
     startts = mythCurrentDateTime();
     endts = startts;
@@ -218,6 +221,9 @@ ProgramInfo &ProgramInfo::clone(const ProgramInfo &other)
     playgroup = QDeepCopy<QString>(other.playgroup);
     programflags = other.programflags;
     transcoder = other.transcoder;
+    audioProp = other.audioProp;
+    videoProp = other.videoProp;
+    subtitleType = other.subtitleType;
 
     hasAirDate = other.hasAirDate;
     repeat = other.repeat;
@@ -320,11 +326,14 @@ void ProgramInfo::ToStringList(QStringList &list) const
     DATETIME_TO_LIST(lastmodified)
     FLOAT_TO_LIST(stars)
     DATE_TO_LIST(originalAirDate)
-    INT_TO_LIST(hasAirDate)     
+    INT_TO_LIST(hasAirDate)
     STR_TO_LIST((playgroup != "") ? playgroup : "Default")
     INT_TO_LIST(recpriority2)
     INT_TO_LIST(parentid)
     STR_TO_LIST((storagegroup != "") ? storagegroup : "Default")
+    INT_TO_LIST(audioProp)
+    INT_TO_LIST(videoProp)
+    INT_TO_LIST(subtitleType)
 }
 
 /** \fn ProgramInfo::FromStringList(QStringList&,int)
@@ -423,13 +432,16 @@ bool ProgramInfo::FromStringList(QStringList &list, QStringList::iterator &it)
     INT_FROM_LIST(recpriority2)
     INT_FROM_LIST(parentid)
     STR_FROM_LIST(storagegroup)
+    INT_FROM_LIST(audioProp)
+    INT_FROM_LIST(videoProp)
+    INT_FROM_LIST(subtitleType)
 
     return true;
 }
 
 /** \fn ProgramInfo::ToMap(QMap<QString,QString>&,bool) const
  *  \brief Converts ProgramInfo into QString QMap containing each field
- *         in ProgramInfo converted into lockalized strings.
+ *         in ProgramInfo converted into localized strings.
  */
 void ProgramInfo::ToMap(QMap<QString, QString> &progMap, 
                         bool showrerecord) const
@@ -559,6 +571,10 @@ void ProgramInfo::ToMap(QMap<QString, QString> &progMap,
     progMap["recgroup"] = recgroup;
     progMap["playgroup"] = playgroup;
     progMap["programflags"] = programflags;
+
+    progMap["audioProp"] = audioProp;
+    progMap["videoProp"] = videoProp;
+    progMap["subtitleType"] = subtitleType;
 
     progMap["timedate"] = recstartts.date().toString(dateFormat) + ", " +
                           recstartts.time().toString(timeFormat) + " - " +
@@ -902,6 +918,8 @@ ProgramInfo *ProgramInfo::GetProgramFromRecorded(const QString &channel,
         proginfo->spread = -1;
 
         proginfo->programflags = proginfo->getProgramFlags();
+
+        proginfo->getProgramProperties();
 
         proginfo->recgroup = query.value(26).toString();
         proginfo->storagegroup = query.value(27).toString();
@@ -3434,7 +3452,7 @@ void ProgramInfo::showDetails(void) const
             title_pronounce;
     float stars = 0.0;
     int partnumber = 0, parttotal = 0;
-    int stereo = 0, subtitled = 0, hdtv = 0, closecaptioned = 0, generic = 0;
+    int audioprop = 0, videoprop = 0, subtype = 0, generic = 0;
     bool recorded = false;
 
     if (record == NULL && recordid)
@@ -3453,7 +3471,7 @@ void ProgramInfo::showDetails(void) const
             ptable = "recordedprogram";
 
         query.prepare(QString("SELECT category_type, airdate, stars,"
-                      " partnumber, parttotal, stereo, subtitled, hdtv,"
+                      " partnumber, parttotal, stereo, hdtv,"
                       " closecaptioned, syndicatedepisodenumber, generic,"
                       " showtype, colorcode, title_pronounce"
                       " FROM %1 WHERE chanid = :CHANID AND"
@@ -3470,15 +3488,14 @@ void ProgramInfo::showDetails(void) const
             stars = query.value(2).toDouble();
             partnumber = query.value(3).toInt();
             parttotal = query.value(4).toInt();
-            stereo = query.value(5).toInt();
-            subtitled = query.value(6).toInt();
-            hdtv = query.value(7).toInt();
-            closecaptioned = query.value(8).toInt();
-            epinum = query.value(9).toString();
-            generic = query.value(10).toInt();
-            showtype = query.value(11).toString();
-            colorcode = query.value(12).toString();
-            title_pronounce = QString::fromUtf8(query.value(13).toString());
+            audioprop = query.value(5).toInt();
+            videoprop = query.value(6).toInt();
+            subtype = query.value(7).toInt();
+            epinum = query.value(8).toString();
+            generic = query.value(9).toInt();
+            showtype = query.value(10).toString();
+            colorcode = query.value(11).toString();
+            title_pronounce = QString::fromUtf8(query.value(12).toString());
         }
         else if (!query.isActive())
             MythContext::DBError(LOC + "showDetails", query);
@@ -3539,14 +3556,28 @@ void ProgramInfo::showDetails(void) const
     }
     if (colorcode != "")
         attr += colorcode + ", ";
-    if (hdtv)
-        attr += QObject::tr("HDTV") + ", ";
-    if (closecaptioned)
-        attr += QObject::tr("CC","Closed Captioned") + ", ";
-    if (subtitled)
-        attr += QObject::tr("Subtitled") + ", ";
-    if (stereo)
+
+    if (audioprop == AUD_MONO)
+        attr += QObject::tr("Mono") + ", ";
+    else if (audioprop == AUD_STEREO)
         attr += QObject::tr("Stereo") + ", ";
+    else if (audioprop == AUD_SURROUND)
+        attr += QObject::tr("Surround Sound") + ", ";
+    else if (audioprop == AUD_DOLBY)
+        attr += QObject::tr("Dolby Sound") + ", ";
+
+    if (videoprop == VID_HDTV)
+        attr += QObject::tr("HDTV") + ", ";
+    else if  (videoprop == VID_WIDESCREEN)
+        attr += QObject::tr("Widescreen") + ", ";
+
+    if (subtype == SUB_HARDHEAR)
+        attr += QObject::tr("CC","Closed Captioned") + ", ";
+    else if (subtype == SUB_NORMAL)
+        attr += QObject::tr("Subtitles Available") + ", ";
+    else if (subtype == SUB_ONSCREEN)
+        attr += QObject::tr("Subtitled") + ", ";
+
     if (generic && category_type == "series")
         attr += QObject::tr("Unidentified Episode") + ", ";
     else if (repeat)
@@ -3845,7 +3876,7 @@ void ProgramInfo::showDetails(void) const
 }
 
 /** \fn ProgramInfo::getProgramFlags(void) const
- *  \brief Returns a bitmap of which jobs have been completed for recording.
+ *  \brief Returns a bitmap of the recorded programmes flags
  *  \sa GetAutoRunJobs(void)
  */
 int ProgramInfo::getProgramFlags(void) const
@@ -3854,8 +3885,7 @@ int ProgramInfo::getProgramFlags(void) const
     MSqlQuery query(MSqlQuery::InitCon());
 
     query.prepare("SELECT commflagged, cutlist, autoexpire, "
-                  "editing, bookmark, stereo, closecaptioned, "
-                  "hdtv, watched, preserve "
+                  "editing, bookmark, watched, preserve "
                   "FROM recorded LEFT JOIN recordedprogram ON "
                   "(recorded.chanid = recordedprogram.chanid AND "
                   "recorded.progstart = recordedprogram.starttime) "
@@ -3874,14 +3904,33 @@ int ProgramInfo::getProgramFlags(void) const
             (query.value(0).toInt() == COMM_FLAG_PROCESSING))
             flags |= FL_EDITING;
         flags |= (query.value(4).toInt() == 1) ? FL_BOOKMARK : 0;
-        flags |= (query.value(5).toInt() == 1) ? FL_STEREO : 0;
-        flags |= (query.value(6).toInt() == 1) ? FL_CC : 0;
-        flags |= (query.value(7).toInt() == 1) ? FL_HDTV : 0;
-        flags |= (query.value(8).toInt() == 1) ? FL_WATCHED : 0;
-        flags |= (query.value(9).toInt() == 1) ? FL_PRESERVED : 0;
+        flags |= (query.value(5).toInt() == 1) ? FL_WATCHED : 0;
+        flags |= (query.value(6).toInt() == 1) ? FL_PRESERVED : 0;
     }
 
     return flags;
+}
+
+void ProgramInfo::getProgramProperties(void)
+{
+
+    MSqlQuery query(MSqlQuery::InitCon());
+
+    query.prepare("SELECT stereo, hdtv, closecaptioned "
+                  "FROM recorded LEFT JOIN recordedprogram ON "
+                  "(recorded.chanid = recordedprogram.chanid AND "
+                  "recorded.progstart = recordedprogram.starttime) "
+                  "WHERE recorded.chanid = :CHANID AND recorded.starttime = :STARTTIME ;");
+    query.bindValue(":CHANID", chanid);
+    query.bindValue(":STARTTIME", recstartts);
+
+    if (query.exec() && query.isActive() && query.size() > 0)
+    {
+        audioProp = query.value(0).toInt();
+        videoProp = query.value(1).toInt();
+        subtitleType = query.value(2).toInt();
+    }
+
 }
 
 void ProgramInfo::UpdateInUseMark(bool force)
@@ -4735,9 +4784,6 @@ bool ProgramList::FromRecorded( bool bDescending, ProgramList *pSchedList )
             flags |=  query.value(11).toString().length() > 1 ? FL_CUTLIST  : 0;
             flags |=  query.value(12).toInt()                 ? FL_AUTOEXP  : 0;
             flags |=  query.value(14).toString().length() > 1 ? FL_BOOKMARK : 0;
-            flags |= (query.value(32).toInt() == 1)           ? FL_STEREO   : 0;
-            flags |= (query.value(34).toInt() == 1)           ? FL_CC       : 0;
-            flags |= (query.value(33).toInt() == 1)           ? FL_HDTV     : 0;
             flags |= (query.value(35).toInt() == 1)           ? FL_WATCHED  : 0;
 
             inUseKey = query.value(0).toString() + " " +
@@ -4759,6 +4805,11 @@ bool ProgramList::FromRecorded( bool bDescending, ProgramList *pSchedList )
             }
 
             proginfo->programflags = flags;
+
+            proginfo->audioProp = query.value(32).toInt();
+            proginfo->videoProp = query.value(33).toInt();
+            proginfo->subtitleType = query.value(34).toInt();
+
             proginfo->category     = QString::fromUtf8(query.value(15).toString());
             proginfo->recgroup     = query.value(16).toString();
             proginfo->playgroup    = query.value(27).toString();

@@ -223,7 +223,7 @@ class MPUBLIC MythPrivRequest
  *       mythtv/bindings/perl/MythTV.pm (version number)
  *       mythtv/bindings/perl/MythTV/Program.pm (layout)
  */
-#define MYTH_PROTO_VERSION "34"
+#define MYTH_PROTO_VERSION "35"
 
 /** \class MythContext
  *  \brief This class contains the runtime context for MythTV.
@@ -243,7 +243,7 @@ class MPUBLIC MythContext : public QObject, public MythObservable,
     MythContext(const QString &binversion);
     virtual ~MythContext();
 
-    bool Init(bool gui = true);
+    bool Init(bool gui = true, DatabaseParams *pParams = NULL );
 
     QString GetMasterHostPrefix(void);
 

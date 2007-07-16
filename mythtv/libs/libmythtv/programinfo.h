@@ -52,12 +52,30 @@ enum FlagMask {
     FL_BOOKMARK       = 0x0010,
     FL_INUSERECORDING = 0x0020,
     FL_INUSEPLAYING   = 0x0040,
-    FL_STEREO         = 0x0080,
-    FL_CC             = 0x0100,
-    FL_HDTV           = 0x0200,
     FL_TRANSCODED     = 0x0400,
     FL_WATCHED        = 0x0800,
     FL_PRESERVED      = 0x1000,
+};
+
+enum AudioProps {
+    AUD_UNKNOWN       = 0, // For backwards compatibility do not change 0 or 1
+    AUD_STEREO        = 1,
+    AUD_MONO          = 2,
+    AUD_SURROUND      = 3,
+    AUD_DOLBY         = 4
+};
+
+enum VideoProps {
+    VID_UNKNOWN       = 0, // For backwards compatibility do not change 0 or 1
+    VID_HDTV          = 1,
+    VID_WIDESCREEN    = 2
+};
+
+enum SubtitleTypes {
+    SUB_UNKNOWN       = 0, // For backwards compatibility do not change 0 or 1
+    SUB_HARDHEAR      = 1,
+    SUB_NORMAL        = 2,
+    SUB_ONSCREEN      = 3
 };
 
 enum RecStatusType {
@@ -202,6 +220,7 @@ class MPUBLIC ProgramInfo
     bool GetPreserveEpisodeFromRecorded(void) const;
     bool UsesMaxEpisodes(void) const;
     int getProgramFlags(void) const;
+    void getProgramProperties(void);
     bool GetChannel(QString &channum, QString &input) const;
     QString GetFileName(void) const { return pathname; }
     QString toString(void) const;
@@ -333,9 +352,12 @@ class MPUBLIC ProgramInfo
     int findid;
 
     int programflags;
+    int subtitleType;
+    int videoProp;
+    int audioProp;
     int transcoder;
     QString chanOutputFilters;
-    
+
     QString seriesid;
     QString programid;
     QString catType;

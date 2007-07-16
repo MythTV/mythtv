@@ -13,6 +13,7 @@
 
 // libmythtv headers
 #include "programdata.h"
+#include "programinfo.h"
 
 // filldata headers
 #include "channeldata.h"
@@ -226,7 +227,12 @@ void parseVideo(QDomElement &element, ProgInfo *pginfo)
             if (info.tagName() == "quality")
             {
                 if (getFirstText(info) == "HDTV")
-                        pginfo->hdtv = true;
+                    pginfo->videoproperties = VID_HDTV;
+            }
+            else if (info.tagName() == "aspect")
+            {
+                if (getFirstText(info) == "16:9")
+                    pginfo->videoproperties = VID_WIDESCREEN;
             }
         }
     }
@@ -244,14 +250,20 @@ void parseAudio(QDomElement &element, ProgInfo *pginfo)
             {
                 if (getFirstText(info) == "mono")
                 {
-                    pginfo->stereo = false;
+                    pginfo->audioproperties = AUD_MONO;
                 }
-                else if (getFirstText(info) == "stereo" ||
-                        getFirstText(info) == "dolby" ||
-                        getFirstText(info) == "dolby digital" ||
-                        getFirstText(info) == "surround")
+                else if (getFirstText(info) == "stereo")
                 {
-                    pginfo->stereo = true;
+                    pginfo->audioproperties = AUD_STEREO;
+                }
+                else if (getFirstText(info) == "dolby" ||
+                        getFirstText(info) == "dolby digital")
+                {
+                    pginfo->audioproperties = AUD_DOLBY;
+                }
+                else if (getFirstText(info) == "surround")
+                {
+                    pginfo->audioproperties = AUD_SURROUND;
                 }
             }
         }
@@ -263,9 +275,10 @@ ProgInfo *XMLTVParser::parseProgram(
 {
     QString uniqueid, seriesid, season, episode;
     ProgInfo *pginfo = new ProgInfo;
- 
-    pginfo->previouslyshown = pginfo->stereo = pginfo->subtitled =
-    pginfo->hdtv = pginfo->closecaptioned = false;
+
+    pginfo->previouslyshown = false;
+
+    pginfo->subtitletype = pginfo->videoproperties = pginfo->audioproperties = 0;
 
     pginfo->subtitle = pginfo->title = pginfo->desc =
     pginfo->category = pginfo->content = pginfo->catType =
@@ -408,11 +421,11 @@ ProgInfo *XMLTVParser::parseProgram(
             }
             else if (info.tagName() == "subtitles" && info.attribute("type") == "teletext")
             {
-                pginfo->closecaptioned = true;
+                pginfo->subtitletype = SUB_NORMAL;
             }
             else if (info.tagName() == "subtitles" && info.attribute("type") == "onscreen")
             {
-                pginfo->subtitled = true;
+                pginfo->subtitletype = SUB_ONSCREEN;
             }
             else if (info.tagName() == "audio")
             {

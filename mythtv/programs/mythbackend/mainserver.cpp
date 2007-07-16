@@ -1189,9 +1189,6 @@ void MainServer::HandleQueryRecordings(QString type, PlaybackSock *pbs)
             flags |= (query.value(11).toInt() == 1) ? FL_CUTLIST : 0;
             flags |= query.value(12).toInt() ? FL_AUTOEXP : 0;
             flags |= (query.value(14).toInt() == 1) ? FL_BOOKMARK : 0;
-            flags |= (query.value(32).toInt() == 1) ? FL_STEREO : 0;
-            flags |= (query.value(33).toInt() == 1) ? FL_HDTV : 0;
-            flags |= (query.value(34).toInt() == 1) ? FL_CC : 0;
             flags |= (query.value(35).toInt() == TRANSCODING_COMPLETE) ?
                       FL_TRANSCODED : 0;
             flags |= (query.value(37).toInt() == 1) ? FL_WATCHED : 0;
@@ -1213,6 +1210,10 @@ void MainServer::HandleQueryRecordings(QString type, PlaybackSock *pbs)
                 else
                     proginfo->SetCommFlagged(COMM_FLAG_NOT_FLAGGED);
             }
+
+            proginfo->audioProp = query.value(32).toInt();
+            proginfo->videoProp = query.value(33).toInt();
+            proginfo->subtitleType = query.value(34).toInt();
 
             proginfo->programflags = flags;
 

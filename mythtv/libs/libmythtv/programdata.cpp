@@ -316,7 +316,7 @@ void ProgramData::handlePrograms(
                               "stars >= (:STARS - 0.001) AND stars <= (:STARS + 0.001) AND "
                               "previouslyshown=:PREVIOUSLYSHOWN AND "
                               "title_pronounce=:TITLE_PRONOUNCE AND "
-                              "stereo=:STEREO AND subtitled=:SUBTITLED AND "
+                              "stereo=:STEREO AND "
                               "hdtv=:HDTV AND "
                               "closecaptioned=:CLOSECAPTIONED AND "
                               "partnumber=:PARTNUMBER AND "
@@ -338,10 +338,9 @@ void ProgramData::handlePrograms(
                 query.bindValue(":STARS", (*i).stars.utf8());
                 query.bindValue(":PREVIOUSLYSHOWN", (*i).previouslyshown);
                 query.bindValue(":TITLE_PRONOUNCE", (*i).title_pronounce.utf8());
-                query.bindValue(":STEREO", (*i).stereo);
-                query.bindValue(":SUBTITLED", (*i).subtitled);
-                query.bindValue(":HDTV", (*i).hdtv);
-                query.bindValue(":CLOSECAPTIONED", (*i).closecaptioned);
+                query.bindValue(":STEREO", (*i).audioproperties);
+                query.bindValue(":HDTV", (*i).videoproperties);
+                query.bindValue(":CLOSECAPTIONED", (*i).subtitletype);
                 query.bindValue(":PARTNUMBER", (*i).partnumber);
                 query.bindValue(":PARTTOTAL", (*i).parttotal);
                 query.bindValue(":SERIESID", (*i).seriesid);
@@ -417,14 +416,14 @@ void ProgramData::handlePrograms(
                 query.prepare("INSERT INTO program (chanid,starttime,endtime,"
                               "title,subtitle,description,category,"
                               "category_type,airdate,stars,previouslyshown,"
-                              "title_pronounce,stereo,subtitled,hdtv,"
+                              "title_pronounce,stereo,hdtv,"
                               "closecaptioned,partnumber,parttotal,"
                               "seriesid,originalairdate,showtype,colorcode,"
                               "syndicatedepisodenumber,programid) "
                               "VALUES(:CHANID,:STARTTIME,:ENDTIME,:TITLE,"
                               ":SUBTITLE,:DESCRIPTION,:CATEGORY,:CATEGORY_TYPE,"
                               ":AIRDATE,:STARS,:PREVIOUSLYSHOWN,"
-                              ":TITLE_PRONOUNCE,:STEREO,:SUBTITLED,:HDTV,"
+                              ":TITLE_PRONOUNCE,:STEREO,:HDTV,"
                               ":CLOSECAPTIONED,:PARTNUMBER,:PARTTOTAL,"
                               ":SERIESID,:ORIGINALAIRDATE,:SHOWTYPE,:COLORCODE,"
                               ":SYNDICATEDEPISODENUMBER,:PROGRAMID);");
@@ -440,10 +439,9 @@ void ProgramData::handlePrograms(
                 query.bindValue(":STARS", (*i).stars.utf8());
                 query.bindValue(":PREVIOUSLYSHOWN", (*i).previouslyshown);
                 query.bindValue(":TITLE_PRONOUNCE", (*i).title_pronounce.utf8());
-                query.bindValue(":STEREO", (*i).stereo);
-                query.bindValue(":SUBTITLED", (*i).subtitled);
-                query.bindValue(":HDTV", (*i).hdtv);
-                query.bindValue(":CLOSECAPTIONED", (*i).closecaptioned);
+                query.bindValue(":STEREO", (*i).audioproperties);
+                query.bindValue(":HDTV", (*i).videoproperties);
+                query.bindValue(":CLOSECAPTIONED", (*i).subtitletype);
                 query.bindValue(":PARTNUMBER", (*i).partnumber);
                 query.bindValue(":PARTTOTAL", (*i).parttotal);
                 query.bindValue(":SERIESID", (*i).seriesid);

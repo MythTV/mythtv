@@ -851,9 +851,6 @@ void PlaybackBox::updateProgramInfo(QPainter *p, QRect& pr, QPixmap& pix)
         iconMap["bookmark"]    = FL_BOOKMARK;
         iconMap["inuse"]       = (FL_INUSERECORDING | FL_INUSEPLAYING);
         iconMap["transcoded"]  = FL_TRANSCODED;
-        iconMap["stereo"]      = FL_STEREO;
-        iconMap["cc"]          = FL_CC;
-        iconMap["hdtv"]        = FL_HDTV;
         iconMap["watched"]     = FL_WATCHED;
         iconMap["preserved"]   = FL_PRESERVED;
 
@@ -868,6 +865,64 @@ void PlaybackBox::updateProgramInfo(QPainter *p, QRect& pr, QPixmap& pix)
                 else
                     itype->hide();
             }
+        }
+
+        iconMap.clear();
+
+        if (curitem)
+        {
+
+            iconMap["mono"] = AUD_MONO;
+            iconMap["stereo"] = AUD_STEREO;
+            iconMap["dolby"]  = AUD_DOLBY;
+
+            for (it = iconMap.begin(); it != iconMap.end(); ++it)
+            {
+                itype = (UIImageType *)container->GetType(it.key());
+                if (itype)
+                {
+                    if (curitem->audioProp == it.data())
+                        itype->show();
+                    else
+                        itype->hide();
+                }
+            }
+
+            iconMap.clear();
+
+            iconMap["widescreen"] = VID_WIDESCREEN;
+            iconMap["hdtv"] = VID_HDTV;
+
+            for (it = iconMap.begin(); it != iconMap.end(); ++it)
+            {
+                itype = (UIImageType *)container->GetType(it.key());
+                if (itype)
+                {
+                    if (curitem->videoProp == it.data())
+                        itype->show();
+                    else
+                        itype->hide();
+                }
+            }
+
+            iconMap.clear();
+
+            iconMap["cc"] = SUB_HARDHEAR;
+            iconMap["subtitles"] = SUB_NORMAL;
+            iconMap["onscreensub"] = SUB_ONSCREEN;
+
+            for (it = iconMap.begin(); it != iconMap.end(); ++it)
+            {
+                itype = (UIImageType *)container->GetType(it.key());
+                if (itype)
+                {
+                    if (curitem->subtitleType == it.data())
+                        itype->show();
+                    else
+                        itype->hide();
+                }
+            }
+
         }
 
         container->Draw(&tmp, 6, (type == Delete) ? 1 : 0);

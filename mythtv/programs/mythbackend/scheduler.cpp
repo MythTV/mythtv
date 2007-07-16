@@ -2407,12 +2407,10 @@ void Scheduler::AddNewRecords(void)
         p->parentid = result.value(34).toInt();
         p->findid = result.value(35).toInt();
 
-        if (result.value(39).toInt())
-            p->programflags |= FL_HDTV;
-        if (result.value(40).toInt())
-            p->programflags |= FL_CC;
-        if (result.value(41).toInt())
-            p->programflags |= FL_STEREO;
+
+        p->videoProp = result.value(39).toInt();
+        p->subtitleType = result.value(40).toInt();
+        p->audioProp = result.value(41).toInt();
 
         if (!recTypeRecPriorityMap.contains(p->rectype))
             recTypeRecPriorityMap[p->rectype] = 
