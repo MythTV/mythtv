@@ -20,6 +20,19 @@
 // NOTE: if this changes, you _MUST_ update the RecTypePriority function 
 // in recordingtypes.cpp.
 
+class ScheduledRecordingDialog : public ConfigurationDialog
+{
+  public:
+    ScheduledRecordingDialog(ScheduledRecording *sr) : schedrec(sr)
+        { addChild(schedrec); }
+
+    virtual MythDialog *dialogWidget(
+        MythMainWindow *parent,
+        const char     *widgetName = "ScheduledRecordingDialog");
+
+    ScheduledRecording *schedrec;
+};
+
 ScheduledRecording::ScheduledRecording() :
     ConfigurationGroup(true, true, false, false)
 {
@@ -664,19 +677,6 @@ void ScheduledRecording::fillSelections(SelectSetting* setting)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-
-class ScheduledRecordingDialog : public ConfigurationDialog
-{
-  public:
-    ScheduledRecordingDialog(ScheduledRecording *sr) : schedrec(sr)
-        { addChild(schedrec); }
-
-    virtual MythDialog *dialogWidget(
-        MythMainWindow *parent,
-        const char     *widgetName = "ScheduledRecordingDialog");
-
-    ScheduledRecording *schedrec;
-};
 
 MythDialog *ScheduledRecordingDialog::dialogWidget(
     MythMainWindow *parent, const char *name)
