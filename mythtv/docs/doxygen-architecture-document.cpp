@@ -673,3 +673,18 @@ This includes information on constructing callgraphs, producing
 an annotated versions of the code, and saving results.
 
 */
+
+// The file ac3.h in ffmpeg contains no Doxygen markup,
+// but for some reason generates the following modules:
+// * Coded elements
+// * Derived values
+//
+// They add nothing useful to this programmer doco, so I camouflage these
+// by manually defining the block here. Same for Macroblock stuff from vc1.c
+
+/**
+ @defgroup coded   .
+ @defgroup derived .
+ @defgroup block   .
+ @defgroup std_mb  .
+ */
