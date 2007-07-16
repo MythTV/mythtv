@@ -875,6 +875,7 @@ void PlaybackBox::updateProgramInfo(QPainter *p, QRect& pr, QPixmap& pix)
             iconMap["mono"] = AUD_MONO;
             iconMap["stereo"] = AUD_STEREO;
             iconMap["dolby"]  = AUD_DOLBY;
+            iconMap["surround"]  = AUD_SURROUND;
 
             for (it = iconMap.begin(); it != iconMap.end(); ++it)
             {
