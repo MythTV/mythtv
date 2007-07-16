@@ -4385,6 +4385,7 @@ void PlaybackBox::showIconHelp(void)
     iconMap["hdtv"]        = tr("Recording is in High Definition");
     iconMap["widescreen"]  = tr("Recording is in WideScreen");
 
+    iconMap["watched"]     = tr("Recording has been watched");
     iconMap["preserved"]   = tr("Recording is preserved");
 
     for (it = iconMap.begin(); it != iconMap.end(); ++it)
