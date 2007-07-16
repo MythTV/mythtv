@@ -30,6 +30,7 @@ using namespace std;
 
 // Apple Firewire example headers
 #include <AVCVideoServices/StringLogger.h>
+#include <AVCVideoServices/AVSShared.h>
 #include <AVCVideoServices/MPEG2Receiver.h>
 
 // header not used because it also requires MPEG2Transmitter.h
