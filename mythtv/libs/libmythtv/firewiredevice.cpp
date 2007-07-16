@@ -386,7 +386,7 @@ static void fw_init(QMap<uint64_t,QString> &id_to_model)
     id_to_model[0x1947ULL << 32 | 0x1072] = "SA4200HD";
     id_to_model[0x0f21ULL << 32 | 0x1072] = "SA4200HD";
 
-    const uint64_t motorolla_vendor_ids[] =
+    const uint64_t motorola_vendor_ids[] =
     {   /* 6200 */
         0x0ce5,    0x0e5c,    0x1225,    0x0f9f,    0x1180,
         0x12c9,    0x11ae,    0x152f,    0x14e8,    0x16b5,    0x1371,
@@ -396,25 +396,25 @@ static void fw_init(QMap<uint64_t,QString> &id_to_model)
         /* 6216, 2224 */
         0x17ee,    0x1a66,
     };
-    const uint motorolla_vendor_id_cnt =
-        sizeof(motorolla_vendor_ids) / sizeof(uint32_t);
+    const uint motorola_vendor_id_cnt =
+        sizeof(motorola_vendor_ids) / sizeof(uint32_t);
 
-    const uint32_t motorolla_6200model_ids[] = { 0x620a, 0x6200, };
-    const uint32_t motorolla_6212model_ids[] = { 0x64ca, 0x64cb, };
-    const uint32_t motorolla_6216model_ids[] = { 0x646b, };
+    const uint32_t motorola_6200model_ids[] = { 0x620a, 0x6200, };
+    const uint32_t motorola_6212model_ids[] = { 0x64ca, 0x64cb, };
+    const uint32_t motorola_6216model_ids[] = { 0x646b, };
 
-    for (uint i = 0; i < motorolla_vendor_id_cnt; i++)
+    for (uint i = 0; i < motorola_vendor_id_cnt; i++)
         for (uint j = 0; j < 2; j++)
-            id_to_model[motorolla_vendor_ids[i] << 32 |
-                        motorolla_6200model_ids[j]] = "DCT-6200";
+            id_to_model[motorola_vendor_ids[i] << 32 |
+                        motorola_6200model_ids[j]] = "DCT-6200";
 
-    for (uint i = 0; i < motorolla_vendor_id_cnt; i++)
+    for (uint i = 0; i < motorola_vendor_id_cnt; i++)
         for (uint j = 0; j < 2; j++)
-            id_to_model[motorolla_vendor_ids[i] << 32 |
-                        motorolla_6212model_ids[j]] = "DCT-6212";
+            id_to_model[motorola_vendor_ids[i] << 32 |
+                        motorola_6212model_ids[j]] = "DCT-6212";
 
-    for (uint i = 0; i < motorolla_vendor_id_cnt; i++)
+    for (uint i = 0; i < motorola_vendor_id_cnt; i++)
         for (uint j = 0; j < 2; j++)
-            id_to_model[motorolla_vendor_ids[i] << 32 |
-                        motorolla_6216model_ids[j]] = "DCT-6216";
+            id_to_model[motorola_vendor_ids[i] << 32 |
+                        motorola_6216model_ids[j]] = "DCT-6216";
 }
