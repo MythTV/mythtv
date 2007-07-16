@@ -243,7 +243,7 @@ class MPUBLIC MythContext : public QObject, public MythObservable,
     MythContext(const QString &binversion);
     virtual ~MythContext();
 
-    bool Init(bool gui = true, DatabaseParams *pParams = NULL );
+    bool Init(bool gui = true);
 
     QString GetMasterHostPrefix(void);
 
