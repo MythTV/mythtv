@@ -29,6 +29,7 @@ EITFixUp::EITFixUp()
              "\\[(SL)(,AD){,1}(,(S)){,1}\\]"),
       m_ukYear("[\\[\\(]([\\d]{4})[\\)\\]]"),
       m_uk24ep("^\\d{1,2}:00[ap]m to \\d{1,2}:00[ap]m: "),
+      m_ukStarring("Starring ([\\w\\s\\-]+)[Aa]nd\\s([\\w\\s\\-]+)[\\.|,](?:\\s)*(\\d{4})?(?:\\.\\s)?"),
       m_comHemCountry("^(\\(.+\\))?\\s?([^ ]+)\\s([^\\.0-9]+)"
                       "(?:\\sfrån\\s([0-9]{4}))(?:\\smed\\s([^\\.]+))?\\.?"),
       m_comHemDirector("[Rr]egi"),
@@ -369,6 +370,30 @@ void EITFixUp::FixUK(DBEvent &event) const
             event.description = event.description.mid(position + 2);
         }
     }
+
+    QRegExp tmpStarring = m_ukStarring;
+    if (tmpStarring.search(event.subtitle) != -1)
+    {
+        // If the "Starring..." string got promoted to subtitle move it back.
+        event.description.prepend(". ");
+        event.description.prepend(tmpStarring.cap(0));
+        event.subtitle.replace(tmpStarring.cap(0), "");
+    }
+    tmpStarring = m_ukStarring;
+    if (tmpStarring.search(event.description) != -1)
+    {
+        // if we match this we've captured 2 actors and an (optional) airdate
+        event.AddPerson(DBPerson::kActor, tmpStarring.cap(1));
+        event.AddPerson(DBPerson::kActor, tmpStarring.cap(2));
+        if (tmpStarring.cap(3).length() > 0)
+        {
+            event.airdate = tmpStarring.cap(3);
+            bool ok;
+            uint y = tmpStarring.cap(3).toUInt(&ok);
+            if (ok)
+                event.originalairdate = QDate(y, 1, 1);
+        }
+    }
     // Trim trailing '.'
     event.title.replace(m_ukPEnd, "");
     event.subtitle.replace(m_ukPEnd, "");
@@ -457,6 +482,7 @@ void EITFixUp::FixUK(DBEvent &event) const
         QString stmp = event.description;
         int     itmp = position + tmpUKYear.cap(0).length();
         event.description = stmp.left(position) + stmp.mid(itmp);
+        event.airdate = tmpUKYear.cap(1);
         bool ok;
         uint y = tmpUKYear.cap(1).toUInt(&ok);
         if (ok)

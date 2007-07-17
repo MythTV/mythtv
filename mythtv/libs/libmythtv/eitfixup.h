@@ -85,6 +85,7 @@ class EITFixUp
     const QRegExp m_ukCC;
     const QRegExp m_ukYear;
     const QRegExp m_uk24ep;
+    const QRegExp m_ukStarring;
     const QRegExp m_comHemCountry;
     const QRegExp m_comHemDirector;
     const QRegExp m_comHemActor;
