@@ -21,7 +21,7 @@
 #include "zmclient.h"
 
 // the protocol version we understand
-#define ZM_PROTOCOL_VERSION "3"
+#define ZM_PROTOCOL_VERSION "4"
 
 #define BUFFER_SIZE  (2048*1536*3)
 
@@ -415,6 +415,19 @@ void ZMClient::deleteEvent(int eventID)
     sendReceiveStringList(strList);
 }
 
+void ZMClient::deleteEventList(vector<Event*> *eventList)
+{
+    QStringList strList = "DELETE_EVENT_LIST";
+
+    vector<Event*>::iterator it;
+    for (it = eventList->begin(); it != eventList->end(); it++)
+    {
+       strList << QString::number((*it)->eventID);
+    }
+
+    sendReceiveStringList(strList);
+}
+
 bool ZMClient::readData(unsigned char *data, int dataSize)
 {
     Q_LONG read = 0;
@@ -501,6 +514,37 @@ void ZMClient::getEventFrame(int monitorID, int eventID, int frameNo, QImage &im
     if (!image.loadFromData(data, imageSize, "JPEG"))
     {
         VERBOSE(VB_GENERAL, "ZMClient::getEventFrame(): Failed to load image from data");
+        image = QImage();
+    }
+}
+
+void ZMClient::getAnalyseFrame(int monitorID, int eventID, int frameNo, QImage &image)
+{
+    QStringList strList = "GET_ANALYSE_FRAME";
+    strList << QString::number(monitorID);
+    strList << QString::number(eventID);
+    strList << QString::number(frameNo);
+    if (!sendReceiveStringList(strList))
+    {
+        image = QImage();
+        return;
+    }
+
+    // get frame length from data
+    int imageSize = strList[1].toInt();
+
+    // grab the image data
+    unsigned char *data = new unsigned char[imageSize];
+    if (!readData(data, imageSize))
+    {
+        VERBOSE(VB_GENERAL, "ZMClient::getAnalyseFrame(): Failed to get image data");
+        image = QImage();
+    }
+
+    // extract the image data and create a QImage from it
+    if (!image.loadFromData(data, imageSize, "JPEG"))
+    {
+        VERBOSE(VB_GENERAL, "ZMClient::getAnalyseFrame(): Failed to load image from data");
         image = QImage();
     }
 }

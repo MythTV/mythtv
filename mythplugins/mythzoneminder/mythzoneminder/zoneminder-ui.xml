@@ -250,6 +250,24 @@
           <bold>yes</bold>
       </font>
 
+      <font name="subtitle_active" face="Arial">
+          <color>#ffffff</color>
+          <size>14</size>
+          <bold>no</bold>
+      </font>
+
+      <font name="subtitle_inactive" face="Arial">
+          <color>#9999cc</color>
+          <size>14</size>
+          <bold>no</bold>
+      </font>
+
+      <font name="subtitle_selected" face="Arial">
+          <color>#ff0000</color>
+          <size>14</size>
+          <bold>no</bold>
+      </font>
+
       <container name="info"> 
 
           <area>0,0,800,530</area>
@@ -302,79 +320,108 @@
           </textarea>
 
           <textarea name="title" draworder="4" align="left">
+              <context>1</context>
               <area>40,150,130,30</area>
               <font>listlabel</font>
               <value>Event Name</value>
           </textarea>
 
           <textarea name="title" draworder="4" align="left">
+              <context>1</context>
               <area>180,150,130,30</area>
               <font>listlabel</font>
               <value>Camera</value>
           </textarea>
 
           <textarea name="title" draworder="4" align="left">
+              <context>1</context>
               <area>385,150,130,30</area>
               <font>listlabel</font>
               <value>Date/Time</value>
           </textarea>
 
           <textarea name="title" draworder="4" align="left">
+              <context>1</context>
               <area>650,150,130,30</area>
               <font>listlabel</font>
               <value>Length</value>
           </textarea>
 
-            <image name="image" draworder="0">
-                <position>25,170</position>
-                <filename>trans-cr-background.png</filename>
-                <staticsize>750,375</staticsize>
-            </image>
+          <image name="image" draworder="0">
+              <context>1</context>
+              <position>25,170</position>
+              <filename>trans-cr-background.png</filename>
+              <staticsize>750,375</staticsize>
+          </image>
 
-            <listarea name="event_list" draworder="4">
-                <area>40,182,740,300</area>
-                <fcnfont name="active" function="active"></fcnfont>
-                <fcnfont name="inactive" function="inactive"></fcnfont>
-                <fcnfont name="selected" function="selected"></fcnfont>
-                <columnpadding>10</columnpadding>
-                <column number="1" width="130" context="-1"></column>
-                <column number="2" width="195" context="-1"></column>
-                <column number="3" width="255" context="-1"></column>
-                <column number="4" width="100" context="-1"></column>
-                <items>9</items>
-                <image function="selectionbar" filename="selectbar.png" location="-2,0"></image>
-                <image function="uparrow" filename="uparrow.png" location="735,190"></image>
-                <image function="downarrow" filename="downarrow.png" location="735,430"></image>
-            </listarea>
+          <listarea name="event_list" draworder="4">
+              <context>1</context>
+              <area>40,182,740,300</area>
+              <fcnfont name="active" function="active"></fcnfont>
+              <fcnfont name="inactive" function="inactive"></fcnfont>
+              <fcnfont name="selected" function="selected"></fcnfont>
+              <columnpadding>10</columnpadding>
+              <column number="1" width="130" context="-1"></column>
+              <column number="2" width="195" context="-1"></column>
+              <column number="3" width="255" context="-1"></column>
+              <column number="4" width="100" context="-1"></column>
+              <items>9</items>
+              <image function="selectionbar" filename="selectbar.png" location="-2,0"></image>
+              <image function="uparrow" filename="uparrow.png" location="735,190"></image>
+              <image function="downarrow" filename="downarrow.png" location="735,430"></image>
+          </listarea>
 
-            <image name="showinglines" draworder="5" fleximage="no">
-                <filename>rk-lines.png</filename>
-                <position>25,170</position>
-                <staticsize>750,335</staticsize>
-            </image>
+          <image name="showinglines" draworder="5" fleximage="no">
+              <context>1</context>
+              <filename>rk-lines.png</filename>
+              <position>25,170</position>
+              <staticsize>750,335</staticsize>
+          </image>
 
-        </container>
+          <imagegrid name="event_grid" draworder="0">
+              <context>2</context>
+              <area>35,150,725,370</area>
+              <textposition>bottom</textposition>
+              <textheight>30</textheight>
+              <columncount>3</columncount>
+              <rowcount>2</rowcount>
+              <cutdown>yes</cutdown>
+              <showchecks>no</showchecks>
+              <showselected>no</showselected>
+              <showscrollarrows>yes</showscrollarrows>
+              <align>allcenter</align>
+              <padding>10</padding>
+              <multiline>no</multiline>
+              <activefont>subtitle_active</activefont>
+              <inactivefont>subtitle_inactive</inactivefont>
+              <selectedfont>subtitle_selected</selectedfont>
+              <image function="normal" filename="mz_browser_back_reg.png"></image>
+              <image function="highlighted" filename="mz_browser_back_sel.png"></image>
+              <image function="selected" filename="mz_browser_back_sel.png"></image>
+              <image function="default" filename="mz_testcard.png"></image>
+          </imagegrid>
+      </container>
 
-        <container name="buttons">
-            <area>0,530,800,50</area>
+      <container name="buttons">
+          <area>0,530,800,50</area>
 
-            <textbutton name="play_button" draworder="1">
-                <position>35,0</position>
-                <image function="on" filename="text_button_on.png"></image>
-                <image function="off" filename="text_button_off.png"></image>
-                <image function="pushed" filename="text_button_pushed.png"></image>
-                <font>buttons</font>
-            </textbutton>
+          <textbutton name="play_button" draworder="1">
+              <position>35,0</position>
+              <image function="on" filename="text_button_on.png"></image>
+              <image function="off" filename="text_button_off.png"></image>
+              <image function="pushed" filename="text_button_pushed.png"></image>
+              <font>buttons</font>
+          </textbutton>
 
-            <textbutton name="delete_button" draworder="1">
-                <position>610,0</position>
-                <image function="on" filename="text_button_on.png"></image>
-                <image function="off" filename="text_button_off.png"></image>
-                <image function="pushed" filename="text_button_pushed.png"></image>
-                <font>buttons</font>
-            </textbutton>
+          <textbutton name="delete_button" draworder="1">
+              <position>610,0</position>
+              <image function="on" filename="text_button_on.png"></image>
+              <image function="off" filename="text_button_off.png"></image>
+              <image function="pushed" filename="text_button_pushed.png"></image>
+              <font>buttons</font>
+          </textbutton>
 
-        </container>
+      </container>
 
    </window>
 

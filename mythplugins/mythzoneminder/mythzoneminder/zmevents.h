@@ -40,7 +40,7 @@ public:
     void deletePressed(void);
     void setCamera(int item);
     void setDate(int item);
-    void updateTimeout(void);
+    void gridItemChanged(ImageGridItem *item);
 
   private:
     void wireUpTheme(void);
@@ -52,6 +52,13 @@ public:
     void eventListUp(bool page);
     void getCameraList(void);
     void getDateList(void);
+    void setView(bool gridView);
+    void setGridLayout(int layout);
+    void showMenu(void);
+
+    void updateImageGrid();
+    QPixmap *createScaledPixmap(QString filename, int width, int height,
+                                QImage::ScaleMode mode);
 
     bool                 m_oldestFirst;
     int                  m_currentEvent;
@@ -62,13 +69,13 @@ public:
     UIListType          *m_event_list;
     UITextType          *m_eventNoText;
 
+    UIImageGridType     *m_eventGrid;
+
     UITextButtonType    *m_playButton;
     UITextButtonType    *m_deleteButton;
 
     UISelectorType      *m_cameraSelector;
     UISelectorType      *m_dateSelector;
-
-    QTimer              *m_updateTimer;
 };
 
 #endif

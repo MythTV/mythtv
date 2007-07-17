@@ -134,15 +134,18 @@ class ZMServer
     void handleGetCameraList(void);
     void handleGetEventList(vector<string> tokens);
     void handleGetEventFrame(vector<string> tokens);
+    void handleGetAnalyseFrame(vector<string> tokens);
     void handleGetLiveFrame(vector<string> tokens);
     void handleGetFrameList(vector<string> tokens);
     void handleDeleteEvent(vector<string> tokens);
+    void handleDeleteEventList(vector<string> tokens);
     void handleGetEventDates(vector<string> tokens);
 
     bool                 m_debug;
     int                  m_sock;
     map<int, MONITOR *>  m_monitors;
     string               m_eventFileFormat;
+    string               m_analyseFileFormat;
     key_t                m_shmKey;
 };
 

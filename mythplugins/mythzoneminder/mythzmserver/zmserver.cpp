@@ -39,7 +39,7 @@
 #include "zmserver.h"
 
 // the version of the protocol we understand
-#define ZM_PROTOCOL_VERSION "3"
+#define ZM_PROTOCOL_VERSION "4"
 
 // the maximum image size we are ever likely to get from ZM
 #define MAX_IMAGE_SIZE  (2048*1536*3)
@@ -215,6 +215,12 @@ ZMServer::ZMServer(int sock, bool debug)
     if (m_debug)
         cout << "Event file format is: " << m_eventFileFormat << endl;
 
+    // get the analyse filename format
+    snprintf(buf, sizeof(buf), "%%0%dd-analyse.jpg", eventDigits);
+    m_analyseFileFormat = buf;
+    if (m_debug)
+        cout << "Analyse file format is: " << m_analyseFileFormat << endl;
+
     getMonitorList();
 }
 
@@ -279,6 +285,8 @@ void ZMServer::processRequest(char* buf, int nbytes)
         handleGetEventDates(tokens);
     else if (tokens[0] == "GET_EVENT_FRAME")
         handleGetEventFrame(tokens);
+    else if (tokens[0] == "GET_ANALYSE_FRAME")
+        handleGetAnalyseFrame(tokens);
     else if (tokens[0] == "GET_LIVE_FRAME")
         handleGetLiveFrame(tokens);
     else if (tokens[0] == "GET_FRAME_LIST")
@@ -289,6 +297,8 @@ void ZMServer::processRequest(char* buf, int nbytes)
         handleGetMonitorList();
     else if (tokens[0] == "DELETE_EVENT")
         handleDeleteEvent(tokens);
+    else if (tokens[0] == "DELETE_EVENT_LIST")
+        handleDeleteEventList(tokens);
     else
         send("UNKNOWN_COMMAND");
 }
@@ -762,6 +772,102 @@ void ZMServer::handleGetEventFrame(vector<string> tokens)
     send(outStr, buffer, fileSize);
 }
 
+void ZMServer::handleGetAnalyseFrame(vector<string> tokens)
+{
+    static unsigned char buffer[MAX_IMAGE_SIZE];
+    char str[100];
+
+    if (tokens.size() != 4)
+    {
+        sendError(ERROR_TOKEN_COUNT);
+        return;
+    }
+
+    string monitorID(tokens[1]);
+    string eventID(tokens[2]);
+    int frameNo = atoi(tokens[3].c_str());
+
+    if (m_debug)
+        cout << "Getting anaylse frame " << frameNo << " for event " << eventID 
+             << " on monitor " << monitorID << endl;
+
+    // get the 'alarm' frames from the Frames table for this event
+    MYSQL_RES *res;
+    MYSQL_ROW row = NULL;
+
+    string sql("");
+    sql += "SELECT FrameId FROM Frames ";
+    sql += "WHERE EventID = " + eventID + " ";
+    sql += "AND Type = 'Alarm' ";
+    sql += "ORDER BY FrameID";
+
+    if (mysql_query(&g_dbConn, sql.c_str()))
+    {
+        fprintf(stderr, "%s\n", mysql_error(&g_dbConn));
+        sendError(ERROR_MYSQL_QUERY);
+        return;
+    }
+
+    res = mysql_store_result(&g_dbConn);
+    int frameCount = mysql_num_rows(res);
+    int frameID;
+
+    // if the required frame mumber is 0 or out of bounds then use the middle frame
+    if (frameNo == 0 || frameNo < 0 || frameNo > frameCount)
+        frameNo = (frameCount / 2) + 1;
+
+    // move to the required frame in the table
+    for (int x = 0; x < frameNo; x++)
+    {
+        row = mysql_fetch_row(res);
+    }
+
+    if (row)
+    {
+        frameID = atoi(row[0]);
+    }
+    else
+    {
+        cout << "Failed to get mysql row" << endl;
+        sendError(ERROR_MYSQL_ROW);
+        return;
+    }
+
+    string outStr("");
+
+    ADD_STR(outStr, "OK")
+
+    // try to find the analyse frame file
+    string filepath("");
+    filepath = g_webPath + "/events/" + monitorID + "/" + eventID + "/";
+    sprintf(str, m_analyseFileFormat.c_str(), frameID); 
+    filepath += str;
+
+    FILE *fd;
+    int fileSize = 0;
+    if ((fd = fopen(filepath.c_str(), "r" )))
+    {
+        fileSize = fread(buffer, 1, sizeof(buffer), fd);
+        fclose(fd);
+    }
+    else
+    {
+        cout << "Can't open " << filepath << ": " << strerror(errno) << endl;
+        sendError(ERROR_FILE_OPEN + string(" - ") + filepath + " : " + strerror(errno));
+        return;
+    }
+
+    if (m_debug)
+        cout << "Frame size: " <<  fileSize << endl;
+
+    // get the file size
+    sprintf(str, "%d", fileSize);
+    ADD_STR(outStr, str)
+
+    // send the data
+    send(outStr, buffer, fileSize);
+}
+
 void ZMServer::handleGetLiveFrame(vector<string> tokens)
 {
     static unsigned char buffer[MAX_IMAGE_SIZE];
@@ -1039,6 +1145,44 @@ void ZMServer::handleDeleteEvent(vector<string> tokens)
     // run zmaudit.pl to clean everything up
     string command(g_binPath + "/zmaudit.pl");
     system(command.c_str());
+    send(outStr);
+}
+
+void ZMServer::handleDeleteEventList(vector<string> tokens)
+{
+    string eventList("");
+    string outStr("");
+
+    vector<string>::iterator it = tokens.begin();
+    it++;
+    while (it != tokens.end())
+    {
+        if (eventList == "")
+            eventList = (*it);
+        else
+            eventList += "," + (*it);
+
+       it++;
+    }
+
+    if (m_debug)
+        cout << "Deleting events: " << eventList << endl;
+
+    string sql("");
+    sql += "DELETE FROM Events WHERE Id IN (" + eventList + ")";
+
+    if (mysql_query(&g_dbConn, sql.c_str()))
+    {
+        fprintf(stderr, "%s\n", mysql_error(&g_dbConn));
+        sendError(ERROR_MYSQL_QUERY);
+        return;
+    }
+
+    // run zmaudit.pl to clean everything up
+    string command(g_binPath + "/zmaudit.pl");
+    system(command.c_str());
+
+    ADD_STR(outStr, "OK")
     send(outStr);
 }
 

@@ -41,7 +41,7 @@ class ZMPlayer : public MythThemedDialog
 
 public:
 
-    ZMPlayer(vector<Event *> *eventList, int currentEvent, MythMainWindow *parent,
+    ZMPlayer(vector<Event *> *eventList, int *currentEvent, MythMainWindow *parent,
              const QString &window_name, const QString &theme_filename,
              const char *name = 0);
     ~ZMPlayer();
@@ -84,7 +84,7 @@ public:
     UITextButtonType     *m_nextButton;
     UITextButtonType     *m_prevButton;
 
-    int                   m_currentEvent;
+    int                  *m_currentEvent;
     vector<Event *>      *m_eventList;
 
     vector<Frame *>      *m_frameList;

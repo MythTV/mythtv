@@ -18,7 +18,6 @@
 #include <qdatetime.h>
 #include <qpainter.h>
 #include <qdir.h>
-#include <qtimer.h>
 #include <qprocess.h>
 
 // myth
@@ -30,8 +29,6 @@
 #include "zmplayer.h"
 #include "zmclient.h"
 
-const int EVENTS_UPDATE_TIME = 1000 * 5; // update the events list every 5 seconds
-
 ZMEvents::ZMEvents(MythMainWindow *parent, 
                 const QString &window_name, const QString &theme_filename, 
                 const char *name)
@@ -41,31 +38,26 @@ ZMEvents::ZMEvents(MythMainWindow *parent,
     m_currentEvent = 0;
     m_eventList = new vector<Event*>;
 
-    m_oldestFirst = (gContext->GetNumSetting("ZoneMinderOldestFirst", 1) == 1);
-
     wireUpTheme();
 
-    m_updateTimer = new QTimer(this);
-
-    connect(m_updateTimer, SIGNAL(timeout()), this,
-            SLOT(updateTimeout()));
-    m_updateTimer->start(EVENTS_UPDATE_TIME);
+    m_oldestFirst = (gContext->GetNumSetting("ZoneMinderOldestFirst", 1) == 1);
+    setView(gContext->GetNumSetting("ZoneMinderGridView", 1) == 2);
+    setGridLayout(gContext->GetNumSetting("ZoneMinderGridLayout", 6));
 
     getCameraList();
     getDateList();
-    updateTimeout();
+    getEventList();
 }
 
 ZMEvents::~ZMEvents()
 {
-    if (m_updateTimer)
-        delete m_updateTimer;
-
     if (!m_eventList)
         delete m_eventList;
 
-    // remember how the user want to display the event list
-    gContext->SetSetting("ZoneMinderOldestFirst", (m_oldestFirst ? "1" : "0"));
+    // remember how the user wants to display the event list
+    gContext->SaveSetting("ZoneMinderOldestFirst", (m_oldestFirst ? "1" : "0"));
+    gContext->SaveSetting("ZoneMinderGridView", getContext());
+    gContext->SaveSetting("ZoneMinderGridLayout",  m_eventGrid->getVisibleCount());
 }
 
 UITextType* ZMEvents::getTextType(QString name)
@@ -88,12 +80,24 @@ void ZMEvents::keyPressEvent(QKeyEvent *e)
 
     bool handled = false;
     QStringList actions;
-    gContext->GetMainWindow()->TranslateKeyPress("Global", e, actions);
+    gContext->GetMainWindow()->TranslateKeyPress("TV Frontend", e, actions);
 
     for (unsigned int i = 0; i < actions.size() && !handled; i++)
     {
         QString action = actions[i];
         handled = true;
+
+        if (getCurrentFocusWidget() == m_eventGrid)
+        {
+            if (action == "ESCAPE")
+            {
+                nextPrevWidgetFocus(true);
+                return;
+            }
+
+            if (m_eventGrid->handleKeyPress(action))
+                return;
+        }
 
         if (action == "UP")
         {
@@ -147,7 +151,8 @@ void ZMEvents::keyPressEvent(QKeyEvent *e)
         }
         else if (action == "SELECT")
         {
-            if (getCurrentFocusWidget() == m_event_list)
+            if (getCurrentFocusWidget() == m_event_list || 
+                getCurrentFocusWidget() == m_eventGrid)
             {
                 if (m_playButton)
                     m_playButton->push();
@@ -163,8 +168,23 @@ void ZMEvents::keyPressEvent(QKeyEvent *e)
         else if (action == "INFO")
         {
             m_oldestFirst = !m_oldestFirst;
-            updateTimeout();
+            getEventList();
         }
+        else if (action == "MENU")
+            showMenu();
+        else if (action == "0")
+        {
+            if (getContext() == 1)
+                setView(true);
+            else
+                setView(false);
+        }
+        else if (action == "1")
+            setGridLayout(1);
+        else if (action == "2")
+            setGridLayout(2);
+        else if (action == "6")
+            setGridLayout(6);
         else
             handled = false;
     }
@@ -181,6 +201,13 @@ void ZMEvents::wireUpTheme()
     {
         m_eventListSize = m_event_list->GetItems();
         m_event_list->SetItemCurrent(0);
+    }
+
+    m_eventGrid = getUIImageGridType("event_grid");
+    if (m_eventGrid)
+    {
+        connect(m_eventGrid, SIGNAL(itemChanged(ImageGridItem *)),
+                this, SLOT(gridItemChanged(ImageGridItem *)));
     }
 
     m_eventNoText = getUITextType("eventno_text");
@@ -241,6 +268,9 @@ void ZMEvents::getEventList(void)
         }
 
         zm->getEventList(monitorName, m_oldestFirst, date, m_eventList);
+
+        updateImageGrid();
+        updateUIList();
     }
 }
 
@@ -322,24 +352,24 @@ void ZMEvents::playPressed(void)
     if (!m_eventList || m_eventList->size() == 0)
         return;
 
-    m_updateTimer->stop();
-
     Event *event = m_eventList->at(m_currentEvent);
     if (event)
     {
-        ZMPlayer *player = new ZMPlayer(m_eventList, m_currentEvent, 
+        ZMPlayer *player = new ZMPlayer(m_eventList, &m_currentEvent, 
                 gContext->GetMainWindow(), "zmplayer", "zoneminder-", "zmplayer");
         player->exec();
         player->deleteLater();
 
-        // update the event list incase some events where deleted in the player
         if (m_currentEvent > (int)m_eventList->size() - 1)
             m_currentEvent = m_eventList->size() - 1;
 
+        // refresh the image grid
+        int currItem = m_currentEvent;
+        updateImageGrid();
+        m_eventGrid->setCurrentPos(currItem);
+        gridItemChanged(m_eventGrid->getCurrentItem());
         updateUIList();
     }
-
-    m_updateTimer->start(EVENTS_UPDATE_TIME);
 }
 
 void ZMEvents::deletePressed(void)
@@ -353,10 +383,25 @@ void ZMEvents::deletePressed(void)
         if (class ZMClient *zm = ZMClient::get())
             zm->deleteEvent(event->eventID);
 
-        getEventList();
+        m_eventGrid->removeItem(m_currentEvent);
+
+        vector<Event*>::iterator it;
+        for (it = m_eventList->begin(); it != m_eventList->end(); it++)
+        {
+            if (*it == event)
+            {
+                m_eventList->erase(it);
+                break;
+            }
+        }
 
         if (m_currentEvent > (int)m_eventList->size() - 1)
+        {
             m_currentEvent = m_eventList->size() - 1;
+            m_eventGrid->setCurrentPos(m_currentEvent);
+        }
+
+        gridItemChanged(m_eventGrid->getCurrentItem());
 
         updateUIList();
     }
@@ -386,9 +431,7 @@ void ZMEvents::setCamera(int item)
 {
     (void) item;
     m_currentEvent = 0;
-    updateTimeout();
     getEventList();
-    updateUIList();
 }
 
 void ZMEvents::getDateList(void)
@@ -424,15 +467,176 @@ void ZMEvents::setDate(int item)
 {
     (void) item;
     m_currentEvent = 0;
-    updateTimeout();
     getEventList();
-    updateUIList();
 }
 
-void ZMEvents::updateTimeout(void)
+void ZMEvents::updateImageGrid()
 {
-    m_updateTimer->stop();
-    getEventList();
-    updateUIList();
-    m_updateTimer->start(EVENTS_UPDATE_TIME);
+    m_eventGrid->reset();
+
+    for (uint x = 0; x < m_eventList->size(); x++)
+    {
+        ImageGridItem *item = new ImageGridItem(m_eventList->at(x)->startTime,
+                NULL, false, (void*) m_eventList->at(x));
+        m_eventGrid->appendItem(item);
+    }
+    m_eventGrid->setItemCount(m_eventList->size());
+    m_eventGrid->recalculateLayout();
+
+    if (m_eventList->size() > 0)
+        gridItemChanged(m_eventGrid->getItemAt(0));
+
+    m_eventGrid->refresh();
+}
+
+void ZMEvents::gridItemChanged(ImageGridItem *item)
+{
+    if (!item)
+        return;
+
+    m_currentEvent = m_eventGrid->getCurrentPos();
+
+    if (m_eventNoText)
+        if (m_eventList->size() > 0)
+            m_eventNoText->SetText(QString("%1/%2")
+                    .arg(m_currentEvent + 1).arg(m_eventList->size()));
+        else
+            m_eventNoText->SetText("0/0");
+
+    // update the pixmaps for all the visible items
+    for (int x = m_eventGrid->getTopItemPos(); 
+         x < m_eventGrid->getTopItemPos() + m_eventGrid->getVisibleCount(); x++)
+    {
+        ImageGridItem *gridItem = m_eventGrid->getItemAt(x);
+        if (gridItem && gridItem->pixmap == NULL)
+        {
+            if (x < 0 || x > (int)m_eventList->size() - 1)
+                continue;
+
+            Event *event = m_eventList->at(x);
+            if (event)
+            {
+                QImage image;
+                if (class ZMClient *zm = ZMClient::get())
+                {
+                    zm->getAnalyseFrame(event->monitorID,
+                                        event->eventID,
+                                        0, image);
+                    if (!image.isNull())
+                    {
+                        QSize size = m_eventGrid->getImageItemSize();
+                        QPixmap *pixmap = new QPixmap(image.smoothScale(
+                                size.width(), size.height(), QImage::ScaleMin));
+
+                        gridItem->pixmap = pixmap;
+                    }
+                }
+            }
+        }
+    }
+
+    m_eventGrid->refresh();
+}
+
+void ZMEvents::setView(bool gridView)
+{
+    if (gridView)
+    {
+        setContext(2);
+        buildFocusList();
+        m_eventGrid->setCurrentPos(m_currentEvent);
+        gridItemChanged(m_eventGrid->getCurrentItem());
+        setCurrentFocusWidget(m_eventGrid);
+    }
+    else
+    {
+        setContext(1);
+        buildFocusList();
+        setCurrentFocusWidget(m_event_list);
+    }
+
+    updateForeground();
+}
+
+void ZMEvents::setGridLayout(int layout)
+{
+    switch (layout)
+    {
+        case 1:
+            m_eventGrid->setRowCount(1);
+            m_eventGrid->setColumnCount(1);
+            break;
+        case 2:
+            m_eventGrid->setRowCount(1);
+            m_eventGrid->setColumnCount(2);
+            break;
+        case 6:
+            m_eventGrid->setRowCount(2);
+            m_eventGrid->setColumnCount(3);
+            break;
+        default:
+            m_eventGrid->setRowCount(2);
+            m_eventGrid->setColumnCount(3);
+            break;
+    }
+
+    m_eventGrid->recalculateLayout();
+    updateImageGrid();
+    m_eventGrid->refresh();
+}
+
+void ZMEvents::showMenu()
+{
+    MythPopupBox *popup = new MythPopupBox(gContext->GetMainWindow(),
+                                      "popup_menu");
+
+    QLabel *caption = popup->addLabel(tr("Event List Menu"), MythPopupBox::Medium);
+    caption->setAlignment(Qt::AlignCenter);
+
+    QButton *button = popup->addButton(tr("Refresh"));
+    if (getContext() == 1)
+        popup->addButton(tr("Show Image View"));
+    else
+        popup->addButton(tr("Show List View"));
+    button->setFocus();
+
+    QLabel *splitter = popup->addLabel(" ", MythPopupBox::Small);
+    splitter->setLineWidth(2);
+    splitter->setFrameShape(QFrame::HLine);
+    splitter->setFrameShadow(QFrame::Sunken);
+    splitter->setMinimumHeight((int) (25 * hmult));
+    splitter->setMaximumHeight((int) (25 * hmult));
+
+    popup->addButton(tr("Delete All"));
+
+    int res = popup->ExecPopup();
+    switch (res)
+    {
+        case 0:
+            // refresh event list;
+                getEventList();
+            break;
+        case 1:
+            if (getContext() == 1)
+            {
+                // switch to grid view;
+                setView(true);
+            }
+            else
+            {
+                // switch to list view
+                setView(false);
+            }
+            break;
+        case 2:
+            //delete all events
+            if (class ZMClient *zm = ZMClient::get())
+            {
+                zm->deleteEventList(m_eventList);
+                getEventList();
+            }
+            break;
+    }
+
+    delete popup;
 }

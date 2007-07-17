@@ -29,7 +29,7 @@
 #include "zmplayer.h"
 #include "zmclient.h"
 
-ZMPlayer::ZMPlayer(vector<Event *> *eventList, int currentEvent, MythMainWindow *parent, 
+ZMPlayer::ZMPlayer(vector<Event *> *eventList, int *currentEvent, MythMainWindow *parent, 
                 const QString &window_name, const QString &theme_filename, 
                 const char *name)
     :MythThemedDialog(parent, window_name, theme_filename, name)
@@ -76,7 +76,7 @@ void ZMPlayer::getEventInfo()
     if (m_frameTimer)
         m_frameTimer->stop();
 
-    if (m_currentEvent == -1)
+    if (*m_currentEvent == -1)
     {
         stopPlayer();
 
@@ -99,7 +99,7 @@ void ZMPlayer::getEventInfo()
             m_noEventsText->hide();
     }
 
-    Event *event = m_eventList->at(m_currentEvent);
+    Event *event = m_eventList->at(*m_currentEvent);
     if (!event)
         return;
 
@@ -107,7 +107,7 @@ void ZMPlayer::getEventInfo()
     m_lastFrame = 0;
 
     m_eventText->SetText(QString(event->eventName + " (%1/%2)")
-            .arg(m_currentEvent + 1)
+            .arg((*m_currentEvent) + 1)
             .arg(m_eventList->size()));
     m_cameraText->SetText(event->monitorName);
     m_dateText->SetText(event->startTime);
@@ -322,10 +322,10 @@ void ZMPlayer::playPressed()
 
 void ZMPlayer::deletePressed()
 {
-    if (m_eventList->size() == 0 || m_currentEvent > (int) m_eventList->size() - 1)
+    if (m_eventList->size() == 0 || *m_currentEvent > (int) m_eventList->size() - 1)
         return;
 
-    Event *event = m_eventList->at(m_currentEvent);
+    Event *event = m_eventList->at(*m_currentEvent);
     if (event)
     {
         m_frameTimer->stop();
@@ -333,9 +333,9 @@ void ZMPlayer::deletePressed()
         if (class ZMClient *zm = ZMClient::get())
             zm->deleteEvent(event->eventID);
 
-        m_eventList->erase(m_eventList->begin() + m_currentEvent);
-        if (m_currentEvent > (int)m_eventList->size() - 1)
-            m_currentEvent = m_eventList->size() - 1;
+        m_eventList->erase(m_eventList->begin() + *m_currentEvent);
+        if (*m_currentEvent > (int)m_eventList->size() - 1)
+            *m_currentEvent = m_eventList->size() - 1;
 
         getEventInfo();
 
@@ -352,10 +352,10 @@ void ZMPlayer::nextPressed()
     if (m_eventList->size() == 0)
         return;
 
-    if (m_currentEvent >= (int) m_eventList->size() - 1)
+    if (*m_currentEvent >= (int) m_eventList->size() - 1)
         return;
 
-    m_currentEvent++;
+    (*m_currentEvent)++;
 
     getEventInfo();
 
@@ -368,13 +368,13 @@ void ZMPlayer::prevPressed()
     if (m_eventList->size() == 0)
         return;
 
-    if (m_currentEvent <= 0)
+    if (*m_currentEvent <= 0)
         return;
 
-    if (m_currentEvent > (int) m_eventList->size())
-        m_currentEvent = m_eventList->size();
+    if (*m_currentEvent > (int) m_eventList->size())
+        *m_currentEvent = m_eventList->size();
 
-    m_currentEvent--;
+    (*m_currentEvent)--;
 
     getEventInfo();
 
@@ -407,7 +407,7 @@ void ZMPlayer::getFrame(void)
     if (m_eventList->size() == 0)
         return;
 
-    Event *event = m_eventList->at(m_currentEvent);
+    Event *event = m_eventList->at(*m_currentEvent);
     if (event)
     {
         if (class ZMClient *zm = ZMClient::get())
