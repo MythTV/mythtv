@@ -3926,6 +3926,8 @@ void ProgramInfo::getProgramProperties(void)
 
     if (query.exec() && query.isActive() && query.size() > 0)
     {
+        query.next();
+
         audioproperties = query.value(0).toInt();
         videoproperties = query.value(1).toInt();
         subtitleType = query.value(2).toInt();
