@@ -227,12 +227,12 @@ void parseVideo(QDomElement &element, ProgInfo *pginfo)
             if (info.tagName() == "quality")
             {
                 if (getFirstText(info) == "HDTV")
-                    pginfo->videoproperties = VID_HDTV;
+                    pginfo->videoproperties |= VID_HDTV;
             }
             else if (info.tagName() == "aspect")
             {
                 if (getFirstText(info) == "16:9")
-                    pginfo->videoproperties = VID_WIDESCREEN;
+                    pginfo->videoproperties |= VID_WIDESCREEN;
             }
         }
     }
@@ -250,20 +250,20 @@ void parseAudio(QDomElement &element, ProgInfo *pginfo)
             {
                 if (getFirstText(info) == "mono")
                 {
-                    pginfo->audioproperties = AUD_MONO;
+                    pginfo->audioproperties |= AUD_MONO;
                 }
                 else if (getFirstText(info) == "stereo")
                 {
-                    pginfo->audioproperties = AUD_STEREO;
+                    pginfo->audioproperties |= AUD_STEREO;
                 }
                 else if (getFirstText(info) == "dolby" ||
                         getFirstText(info) == "dolby digital")
                 {
-                    pginfo->audioproperties = AUD_DOLBY;
+                    pginfo->audioproperties |= AUD_DOLBY;
                 }
                 else if (getFirstText(info) == "surround")
                 {
-                    pginfo->audioproperties = AUD_SURROUND;
+                    pginfo->audioproperties |= AUD_SURROUND;
                 }
             }
         }
@@ -421,11 +421,11 @@ ProgInfo *XMLTVParser::parseProgram(
             }
             else if (info.tagName() == "subtitles" && info.attribute("type") == "teletext")
             {
-                pginfo->subtitletype = SUB_NORMAL;
+                pginfo->subtitletype |= SUB_NORMAL;
             }
             else if (info.tagName() == "subtitles" && info.attribute("type") == "onscreen")
             {
-                pginfo->subtitletype = SUB_ONSCREEN;
+                pginfo->subtitletype |= SUB_ONSCREEN;
             }
             else if (info.tagName() == "audio")
             {
