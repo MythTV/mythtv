@@ -374,9 +374,9 @@
             
             <pushbutton name="rew_button" draworder="0">
                 <position>125,45</position>
-                <image function="on" filename="rew_button_on.png"></image>
-                <image function="off" filename="rew_button_off.png"></image>
-                <image function="pushed" filename="rew_button_pushed.png"></image>
+                <image function="on" filename="mm_rew.png"></image>
+                <image function="off" filename="mm_rew.png"></image>
+                <image function="pushed" filename="mm_rew.png"></image>
             </pushbutton>
             
             <pushbutton name="pause_button" draworder="0">
@@ -402,9 +402,9 @@
             
             <pushbutton name="ff_button" draworder="0">
                 <position>585,45</position>
-                <image function="on" filename="ff_button_on.png"></image>
-                <image function="off" filename="ff_button_off.png"></image>
-                <image function="pushed" filename="ff_button_pushed.png"></image>
+                <image function="on" filename="mm_ffw.png"></image>
+                <image function="off" filename="mm_ffw.png"></image>
+                <image function="pushed" filename="mm_ffw.png"></image>
             </pushbutton>
             
             <pushbutton name="next_button" draworder="0">
