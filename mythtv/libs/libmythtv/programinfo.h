@@ -353,8 +353,8 @@ class MPUBLIC ProgramInfo
 
     int programflags;
     int subtitleType;
-    int videoProp;
-    int audioProp;
+    int videoproperties;
+    int audioproperties;
     int transcoder;
     QString chanOutputFilters;
 

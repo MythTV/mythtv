@@ -1211,8 +1211,8 @@ void MainServer::HandleQueryRecordings(QString type, PlaybackSock *pbs)
                     proginfo->SetCommFlagged(COMM_FLAG_NOT_FLAGGED);
             }
 
-            proginfo->audioProp = query.value(32).toInt();
-            proginfo->videoProp = query.value(33).toInt();
+            proginfo->audioproperties = query.value(32).toInt();
+            proginfo->videoproperties = query.value(33).toInt();
             proginfo->subtitleType = query.value(34).toInt();
 
             proginfo->programflags = flags;

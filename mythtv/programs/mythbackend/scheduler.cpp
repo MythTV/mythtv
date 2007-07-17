@@ -2408,9 +2408,9 @@ void Scheduler::AddNewRecords(void)
         p->findid = result.value(35).toInt();
 
 
-        p->videoProp = result.value(39).toInt();
+        p->videoproperties = result.value(39).toInt();
         p->subtitleType = result.value(40).toInt();
-        p->audioProp = result.value(41).toInt();
+        p->audioproperties = result.value(41).toInt();
 
         if (!recTypeRecPriorityMap.contains(p->rectype))
             recTypeRecPriorityMap[p->rectype] = 

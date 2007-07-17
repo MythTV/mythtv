@@ -91,8 +91,8 @@ ProgramInfo::ProgramInfo(void)
     hostname = "";
     programflags = 0;
     transcoder = 0;
-    audioProp = 0;
-    videoProp = 0;
+    audioproperties = 0;
+    videoproperties = 0;
     subtitleType = 0;
 
     startts = mythCurrentDateTime();
@@ -221,8 +221,8 @@ ProgramInfo &ProgramInfo::clone(const ProgramInfo &other)
     playgroup = QDeepCopy<QString>(other.playgroup);
     programflags = other.programflags;
     transcoder = other.transcoder;
-    audioProp = other.audioProp;
-    videoProp = other.videoProp;
+    audioproperties = other.audioproperties;
+    videoproperties = other.videoproperties;
     subtitleType = other.subtitleType;
 
     hasAirDate = other.hasAirDate;
@@ -331,8 +331,8 @@ void ProgramInfo::ToStringList(QStringList &list) const
     INT_TO_LIST(recpriority2)
     INT_TO_LIST(parentid)
     STR_TO_LIST((storagegroup != "") ? storagegroup : "Default")
-    INT_TO_LIST(audioProp)
-    INT_TO_LIST(videoProp)
+    INT_TO_LIST(audioproperties)
+    INT_TO_LIST(videoproperties)
     INT_TO_LIST(subtitleType)
 }
 
@@ -432,8 +432,8 @@ bool ProgramInfo::FromStringList(QStringList &list, QStringList::iterator &it)
     INT_FROM_LIST(recpriority2)
     INT_FROM_LIST(parentid)
     STR_FROM_LIST(storagegroup)
-    INT_FROM_LIST(audioProp)
-    INT_FROM_LIST(videoProp)
+    INT_FROM_LIST(audioproperties)
+    INT_FROM_LIST(videoproperties)
     INT_FROM_LIST(subtitleType)
 
     return true;
@@ -572,8 +572,8 @@ void ProgramInfo::ToMap(QMap<QString, QString> &progMap,
     progMap["playgroup"] = playgroup;
     progMap["programflags"] = programflags;
 
-    progMap["audioProp"] = audioProp;
-    progMap["videoProp"] = videoProp;
+    progMap["audioproperties"] = audioproperties;
+    progMap["videoproperties"] = videoproperties;
     progMap["subtitleType"] = subtitleType;
 
     progMap["timedate"] = recstartts.date().toString(dateFormat) + ", " +
@@ -3926,8 +3926,8 @@ void ProgramInfo::getProgramProperties(void)
 
     if (query.exec() && query.isActive() && query.size() > 0)
     {
-        audioProp = query.value(0).toInt();
-        videoProp = query.value(1).toInt();
+        audioproperties = query.value(0).toInt();
+        videoproperties = query.value(1).toInt();
         subtitleType = query.value(2).toInt();
     }
 
@@ -4806,8 +4806,8 @@ bool ProgramList::FromRecorded( bool bDescending, ProgramList *pSchedList )
 
             proginfo->programflags = flags;
 
-            proginfo->audioProp = query.value(32).toInt();
-            proginfo->videoProp = query.value(33).toInt();
+            proginfo->audioproperties = query.value(32).toInt();
+            proginfo->videoproperties = query.value(33).toInt();
             proginfo->subtitleType = query.value(34).toInt();
 
             proginfo->category     = QString::fromUtf8(query.value(15).toString());

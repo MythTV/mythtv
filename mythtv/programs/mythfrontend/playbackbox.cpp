@@ -886,7 +886,7 @@ void PlaybackBox::updateProgramInfo(QPainter *p, QRect& pr, QPixmap& pix)
                 {
                     itype->hide();
 
-                    if (!haveaudicon && (curitem->audioProp & it.data()))
+                    if (!haveaudicon && (curitem->audioproperties & it.data()))
                     {
                         itype->show();
                         // We only want one icon displayed
@@ -909,7 +909,7 @@ void PlaybackBox::updateProgramInfo(QPainter *p, QRect& pr, QPixmap& pix)
                 {
                     itype->hide();
 
-                    if (!havevidicon && (curitem->videoProp & it.data()))
+                    if (!havevidicon && (curitem->videoproperties & it.data()))
                     {
                         itype->show();
                         // We only want one icon displayed
