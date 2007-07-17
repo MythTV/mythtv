@@ -1310,6 +1310,19 @@ UIType* MythThemedDialog::getCurrentFocusWidget()
     return NULL;
 }
 
+void MythThemedDialog::setCurrentFocusWidget(UIType* widget)
+{
+    // make sure this widget is in the list of widgets that can take focus
+    if (focus_taking_widgets.find(widget) == -1)
+        return;
+
+    if (widget_with_current_focus)
+        widget_with_current_focus->looseFocus();
+
+    widget_with_current_focus = widget;
+    widget_with_current_focus->takeFocus();
+}
+
 UIManagedTreeListType* MythThemedDialog::getUIManagedTreeListType(const QString &name)
 {
     QPtrListIterator<LayerSet> an_it(my_containers);

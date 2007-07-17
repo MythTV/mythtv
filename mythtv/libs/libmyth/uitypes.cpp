@@ -1960,12 +1960,16 @@ void  UIImageGridType::setCurrentPos(int pos)
     if (pos < 0 || pos > (int) allData->count() - 1)
         return;
 
-    // make sure the selected item is visible
     currentItem = pos;
-    topRow = currentItem / columnCount;
-    curRow = topRow;
-    if (curRow > lastRow - rowCount)
-        topRow = lastRow - rowCount + 1;
+
+    // make sure the selected item is visible
+    if ((currentItem < topRow * columnCount) || 
+            (currentItem >= (topRow + rowCount) * columnCount))
+    {
+        topRow = QMAX(QMIN(currentItem / columnCount, lastRow - rowCount + 1), 0);
+        curRow = topRow;
+    }
+
     curColumn = currentItem % columnCount;
     refresh();
 }
@@ -2024,6 +2028,34 @@ void UIImageGridType::updateItem(int itemNo, ImageGridItem *item)
     // if this item is visible update the imagegrid
     if ((itemNo >= topRow * columnCount) && (itemNo < (topRow + rowCount) * columnCount))
         refresh();
+}
+
+void UIImageGridType::removeItem(ImageGridItem *item)
+{
+    int itemNo = allData->find(item);
+
+    removeItem(itemNo);
+}
+
+void UIImageGridType::removeItem(int itemNo)
+{
+    if (itemNo < 0 || itemNo > (int) allData->count() - 1)
+        return;
+
+    allData->remove(itemNo);
+
+    itemCount--;
+    lastRow = QMAX((int) ceilf((float) itemCount/columnCount) - 1, 0);
+    lastColumn = QMAX(itemCount - lastRow * columnCount - 1, 0);
+
+    // make sure the selected item is still visible
+    if (topRow + rowCount > lastRow) 
+        topRow = QMAX(QMIN(currentItem / columnCount, lastRow - rowCount + 1), 0);
+
+    if (curRow > lastRow)
+        curRow = topRow;
+
+    refresh();
 }
 
 void UIImageGridType::setJustification(int jst)
@@ -2126,7 +2158,7 @@ bool UIImageGridType::handleKeyPress(QString action)
     {
         ImageGridItem *item = allData->at(currentItem);
         if (item)
-            item->selected = ! item->selected;
+            item->selected = !item->selected;
     }
     else
         return false;
@@ -2329,6 +2361,7 @@ void UIImageGridType::recalculateLayout(void)
     lastRow = QMAX((int) ceilf((float) itemCount/columnCount) - 1, 0);
     lastColumn = QMAX(itemCount - lastRow * columnCount - 1, 0);
 
+
     // calc image item bounding rect
     int yoffset = 0;
     int bw = cellWidth;
@@ -2345,6 +2378,8 @@ void UIImageGridType::recalculateLayout(void)
     int cw = checkFullPixmap->width();
     int ch = checkFullPixmap->height();
     checkRect = QRect(0, (textHeight - ch) / 2, cw, ch);
+
+    loadCellImages();
 }
 
 QPixmap *UIImageGridType::createScaledPixmap(QString filename,
@@ -2372,6 +2407,17 @@ QPixmap *UIImageGridType::createScaledPixmap(QString filename,
 
 void UIImageGridType::loadImages(void)
 {
+    checkNonPixmap = gContext->LoadScalePixmap("lb-check-empty.png");
+    checkHalfPixmap = gContext->LoadScalePixmap("lb-check-half.png");
+    checkFullPixmap = gContext->LoadScalePixmap("lb-check-full.png");
+    upArrowRegPixmap = gContext->LoadScalePixmap("lb-uparrow-reg.png");
+    upArrowActPixmap = gContext->LoadScalePixmap("lb-uparrow-sel.png");
+    dnArrowRegPixmap = gContext->LoadScalePixmap("lb-dnarrow-reg.png");
+    dnArrowActPixmap = gContext->LoadScalePixmap("lb-dnarrow-sel.png");
+}
+
+void UIImageGridType::loadCellImages(void)
+{
     int imgHeight = cellHeight - textHeight;
     int imgWidth = cellWidth;
     int sw = (int) (7 * m_wmult);
@@ -2386,14 +2432,6 @@ void UIImageGridType::loadImages(void)
     defaultPixmap = createScaledPixmap(defaultImage, imgWidth - 2 * sw,
                                        imgHeight - 2 * sh,
                                        QImage::ScaleMin);
-
-    checkNonPixmap = gContext->LoadScalePixmap("lb-check-empty.png");
-    checkHalfPixmap = gContext->LoadScalePixmap("lb-check-half.png");
-    checkFullPixmap = gContext->LoadScalePixmap("lb-check-full.png");
-    upArrowRegPixmap = gContext->LoadScalePixmap("lb-uparrow-reg.png");
-    upArrowActPixmap = gContext->LoadScalePixmap("lb-uparrow-sel.png");
-    dnArrowRegPixmap = gContext->LoadScalePixmap("lb-dnarrow-reg.png");
-    dnArrowActPixmap = gContext->LoadScalePixmap("lb-dnarrow-sel.png");
 }
 
 void UIImageGridType::calculateScreenArea(void)

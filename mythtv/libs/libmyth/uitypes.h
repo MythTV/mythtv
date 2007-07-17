@@ -400,6 +400,8 @@ class MPUBLIC UIImageGridType : public UIType
         void appendItem(ImageGridItem *item);
         void updateItem(int itemNo, ImageGridItem *item);
         void updateItem(ImageGridItem *item);
+        void removeItem(int itemNo);
+        void removeItem(ImageGridItem *item);
         void reset(void);
         void setJustification(int jst);
         void setCutDown(bool state) { cutdown = state; }
@@ -450,6 +452,7 @@ class MPUBLIC UIImageGridType : public UIType
         void drawCell(QPainter *p, int curPos, int xpos, int ypos);
         void drawText(QPainter *p, int curPos, int xpos, int ypos);
         void loadImages(void);
+        void loadCellImages(void);
         QPixmap *createScaledPixmap(QString filename, int width, int height,
                                     QImage::ScaleMode mode);
         MythDialog *window;

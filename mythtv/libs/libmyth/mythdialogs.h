@@ -271,7 +271,10 @@ class MPUBLIC MythThemedDialog : public MythDialog
     bool buildFocusList();
 
     UIType *getUIObject(const QString &name);
+
     UIType *getCurrentFocusWidget();
+    void setCurrentFocusWidget(UIType *widget);
+
     UIManagedTreeListType *getUIManagedTreeListType(const QString &name);
     UITextType *getUITextType(const QString &name);
     UIRichTextType *getUIRichTextType(const QString &name);
