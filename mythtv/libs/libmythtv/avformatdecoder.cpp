@@ -2775,7 +2775,7 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
                         dvdTitleChanged = true;
                     if (GetNVP() && GetNVP()->getVideoOutput())
                     {
-                        if (ringBuffer->InDVDMenuOrStillFrame())
+                        if (ringBuffer->DVD()->InStillFrame())
                             GetNVP()->getVideoOutput()->SetPrebuffering(false);
                         else
                             GetNVP()->getVideoOutput()->SetPrebuffering(true);
