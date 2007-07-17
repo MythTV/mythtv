@@ -58,24 +58,24 @@ enum FlagMask {
 };
 
 enum AudioProps {
-    AUD_UNKNOWN       = 0, // For backwards compatibility do not change 0 or 1
-    AUD_STEREO        = 1,
-    AUD_MONO          = 2,
-    AUD_SURROUND      = 3,
-    AUD_DOLBY         = 4
+    AUD_UNKNOWN       = 0x00, // For backwards compatibility do not change 0 or 1
+    AUD_STEREO        = 0x01,
+    AUD_MONO          = 0x02,
+    AUD_SURROUND      = 0x04,
+    AUD_DOLBY         = 0x08
 };
 
 enum VideoProps {
-    VID_UNKNOWN       = 0, // For backwards compatibility do not change 0 or 1
-    VID_HDTV          = 1,
-    VID_WIDESCREEN    = 2
+    VID_UNKNOWN       = 0x00, // For backwards compatibility do not change 0 or 1
+    VID_HDTV          = 0x01,
+    VID_WIDESCREEN    = 0x02
 };
 
 enum SubtitleTypes {
-    SUB_UNKNOWN       = 0, // For backwards compatibility do not change 0 or 1
-    SUB_HARDHEAR      = 1,
-    SUB_NORMAL        = 2,
-    SUB_ONSCREEN      = 3
+    SUB_UNKNOWN       = 0x00, // For backwards compatibility do not change 0 or 1
+    SUB_HARDHEAR      = 0x01,
+    SUB_NORMAL        = 0x02,
+    SUB_ONSCREEN      = 0x04
 };
 
 enum RecStatusType {

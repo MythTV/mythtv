@@ -3557,25 +3557,25 @@ void ProgramInfo::showDetails(void) const
     if (colorcode != "")
         attr += colorcode + ", ";
 
-    if (audioprop == AUD_MONO)
+    if (audioprop & AUD_MONO)
         attr += QObject::tr("Mono") + ", ";
-    else if (audioprop == AUD_STEREO)
+    if (audioprop & AUD_STEREO)
         attr += QObject::tr("Stereo") + ", ";
-    else if (audioprop == AUD_SURROUND)
+    if (audioprop & AUD_SURROUND)
         attr += QObject::tr("Surround Sound") + ", ";
-    else if (audioprop == AUD_DOLBY)
+    if (audioprop & AUD_DOLBY)
         attr += QObject::tr("Dolby Sound") + ", ";
 
-    if (videoprop == VID_HDTV)
+    if (videoprop & VID_HDTV)
         attr += QObject::tr("HDTV") + ", ";
-    else if  (videoprop == VID_WIDESCREEN)
+    if  (videoprop & VID_WIDESCREEN)
         attr += QObject::tr("Widescreen") + ", ";
 
-    if (subtype == SUB_HARDHEAR)
+    if (subtype & SUB_HARDHEAR)
         attr += QObject::tr("CC","Closed Captioned") + ", ";
-    else if (subtype == SUB_NORMAL)
+    if (subtype & SUB_NORMAL)
         attr += QObject::tr("Subtitles Available") + ", ";
-    else if (subtype == SUB_ONSCREEN)
+    if (subtype & SUB_ONSCREEN)
         attr += QObject::tr("Subtitled") + ", ";
 
     if (generic && category_type == "series")

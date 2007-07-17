@@ -872,55 +872,72 @@ void PlaybackBox::updateProgramInfo(QPainter *p, QRect& pr, QPixmap& pix)
         if (curitem)
         {
 
-            iconMap["mono"] = AUD_MONO;
-            iconMap["stereo"] = AUD_STEREO;
             iconMap["dolby"]  = AUD_DOLBY;
             iconMap["surround"]  = AUD_SURROUND;
+            iconMap["stereo"] = AUD_STEREO;
+            iconMap["mono"] = AUD_MONO;
+
+            bool haveaudicon = false;
 
             for (it = iconMap.begin(); it != iconMap.end(); ++it)
             {
                 itype = (UIImageType *)container->GetType(it.key());
                 if (itype)
                 {
-                    if (curitem->audioProp == it.data())
+                    itype->hide();
+
+                    if (!haveaudicon && (curitem->audioProp & it.data()))
+                    {
                         itype->show();
-                    else
-                        itype->hide();
+                        // We only want one icon displayed
+                        haveaudicon = true;
+                    }
                 }
             }
 
             iconMap.clear();
 
-            iconMap["widescreen"] = VID_WIDESCREEN;
             iconMap["hdtv"] = VID_HDTV;
+            iconMap["widescreen"] = VID_WIDESCREEN;
+
+            bool havevidicon = false;
 
             for (it = iconMap.begin(); it != iconMap.end(); ++it)
             {
                 itype = (UIImageType *)container->GetType(it.key());
                 if (itype)
                 {
-                    if (curitem->videoProp == it.data())
+                    itype->hide();
+
+                    if (!havevidicon && (curitem->videoProp & it.data()))
+                    {
                         itype->show();
-                    else
-                        itype->hide();
+                        // We only want one icon displayed
+                        havevidicon = true;
+                    }
                 }
             }
 
             iconMap.clear();
 
-            iconMap["cc"] = SUB_HARDHEAR;
-            iconMap["subtitles"] = SUB_NORMAL;
             iconMap["onscreensub"] = SUB_ONSCREEN;
+            iconMap["subtitles"] = SUB_NORMAL;
+            iconMap["cc"] = SUB_HARDHEAR;
+
+            bool havesubicon = false;
 
             for (it = iconMap.begin(); it != iconMap.end(); ++it)
             {
                 itype = (UIImageType *)container->GetType(it.key());
                 if (itype)
                 {
-                    if (curitem->subtitleType == it.data())
+                    itype->hide();
+                    if (!havesubicon && (curitem->subtitleType & it.data()))
+                    {
                         itype->show();
-                    else
-                        itype->hide();
+                        // We only want one icon displayed
+                        havesubicon = true;
+                    }
                 }
             }
 
