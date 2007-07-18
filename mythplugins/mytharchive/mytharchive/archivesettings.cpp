@@ -187,6 +187,21 @@ static HostComboBox *MythArchiveTimeFormat()
     return gc;
 }
 
+static HostComboBox *MythArchiveDefaultEncProfile()
+{
+    HostComboBox *gc = new HostComboBox("MythArchiveDefaultEncProfile");
+    gc->setLabel(QObject::tr("Default Encoder Profile"));
+
+    gc->addSelection("HQ", "HQ");
+    gc->addSelection("SP", "SP");
+    gc->addSelection("LP", "LP");
+    gc->addSelection("EP", "EP");
+    gc->setValue(1);
+    gc->setHelpText(QObject::tr("Default encoding profile to use if a file "
+                                "needs re-encoding."));
+    return gc;
+}
+
 static HostLineEdit *MythArchiveFfmpegCmd()
 {
     HostLineEdit *gc = new HostLineEdit("MythArchiveFfmpegCmd");
@@ -290,6 +305,7 @@ ArchiveSettings::ArchiveSettings()
     vcg2->addChild(ChapterMenuAspectRatio());
     vcg2->addChild(MythArchiveDateFormat());
     vcg2->addChild(MythArchiveTimeFormat());
+    vcg2->addChild(MythArchiveDefaultEncProfile());
     addChild(vcg2);
 
     VerticalConfigurationGroup* vcg3 = new VerticalConfigurationGroup(false);

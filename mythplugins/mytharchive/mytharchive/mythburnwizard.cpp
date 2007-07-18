@@ -1161,9 +1161,12 @@ EncoderProfile *MythburnWizard::getDefaultProfile(ArchiveItem *item)
 
     if (!profile)
     {
-        // file needs re-encoding - use SP profile by default
+        // file needs re-encoding - use default profile setting
+        QString defaultProfile = 
+                gContext->GetSetting("MythArchiveDefaultEncProfile", "SP");
+
         for (uint x = 0; x < profileList->size(); x++)
-            if (profileList->at(x)->name == "SP")
+            if (profileList->at(x)->name == defaultProfile)
                 profile = profileList->at(x);
     }
 
