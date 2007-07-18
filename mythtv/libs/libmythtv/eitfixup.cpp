@@ -29,7 +29,7 @@ EITFixUp::EITFixUp()
              "\\[(SL)(,AD){,1}(,(S)){,1}\\]"),
       m_ukYear("[\\[\\(]([\\d]{4})[\\)\\]]"),
       m_uk24ep("^\\d{1,2}:00[ap]m to \\d{1,2}:00[ap]m: "),
-      m_ukStarring("Starring ([\\w\\s\\-]+)[Aa]nd\\s([\\w\\s\\-]+)[\\.|,](?:\\s)*(\\d{4})?(?:\\.\\s)?"),
+      m_ukStarring("(?:Western\\s)?[Ss]tarring ([\\w\\s\\-]+)[Aa]nd\\s([\\w\\s\\-]+)[\\.|,](?:\\s)*(\\d{4})?(?:\\.\\s)?"),
       m_comHemCountry("^(\\(.+\\))?\\s?([^ ]+)\\s([^\\.0-9]+)"
                       "(?:\\sfrån\\s([0-9]{4}))(?:\\smed\\s([^\\.]+))?\\.?"),
       m_comHemDirector("[Rr]egi"),
