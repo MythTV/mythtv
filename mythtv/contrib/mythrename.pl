@@ -79,47 +79,84 @@ options:
 
     default:  $dformat
 
-    \%T = title    (aka show name)
-    \%S = subtitle (aka episode name)
-    \%R = description
-    \%C = category (as reported by grabber)
-    \%c = chanid
-    \%U = recording group
-    \%y = year, 2 digits
-    \%Y = year, 4 digits
-    \%n = month
-    \%m = month, leading zero
-    \%j = day of month
-    \%d = day of month, leading zero
-    \%g = 12-hour hour
-    \%G = 24-hour hour
-    \%h = 12-hour hour, with leading zero
-    \%H = 24-hour hour, with leading zero
-    \%i = minutes
-    \%s = seconds
-    \%a = am/pm
-    \%A = AM/PM
-    \%- = separator character
-    /   = directory/folder (path separator)
+    \%T   = Title (show name)
+    \%S   = Subtitle (episode name)
+    \%R   = Description
+    \%C   = Category
+    \%U   = RecGroup
+    \%hn  = Hostname of the machine where the file resides
+    \%c   = Channel:  MythTV chanid
+    \%cn  = Channel:  channum
+    \%cc  = Channel:  callsign
+    \%cN  = Channel:  channel name
+    \%y   = Recording start time:  year, 2 digits
+    \%Y   = Recording start time:  year, 4 digits
+    \%n   = Recording start time:  month
+    \%m   = Recording start time:  month, leading zero
+    \%j   = Recording start time:  day of month
+    \%d   = Recording start time:  day of month, leading zero
+    \%g   = Recording start time:  12-hour hour
+    \%G   = Recording start time:  24-hour hour
+    \%h   = Recording start time:  12-hour hour, with leading zero
+    \%H   = Recording start time:  24-hour hour, with leading zero
+    \%i   = Recording start time:  minutes
+    \%s   = Recording start time:  seconds
+    \%a   = Recording start time:  am/pm
+    \%A   = Recording start time:  AM/PM
+    \%ey  = Recording end time:  year, 2 digits
+    \%eY  = Recording end time:  year, 4 digits
+    \%en  = Recording end time:  month
+    \%em  = Recording end time:  month, leading zero
+    \%ej  = Recording end time:  day of month
+    \%ed  = Recording end time:  day of month, leading zero
+    \%eg  = Recording end time:  12-hour hour
+    \%eG  = Recording end time:  24-hour hour
+    \%eh  = Recording end time:  12-hour hour, with leading zero
+    \%eH  = Recording end time:  24-hour hour, with leading zero
+    \%ei  = Recording end time:  minutes
+    \%es  = Recording end time:  seconds
+    \%ea  = Recording end time:  am/pm
+    \%eA  = Recording end time:  AM/PM
+    \%py  = Program start time:  year, 2 digits
+    \%pY  = Program start time:  year, 4 digits
+    \%pn  = Program start time:  month
+    \%pm  = Program start time:  month, leading zero
+    \%pj  = Program start time:  day of month
+    \%pd  = Program start time:  day of month, leading zero
+    \%pg  = Program start time:  12-hour hour
+    \%pG  = Program start time:  24-hour hour
+    \%ph  = Program start time:  12-hour hour, with leading zero
+    \%pH  = Program start time:  24-hour hour, with leading zero
+    \%pi  = Program start time:  minutes
+    \%ps  = Program start time:  seconds
+    \%pa  = Program start time:  am/pm
+    \%pA  = Program start time:  AM/PM
+    \%pey = Program end time:  year, 2 digits
+    \%peY = Program end time:  year, 4 digits
+    \%pen = Program end time:  month
+    \%pem = Program end time:  month, leading zero
+    \%pej = Program end time:  day of month
+    \%ped = Program end time:  day of month, leading zero
+    \%peg = Program end time:  12-hour hour
+    \%peG = Program end time:  24-hour hour
+    \%peh = Program end time:  12-hour hour, with leading zero
+    \%peH = Program end time:  24-hour hour, with leading zero
+    \%pei = Program end time:  minutes
+    \%pes = Program end time:  seconds
+    \%pea = Program end time:  am/pm
+    \%peA = Program end time:  AM/PM
+    \%oy  = Original Airdate:  year, 2 digits
+    \%oY  = Original Airdate:  year, 4 digits
+    \%on  = Original Airdate:  month
+    \%om  = Original Airdate:  month, leading zero
+    \%oj  = Original Airdate:  day of month
+    \%od  = Original Airdate:  day of month, leading zero#    %f -> full path to the filename
+    \%%   = a literal % character
 
-    * The time/date format codes above represent the recording start times.
-
-    * For recording end time, prepend an "e" to the appropriate time/date
-      format code above; i.e. "\%eG" gives the 24-hour hour for the end time.
-
-    * For program start time, prepend a "p" to the appropriate time/date
-      format code above; i.e. "\%pi" gives the minutes for the program start
-      time.  The program start time is the time from the listings data and is
-      not affected by when the recording started.  Therefore, using program
-      start (or end) times may result in duplicate names.  In that case, the
-      script will append a "counter" value to the name.
-
-    * For program end time, prepend a "pe" to the appropriate time/date format
-      code above; i.e. "\%pes" gives the seconds for the program end time.
-
-    * For original airdate, prepend an "o" to the year, month, or day format
-      codes above; i.e. "\%oY" gives the year in which the episode was first
-      aired.
+    * The program start time is the time from the listings data and is not
+      affected by when the recording started.  Therefore, using program start
+      (or end) times may result in duplicate names.  In that case, the script
+      will append a "counter" value to the name.
 
     * A suffix of .mpg or .nuv will be added where appropriate.
 
