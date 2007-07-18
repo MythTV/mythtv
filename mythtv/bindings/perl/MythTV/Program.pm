@@ -83,6 +83,9 @@ package MythTV::Program;
         $self->{'recpriority2'}    = $_[40]; # 40 recpriority2
         $self->{'parentid'}        = $_[41]; # 41 parentid
         $self->{'storagegroup'}    = $_[42]; # 42 storagegroup
+        $self->{'audio_props'}     = $_[43]; # Audio properties
+        $self->{'video_props'}     = $_[44]; # Video properties
+        $self->{'subtitle_type'}   = $_[45]; # Subtitle type
 
     # Load the channel data
         if ($self->{'chanid'}) {
@@ -95,13 +98,21 @@ package MythTV::Program;
         $self->{'auto_expire'}    = ($self->{'progflags'} & 0x004) ? 1 : 0;     # FL_AUTOEXP        = 0x004
         $self->{'is_editing'}     = ($self->{'progflags'} & 0x008) ? 1 : 0;     # FL_EDITING        = 0x008
         $self->{'bookmark'}       = ($self->{'progflags'} & 0x010) ? 1 : 0;     # FL_BOOKMARK       = 0x010
-                                                                                # FL_INUSERECORDING = 0x020
-                                                                                # FL_INUSEPLAYING   = 0x040
-        $self->{'stereo'}         = ($self->{'progflags'} & 0x080) ? 1 : 0;     # FL_STEREO         = 0x080
-        $self->{'closecaptioned'} = ($self->{'progflags'} & 0x100) ? 1 : 0;     # FL_CC             = 0x100
-        $self->{'hdtv'}           = ($self->{'progflags'} & 0x200) ? 1 : 0;     # FL_HDTV           = 0x200
+        $self->{'is_recording'}   = ($self->{'progflags'} & 0x020) ? 1 : 0;     # FL_INUSERECORDING = 0x020
+        $self->{'is_playing'}     = ($self->{'progflags'} & 0x040) ? 1 : 0;     # FL_INUSEPLAYING   = 0x040
                                                                                 # FL_TRANSCODED     = 0x400
         $self->{'is_watched'}     = ($self->{'progflags'} & 0x800) ? 1 : 0;     # FL_WATCHED        = 0x800
+
+    # Assign shortcut names to the new audio/video/subtitle property flags
+        $self->{'stereo'}         = $self->{'audio_props'}   & 0x01;
+        $self->{'mono'}           = $self->{'audio_props'}   & 0x02;
+        $self->{'surround'}       = $self->{'audio_props'}   & 0x04;
+        $self->{'dolby'}          = $self->{'audio_props'}   & 0x08;
+        $self->{'hdtv'}           = $self->{'video_props'}   & 0x01;
+        $self->{'widescreen'}     = $self->{'video_props'}   & 0x02;
+        $self->{'closecaptioned'} = $self->{'subtitle_type'} & 0x01;
+        $self->{'has_subtitles'}  = $self->{'subtitle_type'} & 0x02;
+        $self->{'subtitled'}      = $self->{'subtitle_type'} & 0x04;
 
     # And some other calculated fields
         $self->{'will_record'} = ($self->{'rectype'} && $self->{'rectype'} != $MythTV::rectype_dontrec) ? 1 : 0;
@@ -164,6 +175,9 @@ package MythTV::Program;
                     $self->{'recpriority2'}   , # 40 recpriority2
                     $self->{'parentid'}       , # 41 parentid
                     $self->{'storagegroup'}   , # 42 storagegroup
+                    $self->{'audio_props'}    , # 43 audio properties
+                    $self->{'video_props'}    , # 44 video properties
+                    $self->{'subtitle_type'}  , # 45 subtitle type
                     ''                          # trailing separator
                    );
     }
