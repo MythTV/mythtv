@@ -67,4 +67,7 @@ MPUBLIC bool getMemStats(int &totalMB, int &freeMB, int &totalVM, int &freeVM);
 
 MPUBLIC void myth_eject(void);
 
+MPUBLIC bool hasUtf8(const char *str);
+#define M_QSTRING_UNICODE(str) hasUtf8(str) ? QString::fromUtf8(str) : str
+
 #endif // UTIL_H_
