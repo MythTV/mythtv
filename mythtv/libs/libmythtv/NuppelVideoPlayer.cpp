@@ -3728,6 +3728,20 @@ void NuppelVideoPlayer::AddAudioData(short int *lbuffer, short int *rbuffer,
                 "Audio buffer overflow, audio data lost!");
 }
 
+/** \fn void SetWatched(bool forceWatched = false);
+ *  \brief Determines if the recording should be considered watched
+ *
+ *   By comparing the number of framesPlayed to the total number of
+ *   frames in the video minus an offset (14%) we determine if the
+ *   recording is likely to have been watched to the end, ignoring
+ *   end credits and trailing adverts.
+ *
+ *   PlaybackInfo::SetWatchedFlag is then called with the argument TRUE
+ *   or FALSE accordingly.
+ *
+ *   \param forceWatched Forces a recording watched ignoring the amount
+ *                       actually played (Optional)
+ */
 void NuppelVideoPlayer::SetWatched(bool forceWatched)
 {
     if (!m_playbackinfo)
@@ -3737,9 +3751,19 @@ void NuppelVideoPlayer::SetWatched(bool forceWatched)
 
     if (m_playbackinfo->GetTranscodedStatus() != TRANSCODING_COMPLETE)
     {
+        uint endtime;
+
+        // If the recording is stopped early we need to use the recording end
+        // time, not the programme end time
+        if (m_playbackinfo->recendts.toTime_t() <
+                m_playbackinfo->endts.toTime_t())
+            endtime = m_playbackinfo->recendts.toTime_t();
+        else
+            endtime = m_playbackinfo->endts.toTime_t();
+
         numFrames = (long long)
-            ((m_playbackinfo->endts.toTime_t() -
-              m_playbackinfo->recstartts.toTime_t()) * video_frame_rate);
+            ((endtime - m_playbackinfo->recstartts.toTime_t())
+              * video_frame_rate);
     }
 
     int offset = (int) round(0.14 * (numFrames / video_frame_rate));
