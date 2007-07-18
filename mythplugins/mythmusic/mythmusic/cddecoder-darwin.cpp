@@ -216,6 +216,7 @@ void CdDecoder::lookupCDDB(const QString &hexID, uint totalTracks)
     if (stat == 211)  // Multiple matches
     {
         // Parse disks, put up dialog box, select disk, prune cddb to selected
+        VERBOSE(VB_MEDIA, "Multiple CDDB matches. Please implement this code");
     }
 
     if (stat == 200)  // One unique match
@@ -279,7 +280,8 @@ void CdDecoder::lookupCDDB(const QString &hexID, uint totalTracks)
                     if (art.length())
                     {
                         compn = true;  // Probably a compilation
-                        m->setArtist(art);
+
+                        m->setArtist(M_QSTRING_UNICODE(art));
                     }
                 }
                 else
@@ -299,19 +301,19 @@ void CdDecoder::lookupCDDB(const QString &hexID, uint totalTracks)
             if (compn)
                 m->setCompilation(true);
 
-            m->setGenre(genre);
+            m->setGenre(M_QSTRING_UNICODE(genre));
 
             if (year)
                 m->setYear(year);
 
             if (album.length())
-                m->setAlbum(album);
+                m->setAlbum(M_QSTRING_UNICODE(album));
 
             if (artist.length())
                 if (compn)
-                    m->setCompilationArtist(artist);
+                    m->setCompilationArtist(M_QSTRING_UNICODE(artist));
                 else
-                    m->setArtist(artist);
+                    m->setArtist(M_QSTRING_UNICODE(artist));
         }
     }
 }

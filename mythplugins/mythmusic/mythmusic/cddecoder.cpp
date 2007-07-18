@@ -395,10 +395,12 @@ Metadata *CdDecoder::getMetadata()
     {
         cd_finish(cd);
         VERBOSE(VB_IMPORTANT, QString("Error during CD lookup: %1").arg(ret));
+        VERBOSE(VB_MEDIA, QString("cddb_read_disc_data() said: ")
+                          + cddb_message);
         return NULL;
     }
 
-    compilation_artist = QString::fromUtf8(discdata.data_artist);
+    compilation_artist = M_QSTRING_UNICODE(discdata.data_artist);
 
     if (compilation_artist.lower().left(7) == "various")
     {
@@ -406,7 +408,7 @@ Metadata *CdDecoder::getMetadata()
     }
 
 
-    album = QString::fromUtf8(discdata.data_title);
+    album = M_QSTRING_UNICODE(discdata.data_title);
     genre = cddb_genre(discdata.data_genre);
  
     if (!genre.isEmpty()) 
@@ -416,8 +418,8 @@ Metadata *CdDecoder::getMetadata()
         genre = flet + rt;
     }
 
-    title = QString::fromUtf8(discdata.data_track[tracknum - 1].track_name);        
-    artist = QString::fromUtf8(discdata.data_track[tracknum - 1].track_artist);
+    title  = M_QSTRING_UNICODE(discdata.data_track[tracknum - 1].track_name);
+    artist = M_QSTRING_UNICODE(discdata.data_track[tracknum - 1].track_artist);
 
     if (artist.length() < 1)
     {
