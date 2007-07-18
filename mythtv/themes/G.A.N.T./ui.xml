@@ -1306,19 +1306,43 @@
         <position>160,195</position>
       </image>
       <image name="stereo" draworder="6">
-        <filename>type/stereo.png</filename>
+        <filename>stereo.png</filename>
+        <position>195,195</position>
+      </image>
+      <image name="surround" draworder="6">
+        <filename>surround.png</filename>
+        <position>195,195</position>
+      </image>
+      <image name="dolby" draworder="6">
+        <filename>dd.png</filename>
+        <position>195,195</position>
+      </image>
+      <image name="mono" draworder="6">
+        <filename>mono.png</filename>
         <position>195,195</position>
       </image>
       <image name="cc" draworder="6">
         <filename>type/cc.png</filename>
         <position>230,195</position>
       </image>
+      <image name="subtitles" draworder="6">
+        <filename>subs.png</filename>
+        <position>230,195</position>
+      </image>
+      <image name="onscreensub" draworder="6">
+        <filename>subs_onscreen.png</filename>
+        <position>230,195</position>
+      </image>
       <image name="hdtv" draworder="6">
         <filename>type/hd.png</filename>
         <position>265,195</position>
       </image>
+      <image name="widescreen" draworder="6">
+        <filename>wide.png</filename>
+        <position>265,195</position>
+      </image>
       <image name="watched" draworder="6">
-          <filename>type/watched.png</filename>
+          <filename>watched.png</filename>
           <position>300,195</position>
       </image>
 
