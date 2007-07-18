@@ -104,11 +104,11 @@
  <!-- 
     <container name="background">
       <image name="backup" draworder="0">
-        <filename>mw-background.png</filename>
+        <filename>mw_background.png</filename>
         <position>22,175</position>
       </image>
       <image name="lines" draworder="0">
-        <filename>mw-lines.png</filename>
+        <filename>mw_lines.png</filename>
         <position>22,175</position>
       </image>
     </container>
@@ -140,11 +140,11 @@
     <area>0,0,0,0</area>
     </blackhole-->
       <image name="backup" draworder="0">
-        <filename>mw-background.png</filename>
+        <filename>mw_background.png</filename>
         <position>22,175</position>
       </image>
       <image name="lines" draworder="0">
-        <filename>mw-lines.png</filename>
+        <filename>mw_lines.png</filename>
         <position>22,175</position>
       </image>
       <textarea name="*currentdatetime" draworder="2" align="right">
@@ -255,11 +255,11 @@
 
     <container name="Three Day Forecast">
       <!--image name="backup" draworder="0">
-        <filename>mw-background.png</filename>
+        <filename>mw_background.png</filename>
         <position>22,175</position>
       </image>
       <image name="lines" draworder="0">
-        <filename>mw-lines.png</filename>
+        <filename>mw_lines.png</filename>
         <position>22,175</position>
       </image-->
       <textarea name="+3dlocation" draworder="5" align="center">
@@ -290,17 +290,17 @@
         <value>Three Day Forecast</value>
       </textarea>
       <image name="background-0" draworder="0">
-        <filename>mw-shading.png</filename>
+        <filename>mw_shading.png</filename>
         <position>40,150</position>
         <staticsize>230,305</staticsize>
       </image>
       <image name="background-1" draworder="0">
-        <filename>mw-shading.png</filename>
+        <filename>mw_shading.png</filename>
         <position>285,220</position>
         <staticsize>230,305</staticsize>
       </image>
       <image name="background-2" draworder="0">
-        <filename>mw-shading.png</filename>
+        <filename>mw_shading.png</filename>
         <position>530,150</position>
         <staticsize>230,305</staticsize>
       </image>
@@ -434,32 +434,32 @@
         <value>Six Day Forecast</value>
       </textarea>   
       <image name="background-0" draworder="0">
-        <filename>mw-shading.png</filename>
+        <filename>mw_shading.png</filename>
         <position>40,135</position>
         <staticsize>233,190</staticsize>
       </image>
       <image name="background-1" draworder="0">
-        <filename>mw-shading.png</filename>
+        <filename>mw_shading.png</filename>
         <position>283,135</position>
         <staticsize>233,190</staticsize>
       </image>
       <image name="background-2" draworder="0">
-        <filename>mw-shading.png</filename>
+        <filename>mw_shading.png</filename>
         <position>526,135</position>
         <staticsize>233,190</staticsize>
       </image>
       <image name="background-3" draworder="0">
-        <filename>mw-shading.png</filename>
+        <filename>mw_shading.png</filename>
         <position>40,335</position>
         <staticsize>233,190</staticsize>
       </image>
       <image name="background-4" draworder="0">
-        <filename>mw-shading.png</filename>
+        <filename>mw_shading.png</filename>
         <position>283,335</position>
         <staticsize>233,190</staticsize>
       </image>
       <image name="background-5" draworder="0">
-        <filename>mw-shading.png</filename>
+        <filename>mw_shading.png</filename>
         <position>526,335</position>
         <staticsize>233,190</staticsize>
       </image>
@@ -630,11 +630,11 @@
    
     <!--container name="Today's Forecast">
       <image name="backup" draworder="0">
-        <filename>mw-background.png</filename>
+        <filename>mw_background.png</filename>
         <position>22,175</position>
       </image>
       <image name="lines" draworder="0">
-        <filename>mw-lines.png</filename>
+        <filename>mw_lines.png</filename>
         <position>22,175</position>
       </image>
       <image name="logo" draworder="2">
@@ -672,7 +672,7 @@
         <area>0,0,0,0</area>
       </blackhole>
       <!--image name="backup" draworder="0">
-        <filename>mw-background.png</filename>
+        <filename>mw_background.png</filename>
         <position>22,175</position>
       </image-->
       <textarea name="*currentdatetime" draworder="2" align="right">
@@ -706,7 +706,7 @@
         <area>0,0,0,0</area>
       </blackhole>
       <!--image name="backup" draworder="0">
-        <filename>mw-background.png</filename>
+        <filename>mw_background.png</filename>
         <position>22,175</position>
       </image-->
       <textarea name="*currentdatetime" draworder="2" align="right">
@@ -761,11 +761,11 @@
         <staticsize>150,110</staticsize>
       </image>
       <image name="lines" draworder="0">
-        <filename>mw-lines.png</filename>
+        <filename>mw_lines.png</filename>
         <position>22,175</position>
       </image>
       <image name="backup" draworder="0">
-        <filename>mw-background.png</filename>
+        <filename>mw_background.png</filename>
         <position>22,175</position>
       </image>
       <textarea name="header" draworder="5" align="center">
@@ -782,8 +782,8 @@
         <image function="downarrow-reg" filename="blank.png" location="750,480"></image>
         <image function="uparrow-sel" filename="uparrow.png" location="750,230"></image>
         <image function="downarrow-sel" filename="downarrow.png" location="750,480"></image>
-        <backgroundreg>mw-shading.png</backgroundreg>
-        <backgroundsel>mw-shading.png</backgroundsel>
+        <backgroundreg>mw_shading.png</backgroundreg>
+        <backgroundsel>mw_shading.png</backgroundsel>
       </richtextarea>
       <textarea name="*updatetime" draworder="5">
         <area>39,540,700,35</area>
@@ -816,32 +816,32 @@
         <value>18 Hour Forecast</value>
       </textarea>   
       <image name="background-0" draworder="0">
-        <filename>mw-shading.png</filename>
+        <filename>mw_shading.png</filename>
         <position>40,135</position>
         <staticsize>233,190</staticsize>
       </image>
       <image name="background-1" draworder="0">
-        <filename>mw-shading.png</filename>
+        <filename>mw_shading.png</filename>
         <position>283,135</position>
         <staticsize>233,190</staticsize>
       </image>
       <image name="background-2" draworder="0">
-        <filename>mw-shading.png</filename>
+        <filename>mw_shading.png</filename>
         <position>526,135</position>
         <staticsize>233,190</staticsize>
       </image>
       <image name="background-3" draworder="0">
-        <filename>mw-shading.png</filename>
+        <filename>mw_shading.png</filename>
         <position>40,335</position>
         <staticsize>233,190</staticsize>
       </image>
       <image name="background-4" draworder="0">
-        <filename>mw-shading.png</filename>
+        <filename>mw_shading.png</filename>
         <position>283,335</position>
         <staticsize>233,190</staticsize>
       </image>
       <image name="background-5" draworder="0">
-        <filename>mw-shading.png</filename>
+        <filename>mw_shading.png</filename>
         <position>526,335</position>
         <staticsize>233,190</staticsize>
       </image>
@@ -1008,11 +1008,11 @@
     </container>
     <!--container name="Tomorrow's Outlook">
       <image name="backup" draworder="0">
-        <filename>mw-background.png</filename>
+        <filename>mw_background.png</filename>
         <position>22,175</position>
       </image>
       <image name="lines" draworder="0">
-        <filename>mw-lines.png</filename>
+        <filename>mw_lines.png</filename>
         <position>22,175</position>
       </image>
       <image name="logo" draworder="2">
@@ -1068,11 +1068,11 @@
 
     <container name="Radar">
       <image name="backup" draworder="0">
-        <filename>mw-background.png</filename>
+        <filename>mw_background.png</filename>
         <position>22,175</position>
       </image>
       <image name="lines" draworder="0">
-        <filename>mw-lines.png</filename>
+        <filename>mw_lines.png</filename>
         <position>22,175</position>
       </image>
       <textarea name="header" draworder="5" align="center">
@@ -1149,7 +1149,7 @@
         <value>CLOUD TEMPERATURE</value>
       </textarea>
       <image name="radarbk" draworder="4">
-        <filename>mw-map.png</filename>
+        <filename>mw_map.png</filename>
         <position>0,0</position>
       </image>
       <image name="+radarimg" draworder="6">
