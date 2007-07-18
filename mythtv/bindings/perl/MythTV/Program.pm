@@ -289,6 +289,8 @@ package MythTV::Program;
         ($fields{'R'} = ($self->{'description'} or '')) =~ s/%/%%/g;
         ($fields{'C'} = ($self->{'category'}    or '')) =~ s/%/%%/g;
         ($fields{'U'} = ($self->{'recgroup'}    or '')) =~ s/%/%%/g;
+    # Misc
+        ($fields{'hn'} = ($self->{'hostname'}    or '')) =~ s/%/%%/g;
     # Channel info
         $fields{'c'}   = $self->{'chanid'};
         ($fields{'cn'} = ($self->{'channel'}{'channum'}  or '')) =~ s/%/%%/g;
