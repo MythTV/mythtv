@@ -47,14 +47,18 @@ EITFixUp::EITFixUp()
                       "(?:\\s?(?:/|:|av)\\s?([0-9]+))?\\."),
       m_comHemSeries2("\\s?-?\\s?([Dd]el\\s+([0-9]+))"),
       m_comHemTSub("\\s+-\\s+([^\\-]+)"),
-      m_mcaIncompleteTitle("(.*)\\.\\.\\.$"),
+      m_mcaIncompleteTitle("(.*).\\.\\.\\.$"),
+      m_mcaCompleteTitlea("^'?("),
+      m_mcaCompleteTitleb("[^\\.\\?]+[^\\'])'?[\\.\\?]\\s+(.+)"),
       m_mcaSubtitle("^'([^\\.]+)'\\.\\s+(.+)"),
-      m_mcaSeries("(^\\d+)\\/(\\d+) - (.*)$"),
-      m_mcaCredits("(.*) \\((\\d{4})\\)\\s*([^\\.]+)\\.?\\s*$"),
-      m_mcaActors("(.*\\.)\\s+([^\\.]+ [A-Z][^\\.]+)\\.\\s*"),
+      m_mcaSeries("(^\\d+)\\/(\\d+)\\s-\\s(.*)$"),
+      m_mcaCredits("(.*)\\s\\((\\d{4})\\)\\s*([^\\.]+)\\.?\\s*$"),
+      m_mcaAvail("\\s(Only available on [^\\.]*bouquet|Not available in RSA [^\\.]*)\\.?"),
+      m_mcaActors("(.*\\.)\\s+([^\\.]+\\s[A-Z][^\\.]+)\\.\\s*"),
       m_mcaActorsSeparator("(,\\s+)"),
-      m_mcaYear("(.*) \\((\\d{4})\\)\\s*$"),
-      m_mcaCC("(.*)\\. HI Subtitles$"),
+      m_mcaYear("(.*)\\s\\((\\d{4})\\)\\s*$"),
+      m_mcaCC(",?\\s(HI|English) Subtitles\\.?"),
+      m_mcaDD(",?\\sDD\\.?"),
       m_RTLrepeat("(\\(|\\s)?Wiederholung.+vo[m|n].+((?:\\d{2}\\.\\d{2}\\.\\d{4})|(?:\\d{2}[:\\.]\\d{2}\\sUhr))\\)?"),
       m_RTLSubtitle1("^Folge\\s(\\d{1,4})\\s*:\\s+'(.*)'(?:\\.\\s*|$)"),
       m_RTLSubtitle2("^Folge\\s(\\d{1,4})\\s+(.{,5}[^\\.]{,120})[\\?!\\.]\\s*"),
@@ -767,8 +771,9 @@ void EITFixUp::FixAUStar(DBEvent &event) const
  */
 void EITFixUp::FixMCA(DBEvent &event) const
 {
-    const uint SUBTITLE_PCT = 35; //% of description to allow subtitle up to
-    const uint SUBTITLE_MAX_LEN = 128; // max length of subtitle field in db.
+    const uint SUBTITLE_PCT     = 60; //% of description to allow subtitle to
+    const uint SUBTITLE_MAX_LEN = 128;// max length of subtitle field in db.
+    bool       dd               = false;
     int        position;
     QRegExp    tmpExp1;
 
@@ -778,6 +783,21 @@ void EITFixUp::FixMCA(DBEvent &event) const
     // No need to continue without a description.
     if (event.description.length() <= 0)
         return;
+
+    // Replace incomplete title if the full one is in the description
+    tmpExp1 = m_mcaIncompleteTitle;
+    if (tmpExp1.search(event.title) != -1)
+    {
+        tmpExp1 = QString(m_mcaCompleteTitlea.pattern() + tmpExp1.cap(1) +
+                          m_mcaCompleteTitleb.pattern());
+        tmpExp1.setCaseSensitive(false);
+        if (tmpExp1.search(event.description) != -1)
+        {
+            event.title       = tmpExp1.cap(1).stripWhiteSpace();
+            event.description = tmpExp1.cap(2).stripWhiteSpace();
+        }
+        tmpExp1.setCaseSensitive(true);
+    }
 
     // Try to find subtitle in description
     tmpExp1 = m_mcaSubtitle;
@@ -789,17 +809,6 @@ void EITFixUp::FixMCA(DBEvent &event) const
         {
             event.subtitle    = tmpExp1.cap(1);
             event.description = tmpExp1.cap(2);
-        }
-    }
-
-    // Replace incomplete titles if the full one is the subtitle
-    tmpExp1 = m_mcaIncompleteTitle;
-    if (tmpExp1.search(event.title) != -1)
-    {
-        if (event.subtitle.find(tmpExp1.cap(1)) == 0)
-        {
-            event.title = event.subtitle;
-            event.subtitle = QString::null;
         }
     }
 
@@ -817,23 +826,34 @@ void EITFixUp::FixMCA(DBEvent &event) const
 
     // Close captioned?
     position = event.description.find(m_mcaCC);
-    if (position != -1)
+    if (position > 0)
     {
         event.flags |= DBEvent::kCaptioned;
         event.description.replace(m_mcaCC, "");
     }
 
+    // Dolby Digital 5.1?
+    position = event.description.find(m_mcaDD);
+    if ((position > 0) && (position > (int) (event.description.length() - 7)))
+    {
+        event.flags |= DBEvent::kStereo;
+        dd = true;
+        event.description.replace(m_mcaDD, "");
+    }
 
-    bool isMovie = false;
+    // Remove bouquet tags
+    event.description.replace(m_mcaAvail, "");
+
     // Try to find year and director from the end of the description
+    bool isMovie = false;
     tmpExp1  = m_mcaCredits;
     position = tmpExp1.search(event.description);
     if (position != -1)
     {
         isMovie = true;
-        event.airdate = tmpExp1.cap(2).stripWhiteSpace();
-        event.AddPerson(DBPerson::kDirector, tmpExp1.cap(3).stripWhiteSpace());
         event.description = tmpExp1.cap(1).stripWhiteSpace();
+        event.airdate     = tmpExp1.cap(2).stripWhiteSpace();
+        event.AddPerson(DBPerson::kDirector, tmpExp1.cap(3).stripWhiteSpace());
     }
     else
     {
@@ -843,8 +863,8 @@ void EITFixUp::FixMCA(DBEvent &event) const
         if (position != -1)
         {
             isMovie = true;
-            event.airdate = tmpExp1.cap(2).stripWhiteSpace();
             event.description = tmpExp1.cap(1).stripWhiteSpace();
+            event.airdate     = tmpExp1.cap(2).stripWhiteSpace();
         }
     }
 
@@ -856,12 +876,16 @@ void EITFixUp::FixMCA(DBEvent &event) const
         {
             QStringList actors;
             actors = QStringList::split(m_mcaActorsSeparator,tmpExp1.cap(2));
-            for(QStringList::size_type i = 0; i < actors.count(); ++i)
+            for (QStringList::size_type i = 0; i < actors.count(); ++i)
                 event.AddPerson(DBPerson::kActor, actors[i].stripWhiteSpace());
             event.description = tmpExp1.cap(1).stripWhiteSpace();
         }
         event.category_type = kCategoryMovie;
     }
+
+    //Add descriptive DD tag
+    if (dd)
+        event.description += " [Dolby 5.1]";
 }
 
 /** \fn EITFixUp::FixRTL(DBEvent&) const
