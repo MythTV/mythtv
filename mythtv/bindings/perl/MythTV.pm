@@ -66,7 +66,7 @@ package MythTV;
 # NUMPROGRAMLINES is defined in mythtv/libs/libmythtv/programinfo.h and is
 # the number of items in a ProgramInfo QStringList group used by
 # ProgramInfo::ToSringList and ProgramInfo::FromStringList.
-    our $NUMPROGRAMLINES = 43;
+    our $NUMPROGRAMLINES = 46;
 
 # Reasons a recording wouldn't be happening (from libs/libmythtv/programinfo.h)
     our %RecStatus_Types = (
