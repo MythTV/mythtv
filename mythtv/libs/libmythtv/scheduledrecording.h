@@ -64,6 +64,8 @@ class MPUBLIC ScheduledRecording : public ConfigurationGroup
     ScheduledRecording();
     ScheduledRecording(const ScheduledRecording& other);
 
+    void deleteLater();
+
     virtual void load();
     
     void makeOverride(void);

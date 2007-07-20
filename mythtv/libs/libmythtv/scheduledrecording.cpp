@@ -33,6 +33,21 @@ class ScheduledRecordingDialog : public ConfigurationDialog
     ScheduledRecording *schedrec;
 };
 
+void ScheduledRecording::deleteLater()
+{
+    // If we created a dialog, it took over management of rootGroup.
+    // If that is the case, delete dialog instead of rootGroup.
+    if (dialog)
+    {
+        delete dialog;
+        dialog = NULL;
+    }
+    else if (rootGroup)
+        rootGroup->deleteLater();
+
+    ConfigurationGroup::deleteLater();
+}
+
 ScheduledRecording::ScheduledRecording() :
     ConfigurationGroup(true, true, false, false)
 {
@@ -93,14 +108,8 @@ ScheduledRecording::ScheduledRecording() :
     dialog = NULL;
 }
 
-ScheduledRecording::~ScheduledRecording() 
+ScheduledRecording::~ScheduledRecording()
 {
-    // If we created a dialog, it took over management of rootGroup.
-    // If that is the case, delete dialog instead of rootGroup.
-    if (dialog)
-        delete dialog;
-    else if (rootGroup)
-        rootGroup->deleteLater();
 }
 
 void ScheduledRecording::load()
