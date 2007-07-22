@@ -1992,6 +1992,7 @@ def createDVDAuthorXML(screensize, numberofitems):
         #Number of video items on this menu page
         itemsonthispage=0
 
+        endbuttons = []
         #Loop through all the items on this menu page
         while itemnum <= numberofitems and itemsonthispage < itemsperpage:
             menuitem=menuitems[ itemsonthispage ]
@@ -2170,8 +2171,7 @@ def createDVDAuthorXML(screensize, numberofitems):
                         button=dvddom.createElement("button")
                         button.setAttribute("name","previous")
                         button.appendChild(dvddom.createTextNode("{g2=1;jump menu %s;}" % page ))
-                        menupgc.appendChild(button)
-                        del button
+                        endbuttons.append(button)
 
 
                 elif node.nodeName=="next":
@@ -2179,14 +2179,17 @@ def createDVDAuthorXML(screensize, numberofitems):
                         button=dvddom.createElement("button")
                         button.setAttribute("name","next")
                         button.appendChild(dvddom.createTextNode("{g2=1;jump menu %s;}" % (page + 2)))
-                        menupgc.appendChild(button)
-                        del button
+                        endbuttons.append(button)
 
             #On to the next item
             itemnum+=1
 
         #Move on to the next page
         page+=1
+
+        for button in endbuttons:
+            menupgc.appendChild(button)
+            del button
 
     if wantIntro:
         #Menu creation is finished so we know how many pages were created
