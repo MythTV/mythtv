@@ -79,7 +79,6 @@ class CDRipperThread: public QThread
 
         RipStatus         *m_parent;
         bool               m_quit;
-        QMutex             m_mutex;
         QString            m_CDdevice;
         int                m_quality;
         vector<RipTrack*> *m_tracks;

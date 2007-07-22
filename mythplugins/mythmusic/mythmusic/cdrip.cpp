@@ -126,18 +126,12 @@ CDRipperThread::~CDRipperThread(void)
 
 void CDRipperThread::cancel(void)
 {
-    m_mutex.lock();
     m_quit = true;
-    m_mutex.unlock();
 }
 
 bool CDRipperThread::isCancelled(void)
 {
-    bool res;
-    m_mutex.lock();
-    res = m_quit;
-    m_mutex.unlock();
-    return res;
+    return m_quit;
 }
 
 void CDRipperThread::sendEvent(int eventType, const QString &value)
