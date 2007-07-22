@@ -1895,11 +1895,23 @@ long long getCutFrames(const QString &filename)
     if (!progInfo)
         return 0;
 
+    if (progInfo->isVideo)
+    {
+        delete progInfo;
+        return 0;
+    }
+
     QMap<long long, int> cutlist;
     QMap<long long, int>::Iterator it;
     long long frames = 0;
 
     progInfo->GetCutList(cutlist);
+
+    if (cutlist.size() == 0)
+    {
+        delete progInfo;
+        return 0;
+    }
 
     for (it = cutlist.begin(); it != cutlist.end();)
     {
@@ -1918,6 +1930,7 @@ long long getCutFrames(const QString &filename)
         frames += end - start;
     }
 
+    delete progInfo;
     return frames;
 }
 
@@ -2131,7 +2144,6 @@ int getFileInfo(QString inFile, QString outFile, int lenMethod)
                 int cutduration = (int)(frames / fps);
                 VERBOSE(VB_JOBQUEUE, QString("cutduration = %1").arg(cutduration));
                 root.setAttribute("cutduration", duration - cutduration);
-
                 break;
             }
 

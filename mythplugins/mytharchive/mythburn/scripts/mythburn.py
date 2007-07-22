@@ -31,7 +31,7 @@
 #******************************************************************************
 
 # version of script - change after each update
-VERSION="0.1.20070619-1"
+VERSION="0.1.20070722-1"
 
 
 ##You can use this debug flag when testing out new themes
@@ -146,12 +146,57 @@ jobDOM = None
 themeDOM = None
 themeName = ''
 
-#Maximum of 10 theme fonts
-themeFonts = [0,0,0,0,0,0,0,0,0,0]
+#dictionary of font definitions used in theme
+themeFonts = {}
 
 # no. of processors we have access to
 cpuCount = 1
 
+# class to hold a font definition
+class FontDef(object):
+    def __init__(self, name=None, fontFile=None, size=19, color="white", effect="normal", shadowColor="black", shadowSize=1):
+        self.name = name
+        self.fontFile = fontFile
+        self.size = size
+        self.color = color
+        self.effect = effect
+        self.shadowColor = shadowColor
+        self.shadowSize = shadowSize
+        self.font = None
+
+    def getFont(self):
+        if self.font == None:
+            self.font = ImageFont.truetype(self.fontFile, int(self.size))
+
+        return self.font
+
+    def drawText(self, text, color=None):
+        if self.font == None:
+            self.font = ImageFont.truetype(self.fontFile, int(self.size))
+
+        if color == None:
+            color = self.color
+
+        textwidth, textheight = self.font.getsize(text)
+
+        image = Image.new("RGBA", (textwidth + (self.shadowSize * 2), textheight), (0,0,0,0))
+        draw = ImageDraw.ImageDraw(image)
+
+        if self.effect == "shadow":
+            draw.text((self.shadowSize,self.shadowSize), text, font=self.font, fill=self.shadowColor)
+            draw.text((0,0), text, font=self.font, fill=color)
+        elif self.effect == "outline":
+            for x in range(0, self.shadowSize * 2 + 1):
+                for y in range(0, self.shadowSize * 2 + 1):
+                    draw.text((x, y), text, font=self.font, fill=self.shadowColor)
+
+            draw.text((self.shadowSize,self.shadowSize), text, font=self.font, fill=color)
+        else:
+            draw.text((0,0), text, font=self.font, fill=color)
+
+        bbox = image.getbbox()
+        image = image.crop(bbox)
+        return image
 
 def write(text, progress=True):
     """Simple place to channel all text output through"""
@@ -716,7 +761,7 @@ def getScaledAttribute(node, attribute):
     else:
         return int(float(node.attributes[attribute].value) / 1.2)
 
-def intelliDraw(drawer,text,font,containerWidth):
+def intelliDraw(drawer, text, font, containerWidth):
     """Based on http://mail.python.org/pipermail/image-sig/2004-December/003064.html"""
     #Args:
     #  drawer: Instance of "ImageDraw.Draw()"
@@ -738,7 +783,7 @@ def intelliDraw(drawer,text,font,containerWidth):
             #write( 'thistext: '+str(thistext))
             #write("textWidth: %s" % drawer.textsize(' '.join(thistext),font)[0])
 
-            if drawer.textsize(' '.join(thistext),font)[0] > containerWidth:
+            if drawer.textsize(' '.join(thistext),font.getFont())[0] > containerWidth:
                 # this is the heart of the algorithm: we pop words off the current
                 # sentence until the width is ok, then in the next outer loop
                 # we move on to the next sentence. 
@@ -758,29 +803,33 @@ def intelliDraw(drawer,text,font,containerWidth):
     for i in lines:
         tmp.append( ' '.join(i) )
     lines = tmp
-    (width,height) = drawer.textsize(lines[0],font)
-    return (lines,width,height)
+    return lines
 
-def paintText(draw, x, y, width, height, text, font, colour, alignment):
+def paintText(draw, image, x, y, width, height, text, font, color, alignment):
     """Takes a piece of text and draws it onto an image inside a bounding box."""
     #The text is wider than the width of the bounding box
 
-    lines,tmp,h = intelliDraw(draw,text,font,width)
+    lines = intelliDraw(draw, text, font, width)
     j = 0
 
+    # work out what the line spacing should be
+    textImage = font.drawText(lines[0])
+    h = int(textImage.size[1] * 1.1)
+
     for i in lines:
-        if (j*h) < (height-h):
+        if (j * h) < (height - h):
+            textImage = font.drawText(i, color)
             write( "Wrapped text  = " + i.encode("ascii", "replace"), False)
 
-            if alignment=="left":
-                indent=0
+            if alignment == "left":
+                indent = 0
             elif  alignment=="center" or alignment=="centre":
-                indent=(width/2) - (draw.textsize(i,font)[0] /2)
-            elif  alignment=="right":
-                indent=width - draw.textsize(i,font)[0]
+                indent = (width / 2) - (textImage.size[0] / 2)
+            elif  alignment == "right":
+                indent = width - textImage.size[0]
             else:
                 indent=0
-            draw.text( (x+indent,y+j*h),i , font=font, fill=colour)
+            image.paste(textImage, (x + indent,y + j * h))
         else:
             write( "Truncated text = " + i.encode("ascii", "replace"), False)
         #Move to next line
@@ -813,12 +862,41 @@ def loadFonts(themeDOM):
     #Find all the fonts
     nodelistfonts=themeDOM.getElementsByTagName("font")
 
-    fontnumber=0
-    for nodefont in nodelistfonts:
-        fontname = getText(nodefont)
-        fontsize = getScaledAttribute(nodefont, "size")
-        themeFonts[fontnumber]=ImageFont.truetype(getFontPathName(fontname),fontsize )
-        write( "Loading font %s, %s size %s" % (fontnumber,getFontPathName(fontname),fontsize) )
+    fontnumber = 0
+    for node in nodelistfonts:
+        filename = getText(node)
+
+        if node.hasAttribute("name"):
+            name = node.attributes["name"].value
+        else:
+            name = str(fontnumber)
+
+        fontsize = getScaledAttribute(node, "size")
+
+        if node.hasAttribute("color"):
+            color = node.attributes["color"].value
+        else:
+            color = "white"
+
+        if node.hasAttribute("effect"):
+            effect = node.attributes["effect"].value
+        else:
+            effect = "normal"
+
+        if node.hasAttribute("shadowsize"):
+            shadowsize = int(node.attributes["shadowsize"].value)
+        else:
+            shadowsize = 0
+
+        if node.hasAttribute("shadowcolor"):
+            shadowcolor = node.attributes["shadowcolor"].value
+        else:
+            shadowcolor = "black"
+
+        themeFonts[name] = FontDef(name, getFontPathName(filename),
+                           fontsize, color, effect, shadowcolor, shadowsize)
+
+        write( "Loading font %s, %s size %s" % (fontnumber,getFontPathName(filename),fontsize) )
         fontnumber+=1
 
 def getFileInformation(file, folder):
@@ -2419,15 +2497,23 @@ def drawThemeItem(page, itemsonthispage, itemnum, menuitem, bgimage, draw,
         elif node.nodeName=="text":
             #Apply some text to the background, including wordwrap if required.
             text=expandItemText(infoDOM,node.attributes["value"].value, itemnum, page, itemsonthispage,chapternumber,chapterlist)
+
+            if node.hasAttribute("colour"):
+                color = node.attributes["colour"].value
+            elif node.hasAttribute("color"):
+                color = node.attributes["color"].value
+            else:
+                color = None
+
             if text>"":
-                paintText( draw,
+                paintText( draw, bgimage,
                            getScaledAttribute(node, "x"),
                            getScaledAttribute(node, "y"),
                            getScaledAttribute(node, "w"),
                            getScaledAttribute(node, "h"),
                            text,
-                           themeFonts[int(node.attributes["font"].value)],
-                           node.attributes["colour"].value,
+                           themeFonts[node.attributes["font"].value],
+                           color,
                            node.attributes["align"].value )
                 boundarybox=checkBoundaryBox(boundarybox, node)
             del text
@@ -2544,15 +2630,23 @@ def drawThemeItem(page, itemsonthispage, itemnum, menuitem, bgimage, draw,
             if textnode.length > 0:
                 textnode = textnode[0]
                 text=expandItemText(infoDOM,textnode.attributes["value"].value, itemnum, page, itemsonthispage,chapternumber,chapterlist)
-                if text>"":
-                    paintText( draw,
+
+                if node.hasAttribute("colour"):
+                    color = node.attributes["colour"].value
+                elif node.hasAttribute("color"):
+                    color = node.attributes["color"].value
+                else:
+                    color = None
+
+                if text > "":
+                    paintText( draw, bgimage,
                            getScaledAttribute(textnode, "x"),
                            getScaledAttribute(textnode, "y"),
                            getScaledAttribute(textnode, "w"),
                            getScaledAttribute(textnode, "h"),
                            text,
-                           themeFonts[int(textnode.attributes["font"].value)],
-                           textnode.attributes["colour"].value,
+                           themeFonts[textnode.attributes["font"].value],
+                           color,
                            textnode.attributes["align"].value )
                 boundarybox=checkBoundaryBox(boundarybox, node)
                 del text
@@ -2568,18 +2662,18 @@ def drawThemeItem(page, itemsonthispage, itemnum, menuitem, bgimage, draw,
             textnode = node.getElementsByTagName("textselected")
             if textnode.length > 0:
                 textnode = textnode[0]
-                text=expandItemText(infoDOM,textnode.attributes["value"].value, itemnum, page, itemsonthispage,chapternumber,chapterlist)
-                textImage=Image.new("RGBA",picture.size)
-                textDraw=ImageDraw.Draw(textImage)
+                text = expandItemText(infoDOM,textnode.attributes["value"].value, itemnum, page, itemsonthispage,chapternumber,chapterlist)
+                textImage = Image.new("RGBA",picture.size)
+                textDraw = ImageDraw.Draw(textImage)
 
-                if text>"":
-                    paintText(textDraw,
+                if text > "":
+                    paintText(textDraw, textImage,
                            getScaledAttribute(node, "x") - getScaledAttribute(textnode, "x"),
                            getScaledAttribute(node, "y") - getScaledAttribute(textnode, "y"),
                            getScaledAttribute(textnode, "w"),
                            getScaledAttribute(textnode, "h"),
                            text,
-                           themeFonts[int(textnode.attributes["font"].value)],
+                           themeFonts[textnode.attributes["font"].value],
                            "white",
                            textnode.attributes["align"].value )
                 #convert the RGB image to a 1 bit image
@@ -2591,7 +2685,14 @@ def drawThemeItem(page, itemsonthispage, itemnum, menuitem, bgimage, draw,
                         else:
                             textImage.putpixel((x,y), (255, 255, 255, 255))
 
-                bgimagemask.paste(textnode.attributes["colour"].value, 
+                if textnode.hasAttribute("colour"):
+                    color = textnode.attributes["colour"].value
+                elif textnode.hasAttribute("color"):
+                    color = textnode.attributes["color"].value
+                else:
+                    color = "white"
+
+                bgimagemask.paste(color,
                             (getScaledAttribute(textnode, "x"), getScaledAttribute(textnode, "y")), 
                             textImage)
                 boundarybox=checkBoundaryBox(boundarybox, node)
@@ -2757,7 +2858,7 @@ def createMenu(screensize, screendpi, numberofitems):
         bgimage.paste(overlayimage, (0,0), overlayimage)
 
         #Save this menu image and its mask
-        bgimage.save(os.path.join(getTempPath(),"background-%s.jpg" % page),"JPEG", quality=90)
+        bgimage.save(os.path.join(getTempPath(),"background-%s.jpg" % page),"JPEG", quality=99)
         bgimagemask.save(os.path.join(getTempPath(),"backgroundmask-%s.png" % page),"PNG",quality=99,optimize=0,dpi=screendpi)
 
         #now that the base background has been made and all the previews generated
@@ -2795,7 +2896,7 @@ def createMenu(screensize, screendpi, numberofitems):
                             del picture
                     previewitem+=1
                 #bgimage.save(os.path.join(getTempPath(),"background-%s-f%06d.png" % (page, framenum)),"PNG",quality=100,optimize=0,dpi=screendpi)
-                bgimage.save(os.path.join(getTempPath(),"background-%s-f%06d.jpg" % (page, framenum)),"JPEG",quality=90)
+                bgimage.save(os.path.join(getTempPath(),"background-%s-f%06d.jpg" % (page, framenum)),"JPEG",quality=99)
                 framenum+=1
 
         spumuxdom.documentElement.firstChild.firstChild.setAttribute("select",os.path.join(getTempPath(),"backgroundmask-%s.png" % page))
@@ -2895,11 +2996,11 @@ def createChapterMenu(screensize, screendpi, numberofitems):
         #preview items are added (the reason for this is it will assist
         #if the background image is actually a video)
 
-        overlayimage=Image.new("RGBA",screensize)
+        overlayimage=Image.new("RGBA",screensize, (0,0,0,0))
         draw=ImageDraw.Draw(overlayimage)
 
         #Create image to hold button masks (same size as background)
-        bgimagemask=Image.new("RGBA",overlayimage.size)
+        bgimagemask=Image.new("RGBA",overlayimage.size, (0,0,0,0))
         drawmask=ImageDraw.Draw(bgimagemask)
 
         spumuxdom = xml.dom.minidom.parseString('<subpictures><stream><spu force="yes" start="00:00:00.0" highlight="" select="" ></spu></stream></subpictures>')
@@ -2959,7 +3060,7 @@ def createChapterMenu(screensize, screendpi, numberofitems):
         #Save this menu image and its mask
         bgimage=Image.open(backgroundfilename,"r").resize(screensize)
         bgimage.paste(overlayimage, (0,0), overlayimage)
-        bgimage.save(os.path.join(getTempPath(),"chaptermenu-%s.jpg" % page),"JPEG", quality=90)
+        bgimage.save(os.path.join(getTempPath(),"chaptermenu-%s.jpg" % page),"JPEG", quality=99)
 
         bgimagemask.save(os.path.join(getTempPath(),"chaptermenumask-%s.png" % page),"PNG",quality=90,optimize=0)
 
@@ -2988,7 +3089,7 @@ def createChapterMenu(screensize, screendpi, numberofitems):
                                 bgimage.paste(picture, (previewx[previewchapter], previewy[previewchapter]))
                             del picture
                     previewchapter+=1
-                bgimage.save(os.path.join(getTempPath(),"chaptermenu-%s-f%06d.jpg" % (page, framenum)),"JPEG",quality=90)
+                bgimage.save(os.path.join(getTempPath(),"chaptermenu-%s-f%06d.jpg" % (page, framenum)),"JPEG",quality=99)
                 framenum+=1
 
         spumuxdom.documentElement.firstChild.firstChild.setAttribute("select",os.path.join(getTempPath(),"chaptermenumask-%s.png" % page))
@@ -3094,7 +3195,7 @@ def createDetailsPage(screensize, screendpi, numberofitems):
         #preview items are added (the reason for this is it will assist
         #if the background image is actually a video)
 
-        overlayimage=Image.new("RGBA",screensize)
+        overlayimage=Image.new("RGBA",screensize, (0,0,0,0))
         draw=ImageDraw.Draw(overlayimage)
 
         spumuxdom = xml.dom.minidom.parseString('<subpictures><stream><spu force="yes" start="00:00:00.0" highlight="" select="" ></spu></stream></subpictures>')
@@ -3106,7 +3207,7 @@ def createDetailsPage(screensize, screendpi, numberofitems):
         #Save this details image
         bgimage=Image.open(backgroundfilename,"r").resize(screensize)
         bgimage.paste(overlayimage, (0,0), overlayimage)
-        bgimage.save(os.path.join(getTempPath(),"details-%s.jpg" % itemnum),"JPEG", quality=90)
+        bgimage.save(os.path.join(getTempPath(),"details-%s.jpg" % itemnum),"JPEG", quality=99)
 
         if haspreview == True:
             numframes=secondsToFrames(menulength)
@@ -3129,7 +3230,7 @@ def createDetailsPage(screensize, screendpi, numberofitems):
                         else:
                             bgimage.paste(picture, (previewx, previewy))
                         del picture
-                bgimage.save(os.path.join(getTempPath(),"details-%s-f%06d.jpg" % (itemnum, framenum)),"JPEG",quality=90)
+                bgimage.save(os.path.join(getTempPath(),"details-%s-f%06d.jpg" % (itemnum, framenum)),"JPEG",quality=99)
                 framenum+=1
 
 
