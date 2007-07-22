@@ -340,7 +340,7 @@ bool VideoFilterSettings::meta_less_than(const Metadata &lhs,
                           lhs.Filename().lower() : lhs.Filename());
             QString rhsfn(sort_ignores_case ?
                           rhs.Filename().lower() : rhs.Filename());
-            ret = QString::localeAwareCompare(lhsfn, rhsfn);
+            ret = QString::localeAwareCompare(lhsfn, rhsfn) < 0;
             break;
         }
         case kOrderByID:
