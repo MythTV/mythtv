@@ -596,6 +596,18 @@ int NativeArchive::exportRecording(QDomElement &itemNode, const QString &saveDir
         root.appendChild(channel);
         VERBOSE(VB_JOBQUEUE, "Created channel element for " + title);
     }
+    else
+    {
+        // cannot find the original channel so create a default channel element
+        VERBOSE(VB_JOBQUEUE, "Cannot find channel details for chanid " + chanID);
+        QDomElement channel = doc.createElement("channel");
+        channel.setAttribute("chanid", chanID);
+        channel.setAttribute("channum", "unknown");
+        channel.setAttribute("callsign", "unknown");
+        channel.setAttribute("name", "unknown");
+        root.appendChild(channel);
+        VERBOSE(VB_JOBQUEUE, "Created a default channel element for " + title);
+    } 
 
     // add any credits
     query.prepare("SELECT credits.person, role, people.name "
