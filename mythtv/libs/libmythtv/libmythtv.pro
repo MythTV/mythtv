@@ -85,11 +85,13 @@ macx {
     using_dvdv {
         # DVDUtils uses Objective-C++, activated by .mm suffix
         QMAKE_EXT_CPP += .mm
+        #QMAKE_CXXFLAGS += -g
     }
 
     # There is a dependence on some stuff in libmythui.
     # It isn't built yet, so we have to ignore these for now:
     QMAKE_LFLAGS_SHLIB += -flat_namespace -undefined warning
+    #LIBS += -lmythui-$${LIBVERSION} -L../libmythui
 
     QMAKE_LFLAGS_SHLIB += -seg1addr 0xC9000000
 }
@@ -270,6 +272,11 @@ using_frontend {
 
     using_dvdv:HEADERS +=         videoout_dvdv.h  videoout_dvdv_private.h
     using_dvdv:SOURCES +=         videoout_dvdv.mm
+    using_dvdv:DEFINES +=         HAVE_DVDV
+
+    using_corevideo:HEADERS +=    videoout_corevideo.h
+    using_corevideo:SOURCES +=    videoout_corevideo.cpp
+    using_corevideo:DEFINES +=    USING_COREVIDEO
 
     using_directfb:HEADERS +=     videoout_directfb.h
     using_directfb:SOURCES +=     videoout_directfb.cpp
