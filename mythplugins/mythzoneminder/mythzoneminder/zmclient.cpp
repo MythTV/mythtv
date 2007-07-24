@@ -117,7 +117,7 @@ bool ZMClient::connectToHost(const QString &lhostname, unsigned int lport)
     if (!m_bConnected)
     {
         MythPopupBox::showOkPopup(gContext->GetMainWindow(), "Connection failure",
-                              tr("Cannot connect to the mythzmerver - Is it running? " 
+                              tr("Cannot connect to the mythzmserver - Is it running? " 
                                  "Have you set the correct IP and port in the settings?"));
     }
 
@@ -193,7 +193,7 @@ bool ZMClient::checkProtoVersion(void)
         VERBOSE(VB_IMPORTANT, QString("Server didn't respond to 'HELLO'!!"));
 
         MythPopupBox::showOkPopup(gContext->GetMainWindow(), "Connection failure",
-            tr(QString("The mythzmerver didn't respond to our request to get the protocol version!!")));
+            tr(QString("The mythzmserver didn't respond to our request to get the protocol version!!")));
         return false;
     }
 
@@ -203,7 +203,7 @@ bool ZMClient::checkProtoVersion(void)
                 "mythzmserver=%2)").arg(ZM_PROTOCOL_VERSION).arg(strList[1]));
 
         MythPopupBox::showOkPopup(gContext->GetMainWindow(), "Connection failure",
-                         tr(QString("The mythzmerver uses protocol version %1, "
+                         tr(QString("The mythzmserver uses protocol version %1, "
                                     "but this client only understands version %2. "
                                     "Make sure you are running compatible versions of "
                                     "both the server and plugin.")
