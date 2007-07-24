@@ -738,12 +738,12 @@ static void init_fixup(QMap<uint64_t,uint> &fix)
     fix[4097U << 16] |= EITFixUp::kEFixForceISO8859_1;
     fix[4098U << 16] |= EITFixUp::kEFixForceISO8859_1;
 
-    // DVB-T Berlin dsf Germany
-    fix[   774LL << 32 |  8468U << 16 | 16392] =
-        EITFixUp::kEFixForceISO8859_15;
+    // DVB-T Germany Berlin dsf
+    fix[  774LL << 32 | 8468 << 16 | 16392] = EITFixUp::kEFixForceISO8859_15;
     //DVB-T Germany Berlin HSE/MonA TV
-    fix[   772LL << 32 |  8468U << 16 | 16387] =
-        EITFixUp::kEFixForceISO8859_15;
+    fix[  772LL << 32 | 8468 << 16 | 16387] = EITFixUp::kEFixForceISO8859_15;
+    //DVB-T Germany Ruhrgebiet Tele 5
+    fix[ 8707LL << 32 | 8468 << 16 | 16413] = EITFixUp::kEFixForceISO8859_15;
 
     // DVB-C Kabel Deutschland encoding fixes Germany
     fix[   112LL << 32 | 61441U << 16] = EITFixUp::kEFixForceISO8859_15;
