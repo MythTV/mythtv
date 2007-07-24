@@ -31,7 +31,7 @@
 #******************************************************************************
 
 # version of script - change after each update
-VERSION="0.1.20070722-1"
+VERSION="0.1.20070724-1"
 
 
 ##You can use this debug flag when testing out new themes
@@ -152,7 +152,10 @@ themeFonts = {}
 # no. of processors we have access to
 cpuCount = 1
 
+
+#############################################################
 # class to hold a font definition
+
 class FontDef(object):
     def __init__(self, name=None, fontFile=None, size=19, color="white", effect="normal", shadowColor="black", shadowSize=1):
         self.name = name
@@ -198,6 +201,9 @@ class FontDef(object):
         image = image.crop(bbox)
         return image
 
+#############################################################
+# Write a string to stdout and optionaly to a progress log file
+
 def write(text, progress=True):
     """Simple place to channel all text output through"""
     sys.stdout.write(text + "\n")
@@ -207,19 +213,35 @@ def write(text, progress=True):
         progressfile.write(time.strftime("%Y-%m-%d %H:%M:%S ") + text + "\n")
         progressfile.flush()
 
+#############################################################
+# Display an error message and exit
+
 def fatalError(msg):
     """Display an error message and exit app"""
     write("*"*60)
     write("ERROR: " + msg)
     write("*"*60)
     write("")
-    saveSetting("MythArchiveLastRunResult", "Failed: " + msg);
+    saveSetting("MythArchiveLastRunResult", "Failed: " + quoteString(msg));
     saveSetting("MythArchiveLastRunEnd", time.strftime("%Y-%m-%d %H:%M:%S "))
     sys.exit(0)
+
+#############################################################
+# Return the input string with single quotes escaped.
+
+def quoteString(str):
+     """Return the input string with single quotes escaped."""
+     return str.replace("'", "'\"'\"'")
+
+#############################################################
+# Directory where all temporary files will be created.
 
 def getTempPath():
     """This is the folder where all temporary files will be created."""
     return temppath
+
+#############################################################
+# Try to work out how many cpus we have available
 
 def getCPUCount():
     """return the number of CPU's"""
@@ -238,12 +260,18 @@ def getCPUCount():
         cpucount = 1
 
     write("Found %d CPUs" % cpucount)
- 
+
     return cpucount
+
+#############################################################
+# Get the directory where all encoder profile files are located.
 
 def getEncodingProfilePath():
     """This is the folder where all encoder profile files are located."""
     return os.path.join(sharepath, "mytharchive", "encoder_profiles")
+
+#############################################################
+# Get the connection parameters needed to connect to the mythconverg DB 
 
 def getMysqlDBParameters():
     global mysql_host
@@ -273,17 +301,29 @@ def getMysqlDBParameters():
     f.close()
     del f
 
+#############################################################
+# Returns a mySQL connection to mythconverg database.
+
 def getDatabaseConnection():
     """Returns a mySQL connection to mythconverg database."""
     return MySQLdb.connect(host=mysql_host, user=mysql_user, passwd=mysql_passwd, db=mysql_db)
+
+#############################################################
+# Returns true/false if a given file or path exists.
 
 def doesFileExist(file):
     """Returns true/false if a given file or path exists."""
     return os.path.exists( file )
 
+#############################################################
+# Escape quotes in a filename
+
 def quoteFilename(filename):
     filename = filename.replace('"', '\\"')
     return '"%s"' % filename
+
+#############################################################
+# Returns the text contents from a given XML element.
 
 def getText(node):
     """Returns the text contents from a given XML element."""
@@ -291,6 +331,9 @@ def getText(node):
         return node.childNodes[0].data
     else:
         return ""
+
+#############################################################
+# Try to find a theme file
 
 def getThemeFile(theme,file):
     """Find a theme file - first look in the specified theme directory then look in the
@@ -309,11 +352,20 @@ def getThemeFile(theme,file):
 
     fatalError("Cannot find theme file '%s' in theme '%s'" % (file, theme))
 
+#############################################################
+# Returns the path where we can find our fonts
+
 def getFontPathName(fontname):
     return os.path.join(sharepath, fontname)
 
+#############################################################
+# Creates a file path where the temp files for a video file can be created
+
 def getItemTempPath(itemnumber):
     return os.path.join(getTempPath(),"%s" % itemnumber)
+
+#############################################################
+# Returns True if the theme.xml file can be found for the given theme
 
 def validateTheme(theme):
     #write( "Checking theme", theme
@@ -321,8 +373,8 @@ def validateTheme(theme):
     write("Looking for: " + file)
     return doesFileExist( getThemeFile(theme,"theme.xml") )
 
-def isResolutionHDTV(videoresolution):
-    return (videoresolution[0]==1920 and videoresolution[1]==1080) or (videoresolution[0]==1280 and videoresolution[1]==720)
+#############################################################
+# Returns True if the given resolution is a DVD compliant one
 
 def isResolutionOkayForDVD(videoresolution):
     if videomode=="ntsc":
@@ -330,15 +382,17 @@ def isResolutionOkayForDVD(videoresolution):
     else:
         return videoresolution==(720,576) or videoresolution==(704,576) or videoresolution==(352,576) or videoresolution==(352,288)
 
-def getImageSize(sourcefile):
-    myimage=Image.open(sourcefile,"r")
-    return myimage.size
+#############################################################
+# Romoves all the files from a directory
 
 def deleteAllFilesInFolder(folder):
     """Does what it says on the tin!."""
     for root, dirs, deletefiles in os.walk(folder, topdown=False):
         for name in deletefiles:
                 os.remove(os.path.join(root, name))
+
+#############################################################
+# Check to see if the user has cancelled the DVD creation process
 
 def checkCancelFlag():
     """Checks to see if the user has cancelled this run"""
@@ -348,6 +402,10 @@ def checkCancelFlag():
         write("Job has been cancelled at users request")
         write('*'*60)
         sys.exit(1)
+
+#############################################################
+# Runs an external command checking to see if the user has cancelled
+# the DVD creation process
 
 def runCommand(command):
     checkCancelFlag()
@@ -359,6 +417,9 @@ def runCommand(command):
     checkCancelFlag()
     return result
 
+#############################################################
+# Convert a time in seconds to a frame number
+
 def secondsToFrames(seconds):
     """Convert a time in seconds to a frame position"""
     if videomode=="pal":
@@ -368,6 +429,9 @@ def secondsToFrames(seconds):
 
     frames=int(seconds * framespersecond)
     return frames
+
+#############################################################
+# Creates a short mpeg file from a jpeg image and an ac3 sound track
 
 def encodeMenu(background, tempvideo, music, musiclength, tempmovie, xmlfile, finaloutput, aspectratio):
     if videomode=="pal":
@@ -401,6 +465,10 @@ def encodeMenu(background, tempvideo, music, musiclength, tempmovie, xmlfile, fi
     if os.path.exists(tempmovie):
             os.remove(tempmovie)
 
+#############################################################
+# Return an xml node from a re-encoding profile xml file for 
+# a given profile name
+
 def findEncodingProfile(profile):
     """Returns the XML node for the given encoding profile"""
 
@@ -425,6 +493,9 @@ def findEncodingProfile(profile):
     fatalError("Encoding profile (%s) not found" % profile)
     return None
 
+#############################################################
+# Load the theme.xml file for a DVD theme
+
 def getThemeConfigurationXML(theme):
     """Loads the XML file from disk for a specific theme"""
 
@@ -434,6 +505,9 @@ def getThemeConfigurationXML(theme):
     if themeDOM.documentElement.tagName != "mythburntheme":
         fatalError("Theme xml file doesn't look right (%s)" % theme)
     return themeDOM
+
+#############################################################
+# Gets the duration of a video file from its stream info file
 
 def getLengthOfVideo(index):
     """Returns the length of a video file (in seconds)"""
@@ -452,6 +526,10 @@ def getLengthOfVideo(index):
 
     return duration
 
+#############################################################
+# Gets the audio sample rate and number of channels of a video file 
+# from its stream info file
+
 def getAudioParams(folder):
     """Returns the audio bitrate and no of channels for a file from its streaminfo.xml"""
 
@@ -467,6 +545,10 @@ def getAudioParams(folder):
     channels = audio.attributes["channels"].value
 
     return (samplerate, channels)
+
+#############################################################
+# Gets the video resolution, frames per second and aspect ratio
+# of a video file from its stream info file
 
 def getVideoParams(folder):
     """Returns the video resolution, fps and aspect ratio for the video file from the streamindo.xml file"""
@@ -489,6 +571,9 @@ def getVideoParams(folder):
 
     return (videores, fps, aspect_ratio)
 
+#############################################################
+# Gets the aspect ratio of a video file from its stream info file
+
 def getAspectRatioOfVideo(index):
     """Returns the aspect ratio of the video file (1.333, 1.778, etc)"""
 
@@ -505,6 +590,9 @@ def getAspectRatioOfVideo(index):
         aspect_ratio = 1.77778; # default
     write("aspect ratio is: %s" % aspect_ratio)
     return aspect_ratio
+
+#############################################################
+# Calculates the sync offset between the video and first audio stream
 
 def calcSyncOffset(index):
     """Returns the sync offset between the video and first audio stream"""
@@ -531,6 +619,9 @@ def calcSyncOffset(index):
 #    write("Sync offset is: %s" % sync_offset)
     return sync_offset
 
+#############################################################
+# Gets the length of a video file and returns it as a string
+
 def getFormatedLengthOfVideo(index):
     duration = getLengthOfVideo(index)
 
@@ -541,6 +632,9 @@ def getFormatedLengthOfVideo(index):
 
     return '%02d:%02d:%02d' % (hours, minutes, seconds)
 
+#############################################################
+# Convert a frame number to a time string
+
 def frameToTime(frame, fps):
     sec = int(frame / fps)
     frame = frame - int(sec * fps)
@@ -550,6 +644,10 @@ def frameToTime(frame, fps):
     mins %= 60
 
     return '%02d:%02d:%02d' % (hour, mins, sec)
+
+#############################################################
+# Creates a set of chapter points evenly spread thoughout a file
+# Optionally grabs the thumbnails from the file
 
 def createVideoChapters(itemnum, numofchapters, lengthofvideo, getthumbnails):
     """Returns numofchapters chapter marks even spaced through a certain time period"""
@@ -593,6 +691,9 @@ def createVideoChapters(itemnum, numofchapters, lengthofvideo, getthumbnails):
 
     return chapters
 
+#############################################################
+# Creates some fixed length chapter marks
+
 def createVideoChaptersFixedLength(segment, lengthofvideo): 
     """Returns chapter marks spaced segment seconds through the file"""
     if lengthofvideo < segment:
@@ -608,6 +709,9 @@ def createVideoChaptersFixedLength(segment, lengthofvideo):
         count += 1
 
     return chapters
+
+#############################################################
+# Reads a load of settings from DB
 
 def getDefaultParametersFromMythTVDB():
     """Reads settings from MythTV database"""
@@ -672,6 +776,9 @@ def getDefaultParametersFromMythTVDB():
         fatalError("Can't find the setting for the temp directory. \nHave you run setup in the frontend?")
     return cfg
 
+#############################################################
+# Save a setting to the settings table in the DB
+
 def saveSetting(name, data):
     db = getDatabaseConnection()
     cursor = db.cursor()
@@ -686,6 +793,9 @@ def saveSetting(name, data):
     del db
     del cursor
 
+#############################################################
+# Remove all archive items from the archiveitems DB table
+
 def clearArchiveItems():
     ''' Remove all archive items from the archiveitems DB table'''
 
@@ -699,6 +809,9 @@ def clearArchiveItems():
     db.close()
     del db
     del cursor
+
+#############################################################
+# Load the options from the options node passed in the job file
 
 def getOptions(options):
     global doburn
@@ -720,6 +833,9 @@ def getOptions(options):
     write("Options - mediatype = %d, doburn = %d, createiso = %d, erasedvdrw = %d" \
            % (mediatype, doburn, docreateiso, erasedvdrw))
     write("          savefilename = '%s'" % savefilename)
+
+#############################################################
+# Substitutes some text from a theme file with the required values
 
 def expandItemText(infoDOM, text, itemnumber, pagenumber, keynumber,chapternumber, chapterlist ):
     """Replaces keywords in a string with variables from the XML and filesystem"""
@@ -753,6 +869,9 @@ def expandItemText(infoDOM, text, itemnumber, pagenumber, keynumber,chapternumbe
 
     return text
 
+#############################################################
+# Scale a theme position/size depending on the current video mode
+
 def getScaledAttribute(node, attribute):
     """ Returns a value taken from attribute in node scaled for the current video mode"""
 
@@ -760,6 +879,9 @@ def getScaledAttribute(node, attribute):
         return int(node.attributes[attribute].value)
     else:
         return int(float(node.attributes[attribute].value) / 1.2)
+
+#############################################################
+# Splits some text into lines so it will fit into a given container
 
 def intelliDraw(drawer, text, font, containerWidth):
     """Based on http://mail.python.org/pipermail/image-sig/2004-December/003064.html"""
@@ -805,6 +927,9 @@ def intelliDraw(drawer, text, font, containerWidth):
     lines = tmp
     return lines
 
+#############################################################
+# Paint some theme text on to an image
+
 def paintText(draw, image, x, y, width, height, text, font, color, alignment):
     """Takes a piece of text and draws it onto an image inside a bounding box."""
     #The text is wider than the width of the bounding box
@@ -835,6 +960,9 @@ def paintText(draw, image, x, y, width, height, text, font, color, alignment):
         #Move to next line
         j = j + 1
 
+#############################################################
+# Check if boundary box need adjusting
+
 def checkBoundaryBox(boundarybox, node):
     # We work out how much space all of our graphics and text are taking up
     # in a bounding rectangle so that we can use this as an automatic highlight
@@ -855,6 +983,9 @@ def checkBoundaryBox(boundarybox, node):
                           getScaledAttribute(node, "y") + getScaledAttribute(node, "h")
 
     return boundarybox
+
+#############################################################
+# Load the font defintions from a DVD theme file
 
 def loadFonts(themeDOM):
     global themeFonts
@@ -898,6 +1029,9 @@ def loadFonts(themeDOM):
 
         write( "Loading font %s, %s size %s" % (fontnumber,getFontPathName(filename),fontsize) )
         fontnumber+=1
+
+#############################################################
+# Creates an info xml file from details in the job file or from the DB
 
 def getFileInformation(file, folder):
     outputfile = os.path.join(folder, "info.xml")
@@ -1253,12 +1387,18 @@ def getFileInformation(file, folder):
 
     WriteXMLToFile (infoDOM, outputfile)
 
+#############################################################
+# Write an xml file to disc
+
 def WriteXMLToFile(myDOM, filename):
     #Save the XML file to disk for use later on
     f=open(filename, 'w')
     f.write(myDOM.toxml("UTF-8"))
     f.close()
 
+
+#############################################################
+# Pre-process a single video/recording file
 
 def preProcessFile(file, folder):
     """Pre-process a single video/recording file."""
@@ -1296,6 +1436,9 @@ def preProcessFile(file, folder):
 
     write( "Video resolution is %s by %s" % (videosize[0], videosize[1]))
 
+#############################################################
+# Re-encodes an audio stream to ac3
+
 def encodeAudio(format, sourcefile, destinationfile, deletesourceafterencode):
     write( "Encoding audio to "+format)
     if format == "ac3":
@@ -1315,6 +1458,10 @@ def encodeAudio(format, sourcefile, destinationfile, deletesourceafterencode):
 
     if deletesourceafterencode==True:
         os.remove(sourcefile)
+
+#############################################################
+# Recombines a video and one or two audio streams back together
+# adding in the NAV packets required to create a DVD
 
 def multiplexMPEGStream(video, audio1, audio2, destination, syncOffset):
     """multiplex one video and one or two audio streams together"""
@@ -1378,6 +1525,9 @@ def multiplexMPEGStream(video, audio1, audio2, destination, syncOffset):
         if result != 0:
             fatalError("mplex failed with result %d" % result)
 
+#############################################################
+# Creates a stream xml file for a video file
+
 def getStreamInformation(filename, xmlFilename, lenMethod):
     """create a stream.xml file for filename"""
     filename = quoteFilename(filename)
@@ -1392,13 +1542,16 @@ def getStreamInformation(filename, xmlFilename, lenMethod):
     infoDOM = xml.dom.minidom.parse(xmlFilename)
     write("streaminfo.xml :-\n" + infoDOM.toprettyxml("    ", ""))
 
+#############################################################
+# Gets the video width and height from a file's stream xml file
+
 def getVideoSize(xmlFilename):
     """Get video width and height from stream.xml file"""
 
     #open the XML containing information about this file
     infoDOM = xml.dom.minidom.parse(xmlFilename)
     #error out if its the wrong XML
-    
+
     if infoDOM.documentElement.tagName != "file":
         fatalError("This info file doesn't look right (%s)." % xmlFilename)
     nodes = infoDOM.getElementsByTagName("video")
@@ -1412,6 +1565,9 @@ def getVideoSize(xmlFilename):
     height = int(node.attributes["height"].value)
 
     return (width, height)
+
+#############################################################
+# Run a file though the lossless encoder optionally removing commercials
 
 def runMythtranscode(chanid, starttime, destination, usecutlist, localfile):
     """Use mythtrancode to cut commercials and/or clean up an mpeg2 file"""
@@ -1436,6 +1592,9 @@ def runMythtranscode(chanid, starttime, destination, usecutlist, localfile):
         return False;
 
     return True
+
+#############################################################
+# Grabs a sequence of consecutive frames from a file
 
 def extractVideoFrame(source, destination, seconds):
     write("Extracting thumbnail image from %s at position %s" % (source, seconds))
@@ -1466,6 +1625,9 @@ def extractVideoFrame(source, destination, seconds):
     except IOError:
         return (0L, 0L)
 
+#############################################################
+# Grabs a list of single frames from a file
+
 def extractVideoFrames(source, destination, thumbList):
     write("Extracting thumbnail images from: %s - at %s" % (source, thumbList))
     write("Destination file %s" % destination)
@@ -1476,6 +1638,9 @@ def extractVideoFrames(source, destination, thumbList):
     result = runCommand(command)
     if result <> 0:
         fatalError("Failed while running mytharchivehelper to get thumbnails")
+
+#############################################################
+# Re-encodes a file to mpeg2
 
 def encodeVideoToMPEG2(source, destvideofile, video, audio1, audio2, aspectratio, profile):
     """Encodes an unknown video source file eg. AVI to MPEG2 video and AC3 audio, use ffmpeg"""
@@ -1557,6 +1722,8 @@ def encodeVideoToMPEG2(source, destvideofile, video, audio1, audio2, aspectratio
         if result!=0:
             fatalError("Failed while running ffmpeg (Pass 2) to re-encode video.\n"
                        "Command was %s" % command)
+#############################################################
+# Re-encodes a nuv file to mpeg2 optionally removing commercials
 
 def encodeNuvToMPEG2(chanid, starttime, mediafile, destvideofile, folder, profile, usecutlist):
     """Encodes a nuv video source file to MPEG2 video and AC3 audio, using mythtranscode & ffmpeg"""
@@ -1660,6 +1827,9 @@ def encodeNuvToMPEG2(chanid, starttime, mediafile, destvideofile, folder, profil
         fatalError("Failed while running ffmpeg to re-encode video.\n"
                    "Command was %s" % command)
 
+#############################################################
+# Runs DVDAuthor to create a DVD file structure
+
 def runDVDAuthor():
     write( "Starting dvdauthor")
     checkCancelFlag()
@@ -1667,6 +1837,9 @@ def runDVDAuthor():
     if result<>0:
         fatalError("Failed while running dvdauthor. Result: %d" % result)
     write( "Finished  dvdauthor")
+
+#############################################################
+# Creates an ISO image from the contents of a directory
 
 def CreateDVDISO():
     write("Creating ISO image")
@@ -1679,6 +1852,9 @@ def CreateDVDISO():
         fatalError("Failed while running mkisofs.")
 
     write("Finished creating ISO image")
+
+#############################################################
+# Burns the contents of a directory to create a DVD 
 
 def BurnDVDISO():
     write( "Burning ISO image to %s" % dvddrivepath)
@@ -1715,6 +1891,9 @@ def BurnDVDISO():
     os.close(f)
 
     write("Finished burning ISO image")
+
+#############################################################
+# Splits a file into the separate audio and video streams
 
 def deMultiplexMPEG2File(folder, mediafile, video, audio1, audio2):
 
@@ -1759,6 +1938,9 @@ def deMultiplexMPEG2File(folder, mediafile, video, audio1, audio2):
     if result<>0:
         fatalError("Failed while running mythreplex. Command was %s" % command)
 
+#############################################################
+# Run tcrequant
+
 def runTcrequant(source,destination,percentage):
     checkCancelFlag()
 
@@ -1770,6 +1952,9 @@ def runTcrequant(source,destination,percentage):
             "-f","%s" % percentage)
     if result<>0:
         fatalError("Failed while running tcrequant")
+
+#############################################################
+# Calculates the total size of all the video, audio and menu files 
 
 def calculateFileSizes(files):
     """ Returns the sizes of all video, audio and menu files"""
@@ -1813,6 +1998,10 @@ def calculateFileSizes(files):
         filecount+=1
 
     return totalvideosize,totalaudiosize,totalmenusize
+
+#############################################################
+# Uses tcrequant if available to shrink the video streams so 
+# they will fit on a DVD
 
 def performMPEG2Shrink(files,dvdrsize):
     checkCancelFlag()
@@ -1858,6 +2047,9 @@ def performMPEG2Shrink(files,dvdrsize):
         dvdrsize-=totalvideosize
         write( "Video will fit onto DVD. %s MBytes of space remaining on recordable DVD." % dvdrsize)
 
+
+#############################################################
+# Creates the DVDAuthor xml file used to create a standard DVD with menus
 
 def createDVDAuthorXML(screensize, numberofitems):
     """Creates the xml file for dvdauthor to use the MythBurn menus."""
@@ -2211,6 +2403,9 @@ def createDVDAuthorXML(screensize, numberofitems):
     #Destroy the DOM and free memory
     dvddom.unlink()   
 
+#############################################################
+# Creates the DVDAuthor xml file used to create a DVD with no main menu
+
 def createDVDAuthorXMLNoMainMenu(screensize, numberofitems):
     """Creates the xml file for dvdauthor to use the MythBurn menus."""
 
@@ -2221,6 +2416,9 @@ def createDVDAuthorXMLNoMainMenu(screensize, numberofitems):
     write( "Creating DVD XML file for dvd author (No Main Menu)")
     #FIXME:
     assert False
+
+#############################################################
+# Creates the DVDAuthor xml file used to create an Autoplay DVD
 
 def createDVDAuthorXMLNoMenus(screensize, numberofitems):
     """Creates the xml file for dvdauthor containing no menus."""
@@ -2396,6 +2594,9 @@ def createDVDAuthorXMLNoMenus(screensize, numberofitems):
     #Destroy the DOM and free memory
     dvddom.unlink()
 
+#############################################################
+# Creates the directory to hold the preview images for an animated menu 
+
 def createEmptyPreviewFolder(videoitem):
     previewfolder = os.path.join(getItemTempPath(videoitem), "preview")
     if os.path.exists(previewfolder):
@@ -2404,6 +2605,8 @@ def createEmptyPreviewFolder(videoitem):
     os.makedirs(previewfolder)
     return previewfolder
 
+#############################################################
+# Generates the thumbnail images used to create animated menus
 
 def generateVideoPreview(videoitem, itemonthispage, menuitem, starttime, menulength, previewfolder):
     """generate thumbnails for a preview in a menu"""
@@ -2442,6 +2645,8 @@ def generateVideoPreview(videoitem, itemonthispage, menuitem, starttime, menulen
 
     return (positionx, positiony, width, height, maskpicture)
 
+#############################################################
+# Draws text and graphics onto a dvd menu
 
 def drawThemeItem(page, itemsonthispage, itemnum, menuitem, bgimage, draw,
                   bgimagemask, drawmask, highlightcolor, spumuxdom, spunode,
@@ -2735,6 +2940,9 @@ def drawThemeItem(page, itemsonthispage, itemnum, menuitem, bgimage, draw,
     node.setAttribute("y1","%d" % int(boundarybox[3] + 1))
     spunode.appendChild(node)   
 
+#############################################################
+# creates the main menu for a DVD
+
 def createMenu(screensize, screendpi, numberofitems):
     """Creates all the necessary menu images and files for the MythBurn menus."""
 
@@ -2945,6 +3153,9 @@ def createMenu(screensize, screendpi, numberofitems):
         #Move on to the next page
         page+=1
 
+#############################################################
+# creates a chapter menu for a file on a DVD
+
 def createChapterMenu(screensize, screendpi, numberofitems):
     """Creates all the necessary menu images and files for the MythBurn menus."""
 
@@ -3145,6 +3356,9 @@ def createChapterMenu(screensize, screendpi, numberofitems):
         #Move on to the next page
         page+=1
 
+#############################################################
+# creates the details page for a file on a DVD
+
 def createDetailsPage(screensize, screendpi, numberofitems):
     """Creates all the necessary images and files for the details page."""
 
@@ -3272,11 +3486,17 @@ def createDetailsPage(screensize, screendpi, numberofitems):
         #On to the next item
         itemnum+=1
 
+#############################################################
+# checks if a file is an avi file
+
 def isMediaAVIFile(file):
     fh = open(file, 'rb')
     Magic = fh.read(4)
     fh.close()
     return Magic=="RIFF"
+
+#############################################################
+# checks to see if an audio stream need to be converted to ac3 
 
 def processAudio(folder):
     """encode audio to ac3 for better compression and compatability with NTSC players"""
@@ -3309,6 +3529,8 @@ def processAudio(folder):
     elif doesFileExist(os.path.join(folder,'stream1.ac3'))==True:
         write( "Audio is already in ac3 format")
 
+#############################################################
+# chooses which streams from a file to include on the DVD
 
 # tuple index constants
 VIDEO_INDEX = 0
@@ -3463,6 +3685,9 @@ def selectStreams(folder):
 
     return (video, audio1, audio2)
 
+#############################################################
+# gets the video aspect ratio from the stream info xml file
+
 def selectAspectRatio(folder):
     """figure out what aspect ratio we want from the source file"""
 
@@ -3501,6 +3726,9 @@ def selectAspectRatio(folder):
 
     return aspectratio
 
+#############################################################
+# gets video stream codec from the stream info xml file
+
 def getVideoCodec(folder):
     """Get the video codec from the streaminfo.xml for the file"""
 
@@ -3519,6 +3747,9 @@ def getVideoCodec(folder):
         write("Found more than one video element in stream info file!!!")
     node = nodes[0]
     return node.attributes["codec"].value
+
+#############################################################
+# gets file container type from the stream info xml file
 
 def getFileType(folder):
     """Get the overall file type from the streaminfo.xml for the file"""
@@ -3539,6 +3770,9 @@ def getFileType(folder):
     node = nodes[0]
 
     return node.attributes["type"].value
+
+#############################################################
+# check if file is DVD compliant
 
 def isFileOkayForDVD(file, folder):
     """return true if the file is dvd compliant"""
@@ -3568,6 +3802,9 @@ def isFileOkayForDVD(file, folder):
             return False
 
     return True
+
+#############################################################
+# process a single file ready for burning
 
 def processFile(file, folder):
     """Process a single video/recording file ready for burning."""
@@ -3770,6 +4007,9 @@ def processFile(file, folder):
     write( "Finished processing file " + file.attributes["filename"].value)
     write( "*************************************************************")
 
+#############################################################
+# copy files on remote filesystems to the local filesystem
+
 def copyRemote(files, tmpPath):
     '''go through the list of files looking for files on remote filesytems
        and copy them to a local file for quicker processing'''
@@ -3792,10 +4032,14 @@ def copyRemote(files, tmpPath):
             node.setAttribute("localfilename", os.path.join(localTmpPath, filename))
     return files
 
+#############################################################
+# processes one job
+
 def processJob(job):
     """Starts processing a MythBurn job, expects XML nodes to be passed as input."""
     global wantIntro, wantMainMenu, wantChapterMenu, wantDetailsPage
     global themeDOM, themeName, themeFonts
+
 
     media=job.getElementsByTagName("media")
 
@@ -3976,6 +4220,9 @@ def processJob(job):
         write( "Nothing to do! (media)")
     return
 
+#############################################################
+# show usage
+
 def usage():
     write("""
     -h/--help               (Show this usage)
@@ -3984,184 +4231,194 @@ def usage():
 
     """)
 
-#
-#
+#############################################################
 # The main starting point for mythburn.py
-#
-#
 
-write( "mythburn.py (%s) starting up..." % VERSION)
+def main():
+    global sharepath, scriptpath, cpuCount, videopath, gallerypath, musicpath
+    global videomode, temppath, logpath, dvddrivepath, dbVersion, preferredlang1
+    global preferredlang2, useFIFO, encodetoac3, alwaysRunMythtranscode
+    global copyremoteFiles, mainmenuAspectRatio, chaptermenuAspectRatio, dateformat
+    global timeformat, clearArchiveTable, nicelevel, path_mplex, path_ffmpeg
+    global path_dvdauthor, path_mkisofs, path_growisofs, path_tcrequant
+    global path_jpeg2yuv, path_spumux, path_mpeg2enc, progresslog
+    global progressfile, jobfile
 
-#Ensure were running at least python 2.3.5
-if not hasattr(sys, "hexversion") or sys.hexversion < 0x20305F0:
-    sys.stderr.write("Sorry, your Python is too old. Please upgrade at least to 2.3.5\n")
-    sys.exit(1)
-
-# figure out where this script is located
-scriptpath = os.path.dirname(sys.argv[0])
-scriptpath = os.path.abspath(scriptpath)
-write("script path:" + scriptpath)
-
-# figure out where the myth share directory is located
-sharepath = os.path.split(scriptpath)[0]
-sharepath = os.path.split(sharepath)[0]
-write("myth share path:" + sharepath)
-
-# process any command line options
-try:
-    opts, args = getopt.getopt(sys.argv[1:], "j:hl:", ["jobfile=", "help", "progresslog="])
-except getopt.GetoptError:
-    # print usage and exit
-    usage()
-    sys.exit(2)
-
-for o, a in opts:
-    if o in ("-h", "--help"):
-        usage()
-        sys.exit()
-    if o in ("-j", "--jobfile"):
-        jobfile = str(a)
-        write("passed job file: " + a)
-    if o in ("-l", "--progresslog"):
-        progresslog = str(a)
-        write("passed progress log file: " + a)
-
-#if we have been given a progresslog filename to write to open it
-if progresslog != "":
-    if os.path.exists(progresslog):
-        os.remove(progresslog)
-    progressfile = open(progresslog, 'w')
     write( "mythburn.py (%s) starting up..." % VERSION)
 
-#Get mysql database parameters
-getMysqlDBParameters()
+    #Ensure we are running at least python 2.3.5
+    if not hasattr(sys, "hexversion") or sys.hexversion < 0x20305F0:
+        sys.stderr.write("Sorry, your Python is too old. Please upgrade at least to 2.3.5\n")
+        sys.exit(1)
 
-saveSetting("MythArchiveLastRunStart", time.strftime("%Y-%m-%d %H:%M:%S "))
-saveSetting("MythArchiveLastRunType", "DVD")
-saveSetting("MythArchiveLastRunStatus", "Running")
+    # figure out where this script is located
+    scriptpath = os.path.dirname(sys.argv[0])
+    scriptpath = os.path.abspath(scriptpath)
+    write("script path:" + scriptpath)
 
-cpuCount = getCPUCount()
+    # figure out where the myth share directory is located
+    sharepath = os.path.split(scriptpath)[0]
+    sharepath = os.path.split(sharepath)[0]
+    write("myth share path:" + sharepath)
 
-#if the script is run from the web interface the PATH environment variable does not include
-#many of the bin locations we need so just append a few likely locations where our required
-#executables may be
-if not os.environ['PATH'].endswith(':'):
-    os.environ['PATH'] += ":"
-os.environ['PATH'] += "/bin:/sbin:/usr/local/bin:/usr/bin:/opt/bin:" + installPrefix +"/bin:"
-
-#Get defaults from MythTV database
-defaultsettings = getDefaultParametersFromMythTVDB()
-videopath = defaultsettings.get("VideoStartupDir", None)
-gallerypath = defaultsettings.get("GalleryDir", None)
-musicpath = defaultsettings.get("MusicLocation", None)
-videomode = string.lower(defaultsettings["MythArchiveVideoFormat"])
-temppath = os.path.join(defaultsettings["MythArchiveTempDir"], "work")
-logpath = os.path.join(defaultsettings["MythArchiveTempDir"], "logs")
-write("temppath: " + temppath)
-write("logpath:  " + logpath)
-dvddrivepath = defaultsettings["MythArchiveDVDLocation"]
-dbVersion = defaultsettings["DBSchemaVer"]
-preferredlang1 = defaultsettings["ISO639Language0"]
-preferredlang2 = defaultsettings["ISO639Language1"]
-useFIFO = (defaultsettings["MythArchiveUseFIFO"] == '1')
-encodetoac3 = (defaultsettings["MythArchiveEncodeToAc3"] == '1')
-alwaysRunMythtranscode = (defaultsettings["MythArchiveAlwaysUseMythTranscode"] == '1')
-copyremoteFiles = (defaultsettings["MythArchiveCopyRemoteFiles"] == '1')
-mainmenuAspectRatio = defaultsettings["MythArchiveMainMenuAR"]
-chaptermenuAspectRatio = defaultsettings["MythArchiveChapterMenuAR"]
-dateformat = defaultsettings.get("MythArchiveDateFormat", "%a %d %b %Y")
-timeformat = defaultsettings.get("MythArchiveTimeFormat", "%I:%M %p")
-if "MythArchiveClearArchiveTable" in defaultsettings:
-    clearArchiveTable = (defaultsettings["MythArchiveClearArchiveTable"] == '1')
-nicelevel = defaultsettings.get("JobQueueCPU", "0")
-
-# external commands
-path_mplex = [defaultsettings["MythArchiveMplexCmd"], os.path.split(defaultsettings["MythArchiveMplexCmd"])[1]]
-path_ffmpeg = [defaultsettings["MythArchiveFfmpegCmd"], os.path.split(defaultsettings["MythArchiveFfmpegCmd"])[1]]
-path_dvdauthor = [defaultsettings["MythArchiveDvdauthorCmd"], os.path.split(defaultsettings["MythArchiveDvdauthorCmd"])[1]]
-path_mkisofs = [defaultsettings["MythArchiveMkisofsCmd"], os.path.split(defaultsettings["MythArchiveMkisofsCmd"])[1]]
-path_growisofs = [defaultsettings["MythArchiveGrowisofsCmd"], os.path.split(defaultsettings["MythArchiveGrowisofsCmd"])[1]]
-path_tcrequant = [defaultsettings["MythArchiveTcrequantCmd"], os.path.split(defaultsettings["MythArchiveTcrequantCmd"])[1]]
-path_jpeg2yuv = [defaultsettings["MythArchiveJpeg2yuvCmd"], os.path.split(defaultsettings["MythArchiveJpeg2yuvCmd"])[1]]
-path_spumux = [defaultsettings["MythArchiveSpumuxCmd"], os.path.split(defaultsettings["MythArchiveSpumuxCmd"])[1]]
-path_mpeg2enc = [defaultsettings["MythArchiveMpeg2encCmd"], os.path.split(defaultsettings["MythArchiveMpeg2encCmd"])[1]]
-
-if nicelevel == '1':
-    nicelevel = 10
-elif nicelevel == '2':
-    nicelevel = 0
-else:
-    nicelevel = 17
-
-nicelevel = os.nice(nicelevel)
-write( "Setting process priority to %s" % nicelevel)
-
-import errno
-
-try:
-    # Attempt to create a lock file so any UI knows we are running.
-    # Testing for and creation of the lock is one atomic operation.
-    lckpath = os.path.join(logpath, "mythburn.lck")
+    # process any command line options
     try:
-        fd = os.open(lckpath, os.O_WRONLY | os.O_CREAT | os.O_EXCL)
-        try:
-            os.write(fd, "%d\n" % os.getpid())
-            os.close(fd)
-        except:
-            os.remove(lckpath)
-            raise
-    except OSError, e:
-        if e.errno == errno.EEXIST:
-            write("Lock file exists -- already running???")
-            sys.exit(1)
-        else:
-            fatalError("cannot create lockfile: %s" % e)
-    # if we get here, we own the lock
+        opts, args = getopt.getopt(sys.argv[1:], "j:hl:", ["jobfile=", "help", "progresslog="])
+    except getopt.GetoptError:
+        # print usage and exit
+        usage()
+        sys.exit(2)
 
-    try:
-        #Load XML input file from disk
-        jobDOM = xml.dom.minidom.parse(jobfile)
+    for o, a in opts:
+        if o in ("-h", "--help"):
+            usage()
+            sys.exit()
+        if o in ("-j", "--jobfile"):
+            jobfile = str(a)
+            write("passed job file: " + a)
+        if o in ("-l", "--progresslog"):
+            progresslog = str(a)
+            write("passed progress log file: " + a)
 
-        #Error out if its the wrong XML
-        if jobDOM.documentElement.tagName != "mythburn":
-            fatalError("Job file doesn't look right!")
-
-        #process each job
-        jobcount=0
-        jobs=jobDOM.getElementsByTagName("job")
-        for job in jobs:
-            jobcount+=1
-            write( "Processing Mythburn job number %s." % jobcount)
-
-            #get any options from the job file if present
-            options = job.getElementsByTagName("options")
-            if options.length > 0:
-                getOptions(options)
-
-            processJob(job)
-
-        jobDOM.unlink()
-
-        # clear the archiveitems table
-        if clearArchiveTable == True:
-            clearArchiveItems()
-
-        saveSetting("MythArchiveLastRunStatus", "Success")
-        saveSetting("MythArchiveLastRunEnd", time.strftime("%Y-%m-%d %H:%M:%S "))
-        write("Finished processing jobs!!!")
-    finally:
-        # remove our lock file
-        os.remove(lckpath)
-
-        # make sure the files we created are read/writable by all 
-        os.system("chmod -R a+rw-x+X %s" % defaultsettings["MythArchiveTempDir"])
-except SystemExit:
-    write("Terminated")
-except:
-    write('-'*60)
-    traceback.print_exc(file=sys.stdout)
+    #if we have been given a progresslog filename to write to open it
     if progresslog != "":
-        traceback.print_exc(file=progressfile)
-    write('-'*60)
-    saveSetting("MythArchiveLastRunStatus", "Failed")
-    saveSetting("MythArchiveLastRunEnd", time.strftime("%Y-%m-%d %H:%M:%S "))
+        if os.path.exists(progresslog):
+            os.remove(progresslog)
+        progressfile = open(progresslog, 'w')
+        write( "mythburn.py (%s) starting up..." % VERSION)
+
+    #Get mysql database parameters
+    getMysqlDBParameters()
+
+    saveSetting("MythArchiveLastRunStart", time.strftime("%Y-%m-%d %H:%M:%S "))
+    saveSetting("MythArchiveLastRunType", "DVD")
+    saveSetting("MythArchiveLastRunStatus", "Running")
+
+    cpuCount = getCPUCount()
+
+    #if the script is run from the web interface the PATH environment variable does not include
+    #many of the bin locations we need so just append a few likely locations where our required
+    #executables may be
+    if not os.environ['PATH'].endswith(':'):
+        os.environ['PATH'] += ":"
+    os.environ['PATH'] += "/bin:/sbin:/usr/local/bin:/usr/bin:/opt/bin:" + installPrefix +"/bin:"
+
+    #Get defaults from MythTV database
+    defaultsettings = getDefaultParametersFromMythTVDB()
+    videopath = defaultsettings.get("VideoStartupDir", None)
+    gallerypath = defaultsettings.get("GalleryDir", None)
+    musicpath = defaultsettings.get("MusicLocation", None)
+    videomode = string.lower(defaultsettings["MythArchiveVideoFormat"])
+    temppath = os.path.join(defaultsettings["MythArchiveTempDir"], "work")
+    logpath = os.path.join(defaultsettings["MythArchiveTempDir"], "logs")
+    write("temppath: " + temppath)
+    write("logpath:  " + logpath)
+    dvddrivepath = defaultsettings["MythArchiveDVDLocation"]
+    dbVersion = defaultsettings["DBSchemaVer"]
+    preferredlang1 = defaultsettings["ISO639Language0"]
+    preferredlang2 = defaultsettings["ISO639Language1"]
+    useFIFO = (defaultsettings["MythArchiveUseFIFO"] == '1')
+    encodetoac3 = (defaultsettings["MythArchiveEncodeToAc3"] == '1')
+    alwaysRunMythtranscode = (defaultsettings["MythArchiveAlwaysUseMythTranscode"] == '1')
+    copyremoteFiles = (defaultsettings["MythArchiveCopyRemoteFiles"] == '1')
+    mainmenuAspectRatio = defaultsettings["MythArchiveMainMenuAR"]
+    chaptermenuAspectRatio = defaultsettings["MythArchiveChapterMenuAR"]
+    dateformat = defaultsettings.get("MythArchiveDateFormat", "%a %d %b %Y")
+    timeformat = defaultsettings.get("MythArchiveTimeFormat", "%I:%M %p")
+    if "MythArchiveClearArchiveTable" in defaultsettings:
+        clearArchiveTable = (defaultsettings["MythArchiveClearArchiveTable"] == '1')
+    nicelevel = defaultsettings.get("JobQueueCPU", "0")
+
+    # external commands
+    path_mplex = [defaultsettings["MythArchiveMplexCmd"], os.path.split(defaultsettings["MythArchiveMplexCmd"])[1]]
+    path_ffmpeg = [defaultsettings["MythArchiveFfmpegCmd"], os.path.split(defaultsettings["MythArchiveFfmpegCmd"])[1]]
+    path_dvdauthor = [defaultsettings["MythArchiveDvdauthorCmd"], os.path.split(defaultsettings["MythArchiveDvdauthorCmd"])[1]]
+    path_mkisofs = [defaultsettings["MythArchiveMkisofsCmd"], os.path.split(defaultsettings["MythArchiveMkisofsCmd"])[1]]
+    path_growisofs = [defaultsettings["MythArchiveGrowisofsCmd"], os.path.split(defaultsettings["MythArchiveGrowisofsCmd"])[1]]
+    path_tcrequant = [defaultsettings["MythArchiveTcrequantCmd"], os.path.split(defaultsettings["MythArchiveTcrequantCmd"])[1]]
+    path_jpeg2yuv = [defaultsettings["MythArchiveJpeg2yuvCmd"], os.path.split(defaultsettings["MythArchiveJpeg2yuvCmd"])[1]]
+    path_spumux = [defaultsettings["MythArchiveSpumuxCmd"], os.path.split(defaultsettings["MythArchiveSpumuxCmd"])[1]]
+    path_mpeg2enc = [defaultsettings["MythArchiveMpeg2encCmd"], os.path.split(defaultsettings["MythArchiveMpeg2encCmd"])[1]]
+
+    if nicelevel == '1':
+        nicelevel = 10
+    elif nicelevel == '2':
+        nicelevel = 0
+    else:
+        nicelevel = 17
+
+    nicelevel = os.nice(nicelevel)
+    write( "Setting process priority to %s" % nicelevel)
+
+    import errno
+
+    try:
+        # Attempt to create a lock file so any UI knows we are running.
+        # Testing for and creation of the lock is one atomic operation.
+        lckpath = os.path.join(logpath, "mythburn.lck")
+        try:
+            fd = os.open(lckpath, os.O_WRONLY | os.O_CREAT | os.O_EXCL)
+            try:
+                os.write(fd, "%d\n" % os.getpid())
+                os.close(fd)
+            except:
+                os.remove(lckpath)
+                raise
+        except OSError, e:
+            if e.errno == errno.EEXIST:
+                write("Lock file exists -- already running???")
+                sys.exit(1)
+            else:
+                fatalError("cannot create lockfile: %s" % e)
+        # if we get here, we own the lock
+
+        try:
+            #Load XML input file from disk
+            jobDOM = xml.dom.minidom.parse(jobfile)
+
+            #Error out if its the wrong XML
+            if jobDOM.documentElement.tagName != "mythburn":
+                fatalError("Job file doesn't look right!")
+
+            #process each job
+            jobcount=0
+            jobs=jobDOM.getElementsByTagName("job")
+            for job in jobs:
+                jobcount+=1
+                write( "Processing Mythburn job number %s." % jobcount)
+
+                #get any options from the job file if present
+                options = job.getElementsByTagName("options")
+                if options.length > 0:
+                    getOptions(options)
+
+                processJob(job)
+
+            jobDOM.unlink()
+
+            # clear the archiveitems table
+            if clearArchiveTable == True:
+                clearArchiveItems()
+
+            saveSetting("MythArchiveLastRunStatus", "Success")
+            saveSetting("MythArchiveLastRunEnd", time.strftime("%Y-%m-%d %H:%M:%S "))
+            write("Finished processing jobs!!!")
+        finally:
+            # remove our lock file
+            os.remove(lckpath)
+
+            # make sure the files we created are read/writable by all 
+            os.system("chmod -R a+rw-x+X %s" % defaultsettings["MythArchiveTempDir"])
+    except SystemExit:
+        write("Terminated")
+    except:
+        write('-'*60)
+        traceback.print_exc(file=sys.stdout)
+        if progresslog != "":
+            traceback.print_exc(file=progressfile)
+        write('-'*60)
+        saveSetting("MythArchiveLastRunStatus", "Failed")
+        saveSetting("MythArchiveLastRunEnd", time.strftime("%Y-%m-%d %H:%M:%S "))
+
+if __name__ == "__main__":
+    main()
