@@ -640,12 +640,6 @@ x86_mmx_cpus="$x86_mmx_cpus,c3,c3-2,k6,k6-2,k6-3"
 
 x86_cpus="i386,i486,i586,i686,pentium,pentiumpro,${x86_mmx_cpus}"
 
-x86_slow_cmov_cpus="pentium4,pentium4m,prescott,nocona"
-
-x86_cmov_cpus="i686,pentiumpro,pentium2,pentium3,pentium3m,pentium-m,"
-x86_cmov_cpus="$x86_cmov_cpus,athlon,athlon-xp,athlon-tbird,athlon-4,"
-x86_cmov_cpus="$x86_cmov_cpus,athlon-mp,c3-2,$x86_slow_cmov_cpus"
-
 x86_64_cpus="x86-64,athlon64,k8,opteron,athlon-fx,nocona"
 
 
@@ -659,14 +653,6 @@ is_x86_64_cpu() {
 
 is_x86_mmx() {
     expr ",${x86_mmx_cpus}," : ".*,$1," > /dev/null
-}
-
-is_x86_cmov_cpu() {
-    expr ",${x86_cmov_cpus}," : ".*,$1," > /dev/null
-}
-
-is_x86_slow_cmov_cpu() {
-    expr ",${x86_slow_cmov_cpus}," : ".*,$1," > /dev/null
 }
 
 CONFIG_LIST='
@@ -974,7 +960,7 @@ processor_flags=""
 tune="generic"
 powerpc_perf="no"
 mmx="default"
-cmov="no"
+cmov="default"
 fast_cmov="no"
 armv5te="default"
 armv6="default"
@@ -1368,12 +1354,7 @@ fi
 
 case "$arch" in
   x86_32)
-    if is_x86_cmov_cpu "$arch_raw" ; then
-        cmov="yes"
-        if ! is_x86_slow_cmov_cpu "$arch_raw" ; then
-            fast_cmov="yes"
-        fi
-    fi
+    arch="x86_32"
   ;;
   x86_64|amd64)
     arch="x86_32"
@@ -1385,9 +1366,6 @@ case "$arch" in
       fi
     fi
     cmov="yes"
-    if ! is_x86_slow_cmov_cpu "$arch_raw" ; then
-        fast_cmov="yes"
-    fi
   ;;
   # armv4l is a subset of armv[567]*l
   arm|armv[4567]*l)
@@ -1757,6 +1735,16 @@ if test x"$mmx" = x"default"; then
     fi
 fi
 
+if test x"$cmov" = x"default"; then
+    disable cmov
+    if test x"$cpu_overide" != x"yes" -a x"$tune_raw" = x"" -a \
+            x"$processor_flags" != x"" ; then
+        if expr "$processor_flags" : ".*cmov" > /dev/null ; then
+            enable cmov
+        fi
+     fi
+fi
+
 test -z "$need_memalign" && need_memalign="$mmx"
 
 #Darwin CC versions
@@ -2120,13 +2108,6 @@ if enabled proc_error_msg; then
     echo " please e-mail the above to mythtv-users@mythtv.org"
     echo " With the subject \"configure did not detect my cpu\""
     echo ""
-fi
-
-if disabled proc_opt; then
-    disabled optimize && enable optimize
-    if test x"$cpu_cmov" = x"yes" -a x"$ARCHFLAGS" != x"-march=k8"; then
-        ARCHFLAGS="-march=pentiumpro";
-    fi
 fi
 
 # if cpu flag is present ignore tune and arch and just use cpu
@@ -2872,8 +2853,8 @@ fi
 echo "big-endian       $bigendian"
 if test $arch = "x86_32" -o $arch = "x86_64"; then
     echo "MMX enabled      $mmx"
-    #echo "CMOV enabled     $cmov"
-    #echo "CMOV is fast     $fast_cmov"
+    echo "CMOV enabled     $cmov"
+    echo "CMOV is fast     $fast_cmov"
 fi
 if test $arch = "armv4l"; then
     echo "ARMv5TE enabled           $armv5te"
