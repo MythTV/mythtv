@@ -1907,8 +1907,10 @@ if test $arch = "powerpc"; then
     if enabled altivec; then
         if test -n "`$cc -v 2>&1 | grep version | grep Apple`"; then
             add_cflags "-faltivec"
+            add_cppflags "-faltivec"
         else
             add_cflags "-maltivec -mabi=altivec"
+            add_cppflags "-maltivec -mabi=altivec"
         fi
     fi
 fi
