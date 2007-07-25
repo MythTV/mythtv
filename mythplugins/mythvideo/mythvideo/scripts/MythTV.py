@@ -47,8 +47,8 @@ RECSTATUS = {
 }
 
 BACKEND_SEP = '[]:[]'
-PROTO_VERSION = 34
-PROGRAM_FIELDS = 43
+PROTO_VERSION = 35
+PROGRAM_FIELDS = 46
 
 class MythDB:
 	def __init__(self):
@@ -73,8 +73,8 @@ class MythDB:
 				continue
 	
 			token = config.get_token()
-			db_host = db_user = db_password = None
-			while  token != config.eof and (db_host == None or db_user == None or db_password == None):
+			db_host = db_user = db_password = db_name = None
+			while  token != config.eof and (db_host == None or db_user == None or db_password == None or db_name == None):
 				if token == "DBHostName":
 					if config.get_token() == "=":
 						db_host = config.get_token()
@@ -477,6 +477,9 @@ class Program:
 		self.recpriority2 = int(data[40])
 		self.parentid = data[41]
 		self.storagegroup = data[42]
+		self.audio_props = data[43]
+		self.video_props = data[44]
+		self.subtitle_type = data[45]
 
 if __name__ == '__main__':
 	banner = "'m' is a MythTV instance."
