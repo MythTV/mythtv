@@ -2010,7 +2010,7 @@ void AvFormatDecoder::HandleGopStart(AVPacket *pkt)
             VERBOSE(VB_PLAYBACK|VB_TIMESTAMP, LOC + 
                     QString("positionMap[ %1 ] == %2.")
                     .arg(prevgoppos / keyframedist)
-                    .arg((int)startpos));
+                    .arg(startpos));
 
             PosMapEntry entry = {prevgoppos / keyframedist,
                                  prevgoppos, startpos};

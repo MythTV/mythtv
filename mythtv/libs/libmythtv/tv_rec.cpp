@@ -2748,7 +2748,7 @@ QString TVRec::GetInput(void) const
  *
  *   You must call PauseRecorder(void) before calling this.
  *
- *  \param input Input to switch to, or "SwitchToNectInput".
+ *  \param input Input to switch to, or "SwitchToNextInput".
  *  \return input we have switched to
  */
 QString TVRec::SetInput(QString input, uint requestType)
