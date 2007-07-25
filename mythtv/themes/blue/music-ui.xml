@@ -573,9 +573,9 @@
             <pushbutton name="searchcompilation_artist_button" draworder="2">
                 <context>1</context>
                 <position>725,110</position>
-                <image function="on" filename="mm_mm_blankbutton_on.png"></image>
-                <image function="off" filename="mm_mm_blankbutton_off.png"></image>
-                <image function="pushed" filename="mm_mm_blankbutton_pushed.png"></image>
+                <image function="on" filename="mm_blankbutton_on.png"></image>
+                <image function="off" filename="mm_blankbutton_off.png"></image>
+                <image function="pushed" filename="mm_blankbutton_pushed.png"></image>
             </pushbutton>
 
 
