@@ -44,7 +44,7 @@ class MTDJob : public QObject
     //
     
     void setNumber(int a_number){job_number = a_number;}
-    void setName(const QString &a_name);
+    void SetName(const QString &a_name);
     void setActivity(const QString &an_act);
     void setOverall(double a_number){overall_progress = a_number;}
     void setSubjob(double a_number);

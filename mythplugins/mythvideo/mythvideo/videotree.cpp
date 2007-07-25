@@ -310,6 +310,8 @@ void VideoTree::keyPressEvent(QKeyEvent *e)
         {
             setParentalLevel(action.toInt());
         }
+        else if (action == "FILTER")
+            slotDoFilter();
         else
             handled = false;
     }
@@ -454,17 +456,10 @@ void VideoTree::doMenu(bool info)
         }
         else
         {
-            QButton *tempButton = NULL;
-            if (!file_browser)
-                focusButton = popup->addButton(tr("Filter Display"), this,
-                                               SLOT(slotDoFilter()));
-
-            tempButton = popup->addButton(tr("Switch to Browse View"), this,
-                                          SLOT(slotVideoBrowser()));
-
-            if (!focusButton)
-                focusButton = tempButton;
-
+            focusButton = popup->addButton(tr("Filter Display"), this,
+                                           SLOT(slotDoFilter()));
+            popup->addButton(tr("Switch to Browse View"), this,
+                             SLOT(slotVideoBrowser()));
             popup->addButton(tr("Switch to Gallery View"), this,
                              SLOT(slotVideoGallery()));
         }

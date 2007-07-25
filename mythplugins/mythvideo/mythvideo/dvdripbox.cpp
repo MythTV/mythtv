@@ -42,7 +42,7 @@ void MTDJob::init()
     cancelled = false;
 }
 
-void MTDJob::setName(const QString &a_name)
+void MTDJob::SetName(const QString &a_name)
 {
     if(a_name != job_name && cancelled)
     {
@@ -877,7 +877,7 @@ void DVDRipBox::setOverallJobStatus(int job_number, double status, QString title
     else
     {
         MTDJob *which_one = jobs.at(job_number);
-        which_one->setName(title);
+        which_one->SetName(title);
         which_one->setOverall(status);
         which_one->setNumber(job_number);
     }    

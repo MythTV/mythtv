@@ -15,9 +15,9 @@ class VideoDialog : public MythDialog
     Q_OBJECT
 
   public:
-    enum DialogType { DLG_BROWSER, DLG_GALLERY, DLG_TREE };
+    enum DialogType { DLG_BROWSER = 0x1, DLG_GALLERY = 0x2, DLG_TREE = 0x4 };
 
-    VideoDialog(DialogType lmyType, MythMainWindow *lparent,
+    VideoDialog(DialogType ltype, MythMainWindow *lparent,
                 const QString &lwinName, const QString &lname,
                 VideoList *video_list);
 
@@ -53,7 +53,7 @@ class VideoDialog : public MythDialog
     bool createPopup();
     void cancelPopup(void);
     void doMenu(bool info);
-    QButton* addDests(MythPopupBox* _popup = NULL);
+    QButton *AddPopupViews();
 
     QPixmap myBackground;
     int currentParentalLevel;
@@ -63,7 +63,7 @@ class VideoDialog : public MythDialog
     MythPopupBox* popup;
     bool expectingPopup;
     QRect fullRect;
-    DialogType myType;
+    int m_type;
 
     bool allowPaint;
 

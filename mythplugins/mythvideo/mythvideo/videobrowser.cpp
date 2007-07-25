@@ -124,13 +124,9 @@ void VideoBrowser::doMenu(bool info)
         }
         else
         {
-            if (!isFileBrowser)
-                focusButton = popup->addButton(tr("Filter Display"), this,
-                                               SLOT(slotDoFilter()));
-
-            QButton* tempButton = addDests();
-            if (!focusButton)
-                focusButton = tempButton;
+            focusButton = popup->addButton(tr("Filter Display"), this,
+                                           SLOT(slotDoFilter()));
+            AddPopupViews();
         }
 
         popup->addButton(tr("Cancel"), this, SLOT(slotDoCancel()));

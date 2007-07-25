@@ -503,16 +503,9 @@ void VideoGallery::doMenu(bool info)
         }
         else
         {
-            if (!isFileBrowser)
-            {
-                focusButton = popup->addButton(tr("Filter Display"), this,
-                                               SLOT(slotDoFilter()));
-                addDests();
-            }
-            else
-            {
-                focusButton = addDests();
-            }
+            focusButton = popup->addButton(tr("Filter Display"), this,
+                                           SLOT(slotDoFilter()));
+            AddPopupViews();
         }
 
         popup->addButton(tr("Cancel"), this, SLOT(slotDoCancel()));
@@ -521,7 +514,6 @@ void VideoGallery::doMenu(bool info)
 
         focusButton->setFocus();
     }
-
 }
 
 void VideoGallery::LoadIconWindow()

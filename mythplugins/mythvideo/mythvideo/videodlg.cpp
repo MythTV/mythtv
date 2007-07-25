@@ -10,10 +10,10 @@
 #include "videolist.h"
 #include "videoutils.h"
 
-VideoDialog::VideoDialog(DialogType lmyType, MythMainWindow *lparent,
+VideoDialog::VideoDialog(DialogType ltype, MythMainWindow *lparent,
                          const QString &lwinName, const QString &lname,
                          VideoList *video_list) :
-    MythDialog(lparent, lname), curitem(NULL), popup(NULL), myType(lmyType),
+    MythDialog(lparent, lname), curitem(NULL), popup(NULL), m_type(ltype),
     m_video_list(video_list), m_exit_type(0)
 {
     //
@@ -90,35 +90,26 @@ void VideoDialog::cancelPopup(void)
     }
 }
 
-QButton* VideoDialog::addDests(MythPopupBox* _popup)
+QButton *VideoDialog::AddPopupViews()
 {
-    if (!_popup)
-        _popup = popup;
-
-    if (!_popup)
+    if (!popup)
         return NULL;
 
-    QButton *focusButton = NULL;
-    QButton *tempButton = NULL;
+    std::vector<QButton *> buttons;
 
-    if (myType != DLG_BROWSER)
-        focusButton = popup->addButton(tr("Switch to Browse View"), this,
-                                       SLOT(slotVideoBrowser()));
+    if (!(m_type & DLG_BROWSER))
+        buttons.push_back(popup->addButton(tr("Switch to Browse View"), this,
+                                           SLOT(slotVideoBrowser())));
 
-    if (myType != DLG_GALLERY)
-        tempButton = popup->addButton(tr("Switch to Gallery View"), this,
-                                      SLOT(slotVideoGallery()));
+    if (!(m_type & DLG_GALLERY))
+        buttons.push_back(popup->addButton(tr("Switch to Gallery View"), this,
+                                           SLOT(slotVideoGallery())));
 
-    focusButton = focusButton ? focusButton : tempButton;
+    if (!(m_type & DLG_TREE))
+        buttons.push_back(popup->addButton(tr("Switch to List View"), this,
+                                 SLOT(slotVideoTree())));
 
-
-    if (myType != DLG_TREE)
-        tempButton = popup->addButton(tr("Switch to List View"), this,
-                                      SLOT(slotVideoTree()));
-
-    focusButton = focusButton ? focusButton : tempButton;
-
-    return focusButton;
+    return buttons.size() ? buttons[0] : NULL;
 }
 
 bool VideoDialog::createPopup()
