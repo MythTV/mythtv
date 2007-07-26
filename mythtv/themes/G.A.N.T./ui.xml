@@ -703,8 +703,7 @@
         <area>20,70,720,140</area>
         <font>info</font>
         <multiline>yes</multiline>
-        <value>%SUBTITLE|"|"
-%%STARS%%DESCRIPTION%</value>
+        <value>%SUBTITLE|"|" %%STARS%%DESCRIPTION%</value>
       </textarea>
     </container>
 
@@ -1281,8 +1280,7 @@
         <altarea>20,70,760,125</altarea>
         <font>info</font>
         <multiline>yes</multiline>
-        <value>%SUBTITLE|"|"
-%%STARS%%DESCRIPTION%</value>
+        <value>%SUBTITLE|"|"%%STARS%%DESCRIPTION%</value>
       </textarea>
 
       <image name="autoexpire" draworder="6">
@@ -1371,8 +1369,7 @@
         <altarea>20,70,760,125</altarea>
         <font>info</font>
         <multiline>yes</multiline>
-        <value>%SUBTITLE|"|"
-%%STARS%%DESCRIPTION%</value>
+        <value>%SUBTITLE|"|"%%STARS%%DESCRIPTION%</value>
       </textarea>
     </container>
 
@@ -1422,6 +1419,296 @@
     </container>
 
   </window>
+
+ <window name="playback-video">
+   
+   <font name="overunderrecfont" face="Arial">
+     <color>#ffffAA</color>
+     <size>16</size>
+     <size:small>11</size:small>
+     <bold>yes</bold>
+   </font>
+
+   <font name="tagged_font" face="Arial">
+     <color>#dddd33</color>
+     <size>16</size>
+     <size:small>11</size:small>
+     <bold>yes</bold>
+   </font>
+
+   <font name="currenttitle" face="Arial">
+     <color>#ffff33</color>
+     <size>18</size>
+     <size:small>12</size:small>
+     <bold>yes</bold>
+   </font>
+
+   <font name="active_font" face="Arial">
+     <color>#ffffff</color>
+     <size>16</size>
+     <size:small>10</size:small>
+     <bold>yes</bold>
+   </font>
+
+   <font name="inactive_font" face="Arial">
+     <color>#9999cc</color>
+     <size>16</size>
+     <size:small>10</size:small>
+     <bold>yes</bold>
+   </font>
+   
+   <font name="record_font" face="Arial">
+     <color>#F7862B</color>
+     <size>16</size>
+     <size:small>11</size:small>
+     <bold>yes</bold>
+   </font>
+
+   <font name="recording_font" face="Arial">
+     <color>#FF33FF</color>
+     <size>16</size>
+     <size:small>11</size:small>
+     <bold>yes</bold>
+   </font>
+
+   <font name="title" face="Arial">
+     <color>#ffffff</color>
+     <dropcolor>#000000</dropcolor>
+     <size>25</size>
+     <size:small>12</size:small>
+     <shadow>3,3</shadow>
+     <bold>yes</bold>
+   </font>
+
+   <font name="info" face="Arial">
+     <color>#ffffff</color>
+     <size>17</size>
+     <size:small>10</size:small>
+     <shadow>2,2</shadow>
+     <bold>yes</bold>
+   </font>
+
+   <font name="descinfo" face="Arial">
+     <shadow>2,2</shadow>
+     <color>#ffffff</color>
+     <size>16</size>
+     <size:small>8</size:small>
+     <bold>yes</bold>
+   </font>
+
+   <font name="chaninfo" face="Arial">
+     <shadow>1,1</shadow>
+     <color>#ffffff</color>
+     <size>15</size>
+     <size:small>10</size:small>
+     <bold>yes</bold>
+   </font>
+
+   <font name="recstatus" face="Arial">
+     <color>#ffff33</color>
+     <size>17</size>
+     <size:small>12</size:small>
+     <shadow>2,2</shadow>
+     <bold>yes</bold>
+   </font>
+
+   <font name="small" face="Arial">
+     <color>#ffff33</color>
+     <size>16</size>
+     <size:small>8</size:small>
+   </font>
+   
+   <container name="background">
+     <image name="filler" draworder="0" fleximage="yes">
+       <filename>background.png</filename>
+       <position>0,290</position>
+     </image>
+     <textarea name="messagedel" draworder="0" >
+       <area>20,10,760,35</area>
+       <font>info</font>
+       <value>Select a recording to permanently erase.</value>
+       <context>1</context>
+     </textarea>
+     <textarea name="messageplay" draworder="0" >
+       <area>20,10,760,35</area>
+       <font>info</font>
+       <value>Select a recording to watch.</value>
+       <context>0</context>
+     </textarea>
+   </container>
+   
+   <container name="selector">
+     <area>0,290,800,320</area>
+     <listarea name="toptitles" draworder="2">
+       <area>30,22,180,105</area>
+       <fcnfont name="active_font" function="active"></fcnfont>
+       <fcnfont name="active_font" function="selected"></fcnfont>
+       <fcnfont name="inactive_font" function="inactive"></fcnfont>
+       <items>3</items>
+     </listarea>
+     <image name="titlelines" draworder="3" fleximage="no">
+       <filename>shared/trans-titles.png</filename>
+       <position>0,0</position>
+     </image>
+     <listarea name="bottomtitles" draworder="2">
+       <area>30,172,180,105</area>
+       <fcnfont name="active_font" function="active"></fcnfont>
+       <fcnfont name="active_font" function="selected"></fcnfont>
+       <fcnfont name="inactive_font" function="inactive"></fcnfont>
+       <items>3</items>
+     </listarea>
+     <listarea name="showing" draworder="4">
+       <area>240,18,600,265</area>
+       <fcnfont name="record_font" function="record"></fcnfont>
+       <fcnfont name="recording_font" function="recording"></fcnfont>
+       <fcnfont name="overunderrecfont" function="overunderrecording"></fcnfont>               
+       <fcnfont name="active_font" function="active"></fcnfont>
+       <fcnfont name="active_font" function="selected"></fcnfont>
+       <fcnfont name="inactive_font" function="inactive"></fcnfont>
+       <fcnfont name="tagged_font" function="tagged"></fcnfont>
+       <columnpadding>5</columnpadding>
+       <column number="1" width="340" context="-1"></column>
+       <column number="2" width="60" context="-1"></column>
+       <column number="3" width="134" context="0"></column>
+       <column number="4" width="110" context="1"></column>
+       
+       <items>7</items>
+       <image function="selectionbar" filename="bar.png" location="-13,-2"></image>
+       <image function="uparrow" filename="uparrow.png" location="760,20"></image>
+       <image function="downarrow" filename="downarrow.png" location="760,220"></image>
+     </listarea>
+     <image name="showinglines" draworder="5" fleximage="yes">
+       <filename>showings.png</filename>
+       <position>0,0</position>
+     </image>
+     <textarea name="current" draworder="6">
+       <area>34,131,185,40</area>
+       <font>currenttitle</font>
+     </textarea>
+   </container>
+   
+   <container name="group_info">
+     <context>0</context>
+     <area>0,40,799,240</area>
+     
+     <textarea name="title" draworder="6">
+       <area>23,12,779,45</area>
+       <font>title</font>
+     </textarea>
+     <textarea name="description" draworder="6">
+       <area>25,50,600,120</area>
+       <font>info</font>
+       <multiline>yes</multiline>
+     </textarea>
+   </container>
+   
+   <container name="program_info_play">
+     <context>0</context>
+     <area>0,40,520,240</area>
+     <textarea name="title" draworder="6">
+       <area>20,0,500,40</area>
+       <font>title</font>
+     </textarea>
+     <textarea name="channel" draworder="6">
+       <area>20,40,160,30</area>
+       <font>info</font>
+     </textarea>
+     <textarea name="timedate" draworder="6">
+       <area>200,40,440,30</area>
+       <font>info</font>
+     </textarea>
+     <textarea name="subdescr" draworder="6">
+       <area>20,70,500,125</area>
+       <font>info</font>
+       <multiline>yes</multiline>
+       <value>%SUBTITLE|"|"%%STARS%%DESCRIPTION%</value>
+     </textarea>
+
+     <image name="autoexpire" draworder="6">
+       <filename>type/autoexpire.png</filename>
+       <position>20,195</position>
+     </image>
+     <image name="bookmark" draworder="6">
+       <filename>type/bookmark.png</filename>
+       <position>55,195</position>
+     </image>
+     <image name="commflagged" draworder="6">
+       <filename>type/commflagged.png</filename>
+       <position>90,195</position>
+     </image>
+     <image name="cutlist" draworder="6">
+       <filename>type/cutlist.png</filename>
+       <position>125,195</position>
+     </image>
+     <image name="processing" draworder="6">
+       <filename>type/processing.png</filename>
+       <position>160,195</position>
+     </image>
+     <image name="stereo" draworder="6">
+       <filename>stereo.png</filename>
+       <position>195,195</position>
+     </image>
+     <image name="cc" draworder="6">
+       <filename>type/cc.png</filename>
+       <position>230,195</position>
+     </image>
+     <image name="hdtv" draworder="6">
+       <filename>type/hd.png</filename>
+       <position>265,195</position>
+     </image>
+     <image name="watched" draworder="6">
+         <filename>type/watched.png</filename>
+         <position>300,195</position>
+     </image>
+     
+   </container>
+   
+   <container name="video">
+     <area>540,30,240,180</area>
+   </container>
+   
+   <!-- Confirm delete and legend help popup -->
+   <popup name="confirmdelete">
+     <foreground>#ffffff</foreground>
+     <highlight>#ffffff</highlight>
+   </popup>
+   
+   <container name="usage">
+     <context>1</context>
+     <area>0,530,800,50</area>
+     <statusbar name="usedbar" draworder="5">
+       <container fleximage="yes">container.png</container>
+       <fill>filler.png</fill>
+       <position>20,0</position>
+     </statusbar>
+     <textarea name="freereport" draworder="6">
+       <area>430,3,370,30</area>
+       <font>info</font>
+     </textarea>
+   </container>
+   
+   <container name="norecordings_list">
+     <textarea name="msg" align="center" draworder="8">
+       <area>200,140,600,30</area>
+       <font>info</font>
+       <value>Sorry, No Recordings Available</value>
+     </textarea>
+   </container>
+   
+   <container name="norecordings_info">
+     <textarea name="topline" align="center" draworder="8">
+       <area>20,80,580,30</area>
+       <font>info</font>
+       <value>To schedule a recording, exit this screen and</value>
+     </textarea>
+     <textarea name="botline" align="center" draworder="8">
+       <area>20,110,580,30</area>
+       <font>info</font>
+       <value>Select 'Schedule a Recording' from the Main Menu</value>
+     </textarea>
+   </container>
+   
+ </window>
 
   <window name="programfind">
 
