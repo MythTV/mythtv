@@ -253,6 +253,11 @@ PSIPTable* MPEGStreamData::AssemblePSIP(const TSPacket* tspacket,
         {
             if (partial->pesdata()[psip->SectionLength()] != 0xff)
             {
+#if 0 /* This doesn't work, you can't start PES packet like this 
+         because the PayloadStart() flag won't be set in this TSPacket
+         -- dtk  May 4th, 2007
+       */
+
                 // If the next section starts in the new tspacket
                 // create a new partial packet to prevent overflow
                 if ((partial->TSSizeInBuffer() > TSPacket::SIZE) &&
@@ -264,6 +269,7 @@ PSIPTable* MPEGStreamData::AssemblePSIP(const TSPacket* tspacket,
                                    new PESPacket(*tspacket));
                 }
                 else
+#endif
                 {
                     partial->SetPSIOffset(partial->PSIOffset() +
                                           psip->SectionLength());
