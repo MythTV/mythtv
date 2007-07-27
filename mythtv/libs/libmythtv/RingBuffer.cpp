@@ -780,17 +780,17 @@ void RingBuffer::ReadAheadThread(void)
             if (readtimeavg < 200 && readblocksize < KB640)
             {
                 readblocksize += CHUNK;
-                VERBOSE(VB_PLAYBACK,
-                    QString("Avg read interval was %1 msec. %2K block size")
-                            .arg(readtimeavg).arg(readblocksize/1024));
+                //VERBOSE(VB_PLAYBACK,
+                //    QString("Avg read interval was %1 msec. %2K block size")
+                //            .arg(readtimeavg).arg(readblocksize/1024));
                 readtimeavg = 300;
             }
             else if (readtimeavg > 400 && readblocksize > CHUNK)
             {
                 readblocksize -= CHUNK;
-                VERBOSE(VB_PLAYBACK,
-                    QString("Avg read interval was %1 msec. %2K block size")
-                            .arg(readtimeavg).arg(readblocksize/1024));
+                //VERBOSE(VB_PLAYBACK,
+                //    QString("Avg read interval was %1 msec. %2K block size")
+                //            .arg(readtimeavg).arg(readblocksize/1024));
                 readtimeavg = 300;
             }
             lastread = now;
