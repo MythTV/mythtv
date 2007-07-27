@@ -143,19 +143,23 @@ $newfilename = $exportdir."/".$channame."_".$title."_".$subtitle."_".$newstartti
 
 if ($debug)
 {
-	print "\n\n Source filename:$filename \nDestination filename:$newfilename\n \n";
+    print "\n\n Source filename:$filename \nDestination filename:$newfilename\n \n";
 }
 #
 # Now run ffmpeg to find out what bitrate the stream is
 #
 
+$origbitrate = -1;
+
 $output = `ffmpeg -i $filename 2>&1`;
 
-@words = split(/Audio/, $output);
-@br = split(/\,/, $words[1]);
-@out = split(/kb/, $br[3]);
+$output =~s/^.*?Audio.*?, (\d*) kb\/s.*$/$1/s;
 
-$origbitrate = $out[0];
+print $output . "\n";
+
+if ($output =~ /^\d+$/) {
+    $origbitrate = $output;
+}
 
 #
 # If maximum bitrate is less than the source bitrate, allow the max bitrate to remain
@@ -163,16 +167,18 @@ $origbitrate = $out[0];
 
 $bitrate = $maxbitrate;
 
-if ($maxbitrate > $origbitrate) {
+if (($origbitrate != -1) && ($maxbitrate > $origbitrate)) {
     print "maxbitrate is greater than original.  Using source bitrate to save space\n";
     $bitrate = $origbitrate;
 }
+
+$bitrate .= "K";
 
 #
 # Now run ffmpeg to get mp3 out of the dvb radio recording
 #
 
-$command = "nice -n19 ffmpeg -i $filename -ab $bitrate -acodec mp3 -f mp3 '$newfilename' 2>&1";
+$command = "nice -n19 ffmpeg -i $filename -ab $bitrate -ac 2 -acodec mp3 -f mp3 '$newfilename' 2>&1";
 
 if ($debug) {
     print "\n\nUSING $command \n\n";
