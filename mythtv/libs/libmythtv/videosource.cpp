@@ -979,11 +979,14 @@ FirewireModel::FirewireModel(const CaptureCard  &parent,
 {
     setLabel(QObject::tr("Cable box model"));
     addSelection(QObject::tr("Generic"), "GENERIC");
+    addSelection("DCT-3412");
+    addSelection("DCT-3416");
     addSelection("DCT-6200");
     addSelection("DCT-6212");
     addSelection("DCT-6216");
     addSelection("SA3250HD");
     addSelection("SA4200HD");
+    addSelection("SA4250HDC");
     QString help = QObject::tr(
         "Choose the model that most closely resembles your set top box. "
         "Depending on firmware revision SA4200HD may work better for a "

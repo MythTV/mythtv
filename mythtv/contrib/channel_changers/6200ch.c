@@ -34,6 +34,9 @@
 #define DCT3412_VENDOR_ID1 0x0000159a
 #define DCT3412_MODEL_ID1  0x000034cb
 
+#define DCT3416_VENDOR_ID1 0x000016b5
+#define DCT3416_MODEL_ID1  0x0000346b
+
 #define DCT5100_VENDOR_ID1 0x000017ee
 #define DCT5100_MODEL_ID1  0x0000620a
 
@@ -181,6 +184,7 @@ int main (int argc, char *argv[])
 
       // WARNING: Please update firewiredevice.cpp when adding to this list.
       if ( ((dir.vendor_id == DCT3412_VENDOR_ID1) || 
+            (dir.vendor_id == DCT3416_VENDOR_ID1) || 
             (dir.vendor_id == DCT5100_VENDOR_ID1) ||
             (dir.vendor_id == DCT6200_VENDOR_ID1) ||
             (dir.vendor_id == DCT6200_VENDOR_ID2) ||
@@ -200,6 +204,7 @@ int main (int argc, char *argv[])
             (dir.vendor_id == DCT6416_VENDOR_ID1) || 
             (dir.vendor_id == DCT6416_VENDOR_ID2)) &&
            ((dir.model_id == DCT3412_MODEL_ID1) ||
+            (dir.model_id == DCT3416_MODEL_ID1) ||
             (dir.model_id == DCT5100_MODEL_ID1) ||
             (dir.model_id == DCT6200_MODEL_ID1) ||
             (dir.model_id == DCT6200_MODEL_ID2) ||

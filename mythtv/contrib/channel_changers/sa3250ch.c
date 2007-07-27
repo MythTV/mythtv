@@ -32,15 +32,14 @@
 
 /* SA3250HD IDs */
 /* WARNING: Please update firewiredevice.cpp when adding to this list. */
-#define SA3250HD_VENDOR_ID1     0x000011e6
-#define SA3250HD_VENDOR_ID2     0x000014f8
-#define SA3250HD_VENDOR_ID3     0x00001692
-#define SA3250HD_VENDOR_ID4     0x00001947
-#define SA3250HD_VENDOR_ID5     0x00000f21
+#define SA_VENDOR_ID1           0x000011e6
+#define SA_VENDOR_ID2           0x000014f8
+#define SA_VENDOR_ID3           0x00001692
+#define SA_VENDOR_ID4           0x00001947
+#define SA_VENDOR_ID5           0x00000f21
 #define SA3250HD_MODEL_ID1      0x00000be0
-#define SA4200HD_VENDOR_ID1     0x000014f8
-#define SA4200HD_VENDOR_ID2     0x00001692
 #define SA4200HD_MODEL_ID1      0x00001072
+#define SA4250HDC_MODEL_ID1     0x000010cc
 
 #define AVC1394_SA3250_COMMAND_CHANNEL 0x000007c00   /* subunit command */
 #define AVC1394_SA3250_OPERAND_KEY_PRESS 0xe7
@@ -129,15 +128,14 @@ int main (int argc, char *argv[])
                  i, dir.vendor_id, dir.model_id); 
 		
       /* WARNING: Please update firewiredevice.cpp when adding to this list. */
-      if ((((dir.vendor_id == SA4200HD_VENDOR_ID1) ||
-            (dir.vendor_id == SA4200HD_VENDOR_ID2)) &&
-	    (dir.model_id == SA4200HD_MODEL_ID1))  ||
-          (((dir.vendor_id == SA3250HD_VENDOR_ID1) ||
-            (dir.vendor_id == SA3250HD_VENDOR_ID2) ||
-            (dir.vendor_id == SA3250HD_VENDOR_ID3) ||
-            (dir.vendor_id == SA3250HD_VENDOR_ID4) ||
-            (dir.vendor_id == SA3250HD_VENDOR_ID5)) &&
-            (dir.model_id == SA3250HD_MODEL_ID1)))
+      if (((dir.vendor_id == SA_VENDOR_ID1) ||
+           (dir.vendor_id == SA_VENDOR_ID2) ||
+           (dir.vendor_id == SA_VENDOR_ID3) ||
+           (dir.vendor_id == SA_VENDOR_ID4) ||
+           (dir.vendor_id == SA_VENDOR_ID5)) &&
+          ((dir.model_id == SA3250HD_MODEL_ID1)  ||
+           (dir.model_id == SA4200HD_MODEL_ID1)  ||
+           (dir.model_id == SA4250HDC_MODEL_ID1)))
       {
             device = i;
             break;

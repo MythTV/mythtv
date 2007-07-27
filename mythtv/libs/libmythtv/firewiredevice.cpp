@@ -166,7 +166,8 @@ bool FirewireDevice::SetChannel(const QString &panel_model,
     vector<uint8_t> ret;
 
     if ((panel_model.upper() == "GENERIC") ||
-        (panel_model.upper() == "SA4200HD"))
+        (panel_model.upper() == "SA4200HD") ||
+        (panel_model.upper() == "SA4250HDC"))
     {
         cmd.push_back(kAVCControlCommand);
         cmd.push_back(kAVCSubunitTypePanel | m_subunitid);
@@ -200,9 +201,7 @@ bool FirewireDevice::SetChannel(const QString &panel_model,
         return true;
     }
 
-    bool is_mot = ((panel_model.upper() == "DCT-6200") ||
-                   (panel_model.upper() == "DCT-6212") ||
-                   (panel_model.upper() == "DCT-6216"));
+    bool is_mot = (panel_model.upper().left(4) == "DCT-");
 
     if (is_mot && !alt_method)
     {
@@ -374,20 +373,25 @@ static void fw_init(QMap<uint64_t,QString> &id_to_model)
     // WARNING: Please update 6200ch.c or sa3250ch.c as well
     //          when updating this function.
 
-    id_to_model[0x11e6ULL << 32 | 0x0be0] = "SA3250HD";
-    id_to_model[0x14f8ULL << 32 | 0x0be0] = "SA3250HD";
-    id_to_model[0x1692ULL << 32 | 0x0be0] = "SA3250HD";
-    id_to_model[0x1947ULL << 32 | 0x0be0] = "SA3250HD";
-    id_to_model[0x0f21ULL << 32 | 0x0be0] = "SA3250HD";
+    const uint64_t sa_vendor_ids[] =
+    {
+        0x11e6,    0x14f8,    0x1692,    0x1947,    0x0f21,
+    };
+    const uint sa_vendor_id_cnt =
+        sizeof(sa_vendor_ids) / sizeof(uint64_t);
 
-    id_to_model[0x11e6ULL << 32 | 0x1072] = "SA4200HD";
-    id_to_model[0x14f8ULL << 32 | 0x1072] = "SA4200HD";
-    id_to_model[0x1692ULL << 32 | 0x1072] = "SA4200HD";
-    id_to_model[0x1947ULL << 32 | 0x1072] = "SA4200HD";
-    id_to_model[0x0f21ULL << 32 | 0x1072] = "SA4200HD";
+    for (uint i = 0; i < sa_vendor_id_cnt; i++)
+    {
+        id_to_model[sa_vendor_ids[i] << 32 | 0x0be0] = "SA3250HD";
+        id_to_model[sa_vendor_ids[i] << 32 | 0x1072] = "SA4200HD";
+        id_to_model[sa_vendor_ids[i] << 32 | 0x10cc] = "SA4250HDC";
+    }
 
     const uint64_t motorola_vendor_ids[] =
-    {   /* 6200 */
+    {
+        /* 3412 */
+        0x159a,
+        /* 6200, 3416 */
         0x0ce5,    0x0e5c,    0x1225,    0x0f9f,    0x1180,
         0x12c9,    0x11ae,    0x152f,    0x14e8,    0x16b5,    0x1371,
         0x19a6,    0x1aad,
@@ -397,24 +401,16 @@ static void fw_init(QMap<uint64_t,QString> &id_to_model)
         0x17ee,    0x1a66,
     };
     const uint motorola_vendor_id_cnt =
-        sizeof(motorola_vendor_ids) / sizeof(uint32_t);
-
-    const uint32_t motorola_6200model_ids[] = { 0x620a, 0x6200, };
-    const uint32_t motorola_6212model_ids[] = { 0x64ca, 0x64cb, };
-    const uint32_t motorola_6216model_ids[] = { 0x646b, };
+        sizeof(motorola_vendor_ids) / sizeof(uint64_t);
 
     for (uint i = 0; i < motorola_vendor_id_cnt; i++)
-        for (uint j = 0; j < 2; j++)
-            id_to_model[motorola_vendor_ids[i] << 32 |
-                        motorola_6200model_ids[j]] = "DCT-6200";
-
-    for (uint i = 0; i < motorola_vendor_id_cnt; i++)
-        for (uint j = 0; j < 2; j++)
-            id_to_model[motorola_vendor_ids[i] << 32 |
-                        motorola_6212model_ids[j]] = "DCT-6212";
-
-    for (uint i = 0; i < motorola_vendor_id_cnt; i++)
-        for (uint j = 0; j < 2; j++)
-            id_to_model[motorola_vendor_ids[i] << 32 |
-                        motorola_6216model_ids[j]] = "DCT-6216";
+    {
+        id_to_model[motorola_vendor_ids[i] << 32 | 0x34cb] = "DCT-3412";
+        id_to_model[motorola_vendor_ids[i] << 32 | 0x346b] = "DCT-3416";
+        id_to_model[motorola_vendor_ids[i] << 32 | 0x6200] = "DCT-6200";
+        id_to_model[motorola_vendor_ids[i] << 32 | 0x620a] = "DCT-6200";
+        id_to_model[motorola_vendor_ids[i] << 32 | 0x64ca] = "DCT-6212";
+        id_to_model[motorola_vendor_ids[i] << 32 | 0x64cb] = "DCT-6212";
+        id_to_model[motorola_vendor_ids[i] << 32 | 0x646b] = "DCT-6216";
+    }
 }
