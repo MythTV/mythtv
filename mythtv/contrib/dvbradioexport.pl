@@ -34,10 +34,11 @@ $debug = 0;
 ##################################
 
 $usage = "\nHow to use dvbradioexport.pl \n\ndvbradioexport.pl exportdir=/foo/bar starttime=%STARTTIME% 
-chanid=%CHANID maxbitrate=x debug\n"
+chanid=%CHANID% maxbitrate=x debug\n"
         ."\n%CHANID% = channel ID associated with the recording to export\n"
         ."%STARTTIME% = recording start time in either 'yyyy-mm-dd hh:mm:ss' or 'yyyymmddhhmmss' format\n"
-        ."exportdir = dir to export completed MP3 files to (note the user the script runs as must have write permission on that dir\n"
+        ."exportdir = dir to export completed MP3 files to (note the user the script runs as must have write permission on that 
+dir)\n"
         ."maxbitrate = maximum bitrate for the export to use.  If more than the original file's bitrate, the original 
 bitrate will be used \n"
         ."debug = enable debugging information - outputs which commands would be run etc\n";
