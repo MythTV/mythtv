@@ -779,6 +779,23 @@ int main(int argc, char **argv)
 #endif
     QApplication a(argc, argv);
 
+    for(int argpos = 1; argpos < a.argc(); ++argpos)
+    {
+        if (!strcmp(a.argv()[argpos],"--version"))
+        {
+            extern const char *myth_source_version;
+            extern const char *myth_source_path;
+            cout << "Library API version     : " << MYTH_BINARY_VERSION << endl;
+            cout << "Source code version     : " << myth_source_version << endl;
+            cout << "SVN Branch              : " << myth_source_path << endl;
+#ifdef MYTH_BUILD_CONFIG
+            cout << "Options compiled in:" <<endl;
+            cout << MYTH_BUILD_CONFIG << endl;
+#endif
+            return FRONTEND_EXIT_OK;
+        }
+    }
+
     QString logfile = "";
 
     QString pluginname = "";
@@ -838,17 +855,6 @@ int main(int argc, char **argv)
                 cerr << "Missing argument to -v/--verbose option\n";
                 return FRONTEND_EXIT_INVALID_CMDLINE;
             }
-        }
-        else if (!strcmp(a.argv()[argpos],"--version"))
-        {
-            extern const char *myth_source_version;
-            cout << "Library API version: " << MYTH_BINARY_VERSION << endl;
-            cout << "Source code version: " << myth_source_version << endl;
-#ifdef MYTH_BUILD_CONFIG
-            cout << "Options compiled in:" <<endl;
-            cout << MYTH_BUILD_CONFIG << endl;
-#endif
-            return FRONTEND_EXIT_OK;
         }
         else if (!strcmp(a.argv()[argpos],"-r") ||
                  !strcmp(a.argv()[argpos],"--reset"))
