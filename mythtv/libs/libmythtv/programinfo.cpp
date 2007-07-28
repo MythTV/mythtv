@@ -2305,14 +2305,28 @@ void ProgramInfo::SetAutoExpire(int autoExpire, bool updateDelete) const
 void ProgramInfo::UpdateLastDelete(bool setTime) const
 {
     MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare("UPDATE record SET last_delete = :TIME "
-                  "WHERE recordid = :RECORDID");
-    query.bindValue(":RECORDID", recordid);
 
-   if (setTime)
-        query.bindValue(":TIME", QDateTime::currentDateTime());
+    if (setTime)
+    {
+        QDateTime timeNow = QDateTime::currentDateTime();
+        int delay = recstartts.secsTo(timeNow) / 3600;
+
+        if (delay > 200)
+            delay = 200;
+        else if (delay < 1)
+            delay = 1;
+
+        query.prepare("UPDATE record SET last_delete = :TIME, "
+                      "avg_delay = (avg_delay * 3 + :DELAY) / 4 "
+                      "WHERE recordid = :RECORDID");
+        query.bindValue(":TIME", timeNow);
+        query.bindValue(":DELAY", delay);
+        query.bindValue(":RECORDID", recordid);
+    }
     else
-        query.bindValue(":TIME", "0000-00-00T00:00:00");
+        query.prepare("UPDATE record SET last_delete = '0000-00-00T00:00:00' "
+                      "WHERE recordid = :RECORDID");
+        query.bindValue(":RECORDID", recordid);
 
     if (!query.exec() || !query.isActive())
         MythContext::DBError("Update last_delete", query);

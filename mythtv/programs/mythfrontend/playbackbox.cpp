@@ -1834,12 +1834,13 @@ bool PlaybackBox::FillList(bool useCachedData)
 
         QMap<int, int> recType;
         QMap<int, int> maxEpisodes;
+        QMap<int, int> avgDelay;
         QMap<int, int> spanHours;
         QMap<int, int> delHours;
         QMap<int, int> nextHours;
 
         MSqlQuery query(MSqlQuery::InitCon());
-        query.prepare("SELECT recordid, type, maxepisodes, "
+        query.prepare("SELECT recordid, type, maxepisodes, avg_delay, "
                       "next_record, last_record, last_delete FROM record;");
 
         if (query.exec() && query.isActive())
@@ -1849,10 +1850,11 @@ bool PlaybackBox::FillList(bool useCachedData)
                 int recid = query.value(0).toInt();
                 recType[recid] = query.value(1).toInt();
                 maxEpisodes[recid] = query.value(2).toInt();
+                avgDelay[recid] = query.value(3).toInt();
 
-                QDateTime next_record = query.value(3).toDateTime();
-                QDateTime last_record = query.value(4).toDateTime();
-                QDateTime last_delete = query.value(5).toDateTime();
+                QDateTime next_record = query.value(4).toDateTime();
+                QDateTime last_record = query.value(5).toDateTime();
+                QDateTime last_delete = query.value(6).toDateTime();
 
                 // Time between the last and next recordings
                 spanHours[recid] = 1000;
@@ -1876,6 +1878,10 @@ bool PlaybackBox::FillList(bool useCachedData)
         while (p)
         {
             int recid = p->recordid;
+            int avgd =  avgDelay[recid];
+
+            if (avgd == 0)
+                avgd = 100;
 
             // Set the intervals beyond range if there is no record entry
             if (spanHours[recid] == 0)
@@ -1927,11 +1933,11 @@ bool PlaybackBox::FillList(bool useCachedData)
                     if (maxEpisodes[recid] > 0)
                         p->recpriority2 += (maxAge / 2) + (hrs / 24);
                     else
-                        p->recpriority2 += (maxAge / 3) + (hrs * 2);
+                        p->recpriority2 += (maxAge / 5) + hrs;
                 }
             }
             // Weekly
-            else if (nextHours[recid] ||
+            else if (nextHours[recid] || avgd != 100 ||
                      recType[recid] == kWeekslotRecord || 
                      recType[recid] == kFindWeeklyRecord)
                      
@@ -1979,6 +1985,12 @@ bool PlaybackBox::FillList(bool useCachedData)
                         p->recpriority2 += maxAge;
                 }
             }
+
+            // Factor based on the average time shift delay
+            if (avgd <= 100)
+                p->recpriority2 = p->recpriority2 * (200 - avgd) / 100;
+            else
+                p->recpriority2 = p->recpriority2 * 100 / avgd;
 
             VERBOSE(VB_FILE, QString(" %1  %2  %3")
                     .arg(p->startts.toString(formatShortDate))

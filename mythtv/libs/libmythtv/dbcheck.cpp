@@ -10,7 +10,7 @@ using namespace std;
 #include "mythdbcon.h"
 
 /// This is the DB schema version expected by the running MythTV instance.
-const QString currentDatabaseVersion = "1191";
+const QString currentDatabaseVersion = "1193";
 
 static bool UpdateDBVersionNumber(const QString &newnumber);
 static bool performActualUpdate(const QString updates[], QString version,
@@ -3108,6 +3108,44 @@ thequery,
 ""
 };
         if (!performActualUpdate(updates, "1191", dbver))
+            return false;
+    }
+
+    if (dbver == "1191")
+    {
+        const QString updates[] = {
+"DROP TABLE IF EXISTS displayprofilegroups;",
+"DROP TABLE IF EXISTS displayprofiles;",
+"CREATE TABLE IF NOT EXISTS displayprofilegroups ("
+"  name varchar(128) NOT NULL,"
+"  hostname  varchar(255) NOT NULL,"
+"  profilegroupid int(10) unsigned NOT NULL auto_increment,"
+"  PRIMARY KEY nameid (name,hostname),"
+"  UNIQUE KEY (profilegroupid)"
+");",
+"CREATE TABLE IF NOT EXISTS displayprofiles ("
+"  profilegroupid int(10) unsigned NOT NULL,"
+"  profileid int(10) unsigned NOT NULL auto_increment,"
+"  value varchar(128) NOT NULL,"
+"  data  varchar(255) NOT NULL default '',"
+"  FOREIGN KEY (profilegroupid) "
+"    REFERENCES displayprofilegroups(profilegroupid),"
+"  KEY (profileid,value),"
+"  INDEX (profileid)"
+");",
+"",
+};
+       if (!performActualUpdate(updates, "1192", dbver))
+            return false;
+    }
+
+    if (dbver == "1192")
+    {
+        const QString updates[] = {
+"ALTER TABLE record ADD COLUMN avg_delay INT NOT NULL default 100;",
+""
+};
+        if (!performActualUpdate(updates, "1193", dbver))
             return false;
     }
 
