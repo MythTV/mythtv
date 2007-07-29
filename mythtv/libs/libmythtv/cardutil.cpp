@@ -112,18 +112,22 @@ QString CardUtil::ProbeDVBFrontendName(uint device)
  *         PAT/PMT tables, and then doesn't fix the CRC.
  *
  *   Currently the list of broken DVB hardware and drivers includes:
- *   "Philips TDA10046H DVB-T", "VLSI VES1x93 DVB-S", "DST DVB-S" and
- *   "ST STV0299 DVB-S"
+ *   "VLSI VES1x93 DVB-S", and "ST STV0299 DVB-S"
  *
- *  \param device video dev to be checked
+ *  Note: "DST DVB-S" was on this list but has been verified to not
+ *        mess up the PAT using Linux 2.6.18.1.
+ *
+ *  Note: "Philips TDA10046H DVB-T" was on this list but has been
+ *        verified to not mess up the PMT with a recent kernel and
+ *        firmware (See http://svn.mythtv.org/trac/ticket/3541).
+ *
+ *  \param device Open DVB frontend device file descriptor to be checked
  *  \return true iff the device munges tables, so that they fail a CRC check.
  */
 bool CardUtil::HasDVBCRCBug(uint device)
 {
     QString name = ProbeDVBFrontendName(device);
-    return ((name == "Philips TDA10046H DVB-T") || // munges PMT
-            (name == "VLSI VES1x93 DVB-S")      || // munges PMT
-            (name == "DST DVB-S")               || // munges PAT
+    return ((name == "VLSI VES1x93 DVB-S")      || // munges PMT
             (name == "ST STV0299 DVB-S"));         // munges PAT
 }
 
