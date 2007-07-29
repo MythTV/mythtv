@@ -19,7 +19,7 @@ libavc1394").
 
 (3) Compile and install "6200ch":
 
-      # cc -o 6200ch 6200ch.c -lrom1394 -lavc1394 -lraw1394
+      # cc -std=gnu99 -o 6200ch 6200ch.c -lavc1394 -lrom1394 -lraw1394
       # cp 6200ch /usr/local/bin
 
 (4) Connect a 1394/Firewire cable from your computer to your DCT-6200 and

@@ -25,6 +25,8 @@
 #include <stdio.h>
 #include <errno.h>
 #include <stdlib.h>
+#include <limits.h> //for LLONG_MAX
+#include <getopt.h>
 #include <unistd.h> // for usleep
 
 // Vendor and Model IDs.
@@ -86,7 +88,7 @@ void set_chan_fast(raw1394handle_t handle, int device, int verbose, int chn);
 
 void usage()
 {
-   fprintf(stderr, "Usage: 6200ch [-v] [-s] [-n NODE] [-p PORT] "
+   fprintf(stderr, "Usage: 6200ch [-v] [-s] [-n NODE] [-g GUID] [-p PORT] "
            "<channel_num>\n");
    fprintf(stderr, "-v        print additional verbose output\n");
    fprintf(stderr, "-s        use single packet method\n");
@@ -94,6 +96,7 @@ void usage()
            STARTING_NODE);
    fprintf(stderr, "-p PORT   port/adapter to use              (default:%i)\n",
            STARTING_PORT);
+   fprintf(stderr, "-g GUID   GUID to use, -n switch, if present, will be ignored.\n");
    exit(1);
 }
 
@@ -104,6 +107,9 @@ int main (int argc, char *argv[])
    int i;
    int verbose = 0;
    int single_packet = 0;
+   int bGUID=0;
+   octlet_t cli_GUID=0LL;
+   octlet_t node_GUID=0LL;
    quadlet_t cmd[2];
    int chn = 550;
 
@@ -117,7 +123,7 @@ int main (int argc, char *argv[])
       usage();
 
    opterr = 0;
-   while ((c = getopt(argc, argv, "vsn:p:")) != -1)
+   while ((c = getopt(argc, argv, "vsg:n:p:")) != -1)
    {
        switch (c) {
        case 'v':
@@ -128,6 +134,11 @@ int main (int argc, char *argv[])
            break;
        case 'n':
            starting_node = atoi(optarg);
+           break;
+       case 'g':
+           bGUID=1;
+	   starting_node=0;
+           cli_GUID = (octlet_t)strtoll(optarg, (char **)NULL, 16);
            break;
        case 'p':
            starting_port = atoi(optarg);
@@ -171,7 +182,23 @@ int main (int argc, char *argv[])
        printf("starting with node: %d\n", starting_node);
 
    int nc = raw1394_get_nodecount(handle);
+   if (bGUID!=0) {
+      if (cli_GUID==0LL || cli_GUID==LLONG_MAX || cli_GUID==LLONG_MIN) {
+	  fprintf(stderr, "error parsing GUID command line parameter\n");
+          exit(1);
+      }	  
+   }	  
    for (i=starting_node; i < nc; ++i) {
+      if (bGUID!=0) {
+         node_GUID=rom1394_get_guid(handle, i);
+#ifdef DEBUG
+	 printf("node=%d, node_GUID=%LX, cli_GUID=%LX\n", i, node_GUID, cli_GUID);
+#endif	 
+         if (cli_GUID!=node_GUID) {
+             continue;
+         }
+      } 
+
       if (rom1394_get_directory(handle, i, &dir) < 0) {
          fprintf(stderr,"error reading config rom directory for node %d\n", i);
          raw1394_destroy_handle(handle);
