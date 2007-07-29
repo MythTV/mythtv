@@ -138,6 +138,8 @@ namespace
                 st = static_cast<screen_type>(
                         gContext->GetNumSetting("Default MythVideo View",
                                                 stVideoGallery));
+                if (!VideoDialog::IsValidDialogType(st))
+                    st = stVideoGallery;
             }
 
             if (!video_list)

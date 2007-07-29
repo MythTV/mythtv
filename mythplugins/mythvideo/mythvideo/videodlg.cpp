@@ -10,6 +10,13 @@
 #include "videolist.h"
 #include "videoutils.h"
 
+bool VideoDialog::IsValidDialogType(int num)
+{
+    for (int i = 1; i <= dtLast - 1; i <<= 1)
+        if (num == i) return true;
+    return false;
+}
+
 VideoDialog::VideoDialog(DialogType ltype, MythMainWindow *lparent,
                          const QString &lwinName, const QString &lname,
                          VideoList *video_list) :

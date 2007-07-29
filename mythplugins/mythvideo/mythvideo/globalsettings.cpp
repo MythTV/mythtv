@@ -2,6 +2,7 @@
 
 #include "globalsettings.h"
 #include "globals.h"
+#include "videodlg.h"
 
 #include <qdir.h>
 
@@ -27,9 +28,12 @@ HostComboBox *VideoDefaultView()
 {
     HostComboBox *gc = new HostComboBox("Default MythVideo View");
     gc->setLabel(QObject::tr("Default View"));
-    gc->addSelection(QObject::tr("Gallery"), "1");
-    gc->addSelection(QObject::tr("Browser"), "0");
-    gc->addSelection(QObject::tr("Listings"), "2");
+    gc->addSelection(QObject::tr("Gallery"),
+                     QString::number(VideoDialog::DLG_GALLERY));
+    gc->addSelection(QObject::tr("Browser"),
+                     QString::number(VideoDialog::DLG_BROWSER));
+    gc->addSelection(QObject::tr("Listings"),
+                     QString::number(VideoDialog::DLG_TREE));
     gc->setHelpText(QObject::tr("The default view for MythVideo. "
                     "Other views can be reached via the popup menu available "
                     "via the MENU key."));

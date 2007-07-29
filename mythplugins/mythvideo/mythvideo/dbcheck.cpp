@@ -6,13 +6,14 @@
 #include <mythtv/mythdbcon.h>
 
 #include "dbcheck.h"
+#include "videodlg.h"
 
 namespace
 {
     const QString lastMythDVDDBVersion = "1002";
     const QString lastMythVideoVersion = "1010";
 
-    const QString currentDatabaseVersion = "1012";
+    const QString currentDatabaseVersion = "1013";
 
     const QString OldMythVideoVersionName = "VideoDBSchemaVer";
     const QString OldMythDVDVersionName = "DVDDBSchemaVer";
@@ -593,6 +594,26 @@ namespace
 ""
 };
             performActualUpdate(updates, "1012", dbver, MythVideoVersionName);
+        }
+
+        if (dbver == "1012")
+        {
+            // handle DialogType value change
+            const QString setting("Default MythVideo View");
+            int view = gContext->GetNumSetting(setting, -1);
+            if (view != -1)
+            {
+                switch (view)
+                {
+                    case 0: view = VideoDialog::DLG_BROWSER; break;
+                    case 2: view = VideoDialog::DLG_TREE; break;
+                    case 1:
+                    default: view = VideoDialog::DLG_GALLERY; break;
+                }
+                gContext->SaveSetting(setting, view);
+            }
+            performActualUpdate(QStringList(), "1013", dbver,
+                                MythVideoVersionName);
         }
     }
 }

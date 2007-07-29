@@ -15,7 +15,10 @@ class VideoDialog : public MythDialog
     Q_OBJECT
 
   public:
-    enum DialogType { DLG_BROWSER = 0x1, DLG_GALLERY = 0x2, DLG_TREE = 0x4 };
+    enum DialogType { DLG_BROWSER = 0x1, DLG_GALLERY = 0x2, DLG_TREE = 0x4,
+                      dtLast };
+
+    static bool IsValidDialogType(int num);
 
     VideoDialog(DialogType ltype, MythMainWindow *lparent,
                 const QString &lwinName, const QString &lname,
