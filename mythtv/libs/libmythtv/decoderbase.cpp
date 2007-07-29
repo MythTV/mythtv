@@ -798,7 +798,7 @@ QString DecoderBase::GetTrackDesc(uint type, uint trackNo) const
         hnum = tracks[type][trackNo].stream_id;
 
     if (!lang)
-        return type_msg + QString("-%1").arg(hnum);
+        return type_msg + QString(" %1").arg(hnum);
     else
     {
         QString lang_msg = iso639_key_toName(lang);
