@@ -296,13 +296,13 @@ osx-packager.pl - build OS X binary packages for MythTV
    -verbose         print informative messages during the process
    -version <str>   custom version suffix (defaults to "svnYYYYMMDD")
    -noversion       don't use any version (for building release versions)
-   -distclean       COMMAND OF GREAT SURPRISE!!!!
+   -distclean       throw away all intermediate files and exit
    -thirdclean      do a clean rebuild of third party packages
    -thirdskip       don't rebuild the third party packages
    -mythtvskip      don't rebuild/install mythtv
    -pluginskip      don't rebuild/install mythplugins
    -themeskip       don't install the extra themes from myththemes
-   -clean           do a distclean before rebuild of MythTV
+   -clean           do a clean rebuild of MythTV
    -svnbranch <str> build a specified Subversion branch,   instead of HEAD
    -svnrev <str>    build a specified Subversion revision, instead of HEAD
    -svntag <str>    build a specified release, instead of Subversion HEAD
@@ -326,7 +326,7 @@ with plugins as specified, as a standalone binary package for Mac OS X.
 It was designed for building daily CVS (now Subversion) snapshots,
 but can also be used to create release builds with the '-svntag' option.
 
-All intermediate files go into an 'osx-packager' directory in the current
+All intermediate files go into an '.osx-packager' directory in the current
 working directory. The finished application is named 'MythFrontend.app' and
 placed in the current working directory.
 
@@ -341,12 +341,12 @@ Building two snapshots, one with plugins and one without:
 
 Building a 0.17 release build:
 
-  rm osx-packager.dmg
+  osx-packager.pl -distclean
   osx-packager.pl -svntag release-0-17 -noversion
 
 Building a "fixes" branch:
 
-  rm osx-packager.dmg
+  osx-packager.pl -distclean
   osx-packager.pl -svnbranch release-0-18-fixes
 
 =head1 CREDITS
@@ -368,6 +368,7 @@ Getopt::Long::GetOptions(\%OPT,
                          'verbose',
                          'version=s',
                          'noversion',
+                         'distclean',
                          'thirdclean',
                          'thirdskip',
                          'mythtvskip',
@@ -441,7 +442,7 @@ END
   die;
 }
 
-our $WORKDIR = "$SCRIPTDIR/osx-packager";
+our $WORKDIR = "$SCRIPTDIR/.osx-packager";
 mkdir $WORKDIR;
 
 # Do we need to force a case-sensitive disk image?
@@ -486,8 +487,6 @@ our %conf = (
         # To "cross compile" something for a lesser Mac:
         #'--tune=G3',
         #'--disable-altivec',
-        #'--enable-dvdv',
-       '--disable-firewire',
       ],
 );
 
@@ -1122,8 +1121,6 @@ sub CleanMakefiles
   {
     &Syscall([ '/bin/rm', @files ]) or die;
   }
-  # ARG! restore the Makefiles we shouldn't have deleted..
-  &Syscall([ $svn, 'update' ]) or die;  
 } # end CleanMakefiles
 
 
@@ -1200,7 +1197,7 @@ sub MountHDImage
 {
     if (!HDImageDevice())
     {
-        if (-e "$SCRIPTDIR/osx-packager.dmg")
+        if (-e "$SCRIPTDIR/.osx-packager.dmg")
         {
             Verbose("Mounting existing UFS disk image for the build");
         }
@@ -1208,12 +1205,12 @@ sub MountHDImage
         {
             Verbose("Creating a case-sensitive (UFS) disk image for the build");
             Syscall(['hdiutil', 'create', '-size', '2048m',
-                     "$SCRIPTDIR/osx-packager.dmg", '-volname',
+                     "$SCRIPTDIR/.osx-packager.dmg", '-volname',
                      'MythTvPackagerHDImage', '-fs', 'UFS', '-quiet']) || die;
         }
 
         &Syscall(['hdiutil', 'mount',
-                  "$SCRIPTDIR/osx-packager.dmg",
+                  "$SCRIPTDIR/.osx-packager.dmg",
                   '-mountpoint', $WORKDIR, '-quiet']) || die;
     }
 
@@ -1241,7 +1238,7 @@ sub HDImageDevice
 
 sub CaseSensitiveFilesystem
 {
-  my $funky = $SCRIPTDIR . "/osx-packager.FunkyStuff";
+  my $funky = $SCRIPTDIR . "/.osx-packager.FunkyStuff";
   my $unfunky = substr($funky, 0, -10) . "FUNKySTuFF";
 
   unlink $funky if -e $funky;
