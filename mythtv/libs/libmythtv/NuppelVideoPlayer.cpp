@@ -1455,7 +1455,7 @@ void NuppelVideoPlayer::DisableCaptions(uint mode, bool osd_msg)
     if (!osd || !osd_msg)
         return;
 
-    QString msg = " ";
+    QString msg = "";
     if (kDisplayNUVTeletextCaptions & mode)
         msg += QObject::tr("TXT CAP");
     if (kDisplayTeletextCaptions & mode)
@@ -1485,7 +1485,7 @@ void NuppelVideoPlayer::DisableCaptions(uint mode, bool osd_msg)
                                      GetTrack(kTrackTypeCC708));
     }
 
-    if (msg != " ")
+    if (! msg.isEmpty())
     {
         msg += " " + QObject::tr("Off");
         osd->SetSettingsText(msg, 3 /* seconds until message timeout */);
