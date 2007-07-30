@@ -342,23 +342,26 @@ void FlacDecoder::run()
         flacok = decoder_process_single(decoder);
         decoderstate = decoder_get_state(decoder);
 
-        if (decoderstate == 0 || decoderstate == 1)
+        if (decoderstate == STREAM_DECODER_SEARCH_FOR_METADATA ||
+            decoderstate == STREAM_DECODER_READ_METADATA ||
+            decoderstate == STREAM_DECODER_SEARCH_FOR_FRAME_SYNC ||
+            decoderstate == STREAM_DECODER_READ_FRAME )
         {
             if (output())
                 flush();
-        } 
-        else 
+        }
+        else
         {
+            // some error condition occurred, so exit the loop
+
             flush(TRUE);
 
-            if (output()) {
-		output()->Drain();
-            }
+            if (output())
+                output()->Drain();
 
             done = TRUE;
-            if (!user_stop) {
+            if (!user_stop)
                 finish = TRUE;
-            }
         }
 
         unlock();
