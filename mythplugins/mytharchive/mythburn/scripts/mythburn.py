@@ -31,7 +31,7 @@
 #******************************************************************************
 
 # version of script - change after each update
-VERSION="0.1.20070724-1"
+VERSION="0.1.20070731-1"
 
 
 ##You can use this debug flag when testing out new themes
@@ -2064,6 +2064,7 @@ def createDVDAuthorXML(screensize, numberofitems):
     #Total number of video items on a single menu page (no less than 1!)
     itemsperpage = menuitems.length
     write( "Menu items per page %s" % itemsperpage)
+    autoplaymenu = 2 + ((numberofitems + itemsperpage - 1)/itemsperpage)
 
     if wantChapterMenu:
         #Get the chapter menu node (we must only have 1)
@@ -2109,6 +2110,7 @@ def createDVDAuthorXML(screensize, numberofitems):
     g2=title number selected on current menu page (see g4)
     g3=1 if intro movie has played
     g4=last menu page on display
+    g5=next title to autoplay (0 or > # titles means no more autoplay)
     """), dvdauthor_element.firstChild )
     dvdauthor_element.insertBefore(dvddom.createComment("dvdauthor XML file created by MythBurn script"), dvdauthor_element.firstChild )
 
@@ -2202,7 +2204,7 @@ def createDVDAuthorXML(screensize, numberofitems):
             #Add this recording to this page's menu...
             button=dvddom.createElement("button")
             button.setAttribute("name","%s" % itemnum)
-            button.appendChild(dvddom.createTextNode("{g2=" + "%s" % itemsonthispage + "; jump title %s;}" % itemnum))
+            button.appendChild(dvddom.createTextNode("{g2=" + "%s" % itemsonthispage + "; g5=0; jump title %s;}" % itemnum))
             menupgc.appendChild(button)
             del button
 
@@ -2343,7 +2345,7 @@ def createDVDAuthorXML(screensize, numberofitems):
             pgc.appendChild(vob)
 
             post = dvddom.createElement("post")
-            post.appendChild(dvddom.createTextNode("call vmgm menu %s;" % (page + 1)))
+            post.appendChild(dvddom.createTextNode("if (g5 eq %s) call vmgm menu %s; call vmgm menu %s;" % (itemnum + 1, autoplaymenu, page + 1)))
             pgc.appendChild(post)
 
             #Quick variable tidy up (not really required under Python)
@@ -2373,6 +2375,12 @@ def createDVDAuthorXML(screensize, numberofitems):
                         button.appendChild(dvddom.createTextNode("{g2=1;jump menu %s;}" % (page + 2)))
                         endbuttons.append(button)
 
+                elif node.nodeName=="playall":
+                   button=dvddom.createElement("button")
+                   button.setAttribute("name","playall")
+                   button.appendChild(dvddom.createTextNode("{g5=1; jump menu %s;}" % autoplaymenu))
+                   endbuttons.append(button)
+
             #On to the next item
             itemnum+=1
 
@@ -2382,6 +2390,21 @@ def createDVDAuthorXML(screensize, numberofitems):
         for button in endbuttons:
             menupgc.appendChild(button)
             del button
+
+    menupgc = dvddom.createElement("pgc")
+    menus_element.appendChild(menupgc)
+    menupgc.setAttribute("pause","inf")
+    menupgc.appendChild( dvddom.createComment("Autoplay hack") )
+
+    dvdcode = ""
+    while (itemnum > 1):
+        itemnum-=1
+        dvdcode += "if (g5 eq %s) {g5 = %s; jump title %s;} " % (itemnum, itemnum + 1, itemnum)
+    dvdcode += "g5 = 0; jump menu 1;"
+
+    pre = dvddom.createElement("pre")
+    pre.appendChild(dvddom.createTextNode(dvdcode))
+    menupgc.appendChild(pre)    
 
     if wantIntro:
         #Menu creation is finished so we know how many pages were created
@@ -2786,6 +2809,35 @@ def drawThemeItem(page, itemsonthispage, itemnum, menuitem, bgimage, draw,
                 button.setAttribute("x1","%s" % (getScaledAttribute(node, "x") + getScaledAttribute(node, "w")))
                 button.setAttribute("y1","%s" % (getScaledAttribute(node, "y") + getScaledAttribute(node, "h")))
                 spunode.appendChild(button)
+
+        elif node.nodeName=="playall":
+           #Overlay playall graphic button onto background
+           imagefilename = getThemeFile(themeName, node.attributes["filename"].value)
+           if not doesFileExist(imagefilename):
+               fatalError("Cannot find image for playall button (%s)." % imagefilename)
+           maskimagefilename = getThemeFile(themeName, node.attributes["mask"].value)
+           if not doesFileExist(maskimagefilename):
+               fatalError("Cannot find mask image for playall button (%s)." % maskimagefilename)
+
+           picture = Image.open(imagefilename,"r").resize((getScaledAttribute(node, "w"), getScaledAttribute(node, "h")))
+           picture = picture.convert("RGBA")
+           bgimage.paste(picture, (getScaledAttribute(node, "x"), getScaledAttribute(node, "y")), picture)
+           del picture
+           write( "Added playall button image %s " % imagefilename)
+
+           picture=Image.open(maskimagefilename,"r").resize((getScaledAttribute(node, "w"), getScaledAttribute(node, "h")))
+           picture=picture.convert("RGBA")
+           bgimagemask.paste(picture, (getScaledAttribute(node, "x"), getScaledAttribute(node, "y")), picture)
+           del picture
+           write( "Added playall button mask image %s" % imagefilename)
+
+           button = spumuxdom.createElement("button")
+           button.setAttribute("name","playall")
+           button.setAttribute("x0","%s" % getScaledAttribute(node, "x"))
+           button.setAttribute("y0","%s" % getScaledAttribute(node, "y"))
+           button.setAttribute("x1","%s" % (getScaledAttribute(node, "x") + getScaledAttribute(node, "w")))
+           button.setAttribute("y1","%s" % (getScaledAttribute(node, "y") + getScaledAttribute(node, "h")))
+           spunode.appendChild(button)
 
         elif node.nodeName=="titlemenu":
             if itemnum < numberofitems:
