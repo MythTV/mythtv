@@ -117,6 +117,7 @@ our %depend = (
     => 'tar -xjf subversion-deps-1.4.3.tar.bz2',
     'conf'
     =>  [
+           '--disable-keychain',  # Workaround a 10.3 build problem
            "MAKEFLAGS=\$parallel_make_flags"   # For builds of deps
         ],
     # For some reason, this dies when the neon sub-make ends
@@ -482,7 +483,6 @@ our %conf = (
       ],
   'mythtv'
   =>  [
-#        '--compile-type=debug',
         '--prefix=' . $PREFIX,
         # To "cross compile" something for a lesser Mac:
         #'--tune=G3',
