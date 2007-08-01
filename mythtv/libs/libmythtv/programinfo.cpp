@@ -3797,8 +3797,8 @@ void ProgramInfo::showDetails(void) const
             s += QString(" \"%2\"").arg(record->getRecordTitle());
         ADD_PAR(QObject::tr("Recording Rule"), s, msg)
 
-        query.prepare("SELECT last_record, next_record FROM record "
-                      "WHERE recordid = :RECORDID");
+        query.prepare("SELECT last_record, next_record, avg_delay "
+                      "FROM record WHERE recordid = :RECORDID");
         query.bindValue(":RECORDID", recordid);
         
         if (query.exec() && query.isActive() && query.size() > 0)
@@ -3812,6 +3812,10 @@ void ProgramInfo::showDetails(void) const
                 ADD_PAR(QObject::tr("Next Recording"),
                         QObject::tr(query.value(1).toDateTime()
                                     .toString(fullDateFormat)), msg)
+            if (query.value(2).toInt() > 0)
+                ADD_PAR(QObject::tr("Average Time Shift"),
+                        QString("%1 %2").arg(query.value(2).toInt())
+                                        .arg(QObject::tr("hours")), msg)
         }
         if (record->getSearchType() &&
             record->getSearchType() != kManualSearch &&
