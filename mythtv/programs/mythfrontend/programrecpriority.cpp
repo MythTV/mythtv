@@ -280,6 +280,20 @@ void ProgramRecPriority::keyPressEvent(QKeyEvent *e)
                 SortList();
                 update(fullRect);
             }
+            else if (action == "8")
+            {
+                if (sortType != byAvgDelay)
+                {
+                    sortType = byAvgDelay;
+                    reverseSort = false;
+                }
+                else
+                {
+                    reverseSort = !reverseSort;
+                }
+                SortList();
+                update(fullRect);
+            }
             else if (action == "PREVVIEW" || action == "NEXTVIEW")
             {
                 reverseSort = false;
@@ -828,7 +842,7 @@ void ProgramRecPriority::FillList(void)
 
     MSqlQuery result(MSqlQuery::InitCon());
     result.prepare("SELECT recordid, title, chanid, starttime, startdate, "
-                   "type, inactive, last_record "
+                   "type, inactive, last_record, avg_delay "
                    "FROM record;");
    
     if (result.exec() && result.isActive() && result.size() > 0)
@@ -846,6 +860,7 @@ void ProgramRecPriority::FillList(void)
             int recTypeRecPriority = rtRecPriors[recType];
             int inactive = result.value(6).toInt();
             QDateTime lastrec = result.value(7).toDateTime();
+            int avgd = result.value(8).toInt();
 
             // find matching program in programData and set
             // recTypeRecPriority and recType
@@ -864,6 +879,7 @@ void ProgramRecPriority::FillList(void)
                     progInfo->matchCount = listMatch[progInfo->recordid];
                     progInfo->recCount = recMatch[progInfo->recordid];
                     progInfo->last_record = lastrec;
+                    progInfo->avg_delay = avgd;
 
                     if (inactive)
                         progInfo->recstatus = rsInactive;
@@ -1133,6 +1149,31 @@ class programLastRecordSort
         bool m_reverse;
 };
 
+class programAvgDelaySort 
+{
+    public:
+        programAvgDelaySort(bool reverseSort=false) 
+            {m_reverse = reverseSort;}
+
+        bool operator()(const RecPriorityInfo a, const RecPriorityInfo b) 
+        {
+            int avgA = a.prog->avg_delay;
+            int avgB = b.prog->avg_delay;
+
+            if (avgA != avgB)
+            {
+                if (m_reverse)
+                    return avgA < avgB;
+                else
+                    return avgA > avgB;
+            }
+            return (a.prog->sortTitle > b.prog->sortTitle);
+        }
+
+    private:
+        bool m_reverse;
+};
+
 void ProgramRecPriority::SortList() 
 {
     int i, j;
@@ -1203,6 +1244,14 @@ void ProgramRecPriority::SortList()
                  else
                      sort(sortedList.begin(), sortedList.end(), 
                           programLastRecordSort());
+                 break;
+        case byAvgDelay :
+                 if (reverseSort)
+                     sort(sortedList.begin(), sortedList.end(), 
+                          programAvgDelaySort(true));
+                 else
+                     sort(sortedList.begin(), sortedList.end(), 
+                          programAvgDelaySort());
                  break;
     }
 

@@ -24,6 +24,7 @@ class ProgramRecPriorityInfo : public ProgramInfo
     int matchCount;
     int recCount;
     QDateTime last_record;
+    int avg_delay;
 };
 
 class ProgramRecPriority : public MythDialog
@@ -37,7 +38,8 @@ class ProgramRecPriority : public MythDialog
         byRecType,
         byCount,
         byRecCount,
-        byLastRecord
+        byLastRecord,
+        byAvgDelay
     };
 
     ProgramRecPriority(MythMainWindow *parent, const char *name = 0);
