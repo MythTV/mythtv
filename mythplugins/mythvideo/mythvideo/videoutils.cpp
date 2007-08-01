@@ -39,7 +39,7 @@ void PlayVideo(const QString &filename, const MetadataListManager &video_list)
             // No internal handler for this, play external
             QString command = Metadata::getPlayCommand(item.get());
             if (command.length())
-                myth_system(command.local8Bit());
+                myth_system(command);
         }
 
         if (item->ChildID() > 0)
