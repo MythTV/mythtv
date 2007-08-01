@@ -213,7 +213,7 @@ class FirewireDevice
     virtual PowerState GetPowerState(void);
 
     // Statics
-    static inline bool IsSTBSupported(const QString &model);
+    static bool IsSTBSupported(const QString &model);
     static QString GetModelName(uint vendorid, uint modelid);
     static vector<AVCInfo> GetSTBList(void);
 
@@ -245,16 +245,5 @@ class FirewireDevice
     static QMap<uint64_t,QString> s_id_to_model;
     static QMutex                 s_static_lock;
 };
-
-inline bool FirewireDevice::IsSTBSupported(const QString &panel_model)
-{
-    QString model = panel_model.upper();
-    return ((model == "DCT-6200") ||
-            (model == "DCT-6212") ||
-            (model == "DCT-6216") ||
-            (model == "SA3250HD") ||
-            (model == "SA4200HD") ||
-            (model == "GENERIC"));
-}
 
 #endif // _FIREWIRE_DEVICE_H_

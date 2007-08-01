@@ -137,8 +137,16 @@ int main (int argc, char *argv[])
            (dir.model_id == SA4200HD_MODEL_ID1)  ||
            (dir.model_id == SA4250HDC_MODEL_ID1)))
       {
-            device = i;
-            break;
+          if (dir.model_id == SA4250HDC_MODEL_ID1)
+          {
+              fprintf(stderr, "Ignoring SA 4250HDC on node %d -- "
+                      "sorry not supported yet\n", i);
+          }
+          else
+          {
+              device = i;
+              break;
+          }
       }
    }
     

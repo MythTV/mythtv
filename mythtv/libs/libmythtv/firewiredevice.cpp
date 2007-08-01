@@ -169,6 +169,14 @@ bool FirewireDevice::SetChannel(const QString &panel_model,
         (panel_model.upper() == "SA4200HD") ||
         (panel_model.upper() == "SA4250HDC"))
     {
+        if (panel_model.upper() == "SA4250HDC")
+        {
+            VERBOSE(VB_IMPORTANT, LOC +
+                    "The Scientific Atlanta 4250 HDC is not supported "
+                    "\n\t\t\tby any MythTV Firewire channel changer."
+                    "At the moment you must use an IR blaster.");
+        }
+
         cmd.push_back(kAVCControlCommand);
         cmd.push_back(kAVCSubunitTypePanel | m_subunitid);
         cmd.push_back(kAVCPanelPassThrough);
@@ -414,3 +422,18 @@ static void fw_init(QMap<uint64_t,QString> &id_to_model)
         id_to_model[motorola_vendor_ids[i] << 32 | 0x646b] = "DCT-6216";
     }
 }
+
+bool FirewireDevice::IsSTBSupported(const QString &panel_model)
+{
+    QString model = panel_model.upper();
+    return ((model == "DCT-3412") ||
+            (model == "DCT-3416") ||
+            (model == "DCT-6200") ||
+            (model == "DCT-6212") ||
+            (model == "DCT-6216") ||
+            (model == "SA3250HD") ||
+            (model == "SA4200HD") ||
+            (model == "SA4250HDC") ||
+            (model == "GENERIC"));
+}
+
