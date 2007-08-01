@@ -17,6 +17,7 @@
 #include <IOKit/storage/IOCDMedia.h>
 #include <IOKit/storage/IODVDMedia.h>
 #include <IOKit/storage/IOBlockStorageDevice.h>
+#include <IOKit/storage/IOStorageDeviceCharacteristics.h>
 #include <IOKit/storage/IOStorageProtocolCharacteristics.h>
 #include <DiskArbitration/DiskArbitration.h>
 #include <qapplication.h>
@@ -513,7 +514,7 @@ bool MediaMonitorDarwin::AddDevice(MythMediaDevice* pDevice)
     // so we force a status change for mediaStatusChanged() to send an event
     if (m_SendEvent)
     {
-        pDevice->setStatus(MEDIASTAT_NODISK);
+        //pDevice->setStatus(MEDIASTAT_NODISK);
         connect(pDevice, SIGNAL(statusChanged(MediaStatus, MythMediaDevice*)),
                 this, SLOT(mediaStatusChanged(MediaStatus, MythMediaDevice*)));
         pDevice->setStatus(MEDIASTAT_USEABLE);
