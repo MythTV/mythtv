@@ -1909,7 +1909,7 @@ bool PlaybackBox::FillList(bool useCachedData)
                 p->recpriority2 += 36 - hrs;
 
             // add points for how close the recorded time of day is to 'now'
-            p->recpriority2 += abs((hrs % 24) - 12);
+            p->recpriority2 += abs((hrs % 24) - 12) * 2;
 
             // Daily 
             if (spanHours[recid] < 50 ||
