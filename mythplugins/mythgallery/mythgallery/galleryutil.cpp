@@ -292,8 +292,8 @@ bool GalleryUtil::Copy(const QFileInfo &src, QFileInfo &dst)
         return false;
 
     MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare("INSERT INTO gallerymetadata (image, keywords, angle) "
-                  "SELECT :IMAGENEW , keywords, angle "
+    query.prepare("INSERT INTO gallerymetadata (image, angle) "
+                  "SELECT :IMAGENEW , angle "
                   "FROM gallerymetadata "
                   "WHERE image = :IMAGEOLD");
     query.bindValue(":IMAGENEW", dst.absFilePath().utf8());
