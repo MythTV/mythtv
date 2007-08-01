@@ -871,6 +871,7 @@ static HostComboBox *MenuTheme()
             gc->addSelection(theme->fileName());
     }
 
+    gc->setHelpText(QObject::tr("Ordering and Layout of Menu entries"));
     return gc;
 }
 
@@ -1419,11 +1420,11 @@ static HostComboBox *PlayBoxShading()
 static HostCheckBox *UseVirtualKeyboard()
 {
     HostCheckBox *gc = new HostCheckBox("UseVirtualKeyboard");
-    gc->setLabel(QObject::tr("Use line edit virtual keyboards"));
+    gc->setLabel(QObject::tr("Use virtual keyboards for text entry"));
     gc->setValue(true);
     gc->setHelpText(QObject::tr("Allows you to use a virtual keyboard "
-                    "in Myth line edit boxes.  To use, hit OK/Select "
-                    "while a line edit is in focus."));
+                    "for text entry.  To use, hit OK/Select "
+                    "while a text entry box is in focus."));
     return gc;
 }
 
