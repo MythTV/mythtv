@@ -7,10 +7,10 @@
 class MythDbSettings1: public VerticalConfigurationGroup {
 public:
     MythDbSettings1();
-    
+
     void load();
     void save();
-    
+
 protected:
     TransLabelSetting    *info;
     TransLineEditSetting *dbHostName;
@@ -24,10 +24,10 @@ protected:
 class MythDbSettings2: public VerticalConfigurationGroup {
 public:
     MythDbSettings2();
-    
+
     void load();
     void save();
-    
+
 protected:
     TransCheckBoxSetting *localEnabled;
     TransLineEditSetting *localHostName;
@@ -60,11 +60,11 @@ class WOLsqlSettings : public TriggeredConfigurationGroup
     WOLsqlSettings(Setting *checkbox, ConfigurationGroup *group) :
         TriggeredConfigurationGroup(false, false, false, false)
     {
-        setLabel(QObject::tr("Wake-On-LAN settings"));
+        setLabel(QObject::tr("Backend Server Wakeup settings"));
 
         addChild(checkbox);
         setTrigger(checkbox);
-        
+
         addTarget("1", group);
         addTarget("0", new VerticalConfigurationGroup(true));
     }
@@ -74,7 +74,7 @@ MythDbSettings1::MythDbSettings1() :
     VerticalConfigurationGroup(false, true, false, false)
 {
     setLabel(QObject::tr("Database Configuration") + " 1/2");
-    
+
     info = new TransLabelSetting();
 
     MSqlQuery query(MSqlQuery::InitCon());
@@ -86,56 +86,61 @@ MythDbSettings1::MythDbSettings1() :
                                    "Please verify your database settings "
                                    "below."));
     addChild(info);
-    
+
+    VerticalConfigurationGroup* dbServer = new VerticalConfigurationGroup();
+    dbServer->setLabel(QObject::tr("Database Server Settings"));
     dbHostName = new TransLineEditSetting(true);
-    dbHostName->setLabel(QObject::tr("Host name"));
+    dbHostName->setLabel(QObject::tr("Hostname"));
     dbHostName->setHelpText(QObject::tr("The host name or IP address of "
                                         "the machine hosting the database. "
                                         "This information is required."));
-    addChild(dbHostName);
+    dbServer->addChild(dbHostName);
 
     dbPort = new TransLineEditSetting(true);
-    dbPort->setLabel(QObject::tr("Host Port"));
+    dbPort->setLabel(QObject::tr("Port"));
     dbPort->setHelpText(QObject::tr("The port number the database is running "
-                                    "on, if it's not the default database "
-                                    "port."));
-    addChild(dbPort);
-    
+                                    "on.  Leave blank if using the default "
+                                    "port (3306)."));
+    dbServer->addChild(dbPort);
+
     dbName = new TransLineEditSetting(true);
-    dbName->setLabel(QObject::tr("Database"));
+    dbName->setLabel(QObject::tr("Database name"));
     dbName->setHelpText(QObject::tr("The name of the database. "
                                     "This information is required."));
-    addChild(dbName);
+    dbServer->addChild(dbName);
 
     dbUserName = new TransLineEditSetting(true);
     dbUserName->setLabel(QObject::tr("User"));
     dbUserName->setHelpText(QObject::tr("The user name to use while "
                                         "connecting to the database. "
                                         "This information is required."));
-    addChild(dbUserName);
-    
+    dbServer->addChild(dbUserName);
+
     dbPassword = new TransLineEditSetting(true);
     dbPassword->setLabel(QObject::tr("Password"));
     dbPassword->setHelpText(QObject::tr("The password to use while "
                                         "connecting to the database. "
                                         "This information is required."));
-    addChild(dbPassword);
-    
+    dbServer->addChild(dbPassword);
+
     dbType = new TransComboBoxSetting(false);
     dbType->setLabel(QObject::tr("Database type"));
     dbType->addSelection(QObject::tr("MySQL"), "QMYSQL3");
-    //dbType->addSelection(QObject::tr("PostgreSQL"), "QPSQL7");
     dbType->setValue(0);
     dbType->setHelpText(QObject::tr("The database implementation used "
                                     "for your server."));
-    addChild(dbType);
+    dbType->setEnabled(false);
+    //dbServer->addChild(dbType);
+
+    addChild(dbServer);
+
 }
 
 MythDbSettings2::MythDbSettings2(void) :
     VerticalConfigurationGroup(false, true, false, false)
 {
     setLabel(QObject::tr("Database Configuration") + " 2/2");
-    
+
     localEnabled = new TransCheckBoxSetting();
     localEnabled->setLabel(QObject::tr("Use custom identifier for frontend "
                                        "preferences"));
@@ -147,54 +152,55 @@ MythDbSettings2::MythDbSettings2(void) :
                                           "machine's local host name will "
                                           "be used to save preferences in "
                                           "the database."));
-    
+
     localHostName = new TransLineEditSetting(true);
     localHostName->setLabel(QObject::tr("Custom identifier"));
     localHostName->setHelpText(QObject::tr("An identifier to use while "
                                            "saving the settings for this "
                                            "frontend."));
-    
+
     VerticalConfigurationGroup *group1 =
         new VerticalConfigurationGroup(false);
     group1->addChild(localHostName);
-        
+
     LocalHostNameSettings *sub3 =
         new LocalHostNameSettings(localEnabled, group1);
     addChild(sub3);
-    
+
     wolEnabled = new TransCheckBoxSetting();
-    wolEnabled->setLabel(QObject::tr("Use Wake-On-LAN to wake database"));
+    wolEnabled->setLabel(QObject::tr("Enable Database Server Wakeup"));
     wolEnabled->setHelpText(QObject::tr("If checked, the frontend will use "
-                                        "Wake-On-LAN parameters to "
+                                        "database wakeup parameters to "
                                         "reconnect to the database server."));
-    
+
     wolReconnect = new TransSpinBoxSetting(0, 60, 1, true);
     wolReconnect->setLabel(QObject::tr("Reconnect time"));
     wolReconnect->setHelpText(QObject::tr("The time in seconds to wait for "
                                           "the server to wake up."));
-    
+
     wolRetry = new TransSpinBoxSetting(1, 10, 1, true);
     wolRetry->setLabel(QObject::tr("Retry attempts"));
     wolRetry->setHelpText(QObject::tr("The number of retries to wake the "
                                       "server before the frontend gives "
                                       "up."));
-    
+
     wolCommand = new TransLineEditSetting(true);
     wolCommand->setLabel(QObject::tr("Wake command"));
     wolCommand->setHelpText(QObject::tr("The command executed on this "
                                         "frontend to wake up the database "
-                                        "server."));
-    
+                                        "server (eg. sudo /etc/init.d/mysql "
+                                        "restart)."));
+
     HorizontalConfigurationGroup *group2 =
         new HorizontalConfigurationGroup(false, false);
     group2->addChild(wolReconnect);
     group2->addChild(wolRetry);
-    
+
     VerticalConfigurationGroup *group3 =
         new VerticalConfigurationGroup(false);
     group3->addChild(group2);
     group3->addChild(wolCommand);
-    
+
     WOLsqlSettings *sub4 =
         new WOLsqlSettings(wolEnabled, group3);
     addChild(sub4);
@@ -203,14 +209,14 @@ MythDbSettings2::MythDbSettings2(void) :
 void MythDbSettings1::load()
 {
     DatabaseParams params = gContext->GetDatabaseParams();
-    
+
     if (params.dbHostName.isEmpty() ||
         params.dbUserName.isEmpty() ||
         params.dbPassword.isEmpty() ||
         params.dbName.isEmpty())
         info->setValue(info->getValue() + "\nRequired fields are marked "
                                           "with an asterisk (*).");
-    
+
     dbHostName->setValue(params.dbHostName);
     if (params.dbHostName.isEmpty())
         dbHostName->setLabel("* " + dbHostName->getLabel());
@@ -227,7 +233,7 @@ void MythDbSettings1::load()
     dbName->setValue(params.dbName);
     if (params.dbName.isEmpty())
         dbName->setLabel("* " + dbName->getLabel());
-        
+
     if (params.dbType == "QMYSQL3")
         dbType->setValue(0);
     else if (params.dbType == "QPSQL7")
@@ -237,10 +243,10 @@ void MythDbSettings1::load()
 void MythDbSettings2::load()
 {
     DatabaseParams params = gContext->GetDatabaseParams();
-    
+
     localEnabled->setValue(params.localEnabled);
     localHostName->setValue(params.localHostName);
-    
+
     wolEnabled->setValue(params.wolEnabled);
     wolReconnect->setValue(params.wolReconnect);
     wolRetry->setValue(params.wolRetry);
@@ -250,29 +256,29 @@ void MythDbSettings2::load()
 void MythDbSettings1::save()
 {
     DatabaseParams params = gContext->GetDatabaseParams();
-    
+
     params.dbHostName    = dbHostName->getValue();
     params.dbPort        = dbPort->getValue().toInt();
     params.dbUserName    = dbUserName->getValue();
     params.dbPassword    = dbPassword->getValue();
     params.dbName        = dbName->getValue();
     params.dbType        = dbType->getValue();
-        
+
     gContext->SaveDatabaseParams(params);
 }
 
 void MythDbSettings2::save()
 {
     DatabaseParams params = gContext->GetDatabaseParams();
-    
+
     params.localEnabled  = localEnabled->boolValue();
     params.localHostName = localHostName->getValue();
-    
+
     params.wolEnabled    = wolEnabled->boolValue();
     params.wolReconnect  = wolReconnect->intValue();
     params.wolRetry      = wolRetry->intValue();
     params.wolCommand    = wolCommand->getValue();
-    
+
     gContext->SaveDatabaseParams(params);
 }
 
