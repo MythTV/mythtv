@@ -10,8 +10,7 @@
 static HostLineEdit *LocalServerIP()
 {
     HostLineEdit *gc = new HostLineEdit("BackendServerIP");
-    gc->setLabel(QObject::tr("IP address for") + QString(" ") +
-                 gContext->GetHostName());
+    gc->setLabel(QObject::tr("IP address"));
     gc->setValue("127.0.0.1");
     gc->setHelpText(QObject::tr("Enter the IP address of this machine.  "
                     "Use an externally accessible address (ie, not "
@@ -23,7 +22,7 @@ static HostLineEdit *LocalServerIP()
 static HostLineEdit *LocalServerPort()
 {
     HostLineEdit *gc = new HostLineEdit("BackendServerPort");
-    gc->setLabel(QObject::tr("Port the server runs on"));
+    gc->setLabel(QObject::tr("Port"));
     gc->setValue("6543");
     gc->setHelpText(QObject::tr("Unless you've got good reason to, don't "
                     "change this."));
@@ -33,7 +32,7 @@ static HostLineEdit *LocalServerPort()
 static HostLineEdit *LocalStatusPort()
 {
     HostLineEdit *gc = new HostLineEdit("BackendStatusPort");
-    gc->setLabel(QObject::tr("Port the server shows status on"));
+    gc->setLabel(QObject::tr("Status Port"));
     gc->setValue("6544");
     gc->setHelpText(QObject::tr("Port which the server will listen to for "
                     "HTTP requests.  Currently, it shows a little status "
@@ -44,7 +43,7 @@ static HostLineEdit *LocalStatusPort()
 static GlobalLineEdit *MasterServerIP()
 {
     GlobalLineEdit *gc = new GlobalLineEdit("MasterServerIP");
-    gc->setLabel(QObject::tr("Master Server IP address"));
+    gc->setLabel(QObject::tr("IP address"));
     gc->setValue("127.0.0.1");
     gc->setHelpText(QObject::tr("The IP address of the master backend "
                     "server. All frontend and non-master backend machines "
@@ -57,10 +56,22 @@ static GlobalLineEdit *MasterServerIP()
 static GlobalLineEdit *MasterServerPort()
 {
     GlobalLineEdit *gc = new GlobalLineEdit("MasterServerPort");
-    gc->setLabel(QObject::tr("Port the master server runs on"));
+    gc->setLabel(QObject::tr("Port"));
     gc->setValue("6543");
     gc->setHelpText(QObject::tr("Unless you've got good reason to, "
                     "don't change this."));
+    return gc;
+};
+
+static HostLineEdit *LocalSecurityPin()
+{
+    HostLineEdit *gc = new HostLineEdit("SecurityPin");
+    gc->setLabel(QObject::tr("Security Pin (Required)"));
+    gc->setValue("");
+    gc->setHelpText(QObject::tr("Pin code required for a frontend to connect "
+                                "to the backend. Blank prevents all "
+                                "connections, 0000 allows any client to "
+                                "connect."));
     return gc;
 };
 
@@ -282,7 +293,7 @@ static GlobalSpinBox *EITCrawIdleStart()
 static GlobalSpinBox *WOLbackendReconnectWaitTime()
 {
     GlobalSpinBox *gc = new GlobalSpinBox("WOLbackendReconnectWaitTime", 0, 1200, 5);
-    gc->setLabel(QObject::tr("Reconnect wait time (secs)"));
+    gc->setLabel(QObject::tr("Delay between wake attempts (secs)"));
     gc->setValue(0);
     gc->setHelpText(QObject::tr("Length of time the frontend waits between "
                     "tries to wake up the master backend. This should be the "
@@ -294,7 +305,7 @@ static GlobalSpinBox *WOLbackendReconnectWaitTime()
 static GlobalSpinBox *WOLbackendConnectRetry()
 {
     GlobalSpinBox *gc = new GlobalSpinBox("WOLbackendConnectRetry", 1, 60, 1);
-    gc->setLabel(QObject::tr("Count of reconnect tries"));
+    gc->setLabel(QObject::tr("Wake Attempts"));
     gc->setHelpText(QObject::tr("Number of times the frontend will try to wake "
                     "up the master backend."));
     gc->setValue(5);
@@ -307,14 +318,14 @@ static GlobalLineEdit *WOLbackendCommand()
     gc->setLabel(QObject::tr("Wake Command"));
     gc->setValue("");
     gc->setHelpText(QObject::tr("The command used to wake up your master "
-                    "backend server."));
+                    "backend server\n(eg. sudo /etc/init.d/mythtv-backend restart)."));
     return gc;
 };
 
 static GlobalLineEdit *WOLslaveBackendsCommand()
 {
     GlobalLineEdit *gc = new GlobalLineEdit("WOLslaveBackendsCommand");
-    gc->setLabel(QObject::tr("Wake command for slaves"));
+    gc->setLabel(QObject::tr("Wake command"));
     gc->setValue("");
     gc->setHelpText(QObject::tr("The command used to wakeup your slave "
                     "backends. Leave empty to disable."));
@@ -324,7 +335,7 @@ static GlobalLineEdit *WOLslaveBackendsCommand()
 static GlobalSpinBox *idleTimeoutSecs()
 {
     GlobalSpinBox *gc = new GlobalSpinBox("idleTimeoutSecs", 0, 1200, 5);
-    gc->setLabel(QObject::tr("Idle timeout (secs)"));
+    gc->setLabel(QObject::tr("Idle shutdown timeout (secs)"));
     gc->setValue(0);
     gc->setHelpText(QObject::tr("The amount of time the master backend idles "
                     "before it shuts down all backends. Set to 0 to disable "
@@ -368,10 +379,10 @@ static GlobalLineEdit *WakeupTimeFormat()
 static GlobalLineEdit *SetWakeuptimeCommand()
 {
     GlobalLineEdit *gc = new GlobalLineEdit("SetWakeuptimeCommand");
-    gc->setLabel(QObject::tr("Set wakeuptime command"));
+    gc->setLabel(QObject::tr("Command to set Wakeup Time"));
     gc->setValue("");
-    gc->setHelpText(QObject::tr("The command used to set the time (passed as "
-                    "$time) to wake up the masterbackend"));
+    gc->setHelpText(QObject::tr("The command used to set the wakeup time (passed as "
+                    "$time) for the Master Backend"));
     return gc;
 };
 
@@ -476,7 +487,7 @@ static HostTimeBox *JobQueueWindowEnd()
 static GlobalCheckBox *JobsRunOnRecordHost()
 {
     GlobalCheckBox *gc = new GlobalCheckBox("JobsRunOnRecordHost");
-    gc->setLabel(QObject::tr("Run Jobs only on original recording host"));
+    gc->setLabel(QObject::tr("Run Jobs only on original recording backend"));
     gc->setValue(false);
     gc->setHelpText(QObject::tr("If set, jobs in the queue will be required "
                                 "to run on the backend that made the "
@@ -670,19 +681,30 @@ static HostCheckBox *JobAllowUserJob4()
 BackendSettings::BackendSettings() {
     VerticalConfigurationGroup* server = new VerticalConfigurationGroup(false);
     server->setLabel(QObject::tr("Host Address Backend Setup"));
-    server->addChild(LocalServerIP());
-    server->addChild(LocalServerPort());
-    server->addChild(LocalStatusPort());
-    server->addChild(MasterServerIP());
-    server->addChild(MasterServerPort());
+    VerticalConfigurationGroup* localServer = new VerticalConfigurationGroup();
+    localServer->setLabel(QObject::tr("Local Backend" + QString(" (") + gContext->GetHostName() + QString(")")));
+    localServer->addChild(LocalServerIP());
+    localServer->addChild(LocalServerPort());
+    localServer->addChild(LocalStatusPort());
+    //localServer->addChild(LocalSecurityPin());
+    VerticalConfigurationGroup* masterServer = new VerticalConfigurationGroup();
+    masterServer->setLabel(QObject::tr("Master Backend"));
+    masterServer->addChild(MasterServerIP());
+    masterServer->addChild(MasterServerPort());
+    server->addChild(localServer);
+    server->addChild(masterServer);
     addChild(server);
 
+    VerticalConfigurationGroup* locale = new VerticalConfigurationGroup(false);
+    locale->setLabel(QObject::tr("Locale Settings"));
+    locale->addChild(TVFormat());
+    locale->addChild(VbiFormat());
+    locale->addChild(FreqTable());
+    locale->addChild(TimeOffset());
+    addChild(locale);
+    
     VerticalConfigurationGroup* group2 = new VerticalConfigurationGroup(false);
-    group2->setLabel(QObject::tr("Backend Setup"));
-    group2->addChild(TVFormat());
-    group2->addChild(VbiFormat());
-    group2->addChild(FreqTable());
-    group2->addChild(TimeOffset());
+    group2->setLabel(QObject::tr("File Management Settings"));
     group2->addChild(MasterBackendOverride());
     group2->addChild(DeletesFollowLinks());
     group2->addChild(TruncateDeletes());
@@ -710,20 +732,23 @@ BackendSettings::BackendSettings() {
     addChild(group3);    
 
     VerticalConfigurationGroup* group4 = new VerticalConfigurationGroup(false);
-    group4->setLabel(QObject::tr("WakeOnLan settings"));
+    group4->setLabel(QObject::tr("Backend Wakeup settings"));
 
     VerticalConfigurationGroup* backend = new VerticalConfigurationGroup();
-    backend->setLabel(QObject::tr("MasterBackend"));
+    backend->setLabel(QObject::tr("Master Backend"));
     backend->addChild(WOLbackendReconnectWaitTime());
     backend->addChild(WOLbackendConnectRetry());
     backend->addChild(WOLbackendCommand());
     group4->addChild(backend);
     
-    group4->addChild(WOLslaveBackendsCommand());
+    VerticalConfigurationGroup* slaveBackend = new VerticalConfigurationGroup();
+    slaveBackend->setLabel(QObject::tr("Slave Backends"));
+    slaveBackend->addChild(WOLslaveBackendsCommand());
+    group4->addChild(slaveBackend);
     addChild(group4);
 
     VerticalConfigurationGroup* group5 = new VerticalConfigurationGroup(false);
-    group5->setLabel(QObject::tr("Job Queue (Host-Specific)"));
+    group5->setLabel(QObject::tr("Job Queue (Backend-Specific)"));
     group5->addChild(JobQueueMaxSimultaneousJobs());
     group5->addChild(JobQueueCheckFrequency());
 
