@@ -79,7 +79,7 @@ int main(int argc, char *argv[])
         }
         else if (!strcmp(a.argv()[argpos], "--file"))
         {
-            if (((argpos + 3) >= a.argc()) ||
+            if (((argpos + 2) >= a.argc()) ||
                 !strncmp(a.argv()[argpos + 1], "--", 2) ||
                 !strncmp(a.argv()[argpos + 2], "--", 2))
             {
@@ -90,8 +90,7 @@ int main(int argc, char *argv[])
             fromfile_id = atoi(a.argv()[++argpos]);
             fromfile_name = a.argv()[++argpos];
 
-            if (fill_data.IsVerbose())
-                cout << "### bypassing grabbers, reading directly from file\n";
+            VERBOSE(VB_GENERAL, "Bypassing grabbers, reading directly from file");
             from_file = true;
         }
         else if (!strcmp(a.argv()[argpos], "--dd-file"))
@@ -111,8 +110,7 @@ int main(int argc, char *argv[])
             fromddfile_lineupid = a.argv()[++argpos];
             fromfile_name = a.argv()[++argpos];
 
-            if (fill_data.IsVerbose())
-                cout << "### bypassing grabbers, reading directly from file\n";
+            VERBOSE(VB_GENERAL, "Bypassing grabbers, reading directly from file");
             from_dd_file = true;
         }
         else if (!strcmp(a.argv()[argpos], "--xawchannels"))
@@ -128,8 +126,7 @@ int main(int argc, char *argv[])
             fromxawfile_id = atoi(a.argv()[++argpos]);
             fromxawfile_name = a.argv()[++argpos];
 
-            if (fill_data.IsVerbose())
-                 cout << "### reading channels from xawtv configfile\n";
+            VERBOSE(VB_GENERAL, "Reading channels from xawtv configfile");
             from_xawfile = true;
         }
         else if (!strcmp(a.argv()[argpos], "--do-channel-updates"))
@@ -234,15 +231,6 @@ int main(int argc, char *argv[])
                 return GENERIC_EXIT_INVALID_CMDLINE;
             }
         }
-#if 0
-        else if (!strcmp(a.argv()[argpos], "--dd-grab-all"))
-        {
-            fill_data.dd_grab_all = true;
-            fill_data.refresh_today = false;
-            fill_data.refresh_tomorrow = false;
-            fill_data.refresh_second = false;
-        }
-#endif
         else if (!strcmp(a.argv()[argpos], "--quiet"))
         {
             fill_data.SetQuiet(true);
@@ -414,11 +402,6 @@ int main(int argc, char *argv[])
             cout << "-v or --verbose debug-level\n";
             cout << "   Use '-v help' for level info\n";
             cout << "\n";
-
-#if 0
-            cout << "--dd-grab-all\n";
-            cout << "   The DataDirect grabber will grab all available data\n";
-#endif
             cout << "--help\n";
             cout << "   This text\n";
             cout << "\n";
@@ -447,8 +430,7 @@ int main(int argc, char *argv[])
 
     gContext->LogEntry("mythfilldatabase", LP_INFO,
                        "Listings Download Started", "");
-    
-    
+
     if (!grab_data)
     {
     }
@@ -585,7 +567,7 @@ int main(int argc, char *argv[])
              MythContext::DBError("loading channel sources", sourcequery);
              return FILLDB_EXIT_DB_ERROR;
         }
-    
+
         if (!fill_data.fillData(sourcelist))
         {
              VERBOSE(VB_IMPORTANT, "Failed to fetch some program info");
@@ -636,7 +618,7 @@ int main(int argc, char *argv[])
         int update_count = ProgramData::fix_end_times();
         if (update_count == -1)
             VERBOSE(VB_IMPORTANT, "fix_end_times failed!");
-        else if (fill_data.IsVerbose())
+        else
             VERBOSE(VB_GENERAL,
                     QString("    %1 replacements made").arg(update_count));
 
@@ -661,26 +643,26 @@ int main(int argc, char *argv[])
     if (mark_repeats)
     {
         VERBOSE(VB_GENERAL, "Marking repeats.");
-       
+
         int newEpiWindow = gContext->GetNumSetting( "NewEpisodeWindow", 14);
-        
+
         MSqlQuery query(MSqlQuery::InitCon());
         query.exec( QString( "UPDATE program SET previouslyshown = 1 "
                     "WHERE previouslyshown = 0 "
                     "AND originalairdate is not null "
                     "AND (to_days(starttime) - to_days(originalairdate)) > %1;")
                     .arg(newEpiWindow));
-        
+
         VERBOSE(VB_GENERAL,
                 QString("    Found %1").arg(query.numRowsAffected()));
-            
+
         VERBOSE(VB_GENERAL, "Unmarking new episode rebroadcast repeats.");
         query.exec( QString( "UPDATE program SET previouslyshown = 0 "
                              "WHERE previouslyshown = 1 "
                              "AND originalairdate is not null "
                              "AND (to_days(starttime) - to_days(originalairdate)) <= %1;")
-                             .arg(newEpiWindow));             
-    
+                             .arg(newEpiWindow));
+
         VERBOSE(VB_GENERAL,
                 QString("    Found %1").arg(query.numRowsAffected()));
     }
@@ -798,7 +780,7 @@ int main(int argc, char *argv[])
         fill_data.ddprocessor.GrabNextSuggestedTime();
     }
 
-    VERBOSE(VB_IMPORTANT, "\n"
+    VERBOSE(VB_GENERAL, "\n"
             "===============================================================\n"
             "| Attempting to contact the master backend for rescheduling.  |\n"
             "| If the master is not running, rescheduling will happen when |\n"

@@ -96,7 +96,7 @@ class ProgInfo
 class MPUBLIC ProgramData
 {
   public:
-    ProgramData() : quiet(false), listing_wrap_offset(0) {}
+    ProgramData() : listing_wrap_offset(0) {}
 
     void handlePrograms(int id,
                         QMap<QString, QValueList<ProgInfo> > *proglist);
@@ -109,7 +109,6 @@ class MPUBLIC ProgramData
     void fixProgramList(QValueList<ProgInfo> *fixlist);
 
   public:
-    bool quiet;
     int  listing_wrap_offset;
 };
 

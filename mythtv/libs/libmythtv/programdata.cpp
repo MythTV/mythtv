@@ -158,20 +158,20 @@ void ProgramData::fixProgramList(QValueList<ProgInfo> *fixlist)
             else
                 tokeep = i, todelete = cur;
 
-            if (!quiet)
-            {
-                cerr << "removing conflicting program: "
-                     << (*todelete).start.toString(Qt::ISODate) << "-"
-                     << (*todelete).end.toString(Qt::ISODate) << " "
-                     << (*todelete).channel << " "
-                     << (*todelete).title.local8Bit() << endl;
-                cerr << "conflicted with             : "
-                     << (*tokeep).start.toString(Qt::ISODate) << "-"
-                     << (*tokeep).end.toString(Qt::ISODate) << " "
-                     << (*tokeep).channel << " "
-                     << (*tokeep).title.local8Bit() << endl;
-                cerr << endl;
-            }
+
+            VERBOSE(VB_XMLTV,
+                QString("Removing conflicting program: %1 - %2 %3 %4")
+                    .arg((*todelete).start.toString(Qt::ISODate))
+                    .arg((*todelete).end.toString(Qt::ISODate))
+                    .arg((*todelete).channel)
+                    .arg((*todelete).title));
+
+            VERBOSE(VB_XMLTV,
+                QString("Conflicted with            : %1 - %2 %3 %4")
+                    .arg((*tokeep).start.toString(Qt::ISODate))
+                    .arg((*tokeep).end.toString(Qt::ISODate))
+                    .arg((*tokeep).channel)
+                    .arg((*tokeep).title));
 
             if (todelete == i)
                 i = cur;
@@ -204,8 +204,9 @@ void ProgramData::handlePrograms(
 
         if (!chanQuery.isActive() || chanQuery.size() <= 0)
         {
-            cerr << "Unknown xmltv channel identifier: " << mapiter.key()
-                 << endl << "Skipping channel.\n";
+            VERBOSE(VB_IMPORTANT, QString("Unknown xmltv channel identifier: "
+                                          "%1 - Skipping channel.")
+                                          .arg(mapiter.key()));
             continue;
         }
 
@@ -215,8 +216,10 @@ void ProgramData::handlePrograms(
 
             if (chanid == 0)
             {
-                cerr << "Unknown xmltv channel identifier: " << mapiter.key()
-                     << endl << "Skipping channel.\n";
+                VERBOSE(VB_IMPORTANT, QString("Unknown xmltv channel "
+                                              "identifier: %1 - Skipping "
+                                              "channel.")
+                                              .arg(mapiter.key()));
                 continue;
             }
 
@@ -287,23 +290,23 @@ void ProgramData::handlePrograms(
 
                 if (query.isActive() && query.size() > 0)
                 {
-                    if (!quiet)
-                    {
-                        while (query.next())
-                        {
-                            cerr << "removing existing program: "
-                                 << query.value(1).toDateTime().toString(Qt::ISODate) << " - "
-                                 << query.value(2).toDateTime().toString(Qt::ISODate) << " "
-                                 << (*i).channel.local8Bit() << " "
-                                 << QString::fromUtf8(query.value(0).toString()).local8Bit()  << endl;
-                        }
 
-                        cerr << "inserting new program    : "
-                             << (*i).start.toString(Qt::ISODate) << " - " 
-                             << (*i).end.toString(Qt::ISODate) << " "
-                             << (*i).channel.local8Bit() << " "
-                             << (*i).title.local8Bit() << endl << endl;
+                    while (query.next())
+                    {
+                        VERBOSE(VB_XMLTV,
+                            QString("Removing existing program: %1 - %2 %3 %4")
+                            .arg(query.value(1).toDateTime().toString(Qt::ISODate))
+                            .arg(query.value(2).toDateTime().toString(Qt::ISODate))
+                            .arg((*i).channel)
+                            .arg(QString::fromUtf8(query.value(0).toString())));
                     }
+
+                    VERBOSE(VB_XMLTV,
+                        QString("Inserting new program    : %1 - %2 %3 %4")
+                            .arg((*i).start.toString(Qt::ISODate))
+                            .arg((*i).end.toString(Qt::ISODate))
+                            .arg((*i).channel)
+                            .arg((*i).title));
 
                     MSqlQuery subquery(MSqlQuery::InitCon());
                     subquery.prepare("DELETE FROM program WHERE "
@@ -430,7 +433,7 @@ void ProgramData::handlePrograms(
 
                     if (personid < 0)
                     {
-                        cerr << "Error inserting person\n";
+                        VERBOSE(VB_IMPORTANT, "Error inserting person");
                         continue;
                     }
 
@@ -462,11 +465,11 @@ void ProgramData::handlePrograms(
             }
         }
     }
-    if (!quiet)
-    {
-        cerr << "Updated programs: " << updated
-             << "  Unchanged programs: " << unchanged << endl;
-    }
+
+    VERBOSE(VB_GENERAL,
+            QString("Updated programs: %1 Unchanged programs: %2")
+                .arg(updated)
+                .arg(unchanged));
 }
 
 int ProgramData::fix_end_times(void)

@@ -57,11 +57,8 @@ class FillData
 
     void SetQuiet(bool quiet)
     {
-        prog_data.quiet = icon_data.quiet = chan_data.quiet = quiet;
+        icon_data.quiet = chan_data.quiet = quiet;
     }
-
-    bool IsQuiet(void)   const { return prog_data.quiet; }
-    bool IsVerbose(void) const { return !IsQuiet(); }
 
   public:
     ProgramData         prog_data;

@@ -90,7 +90,7 @@ bool FillData::grabDDData(Source source, int poffset,
     ddprocessor.SetListingsProvider(ddSource);
     ddprocessor.SetUserID(source.userid);
     ddprocessor.SetPassword(source.password);
-    
+
     bool needtoretrieve = true;
 
     if (source.userid != lastdduserid)
@@ -303,14 +303,14 @@ bool FillData::grabData(Source source, int offset, QDate *qCurrentDate)
 
     VERBOSE(VB_XMLTV, QString("Grabber Command: %1").arg(command));
 
-    VERBOSE(VB_GENERAL,
+    VERBOSE(VB_XMLTV,
             "----------------- Start of XMLTV output -----------------");
 
     int systemcall_status = system(command.ascii());
     bool succeeded = WIFEXITED(systemcall_status) &&
          WEXITSTATUS(systemcall_status) == 0;
 
-    VERBOSE(VB_GENERAL,
+    VERBOSE(VB_XMLTV,
             "------------------ End of XMLTV output ------------------");
 
     qdtNow = QDateTime::currentDateTime();
