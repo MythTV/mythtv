@@ -549,7 +549,10 @@ $parallel_make .= " $parallel_make_flags";
 ### Distclean?
 if ($OPT{'distclean'})
 {
-  &Syscall([ '/bin/rm', '-f', '-r', $PREFIX ]);
+  &Syscall([ '/bin/rm', '-f',       '$PREFIX/bin/myth*'    ]);
+  &Syscall([ '/bin/rm', '-f', '-r', '$PREFIX/lib/libmyth*' ]);
+  &Syscall([ '/bin/rm', '-f', '-r', '$PREFIX/lib/mythtv'   ]);
+  &Syscall([ '/bin/rm', '-f', '-r', '$PREFIX/share/mythtv' ]);
   &Syscall([ '/bin/rm', '-f', '-r', $SRCDIR ]);
   exit;
 }
