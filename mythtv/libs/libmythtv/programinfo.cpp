@@ -921,7 +921,7 @@ ProgramInfo *ProgramInfo::GetProgramFromRecorded(const QString &channel,
 
         proginfo->getProgramProperties();
 
-        proginfo->recgroup = query.value(26).toString();
+        proginfo->recgroup = QString::fromUtf8(query.value(26).toString());
         proginfo->storagegroup = query.value(27).toString();
         proginfo->playgroup = query.value(21).toString();
         proginfo->recpriority = query.value(22).toInt();
@@ -4014,7 +4014,7 @@ void ProgramInfo::UpdateRecGroup(void)
     if (query.exec() && query.isActive() && query.size() > 0)
     {
         if(query.next() && recgroup != query.value(0).toString())
-            recgroup = query.value(0).toString();
+            recgroup = QString::fromUtf8(query.value(0).toString());
     }
 }
 void ProgramInfo::MarkAsInUse(bool inuse, QString usedFor)
@@ -4831,7 +4831,7 @@ bool ProgramList::FromRecorded( bool bDescending, ProgramList *pSchedList )
             proginfo->subtitleType = query.value(34).toInt();
 
             proginfo->category     = QString::fromUtf8(query.value(15).toString());
-            proginfo->recgroup     = query.value(16).toString();
+            proginfo->recgroup     = QString::fromUtf8(query.value(16).toString());
             proginfo->playgroup    = query.value(27).toString();
             proginfo->storagegroup = query.value(36).toString();
             proginfo->recstatus    = rsRecorded;
