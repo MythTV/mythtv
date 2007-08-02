@@ -77,11 +77,6 @@ int main(int argc, char *argv[])
             // users in xmltv zones that do not provide channel data.
             fill_data.chan_data.non_us_updating = true;
         }
-        else if (!strcmp(a.argv()[argpos], "--no-delete"))
-        {
-            // Do not delete old programs from the database until 7 days old.
-            fill_data.prog_data.no_delete = true;
-        }
         else if (!strcmp(a.argv()[argpos], "--file"))
         {
             if (((argpos + 3) >= a.argc()) ||
@@ -343,9 +338,6 @@ int main(int argc, char *argv[])
             cout << "   are used to assigning a sequenced number for each channel, i.e.:\n";
             cout << "   1->TVE1(S41), 2->La 2(SE18), 3->TV3(21), 4->Canal 33(60)...\n";
             cout << "\n";
-            cout << "--no-delete\n";
-            cout << "   Do not delete old programs from the database until 7 days old.\n";
-            cout << "\n";
             cout << "--file <sourceid> <xmlfile>\n";
             cout << "   Bypass the grabbers and read data directly from a file\n";
             cout << "   <sourceid> = number of the video source to use with this file\n";
@@ -496,8 +488,6 @@ int main(int argc, char *argv[])
         if (!fill_data.grabDataFromFile(fromfile_id, fromfile_name))
             return FILLDB_EXIT_GRAB_DATA_FAILED;
 
-        fill_data.prog_data.clearOldDBEntries();
-
         query.exec(QString("UPDATE settings SET data ='%1' "
                            "WHERE value='mythfilldatabaseLastRunEnd'")
                           .arg(QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm")));
@@ -531,7 +521,6 @@ int main(int argc, char *argv[])
     {
         fill_data.grabDataFromDDFile(
             fromfile_id, fromfile_offset, fromfile_name, fromddfile_lineupid);
-        fill_data.prog_data.clearOldDBEntries();
     }
     else
     {

@@ -863,8 +863,6 @@ bool FillData::fillData(QValueList<Source> &sourcelist)
                            .arg(status));
     }
 
-    prog_data.clearOldDBEntries();
-
     return (failures == 0);
 }
 

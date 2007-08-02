@@ -19,7 +19,7 @@ using namespace std;
 #include "libmyth/mythdbcon.h"
 #include "libmyth/util.h"
 
-#include "programdata.h"
+#include "programinfo.h"
 
 #include "libmythtv/eitcache.h"
 
@@ -501,16 +501,78 @@ void HouseKeeper::CleanupRecordedTables(void)
 
 void HouseKeeper::CleanupProgramListings(void)
 {
-    if (!gContext->GetNumSetting("MythFillEnabled", 0))
+
+    MSqlQuery query(MSqlQuery::InitCon());
+    QString querystr;
+    // We keep seven days of guide data
+    int offset = 7;
+
+    query.prepare("DELETE FROM oldprogram WHERE airdate < "
+                  "DATE_SUB(CURRENT_DATE, INTERVAL 320 DAY);");
+    query.exec();
+
+    query.prepare("REPLACE INTO oldprogram (oldtitle,airdate) "
+                  "SELECT title,starttime FROM program "
+                  "WHERE starttime < NOW() AND manualid = 0 "
+                  "GROUP BY title;");
+    query.exec();
+
+    query.prepare("DELETE FROM program WHERE starttime <= "
+                  "DATE_SUB(CURRENT_DATE, INTERVAL :OFFSET DAY);");
+    query.bindValue(":OFFSET", offset);
+    query.exec();
+
+    query.prepare("DELETE FROM programrating WHERE starttime <= "
+                  "DATE_SUB(CURRENT_DATE, INTERVAL :OFFSET DAY);");
+    query.bindValue(":OFFSET", offset);
+    query.exec();
+
+    query.prepare("DELETE FROM programgenres WHERE starttime <= "
+                  "DATE_SUB(CURRENT_DATE, INTERVAL :OFFSET DAY);");
+    query.bindValue(":OFFSET", offset);
+    query.exec();
+
+    query.prepare("DELETE FROM credits WHERE starttime <= "
+                  "DATE_SUB(CURRENT_DATE, INTERVAL :OFFSET DAY);");
+    query.bindValue(":OFFSET", offset);
+    query.exec();
+
+    query.prepare("DELETE FROM record WHERE (type = :SINGLE "
+                  "OR type = :OVERRIDE OR type = :DONTRECORD) "
+                  "AND enddate < CURDATE();");
+    query.bindValue(":SINGLE", kSingleRecord);
+    query.bindValue(":OVERRIDE", kOverrideRecord);
+    query.bindValue(":DONTRECORD", kDontRecord);
+    query.exec();
+
+    MSqlQuery findq(MSqlQuery::InitCon());
+    findq.prepare("SELECT record.recordid FROM record "
+                  "LEFT JOIN oldfind ON oldfind.recordid = record.recordid "
+                  "WHERE type = :FINDONE AND oldfind.findid IS NOT NULL;");
+    findq.bindValue(":FINDONE", kFindOneRecord);
+    findq.exec();
+
+    if (findq.isActive() && findq.size() > 0)
     {
-        ProgramData *prog_data = new ProgramData;
-        // Keep 7 days of old listings.  Users wanting listings deleted
-        // "immediately" may set up mythfilldatabase to run without
-        // the "--no-delete" argument
-        prog_data->no_delete = true;
-        prog_data->clearOldDBEntries();
-        delete prog_data;
+        while (findq.next())
+        {
+            query.prepare("DELETE FROM record WHERE recordid = :RECORDID;");
+            query.bindValue(":RECORDID", findq.value(0).toInt());
+            query.exec();
+        }
     }
+    query.prepare("DELETE FROM oldfind WHERE findid < TO_DAYS(NOW()) - 14;");
+    query.exec();
+
+    int cleanOldRecorded = gContext->GetNumSetting( "CleanOldRecorded", 10);
+
+    query.prepare("DELETE FROM oldrecorded WHERE "
+                  "recstatus <> :RECORDED AND duplicate = 0 AND "
+                  "endtime < DATE_SUB(CURRENT_DATE, INTERVAL :CLEAN DAY);");
+    query.bindValue(":RECORDED", rsRecorded);
+    query.bindValue(":CLEAN", cleanOldRecorded);
+    query.exec();
+
 }
 
 

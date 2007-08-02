@@ -96,9 +96,8 @@ class ProgInfo
 class MPUBLIC ProgramData
 {
   public:
-    ProgramData() : quiet(false), no_delete(false), listing_wrap_offset(0) {}
+    ProgramData() : quiet(false), listing_wrap_offset(0) {}
 
-    void clearOldDBEntries(void);
     void handlePrograms(int id,
                         QMap<QString, QValueList<ProgInfo> > *proglist);
 
@@ -111,7 +110,6 @@ class MPUBLIC ProgramData
 
   public:
     bool quiet;
-    bool no_delete;
     int  listing_wrap_offset;
 };
 
