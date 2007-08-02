@@ -86,15 +86,13 @@ int main(int argc, char *argv[])
         {
             if (((argpos + 3) >= a.argc()) ||
                 !strncmp(a.argv()[argpos + 1], "--", 2) ||
-                !strncmp(a.argv()[argpos + 2], "--", 2) ||
-                !strncmp(a.argv()[argpos + 3], "--", 2))
+                !strncmp(a.argv()[argpos + 2], "--", 2))
             {
                 printf("missing or invalid parameters for --file option\n");
                 return FILLDB_EXIT_INVALID_CMDLINE;
             }
 
             fromfile_id = atoi(a.argv()[++argpos]);
-            fromfile_offset = atoi(a.argv()[++argpos]);
             fromfile_name = a.argv()[++argpos];
 
             if (fill_data.IsVerbose())
@@ -348,16 +346,15 @@ int main(int argc, char *argv[])
             cout << "--no-delete\n";
             cout << "   Do not delete old programs from the database until 7 days old.\n";
             cout << "\n";
-            cout << "--file <sourceid> <offset> <xmlfile>\n";
+            cout << "--file <sourceid> <xmlfile>\n";
             cout << "   Bypass the grabbers and read data directly from a file\n";
-            cout << "   <sourceid> = number for the video source to use with this file\n";
-            cout << "   <offset>   = days from today that xmlfile defines\n";
-            cout << "                (-1 means to replace all data, up to 10 days)\n";
+            cout << "   <sourceid> = number of the video source to use with this file\n";
             cout << "   <xmlfile>  = file to read\n";
             cout << "\n";
             cout << "--dd-file <sourceid> <offset> <lineupid> <xmlfile>\n";
             cout << "   <sourceid> = see --file\n";
-            cout << "   <offset>   = see --file\n";
+            cout << "   <offset>   = days from today that xmlfile defines\n";
+            cout << "                (-1 means to replace all data, up to 10 days)\n";
             cout << "   <lineupid> = the lineup id\n";
             cout << "   <xmlfile>  = see --file\n";
             cout << "\n";
