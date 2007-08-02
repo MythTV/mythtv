@@ -1524,7 +1524,6 @@ static HostComboBox *XineramaScreen()
     return gc;
 }
 
-
 static HostComboBox *XineramaMonitorAspectRatio()
 {
     HostComboBox *gc = new HostComboBox("XineramaMonitorAspectRatio");
@@ -2624,6 +2623,28 @@ static HostSpinBox *NetworkControlPort()
     return gs;
 }
 
+class NetworkControlSettings : public TriggeredConfigurationGroup
+{
+  public:
+     NetworkControlSettings() :
+         TriggeredConfigurationGroup(false, false, true, true)
+     {
+         setLabel(QObject::tr("Network Control"));
+         setUseLabel(false);
+
+         Setting* controlEnabled = NetworkControlEnabled();
+         addChild(controlEnabled);
+         setTrigger(controlEnabled);
+
+         ConfigurationGroup* settings = new VerticalConfigurationGroup(false, true);
+         settings->addChild(NetworkControlPort());
+         addTarget("1", settings);
+
+         // show nothing if fillEnabled is off
+         addTarget("0", new VerticalConfigurationGroup(false, true));
+     };
+};
+
 static HostCheckBox *RealtimePriority()
 {
     HostCheckBox *gc = new HostCheckBox("RealtimePriority");
@@ -3072,9 +3093,9 @@ class MythLogSettings : public TriggeredConfigurationGroup
          Setting* logEnabled = LogEnabled();
          addChild(logEnabled);
          setTrigger(logEnabled);
-         addChild(LogMaxCount());
 
          ConfigurationGroup* settings = new VerticalConfigurationGroup(false);
+         settings->addChild(LogMaxCount());
          settings->addChild(LogPrintLevel());
          settings->addChild(LogCleanEnabled());
          settings->addChild(LogCleanPeriod());
@@ -3538,31 +3559,39 @@ MainGeneralSettings::MainGeneralSettings()
     AudioSettings *audio = new AudioSettings();
     addChild(audio);
 
-    VerticalConfigurationGroup* general = new VerticalConfigurationGroup(false);
-    general->setLabel(QObject::tr("General"));
-    general->addChild(AllowQuitShutdown());
-    general->addChild(NoPromptOnExit());
-    general->addChild(HaltCommand());
-    general->addChild(LircKeyPressedApp());
-    general->addChild(UseArrowAccels());
-    general->addChild(NetworkControlEnabled());
-    general->addChild(NetworkControlPort());
-    addChild(general);
-
-    general = new VerticalConfigurationGroup(false);
-    general->setLabel(QObject::tr("General"));
-
+    VerticalConfigurationGroup* misc = new VerticalConfigurationGroup(false);
+    misc->setLabel(QObject::tr("Miscellaneous"));
     ConfigurationGroup *pin = new HorizontalConfigurationGroup();
     pin->setLabel(QObject::tr("Settings Access"));
     pin->addChild(SetupPinCodeRequired());
     pin->addChild(SetupPinCode());
+    misc->addChild(pin);
+    VerticalConfigurationGroup* shutdownSettings = new VerticalConfigurationGroup(true);
+    shutdownSettings->setLabel(QObject::tr("Shutdown Settings"));
+    shutdownSettings->addChild(HaltCommand());
+    misc->addChild(shutdownSettings);
+    addChild(misc);
+
+    VerticalConfigurationGroup* general = new VerticalConfigurationGroup(false);
+    general->setLabel(QObject::tr("Control"));
+    general->addChild(AllowQuitShutdown());
+    general->addChild(NoPromptOnExit());
+    general->addChild(LircKeyPressedApp());
+    general->addChild(UseArrowAccels());
+    general->addChild(UseVirtualKeyboard());
+    NetworkControlSettings *controlSettings = new NetworkControlSettings();
+    general->addChild(controlSettings);
+    addChild(general);
+
+    general = new VerticalConfigurationGroup(false);
+
+    general->setLabel(QObject::tr("General"));
 
     ConfigurationGroup *mediaMon = new VerticalConfigurationGroup();
     mediaMon->setLabel(QObject::tr("Removable Media"));
     mediaMon->addChild(EnableMediaMon());
     mediaMon->addChild(IgnoreMedia());
 
-    general->addChild(pin);
     general->addChild(mediaMon);
     general->addChild(EnableXbox());
     addChild(general);
@@ -3864,6 +3893,16 @@ AppearanceSettings::AppearanceSettings()
     screen->addChild(RunInWindow());
     addChild(screen);
 
+    VerticalConfigurationGroup* qttheme = new VerticalConfigurationGroup(false);
+    qttheme->setLabel(QObject::tr("QT / Appearance"));
+    qttheme->addChild(QtFontSmall());
+    qttheme->addChild(QtFontMedium());
+    qttheme->addChild(QtFontBig());
+    qttheme->addChild(QtFonTweak());
+    qttheme->addChild(PlayBoxTransparency());
+    qttheme->addChild(PlayBoxShading());
+    addChild(qttheme );
+
 #if defined(USING_XRANDR) || defined(CONFIG_DARWIN)
     const vector<DisplayResScreen> scr = GetVideoModes();
     if (scr.size())
@@ -3878,17 +3917,6 @@ AppearanceSettings::AppearanceSettings()
     dates->addChild(MythShortDateFormat());
     dates->addChild(MythTimeFormat());
     addChild(dates);
-
-    VerticalConfigurationGroup* qttheme = new VerticalConfigurationGroup(false);
-    qttheme->setLabel(QObject::tr("QT"));
-    qttheme->addChild(QtFontSmall());
-    qttheme->addChild(QtFontMedium());
-    qttheme->addChild(QtFontBig());
-    qttheme->addChild(QtFonTweak());
-    qttheme->addChild(PlayBoxTransparency());
-    qttheme->addChild(PlayBoxShading());
-    qttheme->addChild(UseVirtualKeyboard());
-    addChild(qttheme );
 
     addChild(new LcdSettings());
 }
