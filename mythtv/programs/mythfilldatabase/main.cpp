@@ -132,8 +132,7 @@ int main(int argc, char *argv[])
                  cout << "### reading channels from xawtv configfile\n";
             from_xawfile = true;
         }
-        else if ((!strcmp(a.argv()[argpos], "--do-channel-updates")) ||
-                 (!strcmp(a.argv()[argpos], "--do_channel_updates")))
+        else if (!strcmp(a.argv()[argpos], "--do-channel-updates"))
         {
             fill_data.chan_data.channel_updates = true;
         }
