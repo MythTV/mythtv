@@ -986,8 +986,8 @@ void PlaybackBoxMusic::showEditMetadataDialog()
 
     // store the current track metadata in case the track changes
     // while we show the edit dialog
-    Metadata *editMeta = curMeta;
     GenericTree *node = music_tree_list->getCurrentNode();
+    Metadata *editMeta = all_music->getMetadata( node->getInt() );
 
     EditMetadataDialog editDialog(editMeta, gContext->GetMainWindow(),
                       "edit_metadata", "music-", "edit metadata");
@@ -1007,14 +1007,7 @@ void PlaybackBoxMusic::showEditMetadataDialog()
                if (curMeta->ID() == editMeta->ID())
                {
                     *curMeta = editMeta;
-                    if (title_text)
-                        title_text->SetText(curMeta->FormatTitle());
-                    if (artist_text)
-                        artist_text->SetText(curMeta->FormatArtist());
-                    if (album_text)
-                        album_text->SetText(curMeta->Album());
-
-                    setTrackOnLCD(curMeta);
+                    updateTrackInfo(curMeta);
                }
            }
         }
@@ -2076,14 +2069,8 @@ void PlaybackBoxMusic::handleTreeListSignals(int node_int, IntVector *attributes
         //  It's a track
 
         curMeta = all_music->getMetadata(node_int);
-        if (title_text)
-            title_text->SetText(curMeta->FormatTitle());
-        if (artist_text)
-            artist_text->SetText(curMeta->FormatArtist());
-        if (album_text)
-            album_text->SetText(curMeta->Album());
 
-        setTrackOnLCD(curMeta);
+        updateTrackInfo(curMeta);
 
         maxTime = curMeta->Length() / 1000;
 
