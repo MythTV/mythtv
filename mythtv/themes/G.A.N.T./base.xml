@@ -2,7 +2,7 @@
 
   <window name="backgroundwindow">
     <imagetype name="backimg">
-      <filename>bkg/grey.jpeg</filename>
+      <filename>bkg/grey.png</filename>
       <staticsize>-1,-1</staticsize>
     </imagetype>
 

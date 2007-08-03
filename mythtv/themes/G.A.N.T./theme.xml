@@ -1,7 +1,7 @@
 <myththeme>
 
   <background style="normal">
-    <image>bkg/grey.jpeg</image>
+    <image>bkg/grey.png</image>
     <buttonarea>100,140,430,420</buttonarea>
     <visiblerowlimit>7</visiblerowlimit>
   </background>
