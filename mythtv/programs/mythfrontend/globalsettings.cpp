@@ -908,7 +908,7 @@ static HostComboBox *OSDFont()
     gc->setLabel(QObject::tr("OSD font"));
     QDir ttf(gContext->GetFontsDir(), gContext->GetFontsNameFilter());
     gc->fillSelectionsFromDir(ttf, false);
-    gs->setValue("FreeSans.ttf");
+    gc->setValue("FreeSans.ttf");
 
     return gc;
 }
@@ -920,7 +920,7 @@ static HostComboBox *OSDCCFont()
     QDir ttf(gContext->GetFontsDir(), gContext->GetFontsNameFilter());
     gc->fillSelectionsFromDir(ttf, false);
     gc->setHelpText(QObject::tr("Closed Caption font"));
-    gs->setValue("FreeSans.ttf");
+    gc->setValue("FreeSans.ttf");
 
     return gc;
 }
