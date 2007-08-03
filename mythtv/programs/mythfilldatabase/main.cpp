@@ -242,7 +242,6 @@ int main(int argc, char *argv[])
 #endif
         else if (!strcmp(a.argv()[argpos], "--quiet"))
         {
-            fill_data.SetQuiet(true);
             print_verbose_messages = VB_NONE;
         }
         else if (!strcmp(a.argv()[argpos], "--mark-repeats"))
@@ -263,7 +262,6 @@ int main(int argc, char *argv[])
             {
                 if (!isatty(fileno(stdout)))
                 {
-                    fill_data.SetQuiet(true);
                     export_icon_data_filename = "-";
                 }
             }

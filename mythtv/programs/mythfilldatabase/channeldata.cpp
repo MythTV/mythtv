@@ -181,9 +181,10 @@ void ChannelData::handleChannels(int id, QValueList<ChanInfo> *chanlist)
 
             if (query.isActive() && query.size() > 0)
             {
-                if (!quiet)
-                    cout << "Converting old xmltvid (" << (*i).old_xmltvid << ") to new ("
-                         << (*i).xmltvid << ")\n";
+                VERBOSE(VB_GENERAL, QString("Converting old xmltvid (%1) to "
+                                            "new (%2)")
+                                            .arg((*i).old_xmltvid)
+                                            .arg((*i).xmltvid));
 
                 query.exec(QString("UPDATE channel SET xmltvid = '%1' WHERE xmltvid = '%2';")
                             .arg((*i).xmltvid)
@@ -271,9 +272,9 @@ void ChannelData::handleChannels(int id, QValueList<ChanInfo> *chanlist)
 
                     if (!subquery.exec())
                     {
-                        cerr << "DB Error: Channel update failed, SQL query "
-                             << "was:" << endl;
-                        cerr << querystr << endl;
+                        VERBOSE(VB_IMPORTANT, QString("DB Error: Channel "
+                                            "update failed, SQL query was: %1")
+                                            .arg(querystr));
                     }
                     else
                     {

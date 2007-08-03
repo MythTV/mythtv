@@ -7,15 +7,13 @@ class QFile;
 class IconData
 {
   public:
-    IconData() : quiet(false) {}
+    IconData() {}
 
     void UpdateSourceIcons(int sourceid);
     void ImportIconMap(const QString &filename);
     void ExportIconMap(const QString &filename);
     void ResetIconMap(bool reset_icons);
 
-  public:
-    bool quiet;
 };
 
 #endif // _ICONMAP_H_

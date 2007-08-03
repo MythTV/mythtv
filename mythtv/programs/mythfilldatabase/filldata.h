@@ -55,11 +55,6 @@ class FillData
     ChanInfo *xawtvChannel(QString &id, QString &channel, QString &fine);
     void readXawtvChannels(int id, QString xawrcfile);
 
-    void SetQuiet(bool quiet)
-    {
-        icon_data.quiet = chan_data.quiet = quiet;
-    }
-
   public:
     ProgramData         prog_data;
     ChannelData         chan_data;

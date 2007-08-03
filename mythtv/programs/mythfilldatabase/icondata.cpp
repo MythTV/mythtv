@@ -192,12 +192,11 @@ void IconData::UpdateSourceIcons(int sourceid)
             if (localfile.exists())
             {
                 int chanid = query.value(0).toInt();
-                if (!quiet)
-                {
-                    QString m = QString("Updating channel icon for chanid: %1")
-                        .arg(chanid);
-                    cout << m << endl;
-                }
+
+                VERBOSE(VB_GENERAL, QString("Updating channel icon for "
+                                            "chanid: %1")
+                                            .arg(chanid));
+
                 MSqlQuery icon_update_query(MSqlQuery::InitCon());
                 icon_update_query.prepare("UPDATE channel SET icon = :ICON "
                         "WHERE chanid = :CHANID AND sourceid = :SOURCEID");
@@ -211,11 +210,10 @@ void IconData::UpdateSourceIcons(int sourceid)
             }
             else
             {
-                cerr << QString(
+                VERBOSE(VB_IMPORTANT, QString(
                         "Error retrieving icon from '%1' to file '%2'")
                         .arg(icon_url)
-                        .arg(localfile.name())
-                     << endl;
+                        .arg(localfile.name()));
             }
         }
     }
@@ -223,12 +221,10 @@ void IconData::UpdateSourceIcons(int sourceid)
 
 void IconData::ImportIconMap(const QString &filename)
 {
-    if (!quiet)
-    {
-        QString msg = QString("Importing icon mapping from %1...")
-                .arg(filename);
-        cout << msg << endl;
-    }
+
+    VERBOSE(VB_GENERAL, QString("Importing icon mapping from %1...")
+                                .arg(filename));
+
     QFile xml_file;
 
     if (dash_open(xml_file, filename, IO_ReadOnly))
@@ -314,40 +310,37 @@ void IconData::ImportIconMap(const QString &filename)
                 }
                 catch (DOMException &e)
                 {
-                    cerr << QString("Error while processing %1: %2")
-                            .arg(node.nodeName())
-                            .arg(e.getMessage())
-                         << endl;
+                    VERBOSE( VB_IMPORTANT, QString("Error while processing "
+                                                   "%1: %2")
+                                                   .arg(node.nodeName())
+                                                   .arg(e.getMessage()));
                 }
                 node = node.nextSibling();
             }
         }
         else
         {
-            cerr << QString(
-                    "Error unable to set document content: %1:%2c%3 %4")
-                    .arg(filename)
-                    .arg(de_ln)
-                    .arg(de_column)
-                    .arg(de_msg)
-                 << endl;
+            VERBOSE(VB_IMPORTANT, QString("Error unable to set document "
+                                          "content: %1:%2c%3 %4")
+                                          .arg(filename)
+                                          .arg(de_ln)
+                                          .arg(de_column)
+                                          .arg(de_msg));
         }
     }
     else
     {
-        cerr << QString("Error unable to open '%1' for reading.")
-                .arg(filename)
-             << endl;
+        VERBOSE(VB_IMPORTANT, QString("Error unable to open '%1' for reading.")
+                .arg(filename));
     }
 }
 
 void IconData::ExportIconMap(const QString &filename)
 {
-    if (!quiet)
-    {
-        cout << QString("Exporting icon mapping to %1...").arg(filename)
-             << endl;
-    }
+
+    VERBOSE(VB_GENERAL, QString("Exporting icon mapping to %1...")
+                                .arg(filename));
+
     QFile xml_file(filename);
     if (dash_open(xml_file, filename, IO_WriteOnly))
     {
@@ -445,7 +438,7 @@ void IconData::ExportIconMap(const QString &filename)
     }
     else
     {
-        cerr << QString("Error unable to open '%1' for writing.") << endl;
+        VERBOSE(VB_IMPORTANT, QString("Error unable to open '%1' for writing."));
     }
 }
 
