@@ -38,11 +38,11 @@
 
     <!-- Theme Details (Required) -->
     <detail>
-        <!-- At least one thumbnail image of the Main Menu must be included
+        <!-- At least one thumbnail image named "preview" must be included
              with the theme.
              There is no limit to the number of thumbnails.
              Each thumbnail must be given a different name -->
-        <thumbnail name="Main Menu">preview.jpg</thumbnail>
+        <thumbnail name="preview">preview.jpg</thumbnail>
 
         <!-- A description of the theme, including general colours and
              style. The description should include any details that
