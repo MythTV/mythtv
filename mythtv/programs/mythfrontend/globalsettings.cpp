@@ -920,7 +920,7 @@ static HostComboBox *OSDCCFont()
     QDir ttf(gContext->GetFontsDir(), gContext->GetFontsNameFilter());
     gc->fillSelectionsFromDir(ttf, false);
     gc->setHelpText(QObject::tr("Closed Caption font"));
-    gc->setValue("FreeSans.ttf");
+    gc->setValue("FreeMono.ttf");
 
     return gc;
 }
