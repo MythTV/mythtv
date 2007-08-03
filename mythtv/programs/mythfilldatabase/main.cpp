@@ -231,6 +231,15 @@ int main(int argc, char *argv[])
                 return GENERIC_EXIT_INVALID_CMDLINE;
             }
         }
+#if 0
+        else if (!strcmp(a.argv()[argpos], "--dd-grab-all"))
+        {
+            fill_data.dd_grab_all = true;
+            fill_data.refresh_today = false;
+            fill_data.refresh_tomorrow = false;
+            fill_data.refresh_second = false;
+        }
+#endif
         else if (!strcmp(a.argv()[argpos], "--quiet"))
         {
             fill_data.SetQuiet(true);
@@ -402,6 +411,11 @@ int main(int argc, char *argv[])
             cout << "-v or --verbose debug-level\n";
             cout << "   Use '-v help' for level info\n";
             cout << "\n";
+
+#if 0
+            cout << "--dd-grab-all\n";
+            cout << "   The DataDirect grabber will grab all available data\n";
+#endif
             cout << "--help\n";
             cout << "   This text\n";
             cout << "\n";
