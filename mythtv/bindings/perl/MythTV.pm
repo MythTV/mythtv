@@ -157,11 +157,6 @@ package MythTV;
     sub new {
         my $class = shift;
         my $self  = {
-                     'db_host'     => $mysql_conf{'db_host'},
-                     'db_user'     => $mysql_conf{'db_user'},
-                     'db_pass'     => $mysql_conf{'db_pass'},
-                     'db_name'     => $mysql_conf{'db_name'},
-                     'hostname'    => $mysql_conf{'hostname'},
                      'master_host' => undef,
                      'master_port' => undef,
                      'dbh'         => undef,
@@ -172,27 +167,27 @@ package MythTV;
                      'recorded'    => [],
 
                     # The following options can be overridden via $opts
+                     'db_host'     => $mysql_conf{'db_host'},
+                     'db_user'     => $mysql_conf{'db_user'},
+                     'db_pass'     => $mysql_conf{'db_pass'},
+                     'db_name'     => $mysql_conf{'db_name'},
+                     'hostname'    => $mysql_conf{'hostname'},
                      'connect'     => 1,
 
                     };
         bless($self, $class);
 
-    # Options?
-        my $opts = shift;
-        if (ref $opts eq 'HASH') {
-            if (defined $opts->{'connect'}) {
-                $self->{'connect'} = $opts->{'connect'};
-            }
-        }
-
     # Passed-in parameters to override
         my $params = shift;
-        if (ref $params) {
+        if (ref $params eq 'HASH') {
             $self->{'db_host'}  = $params->{'db_host'}  if ($params->{'db_host'});
             $self->{'db_user'}  = $params->{'db_user'}  if ($params->{'db_user'});
             $self->{'db_pass'}  = $params->{'db_pass'}  if ($params->{'db_pass'});
             $self->{'db_name'}  = $params->{'db_name'}  if ($params->{'db_name'});
             $self->{'hostname'} = $params->{'hostname'} if ($params->{'hostname'});
+            if (defined $opts->{'connect'}) {
+                $self->{'connect'} = $opts->{'connect'};
+            }
         }
 
     # No db config?
