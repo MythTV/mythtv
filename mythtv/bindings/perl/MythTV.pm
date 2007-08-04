@@ -185,8 +185,8 @@ package MythTV;
             $self->{'db_pass'}  = $params->{'db_pass'}  if ($params->{'db_pass'});
             $self->{'db_name'}  = $params->{'db_name'}  if ($params->{'db_name'});
             $self->{'hostname'} = $params->{'hostname'} if ($params->{'hostname'});
-            if (defined $opts->{'connect'}) {
-                $self->{'connect'} = $opts->{'connect'};
+            if (defined $params->{'connect'}) {
+                $self->{'connect'} = $params->{'connect'};
             }
         }
 
