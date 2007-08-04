@@ -171,8 +171,19 @@ package MythTV;
                      'scheduled'   => [],
                      'recorded'    => [],
 
+                    # The following options can be overridden via $opts
+                     'connect'     => 1,
+
                     };
         bless($self, $class);
+
+    # Options?
+        my $opts = shift;
+        if (ref $opts eq 'HASH') {
+            if (defined $opts->{'connect'}) {
+                $self->{'connect'} = $opts->{'connect'};
+            }
+        }
 
     # Passed-in parameters to override
         my $params = shift;
@@ -205,19 +216,24 @@ package MythTV;
                ."You may need to check your settings.php file or re-run mythtv-setup.\n";
         }
 
-    # Connect to the backend
-        if ($self->backend_command('ANN Monitor '.$self->{'hostname'}.' 0') ne 'OK') {
-            die "Unable to connect to mythbackend, is it running?\n";
-        }
+    # Cache the database handle
+        $MythTV::last = $self;
+
+    # Connect to the backend?
+        $self->connect() if ($self->{'connect'});
 
     # Find the directory where the recordings are located
         $self->{'video_dirs'} = $self->get_recording_dirs();
 
-    # Cache the database handle
-        $MythTV::last = $self;
-
     # Return
         return $self;
+    }
+
+# Connect to the running backend
+    sub connect {
+        if ($self->backend_command('ANN Monitor '.$self->{'hostname'}.' 0') ne 'OK') {
+            die "Unable to connect to mythbackend, is it running?\n";
+        }
     }
 
 # Get a setting from the database
