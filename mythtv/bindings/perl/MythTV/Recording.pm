@@ -307,7 +307,7 @@ package MythTV::Recording;
     # Set the is_mpeg flag
         $info{'is_mpeg'} = 1;
     # Grab the info we want from mplayer (go uber-verbose to override --really-quiet)
-        my $data = `$program -v -v -v -v -nolirc -nojoystick -vo null -ao null -frames 0 -identify '$file' 2>/dev/null`;
+        my $data = `$program -v -v -v -v -nolirc -nojoystick -vo null -ao null -frames 1 -identify '$file' 2>/dev/null`;
         study $data;
         ($info{'video_type'})            = $data =~ m/^VIDEO:\s*(MPEG[12])/m;
         ($info{'width'})                 = $data =~ m/^ID_VIDEO_WIDTH=0*([1-9]\d*)/m;
