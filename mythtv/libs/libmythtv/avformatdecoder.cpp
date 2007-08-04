@@ -2748,8 +2748,6 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
                     RemoveAudioStreams();
                     storevideoframes = false;
                     dvdTitleChanged = false;
-                    if (ringBuffer->DVD()->InStillFrame())
-                        ringBuffer->DVD()->SeekCellStart();
                 }
                 else
                     storevideoframes = true;
