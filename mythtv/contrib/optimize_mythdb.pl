@@ -15,7 +15,7 @@
     use MythTV;
 
 # Connect to mythbackend
-    my $Myth = new MythTV();
+    my $Myth = new MythTV({'connect' => 0});
 
 # Connect to the database
     $dbh = $Myth->{'dbh'};
