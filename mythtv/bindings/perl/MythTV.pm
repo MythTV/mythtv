@@ -226,6 +226,7 @@ package MythTV;
 
 # Connect to the running backend
     sub connect {
+        my $self = shift;
         if ($self->backend_command('ANN Monitor '.$self->{'hostname'}.' 0') ne 'OK') {
             die "Unable to connect to mythbackend, is it running?\n";
         }
