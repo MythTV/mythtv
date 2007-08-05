@@ -171,7 +171,7 @@ sub getMovieData {
    }
 
    # parse user rating
-   my $userrating = parseBetween($response, ">User Rating:</b>", "> (");
+   my $userrating = parseBetween($response, ">User Rating:</b>", "</b>");
    $userrating = parseBetween($userrating, "<b>", "/");
 
    # parse MPAA rating
