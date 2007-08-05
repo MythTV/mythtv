@@ -1273,9 +1273,6 @@ void VideoManager::pageUp()
 
 void VideoManager::videoMenu()
 {
-    if (!curitem)
-        return;
-
     popup = new MythPopupBox(gContext->GetMainWindow(), "video popup");
 
     expectingPopup = true;
