@@ -369,7 +369,10 @@ int main(int argc, char *argv[])
             cout << "   for DVB and HDTV sources that use DataDirect.\n";
             cout << "\n";
             cout << "--graboptions <\"options\">\n";
-            cout << "   Pass options to grabber\n";
+            cout << "   Pass options to grabber. Do NOT use unless you know\n";
+            cout << "   what you are doing. Mythfilldatabase will\n";
+            cout << "   automatically use the correct options for xmltv\n";
+            cout << "   compliant grabbers.\n";
             cout << "\n";
             cout << "--sourceid <number>\n";
             cout << "   Only refresh data for sourceid given\n";

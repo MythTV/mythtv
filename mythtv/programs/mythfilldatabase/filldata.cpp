@@ -289,6 +289,14 @@ bool FillData::grabData(Source source, int offset, QDate *qCurrentDate)
     if (! (print_verbose_messages & VB_XMLTV))
         command += " --quiet";
 
+    // Append additional arguments passed to mythfilldatabase
+    // using --graboptions
+    if (!graboptions.isEmpty())
+    {
+        command += graboptions;
+        VERBOSE(VB_XMLTV, QString("Using graboptions: %1").arg(graboptions));
+    }
+
     QDateTime qdtNow = QDateTime::currentDateTime();
     MSqlQuery query(MSqlQuery::InitCon());
     QString status = "currently running.";
