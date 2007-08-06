@@ -106,6 +106,13 @@
    </button>
 
    <button>
+     <type>STREAM</type>
+     <text>Play online streams</text>
+     <action>PLUGIN mythtream/action>
+     <depends>mythstream</depends>
+   </button>
+
+   <button>
      <type>IMAGES</type>
      <text>Image Gallery</text>
      <text lang="IT">Immagini</text>

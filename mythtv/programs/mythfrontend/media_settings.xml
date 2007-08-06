@@ -117,6 +117,13 @@
    </button>
    
    <button>
+     <type>SETTINGS_STREAM</type>
+     <text>MythStream Settings</text>
+     <action>CONFIGPLUGIN mythstream</action>
+     <depends>mythstream</depends>
+   </button>
+
+   <button>
       <type>SETTINGS_BURN</type>
       <text>Burn DVD Settings</text>
       <text lang="FI">DVD:n Polttoasetukset</text>
