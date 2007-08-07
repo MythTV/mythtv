@@ -31,7 +31,7 @@
 #******************************************************************************
 
 # version of script - change after each update
-VERSION="0.1.20070731-1"
+VERSION="0.1.20070805-1"
 
 
 ##You can use this debug flag when testing out new themes
@@ -52,7 +52,7 @@ useSyncOffset = False
 #*********************************************************************************
 import os, string, socket, sys, getopt, traceback, signal
 import xml.dom.minidom
-import Image, ImageDraw, ImageFont
+import Image, ImageDraw, ImageFont, ImageColor
 import MySQLdb, codecs
 import time, datetime, tempfile
 from fcntl import ioctl
@@ -928,13 +928,155 @@ def intelliDraw(drawer, text, font, containerWidth):
     return lines
 
 #############################################################
+# Paints a background rectangle onto an image
+
+def paintBackground(image, node):
+    if node.hasAttribute("bgcolor"):
+        bgcolor = node.attributes["bgcolor"].value
+        x = getScaledAttribute(node, "x")
+        y = getScaledAttribute(node, "y")
+        w = getScaledAttribute(node, "w")
+        h = getScaledAttribute(node, "h")
+        r,g,b = ImageColor.getrgb(bgcolor)
+
+        if node.hasAttribute("bgalpha"):
+            a = int(node.attributes["bgalpha"].value)
+        else:
+            a = 255
+
+        image.paste((r, g, b, a), (x, y, x + w, y + h))
+
+
+#############################################################
+# Paints a button onto an image
+
+def paintButton(draw, bgimage, bgimagemask, node, infoDOM, itemnum, page,
+                itemsonthispage, chapternumber, chapterlist):
+
+    imagefilename = getThemeFile(themeName, node.attributes["filename"].value)
+    if not doesFileExist(imagefilename):
+        fatalError("Cannot find image for menu button (%s)." % imagefilename)
+    maskimagefilename = getThemeFile(themeName, node.attributes["mask"].value)
+    if not doesFileExist(maskimagefilename):
+        fatalError("Cannot find mask image for menu button (%s)." % maskimagefilename)
+
+    picture = Image.open(imagefilename,"r").resize(
+              (getScaledAttribute(node, "w"), getScaledAttribute(node, "h")))
+    picture = picture.convert("RGBA")
+    bgimage.paste(picture, (getScaledAttribute(node, "x"),
+                  getScaledAttribute(node, "y")), picture)
+    del picture
+
+    # if we have some text paint that over the image
+    textnode = node.getElementsByTagName("textnormal")
+    if textnode.length > 0:
+        textnode = textnode[0]
+        text = expandItemText(infoDOM,textnode.attributes["value"].value,
+                              itemnum, page, itemsonthispage,
+                              chapternumber,chapterlist)
+
+        if text > "":
+            paintText(draw, bgimage, text, textnode)
+
+        del text
+
+    write( "Added button image %s" % imagefilename)
+
+    picture = Image.open(maskimagefilename,"r").resize(
+              (getScaledAttribute(node, "w"), getScaledAttribute(node, "h")))
+    picture = picture.convert("RGBA")
+    bgimagemask.paste(picture, (getScaledAttribute(node, "x"),
+                      getScaledAttribute(node, "y")),picture)
+    #del picture
+
+    # if we have some text paint that over the image
+    textnode = node.getElementsByTagName("textselected")
+    if textnode.length > 0:
+        textnode = textnode[0]
+        text = expandItemText(infoDOM, textnode.attributes["value"].value,
+                              itemnum, page, itemsonthispage,
+                              chapternumber, chapterlist)
+        textImage = Image.new("RGBA",picture.size)
+        textDraw = ImageDraw.Draw(textImage)
+
+        if text > "":
+            paintText(textDraw, textImage, text, textnode, "white",
+                      getScaledAttribute(node, "x") - getScaledAttribute(textnode, "x"),
+                      getScaledAttribute(node, "y") - getScaledAttribute(textnode, "y"),
+                      getScaledAttribute(textnode, "w"),
+                      getScaledAttribute(textnode, "h"))
+
+        #convert the RGB image to a 1 bit image
+        (width, height) = textImage.size
+        for y in range(height):
+            for x in range(width):
+                if textImage.getpixel((x,y)) < (100, 100, 100, 255):
+                    textImage.putpixel((x,y), (0, 0, 0, 0))
+                else:
+                    textImage.putpixel((x,y), (255, 255, 255, 255))
+
+        if textnode.hasAttribute("colour"):
+            color = textnode.attributes["colour"].value
+        elif textnode.hasAttribute("color"):
+            color = textnode.attributes["color"].value
+        else:
+            color = "white"
+
+        bgimagemask.paste(color,
+                         (getScaledAttribute(textnode, "x"),
+                          getScaledAttribute(textnode, "y")),
+                          textImage)
+
+        del text, textImage, textDraw
+    del picture
+
+#############################################################
 # Paint some theme text on to an image
 
-def paintText(draw, image, x, y, width, height, text, font, color, alignment):
+def paintText(draw, image, text, node, color = None, 
+              x = None, y = None, width = None, height = None):
     """Takes a piece of text and draws it onto an image inside a bounding box."""
     #The text is wider than the width of the bounding box
 
-    lines = intelliDraw(draw, text, font, width)
+    if x == None:
+        x = getScaledAttribute(node, "x") 
+        y = getScaledAttribute(node, "y")
+        width = getScaledAttribute(node, "w")
+        height = getScaledAttribute(node, "h")
+
+    font = themeFonts[node.attributes["font"].value]
+
+    if color == None:
+        if node.hasAttribute("colour"):
+            color = node.attributes["colour"].value
+        elif node.hasAttribute("color"):
+            color = node.attributes["color"].value
+        else:
+            color = None
+
+    if node.hasAttribute("halign"):
+        halign = node.attributes["halign"].value
+    elif node.hasAttribute("align"):
+        halign = node.attributes["align"].value
+    else:
+        halign = "left"
+
+    if node.hasAttribute("valign"):
+        valign = node.attributes["valign"].value
+    else:
+        valign = "top"
+
+    if node.hasAttribute("vindent"):
+        vindent = int(node.attributes["vindent"].value)
+    else:
+        vindent = 0
+
+    if node.hasAttribute("hindent"):
+        hindent = int(node.attributes["hindent"].value)
+    else:
+        hindent = 0
+
+    lines = intelliDraw(draw, text, font, width - (hindent * 2))
     j = 0
 
     # work out what the line spacing should be
@@ -942,23 +1084,109 @@ def paintText(draw, image, x, y, width, height, text, font, color, alignment):
     h = int(textImage.size[1] * 1.1)
 
     for i in lines:
-        if (j * h) < (height - h):
+        if (j * h) < (height - (vindent * 2) - h):
             textImage = font.drawText(i, color)
             write( "Wrapped text  = " + i.encode("ascii", "replace"), False)
 
-            if alignment == "left":
-                indent = 0
-            elif  alignment=="center" or alignment=="centre":
-                indent = (width / 2) - (textImage.size[0] / 2)
-            elif  alignment == "right":
-                indent = width - textImage.size[0]
+            if halign == "left":
+                xoffset = hindent
+            elif  halign == "center" or halign == "centre":
+                xoffset = (width / 2) - (textImage.size[0] / 2)
+            elif  halign == "right":
+                xoffset = width - textImage.size[0] - hindent
             else:
-                indent=0
-            image.paste(textImage, (x + indent,y + j * h))
+                xoffset = hindent
+
+            if valign == "top":
+                yoffset = vindent
+            elif  valign == "center" or halign == "centre":
+                yoffset = (height / 2) - (textImage.size[1] / 2)
+            elif  valign == "bottom":
+                yoffset = height - textImage.size[1] - vindent
+            else:
+                yoffset = vindent
+
+            image.paste(textImage, (x + xoffset,y + yoffset + j * h), textImage)
         else:
             write( "Truncated text = " + i.encode("ascii", "replace"), False)
         #Move to next line
         j = j + 1
+
+#############################################################
+# Paint an image on the background image
+
+def paintImage(filename, maskfilename, imageDom, destimage, stretch=True):
+    """Paste the image specified in the filename into the specified image"""
+
+    if not doesFileExist(filename):
+        write("Image file (%s) does not exist" % filename)
+        return False
+
+    picture = Image.open(filename, "r")
+    xpos = getScaledAttribute(imageDom, "x")
+    ypos = getScaledAttribute(imageDom, "y")
+    w = getScaledAttribute(imageDom, "w")
+    h = getScaledAttribute(imageDom, "h")
+    (imgw, imgh) = picture.size
+    write("Image (%s, %s) into space of (%s, %s) at (%s, %s)" % (imgw, imgh, w, h, xpos, ypos), False)
+
+    # the theme can override the default stretch behaviour 
+    if imageDom.hasAttribute("stretch"): 
+        if imageDom.attributes["stretch"].value == "True":
+            stretch = True
+        else:
+            stretch = False
+
+    if stretch == True:
+        imgw = w;
+        imgh = h;
+    else:
+        if float(w)/imgw < float(h)/imgh:
+            # Width is the constraining dimension
+            imgh = imgh*w/imgw
+            imgw = w
+            if imageDom.hasAttribute("valign"):
+                valign = imageDom.attributes["valign"].value
+            else:
+                valign = "center"
+
+            if valign == "bottom":
+                ypos += h - imgh
+            if valign == "center":
+                ypos += (h - imgh)/2
+        else:
+            # Height is the constraining dimension
+            imgw = imgw*h/imgh
+            imgh = h
+            if imageDom.hasAttribute("halign"):
+                halign = imageDom.attributes["halign"].value
+            else:
+                halign = "center"
+
+            if halign == "right":
+                xpos += w - imgw
+            if halign == "center":
+                xpos += (w - imgw)/2
+
+    write("Image resized to (%s, %s) at (%s, %s)" % (imgw, imgh, xpos, ypos), False)
+    picture = picture.resize((imgw, imgh))
+    picture = picture.convert("RGBA")
+
+    if maskfilename <> None and doesFileExist(maskfilename):
+        maskpicture = Image.open(maskfilename, "r").resize((imgw, imgh))
+        maskpicture = maskpicture.convert("RGBA")
+    else:
+        maskpicture = picture
+
+    destimage.paste(picture, (xpos, ypos), maskpicture)
+    del picture
+    if maskfilename <> None and doesFileExist(maskfilename):
+        del maskpicture
+
+    write ("Added image %s" % filename)
+
+    return True
+
 
 #############################################################
 # Check if boundary box need adjusting
@@ -991,7 +1219,7 @@ def loadFonts(themeDOM):
     global themeFonts
 
     #Find all the fonts
-    nodelistfonts=themeDOM.getElementsByTagName("font")
+    nodelistfonts = themeDOM.getElementsByTagName("font")
 
     fontnumber = 0
     for node in nodelistfonts:
@@ -2674,15 +2902,20 @@ def generateVideoPreview(videoitem, itemonthispage, menuitem, starttime, menulen
 def drawThemeItem(page, itemsonthispage, itemnum, menuitem, bgimage, draw,
                   bgimagemask, drawmask, highlightcolor, spumuxdom, spunode,
                   numberofitems, chapternumber, chapterlist):
-    """Draws text and graphics onto a dvd menu, called by createMenu and createChapterMenu"""
+    """Draws text and graphics onto a dvd menu, called by 
+       createMenu and createChapterMenu"""
+
     #Get the XML containing information about this item
-    infoDOM = xml.dom.minidom.parse( os.path.join(getItemTempPath(itemnum),"info.xml") )
+    infoDOM = xml.dom.minidom.parse(os.path.join(getItemTempPath(itemnum), "info.xml"))
+
     #Error out if its the wrong XML
     if infoDOM.documentElement.tagName != "fileinfo":
-        fatalError("The info.xml file (%s) doesn't look right" % os.path.join(getItemTempPath(itemnum),"info.xml"))
+        fatalError("The info.xml file (%s) doesn't look right" %
+                    os.path.join(getItemTempPath(itemnum),"info.xml"))
 
-    #boundarybox holds the max and min dimensions for this item so we can auto build a menu highlight box
-    boundarybox=9999,9999,0,0
+    #boundarybox holds the max and min dimensions for this item 
+    #so we can auto build a menu highlight box
+    boundarybox = 9999,9999,0,0
     wantHighlightBox = True
 
     #Loop through all the nodes inside this menu item
@@ -2692,273 +2925,162 @@ def drawThemeItem(page, itemsonthispage, itemnum, menuitem, bgimage, draw,
         if node.nodeName=="graphic":
             #Overlay graphic image onto background
 
-            #if this graphic item is a movie thumbnail then we dont process it here
+            # draw background if required
+            paintBackground(bgimage, node)
+
+            # if this graphic item is a movie thumbnail then we dont process it here
             if node.attributes["filename"].value == "%movie":
-                #this is a movie item but we must still update the boundary box
-                boundarybox=checkBoundaryBox(boundarybox, node)
+                # this is a movie item but we must still update the boundary box
+                boundarybox = checkBoundaryBox(boundarybox, node)
             else:
-                imagefilename = expandItemText(infoDOM,node.attributes["filename"].value, itemnum, page, itemsonthispage, chapternumber, chapterlist)
+                imagefilename = expandItemText(infoDOM,
+                                               node.attributes["filename"].value,
+                                               itemnum, page, itemsonthispage,
+                                               chapternumber, chapterlist)
 
                 if doesFileExist(imagefilename) == False:
                     if imagefilename == node.attributes["filename"].value:
-                        imagefilename = getThemeFile(themeName, node.attributes["filename"].value)
-                if doesFileExist(imagefilename):
-                    picture = Image.open(imagefilename,"r").resize((getScaledAttribute(node, "w"), getScaledAttribute(node, "h")))
-                    picture = picture.convert("RGBA")
+                        imagefilename = getThemeFile(themeName,
+                                        node.attributes["filename"].value)
 
-                    #see if an image mask exists
-                    imagemaskfilename = None
-                    if node.hasAttribute("mask"):
-                        if node.attribute["mask"].value <> "":
-                            imagemaskfilename = getThemeFile(themeName, node.attributes["mask"].value)
-                    if imagemaskfilename <> None and doesFileExist(imagemaskfilename):
-                        maskpicture = Image.open(imagemaskfilename,"r").resize((getScaledAttribute(node, "w"), getScaledAttribute(node, "h")))
-                        maskpicture = maskpicture.convert("RGBA")
-                        bgimage.paste(picture, (getScaledAttribute(node, "x"), getScaledAttribute(node, "y")), maskpicture)
-                        del maskpicture
-                    else:
-                        bgimage.paste(picture, (getScaledAttribute(node, "x"), getScaledAttribute(node, "y")), picture)
-                    del picture
-                    write( "Added image %s" % imagefilename)
+                # see if an image mask exists
+                maskfilename = None
+                if node.hasAttribute("mask") and node.attributes["mask"].value <> "":
+                    maskfilename = getThemeFile(themeName, node.attributes["mask"].value)
 
-                    boundarybox=checkBoundaryBox(boundarybox, node)
+                # if this is a thumb image and is a MythVideo coverart image then preserve 
+                # its aspect ratio unless overriden later by the theme
+                if (node.attributes["filename"].value == "%thumbnail"
+                  and getText(infoDOM.getElementsByTagName("coverfile")[0]) !=""):
+                    stretch = False
                 else:
-                    write( "Image file does not exist '%s'" % imagefilename)
+                    stretch = True
 
-        elif node.nodeName=="text":
-            #Apply some text to the background, including wordwrap if required.
-            text=expandItemText(infoDOM,node.attributes["value"].value, itemnum, page, itemsonthispage,chapternumber,chapterlist)
+                if paintImage(imagefilename, maskfilename, node, bgimage, stretch):
+                    boundarybox = checkBoundaryBox(boundarybox, node)
+                else:
+                    write("Image file does not exist '%s'" % imagefilename)
 
-            if node.hasAttribute("colour"):
-                color = node.attributes["colour"].value
-            elif node.hasAttribute("color"):
-                color = node.attributes["color"].value
-            else:
-                color = None
+        elif node.nodeName == "text":
+            # Apply some text to the background, including wordwrap if required.
+
+            # draw background if required
+            paintBackground(bgimage, node)
+
+            text = expandItemText(infoDOM,node.attributes["value"].value,
+                                  itemnum, page, itemsonthispage,
+                                  chapternumber, chapterlist)
 
             if text>"":
-                paintText( draw, bgimage,
-                           getScaledAttribute(node, "x"),
-                           getScaledAttribute(node, "y"),
-                           getScaledAttribute(node, "w"),
-                           getScaledAttribute(node, "h"),
-                           text,
-                           themeFonts[node.attributes["font"].value],
-                           color,
-                           node.attributes["align"].value )
-                boundarybox=checkBoundaryBox(boundarybox, node)
+                paintText(draw, bgimage, text, node)
+
+            boundarybox = checkBoundaryBox(boundarybox, node)
             del text
 
         elif node.nodeName=="previous":
             if page>1:
                 #Overlay previous graphic button onto background
-                imagefilename = getThemeFile(themeName, node.attributes["filename"].value)
-                if not doesFileExist(imagefilename):
-                    fatalError("Cannot find image for previous button (%s)." % imagefilename)
-                maskimagefilename = getThemeFile(themeName, node.attributes["mask"].value)
-                if not doesFileExist(maskimagefilename):
-                    fatalError("Cannot find mask image for previous button (%s)." % maskimagefilename)
 
-                picture=Image.open(imagefilename,"r").resize((getScaledAttribute(node, "w"), getScaledAttribute(node, "h")))
-                picture=picture.convert("RGBA")
-                bgimage.paste(picture, (getScaledAttribute(node, "x"), getScaledAttribute(node, "y")), picture)
-                del picture
-                write( "Added previous button image %s" % imagefilename)
+                # draw background if required
+                paintBackground(bgimage, node)
 
-                picture=Image.open(maskimagefilename,"r").resize((getScaledAttribute(node, "w"), getScaledAttribute(node, "h")))
-                picture=picture.convert("RGBA")
-                bgimagemask.paste(picture, (getScaledAttribute(node, "x"), getScaledAttribute(node, "y")), picture)
-                del picture
-                write( "Added previous button mask image %s" % imagefilename)
+                paintButton(draw, bgimage, bgimagemask, node, infoDOM,
+                            itemnum, page, itemsonthispage, chapternumber,
+                            chapterlist)
 
                 button = spumuxdom.createElement("button")
                 button.setAttribute("name","previous")
                 button.setAttribute("x0","%s" % getScaledAttribute(node, "x"))
                 button.setAttribute("y0","%s" % getScaledAttribute(node, "y"))
-                button.setAttribute("x1","%s" % (getScaledAttribute(node, "x") + getScaledAttribute(node, "w")))
-                button.setAttribute("y1","%s" % (getScaledAttribute(node, "y") + getScaledAttribute(node, "h")))
+                button.setAttribute("x1","%s" % (getScaledAttribute(node, "x") + 
+                                                getScaledAttribute(node, "w")))
+                button.setAttribute("y1","%s" % (getScaledAttribute(node, "y") +
+                                                getScaledAttribute(node, "h")))
                 spunode.appendChild(button)
 
+                write( "Added previous page button")
 
-        elif node.nodeName=="next":
+
+        elif node.nodeName == "next":
             if itemnum < numberofitems:
                 #Overlay next graphic button onto background
-                imagefilename = getThemeFile(themeName, node.attributes["filename"].value)
-                if not doesFileExist(imagefilename):
-                    fatalError("Cannot find image for next button (%s)." % imagefilename)
-                maskimagefilename = getThemeFile(themeName, node.attributes["mask"].value)
-                if not doesFileExist(maskimagefilename):
-                    fatalError("Cannot find mask image for next button (%s)." % maskimagefilename)
 
-                picture = Image.open(imagefilename,"r").resize((getScaledAttribute(node, "w"), getScaledAttribute(node, "h")))
-                picture = picture.convert("RGBA")
-                bgimage.paste(picture, (getScaledAttribute(node, "x"), getScaledAttribute(node, "y")), picture)
-                del picture
-                write( "Added next button image %s " % imagefilename)
+                # draw background if required
+                paintBackground(bgimage, node)
 
-                picture=Image.open(maskimagefilename,"r").resize((getScaledAttribute(node, "w"), getScaledAttribute(node, "h")))
-                picture=picture.convert("RGBA")
-                bgimagemask.paste(picture, (getScaledAttribute(node, "x"), getScaledAttribute(node, "y")), picture)
-                del picture
-                write( "Added next button mask image %s" % imagefilename)
+                paintButton(draw, bgimage, bgimagemask, node, infoDOM,
+                            itemnum, page, itemsonthispage, chapternumber,
+                            chapterlist)
 
                 button = spumuxdom.createElement("button")
                 button.setAttribute("name","next")
                 button.setAttribute("x0","%s" % getScaledAttribute(node, "x"))
                 button.setAttribute("y0","%s" % getScaledAttribute(node, "y"))
-                button.setAttribute("x1","%s" % (getScaledAttribute(node, "x") + getScaledAttribute(node, "w")))
-                button.setAttribute("y1","%s" % (getScaledAttribute(node, "y") + getScaledAttribute(node, "h")))
+                button.setAttribute("x1","%s" % (getScaledAttribute(node, "x") + 
+                                                 getScaledAttribute(node, "w")))
+                button.setAttribute("y1","%s" % (getScaledAttribute(node, "y") + 
+                                                 getScaledAttribute(node, "h")))
                 spunode.appendChild(button)
 
+                write("Added next page button")
+
         elif node.nodeName=="playall":
-           #Overlay playall graphic button onto background
-           imagefilename = getThemeFile(themeName, node.attributes["filename"].value)
-           if not doesFileExist(imagefilename):
-               fatalError("Cannot find image for playall button (%s)." % imagefilename)
-           maskimagefilename = getThemeFile(themeName, node.attributes["mask"].value)
-           if not doesFileExist(maskimagefilename):
-               fatalError("Cannot find mask image for playall button (%s)." % maskimagefilename)
+            #Overlay playall graphic button onto background
 
-           picture = Image.open(imagefilename,"r").resize((getScaledAttribute(node, "w"), getScaledAttribute(node, "h")))
-           picture = picture.convert("RGBA")
-           bgimage.paste(picture, (getScaledAttribute(node, "x"), getScaledAttribute(node, "y")), picture)
-           del picture
-           write( "Added playall button image %s " % imagefilename)
+            # draw background if required
+            paintBackground(bgimage, node)
 
-           picture=Image.open(maskimagefilename,"r").resize((getScaledAttribute(node, "w"), getScaledAttribute(node, "h")))
-           picture=picture.convert("RGBA")
-           bgimagemask.paste(picture, (getScaledAttribute(node, "x"), getScaledAttribute(node, "y")), picture)
-           del picture
-           write( "Added playall button mask image %s" % imagefilename)
+            paintButton(draw, bgimage, bgimagemask, node, infoDOM, itemnum, page,
+                        itemsonthispage, chapternumber, chapterlist)
 
-           button = spumuxdom.createElement("button")
-           button.setAttribute("name","playall")
-           button.setAttribute("x0","%s" % getScaledAttribute(node, "x"))
-           button.setAttribute("y0","%s" % getScaledAttribute(node, "y"))
-           button.setAttribute("x1","%s" % (getScaledAttribute(node, "x") + getScaledAttribute(node, "w")))
-           button.setAttribute("y1","%s" % (getScaledAttribute(node, "y") + getScaledAttribute(node, "h")))
-           spunode.appendChild(button)
+            button = spumuxdom.createElement("button")
+            button.setAttribute("name","playall")
+            button.setAttribute("x0","%s" % getScaledAttribute(node, "x"))
+            button.setAttribute("y0","%s" % getScaledAttribute(node, "y"))
+            button.setAttribute("x1","%s" % (getScaledAttribute(node, "x") + 
+                                             getScaledAttribute(node, "w")))
+            button.setAttribute("y1","%s" % (getScaledAttribute(node, "y") +
+                                             getScaledAttribute(node, "h")))
+            spunode.appendChild(button)
 
-        elif node.nodeName=="titlemenu":
+            write("Added playall button")
+
+        elif node.nodeName == "titlemenu":
             if itemnum < numberofitems:
                 #Overlay next graphic button onto background
-                imagefilename = getThemeFile(themeName, node.attributes["filename"].value)
-                if not doesFileExist(imagefilename):
-                    fatalError("Cannot find image for titlemenu button (%s)." % imagefilename)
-                maskimagefilename = getThemeFile(themeName, node.attributes["mask"].value)
-                if not doesFileExist(maskimagefilename):
-                    fatalError("Cannot find mask image for titlemenu button (%s)." % maskimagefilename)
 
-                picture = Image.open(imagefilename,"r").resize((getScaledAttribute(node, "w"), getScaledAttribute(node, "h")))
-                picture = picture.convert("RGBA")
-                bgimage.paste(picture, (getScaledAttribute(node, "x"), getScaledAttribute(node, "y")), picture)
-                del picture
-                write( "Added titlemenu button image %s " % imagefilename)
+                # draw background if required
+                paintBackground(bgimage, node)
 
-                picture=Image.open(maskimagefilename,"r").resize((getScaledAttribute(node, "w"), getScaledAttribute(node, "h")))
-                picture=picture.convert("RGBA")
-                bgimagemask.paste(picture, (getScaledAttribute(node, "x"), getScaledAttribute(node, "y")), picture)
-                del picture
-                write( "Added titlemenu button mask image %s" % imagefilename)
+                paintButton(draw, bgimage, bgimagemask, node, infoDOM, 
+                            itemnum, page, itemsonthispage, chapternumber, 
+                            chapterlist)
 
                 button = spumuxdom.createElement("button")
                 button.setAttribute("name","titlemenu")
                 button.setAttribute("x0","%s" % getScaledAttribute(node, "x"))
                 button.setAttribute("y0","%s" % getScaledAttribute(node, "y"))
-                button.setAttribute("x1","%s" % (getScaledAttribute(node, "x") + getScaledAttribute(node, "w")))
-                button.setAttribute("y1","%s" % (getScaledAttribute(node, "y") + getScaledAttribute(node, "h")))
+                button.setAttribute("x1","%s" % (getScaledAttribute(node, "x") +
+                                                getScaledAttribute(node, "w")))
+                button.setAttribute("y1","%s" % (getScaledAttribute(node, "y") +
+                                                getScaledAttribute(node, "h")))
                 spunode.appendChild(button)
 
+                write( "Added titlemenu button")
+
         elif node.nodeName=="button":
+            #Overlay item graphic/text button onto background
+
+            # draw background if required
+            paintBackground(bgimage, node)
+
             wantHighlightBox = False
 
-            #Overlay item graphic/text button onto background
-            imagefilename = getThemeFile(themeName, node.attributes["filename"].value)
-            if not doesFileExist(imagefilename):
-                    fatalError("Cannot find image for menu button (%s)." % imagefilename)
-            maskimagefilename = getThemeFile(themeName, node.attributes["mask"].value)
-            if not doesFileExist(maskimagefilename):
-                    fatalError("Cannot find mask image for menu button (%s)." % maskimagefilename)
+            paintButton(draw, bgimage, bgimagemask, node, infoDOM, itemnum, page,
+                        itemsonthispage, chapternumber, chapterlist)
 
-            picture=Image.open(imagefilename,"r").resize((getScaledAttribute(node, "w"), getScaledAttribute(node, "h")))
-            picture=picture.convert("RGBA")
-            bgimage.paste(picture, (getScaledAttribute(node, "x"), getScaledAttribute(node, "y")), picture)
-            del picture
+            boundarybox = checkBoundaryBox(boundarybox, node)
 
-            # if we have some text paint that over the image
-            textnode = node.getElementsByTagName("textnormal")
-            if textnode.length > 0:
-                textnode = textnode[0]
-                text=expandItemText(infoDOM,textnode.attributes["value"].value, itemnum, page, itemsonthispage,chapternumber,chapterlist)
-
-                if node.hasAttribute("colour"):
-                    color = node.attributes["colour"].value
-                elif node.hasAttribute("color"):
-                    color = node.attributes["color"].value
-                else:
-                    color = None
-
-                if text > "":
-                    paintText( draw, bgimage,
-                           getScaledAttribute(textnode, "x"),
-                           getScaledAttribute(textnode, "y"),
-                           getScaledAttribute(textnode, "w"),
-                           getScaledAttribute(textnode, "h"),
-                           text,
-                           themeFonts[textnode.attributes["font"].value],
-                           color,
-                           textnode.attributes["align"].value )
-                boundarybox=checkBoundaryBox(boundarybox, node)
-                del text
-
-            write( "Added button image %s" % imagefilename)
-
-            picture=Image.open(maskimagefilename,"r").resize((getScaledAttribute(node, "w"), getScaledAttribute(node, "h")))
-            picture=picture.convert("RGBA")
-            bgimagemask.paste(picture, (getScaledAttribute(node, "x"), getScaledAttribute(node, "y")),picture)
-            #del picture
-
-            # if we have some text paint that over the image
-            textnode = node.getElementsByTagName("textselected")
-            if textnode.length > 0:
-                textnode = textnode[0]
-                text = expandItemText(infoDOM,textnode.attributes["value"].value, itemnum, page, itemsonthispage,chapternumber,chapterlist)
-                textImage = Image.new("RGBA",picture.size)
-                textDraw = ImageDraw.Draw(textImage)
-
-                if text > "":
-                    paintText(textDraw, textImage,
-                           getScaledAttribute(node, "x") - getScaledAttribute(textnode, "x"),
-                           getScaledAttribute(node, "y") - getScaledAttribute(textnode, "y"),
-                           getScaledAttribute(textnode, "w"),
-                           getScaledAttribute(textnode, "h"),
-                           text,
-                           themeFonts[textnode.attributes["font"].value],
-                           "white",
-                           textnode.attributes["align"].value )
-                #convert the RGB image to a 1 bit image
-                (width, height) = textImage.size
-                for y in range(height):
-                    for x in range(width):
-                        if textImage.getpixel((x,y)) < (100, 100, 100, 255):
-                            textImage.putpixel((x,y), (0, 0, 0, 0))
-                        else:
-                            textImage.putpixel((x,y), (255, 255, 255, 255))
-
-                if textnode.hasAttribute("colour"):
-                    color = textnode.attributes["colour"].value
-                elif textnode.hasAttribute("color"):
-                    color = textnode.attributes["color"].value
-                else:
-                    color = "white"
-
-                bgimagemask.paste(color,
-                            (getScaledAttribute(textnode, "x"), getScaledAttribute(textnode, "y")), 
-                            textImage)
-                boundarybox=checkBoundaryBox(boundarybox, node)
-
-                del text, textImage, textDraw
-            del picture
 
         elif node.nodeName=="#text" or node.nodeName=="#comment":
             #Do nothing
@@ -2969,8 +3091,7 @@ def drawThemeItem(page, itemsonthispage, itemnum, menuitem, bgimage, draw,
     if drawmask == None:
         return
 
-    #Draw the mask for this item
-
+    #Draw the selection mask for this item
     if wantHighlightBox == True:
         # Make the boundary box bigger than the content to avoid over writing it
         boundarybox=boundarybox[0]-1,boundarybox[1]-1,boundarybox[2]+1,boundarybox[3]+1
@@ -2990,7 +3111,7 @@ def drawThemeItem(page, itemsonthispage, itemnum, menuitem, bgimage, draw,
     node.setAttribute("y0","%d" % int(boundarybox[1]))
     node.setAttribute("x1","%d" % int(boundarybox[2] + 1))
     node.setAttribute("y1","%d" % int(boundarybox[3] + 1))
-    spunode.appendChild(node)   
+    spunode.appendChild(node)
 
 #############################################################
 # creates the main menu for a DVD
