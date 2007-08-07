@@ -295,7 +295,7 @@ AvFormatDecoder::AvFormatDecoder(NuppelVideoPlayer *parent,
       disable_passthru(false),
       // DVD
       lastdvdtitle(-1), lastcellstart(0),
-      dvdmenupktseen(false), dvdvideopause(false),
+      dvdmenupktseen(false), indvdstill(false),
       dvd_xvmc_enabled(false), dvd_video_codec_changed(false),
       dvdTitleChanged(false) 
 {
@@ -2049,10 +2049,10 @@ void AvFormatDecoder::MpegPreProcessPkt(AVStream *stream, AVPacket *pkt)
         bufptr = ff_find_start_code(bufptr, bufend, &start_code_state);
         
         if (ringBuffer->isDVD() && pkt->size == 4 &&
-            start_code_state == SEQ_END_CODE && !dvdvideopause)
+            start_code_state == SEQ_END_CODE && !indvdstill)
         {
             ringBuffer->DVD()->InStillFrame(true);
-            dvdvideopause = true;
+            indvdstill = true;
             d->ResetMPEG2();
             if (storedPackets.isEmpty())
                 ringBuffer->DVD()->SeekCellStart();
@@ -2742,8 +2742,8 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
             selectedVideoIndex = 0;
             if (dvdTitleChanged)
             {
-                if ((storedPackets.count() > 10 && !dvdvideopause) ||
-                    dvdvideopause)
+                if ((storedPackets.count() > 10 && !indvdstill) ||
+                    indvdstill)
                 {
                     RemoveAudioStreams();
                     storevideoframes = false;
@@ -2754,7 +2754,7 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
             }
             else
             {
-                if (storedPackets.count() < 2 && !dvdvideopause)
+                if (storedPackets.count() < 2 && !indvdstill)
                     storevideoframes = true;
                 else
                     storevideoframes = false;
@@ -2949,9 +2949,9 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
                 }
             }
 
-            if (len == 4 && dvdvideopause)
+            if (len == 4 && indvdstill)
             {
-                dvdvideopause = false;
+                indvdstill = false;
                 av_free_packet(pkt);
                 continue;
             }
@@ -3181,7 +3181,7 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
                     
                     if (ringBuffer->isDVD() && 
                         ringBuffer->DVD()->InStillFrame() && 
-                        !dvdvideopause)
+                        !indvdstill)
                     {
                         ringBuffer->DVD()->InStillFrame(false);
                     }
@@ -3209,7 +3209,7 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
                     avcodeclock.lock();
                     if (d->HasMPEG2Dec())
                     {
-                        if (dvdvideopause)
+                        if (indvdstill)
                         {
                             int count = 0;
                             // HACK
@@ -3231,7 +3231,7 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
                         ret = avcodec_decode_video(context, &mpa_pic,
                                                    &gotpicture, ptr, len);
                         // Reparse it to not drop the DVD still frame
-                        if (dvdvideopause)
+                        if (indvdstill)
                             ret = avcodec_decode_video(context, &mpa_pic,
                                                         &gotpicture, ptr, len);
                     }
