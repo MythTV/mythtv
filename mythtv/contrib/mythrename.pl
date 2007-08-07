@@ -150,7 +150,7 @@ options:
     \%on  = Original Airdate:  month
     \%om  = Original Airdate:  month, leading zero
     \%oj  = Original Airdate:  day of month
-    \%od  = Original Airdate:  day of month, leading zero#    %f -> full path to the filename
+    \%od  = Original Airdate:  day of month, leading zero
     \%%   = a literal % character
 
     * The program start time is the time from the listings data and is not
