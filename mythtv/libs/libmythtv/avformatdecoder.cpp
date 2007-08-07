@@ -3208,8 +3208,24 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
 
                     avcodeclock.lock();
                     if (d->HasMPEG2Dec())
-                        ret = d->DecodeMPEG2Video(context, &mpa_pic,
+                    {
+                        if (dvdvideopause)
+                        {
+                            int count = 0;
+                            // HACK
+                            while (!gotpicture && count < 5)
+                            {
+                                ret = d->DecodeMPEG2Video(context, &mpa_pic,
                                                   &gotpicture, ptr, len);
+                                count++;
+                            }
+                        }
+                        else
+                        {
+                            ret = d->DecodeMPEG2Video(context, &mpa_pic,
+                                                &gotpicture, ptr, len);
+                        }
+                    }
                     else
                     {
                         ret = avcodec_decode_video(context, &mpa_pic,
