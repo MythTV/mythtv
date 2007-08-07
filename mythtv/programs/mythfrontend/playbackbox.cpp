@@ -1986,7 +1986,10 @@ bool PlaybackBox::FillList(bool useCachedData)
                 }
             }
 
-            // Factor based on the average time shift delay
+            // Factor based on the average time shift delay.
+            // Scale the range down from -100% thru +100% to -50% thru +50% 
+            avgd = avgd / 2 + 50;
+
             if (avgd <= 100)
                 p->recpriority2 = p->recpriority2 * (200 - avgd) / 100;
             else
