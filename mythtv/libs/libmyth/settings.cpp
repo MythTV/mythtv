@@ -866,13 +866,25 @@ void ComboBoxSetting::setVisible(bool b)
 
 void ComboBoxSetting::setValue(QString newValue)
 {
-    if (!rw)
+    bool found = false;
+    for(unsigned i = 0 ; i < values.size() ; ++i)
     {
-        VERBOSE(VB_IMPORTANT, "ComboBoxSetting::setValue(QString): "
-                "BUG: attempted to set value of read-only ComboBox");
+        if (values[i] == newValue) {
+            found = true;
+            break;
+        }
+    }
+
+    if (found || rw)
+        Setting::setValue(newValue);
+    else
+    {
+        VERBOSE(VB_IMPORTANT, QString("ComboBoxSetting::setValue(QString): "
+                "Failed to set value of read-only ComboBox to %1")
+                .arg(newValue));
         return;
     }
-    Setting::setValue(newValue);
+
     if (widget)
         widget->setCurrentItem(current);
 };
