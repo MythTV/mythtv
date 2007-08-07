@@ -1253,7 +1253,7 @@ void Scheduler::RunScheduler(void)
         MythContext::DBError("UpdateAborted", query);
 
     // wait for slaves to connect
-    sleep(2);
+    sleep(3);
 
     Reschedule(-1);
 
