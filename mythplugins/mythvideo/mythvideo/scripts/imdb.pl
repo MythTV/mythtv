@@ -36,8 +36,10 @@ use vars qw($opt_h $opt_r $opt_d $opt_i $opt_v $opt_D $opt_M $opt_P);
 use Getopt::Std; 
 
 $title = "IMDB Query"; 
-$version = "v1.3.1";
+$version = "v1.3.2";
 $author = "Tim Harvey, Andrei Rjeousski";
+
+my @countries = qw(USA UK Canada Japan);
 
 binmode(STDOUT, ":utf8");
 
@@ -185,9 +187,11 @@ sub getMovieData {
    }
 
    # parse movie length
-   my $runtime = trim(parseBetween($response, ">Runtime:</h5>", " min"));
-   unless ($runtime =~ /^-?\d/) {
-      $runtime = trim(parseBetween($response, "USA:", " min"));
+   my $rawruntime = trim(parseBetween($response, ">Runtime:</h5>", "</div>"));
+   my $runtime = trim(parseBetween($rawruntime, "", " min"));
+   for my $country (@countries) {
+      last if ($runtime =~ /^-?\d/);
+      $runtime = trim(parseBetween($rawruntime, "$country:", " min"));
    }
 
    # parse cast 
