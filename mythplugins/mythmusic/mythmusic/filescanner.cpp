@@ -242,14 +242,14 @@ void FileScanner::AddFileToDB(const QString &filename)
                                               "*.png;*.jpg;*.jpeg;*.gif;*.bmp");
 
     // If this file is an image, insert the details into the music_albumart table
-    if (nameFilter.find(extension) > -1)
+    if (nameFilter.find(extension.lower()) > -1)
     {
         QString name = filename.section( '/', -1);
 
         MSqlQuery query(MSqlQuery::InitCon());
         query.prepare("INSERT INTO music_albumart SET filename = :FILE, "
                       "directory_id = :DIRID, imagetype = :TYPE;");
-        query.bindValue(":FILE", name);
+        query.bindValue(":FILE", name.utf8());
         query.bindValue(":DIRID", m_directoryid[directory.utf8().lower()]);
         query.bindValue(":TYPE", AlbumArtImages::guessImageType(name));
 
