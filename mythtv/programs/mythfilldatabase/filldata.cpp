@@ -216,12 +216,14 @@ bool FillData::grabDataFromFile(int id, QString &filename)
 
     chan_data.handleChannels(id, &chanlist);
     icon_data.UpdateSourceIcons(id);
-    if (proglist.count() == 0) {
+    if (proglist.count() == 0)
+    {
         VERBOSE(VB_GENERAL,
                 QString("No programs found in data."));
         endofdata = true;
     }
-    else {
+    else
+    {
         prog_data.handlePrograms(id, &proglist);
     }
     return true;
@@ -452,7 +454,8 @@ bool FillData::fillData(QValueList<Source> &sourcelist)
         query.bindValue(":SRCID", (*it).id);
         query.exec();
 
-        if (query.isActive() && query.size() > 0) {
+        if (query.isActive() && query.size() > 0)
+        {
             query.next();
             source_channels = query.value(0).toInt();
             if (source_channels > 0)
@@ -467,7 +470,8 @@ bool FillData::fillData(QValueList<Source> &sourcelist)
                     "configured to use grabber."));
             }
         }
-        else {
+        else
+        {
             source_channels = 0;
             VERBOSE(VB_GENERAL,
                     QString("Can't get a channel count for source id %1")
@@ -476,7 +480,8 @@ bool FillData::fillData(QValueList<Source> &sourcelist)
 
         bool hasprefmethod = false;
 
-        if (xmltv_grabber != "datadirect") {
+        if (xmltv_grabber != "datadirect")
+        {
 
             QProcess grabber_capabilities_proc(xmltv_grabber);
             grabber_capabilities_proc.addArgument(QString("--capabilities"));
@@ -601,9 +606,8 @@ bool FillData::fillData(QValueList<Source> &sourcelist)
 
             if (maxDays > 0) // passed with --max-days
                 grabdays = maxDays;
-            else if (xmltv_grabber == "datadirect") {
+            else if (xmltv_grabber == "datadirect")
                 grabdays = 14;
-            }
 
             grabdays = (only_update_channels) ? 1 : grabdays;
 
@@ -649,15 +653,18 @@ bool FillData::fillData(QValueList<Source> &sourcelist)
                          (i == 2 && refresh_second))
                 {
                     // Always refresh if the user specified today/tomorrow/second.
-                    if (refresh_today) {
+                    if (refresh_today)
+                    {
                         VERBOSE(VB_GENERAL,
                             "Data Refresh needed because user specified --refresh-today");
                     }
-                    else if (refresh_second) {
+                    else if (refresh_second)
+                    {
                         VERBOSE(VB_GENERAL,
                             "Data Refresh needed because user specified --refresh-second");
                     }
-                    else {
+                    else
+                    {
                         VERBOSE(VB_GENERAL,
                             "Data Refresh always needed for tomorrow");
                     }
@@ -726,7 +733,8 @@ bool FillData::fillData(QValueList<Source> &sourcelist)
                             download_needed = true;
                         }
 
-                        if (currentChanCount < (prevChanCount * 0.90)) {
+                        if (currentChanCount < (prevChanCount * 0.90))
+                        {
                             VERBOSE(VB_GENERAL, QString(
                                     "Data refresh needed because only %1 out "
                                     "of %2 channels have at least one "
@@ -806,7 +814,8 @@ bool FillData::fillData(QValueList<Source> &sourcelist)
                         }
                     }
 
-                    if (endofdata) {
+                    if (endofdata)
+                    {
                         VERBOSE(VB_GENERAL,
                             QString("Grabber is no longer returning program data, finishing"));
                         break;
@@ -861,8 +870,10 @@ bool FillData::fillData(QValueList<Source> &sourcelist)
         if (nonewdata > 0 &&
             (total_sources != externally_handled))
             status = QString("mythfilldatabase ran, but did not insert "
-                     "any new data into the Guide for %1 of %2 sources.  This can indicate a "
-                     "potential grabber failure.").arg(nonewdata).arg(total_sources); 
+                     "any new data into the Guide for %1 of %2 sources. "
+                     "This can indicate a potential grabber failure.")
+                     .arg(nonewdata)
+                     .arg(total_sources);
         else
             status = "Successful.";
 
