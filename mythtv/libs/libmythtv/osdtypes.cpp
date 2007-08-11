@@ -1274,6 +1274,11 @@ void OSDTypeImage::LoadImage(const QString &filename, float wmult, float hmult,
         m_alpha = NULL;
     }
 
+    if (scalew > 0 && m_scalew > 0)
+        scalew = m_scalew;
+    if (scaleh > 0 && m_scaleh > 0)
+        scaleh = m_scaleh;
+
     if (usecache)
     {
         if (!filename.isEmpty() && filename.length() >= 2)
@@ -1312,11 +1317,6 @@ void OSDTypeImage::LoadImage(const QString &filename, float wmult, float hmult,
 
     if (tmpimage.width() == 0)
         return;
-
-    if (scalew > 0 && m_scalew > 0)
-        scalew = m_scalew;
-    if (scaleh > 0 && m_scaleh > 0)
-        scaleh = m_scaleh;
 
     int imwidth = 0, imheight = 0;
 
