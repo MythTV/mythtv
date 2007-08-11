@@ -211,11 +211,11 @@ static void init_time_offsets(GlobalComboBox *gc)
 static GlobalComboBox *TimeOffset()
 {
     GlobalComboBox *gc = new GlobalComboBox("TimeOffset");
-    gc->setLabel(QObject::tr("Time offset for XMLTV listings"));
+    gc->setLabel(QObject::tr("Your Local Timezone (for XMLTV)"));
     init_time_offsets(gc);
     QString helptext = QObject::tr(
-        "Adjust the relative timezone of the XMLTV EPG data read "
-        "by mythfilldatabase.  "
+        "Used if the XMLTV data comes from a different timezone than your "
+        "own. This adjust the times in the XMLTV EPG data to compensate. "
         "'Auto' converts the XMLTV time to local time using your "
         "computer's timezone.  "
         "'None' ignores the XMLTV timezone, interpreting times as local.");
