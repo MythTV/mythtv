@@ -87,6 +87,12 @@ int main(int argc, char *argv[])
                 return FILLDB_EXIT_INVALID_CMDLINE;
             }
 
+            if (!fromfile_name.isEmpty())
+            {
+                printf("only one --file option allowed\n");
+                return FILLDB_EXIT_INVALID_CMDLINE;
+            }
+
             fromfile_id = atoi(a.argv()[++argpos]);
             fromfile_name = a.argv()[++argpos];
 
@@ -105,6 +111,12 @@ int main(int argc, char *argv[])
                 return FILLDB_EXIT_INVALID_CMDLINE;
             }
 
+            if (!fromfile_name.isEmpty())
+            {
+                printf("only one --dd-file option allowed\n");
+                return FILLDB_EXIT_INVALID_CMDLINE;
+            }
+
             fromfile_id = atoi(a.argv()[++argpos]);
             fromfile_offset = atoi(a.argv()[++argpos]);
             fromddfile_lineupid = a.argv()[++argpos];
@@ -120,6 +132,12 @@ int main(int argc, char *argv[])
                 !strncmp(a.argv()[argpos + 2], "--", 2))
             {
                 printf("missing or invalid parameters for --xawchannels option\n");
+                return FILLDB_EXIT_INVALID_CMDLINE;
+            }
+
+            if (!fromxawfile_name.isEmpty())
+            {
+                printf("only one --xawchannels option allowed\n");
                 return FILLDB_EXIT_INVALID_CMDLINE;
             }
 
@@ -325,6 +343,7 @@ int main(int argc, char *argv[])
             cout << "--update\n";
             cout << "   For running non-destructive updates on the database for\n";
             cout << "   users in xmltv zones that do not provide channel data\n";
+            cout << "   Stops the addition of new channels and the changing of channel icons.\n"; 
             cout << "\n";
             cout << "--preset\n";
             cout << "   Use it in case that you want to assign a preset number for\n";
@@ -338,11 +357,11 @@ int main(int argc, char *argv[])
             cout << "   <xmlfile>  = file to read\n";
             cout << "\n";
             cout << "--dd-file <sourceid> <offset> <lineupid> <xmlfile>\n";
-            cout << "   <sourceid> = see --file\n";
+            cout << "   <sourceid> = number of the video source to use with this file\n";
             cout << "   <offset>   = days from today that xmlfile defines\n";
             cout << "                (-1 means to replace all data, up to 10 days)\n";
             cout << "   <lineupid> = the lineup id\n";
-            cout << "   <xmlfile>  = see --file\n";
+            cout << "   <xmlfile>  = file to read\n";
             cout << "\n";
             cout << "--xawchannels <sourceid> <xawtvrcfile>\n";
             cout << "   (--manual flag works in combination with this)\n";
