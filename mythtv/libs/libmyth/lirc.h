@@ -14,7 +14,8 @@ class MPUBLIC LircClient : public QObject
   public:
     LircClient(QObject *main_window);
     ~LircClient();
-    int Init(const QString &config_file, const QString &program);
+    int Init(const QString &config_file, const QString &program,
+                bool ignoreExtApp=false);
     void Process(void);
 
   private:

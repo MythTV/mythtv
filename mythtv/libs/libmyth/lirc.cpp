@@ -17,12 +17,20 @@
 #error Native LIRC support requires Qt 3.1 or greater.
 #endif
 
+/** \class LircClient
+ *  \brief Interface between mythtv and lircd
+ *
+ *   Create connection to the lircd daemon and translate remote keypresses
+ *   into custom events which are posted to the mainwindow.
+ */
+
 LircClient::LircClient(QObject *main_window)
 {
     mainWindow = main_window;
 }
 
-int LircClient::Init(const QString &config_file, const QString &program)
+int LircClient::Init(const QString &config_file, const QString &program,
+                        bool ignoreExtApp)
 {
     int fd;
 
@@ -46,7 +54,8 @@ int LircClient::Init(const QString &config_file, const QString &program)
         return -1;
     }
 
-    external_app = gContext->GetSetting("LircKeyPressedApp") + " &";
+    if (!ignoreExtApp)
+        external_app = gContext->GetSetting("LircKeyPressedApp", "");
 
     VERBOSE(VB_GENERAL,
             QString("lirc init success using configuration file: %1")
@@ -105,14 +114,17 @@ void LircClient::Process(void)
     }
 }
 
+
 void LircClient::SpawnApp(void)
 {
-    // Spawn app to thwap led (or what ever the user has picked if
+    // Spawn app to illuminate led (or what ever the user has picked if
     // anything) to give positive feedback that a key was received
-    if (external_app == " &")
+    if (external_app.isEmpty())
         return;
 
-    int status = myth_system(external_app);
+    QString command = external_app + " &";
+
+    int status = myth_system(command);
 
     if (status > 0)
     {
