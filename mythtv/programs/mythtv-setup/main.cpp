@@ -36,7 +36,6 @@
 #include "checksetup.h"
 
 using namespace std;
-bool is_backend_running(void);
 
 void SetupMenuCallback(void* data, QString& selection) {
     (void)data;
@@ -292,7 +291,6 @@ int main(int argc, char *argv[])
         QObject::tr("Changing existing card inputs, deleting anything, "
                     "or scanning for channels may not work.");
 
-    bool backendIsRunning = false;
     bool backendIsRunning = gContext->BackendIsRunning();
 
     if (backendIsRunning)
