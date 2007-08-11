@@ -573,10 +573,6 @@ int main(int argc, char **argv)
     int port = gContext->GetNumSetting("BackendServerPort", 6543);
 
     QString myip = gContext->GetSetting("BackendServerIP");
-    QString masterip = gContext->GetSetting("MasterServerIP");
-
-    bool ismaster = false;
-
     if (myip.isNull() || myip.isEmpty())
     {
         cerr << "No setting found for this machine's BackendServerIP.\n"
@@ -585,12 +581,14 @@ int main(int argc, char **argv)
         return BACKEND_EXIT_NO_IP_ADDRESS;
     }
 
-    if (masterip == myip)
+    bool ismaster = gContext->IsMasterBackend();
+
+
+    if (ismaster)
     {
         cerr << "Starting up as the master server.\n";
         gContext->LogEntry("mythbackend", LP_INFO,
                            "MythBackend started as master server", "");
-        ismaster = true;
 
         if (nosched)
             cerr << "********** The Scheduler has been DISABLED with "

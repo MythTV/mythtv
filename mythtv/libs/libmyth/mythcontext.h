@@ -262,6 +262,8 @@ class MPUBLIC MythContext : public QObject, public MythObservable,
     void SetBackend(bool backend);
     bool IsBackend(void);
     bool IsFrontendOnly(void);
+    bool IsMasterBackend(void);
+    bool BackendIsRunning(void);
 
     void BlockShutdown(void);
     void AllowShutdown(void);

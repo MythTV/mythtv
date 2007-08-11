@@ -293,8 +293,9 @@ int main(int argc, char *argv[])
                     "or scanning for channels may not work.");
 
     bool backendIsRunning = false;
+    bool backendIsRunning = gContext->BackendIsRunning();
 
-    if (is_backend_running())
+    if (backendIsRunning)
     {
         int val = MythPopupBox::show2ButtonPopup(
             gContext->GetMainWindow(), QObject::tr("WARNING"),
@@ -345,40 +346,20 @@ int main(int argc, char *argv[])
     }
     while (haveProblems);
 
-    dia = new DialogBox(mainWindow,
-                        QObject::tr("If this is the master backend server, "
-                                    "please run 'mythfilldatabase' "
-                                    "to populate the database "
-                                    "with channel information."));
-    dia->AddButton(QObject::tr("OK"));
-    dia->exec();
-    delete dia;
+    if (gContext->IsMasterBackend())
+    {
+        dia = new DialogBox(mainWindow,
+                            QObject::tr("If this is the master backend server, "
+                                        "please run 'mythfilldatabase' "
+                                        "to populate the database "
+                                        "with channel information."));
+        dia->AddButton(QObject::tr("OK"));
+        dia->exec();
+        delete dia;
+    }
 
     if (backendIsRunning)
         RemoteSendMessage("CLEAR_SETTINGS_CACHE");
 
     return 0;
-}
-
-bool is_backend_running(void)
-{
-#if defined(CONFIG_DARWIN) || (__FreeBSD__) || defined(__OpenBSD__)
-    char    *command = "ps -ax | grep -i mythbackend | grep -v grep > ";
-#else
-    char    *command = "ps -ae | grep mythbackend > ";
-#endif
-    QString tmp_file = "/tmp/backendrunning";
-    myth_system(command + tmp_file,
-                MYTH_SYSTEM_DONT_BLOCK_LIRC |
-                MYTH_SYSTEM_DONT_BLOCK_JOYSTICK_MENU);
-
-    FILE *fptr = fopen(tmp_file, "r");
-    if (!fptr)
-        return false;
-    char buf[1024];
-    int read_bytes = fread(buf, 1, 1024, fptr);
-    fclose(fptr);
-    unlink(tmp_file);
-
-    return read_bytes != 0;
 }

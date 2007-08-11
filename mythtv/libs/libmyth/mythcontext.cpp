@@ -1055,6 +1055,31 @@ bool MythContext::IsBackend(void)
     return d->m_backend;
 }
 
+bool MythContext::IsMasterBackend(void)
+{
+    QString myip = gContext->GetSetting("BackendServerIP");
+    QString masterip = gContext->GetSetting("MasterServerIP");
+
+    bool ismaster = false;
+
+    if (masterip == myip)
+        ismaster = true;
+    return ismaster;
+}
+
+bool MythContext::BackendIsRunning(void)
+{
+#if defined(CONFIG_DARWIN) || (__FreeBSD__) || defined(__OpenBSD__)
+    char    *command = "ps -ax | grep -i mythbackend | grep -v grep > /dev/null";
+#else
+    char    *command = "ps -ae | grep mythbackend > /dev/null";
+#endif
+    bool res = myth_system(command,
+                MYTH_SYSTEM_DONT_BLOCK_LIRC |
+                MYTH_SYSTEM_DONT_BLOCK_JOYSTICK_MENU);
+    return !res;
+}
+
 bool MythContext::IsFrontendOnly(void)
 {
     // find out if a backend runs on this host...
