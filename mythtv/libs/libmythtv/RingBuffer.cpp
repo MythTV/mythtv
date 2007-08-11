@@ -1181,6 +1181,14 @@ long long RingBuffer::Seek(long long pos, int whence)
     pthread_rwlock_wrlock(&rwlock);
     wantseek = false;
 
+    // optimize nop seeks
+    if ((whence == SEEK_SET && pos == readpos) ||
+        (whence == SEEK_CUR && pos == 0))
+    {
+        pthread_rwlock_unlock(&rwlock);
+        return readpos;
+    }
+
     long long ret = -1;
     if (remotefile)
         ret = remotefile->Seek(pos, whence, readpos);
