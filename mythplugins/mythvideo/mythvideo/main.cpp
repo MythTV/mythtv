@@ -212,6 +212,7 @@ namespace
             dvd_device = MediaMonitor::defaultDVDdevice();
 
 #ifdef Q_OS_MAC
+        // Convert the BSD 'leaf' name to a raw device in /dev
         dvd_device.prepend("/dev/r");
 #endif
         DVDRipBox *drb = new DVDRipBox(gContext->GetMainWindow(),
@@ -286,6 +287,7 @@ namespace
             dvd_device = MediaMonitor::defaultDVDdevice();
 
 #ifdef Q_OS_MAC
+        // Convert the BSD 'leaf' name to a raw device in /dev
         dvd_device.prepend("/dev/r");
 #endif
         gContext->addCurrentLocation("playdvd");
