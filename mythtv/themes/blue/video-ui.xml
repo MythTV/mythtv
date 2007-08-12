@@ -14,7 +14,7 @@
 
 
     <container name="background">
-      <image name="filler" draworder="0" fleximage="no">
+      <image name="filler" draworder="0" fleximage="yes">
         <filename>vm-background.png</filename>
         <position>0,0</position>
         <!--<staticsize>800,290</staticsize>-->
