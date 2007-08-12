@@ -101,7 +101,7 @@ bool FillData::grabDDData(Source source, int poffset,
 
     QDateTime qdtNow = QDateTime::currentDateTime();
     MSqlQuery query(MSqlQuery::DDCon());
-    QString status = "currently running.";
+    QString status = QObject::tr("currently running.");
 
     query.exec(QString("UPDATE settings SET data ='%1' "
                        "WHERE value='mythfilldatabaseLastRunStart'")
@@ -301,7 +301,7 @@ bool FillData::grabData(Source source, int offset, QDate *qCurrentDate)
 
     QDateTime qdtNow = QDateTime::currentDateTime();
     MSqlQuery query(MSqlQuery::InitCon());
-    QString status = "currently running.";
+    QString status = QObject::tr("currently running.");
 
     query.exec(QString("UPDATE settings SET data ='%1' "
                        "WHERE value='mythfilldatabaseLastRunStart'")
@@ -328,22 +328,28 @@ bool FillData::grabData(Source source, int offset, QDate *qCurrentDate)
                        "WHERE value='mythfilldatabaseLastRunEnd'")
                        .arg(qdtNow.toString("yyyy-MM-dd hh:mm")));
 
-    status = "Successful.";
+    status = QObject::tr("Successful.");
 
     if (!succeeded)
     {
-        status = QString("FAILED:  xmltv returned error code %1.")
-                         .arg(systemcall_status);
-        query.exec(QString("UPDATE settings SET data ='%1' "
+        if (WIFSIGNALED(systemcall_status) &&
+            (WTERMSIG(systemcall_status) == SIGINT
+            || WTERMSIG(systemcall_status) == SIGQUIT))
+        {
+            interrupted = true;
+            status = QString(QObject::tr("FAILED: xmltv ran but was interrupted."));
+        }
+        else
+        {
+            status = QString(QObject::tr("FAILED: xmltv returned error code %1."))
+                            .arg(systemcall_status);
+            VERBOSE(VB_IMPORTANT, status);
+        }
+    }
+
+    query.exec(QString("UPDATE settings SET data ='%1' "
                            "WHERE value='mythfilldatabaseLastRunStatus'")
                            .arg(status));
-
-        VERBOSE(VB_GENERAL, status);
-
-        if (WIFSIGNALED(systemcall_status) &&
-            (WTERMSIG(systemcall_status) == SIGINT || WTERMSIG(systemcall_status) == SIGQUIT))
-            interrupted = true;
-    }
 
     grabDataFromFile(source.id, filename);
 
@@ -869,13 +875,13 @@ bool FillData::fillData(QValueList<Source> &sourcelist)
     {
         if (nonewdata > 0 &&
             (total_sources != externally_handled))
-            status = QString("mythfilldatabase ran, but did not insert "
+            status = QString(QObject::tr("mythfilldatabase ran, but did not insert "
                      "any new data into the Guide for %1 of %2 sources. "
-                     "This can indicate a potential grabber failure.")
+                     "This can indicate a potential grabber failure."))
                      .arg(nonewdata)
                      .arg(total_sources);
         else
-            status = "Successful.";
+            status = QObject::tr("Successful.");
 
         query.exec(QString("UPDATE settings SET data ='%1' "
                            "WHERE value='mythfilldatabaseLastRunStatus'")

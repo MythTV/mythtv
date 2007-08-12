@@ -474,7 +474,7 @@ int main(int argc, char *argv[])
     }
     else if (from_file)
     {
-        QString status = "currently running.";
+        QString status = QObject::tr("currently running.");
         QDateTime GuideDataBefore, GuideDataAfter;
 
         MSqlQuery query(MSqlQuery::InitCon());
@@ -522,11 +522,11 @@ int main(int argc, char *argv[])
         }
 
         if (GuideDataAfter == GuideDataBefore)
-            status = "mythfilldatabase ran, but did not insert "
+            status = QObject::tr("mythfilldatabase ran, but did not insert "
                      "any new data into the Guide.  This can indicate a "
-                     "potential problem with the XML file used for the update.";
+                     "potential problem with the XML file used for the update.");
         else
-            status = "Successful.";
+            status = QObject::tr("Successful.");
 
         query.exec(QString("UPDATE settings SET data ='%1' "
                            "WHERE value='mythfilldatabaseLastRunStatus'")
