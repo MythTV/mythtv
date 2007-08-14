@@ -1039,7 +1039,7 @@ void IconView::LoadThumbnail(ThumbItem *item)
     {
         image = image.smoothScale((int)(m_thumbW - 10 * wmult),
                                   (int)(m_thumbH - 10 * hmult),
-                                  QImage::ScaleMax);
+                                  QImage::ScaleMin);
         int rotateAngle = 0;
 
         rotateAngle = item->GetRotationAngle();

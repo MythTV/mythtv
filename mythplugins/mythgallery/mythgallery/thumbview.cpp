@@ -76,11 +76,26 @@ void ThumbItem::SetPixmap(QPixmap *pixmap)
 long ThumbItem::GetRotationAngle(void)
 {
     MSqlQuery query(MSqlQuery::InitCon());
+
+    // first try to find the exact file
     query.prepare(
         "SELECT angle "
         "FROM gallerymetadata "
         "WHERE image = :PATH");
     query.bindValue(":PATH", m_path.utf8());
+
+    if (!query.exec() || !query.isActive())
+        MythContext::DBError("get_rotation_angle", query);
+    else if (query.next())
+        return query.value(0).toInt();
+
+    // second try to find the first image in the same directory
+    query.prepare(
+        "SELECT angle, image "
+        "FROM gallerymetadata "
+        "WHERE image LIKE :PATH "
+        "ORDER BY image");
+    query.bindValue(":PATH", m_path.utf8() + '%');
 
     if (!query.exec() || !query.isActive())
         MythContext::DBError("get_rotation_angle", query);
