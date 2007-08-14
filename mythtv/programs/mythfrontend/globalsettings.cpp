@@ -2014,7 +2014,7 @@ ThemeSelector::ThemeSelector():
         addImageSelection(theme->fileName(), previewImage);
     }
 
-    setValue("G.A.N.T.");
+    setValue("G.A.N.T");
 }
 
 class StyleSetting: public HostComboBox {

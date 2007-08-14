@@ -1369,7 +1369,7 @@ void DVBRecorder::RunDummyVideo(void)
     QString p = gContext->GetThemesParentDir();
     QString path[] =
     {
-        p + gContext->GetSetting("Theme", "G.A.N.T.") + "/",
+        p + gContext->GetSetting("Theme", "G.A.N.T") + "/",
         p + "default/",
     };
 

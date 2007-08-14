@@ -265,7 +265,7 @@ int main(int argc, char *argv[])
 
     UpgradeTVDatabaseSchema();
 
-    gContext->SetSetting("Theme", "G.A.N.T.");
+    gContext->SetSetting("Theme", "G.A.N.T");
     gContext->LoadQtConfig();
 
     QString fileprefix = MythContext::GetConfDir();

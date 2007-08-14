@@ -1715,8 +1715,8 @@ bool MythContext::ParseGeometryOverride(const QString geometry)
 /** \fn FindThemeDir(const QString &themename)
  *  \brief Returns the full path to the theme denoted by themename
  *
- *   If the theme cannot be found falls back to the G.A.N.T. theme.
- *   If the G.A.N.T. theme doesn't exist then returns an empty string.
+ *   If the theme cannot be found falls back to the G.A.N.T theme.
+ *   If the G.A.N.T theme doesn't exist then returns an empty string.
  *  \param themename The theme name.
  *  \return Path to theme or empty string.
  */
@@ -1733,13 +1733,13 @@ QString MythContext::FindThemeDir(const QString &themename)
     if (dir.exists())
         return testdir;
 
-    testdir = GetThemesParentDir() + "G.A.N.T.";
+    testdir = GetThemesParentDir() + "G.A.N.T";
     dir.setPath(testdir);
     if (dir.exists())
     {
         VERBOSE(VB_IMPORTANT, QString("Could not find theme: %1 - "
-                "Switching to G.A.N.T.").arg(themename));
-        SaveSetting("Theme", "G.A.N.T.");
+                "Switching to G.A.N.T").arg(themename));
+        SaveSetting("Theme", "G.A.N.T");
         return testdir;
     }
 
