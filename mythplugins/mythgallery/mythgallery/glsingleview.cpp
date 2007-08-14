@@ -252,14 +252,6 @@ void GLSingleView::keyPressEvent(QKeyEvent *e)
     float scrollX = 0.2f;
     float scrollY = 0.2f;
 
-    if (actions.empty())
-    {
-        handled = false;
-        m_info_show = wasInfo;
-        m_info_show_short = true;
-        m_slideshow_running = wasRunning;
-    }
-
     for (unsigned int i = 0; i < actions.size() && !handled; i++)
     {
         QString action = actions[i];
@@ -295,8 +287,6 @@ void GLSingleView::keyPressEvent(QKeyEvent *e)
                     m_source_y = 0;
                 }
             }
-            else
-                handled = false;
         }
         else if (action == "ZOOMIN")
         {
@@ -316,8 +306,6 @@ void GLSingleView::keyPressEvent(QKeyEvent *e)
                     m_source_y = 0;
                 }
             }
-            else
-                handled = false;
         }
         else if (action == "FULLSIZE")
         {
@@ -325,8 +313,6 @@ void GLSingleView::keyPressEvent(QKeyEvent *e)
             m_source_y = 0;
             if (m_zoom != 1)
                 SetZoom(1.0f);
-            else
-                handled = false;
         }
         else if (action == "SCROLLLEFT")
         {
@@ -335,8 +321,6 @@ void GLSingleView::keyPressEvent(QKeyEvent *e)
                 m_source_x += scrollX;
                 m_source_x  = min(m_source_x, m_zoom - 1.0f);
             }
-            else
-                handled = false;
         }
         else if (action == "SCROLLRIGHT")
         {
@@ -345,8 +329,6 @@ void GLSingleView::keyPressEvent(QKeyEvent *e)
                 m_source_x -= scrollX;
                 m_source_x  = max(m_source_x, -m_zoom + 1.0f);
             }
-            else
-                handled = false;
         }
         else if (action == "SCROLLUP")
         {
@@ -355,8 +337,6 @@ void GLSingleView::keyPressEvent(QKeyEvent *e)
                 m_source_y += scrollY;
                 m_source_y  = min(m_source_y,  m_zoom - 1.0f);
             }
-            else
-                handled = false;
         }
         else if (action == "SCROLLDOWN")
         {
@@ -365,8 +345,6 @@ void GLSingleView::keyPressEvent(QKeyEvent *e)
                 m_source_y -= scrollY;
                 m_source_y  = max(m_source_y, -m_zoom + 1.0f);
             }
-            else
-                handled = false;
         }
         else if (action == "RECENTER")
         {
@@ -375,8 +353,6 @@ void GLSingleView::keyPressEvent(QKeyEvent *e)
                 m_source_x = 0.0f;
                 m_source_y = 0.0f;
             }
-            else
-                handled = false;
         }
         else if (action == "UPLEFT")
         {
@@ -385,8 +361,6 @@ void GLSingleView::keyPressEvent(QKeyEvent *e)
                 m_source_x  =  1.0f;
                 m_source_y  = -1.0f;
             }
-            else
-                handled = false;
         }
         else if (action == "LOWRIGHT")
         {
@@ -395,8 +369,6 @@ void GLSingleView::keyPressEvent(QKeyEvent *e)
                 m_source_x = -1.0f;
                 m_source_y =  1.0f;
             }
-            else
-                handled = false;
         }
         else if (action == "ROTRIGHT")
         {
@@ -439,9 +411,6 @@ void GLSingleView::keyPressEvent(QKeyEvent *e)
         else
         {
             handled = false;
-            m_info_show = wasInfo;
-            m_info_show_short = true;
-            m_slideshow_running = wasRunning;
         }
     }
 

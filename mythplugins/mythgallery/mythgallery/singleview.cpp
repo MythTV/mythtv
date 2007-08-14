@@ -304,14 +304,6 @@ void SingleView::keyPressEvent(QKeyEvent *e)
     int scrollX = screenwidth / 10;
     int scrollY = screenheight / 10;
 
-    if (actions.empty())
-    {
-        handled = false;
-        m_info_show = wasInfo;
-        m_info_show_short = true;
-        m_slideshow_running = wasRunning;
-    }
-
     for (unsigned int i = 0; i < actions.size() && !handled; i++)
     {
         QString action = actions[i];
@@ -343,8 +335,6 @@ void SingleView::keyPressEvent(QKeyEvent *e)
                 else
                     m_source_loc = QPoint(0, 0);
             }
-            else
-                handled = false;
         }
         else if (action == "ZOOMIN")
         {
@@ -360,16 +350,12 @@ void SingleView::keyPressEvent(QKeyEvent *e)
                 else
                     m_source_loc = QPoint(0, 0);
             }
-            else
-                handled = false;
         }
         else if (action == "FULLSIZE")
         {
             m_source_loc = QPoint(0, 0);
             if (m_zoom != 1.0f)
                 SetZoom(1.0f);
-            else
-                handled = false;
         }
         else if (action == "SCROLLLEFT")
         {
@@ -379,8 +365,6 @@ void SingleView::keyPressEvent(QKeyEvent *e)
                 m_source_loc.setX(
                     (m_source_loc.x() < 0) ? 0 : m_source_loc.x());
             }
-            else
-                handled = false;
         }
         else if (action == "SCROLLRIGHT")
         {
@@ -390,8 +374,6 @@ void SingleView::keyPressEvent(QKeyEvent *e)
                 m_source_loc.setX(min(m_source_loc.x(), 
                                   m_pixmap->width() - screenwidth));
             }
-            else
-                handled = false;
         }
         else if (action == "SCROLLUP")
         {
@@ -401,8 +383,6 @@ void SingleView::keyPressEvent(QKeyEvent *e)
                 m_source_loc.setY(min(m_source_loc.y(),
                                   m_pixmap->height() - screenheight));
             }
-            else
-                handled = false;
         }
         else if (action == "SCROLLDOWN")
         {
@@ -412,8 +392,6 @@ void SingleView::keyPressEvent(QKeyEvent *e)
                 m_source_loc.setY(
                     (m_source_loc.y() < 0) ? 0 : m_source_loc.y());
             }
-            else
-                handled = false;
         }
         else if (action == "RECENTER")
         {
@@ -423,8 +401,6 @@ void SingleView::keyPressEvent(QKeyEvent *e)
                     (m_pixmap->width()  - screenwidth)  >> 1,
                     (m_pixmap->height() - screenheight) >> 1);
             }
-            else
-                handled = false;
         }
         else if (action == "UPLEFT")
         {
@@ -432,8 +408,6 @@ void SingleView::keyPressEvent(QKeyEvent *e)
             {
                 m_source_loc = QPoint(0,0);
             }
-            else
-                handled = false;
         }
         else if (action == "LOWRIGHT")
         {
@@ -443,8 +417,6 @@ void SingleView::keyPressEvent(QKeyEvent *e)
                     m_pixmap->width()  - scrollX - screenwidth,
                     m_pixmap->height() - scrollY - screenheight);
             }
-            else
-                handled = false;
         }
         else if (action == "ROTRIGHT")
         {
@@ -485,9 +457,6 @@ void SingleView::keyPressEvent(QKeyEvent *e)
         else 
         {
             handled = false;
-            m_info_show = wasInfo;
-            m_info_show_short = true;
-            m_slideshow_running = wasRunning;
         }
     }
 
