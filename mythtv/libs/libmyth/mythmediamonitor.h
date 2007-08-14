@@ -57,6 +57,7 @@ class MPUBLIC MediaMonitor : public QObject
     void ChooseAndEjectMedia(void);
 
     static MediaMonitor *GetMediaMonitor(void);
+    static QString GetMountPath(const QString& devPath);
     static void SetCDSpeed(const char *device, int speed);
 
     bool ValidateAndLock(MythMediaDevice *pMedia);

@@ -439,6 +439,29 @@ MythMediaDevice* MediaMonitor::GetMedia(const QString& path)
     return NULL;
 }
 
+/**
+ * If the device is being monitored, return its mountpoint.
+ *
+ * A convenience function for plugins.
+ * (Only currently needed for Mac OS X, which mounts Audio CDs)
+ */
+QString MediaMonitor::GetMountPath(const QString& devPath)
+{
+    QString mountPath;
+
+    if (c_monitor)
+    {
+        MythMediaDevice *pMedia = c_monitor->GetMedia(devPath);
+        if (pMedia && c_monitor->ValidateAndLock(pMedia))
+        {
+            mountPath = pMedia->getMountPath();
+            c_monitor->Unlock(pMedia);
+        }
+    }
+
+    return mountPath;
+}
+
 /** \fn MediaMonitor::GetMedias(MediaType mediatype)
  *  \brief Ask for available media. Must be locked with ValidateAndLock().
  *
@@ -575,9 +598,11 @@ QString MediaMonitor::defaultDevice(QString dbSetting,
 {
     QString device = gContext->GetSetting(dbSetting);
 
-    // No settings database defaults. Try to choose one:
+    // No settings database defaults? Try to choose one:
     if (device.isEmpty() || device == "default")
     {
+        device = hardCodedDefault;
+
         if (!c_monitor)
             c_monitor = GetMediaMonitor();
 
@@ -590,8 +615,6 @@ QString MediaMonitor::defaultDevice(QString dbSetting,
 
             if (d)
                 device = d->getDevicePath();
-            else
-                device = hardCodedDefault;
         }
     }
 
