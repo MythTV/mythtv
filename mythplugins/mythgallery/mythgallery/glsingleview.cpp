@@ -249,8 +249,8 @@ void GLSingleView::keyPressEvent(QKeyEvent *e)
     QStringList actions;
     gContext->GetMainWindow()->TranslateKeyPress("Gallery", e, actions);
 
-    float scrollX = 0.02f;
-    float scrollY = 0.02f;
+    float scrollX = 0.2f;
+    float scrollY = 0.2f;
 
     if (actions.empty())
     {
