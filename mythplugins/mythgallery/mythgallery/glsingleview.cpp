@@ -279,19 +279,43 @@ void GLSingleView::keyPressEvent(QKeyEvent *e)
         }
         else if (action == "ZOOMOUT")
         {
-            m_source_x   = 0;
-            m_source_y   = 0;
             if (m_zoom > 0.5f)
-                SetZoom(m_zoom * 0.5f);
+            {
+                SetZoom(m_zoom - 0.5f);
+                if (m_zoom > 1.0f)
+                {
+                    m_source_x   -= m_source_x / ((m_zoom + 0.5) * 2.0f);
+                    m_source_y   -= m_source_y / ((m_zoom + 0.5) * 2.0f);
+
+                    checkPosition();
+                }
+                else
+                {
+                    m_source_x = 0;
+                    m_source_y = 0;
+                }
+            }
             else
                 handled = false;
         }
         else if (action == "ZOOMIN")
         {
-            m_source_x   = 0;
-            m_source_y   = 0;
             if (m_zoom < 4.0f)
-                SetZoom(m_zoom * 2.0f);
+            {
+                SetZoom(m_zoom + 0.5f);
+                if (m_zoom > 1.0f)
+                {
+                    m_source_x   += m_source_x / (m_zoom * 2.0f);
+                    m_source_y   += m_source_y / (m_zoom * 2.0f);
+
+                    checkPosition();
+                }
+                else
+                {
+                    m_source_x = 0;
+                    m_source_y = 0;
+                }
+            }
             else
                 handled = false;
         }
@@ -440,6 +464,14 @@ void GLSingleView::keyPressEvent(QKeyEvent *e)
     else {
         e->ignore();
     }
+}
+
+void  GLSingleView::checkPosition(void)
+{
+    m_source_x = max(m_source_x, -m_zoom + 1.0f);
+    m_source_y = max(m_source_y, -m_zoom + 1.0f);
+    m_source_x = min(m_source_x, m_zoom - 1.0f);
+    m_source_y = min(m_source_y, m_zoom - 1.0f);
 }
 
 void GLSingleView::paintTexture(void)

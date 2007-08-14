@@ -76,10 +76,12 @@ class GLSingleView : public QGLWidget, public ImageView
     virtual void DisplayPrev(bool reset, bool loadImage);
     virtual void LoadImage(void);
     void resizeGL(int w, int h);
+
     void paintGL(void);
     void paintTexture(void);
     void createTexInfo(void);
     virtual void keyPressEvent(QKeyEvent *e);
+    void checkPosition(void);
 
     // Sets
     virtual void SetZoom(float zoom);

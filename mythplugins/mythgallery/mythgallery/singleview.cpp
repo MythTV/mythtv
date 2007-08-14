@@ -331,17 +331,35 @@ void SingleView::keyPressEvent(QKeyEvent *e)
         }
         else if (action == "ZOOMOUT")
         {
-            m_source_loc = QPoint(0, 0);
             if (m_zoom > 0.5f)
-                SetZoom(m_zoom * 0.5f);
+            {
+                SetZoom(m_zoom - 0.5f);
+                if (m_zoom > 1.0)
+                { 
+                    m_source_loc.setY(m_source_loc.y() - (screenheight / 4));
+                    m_source_loc.setX(m_source_loc.x() - (screenwidth / 4));
+                    CheckPosition();
+                }
+                else
+                    m_source_loc = QPoint(0, 0);
+            }
             else
                 handled = false;
         }
         else if (action == "ZOOMIN")
         {
-            m_source_loc = QPoint(0, 0);
             if (m_zoom < 4.0f)
-                SetZoom(m_zoom * 2.0f);
+            {
+                SetZoom(m_zoom + 0.5f);
+                if (m_zoom > 1.0)
+                {
+                    m_source_loc.setY(m_source_loc.y() + (screenheight / 4));
+                    m_source_loc.setX(m_source_loc.x() + (screenwidth / 4));
+                    CheckPosition();
+                }
+                else
+                    m_source_loc = QPoint(0, 0);
+            }
             else
                 handled = false;
         }
@@ -486,6 +504,14 @@ void SingleView::keyPressEvent(QKeyEvent *e)
 
     if (!handled)
         MythDialog::keyPressEvent(e);
+}
+
+void  SingleView::CheckPosition(void)
+{
+    m_source_loc.setX((m_source_loc.x() < 0) ? 0 : m_source_loc.x());
+    m_source_loc.setY((m_source_loc.y() < 0) ? 0 : m_source_loc.y());
+    m_source_loc.setX(min(m_source_loc.x(), m_pixmap->width() - screenwidth));
+    m_source_loc.setY(min(m_source_loc.y(), m_pixmap->height() - screenheight));
 }
 
 void SingleView::DisplayNext(bool reset, bool loadImage)

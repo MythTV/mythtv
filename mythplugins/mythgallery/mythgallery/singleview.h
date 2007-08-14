@@ -71,6 +71,7 @@ class SingleView : public MythDialog, public ImageView
   private:
     void  StartPainter(void);
     void  CreateEffectPixmap(void);
+    void  CheckPosition(void);
 
     // Various special effects methods
     void  EffectNone(void);
