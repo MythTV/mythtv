@@ -369,9 +369,8 @@ void SingleView::keyPressEvent(QKeyEvent *e)
             if (m_zoom > 1.0f && m_pixmap)
             {
                 m_source_loc.setX(m_source_loc.x() + scrollX);
-                m_source_loc.setX(
-                    min(m_source_loc.x(),
-                        m_pixmap->width() - scrollX - screenwidth));
+                m_source_loc.setX(min(m_source_loc.x(), 
+                                  m_pixmap->width() - screenwidth));
             }
             else
                 handled = false;
@@ -381,9 +380,8 @@ void SingleView::keyPressEvent(QKeyEvent *e)
             if (m_zoom > 1.0f && m_pixmap)
             {
                 m_source_loc.setY(m_source_loc.y() + scrollY);
-                m_source_loc.setY( 
-                    min(m_source_loc.y(),
-                        m_pixmap->height() - scrollY - screenheight));
+                m_source_loc.setY(min(m_source_loc.y(),
+                                  m_pixmap->height() - screenheight));
             }
             else
                 handled = false;

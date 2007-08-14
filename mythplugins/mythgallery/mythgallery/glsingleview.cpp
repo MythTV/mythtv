@@ -306,40 +306,40 @@ void GLSingleView::keyPressEvent(QKeyEvent *e)
         }
         else if (action == "SCROLLLEFT")
         {
-            if (m_zoom > 1.0f && m_source_x < 1.0f)
+            if (m_zoom > 1.0f && m_source_x < m_zoom - 1.0f)
             {
                 m_source_x += scrollX;
-                m_source_x  = min(m_source_x, 1.0f);
+                m_source_x  = min(m_source_x, m_zoom - 1.0f);
             }
             else
                 handled = false;
         }
         else if (action == "SCROLLRIGHT")
         {
-            if (m_zoom > 1.0f && m_source_x > -1.0f)
+            if (m_zoom > 1.0f && m_source_x > -m_zoom + 1.0f)
             {
                 m_source_x -= scrollX;
-                m_source_x  = max(m_source_x, -1.0f);
+                m_source_x  = max(m_source_x, -m_zoom + 1.0f);
             }
             else
                 handled = false;
         }
         else if (action == "SCROLLUP")
         {
-            if (m_zoom > 1.0f && m_source_y < 1.0f)
+            if (m_zoom > 1.0f && m_source_y <  m_zoom - 1.0f)
             {
                 m_source_y += scrollY;
-                m_source_y  = min(m_source_y, 1.0f);
+                m_source_y  = min(m_source_y,  m_zoom - 1.0f);
             }
             else
                 handled = false;
         }
         else if (action == "SCROLLDOWN")
         {
-            if (m_zoom > 1.0f && m_source_y > -1.0f)
+            if (m_zoom > 1.0f && m_source_y > -m_zoom + 1.0f)
             {
                 m_source_y -= scrollY;
-                m_source_y  = max(m_source_y, -1.0f);
+                m_source_y  = max(m_source_y, -m_zoom + 1.0f);
             }
             else
                 handled = false;
