@@ -1334,7 +1334,7 @@ void PlaybackBoxMusic::CycleVisualizer()
         }
 
         //Change to the new visualizer
-        visual_mode_timer->stop();
+        resetTimer();
         mainvisual->setVisual("Blank");
         mainvisual->setVisual(visual_modes[current_visual]);
     }
@@ -1344,11 +1344,10 @@ void PlaybackBoxMusic::CycleVisualizer()
         // If only the AlbumArt visualization is selected, then go ahead and
         // restart the visualization.  This will give AlbumArt the opportunity
         // to change images if there are multiple images available.
-        visual_mode_timer->stop();
+        resetTimer();
         mainvisual->setVisual("Blank");
         mainvisual->setVisual(visual_modes[current_visual]);
     }
-
 }
 
 void PlaybackBoxMusic::setTrackOnLCD(Metadata *mdata)
