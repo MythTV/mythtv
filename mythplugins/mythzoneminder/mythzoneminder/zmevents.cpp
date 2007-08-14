@@ -19,6 +19,7 @@
 #include <qpainter.h>
 #include <qdir.h>
 #include <qprocess.h>
+#include <qapplication.h>
 
 // myth
 #include "mythtv/mythcontext.h"
@@ -632,8 +633,19 @@ void ZMEvents::showMenu()
             //delete all events
             if (class ZMClient *zm = ZMClient::get())
             {
+                MythBusyDialog *busy = new MythBusyDialog(
+                        QObject::tr("Deleting events. Please wait ..."));
+                for (int x = 0; x < 5; x++)
+                {
+                    usleep(100);
+                    qApp->processEvents();
+                }
+
                 zm->deleteEventList(m_eventList);
+
                 getEventList();
+                busy->close();
+                delete busy;
             }
             break;
     }

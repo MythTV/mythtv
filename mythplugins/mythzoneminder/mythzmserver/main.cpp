@@ -53,7 +53,7 @@ int main(int argc, char **argv)
     int fdmax;                      // maximum file descriptor number
     int listener;                   // listening socket descriptor
     int newfd;                      // newly accept()ed socket descriptor
-    char buf[256];                  // buffer for client data
+    char buf[4096];                 // buffer for client data
     int nbytes;
     int yes=1;                      // for setsockopt() SO_REUSEADDR, below
     socklen_t addrlen;

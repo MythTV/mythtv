@@ -417,14 +417,23 @@ void ZMClient::deleteEvent(int eventID)
 
 void ZMClient::deleteEventList(vector<Event*> *eventList)
 {
+    // delete events in 250 event chunks
     QStringList strList = "DELETE_EVENT_LIST";
-
+    int count = 0;
     vector<Event*>::iterator it;
     for (it = eventList->begin(); it != eventList->end(); it++)
     {
-       strList << QString::number((*it)->eventID);
+        strList << QString::number((*it)->eventID);
+
+        if (++count == 250)
+        {
+            sendReceiveStringList(strList);
+            strList = "DELETE_EVENT_LIST";
+            count = 0;
+        }
     }
 
+    // make sure the last chunk is deleted
     sendReceiveStringList(strList);
 }
 
