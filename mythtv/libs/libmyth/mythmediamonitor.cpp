@@ -251,6 +251,9 @@ void MediaMonitor::ChooseAndEjectMedia(void)
 /**
  * \brief  Lookup some settings, and do OS-specific stuff in sub-classes
  *
+ * \bug    After r13882, the media monitor loops and checks drives,
+ *         even if the user didn't select MonitorDrives.
+ * 
  * \bug    If the user changes the MonitorDrives or IgnoreDevices settings,
  *         it will have no effect until the frontend is restarted.
  */
@@ -343,6 +346,9 @@ void MediaMonitor::StartMonitoring(void)
     // Sanity check
     if (m_Active)
         return;
+
+    //if (!m_SendEvent)
+    //    Should we be starting the monitor thread? Or returning here.
 
     if (!m_Thread)
         m_Thread = new MonitorThread(this, m_MonitorPollingInterval);
@@ -539,6 +545,14 @@ bool MediaMonitor::shouldIgnore(MythMediaDevice* device)
         VERBOSE(VB_MEDIA, "Ignoring device: " + device->getDevicePath());
         return true;
     }
+#if 0
+    else
+    {
+        VERBOSE(VB_MEDIA, "Not ignoring: " + device->getDevicePath()
+                          + " / " + device->getMountPath());
+        VERBOSE(VB_MEDIA, "Paths not in: " + m_IgnoreList.join(", "));
+    }
+#endif
 
     return false;
 }
