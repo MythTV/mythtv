@@ -13,6 +13,7 @@ TARGET = mythgallery
 target.path = $${LIBDIR}/mythtv/plugins
 INSTALLS += target
 LIBS += -ltiff
+LIBS *= $$LOCAL_LIBDIR_X11
 
 uifiles.path = $${PREFIX}/share/mythtv/themes/default
 uifiles.files = gallery-ui.xml
