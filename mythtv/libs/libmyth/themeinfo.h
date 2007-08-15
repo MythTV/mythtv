@@ -5,6 +5,8 @@
 #include <qstring.h>
 #include <qdom.h>
 
+#include "mythexp.h"
+
 typedef enum {
     THEME_UNKN  = 0x00,
     THEME_UI    = 0x01,
@@ -14,7 +16,7 @@ typedef enum {
 
 class QFileInfo;
 
-class ThemeInfo
+class MPUBLIC ThemeInfo
 {
 
   public:
