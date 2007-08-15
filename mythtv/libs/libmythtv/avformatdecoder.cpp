@@ -3388,9 +3388,12 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
                         else
                         {
                             if (pkt->stream_index == subIdx)
+                            {
+                                QMutexLocker locker(&avcodeclock);
                                 ringBuffer->DVD()->DecodeSubtitles(&subtitle, 
                                                                    &gotSubtitles,
                                                                    ptr, len);
+                            }
                         }
                     }
                     else if (pkt->stream_index == subIdx)

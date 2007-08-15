@@ -863,7 +863,7 @@ bool DVDRingBufferPriv::DecodeSubtitles(AVSubtitle *sub, int *gotSubtitles,
                         alpha[3] = spu_pkt[pos] >> 4;
                         alpha[2] = spu_pkt[pos] & 0x0f;
                         alpha[1] = spu_pkt[pos + 1] >> 4;
-                        alpha[0] = spu_pkt[pos + 1] >> 0x0f;
+                        alpha[0] = spu_pkt[pos + 1] & 0x0f;
                     }
                     pos +=2;
                 }
