@@ -20,7 +20,7 @@ HEADERS += dbsettings.h screensaver-null.h output.h visual.h
 HEADERS += langsettings.h audiooutputnull.h mythsocket.h
 HEADERS += DisplayResScreen.h util-x11.h mythdeque.h qmdcodec.h
 HEADERS += exitcodes.h virtualkeyboard.h mythobservable.h mythevent.h
-HEADERS += mythexp.h mythpluginapi.h
+HEADERS += mythexp.h mythpluginapi.h themeinfo.h
 
 SOURCES += dialogbox.cpp lcddevice.cpp mythcontext.cpp mythwidgets.cpp 
 SOURCES += oldsettings.cpp remotefile.cpp settings.cpp
@@ -32,7 +32,7 @@ SOURCES += volumecontrol.cpp volumebase.cpp audiooutputbase.cpp
 SOURCES += dbsettings.cpp screensaver.cpp screensaver-null.cpp output.cpp
 SOURCES += langsettings.cpp mythdbcon.cpp audiooutputnull.cpp
 SOURCES += DisplayResScreen.cpp util-x11.cpp qmdcodec.cpp
-SOURCES += virtualkeyboard.cpp mythobservable.cpp mythsocket.cpp
+SOURCES += virtualkeyboard.cpp mythobservable.cpp mythsocket.cpp themeinfo.cpp
 
 INCLUDEPATH += ../libmythsamplerate ../libmythsoundtouch ../.. ../
 DEPENDPATH += ../libmythsamplerate ../libmythsoundtouch ../ ../libmythui

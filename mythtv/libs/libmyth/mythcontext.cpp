@@ -32,6 +32,7 @@
 #include "mythdbcon.h"
 #include "util-x11.h"
 #include "mythsocket.h"
+#include "themeinfo.h"
 
 #include "libmythui/mythmainwindow.h"
 
@@ -1284,8 +1285,10 @@ void MythContext::LoadQtConfig(void)
 
     QString themename = GetSetting("Theme");    
     QString themedir = FindThemeDir(themename);
-    
-    if (themename.contains("-wide", false))
+
+    ThemeInfo *themeinfo = new ThemeInfo(themedir);
+
+    if (themeinfo && themeinfo->IsWide())
     {
         VERBOSE( VB_IMPORTANT, QString("Switching to wide mode (%1)").arg(themename));
         d->SetWideMode();
@@ -1295,6 +1298,9 @@ void MythContext::LoadQtConfig(void)
         VERBOSE( VB_IMPORTANT, QString("Switching to square mode (%1)").arg(themename));
         d->SetSquareMode();
     }
+
+    if (themeinfo)
+        delete themeinfo;
     
     // Recalculate GUI dimensions
     d->StoreGUIsettings();
