@@ -1061,11 +1061,7 @@ bool MythContext::IsMasterBackend(void)
     QString myip = gContext->GetSetting("BackendServerIP");
     QString masterip = gContext->GetSetting("MasterServerIP");
 
-    bool ismaster = false;
-
-    if (masterip == myip)
-        ismaster = true;
-    return ismaster;
+    return (masterip == myip);
 }
 
 bool MythContext::BackendIsRunning(void)
