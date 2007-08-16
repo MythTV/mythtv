@@ -213,8 +213,9 @@ class MythContextPrivate
     bool FindSettingsProbs(void);
 
     QString getResponse(const QString &query, const QString &def);
-    int intResponse(const QString &query, int def);
-    bool PromptForDatabaseParams(void);
+    int     intResponse(const QString &query, int def);
+    bool    PromptForDatabaseParams(QString error);
+    QString TestDBconnection(void);
 
     MythContext *parent;
 
@@ -422,14 +423,20 @@ bool MythContextPrivate::Init(bool gui)
     if (!LoadDatabaseSettings(false))
         return false;
 
+    // Attempt to connect to the database, get message for user if it failed.
+    QString failure = TestDBconnection();
+
     // Queries the user for the DB info, using the command 
     // line or the GUI depending on the application.
-    if (!MSqlQuery::testDBConnection())
+    if (failure.length())
     {
-        if (m_gui && PromptForDatabaseParams())
+        VERBOSE(VB_IMPORTANT, failure);
+        if (PromptForDatabaseParams(failure))
         {
-            if (!MSqlQuery::testDBConnection())
+            failure = TestDBconnection();
+            if (failure.length())
             {
+                VERBOSE(VB_IMPORTANT, failure);
                 return false;
             }
         }
@@ -736,7 +743,7 @@ int MythContextPrivate::intResponse(const QString &query, int def)
     return (ok ? resp : def);
 }
 
-bool MythContextPrivate::PromptForDatabaseParams(void)
+bool MythContextPrivate::PromptForDatabaseParams(QString error)
 {
     bool accepted = false;
     if (m_gui)
@@ -756,6 +763,9 @@ bool MythContextPrivate::PromptForDatabaseParams(void)
         // ask user for language settings
         LanguageSettings::prompt();
         LanguageSettings::load("mythfrontend");
+
+        // Tell the user what went wrong:
+        MythPopupBox::showOkPopup(mainWindow, "DB connect failure", error);
         
         // ask user for database parameters
         DatabaseSettings settings;
@@ -773,6 +783,7 @@ bool MythContextPrivate::PromptForDatabaseParams(void)
         QString response;
         
         // give user chance to skip config
+        cout << endl << error << endl << endl;
         response = getResponse("Would you like to configure the database "
                                "connection now?",
                                "yes");
@@ -817,6 +828,48 @@ bool MythContextPrivate::PromptForDatabaseParams(void)
     }
     return accepted;
 }
+
+/**
+ * Some quick sanity checks before opening a database connection
+ */
+QString MythContextPrivate::TestDBconnection(void)
+{
+    QString err;
+    QString host = m_settings->GetSetting("DBHostName");
+    QString port = m_settings->GetSetting("DBPort");
+
+
+    // 1. Check the supplied host or IP address, to prevent the app
+    //    appearing to hang if we cannot route to the machine:
+
+    if (!ping(host, 3))  // Fail after trying for 3 seconds
+    {
+        // Cause MSqlQuery to fail, instead of minutes timeout per DB value
+        m_settings->SetSetting("DBHostName", "");
+
+        err = parent->tr("Cannot find database host %1 on the network");
+        return err.arg(host);
+    }
+
+
+    // 2. Check that the supplied DBport is listening:
+
+    if (port.length() && !telnet(host, port.toInt()))
+    {
+        err = parent->tr("Cannot connect to port %1 on database host %2");
+        return err.arg(port).arg(host);
+    }
+
+
+    // 3. Finally, try to login, et c:
+
+    if (!MSqlQuery::testDBConnection())
+        return parent->tr(QString("Cannot login to database?"));
+
+
+    return QString::null;
+}
+
 
 MythContext::MythContext(const QString &binversion)
     : QObject(), d(NULL), app_binary_version(binversion)
