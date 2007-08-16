@@ -925,20 +925,20 @@ LogScale::LogScale(int maxscale, int maxrange)
 LogScale::~LogScale()
 {
     if (indices)
-	delete [] indices;
+        delete [] indices;
 }
 
 
 void LogScale::setMax(int maxscale, int maxrange)
 {
     if (maxscale == 0 || maxrange == 0)
-	return;
+        return;
 
     s = maxscale;
     r = maxrange;
 
     if (indices)
-	delete [] indices;
+        delete [] indices;
 
     double alpha;
     int i, scaled;
@@ -953,23 +953,23 @@ void LogScale::setMax(int maxscale, int maxrange)
 
     indices = new int[maxrange];
     for (i = 0; i < maxrange; i++)
-	indices[i] = 0;
+        indices[i] = 0;
 
     // initialize log scale
     for (uint i=0; i<10000 && (std::abs(dx) > e4); i++)
     {
-	t = std::log((domain + x) / x);
-	y = (x * t) - range;
-	yy = t - (domain / (x + domain));
-	dx = y / yy;
-	x -= dx;
+        t = std::log((domain + x) / x);
+        y = (x * t) - range;
+        yy = t - (domain / (x + domain));
+        dx = y / yy;
+        x -= dx;
     }
 
     alpha = x;
     for (i = 1; i < (int) domain; i++) {
-	scaled = (int) floor(0.5 + (alpha * log((double(i) + alpha) / alpha)));
-	if (indices[scaled - 1] < i)
-	    indices[scaled - 1] = i;
+        scaled = (int) floor(0.5 + (alpha * log((double(i) + alpha) / alpha)));
+        if (indices[scaled - 1] < i)
+            indices[scaled - 1] = i;
     }
 }
 
