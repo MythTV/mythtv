@@ -70,4 +70,7 @@ MPUBLIC void myth_eject(void);
 MPUBLIC bool hasUtf8(const char *str);
 #define M_QSTRING_UNICODE(str) hasUtf8(str) ? QString::fromUtf8(str) : str
 
+MPUBLIC bool ping(const QString &host, int timeout);
+MPUBLIC bool telnet(const QString &host, int port);
+
 #endif // UTIL_H_

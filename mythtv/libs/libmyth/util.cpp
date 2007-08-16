@@ -573,3 +573,33 @@ bool hasUtf8(const char *str)
 
     return false;
 }
+
+/**
+ * \brief Can we ping host within timeout seconds?
+ */
+bool ping(const QString &host, int timeout)
+{
+    QString cmd = QString("ping -t %1 -c 1  %2  >/dev/null")
+                  .arg(timeout).arg(host);
+
+    if (myth_system(cmd))
+        return false;
+
+    return true;
+}
+
+/**
+ * \brief Can we talk to port on host?
+ */
+bool telnet(const QString &host, int port)
+{
+    MythSocket *s = new MythSocket();
+    
+    if (s->connect(host, port))
+    {
+        s->close();
+        return true;
+    }
+
+    return false;
+}
