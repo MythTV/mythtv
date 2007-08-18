@@ -3362,7 +3362,7 @@ END
 
 rm -f $TMPO $TMPC $TMPE $TMPS $TMPH
 
-if test x"$QTDIR/bin/qmake" != x""; then
+if test -x $QTDIR/bin/qmake; then
   $QTDIR/bin/qmake QMAKE=${QTDIR}/bin/qmake mythtv.pro
 else
   qmake mythtv.pro
