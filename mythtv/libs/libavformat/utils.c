@@ -1684,6 +1684,7 @@ void av_estimate_timings(AVFormatContext *ic, offset_t old_offset)
     }
     av_update_stream_timings(ic);
 
+#if 0
     {
         int i;
         AVStream *st;
@@ -1698,6 +1699,7 @@ void av_estimate_timings(AVFormatContext *ic, offset_t old_offset)
                (double)ic->duration / AV_TIME_BASE,
                ic->bit_rate / 1000);
     }
+#endif
 }
 
 static int has_codec_parameters(AVCodecContext *enc)
