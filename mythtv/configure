@@ -3362,4 +3362,4 @@ END
 
 rm -f $TMPO $TMPC $TMPE $TMPS $TMPH
 
-qmake mythtv.pro
+$QTDIR/bin/qmake QMAKE=${QTDIR}/bin/qmake mythtv.pro

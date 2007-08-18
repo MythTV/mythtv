@@ -945,4 +945,4 @@ fi
 
 echo ""
 
-qmake mythplugins.pro
+$QTDIR/bin/qmake QMAKE=${QTDIR}/bin/qmake mythtv.pro
