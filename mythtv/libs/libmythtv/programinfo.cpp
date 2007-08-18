@@ -27,6 +27,9 @@
 
 using namespace std;
 
+// works only for integer divisors of 60
+static const uint kUnknownProgramLength = 30;
+
 static bool insert_program(const ProgramInfo*,
                            const ScheduledRecording*);
 
@@ -755,22 +758,14 @@ ProgramInfo *ProgramInfo::GetProgramAtDateTime(const QString &channel,
         return p;
 
     // Round endtime up to the next half-hour.
-    if (p->endts.time().minute() < 30)
-        p->endts.setTime(QTime(p->endts.time().hour(), 30));
-    else
-    {
-        if (p->endts.time().hour() == 23)
-        {
-            p->endts = p->endts.addDays(1);
-            p->endts.setTime(QTime(0, 0));
-        }
-        else
-            p->endts.setTime(QTime(p->endts.time().hour() + 1, 0));
-    }
+    p->endts.setTime(QTime(p->endts.time().hour(),
+                           p->endts.time().minute() / kUnknownProgramLength
+                           * kUnknownProgramLength));
+    p->endts = p->endts.addSecs(kUnknownProgramLength * 60);
 
     // if under a minute, bump it up to the next half hour
     if (p->startts.secsTo(p->endts) < 60)
-        p->endts = p->endts.addSecs(30 * 60);
+        p->endts = p->endts.addSecs(kUnknownProgramLength * 60);
 
     p->recendts = p->endts;
 
