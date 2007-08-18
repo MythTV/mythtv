@@ -659,12 +659,7 @@ void UIGuideType::drawRecType(QPainter *dr, UIGTCon *data)
     QRect area = data->drawArea;
     area.addCoords(breakin, breakin, -breakin, -breakin);
 
-    if (data->recType != 0)
-    {
-        QPixmap *recImg = &recImages[data->recType];
-        dr->drawPixmap(area.right() - recImg->width(),
-                       area.bottom() - recImg->height(), *recImg);
-    }
+    int recTypeOffset = 0;
 
     if (data->arrow != 0)
     {
@@ -678,10 +673,18 @@ void UIGuideType::drawRecType(QPainter *dr, UIGTCon *data)
         if (data->arrow == 2 || data->arrow == 3)
         {
             arrowImg = &arrowImages[1];
+            recTypeOffset = arrowImg->width();
             dr->drawPixmap(area.right() - arrowImg->width(),
                            area.top() + (area.height() / 2) -
                            (arrowImg->height() / 2), *arrowImg);
         }
+    }
+
+    if (data->recType != 0)
+    {
+        QPixmap *recImg = &recImages[data->recType];
+        dr->drawPixmap(area.right() - recImg->width() - recTypeOffset,
+                       area.bottom() - recImg->height(), *recImg);
     }
 }
 
