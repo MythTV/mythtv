@@ -456,7 +456,8 @@ void PlaybackBoxMusic::keyPressEvent(QKeyEvent *e)
             else
             {
                 // pass the key press on to the visualiser
-                mainvisual->visual()->handleKeyPress(action);
+                if (mainvisual->visual())
+                    mainvisual->visual()->handleKeyPress(action);
             }
         }
     }
