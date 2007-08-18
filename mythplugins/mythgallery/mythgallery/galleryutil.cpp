@@ -348,6 +348,55 @@ bool GalleryUtil::Delete(const QFileInfo &file)
     return false;
 }
 
+bool GalleryUtil::Rename(const QString &currDir, const QString &oldName,
+                         const QString &newName)
+{
+    // make sure there isn't already a file/directory with the same name
+    QFileInfo fi(currDir + '/' + newName);
+    if (fi.exists())
+        return false;
+
+    fi.setFile(currDir + '/' + oldName);
+    if (fi.isDir())
+        return RenameDirectory(currDir, oldName, newName);
+
+    // rename the file
+    QDir cdir(currDir);
+    if (!cdir.rename(oldName, newName))
+        return false;
+
+    // rename the file's thumbnail if it exists
+    if (QFile::exists(currDir + "/.thumbcache/" + oldName))
+    {
+        QDir d(currDir + "/.thumbcache/");
+        d.rename(oldName, newName);
+    }
+
+    int prefixLen = gContext->GetSetting("GalleryDir").length();
+    QString path = gContext->GetConfDir() + "/MythGallery";
+    path += currDir.right(currDir.length() - prefixLen);
+    path += QString("/.thumbcache/");
+    if (QFile::exists(path + oldName))
+    {
+        QDir d(path);
+        d.rename(oldName, newName);
+    }
+
+    // fix up the metadata in the database
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare("UPDATE gallerymetadata "
+                  "SET image = :IMAGENEW "
+                  "WHERE image = :IMAGEOLD");
+    query.bindValue(":IMAGENEW", QString(currDir + '/' + newName).utf8());
+    query.bindValue(":IMAGEOLD", QString(currDir + '/' + oldName).utf8());
+    if (query.exec())
+        return true;
+
+    // try to undo rename on DB failure
+    cdir.rename(newName, oldName);
+    return false;
+}
+
 bool GalleryUtil::CopyDirectory(const QFileInfo src, QFileInfo &dst)
 {
     QDir srcDir(src.absFilePath());
@@ -423,6 +472,67 @@ bool GalleryUtil::DeleteDirectory(const QFileInfo &dir)
     }
 
     return FileDelete(dir);
+}
+
+bool GalleryUtil::RenameDirectory(const QString &currDir, const QString &oldName, 
+                                const QString &newName)
+{
+    // rename the directory
+    QDir cdir(currDir);
+    if (!cdir.rename(oldName, newName))
+        return false;
+
+    // rename the directory's thumbnail if it exists in the parent directory
+    if (QFile::exists(currDir + "/.thumbcache/" + oldName))
+    {
+        QDir d(currDir + "/.thumbcache/");
+        d.rename(oldName, newName);
+    }
+
+    // also look in HOME directory for any thumbnails
+    int prefixLen = gContext->GetSetting("GalleryDir").length();
+    QString path = gContext->GetConfDir() + "/MythGallery";
+    path += currDir.right(currDir.length() - prefixLen) + '/';
+    if (QFile::exists(path + oldName))
+    {
+        QDir d(path);
+        d.rename(oldName, newName);
+
+        // rename this directory's thumbnail
+        path += QString(".thumbcache/");
+        if (QFile::exists(path + oldName))
+        {
+            QDir d(path);
+            d.rename(oldName, newName);
+        }
+    }
+
+    // fix up the metadata in the database
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare("SELECT image, angle FROM gallerymetadata "
+                  "WHERE image LIKE :IMAGEOLD");
+    query.bindValue(":IMAGEOLD", QString(currDir + '/' + oldName + '%').utf8());
+    if (query.exec())
+    {
+        while (query.next())
+        {
+            QString oldImage = query.value(0).asString();
+            oldImage = QString::fromUtf8(oldImage);
+            QString newImage = oldImage;
+            newImage = newImage.replace(currDir + '/' + oldName,
+                                        currDir + '/' + newName);
+
+            MSqlQuery subquery(MSqlQuery::InitCon());
+            subquery.prepare("UPDATE gallerymetadata "
+                        "SET image = :IMAGENEW "
+                        "WHERE image = :IMAGEOLD");
+            subquery.bindValue(":IMAGENEW", newImage);
+            subquery.bindValue(":IMAGEOLD", oldImage);
+            subquery.exec();
+        }
+    }
+
+    return true;
 }
 
 static QFileInfo MakeUnique(const QFileInfo &dest)

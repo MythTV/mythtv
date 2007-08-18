@@ -43,11 +43,15 @@ class GalleryUtil
     static bool Copy(const QFileInfo &src, QFileInfo &dst);
     static bool Move(const QFileInfo &src, QFileInfo &dst);
     static bool Delete(const QFileInfo &file);
+    static bool Rename(const QString &currDir, const QString &oldName, 
+                       const QString &newName);
 
   private:
     static bool CopyDirectory(const QFileInfo src, QFileInfo &dst);
     static bool MoveDirectory(const QFileInfo src, QFileInfo &dst);
     static bool DeleteDirectory(const QFileInfo &dir);
+    static bool RenameDirectory(const QString &currDir, const QString &oldName, 
+                                const QString &newName);
 };
 
 #endif /* EXIFUTIL_H */

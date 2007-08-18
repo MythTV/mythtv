@@ -1215,6 +1215,9 @@ void IconView::HandleSubMenuFile(void)
     item = new UIListBtnTypeItem(m_submenuType, tr("Create Dir"));
     item->setData(new MenuAction(&IconView::HandleMkDir));
 
+    item = new UIListBtnTypeItem(m_submenuType, tr("Rename"));
+    item->setData(new MenuAction(&IconView::HandleRename));
+
     m_inSubMenu = true;
 }
 
@@ -1512,6 +1515,45 @@ void IconView::HandleMkDir(void)
         LoadDirectory(m_currDir, true);
     }
 }
+
+
+void IconView::HandleRename(void)
+{
+    ThumbItem *item = m_itemList.at(m_currRow * m_nCols + m_currCol);
+
+    if (!item)
+        return;
+
+    QString folderName = item->GetName();
+
+    bool res = MythPopupBox::showGetTextPopup(
+        gContext->GetMainWindow(), tr("Rename"),
+        tr("Rename"), folderName);
+
+    if (folderName.isEmpty() || folderName == "." || folderName == "..")
+        return;
+
+    if (res)
+    {
+        if (!GalleryUtil::Rename(m_currDir, item->GetName(), folderName))
+        {
+            QString msg;
+            if (item->IsDir())
+                msg = tr("Failed to rename directory");
+            else
+                msg = tr("Failed to rename file");
+            DialogBox dialog(gContext->GetMainWindow(), msg);
+            dialog.AddButton(tr("OK"));
+            dialog.exec();
+
+            return;
+        }
+
+        LoadDirectory(m_currDir, true);
+    }
+}
+
+
 
 void IconView::ImportFromDir(const QString &fromDir, const QString &toDir)
 {

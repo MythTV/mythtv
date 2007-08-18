@@ -100,6 +100,7 @@ class IconView : public MythDialog
     void HandleClearMarked(void);
     void HandleSelectAll(void);
     void HandleMkDir(void);
+    void HandleRename(void);
 
     void HandleMenuButtonPress(void);
 

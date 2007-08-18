@@ -21,10 +21,10 @@
     </font>
 
     <container name="menu">
-      <area>20,20,140,500</area>
+      <area>20,20,140,540</area>
 
       <listbtnarea name="menu" draworder="0">
-        <area>0,0,140,240</area>
+        <area>0,0,140,220</area>
         <gradient type="unselected" start="#000000" end="#505050" alpha="100">
         </gradient>
         <gradient type="selected" start="#52CA38" end="#349838" alpha="255">
@@ -36,7 +36,7 @@
       </listbtnarea>
 
       <listbtnarea name="submenu" draworder="0">
-        <area>0,260,140,240</area>
+        <area>0,240,140,280</area>
         <gradient type="unselected" start="#000000" end="#505050" alpha="100">
         </gradient>
         <gradient type="selected" start="#52CA38" end="#349838" alpha="255">
