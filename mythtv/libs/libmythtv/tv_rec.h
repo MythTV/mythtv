@@ -348,9 +348,7 @@ class MPUBLIC TVRec : public QObject
     QDateTime      eitScanStartTime;
     QWaitCondition triggerEventLoop;
     QWaitCondition triggerEventSleep;
-
-    // Previous recording pointer (do not dereference)
-    ProgramInfo *lastRecording;
+    bool           m_switchingBuffer;
 
     // Current recording info
     ProgramInfo *curRecording;

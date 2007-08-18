@@ -117,8 +117,7 @@ TVRec::TVRec(int capturecardnum)
       internalState(kState_None), desiredNextState(kState_None),
       changeState(false), pauseNotify(true),
       stateFlags(0), lastTuningRequest(0),
-      // Previous recording info
-      lastRecording(NULL),
+      m_switchingBuffer(false),
       // Current recording info
       curRecording(NULL), autoRunJobs(JOB_NONE),
       // Pending recording info
@@ -1303,9 +1302,9 @@ void TVRec::RunTV(void)
             else if (!has_rec && !rec_soon && curRecording &&
                      (now >= curRecording->endts))
             {
-                if (lastRecording != curRecording)
+                if (!m_switchingBuffer)
                 {
-                    lastRecording = curRecording;
+                    m_switchingBuffer = true;
 
                     SwitchLiveTVRingBuffer(false, true);
 
@@ -1319,6 +1318,10 @@ void TVRec::RunTV(void)
                             <<"curRec("<<curRecording<<") "
                             <<"starttm("
                             <<starttime.toString(Qt::ISODate)<<")");
+                }
+                else
+                {
+                    VERBOSE(VB_RECORD, "Waiting for ringbuffer switch");
                 }
             }
             else
@@ -3080,6 +3083,8 @@ void TVRec::RingBufferChanged(RingBuffer *rb, ProgramInfo *pginfo)
         curRecording = new ProgramInfo(*pginfo);
         curRecording->MarkAsInUse(true, "recorder");
     }
+
+    m_switchingBuffer = false;
 }
 
 QString TVRec::TuningGetChanNum(const TuningRequest &request,
