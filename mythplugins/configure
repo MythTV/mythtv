@@ -945,4 +945,8 @@ fi
 
 echo ""
 
-$QTDIR/bin/qmake QMAKE=${QTDIR}/bin/qmake mythplugins.pro
+if test x"$QTDIR/bin/qmake" != x""; then
+  $QTDIR/bin/qmake QMAKE=${QTDIR}/bin/qmake mythplugins.pro
+else
+  qmake mythplugins.pro
+fi
