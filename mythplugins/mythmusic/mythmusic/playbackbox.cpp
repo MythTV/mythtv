@@ -1011,6 +1011,52 @@ void PlaybackBoxMusic::showEditMetadataDialog()
                }
            }
         }
+
+        MythBusyDialog busy(QObject::tr("Rebuilding music tree"));
+        busy.start();
+
+        // Get a reference to the current track
+        QValueList <int> branches_to_current_node;
+
+        QValueList <int> *a_route;
+        a_route = music_tree_list->getRouteToActive();
+        branches_to_current_node = *a_route;
+
+        // reload music
+        all_music->startLoading();
+        while (!all_music->doneLoading())
+        {
+            qApp->processEvents();
+            usleep(50000);
+        }
+        all_playlists->postLoad();
+
+        constructPlaylistTree();
+
+        if (music_tree_list->tryToSetActive(branches_to_current_node))
+        {
+            //  All is well
+        }
+        else
+        {
+            // should never happen
+            stop();
+            wipeTrackInfo();
+            branches_to_current_node.clear();
+            branches_to_current_node.append(0); //  Root node
+            branches_to_current_node.append(1); //  We're on a playlist (not "My Music")
+            branches_to_current_node.append(0); //  Active play Queue
+            music_tree_list->moveToNodesFirstChild(branches_to_current_node);
+        }
+
+        GenericTree *node = music_tree_list->getCurrentNode();
+        curMeta = all_music->getMetadata(node->getInt());
+
+        setShuffleMode(shufflemode);
+
+        music_tree_list->refresh();
+
+        busy.Close();
     }
 }
 
