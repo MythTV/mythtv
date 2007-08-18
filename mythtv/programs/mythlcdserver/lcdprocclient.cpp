@@ -104,6 +104,10 @@ LCDProcClient::LCDProcClient(LCDServer *lparent) :
     connect(showMessageTimer, SIGNAL(timeout()), this, 
             SLOT(removeStartupMessage()));
 
+    updateRecInfoTimer = new QTimer(this);
+    connect(updateRecInfoTimer, SIGNAL(timeout()), this, 
+            SLOT(updateRecordingList()));
+
     gContext->addListener(this);
 
     isRecording = false;
@@ -2265,11 +2269,14 @@ void LCDProcClient::customEvent(QCustomEvent *e)
 
         if (me->Message().left(21) == "RECORDING_LIST_CHANGE")
         {
-            if (lcd_showrecstatus)
+            if (lcd_showrecstatus && !updateRecInfoTimer->isActive())
             {
+               if (debug_level > 1)
+                   VERBOSE(VB_GENERAL, "LCDProcClient: Received recording list change");
+
                 // we can't query the backend from inside the customEvent
-                // so fire the recording list update from a timer  
-                QTimer::singleShot(500, this, SLOT(updateRecordingList()));
+                // so fire the recording list update from a timer 
+                updateRecInfoTimer->start(500, true);
             }
         }
     }

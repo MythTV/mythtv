@@ -142,6 +142,7 @@ class LCDProcClient : public QObject
     QTimer *recStatusTimer;
     QTimer *scrollListTimer;
     QTimer *showMessageTimer;
+    QTimer *updateRecInfoTimer;
 
     void setWidth(unsigned int);
     void setHeight(unsigned int);
