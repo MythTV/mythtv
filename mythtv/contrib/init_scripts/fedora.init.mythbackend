@@ -41,11 +41,26 @@
 ###############################################################################
 
 # Default values to use if none are supplied in the config file.
+
+# Running mythbackend as non-root requires you to ensure that audio/video
+# devices used for recording have suitable user permissions. One way
+# to achieve this is to modify existing or create new udev rules which
+# assign these devices to a non-root group with rw permissions and add
+# your mythbackend user to that group. Be aware that console.perms can
+# also affect device permissions and may need additional configuration.
+# Running as non-root may also introduce increased process latency.
+#
 # User who should start the mythbackend processes
     MBE_USER='root'
 
+# Directory holding the mythbackend binary (empty means autodetect)
+    MBE_DIR=''
+
 # Name of mythbackend binary
     MBE_PROG='mythbackend'
+
+# Startup options for mythbackend
+    MBE_OPTIONS=''
 
 # Directory holding the mythbackend log file
     LOG_DIR='/var/log/mythtv'
@@ -55,15 +70,6 @@
 
 # Logging options for mythbackend (empty means '-v important,general')
     LOG_OPTS=''
-
-# Startup options for mythbackend
-    MBE_OPTIONS=''
-
-# Pseudo-homedir for MythBackend
-    MYTHTV_HOME='/var/lib/mythtv'
-
-# Directory holding the mythbackend binary (empty means autodetect)
-    MBE_DIR=''
 
 ###############################################################################
 
@@ -79,7 +85,7 @@
     if [ ! -z "$MBE_DIR" ]; then
         MBE_BIN="$MBE_DIR/$MBE_PROG"
     else
-        MBE_BIN=`which "$MBE_PROG"`
+        MBE_BIN=`which "$MBE_PROG" 2>/dev/null`
         if [ ! -f "$MBE_BIN" ]; then
             if [ -f "/usr/bin/$MBE_PROG" ]; then
                 MBE_BIN="/usr/bin/$MBE_PROG"
@@ -95,9 +101,6 @@
         exit 1
     elif [ ! -x "$MBE_BIN" ]; then
         echo "$MBE_PROG is not executable"
-        exit 1
-    elif [ ! -d "$MYTHTV_HOME" ]; then
-        echo "mythbackend pseudo-home directory does not exist"
         exit 1
     elif [ ! -d "$LOG_DIR" ]; then
         echo "Log directory does not exist"
@@ -118,19 +121,12 @@
             echo "$MBE_PROG is already running."
             return 0
         fi
-    # Start
-
-    # Running mythbackend as non-root requires you to ensure that audio/video
-    # devices used for recording have suitable user permissions. One way
-    # to achieve this is to modify existing or create new udev rules which
-    # assign these devices to a non-root group with rw permissions and add
-    # your mythbackend user to that group.
-
+ 
+   # Start
         echo -n $"Starting $MBE_PROG: "
         touch "/var/run/$MBE_PROG.pid"
         chown "$MBE_USER":"$MBE_USER" "/var/run/$MBE_PROG.pid"
-        cd $MYTHTV_HOME                                   \
-            && daemon --user "$MBE_USER" "$MBE_BIN"       \
+        daemon --user "$MBE_USER" "$MBE_BIN"              \
                --daemon                                   \
                --logfile "$LOG_DIR/$LOG_FILE" "$LOG_OPTS" \
                --pidfile "/var/run/$MBE_PROG.pid"         \
@@ -189,4 +185,3 @@ status)
 esac
 
 exit $RETVAL
-
