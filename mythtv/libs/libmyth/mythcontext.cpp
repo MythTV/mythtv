@@ -834,27 +834,27 @@ bool MythContextPrivate::PromptForDatabaseParams(QString error)
  */
 QString MythContextPrivate::TestDBconnection(void)
 {
+    bool    doPing = (m_settings->GetSetting("DBHostPing") != "no");
     QString err;
     QString host = m_settings->GetSetting("DBHostName");
-    QString port = m_settings->GetSetting("DBPort");
+    int     port = m_settings->GetSetting("DBPort").toInt();
 
 
     // 1. Check the supplied host or IP address, to prevent the app
     //    appearing to hang if we cannot route to the machine:
 
-    if (!ping(host, 3))  // Fail after trying for 3 seconds
+    if (doPing && !ping(host, 3))  // Fail after trying for 3 seconds
     {
         // Cause MSqlQuery to fail, instead of minutes timeout per DB value
         m_settings->SetSetting("DBHostName", "");
 
-        err = parent->tr("Cannot find database host %1 on the network");
+        err = parent->tr("Cannot find (ping) database host %1 on the network");
         return err.arg(host);
     }
 
 
     // 2. Check that the supplied DBport is listening:
-
-    if (port.length() && !telnet(host, port.toInt()))
+    if (port && !telnet(host, port))
     {
         err = parent->tr("Cannot connect to port %1 on database host %2");
         return err.arg(port).arg(host);
