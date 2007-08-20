@@ -853,7 +853,7 @@ void XMLParse::parseGuideGrid(LayerSet *container, QDomElement &element)
                 cat = info.attribute("category");
                 col = info.attribute("color");
 
-                catColors[cat] = col;
+                catColors[cat.lower()] = col;
             }
             else
             {

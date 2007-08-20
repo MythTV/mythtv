@@ -849,7 +849,7 @@ void UIGuideType::SetProgramInfo(int row, int col, const QRect &area,
 
     if (drawCategoryColors)
     {
-        data->categoryColor = categoryColors[data->category];
+        data->categoryColor = categoryColors[data->category.lower()];
         if (!data->categoryColor.isValid())
             data->categoryColor = categoryColors["none"];
     }
