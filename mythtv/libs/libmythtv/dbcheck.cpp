@@ -8,6 +8,7 @@ using namespace std;
 
 #include "mythcontext.h"
 #include "mythdbcon.h"
+#include "datadirect.h" // for DataDirectProcessor::FixProgramIDs
 
 /// This is the DB schema version expected by the running MythTV instance.
 const QString currentDatabaseVersion = "1195";
@@ -426,6 +427,9 @@ bool UpgradeTVDatabaseSchema(void)
     QString dbver = gContext->GetSetting("DBSchemaVer");
 
     VERBOSE(VB_IMPORTANT, QString("Current Schema Version: %1").arg(dbver));
+
+    if (!gContext->GetNumSetting("MythFillFixProgramIDsHasRunOnce", 0))
+        DataDirectProcessor::FixProgramIDs();
 
     if (dbver == currentDatabaseVersion)
         return true;

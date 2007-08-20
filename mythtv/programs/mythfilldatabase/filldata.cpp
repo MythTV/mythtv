@@ -23,6 +23,9 @@ using namespace std;
 #include "mythcontext.h"
 #include "mythdbcon.h"
 
+// libmythtv headers
+#include "videosource.h" // for is_grabber..
+
 // filldata headers
 #include "filldata.h"
 
@@ -44,7 +47,8 @@ void FillData::DataDirectStationUpdate(Source source, bool update_icons)
         icon_data.UpdateSourceIcons(source.id);
 
     // Unselect channels not in users lineup for DVB, HDTV
-    if (!insert_channels && (new_channels > 0))
+    if (!insert_channels && (new_channels > 0) &&
+        is_grabber_labs(source.xmltvgrabber))
     {
         bool ok0 = (logged_in == source.userid);
         bool ok1 = (raw_lineup == source.id);
@@ -69,6 +73,13 @@ void FillData::DataDirectStationUpdate(Source source, bool update_icons)
 
 bool FillData::DataDirectUpdateChannels(Source source)
 {
+    if (!is_grabber_labs(source.xmltvgrabber))
+    {
+        VERBOSE(VB_IMPORTANT, "FillData: We only support "
+                "DataDirectUpdateChannels with TMS Labs channel editor");
+        return false;
+    }
+
     ddprocessor.SetListingsProvider(DD_ZAP2IT);
     ddprocessor.SetUserID(source.userid);
     ddprocessor.SetPassword(source.password);
@@ -87,6 +98,25 @@ bool FillData::DataDirectUpdateChannels(Source source)
 bool FillData::grabDDData(Source source, int poffset,
                           QDate pdate, int ddSource) 
 {
+    if (source.dd_dups.empty())
+        ddprocessor.SetCacheData(false);
+    else
+    {
+        VERBOSE(VB_GENERAL, QString(
+                    "This DataDirect listings source is "
+                    "shared by %1 MythTV lineups")
+                .arg(source.dd_dups.size()+1));
+        if (source.id > source.dd_dups[0])
+        {
+            VERBOSE(VB_IMPORTANT, "We should use cached data for this one");
+        }
+        else if (source.id < source.dd_dups[0])
+        {
+            VERBOSE(VB_IMPORTANT, "We should keep data around after this one");
+        }
+        ddprocessor.SetCacheData(true);
+    }
+
     ddprocessor.SetListingsProvider(ddSource);
     ddprocessor.SetUserID(source.userid);
     ddprocessor.SetPassword(source.password);
@@ -251,6 +281,8 @@ bool FillData::grabData(Source source, int offset, QDate *qCurrentDate)
 
     if (xmltv_grabber == "datadirect")
         return grabDDData(source, offset, *qCurrentDate, DD_ZAP2IT);
+    if (xmltv_grabber == "schedulesdirect1")
+        return grabDDData(source, offset, *qCurrentDate, DD_SCHEDULES_DIRECT);
 
     char tempfilename[] = "/tmp/mythXXXXXX";
     if (mkstemp(tempfilename) == -1)
@@ -389,6 +421,7 @@ void FillData::grabDataFromDDFile(
 bool FillData::fillData(QValueList<Source> &sourcelist)
 {
     QValueList<Source>::Iterator it;
+    QValueList<Source>::Iterator it2;
 
     QString status, querystr;
     MSqlQuery query(MSqlQuery::InitCon());
@@ -402,6 +435,28 @@ bool FillData::fillData(QValueList<Source> &sourcelist)
 
     need_post_grab_proc = false;
     int nonewdata = 0;
+    bool has_dd_source = false;
+
+    // find all DataDirect duplicates, so we only data download once.
+    for (it = sourcelist.begin(); it != sourcelist.end(); ++it)
+    {
+        if (!is_grabber_datadirect((*it).xmltvgrabber))
+            continue;
+
+        has_dd_source = true;
+        for (it2 = sourcelist.begin(); it2 != sourcelist.end(); ++it2)
+        {
+            if (((*it).id           != (*it2).id)           &&
+                ((*it).xmltvgrabber == (*it2).xmltvgrabber) &&
+                ((*it).userid       == (*it2).userid)       &&
+                ((*it).password     == (*it2).password))
+            {
+                (*it).dd_dups.push_back((*it2).id);
+            }
+        }
+    }
+    if (has_dd_source)
+        ddprocessor.CreateTempDirectory();
 
     for (it = sourcelist.begin(); it != sourcelist.end(); ++it)
     {
@@ -427,8 +482,11 @@ bool FillData::fillData(QValueList<Source> &sourcelist)
 
         if (xmltv_grabber == "eitonly")
         {
-            VERBOSE(VB_IMPORTANT, "Source configured to use only the "
-                    "broadcasted guide data. Skipping.");
+            VERBOSE(VB_GENERAL,
+                    QString("Source %1 configured to use only the "
+                            "broadcasted guide data. Skipping.")
+                    .arg((*it).id));
+
             externally_handled++;
             query.exec(QString("UPDATE settings SET data ='%1' "
                                "WHERE value='mythfilldatabaseLastRunStart' OR "
@@ -440,8 +498,10 @@ bool FillData::fillData(QValueList<Source> &sourcelist)
                  xmltv_grabber == "none" ||
                  xmltv_grabber == "")
         {
-            VERBOSE(VB_IMPORTANT,
-                    "Source configured with no grabber. Nothing to do.");
+            VERBOSE(VB_GENERAL,
+                    QString("Source %1 configured with no grabber. "
+                            "Nothing to do.").arg((*it).id));
+
             externally_handled++;
             query.exec(QString("UPDATE settings SET data ='%1' "
                                "WHERE value='mythfilldatabaseLastRunStart' OR "
@@ -486,7 +546,7 @@ bool FillData::fillData(QValueList<Source> &sourcelist)
 
         bool hasprefmethod = false;
 
-        if (xmltv_grabber != "datadirect")
+        if (is_grabber_external(xmltv_grabber))
         {
 
             QProcess grabber_capabilities_proc(xmltv_grabber);
@@ -584,9 +644,9 @@ bool FillData::fillData(QValueList<Source> &sourcelist)
             }
         }
 
-        need_post_grab_proc |= (xmltv_grabber != "datadirect");
+        need_post_grab_proc |= !is_grabber_datadirect(xmltv_grabber);
 
-        if ((xmltv_grabber == "datadirect") && dd_grab_all)
+        if (is_grabber_labs(xmltv_grabber) && dd_grab_all)
         {
             if (only_update_channels)
                 DataDirectUpdateChannels(*it);
@@ -601,7 +661,8 @@ bool FillData::fillData(QValueList<Source> &sourcelist)
             if (!grabData(*it, 0))
                 ++failures;
         }
-        else if ((*it).xmltvgrabber_baseline || xmltv_grabber == "datadirect")
+        else if ((*it).xmltvgrabber_baseline ||
+                 is_grabber_datadirect(xmltv_grabber))
         {
 
             QDate qCurrentDate = QDate::currentDate();
@@ -612,7 +673,7 @@ bool FillData::fillData(QValueList<Source> &sourcelist)
 
             if (maxDays > 0) // passed with --max-days
                 grabdays = maxDays;
-            else if (xmltv_grabber == "datadirect")
+            else if (is_grabber_datadirect(xmltv_grabber))
                 grabdays = 14;
 
             grabdays = (only_update_channels) ? 1 : grabdays;
@@ -620,7 +681,7 @@ bool FillData::fillData(QValueList<Source> &sourcelist)
             if (grabdays == 1)
                 refresh_today = true;
 
-            if ((xmltv_grabber == "datadirect") && only_update_channels)
+            if (is_grabber_labs(xmltv_grabber) && only_update_channels)
             {
                 DataDirectUpdateChannels(*it);
                 grabdays = 0;

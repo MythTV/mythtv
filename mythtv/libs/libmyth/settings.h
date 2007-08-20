@@ -200,7 +200,7 @@ class MPUBLIC LineEditSetting: public Setting
 {
   protected:
     LineEditSetting(Storage *_storage, bool readwrite = true) :
-        Setting(_storage), edit(NULL), rw(readwrite) { }
+        Setting(_storage), edit(NULL), rw(readwrite), password_echo(false) { }
 
   public:
     virtual QWidget* configWidget(ConfigurationGroup *cg, QWidget* parent, 
@@ -217,10 +217,12 @@ class MPUBLIC LineEditSetting: public Setting
 
     virtual void setEnabled(bool b);
     virtual void setVisible(bool b);
+    virtual void SetPasswordEcho(bool b);
 
 private:
     MythLineEdit* edit;
     bool rw;
+    bool password_echo;
 };
 
 // TODO: set things up so that setting the value as a string emits

@@ -6,6 +6,7 @@
 
 // Qt headers
 #include <qmap.h>
+#include <qdir.h>
 #include <qfile.h>
 #include <qstring.h>
 #include <qregexp.h>
@@ -25,6 +26,7 @@
 #define SHOW_WGET_OUTPUT 0
 
 #define LOC QString("DataDirect: ")
+#define LOC_WARN QString("DataDirect, Warning: ")
 #define LOC_ERR QString("DataDirect, Error: ")
 
 static QMutex lineup_type_lock;
@@ -511,30 +513,12 @@ bool DDStructureParser::characters(const QString& pchars)
     return true;
 }
 
-static QString makeTempFile(QString name_template)
-{
-    const char *tmp = name_template.ascii();
-    char *ctemplate = strdup(tmp);
-    int ret = mkstemp(ctemplate);
-    QString tmpFileName(ctemplate);
-    free(ctemplate);
-
-    if (ret == -1)
-    {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "Creating temp file from " +
-                QString("template '%1'").arg(name_template) + ENO);
-        return name_template;
-    }
-    close(ret);
-
-    return tmpFileName;
-}
-
 DataDirectProcessor::DataDirectProcessor(uint lp, QString user, QString pass) :
     listings_provider(lp % DD_PROVIDER_COUNT),
-    userid(user),               password(pass),
-    inputfilename(""),          tmpPostFile(""),
-    tmpResultFile(""),          cookieFile(""),
+    userid(user),                   password(pass),
+    tmpDir("/tmp"),                 cachedata(false),
+    inputfilename(""),              tmpPostFile(QString::null),
+    tmpResultFile(QString::null),   cookieFile(QString::null),
     cookieFileDT()
 {
     DataDirectURLs urls0(
@@ -542,19 +526,47 @@ DataDirectProcessor::DataDirectProcessor(uint lp, QString user, QString pass) :
         "http://datadirect.webservices.zap2it.com/tvlistings/xtvdService",
         "http://labs.zap2it.com",
         "/ztvws/ztvws_login/1,1059,TMS01-1,00.html");
+    DataDirectURLs urls1(
+        "Schedules Direct",
+        "http://webservices.schedulesdirect.tmsdatadirect.com"
+        "/schedulesdirect/tvlistings/xtvdService",
+        "http://schedulesdirect.org",
+        "/login/index.php");
     providers.push_back(urls0);
-
-    QString tmpDir = "/tmp";
-    tmpPostFile   = makeTempFile(tmpDir + "/mythtv_post_XXXXXX");
-    tmpResultFile = makeTempFile(tmpDir + "/mythtv_result_XXXXXX");
-    cookieFile    = makeTempFile(tmpDir + "/mythtv_cookies_XXXXXX");
+    providers.push_back(urls1);
 }
 
 DataDirectProcessor::~DataDirectProcessor()
 {
-    unlink(tmpPostFile.ascii());
-    unlink(tmpResultFile.ascii());
-    unlink(cookieFile.ascii());
+    VERBOSE(VB_GENERAL, LOC + "Deleting temporary files");
+
+    if (!tmpPostFile.isEmpty())
+        unlink(tmpPostFile.ascii());
+
+    if (!tmpResultFile.isEmpty())
+        unlink(tmpResultFile.ascii());
+
+    if (!cookieFile.isEmpty())
+        unlink(cookieFile.ascii());
+
+    QDir d(tmpDir, "mythtv_dd_cache_*", QDir::Name,
+           QDir::Files | QDir::NoSymLinks);
+
+    for (uint i = 0; i < d.count(); i++)
+    {
+        //cout<<"deleting '"<<tmpDir<<"/"<<d[i]<<"'"<<endl;
+        unlink((tmpDir + "/" + d[i]).ascii());
+    }
+
+    if (tmpDir != "/tmp")
+        rmdir(tmpDir.ascii());
+}
+
+QString DataDirectProcessor::CreateTempDirectory(void)
+{
+    if (tmpDir == "/tmp")
+        tmpDir = createTempFile("/tmp/mythtv_ddp_XXXXXX", true);
+    return QDeepCopy<QString>(tmpDir);
 }
 
 void DataDirectProcessor::UpdateStationViewTable(QString lineupid)
@@ -805,6 +817,52 @@ void DataDirectProcessor::DataDirectProgramUpdate(void)
     //cerr << "Done...\n";
 }
 
+void DataDirectProcessor::FixProgramIDs(void)
+{
+    VERBOSE(VB_GENERAL, "DataDirectProcessor::FixProgramIDs() -- begin");
+
+    MSqlQuery query(MSqlQuery::DDCon());
+    query.prepare(
+        "UPDATE recorded "
+        "SET programid=CONCAT(SUBSTRING(programid, 1, 2), "
+        "                     '00', SUBSTRING(programid, 3)) "
+        "WHERE length(programid) = 12");
+
+    if (!query.exec())
+    {
+        MythContext::DBError("Fixing program ids in recorded", query);
+        return;
+    }
+
+    query.prepare(
+        "UPDATE oldrecorded "
+        "SET programid=CONCAT(SUBSTRING(programid, 1, 2), "
+        "                     '00', SUBSTRING(programid, 3)) "
+        "WHERE length(programid) = 12");
+
+    if (!query.exec())
+    {
+        MythContext::DBError("Fixing program ids in oldrecorded", query);
+        return;
+    }
+
+    query.prepare(
+        "UPDATE program "
+        "SET programid=CONCAT(SUBSTRING(programid, 1, 2), "
+        "                     '00', SUBSTRING(programid, 3)) "
+        "WHERE length(programid) = 12");
+
+    if (!query.exec())
+    {
+        MythContext::DBError("Fixing program ids in program", query);
+        return;
+    }
+
+    gContext->SaveSetting("MythFillFixProgramIDsHasRunOnce", "1");
+
+    VERBOSE(VB_GENERAL, "DataDirectProcessor::FixProgramIDs() -- end");
+}
+
 FILE *DataDirectProcessor::DDPost(
     QString    ddurl,
     QString    postFilename, QString    inputFile,
@@ -870,12 +928,12 @@ bool DataDirectProcessor::GrabNextSuggestedTime(void)
     VERBOSE(VB_GENERAL, "Grabbing next suggested grabbing time");
 
     QString ddurl = providers[listings_provider].webServiceURL;
-         
-    QFile postfile(tmpPostFile);
+
+    QFile postfile(GetPostFilename());
     if (!postfile.open(IO_WriteOnly))
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR + QString("Opening '%1'")
-                .arg(tmpPostFile) + ENO);
+                .arg(GetPostFilename()) + ENO);
         return false;
     }
 
@@ -896,8 +954,8 @@ bool DataDirectProcessor::GrabNextSuggestedTime(void)
 
     QString command = QString("wget --http-user='%1' --http-passwd='%2' "
                               "--post-file='%3' %4 --output-document='%5'")
-        .arg(GetUserID()).arg(GetPassword()).arg(tmpPostFile)
-        .arg(ddurl).arg(tmpResultFile);
+        .arg(GetUserID()).arg(GetPassword()).arg(GetPostFilename())
+        .arg(ddurl).arg(GetResultFilename());
 
     if (SHOW_WGET_OUTPUT)
         VERBOSE(VB_GENERAL, "command: "<<command<<endl);
@@ -909,7 +967,7 @@ bool DataDirectProcessor::GrabNextSuggestedTime(void)
     QDateTime NextSuggestedTime;
     QDateTime BlockedTime;
 
-    QFile file(tmpResultFile);
+    QFile file(GetResultFilename());
 
     bool GotNextSuggestedTime = false;
     bool GotBlockedTime = false;
@@ -994,8 +1052,25 @@ bool DataDirectProcessor::GrabData(const QDateTime pstartDate,
 
     QString err = "";
     QString ddurl = providers[listings_provider].webServiceURL;
+    QString inputfile = inputfilename;
+    QString cache_dd_data = QString::null;
 
-    FILE *fp = DDPost(ddurl, tmpPostFile, inputfilename,
+    if (cachedata)
+    {
+        cache_dd_data = tmpDir + QString("/mythtv_dd_cache_%1_%2_%3_%4")
+            .arg(GetListingsProvider())
+            .arg(GetUserID().ascii())
+            .arg(pstartDate.toString())
+            .arg(pendDate.toString());
+
+        if (QFile(cache_dd_data).exists() && inputfilename.isEmpty())
+        {
+            VERBOSE(VB_GENERAL, LOC + "Copying from DD cache");
+            inputfile = cache_dd_data;
+        }
+    }
+
+    FILE *fp = DDPost(ddurl, GetPostFilename(), inputfile,
                       GetUserID(), GetPassword(),
                       pstartDate, pendDate, err);
     if (!fp)
@@ -1003,6 +1078,44 @@ bool DataDirectProcessor::GrabData(const QDateTime pstartDate,
         VERBOSE(VB_IMPORTANT, LOC_ERR + "Failed to get data " +
                 QString("(%1) -- ").arg(err) + ENO);
         return false;
+    }
+
+    if (cachedata && (inputfile != cache_dd_data))
+    {
+        QFile in, out(cache_dd_data);
+        bool ok = out.open(IO_WriteOnly);
+        if (!ok)
+        {
+            VERBOSE(VB_IMPORTANT, LOC_WARN +
+                    "Can not open DD cache file in '" +
+                    tmpDir + "' for writing!");
+        }
+        else
+        {
+            VERBOSE(VB_GENERAL, LOC + "Saving listings to DD cache");
+            ok = in.open(IO_ReadOnly, fp);
+            out.close(); // let copy routine handle dst file
+        }
+
+        if (ok)
+        {
+            if (copy(out, in))
+            {
+                pclose(fp);
+                fp = fopen(cache_dd_data.ascii(), "r");
+            }
+            else
+            {
+                VERBOSE(VB_IMPORTANT,
+                        LOC_ERR + "Failed to save DD cache! "
+                        "redownloading data...");
+                cachedata = false;
+                pclose(fp);
+                fp = DDPost(ddurl, GetPostFilename(), inputfile,
+                            GetUserID(), GetPassword(),
+                            pstartDate, pendDate, err);
+            }
+        }
     }
 
     QFile f;
@@ -1083,7 +1196,7 @@ void DataDirectProcessor::CreateTempTables()
         "  channelMinor char(3) )";
 
     dd_tables["dd_schedule"] =
-        "( programid char(12),           stationid char(12), "
+        "( programid char(40),           stationid char(12), "
         "  scheduletime datetime,        duration time,      "
         "  isrepeat bool,                stereo bool,        "
         "  subtitled bool,               hdtv bool,          "
@@ -1093,7 +1206,7 @@ void DataDirectProcessor::CreateTempTables()
         "INDEX progidx (programid) )";
 
     dd_tables["dd_program"] =
-        "( programid char(12) NOT NULL,  seriesid char(12),     "
+        "( programid char(40) NOT NULL,  seriesid char(12),     "
         "  title varchar(120),           subtitle varchar(150), "
         "  description text,             mpaarating char(5),    "
         "  starrating char(5),           runtime time,          "
@@ -1115,19 +1228,19 @@ void DataDirectProcessor::CreateTempTables()
         "  partnumber int,               parttotal int,               "
         "  seriesid char(12),            originalairdate date,        "
         "  showtype varchar(30),         colorcode varchar(20),       "
-        "  syndicatedepisodenumber varchar(20), programid char(12),   "
+        "  syndicatedepisodenumber varchar(20), programid char(40),   "
         "  tvrating char(5),             mpaarating char(5),          "
         "INDEX progidx (programid))";
 
     dd_tables["dd_productioncrew"] =
-        "( programid char(12),           role char(30),    "
+        "( programid char(40),           role char(30),    "
         "  givenname char(20),           surname char(20), "
         "  fullname char(41), "
         "INDEX progidx (programid), "
         "INDEX nameidx (fullname))";
 
     dd_tables["dd_genre"] =
-        "( programid char(12) NOT NULL,  class char(30), "
+        "( programid char(40) NOT NULL,  class char(30), "
         "  relevance char(1), "
         "INDEX progidx (programid))";
 
@@ -1148,11 +1261,12 @@ bool DataDirectProcessor::GrabLoginCookiesAndLineups(bool parse_lineups)
     QString labsURL   = providers[listings_provider].webURL;
     QString loginPage = providers[listings_provider].loginPage;
 
-    bool ok = Post(labsURL + loginPage, list, tmpResultFile, "", cookieFile);
+    bool ok = Post(labsURL + loginPage, list, GetResultFilename(), "",
+                   GetCookieFilename());
 
-    bool got_cookie = QFileInfo(cookieFile).size() > 100;
+    bool got_cookie = QFileInfo(GetCookieFilename()).size() > 100;
 
-    ok &= got_cookie && (!parse_lineups || ParseLineups(tmpResultFile));
+    ok &= got_cookie && (!parse_lineups || ParseLineups(GetResultFilename()));
     if (ok)
         cookieFileDT = QDateTime::currentDateTime();
 
@@ -1175,10 +1289,10 @@ bool DataDirectProcessor::GrabLineupForModify(const QString &lineupid)
     list.push_back(PostItem("submit",    "Modify"));
 
     QString labsURL = providers[listings_provider].webURL;
-    bool ok = Post(labsURL + (*it).get_action, list, tmpResultFile,
-                   cookieFile, "");
+    bool ok = Post(labsURL + (*it).get_action, list, GetResultFilename(),
+                   GetCookieFilename(), "");
 
-    return ok && ParseLineup(lineupid, tmpResultFile);
+    return ok && ParseLineup(lineupid, GetResultFilename());
 }
 
 void DataDirectProcessor::SetAll(const QString &lineupid, bool val)
@@ -1457,7 +1571,8 @@ bool DataDirectProcessor::SaveLineupChanges(const QString &lineupid)
             .arg(lineupid).arg(list.size() - 1));
 
     QString labsURL = providers[listings_provider].webURL;
-    return Post(labsURL + lineup.set_action, list, "", cookieFile, "");
+    return Post(labsURL + lineup.set_action, list, "",
+                GetCookieFilename(), "");
 }
 
 bool DataDirectProcessor::UpdateListings(uint sourceid)
@@ -1532,6 +1647,42 @@ RawLineup DataDirectProcessor::GetRawLineup(const QString &lineupid) const
     if (it == rawlineups.end())
         return tmp;
     return (*it);
+}
+
+QString DataDirectProcessor::GetPostFilename(void) const
+{
+    if (tmpPostFile.isEmpty())
+        tmpPostFile = createTempFile(tmpDir + "/mythtv_post_XXXXXX");
+    return QDeepCopy<QString>(tmpPostFile);
+}
+
+QString DataDirectProcessor::GetResultFilename(void) const
+{
+    if (tmpResultFile.isEmpty())
+        tmpResultFile = createTempFile(tmpDir + "/mythtv_result_XXXXXX");
+    return QDeepCopy<QString>(tmpResultFile);
+}
+
+QString DataDirectProcessor::GetCookieFilename(void) const
+{
+    if (cookieFile.isEmpty())
+        cookieFile = createTempFile(tmpDir + "/mythtv_cookies_XXXXXX");
+    return QDeepCopy<QString>(cookieFile);
+}
+
+void DataDirectProcessor::SetUserID(const QString &uid)
+{
+    userid = QDeepCopy<QString>(uid);
+}
+
+void DataDirectProcessor::SetPassword(const QString &pwd)
+{
+    password = QDeepCopy<QString>(pwd);
+}
+
+void DataDirectProcessor::SetInputFile(const QString &file)
+{
+    inputfilename = QDeepCopy<QString>(file);
 }
 
 bool DataDirectProcessor::Post(QString url, const PostList &list,

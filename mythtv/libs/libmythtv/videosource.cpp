@@ -20,6 +20,7 @@ using namespace std;
 #include <qmap.h>
 #include <qdir.h>
 #include <qprocess.h>
+#include <qdatetime.h>
 
 // MythTV headers
 #include "mythconfig.h"
@@ -295,8 +296,10 @@ class DataDirectPassword : public LineEditSetting, public VideoSourceDBStorage
 {
   public:
     DataDirectPassword(const VideoSource &parent) :
-        LineEditSetting(this), VideoSourceDBStorage(this, parent, "password")
+        LineEditSetting(this, true),
+        VideoSourceDBStorage(this, parent, "password")
     {
+        SetPasswordEcho(true);
         setLabel(QObject::tr("Password"));
     }
 };
@@ -307,7 +310,6 @@ void DataDirectLineupSelector::fillSelections(const QString &uid,
 {
     (void) uid;
     (void) pwd;
-    (void) _source;
 #ifdef USING_BACKEND
     if (uid.isEmpty() || pwd.isEmpty())
         return;
@@ -348,8 +350,11 @@ void DataDirectLineupSelector::fillSelections(const QString &uid,
 void DataDirect_config::load() 
 {
     VerticalConfigurationGroup::load();
-    if ((userid->getValue() != lastloadeduserid) || 
-        (password->getValue() != lastloadedpassword)) 
+    bool is_sd_userid = userid->getValue().contains("@") > 0;
+    bool match = ((is_sd_userid  && (source == DD_SCHEDULES_DIRECT)) ||
+                  (!is_sd_userid && (source == DD_ZAP2IT)));
+    if (((userid->getValue() != lastloadeduserid) ||
+         (password->getValue() != lastloadedpassword)) && match)
     {
         lineupselector->fillSelections(userid->getValue(), 
                                        password->getValue(),
@@ -442,8 +447,7 @@ void XMLTV_generic_config::save()
         "instead of just 'mythfilldatabase'.\nYour grabber does not provide "
         "channel numbers, so you have to set them manually.");
 
-    if (grabber != "datadirect" && grabber != "eitonly" && 
-        grabber != "/bin/true")
+    if (is_grabber_external(grabber))
     {
         VERBOSE(VB_IMPORTANT, "\n" << err_msg);
         MythPopupBox::showOkPopup(
@@ -508,8 +512,16 @@ XMLTVConfig::XMLTVConfig(const VideoSource &parent) :
     // only save settings for the selected grabber
     setSaveAll(false);
 
-    addTarget("datadirect", new DataDirect_config(parent));
-    grabber->addSelection("North America (DataDirect) (Internal)", "datadirect");
+    addTarget("schedulesdirect1",
+              new DataDirect_config(parent, DD_SCHEDULES_DIRECT));
+    grabber->addSelection("North America (SchedulesDirect.org) "
+                          "(Internal)", "schedulesdirect1");
+
+#if 1
+    addTarget("datadirect", new DataDirect_config(parent, DD_ZAP2IT));
+    grabber->addSelection(
+        "North America (TMS Labs) (Internal)", "datadirect");
+#endif
 
     addTarget("eitonly", new EITOnly_config(parent));
     grabber->addSelection("Transmitted guide only (EIT)", "eitonly");

@@ -32,6 +32,7 @@ using namespace std;
 #include <qpainter.h>
 #include <qpixmap.h>
 #include <qfont.h>
+#include <qfile.h>
 
 // Myth headers
 #include "mythconfig.h"
@@ -603,3 +604,107 @@ bool telnet(const QString &host, int port)
 
     return false;
 }
+
+/** \fn  Copy(QFile&,QFile&,uint)
+ *  \brief Copies src file to dst file.
+ *
+ *   If the dst file is open, it must be open for writing.
+ *   If the src file is open, if must be open for reading.
+ *
+ *   The files will be in the same open or close state after
+ *   this function runs as they were prior to this function being called.
+ *
+ *   This function does not care if the files are actual files.
+ *   For compatibility with pipes and socket streams the file location
+ *   will not be reset to 0 at the end of this function. If the function
+ *   is succesful the file pointers will be at the end of the copied
+ *   data.
+ *
+ *  \param dst Destination QFile
+ *  \param src Source QFile
+ *  \param block_size Optional block size in bytes, must be at least 1024,
+ *                    otherwise the default of 16 KB will be used.
+ *  \return bytes copied on success, -1 on failure.
+ */
+long long copy(QFile &dst, QFile &src, uint block_size)
+{
+    uint buflen = (block_size < 1024) ? (16 * 1024) : block_size;
+    char *buf = new char[buflen];
+    bool odst = false, osrc = false;
+
+    if (!buf)
+        return -1LL;
+
+    if (!dst.isWritable() && !dst.isOpen())
+        odst = dst.open(IO_Raw|IO_WriteOnly|IO_Truncate);
+
+    if (!src.isReadable() && !src.isOpen())
+        osrc = src.open(IO_Raw|IO_ReadOnly);
+
+    bool ok = dst.isWritable() && src.isReadable();
+    long long total_bytes = 0LL;
+    while (ok)
+    {
+        long long rlen, wlen, off = 0;
+        rlen = src.readBlock(buf, buflen);
+        if (rlen<0)
+        {
+            ok = false;
+            break;
+        }
+        if (rlen==0)
+            break;
+
+        total_bytes += (long long) rlen;
+
+        while ((rlen-off>0) && ok)
+        {
+            wlen = dst.writeBlock(buf + off, rlen - off);
+            if (wlen>=0)
+                off+= wlen;
+            if (wlen<0)
+                ok = false;
+        }
+    }
+    delete[] buf;
+
+    if (odst)
+        dst.close();
+
+    if (osrc)
+        src.close();
+
+    return (ok) ? total_bytes : -1LL;
+}
+
+QString createTempFile(QString name_template, bool dir)
+{
+    const char *tmp = name_template.ascii();
+    char *ctemplate = strdup(tmp);
+    int ret = -1;
+
+    if (dir)
+    {
+        ret = (mkdtemp(ctemplate)) ? 0 : -1;
+    }
+    else
+    {
+        ret = mkstemp(ctemplate);
+    }
+
+    QString tmpFileName(ctemplate);
+    free(ctemplate);
+
+    if (ret == -1)
+    {
+        VERBOSE(VB_IMPORTANT, QString("createTempFile(%1), Error ")
+                .arg(name_template) + ENO);
+        return name_template;
+    }
+
+    if (!dir && (ret >= 0))
+        close(ret);
+
+    return tmpFileName;
+}
+

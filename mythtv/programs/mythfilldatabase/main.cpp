@@ -16,6 +16,7 @@ using namespace std;
 // libmythtv headers
 #include "scheduledrecording.h"
 #include "remoteutil.h"
+#include "videosource.h" // for is_grabber..
 
 // filldata headers
 #include "filldata.h"
@@ -34,7 +35,7 @@ int main(int argc, char *argv[])
     bool from_file = false;
     bool mark_repeats = true;
 
-    bool usingDataDirect = false;
+    bool usingDataDirect = false, usingDataDirectLabs = false;
     bool grab_data = true;
 
     bool export_iconmap = false;
@@ -579,8 +580,10 @@ int main(int argc, char *argv[])
                        newsource.xmltvgrabber_prefmethod = "";
 
                        sourcelist.append(newsource);
-                       if (newsource.xmltvgrabber == "datadirect")
-                           usingDataDirect = true;
+                       usingDataDirect |=
+                           is_grabber_datadirect(newsource.xmltvgrabber);
+                       usingDataDirectLabs |=
+                           is_grabber_labs(newsource.xmltvgrabber);
                   }
              }
              else
@@ -812,6 +815,12 @@ int main(int argc, char *argv[])
         (gContext->GetNumSetting("MythFillGrabberSuggestsTime", 1)))
     {
         fill_data.ddprocessor.GrabNextSuggestedTime();
+    }
+
+    if (usingDataDirectLabs ||
+        !gContext->GetNumSetting("MythFillFixProgramIDsHasRunOnce", 0))
+    {
+        DataDirectProcessor::FixProgramIDs();
     }
 
     VERBOSE(VB_GENERAL, "\n"

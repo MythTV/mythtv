@@ -26,6 +26,7 @@ struct Source
     bool    xmltvgrabber_manualconfig;
     bool    xmltvgrabber_cache;
     QString xmltvgrabber_prefmethod;
+    vector<int> dd_dups;
 };
 
 class FillData

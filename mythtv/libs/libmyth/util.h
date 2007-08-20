@@ -16,6 +16,7 @@ class QPixmap;
 class QImage;
 class QPainter;
 class QFont;
+class QFile;
 
 class MPUBLIC MythTimer
 {
@@ -72,5 +73,9 @@ MPUBLIC bool hasUtf8(const char *str);
 
 MPUBLIC bool ping(const QString &host, int timeout);
 MPUBLIC bool telnet(const QString &host, int port);
+
+MPUBLIC long long copy(QFile &dst, QFile &src, uint block_size = 0);
+MPUBLIC QString createTempFile(QString name_template = "/tmp/mythtv_XXXXX",
+                               bool dir = false);
 
 #endif // UTIL_H_

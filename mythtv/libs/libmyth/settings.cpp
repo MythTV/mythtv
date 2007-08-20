@@ -639,7 +639,8 @@ QWidget* LineEditSetting::configWidget(ConfigurationGroup *cg, QWidget* parent,
         connect(edit, SIGNAL(changeHelpText(QString)), cg, 
                 SIGNAL(changeHelpText(QString)));
 
-    edit->setRW(rw);
+    setRW(rw);
+    SetPasswordEcho(password_echo);
 
     return widget;
 }
@@ -662,6 +663,13 @@ void LineEditSetting::setVisible(bool b)
         else
             edit->hide();
     }
+}
+
+void LineEditSetting::SetPasswordEcho(bool b)
+{
+    password_echo = b;
+    if (edit)
+        edit->setEchoMode(b ? QLineEdit::Password : QLineEdit::Normal);
 }
 
 QWidget* SliderSetting::configWidget(ConfigurationGroup *cg, QWidget* parent,

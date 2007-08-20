@@ -13,8 +13,9 @@ using namespace std;
 
 enum DD_PROVIDERS
 {
-    DD_ZAP2IT = 0,
-    DD_PROVIDER_COUNT,
+    DD_ZAP2IT           = 0,
+    DD_SCHEDULES_DIRECT = 1,
+    DD_PROVIDER_COUNT   = 2,
 };
 
 class DataDirectURLs
@@ -254,6 +255,8 @@ class MPUBLIC DataDirectProcessor
                         QString userid = "", QString password = "");
    ~DataDirectProcessor();
 
+    QString CreateTempDirectory(void);
+
     // web service commands
     bool GrabData(const QDateTime pstartdate, const QDateTime penddate);
     bool GrabNextSuggestedTime(void);
@@ -303,11 +306,13 @@ class MPUBLIC DataDirectProcessor
     RawLineup GetRawLineup( const QString &lineupid) const;
 
     // sets
-    void SetUserID(QString uid)                 { userid             = uid;  }
-    void SetPassword(QString pwd)               { password           = pwd;  }
+    void SetUserID(const QString &uid);
+    void SetPassword(const QString &pwd);
     void SetListingsProvider(uint i)
         { listings_provider = i % DD_PROVIDER_COUNT; }
-    void SetInputFile(const QString &file)      { inputfilename      = file; }
+
+    void SetInputFile(const QString &file);
+    void SetCacheData(bool cd) { cachedata = cd; }
 
     // static commands (these update temp DB tables)
     static void UpdateStationViewTable(QString lineupid);
@@ -318,6 +323,9 @@ class MPUBLIC DataDirectProcessor
     static bool UpdateChannelsUnsafe(uint sourceid);
     static void DataDirectProgramUpdate(void);
 
+    // static command, makes Labs and Schedules Direct ProgramIDs compatible.
+    static void FixProgramIDs(void);
+
   private:
     void CreateTempTables(void);
     void CreateATempTable(const QString &ptablename,
@@ -325,6 +333,10 @@ class MPUBLIC DataDirectProcessor
 
     bool ParseLineups(const QString &documentFile);
     bool ParseLineup(const QString &lineupid, const QString &documentFile);
+
+    QString GetPostFilename(void) const;
+    QString GetResultFilename(void) const;
+    QString GetCookieFilename(void) const;
 
     void SetAll(const QString &lineupid, bool val);
     void SetDDProgramsStartAt(QDateTime begts)  { actuallistingsfrom = begts; }
@@ -346,6 +358,8 @@ class MPUBLIC DataDirectProcessor
 
     QString       userid;
     QString       password;
+    QString       tmpDir;
+    bool          cachedata;
 
     QDateTime     actuallistingsfrom;
     QDateTime     actuallistingsto;
@@ -356,11 +370,11 @@ class MPUBLIC DataDirectProcessor
     DDLineupList  lineups;
     DDLineupMap   lineupmaps;
 
-    RawLineupMap  rawlineups;
-    QString       tmpPostFile;
-    QString       tmpResultFile;
-    QString       cookieFile;
-    QDateTime     cookieFileDT;
+    RawLineupMap    rawlineups;
+    mutable QString tmpPostFile;
+    mutable QString tmpResultFile;
+    mutable QString cookieFile;
+    QDateTime       cookieFileDT;
 };
 
 #endif
