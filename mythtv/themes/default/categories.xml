@@ -10,6 +10,7 @@
   <catcolor category="Cooking" color="tan3"></catcolor>
   <catcolor category="Documentary" color="goldenrod"></catcolor>
   <catcolor category="Doc" color="goldenrod"></catcolor>
+  <catcolor category="Sport" color="DarkCyan"></catcolor>
   <catcolor category="Sports" color="DarkCyan"></catcolor>
   <catcolor category="Sports event" color="DarkCyan"></catcolor>
   <catcolor category="Sports non-event" color="DarkCyan"></catcolor>
@@ -19,6 +20,8 @@
   <catcolor category="Music" color="DarkRed"></catcolor>
   <catcolor category="Music special" color="#aa0000"></catcolor>
   <catcolor category="Movies" color="Blue"></catcolor>
+  <catcolor category="Movie" color="Blue"></catcolor>
+  <catcolor category="Film" color="Blue"></catcolor>
   <catcolor category="Drama" color="rosybrown3"></catcolor>
   <catcolor category="Classic" color="grey62"></catcolor>
   <catcolor category="Crime" color="MediumVioletRed"></catcolor>
@@ -53,10 +56,23 @@
   <catcolor category="Game" color="orchid"></catcolor>
   <catcolor category="Children's" color="MediumSlateBlue"></catcolor>
   <catcolor category="Children" color="MediumSlateBlue"></catcolor>
+  <catcolor category="Childrens" color="MediumSlateBlue"></catcolor>
   <catcolor category="Children-musical" color="#3333dd"></catcolor>
   <catcolor category="Children-music" color="#3333dd"></catcolor>
   <catcolor category="Kids" color="MediumSlateBlue"></catcolor>
   <catcolor category="Anthology" color="DarkOrchid"></catcolor>
+  <catcolor category="Animated" color="#3333aa"></catcolor>
+  <catcolor category="Game show" color="orchid"></catcolor>
+  <catcolor category="Docudrama" color="goldenrod"></catcolor>
+  <catcolor category="Self improvement" color="#00ffaa"></catcolor>
+  <catcolor category="Excercise" color="#00dd99"></catcolor>
+  <catcolor category="Bus./financial" color="DarkOrange3"></catcolor>
+  <catcolor category="Auto" color="#a8bde8"></catcolor>
+  <catcolor category="Biography" color="#e9ecf3"></catcolor>
+  <catcolor category="Fashion" color="#a8cdea"></catcolor>
+  <catcolor category="Soaps" color="DarkOrchid"></catcolor>
+  <catcolor category="Soap" color="DarkOrchid"></catcolor>
+
   <catcolor category="CINE" color="Blue"></catcolor>
   <catcolor category="SERIE" color="DarkOrchid"></catcolor>
   <catcolor category="DOCUMENTAL" color="goldenrod"></catcolor>
@@ -68,37 +84,22 @@
   <catcolor category="MAGAZINE" color="MediumTurquoise"></catcolor>
   <catcolor category="TIEMPO" color="#33ff99"></catcolor>
   <catcolor category="SHOW" color="sienna"></catcolor>
-  <catcolor category="Animated" color="#3333aa"></catcolor>
-  <catcolor category="Game show" color="orchid"></catcolor>
-  <catcolor category="Docudrama" color="goldenrod"></catcolor>
-  <catcolor category="Self improvement" color="#00ffaa"></catcolor>
-  <catcolor category="Excercise" color="#00dd99"></catcolor>
-  <catcolor category="Bus./financial" color="DarkOrange3"></catcolor>
-  <catcolor category="Auto" color="#a8bde8"></catcolor>
-  <catcolor category="Biography" color="#e9ecf3"></catcolor>
-  <catcolor category="Fashion" color="#a8cdea"></catcolor>
 
   <!-- Categories introduced by tv_grab_au -->
-  <catcolor category="Childrens" color="MediumSlateBlue"></catcolor>
-  <catcolor category="Movie" color="Blue"></catcolor>
-<catcolor category="Live" color="DarkOrange3"></catcolor>
-  
+  <catcolor category="Live" color="DarkOrange3"></catcolor>
+
   <!-- Categories used by the NextView EPG service -->
   <!-- (available in some european countries) -->
-  <catcolor category="news" color="DarkOrange3"></catcolor>
   <catcolor category="music/ballet/dance" color="DarkRed"></catcolor>
-  <catcolor category="sports" color="DarkCyan"></catcolor>
   <catcolor category="series" color="DarkOrchid"></catcolor>
   <catcolor category="social/political/economics" color="DarkOrange3"></catcolor>
-  <catcolor category="show/game show" color="MediumTurquoise"></catcolor>
+  <catcolor category="show/game show" color="orchid"></catcolor>
   <catcolor category="science" color="#33ff99"></catcolor>
   <catcolor category="technology" color="#33ff99"></catcolor>
-  <catcolor category="kids" color="MediumSlateBlue"></catcolor>
   <catcolor category="leisure hobbies" color="Red"></catcolor>
   <catcolor category="tourism/travel" color="#aa00aa"></catcolor>
   <catcolor category="arts/culture" color="goldenrod"></catcolor>
-  <catcolor category="movie" color="Blue"></catcolor>
-  
+
   <!-- Categories introduced by tv_grab_uk_rt -->
   <catcolor category="Animation" color="MediumSlateBlue"></catcolor>
   <catcolor category="Business" color="DarkOrange3"></catcolor>
@@ -109,31 +110,23 @@
   <catcolor category="Drama Series" color="rosybrown3"></catcolor>
   <catcolor category="Entertainment" color="DarkOrchid"></catcolor>
   <catcolor category="Environment" color="#33ff99"></catcolor>
-  <catcolor category="Film" color="Blue"></catcolor>
-  <catcolor category="Game Show" color="orchid"></catcolor>
   <catcolor category="Gardening" color="Red"></catcolor>
   <catcolor category="Interests" color="Red"></catcolor>
-  <catcolor category="Music &amp; Arts" color="goldenrod"></catcolor>
-  <catcolor category="News &amp; Current Affairs" color="DarkOrange3"></catcolor>
+  <catcolor category="Music and Arts" color="goldenrod"></catcolor>
+  <catcolor category="News and Current Affairs" color="DarkOrange3"></catcolor>
   <catcolor category="Religious" color="goldenrod"></catcolor>
   <catcolor category="Sitcoms" color="DarkOrchid"></catcolor>
-  <catcolor category="Soaps" color="DarkOrchid"></catcolor>
-  <catcolor category="Soap" color="DarkOrchid"></catcolor>
-  <catcolor category="Sport" color="DarkCyan"></catcolor>
   <catcolor category="Talk Show" color="MediumTurquoise"></catcolor>
   <catcolor category="Transport" color="#33ff99"></catcolor>
   <catcolor category="Travel" color="#aa00aa"></catcolor>
-  
+
   <!-- Categories used by teveblad.be (grabbed with pytvgrab) -->
   <catcolor category="nieuws" color="DarkOrange3"></catcolor>
   <catcolor category="actua" color="sienna"></catcolor>
   <catcolor category="documentaire" color="goldenrod"></catcolor>
   <catcolor category="wielrennen" color="DarkCyan"></catcolor>
-  <catcolor category="sport" color="DarkCyan"></catcolor>
   <catcolor category="voetbal" color="DarkCyan"></catcolor>
-  <catcolor category="soap" color="SlateGrey"></catcolor>
   <catcolor category="muziek" color="DarkRed"></catcolor>
-  <catcolor category="film" color="Blue"></catcolor>
   <catcolor category="talkshow" color="MediumTurquoise"></catcolor>
   <catcolor category="serie" color="DarkOrchid"></catcolor>
   <catcolor category="spelprogramma" color="orchid"></catcolor>
@@ -145,10 +138,8 @@
   <!-- Categories used by tvgids.nl (grabbed with tv_grab_nl) -->
   <catcolor category="Amusement" color="orchid"></catcolor>
   <catcolor category="Animatie" color="#3333aa"></catcolor>
-  <catcolor category="Comedy" color="#8800aa"></catcolor>
   <catcolor category="Documentaire" color="goldenrod"></catcolor>
   <catcolor category="Erotiek" color="thistle3"></catcolor>
-  <catcolor category="Film" color="Blue"></catcolor>
   <catcolor category="Informatief" color="DarkOrange3"></catcolor>
   <catcolor category="Jeugd" color="MediumSlateBlue"></catcolor>
   <catcolor category="Kunst/cultuur" color="grey62"></catcolor>
@@ -158,8 +149,7 @@
   <catcolor category="Nieuws/actualiteiten" color="DarkOrange3"></catcolor>
   <catcolor category="Overige" color="#222200"></catcolor>
   <catcolor category="Religieus" color="CornflowerBlue"></catcolor>
-  <catcolor category="Serie/soap" color="SlateGrey"></catcolor>
-  <catcolor category="Sport" color="DarkCyan"></catcolor>
+  <catcolor category="Serie/soap" color="DarkOrchid"></catcolor>
   <catcolor category="Wetenschap" color="#33ff99"></catcolor>
   
   <!-- Categories introduced by tv_grab_jp -->
@@ -188,7 +178,6 @@
   <catcolor category="Competição" color="DarkCyan"></catcolor>
   <catcolor category="Futebol" color="DarkCyan"></catcolor>
   <catcolor category="Cinema" color="Blue"></catcolor>
-  <catcolor category="Drama" color="rosybrown3"></catcolor>
   <catcolor category="Ação" color="maroon"></catcolor>
   <catcolor category="Humor" color="DarkOrchid"></catcolor>
   <catcolor category="Suspense" color="SlateGrey"></catcolor>
@@ -201,8 +190,6 @@
   <!-- Categories introduced by tv_grab_cz -->
   <catcolor category="Zpravy" color="DarkOrange3"></catcolor>
   <catcolor category="Dokument" color="goldenrod"></catcolor>
-  <catcolor category="Sport" color="DarkCyan"></catcolor>
-  <catcolor category="Film" color="Blue"></catcolor>
   <catcolor category="Pro deti" color="MediumSlateBlue"></catcolor>
   <catcolor category="Serial" color="DarkOrchid"></catcolor>
   <catcolor category="Zabava" color="MediumTurquoise"></catcolor>
@@ -210,7 +197,6 @@
   <!-- Categories introduced by tv_grab_de_prisma -->
   <!-- (unofficial xmltv grabber for Germany) -->
   <catcolor category="Abenteuer" color="maroon"></catcolor>
-  <catcolor category="Animation" color="MediumSlateBlue"></catcolor>
   <catcolor category="Ansprache" color="DarkOrange3"></catcolor>
   <catcolor category="Architektur" color="goldenrod"></catcolor>
   <catcolor category="Ausland" color="goldenrod"></catcolor>
@@ -224,7 +210,6 @@
   <catcolor category="Eastern" color="maroon"></catcolor>
   <catcolor category="Erotik" color="thistle3"></catcolor>
   <catcolor category="Familie" color="#222200"></catcolor>
-  <catcolor category="Film" color="Blue"></catcolor>
   <catcolor category="Frauen" color="#222200"></catcolor>
   <catcolor category="Freizeit" color="#00aa00"></catcolor>
   <catcolor category="Frueh" color="goldenrod"></catcolor>
@@ -267,12 +252,9 @@
   <catcolor category="Rockmusik" color="DarkRed"></catcolor>
   <catcolor category="Rock/Pop" color="DarkRed"></catcolor>
   <catcolor category="Satire" color="#222200"></catcolor>
-  <catcolor category="Scifi" color="DarkBlue"></catcolor>
   <catcolor category="Serie" color="DarkOrchid"></catcolor>
   <catcolor category="Show" color="MediumTurquoise"></catcolor>
-  <catcolor category="Soap" color="DarkOrchid"></catcolor>
   <catcolor category="Spiel" color="orchid"></catcolor>
-  <catcolor category="Sport" color="DarkCyan"></catcolor>
   <catcolor category="Technik" color="#33ff99"></catcolor>
   <catcolor category="Theater" color="goldenrod"></catcolor>
   <catcolor category="Thriller" color="firebrick3"></catcolor>
@@ -324,7 +306,6 @@
   <catcolor category="Reisisaated" color="#aa00aa"></catcolor>
   <catcolor category="Romantika" color="#ff9999"></catcolor>
   <catcolor category="Seiklus" color="maroon"></catcolor>
-  <catcolor category="Sport" color="DarkCyan"></catcolor>
   <catcolor category="Telemängud" color="orchid"></catcolor>
   <catcolor category="Telesarjad" color="DarkOrchid"></catcolor>
   <catcolor category="Tõsielu" color="sienna"></catcolor>
