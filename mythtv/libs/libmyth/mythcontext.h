@@ -119,6 +119,7 @@ enum LogPriorities
 struct MPUBLIC DatabaseParams
 {
     QString dbHostName;         ///< database server
+    bool    dbHostPing;         ///< Can we test connectivity using ping?
     int     dbPort;             ///< database port
     QString dbUserName;         ///< DB user name 
     QString dbPassword;         ///< DB password
@@ -275,7 +276,6 @@ class MPUBLIC MythContext : public QObject, public MythObservable,
 
     QString GetFilePrefix(void);
 
-    bool LoadSettingsFiles(const QString &filename);
     void LoadQtConfig(void);
     void UpdateImageCache(void);
 

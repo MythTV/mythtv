@@ -208,6 +208,7 @@ class MythContextPrivate
     bool LoadDatabaseSettings(bool reload);
     
     bool FixSettingsFile(void);
+    bool LoadSettingsFiles(const QString &filename);
     bool WriteSettingsFile(const DatabaseParams &params,
                            bool overwrite = false);
     bool FindSettingsProbs(void);
@@ -553,13 +554,13 @@ bool MythContextPrivate::LoadDatabaseSettings(bool reload)
         m_settings = new Settings;
     }
     
-    if (!parent->LoadSettingsFiles("mysql.txt"))
+    if (!LoadSettingsFiles("mysql.txt"))
     {
         VERBOSE(VB_IMPORTANT, "Unable to read configuration file mysql.txt");
         if (!FixSettingsFile())
             return false;
         else
-            parent->LoadSettingsFiles("mysql.txt");
+            LoadSettingsFiles("mysql.txt");
     }
 
     // Even if we have loaded the settings file, it may be incomplete,
@@ -587,6 +588,11 @@ bool MythContextPrivate::FixSettingsFile(void)
     DatabaseParams defaultParams = parent->GetDatabaseParams();
     
     return WriteSettingsFile(defaultParams);
+}
+
+bool MythContextPrivate::LoadSettingsFiles(const QString &filename)
+{
+    return m_settings->LoadSettingsFiles(filename, m_installprefix);
 }
 
 bool MythContextPrivate::WriteSettingsFile(const DatabaseParams &params,
@@ -840,7 +846,7 @@ QString MythContextPrivate::TestDBconnection(void)
     int     port = m_settings->GetSetting("DBPort").toInt();
 
     // Deal with missing hostname line, OR one without a value
-    if (host.isNull())
+    if (!host.length())
         host = "localhost";
 
 
@@ -1307,10 +1313,6 @@ QString MythContext::GetFiltersDir(void)
     return GetLibraryDir() + "filters/"; 
 }
 
-bool MythContext::LoadSettingsFiles(const QString &filename)
-{
-    return d->m_settings->LoadSettingsFiles(filename, d->m_installprefix);
-}
 
 void MythContext::LoadQtConfig(void)
 {
