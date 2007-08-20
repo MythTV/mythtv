@@ -11,8 +11,9 @@ using namespace std;
 
 enum DD_PROVIDERS
 {
-    DD_ZAP2IT = 0,
-    DD_PROVIDER_COUNT,
+    DD_ZAP2IT           = 0,
+    DD_SCHEDULES_DIRECT = 1,
+    DD_PROVIDER_COUNT   = 2,
 };
 
 class DataDirectURLs
@@ -314,6 +315,9 @@ class DataDirectProcessor
     // static commands (these update regular DB tables from temp DB tables)
     static int  UpdateChannelsSafe(uint sourceid, bool insert_channels);
     static bool UpdateChannelsUnsafe(uint sourceid);
+
+    // static command, makes Labs and Schedules Direct ProgramIDs compatible.
+    static void FixProgramIDs(void);
 
   private:
     void CreateTempTables(void);

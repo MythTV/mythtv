@@ -11,8 +11,26 @@ using namespace std;
 class SignalTimeout;
 class ChannelTimeout;
 class UseEIT;
-
 class VideoSource;
+
+static inline bool is_grabber_external(const QString &grabber)
+{
+    return !(grabber == "datadirect" ||
+             grabber == "eitonly" ||
+             grabber == "schedulesdirect1" ||
+             grabber == "/bin/true");
+}
+
+static inline bool is_grabber_datadirect(const QString &grabber)
+{
+    return (grabber == "datadirect") || (grabber == "schedulesdirect1");
+}
+
+static inline bool is_grabber_labs(const QString &grabber)
+{
+    return grabber == "datadirect";
+}
+
 class VSSetting: public SimpleDBStorage {
 protected:
     VSSetting(const VideoSource& _parent, QString name):
@@ -62,7 +80,7 @@ class DataDirect_config: public VerticalConfigurationGroup
 {
     Q_OBJECT
   public:
-    DataDirect_config(const VideoSource& _parent, int _source = DD_ZAP2IT); 
+    DataDirect_config(const VideoSource& _parent, int _ddsource); 
 
     virtual void load(void);
 

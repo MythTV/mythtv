@@ -542,7 +542,14 @@ DataDirectProcessor::DataDirectProcessor(uint lp, QString user, QString pass) :
         "http://datadirect.webservices.zap2it.com/tvlistings/xtvdService",
         "http://labs.zap2it.com",
         "/ztvws/ztvws_login/1,1059,TMS01-1,00.html");
+    DataDirectURLs urls1(
+        "Schedules Direct",
+        "http://webservices.schedulesdirect.tmsdatadirect.com"
+        "/schedulesdirect/tvlistings/xtvdService",
+        "http://schedulesdirect.org",
+        "/login/index.php");
     providers.push_back(urls0);
+    providers.push_back(urls1);
 
     QString tmpDir = "/tmp";
     tmpPostFile   = makeTempFile(tmpDir + "/mythtv_post_XXXXXX");
@@ -721,6 +728,52 @@ bool DataDirectProcessor::UpdateChannelsUnsafe(uint sourceid)
     }
 
     return true;
+}
+
+void DataDirectProcessor::FixProgramIDs(void)
+{
+    VERBOSE(VB_GENERAL, "DataDirectProcessor::FixProgramIDs() -- begin");
+
+    MSqlQuery query(MSqlQuery::DDCon());
+    query.prepare(
+        "UPDATE recorded "
+        "SET programid=CONCAT(SUBSTRING(programid, 1, 2), "
+        "                     '00', SUBSTRING(programid, 3)) "
+        "WHERE length(programid) = 12");
+
+    if (!query.exec())
+    {
+        MythContext::DBError("Fixing program ids in recorded", query);
+        return;
+    }
+
+    query.prepare(
+        "UPDATE oldrecorded "
+        "SET programid=CONCAT(SUBSTRING(programid, 1, 2), "
+        "                     '00', SUBSTRING(programid, 3)) "
+        "WHERE length(programid) = 12");
+
+    if (!query.exec())
+    {
+        MythContext::DBError("Fixing program ids in oldrecorded", query);
+        return;
+    }
+
+    query.prepare(
+        "UPDATE program "
+        "SET programid=CONCAT(SUBSTRING(programid, 1, 2), "
+        "                     '00', SUBSTRING(programid, 3)) "
+        "WHERE length(programid) = 12");
+
+    if (!query.exec())
+    {
+        MythContext::DBError("Fixing program ids in program", query);
+        return;
+    }
+
+    gContext->SaveSetting("MythFillFixProgramIDsHasRunOnce", "1");
+
+    VERBOSE(VB_GENERAL, "DataDirectProcessor::FixProgramIDs() -- end");
 }
 
 FILE *DataDirectProcessor::DDPost(
@@ -1018,7 +1071,7 @@ void DataDirectProcessor::CreateTempTables()
         "  channelMinor char(3) )";
 
     dd_tables["dd_schedule"] =
-        "( programid char(12),           stationid char(12), "
+        "( programid char(40),           stationid char(12), "
         "  scheduletime datetime,        duration time,      "
         "  isrepeat bool,                stereo bool,        "
         "  subtitled bool,               hdtv bool,          "
@@ -1028,7 +1081,7 @@ void DataDirectProcessor::CreateTempTables()
         "INDEX progidx (programid) )";
 
     dd_tables["dd_program"] =
-        "( programid char(12) NOT NULL,  seriesid char(12),     "
+        "( programid char(40) NOT NULL,  seriesid char(12),     "
         "  title varchar(120),           subtitle varchar(150), "
         "  description text,             mpaarating char(5),    "
         "  starrating char(5),           runtime time,          "
@@ -1050,19 +1103,19 @@ void DataDirectProcessor::CreateTempTables()
         "  partnumber int,               parttotal int,               "
         "  seriesid char(12),            originalairdate date,        "
         "  showtype varchar(30),         colorcode varchar(20),       "
-        "  syndicatedepisodenumber varchar(20), programid char(12),   "
+        "  syndicatedepisodenumber varchar(20), programid char(40),   "
         "  tvrating char(5),             mpaarating char(5),          "
         "INDEX progidx (programid))";
 
     dd_tables["dd_productioncrew"] =
-        "( programid char(12),           role char(30),    "
+        "( programid char(40),           role char(30),    "
         "  givenname char(20),           surname char(20), "
         "  fullname char(41), "
         "INDEX progidx (programid), "
         "INDEX nameidx (fullname))";
 
     dd_tables["dd_genre"] =
-        "( programid char(12) NOT NULL,  class char(30), "
+        "( programid char(40) NOT NULL,  class char(30), "
         "  relevance char(1), "
         "INDEX progidx (programid))";
 

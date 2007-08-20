@@ -41,6 +41,7 @@
 #include "cardutil.h"
 #include "sourceutil.h"
 #include "remoteutil.h"
+#include "videosource.h" // for is_grabber..
 
 using namespace std;
 
@@ -858,7 +859,8 @@ void DataDirectStationUpdate(Source source, bool update_icons = true)
         UpdateSourceIcons(source.id);
 
     // Unselect channels not in users lineup for DVB, HDTV
-    if (!insert_channels && (new_channels > 0))
+    if (!insert_channels && (new_channels > 0) &&
+        is_grabber_labs(source.xmltvgrabber))
     {
         bool ok0 = (logged_in == source.userid);
         bool ok1 = (raw_lineup == source.id);
@@ -883,6 +885,13 @@ void DataDirectStationUpdate(Source source, bool update_icons = true)
 
 bool DataDirectUpdateChannels(Source source)
 {
+    if (!is_grabber_labs(source.xmltvgrabber))
+    {
+        VERBOSE(VB_IMPORTANT, "FillData: We only support "
+                "DataDirectUpdateChannels with TMS Labs channel editor");
+        return false;
+    }
+
     ddprocessor.SetListingsProvider(DD_ZAP2IT);
     ddprocessor.SetUserID(source.userid);
     ddprocessor.SetPassword(source.password);
@@ -2547,6 +2556,8 @@ bool grabData(Source source, int offset, QDate *qCurrentDate = 0)
 
     if (xmltv_grabber == "datadirect")
         return grabDDData(source, offset, *qCurrentDate, DD_ZAP2IT);
+    else if (xmltv_grabber == "schedulesdirect1")
+        return grabDDData(source, offset, *qCurrentDate, DD_SCHEDULES_DIRECT);
     else if (xmltv_grabber == "technovera")
     {
         VERBOSE(VB_IMPORTANT, "The technovera grabber is no longer supported");
@@ -2852,7 +2863,7 @@ bool fillData(QValueList<Source> &sourcelist)
 
         bool hasprefmethod = false;
 
-        if (xmltv_grabber != "datadirect")
+        if (is_grabber_external(xmltv_grabber))
         {
 
             QProcess grabber_capabilities_proc(xmltv_grabber);
@@ -2950,9 +2961,9 @@ bool fillData(QValueList<Source> &sourcelist)
             }
         }
 
-        need_post_grab_proc |= (xmltv_grabber != "datadirect");
+        need_post_grab_proc |= !is_grabber_datadirect(xmltv_grabber);
 
-        if ((xmltv_grabber == "datadirect") && dd_grab_all)
+        if (is_grabber_labs(xmltv_grabber) && dd_grab_all)
         {
             if (only_update_channels)
                 DataDirectUpdateChannels(*it);
@@ -2967,7 +2978,8 @@ bool fillData(QValueList<Source> &sourcelist)
             if (!grabData(*it, 0))
                 ++failures;
         }
-        else if ((*it).xmltvgrabber_baseline || xmltv_grabber == "datadirect")
+        else if ((*it).xmltvgrabber_baseline ||
+                 is_grabber_datadirect(xmltv_grabber))
         {
 
             QDate qCurrentDate = QDate::currentDate();
@@ -2978,7 +2990,7 @@ bool fillData(QValueList<Source> &sourcelist)
 
             if (maxDays > 0) // passed with --max-days
                 grabdays = maxDays;
-            else if (xmltv_grabber == "datadirect")
+            else if (is_grabber_datadirect(xmltv_grabber))
                 grabdays = 14;
 
             grabdays = (only_update_channels) ? 1 : grabdays;
@@ -2986,7 +2998,7 @@ bool fillData(QValueList<Source> &sourcelist)
             if (grabdays == 1)
                 refresh_today = true;
 
-            if ((xmltv_grabber == "datadirect") && only_update_channels)
+            if (is_grabber_labs(xmltv_grabber) && only_update_channels)
             {
                 DataDirectUpdateChannels(*it);
                 grabdays = 0;
@@ -3397,7 +3409,7 @@ int main(int argc, char *argv[])
     int fromxawfile_id = 1;
     QString fromxawfile_name;
 
-    bool usingDataDirect = false;
+    bool usingDataDirect = false, usingDataDirectLabs = false;
     bool grab_data = true;
 
     bool export_iconmap = false;
@@ -3932,8 +3944,10 @@ int main(int argc, char *argv[])
                        newsource.xmltvgrabber_prefmethod = "";
 
                        sourcelist.append(newsource);
-                       if (newsource.xmltvgrabber == "datadirect")
-                           usingDataDirect = true;
+                       usingDataDirect |=
+                           is_grabber_datadirect(newsource.xmltvgrabber);
+                       usingDataDirectLabs |=
+                           is_grabber_labs(newsource.xmltvgrabber);
                   }
              }
              else
@@ -4165,6 +4179,12 @@ int main(int argc, char *argv[])
         (gContext->GetNumSetting("MythFillGrabberSuggestsTime", 1)))
     {
         ddprocessor.GrabNextSuggestedTime();
+    }
+
+    if (usingDataDirectLabs ||
+        !gContext->GetNumSetting("MythFillFixProgramIDsHasRunOnce", 0))
+    {
+        DataDirectProcessor::FixProgramIDs();
     }
 
     VERBOSE(VB_IMPORTANT, "\n"

@@ -276,7 +276,8 @@ public:
 
 class LineEditSetting: virtual public Setting {
 protected:
-    LineEditSetting(bool readwrite = true) : edit(NULL) { rw = readwrite; };
+    LineEditSetting(bool readwrite = true) :
+        edit(NULL), rw(readwrite),  password_echo(false) { }
 public:
     virtual QWidget* configWidget(ConfigurationGroup *cg, QWidget* parent, 
                                   const char* widgetName = 0);
@@ -292,10 +293,12 @@ public:
 
     virtual void setEnabled(bool b);
     virtual void setVisible(bool b);
+    virtual void SetPasswordEcho(bool b);
 
 private:
     MythLineEdit* edit;
     bool rw;
+    bool password_echo;
 };
 
 // TODO: set things up so that setting the value as a string emits
