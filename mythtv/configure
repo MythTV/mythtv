@@ -2326,6 +2326,8 @@ if enabled libdts; then
         dtslib="-ldts_pic"
     elif has_library libdts; then
         dtslib="-ldts"
+    elif has_library libdca; then
+         dtslib="-ldca"
     else
         echo "Warning: DTS library not found."
     fi
@@ -2335,7 +2337,7 @@ fi
 enabled amr_nb     && require libamrnb amrnb/interf_dec.h Speech_Decode_Frame_init -lamrnb -lm
 enabled amr_wb     && require libamrwb amrwb/dec_if.h D_IF_init -lamrwb -lm
 enabled liba52     && require liba52 a52dec/a52.h a52_init -la52
-enabled libdts     && require libdts dts.h dts_init $dtslib
+enabled libdts     && require2 libdts "stdint.h dts.h" dts_init $dtslib
 enabled libgsm     && require libgsm gsm.h gsm_create -lgsm
 enabled libmp3lame && require LAME lame/lame.h lame_init -lmp3lame -lm
 enabled libtheora  && require libtheora theora/theora.h theora_info_init -ltheora -logg
