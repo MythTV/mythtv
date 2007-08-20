@@ -843,6 +843,10 @@ QString MythContextPrivate::TestDBconnection(void)
     // 1. Check the supplied host or IP address, to prevent the app
     //    appearing to hang if we cannot route to the machine:
 
+    // No need to ping myself
+    if (host == "localhost" || host == "127.0.0.1" || host == m_localhostname)
+        doPing = false;
+
     if (doPing && !ping(host, 3))  // Fail after trying for 3 seconds
     {
         // Cause MSqlQuery to fail, instead of minutes timeout per DB value
@@ -854,6 +858,7 @@ QString MythContextPrivate::TestDBconnection(void)
 
 
     // 2. Check that the supplied DBport is listening:
+
     if (port && !telnet(host, port))
     {
         err = parent->tr("Cannot connect to port %1 on database host %2");
