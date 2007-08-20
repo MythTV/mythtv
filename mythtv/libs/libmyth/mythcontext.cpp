@@ -839,6 +839,10 @@ QString MythContextPrivate::TestDBconnection(void)
     QString host = m_settings->GetSetting("DBHostName");
     int     port = m_settings->GetSetting("DBPort").toInt();
 
+    // Deal with missing hostname line, OR one without a value
+    if (host.isNull())
+        host = "localhost";
+
 
     // 1. Check the supplied host or IP address, to prevent the app
     //    appearing to hang if we cannot route to the machine:
