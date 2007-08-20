@@ -703,7 +703,7 @@ bool XMLParse::parseDefaultCategoryColors(QMap<QString, QString> &catColors)
             cat = info.attribute("category");
             col = info.attribute("color");
             
-            catColors[cat] = col;
+            catColors[cat.lower()] = col;
         }
     }
     

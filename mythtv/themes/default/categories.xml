@@ -49,6 +49,7 @@
   <catcolor category="Adventure" color="maroon"></catcolor>
   <catcolor category="Romance" color="#ff9999"></catcolor>
   <catcolor category="Food/Travel" color="#aa00aa"></catcolor>
+  <catcolor category="Health" color="#00ffaa"></catcolor>
   <catcolor category="Home/How-to" color="Red"></catcolor>
   <catcolor category="Home improvement" color="#00cc00"></catcolor>
   <catcolor category="How-to" color="#00aa00"></catcolor>
@@ -112,6 +113,7 @@
   <catcolor category="Environment" color="#33ff99"></catcolor>
   <catcolor category="Gardening" color="Red"></catcolor>
   <catcolor category="Interests" color="Red"></catcolor>
+  <catcolor category="Leisure/Hobbies" color="red"></catcolor>
   <catcolor category="Music and Arts" color="goldenrod"></catcolor>
   <catcolor category="News and Current Affairs" color="DarkOrange3"></catcolor>
   <catcolor category="Religious" color="goldenrod"></catcolor>
