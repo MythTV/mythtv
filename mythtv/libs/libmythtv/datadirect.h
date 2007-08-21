@@ -346,7 +346,7 @@ class DataDirectProcessor
                         QString    postFilename, QString    inputFilename,
                         QString    userid,       QString    password,
                         QDateTime  pstartDate,   QDateTime  pendDate,
-                        QString   &err_txt);
+                        QString   &err_txt,      bool      &is_pipe);
 
 
   private:
