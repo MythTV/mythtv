@@ -551,6 +551,7 @@ long long copy(QFile &dst, QFile &src, uint block_size)
         rlen = src.readBlock(buf, buflen);
         if (rlen<0)
         {
+            VERBOSE(VB_IMPORTANT, "util.cpp:copy: read error");
             ok = false;
             break;
         }
@@ -565,7 +566,10 @@ long long copy(QFile &dst, QFile &src, uint block_size)
             if (wlen>=0)
                 off+= wlen;
             if (wlen<0)
+            {
+                VERBOSE(VB_IMPORTANT, "util.cpp:copy: write error");
                 ok = false;
+            }
         }
     }
     delete[] buf;
