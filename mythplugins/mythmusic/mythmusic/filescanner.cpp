@@ -316,9 +316,8 @@ void FileScanner::cleanDB()
 
     int counter = 0;
 
-    MSqlQueryInfo connection = MSqlQuery::InitCon();
-    MSqlQuery query(connection);
-    MSqlQuery deletequery(connection);
+    MSqlQuery query(MSqlQuery::InitCon());
+    MSqlQuery deletequery(MSqlQuery::InitCon());
 
     query.exec("SELECT g.genre_id FROM music_genres g LEFT JOIN music_songs s "
                "ON g.genre_id=s.genre_id WHERE s.genre_id IS NULL;");
