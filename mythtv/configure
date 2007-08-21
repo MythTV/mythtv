@@ -2305,9 +2305,12 @@ fi
 
 if test x"$dts" = x"yes"; then
     dts="no"
-    if has_library libdts ; then
+    if has_library libdca; then
         dts="yes"
-        extralibs="$extralibs -ldts"
+        dtslib="-ldca"
+    elif has_library libdts ; then
+        dts="yes"
+        dtslib="-ldts"
     fi
 fi
 
@@ -2941,6 +2944,7 @@ fi
 if test "$dts" = "yes" ; then
   echo "#define CONFIG_DTS 1" >> $TMPH
   echo "CONFIG_DTS=yes" >> $MYTH_CONFIG_MAK
+  echo "CONFIG_DTSLIB=$dtslib" >>  $MYTH_CONFIG_MAK
 fi
 
 # PP

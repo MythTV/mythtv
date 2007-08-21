@@ -359,7 +359,7 @@ contains( CONFIG_AC3, yes ) {
 
 contains( CONFIG_DTS, yes ) {
     SOURCES += dtsdec.c
-    LIBS += -ldts
+    LIBS += $$CONFIG_DTSLIB
 }
 
 using_xvmc {
