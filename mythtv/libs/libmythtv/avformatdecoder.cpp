@@ -2373,7 +2373,7 @@ QString AvFormatDecoder::GetTrackDesc(uint type, uint trackNo) const
 
         if (s->codec->codec_id == CODEC_ID_MP3)
             msg += QString(" MP%1").arg(s->codec->sub_id);
-        else
+        else if (s->codec->codec)
             msg += QString(" %1").arg(s->codec->codec->name).upper();
 
         int channels = 0;
