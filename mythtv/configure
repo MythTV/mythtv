@@ -2322,12 +2322,12 @@ enabled_all amr_nb amr_nb_fixed &&
     die "Only one of amr_nb and amr_nb_fixed may be enabled."
 
 if enabled libdts; then
-    if has_library libdts_pic; then
+    if has_library libdca; then
+         dtslib="-ldca"
+    elif has_library libdts_pic; then
         dtslib="-ldts_pic"
     elif has_library libdts; then
         dtslib="-ldts"
-    elif has_library libdca; then
-         dtslib="-ldca"
     else
         echo "Warning: DTS library not found."
     fi
