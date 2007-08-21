@@ -605,7 +605,7 @@ bool telnet(const QString &host, int port)
     return false;
 }
 
-/** \fn  Copy(QFile&,QFile&,uint)
+/** \fn copy(QFile&,QFile&,uint)
  *  \brief Copies src file to dst file.
  *
  *   If the dst file is open, it must be open for writing.
@@ -649,6 +649,7 @@ long long copy(QFile &dst, QFile &src, uint block_size)
         rlen = src.readBlock(buf, buflen);
         if (rlen<0)
         {
+            VERBOSE(VB_IMPORTANT, "util.cpp:copy: read error");
             ok = false;
             break;
         }
@@ -663,7 +664,10 @@ long long copy(QFile &dst, QFile &src, uint block_size)
             if (wlen>=0)
                 off+= wlen;
             if (wlen<0)
+            {
+                VERBOSE(VB_IMPORTANT, "util.cpp:copy: write error");
                 ok = false;
+            }
         }
     }
     delete[] buf;
