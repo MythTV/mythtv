@@ -868,11 +868,12 @@ FILE *DataDirectProcessor::DDPost(
     QString    postFilename, QString    inputFile,
     QString    userid,       QString    password,
     QDateTime  pstartDate,   QDateTime  pendDate,
-    QString   &err_txt)
+    QString   &err_txt,      bool      &is_pipe)
 {
     if (!inputFile.isEmpty())
     {
         err_txt = QString("Unable to open '%1'").arg(inputFile);
+        is_pipe = false;
         return fopen(inputFile.ascii(), "r");
     }
 
@@ -920,6 +921,7 @@ FILE *DataDirectProcessor::DDPost(
 
     err_txt = command;
 
+    is_pipe = true;
     return popen(command.ascii(), "r");
 }
 
@@ -1044,6 +1046,23 @@ bool DataDirectProcessor::GrabNextSuggestedTime(void)
     return GotNextSuggestedTime;
 }
 
+static inline bool close_fp(FILE *&fp, bool fp_is_pipe)
+{
+    int err;
+
+    if (fp_is_pipe)
+        err = pclose(fp);
+    else
+        err = fclose(fp);
+
+    if (err<0)
+        VERBOSE(VB_IMPORTANT, "Failed to close file." + ENO);
+
+    fp = NULL;
+
+    return err>=0;
+}
+
 bool DataDirectProcessor::GrabData(const QDateTime pstartDate,
                                    const QDateTime pendDate)
 {
@@ -1070,9 +1089,10 @@ bool DataDirectProcessor::GrabData(const QDateTime pstartDate,
         }
     }
 
+    bool fp_is_pipe;
     FILE *fp = DDPost(ddurl, GetPostFilename(), inputfile,
                       GetUserID(), GetPassword(),
-                      pstartDate, pendDate, err);
+                      pstartDate, pendDate, err, fp_is_pipe);
     if (!fp)
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR + "Failed to get data " +
@@ -1099,10 +1119,15 @@ bool DataDirectProcessor::GrabData(const QDateTime pstartDate,
 
         if (ok)
         {
-            if (copy(out, in))
+            ok = copy(out, in);
+            in.close();
+
+            close_fp(fp, fp_is_pipe);
+
+            if (ok)
             {
-                pclose(fp);
                 fp = fopen(cache_dd_data.ascii(), "r");
+                fp_is_pipe = false;
             }
             else
             {
@@ -1110,14 +1135,21 @@ bool DataDirectProcessor::GrabData(const QDateTime pstartDate,
                         LOC_ERR + "Failed to save DD cache! "
                         "redownloading data...");
                 cachedata = false;
-                pclose(fp);
                 fp = DDPost(ddurl, GetPostFilename(), inputfile,
                             GetUserID(), GetPassword(),
-                            pstartDate, pendDate, err);
+                            pstartDate, pendDate, err, fp_is_pipe);
             }
         }
     }
 
+    if (!fp)
+    {
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "Failed to get data 2 " +
+                QString("(%1) -- ").arg(err) + ENO);
+        return false;
+    }
+
+    bool ok = true;
     QFile f;
     if (f.open(IO_ReadOnly, fp)) 
     {
@@ -1131,11 +1163,13 @@ bool DataDirectProcessor::GrabData(const QDateTime pstartDate,
     else
     {
         VERBOSE(VB_GENERAL, LOC_ERR + "Error opening DataDirect file");
-        pclose(fp);
-        fp = NULL;
+        ok = false;
     }
 
-    return fp;
+    // f.close() only flushes pipe/file, we need to actually close it.
+    close_fp(fp, fp_is_pipe);
+
+    return ok;
 }
 
 bool DataDirectProcessor::GrabLineupsOnly(void)
