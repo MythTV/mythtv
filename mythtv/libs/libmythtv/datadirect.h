@@ -253,6 +253,8 @@ class DataDirectProcessor
                         QString userid = "", QString password = "");
    ~DataDirectProcessor();
 
+    QString CreateTempDirectory(void);
+
     // web service commands
     bool GrabData(const QDateTime pstartdate, const QDateTime penddate);
     bool GrabNextSuggestedTime(void);
@@ -302,11 +304,13 @@ class DataDirectProcessor
     RawLineup GetRawLineup( const QString &lineupid) const;
 
     // sets
-    void SetUserID(QString uid)                 { userid             = uid;  }
-    void SetPassword(QString pwd)               { password           = pwd;  }
+    void SetUserID(const QString &uid);
+    void SetPassword(const QString &pwd);
     void SetListingsProvider(uint i)
         { listings_provider = i % DD_PROVIDER_COUNT; }
-    void SetInputFile(const QString &file)      { inputfilename      = file; }
+
+    void SetInputFile(const QString &file);
+    void SetCacheData(bool cd) { cachedata = cd; }
 
     // static commands (these update temp DB tables)
     static void UpdateStationViewTable(QString lineupid);
@@ -326,6 +330,10 @@ class DataDirectProcessor
 
     bool ParseLineups(const QString &documentFile);
     bool ParseLineup(const QString &lineupid, const QString &documentFile);
+
+    QString GetPostFilename(void) const;
+    QString GetResultFilename(void) const;
+    QString GetCookieFilename(void) const;
 
     void SetAll(const QString &lineupid, bool val);
     void SetDDProgramsStartAt(QDateTime begts)  { actuallistingsfrom = begts; }
@@ -347,6 +355,8 @@ class DataDirectProcessor
 
     QString       userid;
     QString       password;
+    QString       tmpDir;
+    bool          cachedata;
 
     QDateTime     actuallistingsfrom;
     QDateTime     actuallistingsto;
@@ -357,11 +367,11 @@ class DataDirectProcessor
     DDLineupList  lineups;
     DDLineupMap   lineupmaps;
 
-    RawLineupMap  rawlineups;
-    QString       tmpPostFile;
-    QString       tmpResultFile;
-    QString       cookieFile;
-    QDateTime     cookieFileDT;
+    RawLineupMap    rawlineups;
+    mutable QString tmpPostFile;
+    mutable QString tmpResultFile;
+    mutable QString cookieFile;
+    QDateTime       cookieFileDT;
 };
 
 #endif

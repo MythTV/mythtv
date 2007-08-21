@@ -14,6 +14,7 @@ class QPixmap;
 class QImage;
 class QPainter;
 class QFont;
+class QFile;
 
 class MythTimer
 {
@@ -63,4 +64,10 @@ bool getUptime(time_t &uptime);
 bool getMemStats(int &totalMB, int &freeMB, int &totalVM, int &freeVM);
 
 void myth_eject(void);
+
+long long copy(QFile &dst, QFile &src, uint block_size = 0);
+QString createTempFile(QString name_template = "/tmp/mythtv_XXXXXX",
+                       bool dir = false);
+
+
 #endif // UTIL_H_

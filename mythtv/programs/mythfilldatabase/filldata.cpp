@@ -219,6 +219,7 @@ struct Source
     bool    xmltvgrabber_manualconfig;
     bool    xmltvgrabber_cache;
     QString xmltvgrabber_prefmethod;
+    vector<int> dd_dups;
 };
 
 
@@ -991,6 +992,25 @@ void DataDirectProgramUpdate()
 
 bool grabDDData(Source source, int poffset, QDate pdate, int ddSource) 
 {
+    if (source.dd_dups.empty())
+        ddprocessor.SetCacheData(false);
+    else
+    {
+        VERBOSE(VB_GENERAL, QString(
+                    "This DataDirect listings source is "
+                    "shared by %1 MythTV lineups")
+                .arg(source.dd_dups.size()+1));
+        if (source.id > source.dd_dups[0])
+        {
+            VERBOSE(VB_IMPORTANT, "We should use cached data for this one");
+        }
+        else if (source.id < source.dd_dups[0])
+        {
+            VERBOSE(VB_IMPORTANT, "We should keep data around after this one");
+        }
+        ddprocessor.SetCacheData(true);
+    }
+
     ddprocessor.SetListingsProvider(ddSource);
     ddprocessor.SetUserID(source.userid);
     ddprocessor.SetPassword(source.password);
@@ -2556,13 +2576,8 @@ bool grabData(Source source, int offset, QDate *qCurrentDate = 0)
 
     if (xmltv_grabber == "datadirect")
         return grabDDData(source, offset, *qCurrentDate, DD_ZAP2IT);
-    else if (xmltv_grabber == "schedulesdirect1")
+    if (xmltv_grabber == "schedulesdirect1")
         return grabDDData(source, offset, *qCurrentDate, DD_SCHEDULES_DIRECT);
-    else if (xmltv_grabber == "technovera")
-    {
-        VERBOSE(VB_IMPORTANT, "The technovera grabber is no longer supported");
-        exit(FILLDB_EXIT_INVALID_CMDLINE);
-    }
 
     char tempfilename[] = "/tmp/mythXXXXXX";
     if (mkstemp(tempfilename) == -1)
@@ -2767,6 +2782,7 @@ void clearOldDBEntries(void)
 bool fillData(QValueList<Source> &sourcelist)
 {
     QValueList<Source>::Iterator it;
+    QValueList<Source>::Iterator it2;
 
     QString status, querystr;
     MSqlQuery query(MSqlQuery::InitCon());
@@ -2780,6 +2796,28 @@ bool fillData(QValueList<Source> &sourcelist)
 
     need_post_grab_proc = false;
     int nonewdata = 0;
+    bool has_dd_source = false;
+
+    // find all DataDirect duplicates, so we only data download once.
+    for (it = sourcelist.begin(); it != sourcelist.end(); ++it)
+    {
+        if (!is_grabber_datadirect((*it).xmltvgrabber))
+            continue;
+
+        has_dd_source = true;
+        for (it2 = sourcelist.begin(); it2 != sourcelist.end(); ++it2)
+        {
+            if (((*it).id           != (*it2).id)           &&
+                ((*it).xmltvgrabber == (*it2).xmltvgrabber) &&
+                ((*it).userid       == (*it2).userid)       &&
+                ((*it).password     == (*it2).password))
+            {
+                (*it).dd_dups.push_back((*it2).id);
+            }
+        }
+    }
+    if (has_dd_source)
+        ddprocessor.CreateTempDirectory();
 
     for (it = sourcelist.begin(); it != sourcelist.end(); ++it)
     {
@@ -2805,8 +2843,11 @@ bool fillData(QValueList<Source> &sourcelist)
 
         if (xmltv_grabber == "eitonly") 
         {
-            VERBOSE(VB_IMPORTANT, "Source configured to use only the "
-                    "broadcasted guide data. Skipping.");
+            VERBOSE(VB_GENERAL,
+                    QString("Source %1 configured to use only the "
+                            "broadcasted guide data. Skipping.")
+                    .arg((*it).id));
+
             externally_handled++;
             query.exec(QString("UPDATE settings SET data ='%1' "
                                "WHERE value='mythfilldatabaseLastRunStart' OR "
@@ -2818,8 +2859,10 @@ bool fillData(QValueList<Source> &sourcelist)
                  xmltv_grabber == "none" ||
                  xmltv_grabber == "")
         {
-            VERBOSE(VB_IMPORTANT,
-                    "Source configured with no grabber. Nothing to do.");
+            VERBOSE(VB_GENERAL,
+                    QString("Source %1 configured with no grabber. "
+                            "Nothing to do.").arg((*it).id));
+
             externally_handled++;
             query.exec(QString("UPDATE settings SET data ='%1' "
                                "WHERE value='mythfilldatabaseLastRunStart' OR "
