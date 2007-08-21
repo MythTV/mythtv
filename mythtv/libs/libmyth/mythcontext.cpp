@@ -629,6 +629,16 @@ bool MythContextPrivate::WriteSettingsFile(const DatabaseParams &params,
     QTextStream s(f);
     s << "DBHostName=" << params.dbHostName << endl;
 
+    s << "\n"
+      << "# By default, Myth tries to ping the DB host to see if it exists.\n"
+      << "# If your DB host or network doesn't accept pings, set this to no:\n"
+      << "#\n";
+
+    if (params.dbHostPing)
+        s << "#DBHostPing=no" << endl << endl;
+    else
+        s << "DBHostPing=no" << endl << endl;
+
     if (params.dbPort)
         s << "DBPort=" << params.dbPort << endl;
 
@@ -637,10 +647,10 @@ bool MythContextPrivate::WriteSettingsFile(const DatabaseParams &params,
       << "DBName="     << params.dbName     << endl
       << "DBType="     << params.dbType     << endl
       << endl
-      << "# Set the following if you want to use something other than the\n"
+      << "# Set the following if you want to use something other than this\n"
       << "# machine's real hostname for identifying settings in the database.\n"
-      << "# This is useful if your hostname changes often, as otherwise\n"
-      << "# you'll need to reconfigure mythtv (or futz with the DB) every time.\n"
+      << "# This is useful if your hostname changes often, as otherwise you\n"
+      << "# will need to reconfigure mythtv (or futz with the DB) every time.\n"
       << "# TWO HOSTS MUST NOT USE THE SAME VALUE\n"
       << "#\n";
     
@@ -653,8 +663,10 @@ bool MythContextPrivate::WriteSettingsFile(const DatabaseParams &params,
       << "# If you want your frontend to be able to wake your MySQL server\n"
       << "# using WakeOnLan, have a look at the following settings:\n"
       << "#\n"
-      << "# Set the time the frontend waits (in seconds) between reconnect tries.\n"
-      << "# This should be the rough time your MySQL server needs for startup\n";
+      << "#\n"
+      << "# The time the frontend waits (in seconds) between reconnect tries.\n"
+      << "# This should be the rough time your MySQL server needs for startup\n"
+      << "#\n";
 
     if (params.wolEnabled)
         s << "WOLsqlReconnectWaitTime=" << params.wolReconnect << endl;
@@ -663,8 +675,9 @@ bool MythContextPrivate::WriteSettingsFile(const DatabaseParams &params,
     
     s << "#\n"
       << "#\n"
-      << "# This is the amount of retries to wake the MySQL server until the frontend\n"
-      << "# gives up\n";
+      << "# This is the number of retries to wake the MySQL server\n"
+      << "# until the frontend gives up\n"
+      << "#\n";
      
     if (params.wolEnabled)
         s << "WOLsqlConnectRetry=" << params.wolRetry << endl;
@@ -673,7 +686,8 @@ bool MythContextPrivate::WriteSettingsFile(const DatabaseParams &params,
     
     s << "#\n"
       << "#\n"
-      << "# This is the command executed to wake your MySQL server.\n";
+      << "# This is the command executed to wake your MySQL server.\n"
+      << "#\n";
     
     if (params.wolEnabled)
         s << "WOLsqlCommand=" << params.wolCommand << endl;
@@ -798,6 +812,10 @@ bool MythContextPrivate::PromptForDatabaseParams(QString error)
         
         params.dbHostName = getResponse("Database host name:",
                                         params.dbHostName);
+        response = getResponse("Should I test connectivity to this host "
+                               "using the ping command?", "yes");
+        params.dbHostPing = (!response || response.left(1).lower() != "y");
+
         params.dbPort     = intResponse("Database non-default port:",
                                         params.dbPort);
         params.dbName     = getResponse("Database name:",
@@ -815,10 +833,12 @@ bool MythContextPrivate::PromptForDatabaseParams(QString error)
         
         response = getResponse("Would you like to use Wake-On-LAN to retry "
                                "database connections?",
-                               (params.wolEnabled ? "no" : "yes"));
-        if (response.left(1).lower() == "y")
+                               (params.wolEnabled ? "yes" : "no"));
+        if (response)
+            params.wolEnabled  = (response.left(1).lower() == "y");
+
+        if (params.wolEnabled)
         {
-            params.wolEnabled   = true;
             params.wolReconnect = intResponse("Seconds to wait for "
                                               "reconnection:",
                                               params.wolReconnect);
@@ -827,8 +847,6 @@ bool MythContextPrivate::PromptForDatabaseParams(QString error)
             params.wolCommand   = getResponse("Command to use to wake server:",
                                               params.wolCommand);
         }
-        else
-            params.wolEnabled   = false;
         
         accepted = parent->SaveDatabaseParams(params);
     }
@@ -2992,6 +3010,7 @@ DatabaseParams MythContext::GetDatabaseParams(void)
     DatabaseParams params;
     
     params.dbHostName = d->m_settings->GetSetting("DBHostName", "localhost");
+    params.dbHostPing = d->m_settings->GetSetting("DBHostPing") != "no";
     params.dbPort     = d->m_settings->GetNumSetting("DBPort", 0);
     params.dbUserName = d->m_settings->GetSetting("DBUserName", "mythtv");
     params.dbPassword = d->m_settings->GetSetting("DBPassword", "mythtv");
@@ -3029,6 +3048,7 @@ bool MythContext::SaveDatabaseParams(const DatabaseParams &params)
     
     // only rewrite file if it has changed
     if (params.dbHostName   != cur_params.dbHostName          ||
+        params.dbHostPing   != cur_params.dbHostPing          ||
         params.dbPort       != cur_params.dbPort              ||
         params.dbUserName   != cur_params.dbUserName          ||
         params.dbPassword   != cur_params.dbPassword          ||

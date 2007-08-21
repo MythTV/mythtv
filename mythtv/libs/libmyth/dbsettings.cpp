@@ -14,6 +14,7 @@ public:
 protected:
     TransLabelSetting    *info;
     TransLineEditSetting *dbHostName;
+    TransCheckBoxSetting *dbHostPing;
     TransLineEditSetting *dbPort;
     TransLineEditSetting *dbName;
     TransLineEditSetting *dbUserName;
@@ -96,12 +97,30 @@ MythDbSettings1::MythDbSettings1() :
                                         "This information is required."));
     dbServer->addChild(dbHostName);
 
+    HorizontalConfigurationGroup* g =
+        new HorizontalConfigurationGroup(false, false);
+
+    dbHostPing = new TransCheckBoxSetting();
+    dbHostPing->setLabel(QObject::tr("Ping test server?"));
+    dbHostPing->setHelpText(QObject::tr("Test basic host connectivity using "
+                                        "the ping command. Turn off if your "
+                                        "host or network don't support ping "
+                                        "(ICMP ECHO) packets"));
+    g->addChild(dbHostPing);
+
+    // Some extra horizontal space:
+    TransLabelSetting *l = new TransLabelSetting();
+    l->setValue("                               ");
+    g->addChild(l);
+
+    dbServer->addChild(g);
+
     dbPort = new TransLineEditSetting(true);
     dbPort->setLabel(QObject::tr("Port"));
     dbPort->setHelpText(QObject::tr("The port number the database is running "
                                     "on.  Leave blank if using the default "
                                     "port (3306)."));
-    dbServer->addChild(dbPort);
+    g->addChild(dbPort);
 
     dbName = new TransLineEditSetting(true);
     dbName->setLabel(QObject::tr("Database name"));
@@ -221,6 +240,8 @@ void MythDbSettings1::load()
     if (params.dbHostName.isEmpty())
         dbHostName->setLabel("* " + dbHostName->getLabel());
 
+    dbHostPing->setValue(params.dbHostPing);
+
     if (params.dbPort)
         dbPort->setValue(QString::number(params.dbPort));
 
@@ -258,6 +279,7 @@ void MythDbSettings1::save()
     DatabaseParams params = gContext->GetDatabaseParams();
 
     params.dbHostName    = dbHostName->getValue();
+    params.dbHostPing    = dbHostPing->boolValue();
     params.dbPort        = dbPort->getValue().toInt();
     params.dbUserName    = dbUserName->getValue();
     params.dbPassword    = dbPassword->getValue();
