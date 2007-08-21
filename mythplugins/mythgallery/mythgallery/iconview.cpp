@@ -138,22 +138,34 @@ void IconView::SetupMediaMonitor(void)
     MediaMonitor *mon = MediaMonitor::GetMediaMonitor();
     if (m_currDevice && mon && mon->ValidateAndLock(m_currDevice))
     {
-        if (!m_currDevice->isMounted(true))
-            m_currDevice->mount();
+        bool mounted = m_currDevice->isMounted(true);
+        if (!mounted)
+            mounted = m_currDevice->mount();
 
-        connect(m_currDevice,
+        if (mounted)
+        {
+            connect(m_currDevice,
                 SIGNAL(statusChanged(MediaStatus, MythMediaDevice*)),
                 SLOT(mediaStatusChanged(MediaStatus, MythMediaDevice*)));
 
-        LoadDirectory(m_currDevice->getMountPath(), true);
+            LoadDirectory(m_currDevice->getMountPath(), true);
 
-        mon->Unlock(m_currDevice);
+            mon->Unlock(m_currDevice);
+            return;
+        }
+        else 
+        {
+            DialogBox dialog(gContext->GetMainWindow(),
+                             tr("Failed to mount device: ") + 
+                             m_currDevice->getDevicePath() + "\n\n" +
+                             tr("Showing the default MythGallery directory."));
+            dialog.AddButton(tr("OK"));
+            dialog.exec();
+            mon->Unlock(m_currDevice);
+        }
     }
-    else
-    {
-        m_currDevice = NULL;
-        LoadDirectory(m_galleryDir, true);
-    }
+    m_currDevice = NULL;
+    LoadDirectory(m_galleryDir, true);
 #endif // _WIN32
 }
 
@@ -749,7 +761,7 @@ bool IconView::HandleEscape(void)
 
     // If we are viewing an attached device we should show the attached devices
     MediaMonitor *mon = MediaMonitor::GetMediaMonitor();
-    if (mon)
+    if (mon && m_currDevice)
         handled = HandleMediaEscape(mon);
 
     // If we are viewing a subdirectory of the gallery directory, we should
