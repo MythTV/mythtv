@@ -23,7 +23,7 @@
 #include <math.h>
 
 #include "../../config.h"
-#ifdef HAVE_LMSENSORS 
+#ifdef CONFIG_LMSENSORS 
     #define LMSENSOR_DEFAULT_CONFIG_FILE "/etc/sensors.conf" 
     #include <sensors/sensors.h> 
     #include <sensors/chips.h> 
