@@ -68,9 +68,10 @@ DataDirectLineupMap::DataDirectLineupMap() :
 DataDirectSchedule::DataDirectSchedule() :
     programid(""),              stationid(""),
     time(QDateTime()),          duration(QTime()),
-    repeat(false),              stereo(false),
-    subtitled(false),           hdtv(false),
-    closecaptioned(false),      tvrating(""),
+    repeat(false),              isnew(false),
+    stereo(false),              subtitled(false),
+    hdtv(false),                closecaptioned(false),
+    tvrating(""),
     partnumber(0),              parttotal(0)
 {
 }
@@ -167,7 +168,14 @@ bool DDStructureParser::startElement(const QString &pnamespaceuri,
         curr_schedule.duration = QTime(durstr.mid(2, 2).toInt(), 
                                        durstr.mid(5, 2).toInt(), 0, 0);
 
-        curr_schedule.repeat = (pxmlatts.value("repeat") == "true");
+        QString isrepeat = pxmlatts.value("repeat");
+        curr_schedule.repeat = (isrepeat == "true");
+        saw_repeat |= !isrepeat.isEmpty();
+
+        QString isnew = pxmlatts.value("new");
+        curr_schedule.isnew = (isnew == "true");
+        saw_new |= !isnew.isEmpty();
+
         curr_schedule.stereo = (pxmlatts.value("stereo") == "true");
         curr_schedule.subtitled = (pxmlatts.value("subtitled") == "true");
         curr_schedule.hdtv = (pxmlatts.value("hdtv") == "true");
@@ -278,13 +286,13 @@ bool DDStructureParser::endElement(const QString &pnamespaceuri,
             "       duration,   isrepeat,    stereo,         "
             "       subtitled,  hdtv,        closecaptioned, "
             "       tvrating,   partnumber,  parttotal,      "
-            "       endtime) "
+            "       endtime,    isnew) "
             "VALUES "
             "     (:PROGRAMID, :STATIONID,  :TIME,           "
             "      :DURATION,  :ISREPEAT,   :STEREO,         "
             "      :SUBTITLED, :HDTV,       :CAPTIONED,      "
             "      :TVRATING,  :PARTNUMBER, :PARTTOTAL,      "
-            "      :ENDTIME)");
+            "      :ENDTIME,   :ISNEW)");
 
         query.bindValue(":PROGRAMID",   curr_schedule.programid);
         query.bindValue(":STATIONID",   curr_schedule.stationid);
@@ -299,6 +307,7 @@ bool DDStructureParser::endElement(const QString &pnamespaceuri,
         query.bindValue(":PARTNUMBER",  curr_schedule.partnumber);
         query.bindValue(":PARTTOTAL",   curr_schedule.parttotal);
         query.bindValue(":ENDTIME",     endtime);
+        query.bindValue(":ISNEW",       curr_schedule.isnew);
 
         if (!query.exec())
             MythContext::DBError("Inserting into dd_schedule", query);
@@ -411,6 +420,16 @@ bool DDStructureParser::startDocument()
 
 bool DDStructureParser::endDocument() 
 {
+    MSqlQuery query(MSqlQuery::DDCon());
+    query.prepare(
+        "INSERT INTO dd_state (sawrepeat, sawnew) "
+        "VALUES (:SAWREPEAT, :SAWNEW)");
+    query.bindValue(":SAWREPEAT", saw_repeat);
+    query.bindValue(":SAWNEW",    saw_new);
+
+    if (!query.exec())
+        MythContext::DBError("Inserting into dd_state", query);
+
     return true;
 }
  
@@ -597,11 +616,33 @@ void DataDirectProcessor::UpdateStationViewTable(QString lineupid)
 void DataDirectProcessor::UpdateProgramViewTable(uint sourceid)
 {
     MSqlQuery query(MSqlQuery::DDCon());
-   
+
+    query.prepare(
+        "SELECT sawrepeat, sawnew "
+        "FROM dd_state");
+
+    if (!query.exec())
+    {
+        MythContext::DBError("Querying into dd_state", query);
+        return;
+    }
+
+    if (!query.next())
+    {
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "UpdateProgramViewTable no dd_state!");
+        return;
+    }
+
+    bool saw_repeat = query.value(0).toUInt(); (void) saw_repeat;
+    bool saw_new    = query.value(1).toUInt(); (void) saw_new;
+
+//    VERBOSE(VB_GENERAL, LOC + QString("Saw new: %1, saw repeat: %2")
+//            .arg(saw_new).arg(saw_repeat));
+
     if (!query.exec("TRUNCATE TABLE dd_v_program;"))
         MythContext::DBError("Truncating temporary table dd_v_program", query);
 
-    query.prepare(
+    QString qstr =
         "INSERT INTO dd_v_program "
         "     ( chanid,         starttime,       endtime,         "
         "       title,          subtitle,        description,     "
@@ -613,7 +654,7 @@ void DataDirectProcessor::UpdateProgramViewTable(uint sourceid)
         "       tvrating,       mpaarating,      programid )      "
         "SELECT chanid,         scheduletime,    endtime,         "
         "       title,          subtitle,        description,     "
-        "       year,           stars,           isrepeat,        "
+        "       year,           stars,           %1,              "
         "       stereo,         subtitled,       hdtv,            "
         "       closecaptioned, partnumber,      parttotal,       "
         "       seriesid,       originalairdate, showtype,        "
@@ -622,7 +663,9 @@ void DataDirectProcessor::UpdateProgramViewTable(uint sourceid)
         "FROM channel, dd_schedule, dd_program "
         "WHERE ((dd_schedule.programid = dd_program.programid)  AND "
         "       (channel.xmltvid       = dd_schedule.stationid) AND "
-        "       (channel.sourceid      = :SOURCEID))");
+        "       (channel.sourceid      = :SOURCEID))";
+
+    query.prepare(qstr.arg((saw_new) ? "not isnew" : "isrepeat"));
 
     query.bindValue(":SOURCEID", sourceid);
 
@@ -1208,6 +1251,9 @@ void DataDirectProcessor::CreateTempTables()
 {
     QMap<QString,QString> dd_tables;
 
+    dd_tables["dd_state"] =
+        "( sawrepeat bool,               sawnew bool )";
+
     dd_tables["dd_station"] =
         "( stationid char(12),           callsign char(10),     "
         "  stationname varchar(40),      affiliate varchar(25), "
@@ -1236,7 +1282,7 @@ void DataDirectProcessor::CreateTempTables()
         "  subtitled bool,               hdtv bool,          "
         "  closecaptioned bool,          tvrating char(5),   "
         "  partnumber int,               parttotal int,      "
-        "  endtime datetime, "
+        "  endtime datetime,             isnew bool,         "
         "INDEX progidx (programid) )";
 
     dd_tables["dd_program"] =

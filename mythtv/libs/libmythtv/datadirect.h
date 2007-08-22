@@ -98,6 +98,7 @@ class DataDirectSchedule
     QDateTime time;
     QTime     duration;
     bool      repeat;
+    bool      isnew;
     bool      stereo;
     bool      subtitled;
     bool      hdtv;
@@ -215,7 +216,8 @@ typedef vector<PostItem> PostList;
 class DDStructureParser: public QXmlDefaultHandler
 {
   public:
-    DDStructureParser(DataDirectProcessor& _ddparent): parent(_ddparent) {}
+    DDStructureParser(DataDirectProcessor& _ddparent) :
+        parent(_ddparent), saw_repeat(false), saw_new(false) {}
 
     bool startElement(const QString &pnamespaceuri, const QString &plocalname,
                       const QString &pqname, const QXmlAttributes &pxmlatts);
@@ -240,7 +242,10 @@ class DDStructureParser: public QXmlDefaultHandler
     DataDirectProductionCrew curr_productioncrew;
     DataDirectGenre          curr_genre;
     QString                  lastprogramid;
+    bool                     saw_repeat;
+    bool                     saw_new;
 };
+
 
 typedef QMap<QString,DataDirectStation>    DDStationList; // stationid ->
 typedef vector<DataDirectLineup>           DDLineupList;
