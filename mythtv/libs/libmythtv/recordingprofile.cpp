@@ -669,7 +669,7 @@ public:
         setValue(false);
         setHelpText(QObject::tr("Automatically transcode when a recording is "
                                 "made using this profile and the recording's "
-                                "schedule is configurd to allow transcoding."));
+                                "schedule is configured to allow transcoding."));
     };
 };
 
