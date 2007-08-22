@@ -28,8 +28,7 @@ void Track::postLoad(PlaylistsContainer *grandparent)
 {
     if (cd_flag)
     {
-        int val = (index_value < 0) ? -index_value : index_value;
-        label = all_available_music->getLabel(val, &bad_reference);
+        label = all_available_music->getLabel(index_value, &bad_reference);
         return;
     }
 
