@@ -134,7 +134,7 @@ TransportScanItem::TransportScanItem(int sourceid,
     }
     else if (standard == "atsc")
     {
-#if (DVB_API_VERSION_MINOR == 1)
+#if (DVB_API_VERSION == 3 && DVB_API_VERSION_MINOR >= 1)
         tuning.params.u.vsb.modulation = (fe_modulation) ft.modulation;
 #endif
         if (dvbft)
@@ -206,7 +206,7 @@ QString TransportScanItem::toString() const
         .arg(UseTimer).arg(scanning);
     str += QString("\ttimeoutTune(%3 msec)\n").arg(timeoutTune);
 #ifdef USING_DVB
-#if (DVB_API_VERSION_MINOR == 1)
+#if (DVB_API_VERSION == 3 && DVB_API_VERSION_MINOR >= 1)
     if (standard == "atsc")
     {
         str += QString("\tfrequency(%1) modulation(%2)\n")
@@ -214,7 +214,7 @@ QString TransportScanItem::toString() const
             .arg(tuning.params.u.vsb.modulation);
     }
     else
-#endif // (DVB_API_VERSION_MINOR == 1)
+#endif // (DVB_API_VERSION == 3 && DVB_API_VERSION_MINOR >= 1)
     {
         str += QString("\tfrequency(%1) constellation(%2)\n")
             .arg(tuning.params.frequency)
