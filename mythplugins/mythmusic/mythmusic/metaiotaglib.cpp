@@ -143,12 +143,12 @@ Metadata* MetaIOTagLib::read(QString filename)
     // Basic Tags
     if (! tag->isEmpty())
     {
-        title = TStringToQString(tag->title().stripWhiteSpace());
-        artist = TStringToQString(tag->artist().stripWhiteSpace());
-        album = TStringToQString(tag->album().stripWhiteSpace());
+        title = TStringToQString(tag->title()).stripWhiteSpace();
+        artist = TStringToQString(tag->artist()).stripWhiteSpace();
+        album = TStringToQString(tag->album()).stripWhiteSpace();
         tracknum = tag->track();
         year = tag->year();
-        genre = TStringToQString(tag->genre().stripWhiteSpace());
+        genre = TStringToQString(tag->genre()).stripWhiteSpace();
     }
 
     // ID3V2 Only Tags
@@ -156,9 +156,11 @@ Metadata* MetaIOTagLib::read(QString filename)
     {
         // Compilation Artist (TPE4)
         if(!taglib->ID3v2Tag()->frameListMap()["TPE4"].isEmpty())
+        {
             compilation_artist = TStringToQString(
-            taglib->ID3v2Tag()->frameListMap()["TPE4"].front()->toString()
-                .stripWhiteSpace());
+            taglib->ID3v2Tag()->frameListMap()["TPE4"].front()->toString())
+            .stripWhiteSpace();
+        }
 
         // Look for MusicBrainz Album+Artist ID in TXXX Frame
         UserTextIdentificationFrame *musicbrainz = find(taglib->ID3v2Tag(),
@@ -168,7 +170,8 @@ Metadata* MetaIOTagLib::read(QString filename)
         {
             // If the MusicBrainz ID is the special "Various Artists" ID
             // then compilation is TRUE
-            compilation = (MYTH_MUSICBRAINZ_ALBUMARTIST_UUID
+            if (! musicbrainz->fieldList().isEmpty())
+                compilation = (MYTH_MUSICBRAINZ_ALBUMARTIST_UUID
                 == TStringToQString(musicbrainz->fieldList().front()));
         }
 
