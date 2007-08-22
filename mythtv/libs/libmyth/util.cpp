@@ -584,7 +584,14 @@ bool ping(const QString &host, int timeout)
                   .arg(timeout).arg(host);
 
     if (myth_system(cmd))
-        return false;
+    {
+        // ping command may not like -t argument. Simplify:
+
+        cmd = QString("ping -c 1  %2  >/dev/null").arg(host);
+
+        if (myth_system(cmd))
+            return false;
+    }
 
     return true;
 }
