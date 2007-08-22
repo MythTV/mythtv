@@ -28,12 +28,12 @@ using namespace std;
 #ifdef USING_XVMC
 #include "videoout_xv.h"
 extern "C" {
-#include "libavcodec/xvmc_render.h"
+#include "../libavcodec/xvmc_render.h"
 }
 #endif // USING_XVMC
 
 extern "C" {
-#include "libavcodec/liba52/a52.h"
+#include "../libavcodec/liba52/a52.h"
 #include "../libmythmpeg2/mpeg2.h"
 #include "ivtv_myth.h"
 }

@@ -4,7 +4,9 @@
 #include <unistd.h>
 #include "mythcontext.h"
 #include "videobuffers.h"
+extern "C" {
 #include "../libavcodec/avcodec.h"
+}
 #include "fourcc.h"
 
 #ifdef USING_XVMC

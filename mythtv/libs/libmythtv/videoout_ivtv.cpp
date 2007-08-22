@@ -39,7 +39,9 @@ extern "C" {
 #include "libmyth/mythcontext.h"
 
 #include "NuppelVideoPlayer.h"
+extern "C" {
 #include "../libavcodec/avcodec.h"
+}
 #include "yuv2rgb.h"
 #include "osd.h"
 #include "osdsurface.h"

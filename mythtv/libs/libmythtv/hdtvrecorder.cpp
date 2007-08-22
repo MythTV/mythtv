@@ -86,9 +86,11 @@ using namespace std;
 #include "tv_rec.h"
 
 // AVLib/FFMPEG includes
+extern "C" {
 #include "../libavcodec/avcodec.h"
 #include "../libavformat/avformat.h"
 #include "../libavformat/mpegts.h"
+}
 
 #define REPORT_RING_STATS 1
 
