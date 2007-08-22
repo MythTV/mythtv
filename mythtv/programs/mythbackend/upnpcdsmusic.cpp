@@ -52,6 +52,9 @@ UPnpCDSRootInfo UPnpCDSMusic::g_RootNodes[] =
             "ORDER BY name",
         "" },
 
+/*
+This is currently broken... need to handle list of items with single parent (like 'All Music')
+
     {   "Recently Added",
         "*",
         "SELECT song_id id, "
@@ -61,9 +64,9 @@ UPnpCDSRootInfo UPnpCDSMusic::g_RootNodes[] =
             "%1 "
             "ORDER BY name",
         "WHERE (DATEDIFF( CURDATE(), date_modified ) <= 30 ) " },
-
+*/
     {   "By Album",
-        "album_id",
+        "song.album_id",
         "SELECT a.album_id as id, "
           "a.album_name as name, "
           "count( song.album_id ) as children "
@@ -279,7 +282,7 @@ void UPnpCDSMusic::AddItem( const QString           &sObjectId,
     QFileInfo fInfo( sFileName );
 
     QString sMimeType = HTTPRequest::GetMimeType( fInfo.extension( FALSE ));
-    QString sProtocol = QString( "http-get:*:%1:*" ).arg( sMimeType  );
+    QString sProtocol = QString( "http-get:*:%1:DLNA.ORG_OP=01;DLNA.ORG_CI=0;DLNA.OR G_FLAGS=01500000000000000000000000000000" ).arg( sMimeType  );
     QString sURI      = QString( "%1GetMusic%2").arg( sURIBase   )
                                                 .arg( sURIParams ); 
 

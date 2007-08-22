@@ -266,7 +266,8 @@ void UPnpCDSTv::AddItem( const QString           &sObjectId,
     QFileInfo fInfo( sBaseName );
 
     QString sMimeType = HTTPRequest::GetMimeType( fInfo.extension( FALSE ));
-    QString sProtocol = QString( "http-get:*:%1:*" ).arg( sMimeType  );
+    // DLNA string below is temp fix for ps3 seeking.
+    QString sProtocol = QString( "http-get:*:%1:DLNA.ORG_OP=01;DLNA.ORG_CI=0;DLNA.OR G_FLAGS=01500000000000000000000000000000" ).arg( sMimeType  );
     QString sURI      = QString( "%1GetRecording%2").arg( sURIBase   )
                                                     .arg( sURIParams ); 
 
@@ -304,10 +305,10 @@ void UPnpCDSTv::AddItem( const QString           &sObjectId,
     // Add Thumbnail Resource
     // ----------------------------------------------------------------------
 
-    sURI = QString( "%1GetPreviewImage%2").arg( sURIBase   )
-                                          .arg( sURIParams ); 
+    //sURI = QString( "%1GetPreviewImage%2").arg( sURIBase   )
+    //                                      .arg( sURIParams ); 
 
-    pItem->AddResource( "http-get:*:image/png:*" , sURI );
+    //pItem->AddResource( "http-get:*:image/png:*" , sURI );
 
 }
 

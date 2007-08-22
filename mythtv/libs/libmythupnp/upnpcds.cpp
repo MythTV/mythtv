@@ -887,6 +887,10 @@ UPnpCDSExtensionResults *UPnpCDSExtension::ProcessKey( UPnpCDSRequest          *
                     QString sSQL   = QString( pInfo->sql )
                                         .arg( pInfo->where );
 
+                    // -=>TODO: There is a problem when called for an Item, instead of a container
+                    //          sKey = '<KeyName>/item?ChanId' which is incorrect.
+
+
                     query.prepare  ( sSQL );
                     query.bindValue( ":KEY", sKey );
                     query.exec();

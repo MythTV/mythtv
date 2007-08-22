@@ -239,9 +239,14 @@ long HTTPRequest::SendResponse( void )
 
     if (( m_eType != RequestTypeHead ) && ( m_aBuffer.size() > 0 ))
     {
-        //VERBOSE(VB_UPNP,QString("HTTPRequest::SendResponse : DATA : %1 : ")
-        //                .arg(m_aBuffer.data()));
-        
+/*
+        VERBOSE(VB_UPNP,QString("HTTPRequest::SendResponse : DATA : %1 : ").arg( m_aBuffer.size() ));
+
+        for (int i=0; i<m_aBuffer.size(); i++)
+          cout << m_aBuffer.data()[i];
+
+        cout << endl;
+*/        
         nBytes += WriteBlockDirect( m_aBuffer.data(), m_aBuffer.size() );
     }
 
@@ -384,9 +389,16 @@ long HTTPRequest::SendResponseFile( QString sFileName )
         } 
         while (( sent >= 0 ) && ( llSize > 0 ));  
 
-        if (sent < 0)
-            nBytes = sent;
+        if (sent == -1)
+        {
+            VERBOSE(VB_UPNP,QString("SendResponseFile( %1 ) Error: %2 [%3]" )
+                               .arg( sFileName ) 
+                               .arg( errno     )
+                               .arg( strerror( errno ) ));
 
+            nBytes = -1;
+        }
+            
         close( file );
     }
 

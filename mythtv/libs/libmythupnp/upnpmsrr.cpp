@@ -104,7 +104,12 @@ void UPnpMSRR::HandleIsAuthorized( HTTPRequest *pRequest )
     VERBOSE(VB_UPNP, QString("UPnpMSRR::HandleIsAuthorized"));
     NameValueList list;
 
-    list.append( new NameValue( "Result", "1"));
+    NameValue *pResult = new NameValue( "Result", "1");
+
+    pResult->AddAttribute( "xmlns:dt", "urn:schemas-microsoft-com:datatypes" );
+    pResult->AddAttribute( "dt:dt"   , "int"                                 );
+
+    list.append( pResult );
 
     pRequest->FormatActionResponse( &list );
 
@@ -133,7 +138,12 @@ void UPnpMSRR::HandleIsValidated( HTTPRequest *pRequest )
     VERBOSE(VB_UPNP, QString("UPnpMSRR::HandleIsValidated"));
     NameValueList list;
 
-    list.append( new NameValue( "Result", "1"));
+    NameValue *pResult = new NameValue( "Result", "1");
+
+    pResult->AddAttribute( "xmlns:dt", "urn:schemas-microsoft-com:datatypes" );
+    pResult->AddAttribute( "dt:dt"   , "int"                                 );
+
+    list.append( pResult );
 
     pRequest->FormatActionResponse( &list );
 

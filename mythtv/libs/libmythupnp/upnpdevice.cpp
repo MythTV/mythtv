@@ -302,12 +302,9 @@ void UPnpDeviceDesc::OutputDevice( QTextStream &os,
     if (pDevice == NULL)
         return;
 
-    os << "<device>";
-    os << FormatValue( "deviceType"       , pDevice->m_sDeviceType      );
-
-    QString sFriendlyName = QString( "%1 on %2" )
-                               .arg( pDevice->m_sFriendlyName   )
-                               .arg( GetHostName() );
+    QString sFriendlyName = QString( "%1: %2" )
+                               .arg( GetHostName() )
+                               .arg( pDevice->m_sFriendlyName );
 
     // ----------------------------------------------------------------------
     // Only override the root device
@@ -316,7 +313,10 @@ void UPnpDeviceDesc::OutputDevice( QTextStream &os,
     if (pDevice == &m_rootDevice)
         sFriendlyName = UPnp::g_pConfig->GetValue( "UPnP/FriendlyName", sFriendlyName  );
     
-    os << FormatValue( "friendlyName" , sFriendlyName );
+    os << "<device>";
+    os << FormatValue( "UDN"          , pDevice->GetUDN()      );
+    os << FormatValue( "friendlyName" , sFriendlyName          );
+    os << FormatValue( "deviceType"   , pDevice->m_sDeviceType );
 
     // ----------------------------------------------------------------------
     // XBox 360 needs specific values in the Device Description.
@@ -325,7 +325,9 @@ void UPnpDeviceDesc::OutputDevice( QTextStream &os,
     //          kind of way.
     // ----------------------------------------------------------------------
 
-    if (sUserAgent.startsWith( "Xbox/2.0", false ))
+    bool bIsXbox360 = sUserAgent.startsWith( "Xbox/2.0", false ) || sUserAgent.startsWith( "Mozilla/4.0", false);
+                                                                              
+    if ( bIsXbox360 )
     {
         os << FormatValue( "manufacturer" , "Microsoft"                    );
         os << FormatValue( "modelName"    , "Windows Media Player Sharing" );
@@ -342,7 +344,6 @@ void UPnpDeviceDesc::OutputDevice( QTextStream &os,
     os << FormatValue( "modelDescription" , pDevice->m_sModelDescription);
     os << FormatValue( "modelNumber"      , pDevice->m_sModelNumber     );
     os << FormatValue( "serialNumber"     , pDevice->m_sSerialNumber    );
-    os << FormatValue( "UDN"              , pDevice->GetUDN()           );
     os << FormatValue( "UPC"              , pDevice->m_sUPC             );
     os << FormatValue( "presentationURL"  , pDevice->m_sPresentationURL );
 
@@ -389,12 +390,30 @@ void UPnpDeviceDesc::OutputDevice( QTextStream &os,
 
     if (pDevice->m_listServices.count() > 0)
     {
+        // ------------------------------------------------------------------
+        // -=>TODO: As a temporary fix don't expose the MSRR service unless we
+        //          as an XBox360 or Windows MediaPlayer.
+        //
+        //          There is a problem with a DSM-520 with firmware 1.04 and
+        //          the Denon AVR-4306 reciever.
+        //
+        //          If the MSRR Service is exposed, it won't let us browse
+        //          any media content.
+        //
+        //          Need to find out real fix and remove this code.
+        // ------------------------------------------------------------------
+
+        bool bDSM = sUserAgent.startsWith( "INTEL_NMPR/2.1 DLNADOC/1.00", false );
+
         os << "<serviceList>";
 
         for ( UPnpService *pService  = pDevice->m_listServices.first(); 
                            pService != NULL;
                            pService  = pDevice->m_listServices.next() )
         {
+            if ( !bIsXbox360 && pService->m_sServiceType.startsWith( "urn:microsoft.com:service:X_MS_MediaReceiverRegistrar", false ))
+                continue;
+
             os << "<service>";
             os << FormatValue( "serviceType", pService->m_sServiceType );
             os << FormatValue( "serviceId"  , pService->m_sServiceId   );
@@ -411,7 +430,7 @@ void UPnpDeviceDesc::OutputDevice( QTextStream &os,
     // ----------------------------------------------------------------------
 
     // -=>Note:  XBMC can't handle sub-devices, it's UserAgent is blank.
-
+/*
     if (sUserAgent.length() > 0)
     {
         if (pDevice->m_listDevices.count() > 0)
@@ -427,7 +446,7 @@ void UPnpDeviceDesc::OutputDevice( QTextStream &os,
             os << "</deviceList>";
         }
     }
-
+*/
     os << "</device>";
 }
 
