@@ -978,6 +978,13 @@ bool cCiConditionalAccessSupport::Process(int Length, const uint8_t *Data)
                   d += 2;
                   l -= 2;
                   if (numCaSystemIds < MAXCASYSTEMIDS) {
+                     int i;
+                     // Make sure the id is not already present
+                     for (i = 0; i < numCaSystemIds; i++)
+                        if (caSystemIds[i] == id)
+                           break;
+                     if (i < numCaSystemIds)
+                         continue;
                      caSystemIds[numCaSystemIds++] = id;
                      caSystemIds[numCaSystemIds] = 0;
                      }
