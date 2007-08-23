@@ -2308,6 +2308,9 @@ if test x"$dts" = x"yes"; then
     if has_library libdca; then
         dts="yes"
         dtslib="-ldca"
+    elif has_library libdts_pic ; then
+        dts="yes"
+        dtslib="-ldts_pic"
     elif has_library libdts ; then
         dts="yes"
         dtslib="-ldts"
