@@ -73,22 +73,34 @@ void FillData::DataDirectStationUpdate(Source source, bool update_icons)
 
 bool FillData::DataDirectUpdateChannels(Source source)
 {
-    if (!is_grabber_labs(source.xmltvgrabber))
+    if (source.xmltvgrabber == "datadirect")
+        ddprocessor.SetListingsProvider(DD_ZAP2IT);
+    else if (source.xmltvgrabber == "schedulesdirect1")
+        ddprocessor.SetListingsProvider(DD_SCHEDULES_DIRECT);
+    else
     {
-        VERBOSE(VB_IMPORTANT, "FillData: We only support "
-                "DataDirectUpdateChannels with TMS Labs channel editor");
+        VERBOSE(VB_IMPORTANT,
+                "FillData: We only support DataDirectUpdateChannels with "
+                "TMS Labs and Schedules Direct.");
         return false;
     }
 
-    ddprocessor.SetListingsProvider(DD_ZAP2IT);
     ddprocessor.SetUserID(source.userid);
     ddprocessor.SetPassword(source.password);
 
-    bool ok    = ddprocessor.GrabFullLineup(
-        source.lineupid, true, chan_data.insert_chan(source.id)/*only sel*/);
-    logged_in  = source.userid;
-    raw_lineup = source.id;
-
+    bool ok = true;
+    if (!is_grabber_labs(source.xmltvgrabber))
+    {
+        ok = ddprocessor.GrabLineupsOnly();
+    }
+    else
+    {
+        ok = ddprocessor.GrabFullLineup(
+            source.lineupid, true, chan_data.insert_chan(source.id)/*only sel*/);
+        logged_in  = source.userid;
+        raw_lineup = source.id;
+    }
+  
     if (ok)
         DataDirectStationUpdate(source, false);
 
@@ -646,7 +658,7 @@ bool FillData::fillData(QValueList<Source> &sourcelist)
 
         need_post_grab_proc |= !is_grabber_datadirect(xmltv_grabber);
 
-        if (is_grabber_labs(xmltv_grabber) && dd_grab_all)
+        if (is_grabber_datadirect(xmltv_grabber) && dd_grab_all)
         {
             if (only_update_channels)
                 DataDirectUpdateChannels(*it);
@@ -681,7 +693,7 @@ bool FillData::fillData(QValueList<Source> &sourcelist)
             if (grabdays == 1)
                 refresh_today = true;
 
-            if (is_grabber_labs(xmltv_grabber) && only_update_channels)
+            if (is_grabber_datadirect(xmltv_grabber) && only_update_channels)
             {
                 DataDirectUpdateChannels(*it);
                 grabdays = 0;
