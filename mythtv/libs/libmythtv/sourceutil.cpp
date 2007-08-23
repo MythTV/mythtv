@@ -114,7 +114,7 @@ static QStringList get_cardtypes(uint sourceid)
     return list;
 }
 
-bool SourceUtil::IsEncoder(uint sourceid)
+bool SourceUtil::IsEncoder(uint sourceid, bool strict)
 {
     bool encoder = true;
 
@@ -135,15 +135,19 @@ bool SourceUtil::IsEncoder(uint sourceid)
         "WHERE sourceid = :SOURCEID");
     query.bindValue(":SOURCEID", sourceid);
 
+    bool has_any_chan = false;
     if (!query.exec() || !query.isActive())
         MythContext::DBError("SourceUtil::IsEncoder", query);
     else
     {
         while (query.next())
+        {
             encoder &= !query.value(0).toInt() && !query.value(1).toInt();
+            has_any_chan = true;
+        }
     }
 
-    return encoder;
+    return (strict && !has_any_chan) ? false: encoder;
 }
 
 bool SourceUtil::IsUnscanable(uint sourceid)

@@ -68,6 +68,7 @@ bool mark_repeats = true;
 bool channel_updates = false;
 bool channel_update_run = false;
 bool remove_new_channels = false;
+bool filter_new_channels = true;
 bool only_update_channels = false;
 bool need_post_grab_proc = true;
 QString logged_in = "";
@@ -849,11 +850,14 @@ void DataDirectStationUpdate(Source source, bool update_icons = true)
 
     bool insert_channels = insert_chan(source.id);
     int new_channels = DataDirectProcessor::UpdateChannelsSafe(
-        source.id, insert_channels);
+        source.id, insert_channels, filter_new_channels);
 
     //  User must pass "--do-channel-updates" for these updates
     if (channel_updates)
-        DataDirectProcessor::UpdateChannelsUnsafe(source.id);
+    {
+        DataDirectProcessor::UpdateChannelsUnsafe(
+            source.id, filter_new_channels);
+    }
     // TODO delete any channels which no longer exist in listings source
 
     if (update_icons)
@@ -3578,6 +3582,10 @@ int main(int argc, char *argv[])
         {
             remove_new_channels = true;
         }
+        else if (!strcmp(a.argv()[argpos], "--do-not-filter-new-channels"))
+        {
+            filter_new_channels = false;
+        }
         else if (!strcmp(a.argv()[argpos], "--graboptions"))
         {
             if (((argpos + 1) >= a.argc()))
@@ -3813,6 +3821,13 @@ int main(int argc, char *argv[])
             cout << "   MythTV by running mythfilldatabase without this\n";
             cout << "   option.  New channels are automatically removed\n";
             cout << "   for DVB and HDTV sources that use DataDirect.\n";
+            cout << "\n";
+            cout << "--do-not-filter-new-channels\n";
+            cout << "   Normally MythTV tries to avoid adding ATSC channels\n";
+            cout << "   to NTSC channel lineups. This option restores the\n";
+            cout << "   behaviour of adding every channel in the downloaded\n";
+            cout << "   channel lineup to MythTV's lineup, in case MythTV's\n";
+            cout << "   smarts fail you.\n";
             cout << "\n";
             cout << "--graboptions <\"options\">\n";
             cout << "   Pass options to grabber\n";
