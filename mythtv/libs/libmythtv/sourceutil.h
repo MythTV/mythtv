@@ -16,7 +16,7 @@ class MPUBLIC SourceUtil
     static bool    GetListingsLoginData(uint sourceid,
                                         QString &grabber, QString &userid,
                                         QString &passwd,  QString &lineupid);
-    static bool    IsEncoder(uint sourceid);
+    static bool    IsEncoder(uint sourceid, bool strict = false);
     static bool    IsUnscanable(uint sourceid);
     static bool    IsAnySourceScanable(void);
     static bool    UpdateChannelsFromListings(

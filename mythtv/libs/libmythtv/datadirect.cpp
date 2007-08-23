@@ -43,7 +43,7 @@ static void    get_atsc_stuff(QString channum, int sourceid, int freqid,
 static QString process_dd_station(uint sourceid,
                                   QString  chan_major, QString  chan_minor,
                                   QString &tvformat,   uint    &freqid);
-static void    update_channel_basic(uint    sourceid,   bool    insert,
+static uint    update_channel_basic(uint    sourceid,   bool    insert,
                                     QString xmltvid,    QString callsign,
                                     QString name,       uint    freqid,
                                     QString chan_major, QString chan_minor);
@@ -679,8 +679,10 @@ void DataDirectProcessor::UpdateProgramViewTable(uint sourceid)
         MythContext::DBError("Analyzing table dd_productioncrew", query);
 }
 
-int DataDirectProcessor::UpdateChannelsSafe(uint sourceid,
-                                            bool insert_channels)
+int DataDirectProcessor::UpdateChannelsSafe(
+    uint sourceid,
+    bool insert_channels,
+    bool filter_new_channels)
 {
     int new_channels = 0;
 
@@ -704,6 +706,8 @@ int DataDirectProcessor::UpdateChannelsSafe(uint sourceid,
         return -1;
     }
 
+    bool is_encoder = SourceUtil::IsEncoder(sourceid, true);
+
     while (query.next())
     {
         QString xmltvid    = query.value(0).toString();
@@ -713,22 +717,38 @@ int DataDirectProcessor::UpdateChannelsSafe(uint sourceid,
         QString chan_major = query.value(4).toString();
         QString chan_minor = query.value(5).toString();
 
-        update_channel_basic(sourceid, insert_channels,
-                             xmltvid, callsign, name, freqid,
-                             chan_major, chan_minor);
-
-        if (!insert_channels)
+        if (filter_new_channels && is_encoder &&
+            (query.value(5).toUInt() > 0))
         {
-            VERBOSE(VB_GENERAL, LOC + QString("Not adding channel %1 (%2).")
+#if 0
+            VERBOSE(VB_GENERAL, LOC + QString(
+                        "Not adding channel %1-%2 '%3' (%4),\n\t\t\t"
+                        "looks like a digital channel on an analog source.")
+                    .arg(chan_major).arg(chan_minor).arg(name).arg(callsign));
+#endif
+            continue;
+        }
+
+        uint mods =
+            update_channel_basic(sourceid, insert_channels && is_encoder,
+                                 xmltvid, callsign, name, freqid,
+                                 chan_major, chan_minor);
+
+#if 0
+        if (!insert_channels && !mods)
+        {
+            VERBOSE(VB_GENERAL, LOC + QString("Not adding channel '%1' (%2).")
                     .arg(name).arg(callsign));
         }
+#endif
         new_channels++;
     }
 
     return new_channels;
 }
 
-bool DataDirectProcessor::UpdateChannelsUnsafe(uint sourceid)
+bool DataDirectProcessor::UpdateChannelsUnsafe(
+    uint sourceid, bool filter_new_channels)
 {
     MSqlQuery dd_station_info(MSqlQuery::DDCon());
     dd_station_info.prepare(
@@ -750,6 +770,8 @@ bool DataDirectProcessor::UpdateChannelsUnsafe(uint sourceid)
         "    atsc_minor_chan = :MINORCHAN "
         "WHERE xmltvid = :STATIONID AND sourceid = :SOURCEID");
 
+    bool is_encoder = SourceUtil::IsEncoder(sourceid, true);
+
     while (dd_station_info.next())        
     {
         uint    freqid     = dd_station_info.value(3).toUInt();
@@ -758,6 +780,20 @@ bool DataDirectProcessor::UpdateChannelsUnsafe(uint sourceid)
         QString tvformat   = QString::null;
         QString channum    = process_dd_station(
             sourceid, chan_major, chan_minor, tvformat, freqid);
+
+        if (filter_new_channels && is_encoder &&
+            (dd_station_info.value(5).toUInt() > 0))
+        {
+#if 0
+            VERBOSE(VB_GENERAL, LOC + QString(
+                        "Not adding channel %1-%2 '%3' (%4),\n\t\t\t"
+                        "looks like a digital channel on an analog source.")
+                    .arg(chan_major).arg(chan_minor)
+                    .arg(dd_station_info.value(1).toString())
+                    .arg(dd_station_info.value(0).toString()));
+#endif
+            continue;
+        }
 
         chan_update_q.bindValue(":CALLSIGN",  dd_station_info.value(0));
         chan_update_q.bindValue(":NAME",      dd_station_info.value(1));
@@ -2091,7 +2127,7 @@ static QString process_dd_station(
     return channum;
 }
 
-static void update_channel_basic(uint    sourceid,   bool    insert,
+static uint update_channel_basic(uint    sourceid,   bool    insert,
                                  QString xmltvid,    QString callsign,
                                  QString name,       uint    freqid,
                                  QString chan_major, QString chan_minor)
@@ -2124,7 +2160,7 @@ static void update_channel_basic(uint    sourceid,   bool    insert,
     {
         MythContext::DBError(
             "Getting chanid of existing channel", query);
-        return; // go on to next channel without xmltv
+        return 0; // go on to next channel without xmltv
     }
 
     if (query.next())
@@ -2137,6 +2173,7 @@ static void update_channel_basic(uint    sourceid,   bool    insert,
             "SET xmltvid = :XMLTVID, name = :NAME, callsign = :CALLSIGN "
             "WHERE chanid = :CHANID AND sourceid = :SOURCEID");
 
+        uint i = 0;
         do
         {
             uint chanid = query.value(0).toInt();
@@ -2156,20 +2193,27 @@ static void update_channel_basic(uint    sourceid,   bool    insert,
             chan_update_q.bindValue(":XMLTVID",  xmltvid);
             chan_update_q.bindValue(":SOURCEID", sourceid);
 
+#if 0
+            VERBOSE(VB_GENERAL, LOC +
+                    QString("Updating channel %1: '%2' (%3).")
+                    .arg(chanid).arg(name).arg(callsign));
+#endif
+
             if (!chan_update_q.exec() || !chan_update_q.isActive())
             {
                 MythContext::DBError(
                     "Updating XMLTVID of existing channel", chan_update_q);
                 continue; // go on to next instance of this channel
             }
+            i++;
         }
         while (query.next());
 
-        return; // go on to next channel without xmltv
+        return i; // go on to next channel without xmltv
     }
 
     if (!insert)
-        return; // go on to next channel without xmltv
+        return 0; // go on to next channel without xmltv
 
     // The channel doesn't exist in the DB, insert it...
     int mplexid = -1, majorC, minorC, chanid = 0;
@@ -2182,6 +2226,9 @@ static void update_channel_basic(uint    sourceid,   bool    insert,
 
     if ((mplexid > 0) || (minorC == 0))
         chanid = ChannelUtil::CreateChanID(sourceid, channum);
+
+    VERBOSE(VB_GENERAL, LOC + QString("Adding channel %1 '%2' (%3).")
+            .arg(channum).arg(name).arg(callsign));
 
     if (chanid > 0)
     {
@@ -2200,6 +2247,8 @@ static void update_channel_basic(uint    sourceid,   bool    insert,
             freq_id,   icon,      tvformat,
             xmltvid);
     }
+
+    return 1;
 }
 
 static void set_lineup_type(const QString &lineupid, const QString &type)

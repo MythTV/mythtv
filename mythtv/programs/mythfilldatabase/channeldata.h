@@ -37,7 +37,8 @@ class ChannelData
     ChannelData() :
         interactive(false),         non_us_updating(false),
         channel_preset(false),      channel_updates(false),
-        remove_new_channels(false), cardtype(QString::null) {}
+        remove_new_channels(false), filter_new_channels(true),
+        cardtype(QString::null) {}
 
     bool insert_chan(uint sourceid);
     void handleChannels(int id, QValueList<ChanInfo> *chanlist);
@@ -50,6 +51,7 @@ class ChannelData
     bool    channel_preset;
     bool    channel_updates;
     bool    remove_new_channels;
+    bool    filter_new_channels;
     QString cardtype;
 };
 

@@ -36,11 +36,14 @@ void FillData::DataDirectStationUpdate(Source source, bool update_icons)
 
     bool insert_channels = chan_data.insert_chan(source.id);
     int new_channels = DataDirectProcessor::UpdateChannelsSafe(
-        source.id, insert_channels);
+        source.id, insert_channels, chan_data.filter_new_channels);
 
     //  User must pass "--do-channel-updates" for these updates
     if (chan_data.channel_updates)
-        DataDirectProcessor::UpdateChannelsUnsafe(source.id);
+    {
+        DataDirectProcessor::UpdateChannelsUnsafe(
+            source.id, chan_data.filter_new_channels);
+    }
     // TODO delete any channels which no longer exist in listings source
 
     if (update_icons)

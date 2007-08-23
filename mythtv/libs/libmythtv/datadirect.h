@@ -324,8 +324,10 @@ class MPUBLIC DataDirectProcessor
     static void UpdateProgramViewTable(uint sourceid);
 
     // static commands (these update regular DB tables from temp DB tables)
-    static int  UpdateChannelsSafe(uint sourceid, bool insert_channels);
-    static bool UpdateChannelsUnsafe(uint sourceid);
+    static int  UpdateChannelsSafe(
+        uint sourceid, bool insert_channels, bool filter_new_channels);
+    static bool UpdateChannelsUnsafe(
+        uint sourceid, bool filter_new_channels);
     static void DataDirectProgramUpdate(void);
 
     // static command, makes Labs and Schedules Direct ProgramIDs compatible.
