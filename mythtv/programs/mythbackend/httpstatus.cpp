@@ -9,6 +9,7 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include "httpstatus.h"
+#include "mythxml.h"
 
 #include "libmyth/mythcontext.h"
 #include "libmyth/util.h"
@@ -18,6 +19,7 @@
 #include <qdir.h>
 #include <qfile.h>
 #include <qregexp.h>
+#include <qbuffer.h>
 #include <math.h>
 
 #include "../../config.h"
@@ -57,29 +59,9 @@ HttpStatus::~HttpStatus()
 HttpStatusMethod HttpStatus::GetMethod( const QString &sURI )
 {
     if (sURI == ""                     ) return( HSM_GetStatusHTML   );
-    if (sURI == "getStatusHTML"        ) return( HSM_GetStatusHTML   );
-    if (sURI == "getStatus"            ) return( HSM_GetStatusXML    );
+    if (sURI == "GetStatusHTML"        ) return( HSM_GetStatusHTML   );
+    if (sURI == "GetStatus"            ) return( HSM_GetStatusXML    );
     if (sURI == "xml"                  ) return( HSM_GetStatusXML    );
-    if (sURI == "getProgramGuide"      ) return( HSM_GetProgramGuide );
-    if (sURI == "getProgramDetails"    ) return( HSM_GetProgramDetails);
-
-    if (sURI == "getHosts"             ) return( HSM_GetHosts        );
-    if (sURI == "getKeys"              ) return( HSM_GetKeys         );
-    if (sURI == "getSetting"           ) return( HSM_GetSetting      );
-    if (sURI == "putSetting"           ) return( HSM_PutSetting      );
-
-    if (sURI == "getChannelIcon"       ) return( HSM_GetChannelIcon  );
-    if (sURI == "getRecorded"          ) return( HSM_GetRecorded     );
-    if (sURI == "getExpiring"          ) return( HSM_GetExpiring     );
-    if (sURI == "getPreviewImage"      ) return( HSM_GetPreviewImage );
-    if (sURI == "getRecording"         ) return( HSM_GetRecording    );
-    if (sURI == "getMusic"             ) return( HSM_GetMusic        );
-
-    if (sURI == "getDeviceDesc"        ) return( HSM_GetDeviceDesc   );
-    if (sURI == "getCDSDesc"           ) return( HSM_GetCDSDesc      );
-    if (sURI == "getCMGRDesc"          ) return( HSM_GetCMGRDesc     );
-
-    if (sURI == "*"                    ) return( HSM_Asterisk        );
 
     return( HSM_Unknown );
 }
@@ -88,7 +70,7 @@ HttpStatusMethod HttpStatus::GetMethod( const QString &sURI )
 //
 /////////////////////////////////////////////////////////////////////////////
 
-bool HttpStatus::ProcessRequest( HttpWorkerThread *pThread, HTTPRequest *pRequest )
+bool HttpStatus::ProcessRequest( HttpWorkerThread * /* pThread */, HTTPRequest *pRequest )
 {
     try
     {
@@ -99,26 +81,16 @@ bool HttpStatus::ProcessRequest( HttpWorkerThread *pThread, HTTPRequest *pReques
 
             switch( GetMethod( pRequest->m_sMethod ))
             {
-                case HSM_GetStatusXML   : GetStatusXML   ( pRequest ); return( true );
-                case HSM_GetStatusHTML  : GetStatusHTML  ( pRequest ); return( true ); 
+                case HSM_GetStatusXML   : GetStatusXML   ( pRequest ); return true;
+                case HSM_GetStatusHTML  : GetStatusHTML  ( pRequest ); return true; 
 
-                case HSM_GetProgramGuide: GetProgramGuide( pRequest ); return( true );
+                default: 
+                {
+                    pRequest->m_eResponseType   = ResponseTypeHTML;
+                    pRequest->m_nResponseStatus = 200;
 
-                case HSM_GetProgramDetails: GetProgramDetails( pRequest ); return( true );
-
-                case HSM_GetHosts       : GetHosts       ( pRequest ); return( true );
-                case HSM_GetKeys        : GetKeys        ( pRequest ); return( true );
-                case HSM_GetSetting     : GetSetting     ( pRequest ); return( true );
-                case HSM_PutSetting     : PutSetting     ( pRequest ); return( true );
-                                                                       
-                case HSM_GetChannelIcon : GetChannelIcon ( pRequest ); return( true );
-                case HSM_GetRecorded    : GetRecorded    ( pRequest ); return( true );
-                case HSM_GetExpiring    : GetExpiring    ( pRequest ); return( true );
-                case HSM_GetPreviewImage: GetPreviewImage( pRequest ); return( true );
-
-                case HSM_GetRecording   : GetRecording   ( pThread, pRequest ); return( true );
-                case HSM_GetMusic       : GetMusic       ( pThread, pRequest ); return( true );
-                default: break;
+                    break;
+                }
             }
         }
     }
@@ -129,951 +101,6 @@ bool HttpStatus::ProcessRequest( HttpWorkerThread *pThread, HTTPRequest *pReques
 
     return( false );
 }           
-
-// ==========================================================================
-// Request handler Methods
-// ==========================================================================
-
-/////////////////////////////////////////////////////////////////////////////
-//
-/////////////////////////////////////////////////////////////////////////////
-
-void HttpStatus::GetHosts( HTTPRequest *pRequest )
-{
-    pRequest->m_eResponseType = ResponseTypeXML;
-    pRequest->m_mapRespHeaders[ "Cache-Control" ] = "no-cache=\"Ext\", max-age = 5000";
-
-    MSqlQuery query(MSqlQuery::InitCon());
-
-    if (query.isConnected())
-    {
-        query.prepare("SELECT DISTINCTROW hostname "
-                        "FROM settings WHERE (not isNull( hostname ));" );
-        query.exec();
-
-        if (query.isActive() && query.size() > 0)
-        {
-            pRequest->m_response << "<Hosts count='" << query.size() << "'>";
-            
-            while(query.next())
-            {
-                QString sHost = query.value(0).toString();
-
-                pRequest->m_response << "<Host>" 
-                                     << HTTPRequest::Encode( sHost )
-                                     << "</Host>";
-            }
-
-            pRequest->m_response << "</Hosts>";
-
-        }
-    }
-    else
-    {
-        QString sMsg = "Database not open while trying to load list of hosts";
-         
-        VERBOSE(VB_IMPORTANT, sMsg );
-
-        pRequest->m_response << "<Error>" + sMsg + "</Error>";
-        pRequest->m_nResponseStatus = 500;
-
-    }
-}
-
-/////////////////////////////////////////////////////////////////////////////
-//
-/////////////////////////////////////////////////////////////////////////////
-
-void HttpStatus::GetKeys( HTTPRequest *pRequest )
-{
-    pRequest->m_eResponseType   = ResponseTypeXML;
-    pRequest->m_mapRespHeaders[ "Cache-Control" ] = "no-cache=\"Ext\", max-age = 5000";
-
-    MSqlQuery query(MSqlQuery::InitCon());
-
-    if (query.isConnected())
-    {
-        query.prepare("SELECT DISTINCTROW value FROM settings;" );
-        query.exec();
-
-        if (query.isActive() && query.size() > 0)
-        {
-            pRequest->m_response << "<Keys count='" << query.size() << "'>";
-            
-            while(query.next())
-            {
-                QString sKey = query.value(0).toString();
-
-                pRequest->m_response << "<Key>" 
-                                     << HTTPRequest::Encode( sKey )
-                                     << "</Key>";
-            }
-
-            pRequest->m_response << "</Keys>";
-
-        }
-    }
-    else
-    {
-        QString sMsg = QString("Database not open while trying to load setting: %1")
-                               .arg( pRequest->m_mapParams[ "Key" ] );
-         
-        VERBOSE(VB_IMPORTANT, sMsg );
-
-        pRequest->m_response << "<Error>" + HTTPRequest::Encode( sMsg ) + "</Error>";
-        pRequest->m_nResponseStatus = 500;
-
-    }
-}
-
-/////////////////////////////////////////////////////////////////////////////
-//
-/////////////////////////////////////////////////////////////////////////////
-
-void HttpStatus::GetSetting( HTTPRequest *pRequest )
-{
-    pRequest->m_eResponseType   = ResponseTypeXML;
-    pRequest->m_mapRespHeaders[ "Cache-Control" ] = "no-cache=\"Ext\", max-age = 5000";
-
-    QString sKey      = pRequest->m_mapParams[ "Key"      ];
-    QString sHostName = pRequest->m_mapParams[ "HostName" ];
-    QString sValue;
-
-    MSqlQuery query(MSqlQuery::InitCon());
-
-    if (query.isConnected())
-    {
-        // Was a Key Supplied?
-
-        if (sKey.length() > 0)
-        {
-            query.prepare("SELECT data, hostname from settings "
-                            "WHERE value = :KEY AND "
-                                 "(hostname = :HOSTNAME OR hostname IS NULL) "
-                            "ORDER BY hostname DESC;" );
-
-            query.bindValue(":KEY"     , sKey      );
-            query.bindValue(":HOSTNAME", sHostName );
-            query.exec();
-
-            if (query.isActive() && query.size() > 0)
-            {
-                query.next();
-
-                if ( (sHostName.length() == 0) || 
-                    ((sHostName.length() >  0) && 
-                     (sHostName == query.value(1).toString())))
-                {
-                    sValue    = query.value(0).toString();
-                    sHostName = query.value(1).toString();
-
-                    pRequest->m_response <<  "<Value hostName='" 
-                                         << HTTPRequest::Encode( sHostName )
-                                         << "' key='" 
-                                         << HTTPRequest::Encode( sKey   ) 
-                                         << "'>"
-                                         << HTTPRequest::Encode( sValue ) 
-                                         << "</Value>";
-                    return;
-                }
-            }
-
-        }
-        else
-        {
-
-            VERBOSE(VB_IMPORTANT, "HostName:" );
-            VERBOSE(VB_IMPORTANT, sHostName );
-
-            if (sHostName.length() == 0)
-            {
-                query.prepare("SELECT value, data FROM settings "
-                                "WHERE (hostname IS NULL)" );
-            }
-            else
-            {
-                query.prepare("SELECT value, data FROM settings "
-                                "WHERE (hostname = :HOSTNAME)" );
-                query.bindValue(":HOSTNAME", sHostName );
-            }
-
-            query.exec();
-
-            if (query.isActive() && query.size() > 0)
-            {
-                pRequest->m_response << "<Values hostName='" 
-                                     << HTTPRequest::Encode( sHostName )
-                                     << "' count='" << query.size() << "'>";
-            
-                while(query.next())
-                {
-                    sKey      = query.value(0).toString();
-                    sValue    = query.value(1).toString();
-
-                    pRequest->m_response <<  "<Value key='" 
-                                         << HTTPRequest::Encode( sKey   )
-                                         << "'>"
-                                         << HTTPRequest::Encode( sValue )
-                                         << "</Value>";
-                }
-
-                pRequest->m_response << "</Values>";
-            
-                return;
-            }
-
-        }
-
-        // Not found, so return the supplied default value
-
-        pRequest->m_response << "<Value hostName='' key='" 
-                             << HTTPRequest::Encode( sKey ) << "'>" 
-                             << HTTPRequest::Encode( pRequest->m_mapParams[ "Default" ] )
-                             << "</Value>";
-    }
-    else
-    {
-        QString sMsg = QString("Database not open while trying to load setting: %1")
-                               .arg( pRequest->m_mapParams[ "Key" ] );
-         
-        VERBOSE(VB_IMPORTANT, sMsg );
-
-        pRequest->m_response << "<Error>" << HTTPRequest::Encode( sMsg ) << "</Error>";
-        pRequest->m_nResponseStatus = 500;
-    }
-}
-
-/////////////////////////////////////////////////////////////////////////////
-//
-/////////////////////////////////////////////////////////////////////////////
-
-void HttpStatus::PutSetting( HTTPRequest *pRequest )
-{
-    pRequest->m_eResponseType   = ResponseTypeXML;
-    pRequest->m_mapRespHeaders[ "Cache-Control" ] = "no-cache=\"Ext\", max-age = 5000";
-
-    QString sHostName = pRequest->m_mapParams[ "HostName" ];
-    QString sKey      = pRequest->m_mapParams[ "Key"      ];
-    QString sValue    = pRequest->m_mapParams[ "Value"    ];
-
-    if (sKey.length() > 0)
-    {
-        // -=>TODO: MythContext::SaveSettingOnHost does not handle NULL hostnames.
-        //          This code should be removed when fixed in MythContext.
-
-        if (sHostName.length() == 0)
-        {
-
-            MSqlQuery query(MSqlQuery::InitCon());
-
-            query.prepare("DELETE FROM settings WHERE value = :KEY "
-                      "AND hostname IS NULL;");
-            query.bindValue(":KEY", sKey);
-
-            if (!query.exec() || !query.isActive())
-                MythContext::DBError("Clear setting", query);
-        }
-
-        // End hack.
-
-        gContext->SaveSettingOnHost( sKey, sValue, sHostName );
-
-        pRequest->m_response <<  "<Success/>";
-    }
-    else
-        pRequest->m_response <<  "<Error>Key Required</Error>";
-
-}
-
-/////////////////////////////////////////////////////////////////////////////
-//
-/////////////////////////////////////////////////////////////////////////////
-
-void HttpStatus::GetProgramGuide( HTTPRequest *pRequest )
-{
-    pRequest->m_eResponseType = ResponseTypeXML;
-    pRequest->m_mapRespHeaders[ "Cache-Control" ] = "no-cache=\"Ext\", max-age = 5000";
-
-    QString sStartTime     = pRequest->m_mapParams[ "StartTime"    ];
-    QString sEndTime       = pRequest->m_mapParams[ "EndTime"      ];
-    int     iNumOfChannels = pRequest->m_mapParams[ "NumOfChannels"].toInt();
-    int     iStartChanId   = pRequest->m_mapParams[ "StartChanId"  ].toInt();
-    bool    bDetails       = pRequest->m_mapParams[ "Details"      ].toInt();
-    int     iEndChanId     = iStartChanId;
-
-    QDateTime dtStart = QDateTime::fromString( sStartTime, Qt::ISODate );
-    QDateTime dtEnd   = QDateTime::fromString( sEndTime  , Qt::ISODate );
-
-    if (!dtStart.isValid()) 
-    { 
-        pRequest->m_response <<  "<Error>StartTime is invalid</Error>";
-        return;
-    }
-        
-    if (!dtEnd.isValid()) 
-    { 
-        pRequest->m_response <<  "<Error>EndTime is invalid</Error>";
-        return;
-    }
-
-    if (dtEnd < dtStart) 
-    { 
-        pRequest->m_response <<  "<Error>EndTime is before StartTime</Error>";
-        return;
-    }
-
-    if (iNumOfChannels == 0)
-        iNumOfChannels = 1;
-
-    if (iNumOfChannels == -1)
-        iNumOfChannels = SHRT_MAX;
-
-    // Find the ending channel Id
-
-    MSqlQuery query(MSqlQuery::InitCon());
-
-    query.prepare( "SELECT chanid FROM channel WHERE (chanid >= :STARTCHANID )"
-                   " ORDER BY chanid LIMIT :NUMCHAN" );
-    
-    query.bindValue(":STARTCHANID", iStartChanId );
-    query.bindValue(":NUMCHAN"    , iNumOfChannels );
-
-    if (!query.exec() || !query.isActive())
-        MythContext::DBError("Select ChanId", query);
-
-    query.first();  iStartChanId = query.value(0).toInt();
-    query.last();   iEndChanId   = query.value(0).toInt();
-        
-    // Build add'l SQL statement for Program Listing
-
-    MSqlBindings bindings;
-    QString      sSQL = "WHERE program.chanid >= :StartChanId "
-                         "AND program.chanid <= :EndChanId "
-                         "AND program.starttime >= :StartDate "
-                         "AND program.endtime <= :EndDate "
-                        "GROUP BY program.starttime, channel.channum, "
-                         "channel.callsign, program.title "
-                        "ORDER BY program.chanid ";
-
-    bindings[":StartChanId"] = iStartChanId;
-    bindings[":EndChanId"  ] = iEndChanId;
-    bindings[":StartDate"  ] = dtStart.toString( Qt::ISODate );
-    bindings[":EndDate"    ] = dtEnd.toString( Qt::ISODate );
-
-    // Get all Pending Scheduled Programs
-
-    RecList      recList;
-    ProgramList  schedList;
-
-    if (m_pSched)
-        m_pSched->getAllPending( &recList);
-
-    // ----------------------------------------------------------------------
-    // We need to convert from a RecList to a ProgramList  
-    // (ProgramList will autodelete ProgramInfo pointers)
-    // ----------------------------------------------------------------------
-
-    for (RecIter itRecList =  recList.begin();
-                 itRecList != recList.end();   itRecList++)
-    {
-        schedList.append( *itRecList );
-    }
-
-    // ----------------------------------------------------------------------
-
-    ProgramList progList;
-
-    progList.FromProgram( sSQL, bindings, schedList );
-
-    // Build Response XML
-
-    QDomDocument doc( "ProgramGuide" );                        
-
-    QDomElement root = doc.createElement("ProgramGuide");
-    doc.appendChild(root);
-
-    root.setAttribute("asOf"      , QDateTime::currentDateTime().toString( Qt::ISODate ));
-    root.setAttribute("version"   , MYTH_BINARY_VERSION           );
-    root.setAttribute("protoVer"  , MYTH_PROTO_VERSION            );
-    root.setAttribute("totalCount", progList.count()              );
-
-    // ----------------------------------------------------------------------
-
-    QDomElement channels = doc.createElement("Channels");
-    root.appendChild( channels );
-
-    int          iChanCount = 0;
-    QDomElement  channel;
-    QString      sCurChanId = "";
-    ProgramInfo *pInfo      = progList.first();
-
-    while (pInfo != NULL)
-    {
-        if ( sCurChanId != pInfo->chanid )
-        {
-            iChanCount++;
-
-            sCurChanId = pInfo->chanid;
-
-            // Ouput new Channel Node
-
-            channel = doc.createElement( "Channel" );
-            channels.appendChild( channel );
-
-            FillChannelInfo( channel, pInfo, bDetails );
-        }
-
-        FillProgramInfo( &doc, channel, pInfo, false, bDetails );
-
-        pInfo = progList.next();
-
-    }
-
-    root.setAttribute("startTime"    , sStartTime   );
-    root.setAttribute("endTime"      , sEndTime     );
-    root.setAttribute("startChanId"  , iStartChanId );
-    root.setAttribute("endChanId"    , iEndChanId   );
-    root.setAttribute("numOfChannels", iChanCount   );
-    root.setAttribute("details"      , bDetails     );
-
-    pRequest->m_response << doc.toString();
-}
-
-
-/////////////////////////////////////////////////////////////////////////////
-//                  
-/////////////////////////////////////////////////////////////////////////////
-
-void HttpStatus::GetProgramDetails( HTTPRequest *pRequest )
-{
-    pRequest->m_eResponseType = ResponseTypeXML;
-    pRequest->m_mapRespHeaders[ "Cache-Control" ] = "no-cache=\"Ext\", max-age = 5000";
-
-    QString sStartTime = pRequest->m_mapParams[ "StartTime" ];
-    QString sChanId    = pRequest->m_mapParams[ "ChanId"    ];
-
-    QDateTime dtStart = QDateTime::fromString( sStartTime, Qt::ISODate );
-
-    if (!dtStart.isValid()) 
-    { 
-        pRequest->m_response <<  "<Error>StartTime is invalid</Error>";
-        return;
-    }
-    
-    // ----------------------------------------------------------------------
-    // -=>TODO: Add support for getting Recorded Program Info
-    // ----------------------------------------------------------------------
-    
-    // Build add'l SQL statement for Program Listing
-
-    MSqlBindings bindings;
-    QString      sSQL = "WHERE program.chanid = :ChanId "
-                          "AND program.starttime = :StartTime ";
-
-    bindings[":ChanId"   ] = sChanId;
-    bindings[":StartTime"] = dtStart.toString( Qt::ISODate );
-
-    // Get all Pending Scheduled Programs
-
-    RecList      recList;
-    ProgramList  schedList;
-
-    if (m_pSched)
-        m_pSched->getAllPending( &recList);
-
-    // ----------------------------------------------------------------------
-    // We need to convert from a RecList to a ProgramList  
-    // (ProgramList will autodelete ProgramInfo pointers)
-    // ----------------------------------------------------------------------
-
-    for (RecIter itRecList =  recList.begin();
-                 itRecList != recList.end();   itRecList++)
-    {
-        schedList.append( *itRecList );
-    }
-
-    // ----------------------------------------------------------------------
-
-    ProgramList progList;
-
-    progList.FromProgram( sSQL, bindings, schedList );
-
-    ProgramInfo *pInfo = progList.first();
-
-    if (pInfo==NULL)
-    { 
-        pRequest->m_response <<  "<Error>Error Reading Program Info</Error>";
-        return;
-    }
-
-    // Build Response XML
-
-    QDomDocument doc( "ProgramDetails" );                        
-
-    QDomElement root = doc.createElement("ProgramDetails");
-    doc.appendChild(root);
-
-    root.setAttribute("asOf"      , QDateTime::currentDateTime().toString( Qt::ISODate ));
-    root.setAttribute("version"   , MYTH_BINARY_VERSION           );
-    root.setAttribute("protoVer"  , MYTH_PROTO_VERSION            );
-    root.setAttribute("totalCount", 1                             );
-    root.setAttribute("startTime" , sStartTime   );
-    root.setAttribute("chanId"    , sChanId     );
-
-    FillProgramInfo( &doc, root, pInfo, true );
-
-    pRequest->m_response << doc.toString();
-}
-
-/////////////////////////////////////////////////////////////////////////////
-//                  
-/////////////////////////////////////////////////////////////////////////////
-
-void HttpStatus::GetChannelIcon( HTTPRequest *pRequest )
-{
-    pRequest->m_eResponseType   = ResponseTypeFile;
-
-    int  iChanId   = pRequest->m_mapParams[ "ChanId"  ].toInt();
-
-    // Read Icon file path from database
-
-    MSqlQuery query(MSqlQuery::InitCon());
-
-    query.prepare( "SELECT icon FROM channel WHERE (chanid = :CHANID )" );
-    query.bindValue(":CHANID", iChanId );
-
-    if (!query.exec() || !query.isActive())
-        MythContext::DBError("Select ChanId", query);
-
-    if (query.size() > 0)
-    {
-        query.first();  
-
-        pRequest->m_sFileName       = query.value(0).toString();
-    }
-}
-
-/////////////////////////////////////////////////////////////////////////////
-//
-/////////////////////////////////////////////////////////////////////////////
-
-void HttpStatus::GetRecorded( HTTPRequest *pRequest )
-{
-    bool    bDescending = pRequest->m_mapParams[ "Descending"  ].toInt();
-
-    // Get all Pending Scheduled Programs
-
-    RecList      recList;
-    ProgramList  schedList;
-
-    if (m_pSched)
-        m_pSched->getAllPending( &recList);
-
-    // ----------------------------------------------------------------------
-    // We need to convert from a RecList to a ProgramList  
-    // (ProgramList will autodelete ProgramInfo pointers)
-    // ----------------------------------------------------------------------
-
-    for (RecIter itRecList =  recList.begin();
-                 itRecList != recList.end();   itRecList++)
-    {
-        schedList.append( *itRecList );
-    }
-
-    // ----------------------------------------------------------------------
-
-    ProgramList progList;
-
-    progList.FromRecorded( bDescending, &schedList ); 
-
-    // Build Response XML
-
-    QDomDocument doc( "Recorded" );                        
-
-    QDomElement root = doc.createElement("Recorded");
-    doc.appendChild(root);
-
-    root.setAttribute("asOf"      , QDateTime::currentDateTime().toString( Qt::ISODate ));
-    root.setAttribute("version"   , MYTH_BINARY_VERSION           );
-    root.setAttribute("protoVer"  , MYTH_PROTO_VERSION            );
-    root.setAttribute("totalCount", progList.count()              );
-
-    ProgramInfo *pInfo = progList.first();
-
-    while (pInfo != NULL)
-    {
-        FillProgramInfo( &doc, root, pInfo, true );
-
-        pInfo = progList.next();
-    }
-
-    pRequest->m_mapRespHeaders[ "Cache-Control" ] = "no-cache=\"Ext\", max-age = 5000";
-    pRequest->m_eResponseType = ResponseTypeXML;
-    pRequest->m_response << doc.toString();
-
-}
-
-/////////////////////////////////////////////////////////////////////////////
-//                  
-/////////////////////////////////////////////////////////////////////////////
-
-void HttpStatus::GetExpiring( HTTPRequest *pRequest )
-{
-    pginfolist_t  list;
-
-    m_pExpirer->GetAllExpiring( list );
-
-    // Build Response XML
-
-    QDomDocument doc( "Expiring" );                        
-
-    QDomElement root = doc.createElement("Expiring");
-    doc.appendChild(root);
-
-    root.setAttribute("asOf"      , QDateTime::currentDateTime().toString( Qt::ISODate ));
-    root.setAttribute("version"   , MYTH_BINARY_VERSION           );
-    root.setAttribute("protoVer"  , MYTH_PROTO_VERSION            );
-    root.setAttribute("totalCount", list.size()                   );
-
-    pginfolist_t::iterator it = list.begin();
-    for (; it !=list.end(); it++)
-    {
-        ProgramInfo *pInfo = (*it);
-
-        if (pInfo != NULL)
-        {
-            FillProgramInfo( &doc, root, pInfo, true );
-            delete pInfo;
-        }
-    }
-
-    pRequest->m_mapRespHeaders[ "Cache-Control" ] = "no-cache=\"Ext\", max-age = 5000";
-    pRequest->m_eResponseType = ResponseTypeXML;
-    pRequest->m_response << doc.toString();
-}
-
-/////////////////////////////////////////////////////////////////////////////
-//                  
-/////////////////////////////////////////////////////////////////////////////
-
-void HttpStatus::GetPreviewImage( HTTPRequest *pRequest )
-{
-    pRequest->m_eResponseType   = ResponseTypeHTML;
-    pRequest->m_nResponseStatus = 404;
-
-    // -=>TODO: Add Parameters to allow various sizes & times
-
-    QString sChanId   = pRequest->m_mapParams[ "ChanId"    ];
-    QString sStartTime= pRequest->m_mapParams[ "StartTime" ];
-
-    QDateTime dtStart = QDateTime::fromString( sStartTime, Qt::ISODate );
-
-    if (!dtStart.isValid())
-        return;
-
-    // ----------------------------------------------------------------------
-    // Read Recording From Database
-    // ----------------------------------------------------------------------
-
-    ProgramInfo *pInfo = ProgramInfo::GetProgramFromRecorded( sChanId, dtStart );
-
-    if (pInfo==NULL)
-        return;
-
-    if ( pInfo->hostname != gContext->GetHostName())
-    {
-        // We only handle requests for local resources   
-
-        delete pInfo;
-
-        return;     
-    }
-
-    // ----------------------------------------------------------------------
-    // check to see if preview image is already created.
-    // ----------------------------------------------------------------------
-
-    QString sFileName     = pInfo->GetRecordFilename( gContext->GetFilePrefix() );
-    pRequest->m_sFileName = sFileName + ".png";
-
-    if (!QFile::exists( pRequest->m_sFileName ))
-    {
-        // Must generate Preview Image 
-
-        // Find first Local encoder
-
-        EncoderLink *pEncoder = NULL;
-
-        for ( QMap<int, EncoderLink *>::Iterator it = m_pEncoders->begin();
-              it != m_pEncoders->end();
-              ++it )
-        {
-            if (it.data()->IsLocal())
-            {
-                pEncoder = it.data();
-                break;
-            }
-        }
-
-        if ( pEncoder == NULL)
-        {
-            delete pInfo;
-            return;
-        }
-
-        // ------------------------------------------------------------------
-        // Generate Preview Image and save.
-        // ------------------------------------------------------------------
-
-        int len = 0;
-        int width = 0, height = 0;
-        float aspect = 0;
-        int secondsin = gContext->GetNumSetting("PreviewPixmapOffset", 64) +
-                        gContext->GetNumSetting("RecordPreRoll",0);
-
-        unsigned char *data = (unsigned char *)pEncoder->GetScreenGrab(pInfo, 
-                                                                    sFileName, 
-                                                                    secondsin,
-                                                                    len, width,
-                                                                    height, aspect);
-
-
-        if (!data)
-        {
-            delete pInfo;
-            return;
-        }
-
-        QImage img(data, width, height, 32, NULL, 65536 * 65536, QImage::LittleEndian);
-
-        float ppw = gContext->GetNumSetting("PreviewPixmapWidth", 160);
-        float pph = gContext->GetNumSetting("PreviewPixmapHeight", 120);
-
-        if (aspect <= 0)
-            aspect = ((float) width) / height;
-
-        if (aspect > ppw / pph)
-            pph = rint(ppw / aspect);
-        else
-            ppw = rint(pph * aspect);
-
-        img = img.smoothScale((int) ppw, (int) pph);
-
-        img.save( pRequest->m_sFileName.ascii(), "PNG" );
-    }
-
-    if (pInfo)
-        delete pInfo;
-
-    if (QFile::exists( pRequest->m_sFileName ))
-    {
-        pRequest->m_eResponseType   = ResponseTypeFile;
-        pRequest->m_nResponseStatus = 200;
-    }
-
-}
-
-/////////////////////////////////////////////////////////////////////////////
-//                  
-/////////////////////////////////////////////////////////////////////////////
-
-void HttpStatus::GetRecording( HttpWorkerThread *pThread, 
-                               HTTPRequest      *pRequest )
-{
-    bool bIndexFile = false;
-
-    pRequest->m_eResponseType   = ResponseTypeHTML;
-    pRequest->m_mapRespHeaders[ "Cache-Control" ] = "no-cache=\"Ext\", max-age = 5000";
-    pRequest->m_nResponseStatus = 404;
-
-    QString sChanId   = pRequest->m_mapParams[ "ChanId"    ];
-    QString sStartTime= pRequest->m_mapParams[ "StartTime" ];
-
-    if (sStartTime.length() == 0)
-        return;
-
-    // ----------------------------------------------------------------------
-    // DSM-320 & DSM-520 Special File Request for Index file of MPEG
-    //
-    // -=>TODO: Need to reverse Engineer File Format & create on the fly
-    //          from the RecordedMarkup Table.
-    // ----------------------------------------------------------------------
-
-    int nIdxPos = sStartTime.findRev( ".idx", -1, FALSE );
-
-    if (nIdxPos >=0 )
-    {
-        bIndexFile = true;
-        sStartTime = sStartTime.left( nIdxPos );
-    }
-
-    // ----------------------------------------------------------------------
-    // Check to see if this is another request for the same recording...
-    // ----------------------------------------------------------------------
-
-    ThreadData *pData = (ThreadData *)pThread->GetWorkerData();
-
-    if (pData != NULL)
-    {   
-        if ((pData->m_eType == ThreadData::DT_Recording) && 
-               pData->IsSameRecording( sChanId, sStartTime ))
-        {   
-            pRequest->m_sFileName = pData->m_sFileName;
-
-        }
-        else
-           pData = NULL;
-    }
-
-    // ----------------------------------------------------------------------
-    // New request if pData == NULL
-    // ----------------------------------------------------------------------
-
-    if (pData == NULL)
-    {
-        // ------------------------------------------------------------------
-        // Load Program Information & build FileName
-        // ------------------------------------------------------------------
-
-        QDateTime dtStart = QDateTime::fromString( sStartTime, Qt::ISODate );
-
-        if (!dtStart.isValid())
-            return;
-
-        // ------------------------------------------------------------------
-        // Read Recording From Database
-        // ------------------------------------------------------------------
-
-        ProgramInfo *pInfo = ProgramInfo::GetProgramFromRecorded( sChanId, dtStart );
-
-        if (pInfo==NULL)
-            return;
-
-        if ( pInfo->hostname != gContext->GetHostName())
-        {
-            // We only handle requests for local resources   
-
-            delete pInfo;
-
-            return;     
-        }
-
-        pRequest->m_sFileName = pInfo->GetRecordFilename( gContext->GetFilePrefix() );
-
-        delete pInfo;
-
-        // ------------------------------------------------------------------
-        // Store File information in WorkerThread Storage for next request (cache)
-        // ------------------------------------------------------------------
-
-        pData = new ThreadData( sChanId, sStartTime, pRequest->m_sFileName );
-
-        pThread->SetWorkerData( pData );
-    }
-
-    // ----------------------------------------------------------------------
-    // DSM-?20 Seek table support.
-    // ----------------------------------------------------------------------
-
-    if (bIndexFile)
-        pRequest->m_sFileName += ".idx";
-
-    // ----------------------------------------------------------------------
-    // check to see if the file exists
-    // ----------------------------------------------------------------------
-
-    if (QFile::exists( pRequest->m_sFileName ))
-    {
-        pRequest->m_eResponseType   = ResponseTypeFile;
-        pRequest->m_nResponseStatus = 200;
-    }
-}
-
-/////////////////////////////////////////////////////////////////////////////
-//                  
-/////////////////////////////////////////////////////////////////////////////
-
-void HttpStatus::GetMusic( HttpWorkerThread *pThread, 
-                           HTTPRequest      *pRequest )
-{
-    pRequest->m_eResponseType   = ResponseTypeHTML;
-    pRequest->m_mapRespHeaders[ "Cache-Control" ] = "no-cache=\"Ext\", max-age = 5000";
-    pRequest->m_nResponseStatus = 404;
-
-    QString sId   = pRequest->m_mapParams[ "Id"    ];
-
-    if (sId.length() == 0)
-        return;
-
-    int nTrack = sId.toInt();
-
-    // ----------------------------------------------------------------------
-    // Check to see if this is another request for the same recording...
-    // ----------------------------------------------------------------------
-
-    ThreadData *pData = (ThreadData *)pThread->GetWorkerData();
-
-    if (pData != NULL)
-    {   
-        if ((pData->m_eType == ThreadData::DT_Music) && 
-               (pData->m_nTrackNumber == nTrack))
-        {   
-            pRequest->m_sFileName = pData->m_sFileName;
-
-        }
-        else
-           pData = NULL;
-    }
-
-    // ----------------------------------------------------------------------
-    // New request if pData == NULL
-    // ----------------------------------------------------------------------
-
-    if (pData == NULL)
-    {
-        QString sBasePath = gContext->GetSetting( "MusicLocation", "");
-
-        // ------------------------------------------------------------------
-        // Load Track's FileName
-        // ------------------------------------------------------------------
-
-        MSqlQuery query(MSqlQuery::InitCon());
-
-        if (query.isConnected())
-        {
-            query.prepare("SELECT filename FROM musicmetadata WHERE intid = :KEY" );
-            query.bindValue(":KEY", nTrack );
-            query.exec();
-
-            if (query.isActive() && query.size() > 0)
-            {
-                query.first();  
-                pRequest->m_sFileName = QString( "%1/%2" )
-                                           .arg( sBasePath )
-                                           .arg( query.value(0).toString() );
-            }
-        }
-
-        // ------------------------------------------------------------------
-        // Store information in WorkerThread Storage for next request (cache)
-        // ------------------------------------------------------------------
-
-        pData = new ThreadData( nTrack, pRequest->m_sFileName );
-
-        pThread->SetWorkerData( pData );
-    }
-
-    // ----------------------------------------------------------------------
-    // check to see if the file exists
-    // ----------------------------------------------------------------------
-
-    if (QFile::exists( pRequest->m_sFileName ))
-    {
-        pRequest->m_eResponseType   = ResponseTypeFile;
-        pRequest->m_nResponseStatus = 200;
-    }
-}
-
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -1172,7 +199,7 @@ void HttpStatus::FillStatusXML( QDomDocument *pDoc )
 
                     if (pInfo)
                     {
-                        FillProgramInfo(pDoc, encoder, pInfo);
+                        MythXML::FillProgramInfo(pDoc, encoder, pInfo);
                         delete pInfo;
                     }
 
@@ -1207,7 +234,7 @@ void HttpStatus::FillStatusXML( QDomDocument *pDoc )
             ((*itProg)->recstartts >= QDateTime::currentDateTime()))
         {
             iNumRecordings++;
-            FillProgramInfo(pDoc, scheduled, *itProg);
+            MythXML::FillProgramInfo(pDoc, scheduled, *itProg);
         }
     }
 
@@ -1257,6 +284,7 @@ void HttpStatus::FillStatusXML( QDomDocument *pDoc )
             job.setAttribute("flags"     , it.data().flags      );
             job.setAttribute("status"    , it.data().status     );
             job.setAttribute("statusTime", it.data().statustime.toString(Qt::ISODate));
+//            job.setAttribute("schedTime" , it.data().schedruntime.toString(Qt::ISODate));
             job.setAttribute("args"      , it.data().args       );
 
             if (it.data().hostname == "")
@@ -1267,7 +295,7 @@ void HttpStatus::FillStatusXML( QDomDocument *pDoc )
             QDomText textNode = pDoc->createTextNode(it.data().comment);
             job.appendChild(textNode);
 
-            FillProgramInfo(pDoc, job, pInfo);
+            MythXML::FillProgramInfo(pDoc, job, pInfo);
 
             delete pInfo;
         }
@@ -1289,67 +317,67 @@ void HttpStatus::FillStatusXML( QDomDocument *pDoc )
     mInfo.appendChild(guide  );
 
     // drive space   --------------------- 
- 
-    long long iTotal = -1, iUsed = -1, iAvail = -1; 
- 
-    iAvail = getDiskSpace( gContext->GetFilePrefix(), iTotal, iUsed); 
- 
-    storage.setAttribute("_local_total", (int)(iTotal>>10)); 
-    storage.setAttribute("_local_used" , (int)(iUsed>>10)); 
-    storage.setAttribute("_local_free" , (int)(iAvail>>10)); 
- 
-    if (m_bIsMaster) 
-    { 
-        long long mTotal =  0, mUsed =  0, mAvail =  0; 
-        long long gTotal =  0, gUsed =  0, gAvail =  0; 
-        QString hosts = "_local"; 
-        QMap <QString, bool> backendsCounted; 
-        QString encoderHost; 
-        QMap<int, EncoderLink *>::Iterator eit; 
- 
-        gTotal = iTotal; 
-        gUsed  = iUsed; 
-        gAvail = iAvail; 
- 
-        for (eit = m_pEncoders->begin(); eit != m_pEncoders->end(); ++eit) 
-        { 
-            encoderHost = eit.data()->GetHostName(); 
-            if (eit.data()->IsConnected() && 
-                !eit.data()->IsLocal() && 
-                !backendsCounted.contains(encoderHost)) 
-            { 
-                backendsCounted[encoderHost] = true; 
-                hosts += "," + encoderHost; 
- 
-                eit.data()->GetFreeDiskSpace(mTotal, mUsed); 
-                mAvail = mTotal - mUsed; 
- 
-                storage.setAttribute(encoderHost + "_total", (int)(mTotal>>10)); 
-                storage.setAttribute(encoderHost + "_used" , (int)(mUsed>>10)); 
-                storage.setAttribute(encoderHost + "_free" , (int)(mAvail>>10)); 
- 
-                if ((mTotal == iTotal) && 
-                    (absLongLong(mAvail - iAvail) < (iAvail * 0.05))) 
-                { 
-                    storage.setAttribute(encoderHost + "_shared" , 1); 
-                } 
-                else 
-                { 
-                    storage.setAttribute(encoderHost + "_shared" , 0); 
-                    gTotal += mTotal; 
-                    gUsed  += mUsed; 
-                    gAvail += mAvail; 
-                } 
-            } 
-        } 
-        storage.setAttribute("_total_total", (int)(gTotal>>10)); 
-        storage.setAttribute("_total_used" , (int)(gUsed>>10)); 
-        storage.setAttribute("_total_free" , (int)(gAvail>>10)); 
- 
-        if (hosts != "") 
-            hosts += ",_total"; 
-        storage.setAttribute("slaves", hosts); 
-    } 
+
+    long long iTotal = -1, iUsed = -1, iAvail = -1;  
+
+    iAvail = getDiskSpace( gContext->GetFilePrefix(), iTotal, iUsed);  
+
+    storage.setAttribute("_local_total", (int)(iTotal>>10));  
+    storage.setAttribute("_local_used" , (int)(iUsed>>10));  
+    storage.setAttribute("_local_free" , (int)(iAvail>>10));  
+
+    if (m_bIsMaster)  
+    {  
+        long long mTotal =  0, mUsed =  0, mAvail =  0;  
+        long long gTotal =  0, gUsed =  0, gAvail =  0;  
+        QString hosts = "_local";  
+        QMap <QString, bool> backendsCounted;  
+        QString encoderHost;  
+        QMap<int, EncoderLink *>::Iterator eit;  
+
+        gTotal = iTotal;  
+        gUsed  = iUsed;  
+        gAvail = iAvail;  
+
+        for (eit = m_pEncoders->begin(); eit != m_pEncoders->end(); ++eit)  
+        {  
+            encoderHost = eit.data()->GetHostName();  
+            if (eit.data()->IsConnected() &&  
+                !eit.data()->IsLocal() &&  
+                !backendsCounted.contains(encoderHost))  
+            {  
+                backendsCounted[encoderHost] = true;  
+                hosts += "," + encoderHost;  
+
+                eit.data()->GetFreeDiskSpace(mTotal, mUsed);  
+                mAvail = mTotal - mUsed;  
+
+                storage.setAttribute(encoderHost + "_total", (int)(mTotal>>10));  
+                storage.setAttribute(encoderHost + "_used" , (int)(mUsed>>10));  
+                storage.setAttribute(encoderHost + "_free" , (int)(mAvail>>10));  
+
+                if ((mTotal == iTotal) &&  
+                    (absLongLong(mAvail - iAvail) < (iAvail * 0.05)))  
+                {  
+                    storage.setAttribute(encoderHost + "_shared" , 1);  
+                }  
+                else  
+                {  
+                    storage.setAttribute(encoderHost + "_shared" , 0);  
+                    gTotal += mTotal;  
+                    gUsed  += mUsed;  
+                    gAvail += mAvail;  
+                }  
+            }  
+        }  
+        storage.setAttribute("_total_total", (int)(gTotal>>10));  
+        storage.setAttribute("_total_used" , (int)(gUsed>>10));  
+        storage.setAttribute("_total_free" , (int)(gAvail>>10));  
+
+        if (hosts != "")  
+            hosts += ",_total";  
+        storage.setAttribute("slaves", hosts);  
+    }  
 
     // load average ---------------------
 
@@ -1400,7 +428,8 @@ void HttpStatus::FillStatusXML( QDomDocument *pDoc )
     }                                                  
 
 #ifdef HAVE_LMSENSORS
-    tempSettingLock.lock();
+    m_settingLock.lock();
+
     if (!found_acpi) 
     { 
         int chip_nr, a, b; 
@@ -1434,7 +463,7 @@ void HttpStatus::FillStatusXML( QDomDocument *pDoc )
         }  
         sensors_cleanup(); 
     } 
-    tempSettingLock.unlock();
+    m_settingLock.unlock();
 #endif 
 
     // Guide Data ---------------------
@@ -1442,7 +471,7 @@ void HttpStatus::FillStatusXML( QDomDocument *pDoc )
     QDateTime GuideDataThrough;
 
     MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare("SELECT max(endtime) FROM program;");
+    query.prepare("SELECT MAX(endtime) FROM program WHERE manualid = 0;");
 
     if (query.exec() && query.isActive() && query.size())
     {
@@ -1470,119 +499,6 @@ void HttpStatus::FillStatusXML( QDomDocument *pDoc )
 
     QDomText dataDirectMessage = pDoc->createTextNode(gContext->GetSetting("DataDirectMessage"));
     guide.appendChild(dataDirectMessage);
-}
-
-void HttpStatus::FillProgramInfo(QDomDocument *pDoc, 
-                                 QDomElement  &e, 
-                                 ProgramInfo  *pInfo, 
-                                 bool          bIncChannel /* = true */,
-                                 bool          bDetails    /* = true */)
-{
-    if ((pDoc == NULL) || (pInfo == NULL))
-        return;
-
-    // Build Program Element
-
-    QDomElement program = pDoc->createElement( "Program" );
-    e.appendChild( program );
-
-    program.setAttribute( "startTime"   , pInfo->startts.toString(Qt::ISODate));
-    program.setAttribute( "endTime"     , pInfo->endts.toString(Qt::ISODate));
-    program.setAttribute( "title"       , pInfo->title        );
-    program.setAttribute( "subTitle"    , pInfo->subtitle     );
-    program.setAttribute( "category"    , pInfo->category     );
-    program.setAttribute( "catType"     , pInfo->catType      );
-    program.setAttribute( "repeat"      , pInfo->repeat       );
-
-    if (bDetails)
-    {
-
-        program.setAttribute( "seriesId"    , pInfo->seriesid     );
-        program.setAttribute( "programId"   , pInfo->programid    );
-        program.setAttribute( "stars"       , pInfo->stars        );
-        program.setAttribute( "fileSize"    , longLongToString( pInfo->filesize ));
-        program.setAttribute( "lastModified", pInfo->lastmodified.toString(Qt::ISODate) );
-        program.setAttribute( "programFlags", pInfo->programflags );
-        program.setAttribute( "hostname"    , pInfo->hostname     );
-
-        if (pInfo->hasAirDate)
-            program.setAttribute( "airdate"  , pInfo->originalAirDate.toString(Qt::ISODate) );
-
-        QDomText textNode = pDoc->createTextNode( pInfo->description );
-        program.appendChild( textNode );
-
-    }
-
-    if ( bIncChannel )
-    {
-        // Build Channel Child Element
-        
-        QDomElement channel = pDoc->createElement( "Channel" );
-        program.appendChild( channel );
-
-        FillChannelInfo( channel, pInfo, bDetails );
-    }
-
-    // Build Recording Child Element
-
-    if ( pInfo->recstatus != rsUnknown )
-    { 
-        QDomElement recording = pDoc->createElement( "Recording" );
-        program.appendChild( recording );
-
-        recording.setAttribute( "recStatus"     , pInfo->recstatus   );
-        recording.setAttribute( "recPriority"   , pInfo->recpriority );
-        recording.setAttribute( "recStartTs"    , pInfo->recstartts.toString(Qt::ISODate));
-        recording.setAttribute( "recEndTs"      , pInfo->recendts.toString(Qt::ISODate));
-
-        if (bDetails)
-        {
-            recording.setAttribute( "recordId"      , pInfo->recordid    );
-            recording.setAttribute( "recGroup"      , pInfo->recgroup    );
-            recording.setAttribute( "playGroup"     , pInfo->playgroup   );
-            recording.setAttribute( "recType"       , pInfo->rectype     );
-            recording.setAttribute( "dupInType"     , pInfo->dupin       );
-            recording.setAttribute( "dupMethod"     , pInfo->dupmethod   );
-            recording.setAttribute( "encoderId"     , pInfo->cardid      );
-            recording.setAttribute( "recProfile"    , pInfo->GetProgramRecordingProfile());
-            recording.setAttribute( "preRollSeconds", m_nPreRollSeconds );
-        }
-    }
-}
-
-/////////////////////////////////////////////////////////////////////////////
-//
-/////////////////////////////////////////////////////////////////////////////
-
-void HttpStatus::FillChannelInfo( QDomElement &channel, 
-                                  ProgramInfo *pInfo, 
-                                  bool         bDetails  /* = true */ )
-{
-    if (pInfo)
-    {
-/*
-        QString sHostName = gContext->GetHostName();
-        QString sPort     = gContext->GetSettingOnHost( "BackendStatusPort", sHostName);
-        QString sIconURL  = QString( "http://%1:%2/getChannelIcon?ChanId=%3" )
-                                   .arg( sHostName )
-                                   .arg( sPort )
-                                   .arg( pInfo->chanid );
-*/
-
-        channel.setAttribute( "chanId"     , pInfo->chanid      );
-        channel.setAttribute( "chanNum"    , pInfo->chanstr     );
-        channel.setAttribute( "callSign"   , pInfo->chansign    );
-//        channel.setAttribute( "iconURL"    , sIconURL           );
-        channel.setAttribute( "channelName", pInfo->channame    );
-
-        if (bDetails)
-        {
-            channel.setAttribute( "chanFilters", pInfo->chanOutputFilters );
-            channel.setAttribute( "sourceId"   , pInfo->sourceid    );
-            channel.setAttribute( "inputId"    , pInfo->inputid     );
-            channel.setAttribute( "commFree"   , pInfo->chancommfree);
-        }
-    }
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -1679,7 +595,6 @@ void HttpStatus::PrintStatus( QTextStream &os, QDomDocument *pDoc )
        << "  div.loadstatus {\r\n"
        << "    width:325px;\r\n"
        << "    height:7em;\r\n"
-       << "    float:right;\r\n"
        << "  }\r\n"
        << "  .jobfinished { color: #0000ff; }\r\n"
        << "  .jobaborted { color: #7f0000; }\r\n"
@@ -2087,6 +1002,7 @@ int HttpStatus::PrintJobQueue( QTextStream &os, QDomElement jobs )
                     QDateTime endTs        = QDateTime::fromString( p.attribute( "endTime"   ,"" ), Qt::ISODate );
                     QDateTime recStartTs   = QDateTime::fromString( r.attribute( "recStartTs","" ), Qt::ISODate );
                     QDateTime statusTime   = QDateTime::fromString( e.attribute( "statusTime","" ), Qt::ISODate );
+//                    QDateTime schedRunTime = QDateTime::fromString( e.attribute( "schedTime","" ), Qt::ISODate );
                     QString   sHostname    = e.attribute( "hostname", "master" );
                     QString   sComment     = "";
 
@@ -2107,8 +1023,14 @@ int HttpStatus::PrintJobQueue( QTextStream &os, QDomElement jobs )
                     if ( !sSubTitle.isNull() && !sSubTitle.isEmpty())
                         os << "<em>" << sSubTitle << "</em><br /><br />";
 
-                    os << "Job: " << JobQueue::JobText( nType ) << "<br />"
-                       << "Status: <font" << statusColor << ">"
+                    os << "Job: " << JobQueue::JobText( nType ) << "<br />";
+/*
+                    if (schedRunTime > QDateTime::currentDateTime())
+                        os << "Scheduled Run Time: "
+                           << schedRunTime.toString(timeDateFormat)
+                           << "<br />";
+*/
+                    os << "Status: <font" << statusColor << ">"
                        << JobQueue::StatusText( nStatus )
                        << "</font><br />"
                        << "Status Time: "
@@ -2181,70 +1103,70 @@ int HttpStatus::PrintMachineInfo( QTextStream &os, QDomElement info )
 
     // local drive space   ---------------------
     
-    node = info.namedItem( "Storage" );
+    node = info.namedItem( "Storage" ); 
 
-    if (!node.isNull())
-    {    
-        QDomElement e = node.toElement();
+    if (!node.isNull()) 
+    {     
+        QDomElement e = node.toElement(); 
 
-        if (!e.isNull())
-        {
-            QString slaves = e.attribute("slaves", "_local");
-            QStringList tokens = QStringList::split(",", slaves);
+        if (!e.isNull()) 
+        { 
+            QString slaves = e.attribute("slaves", "_local"); 
+            QStringList tokens = QStringList::split(",", slaves); 
 
-            os << "      Disk Usage:<br />\r\n";
-            os << "      <ul>\r\n";
+            os << "      Disk Usage:<br />\r\n"; 
+            os << "      <ul>\r\n"; 
 
-            for (unsigned int i = 0; i < tokens.size(); i++)
-            {
-                int nFree = e.attribute(tokens[i] + "_free" , "0" ).toInt();
-                int nTotal= e.attribute(tokens[i] + "_total", "0" ).toInt();
-                int nUsed = e.attribute(tokens[i] + "_used" , "0" ).toInt();
+            for (unsigned int i = 0; i < tokens.size(); i++) 
+            { 
+                int nFree = e.attribute(tokens[i] + "_free" , "0" ).toInt(); 
+                int nTotal= e.attribute(tokens[i] + "_total", "0" ).toInt(); 
+                int nUsed = e.attribute(tokens[i] + "_used" , "0" ).toInt(); 
 
-                if (slaves == "_local")
-                {
-                    // do nothing
-                }
-                else if (tokens[i] == "_local")
-                {
-                    os << "        <li>Master Backend:\r\n"
-                       << "          <ul>\r\n";
-                }
-                else if (tokens[i] == "_total")
-                {
-                    os << "        <li>Total Disk Space:\r\n"
-                       << "          <ul>\r\n";
-                }
-                else
-                {
-                    os << "        <li>" << tokens[i] << ": ";
+                if (slaves == "_local") 
+                { 
+                    // do nothing 
+                } 
+                else if (tokens[i] == "_local") 
+                { 
+                    os << "        <li>Master Backend:\r\n" 
+                       << "          <ul>\r\n"; 
+                } 
+                else if (tokens[i] == "_total") 
+                { 
+                    os << "        <li>Total Disk Space:\r\n" 
+                       << "          <ul>\r\n"; 
+                } 
+                else 
+                { 
+                    os << "        <li>" << tokens[i] << ": "; 
 
-                    if (e.attribute(tokens[i] + "shared", "0").toInt())
-                        os << " (Shared with master)";
+                    if (e.attribute(tokens[i] + "shared", "0").toInt()) 
+                        os << " (Shared with master)"; 
 
-                    os << "\r\n"
-                       << "          <ul>\r\n";
-                }
+                    os << "\r\n" 
+                       << "          <ul>\r\n"; 
+                } 
 
-                os << "            <li>Total Space: ";
-                sRep.sprintf( "%d,%03d MB ", (nTotal) / 1000, (nTotal) % 1000);
-                os << sRep << "</li>\r\n";
+                os << "            <li>Total Space: "; 
+                sRep.sprintf( "%d,%03d MB ", (nTotal) / 1000, (nTotal) % 1000); 
+                os << sRep << "</li>\r\n"; 
 
-                os << "            <li>Space Used: ";
-                sRep.sprintf( "%d,%03d MB ", (nUsed) / 1000, (nUsed) % 1000);
-                os << sRep << "</li>\r\n";
+                os << "            <li>Space Used: "; 
+                sRep.sprintf( "%d,%03d MB ", (nUsed) / 1000, (nUsed) % 1000); 
+                os << sRep << "</li>\r\n"; 
 
-                os << "            <li>Space Free: ";
-                sRep.sprintf( "%d,%03d MB ", (nFree) / 1000, (nFree) % 1000);
-                os << sRep << "</li>\r\n";
+                os << "            <li>Space Free: "; 
+                sRep.sprintf( "%d,%03d MB ", (nFree) / 1000, (nFree) % 1000); 
+                os << sRep << "</li>\r\n"; 
 
-                if (slaves != "_local_")
-                    os << "          </ul>\r\n"
-                       << "        </li>\r\n";
-            }
-            os << "      </ul>\r\n";
-        }
-    }
+                if (slaves != "_local_") 
+                    os << "          </ul>\r\n" 
+                       << "        </li>\r\n"; 
+            } 
+            os << "      </ul>\r\n"; 
+        } 
+    } 
 
    // ACPI temperature ------------------
 

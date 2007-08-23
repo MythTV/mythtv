@@ -16,14 +16,14 @@
 /*
    Music                            Music
     - All Music                     Music/All
-      + <Track 1>                   Music/All/track?Id=1
+      + <Track 1>                   Music/All/item?Id=1
       + <Track 2>
       + <Track 3>
     - PlayLists
     - By Artist                     Music/artist
       - <Artist 1>                  Music/artist/artistKey=Pink Floyd
         - <Album 1>                 Music/artist/artistKey=Pink Floyd/album/albumKey=The Wall
-          + <Track 1>               Music/artist/artistKey=Pink Floyd/album/albumKey=The Wall/track?Id=1
+          + <Track 1>               Music/artist/artistKey=Pink Floyd/album/albumKey=The Wall/item?Id=1
           + <Track 2>
     - By Album                     
       - <Album 1>                  
@@ -36,670 +36,145 @@
       - By Artist                   Music/artist
         - <Artist 1>                Music/artist/artistKey=Pink Floyd
           - <Album 1>               Music/artist/artistKey=Pink Floyd/album/albumKey=The Wall
-            + <Track 1>             Music/artist/artistKey=Pink Floyd/album/albumKey=The Wall/track?Id=1
+            + <Track 1>             Music/artist/artistKey=Pink Floyd/album/albumKey=The Wall/item?Id=1
             + <Track 2>
 */
 
-
-typedef struct
+UPnpCDSRootInfo UPnpCDSMusic::g_RootNodes[] = 
 {
-    char *title;
-    char *column;
-    char *sql;
-    char *where;
-
-} RootInfo;
-
-static RootInfo g_RootNodes[] = 
-{
-    {   "All Music", 
+    {   "All Music",
         "*",
-        "SELECT intid as id, "
-          "title as name, "
+        "SELECT song_id as id, "
+          "name, "
           "1 as children "
-            "FROM musicmetadata "
+            "FROM music_songs song "
             "%1 "
-            "ORDER BY title",
+            "ORDER BY name",
         "" },
+
+/*
+This is currently broken... need to handle list of items with single parent (like 'All Music')
 
     {   "Recently Added",
         "*",
-        "SELECT intid id, "
-          "title as name, "
+        "SELECT song_id id, "
+          "name, "
           "1 as children "
-            "FROM musicmetadata "
+            "FROM music_songs song "
             "%1 "
-            "ORDER BY title",
-        "WHERE (DATEDIFF( CURDATE(), date_added ) <= 30 ) " },
-
-    {   "By Album", 
-        "album", 
-        "SELECT album as id, "
-          "album as name, "
-          "count( album ) as children "
-            "FROM musicmetadata "
+            "ORDER BY name",
+        "WHERE (DATEDIFF( CURDATE(), date_modified ) <= 30 ) " },
+*/
+    {   "By Album",
+        "song.album_id",
+        "SELECT a.album_id as id, "
+          "a.album_name as name, "
+          "count( song.album_id ) as children "
+            "FROM music_songs song join music_albums a on a.album_id = song.album_id "
             "%1 "
-            "GROUP BY album "
-            "ORDER BY album",
-        "WHERE album=:KEY" },
-
+            "GROUP BY a.album_id "
+            "ORDER BY a.album_name",
+        "WHERE song.album_id=:KEY" },
 /*
 
-    {   "By Artist", 
-        "artist",
-        "SELECT artist as id, "
-          "artist as name, "
-          "count( distinct album ) as children "
-            "FROM musicmetadata "
+    {   "By Artist",
+        "artist_id",
+        "SELECT a.artist_id as id, "
+          "a.artist_name as name, "
+          "count( distinct song.artist_id ) as children "
+            "FROM music_songs song join music_artists a on a.artist_id = song.artist_id "
             "%1 "
-            "GROUP BY artist "
-            "ORDER BY artist", 
-        "WHERE artist=:KEY" },
+            "GROUP BY a.artist_id "
+            "ORDER BY a.artist_name",
+        "WHERE song.artist_id=:KEY" },
 */
 /*
-    {   "By Genre",
-        "genre",
-        "SELECT genre as id, "
+{   "By Genre",
+        "genre_id",
+        "SELECT g.genre_id as id, "
           "genre as name, "
-          "count( distinct artist ) as children "
-            "FROM musicmetadata "
+          "count( distinct song.genre_id ) as children "
+            "FROM music_songs song join music_genres g on g.genre_id = song.genre_id "
             "%1 "
-            "GROUP BY genre "
-            "ORDER BY genre",
-        "WHERE genre=:KEY" },
+            "GROUP BY g.genre_id "
+            "ORDER BY g.genre",
+        "WHERE song.genre_id=:KEY" },
 
 */
 };
 
-static const short g_nRootNodeLength = sizeof( g_RootNodes ) / sizeof( RootInfo );
+int UPnpCDSMusic::g_nRootCount = sizeof( g_RootNodes ) / sizeof( UPnpCDSRootInfo );
 
 /////////////////////////////////////////////////////////////////////////////
 //
 /////////////////////////////////////////////////////////////////////////////
 
-#define SHARED_MUSIC_SQL "SELECT intid, artist, album, title, "          \
-                                "genre, year, tracknum, description, "   \
-                                "filename, length "                      \
-                            "FROM musicmetadata "
+UPnpCDSRootInfo *UPnpCDSMusic::GetRootInfo( int nIdx )
+{ 
+    if ((nIdx >=0 ) && ( nIdx < g_nRootCount ))
+        return &(g_RootNodes[ nIdx ]); 
 
-/////////////////////////////////////////////////////////////////////////////
-//
-/////////////////////////////////////////////////////////////////////////////
-
-template <class T> inline const T& Min( const T &x, const T &y ) 
-{
-    return( ( x < y ) ? x : y );
-}
- 
-template <class T> inline const T& Max( const T &x, const T &y ) 
-{
-    return( ( x > y ) ? x : y );
-}
-                                                         
-/////////////////////////////////////////////////////////////////////////////
-//
-/////////////////////////////////////////////////////////////////////////////
-
-UPnpCDSExtensionResults *UPnpCDSMusic::Browse( UPnpCDSBrowseRequest *pRequest )
-{
-
-    // -=>TODO: Need to add Filter & Sorting Support.
-    // -=>TODO: Need to add Sub-Folder/Category Support!!!!!
-
-    if (! pRequest->m_sObjectId.startsWith( m_sExtensionId, true ))
-        return( NULL );
-
-    // ----------------------------------------------------------------------
-    // Parse out request object's path
-    // ----------------------------------------------------------------------
-
-    QStringList idPath = QStringList::split( "/", pRequest->m_sObjectId.section('=',0,0) );
-
-    QString key = pRequest->m_sObjectId.section('=',1);
-
-    if (idPath.count() == 0)
-        return( NULL );
-
-    // ----------------------------------------------------------------------
-    // Process based on location in hierarchy
-    // ----------------------------------------------------------------------
-
-    UPnpCDSExtensionResults *pResults = new UPnpCDSExtensionResults();
-
-    if (pResults != NULL)
-    {
-
-        if (key)
-            idPath.last().append(QString("=%1").arg(key));
-
-        QString sLast = idPath.last();
-
-        pRequest->m_sParentId = RemoveToken( "/", pRequest->m_sObjectId, 1 );
-
-        if (sLast == m_sExtensionId          ) { return( ProcessRoot ( pRequest, pResults, idPath    )); }
-        if (sLast == "0"                     ) { return( ProcessAll  ( pRequest, pResults, idPath, 0 )); }
-        if (sLast == "1"                     ) { return( ProcessAll  ( pRequest, pResults, idPath, 1 )); }
-        if (sLast.startsWith( "key"  , true )) { return( ProcessKey  ( pRequest, pResults, idPath    )); }
-        if (sLast.startsWith( "track", true )) { return( ProcessTrack( pRequest, pResults, idPath    )); }
-
-        int nNodeIdx = sLast.toInt();
-
-        if ((nNodeIdx > 1) && (nNodeIdx < g_nRootNodeLength))
-            return( ProcessContainer( pRequest, pResults, nNodeIdx, idPath ));
-
-        delete pResults;
-    }
-
-    return( NULL );        
-
+    return NULL;
 }
 
 /////////////////////////////////////////////////////////////////////////////
 //
 /////////////////////////////////////////////////////////////////////////////
 
-QString UPnpCDSMusic::RemoveToken( const QString &sToken, const QString &sStr, int num )
+int UPnpCDSMusic::GetRootCount()
 {
-    QString sResult( "" );
-    int     nPos = -1;
-
-    for (int nIdx=0; nIdx < num; nIdx++)
-    {
-        if ((nPos = sStr.findRev( sToken, nPos )) == -1)
-            break;
-    }
-
-    if (nPos > 0)
-        sResult = sStr.left( nPos );
-
-    return sResult;
+    return g_nRootCount;
 }
 
 /////////////////////////////////////////////////////////////////////////////
 //
 /////////////////////////////////////////////////////////////////////////////
 
-UPnpCDSExtensionResults *UPnpCDSMusic::ProcessRoot( UPnpCDSBrowseRequest    *pRequest, 
-                                                    UPnpCDSExtensionResults *pResults, 
-                                                    QStringList             &/*idPath*/ )
+QString UPnpCDSMusic::GetTableName( QString sColumn )
 {
-
-
-    switch( pRequest->m_eBrowseFlag )
-    { 
-        case CDS_BrowseMetadata:
-        {
-            // --------------------------------------------------------------
-            // Return Root Object Only
-            // --------------------------------------------------------------
-
-            pResults->m_nTotalMatches   = 1;
-            pResults->m_nUpdateID       = 1;
-
-            CDSObject *pRoot = CDSObject::CreateContainer( m_sExtensionId, 
-                                                           m_sName, 
-                                                           "0");
-
-            pRoot->SetChildCount( g_nRootNodeLength );
-
-            pResults->Add( pRoot ); 
-
-            break;
-        }
-
-        case CDS_BrowseDirectChildren:
-        {
-            pResults->m_nUpdateID     = 1;
-            pResults->m_nTotalMatches = g_nRootNodeLength;
-            
-            if ( pRequest->m_nRequestedCount == 0)
-                pRequest->m_nRequestedCount = g_nRootNodeLength;
-
-            short nStart = Max( pRequest->m_nStartingIndex, short( 0 ));
-            short nEnd   = Min( g_nRootNodeLength, short( nStart + pRequest->m_nRequestedCount));
-
-            if (nStart < g_nRootNodeLength)
-            {
-                for (short nIdx = nStart; nIdx < nEnd; nIdx++)
-                {
-                    QString sId = QString( "%1/%2" ).arg( pRequest->m_sObjectId   )
-                                                    .arg( nIdx );
-
-                    CDSObject *pItem = CDSObject::CreateContainer( sId,  
-                                                                   QObject::tr( g_RootNodes[ nIdx ].title ), 
-                                                                   pRequest->m_sParentId );
-
-                    pItem->SetChildCount( GetDistinctCount( g_RootNodes[ nIdx ].column ) );
-
-                    pResults->Add( pItem );
-                }
-            }
-        }
-
-        case CDS_BrowseUnknown:
-        default:
-            break;
-    }
-
-    return( pResults );
-}
-
-
-/////////////////////////////////////////////////////////////////////////////
-//
-/////////////////////////////////////////////////////////////////////////////
-
-UPnpCDSExtensionResults *UPnpCDSMusic::ProcessAll ( UPnpCDSBrowseRequest    *pRequest,
-                                                    UPnpCDSExtensionResults *pResults,
-                                                    QStringList             &/*idPath*/,
-                                                    int                      nNodeIdx )
-{
-    // ----------------------------------------------------------------------
-    //
-    // ----------------------------------------------------------------------
-    
-    switch( pRequest->m_eBrowseFlag )
-    { 
-        case CDS_BrowseMetadata:
-        {
-            // --------------------------------------------------------------
-            // Return Container Object Only
-            // --------------------------------------------------------------
-
-            pResults->m_nTotalMatches   = 1;
-            pResults->m_nUpdateID       = 1;
-
-            CDSObject *pItem = CDSObject::CreateContainer( pRequest->m_sObjectId,  
-                                                           QObject::tr( g_RootNodes[ nNodeIdx ].title ), 
-                                                           m_sExtensionId );
-            pItem->SetChildCount( GetDistinctCount( g_RootNodes[ nNodeIdx ].column, 
-                                                    g_RootNodes[ nNodeIdx ].where  ) );
-
-            pResults->Add( pItem ); 
-
-            break;
-        }
-
-        case CDS_BrowseDirectChildren:
-        {
-
-            CreateMusicTracks( pRequest, pResults, nNodeIdx, "", false );
-
-            break;
-        }
-
-        case CDS_BrowseUnknown:
-        default:
-            break;
-    }
-    
-
-    return( pResults );
+    return "music_songs song";
 }
 
 /////////////////////////////////////////////////////////////////////////////
 //
 /////////////////////////////////////////////////////////////////////////////
 
-UPnpCDSExtensionResults *UPnpCDSMusic::ProcessTrack( UPnpCDSBrowseRequest    */* pRequest */,
-                                                     UPnpCDSExtensionResults *pResults, 
-                                                     QStringList             &/* idPath */)
+QString UPnpCDSMusic::GetItemListSQL( QString /* sColumn */ )
 {
-    pResults->m_nTotalMatches   = 0;
-    pResults->m_nUpdateID       = 1;
-
-/*
-    // ----------------------------------------------------------------------
-    //
-    // ----------------------------------------------------------------------
-    
-    if ( pRequest->m_eBrowseFlag == CDS_BrowseMetadata )
-    {
-        // --------------------------------------------------------------
-        // Return 1 VideoItem
-        // --------------------------------------------------------------
-
-        QStringMap  mapParams;
-        QString     sParams = idPath.last().section( '?', 1, 1 );
-            
-        sParams.replace(QRegExp( "&amp;"), "&" ); 
-
-        HTTPRequest::GetParameters( sParams, mapParams );
-
-        int     nChanId    = mapParams[ "ChanId"    ].toInt();
-        QString sStartTime = mapParams[ "StartTime" ];
-
-        MSqlQuery query(MSqlQuery::InitCon());
-
-        if (query.isConnected())                                                           
-        {
-            query.prepare( SHARED_MUSIC_SQL
-                           "WHERE chanid=:CHANID and starttime=:STARTTIME " );
-
-            query.bindValue(":CHANID"   , (int)nChanId    );
-            query.bindValue(":STARTTIME", sStartTime );
-            query.exec();
-
-            if (query.isActive() && query.size() > 0)
-            {
-                if ( query.next() )
-                {
-                    pRequest->m_sObjectId = RemoveToken( "/", pRequest->m_sObjectId, 1 );
-
-                    AddVideoItem( pRequest, pResults, false, query );
-                    pResults->m_nTotalMatches = 1;
-                }
-            }
-        }
-    }
-*/
-
-    return( pResults );
+    return "SELECT song.song_id as intid, artist.artist_name as artist, "         \
+               "album.album_name as album, song.name as title, "                  \
+               "genre.genre, song.year, song.track as tracknum, "                 \
+               "song.description, song.filename, song.length "                    \
+            "FROM music_songs song "                                              \
+               " join music_artists artist on artist.artist_id = song.artist_id " \
+               " join music_albums album on album.album_id = song.album_id "      \
+               " join music_genres genre on  genre.genre_id = song.genre_id ";
 }
 
 /////////////////////////////////////////////////////////////////////////////
 //
 /////////////////////////////////////////////////////////////////////////////
 
-UPnpCDSExtensionResults *UPnpCDSMusic::ProcessKey( UPnpCDSBrowseRequest    *pRequest,
-                                                   UPnpCDSExtensionResults *pResults, 
-                                                   QStringList             &idPath )
+void UPnpCDSMusic::BuildItemQuery( MSqlQuery &query, const QStringMap &mapParams )
 {
-    pResults->m_nTotalMatches   = 0;
-    pResults->m_nUpdateID       = 1;
+    int     nId    = mapParams[ "Id" ].toInt();
 
-    // ----------------------------------------------------------------------
-    //
-    // ----------------------------------------------------------------------
-    
-    QString sKey = idPath.last().section( '=', 1, 1 );
+    QString sSQL = QString( "%1 WHERE song.song_id=:ID " )
+                      .arg( GetItemListSQL() );
 
-    if (sKey.length() > 0)
-    {
-        QUrl::decode( sKey );
+    query.prepare( sSQL );
 
-        int nNodeIdx = idPath[ idPath.count() - 2 ].toInt();
-
-        switch( pRequest->m_eBrowseFlag )
-        { 
-
-            case CDS_BrowseMetadata:
-            {                                    
-                // --------------------------------------------------------------
-                // Since Key is not always the title, we need to lookup title.
-                // --------------------------------------------------------------
-
-                MSqlQuery query(MSqlQuery::InitCon());
-
-                if (query.isConnected())
-                {
-                    QString sSQL   = QString( g_RootNodes[ nNodeIdx ].sql )
-                                        .arg( g_RootNodes[ nNodeIdx ].where );
-
-                    query.prepare  ( sSQL );
-                    query.bindValue( ":KEY", sKey );
-                    query.exec();
-
-                    if (query.isActive() && query.size() > 0)
-                    {
-                        if ( query.next() )
-                        {
-                            // ----------------------------------------------
-                            // Return Container Object Only
-                            // ----------------------------------------------
-
-                            pResults->m_nTotalMatches   = 1;
-                            pResults->m_nUpdateID       = 1;
-
-                            CDSObject *pItem = CDSObject::CreateContainer( pRequest->m_sObjectId,  
-                                                                           query.value(1).toString(), 
-                                                                           pRequest->m_sParentId );
-
-                            pItem->SetChildCount( GetDistinctCount( g_RootNodes[ nNodeIdx ].column  ));
-
-                            pResults->Add( pItem ); 
-                        }
-                    }
-                }
-                break;
-            }
-
-            case CDS_BrowseDirectChildren:
-            {
-                CreateMusicTracks( pRequest, pResults, nNodeIdx, sKey, true );
-
-                break;
-            }
-
-            case CDS_BrowseUnknown:
-                default:
-                break;
-
-        }
-    }
-  
-    return( pResults );                                                                           
+    query.bindValue(":ID"   , (int)nId    );
 }
 
 /////////////////////////////////////////////////////////////////////////////
 //
 /////////////////////////////////////////////////////////////////////////////
 
-UPnpCDSExtensionResults *UPnpCDSMusic::ProcessContainer( UPnpCDSBrowseRequest    *pRequest,
-                                                         UPnpCDSExtensionResults *pResults,
-                                                         int                      nNodeIdx,
-                                                         QStringList             &/*idPath*/ )
-
-{
-    pResults->m_nUpdateID     = 1;
-    pResults->m_nTotalMatches = 0;
-
-    switch( pRequest->m_eBrowseFlag )
-    { 
-        case CDS_BrowseMetadata:
-        {
-            // --------------------------------------------------------------
-            // Return Container Object Only
-            // --------------------------------------------------------------
-
-            pResults->m_nTotalMatches   = 1;
-            pResults->m_nUpdateID       = 1;
-
-            CDSObject *pItem = CDSObject::CreateContainer( pRequest->m_sObjectId,  
-                                                           QObject::tr( g_RootNodes[ nNodeIdx ].title ), 
-                                                           m_sExtensionId );
-
-            pItem->SetChildCount( GetDistinctCount( g_RootNodes[ nNodeIdx ].column ));
-
-            pResults->Add( pItem ); 
-
-            break;
-        }
-
-        case CDS_BrowseDirectChildren:
-        {
-            pResults->m_nTotalMatches = GetDistinctCount( g_RootNodes[ nNodeIdx ].column );
-            pResults->m_nUpdateID     = 1;
-
-            if (pRequest->m_nRequestedCount == 0) 
-                pRequest->m_nRequestedCount = SHRT_MAX;
-
-            MSqlQuery query(MSqlQuery::InitCon());
-
-            if (query.isConnected())
-            {
-                // Remove where clause placeholder.
-
-                QString sSQL = g_RootNodes[ nNodeIdx ].sql;
-                sSQL.replace( "%1", "" );
-
-                sSQL += QString( " LIMIT %2, %3" )
-                           .arg( pRequest->m_nStartingIndex  )
-                           .arg( pRequest->m_nRequestedCount );
-
-                query.prepare( sSQL );
-                query.exec();
-
-                if (query.isActive() && query.size() > 0)
-                {
-
-                    while(query.next())
-                    {
-                        QString sKey   = query.value(0).toString();
-                        QString sTitle = query.value(1).toString();
-                        long    nCount = query.value(2).toInt();
-
-                        if (sTitle.length() == 0)
-                            sTitle = "(undefined)";
-
-                        QString sId = QString( "%1/%2/key=%3" )
-                                         .arg( pRequest->m_sParentId )
-                                         .arg( nNodeIdx )
-                                         .arg( sKey     );
-
-                        CDSObject *pRoot = CDSObject::CreateContainer( sId, sTitle, pRequest->m_sParentId );
-
-                        pRoot->SetChildCount( nCount );
-
-                        pResults->Add( pRoot ); 
-                    }
-                }
-            }
-
-            break;
-        }
-
-        case CDS_BrowseUnknown:
-        default:
-            break;
-
-    }
-
-    return( pResults );
-}
-
-/////////////////////////////////////////////////////////////////////////////
-//
-/////////////////////////////////////////////////////////////////////////////
-
-int UPnpCDSMusic::GetDistinctCount( const QString &sColumn, const QString &sWhere  )
-{
-    int nCount = 0;
-
-    MSqlQuery query(MSqlQuery::InitCon());
-
-    if (query.isConnected())
-    {
-        // Note: Tried to use Bind, however it would not allow me to use it
-        //       for column & table names
-
-        QString sSQL;
-        
-        if (sColumn == "*")
-            sSQL = QString( "SELECT count( * ) FROM musicmetadata %1" ).arg( sWhere );
-        else
-            sSQL = QString( "SELECT count( DISTINCT %1 ) FROM musicmetadata" ).arg( sColumn );
-
-        query.prepare( sSQL );
-        query.exec();
-
-        if (query.size() > 0)
-        {
-            query.next();
-
-            nCount = query.value(0).toInt();
-        }
-    }
-
-    return( nCount );
-}
-
-
-/////////////////////////////////////////////////////////////////////////////
-//
-/////////////////////////////////////////////////////////////////////////////
-
-int UPnpCDSMusic::GetCount( int nNodeIdx , const QString &sKey )
-{
-    int nCount = 0;
-
-    MSqlQuery query(MSqlQuery::InitCon());
-
-    if (query.isConnected())
-    {
-        // Note: Tried to use Bind, however it would not allow me to use it
-        //       for column & table names
-
-        QString sSQL = QString( "SELECT count( %1 ) FROM musicmetadata %2" )
-                          .arg( g_RootNodes[ nNodeIdx ].column )
-                          .arg( g_RootNodes[ nNodeIdx ].where );
-
-        query.prepare( sSQL );
-        query.bindValue( ":KEY", sKey );
-        query.exec();
-
-        if (query.size() > 0)
-        {
-            query.next();
-
-            nCount = query.value(0).toInt();
-        }
-
-    }
-
-    return( nCount );
-}
-
-/////////////////////////////////////////////////////////////////////////////
-//
-/////////////////////////////////////////////////////////////////////////////
-
-void UPnpCDSMusic::CreateMusicTracks( UPnpCDSBrowseRequest    *pRequest,
-                                      UPnpCDSExtensionResults *pResults,
-                                      int                      nNodeIdx,
-                                      const QString           &sKey, 
-                                      bool                     bAddRef )
-{
-
-    pResults->m_nTotalMatches = GetCount( nNodeIdx, sKey );
-    pResults->m_nUpdateID     = 1;
-
-    if (pRequest->m_nRequestedCount == 0) 
-        pRequest->m_nRequestedCount = SHRT_MAX;
-
-    MSqlQuery query(MSqlQuery::InitCon());
-
-    if (query.isConnected())
-    {
-        QString sSQL = QString( SHARED_MUSIC_SQL
-                                "%1 LIMIT %2, %3" )
-                          .arg( g_RootNodes[ nNodeIdx ].where )
-                          .arg( pRequest->m_nStartingIndex    )
-                          .arg( pRequest->m_nRequestedCount   );
-
-        query.prepare  ( sSQL );
-        query.bindValue(":KEY", sKey );
-        query.exec();
-
-        if (query.isActive() && query.size() > 0)
-        {
-//            pResults->m_nTotalMatches = query.size();
-
-            while(query.next())
-                AddMusicTrack( pRequest, pResults, bAddRef, nNodeIdx, query );
-        }
-    }
-}
-
-/////////////////////////////////////////////////////////////////////////////
-//
-/////////////////////////////////////////////////////////////////////////////
-
-void UPnpCDSMusic::AddMusicTrack( UPnpCDSBrowseRequest    *pRequest,
-                                  UPnpCDSExtensionResults *pResults,
-                                  bool                     bAddRef,
-                                  int                      /*nNodeIdx*/,
-                                  MSqlQuery               &query )
+void UPnpCDSMusic::AddItem( const QString           &sObjectId,
+                            UPnpCDSExtensionResults *pResults,
+                            bool                     bAddRef, 
+                            MSqlQuery               &query )
 {
     QString        sName;
 
@@ -739,14 +214,14 @@ void UPnpCDSMusic::AddMusicTrack( UPnpCDSBrowseRequest    *pRequest,
 //    if (!m_mapBackendPort.contains( sHostName ))
 //        m_mapBackendPort[ sHostName ] = gContext->GetSettingOnHost("BackendStatusPort", sHostName);
 
-    QString sServerIp = gContext->GetSetting( "BackendServerIp"  );
-    QString sPort     = gContext->GetSetting("BackendStatusPort" );
+    QString sServerIp = gContext->GetSetting( "BackendServerIp"   );
+    QString sPort     = gContext->GetSetting( "BackendStatusPort" );
 
     // ----------------------------------------------------------------------
     // Build Support Strings
     // ----------------------------------------------------------------------
 
-    QString sURIBase   = QString( "http://%1:%2/" )
+    QString sURIBase   = QString( "http://%1:%2/Myth/" )
                             .arg( sServerIp ) 
                             .arg( sPort     );
 
@@ -754,20 +229,20 @@ void UPnpCDSMusic::AddMusicTrack( UPnpCDSBrowseRequest    *pRequest,
                             .arg( nId );
 
 
-    QString sId        = QString( "%1/track%2")
-                            .arg( pRequest->m_sObjectId )
+    QString sId        = QString( "%1/item%2")
+                            .arg( sObjectId )
                             .arg( sURIParams );
 
     CDSObject *pItem   = CDSObject::CreateMusicTrack( sId, 
                                                       sName, 
-                                                      pRequest->m_sParentId );
+                                                      sObjectId );
     pItem->m_bRestricted  = true;
     pItem->m_bSearchable  = true;
     pItem->m_sWriteStatus = "NOT_WRITABLE";
 
     if ( bAddRef )
     {
-        QString sRefId = QString( "%1/0/track%2")
+        QString sRefId = QString( "%1/0/item%2")
                             .arg( m_sExtensionId )
                             .arg( sURIParams     );
 
@@ -807,8 +282,8 @@ void UPnpCDSMusic::AddMusicTrack( UPnpCDSBrowseRequest    *pRequest,
     QFileInfo fInfo( sFileName );
 
     QString sMimeType = HTTPRequest::GetMimeType( fInfo.extension( FALSE ));
-    QString sProtocol = QString( "http-get:*:%1:*" ).arg( sMimeType  );
-    QString sURI      = QString( "%1getMusic%2").arg( sURIBase   )
+    QString sProtocol = QString( "http-get:*:%1:DLNA.ORG_OP=01;DLNA.ORG_CI=0;DLNA.OR G_FLAGS=01500000000000000000000000000000" ).arg( sMimeType  );
+    QString sURI      = QString( "%1GetMusic%2").arg( sURIBase   )
                                                 .arg( sURIParams ); 
 
     Resource *pRes = pItem->AddResource( sProtocol, sURI );

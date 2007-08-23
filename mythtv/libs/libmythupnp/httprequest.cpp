@@ -18,13 +18,16 @@
 #include <qfileinfo.h>
 
 #include "mythconfig.h"
-#ifdef CONFIG_DARWIN
+#if defined CONFIG_DARWIN || defined CONFIG_CYGWIN || defined(__FreeBSD__)
 #include "darwin-sendfile.h"
 #else
+#define USE_SETSOCKOPT
 #include <sys/sendfile.h>
 #endif
+#include <sys/socket.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <netinet/tcp.h>
 #include <unistd.h>
 #include <fcntl.h>
 
@@ -59,10 +62,15 @@ static MIMETypes g_MIMETypes[] =
     { "zip" , "application/x-tar"          },
     { "gz"  , "application/x-tar"          },
     { "mpg" , "video/mpeg"                 },
-    { "mpeg", "video/mpeg"                 }
+    { "mpeg", "video/mpeg"                 },
+    { "vob",  "video/mpeg"                 },
+    { "nuv" , "video/nupplevideo"          },
+    { "wmv" , "video/x-ms-wmv"             }
 };
 
-static const int     g_nMIMELength    = sizeof( g_MIMETypes) / sizeof( MIMETypes );
+static const int g_nMIMELength = sizeof( g_MIMETypes) / sizeof( MIMETypes );
+static const int g_on          = 1;
+static const int g_off         = 0;
 
 const char *HTTPRequest::m_szServerHeaders = "Accept-Ranges: bytes\r\n";
 
@@ -77,7 +85,8 @@ HTTPRequest::HTTPRequest() : m_eType          ( RequestTypeUnknown ),
                              m_bSOAPRequest   ( false ),
                              m_eResponseType  ( ResponseTypeUnknown),
                              m_nResponseStatus( 200 ),
-                             m_response       ( m_aBuffer, IO_WriteOnly )
+                             m_response       ( m_aBuffer, IO_WriteOnly ),
+                             m_pPostProcess   ( NULL )
 {
     m_response.setEncoding( QTextStream::UnicodeUTF8 );
 }
@@ -95,6 +104,7 @@ void HTTPRequest::Reset()
     m_bSOAPRequest   = false;
     m_eResponseType  = ResponseTypeUnknown;
     m_nResponseStatus= 200;
+    m_pPostProcess   = NULL;
 
     m_aBuffer.truncate( 0 );
 
@@ -121,10 +131,19 @@ void HTTPRequest::Reset()
 
 RequestType HTTPRequest::SetRequestType( const QString &sType )
 {
-    if (sType == "GET"     )    return( m_eType = RequestTypeGet      );
-    if (sType == "HEAD"    )    return( m_eType = RequestTypeHead     );
-    if (sType == "POST"    )    return( m_eType = RequestTypePost     );
-    if (sType == "M-SEARCH")    return( m_eType = RequestTypeMSearch  );
+    if (sType == "GET"        ) return( m_eType = RequestTypeGet         );
+    if (sType == "HEAD"       ) return( m_eType = RequestTypeHead        );
+    if (sType == "POST"       ) return( m_eType = RequestTypePost        );
+    if (sType == "M-SEARCH"   ) return( m_eType = RequestTypeMSearch     );
+
+    if (sType == "SUBSCRIBE"  ) return( m_eType = RequestTypeSubscribe   );
+    if (sType == "UNSUBSCRIBE") return( m_eType = RequestTypeUnsubscribe );
+    if (sType == "NOTIFY"     ) return( m_eType = RequestTypeNotify      );
+
+    if (sType.startsWith( "HTTP/" )) return( m_eType = RequestTypeResponse );
+
+    VERBOSE( VB_UPNP, QString( "HTTPRequest::SentRequestType( %1 ) - returning Unknown." )
+                         .arg( sType ) );
 
     return( m_eType = RequestTypeUnknown);
 }
@@ -133,60 +152,111 @@ RequestType HTTPRequest::SetRequestType( const QString &sType )
 //  
 /////////////////////////////////////////////////////////////////////////////
 
+QString HTTPRequest::BuildHeader( long long nSize )
+{
+    QString sHeader;
+    QString sContentType = (m_eResponseType == ResponseTypeOther) ? 
+                            m_sResponseTypeText : GetResponseType();
+
+    sHeader = QString( "HTTP/%1.%2 %3\r\n"
+                       "Date: %4\r\n"
+                       "Server: %5, UPnP/1.0, MythTv %6\r\n" )
+                 .arg( m_nMajor )
+                 .arg( m_nMinor )
+                 .arg( GetResponseStatus() )
+                 .arg( QDateTime::currentDateTime().toString( "d MMM yyyy hh:mm:ss" ) )
+                 .arg( HttpServer::g_sPlatform )
+                 .arg( MYTH_BINARY_VERSION );
+
+    sHeader += GetAdditionalHeaders();
+
+    sHeader += QString( "Connection: %1\r\n"
+                        "Content-Type: %2\r\n"
+                        "Content-Length: %3\r\n" )
+                        .arg( GetKeepAlive() ? "Keep-Alive" : "Close" )
+                        .arg( sContentType )
+                        .arg( nSize );
+    sHeader += "\r\n";
+
+    return sHeader;
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//  
+/////////////////////////////////////////////////////////////////////////////
+
 long HTTPRequest::SendResponse( void )
 {
-    long     nBytes    = 0;
-    QCString sHeader;
+    long      nBytes    = 0;
+    QCString  sHeader;
 
     switch( m_eResponseType )
     {
+        case ResponseTypeUnknown:
         case ResponseTypeNone:
-            return( 0 );
+//            VERBOSE(VB_UPNP,QString("HTTPRequest::SendResponse( None ) :%1 -> %2:")
+//                            .arg(GetResponseStatus())
+//                            .arg(GetPeerAddress()));
+            return( -1 );
 
         case ResponseTypeFile:
+//            VERBOSE(VB_UPNP,QString("HTTPRequest::SendResponse( File ) :%1 -> %2:")
+//                            .arg(GetResponseStatus())
+//                            .arg(GetPeerAddress()));
+
             return( SendResponseFile( m_sFileName ));
 
         case ResponseTypeXML: 
         case ResponseTypeHTML:
-        {
-            QString sDate = QDateTime::currentDateTime()
-                                        .toString( "d MMM yyyy hh:mm:ss" );  
-
-            sHeader   = QString("HTTP/1.1 %1\r\n"
-                                "DATE: %2\r\n" )
-                                .arg( GetResponseStatus())
-                                .arg( sDate ).utf8();
-
-            QString sAddlHeaders = GetAdditionalHeaders();
-
-            sHeader += sAddlHeaders.utf8();
-            
-            sHeader += QString( "Content-Type: %1\r\n"
-                                "Content-Length: %2\r\n" )
-                                .arg( GetResponseType()  )
-                                .arg( m_aBuffer.size()   ).utf8();
-            
-             sHeader += QString("\r\n").utf8();
-
-            //cout << "Response =====" << endl;
-            //cout << sHeader;
-
-            // Write out Header.
-
-            nBytes = WriteBlock( sHeader.data(), sHeader.length() );
-
-            break;
-        }
+        case ResponseTypeOther:
         default:
             break;
     }
 
+    // VERBOSE(VB_UPNP,QString("HTTPRequest::SendResponse(xml/html) :%1 -> %2:")
+    //                    .arg(GetResponseStatus())
+    //                    .arg(GetPeerAddress()));
+
+    // ----------------------------------------------------------------------
+    // Make it so the header is sent with the data
+    // ----------------------------------------------------------------------
+
+#ifdef USE_SETSOCKOPT
+    // Never send out partially complete segments
+    setsockopt( getSocketHandle(), SOL_TCP, TCP_CORK, &g_on, sizeof( g_on ));
+#endif
+
+    // ----------------------------------------------------------------------
+    // Write out Header.
+    // ----------------------------------------------------------------------
+
+    sHeader = BuildHeader     ( m_aBuffer.size() ).utf8();
+    nBytes  = WriteBlockDirect( sHeader.data(), sHeader.length() );
+
+    // ----------------------------------------------------------------------
     // Write out Response buffer.
+    // ----------------------------------------------------------------------
 
     if (( m_eType != RequestTypeHead ) && ( m_aBuffer.size() > 0 ))
-        nBytes += WriteBlock( m_aBuffer.data(), m_aBuffer.size() );
+    {
+/*
+        VERBOSE(VB_UPNP,QString("HTTPRequest::SendResponse : DATA : %1 : ").arg( m_aBuffer.size() ));
 
-    Flush();
+        for (int i=0; i<m_aBuffer.size(); i++)
+          cout << m_aBuffer.data()[i];
+
+        cout << endl;
+*/        
+        nBytes += WriteBlockDirect( m_aBuffer.data(), m_aBuffer.size() );
+    }
+
+    // ----------------------------------------------------------------------
+    // Turn off the option so any small remaining packets will be sent
+    // ----------------------------------------------------------------------
+
+#ifdef USE_SETSOCKOPT
+    setsockopt( getSocketHandle(), SOL_TCP, TCP_CORK, &g_off, sizeof( g_off ));
+#endif
 
     return( nBytes );
 }
@@ -197,18 +267,39 @@ long HTTPRequest::SendResponse( void )
 
 long HTTPRequest::SendResponseFile( QString sFileName )
 {
-    QCString    sHeader,
-                sContentType = "text/plain";
+    QCString    sHeader;
     long        nBytes  = 0;
     long long   llSize  = 0;
     long long   llStart = 0;
     long long   llEnd   = 0;
 
+    m_eResponseType     = ResponseTypeOther;
+    m_sResponseTypeText = "text/plain";
+
+    /*
+        Dump request header
+    for ( QStringMap::iterator it  = m_mapHeaders.begin(); 
+                               it != m_mapHeaders.end(); 
+                             ++it ) 
+    {  
+        cout << it.key() << ": " << it.data() << endl;
+    }
+    */
+
+    // ----------------------------------------------------------------------
+    // Make it so the header is sent with the data
+    // ----------------------------------------------------------------------
+
+#ifdef USE_SETSOCKOPT
+    // Never send out partially complete segments
+    setsockopt( getSocketHandle(), SOL_TCP, TCP_CORK, &g_on, sizeof( g_on ));
+#endif
+
     if (QFile::exists( sFileName ))
     {
         QFileInfo info( sFileName );
 
-        sContentType = GetMimeType( info.extension( FALSE ).lower() );
+        m_sResponseTypeText = GetMimeType( info.extension( FALSE ).lower() );
 
         // ------------------------------------------------------------------
         // Get File size
@@ -217,40 +308,47 @@ long HTTPRequest::SendResponseFile( QString sFileName )
         struct stat st;
 
         if (stat( sFileName.ascii(), &st ) == 0)
-            llSize = st.st_size;
+            llSize = llEnd = st.st_size;
 
         m_nResponseStatus = 200;
 
         // ------------------------------------------------------------------
-        // Process any Range Header
+        // The Content-Range header is apparently a problem for the 
+        // AVeL LinkPlayer2 and probably other hardware players with 
+        // Syabas firmware. 
+        //
+        // -=>TODO: Need conformation
         // ------------------------------------------------------------------
 
-        QString sRange = GetHeaderValue( "range", "" );
+        bool    bRange     = false;
+        QString sUserAgent = GetHeaderValue( "User-Agent", "");
 
-        bool bRange = false;
-
-        if (sRange.length() > 0)
+        if ( sUserAgent.contains( "Syabas", false ) == 0 )
         {
-            if ( bRange = ParseRange( sRange, llSize, &llStart, &llEnd ) )
-            {
-                // sContentType="video/x-msvideo";
-                m_nResponseStatus = 206;
-                m_mapRespHeaders[ "Content-Range" ] = QString("%1-%2/%3")
-                                                              .arg( llStart )
-                                                              .arg( llEnd   )
-                                                              .arg( llSize  );
-                //llSize = (llEnd - llStart) + 1;
-                llSize = (llEnd - llStart);
+            // --------------------------------------------------------------
+            // Process any Range Header
+            // --------------------------------------------------------------
 
+            QString sRange = GetHeaderValue( "range", "" ); 
+
+            if (sRange.length() > 0)
+            {
+                if ( bRange = ParseRange( sRange, llSize, &llStart, &llEnd ) )
+                {
+                    m_nResponseStatus = 206;
+                    m_mapRespHeaders[ "Content-Range" ] = QString("bytes %1-%2/%3")
+                                                                  .arg( llStart )
+                                                                  .arg( llEnd   )
+                                                                  .arg( llSize  );
+                    llSize = (llEnd - llStart) + 1;
+                }
             }
         }
         
-        if (bRange == false)
-        {
-            // DSM-?20 specific response headers
+        // DSM-?20 specific response headers
 
+        if (bRange == false)
             m_mapRespHeaders[ "User-Agent"    ] = "redsonic";
-        }
 
         // ------------------------------------------------------------------
         //
@@ -260,29 +358,18 @@ long HTTPRequest::SendResponseFile( QString sFileName )
     else
         m_nResponseStatus = 404;
 
-    QString sDate = QDateTime::currentDateTime().toString( "d MMM yyyy hh:mm:ss" );  
+    // -=>TODO: Should set "Content-Length: *" if file is still recording
 
-    sHeader   = QString("HTTP/%1.%2 %3\r\n"
-                        "Date: %4\r\n"
-                        "Content-Type: %5\r\n"
-                        "Content-Length: %6\r\n" )
-                        .arg( m_nMajor )
-                        .arg( m_nMinor )
-                        .arg( GetResponseStatus())
-                        .arg( sDate )
-                        .arg( sContentType )
-                        .arg( llSize       ).utf8();
-
-
-    sHeader += GetAdditionalHeaders() + "\r\n";
-
+    // ----------------------------------------------------------------------
     // Write out Header.
+    // ----------------------------------------------------------------------
 
-    nBytes = WriteBlock( sHeader.data(), sHeader.length() );
+    sHeader  = BuildHeader( llSize ).utf8();
+    nBytes = WriteBlockDirect( sHeader.data(), sHeader.length() );
 
-    Flush();
-
+    // ----------------------------------------------------------------------
     // Write out File.
+    // ----------------------------------------------------------------------
 
     if (( m_eType != RequestTypeHead ) && (llSize != 0))
     {
@@ -296,56 +383,68 @@ long HTTPRequest::SendResponseFile( QString sFileName )
             // The loop is needed in any case.  
 
             sent = sendfile64( getSocketHandle(), file, &offset, 
-                               (size_t)(llSize > INT_MAX ? INT_MAX : llSize));  
+                                (size_t)(llSize > INT_MAX ? INT_MAX : llSize));  
 
-            llSize -= sent;  
+            llSize  = llEnd - offset;  
         } 
         while (( sent >= 0 ) && ( llSize > 0 ));  
 
+        if (sent == -1)
+        {
+            VERBOSE(VB_UPNP,QString("SendResponseFile( %1 ) Error: %2 [%3]" )
+                               .arg( sFileName ) 
+                               .arg( errno     )
+                               .arg( strerror( errno ) ));
+
+            nBytes = -1;
+        }
+            
         close( file );
     }
+
+    // ----------------------------------------------------------------------
+    // Turn off the option so any small remaining packets will be sent
+    // ----------------------------------------------------------------------
+    
+#ifdef USE_SETSOCKOPT
+    setsockopt( getSocketHandle(), SOL_TCP, TCP_CORK, &g_off, sizeof( g_off ));
+#endif
 
     // -=>TODO: Only returns header length... 
     //          should we change to return total bytes?
 
-    return( nBytes );   
+    return nBytes;   
 }
 
 /////////////////////////////////////////////////////////////////////////////
 //
 /////////////////////////////////////////////////////////////////////////////
 
-void HTTPRequest::FormatErrorReponse( long nCode, const QString &sDesc )
+void HTTPRequest::FormatErrorResponse( bool  bServerError, 
+                                       const QString &sFaultString, 
+                                       const QString &sDetails )
 {
     m_eResponseType   = ResponseTypeXML;
     m_nResponseStatus = 500;
 
     m_response << "<?xml version=\"1.0\" encoding=\"utf-8\"?>";
 
+    QString sWhere = ( bServerError ) ? "s:Server" : "s:Client";
+
     if (m_bSOAPRequest)
     {
         m_mapRespHeaders[ "EXT" ] = "";
-        m_mapRespHeaders[ "SERVER" ] = QString( "%1, UPnP/1.0, MythTv %2" )
-                                          .arg( UPnp::g_sPlatform )
-                                          .arg( MYTH_BINARY_VERSION );
 
-        m_response <<  "<s:Fault>"
-                       "<faultcode>s:Client</faultcode>"
-                       "<faultstring>UPnPError</faultstring>";
+        m_response << SOAP_ENVELOPE_BEGIN 
+                   << "<s:Fault>"
+                   << "<faultcode>"   << sWhere       << "</faultcode>"
+                   << "<faultstring>" << sFaultString << "</faultstring>";
     }
 
-    m_response << "<detail>";
-
-    if (m_bSOAPRequest)     
-        m_response << "<UPnpError xmlns=\"urn:schemas-upnp-org:control-1-0\">";
-
-    m_response << "<errorCode>" << nCode << "</errorCode>";
-    m_response << "<errorDescription>" << sDesc << "</errorDescription>";
-
-    if (m_bSOAPRequest)     
-        m_response << "</UPnpError>";
-
-    m_response << "</detail>";
+    if (sDetails.length() > 0)
+    {
+        m_response << "<detail>" << sDetails << "</detail>";
+    }
 
     if (m_bSOAPRequest)
         m_response << "</s:Fault>" << SOAP_ENVELOPE_END;
@@ -355,7 +454,7 @@ void HTTPRequest::FormatErrorReponse( long nCode, const QString &sDesc )
 //
 /////////////////////////////////////////////////////////////////////////////
 
-void HTTPRequest::FormatActionReponse( NameValueList *pArgs )
+void HTTPRequest::FormatActionResponse( NameValueList *pArgs )
 {
     m_eResponseType   = ResponseTypeXML;
     m_nResponseStatus = 200;
@@ -365,9 +464,6 @@ void HTTPRequest::FormatActionReponse( NameValueList *pArgs )
     if (m_bSOAPRequest)
     {
         m_mapRespHeaders[ "EXT" ] = "";
-        m_mapRespHeaders[ "SERVER" ] = QString( "%1, UPnP/1.0, MythTv %2" )
-                                          .arg( UPnp::g_sPlatform )
-                                          .arg( MYTH_BINARY_VERSION );
 
         m_response << SOAP_ENVELOPE_BEGIN 
                    << "<u:" << m_sMethod << "Response xmlns:u=\"" << m_sNameSpace << "\">\r\n";
@@ -377,8 +473,26 @@ void HTTPRequest::FormatActionReponse( NameValueList *pArgs )
 
     for (NameValue *pNV = pArgs->first(); pNV != NULL; pNV = pArgs->next())
     {                                                               
-        m_response << "<" << pNV->sName << ">";
-        m_response << pNV->sValue;
+        m_response << "<" << pNV->sName;
+        
+        if (pNV->pAttributes != NULL)
+        {
+
+            for (NameValue *pAttr  = pNV->pAttributes->first(); 
+                            pAttr != NULL; 
+                            pAttr  = pNV->pAttributes->next())
+            {                                                               
+                m_response << " " << pAttr->sName << "='" << Encode( pAttr->sValue ) << "'";
+            }
+        }
+
+        m_response << ">";
+
+        if (m_bSOAPRequest)
+            m_response << Encode( pNV->sValue );
+        else
+            m_response << pNV->sValue;
+
         m_response << "</" << pNV->sName << ">\r\n";
     }
 
@@ -389,6 +503,26 @@ void HTTPRequest::FormatActionReponse( NameValueList *pArgs )
     }
     else
         m_response << "</" << m_sMethod << "Response>\r\n";
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//                  
+/////////////////////////////////////////////////////////////////////////////
+
+void HTTPRequest::FormatFileResponse( const QString &sFileName )
+{
+    m_eResponseType   = ResponseTypeHTML;
+    m_nResponseStatus = 404;
+
+    m_sFileName = sFileName;
+
+    if (QFile::exists( m_sFileName ))
+    {
+
+        m_eResponseType                     = ResponseTypeFile;
+        m_nResponseStatus                   = 200;
+        m_mapRespHeaders[ "Cache-Control" ] = "no-cache=\"Ext\", max-age = 5000";
+    }
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -476,9 +610,13 @@ QString HTTPRequest::GetResponseType( void )
 
 QString HTTPRequest::GetMimeType( const QString &sFileExtension )
 {
+    QString ext;
+
     for (int i = 0; i < g_nMIMELength; i++)
     {
-        if ( sFileExtension == g_MIMETypes[i].pszExtension )
+        ext = g_MIMETypes[i].pszExtension;
+
+        if ( sFileExtension.upper() == ext.upper() )
             return( g_MIMETypes[i].pszType );
     }
 
@@ -652,8 +790,9 @@ bool HTTPRequest::ParseRequest()
         if (nPayloadSize > 0)
         {
             char *pszPayload = new char[ nPayloadSize + 2 ];
+            long  nBytes     = 0;
 
-            if ( ReadBlock( pszPayload, nPayloadSize, 5000 ) == nPayloadSize )
+            if (( nBytes = ReadBlock( pszPayload, nPayloadSize, 5000 )) == nPayloadSize )
             {
                 m_sPayload = QString::fromUtf8( pszPayload, nPayloadSize );
 
@@ -663,9 +802,14 @@ bool HTTPRequest::ParseRequest()
                     GetParameters( m_sPayload, m_mapParams );
             }
             else
+            {
+                VERBOSE( VB_IMPORTANT, QString( "HTTPRequest::ParseRequest - Unable to read entire payload (read %1 of %2 bytes" )
+                                        .arg( nBytes )
+                                        .arg( nPayloadSize ) );
                 bSuccess = false;
+            }
 
-            delete pszPayload;
+            delete [] pszPayload;
         }
 
         // Check to see if this is a SOAP encoded message
@@ -676,6 +820,15 @@ bool HTTPRequest::ParseRequest()
             bSuccess = ProcessSOAPPayload( sSOAPAction );
         else
             ExtractMethodFromURL();
+
+/*
+        if (m_sMethod != "*" )
+            VERBOSE( VB_UPNP, QString("HTTPRequest::ParseRequest - Socket (%1) Base (%2) Method (%3) - Bytes in Socket Buffer (%4)")
+                                 .arg( getSocketHandle() )
+                                 .arg( m_sBaseUrl )
+                                 .arg( m_sMethod  )
+                                 .arg( BytesAvailable()));
+*/
     }
     catch( ... )
     {
@@ -691,40 +844,63 @@ bool HTTPRequest::ParseRequest()
 
 void HTTPRequest::ProcessRequestLine( const QString &sLine )
 {
+
     m_sRawRequest = sLine;
 
+    QString     sToken;
     QStringList tokens = QStringList::split(QRegExp("[ \r\n][ \r\n]*"), sLine );
+    int         nCount = tokens.count();
 
-    for (unsigned int nIdx = 0; nIdx < tokens.count(); nIdx++)
+    // ----------------------------------------------------------------------
+
+    if ( sLine.startsWith( "HTTP/" )) 
+        m_eType = RequestTypeResponse;
+    else
+        m_eType = RequestTypeUnknown;
+
+    // ----------------------------------------------------------------------
+    // if this is actually a response, then sLine's format will be:
+    //      HTTP/m.n <response code> <response text>
+    // otherwise:
+    //      <method> <Resource URI> HTTP/m.n
+    // ----------------------------------------------------------------------
+
+    if (m_eType != RequestTypeResponse)
     {
-        switch( nIdx )
+        // ------------------------------------------------------------------
+        // Process as a request
+        // ------------------------------------------------------------------
+
+        if (nCount > 0)
+            SetRequestType( tokens[0].stripWhiteSpace() );
+
+        if (nCount > 1)
         {
-            case 0: 
-            {
-                SetRequestType( tokens[0].stripWhiteSpace()  ); 
-                break;
-            }
+            m_sBaseUrl = tokens[1].section( '?', 0, 0).stripWhiteSpace();
 
-            case 1: 
-            {
-                m_sBaseUrl = tokens[1].section( '?', 0, 0).stripWhiteSpace();
+            // Process any Query String Parameters
 
-                // Process any Query String Parameters
+            QString sQueryStr = tokens[1].section( '?', 1, 1   );
 
-                QString sQueryStr = tokens[1].section( '?', 1, 1   );
+            if (sQueryStr.length() > 0)
+                GetParameters( sQueryStr, m_mapParams );
 
-                if (sQueryStr.length() > 0)
-                    GetParameters( sQueryStr, m_mapParams );
-
-                break;
-            }
-
-            case 2:
-            {
-                SetRequestProtocol( tokens[2].stripWhiteSpace() );
-                break;
-            }
         }
+
+        if (nCount > 2)
+            SetRequestProtocol( tokens[2].stripWhiteSpace() );
+    }
+    else
+    {
+        // ------------------------------------------------------------------
+        // Process as a Response
+        // ------------------------------------------------------------------
+
+        if (nCount > 0)
+            SetRequestProtocol( tokens[0].stripWhiteSpace() );
+
+        if (nCount > 1)
+            m_nResponseStatus = tokens[1].toInt();
     }
 }
 
@@ -771,7 +947,7 @@ bool HTTPRequest::ParseRange( QString sRange,
 
     QStringList parts = QStringList::split( "-", ranges[0], true );
 
-    if (parts.count() != 2)
+    if (parts.count() != 2) 
         return false;
 
     if (parts[0].isNull() && parts[1].isNull())
@@ -818,6 +994,8 @@ bool HTTPRequest::ParseRange( QString sRange,
             return false;
     }
 
+    //cout << getSocketHandle() << "Range Requested " << *pllStart << " - " << *pllEnd << endl;
+
     return true;
 }
 
@@ -838,6 +1016,7 @@ void HTTPRequest::ExtractMethodFromURL()
     }
 
     m_sBaseUrl = "/" + sList.join( "/" ); 
+    //VERBOSE(VB_UPNP, QString("ExtractMethodFromURL : %1 : ").arg(m_sMethod));
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -852,6 +1031,7 @@ bool HTTPRequest::ProcessSOAPPayload( const QString &sSOAPAction )
     // Open Supplied XML uPnp Description file.
     // ----------------------------------------------------------------------
 
+//    VERBOSE(VB_UPNP, QString("HTTPRequest::ProcessSOAPPayload : %1 : ").arg(sSOAPAction));
     QDomDocument doc ( "request" );
 
     QString sErrMsg;
@@ -929,203 +1109,6 @@ QString &HTTPRequest::Encode( QString &sStr )
     return( sStr );
 }
 
-/*
-/////////////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////////////
-// 
-// QSocketRequest Class Implementation
-//
-/////////////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////////////
-
-QSocketRequest::QSocketRequest( QSocket *pSocket )
-{
-    m_pSocket = pSocket;
-}
-
-/////////////////////////////////////////////////////////////////////////////
-//
-/////////////////////////////////////////////////////////////////////////////
-
-Q_LONG QSocketRequest::BytesAvailable()
-{
-    if (m_pSocket)
-        return( m_pSocket->bytesAvailable() );
-
-    return( 0 );
-}
-
-/////////////////////////////////////////////////////////////////////////////
-//
-/////////////////////////////////////////////////////////////////////////////
-
-Q_ULONG QSocketRequest::WaitForMore( int msecs, bool *timeout )
-{
-    if (m_pSocket)
-        return( m_pSocket->waitForMore( msecs, timeout ));
-
-    return( 0 );
-}
-
-/////////////////////////////////////////////////////////////////////////////
-//
-/////////////////////////////////////////////////////////////////////////////
-
-QString QSocketRequest::ReadLine( int msecs )
-{
-    QString sLine;
-
-    if (m_pSocket)
-    {
-        if (CanReadLine())
-            return( m_pSocket->readLine() );
-        
-        if (nTimeout != 0)
-            m_pSocket->waitForMore( msecs, NULL );
-            
-        if (CanReadLine())
-            return( m_pSocket->readLine() );
-    }
-
-    return( sLine );
-}
-
-/////////////////////////////////////////////////////////////////////////////
-//
-/////////////////////////////////////////////////////////////////////////////
-
-Q_LONG  QSocketRequest::ReadBlock( char *pData, Q_ULONG nMaxLen, int msecs )
-{
-    if (m_pSocket)
-    {
-        if (msecs == 0)
-            return( m_pSocket->readBlock( pData, nMaxLen ));
-
-        
-    }
-
-    return( -1 );
-}
-
-/////////////////////////////////////////////////////////////////////////////
-//
-/////////////////////////////////////////////////////////////////////////////
-
-Q_LONG  QSocketRequest::WriteBlock( char *pData, Q_ULONG nLen )
-{
-    if (m_pSocket)
-        return( m_pSocket->writeBlock( pData, nLen ));
-
-    return( -1 );
-}
-
-/////////////////////////////////////////////////////////////////////////////
-//
-/////////////////////////////////////////////////////////////////////////////
-
-QString QSocketRequest::GetHostAddress()
-{
-    return( m_pSocket->address().toString() );    
-}
-
-/////////////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////////////
-//
-// QSocketDeviceRequest Class Implementation
-//
-/////////////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////////////
-
-QSocketDeviceRequest::QSocketDeviceRequest( QSocketDevice *pSocket, 
-                                            QHostAddress  *pHost,
-                                            Q_UINT16       nPort ) 
-{
-    m_pSocket = pSocket;
-    m_pHost   = pHost;
-    m_nPort   = nPort;
-}
-
-/////////////////////////////////////////////////////////////////////////////
-//
-/////////////////////////////////////////////////////////////////////////////
-
-Q_LONG QSocketDeviceRequest::BytesAvailable()
-{
-    return( m_pSocket->bytesAvailable() );
-}
-
-/////////////////////////////////////////////////////////////////////////////
-//
-/////////////////////////////////////////////////////////////////////////////
-
-Q_ULONG QSocketDeviceRequest::WaitForMore( int msecs, bool *timeout )
-{
-    if (m_pSocket)
-        return( m_pSocket->waitForMore( msecs, timeout ));
-
-    return( 0 );
-}
-
-/////////////////////////////////////////////////////////////////////////////
-//
-/////////////////////////////////////////////////////////////////////////////
-
-bool QSocketDeviceRequest::CanReadLine()
-{
-    return( BytesAvailable() );
-}
-
-/////////////////////////////////////////////////////////////////////////////
-//
-/////////////////////////////////////////////////////////////////////////////
-
-QString QSocketDeviceRequest::ReadLine()
-{
-    char szLine[ 1024 ];
-    
-    m_pSocket->readLine( szLine, sizeof( szLine ));
-
-    return( szLine );
-}
-
-/////////////////////////////////////////////////////////////////////////////
-//
-/////////////////////////////////////////////////////////////////////////////
-
-Q_LONG  QSocketDeviceRequest::ReadBlock( char *pData, Q_ULONG nMaxLen )
-{
-    return( m_pSocket->readBlock( pData, nMaxLen ));
-
-    return( -1 );
-}
-
-/////////////////////////////////////////////////////////////////////////////
-//
-/////////////////////////////////////////////////////////////////////////////
-
-Q_LONG  QSocketDeviceRequest::WriteBlock( char *pData, Q_ULONG nLen )
-{
-    if (m_pSocket)
-    {
-        if (m_pHost)
-            return( m_pSocket->writeBlock( pData, nLen, *m_pHost, m_nPort ));
-        else
-            return( m_pSocket->writeBlock( pData, nLen ));
-    }
-
-    return( -1 );
-}
-
-/////////////////////////////////////////////////////////////////////////////
-//
-/////////////////////////////////////////////////////////////////////////////
-
-QString QSocketDeviceRequest::GetHostAddress()
-{
-    return( m_pSocket->address().toString() );    
-}
-*/
-
 /////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////
 // 
@@ -1182,41 +1165,9 @@ bool BufferedSocketDeviceRequest::CanReadLine()
 QString BufferedSocketDeviceRequest::ReadLine( int msecs )
 {
     QString sLine;
-    MythTimer timeout;
 
     if (m_pSocket)
-    {
-
-        if (m_pSocket->CanReadLine())
-            return( m_pSocket->ReadLine() );
-        
-        // If the user supplied a timeout, lets loop until we can read a line 
-        // or timeout.
-
-        if ( msecs != 0)
-        {
-            bool bTimeout = false;
-
-            timeout.start();
-
-            while ( !m_pSocket->CanReadLine() && !bTimeout )
-            {
-                m_pSocket->WaitForMore( msecs, &bTimeout );
-
-                if ( timeout.elapsed() >= msecs ) 
-                {
-                    bTimeout = true;
-                    m_pSocket->ClearReadBuffer(); 
-                }
-                else 
-                    usleep(20);
-            }
-            
-            if (!bTimeout)
-                sLine = m_pSocket->ReadLine();
-
-        }
-    }
+        sLine = m_pSocket->ReadLine( msecs );
 
     return( sLine );
 }
@@ -1254,8 +1205,19 @@ Q_LONG  BufferedSocketDeviceRequest::ReadBlock( char *pData, Q_ULONG nMaxLen, in
 Q_LONG BufferedSocketDeviceRequest::WriteBlock( char *pData, Q_ULONG nLen )
 {
     if (m_pSocket)
+        return( m_pSocket->WriteBlock( pData, nLen ));
+
+    return( -1 );
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
+Q_LONG BufferedSocketDeviceRequest::WriteBlockDirect( char *pData, Q_ULONG nLen )
+{
+    if (m_pSocket)
         return( m_pSocket->WriteBlockDirect( pData, nLen ));
-//        return( m_pSocket->WriteBlock( pData, nLen ));
 
     return( -1 );
 }
@@ -1269,3 +1231,33 @@ QString BufferedSocketDeviceRequest::GetHostAddress()
     return( m_pSocket->SocketDevice()->address().toString() );    
 }
 
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
+QString BufferedSocketDeviceRequest::GetPeerAddress()
+{
+    return( m_pSocket->SocketDevice()->peerAddress().toString() );
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
+void BufferedSocketDeviceRequest::SetBlocking( bool bBlock )
+{
+    if (m_pSocket)
+        return( m_pSocket->SocketDevice()->setBlocking( bBlock ));
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
+bool BufferedSocketDeviceRequest::IsBlocking()
+{
+    if (m_pSocket)
+        return( m_pSocket->SocketDevice()->blocking());
+
+    return false;
+}

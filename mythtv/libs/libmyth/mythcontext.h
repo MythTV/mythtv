@@ -200,6 +200,8 @@ do { \
 /// Verbose helper function for ENO macro
 QString safe_eno_to_string(int errnum);
 
+void GetInstallPrefixPath( QString &sInstallPrefix, QString &sInstallLibDir );
+
 /** \class MythPrivRequest
  *  \brief Container for requests that require privledge escalation.
  *

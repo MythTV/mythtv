@@ -33,7 +33,7 @@ class UPnpSearchTask : public Task
     protected: 
 
         QStringList     m_addressList;
-        int             m_nStatusPort;
+        int             m_nServicePort;
         int             m_nMaxAge;
 
         QHostAddress    m_PeerAddress;
@@ -55,7 +55,8 @@ class UPnpSearchTask : public Task
 
     public:
 
-        UPnpSearchTask( QHostAddress peerAddress,
+        UPnpSearchTask( int          nServicePort,
+                        QHostAddress peerAddress,
                         int          nPeerPort,  
                         QString      sST, 
                         QString      sUDN );

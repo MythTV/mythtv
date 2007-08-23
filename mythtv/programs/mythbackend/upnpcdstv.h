@@ -14,10 +14,6 @@
 #include "mainserver.h"
 #include "upnpcds.h"
               
-//using namespace UPnp;
-
-typedef QMap< QString, QString > StringMap;
-
 //////////////////////////////////////////////////////////////////////////////
 //
 //////////////////////////////////////////////////////////////////////////////
@@ -26,67 +22,35 @@ class UPnpCDSTv : public UPnpCDSExtension
 {
     private:
 
-        StringMap    m_mapBackendIp;
-        StringMap    m_mapBackendPort;
+        static UPnpCDSRootInfo g_RootNodes[];
+        static int             g_nRootCount;
 
-    private:
+        QStringMap             m_mapBackendIp;
+        QStringMap             m_mapBackendPort;
 
-        QString RemoveToken ( const QString &sToken, const QString &sStr, int num );
+    protected:
 
-        int  GetDistinctCount      ( const QString &sColumn );
-        int  GetCount              ( const QString &sColumn, const QString &sKey );
+        virtual UPnpCDSRootInfo *GetRootInfo   (int nIdx);
+        virtual int              GetRootCount  ( );
+        virtual QString          GetTableName  ( QString sColumn );
+        virtual QString          GetItemListSQL( QString sColumn = "" );
 
-        void BuildContainerChildren( UPnpCDSExtensionResults *pResults, 
-                                     int                      nNodeIdx,
-                                     const QString           &sParentId,
-                                     short                    nStartingIndex,
-                                     short                    nRequestedCount );
+        virtual void             BuildItemQuery( MSqlQuery        &query, 
+                                                 const QStringMap &mapParams );
 
-        void CreateVideoItems      ( UPnpCDSBrowseRequest    *pRequest,
-                                     UPnpCDSExtensionResults *pResults,
-                                     int                      nNodeIdx,
-                                     const QString           &sKey, 
-                                     bool                     bAddRef );
-
-        void AddVideoItem          ( UPnpCDSBrowseRequest    *pRequest,
-                                     UPnpCDSExtensionResults *pResults,
-                                     bool                     bAddRef, 
-                                     MSqlQuery               &query );
-
-        UPnpCDSExtensionResults *ProcessRoot     ( UPnpCDSBrowseRequest    *pRequest, 
-                                                   UPnpCDSExtensionResults *pResults,
-                                                   QStringList             &idPath );
-        UPnpCDSExtensionResults *ProcessAll      ( UPnpCDSBrowseRequest    *pRequest, 
-                                                   UPnpCDSExtensionResults *pResults,
-                                                   QStringList             &idPath );
-        UPnpCDSExtensionResults *ProcessItem     ( UPnpCDSBrowseRequest    *pRequest,
-                                                   UPnpCDSExtensionResults *pResults,
-                                                   QStringList             &idPath );
-        UPnpCDSExtensionResults *ProcessKey      ( UPnpCDSBrowseRequest    *pRequest,
-                                                   UPnpCDSExtensionResults *pResults,
-                                                   QStringList             &idPath );
-        UPnpCDSExtensionResults *ProcessContainer( UPnpCDSBrowseRequest    *pRequest,
-                                                   UPnpCDSExtensionResults *pResults,
-                                                   int                      nNodeIdx,
-                                                   QStringList             &idPath );
-
+        virtual void             AddItem( const QString           &sObjectId,
+                                          UPnpCDSExtensionResults *pResults,
+                                          bool                     bAddRef, 
+                                          MSqlQuery               &query );
 
     public:
 
-        UPnpCDSTv( ) : UPnpCDSExtension( "Recordings", "RecTv" )
+        UPnpCDSTv( ) : UPnpCDSExtension( "Recordings", "RecTv",
+                                         "object.item.videoItem" )
         {
         }
 
         virtual ~UPnpCDSTv() {}
-
-        virtual UPnpCDSExtensionResults *Browse( UPnpCDSBrowseRequest *pRequest );
-        virtual UPnpCDSExtensionResults *Search( UPnpCDSSearchRequest * /* pRequest */ )
-        { 
-            return( NULL );
-        }
-
-        virtual QString GetSearchCapabilities() { return( "" ); }
-        virtual QString GetSortCapabilities  () { return( "" ); }
 };
 
 #endif

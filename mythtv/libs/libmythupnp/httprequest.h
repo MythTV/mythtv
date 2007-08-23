@@ -17,6 +17,7 @@
 using namespace std;
 
 #include <qsocket.h>
+#include "upnputil.h"
 #include "bufferedsocketdevice.h"
 
 #define SOAP_ENVELOPE_BEGIN  "<s:Envelope xmlns:s=\"http://schemas.xmlsoap.org/soap/envelope/\" " \
@@ -31,13 +32,17 @@ using namespace std;
 
 typedef enum 
 {
-    RequestTypeUnknown  = 0x0000,
-    RequestTypeGet      = 0x0001,
-    RequestTypeHead     = 0x0002,
-    RequestTypePost     = 0x0004,
-    RequestTypeMSearch  = 0x0008
+    RequestTypeUnknown      = 0x0000,
+    RequestTypeGet          = 0x0001,
+    RequestTypeHead         = 0x0002,
+    RequestTypePost         = 0x0004,
+    RequestTypeMSearch      = 0x0008,
+    RequestTypeSubscribe    = 0x0010,
+    RequestTypeUnsubscribe  = 0x0020,
+    RequestTypeNotify       = 0x0040,
+    RequestTypeResponse     = 0x0080
 
-} RequestType;
+} RequestType;                
 
 typedef enum 
 {
@@ -53,12 +58,11 @@ typedef enum
     ResponseTypeUnknown  =  0,
     ResponseTypeXML      =  1,
     ResponseTypeHTML     =  2,
-    ResponseTypeFile     =  3
+    ResponseTypeFile     =  3,
+    ResponseTypeOther    =  4
 
 } ResponseType;
 
-
-typedef QMap< QString, QString >    QStringMap;
 
 typedef struct
 {
@@ -69,24 +73,11 @@ typedef struct
 
 /////////////////////////////////////////////////////////////////////////////
 
-typedef struct _NameValue
-{   
-    QString sName;
-    QString sValue;
-
-    _NameValue( const QString &name, const QString value ) 
-        : sName( name ), sValue( value ) { }
-
-} NameValue;
-
-class NameValueList : public QPtrList< NameValue > 
+class IPostProcess
 {
     public:
-
-        NameValueList()
-        {
-            setAutoDelete( true );
-        }       
+        virtual void ExecutePostProcess( ) = 0;
+        virtual ~IPostProcess() {}
 };
 
 /////////////////////////////////////////////////////////////////////////////
@@ -126,15 +117,19 @@ class HTTPRequest
         bool                m_bSOAPRequest;
         QString             m_sNameSpace;
 
-        // Reponse
+        // Response
 
         ResponseType        m_eResponseType;
+        QString             m_sResponseTypeText;    // used for ResponseTypeOther
+
         long                m_nResponseStatus;
         QStringMap          m_mapRespHeaders;
 
         QString             m_sFileName;
 
         QTextStream         m_response;
+
+        IPostProcess       *m_pPostProcess;
 
     protected:
 
@@ -157,6 +152,8 @@ class HTTPRequest
                                               long long *pllStart, 
                                               long long *pllEnd   );
 
+        QString         BuildHeader         ( long long nSize );
+
     public:
         
                         HTTPRequest     ();
@@ -166,8 +163,12 @@ class HTTPRequest
 
         bool            ParseRequest    ();
 
-        void            FormatErrorReponse ( long nCode, const QString &sDesc );
-        void            FormatActionReponse( NameValueList *pArgs );
+        void            FormatErrorResponse ( bool  bServerError, 
+                                              const QString &sFaultString, 
+                                              const QString &sDetails );
+
+        void            FormatActionResponse( NameValueList *pArgs );
+        void            FormatFileResponse ( const QString &sFileName );
 
         long            SendResponse    ( void );
         long            SendResponseFile( QString sFileName );
@@ -189,73 +190,15 @@ class HTTPRequest
         virtual QString ReadLine        ( int msecs = 0 ) = 0;
         virtual Q_LONG  ReadBlock       ( char *pData, Q_ULONG nMaxLen, int msecs = 0 ) = 0;
         virtual Q_LONG  WriteBlock      ( char *pData, Q_ULONG nLen    ) = 0;
+        virtual Q_LONG  WriteBlockDirect( char *pData, Q_ULONG nLen    ) = 0;
         virtual QString GetHostAddress  () = 0;
+        virtual QString GetPeerAddress  () = 0;
         virtual void    Flush           () = 0;
         virtual bool    IsValid         () = 0;
         virtual int     getSocketHandle () = 0;
+        virtual void    SetBlocking     ( bool bBlock ) = 0;
+        virtual bool    IsBlocking      () = 0;
 };
-
-/*
-/////////////////////////////////////////////////////////////////////////////
-// 
-/////////////////////////////////////////////////////////////////////////////
-
-class QSocketRequest : public HTTPRequest
-{
-    public:    
-        
-        QSocket            *m_pSocket;
-
-    public:
-        
-                        QSocketRequest     ( QSocket *pSocket );
-        virtual        ~QSocketRequest     () {};
-
-        virtual Q_LONG  BytesAvailable  ();
-        virtual Q_ULONG WaitForMore     ( int msecs, bool *timeout = NULL );
-        virtual bool    CanReadLine     ();
-        virtual QString ReadLine        ();
-        virtual Q_LONG  ReadBlock       ( char *pData, Q_ULONG nMaxLen );
-        virtual Q_LONG  WriteBlock      ( char *pData, Q_ULONG nLen    );
-        virtual QString GetHostAddress  ();
-        virtual void    Flush           () {m_pSocket->flush(); }
-        virtual bool    IsValid         () {return( m_pSocket->state() == QSocket::Connected ); }
-        virtual int     getSocketHandle () {return( m_pSocket->socket() ); }
-
-};
-
-/////////////////////////////////////////////////////////////////////////////
-// 
-/////////////////////////////////////////////////////////////////////////////
-
-class QSocketDeviceRequest : public HTTPRequest
-{
-    public:    
-
-        QSocketDevice      *m_pSocket;
-        QHostAddress       *m_pHost;
-        Q_UINT16            m_nPort;
-
-    public:
-        
-                 QSocketDeviceRequest   ( QSocketDevice *pSocket, 
-                                          QHostAddress  *pHost,
-                                          Q_UINT16       nPort );
-        virtual ~QSocketDeviceRequest   () {};
-
-        virtual Q_LONG  BytesAvailable  ();
-        virtual Q_ULONG WaitForMore     ( int msecs, bool *timeout = NULL );
-        virtual bool    CanReadLine     ();
-        virtual QString ReadLine        ();
-        virtual Q_LONG  ReadBlock       ( char *pData, Q_ULONG nMaxLen );
-        virtual Q_LONG  WriteBlock      ( char *pData, Q_ULONG nLen    );
-        virtual QString GetHostAddress  ();
-        virtual void    Flush           () { }
-        virtual bool    IsValid         () {return( m_pSocket->isValid() ); }
-        virtual int     getSocketHandle () {return( m_pSocket->socket() ); }
-};
-
-*/
 
 /////////////////////////////////////////////////////////////////////////////
 // 
@@ -278,10 +221,15 @@ class BufferedSocketDeviceRequest : public HTTPRequest
         virtual QString ReadLine        ( int msecs = 0 );
         virtual Q_LONG  ReadBlock       ( char *pData, Q_ULONG nMaxLen, int msecs = 0  );
         virtual Q_LONG  WriteBlock      ( char *pData, Q_ULONG nLen    );
+        virtual Q_LONG  WriteBlockDirect( char *pData, Q_ULONG nLen    );
         virtual QString GetHostAddress  ();
+        virtual QString GetPeerAddress  ();
         virtual void    Flush           () { m_pSocket->Flush(); }
         virtual bool    IsValid         () {return( m_pSocket->IsValid() ); }
         virtual int     getSocketHandle () {return( m_pSocket->socket() ); }
+        virtual void    SetBlocking     ( bool bBlock );
+        virtual bool    IsBlocking      ();
+
 };
 
 #endif

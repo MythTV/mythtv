@@ -25,7 +25,7 @@ class MainServer : public QObject, public MythSocketCBs
 {
     Q_OBJECT
   public:
-    MainServer(bool master, int port, int statusport, 
+    MainServer(bool master, int port, 
                QMap<int, EncoderLink *> *tvList,
                Scheduler *sched, AutoExpire *expirer);
 

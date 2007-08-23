@@ -9,27 +9,21 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include "upnp.h"
-
-#include <quuid.h>
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <sys/ioctl.h>
-#include <net/if.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
-#include <sys/utsname.h> 
-#include <sys/time.h>
-
-#include "upnpcds.h"
+#include "upnptaskcache.h"
+#include "multicast.h"
+#include "broadcast.h"
 
 //////////////////////////////////////////////////////////////////////////////
 // Global/Class Static variables
 //////////////////////////////////////////////////////////////////////////////
 
-QString          UPnp::g_sPlatform;
 UPnpDeviceDesc   UPnp::g_UPnpDeviceDesc;
-TaskQueue       *UPnp::g_pTaskQueue;
-SSDP            *UPnp::g_pSSDP;
+TaskQueue       *UPnp::g_pTaskQueue     = NULL;
+SSDP            *UPnp::g_pSSDP          = NULL;
+SSDPCache        UPnp::g_SSDPCache;
+QStringList      UPnp::g_IPAddrList;
+
+Configuration   *UPnp::g_pConfig        = NULL;
 
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
@@ -43,69 +37,9 @@ SSDP            *UPnp::g_pSSDP;
 //
 //////////////////////////////////////////////////////////////////////////////
 
-UPnp::UPnp( bool /*bIsMaster */, HttpServer *pHttpServer ) 
+UPnp::UPnp()
 {
-    VERBOSE(VB_UPNP, QString("UPnp::UPnp:Begin"));
-
-    if ((m_pHttpServer = pHttpServer) == NULL)
-    {
-        VERBOSE(VB_IMPORTANT, QString( "UPnp::UPnp:Invalid Parameter (pHttpServer == NULL)" ));
-        return;
-    }
-
-    // ----------------------------------------------------------------------
-    // Build Platform String
-    // ----------------------------------------------------------------------
-
-    struct utsname uname_info;
-
-    uname( &uname_info );
-
-    g_sPlatform = QString( "%1 %2" ).arg( uname_info.sysname )
-                                    .arg( uname_info.release );
-
-    // ----------------------------------------------------------------------
-    // Initialize & Start the global Task Queue Processing Thread
-    // ----------------------------------------------------------------------
-
-    VERBOSE(VB_UPNP, QString( "UPnp::UPnp:Starting TaskQueue" ));
-
-    g_pTaskQueue = new TaskQueue();
-    g_pTaskQueue->start();
-
-    // ----------------------------------------------------------------------
-    // Make sure our device Description is loaded.
-    // ----------------------------------------------------------------------
-
-    VERBOSE(VB_UPNP, QString( "UPnp::UPnp:Loading UPnp Description" ));
-
-    g_UPnpDeviceDesc.Load();
-
-    // ----------------------------------------------------------------------
-    // Register any HttpServerExtensions
-    // ----------------------------------------------------------------------
-
-    m_pHttpServer->RegisterExtension(              new SSDPExtension());
-    m_pHttpServer->RegisterExtension( m_pUPnpCDS = new UPnpCDS      ());
-
-    // ----------------------------------------------------------------------
-    // Start up the SSDP (Upnp Discovery) Thread.
-    // ----------------------------------------------------------------------
-
-    VERBOSE(VB_UPNP, QString( "UPnp::UPnp:Starting SSDP Thread" ));
-
-    g_pSSDP = new SSDP();
-    g_pSSDP->start();
-
-    // ----------------------------------------------------------------------
-    //
-    // ----------------------------------------------------------------------
-
-    VERBOSE(VB_UPNP, QString( "UPnp::UPnp:Adding Context Listener" ));
-
-    gContext->addListener( this );
-
-    VERBOSE(VB_UPNP, QString( "UPnp::UPnp:End" ));
+    VERBOSE( VB_UPNP, "UPnp - Constructor" );
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -114,7 +48,104 @@ UPnp::UPnp( bool /*bIsMaster */, HttpServer *pHttpServer )
 
 UPnp::~UPnp()
 {
-	CleanUp();
+    VERBOSE( VB_UPNP, "UPnp - Destructor" );
+    CleanUp();
+}
+
+//////////////////////////////////////////////////////////////////////////////
+//
+//////////////////////////////////////////////////////////////////////////////
+
+void UPnp::SetConfiguration( Configuration *pConfig )
+{
+    if (g_pConfig)
+        delete g_pConfig;
+
+    g_pConfig = pConfig;
+}
+
+//////////////////////////////////////////////////////////////////////////////
+//
+//////////////////////////////////////////////////////////////////////////////
+
+bool UPnp::Initialize( int nServicePort, HttpServer *pHttpServer )
+{
+    QStringList sList;
+
+    GetIPAddressList( sList );
+
+    return Initialize( sList, nServicePort, pHttpServer );
+}
+
+//////////////////////////////////////////////////////////////////////////////
+//
+//////////////////////////////////////////////////////////////////////////////
+
+bool UPnp::Initialize( QStringList &sIPAddrList, int nServicePort, HttpServer *pHttpServer )
+{
+    VERBOSE(VB_UPNP, QString("UPnp::Initialize - Begin"));
+
+    if (g_pConfig == NULL)
+    {
+        VERBOSE(VB_IMPORTANT, QString( "UPnp::Initialize - Must call SetConfiguration." ));
+        return false;
+    }
+
+    if ((m_pHttpServer = pHttpServer) == NULL)
+    {
+        VERBOSE(VB_IMPORTANT, QString( "UPnp::Initialize - Invalid Parameter (pHttpServer == NULL)" ));
+        return false;
+    }
+
+    g_IPAddrList   = sIPAddrList;
+    m_nServicePort = nServicePort;
+
+    // ----------------------------------------------------------------------
+    // Initialize & Start the global Task Queue Processing Thread
+    // ----------------------------------------------------------------------
+
+    VERBOSE(VB_UPNP, QString( "UPnp::Initialize - Starting TaskQueue" ));
+
+    g_pTaskQueue = new TaskQueue();
+    g_pTaskQueue->start();
+
+    // ----------------------------------------------------------------------
+    // Register any HttpServerExtensions
+    // ----------------------------------------------------------------------
+
+    m_pHttpServer->RegisterExtension( new SSDPExtension( m_nServicePort ));
+
+    // ----------------------------------------------------------------------
+    // Add Task to keep SSDPCache purged of stale entries.  
+    // ----------------------------------------------------------------------
+
+    UPnp::g_pTaskQueue->AddTask( new SSDPCacheTask() );
+
+    // ----------------------------------------------------------------------
+    // Create the SSDP (Upnp Discovery) Thread.
+    // ----------------------------------------------------------------------
+
+    VERBOSE(VB_UPNP, QString(  "UPnp::Initialize - Creating SSDP Thread" ));
+
+    g_pSSDP = new SSDP( m_nServicePort );
+
+    VERBOSE(VB_UPNP, QString( "UPnp::Initialize - End" ));
+
+    return true;
+}
+
+//////////////////////////////////////////////////////////////////////////////
+// Delay startup of Discovery Threads until all Extensions are registered.
+//////////////////////////////////////////////////////////////////////////////
+
+void UPnp::Start()
+{
+    if (g_pSSDP != NULL)
+    {
+        VERBOSE(VB_UPNP, QString(  "UPnp::UPnp:Starting SSDP Thread (Multicast)" ));
+        g_pSSDP->start();
+        g_pSSDP->EnableNotifications();
+    }
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -124,12 +155,9 @@ UPnp::~UPnp()
 void UPnp::CleanUp( void )
 {
 
-    // -=>TODO: Need to check to see if calling this more than once is ok.
-
-    gContext->removeListener(this);
-
     if (g_pSSDP)
     {
+        g_pSSDP->DisableNotifications();
         g_pSSDP->RequestTerminate();
 
         delete g_pSSDP;
@@ -149,177 +177,135 @@ void UPnp::CleanUp( void )
         g_pTaskQueue = NULL;
     }
 
+    if (g_pConfig)
+    {
+        delete g_pConfig;
+        g_pConfig = NULL;
+    }
+
 } 
-    
+
 //////////////////////////////////////////////////////////////////////////////
 //
 //////////////////////////////////////////////////////////////////////////////
 
-void UPnp::customEvent( QCustomEvent *e )
+SSDPCacheEntries *UPnp::Find( const QString &sURI )
 {
-    if (MythEvent::Type(e->type()) == MythEvent::MythEventMessage)
+    return g_SSDPCache.Find( sURI );
+}
+
+//////////////////////////////////////////////////////////////////////////////
+//
+//////////////////////////////////////////////////////////////////////////////
+DeviceLocation *UPnp::Find( const QString &sURI, const QString &sUSN )
+{
+    return g_SSDPCache.Find( sURI, sUSN );
+}
+
+//////////////////////////////////////////////////////////////////////////////
+//
+//////////////////////////////////////////////////////////////////////////////
+
+UPnpDeviceDesc *UPnp::GetDeviceDesc( QString &sURL, bool bInQtThread )
+{
+    return UPnpDeviceDesc::Retrieve( sURL, bInQtThread );
+}
+
+//////////////////////////////////////////////////////////////////////////////
+//
+//////////////////////////////////////////////////////////////////////////////
+
+QString UPnp::GetResultDesc( UPnPResultCode eCode )
+{
+    switch( eCode )
     {
-        MythEvent *me = (MythEvent *)e;
-        QString message = me->Message();
+        case UPnPResult_Success                     : return "Success";
+        case UPnPResult_InvalidAction               : return "Invalid Action"; 
+        case UPnPResult_InvalidArgs                 : return "Invalid Args"; 
+        case UPnPResult_ActionFailed                : return "Action Failed"; 
+        case UPnPResult_ArgumentValueInvalid        : return "Argument Value Invalid"; 
+        case UPnPResult_ArgumentValueOutOfRange     : return "Argument Value Out Of Range"; 
+        case UPnPResult_OptionalActionNotImplemented: return "Optional Action Not Implemented"; 
+        case UPnPResult_OutOfMemory                 : return "Out Of Memory"; 
+        case UPnPResult_HumanInterventionRequired   : return "Human Intervention Required"; 
+        case UPnPResult_StringArgumentTooLong       : return "String Argument Too Long"; 
+        case UPnPResult_ActionNotAuthorized         : return "Action Not Authorized"; 
+        case UPnPResult_SignatureFailure            : return "Signature Failure"; 
+        case UPnPResult_SignatureMissing            : return "Signature Missing"; 
+        case UPnPResult_NotEncrypted                : return "Not Encrypted"; 
+        case UPnPResult_InvalidSequence             : return "Invalid Sequence"; 
+        case UPnPResult_InvalidControlURL           : return "Invalid Control URL"; 
+        case UPnPResult_NoSuchSession               : return "No Such Session"; 
+        case UPnPResult_MS_AccessDenied             : return "Access Denied"; 
 
-        //-=>TODO: Need to handle events to notify clients of changes
+        case UPnPResult_CDS_NoSuchObject            : return "No Such Object";
+        case UPnPResult_CDS_InvalidCurrentTagValue  : return "Invalid CurrentTagValue";
+        case UPnPResult_CDS_InvalidNewTagValue      : return "Invalid NewTagValue";
+        case UPnPResult_CDS_RequiredTag             : return "Required Tag";
+        case UPnPResult_CDS_ReadOnlyTag             : return "Read Only Tag";
+        case UPnPResult_CDS_ParameterMismatch       : return "Parameter Mismatch";
+        case UPnPResult_CDS_InvalidSearchCriteria   : return "Invalid Search Criteria";
+        case UPnPResult_CDS_InvalidSortCriteria     : return "Invalid Sort Criteria";
+        case UPnPResult_CDS_NoSuchContainer         : return "No Such Container";
+        case UPnPResult_CDS_RestrictedObject        : return "Restricted Object";
+        case UPnPResult_CDS_BadMetadata             : return "Bad Metadata";
+        case UPnPResult_CDS_ResrtictedParentObject  : return "Resrticted Parent Object";
+        case UPnPResult_CDS_NoSuchSourceResource    : return "No Such Source Resource";
+        case UPnPResult_CDS_ResourceAccessDenied    : return "Resource Access Denied";
+        case UPnPResult_CDS_TransferBusy            : return "Transfer Busy";
+        case UPnPResult_CDS_NoSuchFileTransfer      : return "No Such File Transfer";
+        case UPnPResult_CDS_NoSuchDestRes           : return "No Such Destination Resource";
+        case UPnPResult_CDS_DestResAccessDenied     : return "Destination Resource Access Denied";
+        case UPnPResult_CDS_CannotProcessRequest    : return "Cannot Process The Request";
+
+        //case UPnPResult_CMGR_IncompatibleProtocol     = 701,
+        //case UPnPResult_CMGR_IncompatibleDirections   = 702,
+        //case UPnPResult_CMGR_InsufficientNetResources = 703,
+        //case UPnPResult_CMGR_LocalRestrictions        = 704,
+        //case UPnPResult_CMGR_AccessDenied             = 705,
+        //case UPnPResult_CMGR_InvalidConnectionRef     = 706,
+        case UPnPResult_CMGR_NotInNetwork           : return "Not In Network";
+
     }
+
+    return "Unkown";
 }
 
 //////////////////////////////////////////////////////////////////////////////
-//
-//////////////////////////////////////////////////////////////////////////////
-
-void UPnp::RegisterExtension( UPnpCDSExtension *pExtension )
-{
-    m_pUPnpCDS->RegisterExtension( pExtension );
-}
-
-//////////////////////////////////////////////////////////////////////////////
-//
-//////////////////////////////////////////////////////////////////////////////
-
-void UPnp::UnregisterExtension( UPnpCDSExtension *pExtension )
-{
-    m_pUPnpCDS->UnregisterExtension( pExtension );
-}
-
-//////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////
-//
-// Global Helper Methods... 
 // 
-// -=>TODO: Should these functions go someplace else?
-//
-//////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
 
-/////////////////////////////////////////////////////////////////////////////
-//
-/////////////////////////////////////////////////////////////////////////////
-
-QString LookupUDN( QString sDeviceType )
+void UPnp::FormatErrorResponse( HTTPRequest   *pRequest, 
+                                UPnPResultCode  eCode,
+                                const QString &msg )
 {
-    sDeviceType = "upnp:UDN:" + sDeviceType;
-    
-    QString sUDN = gContext->GetSetting( sDeviceType, "" );
+    QString sMsg( msg );
 
-    if ( sUDN.length() == 0) 
+    if (pRequest != NULL)
     {
-        sUDN = QUuid::createUuid().toString();
+        QString sDetails = ""; 
 
-        sUDN = sUDN.mid( 1, sUDN.length() - 2);
+        if (pRequest->m_bSOAPRequest)
+            sDetails = "<UPnPResult xmlns=\"urn:schemas-upnp-org:control-1-0\">";
 
-        gContext->SaveSetting   ( sDeviceType, sUDN );
+        if (sMsg.length() == 0)
+            sMsg = GetResultDesc( eCode );
+
+        HTTPRequest::Encode( sMsg );
+
+        sDetails += QString( "<errorCode>%1</errorCode>"
+                             "<errorDescription>%2</errorDescription>" )
+                       .arg( eCode )
+                       .arg( sMsg  );
+
+        if (pRequest->m_bSOAPRequest)     
+            sDetails += "</UPnPResult>";
+
+
+        pRequest->FormatErrorResponse ( true,   // -=>TODO: Should make this dynamic
+                                        "UPnPResult", 
+                                        sDetails );
     }
-
-    return( sUDN );
+    else
+        VERBOSE( VB_IMPORTANT, "UPnp::FormatErrorResponse : Response not created - pRequest == NULL" );
 }
-
-/////////////////////////////////////////////////////////////////////////////
-
-long GetIPAddressList( QStringList &sStrList )
-{
-    sStrList.clear();
-
-    QSocketDevice socket( QSocketDevice::Datagram );
-
-    struct ifreq  ifReqs[ 16 ];
-    struct ifreq  ifReq;
-    struct ifconf ifConf;
-
-    // ----------------------------------------------------------------------
-    // Get Configuration information...
-    // ----------------------------------------------------------------------
-
-    ifConf.ifc_len           = sizeof( struct ifreq ) * sizeof( ifReqs );
-    ifConf.ifc_ifcu.ifcu_req = ifReqs;
-
-    if ( ioctl( socket.socket(), SIOCGIFCONF, &ifConf ) < 0)
-        return( 0 );
-
-    long nCount = ifConf.ifc_len / sizeof( struct ifreq );
-
-    // ----------------------------------------------------------------------
-    // Loop through looking for IP addresses.
-    // ----------------------------------------------------------------------
-
-    for (long nIdx = 0; nIdx < nCount; nIdx++ )
-    {
-        // ------------------------------------------------------------------
-        // Is this an interface we want?
-        // ------------------------------------------------------------------
-
-        strcpy ( ifReq.ifr_name, ifReqs[ nIdx ].ifr_name );
-
-        if (ioctl ( socket.socket(), SIOCGIFFLAGS, &ifReq ) < 0)
-            continue;
-
-        // ------------------------------------------------------------------
-        // Skip loopback and down interfaces
-        // ------------------------------------------------------------------
-
-        if ((ifReq.ifr_flags & IFF_LOOPBACK) || (!(ifReq.ifr_flags & IFF_UP)))
-            continue;
-
-        if ( ifReqs[ nIdx ].ifr_addr.sa_family == AF_INET)
-        {
-            struct sockaddr_in addr;
-
-            // --------------------------------------------------------------
-            // Get a pointer to the address
-            // --------------------------------------------------------------
-
-            memcpy (&addr, &(ifReqs[ nIdx ].ifr_addr), sizeof( ifReqs[ nIdx ].ifr_addr ));
-
-            if (addr.sin_addr.s_addr != htonl( INADDR_LOOPBACK ))
-            {
-                QHostAddress address( htonl( addr.sin_addr.s_addr ));
-
-                sStrList.append( address.toString() ); 
-            }
-        }
-    }
-
-    return( sStrList.count() );
-}
-
-/////////////////////////////////////////////////////////////////////////////
-//           
-/////////////////////////////////////////////////////////////////////////////
-
-bool operator< ( TaskTime t1, TaskTime t2 )
-{
-    if ( (t1.tv_sec  < t2.tv_sec) or 
-        ((t1.tv_sec == t2.tv_sec) && (t1.tv_usec < t2.tv_usec)))
-    {
-        return true;
-    }
-
-    return false;
-}
-
-/////////////////////////////////////////////////////////////////////////////
-//           
-/////////////////////////////////////////////////////////////////////////////
-
-bool operator== ( TaskTime t1, TaskTime t2 )
-{
-    if ((t1.tv_sec == t2.tv_sec) && (t1.tv_usec == t2.tv_usec))
-        return true;
-
-    return false;
-}
-
-/////////////////////////////////////////////////////////////////////////////
-//           
-/////////////////////////////////////////////////////////////////////////////
-
-void AddMicroSecToTaskTime( TaskTime &t, __suseconds_t uSecs )
-{
-    uSecs += t.tv_usec;
-
-    t.tv_sec  += (uSecs / 1000000);
-    t.tv_usec  = (uSecs % 1000000);
-}
-

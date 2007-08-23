@@ -8,8 +8,8 @@
 //                                                                            
 //////////////////////////////////////////////////////////////////////////////
 
-#include "upnpdevice.h"
-#include "ssdp.h"
+#include "upnp.h"
+#include "mythcontext.h"
 #include "upnptasksearch.h"
 
 #include <unistd.h>
@@ -31,7 +31,8 @@
 //
 /////////////////////////////////////////////////////////////////////////////
 
-UPnpSearchTask::UPnpSearchTask( QHostAddress peerAddress,
+UPnpSearchTask::UPnpSearchTask( int          nServicePort, 
+                                QHostAddress peerAddress,
                                 int          nPeerPort,  
                                 QString      sST, 
                                 QString      sUDN )
@@ -40,6 +41,9 @@ UPnpSearchTask::UPnpSearchTask( QHostAddress peerAddress,
     m_nPeerPort   = nPeerPort;
     m_sST         = sST;
     m_sUDN        = sUDN;
+    m_nServicePort= nServicePort;
+    m_nMaxAge     = UPnp::g_pConfig->GetValue( "UPnP/SSDP/MaxAge" , 3600 );
+
 } 
 
 /////////////////////////////////////////////////////////////////////////////
@@ -60,7 +64,7 @@ void UPnpSearchTask::SendMsg( QSocketDevice  *pSocket,
 {
     QString sUSN;
 
-    if ( sUDN.length() > 0)
+    if (( sUDN.length() > 0) && ( sUDN != sST ))
         sUSN = sUDN + "::" + sST;
     else
         sUSN = sST;
@@ -70,16 +74,22 @@ void UPnpSearchTask::SendMsg( QSocketDevice  *pSocket,
     QString sData = QString ( "CACHE-CONTROL: max-age=%1\r\n"
                               "DATE: %2\r\n"
                               "EXT:\r\n"
-                              "SERVER: %3, UPnP/1.0, MythTv %4\r\n"
+                              "Server: %3, UPnP/1.0, MythTv %4\r\n"
                               "ST: %5\r\n"
                               "USN: %6\r\n"
                               "Content-Length: 0\r\n\r\n" )
                               .arg( m_nMaxAge    )
                               .arg( sDate )
-                              .arg( UPnp::g_sPlatform )
+                              .arg( HttpServer::g_sPlatform )
                               .arg( MYTH_BINARY_VERSION )
                               .arg( sST )
                               .arg( sUSN );
+
+//    VERBOSE(VB_UPNP, QString("UPnpSearchTask::SendMsg : %1 : %2 ")
+//                        .arg( sST  )
+//                        .arg( sUSN ));
+
+//cout << "UPnpSearchTask::SendMsg    m_PeerAddress = " <<  m_PeerAddress.toString() << " Port=" << m_nPeerPort << endl;
 
     for ( QStringList::Iterator it  = m_addressList.begin(); 
                                 it != m_addressList.end(); 
@@ -88,7 +98,7 @@ void UPnpSearchTask::SendMsg( QSocketDevice  *pSocket,
         QString sHeader = QString ( "HTTP/1.1 200 OK\r\n"
                                     "LOCATION: http://%1:%2/getDeviceDesc\r\n" )
                             .arg( *it )
-                            .arg( m_nStatusPort);
+                            .arg( m_nServicePort);
 
 
         QString  sPacket  = sHeader + sData;
@@ -99,7 +109,7 @@ void UPnpSearchTask::SendMsg( QSocketDevice  *pSocket,
         // ------------------------------------------------------------------
 
         pSocket->writeBlock( scPacket, scPacket.length(), m_PeerAddress, m_nPeerPort );
-        usleep( 500000 );
+        usleep( rand() % 250000 );
         pSocket->writeBlock( scPacket, scPacket.length(), m_PeerAddress, m_nPeerPort );
     }
 
@@ -111,20 +121,13 @@ void UPnpSearchTask::SendMsg( QSocketDevice  *pSocket,
 
 void UPnpSearchTask::Execute( TaskQueue * /*pQueue*/ )
 {
-    // ----------------------------------------------------------------------
-    // Reload in case they have changed.
-    // ----------------------------------------------------------------------
-
-    m_nStatusPort = gContext->GetNumSetting("BackendStatusPort", 6544 );
-    m_nMaxAge     = gContext->GetNumSetting("upnpMaxAge"       , 3600 );
-
     QSocketDevice *pSocket = new QSocketDevice( QSocketDevice::Datagram );
 
     // ----------------------------------------------------------------------
     // Refresh IP Address List in case of changes
     // ----------------------------------------------------------------------
 
-    GetIPAddressList( m_addressList );
+    m_addressList = UPnp::g_IPAddrList;
 
     // ----------------------------------------------------------------------
     // Check to see if this is a rootdevice or all request.
