@@ -13,7 +13,7 @@ libdir_name="lib"
 music="yes"
 video="yes"
 dvd="yes"
-weather="yes"
+weather="no"
 gallery="yes"
 game="yes"
 news="yes"
@@ -104,6 +104,7 @@ MythVideo related options:
 
 MythWeather related options:
   --enable-mythweather     build the mythweather plugin [$weather]
+                           WARNING! Broken data acquisition
 EOF
 exit 1
 fi
@@ -605,6 +606,7 @@ fi
 
 if test "$weather" = "yes" ; then
   echo "        MythWeather   plugin will be built"
+  echo "            WARNING! The weather data acquisition is broken due to changes at the source."
   echo "SUBDIRS += mythweather" >> ./config.pro
 else
   echo "        MythWeather   plugin will not be built"
