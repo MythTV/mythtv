@@ -313,35 +313,22 @@ long HTTPRequest::SendResponseFile( QString sFileName )
         m_nResponseStatus = 200;
 
         // ------------------------------------------------------------------
-        // The Content-Range header is apparently a problem for the 
-        // AVeL LinkPlayer2 and probably other hardware players with 
-        // Syabas firmware. 
-        //
-        // -=>TODO: Need conformation
+        // Process any Range Header
         // ------------------------------------------------------------------
 
-        bool    bRange     = false;
-        QString sUserAgent = GetHeaderValue( "User-Agent", "");
+        bool    bRange = false;
+        QString sRange = GetHeaderValue( "range", "" ); 
 
-        if ( sUserAgent.contains( "Syabas", false ) == 0 )
+        if (sRange.length() > 0)
         {
-            // --------------------------------------------------------------
-            // Process any Range Header
-            // --------------------------------------------------------------
-
-            QString sRange = GetHeaderValue( "range", "" ); 
-
-            if (sRange.length() > 0)
+            if ( bRange = ParseRange( sRange, llSize, &llStart, &llEnd ) )
             {
-                if ( bRange = ParseRange( sRange, llSize, &llStart, &llEnd ) )
-                {
-                    m_nResponseStatus = 206;
-                    m_mapRespHeaders[ "Content-Range" ] = QString("bytes %1-%2/%3")
-                                                                  .arg( llStart )
-                                                                  .arg( llEnd   )
-                                                                  .arg( llSize  );
-                    llSize = (llEnd - llStart) + 1;
-                }
+                m_nResponseStatus = 206;
+                m_mapRespHeaders[ "Content-Range" ] = QString("bytes %1-%2/%3")
+                                                              .arg( llStart )
+                                                              .arg( llEnd   )
+                                                              .arg( llSize  );
+                llSize = (llEnd - llStart) + 1;
             }
         }
         
