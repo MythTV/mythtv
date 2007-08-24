@@ -145,7 +145,7 @@ deleting large files is important.  Numerous benchmarks show that XFS and
 JFS do very well at this task.  You are <EM>strongly</EM> encouraged to
 consider one of these for your MythTV filesystem.  JFS is the absolute best
 at deletion, so you may want to try it if XFS gives you problems.  MythTV
-.20 also incorporates a "slow delete" feature, which progressively shrinks
+.20 and above also incorporates a "slow delete" feature, which progressively shrinks
 the file rather than attempting to delete it all at once, so if you're more
 comfortable with a filesystem such as ext3 (whose delete performance for
 large files isn't that good) you may use it rather than one of the
@@ -565,7 +565,7 @@ additional configuration steps in this HOWTO.  The next logical step is
 <A HREF="mythtv-HOWTO-6.html#mysql">configuring MySQL</A>, which you may or may not have to
 perform.  See your package documentation.</P>
 
-<H3><A NAME="atrpms"></A> Red Hat Linux / Fedora Core</H3>
+<H3><A NAME="atrpms"></A> Red Hat Linux / Fedora Core </H3>
 
 <P>The definitive documentation on installing MythTV on Red Hat Linux /
 Fedora Core can be found in Jarod Wilson's (

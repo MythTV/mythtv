@@ -3,7 +3,7 @@
 <title>Installing and using MythTV
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com"
 name="mailto:rkulagow@rocketmail.com">
-<date>2007-06-11, v0.20.22
+<date>2007-08-24, v0.20.23
 <abstract>
 Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -51,12 +51,13 @@ entirely by a remote control.
 MJPEG, DVB, HDTV, USB and firewire capture devices.  With appropriate
 hardware, MythTV can control set top boxes, often found in digital cable and
 satellite TV systems.
-<item>Program Guide Data in North America is downloaded from Zap2It.com, a
-subsidiary of Tribune Media Services.  This free service is called
-DataDirect, and provides MythTV almost two weeks of scheduling information. 
-Program Guide Data in other countries is obtained using XMLTV.  MythTV uses
-this information to create a schedule that maximizes the number of programs
-that can be recorded if you don't have enough tuners.
+<item>Program Guide Data in North America is downloaded from
+schedulesdirect.org, a non-profit organization which has licensed data from
+Tribune Media Services.  This service provides almost two weeks of
+scheduling information. Program Guide Data in other countries is obtained
+using XMLTV.  MythTV uses this information to create a schedule that
+maximizes the number of programs that can be recorded if you don't have
+enough tuners.
 <item>MythTV implements a UPNP server, so a UPNP client should automatically
 see content from your MythTV system.
 </itemize> 
@@ -122,7 +123,7 @@ name="http://www.mythtv.org/docs/mythtv-HOWTO-singlehtml.html"> or as a PDF
 at <url url="http://www.mythtv.org/docs/mythtv-HOWTO.pdf"
 name="http://www.mythtv.org/docs/mythtv-HOWTO.pdf">.
 
-This HOWTO is for MythTV v0.20
+This HOWTO is for MythTV v0.20.2
 
 <sect1>Books about MythTV
 <p>If you would like to purchase a book specifically about MythTV:
@@ -392,7 +393,7 @@ deleting large files is important.  Numerous benchmarks show that XFS and
 JFS do very well at this task.  You are <em>strongly</em> encouraged to
 consider one of these for your MythTV filesystem.  JFS is the absolute best
 at deletion, so you may want to try it if XFS gives you problems.  MythTV
-.20 also incorporates a "slow delete" feature, which progressively shrinks
+.20 and above also incorporates a "slow delete" feature, which progressively shrinks
 the file rather than attempting to delete it all at once, so if you're more
 comfortable with a filesystem such as ext3 (whose delete performance for
 large files isn't that good) you may use it rather than one of the
@@ -1182,7 +1183,7 @@ subversion has no guarantees regarding stability, etc.
 </caption>
 </figure>
 
-If you are in North America you will use the DataDirect grabber which is
+If you are in North America you will use the Schedules Direct grabber which is
 built-in to MythTV.  You <em>do not</em> need to install XMLTV (so you may
 skip XMLTV-related instructions), but you need <bf>wget</bf> version 1.9.1
 or higher.
@@ -1263,7 +1264,7 @@ and skip straight to the XMLTV compilation step.
 <p>
 <label id="untarring_xmltv">Untar the xmltv file:
 <tscreen><verb>
-$ tar -xjf xmltv-0.5.44.tar.bz2
+$ tar -xjf xmltv-0.5.48.tar.bz2
 </verb></tscreen>
 Install the xmltv prerequisites.  The following prerequisites are the
 minimum required; when you actually start running the xmltv setup program it
@@ -1282,7 +1283,7 @@ cpan> exit
 
 Change to the XMLTV directory and compile it:
 <tscreen><verb>
-$ cd xmltv-0.5.44
+$ cd xmltv-0.5.48
 $ perl Makefile.PL
 </verb></tscreen>
 You can answer "N" to the tv_check, tv_pick_cgi questions.  Say "yes" to
@@ -1299,37 +1300,20 @@ $ su
 # exit
 </verb></tscreen>
 
-<sect1>Configuring the Zap2It.com DataDirect service <label id="ConfigureDD">
-<p>Zap2It DataDirect is a service provided by Zap2It, a subsidiary of
-Tribune Media Services.  TMS is one of the primary providers for program
-listing data in the United States and Canada.  There are a number of
-advantages to using DataDirect rather than the standard XMLTV
-<tt>tv_grab_na</tt> grabber.
+<sect1>Configuring the Schedules Direct service <label id="ConfigureSD">
+<p>As of 2007-09-01, Tribune Media Services will no longer offer free guide
+data.  Schedules Direct is a non-profit organization which has licensed the
+data to make it available to users of Freeware and Open Source applications.
 
-<itemize>
-<item>The <tt>tv_grab_na</tt> grabber is no longer supported and will not be
-fixed when problems occur.
-<item>It's much faster, because the grabber isn't downloading hundreds of
-HTML pages and trying to parse the program data out of the HTML.
-<item>It contains more program information.
-<item>It's easier on the Zap2It servers, since they're not generating
-hundreds of custom HTML pages when you scrape their listings.
-<item>The service is available free of charge by periodically filling in
-surveys similar to the one presented during registration, and the data
-provider has no intention of charging for it in the future.
-</itemize>
+If you wish to use Schedules Direct, you'll need to establish a user
+account.  Go to <url url="http://www.schedulesdirect.org"
+name="http://www.schedulesdirect.org"> and click on the "Membership" link. 
 
-If you wish to use Zap2It DataDirect, you'll need to establish a user
-account.  Go to <url url="http://labs.zap2it.com"
-name="http://labs.zap2it.com"> and click on the "New User? Sign Up" link. 
-Read the license terms, and if you agree with them click "Accept".  The next
-screen is the subscription registration.  In the "Certificate Code" field,
-enter <bf>ZIYN-DQZO-SBUT</bf>.
-
-Fill in the survey, then proceed to the lineup choices and configure your
-account for your particular location and the channels that you have.  This
-configuration will be imported into MythTV when you first run the
-<bf>mythtv-setup</bf> program.
+Once you've read and agreed to the Subscriber Agreement, Terms of Use and
+Privacy Policy proceed to the lineup choices and configure your account for
+your particular location and the channels that you have.  This configuration
+will be imported into MythTV when you first run the <bf>mythtv-setup</bf>
+program.
 
 <label id="manually_building_mythtv">
 <sect1>Manually building MythTV
@@ -1347,8 +1331,8 @@ $ cd mythtv
 
 If you are using the tarball, then unpack it:
 <tscreen><verb>
-$ tar -xjf mythtv-0.20.tar.bz2
-$ cd mythtv-0.20
+$ tar -xjf mythtv-0.20.2.tar.bz2
+$ cd mythtv-0.20.2
 $ ./configure
 </verb></tscreen>
 
@@ -1997,7 +1981,7 @@ to control MythTV.  MythTV now includes native support for lirc and can
 interact directly with 
 
 <tscreen><verb>
-$ cd ~/mythtv-0.20/contrib/configfiles
+$ cd ~/mythtv-0.20.2/contrib/configfiles
 $ cp lircrc.example ~/.lircrc
 </verb></tscreen> 
 or
@@ -2404,18 +2388,18 @@ space bar to begin.  The first field asks for the name of the video source.
 You may choose something easy to remember, like "Antenna" or "Cable".  Once
 you've chosen a name, press the down arrow to move to the next field.  
 
-If you're in North America, change the grabber to "DataDirect", then
+If you're in North America, change the grabber to "Schedules Direct", then
 continue pressing the down arrow to move to the next field.  Fill in the
-username and password that you have established with DataDirect, then move
-to the "Retrieve Listings" button and press the space bar.  
+username and password that you have established with Schedules Direct, then
+move to the "Retrieve Listings" button and press the space bar.
 
 <bf>NOTE</bf>: You need <bf>wget</bf> version 1.9.1 or higher to use
-DataDirect.
+Schedules Direct.
 
-The mythtv-setup program will contact the Zap2It servers and get your account
-information.  Once you're done, you may click the Finish button and skip the
-next few paragraphs in this document since they only apply to users that are
-using the external XMLTV script to get their guide data.
+The mythtv-setup program will contact the Schedules Direct servers and get
+your account information.  Once you're done, you may click the Finish button
+and skip the next few paragraphs in this document since they only apply to
+users that are using the external XMLTV script to get their guide data.
 
 If you wish to continue using the XMLTV grabber, then move to the Zip/postal
 code field and put in the appropriate value.
@@ -2633,9 +2617,9 @@ and start-early/end-late settings.
 backend will obtain guide data for all the video sources you defined during
 setup.
 
-<bf>NOTE</bf>: If you are using DataDirect and watching the output messages
+<bf>NOTE</bf>: If you are using Schedules Direct and watching the output messages
 on the console or the log file it is normal to see a "401 Unauthorized"
-error followed by a "200 OK" when the connection to Zap2It is being
+error followed by a "200 OK" when the connection to Schedules Direct is being
 established.
 <tscreen><verb>
 From : Sun Jun 13 05:00:00 2004 To : Mon Jun 14 05:00:00 2004 (UTC)
@@ -2670,7 +2654,7 @@ mythbackend will print information about connections and what it's doing to
 the console.  If you'd like to see the options that are available for
 mythbackend, type <tt>mythbackend -h</tt> for help.
 
-As of MythTV v0.20, the available options are:
+As of MythTV v0.20.2, the available options are:
 <tscreen><verb>
 $ mythbackend --help
 Valid options are:
@@ -2782,11 +2766,11 @@ Setup>General screen and advance to "Mythfilldatabase", the fourth screen.
 Select the checkbox, then complete the options as you see fit.  The
 <bf>mythbackend</bf> program will now run <bf>mythfilldatabase</bf> for you.
 
-<sect1>Grabbing channel icons for DataDirect users
-<p>While the DataDirect TV listings service has several advantages, it does
-not support grabbing logo icons for the stations you receive. However, there
-are utilities provided with MythTV which you may use to grab your initial
-set of icons and to keep them updated if your lineups change.
+<sect1>Grabbing channel icons for Schedules Direct users
+<p>While the Schedules Direct TV listings service has several advantages, it
+does not support grabbing logo icons for the stations you receive. However,
+there are utilities provided with MythTV which you may use to grab your
+initial set of icons and to keep them updated if your lineups change.
 
 First, you need to generate or obtain an XML file with the information for
 your stations.
@@ -2900,7 +2884,7 @@ during playback. These filters can be used to improve or modify the video
 image, including hiding the effects of an interlaced image or reducing the
 impact of noise in a poor video signal. The following is a brief
 introduction to introduce you to the filters that are available in MythTV
-version 0.20
+version 0.20 and higher.
 <sect2>Applying filters
 <p>One or more filters can be included in a "filter chain". The filters to
 be used are identified in a "filter string". A filter string is a group of
@@ -3536,8 +3520,8 @@ can be modified by the user without re-compiling or altering the program
 functionality.  Download the MythThemes tarball from the website and untar it:
 
 <tscreen><verb>
-$ tar -xjf myththemes-0.20.tar.bz2
-$ cd ~/myththemes-0.20
+$ tar -xjf myththemes-0.20.2.tar.bz2
+$ cd ~/myththemes-0.20.2
 $ qmake myththemes.pro
 $ su -
 # make install
@@ -4454,8 +4438,10 @@ letter prefix, MV, EP, SP or SH that correspond to the
 EP where the last four digits are the episode number in the series. Note
 that these are generated by TMS and not the show's producers but they are
 usually in the same order as the original air dates for the episodes.
-Detailed information can be found in the Data Direct documentation at <url
-url="http://labs.zap2it.com/" name="http://labs.zap2it.com/">.
+
+Additional information can be found in the Schedules Direct Developer forum
+at <url url="http://forums.schedulesdirect.org"
+name="http://forums.schedulesdirect.org">
 </itemize>
 
 Finally, if you are doing something very experimental and a field is not
@@ -4814,8 +4800,8 @@ examples that can be used or you can create your own to suit your needs.
 the tarball, untar it and run the <bf>configure</bf> script:
 
 <tscreen><verb>
-$ tar -xjf mythplugins-0.20.tar.bz2
-$ cd mythplugins-0.20
+$ tar -xjf mythplugins-0.20.2.tar.bz2
+$ cd mythplugins-0.20.2
 $ ./configure --help
 
 Usage:   configure [options]
@@ -4863,7 +4849,7 @@ MythWeather related options:
 </verb></tscreen>
 
 The sections detailing configuration of the plugins assume that you are
-already in the <tt>~/mythplugins-0.20/</tt> directory.
+already in the <tt>~/mythplugins-0.20.2/</tt> directory.
 
 Note that a single <bf>configure</bf> script now does configuration for all
 modules.  By default, it will compile all modules.  If you do not wish to
@@ -4879,7 +4865,7 @@ like to enable support for the opengl and FFT visualizations.  The command
 line would look like:
 
 <tscreen><verb>
-$ cd ~/mythplugins-0.20 
+$ cd ~/mythplugins-0.20.2 
 $ ./configure --disable-all --enable-opengl --enable-mythgallery --enable-exif --enable-mythmusic --enable-fft
 $ qmake mythplugins.pro
 $ make
@@ -4923,7 +4909,7 @@ installation is quite simple.
 <sect1>Completing the installation
 <p>
 <tscreen><verb>
-$ cd ~/mythplugins-0.20/mythweb
+$ cd ~/mythplugins-0.20.2/mythweb
 $ su
 # mkdir /var/www/html/mythweb
 # cp -r . /var/www/html/mythweb
@@ -4985,7 +4971,7 @@ would perform the following command:
 </verb></tscreen>
 Once you have satisfied the prerequisites for your distribution, install the application:
 <tscreen><verb>
-$ cd ~/mythplugins-0.20
+$ cd ~/mythplugins-0.20.2
 $ ./configure --disable-all --enable-opengl --enable-mythgallery
 $ qmake mythplugins.pro
 $ make
@@ -5228,7 +5214,7 @@ section to obtain mythplugins.
 
 Switch to the mythplugins directory:
 <tscreen><verb>
-$ cd ~/mythplugins-0.20
+$ cd ~/mythplugins-0.20.2
 </verb></tscreen>
 
 Compile and install mythgame:
@@ -5450,7 +5436,7 @@ step.
 compiling MythMusic.
 
 <tscreen><verb>
-$ cd ~/mythplugins-0.20
+$ cd ~/mythplugins-0.20.2
 $ ./configure --disable-all --enable-mythmusic --enable-fftw --enable-sdl --enable-aac
 $ qmake mythplugins.pro
 $ make
@@ -5583,7 +5569,7 @@ id="mythplugins_" name="MythPlugins"> for instructions on downloading the
 tarball.
 
 <tscreen><verb>
-$ cd ~/mythplugins-0.20
+$ cd ~/mythplugins-0.20.2
 $ ./configure --disable-all --enable-mythweather
 $ qmake mythplugins.pro
 $ make
@@ -5635,7 +5621,7 @@ MythVideo will allow you to use an external program to watch media files
 that are not directly supported by MythTV.
 
 <tscreen><verb>
-$ cd ~/mythplugins-0.20
+$ cd ~/mythplugins-0.20.2
 $ ./configure --disable-all --enable-mythvideo
 $ qmake mythplugins.pro
 $ make
@@ -5711,7 +5697,7 @@ mythbackend at system boot time"> to start mtd instead of mythbackend.
 id="mythplugins_" name="MythPlugins"> for instructions on downloading the
 tarball.  MythNews is a RSS reader.
 <tscreen><verb>
-$ cd ~/mythplugins-0.20
+$ cd ~/mythplugins-0.20.2
 $ ./configure --disable-all --enable-mythnews
 $ qmake mythplugins.pro
 $ make
@@ -7697,7 +7683,8 @@ v0.20.19, 2007-04-07.  Put in bjm's Custom Priority section.
 v0.20.20, 2007-04-11.  Update Storage Directory text, add an update to the
 LVM section that SG's are better.
 v0.20.21, 2007-06-07.  Add link to books on MythTV.
-v0.20.22, 2006-06-11.  Update link to ATSC devices on linuxtv.org (D. Hugh Redelmeier)
+v0.20.22, 2007-06-11.  Update link to ATSC devices on linuxtv.org (D. Hugh Redelmeier)
+v0.20.23, 2007-08-24.  Update information on Schedules Direct.  Update version for XMLTV.  Change version numbers.
 -->
 
 <!--

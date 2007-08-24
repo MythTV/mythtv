@@ -1,7 +1,7 @@
   Installing and using MythTV
   Robert Kulagowski, mailto:rkulagow@rocketmail.com
   <mailto:rkulagow@rocketmail.com>
-  2007-06-11, v0.20.22
+  2007-08-24, v0.20.23
 
   Initially, installation of MythTV seems like a huge task.  There are
   lots of dependencies, and various distributions seem to do the same
@@ -80,7 +80,7 @@
         5.2.1 Red Hat Linux and Fedora Core:
         5.2.2 Mandriva
         5.2.3 Manual installation
-     5.3 Configuring the Zap2It.com DataDirect service
+     5.3 Configuring the Schedules Direct service
      5.4 Manually building MythTV
         5.4.1 Enabling real-time scheduling of the display thread.
            5.4.1.1 rlimits
@@ -129,7 +129,7 @@
      9.3 Configuring a non-master backend
      9.4 Configuring and running mythfilldatabase
         9.4.1 Periodically running mythfilldatabase
-     9.5 Grabbing channel icons for DataDirect users
+     9.5 Grabbing channel icons for Schedules Direct users
 
   10. Configuring mythfrontend.
      10.1 General
@@ -387,13 +387,13 @@
      appropriate hardware, MythTV can control set top boxes, often found
      in digital cable and satellite TV systems.
 
-  +o  Program Guide Data in North America is downloaded from Zap2It.com,
-     a subsidiary of Tribune Media Services.  This free service is
-     called DataDirect, and provides MythTV almost two weeks of
-     scheduling information.  Program Guide Data in other countries is
-     obtained using XMLTV.  MythTV uses this information to create a
-     schedule that maximizes the number of programs that can be recorded
-     if you don't have enough tuners.
+  +o  Program Guide Data in North America is downloaded from
+     schedulesdirect.org, a non-profit organization which has licensed
+     data from Tribune Media Services.  This service provides almost two
+     weeks of scheduling information. Program Guide Data in other
+     countries is obtained using XMLTV.  MythTV uses this information to
+     create a schedule that maximizes the number of programs that can be
+     recorded if you don't have enough tuners.
 
   +o  MythTV implements a UPNP server, so a UPNP client should
      automatically see content from your MythTV system.
@@ -478,7 +478,7 @@
   at http://www.mythtv.org/docs/mythtv-HOWTO.pdf
   <http://www.mythtv.org/docs/mythtv-HOWTO.pdf>.
 
-  This HOWTO is for MythTV v0.20
+  This HOWTO is for MythTV v0.20.2
 
 
   [1m1.5.  Books about MythTV[0m
@@ -775,7 +775,7 @@
   XFS and JFS do very well at this task.  You are [4mstrongly[24m encouraged to
   consider one of these for your MythTV filesystem.  JFS is the absolute
   best at deletion, so you may want to try it if XFS gives you problems.
-  MythTV .20 also incorporates a "slow delete" feature, which
+  MythTV .20 and above also incorporates a "slow delete" feature, which
   progressively shrinks the file rather than attempting to delete it all
   at once, so if you're more comfortable with a filesystem such as ext3
   (whose delete performance for large files isn't that good) you may use
@@ -1661,10 +1661,10 @@
   keep up to date with the current status of the code.  Code obtained
   from subversion has no guarantees regarding stability, etc.
 
-  If you are in North America you will use the DataDirect grabber which
-  is built-in to MythTV.  You [4mdo[24m [4mnot[24m need to install XMLTV (so you may
-  skip XMLTV-related instructions), but you need [1mwget [22mversion 1.9.1 or
-  higher.
+  If you are in North America you will use the Schedules Direct grabber
+  which is built-in to MythTV.  You [4mdo[24m [4mnot[24m need to install XMLTV (so you
+  may skip XMLTV-related instructions), but you need [1mwget [22mversion 1.9.1
+  or higher.
 
   Get XMLTV from http://xmltv.sourceforge.net
   <http://xmltv.sourceforge.net>.  Download the latest version (0.5.44).
@@ -1764,7 +1764,7 @@
   Untar the xmltv file:
 
 
-       $ tar -xjf xmltv-0.5.44.tar.bz2
+       $ tar -xjf xmltv-0.5.48.tar.bz2
 
 
 
@@ -1788,7 +1788,7 @@
   Change to the XMLTV directory and compile it:
 
 
-       $ cd xmltv-0.5.44
+       $ cd xmltv-0.5.48
        $ perl Makefile.PL
 
 
@@ -1809,41 +1809,22 @@
 
 
 
-  [1m5.3.  Configuring the Zap2It.com DataDirect service[0m
+  [1m5.3.  Configuring the Schedules Direct service[0m
 
-  Zap2It DataDirect is a service provided by Zap2It, a subsidiary of
-  Tribune Media Services.  TMS is one of the primary providers for
-  program listing data in the United States and Canada.  There are a
-  number of advantages to using DataDirect rather than the standard
-  XMLTV tv_grab_na grabber.
+  As of 2007-09-01, Tribune Media Services will no longer offer free
+  guide data.  Schedules Direct is a non-profit organization which has
+  licensed the data to make it available to users of Freeware and Open
+  Source applications.
 
+  If you wish to use Schedules Direct, you'll need to establish a user
+  account.  Go to http://www.schedulesdirect.org
+  <http://www.schedulesdirect.org> and click on the "Membership" link.
 
-  +o  The tv_grab_na grabber is no longer supported and will not be fixed
-     when problems occur.
-
-  +o  It's much faster, because the grabber isn't downloading hundreds of
-     HTML pages and trying to parse the program data out of the HTML.
-
-  +o  It contains more program information.
-
-  +o  It's easier on the Zap2It servers, since they're not generating
-     hundreds of custom HTML pages when you scrape their listings.
-
-  +o  The service is available free of charge by periodically filling in
-     surveys similar to the one presented during registration, and the
-     data provider has no intention of charging for it in the future.
-
-  If you wish to use Zap2It DataDirect, you'll need to establish a user
-  account.  Go to http://labs.zap2it.com <http://labs.zap2it.com> and
-  click on the "New User? Sign Up" link.  Read the license terms, and if
-  you agree with them click "Accept".  The next screen is the
-  subscription registration.  In the "Certificate Code" field, enter
-  [1mZIYN-DQZO-SBUT[22m.
-
-  Fill in the survey, then proceed to the lineup choices and configure
-  your account for your particular location and the channels that you
-  have.  This configuration will be imported into MythTV when you first
-  run the [1mmythtv-setup [22mprogram.
+  Once you've read and agreed to the Subscriber Agreement, Terms of Use
+  and Privacy Policy proceed to the lineup choices and configure your
+  account for your particular location and the channels that you have.
+  This configuration will be imported into MythTV when you first run the
+  [1mmythtv-setup [22mprogram.
 
 
   [1m5.4.  Manually building MythTV[0m
@@ -1853,20 +1834,20 @@
 
 
 
-       $ mkdir mythtv
-       $ cd mythtv
-       $ svn co http://svn.mythtv.org/svn/trunk/mythtv
-       $ svn co http://svn.mythtv.org/svn/trunk/mythplugins
-       $ svn co http://svn.mythtv.org/svn/trunk/myththemes
-       $ cd mythtv
+  $ mkdir mythtv
+  $ cd mythtv
+  $ svn co http://svn.mythtv.org/svn/trunk/mythtv
+  $ svn co http://svn.mythtv.org/svn/trunk/mythplugins
+  $ svn co http://svn.mythtv.org/svn/trunk/myththemes
+  $ cd mythtv
 
 
 
   If you are using the tarball, then unpack it:
 
 
-       $ tar -xjf mythtv-0.20.tar.bz2
-       $ cd mythtv-0.20
+       $ tar -xjf mythtv-0.20.2.tar.bz2
+       $ cd mythtv-0.20.2
        $ ./configure
 
 
@@ -1955,10 +1936,10 @@
 
 
 
-  *               -       rtprio     0
-  *               -       nice       0
-  @audio          -       rtprio     50
-  @audio          -       nice       0
+       *               -       rtprio     0
+       *               -       nice       0
+       @audio          -       rtprio     50
+       @audio          -       nice       0
 
 
 
@@ -1970,8 +1951,8 @@
   the distribution kernel you must configure your kernel with:
 
 
-       Security options : [*] Enable different security models
-       Security options : [M] Default Linux Capabilties
+  Security options : [*] Enable different security models
+  Security options : [M] Default Linux Capabilties
 
 
 
@@ -2087,10 +2068,11 @@
   If this is happening to you, try running the following commands.
 
 
-       $ su
-       # chkconfig --level 35 mysql on
-       # /etc/rc.d/init.d/mysql start
-       # exit
+
+  $ su
+  # chkconfig --level 35 mysql on
+  # /etc/rc.d/init.d/mysql start
+  # exit
 
 
 
@@ -2133,6 +2115,7 @@
 
 
        $ mysql -u root < mc.sql
+
 
 
   [1m6.2.2.  Debian 3.0[0m
@@ -2197,8 +2180,6 @@
        $ mysql -u root mythconverg
        mysql> grant all on mythconverg.* to mythtv@"192.168.1.%" identified by "mythtv";
        mysql> flush privileges;
-
-
 
   You'll also need to check that the "networking" feature of MySQL is
   turned on. Check that /etc/mysql/my.cnf [4mdoes[24m [4mnot[24m contain skip-
@@ -2440,11 +2421,12 @@
   device is connected to ttyS0.  If it were connected to "COM2", then
   use ttyS1, etc.
 
-  $ su
-  # cd /dev
-  # ln -sf ttyS0 lirc
-  # exit
-  $
+
+       $ su
+       # cd /dev
+       # ln -sf ttyS0 lirc
+       # exit
+       $
 
 
 
@@ -2508,7 +2490,7 @@
   9.1 users, type: # /etc/rc.d/init.d/lircd start instead of:
 
 
-       # /usr/local/sbin/lircd
+  # /usr/local/sbin/lircd
 
 
 
@@ -2557,7 +2539,7 @@
   To make your own lircd.conf file
 
 
-  $ irrecord myremote
+       $ irrecord myremote
 
 
 
@@ -2613,8 +2595,9 @@
 
 
 
-       $ cd ~/mythtv-0.20/contrib/configfiles
+       $ cd ~/mythtv-0.20.2/contrib/configfiles
        $ cp lircrc.example ~/.lircrc
+
 
 
   or
@@ -2628,7 +2611,6 @@
 
 
        $ irw
-
 
 
   Start pressing the keys on your remote; [1mirw [22mwill print the name of the
@@ -2679,6 +2661,8 @@
 
   but the /etc/lircd.conf that comes in the lircd package defines the
   buttons for the Pinnacle Studio PCTV as:
+
+
                  channel+                 0x0000000000000017
                  channel-                 0x000000000000001C
 
@@ -2688,19 +2672,20 @@
   my /home/[yourusername]/.lircrc file:
 
 
-       begin
-           prog = irxevent
-           button = channel+
-           repeat = 3
-           config = Key Up CurrentWindow
-       end
 
-       begin
-           prog = irxevent
-           button = channel-
-           repeat = 3
-           config = Key Down CurrentWindow
-       end
+  begin
+      prog = irxevent
+      button = channel+
+      repeat = 3
+      config = Key Up CurrentWindow
+  end
+
+  begin
+      prog = irxevent
+      button = channel-
+      repeat = 3
+      config = Key Down CurrentWindow
+  end
 
 
 
@@ -2743,25 +2728,28 @@
 
        $ make
 
+
+
   Please note: unlike the Pinnacle receiver above you will be compiling
   lircd in addition to a kernel module for the SIR transmitter.
   Depending on whether you have your serial port driver configured as a
   kernel module you might see the following message during make:
 
 
-       lirc_sir.c:56:2: warning: #warning
-       "******************************************"
 
-       lirc_sir.c:57:2: warning: #warning "Your serial port driver is compiled into "
+  lirc_sir.c:56:2: warning: #warning
+  "******************************************"
 
-       lirc_sir.c:58:2: warning: #warning "the kernel. You will have to release the "
+  lirc_sir.c:57:2: warning: #warning "Your serial port driver is compiled into "
 
-       lirc_sir.c:59:2: warning: #warning "port you want to use for LIRC with:"
+  lirc_sir.c:58:2: warning: #warning "the kernel. You will have to release the "
 
-       lirc_sir.c:60:2: warning: #warning "setserial /dev/ttySx uart none"
+  lirc_sir.c:59:2: warning: #warning "port you want to use for LIRC with:"
 
-       lirc_sir.c:61:2: warning: #warning
-       "******************************************"
+  lirc_sir.c:60:2: warning: #warning "setserial /dev/ttySx uart none"
+
+  lirc_sir.c:61:2: warning: #warning
+  "******************************************"
 
 
 
@@ -2806,12 +2794,11 @@
   being received. If everything is configured correctly you should see
   something similar to the following:
 
-  $ irw
-  0000000000007ff0 00 1 gi-motorola-dct2000
-  000000000000bff8 00 2 gi-motorola-dct2000
-  000000000000f7f0 00 ENTER gi-motorola-dct2000
 
-
+       $ irw
+       0000000000007ff0 00 1 gi-motorola-dct2000
+       000000000000bff8 00 2 gi-motorola-dct2000
+       000000000000f7f0 00 ENTER gi-motorola-dct2000
 
   Once you've verified lirc is working you can press [1mCTRL-C [22mto exit [1mirw[0m
   and configure the channel changing script.
@@ -2866,6 +2853,7 @@
        $ su -
        # apt-get install libqt3c102-mt-mysql
        # exit
+
 
 
   [1m9.1.  Configuring the Master backend system[0m
@@ -2933,8 +2921,6 @@
   remote access to the MySQL database.  The following instructions may
   or may not work.  Add the following to /etc/my.cnf on the backend
   machine and restart MySQL.
-
-
        skip-innodb
        set-variable=thread_stack=256k
 
@@ -2994,6 +2980,7 @@
   If you will be deploying multiple backends, or if your backend is on
   one system and you're running the frontend on another machine then [4mdo[0m
   [4mnot[24m use the "127.0.0.1" IP address.
+
 
   [1mNOTE[22m: If you modify the 127.0.0.1 address and use a "real" IP address,
   you must use real IP addresses in both fields, otherwise your frontend
@@ -3056,18 +3043,19 @@
   "Antenna" or "Cable".  Once you've chosen a name, press the down arrow
   to move to the next field.
 
-  If you're in North America, change the grabber to "DataDirect", then
-  continue pressing the down arrow to move to the next field.  Fill in
-  the username and password that you have established with DataDirect,
-  then move to the "Retrieve Listings" button and press the space bar.
+  If you're in North America, change the grabber to "Schedules Direct",
+  then continue pressing the down arrow to move to the next field.  Fill
+  in the username and password that you have established with Schedules
+  Direct, then move to the "Retrieve Listings" button and press the
+  space bar.
 
-  [1mNOTE[22m: You need [1mwget [22mversion 1.9.1 or higher to use DataDirect.
+  [1mNOTE[22m: You need [1mwget [22mversion 1.9.1 or higher to use Schedules Direct.
 
-  The mythtv-setup program will contact the Zap2It servers and get your
-  account information.  Once you're done, you may click the Finish
-  button and skip the next few paragraphs in this document since they
-  only apply to users that are using the external XMLTV script to get
-  their guide data.
+  The mythtv-setup program will contact the Schedules Direct servers and
+  get your account information.  Once you're done, you may click the
+  Finish button and skip the next few paragraphs in this document since
+  they only apply to users that are using the external XMLTV script to
+  get their guide data.
 
   If you wish to continue using the XMLTV grabber, then move to the
   Zip/postal code field and put in the appropriate value.
@@ -3115,7 +3103,6 @@
   channels and you must do this before pressing the "Fetch channels from
   listings source" button. You may scan for analog channels on an analog
   input, but this is not needed.
-
 
 
   The other button is called "Fetch channels from listings source". As
@@ -3294,10 +3281,10 @@
   Run the mythfilldatabase program as directed.  The master backend will
   obtain guide data for all the video sources you defined during setup.
 
-  [1mNOTE[22m: If you are using DataDirect and watching the output messages on
-  the console or the log file it is normal to see a "401 Unauthorized"
-  error followed by a "200 OK" when the connection to Zap2It is being
-  established.
+  [1mNOTE[22m: If you are using Schedules Direct and watching the output
+  messages on the console or the log file it is normal to see a "401
+  Unauthorized" error followed by a "200 OK" when the connection to
+  Schedules Direct is being established.
 
 
 
@@ -3336,7 +3323,7 @@
   doing to the console.  If you'd like to see the options that are
   available for mythbackend, type mythbackend -h for help.
 
-  As of MythTV v0.20, the available options are:
+  As of MythTV v0.20.2, the available options are:
 
 
        $ mythbackend --help
@@ -3446,10 +3433,10 @@
   fit.  The [1mmythbackend [22mprogram will now run [1mmythfilldatabase [22mfor you.
 
 
-  [1m9.5.  Grabbing channel icons for DataDirect users[0m
+  [1m9.5.  Grabbing channel icons for Schedules Direct users[0m
 
-  While the DataDirect TV listings service has several advantages, it
-  does not support grabbing logo icons for the stations you receive.
+  While the Schedules Direct TV listings service has several advantages,
+  it does not support grabbing logo icons for the stations you receive.
   However, there are utilities provided with MythTV which you may use to
   grab your initial set of icons and to keep them updated if your
   lineups change.
@@ -3583,7 +3570,7 @@
   video image, including hiding the effects of an interlaced image or
   reducing the impact of noise in a poor video signal. The following is
   a brief introduction to introduce you to the filters that are
-  available in MythTV version 0.20
+  available in MythTV version 0.20 and higher.
 
   [1m10.4.2.  Applying filters[0m
 
@@ -4197,8 +4184,8 @@
 
 
 
-       $ tar -xjf myththemes-0.20.tar.bz2
-       $ cd ~/myththemes-0.20
+       $ tar -xjf myththemes-0.20.2.tar.bz2
+       $ cd ~/myththemes-0.20.2
        $ qmake myththemes.pro
        $ su -
        # make install
@@ -5265,17 +5252,17 @@
      except EP where the last four digits are the episode number in the
      series. Note that these are generated by TMS and not the show's
      producers but they are usually in the same order as the original
-     air dates for the episodes.  Detailed information can be found in
-     the Data Direct documentation at http://labs.zap2it.com/
-     <http://labs.zap2it.com/>.
+     air dates for the episodes.
+
+     Additional information can be found in the Schedules Direct
+     Developer forum at http://forums.schedulesdirect.org
+     <http://forums.schedulesdirect.org>
 
   Finally, if you are doing something very experimental and a field is
   not giving you the results you had anticipated, you can always check
   the MythTV source code to see exactly how a field is used. The open
   source for MythTV is available from http://www.mythtv.org/
   <http://www.mythtv.org/> .
-
-
   [1m12.6.  Scheduling with more than one Input[0m
 
   MythTV is designed to allow recording television programs from one or
@@ -5633,8 +5620,8 @@
 
   MythTV has a rich set of plugins available.  Once you have downloaded
   the tarball, untar it and run the [1mconfigure [22mscript:
-       $ tar -xjf mythplugins-0.20.tar.bz2
-       $ cd mythplugins-0.20
+       $ tar -xjf mythplugins-0.20.2.tar.bz2
+       $ cd mythplugins-0.20.2
        $ ./configure --help
 
        Usage:   configure [options]
@@ -5683,7 +5670,7 @@
 
 
   The sections detailing configuration of the plugins assume that you
-  are already in the ~/mythplugins-0.20/ directory.
+  are already in the ~/mythplugins-0.20.2/ directory.
 
   Note that a single [1mconfigure [22mscript now does configuration for all
   modules.  By default, it will compile all modules.  If you do not wish
@@ -5698,7 +5685,7 @@
   MythMusic, you would like to enable support for the opengl and FFT
   visualizations.  The command line would look like:
 
-       $ cd ~/mythplugins-0.20
+       $ cd ~/mythplugins-0.20.2
        $ ./configure --disable-all --enable-opengl --enable-mythgallery --enable-exif --enable-mythmusic --enable-fft
        $ qmake mythplugins.pro
        $ make
@@ -5748,7 +5735,7 @@
 
 
 
-       $ cd ~/mythplugins-0.20/mythweb
+       $ cd ~/mythplugins-0.20.2/mythweb
        $ su
        # mkdir /var/www/html/mythweb
        # cp -r . /var/www/html/mythweb
@@ -5822,7 +5809,7 @@
   install the application:
 
 
-       $ cd ~/mythplugins-0.20
+       $ cd ~/mythplugins-0.20.2
        $ ./configure --disable-all --enable-opengl --enable-mythgallery
        $ qmake mythplugins.pro
        $ make
@@ -6108,7 +6095,7 @@
   Switch to the mythplugins directory:
 
 
-       $ cd ~/mythplugins-0.20
+       $ cd ~/mythplugins-0.20.2
 
 
 
@@ -6176,7 +6163,7 @@
 
   +o  taglib
 
-  +o  libvorbis-devel
+  +o  libogg and libvorbis
 
   +o  FLAC
 
@@ -6219,6 +6206,10 @@
 
 
 
+  Download libogg and libvorbis from http://www.xiph.org/downloads
+  <http://www.xiph.org/downloads> and install in a similar manner to the
+  above packages.
+
   Download FLAC from http://flac.sourceforge.net
   <http://flac.sourceforge.net> and install:
 
@@ -6255,18 +6246,17 @@
   alpha9.8.src.tgz>.
 
 
-
-  $ tar -xzf cdparanoia-III-alpha9.8.src.tgz
-  $ cd cdparanoia-III-alpha9.8
-  $ ./configure
-  $ make
-  $ su
-  # make install
-  # cd /usr/lib
-  # ln -sf libcdda_interface.so.0.9.8 libcdda_interface.so
-  # ln -sf libcdda_paranoia.so.0.9.8 libcdda_paranoia.so
-  # exit
-  $
+       $ tar -xzf cdparanoia-III-alpha9.8.src.tgz
+       $ cd cdparanoia-III-alpha9.8
+       $ ./configure
+       $ make
+       $ su
+       # make install
+       # cd /usr/lib
+       # ln -sf libcdda_interface.so.0.9.8 libcdda_interface.so
+       # ln -sf libcdda_paranoia.so.0.9.8 libcdda_paranoia.so
+       # exit
+       $
 
 
 
@@ -6315,8 +6305,9 @@
   fftw may be obtained from http://www.fftw.org/ <http://www.fftw.org/>.
   In Mandriva it may be installed by typing:
 
+  # urpmi libfftw2 libfftw2-devel
 
-       # urpmi libfftw2 libfftw2-devel
+
 
   OpenGL should be installed on practically all distributions.  However,
   you will need the devel module.  In Mandriva it may be installed by
@@ -6370,7 +6361,7 @@
 
 
 
-  $ cd ~/mythplugins-0.20
+  $ cd ~/mythplugins-0.20.2
   $ ./configure --disable-all --enable-mythmusic --enable-fftw --enable-sdl --enable-aac
   $ qmake mythplugins.pro
   $ make
@@ -6516,7 +6507,7 @@
 
 
 
-       $ cd ~/mythplugins-0.20
+       $ cd ~/mythplugins-0.20.2
        $ ./configure --disable-all --enable-mythweather
        $ qmake mythplugins.pro
        $ make
@@ -6573,7 +6564,7 @@
 
 
 
-       $ cd ~/mythplugins-0.20
+       $ cd ~/mythplugins-0.20.2
        $ ./configure --disable-all --enable-mythvideo
        $ qmake mythplugins.pro
        $ make
@@ -6676,7 +6667,7 @@
   reader.
 
 
-       $ cd ~/mythplugins-0.20
+       $ cd ~/mythplugins-0.20.2
        $ ./configure --disable-all --enable-mythnews
        $ qmake mythplugins.pro
        $ make

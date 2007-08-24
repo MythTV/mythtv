@@ -34,7 +34,7 @@ keep up to date with the current status of the code.  Code obtained from
 subversion has no guarantees regarding stability, etc.</CAPTION>
 </FIGURE>
 </P>
-<P>If you are in North America you will use the DataDirect grabber which is
+<P>If you are in North America you will use the Schedules Direct grabber which is
 built-in to MythTV.  You <EM>do not</EM> need to install XMLTV (so you may
 skip XMLTV-related instructions), but you need <B>wget</B> version 1.9.1
 or higher.</P>
@@ -135,7 +135,7 @@ does not have <B>XMLTV</B>, so you may install the XMLTV prerequisites by typing
 <A NAME="untarring_xmltv"></A> Untar the xmltv file:
 <BLOCKQUOTE><CODE>
 <PRE>
-$ tar -xjf xmltv-0.5.44.tar.bz2
+$ tar -xjf xmltv-0.5.48.tar.bz2
 </PRE>
 </CODE></BLOCKQUOTE>
 
@@ -159,7 +159,7 @@ cpan> exit
 <P>Change to the XMLTV directory and compile it:
 <BLOCKQUOTE><CODE>
 <PRE>
-$ cd xmltv-0.5.44
+$ cd xmltv-0.5.48
 $ perl Makefile.PL
 </PRE>
 </CODE></BLOCKQUOTE>
@@ -180,38 +180,20 @@ $ su
 </CODE></BLOCKQUOTE>
 </P>
 
-<H2><A NAME="ConfigureDD"></A> <A NAME="ss5.3">5.3</A> <A HREF="mythtv-HOWTO.html#toc5.3">Configuring the Zap2It.com DataDirect service </A>
+<H2><A NAME="ConfigureSD"></A> <A NAME="ss5.3">5.3</A> <A HREF="mythtv-HOWTO.html#toc5.3">Configuring the Schedules Direct service </A>
 </H2>
 
-<P>Zap2It DataDirect is a service provided by Zap2It, a subsidiary of
-Tribune Media Services.  TMS is one of the primary providers for program
-listing data in the United States and Canada.  There are a number of
-advantages to using DataDirect rather than the standard XMLTV
-<CODE>tv_grab_na</CODE> grabber.</P>
-<P>
-<UL>
-<LI>The <CODE>tv_grab_na</CODE> grabber is no longer supported and will not be
-fixed when problems occur.</LI>
-<LI>It's much faster, because the grabber isn't downloading hundreds of
-HTML pages and trying to parse the program data out of the HTML.</LI>
-<LI>It contains more program information.</LI>
-<LI>It's easier on the Zap2It servers, since they're not generating
-hundreds of custom HTML pages when you scrape their listings.</LI>
-<LI>The service is available free of charge by periodically filling in
-surveys similar to the one presented during registration, and the data
-provider has no intention of charging for it in the future.</LI>
-</UL>
-</P>
-<P>If you wish to use Zap2It DataDirect, you'll need to establish a user
+<P>As of 2007-09-01, Tribune Media Services will no longer offer free guide
+data.  Schedules Direct is a non-profit organization which has licensed the
+data to make it available to users of Freeware and Open Source applications.</P>
+<P>If you wish to use Schedules Direct, you'll need to establish a user
 account.  Go to 
-<A HREF="http://labs.zap2it.com">http://labs.zap2it.com</A> and click on the "New User? Sign Up" link. 
-Read the license terms, and if you agree with them click "Accept".  The next
-screen is the subscription registration.  In the "Certificate Code" field,
-enter <B>ZIYN-DQZO-SBUT</B>.</P>
-<P>Fill in the survey, then proceed to the lineup choices and configure your
-account for your particular location and the channels that you have.  This
-configuration will be imported into MythTV when you first run the
-<B>mythtv-setup</B> program.</P>
+<A HREF="http://www.schedulesdirect.org">http://www.schedulesdirect.org</A> and click on the "Membership" link. </P>
+<P>Once you've read and agreed to the Subscriber Agreement, Terms of Use and
+Privacy Policy proceed to the lineup choices and configure your account for
+your particular location and the channels that you have.  This configuration
+will be imported into MythTV when you first run the <B>mythtv-setup</B>
+program.</P>
 <P>
 <A NAME="manually_building_mythtv"></A> </P>
 <H2><A NAME="ss5.4">5.4</A> <A HREF="mythtv-HOWTO.html#toc5.4">Manually building MythTV</A>
@@ -234,8 +216,8 @@ $ cd mythtv
 <P>If you are using the tarball, then unpack it:
 <BLOCKQUOTE><CODE>
 <PRE>
-$ tar -xjf mythtv-0.20.tar.bz2
-$ cd mythtv-0.20
+$ tar -xjf mythtv-0.20.2.tar.bz2
+$ cd mythtv-0.20.2
 $ ./configure
 </PRE>
 </CODE></BLOCKQUOTE>

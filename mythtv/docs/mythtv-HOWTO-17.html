@@ -23,7 +23,7 @@ instructions for manually compiling and installing the software.</P>
 <UL>
 <LI>MAD</LI>
 <LI>taglib</LI>
-<LI>libvorbis-devel</LI>
+<LI>libogg and libvorbis</LI>
 <LI>FLAC</LI>
 <LI>libcdaudio</LI>
 <LI>CDParanoia</LI>
@@ -65,6 +65,9 @@ $ su
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
+<P>Download libogg and libvorbis from 
+<A HREF="http://www.xiph.org/downloads">http://www.xiph.org/downloads</A> and install in a similar manner
+to the above packages.</P>
 <P>Download FLAC from 
 <A HREF="http://flac.sourceforge.net">http://flac.sourceforge.net</A> and install:
 <BLOCKQUOTE><CODE>
@@ -221,7 +224,7 @@ compiling MythMusic.</P>
 <P>
 <BLOCKQUOTE><CODE>
 <PRE>
-$ cd ~/mythplugins-0.20
+$ cd ~/mythplugins-0.20.2
 $ ./configure --disable-all --enable-mythmusic --enable-fftw --enable-sdl --enable-aac
 $ qmake mythplugins.pro
 $ make
