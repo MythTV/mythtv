@@ -1667,7 +1667,7 @@
   or higher.
 
   Get XMLTV from http://xmltv.sourceforge.net
-  <http://xmltv.sourceforge.net>.  Download the latest version (0.5.44).
+  <http://xmltv.sourceforge.net>.  Download the latest version (0.5.48).
 
 
   ______________________________________________________________________
@@ -6502,6 +6502,10 @@
 
   [1m18.  MythWeather.[0m
 
+  [1mNOTE[22m:  As of MythTV v0.20.2, MythWeather is disabled because it no
+  longer works correctly.  A working version of MythWeather can be found
+  in svn.
+
   MythWeather is a part of the [1mmythplugins [22mpackage.  See ``MythPlugins''
   for instructions on downloading the tarball.
 
@@ -6550,10 +6554,11 @@
   wish to see additional debugging information while MythWeather is
   running, run mythweather from the command line with as mythweather
   --debug
-
   You may also force mythweather to re-run the configuration by starting
   it on the command line as mythweather --configure.  These two options
   are mutually exclusive.
+
+
   [1m19.  MythVideo.[0m
 
   MythVideo is a part of the [1mmythplugins [22mpackage.  See ``MythPlugins''
@@ -6617,12 +6622,12 @@
   VCD playing.  You may remove these options if you don't need them.
 
 
-  $ cd ~/mythplugins-0.20
-  $ ./configure --disable-all --enable-mythdvd --enable-transcode --enable-vcd
-  $ qmake mythplugins.pro
-  $ make
-  $ su
-  # make install
+       $ cd ~/mythplugins-0.20
+       $ ./configure --disable-all --enable-mythdvd --enable-transcode --enable-vcd
+       $ qmake mythplugins.pro
+       $ make
+       $ su
+       # make install
 
 
 
@@ -6673,7 +6678,6 @@
        $ make
        $ su
        # make install
-
 
 
   [1m22.  Troubleshooting.[0m

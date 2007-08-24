@@ -1189,7 +1189,7 @@ skip XMLTV-related instructions), but you need <bf>wget</bf> version 1.9.1
 or higher.
 
 Get XMLTV from <url url="http://xmltv.sourceforge.net"
-name="http://xmltv.sourceforge.net">.  Download the latest version (0.5.44).
+name="http://xmltv.sourceforge.net">.  Download the latest version (0.5.48).
 
 <code>
 NOTE for Mandriva users:  If you have added a "PLF" mirror, you may skip the
@@ -5563,8 +5563,11 @@ been deleted the stale information will be gone and your local database
 will be rebuilt as you use CDs.
 
 <sect>MythWeather.
+<p><bf>NOTE</bf>:  As of MythTV v0.20.2, MythWeather is disabled because it
+no longer works correctly.  A working version of MythWeather can be found in
+svn.
 
-<p>MythWeather is a part of the <bf>mythplugins</bf> package.  See <ref
+MythWeather is a part of the <bf>mythplugins</bf> package.  See <ref
 id="mythplugins_" name="MythPlugins"> for instructions on downloading the
 tarball.
 
@@ -7684,7 +7687,10 @@ v0.20.20, 2007-04-11.  Update Storage Directory text, add an update to the
 LVM section that SG's are better.
 v0.20.21, 2007-06-07.  Add link to books on MythTV.
 v0.20.22, 2007-06-11.  Update link to ATSC devices on linuxtv.org (D. Hugh Redelmeier)
-v0.20.23, 2007-08-24.  Update information on Schedules Direct.  Update version for XMLTV.  Change version numbers.
+v0.20.23, 2007-08-24.  Update information on Schedules Direct.  Update
+version for XMLTV.  Change version numbers.  Add note about MythWeather
+being disabled becuase it's broken.
+
 -->
 
 <!--
