@@ -3382,6 +3382,8 @@ void PlaybackBox::doEditScheduled()
         connected = FillList();
         delete t_pginfo;
     }
+
+    EmbedTVWindow();
 }    
 
 void PlaybackBox::doJobQueueJob(int jobType, int jobFlags)
