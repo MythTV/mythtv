@@ -4,8 +4,8 @@ isEmpty( PREFIX ) {
     PREFIX = /usr/local
 }
 
-LIBVERSION = 0.20.1
-VERSION = 0.20.1
+LIBVERSION = 0.20.2
+VERSION = 0.20.2
 
 # Die on the (common) case where OS X users inadvertently use Fink's
 # Qt/X11 install instead of Qt/Mac. '
