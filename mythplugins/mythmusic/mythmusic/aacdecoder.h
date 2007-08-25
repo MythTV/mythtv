@@ -15,6 +15,7 @@
 
 #include <mp4ff.h>
 
+
 class Metadata;
 
 class aacDecoder : public Decoder
@@ -50,7 +51,7 @@ class aacDecoder : public Decoder
     bool done, finish;
     long len, bitrate;
     uchar channels;
-    uint32_t sample_rate;
+    unsigned long sample_rate;
     unsigned long output_size;
     double totalTime, seekTime;
 

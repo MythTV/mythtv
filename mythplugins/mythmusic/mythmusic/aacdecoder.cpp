@@ -289,7 +289,7 @@ bool aacDecoder::initializeMP4()
     //
 
     unsigned char *buffer = NULL;
-    uint32_t buffer_size;
+    uint buffer_size;
 
     mp4ff_get_decoder_config(
                                 mp4_input_file, 
@@ -299,6 +299,9 @@ bool aacDecoder::initializeMP4()
                             );    
     
     if (faacDecInit2(decoder_handle, buffer, buffer_size,
+#ifdef FAAD_MODIFIED
+                     (uint32_t*)
+#endif
                      &sample_rate, &channels) < 0)
     {
         error("aacDecoder: error in second stage initialization");
@@ -396,7 +399,7 @@ int aacDecoder::getAACTrack(mp4ff_t *infile)
     for (i = 0; i < numTracks; i++)
     {
         unsigned char *buff = NULL;
-        uint32_t buff_size = 0;
+        uint buff_size = 0;
         mp4AudioSpecificConfig mp4ASC;
 
         mp4ff_get_decoder_config(infile, i, &buff, &buff_size);
@@ -471,7 +474,7 @@ void aacDecoder::run()
     total_numb_samples = mp4ff_num_samples(mp4_input_file, aac_track_number);
     current_sample = -1;
     uchar *buffer;
-    uint32_t buffer_size;
+    uint  buffer_size;
 
     while (!done && !finish && !user_stop) 
     {
