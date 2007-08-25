@@ -201,11 +201,35 @@
   </buttondef>
 
   <buttondef name="NETFLIX">
-	  <image>text-blank.png</image>
-          <watermarkimage>watermark/cd.png</watermarkimage>
-	  <offset>0,0</offset>
+    <image>text-blank.png</image>
+    <watermarkimage>watermark/cd.png</watermarkimage>
+    <offset>0,0</offset>
   </buttondef>
   
+  <buttondef name="NETFLIX_QUEUE">
+    <image>text-blank.png</image>
+    <watermarkimage>watermark/cd.png</watermarkimage>
+    <offset>0,0</offset>
+  </buttondef>
+
+  <buttondef name="NETFLIX_BROWSE">
+    <image>text-blank.png</image>
+    <watermarkimage>watermark/cd.png</watermarkimage>
+    <offset>0,0</offset>
+  </buttondef>
+
+  <buttondef name="NETFLIX_HISTORY">
+    <image>text-blank.png</image>
+    <watermarkimage>watermark/cd.png</watermarkimage>
+    <offset>0,0</offset>
+  </buttondef>
+
+  <buttondef name="SETTINGS_NETFLIX">
+    <image>text-blank.png</image>
+    <watermarkimage>watermark/cd.png</watermarkimage>
+    <offset>0,0</offset>
+  </buttondef>
+
   <buttondef name="WEBPAGE">
     <image>text-blank.png</image>
     <watermarkimage>watermark/globe.png</watermarkimage>

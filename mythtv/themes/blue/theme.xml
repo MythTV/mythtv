@@ -316,6 +316,26 @@
     <offset>20,10</offset>
   </buttondef>
 
+  <buttondef name="NETFLIX_QUEUE">
+    <image>watch_dvd.png</image>
+    <offset>20,10</offset>
+  </buttondef>
+ 
+  <buttondef name="NETFLIX_BROWSE">
+    <image>watch_dvd.png</image>
+    <offset>20,10</offset>
+  </buttondef>
+ 
+  <buttondef name="NETFLIX_HISTORY">
+    <image>watch_dvd.png</image>
+    <offset>20,10</offset>
+  </buttondef>
+
+  <buttondef name="SETTINGS_NETFLIX">
+    <image>watch_dvd.png</image>
+    <offset>20,10</offset>
+  </buttondef>
+
 <!-- #####################################-->
 <!-- ########  main_settings.xml  ########-->
 <!-- #####################################-->
