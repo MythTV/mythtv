@@ -296,13 +296,18 @@ bool aacDecoder::initializeMP4()
                                 aac_track_number, 
                                 &buffer, 
                                 &buffer_size
-                            );    
-    
-    if (faacDecInit2(decoder_handle, buffer, buffer_size,
+                            );
+// some linux distros (gentoo, debian) modify the faad2 api with stdint.h types
+// instead of unsigned long int
 #ifdef FAAD_MODIFIED
-                     (uint32_t*)
-#endif
+    uint32_t srate_tmp;
+    int err = faacDecInit2(decoder_handle, buffer, buffer_size, &srate_tmp, &channels);
+    sample_rate = srate_tmp;
+    if (err < 0)
+#else
+    if (faacDecInit2(decoder_handle, buffer, buffer_size,
                      &sample_rate, &channels) < 0)
+#endif
     {
         error("aacDecoder: error in second stage initialization");
         faacDecClose(decoder_handle);
