@@ -713,7 +713,7 @@ void Playlist::fillSonglistFromQuery(QString whereClause,
 void Playlist::fillSongsFromCD()
 {
     for (int i = 1; i <= all_available_music->getCDTrackCount(); i++)
-       addTrack(-1 * i, true, true);
+       addTrack(-1 * i, false, true);
 }
 
 void Playlist::fillSonglistFromSmartPlaylist(QString category, QString name,

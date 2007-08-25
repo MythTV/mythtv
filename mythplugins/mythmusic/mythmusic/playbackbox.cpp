@@ -957,7 +957,7 @@ void PlaybackBoxMusic::occasionallyCheckCD()
         all_playlists->clearCDList();
         all_playlists->getActive()->ripOutAllCDTracksNow();
 
-        if(all_music->getCDTrackCount())
+        if (all_music->getCDTrackCount())
         {
             visual_mode_timer->stop();
 
@@ -966,7 +966,7 @@ void PlaybackBoxMusic::occasionallyCheckCD()
 
         }
 
-            postUpdate();
+        postUpdate();
     }
 
     if (scan_for_cd && !cd_reader_thread->running())
@@ -1855,6 +1855,10 @@ void PlaybackBoxMusic::editPlaylist()
     visual_mode_timer->stop();
     DatabaseBox dbbox(all_playlists, all_music, gContext->GetMainWindow(),
                       m_CDdevice, "music_select", "music-", "database box");
+
+    if (cd_watcher)
+        cd_watcher->stop();
+
     dbbox.exec();
     if (visual_mode_delay > 0)
         visual_mode_timer->start(visual_mode_delay * 1000);
@@ -1878,6 +1882,9 @@ void PlaybackBoxMusic::editPlaylist()
         music_tree_list->moveToNodesFirstChild(branches_to_current_node);
     }
     music_tree_list->refresh();
+
+    if (scan_for_cd && cd_watcher)
+        cd_watcher->start(1000);
 }
 
 void PlaybackBoxMusic::closeEvent(QCloseEvent *event)
