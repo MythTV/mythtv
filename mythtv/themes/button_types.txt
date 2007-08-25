@@ -75,6 +75,12 @@ media_settings.xml
       6. SETTINGS_BURN
       7. SETTINGS_ARCHIVE
 
+netflix_menu.xml
+
+      1. NETFLIX_QUEUE
+      2. NETFLIX_BROWSE
+      3. NETFLIX_HISTORY
+
 optical_menu.xml
 
       1. DVD_PLAY
