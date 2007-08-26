@@ -31,7 +31,7 @@
 #******************************************************************************
 
 # version of script - change after each update
-VERSION="0.1.20070826-1"
+VERSION="0.1.20070826-2"
 
 
 ##You can use this debug flag when testing out new themes
@@ -45,7 +45,7 @@ debug_secondrunthrough = False
 defaultEncodingProfile = "SP"
 
 # add audio sync offset when re-muxing
-useSyncOffset = False
+useSyncOffset = True
 
 #*********************************************************************************
 #Dont change the stuff below!!
