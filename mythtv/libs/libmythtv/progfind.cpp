@@ -47,7 +47,10 @@ void RunProgramFind(bool thread, bool ggActive)
     if (gContext->GetLanguage() == "ja")
         programFind = new JaProgFinder(gContext->GetMainWindow(),
                                        "program finder", ggActive);
-    else
+    else if (gContext->GetLanguage() == "he")
+        programFind = new HeProgFinder(gContext->GetMainWindow(),
+                                     "program finder", ggActive);
+    else // default
         programFind = new ProgFinder(gContext->GetMainWindow(),
                                      "program finder", ggActive);
 
@@ -998,7 +1001,7 @@ void ProgFinder::showShowingList()
     update(infoRect);
     update(listRect);
 }
-
+ 
 void ProgFinder::selectSearchData()
 {
     if (running == false)
@@ -1555,5 +1558,90 @@ void JaProgFinder::getAllProgramData()
         getSearchData(charNum);
     }
 }
+
+// Hebrew specific program finder
+
+// Hebrew alphabet list and more
+const char* HeProgFinder::searchChars[] = {
+    "א", "ב", "ג", "ד", "ה", "ו", "ז", "ח", "ט", "י", "כ", "ל", "מ",
+    "נ", "ס", "ע", "פ", "צ", "ק", "ר", "ש", "ת", "E", "#", 0, 
+};
+
+HeProgFinder::HeProgFinder(MythMainWindow *parent, const char *name, bool gg)
+            : ProgFinder(parent, name, gg)
+{
+    for (numberOfSearchChars = 0; searchChars[numberOfSearchChars];
+         numberOfSearchChars++)
+        ;
+
+    searchCount = numberOfSearchChars;
+    curSearch = 0;
+}
+
+void HeProgFinder::fillSearchData()
+{
+    int curLabel = 0;
+    for (int charNum = 0; charNum < searchCount; charNum++)
+    {
+        gotInitData[curLabel] = 0;
+        searchData[curLabel] = QString::fromUtf8(searchChars[charNum]);
+        curLabel++;
+    }
+}
+
+// search by hebrew aleph-bet
+// # for all numbers, E for all latin
+void HeProgFinder::whereClauseGetSearchData(int charNum, QString &where,
+                                            MSqlBindings &bindings)
+{
+    QDateTime progStart = QDateTime::currentDateTime();
+
+    where = "SELECT DISTINCT title FROM program ";
+
+    if (searchData[charNum].contains('E'))
+    {
+        where += "WHERE ( title REGEXP '^[A-Z]') ";
+    }
+    else if (searchData[charNum].contains('#'))
+    {
+        where += "WHERE ( title REGEXP '^[0-9]') ";
+    }
+    else 
+    {
+        QString one = searchData[charNum] + "%";
+        bindings[":ONE"] = one.local8Bit(); 
+        where += "WHERE ( title LIKE :ONE ) ";
+    }
+
+    where += "AND starttime > :STARTTIME ORDER BY title;";
+    bindings[":STARTTIME"] = progStart.toString("yyyy-MM-ddThh:mm:50");
+}
+
+bool HeProgFinder::formatSelectedData(QString& data)
+{
+    (void)data;
+    return true;
+}
+
+bool HeProgFinder::formatSelectedData(QString& data, int charNum)
+{
+    (void)data;
+    (void)charNum;
+    return true;
+}
+
+void HeProgFinder::restoreSelectedData(QString& data)
+{
+    (void)data;
+}
+
+void HeProgFinder::getAllProgramData()
+{
+    for (int charNum = 0; charNum < searchCount; charNum++)
+    {
+        getSearchData(charNum);
+    }
+}
+
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

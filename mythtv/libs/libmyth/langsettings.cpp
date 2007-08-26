@@ -158,11 +158,12 @@ QStringList LanguageSettings::getLanguages(void)
               << "ZH_TW"                                // Traditional Chinese
           << QString::fromUtf8("Eesti")       << "ET"   // Estonian
           << QString::fromUtf8("Português Brasileiro")
-              << "PT_BR"                               // Brazilian Portuguese
+              << "PT_BR"                                // Brazilian Portuguese
           << QString::fromUtf8("English (British)") << "EN_GB"   // British English
-          << QString::fromUtf8("Česky")       << "CZ"    // Czech
-          << QString::fromUtf8("Türkçe")      << "TR"   // Turkish
-          << QString::fromUtf8("Русский")    << "RU";     // Russian
+          << QString::fromUtf8("Česky")      << "CZ"   // Czech
+          << QString::fromUtf8("Türkçe")    << "TR"   // Turkish
+          << QString::fromUtf8("Русский")    << "RU"     // Russian
+          << QString::fromUtf8("עברית")  << "HE";  // Hebrew
     return langs;
 }
 

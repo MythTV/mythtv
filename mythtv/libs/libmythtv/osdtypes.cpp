@@ -738,7 +738,47 @@ void OSDTypeText::SetAltFont(TTFFont *font)
 
 void OSDTypeText::SetText(const QString &text)
 {
-    m_message = text;
+    QChar::Direction text_dir;
+    QStringList rtl_string_composer;
+    bool handle_rtl(false);
+    QChar prev_char;
+
+    //Handling Right-to-Left languages.
+    //Left-to-Right languages are not affected.
+    for (int i = (int)text.length() - 1; i >= 0; i--)
+    {
+        text_dir = text[i].direction();
+        if (text_dir != QChar::DirR && 
+                text_dir != QChar::DirRLE && text_dir != QChar::DirRLO)
+        {
+            if (handle_rtl || rtl_string_composer.empty())
+                rtl_string_composer.append(QString());
+
+            if (text[i].isSpace() && !prev_char.isNull()
+                    && prev_char.isDigit() && handle_rtl)
+                rtl_string_composer.back().append(text[i]);
+            else
+                rtl_string_composer.back().prepend(text[i]);
+
+            prev_char = text[i];
+
+            if (handle_rtl)
+                handle_rtl = false;
+        }
+        else
+        {
+            if (!handle_rtl)
+            {
+                rtl_string_composer.append(QString());
+                handle_rtl = true;
+                prev_char = QChar();
+            }
+            rtl_string_composer.back().append(text[i]);
+        }
+    }
+
+    m_message = rtl_string_composer.join("");
+
     m_cursorpos = text.length();
     m_scrollinit = false;
 }

@@ -1046,6 +1046,10 @@ void UIListType::Draw(QPainter *dr, int drawlayer, int context)
             {
                 int offsetRight = 0;
                 int offsetLeft = 0;
+                int caw = columnWidth[j];
+
+                if (caw == 0)
+                    caw = m_area.width();
 
                 if (j > 1 && lastShown == true)
                     left = left + columnWidth[j - 1] + m_pad;
@@ -1095,7 +1099,6 @@ void UIListType::Draw(QPainter *dr, int drawlayer, int context)
                         tempWrite = "";
 
 
-
                     if (drawFontShadow &&
                         (fontdrop.x() != 0 || fontdrop.y() != 0))
                     {
@@ -1104,17 +1107,14 @@ void UIListType::Draw(QPainter *dr, int drawlayer, int context)
                                         (int)(2 * m_wmult)));
                         dr->drawText((int)(left + fontdrop.x()) + offsetLeft,
                                      (int)(m_area.top() + (int)(i*m_selheight) +
-                                     fontdrop.y()), m_area.width() - offsetRight, m_selheight,
+                                     fontdrop.y()), caw - offsetRight, m_selheight,
                                      m_justification, tempWrite);
                     }
                     dr->setBrush(tmpfont->color);
                     dr->setPen(QPen(tmpfont->color, (int)(2 * m_wmult)));
 
-
-
-
                     dr->drawText(left + offsetLeft, m_area.top() + (int)(i*m_selheight),
-                                 m_area.width() - offsetRight, m_selheight, m_justification,
+                                 caw - offsetRight, m_selheight, m_justification,
                                  tempWrite);
                     dr->setFont(tmpfont->face);
                     if (m_debug == true)
@@ -1162,6 +1162,10 @@ void UIListType::Draw(QPainter *dr, int drawlayer, int context)
         {
             int offsetRight = 0;
             int offsetLeft = 0;
+            int caw = columnWidth[j];
+
+            if (caw == 0)
+                caw = m_area.width();
 
             if (j > 1 && lastShown == true)
                 left = left + columnWidth[j - 1] + m_pad;
@@ -1214,14 +1218,14 @@ void UIListType::Draw(QPainter *dr, int drawlayer, int context)
                      dr->setPen(QPen(tmpfont->dropColor, (int)(2 * m_wmult)));
                      dr->drawText((int)(left + fontdrop.x()) + offsetLeft,
                                   (int)(m_area.top() + (int)(i*m_selheight) +
-                                  fontdrop.y()), m_area.width() - offsetRight, m_selheight,
+                                  fontdrop.y()), caw - offsetRight, m_selheight,
                                   m_justification, tempWrite);
                  }
                  dr->setBrush(tmpfont->color);
                  dr->setPen(QPen(tmpfont->color, (int)(2 * m_wmult)));
 
                  dr->drawText(left + offsetLeft, m_area.top() + (int)(i*m_selheight),
-                              m_area.width() - offsetRight, m_selheight, m_justification,
+                              caw - offsetRight, m_selheight, m_justification,
                               tempWrite);
 
                  dr->setFont(tmpfont->face);

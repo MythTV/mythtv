@@ -9,7 +9,6 @@
         Note: Portions of this code taken from MythMusic
 */
 
-
 #ifndef PROGFIND_H_
 #define PROGFIND_H_
 
@@ -128,6 +127,25 @@ class JaProgFinder : public ProgFinder
 {
   public:
     JaProgFinder(MythMainWindow *parent, const char *name = 0, bool gg=false);
+
+  protected:
+    virtual void fillSearchData();
+    virtual void getAllProgramData();
+    virtual bool formatSelectedData(QString &data);
+    virtual bool formatSelectedData(QString &data, int charNum);
+    virtual void restoreSelectedData(QString &data);
+    virtual void whereClauseGetSearchData(int canNum, QString &where,
+                                          MSqlBindings &bindings);
+
+  private:
+    static const char* searchChars[];
+    int numberOfSearchChars;
+};
+
+class HeProgFinder : public ProgFinder
+{
+  public:
+    HeProgFinder(MythMainWindow *parent, const char *name = 0, bool gg=false);
 
   protected:
     virtual void fillSearchData();
