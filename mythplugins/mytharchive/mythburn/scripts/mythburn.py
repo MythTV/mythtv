@@ -31,7 +31,7 @@
 #******************************************************************************
 
 # version of script - change after each update
-VERSION="0.1.20070805-1"
+VERSION="0.1.20070826-1"
 
 
 ##You can use this debug flag when testing out new themes
@@ -56,8 +56,7 @@ import Image, ImageDraw, ImageFont, ImageColor
 import MySQLdb, codecs
 import time, datetime, tempfile
 from fcntl import ioctl
-from CDROM import CDROMEJECT
-from CDROM import CDROMCLOSETRAY
+import CDROM
 from shutil import copy
 
 # media types (should match the enum in mytharchivewizard.h)
@@ -2088,35 +2087,60 @@ def BurnDVDISO():
     write( "Burning ISO image to %s" % dvddrivepath)
     checkCancelFlag()
 
-    if mediatype == DVD_RW and erasedvdrw == True:
-        command = path_growisofs[0] + " -dvd-compat -use-the-force-luke -Z " + dvddrivepath + \
-                  " -dvd-video -V 'MythTV DVD' " + os.path.join(getTempPath(),'dvd')
-    else:
-        command = path_growisofs[0] + " -dvd-compat -Z " + dvddrivepath + \
-                  " -dvd-video -V 'MythTV DVD' " + os.path.join(getTempPath(),'dvd')
-
-    if os.system(command) != 0:
-        write("ERROR: Retrying to start growisofs after reload.")
+    finished = False
+    tries = 0
+    while not finished and tries < 10:
         f = os.open(dvddrivepath, os.O_RDONLY | os.O_NONBLOCK)
-        r = ioctl(f,CDROMEJECT, 0)
-        os.close(f)
-        f = os.open(dvddrivepath, os.O_RDONLY | os.O_NONBLOCK)
-        r = ioctl(f,CDROMCLOSETRAY, 0)
-        os.close(f)
-        result = os.system(command)
-        if result != 0:
-            write("-"*60)
-            write("ERROR: Failed while running growisofs")
-            write("Result %d, Command was: %s" % (result, command))
-            write("Please check the troubleshooting section of the README for ways to fix this error")
-            write("-"*60)
-            write("")
-            sys.exit(1)
+        drivestatus = ioctl(f,CDROM.CDROM_DRIVE_STATUS, 0)
+        os.close(f);
 
-    # eject the burned disc
-    f = os.open(dvddrivepath, os.O_RDONLY | os.O_NONBLOCK)
-    r = ioctl(f,CDROMEJECT, 0)
-    os.close(f)
+        if drivestatus == CDROM.CDS_DISC_OK or drivestatus == CDROM.CDS_NO_INFO:
+            if mediatype == DVD_RW and erasedvdrw == True:
+                command = path_growisofs[0] + " -dvd-compat -use-the-force-luke -Z " + dvddrivepath + \
+                          " -dvd-video -V 'MythTV DVD' " + os.path.join(getTempPath(),'dvd')
+            else:
+                command = path_growisofs[0] + " -dvd-compat -Z " + dvddrivepath + \
+                          " -dvd-video -V 'MythTV DVD' " + os.path.join(getTempPath(),'dvd')
+
+            write("Running growisofs to burn DVD")
+
+            result = runCommand(command)
+            if result != 0:
+                write("-"*60)
+                write("ERROR: Failed while running growisofs.")
+                write("Result %d, Command was: %s" % (result, command))
+                write("Please check the troubleshooting section of the README for ways to fix this error")
+                write("-"*60)
+                write("")
+                sys.exit(1)
+            finished = True
+
+            # eject the burned disc
+            f = os.open(dvddrivepath, os.O_RDONLY | os.O_NONBLOCK)
+            r = ioctl(f,CDROM.CDROMEJECT, 0)
+            os.close(f)
+        elif drivestatus == CDROM.CDS_TRAY_OPEN:
+            # Give the user 10secs to close the Tray
+            write("Waiting for tray to close.")
+            time.sleep(10)
+        elif drivestatus == CDROM.CDS_NO_DISC:
+            # Open the Tray, if there is one.
+            write("Opening tray to get it fed with a DVD.")
+            f = os.open(dvddrivepath, os.O_RDONLY | os.O_NONBLOCK)
+            ioctl(f,CDROM.CDROMEJECT, 0)
+            os.close(f);
+        elif drivestatus == CDROM.CDS_DRIVE_NOT_READY:
+            # Try a hard reset
+            write("Trying a hard-reset of the device")
+            f = os.open(dvddrivepath, os.O_RDONLY | os.O_NONBLOCK)
+            ioctl(f,CDROM.CDROMEJECT, 0)
+            os.close(f);
+
+        time.sleep(1)
+        tries += 1
+
+    if not finished:
+        fatalError("Tried 10 times to get a good status from DVD drive - Giving up!")
 
     write("Finished burning ISO image")
 
