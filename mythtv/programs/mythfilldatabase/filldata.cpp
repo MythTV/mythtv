@@ -3111,6 +3111,8 @@ bool fillData(QValueList<Source> &sourcelist)
                         VERBOSE(VB_GENERAL,
                             "Data Refresh always needed for tomorrow");
                     }
+
+                    download_needed = true;
                 }
                 else
                 {
