@@ -31,7 +31,7 @@
 #******************************************************************************
 
 # version of script - change after each update
-VERSION="0.1.20070826-2"
+VERSION="0.1.20070826-3"
 
 
 ##You can use this debug flag when testing out new themes
@@ -46,6 +46,10 @@ defaultEncodingProfile = "SP"
 
 # add audio sync offset when re-muxing
 useSyncOffset = True
+
+# if the theme doesn't have a chapter menu and this is set to true then the
+# chapter marks will be set to the cut point end marks
+addCutlistChapters = False
 
 #*********************************************************************************
 #Dont change the stuff below!!
@@ -665,6 +669,7 @@ def createVideoChapters(itemnum, numofchapters, lengthofvideo, getthumbnails):
     write( "Video length is %s seconds. Each chapter will be %s seconds" % (lengthofvideo,segment))
 
     chapters=""
+
     thumbList=""
     starttime=0
     count=1
@@ -680,7 +685,8 @@ def createVideoChapters(itemnum, numofchapters, lengthofvideo, getthumbnails):
             thumbList+="%s," % starttime
 
         if numofchapters>1:
-            chapters+="," 
+            chapters+=","
+
         starttime+=segment
         count+=1
 
@@ -693,8 +699,22 @@ def createVideoChapters(itemnum, numofchapters, lengthofvideo, getthumbnails):
 #############################################################
 # Creates some fixed length chapter marks
 
-def createVideoChaptersFixedLength(segment, lengthofvideo): 
-    """Returns chapter marks spaced segment seconds through the file"""
+def createVideoChaptersFixedLength(itemnum, segment, lengthofvideo): 
+    """Returns chapter marks at cut list ends, 
+       or evenly spaced chapters 'segment' seconds through the file"""
+
+
+    if addCutlistChapters == True:
+        # we've been asked to use the cut list as chapter marks
+        # so if there is a cut list available, use it
+
+        infoDOM = xml.dom.minidom.parse(os.path.join(getItemTempPath(itemnum),"info.xml"))
+        chapterlistNode = infoDOM.getElementsByTagName("chapterlist")
+        if chapterlistNode.length > 0:
+            chapterlist = getText(chapterlistNode[0])
+            write("Using commercial end marks - %s" % chapterlist)
+            return chapterlist
+
     if lengthofvideo < segment:
         return "00:00:00"
 
@@ -1310,7 +1330,7 @@ def getFileInformation(file, folder):
         node.appendChild(infoDOM.createTextNode(""))
         top_element.appendChild(node)
 
-        #if this a myth recording we still need to find the chanid, starttime and hascutlist
+        # if this a myth recording we still need to find the chanid, starttime and hascutlist
         if file.attributes["type"].value=="recording":
             basename = os.path.basename(file.attributes["filename"].value)
             sqlstatement  = """SELECT starttime, chanid FROM recorded 
@@ -1357,9 +1377,30 @@ def getFileInformation(file, folder):
                     node.appendChild(infoDOM.createTextNode("no"))
                     top_element.appendChild(node)
 
-                db.close()
-                del db
-                del cursor
+                # find the cut list end marks if available to use as chapter marks
+                if file.attributes["usecutlist"].value == "0" and addCutlistChapters == False:
+                    sqlstatement  = """SELECT mark, type FROM recordedmarkup 
+                                    WHERE chanid = '%s' AND starttime = '%s' 
+                                    AND type = 0 ORDER BY mark""" % (chanid, starttime)
+                    cursor = db.cursor()
+                    # execute SQL statement
+                    cursor.execute(sqlstatement)
+                    # get the resultset as a tuple
+                    result = cursor.fetchall()
+                    if cursor.rowcount > 0:
+                        res, fps, ar = getVideoParams(folder)
+                        chapterlist="00:00:00"
+                        #iterate through marks, adding to chapterlist
+                        for record in result:
+                            chapterlist += "," + frameToTime(int(record[0]), float(fps))
+
+                        node = infoDOM.createElement("chapterlist")
+                        node.appendChild(infoDOM.createTextNode(chapterlist))
+                        top_element.appendChild(node)
+
+                    db.close()
+                    del db
+                    del cursor
 
     elif file.attributes["type"].value=="recording":
         basename = os.path.basename(file.attributes["filename"].value)
@@ -1454,6 +1495,27 @@ def getFileInformation(file, folder):
                 node = infoDOM.createElement("hascutlist")
                 node.appendChild(infoDOM.createTextNode("no"))
                 top_element.appendChild(node)
+
+            if file.attributes["usecutlist"].value == "0" and addCutlistChapters == True:
+                # find the cut list end marks if available
+                sqlstatement  = """SELECT mark, type FROM recordedmarkup 
+                                    WHERE chanid = '%s' AND starttime = '%s' 
+                                    AND type = 0 ORDER BY mark""" % (chanid, starttime)
+                cursor = db.cursor()
+                # execute SQL statement
+                cursor.execute(sqlstatement)
+                # get the resultset as a tuple
+                result = cursor.fetchall()
+                if cursor.rowcount > 0:
+                    res, fps, ar = getVideoParams(folder)
+                    chapterlist="00:00:00"
+                    #iterate through marks, adding to chapterlist
+                    for record in result:
+                        chapterlist += "," + frameToTime(int(record[0]), float(fps))
+
+                    node = infoDOM.createElement("chapterlist")
+                    node.appendChild(infoDOM.createTextNode(chapterlist))
+                    top_element.appendChild(node)
 
         db.close()
         del db
@@ -2589,9 +2651,16 @@ def createDVDAuthorXML(screensize, numberofitems):
 
             vob = dvddom.createElement("vob")
             if wantChapterMenu:
-                vob.setAttribute("chapters",createVideoChapters(itemnum,chapters,getLengthOfVideo(itemnum),False) )
+                vob.setAttribute("chapters",
+                    createVideoChapters(itemnum,
+                                        chapters,
+                                        getLengthOfVideo(itemnum),
+                                        False))
             else:
-                vob.setAttribute("chapters", createVideoChaptersFixedLength(chapterLength, getLengthOfVideo(itemnum)))
+                vob.setAttribute("chapters", 
+                    createVideoChaptersFixedLength(itemnum,
+                                                   chapterLength, 
+                                                   getLengthOfVideo(itemnum)))
 
             vob.setAttribute("file",os.path.join(getItemTempPath(itemnum),"final.mpg"))
             pgc.appendChild(vob)
@@ -2838,7 +2907,9 @@ def createDVDAuthorXMLNoMenus(screensize, numberofitems):
 
         vob = dvddom.createElement("vob")
         vob.setAttribute("file", os.path.join(getItemTempPath(itemNum), "final.mpg"))
-        vob.setAttribute("chapters", createVideoChaptersFixedLength(chapterLength, getLengthOfVideo(itemNum)))
+        vob.setAttribute("chapters", createVideoChaptersFixedLength(itemNum,
+                                                                    chapterLength,
+                                                                    getLengthOfVideo(itemNum)))
         pgc.appendChild(vob)
 
         del vob
