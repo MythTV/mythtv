@@ -317,13 +317,6 @@ void VideoSelector::titleChanged(UIListBtnTypeItem *item)
 
 void VideoSelector::OKPressed()
 {
-    if (selectedList.count() == 0)
-    {
-        MythPopupBox::showOkPopup(gContext->GetMainWindow(), tr("Myth Archive"),
-            tr("You need to select at least one video file!"));
-        return;
-    }
-
     // remove all videos from archivelist
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("DELETE FROM archiveitems WHERE type = 'Video'");

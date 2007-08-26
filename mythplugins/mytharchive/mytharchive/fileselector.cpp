@@ -247,12 +247,10 @@ void FileSelector::OKPressed()
 {
     if (m_selectorType == FSTYPE_FILELIST)
     {
-        if (m_selectedList.count() == 0)
-        {
-            MythPopupBox::showOkPopup(gContext->GetMainWindow(), tr("Myth Archive"),
-                                    tr("You need to select at least one file!"));
-            return;
-        }
+        // remove all files from archivelist
+        MSqlQuery query(MSqlQuery::InitCon());
+        query.prepare("DELETE FROM archiveitems WHERE type = 'File'");
+        query.exec();
 
         // loop though selected files and add them to the archiveitems table
         QString s;
@@ -261,41 +259,29 @@ void FileSelector::OKPressed()
         {
             s = (*it);
 
-            //check this file is not already in the archiveitems table
-            MSqlQuery query(MSqlQuery::InitCon());
-            query.prepare("SELECT * FROM archiveitems WHERE filename = :FILENAME");
-            query.bindValue(":FILENAME", s);
-            query.exec();
-            if (query.isActive() && query.numRowsAffected())
+            QFile file(s);
+            if (file.exists())
             {
-                //already there
-            }
-            else
-            {
-                QFile file(s);
-                if (file.exists())
-                {
-                    QString title = s;
-                    int pos = s.findRev('/');
-                    if (pos > 0)
-                        title = s.mid(pos + 1);
+                QString title = s;
+                int pos = s.findRev('/');
+                if (pos > 0)
+                    title = s.mid(pos + 1);
 
-                    query.prepare("INSERT INTO archiveitems (type, title, subtitle,"
-                            "description, startdate, starttime, size, filename, hascutlist) "
-                            "VALUES(:TYPE, :TITLE, :SUBTITLE, :DESCRIPTION, :STARTDATE, "
-                            ":STARTTIME, :SIZE, :FILENAME, :HASCUTLIST);");
-                    query.bindValue(":TYPE", "File");
-                    query.bindValue(":TITLE", title);
-                    query.bindValue(":SUBTITLE", "");
-                    query.bindValue(":DESCRIPTION", "");
-                    query.bindValue(":STARTDATE", "");
-                    query.bindValue(":STARTTIME", "");
-                    query.bindValue(":SIZE", (long long)file.size());
-                    query.bindValue(":FILENAME", s);
-                    query.bindValue(":HASCUTLIST", 0);
-                    if (!query.exec())
-                        MythContext::DBError("archive item insert", query);
-                }
+                query.prepare("INSERT INTO archiveitems (type, title, subtitle,"
+                        "description, startdate, starttime, size, filename, hascutlist) "
+                        "VALUES(:TYPE, :TITLE, :SUBTITLE, :DESCRIPTION, :STARTDATE, "
+                        ":STARTTIME, :SIZE, :FILENAME, :HASCUTLIST);");
+                query.bindValue(":TYPE", "File");
+                query.bindValue(":TITLE", title);
+                query.bindValue(":SUBTITLE", "");
+                query.bindValue(":DESCRIPTION", "");
+                query.bindValue(":STARTDATE", "");
+                query.bindValue(":STARTTIME", "");
+                query.bindValue(":SIZE", (long long)file.size());
+                query.bindValue(":FILENAME", s);
+                query.bindValue(":HASCUTLIST", 0);
+                if (!query.exec())
+                    MythContext::DBError("archive item insert", query);
             }
         }
     }

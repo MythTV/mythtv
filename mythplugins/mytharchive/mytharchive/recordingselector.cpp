@@ -312,13 +312,6 @@ void RecordingSelector::titleChanged(UIListBtnTypeItem *item)
 
 void RecordingSelector::OKPressed()
 {
-    if (selectedList.count() == 0)
-    {
-        MythPopupBox::showOkPopup(gContext->GetMainWindow(), tr("Myth Archive"),
-                                  tr("You need to select at least one recording!"));
-        return;
-    }
-
     // remove all recordings from archivelist
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("DELETE FROM archiveitems WHERE type = 'Recording'");
