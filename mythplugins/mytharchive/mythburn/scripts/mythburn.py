@@ -31,7 +31,7 @@
 #******************************************************************************
 
 # version of script - change after each update
-VERSION="0.1.20070826-4"
+VERSION="0.1.20070826-5"
 
 
 ##You can use this debug flag when testing out new themes
@@ -2615,18 +2615,11 @@ def createDVDAuthorXML(screensize, numberofitems):
             title_video = dvddom.createElement("video")
             title_video.setAttribute("format",videomode)
 
-            if chaptermenuAspectRatio == "4:3":
-                title_video.setAttribute("aspect", "4:3")
-            elif chaptermenuAspectRatio == "16:9":
+            if getAspectRatioOfVideo(itemnum) > aspectRatioThreshold:
                 title_video.setAttribute("aspect", "16:9")
                 title_video.setAttribute("widescreen", "nopanscan")
-            else: 
-                # use same aspect ratio as the video
-                if getAspectRatioOfVideo(itemnum) > aspectRatioThreshold:
-                    title_video.setAttribute("aspect", "16:9")
-                    title_video.setAttribute("widescreen", "nopanscan")
-                else:
-                    title_video.setAttribute("aspect", "4:3")
+            else:
+                title_video.setAttribute("aspect", "4:3")
 
             titles.appendChild(title_video)
 
