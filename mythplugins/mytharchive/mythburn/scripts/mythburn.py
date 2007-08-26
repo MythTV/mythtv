@@ -31,7 +31,7 @@
 #******************************************************************************
 
 # version of script - change after each update
-VERSION="0.1.20070826-3"
+VERSION="0.1.20070826-4"
 
 
 ##You can use this debug flag when testing out new themes
@@ -323,6 +323,7 @@ def doesFileExist(file):
 
 def quoteFilename(filename):
     filename = filename.replace('"', '\\"')
+    filename = filename.replace('`', '\\`')
     return '"%s"' % filename
 
 #############################################################

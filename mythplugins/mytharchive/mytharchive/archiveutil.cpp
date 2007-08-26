@@ -203,6 +203,10 @@ bool getFileDetails(ArchiveItem *a)
         inFile = a->filename;
     }
 
+    inFile.replace("\'", "\\\'");
+    inFile.replace("\"", "\\\"");
+    inFile.replace("`", "\\`");
+
     QString outFile = tempDir + "/work/file.xml";
 
     // call mytharchivehelper to get files stream info etc.
