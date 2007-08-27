@@ -3,7 +3,7 @@
 <title>Installing and using MythTV
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com"
 name="mailto:rkulagow@rocketmail.com">
-<date>2007-08-25, v0.20.24
+<date>2007-08-26, v0.20.25
 <abstract>
 Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -7680,6 +7680,99 @@ if there were any errors.
 <item>Restart your <bf>mythbackend</bf> and <bf>mythfrontend</bf> programs.
 </itemize>
 
+<sect1>Caching support for Schedules Direct
+<p>MythTV 0.20.2 supports caching of downloaded information from Schedules
+Direct, so devices that share a common source do not require multiple
+downloads.
+
+Before beginning, perform a backup of your existing database.  See <ref id="backupdb"
+name="Saving or restoring the database"> for instructions.
+
+In the following scenario, assume that you have the following:
+<enum>
+<item>A PVR-150 MPEG-2 encoder card connected directly to a CATV source.
+<item>A PVR-250 MPEG-2 encoder card connected via S-Video to a CATV Set Top Box.
+</enum>
+
+What we are going to do is to create a single lineup at Schedules Direct,
+associate it with a single Video Source, but then use that Video Source on
+multiple devices.
+
+On your Schedules Direct account, create a lineup that has all of the
+channels that you can receive.  Because we have a Set Top Box (STB), choose a
+Digital lineup.  Yes, this means that you may have 900 channels, but that's ok.
+
+Use the Schedules Direct channel editor and unselect any channels that you
+can't tune without the STB.  This will usually be channels higher than
+125.  Once you've deselected them (using a click on the first channel you
+can't receive and then a shift-click on the last channel you can't receive
+will deselect all the channels in between those two.) save your lineup.
+
+In <bf>mythtv-setup</bf>, create a Video Source with an appropriate name.
+"SD-All Channels" will be used in this example.  Click "Retrieve Lineups"
+and select the digital lineup you just created at Schedules Direct.
+
+Go back one screen, then go into the Input Connections screen for the
+PVR-150 which is connected directly to the CATV.  Set the Video Source to
+"SD-All Channels" and click "Fetch channels".
+
+Set the start channel to an appropriate value.
+
+<bf>NOTE</bf>:  There is a bug where the "Fetch" command may not work; you
+can tell that the Fetch did not retrieve any channels in one of two ways: in
+the text-mode console, you will see a connection to Schedules Direct, but it
+doesn't appear to retrieve any channel information:
+<tscreen><verb>
+2007-08-25 15:03:05.526 New DB DataDirect connection
+2007-08-25 15:03:05.526 Connected to database 'mythconverg' at host: localhost
+2007-08-25 15:03:05.536 DataDirect: Your subscription expires on 11/23/2007 01:12:10 PM
+2007-08-25 15:03:05.707 New DB connection, total: 3
+2007-08-25 15:03:05.707 Connected to database 'mythconverg' at host: localhost
+2007-08-25 15:03:05.708 sourceid 2 has lineup type: CableDigital
+2007-08-25 15:03:06.623 Data fetching complete.
+2007-08-25 15:03:06.624 DataDirect: Deleting temporary files
+</verb></tscreen>
+
+or, the "Please select" message in the default channel stays on the screen. 
+If either of these happens, save the information on this screen, exit back
+to the Input connections screen, then select this Input Connection again. 
+This time the Fetch will work and the "Please select" message will
+disappear.
+
+If you look at the text-mode console, you'll see this if the channel
+retrieval is working:
+<tscreen><verb>
+2007-08-25 15:04:32.437 New DB DataDirect connection
+2007-08-25 15:04:32.437 Connected to database 'mythconverg' at host: localhost
+2007-08-25 15:04:32.447 DataDirect: Your subscription expires on 11/23/2007 01:12:10 PM
+2007-08-25 15:04:32.622 New DB connection, total: 3
+2007-08-25 15:04:32.622 Connected to database 'mythconverg' at host: localhost
+2007-08-25 15:04:32.623 sourceid 2 has lineup type: CableDigital
+2007-08-25 15:04:33.418 DataDirect: Adding channel 41 'AMC' (AMC).
+2007-08-25 15:04:33.422 DataDirect: Adding channel 32 'A & E Network' (AETV).
+2007-08-25 15:04:33.425 DataDirect: Adding channel 66 'Black Entertainment Television' (BET).
+2007-08-25 15:04:33.427 DataDirect: Adding channel 180 'Bravo' (BRAVO).
+2007-08-25 15:04:33.430 DataDirect: Adding channel 51 'ABC Family' (FAM).
+2007-08-25 15:04:33.432 DataDirect: Adding channel 146 'Country Music Television' (CMTV).
+2007-08-25 15:04:33.435 DataDirect: Adding channel 39 'CNBC' (CNBC).
+2007-08-25 15:04:33.437 DataDirect: Adding channel 36 'Cable News Network' (CNN).
+2007-08-25 15:04:33.440 DataDirect: Adding channel 35 'CNN Headline News' (CNNH).
+</verb></tscreen>
+
+Repeat the sequence for any other capture devices that are connected
+directly to the CATV system.
+
+Go back to Schedules Direct and re-enable the channels that you had
+previously deselected, then save.
+
+On the Input Connections screen, select the PVR-250 which is connected to
+the STB, perform a retrieve channels.  This will pull down the complete
+channel listing.
+
+When <bf>mythfilldatabase</bf> runs, it will cache the "big" download which
+is appropriate for the STB, and then copy the information to the channels
+that can only be accessed without the STB.
+
 </article>
 <!-- Revision History
 v0.20.00, 2006-09-10.  Start prepping for 0.20.  Add HDHomeRun as a capture device.
@@ -7728,9 +7821,9 @@ version for XMLTV.  Change version numbers.  Add note about MythWeather
 being disabled becuase it's broken.
 v0.20.24, 2007-08-25.  Update information on Schedules Direct.  Added note
 that migration to Schedules Direct only requires updated user account
-information in the grabber, don't have to delete everything.  Added pointed
+information in the grabber, don't have to delete everything.  Added pointer
 to release notes on Wiki.
-
+v0.20.25, 2007-08-26.  Add information on caching support for SD.
 -->
 
 <!--
