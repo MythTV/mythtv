@@ -7658,8 +7658,8 @@ leading to dropped frames.
 <!-- Mostly from a post by Bruce Markey -->
 <sect1>Migrating from DataDirect Labs to Schedules Direct
 
-<p>MythTV v0.20.2 is required to natively support Schedules Direct.  Code
-has been included to make the transition as simple as possible.
+<p>MythTV v0.20.2 or later is required to natively support Schedules Direct. 
+Code has been included to make the transition as simple as possible.
 
 <bf>You do not need to delete your existing video sources or add new ones!</bf>  
 
