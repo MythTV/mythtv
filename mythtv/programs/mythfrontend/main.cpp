@@ -54,6 +54,7 @@ using namespace std;
 #define NO_EXIT  0
 #define QUIT     1
 #define HALT     2
+#define REBOOT   3
 
 static MythThemedMenu *menu;
 static MythThemeBase *themeBase;
@@ -437,22 +438,95 @@ int handleExit(void)
     // first of all find out, if this is a frontend only host...
     bool frontendOnly = gContext->IsFrontendOnly();
 
+    // how do you want to quit today?
+    int  exitMenuStyle = gContext->GetNumSetting("OverrideExitMenu", 0);
+
     QString title = QObject::tr("Do you really want to exit MythTV?");
 
     DialogBox diag(gContext->GetMainWindow(), title);
-    diag.AddButton(QObject::tr("No"));
-    diag.AddButton(QObject::tr("Yes, Exit now"));
-    if (frontendOnly)
-        diag.AddButton(QObject::tr("Yes, Exit and Shutdown"));
 
-    int result = diag.exec();
-    switch (result)
+    diag.AddButton(QObject::tr("No"));
+    int result;
+
+    switch (exitMenuStyle)
     {
-        case 1: return NO_EXIT;
-        case 2: return QUIT;
-        case 3: return HALT;
-        default: return NO_EXIT;
+        case 0:
+            diag.AddButton(QObject::tr("Yes, Exit now"));
+            if (frontendOnly)
+                diag.AddButton(QObject::tr("Yes, Exit and Shutdown"));
+            result = diag.exec();
+            switch (result)
+            {
+                case 1: return NO_EXIT;
+                case 2: return QUIT;
+                case 3: return HALT;
+                default: return NO_EXIT;
+            }
+        case 1:
+            diag.AddButton(QObject::tr("Yes, Exit now"));
+            result = diag.exec();
+            switch (result)
+            {
+                case 1: return NO_EXIT;
+                case 2: return QUIT;
+                default: return NO_EXIT;
+            }
+        case 2:
+            diag.AddButton(QObject::tr("Yes, Exit now"));
+            diag.AddButton(QObject::tr("Yes, Exit and Shutdown"));
+            result = diag.exec();
+            switch (result)
+            {
+                case 1: return NO_EXIT;
+                case 2: return QUIT;
+                case 3: return HALT;
+                default: return NO_EXIT;
+            }
+        case 3:
+            diag.AddButton(QObject::tr("Yes, Exit now"));
+            diag.AddButton(QObject::tr("Yes, Exit and Reboot"));
+            diag.AddButton(QObject::tr("Yes, Exit and Shutdown"));
+            result = diag.exec();
+            switch (result)
+            {
+                case 1: return NO_EXIT;
+                case 2: return QUIT;
+                case 3: return REBOOT;
+                case 4: return HALT;
+                default: return NO_EXIT;
+            }
+        case 4:
+            diag.AddButton(QObject::tr("Yes, Exit and Shutdown"));
+            result = diag.exec();
+            switch (result)
+            {
+                case 1: return NO_EXIT;
+                case 2: return HALT;
+                default: return NO_EXIT;
+            }
+        case 5:
+            diag.AddButton(QObject::tr("Yes, Exit and Reboot"));
+            result = diag.exec();
+            switch (result)
+            {
+                case 1: return NO_EXIT;
+                case 2: return REBOOT;
+                default: return NO_EXIT;
+            }
+        case 6:
+            diag.AddButton(QObject::tr("Yes, Exit and Reboot"));
+            diag.AddButton(QObject::tr("Yes, Exit and Shutdown"));
+            result = diag.exec();
+            switch (result)
+            {
+                case 1: return NO_EXIT;
+                case 2: return REBOOT;
+                case 3: return HALT;
+                default: return NO_EXIT;
+            }
     }
+
+    return NO_EXIT;
 }
 
 void haltnow()
@@ -461,6 +535,14 @@ void haltnow()
                                             "sudo /sbin/halt -p");
     if (!halt_cmd.isEmpty())
         system(halt_cmd.ascii());
+}
+
+void rebootnow() 
+{ 
+    QString reboot_cmd = gContext->GetSetting("RebootCommand", 
+                                            "sudo /sbin/reboot"); 
+    if (!reboot_cmd.isEmpty()) 
+        system(reboot_cmd.ascii()); 
 }
 
 bool RunMenu(QString themedir)
@@ -1249,6 +1331,9 @@ int main(int argc, char **argv)
 
     if (exitstatus == HALT)
         haltnow();
+
+    if (exitstatus == REBOOT)
+        rebootnow();
 
     pmanager->DestroyAllPlugins();
 

@@ -1447,6 +1447,23 @@ static HostComboBox *AllowQuitShutdown()
     return gc;
 }
 
+static HostComboBox *OverrideExitMenu()
+{
+    HostComboBox *gc = new HostComboBox("OverrideExitMenu");
+    gc->setLabel(QObject::tr("Customise exit menu options"));
+    gc->addSelection(QObject::tr("Autodetect"), "0");
+    gc->addSelection(QObject::tr("Show quit"), "1");
+    gc->addSelection(QObject::tr("Show quit and shutdown"), "2");
+    gc->addSelection(QObject::tr("Show quit, reboot and shutdown"), "3");
+    gc->addSelection(QObject::tr("Show shutdown"), "4");
+    gc->addSelection(QObject::tr("Show reboot"), "5");
+    gc->addSelection(QObject::tr("Show reboot and shutdown"), "6");
+    gc->setHelpText(QObject::tr("By default, only remote frontends are shown "
+                    "the shutdown option on the exit menu. Here you can force "
+                    "specific shutdown and reboot options to be displayed."));
+    return gc;
+}
+
 static HostCheckBox *NoPromptOnExit()
 {
     HostCheckBox *gc = new HostCheckBox("NoPromptOnExit");
@@ -1458,15 +1475,27 @@ static HostCheckBox *NoPromptOnExit()
     return gc;
 }
 
+static HostLineEdit *RebootCommand()
+{
+    HostLineEdit *ge = new HostLineEdit("RebootCommand");
+    ge->setLabel(QObject::tr("Reboot command"));
+    ge->setValue("reboot");
+    ge->setHelpText(QObject::tr("Command or script to run if you select "
+                    "the reboot option from the exit menu, if the option "
+                    "is displayed. You must configure an exit key to "
+                    "display the exit menu."));
+    return ge;
+}
+
 static HostLineEdit *HaltCommand()
 {
     HostLineEdit *ge = new HostLineEdit("HaltCommand");
     ge->setLabel(QObject::tr("Halt command"));
     ge->setValue("halt");
-    ge->setHelpText(QObject::tr("If you have configured an exit key using the "
-                    "System Shutdown option, you will be given the opportunity "
-                    "to exit MythTV or halt the system completely. "
-                    "Another possibility for this field is \"poweroff\""));
+    ge->setHelpText(QObject::tr("Command or script to run if you select "
+                    "the shutdown option from the exit menu, if the option "
+                    "is displayed. You must configure an exit key to "
+                    "display the exit menu."));
     return ge;
 }
 
@@ -3594,8 +3623,10 @@ MainGeneralSettings::MainGeneralSettings()
     pin->addChild(SetupPinCode());
     misc->addChild(pin);
     VerticalConfigurationGroup* shutdownSettings = new VerticalConfigurationGroup(true);
-    shutdownSettings->setLabel(QObject::tr("Shutdown Settings"));
+    shutdownSettings->setLabel(QObject::tr("Shutdown/Reboot Settings"));
+    shutdownSettings->addChild(OverrideExitMenu());
     shutdownSettings->addChild(HaltCommand());
+    shutdownSettings->addChild(RebootCommand());
     misc->addChild(shutdownSettings);
     addChild(misc);
 
