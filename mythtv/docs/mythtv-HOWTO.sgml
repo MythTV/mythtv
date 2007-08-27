@@ -7681,9 +7681,9 @@ if there were any errors.
 </itemize>
 
 <sect1>Caching support for Schedules Direct
-<p>MythTV 0.20.2 supports caching of downloaded information from Schedules
-Direct, so devices that share a common source do not require multiple
-downloads.
+<p>MythTV 0.20.2 or later supports caching of downloaded information from
+Schedules Direct, so devices that share a common source do not require
+multiple downloads.
 
 Before beginning, perform a backup of your existing database.  See <ref
 id="backupdb" name="Saving or restoring the database"> for instructions.
