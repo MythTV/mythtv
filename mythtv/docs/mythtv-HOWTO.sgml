@@ -4462,11 +4462,16 @@ name="http://www.mythtv.org/"> .
 
 <sect1>Scheduling with more than one Input
 <p>
+
 MythTV is designed to allow recording television programs from one or more
 service providers, or video source, on one or more video input from each
 provider. A single TV capture card may have video connections to more than
-one of its input and each input may be from a different service although
-the card may only be allowed to record from one of these inputs at one time.
+one of its inputs and each input may be from a different service.  The card
+may only be allowed to record from one of these inputs at one time because
+there is only one pipeline on the card that actually captures the content
+and sends it to the PC.  Cards such as the Hauppauge PVR-500 are able to
+record two sources simultaneously, because it has two MPEG-2 encoders, and
+each encoder appears as a separate device.
 
 <figure loc="here">
 <eps file="BlockDiagramofavideocapturedevice.eps" height="1cm">
@@ -7715,9 +7720,12 @@ In <bf>mythtv-setup</bf>, create a Video Source with an appropriate name.
 "SD-Analog Only" will be used in this example.  Click "Retrieve Lineups"
 and select the digital lineup you just created at Schedules Direct.
 
-Go back to the main screen by pressing ESC, then choose Input Connections.
-Select the PVR-150 which is connected directly to the CATV.  Set the Video
-Source to "SD-Analog Only" and click "Fetch channels from listings source".
+Click "Finish" to return to the Video sources selector and then press the
+ESC key to go back to the main screen.
+
+Now choose Input Connections.  Select the PVR-150 which is connected
+directly to the CATV.  Set the Video Source to "SD-Analog Only" and click
+"Fetch channels from listings source".
 
 Set the start channel to an appropriate value.
 
@@ -7737,10 +7745,11 @@ doesn't appear to retrieve any channel information:
 </verb></tscreen>
 
 or, the "Please select" message in the default channel stays on the screen. 
-If either of these happens, save the information on this screen, exit back
-to the Input connections screen, then select this Input Connection again. 
-This time the Fetch will work and the "Please select" message will
-disappear.
+
+If either of these happens, save the information on this screen by clicking
+the "Finish" button.  Exit back to the Input connections screen by pressing
+ESC, then select this Input Connection again.  This time the Fetch will work
+and the "Please select" message will disappear.
 
 If you look at the text-mode console, you'll see this if the channel
 retrieval is working:
