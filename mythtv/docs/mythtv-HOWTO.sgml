@@ -7772,8 +7772,10 @@ retrieval is working:
 2007-08-25 15:04:33.440 DataDirect: Adding channel 35 'CNN Headline News' (CNNH).
 </verb></tscreen>
 
-Repeat the sequence for any other capture devices that are connected
-directly to the CATV system.
+Repeat the Input Connection configuration for any other capture devices that
+are connected directly to the CATV system.  You do not need to click Fetch
+once you've done one successful download of the channel information - the
+Starting channel should be automatically populated.
 
 Go back to Schedules Direct and re-enable the channels that you had
 previously deselected, then click Save Changes.
