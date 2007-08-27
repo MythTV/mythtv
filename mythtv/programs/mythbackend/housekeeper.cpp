@@ -200,7 +200,8 @@ void HouseKeeper::RunHouseKeeping(void)
                     {
                         result.prepare("SELECT COUNT(*) FROM videosource "
                                        "WHERE xmltvgrabber IN "
-                                           "( 'datadirect', 'technovera' );");
+                                           "( 'datadirect', 'technovera',"
+                                           " 'schedulesdirect1' );");
 
                         if ((result.exec()) &&
                             (result.isActive()) &&
