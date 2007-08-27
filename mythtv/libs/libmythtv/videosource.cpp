@@ -370,10 +370,15 @@ DataDirect_config::DataDirect_config(const VideoSource& _parent, int _source) :
 {
     source = _source;
 
+    HorizontalConfigurationGroup *up =
+        new HorizontalConfigurationGroup(false, false, true, true);
+
+    up->addChild(userid   = new DataDirectUserID(parent));
+    addChild(up);
+
     HorizontalConfigurationGroup *lp =
         new HorizontalConfigurationGroup(false, false, true, true);
 
-    lp->addChild(userid   = new DataDirectUserID(parent));
     lp->addChild(password = new DataDirectPassword(parent));
     lp->addChild(button   = new DataDirectButton());
     addChild(lp);
