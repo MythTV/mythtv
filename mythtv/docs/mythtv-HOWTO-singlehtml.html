@@ -8,7 +8,7 @@
 <H1>Installing and using MythTV</H1>
 
 <H2>Robert Kulagowski, 
-<A HREF="mailto:rkulagow@rocketmail.com">mailto:rkulagow@rocketmail.com</A></H2>2007-08-24, v0.20.23
+<A HREF="mailto:rkulagow@rocketmail.com">mailto:rkulagow@rocketmail.com</A></H2>2007-08-25, v0.20.24
 <HR>
 <EM>Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -232,6 +232,7 @@ necessary.</EM>
 <UL>
 <LI><A NAME="toc24.1">24.1</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss24.1">Logical Volume Manager (LVM) </A>
 <LI><A NAME="toc24.2">24.2</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss24.2">Advanced Partition Formatting </A>
+<LI><A NAME="toc24.3">24.3</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss24.3">Migrating from DataDirect Labs to Schedules Direct</A>
 </UL>
 
 <HR>
@@ -329,6 +330,9 @@ like to install MythTV on a Xbox.</P>
 Fedora Core distribution.</P>
 <P>There is a MythTV wiki at 
 <A HREF="http://wiki.mythtv.org">http://wiki.mythtv.org</A>.</P>
+<P>If you are installing this version for Schedules Direct support, please see
+the 
+<A HREF="#migratingtoSD">Migrating from DataDirect Labs to Schedules Direct</A> section for additional information.</P>
 
 <H2><A NAME="ss1.3">1.3</A> <A HREF="#toc1.3">Upgrading from previous versions</A>
 </H2>
@@ -352,6 +356,8 @@ Kulagowski
 at 
 <A HREF="http://www.mythtv.org/docs/mythtv-HOWTO.pdf">http://www.mythtv.org/docs/mythtv-HOWTO.pdf</A>.</P>
 <P>This HOWTO is for MythTV v0.20.2</P>
+<P>Release notes for this version may be found in the MythTV Wiki at 
+<A HREF="http://www.mythtv.org/wiki/index.php/Release_Notes_-_0.20.2">http://www.mythtv.org/wiki/index.php/Release_Notes_-_0.20.2</A></P>
 
 <H2><A NAME="ss1.5">1.5</A> <A HREF="#toc1.5">Books about MythTV</A>
 </H2>
@@ -1616,6 +1622,7 @@ Privacy Policy proceed to the lineup choices and configure your account for
 your particular location and the channels that you have.  This configuration
 will be imported into MythTV when you first run the <B>mythtv-setup</B>
 program.</P>
+
 <P>
 <A NAME="manually_building_mythtv"></A> </P>
 <H2><A NAME="ss5.4">5.4</A> <A HREF="#toc5.4">Manually building MythTV</A>
@@ -2739,7 +2746,7 @@ information.  You should answer "YES" to this as well.</P>
 <LI>General</LI>
 <LI>Capture Cards</LI>
 <LI>Video Sources</LI>
-<LI>Input Connections</LI>
+<LI>Input connections</LI>
 <LI>Channel Editor</LI>
 <LI>Storage Directories</LI>
 </OL>
@@ -2810,10 +2817,11 @@ the card and configure the analog portion of the card there.</CAPTION>
 space bar to begin.  The first field asks for the name of the video source.
 You may choose something easy to remember, like "Antenna" or "Cable".  Once
 you've chosen a name, press the down arrow to move to the next field.  </P>
-<P>If you're in North America, change the grabber to "Schedules Direct", then
-continue pressing the down arrow to move to the next field.  Fill in the
-username and password that you have established with Schedules Direct, then
-move to the "Retrieve Listings" button and press the space bar.</P>
+<P>If you're in North America, change the grabber to
+"SchedulesDirect.org(Internal)", then continue pressing the down arrow to
+move to the next field.  Fill in the username and password that you have
+established with Schedules Direct, then move to the "Retrieve Listings"
+button and press the space bar.</P>
 <P><B>NOTE</B>: You need <B>wget</B> version 1.9.1 or higher to use
 Schedules Direct.</P>
 <P>The mythtv-setup program will contact the Schedules Direct servers and get
@@ -8243,6 +8251,31 @@ results shown at (
 higher I/O rates than JFS, albeit at a higher CPU loading.  This may cause
 issues if you do not have the spare CPU capacity to handle XFS, potentially
 leading to dropped frames.</P>
+<P>
+<A NAME="migratingtoSD"></A> </P>
+<H2><A NAME="ss24.3">24.3</A> <A HREF="#toc24.3">Migrating from DataDirect Labs to Schedules Direct</A>
+</H2>
+
+<P>MythTV v0.20.2 is required to natively support Schedules Direct.  Code
+has been included to make the transition as simple as possible.</P>
+<P><B>You do not need to delete your existing video sources or add new ones!</B>  </P>
+<P>The following steps should work for most users:
+<UL>
+<LI>Create a Schedules Direct account and use the same information as your
+existing lineups at Zap2It Labs.  Do not add or delete channels at this
+time.</LI>
+<LI>Shut down any running <B>mythfrontend</B> and <B>mythbackend</B> programs</LI>
+<LI>Perform a backup of your existing database.  See 
+<A HREF="#backupdb">Saving or restoring the database</A> for instructions.</LI>
+<LI>Run <B>mythtv-setup</B> -> Video Sources.  Change the grabber to
+Schedules Direct, update the username and password fields with the account
+information you created at Schedules Direct and select "Retrieve Lineups". 
+Click Finish.</LI>
+<LI>Exit <B>mythtv-setup</B> and run <B>mythfilldatabase</B>.  Check
+if there were any errors.</LI>
+<LI>Restart your <B>mythbackend</B> and <B>mythfrontend</B> programs.</LI>
+</UL>
+</P>
 
 </BODY>
 </HTML>

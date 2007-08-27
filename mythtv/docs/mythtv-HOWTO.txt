@@ -1,7 +1,7 @@
   Installing and using MythTV
   Robert Kulagowski, mailto:rkulagow@rocketmail.com
   <mailto:rkulagow@rocketmail.com>
-  2007-08-24, v0.20.23
+  2007-08-25, v0.20.24
 
   Initially, installation of MythTV seems like a huge task.  There are
   lots of dependencies, and various distributions seem to do the same
@@ -337,6 +337,7 @@
         24.2.3 ReiserFS
         24.2.4 JFS
         24.2.5 XFS
+     24.3 Migrating from DataDirect Labs to Schedules Direct
 
 
   ______________________________________________________________________
@@ -453,6 +454,10 @@
   There is a MythTV wiki at http://wiki.mythtv.org
   <http://wiki.mythtv.org>.
 
+  If you are installing this version for Schedules Direct support,
+  please see the ``Migrating from DataDirect Labs to Schedules Direct''
+  section for additional information.
+
 
   [1m1.3.  Upgrading from previous versions[0m
 
@@ -465,12 +470,12 @@
   See ``Saving or Restoring the database'' for instructions.
 
 
+
   [1m1.4.  How to obtain this document / PDF versions of this document[0m
 
   This HOWTO document is maintained at the primary MythTV website:
   http://www.mythtv.org <http://www.mythtv.org> by Robert Kulagowski
   <mailto:rkulagow@rocketmail.com>.
-
 
   This document is available as a single-page HTML document at
   http://www.mythtv.org/docs/mythtv-HOWTO-singlehtml.html
@@ -479,6 +484,10 @@
   <http://www.mythtv.org/docs/mythtv-HOWTO.pdf>.
 
   This HOWTO is for MythTV v0.20.2
+
+  Release notes for this version may be found in the MythTV Wiki at
+  http://www.mythtv.org/wiki/index.php/Release_Notes_-_0.20.2
+  <http://www.mythtv.org/wiki/index.php/Release_Notes_-_0.20.2>
 
 
   [1m1.5.  Books about MythTV[0m
@@ -526,7 +535,6 @@
   Searchable archives for the lists are available at
   http://www.gossamer-threads.com/lists/mythtv/ <http://www.gossamer-
   threads.com/lists/mythtv/>.
-
 
 
   [1m1.8.  IRC[0m
@@ -649,14 +657,11 @@
   http://pvrhw.goldfish.org/ <http://pvrhw.goldfish.org/>. The website
   will let you browse what other users have reported as their hardware
   configuration, and how happy they are with the results.
-
   If you have specific questions about the suitability of specific
   hardware choices, you can consult the archives of the mythtv-users
   mailing list at http://www.gossamer-threads.com/lists/mythtv/
   <http://www.gossamer-threads.com/lists/mythtv/> or post a question to
   the list.
-
-
 
   [1m3.1.1.  CPU Type and Speed[0m
 
@@ -717,12 +722,12 @@
   requirements are quite low.  See the ``Video Capture Device'' section
   for details.
 
+
   The price differential between a frame grabber and a card that
   implements hardware MPEG-2 encoding, such as the Hauppauge PVR-x50
   series, is now less than $30 US.  Primary development in MythTV has
   transitioned to supporting MPEG-2 capture devices and HDTV, so if
   given the option, go with the hardware MPEG-2 encoder.
-
 
   If you have a Via M10000 series or a Hauppauge PVR-350, MythTV can use
   the hardware-based video decoder for playback, which further reduces
@@ -899,7 +904,6 @@
   http://www.linuxtv.org/wiki/index.php/Main_Page
   <http://www.linuxtv.org/wiki/index.php/Main_Page> for more
   information.
-
   In the United States, you may use a card such as the TwinHan to obtain
   unencrypted Free-To-Air satellite channels.  See
   http://www.lyngsat.com/ <http://www.lyngsat.com/> for the types of
@@ -963,6 +967,7 @@
   and Weave" deinterlacing, or if you have an NVIDIA card with MPEG-2
   hardware acceleration.  If you enable the hardware acceleration, you
   may be able to use a 1.8GHz processor.
+
 
 
   [1m3.1.5.5.  Firewire.[0m
@@ -1031,7 +1036,6 @@
 
   +o  ATI All-in-Wonder series
 
-
   [1m3.1.7.  Sound card[0m
 
   The system needs a sound card or an on-board equivalent on the
@@ -1091,7 +1095,6 @@
 
   Note that with some video cards and X drivers, XVideo extensions are
   only supported on the VGA output, and not on the TV output.
-
 
   [1m3.1.9.  Cards with TV-out[0m
 
@@ -1159,7 +1162,6 @@
   The PVR-350 is unique amongst the Hauppauge PVR-x50 cards in that it
   also supports audio output, but you need to connect that audio output
   to something.  There are two courses of action you may take:
-
   1. Take the audio output from the PVR-350 and plug it into an input on
      a sound card on your machine.  You may then use MythTV's internal
      audio controls.
@@ -1222,8 +1224,6 @@
 
   A number of people have created pre-compiled packages for MythTV that
   may make your installation easier.
-
-
 
           [1mBIG FAT WARNING[22m:  This HOWTO assumes that you have [4mnot[0m
   installed MythTV from a package.  All example command lines and file
@@ -1825,6 +1825,7 @@
   account for your particular location and the channels that you have.
   This configuration will be imported into MythTV when you first run the
   [1mmythtv-setup [22mprogram.
+
 
 
   [1m5.4.  Manually building MythTV[0m
@@ -2958,7 +2959,7 @@
 
   3. Video Sources
 
-  4. Input Connections
+  4. Input connections
 
   5. Channel Editor
 
@@ -3043,11 +3044,11 @@
   "Antenna" or "Cable".  Once you've chosen a name, press the down arrow
   to move to the next field.
 
-  If you're in North America, change the grabber to "Schedules Direct",
-  then continue pressing the down arrow to move to the next field.  Fill
-  in the username and password that you have established with Schedules
-  Direct, then move to the "Retrieve Listings" button and press the
-  space bar.
+  If you're in North America, change the grabber to
+  "SchedulesDirect.org(Internal)", then continue pressing the down arrow
+  to move to the next field.  Fill in the username and password that you
+  have established with Schedules Direct, then move to the "Retrieve
+  Listings" button and press the space bar.
 
   [1mNOTE[22m: You need [1mwget [22mversion 1.9.1 or higher to use Schedules Direct.
 
@@ -8909,6 +8910,36 @@
   higher I/O rates than JFS, albeit at a higher CPU loading.  This may
   cause issues if you do not have the spare CPU capacity to handle XFS,
   potentially leading to dropped frames.
+
+
+
+  [1m24.3.  Migrating from DataDirect Labs to Schedules Direct[0m
+
+  MythTV v0.20.2 is required to natively support Schedules Direct.  Code
+  has been included to make the transition as simple as possible.
+
+  [1mYou do not need to delete your existing video sources or add new ones![0m
+
+  The following steps should work for most users:
+
+  +o  Create a Schedules Direct account and use the same information as
+     your existing lineups at Zap2It Labs.  Do not add or delete
+     channels at this time.
+
+  +o  Shut down any running [1mmythfrontend [22mand [1mmythbackend [22mprograms
+
+  +o  Perform a backup of your existing database.  See ``Saving or
+     restoring the database'' for instructions.
+
+  +o  Run [1mmythtv-setup [22m-> Video Sources.  Change the grabber to Schedules
+     Direct, update the username and password fields with the account
+     information you created at Schedules Direct and select "Retrieve
+     Lineups".  Click Finish.
+
+  +o  Exit [1mmythtv-setup [22mand run [1mmythfilldatabase[22m.  Check if there were
+     any errors.
+
+  +o  Restart your [1mmythbackend [22mand [1mmythfrontend [22mprograms.
 
 
 

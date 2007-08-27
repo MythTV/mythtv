@@ -3,7 +3,7 @@
 <title>Installing and using MythTV
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com"
 name="mailto:rkulagow@rocketmail.com">
-<date>2007-08-24, v0.20.23
+<date>2007-08-25, v0.20.24
 <abstract>
 Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -103,6 +103,10 @@ Fedora Core distribution.
 There is a MythTV wiki at <url url="http://wiki.mythtv.org"
 name="http://wiki.mythtv.org">.
 
+If you are installing this version for Schedules Direct support, please see
+the <ref id="migratingtoSD" name="Migrating from DataDirect Labs to
+Schedules Direct"> section for additional information.
+
 <sect1>Upgrading from previous versions
 <p>The upgrade from previous versions should be transparent.  Any changes to
 the database structure should be applied automatically.
@@ -124,6 +128,10 @@ at <url url="http://www.mythtv.org/docs/mythtv-HOWTO.pdf"
 name="http://www.mythtv.org/docs/mythtv-HOWTO.pdf">.
 
 This HOWTO is for MythTV v0.20.2
+
+Release notes for this version may be found in the MythTV Wiki at <url
+url="http://www.mythtv.org/wiki/index.php/Release_Notes_-_0.20.2"
+name="http://www.mythtv.org/wiki/index.php/Release_Notes_-_0.20.2">
 
 <sect1>Books about MythTV
 <p>If you would like to purchase a book specifically about MythTV:
@@ -1315,6 +1323,7 @@ your particular location and the channels that you have.  This configuration
 will be imported into MythTV when you first run the <bf>mythtv-setup</bf>
 program.
 
+
 <label id="manually_building_mythtv">
 <sect1>Manually building MythTV
 <p>If you are going to use <bf>subversion</bf>, execute the following
@@ -2309,7 +2318,7 @@ The Storage Directories feature is available only in the SVN version of MythTV.
 <item>General
 <item>Capture Cards
 <item>Video Sources
-<item>Input Connections
+<item>Input connections
 <item>Channel Editor
 <item>Storage Directories
 </enum>
@@ -2388,10 +2397,11 @@ space bar to begin.  The first field asks for the name of the video source.
 You may choose something easy to remember, like "Antenna" or "Cable".  Once
 you've chosen a name, press the down arrow to move to the next field.  
 
-If you're in North America, change the grabber to "Schedules Direct", then
-continue pressing the down arrow to move to the next field.  Fill in the
-username and password that you have established with Schedules Direct, then
-move to the "Retrieve Listings" button and press the space bar.
+If you're in North America, change the grabber to
+"SchedulesDirect.org(Internal)", then continue pressing the down arrow to
+move to the next field.  Fill in the username and password that you have
+established with Schedules Direct, then move to the "Retrieve Listings"
+button and press the space bar.
 
 <bf>NOTE</bf>: You need <bf>wget</bf> version 1.9.1 or higher to use
 Schedules Direct.
@@ -7644,6 +7654,32 @@ higher I/O rates than JFS, albeit at a higher CPU loading.  This may cause
 issues if you do not have the spare CPU capacity to handle XFS, potentially
 leading to dropped frames.
 
+<label id="migratingtoSD">
+<!-- Mostly from a post by Bruce Markey -->
+<sect1>Migrating from DataDirect Labs to Schedules Direct
+
+<p>MythTV v0.20.2 is required to natively support Schedules Direct.  Code
+has been included to make the transition as simple as possible.
+
+<bf>You do not need to delete your existing video sources or add new ones!</bf>  
+
+The following steps should work for most users:
+<itemize>
+<item>Create a Schedules Direct account and use the same information as your
+existing lineups at Zap2It Labs.  Do not add or delete channels at this
+time.
+<item>Shut down any running <bf>mythfrontend</bf> and <bf>mythbackend</bf> programs
+<item>Perform a backup of your existing database.  See <ref id="backupdb"
+name="Saving or restoring the database"> for instructions.
+<item>Run <bf>mythtv-setup</bf> -> Video Sources.  Change the grabber to
+Schedules Direct, update the username and password fields with the account
+information you created at Schedules Direct and select "Retrieve Lineups". 
+Click Finish.
+<item>Exit <bf>mythtv-setup</bf> and run <bf>mythfilldatabase</bf>.  Check
+if there were any errors.
+<item>Restart your <bf>mythbackend</bf> and <bf>mythfrontend</bf> programs.
+</itemize>
+
 </article>
 <!-- Revision History
 v0.20.00, 2006-09-10.  Start prepping for 0.20.  Add HDHomeRun as a capture device.
@@ -7690,6 +7726,10 @@ v0.20.22, 2007-06-11.  Update link to ATSC devices on linuxtv.org (D. Hugh Redel
 v0.20.23, 2007-08-24.  Update information on Schedules Direct.  Update
 version for XMLTV.  Change version numbers.  Add note about MythWeather
 being disabled becuase it's broken.
+v0.20.24, 2007-08-25.  Update information on Schedules Direct.  Added note
+that migration to Schedules Direct only requires updated user account
+information in the grabber, don't have to delete everything.  Added pointed
+to release notes on Wiki.
 
 -->
 
