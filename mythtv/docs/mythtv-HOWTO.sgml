@@ -3,7 +3,7 @@
 <title>Installing and using MythTV
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com"
 name="mailto:rkulagow@rocketmail.com">
-<date>2007-08-26, v0.20.25
+<date>2007-08-27, v0.20.25
 <abstract>
 Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -7863,7 +7863,7 @@ v0.20.24, 2007-08-25.  Update information on Schedules Direct.  Added note
 that migration to Schedules Direct only requires updated user account
 information in the grabber, don't have to delete everything.  Added pointer
 to release notes on Wiki.
-v0.20.25, 2007-08-26.  Add information on caching support for SD.
+v0.20.25, 2007-08-27.  Add information on caching support for SD.
 -->
 
 <!--

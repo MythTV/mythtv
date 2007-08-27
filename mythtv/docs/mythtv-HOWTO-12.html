@@ -682,11 +682,16 @@ is available from
 <H2><A NAME="ss12.6">12.6</A> <A HREF="mythtv-HOWTO.html#toc12.6">Scheduling with more than one Input</A>
 </H2>
 
+
 <P>MythTV is designed to allow recording television programs from one or more
 service providers, or video source, on one or more video input from each
 provider. A single TV capture card may have video connections to more than
-one of its input and each input may be from a different service although
-the card may only be allowed to record from one of these inputs at one time.</P>
+one of its inputs and each input may be from a different service.  The card
+may only be allowed to record from one of these inputs at one time because
+there is only one pipeline on the card that actually captures the content
+and sends it to the PC.  Cards such as the Hauppauge PVR-500 are able to
+record two sources simultaneously, because it has two MPEG-2 encoders, and
+each encoder appears as a separate device.</P>
 <P>
 <FIGURE>
 <EPS FILE="BlockDiagramofavideocapturedevice.eps">
