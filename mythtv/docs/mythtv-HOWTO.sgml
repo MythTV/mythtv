@@ -7744,12 +7744,13 @@ doesn't appear to retrieve any channel information:
 2007-08-25 15:03:06.624 DataDirect: Deleting temporary files
 </verb></tscreen>
 
-or, the "Please select" message in the default channel stays on the screen. 
+or, the "Please add channels to this source" message in the default channel
+stays on the screen.
 
 If either of these happens, save the information on this screen by clicking
 the "Finish" button.  Exit back to the Input connections screen by pressing
 ESC, then select this Input Connection again.  This time the Fetch will work
-and the "Please select" message will disappear.
+and the "Please add channels to this source" message will disappear.
 
 If you look at the text-mode console, you'll see this if the channel
 retrieval is working:
