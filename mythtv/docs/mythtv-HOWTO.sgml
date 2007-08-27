@@ -7668,7 +7668,7 @@ The following steps should work for most users:
 <item>Create a Schedules Direct account and use the same information as your
 existing lineups at Zap2It Labs.  Do not add or delete channels at this
 time.
-<item>Shut down any running <bf>mythfrontend</bf> and <bf>mythbackend</bf> programs
+<item>Shut down any running <bf>mythfrontend</bf> and <bf>mythbackend</bf> programs.
 <item>Perform a backup of your existing database.  See <ref id="backupdb"
 name="Saving or restoring the database"> for instructions.
 <item>Run <bf>mythtv-setup</bf> -> Video Sources.  Change the grabber to
@@ -7791,11 +7791,16 @@ $ mythfilldatabase --remove-new-channels
 </verb></tscreen>
 
 You will also need to modify how the <bf>mythbackend</bf> calls
-<bf>mythfilldatabase</bf> when it performs it's automatic listings update.
+<bf>mythfilldatabase</bf> when it performs its automatic listings update.
 
+In <bf>mythfrontend</bf>, select "Setup" -> "General".
 
+Continue press ENTER until you reach the Mythfilldatabase configuration
+screen.  In the "mythfilldatabase Arguments" field, type
+--remove-new-channels
 
-
+then press the TAB key until you reach Finish, then press ENTER to save. 
+You can then press ESC until you return to the main screen.
 </article>
 <!-- Revision History
 v0.20.00, 2006-09-10.  Start prepping for 0.20.  Add HDHomeRun as a capture device.
