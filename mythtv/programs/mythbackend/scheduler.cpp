@@ -1321,7 +1321,7 @@ void Scheduler::RunScheduler(void)
             msg.sprintf("Scheduled %d items in "
                         "%.1f = %.2f match + %.2f place", (int)reclist.size(),
                         matchTime + placeTime, matchTime, placeTime);
-                         
+
             VERBOSE(VB_GENERAL, msg);
             gContext->LogEntry("scheduler", LP_INFO, "Scheduled items", msg);
 
@@ -1344,16 +1344,22 @@ void Scheduler::RunScheduler(void)
                 //the parameter given to the startup_cmd. "user" means a user
                 // started the BE, 'auto' means it was started automatically
                 QString startupParam = "user";
-                
+
+                // find the first recording that WILL be recorded
+                RecIter firstRunIter = reclist.begin();
+                for ( ; firstRunIter != reclist.end(); firstRunIter++)
+                    if ((*firstRunIter)->recstatus == rsWillRecord)
+                        break;
+
                 // have we been started automatically?
                 if (WasStartedAutomatically() ||
-                    ((startIter != reclist.end()) &&
-                     ((curtime.secsTo((*startIter)->startts) - prerollseconds)
+                    ((firstRunIter != reclist.end()) &&
+                     ((curtime.secsTo((*firstRunIter)->startts) - prerollseconds)
                         < (idleWaitForRecordingTime * 60))))
                 {
                     VERBOSE(VB_IMPORTANT, "AUTO-Startup assumed");
                     startupParam = "auto";
-            
+
                     // Since we've started automatically, don't wait for
                     // client to connect before allowing shutdown.
                     blockShutdown = false;
@@ -1362,7 +1368,7 @@ void Scheduler::RunScheduler(void)
                 {
                     VERBOSE(VB_IMPORTANT, "Seem to be woken up by USER");
                 }
-        
+
                 QString startupCommand = gContext->GetSetting("startupCommand",
                                                               "");
                 if (!startupCommand.isEmpty())
@@ -1547,14 +1553,19 @@ void Scheduler::RunScheduler(void)
                     if (it.data()->IsBusy())
                         recording = true;
                 }
-                
+
                 if (!(m_mainServer->isClientConnected()) && !recording)
                 {
                     if (!idleSince.isValid())
                     {
-                        if (startIter != reclist.end())
+                        RecIter idleIter = reclist.begin();
+                        for ( ; idleIter != reclist.end(); idleIter++)
+                            if ((*idleIter)->recstatus == rsWillRecord)
+                                break;
+
+                        if (idleIter != reclist.end())
                         {
-                            if (curtime.secsTo((*startIter)->startts) - 
+                            if (curtime.secsTo((*idleIter)->startts) - 
                                 prerollseconds > idleWaitForRecordingTime * 60)
                             {
                                 idleSince = curtime;
@@ -1565,7 +1576,7 @@ void Scheduler::RunScheduler(void)
                     } 
                     else 
                     {
-                        // is the machine already ideling the timeout time?
+                        // is the machine already idling the timeout time?
                         if (idleSince.addSecs(idleTimeoutSecs) < curtime)
                         {
                             // are we waiting for shutdown?
