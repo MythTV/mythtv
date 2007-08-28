@@ -87,6 +87,13 @@ void GlobalSetup::wireUI()
     {
         VERBOSE(VB_IMPORTANT, "error loading skipcheck");
     }
+
+    m_finish_btn = getUITextButtonType("finishbutton");
+    if (m_finish_btn)
+    {
+        m_finish_btn->setText(tr("Finish"));
+        connect(m_finish_btn, SIGNAL(pushed()), this, SLOT(saveData()));
+    }
 }
 
 void GlobalSetup::loadData()
@@ -104,6 +111,7 @@ void GlobalSetup::saveData()
     gContext->SaveSetting("weatherHoldTimeout", m_hold_spinbox->value());
     gContext->SaveSetting("weatherbackgroundfetch",
                           m_background_check->getState() ? 1 : 0);
+    accept();
 }
 
 void GlobalSetup::keyPressEvent(QKeyEvent *e)
@@ -132,11 +140,8 @@ void GlobalSetup::keyPressEvent(QKeyEvent *e)
             {
                 check->push();
             }
-        }
-        else if (action == "MENU")
-        {
-            saveData();
-            accept();
+            if (curr == m_finish_btn)
+                m_finish_btn->push();
         }
         else
             handled = false;
@@ -165,6 +170,18 @@ void ScreenSetup::wireUI()
     {
         VERBOSE(VB_IMPORTANT, "error loading helptxt");
     }
+
+    UITextType *header = getUITextType("header");
+    if (header)
+        header->SetText(tr("Screen Setup"));
+
+    UITextType *activeheader = getUITextType("activehdr");
+    if (activeheader)
+        activeheader->SetText(tr("Active Screens"));
+
+    UITextType *inactiveheader = getUITextType("inactivehdr");
+    if (inactiveheader)
+        inactiveheader->SetText(tr("Inactive Screens"));
 
     m_active_list = getUIListBtnType("activelist");
     if (!m_active_list)
@@ -202,6 +219,7 @@ void ScreenSetup::wireUI()
     else
     {
         m_type_list->calculateScreenArea();
+        m_type_list->allowFocus(false);
         // connect(m_active_list, SIGNAL(takingFocus()), m_type_list,
         // SLOT(show()));
         connect(m_type_list, SIGNAL(takingFocus()), m_type_list, SLOT(show()));
@@ -226,7 +244,16 @@ void ScreenSetup::wireUI()
         connect(m_type_list, SIGNAL(takingFocus()), txt, SLOT(show()));
         connect(m_active_list, SIGNAL(loosingFocus()), txt, SLOT(hide()));
         txt->hide();
+        txt->SetText(tr("Data Types"));
     }
+
+    m_finish_btn = getUITextButtonType("finishbutton");
+    if (m_finish_btn)
+    {
+        m_finish_btn->setText(tr("Finish"));
+        connect(m_finish_btn, SIGNAL(pushed()), this, SLOT(saveData()));
+    }
+
 }
 
 void ScreenSetup::keyPressEvent(QKeyEvent *e)
@@ -247,8 +274,6 @@ void ScreenSetup::keyPressEvent(QKeyEvent *e)
             cursorUp(curr);
         else if (action == "SELECT")
             cursorSelect(curr);
-        else if (action == "MENU")
-            cursorMenu();
         else if (action == "RIGHT")
             cursorRight(curr);
         else if (action == "LEFT")
@@ -353,8 +378,10 @@ void ScreenSetup::loadData()
     int line, col;
     if (!doc.setContent(&xml, false, &msg, &line, &col))
     {
-        cerr << "Error parsing weather-ui.xml at line "
-            << line << endl << msg << endl;
+        VERBOSE(VB_IMPORTANT, QString("Error parsing weather-ui.xml at line %1")
+                                      .arg(line));
+        VERBOSE(VB_IMPORTANT, QString("XML error %1")
+                                      .arg(msg));
         return;
     }
 
@@ -481,6 +508,40 @@ void ScreenSetup::loadData()
 
 void ScreenSetup::saveData()
 {
+    // check if all active screens have sources/locations defined
+    QStringList notDefined;
+    QPtrListIterator<UIListBtnTypeItem> screens = m_active_list->GetIterator();
+    if (!screens)
+    {
+        MythPopupBox::showOkPopup(gContext->GetMainWindow(), "No Screens",
+                tr("No Active Screens are defined.  Define atleast one "
+                    "before continuing."));
+        return;
+    }
+
+    while (screens)
+    {
+        UIListBtnTypeItem *itm = *screens;
+        ScreenListInfo *si = (ScreenListInfo *) itm->getData();
+        QDictIterator<TypeListInfo> it(si->types);
+        for (; it.current(); ++it)
+        {
+            TypeListInfo *ti = it.current();
+            if (!ti->src)
+                notDefined << ti->name;
+        }
+        ++screens;
+    }
+
+    if (notDefined.size())
+    {
+        QString msg = tr("Cannot proceed, the following data items do not have sources defined:\n");
+        msg += notDefined.join("\n");
+        MythPopupBox::showOkPopup(gContext->GetMainWindow(),
+                                  "Undefined Sources", msg);
+        return;
+    }
+
     MSqlQuery db(MSqlQuery::InitCon());
     MSqlQuery db2(MSqlQuery::InitCon());
     QString query = "DELETE FROM weatherscreens WHERE hostname=:HOST";
@@ -550,6 +611,8 @@ void ScreenSetup::saveData()
         ++an_it;
         ++draworder;
     }
+
+    accept();
 }
 
 void ScreenSetup::doListSelect(UIListBtnType *list, UIListBtnTypeItem *selected)
@@ -597,6 +660,7 @@ void ScreenSetup::doListSelect(UIListBtnType *list, UIListBtnTypeItem *selected)
                 nextPrevWidgetFocus(false);
                 list->allowFocus(false);
                 m_type_list->hide();
+                m_type_list->allowFocus(false);
                 UITextType *txt = getUITextType("typelbl");
                 if (txt) txt->hide();
             }
@@ -709,13 +773,16 @@ void ScreenSetup::activeListItemSelected(UIListBtnTypeItem *itm)
                                                            it.current()->name);
             item->setData(it.current());
         }
-    if (txt) txt->show();
-    m_type_list->show();
+
+        if (txt) txt->show();
+        m_type_list->show();
+        m_type_list->allowFocus(true);
     }
     else
     {
         if (txt) txt->hide();
         m_type_list->hide();
+        m_type_list->allowFocus(false);
     }
     updateForeground();
 }
@@ -772,13 +839,11 @@ void ScreenSetup::cursorUp(UIType *curr)
             list->MoveUp(UIListBtnType::MoveItem);
             updateForeground();
         }
-        else if (list == m_active_list && m_inactive_list->GetCount())
+        else
             nextPrevWidgetFocus(false);
     }
     else
-    {
         nextPrevWidgetFocus(false);
-    }
 }
 
 void ScreenSetup::cursorDown(UIType *curr)
@@ -792,13 +857,11 @@ void ScreenSetup::cursorDown(UIType *curr)
             list->MoveDown(UIListBtnType::MoveItem);
             updateForeground();
         }
-        else if (list == m_inactive_list && m_active_list->GetCount())
+        else
             nextPrevWidgetFocus(true);
     }
     else
-    {
         nextPrevWidgetFocus(true);
-    }
 }
 
 void ScreenSetup::cursorSelect(UIType *curr)
@@ -809,6 +872,9 @@ void ScreenSetup::cursorSelect(UIType *curr)
         doListSelect(list, list->GetItemCurrent());
         updateForeground();
     }
+
+    if (curr == m_finish_btn)
+        m_finish_btn->push();
 }
 
 void ScreenSetup::cursorRight(UIType *curr)
@@ -830,45 +896,6 @@ void ScreenSetup::cursorLeft(UIType *curr)
     {
         nextPrevWidgetFocus(false);
     }
-}
-
-void ScreenSetup::cursorMenu()
-{
-    // check if all active screens have sources/locations defined
-    QStringList notDefined;
-    QPtrListIterator<UIListBtnTypeItem> screens = m_active_list->GetIterator();
-    if (!screens)
-    {
-        MythPopupBox::showOkPopup(gContext->GetMainWindow(), "No Screens",
-                tr("No Active Screens are defined.  Define atleast one "
-                    "before continuing."));
-        return;
-    }
-
-    while (screens)
-    {
-        UIListBtnTypeItem *itm = *screens;
-        ScreenListInfo *si = (ScreenListInfo *) itm->getData();
-        QDictIterator<TypeListInfo> it(si->types);
-        for (; it.current(); ++it)
-        {
-            TypeListInfo *ti = it.current();
-            if (!ti->src)
-                notDefined << ti->name;
-        }
-        ++screens;
-    }
-
-    if (notDefined.size())
-    {
-        QString msg = tr("Cannot proceed, the following data items do not have sources defined:\n");
-        msg += notDefined.join("\n");
-        MythPopupBox::showOkPopup(gContext->GetMainWindow(),
-                                  "Undefined Sources", msg);
-        return;
-    }
-    saveData();
-    accept();
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -954,6 +981,13 @@ void SourceSetup::wireUI()
         connect(blckhl, SIGNAL(loosingFocus()), this,
                 SLOT(retrieveSpinboxUpdate()));
     }
+
+    m_finish_btn = getUITextButtonType("finishbutton");
+    if (m_finish_btn)
+    {
+        m_finish_btn->setText(tr("Finish"));
+        connect(m_finish_btn, SIGNAL(pushed()), this, SLOT(saveData()));
+    }
 }
 
 bool SourceSetup::loadData()
@@ -992,6 +1026,9 @@ bool SourceSetup::loadData()
             new UIListBtnTypeItem(m_src_list, tr(si->name));
         item->setData(si);
     }
+
+    m_src_list->SetItemCurrent(0);
+
     return true;
 }
 
@@ -1024,6 +1061,8 @@ void SourceSetup::saveData()
 
         ++an_it;
     }
+
+    accept();
 }
 
 void SourceSetup::updateSpinboxUpdate()
@@ -1046,9 +1085,7 @@ void SourceSetup::keyPressEvent(QKeyEvent *e)
     gContext->GetMainWindow()->TranslateKeyPress("Weather", e, actions);
     UIType *curr = getCurrentFocusWidget();
     bool handled = false;
-    if (curr)
-        cout << curr->name() << endl;
-    else cout << "curr is null" << endl;
+
     for (uint i = 0; i < actions.size() && !handled; ++i)
     {
         handled = true;
@@ -1083,11 +1120,10 @@ void SourceSetup::keyPressEvent(QKeyEvent *e)
             else
                 nextPrevWidgetFocus(false);
         }
-        else if (action == "MENU")
+        else if (action == "SELECT")
         {
-            if (curr)
-                saveData();
-            accept();
+            if (curr == m_finish_btn)
+                m_finish_btn->push();
         }
         else if (action == "RIGHT")
         {

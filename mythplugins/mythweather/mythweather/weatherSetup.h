@@ -108,10 +108,10 @@ class GlobalSetup : public MythThemedDialog
 
   protected slots:
     void keyPressEvent(QKeyEvent *e);
+    void saveData();
 
   private:
     void loadData();
-    void saveData();
     void wireUI();
 
   private:
@@ -121,6 +121,7 @@ class GlobalSetup : public MythThemedDialog
     WeatherSpinBox *m_hold_spinbox;
     int m_timeout;
     int m_hold_timeout;
+    UITextButtonType *m_finish_btn;
 };
 
 class ScreenSetup : public MythThemedDialog
@@ -134,10 +135,10 @@ class ScreenSetup : public MythThemedDialog
     void keyPressEvent(QKeyEvent *e);
     void activeListItemSelected(UIListBtnTypeItem *itm = 0);
     void updateHelpText();
+    void saveData();
 
   private:
     void loadData();
-    void saveData();
     void wireUI();
 
     void doListSelect(UIListBtnType *list, UIListBtnTypeItem *selected);
@@ -151,7 +152,6 @@ class ScreenSetup : public MythThemedDialog
     void cursorRight(UIType *curr);
     void cursorLeft(UIType *curr);
     void cursorSelect(UIType *curr);
-    void cursorMenu();
 
   private:
     SourceManager *m_src_man;
@@ -160,6 +160,7 @@ class ScreenSetup : public MythThemedDialog
     UIListBtnType *m_active_list;
     UIListBtnType *m_inactive_list;
     UIListBtnType *m_type_list;
+    UITextButtonType *m_finish_btn;
 };
 
 class SourceSetup : public MythThemedDialog
@@ -177,14 +178,15 @@ class SourceSetup : public MythThemedDialog
     void sourceListItemSelected(UIListBtnTypeItem *itm = 0);
     void updateSpinboxUpdate();
     void retrieveSpinboxUpdate();
+    void saveData();
 
   private:
-    void saveData();
     void wireUI();
 
     WeatherSpinBox *m_update_spinbox;
     WeatherSpinBox *m_retrieve_spinbox;
     UIListBtnType *m_src_list;
+    UITextButtonType *m_finish_btn;
 };
 
 struct ResultListInfo
