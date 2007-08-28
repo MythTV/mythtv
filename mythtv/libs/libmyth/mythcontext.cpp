@@ -242,6 +242,7 @@ class MythContextPrivate
     // Dimensions of the theme
     int m_baseWidth, m_baseHeight;
     
+    QMutex m_hostnamelock;
     QString m_localhostname;
 
     QMutex serverSockLock;
@@ -1236,7 +1237,12 @@ void MythContext::ActivateSettingsCache(bool activate)
 
 QString MythContext::GetHostName(void)
 {
-    return d->m_localhostname; 
+    // The reference counting in QString isn't thread-safe, so we need
+    // take care of it ourselves.
+    d->m_hostnamelock.lock();
+    QString tmp = QDeepCopy<QString>(d->m_localhostname);
+    d->m_hostnamelock.unlock();
+    return tmp;
 }
 
 QString MythContext::GetFilePrefix(void)
