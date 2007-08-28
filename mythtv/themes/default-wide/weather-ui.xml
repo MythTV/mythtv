@@ -1271,12 +1271,15 @@
         <image function="unchecked" filename="mw_unchecked.png"></image>
         <image function="checked_high" filename="mw_checked_high.png"></image>
         <image function="unchecked_high" filename="mw_unchecked_high.png"></image>
-      </checkbox>      
-      <textarea name="menulbl" draworder="0" align="left">
-        <area>500,400,475,30</area>
-        <font>label</font>
-        <value>Press MENU to continue</value>
-      </textarea>
+      </checkbox>
+
+      <textbutton name="finishbutton" draworder="0">
+        <position>500,500</position>
+        <font>button</font>
+        <image function="on" filename="text_button_on.png"/>
+        <image function="off" filename="text_button_off.png"/>
+        <image function="pushed" filename="text_button_pushed.png"/>
+      </textbutton>
     </container>
   </window>
   <window name="screen-setup">
@@ -1327,7 +1330,6 @@
       <textarea name="header" draworder="0" align="center">
         <area>0,18,800,45</area>
         <font>header</font>
-        <value>Screen Setup</value>
       </textarea>
       </container>
       <container name="screen-setup">
@@ -1349,12 +1351,10 @@
       <textarea name="activehdr" draworder="0" align="left">
         <area>15, 190, 375, 30</area>
         <font>active</font>
-        <value>Active Screens</value>
       </textarea>
       <textarea name="inactivehdr" draworder="0" align="left">
         <area>25,20,200,30</area>
         <font>active</font>
-        <value>Inactive Screens</value>
       </textarea>
       <listbtnarea name="typelist" draworder="0">
         <area>265,45,200,348</area>
@@ -1366,7 +1366,6 @@
       <textarea name="typelbl" draworder="0">
         <area>260,20,200,30</area>
         <font>active</font>
-        <value>Data Types</value>
       </textarea>
       <image name="txtlines" draworder="0">
         <position>475,45</position>
@@ -1378,11 +1377,13 @@
         <multiline>yes</multiline>
         <font>help</font>
       </textarea>
-      <textarea name="menulbl" draworder="0" align="left">
-        <area>500,400,475,30</area>
-        <font>label</font>
-        <value>Press MENU to continue</value>
-      </textarea>
+      <textbutton name="finishbutton" draworder="0">
+        <position>500,500</position>
+        <font>button</font>
+        <image function="on" filename="text_button_on.png"/>
+        <image function="off" filename="text_button_off.png"/>
+        <image function="pushed" filename="text_button_pushed.png"/>
+      </textbutton>
     </container>
   </window>
   <window name="source-setup">
@@ -1467,17 +1468,18 @@
       <blackhole name="retrieve_spinbox" draworder="0">
         <area>600,155,70,30</area>
       </blackhole>
-      <textarea name="menulbl" draworder="0" align="left">
-        <area>500,400,475,30</area>
-        <font>label</font>
-        <value>Press MENU to continue</value>
-      </textarea>
       <textarea name="srcinfo" draworder="0" align="left">
         <area>290,290,450,90</area>
         <multiline>yes</multiline>
         <font>help</font>
       </textarea>
-        
+      <textbutton name="finishbutton" draworder="0">
+        <position>500,500</position>
+        <font>button</font>
+        <image function="on" filename="text_button_on.png"/>
+        <image function="off" filename="text_button_off.png"/>
+        <image function="pushed" filename="text_button_pushed.png"/>
+      </textbutton>
     </container>
     
   </window>
