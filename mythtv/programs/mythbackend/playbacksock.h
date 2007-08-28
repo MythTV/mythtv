@@ -73,6 +73,7 @@ class PlaybackSock
     bool blockshutdown;
     bool backend;
 
+    QMutex refLock;
     QMutex sockLock;
 
     bool expectingreply;

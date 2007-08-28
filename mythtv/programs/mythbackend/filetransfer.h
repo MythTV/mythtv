@@ -55,6 +55,7 @@ class FileTransfer
 
     vector<char> requestBuffer;
 
+    QMutex refLock;
     int refCount;
 };
 
