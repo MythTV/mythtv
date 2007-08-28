@@ -4372,7 +4372,8 @@ QPixmap PlaybackBox::getPixmap(ProgramInfo *pginfo)
 
 void PlaybackBox::showIconHelp(void)
 {
-    int curRow = 0;
+    int curRow = 1;
+    int curCol = 0;
     LayerSet *container = NULL;
     if (type != Delete)
         container = theme->GetSet("program_info_play");
@@ -4386,16 +4387,25 @@ void PlaybackBox::showIconHelp(void)
         gContext->GetMainWindow(), true, drawPopupFgColor,
         drawPopupBgColor, drawPopupSelColor, "icon help");
 
-    QGridLayout *grid = new QGridLayout(6, 2, (int)(10 * wmult));
+    QGridLayout *grid = new QGridLayout(6, 4, (int)(5 * wmult));
 
     QLabel *label;
     UIImageType *itype;
     bool displayme = false;
 
-    label = iconhelp->addLabel(tr("Status Icons"), MythPopupBox::Large,
-                               false);
-
-    label->setAlignment(Qt::AlignCenter | Qt::WordBreak);
+    label = new QLabel(tr("Status Icons"), iconhelp, "");
+    QFont font = label->font();
+    font.setPointSize(int (font.pointSize() * 1.5));
+    font.setBold(true);
+    label->setFont(font);
+    label->setBackgroundOrigin(ParentOrigin);
+    label->setPaletteForegroundColor(drawPopupFgColor);
+    label->setAlignment(Qt::AlignHCenter | Qt::AlignTop);
+    label->setMinimumWidth((int)(600 * wmult));
+    label->setMaximumWidth((int)(600 * wmult));
+    label->setMinimumHeight((int)(35 * hmult));
+    label->setMaximumHeight((int)(35 * hmult));
+    grid->addMultiCellWidget(label, 0, 0, 0, 3, Qt::AlignHCenter);
 
     QMap <QString, QString>::iterator it;
     QMap <QString, QString> iconMap;
@@ -4427,12 +4437,18 @@ void PlaybackBox::showIconHelp(void)
         itype = (UIImageType *)container->GetType(it.key());
         if (itype)
         {
-            label = new QLabel(it.data(), iconhelp);
-            label->setAlignment(Qt::WordBreak | Qt::AlignLeft);
+            if (curCol == 0) 
+                label = new QLabel(it.data(), iconhelp, "nopopsize");
+            else
+                label = new QLabel(it.data(), iconhelp, "");
+            label->setAlignment(Qt::WordBreak | Qt::AlignLeft | Qt::AlignVCenter);
             label->setBackgroundOrigin(ParentOrigin);
             label->setPaletteForegroundColor(drawPopupFgColor);
-            grid->addWidget(label, curRow, 1, Qt::AlignLeft);
-             
+            label->setMinimumHeight((int)(50 * hmult));
+            label->setMaximumHeight((int)(50 * hmult));
+
+            grid->addWidget(label, curRow, curCol + 1, Qt::AlignLeft);
+
             label = new QLabel(iconhelp, "nopopsize");
 
             itype->ResetFilename();
@@ -4440,12 +4456,14 @@ void PlaybackBox::showIconHelp(void)
             label->setPixmap(itype->GetImage());
             displayme = true;
 
-            label->setMaximumWidth(width() / 2);
             label->setBackgroundOrigin(ParentOrigin);
             label->setPaletteForegroundColor(drawPopupFgColor);
-            grid->addWidget(label, curRow, 0, Qt::AlignCenter);
+            grid->addWidget(label, curRow, curCol, Qt::AlignCenter);
 
-            curRow++;
+            curCol += 2;
+            curCol %= 4;
+            if (curCol == 0)
+                curRow++;
         }
     }
 
