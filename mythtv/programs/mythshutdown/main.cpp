@@ -73,7 +73,12 @@ int lockShutdown()
 {
     VERBOSE(VB_GENERAL, "Mythshutdown: --lock");
 
-    setGlobalSetting("MythShutdownLock", "1");
+    QString value_str = getGlobalSetting("MythShutdownLock", "0");
+    bool isNumber = false;
+    ulong value = value_str.toULong(&isNumber);
+    if (!isNumber)
+        value = 0;
+    setGlobalSetting("MythShutdownLock", QString::number(++value));
 
     return 0;
 }
@@ -82,7 +87,15 @@ int unlockShutdown()
 {
     VERBOSE(VB_GENERAL, "Mythshutdown: --unlock");
 
-    setGlobalSetting("MythShutdownLock", "0");
+    QString value_str = getGlobalSetting("MythShutdownLock", "0");
+    bool isNumber = false;
+    ulong value = value_str.toULong(&isNumber);
+    if (!isNumber)
+        value = 0;
+    // Prevent going negative
+    if (value == 0)
+        ++value;
+    setGlobalSetting("MythShutdownLock", QString::number(--value));
 
     return 0;
 }
@@ -196,7 +209,7 @@ int getStatus(bool bWantRecStatus)
         res += 8;
     }
 
-    if (getGlobalSetting("MythShutdownLock", "0") == "1")
+    if (getGlobalSetting("MythShutdownLock", "0") != "0")
     {
         VERBOSE(VB_IMPORTANT, "Shutdown is locked");
         res += 16;
