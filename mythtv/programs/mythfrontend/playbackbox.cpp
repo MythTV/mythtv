@@ -2427,6 +2427,9 @@ void PlaybackBox::showMenu()
         }
     }
 
+    popup->addButton(tr("Help (Status Icons)"), this,
+                         SLOT(showIconHelp()));
+
     popup->ShowPopup(this, SLOT(doCancel()));
 
     topButton->setFocus();
@@ -4372,6 +4375,9 @@ QPixmap PlaybackBox::getPixmap(ProgramInfo *pginfo)
 
 void PlaybackBox::showIconHelp(void)
 {
+    if (expectingPopup)
+       cancelPopup();
+
     int curRow = 1;
     int curCol = 0;
     LayerSet *container = NULL;

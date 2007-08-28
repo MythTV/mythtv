@@ -148,6 +148,7 @@ class PlaybackBox : public MythDialog
     void showPlaylistPopup();
     void showPlaylistJobPopup();
     void showProgramDetails();
+    void showIconHelp();
 
     void doPlay();
     void doPlayFromBeg();
@@ -286,7 +287,6 @@ class PlaybackBox : public MythDialog
 
     bool fileExists(ProgramInfo *pginfo);
 
-    void showIconHelp();
 
     QString getRecGroupPassword(QString recGroup);
     void fillRecGroupPasswordCache(void);
