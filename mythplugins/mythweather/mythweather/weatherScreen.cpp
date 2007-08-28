@@ -195,8 +195,9 @@ void WeatherScreen::toggle_pause(bool paused)
     UITextType *txt = (UITextType *) getType("pause_text");
     if (txt)
     {
+        QString pausetext = QString("- %1 -").arg(tr("PAUSED"));
         if (paused)
-            txt->SetText(tr("- PAUSED -"));
+            txt->SetText(pausetext);
         else
             txt->SetText("");
     }
