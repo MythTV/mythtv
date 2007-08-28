@@ -46,6 +46,7 @@ class ProgFinder : public MythDialog
     void showGuide();
     void pageUp();
     void pageDown();
+    void pageMiddle();
     void select();
     void customEdit();
     void upcoming();

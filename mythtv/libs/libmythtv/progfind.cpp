@@ -194,6 +194,8 @@ void ProgFinder::keyPressEvent(QKeyEvent *e)
             pageUp();
         else if (action == "PAGEDOWN")
             pageDown();
+        else if (action == "5")
+            pageMiddle();
         else if (action == "SELECT" || action == "INFO")
             select();
         else if (action == "CUSTOMEDIT")
@@ -703,6 +705,37 @@ void ProgFinder::pageDown()
             curShow = curShow - showCount;
 
         showShowingList();
+    }
+}
+
+void ProgFinder::pageMiddle()
+{
+    if (inSearch == 0)
+    {
+        curSearch = searchCount / 2 + 10 - 1;
+
+        if (gotInitData[curSearch] <= 1)
+            clearProgramList();
+        else
+            showSearchList();
+    }
+    if (inSearch == 1)
+    {
+        if (listCount > showsPerListing)
+        {
+          curProgram = listCount / 2 - 1;
+
+          showProgramList();
+        }
+    }
+    if (inSearch == 2)
+    {
+        if (showCount > showsPerListing)
+        {
+          curShow = showCount / 2 - 1;
+
+          showShowingList();
+        }
     }
 }
 
