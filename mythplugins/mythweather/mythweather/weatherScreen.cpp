@@ -279,12 +279,12 @@ QString CurrCondScreen::prepareDataItem(const QString &key,
         return value + (m_units == ENG_UNITS ? " mi" : " km");
 
     if (key == "appt")
-        return value == "NA" ? value : value + (m_units == ENG_UNITS ? " F" : " C");
+        return value == "NA" ? value : value + (m_units == ENG_UNITS ? " °F" : " °C");
 
     if (key == "temp")
-        return value + (m_units == ENG_UNITS ? " F" : " C");
+        return value + (m_units == ENG_UNITS ? " °F" : " °C");
 
-    if (key == "wind_gust")
+    if (key == "wind_gust" || key == "wind_spdgst" || key == "wind_speed")
         return '(' + value + ')' + (m_units == ENG_UNITS ? " mph" : " kph");
 
     return value;
