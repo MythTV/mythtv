@@ -88,7 +88,7 @@
 
   <buttondef name="DVD_SETTINGS_GENERAL">
     <image>text-blank.png</image>
-    <watermarkimage>watermark/cd.png</watermarkimage>
+    <watermarkimage>watermark/dvd.png</watermarkimage>
     <offset>0,0</offset>
   </buttondef>
 
@@ -166,7 +166,7 @@
 
   <buttondef name="DVD">
     <image>text-blank.png</image>
-    <watermarkimage>watermark/cd.png</watermarkimage>
+    <watermarkimage>watermark/dvd.png</watermarkimage>
     <offset>0,0</offset>
   </buttondef>
 
@@ -202,31 +202,31 @@
 
   <buttondef name="NETFLIX">
     <image>text-blank.png</image>
-    <watermarkimage>watermark/cd.png</watermarkimage>
+    <watermarkimage>watermark/dvd.png</watermarkimage>
     <offset>0,0</offset>
   </buttondef>
   
   <buttondef name="NETFLIX_QUEUE">
     <image>text-blank.png</image>
-    <watermarkimage>watermark/cd.png</watermarkimage>
+    <watermarkimage>watermark/dvd.png</watermarkimage>
     <offset>0,0</offset>
   </buttondef>
 
   <buttondef name="NETFLIX_BROWSE">
     <image>text-blank.png</image>
-    <watermarkimage>watermark/cd.png</watermarkimage>
+    <watermarkimage>watermark/dvd.png</watermarkimage>
     <offset>0,0</offset>
   </buttondef>
 
   <buttondef name="NETFLIX_HISTORY">
     <image>text-blank.png</image>
-    <watermarkimage>watermark/cd.png</watermarkimage>
+    <watermarkimage>watermark/dvd.png</watermarkimage>
     <offset>0,0</offset>
   </buttondef>
 
   <buttondef name="SETTINGS_NETFLIX">
     <image>text-blank.png</image>
-    <watermarkimage>watermark/cd.png</watermarkimage>
+    <watermarkimage>watermark/dvd.png</watermarkimage>
     <offset>0,0</offset>
   </buttondef>
 
@@ -780,4 +780,39 @@
     <offset>0,0</offset>
   </buttondef>
 
+<!-- ARCHIVE -->
+
+  <buttondef name="ARCHIVE">
+    <image>text-blank.png</image>
+    <watermarkimage>watermark/archive.png</watermarkimage>
+    <offset>0,0</offset>
+  </buttondef>
+
+  <buttondef name="SETTINGS_ARCHIVE">
+    <image>text-blank.png</image>
+    <watermarkimage>watermark/archive.png</watermarkimage>
+    <offset>0,0</offset>
+  </buttondef>
+
+  <buttondef name="EJECT">
+    <image>text-blank.png</image>
+    <watermarkimage>watermark/eject.png</watermarkimage>
+    <offset>0,0</offset>
+  </buttondef>
+
+<!-- ZONEMINDER -->
+
+  <buttondef name="ZONEMINDER">
+    <image>text-blank.png</image>
+    <watermarkimage>watermark/webcam.png</watermarkimage>
+    <offset>0,0</offset>
+  </buttondef>
+
+  <buttondef name="SETTINGS_ZONEMINDER">
+    <image>text-blank.png</image>
+    <watermarkimage>watermark/webcam.png</watermarkimage>
+    <offset>0,0</offset>
+  </buttondef>
+
+ 
 </myththeme>
