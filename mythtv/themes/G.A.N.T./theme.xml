@@ -762,4 +762,26 @@
     <offset>0,0</offset>
   </buttondef>
 
+<!-- MYTHARCHIVE -->
+
+  <buttondef name="ARCHIVE">
+    <image>text-blank.png</image>
+    <watermarkimage>watermark/archive.png</watermarkimage>
+    <offset>0,0</offset>
+  </buttondef>
+
+  <buttondef name="SETTINGS_ARCHIVE">
+    <image>text-blank.png</image>
+    <watermarkimage>watermark/archive.png</watermarkimage>
+    <offset>0,0</offset>
+  </buttondef>
+
+<!-- EJECT -->
+
+  <buttondef name="EJECT">
+    <image>text-blank.png</image>
+    <watermarkimage>watermark/eject.png</watermarkimage>
+    <offset>0,0</offset>
+  </buttondef>
+
 </myththeme>
