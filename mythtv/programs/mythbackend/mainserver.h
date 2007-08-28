@@ -162,6 +162,7 @@ class MainServer : public QObject, public MythSocketCBs
 
     MythServer *mythserver;
 
+    QMutex sockListLock;
     vector<PlaybackSock *> playbackList;
     vector<FileTransfer *> fileTransferList;
 

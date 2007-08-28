@@ -43,11 +43,14 @@ PlaybackSock::~PlaybackSock()
 
 void PlaybackSock::UpRef(void)
 {
+    QMutexLocker locker(&refLock);
     refCount++;
 }
 
 bool PlaybackSock::DownRef(void)
 {
+    QMutexLocker locker(&refLock);
+
     refCount--;
     if (refCount < 0)
     {

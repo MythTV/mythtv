@@ -37,11 +37,14 @@ FileTransfer::~FileTransfer()
 
 void FileTransfer::UpRef(void)
 {
+    QMutexLocker locker(&refLock);
     refCount++;
 }
 
 bool FileTransfer::DownRef(void)
 {
+    refLock.lock();
+
     refCount--;
 
     if (refCount < 0)
@@ -52,9 +55,12 @@ bool FileTransfer::DownRef(void)
             delete rbuffer;
 
         readthreadLock.unlock();
+        refLock.unlock();
         delete this;
         return true;
     }
+    
+    refLock.unlock();
     return false;
 }
 

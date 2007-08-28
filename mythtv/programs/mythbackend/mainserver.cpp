@@ -789,6 +789,7 @@ void MainServer::customEvent(QCustomEvent *e)
 
         // Make a local copy of the list, upping the refcount as we go..
         vector<PlaybackSock *> localPBSList;
+        sockListLock.lock();
         vector<PlaybackSock *>::iterator iter = playbackList.begin();
         for (; iter != playbackList.end(); iter++)
         {
@@ -796,6 +797,7 @@ void MainServer::customEvent(QCustomEvent *e)
             pbs->UpRef();
             localPBSList.push_back(pbs);
         }
+        sockListLock.unlock();
 
         for (iter = localPBSList.begin(); iter != localPBSList.end(); iter++)
         {
@@ -834,11 +836,7 @@ void MainServer::customEvent(QCustomEvent *e)
                 sock->Unlock();
             }
 
-            if (sock->DownRef())
-            {
-                // was deleted elsewhere, so the iterator's invalid.
-                iter = playbackList.begin();
-            }
+            sock->DownRef();
         }
 
         // Done with the pbs list, so decrement all the instances..
@@ -873,12 +871,14 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
 {
     QStringList retlist = "OK";
 
+    sockListLock.lock();
     vector<PlaybackSock *>::iterator iter = playbackList.begin();
     for (; iter != playbackList.end(); iter++)
     {
         PlaybackSock *pbs = (*iter);
         if (pbs->getSocket() == socket)
         {
+            sockListLock.unlock();
             VERBOSE(VB_IMPORTANT, QString("Client %1 is trying to announce a socket "
                                     "multiple times.")
                                     .arg(commands[2]));
@@ -886,6 +886,7 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
             return;
         }
     }
+    sockListLock.unlock();
 
     if (commands[1] == "Playback" || commands[1] == "Monitor")
     {
@@ -899,7 +900,9 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
                                .arg(commands[2]).arg(wantevents));
         PlaybackSock *pbs = new PlaybackSock(this, socket, commands[2], wantevents);
         pbs->setBlockShutdown(commands[1] == "Playback");
+        sockListLock.lock();
         playbackList.push_back(pbs);
+        sockListLock.unlock();
     }
     else if (commands[1] == "SlaveBackend")
     {
@@ -941,7 +944,9 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
 
         pbs->setBlockShutdown(false);
 
+        sockListLock.lock();
         playbackList.push_back(pbs);
+        sockListLock.unlock();
 
         autoexpireUpdateTimer->start(1000, true);
     }
@@ -967,7 +972,9 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
         else
             ft = new FileTransfer(filename, socket);
         
+        sockListLock.lock();
         fileTransferList.push_back(ft);
+        sockListLock.unlock();
 
         retlist << QString::number(socket->socket());
         ft->UpRef();
@@ -3592,6 +3599,8 @@ void MainServer::DeletePBS(PlaybackSock *sock)
 
 void MainServer::connectionClosed(MythSocket *socket)
 {
+    sockListLock.lock();
+
     vector<PlaybackSock *>::iterator it = playbackList.begin();
     for (; it != playbackList.end(); ++it)
     {
@@ -3600,6 +3609,7 @@ void MainServer::connectionClosed(MythSocket *socket)
         if (sock == socket && pbs == masterServer)
         {
             playbackList.erase(it);
+            sockListLock.unlock();
             masterServer->DownRef();
             masterServer = NULL;
             masterServerReconnect->start(1000, true);
@@ -3660,6 +3670,7 @@ void MainServer::connectionClosed(MythSocket *socket)
 
             pbs->SetDisconnected();
             playbackList.erase(it);
+            sockListLock.unlock();
 
             PlaybackSock *testsock = getPlaybackBySock(socket);
             if (testsock)
@@ -3678,9 +3689,12 @@ void MainServer::connectionClosed(MythSocket *socket)
         {
             (*ft)->DownRef();
             fileTransferList.erase(ft);
+            sockListLock.unlock();
             return;
         }
     }
+
+    sockListLock.unlock();
 
     VERBOSE(VB_IMPORTANT, "Unknown socket closing");
 }
@@ -3690,6 +3704,8 @@ PlaybackSock *MainServer::getSlaveByHostname(QString &hostname)
     if (!ismaster)
         return NULL;
 
+    sockListLock.lock();
+
     vector<PlaybackSock *>::iterator iter = playbackList.begin();
     for (; iter != playbackList.end(); iter++)
     {
@@ -3697,10 +3713,13 @@ PlaybackSock *MainServer::getSlaveByHostname(QString &hostname)
         if (pbs->isSlaveBackend() && 
             ((pbs->getHostname() == hostname) || (pbs->getIP() == hostname)))
         {
+            sockListLock.unlock();
             pbs->UpRef();
             return pbs;
         }
     }
+
+    sockListLock.unlock();
 
     return NULL;
 }
@@ -3708,6 +3727,8 @@ PlaybackSock *MainServer::getSlaveByHostname(QString &hostname)
 PlaybackSock *MainServer::getPlaybackBySock(MythSocket *sock)
 {
     PlaybackSock *retval = NULL;
+
+    sockListLock.lock();
 
     vector<PlaybackSock *>::iterator it = playbackList.begin();
     for (; it != playbackList.end(); ++it)
@@ -3719,12 +3740,16 @@ PlaybackSock *MainServer::getPlaybackBySock(MythSocket *sock)
         }
     }
 
+    sockListLock.unlock();
+
     return retval;
 }
 
 FileTransfer *MainServer::getFileTransferByID(int id)
 {
     FileTransfer *retval = NULL;
+
+    sockListLock.lock();
 
     vector<FileTransfer *>::iterator it = fileTransferList.begin();
     for (; it != fileTransferList.end(); ++it)
@@ -3736,12 +3761,16 @@ FileTransfer *MainServer::getFileTransferByID(int id)
         }
     }
 
+    sockListLock.unlock();
+
     return retval;
 }
 
 FileTransfer *MainServer::getFileTransferBySock(MythSocket *sock)
 {
     FileTransfer *retval = NULL;
+
+    sockListLock.lock();
 
     vector<FileTransfer *>::iterator it = fileTransferList.begin();
     for (; it != fileTransferList.end(); ++it)
@@ -3752,6 +3781,8 @@ FileTransfer *MainServer::getFileTransferBySock(MythSocket *sock)
             break;
         }
     }
+
+    sockListLock.unlock();
 
     return retval;
 }
@@ -3909,7 +3940,9 @@ void MainServer::reconnectTimeout(void)
     masterServerSock->setCallbacks(this);
 
     masterServer = new PlaybackSock(this, masterServerSock, server, true);
+    sockListLock.lock();
     playbackList.push_back(masterServer);
+    sockListLock.unlock();
 
     masterServerSock->Unlock();
 
@@ -3921,6 +3954,8 @@ void MainServer::reconnectTimeout(void)
 bool MainServer::isClientConnected()
 {
     bool foundClient = false;
+
+    sockListLock.lock();
 
     foundClient |= (fileTransferList.size() > 0);
 
@@ -3935,6 +3970,8 @@ bool MainServer::isClientConnected()
                 foundClient = true;
         }
     }
+
+    sockListLock.unlock();
     
     return (foundClient);
 }
@@ -3944,6 +3981,8 @@ void MainServer::ShutSlaveBackendsDown(QString &haltcmd)
 {
     QStringList bcast = "SHUTDOWN_NOW";
     bcast << haltcmd;
+
+    sockListLock.lock();
     
     if (playbackList.size() > 0)
     {
@@ -3954,6 +3993,8 @@ void MainServer::ShutSlaveBackendsDown(QString &haltcmd)
                 (*it)->getSocket()->writeStringList(bcast); 
         }
     }
+
+    sockListLock.unlock();
 }
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
