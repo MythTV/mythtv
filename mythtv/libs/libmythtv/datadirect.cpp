@@ -985,6 +985,9 @@ FILE *DataDirectProcessor::DDPost(
     poststream << "</SOAP-ENV:Envelope>\n";
     postfile.close();
 
+    // Allow for single quotes in userid and password (shell escape)
+    password.replace('\'', "'\\''");
+    userid.replace('\'', "'\\''");
     QString command = QString(
         "wget --http-user='%1' --http-passwd='%2' --post-file='%3' "
         "--header='Accept-Encoding:gzip' %4 --output-document=- ")
@@ -1035,7 +1038,8 @@ bool DataDirectProcessor::GrabNextSuggestedTime(void)
 
     QString command = QString("wget --http-user='%1' --http-passwd='%2' "
                               "--post-file='%3' %4 --output-document='%5'")
-        .arg(GetUserID()).arg(GetPassword()).arg(GetPostFilename())
+        .arg(GetUserID().replace('\'', "'\\''"))
+        .arg(GetPassword().replace('\'', "'\\''")).arg(GetPostFilename())
         .arg(ddurl).arg(GetResultFilename());
 
     if (SHOW_WGET_OUTPUT)
