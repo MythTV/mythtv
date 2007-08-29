@@ -285,7 +285,7 @@ QString CurrCondScreen::prepareDataItem(const QString &key,
         return value + (m_units == ENG_UNITS ? " °F" : " °C");
 
     if (key == "wind_gust" || key == "wind_spdgst" || key == "wind_speed")
-        return '(' + value + ')' + (m_units == ENG_UNITS ? " mph" : " kph");
+        return value + (m_units == ENG_UNITS ? " mph" : " kph");
 
     return value;
 }
