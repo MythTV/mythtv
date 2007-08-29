@@ -706,6 +706,14 @@ bool DVBChannel::IsTuningParamsProbeSupported(void) const
         return false;
     }
 
+    if (diseqc_tree)
+    {
+        // TODO We need to implement the inverse of
+        // lnb->GetIntermediateFrequency() for ProbeTuningParams()
+        // to accurately reflect the frequency before LNB transform.
+        return false;
+    }
+
     dvb_fe_params params;
     return ioctl(fd_frontend, FE_GET_FRONTEND, &params) >= 0;
 }
@@ -723,6 +731,14 @@ bool DVBChannel::ProbeTuningParams(DTVMultiplex &tuning) const
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR + "Card not open!");
 
+        return false;
+    }
+
+    if (diseqc_tree)
+    {
+        // TODO We need to implement the inverse of
+        // lnb->GetIntermediateFrequency() for ProbeTuningParams()
+        // to accurately reflect the frequency before LNB transform.
         return false;
     }
 
