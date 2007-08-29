@@ -107,6 +107,18 @@ class MPUBLIC CardUtil
             (rawtype == "HDHOMERUN");
     }
 
+    static bool         IsTuningDigital(const QString &rawtype)
+    {
+        return
+            (rawtype == "DVB")       || (rawtype == "HDTV")  ||
+            (rawtype == "HDHOMERUN");
+    }
+
+    static bool         IsTuningAnalog(const QString &rawtype)
+    {
+        return (rawtype == "V4L");
+    }
+
     static int          GetCardID(const QString &videodevice,
                                   QString hostname = QString::null);
     static uint         GetChildCardID(uint cardid);

@@ -686,6 +686,17 @@ int DataDirectProcessor::UpdateChannelsSafe(
 {
     int new_channels = 0;
 
+    if (!SourceUtil::GetConnectionCount(sourceid))
+    {
+        VERBOSE(VB_IMPORTANT, LOC +
+                "Not inserting channels into disconnected source "
+                <<sourceid<<".");
+        return -1;
+    }
+
+    if (!SourceUtil::IsProperlyConnected(sourceid, true))
+        return -1;
+
     // Find all the channels in the dd_v_station temp table
     // where there is no channel with the same xmltvid in the
     // DB using the same source.
@@ -706,7 +717,8 @@ int DataDirectProcessor::UpdateChannelsSafe(
         return -1;
     }
 
-    bool is_encoder = SourceUtil::IsEncoder(sourceid, true);
+    bool is_encoder = (SourceUtil::IsEncoder(sourceid, true) ||
+                       SourceUtil::IsUnscanable(sourceid));
 
     while (query.next())
     {
@@ -750,6 +762,12 @@ int DataDirectProcessor::UpdateChannelsSafe(
 bool DataDirectProcessor::UpdateChannelsUnsafe(
     uint sourceid, bool filter_new_channels)
 {
+    if (filter_new_channels &&
+        !SourceUtil::IsProperlyConnected(sourceid, false))
+    {
+        return false;
+    }
+
     MSqlQuery dd_station_info(MSqlQuery::DDCon());
     dd_station_info.prepare(
         "SELECT callsign,         stationname, stationid,"
@@ -770,7 +788,8 @@ bool DataDirectProcessor::UpdateChannelsUnsafe(
         "    atsc_minor_chan = :MINORCHAN "
         "WHERE xmltvid = :STATIONID AND sourceid = :SOURCEID");
 
-    bool is_encoder = SourceUtil::IsEncoder(sourceid, true);
+    bool is_encoder = (SourceUtil::IsEncoder(sourceid, true) ||
+                       SourceUtil::IsUnscanable(sourceid));
 
     while (dd_station_info.next())        
     {

@@ -1924,6 +1924,8 @@ void CardInput::sourceFetch(void)
 
     if (cardid && srcid)
     {
+        save(); // save info for fetch..
+
         QString cardtype = CardUtil::GetRawCardType(crdid, 0);
 
         if (!CardUtil::IsUnscanable(cardtype) &&
