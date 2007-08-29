@@ -607,6 +607,7 @@ bool DecoderBase::DoFastForward(long long desiredFrame, bool discardFrames)
     // Do any Extra frame-by-frame seeking for exactseeks mode
     // And flush pre-seek frame if we are allowed to and need to..
     int normalframes = (exactseeks) ? desiredFrame - framesPlayed : 0;
+    normalframes = max(normalframes, 0);
     SeekReset(lastKey, normalframes, needflush, discardFrames);
 
     if (discardFrames)
