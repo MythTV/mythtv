@@ -231,9 +231,9 @@
         <area>230,480,300,32</area>
         <font>weatherdata</font>
       </textarea>
-      <textarea name="+temp" draworder="5" align="right">
+      <textarea name="+temp" draworder="5" align="allcenter">
         <cutdown>no</cutdown>
-        <area>545,437,138,70</area>
+        <area>545,437,227,70</area>
         <font>temp</font>
       </textarea>
       <textarea name="+weather" draworder="5" align="allcenter">
