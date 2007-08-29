@@ -581,6 +581,8 @@ int DVDRingBufferPriv::safe_read(void *data, unsigned sz)
 bool DVDRingBufferPriv::nextTrack(void)
 {
     int newPart = part + 1;
+
+    QMutexLocker lock(&seekLock);
     if (newPart < titleParts)
     {
         dvdnav_part_play(dvdnav, title, newPart);
@@ -594,13 +596,11 @@ void DVDRingBufferPriv::prevTrack(void)
 {
     int newPart = part - 1;
 
+    QMutexLocker lock(&seekLock); 
     if (newPart > 0)
         dvdnav_part_play(dvdnav, title, newPart);
     else
-    {
-        QMutexLocker lock(&seekLock);
         Seek(0);
-    }
     gotStop = false;
 }
 
@@ -621,11 +621,13 @@ uint DVDRingBufferPriv::GetCellStart(void)
 
 void DVDRingBufferPriv::SkipStillFrame(void)
 {
+    QMutexLocker locker(&seekLock);
     dvdnav_still_skip(dvdnav);
 }
 
 void DVDRingBufferPriv::WaitSkip(void)
 {
+    QMutexLocker locker(&seekLock);
     dvdnav_wait_skip(dvdnav);
     dvdWaiting = false;
 }
@@ -635,6 +637,7 @@ void DVDRingBufferPriv::WaitSkip(void)
 bool DVDRingBufferPriv::GoToMenu(const QString str)
 {
     DVDMenuID_t menuid;
+    QMutexLocker locker(&seekLock);
     if (str.compare("chapter") == 0)
     {
         dvdnav_status_t partMenuSupported =
@@ -664,6 +667,7 @@ bool DVDRingBufferPriv::GoToMenu(const QString str)
 
 void DVDRingBufferPriv::GoToNextProgram(void)
 {
+    QMutexLocker locker(&seekLock);
     // if not in the menu feature, okay to skip allow to skip it.
     //  if (!dvdnav_is_domain_vts(dvdnav))
         dvdnav_next_pg_search(dvdnav);
@@ -671,7 +675,8 @@ void DVDRingBufferPriv::GoToNextProgram(void)
 
 void DVDRingBufferPriv::GoToPreviousProgram(void)
 {
-     if (!dvdnav_is_domain_vts(dvdnav))
+    QMutexLocker locker(&seekLock);
+    if (!dvdnav_is_domain_vts(dvdnav))
         dvdnav_prev_pg_search(dvdnav);
 }
 
