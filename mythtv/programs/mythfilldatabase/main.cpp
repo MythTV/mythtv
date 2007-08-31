@@ -456,6 +456,10 @@ int main(int argc, char *argv[])
             cout << "\n";
             return FILLDB_EXIT_INVALID_CMDLINE;
         }
+        else if (!strcmp(a.argv()[argpos], "--no-delete")
+        {
+            cerr << "Deprecated option '" << a.argv()[argpos] << "'" << endl;
+        }
         else
         {
             fprintf(stderr, "illegal option: '%s' (use --help)\n",
