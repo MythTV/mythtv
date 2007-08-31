@@ -278,6 +278,14 @@ void ScreenSetup::keyPressEvent(QKeyEvent *e)
             cursorRight(curr);
         else if (action == "LEFT")
             cursorLeft(curr);
+        else if (action == "DELETE")
+        {
+            if (curr == m_active_list)
+            {
+                UIListBtnType *list = dynamic_cast<UIListBtnType *>(curr);
+                deleteScreen(list);
+            }
+        }
         else if (action == "SEARCH" &&
                  (list = dynamic_cast<UIListBtnType *>(curr)))
         {
@@ -650,20 +658,11 @@ void ScreenSetup::doListSelect(UIListBtnType *list, UIListBtnTypeItem *selected)
         }
         else if (result == tr("Move Down"))
         {
-                list->MoveItemUpDown(selected, false);
+            list->MoveItemUpDown(selected, false);
         }
         else if (result == tr("Remove"))
         {
-            delete selected;
-            if (!list->GetCount())
-            {
-                nextPrevWidgetFocus(false);
-                list->allowFocus(false);
-                m_type_list->hide();
-                m_type_list->allowFocus(false);
-                UITextType *txt = getUITextType("typelbl");
-                if (txt) txt->hide();
-            }
+            deleteScreen(list);
         }
     }
     else if (list == m_inactive_list)
@@ -862,6 +861,24 @@ void ScreenSetup::cursorDown(UIType *curr)
     }
     else
         nextPrevWidgetFocus(true);
+}
+
+void ScreenSetup::deleteScreen(UIListBtnType *list)
+{
+
+    if (list->GetItemCurrent())
+        delete list->GetItemCurrent();
+
+    if (!list->GetCount())
+    {
+        nextPrevWidgetFocus(false);
+        list->allowFocus(false);
+        m_type_list->hide();
+        m_type_list->allowFocus(false);
+        UITextType *txt = getUITextType("typelbl");
+        if (txt) txt->hide();
+    }
+
 }
 
 void ScreenSetup::cursorSelect(UIType *curr)

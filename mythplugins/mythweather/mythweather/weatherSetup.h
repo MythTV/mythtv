@@ -153,6 +153,8 @@ class ScreenSetup : public MythThemedDialog
     void cursorLeft(UIType *curr);
     void cursorSelect(UIType *curr);
 
+    void deleteScreen(UIListBtnType *list);
+
   private:
     SourceManager *m_src_man;
     XMLParse m_weather_screens;
