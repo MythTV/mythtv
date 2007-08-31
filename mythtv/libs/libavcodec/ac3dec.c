@@ -678,8 +678,15 @@ static void ac3_downmix(float samples[AC3_MAX_CHANNELS][256], int nfchans,
             s0 += coef[j][0];
             s1 += coef[j][1];
         }
-        v0 /= s0;
-        v1 /= s1;
+        // HACK: 5.1 downmixed to stereo is around 10 dB quieter than
+        // alternate mp2 audio tracks. to be on the safe side
+        // we multiply only by 8 which happens to be the sum of the
+        // downmixing coefficients for 5.1
+        // ffmpeg rev 10252 shows a different effect so this has to
+        // be handled when we sync to this revision
+        v0 /= s0 / 8;
+        v1 /= s1 / 8;
+        // END HACK
         if(output_mode == AC3_ACMOD_MONO) {
             samples[0][i] = (v0 + v1) * LEVEL_MINUS_3DB;
         } else if(output_mode == AC3_ACMOD_STEREO) {
