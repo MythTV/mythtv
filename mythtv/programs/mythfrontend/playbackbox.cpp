@@ -1937,7 +1937,7 @@ bool PlaybackBox::FillList(bool useCachedData)
                 }
             }
             // Weekly
-            else if (nextHours[recid] || avgd != 100 ||
+            else if (nextHours[recid] || 
                      recType[recid] == kWeekslotRecord || 
                      recType[recid] == kFindWeeklyRecord)
                      
@@ -1979,7 +1979,15 @@ bool PlaybackBox::FillList(bool useCachedData)
                     if (hrs < 36)
                         p->recpriority2 += maxAge * (36 - hrs) / 36;
 
-                    if ((hrs / 24) < maxAge)
+		    if (avgd != 100)
+		    {
+			if (maxEpisodes[recid] > 0)
+			    p->recpriority2 += (maxAge / 2) + (hrs / 24);
+			else
+			    p->recpriority2 += 
+				(maxAge / 3) + (maxAge * hrs / 24 / 4);
+		    }
+                    else if ((hrs / 24) < maxAge)
                         p->recpriority2 += hrs / 24;
                     else
                         p->recpriority2 += maxAge;
@@ -1987,8 +1995,8 @@ bool PlaybackBox::FillList(bool useCachedData)
             }
 
             // Factor based on the average time shift delay.
-            // Scale the range down from -100% thru +100% to -50% thru +50% 
-            avgd = avgd / 2 + 50;
+            // Scale the range down from -100% thru +100% to -25% thru +25% 
+            avgd = avgd / 4 + 75;
 
             if (avgd <= 100)
                 p->recpriority2 = p->recpriority2 * (200 - avgd) / 100;
