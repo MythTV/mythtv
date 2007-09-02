@@ -74,12 +74,17 @@ NewsSite::NewsSite(const QString& name,
     m_data.resize(0);
     m_urlOp = new QUrlOperator(m_url);
 
+    connect(m_urlOp, SIGNAL(data(const QByteArray&, QNetworkOperation*)),
+            this, SLOT(slotGotData(const QByteArray&, QNetworkOperation*)));
+    connect(m_urlOp, SIGNAL(finished(QNetworkOperation*)),
+            this, SLOT(slotFinished(QNetworkOperation*)));
 }
 
 NewsSite::~NewsSite()
 {
+    m_urlOp->disconnect(this, 0, 0, 0);
     m_urlOp->stop();
-    delete m_urlOp;
+    m_urlOp->deleteLater();
     m_articleList.clear();
 }
 
@@ -135,26 +140,15 @@ void NewsSite::retrieve()
 {
     stop();
 
-    connect(m_urlOp, SIGNAL(data(const QByteArray&, QNetworkOperation*)),
-            this, SLOT(slotGotData(const QByteArray&, QNetworkOperation*)));
-    connect(m_urlOp, SIGNAL(finished(QNetworkOperation*)),
-            this, SLOT(slotFinished(QNetworkOperation*)));
-
     m_state = NewsSite::Retrieving;
     m_data.resize(0);
     m_articleList.clear();
     m_urlOp->get(m_url);
 }
 
-
 void NewsSite::stop()
 {
     m_urlOp->stop();
-
-    disconnect(m_urlOp, SIGNAL(data(const QByteArray&, QNetworkOperation*)),
-               this, SLOT(slotGotData(const QByteArray&, QNetworkOperation*)));
-    disconnect(m_urlOp, SIGNAL(finished(QNetworkOperation*)),
-               this, SLOT(slotFinished(QNetworkOperation*)));
 }
 
 bool NewsSite::successful() const
@@ -170,7 +164,8 @@ QString NewsSite::errorMsg() const
 void NewsSite::slotFinished(QNetworkOperation* op)
 {
     if (op->state() == QNetworkProtocol::StDone &&
-        op->errorCode() == QNetworkProtocol::NoError) {
+        op->errorCode() == QNetworkProtocol::NoError) 
+    {
 
         QFile xmlFile(m_destDir+QString("/")+m_name);
         if (xmlFile.open( IO_WriteOnly )) {
@@ -180,16 +175,16 @@ void NewsSite::slotFinished(QNetworkOperation* op)
             m_updated = QDateTime::currentDateTime();
             m_state = NewsSite::Success;
         }
-        else {
+        else 
+        {
             m_state = NewsSite::WriteFailed;
             cerr << "MythNews: NewsEngine: Write failed" << endl;
         }
     }
-    else {
+    else 
+    {
         m_state = NewsSite::RetrieveFailed;
     }
-
-    stop();
 
     emit finished(this);
 }

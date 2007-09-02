@@ -58,7 +58,7 @@ private:
     QString   m_title;
     QString   m_desc;
     NewsSite *m_parent;
-    QString m_articleURL;
+    QString   m_articleURL;
     QString   m_thumbnail;
     QString   m_mediaURL;
     QString   m_enclosure;
@@ -117,7 +117,7 @@ private:
     QString    m_imageURL;
 
     NewsArticle::List m_articleList;
-    QUrlOperator*     m_urlOp;
+    QUrlOperator     *m_urlOp;
 
     void ReplaceHtmlChar( QString &s);
 

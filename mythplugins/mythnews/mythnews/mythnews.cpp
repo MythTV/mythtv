@@ -115,6 +115,8 @@ MythNews::MythNews(MythMainWindow *parent, const char *name )
     // Load sites from database
     loadSites();
 
+    m_NewsSites.setAutoDelete(true);
+
     m_RetrieveTimer->start(m_TimerTimeout, false);
 }
 
@@ -148,6 +150,9 @@ void MythNews::loadSites(void)
         UIListBtnTypeItem* item =
             new UIListBtnTypeItem(m_UISites, site->name());
         item->setData(site);
+
+        connect(site, SIGNAL(finished(NewsSite*)),
+                this, SLOT(slotNewsRetrieved(NewsSite*)));
     }
 
     slotRetrieveNews();
@@ -710,16 +715,7 @@ void MythNews::slotRetrieveNews()
     if (m_NewsSites.count() == 0)
         return;
 
-    cancelRetrieve();
-
     m_RetrieveTimer->stop();
-
-    for (NewsSite* site = m_NewsSites.first(); site; site = m_NewsSites.next())
-    {
-        site->stop();
-        connect(site, SIGNAL(finished(NewsSite*)),
-                this, SLOT(slotNewsRetrieved(NewsSite*)));
-    }
 
     for (NewsSite* site = m_NewsSites.first(); site; site = m_NewsSites.next())
     {
