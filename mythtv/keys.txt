@@ -247,6 +247,13 @@ Viewing Search Listings
   - In the title and description search popup, press M again to edit or 
     delete the selected view.
 
+Program Finder
+--------------
+- R will change the current item from Recording/Not-Recording.
+  Successive keypresses cycle through the scheduled recording type list.
+- 4 switch to the Program Guide.
+- 5 move to the middle of the active list.
+
 Recording Profiles Setup Screen
 -------------------------------
 
