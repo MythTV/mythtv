@@ -108,7 +108,7 @@
    <button>
      <type>STREAM</type>
      <text>Play online streams</text>
-     <action>PLUGIN mythtream</action>
+     <action>PLUGIN mythstream</action>
      <depends>mythstream</depends>
    </button>
 
