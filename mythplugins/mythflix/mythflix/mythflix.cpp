@@ -571,21 +571,11 @@ void MythFlix::slotViewArticle()
                     gContext->GetSetting("NetFlixAddQueueCommandLine", 
                     gContext->GetShareDir() + "mythflix/scripts/netflix.pl -A"));
 
-            QString cmdUrl(article->articleURL());
-            cmdUrl.replace('\'', "%27");
-
-            QUrl url(cmdUrl);
-
-            QString query = url.query();
-            QStringList getArgs = QStringList::split('&', query);
-
-            for (QStringList::Iterator it = getArgs.begin();it != getArgs.end(); ++it) 
-            {
-                QString name = (*it).section('=', 0, 0);
-                QString vale = (*it).section('=', 1);
-
-                args += vale;
-            }
+            QString movieID(article->articleURL());
+            int length = movieID.length();
+            int index = movieID.findRev("/");
+            movieID = movieID.mid(index+1,length);
+            args += movieID;
 		
 			// execute external command to obtain list of possible movie matches 
 			QString results = executeExternal(args, "Add Movie");
