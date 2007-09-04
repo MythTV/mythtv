@@ -70,7 +70,8 @@ private:
     QRect          m_ArticlesRect;
     QRect          m_InfoRect;
     MythPopupBox  *popup;
-
+	QString        zoom;
+    QString        browser;
     NewsSite::List m_NewsSites;
 
     QHttp         *http;
@@ -88,6 +89,7 @@ private slots:
 
     void slotMoveToTop();
     void slotRemoveFromQueue();
+    void slotShowNetFlixPage();
     void slotCancelPopup();
 
 };

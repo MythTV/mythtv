@@ -57,8 +57,12 @@ MythFlixQueue::MythFlixQueue(MythMainWindow *parent, const char *name )
         dir.mkdir(fileprefix);
     
     // Initialize variables
-
+	zoom = QString("-z %1").arg(gContext->GetNumSetting("WebBrowserZoomLevel",200));
+    browser = gContext->GetSetting("WebBrowserCommand",
+                                   gContext->GetInstallPrefix() +
+                                      "/bin/mythbrowser");
     m_UIArticles   = 0;
+    expectingPopup = false;
 
     setNoErase();
     loadTheme();
@@ -370,6 +374,8 @@ void MythFlixQueue::keyPressEvent(QKeyEvent *e)
              slotMoveToTop();
         else if (action == "SELECT")
             displayOptions();
+        else if (action == "MENU")
+            displayOptions();            
         else
             handled = false;
     }
@@ -499,6 +505,30 @@ void MythFlixQueue::slotRemoveFromQueue()
 
 }
 
+void MythFlixQueue::slotShowNetFlixPage()
+{
+	if (expectingPopup)
+	slotCancelPopup();
+    
+    UIListBtnTypeItem *articleUIItem = m_UIArticles->GetItemCurrent();
+	if (articleUIItem && articleUIItem->getData())
+    {
+        NewsArticle *article = (NewsArticle*) articleUIItem->getData();
+        if(article)
+        {
+			QString cmdUrl(article->articleURL());
+			cmdUrl.replace('\'', "%27");
+	
+			QString cmd = QString("%1 %2 '%3'")
+				 .arg(browser)
+				 .arg(zoom)
+				 .arg(cmdUrl);
+			VERBOSE(VB_GENERAL, QString("MythFlixQueue: Opening Neflix site: (%1)").arg(cmd));
+			myth_system(cmd);
+        }
+    }
+}
+
 void MythFlixQueue::slotArticleSelected(UIListBtnTypeItem*)
 {
     update(m_ArticlesRect);
@@ -519,6 +549,9 @@ void MythFlixQueue::displayOptions()
 
     popup->addButton(tr("Remove From Queue"), this,
                      SLOT(slotRemoveFromQueue()));
+                     
+    popup->addButton(tr("Show NetFlix Page"), this,
+                     SLOT(slotShowNetFlixPage()));
 
     popup->addButton(tr("Cancel"), this, SLOT(slotCancelPopup()));
 

@@ -58,7 +58,11 @@ MythFlix::MythFlix(MythMainWindow *parent, const char *name )
         dir.mkdir(fileprefix);
     
     // Initialize variables
-
+	zoom = QString("-z %1").arg(gContext->GetNumSetting("WebBrowserZoomLevel",200));
+    browser = gContext->GetSetting("WebBrowserCommand",
+                                   gContext->GetInstallPrefix() +
+                                      "/bin/mythbrowser");
+	expectingPopup = false;
     m_InColumn     = 0;
     m_UISites      = 0;
     m_UIArticles   = 0;
@@ -430,7 +434,7 @@ void MythFlix::keyPressEvent(QKeyEvent *e)
         else if (action == "RIGHT")
             cursorRight();
         else if(action == "SELECT")
-            slotViewArticle();
+            displayOptions();
         else
             handled = false;
     }
@@ -543,6 +547,30 @@ void MythFlix::processAndShowNews(NewsSite* site)
     } 
 }
 
+void MythFlix::slotShowNetFlixPage()
+{
+	if (expectingPopup)
+	slotCancelPopup();
+    
+    UIListBtnTypeItem *articleUIItem = m_UIArticles->GetItemCurrent();
+	if (articleUIItem && articleUIItem->getData())
+    {
+        NewsArticle *article = (NewsArticle*) articleUIItem->getData();
+        if(article)
+        {
+			QString cmdUrl(article->articleURL());
+			cmdUrl.replace('\'', "%27");
+	
+			QString cmd = QString("%1 %2 '%3'")
+				 .arg(browser)
+				 .arg(zoom)
+				 .arg(cmdUrl);
+			VERBOSE(VB_GENERAL, QString("MythFlixBrowse: Opening Neflix site: (%1)").arg(cmd));
+			myth_system(cmd);
+        }
+    }
+}
+
 void MythFlix::slotSiteSelected(UIListBtnTypeItem *item)
 {
     if (!item || !item->getData())
@@ -583,6 +611,43 @@ void MythFlix::slotViewArticle()
         }
     } 
 }
+
+void MythFlix::displayOptions()
+{
+
+    popup = new MythPopupBox(gContext->GetMainWindow(), "menu popup");
+
+    QLabel *label = popup->addLabel(tr("Browse Options"),
+                                  MythPopupBox::Large, false);
+    label->setAlignment(Qt::AlignCenter | Qt::WordBreak);
+
+    QButton *topButton = popup->addButton(tr("Add To Queue"), this,
+                     SLOT(slotViewArticle()));
+                     
+    popup->addButton(tr("Show NetFlix Page"), this,
+                     SLOT(slotShowNetFlixPage()));
+
+    popup->addButton(tr("Cancel"), this, SLOT(slotCancelPopup()));
+
+    popup->ShowPopup(this, SLOT(slotCancelPopup()));
+
+    topButton->setFocus();
+
+    expectingPopup = true;
+
+}
+
+void MythFlix::slotCancelPopup(void)
+{
+    popup->hide();
+    expectingPopup = false;
+
+    delete popup;
+    popup = NULL;
+
+    setActiveWindow();
+}
+
 
 // Execute an external command and return results in string
 //   probably should make this routing async vs polling like this
