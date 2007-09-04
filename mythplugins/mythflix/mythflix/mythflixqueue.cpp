@@ -248,8 +248,9 @@ void MythFlixQueue::updateInfoView()
                     ttype->SetText(article->description());
 
                 QString imageLoc = article->articleURL();
-                int index = imageLoc.find("movieid=");
-                imageLoc = imageLoc.mid(index+8,8) + ".jpg";
+                int length = imageLoc.length();
+                int index = imageLoc.findRev("/");
+                imageLoc = imageLoc.mid(index,length) + ".jpg";
 
                 QString fileprefix = MythContext::GetConfDir();
                 
