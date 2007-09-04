@@ -449,21 +449,12 @@ void MythFlixQueue::slotMoveToTop()
                     gContext->GetSetting("NetFlixMoveToTopCommandLine", 
                     gContext->GetShareDir() + "mythflix/scripts/netflix.pl -1"));
 
-            QString cmdUrl(article->articleURL());
-            cmdUrl.replace('\'', "%27");
+            QString movieID(article->articleURL());
+            int length = movieID.length();
+            int index = movieID.findRev("/");
+            movieID = movieID.mid(index+1,length);            
+            args += movieID;
 
-            QUrl url(cmdUrl);
-
-            QString query = url.query();
-            QStringList getArgs = QStringList::split('&', query);
-
-            for (QStringList::Iterator it = getArgs.begin();it != getArgs.end(); ++it) 
-            {
-                QString name = (*it).section('=', 0, 0);
-                QString vale = (*it).section('=', 1);
-
-                args += vale;
-            }
             // execute external command to obtain list of possible movie matches 
             QString results = executeExternal(args, "Move To Top");
         
@@ -492,21 +483,12 @@ void MythFlixQueue::slotRemoveFromQueue()
                     gContext->GetSetting("NetFlixRemoveFromQueueCommandLine", 
                     gContext->GetShareDir() + "mythflix/scripts/netflix.pl -R"));
 
-            QString cmdUrl(article->articleURL());
-            cmdUrl.replace('\'', "%27");
+            QString movieID(article->articleURL());
+            int length = movieID.length();
+            int index = movieID.findRev("/");
+            movieID = movieID.mid(index+1,length);            
+            args += movieID;
 
-            QUrl url(cmdUrl);
-
-            QString query = url.query();
-            QStringList getArgs = QStringList::split('&', query);
-
-            for (QStringList::Iterator it = getArgs.begin();it != getArgs.end(); ++it) 
-            {
-                QString name = (*it).section('=', 0, 0);
-                QString vale = (*it).section('=', 1);
-
-                args += vale;
-            }
             // execute external command to obtain list of possible movie matches 
             QString results = executeExternal(args, "Remove From Queue");
         
