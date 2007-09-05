@@ -375,7 +375,7 @@ int DVDRingBufferPriv::safe_read(void *data, unsigned sz)
                 if (autoselectsubtitle)
                     curSubtitleTrack = dvdnav_get_active_spu_stream(dvdnav);
 
-                VERBOSE(VB_IMPORTANT,
+                VERBOSE(VB_PLAYBACK,
                         QString("DVDNAV_SPU_STREAM_CHANGE: "
                                 "physical_wide==%1, physical_letterbox==%2, "
                                 "physical_pan_scan==%3, current_track==%4, "
