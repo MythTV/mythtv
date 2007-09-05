@@ -104,6 +104,18 @@ class CardUtil
             (rawtype == "CRC_IP");
     }
 
+    static bool         IsTuningDigital(const QString &rawtype)
+    {
+        return
+            (rawtype == "DVB")       || (rawtype == "HDTV")  ||
+            (rawtype == "HDHOMERUN");
+    }
+
+    static bool         IsTuningAnalog(const QString &rawtype)
+    {
+        return (rawtype == "V4L");
+    }
+
     static int          GetCardID(const QString &videodevice,
                                   QString hostname = QString::null);
     static uint         GetChildCardID(uint cardid);
