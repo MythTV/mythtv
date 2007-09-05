@@ -421,6 +421,7 @@ void WeatherSource::startUpdate()
     VERBOSE(VB_GENERAL, "Starting update of " + m_info->name);
     m_data.clear();
     m_proc->clearArguments();
+    m_proc->addArgument("nice");
     m_proc->addArgument(m_info->file->absFilePath());
     m_proc->addArgument("-u");
     m_proc->addArgument(m_units == SI_UNITS ? "SI" : "ENG");
