@@ -262,16 +262,21 @@ using_frontend {
     HEADERS += videooutbase.h           videoout_null.h
     HEADERS += videobuffers.h           vsync.h
     HEADERS += jitterometer.h           yuv2rgb.h
+    HEADERS += videodisplayprofile.h    mythcodecid.h
     SOURCES += videooutbase.cpp         videoout_null.cpp
     SOURCES += videobuffers.cpp         vsync.cpp
     SOURCES += jitterometer.cpp         yuv2rgb.cpp
+    SOURCES += videodisplayprofile.cpp  mythcodecid.cpp
 
+    macx:HEADERS +=               videoout_dvdv.h
     macx:HEADERS +=               videoout_quartz.h
     macx:SOURCES +=               videoout_quartz.cpp
 
-    using_dvdv:HEADERS +=         videoout_dvdv.h  videoout_dvdv_private.h
+    using_dvdv:DEFINES +=         USING_DVDV
+    using_dvdv:HEADERS +=         videoout_dvdv_private.h
+    using_dvdv:HEADERS +=         util-osx-cocoa.h
     using_dvdv:SOURCES +=         videoout_dvdv.mm
-    using_dvdv:DEFINES +=         HAVE_DVDV
+    using_dvdv:SOURCES +=         util-osx-cocoa.mm
 
     using_directfb:HEADERS +=     videoout_directfb.h
     using_directfb:SOURCES +=     videoout_directfb.cpp
@@ -282,6 +287,8 @@ using_frontend {
 
     using_ivtv:HEADERS +=         videoout_ivtv.h
     using_ivtv:SOURCES +=         videoout_ivtv.cpp
+
+    using_x11:DEFINES += USING_X11
 
     using_xv:HEADERS += videoout_xv.h   XvMCSurfaceTypes.h
     using_xv:HEADERS += osdxvmc.h       osdchromakey.h
@@ -299,10 +306,18 @@ using_frontend {
     using_xvmc_vld:DEFINES += USING_XVMC_VLD
     using_xvmc_pbuffer:DEFINES += USING_XVMC_PBUFFER
 
-    using_opengl:CONFIG += opengl
-    using_opengl:DEFINES += USING_OPENGL
+    using_opengl {
+        CONFIG += opengl
+        DEFINES += USING_OPENGL
+        HEADERS += util-opengl.h        openglcontext.h
+        SOURCES += util-opengl.cpp      openglcontext.cpp
+    }
     using_xvmc_opengl:DEFINES += USING_XVMC_OPENGL
     using_opengl_vsync:DEFINES += USING_OPENGL_VSYNC
+
+    using_opengl_video:DEFINES += USING_OPENGL_VIDEO
+    using_opengl_video:HEADERS += openglvideo.h
+    using_opengl_video:SOURCES += openglvideo.cpp
 
     # Misc. frontend
     HEADERS += guidegrid.h              infostructs.h

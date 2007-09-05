@@ -12,6 +12,7 @@ extern "C" {
 #include <qptrqueue.h>
 #include <qptrlist.h>
 #include "videobuffers.h"
+#include "mythcodecid.h"
 
 using namespace std;
 
@@ -20,55 +21,11 @@ class OSD;
 class OSDSurface;
 class FilterChain;
 class FilterManager;
+class VideoDisplayProfile;
 
 extern "C" {
 struct ImgReSampleContext;
 }
-
-enum VideoOutputType
-{
-    kVideoOutput_Default = 0,
-    kVideoOutput_VIA,
-    kVideoOutput_IVTV,
-    kVideoOutput_Directfb
-};
-
-enum MythCodecID
-{
-// if you add anything to this list please update
-// myth2av_codecid in videoout_xv.cpp
-    kCodec_NONE = 0,
-
-    kCodec_MPEG1,
-    kCodec_MPEG2,
-    kCodec_H263,
-    kCodec_MPEG4,
-    kCodec_H264,
-    
-    kCodec_NORMAL_END,
-
-    kCodec_MPEG1_XVMC,
-    kCodec_MPEG2_XVMC,
-    kCodec_H263_XVMC,
-    kCodec_MPEG4_XVMC,
-    kCodec_H264_XVMC,
-
-    kCodec_MPEG1_IDCT,
-    kCodec_MPEG2_IDCT,
-    kCodec_H263_IDCT,
-    kCodec_MPEG4_IDCT,
-    kCodec_H264_IDCT,
-
-    kCodec_STD_XVMC_END,
-
-    kCodec_MPEG1_VLD,
-    kCodec_MPEG2_VLD,
-    kCodec_H263_VLD,
-    kCodec_MPEG4_VLD,
-    kCodec_H264_VLD,
-
-    kCodec_SPECIAL_END,
-};
 
 enum PIPLocations
 {
@@ -154,8 +111,12 @@ static inline QString frame_scan_to_string(FrameScanType scan,
 class VideoOutput
 {
   public:
-    static VideoOutput *InitVideoOut(VideoOutputType type,
-                                     MythCodecID av_codec_id);
+    static VideoOutput *Create(
+        const QString &decoder,   MythCodecID  codec_id,
+        void          *codec_priv,
+        const QSize   &video_dim, float        video_aspect,
+        WId            win_id,    const QRect &display_rect,
+        WId            embed_id);
 
     VideoOutput();
     virtual ~VideoOutput();
@@ -163,17 +124,23 @@ class VideoOutput
     virtual bool Init(int width, int height, float aspect,
                       WId winid, int winx, int winy, int winw, 
                       int winh, WId embedid = 0);
+    virtual void InitOSD(OSD *osd);
+    virtual void SetVideoFrameRate(float);
 
     virtual bool SetDeinterlacingEnabled(bool);
     virtual bool SetupDeinterlace(bool i, const QString& ovrf="");
+    virtual void FallbackDeint(void);
+    virtual void BestDeint(void);
     virtual bool NeedsDoubleFramerate(void) const;
     virtual bool ApproveDeintFilter(const QString& filtername) const;
 
     virtual void PrepareFrame(VideoFrame *buffer, FrameScanType) = 0;
     virtual void Show(FrameScanType) = 0;
 
-    virtual void InputChanged(int width, int height, float aspect,
-                              MythCodecID av_codec_id);
+    virtual bool InputChanged(const QSize &input_size,
+                              float        aspect,
+                              MythCodecID  myth_codec_id,
+                              void        *codec_private);
     virtual void VideoAspectRatioChanged(float aspect);
 
     virtual void EmbedInWidget(WId wid, int x, int y, int w, int h);
@@ -221,12 +188,12 @@ class VideoOutput
     bool AllowPreviewEPG(void) { return allowpreviewepg; }
 
     /// \brief Returns true iff Motion Compensation acceleration is available.
-    virtual bool hasMCAcceleration() const { return false; }
+    virtual bool hasMCAcceleration(void) const { return false; }
     /// \brief Returns true iff Inverse Discrete Cosine Transform acceleration
     ///        is available.
-    virtual bool hasIDCTAcceleration() const { return false; }
+    virtual bool hasIDCTAcceleration(void) const { return false; }
     /// \brief Returns true iff VLD acceleration is available.
-    virtual bool hasVLDAcceleration() const { return false; }
+    virtual bool hasVLDAcceleration(void) const { return false; }
 
     /// \brief Sets the number of frames played
     virtual void SetFramesPlayed(long long fp) { framesPlayed = fp; };
@@ -307,13 +274,20 @@ class VideoOutput
     /// \brief Tells the player to resize the video frame (used for ITV)
     void SetVideoResize(const QRect &videoRect);
 
+    void SetVideoScalingAllowed(bool change); 
+
+    /// \brief check if video underscan/overscan is allowed
+    bool IsVideoScalingAllowed(void) { return db_scaling_allowed; }
+
+    /// \brief returns QRect of PIP based on PIPLocation
+    virtual QRect GetPIPRect(int location, NuppelVideoPlayer *pipplayer = NULL);
   protected:
     void InitBuffers(int numdecode, bool extra_for_pause, int need_free,
                      int needprebuffer_normal, int needprebuffer_small,
                      int keepprebuffer);
 
     virtual void ShowPip(VideoFrame *frame, NuppelVideoPlayer *pipplayer);
-    int DisplayOSD(VideoFrame *frame, OSD *osd, int stride = -1, int revision = -1);
+    virtual int DisplayOSD(VideoFrame *frame, OSD *osd, int stride = -1, int revision = -1);
 
     virtual void SetPictureAttributeDBValue(int attributeType, int newValue);
     virtual QRect GetVisibleOSDBounds(float&, float&) const;
@@ -326,7 +300,7 @@ class VideoOutput
 
     void ResizeVideo(VideoFrame *frame);
     void DoVideoResize(const QSize &inDim, const QSize &outDim);
-    void ShutdownVideoResize(void);
+    virtual void ShutdownVideoResize(void);
 
     void SetVideoAspectRatio(float aspect);
 
@@ -345,6 +319,8 @@ class VideoOutput
     QMap<int,int> db_pict_attr; ///< Picture settings
     int     db_letterbox;
     QString db_deint_filtername;
+
+    VideoDisplayProfile *db_vdisp_profile;
 
     // Manual Zoom
     int     mz_scale;         ///< Manually applied percentage scaling.
@@ -395,7 +371,7 @@ class VideoOutput
     QString        m_deintfiltername;
     FilterManager *m_deintFiltMan;
     FilterChain   *m_deintFilter;
-    bool           m_deinterlaceBeforeOSD;;
+    bool           m_deinterlaceBeforeOSD;
 
     /// VideoBuffers instance used to track video output buffers.
     VideoBuffers vbuffers;
@@ -406,6 +382,7 @@ class VideoOutput
     bool    allowpreviewepg;
     bool    errored;
     long long framesPlayed;
+    bool    db_scaling_allowed; ///< disable this to prevent overscan/underscan
 };
 
 #endif

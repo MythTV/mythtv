@@ -21,10 +21,10 @@
 #include "scanwizard.h"
 
 ChannelWizard::ChannelWizard(int id, int default_sourceid)
-             : ConfigurationWizard() {
-/* TODO FIXME
+    : ConfigurationWizard()
+{
     setLabel(QObject::tr("Channel Options"));
-*/
+
     // Must be first.
     addChild(cid = new ChannelID());
     cid->setValue(id);
@@ -236,9 +236,8 @@ class NoChanNumHide : public CheckBoxSetting, public TransientStorage
 
 ChannelEditor::ChannelEditor() : ConfigurationDialog()
 {
-/* TODO FIXME
     setLabel(tr("Channels"));
-*/
+
     addChild(list = new ChannelListSetting());
 
     SortMode           *sort   = new SortMode();

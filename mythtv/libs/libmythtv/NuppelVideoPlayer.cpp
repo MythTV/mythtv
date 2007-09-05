@@ -52,6 +52,7 @@ using namespace std;
 #include "NuppelVideoRecorder.h"
 #include "tv_play.h"
 #include "interactivetv.h"
+#include "util-osx-cocoa.h"
 
 extern "C" {
 #include "vbitext/vbi.h"
@@ -140,15 +141,15 @@ uint track_type_to_display_mode[kTrackTypeCount+2] =
 };
 
 NuppelVideoPlayer::NuppelVideoPlayer(QString inUseID, const ProgramInfo *info)
-    : forceVideoOutput(kVideoOutput_Default),
-      decoder(NULL),                decoder_change_lock(true),
+    : decoder(NULL),                decoder_change_lock(true),
       videoOutput(NULL),            nvr_enc(NULL), 
       m_playbackinfo(NULL),
       // Window stuff
       parentWidget(NULL), embedid(0), embx(-1), emby(-1), embw(-1), embh(-1),
       // State
       eof(false),                   m_double_framerate(false),
-      m_can_double(false),          paused(false),
+      m_can_double(false),          m_deint_possible(true),
+      paused(false),
       pausevideo(false),            actuallypaused(false),
       video_actually_paused(false), playing(false),
       decoder_thread_alive(true),   killplayer(false),
@@ -159,7 +160,6 @@ NuppelVideoPlayer::NuppelVideoPlayer(QString inUseID, const ProgramInfo *info)
       transcoding(false),
       hasFullPositionMap(false),    limitKeyRepeat(false),
       errored(false),
-      m_DeintSetting(0),
       // Bookmark stuff
       bookmarkseek(0),              previewFromBookmark(false),
       // Seek
@@ -271,7 +271,6 @@ NuppelVideoPlayer::NuppelVideoPlayer(QString inUseID, const ProgramInfo *info)
 
     commrewindamount = gContext->GetNumSetting("CommRewindAmount",0);
     commnotifyamount = gContext->GetNumSetting("CommNotifyAmount",0);
-    m_DeintSetting   = gContext->GetNumSetting("Deinterlace", 0);
     decode_extra_audio=gContext->GetNumSetting("DecodeExtraAudio", 0);
     itvEnabled       = gContext->GetNumSetting("EnableMHEG", 0);
 
@@ -418,7 +417,7 @@ void NuppelVideoPlayer::Pause(bool waitvideo)
     if (GetDecoder() && videoOutput)
     {
         //cout << "updating frames played" << endl;
-        if (using_null_videoout || forceVideoOutput == kVideoOutput_IVTV)
+        if (using_null_videoout || IsIVTVDecoder())
             GetDecoder()->UpdateFramesPlayed();
         else
             framesPlayed = videoOutput->GetFramesPlayed();
@@ -528,11 +527,6 @@ void NuppelVideoPlayer::SetPrebuffering(bool prebuffer)
     prebuffering_lock.unlock();
 }
 
-void NuppelVideoPlayer::ForceVideoOutputType(VideoOutputType type)
-{
-    forceVideoOutput = type;
-}
-
 bool NuppelVideoPlayer::InitVideo(void)
 {
     InitFilters();
@@ -573,8 +567,15 @@ bool NuppelVideoPlayer::InitVideo(void)
             return false;
         }
 
-        videoOutput = VideoOutput::InitVideoOut(forceVideoOutput,
-                                                GetDecoder()->GetVideoCodecID());
+        const QSize video_dim(video_width, video_height);
+        const QRect display_rect(0, 0, widget->width(), widget->height());
+
+        videoOutput = VideoOutput::Create(
+            GetDecoder()->GetCodecDecoderName(),
+            GetDecoder()->GetVideoCodecID(),
+            GetDecoder()->GetVideoCodecPrivate(),
+            video_dim, video_aspect,
+            widget->winId(), display_rect, 0 /*embedid*/);
 
         if (!videoOutput)
         {
@@ -582,13 +583,14 @@ bool NuppelVideoPlayer::InitVideo(void)
             return false;
         }
 
-        if (!videoOutput->Init(video_width, video_height, video_aspect,
-                               widget->winId(), 0, 0, widget->width(),
-                               widget->height(), 0))
-        {
-            errored = true;
-            return false;
-        }
+        bool db_scale = true;
+        if (ringBuffer->isDVD())
+            db_scale = false;
+
+        videoOutput->SetVideoScalingAllowed(db_scale);
+
+        // We need to tell it this for automatic deinterlacer settings
+        videoOutput->SetVideoFrameRate(video_frame_rate * play_speed);
 
         if (videoOutput->hasMCAcceleration() && !decode_extra_audio)
         {
@@ -637,8 +639,14 @@ void NuppelVideoPlayer::ReinitVideo(void)
     videofiltersLock.lock();
 
     float aspect = (forced_video_aspect > 0) ? forced_video_aspect : video_aspect;
-    videoOutput->InputChanged(video_width, video_height, aspect, 
-                              GetDecoder()->GetVideoCodecID());
+
+    videoOutput->InputChanged(QSize(video_width, video_height), aspect, 
+                              GetDecoder()->GetVideoCodecID(),
+                              GetDecoder()->GetVideoCodecPrivate());
+
+    // We need to tell it this for automatic deinterlacer settings
+    videoOutput->SetVideoFrameRate(video_frame_rate * play_speed);
+
     if (videoOutput->IsErrored())
     {
         VERBOSE(VB_IMPORTANT, "ReinitVideo(): videoOutput->IsErrored()");
@@ -779,7 +787,7 @@ void NuppelVideoPlayer::SetKeyframeDistance(int keyframedistance)
 }
 
 /** \fn NuppelVideoPlayer::FallbackDeint(void)
- *  \brief Fallback to non-bob a deinterlacing method.
+ *  \brief Fallback to non-frame-rate-doubling deinterlacing method.
  */
 void NuppelVideoPlayer::FallbackDeint(void)
 {
@@ -789,10 +797,7 @@ void NuppelVideoPlayer::FallbackDeint(void)
          videosync->SetFrameInterval(frame_interval, false);
 
      if (videoOutput)
-     {
-         videoOutput->SetupDeinterlace(false);
-         videoOutput->SetupDeinterlace(true, "onefield");
-     }
+         videoOutput->FallbackDeint();
 }
 
 void NuppelVideoPlayer::AutoDeint(VideoFrame *frame)
@@ -848,8 +853,8 @@ void NuppelVideoPlayer::SetScanType(FrameScanType scan)
     if (scan == m_scan)
         return;
 
-    bool interlaced = scan == kScan_Interlaced || kScan_Intr2ndField == scan;
-    if (interlaced && !m_DeintSetting)
+    bool interlaced = is_interlaced(scan);
+    if (interlaced && !m_deint_possible)
     {
         m_scan = scan;
         return;
@@ -857,19 +862,24 @@ void NuppelVideoPlayer::SetScanType(FrameScanType scan)
 
     if (interlaced)
     {
-        videoOutput->SetDeinterlacingEnabled(true);
+        m_deint_possible = videoOutput->SetDeinterlacingEnabled(true);
+        if (!m_deint_possible)
+        {
+            VERBOSE(VB_IMPORTANT, "Failed to enable deinterlacing");
+            m_scan = scan;
+            return;
+        }
         if (videoOutput->NeedsDoubleFramerate())
         {
             m_double_framerate = true;
-            m_can_double = true;
             videosync->SetFrameInterval(frame_interval, true);
             // Make sure video sync can double frame rate
-            if (videosync->UsesFrameInterval())
+            m_can_double = videosync->UsesFieldInterval();
+            if (!m_can_double)
             {
                 VERBOSE(VB_IMPORTANT, "Video sync method can't support double "
                         "framerate (refresh rate too low for bob deint)");
                 FallbackDeint();
-                m_double_framerate = false;
             }
         }
         VERBOSE(VB_PLAYBACK, "Enabled deinterlacing");
@@ -880,7 +890,6 @@ void NuppelVideoPlayer::SetScanType(FrameScanType scan)
         if (m_double_framerate) 
         {
             m_double_framerate = false;
-            m_can_double = false;
             videosync->SetFrameInterval(frame_interval, false);
         }
         videoOutput->SetDeinterlacingEnabled(false);
@@ -1026,7 +1035,7 @@ int NuppelVideoPlayer::OpenFile(bool skipDsp, uint retries,
         audio_samplerate = 44100;
         audio_channels = 2;
     }
-    else if (forceVideoOutput == kVideoOutput_IVTV)
+    else if (IsIVTVDecoder())
     {
         VERBOSE(VB_IMPORTANT,
                 QString("NVP: Couldn't open '%1' with ivtv decoder")
@@ -1237,7 +1246,7 @@ void NuppelVideoPlayer::AddTextData(unsigned char *buffer, int len,
 
 void NuppelVideoPlayer::CheckPrebuffering(void)
 {
-    if (kVideoOutput_IVTV == forceVideoOutput)
+    if (IsIVTVDecoder())
         return;
 
     if ((videoOutput->hasMCAcceleration()   ||
@@ -1320,7 +1329,7 @@ bool NuppelVideoPlayer::GetFrame(int onlyvideo, bool unsafe)
     bool ret = false;
 
     // Wait for frames to be available for decoding onto
-    if ((forceVideoOutput != kVideoOutput_IVTV) &&
+    if ((!IsIVTVDecoder()) &&
         !videoOutput->EnoughFreeFrames()        &&
         !unsafe)
     {
@@ -2623,9 +2632,8 @@ void NuppelVideoPlayer::OutputVideoLoop(void)
     else if (videoOutput)
     {
         // Set up deinterlacing in the video output method
-        m_double_framerate = m_can_double =
-            (m_DeintSetting &&
-             videoOutput->SetupDeinterlace(true) &&
+        m_double_framerate =
+            (videoOutput->SetupDeinterlace(true) &&
              videoOutput->NeedsDoubleFramerate());
 
         videosync = VideoSync::BestMethod(
@@ -2635,7 +2643,8 @@ void NuppelVideoPlayer::OutputVideoLoop(void)
         if (videosync != NULL && m_double_framerate)
         {
             videosync->SetFrameInterval(frame_interval, m_double_framerate);
-            if (videosync->UsesFrameInterval())
+            m_can_double = videosync->UsesFieldInterval();
+            if (!m_can_double)
             {
                 VERBOSE(VB_IMPORTANT, "Video sync method can't support double "
                         "framerate (refresh rate too low for bob deint)");
@@ -2778,11 +2787,18 @@ void *NuppelVideoPlayer::kickoffOutputVideoLoop(void *player)
     NuppelVideoPlayer *nvp = (NuppelVideoPlayer *)player;
 
 #ifdef USING_IVTV
-    if (nvp->forceVideoOutput == kVideoOutput_IVTV)
+    if (nvp->IsIVTVDecoder())
+    {
         nvp->IvtvVideoLoop();
-    else
+        return NULL;
+    }
 #endif
-        nvp->OutputVideoLoop();
+
+    // OS X needs a garbage collector allocated..
+    void *video_thread_pool = CreateOSXCocoaPool();
+    nvp->OutputVideoLoop();
+    DeleteOSXCocoaPool(video_thread_pool);
+
     return NULL;
 }
 
@@ -3074,7 +3090,7 @@ void NuppelVideoPlayer::StartPlaying(void)
         ringBuffer->DVD()->SetParent(this);
 
     if (!no_audio_out ||
-        (forceVideoOutput == kVideoOutput_IVTV &&
+        (IsIVTVDecoder() &&
          !gContext->GetNumSetting("PVR350InternalAudioOnly")))
     {
         QString errMsg = ReinitAudio();
@@ -3149,12 +3165,8 @@ void NuppelVideoPlayer::StartPlaying(void)
         videoOutput->GetOSDBounds(total, visible, aspect, scaling);
         osd = new OSD(total, frame_interval, visible, aspect, scaling);
 
-        if (kCodec_NORMAL_END < GetDecoder()->GetVideoCodecID() &&
-            kCodec_SPECIAL_END > GetDecoder()->GetVideoCodecID() &&
-            (600 < video_height))
-        {            
-            osd->DisableFade();
-        }
+        videoOutput->InitOSD(osd);
+
         osd->SetCC708Service(&CC708services[1]);
     
         TeletextViewer *tt_view = GetOSD()->GetTeletextViewer();
@@ -3185,6 +3197,7 @@ void NuppelVideoPlayer::StartPlaying(void)
 
     decoder_thread = pthread_self();
     pthread_create(&output_video, NULL, kickoffOutputVideoLoop, this);
+
 
     if (!using_null_videoout && !ringBuffer->isDVD())
     {
@@ -3446,7 +3459,7 @@ void NuppelVideoPlayer::StartPlaying(void)
 
         GetFrame(audioOutput == NULL || !normal_speed);
 
-        if (using_null_videoout || forceVideoOutput == kVideoOutput_IVTV)
+        if (using_null_videoout || IsIVTVDecoder())
             GetDecoder()->UpdateFramesPlayed();
         else
             framesPlayed = videoOutput->GetFramesPlayed();
@@ -3787,7 +3800,7 @@ void NuppelVideoPlayer::SetWatched(bool forceWatched)
 
 void NuppelVideoPlayer::SetBookmark(void)
 {
-    if (!m_playbackinfo || !osd)
+    if (!m_playbackinfo)
         return;
 
     if (ringBuffer->isDVD())
@@ -3798,11 +3811,14 @@ void NuppelVideoPlayer::SetBookmark(void)
             SetDVDBookmark(framesPlayed);
     }
     m_playbackinfo->SetBookmark(framesPlayed);
-    osd->SetSettingsText(QObject::tr("Position Saved"), 1);
+    if (osd)
+    {
+        osd->SetSettingsText(QObject::tr("Position Saved"), 1);
 
-    struct StatusPosInfo posInfo;
-    calcSliderPos(posInfo);
-    osd->ShowStatus(posInfo, false, QObject::tr("Position"), 2);
+        struct StatusPosInfo posInfo;
+        calcSliderPos(posInfo);
+        osd->ShowStatus(posInfo, false, QObject::tr("Position"), 2);
+    }
 }
 
 void NuppelVideoPlayer::ClearBookmark(void)
@@ -3833,7 +3849,7 @@ void NuppelVideoPlayer::DoPause(void)
     bool skip_changed;
 
 #ifdef USING_IVTV
-    if (forceVideoOutput == kVideoOutput_IVTV)
+    if (IsIVTVDecoder())
     {
         VideoOutputIvtv *vidout = (VideoOutputIvtv *)videoOutput;
         vidout->Pause();
@@ -3858,7 +3874,7 @@ void NuppelVideoPlayer::DoPause(void)
     VERBOSE(VB_PLAYBACK, QString("rate: %1 speed: %2 skip: %3 = interval %4")
                                  .arg(video_frame_rate).arg(temp_speed)
                                  .arg(ffrew_skip).arg(frame_interval));
-    if (osd && forceVideoOutput != kVideoOutput_IVTV)
+    if (osd && !IsIVTVDecoder())
         osd->SetFrameInterval(frame_interval);
     if (videosync != NULL)
         videosync->SetFrameInterval(frame_interval, m_double_framerate);
@@ -3903,7 +3919,7 @@ void NuppelVideoPlayer::DoPlay(void)
         videoOutput->SetPrebuffering(ffrew_skip == 1);
 
 #ifdef USING_IVTV
-        if (forceVideoOutput == kVideoOutput_IVTV)
+        if (IsIVTVDecoder())
         {
             VideoOutputIvtv *vidout = (VideoOutputIvtv *)videoOutput;
             vidout->NextPlay(play_speed / ffrew_skip, normal_speed, 
@@ -3924,41 +3940,33 @@ void NuppelVideoPlayer::DoPlay(void)
             .arg(video_frame_rate).arg(play_speed)
             .arg(ffrew_skip).arg(frame_interval));
 
-    if (osd && forceVideoOutput != kVideoOutput_IVTV)
+    if (osd && !IsIVTVDecoder())
         osd->SetFrameInterval(frame_interval);
 
     if (videoOutput && videosync)
     {
-        videosync->SetFrameInterval(frame_interval, m_double_framerate);
+        // We need to tell it this for automatic deinterlacer settings
+        videoOutput->SetVideoFrameRate(video_frame_rate * play_speed);
 
         // If using bob deinterlace, turn on or off if we
         // changed to or from synchronous playback speed.
+        bool play_1 = play_speed > 0.99f && play_speed < 1.01f && normal_speed;
+        bool inter  = (kScan_Interlaced   == m_scan  ||
+                       kScan_Intr2ndField == m_scan);
 
         videofiltersLock.lock();
-        if (m_double_framerate)
-        {
-            if (!normal_speed || play_speed < 0.99 || play_speed > 1.01)
-            {
-                FallbackDeint();
-            }
-        }
-        else if (m_can_double && !m_double_framerate)
-        {
-            if (normal_speed && play_speed > 0.99 && play_speed < 1.01 &&
-                (m_scan == kScan_Interlaced && m_DeintSetting))
-            {
-                videosync->SetFrameInterval(frame_interval, true);
-                videoOutput->SetupDeinterlace(false);
-                videoOutput->SetupDeinterlace(true);
-                if (videoOutput->NeedsDoubleFramerate())
-                    m_double_framerate = true;
-            }
-        }
+        if (m_double_framerate && !play_1)
+            videoOutput->FallbackDeint();
+        else if (!m_double_framerate && m_can_double && play_1 && inter)
+            videoOutput->BestDeint();
         videofiltersLock.unlock();
+
+        m_double_framerate = videoOutput->NeedsDoubleFramerate();
+        videosync->SetFrameInterval(frame_interval, m_double_framerate);
     }
 
 #ifdef USING_IVTV
-    if (forceVideoOutput == kVideoOutput_IVTV)
+    if (IsIVTVDecoder())
     {
         VideoOutputIvtv *vidout = (VideoOutputIvtv *)videoOutput;
         vidout->Play(play_speed / ffrew_skip, normal_speed, 
@@ -5028,6 +5036,15 @@ bool NuppelVideoPlayer::IsInDelete(long long testframe) const
     return ret;
 }
 
+bool NuppelVideoPlayer::IsIVTVDecoder(void) const
+{
+#ifdef USING_IVTV
+    return dynamic_cast<const IvtvDecoder*>(decoder);
+#else // if !USING_IVTV
+    return false;
+#endif // !USING_IVTV
+}
+
 void NuppelVideoPlayer::SaveCutList(void)
 {
     if (!m_playbackinfo)
@@ -5357,7 +5374,56 @@ VideoFrame* NuppelVideoPlayer::GetRawVideoFrame(long long frameNumber)
 
 QString NuppelVideoPlayer::GetEncodingType(void) const
 {
-    return GetDecoder()->GetEncodingType();
+    MythCodecID codecid = GetDecoder()->GetVideoCodecID();
+
+    switch (codecid)
+    {
+        case kCodec_NUV_RTjpeg:
+            return "RTjpeg";
+
+        case kCodec_MPEG1:
+        case kCodec_MPEG1_XVMC:
+        case kCodec_MPEG1_IDCT:
+        case kCodec_MPEG1_VLD:
+        case kCodec_MPEG1_DVDV:
+        case kCodec_MPEG2:
+        case kCodec_MPEG2_XVMC:
+        case kCodec_MPEG2_IDCT:
+        case kCodec_MPEG2_VLD:
+        case kCodec_MPEG2_DVDV:
+            return "MPEG-2";
+
+        case kCodec_H263:
+        case kCodec_H263_XVMC:
+        case kCodec_H263_IDCT:
+        case kCodec_H263_VLD:
+        case kCodec_H263_DVDV:
+            return "H.263";
+
+        case kCodec_NUV_MPEG4:
+        case kCodec_MPEG4:
+        case kCodec_MPEG4_IDCT:
+        case kCodec_MPEG4_XVMC:
+        case kCodec_MPEG4_VLD:
+        case kCodec_MPEG4_DVDV:
+            return "MPEG-4";
+
+        case kCodec_H264:
+        case kCodec_H264_XVMC:
+        case kCodec_H264_IDCT:
+        case kCodec_H264_VLD:
+        case kCodec_H264_DVDV:
+            return "H.264";
+
+        case kCodec_NONE:
+        case kCodec_NORMAL_END:
+        case kCodec_STD_XVMC_END:
+        case kCodec_VLD_END:
+        case kCodec_DVDV_END:
+            return QString::null;
+    }
+
+    return QString::null;
 }
 
 bool NuppelVideoPlayer::GetRawAudioState(void) const
@@ -6066,16 +6132,6 @@ int NuppelVideoPlayer::SetTrack(uint type, int trackNo)
     if (decoder)
         ret = decoder->SetTrack(type, trackNo);
 
-    if (kTrackTypeAudio == type)
-    {
-        QString msg = "";
-
-        if (decoder)
-            msg = decoder->GetTrackDesc(type, GetTrack(type));
-
-        if (osd)
-            osd->SetSettingsText(msg, 3);
-    }
     if (kTrackTypeSubtitle == type)
     {
         DisableCaptions(textDisplayMode, false);
@@ -6220,23 +6276,7 @@ int NuppelVideoPlayer::ChangeTrack(uint type, int dir)
     QMutexLocker locker(&decoder_change_lock);
 
     if (GetDecoder())
-    {
-        int retval;
-
-        if ((retval = GetDecoder()->ChangeTrack(type, dir)) >= 0)
-        {
-            QString msg = "";
-
-            //msg = track_type_to_string(type);
-
-            msg = GetDecoder()->GetTrackDesc(type, GetTrack(type));
-
-            if (osd)
-                osd->SetSettingsText(msg, 3);
-
-            return retval;
-        }
-    }
+        return GetDecoder()->ChangeTrack(type, dir);
     return -1;
 }
 
@@ -6619,7 +6659,22 @@ void NuppelVideoPlayer::AddAVSubtitle(const AVSubtitle &subtitle)
  */
 void NuppelVideoPlayer::SetDecoder(DecoderBase *dec)
 {
-    //VERBOSE(VB_IMPORTANT, "SetDecoder("<<dec<<") was "<<decoder);
+#if 0
+    DummyDecoder    *dummy = dynamic_cast<DummyDecoder*>(dec);
+    NuppelDecoder   *nuv   = dynamic_cast<NuppelDecoder*>(dec);
+    AvFormatDecoder *av    = dynamic_cast<AvFormatDecoder*>(dec);
+    IvtvDecoder     *ivtv  = dynamic_cast<IvtvDecoder*>(dec);
+
+    QString dec_class = (dummy) ? "dummy" :
+        ((nuv) ? "nuppel" : ((av) ? "av" : ((ivtv) ? "ivtv": "null")));
+
+    QString dec_type = "null";
+    if (dec)
+        dec_type = dec->GetCodecDecoderName();
+
+    VERBOSE(VB_IMPORTANT, "SetDecoder("<<dec<<") "
+            <<QString("%1:%2").arg(dec_class).arg(dec_type));
+#endif
     QMutexLocker locker(&decoder_change_lock);
 
     if (!decoder)

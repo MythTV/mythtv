@@ -4,6 +4,8 @@
 #include "osd.h"
 #include "osdsurface.h"
 #include "NuppelVideoPlayer.h"
+#include "videodisplayprofile.h"
+#include "decoderbase.h"
 
 #include "../libmyth/mythcontext.h"
 
@@ -37,43 +39,131 @@ extern "C" {
 
 #include "filtermanager.h"
 
+#define LOC QString("VideoOutput: ")
+#define LOC_ERR QString("VideoOutput, Error: ")
+
 static QSize fix_1080i(QSize raw);
 static float fix_aspect(float raw);
+static QString to_comma_list(const QStringList &list);
 
 /**
- * \fn VideoOutput::InitVideoOut(VideoOutputType, MythCodecID)
- * \brief Creates a VideoOutput class compatible with both "type" and
- *        "codec_id".
+ * \fn VideoOutput::Create(const QString&, MythCodecID, const QSize&,
+                           float, WId, const QRect&, Wid, PIPType)
  * \return instance of VideoOutput if successful, NULL otherwise.
  */
-VideoOutput *VideoOutput::InitVideoOut(
-    VideoOutputType type, MythCodecID codec_id)
+VideoOutput *VideoOutput::Create(
+        const QString &decoder,   MythCodecID  codec_id,
+        void          *codec_priv,
+        const QSize   &video_dim, float        video_aspect,
+        WId            win_id,    const QRect &display_rect,
+        WId            embed_id)
 {
-    (void) type;
-    (void) codec_id;
+    (void) codec_priv;
+
+    QStringList renderers;
 
 #ifdef USING_IVTV
-    if (type == kVideoOutput_IVTV)
-        return new VideoOutputIvtv();
-#endif
+    renderers += VideoOutputIvtv::GetAllowedRenderers(codec_id, video_dim);
+#endif // USING_IVTV
 
 #ifdef USING_DIRECTFB
-    return new VideoOutputDirectfb();
-#endif
+    renderers += VideoOutputDirectfb::GetAllowedRenderers(codec_id, video_dim);
+#endif // USING_DIRECTFB
 
 #ifdef USING_DIRECTX
-    return new VideoOutputDX();
-#endif
+    renderers += VideoOutputDX::GetAllowedRenderers(coded_id, video_dim);
+#endif // USING_DIRECTX
 
 #ifdef USING_XV
-    return new VideoOutputXv(codec_id);
-#endif
+    const QStringList xvlist =
+        VideoOutputXv::GetAllowedRenderers(codec_id, video_dim);
+    renderers += xvlist;
+#endif // USING_XV
 
 #ifdef Q_OS_MACX
-    return new VideoOutputQuartz();
-#endif
+    const QStringList osxlist =
+        VideoOutputQuartz::GetAllowedRenderers(codec_id, video_dim);
+    renderers += osxlist;
+#endif // Q_OS_MACX
 
-    VERBOSE(VB_IMPORTANT, "Not compiled with any useable video output method.");
+    VERBOSE(VB_PLAYBACK, LOC + "Allowed renderers: " +
+            to_comma_list(renderers));
+
+    renderers = VideoDisplayProfile::GetFilteredRenderers(decoder, renderers);
+
+    VERBOSE(VB_PLAYBACK, LOC + "Allowed renderers (filt: " + decoder + "): " +
+            to_comma_list(renderers));
+
+    QString renderer = QString::null;
+    if (renderers.size() > 1)
+    {
+        VideoDisplayProfile vprof;
+        vprof.SetInput(video_dim);
+
+        QString tmp = vprof.GetVideoRenderer();
+        if (vprof.IsDecoderCompatible(decoder) && renderers.contains(tmp))
+        {
+            renderer = tmp;
+            VERBOSE(VB_PLAYBACK, LOC + "Preferred renderer: " + renderer);
+        }
+    }
+
+    if (renderer.isEmpty())
+        renderer = VideoDisplayProfile::GetBestVideoRenderer(renderers);
+
+    while (!renderers.empty())
+    {
+        VERBOSE(VB_PLAYBACK, LOC + "Trying video renderer: " + renderer);
+        QStringList::iterator it = renderers.find(renderer);
+        if (it != renderers.end())
+            renderers.erase(it);
+
+        VideoOutput *vo = NULL;
+#ifdef USING_IVTV
+        if (renderer == "ivtv")
+            vo = new VideoOutputIvtv();
+#endif // USING_IVTV
+
+#ifdef USING_DIRECTFB
+        if (renderer == "directfb")
+            vo = new VideoOutputDirectfb();
+#endif // USING_DIRECTFB
+
+#ifdef USING_DIRECTX
+        if (renderer == "directx")
+            vo = new VideoOutputDX();
+#endif // USING_DIRECTX
+
+#ifdef Q_OS_MACX
+        if (osxlist.contains(renderer))
+            vo = new VideoOutputQuartz(codec_id, codec_priv);
+#endif // Q_OS_MACX
+
+#ifdef USING_XV
+        if (xvlist.contains(renderer))
+            vo = new VideoOutputXv(codec_id);
+#endif // USING_XV
+
+        if (vo)
+        {
+            if (vo->Init(
+                    video_dim.width(), video_dim.height(), video_aspect,
+                    win_id, display_rect.x(), display_rect.y(),
+                    display_rect.width(), display_rect.height(), embed_id))
+            {
+                return vo;
+            }
+
+            delete vo;
+            vo = NULL;
+        }
+
+        renderer = VideoDisplayProfile::GetBestVideoRenderer(renderers);
+    }
+
+    VERBOSE(VB_IMPORTANT, LOC_ERR +
+            "Not compiled with any useable video output method.");
+
     return NULL;
 }
 
@@ -152,6 +242,7 @@ VideoOutput::VideoOutput() :
     db_scale_horiz(0.0f),               db_scale_vert(0.0f),
     db_pip_location(0),                 db_pip_size(26),
     db_letterbox(kLetterbox_Off),       db_deint_filtername(QString::null),
+    db_vdisp_profile(new VideoDisplayProfile()),
 
     // Manual Zoom
     mz_scale(0),                        mz_move(0,0),
@@ -188,16 +279,13 @@ VideoOutput::VideoOutput() :
     // Various state variables
     embedding(false),                   needrepaint(false),
     allowpreviewepg(true),              errored(false),
-    framesPlayed(0)
+    framesPlayed(0), db_scaling_allowed(true)
 {
     db_display_dim = QSize(gContext->GetNumSetting("DisplaySizeWidth",  0),
                            gContext->GetNumSetting("DisplaySizeHeight", 0));
 
     db_move        = QPoint(gContext->GetNumSetting("xScanDisplacement", 0),
                             gContext->GetNumSetting("yScanDisplacement", 0));
-
-    db_scale_vert  = gContext->GetNumSetting("VertScanPercentage",  5) / 100.0;
-    db_scale_horiz = gContext->GetNumSetting("HorizScanPercentage", 5) / 100.0;
 
     db_pip_location    = gContext->GetNumSetting("PIPLocation",        0);
     db_pip_size        = gContext->GetNumSetting("PIPSize",           26);
@@ -212,8 +300,6 @@ VideoOutput::VideoOutput() :
         gContext->GetNumSetting("PlaybackHue",         0);
 
     db_letterbox       = gContext->GetNumSetting("AspectOverride",     0);
-    db_deint_filtername= gContext->GetSetting("DeinterlaceFilter",
-                                              "linearblend");
 }
 
 /**
@@ -246,14 +332,15 @@ bool VideoOutput::Init(int width, int height, float aspect, WId winid,
     if (winw && winh)
     {
         VERBOSE(VB_PLAYBACK,
-                QString("Over/underscan. V: %1, H: %2, XOff: %3, YOff: %4")
-                .arg(db_scale_vert).arg(db_scale_horiz)
+                QString("XOff: %1, YOff: %2")
                 .arg(db_move.x()).arg(db_move.y()));
     }
 
     display_visible_rect = QRect(0, 0, winw, winh);
     video_dim            = QSize(width, height);
     video_rect           = QRect(QPoint(winx, winy), fix_1080i(video_dim));
+
+    db_vdisp_profile->SetInput(video_dim);
 
     letterbox  = db_letterbox;
 
@@ -262,6 +349,17 @@ bool VideoOutput::Init(int width, int height, float aspect, WId winid,
     embedding = false;
 
     return true;
+}
+
+void VideoOutput::InitOSD(OSD *osd)
+{
+    if (!db_vdisp_profile->IsOSDFadeEnabled())
+        osd->DisableFade();
+}
+
+void VideoOutput::SetVideoFrameRate(float playback_fps)
+{
+    db_vdisp_profile->SetOutput(playback_fps);
 }
 
 /**
@@ -315,19 +413,28 @@ bool VideoOutput::SetupDeinterlace(bool interlaced,
         VideoFrameType otmp = FMT_YV12;
         int btmp;
         
-        m_deintfiltername = QDeepCopy<QString>(
-            overridefilter.isEmpty() ? db_deint_filtername : overridefilter);
+        m_deintfiltername = db_vdisp_profile->GetFilteredDeint(overridefilter);
 
         m_deintFiltMan = new FilterManager;
         m_deintFilter = NULL;
 
-        if (ApproveDeintFilter(m_deintfiltername))
+        if (!m_deintfiltername.isEmpty())
         {
-            int width  = video_dim.width();
-            int height = video_dim.height();
-            m_deintFilter = m_deintFiltMan->LoadFilters(
-                m_deintfiltername, itmp, otmp, width, height, btmp);
-            video_dim = QSize(width, height);
+            if (!ApproveDeintFilter(m_deintfiltername))
+            {
+                VERBOSE(VB_IMPORTANT,
+                        QString("Failed to approve '%1' deinterlacer")
+                        .arg(m_deintfiltername));
+                m_deintfiltername = QString::null;
+            }
+            else
+            {
+                int width  = video_dim.width();
+                int height = video_dim.height();
+                m_deintFilter = m_deintFiltMan->LoadFilters(
+                    m_deintfiltername, itmp, otmp, width, height, btmp);
+                video_dim = QSize(width, height);
+            }
         }
 
         if (m_deintFilter == NULL) 
@@ -348,6 +455,24 @@ bool VideoOutput::SetupDeinterlace(bool interlaced,
     return m_deinterlacing;
 }
 
+/** \fn VideoOutput::FallbackDeint(void)
+ *  \brief Fallback to non-frame-rate-doubling deinterlacing method.
+ */
+void VideoOutput::FallbackDeint(void)
+{
+    SetupDeinterlace(false);
+    SetupDeinterlace(true, db_vdisp_profile->GetFallbackDeinterlacer());
+}
+
+/** \fn VideoOutput::FallbackDeint(void)
+ *  \brief Change to the best deinterlacing method.
+ */
+void VideoOutput::BestDeint(void)
+{
+    SetupDeinterlace(false);
+    SetupDeinterlace(true);
+}
+
 /**
  * \fn VideoOutput::NeedsDoubleFramerate() const
  * \brief Should Prepare() and Show() be called twice for every ProcessFrame().
@@ -357,20 +482,22 @@ bool VideoOutput::SetupDeinterlace(bool interlaced,
 bool VideoOutput::NeedsDoubleFramerate() const
 {
     // Bob deinterlace requires doubling framerate
-    return (m_deintfiltername == "bobdeint" && m_deinterlacing);
+    return ((m_deintfiltername.contains("bobdeint") ||
+             m_deintfiltername.contains("doublerate")) &&
+            m_deinterlacing);
 }
 
 /**
  * \fn VideoOutput::ApproveDeintFilter(const QString& filtername) const
- * \brief Approves all deinterlace filters, except bobdeint, which
+ * \brief Approves all deinterlace filters, except ones which
  *        must be supported by a specific video output class.
- *
- * \return filtername != "bobdeint"
  */
 bool VideoOutput::ApproveDeintFilter(const QString& filtername) const
 {
     // Default to not supporting bob deinterlace
-    return (filtername != "bobdeint");
+    return (!filtername.contains("bobdeint") &&
+            !filtername.contains("doublerate") &&
+            !filtername.contains("opengl"));
 }
 
 /**
@@ -411,20 +538,28 @@ void VideoOutput::VideoAspectRatioChanged(float aspect)
 }
 
 /**
- * \fn VideoOutput::InputChanged(int, int, float, MythCodecID)
+ * \fn VideoOutput::InputChanged(const QSize&, float, MythCodecID, void*)
  * \brief Tells video output to discard decoded frames and wait for new ones.
  * \bug We set the new width height and aspect ratio here, but we should
  *      do this based on the new video frames in Show().
  */
-void VideoOutput::InputChanged(int width, int height, float aspect,
-                               MythCodecID av_codec_id)
+bool VideoOutput::InputChanged(const QSize &input_size,
+                               float        aspect,
+                               MythCodecID  myth_codec_id,
+                               void        *codec_private)
 {
-    (void)av_codec_id;
+    (void)myth_codec_id;
+    (void)codec_private;
 
-    video_dim = QSize(width, height);
+    video_dim = input_size;
+
+    db_vdisp_profile->SetInput(video_dim);
+
     SetVideoAspectRatio(aspect);
     
     DiscardFrames(true);
+
+    return true;
 }
 
 /**
@@ -1021,6 +1156,40 @@ void VideoOutput::SetPictureAttributeDBValue(int attributeType, int newValue)
 
     db_pict_attr[attributeType] = newValue;
 }
+/*
+ * \brief Determines PIP Window size and Position.
+ */
+QRect VideoOutput::GetPIPRect(int location, NuppelVideoPlayer *pipplayer)
+{
+    QRect position;
+    float pipVideoAspect = pipplayer ? (float)pipplayer->GetVideoAspect():(4.0f/3.0f);
+    int tmph = (display_visible_rect.height() * db_pip_size) / 100;
+    float pixel_adj = ((float)display_visible_rect.width() / 
+            (float) display_visible_rect.height()) / display_aspect;
+    position.setHeight(tmph);
+    position.setWidth((int)(tmph * pipVideoAspect * pixel_adj));
+
+    int xoff = (int)(display_visible_rect.width()  * 0.06);
+    int yoff = (int)(display_visible_rect.height() * 0.06);
+    switch (location)
+    {
+        default:
+        case kPIPTopLeft:
+            break;
+        case kPIPBottomLeft:
+            yoff = display_visible_rect.height() - position.height() - yoff;
+            break;
+        case kPIPTopRight:
+            xoff = display_visible_rect.width() - position.width() - xoff;
+            break;
+        case kPIPBottomRight:
+            xoff = display_visible_rect.width() - position.width() - xoff;
+            yoff = display_visible_rect.height() - position.height() - yoff;
+            break;
+    }
+    position.moveBy(xoff, yoff);
+    return position;
+}
 
 /**
  * \fn VideoOutput::DoPipResize(int,int)
@@ -1341,6 +1510,30 @@ void VideoOutput::SetVideoResize(const QRect &videoRect)
 }
 
 /**
+ * \brief Disable or enable underscan/overscan
+ */
+void VideoOutput::SetVideoScalingAllowed(bool change)
+{
+    if (change)
+    {
+        db_scale_vert  = gContext->GetNumSetting("VertScanPercentage",  5) / 100.0;
+        db_scale_horiz = gContext->GetNumSetting("HorizScanPercentage", 5) / 100.0;
+        db_scaling_allowed = true;
+    }
+    else
+    {
+        db_scale_vert = 0.0f;
+        db_scale_horiz = 0.0f;
+        db_scaling_allowed = false;
+    }
+
+    VERBOSE(VB_PLAYBACK, QString("Over/underscan. V: %1, H: %2")
+            .arg(db_scale_vert).arg(db_scale_horiz));
+
+    MoveResize();
+}
+
+/**
  * \fn VideoOutput::DisplayOSD(VideoFrame*,OSD *,int,int)
  * \brief If the OSD has changed, this will convert the OSD buffer
  *        to the OSDSurface's color format.
@@ -1426,6 +1619,32 @@ void VideoOutput::CopyFrame(VideoFrame *to, const VideoFrame *from)
     // guaranteed to be correct sizes.
     if (from->size == to->size)
         memcpy(to->buf, from->buf, from->size);
+    else if ((to->pitches[0] == from->pitches[0]) &&
+             (to->pitches[1] == from->pitches[1]) &&
+             (to->pitches[2] == from->pitches[2]))
+    {
+        memcpy(to->buf + to->offsets[0], from->buf + from->offsets[0],
+               from->pitches[0] * from->height);
+        memcpy(to->buf + to->offsets[1], from->buf + from->offsets[1],
+               from->pitches[1] * (from->height>>1));
+        memcpy(to->buf + to->offsets[2], from->buf + from->offsets[2],
+               from->pitches[2] * (from->height>>1));        
+    }
+    else
+    {
+        uint f[3] = { from->height,   from->height>>1, from->height>>1, };
+        uint t[3] = { to->height,     to->height>>1,   to->height>>1,   };
+        uint h[3] = { min(f[0],t[0]), min(f[1],t[1]),  min(f[2],t[2]),  };
+        for (uint i = 0; i < 3; i++)
+        {
+            for (uint j = 0; j < h[i]; j++)
+            {
+                memcpy(to->buf   + to->offsets[i]   + (j * to->pitches[i]),
+                       from->buf + from->offsets[i] + (j * from->pitches[i]),
+                       min(from->pitches[i], to->pitches[i]));
+            }
+        }
+    }
 
 /* XXX: Broken.
     if (from->qstride > 0 && from->qscale_table != NULL)
@@ -1451,6 +1670,8 @@ static QSize fix_1080i(QSize raw)
 {
     if (QSize(1920, 1088) == raw)
         return QSize(1920, 1080);
+    if (QSize(1440, 1088) == raw)
+        return QSize(1440, 1080);
     return raw;
 }
 
@@ -1466,4 +1687,16 @@ static float fix_aspect(float raw)
         raw = 1.777777f;
 
     return raw;
+}
+
+static QString to_comma_list(const QStringList &list)
+{
+    QString ret = "";
+    for (QStringList::const_iterator it = list.begin(); it != list.end(); ++it)
+        ret += *it + ",";
+
+    if (ret.length())
+        return ret.left(ret.length()-1);
+
+    return "";
 }

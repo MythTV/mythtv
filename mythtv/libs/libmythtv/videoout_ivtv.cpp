@@ -45,6 +45,7 @@ extern "C" {
 #include "yuv2rgb.h"
 #include "osd.h"
 #include "osdsurface.h"
+#include "videodisplayprofile.h"
 
 #define LOC QString("IVD: ")
 #define LOC_ERR QString("IVD Error: ")
@@ -170,13 +171,16 @@ void VideoOutputIvtv::SetAlpha(eAlphaState newAlphaState)
                 "Failed to set ivtv alpha values." + ENO);
 }
 
-void VideoOutputIvtv::InputChanged(int width, int height, float aspect,
-                                   MythCodecID av_codec_id)
+bool VideoOutputIvtv::InputChanged(const QSize &input_size,
+                                   float        aspect,
+                                   MythCodecID  av_codec_id,
+                                   void        *codec_private)
 {
     VERBOSE(VB_PLAYBACK, LOC + "InputChanged() -- begin");
-    VideoOutput::InputChanged(width, height, aspect, av_codec_id);
+    VideoOutput::InputChanged(input_size, aspect, av_codec_id, codec_private);
     MoveResize();
     VERBOSE(VB_PLAYBACK, LOC + "InputChanged() -- end");
+    return true;
 }
 
 int VideoOutputIvtv::GetRefreshRate(void)
@@ -194,6 +198,9 @@ bool VideoOutputIvtv::Init(int width, int height, float aspect,
                            int winh, WId embedid)
 {
     VERBOSE(VB_PLAYBACK, LOC + "Init() -- begin");
+
+    db_vdisp_profile->SetVideoRenderer("ivtv");
+
     allowpreviewepg = false;
 
     videoDevice = gContext->GetSetting("PVR350VideoDev");
@@ -752,4 +759,20 @@ void VideoOutputIvtv::Step(void)
             break;
         }
     }
+}
+
+QStringList VideoOutputIvtv::GetAllowedRenderers(
+    MythCodecID myth_codec_id, const QSize &video_dim)
+{
+    QStringList list;
+
+    if (((kCodec_MPEG1 == myth_codec_id) ||
+         (kCodec_MPEG2 == myth_codec_id)) &&
+        (video_dim.width() <= 768) &&
+        (video_dim.height() <= 576))
+    {
+        list += "ivtv";
+    }
+
+    return list;
 }

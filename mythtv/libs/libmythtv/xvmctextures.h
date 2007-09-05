@@ -30,38 +30,19 @@ class XvMCTextures
 
     void PrepareFrame(XvMCSurface*, const QRect&, int) {}
     void DeInit(void) {}
-    void Show(void) {}
+    void Show(int) {}
     bool ProcessOSD(OSD*) { return false; }
 };
 
-#else // ! USING_XVMC_OPENGL
+#else // ifdef USING_XVMC_OPENGL
 
-#ifdef USING_OPENGL
-#include <GL/glx.h>
-#include <GL/glu.h>
-#endif
-
-#include "mythcontext.h"
-#include "util-x11.h"
-
-static inline int __glCheck__(const QString &loc, const char* fileName, int n)
-{
-    int error = glGetError();
-    if (error)
-    { 
-        VERBOSE(VB_IMPORTANT, loc << gluErrorString(error) << " @ "
-                << fileName << ", #" << n);
-    }
-    return error;
-}
-
-#define glCheck() __glCheck__(LOC, __FILE__, __LINE__)
+#include "util-opengl.h"
 
 class XvMCTextures
 {
   public:
     XvMCTextures() :
-        XJ_disp(NULL),
+        XJ_disp(NULL),          last_video_rect(0,0,0,0),
         gl_video_size(0,0),     gl_display_size(0,0),
         gl_vid_tex_index(0),    gl_osd_tex_index(0),
         gl_osd_revision(-1),
@@ -89,11 +70,16 @@ class XvMCTextures
 
     void PrepareFrame(XvMCSurface *surf, const QRect &video_rect, int field);
 
-    void Show(void);
+    void Show(int field);
 
     bool ProcessOSD(OSD *osd);
 
+  private:
+    void CompositeFrameAndOSD(int scan);
+
+  private:
     Display             *XJ_disp;
+    QRect                last_video_rect;
     QSize                gl_video_size;
     QSize                gl_display_size;
     vector<GLuint>       gl_vid_textures;

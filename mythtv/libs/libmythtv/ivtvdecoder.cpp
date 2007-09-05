@@ -265,8 +265,6 @@ int IvtvDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
 
     ringBuffer = rbuffer;
 
-    GetNVP()->ForceVideoOutputType(kVideoOutput_IVTV);
-
     keyframedist = -1;
     positionMapType = MARK_UNSET;
 

@@ -99,13 +99,17 @@ void VideoOutputDX::MoveResize()
     DirectXUpdateOverlay();
 }
 
-void VideoOutputDX::InputChanged(int width, int height, float aspect,
-                                 MythCodecID av_codec_id)
+bool VideoOutputDX::InputChanged(const QSize &input_size,
+                                 float        aspect,
+                                 MythCodecID  av_codec_id,
+                                 void        *codec_private)
 {
-    VideoOutput::InputChanged(width, height, aspect, av_codec_id);
+    VideoOutput::InputChanged(input_size, aspect, av_codec_id, codec_private);
 
-    XJ_width  = width;
-    XJ_height = height;
+    db_vdisp_profile->SetVideoRenderer("directx");
+
+    XJ_width  = input_size.width();
+    XJ_height = input_size.height();
 
     vbuffers.DeleteBuffers();
     
@@ -125,6 +129,8 @@ void VideoOutputDX::InputChanged(int width, int height, float aspect,
     pauseFrame.size   = vbuffers.GetScratchFrame()->size;
     pauseFrame.buf    = new unsigned char[pauseFrame.size];
     pauseFrame.frameNumber = vbuffers.GetScratchFrame()->frameNumber;
+
+    return true;
 }
 
 int VideoOutputDX::GetRefreshRate(void)
@@ -153,6 +159,8 @@ bool VideoOutputDX::Init(int width, int height, float aspect,
                            WId winid, int winx, int winy, int winw, 
                            int winh, WId embedid)
 {
+    db_vdisp_profile->SetVideoRenderer("directx");
+
     vbuffers.Init(kNumBuffers, true, kNeedFreeFrames, 
                   kPrebufferFramesNormal, kPrebufferFramesSmall, 
                   kKeepPrebuffer);
@@ -205,7 +213,7 @@ bool VideoOutputDX::Init(int width, int height, float aspect,
     pauseFrame.frameNumber = vbuffers.GetScratchFrame()->frameNumber;
     
     XJ_started = true;
-    
+
     return true;
 }
 
@@ -1491,5 +1499,13 @@ int VideoOutputDX::DirectXUnlockSurface()
         return 0;
     else
         return -1;
+}
+
+QStringList VideoOutputDX::GetAllowedRenderers(
+    MythCodecID myth_codec_id, const QSize &video_dim)
+{
+    QStringList list;
+    list += "directx";
+    return list;
 }
 

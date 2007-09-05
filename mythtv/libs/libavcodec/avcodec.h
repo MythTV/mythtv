@@ -59,6 +59,7 @@ enum CodecID {
     CODEC_ID_MPEG2VIDEO, /* preferred ID for MPEG-1/2 video decoding */
     CODEC_ID_MPEG2VIDEO_XVMC,
     CODEC_ID_MPEG2VIDEO_XVMC_VLD,
+    CODEC_ID_MPEG2VIDEO_DVDV,
     CODEC_ID_H261,
     CODEC_ID_H263,
     CODEC_ID_RV10,
@@ -2157,6 +2158,15 @@ typedef struct AVCodecContext {
      * - decoding: set by decoder
      */
     void (*decode_cc_dvd)(struct AVCodecContext *c, const uint8_t *buf, int buf_size);
+
+    /**
+     * DVD Video (Mac OS X Hardware MPEG) decoding
+     *     (originally by John Dagliesh
+     *      http://www.defyne.org/dvb/accellent.html)
+     * - encoding: forbidden
+     * - decoding: set by decoder
+     */
+    void *dvdv;  /* This is actually a pointer to a DVDV_CurPtrs */
 } AVCodecContext;
 
 /**
@@ -2326,6 +2336,7 @@ extern AVCodec fraps_decoder;
 extern AVCodec gif_decoder;
 extern AVCodec h261_decoder;
 extern AVCodec h263_decoder;
+extern AVCodec mpeg_dvdv_decoder;
 extern AVCodec h263i_decoder;
 extern AVCodec h264_decoder;
 extern AVCodec huffyuv_decoder;

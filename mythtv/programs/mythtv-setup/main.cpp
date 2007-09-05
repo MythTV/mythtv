@@ -90,7 +90,7 @@ int main(int argc, char *argv[])
     QString display  = QString::null;
     QString verboseString = QString(" important general");
 
-#ifdef Q_WS_X11
+#ifdef USING_X11
     // Remember any -display or -geometry argument
     // which QApplication init will remove.
     for(int argpos = 1; argpos + 1 < argc; ++argpos)
@@ -209,7 +209,7 @@ int main(int argc, char *argv[])
                 cerr << "Invalid argument: " << a.argv()[argpos] << endl;
 
             cerr << "Valid options are: "<<endl
-#ifdef Q_WS_X11 
+#ifdef USING_X11 
                  <<"-display X-server              Create GUI on X-server, not localhost"<<endl
 #endif          
                  <<"-geometry or --geometry WxH    Override window size settings"<<endl

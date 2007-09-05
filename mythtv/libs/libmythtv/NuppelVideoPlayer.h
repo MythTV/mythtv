@@ -48,6 +48,7 @@ class LiveTVChain;
 class TV;
 struct AVSubtitle;
 class InteractiveTV;
+class NSAutoreleasePool;
 
 struct TextContainer
 {
@@ -107,7 +108,6 @@ class MPUBLIC NuppelVideoPlayer : public CC608Reader, public CC708Reader
    ~NuppelVideoPlayer();
 
     // Initialization
-    void ForceVideoOutputType(VideoOutputType type);
     bool InitVideo(void);
     int  OpenFile(bool skipDsp = false, uint retries = 4,
                   bool allow_libmpeg2 = true);
@@ -416,6 +416,7 @@ class MPUBLIC NuppelVideoPlayer : public CC608Reader, public CC708Reader
     // Private Gets
     int  GetStatusbarPos(void) const;
     bool IsInDelete(long long testframe) const;
+    bool IsIVTVDecoder(void) const;
 
     // Private pausing stuff
     void PauseVideo(bool wait = true);
@@ -509,8 +510,6 @@ class MPUBLIC NuppelVideoPlayer : public CC608Reader, public CC708Reader
     void SetDVDBookmark(long long frames);
 
   private:
-    VideoOutputType forceVideoOutput;
-
     DecoderBase   *decoder;
     QMutex         decoder_change_lock;
     VideoOutput   *videoOutput;
@@ -533,6 +532,7 @@ class MPUBLIC NuppelVideoPlayer : public CC608Reader, public CC708Reader
     bool     eof;             ///< At end of file/ringbuffer
     bool     m_double_framerate;///< Output fps is double Video (input) rate
     bool     m_can_double;    ///< VideoOutput capable of doubling frame rate
+    bool     m_deint_possible;
     bool     paused;
     bool     pausevideo;
     bool     actuallypaused;
@@ -552,7 +552,6 @@ class MPUBLIC NuppelVideoPlayer : public CC608Reader, public CC708Reader
     bool     hasFullPositionMap;
     mutable bool     limitKeyRepeat;
     bool     errored;
-    int      m_DeintSetting;
 
     // Bookmark stuff
     long long bookmarkseek;

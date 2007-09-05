@@ -746,6 +746,7 @@ int DataDirectProcessor::UpdateChannelsSafe(
                                  xmltvid, callsign, name, freqid,
                                  chan_major, chan_minor);
 
+        (void) mods;
 #if 0
         if (!insert_channels && !mods)
         {

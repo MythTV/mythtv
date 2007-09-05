@@ -622,6 +622,11 @@
     <offset>20,10</offset>
   </buttondef>
 
+  <buttondef name="TV_SETTINGS_PLAYBACK_OSD">
+    <image>play.png</image>
+    <offset>20,10</offset>
+  </buttondef>
+
   <buttondef name="TV_SETTINGS_PLAYBACK_GROUPS">
     <image>play.png</image>
     <offset>20,10</offset>

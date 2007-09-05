@@ -692,7 +692,7 @@ void rgb32_to_yuv420p(unsigned char *lum, unsigned char *cb, unsigned char *cr,
     }
 }
 
-/* YUV420 to VUY2 colorspace conversion routines.
+/* I420 to 2VUY colorspace conversion routines.
  *
  * In the early days of the OS X port of MythTV, Paul Jara noticed that
  * QuickTime spent a lot of time converting from YUV420 to YUV422.
@@ -706,45 +706,106 @@ void rgb32_to_yuv420p(unsigned char *lum, unsigned char *cb, unsigned char *cr,
  * Fortunately, Mino Taoyama has provided an MMX optimised version too.
  */
 
-// Plain C function which is used for non-Vector-compatible dimensions
-static void non_vec_yuv420_2vuy (uint8_t * image, uint8_t * py, uint8_t * pu,
-                                 uint8_t * pv, int h_size, int v_size,
-                                 int vuy_stride, int y_stride, int uv_stride);
+/** \brief Plain C I420 to 2VUY conversion function.
+ *
+ *  See http://developer.apple.com/quicktime/icefloe/dispatch019.html
+ *  for a complete description of 2VUY and fourcc.org for YUV 4:2:0.
+ *
+ *  2vuy is a like a 8-bit per component YUV 4:2:2, but it's actually
+ *  a Y'Cb'Cr sampling.
+ *  2vuy is packed with bytes [Cb, Y, Cr, Y] representing two pixels.
+ *
+ *  \return A pointer to a I420 to 2VUY conversion function,
+ *          which uses Altivec or MMX when supported.
+ */
+static void non_vec_i420_2vuy(
+    uint8_t *image, int vuy_stride,
+    const uint8_t *py, const uint8_t *pu, const uint8_t *pv,
+    int y_stride, int u_stride, int v_stride,
+    int h_size, int v_size)
+{
+    uint8_t *pi1, *pi2;
+    const uint8_t *py1;
+    const uint8_t *py2;
+    const uint8_t *pu1;
+    const uint8_t *pv1;
+    int x, y;
+
+    for (y = 0; y < (v_size>>1); y++)
+    {
+        pi1 = image + 2*y * vuy_stride;
+        pi2 = image + 2*y * vuy_stride + vuy_stride;
+        py1 = py + 2*y * y_stride;
+        py2 = py + 2*y * y_stride + y_stride;
+        pu1 = pu + y * u_stride;
+        pv1 = pv + y * v_stride;
+
+        for (x = 0; x < (h_size>>1); x++)
+        {
+            pi1[4*x+0] = pu1[1*x+0];
+            pi2[4*x+0] = pu1[1*x+0];
+            pi1[4*x+1] = py1[2*x+0];
+            pi2[4*x+1] = py2[2*x+0];
+            pi1[4*x+2] = pv1[1*x+0];
+            pi2[4*x+2] = pv1[1*x+0];
+            pi1[4*x+3] = py1[2*x+1];
+            pi2[4*x+3] = py2[2*x+1];
+        }
+    }
+}
 
 #ifdef MMX
-static void mmx_yuv420_2vuy (uint8_t * image, uint8_t * py,
-                             uint8_t * pu, uint8_t * pv,
-                             int h_size, int v_size,
-                             int vuy_stride, int y_stride, int uv_stride)
+/** \brief MMX I420 to 2VUY conversion function.
+ *
+ *  See http://developer.apple.com/quicktime/icefloe/dispatch019.html
+ *  for a complete description of 2VUY and fourcc.org for YUV 4:2:0.
+ *
+ *  2vuy is a like a 8-bit per component YUV 4:2:2, but it's actually
+ *  a Y'Cb'Cr sampling.
+ *  2vuy is packed with bytes [Cb, Y, Cr, Y] representing two pixels.
+ *
+ *  \return A pointer to a I420 to 2VUY conversion function,
+ *          which uses Altivec or MMX when supported.
+ */
+static void mmx_i420_2vuy(
+    uint8_t *image, int vuy_stride,
+    const uint8_t *py, const uint8_t *pu, const uint8_t *pv,
+    int y_stride, int u_stride, int v_stride,
+    int h_size, int v_size)
 {
-    uint8_t *ibuf1 = image;
-    uint8_t *ibuf2 = image;
-    uint8_t *ybuf1 = py;
-    uint8_t *ybuf2 = py;
-    uint8_t *ubuf = pu;
-    uint8_t *vbuf = pv;
+    uint8_t *pi1, *pi2;
+    const uint8_t *py1 = py;
+    const uint8_t *py2 = py;
+    const uint8_t *pu1 = pu;
+    const uint8_t *pv1 = pv;
     
     int x,y;
-    
 
     if ((h_size % 16) || (v_size % 2))
-        return non_vec_yuv420_2vuy(image, py, pu, pv, h_size, v_size,
-                                   vuy_stride, y_stride, uv_stride);
-
-    for(y = v_size/2; y--; )
     {
-        ibuf1 = ibuf2;
-        ibuf2 += h_size * 2;
-        ybuf1 = ybuf2;
-        ybuf2 += h_size;
-        
-        for(x = 0; x < h_size / 16; x++)
+        non_vec_i420_2vuy(image, vuy_stride,
+                          py, pu, pv, y_stride, u_stride, v_stride,
+                          h_size, v_size);
+        return;
+    }
+                                 
+    emms();
+
+    for (y = 0; y < (v_size>>1); y++)
+    {
+        pi1 = image + 2*y * vuy_stride;
+        pi2 = image + 2*y * vuy_stride + vuy_stride;
+        py1 = py + 2*y * y_stride;
+        py2 = py + 2*y * y_stride + y_stride;
+        pu1 = pu + y * u_stride;
+        pv1 = pv + y * v_stride;
+
+        for (x = 0; x < h_size / 16; x++)
         {
-            
-            movq_m2r (*ybuf1, mm0);   // y data
-            movq_m2r (*ybuf2, mm1);   // y data
-            movq_m2r (*ubuf, mm2);    // u data
-            movq_m2r (*vbuf, mm3);    // v data
+            movq_m2r (*py1, mm0);     // y data
+            movq_m2r (*py2, mm1);     // y data
+            movq_m2r (*pu1, mm2);     // u data
+            movq_m2r (*pv1, mm3);     // v data
             
             movq_r2r (mm2, mm4);      // Copy U
             
@@ -756,90 +817,50 @@ static void mmx_yuv420_2vuy (uint8_t * image, uint8_t * py,
             punpcklbw_r2r (mm0, mm5); // mm5 = y1 low uv low
             punpckhbw_r2r (mm0, mm6); // mm6 = y1 high uv high
             
-            movntq_r2m (mm5, *(ibuf1));
-            movntq_r2m (mm6, *(ibuf1+8));
+            movntq_r2m (mm5, *(pi1));
+            movntq_r2m (mm6, *(pi1+8));
     
             movq_r2r (mm2, mm5);      // Copy low UV mm5 = uv low
             movq_r2r (mm2, mm6);      // Copy low UV mm6 = uv low
 	    punpcklbw_r2r (mm1, mm5); // mm5 = y2 low uv low
             punpckhbw_r2r (mm1, mm6); // mm6 = y2 high uv high
     
-            movntq_r2m (mm5, *(ibuf2));
-            movntq_r2m (mm6, *(ibuf2+8));
+            movntq_r2m (mm5, *(pi2));
+            movntq_r2m (mm6, *(pi2+8));
     
     
-            movq_m2r (*(ybuf1+8), mm0); // y data
-            movq_m2r (*(ybuf2+8), mm1); // y data
+            movq_m2r (*(py1+8), mm0); // y data
+            movq_m2r (*(py2+8), mm1); // y data
     
             movq_r2r (mm4, mm5);      // Copy high UV mm5 = uv high
             movq_r2r (mm4, mm6);      // Copy high UV mm6 = uv high
             punpcklbw_r2r (mm0, mm5); // mm5 = y1 low uv high
             punpckhbw_r2r (mm0, mm6); // mm6 = y1 high uv high
             
-            movntq_r2m (mm5, *(ibuf1+16));
-            movntq_r2m (mm6, *(ibuf1+24));
+            movntq_r2m (mm5, *(pi1+16));
+            movntq_r2m (mm6, *(pi1+24));
             
             movq_r2r (mm4, mm5);      // Copy high UV mm5 = uv high
             movq_r2r (mm4, mm6);      // Copy high UV mm6 = uv high     
             punpcklbw_r2r (mm1, mm5); // mm5 = y2 low uv low
             punpckhbw_r2r (mm1, mm6); // mm6 = y2 high uv high
     
-            movntq_r2m (mm5, *(ibuf2+16));
-            movntq_r2m (mm6, *(ibuf2+24));
+            movntq_r2m (mm5, *(pi2+16));
+            movntq_r2m (mm6, *(pi2+24));
             
-            ibuf1 += 32;
-            ibuf2 += 32;
-            ybuf1 += 16;
-            ybuf2 += 16;
-            ubuf += 8;
-            vbuf += 8;
+            pi1 += 32;
+            pi2 += 32;
+            py1 += 16;
+            py2 += 16;
+            pu1 += 8;
+            pv1 += 8;
         }
-        ibuf2 += vuy_stride;
-        ybuf2 += y_stride;
-        ubuf += uv_stride;
-        vbuf += uv_stride;
     }
 
     emms();
 }
 
 #endif // MMX
-
-
-static void non_vec_yuv420_2vuy (uint8_t * image, uint8_t * py,
-                                 uint8_t * pu, uint8_t * pv,
-                                 int h_size, int v_size,
-                                 int vuy_stride, int y_stride, int uv_stride)
-{
-    uint8_t *pi1, *pi2 = image;
-    uint8_t *py1, *py2 = py;
-
-    int x, y;
-
-    for (y = v_size / 2; y--; )
-    {
-        pi1  = pi2;
-        pi2 += h_size * 2;
-        py1  = py2;
-        py2 += h_size;
-
-        for (x = h_size / 2; x--; )
-        {
-            *(pi1)++ =            *(pi2)++ = *(pu)++;
-            *(pi1)++ = *(py1)++;  *(pi2)++ = *(py2)++;
-            *(pi1)++ =            *(pi2)++ = *(pv)++;
-            *(pi1)++ = *(py1)++;  *(pi2)++ = *(py2)++;
-        }
-
-        py1 += y_stride;
-        py2 += y_stride;
-        pu  += uv_stride;
-        pv  += uv_stride;
-        pi1 += vuy_stride;
-        pi2 += vuy_stride;
-    }
-}
-
 
 #ifdef HAVE_ALTIVEC
 
@@ -864,13 +885,27 @@ static void non_vec_yuv420_2vuy (uint8_t * image, uint8_t * py,
     vec_st(vec_mergeh(uv_vec, y_vec), 0, pi2); pi2 += 16;                   \
     vec_st(vec_mergel(uv_vec, y_vec), 0, pi2); pi2 += 16;
 
-static void altivec_yuv420_2vuy (uint8_t * image, uint8_t * py,
-                                 uint8_t * pu, uint8_t * pv,
-                                 int h_size, int v_size,
-                                 int vuy_stride, int y_stride, int uv_stride)
+/** \brief Alitvec I420 to 2VUY conversion function.
+ *
+ *  See http://developer.apple.com/quicktime/icefloe/dispatch019.html
+ *  for a complete description of 2VUY and fourcc.org for YUV 4:2:0.
+ *
+ *  2vuy is a like a 8-bit per component YUV 4:2:2, but it's actually
+ *  a Y'Cb'Cr sampling.
+ *  2vuy is packed with bytes [Cb, Y, Cr, Y] representing two pixels.
+ *
+ *  \return A pointer to a I420 to 2VUY conversion function,
+ *          which uses Altivec or MMX when supported.
+ */
+static void altivec_i420_2vuy(
+    uint8_t *image, int vuy_stride,
+    const uint8_t *py, const uint8_t *pu, const uint8_t *pv,
+    int y_stride, int u_stride, int v_stride,
+    int h_size, int v_size)
 {
     uint8_t *pi1, *pi2 = image;
-    uint8_t *py1, *py2 = py;
+    const uint8_t *py1;
+    const uint8_t *py2 = py;
         
     int x, y;
 
@@ -878,6 +913,23 @@ static void altivec_yuv420_2vuy (uint8_t * image, uint8_t * py,
     vector unsigned char v_vec;
     vector unsigned char uv_vec;
     vector unsigned char y_vec;
+
+    int vuy_extra = vuy_stride - (h_size<<1);
+    int y_extra   = y_stride   - (h_size);
+    int u_extra   = u_stride   - (h_size>>1);
+    int v_extra   = v_stride   - (h_size>>1);
+    bool any_extra = vuy_extra || y_extra || u_extra || v_extra ||
+        (u_extra != v_extra);
+
+    if (any_extra)
+    {
+        // Fall back to C version
+        non_vec_i420_2vuy(image, vuy_stride,
+                          py, pu, pv,
+                          y_stride, u_stride, v_stride,
+                          h_size, v_size);
+        return;
+    }
 
     if (!((h_size % 32) || (v_size % 2)))
     {
@@ -928,73 +980,81 @@ static void altivec_yuv420_2vuy (uint8_t * image, uint8_t * py,
     else
     {
         // Fall back to C version
-        non_vec_yuv420_2vuy(image, py, pu, pv, h_size, v_size,
-                            vuy_stride, y_stride, uv_stride);
+        non_vec_i420_2vuy(image, vuy_stride,
+                          py, pu, pv,
+                          y_stride, u_stride, v_stride,
+                          h_size, v_size);
     }
 }
 
 #endif // HAVE_ALTIVEC
 
 
-/** \fn     get_vuy2yuv_conv(void)
- *  \brief  Select a function to help speed up QuickTime YUV rendering
- *  \return A pointer to a YUV to VUY conversion function,
- *          which uses Altivec on appropriate machines,
- *          or MMX if it was compiled in.
+/** \fn     get_i420_2yuv_conv(void)
+ *  \brief  Returns I420 to 2VUY conversion function.
+ *
+ *  See http://developer.apple.com/quicktime/icefloe/dispatch019.html
+ *  for a complete description of 2VUY and fourcc.org for YUV 4:2:0.
+ *
+ *  2vuy is a like a 8-bit per component YUV 4:2:2, but it's actually
+ *  a Y'Cb'Cr sampling.
+ *  2vuy is packed with bytes [Cb, Y, Cr, Y] representing two pixels.
+ *
+ *  \return A pointer to a I420 to 2VUY conversion function,
+ *          which uses Altivec or MMX when supported.
  */
-yuv2vuy_fun get_yuv2vuy_conv(void)
+conv_i420_2vuy_fun get_i420_2vuy_conv(void)
 {
 #ifdef HAVE_ALTIVEC
     if (has_altivec())
-        return altivec_yuv420_2vuy;
+        return altivec_i420_2vuy;
 #endif
 
 #ifdef MMX
-    return mmx_yuv420_2vuy;
+    return mmx_i420_2vuy;
 #endif
 
-    return non_vec_yuv420_2vuy; /* Fallback to C */
+    return non_vec_i420_2vuy; /* Fallback to C */
 }
 
-
-
-/* 2VUY to YUV420 conversion routines
+/** \brief Plain C 2VUY to I420 conversion routine
  *
- * For completeness, and as another Altivec assembler example.
- * Note that we have no MMX version of this.
+ *  See http://developer.apple.com/quicktime/icefloe/dispatch019.html
+ *  for a complete description of 2VUY and fourcc.org for YUV 4:2:0.
+ *
+ *  2vuy is a like a 8-bit per component YUV 4:2:2, but it's actually
+ *  a Y'Cb'Cr sampling.
+ *  2vuy is packed with bytes [Cb, Y, Cr, Y] representing two pixels.
  */
-
-static void non_vec_2vuy_yuv420 (uint8_t * image, uint8_t * py,
-                                 uint8_t * pu, uint8_t * pv,
-                                 int h_size, int v_size,
-                                 int vuy_stride, int y_stride, int uv_stride)
+static void non_vec_2vuy_i420(
+    uint8_t *py, uint8_t *pu, uint8_t *pv,
+    int y_stride, int u_stride, int v_stride,
+    const uint8_t *image, int vuy_stride,
+    int h_size, int v_size)
 {
-    uint8_t *pi1, *pi2 = image;
-    uint8_t *py1, *py2 = py;
-
+    const uint8_t *pi1;
+    const uint8_t *pi2;
+    uint8_t *py1, *py2, *pu1, *pv1;
     int x, y;
 
-    for (y = v_size / 2; y--; )
+    for (y = 0; y < (v_size>>1); y++)
     {
-        pi1  = pi2;
-        pi2 += h_size * 2;
-        py1  = py2;
-        py2 += h_size;
+        pi1 = image + 2*y * vuy_stride;
+        pi2 = image + 2*y * vuy_stride + vuy_stride;
+        py1 = py + 2*y * y_stride;
+        py2 = py + 2*y * y_stride + y_stride;
+        pu1 = pu + y * u_stride;
+        pv1 = pv + y * v_stride;
 
-        for (x = h_size / 2; x--; )
+        for (x = 0; x < (h_size>>1); x++)
         {
-            *(pu)++  = (*(pi1)++ +            *(pi2)++) / 2;
-            *(py1)++ =  *(pi1)++;  *(py2)++ = *(pi2)++;
-            *(pv)++  = (*(pi1)++ +            *(pi2)++) / 2;
-            *(py1)++ =  *(pi1)++;  *(py2)++ = *(pi2)++;
+            pu1[1*x+0] = (pi1[4*x+0] + pi2[4*x+0]) >> 1;
+            py1[2*x+0] =  pi1[4*x+1];
+            py2[2*x+0] =  pi2[4*x+1];
+            pv1[1*x+0] = (pi1[4*x+2] + pi2[4*x+2]) >> 1;
+            py1[2*x+1] =  pi1[4*x+3];
+            py2[2*x+1] =  pi2[4*x+3];
         }
-
-        py1 += y_stride;
-        py2 += y_stride;
-        pu  += uv_stride;
-        pv  += uv_stride;
-        pi1 += vuy_stride;
-        pi2 += vuy_stride;
     }
 }
 
@@ -1025,12 +1085,23 @@ static void non_vec_2vuy_yuv420 (uint8_t * image, uint8_t * py,
            0, pu); pu += 16;
 
     
-static void altivec_2vuy_yuv420 (uint8_t * image, uint8_t * py,
-                                 uint8_t * pu, uint8_t * pv,
-                                 int h_size, int v_size,
-                                 int vuy_stride, int y_stride, int uv_stride)
+/** \brief Altivec 2VUY to YUV420 conversion routine
+ *
+ *  See http://developer.apple.com/quicktime/icefloe/dispatch019.html
+ *  for a complete description of 2VUY and fourcc.org for YUV 4:2:0.
+ *
+ *  2vuy is a like a 8-bit per component YUV 4:2:2, but it's actually
+ *  a Y'Cb'Cr sampling.
+ *  2vuy is packed with bytes [Cb, Y, Cr, Y] representing two pixels.
+ */
+static void altivec_2vuy_i420(
+    uint8_t *py, uint8_t *pu, uint8_t *pv,
+    int y_stride, int u_stride, int v_stride,
+    const uint8_t *image, int vuy_stride,
+    int h_size, int v_size)
 {
-    uint8_t *pi1, *pi2 = image;
+    const uint8_t *pi1;
+    const uint8_t *pi2 = image;
     uint8_t *py1, *py2 = py;
         
     int x, y;
@@ -1039,6 +1110,23 @@ static void altivec_2vuy_yuv420 (uint8_t * image, uint8_t * py,
     vector unsigned char pa_vec, pb_vec,
                          uv1_vec, uv2_vec,
                          uva_vec, uvb_vec;
+
+    int vuy_extra = vuy_stride - (h_size<<1);
+    int y_extra   = y_stride   - (h_size);
+    int u_extra   = u_stride   - (h_size>>1);
+    int v_extra   = v_stride   - (h_size>>1);
+    bool any_extra = vuy_extra || y_extra || u_extra || v_extra ||
+        (u_extra != v_extra);
+
+    if (any_extra)
+    {
+        // Fall back to C version
+        non_vec_2vuy_i420(py, pu, pv,
+                          y_stride, u_stride, v_stride,
+                          image, vuy_stride,
+                          h_size, v_size);
+        return;
+    }
 
     if (!((h_size % 32) || (v_size % 2)))
     {
@@ -1053,7 +1141,6 @@ static void altivec_2vuy_yuv420 (uint8_t * image, uint8_t * py,
                 VEC_STORE_UV();
             }
         }
-    
     }
     else if (!((h_size % 16) || (v_size % 4)))
     {
@@ -1089,23 +1176,34 @@ static void altivec_2vuy_yuv420 (uint8_t * image, uint8_t * py,
     else
     {
         // Fall back to C version
-        non_vec_2vuy_yuv420(image, py, pu, pv, h_size, v_size,
-                            vuy_stride, y_stride, uv_stride);
+        non_vec_2vuy_i420(py, pu, pv,
+                          y_stride, u_stride, v_stride,
+                          image, vuy_stride,
+                          h_size, v_size);
     }
 }
 
 #endif // HAVE_ALTIVEC
 
 
-/** \fn     get_vuy2yuv_conv(void)
- *  \return A pointer to a VUY to YUV conversion function,
- *          which uses Altivec on appropriate machines.
+/** \fn get_2vuy_i420_conv(void)
+ *  \brief Returns 2VUY to I420 conversion function.
+ *
+ *  See http://developer.apple.com/quicktime/icefloe/dispatch019.html
+ *  for a complete description of 2VUY and fourcc.org for YUV 4:2:0.
+ *
+ *  2vuy is a like a 8-bit per component YUV 4:2:2, but it's actually
+ *  a Y'Cb'Cr sampling.
+ *  2vuy is packed with bytes [Cb, Y, Cr, Y] representing two pixels.
+ *
+ *  \return A pointer to a 2VUY to I420 conversion function,
+ *          which uses Altivec when supported.
  */
-vuy2yuv_fun get_vuy2yuv_conv(void)
+conv_2vuy_i420_fun get_2vuy_i420_conv(void)
 {
 #ifdef HAVE_ALTIVEC
     if (has_altivec())
-        return altivec_2vuy_yuv420;
+        return altivec_2vuy_i420;
 #endif
-    return non_vec_2vuy_yuv420; /* Fallback to C */
+    return non_vec_2vuy_i420; /* Fallback to C */
 }

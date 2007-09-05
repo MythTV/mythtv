@@ -35,13 +35,8 @@
 #include "util-x11.h"    // for OpenGL VSync
 
 #ifdef USING_OPENGL_VSYNC
-#define GLX_GLXEXT_PROTOTYPES
-#define XMD_H 1
-#include <GL/glx.h>
-#include <GL/gl.h>
-#undef GLX_ARB_get_proc_address
-#include <GL/glxext.h>
-#endif
+#include "util-opengl.h"
+#endif // USING_OPENGL_VSYNC
 
 #ifdef __linux__
 #include <linux/rtc.h>
@@ -437,80 +432,33 @@ void nVidiaVideoSync::AdvanceTrigger(void)
     UpdateNexttrigger();
 }
 
-#ifdef USING_OPENGL_VSYNC
-class OpenGLVideoSyncPrivate
-{
-  public:
-    OpenGLVideoSyncPrivate()
-    {
-        m_glXGetVideoSyncSGI = (PFNGLXGETVIDEOSYNCSGIPROC)
-                glXGetProcAddress("glXGetVideoSyncSGI");
-        m_glXWaitVideoSyncSGI = (PFNGLXWAITVIDEOSYNCSGIPROC)
-                glXGetProcAddress("glXWaitVideoSyncSGI");
-    }
-
-    bool funcsLoaded()
-    {
-        return m_glXGetVideoSyncSGI && m_glXWaitVideoSyncSGI;
-    }
-
-  public:
-    int glXGetVideoSyncSGI(unsigned int *count)
-    {
-        return m_glXGetVideoSyncSGI(count);
-    }
-
-    int glXWaitVideoSyncSGI(int divisor, int remainder, unsigned int *count)
-    {
-        return m_glXWaitVideoSyncSGI(divisor, remainder, count);
-    }
-
-  private:
-    __GLXextFuncPtr glXGetProcAddress(const char * const procName)
-    {
-        __GLXextFuncPtr ret = glXGetProcAddressARB((const GLubyte *) procName);
-
-        if (!ret)
-        {
-            VERBOSE(VB_PLAYBACK,
-                    QString("Error: glXGetProcAddressARB unable to find %1")
-                    .arg(procName));
-        }
-
-        return ret;
-    }
-
-  private:
-    PFNGLXGETVIDEOSYNCSGIPROC m_glXGetVideoSyncSGI;
-    PFNGLXWAITVIDEOSYNCSGIPROC m_glXWaitVideoSyncSGI;
-};
-#endif // USING_OPENGL_VSYNC
-
 OpenGLVideoSync::OpenGLVideoSync(VideoOutput *video_output,
                                  int frame_interval, int refresh_interval,
                                  bool interlaced)
     : VideoSync(video_output, frame_interval, refresh_interval, interlaced),
-      m_drawable(0), m_context(0), m_imp(0)
+      m_drawable(0), m_context(0), m_lock(false)
 {
-#ifdef USING_OPENGL_VSYNC
-    m_imp = new OpenGLVideoSyncPrivate;
-#endif // USING_OPENGL_VSYNC
+    VERBOSE(VB_IMPORTANT, "OpenGLVideoSync()");
 }
 
 OpenGLVideoSync::~OpenGLVideoSync()
 {
+    VERBOSE(VB_IMPORTANT, "~OpenGLVideoSync() -- begin");
 #ifdef USING_OPENGL_VSYNC
+    QMutexLocker locker(&m_lock);
+
     VideoOutputXv *vo = dynamic_cast<VideoOutputXv*>(m_video_output);
     if (vo && vo->XJ_disp)
     {
+        VERBOSE(VB_IMPORTANT, "~OpenGLVideoSync() -- middle");
         Stop();
         if (m_context)
             X11S(glXDestroyContext(vo->XJ_disp, m_context));
         if (m_drawable)
             X11S(XDestroyWindow(vo->XJ_disp, m_drawable));
     }
-    delete m_imp;
 #endif /* USING_OPENGL_VSYNC */
+    VERBOSE(VB_IMPORTANT, "~OpenGLVideoSync() -- end");
 }
 
 /** \fn OpenGLVideoSync::TryInit(void)
@@ -520,6 +468,8 @@ OpenGLVideoSync::~OpenGLVideoSync()
 bool OpenGLVideoSync::TryInit(void)
 {
 #ifdef USING_OPENGL_VSYNC
+    QMutexLocker locker(&m_lock);
+
     VideoOutputXv *vo =  dynamic_cast<VideoOutputXv*>(m_video_output);
     if (!vo)
     {
@@ -535,10 +485,8 @@ bool OpenGLVideoSync::TryInit(void)
     }
 
     /* Look for GLX at all */
-    int ndummy;
-    int ret;
-    X11S(ret = glXQueryExtension(vo->XJ_disp, &ndummy, &ndummy));
-    if (!ret)
+    uint major, minor;
+    if (!init_opengl() || !get_glx_version(vo->XJ_disp, major, minor))
     {
         VERBOSE(VB_PLAYBACK, "OpenGLVideoSync: OpenGL extension not present.");
         return false;
@@ -546,20 +494,12 @@ bool OpenGLVideoSync::TryInit(void)
 
     /* Look for video sync extension */
     const char *xt = NULL;
-    X11S(xt = glXQueryExtensionsString(vo->XJ_disp, DefaultScreen(vo->XJ_disp)));
-    VERBOSE(VB_PLAYBACK, QString("OpenGLVideoSync: GLX extensions: %1")
-            .arg(xt));
-    if (strstr(xt, "GLX_SGI_video_sync") == NULL)
+    X11S(xt = glXQueryExtensionsString(vo->XJ_disp, vo->XJ_screen_num));
+    const QString glx_ext = xt;
+    if (!has_glx_video_sync_support(glx_ext))
     {
-        VERBOSE(VB_PLAYBACK, "OpenGLVideoSync: GLX Video Sync"
-                " extension not present.");
+        VERBOSE(VB_PLAYBACK, "OpenGLVideoSync: GLX Video Sync not available");
         return false;
-    }
-
-    if (!m_imp->funcsLoaded())
-    {
-       VERBOSE(VB_PLAYBACK, QString("GL sync functions not found"));
-       return false;
     }
 
     int attribList[] = {GLX_RGBA, 
@@ -607,11 +547,13 @@ bool OpenGLVideoSync::TryInit(void)
         VERBOSE(VB_PLAYBACK, "OpenGLVideoSync: Failed to create GLX context");
         return false;
     }
+
+    int ret;
     X11S(ret = glXMakeCurrent(vo->XJ_disp, m_drawable, m_context));
     if (ret != False)
     {
         unsigned int count;
-        X11S(ret = m_imp->glXGetVideoSyncSGI(&count));
+        X11S(ret = gMythGLXGetVideoSyncSGI(&count));
         if (ret == 0)
         {
             VERBOSE(VB_PLAYBACK, "Using OpenGLVideoSync");
@@ -674,6 +616,8 @@ bool checkGLSyncError(const QString& hdr, int err)
 void OpenGLVideoSync::Start(void)
 {
 #ifdef USING_OPENGL_VSYNC
+    QMutexLocker locker(&m_lock);
+
     VideoOutputXv *vo = dynamic_cast<VideoOutputXv*>(m_video_output);
     if (!vo || !vo->XJ_disp)
         return;
@@ -690,10 +634,12 @@ void OpenGLVideoSync::Start(void)
 
     // Wait for a refresh so we start out synched
     unsigned int count;
-    err = m_imp->glXGetVideoSyncSGI(&count);
+    X11S(err = gMythGLXGetVideoSyncSGI(&count));
     checkGLSyncError("OpenGLVideoSync::Start(): Frame Number Query", err);
-    err = m_imp->glXWaitVideoSyncSGI(2, (count+1)%2 ,&count);
+    X11S(err = gMythGLXWaitVideoSyncSGI(2, (count+1)%2 ,&count));
     checkGLSyncError("OpenGLVideoSync::Start(): A/V Sync", err);
+
+    X11S(err = glXMakeCurrent(vo->XJ_disp, None, NULL));
 
     // Initialize next trigger 
     VideoSync::Start();
@@ -704,17 +650,24 @@ void OpenGLVideoSync::WaitForFrame(int sync_delay)
 {
     (void) sync_delay;
 #ifdef USING_OPENGL_VSYNC
+    QMutexLocker locker(&m_lock);
+
     const QString msg1("First A/V Sync"), msg2("Second A/V Sync");
     OffsetTimeval(m_nexttrigger, sync_delay);
 
+    VideoOutputXv *vo = dynamic_cast<VideoOutputXv*>(m_video_output);
+
+    int err;
+    X11S(err = glXMakeCurrent(vo->XJ_disp, m_drawable, m_context));
+
     unsigned int frameNum = 0;
-    int err = m_imp->glXGetVideoSyncSGI(&frameNum);
+    X11S(err = gMythGLXGetVideoSyncSGI(&frameNum));
     checkGLSyncError("Frame Number Query", err);
 
     // Always sync to the next retrace execpt when we are very late.
     if ((m_delay = CalcDelay()) > -(m_refresh_interval/2)) 
     {
-        err = m_imp->glXWaitVideoSyncSGI(2, (frameNum+1)%2 ,&frameNum);
+        err = gMythGLXWaitVideoSyncSGI(2, (frameNum+1)%2 ,&frameNum);
         checkGLSyncError(msg1, err);
         m_delay = CalcDelay();
     }
@@ -723,31 +676,22 @@ void OpenGLVideoSync::WaitForFrame(int sync_delay)
     if (m_delay > 0)
     {
         uint n = m_delay / m_refresh_interval + 1;
-        err = m_imp->glXWaitVideoSyncSGI((n+1), (frameNum+n)%(n+1), &frameNum);
+        err = gMythGLXWaitVideoSyncSGI((n+1), (frameNum+n)%(n+1), &frameNum);
         checkGLSyncError(msg2, err);
         m_delay = CalcDelay();
     }
+
+    X11S(err = glXMakeCurrent(vo->XJ_disp, None, NULL));
 #endif /* USING_OPENGL_VSYNC */
 }
 
 void OpenGLVideoSync::AdvanceTrigger(void)
 {
 #ifdef USING_OPENGL_VSYNC
+    QMutexLocker locker(&m_lock);
+
     KeepPhase();
     UpdateNexttrigger();
-#endif /* USING_OPENGL_VSYNC */
-}
-
-/** \fn OpenGLVideoSync::Stop(void)
- *  \brief Stops VSync; must be called from main thread.
- *
- */
-void OpenGLVideoSync::Stop(void)
-{
-#ifdef USING_OPENGL_VSYNC
-    VideoOutputXv *vo = dynamic_cast<VideoOutputXv*>(m_video_output);
-    if (vo && vo->XJ_disp)
-        X11S(glXMakeCurrent(vo->XJ_disp, 0, 0));
 #endif /* USING_OPENGL_VSYNC */
 }
 

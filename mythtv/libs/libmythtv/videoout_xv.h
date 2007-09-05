@@ -7,6 +7,7 @@
 #include "DisplayRes.h"
 #include "videooutbase.h"
 
+#include "util-x11.h"
 #include <X11/Xatom.h>
 #include <X11/Xutil.h>
 #include <X11/extensions/XShm.h>
@@ -20,6 +21,9 @@ extern "C" {
 
 class NuppelVideoPlayer;
 class ChromaKeyOSD;
+
+class OpenGLContext;
+class OpenGLVideo;
 
 class XvMCBufferSettings;
 class XvMCSurfaceTypes;
@@ -43,7 +47,7 @@ class XvMCOSD;
 
 typedef enum VideoOutputSubType
 {
-    XVUnknown = 0, Xlib, XShm, XVideo, XVideoMC, XVideoIDCT, XVideoVLD,
+    XVUnknown = 0, Xlib, XShm, OpenGL, XVideo, XVideoMC, XVideoIDCT, XVideoVLD,
 } VOSType;
 
 class VideoOutputXv : public VideoOutput
@@ -72,8 +76,10 @@ class VideoOutputXv : public VideoOutput
     void ClearAfterSeek(void);
 
     void MoveResize(void);
-    void InputChanged(int width, int height, float aspect, 
-                      MythCodecID av_codec_id);
+    bool InputChanged(const QSize &input_size,
+                      float        aspect,
+                      MythCodecID  av_codec_id,
+                      void        *codec_private);
     void Zoom(int direction);
     void VideoAspectRatioChanged(float aspect);
     void EmbedInWidget(WId wid, int x, int y, int w, int h);
@@ -92,6 +98,9 @@ class VideoOutputXv : public VideoOutput
         { return XVideoVLD == VideoOutputSubType(); }
 
     void CheckFrameStates(void);
+    QRect GetPIPRect(int location, NuppelVideoPlayer *pipplayer = NULL);
+
+    virtual void ShutdownVideoResize(void);
 
     static MythCodecID GetBestSupportedCodec(uint width, uint height,
                                              uint osd_width, uint osd_height,
@@ -110,6 +119,10 @@ class VideoOutputXv : public VideoOutput
                                           int width, int height);
     static void DeleteXvMCContext(Display* disp, XvMCContext*& ctx);
 
+
+    static QStringList GetAllowedRenderers(MythCodecID myth_codec_id,
+                                           const QSize &video_dim);
+
   private:
     VOSType VideoOutputSubType() const { return video_output_subtype; }
     virtual QRect GetVisibleOSDBounds(float&, float&) const;
@@ -121,26 +134,39 @@ class VideoOutputXv : public VideoOutput
     void DoneDisplayingFrame(void);
 
     void ProcessFrameXvMC(VideoFrame *frame, OSD *osd);
+    void ProcessFrameOpenGL(VideoFrame *frame, OSD *osd,
+                            FilterChain *filterList,
+                            NuppelVideoPlayer *pipPlayer);
     void ProcessFrameMem(VideoFrame *frame, OSD *osd,
                          FilterChain *filterList,
                          NuppelVideoPlayer *pipPlayer);
 
     void PrepareFrameXvMC(VideoFrame *, FrameScanType);
     void PrepareFrameXv(VideoFrame *);
+    void PrepareFrameOpenGL(VideoFrame *, FrameScanType);
     void PrepareFrameMem(VideoFrame *, FrameScanType);
 
     void ShowXvMC(FrameScanType scan);
     void ShowXVideo(FrameScanType scan);
 
+    void ShowPip(VideoFrame *frame, NuppelVideoPlayer *pipplayer);
+    virtual int DisplayOSD(VideoFrame *frame, OSD *osd,
+                           int stride = -1, int revision = -1);
+
     void ResizeForVideo(uint width, uint height);
     void InitDisplayMeasurements(uint width, uint height);
     void InitColorKey(bool turnoffautopaint);
 
-    bool InitVideoBuffers(MythCodecID, bool use_xv, bool use_shm);
+    bool InitVideoBuffers(MythCodecID, bool use_xv,
+                          bool use_shm, bool use_opengl);
+
     bool InitXvMC(MythCodecID);
     bool InitXVideo(void);
+    bool InitOpenGL(void);
     bool InitXShm(void);
     bool InitXlib(void);
+    bool InitOSD(const QString&);
+    bool CheckOSDInit(void);
 
     bool CreateXvMCBuffers(void);
     bool CreateBuffers(VOSType subtype);
@@ -164,11 +190,19 @@ class VideoOutputXv : public VideoOutput
     void ReturnAvailableOSD(XvMCOSD*);
 #endif // USING_XVMC
 
+    // OpenGL specific helper functions
+    bool SetDeinterlacingEnabledOpenGL(bool enable);
+    bool SetupDeinterlaceOpenGL(
+        bool interlaced, const QString &overridefilter);
+
+
     // Misc.
     MythCodecID          myth_codec_id;
     VOSType              video_output_subtype;
     DisplayRes          *display_res;
     QMutex               global_lock;
+    bool                 use_picture_controls;
+    bool		 use_i420_hack_for_broken_driver;
 
     // Basic X11 info
     Window               XJ_root;
@@ -223,13 +257,17 @@ class VideoOutputXv : public VideoOutput
     buffer_map_t         xv_buffers;
     bool                 xv_need_bobdeint_repaint;
 
-    bool		 brokenI420Hack;
+    // OpenGL drawing info
+    OpenGLContext       *gl_context;
+    OpenGLVideo         *gl_videochain;
+    OpenGLVideo         *gl_pipchain;
+    OpenGLVideo         *gl_osdchain;
+    bool                 gl_use_osd_opengl2;
+    bool                 gl_pip_ready;
+    bool                 gl_osd_ready;
 
     // Chromakey OSD info
     ChromaKeyOSD        *chroma_osd;
 };
-
-CodecID myth2av_codecid(MythCodecID codec_id,
-                        bool& vld, bool& idct, bool& mc);
 
 #endif // VIDEOOUT_XV_H_

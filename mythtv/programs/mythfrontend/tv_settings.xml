@@ -76,6 +76,12 @@
    </button>
 
    <button>
+      <type>TV_SETTINGS_PLAYBACK_OSD</type>
+      <text>Playback OSD</text>
+      <action>SETTINGS OSD</action>
+   </button>
+
+   <button>
       <type>TV_SETTINGS_PLAYBACK_GROUPS</type>
       <text>Playback Groups</text>
       <text lang="SV">Uppspelningsgrupper</text>

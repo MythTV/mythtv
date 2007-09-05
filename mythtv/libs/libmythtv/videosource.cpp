@@ -2656,9 +2656,8 @@ void CaptureCard::analogPanel()
         card->loadByID(child_cardid);
     else
         card->setParentID(cardid);
-/* TODO FIXME
+
     card->setLabel(tr("Analog Options for") + " " + devname);
-*/
     card->exec();
     delete card;
 }

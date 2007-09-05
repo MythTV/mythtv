@@ -134,7 +134,6 @@ class MPUBLIC TV : public QObject
     bool PromptRecGroupPassword(void);
     bool BookmarkAllowed(void);
     bool DeleteAllowed(void);
-
     // Boolean queries
 
     /// Returns true if we are playing back a non-LiveTV recording.
@@ -169,7 +168,6 @@ class MPUBLIC TV : public QObject
     /// true if NVP is near the end
     bool IsNearEnd(void) { return isnearend; }
 
-    
     // Other queries
     int GetLastRecorderNum(void) const;
     TVState GetState(void) const;
@@ -344,6 +342,7 @@ class MPUBLIC TV : public QObject
     void ToggleActiveWindow(void);
     void SwapPIP(void);
     void SwapPIPSoon(void) { needToSwapPIP = true; }
+    
     void DisplayJumpMenuSoon(void) { needToJumpMenu = true; }
 
     void ToggleAutoExpire(void);

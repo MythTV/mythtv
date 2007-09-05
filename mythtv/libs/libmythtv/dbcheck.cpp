@@ -69,6 +69,8 @@ The schema contains the following tables:
 <tr><td>recordoverride             <td>
 <tr><td>settings                   <td>k(value,hostname)
 <tr><td>videosource                <td>pk(sourceid) uk(name)
+<tr><td>displayprofilegroups       <td>pk(name, host), uk(profileid)
+<tr><td>displayprofiles            <td>pk(profileid),
 </table>
 \endhtmlonly
 

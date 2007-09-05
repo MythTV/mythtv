@@ -172,3 +172,4 @@ bool ChromaKeyOSD::ProcessOSD(OSD *osd)
 
     return true;
 }
+

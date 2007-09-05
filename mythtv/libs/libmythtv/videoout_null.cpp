@@ -4,6 +4,7 @@ using namespace std;
 
 #include "mythcontext.h"
 #include "videoout_null.h"
+#include "videodisplayprofile.h"
 
 const int kNumBuffers = 31;
 const int kNeedFreeFrames = 1;
@@ -35,32 +36,39 @@ void VideoOutputNull::Zoom(int direction)
     MoveResize();
 }
 
-void VideoOutputNull::InputChanged(int width, int height, float aspect,
-                                   MythCodecID av_codec_id)
+bool VideoOutputNull::InputChanged(const QSize &input_size,
+                                   float        aspect,
+                                   MythCodecID  av_codec_id,
+                                   void        *codec_private)
 {
-    VERBOSE(VB_PLAYBACK, "InputChanged(w "<<width<<", h"
-            <<height<<", a"<<aspect<<")");
-    VideoOutput::InputChanged(width, height, aspect, av_codec_id);
+    VERBOSE(VB_PLAYBACK,
+            QString("InputChanged(WxH = %1x%2, aspect = %3)")
+            .arg(input_size.width())
+            .arg(input_size.height()).arg(aspect));
 
-    if (width == vbuffers.GetScratchFrame()->width &&
-        height == vbuffers.GetScratchFrame()->height)
+    VideoOutput::InputChanged(input_size, aspect, av_codec_id, codec_private);
+
+    if (input_size.width()  == vbuffers.GetScratchFrame()->width &&
+        input_size.height() == vbuffers.GetScratchFrame()->height)
     {
         MoveResize();
-        return;
+        return true;
     }
 
-    video_dim = QSize(width, height);
+    video_dim = input_size;
 
     vbuffers.DeleteBuffers();
 
     MoveResize();
 
-    if (!vbuffers.CreateBuffers(width, height))
+    if (!vbuffers.CreateBuffers(video_dim.width(), video_dim.height()))
     {
         VERBOSE(VB_IMPORTANT, "VideoOutputNull::InputChanged(): "
                 "Failed to recreate buffers");
         errored = true;
     }
+
+    db_vdisp_profile->SetVideoRenderer("null");
 
     if (pauseFrame.buf)
         delete [] pauseFrame.buf;
@@ -71,6 +79,8 @@ void VideoOutputNull::InputChanged(int width, int height, float aspect,
     pauseFrame.size   = vbuffers.GetScratchFrame()->size;
     pauseFrame.buf    = new unsigned char[pauseFrame.size];
     pauseFrame.frameNumber = vbuffers.GetScratchFrame()->frameNumber;
+
+    return true;
 }
 
 int VideoOutputNull::GetRefreshRate(void)
@@ -95,6 +105,8 @@ bool VideoOutputNull::Init(int width, int height, float aspect,
 
     if (!vbuffers.CreateBuffers(width, height))
         return false;
+
+    db_vdisp_profile->SetVideoRenderer("null");
 
     pauseFrame.height = vbuffers.GetScratchFrame()->height;
     pauseFrame.width  = vbuffers.GetScratchFrame()->width;

@@ -523,6 +523,11 @@ using_xvmc_vld {
     DEFINES += HAVE_XVMC_VLD
 }
 
+using_dvdv {
+    SOURCES += dvdv.c
+    DEFINES += HAVE_DVDV
+}
+
 contains( AMR_NB, yes) {
     SOURCES += amr.c
 }
@@ -579,10 +584,6 @@ contains( TARGET_MMX, yes ) {
     SOURCES += i386/vp3dsp_mmx.c i386/vp3dsp_sse2.c i386/fft_3dn.c
     SOURCES += i386/fft_3dn2.c #i386/snowdsp_mmx.c
     SOURCES += i386/cavsdsp_mmx.c
-#    contains( TARGET_BUILTIN_VECTOR, yes ) {
-#        QMAKE_CFLAGS_RELEASE += -msse
-#        QMAKE_CFLAGS_DEBUG += -msse
-#    }
 }
 
 contains( TARGET_ARCH_ARMV4L, yes ) {
@@ -620,13 +621,6 @@ contains( TARGET_ALTIVEC, yes ) {
     SOURCES += ppc/gmc_altivec.c ppc/fdct_altivec.c ppc/fft_altivec.c
     SOURCES += ppc/h264_altivec.c ppc/snow_altivec.c ppc/vc1dsp_altivec.c
     SOURCES += ppc/float_altivec.c ppc/int_altivec.c
-  macx {
-    QMAKE_CFLAGS_RELEASE += -faltivec
-    QMAKE_CFLAGS_DEBUG   += -faltivec
-  }
-  !macx {
-    QMAKE_CFLAGS_RELEASE += -maltivec -mabi=altivec
-  }
 }
 
 macx {

@@ -457,10 +457,7 @@ class RotorPosConfig : public ConfigurationDialog
   public:
     RotorPosConfig(DiSEqCDevRotor &rotor)
     {
-/* TODO FIXME
         setLabel(DeviceTree::tr("Rotor Position Map"));
-        setUseLabel(true);
-*/
         addChild(new RotorPosMap(rotor));
     }
 
@@ -1081,9 +1078,7 @@ void DeviceTree::PopulateTree(DiSEqCDevDevice *node,
 
 DTVDeviceTreeWizard::DTVDeviceTreeWizard(DiSEqCDevTree &tree)
 {
-/* TODO FIXME
     setLabel(DeviceTree::tr("DiSEqC Device Tree"));
-*/
     addChild(new DeviceTree(tree));
 }
 
@@ -1101,9 +1096,7 @@ class SwitchSetting : public ComboBoxSetting, public Storage
     SwitchSetting(DiSEqCDevDevice &node, DiSEqCDevSettings &settings)
         : ComboBoxSetting(this), m_node(node), m_settings(settings)
     {
-/* TODO FIXME
         setLabel(node.GetDescription());
-*/
         setHelpText(DeviceTree::tr("Choose a port to use for this switch."));
 
         uint num_children = node.GetChildCount();

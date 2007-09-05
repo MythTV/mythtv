@@ -50,18 +50,21 @@ void rgb32_to_yuv420p(unsigned char *lum, unsigned char *cb, unsigned char *cr,
 
 // These are used to help speed up playback by QuickTime on OS X
 
-typedef void (* yuv2vuy_fun) (uint8_t * image, uint8_t * py,
-                              uint8_t * pu, uint8_t * pv,
-                              int h_size, int v_size,
-                              int vuy_stride, int y_stride, int uv_stride);
+typedef void (*conv_i420_2vuy_fun) (
+    uint8_t *image, int vuy_stride,
+    const uint8_t *py, const uint8_t *pu, const uint8_t *pv,
+    int y_stride, int u_stride, int v_stride,
+    int h_size, int v_size);
 
-yuv2vuy_fun get_yuv2vuy_conv(void);
 
-typedef void (* vuy2yuv_fun) (uint8_t * image, uint8_t * py,
-                              uint8_t * pu, uint8_t * pv,
-                              int h_size, int v_size,
-                              int vuy_stride, int y_stride, int uv_stride);
+conv_i420_2vuy_fun get_i420_2vuy_conv(void);
 
-vuy2yuv_fun get_vuy2yuv_conv(void);
+typedef void (*conv_2vuy_i420_fun) (
+    uint8_t *py, uint8_t *pu, uint8_t *pv,
+    int y_stride, int u_stride, int v_stride,
+    const uint8_t *image, int vuy_stride,
+    int h_size, int v_size);
+
+conv_2vuy_i420_fun get_2vuy_i420_conv(void);
 
 #endif /* MYTH_YUV2RGB_H */

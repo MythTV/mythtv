@@ -1,3 +1,6 @@
+#include <algorithm>
+using namespace std;
+
 #include "settings.h"
 #include "mythwidgets.h"
 #include <qsqldatabase.h>
@@ -144,8 +147,8 @@ void ConfigurationGroup::save(QString destination)
 QWidget* VerticalConfigurationGroup::configWidget(ConfigurationGroup *cg, 
                                                   QWidget* parent,
                                                   const char* widgetName) 
-{    
-    QGroupBox* widget = new QGroupBox(parent, widgetName);
+{
+    widget = new QGroupBox(parent, widgetName);
     widget->setBackgroundOrigin(QWidget::WindowOrigin);
 
     if (!useframe)
@@ -158,17 +161,18 @@ QWidget* VerticalConfigurationGroup::configWidget(ConfigurationGroup *cg,
     int margin = (int) ((uselabel) ? (28 * hmult) : (10 * hmult));
     margin = (zeroMargin) ? 4 : margin;
 
-    QVBoxLayout *layout = new QVBoxLayout(widget, margin, space);
+    layout = new QVBoxLayout(widget, margin, space);
 
     if (uselabel)
         widget->setTitle(getLabel());
 
+    childwidget.resize(children.size());
     for (uint i = 0; i < children.size(); i++)
     {
         if (children[i]->isVisible())
         {
-            QWidget *child = children[i]->configWidget(cg, widget, NULL);
-            layout->add(child);
+            childwidget[i] = children[i]->configWidget(cg, widget, NULL);
+            layout->add(childwidget[i]);
             children[i]->setEnabled(children[i]->isEnabled());
         }
     }
@@ -177,9 +181,57 @@ QWidget* VerticalConfigurationGroup::configWidget(ConfigurationGroup *cg,
     {
         connect(this, SIGNAL(changeHelpText(QString)),
                 cg,   SIGNAL(changeHelpText(QString)));
+        confgrp = cg;
     } 
 
     return widget;
+}
+
+bool VerticalConfigurationGroup::replaceChild(
+    Configurable *old_child, Configurable *new_child)
+{
+    childList::iterator it = children.begin();
+    for (uint i = 0; it != children.end(); ++it, ++i)
+    {
+        if (*it != old_child)
+            continue;
+
+        *it = new_child;
+
+        if (!widget)
+        {
+            old_child->deleteLater();
+            return true;
+        }
+
+        if (childwidget[i])
+        {
+            layout->remove(childwidget[i]);
+            childwidget[i]->deleteLater();
+            childwidget[i] = NULL;
+        }
+
+        old_child->deleteLater();
+
+        if (children[i]->isVisible())
+        {
+            childwidget[i] = children[i]->configWidget(confgrp, widget, NULL);
+            layout->add(childwidget[i]);
+            children[i]->setEnabled(children[i]->isEnabled());
+            childwidget[i]->resize(1,1);
+            childwidget[i]->show();
+        }
+
+        return true;
+    }
+
+    return false;
+}
+
+void VerticalConfigurationGroup::repaint(void)
+{
+    if (widget)
+        widget->repaint();
 }
 
 QWidget* HorizontalConfigurationGroup::configWidget(ConfigurationGroup *cg, 
@@ -305,13 +357,17 @@ QWidget* StackedConfigurationGroup::configWidget(ConfigurationGroup *cg,
                                                  QWidget* parent,
                                                  const char* widgetName) 
 {
-    QWidgetStack* widget = new QWidgetStack(parent, widgetName);
+    widget = new QWidgetStack(parent, widgetName);
     widget->setBackgroundOrigin(QWidget::WindowOrigin);
 
-    for(unsigned i = 0 ; i < children.size() ; ++i)
+    for (uint i = 0 ; i < children.size() ; ++i)
+    {
         if (children[i]->isVisible())
-            widget->addWidget(children[i]->configWidget(cg, widget,
-                                                        NULL), i);
+        {
+            childwidget[i] = children[i]->configWidget(cg, widget, NULL);
+            widget->addWidget(childwidget[i], i);
+        }
+    }
 
     widget->raiseWidget(top);
 
@@ -323,8 +379,46 @@ QWidget* StackedConfigurationGroup::configWidget(ConfigurationGroup *cg,
         connect(this, SIGNAL(changeHelpText(QString)), cg,
                 SIGNAL(changeHelpText(QString)));
     }
+    confgrp = cg;
 
     return widget;
+}
+
+void StackedConfigurationGroup::addChild(Configurable *child)
+{
+    ConfigurationGroup::addChild(child);
+    childwidget.resize(childwidget.size() + 1);
+    if (!widget)
+        return;
+
+    uint i = children.size() - 1;
+    if ((i < children.size()) && children[i]->isVisible())
+    {
+        childwidget[i] = children[i]->configWidget(confgrp, widget, NULL);
+        widget->addWidget(childwidget[i], i);
+        childwidget[i]->resize(1,1);
+        childwidget[i]->show();
+    }
+}
+
+void StackedConfigurationGroup::removeChild(Configurable *child)
+{
+    childList::iterator it = find(children.begin(), children.end(), child);
+    if (it == children.end())
+        return;
+
+    uint i = it - children.begin();
+    if ((i >= children.size()) || (i >= childwidget.size()))
+        return;
+
+    children.erase(it);
+    
+    vector<QWidget*>::iterator cit = childwidget.begin() + i;
+    QWidget *cw = *cit;
+    childwidget.erase(cit);
+
+    if (widget && cw)
+        widget->removeWidget(cw);
 }
 
 QWidget* TabbedConfigurationGroup::configWidget(ConfigurationGroup *cg, 
@@ -384,7 +478,7 @@ void TriggeredConfigurationGroup::addTarget(QString triggerValue,
                                             Configurable *target)
 {
     VerifyLayout();
-    triggerMap[triggerValue] = target;
+    triggerMap[QDeepCopy<QString>(triggerValue)] = target;
 
     if (!configStack)
     {
@@ -440,6 +534,14 @@ void TriggeredConfigurationGroup::save(QString destination)
         configStack->save(destination);
 }
 
+void TriggeredConfigurationGroup::repaint(void)
+{
+    VerifyLayout();
+
+    if (widget)
+        widget->repaint();
+}
+
 void TriggeredConfigurationGroup::setTrigger(Configurable *_trigger)
 {
     if (trigger)
@@ -475,6 +577,24 @@ void TriggeredConfigurationGroup::SetVertical(bool vert)
     isVertical = vert;
 }
 
+void TriggeredConfigurationGroup::removeTarget(QString triggerValue)
+{
+    HostComboBox *combobox = dynamic_cast<HostComboBox*>(trigger);
+    if (!combobox)
+        return;
+
+    QMap<QString,Configurable*>::iterator cit = triggerMap.find(triggerValue);
+    if (cit == triggerMap.end())
+        return;
+
+    // remove trigger value from trigger combobox
+    combobox->removeSelection(triggerValue);
+
+    // actually remove the pane
+    configStack->removeChild(*cit);
+    triggerMap.erase(cit);
+}
+
 void TriggeredConfigurationGroup::VerifyLayout(void)
 {
     if (configLayout)
@@ -506,28 +626,60 @@ QWidget *TriggeredConfigurationGroup::configWidget(
     return widget;
 }
 
-void SelectSetting::addSelection(const QString& label, QString value, bool select) {
-    if (value == QString::null)
-        value = label;
-    
-    bool found = false;
-    for(unsigned i = 0 ; i < values.size() ; ++i)
-        if ((values[i] == value) &&
-            (labels[i] == label)) {
-            found = true;
-            break;
-        }
+int SelectSetting::findSelection(const QString &label, QString value) const
+{
+    value = (value.isEmpty()) ? label : value;
 
-    if (!found)
+    for (uint i = 0; i < values.size(); i++)
+    {
+        if ((values[i] == value) && (labels[i] == label))
+            return i;
+    }
+
+    return -1;
+}
+
+void SelectSetting::addSelection(const QString &label, QString value,
+                                 bool select)
+{
+    value = (value.isEmpty()) ? label : value;
+    
+    int found = findSelection(label, value);
+    if (found < 0)
     {
         labels.push_back(label);
         values.push_back(value);
-    
         emit selectionAdded(label, value);
-    
-        if (select || !isSet)
-            setValue(value);
     }
+
+    if (select || !isSet)
+        setValue(value);
+}
+
+bool SelectSetting::removeSelection(const QString &label, QString value)
+{
+    value = (value.isEmpty()) ? label : value;
+
+    int found = findSelection(label, value);
+    if (found < 0)
+        return false;
+
+    bool wasSet = isSet;
+    isSet = false;
+
+    labels.erase(labels.begin() + found);
+    values.erase(values.begin() + found);
+
+    isSet = wasSet && labels.size();
+    if (isSet)
+    {
+        current = (current > (uint)found) ? current - 1 : current;
+        current = min(current, (uint) (labels.size() - 1));
+    }
+
+    emit selectionRemoved(label, value);
+
+    return true;
 }
 
 void SelectSetting::fillSelectionsFromDir(const QDir& dir, bool absPath) {
@@ -552,31 +704,59 @@ void SelectSetting::clearSelections(void) {
     emit selectionsCleared();
 }
 
-void SelectSetting::setValue(const QString& newValue)  {
-    bool found = false;
-    for(unsigned i = 0 ; i < values.size() ; ++i)
-        if (values[i] == newValue) {
-            current = i;
-            found = true;
-            isSet = true;
-            break;
-        }
-    if (found)
-        Setting::setValue(newValue);
-    else
+void SelectSetting::setValue(const QString &newValue)
+{
+    int found = getValueIndex(newValue);
+    if (found < 0)
+    {
         addSelection(newValue, newValue, true);
+    }
+    else
+    {
+        current = found;
+        isSet   = true;
+        Setting::setValue(newValue);
+    }
 }
 
 void SelectSetting::setValue(int which)
 {
-    if ((unsigned)which > values.size()-1 || which < 0) {
-        VERBOSE(VB_IMPORTANT, 
-                "SelectSetting::setValue(): invalid index " << which);
-        return;
+    if ((which >= ((int) values.size())) || (which < 0))
+    {
+        VERBOSE(VB_IMPORTANT, "SelectSetting::setValue(): "
+                "invalid index: " << which << " size: "<<values.size());
     }
-    current = which;
-    isSet = true;
-    Setting::setValue(values[current]);
+    else
+    {
+        current = which;
+        isSet   = true;
+        Setting::setValue(values[current]);
+    }
+}
+
+QString SelectSetting::getSelectionLabel(void) const
+{
+    if (!isSet || (current >= values.size()))
+        return QString::null;
+
+    return labels[current];
+}
+
+/** \fn SelectSetting::getValueIndex(QString)
+ *  \brief Returns index of value in SelectSetting, or -1 if not found.
+ */
+int SelectSetting::getValueIndex(QString value)
+{
+    int ret = 0;
+
+    selectionList::const_iterator it = values.begin();
+    for (; it != values.end(); ++it, ++ret)
+    {
+        if (*it == value)
+            return ret;
+    }
+
+    return -1;
 }
 
 QWidget* LabelSetting::configWidget(ConfigurationGroup *cg, QWidget* parent,
@@ -672,6 +852,12 @@ void LineEditSetting::SetPasswordEcho(bool b)
         edit->setEchoMode(b ? QLineEdit::Password : QLineEdit::Normal);
 }
 
+void BoundedIntegerSetting::setValue(int newValue)
+{
+    newValue = std::max(std::min(newValue, max), min);
+    IntegerSetting::setValue(newValue);
+}
+
 QWidget* SliderSetting::configWidget(ConfigurationGroup *cg, QWidget* parent,
                                      const char* widgetName) {
     QHBox* widget;
@@ -719,6 +905,21 @@ QWidget* SliderSetting::configWidget(ConfigurationGroup *cg, QWidget* parent,
     return widget;
 }
 
+SpinBoxSetting::SpinBoxSetting(
+    Storage *_storage, int _min, int _max, int _step, 
+    bool _allow_single_step, QString _special_value_text) :
+    BoundedIntegerSetting(_storage, _min, _max, _step),
+    spinbox(NULL), relayEnabled(true),
+    sstep(_allow_single_step), svtext("")
+{
+    if (!_special_value_text.isEmpty())
+        svtext = QDeepCopy<QString>(_special_value_text);
+
+    IntegerSetting *iset = (IntegerSetting *) this;
+    connect(iset, SIGNAL(valueChanged(     int)),
+            this, SLOT(  relayValueChanged(int)));
+}
+
 QWidget* SpinBoxSetting::configWidget(ConfigurationGroup *cg, QWidget* parent,
                                       const char* widgetName) {
     QHBox* box;
@@ -739,8 +940,7 @@ QWidget* SpinBoxSetting::configWidget(ConfigurationGroup *cg, QWidget* parent,
         label->setText(getLabel() + ":     ");
     }
 
-    MythSpinBox* spinbox = new MythSpinBox(box, QString(widgetName) + 
-                                           "MythSpinBox", sstep);
+    spinbox = new MythSpinBox(box, QString(widgetName) + "MythSpinBox", sstep);
     spinbox->setHelpText(getHelpText());
     spinbox->setBackgroundOrigin(QWidget::WindowOrigin);
     spinbox->setMinValue(min);
@@ -754,13 +954,52 @@ QWidget* SpinBoxSetting::configWidget(ConfigurationGroup *cg, QWidget* parent,
         spinbox->setSpecialValueText(svtext);
 
     connect(spinbox, SIGNAL(valueChanged(int)), this, SLOT(setValue(int)));
-    connect(this, SIGNAL(valueChanged(int)), spinbox, SLOT(setValue(int)));
 
     if (cg)
         connect(spinbox, SIGNAL(changeHelpText(QString)), cg,
                 SIGNAL(changeHelpText(QString)));
 
     return box;
+}
+
+void SpinBoxSetting::setValue(int newValue)
+{
+    newValue = std::max(std::min(newValue, max), min);
+    if (spinbox && (spinbox->value() != newValue))
+    {
+        //int old = intValue();
+        spinbox->setValue(newValue);
+    }
+    else if (intValue() != newValue)
+    {
+        BoundedIntegerSetting::setValue(newValue);
+    }
+}
+
+void SpinBoxSetting::setFocus(void)
+{
+    if (spinbox)
+        spinbox->setFocus();
+}
+
+void SpinBoxSetting::clearFocus(void)
+{
+    if (spinbox)
+        spinbox->clearFocus();
+}
+
+bool SpinBoxSetting::hasFocus(void) const
+{
+    if (spinbox)
+        return spinbox->hasFocus();
+
+    return false;
+}
+
+void SpinBoxSetting::relayValueChanged(int newValue)
+{
+    if (relayEnabled)
+        emit valueChanged(configName, newValue);
 }
 
 QWidget* SelectLabelSetting::configWidget(ConfigurationGroup *cg,
@@ -874,27 +1113,21 @@ void ComboBoxSetting::setVisible(bool b)
 
 void ComboBoxSetting::setValue(QString newValue)
 {
-    bool found = false;
-    for(unsigned i = 0 ; i < values.size() ; ++i)
+    for (uint i = 0; i < values.size(); i++)
     {
-        if (values[i] == newValue) {
-            found = true;
+        if (values[i] == newValue)
+        {
+            setValue(i);
             break;
         }
     }
 
-    if (found || rw)
-        Setting::setValue(newValue);
-    else
+    if (rw)
     {
-        VERBOSE(VB_IMPORTANT, QString("ComboBoxSetting::setValue(QString): "
-                "Failed to set value of read-only ComboBox to %1")
-                .arg(newValue));
-        return;
+        Setting::setValue(newValue);
+        if (widget)
+            widget->setCurrentItem(current);
     }
-
-    if (widget)
-        widget->setCurrentItem(current);
 };
 
 void ComboBoxSetting::setValue(int which)
@@ -903,6 +1136,40 @@ void ComboBoxSetting::setValue(int which)
         widget->setCurrentItem(which);
     SelectSetting::setValue(which);
 };
+
+void ComboBoxSetting::addSelection(
+    const QString &label, QString value, bool select)
+{
+    if ((findSelection(label, value) < 0) && widget)
+    {
+        widget->insertItem(label);
+    }
+
+    SelectSetting::addSelection(label, value, select);
+
+    if (widget && isSet)
+        widget->setCurrentItem(current);
+}
+
+bool ComboBoxSetting::removeSelection(const QString &label, QString value)
+{
+    SelectSetting::removeSelection(label, value);
+    if (!widget)
+        return true;
+
+    for (uint i = 0; ((int) i) < widget->count(); i++)
+    {
+        if (widget->text(i) == label)
+        {
+            widget->removeItem(i);
+            if (isSet)
+                widget->setCurrentItem(current);
+            return true;
+        }
+    }
+
+    return false;
+}
 
 void HostRefreshRateComboBox::ChangeResolution(const QString& resolution)
 {
@@ -1114,6 +1381,21 @@ void ConfigurationDialog::addChild(Configurable *child)
 {
     cfgChildren.push_back(child);
     cfgGrp->addChild(child);
+}
+
+void ConfigurationDialog::setLabel(const QString &label)
+{
+    if (label.isEmpty())
+    {
+        cfgGrp->setUseLabel(false);
+        cfgGrp->setLabel("");
+    }
+    else
+    {
+        cfgGrp->setLabel(QDeepCopy<QString>(label));
+        cfgGrp->setUseLabel(true);
+        cfgGrp->setUseFrame(true);
+    }
 }
 
 MythDialog *ConfigurationWizard::dialogWidget(MythMainWindow *parent,

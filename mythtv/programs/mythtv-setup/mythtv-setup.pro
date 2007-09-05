@@ -25,3 +25,5 @@ macx {
         QMAKE_POST_LINK = ../../contrib/OSX/makebundle.sh mythtv-setup
     }
 }
+
+using_x11:DEFINES += USING_X11

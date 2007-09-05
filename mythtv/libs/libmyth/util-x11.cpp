@@ -1,15 +1,14 @@
 /** This file is intended to hold X11 specific utility functions */
 #include <map>
 #include <vector>
-#include <qglobal.h> // for Q_WS_X11 define
+using namespace std;
 
 #include "config.h" // for CONFIG_DARWIN
 #include "mythcontext.h"
 
 QMutex x11_lock;
 
-#ifdef Q_WS_X11
-#define USING_XV
+#ifdef USING_X11
 #include "util-x11.h"
 extern "C" {
 #include <X11/extensions/Xinerama.h>
@@ -18,12 +17,12 @@ typedef int (*XErrorCallbackType)(Display *, XErrorEvent *);
 typedef vector<XErrorEvent>       XErrorVectorType;
 #else
 #include <qapplication.h>
-#endif // Q_WS_X11
+#endif // USING_X11
 
-#ifdef Q_WS_X11
+#ifdef USING_X11
 map<Display*, XErrorVectorType>   error_map;
 map<Display*, XErrorCallbackType> error_handler_map;
-#endif // Q_WS_X11
+#endif // USING_X11
 
 /** \fn GetNumberOfXineramaScreens(void)
  *  \brief Returns number of Xinerama screens if Xinerama
@@ -33,7 +32,7 @@ int GetNumberOfXineramaScreens(void)
 {
     int nr_xinerama_screens = 0;
 
-#ifdef Q_WS_X11
+#ifdef USING_X11
     Display *d = MythXOpenDisplay();
     X11L;
     int event_base = 0, error_base = 0;
@@ -42,16 +41,18 @@ int GetNumberOfXineramaScreens(void)
         XFree(XineramaQueryScreens(d, &nr_xinerama_screens));
     XCloseDisplay(d);
     X11U;
-#else // if !Q_WS_X11
+#else // if !USING_X11
 #if CONFIG_DARWIN
     // Mac OS X when not using X11 server supports Xinerama.
     nr_xinerama_screens = QApplication::desktop()->numScreens();
 #endif // CONFIG_DARWIN
-#endif // !Q_WS_X11
+#endif // !USING_X11
     return nr_xinerama_screens;
 }
 
-#ifdef Q_WS_X11
+// Everything below this line is only compiled if using X11
+
+#ifdef USING_X11
 Display *MythXOpenDisplay(void)
 {
     QString dispStr = MythContext::GetX11Display();
@@ -68,11 +69,7 @@ Display *MythXOpenDisplay(void)
 
     return disp;
 }
-#endif
 
-// Everything below this line is only compiled if using X11
-
-#ifdef Q_WS_X11
 int ErrorCatcher(Display * d, XErrorEvent * xeev)
 {
     error_map[d].push_back(*xeev);
@@ -129,4 +126,4 @@ vector<XErrorEvent> UninstallXErrorHandler(Display *d, bool printErrors)
     }
     return events;
 }
-#endif // Q_WS_X11
+#endif // USING_X11

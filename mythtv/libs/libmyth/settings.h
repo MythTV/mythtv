@@ -18,6 +18,7 @@ using namespace std;
 class QWidget;
 class ConfigurationGroup;
 class QDir;
+class QWidgetStack;
 class Setting;
 
 class MPUBLIC Storage
@@ -196,7 +197,7 @@ class MPUBLIC LabelSetting : public Setting
                                   const char* widgetName = 0);
 };
 
-class MPUBLIC LineEditSetting: public Setting
+class MPUBLIC LineEditSetting : public Setting
 {
   protected:
     LineEditSetting(Storage *_storage, bool readwrite = true) :
@@ -219,7 +220,7 @@ class MPUBLIC LineEditSetting: public Setting
     virtual void setVisible(bool b);
     virtual void SetPasswordEcho(bool b);
 
-private:
+  private:
     MythLineEdit* edit;
     bool rw;
     bool password_echo;
@@ -253,6 +254,9 @@ class MPUBLIC BoundedIntegerSetting : public IntegerSetting
     BoundedIntegerSetting(Storage *_storage, int _min, int _max, int _step) :
         IntegerSetting(_storage), min(_min), max(_max), step(_step) { }
 
+  public:
+    virtual void setValue(int newValue);
+
   protected:
     int min;
     int max;
@@ -268,21 +272,38 @@ public:
                                   const char* widgetName = 0);
 };
 
-class MPUBLIC SpinBoxSetting: public BoundedIntegerSetting {
-protected:
+class MPUBLIC SpinBoxSetting: public BoundedIntegerSetting
+{
+    Q_OBJECT
+
+  public:
     SpinBoxSetting(Storage *_storage, int min, int max, int step, 
                    bool allow_single_step = false,
-                   QString special_value_text = ""):
-        BoundedIntegerSetting(_storage, min, max, step),
-	sstep(allow_single_step),
-        svtext(special_value_text) {};
+                   QString special_value_text = "");
 
-    bool sstep;
-    QString svtext;
-    
-public:
-    virtual QWidget* configWidget(ConfigurationGroup *cg, QWidget* parent, 
-                                  const char* widgetName = 0);
+    virtual QWidget *configWidget(ConfigurationGroup *cg, QWidget *parent, 
+                                  const char *widgetName = 0);
+
+    virtual void setValue(int newValue);
+
+    void setFocus(void);
+    void clearFocus(void);
+    bool hasFocus(void) const;
+
+    void SetRelayEnabled(bool enabled) { relayEnabled = enabled; }
+    bool IsRelayEnabled(void) const { return relayEnabled; }
+
+  signals:
+    void valueChanged(const QString &name, int newValue);
+
+  private slots:
+    void relayValueChanged(int newValue);
+
+  private:
+    MythSpinBox *spinbox;
+    bool         relayEnabled;
+    bool         sstep;
+    QString      svtext;
 };
 
 class MPUBLIC SelectSetting : public Setting
@@ -294,9 +315,13 @@ class MPUBLIC SelectSetting : public Setting
         Setting(_storage), current(0), isSet(false) { }
 
   public:
-    virtual void addSelection(const QString& label,
-                              QString value=QString::null,
-                              bool select=false);
+    virtual int  findSelection(  const QString &label,
+                                 QString        value  = QString::null) const;
+    virtual void addSelection(   const QString &label,
+                                 QString        value  = QString::null,
+                                 bool           select = false);
+    virtual bool removeSelection(const QString &label,
+                                 QString        value  = QString::null);
 
     virtual void clearSelections(void);
 
@@ -304,6 +329,7 @@ class MPUBLIC SelectSetting : public Setting
 
 signals:
     void selectionAdded(const QString& label, QString value);
+    void selectionRemoved(const QString &label, const QString &value);
     void selectionsCleared(void);
 
 public slots:
@@ -311,25 +337,8 @@ public slots:
     virtual void setValue(const QString& newValue);
     virtual void setValue(int which);
 
-    virtual QString getSelectionLabel(void) const {
-        if (!isSet)
-            return QString::null;
-        return labels[current];
-    };
-
-    virtual int getValueIndex(QString value) {
-        selectionList::iterator iter = values.begin();
-        int ret = 0;
-        while (iter != values.end()) {
-            if (*iter == value) {
-                return ret;
-            } else {
-                ret++;
-                iter++;
-            }
-        }
-        return 0;
-    };
+    virtual QString getSelectionLabel(void) const;
+    virtual int getValueIndex(QString value);
 
 protected:
     typedef vector<QString> selectionList;
@@ -369,13 +378,12 @@ public:
     virtual void setVisible(bool b);
 
 public slots:
-    void addSelection(const QString& label,
-                      QString value=QString::null,
-                      bool select=false) {
-        if (widget != NULL)
-            widget->insertItem(label);
-        SelectSetting::addSelection(label, value, select);
-    };
+    void addSelection(const QString &label,
+                      QString value = QString::null,
+                      bool select = false);
+    bool removeSelection(const QString &label,
+                         QString value = QString::null);
+
 protected slots:
     void widgetDestroyed() { widget=NULL; };
 
@@ -645,7 +653,7 @@ class MPUBLIC TransComboBoxSetting :
     public ComboBoxSetting, public TransientStorage
 {
   public:
-    TransComboBoxSetting(bool rw = true, int _step = 1) :
+    TransComboBoxSetting(bool rw = false, int _step = 1) :
         ComboBoxSetting(this, rw, _step), TransientStorage() { }
 };
 
@@ -653,11 +661,11 @@ class MPUBLIC TransSpinBoxSetting :
     public SpinBoxSetting, public TransientStorage
 {
   public:
-    TransSpinBoxSetting(int min, int max, int step,
+    TransSpinBoxSetting(int minv, int maxv, int step,
                         bool allow_single_step = false,
                         QString special_value_text = "") :
-        SpinBoxSetting(this, min, max, step, allow_single_step,
-                       special_value_text), TransientStorage() { }
+        SpinBoxSetting(this, minv, maxv, step,
+                       allow_single_step, special_value_text) { }
 };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -875,7 +883,8 @@ class MPUBLIC VerticalConfigurationGroup : public ConfigurationGroup
     VerticalConfigurationGroup(
         bool luselabel   = true,  bool luseframe  = true,
         bool lzeroMargin = false, bool lzeroSpace = false) :
-        ConfigurationGroup(luselabel, luseframe, lzeroMargin, lzeroSpace)
+        ConfigurationGroup(luselabel, luseframe, lzeroMargin, lzeroSpace),
+        widget(NULL), confgrp(NULL), layout(NULL)
     {
     }
 
@@ -883,9 +892,18 @@ class MPUBLIC VerticalConfigurationGroup : public ConfigurationGroup
                                   QWidget            *parent,
                                   const char         *widgetName);
 
+    bool replaceChild(Configurable *old_child, Configurable *new_child);
+    void repaint(void);
+
   protected:
     /// You need to call deleteLater to delete QObject
     virtual ~VerticalConfigurationGroup() { }
+
+  private:
+    vector<QWidget*>    childwidget;
+    QGroupBox          *widget;
+    ConfigurationGroup *confgrp;
+    QVBoxLayout        *layout;
 };
 
 class MPUBLIC HorizontalConfigurationGroup : public ConfigurationGroup
@@ -939,7 +957,7 @@ class MPUBLIC StackedConfigurationGroup : public ConfigurationGroup
         bool uselabel   = true,  bool useframe  = true,
         bool zeroMargin = false, bool zeroSpace = false) :
         ConfigurationGroup(uselabel, useframe, zeroMargin, zeroSpace),
-        top(0), saveAll(true)
+        widget(NULL), confgrp(NULL), top(0), saveAll(true)
     {
     }
 
@@ -953,6 +971,9 @@ class MPUBLIC StackedConfigurationGroup : public ConfigurationGroup
     // save all children, or only the top?
     void setSaveAll(bool b) { saveAll = b; };
 
+    void addChild(Configurable*);
+    void removeChild(Configurable*);
+
   signals:
     void raiseWidget(int);
 
@@ -961,8 +982,11 @@ class MPUBLIC StackedConfigurationGroup : public ConfigurationGroup
     virtual ~StackedConfigurationGroup() { }
 
   protected:
-    uint top;
-    bool saveAll;
+    vector<QWidget*>    childwidget;
+    QWidgetStack       *widget;
+    ConfigurationGroup *confgrp;
+    uint                top;
+    bool                saveAll;
 };
 
 
@@ -990,6 +1014,7 @@ class MPUBLIC TriggeredConfigurationGroup : public ConfigurationGroup
     virtual void addChild(Configurable *child);
 
     void addTarget(QString triggerValue, Configurable *target);
+    void removeTarget(QString triggerValue);
 
     virtual QWidget *configWidget(ConfigurationGroup *cg, 
                                   QWidget            *parent,
@@ -1000,6 +1025,8 @@ class MPUBLIC TriggeredConfigurationGroup : public ConfigurationGroup
     virtual void load(void);
     virtual void save(void);
     virtual void save(QString destination);
+
+    void repaint(void);
 
     // Sets
 
@@ -1142,6 +1169,8 @@ class MPUBLIC ConfigurationDialog : public Storage
 
     virtual Setting *byName(const QString &settingName)
         { return cfgGrp->byName(settingName); }
+
+    void setLabel(const QString &label);
 
   protected:
     typedef vector<Configurable*> ChildList;

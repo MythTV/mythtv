@@ -209,13 +209,13 @@ class OpenGLVideoSync : public VideoSync
     void Start(void);
     void WaitForFrame(int sync_delay);
     void AdvanceTrigger(void);
-    void Stop(void);
 
   private:
     GLXDrawable m_drawable;
     GLXContext  m_context;
+
   private:
-    class OpenGLVideoSyncPrivate *m_imp;
+    QMutex      m_lock;
 };
 
 #ifdef __linux__

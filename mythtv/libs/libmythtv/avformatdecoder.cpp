@@ -24,6 +24,10 @@ using namespace std;
 #include "cc708decoder.h"
 #include "interactivetv.h"
 #include "DVDRingBuffer.h"
+#include "videodisplayprofile.h"
+
+#include "videoout_dvdv.h"    // AvFormatDecoderPrivate has DVDV ptr
+#include "videoout_quartz.h"  // For VOQ::GetBestSupportedCodec()
 
 #ifdef USING_XVMC
 #include "videoout_xv.h"
@@ -86,36 +90,63 @@ class AvFormatDecoderPrivate
 {
   public:
     AvFormatDecoderPrivate(bool allow_libmpeg2)
-        : mpeg2dec(NULL), allow_mpeg2dec(allow_libmpeg2) { ; }
+        : mpeg2dec(NULL), dvdvdec(NULL), allow_mpeg2dec(allow_libmpeg2) { ; }
    ~AvFormatDecoderPrivate() { DestroyMPEG2(); }
     
-    bool InitMPEG2();
-    bool HasMPEG2Dec() const { return (bool)(mpeg2dec); }
+    bool InitMPEG2(const QString &dec);
+    bool HasMPEG2Dec(void) const { return (bool)(mpeg2dec); }
+    bool HasDVDVDec(void) const { return (bool)(dvdvdec); }
+    bool HasDecoder(void) const { return HasMPEG2Dec() || HasDVDVDec(); }
 
     void DestroyMPEG2();
     void ResetMPEG2();
     int DecodeMPEG2Video(AVCodecContext *avctx, AVFrame *picture,
                          int *got_picture_ptr, uint8_t *buf, int buf_size);
 
+    // Mac OS X Hardware DVD-Video decoder
+    bool SetVideoSize(const QSize &video_dim);
+    DVDV *GetDVDVDecoder(void) { return dvdvdec; }
+
   private:
     mpeg2dec_t *mpeg2dec;
+    DVDV       *dvdvdec;
     bool        allow_mpeg2dec;
     avframe_q   partialFrames;
 };
 
-bool AvFormatDecoderPrivate::InitMPEG2()
+/**
+ * \brief Initialise either libmpeg2, or DVDV (Mac HW accel), to do decoding
+ *
+ * Both of these are meant to be alternatives to FFMPEG,
+ * but currently, DVDV uses the MPEG demuxer in FFMPEG
+ */
+bool AvFormatDecoderPrivate::InitMPEG2(const QString &dec)
 {
+    // only ffmpeg is used for decoding previews
     if (!allow_mpeg2dec)
         return false;
     DestroyMPEG2();
-    QString dec = gContext->GetSetting("PreferredMPEG2Decoder", "ffmpeg");
+
+#ifdef USING_DVDV
+    if (dec == "macaccel")
+    {
+        dvdvdec = new DVDV();
+        if (dvdvdec)
+        {
+            VERBOSE(VB_PLAYBACK,
+                    LOC + "Using Mac Acceleration (DVDV) for video decoding");
+        }
+    }
+#endif // !USING_DVDV
+
     if (dec == "libmpeg2")
     {
         mpeg2dec = mpeg2_init();
         if (mpeg2dec)
             VERBOSE(VB_PLAYBACK, LOC + "Using libmpeg2 for video decoding");
     }
-    return (mpeg2dec != NULL);
+
+    return HasDecoder();
 }
 
 void AvFormatDecoderPrivate::DestroyMPEG2()
@@ -130,6 +161,12 @@ void AvFormatDecoderPrivate::DestroyMPEG2()
             delete (*it);
         partialFrames.clear();
     }
+
+    if (dvdvdec)
+    {
+        delete dvdvdec;
+        dvdvdec = NULL;
+    }
 }
 
 void AvFormatDecoderPrivate::ResetMPEG2()
@@ -143,6 +180,9 @@ void AvFormatDecoderPrivate::ResetMPEG2()
             delete (*it);
         partialFrames.clear();
     }
+
+    if (dvdvdec)
+        dvdvdec->Reset();
 }
 
 int AvFormatDecoderPrivate::DecodeMPEG2Video(AVCodecContext *avctx,
@@ -150,6 +190,23 @@ int AvFormatDecoderPrivate::DecodeMPEG2Video(AVCodecContext *avctx,
                                              int *got_picture_ptr,
                                              uint8_t *buf, int buf_size)
 {
+    if (dvdvdec)
+    {
+        if (!dvdvdec->PreProcessFrame(avctx))
+        {
+            VERBOSE(VB_ALL, "DVDV::PreProcessFrame() failed");
+            DestroyMPEG2();
+            return -1;
+        }
+
+        int ret = avcodec_decode_video(avctx, picture,
+                                       got_picture_ptr, buf, buf_size);
+
+        dvdvdec->PostProcessFrame(avctx, (VideoFrame *)(picture->opaque),
+                                  picture->pict_type, *got_picture_ptr);
+        return ret;
+    }
+
     *got_picture_ptr = 0;
     const mpeg2_info_t *info = mpeg2_info(mpeg2dec);
     mpeg2_buffer(mpeg2dec, buf, buf + buf_size);
@@ -260,6 +317,17 @@ int AvFormatDecoderPrivate::DecodeMPEG2Video(AVCodecContext *avctx,
                 break;
         }
     }
+}
+
+bool AvFormatDecoderPrivate::SetVideoSize(const QSize &video_dim)
+{
+    if (dvdvdec && !dvdvdec->SetVideoSize(video_dim))
+    {
+        DestroyMPEG2();
+        return false;
+    }
+
+    return true;
 }
 
 AvFormatDecoder::AvFormatDecoder(NuppelVideoPlayer *parent,
@@ -421,13 +489,8 @@ bool AvFormatDecoder::DoFastForward(long long desiredFrame, bool discardFrames)
     int64_t frameseekadjust = 0;
     AVCodecContext *context = st->codec;
 
-    if (context->codec_id == CODEC_ID_MPEG1VIDEO ||
-        context->codec_id == CODEC_ID_MPEG2VIDEO ||
-        context->codec_id == CODEC_ID_MPEG2VIDEO_XVMC ||
-        context->codec_id == CODEC_ID_MPEG2VIDEO_XVMC_VLD)
-    {
+    if (CODEC_IS_MPEG(context->codec_id))
         frameseekadjust = maxkeyframedist+1;
-    }
 
     // convert framenumber to normalized timestamp
     long double diff = (max(desiredFrame - frameseekadjust, 0LL)) * AV_TIME_BASE;
@@ -751,12 +814,6 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
         av_free_packet(&pkt1);
         ringBuffer->Seek(0, SEEK_SET);
         ringBuffer->DVD()->IgnoreStillOrWait(false);
-        QString dec = gContext->GetSetting("PreferredMPEG2Decoder", "ffmpeg");
-        if (dec.contains("xvmc") && 
-            !gContext->GetNumSetting("UseXvMCForHDOnly", 0))
-        {
-            dvd_xvmc_enabled = true;
-        }
     }
     else
     {
@@ -896,6 +953,12 @@ static float normalized_fps(AVStream *stream, AVCodecContext *enc)
 void AvFormatDecoder::InitVideoCodec(AVStream *stream, AVCodecContext *enc,
                                      bool selectedStream)
 {
+    VERBOSE(VB_PLAYBACK, LOC
+            <<"InitVideoCodec() "<<enc<<" "
+            <<"id("<<codec_id_string(enc->codec_id)
+            <<") type ("<<codec_type_string(enc->codec_type)
+            <<").");
+
     float aspect_ratio = 0.0;
 
     if (ringBuffer->isDVD())
@@ -937,8 +1000,7 @@ void AvFormatDecoder::InitVideoCodec(AVStream *stream, AVCodecContext *enc,
 
     if (selectedStream &&
         !gContext->GetNumSetting("DecodeExtraAudio", 0) &&
-        codec->id != CODEC_ID_MPEG2VIDEO_XVMC           &&
-        codec->id != CODEC_ID_MPEG2VIDEO_XVMC_VLD)
+        codec && !CODEC_IS_HW_ACCEL(codec->id))
     {
         SetLowBuffers(false);
     }
@@ -955,6 +1017,17 @@ void AvFormatDecoder::InitVideoCodec(AVStream *stream, AVCodecContext *enc,
         if (selectedStream)
             directrendering = true;
     }
+    else if (codec && codec->id == CODEC_ID_MPEG2VIDEO_DVDV)
+    {
+        enc->flags           |= (CODEC_FLAG_EMU_EDGE  |
+//                                 CODEC_FLAG_TRUNCATED | 
+                                 CODEC_FLAG_LOW_DELAY |
+                                 CODEC_FLAG2_FAST);
+        enc->get_buffer       = get_avf_buffer;
+        enc->release_buffer   = release_avf_buffer;
+        enc->draw_horiz_band  = NULL;
+        directrendering      |= selectedStream;
+    }
     else if (codec && codec->capabilities & CODEC_CAP_DR1 &&
              !(enc->width % 16))
     {
@@ -964,6 +1037,13 @@ void AvFormatDecoder::InitVideoCodec(AVStream *stream, AVCodecContext *enc,
         enc->draw_horiz_band = NULL;
         if (selectedStream)
             directrendering = true;
+    }
+    else if (codec && codec->capabilities & CODEC_CAP_DR1)
+    {
+        VERBOSE(VB_IMPORTANT, "Direct Rendering codec, but "
+                "no custom frame allocator defined!");
+        enc->get_buffer      = get_avf_buffer;
+        enc->release_buffer  = release_avf_buffer;
     }
 
     if (selectedStream)
@@ -989,8 +1069,8 @@ void AvFormatDecoder::InitVideoCodec(AVStream *stream, AVCodecContext *enc,
     }
 }
 
-#ifdef USING_XVMC
-static int xvmc_stream_type(int codec_id)
+#if defined(USING_XVMC) || defined(USING_DVDV)
+static int mpeg_version(int codec_id)
 {
     switch (codec_id)
     {
@@ -999,20 +1079,20 @@ static int xvmc_stream_type(int codec_id)
         case CODEC_ID_MPEG2VIDEO:
         case CODEC_ID_MPEG2VIDEO_XVMC:
         case CODEC_ID_MPEG2VIDEO_XVMC_VLD:
+        case CODEC_ID_MPEG2VIDEO_DVDV:
             return 2;
-#if 0
-// We don't support these yet.
         case CODEC_ID_H263:
             return 3;
         case CODEC_ID_MPEG4:
             return 4;
         case CODEC_ID_H264:
             return 4;
-#endif
     }
     return 0;
 }
+#endif // defined(USING_XVMC) || defined(USING_DVDV)
 
+#ifdef USING_XVMC
 static int xvmc_pixel_format(enum PixelFormat pix_fmt)
 {
     (void) pix_fmt;
@@ -1321,8 +1401,16 @@ int AvFormatDecoder::ScanStreams(bool novideo)
 
                 d->DestroyMPEG2();
                 h264_kf_seq->Reset();
+
+                uint width  = max(enc->width, 16);
+                uint height = max(enc->height, 16);
+                VideoDisplayProfile vdp;
+                vdp.SetInput(QSize(width, height));
+                QString dec = vdp.GetDecoder();
+
+                bool handled = false;
 #ifdef USING_XVMC
-                if (!using_null_videoout && xvmc_stream_type(enc->codec_id))
+                if (!using_null_videoout && mpeg_version(enc->codec_id))
                 {
                     // HACK -- begin
                     // Force MPEG2 decoder on MPEG1 streams.
@@ -1334,25 +1422,33 @@ int AvFormatDecoder::ScanStreams(bool novideo)
                     // HACK -- end
 
                     bool force_xv = false;
-                    if (ringBuffer->InDVDMenuOrStillFrame() &&
-                        dvd_xvmc_enabled)
+                    if (ringBuffer->isDVD())
                     {
-                        force_xv = true;
-                        enc->pix_fmt = PIX_FMT_YUV420P;
+                        if (dec == "xvmc")
+                            dvd_xvmc_enabled = true;
+                                
+                        if (ringBuffer->InDVDMenuOrStillFrame() &&
+                            dvd_xvmc_enabled)
+                        {
+                            force_xv = true;
+                            enc->pix_fmt = PIX_FMT_YUV420P;
+                        }
                     }
-                    
+
                     MythCodecID mcid;
                     mcid = VideoOutputXv::GetBestSupportedCodec(
-                        /* disp dim     */ enc->width, enc->height,
+                        /* disp dim     */ width, height,
                         /* osd dim      */ /*enc->width*/ 0, /*enc->height*/ 0,
-                        /* mpeg type    */ xvmc_stream_type(enc->codec_id),
+                        /* mpeg type    */ mpeg_version(enc->codec_id),
                         /* xvmc pix fmt */ xvmc_pixel_format(enc->pix_fmt),
                         /* test surface */ kCodec_NORMAL_END > video_codec_id,
                         /* force_xv     */ force_xv);
                     bool vcd, idct, mc;
-                    enc->codec_id = myth2av_codecid(mcid, vcd, idct, mc);
+                    enc->codec_id = (CodecID)
+                        myth2av_codecid(mcid, vcd, idct, mc);
+
                     if (ringBuffer->isDVD() && (mcid == video_codec_id) &&
-                            dvd_video_codec_changed)
+                        dvd_video_codec_changed)
                     {
                         dvd_video_codec_changed = false;
                         dvd_xvmc_enabled = false;
@@ -1364,20 +1460,34 @@ int AvFormatDecoder::ScanStreams(bool novideo)
                         enc->pix_fmt = (idct) ?
                             PIX_FMT_XVMC_MPEG2_IDCT : PIX_FMT_XVMC_MPEG2_MC;
                     }
+                    handled = true;
                 }
-                else
+#elif USING_DVDV
+                if (!using_null_videoout && mpeg_version(enc->codec_id))
+                {
+                    MythCodecID mcid;
+                    mcid = VideoOutputQuartz::GetBestSupportedCodec(
+                        /* disp dim     */ width, height,
+                        /* osd dim      */ 0, 0,
+                        /* mpeg type    */ mpeg_version(enc->codec_id),
+                        /* pixel format */
+                        (PIX_FMT_YUV420P == enc->pix_fmt) ? FOURCC_I420 : 0);
+
+                    enc->codec_id = (CodecID) myth2av_codecid(mcid);
+                    video_codec_id = mcid;
+
+                    handled = true;
+                }
+#endif // USING_XVMC || USING_DVDV
+
+                if (!handled)
                 {
                     if (CODEC_ID_H264 == enc->codec_id)
                         video_codec_id = kCodec_H264;
                     else
                         video_codec_id = kCodec_MPEG2; // default to MPEG2
                 }
-#else
-                if (CODEC_ID_H264 == enc->codec_id)
-                    video_codec_id = kCodec_H264;
-                else
-                    video_codec_id = kCodec_MPEG2; // default to MPEG2
-#endif // USING_XVMC
+
                 if (enc->codec)
                 {
                     VERBOSE(VB_IMPORTANT, LOC
@@ -1387,11 +1497,24 @@ int AvFormatDecoder::ScanStreams(bool novideo)
                             <<") already open.");
                 }
 
-                // Only use libmpeg2 when not using XvMC
-                if (CODEC_ID_MPEG1VIDEO == enc->codec_id ||
-                    CODEC_ID_MPEG2VIDEO == enc->codec_id)
+                // Initialize alternate decoders when needed...
+                if (((dec == "libmpeg2") &&
+                     (CODEC_ID_MPEG1VIDEO == enc->codec_id ||
+                      CODEC_ID_MPEG2VIDEO == enc->codec_id)) ||
+                    (CODEC_ID_MPEG2VIDEO_DVDV == enc->codec_id))
                 {
-                    d->InitMPEG2();
+                    d->InitMPEG2(dec);
+                    
+                    // fallback if we can't handle this resolution
+                    if (!d->SetVideoSize(QSize(width, height)))
+                    {
+                        VERBOSE(VB_IMPORTANT, LOC_WARN +
+                                "Failed to setup DVDV decoder, falling "
+                                "back to software decoding");
+
+                        enc->codec_id  = CODEC_ID_MPEG2VIDEO;
+                        video_codec_id = kCodec_MPEG2;
+                    }
                 }
 
                 enc->decode_cc_dvd  = decode_cc_dvd;
@@ -1407,6 +1530,10 @@ int AvFormatDecoder::ScanStreams(bool novideo)
                                selectedVideoIndex == (int) i);
 
                 ScanATSCCaptionStreams(i);
+
+                VERBOSE(VB_PLAYBACK, LOC + 
+                        QString("Using %1 for video decoding")
+                        .arg(GetCodecDecoderName()));
 
                 break;
             }
@@ -1472,7 +1599,30 @@ int AvFormatDecoder::ScanStreams(bool novideo)
                     QString("Could not find decoder for "
                             "codec (%1), ignoring.")
                     .arg(codec_id_string(enc->codec_id)));
-            continue;
+
+            // Nigel's bogus codec-debug. Dump the list of codecs & decoders,
+            // and have one last attempt to find a decoder. This is usually
+            // only caused by build problems, where libavcodec needs a rebuild
+            if (print_verbose_messages & VB_LIBAV)
+            {
+                AVCodec *p = first_avcodec;
+                int      i = 1;
+                while (p)
+                {
+                    if (p->name[0] != '\0')  printf("Codec %s:", p->name);
+                    else                     printf("Codec %d, null name,", i);
+                    if (p->decode == NULL)   puts("decoder is null");
+          
+                    if (p->id == enc->codec_id)
+                    {   codec = p; break;    }
+
+                    printf("Codec %d != %d\n", p->id, enc->codec_id);
+                    p = p->next;
+                    ++i;
+                }
+            }
+            if (!codec)
+                continue;
         }
 
         if (!enc->codec)
@@ -2968,6 +3118,16 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
 
             if (exitafterdecoded)
                 gotvideo = 1;
+
+            // If the resolution changed in XXXPreProcessPkt, we may
+            // have a fatal error, so check for this before continuing.
+            if (GetNVP()->IsErrored())
+            {
+                av_free_packet(pkt);
+                if (pkt)
+                    delete pkt;
+                return false;
+            }
         }
 
         if (len > 0 &&
@@ -3207,7 +3367,7 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
                     int gotpicture = 0;
 
                     avcodeclock.lock();
-                    if (d->HasMPEG2Dec())
+                    if (d->HasDecoder())
                     {
                         if (indvdstill)
                         {
@@ -3447,31 +3607,29 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
     return true;
 }
 
-QString AvFormatDecoder::GetEncodingType(void) const
+QString AvFormatDecoder::GetCodecDecoderName(void) const
 {
-    switch (video_codec_id)
-    {
-        case kCodec_MPEG1:
-        case kCodec_MPEG1_XVMC:
-        case kCodec_MPEG1_VLD:
-        case kCodec_MPEG2:
-        case kCodec_MPEG2_IDCT:
-        case kCodec_MPEG2_VLD:
-            return QString("MPEG-2");
+    if (d && d->HasMPEG2Dec())
+        return "libmpeg2";
 
-        case kCodec_H264:
-        case kCodec_H264_XVMC:
-        case kCodec_H264_IDCT:
-        case kCodec_H264_VLD:
-            return QString("H.264");
+    if ((video_codec_id > kCodec_VLD_END) &&
+        (video_codec_id < kCodec_DVDV_END))
+        return "macaccel";
 
-        default:
-            // defaults to MPEG-2
-            return QString("MPEG-2");
-    }
+    if ((video_codec_id > kCodec_NORMAL_END) &&
+        (video_codec_id < kCodec_STD_XVMC_END))
+        return "xvmc";
 
-    // defaults to MPEG-2
-    return QString("MPEG-2");
+    if ((video_codec_id > kCodec_STD_XVMC_END) &&
+        (video_codec_id < kCodec_VLD_END))
+        return "xvmc-vld";
+
+    return "ffmpeg";
+}
+
+void *AvFormatDecoder::GetVideoCodecPrivate(void)
+{
+    return d->GetDVDVDecoder();
 }
 
 void AvFormatDecoder::SetDisablePassThrough(bool disable)

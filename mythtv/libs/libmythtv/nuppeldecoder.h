@@ -47,7 +47,8 @@ class NuppelDecoder : public DecoderBase
 
     long UpdateStoredFrameNum(long framenumber);
 
-    QString GetEncodingType(void) const;
+    QString GetCodecDecoderName(void) const { return "nuppel"; }
+    MythCodecID GetVideoCodecID(void) const;
 
   private:
     inline bool ReadFileheader(struct rtfileheader *fileheader);

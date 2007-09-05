@@ -49,7 +49,9 @@ openbsd {
     setting.extra += -ldconfig -R
 }
 
+using_x11:DEFINES += USING_X11
 using_xv:DEFINES += USING_XV
+using_ivtv:DEFINES += USING_IVTV
 using_xvmc:DEFINES += USING_XVMC
 using_xvmc_vld:DEFINES += USING_XVMC_VLD
 using_xrandr:DEFINES += USING_XRANDR

@@ -608,6 +608,12 @@
     <offset>0,0</offset>
   </buttondef>
 
+  <buttondef name="TV_SETTINGS_PLAYBACK_OSD">
+    <image>text-blank.png</image>
+    <watermarkimage>watermark/tv_recorded.png</watermarkimage>
+    <offset>0,0</offset>
+  </buttondef>
+
   <buttondef name="TV_SETTINGS_PLAYBACK_GROUPS">
     <image>text-blank.png</image>
     <watermarkimage>watermark/tv_recorded.png</watermarkimage>

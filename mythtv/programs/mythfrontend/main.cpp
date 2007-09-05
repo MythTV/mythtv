@@ -389,6 +389,11 @@ void TVMenuCallback(void *data, QString &selection)
         PlaybackSettings settings;
         settings.exec();
     } 
+    else if (sel == "settings osd") 
+    {
+        OSDSettings settings;
+        settings.exec();
+    } 
     else if (sel == "settings epg") 
     {
         EPGSettings settings;
@@ -568,6 +573,9 @@ void WriteDefaults()
     PlaybackSettings ps;
     ps.load();
     ps.save();
+    OSDSettings os;
+    os.load();
+    os.save();
     GeneralSettings gs;
     gs.load();
     gs.save();
@@ -871,14 +879,14 @@ int main(int argc, char **argv)
 #endif
             return FRONTEND_EXIT_OK;
         }
-#ifdef Q_WS_X11
+#ifdef USING_X11
     // Remember any -display or -geometry argument
     // which QApplication init will remove.
         else if (!strcmp(argv[argpos],"-geometry"))
             geometry = argv[argpos+1];
         else if (!strcmp(argv[argpos],"-display"))
             display = argv[argpos+1];
-#endif
+#endif // USING_X11
     }
 
 #ifdef Q_WS_MACX
@@ -1085,7 +1093,7 @@ int main(int argc, char **argv)
                 !strcmp(a.argv()[argpos],"--usage")))
                 cerr << "Invalid argument: " << a.argv()[argpos] << endl;
             cerr << "Valid options are: " << endl <<
-#ifdef Q_WS_X11
+#ifdef USING_X11
                     "-display X-server              Create GUI on X-server, not localhost\n" <<
 #endif
                     "-geometry or --geometry WxH    Override window size settings\n" <<

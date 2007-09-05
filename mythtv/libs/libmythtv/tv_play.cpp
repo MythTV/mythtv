@@ -40,6 +40,7 @@
 #include "DVDRingBuffer.h"
 #include "datadirect.h"
 #include "sourceutil.h"
+#include "util-osx-cocoa.h"
 
 #ifndef HAVE_ROUND
 #define round(x) ((int) ((x) + 0.5))
@@ -453,9 +454,12 @@ void TV::InitKeys(void)
 
 void *SpawnDecode(void *param)
 {
+    // OS X needs a garbage collector allocated..
+    void *decoder_thread_pool = CreateOSXCocoaPool();
     NuppelVideoPlayer *nvp = (NuppelVideoPlayer *)param;
     nvp->StartPlaying();
     nvp->StopPlaying();
+    DeleteOSXCocoaPool(decoder_thread_pool);
     return NULL;
 }
 
@@ -3617,7 +3621,6 @@ QString TV::PlayMesg()
 
 void TV::DoPause(bool showOSD)
 {
-    QMutexLocker locker(&stateLock);
     if (activerbuffer && 
         activerbuffer->InDVDMenuOrStillFrame())
     {
@@ -3628,7 +3631,9 @@ void TV::DoPause(bool showOSD)
     float time = 0.0;
 
     if (paused)
+    {
         activenvp->Play(normal_speed, true);
+    }
     else 
     {
         if (doing_ff_rew)
@@ -5153,7 +5158,7 @@ void TV::doEditSchedule(int editType)
     {
         bool stayPaused = paused;
         if (!paused)
-            DoPause(false);
+            DoPause();
 
         switch (editType)
         {
@@ -5206,7 +5211,7 @@ void TV::doEditSchedule(int editType)
         }
 
         if (!stayPaused)
-            DoPause(false);
+            DoPause();
     }
 
     // Resize the window back to the MythTV Player size

@@ -109,18 +109,18 @@ bool NuppelDecoder::CanHandle(char testbuf[kDecoderProbeBufferSize],
     return false;
 }
 
-QString NuppelDecoder::GetEncodingType(void) const
+MythCodecID NuppelDecoder::GetVideoCodecID(void) const
 {
-    QString value = "Unknown";
+    MythCodecID value = kCodec_NONE;
     if (mpa_vidcodec)
     {
         if (QString(mpa_vidcodec->name) == "mpeg4")
-            value = "MPEG-4";
+            value = kCodec_NUV_MPEG4;
     }
     else if (usingextradata && extradata.video_fourcc == FOURCC_DIVX)
-        value = "MPEG-4";
+        value = kCodec_NUV_MPEG4;
     else
-        value = "RTjpeg";
+        value = kCodec_NUV_RTjpeg;
     return (value);
 }
 

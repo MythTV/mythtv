@@ -1,3 +1,5 @@
+#include "NuppelVideoPlayer.h"
+
 /* Based on xqcam.c by Paul Chinn <loomer@svpal.org> */
 
 // ANSI C headers
@@ -39,9 +41,14 @@ using namespace std;
 #include "mythconfig.h"
 #include "mythcontext.h"
 #include "filtermanager.h"
+#include "videodisplayprofile.h"
 #define IGNORE_TV_PLAY_REC
 #include "tv.h"
 #include "fourcc.h"
+
+// MythTV OpenGL headers
+#include "openglcontext.h"
+#include "openglvideo.h"
 
 #define LOC QString("VideoOutputXv: ")
 #define LOC_ERR QString("VideoOutputXv Error: ")
@@ -64,15 +71,22 @@ extern "C" {
 #define XVMC_CHROMA_FORMAT_420 0x00000001
 #endif
 
+static QStringList allowed_video_renderers(MythCodecID codec_id,
+                                           Display *XJ_disp);
+
 static void SetFromEnv(bool &useXvVLD, bool &useXvIDCT, bool &useXvMC,
-                       bool &useXV, bool &useShm);
-static void SetFromHW(Display *d, bool &useXvMC, bool &useXV, bool& useShm);
+                       bool &useXV, bool &useShm, bool &useOpenGL);
+static void SetFromHW(Display *d, bool &useXvMC, bool &useXV,
+                      bool &useShm, bool &useXvMCOpenGL, bool &useOpenGL);
 static int calc_hue_base(const QString &adaptor_name);
 
+const char *vr_str[] =
+{
+    "unknown", "xlib", "xshm", "opengl", "xv-blit", "xvmc", "xvmc", "xvmc",
+};
+
 /** \class  VideoOutputXv
- *  \brief  Implementation of Unix X Window System video output
- *
- * Supports common video output methods used with %X11 Servers.
+ *  \brief Supports common video output methods used with %X11 Servers.
  *
  * This class suppurts XVideo with VLD acceleration (XvMC-VLD), XVideo with
  * inverse discrete cosine transform (XvMC-IDCT) acceleration, XVideo with
@@ -87,6 +101,8 @@ VideoOutputXv::VideoOutputXv(MythCodecID codec_id)
     : VideoOutput(),
       myth_codec_id(codec_id), video_output_subtype(XVUnknown),
       display_res(NULL), global_lock(true),
+      use_picture_controls(false),
+      use_i420_hack_for_broken_driver(false),
 
       XJ_root(0),  XJ_win(0), XJ_curwin(0), XJ_gc(0), XJ_screen(NULL),
       XJ_disp(NULL), XJ_screen_num(0), XJ_white(0), XJ_black(0), XJ_depth(0),
@@ -105,6 +121,15 @@ VideoOutputXv::VideoOutputXv(MythCodecID codec_id)
       xv_colorkey(0),   xv_draw_colorkey(false),
       xv_chroma(0),
 
+      gl_context(NULL),
+      gl_videochain(NULL), gl_pipchain(NULL),
+      gl_osdchain(NULL),
+
+      gl_use_osd_opengl2(false),
+      gl_pip_ready(false),
+      gl_osd_ready(false),
+
+
       chroma_osd(NULL)
 {
     VERBOSE(VB_PLAYBACK, LOC + "ctor");
@@ -117,14 +142,20 @@ VideoOutputXv::VideoOutputXv(MythCodecID codec_id)
     // people report the bug in the driver the more likely it is to be
     // fixed.
 
-    brokenI420Hack = gContext->GetNumSetting("BrokenI420Hack", 0);
+    use_i420_hack_for_broken_driver =
+        gContext->GetNumSetting("BrokenI420Hack", 0);
 
-    if (brokenI420Hack)
-        VERBOSE(VB_GENERAL, LOC + "Using broken I420 workaround. Please " +
-                                  "ask your driver vendor to fix their " +
-                                  "drivers! ");
-
-
+    if (use_i420_hack_for_broken_driver)
+    {
+        VERBOSE(VB_IMPORTANT, LOC +
+                "\n"
+                "\n*********************************************************"
+                "\n Using broken I420 workaround. Please ask your driver    "
+                "\n vendor to fix their drivers! This hack will be removed  "
+                "\n in a future MythTV release.                             "
+                "\n*********************************************************"
+                "\n");
+    }
 
     // If using custom display resolutions, display_res will point
     // to a singleton instance of the DisplayRes class
@@ -149,7 +180,14 @@ VideoOutputXv::~VideoOutputXv()
         m_deinterlacing = false;
     }
 
+    // Delete the video buffers
     DeleteBuffers(VideoOutputSubType(), true);
+
+    if (gl_context)
+    {
+        delete gl_context;
+        gl_context = NULL;
+    }
 
     // ungrab port...
     if (xv_port >= 0)
@@ -175,9 +213,6 @@ VideoOutputXv::~VideoOutputXv()
     // Switch back to desired resolution for GUI
     if (display_res)
         display_res->SwitchToGUI();
-
-    if (xvmc_tex)
-        delete xvmc_tex;
 }
 
 // this is documented in videooutbase.cpp
@@ -198,23 +233,28 @@ void VideoOutputXv::MoveResize(void)
         chroma_osd->Reset();
         needrepaint = true;
     }
+
+    if (gl_videochain)
+        gl_videochain->SetVideoRect(display_video_rect);
 }
 
 // documented in videooutbase.cpp
-void VideoOutputXv::InputChanged(int width, int height, float aspect,
-                                 MythCodecID av_codec_id)
+bool VideoOutputXv::InputChanged(const QSize &input_size,
+                                 float        aspect,
+                                 MythCodecID  av_codec_id,
+                                 void        *codec_private)
 {
-    VERBOSE(VB_PLAYBACK, LOC + QString("InputChanged(%1,%2,%3)")
-            .arg(width).arg(height).arg(aspect));
+    VERBOSE(VB_PLAYBACK, LOC + QString("InputChanged(%1,%2,%3) '%4'->'%5'")
+            .arg(input_size.width()).arg(input_size.height()).arg(aspect)
+            .arg(toString(myth_codec_id)).arg(toString(av_codec_id)));
 
     QMutexLocker locker(&global_lock);
 
     bool cid_changed = (myth_codec_id != av_codec_id);
-    QSize new_res = QSize(width, height);
-    bool res_changed = new_res != video_dim;
+    bool res_changed = input_size != video_dim;
     bool asp_changed = aspect != video_aspect;
 
-    VideoOutput::InputChanged(width, height, aspect, av_codec_id);
+    VideoOutput::InputChanged(input_size, aspect, av_codec_id, codec_private);
 
     if (!res_changed && !cid_changed)
     {
@@ -222,14 +262,16 @@ void VideoOutputXv::InputChanged(int width, int height, float aspect,
             vbuffers.Clear(xv_chroma);
         if (asp_changed)
             MoveResize();
-        return;
+        return true;
     }
 
     bool ok = true;
 
-    DeleteBuffers(VideoOutputSubType(), cid_changed);
-    ResizeForVideo((uint) width, (uint) height);
-    if (cid_changed)
+    DeleteBuffers(VideoOutputSubType(),
+                  cid_changed || (OpenGL == VideoOutputSubType()));
+    ResizeForVideo((uint) input_size.width(), (uint) input_size.height());
+
+    if (cid_changed && (OpenGL != VideoOutputSubType()))
     {
         myth_codec_id = av_codec_id;
 
@@ -246,8 +288,14 @@ void VideoOutputXv::InputChanged(int width, int height, float aspect,
 
         ok = InitSetupBuffers();
     }
-    else
+    else if (OpenGL != VideoOutputSubType())
         ok = CreateBuffers(VideoOutputSubType());
+
+    if (OpenGL == VideoOutputSubType())
+    {
+        myth_codec_id = av_codec_id;
+        ok = InitSetupBuffers();
+    }
 
     MoveResize();
 
@@ -257,26 +305,36 @@ void VideoOutputXv::InputChanged(int width, int height, float aspect,
                 "Failed to recreate buffers");
         errored = true;
     }
+
+    return ok;
 }
 
 // documented in videooutbase.cpp
 QRect VideoOutputXv::GetVisibleOSDBounds(
     float &visible_aspect, float &font_scaling) const
 {
-    if (!chroma_osd)
+    // This rounding works for I420 video...
+    QSize dvr2 = QSize(display_visible_rect.width()  & ~0x3,
+                       display_visible_rect.height() & ~0x1);
+
+    if (!chroma_osd && !gl_use_osd_opengl2)
         return VideoOutput::GetVisibleOSDBounds(visible_aspect, font_scaling);
 
-    float dispPixelAdj  = GetDisplayAspect() * display_visible_rect.height();
-    dispPixelAdj       /= display_visible_rect.width();
-    visible_aspect = 1.3333f/dispPixelAdj;
+    float dispPixelAdj = 1.0f;
+    if (dvr2.height() && dvr2.width())
+        dispPixelAdj = (GetDisplayAspect() * dvr2.height()) / dvr2.width();
+    visible_aspect = 1.3333f / dispPixelAdj;
     font_scaling   = 1.0f;
-    return QRect(QPoint(0,0), display_visible_rect.size());
+    return QRect(QPoint(0,0), dvr2);
 }
 
 // documented in videooutbase.cpp
 QRect VideoOutputXv::GetTotalOSDBounds(void) const
 {
-    QSize sz = (chroma_osd) ? display_visible_rect.size() : video_dim;
+    QSize dvr2 = QSize(display_visible_rect.width()  & ~0x3,
+                       display_visible_rect.height() & ~0x1);
+
+    QSize sz = (chroma_osd || gl_use_osd_opengl2) ? dvr2 : video_dim;
     return QRect(QPoint(0,0), sz);
 }
 
@@ -348,7 +406,7 @@ int VideoOutputXv::GetRefreshRate(void)
  */
 void VideoOutputXv::ResizeForVideo(uint width, uint height)
 {
-    if (width == 1920 && height == 1088)
+    if ((width == 1920 || width == 1440) && height == 1088)
         height = 1080; // ATSC 1920x1080
 
     if (display_res && display_res->SwitchToVideo(width, height))
@@ -666,7 +724,7 @@ int VideoOutputXv::GrabSuitableXvPort(Display* disp, Window root,
 void VideoOutputXv::CreatePauseFrame(VOSType subtype)
 {
     // All methods but XvMC use a pause frame, create it if needed
-    if (subtype <= XVideo)
+    if ((subtype <= XVideo) || (subtype == OpenGL))
     {
         vbuffers.LockFrame(&av_pause_frame, "CreatePauseFrame");
 
@@ -692,7 +750,7 @@ void VideoOutputXv::CreatePauseFrame(VOSType subtype)
 }
 
 /**
- * \fn VideoOutputXv::InitVideoBuffers(MythCodecID,bool,bool)
+ * \fn VideoOutputXv::InitVideoBuffers(MythCodecID,bool,bool,bool)
  * Creates and initializes video buffers.
  *
  * \sideeffect sets video_output_subtype if it succeeds.
@@ -703,7 +761,8 @@ void VideoOutputXv::CreatePauseFrame(VOSType subtype)
  * \return success or failure at creating any buffers.
  */
 bool VideoOutputXv::InitVideoBuffers(MythCodecID mcodecid,
-                                     bool use_xv, bool use_shm)
+                                     bool use_xv, bool use_shm,
+                                     bool use_opengl)
 {
     (void)mcodecid;
 
@@ -715,9 +774,6 @@ bool VideoOutputXv::InitVideoBuffers(MythCodecID mcodecid,
         // Create ffmpeg VideoFrames
         bool vld, idct, mc;
         myth2av_codecid(myth_codec_id, vld, idct, mc);
-
-        if (vld)
-            xvmc_buf_attr->SetNumSurf(16);
 
         vbuffers.Init(xvmc_buf_attr->GetNumSurf(),
                       false /* create an extra frame for pause? */,
@@ -739,6 +795,9 @@ bool VideoOutputXv::InitVideoBuffers(MythCodecID mcodecid,
     if (!done)
         vbuffers.Init(31, true, 1, 12, 4, 2, false);
 
+    if (!done && use_opengl)
+        done = InitOpenGL();
+
     // Fall back to XVideo if there is an xv_port
     if (!done && use_xv)
         done = InitXVideo();
@@ -751,7 +810,98 @@ bool VideoOutputXv::InitVideoBuffers(MythCodecID mcodecid,
     if (!done)
         done = InitXlib();
 
+    QString tmp = vr_str[VideoOutputSubType()];
+    QString rend = db_vdisp_profile->GetVideoRenderer();
+    if ((tmp == "xvmc") && (rend.left(4) == "xvmc"))
+        tmp = rend;
+    db_vdisp_profile->SetVideoRenderer(tmp);
+
     return done;
+}
+
+bool VideoOutputXv::InitOpenGL(void)
+{
+    bool ok = false;
+
+#ifdef USING_OPENGL_VIDEO
+    ok = gl_context;
+    if (!ok)
+    {
+        gl_context = new OpenGLContext();
+
+        ok = gl_context->Create(
+            XJ_disp, XJ_win, XJ_screen_num,
+            display_visible_rect.size(), true);
+    }
+
+    if (ok)
+    {
+        gl_context->Show();
+        gl_context->MakeCurrent(true);
+        gl_videochain = new OpenGLVideo();
+        ok = gl_videochain->Init(gl_context, use_picture_controls,
+                                 true, video_dim,
+                                 display_visible_rect,
+                                 display_video_rect, true);
+        gl_context->MakeCurrent(false);
+    }
+
+    if (ok)
+    {
+        InstallXErrorHandler(XJ_disp);
+
+        ok = CreateBuffers(OpenGL);
+
+        vector<XErrorEvent> errs = UninstallXErrorHandler(XJ_disp);
+        if (!ok || errs.size())
+        {
+            VERBOSE(VB_IMPORTANT, LOC_ERR +
+                    "Failed to allocate video buffers.");
+
+            PrintXErrors(XJ_disp, errs);
+            DeleteBuffers(OpenGL, false);
+            ok = false;
+        }
+        else
+        {
+            video_output_subtype = OpenGL;
+            allowpreviewepg = false;
+
+            // ensure deinterlacing is re-enabled after input change
+            bool temp_deinterlacing = m_deinterlacing;
+
+            if (!m_deintfiltername.isEmpty() &&
+                !m_deintfiltername.contains("opengl"))
+            {
+                gl_videochain->SetSoftwareDeinterlacer(m_deintfiltername);
+            }
+
+            SetDeinterlacingEnabled(true);
+
+            if (!temp_deinterlacing)
+            {
+                SetDeinterlacingEnabled(false);
+            }
+        }
+    }
+
+    if (!ok)
+    {
+        if (gl_videochain)
+        {
+            delete gl_videochain;
+            gl_videochain = NULL;
+        }
+
+        if (gl_context)
+        {
+            delete gl_context;
+            gl_context = NULL;
+        }
+    }
+#endif // USING_OPENGL_VIDEO
+
+    return ok;
 }
 
 /**
@@ -877,7 +1027,7 @@ bool VideoOutputXv::InitXVideo()
                 .arg(i).arg(chr[0]).arg(chr[1]).arg(chr[2]).arg(chr[3]));
     }
 
-    if (brokenI420Hack) 
+    if (use_i420_hack_for_broken_driver) 
         swap(ids[0], ids[2]);
 
     for (uint i = 0; i < sizeof(ids)/sizeof(int); i++)
@@ -1016,23 +1166,29 @@ MythCodecID VideoOutputXv::GetBestSupportedCodec(
     if (force_xv)
         return (MythCodecID)(kCodec_MPEG1 + (stream_type-1));
 #ifdef USING_XVMC
+    VideoDisplayProfile vdp;
+    vdp.SetInput(QSize(width, height));
+    QString dec = vdp.GetDecoder();
+    if ((dec == "libmpeg2") || (dec == "ffmpeg"))
+        return (MythCodecID)(kCodec_MPEG1 + (stream_type-1));
+
     Display *disp = MythXOpenDisplay();
 
     // Disable features based on environment and DB values.
     bool use_xvmc_vld = false, use_xvmc_idct = false, use_xvmc = false;
-    bool use_xv = true, use_shm = true;
+    bool use_xv = true, use_shm = true, use_opengl = true;
 
-    QString dec = gContext->GetSetting("PreferredMPEG2Decoder", "ffmpeg");
-    if (dec != "libmpeg2" && height < 720 &&
-        gContext->GetNumSetting("UseXvMCForHDOnly", 0))
-        dec = "ffmpeg";
     if (dec == "xvmc")
         use_xvmc_idct = use_xvmc = true;
     else if (dec == "xvmc-vld")
         use_xvmc_vld = use_xvmc = true;
 
-    SetFromEnv(use_xvmc_vld, use_xvmc_idct, use_xvmc, use_xv, use_shm);
-    SetFromHW(disp, use_xvmc, use_xv, use_shm);
+    SetFromEnv(use_xvmc_vld, use_xvmc_idct, use_xvmc, use_xv,
+               use_shm, use_opengl);
+
+    // Disable features based on hardware capabilities.
+    bool use_xvmc_opengl = use_xvmc;
+    SetFromHW(disp, use_xvmc, use_xv, use_shm, use_xvmc_opengl, use_opengl);
 
     MythCodecID ret = (MythCodecID)(kCodec_MPEG1 + (stream_type-1));
     if (use_xvmc_vld &&
@@ -1104,34 +1260,14 @@ MythCodecID VideoOutputXv::GetBestSupportedCodec(
 #endif // !USING_XVMC
 }
 
-#define XV_INIT_FATAL_ERROR_TEST(test,msg) \
-do { \
-    if (test) \
-    { \
-        VERBOSE(VB_IMPORTANT, LOC_ERR + msg << " Exiting playback."); \
-        errored = true; \
-        return false; \
-    } \
-} while (false)
-
-bool VideoOutputXv::InitSetupBuffers(void)
+bool VideoOutputXv::InitOSD(const QString &osd_renderer)
 {
-   // Set use variables...
-    bool vld, idct, mc, xv, shm;
-    myth2av_codecid(myth_codec_id, vld, idct, mc);
-    xv = shm = !vld && !idct;
-    SetFromEnv(vld, idct, mc, xv, shm);
-    SetFromHW(XJ_disp, mc, xv, shm);
-    bool use_chroma_key_osd = gContext->GetNumSettingOnHost(
-        "UseChromaKeyOSD", gContext->GetHostName(), 0);
-    use_chroma_key_osd &= (xv || vld || idct || mc);
-
-    // Are we using XvMC?
-    QString dec = gContext->GetSetting("PreferredMPEG2Decoder", "ffmpeg");
-    if (dec == "xvmc" || dec == "xvmc-vld")
+    if (osd_renderer == "opengl")
     {
-        xvmc_tex = XvMCTextures::Create(XJ_disp, XJ_curwin, XJ_screen_num,
-                                        video_dim, display_visible_rect.size());
+        xvmc_tex = XvMCTextures::Create(
+            XJ_disp, XJ_curwin, XJ_screen_num,
+            video_dim, GetTotalOSDBounds().size());
+
         if (xvmc_tex)
         {
             VERBOSE(VB_IMPORTANT, LOC + "XvMCTex: Init succeeded");
@@ -1141,41 +1277,78 @@ bool VideoOutputXv::InitSetupBuffers(void)
         {
             VERBOSE(VB_IMPORTANT, LOC + "XvMCTex: Init failed");
         }
+
+        return xvmc_tex;
     }
 
-    // create chroma key osd structure if needed
-    if (!xvmc_tex && use_chroma_key_osd &&
-        ((32 == XJ_depth) || (24 == XJ_depth)))
+    if (osd_renderer == "opengl2")
     {
-        chroma_osd = new ChromaKeyOSD(this);
-#ifdef USING_XVMC
-        xvmc_buf_attr->SetOSDNum(0); // disable XvMC blending OSD
-#endif // USING_XVMC
+        gl_use_osd_opengl2 = true;
+
+        gl_context->MakeCurrent(true);
+
+        gl_osdchain = new OpenGLVideo();
+        if (!gl_osdchain->Init(
+                gl_context, false, true,
+                GetTotalOSDBounds().size(),
+                GetTotalOSDBounds(), display_visible_rect, false, true))
+        {
+            VERBOSE(VB_PLAYBACK, LOC_ERR + 
+                    "InitOSD(): Failed to create OpenGL2 OSD");
+            delete gl_osdchain;
+            gl_osdchain = NULL;
+            gl_use_osd_opengl2 = false;
+        }
+        else if (gl_videochain)
+        {
+            gl_osdchain->SetMasterViewport(gl_videochain->GetViewPort());
+        }
+
+        gl_context->MakeCurrent(false);
     }
-    else if (use_chroma_key_osd)
+
+    if (osd_renderer == "chromakey")
     {
-        VERBOSE(VB_IMPORTANT, LOC + QString(
-                    "Number of bits per pixel is %1, \n\t\t\t"
-                    "but we only support ARGB 32 bbp for ChromaKeyOSD.")
-                .arg(XJ_depth));
+        // TODO Make sure that we are using chroma-keying
+        //      before allowing chromakey OSD rendering.
+
+        // create chroma key osd structure if needed
+        if ((32 == XJ_depth) || (24 == XJ_depth))
+        {
+            chroma_osd = new ChromaKeyOSD(this);
+            xvmc_buf_attr->SetOSDNum(0); // disable XvMC blending OSD
+        }
+        else
+        {
+            VERBOSE(VB_IMPORTANT, LOC + QString(
+                        "Number of bits per pixel is %1, \n\t\t\t"
+                        "but we only support ARGB 32 bbp for ChromaKeyOSD.")
+                    .arg(XJ_depth));
+        }
+        return chroma_osd;
     }
 
-    // Create video buffers
-    bool ok = InitVideoBuffers(myth_codec_id, xv, shm);
-    XV_INIT_FATAL_ERROR_TEST(!ok, "Failed to get any video output");
+    // Other OSD's don't require initialization here...
+    return true;
+}
 
-    if (!xvmc_tex && video_output_subtype >= XVideo)
-        InitColorKey(true);
-
+bool VideoOutputXv::CheckOSDInit(void)
+{
     // Deal with the nVidia 6xxx & 7xxx cards which do
     // not support chromakeying with the latest drivers
-    if (!xv_colorkey && chroma_osd)
-    {
-        VERBOSE(VB_IMPORTANT, LOC + "Ack! Disabling ChromaKey OSD"
-                "\n\t\t\tWe can't use ChromaKey OSD "
-                "if chromakeying is not supported!");
+    if (xv_colorkey || !chroma_osd)
+        return true;
 
-#ifdef USING_XVMC
+    VERBOSE(VB_IMPORTANT, LOC + "Ack! Disabling ChromaKey OSD"
+            "\n\t\t\tWe can't use ChromaKey OSD "
+            "if chromakeying is not supported!");
+
+    // Get rid of the chromakey osd..
+    delete chroma_osd;
+    chroma_osd = NULL;
+
+    if (VideoOutputSubType() >= XVideoMC)
+    {
         // Delete the buffers we allocated before
         DeleteBuffers(VideoOutputSubType(), true);
         if (xv_port >= 0)
@@ -1187,24 +1360,109 @@ bool VideoOutputXv::InitSetupBuffers(void)
             X11U;
             xv_port = -1;
         }
-#endif // USING_XVMC
 
-        // Get rid of the chromakey osd..
-        delete chroma_osd;
-        chroma_osd = NULL;
-
-#ifdef USING_XVMC
-        // Recreate video buffers
         xvmc_buf_attr->SetOSDNum(1);
-        ok = InitVideoBuffers(myth_codec_id, xv, shm);
-        XV_INIT_FATAL_ERROR_TEST(!ok, "Failed to get any video output (nCK)");
-#endif // USING_XVMC
+        return false;
     }
 
+    return true;
+}
+
+#define XV_INIT_FATAL_ERROR_TEST(test,msg) \
+do { \
+    if (test) \
+    { \
+        VERBOSE(VB_IMPORTANT, LOC_ERR + msg << " Exiting playback."); \
+        errored = true; \
+        return false; \
+    } \
+} while (false)
+
+static QString toCommaList(const QStringList &list)
+{
+    QString ret = "";
+    for (QStringList::const_iterator it = list.begin(); it != list.end(); ++it)
+        ret += *it + ",";
+
+    if (ret.length())
+        return ret.left(ret.length()-1);
+
+    return "";
+}
+
+bool VideoOutputXv::InitSetupBuffers(void)
+{
+    // Figure out what video renderer to use
+    db_vdisp_profile->SetInput(video_dim);
+    QStringList renderers = allowed_video_renderers(myth_codec_id, XJ_disp);
+    QString     renderer  = QString::null;
+
+    QString tmp = db_vdisp_profile->GetVideoRenderer();
+    VERBOSE(VB_PLAYBACK, LOC + "InitSetupBuffers() "
+            <<QString("render: %1, allowed: %2")
+            .arg(tmp).arg(toCommaList(renderers)));
+
+    if (renderers.contains(tmp))
+        renderer = tmp;
+    else if (renderers.empty())
+        XV_INIT_FATAL_ERROR_TEST(false, "Failed to find a video renderer");
+    else
+    {
+        QString tmp;
+        QStringList::const_iterator it = renderers.begin();
+        for (; it != renderers.end(); ++it)
+            tmp += *it + ",";
+
+        renderer = renderers[0];
+        VERBOSE(VB_IMPORTANT, LOC + QString(
+                    "Desired video renderer '%1' not available.\n\t\t\t"
+                    "codec '%2' makes '%3' available, using '%4' instead.")
+                .arg(db_vdisp_profile->GetVideoRenderer())
+                .arg(toString(myth_codec_id)).arg(tmp).arg(renderer));
+        db_vdisp_profile->SetVideoRenderer(renderer);
+    }
+
+    // Create video buffers
+    bool use_xv     = (renderer.left(2) == "xv");
+    bool use_shm    = (renderer == "xshm");
+    bool use_opengl = (renderer == "opengl");
+    bool ok = InitVideoBuffers(myth_codec_id, use_xv, use_shm, use_opengl);
+    if (!ok)
+    {
+        use_xv     = renderers.contains("xv-blit");
+        use_shm    = renderers.contains("xshm");
+        use_opengl = renderers.contains("opengl");
+        ok = InitVideoBuffers(myth_codec_id, use_xv, use_shm, use_opengl);
+    }
+    XV_INIT_FATAL_ERROR_TEST(!ok, "Failed to get any video output");
+
+    QString osdrenderer = db_vdisp_profile->GetOSDRenderer();
+
+    // Initialize the OSD, if we need to
+    InitOSD(osdrenderer);
+
+    // Initialize chromakeying, if we need to
+    if (!xvmc_tex && video_output_subtype >= XVideo)
+        InitColorKey(true);
+
+    // Check if we can actually use the OSD we want to use...
+    if (!CheckOSDInit())
+    {
+        ok = InitVideoBuffers(myth_codec_id, use_xv, use_shm, use_opengl);
+        XV_INIT_FATAL_ERROR_TEST(!ok, "Failed to get any video output (nCK)");
+    }
+
+    // The OpenGL video output method always allows picture controls.
     // The XVideo output methods sometimes allow the picture to
     // be adjusted, if the chroma keying color can be discovered.
-    if (VideoOutputSubType() >= XVideo && xv_colorkey &&
-        gContext->GetNumSetting("UseOutputPictureControls", 0))
+    use_picture_controls =
+        gContext->GetNumSetting("UseOutputPictureControls", 0);
+
+    use_picture_controls &= 
+        (VideoOutputSubType() >= XVideo && xv_colorkey) ||
+        (VideoOutputSubType() == OpenGL);
+
+    if (use_picture_controls)
         InitPictureAttributes();
 
     return true;
@@ -1342,6 +1600,9 @@ void VideoOutputXv::InitColorKey(bool turnoffautopaint)
 // documented in videooutbase.cpp
 bool VideoOutputXv::SetDeinterlacingEnabled(bool enable)
 {
+    if (VideoOutputSubType() == OpenGL)
+        return SetDeinterlacingEnabledOpenGL(enable);
+
     bool deint = VideoOutput::SetDeinterlacingEnabled(enable);
     xv_need_bobdeint_repaint = (m_deintfiltername == "bobdeint");
     return deint;
@@ -1350,10 +1611,113 @@ bool VideoOutputXv::SetDeinterlacingEnabled(bool enable)
 bool VideoOutputXv::SetupDeinterlace(bool interlaced,
                                      const QString& overridefilter)
 {
-    QString f = (VideoOutputSubType() > XVideo) ? "bobdeint" : overridefilter;
-    bool deint = VideoOutput::SetupDeinterlace(interlaced, f);
+    if (VideoOutputSubType() == OpenGL)
+        return SetupDeinterlaceOpenGL(interlaced, overridefilter);
+
+    bool deint = VideoOutput::SetupDeinterlace(interlaced, overridefilter);
     needrepaint = true;
     return deint;
+}
+
+bool VideoOutputXv::SetDeinterlacingEnabledOpenGL(bool enable)
+{
+    (void) enable;
+
+    if (!gl_videochain)
+        return false;
+
+    if (enable && m_deinterlacing && (OpenGL != VideoOutputSubType()))
+        return m_deinterlacing;
+
+    if (enable)
+    {
+        if (m_deintfiltername == "")
+            return SetupDeinterlace(enable);
+        if (m_deintfiltername.contains("opengl"))
+        {
+            if (gl_videochain->GetDeinterlacer() == "")
+                return SetupDeinterlace(enable);
+        }
+        else if (!m_deintfiltername.contains("opengl"))
+        {
+            // make sure opengl deinterlacing is disabled
+            X11S(gl_videochain->SetDeinterlacing(false));
+            if (!m_deintFiltMan || !m_deintFilter)
+                return VideoOutput::SetupDeinterlace(enable);
+        }
+    }
+
+    if (gl_videochain)
+        gl_videochain->SetDeinterlacing(enable);
+
+    m_deinterlacing = enable;
+
+    return m_deinterlacing;
+}
+
+bool VideoOutputXv::SetupDeinterlaceOpenGL(
+    bool interlaced, const QString &overridefilter)
+{
+    (void) interlaced;
+    (void) overridefilter;
+
+    m_deintfiltername = db_vdisp_profile->GetFilteredDeint(overridefilter);
+
+    if (!m_deintfiltername.contains("opengl"))
+    {
+        gl_videochain->SetDeinterlacing(false);
+        gl_videochain->SetSoftwareDeinterlacer(QString::null);
+
+        VideoOutput::SetupDeinterlace(interlaced, overridefilter);
+        if (m_deinterlacing)
+            gl_videochain->SetSoftwareDeinterlacer(m_deintfiltername);
+
+        return m_deinterlacing;
+    }
+
+    // clear any non opengl filters
+    if (m_deintFiltMan)
+    {
+        delete m_deintFiltMan;
+        m_deintFiltMan = NULL;
+    }
+    if (m_deintFilter)
+    {
+        delete m_deintFilter;
+        m_deintFilter = NULL;
+    }
+
+    if (m_deinterlacing == interlaced && (OpenGL != VideoOutputSubType()))
+        return m_deinterlacing;
+    m_deinterlacing = interlaced;
+
+    if (!gl_videochain)
+        return false;
+
+    if (m_deinterlacing && !m_deintfiltername.isEmpty()) 
+    {
+        if (gl_videochain->GetDeinterlacer() != m_deintfiltername)
+        {
+            if (!gl_videochain->AddDeinterlacer(m_deintfiltername))
+            {
+                VERBOSE(VB_IMPORTANT, LOC +
+                        QString("Couldn't load deinterlace filter %1")
+                        .arg(m_deintfiltername));
+                m_deinterlacing = false;
+                m_deintfiltername = "";
+            }
+            else
+            {
+                VERBOSE(VB_PLAYBACK, LOC +
+                        QString("Using deinterlace method %1")
+                   .arg(m_deintfiltername));
+            }
+        }
+    }
+
+    gl_videochain->SetDeinterlacing(m_deinterlacing);
+
+    return m_deinterlacing;
 }
 
 /**
@@ -1676,8 +2040,10 @@ bool VideoOutputXv::CreateBuffers(VOSType subtype)
     {
         vector<unsigned char*> bufs =
             CreateShmImages(vbuffers.allocSize(), true);
-        ok = vbuffers.CreateBuffers(
-            video_dim.width(), video_dim.height(), bufs, XJ_yuv_infos);
+
+        ok = (bufs.size() >= vbuffers.allocSize()) &&
+            vbuffers.CreateBuffers(video_dim.width(), video_dim.height(),
+                                   bufs, XJ_yuv_infos);
 
         X11S(XSync(XJ_disp, False));
     }
@@ -1740,7 +2106,11 @@ bool VideoOutputXv::CreateBuffers(VOSType subtype)
         }
         else
             ok = vbuffers.CreateBuffers(video_dim.width(), video_dim.height());
-
+    }
+    else if (subtype == OpenGL)
+    {
+        QSize size = gl_videochain->GetVideoSize();
+        ok = vbuffers.CreateBuffers(size.width(), size.height());
     }
 
     if (ok)
@@ -1792,6 +2162,32 @@ void VideoOutputXv::DeleteBuffers(VOSType subtype, bool delete_pause_frame)
         xvmc_tex = NULL;
     }
 #endif // USING_XVMC
+
+    // OpenGL stuff
+    if (gl_videochain)
+    {
+        delete gl_videochain;
+        gl_videochain = NULL;
+    }
+    if (gl_pipchain)
+    {
+        delete gl_pipchain;
+        gl_pipchain = NULL;
+    }
+    if (gl_osdchain)
+    {
+        delete gl_osdchain;
+        gl_osdchain = NULL;
+    }
+#ifdef USING_OPENGL
+    if (gl_context)
+        gl_context->Hide();
+#endif
+    gl_use_osd_opengl2 = false;
+    gl_pip_ready = false;
+    gl_osd_ready = false;
+    allowpreviewepg = true;
+    // end OpenGL stuff
 
     vbuffers.DeleteBuffers();
 
@@ -2137,6 +2533,35 @@ void VideoOutputXv::PrepareFrameXv(VideoFrame *frame)
         vbuffers.SetLastShownFrameToScratch();
 }
 
+void VideoOutputXv::PrepareFrameOpenGL(VideoFrame *buffer, FrameScanType t)
+{
+    (void) t;
+
+    if (!buffer)
+        buffer = vbuffers.GetScratchFrame();
+
+    framesPlayed = buffer->frameNumber + 1;
+
+    // TODO should cope with YUV422P, rgb24, argb32 etc
+    if (buffer->codec != FMT_YV12)
+        return;
+
+    gl_context->MakeCurrent(true);
+    gl_videochain->PrepareFrame(t, m_deinterlacing, framesPlayed);
+
+    if (gl_pip_ready && gl_pipchain)
+        gl_pipchain->PrepareFrame(t, m_deinterlacing, framesPlayed);
+
+    if (gl_osd_ready && gl_osdchain)
+        gl_osdchain->PrepareFrame(t, m_deinterlacing, framesPlayed);
+
+    gl_context->Flush();
+    gl_context->MakeCurrent(false);
+
+    if (vbuffers.GetScratchFrame() == buffer)
+        vbuffers.SetLastShownFrameToScratch();
+}
+
 /**
  * \fn VideoOutputXv::PrepareFrameMem(VideoFrame*, FrameScanType)
  *
@@ -2254,6 +2679,8 @@ void VideoOutputXv::PrepareFrame(VideoFrame *buffer, FrameScanType scan)
         PrepareFrameXvMC(buffer, scan);
     else if (VideoOutputSubType() == XVideo)
         PrepareFrameXv(buffer);
+    else if (VideoOutputSubType() == OpenGL)
+        PrepareFrameOpenGL(buffer, scan);
     else
         PrepareFrameMem(buffer, scan);
 }
@@ -2269,6 +2696,10 @@ static void calc_bob(FrameScanType scan, int imgh, int disphoff,
     src_y = imgy;
     dest_y = dispyoff;
     xv_src_y_incr = 0;
+
+    if ((kScan_Interlaced != scan) && (kScan_Intr2ndField != scan))
+        return;
+
     // a negative offset y gives us bobbing, so adjust...
     if (dispyoff < 0)
     {
@@ -2342,7 +2773,7 @@ void VideoOutputXv::ShowXvMC(FrameScanType scan)
 
     if (xvmc_tex)
     {
-        xvmc_tex->Show();
+        xvmc_tex->Show(scan);
 
         // clear any displayed frames not on screen
         CheckFrameStates();
@@ -2493,12 +2924,92 @@ void VideoOutputXv::Show(FrameScanType scan)
         ShowXvMC(scan);
     else if (VideoOutputSubType() == XVideo)
         ShowXVideo(scan);
+    else if (VideoOutputSubType() == OpenGL)
+        gl_context->SwapBuffers();
 
     X11S(XSync(XJ_disp, False));
 }
 
+void VideoOutputXv::ShowPip(VideoFrame *frame, NuppelVideoPlayer *pipplayer)
+{
+    if (VideoOutputSubType() != OpenGL)
+    {
+        VideoOutput::ShowPip(frame, pipplayer);
+        return;
+    }
+
+    (void) frame;
+
+    gl_pip_ready = false;
+
+    if (!pipplayer)
+        return;
+
+    int pipw, piph;
+    VideoFrame *pipimage = pipplayer->GetCurrentFrame(pipw, piph);
+    float pipVideoAspect = pipplayer->GetVideoAspect();
+    uint  pipVideoWidth  = pipplayer->GetVideoWidth();
+    uint  pipVideoHeight = pipplayer->GetVideoHeight();
+
+    // If PiP is not initialized to values we like, silently ignore the frame.
+    if ((pipVideoAspect <= 0) || !pipimage || 
+        !pipimage->buf || pipimage->codec != FMT_YV12)
+    {
+        pipplayer->ReleaseCurrentFrame(pipimage);
+        return;
+    }
+
+    QRect position = GetPIPRect(db_pip_location, pipplayer);
+
+    if (!gl_pipchain)
+    {
+        VERBOSE(VB_PLAYBACK, LOC + "Initialise PiP.");
+        gl_pipchain = new OpenGLVideo();
+        bool success = gl_pipchain->Init(gl_context, use_picture_controls,
+                     true, QSize(pipVideoWidth, pipVideoHeight),
+                     position,
+                     position, false);
+        success &= gl_pipchain->AddDeinterlacer("openglonefield");
+        gl_pipchain->SetMasterViewport(gl_videochain->GetViewPort());
+        if (!success)
+        {
+            pipplayer->ReleaseCurrentFrame(pipimage);
+            return;
+        }
+    }
+
+    QSize current = gl_pipchain->GetVideoSize();
+    if ((uint)current.width()  != pipVideoWidth ||
+        (uint)current.height() != pipVideoHeight)
+    {
+        VERBOSE(VB_PLAYBACK, LOC + "Re-initialise PiP.");
+
+        bool success = gl_pipchain->ReInit(
+            gl_context, use_picture_controls,
+            true, QSize(pipVideoWidth, pipVideoHeight),
+            position, position, false);
+
+        gl_pipchain->SetMasterViewport(gl_videochain->GetViewPort());
+        if (!success)
+        {
+            pipplayer->ReleaseCurrentFrame(pipimage);
+            return;
+        }
+
+    }
+    gl_pipchain->SetVideoRect(position);
+    gl_pipchain->UpdateInputFrame(pipimage);
+
+    gl_pip_ready = true;
+
+    pipplayer->ReleaseCurrentFrame(pipimage);
+}
+
 void VideoOutputXv::DrawUnusedRects(bool sync)
 {
+    if (VideoOutputSubType() == OpenGL)
+        return;
+
     // boboff assumes the smallest interlaced resolution is 480 lines - 5%
     bool use_bob   = (m_deinterlacing && m_deintfiltername == "bobdeint");
     int boboff_raw = (int)round(((double)display_video_rect.height()) /
@@ -2719,7 +3230,10 @@ void VideoOutputXv::UpdatePauseFrame(void)
 {
     QMutexLocker locker(&global_lock);
 
-    if (VideoOutputSubType() <= XVideo || xvmc_tex)
+    VERBOSE(VB_PLAYBACK, LOC + "UpdatePauseFrame() " + vbuffers.GetStatus());
+
+    if ((VideoOutputSubType() <= XVideo) ||
+        (VideoOutputSubType() == OpenGL) || xvmc_tex)
     {
         // Try used frame first, then fall back to scratch frame.
         vbuffers.LockFrame(&av_pause_frame, "UpdatePauseFrame -- pause");
@@ -3003,6 +3517,52 @@ void VideoOutputXv::ReturnAvailableOSD(XvMCOSD *avail)
 }
 #endif // USING_XVMC
 
+void VideoOutputXv::ProcessFrameOpenGL(VideoFrame *frame, OSD *osd,
+                                       FilterChain *filterList,
+                                       NuppelVideoPlayer *pipPlayer)
+{
+    (void) osd;
+    (void) filterList;
+    (void) pipPlayer;
+
+    bool pauseframe = false;
+    if (!frame)
+    {
+        frame = vbuffers.GetScratchFrame();
+        CopyFrame(vbuffers.GetScratchFrame(), &av_pause_frame);
+        pauseframe = true;
+    }
+
+    // disable image processing for offscreen rendering
+    gl_context->MakeCurrent(true);
+
+    if (filterList)
+        filterList->ProcessFrame(frame);
+
+    if (m_deinterlacing && m_deintFilter != NULL &&
+        m_deinterlaceBeforeOSD &&
+        !pauseframe)
+    {
+        m_deintFilter->ProcessFrame(frame);
+    }
+
+    ShowPip(frame, pipPlayer);
+
+    DisplayOSD(frame, osd);
+
+    if (m_deinterlacing && m_deintFilter != NULL &&
+        !m_deinterlaceBeforeOSD &&
+        !pauseframe)
+    {
+        m_deintFilter->ProcessFrame(frame);
+    }
+
+    if (gl_videochain)
+        gl_videochain->UpdateInputFrame(frame);
+
+    gl_context->MakeCurrent(false);
+}
+
 void VideoOutputXv::ProcessFrameMem(VideoFrame *frame, OSD *osd,
                                     FilterChain *filterList,
                                     NuppelVideoPlayer *pipPlayer)
@@ -3062,7 +3622,9 @@ void VideoOutputXv::ProcessFrame(VideoFrame *frame, OSD *osd,
         return;
     }
 
-    if (VideoOutputSubType() <= XVideo)
+    if (VideoOutputSubType() == OpenGL)
+        ProcessFrameOpenGL(frame, osd, filterList, pipPlayer);
+    else if (VideoOutputSubType() <= XVideo)
         ProcessFrameMem(frame, osd, filterList, pipPlayer);
     else
         ProcessFrameXvMC(frame, osd);
@@ -3071,6 +3633,21 @@ void VideoOutputXv::ProcessFrame(VideoFrame *frame, OSD *osd,
 // this is documented in videooutbase.cpp
 int VideoOutputXv::SetPictureAttribute(int attribute, int newValue)
 {
+    if (!use_picture_controls)
+        return -1;
+
+    if (VideoOutputSubType() == OpenGL)
+    {
+        if (kPictureAttribute_Hue == attribute)
+            return -1;
+
+        gl_videochain->SetPictureAttribute(attribute, newValue);
+
+        SetPictureAttributeDBValue(attribute, newValue);
+
+        return newValue;
+    }
+
     QString  attrName = QString::null;
     int      valAdj   = 0;
 
@@ -3325,8 +3902,149 @@ void VideoOutputXv::FlushSurface(VideoFrame* frame)
 #endif // USING_XVMC
 }
 
+QRect VideoOutputXv::GetPIPRect(int location, NuppelVideoPlayer *pipplayer)
+{
+    if (!pipplayer)
+        return VideoOutput::GetPIPRect(location, pipplayer);
+    
+    QRect position;
+    float pipVideoAspect = 1.3333f;
+    // set height
+    int tmph = (video_dim.height() * db_pip_size) / 100;
+    // adjust for letterbox modes...
+    int letterXadj = 0;
+    int letterYadj = 0;
+    float letterAdj = 1.0f;
+    if (letterbox != kLetterbox_Off)
+    {
+        letterXadj = max(-display_video_rect.left(), 0);
+        float xadj = (float)video_rect.width() / display_visible_rect.width();
+        letterXadj = (int)(letterXadj * xadj);
+        float yadj = (float)video_rect.height() / display_visible_rect.height();
+        letterYadj = max(-display_video_rect.top(), 0);
+        letterYadj = (int)(letterYadj * yadj);
+        letterAdj  = video_aspect / letterboxed_video_aspect;
+    }
+    int tmpw = (int)(tmph * (pipVideoAspect / video_aspect) * letterAdj);
+    position.setWidth((tmpw >> 1) << 1);
+    position.setHeight((tmph >> 1) << 1);
+
+    int xoff = (int)(display_visible_rect.width()  * 0.06);
+    int yoff = (int)(display_visible_rect.height() * 0.06);
+    xoff = (xoff >> 1) << 1;
+    yoff = (yoff >> 1) << 1;
+
+    switch (location)
+    {
+        default:
+        case kPIPTopLeft:
+            xoff += letterXadj;
+            yoff += letterYadj;
+            break;
+        case kPIPBottomLeft:
+            xoff += letterXadj;
+            yoff = video_dim.height() - position.height() - 
+                yoff - letterYadj;
+            break;
+        case kPIPTopRight:
+            xoff = video_dim.width() - position.width() -
+                    xoff - letterXadj;
+            yoff = yoff + letterYadj;
+            break;
+        case kPIPBottomRight:
+            xoff = video_dim.width() - position.width() -
+                    xoff - letterXadj;
+            yoff = video_dim.height() - position.height() -
+                   yoff - letterYadj;
+            break;
+    }
+
+    position.moveBy(xoff, yoff);
+    return position;
+}
+
+void VideoOutputXv::ShutdownVideoResize(void)
+{
+    if (VideoOutputSubType() != OpenGL)
+    {
+        VideoOutput::ShutdownVideoResize();
+        return;
+    }
+
+    if (!gl_osdchain)
+    {
+        VideoOutput::ShutdownVideoResize();
+        return;
+    }
+
+    if (gl_videochain)
+        gl_videochain->DisableVideoResize();
+
+    vsz_enabled = false;
+}
+
+int VideoOutputXv::DisplayOSD(VideoFrame *frame, OSD *osd,
+                              int stride, int revision)
+{
+    if (!gl_use_osd_opengl2)
+        return VideoOutput::DisplayOSD(frame, osd, stride, revision);
+
+    gl_osd_ready = false;
+
+    if (!osd || !gl_osdchain)
+        return -1;
+
+    if (vsz_enabled && gl_videochain)
+        gl_videochain->SetVideoResize(vsz_desired_display_rect);
+
+    OSDSurface *surface = osd->Display();
+    if (!surface)
+        return -1;
+
+    gl_osd_ready = true;
+
+    bool changed = (-1 == revision) ?
+        surface->Changed() : (surface->GetRevision()!=revision);
+
+    if (changed)
+    {
+        QSize visible = GetTotalOSDBounds().size();
+
+        int offsets[3] =
+        {
+            surface->y - surface->yuvbuffer,
+            surface->u - surface->yuvbuffer,
+            surface->v - surface->yuvbuffer,
+        };
+        gl_osdchain->UpdateInput(surface->yuvbuffer, offsets,
+                                 0, FMT_YV12, visible);
+        gl_osdchain->UpdateInput(surface->alpha, offsets,
+                                 3, FMT_ALPHA, visible);
+    }
+    return changed;
+}
+
+QStringList VideoOutputXv::GetAllowedRenderers(
+    MythCodecID myth_codec_id, const QSize &video_dim)
+{
+    (void) video_dim;
+
+    QStringList list;
+
+    Display *disp = MythXOpenDisplay();
+
+    if (!disp)
+        return list;
+
+    list = allowed_video_renderers(myth_codec_id, disp);
+
+    XCloseDisplay(disp);
+
+    return list;
+}
+
 static void SetFromEnv(bool &useXvVLD, bool &useXvIDCT, bool &useXvMC,
-                       bool &useXVideo, bool &useShm)
+                       bool &useXVideo, bool &useShm, bool &useOpenGL)
 {
     // can be used to force non-Xv mode as well as non-Xv/non-Shm mode
     if (getenv("NO_XVMC_VLD"))
@@ -3339,9 +4057,14 @@ static void SetFromEnv(bool &useXvVLD, bool &useXvIDCT, bool &useXvMC,
         useXvVLD = useXvIDCT = useXvMC = useXVideo = false;
     if (getenv("NO_SHM"))
         useXVideo = useShm = false;
+    if (getenv("NO_OPENGL"))
+        useOpenGL = false;
 }
 
-static void SetFromHW(Display *d, bool &useXvMC, bool &useXVideo, bool &useShm)
+static void SetFromHW(Display *d,
+                      bool &useXvMC, bool &useXVideo,
+                      bool &useShm,  bool &useXvMCOpenGL,
+                      bool &useOpenGL)
 {
     // find out about XvMC support
     if (useXvMC)
@@ -3388,95 +4111,63 @@ static void SetFromHW(Display *d, bool &useXvMC, bool &useXVideo, bool &useShm)
         if ((dispname) && (*dispname == ':'))
             X11S(useShm = (bool) XShmQueryExtension(d));
     }
+
+#ifdef USING_OPENGL
+    bool glx_1_3 = OpenGLContext::IsGLXSupported(d,1,3);
+#endif // USING_OPENGL
+
+    if (useXvMCOpenGL)
+    {
+        useXvMCOpenGL = false;
+#ifdef USING_XVMC_OPENGL
+        useXvMCOpenGL = (useXvMC && glx_1_3);
+#endif // USING_XVMC_OPENGL
+    }
+
+    if (useOpenGL)
+    {
+        useOpenGL = false;
+#ifdef USING_OPENGL_VIDEO
+        useOpenGL = glx_1_3;
+#endif // USING_OPENGL_VIDEO
+    }
 }
 
-CodecID myth2av_codecid(MythCodecID codec_id,
-                        bool& vld, bool& idct, bool& mc)
+static QStringList allowed_video_renderers(MythCodecID myth_codec_id,
+                                           Display *XJ_disp)
 {
-    vld = idct = mc = false;
-    CodecID ret = CODEC_ID_NONE;
-    switch (codec_id)
+    bool vld, idct, mc, xv, shm, xvmc_opengl, opengl;
+
+    myth2av_codecid(myth_codec_id, vld, idct, mc);
+
+    opengl = xv = shm = !vld && !idct;
+    xvmc_opengl = vld || idct || mc;
+
+    SetFromEnv(vld, idct, mc, xv, shm, opengl);
+    SetFromHW(XJ_disp, mc, xv, shm, xvmc_opengl, opengl);
+
+    vld  &= mc;
+    idct &= mc;
+
+    QStringList list;
+    if (myth_codec_id < kCodec_NORMAL_END)
     {
-        case kCodec_NONE:
-            ret = CODEC_ID_NONE;
-            break;
-
-        case kCodec_MPEG1:
-            ret = CODEC_ID_MPEG1VIDEO;
-            break;
-        case kCodec_MPEG2:
-            ret = CODEC_ID_MPEG2VIDEO;
-            break;
-        case kCodec_H263:
-            ret = CODEC_ID_H263;
-            break;
-        case kCodec_MPEG4:
-            ret = CODEC_ID_MPEG4;
-            break;
-        case kCodec_H264:
-            ret = CODEC_ID_H264;
-            break;
-
-        case kCodec_MPEG1_XVMC:
-            mc = true;
-            ret = CODEC_ID_MPEG2VIDEO_XVMC;
-            break;
-        case kCodec_MPEG2_XVMC:
-            mc = true;
-            ret = CODEC_ID_MPEG2VIDEO_XVMC;
-            break;
-        case kCodec_H263_XVMC:
-            VERBOSE(VB_IMPORTANT, "Error: XvMC H263 not supported by ffmpeg");
-            break;
-        case kCodec_MPEG4_XVMC:
-            VERBOSE(VB_IMPORTANT, "Error: XvMC MPEG4 not supported by ffmpeg");
-            break;
-        case kCodec_H264_XVMC:
-            VERBOSE(VB_IMPORTANT, "Error: XvMC H264 not supported by ffmpeg");
-            break;
-
-        case kCodec_MPEG1_IDCT:
-            idct = mc = true;
-            ret = CODEC_ID_MPEG2VIDEO_XVMC;
-            break;
-        case kCodec_MPEG2_IDCT:
-            idct = mc = true;
-            ret = CODEC_ID_MPEG2VIDEO_XVMC;
-            break;
-        case kCodec_H263_IDCT:
-            VERBOSE(VB_IMPORTANT, "Error: XvMC-IDCT H263 not supported by ffmpeg");
-            break;
-        case kCodec_MPEG4_IDCT:
-            VERBOSE(VB_IMPORTANT, "Error: XvMC-IDCT MPEG4 not supported by ffmpeg");
-            break;
-        case kCodec_H264_IDCT:
-            VERBOSE(VB_IMPORTANT, "Error: XvMC-IDCT H264 not supported by ffmpeg");
-            break;
-
-        case kCodec_MPEG1_VLD:
-            vld = true;
-            ret = CODEC_ID_MPEG2VIDEO_XVMC_VLD;
-            break;
-        case kCodec_MPEG2_VLD:
-            vld = true;
-            ret = CODEC_ID_MPEG2VIDEO_XVMC_VLD;
-            break;
-        case kCodec_H263_VLD:
-            VERBOSE(VB_IMPORTANT, "Error: XvMC-VLD H263 not supported by ffmpeg");
-            break;
-        case kCodec_MPEG4_VLD:
-            VERBOSE(VB_IMPORTANT, "Error: XvMC-VLD MPEG4 not supported by ffmpeg");
-            break;
-        case kCodec_H264_VLD:
-            VERBOSE(VB_IMPORTANT, "Error: XvMC-VLD H264 not supported by ffmpeg");
-            break;
-        default:
-            VERBOSE(VB_IMPORTANT, QString("Error: MythCodecID %1 has not been "
-                                          "added to myth2av_codecid")
-                    .arg(codec_id));
-            break;
-    } // switch(codec_id)
-    return ret;
+        if (opengl)
+            list += "opengl";
+        if (xv)
+            list += "xv-blit";
+        if (shm)
+            list += "xshm";
+        list += "xlib";
+    }
+    else
+    {
+        if (vld || idct || mc)
+            list += "xvmc-blit";
+        if ((vld || idct || mc) && xvmc_opengl)
+            list += "xvmc-opengl";
+    }
+    return list;
 }
 
 static int calc_hue_base(const QString &adaptor_name)

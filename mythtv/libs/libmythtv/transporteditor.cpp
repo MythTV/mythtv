@@ -274,10 +274,8 @@ TransportListEditor::TransportListEditor(uint sourceid) :
     m_videosource(new VideoSourceSelector(sourceid, QString::null, false)), 
     m_list(new TransportList())
 {
-/* TODO FIXME
     setLabel(tr("Multiplex Editor"));
-    setUseLabel(true);
-*/
+
     m_list->SetSourceID(m_videosource->GetSourceID());
 
     addChild(m_videosource);
@@ -760,9 +758,7 @@ TransportWizard::TransportWizard(
     uint _mplexid, uint _sourceid, CardUtil::CARD_TYPES _cardtype) :
     mplexid(new MultiplexID())
 {
-/* TODO FIXME
     setLabel(QObject::tr("DVB Transport"));
-*/
 
     // Must be first.
     mplexid->setValue(_mplexid);

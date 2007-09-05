@@ -61,10 +61,10 @@ class IvtvDecoder : public DecoderBase
     bool GetRawVideoState(void) const { return false; }
 
     long UpdateStoredFrameNum(long frame) { (void)frame; return 0; }
-
-    QString GetEncodingType(void) const { return QString("MPEG-2"); }
-
     void UpdateFramesPlayed(void);
+
+    QString GetCodecDecoderName(void) const { return "ivtv"; }
+    MythCodecID GetVideoCodecID(void) const { return kCodec_MPEG2; }
 
   protected:
     RingBuffer *getRingBuf(void) { return ringBuffer; }

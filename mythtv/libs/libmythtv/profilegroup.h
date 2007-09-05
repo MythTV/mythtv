@@ -113,6 +113,7 @@ class MPUBLIC ProfileGroupEditor :
     public QObject, public ConfigurationDialog
 {
     Q_OBJECT
+
   public:
     ProfileGroupEditor() :
         listbox(new ListBoxSetting(this)), dialog(NULL), redraw(true)

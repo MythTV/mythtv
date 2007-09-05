@@ -1,4 +1,16 @@
 // -*- Mode: c++ -*-
+
+// Standard UNIX C headers
+#include <unistd.h>
+#include <fcntl.h>
+#include <sys/ioctl.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+
+// Qt headers
+#include <qapplication.h>
+#include <qevent.h>
+#include <qnamespace.h>
 #include <qstylefactory.h>
 #include <qsqldatabase.h>
 #include <qfile.h>
@@ -7,6 +19,7 @@
 #include <qdir.h>
 #include <qimage.h>
 
+// MythTV headers
 #include "mythconfig.h"
 #include "mythcontext.h"
 #include "mythdbcon.h"
@@ -20,7 +33,7 @@
 #include "util-x11.h"
 #include "DisplayRes.h"
 #include "uitypes.h"
-#include "themeinfo.h"
+#include "cardutil.h"
 
 static HostComboBox *AudioOutputDevice()
 {
@@ -186,61 +199,6 @@ static HostCheckBox *DTSPassThrough()
 }
 #endif
 
-static HostCheckBox *Deinterlace()
-{
-    HostCheckBox *gc = new HostCheckBox("Deinterlace");
-    gc->setLabel(QObject::tr("Deinterlace playback"));
-    gc->setValue(false);
-    gc->setHelpText(QObject::tr("Make the video look normal on a progressive "
-                    "display (i.e. monitor)."));
-    return gc;
-}
-
-static HostComboBox *DeinterlaceFilter()
-{
-    HostComboBox *gc = new HostComboBox("DeinterlaceFilter", false);
-    gc->setLabel(QObject::tr("Algorithm"));
-    gc->addSelection(QObject::tr("Linear blend"), "linearblend");
-    gc->addSelection(QObject::tr("Kernel (less motion blur)"), "kerneldeint");
-    gc->addSelection(QObject::tr("Bob (2x framerate)"), "bobdeint");
-    gc->addSelection(QObject::tr("One field"), "onefield");
-    gc->setHelpText(QObject::tr("Deinterlace algorithm.") + " " +
-                    QObject::tr("'Kernel' requires SSE CPU support.") + " " +
-                    QObject::tr("'Bob' requires XVideo or XvMC video out."));
-    return gc;
-}
-
-class DeinterlaceSettings : public TriggeredConfigurationGroup
-{
-  public:
-    DeinterlaceSettings() :
-        TriggeredConfigurationGroup(false, false, true, true,
-                                    false, false, true, true)
-    {
-        setLabel(QObject::tr("Deinterlace settings"));
-
-        SetVertical(false);
-
-        Setting *deinterlace = Deinterlace();
-        addChild(deinterlace);
-        setTrigger(deinterlace);
-
-        Setting *filter = DeinterlaceFilter();
-        addTarget("1", filter);
-        addTarget("0", new HorizontalConfigurationGroup(false, false));
-    }
-};
-
-static HostLineEdit *CustomFilters()
-{
-    HostLineEdit *ge = new HostLineEdit("CustomFilters");
-    ge->setLabel(QObject::tr("Custom Filters"));
-    ge->setValue("");
-    ge->setHelpText(QObject::tr("Advanced Filter configuration, format:\n"
-                    "[[<filter>=<options>,]...]"));
-    return ge;
-}
-
 static HostCheckBox *DecodeExtraAudio()
 {
     HostCheckBox *gc = new HostCheckBox("DecodeExtraAudio");
@@ -312,7 +270,7 @@ static HostComboBox *DisplayRecGroup()
     }
 
     gc->setHelpText(QObject::tr("Default group filter to apply "
-                    "on the Watch Recordings screen."));
+                    "on the View Recordings screen."));
     return gc;
 }
 
@@ -335,6 +293,33 @@ static HostCheckBox *RememberRecGroup()
     gc->setHelpText(QObject::tr("Remember the last selected filter "
                     "instead of displaying the default filter "
                     "whenever you enter the playback screen."));
+
+    return gc;
+}
+
+static HostComboBox *DefaultView()
+{
+    HostComboBox *gc = new HostComboBox("DisplayGroupDefaultView");
+    gc->setLabel(QObject::tr("Default View"));
+
+    gc->addSelection(QObject::tr("Show Titles only"),
+            QString::number(PlaybackBox::TitlesOnly));
+    gc->addSelection(QObject::tr("Show Titles and Categories"),
+            QString::number(PlaybackBox::TitlesCategories));
+    gc->addSelection(QObject::tr(
+                "Show Titles, Categories, and Recording Groups"),
+            QString::number(PlaybackBox::TitlesCategoriesRecGroups));
+    gc->addSelection(QObject::tr("Show Titles and Recording Groups"),
+            QString::number(PlaybackBox::TitlesRecGroups));
+    gc->addSelection(QObject::tr("Show Categories only"),
+            QString::number(PlaybackBox::Categories));
+    gc->addSelection(QObject::tr("Show Categories and Recording Groups"),
+            QString::number(PlaybackBox::CategoriesRecGroups));
+    gc->addSelection(QObject::tr("Show Recording Groups only"),
+            QString::number(PlaybackBox::RecGroups));
+
+    gc->setHelpText(QObject::tr("Select what type of grouping to show on the Watch Recordings screen "
+                    "by default."));
 
     return gc;
 }
@@ -726,6 +711,611 @@ static VerticalConfigurationGroup *CategoryOverTimeSettings()
     return vcg;
 }
 
+static QString trunc(const QString &str, uint len)
+{
+    if (str.length() > len)
+        return str.mid(0, len - 5) + " . . . ";
+    return str;
+}
+
+static QString pad(const QString &str, uint len)
+{
+    QString tmp = str;
+
+    while (tmp.length() + 4 < len)
+        tmp += "    ";
+
+    while (tmp.length() < len)
+        tmp += " ";
+
+    return tmp;
+}
+
+PlaybackProfileItemConfig::PlaybackProfileItemConfig(ProfileItem &_item) :
+    item(_item)
+{
+    setLabel(QObject::tr("Profile Item"));
+
+    HorizontalConfigurationGroup *row[2];
+
+    row[0]    = new HorizontalConfigurationGroup(false, false, true, true);
+    cmp[0]    = new TransComboBoxSetting();
+    width[0]  = new TransSpinBoxSetting(0, 1920, 64, true);
+    height[0] = new TransSpinBoxSetting(0, 1088, 64, true);
+    row[1]    = new HorizontalConfigurationGroup(false, false, true, true);
+    cmp[1]    = new TransComboBoxSetting();
+    width[1]  = new TransSpinBoxSetting(0, 1920, 64, true);
+    height[1] = new TransSpinBoxSetting(0, 1088, 64, true);
+    decoder   = new TransComboBoxSetting();
+    vidrend   = new TransComboBoxSetting();
+    osdrend   = new TransComboBoxSetting();
+    osdfade   = new TransCheckBoxSetting();
+    deint0    = new TransComboBoxSetting();
+    deint1    = new TransComboBoxSetting();
+    filters   = new TransComboBoxSetting(true);
+
+    for (uint i = 0; i < 2; i++)
+    {
+        const QString kCMP[6] = { "", "<", "<=", "==", ">=", ">" };
+        for (uint j = 0; j < 6; j++)
+            cmp[i]->addSelection(kCMP[j]);
+
+        cmp[i]->setLabel(tr("Match Criteria"));
+        width[i]->setName(QString("w%1").arg(i));
+        width[i]->setLabel(tr("W"));
+        height[i]->setName(QString("h%1").arg(i));
+        height[i]->setLabel(tr("H"));
+
+        row[i]->addChild(cmp[i]);
+        row[i]->addChild(width[i]);
+        row[i]->addChild(height[i]);
+    }
+
+    HorizontalConfigurationGroup *vid_row =
+        new HorizontalConfigurationGroup(false, false, true, true);
+    HorizontalConfigurationGroup *osd_row =
+        new HorizontalConfigurationGroup(false, false, true, true);
+    HorizontalConfigurationGroup *deint_row =
+        new HorizontalConfigurationGroup(false, false, true, true);
+
+    decoder->setLabel(tr("Decoder"));
+    vidrend->setLabel(tr("Video Renderer"));
+    osdrend->setLabel(tr("OSD Renderer"));
+    osdfade->setLabel(tr("OSD Fade"));
+    deint0->setLabel(tr("Primary Deinterlacer"));
+    deint1->setLabel(tr("Fallback"));
+    filters->setLabel(tr("Custom Filters"));
+
+    deint0->setHelpText(
+        QObject::tr("2x means the deinterlacer doubles the framerate.") + " " +
+        QObject::tr("HW means the deinterlacer uses specialized hardware."));
+    deint1->setHelpText(
+        QObject::tr("HW means the deinterlacer uses specialized hardware."));
+
+    vid_row->addChild(decoder);
+    vid_row->addChild(vidrend);
+
+    osd_row->addChild(osdrend);
+    osd_row->addChild(osdfade);
+
+    deint_row->addChild(deint0);
+    deint_row->addChild(deint1);
+
+    VerticalConfigurationGroup *grp =
+        new VerticalConfigurationGroup(false, false, true, true);
+    grp->addChild(row[0]);
+    grp->addChild(row[1]);
+    grp->addChild(vid_row);
+    grp->addChild(osd_row);
+    grp->addChild(deint_row);
+    grp->addChild(filters);
+    addChild(grp);
+
+    connect(decoder, SIGNAL(valueChanged(const QString&)),
+            this,    SLOT(decoderChanged(const QString&)));
+    connect(vidrend, SIGNAL(valueChanged(const QString&)),
+            this,    SLOT(vrenderChanged(const QString&)));
+}
+
+void PlaybackProfileItemConfig::load(void)
+{
+    for (uint i = 0; i < 2; i++)
+    {
+        QString     pcmp  = item.Get(QString("pref_cmp%1").arg(i));
+        QStringList clist = QStringList::split(" ", pcmp);
+
+        if (clist.size() == 0)
+            clist<<((i) ? "" : ">");
+        if (clist.size() == 1)
+            clist<<"0";
+        if (clist.size() == 2)
+            clist<<"0";
+
+        cmp[i]->setValue(clist[0]);
+        width[i]->setValue(clist[1].toInt());
+        height[i]->setValue(clist[2].toInt());
+    }
+
+    QString pdecoder  = item.Get("pref_decoder");
+    QString prenderer = item.Get("pref_videorenderer");
+    QString posd      = item.Get("pref_osdrenderer");
+    QString posdfade  = item.Get("pref_osdfade");
+    QString pdeint0   = item.Get("pref_deint0");
+    QString pdeint1   = item.Get("pref_deint1");
+    QString pfilter   = item.Get("pref_filters");
+    bool    found     = false;
+
+    QStringList decr = VideoDisplayProfile::GetDecoders();
+    QStringList decn = VideoDisplayProfile::GetDecoderNames();
+    QStringList::const_iterator itr = decr.begin();
+    QStringList::const_iterator itn = decn.begin();
+    for (; (itr != decr.end()) && (itn != decn.end()); itr++, itn++)
+    {
+        decoder->addSelection(*itn, *itr, (*itr == pdecoder));
+        found |= (*itr == pdecoder);
+    }
+    if (!found && !pdecoder.isEmpty())
+        decoder->SelectSetting::addSelection(pdecoder);
+    if (!prenderer.isEmpty())
+        vidrend->setValue(prenderer);
+    if (!posd.isEmpty())
+        osdrend->setValue(posd);
+
+    osdfade->setValue((!posdfade.isEmpty()) ? (bool) posdfade.toInt() : true);
+
+    if (!pdeint0.isEmpty())
+        deint0->setValue(pdeint0);
+    if (!pdeint1.isEmpty())
+        deint1->setValue(pdeint1);
+    if (!pfilter.isEmpty())
+        filters->setValue(pfilter);
+}
+
+void PlaybackProfileItemConfig::save(void)
+{
+    for (uint i = 0; i < 2; i++)
+    {
+        QString val = QString("pref_cmp%1").arg(i);
+        QString data = "";
+        if (!cmp[i]->getValue().isEmpty())
+        {
+            data = QString("%1 %2 %3")
+                .arg(cmp[i]->getValue())
+                .arg(width[i]->intValue())
+                .arg(height[i]->intValue());
+        }
+        item.Set(val, data);
+    }
+
+    item.Set("pref_decoder",       decoder->getValue());
+    item.Set("pref_videorenderer", vidrend->getValue());
+    item.Set("pref_osdrenderer",   osdrend->getValue());
+    item.Set("pref_osdfade",       (osdfade->boolValue()) ? "1" : "0");
+    item.Set("pref_deint0",        deint0->getValue());
+    item.Set("pref_deint1",        deint1->getValue());
+
+    QString tmp0 = filters->getValue();
+    QString tmp1 = VideoDisplayProfile::IsFilterAllowed(tmp0) ? tmp0 : "";
+    item.Set("pref_filters", tmp1);
+}
+
+void PlaybackProfileItemConfig::decoderChanged(const QString &dec)
+{
+    QString     vrenderer = vidrend->getValue();
+    QStringList renderers = VideoDisplayProfile::GetVideoRenderers(dec);
+    QStringList::const_iterator it;
+
+    QString prenderer = QString::null;
+    for (it = renderers.begin(); it != renderers.end(); it++)
+        prenderer = (*it == vrenderer) ? vrenderer : prenderer;
+    if (prenderer.isEmpty())
+        prenderer = VideoDisplayProfile::GetPreferredVideoRenderer(dec);
+
+    vidrend->clearSelections();
+    for (it = renderers.begin(); it != renderers.end(); it++)
+    {
+        if (*it != "null")
+            vidrend->addSelection(*it, *it, (*it == prenderer));
+    }
+}
+
+void PlaybackProfileItemConfig::vrenderChanged(const QString &renderer)
+{
+    QStringList osds    = VideoDisplayProfile::GetOSDs(renderer);
+    QStringList deints  = VideoDisplayProfile::GetDeinterlacers(renderer);
+    QString     losd    = osdrend->getValue();
+    QString     ldeint0 = deint0->getValue();
+    QString     ldeint1 = deint1->getValue();
+    QStringList::const_iterator it;
+
+    osdrend->clearSelections();
+    for (it = osds.begin(); it != osds.end(); it++)
+        osdrend->addSelection(*it, *it, (*it == losd));
+
+    deint0->clearSelections();
+    for (it = deints.begin(); it != deints.end(); it++)
+    {
+        deint0->addSelection(VideoDisplayProfile::GetDeinterlacerName(*it),
+                             *it, (*it == ldeint0));
+    }
+
+    deint1->clearSelections();
+    for (it = deints.begin(); it != deints.end(); it++)
+    {
+        if (!(*it).contains("bobdeint") && !(*it).contains("doublerate"))
+            deint1->addSelection(VideoDisplayProfile::GetDeinterlacerName(*it),
+                                 *it, (*it == ldeint1));
+    }
+
+    filters->setEnabled(VideoDisplayProfile::IsFilterAllowed(renderer));
+}
+
+PlaybackProfileConfig::PlaybackProfileConfig(const QString &profilename) :
+    VerticalConfigurationGroup(false, false, true, true),
+    profile_name(profilename), needs_save(false),
+    groupid(0), last_main(NULL)
+{
+    groupid = VideoDisplayProfile::GetProfileGroupID(
+        profilename, gContext->GetHostName());
+
+    items = VideoDisplayProfile::LoadDB(groupid);
+
+    InitUI();
+}
+
+PlaybackProfileConfig::~PlaybackProfileConfig()
+{
+}
+
+void PlaybackProfileConfig::InitLabel(uint i)
+{
+    if (!labels[i])
+        return;
+
+    QString andStr = QObject::tr("&", "and");
+    QString cmp0   = items[i].Get("pref_cmp0");
+    QString cmp1   = items[i].Get("pref_cmp1");
+    QString str    = QObject::tr("if rez") + " " + cmp0;
+
+    if (!cmp1.isEmpty())
+        str += " " + andStr + " " + cmp1;
+
+    str += " -> ";
+    str += items[i].Get("pref_decoder");
+    str += " " + andStr + " ";
+    str += items[i].Get("pref_videorenderer");
+    str.replace("-blit", "");
+    str.replace("ivtv " + andStr + " ivtv", "ivtv");
+    str.replace("xvmc " + andStr + " xvmc", "xvmc");
+    str.replace("xvmc", "XvMC");
+    str.replace("xv", "XVideo");
+
+    labels[i]->setValue(pad(trunc(str, 48), 48));
+}
+
+void PlaybackProfileConfig::InitUI(void)
+{
+    VerticalConfigurationGroup *main =
+        new VerticalConfigurationGroup(false, false, true, true);
+
+    HorizontalConfigurationGroup *rows =
+        new HorizontalConfigurationGroup(false, false, true, true);
+    VerticalConfigurationGroup *column1 =
+        new VerticalConfigurationGroup(false, false, true, true);
+    VerticalConfigurationGroup *column2 =
+        new VerticalConfigurationGroup(false, false, true, true);
+
+    labels.resize(items.size());
+
+    for (uint i = 0; i < items.size(); i++)
+    {
+        labels[i] = new TransLabelSetting();
+        InitLabel(i);
+        column1->addChild(labels[i]);
+    }
+
+    editProf.resize(items.size());
+    delProf.resize(items.size());
+    priority.resize(items.size());
+
+    for (uint i = 0; i < items.size(); i++)
+    {
+        HorizontalConfigurationGroup *grp =
+            new HorizontalConfigurationGroup(false, false, true, true);
+
+        editProf[i] = new TransButtonSetting(QString("edit%1").arg(i));
+        delProf[i]  = new TransButtonSetting(QString("del%1").arg(i));
+        priority[i] = new TransSpinBoxSetting(1, items.size(), 1);
+        priority[i]->setName(QString("pri%1").arg(i));
+
+        editProf[i]->setLabel(QObject::tr("Edit"));
+        delProf[i]->setLabel(QObject::tr("Delete"));
+        priority[i]->setValue(i + 1);
+
+        grp->addChild(editProf[i]);
+        grp->addChild(delProf[i]);
+        grp->addChild(priority[i]);
+
+        connect(editProf[i], SIGNAL(pressed(QString)),
+                this,        SLOT  (pressed(QString)));
+        connect(delProf[i],  SIGNAL(pressed(QString)),
+                this,        SLOT  (pressed(QString)));
+        connect(priority[i], SIGNAL(valueChanged(   const QString&, int)),
+                this,        SLOT(  priorityChanged(const QString&, int)));
+
+        column2->addChild(grp);
+    }
+
+    rows->addChild(column1);
+    rows->addChild(column2);
+
+    TransButtonSetting *addEntry = new TransButtonSetting("addentry");
+    addEntry->setLabel(QObject::tr("Add New Entry"));
+
+    main->addChild(rows);
+    main->addChild(addEntry);
+
+    connect(addEntry, SIGNAL(pressed(QString)),
+            this,     SLOT  (pressed(QString)));
+
+    if (last_main)
+        replaceChild(last_main, main);
+    else
+        addChild(main);
+
+    last_main = main;
+}
+
+void PlaybackProfileConfig::load(void)
+{
+    // Already loaded data in constructor...
+}
+
+void PlaybackProfileConfig::save(void)
+{
+    if (!needs_save)
+        return; // nothing to do..
+
+    bool ok = VideoDisplayProfile::DeleteDB(groupid, del_items);
+    if (!ok)
+    {
+        VERBOSE(VB_IMPORTANT,
+                "PlaybackProfileConfig::save() -- failed to delete items");
+        return;
+    }
+
+    ok = VideoDisplayProfile::SaveDB(groupid, items);
+    if (!ok)
+    {
+        VERBOSE(VB_IMPORTANT,
+                "PlaybackProfileConfig::save() -- failed to save items");
+        return;
+    }
+}
+
+void PlaybackProfileConfig::pressed(QString cmd)
+{
+    if (cmd.left(4) == "edit")
+    {
+        uint i = cmd.mid(4).toUInt();
+        PlaybackProfileItemConfig itemcfg(items[i]);
+
+        if (itemcfg.exec() != QDialog::Accepted)
+            VERBOSE(VB_IMPORTANT, QString("edit #%1").arg(i) + " rejected");
+
+        InitLabel(i);
+        needs_save = true;
+    }
+    else if (cmd.left(3) == "del")
+    {
+        uint i = cmd.mid(3).toUInt();
+        del_items.push_back(items[i]);
+        items.erase(items.begin() + i);
+
+        InitUI();
+        needs_save = true;
+    }
+    else if (cmd == "addentry")
+    {
+        ProfileItem item;
+        PlaybackProfileItemConfig itemcfg(item);
+
+        if (itemcfg.exec() != QDialog::Accepted)
+            VERBOSE(VB_IMPORTANT, "addentry rejected");
+
+        items.push_back(item);
+        InitUI();
+        needs_save = true;        
+    }
+
+    repaint();
+}
+
+void PlaybackProfileConfig::priorityChanged(const QString &name, int val)
+{
+    uint i = name.mid(3).toInt();
+    uint j = i;
+
+    priority[i]->SetRelayEnabled(false);
+
+    if (((int)items[i].GetPriority() < val) &&
+        (i + 1 < priority.size())           &&
+        ((int)items[i+1].GetPriority() == val))
+    {
+        j++;
+        priority[j]->SetRelayEnabled(false);
+
+        swap(i, j);
+        priority[j]->setFocus();
+    }
+    else if (((int)items[i].GetPriority() > val) &&
+             (i > 0) &&
+             ((int)items[i-1].GetPriority() == val))
+    {
+        j--;
+        priority[j]->SetRelayEnabled(false);
+
+        swap(i, j);
+
+        priority[j]->setFocus();
+    }
+    else
+    {
+        priority[i]->setValue((int) items[i].GetPriority());
+    }
+
+    needs_save = true;
+
+    repaint();
+
+    priority[i]->SetRelayEnabled(true);
+    if (i != j)
+        priority[j]->SetRelayEnabled(true);
+}
+
+void PlaybackProfileConfig::swap(int i, int j)
+{
+    int pri_i = items[i].GetPriority();
+    int pri_j = items[j].GetPriority();
+
+    ProfileItem item = items[j];
+    items[j] = items[i];
+    items[i] = item;
+
+    priority[i]->setValue(pri_i);
+    priority[j]->setValue(pri_j);
+
+    items[i].Set("pref_priority", QString::number(pri_i));
+    items[j].Set("pref_priority", QString::number(pri_j));
+
+    const QString label_i = labels[i]->getValue();
+    const QString label_j = labels[j]->getValue();
+    labels[i]->setValue(label_j);
+    labels[j]->setValue(label_i);
+}
+
+PlaybackProfileConfigs::PlaybackProfileConfigs(const QString &str) :
+    TriggeredConfigurationGroup(false, true,  true, true,
+                                false, false, true, true), grouptrigger(NULL)
+{
+    setLabel(QObject::tr("Playback Profiles") + str);
+
+    QString host = gContext->GetHostName();
+    QStringList profiles = VideoDisplayProfile::GetProfiles(host);
+    if (profiles.empty())
+    {
+        VideoDisplayProfile::CreateProfiles(host);
+        profiles = VideoDisplayProfile::GetProfiles(host);
+    }
+    if (profiles.empty())
+        return;
+
+    QString profile = VideoDisplayProfile::GetDefaultProfileName(host);
+    if (!profiles.contains(profile))
+    {
+        profile = profiles[0];
+        VideoDisplayProfile::SetDefaultProfileName(profile, host);
+    }
+
+    grouptrigger = new HostComboBox("DefaultVideoPlaybackProfile");
+    grouptrigger->setLabel(QObject::tr("Current Video Playback Profile"));
+    QStringList::const_iterator it;
+    for (it = profiles.begin(); it != profiles.end(); it++)
+        grouptrigger->addSelection(*it);
+
+    HorizontalConfigurationGroup *grp =
+        new HorizontalConfigurationGroup(false, false, true, true);
+    TransButtonSetting *addProf = new TransButtonSetting("add");
+    TransButtonSetting *delProf = new TransButtonSetting("del");
+
+    addProf->setLabel(QObject::tr("Add New"));
+    delProf->setLabel(QObject::tr("Delete"));
+
+    grp->addChild(grouptrigger);
+    grp->addChild(addProf);
+    grp->addChild(delProf);
+
+    addChild(grp);
+
+    setTrigger(grouptrigger);
+    for (it = profiles.begin(); it != profiles.end(); ++it)
+        addTarget(*it, new PlaybackProfileConfig(*it));
+    setSaveAll(true);
+
+    connect(addProf, SIGNAL(pressed( QString)),
+            this,    SLOT  (btnPress(QString)));
+    connect(delProf, SIGNAL(pressed( QString)),
+            this,    SLOT  (btnPress(QString)));
+}
+
+PlaybackProfileConfigs::~PlaybackProfileConfigs()
+{
+    //VERBOSE(VB_IMPORTANT, "~PlaybackProfileConfigs()");
+}
+
+void PlaybackProfileConfigs::btnPress(QString cmd)
+{
+    if (cmd == "add")
+    {
+        QString name = QString::null;
+
+        QString host = gContext->GetHostName();
+        QStringList not_ok_list = VideoDisplayProfile::GetProfiles(host);
+
+        bool ok = true;
+        while (ok)
+        {
+            QString msg = QObject::tr("Enter Playback Group Name");
+
+            ok = MythPopupBox::showGetTextPopup(
+                gContext->GetMainWindow(), msg, msg, name);
+
+            if (!ok)
+                return;
+
+            if (not_ok_list.contains(name) || name.isEmpty())
+            {
+                msg = (name.isEmpty()) ?
+                    QObject::tr(
+                        "Sorry, playback group\nname can not be blank.") :
+                    QObject::tr(
+                        "Sorry, playback group name\n"
+                        "'%1' is already being used.").arg(name);
+
+                MythPopupBox::showOkPopup(
+                    gContext->GetMainWindow(), QObject::tr("Error"), msg);
+
+                continue;
+            }
+
+            break;
+        }
+
+        VideoDisplayProfile::CreateProfileGroup(name, gContext->GetHostName());
+        addTarget(name, new PlaybackProfileConfig(name));
+
+        if (grouptrigger)
+            grouptrigger->addSelection(name, name, true);
+    }
+    else if ((cmd == "del") && grouptrigger)
+    {
+        const QString name = grouptrigger->getSelectionLabel();
+        if (!name.isEmpty())
+        {
+            removeTarget(name);
+            VideoDisplayProfile::DeleteProfileGroup(
+                name, gContext->GetHostName());
+        }
+    }
+
+    repaint();
+}
+
+void PlaybackProfileConfigs::triggerChanged(const QString &trig)
+{
+    TriggeredConfigurationGroup::triggerChanged(trig);
+}
+
 static HostComboBox *PlayBoxOrdering()
 {
     QString str[4] =
@@ -872,7 +1462,6 @@ static HostComboBox *MenuTheme()
             gc->addSelection(theme->fileName());
     }
 
-    gc->setHelpText(QObject::tr("Ordering and Layout of Menu entries"));
     return gc;
 }
 
@@ -909,7 +1498,6 @@ static HostComboBox *OSDFont()
     gc->setLabel(QObject::tr("OSD font"));
     QDir ttf(gContext->GetFontsDir(), gContext->GetFontsNameFilter());
     gc->fillSelectionsFromDir(ttf, false);
-    gc->setValue("FreeSans.ttf");
 
     return gc;
 }
@@ -921,7 +1509,6 @@ static HostComboBox *OSDCCFont()
     QDir ttf(gContext->GetFontsDir(), gContext->GetFontsNameFilter());
     gc->fillSelectionsFromDir(ttf, false);
     gc->setHelpText(QObject::tr("Closed Caption font"));
-    gc->setValue("FreeMono.ttf");
 
     return gc;
 }
@@ -967,7 +1554,7 @@ static HostComboBox *OSDCC708DefaultFontType(void)
 static VerticalConfigurationGroup *OSDCC708Settings(void)
 {
     VerticalConfigurationGroup *grp =
-        new VerticalConfigurationGroup(true, false, true, true);
+        new VerticalConfigurationGroup(false, true, true, true);
     grp->setLabel(QObject::tr("ATSC caption settings"));
 
 // default text zoom 1.0
@@ -1001,7 +1588,7 @@ static HostComboBox *OSDCC708Font(QString subtype, QString subtypeName)
 static HorizontalConfigurationGroup *OSDCC708Fonts(void)
 {
     HorizontalConfigurationGroup *grpmain =
-        new HorizontalConfigurationGroup(true, false, true, true);
+        new HorizontalConfigurationGroup(false, true, true, true);
     grpmain->setLabel(QObject::tr("ATSC caption fonts"));
     VerticalConfigurationGroup *col[] =
     {
@@ -1064,20 +1651,22 @@ static HostComboBox *ChannelOrdering()
 static HostSpinBox *VertScanPercentage()
 {
     HostSpinBox *gs = new HostSpinBox("VertScanPercentage", -100, 100, 1);
-    gs->setLabel(QObject::tr("Vertical over/underscan percentage"));
+    gs->setLabel(QObject::tr("Vertical scaling"));
     gs->setValue(0);
-    gs->setHelpText(QObject::tr("Adjust this if the image does not fill your "
-                    "screen vertically."));
+    gs->setHelpText(QObject::tr(
+                        "Adjust this if the image does not fill your "
+                        "screen vertically. Range -100% to 100%"));
     return gs;
 }
 
 static HostSpinBox *HorizScanPercentage()
 {
     HostSpinBox *gs = new HostSpinBox("HorizScanPercentage", -100, 100, 1);
-    gs->setLabel(QObject::tr("Horizontal over/underscan percentage"));
+    gs->setLabel(QObject::tr("Horizontal scaling"));
     gs->setValue(0);
-    gs->setHelpText(QObject::tr("Adjust this if the image does not fill your "
-                    "screen horizontally."));
+    gs->setHelpText(QObject::tr(
+                        "Adjust this if the image does not fill your "
+                        "screen horizontally. Range -100% to 100%"));
     return gs;
 };
 
@@ -1099,55 +1688,16 @@ static HostSpinBox *YScanDisplacement()
     return gs;
 };
 
-static HostComboBox *PreferredMPEG2Decoder()
-{
-    HostComboBox *gc = new HostComboBox("PreferredMPEG2Decoder", false);
-
-    gc->setLabel(QObject::tr("Preferred MPEG2 Decoder"));
-    gc->addSelection(QObject::tr("Standard"), "ffmpeg");
-    gc->addSelection(QObject::tr("libmpeg2"), "libmpeg2");
-#ifdef USING_XVMC
-    gc->addSelection(QObject::tr("Standard XvMC"), "xvmc");
-#endif // USING_XVMC
-#ifdef USING_XVMC_VLD
-    gc->addSelection(QObject::tr("VIA XvMC"), "xvmc-vld");
-#endif // USING_XVMC_VLD    
-#ifdef HAVE_DVDV
-    gc->addSelection(QObject::tr("Mac hardware acceleration"), "macaccel");
-#endif
-    gc->setHelpText(
-        QObject::tr("Decoder to use to play back MPEG2 video.") + " " +
-        QObject::tr("Standard will use ffmpeg library.") + " " +
-        QObject::tr("libmpeg2 will use mpeg2 library; "
-                    "this is faster on some AMD processors.")
-#ifdef USING_XVMC
-        + " " +
-        QObject::tr("Standard XvMC will use XvMC API 1.0 to "
-                    "play back video; this is fast, but does not "
-                    "work well with HDTV sized frames.")
-#endif // USING_XVMC
-#ifdef USING_XVMC_VLD
-        + " " +
-        QObject::tr("VIA XvMC will use the VIA VLD XvMC extension.")
-#endif // USING_XVMC_VLD
-#ifdef CONFIG_MAC_ACCEL
-        + " " +
-        QObject::tr("Mac hardware will try to use the graphics "
-                    "processor - this may hang or crash your Mac!")
-#endif
-        );
-    return gc;
-}
-
-static HostCheckBox *AlwaysStreamFiles()
+static HostCheckBox *AlwaysStreamFiles() 
 {
     HostCheckBox *gc = new HostCheckBox("AlwaysStreamFiles");
     gc->setLabel(QObject::tr("Always stream recordings from the backend"));
     gc->setValue(false);
-    gc->setHelpText(QObject::tr("Enable this setting if you want MythTV to "
-                    "always stream files from a remote backend instead of "
-                    "directly reading a recording file if it is accessible "
-                    "locally."));
+    gc->setHelpText(QObject::tr(
+                        "Enable this setting if you want MythTV to "
+                        "always stream files from a remote backend "
+                        "instead of directly reading a recording "
+                        "file if it is accessible locally."));
     return gc;
 }
 
@@ -1265,7 +1815,7 @@ static HostCheckBox *UsePicControls()
 static HostCheckBox *AudioNagSetting()
 {
     HostCheckBox *gc = new HostCheckBox("AudioNag");
-    gc->setLabel(QObject::tr("Enable warning about missing audio output"));
+    gc->setLabel(QObject::tr("Warn on no audio output"));
     gc->setValue(true);
     gc->setHelpText(QObject::tr("If enabled, MythTV will warn you "
                                 "whenever you try to watch a something "
@@ -1317,9 +1867,12 @@ static HostCheckBox *JumpToProgramOSD()
     HostCheckBox *gc = new HostCheckBox("JumpToProgramOSD");
     gc->setLabel(QObject::tr("Jump to Program OSD"));
     gc->setValue(true);
-    gc->setHelpText(QObject::tr("Set the choice between viewing the current recording group "
-                "in the OSD, or showing the 'Watch Recording' screen when 'Jump to Program' "
-                "is activated. If set, the recordings are shown in the OSD"));
+    gc->setHelpText(QObject::tr(
+                        "Set the choice between viewing the current "
+                        "recording group in the OSD, or showing the "
+                        "'Watch Recording' screen when 'Jump to Program' "
+                        "is activated. If set, the recordings are shown "
+                        "in the OSD"));
     return gc;
 }
 
@@ -1384,16 +1937,6 @@ static HostCheckBox *PlaybackPreview()
     return gc;
 }
 
-static HostCheckBox *PlaybackPreviewLowCPU()
-{
-    HostCheckBox *gc = new HostCheckBox("PlaybackPreviewLowCPU");
-    gc->setLabel(QObject::tr("CPU friendly preview of recordings"));
-    gc->setValue(false);
-    gc->setHelpText(QObject::tr("When enabled, recording previews "
-                    "will play with reduced FPS to save CPU."));
-    return gc;
-}
-
 static HostCheckBox *PlayBoxTransparency()
 {
     HostCheckBox *gc = new HostCheckBox("PlayBoxTransparency");
@@ -1423,11 +1966,11 @@ static HostComboBox *PlayBoxShading()
 static HostCheckBox *UseVirtualKeyboard()
 {
     HostCheckBox *gc = new HostCheckBox("UseVirtualKeyboard");
-    gc->setLabel(QObject::tr("Use virtual keyboards for text entry"));
+    gc->setLabel(QObject::tr("Use line edit virtual keyboards"));
     gc->setValue(true);
     gc->setHelpText(QObject::tr("Allows you to use a virtual keyboard "
-                    "for text entry.  To use, hit OK/Select "
-                    "while a text entry box is in focus."));
+                    "in Myth line edit boxes.  To use, hit OK/Select "
+                    "while a line edit is in focus."));
     return gc;
 }
 
@@ -1555,6 +2098,7 @@ static HostComboBox *XineramaScreen()
                     "spanning all screens."));
     return gc;
 }
+
 
 static HostComboBox *XineramaMonitorAspectRatio()
 {
@@ -2026,49 +2570,25 @@ ThemeSelector::ThemeSelector():
 
     for( ; it.current() != 0 ; ++it ) {
         theme = it.current();
+        QFileInfo preview(theme->absFilePath() + "/preview.jpg");
+        QFileInfo xml(theme->absFilePath() + "/theme.xml");
 
-        if (theme->fileName() == "." || theme->fileName() == ".."
-                || theme->fileName() == "default"
-                || theme->fileName() == "default-wide")
-            continue;
-
-        QFileInfo preview;
-        QString name;
-
-        ThemeInfo *themeinfo = new ThemeInfo(theme->absFilePath());
-
-        if (!themeinfo || (!(themeinfo->Type() & THEME_UI)))
-            continue;
-
-        name = themeinfo->Name();
-        preview = QFileInfo(themeinfo->PreviewPath());
-
-        if (name.isEmpty())
-            continue;
-
-        if (themeinfo->IsWide())
-            name += QString(" (%1)").arg(QObject::tr("Widescreen"));
-
-        delete themeinfo;
-
-        if (!preview.exists())
-        {
-            VERBOSE(VB_IMPORTANT, QString("UI Theme %1 missing preview image.")
-                                    .arg(theme->fileName()));
+        if (theme->fileName()[0] == '.' || !preview.exists() || !xml.exists()) {
+            //cout << theme->absFilePath() << " doesn't look like a theme\n";
             continue;
         }
 
         QImage* previewImage = new QImage(preview.absFilePath());
         if (previewImage->width() == 0 || previewImage->height() == 0) {
-            VERBOSE(VB_IMPORTANT, QString("Problem reading theme preview image"
-                                          " %1").arg(preview.dirPath()));
+            cout << QObject::tr("Problem reading theme preview image ")
+                 << preview.dirPath() << endl;
             continue;
         }
 
-        addImageSelection(name, previewImage, theme->fileName());
+        addImageSelection(theme->fileName(), previewImage);
     }
 
-    setValue("G.A.N.T");
+    setValue("G.A.N.T.");
 }
 
 class StyleSetting: public HostComboBox {
@@ -2679,28 +3199,6 @@ static HostSpinBox *NetworkControlPort()
     return gs;
 }
 
-class NetworkControlSettings : public TriggeredConfigurationGroup
-{
-  public:
-     NetworkControlSettings() :
-         TriggeredConfigurationGroup(false, false, true, true)
-     {
-         setLabel(QObject::tr("Network Control"));
-         setUseLabel(false);
-
-         Setting* controlEnabled = NetworkControlEnabled();
-         addChild(controlEnabled);
-         setTrigger(controlEnabled);
-
-         ConfigurationGroup* settings = new VerticalConfigurationGroup(false, true);
-         settings->addChild(NetworkControlPort());
-         addTarget("1", settings);
-
-         // show nothing if fillEnabled is off
-         addTarget("0", new VerticalConfigurationGroup(false, true));
-     };
-};
-
 static HostCheckBox *RealtimePriority()
 {
     HostCheckBox *gc = new HostCheckBox("RealtimePriority");
@@ -2800,6 +3298,29 @@ static HostComboBox *DisplayGroupTitleSort()
     return gc;
 }
 
+class DefaultViewSettings : public TriggeredConfigurationGroup
+{
+  public:
+    DefaultViewSettings() :
+        TriggeredConfigurationGroup(false, false, true, true)
+    {
+        HostComboBox *defaultView = DefaultView();
+        addChild(defaultView);
+        setTrigger(defaultView);
+
+        HostComboBox *titleSort = DisplayGroupTitleSort();
+
+        for (unsigned int ii = 0; ii < PlaybackBox::ViewTypes; ii++)
+        {
+            if (ii == PlaybackBox::TitlesOnly)
+                addTarget(QString::number(ii), titleSort);
+            else
+                addTarget(QString::number(ii),
+                        new VerticalConfigurationGroup(false, false));
+        }
+    }
+};
+
 static HostCheckBox *PlaybackWatchList()
 {
     HostCheckBox *gc = new HostCheckBox("PlaybackWatchList");
@@ -2818,8 +3339,8 @@ static HostCheckBox *PlaybackWLStart()
     gc->setLabel(QObject::tr("Start from the Watch List view"));
     gc->setValue(false);
     gc->setHelpText(QObject::tr("If set, the 'Watch List' will be the "
-                                "initial view each time you enter the "
-                                "Watch Recordings screen"));
+                    "initial view each time you enter the "
+                    "Watch Recordings screen"));
     return gc;
 }
 
@@ -2882,6 +3403,7 @@ class WatchListSettings : public TriggeredConfigurationGroup
     };
 };
 
+#ifdef USING_IVTV
 static HostCheckBox *PVR350OutputEnable()
 {
     HostCheckBox *gc = new HostCheckBox("PVR350OutputEnable");
@@ -2893,15 +3415,87 @@ static HostCheckBox *PVR350OutputEnable()
                     "properly."));
     return gc;
 }
+#endif
 
-static HostLineEdit *PVR350VideoDev()
+#ifdef USING_IVTV
+PVR350VideoDevice::PVR350VideoDevice() :
+    PathSetting(this, false),
+    HostDBStorage(this, "PVR350VideoDev")
 {
-    HostLineEdit *ge = new HostLineEdit("PVR350VideoDev");
-    ge->setLabel(QObject::tr("Video device for the PVR-350 MPEG decoder"));
-    ge->setValue("/dev/video16");
-    return ge;
-};
+    setLabel(QObject::tr("Video device for the PVR-350 MPEG decoder"));
 
+    QDir dev("/dev/v4l", "video*", QDir::Name, QDir::System);
+    fillSelectionsFromDir(dev, 16, 31, QString::null, "ivtv", false);
+
+    dev.setPath("/dev");
+    fillSelectionsFromDir(dev, 16, 31, QString::null, "ivtv", false);
+}
+#endif // USING_IVTV
+
+#ifdef USING_IVTV
+uint PVR350VideoDevice::fillSelectionsFromDir(const QDir &dir,
+                                              uint minor_min, uint minor_max,
+                                              QString card, QString driver,
+                                              bool allow_duplicates)
+{
+    uint cnt = 0;
+    const QFileInfoList *il = dir.entryInfoList();
+    if (!il)
+        return cnt;
+        
+    QFileInfoListIterator it( *il );
+    QFileInfo *fi;
+
+    for (; (fi = it.current()) != 0; ++it)
+    {
+        struct stat st;
+        QString filepath = fi->absFilePath();
+        int err = lstat(filepath, &st);
+
+        if (0 != err)
+        {
+            VERBOSE(VB_IMPORTANT,
+                    QString("Could not stat file: %1").arg(filepath));
+            continue;
+        }
+
+        // is this is a character device?
+        if (!S_ISCHR(st.st_mode))
+            continue;
+
+        // is this device is in our minor range?
+        uint minor_num = minor(st.st_rdev);
+        if (minor_min > minor_num || minor_max < minor_num)
+            continue;
+
+        // ignore duplicates if allow_duplicates not set
+        if (!allow_duplicates && minor_list[minor_num])
+            continue;
+
+        // if the driver returns any info add this device to our list
+        int videofd = open(filepath.ascii(), O_RDWR);
+        if (videofd >= 0)
+        {
+            QString cn, dn;
+            if (CardUtil::GetV4LInfo(videofd, cn, dn) &&
+                (driver.isEmpty() || (dn == driver))  &&
+                (card.isEmpty()   || (cn == card)))
+            {
+                addSelection(filepath);
+                cnt++;
+            }
+            close(videofd);
+        }
+
+        // add to list of minors discovered to avoid duplicates
+        minor_list[minor_num] = 1;
+    }
+
+    return cnt;
+};
+#endif
+
+#ifdef USING_IVTV
 static HostSpinBox *PVR350EPGAlphaValue()
 {
     HostSpinBox *gs = new HostSpinBox("PVR350EPGAlphaValue", 0, 255, 1);
@@ -2912,17 +3506,22 @@ static HostSpinBox *PVR350EPGAlphaValue()
                     "TV."));
     return gs;
 }
+#endif
 
+#ifdef USING_IVTV
 static HostCheckBox *PVR350UseInternalSound()
 {
     HostCheckBox *gc = new HostCheckBox("PVR350InternalAudioOnly");
     gc->setLabel(QObject::tr("TV audio through PVR-350 only"));
     gc->setValue(false);
-    gc->setHelpText(QObject::tr("Normally, PVR-350 audio is looped into a sound card; "
-                    "here you can indicate when that is not the case. "
-                    "MythTV cannot control TV volume when this option is checked."));
+    gc->setHelpText(QObject::tr(
+                        "Normally, PVR-350 audio is looped into a sound card; "
+                        "here you can indicate when that is not the case. "
+                        "MythTV cannot control TV volume when this option "
+                        "is checked."));
     return gc;
 }
+#endif
 
 #ifdef USING_OPENGL_VSYNC
 static HostCheckBox *UseOpenGLVSync()
@@ -2938,27 +3537,29 @@ static HostCheckBox *UseOpenGLVSync()
 }
 #endif
 
-class HwDecSettings : public TriggeredConfigurationGroup
+#ifdef USING_IVTV
+class PVR350HWDecoderSettings : public TriggeredConfigurationGroup
 {
-   public:
-     HwDecSettings() : TriggeredConfigurationGroup(false, true, false, false)
+  public:
+     PVR350HWDecoderSettings(const QString &tmp) :
+         TriggeredConfigurationGroup(false, true, false, false)
      {
-         setLabel(QObject::tr("Hardware Decoding Settings"));
-         setUseLabel(false);
+         setLabel(QObject::tr("PVR-350 Hardware Decoder Settings") + tmp);
 
-         Setting* pvr350output = PVR350OutputEnable();
+         Setting *pvr350output = PVR350OutputEnable();
          addChild(pvr350output);
          setTrigger(pvr350output);
 
          ConfigurationGroup* settings = new VerticalConfigurationGroup(false);
-         settings->addChild(PVR350VideoDev());
+         settings->addChild(new PVR350VideoDevice());
          settings->addChild(PVR350EPGAlphaValue());
          settings->addChild(PVR350UseInternalSound());
-         addTarget("1", settings);
 
+         addTarget("1", settings);
          addTarget("0", new VerticalConfigurationGroup(true));
     };
 };
+#endif
 
 static GlobalCheckBox *LogEnabled()
 {
@@ -3149,9 +3750,9 @@ class MythLogSettings : public TriggeredConfigurationGroup
          Setting* logEnabled = LogEnabled();
          addChild(logEnabled);
          setTrigger(logEnabled);
+         addChild(LogMaxCount());
 
          ConfigurationGroup* settings = new VerticalConfigurationGroup(false);
-         settings->addChild(LogMaxCount());
          settings->addChild(LogPrintLevel());
          settings->addChild(LogCleanEnabled());
          settings->addChild(LogCleanPeriod());
@@ -3332,7 +3933,8 @@ static HostCheckBox *LCDEnable()
 class LcdSettings : public TriggeredConfigurationGroup
 {
   public:
-    LcdSettings() : TriggeredConfigurationGroup(false, true, false, false)
+    LcdSettings() : TriggeredConfigurationGroup(false, false,  false, false,
+                                                false, false, false, false)
     {
          setLabel(QObject::tr("LCD device display"));
          setUseLabel(false);
@@ -3341,10 +3943,15 @@ class LcdSettings : public TriggeredConfigurationGroup
          addChild(lcd_enable);
          setTrigger(lcd_enable);
 
-         ConfigurationGroup* settings = new VerticalConfigurationGroup(false);
-         ConfigurationGroup* setHoriz = new HorizontalConfigurationGroup(false);
-         ConfigurationGroup* setLeft  = new VerticalConfigurationGroup(false);
-         ConfigurationGroup* setRight = new VerticalConfigurationGroup(false);
+         ConfigurationGroup *settings =
+             new VerticalConfigurationGroup(false, true, false, false);
+         ConfigurationGroup *setHoriz =
+             new HorizontalConfigurationGroup(false, false, false, false);
+
+         ConfigurationGroup* setLeft  =
+             new VerticalConfigurationGroup(false, false, false, false);
+         ConfigurationGroup* setRight =
+             new VerticalConfigurationGroup(false, false, false, false);
 
          setLeft->addChild(LCDShowTime());
          setLeft->addChild(LCDShowMenu());
@@ -3615,44 +4222,50 @@ MainGeneralSettings::MainGeneralSettings()
     AudioSettings *audio = new AudioSettings();
     addChild(audio);
 
-    VerticalConfigurationGroup* misc = new VerticalConfigurationGroup(false);
-    misc->setLabel(QObject::tr("Miscellaneous"));
-    ConfigurationGroup *pin = new HorizontalConfigurationGroup();
-    pin->setLabel(QObject::tr("Settings Access"));
-    pin->addChild(SetupPinCodeRequired());
-    pin->addChild(SetupPinCode());
-    misc->addChild(pin);
-    VerticalConfigurationGroup* shutdownSettings = new VerticalConfigurationGroup(true);
-    shutdownSettings->setLabel(QObject::tr("Shutdown/Reboot Settings"));
-    shutdownSettings->addChild(OverrideExitMenu());
-    shutdownSettings->addChild(HaltCommand());
-    shutdownSettings->addChild(RebootCommand());
-    misc->addChild(shutdownSettings);
-    addChild(misc);
-
-    VerticalConfigurationGroup* general = new VerticalConfigurationGroup(false);
-    general->setLabel(QObject::tr("Control"));
-    general->addChild(AllowQuitShutdown());
-    general->addChild(NoPromptOnExit());
-    general->addChild(LircKeyPressedApp());
-    general->addChild(UseArrowAccels());
-    general->addChild(UseVirtualKeyboard());
-    NetworkControlSettings *controlSettings = new NetworkControlSettings();
-    general->addChild(controlSettings);
-    addChild(general);
-
-    general = new VerticalConfigurationGroup(false);
-
+    VerticalConfigurationGroup *general =
+        new VerticalConfigurationGroup(false, true, false, false);
     general->setLabel(QObject::tr("General"));
-
+    HorizontalConfigurationGroup *row =
+        new HorizontalConfigurationGroup(false, false, true, true);
+    VerticalConfigurationGroup *col1 =
+        new VerticalConfigurationGroup(false, false, true, true);
+    VerticalConfigurationGroup *col2 =
+        new VerticalConfigurationGroup(false, false, true, true);
+    col1->addChild(AllowQuitShutdown());
+    col1->addChild(NoPromptOnExit());
+    col2->addChild(UseArrowAccels());
+    col2->addChild(NetworkControlEnabled());
+    row->addChild(col1);
+    row->addChild(col2);
     ConfigurationGroup *mediaMon = new VerticalConfigurationGroup();
     mediaMon->setLabel(QObject::tr("Removable Media"));
     mediaMon->addChild(EnableMediaMon());
     mediaMon->addChild(IgnoreMedia());
-
+    general->addChild(LircKeyPressedApp());
+    general->addChild(row);
+    general->addChild(NetworkControlPort());
     general->addChild(mediaMon);
-    general->addChild(EnableXbox());
     addChild(general);
+
+    VerticalConfigurationGroup* misc = new VerticalConfigurationGroup(false);
+    misc->setLabel(QObject::tr("Miscellaneous"));
+
+    ConfigurationGroup *pin = new HorizontalConfigurationGroup();
+    pin->setLabel(QObject::tr("Settings Access"));
+    pin->addChild(SetupPinCodeRequired());
+    pin->addChild(SetupPinCode());
+
+    VerticalConfigurationGroup* shutdownSettings =
+        new VerticalConfigurationGroup(true);
+    shutdownSettings->setLabel(QObject::tr("Shutdown/Reboot Settings"));
+    shutdownSettings->addChild(OverrideExitMenu());
+    shutdownSettings->addChild(HaltCommand());
+    shutdownSettings->addChild(RebootCommand());
+
+    misc->addChild(pin);
+    misc->addChild(shutdownSettings);
+    misc->addChild(EnableXbox());
+    addChild(misc);
 
     MythLogSettings *mythlog = new MythLogSettings();
     addChild(mythlog);
@@ -3663,50 +4276,93 @@ MainGeneralSettings::MainGeneralSettings()
 
 PlaybackSettings::PlaybackSettings()
 {
-    VerticalConfigurationGroup* general = new VerticalConfigurationGroup(false);
-    general->setLabel(QObject::tr("General playback"));
-    general->addChild(new DeinterlaceSettings());
-    general->addChild(CustomFilters());
-#ifdef USING_OPENGL_VSYNC
-    general->addChild(UseOpenGLVSync());
-#endif // USING_OPENGL_VSYNC
-    general->addChild(RealtimePriority());
-    general->addChild(UseVideoTimebase());
-    general->addChild(DecodeExtraAudio());
-    general->addChild(AspectOverride());
-    general->addChild(PIPLocation());
-    addChild(general);
+    uint i = 0, total = 8;
+#ifdef USING_IVTV
+    total += 1;
+#endif // USING_IVTV
+#ifdef CONFIG_DARWIN
+    total += 2;
+#endif // USING_DARWIN
 
-    VerticalConfigurationGroup* gen2 = new VerticalConfigurationGroup(false);
-    gen2->setLabel(QObject::tr("General playback (part 2)"));
-    gen2->addChild(PlaybackExitPrompt());
-    gen2->addChild(EndOfRecordingExitPrompt());
-    gen2->addChild(JumpToProgramOSD());
-    gen2->addChild(AutomaticSetWatched());
-    gen2->addChild(ClearSavedPosition());
-    gen2->addChild(AltClearSavedPosition());
+
+    VerticalConfigurationGroup* general1 =
+        new VerticalConfigurationGroup(false);
+    general1->setLabel(QObject::tr("General Playback") +
+                      QString(" (%1/%2)").arg(++i).arg(total));
+
+    HorizontalConfigurationGroup *columns =
+        new HorizontalConfigurationGroup(false, false, true, true);
+
+    VerticalConfigurationGroup *column1 =
+        new VerticalConfigurationGroup(false, false, true, true);
+    column1->addChild(RealtimePriority());
+    column1->addChild(DecodeExtraAudio());
+    column1->addChild(AudioNagSetting());
+    column1->addChild(UseVideoTimebase());
+    columns->addChild(column1);
+
+    VerticalConfigurationGroup *column2 =
+        new VerticalConfigurationGroup(false, false, true, true);
+    column2->addChild(ClearSavedPosition());
+    column2->addChild(AltClearSavedPosition());
+    column2->addChild(JumpToProgramOSD());
+    column2->addChild(AutomaticSetWatched());
+    columns->addChild(column2);
+
+    general1->addChild(columns);
+    general1->addChild(AlwaysStreamFiles());
+#ifdef USING_OPENGL_VSYNC
+    general1->addChild(UseOpenGLVSync());
+#endif // USING_OPENGL_VSYNC
 #ifdef USING_XV
-    gen2->addChild(UsePicControls());
-#endif
-    gen2->addChild(AudioNagSetting());
-    gen2->addChild(UDPNotifyPort());
-    addChild(gen2);
+    general1->addChild(UsePicControls());
+#endif // USING_XV
+    addChild(general1);
+
+    VerticalConfigurationGroup* general2 =
+        new VerticalConfigurationGroup(false);
+    general2->setLabel(QObject::tr("General Playback") +
+                      QString(" (%1/%2)").arg(++i).arg(total));
+
+    HorizontalConfigurationGroup* oscan =
+        new HorizontalConfigurationGroup(false, false, true, true);
+    VerticalConfigurationGroup *ocol1 =
+        new VerticalConfigurationGroup(false, false, true, true);
+    VerticalConfigurationGroup *ocol2 =
+        new VerticalConfigurationGroup(false, false, true, true);
+    ocol1->addChild(VertScanPercentage());
+    ocol1->addChild(HorizScanPercentage());
+    ocol2->addChild(XScanDisplacement());
+    ocol2->addChild(YScanDisplacement());
+    oscan->addChild(ocol1);
+    oscan->addChild(ocol2);
+
+    general2->addChild(oscan);
+    general2->addChild(AspectOverride());
+    general2->addChild(PIPLocation());
+    general2->addChild(PlaybackExitPrompt());
+    general2->addChild(EndOfRecordingExitPrompt());
+    addChild(general2);
+
+    QString tmp = QString(" (%1/%2)").arg(++i).arg(total);
+    addChild(new PlaybackProfileConfigs(tmp));
 
     VerticalConfigurationGroup* pbox = new VerticalConfigurationGroup(false);
-    pbox->setLabel(QObject::tr("View Recordings"));
+    pbox->setLabel(QObject::tr("View Recordings") +
+                   QString(" (%1/%2)").arg(++i).arg(total));
     pbox->addChild(PlayBoxOrdering());
     pbox->addChild(PlayBoxEpisodeSort());
     pbox->addChild(GeneratePreviewPixmaps());
     pbox->addChild(PreviewPixmapOffset());
     pbox->addChild(PreviewFromBookmark());
     pbox->addChild(PlaybackPreview());
-    pbox->addChild(PlaybackPreviewLowCPU());
     pbox->addChild(PBBStartInTitle());
     pbox->addChild(PBBShowGroupSummary());
     addChild(pbox);
 
     VerticalConfigurationGroup* pbox2 = new VerticalConfigurationGroup(false);
-    pbox2->setLabel(QObject::tr("View Recordings (Recording Groups)"));
+    pbox2->setLabel(QObject::tr("Recording Groups") +
+                    QString(" (%1/%2)").arg(++i).arg(total));
     pbox2->addChild(AllRecGroupPassword());
     pbox2->addChild(DisplayRecGroup());
     pbox2->addChild(QueryInitialFilter());
@@ -3716,20 +4372,15 @@ PlaybackSettings::PlaybackSettings()
     addChild(pbox2);
 
     VerticalConfigurationGroup* pbox3 = new VerticalConfigurationGroup(false);
-    pbox3->setLabel(QObject::tr("View Recordings (Views)"));
-    pbox3->addChild(DisplayGroupTitleSort());
+    pbox3->setLabel(QObject::tr("View Recordings") +
+                    QString(" (%1/%2)").arg(++i).arg(total));
+    pbox3->addChild(new DefaultViewSettings());
     pbox3->addChild(new WatchListSettings());
     addChild(pbox3);
 
-    VerticalConfigurationGroup* decoder = new VerticalConfigurationGroup(false);
-    decoder->setLabel(QObject::tr("Decoder Settings"));
-    decoder->addChild(PreferredMPEG2Decoder());
-    decoder->addChild(AlwaysStreamFiles());
-    decoder->addChild(new HwDecSettings());
-    addChild(decoder);
-
     VerticalConfigurationGroup* seek = new VerticalConfigurationGroup(false);
-    seek->setLabel(QObject::tr("Seeking"));
+    seek->setLabel(QObject::tr("Seeking") +
+                   QString(" (%1/%2)").arg(++i).arg(total));
     seek->addChild(SmartForward());
     seek->addChild(StickyKeys());
     seek->addChild(FFRewReposTime());
@@ -3738,7 +4389,8 @@ PlaybackSettings::PlaybackSettings()
     addChild(seek);
 
     VerticalConfigurationGroup* comms = new VerticalConfigurationGroup(false);
-    comms->setLabel(QObject::tr("Commercial Skip"));
+    comms->setLabel(QObject::tr("Commercial Skip") +
+                    QString(" (%1/%2)").arg(++i).arg(total));
     comms->addChild(AutoCommercialSkip());
     comms->addChild(CommRewindAmount());
     comms->addChild(CommNotifyAmount());
@@ -3747,14 +4399,33 @@ PlaybackSettings::PlaybackSettings()
     comms->addChild(CommSkipAllBlanks());
     addChild(comms);
 
-    VerticalConfigurationGroup* oscan = new VerticalConfigurationGroup(false);
-    oscan->setLabel(QObject::tr("Overscan"));
-    oscan->addChild(VertScanPercentage());
-    oscan->addChild(HorizScanPercentage());
-    oscan->addChild(XScanDisplacement());
-    oscan->addChild(YScanDisplacement());
-    addChild(oscan);
+#ifdef USING_IVTV
+    QString tmp2 = QString(" (%1/%2)").arg(++i).arg(total);
+    addChild(new PVR350HWDecoderSettings(tmp2));
+#endif // USING_IVTV
 
+#ifdef CONFIG_DARWIN
+    VerticalConfigurationGroup* mac1 = new VerticalConfigurationGroup(false);
+    mac1->setLabel(QObject::tr("Mac OS X video settings") +
+                   QString(" (%1/%2)").arg(++i).arg(total));
+    mac1->addChild(MacGammaCorrect());
+    mac1->addChild(MacScaleUp());
+    mac1->addChild(MacFullSkip());
+    addChild(mac1);
+
+    VerticalConfigurationGroup* mac2 = new VerticalConfigurationGroup(false);
+    mac2->setLabel(QObject::tr("Mac OS X video settings") +
+                   QString(" (%1/%2)").arg(++i).arg(total));
+    mac2->addChild(new MacMainSettings());
+    mac2->addChild(new MacFloatSettings());
+    mac2->addChild(new MacDockSettings());
+    mac2->addChild(new MacDesktopSettings());
+    addChild(mac2);
+#endif
+}
+
+OSDSettings::OSDSettings()
+{
     VerticalConfigurationGroup* osd = new VerticalConfigurationGroup(false);
     osd->setLabel(QObject::tr("On-screen display"));
     osd->addChild(OSDTheme());
@@ -3766,6 +4437,7 @@ PlaybackSettings::PlaybackSettings()
     osdvg1->addChild(OSDGeneralTimeout());
     osdvg1->addChild(OSDProgramInfoTimeout());
     osdvg1->addChild(OSDNotifyTimeout());
+    osdvg1->addChild(UDPNotifyPort());
     osdhg->addChild(osdvg1);
 
     VerticalConfigurationGroup* osdvg2 =
@@ -3773,33 +4445,21 @@ PlaybackSettings::PlaybackSettings()
     osdvg2->addChild(OSDFont());
     osdvg2->addChild(OSDCCFont());
     osdvg2->addChild(OSDThemeFontSizeType());
+    osdvg2->addChild(EnableMHEG());
     osdhg->addChild(osdvg2);
     osd->addChild(osdhg);
 
     osd->addChild(CCBackground());
     osd->addChild(DefaultCCMode());
     osd->addChild(PersistentBrowseMode());
-    osd->addChild(EnableMHEG());
     addChild(osd);
 
     addChild(OSDCC708Settings());
     addChild(OSDCC708Fonts());
 
 #ifdef CONFIG_DARWIN
-    VerticalConfigurationGroup* mac1 = new VerticalConfigurationGroup(false);
-    mac1->setLabel(QObject::tr("Mac OS X video settings") + " 1/2");
-    mac1->addChild(MacGammaCorrect());
-    mac1->addChild(MacScaleUp());
-    mac1->addChild(MacFullSkip());
-    addChild(mac1);
-
-    VerticalConfigurationGroup* mac2 = new VerticalConfigurationGroup(false);
-    mac2->setLabel(QObject::tr("Mac OS X video settings") + " 2/2");
-    mac2->addChild(new MacMainSettings());
-    mac2->addChild(new MacFloatSettings());
-    mac2->addChild(new MacDockSettings());
-    mac2->addChild(new MacDesktopSettings());
-    addChild(mac2);
+    // Any Mac OS-specific OSD stuff would go here.
+    // Note that this define should be Q_WS_MACX
 #endif
 }
 
@@ -3925,12 +4585,17 @@ AppearanceSettings::AppearanceSettings()
     theme->setLabel(QObject::tr("Theme"));
 
     theme->addChild(new ThemeSelector());
+
+    HorizontalConfigurationGroup *grp1 =
+        new HorizontalConfigurationGroup(false, false, false, false);
+    grp1->addChild(RandomTheme());
+    grp1->addChild(ThemeCacheSize());
+    theme->addChild(grp1);
+
     theme->addChild(ThemePainter());
     theme->addChild(new StyleSetting());
     theme->addChild(ThemeFontSizeType());
-    theme->addChild(RandomTheme());
     theme->addChild(MenuTheme());
-    theme->addChild(ThemeCacheSize());
     addChild(theme);
 
     VerticalConfigurationGroup* screen = new VerticalConfigurationGroup(false);
@@ -3940,26 +4605,33 @@ AppearanceSettings::AppearanceSettings()
         screen->addChild(XineramaScreen());
         screen->addChild(XineramaMonitorAspectRatio());
     }
-    screen->addChild(GuiWidth());
-    screen->addChild(GuiHeight());
+
 //    screen->addChild(DisplaySizeHeight());
 //    screen->addChild(DisplaySizeWidth());
-    screen->addChild(GuiOffsetX());
-    screen->addChild(GuiOffsetY());
-    screen->addChild(GuiSizeForTV());
-    screen->addChild(HideMouseCursor());
-    screen->addChild(RunInWindow());
-    addChild(screen);
 
-    VerticalConfigurationGroup* qttheme = new VerticalConfigurationGroup(false);
-    qttheme->setLabel(QObject::tr("QT / Appearance"));
-    qttheme->addChild(QtFontSmall());
-    qttheme->addChild(QtFontMedium());
-    qttheme->addChild(QtFontBig());
-    qttheme->addChild(QtFonTweak());
-    qttheme->addChild(PlayBoxTransparency());
-    qttheme->addChild(PlayBoxShading());
-    addChild(qttheme );
+    VerticalConfigurationGroup *column1 =
+        new VerticalConfigurationGroup(false, false, false, false);
+
+    VerticalConfigurationGroup *column2 =
+        new VerticalConfigurationGroup(false, false, false, false);
+
+    column1->addChild(GuiWidth());
+    column1->addChild(GuiHeight());
+    column1->addChild(GuiSizeForTV());
+    column2->addChild(GuiOffsetX());
+    column2->addChild(GuiOffsetY());
+    column2->addChild(HideMouseCursor());
+
+    HorizontalConfigurationGroup *columns =
+        new HorizontalConfigurationGroup(false, false, false, false);
+
+    columns->addChild(column1);
+    columns->addChild(column2);
+
+    screen->addChild(columns);
+    screen->addChild(RunInWindow());
+
+    addChild(screen);
 
 #if defined(USING_XRANDR) || defined(CONFIG_DARWIN)
     const vector<DisplayResScreen> scr = GetVideoModes();
@@ -3975,6 +4647,17 @@ AppearanceSettings::AppearanceSettings()
     dates->addChild(MythShortDateFormat());
     dates->addChild(MythTimeFormat());
     addChild(dates);
+
+    VerticalConfigurationGroup* qttheme = new VerticalConfigurationGroup(false);
+    qttheme->setLabel(QObject::tr("QT"));
+    qttheme->addChild(QtFontSmall());
+    qttheme->addChild(QtFontMedium());
+    qttheme->addChild(QtFontBig());
+    qttheme->addChild(QtFonTweak());
+    qttheme->addChild(PlayBoxTransparency());
+    qttheme->addChild(PlayBoxShading());
+    qttheme->addChild(UseVirtualKeyboard());
+    addChild(qttheme );
 
     addChild(new LcdSettings());
 }

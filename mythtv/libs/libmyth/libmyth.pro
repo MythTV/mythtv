@@ -167,6 +167,7 @@ using_directx {
 }
 
 using_x11 {
+    DEFINES += USING_X11
     HEADERS += screensaver-x11.h
     SOURCES += screensaver-x11.cpp
     LIBS += $$EXTRA_LIBS

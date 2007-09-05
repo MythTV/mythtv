@@ -4,19 +4,10 @@
 #include <cstring>
 #include <cstdlib>
 
-namespace X11
-{
-#include <X11/Xlib.h>
-#include <X11/Xlibint.h>
-#include <X11/Xproto.h>
-#include <X11/extensions/Xrandr.h>
-}
-
 #include "util-x11.h"
 
-using namespace X11;
+#include <X11/extensions/Xrandr.h> // this has to be after util-x11.h (Qt bug)
 
-Display *MythXOpenDisplay(void);
 static XRRScreenConfiguration *GetScreenConfig(Display*& display);
 
 DisplayResX::DisplayResX(void)

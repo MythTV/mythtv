@@ -20,8 +20,10 @@ class VideoOutputIvtv: public VideoOutput
     void PrepareFrame(VideoFrame *buffer, FrameScanType);
     void Show(FrameScanType );
 
-    void InputChanged(int width, int height, float aspect,
-                      MythCodecID av_codec_id);
+    bool InputChanged(const QSize &input_size,
+                      float        aspect,
+                      MythCodecID  av_codec_id,
+                      void        *codec_private);
 
     int GetRefreshRate(void);
 
@@ -62,6 +64,9 @@ class VideoOutputIvtv: public VideoOutput
     }
 
     int ValidVideoFrames(void) const;
+
+    static QStringList GetAllowedRenderers(MythCodecID myth_codec_id,
+                                           const QSize &video_dim);
 
   private:
     typedef enum

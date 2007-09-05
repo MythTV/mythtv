@@ -27,7 +27,8 @@ class DummyDecoder : public DecoderBase
 
     virtual long UpdateStoredFrameNum(long) { return 0; }
 
-    virtual QString GetEncodingType(void) const { return QString("MPEG-2"); }
+    virtual QString GetCodecDecoderName(void) const { return "dummy"; }
+    virtual MythCodecID GetVideoCodecID(void) const { return kCodec_NONE; }
 
     virtual bool SyncPositionMap(void) { return false; }
 };

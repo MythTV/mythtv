@@ -109,7 +109,7 @@ void EITScanner::RunEventLoop(void)
         // seen any in a while, tell scheduler to run.
         if (eitCount && (t.elapsed() > 60 * 1000))
         {
-            VERBOSE(VB_EIT, LOC + "Added "<<eitCount<<" EIT Events");
+            VERBOSE(VB_GENERAL, LOC + "Added "<<eitCount<<" EIT Events");
             eitCount = 0;
             RescheduleRecordings();
         }
@@ -119,7 +119,7 @@ void EITScanner::RunEventLoop(void)
             // if there have been any new events, tell scheduler to run.
             if (eitCount)
             {
-                VERBOSE(VB_EIT, LOC + "Added "<<eitCount<<" EIT Events");
+                VERBOSE(VB_GENERAL, LOC + "Added "<<eitCount<<" EIT Events");
                 eitCount = 0;
                 RescheduleRecordings();
             }
@@ -131,7 +131,7 @@ void EITScanner::RunEventLoop(void)
             {
                 eitHelper->WriteEITCache();
                 rec->SetChannel(*activeScanNextChan, TVRec::kFlagEITScan);
-                VERBOSE(VB_EIT, LOC +
+                VERBOSE(VB_GENERAL, LOC + 
                         QString("Now looking for EIT data on "
                                 "multiplex of channel %1")
                         .arg(*activeScanNextChan));

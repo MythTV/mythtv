@@ -114,9 +114,10 @@ show_help(){
   #echo "  --target-os=OS           compiler targets OS [$targetos]"
   #echo "  --cc=CC                  use C compiler CC [$cc]"
   #echo "  --make=MAKE              use specified make [$make]"
-  echo "  --extra-cflags=ECFLAGS   add ECFLAGS to CFLAGS [$CFLAGS]"
-  echo "  --extra-ldflags=ELDFLAGS add ELDFLAGS to LDFLAGS [$LDFLAGS]"
-  echo "  --enable-symbol-visibility  enables symbol visibility options"
+  echo  "  --extra-cflags=ECFLAGS   add ECFLAGS to CFLAGS [$CFLAGS]"
+  echo  "  --extra-cxxflags=ECXFLAGS add ECXXFLAGS to list of flags for C++ compile"
+  echo  "  --extra-ldflags=ELDFLAGS  add ELDFLAGS to LDFLAGS [$LDFLAGS]"
+  echo  "  --enable-symbol-visibility enables symbol visibility options"
   #echo "  --extra-libs=ELIBS       add ELIBS [$ELIBS]"
   #echo "  --build-suffix=SUFFIX    suffix for application specific build []"
   echo "  --arch=ARCH              select architecture  [$arch]"
@@ -125,7 +126,8 @@ show_help(){
   echo "                           instruction selection, may crash on older CPUs)"
   #echo "  --enable-powerpc-perf    enable performance report on PPC"
   #echo "                           (requires enabling PMC)"
-  echo "  --disable-mmx            disable MMX usage"
+  echo  "  --enable-proc-opt        enable processor specific compilation"
+  echo  "  --disable-mmx            disable MMX usage"
   #echo "  --disable-armv5te        disable armv5te usage"
   #echo "  --disable-armv6          disable armv6 usage"
   #echo "  --disable-iwmmxt         disable iwmmxt usage"
@@ -158,15 +160,16 @@ show_help(){
   echo "  --x11-path=X11LOC        location of X11 include files [$x11_include_path-path]"
   echo "  --disable-xrandr         disable X11 resolution switching"
   echo "  --disable-xv             disable XVideo   (X11 video output accel.)"
-  echo "  --enable-xvmc            enable XvMC      (Linux/BSD MPEG accel.)"
-  echo "  --enable-xvmcw           disable XvMC Wrapper, use --xvmc-lib if autodetection fails"
+  echo "  --disable-xvmc           disable XvMC     (Linux/BSD MPEG accel.)"
+  echo "  --disable-xvmcw          disable XvMC Wrapper, use --xvmc-lib if autodetection fails"
   echo "  --enable-xvmc-pro        enable XvMC for the unichrome pro (NOT unichrome) chipset"
   echo "  --enable-xvmc-opengl     enable nVidia XvMC OpenGL texture method"
   echo "  --xvmc-lib=LIB           XvMC library override (for crosscompiling)"
   #echo "  --disable-xvmc-vld       disable XvMC-VLD (VIA Epia MPEG accel.)"
+  echo "  --enable-opengl-video   disable opengl based video display "
   echo "  --enable-mac-accel       enable Mac OS X MPEG acceleration"
   echo "  --enable-opengl-vsync    enable OpenGL vsync method"
-  echo "  --enable-directfb        enable DirectFB  (Linux non-X11 video)"
+  echo "  --disable-directfb       disable DirectFB (Linux non-X11 video)"
   echo "  --enable-directx         enable DirectX   (Microsoft video)"
   echo ""
   echo "  --enable-mac-bundle      produce standalone OS X apps (e.g. mythfrontend.app)"
@@ -787,6 +790,7 @@ MYTHTV_CONFIG_LIST='
     lirc
     lmsensors
     opengl_vsync
+    opengl_video
     v4l
     valgrind
     x11
@@ -796,6 +800,7 @@ MYTHTV_CONFIG_LIST='
     xvmcw
     xvmc_opengl
     xvmc_vld
+    dvdv
 '
 
 MYTHTV_LIST='
@@ -834,6 +839,7 @@ flashsv_decoder_deps="zlib"
 flashsv_encoder_deps="zlib"
 mpeg_xvmc_decoder_deps="xvmc"
 mpeg_xvmc_vld_decoder_deps="xvmc_vld"
+mpeg_dvdv_decoder_deps="dvdv"
 png_decoder_deps="zlib"
 png_encoder_deps="zlib"
 x264_encoder_deps="x264"
@@ -1022,7 +1028,7 @@ audio_jack_libs="-ljack"
 backend="no"
 bindings_perl="yes"
 dbox2="yes"
-directfb="no"
+directfb="yes"
 directx="no"
 dvb_path="/usr/include"
 dvb="yes"
@@ -1040,6 +1046,7 @@ mac_bundle="no"
 mac_corevideo="no"
 opengl="no"
 opengl_vsync="no"
+opengl_video="no"
 proc_opt="no"
 symbol_visibility="no"
 v4l="yes"
@@ -1048,9 +1055,9 @@ x11="yes"
 x11_include_path="/usr/X11R6/include"
 xrandr="yes"
 xv="yes"
-xvmc="no"
+xvmc="yes"
 xvmc_lib=""
-xvmc_opengl="no"
+xvmc_opengl="yes"
 xvmc_pro="no"
 xvmc_vld="yes"
 xvmcw="yes"
@@ -1250,6 +1257,10 @@ for opt do
   --enable-mac-accel) dvdv="yes"
   ;;
   --disable-mac-accel) dvdv="no"
+  ;;
+  --enable-opengl-video) opengl_video="yes"
+  ;;
+  --disable-opengl-video) opengl_video="no"
   ;;
 # remove after 0.21
   --enable-dts) enable libdts
@@ -2666,64 +2677,70 @@ fi
 
 enabled x11 && has_library libX11 || disable x11
 
+if ! enabled x11; then
+    disable xrandr xv xvmc xvmc_vld xvmc_opengl opengl_video opengl
+fi
+
 enabled xrandr && has_header X11/extensions/Xrandr.h || disable xrandr
 enabled xv && has_library libXv || disable xv
 
+if ! enabled xv; then
+    disable xrandr xv xvmc xvmc_vld xvmc_opengl opengl_video
+fi
+
 VENDOR_XVMC_LIBS=""
 if enabled xvmc; then
-    xvmc="no"
-    if ! has_library libXvMCW ; then
-        xvmcw="no"
-    fi
+    disable xvmc
+    has_library libXvMCW || disable xvmcw
+
     if test x"$xvmc_lib" != x""; then
         VENDOR_XVMC_LIBS="-l"$xvmc_lib
-        xvmc="yes"
-        xvmcw="no"
-        if has_header X11/extensions/vldXvMC.h ; then
-            echo > /dev/null
-        else
-            xvmc_vld="no"
-        fi
+        enable xvmc
+        disable xvmcw
     elif enabled xvmcw; then
         VENDOR_XVMC_LIBS="-lXvMCW"
-        xvmc="yes"
-        if has_header X11/extensions/vldXvMC.h ; then
-            echo > /dev/null
-        else
-            xvmc_vld="no"
-        fi
+        enable xvmc
     elif has_library libXvMCNVIDIA ; then
         VENDOR_XVMC_LIBS="-lXvMCNVIDIA"
-        xvmc="yes"
-        if enabled xvmc_vld; then
-            xvmc_vld="no"
-        fi
+        enable xvmc
+        disable xvmc_vld
     elif enabled xvmc_pro; then
+        disable xvmc_pro
         if has_library libviaXvMCPro ; then
             VENDOR_XVMC_LIBS="-lviaXvMCPro"
-            xvmc="yes"
-            xvmc_vld="yes"
+            enable xvmc xvmc_vld xvmc_pro
         fi
     elif has_library libviaXvMC ; then
         VENDOR_XVMC_LIBS="-lviaXvMC"
-        xvmc="yes"
+        enable xvmc xvmc_vld
     elif has_library libI810XvMC ; then
         VENDOR_XVMC_LIBS="-lI810XvMC"
-        xvmc="yes"
-        if enabled xvmc_vld; then
-            xvmc_vld="no"
-        fi
+        enable xvmc
+        disable xvmc_vld
     fi
 else
-    xvmc_vld="no"
+    disable xvmc_vld xvmc_opengl
 fi
 
 if test x"$VENDOR_XVMC_LIBS" != x"-lXvMCNVIDIA" ; then
-    xvmc_opengl="no"
+    disable xvmc_opengl
 fi
 
-enabled opengl_vsync && has_library libGL && enable opengl || disable opengl_vsync
-enabled xvmc_opengl  && has_library libGL && enable opengl && disable xvmc_vld && disable xvmc_pro || disable xvmc_opengl
+if ! has_header X11/extensions/vldXvMC.h ; then
+    disable xvmc_vld
+fi
+
+if test x"$VENDOR_XVMC_LIBS" != x"-lviaXvMC" ; then
+    if test x"$VENDOR_XVMC_LIBS" != x"-lviaXvMCPro" ; then
+        if test x"$VENDOR_XVMC_LIBS" != x"-lXvMCW" ; then
+            disable xvmc_vld
+        fi
+    fi
+fi
+
+disabled xvmc_opengl || enable opengl && disable xvmc_vld xvmc_pro
+disabled opengl_video || enable opengl
+has_library libGL || disable opengl_video xvmc_opengl opengl_vsync opengl
 
 # Can only do Mac accel on Mac platform
 enabled dvdv && test $targetos = darwin || disable dvdv
@@ -2959,6 +2976,7 @@ if enabled frontend; then
 if test "$VENDOR_XVMC_LIBS" != "" ; then
   echo "XvMC libs        $VENDOR_XVMC_LIBS"
 fi
+  echo "OpenGL video     $opengl_video"
   echo "Mac acceleration $dvdv"
   echo "OpenGL vsync     $opengl_vsync"
   echo "DirectFB         $directfb"

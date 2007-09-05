@@ -7,7 +7,7 @@
 #include "mythcontext.h"
 #include "mythdbcon.h"
 #include "programinfo.h"
-#include "videooutbase.h" // for MythCodecID
+#include "mythcodecid.h"
 
 class RingBuffer;
 class TeletextViewer;
@@ -95,7 +95,6 @@ class DecoderBase
 
     virtual long UpdateStoredFrameNum(long frame) = 0;
 
-    virtual QString GetEncodingType(void) const = 0;
     virtual double  GetFPS(void) const { return fps; }
     /// Returns the estimated bitrate if the video were played at normal speed.
     uint GetRawBitrate(void) const { return bitrate; }
@@ -103,7 +102,10 @@ class DecoderBase
     virtual void UpdateFramesPlayed(void);
     long long GetFramesRead(void) const { return framesRead; };
 
-    virtual MythCodecID GetVideoCodecID() const { return kCodec_NONE; }
+    virtual QString GetCodecDecoderName(void) const = 0;
+    virtual MythCodecID GetVideoCodecID(void) const = 0;
+    virtual void *GetVideoCodecPrivate(void) { return NULL; }
+
     virtual bool SyncPositionMap(void);
     virtual bool PosMapFromDb(void);
     virtual bool PosMapFromEnc(void);

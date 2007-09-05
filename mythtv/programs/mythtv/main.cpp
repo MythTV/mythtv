@@ -73,7 +73,7 @@ int main(int argc, char *argv[])
 {
     QString geometry = QString::null;
     QString display  = QString::null;
-#ifdef Q_WS_X11
+#ifdef USING_X11
     // Remember any -display or -geometry argument
     // which QApplication init will remove.
     for(int argpos = 1; argpos + 1 < argc; ++argpos)

@@ -3,6 +3,7 @@
 
 #include "libmyth/settings.h"
 #include "libmyth/mythcontext.h"
+#include "libmythtv/videodisplayprofile.h"
 
 class ThemeSelector : public HostImageSelect
 {
@@ -14,6 +15,12 @@ class PlaybackSettings : public ConfigurationWizard
 {
   public:
     PlaybackSettings();
+};
+
+class OSDSettings: virtual public ConfigurationWizard
+{
+  public:
+    OSDSettings();
 };
 
 class GeneralSettings : public ConfigurationWizard
@@ -51,5 +58,103 @@ class XboxSettings : public ConfigurationWizard
   public:
     XboxSettings();
 };
+
+class PlaybackProfileItemConfig : public QObject, public ConfigurationWizard
+{
+    Q_OBJECT
+
+  public:
+    PlaybackProfileItemConfig(ProfileItem &_item);
+
+    virtual void load(void);
+    virtual void save(void);
+
+  private slots:
+    void decoderChanged(const QString &dec);
+    void vrenderChanged(const QString &renderer);
+
+  private:
+    ProfileItem          &item;
+    TransComboBoxSetting *cmp[2];
+    TransSpinBoxSetting  *width[2];
+    TransSpinBoxSetting  *height[2];
+    TransComboBoxSetting *decoder;
+    TransComboBoxSetting *vidrend;
+    TransComboBoxSetting *osdrend;
+    TransCheckBoxSetting *osdfade;
+    TransComboBoxSetting *deint0;
+    TransComboBoxSetting *deint1;
+    TransComboBoxSetting *filters;
+};
+
+class PlaybackProfileConfig : public VerticalConfigurationGroup
+{
+    Q_OBJECT
+
+  public:
+    PlaybackProfileConfig(const QString &profilename);
+    virtual ~PlaybackProfileConfig();
+
+    virtual void load(void);
+    virtual void save(void);
+
+    void swap(int indexA, int intexB);
+
+  private slots:
+    void pressed(QString);
+    void priorityChanged(const QString &name, int);
+
+  private:
+    void InitLabel(uint);
+    void InitUI(void);
+
+  private:
+    item_list_t items;
+    item_list_t del_items;
+    QString     profile_name;
+    bool        needs_save;
+    uint        groupid;
+
+    VerticalConfigurationGroup  *last_main;
+    vector<TransLabelSetting*>   labels;
+    vector<TransButtonSetting*>  editProf;
+    vector<TransButtonSetting*>  delProf;
+    vector<TransSpinBoxSetting*> priority;
+};
+
+class PlaybackProfileConfigs : public TriggeredConfigurationGroup
+{
+    Q_OBJECT
+
+  public:
+    PlaybackProfileConfigs(const QString &str);
+    virtual ~PlaybackProfileConfigs();
+
+  private:
+    void InitUI(void);
+
+  private slots:
+    void btnPress(QString);
+    void triggerChanged(const QString&);
+
+  private:
+    QStringList   profiles;
+    HostComboBox *grouptrigger;
+};
+
+#ifdef USING_IVTV
+class PVR350VideoDevice : public PathSetting, public HostDBStorage
+{
+  public:
+    PVR350VideoDevice();
+
+    uint fillSelectionsFromDir(const QDir &dir,
+                               uint minor_min, uint minor_max,
+                               QString card, QString driver,
+                               bool allow_duplicates);
+  private:
+    QMap<uint, uint> minor_list;
+};
+#endif // USING_IVTV
 
 #endif

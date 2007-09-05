@@ -1330,6 +1330,9 @@ void SIScan::UpdateVCTinDB(int db_mplexid,
             chanid = ChannelUtil::CreateChanID(db_source_id, chan_num);
             if (chanid > 0)
             {
+                bool use_eit = !vct->IsHidden(i) ||
+                    (vct->IsHidden(i) && !vct->IsHiddenInGuide(i));
+
                 ChannelUtil::CreateChannel(
                     db_mplexid,
                     db_source_id,

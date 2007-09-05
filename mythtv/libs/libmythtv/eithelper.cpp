@@ -46,7 +46,7 @@ EITHelper::EITHelper() :
     int hours   = diff / (60 * 60);
     int minutes = ((diff) / 60) % 60;
     int seconds = diff % 60;
-    VERBOSE(VB_EIT, LOC + QString("localtime offset %1%2:%3%4:%5%6 ")
+    VERBOSE(VB_IMPORTANT, LOC + QString("localtime offset %1%2:%3%4:%5%6 ")
             .arg((sign < 0) ? "-" : "")
             .arg(hours).arg(minutes/10).arg(minutes%10)
             .arg(seconds/10).arg(seconds%10));

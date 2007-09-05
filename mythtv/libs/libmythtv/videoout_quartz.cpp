@@ -59,9 +59,11 @@ using namespace std;
 #include "osd.h"
 #include "osdsurface.h"
 #include "mythconfig.h"
-#ifdef HAVE_DVDV
+#include "videodisplayprofile.h"
 #include "videoout_dvdv.h"
-#endif
+
+#define LOC QString("VideoOutputQuartz: ")
+#define LOC_ERR QString("VideoOutputQuartz Error: ")
 
 class VideoOutputQuartzView;
 
@@ -73,10 +75,31 @@ OSStatus VoqvFloater_Callback(EventHandlerCallRef inHandlerCallRef,
                               void *inUserData);
 
 /*
- * The structure containing most of VideoOutQuartz's variables
+ * The class containing most of VideoOutputQuartz's variables
  */
-struct QuartzData
+class QuartzData
 {
+  public:
+    QuartzData() :
+        srcWidth(0),                srcHeight(0),
+        srcAspect(1.3333f),         srcMode(kLetterbox_Off),
+
+        pixelData(0),               pixelSize(0),
+        pixelLock(false),
+
+        window(0),
+        screen(0),                  refreshRate(60.0f),
+
+        drawInWindow(false),        windowedMode(false),
+        scaleUpVideo(false),        correctGamma(false),
+        convertI420to2VUY(NULL),
+
+        ZoomedIn(0),
+        ZoomedUp(0),                ZoomedRight(0),
+
+        embeddedView(NULL),         dvdv(NULL)
+    {;}
+
     // Stored information about the media stream:
     int                srcWidth,
                        srcHeight;
@@ -100,18 +123,20 @@ struct QuartzData
     bool               windowedMode;      // GUI runs in window?
     bool               scaleUpVideo;      // Enlarge video as needed?
     bool               correctGamma;      // Video gamma correction
-    yuv2vuy_fun        yuvConverter;      // 420 -> 2vuy conversion function
+    conv_i420_2vuy_fun convertI420to2VUY; // I420 -> 2VUY conversion function
     
     // Zoom preferences:
-    int                ZoomedIn;          // These mirror the videooutbase
-    int                ZoomedUp;          // variables, for the benefit of
-    int                ZoomedRight;       // the views
+    int                ZoomedIn;          // VideoOutputBase::mz_scale
+    int                ZoomedUp;          // VideoOutputBase::mz_move.y()
+    int                ZoomedRight;       // VideoOutputBase::mz_move.x()
 
     // Output viewports:
     QPtrList<VideoOutputQuartzView> views;   // current views
 
     // Embedding:
     VideoOutputQuartzView * embeddedView;    // special embedded widget
+
+    DVDV                  * dvdv;            // MPEG acceleration data
 };
 
 /**
@@ -402,12 +427,14 @@ void VideoOutputQuartzView::Transform(void)
     }
 
 // apply the basic sizing to DVDV
-#ifdef HAVE_DVDV
-    DVDV *dvdv = DVDV::singleton();
-    if (dvdv)
-        dvdv->MoveResize(0, 0, parentData->srcWidth, parentData->srcHeight,
-                         (int)((w - sw) / 2.0), (int)((h - sh) / 2.0), sw, sh);
-#endif
+#ifdef USING_DVDV
+    if (parentData->dvdv)
+    {
+        parentData->dvdv->MoveResize(
+            0, 0, parentData->srcWidth, parentData->srcHeight,
+            (int)((w - sw) / 2.0), (int)((h - sh) / 2.0), sw, sh);
+    }
+#endif // USING_DVDV
 
     // apply over/underscan
     int hscan = gContext->GetNumSetting("HorizScanPercentage", 5);
@@ -1166,22 +1193,27 @@ class VoqvDesktop : public VideoOutputQuartzView
 /** \class VideoOutputQuartz
  *  \brief Implementation of Quartz (Mac OS X windowing system) video output
  */
-VideoOutputQuartz::VideoOutputQuartz(void)
-                 : VideoOutput()
+VideoOutputQuartz::VideoOutputQuartz(
+    MythCodecID _myth_codec_id, void *codec_priv) :
+    VideoOutput(), Started(false), data(new QuartzData()),
+    myth_codec_id(_myth_codec_id)
 {
-    Started = 0; 
-
     init(&pauseFrame, FMT_YV12, NULL, 0, 0, 0, 0);
 
-    data = new QuartzData();
     data->views.setAutoDelete(true);
+
+    SetDVDVDecoder((DVDV*)codec_priv);
 }
 
 VideoOutputQuartz::~VideoOutputQuartz()
 {
-    Exit();
+    if (data)
+    {
+        Exit();
 
-    delete data;
+        delete data;
+        data = NULL;
+    }
 }
 
 void VideoOutputQuartz::VideoAspectRatioChanged(float aspect)
@@ -1220,19 +1252,51 @@ void VideoOutputQuartz::Zoom(int direction)
     }
 }
 
-void VideoOutputQuartz::InputChanged(int width, int height, float aspect,
-                                     MythCodecID av_codec_id)
+bool VideoOutputQuartz::InputChanged(const QSize &input_size,
+                                     float        aspect,
+                                     MythCodecID  av_codec_id,
+                                     void        *codec_private)
 {
-    VERBOSE(VB_PLAYBACK,
-            QString("VideoOutputQuartz::InputChanged(width=%1, height=%2, aspect=%3")
-                   .arg(width).arg(height).arg(aspect));
+    VERBOSE(VB_PLAYBACK, LOC +
+            QString("InputChanged(WxH = %1x%2, aspect=%3")
+            .arg(input_size.width())
+            .arg(input_size.height()).arg(aspect));
 
-    VideoOutput::InputChanged(width, height, aspect, av_codec_id);
+    bool cid_changed = (myth_codec_id != av_codec_id);
+    bool res_changed = input_size != video_dim;
+    bool asp_changed = aspect != video_aspect;
+
+    VideoOutput::InputChanged(input_size, aspect, av_codec_id, codec_private);
+
+    if (!res_changed && !cid_changed)
+    {
+        // TODO we should clear our buffers to black here..
+        if (asp_changed)
+            MoveResize();
+        return true;
+    }
+
+    if (cid_changed)
+    {
+        myth_codec_id = av_codec_id;
+        data->dvdv    = (DVDV*) codec_private;
+
+        if ((data->dvdv && (kCodec_MPEG2_DVDV != myth_codec_id)) ||
+            (!data->dvdv && (kCodec_NORMAL_END <= myth_codec_id)))
+        {
+            return false;
+        }
+
+        if (data->dvdv && !data->dvdv->SetVideoSize(video_dim))
+        {
+            return false;
+        }
+    }
 
     DeleteQuartzBuffers();
 
-    data->srcWidth  = width;
-    data->srcHeight = height;
+    data->srcWidth  = input_size.width();
+    data->srcHeight = input_size.height();
     data->srcAspect = aspect;
     data->srcMode   = db_letterbox;
 
@@ -1242,10 +1306,13 @@ void VideoOutputQuartz::InputChanged(int width, int height, float aspect,
          view;
          view = data->views.next())
     {
-        view->InputChanged(width, height, aspect, av_codec_id);
+        view->InputChanged(
+            video_dim.width(), video_dim.height(), aspect, av_codec_id);
     }
 
-    MoveResize();    
+    MoveResize();
+
+    return true;
 }
 
 int VideoOutputQuartz::GetRefreshRate(void)
@@ -1261,17 +1328,22 @@ bool VideoOutputQuartz::Init(int width, int height, float aspect,
                              WId winid, int winx, int winy,
                              int winw, int winh, WId embedid)
 {
-    VERBOSE(VB_PLAYBACK,
-            QString("VideoOutputQuartz::Init(width=%1, height=%2, aspect=%3, winid=%4\n winx=%5, winy=%6, winw=%7, winh=%8, WId embedid=%9)")
-                   .arg(width)
-                   .arg(height)
-                   .arg(aspect)
-                   .arg(winid)
-                   .arg(winx)
-                   .arg(winy)
-                   .arg(winw)
-                   .arg(winh)
-                   .arg(embedid));
+    VERBOSE(VB_PLAYBACK, LOC +
+            QString("Init(WxH %1x%2, aspect=%3, winid=%4\n\t\t\t"
+                    "win_bounds(x %5, y%6, WxH %7x%8), WId embedid=%9)")
+            .arg(width).arg(height).arg(aspect).arg(winid)
+            .arg(winx).arg(winy).arg(winw).arg(winh).arg(embedid));
+
+    if ((data->dvdv && (kCodec_MPEG2_DVDV != myth_codec_id)) ||
+        (!data->dvdv && (kCodec_NORMAL_END <= myth_codec_id)))
+    {
+        return false;
+    }
+
+    if (data->dvdv && !data->dvdv->SetVideoSize(QSize(width, height)))
+    {
+        return false;
+    }
 
     vbuffers.Init(kNumBuffers, true, kNeedFreeFrames, 
                   kPrebufferFramesNormal, kPrebufferFramesSmall, 
@@ -1332,13 +1404,21 @@ bool VideoOutputQuartz::Init(int width, int height, float aspect,
         data->refreshRate = 150.0;   // Divisible by 25Hz and 30Hz
                                      // to minimise AV sync waiting
 
+    // Find the display physical aspect ratio
+    CGSize size_in_mm = CGDisplayScreenSize(data->screen);
+    if ((size_in_mm.width > 0.0001f) && (size_in_mm.height > 0.0001f))
+    {
+        display_dim = QSize((uint) size_in_mm.width, (uint) size_in_mm.height);
+        display_aspect = size_in_mm.width / size_in_mm.height;
+    }
+
     // Global configuration options
     data->scaleUpVideo = gContext->GetNumSetting("MacScaleUp", 1);
     data->drawInWindow = gContext->GetNumSetting("GuiSizeForTV", 0);
     data->windowedMode = gContext->GetNumSetting("RunFrontendInWindow", 0);
     data->correctGamma = gContext->GetNumSetting("MacGammaCorrect", 0);
     
-    data->yuvConverter = get_yuv2vuy_conv();
+    data->convertI420to2VUY = get_i420_2vuy_conv();
 
     if (!CreateQuartzBuffers())
     {
@@ -1417,20 +1497,70 @@ bool VideoOutputQuartz::Init(int width, int height, float aspect,
     return true;
 }
 
-/** \brief
- * Allocate buffers for parent to decode into. Also creates a new pause frame,
- * and sets up some QuickTime headers for fast munging in ProcessFrame()
- */
+void VideoOutputQuartz::SetVideoFrameRate(float playback_fps)
+{
+    VERBOSE(VB_PLAYBACK, "SetVideoFrameRate("<<playback_fps<<")");
+}
+
+void VideoOutputQuartz::SetDVDVDecoder(DVDV *dvdvdec)
+{
+    QString renderer = "quartz-blit";
+
+    (void) dvdvdec;
+
+#ifdef USING_DVDV
+    data->dvdv = dvdvdec;
+    renderer = (data->dvdv) ? "quartz-accel" : renderer;
+#endif // USING_DVDV
+
+    db_vdisp_profile->SetVideoRenderer(renderer);
+}
+
+static QString toCommaList(const QStringList &list)
+{
+    QString ret = "";
+    for (QStringList::const_iterator it = list.begin(); it != list.end(); ++it)
+        ret += *it + ",";
+
+    if (ret.length())
+        return ret.left(ret.length()-1);
+
+    return "";
+}
+
 bool VideoOutputQuartz::CreateQuartzBuffers(void)
 {
-    vbuffers.CreateBuffers(video_dim.width(), video_dim.height());
+    db_vdisp_profile->SetInput(video_dim);
+    QStringList renderers = GetAllowedRenderers(myth_codec_id, video_dim);
+    QString     renderer  = QString::null;
 
+    QString tmp = db_vdisp_profile->GetVideoRenderer();
+    VERBOSE(VB_PLAYBACK, LOC + "CreateQuartzBuffers() "
+            <<QString("render: %1, allowed: %2")
+            .arg(tmp).arg(toCommaList(renderers)));
+
+    if (renderers.contains(tmp))
+        renderer = tmp;
+    else if (!renderers.empty())
+        renderer = renderers[0];
+    else
+    {
+        VERBOSE(VB_IMPORTANT, "Failed to find a video renderer");
+        return false;
+    }
+
+    // reset this so that all the prefs are reinitialized
+    db_vdisp_profile->SetVideoRenderer(renderer);
+    VERBOSE(VB_IMPORTANT, LOC + "VProf: " + db_vdisp_profile->toString());
+
+    vbuffers.CreateBuffers(video_dim.width(), video_dim.height());
+  
     // Set up pause frame
     if (pauseFrame.buf)
         delete [] pauseFrame.buf;
 
     VideoFrame *scratch = vbuffers.GetScratchFrame();
-
+  
     init(&pauseFrame, FMT_YV12, new unsigned char[scratch->size], 
          scratch->width, scratch->height, scratch->bpp, scratch->size);
 
@@ -1600,11 +1730,10 @@ void VideoOutputQuartz::PrepareFrame(VideoFrame *buffer, FrameScanType t)
 {
     (void)t;
 
-#ifdef HAVE_DVDV
-    DVDV *dvdv = DVDV::singleton();
-    if (dvdv && buffer)
-        dvdv->DecodeFrame(buffer);
-#endif
+#ifdef USING_DVDV
+    if (data->dvdv && buffer)
+        data->dvdv->DecodeFrame(buffer);
+#endif // USING_DVDV
 
     if (buffer)
         framesPlayed = buffer->frameNumber + 1;
@@ -1618,14 +1747,13 @@ void VideoOutputQuartz::Show(FrameScanType t)
 {
     (void)t;
 
-#ifdef HAVE_DVDV
-    DVDV *dvdv = DVDV::singleton();
-    if (dvdv)
+#ifdef USING_DVDV
+    if (data->dvdv)
     {
-        dvdv->ShowFrame();
+        data->dvdv->ShowFrame();
         return;
     }
-#endif
+#endif // USING_DVDV
 
     data->pixelLock.lock();
     for (VideoOutputQuartzView *view = data->views.first();
@@ -1665,29 +1793,31 @@ void VideoOutputQuartz::ProcessFrame(VideoFrame *frame, OSD *osd,
                                      FilterChain *filterList,
                                      NuppelVideoPlayer *pipPlayer)
 {
-    if (!frame)
-    {
-        frame = vbuffers.GetScratchFrame();
-        CopyFrame(vbuffers.GetScratchFrame(), &pauseFrame);
-    }
-
-#ifdef HAVE_DVDV
-    DVDV *dvdv = DVDV::singleton();
-    if (dvdv)
+#ifdef USING_DVDV
+    if (data->dvdv)
     {
         if (osd && osd->Visible())
         {
             OSDSurface *surface = osd->Display();
             if (surface && surface->Changed())
-                dvdv->DrawOSD(surface->y, surface->u,
-                              surface->v, surface->alpha);
+            {
+                data->dvdv->DrawOSD(surface->y, surface->u,
+                                    surface->v, surface->alpha);
+            }
         }
         else
-            dvdv->DrawOSD(NULL, NULL, NULL, NULL);
-
+        {
+            data->dvdv->DrawOSD(NULL, NULL, NULL, NULL);
+        }
         return;   // no need to process frame, it won't be used
     }
-#endif
+#endif // USING_DVDV
+
+    if (!frame)
+    {
+        frame = vbuffers.GetScratchFrame();
+        CopyFrame(vbuffers.GetScratchFrame(), &pauseFrame);
+    }
 
     if (filterList)
         filterList->ProcessFrame(frame);
@@ -1709,6 +1839,7 @@ void VideoOutputQuartz::ProcessFrame(VideoFrame *frame, OSD *osd,
         m_deintFilter->ProcessFrame(frame);
     }
 
+    QMutexLocker locker(&data->pixelLock);
     if (!data->pixelData)
     {
         VERBOSE(VB_PLAYBACK,
@@ -1717,14 +1848,56 @@ void VideoOutputQuartz::ProcessFrame(VideoFrame *frame, OSD *osd,
     }
 
     // copy data to our buffer
-    data->pixelLock.lock();
-    data->yuvConverter((uint8_t *)(data->pixelData),
-                       frame->buf + frame->offsets[0], // Y
-                       frame->buf + frame->offsets[1], // U
-                       frame->buf + frame->offsets[2], // V
-                       frame->width, frame->height,
-                       (frame->width % 2), (frame->width % 2), 0);
-            // FIXME - These values (stride) should be calculated
-            //         from frame->pitches and frame->width ?
-    data->pixelLock.unlock();
+    data->convertI420to2VUY(
+        (unsigned char*) data->pixelData, frame->width<<1, // 2vuy
+        frame->buf + frame->offsets[0], // Y plane
+        frame->buf + frame->offsets[1], // U plane
+        frame->buf + frame->offsets[2], // V plane
+        frame->pitches[0], frame->pitches[1], frame->pitches[2],
+        frame->width, frame->height);
+}
+
+QStringList VideoOutputQuartz::GetAllowedRenderers(
+    MythCodecID myth_codec_id, const QSize &video_dim)
+{
+    (void) video_dim;
+
+    QStringList list;
+
+    if (kCodec_MPEG2_DVDV == myth_codec_id)
+    {
+        list += "quartz-accel";
+    }
+    else if (kCodec_MPEG2_DVDV != myth_codec_id)
+    {
+        list += "quartz-blit";
+    }
+
+    return list;
+}
+
+MythCodecID VideoOutputQuartz::GetBestSupportedCodec(
+    uint width, uint height,
+    uint osd_width, uint osd_height,
+    uint stream_type, uint fourcc)
+{
+    (void) osd_width;
+    (void) osd_height;
+
+    VideoDisplayProfile vdp;
+    vdp.SetInput(QSize(width, height));
+    QString dec = vdp.GetDecoder();
+    if ((dec == "libmpeg2") || (dec == "ffmpeg"))
+        return (MythCodecID)(kCodec_MPEG1 + (stream_type-1));
+
+    if ((dec == "macaccel") &&
+        ((FOURCC_I420 == fourcc) || (FOURCC_IYUV == fourcc)) &&
+        ((2 == stream_type) || (1 == stream_type)))
+    {
+        return kCodec_MPEG2_DVDV;
+    }
+    else
+    {
+        return (MythCodecID)(kCodec_MPEG1 + (stream_type-1));
+    }
 }

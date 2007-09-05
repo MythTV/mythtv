@@ -4,26 +4,10 @@
 #include "xvmctextures.h"
 #include "osd.h"
 #include "osdsurface.h"
+#include "frame.h"
 
 #define LOC QString("XvMCTex: ")
 #define LOC_ERR QString("XvMCTex, Error: ")
-
-static GLXFBConfig get_pbuffer_cfg(Display *XJ_disp, int XJ_screen_num);
-
-static GLXPbuffer get_pbuffer(Display     *XJ_disp,
-                              GLXFBConfig  glx_fbconfig,
-                              const QSize &video_dim);
-
-static Window get_gl_window(Display *XJ_disp, Window XJ_curwin,
-                            GLXFBConfig glx_fbconfig,
-                            const QSize &window_size);
-
-static GLXWindow get_glx_window(Display     *XJ_disp,
-                                GLXFBConfig  glx_fbconfig,
-                                Window       gl_window,
-                                GLXContext   glx_context,
-                                GLXPbuffer  glx_pbuffer,
-                                const QSize &window_size);
 
 static vector<GLuint> create_textures(
     Display     *XJ_disp,
@@ -64,8 +48,32 @@ bool XvMCTextures::Init(Display *disp, Window XJ_curwin,
 
     XJ_disp = disp;
 
+    if (!init_opengl())
+    {
+        VERBOSE(VB_PLAYBACK, LOC_ERR + "Failed to initialize OpenGL support.");
+
+        return false;
+    }
+
+    uint major = 0, minor = 0;
+    if (!get_glx_version(XJ_disp, major, minor))
+    {
+        VERBOSE(VB_PLAYBACK, LOC_ERR + "GLX extension not present.");
+
+        return false;
+    }
+
+    if ((1 == major) && (minor < 3))
+    {
+        VERBOSE(VB_PLAYBACK, LOC_ERR + QString(
+                    "Need GLX 1.3 or better, have %1.%2")
+                .arg(major).arg(minor));
+
+        return false;
+    }
+
     if (!glx_fbconfig)
-        glx_fbconfig = get_pbuffer_cfg(XJ_disp, XJ_screen_num);
+        glx_fbconfig = get_fbuffer_cfg(XJ_disp, XJ_screen_num, kRenderRGBA);
 
     if (glx_fbconfig)
         glx_pbuffer = get_pbuffer(XJ_disp, glx_fbconfig, video_dim);
@@ -74,7 +82,8 @@ bool XvMCTextures::Init(Display *disp, Window XJ_curwin,
         X11S(glx_context = glXCreateNewContext(XJ_disp, glx_fbconfig,
                                                GLX_RGBA_TYPE, NULL, 1));
 
-    gl_window = get_gl_window(XJ_disp, XJ_curwin, glx_fbconfig, window_size);
+    gl_window = get_gl_window(XJ_disp, XJ_curwin, glx_fbconfig,
+                              window_size, true);
 
     glx_window = get_glx_window(XJ_disp, glx_fbconfig, gl_window, glx_context,
                                 glx_pbuffer, window_size);
@@ -189,7 +198,7 @@ bool XvMCTextures::ProcessOSD(OSD *osd)
     glTexParameterf(rect_type, GL_TEXTURE_WRAP_T, GL_CLAMP);
     glTexParameterf(rect_type, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameterf(rect_type, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    //glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
+
     glTexImage2D(rect_type, 0, GL_RGBA8,
                  gl_video_size.width(), gl_video_size.height(),
                  0, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
@@ -239,6 +248,26 @@ void XvMCTextures::PrepareFrame(XvMCSurface *surf,
     gl_vid_tex_size[tex_idx] = QSize(gl_video_size.width(), h);
 
     /////
+
+    last_video_rect = video_rect;
+
+    /////
+
+    glFlush();
+
+    glXMakeContextCurrent(XJ_disp, None, None, NULL);
+
+    X11U;
+}
+
+void XvMCTextures::CompositeFrameAndOSD(int scan)
+{
+    if (last_video_rect.width() <= 0)
+        return;
+
+    QRect video_rect = last_video_rect;
+
+    int field = (scan <= 0) ? 1 : scan;
 
     float bob_delta = 0.0f;
     if (XVMC_FRAME_PICTURE != field)
@@ -292,155 +321,25 @@ void XvMCTextures::PrepareFrame(XvMCSurface *surf,
         glTexCoord2f(xbeg, ybeg); glVertex3f(xobeg, yoend, -1.0f);
         glEnd();
     }
-
-    /////
-
-    glFlush();
-
-    glXMakeContextCurrent(XJ_disp, None, None, NULL);
-
-    X11U;
 }
 
-void XvMCTextures::Show(void)
+void XvMCTextures::Show(int scan)
 {
     X11L;
 
     glXMakeContextCurrent(XJ_disp, glx_window, glx_pbuffer, glx_context);
+
+    CompositeFrameAndOSD(scan);
 
     glFinish();
     glXSwapBuffers(XJ_disp, glx_window);
-    glFinish();
 
     glXMakeContextCurrent(XJ_disp, None, None, NULL);
 
     X11U;
 }
 
-static GLXFBConfig get_pbuffer_cfg(Display *XJ_disp, int XJ_screen_num)
-{
-    static const int attr_fbconfig[] =
-    {
-        GLX_CONFIG_CAVEAT, GLX_NONE,
-        GLX_RENDER_TYPE,   GLX_RGBA_BIT,
-        GLX_RED_SIZE,      5,
-        GLX_GREEN_SIZE,    5,
-        GLX_BLUE_SIZE,     5,
-        GLX_DOUBLEBUFFER,  1,
-        GLX_STEREO,        0,
-        GLX_LEVEL,         0,
-        GLX_DRAWABLE_TYPE, GLX_PBUFFER_BIT | GLX_WINDOW_BIT,
-        GLX_X_VISUAL_TYPE, GLX_TRUE_COLOR,
-        0
-    };
-    GLXFBConfig  cfg  = 0;
-    GLXFBConfig *cfgs = NULL;
-    int          num  = 0;
-
-    X11L;
-
-    cfgs = glXChooseFBConfig(XJ_disp, XJ_screen_num, attr_fbconfig, &num);
-
-    if (num)
-    {
-        cfg = cfgs[0];
-
-        // Try to waste less memory by getting a pbuffer without depth
-        for (int i = 0; i < num; i++)
-        {
-            int value;
-            glXGetFBConfigAttrib(XJ_disp, cfgs[i], GLX_DEPTH_SIZE, &value);
-            if (!value)
-            {
-                cfg = cfgs[i];
-                break;
-            }
-        }
-    }
-
-    X11U;
-
-    return cfg;
-}
-
-static GLXPbuffer get_pbuffer(Display     *XJ_disp,
-                              GLXFBConfig  glx_fbconfig,
-                              const QSize &video_dim)
-{
-    int attrib_pbuffer[16];
-    bzero(attrib_pbuffer, sizeof(int) * 16);
-    attrib_pbuffer[0] = GLX_PBUFFER_WIDTH;
-    attrib_pbuffer[1] = video_dim.width();
-    attrib_pbuffer[2] = GLX_PBUFFER_HEIGHT;
-    attrib_pbuffer[3] = video_dim.height();
-    attrib_pbuffer[4] = GLX_PRESERVED_CONTENTS;
-    attrib_pbuffer[5] = 0;
-
-    X11L;
-    GLXPbuffer tmp = glXCreatePbuffer(XJ_disp, glx_fbconfig, attrib_pbuffer);
-    X11U;
-    return tmp;
-}
-
-static Window get_gl_window(Display     *XJ_disp,
-                            Window       XJ_curwin,
-                            GLXFBConfig  glx_fbconfig,
-                            const QSize &window_size)
-{
-    X11L;
-
-    XVisualInfo *visInfo = glXGetVisualFromFBConfig(XJ_disp, glx_fbconfig);
-
-    XSetWindowAttributes attributes;
-    attributes.colormap = XCreateColormap(
-        XJ_disp, XJ_curwin, visInfo->visual, AllocNone);
-
-    Window gl_window = XCreateWindow(
-        XJ_disp, XJ_curwin, 0, 0, window_size.width(), window_size.height(), 0,
-        visInfo->depth, InputOutput, visInfo->visual, CWColormap, &attributes);
-
-    XMapWindow(XJ_disp, gl_window);
-
-    X11U;
-
-    return gl_window;
-}
-
-GLXWindow get_glx_window(Display    *XJ_disp,     GLXFBConfig  glx_fbconfig,
-                         Window      gl_window,   GLXContext   glx_context,
-                         GLXPbuffer  glx_pbuffer, const QSize &window_size)
-{
-    X11L;
-
-    GLXWindow glx_window = glXCreateWindow(
-        XJ_disp, glx_fbconfig, gl_window, NULL);
-
-    glXMakeContextCurrent(XJ_disp, glx_window, glx_pbuffer, glx_context);
-
-    glDrawBuffer(GL_BACK_LEFT);
-    glReadBuffer(GL_FRONT_LEFT);
-    glClearColor (0.0, 0.0, 0.0, 0.0);
-    glShadeModel(GL_FLAT);
-    glEnable(GL_TEXTURE_RECTANGLE_NV);
-    
-    glViewport(0, 0, window_size.width(), window_size.height());
-    glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
-    // left, right, botton, top, near, far
-    glOrtho(0, window_size.width(), 0, window_size.height(), -2, 2);
-    glMatrixMode(GL_MODELVIEW);
-    glLoadIdentity();
-
-    glFinish();
-
-    glXMakeContextCurrent(XJ_disp, None, None, NULL);
-
-    X11U;
-
-    return glx_window;
-}                       
-
-vector<GLuint> create_textures(
+static vector<GLuint> create_textures(
     Display     *XJ_disp,
     GLXWindow    glx_window,   GLXContext  glx_context,
     GLXPbuffer   glx_pbuffer,  const QSize &tex_size,   

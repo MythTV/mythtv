@@ -18,8 +18,10 @@ class VideoOutputNull : public VideoOutput
     void PrepareFrame(VideoFrame *buffer, FrameScanType);
     void Show(FrameScanType );
 
-    void InputChanged(int width, int height, float aspect,
-                      MythCodecID av_codec_id);
+    bool InputChanged(const QSize &input_size,
+                      float        aspect,
+                      MythCodecID  av_codec_id,
+                      void        *codec_private);
     void Zoom(int direction);
 
     void EmbedInWidget(WId wid, int x, int y, int w, int h);
@@ -33,6 +35,9 @@ class VideoOutputNull : public VideoOutput
     void ProcessFrame(VideoFrame *frame, OSD *osd,
                       FilterChain *filterList,
                       NuppelVideoPlayer *pipPlayer);
+
+    static QStringList GetAllowedRenderers(MythCodecID myth_codec_id,
+                                           const QSize &video_dim);
 
   private:
     void Exit(void);

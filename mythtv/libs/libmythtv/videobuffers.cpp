@@ -1166,16 +1166,18 @@ bool VideoBuffers::CreateBuffers(int width, int height,
     if (surfs.size()>allocSize())
     {
         VERBOSE(VB_PLAYBACK,
-                "Woo Hoo! We have more XvMC Surfaces than we need");
+                QString("Allocated %1 XvMC surfaces, minimum was %2 surfaces")
+                .arg(surfs.size()).arg(allocSize()));
+
         Reset();
-        bool extra_for_pause = allocSize() > numbuffers;
-        bool normal = (needprebufferframes_normal == needprebufferframes);
         uint increment = surfs.size() - allocSize();
-        
-        Init(numbuffers, extra_for_pause, 
-             needfreeframes, needprebufferframes_normal+increment-1,
-             needprebufferframes_small, keepprebufferframes+1);
-        SetPrebuffering(normal);
+
+        Init(surfs.size(),
+             false /* create an extra frame for pause? */,
+             needfreeframes,
+             needprebufferframes_normal + increment - 1,
+             needprebufferframes_small,
+             keepprebufferframes + 1);
     }
 
     for (uint i = 0; i < allocSize(); i++)
