@@ -37,6 +37,7 @@ extern "C" {
 #endif // USING_XVMC
 
 extern "C" {
+#include "../libavutil/avutil.h"
 #include "../libavcodec/parser.h"
 #include "../libmythmpeg2/mpeg2.h"
 #include "ivtv_myth.h"
@@ -80,6 +81,45 @@ static void align_dimensions(AVCodecContext *avctx, uint &width, uint &height)
     width  = (width  + 15) & (~0xf);
     height = (height + 15) & (~0xf);
 }
+
+static void myth_av_log(void *ptr, int level, const char* fmt, va_list vl)
+{
+    static QString full_line("");
+    static const int msg_len = 255;
+    static QMutex string_lock;
+
+    // determine mythtv debug level from av log level
+    int verbose_level = (level < AV_LOG_WARNING) ? VB_IMPORTANT : VB_LIBAV;
+
+    if (!(print_verbose_messages & verbose_level))
+        return;
+
+    string_lock.lock();
+    if (full_line.isEmpty() && ptr) {
+        AVClass* avc = *(AVClass**)ptr;
+        full_line.sprintf("[%s @ %p]", avc->item_name(ptr), avc);
+    }
+
+    char str[msg_len+1];
+    int bytes = vsnprintf(str, msg_len+1, fmt, vl);
+    // check for truncted messages and fix them
+    if (bytes > msg_len)
+    {
+        VERBOSE(VB_IMPORTANT, QString("Libav log output truncated %1 of %2 bytes written")
+                .arg(msg_len).arg(bytes));
+        str[msg_len-1] = '\n';
+    }
+
+    full_line += QString(str);
+    if (full_line.endsWith("\n"))
+    {
+        full_line.truncate(full_line.length() - 1);
+        VERBOSE(verbose_level, full_line);
+        full_line.truncate(0);
+    }
+    string_lock.unlock();
+}
+
 
 typedef MythDeque<AVFrame*> avframe_q;
 
@@ -373,6 +413,7 @@ AvFormatDecoder::AvFormatDecoder(NuppelVideoPlayer *parent,
 
     bool debug = (bool)(print_verbose_messages & VB_LIBAV);
     av_log_set_level((debug) ? AV_LOG_DEBUG : AV_LOG_ERROR);
+    av_log_set_callback(myth_av_log);
 
     allow_ac3_passthru = gContext->GetNumSetting("AC3PassThru", false);
 #ifdef CONFIG_LIBDTS
