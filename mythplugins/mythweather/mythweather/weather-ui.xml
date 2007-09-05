@@ -248,9 +248,14 @@
       </image>
 
       <textarea name="+observation_time" draworder="5">
-        <area>39,540,700,35</area>
+        <area>39,540,450,35</area>
         <font>footer</font>
       </textarea>
+
+      <!-- <textarea name="+copyright" draworder="5">
+        <area>450,540,700,35</area>
+        <font>footer</font>
+      </textarea> -->
     </container> 
 
     <container name="Three Day Forecast">
@@ -1240,10 +1245,10 @@
       </textarea>
 
       <blackhole name="pgto_spinbox" draworder="0">
-        <area>495,0,50,30</area>
+        <area>600,0,50,30</area>
       </blackhole>
       <blackhole name="hold_spinbox" draworder="0">
-        <area>495,80,50,30</area>
+        <area>600,80,50,30</area>
       </blackhole>
       <textarea name="backgroundlbl" draworder="0">
         <area>25,165,500,60</area>
@@ -1259,21 +1264,21 @@
       </textarea>
       <!-- Don't really like these images -->
       <checkbox name="backgroundcheck" draworder="0">
-        <position>495,160</position>
+        <position>600,160</position>
         <image function="checked" filename="mw_checked.png"></image>
         <image function="unchecked" filename="mw_unchecked.png"></image>
         <image function="checked_high" filename="mw_checked_high.png"></image>
         <image function="unchecked_high" filename="mw_unchecked_high.png"></image>
       </checkbox>      
       <checkbox name="skipcheck" draworder="0">
-        <position>495,240</position>
+        <position>600,240</position>
         <image function="checked" filename="mw_checked.png"></image>
         <image function="unchecked" filename="mw_unchecked.png"></image>
         <image function="checked_high" filename="mw_checked_high.png"></image>
         <image function="unchecked_high" filename="mw_unchecked_high.png"></image>
       </checkbox>
       <textbutton name="finishbutton" draworder="0">
-        <position>500,500</position>
+        <position>600,390</position>
         <font>button</font>
         <image function="on" filename="text_button_on.png"/>
         <image function="off" filename="text_button_off.png"/>
@@ -1378,7 +1383,7 @@
       </textarea>
 
       <textbutton name="finishbutton" draworder="0">
-        <position>500,500</position>
+        <position>600,390</position>
         <font>button</font>
         <image function="on" filename="text_button_on.png"/>
         <image function="off" filename="text_button_off.png"/>
@@ -1474,7 +1479,7 @@
         <font>help</font>
       </textarea>
       <textbutton name="finishbutton" draworder="0">
-        <position>500,500</position>
+        <position>600,390</position>
         <font>button</font>
         <image function="on" filename="text_button_on.png"/>
         <image function="off" filename="text_button_off.png"/>
