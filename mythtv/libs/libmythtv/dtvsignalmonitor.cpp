@@ -44,6 +44,7 @@ DTVSignalMonitor::DTVSignalMonitor(int db_cardnum,
       networkID(0), transportID(0),
       detectedNetworkID(0), detectedTransportID(0),
       programNumber(-1),
+      last_pat_crc(-1),
       error("")
 {
 }
@@ -185,6 +186,7 @@ void DTVSignalMonitor::UpdateListeningForEIT(void)
 void DTVSignalMonitor::SetChannel(int major, int minor)
 {
     DBG_SM(QString("SetChannel(%1, %2)").arg(major).arg(minor), "");
+    last_pat_crc = -1;
     if (GetATSCStreamData() && (majorChannel != major || minorChannel != minor))
     {
         RemoveFlags(kDTVSigMon_PATSeen   | kDTVSigMon_PATMatch |
@@ -201,6 +203,7 @@ void DTVSignalMonitor::SetChannel(int major, int minor)
 void DTVSignalMonitor::SetProgramNumber(int progNum)
 {
     DBG_SM(QString("SetProgramNumber(%1)").arg(progNum), "");
+    last_pat_crc = -1;
     if (programNumber != progNum)
     {
         RemoveFlags(kDTVSigMon_PMTSeen   | kDTVSigMon_PMTMatch |
@@ -216,6 +219,7 @@ void DTVSignalMonitor::SetDVBService(uint netid, uint tsid, int serviceid)
 {
     DBG_SM(QString("SetDVBService(transport_id: %1, network_id: %2, "
                    "service_id: %3)").arg(tsid).arg(netid).arg(serviceid), "");
+    last_pat_crc = -1;
 
     if (netid == networkID && tsid == transportID &&
         serviceid == programNumber)
@@ -280,6 +284,7 @@ void DTVSignalMonitor::HandlePAT(const ProgramAssociationTable *pat)
     {
         AddFlags(kDTVSigMon_PATMatch);
         GetStreamData()->AddListeningPID(pmt_pid);
+        last_pat_crc = pat->CRC();
         return;
     }
 
@@ -293,9 +298,13 @@ void DTVSignalMonitor::HandlePAT(const ProgramAssociationTable *pat)
         GetStreamData()->SetVersionPAT(tsid, -1,0);
         // END HACK HACK HACK
 
-        QString errStr = QString("Program #%1 not found in PAT!")
-            .arg(programNumber);
-        VERBOSE(VB_IMPORTANT, errStr<<endl<<pat->toString()<<endl);
+        if (last_pat_crc != pat->CRC())
+        {
+            last_pat_crc = pat->CRC();
+            QString errStr = QString("Program #%1 not found in PAT!")
+                .arg(programNumber);
+            VERBOSE(VB_IMPORTANT, errStr<<endl<<pat->toString());
+        }
         if (pat->ProgramCount() == 1)
         {
             VERBOSE(VB_IMPORTANT, "But there is only one program "
@@ -303,6 +312,7 @@ void DTVSignalMonitor::HandlePAT(const ProgramAssociationTable *pat)
             SetProgramNumber(pat->ProgramNumber(0));
             AddFlags(kDTVSigMon_PATMatch);
             GetStreamData()->AddListeningPID(pat->ProgramPID(0));
+            last_pat_crc == pat->CRC();
         }
     }
 }
