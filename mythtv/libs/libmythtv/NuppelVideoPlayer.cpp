@@ -6132,6 +6132,16 @@ int NuppelVideoPlayer::SetTrack(uint type, int trackNo)
     if (decoder)
         ret = decoder->SetTrack(type, trackNo);
 
+    if (kTrackTypeAudio == type)
+    {
+        QString msg = "";
+
+        if (decoder)
+            msg = decoder->GetTrackDesc(type, GetTrack(type));
+
+        if (osd)
+            osd->SetSettingsText(msg, 3);
+    }
     if (kTrackTypeSubtitle == type)
     {
         DisableCaptions(textDisplayMode, false);
@@ -6276,7 +6286,23 @@ int NuppelVideoPlayer::ChangeTrack(uint type, int dir)
     QMutexLocker locker(&decoder_change_lock);
 
     if (GetDecoder())
-        return GetDecoder()->ChangeTrack(type, dir);
+    {
+        int retval;
+
+        if ((retval = GetDecoder()->ChangeTrack(type, dir)) >= 0)
+        {
+            QString msg = "";
+
+            //msg = track_type_to_string(type);
+
+            msg = GetDecoder()->GetTrackDesc(type, GetTrack(type));
+
+            if (osd)
+                osd->SetSettingsText(msg, 3);
+
+            return retval;
+        }
+    }
     return -1;
 }
 
