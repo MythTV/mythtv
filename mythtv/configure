@@ -2740,6 +2740,8 @@ fi
 
 disabled xvmc_opengl || enable opengl && disable xvmc_vld xvmc_pro
 disabled opengl_video || enable opengl
+disabled opengl_vsync || enable opengl
+disabled x11 || enable opengl
 has_library libGL || disable opengl_video xvmc_opengl opengl_vsync opengl
 
 # Can only do Mac accel on Mac platform
