@@ -342,20 +342,8 @@ int DVDRingBufferPriv::safe_read(void *data, unsigned sz)
                 dvdnav_spu_stream_change_event_t* spu =
                     (dvdnav_spu_stream_change_event_t*)(blockBuf);
 
-                if (autoselectsubtitle)
-                    curSubtitleTrack = dvdnav_get_active_spu_stream(dvdnav);
-
                 subTrackMap.clear();
                 uint count = dvdnav_subp_get_stream_count(dvdnav);
-
-                VERBOSE(VB_PLAYBACK,
-                        QString("DVDNAV_SPU_STREAM_CHANGE: "
-                                "physical_wide==%1, physical_letterbox==%2, "
-                                "physical_pan_scan==%3, current_track==%4, "
-                                "total count %5")
-                        .arg(spu->physical_wide).arg(spu->physical_letterbox)
-                        .arg(spu->physical_pan_scan).arg(curSubtitleTrack)
-                        .arg(count));
 
                 ClearMenuSPUParameters();
                 ClearSubtitlesOSD();
@@ -366,6 +354,9 @@ int DVDRingBufferPriv::safe_read(void *data, unsigned sz)
                     int aspect = dvdnav_get_video_aspect(dvdnav);
                     if (aspect != 0)
                         buttonstreamid = spu->physical_wide + buttonstreamid;
+
+                    if (parent && parent->GetCaptionMode())
+                        parent->SetCaptionsEnabled(false, false);
                 }
                 else
                 {
@@ -381,11 +372,17 @@ int DVDRingBufferPriv::safe_read(void *data, unsigned sz)
                     }
                 }
 
-                if (parent)
-                {
-                    if (IsInMenu() && parent->GetCaptionMode())
-                        parent->SetCaptionsEnabled(false, false);
-                }
+                if (autoselectsubtitle)
+                    curSubtitleTrack = dvdnav_get_active_spu_stream(dvdnav);
+
+                VERBOSE(VB_IMPORTANT,
+                        QString("DVDNAV_SPU_STREAM_CHANGE: "
+                                "physical_wide==%1, physical_letterbox==%2, "
+                                "physical_pan_scan==%3, current_track==%4, "
+                                "total count %5")
+                                .arg(spu->physical_wide).arg(spu->physical_letterbox)
+                                .arg(spu->physical_pan_scan).arg(curSubtitleTrack)
+                                .arg(count));
 
                 if (blockBuf != dvdBlockWriteBuf)
                 {

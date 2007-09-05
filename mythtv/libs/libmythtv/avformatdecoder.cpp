@@ -1772,7 +1772,8 @@ int AvFormatDecoder::ScanStreams(bool novideo)
                 trackNo = GetTrackCount(kTrackTypeAudio) - 1;
             SetTrack(kTrackTypeAudio, trackNo);
         }
-        if (tracks[kTrackTypeSubtitle].size() > 0)
+        if (tracks[kTrackTypeSubtitle].size() > 0 &&
+            !ringBuffer->InDVDMenuOrStillFrame())
         {
             qBubbleSort(tracks[kTrackTypeSubtitle]);
             sinfo_vec_t::iterator it = tracks[kTrackTypeSubtitle].begin();

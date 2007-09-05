@@ -1568,7 +1568,8 @@ void NuppelVideoPlayer::EnableCaptions(uint mode, bool osd_msg)
     {
         msg += decoder->GetTrackDesc(kTrackTypeSubtitle,
                                      GetTrack(kTrackTypeSubtitle));
-        if (ringBuffer->isDVD())
+
+        if (ringBuffer->isDVD() && osd_msg)
             ringBuffer->DVD()->SetTrack(kTrackTypeSubtitle, 
                                         GetTrack(kTrackTypeSubtitle));
     }
