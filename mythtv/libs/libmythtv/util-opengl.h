@@ -98,11 +98,25 @@ extern PFNGLPROGRAMENVPARAMETER4FARBPROC   gMythGLProgramEnvParameter4fARB;
 extern PFNGLDELETEPROGRAMSARBPROC          gMythGLDeleteProgramsARB;
 extern PFNGLGETPROGRAMIVARBPROC            gMythGLGetProgramivARB;
 
-extern PFNGLGENFRAMEBUFFERSEXTPROC         gMythGLGenFramebuffersEXT;
-extern PFNGLBINDFRAMEBUFFEREXTPROC         gMythGLBindFramebufferEXT;
-extern PFNGLFRAMEBUFFERTEXTURE2DEXTPROC    gMythGLFramebufferTexture2DEXT;
-extern PFNGLCHECKFRAMEBUFFERSTATUSEXTPROC  gMythGLCheckFramebufferStatusEXT;
-extern PFNGLDELETEFRAMEBUFFERSEXTPROC      gMythGLDeleteFramebuffersEXT;
+// Not all platforms with OpenGL that MythTV supports have the
+// GL_EXT_framebuffer_object extension so we need to define these..
+typedef void (APIENTRYP MYTH_GLGENFRAMEBUFFERSEXTPROC)
+    (GLsizei n, GLuint *framebuffers);
+typedef void (APIENTRYP MYTH_GLBINDFRAMEBUFFEREXTPROC)
+    (GLenum target, GLuint framebuffer);
+typedef void (APIENTRYP MYTH_GLFRAMEBUFFERTEXTURE2DEXTPROC)
+    (GLenum target, GLenum attachment, GLenum textarget,
+     GLuint texture, GLint level);
+typedef GLenum (APIENTRYP MYTH_GLCHECKFRAMEBUFFERSTATUSEXTPROC)
+    (GLenum target);
+typedef void (APIENTRYP MYTH_GLDELETEFRAMEBUFFERSEXTPROC)
+    (GLsizei n, const GLuint *framebuffers);
+
+extern MYTH_GLGENFRAMEBUFFERSEXTPROC         gMythGLGenFramebuffersEXT;
+extern MYTH_GLBINDFRAMEBUFFEREXTPROC         gMythGLBindFramebufferEXT;
+extern MYTH_GLFRAMEBUFFERTEXTURE2DEXTPROC    gMythGLFramebufferTexture2DEXT;
+extern MYTH_GLCHECKFRAMEBUFFERSTATUSEXTPROC  gMythGLCheckFramebufferStatusEXT;
+extern MYTH_GLDELETEFRAMEBUFFERSEXTPROC      gMythGLDeleteFramebuffersEXT;
 
 extern PFNGLXGETVIDEOSYNCSGIPROC           gMythGLXGetVideoSyncSGI;
 extern PFNGLXWAITVIDEOSYNCSGIPROC          gMythGLXWaitVideoSyncSGI;
