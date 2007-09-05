@@ -23,8 +23,8 @@
 
 using namespace std;
 
-#if (QT_VERSION < 0x030100)
-#error You need Qt version >= 3.1.0 to compile MythTV.
+#if (QT_VERSION < 0x030200)
+#error You need Qt version >= 3.2.0 to compile MythTV.
 #endif
 
 class Settings;
