@@ -131,6 +131,8 @@ class DTVSignalMonitor : public SignalMonitor,
     uint               detectedTransportID;
     // MPEG/DVB/ATSC tuning info
     int                programNumber;
+    // CRC of the last seen PAT
+    int64_t           last_pat_crc;
 
     bool               ignoreEncrypted;
     QString            error;
