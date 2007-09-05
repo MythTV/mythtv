@@ -383,7 +383,7 @@ static void fw_init(QMap<uint64_t,QString> &id_to_model)
 
     const uint64_t sa_vendor_ids[] =
     {
-        0x11e6,    0x14f8,    0x1692,    0x1947,    0x0f21,
+        0x11e6,    0x14f8,    0x1692,    0x1947,    0x0f21,    0x1ac3,
     };
     const uint sa_vendor_id_cnt =
         sizeof(sa_vendor_ids) / sizeof(uint64_t);
@@ -402,7 +402,7 @@ static void fw_init(QMap<uint64_t,QString> &id_to_model)
         /* 6200, 3416 */
         0x0ce5,    0x0e5c,    0x1225,    0x0f9f,    0x1180,
         0x12c9,    0x11ae,    0x152f,    0x14e8,    0x16b5,    0x1371,
-        0x19a6,    0x1aad,
+        0x19a6,    0x1aad,    0x0b06,
         /* 6212 */
         0x0f9f,    0x152f,
         /* 6216, 2224 */
