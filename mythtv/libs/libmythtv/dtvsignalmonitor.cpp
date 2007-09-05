@@ -293,7 +293,7 @@ void DTVSignalMonitor::HandlePAT(const ProgramAssociationTable *pat)
             SetProgramNumber(pat->ProgramNumber(0));
             AddFlags(kDTVSigMon_PATMatch);
             GetStreamData()->AddListeningPID(pat->ProgramPID(0));
-            last_pat_crc == pat->CRC();
+            last_pat_crc = pat->CRC();
         }
     }
 }
