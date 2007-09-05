@@ -1419,7 +1419,8 @@ void MPEGStreamData::ProcessEncryptedPacket(const TSPacket& tspacket)
 
     info.status = status;
 
-    VERBOSE(VB_IMPORTANT, QString("PID 0x%1 status: %2")
+    VERBOSE(status != kEncDecrypted ? VB_IMPORTANT : VB_RECORD,
+            QString("PID 0x%1 status: %2")
             .arg(pid,0,16).arg(toString(status)));
 
     uint_vec_t pnum_del_list;
