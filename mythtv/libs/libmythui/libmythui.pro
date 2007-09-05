@@ -48,7 +48,7 @@ INSTALLS += inc
 #	level settings.pro)
 #
 
-using_x11 {
+using_x11:using_opengl {
     DEFINES += USE_OPENGL_PAINTER
     SOURCES += mythpainter_ogl.cpp
     HEADERS += mythpainter_ogl.h

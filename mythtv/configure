@@ -2743,6 +2743,7 @@ disabled opengl_video || enable opengl
 disabled opengl_vsync || enable opengl
 disabled x11 || enable opengl
 has_library libGL || disable opengl_video xvmc_opengl opengl_vsync opengl
+has_header GL/gl.h || disable opengl_video xvmc_opengl opengl_vsync opengl
 
 # Can only do Mac accel on Mac platform
 enabled dvdv && test $targetos = darwin || disable dvdv
