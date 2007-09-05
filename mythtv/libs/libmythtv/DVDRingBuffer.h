@@ -57,6 +57,7 @@ class MPUBLIC DVDRingBufferPriv
     uint ButtonWidth(void)  { return hl_width; }
     uint ButtonHeight(void) { return hl_height; }
     uint GetAudioLanguage(int id);
+    int  GetSubTrackNum(uint key);
     int  GetAudioTrackNum(uint key);
     uint GetSubtitleLanguage(int key);
     void SetMenuPktPts(long long pts) { menupktpts = pts; }
@@ -73,7 +74,7 @@ class MPUBLIC DVDRingBufferPriv
     int GetCellID(void) { return cellid; }
     int GetVobID(void)  { return vobid; }
     bool IsSameChapter(int tmpcellid, int tmpvobid);
-    
+
     // commands
     bool OpenFile(const QString &filename);
     void PlayTitleAndPart(int _title, int _part) 
@@ -109,7 +110,6 @@ class MPUBLIC DVDRingBufferPriv
     void SetParent(NuppelVideoPlayer *p) { parent = p; }
 
 
-    
   protected:
     dvdnav_t      *dvdnav;
     unsigned char  dvdBlockWriteBuf[DVD_BLOCK_SIZE];
@@ -169,6 +169,7 @@ class MPUBLIC DVDRingBufferPriv
     uint           currentTime;
     QMap<uint, uint> seekSpeedMap;
     QMap<uint, uint> audioTrackMap;
+    QMap<uint, uint> subTrackMap;
 
     NuppelVideoPlayer *parent;
 
@@ -184,7 +185,7 @@ class MPUBLIC DVDRingBufferPriv
     uint ConvertLangCode(uint16_t code);
     void SelectDefaultButton(void);
     void ClearSubtitlesOSD(void);
-    
+
     int get_nibble(const uint8_t *buf, int nibble_offset);
     int decode_rle(uint8_t *bitmap, int linesize, int w, int h,
                     const uint8_t *buf, int nibble_offset, int buf_size);

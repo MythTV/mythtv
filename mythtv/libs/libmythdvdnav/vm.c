@@ -699,15 +699,14 @@ int vm_get_audio_stream(vm_t *vm, int audioN) {
     audioN = 0;
   
   if(audioN < 8) {
-    /* Is there any control info for this logical stream */ 
-    if((vm->state).pgc->audio_control[audioN] & (1<<15)) {
-      streamN = ((vm->state).pgc->audio_control[audioN] >> 8) & 0x07;  
-    }
+    /* Is there any control info for this logical stream */
+    if ((vm->state).pgc->audio_control[audioN].present)
+      streamN = (vm->state).pgc->audio_control[audioN].s_audio;
   }
   
   if((vm->state).domain != VTS_DOMAIN && streamN == -1)
     streamN = 0;
-  
+ 
   /* FIXME: Should also check in vtsi/vmgi status what kind of stream
    * it is (ac3/lpcm/dts/sdds...) to find the right (sub)stream id */
   return streamN;
@@ -728,23 +727,24 @@ int vm_get_subp_stream(vm_t *vm, int subpN, int mode) {
   
   if(subpN < 32) { /* a valid logical stream */
     /* Is this logical stream present */ 
-    if((vm->state).pgc->subp_control[subpN] & (1<<31)) {
+    if((vm->state).pgc->subp_control[subpN].present) {
       if(source_aspect == 0) /* 4:3 */	     
-	streamN = ((vm->state).pgc->subp_control[subpN] >> 24) & 0x1f;  
-      if(source_aspect == 3) /* 16:9 */
+	    streamN = (vm->state).pgc->subp_control[subpN].s_4p3;  
+      if(source_aspect == 3) { /* 16:9 */
         switch (mode) {
-	case 0:
-	  streamN = ((vm->state).pgc->subp_control[subpN] >> 16) & 0x1f;
-	  break;
-	case 1:
-	  streamN = ((vm->state).pgc->subp_control[subpN] >> 8) & 0x1f;
-	  break;
-	case 2:
-	  streamN = (vm->state).pgc->subp_control[subpN] & 0x1f;
-	}
+	      case 0:
+	        streamN = (vm->state).pgc->subp_control[subpN].s_wide;
+	        break;
+	      case 1:
+	        streamN = (vm->state).pgc->subp_control[subpN].s_lbox;
+	        break;
+	      case 2:
+	        streamN = (vm->state).pgc->subp_control[subpN].s_panscan;
+	        break;
+        }
+      } 
     }
-  }
-  
+  }  
   if((vm->state).domain != VTS_DOMAIN && streamN == -1)
     streamN = 0;
 
@@ -761,7 +761,7 @@ int vm_get_audio_active_stream(vm_t *vm) {
   /* If no such stream, then select the first one that exists. */
   if(streamN == -1) {
     for(audioN = 0; audioN < 8; audioN++) {
-      if((vm->state).pgc->audio_control[audioN] & (1<<15)) {
+      if((vm->state).pgc->audio_control[audioN].present) {
         if ((streamN = vm_get_audio_stream(vm, audioN)) >= 0)
           break;
       }
@@ -780,7 +780,7 @@ int vm_get_subp_active_stream(vm_t *vm, int mode) {
   /* If no such stream, then select the first one that exists. */
   if(streamN == -1) {
     for(subpN = 0; subpN < 32; subpN++) {
-      if((vm->state).pgc->subp_control[subpN] & (1<<31)) {
+      if((vm->state).pgc->subp_control[subpN].present) {
         if ((streamN = vm_get_subp_stream(vm, subpN, mode)) >= 0)
           break;
       }
@@ -829,24 +829,21 @@ int vm_get_audio_stream_count(vm_t *vm) {
   return count;
 }
 
-#if 0
-/* currently unused */
-void vm_get_subp_info(vm_t *vm, int *current, int *num_avail) {
+int vm_get_subp_stream_count(vm_t *vm) {
+  int count = 0;
   switch ((vm->state).domain) {
   case VTS_DOMAIN:
-    *num_avail = vm->vtsi->vtsi_mat->nr_of_vts_subp_streams;
-    *current = (vm->state).SPST_REG;
+    count = vm->vtsi->vtsi_mat->nr_of_vts_subp_streams;
     break;
   case VTSM_DOMAIN:
-    *num_avail = vm->vtsi->vtsi_mat->nr_of_vtsm_subp_streams; /*  1 */
-    *current = 0x41;
+    count = vm->vtsi->vtsi_mat->nr_of_vtsm_subp_streams; /*  1 */
     break;
   case VMGM_DOMAIN:
   case FP_DOMAIN:
-    *num_avail = vm->vmgi->vmgi_mat->nr_of_vmgm_subp_streams; /*  1 */
-    *current = 0x41;
+    count = vm->vmgi->vmgi_mat->nr_of_vmgm_subp_streams; /*  1 */
     break;
   }
+  return count;
 }
 
 /* currently unused */
@@ -873,7 +870,6 @@ void vm_get_video_res(vm_t *vm, int *width, int *height) {
     break;
   }
 }
-#endif
 
 int vm_get_video_aspect(vm_t *vm) {
   int aspect = vm_get_video_attr(vm).display_aspect_ratio;

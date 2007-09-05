@@ -951,6 +951,27 @@ unsigned char dvdnav_audio_get_format(dvdnav_t *this, uint8_t stream){
 }
 
 /*
+ * \brief get total dvd subtitle stream count
+ */
+int dvdnav_subp_get_stream_count(dvdnav_t *this) {
+  int count = 0;
+  if (!this) {
+    printerr("Passed a NULL pointer.");
+    return 0;
+  }
+  if(!this->started) {
+    printerr("Virtual DVD machine not started.");
+    return 0;
+  }
+
+  pthread_mutex_lock(&this->vm_lock);
+  count = vm_get_subp_stream_count(this->vm);
+  pthread_mutex_unlock(&this->vm_lock);
+
+  return count;
+}
+
+/*
  * \brief get total dvd audio stream count
  */
 int dvdnav_audio_get_stream_count(dvdnav_t *this) {

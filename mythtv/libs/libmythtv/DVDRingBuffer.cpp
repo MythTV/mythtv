@@ -71,7 +71,7 @@ void DVDRingBufferPriv::CloseDVD(void)
         SetDVDSpeed(-1);
         dvdnav_close(dvdnav);
         dvdnav = NULL;
-    }            
+    }
 }
 
 bool DVDRingBufferPriv::IsInMenu(void) const
@@ -96,7 +96,7 @@ long long DVDRingBufferPriv::Seek(long long time)
     int ffrewSkip = 1;
     if (parent)
         ffrewSkip = parent->GetFFRewSkip();
-   
+
     if (ffrewSkip != 1 && time != 0)
     {
         QMapConstIterator<uint, uint> it = seekSpeedMap.find(labs(time));
@@ -122,10 +122,10 @@ long long DVDRingBufferPriv::Seek(long long time)
         if (time > 0 && ffrewSkip == 1)
             seeking = true;
     }
-    
+
     return currentpos;
 }
-            
+
 void DVDRingBufferPriv::GetDescForPos(QString &desc) const
 {
     if (IsInMenu())
@@ -170,7 +170,7 @@ bool DVDRingBufferPriv::OpenFile(const QString &filename)
             safe_read(buf, DVD_BLOCK_SIZE * 5);
             dvdRet = dvdnav_get_number_of_titles(dvdnav, &numTitles);
         }
-                
+
         if ( dvdRet == DVDNAV_STATUS_ERR)
         {
             VERBOSE(VB_IMPORTANT,
@@ -189,7 +189,7 @@ bool DVDRingBufferPriv::OpenFile(const QString &filename)
                         .arg(curTitle).arg(titleParts));
             }
         }
-       
+
         const char *name;
         const char *serialnum;
         dvdnav_current_title_info(dvdnav, &title, &part);
@@ -258,12 +258,12 @@ int DVDRingBufferPriv::safe_read(void *data, unsigned sz)
                     memcpy(dest + offset, blockBuf, DVD_BLOCK_SIZE);
                     tot += DVD_BLOCK_SIZE;
                 }
-                
+
                 if (blockBuf != dvdBlockWriteBuf)
                 {
                     dvdnav_free_cache_block(dvdnav, blockBuf);
                 }
-              
+
                 break;
             case DVDNAV_CELL_CHANGE:
             {
@@ -300,7 +300,7 @@ int DVDRingBufferPriv::safe_read(void *data, unsigned sz)
                             .arg(pgLength).arg(pgcLength)
                             .arg(cellStart).arg(pgStart)
                             .arg(title).arg(part).arg(titleParts));
-                                
+
                 buttonSelected = false;
                 if (gotoCellStart)
                 {
@@ -336,7 +336,7 @@ int DVDRingBufferPriv::safe_read(void *data, unsigned sz)
                 memcpy(clut, blockBuf, 16 * sizeof(uint32_t));
                 VERBOSE(VB_PLAYBACK, "DVDNAV_SPU_CLUT_CHANGE happened.");
             }
-            break;  
+            break;
             case DVDNAV_SPU_STREAM_CHANGE:
             {
                 dvdnav_spu_stream_change_event_t* spu =
@@ -345,12 +345,17 @@ int DVDRingBufferPriv::safe_read(void *data, unsigned sz)
                 if (autoselectsubtitle)
                     curSubtitleTrack = dvdnav_get_active_spu_stream(dvdnav);
 
+                subTrackMap.clear();
+                uint count = dvdnav_subp_get_stream_count(dvdnav);
+
                 VERBOSE(VB_PLAYBACK,
                         QString("DVDNAV_SPU_STREAM_CHANGE: "
                                 "physical_wide==%1, physical_letterbox==%2, "
-                                "physical_pan_scan==%3, current_track==%4")
+                                "physical_pan_scan==%3, current_track==%4, "
+                                "total count %5")
                         .arg(spu->physical_wide).arg(spu->physical_letterbox)
-                        .arg(spu->physical_pan_scan).arg(curSubtitleTrack));
+                        .arg(spu->physical_pan_scan).arg(curSubtitleTrack)
+                        .arg(count));
 
                 ClearMenuSPUParameters();
                 ClearSubtitlesOSD();
@@ -359,8 +364,21 @@ int DVDRingBufferPriv::safe_read(void *data, unsigned sz)
                 {
                     buttonstreamid = 32;
                     int aspect = dvdnav_get_video_aspect(dvdnav);
-                    if (aspect != 0)                           
+                    if (aspect != 0)
                         buttonstreamid = spu->physical_wide + buttonstreamid;
+                }
+                else
+                {
+                    int8_t id = 0;
+
+                    for (uint i = 0; i < count; i++)
+                    {
+                        id =  dvdnav_get_spu_logical_stream(dvdnav, i);
+                        if (id == -1)
+                            continue;
+                        id = 32 + id;
+                        subTrackMap.insert(id, i);
+                    }
                 }
 
                 if (parent)
@@ -372,7 +390,7 @@ int DVDRingBufferPriv::safe_read(void *data, unsigned sz)
                 if (blockBuf != dvdBlockWriteBuf)
                 {
                     dvdnav_free_cache_block(dvdnav, blockBuf);
-                }                                                   
+                }
             }
             break;
             case DVDNAV_AUDIO_STREAM_CHANGE:
@@ -392,39 +410,40 @@ int DVDRingBufferPriv::safe_read(void *data, unsigned sz)
                         "Current Active Stream %1 Track Count %2")
                         .arg(curAudioTrack).arg(count));
 
+                int8_t audio_format, id;
                 for (uint i = 0; i < count; i++)
                 {
-                    int audio_format = dvdnav_audio_get_format(dvdnav, i);
+                    audio_format = dvdnav_audio_get_format(dvdnav, i);
+                    id = dvdnav_get_audio_logical_stream(dvdnav, i);
+                    if (id == -1)
+                        continue;
                     switch (audio_format)
                     {
                         case 0:
-                            audioTrackMap.insert(ac3StreamId, i);
-                            ac3StreamId++;
+                            audioTrackMap.insert(ac3StreamId + id, i);
                             break;
                         case 2:
-                            audioTrackMap.insert(mp2StreamId, i);
-                            mp2StreamId++;
+                            audioTrackMap.insert(mp2StreamId + id, i);
                             break;
                         case 4:
-                            audioTrackMap.insert(lpcmStreamId, i);
-                            lpcmStreamId++;
+                            audioTrackMap.insert(lpcmStreamId + id, i);
                             break;
                         case 6:
-                            audioTrackMap.insert(dtsStreamId, i);
-                            dtsStreamId++;
+                            audioTrackMap.insert(dtsStreamId + id, i);
                             break;
                         default:
                             VERBOSE(VB_PLAYBACK, LOC_ERR + 
-                                QString("AUDIO_STREAM_CHANGE: Unhandled audio format %1")
-                                .arg(i));
+                                QString("AUDIO_STREAM_CHANGE: "
+                                        "Unhandled audio format %1")
+                                        .arg(i));
                             break;
                     }
                 }
-               
+
                 if (blockBuf != dvdBlockWriteBuf)
                 {
                     dvdnav_free_cache_block(dvdnav, blockBuf);
-                }                                                   
+                }
             }
             break;
             case DVDNAV_NAV_PACKET:
@@ -468,7 +487,7 @@ int DVDRingBufferPriv::safe_read(void *data, unsigned sz)
             break;
             case DVDNAV_HOP_CHANNEL:
                 VERBOSE(VB_PLAYBACK, "DVDNAV_HOP_CHANNEL happened.");
-                break;                        
+                break;
             case DVDNAV_NOP:
                 break;
             case DVDNAV_VTS_CHANGE:
@@ -491,7 +510,7 @@ int DVDRingBufferPriv::safe_read(void *data, unsigned sz)
                 if (blockBuf != dvdBlockWriteBuf)
                 {
                     dvdnav_free_cache_block(dvdnav, blockBuf);
-                }                                                   
+                }
             }
             break;
             case DVDNAV_HIGHLIGHT:
@@ -522,7 +541,7 @@ int DVDRingBufferPriv::safe_read(void *data, unsigned sz)
                 if (blockBuf != dvdBlockWriteBuf)
                 {
                     dvdnav_free_cache_block(dvdnav, blockBuf);
-                }          
+                }
             }
             break;
             case DVDNAV_STILL_FRAME:
@@ -793,7 +812,7 @@ bool DVDRingBufferPriv::DrawMenuButton(uint8_t *spu_pkt, int buf_size)
             dvdMenuButton.rects[0].y = 0;
         return true;
     }
-    return false;       
+    return false;
 }
 
 /** \brief generate dvd subtitle bitmap or dvd menu bitmap. 
@@ -956,7 +975,7 @@ bool DVDRingBufferPriv::DecodeSubtitles(AVSubtitle *sub, int *gotSubtitles,
                             }
                         }
                     }
-                    
+
                     int newh = h - sy;
                     tmp_bitmap = (uint8_t*) av_malloc(w * newh);
                     memcpy(tmp_bitmap, bitmap + (w * sy), (w * newh));
@@ -1081,40 +1100,49 @@ int DVDRingBufferPriv::NumMenuButtons(void) const
  */
 uint DVDRingBufferPriv::GetAudioLanguage(int id)
 {
-    int8_t channel = dvdnav_get_audio_logical_stream(dvdnav, id);
-    uint16_t lang = 0;
-    if (channel != -1)
-        lang = dvdnav_audio_stream_to_lang(dvdnav,channel);
+    uint16_t lang = dvdnav_audio_stream_to_lang(dvdnav, id);
     return ConvertLangCode(lang);
 }
 
-/** \brief get real dvd track audio number
- *  \param key position in audioTrackMap.
- *  \return -1 if track number not found
+/** \brief get real dvd track subtitle number
+ *  \param stream_id stream_id of dvd track.
+ *  \return 33 (max track num is 31) if track number not found
  */
-int DVDRingBufferPriv::GetAudioTrackNum(uint key)
+int DVDRingBufferPriv::GetSubTrackNum(uint stream_id)
+{
+    if (subTrackMap.empty())
+        return -1;
+    QMapConstIterator<uint, uint> it = subTrackMap.begin();
+    for (; it != subTrackMap.end(); ++it)
+    {
+        if (it.key() == stream_id)
+            return (int)it.data();
+    }
+    return 33;
+}
+
+/** \brief get real dvd track audio number
+ *  \param key stream_id of dvd track audioTrackMap.
+ *  \return 10 (max track is 7) if track number not found
+ */
+int DVDRingBufferPriv::GetAudioTrackNum(uint stream_id)
 {
     if (audioTrackMap.empty())
         return -1;
-    uint count = 0;
     QMapConstIterator<uint, uint> it = audioTrackMap.begin();
     for (; it != audioTrackMap.end(); ++it)
     {
-        if (count == key)
-            break;
-        ++count;
+        if (it.key() == stream_id)
+            return (int)it.data();
     }
-    return (int)it.data();
+    return 10;
 }
 
 /** \brief get the subtitle language from the dvd
  */
 uint DVDRingBufferPriv::GetSubtitleLanguage(int id)
 {
-    int8_t channel = dvdnav_get_spu_logical_stream(dvdnav,id);
-    uint16_t lang = 0;
-    if (channel != -1)
-        lang = dvdnav_spu_stream_to_lang(dvdnav,channel);
+    uint16_t lang = dvdnav_spu_stream_to_lang(dvdnav, id);
     return ConvertLangCode(lang);
 }
 
@@ -1128,7 +1156,7 @@ uint DVDRingBufferPriv::ConvertLangCode(uint16_t code)
     QChar str2[2];
     str2[0] = QChar(code >> 8);
     str2[1] = QChar(code & 0xff);
-    QString str3 = iso639_str2_to_str3(QString(str2,2));
+    QString str3 = iso639_str2_to_str3(QString(str2, 2));
     if (str3)
         return iso639_str3_to_key(str3);
     return 0;

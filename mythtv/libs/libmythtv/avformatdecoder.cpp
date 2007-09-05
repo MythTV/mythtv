@@ -1251,7 +1251,7 @@ void AvFormatDecoder::ScanTeletextCaptions(int av_index)
     const PESPacket pes = PESPacket::ViewData(ic->cur_pmt_sect);
     const PSIPTable psip(pes);
     const ProgramMapTable pmt(psip);
-    
+
     for (uint i = 0; i < pmt.StreamCount(); i++)
     {
         if (pmt.StreamType(i) != 6)
@@ -1307,7 +1307,7 @@ void AvFormatDecoder::ScanDSMCCStreams(void)
     const PESPacket pes = PESPacket::ViewData(ic->cur_pmt_sect);
     const PSIPTable psip(pes);
     const ProgramMapTable pmt(psip);
-    
+
     for (uint i = 0; i < pmt.StreamCount(); i++)
     {
         if (! StreamID::IsObjectCarousel(pmt.StreamType(i)))
@@ -1716,15 +1716,14 @@ int AvFormatDecoder::ScanStreams(bool novideo)
         {
             qBubbleSort(tracks[kTrackTypeAudio]);
             sinfo_vec_t::iterator it = tracks[kTrackTypeAudio].begin();
-            int count = 0;
             for (; it != tracks[kTrackTypeAudio].end(); ++it)
             {
-                it->dvd_track_num = ringBuffer->DVD()->GetAudioTrackNum(count);
+                it->dvd_track_num =
+                        ringBuffer->DVD()->GetAudioTrackNum(it->stream_id);
                 VERBOSE(VB_PLAYBACK, LOC + 
                             QString("DVD Audio Track Map "
                                     "Stream id #%1 track #%2 ")
                             .arg(it->stream_id).arg(it->dvd_track_num));
-                count++;
             }
             qBubbleSort(tracks[kTrackTypeAudio]);
             int trackNo = ringBuffer->DVD()->GetTrack(kTrackTypeAudio);
@@ -1734,6 +1733,17 @@ int AvFormatDecoder::ScanStreams(bool novideo)
         }
         if (tracks[kTrackTypeSubtitle].size() > 0)
         {
+            qBubbleSort(tracks[kTrackTypeSubtitle]);
+            sinfo_vec_t::iterator it = tracks[kTrackTypeSubtitle].begin();
+            for(; it != tracks[kTrackTypeSubtitle].end(); ++it)
+            {
+                it->dvd_track_num =
+                        ringBuffer->DVD()->GetSubTrackNum(it->stream_id);
+                VERBOSE(VB_PLAYBACK, LOC +
+                        QString("DVD Subtitle Track Map "
+                                "Stream id #%1 track #%2 ")
+                        .arg(it->stream_id).arg(it->dvd_track_num));
+            }
             qBubbleSort(tracks[kTrackTypeSubtitle]);
             int trackNo = ringBuffer->DVD()->GetTrack(kTrackTypeSubtitle);
             uint captionmode = GetNVP()->GetCaptionMode();
