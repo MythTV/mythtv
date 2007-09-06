@@ -4,6 +4,9 @@
 ### Tool for automating frontend builds on Mac OS X.
 ### Run "osx-packager.pl -man" for full documentation.
 
+## This version for the fixes branch MUST be run with                                        --svnbranch releases-0-20-fixes
+## in order to properly build the 0-20-fixes version.                                           You have been warned !!!!!
+
 use strict;
 use Getopt::Long qw(:config auto_abbrev);
 use Pod::Usage ();
@@ -12,10 +15,9 @@ use Cwd ();
 ### Configuration settings (stuff that might change more often)
 
 # We try to auto-locate the Subversion client binaries.
-# If they are not in your path, you should use the second line.
+# If they are not in your path, we build them from source
 #
 our $svn = `which svn`; chomp $svn;
-#our $svn = '/Volumes/Users/nigel/bin/svn';
 
 # This script used to always delete the installed include and lib dirs.
 # That probably ensures a safe build, but when rebuilding adds minutes to
@@ -33,9 +35,10 @@ our $jobtools = 0;
 #$ENV{'DISTCC_HOSTS'}   = "localhost 192.168.0.6";
 #$ENV{'DISTCC_VERBOSE'} = '1';
 
-# For faster downloads, change this to a local mirror.
+# Start with a generic address and let sourceforge 
+# figure out which mirror is closest to us.
 #
-our $sourceforge = 'http://umn.dl.sourceforge.net';
+our $sourceforge = 'http://downloads.sourceforge.net';
 
 # At the moment, there is mythtv plus these two
 our @components = ( 'myththemes', 'mythplugins' );
@@ -47,6 +50,34 @@ our @targetsBE = ( 'MythBackend',   'MythFillDatabase',
 
 # Patches for MythTV source
 our %patches = (
+  'mythtv' => 'Index: libs/libmythui/mythmainwindow.cpp
+===================================================================
+--- libs/libmythui/mythmainwindow.cpp  (revision 12154)
++++ libs/libmythui/mythmainwindow.cpp  (working copy)
+@@ -1089,9 +1089,13 @@
+     {
+         case QEvent::KeyPress:
+         {
++            QKeyEvent *ke = dynamic_cast<QKeyEvent*>(e);
++
++            if (!ke)
++                {puts("No RTTI?");ke = (QKeyEvent *)e;}
++
+             if (currentWidget())
+             {
+-                QKeyEvent *ke = dynamic_cast<QKeyEvent*>(e);
+                 ke->accept();
+                 QWidget *current = currentWidget();
+                 if (current && current->isEnabled())
+@@ -1108,7 +1112,7 @@
+                 MythScreenType *top = (*it)->GetTopScreen();
+                 if (top)
+                 {
+-                    if (top->keyPressEvent(dynamic_cast<QKeyEvent*>(e)))
++                    if (top->keyPressEvent(ke))
+                         return true;
+                 }
+             }'
 );
 
 our %depend_order = (
@@ -56,31 +87,40 @@ our %depend_order = (
         'lame',
         'mysqlclient',
         'qt-mt',
-        # Not needed since SVN -r8965. Kept here for 0.19 builds
-        #'dvdnav'
       ],
   'mythplugins'
   =>  [
         'tiff',
         'exif',
         'dvdcss',
-        # MythDVD used to use this to build mtd.
-        # Not needed since SVN -r8965. Kept here for 0.19 builds
-        # 'dvdread',
-# MythMusic needs these seven things:
-#        'libmad',
-#        'libid3tag',
-#        'libogg',
-#        'vorbis',
-#        'flac',
-# These CD ones don't compile on OS X. I doubt that they ever will.
-# MythMusic probably needs to have native OS X code to assess CDs
-#        'cddaparanoia',
-#        'cdaudio'
       ],
 );
 
 our %depend = (
+
+  'svndeps' =>
+  {
+    'url'
+    => 'http://subversion.tigris.org/downloads/subversion-deps-1.4.3.tar.bz2',
+    'skip'
+    => 'yes'   # Don't actually untarr/configure/make.
+  },
+
+  'svn' =>
+  {
+    'url'
+    => 'http://subversion.tigris.org/downloads/subversion-1.4.3.tar.bz2',
+    'pre-conf'
+    => 'tar -xjf subversion-deps-1.4.3.tar.bz2',
+    'conf'
+    =>  [
+           '--disable-keychain',  # Workaround a 10.3 build problem
+           "MAKEFLAGS=\$parallel_make_flags"   # For builds of deps
+        ],
+    # For some reason, this dies when the neon sub-make ends
+    #'parallel-make'
+    #=> 'yes'
+  },
 
   'freetype'
   =>
@@ -106,65 +146,18 @@ our %depend = (
         ],
   },
 
-  'cdaudio' =>
-  {
-    'url' => "$sourceforge/sourceforge/libcdaudio/libcdaudio-0.99.12.tar.gz"
-  },
-
-  'libmad' =>
-  {
-    'url' => 'ftp://ftp.mars.org/pub/mpeg/libmad-0.15.0b.tar.gz'
-  },
-
-  'libid3tag' =>
-  {
-    'url' => 'ftp://ftp.mars.org/pub/mpeg/libid3tag-0.15.0b.tar.gz'
-  },
-
-  'cddaparanoia' =>
-  {
-    'url' => 'http://www.buserror.net/cdparanoia/cdparanoia-osx-5.tar.gz',
-  },
-
-  'libogg' =>
-  {
-    'url' => 'http://downloads.xiph.org/releases/ogg/libogg-1.1.2.tar.gz'
-  },   
-
-  'vorbis' =>
-  {
-    'url' => 'http://downloads.xiph.org/releases/vorbis/libvorbis-1.1.1.tar.gz'
-  },
-
-  'flac' =>
-  {
-    'url' => "$sourceforge/sourceforge/flac/flac-1.1.2.tar.gz"
-  },
-
   'dvdcss'
   =>
   {
     'url'
-    =>  'ftp://ftp.fu-berlin.de/unix/linux/mirrors/gentoo/distfiles/libdvdcss-1.2.8.tar.bz2',
+    =>  'http://download.videolan.org/pub/videolan/libdvdcss/1.2.9/libdvdcss-1.2.9.tar.bz2'
   },
 
-  'dvdread'
-  =>
-  {
-    'url'
-    =>  'http://www.dtek.chalmers.se/groups/dvd/dist/libdvdread-0.9.4.tar.gz',
-    'conf'
-    =>  [
-          '--with-libdvdcss',
-        ],
-  },
-
- 
   'mysqlclient'
   =>
   {
     'url' 
-    => 'http://mysql.binarycompass.org/Downloads/MySQL-4.1/mysql-4.1.21.tar.gz',
+    => 'http://mysql.osuosl.org/Downloads/MySQL-4.1/mysql-4.1.21.tar.gz',
     'conf'
     =>  [
           '--without-debug',
@@ -286,8 +279,11 @@ osx-packager.pl - build OS X binary packages for MythTV
    -svntag <str>    build a specified release, instead of Subversion HEAD
    -nohead          don't update to HEAD revision of MythTV before building
    -usehdimage      perform build inside of a case-sensitive disk image
+   -leavehdimage    leave disk image mounted on exit
    -enable-backend  build the backend server as well as the frontend
    -enable-jobtools build commflag/jobqueue  as well as the frontend
+   -profile         build with compile-type=profile
+   -debug           build with compile-type=debug
    -plugins <str>   comma-separated list of plugins to include
                       Available plugins:
    mythbrowser mythcontrols mythdvd mythflix mythgallery mythgame
@@ -356,8 +352,11 @@ Getopt::Long::GetOptions(\%OPT,
                          'nocvs', # This is obsolete, but should stay a while
                          'nohead',
                          'usehdimage',
+                         'leavehdimage',
                          'enable-backend',
                          'enable-jobtools',
+                         'profile',
+                         'debug',
                          'plugins=s',
                         ) or Pod::Usage::pod2usage(2);
 Pod::Usage::pod2usage(1) if $OPT{'help'};
@@ -425,10 +424,7 @@ if (!$OPT{usehdimage} && !CaseSensitiveFilesystem())
 }
 
 if ($OPT{usehdimage})
-{
-  Verbose("Creating a case-sensitive device for the build");
-  MountHDImage();
-}
+{  MountHDImage()  }
 
 our $PREFIX = "$WORKDIR/build";
 mkdir $PREFIX;
@@ -454,6 +450,7 @@ our %conf = (
         '--enable-mythnews',
         '--disable-mythphone',
         '--enable-mythweather',
+        '--disable-mythzoneminder',
       ],
   'myththemes'
   =>  [
@@ -461,8 +458,10 @@ our %conf = (
       ],
   'mythtv'
   =>  [
-#        '--compile-type=debug',
         '--prefix=' . $PREFIX,
+        # To "cross compile" something for a lesser Mac:
+        #'--tune=G3',
+        #'--disable-altivec',
       ],
 );
 
@@ -500,6 +499,7 @@ $ENV{'QTDIR'} = "$SRCDIR/$qt_vers";
 # If environment is setup to use distcc, take advantage of it
 our $standard_make = '/usr/bin/make';
 our $parallel_make = $standard_make;
+our $parallel_make_flags = '';
 
 if ( $ENV{'DISTCC_HOSTS'} )
 {
@@ -507,7 +507,7 @@ if ( $ENV{'DISTCC_HOSTS'} )
   my $numhosts = $#hosts + 1;
   &Verbose("Using ", $numhosts * 2, " DistCC jobs on $numhosts build hosts:",
            join ', ', @hosts);
-  $parallel_make .= ' -j' . $numhosts * 2;
+  $parallel_make_flags = '-j' . $numhosts * 2;
 }
 
 # Ditto for multi-cpu setups:
@@ -518,13 +518,18 @@ $cpus =~ s/.*, (\d+) processors$/$1/;
 if ( $cpus gt 1 )
 {
   &Verbose("Using $cpus parallel CPUs");
-  $parallel_make .= " -j$cpus";
+  $parallel_make_flags = "-j$cpus";
 }
+
+$parallel_make .= " $parallel_make_flags";
 
 ### Distclean?
 if ($OPT{'distclean'})
 {
-  &Syscall([ '/bin/rm', '-f', '-r', $PREFIX ]);
+  &Syscall([ '/bin/rm', '-f',       '$PREFIX/bin/myth*'    ]);
+  &Syscall([ '/bin/rm', '-f', '-r', '$PREFIX/lib/libmyth*' ]);
+  &Syscall([ '/bin/rm', '-f', '-r', '$PREFIX/lib/mythtv'   ]);
+  &Syscall([ '/bin/rm', '-f', '-r', '$PREFIX/share/mythtv' ]);
   &Syscall([ '/bin/rm', '-f', '-r', $SRCDIR ]);
   exit;
 }
@@ -548,6 +553,13 @@ END
 my (@build_depends, %seen_depends);
 my @comps = ('mythtv', @components);
 &Verbose("Including components:", @comps);
+
+# If no SubVersion in path, and we are checking something out, build SVN:
+if ( $svn =~ m/no svn in / && ! $OPT{'nohead'} )
+{
+  $svn = "$PREFIX/bin/svn";
+  @build_depends = ('svndeps', 'svn');
+}
 
 foreach my $comp (@comps)
 {
@@ -577,7 +589,7 @@ foreach my $sw (@build_depends)
   unless (-e $filename)
   {
     &Verbose("Downloading $sw");
-    unless (&Syscall([ '/usr/bin/curl', $url, '>', $filename ],
+    unless (&Syscall([ '/usr/bin/curl', '-L', $url, '>', $filename ],
                      'munge' => 1))
     {
       &Syscall([ '/bin/rm', $filename ]) if (-e $filename);
@@ -589,6 +601,9 @@ foreach my $sw (@build_depends)
     &Verbose("Using previously downloaded $sw");
   }
   
+  if ($pkg->{'skip'})
+  { next }
+
   if ( -d $dirname )
   {
    if ( $OPT{'thirdclean'} )
@@ -616,8 +631,18 @@ foreach my $sw (@build_depends)
     {
       &Syscall([ '/usr/bin/tar', '-xjf', $filename ]) or die;
     }
+    else
+    {
+      &Complain("Cannot unpack file $filename");
+      exit;
+    }
   }
   
+  if ($pkg->{'pre-conf'})
+  { 
+    &Syscall([ $pkg->{'pre-conf'} ], 'munge' => 1) or die;
+  }
+
   # Configure
   chdir($dirname);
   unless (-e '.osx-config')
@@ -659,9 +684,10 @@ foreach my $sw (@build_depends)
     &Verbose("Making $sw");
     my (@make);
     
-    # I would like to use $parallel_make here, but several
-    # of the packages don't compile correctly then.
     push(@make, $standard_make);
+    if ($pkg->{'parallel-make'})
+    { push(@make, $parallel_make_flags) }
+
     if ($pkg->{'make'})
     {
       push(@make, @{ $pkg->{'make'} });
@@ -739,10 +765,17 @@ elsif ( ! $OPT{'nohead'} )
   my $cmd = "$svn log $svnrepository --revision HEAD --xml | grep revision";
   &Verbose($cmd);
   my $rev = `$cmd`;
-  $rev =~ s/[^[:digit:]]//gs;
 
-  $svnrepository .= 'trunk/';
-  @svnrevision = ('--revision', $rev);
+  if ( $rev =~ m/revision="(\d+)">/ )
+  {
+    $svnrepository .= 'trunk/';
+    @svnrevision = ('--revision', $1);
+  }
+  else
+  {
+    &Complain("Cannot get head revision - Got '$rev'");
+    die;
+  }
 }
 
 # Retrieve source
@@ -826,6 +859,14 @@ foreach my $comp (@comps)
     {
       push @config, '--enable-backend'
     }
+    if ( $OPT{'profile'} )
+    {
+      push @config, '--compile-type=profile'
+    }
+    if ( $OPT{'debug'} )
+    {
+      push @config, '--compile-type=debug'
+    }
     if ( $comp eq 'mythtv' && ! $ENV{'DISTCC_HOSTS'} )
     {
       push @config, '--disable-distcc'
@@ -884,6 +925,11 @@ our $VERS = `find $PREFIX/lib -name 'libmyth-[0-9].[0-9][0-9].[0-9].dylib'`;
 chomp $VERS;
 $VERS =~ s/^.*\-(.*)\.dylib$/$1/s;
 $VERS .= '.' . $OPT{'version'} if $OPT{'version'};
+
+### Program which creates bundles:
+our @bundler = "$svndir/mythtv/contrib/OSX/osx-bundler.pl";
+if ( $OPT{'verbose'} )
+{   push @bundler, '--verbose'   }
 
 ### Create each package.
 ### Note that this is a bit of a waste of disk space,
@@ -946,14 +992,17 @@ if ( $backend )
   # The backend gets all the useful binaries it might call:
   foreach my $binary ( 'mythjobqueue', 'mythcommflag', 'mythtranscode' )
   {
-    my $SRC  = "$PREFIX/bin/$binary.app/Contents/MacOS/$binary";
+    my $SRC  = "$PREFIX/bin/$binary";
     if ( -e $SRC )
     {
+      &Verbose("Installing $SRC into $BE");
       &Syscall([ '/bin/cp', $SRC, "$BE/Contents/MacOS" ]) or die;
-      &PackagedExecutable($BE, $binary);
-      &AddFakeBinDir($BE);
+
+      &Verbose("Updating lib paths of $BE/Contents/MacOS/$binary");
+      &Syscall([ @bundler, "$BE/Contents/MacOS/$binary" ]) or die;
     }
   }
+  &AddFakeBinDir($BE);
 }
 
 if ( $jobtools )
@@ -961,21 +1010,30 @@ if ( $jobtools )
   # JobQueue also gets some binaries it might call:
   my $JQ   = "$SCRIPTDIR/MythJobQueue.app";
   my $DEST = "$JQ/Contents/MacOS";
-  my $SRC  = "$PREFIX/bin/mythcommflag.app/Contents/MacOS/mythcommflag";
+  my $SRC  = "$PREFIX/bin/mythcommflag";
 
   &Syscall([ '/bin/cp', $SRC, $DEST ]) or die;
-  &PackagedExecutable($JQ, 'mythcommflag');
+  &AddFakeBinDir($JQ);
+  &Verbose("Updating lib paths of $DEST/mythcommflag");
+  &Syscall([ @bundler, "$DEST/mythcommflag" ]) or die;
 
   $SRC  = "$PREFIX/bin/mythtranscode.app/Contents/MacOS/mythtranscode";
   if ( -e $SRC )
   {
+      &Verbose("Installing $SRC into $JQ");
       &Syscall([ '/bin/cp', $SRC, $DEST ]) or die;
-      &PackagedExecutable($JQ, 'mythtranscode');
-      &AddFakeBinDir($JQ);
+      &Verbose("Updating lib paths of $DEST/mythtranscode");
+      &Syscall([ @bundler, "$DEST/mythtranscode" ]) or die;
   }
 }
 
-if ($OPT{usehdimage})
+# Clean tmp files. Most of these are leftovers from configure:
+#
+&Verbose('Cleaning build tmp directory');
+&Syscall([ 'rm', '-fr', $WORKDIR . '/tmp' ]) or die;
+&Syscall([ 'mkdir',     $WORKDIR . '/tmp' ]) or die;
+
+if ($OPT{usehdimage} && !$OPT{leavehdimage})
 {
     Verbose("Dismounting case-sensitive build device");
     UnmountHDImage();
@@ -1322,6 +1380,7 @@ sub Syscall
     foreach my $arg (@$arglist)
     {
       $arg =~ s/\$PREFIX/$PREFIX/ge;
+      $arg =~ s/\$parallel_make_flags/$parallel_make_flags/ge;
       push(@args, $arg);
     }
     $arglist = \@args;
@@ -1374,15 +1433,21 @@ sub MountHDImage
 {
     if (!HDImageDevice())
     {
-        if (! -e "$SCRIPTDIR/.osx-packager.dmg")
+        if (-e "$SCRIPTDIR/.osx-packager.dmg")
         {
-            Syscall(['hdiutil', 'create', '-size', '1300m',
+            Verbose("Mounting existing UFS disk image for the build");
+        }
+        else
+        {
+            Verbose("Creating a case-sensitive (UFS) disk image for the build");
+            Syscall(['hdiutil', 'create', '-size', '2048m',
                      "$SCRIPTDIR/.osx-packager.dmg", '-volname',
-                     'MythTvPackagerHDImage', '-fs', 'UFS', '-quiet']);
+                     'MythTvPackagerHDImage', '-fs', 'UFS', '-quiet']) || die;
         }
 
-        Syscall(['hdiutil', 'mount', "$SCRIPTDIR/.osx-packager.dmg",
-                 '-mountpoint', $WORKDIR, '-quiet']);
+        &Syscall(['hdiutil', 'mount',
+                  "$SCRIPTDIR/.osx-packager.dmg",
+                  '-mountpoint', $WORKDIR, '-quiet']) || die;
     }
 
     # configure defaults to /tmp and OSX barfs when mv crosses
@@ -1459,6 +1524,7 @@ sub AddFakeBinDir($)
 {
   my ($target) = @_;
 
+  &Syscall("mkdir -p $target/Contents/Resources");
   &Syscall(['ln', '-sf', '../MacOS', "$target/Contents/Resources/bin"]);
 }
 
