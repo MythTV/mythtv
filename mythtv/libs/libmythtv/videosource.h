@@ -188,6 +188,7 @@ class XMLTVConfig : public TriggeredConfigurationGroup
 {
 public:
     XMLTVConfig(const VideoSource& parent);
+    virtual void save(void);
 };
 
 class VideoSource : public ConfigurationWizard {

@@ -573,6 +573,18 @@ XMLTVConfig::XMLTVConfig(const VideoSource &parent) :
     grabber->addSelection("No grabber", "/bin/true");
 }
 
+void XMLTVConfig::save(void)
+{
+    TriggeredConfigurationGroup::save();
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare(
+        "UPDATE videosource "
+        "SET userid=NULL, password=NULL "
+        "WHERE xmltvgrabber NOT IN ( 'datadirect', 'technovera', "
+        "                            'schedulesdirect1' )");
+    query.exec();
+}
+
 VideoSource::VideoSource() 
 {
     // must be first
