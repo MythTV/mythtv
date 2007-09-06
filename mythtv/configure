@@ -2700,26 +2700,31 @@ if enabled xvmc; then
     elif enabled xvmcw; then
         VENDOR_XVMC_LIBS="-lXvMCW"
         enable xvmc
-    elif has_library libXvMCNVIDIA ; then
-        VENDOR_XVMC_LIBS="-lXvMCNVIDIA"
-        enable xvmc
-        disable xvmc_vld
     elif enabled xvmc_pro; then
         disable xvmc_pro
         if has_library libviaXvMCPro ; then
             VENDOR_XVMC_LIBS="-lviaXvMCPro"
             enable xvmc xvmc_vld xvmc_pro
         fi
+    elif enabled xvmc_vld; then
+        if has_library libviaXvMC ; then
+            VENDOR_XVMC_LIBS="-lviaXvMC"
+            enable xvmc
+        fi
+    elif has_library libXvMCNVIDIA ; then
+        VENDOR_XVMC_LIBS="-lXvMCNVIDIA"
+        enable xvmc
+        disable xvmc_vld xvmc_pro
     elif has_library libviaXvMC ; then
         VENDOR_XVMC_LIBS="-lviaXvMC"
         enable xvmc xvmc_vld
     elif has_library libI810XvMC ; then
         VENDOR_XVMC_LIBS="-lI810XvMC"
         enable xvmc
-        disable xvmc_vld
+        disable xvmc_vld xvmc_pro
     fi
 else
-    disable xvmc_vld xvmc_opengl
+    disable xvmc_vld xvmc_pro xvmc_opengl
 fi
 
 if test x"$VENDOR_XVMC_LIBS" != x"-lXvMCNVIDIA" ; then
@@ -2727,18 +2732,19 @@ if test x"$VENDOR_XVMC_LIBS" != x"-lXvMCNVIDIA" ; then
 fi
 
 if ! has_header X11/extensions/vldXvMC.h ; then
-    disable xvmc_vld
+    disable xvmc_vld xvmc_pro
 fi
 
 if test x"$VENDOR_XVMC_LIBS" != x"-lviaXvMC" ; then
     if test x"$VENDOR_XVMC_LIBS" != x"-lviaXvMCPro" ; then
         if test x"$VENDOR_XVMC_LIBS" != x"-lXvMCW" ; then
-            disable xvmc_vld
+            disable xvmc_vld xvmc_pro
         fi
     fi
 fi
 
-disabled xvmc_opengl || enable opengl && disable xvmc_vld xvmc_pro
+disabled xvmc_pro || enable xvmc_vld
+disabled xvmc_opengl || (enable opengl && disable xvmc_vld xvmc_pro)
 disabled opengl_video || enable opengl
 disabled opengl_vsync || enable opengl
 disabled x11 || enable opengl
