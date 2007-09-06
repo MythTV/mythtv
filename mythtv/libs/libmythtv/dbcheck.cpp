@@ -428,6 +428,17 @@ bool UpgradeTVDatabaseSchema(void)
     if (!gContext->GetNumSetting("MythFillFixProgramIDsHasRunOnce", 0))
         DataDirectProcessor::FixProgramIDs();
 
+    /// Remove any old TMS labs grabber. -- begin
+    /// We can't update 'DBSchemaVer' in 0.20-fixes so we do this update
+    /// unconditionally on every startup...
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare(
+        "UPDATE videosource "
+        "SET xmltvgrabber='schedulesdirect1', userid='', password=NULL "
+        "WHERE xmltvgrabber='datadirect' OR xmltvgrabber='technovera';");
+    query.exec();
+    /// Remove any old TMS labs grabber. -- end
+
     if (dbver == currentDatabaseVersion)
         return true;
 
