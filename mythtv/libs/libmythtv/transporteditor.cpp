@@ -226,12 +226,10 @@ static CardUtil::CARD_TYPES get_cardtype(uint sourceid)
     {
         CardUtil::CARD_TYPES typeA = cardtypes[i - 1];
         typeA = (CardUtil::HDHOMERUN == typeA) ? CardUtil::ATSC : typeA;
-        typeA = (CardUtil::HDTV      == typeA) ? CardUtil::ATSC : typeA;
         typeA = (CardUtil::MPEG      == typeA) ? CardUtil::V4L  : typeA;
 
         CardUtil::CARD_TYPES typeB = cardtypes[i + 0];
         typeB = (CardUtil::HDHOMERUN == typeB) ? CardUtil::ATSC : typeB;
-        typeB = (CardUtil::HDTV      == typeB) ? CardUtil::ATSC : typeB;
         typeB = (CardUtil::MPEG      == typeB) ? CardUtil::V4L  : typeB;
 
         if (typeA == typeB)
@@ -524,11 +522,6 @@ Modulation::Modulation(const MultiplexID *id,  uint nType) :
         addSelection("QAM-64",   "qam_64");
         addSelection("QAM-256",  "qam_256");
     }
-    else if (CardUtil::HDTV == nType)
-    {
-        addSelection("8-VSB",    "8vsb");
-        setVisible(false);
-    }
     else
     {
         addSelection(QObject::tr("Analog"), "analog");
@@ -729,7 +722,6 @@ TransportPage::TransportPage(const MultiplexID *_id, uint nType) :
         right->addChild(new DVBForwardErrorCorrection(id));
     }
     else if (CardUtil::ATSC      == nType ||
-             CardUtil::HDTV      == nType ||
              CardUtil::HDHOMERUN == nType)
     {
         left->addChild(new DTVStandard(id, false, true));

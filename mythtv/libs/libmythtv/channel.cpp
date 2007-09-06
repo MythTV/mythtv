@@ -343,21 +343,15 @@ int Channel::SetFreqTable(const QString &name)
 
 int Channel::GetCurrentChannelNum(const QString &channame)
 {
-    // remove part after '-' for (HDTV subchannels)
-    QString real_channame = channame;
-    int pos = channame.find('-');
-    if (pos != -1)
-        real_channame.truncate(pos);
-
     for (int i = 0; i < totalChannels; i++)
     {
-        if (real_channame == curList[i].name)
+        if (channame == curList[i].name)
             return i;
     }
-    VERBOSE(VB_IMPORTANT,
-            QString("Channel::GetCurrentChannelNum(%1): "
-                    "Failed to find Channel '%2'")
-            .arg(channame).arg(real_channame));
+
+    VERBOSE(VB_IMPORTANT, LOC_ERR +
+            QString("GetCurrentChannelNum(%1): "
+                    "Failed to find Channel").arg(channame));
 
     return -1;
 }
@@ -815,9 +809,6 @@ bool Channel::SetInputAndFormat(int inputNum, QString newFmt)
             VERBOSE(VB_IMPORTANT, LOC_ERR + msg +
                     "\n\t\t\twhile setting format (v4l v2)" + ENO);
 
-            // Fall through to try v4l version 1, pcHDTV 1.4 (for HD-2000)
-            // drivers don't work with VIDIOC_S_STD ioctl.
-            usingv4l1 = true;
             ok = false;
         }
 

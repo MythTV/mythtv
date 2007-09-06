@@ -385,22 +385,6 @@ class MPEGConfigurationGroup: public VerticalConfigurationGroup
     TunerCardInput    *input;
 };
 
-class pcHDTVConfigurationGroup: public VerticalConfigurationGroup
-{
-    Q_OBJECT
-
-  public:
-    pcHDTVConfigurationGroup(CaptureCard& a_parent);
-
-  public slots:
-    void probeCard(const QString &device);
-
-  private:
-    CaptureCard       &parent;
-    TransLabelSetting *cardinfo;
-    TunerCardInput    *input;
-};
-
 class DVBInput;
 class DVBCardName;
 class DVBCardType;

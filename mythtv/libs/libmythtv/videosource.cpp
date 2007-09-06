@@ -1328,45 +1328,6 @@ void MPEGConfigurationGroup::probeCard(const QString &device)
     input->fillSelections(device);
 }
 
-pcHDTVConfigurationGroup::pcHDTVConfigurationGroup(CaptureCard& a_parent) :
-    VerticalConfigurationGroup(false, true, false, false),
-    parent(a_parent), cardinfo(new TransLabelSetting()),
-    input(new TunerCardInput(parent))
-{
-    VideoDevice    *atsc_device     = new VideoDevice(parent, 0, 64);
-    SignalTimeout  *signal_timeout  = new SignalTimeout(parent, 500, 250);
-    ChannelTimeout *channel_timeout = new ChannelTimeout(parent, 2000, 1750);
-
-    addChild(atsc_device);
-    addChild(cardinfo);
-    addChild(signal_timeout);
-    addChild(channel_timeout);
-    addChild(input);
-
-    connect(atsc_device, SIGNAL(valueChanged(const QString&)),
-            this,        SLOT(  probeCard(   const QString&)));
-
-    probeCard(atsc_device->getValue());
-}
-
-void pcHDTVConfigurationGroup::probeCard(const QString &device)
-{
-    QString cn = tr("Failed to open"), ci = cn, dn = QString::null;
-
-    int videofd = open(device.ascii(), O_RDWR);
-    if (videofd >= 0)
-    {
-        if (!CardUtil::GetV4LInfo(videofd, cn, dn))
-            ci = cn = tr("Failed to probe");
-        else if (!dn.isEmpty())
-            ci = cn + "  [" + dn + "]";
-        close(videofd);
-    }
-
-    cardinfo->setValue(ci);
-    input->fillSelections(device);
-}
-
 CaptureCardGroup::CaptureCardGroup(CaptureCard &parent) :
     TriggeredConfigurationGroup(true, true, false, false)
 {
@@ -1380,7 +1341,6 @@ CaptureCardGroup::CaptureCardGroup(CaptureCard &parent) :
     
 #ifdef USING_V4L
     addTarget("V4L",       new V4LConfigurationGroup(parent));
-    addTarget("HDTV",      new pcHDTVConfigurationGroup(parent));
 # ifdef USING_IVTV
     addTarget("MPEG",      new MPEGConfigurationGroup(parent));
 # endif // USING_IVTV
@@ -1498,11 +1458,6 @@ void CardType::fillSelections(SelectSetting* setting)
     setting->addSelection(
         QObject::tr("DVB DTV capture card (v3.x)"), "DVB");
 #endif // USING_DVB
-
-#ifdef USING_V4L
-    setting->addSelection(
-        QObject::tr("pcHDTV DTV capture card (w/V4L drivers)"), "HDTV");
-#endif // USING_V4L
 
 #ifdef USING_FIREWIRE
     setting->addSelection(

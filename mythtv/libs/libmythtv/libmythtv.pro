@@ -388,9 +388,7 @@ using_backend {
     # Support for Video4Linux devices
     using_v4l {
         HEADERS += channel.h                   analogsignalmonitor.h
-        HEADERS += hdtvrecorder.h              pchdtvsignalmonitor.h
         SOURCES += channel.cpp                 analogsignalmonitor.h
-        SOURCES += hdtvrecorder.cpp            pchdtvsignalmonitor.cpp
 
         DEFINES += USING_V4L
     }

@@ -1,6 +1,6 @@
 // -*- Mode: c++ -*-
 /**
- *  DTVRecorder -- base class for DVBRecorder and HDTVRecorder
+ *  DTVRecorder -- base class for Digital Television recorders
  *  Copyright (c) 2003-2004 by Brandon Beattie, Doug Larrick, 
  *    Jason Hoos, and Daniel Thor Kristjansson
  *  Distributed as part of MythTV under GPL v2 and later.

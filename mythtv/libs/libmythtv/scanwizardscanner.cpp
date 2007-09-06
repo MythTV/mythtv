@@ -47,7 +47,6 @@
 
 #ifdef USING_V4L
 #include "channel.h"
-#include "pchdtvsignalmonitor.h"
 #include "analogsignalmonitor.h"
 #endif
 
@@ -423,8 +422,8 @@ void ScanWizardScanner::ImportDVBUtils(uint sourceid, int cardtype,
     type = (CardUtil::OFDM == cardtype) ? DTVConfParser::OFDM : type;
     type = (CardUtil::QPSK == cardtype) ? DTVConfParser::QPSK : type;
     type = (CardUtil::QAM  == cardtype) ? DTVConfParser::QAM  : type;
-    type = ((CardUtil::ATSC == cardtype) || (CardUtil::HDTV == cardtype) ||
-            (CardUtil::HDHOMERUN == cardtype)) ? DTVConfParser::ATSC : type;
+    type = ((CardUtil::ATSC == cardtype)||(CardUtil::HDHOMERUN == cardtype)) ?
+        DTVConfParser::ATSC : type;
 
     if (type == DTVConfParser::UNKNOWN)
         return;
@@ -493,7 +492,7 @@ void ScanWizardScanner::PreScanCommon(int scantype,
 #endif
 
 #ifdef USING_V4L
-    if (("HDTV" == card_type) || ("V4L" == card_type) || ("MPEG" == card_type))
+    if (("V4L" == card_type) || ("MPEG" == card_type))
         channel = new Channel(NULL, device);
 #endif
 

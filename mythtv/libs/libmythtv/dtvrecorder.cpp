@@ -1,11 +1,9 @@
 /**
- *  DTVRecorder -- base class for DVBRecorder and HDTVRecorder
+ *  DTVRecorder -- base class for Digital Televison recorders
  *  Copyright 2003-2004 by Brandon Beattie, Doug Larrick, 
  *    Jason Hoos, and Daniel Thor Kristjansson
  *  Distributed as part of MythTV under GPL v2 and later.
  */
-
-using namespace std;
 
 #include "RingBuffer.h"
 #include "programinfo.h"
@@ -25,15 +23,10 @@ const uint DTVRecorder::kMaxKeyFrameDistance = 32;
 
 /** \class DTVRecorder
  *  \brief This is a specialization of RecorderBase used to
- *         handle DVB and ATSC streams.
+ *         handle MPEG-2, MPEG-4, MPEG-4 AVC, DVB and ATSC streams.
  *
- *  This class is an abstract class. If you are using a
- *  pcHDTV card with the bttv drivers, ATSC streams are
- *  handled by the HDTVRecorder. If you are using DVB
- *  drivers DVBRecorder is used. If you are using firewire
- *  cable box input the FirewireRecorder is used.
- *
- *  \sa DVBRecorder, HDTVRecorder, FirewireRecorder, DBox2Recorder
+ *  \sa DBox2Recorder, DVBRecorder, FirewireRecorder,
+        HDHRRecoreder, IPTVRecorder
  */
 
 DTVRecorder::DTVRecorder(TVRec *rec) : 

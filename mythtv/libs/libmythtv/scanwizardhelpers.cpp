@@ -54,7 +54,7 @@ static QString card_types(void)
 #ifdef USING_V4L
     if (!cardTypes.isEmpty())
         cardTypes += ",";
-    cardTypes += "'V4L','HDTV'";
+    cardTypes += "'V4L'";
 # ifdef USING_IVTV
     cardTypes += ",'MPEG'";
 # endif // USING_IVTV
@@ -412,7 +412,6 @@ void ScanTypeSetting::SetInput(const QString &cardids_inputname)
                      QString::number(DVBUtilsImport));
         break;
     case CardUtil::ATSC:
-    case CardUtil::HDTV:
     case CardUtil::HDHOMERUN:
         addSelection(tr("Full Scan"),
                      QString::number(FullScan_ATSC), true);

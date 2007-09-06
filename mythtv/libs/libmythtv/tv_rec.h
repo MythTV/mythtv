@@ -25,7 +25,6 @@ class LiveTVChain;
 class RecorderBase;
 class DTVRecorder;
 class DVBRecorder;
-class HDTVRecorder;
 class HDHRRecorder;
 
 class SignalMonitor;

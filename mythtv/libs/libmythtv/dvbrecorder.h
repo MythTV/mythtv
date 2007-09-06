@@ -53,7 +53,7 @@ typedef vector<uint>        uint_vec_t;
  *  \brief This is a specialization of DTVRecorder used to
  *         handle streams from DVB drivers.
  *
- *  \sa DTVRecorder, HDTVRecorder
+ *  \sa DTVRecorder
  */
 class DVBRecorder :
     public DTVRecorder,

@@ -895,18 +895,6 @@ int ChannelUtil::GetChanID(int mplexid,       int service_transport_id,
         QString("SELECT chanid FROM channel "
                 "WHERE sourceid=%1 AND serviceID=%1 AND mplexid=%2")
         .arg(source_id).arg(program_number).arg(mplexid),
-        // find based on OLD pcHDTV formatted major and minor channels
-        QString("SELECT chanid FROM channel "
-                "WHERE sourceid=%1 AND channum='%2_%3'")
-        .arg(source_id).arg(major_channel).arg(minor_channel),
-        // find based on OLD pcHDTV formatted major channel and program number
-        QString("SELECT chanid FROM channel "
-                "WHERE sourceid=%1 AND channum='%2-%3'")
-        .arg(source_id).arg(major_channel).arg(program_number),
-        // find based on OLD DVB formatted major and minor channels
-        QString("SELECT chanid FROM channel "
-                "WHERE sourceid=%1 AND channum='%2%3'")
-        .arg(source_id).arg(major_channel).arg(minor_channel),
     };
 
     for (uint i = 0; i < 6; i++)

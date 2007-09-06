@@ -53,7 +53,6 @@ using namespace std;
 #include "recorderbase.h"
 #include "NuppelVideoRecorder.h"
 #include "mpegrecorder.h"
-#include "hdtvrecorder.h"
 #include "dvbrecorder.h"
 #include "dbox2recorder.h"
 #include "hdhrrecorder.h"
@@ -195,7 +194,7 @@ bool TVRec::CreateChannel(const QString &startchannel)
         init_run = true;
 #endif
     }    
-    else // "V4L" or "MPEG", ie, analog TV, or "HDTV"
+    else // "V4L" or "MPEG", ie, analog TV
     {
 #ifdef USING_V4L
         channel = new Channel(this, genOpt.videodev);
@@ -205,7 +204,7 @@ bool TVRec::CreateChannel(const QString &startchannel)
         CloseChannel();
         init_run = true;
 #endif
-        if (genOpt.cardtype != "HDTV" && genOpt.cardtype != "MPEG")
+        if (genOpt.cardtype != "MPEG")
             rbFileExt = "nuv";
     }
 
@@ -796,7 +795,7 @@ void TVRec::ChangeState(TVState nextState)
  *
  *  Based on the card type, one of the possible recorders are started.
  *  If the card type is "MPEG" a MpegRecorder is started,
- *  if the card type is "HDTV" a HDTVRecorder is started,
+ *  if the card type is "HDHOMERUN" a HDHRRecorder is started,
  *  if the card type is "FIREWIRE" a FirewireRecorder is started,
  *  if the card type is "DVB" a DVBRecorder is started,
  *  otherwise a NuppelVideoRecorder is started.
@@ -812,14 +811,6 @@ bool TVRec::SetupRecorder(RecordingProfile &profile)
 #ifdef USING_IVTV
         recorder = new MpegRecorder(this);
 #endif // USING_IVTV
-    }
-    else if (genOpt.cardtype == "HDTV")
-    {
-#ifdef USING_V4L
-        recorder = new HDTVRecorder(this);
-        ringBuffer->SetWriteBufferSize(4*1024*1024);
-        recorder->SetOption("wait_for_seqstart", genOpt.wait_for_seqstart);
-#endif // USING_V4L
     }
     else if (genOpt.cardtype == "FIREWIRE")
     {
@@ -1800,7 +1791,7 @@ bool TVRec::SetupDTVSignalMonitor(void)
  *  \brief This creates a SignalMonitor instance if one is needed and
  *         begins signal monitoring.
  *
- *   If the channel exists and the cardtype is "DVB", "HDTV" or "HDHomeRun"
+ *   If the channel exists and the cardtype is "DVB" or "HDHomeRun"
  *   a SignalMonitor instance is created and SignalMonitor::Start()
  *   is called to start the signal monitoring thread.
  *

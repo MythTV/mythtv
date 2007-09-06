@@ -49,7 +49,6 @@ class MPUBLIC CardUtil
         ATSC,
         V4L,
         MPEG,
-        HDTV,
         FIREWIRE,
         HDHOMERUN,
         FREEBOX,
@@ -75,8 +74,6 @@ class MPUBLIC CardUtil
             return V4L;
         if ("MPEG" == name)
             return MPEG;
-        if ("HDTV" == name)
-            return HDTV;
         if ("FIREWIRE" == name)
             return FIREWIRE;
         if ("HDHOMERUN" == name)
@@ -89,7 +86,7 @@ class MPUBLIC CardUtil
     static bool         IsEncoder(const QString &rawtype)
     {
         return
-            (rawtype != "DVB")       && (rawtype != "HDTV")    &&
+            (rawtype != "DVB")       &&
             (rawtype != "FIREWIRE")  && (rawtype != "DBOX2")   &&
             (rawtype != "HDHOMERUN") && (rawtype != "FREEBOX");
     }
@@ -103,15 +100,13 @@ class MPUBLIC CardUtil
     static bool         IsEITCapable(const QString &rawtype)
     {
         return
-            (rawtype == "DVB")       || (rawtype == "HDTV")  ||
-            (rawtype == "HDHOMERUN");
+            (rawtype == "DVB")       || (rawtype == "HDHOMERUN");
     }
 
     static bool         IsTuningDigital(const QString &rawtype)
     {
         return
-            (rawtype == "DVB")       || (rawtype == "HDTV")  ||
-            (rawtype == "HDHOMERUN");
+            (rawtype == "DVB")       || (rawtype == "HDHOMERUN");
     }
 
     static bool         IsTuningAnalog(const QString &rawtype)

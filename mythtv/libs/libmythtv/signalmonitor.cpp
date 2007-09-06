@@ -21,7 +21,6 @@ extern "C" {
 #endif
 
 #ifdef USING_V4L
-#   include "pchdtvsignalmonitor.h"
 #   include "analogsignalmonitor.h"
 #   include "channel.h"
 #endif
@@ -58,7 +57,8 @@ extern "C" {
  *   Additional signals may be implemented, see DTVSignalMonitor and 
  *   DVBSignalMonitor for example.
  *
- *  \sa DTVSignalMonitor DVBSignalMonitor, HDTVSignalMonitor, SignalMonitorValue
+ *  \sa AnalocSignalMonitor, DTVSignalMonitor, DVBSignalMonitor,
+        HDHRSignalMonitor, SignalMonitorValue
  */
 
 void ALRMhandler(int /*sig*/)
@@ -91,12 +91,6 @@ SignalMonitor *SignalMonitor::Init(QString cardtype, int db_cardnum,
 #endif
 
 #ifdef USING_V4L
-    if (cardtype.upper() == "HDTV")
-    {
-        Channel *hdtvc = dynamic_cast<Channel*>(channel);
-        if (hdtvc)
-            signalMonitor = new pcHDTVSignalMonitor(db_cardnum, hdtvc);
-    }
     if ((cardtype.upper() == "V4L") ||
         (cardtype.upper() == "MPEG"))
     {

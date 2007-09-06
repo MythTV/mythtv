@@ -2116,21 +2116,6 @@ static void get_atsc_stuff(QString channum, int sourceid, int freqid,
     minor = channum.right(channum.length() - (chansep + 1)).toInt();
 
     freq = get_center_frequency("atsc", "vsb8", "us", freqid);
-
-    // Check if this is connected to an HDTV card.
-    MSqlQuery query(MSqlQuery::DDCon());
-    query.prepare(
-        "SELECT cardtype "
-        "FROM capturecard, cardinput "
-        "WHERE cardinput.cardid = capturecard.cardid AND "
-        "      sourceid         = :SOURCEID");
-    query.bindValue(":SOURCEID", sourceid);
-
-    if (query.exec() && query.isActive() && query.next() &&
-        query.value(0).toString() == "HDTV")
-    {
-        freq -= 1750000; // convert to visual carrier freq.
-    }
 }
 
 static QString process_dd_station(
