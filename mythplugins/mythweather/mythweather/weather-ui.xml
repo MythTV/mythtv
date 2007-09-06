@@ -518,32 +518,32 @@
       </image>
 
       <textarea name="hilbl0" draworder="5" align="left">
-        <area>70,297,100,30</area>
+        <area>50,297,100,30</area>
         <font>lohifont2</font>
         <value>High</value>
       </textarea>
       <textarea name="hilbl1" draworder="5" align="left">
-        <area>313,297,100,30</area>
+        <area>293,297,100,30</area>
         <font>lohifont2</font>
         <value>High</value>
       </textarea>
       <textarea name="hilbl2" draworder="5" align="left">
-        <area>556,297,100,30</area>
+        <area>536,297,100,30</area>
         <font>lohifont2</font>
         <value>High</value>
       </textarea>
       <textarea name="hilbl3" draworder="5" align="left">
-        <area>70,497,100,30</area>
+        <area>50,497,100,30</area>
         <font>lohifont2</font>
         <value>High</value>
       </textarea>
       <textarea name="hilbl4" draworder="5" align="left">
-        <area>313,497,100,30</area>
+        <area>293,497,100,30</area>
         <font>lohifont2</font>
         <value>High</value>
       </textarea>
       <textarea name="hilbl5" draworder="5" align="left">
-        <area>556,497,100,30</area>
+        <area>536,497,100,30</area>
         <font>lohifont2</font>
         <value>High</value>
       </textarea>
@@ -579,51 +579,51 @@
       </textarea>
 
       <textarea name="+high-0" draworder="5" align="left">
-        <area>120,297,40,20</area>
+        <area>110,297,60,20</area>
         <font>tempdata2</font>
       </textarea>
       <textarea name="+high-1" draworder="5" align="left">
-        <area>363,297,40,20</area>
+        <area>353,297,60,20</area>
         <font>tempdata2</font>
       </textarea>
       <textarea name="+high-2" draworder="5" align="left">
-        <area>606,297,40,20</area>
+        <area>596,297,60,20</area>
         <font>tempdata2</font>
       </textarea>
       <textarea name="+high-3" draworder="5" align="left">
-        <area>120,497,40,20</area>
+        <area>110,497,60,20</area>
         <font>tempdata2</font>
       </textarea>
       <textarea name="+high-4" draworder="5" align="left">
-        <area>363,497,40,20</area>
+        <area>353,497,60,20</area>
         <font>tempdata2</font>
       </textarea>
       <textarea name="+high-5" draworder="5" align="left">
-        <area>606,497,40,20</area>
+        <area>596,497,60,20</area>
         <font>tempdata2</font>
       </textarea>
       <textarea name="+low-0" draworder="5" align="left">
-        <area>220,297,40,20</area>
+        <area>225,297,60,20</area>
         <font>tempdata2</font>
       </textarea>
       <textarea name="+low-1" draworder="5" align="left">
-        <area>463,297,40,20</area>
+        <area>468,297,60,20</area>
         <font>tempdata2</font>
       </textarea>
       <textarea name="+low-2" draworder="5" align="left">
-        <area>706,297,40,20</area>
+        <area>711,297,60,20</area>
         <font>tempdata2</font>
       </textarea>
       <textarea name="+low-3" draworder="5" align="left">
-        <area>220,497,40,20</area>
+        <area>225,497,60,20</area>
         <font>tempdata2</font>
       </textarea>
       <textarea name="+low-4" draworder="5" align="left">
-        <area>463,497,40,20</area>
+        <area>468,497,60,20</area>
         <font>tempdata2</font>
       </textarea>
       <textarea name="+low-5" draworder="5" align="left">
-        <area>706,497,40,20</area>
+        <area>711,497,60,20</area>
         <font>tempdata2</font>
       </textarea>
 

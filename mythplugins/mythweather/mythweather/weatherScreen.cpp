@@ -14,6 +14,8 @@ WeatherScreen *WeatherScreen::loadScreen(Weather *parent, LayerSet *container,
         return new CurrCondScreen(parent, container, id);
     if (key == "Three Day Forecast")
         return new ThreeDayForecastScreen(parent, container, id);
+    if (key == "Six Day Forecast")
+        return new SixDayForecastScreen(parent, container, id);        
     if (key == "Severe Weather Alerts")
         return new SevereWeatherScreen(parent, container, id);
     if (key == "Static Map")
@@ -279,10 +281,15 @@ QString CurrCondScreen::prepareDataItem(const QString &key,
         return value + (m_units == ENG_UNITS ? " mi" : " km");
 
     if (key == "appt")
-        return value == "NA" ? value : value + (m_units == ENG_UNITS ? " °F" : " °C");
+        return value == "NA" ? value : value + (m_units == ENG_UNITS ? "°F" : "°C");
 
     if (key == "temp")
-        return value + (m_units == ENG_UNITS ? " °F" : " °C");
+    {
+       if ( (value == "NA") || (value == "N/A") )
+          return value;
+       else
+          return value + (m_units == ENG_UNITS ? "°F" : "°C");
+    }
 
     if (key == "wind_gust" || key == "wind_spdgst" || key == "wind_speed")
         return value + (m_units == ENG_UNITS ? " mph" : " kph");
@@ -294,6 +301,40 @@ ThreeDayForecastScreen::ThreeDayForecastScreen(Weather *parent,
                                                LayerSet *container, int id) :
     WeatherScreen(parent, container, id)
 {
+}
+
+QString ThreeDayForecastScreen::prepareDataItem(const QString &key,
+                                        const QString &value)
+{
+    if (key.contains("low",FALSE) || key.contains("high",FALSE) )
+    {
+       if ( (value == "NA") || (value == "N/A") )
+          return value;
+       else
+          return value + (m_units == ENG_UNITS ? "°F" : "°C");
+    }
+    
+    return value;
+}
+
+SixDayForecastScreen::SixDayForecastScreen(Weather *parent,
+                                               LayerSet *container, int id) :
+    WeatherScreen(parent, container, id)
+{
+}
+
+QString SixDayForecastScreen::prepareDataItem(const QString &key,
+                                        const QString &value)
+{
+    if (key.contains("low",FALSE) || key.contains("high",FALSE) )
+    {
+       if ( (value == "NA") || (value == "N/A") )
+          return value;
+       else
+          return value + (m_units == ENG_UNITS ? "°F" : "°C");
+    }
+    
+    return value;
 }
 
 SevereWeatherScreen::SevereWeatherScreen(Weather *parent, LayerSet *container,

@@ -88,6 +88,22 @@ class ThreeDayForecastScreen : public WeatherScreen
 
   public:
     ThreeDayForecastScreen(Weather *parent, LayerSet *container, int id);
+    
+  protected:
+    virtual QString prepareDataItem(const QString &key, const QString &value);
+
+};
+
+class SixDayForecastScreen : public WeatherScreen
+{
+    Q_OBJECT
+
+  public:
+    SixDayForecastScreen(Weather *parent, LayerSet *container, int id);
+    
+  protected:
+    virtual QString prepareDataItem(const QString &key, const QString &value);
+
 };
 
 class SevereWeatherScreen : public WeatherScreen
