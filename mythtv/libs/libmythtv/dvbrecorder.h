@@ -185,7 +185,6 @@ class DVBRecorder :
     bool            _stop_dummy;
     bool            _dummy_stopped;
     QWaitCondition  _wait_time;
-    QWaitCondition  _wait_stop;
     QMutex          _ts_lock;
     uint            _video_cc;
 

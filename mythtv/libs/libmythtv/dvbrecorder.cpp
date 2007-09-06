@@ -1313,9 +1313,10 @@ void DVBRecorder::GetTimeStamp(const TSPacket& tspacket)
 void *DVBRecorder::run_dummy_video(void *param)
 {
     DVBRecorder *dvbrec = (DVBRecorder*) param;
+    dvbrec->_stop_dummy = false;
+    dvbrec->_dummy_stopped = false;
     dvbrec->RunDummyVideo();
     dvbrec->_dummy_stopped = true;
-    dvbrec->_wait_stop.wakeAll();
     return NULL;
 }
 
@@ -1358,9 +1359,9 @@ void DVBRecorder::StartDummyVideo(void)
     _ts_change_count = 0;
 
     // Start the dummy video thread.
-    _stop_dummy = false;
-    int ret = pthread_create(&_video_thread, NULL, run_dummy_video, this);
-    _dummy_stopped = (0 != ret);
+    pthread_create(&_video_thread, NULL, run_dummy_video, this);
+    while (_dummy_stopped)
+        usleep(50);
 }
 
 void DVBRecorder::RunDummyVideo(void)
@@ -1390,11 +1391,10 @@ void DVBRecorder::RunDummyVideo(void)
 
     unsigned long frameTime = (unsigned long)(1000 / _frames_per_sec);
     int64_t last_synch = 0;
-    _wait_time.wait(frameTime * 4); // Initial wait
+    _wait_time.wait(frameTime * 5); // Initial wait
 
-    while (! _stop_dummy)
+    while (!_stop_dummy)
     {
-        _wait_time.wait(frameTime);
         _ts_lock.lock();
         int64_t synch_ts = _synch_time_stamp;
         _ts_lock.unlock();
@@ -1417,6 +1417,7 @@ void DVBRecorder::RunDummyVideo(void)
         {
             CreateVideoFrame(); // Just generate one frame
         }
+        _wait_time.wait(frameTime);
     }
 
     close(_video_stream_fd);
@@ -1426,13 +1427,12 @@ void DVBRecorder::RunDummyVideo(void)
 // Stop the dummy video thread
 void DVBRecorder::StopDummyVideo(void)
 {
-    while (!_dummy_stopped)
-    {
-        _stop_dummy = true;
-        _wait_time.wakeAll();
-        _wait_stop.wait(1000);
-        pthread_join(_video_thread, NULL);
-    }
+    if (_dummy_stopped)
+        return;
+
+    _stop_dummy = true;
+    _wait_time.wakeAll();
+    pthread_join(_video_thread, NULL);
 }
 
 void DVBRecorder::CreateVideoFrame(void)
