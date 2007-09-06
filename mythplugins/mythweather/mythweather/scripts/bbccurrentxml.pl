@@ -1,8 +1,12 @@
 #! /usr/bin/perl -w
 
+#
+# Based on nwsxml.pl by Lucien Dunning
+#
+
 use strict;
 use XML::Simple;
-use LWP::Simple qw($ua get);
+use LWP::Simple;
 # Ideally we would use the If-Modified-Since header
 # to reduce server load, but they ignore it
 #use HTTP::Cache::Transparent;
@@ -22,7 +26,7 @@ my $updateTimeout = 120*60;
 # Given that the option to update in the background now exists
 # potentially we could be hitting the server 12 times in a day
 my $retrieveTimeout = 30;
-my @types = ('cclocation', 'station_id', 'latitude', 'longitude',
+my @types = ('cclocation', 'station_id', 'copyright',
         'observation_time', 'weather', 'temp', 'relative_humidity',
         'wind_dir', 'pressure', 'visibility', 'weather_icon',
         'appt', 'wind_spdgst');
@@ -40,7 +44,6 @@ if (defined $opt_T) {
     exit 0;
 }
 
-# TODO
 if (defined $opt_l) {
 
     my $search = shift;
@@ -72,7 +75,8 @@ if (!(defined $opt_u && defined $locid && !$locid eq "")) {
 
 my $units = $opt_u;
 my $base_url;
-my $local_base_url = 'http://feeds.bbc.co.uk/weather/feeds/obs/id/';
+
+my $local_base_url = 'http://feeds.bbc.co.uk/weather/feeds/rss/obs/id/';
 my $world_base_url = 'http://feeds.bbc.co.uk/weather/feeds/rss/obs/world/';
 
 if ($locid =~ s/^W(.*)/$1/)
