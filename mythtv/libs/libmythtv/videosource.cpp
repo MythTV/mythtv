@@ -522,12 +522,6 @@ XMLTVConfig::XMLTVConfig(const VideoSource &parent) :
     grabber->addSelection("North America (SchedulesDirect.org) "
                           "(Internal)", "schedulesdirect1");
 
-#if 1
-    addTarget("datadirect", new DataDirect_config(parent, DD_ZAP2IT));
-    grabber->addSelection(
-        "North America (TMS Labs) (Internal)", "datadirect");
-#endif
-
     addTarget("eitonly", new EITOnly_config(parent));
     grabber->addSelection("Transmitted guide only (EIT)", "eitonly");
 
