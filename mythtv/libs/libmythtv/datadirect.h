@@ -293,7 +293,7 @@ class MPUBLIC DataDirectProcessor
     DDLineupMap   GetLineupMap(void)      const { return lineupmaps;         }
     QDateTime     GetLineupCacheAge(const QString &lineupid) const;
 
-    QString   GetUserID(void)             const { return userid;             }
+    QString   GetUserID(void)             const { return userid.lower();     }
     QString   GetPassword(void)           const { return password;           }
     uint      GetListingsProvider(void)   const { return listings_provider;  }
     QString   GetListingsProviderName(void) const
