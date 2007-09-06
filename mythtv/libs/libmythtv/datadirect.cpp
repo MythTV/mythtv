@@ -665,7 +665,12 @@ void DataDirectProcessor::UpdateProgramViewTable(uint sourceid)
         "       (channel.xmltvid       = dd_schedule.stationid) AND "
         "       (channel.sourceid      = :SOURCEID))";
 
-    query.prepare(qstr.arg((saw_new) ? "not isnew" : "isrepeat"));
+    QString repeat = (saw_new) ?
+        "(not isnew) AND "
+        "(SUBSTRING(dd_program.programid,1,2) IN ('EP', 'SH'))" :
+        "isrepeat";
+
+    query.prepare(qstr.arg(repeat));
 
     query.bindValue(":SOURCEID", sourceid);
 
