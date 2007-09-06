@@ -955,34 +955,6 @@ bool DVDRingBufferPriv::DecodeSubtitles(AVSubtitle *sub, int *gotSubtitles,
                 decode_rle(bitmap + w, w * 2, w, h / 2,
                             spu_pkt, offset2 * 2, buf_size);
                 guess_palette(sub->rects[0].rgba_palette, palette, alpha);
-                if (!IsInMenu() && y1 < 5)
-                {
-                    uint8_t *tmp_bitmap;
-                    int sy;
-                    bool found = false;
-                    for (sy = 0; sy < h && !found; ++sy)
-                    {
-                        for (int tmpx = 0; tmpx < w; ++tmpx)
-                        {
-                            const uint8_t color = bitmap[sy * w + tmpx];
-                            if (color > 0)
-                            {
-                                found = true;
-                                break;
-                            }
-                        }
-                    }
-
-                    int newh = h - sy;
-                    tmp_bitmap = (uint8_t*) av_malloc(w * newh);
-                    memcpy(tmp_bitmap, bitmap + (w * sy), (w * newh));
-                    av_free(bitmap);
-                    y1 = sy + y1;
-                    h = newh;
-                    bitmap = (uint8_t*) av_malloc(w * h);
-                    memcpy(bitmap, tmp_bitmap, (w * h));
-                    av_free(tmp_bitmap);
-                }
                 sub->rects[0].bitmap = bitmap;
                 sub->rects[0].x = x1;
                 sub->rects[0].y = y1;
@@ -990,6 +962,8 @@ bool DVDRingBufferPriv::DecodeSubtitles(AVSubtitle *sub, int *gotSubtitles,
                 sub->rects[0].h = h;
                 sub->rects[0].nb_colors = 4;
                 sub->rects[0].linesize = w;
+                if (!IsInMenu())
+                    find_smallest_bounding_rectangle(sub);
                 *gotSubtitles = 1;
             }
         }
@@ -1392,3 +1366,104 @@ int DVDRingBufferPriv::get_nibble(const uint8_t *buf, int nibble_offset)
     return (buf[nibble_offset >> 1] >> ((1 - (nibble_offset & 1)) << 2)) & 0xf;
 }
 
+/**
+ * \brief obtained from ffmpeg dvdsubdec.c
+ * used to find smallest bounded rectangle
+ */
+int DVDRingBufferPriv::is_transp(const uint8_t *buf, int pitch, int n,
+                     const uint8_t *transp_color)
+{
+    int i;
+    for (i = 0; i < n; i++)
+    {
+        if (!transp_color[*buf])
+            return 0;
+        buf += pitch;
+    }
+    return 1;
+}
+
+/**
+ * \brief obtained from ffmpeg dvdsubdec.c
+ * used to find smallest bounded rect.
+ * helps prevent jerky picture during subtitle creation
+ */
+int DVDRingBufferPriv::find_smallest_bounding_rectangle(AVSubtitle *s)
+{
+    uint8_t transp_color[256];
+    int y1, y2, x1, x2, y, w, h, i;
+    uint8_t *bitmap;
+
+    if (s->num_rects == 0 || s->rects == NULL || 
+        s->rects[0].w <= 0 || s->rects[0].h <= 0)
+    {
+        return 0;
+    }
+
+    memset(transp_color, 0, 256);
+    for (i = 0; i < s->rects[0].nb_colors; i++) 
+    {
+        if ((s->rects[0].rgba_palette[i] >> 24) == 0)
+            transp_color[i] = 1;
+    }
+
+    y1 = 0;
+    while (y1 < s->rects[0].h && 
+            is_transp(s->rects[0].bitmap + y1 * s->rects[0].linesize,
+                    1, s->rects[0].w, transp_color))
+    {
+        y1++;
+    }
+
+    if (y1 == s->rects[0].h)
+    {
+        av_freep(&s->rects[0].bitmap);
+        s->rects[0].w = s->rects[0].h = 0;
+        return 0;
+    }
+
+    y2 = s->rects[0].h - 1;
+    while (y2 > 0 && 
+            is_transp(s->rects[0].bitmap + y2 * s->rects[0].linesize, 1,
+                    s->rects[0].w, transp_color))
+    {
+        y2--;
+    }
+
+    x1 = 0;
+    while (x1 < (s->rects[0].w - 1) &&
+           is_transp(s->rects[0].bitmap + x1, s->rects[0].linesize,
+                    s->rects[0].h, transp_color))
+    {
+        x1++;
+    }
+
+    x2 = s->rects[0].w - 1;
+    while (x2 > 0 &&
+           is_transp(s->rects[0].bitmap + x2, s->rects[0].linesize,
+                     s->rects[0].h, transp_color))
+    {
+        x2--;
+    }
+
+    w = x2 - x1 + 1;
+    h = y2 - y1 + 1;
+    bitmap = (uint8_t*) av_malloc(w * h);
+    if (!bitmap)
+        return 1;
+
+    for(y = 0; y < h; y++)
+    {
+        memcpy(bitmap + w * y, s->rects[0].bitmap + x1 +
+                (y1 + y) * s->rects[0].linesize, w);
+    }
+
+    av_freep(&s->rects[0].bitmap);
+    s->rects[0].bitmap = bitmap;
+    s->rects[0].linesize = w;
+    s->rects[0].w = w;
+    s->rects[0].h = h;
+    s->rects[0].x += x1;
+    s->rects[0].y += y1;
+    return 1;
+}

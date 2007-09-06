@@ -191,6 +191,9 @@ class MPUBLIC DVDRingBufferPriv
                     const uint8_t *buf, int nibble_offset, int buf_size);
     void guess_palette(uint32_t *rgba_palette,uint8_t *palette,
                         uint8_t *alpha);
+    int is_transp(const uint8_t *buf, int pitch, int n,
+                  const uint8_t *transp_color);
+    int find_smallest_bounding_rectangle(AVSubtitle *s);
 };
 
 #endif // DVD_RING_BUFFER_H_
