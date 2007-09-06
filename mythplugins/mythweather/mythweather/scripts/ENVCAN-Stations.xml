@@ -1,0 +1,6678 @@
+<envcan_station_index>
+	<credit>Environment Canada's Weather Service</credit>
+	<credit_url>http://www.weatheroffice.gc.ca</credit_url>
+	<generated>Wed Aug  8 01:50:56 2007 UTC</generated>
+
+	<station>
+		<station_id>ab-12</station_id>
+		<region_id>AB</region_id>
+		<province>Alberta</province>
+		<city>Airdrie</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/ab-12_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>ab-10</station_id>
+		<region_id>AB</region_id>
+		<province>Alberta</province>
+		<city>Athabasca</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/ab-10_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>ab-49</station_id>
+		<region_id>AB</region_id>
+		<province>Alberta</province>
+		<city>Banff</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/ab-49_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>ab-2</station_id>
+		<region_id>AB</region_id>
+		<province>Alberta</province>
+		<city>Barrhead</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/ab-2_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>ab-57</station_id>
+		<region_id>AB</region_id>
+		<province>Alberta</province>
+		<city>Beaverlodge</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/ab-57_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>ab-43</station_id>
+		<region_id>AB</region_id>
+		<province>Alberta</province>
+		<city>Bow Island</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/ab-43_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>ab-42</station_id>
+		<region_id>AB</region_id>
+		<province>Alberta</province>
+		<city>Bow Valley (Provincial Park)</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/ab-42_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>ab-36</station_id>
+		<region_id>AB</region_id>
+		<province>Alberta</province>
+		<city>Breton</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/ab-36_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>ab-58</station_id>
+		<region_id>AB</region_id>
+		<province>Alberta</province>
+		<city>Brooks</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/ab-58_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>ab-52</station_id>
+		<region_id>AB</region_id>
+		<province>Alberta</province>
+		<city>Calgary</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/ab-52_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>ab-61</station_id>
+		<region_id>AB</region_id>
+		<province>Alberta</province>
+		<city>Calgary (Olympic Park)</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/ab-61_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>ab-18</station_id>
+		<region_id>AB</region_id>
+		<province>Alberta</province>
+		<city>Camrose</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/ab-18_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>ab-3</station_id>
+		<region_id>AB</region_id>
+		<province>Alberta</province>
+		<city>Canmore</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/ab-3_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>ab-64</station_id>
+		<region_id>AB</region_id>
+		<province>Alberta</province>
+		<city>Cardston</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/ab-64_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>ab-60</station_id>
+		<region_id>AB</region_id>
+		<province>Alberta</province>
+		<city>Claresholm</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/ab-60_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>ab-1</station_id>
+		<region_id>AB</region_id>
+		<province>Alberta</province>
+		<city>Cochrane</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/ab-1_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>ab-23</station_id>
+		<region_id>AB</region_id>
+		<province>Alberta</province>
+		<city>Cold Lake</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/ab-23_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>ab-59</station_id>
+		<region_id>AB</region_id>
+		<province>Alberta</province>
+		<city>Coronation</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/ab-59_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>ab-17</station_id>
+		<region_id>AB</region_id>
+		<province>Alberta</province>
+		<city>Crowsnest</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/ab-17_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>ab-48</station_id>
+		<region_id>AB</region_id>
+		<province>Alberta</province>
+		<city>Drayton Valley</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/ab-48_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>ab-62</station_id>
+		<region_id>AB</region_id>
+		<province>Alberta</province>
+		<city>Drumheller</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/ab-62_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>ab-50</station_id>
+		<region_id>AB</region_id>
+		<province>Alberta</province>
+		<city>Edmonton</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/ab-50_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>ab-71</station_id>
+		<region_id>AB</region_id>
+		<province>Alberta</province>
+		<city>Edmonton (Intl Aprt)</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/ab-71_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>ab-72</station_id>
+		<region_id>AB</region_id>
+		<province>Alberta</province>
+		<city>Edson</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/ab-72_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>ab-63</station_id>
+		<region_id>AB</region_id>
+		<province>Alberta</province>
+		<city>Elk Island (National Park)</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/ab-63_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>ab-67</station_id>
+		<region_id>AB</region_id>
+		<province>Alberta</province>
+		<city>Esther</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/ab-67_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>ab-28</station_id>
+		<region_id>AB</region_id>
+		<province>Alberta</province>
+		<city>Fort Chipewyan</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/ab-28_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>ab-20</station_id>
+		<region_id>AB</region_id>
+		<province>Alberta</province>
+		<city>Fort McMurray</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/ab-20_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>ab-65</station_id>
+		<region_id>AB</region_id>
+		<province>Alberta</province>
+		<city>Garden Creek</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/ab-65_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>ab-45</station_id>
+		<region_id>AB</region_id>
+		<province>Alberta</province>
+		<city>Grande Cache</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/ab-45_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>ab-31</station_id>
+		<region_id>AB</region_id>
+		<province>Alberta</province>
+		<city>Grande Prairie</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/ab-31_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>ab-37</station_id>
+		<region_id>AB</region_id>
+		<province>Alberta</province>
+		<city>Hendrickson Creek</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/ab-37_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>ab-24</station_id>
+		<region_id>AB</region_id>
+		<province>Alberta</province>
+		<city>High Level</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/ab-24_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>ab-4</station_id>
+		<region_id>AB</region_id>
+		<province>Alberta</province>
+		<city>High River</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/ab-4_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>ab-68</station_id>
+		<region_id>AB</region_id>
+		<province>Alberta</province>
+		<city>Highvale</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/ab-68_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>ab-14</station_id>
+		<region_id>AB</region_id>
+		<province>Alberta</province>
+		<city>Hinton</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/ab-14_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>ab-70</station_id>
+		<region_id>AB</region_id>
+		<province>Alberta</province>
+		<city>Jasper</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/ab-70_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>ab-34</station_id>
+		<region_id>AB</region_id>
+		<province>Alberta</province>
+		<city>Kananaskis (Nakiska Ridgetop)</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/ab-34_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>ab-32</station_id>
+		<region_id>AB</region_id>
+		<province>Alberta</province>
+		<city>Lac La Biche</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/ab-32_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>ab-39</station_id>
+		<region_id>AB</region_id>
+		<province>Alberta</province>
+		<city>Lacombe</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/ab-39_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>ab-30</station_id>
+		<region_id>AB</region_id>
+		<province>Alberta</province>
+		<city>Lethbridge</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/ab-30_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>ab-15</station_id>
+		<region_id>AB</region_id>
+		<province>Alberta</province>
+		<city>Lloydminster</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/ab-15_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>ab-51</station_id>
+		<region_id>AB</region_id>
+		<province>Alberta</province>
+		<city>Medicine Hat</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/ab-51_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>ab-33</station_id>
+		<region_id>AB</region_id>
+		<province>Alberta</province>
+		<city>Mildred Lake</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/ab-33_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>ab-19</station_id>
+		<region_id>AB</region_id>
+		<province>Alberta</province>
+		<city>Milk River</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/ab-19_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>ab-38</station_id>
+		<region_id>AB</region_id>
+		<province>Alberta</province>
+		<city>Nordegg</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/ab-38_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>ab-11</station_id>
+		<region_id>AB</region_id>
+		<province>Alberta</province>
+		<city>Okotoks</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/ab-11_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>ab-35</station_id>
+		<region_id>AB</region_id>
+		<province>Alberta</province>
+		<city>Onefour</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/ab-35_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>ab-25</station_id>
+		<region_id>AB</region_id>
+		<province>Alberta</province>
+		<city>Peace River</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/ab-25_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>ab-46</station_id>
+		<region_id>AB</region_id>
+		<province>Alberta</province>
+		<city>Pincher Creek</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/ab-46_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>ab-21</station_id>
+		<region_id>AB</region_id>
+		<province>Alberta</province>
+		<city>Rainbow Lake</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/ab-21_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>ab-29</station_id>
+		<region_id>AB</region_id>
+		<province>Alberta</province>
+		<city>Red Deer</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/ab-29_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>ab-40</station_id>
+		<region_id>AB</region_id>
+		<province>Alberta</province>
+		<city>Red Earth Creek</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/ab-40_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>ab-16</station_id>
+		<region_id>AB</region_id>
+		<province>Alberta</province>
+		<city>Rocky Mountain House</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/ab-16_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>ab-54</station_id>
+		<region_id>AB</region_id>
+		<province>Alberta</province>
+		<city>Slave Lake</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/ab-54_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>ab-44</station_id>
+		<region_id>AB</region_id>
+		<province>Alberta</province>
+		<city>Stavely</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/ab-44_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>ab-5</station_id>
+		<region_id>AB</region_id>
+		<province>Alberta</province>
+		<city>Stettler</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/ab-5_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>ab-22</station_id>
+		<region_id>AB</region_id>
+		<province>Alberta</province>
+		<city>Stony Plain</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/ab-22_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>ab-6</station_id>
+		<region_id>AB</region_id>
+		<province>Alberta</province>
+		<city>Strathmore</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/ab-6_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>ab-47</station_id>
+		<region_id>AB</region_id>
+		<province>Alberta</province>
+		<city>Suffield</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/ab-47_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>ab-53</station_id>
+		<region_id>AB</region_id>
+		<province>Alberta</province>
+		<city>Sundre</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/ab-53_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>ab-7</station_id>
+		<region_id>AB</region_id>
+		<province>Alberta</province>
+		<city>Taber</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/ab-7_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>ab-69</station_id>
+		<region_id>AB</region_id>
+		<province>Alberta</province>
+		<city>Three Hills</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/ab-69_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>ab-27</station_id>
+		<region_id>AB</region_id>
+		<province>Alberta</province>
+		<city>Vauxhall</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/ab-27_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>ab-26</station_id>
+		<region_id>AB</region_id>
+		<province>Alberta</province>
+		<city>Vegreville</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/ab-26_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>ab-55</station_id>
+		<region_id>AB</region_id>
+		<province>Alberta</province>
+		<city>Wainwright</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/ab-55_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>ab-66</station_id>
+		<region_id>AB</region_id>
+		<province>Alberta</province>
+		<city>Waterton Park</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/ab-66_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>ab-8</station_id>
+		<region_id>AB</region_id>
+		<province>Alberta</province>
+		<city>Westlock</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/ab-8_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>ab-9</station_id>
+		<region_id>AB</region_id>
+		<province>Alberta</province>
+		<city>Wetaskiwin</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/ab-9_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>ab-56</station_id>
+		<region_id>AB</region_id>
+		<province>Alberta</province>
+		<city>Whitecourt</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/ab-56_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>ab-41</station_id>
+		<region_id>AB</region_id>
+		<province>Alberta</province>
+		<city>Willow Creek (Provincial Park)</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/ab-41_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>bc-7</station_id>
+		<region_id>BC</region_id>
+		<province>British Columbia</province>
+		<city>100 Mile House</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/bc-7_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>bc-81</station_id>
+		<region_id>BC</region_id>
+		<province>British Columbia</province>
+		<city>Abbotsford</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/bc-81_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>bc-70</station_id>
+		<region_id>BC</region_id>
+		<province>British Columbia</province>
+		<city>Agassiz</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/bc-70_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>bc-67</station_id>
+		<region_id>BC</region_id>
+		<province>British Columbia</province>
+		<city>Atlin</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/bc-67_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>bc-18</station_id>
+		<region_id>BC</region_id>
+		<province>British Columbia</province>
+		<city>Bella Coola</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/bc-18_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>bc-22</station_id>
+		<region_id>BC</region_id>
+		<province>British Columbia</province>
+		<city>Blue River</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/bc-22_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>bc-43</station_id>
+		<region_id>BC</region_id>
+		<province>British Columbia</province>
+		<city>Burns Lake</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/bc-43_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>bc-55</station_id>
+		<region_id>BC</region_id>
+		<province>British Columbia</province>
+		<city>Cache Creek</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/bc-55_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>bc-19</station_id>
+		<region_id>BC</region_id>
+		<province>British Columbia</province>
+		<city>Campbell River</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/bc-19_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>bc-6</station_id>
+		<region_id>BC</region_id>
+		<province>British Columbia</province>
+		<city>Cassiar</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/bc-6_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>bc-21</station_id>
+		<region_id>BC</region_id>
+		<province>British Columbia</province>
+		<city>Castlegar</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/bc-21_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>bc-23</station_id>
+		<region_id>BC</region_id>
+		<province>British Columbia</province>
+		<city>Chetwynd</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/bc-23_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>bc-24</station_id>
+		<region_id>BC</region_id>
+		<province>British Columbia</province>
+		<city>Chilliwack</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/bc-24_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>bc-12</station_id>
+		<region_id>BC</region_id>
+		<province>British Columbia</province>
+		<city>Clearwater</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/bc-12_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>bc-91</station_id>
+		<region_id>BC</region_id>
+		<province>British Columbia</province>
+		<city>Clinton</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/bc-91_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>bc-61</station_id>
+		<region_id>BC</region_id>
+		<province>British Columbia</province>
+		<city>Comox</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/bc-61_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>bc-92</station_id>
+		<region_id>BC</region_id>
+		<province>British Columbia</province>
+		<city>Courtenay</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/bc-92_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>bc-77</station_id>
+		<region_id>BC</region_id>
+		<province>British Columbia</province>
+		<city>Cranbrook</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/bc-77_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>bc-26</station_id>
+		<region_id>BC</region_id>
+		<province>British Columbia</province>
+		<city>Creston</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/bc-26_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>bc-25</station_id>
+		<region_id>BC</region_id>
+		<province>British Columbia</province>
+		<city>Dawson Creek</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/bc-25_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>bc-14</station_id>
+		<region_id>BC</region_id>
+		<province>British Columbia</province>
+		<city>Dease Lake</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/bc-14_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>bc-8</station_id>
+		<region_id>BC</region_id>
+		<province>British Columbia</province>
+		<city>Dome Creek</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/bc-8_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>bc-40</station_id>
+		<region_id>BC</region_id>
+		<province>British Columbia</province>
+		<city>Esquimalt</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/bc-40_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>bc-15</station_id>
+		<region_id>BC</region_id>
+		<province>British Columbia</province>
+		<city>Estevan Point</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/bc-15_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>bc-83</station_id>
+		<region_id>BC</region_id>
+		<province>British Columbia</province>
+		<city>Fort Nelson</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/bc-83_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>bc-78</station_id>
+		<region_id>BC</region_id>
+		<province>British Columbia</province>
+		<city>Fort St John</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/bc-78_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>bc-1</station_id>
+		<region_id>BC</region_id>
+		<province>British Columbia</province>
+		<city>Gibsons</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/bc-1_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>bc-34</station_id>
+		<region_id>BC</region_id>
+		<province>British Columbia</province>
+		<city>Golden</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/bc-34_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>bc-32</station_id>
+		<region_id>BC</region_id>
+		<province>British Columbia</province>
+		<city>Gonzales Point</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/bc-32_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>bc-9</station_id>
+		<region_id>BC</region_id>
+		<province>British Columbia</province>
+		<city>Good Hope Lake</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/bc-9_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>bc-39</station_id>
+		<region_id>BC</region_id>
+		<province>British Columbia</province>
+		<city>Grand Forks</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/bc-39_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>bc-93</station_id>
+		<region_id>BC</region_id>
+		<province>British Columbia</province>
+		<city>Gulf Islands (Southern)</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/bc-93_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>bc-36</station_id>
+		<region_id>BC</region_id>
+		<province>British Columbia</province>
+		<city>Hope</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/bc-36_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>bc-31</station_id>
+		<region_id>BC</region_id>
+		<province>British Columbia</province>
+		<city>Hope Slide</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/bc-31_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>bc-72</station_id>
+		<region_id>BC</region_id>
+		<province>British Columbia</province>
+		<city>Invermere</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/bc-72_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>bc-45</station_id>
+		<region_id>BC</region_id>
+		<province>British Columbia</province>
+		<city>Kamloops</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/bc-45_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>bc-48</station_id>
+		<region_id>BC</region_id>
+		<province>British Columbia</province>
+		<city>Kelowna</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/bc-48_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>bc-30</station_id>
+		<region_id>BC</region_id>
+		<province>British Columbia</province>
+		<city>Kitimat</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/bc-30_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>bc-11</station_id>
+		<region_id>BC</region_id>
+		<province>British Columbia</province>
+		<city>Kootenay (National Park)</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/bc-11_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>bc-87</station_id>
+		<region_id>BC</region_id>
+		<province>British Columbia</province>
+		<city>Liard River</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/bc-87_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>bc-28</station_id>
+		<region_id>BC</region_id>
+		<province>British Columbia</province>
+		<city>Lillooet</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/bc-28_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>bc-33</station_id>
+		<region_id>BC</region_id>
+		<province>British Columbia</province>
+		<city>Lytton</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/bc-33_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>bc-90</station_id>
+		<region_id>BC</region_id>
+		<province>British Columbia</province>
+		<city>Mackenzie</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/bc-90_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>bc-29</station_id>
+		<region_id>BC</region_id>
+		<province>British Columbia</province>
+		<city>Malahat</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/bc-29_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>bc-56</station_id>
+		<region_id>BC</region_id>
+		<province>British Columbia</province>
+		<city>Masset</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/bc-56_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>bc-47</station_id>
+		<region_id>BC</region_id>
+		<province>British Columbia</province>
+		<city>McBride</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/bc-47_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>bc-49</station_id>
+		<region_id>BC</region_id>
+		<province>British Columbia</province>
+		<city>Merritt</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/bc-49_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>bc-63</station_id>
+		<region_id>BC</region_id>
+		<province>British Columbia</province>
+		<city>Muncho Lake</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/bc-63_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>bc-38</station_id>
+		<region_id>BC</region_id>
+		<province>British Columbia</province>
+		<city>Nakusp</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/bc-38_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>bc-20</station_id>
+		<region_id>BC</region_id>
+		<province>British Columbia</province>
+		<city>Nanaimo</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/bc-20_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>bc-37</station_id>
+		<region_id>BC</region_id>
+		<province>British Columbia</province>
+		<city>Nelson</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/bc-37_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>bc-69</station_id>
+		<region_id>BC</region_id>
+		<province>British Columbia</province>
+		<city>Osoyoos</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/bc-69_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>bc-16</station_id>
+		<region_id>BC</region_id>
+		<province>British Columbia</province>
+		<city>Pemberton</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/bc-16_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>bc-84</station_id>
+		<region_id>BC</region_id>
+		<province>British Columbia</province>
+		<city>Penticton</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/bc-84_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>bc-35</station_id>
+		<region_id>BC</region_id>
+		<province>British Columbia</province>
+		<city>Pitt Meadows</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/bc-35_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>bc-46</station_id>
+		<region_id>BC</region_id>
+		<province>British Columbia</province>
+		<city>Port Alberni</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/bc-46_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>bc-89</station_id>
+		<region_id>BC</region_id>
+		<province>British Columbia</province>
+		<city>Port Hardy</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/bc-89_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>bc-58</station_id>
+		<region_id>BC</region_id>
+		<province>British Columbia</province>
+		<city>Powell River</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/bc-58_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>bc-79</station_id>
+		<region_id>BC</region_id>
+		<province>British Columbia</province>
+		<city>Prince George</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/bc-79_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>bc-57</station_id>
+		<region_id>BC</region_id>
+		<province>British Columbia</province>
+		<city>Prince Rupert</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/bc-57_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>bc-41</station_id>
+		<region_id>BC</region_id>
+		<province>British Columbia</province>
+		<city>Princeton</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/bc-41_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>bc-42</station_id>
+		<region_id>BC</region_id>
+		<province>British Columbia</province>
+		<city>Puntzi Mountain</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/bc-42_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>bc-64</station_id>
+		<region_id>BC</region_id>
+		<province>British Columbia</province>
+		<city>Quesnel</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/bc-64_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>bc-65</station_id>
+		<region_id>BC</region_id>
+		<province>British Columbia</province>
+		<city>Revelstoke</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/bc-65_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>bc-10</station_id>
+		<region_id>BC</region_id>
+		<province>British Columbia</province>
+		<city>Rock Creek</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/bc-10_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>bc-51</station_id>
+		<region_id>BC</region_id>
+		<province>British Columbia</province>
+		<city>Salmon Arm</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/bc-51_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>bc-88</station_id>
+		<region_id>BC</region_id>
+		<province>British Columbia</province>
+		<city>Sandspit</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/bc-88_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>bc-3</station_id>
+		<region_id>BC</region_id>
+		<province>British Columbia</province>
+		<city>Sechelt</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/bc-3_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>bc-82</station_id>
+		<region_id>BC</region_id>
+		<province>British Columbia</province>
+		<city>Smithers</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/bc-82_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>bc-52</station_id>
+		<region_id>BC</region_id>
+		<province>British Columbia</province>
+		<city>Sparwood</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/bc-52_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>bc-50</station_id>
+		<region_id>BC</region_id>
+		<province>British Columbia</province>
+		<city>Squamish</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/bc-50_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>bc-73</station_id>
+		<region_id>BC</region_id>
+		<province>British Columbia</province>
+		<city>Stewart</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/bc-73_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>bc-54</station_id>
+		<region_id>BC</region_id>
+		<province>British Columbia</province>
+		<city>Summerland</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/bc-54_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>bc-60</station_id>
+		<region_id>BC</region_id>
+		<province>British Columbia</province>
+		<city>Tatlayoko Lake</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/bc-60_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>bc-80</station_id>
+		<region_id>BC</region_id>
+		<province>British Columbia</province>
+		<city>Terrace</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/bc-80_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>bc-53</station_id>
+		<region_id>BC</region_id>
+		<province>British Columbia</province>
+		<city>Tetsa River (Provincial Park)</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/bc-53_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>bc-17</station_id>
+		<region_id>BC</region_id>
+		<province>British Columbia</province>
+		<city>Tofino</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/bc-17_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>bc-71</station_id>
+		<region_id>BC</region_id>
+		<province>British Columbia</province>
+		<city>Trail</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/bc-71_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>bc-5</station_id>
+		<region_id>BC</region_id>
+		<province>British Columbia</province>
+		<city>Ucluelet</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/bc-5_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>bc-13</station_id>
+		<region_id>BC</region_id>
+		<province>British Columbia</province>
+		<city>Valemount</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/bc-13_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>bc-74</station_id>
+		<region_id>BC</region_id>
+		<province>British Columbia</province>
+		<city>Vancouver</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/bc-74_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>bc-44</station_id>
+		<region_id>BC</region_id>
+		<province>British Columbia</province>
+		<city>Vanderhoof</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/bc-44_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>bc-27</station_id>
+		<region_id>BC</region_id>
+		<province>British Columbia</province>
+		<city>Vernon</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/bc-27_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>bc-85</station_id>
+		<region_id>BC</region_id>
+		<province>British Columbia</province>
+		<city>Victoria</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/bc-85_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>bc-59</station_id>
+		<region_id>BC</region_id>
+		<province>British Columbia</province>
+		<city>Victoria (Hartland)</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/bc-59_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>bc-66</station_id>
+		<region_id>BC</region_id>
+		<province>British Columbia</province>
+		<city>Victoria (University of)</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/bc-66_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>bc-75</station_id>
+		<region_id>BC</region_id>
+		<province>British Columbia</province>
+		<city>Victoria Harbour</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/bc-75_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>bc-86</station_id>
+		<region_id>BC</region_id>
+		<province>British Columbia</province>
+		<city>Whistler</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/bc-86_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>bc-62</station_id>
+		<region_id>BC</region_id>
+		<province>British Columbia</province>
+		<city>White Rock</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/bc-62_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>bc-76</station_id>
+		<region_id>BC</region_id>
+		<province>British Columbia</province>
+		<city>Williams Lake</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/bc-76_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>bc-68</station_id>
+		<region_id>BC</region_id>
+		<province>British Columbia</province>
+		<city>Yoho (National Park)</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/bc-68_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>mb-3</station_id>
+		<region_id>MB</region_id>
+		<province>Manitoba</province>
+		<city>Altona</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/mb-3_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>mb-21</station_id>
+		<region_id>MB</region_id>
+		<province>Manitoba</province>
+		<city>Arnes</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/mb-21_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>mb-43</station_id>
+		<region_id>MB</region_id>
+		<province>Manitoba</province>
+		<city>Bachelors Island</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/mb-43_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>mb-54</station_id>
+		<region_id>MB</region_id>
+		<province>Manitoba</province>
+		<city>Berens River</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/mb-54_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>mb-33</station_id>
+		<region_id>MB</region_id>
+		<province>Manitoba</province>
+		<city>Bissett</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/mb-33_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>mb-37</station_id>
+		<region_id>MB</region_id>
+		<province>Manitoba</province>
+		<city>Bloodvein</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/mb-37_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>mb-52</station_id>
+		<region_id>MB</region_id>
+		<province>Manitoba</province>
+		<city>Brandon</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/mb-52_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>mb-53</station_id>
+		<region_id>MB</region_id>
+		<province>Manitoba</province>
+		<city>Brochet</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/mb-53_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>mb-35</station_id>
+		<region_id>MB</region_id>
+		<province>Manitoba</province>
+		<city>Carberry</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/mb-35_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>mb-65</station_id>
+		<region_id>MB</region_id>
+		<province>Manitoba</province>
+		<city>Carman</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/mb-65_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>mb-42</station_id>
+		<region_id>MB</region_id>
+		<province>Manitoba</province>
+		<city>Churchill</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/mb-42_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>mb-58</station_id>
+		<region_id>MB</region_id>
+		<province>Manitoba</province>
+		<city>Dauphin</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/mb-58_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>mb-49</station_id>
+		<region_id>MB</region_id>
+		<province>Manitoba</province>
+		<city>Deerwood</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/mb-49_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>mb-40</station_id>
+		<region_id>MB</region_id>
+		<province>Manitoba</province>
+		<city>Delta</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/mb-40_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>mb-2</station_id>
+		<region_id>MB</region_id>
+		<province>Manitoba</province>
+		<city>Dominion City</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/mb-2_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>mb-47</station_id>
+		<region_id>MB</region_id>
+		<province>Manitoba</province>
+		<city>Emerson</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/mb-47_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>mb-24</station_id>
+		<region_id>MB</region_id>
+		<province>Manitoba</province>
+		<city>Fisher Branch</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/mb-24_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>mb-60</station_id>
+		<region_id>MB</region_id>
+		<province>Manitoba</province>
+		<city>Flin Flon</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/mb-60_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>mb-64</station_id>
+		<region_id>MB</region_id>
+		<province>Manitoba</province>
+		<city>Gillam</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/mb-64_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>mb-62</station_id>
+		<region_id>MB</region_id>
+		<province>Manitoba</province>
+		<city>Gimli</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/mb-62_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>mb-63</station_id>
+		<region_id>MB</region_id>
+		<province>Manitoba</province>
+		<city>Gods Lake</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/mb-63_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>mb-9</station_id>
+		<region_id>MB</region_id>
+		<province>Manitoba</province>
+		<city>Grand Beach</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/mb-9_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>mb-57</station_id>
+		<region_id>MB</region_id>
+		<province>Manitoba</province>
+		<city>Grand Rapids</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/mb-57_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>mb-48</station_id>
+		<region_id>MB</region_id>
+		<province>Manitoba</province>
+		<city>Gretna</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/mb-48_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>mb-50</station_id>
+		<region_id>MB</region_id>
+		<province>Manitoba</province>
+		<city>Hunters Point</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/mb-50_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>mb-59</station_id>
+		<region_id>MB</region_id>
+		<province>Manitoba</province>
+		<city>Island Lake</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/mb-59_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>mb-22</station_id>
+		<region_id>MB</region_id>
+		<province>Manitoba</province>
+		<city>Leaf Rapids</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/mb-22_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>mb-18</station_id>
+		<region_id>MB</region_id>
+		<province>Manitoba</province>
+		<city>Little Grand Rapids</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/mb-18_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>mb-41</station_id>
+		<region_id>MB</region_id>
+		<province>Manitoba</province>
+		<city>Lynn Lake</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/mb-41_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>mb-15</station_id>
+		<region_id>MB</region_id>
+		<province>Manitoba</province>
+		<city>McCreary</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/mb-15_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>mb-45</station_id>
+		<region_id>MB</region_id>
+		<province>Manitoba</province>
+		<city>Melita</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/mb-45_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>mb-10</station_id>
+		<region_id>MB</region_id>
+		<province>Manitoba</province>
+		<city>Minnedosa</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/mb-10_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>mb-17</station_id>
+		<region_id>MB</region_id>
+		<province>Manitoba</province>
+		<city>Morden</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/mb-17_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>mb-11</station_id>
+		<region_id>MB</region_id>
+		<province>Manitoba</province>
+		<city>Morris</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/mb-11_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>mb-25</station_id>
+		<region_id>MB</region_id>
+		<province>Manitoba</province>
+		<city>Norway House</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/mb-25_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>mb-14</station_id>
+		<region_id>MB</region_id>
+		<province>Manitoba</province>
+		<city>Oak Point</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/mb-14_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>mb-27</station_id>
+		<region_id>MB</region_id>
+		<province>Manitoba</province>
+		<city>Oxford House</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/mb-27_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>mb-19</station_id>
+		<region_id>MB</region_id>
+		<province>Manitoba</province>
+		<city>Pilot Mound</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/mb-19_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>mb-44</station_id>
+		<region_id>MB</region_id>
+		<province>Manitoba</province>
+		<city>Pinawa</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/mb-44_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>mb-4</station_id>
+		<region_id>MB</region_id>
+		<province>Manitoba</province>
+		<city>Pine Falls</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/mb-4_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>mb-5</station_id>
+		<region_id>MB</region_id>
+		<province>Manitoba</province>
+		<city>Poplar River</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/mb-5_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>mb-29</station_id>
+		<region_id>MB</region_id>
+		<province>Manitoba</province>
+		<city>Portage la Prairie</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/mb-29_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>mb-67</station_id>
+		<region_id>MB</region_id>
+		<province>Manitoba</province>
+		<city>Pukatawagan</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/mb-67_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>mb-6</station_id>
+		<region_id>MB</region_id>
+		<province>Manitoba</province>
+		<city>Richer</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/mb-6_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>mb-32</station_id>
+		<region_id>MB</region_id>
+		<province>Manitoba</province>
+		<city>Roblin</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/mb-32_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>mb-39</station_id>
+		<region_id>MB</region_id>
+		<province>Manitoba</province>
+		<city>Shamattawa</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/mb-39_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>mb-61</station_id>
+		<region_id>MB</region_id>
+		<province>Manitoba</province>
+		<city>Shilo</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/mb-61_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>mb-28</station_id>
+		<region_id>MB</region_id>
+		<province>Manitoba</province>
+		<city>Shoal Lake</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/mb-28_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>mb-12</station_id>
+		<region_id>MB</region_id>
+		<province>Manitoba</province>
+		<city>Snow Lake</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/mb-12_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>mb-16</station_id>
+		<region_id>MB</region_id>
+		<province>Manitoba</province>
+		<city>Souris</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/mb-16_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>mb-23</station_id>
+		<region_id>MB</region_id>
+		<province>Manitoba</province>
+		<city>Sprague</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/mb-23_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>mb-13</station_id>
+		<region_id>MB</region_id>
+		<province>Manitoba</province>
+		<city>Steinbach</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/mb-13_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>mb-46</station_id>
+		<region_id>MB</region_id>
+		<province>Manitoba</province>
+		<city>Swan River</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/mb-46_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>mb-51</station_id>
+		<region_id>MB</region_id>
+		<province>Manitoba</province>
+		<city>Tadoule Lake</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/mb-51_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>mb-30</station_id>
+		<region_id>MB</region_id>
+		<province>Manitoba</province>
+		<city>The Pas</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/mb-30_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>mb-34</station_id>
+		<region_id>MB</region_id>
+		<province>Manitoba</province>
+		<city>Thompson</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/mb-34_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>mb-66</station_id>
+		<region_id>MB</region_id>
+		<province>Manitoba</province>
+		<city>Turtle Mountain (Provincial Park)</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/mb-66_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>mb-55</station_id>
+		<region_id>MB</region_id>
+		<province>Manitoba</province>
+		<city>Victoria Beach</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/mb-55_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>mb-20</station_id>
+		<region_id>MB</region_id>
+		<province>Manitoba</province>
+		<city>Virden</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/mb-20_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>mb-7</station_id>
+		<region_id>MB</region_id>
+		<province>Manitoba</province>
+		<city>Vita</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/mb-7_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>mb-31</station_id>
+		<region_id>MB</region_id>
+		<province>Manitoba</province>
+		<city>Wasagaming</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/mb-31_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>mb-8</station_id>
+		<region_id>MB</region_id>
+		<province>Manitoba</province>
+		<city>Whiteshell</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/mb-8_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>mb-26</station_id>
+		<region_id>MB</region_id>
+		<province>Manitoba</province>
+		<city>Winkler</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/mb-26_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>mb-38</station_id>
+		<region_id>MB</region_id>
+		<province>Manitoba</province>
+		<city>Winnipeg</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/mb-38_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>mb-36</station_id>
+		<region_id>MB</region_id>
+		<province>Manitoba</province>
+		<city>Winnipeg (The Forks)</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/mb-36_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>mb-56</station_id>
+		<region_id>MB</region_id>
+		<province>Manitoba</province>
+		<city>York Factory</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/mb-56_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>nb-22</station_id>
+		<region_id>NB</region_id>
+		<province>New Brunswick</province>
+		<city>Bas-Caraquet</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/nb-22_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>nb-28</station_id>
+		<region_id>NB</region_id>
+		<province>New Brunswick</province>
+		<city>Bathurst</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/nb-28_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>nb-1</station_id>
+		<region_id>NB</region_id>
+		<province>New Brunswick</province>
+		<city>Bouctouche</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/nb-1_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>nb-2</station_id>
+		<region_id>NB</region_id>
+		<province>New Brunswick</province>
+		<city>Campbellton</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/nb-2_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>nb-30</station_id>
+		<region_id>NB</region_id>
+		<province>New Brunswick</province>
+		<city>Charlo</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/nb-30_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>nb-3</station_id>
+		<region_id>NB</region_id>
+		<province>New Brunswick</province>
+		<city>Chipman</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/nb-3_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>nb-26</station_id>
+		<region_id>NB</region_id>
+		<province>New Brunswick</province>
+		<city>Dalhousie</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/nb-26_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>nb-4</station_id>
+		<region_id>NB</region_id>
+		<province>New Brunswick</province>
+		<city>Doaktown</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/nb-4_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>nb-32</station_id>
+		<region_id>NB</region_id>
+		<province>New Brunswick</province>
+		<city>Edmundston</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/nb-32_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>nb-29</station_id>
+		<region_id>NB</region_id>
+		<province>New Brunswick</province>
+		<city>Fredericton</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/nb-29_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>nb-5</station_id>
+		<region_id>NB</region_id>
+		<province>New Brunswick</province>
+		<city>Fundy (National Park)</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/nb-5_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>nb-6</station_id>
+		<region_id>NB</region_id>
+		<province>New Brunswick</province>
+		<city>Grand Falls</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/nb-6_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>nb-27</station_id>
+		<region_id>NB</region_id>
+		<province>New Brunswick</province>
+		<city>Grand Manan</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/nb-27_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>nb-8</station_id>
+		<region_id>NB</region_id>
+		<province>New Brunswick</province>
+		<city>Hopewell</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/nb-8_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>nb-9</station_id>
+		<region_id>NB</region_id>
+		<province>New Brunswick</province>
+		<city>Kouchibouguac</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/nb-9_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>nb-25</station_id>
+		<region_id>NB</region_id>
+		<province>New Brunswick</province>
+		<city>Miramichi</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/nb-25_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>nb-31</station_id>
+		<region_id>NB</region_id>
+		<province>New Brunswick</province>
+		<city>Miscou Island</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/nb-31_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>nb-36</station_id>
+		<region_id>NB</region_id>
+		<province>New Brunswick</province>
+		<city>Moncton</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/nb-36_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>nb-10</station_id>
+		<region_id>NB</region_id>
+		<province>New Brunswick</province>
+		<city>Mount Carleton (Provincial Park)</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/nb-10_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>nb-11</station_id>
+		<region_id>NB</region_id>
+		<province>New Brunswick</province>
+		<city>Oromocto</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/nb-11_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>nb-34</station_id>
+		<region_id>NB</region_id>
+		<province>New Brunswick</province>
+		<city>Point Escuminac</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/nb-34_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>nb-33</station_id>
+		<region_id>NB</region_id>
+		<province>New Brunswick</province>
+		<city>Point Lepreau</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/nb-33_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>nb-12</station_id>
+		<region_id>NB</region_id>
+		<province>New Brunswick</province>
+		<city>Quispamsis</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/nb-12_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>nb-13</station_id>
+		<region_id>NB</region_id>
+		<province>New Brunswick</province>
+		<city>Richibucto</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/nb-13_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>nb-14</station_id>
+		<region_id>NB</region_id>
+		<province>New Brunswick</province>
+		<city>Rogersville</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/nb-14_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>nb-15</station_id>
+		<region_id>NB</region_id>
+		<province>New Brunswick</province>
+		<city>Sackville</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/nb-15_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>nb-18</station_id>
+		<region_id>NB</region_id>
+		<province>New Brunswick</province>
+		<city>Saint Andrews</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/nb-18_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>nb-23</station_id>
+		<region_id>NB</region_id>
+		<province>New Brunswick</province>
+		<city>Saint John</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/nb-23_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>nb-16</station_id>
+		<region_id>NB</region_id>
+		<province>New Brunswick</province>
+		<city>Saint-Quentin</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/nb-16_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>nb-17</station_id>
+		<region_id>NB</region_id>
+		<province>New Brunswick</province>
+		<city>Shediac</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/nb-17_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>nb-24</station_id>
+		<region_id>NB</region_id>
+		<province>New Brunswick</province>
+		<city>St. Leonard</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/nb-24_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>nb-35</station_id>
+		<region_id>NB</region_id>
+		<province>New Brunswick</province>
+		<city>St. Stephen</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/nb-35_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>nb-19</station_id>
+		<region_id>NB</region_id>
+		<province>New Brunswick</province>
+		<city>Sussex</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/nb-19_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>nb-20</station_id>
+		<region_id>NB</region_id>
+		<province>New Brunswick</province>
+		<city>Tracadie-Sheila</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/nb-20_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>nb-21</station_id>
+		<region_id>NB</region_id>
+		<province>New Brunswick</province>
+		<city>Woodstock</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/nb-21_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>nf-30</station_id>
+		<region_id>NF</region_id>
+		<province>Newfoundland and Labrador</province>
+		<city>Argentia</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/nf-30_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>nf-34</station_id>
+		<region_id>NF</region_id>
+		<province>Newfoundland and Labrador</province>
+		<city>Badger</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/nf-34_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>nf-43</station_id>
+		<region_id>NF</region_id>
+		<province>Newfoundland and Labrador</province>
+		<city>Bay Roberts</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/nf-43_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>nf-14</station_id>
+		<region_id>NF</region_id>
+		<province>Newfoundland and Labrador</province>
+		<city>Bonavista</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/nf-14_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>nf-4</station_id>
+		<region_id>NF</region_id>
+		<province>Newfoundland and Labrador</province>
+		<city>Buchans</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/nf-4_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>nf-31</station_id>
+		<region_id>NF</region_id>
+		<province>Newfoundland and Labrador</province>
+		<city>Burgeo</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/nf-31_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>nf-2</station_id>
+		<region_id>NF</region_id>
+		<province>Newfoundland and Labrador</province>
+		<city>Campbellton</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/nf-2_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>nf-28</station_id>
+		<region_id>NF</region_id>
+		<province>Newfoundland and Labrador</province>
+		<city>Cape Race</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/nf-28_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>nf-32</station_id>
+		<region_id>NF</region_id>
+		<province>Newfoundland and Labrador</province>
+		<city>Cartwright</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/nf-32_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>nf-17</station_id>
+		<region_id>NF</region_id>
+		<province>Newfoundland and Labrador</province>
+		<city>Channel - Port aux Basques</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/nf-17_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>nf-21</station_id>
+		<region_id>NF</region_id>
+		<province>Newfoundland and Labrador</province>
+		<city>Churchill Falls</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/nf-21_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>nf-1</station_id>
+		<region_id>NF</region_id>
+		<province>Newfoundland and Labrador</province>
+		<city>Clarenville</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/nf-1_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>nf-41</station_id>
+		<region_id>NF</region_id>
+		<province>Newfoundland and Labrador</province>
+		<city>Corner Brook</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/nf-41_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>nf-33</station_id>
+		<region_id>NF</region_id>
+		<province>Newfoundland and Labrador</province>
+		<city>Daniel's Harbour</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/nf-33_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>nf-39</station_id>
+		<region_id>NF</region_id>
+		<province>Newfoundland and Labrador</province>
+		<city>Deer Lake</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/nf-39_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>nf-44</station_id>
+		<region_id>NF</region_id>
+		<province>Newfoundland and Labrador</province>
+		<city>Englee</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/nf-44_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>nf-16</station_id>
+		<region_id>NF</region_id>
+		<province>Newfoundland and Labrador</province>
+		<city>Gander</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/nf-16_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>nf-5</station_id>
+		<region_id>NF</region_id>
+		<province>Newfoundland and Labrador</province>
+		<city>Grand Bank</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/nf-5_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>nf-6</station_id>
+		<region_id>NF</region_id>
+		<province>Newfoundland and Labrador</province>
+		<city>Grand Falls/Windsor</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/nf-6_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>nf-7</station_id>
+		<region_id>NF</region_id>
+		<province>Newfoundland and Labrador</province>
+		<city>Gros Morne</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/nf-7_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>nf-23</station_id>
+		<region_id>NF</region_id>
+		<province>Newfoundland and Labrador</province>
+		<city>Happy Valley-Goose Bay</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/nf-23_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>nf-38</station_id>
+		<region_id>NF</region_id>
+		<province>Newfoundland and Labrador</province>
+		<city>Hopedale</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/nf-38_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>nf-22</station_id>
+		<region_id>NF</region_id>
+		<province>Newfoundland and Labrador</province>
+		<city>La Scie</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/nf-22_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>nf-20</station_id>
+		<region_id>NF</region_id>
+		<province>Newfoundland and Labrador</province>
+		<city>Labrador City</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/nf-20_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>nf-9</station_id>
+		<region_id>NF</region_id>
+		<province>Newfoundland and Labrador</province>
+		<city>Lewisporte</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/nf-9_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>nf-25</station_id>
+		<region_id>NF</region_id>
+		<province>Newfoundland and Labrador</province>
+		<city>Makkovik</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/nf-25_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>nf-26</station_id>
+		<region_id>NF</region_id>
+		<province>Newfoundland and Labrador</province>
+		<city>Marble Mountain</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/nf-26_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>nf-29</station_id>
+		<region_id>NF</region_id>
+		<province>Newfoundland and Labrador</province>
+		<city>Mary's Harbour</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/nf-29_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>nf-3</station_id>
+		<region_id>NF</region_id>
+		<province>Newfoundland and Labrador</province>
+		<city>Marystown</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/nf-3_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>nf-10</station_id>
+		<region_id>NF</region_id>
+		<province>Newfoundland and Labrador</province>
+		<city>Musgrave Harbour</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/nf-10_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>nf-40</station_id>
+		<region_id>NF</region_id>
+		<province>Newfoundland and Labrador</province>
+		<city>Nain</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/nf-40_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>nf-42</station_id>
+		<region_id>NF</region_id>
+		<province>Newfoundland and Labrador</province>
+		<city>New-Wes-Valley</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/nf-42_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>nf-11</station_id>
+		<region_id>NF</region_id>
+		<province>Newfoundland and Labrador</province>
+		<city>Port au Choix</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/nf-11_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>nf-13</station_id>
+		<region_id>NF</region_id>
+		<province>Newfoundland and Labrador</province>
+		<city>Rocky Harbour</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/nf-13_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>nf-8</station_id>
+		<region_id>NF</region_id>
+		<province>Newfoundland and Labrador</province>
+		<city>St Alban's</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/nf-8_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>nf-37</station_id>
+		<region_id>NF</region_id>
+		<province>Newfoundland and Labrador</province>
+		<city>St. Anthony</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/nf-37_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>nf-24</station_id>
+		<region_id>NF</region_id>
+		<province>Newfoundland and Labrador</province>
+		<city>St. John's</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/nf-24_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>nf-36</station_id>
+		<region_id>NF</region_id>
+		<province>Newfoundland and Labrador</province>
+		<city>St. Lawrence</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/nf-36_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>nf-27</station_id>
+		<region_id>NF</region_id>
+		<province>Newfoundland and Labrador</province>
+		<city>Stephenville</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/nf-27_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>nf-15</station_id>
+		<region_id>NF</region_id>
+		<province>Newfoundland and Labrador</province>
+		<city>Terra Nova (National Park)</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/nf-15_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>nf-35</station_id>
+		<region_id>NF</region_id>
+		<province>Newfoundland and Labrador</province>
+		<city>Twillingate</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/nf-35_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>nf-12</station_id>
+		<region_id>NF</region_id>
+		<province>Newfoundland and Labrador</province>
+		<city>Wabush Lake</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/nf-12_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>nf-19</station_id>
+		<region_id>NF</region_id>
+		<province>Newfoundland and Labrador</province>
+		<city>Winterland</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/nf-19_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>nf-18</station_id>
+		<region_id>NF</region_id>
+		<province>Newfoundland and Labrador</province>
+		<city>Wreckhouse</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/nf-18_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>nt-13</station_id>
+		<region_id>NT</region_id>
+		<province>Northwest Territories</province>
+		<city>Aklavik</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/nt-13_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>nt-26</station_id>
+		<region_id>NT</region_id>
+		<province>Northwest Territories</province>
+		<city>Colville Lake</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/nt-26_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>nt-22</station_id>
+		<region_id>NT</region_id>
+		<province>Northwest Territories</province>
+		<city>Deline</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/nt-22_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>nt-1</station_id>
+		<region_id>NT</region_id>
+		<province>Northwest Territories</province>
+		<city>Detah</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/nt-1_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>nt-14</station_id>
+		<region_id>NT</region_id>
+		<province>Northwest Territories</province>
+		<city>Ekati (Lac de Gras)</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/nt-14_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>nt-2</station_id>
+		<region_id>NT</region_id>
+		<province>Northwest Territories</province>
+		<city>Enterprise</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/nt-2_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>nt-5</station_id>
+		<region_id>NT</region_id>
+		<province>Northwest Territories</province>
+		<city>Fort Good Hope</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/nt-5_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>nt-29</station_id>
+		<region_id>NT</region_id>
+		<province>Northwest Territories</province>
+		<city>Fort Liard</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/nt-29_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>nt-10</station_id>
+		<region_id>NT</region_id>
+		<province>Northwest Territories</province>
+		<city>Fort McPherson</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/nt-10_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>nt-27</station_id>
+		<region_id>NT</region_id>
+		<province>Northwest Territories</province>
+		<city>Fort Providence</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/nt-27_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>nt-3</station_id>
+		<region_id>NT</region_id>
+		<province>Northwest Territories</province>
+		<city>Fort Resolution</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/nt-3_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>nt-4</station_id>
+		<region_id>NT</region_id>
+		<province>Northwest Territories</province>
+		<city>Fort Simpson</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/nt-4_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>nt-17</station_id>
+		<region_id>NT</region_id>
+		<province>Northwest Territories</province>
+		<city>Fort Smith</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/nt-17_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>nt-18</station_id>
+		<region_id>NT</region_id>
+		<province>Northwest Territories</province>
+		<city>Gameti</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/nt-18_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>nt-8</station_id>
+		<region_id>NT</region_id>
+		<province>Northwest Territories</province>
+		<city>Hay River</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/nt-8_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>nt-28</station_id>
+		<region_id>NT</region_id>
+		<province>Northwest Territories</province>
+		<city>Indin River</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/nt-28_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>nt-30</station_id>
+		<region_id>NT</region_id>
+		<province>Northwest Territories</province>
+		<city>Inuvik</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/nt-30_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>nt-31</station_id>
+		<region_id>NT</region_id>
+		<province>Northwest Territories</province>
+		<city>Lutselke</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/nt-31_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>nt-12</station_id>
+		<region_id>NT</region_id>
+		<province>Northwest Territories</province>
+		<city>Nahanni Butte</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/nt-12_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>nt-21</station_id>
+		<region_id>NT</region_id>
+		<province>Northwest Territories</province>
+		<city>Norman Wells</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/nt-21_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>nt-16</station_id>
+		<region_id>NT</region_id>
+		<province>Northwest Territories</province>
+		<city>Paulatuk</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/nt-16_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>nt-19</station_id>
+		<region_id>NT</region_id>
+		<province>Northwest Territories</province>
+		<city>Sachs Harbour</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/nt-19_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>nt-15</station_id>
+		<region_id>NT</region_id>
+		<province>Northwest Territories</province>
+		<city>Trout Lake</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/nt-15_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>nt-20</station_id>
+		<region_id>NT</region_id>
+		<province>Northwest Territories</province>
+		<city>Tuktoyaktuk</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/nt-20_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>nt-11</station_id>
+		<region_id>NT</region_id>
+		<province>Northwest Territories</province>
+		<city>Tulita</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/nt-11_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>nt-7</station_id>
+		<region_id>NT</region_id>
+		<province>Northwest Territories</province>
+		<city>Ulukhaktok</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/nt-7_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>nt-9</station_id>
+		<region_id>NT</region_id>
+		<province>Northwest Territories</province>
+		<city>Wekweeti</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/nt-9_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>nt-6</station_id>
+		<region_id>NT</region_id>
+		<province>Northwest Territories</province>
+		<city>Whati</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/nt-6_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>nt-23</station_id>
+		<region_id>NT</region_id>
+		<province>Northwest Territories</province>
+		<city>Wrigley</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/nt-23_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>nt-24</station_id>
+		<region_id>NT</region_id>
+		<province>Northwest Territories</province>
+		<city>Yellowknife</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/nt-24_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>ns-33</station_id>
+		<region_id>NS</region_id>
+		<province>Nova Scotia</province>
+		<city>Amherst</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/ns-33_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>ns-2</station_id>
+		<region_id>NS</region_id>
+		<province>Nova Scotia</province>
+		<city>Annapolis Royal</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/ns-2_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>ns-3</station_id>
+		<region_id>NS</region_id>
+		<province>Nova Scotia</province>
+		<city>Antigonish</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/ns-3_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>ns-37</station_id>
+		<region_id>NS</region_id>
+		<province>Nova Scotia</province>
+		<city>Baccaro Point</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/ns-37_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>ns-4</station_id>
+		<region_id>NS</region_id>
+		<province>Nova Scotia</province>
+		<city>Baddeck</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/ns-4_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>ns-36</station_id>
+		<region_id>NS</region_id>
+		<province>Nova Scotia</province>
+		<city>Beaver Island</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/ns-36_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>ns-5</station_id>
+		<region_id>NS</region_id>
+		<province>Nova Scotia</province>
+		<city>Bridgetown</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/ns-5_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>ns-6</station_id>
+		<region_id>NS</region_id>
+		<province>Nova Scotia</province>
+		<city>Bridgewater</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/ns-6_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>ns-27</station_id>
+		<region_id>NS</region_id>
+		<province>Nova Scotia</province>
+		<city>Brier Island</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/ns-27_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>ns-41</station_id>
+		<region_id>NS</region_id>
+		<province>Nova Scotia</province>
+		<city>Cape George</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/ns-41_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>ns-34</station_id>
+		<region_id>NS</region_id>
+		<province>Nova Scotia</province>
+		<city>Caribou</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/ns-34_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>ns-38</station_id>
+		<region_id>NS</region_id>
+		<province>Nova Scotia</province>
+		<city>Cheticamp</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/ns-38_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>ns-20</station_id>
+		<region_id>NS</region_id>
+		<province>Nova Scotia</province>
+		<city>Digby</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/ns-20_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>ns-7</station_id>
+		<region_id>NS</region_id>
+		<province>Nova Scotia</province>
+		<city>Economy</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/ns-7_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>ns-24</station_id>
+		<region_id>NS</region_id>
+		<province>Nova Scotia</province>
+		<city>Fourchu Head</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/ns-24_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>ns-32</station_id>
+		<region_id>NS</region_id>
+		<province>Nova Scotia</province>
+		<city>Grand &#201;tang</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/ns-32_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>ns-35</station_id>
+		<region_id>NS</region_id>
+		<province>Nova Scotia</province>
+		<city>Greenwood</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/ns-35_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>ns-8</station_id>
+		<region_id>NS</region_id>
+		<province>Nova Scotia</province>
+		<city>Guysborough</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/ns-8_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>ns-19</station_id>
+		<region_id>NS</region_id>
+		<province>Nova Scotia</province>
+		<city>Halifax</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/ns-19_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>ns-40</station_id>
+		<region_id>NS</region_id>
+		<province>Nova Scotia</province>
+		<city>Halifax (Shearwater)</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/ns-40_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>ns-23</station_id>
+		<region_id>NS</region_id>
+		<province>Nova Scotia</province>
+		<city>Hart Island</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/ns-23_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>ns-16</station_id>
+		<region_id>NS</region_id>
+		<province>Nova Scotia</province>
+		<city>Ingonish</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/ns-16_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>ns-42</station_id>
+		<region_id>NS</region_id>
+		<province>Nova Scotia</province>
+		<city>Kejimkujik (National Park)</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/ns-42_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>ns-17</station_id>
+		<region_id>NS</region_id>
+		<province>Nova Scotia</province>
+		<city>Kentville</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/ns-17_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>ns-39</station_id>
+		<region_id>NS</region_id>
+		<province>Nova Scotia</province>
+		<city>Liverpool</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/ns-39_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>ns-21</station_id>
+		<region_id>NS</region_id>
+		<province>Nova Scotia</province>
+		<city>Lunenburg</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/ns-21_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>ns-22</station_id>
+		<region_id>NS</region_id>
+		<province>Nova Scotia</province>
+		<city>Malay Falls</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/ns-22_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>ns-1</station_id>
+		<region_id>NS</region_id>
+		<province>Nova Scotia</province>
+		<city>New Glasgow</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/ns-1_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>ns-18</station_id>
+		<region_id>NS</region_id>
+		<province>Nova Scotia</province>
+		<city>North East Margaree</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/ns-18_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>ns-43</station_id>
+		<region_id>NS</region_id>
+		<province>Nova Scotia</province>
+		<city>North Mountain (Cape Breton)</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/ns-43_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>ns-13</station_id>
+		<region_id>NS</region_id>
+		<province>Nova Scotia</province>
+		<city>Parrsboro</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/ns-13_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>ns-26</station_id>
+		<region_id>NS</region_id>
+		<province>Nova Scotia</province>
+		<city>Port Hawkesbury</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/ns-26_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>ns-10</station_id>
+		<region_id>NS</region_id>
+		<province>Nova Scotia</province>
+		<city>Sheet Harbour</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/ns-10_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>ns-11</station_id>
+		<region_id>NS</region_id>
+		<province>Nova Scotia</province>
+		<city>Shelburne</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/ns-11_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>ns-12</station_id>
+		<region_id>NS</region_id>
+		<province>Nova Scotia</province>
+		<city>St. Peter's</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/ns-12_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>ns-31</station_id>
+		<region_id>NS</region_id>
+		<province>Nova Scotia</province>
+		<city>Sydney</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/ns-31_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>ns-14</station_id>
+		<region_id>NS</region_id>
+		<province>Nova Scotia</province>
+		<city>Tatamagouche</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/ns-14_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>ns-28</station_id>
+		<region_id>NS</region_id>
+		<province>Nova Scotia</province>
+		<city>Tracadie</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/ns-28_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>ns-25</station_id>
+		<region_id>NS</region_id>
+		<province>Nova Scotia</province>
+		<city>Truro</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/ns-25_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>ns-30</station_id>
+		<region_id>NS</region_id>
+		<province>Nova Scotia</province>
+		<city>Western Head</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/ns-30_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>ns-15</station_id>
+		<region_id>NS</region_id>
+		<province>Nova Scotia</province>
+		<city>Windsor</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/ns-15_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>ns-29</station_id>
+		<region_id>NS</region_id>
+		<province>Nova Scotia</province>
+		<city>Yarmouth</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/ns-29_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>nu-22</station_id>
+		<region_id>NU</region_id>
+		<province>Nunavut</province>
+		<city>Alert</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/nu-22_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>nu-10</station_id>
+		<region_id>NU</region_id>
+		<province>Nunavut</province>
+		<city>Arctic Bay</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/nu-10_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>nu-20</station_id>
+		<region_id>NU</region_id>
+		<province>Nunavut</province>
+		<city>Arviat</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/nu-20_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>nu-14</station_id>
+		<region_id>NU</region_id>
+		<province>Nunavut</province>
+		<city>Baker Lake</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/nu-14_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>nu-15</station_id>
+		<region_id>NU</region_id>
+		<province>Nunavut</province>
+		<city>Cambridge Bay</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/nu-15_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>nu-2</station_id>
+		<region_id>NU</region_id>
+		<province>Nunavut</province>
+		<city>Cape Dorset</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/nu-2_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>nu-17</station_id>
+		<region_id>NU</region_id>
+		<province>Nunavut</province>
+		<city>Chesterfield</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/nu-17_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>nu-18</station_id>
+		<region_id>NU</region_id>
+		<province>Nunavut</province>
+		<city>Clyde River</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/nu-18_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>nu-9</station_id>
+		<region_id>NU</region_id>
+		<province>Nunavut</province>
+		<city>Coral Harbour</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/nu-9_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>nu-19</station_id>
+		<region_id>NU</region_id>
+		<province>Nunavut</province>
+		<city>Ennadai</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/nu-19_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>nu-11</station_id>
+		<region_id>NU</region_id>
+		<province>Nunavut</province>
+		<city>Eureka</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/nu-11_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>nu-24</station_id>
+		<region_id>NU</region_id>
+		<province>Nunavut</province>
+		<city>Gjoa Haven</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/nu-24_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>nu-12</station_id>
+		<region_id>NU</region_id>
+		<province>Nunavut</province>
+		<city>Grise Fiord</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/nu-12_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>nu-4</station_id>
+		<region_id>NU</region_id>
+		<province>Nunavut</province>
+		<city>Hall Beach</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/nu-4_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>nu-23</station_id>
+		<region_id>NU</region_id>
+		<province>Nunavut</province>
+		<city>Igloolik</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/nu-23_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>nu-21</station_id>
+		<region_id>NU</region_id>
+		<province>Nunavut</province>
+		<city>Iqaluit</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/nu-21_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>nu-26</station_id>
+		<region_id>NU</region_id>
+		<province>Nunavut</province>
+		<city>Kimmirut</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/nu-26_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>nu-13</station_id>
+		<region_id>NU</region_id>
+		<province>Nunavut</province>
+		<city>Kugaaruk</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/nu-13_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>nu-16</station_id>
+		<region_id>NU</region_id>
+		<province>Nunavut</province>
+		<city>Kugluktuk</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/nu-16_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>nu-1</station_id>
+		<region_id>NU</region_id>
+		<province>Nunavut</province>
+		<city>Nanisivik</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/nu-1_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>nu-7</station_id>
+		<region_id>NU</region_id>
+		<province>Nunavut</province>
+		<city>Pangnirtung</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/nu-7_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>nu-25</station_id>
+		<region_id>NU</region_id>
+		<province>Nunavut</province>
+		<city>Pond Inlet</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/nu-25_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>nu-5</station_id>
+		<region_id>NU</region_id>
+		<province>Nunavut</province>
+		<city>Qikiqtarjuaq</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/nu-5_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>nu-28</station_id>
+		<region_id>NU</region_id>
+		<province>Nunavut</province>
+		<city>Rankin Inlet</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/nu-28_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>nu-3</station_id>
+		<region_id>NU</region_id>
+		<province>Nunavut</province>
+		<city>Repulse Bay</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/nu-3_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>nu-27</station_id>
+		<region_id>NU</region_id>
+		<province>Nunavut</province>
+		<city>Resolute</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/nu-27_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>nu-29</station_id>
+		<region_id>NU</region_id>
+		<province>Nunavut</province>
+		<city>Sanikiluaq</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/nu-29_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>nu-8</station_id>
+		<region_id>NU</region_id>
+		<province>Nunavut</province>
+		<city>Taloyoak</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/nu-8_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>nu-6</station_id>
+		<region_id>NU</region_id>
+		<province>Nunavut</province>
+		<city>Whale Cove</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/nu-6_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>on-122</station_id>
+		<region_id>ON</region_id>
+		<province>Ontario</province>
+		<city>Alexandria</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/on-122_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>on-1</station_id>
+		<region_id>ON</region_id>
+		<province>Ontario</province>
+		<city>Algonquin Park (Brent)</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/on-1_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>on-29</station_id>
+		<region_id>ON</region_id>
+		<province>Ontario</province>
+		<city>Algonquin Park (Lake of Two Rivers)</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/on-29_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>on-114</station_id>
+		<region_id>ON</region_id>
+		<province>Ontario</province>
+		<city>Alliston</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/on-114_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>on-30</station_id>
+		<region_id>ON</region_id>
+		<province>Ontario</province>
+		<city>Apsley</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/on-30_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>on-111</station_id>
+		<region_id>ON</region_id>
+		<province>Ontario</province>
+		<city>Armstrong</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/on-111_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>on-148</station_id>
+		<region_id>ON</region_id>
+		<province>Ontario</province>
+		<city>Atikokan</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/on-148_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>on-164</station_id>
+		<region_id>ON</region_id>
+		<province>Ontario</province>
+		<city>Attawapiskat</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/on-164_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>on-102</station_id>
+		<region_id>ON</region_id>
+		<province>Ontario</province>
+		<city>Bancroft</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/on-102_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>on-151</station_id>
+		<region_id>ON</region_id>
+		<province>Ontario</province>
+		<city>Barrie</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/on-151_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>on-133</station_id>
+		<region_id>ON</region_id>
+		<province>Ontario</province>
+		<city>Barry's Bay</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/on-133_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>on-3</station_id>
+		<region_id>ON</region_id>
+		<province>Ontario</province>
+		<city>Belleville</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/on-3_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>on-124</station_id>
+		<region_id>ON</region_id>
+		<province>Ontario</province>
+		<city>Big Trout Lake</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/on-124_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>on-21</station_id>
+		<region_id>ON</region_id>
+		<province>Ontario</province>
+		<city>Blind River</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/on-21_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>on-9</station_id>
+		<region_id>ON</region_id>
+		<province>Ontario</province>
+		<city>Bracebridge</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/on-9_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>on-4</station_id>
+		<region_id>ON</region_id>
+		<province>Ontario</province>
+		<city>Brampton</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/on-4_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>on-86</station_id>
+		<region_id>ON</region_id>
+		<province>Ontario</province>
+		<city>Brantford</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/on-86_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>on-8</station_id>
+		<region_id>ON</region_id>
+		<province>Ontario</province>
+		<city>Brockville</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/on-8_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>on-31</station_id>
+		<region_id>ON</region_id>
+		<province>Ontario</province>
+		<city>Burk's Falls</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/on-31_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>on-95</station_id>
+		<region_id>ON</region_id>
+		<province>Ontario</province>
+		<city>Burlington</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/on-95_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>on-32</station_id>
+		<region_id>ON</region_id>
+		<province>Ontario</province>
+		<city>Caledon</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/on-32_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>on-81</station_id>
+		<region_id>ON</region_id>
+		<province>Ontario</province>
+		<city>Cambridge</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/on-81_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>on-91</station_id>
+		<region_id>ON</region_id>
+		<province>Ontario</province>
+		<city>Chapleau</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/on-91_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>on-11</station_id>
+		<region_id>ON</region_id>
+		<province>Ontario</province>
+		<city>Chatham-Kent</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/on-11_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>on-75</station_id>
+		<region_id>ON</region_id>
+		<province>Ontario</province>
+		<city>Cobourg</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/on-75_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>on-33</station_id>
+		<region_id>ON</region_id>
+		<province>Ontario</province>
+		<city>Cochrane</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/on-33_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>on-150</station_id>
+		<region_id>ON</region_id>
+		<province>Ontario</province>
+		<city>Collingwood</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/on-150_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>on-152</station_id>
+		<region_id>ON</region_id>
+		<province>Ontario</province>
+		<city>Cornwall</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/on-152_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>on-83</station_id>
+		<region_id>ON</region_id>
+		<province>Ontario</province>
+		<city>Deep River</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/on-83_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>on-34</station_id>
+		<region_id>ON</region_id>
+		<province>Ontario</province>
+		<city>Dorion</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/on-34_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>on-72</station_id>
+		<region_id>ON</region_id>
+		<province>Ontario</province>
+		<city>Dryden</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/on-72_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>on-35</station_id>
+		<region_id>ON</region_id>
+		<province>Ontario</province>
+		<city>Dunchurch</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/on-35_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>on-36</station_id>
+		<region_id>ON</region_id>
+		<province>Ontario</province>
+		<city>Dundalk</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/on-36_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>on-167</station_id>
+		<region_id>ON</region_id>
+		<province>Ontario</province>
+		<city>Ear Falls</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/on-167_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>on-136</station_id>
+		<region_id>ON</region_id>
+		<province>Ontario</province>
+		<city>Earlton</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/on-136_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>on-170</station_id>
+		<region_id>ON</region_id>
+		<province>Ontario</province>
+		<city>Elliot Lake</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/on-170_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>on-173</station_id>
+		<region_id>ON</region_id>
+		<province>Ontario</province>
+		<city>Fort Albany</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/on-173_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>on-12</station_id>
+		<region_id>ON</region_id>
+		<province>Ontario</province>
+		<city>Fort Erie</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/on-12_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>on-159</station_id>
+		<region_id>ON</region_id>
+		<province>Ontario</province>
+		<city>Fort Frances</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/on-159_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>on-171</station_id>
+		<region_id>ON</region_id>
+		<province>Ontario</province>
+		<city>Fort Severn</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/on-171_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>on-90</station_id>
+		<region_id>ON</region_id>
+		<province>Ontario</province>
+		<city>Gananoque</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/on-90_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>on-160</station_id>
+		<region_id>ON</region_id>
+		<province>Ontario</province>
+		<city>Goderich</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/on-160_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>on-37</station_id>
+		<region_id>ON</region_id>
+		<province>Ontario</province>
+		<city>Gogama</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/on-37_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>on-144</station_id>
+		<region_id>ON</region_id>
+		<province>Ontario</province>
+		<city>Gore Bay</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/on-144_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>on-38</station_id>
+		<region_id>ON</region_id>
+		<province>Ontario</province>
+		<city>Gravenhurst</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/on-38_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>on-39</station_id>
+		<region_id>ON</region_id>
+		<province>Ontario</province>
+		<city>Greater Napanee</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/on-39_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>on-40</station_id>
+		<region_id>ON</region_id>
+		<province>Ontario</province>
+		<city>Greater Sudbury</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/on-40_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>on-153</station_id>
+		<region_id>ON</region_id>
+		<province>Ontario</province>
+		<city>Greenstone (Beardmore)</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/on-153_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>on-70</station_id>
+		<region_id>ON</region_id>
+		<province>Ontario</province>
+		<city>Greenstone (Geraldton)</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/on-70_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>on-97</station_id>
+		<region_id>ON</region_id>
+		<province>Ontario</province>
+		<city>Greenstone (Nakina)</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/on-97_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>on-5</station_id>
+		<region_id>ON</region_id>
+		<province>Ontario</province>
+		<city>Guelph</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/on-5_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>on-41</station_id>
+		<region_id>ON</region_id>
+		<province>Ontario</province>
+		<city>Gull Bay</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/on-41_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>on-42</station_id>
+		<region_id>ON</region_id>
+		<province>Ontario</province>
+		<city>Haldimand</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/on-42_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>on-165</station_id>
+		<region_id>ON</region_id>
+		<province>Ontario</province>
+		<city>Haliburton</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/on-165_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>on-68</station_id>
+		<region_id>ON</region_id>
+		<province>Ontario</province>
+		<city>Halton Hills</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/on-68_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>on-77</station_id>
+		<region_id>ON</region_id>
+		<province>Ontario</province>
+		<city>Hamilton</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/on-77_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>on-71</station_id>
+		<region_id>ON</region_id>
+		<province>Ontario</province>
+		<city>Hawkesbury</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/on-71_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>on-73</station_id>
+		<region_id>ON</region_id>
+		<province>Ontario</province>
+		<city>Hearst</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/on-73_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>on-78</station_id>
+		<region_id>ON</region_id>
+		<province>Ontario</province>
+		<city>Hornepayne</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/on-78_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>on-88</station_id>
+		<region_id>ON</region_id>
+		<province>Ontario</province>
+		<city>Huntsville</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/on-88_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>on-156</station_id>
+		<region_id>ON</region_id>
+		<province>Ontario</province>
+		<city>Ignace</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/on-156_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>on-145</station_id>
+		<region_id>ON</region_id>
+		<province>Ontario</province>
+		<city>Kakabeka Falls</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/on-145_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>on-43</station_id>
+		<region_id>ON</region_id>
+		<province>Ontario</province>
+		<city>Kaladar</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/on-43_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>on-142</station_id>
+		<region_id>ON</region_id>
+		<province>Ontario</province>
+		<city>Kapuskasing</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/on-142_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>on-44</station_id>
+		<region_id>ON</region_id>
+		<province>Ontario</province>
+		<city>Kawartha Lakes (Fenelon Falls)</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/on-44_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>on-168</station_id>
+		<region_id>ON</region_id>
+		<province>Ontario</province>
+		<city>Kawartha Lakes (Lindsay)</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/on-168_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>on-74</station_id>
+		<region_id>ON</region_id>
+		<province>Ontario</province>
+		<city>Kemptville</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/on-74_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>on-96</station_id>
+		<region_id>ON</region_id>
+		<province>Ontario</province>
+		<city>Kenora</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/on-96_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>on-146</station_id>
+		<region_id>ON</region_id>
+		<province>Ontario</province>
+		<city>Killarney</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/on-146_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>on-28</station_id>
+		<region_id>ON</region_id>
+		<province>Ontario</province>
+		<city>Kincardine</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/on-28_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>on-69</station_id>
+		<region_id>ON</region_id>
+		<province>Ontario</province>
+		<city>Kingston</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/on-69_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>on-76</station_id>
+		<region_id>ON</region_id>
+		<province>Ontario</province>
+		<city>Kirkland Lake</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/on-76_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>on-82</station_id>
+		<region_id>ON</region_id>
+		<province>Ontario</province>
+		<city>Kitchener-Waterloo</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/on-82_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>on-45</station_id>
+		<region_id>ON</region_id>
+		<province>Ontario</province>
+		<city>Lake Superior (Provincial Park)</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/on-45_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>on-46</station_id>
+		<region_id>ON</region_id>
+		<province>Ontario</province>
+		<city>Lambton Shores</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/on-46_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>on-87</station_id>
+		<region_id>ON</region_id>
+		<province>Ontario</province>
+		<city>Lansdowne House</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/on-87_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>on-23</station_id>
+		<region_id>ON</region_id>
+		<province>Ontario</province>
+		<city>Leamington</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/on-23_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>on-47</station_id>
+		<region_id>ON</region_id>
+		<province>Ontario</province>
+		<city>Lincoln</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/on-47_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>on-137</station_id>
+		<region_id>ON</region_id>
+		<province>Ontario</province>
+		<city>London</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/on-137_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>on-108</station_id>
+		<region_id>ON</region_id>
+		<province>Ontario</province>
+		<city>Marathon</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/on-108_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>on-85</station_id>
+		<region_id>ON</region_id>
+		<province>Ontario</province>
+		<city>Markham</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/on-85_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>on-169</station_id>
+		<region_id>ON</region_id>
+		<province>Ontario</province>
+		<city>Midland</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/on-169_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>on-48</station_id>
+		<region_id>ON</region_id>
+		<province>Ontario</province>
+		<city>Mine Centre</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/on-48_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>on-24</station_id>
+		<region_id>ON</region_id>
+		<province>Ontario</province>
+		<city>Mississauga</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/on-24_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>on-163</station_id>
+		<region_id>ON</region_id>
+		<province>Ontario</province>
+		<city>Montreal River Harbour</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/on-163_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>on-113</station_id>
+		<region_id>ON</region_id>
+		<province>Ontario</province>
+		<city>Moosonee</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/on-113_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>on-92</station_id>
+		<region_id>ON</region_id>
+		<province>Ontario</province>
+		<city>Morrisburg</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/on-92_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>on-89</station_id>
+		<region_id>ON</region_id>
+		<province>Ontario</province>
+		<city>Mount Forest</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/on-89_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>on-93</station_id>
+		<region_id>ON</region_id>
+		<province>Ontario</province>
+		<city>Muskoka</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/on-93_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>on-49</station_id>
+		<region_id>ON</region_id>
+		<province>Ontario</province>
+		<city>New Tecumseth</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/on-49_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>on-25</station_id>
+		<region_id>ON</region_id>
+		<province>Ontario</province>
+		<city>Newmarket</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/on-25_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>on-125</station_id>
+		<region_id>ON</region_id>
+		<province>Ontario</province>
+		<city>Niagara Falls</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/on-125_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>on-26</station_id>
+		<region_id>ON</region_id>
+		<province>Ontario</province>
+		<city>Nipigon</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/on-26_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>on-50</station_id>
+		<region_id>ON</region_id>
+		<province>Ontario</province>
+		<city>Norfolk</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/on-50_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>on-139</station_id>
+		<region_id>ON</region_id>
+		<province>Ontario</province>
+		<city>North Bay</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/on-139_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>on-51</station_id>
+		<region_id>ON</region_id>
+		<province>Ontario</province>
+		<city>North Perth</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/on-51_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>on-79</station_id>
+		<region_id>ON</region_id>
+		<province>Ontario</province>
+		<city>Oakville</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/on-79_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>on-101</station_id>
+		<region_id>ON</region_id>
+		<province>Ontario</province>
+		<city>Ogoki</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/on-101_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>on-140</station_id>
+		<region_id>ON</region_id>
+		<province>Ontario</province>
+		<city>Orangeville</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/on-140_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>on-13</station_id>
+		<region_id>ON</region_id>
+		<province>Ontario</province>
+		<city>Orillia</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/on-13_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>on-117</station_id>
+		<region_id>ON</region_id>
+		<province>Ontario</province>
+		<city>Oshawa</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/on-117_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>on-118</station_id>
+		<region_id>ON</region_id>
+		<province>Ontario</province>
+		<city>Ottawa (Kanata-Orleans)</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/on-118_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>on-52</station_id>
+		<region_id>ON</region_id>
+		<province>Ontario</province>
+		<city>Ottawa (Richmond - Metcalfe)</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/on-52_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>on-7</station_id>
+		<region_id>ON</region_id>
+		<province>Ontario</province>
+		<city>Owen Sound</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/on-7_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>on-53</station_id>
+		<region_id>ON</region_id>
+		<province>Ontario</province>
+		<city>Oxtongue Lake</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/on-53_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>on-103</station_id>
+		<region_id>ON</region_id>
+		<province>Ontario</province>
+		<city>Parry Sound</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/on-103_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>on-99</station_id>
+		<region_id>ON</region_id>
+		<province>Ontario</province>
+		<city>Peawanuck</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/on-99_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>on-131</station_id>
+		<region_id>ON</region_id>
+		<province>Ontario</province>
+		<city>Pembroke</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/on-131_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>on-112</station_id>
+		<region_id>ON</region_id>
+		<province>Ontario</province>
+		<city>Petawawa</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/on-112_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>on-121</station_id>
+		<region_id>ON</region_id>
+		<province>Ontario</province>
+		<city>Peterborough</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/on-121_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>on-54</station_id>
+		<region_id>ON</region_id>
+		<province>Ontario</province>
+		<city>Pickering</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/on-54_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>on-120</station_id>
+		<region_id>ON</region_id>
+		<province>Ontario</province>
+		<city>Pickle Lake</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/on-120_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>on-55</station_id>
+		<region_id>ON</region_id>
+		<province>Ontario</province>
+		<city>Pikangikum</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/on-55_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>on-56</station_id>
+		<region_id>ON</region_id>
+		<province>Ontario</province>
+		<city>Port Carling</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/on-56_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>on-80</station_id>
+		<region_id>ON</region_id>
+		<province>Ontario</province>
+		<city>Port Colborne</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/on-80_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>on-19</station_id>
+		<region_id>ON</region_id>
+		<province>Ontario</province>
+		<city>Port Elgin</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/on-19_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>on-149</station_id>
+		<region_id>ON</region_id>
+		<province>Ontario</province>
+		<city>Port Perry</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/on-149_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>on-27</station_id>
+		<region_id>ON</region_id>
+		<province>Ontario</province>
+		<city>Prince Edward (Picton)</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/on-27_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>on-57</station_id>
+		<region_id>ON</region_id>
+		<province>Ontario</province>
+		<city>Quinte West</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/on-57_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>on-104</station_id>
+		<region_id>ON</region_id>
+		<province>Ontario</province>
+		<city>Red Lake</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/on-104_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>on-58</station_id>
+		<region_id>ON</region_id>
+		<province>Ontario</province>
+		<city>Renfrew</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/on-58_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>on-59</station_id>
+		<region_id>ON</region_id>
+		<province>Ontario</province>
+		<city>Richmond Hill</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/on-59_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>on-172</station_id>
+		<region_id>ON</region_id>
+		<province>Ontario</province>
+		<city>Rodney</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/on-172_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>on-141</station_id>
+		<region_id>ON</region_id>
+		<province>Ontario</province>
+		<city>Rondeau (Provincial Park)</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/on-141_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>on-105</station_id>
+		<region_id>ON</region_id>
+		<province>Ontario</province>
+		<city>Sachigo Lake</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/on-105_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>on-129</station_id>
+		<region_id>ON</region_id>
+		<province>Ontario</province>
+		<city>Sandy Lake</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/on-129_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>on-147</station_id>
+		<region_id>ON</region_id>
+		<province>Ontario</province>
+		<city>Sarnia</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/on-147_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>on-60</station_id>
+		<region_id>ON</region_id>
+		<province>Ontario</province>
+		<city>Saugeen Shores</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/on-60_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>on-162</station_id>
+		<region_id>ON</region_id>
+		<province>Ontario</province>
+		<city>Sault Ste. Marie</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/on-162_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>on-134</station_id>
+		<region_id>ON</region_id>
+		<province>Ontario</province>
+		<city>Savant Lake</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/on-134_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>on-61</station_id>
+		<region_id>ON</region_id>
+		<province>Ontario</province>
+		<city>Sharbot Lake</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/on-61_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>on-84</station_id>
+		<region_id>ON</region_id>
+		<province>Ontario</province>
+		<city>Shelburne</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/on-84_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>on-161</station_id>
+		<region_id>ON</region_id>
+		<province>Ontario</province>
+		<city>Simcoe</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/on-161_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>on-135</station_id>
+		<region_id>ON</region_id>
+		<province>Ontario</province>
+		<city>Sioux Lookout</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/on-135_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>on-166</station_id>
+		<region_id>ON</region_id>
+		<province>Ontario</province>
+		<city>Sioux Narrows</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/on-166_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>on-106</station_id>
+		<region_id>ON</region_id>
+		<province>Ontario</province>
+		<city>Smiths Falls</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/on-106_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>on-62</station_id>
+		<region_id>ON</region_id>
+		<province>Ontario</province>
+		<city>South Bruce Peninsula</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/on-62_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>on-107</station_id>
+		<region_id>ON</region_id>
+		<province>Ontario</province>
+		<city>St. Catharines</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/on-107_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>on-98</station_id>
+		<region_id>ON</region_id>
+		<province>Ontario</province>
+		<city>St. Thomas</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/on-98_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>on-115</station_id>
+		<region_id>ON</region_id>
+		<province>Ontario</province>
+		<city>Stirling</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/on-115_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>on-116</station_id>
+		<region_id>ON</region_id>
+		<province>Ontario</province>
+		<city>Stratford</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/on-116_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>on-18</station_id>
+		<region_id>ON</region_id>
+		<province>Ontario</province>
+		<city>Strathroy</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/on-18_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>on-63</station_id>
+		<region_id>ON</region_id>
+		<province>Ontario</province>
+		<city>Sydenham</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/on-63_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>on-22</station_id>
+		<region_id>ON</region_id>
+		<province>Ontario</province>
+		<city>Temiskaming Shores</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/on-22_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>on-123</station_id>
+		<region_id>ON</region_id>
+		<province>Ontario</province>
+		<city>Terrace Bay</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/on-123_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>on-100</station_id>
+		<region_id>ON</region_id>
+		<province>Ontario</province>
+		<city>Thunder Bay</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/on-100_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>on-17</station_id>
+		<region_id>ON</region_id>
+		<province>Ontario</province>
+		<city>Tillsonburg</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/on-17_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>on-127</station_id>
+		<region_id>ON</region_id>
+		<province>Ontario</province>
+		<city>Timmins</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/on-127_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>on-157</station_id>
+		<region_id>ON</region_id>
+		<province>Ontario</province>
+		<city>Tobermory</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/on-157_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>on-143</station_id>
+		<region_id>ON</region_id>
+		<province>Ontario</province>
+		<city>Toronto</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/on-143_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>on-128</station_id>
+		<region_id>ON</region_id>
+		<province>Ontario</province>
+		<city>Toronto Island</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/on-128_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>on-126</station_id>
+		<region_id>ON</region_id>
+		<province>Ontario</province>
+		<city>Trenton</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/on-126_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>on-154</station_id>
+		<region_id>ON</region_id>
+		<province>Ontario</province>
+		<city>Upsala</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/on-154_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>on-64</station_id>
+		<region_id>ON</region_id>
+		<province>Ontario</province>
+		<city>Vaughan</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/on-64_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>on-109</station_id>
+		<region_id>ON</region_id>
+		<province>Ontario</province>
+		<city>Vineland</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/on-109_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>on-16</station_id>
+		<region_id>ON</region_id>
+		<province>Ontario</province>
+		<city>Walkerton</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/on-16_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>on-138</station_id>
+		<region_id>ON</region_id>
+		<province>Ontario</province>
+		<city>Wawa</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/on-138_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>on-132</station_id>
+		<region_id>ON</region_id>
+		<province>Ontario</province>
+		<city>Webequie</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/on-132_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>on-14</station_id>
+		<region_id>ON</region_id>
+		<province>Ontario</province>
+		<city>Welland</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/on-14_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>on-65</station_id>
+		<region_id>ON</region_id>
+		<province>Ontario</province>
+		<city>West Nipissing</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/on-65_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>on-66</station_id>
+		<region_id>ON</region_id>
+		<province>Ontario</province>
+		<city>Westport</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/on-66_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>on-119</station_id>
+		<region_id>ON</region_id>
+		<province>Ontario</province>
+		<city>Whitby</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/on-119_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>on-67</station_id>
+		<region_id>ON</region_id>
+		<province>Ontario</province>
+		<city>White River</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/on-67_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>on-130</station_id>
+		<region_id>ON</region_id>
+		<province>Ontario</province>
+		<city>Wiarton</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/on-130_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>on-155</station_id>
+		<region_id>ON</region_id>
+		<province>Ontario</province>
+		<city>Winchester</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/on-155_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>on-94</station_id>
+		<region_id>ON</region_id>
+		<province>Ontario</province>
+		<city>Windsor</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/on-94_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>on-110</station_id>
+		<region_id>ON</region_id>
+		<province>Ontario</province>
+		<city>Wingham</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/on-110_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>on-15</station_id>
+		<region_id>ON</region_id>
+		<province>Ontario</province>
+		<city>Woodstock</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/on-15_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>on-158</station_id>
+		<region_id>ON</region_id>
+		<province>Ontario</province>
+		<city>Wunnummin Lake</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/on-158_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>pe-5</station_id>
+		<region_id>PE</region_id>
+		<province>Prince Edward Island</province>
+		<city>Charlottetown</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/pe-5_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>pe-6</station_id>
+		<region_id>PE</region_id>
+		<province>Prince Edward Island</province>
+		<city>East Point</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/pe-6_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>pe-2</station_id>
+		<region_id>PE</region_id>
+		<province>Prince Edward Island</province>
+		<city>Maple Plains</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/pe-2_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>pe-1</station_id>
+		<region_id>PE</region_id>
+		<province>Prince Edward Island</province>
+		<city>North Cape</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/pe-1_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>pe-4</station_id>
+		<region_id>PE</region_id>
+		<province>Prince Edward Island</province>
+		<city>St. Peters Bay</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/pe-4_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>pe-3</station_id>
+		<region_id>PE</region_id>
+		<province>Prince Edward Island</province>
+		<city>Summerside</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/pe-3_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>qc-36</station_id>
+		<region_id>QC</region_id>
+		<province>Quebec</province>
+		<city>Akulivik</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/qc-36_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>qc-144</station_id>
+		<region_id>QC</region_id>
+		<province>Quebec</province>
+		<city>Alma</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/qc-144_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>qc-168</station_id>
+		<region_id>QC</region_id>
+		<province>Quebec</province>
+		<city>Amos</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/qc-168_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>qc-146</station_id>
+		<region_id>QC</region_id>
+		<province>Quebec</province>
+		<city>Amqui</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/qc-146_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>qc-38</station_id>
+		<region_id>QC</region_id>
+		<province>Quebec</province>
+		<city>Asbestos</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/qc-38_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>qc-117</station_id>
+		<region_id>QC</region_id>
+		<province>Quebec</province>
+		<city>Aupaluk</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/qc-117_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>qc-161</station_id>
+		<region_id>QC</region_id>
+		<province>Quebec</province>
+		<city>Bagotville</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/qc-161_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>qc-160</station_id>
+		<region_id>QC</region_id>
+		<province>Quebec</province>
+		<city>Baie-Comeau</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/qc-160_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>qc-69</station_id>
+		<region_id>QC</region_id>
+		<province>Quebec</province>
+		<city>Baie-James</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/qc-69_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>qc-165</station_id>
+		<region_id>QC</region_id>
+		<province>Quebec</province>
+		<city>Baie-Saint-Paul</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/qc-165_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>qc-164</station_id>
+		<region_id>QC</region_id>
+		<province>Quebec</province>
+		<city>Beauce</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/qc-164_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>qc-48</station_id>
+		<region_id>QC</region_id>
+		<province>Quebec</province>
+		<city>Beauceville</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/qc-48_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>qc-49</station_id>
+		<region_id>QC</region_id>
+		<province>Quebec</province>
+		<city>Beauharnois</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/qc-49_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>qc-50</station_id>
+		<region_id>QC</region_id>
+		<province>Quebec</province>
+		<city>B&#233;cancour</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/qc-50_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>qc-51</station_id>
+		<region_id>QC</region_id>
+		<province>Quebec</province>
+		<city>Berni&#232;res</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/qc-51_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>qc-25</station_id>
+		<region_id>QC</region_id>
+		<province>Quebec</province>
+		<city>Berthierville</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/qc-25_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>qc-52</station_id>
+		<region_id>QC</region_id>
+		<province>Quebec</province>
+		<city>Blainville</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/qc-52_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>qc-163</station_id>
+		<region_id>QC</region_id>
+		<province>Quebec</province>
+		<city>Blanc-Sablon</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/qc-163_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>qc-53</station_id>
+		<region_id>QC</region_id>
+		<province>Quebec</province>
+		<city>Boisbriand</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/qc-53_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>qc-54</station_id>
+		<region_id>QC</region_id>
+		<province>Quebec</province>
+		<city>Bonaventure</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/qc-54_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>qc-55</station_id>
+		<region_id>QC</region_id>
+		<province>Quebec</province>
+		<city>Candiac</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/qc-55_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>qc-120</station_id>
+		<region_id>QC</region_id>
+		<province>Quebec</province>
+		<city>Cap Chat</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/qc-120_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>qc-56</station_id>
+		<region_id>QC</region_id>
+		<province>Quebec</province>
+		<city>Carignan</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/qc-56_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>qc-57</station_id>
+		<region_id>QC</region_id>
+		<province>Quebec</province>
+		<city>Carleton</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/qc-57_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>qc-58</station_id>
+		<region_id>QC</region_id>
+		<province>Quebec</province>
+		<city>Chambly</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/qc-58_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>qc-d4</station_id>
+		<region_id>QC</region_id>
+		<province>Quebec</province>
+		<city>Chandler</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/qc-d4_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>qc-119</station_id>
+		<region_id>QC</region_id>
+		<province>Quebec</province>
+		<city>Charlevoix</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/qc-119_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>qc-59</station_id>
+		<region_id>QC</region_id>
+		<province>Quebec</province>
+		<city>Chelsea</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/qc-59_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>qc-152</station_id>
+		<region_id>QC</region_id>
+		<province>Quebec</province>
+		<city>Chevery</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/qc-152_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>qc-121</station_id>
+		<region_id>QC</region_id>
+		<province>Quebec</province>
+		<city>Chibougamau</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/qc-121_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>qc-60</station_id>
+		<region_id>QC</region_id>
+		<province>Quebec</province>
+		<city>Coaticook</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/qc-60_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>qc-46</station_id>
+		<region_id>QC</region_id>
+		<province>Quebec</province>
+		<city>Contrecoeur</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/qc-46_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>qc-61</station_id>
+		<region_id>QC</region_id>
+		<province>Quebec</province>
+		<city>Cowansville</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/qc-61_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>qc-62</station_id>
+		<region_id>QC</region_id>
+		<province>Quebec</province>
+		<city>Delson</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/qc-62_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>qc-63</station_id>
+		<region_id>QC</region_id>
+		<province>Quebec</province>
+		<city>Deux-Montagnes</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/qc-63_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>qc-64</station_id>
+		<region_id>QC</region_id>
+		<province>Quebec</province>
+		<city>Dolbeau-Mistassini</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/qc-64_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>qc-65</station_id>
+		<region_id>QC</region_id>
+		<province>Quebec</province>
+		<city>Donnacona</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/qc-65_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>qc-2</station_id>
+		<region_id>QC</region_id>
+		<province>Quebec</province>
+		<city>Drummondville</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/qc-2_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>qc-26</station_id>
+		<region_id>QC</region_id>
+		<province>Quebec</province>
+		<city>Escoumins</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/qc-26_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>qc-140</station_id>
+		<region_id>QC</region_id>
+		<province>Quebec</province>
+		<city>Farnham</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/qc-140_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>qc-29</station_id>
+		<region_id>QC</region_id>
+		<province>Quebec</province>
+		<city>Fermont</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/qc-29_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>qc-27</station_id>
+		<region_id>QC</region_id>
+		<province>Quebec</province>
+		<city>Forestville</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/qc-27_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>qc-67</station_id>
+		<region_id>QC</region_id>
+		<province>Quebec</province>
+		<city>Forillon</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/qc-67_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>qc-95</station_id>
+		<region_id>QC</region_id>
+		<province>Quebec</province>
+		<city>Forillon (National Park)</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/qc-95_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>qc-101</station_id>
+		<region_id>QC</region_id>
+		<province>Quebec</province>
+		<city>Gasp&#233;</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/qc-101_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>qc-94</station_id>
+		<region_id>QC</region_id>
+		<province>Quebec</province>
+		<city>Gasp&#233;sie (Parc national)</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/qc-94_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>qc-126</station_id>
+		<region_id>QC</region_id>
+		<province>Quebec</province>
+		<city>Gatineau</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/qc-126_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>qc-a1</station_id>
+		<region_id>QC</region_id>
+		<province>Quebec</province>
+		<city>Gouin (R&#233;servoir)</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/qc-a1_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>qc-5</station_id>
+		<region_id>QC</region_id>
+		<province>Quebec</province>
+		<city>Granby</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/qc-5_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>qc-169</station_id>
+		<region_id>QC</region_id>
+		<province>Quebec</province>
+		<city>Grande-Vall&#233;e</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/qc-169_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>qc-104</station_id>
+		<region_id>QC</region_id>
+		<province>Quebec</province>
+		<city>Havre St-Pierre</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/qc-104_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>qc-68</station_id>
+		<region_id>QC</region_id>
+		<province>Quebec</province>
+		<city>Huntingdon</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/qc-68_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>qc-103</station_id>
+		<region_id>QC</region_id>
+		<province>Quebec</province>
+		<city>&#206;les-de-la-Madeleine</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/qc-103_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>qc-131</station_id>
+		<region_id>QC</region_id>
+		<province>Quebec</province>
+		<city>Inukjuak</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/qc-131_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>qc-112</station_id>
+		<region_id>QC</region_id>
+		<province>Quebec</province>
+		<city>Ivujivik</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/qc-112_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>qc-137</station_id>
+		<region_id>QC</region_id>
+		<province>Quebec</province>
+		<city>Joliette</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/qc-137_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>qc-70</station_id>
+		<region_id>QC</region_id>
+		<province>Quebec</province>
+		<city>Kamouraska</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/qc-70_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>qc-118</station_id>
+		<region_id>QC</region_id>
+		<province>Quebec</province>
+		<city>Kangiqsualujjuaq</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/qc-118_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>qc-155</station_id>
+		<region_id>QC</region_id>
+		<province>Quebec</province>
+		<city>Kangiqsujuaq</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/qc-155_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>qc-159</station_id>
+		<region_id>QC</region_id>
+		<province>Quebec</province>
+		<city>Kangirsuk</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/qc-159_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>qc-150</station_id>
+		<region_id>QC</region_id>
+		<province>Quebec</province>
+		<city>Kuujjuaq</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/qc-150_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>qc-105</station_id>
+		<region_id>QC</region_id>
+		<province>Quebec</province>
+		<city>Kuujjuarapik</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/qc-105_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>qc-156</station_id>
+		<region_id>QC</region_id>
+		<province>Quebec</province>
+		<city>L'Assomption</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/qc-156_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>qc-77</station_id>
+		<region_id>QC</region_id>
+		<province>Quebec</province>
+		<city>L'Islet</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/qc-77_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>qc-158</station_id>
+		<region_id>QC</region_id>
+		<province>Quebec</province>
+		<city>La Grande Rivi&#232;re</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/qc-158_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>qc-100</station_id>
+		<region_id>QC</region_id>
+		<province>Quebec</province>
+		<city>La Grande-Quatre</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/qc-100_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>qc-11</station_id>
+		<region_id>QC</region_id>
+		<province>Quebec</province>
+		<city>La Malbaie</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/qc-11_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>qc-71</station_id>
+		<region_id>QC</region_id>
+		<province>Quebec</province>
+		<city>La Prairie</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/qc-71_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>qc-45</station_id>
+		<region_id>QC</region_id>
+		<province>Quebec</province>
+		<city>La Sarre</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/qc-45_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>qc-154</station_id>
+		<region_id>QC</region_id>
+		<province>Quebec</province>
+		<city>La Tuque</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/qc-154_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>qc-30</station_id>
+		<region_id>QC</region_id>
+		<province>Quebec</province>
+		<city>La V&#233;rendrye (R&#233;serve faunique)</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/qc-30_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>qc-99</station_id>
+		<region_id>QC</region_id>
+		<province>Quebec</province>
+		<city>Lac Raglan</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/qc-99_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>qc-73</station_id>
+		<region_id>QC</region_id>
+		<province>Quebec</province>
+		<city>Lac Saint-Jean</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/qc-73_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>qc-72</station_id>
+		<region_id>QC</region_id>
+		<province>Quebec</province>
+		<city>Lac-M&#233;gantic</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/qc-72_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>qc-14</station_id>
+		<region_id>QC</region_id>
+		<province>Quebec</province>
+		<city>Lachute</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/qc-14_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>qc-74</station_id>
+		<region_id>QC</region_id>
+		<province>Quebec</province>
+		<city>Lanaudi&#232;re</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/qc-74_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>qc-75</station_id>
+		<region_id>QC</region_id>
+		<province>Quebec</province>
+		<city>Laurentides</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/qc-75_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>qc-113</station_id>
+		<region_id>QC</region_id>
+		<province>Quebec</province>
+		<city>Laurentides (R&#233;serve faunique)</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/qc-113_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>qc-76</station_id>
+		<region_id>QC</region_id>
+		<province>Quebec</province>
+		<city>Laval</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/qc-76_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>qc-d3</station_id>
+		<region_id>QC</region_id>
+		<province>Quebec</province>
+		<city>Le Gardeur</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/qc-d3_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>qc-78</station_id>
+		<region_id>QC</region_id>
+		<province>Quebec</province>
+		<city>L&#233;vis</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/qc-78_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>qc-109</station_id>
+		<region_id>QC</region_id>
+		<province>Quebec</province>
+		<city>Longueuil</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/qc-109_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>qc-81</station_id>
+		<region_id>QC</region_id>
+		<province>Quebec</province>
+		<city>Lorraine</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/qc-81_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>qc-d2</station_id>
+		<region_id>QC</region_id>
+		<province>Quebec</province>
+		<city>Louiseville</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/qc-d2_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>qc-83</station_id>
+		<region_id>QC</region_id>
+		<province>Quebec</province>
+		<city>Magog</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/qc-83_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>qc-153</station_id>
+		<region_id>QC</region_id>
+		<province>Quebec</province>
+		<city>Manicouagan</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/qc-153_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>qc-102</station_id>
+		<region_id>QC</region_id>
+		<province>Quebec</province>
+		<city>Maniwaki</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/qc-102_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>qc-84</station_id>
+		<region_id>QC</region_id>
+		<province>Quebec</province>
+		<city>Marieville</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/qc-84_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>qc-85</station_id>
+		<region_id>QC</region_id>
+		<province>Quebec</province>
+		<city>Mascouche</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/qc-85_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>qc-129</station_id>
+		<region_id>QC</region_id>
+		<province>Quebec</province>
+		<city>Matagami</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/qc-129_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>qc-15</station_id>
+		<region_id>QC</region_id>
+		<province>Quebec</province>
+		<city>Matane</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/qc-15_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>qc-151</station_id>
+		<region_id>QC</region_id>
+		<province>Quebec</province>
+		<city>Matapedia</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/qc-151_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>qc-89</station_id>
+		<region_id>QC</region_id>
+		<province>Quebec</province>
+		<city>Mauricie</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/qc-89_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>qc-90</station_id>
+		<region_id>QC</region_id>
+		<province>Quebec</province>
+		<city>Mingan</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/qc-90_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>qc-123</station_id>
+		<region_id>QC</region_id>
+		<province>Quebec</province>
+		<city>Mirabel</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/qc-123_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>qc-91</station_id>
+		<region_id>QC</region_id>
+		<province>Quebec</province>
+		<city>Mistassini</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/qc-91_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>qc-92</station_id>
+		<region_id>QC</region_id>
+		<province>Quebec</province>
+		<city>Mont Saint-Hilaire</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/qc-92_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>qc-127</station_id>
+		<region_id>QC</region_id>
+		<province>Quebec</province>
+		<city>Mont-Joli</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/qc-127_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>qc-47</station_id>
+		<region_id>QC</region_id>
+		<province>Quebec</province>
+		<city>Mont-Laurier</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/qc-47_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>qc-167</station_id>
+		<region_id>QC</region_id>
+		<province>Quebec</province>
+		<city>Mont-Tremblant</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/qc-167_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>qc-124</station_id>
+		<region_id>QC</region_id>
+		<province>Quebec</province>
+		<city>Montmagny</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/qc-124_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>qc-147</station_id>
+		<region_id>QC</region_id>
+		<province>Quebec</province>
+		<city>Montr&#233;al</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/qc-147_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>qc-16</station_id>
+		<region_id>QC</region_id>
+		<province>Quebec</province>
+		<city>Murdochville</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/qc-16_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>qc-125</station_id>
+		<region_id>QC</region_id>
+		<province>Quebec</province>
+		<city>Natashquan</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/qc-125_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>qc-111</station_id>
+		<region_id>QC</region_id>
+		<province>Quebec</province>
+		<city>New Carlisle</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/qc-111_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>qc-110</station_id>
+		<region_id>QC</region_id>
+		<province>Quebec</province>
+		<city>Nicolet</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/qc-110_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>qc-93</station_id>
+		<region_id>QC</region_id>
+		<province>Quebec</province>
+		<city>Otterburn Park</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/qc-93_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>qc-17</station_id>
+		<region_id>QC</region_id>
+		<province>Quebec</province>
+		<city>Papineau</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/qc-17_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>qc-114</station_id>
+		<region_id>QC</region_id>
+		<province>Quebec</province>
+		<city>Parent</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/qc-114_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>qc-18</station_id>
+		<region_id>QC</region_id>
+		<province>Quebec</province>
+		<city>Perc&#233;</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/qc-18_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>qc-96</station_id>
+		<region_id>QC</region_id>
+		<province>Quebec</province>
+		<city>Pincourt</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/qc-96_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>qc-19</station_id>
+		<region_id>QC</region_id>
+		<province>Quebec</province>
+		<city>Pontiac</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/qc-19_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>qc-97</station_id>
+		<region_id>QC</region_id>
+		<province>Quebec</province>
+		<city>Port-Cartier</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/qc-97_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>qc-142</station_id>
+		<region_id>QC</region_id>
+		<province>Quebec</province>
+		<city>Port-Menier</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/qc-142_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>qc-98</station_id>
+		<region_id>QC</region_id>
+		<province>Quebec</province>
+		<city>Pr&#233;vost</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/qc-98_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>qc-40</station_id>
+		<region_id>QC</region_id>
+		<province>Quebec</province>
+		<city>Puvirnituq</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/qc-40_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>qc-106</station_id>
+		<region_id>QC</region_id>
+		<province>Quebec</province>
+		<city>Quaqtaq</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/qc-106_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>qc-133</station_id>
+		<region_id>QC</region_id>
+		<province>Quebec</province>
+		<city>Qu&#233;bec</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/qc-133_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>qc-a0</station_id>
+		<region_id>QC</region_id>
+		<province>Quebec</province>
+		<city>Repentigny</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/qc-a0_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>qc-20</station_id>
+		<region_id>QC</region_id>
+		<province>Quebec</province>
+		<city>Restigouche</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/qc-20_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>qc-21</station_id>
+		<region_id>QC</region_id>
+		<province>Quebec</province>
+		<city>Richelieu</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/qc-21_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>qc-a2</station_id>
+		<region_id>QC</region_id>
+		<province>Quebec</province>
+		<city>Rigaud</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/qc-a2_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>qc-138</station_id>
+		<region_id>QC</region_id>
+		<province>Quebec</province>
+		<city>Rimouski</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/qc-138_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>qc-108</station_id>
+		<region_id>QC</region_id>
+		<province>Quebec</province>
+		<city>Rivi&#232;re-du-Loup</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/qc-108_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>qc-134</station_id>
+		<region_id>QC</region_id>
+		<province>Quebec</province>
+		<city>Roberval</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/qc-134_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>qc-a3</station_id>
+		<region_id>QC</region_id>
+		<province>Quebec</province>
+		<city>Rosem&#232;re</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/qc-a3_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>qc-148</station_id>
+		<region_id>QC</region_id>
+		<province>Quebec</province>
+		<city>Rouyn-Noranda</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/qc-148_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>qc-166</station_id>
+		<region_id>QC</region_id>
+		<province>Quebec</province>
+		<city>Saguenay</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/qc-166_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>qc-a5</station_id>
+		<region_id>QC</region_id>
+		<province>Quebec</province>
+		<city>Saint-Amable</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/qc-a5_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>qc-a6</station_id>
+		<region_id>QC</region_id>
+		<province>Quebec</province>
+		<city>Saint-Basile Le Grand</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/qc-a6_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>qc-a7</station_id>
+		<region_id>QC</region_id>
+		<province>Quebec</province>
+		<city>Saint-Constant</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/qc-a7_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>qc-b4</station_id>
+		<region_id>QC</region_id>
+		<province>Quebec</province>
+		<city>Saint-Eustache</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/qc-b4_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>qc-b5</station_id>
+		<region_id>QC</region_id>
+		<province>Quebec</province>
+		<city>Saint-F&#233;licien</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/qc-b5_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>qc-b6</station_id>
+		<region_id>QC</region_id>
+		<province>Quebec</province>
+		<city>Saint-Georges</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/qc-b6_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>qc-22</station_id>
+		<region_id>QC</region_id>
+		<province>Quebec</province>
+		<city>Saint-Hyacinthe</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/qc-22_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>qc-28</station_id>
+		<region_id>QC</region_id>
+		<province>Quebec</province>
+		<city>Saint-Jean-sur-Richelieu</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/qc-28_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>qc-13</station_id>
+		<region_id>QC</region_id>
+		<province>Quebec</province>
+		<city>Saint-J&#233;r&#244;me</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/qc-13_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>qc-b7</station_id>
+		<region_id>QC</region_id>
+		<province>Quebec</province>
+		<city>Saint-Lazare</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/qc-b7_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>qc-b8</station_id>
+		<region_id>QC</region_id>
+		<province>Quebec</province>
+		<city>Saint-Lin-Laurentides</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/qc-b8_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>qc-b9</station_id>
+		<region_id>QC</region_id>
+		<province>Quebec</province>
+		<city>Saint-Luc</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/qc-b9_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>qc-c0</station_id>
+		<region_id>QC</region_id>
+		<province>Quebec</province>
+		<city>Saint-Michel-des-Saints</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/qc-c0_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>qc-c1</station_id>
+		<region_id>QC</region_id>
+		<province>Quebec</province>
+		<city>Saint-Nic&#233;phore</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/qc-c1_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>qc-c2</station_id>
+		<region_id>QC</region_id>
+		<province>Quebec</province>
+		<city>Saint-R&#233;mi</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/qc-c2_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>qc-c3</station_id>
+		<region_id>QC</region_id>
+		<province>Quebec</province>
+		<city>Saint-Sauveur</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/qc-c3_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>qc-c4</station_id>
+		<region_id>QC</region_id>
+		<province>Quebec</province>
+		<city>Saint-Timoth&#233;e</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/qc-c4_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>qc-33</station_id>
+		<region_id>QC</region_id>
+		<province>Quebec</province>
+		<city>Sainte-Agathe</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/qc-33_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>qc-a8</station_id>
+		<region_id>QC</region_id>
+		<province>Quebec</province>
+		<city>Sainte-Anne-Des-Monts</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/qc-a8_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>qc-a9</station_id>
+		<region_id>QC</region_id>
+		<province>Quebec</province>
+		<city>Sainte-Anne-Des-Plaines</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/qc-a9_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>qc-b0</station_id>
+		<region_id>QC</region_id>
+		<province>Quebec</province>
+		<city>Sainte-Catherine</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/qc-b0_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>qc-b1</station_id>
+		<region_id>QC</region_id>
+		<province>Quebec</province>
+		<city>Sainte-Julie</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/qc-b1_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>qc-b2</station_id>
+		<region_id>QC</region_id>
+		<province>Quebec</province>
+		<city>Sainte-Sophie</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/qc-b2_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>qc-b3</station_id>
+		<region_id>QC</region_id>
+		<province>Quebec</province>
+		<city>Sainte-Th&#233;r&#232;se</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/qc-b3_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>qc-143</station_id>
+		<region_id>QC</region_id>
+		<province>Quebec</province>
+		<city>Salaberry-de-Valleyfield</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/qc-143_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>qc-128</station_id>
+		<region_id>QC</region_id>
+		<province>Quebec</province>
+		<city>Salluit</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/qc-128_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>qc-115</station_id>
+		<region_id>QC</region_id>
+		<province>Quebec</province>
+		<city>Schefferville</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/qc-115_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>qc-141</station_id>
+		<region_id>QC</region_id>
+		<province>Quebec</province>
+		<city>Sept-&#206;les</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/qc-141_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>qc-132</station_id>
+		<region_id>QC</region_id>
+		<province>Quebec</province>
+		<city>Shawinigan</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/qc-132_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>qc-136</station_id>
+		<region_id>QC</region_id>
+		<province>Quebec</province>
+		<city>Sherbrooke</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/qc-136_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>qc-c6</station_id>
+		<region_id>QC</region_id>
+		<province>Quebec</province>
+		<city>Sorel-Tracy</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/qc-c6_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>qc-135</station_id>
+		<region_id>QC</region_id>
+		<province>Quebec</province>
+		<city>Sutton</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/qc-135_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>qc-107</station_id>
+		<region_id>QC</region_id>
+		<province>Quebec</province>
+		<city>Tadoussac</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/qc-107_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>qc-145</station_id>
+		<region_id>QC</region_id>
+		<province>Quebec</province>
+		<city>Tasiujaq</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/qc-145_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>qc-139</station_id>
+		<region_id>QC</region_id>
+		<province>Quebec</province>
+		<city>T&#233;miscamingue</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/qc-139_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>qc-35</station_id>
+		<region_id>QC</region_id>
+		<province>Quebec</province>
+		<city>Temiscouata</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/qc-35_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>qc-c7</station_id>
+		<region_id>QC</region_id>
+		<province>Quebec</province>
+		<city>Terrebonne</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/qc-c7_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>qc-c8</station_id>
+		<region_id>QC</region_id>
+		<province>Quebec</province>
+		<city>Thetford Mines</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/qc-c8_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>qc-c9</station_id>
+		<region_id>QC</region_id>
+		<province>Quebec</province>
+		<city>Tracy</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/qc-c9_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>qc-24</station_id>
+		<region_id>QC</region_id>
+		<province>Quebec</province>
+		<city>Trois-Pistoles</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/qc-24_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>qc-130</station_id>
+		<region_id>QC</region_id>
+		<province>Quebec</province>
+		<city>Trois-Rivi&#232;res</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/qc-130_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>qc-122</station_id>
+		<region_id>QC</region_id>
+		<province>Quebec</province>
+		<city>Umiujaq</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/qc-122_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>qc-149</station_id>
+		<region_id>QC</region_id>
+		<province>Quebec</province>
+		<city>Val-d'Or</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/qc-149_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>qc-42</station_id>
+		<region_id>QC</region_id>
+		<province>Quebec</province>
+		<city>Val-des-Monts</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/qc-42_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>qc-d0</station_id>
+		<region_id>QC</region_id>
+		<province>Quebec</province>
+		<city>Vall&#233;e de la Matap&#233;dia</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/qc-d0_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>qc-41</station_id>
+		<region_id>QC</region_id>
+		<province>Quebec</province>
+		<city>Vanier</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/qc-41_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>qc-162</station_id>
+		<region_id>QC</region_id>
+		<province>Quebec</province>
+		<city>Varennes</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/qc-162_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>qc-66</station_id>
+		<region_id>QC</region_id>
+		<province>Quebec</province>
+		<city>Vaudreuil-Dorion</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/qc-66_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>qc-157</station_id>
+		<region_id>QC</region_id>
+		<province>Quebec</province>
+		<city>Victoriaville</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/qc-157_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>qc-116</station_id>
+		<region_id>QC</region_id>
+		<province>Quebec</province>
+		<city>Waskaganish</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/qc-116_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>sk-51</station_id>
+		<region_id>SK</region_id>
+		<province>Saskatchewan</province>
+		<city>Assiniboia</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/sk-51_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>sk-2</station_id>
+		<region_id>SK</region_id>
+		<province>Saskatchewan</province>
+		<city>Biggar</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/sk-2_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>sk-48</station_id>
+		<region_id>SK</region_id>
+		<province>Saskatchewan</province>
+		<city>Broadview</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/sk-48_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>sk-39</station_id>
+		<region_id>SK</region_id>
+		<province>Saskatchewan</province>
+		<city>Buffalo Narrows</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/sk-39_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>sk-3</station_id>
+		<region_id>SK</region_id>
+		<province>Saskatchewan</province>
+		<city>Canora</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/sk-3_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>sk-4</station_id>
+		<region_id>SK</region_id>
+		<province>Saskatchewan</province>
+		<city>Carlyle</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/sk-4_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>sk-30</station_id>
+		<region_id>SK</region_id>
+		<province>Saskatchewan</province>
+		<city>Collins Bay</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/sk-30_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>sk-42</station_id>
+		<region_id>SK</region_id>
+		<province>Saskatchewan</province>
+		<city>Coronach</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/sk-42_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>sk-29</station_id>
+		<region_id>SK</region_id>
+		<province>Saskatchewan</province>
+		<city>Cypress Hills (Provincial Park)</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/sk-29_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>sk-45</station_id>
+		<region_id>SK</region_id>
+		<province>Saskatchewan</province>
+		<city>Eastend</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/sk-45_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>sk-18</station_id>
+		<region_id>SK</region_id>
+		<province>Saskatchewan</province>
+		<city>Elbow</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/sk-18_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>sk-53</station_id>
+		<region_id>SK</region_id>
+		<province>Saskatchewan</province>
+		<city>Estevan</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/sk-53_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>sk-5</station_id>
+		<region_id>SK</region_id>
+		<province>Saskatchewan</province>
+		<city>Fort Qu'Appelle</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/sk-5_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>sk-17</station_id>
+		<region_id>SK</region_id>
+		<province>Saskatchewan</province>
+		<city>Hudson Bay</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/sk-17_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>sk-6</station_id>
+		<region_id>SK</region_id>
+		<province>Saskatchewan</province>
+		<city>Humboldt</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/sk-6_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>sk-43</station_id>
+		<region_id>SK</region_id>
+		<province>Saskatchewan</province>
+		<city>Indian Head</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/sk-43_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>sk-7</station_id>
+		<region_id>SK</region_id>
+		<province>Saskatchewan</province>
+		<city>Kamsack</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/sk-7_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>sk-20</station_id>
+		<region_id>SK</region_id>
+		<province>Saskatchewan</province>
+		<city>Key Lake</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/sk-20_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>sk-21</station_id>
+		<region_id>SK</region_id>
+		<province>Saskatchewan</province>
+		<city>Kindersley</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/sk-21_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>sk-13</station_id>
+		<region_id>SK</region_id>
+		<province>Saskatchewan</province>
+		<city>La Loche</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/sk-13_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>sk-38</station_id>
+		<region_id>SK</region_id>
+		<province>Saskatchewan</province>
+		<city>La Ronge</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/sk-38_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>sk-35</station_id>
+		<region_id>SK</region_id>
+		<province>Saskatchewan</province>
+		<city>Last Mountain Lake (Sanctuary)</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/sk-35_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>sk-52</station_id>
+		<region_id>SK</region_id>
+		<province>Saskatchewan</province>
+		<city>Leader</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/sk-52_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>ab-15</station_id>
+		<region_id>SK</region_id>
+		<province>Saskatchewan</province>
+		<city>Lloydminster</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/ab-15_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>sk-14</station_id>
+		<region_id>SK</region_id>
+		<province>Saskatchewan</province>
+		<city>Lucky Lake</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/sk-14_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>sk-16</station_id>
+		<region_id>SK</region_id>
+		<province>Saskatchewan</province>
+		<city>Maple Creek</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/sk-16_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>sk-22</station_id>
+		<region_id>SK</region_id>
+		<province>Saskatchewan</province>
+		<city>Meadow Lake</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/sk-22_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>sk-46</station_id>
+		<region_id>SK</region_id>
+		<province>Saskatchewan</province>
+		<city>Melfort</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/sk-46_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>sk-8</station_id>
+		<region_id>SK</region_id>
+		<province>Saskatchewan</province>
+		<city>Melville</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/sk-8_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>sk-24</station_id>
+		<region_id>SK</region_id>
+		<province>Saskatchewan</province>
+		<city>Moose Jaw</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/sk-24_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>sk-9</station_id>
+		<region_id>SK</region_id>
+		<province>Saskatchewan</province>
+		<city>Moosomin</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/sk-9_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>sk-47</station_id>
+		<region_id>SK</region_id>
+		<province>Saskatchewan</province>
+		<city>Nipawin</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/sk-47_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>sk-34</station_id>
+		<region_id>SK</region_id>
+		<province>Saskatchewan</province>
+		<city>North Battleford</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/sk-34_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>sk-37</station_id>
+		<region_id>SK</region_id>
+		<province>Saskatchewan</province>
+		<city>Outlook</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/sk-37_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>sk-10</station_id>
+		<region_id>SK</region_id>
+		<province>Saskatchewan</province>
+		<city>Oxbow</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/sk-10_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>sk-55</station_id>
+		<region_id>SK</region_id>
+		<province>Saskatchewan</province>
+		<city>Pelican Narrows</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/sk-55_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>sk-27</station_id>
+		<region_id>SK</region_id>
+		<province>Saskatchewan</province>
+		<city>Prince Albert</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/sk-27_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>sk-32</station_id>
+		<region_id>SK</region_id>
+		<province>Saskatchewan</province>
+		<city>Regina</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/sk-32_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>sk-54</station_id>
+		<region_id>SK</region_id>
+		<province>Saskatchewan</province>
+		<city>Rockglen</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/sk-54_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>sk-23</station_id>
+		<region_id>SK</region_id>
+		<province>Saskatchewan</province>
+		<city>Rosetown</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/sk-23_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>sk-1</station_id>
+		<region_id>SK</region_id>
+		<province>Saskatchewan</province>
+		<city>Rosthern</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/sk-1_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>sk-40</station_id>
+		<region_id>SK</region_id>
+		<province>Saskatchewan</province>
+		<city>Saskatoon</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/sk-40_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>sk-26</station_id>
+		<region_id>SK</region_id>
+		<province>Saskatchewan</province>
+		<city>Scott</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/sk-26_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>sk-11</station_id>
+		<region_id>SK</region_id>
+		<province>Saskatchewan</province>
+		<city>Shaunavon</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/sk-11_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>sk-50</station_id>
+		<region_id>SK</region_id>
+		<province>Saskatchewan</province>
+		<city>Southend Reindeer</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/sk-50_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>sk-25</station_id>
+		<region_id>SK</region_id>
+		<province>Saskatchewan</province>
+		<city>Spiritwood</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/sk-25_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>sk-36</station_id>
+		<region_id>SK</region_id>
+		<province>Saskatchewan</province>
+		<city>Stony Rapids</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/sk-36_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>sk-41</station_id>
+		<region_id>SK</region_id>
+		<province>Saskatchewan</province>
+		<city>Swift Current</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/sk-41_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>sk-12</station_id>
+		<region_id>SK</region_id>
+		<province>Saskatchewan</province>
+		<city>Tisdale</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/sk-12_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>sk-44</station_id>
+		<region_id>SK</region_id>
+		<province>Saskatchewan</province>
+		<city>Uranium City</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/sk-44_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>sk-28</station_id>
+		<region_id>SK</region_id>
+		<province>Saskatchewan</province>
+		<city>Val Marie</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/sk-28_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>sk-15</station_id>
+		<region_id>SK</region_id>
+		<province>Saskatchewan</province>
+		<city>Waskesiu Lake</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/sk-15_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>sk-49</station_id>
+		<region_id>SK</region_id>
+		<province>Saskatchewan</province>
+		<city>Watrous</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/sk-49_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>sk-31</station_id>
+		<region_id>SK</region_id>
+		<province>Saskatchewan</province>
+		<city>Weyburn</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/sk-31_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>sk-19</station_id>
+		<region_id>SK</region_id>
+		<province>Saskatchewan</province>
+		<city>Wynyard</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/sk-19_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>sk-33</station_id>
+		<region_id>SK</region_id>
+		<province>Saskatchewan</province>
+		<city>Yorkton</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/sk-33_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>yk-15</station_id>
+		<region_id>YK</region_id>
+		<province>Yukon</province>
+		<city>Beaver Creek</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/yk-15_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>yk-7</station_id>
+		<region_id>YK</region_id>
+		<province>Yukon</province>
+		<city>Burwash Landing</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/yk-7_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>yk-2</station_id>
+		<region_id>YK</region_id>
+		<province>Yukon</province>
+		<city>Carcross</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/yk-2_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>yk-17</station_id>
+		<region_id>YK</region_id>
+		<province>Yukon</province>
+		<city>Carmacks</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/yk-17_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>yk-6</station_id>
+		<region_id>YK</region_id>
+		<province>Yukon</province>
+		<city>Dawson</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/yk-6_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>yk-4</station_id>
+		<region_id>YK</region_id>
+		<province>Yukon</province>
+		<city>Dempster (Highway)</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/yk-4_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>yk-12</station_id>
+		<region_id>YK</region_id>
+		<province>Yukon</province>
+		<city>Faro</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/yk-12_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>yk-5</station_id>
+		<region_id>YK</region_id>
+		<province>Yukon</province>
+		<city>Haines Junction</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/yk-5_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>yk-1</station_id>
+		<region_id>YK</region_id>
+		<province>Yukon</province>
+		<city>Kluane Lake</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/yk-1_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>yk-10</station_id>
+		<region_id>YK</region_id>
+		<province>Yukon</province>
+		<city>Mayo</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/yk-10_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>yk-11</station_id>
+		<region_id>YK</region_id>
+		<province>Yukon</province>
+		<city>Old Crow</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/yk-11_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>yk-3</station_id>
+		<region_id>YK</region_id>
+		<province>Yukon</province>
+		<city>Rancheria</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/yk-3_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>yk-9</station_id>
+		<region_id>YK</region_id>
+		<province>Yukon</province>
+		<city>Rock River</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/yk-9_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>yk-8</station_id>
+		<region_id>YK</region_id>
+		<province>Yukon</province>
+		<city>Ross River</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/yk-8_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>yk-14</station_id>
+		<region_id>YK</region_id>
+		<province>Yukon</province>
+		<city>Teslin</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/yk-14_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>yk-13</station_id>
+		<region_id>YK</region_id>
+		<province>Yukon</province>
+		<city>Watson Lake</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/yk-13_metric_e.html</html_url>
+	</station>
+
+	<station>
+		<station_id>yk-16</station_id>
+		<region_id>YK</region_id>
+		<province>Yukon</province>
+		<city>Whitehorse</city>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/yk-16_metric_e.html</html_url>
+	</station>
+
+</envcan_station_index>

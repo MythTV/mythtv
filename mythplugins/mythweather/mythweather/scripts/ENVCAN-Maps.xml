@@ -1,0 +1,465 @@
+<maplist>
+	<credit>Environment Canada's Weather Service</credit>
+	<credit_url>http://www.weatheroffice.gc.ca/satellite</credit_url>
+	<generated>Fri Aug 10 17:05:59 2007 UTC</generated>
+
+	<entry>
+		<entry_id>goes_nam_1070x_100</entry_id>
+		<satellite_class>GOES-East/West</satellite_class>
+		<satellite>North American Composite </satellite>
+		<image_type>IR &amp; topography</image_type>
+		<static_url>http://www.weatheroffice.gc.ca/data/satellite/goes_nam_1070x_100.jpg</static_url>
+		<animated_url>http://www.weatheroffice.gc.ca/satellite/animateweb_e.html?imagetype=satellite&amp;imagename=goes_nam_1070x_m_..................jpg&amp;nbimages=1&amp;clf=1</animated_url>
+	</entry>
+
+	<entry>
+		<entry_id>goes_nam_1070_100</entry_id>
+		<satellite_class>GOES-East/West</satellite_class>
+		<satellite>North American Composite </satellite>
+		<image_type>IR(infra-red: 10.7)</image_type>
+		<static_url>http://www.weatheroffice.gc.ca/data/satellite/goes_nam_1070_100.jpg</static_url>
+		<animated_url>http://www.weatheroffice.gc.ca/satellite/animateweb_e.html?imagetype=satellite&amp;imagename=goes_nam_1070_m_..................jpg&amp;nbimages=1&amp;clf=1</animated_url>
+	</entry>
+
+	<entry>
+		<entry_id>goes_nam_visiblex_100</entry_id>
+		<satellite_class>GOES-East/West</satellite_class>
+		<satellite>North American Composite </satellite>
+		<image_type>Visible &amp; topography</image_type>
+		<static_url>http://www.weatheroffice.gc.ca/data/satellite/goes_nam_visiblex_100.jpg</static_url>
+		<animated_url>http://www.weatheroffice.gc.ca/satellite/animateweb_e.html?imagetype=satellite&amp;imagename=goes_nam_visiblex_m_..................jpg&amp;nbimages=1&amp;clf=1</animated_url>
+	</entry>
+
+	<entry>
+		<entry_id>goes_nam_vvi_100</entry_id>
+		<satellite_class>GOES-East/West</satellite_class>
+		<satellite>North American Composite </satellite>
+		<image_type>IR + Visible</image_type>
+		<static_url>http://www.weatheroffice.gc.ca/data/satellite/goes_nam_vvi_100.jpg</static_url>
+		<animated_url>http://www.weatheroffice.gc.ca/satellite/animateweb_e.html?imagetype=satellite&amp;imagename=goes_nam_vvi_m_..................jpg&amp;nbimages=1&amp;clf=1</animated_url>
+	</entry>
+
+	<entry>
+		<entry_id>goes_ecan_1070_100</entry_id>
+		<satellite_class>GOES-East</satellite_class>
+		<satellite>Eastern Canada </satellite>
+		<image_type>IR(infra-red: 10.7)</image_type>
+		<static_url>http://www.weatheroffice.gc.ca/data/satellite/goes_ecan_1070_100.jpg</static_url>
+		<animated_url>http://www.weatheroffice.gc.ca/satellite/animateweb_e.html?imagetype=satellite&amp;imagename=goes_ecan_1070_m_..................jpg&amp;nbimages=1&amp;clf=1</animated_url>
+	</entry>
+
+	<entry>
+		<entry_id>goes_ecan_visible_100</entry_id>
+		<satellite_class>GOES-East</satellite_class>
+		<satellite>Eastern Canada </satellite>
+		<image_type>Visible</image_type>
+		<static_url>http://www.weatheroffice.gc.ca/data/satellite/goes_ecan_visible_100.jpg</static_url>
+		<animated_url>http://www.weatheroffice.gc.ca/satellite/animateweb_e.html?imagetype=satellite&amp;imagename=goes_ecan_visible_m_..................jpg&amp;nbimages=1&amp;clf=1</animated_url>
+	</entry>
+
+	<entry>
+		<entry_id>goes_ecan_vvi_100</entry_id>
+		<satellite_class>GOES-East</satellite_class>
+		<satellite>Eastern Canada </satellite>
+		<image_type>IR + Visible</image_type>
+		<static_url>http://www.weatheroffice.gc.ca/data/satellite/goes_ecan_vvi_100.jpg</static_url>
+		<animated_url>http://www.weatheroffice.gc.ca/satellite/animateweb_e.html?imagetype=satellite&amp;imagename=goes_ecan_vvi_m_..................jpg&amp;nbimages=1&amp;clf=1</animated_url>
+	</entry>
+
+	<entry>
+		<entry_id>goes_enam_1070_100</entry_id>
+		<satellite_class>GOES-East</satellite_class>
+		<satellite>Eastern North America </satellite>
+		<image_type>IR(infra-red: 10.7)</image_type>
+		<static_url>http://www.weatheroffice.gc.ca/data/satellite/goes_enam_1070_100.jpg</static_url>
+		<animated_url>http://www.weatheroffice.gc.ca/satellite/animateweb_e.html?imagetype=satellite&amp;imagename=goes_enam_1070_m_..................jpg&amp;nbimages=1&amp;clf=1</animated_url>
+	</entry>
+
+	<entry>
+		<entry_id>goes_enam_visible_100</entry_id>
+		<satellite_class>GOES-East</satellite_class>
+		<satellite>Eastern North America </satellite>
+		<image_type>Visible</image_type>
+		<static_url>http://www.weatheroffice.gc.ca/data/satellite/goes_enam_visible_100.jpg</static_url>
+		<animated_url>http://www.weatheroffice.gc.ca/satellite/animateweb_e.html?imagetype=satellite&amp;imagename=goes_enam_visible_m_..................jpg&amp;nbimages=1&amp;clf=1</animated_url>
+	</entry>
+
+	<entry>
+		<entry_id>goes_enam_vvi_100</entry_id>
+		<satellite_class>GOES-East</satellite_class>
+		<satellite>Eastern North America </satellite>
+		<image_type>IR + Visible</image_type>
+		<static_url>http://www.weatheroffice.gc.ca/data/satellite/goes_enam_vvi_100.jpg</static_url>
+		<animated_url>http://www.weatheroffice.gc.ca/satellite/animateweb_e.html?imagetype=satellite&amp;imagename=goes_enam_vvi_m_..................jpg&amp;nbimages=1&amp;clf=1</animated_url>
+	</entry>
+
+	<entry>
+		<entry_id>goes_eusa_1070_100</entry_id>
+		<satellite_class>GOES-East</satellite_class>
+		<satellite>Eastern USA </satellite>
+		<image_type>IR(infra-red: 10.7)</image_type>
+		<static_url>http://www.weatheroffice.gc.ca/data/satellite/goes_eusa_1070_100.jpg</static_url>
+		<animated_url>http://www.weatheroffice.gc.ca/satellite/animateweb_e.html?imagetype=satellite&amp;imagename=goes_eusa_1070_m_..................jpg&amp;nbimages=1&amp;clf=1</animated_url>
+	</entry>
+
+	<entry>
+		<entry_id>goes_eusa_visible_100</entry_id>
+		<satellite_class>GOES-East</satellite_class>
+		<satellite>Eastern USA </satellite>
+		<image_type>Visible</image_type>
+		<static_url>http://www.weatheroffice.gc.ca/data/satellite/goes_eusa_visible_100.jpg</static_url>
+		<animated_url>http://www.weatheroffice.gc.ca/satellite/animateweb_e.html?imagetype=satellite&amp;imagename=goes_eusa_visible_m_..................jpg&amp;nbimages=1&amp;clf=1</animated_url>
+	</entry>
+
+	<entry>
+		<entry_id>goes_eusa_vvi_100</entry_id>
+		<satellite_class>GOES-East</satellite_class>
+		<satellite>Eastern USA </satellite>
+		<image_type>IR + Visible</image_type>
+		<static_url>http://www.weatheroffice.gc.ca/data/satellite/goes_eusa_vvi_100.jpg</static_url>
+		<animated_url>http://www.weatheroffice.gc.ca/satellite/animateweb_e.html?imagetype=satellite&amp;imagename=goes_eusa_vvi_m_..................jpg&amp;nbimages=1&amp;clf=1</animated_url>
+	</entry>
+
+	<entry>
+		<entry_id>goes_sigwx_1070_100</entry_id>
+		<satellite_class>GOES-East</satellite_class>
+		<satellite>North Atlantic </satellite>
+		<image_type>IR(infra-red: 10.7)</image_type>
+		<static_url>http://www.weatheroffice.gc.ca/data/satellite/goes_sigwx_1070_100.jpg</static_url>
+		<animated_url>http://www.weatheroffice.gc.ca/satellite/animateweb_e.html?imagetype=satellite&amp;imagename=goes_sigwx_1070_m_..................jpg&amp;nbimages=1&amp;clf=1</animated_url>
+	</entry>
+
+	<entry>
+		<entry_id>goes_sigwx_visible_100</entry_id>
+		<satellite_class>GOES-East</satellite_class>
+		<satellite>North Atlantic </satellite>
+		<image_type>Visible</image_type>
+		<static_url>http://www.weatheroffice.gc.ca/data/satellite/goes_sigwx_visible_100.jpg</static_url>
+		<animated_url>http://www.weatheroffice.gc.ca/satellite/animateweb_e.html?imagetype=satellite&amp;imagename=goes_sigwx_visible_m_..................jpg&amp;nbimages=1&amp;clf=1</animated_url>
+	</entry>
+
+	<entry>
+		<entry_id>goes_sigwx_vvi_100</entry_id>
+		<satellite_class>GOES-East</satellite_class>
+		<satellite>North Atlantic </satellite>
+		<image_type>IR + Visible</image_type>
+		<static_url>http://www.weatheroffice.gc.ca/data/satellite/goes_sigwx_vvi_100.jpg</static_url>
+		<animated_url>http://www.weatheroffice.gc.ca/satellite/animateweb_e.html?imagetype=satellite&amp;imagename=goes_sigwx_vvi_m_..................jpg&amp;nbimages=1&amp;clf=1</animated_url>
+	</entry>
+
+	<entry>
+		<entry_id>goes_gedisk11_1070_100</entry_id>
+		<satellite_class>GOES-East</satellite_class>
+		<satellite>North and South America </satellite>
+		<image_type>IR(infra-red: 10.7)</image_type>
+		<static_url>http://www.weatheroffice.gc.ca/data/satellite/goes_gedisk11_1070_100.jpg</static_url>
+		<animated_url>http://www.weatheroffice.gc.ca/satellite/animateweb_e.html?imagetype=satellite&amp;imagename=goes_gedisk11_1070_m_..................jpg&amp;nbimages=1&amp;clf=1</animated_url>
+	</entry>
+
+	<entry>
+		<entry_id>goes_gedisk11_visible_100</entry_id>
+		<satellite_class>GOES-East</satellite_class>
+		<satellite>North and South America </satellite>
+		<image_type>Visible</image_type>
+		<static_url>http://www.weatheroffice.gc.ca/data/satellite/goes_gedisk11_visible_100.jpg</static_url>
+		<animated_url>http://www.weatheroffice.gc.ca/satellite/animateweb_e.html?imagetype=satellite&amp;imagename=goes_gedisk11_visible_m_..................jpg&amp;nbimages=1&amp;clf=1</animated_url>
+	</entry>
+
+	<entry>
+		<entry_id>goes_gedisk11_vvi_100</entry_id>
+		<satellite_class>GOES-East</satellite_class>
+		<satellite>North and South America </satellite>
+		<image_type>IR + Visible</image_type>
+		<static_url>http://www.weatheroffice.gc.ca/data/satellite/goes_gedisk11_vvi_100.jpg</static_url>
+		<animated_url>http://www.weatheroffice.gc.ca/satellite/animateweb_e.html?imagetype=satellite&amp;imagename=goes_gedisk11_vvi_m_..................jpg&amp;nbimages=1&amp;clf=1</animated_url>
+	</entry>
+
+	<entry>
+		<entry_id>goes_wcan_1070_100</entry_id>
+		<satellite_class>GOES-West</satellite_class>
+		<satellite>Western Canada </satellite>
+		<image_type>IR(infra-red: 10.7)</image_type>
+		<static_url>http://www.weatheroffice.gc.ca/data/satellite/goes_wcan_1070_100.jpg</static_url>
+		<animated_url>http://www.weatheroffice.gc.ca/satellite/animateweb_e.html?imagetype=satellite&amp;imagename=goes_wcan_1070_m_..................jpg&amp;nbimages=1&amp;clf=1</animated_url>
+	</entry>
+
+	<entry>
+		<entry_id>goes_wcan_visible_100</entry_id>
+		<satellite_class>GOES-West</satellite_class>
+		<satellite>Western Canada </satellite>
+		<image_type>Visible</image_type>
+		<static_url>http://www.weatheroffice.gc.ca/data/satellite/goes_wcan_visible_100.jpg</static_url>
+		<animated_url>http://www.weatheroffice.gc.ca/satellite/animateweb_e.html?imagetype=satellite&amp;imagename=goes_wcan_visible_m_..................jpg&amp;nbimages=1&amp;clf=1</animated_url>
+	</entry>
+
+	<entry>
+		<entry_id>goes_wcan_vvi_100</entry_id>
+		<satellite_class>GOES-West</satellite_class>
+		<satellite>Western Canada </satellite>
+		<image_type>IR + Visible</image_type>
+		<static_url>http://www.weatheroffice.gc.ca/data/satellite/goes_wcan_vvi_100.jpg</static_url>
+		<animated_url>http://www.weatheroffice.gc.ca/satellite/animateweb_e.html?imagetype=satellite&amp;imagename=goes_wcan_vvi_m_..................jpg&amp;nbimages=1&amp;clf=1</animated_url>
+	</entry>
+
+	<entry>
+		<entry_id>goes_wnam_1070_100</entry_id>
+		<satellite_class>GOES-West</satellite_class>
+		<satellite>Western North America </satellite>
+		<image_type>IR(infra-red: 10.7)</image_type>
+		<static_url>http://www.weatheroffice.gc.ca/data/satellite/goes_wnam_1070_100.jpg</static_url>
+		<animated_url>http://www.weatheroffice.gc.ca/satellite/animateweb_e.html?imagetype=satellite&amp;imagename=goes_wnam_1070_m_..................jpg&amp;nbimages=1&amp;clf=1</animated_url>
+	</entry>
+
+	<entry>
+		<entry_id>goes_wnam_visible_100</entry_id>
+		<satellite_class>GOES-West</satellite_class>
+		<satellite>Western North America </satellite>
+		<image_type>Visible</image_type>
+		<static_url>http://www.weatheroffice.gc.ca/data/satellite/goes_wnam_visible_100.jpg</static_url>
+		<animated_url>http://www.weatheroffice.gc.ca/satellite/animateweb_e.html?imagetype=satellite&amp;imagename=goes_wnam_visible_m_..................jpg&amp;nbimages=1&amp;clf=1</animated_url>
+	</entry>
+
+	<entry>
+		<entry_id>goes_wnam_vvi_100</entry_id>
+		<satellite_class>GOES-West</satellite_class>
+		<satellite>Western North America </satellite>
+		<image_type>IR + Visible</image_type>
+		<static_url>http://www.weatheroffice.gc.ca/data/satellite/goes_wnam_vvi_100.jpg</static_url>
+		<animated_url>http://www.weatheroffice.gc.ca/satellite/animateweb_e.html?imagetype=satellite&amp;imagename=goes_wnam_vvi_m_..................jpg&amp;nbimages=1&amp;clf=1</animated_url>
+	</entry>
+
+	<entry>
+		<entry_id>goes_pac_1070_100</entry_id>
+		<satellite_class>GOES-West</satellite_class>
+		<satellite>North Pacific </satellite>
+		<image_type>IR(infra-red: 10.7)</image_type>
+		<static_url>http://www.weatheroffice.gc.ca/data/satellite/goes_pac_1070_100.jpg</static_url>
+		<animated_url>http://www.weatheroffice.gc.ca/satellite/animateweb_e.html?imagetype=satellite&amp;imagename=goes_pac_1070_m_..................jpg&amp;nbimages=1&amp;clf=1</animated_url>
+	</entry>
+
+	<entry>
+		<entry_id>goes_pac_visible_100</entry_id>
+		<satellite_class>GOES-West</satellite_class>
+		<satellite>North Pacific </satellite>
+		<image_type>Visible</image_type>
+		<static_url>http://www.weatheroffice.gc.ca/data/satellite/goes_pac_visible_100.jpg</static_url>
+		<animated_url>http://www.weatheroffice.gc.ca/satellite/animateweb_e.html?imagetype=satellite&amp;imagename=goes_pac_visible_m_..................jpg&amp;nbimages=1&amp;clf=1</animated_url>
+	</entry>
+
+	<entry>
+		<entry_id>goes_pac_vvi_100</entry_id>
+		<satellite_class>GOES-West</satellite_class>
+		<satellite>North Pacific </satellite>
+		<image_type>IR + Visible</image_type>
+		<static_url>http://www.weatheroffice.gc.ca/data/satellite/goes_pac_vvi_100.jpg</static_url>
+		<animated_url>http://www.weatheroffice.gc.ca/satellite/animateweb_e.html?imagetype=satellite&amp;imagename=goes_pac_vvi_m_..................jpg&amp;nbimages=1&amp;clf=1</animated_url>
+	</entry>
+
+	<entry>
+		<entry_id>goes_gwdisk11_1070_100</entry_id>
+		<satellite_class>GOES-West</satellite_class>
+		<satellite>Pacific and North America </satellite>
+		<image_type>IR(infra-red: 10.7)</image_type>
+		<static_url>http://www.weatheroffice.gc.ca/data/satellite/goes_gwdisk11_1070_100.jpg</static_url>
+		<animated_url>http://www.weatheroffice.gc.ca/satellite/animateweb_e.html?imagetype=satellite&amp;imagename=goes_gwdisk11_1070_m_..................jpg&amp;nbimages=1&amp;clf=1</animated_url>
+	</entry>
+
+	<entry>
+		<entry_id>goes_gwdisk11_visible_100</entry_id>
+		<satellite_class>GOES-West</satellite_class>
+		<satellite>Pacific and North America </satellite>
+		<image_type>Visible</image_type>
+		<static_url>http://www.weatheroffice.gc.ca/data/satellite/goes_gwdisk11_visible_100.jpg</static_url>
+		<animated_url>http://www.weatheroffice.gc.ca/satellite/animateweb_e.html?imagetype=satellite&amp;imagename=goes_gwdisk11_visible_m_..................jpg&amp;nbimages=1&amp;clf=1</animated_url>
+	</entry>
+
+	<entry>
+		<entry_id>goes_gwdisk11_vvi_100</entry_id>
+		<satellite_class>GOES-West</satellite_class>
+		<satellite>Pacific and North America </satellite>
+		<image_type>IR + Visible</image_type>
+		<static_url>http://www.weatheroffice.gc.ca/data/satellite/goes_gwdisk11_vvi_100.jpg</static_url>
+		<animated_url>http://www.weatheroffice.gc.ca/satellite/animateweb_e.html?imagetype=satellite&amp;imagename=goes_gwdisk11_vvi_m_..................jpg&amp;nbimages=1&amp;clf=1</animated_url>
+	</entry>
+
+	<entry>
+		<entry_id>hrpt_dfo_ir_100</entry_id>
+		<satellite_class>HRPT (NOAA polar orbiting)</satellite_class>
+		<satellite>Northern Canada and Arctic Ocean </satellite>
+		<image_type>IR(infra-red: 11)</image_type>
+		<static_url>http://www.weatheroffice.gc.ca/data/satellite/hrpt_dfo_ir_100.jpg</static_url>
+		<animated_url>http://www.weatheroffice.gc.ca/satellite/animateweb_e.html?imagetype=satellite&amp;imagename=hrpt_dfo_ir_m_..................jpg&amp;nbimages=1&amp;clf=1</animated_url>
+	</entry>
+
+	<entry>
+		<entry_id>hrpt_dfo_nir_100</entry_id>
+		<satellite_class>HRPT (NOAA polar orbiting)</satellite_class>
+		<satellite>Northern Canada and Arctic Ocean </satellite>
+		<image_type>Visible</image_type>
+		<static_url>http://www.weatheroffice.gc.ca/data/satellite/hrpt_dfo_nir_100.jpg</static_url>
+		<animated_url>http://www.weatheroffice.gc.ca/satellite/animateweb_e.html?imagetype=satellite&amp;imagename=hrpt_dfo_nir_m_..................jpg&amp;nbimages=1&amp;clf=1</animated_url>
+	</entry>
+
+	<entry>
+		<entry_id>hrpt_canarc_ir_100</entry_id>
+		<satellite_class>HRPT (NOAA polar orbiting)</satellite_class>
+		<satellite>Canadian Arctic Composite</satellite>
+		<image_type>IR(infra-red: 10.7)</image_type>
+		<static_url>http://www.weatheroffice.gc.ca/data/satellite/hrpt_canarc_ir_100.jpg</static_url>
+		<animated_url>http://www.weatheroffice.gc.ca/satellite/animateweb_e.html?imagetype=satellite&amp;imagename=hrpt_canarc_ir_m_..................jpg&amp;nbimages=1&amp;clf=1</animated_url>
+	</entry>
+
+	<entry>
+		<entry_id>hrpt_canarc_nir_100</entry_id>
+		<satellite_class>HRPT (NOAA polar orbiting)</satellite_class>
+		<satellite>Canadian Arctic Composite</satellite>
+		<image_type>Visible</image_type>
+		<static_url>http://www.weatheroffice.gc.ca/data/satellite/hrpt_canarc_nir_100.jpg</static_url>
+		<animated_url>http://www.weatheroffice.gc.ca/satellite/animateweb_e.html?imagetype=satellite&amp;imagename=hrpt_canarc_nir_m_..................jpg&amp;nbimages=1&amp;clf=1</animated_url>
+	</entry>
+
+	<entry>
+		<entry_id>hrpt_yfb_ir_100</entry_id>
+		<satellite_class>HRPT (NOAA polar orbiting)</satellite_class>
+		<satellite>Baffin Island / Qikiqtaaluk </satellite>
+		<image_type>IR(infra-red: 10.7)</image_type>
+		<static_url>http://www.weatheroffice.gc.ca/data/satellite/hrpt_yfb_ir_100.jpg</static_url>
+		<animated_url>http://www.weatheroffice.gc.ca/satellite/animateweb_e.html?imagetype=satellite&amp;imagename=hrpt_yfb_ir_m_..................jpg&amp;nbimages=1&amp;clf=1</animated_url>
+	</entry>
+
+	<entry>
+		<entry_id>hrpt_yfb_nir_100</entry_id>
+		<satellite_class>HRPT (NOAA polar orbiting)</satellite_class>
+		<satellite>Baffin Island / Qikiqtaaluk </satellite>
+		<image_type>Visible</image_type>
+		<static_url>http://www.weatheroffice.gc.ca/data/satellite/hrpt_yfb_nir_100.jpg</static_url>
+		<animated_url>http://www.weatheroffice.gc.ca/satellite/animateweb_e.html?imagetype=satellite&amp;imagename=hrpt_yfb_nir_m_..................jpg&amp;nbimages=1&amp;clf=1</animated_url>
+	</entry>
+
+	<entry>
+		<entry_id>hrpt_ykn_ir_100</entry_id>
+		<satellite_class>HRPT (NOAA polar orbiting)</satellite_class>
+		<satellite>Yukon </satellite>
+		<image_type>IR(infra-red: 10.7)</image_type>
+		<static_url>http://www.weatheroffice.gc.ca/data/satellite/hrpt_ykn_ir_100.jpg</static_url>
+		<animated_url>http://www.weatheroffice.gc.ca/satellite/animateweb_e.html?imagetype=satellite&amp;imagename=hrpt_ykn_ir_m_..................jpg&amp;nbimages=1&amp;clf=1</animated_url>
+	</entry>
+
+	<entry>
+		<entry_id>hrpt_ykn_nir_100</entry_id>
+		<satellite_class>HRPT (NOAA polar orbiting)</satellite_class>
+		<satellite>Yukon </satellite>
+		<image_type>Visible</image_type>
+		<static_url>http://www.weatheroffice.gc.ca/data/satellite/hrpt_ykn_nir_100.jpg</static_url>
+		<animated_url>http://www.weatheroffice.gc.ca/satellite/animateweb_e.html?imagetype=satellite&amp;imagename=hrpt_ykn_nir_m_..................jpg&amp;nbimages=1&amp;clf=1</animated_url>
+	</entry>
+
+	<entry>
+		<entry_id>hrpt_ykn_03_100</entry_id>
+		<satellite_class>HRPT (NOAA polar orbiting)</satellite_class>
+		<satellite>Yukon </satellite>
+		<image_type>3</image_type>
+		<static_url>http://www.weatheroffice.gc.ca/data/satellite/hrpt_ykn_03_100.jpg</static_url>
+		<animated_url>http://www.weatheroffice.gc.ca/satellite/animateweb_e.html?imagetype=satellite&amp;imagename=hrpt_ykn_03_m_..................jpg&amp;nbimages=1&amp;clf=1</animated_url>
+	</entry>
+
+	<entry>
+		<entry_id>hrpt_yrb_ir_100</entry_id>
+		<satellite_class>HRPT (NOAA polar orbiting)</satellite_class>
+		<satellite>Northern Nunavut </satellite>
+		<image_type>IR(infra-red: 10.7)</image_type>
+		<static_url>http://www.weatheroffice.gc.ca/data/satellite/hrpt_yrb_ir_100.jpg</static_url>
+		<animated_url>http://www.weatheroffice.gc.ca/satellite/animateweb_e.html?imagetype=satellite&amp;imagename=hrpt_yrb_ir_m_..................jpg&amp;nbimages=1&amp;clf=1</animated_url>
+	</entry>
+
+	<entry>
+		<entry_id>hrpt_yrb_nir_100</entry_id>
+		<satellite_class>HRPT (NOAA polar orbiting)</satellite_class>
+		<satellite>Northern Nunavut </satellite>
+		<image_type>Visible</image_type>
+		<static_url>http://www.weatheroffice.gc.ca/data/satellite/hrpt_yrb_nir_100.jpg</static_url>
+		<animated_url>http://www.weatheroffice.gc.ca/satellite/animateweb_e.html?imagetype=satellite&amp;imagename=hrpt_yrb_nir_m_..................jpg&amp;nbimages=1&amp;clf=1</animated_url>
+	</entry>
+
+	<entry>
+		<entry_id>hrpt_wel_ir_100</entry_id>
+		<satellite_class>HRPT (NOAA polar orbiting)</satellite_class>
+		<satellite>Northwest Territories / Kivalliq / Kitikmeot </satellite>
+		<image_type>IR(infra-red: 10.7)</image_type>
+		<static_url>http://www.weatheroffice.gc.ca/data/satellite/hrpt_wel_ir_100.jpg</static_url>
+		<animated_url>http://www.weatheroffice.gc.ca/satellite/animateweb_e.html?imagetype=satellite&amp;imagename=hrpt_wel_ir_m_..................jpg&amp;nbimages=1&amp;clf=1</animated_url>
+	</entry>
+
+	<entry>
+		<entry_id>hrpt_wel_nir_100</entry_id>
+		<satellite_class>HRPT (NOAA polar orbiting)</satellite_class>
+		<satellite>Northwest Territories / Kivalliq / Kitikmeot </satellite>
+		<image_type>Visible</image_type>
+		<static_url>http://www.weatheroffice.gc.ca/data/satellite/hrpt_wel_nir_100.jpg</static_url>
+		<animated_url>http://www.weatheroffice.gc.ca/satellite/animateweb_e.html?imagetype=satellite&amp;imagename=hrpt_wel_nir_m_..................jpg&amp;nbimages=1&amp;clf=1</animated_url>
+	</entry>
+
+	<entry>
+		<entry_id>hrpt_pry_03_100</entry_id>
+		<satellite_class>HRPT (NOAA polar orbiting)</satellite_class>
+		<satellite>Prairie </satellite>
+		<image_type>3</image_type>
+		<static_url>http://www.weatheroffice.gc.ca/data/satellite/hrpt_pry_03_100.jpg</static_url>
+		<animated_url>http://www.weatheroffice.gc.ca/satellite/animateweb_e.html?imagetype=satellite&amp;imagename=hrpt_pry_03_m_..................jpg&amp;nbimages=1&amp;clf=1</animated_url>
+	</entry>
+
+	<entry>
+		<entry_id>hrpt_emar_ir_100</entry_id>
+		<satellite_class>HRPT (NOAA polar orbiting)</satellite_class>
+		<satellite>Atlantic Canada </satellite>
+		<image_type>IR(infra-red: 11)</image_type>
+		<static_url>http://www.weatheroffice.gc.ca/data/satellite/hrpt_emar_ir_100.jpg</static_url>
+		<animated_url>http://www.weatheroffice.gc.ca/satellite/animateweb_e.html?imagetype=satellite&amp;imagename=hrpt_emar_ir_m_..................jpg&amp;nbimages=1&amp;clf=1</animated_url>
+	</entry>
+
+	<entry>
+		<entry_id>hrpt_emar_vis_100</entry_id>
+		<satellite_class>HRPT (NOAA polar orbiting)</satellite_class>
+		<satellite>Atlantic Canada </satellite>
+		<image_type>Visible</image_type>
+		<static_url>http://www.weatheroffice.gc.ca/data/satellite/hrpt_emar_vis_100.jpg</static_url>
+		<animated_url>http://www.weatheroffice.gc.ca/satellite/animateweb_e.html?imagetype=satellite&amp;imagename=hrpt_emar_vis_m_..................jpg&amp;nbimages=1&amp;clf=1</animated_url>
+	</entry>
+
+	<entry>
+		<entry_id>hrpt_nque_ir_100</entry_id>
+		<satellite_class>HRPT (NOAA polar orbiting)</satellite_class>
+		<satellite>Quebec and Labrador </satellite>
+		<image_type>IR(infra-red: 11)</image_type>
+		<static_url>http://www.weatheroffice.gc.ca/data/satellite/hrpt_nque_ir_100.jpg</static_url>
+		<animated_url>http://www.weatheroffice.gc.ca/satellite/animateweb_e.html?imagetype=satellite&amp;imagename=hrpt_nque_ir_m_..................jpg&amp;nbimages=1&amp;clf=1</animated_url>
+	</entry>
+
+	<entry>
+		<entry_id>hrpt_nque_vis_100</entry_id>
+		<satellite_class>HRPT (NOAA polar orbiting)</satellite_class>
+		<satellite>Quebec and Labrador </satellite>
+		<image_type>Visible</image_type>
+		<static_url>http://www.weatheroffice.gc.ca/data/satellite/hrpt_nque_vis_100.jpg</static_url>
+		<animated_url>http://www.weatheroffice.gc.ca/satellite/animateweb_e.html?imagetype=satellite&amp;imagename=hrpt_nque_vis_m_..................jpg&amp;nbimages=1&amp;clf=1</animated_url>
+	</entry>
+
+	<entry>
+		<entry_id>hrpt_ont1_ir_100</entry_id>
+		<satellite_class>HRPT (NOAA polar orbiting)</satellite_class>
+		<satellite>Ontario </satellite>
+		<image_type>IR(infra-red: 11)</image_type>
+		<static_url>http://www.weatheroffice.gc.ca/data/satellite/hrpt_ont1_ir_100.jpg</static_url>
+		<animated_url>http://www.weatheroffice.gc.ca/satellite/animateweb_e.html?imagetype=satellite&amp;imagename=hrpt_ont1_ir_m_..................jpg&amp;nbimages=1&amp;clf=1</animated_url>
+	</entry>
+
+	<entry>
+		<entry_id>hrpt_ont1_vis_100</entry_id>
+		<satellite_class>HRPT (NOAA polar orbiting)</satellite_class>
+		<satellite>Ontario </satellite>
+		<image_type>Visible</image_type>
+		<static_url>http://www.weatheroffice.gc.ca/data/satellite/hrpt_ont1_vis_100.jpg</static_url>
+		<animated_url>http://www.weatheroffice.gc.ca/satellite/animateweb_e.html?imagetype=satellite&amp;imagename=hrpt_ont1_vis_m_..................jpg&amp;nbimages=1&amp;clf=1</animated_url>
+	</entry>
+
+</maplist>
