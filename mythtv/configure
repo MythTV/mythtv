@@ -2689,6 +2689,7 @@ if ! enabled xv; then
 fi
 
 VENDOR_XVMC_LIBS=""
+has_header X11/extensions/XvMClib.h || disable xvmc
 if enabled xvmc; then
     disable xvmc
     has_library libXvMCW || disable xvmcw
