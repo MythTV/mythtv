@@ -10,11 +10,11 @@ PFNGLPROGRAMENVPARAMETER4FARBPROC   gMythGLProgramEnvParameter4fARB  = NULL;
 PFNGLDELETEPROGRAMSARBPROC          gMythGLDeleteProgramsARB         = NULL;
 PFNGLGETPROGRAMIVARBPROC            gMythGLGetProgramivARB           = NULL;
 
-PFNGLGENFRAMEBUFFERSEXTPROC         gMythGLGenFramebuffersEXT        = NULL;
-PFNGLBINDFRAMEBUFFEREXTPROC         gMythGLBindFramebufferEXT        = NULL;
-PFNGLFRAMEBUFFERTEXTURE2DEXTPROC    gMythGLFramebufferTexture2DEXT   = NULL;
-PFNGLCHECKFRAMEBUFFERSTATUSEXTPROC  gMythGLCheckFramebufferStatusEXT = NULL;
-PFNGLDELETEFRAMEBUFFERSEXTPROC      gMythGLDeleteFramebuffersEXT     = NULL;
+MYTH_GLGENFRAMEBUFFERSEXTPROC         gMythGLGenFramebuffersEXT        = NULL;
+MYTH_GLBINDFRAMEBUFFEREXTPROC         gMythGLBindFramebufferEXT        = NULL;
+MYTH_GLFRAMEBUFFERTEXTURE2DEXTPROC    gMythGLFramebufferTexture2DEXT   = NULL;
+MYTH_GLCHECKFRAMEBUFFERSTATUSEXTPROC  gMythGLCheckFramebufferStatusEXT = NULL;
+MYTH_GLDELETEFRAMEBUFFERSEXTPROC      gMythGLDeleteFramebuffersEXT     = NULL;
 
 PFNGLXGETVIDEOSYNCSGIPROC           gMythGLXGetVideoSyncSGI          = NULL;
 PFNGLXWAITVIDEOSYNCSGIPROC          gMythGLXWaitVideoSyncSGI         = NULL;
@@ -43,16 +43,16 @@ bool init_opengl(void)
     gMythGLGetProgramivARB = (PFNGLGETPROGRAMIVARBPROC)
         get_gl_proc_address("glGetProgramivARB");
 
-    gMythGLGenFramebuffersEXT = (PFNGLGENFRAMEBUFFERSEXTPROC)
+    gMythGLGenFramebuffersEXT = (MYTH_GLGENFRAMEBUFFERSEXTPROC)
         get_gl_proc_address("glGenFramebuffersEXT");
-    gMythGLBindFramebufferEXT = (PFNGLBINDFRAMEBUFFEREXTPROC)
+    gMythGLBindFramebufferEXT = (MYTH_GLBINDFRAMEBUFFEREXTPROC)
         get_gl_proc_address("glBindFramebufferEXT");
-    gMythGLFramebufferTexture2DEXT = (PFNGLFRAMEBUFFERTEXTURE2DEXTPROC)
+    gMythGLFramebufferTexture2DEXT = (MYTH_GLFRAMEBUFFERTEXTURE2DEXTPROC)
         get_gl_proc_address("glFramebufferTexture2DEXT");
     gMythGLCheckFramebufferStatusEXT =
-        (PFNGLCHECKFRAMEBUFFERSTATUSEXTPROC)
+        (MYTH_GLCHECKFRAMEBUFFERSTATUSEXTPROC)
         get_gl_proc_address("glCheckFramebufferStatusEXT");
-    gMythGLDeleteFramebuffersEXT = (PFNGLDELETEFRAMEBUFFERSEXTPROC)
+    gMythGLDeleteFramebuffersEXT = (MYTH_GLDELETEFRAMEBUFFERSEXTPROC)
         get_gl_proc_address("glDeleteFramebuffersEXT");
 
     gMythGLXGetVideoSyncSGI = (PFNGLXGETVIDEOSYNCSGIPROC)
