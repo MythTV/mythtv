@@ -2156,7 +2156,8 @@ static uint update_channel_basic(uint    sourceid,   bool    insert,
     MSqlQuery query(MSqlQuery::DDCon());
     query.prepare("SELECT chanid, callsign, name "
                   "FROM channel "
-                  "WHERE sourceid = :SOURCEID AND xmltvid = 0 AND "
+                  "WHERE sourceid = :SOURCEID AND "
+                  "      ( xmltvid = '0' OR xmltvid = '') AND "
                   "      ( channum = :CHANNUM OR "
                   "        ( freqid  = :FREQID AND "
                   "          freqid != '0'     AND "

@@ -859,7 +859,7 @@ int ChannelUtil::GetChanID(int mplexid,       int service_transport_id,
                   "FROM dtv_multiplex "
                   "WHERE mplexid = :MPLEXID");
     query.bindValue(":MPLEXID", mplexid);
-    if (!query.exec() || !query.isActive() || !query.size())
+    if (!query.exec())
     {
         MythContext::DBError("Selecting channel/dtv_multiplex 2", query);
         return -1;
@@ -869,9 +869,10 @@ int ChannelUtil::GetChanID(int mplexid,       int service_transport_id,
 
     int source_id = query.value(0).toInt();
 
-    QString qstr[] = 
-    {
-        // find a proper ATSC channel
+    QStringList qstr;
+
+    // find a proper ATSC channel
+    qstr.push_back(
         QString("SELECT chanid FROM channel,dtv_multiplex "
                 "WHERE channel.sourceid          = %1 AND "
                 "      atsc_major_chan           = %2 AND "
@@ -881,28 +882,29 @@ int ChannelUtil::GetChanID(int mplexid,       int service_transport_id,
                 "      dtv_multiplex.sourceid    = channel.sourceid AND "
                 "      dtv_multiplex.mplexid     = channel.mplexid")
         .arg(source_id).arg(major_channel).arg(minor_channel)
-        .arg(service_transport_id).arg(mplexid),
+        .arg(service_transport_id).arg(mplexid));
 
-        // Find manually inserted/edited channels in order of scariness.
-
-        // find renamed channel, where atsc is valid
+    // Find manually inserted/edited channels in order of scariness.
+    // find renamed channel, where atsc is valid
+    qstr.push_back(
         QString("SELECT chanid FROM channel "
                 "WHERE sourceid=%1 AND "
                 "atsc_major_chan=%2 AND "
                 "atsc_minor_chan=%3")
-        .arg(source_id).arg(major_channel).arg(minor_channel),
+        .arg(source_id).arg(major_channel).arg(minor_channel));
+
         // find based on mpeg program number and mplexid alone
+    qstr.push_back(
         QString("SELECT chanid FROM channel "
                 "WHERE sourceid=%1 AND serviceID=%1 AND mplexid=%2")
-        .arg(source_id).arg(program_number).arg(mplexid),
-    };
+        .arg(source_id).arg(program_number).arg(mplexid));
 
-    for (uint i = 0; i < 6; i++)
+    for (uint i = 0; i < qstr.size(); i++)
     {
         query.prepare(qstr[i]);
-        if (!query.exec() || !query.isActive())
+        if (!query.exec())
             MythContext::DBError("Selecting channel/dtv_multiplex 3", query);
-        if (query.next())
+        else if (query.next())
             return query.value(0).toInt();
     }
 
@@ -1101,25 +1103,34 @@ bool ChannelUtil::UpdateChannel(uint db_mplexid,
                                 QString xmltvid,
                                 QString default_authority)
 {
-    MSqlQuery query(MSqlQuery::InitCon());
+    if (!channel_id)
+        return false;
 
-    query.prepare(
+    QString tvformat = (atsc_minor_channel > 0) ? "ATSC" : format;
+    bool set_channum = !chan_num.isEmpty() && chan_num != "-1";
+    QString qstr = QString(
         "UPDATE channel "
-        "SET mplexid         = :MPLEXID,   serviceid       = :SERVICEID, "
+        "SET %1 %2 %3 %4 %5 %6"
+        "    mplexid         = :MPLEXID,   serviceid       = :SERVICEID, "
         "    atsc_major_chan = :MAJORCHAN, atsc_minor_chan = :MINORCHAN, "
         "    callsign        = :CALLSIGN,  name            = :NAME,      "
-        "    channum         = :CHANNUM,   freqid          = :FREQID,    "
-        "    tvformat        = :TVFORMAT,  sourceid        = :SOURCEID,  "
-        "    useonairguide   = :USEOAG,    visible         = :VISIBLE,   "
-        "    tvformat        = :TVFORMAT,  icon            = :ICON,      "
-        "    xmltvid         = :XMLTVID,   channum         = :CHANNUM,   "
-        "    default_authority = :AUTHORITY "
-        "WHERE chanid=:CHANID");
+        "    sourceid        = :SOURCEID,  useonairguide   = :USEOAG,    "
+        "    visible         = :VISIBLE "
+        "WHERE chanid=:CHANID")
+        .arg((!set_channum)       ? "" : "channum  = :CHANNUM,  ")
+        .arg((freqid.isEmpty())   ? "" : "freqid   = :FREQID,   ")
+        .arg((icon.isEmpty())     ? "" : "icon     = :ICON,     ")
+        .arg((tvformat.isEmpty()) ? "" : "tvformat = :TVFORMAT, ")
+        .arg((xmltvid.isEmpty())  ? "" : "xmltvid  = :XMLTVID,  ")
+        .arg((default_authority.isEmpty()) ?
+             "" : "default_authority = :AUTHORITY,");
 
-    if (channel_id > 0)
-        query.bindValue(":CHANID", channel_id);
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare(qstr);
 
-    if (!chan_num.isEmpty() && chan_num != "-1")
+    query.bindValue(":CHANID", channel_id);
+
+    if (set_channum)
         query.bindValue(":CHANNUM", chan_num.utf8());
 
     query.bindValue(":SOURCEID",  source_id);
@@ -1138,7 +1149,6 @@ bool ChannelUtil::UpdateChannel(uint db_mplexid,
     if (!freqid.isEmpty())
         query.bindValue(":FREQID",    freqid);
 
-    QString tvformat = (atsc_minor_channel > 0) ? "ATSC" : format;
     if (!tvformat.isEmpty())
         query.bindValue(":TVFORMAT",  tvformat);
 
@@ -1149,7 +1159,7 @@ bool ChannelUtil::UpdateChannel(uint db_mplexid,
     if (!default_authority.isEmpty())
         query.bindValue(":AUTHORITY",   default_authority);
 
-    if (!query.exec() || !query.isActive())
+    if (!query.exec())
     {
         MythContext::DBError("Updating Service", query);
         return false;
