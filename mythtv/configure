@@ -166,7 +166,7 @@ show_help(){
   echo "  --enable-xvmc-opengl     enable nVidia XvMC OpenGL texture method"
   echo "  --xvmc-lib=LIB           XvMC library override (for crosscompiling)"
   #echo "  --disable-xvmc-vld       disable XvMC-VLD (VIA Epia MPEG accel.)"
-  echo "  --enable-opengl-video   disable opengl based video display "
+  echo "  --enable-opengl-video    enable opengl based video display "
   echo "  --enable-mac-accel       enable Mac OS X MPEG acceleration"
   echo "  --enable-opengl-vsync    enable OpenGL vsync method"
   echo "  --disable-directfb       disable DirectFB (Linux non-X11 video)"
