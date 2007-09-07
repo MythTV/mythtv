@@ -1367,14 +1367,35 @@ inline bool lt_smart(const DBChannel &a, const DBChannel &b)
     int a_minor = a.minor_chan;
     int b_minor = b.minor_chan;
 
+    // Extract minor and major numbers from channum..
+    const QRegExp sepExpr("(_|-|#|\\.)");
+    bool tmp1, tmp2;
+    int idx = a.channum.find(sepExpr);
+    if (idx >= 0)
+    {
+        int major = a.channum.left(idx).toUInt(&tmp1);
+        int minor = a.channum.mid(idx+1).toUInt(&tmp2);
+        if (tmp1 && tmp2)
+            (a_major = major), (a_minor = minor), (isIntA = false);
+    }
+
+    idx = b.channum.find(sepExpr);
+    if (idx >= 0)
+    {
+        int major = b.channum.left(idx).toUInt(&tmp1);
+        int minor = b.channum.mid(idx+1).toUInt(&tmp2);
+        if (tmp1 && tmp2)
+            (b_major = major), (b_minor = minor), (isIntB = false);
+    }
+
     // If ATSC channel has been renumbered, sort by new channel number
-    if ((a_minor > 0) && a_int)
+    if ((a_minor > 0) && isIntA)
     {
         int atsc_int = (QString("%1%2").arg(a_major).arg(a_minor)).toInt();
         a_minor = (atsc_int == a_int) ? a_minor : 0;
     }
 
-    if ((b_minor > 0) && b_int)
+    if ((b_minor > 0) && isIntB)
     {
         int atsc_int = (QString("%1%2").arg(b_major).arg(b_minor)).toInt();
         b_minor = (atsc_int == b_int) ? b_minor : 0;
@@ -1408,7 +1429,7 @@ inline bool lt_smart(const DBChannel &a, const DBChannel &b)
     }
     else
     {
-        // one of channels does not have a numeric channum
+        // neither of channels have a numeric channum
         cmp = QString::localeAwareCompare(a.channum, b.channum);
         if (cmp)
             return cmp < 0;
