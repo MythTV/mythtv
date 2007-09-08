@@ -196,8 +196,6 @@ void MythNews::loadTheme()
                     m_ArticlesRect = area;
                 else if (name.lower() == "info")
                     m_InfoRect = area;
-                else if (name.lower() == "icons")
-                    m_StatusRect = area;
             }
             else {
                 std::cerr << "Unknown element: " << e.tagName()
@@ -254,8 +252,6 @@ void MythNews::paintEvent(QPaintEvent *e)
         updateArticlesView();
     if (r.intersects(m_InfoRect))
         updateInfoView();
-    if (r.intersects(m_StatusRect))
-        updateStatusView();
 }
 
 void MythNews::updateBackground(void)
@@ -325,81 +321,6 @@ void MythNews::updateArticlesView()
            &pix, 0, 0, -1, -1, Qt::CopyROP);
 }
 
-void MythNews::updateStatusView()
-{
-    QPixmap pix(m_StatusRect.size());
-    pix.fill(this, m_StatusRect.topLeft());
-    QPainter p(&pix);
-
-    LayerSet* container = m_Theme->GetSet("icons");
-    if (container)
-    {
-        NewsSite    *site     = 0;
-        NewsArticle *article  = 0;
-
-        UIListBtnTypeItem *siteUIItem = m_UISites->GetItemCurrent();
-        if (siteUIItem && siteUIItem->getData()) 
-            site = (NewsSite*) siteUIItem->getData();
-        
-        UIListBtnTypeItem *articleUIItem = m_UIArticles->GetItemCurrent();
-        if (articleUIItem && articleUIItem->getData())
-            article = (NewsArticle*) articleUIItem->getData();
-
-        UIImageType *itype = (UIImageType *)container->GetType("enclosures");
-        if (itype)
-        {
-            // if (!itype->isHidden())
-            //     itype->hide();
-            if ((article) && (m_InColumn == 1))
-            {
-                if (article->enclosure())
-                {
-                    if (itype->isHidden())
-                        itype->show();
-                } else {
-                    itype->hide();
-                }
-            } else {
-                itype->hide(); 
-            }
-        }
-
-        UIImageType *dtype = (UIImageType *)container->GetType("download");
-        if (dtype)
-        {
-            // if (!dtype->isHidden())
-            //     dtype->hide();
-            if ((article) && (m_InColumn == 1))
-            {
-                if (article->enclosure())
-                {
-                    if (dtype->isHidden())
-                        dtype->show();
-                } else {
-                    dtype->hide(); 
-                }
-            } else {
-                dtype->hide(); 
-            }
-        }
-
-        container->Draw(&p, 0, 0);
-        container->Draw(&p, 1, 0);
-        container->Draw(&p, 2, 0);
-        container->Draw(&p, 3, 0);
-        container->Draw(&p, 4, 0);
-        container->Draw(&p, 5, 0);
-        container->Draw(&p, 6, 0);
-        container->Draw(&p, 7, 0);
-        container->Draw(&p, 8, 0);
-    }
-
-    p.end();
-
-    bitBlt(this, m_StatusRect.left(), m_StatusRect.top(),
-           &pix, 0, 0, -1, -1, Qt::CopyROP);
-}
-
 void MythNews::updateInfoView()
 {
     QPixmap pix(m_InfoRect.size());
@@ -415,13 +336,13 @@ void MythNews::updateInfoView()
         UIListBtnTypeItem *siteUIItem = m_UISites->GetItemCurrent();
         if (siteUIItem && siteUIItem->getData()) 
             site = (NewsSite*) siteUIItem->getData();
-        
+
         UIListBtnTypeItem *articleUIItem = m_UIArticles->GetItemCurrent();
         if (articleUIItem && articleUIItem->getData())
             article = (NewsArticle*) articleUIItem->getData();
-        
-        if (m_InColumn == 1) {
 
+        if (m_InColumn == 1) 
+        {
             if (article)
             {
                 UITextType *ttype =
@@ -478,9 +399,8 @@ void MythNews::updateInfoView()
                         dir.mkdir(fileprefix);
 
                     QString url = article->thumbnail();
-                    // VERBOSE(VB_GENERAL, QString("MythNews: Thumbnail url %1").arg(url));
-                    QString sFilename = QString("%1/%2").arg(fileprefix).arg(qChecksum(url,url.length()));
-                    // VERBOSE(VB_GENERAL, QString("MythNews: Thumbnail filename %1").arg(sFilename));
+                    QString sFilename = QString("%1/%2")
+                            .arg(fileprefix).arg(qChecksum(url,url.length()));
 
                     bool exists = QFile::exists(sFilename);
                     if (!exists)
@@ -495,16 +415,46 @@ void MythNews::updateInfoView()
                        if (itype->isHidden())
                            itype->show();
                     }
-                } else {
-                    UIImageType *itype = (UIImageType *)container->GetType("thumbnail");
-                    if (itype)
+                }
+                else
+                {
+                    if (site->imageURL())
                     {
-                        itype->hide();
+                        QString fileprefix = MythContext::GetConfDir();
+
+                        QDir dir(fileprefix);
+                        if (!dir.exists())
+                            dir.mkdir(fileprefix);
+
+                        fileprefix += "/MythNews/scache";
+
+                        dir = QDir(fileprefix);
+                        if (!dir.exists())
+                            dir.mkdir(fileprefix);
+
+                        QString sitename = site->name();
+                        QString sFilename(fileprefix + "/" + sitename + ".jpg");
+                        QString url = site->imageURL();
+
+                        bool exists = QFile::exists(sFilename);
+                        if (!exists)
+                            HttpComms::getHttpFile(sFilename, url, 20000);
+
+                        UIImageType *itype = (UIImageType *)container->GetType("thumbnail");
+                        if (itype)
+                        {
+                        itype->SetImage(sFilename);
+                        itype->LoadImage();
+
+                        if (itype->isHidden())
+                            itype->show();
+                        }
                     }
                 }
             }
         }
-        else {
+        else
+        {
             UIImageType *itype = (UIImageType *)container->GetType("thumbnail");
             if (itype)
             {
@@ -555,7 +505,6 @@ void MythNews::updateInfoView()
                            itype->show();
                     }
                 }
-
             }
         }
 
@@ -583,10 +532,47 @@ void MythNews::updateInfoView()
                 if ((progress > 0) && (total > 0) && (progress < total))
                 {
                     float fProgress = (float)progress/total;
-                    QString text = QString("%1 of %2 (%3 percent)").arg(progress).arg(total).arg(floor(fProgress*100));
+                    QString text = QString("%1 of %2 (%3 percent)")
+                            .arg(formatSize(progress, 2))
+                            .arg(formatSize(total, 2))
+                            .arg(floor(fProgress*100));
                     ttype->SetText(text);
                 }
             }
+        }
+
+        UIImageType *itype = (UIImageType *)container->GetType("enclosures");
+        if (itype)
+        {
+            if ((article) && (m_InColumn == 1))
+            {
+                if (article->enclosure())
+                {
+                    if (itype->isHidden())
+                        itype->show();
+                } else {
+                    itype->hide();
+                }
+            } else {
+                itype->hide(); 
+            }
+        }
+
+        UIImageType *dtype = (UIImageType *)container->GetType("download");
+        if (dtype)
+        {
+            if ((article) && (m_InColumn == 1))
+            {
+                if (article->enclosure())
+                {
+                    if (dtype->isHidden())
+                        dtype->show();
+                }
+                else 
+                    dtype->hide();
+            }
+            else
+                dtype->hide();
         }
 
         container->Draw(&p, 0, 0);
@@ -605,6 +591,29 @@ void MythNews::updateInfoView()
 
     bitBlt(this, m_InfoRect.left(), m_InfoRect.top(),
            &pix, 0, 0, -1, -1, Qt::CopyROP);
+}
+
+QString MythNews::formatSize(long long bytes, int prec)
+{
+    long long sizeKB = bytes / 1024;
+
+    if (sizeKB>1024*1024*1024) // Terabytes
+    {
+        double sizeGB = sizeKB/(1024*1024*1024.0);
+        return QString("%1 TB").arg(sizeGB, 0, 'f', (sizeGB>10)?0:prec);
+    }
+    else if (sizeKB>1024*1024) // Gigabytes
+    {
+        double sizeGB = sizeKB/(1024*1024.0);
+        return QString("%1 GB").arg(sizeGB, 0, 'f', (sizeGB>10)?0:prec);
+    }
+    else if (sizeKB>1024) // Megabytes
+    {
+        double sizeMB = sizeKB/1024.0;
+        return QString("%1 MB").arg(sizeMB, 0, 'f', (sizeMB>10)?0:prec);
+    }
+    // Kilobytes
+    return QString("%1 KB").arg(sizeKB);
 }
 
 void MythNews::keyPressEvent(QKeyEvent *e)
@@ -688,7 +697,6 @@ void MythNews::cursorRight()
     update(m_SitesRect);
     update(m_ArticlesRect);
     update(m_InfoRect);
-    update(m_StatusRect);
 }
 
 void MythNews::cursorLeft()
@@ -707,7 +715,6 @@ void MythNews::cursorLeft()
     update(m_SitesRect);
     update(m_ArticlesRect);
     update(m_InfoRect);
-    update(m_StatusRect);
 }
 
 void MythNews::slotRetrieveNews()
@@ -809,7 +816,6 @@ void MythNews::slotArticleSelected(UIListBtnTypeItem*)
 {
     update(m_ArticlesRect);
     update(m_InfoRect);
-    update(m_StatusRect);
 }
 
 void MythNews::slotProgressCancelled()
@@ -942,10 +948,8 @@ void MythNews::slotViewArticle()
                 if (getHttpFile(sFilename, cmdURL))
                 {
                     qApp->unlock();
-                    QString handler = "Internal";
-                    gContext->GetMainWindow()->HandleMedia(handler, sFilename);
+                    playVideo(sFilename);
                     qApp->lock();
-                    // myth_system(QString("mplayer -fs %1").arg(sFilename));
                 }
             } else {
                 QString cmdUrl(article->articleURL());
@@ -1177,4 +1181,24 @@ bool MythNews::removeFromDB(const QString &name)
     }
 
     return (query.numRowsAffected() > 0);
+}
+
+void MythNews::playVideo(const QString &filename)
+{
+    QString command_string = gContext->GetSetting("VideoDefaultPlayer");
+
+    if ((command_string.find("Internal", 0, false) > -1) ||
+        (command_string.length() < 1))
+    {
+        command_string = "Internal";
+        gContext->GetMainWindow()->HandleMedia(command_string, filename);
+        return;
+    }
+    else
+    {
+        if (command_string.contains("%s"))
+            command_string = command_string.replace(QRegExp("%s"), filename);
+
+        myth_system(command_string);
+    }
 }

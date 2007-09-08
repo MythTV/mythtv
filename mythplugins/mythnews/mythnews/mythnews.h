@@ -68,8 +68,7 @@ private:
     void updateSitesView();
     void updateArticlesView();
     void updateInfoView();
-    void updateStatusView();
-    
+
     void keyPressEvent(QKeyEvent *e);
     void cursorUp(bool page=false);
     void cursorDown(bool page=false);
@@ -88,6 +87,8 @@ private:
     bool getHttpFile(QString sFilename, QString cmdURL);
     void createProgress(QString title);
     void createProgress(QString title, int total);
+    QString formatSize(long long bytes, int prec);
+    void playVideo(const QString &filename);
 
     XMLParse      *m_Theme;
 
@@ -98,7 +99,6 @@ private:
     QRect          m_SitesRect;
     QRect          m_ArticlesRect;
     QRect          m_InfoRect;
-    QRect          m_StatusRect;
     unsigned int   m_InColumn;
 
     NewsSite::List m_NewsSites;

@@ -70,21 +70,6 @@
 
     </container>
 
-    <container name="icons">
-      <area>330,280,300,40</area>
-
-      <image name="enclosures" draworder="1">
-        <filename>enclosures.png</filename>
-        <position>0,5</position>
-        <staticsize>32,32</staticsize>
-      </image>
-      <image name="download" draworder="1">
-        <filename>need-download.png</filename>
-        <position>40,5</position>
-        <staticsize>32,32</staticsize>
-      </image>
-    </container>
-
     <container name="info"> 
 
       <area>0,340,800,260</area>
@@ -96,7 +81,7 @@
       </textarea>
 
       <textarea name="description" draworder="1">
-        <area>20,75,640,150</area>
+        <area>20,70,625,150</area>
         <font>desc</font>
         <multiline>yes</multiline>
       </textarea>
@@ -113,8 +98,20 @@
       </textarea>
 
       <image name="thumbnail" draworder="2">
-        <position>660,50</position>
+        <position>660,75</position>
         <staticsize>120,90</staticsize>
+      </image>
+
+      <image name="enclosures" draworder="1">
+        <filename>enclosures.png</filename>
+        <position>685,170</position>
+        <staticsize>32,32</staticsize>
+      </image>
+
+      <image name="download" draworder="1">
+        <filename>need-download.png</filename>
+        <position>720,170</position>
+        <staticsize>32,32</staticsize>
       </image>
 
     </container>

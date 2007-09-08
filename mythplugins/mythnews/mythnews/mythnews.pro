@@ -1,6 +1,6 @@
 include ( ../../mythconfig.mak )
 include ( ../../settings.pro )
-
+ 
 TEMPLATE = lib
 CONFIG += plugin thread warn_on debug
 TARGET = mythnews
