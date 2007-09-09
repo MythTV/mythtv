@@ -274,6 +274,7 @@ ProgInfo *XMLTVParser::parseProgram(
     QDomElement &element, int localTimezoneOffset)
 {
     QString uniqueid, seriesid, season, episode;
+    int dd_progid_done = 0;
     ProgInfo *pginfo = new ProgInfo;
 
     pginfo->previouslyshown = false;
@@ -438,6 +439,17 @@ ProgInfo *XMLTVParser::parseProgram(
                 parseVideo(info, pginfo);
             }
             else if (info.tagName() == "episode-num" &&
+                info.attribute("system") == "dd_progid")
+            {
+                QString episodenum(getFirstText(info));
+                // if this field includes a dot, strip it out
+                int idx = episodenum.find('.');
+                if (idx != -1)
+                    episodenum.remove(idx, 1);
+                pginfo->programid = episodenum;
+                dd_progid_done = 1;
+            }
+            else if (info.tagName() == "episode-num" &&
                      info.attribute("system") == "xmltv_ns")
             {
                 int tmp;
@@ -552,8 +564,8 @@ ProgInfo *XMLTVParser::parseProgram(
                 programid = "";
         }
     }
-    
-    pginfo->programid = programid;
+    if (dd_progid_done == 0)
+        pginfo->programid = programid;
 
     return pginfo;
 }
