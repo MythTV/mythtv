@@ -286,6 +286,8 @@ ProgInfo *XMLTVParser::parseProgram(
     pginfo->parttotal = pginfo->showtype = pginfo->colorcode =
     pginfo->stars = "";
 
+    pginfo->originalairdate = "0000-00-00";
+
     QString text = element.attribute("start", "");
     fromXMLTVDate(text, pginfo->start, localTimezoneOffset);
     pginfo->startts = text;
