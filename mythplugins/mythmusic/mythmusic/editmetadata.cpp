@@ -428,6 +428,8 @@ void EditMetadataDialog::switchToMetadata()
 
     updateForeground();
     buildFocusList();
+    if (albumart_button)
+        setCurrentFocusWidget(albumart_button);
 }
 
 void EditMetadataDialog::switchToAlbumArt()
@@ -436,6 +438,8 @@ void EditMetadataDialog::switchToAlbumArt()
 
     updateForeground();
     buildFocusList();
+    if (metadata_button)
+        setCurrentFocusWidget(metadata_button);
 }
 
 void EditMetadataDialog::switchToDBStats()

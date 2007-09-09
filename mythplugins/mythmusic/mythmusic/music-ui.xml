@@ -774,10 +774,10 @@
                 <activefont>subtitle_active</activefont>
                 <inactivefont>subtitle_inactive</inactivefont>
                 <selectedfont>subtitle_selected</selectedfont>
-                <image function="normal" filename="ma_browser_back_reg.png"></image>
-                <image function="highlighted" filename="ma_browser_back_sel.png"></image>
-                <image function="selected" filename="ma_browser_back_sel.png"></image>
-                <image function="default" filename="ma_nothumb.png"></image>
+                <image function="normal" filename="mm_browser_back_reg.png"></image>
+                <image function="highlighted" filename="mm_browser_back_sel.png"></image>
+                <image function="selected" filename="mm_browser_back_sel.png"></image>
+                <image function="default" filename="mm_nothumb.png"></image>
             </imagegrid>
 
             <!--
@@ -785,6 +785,7 @@
             -->
 
             <textbutton name="metadata_button" draworder="0">
+                <context>2</context>
                 <position>20,540</position>
                 <font>display</font>
                 <image function="on" filename="text_button_on.png"></image>
@@ -793,7 +794,8 @@
             </textbutton>
 
             <textbutton name="albumart_button" draworder="0">
-                <position>190,540</position>
+                <context>1</context>
+                <position>20,540</position>
                 <font>display</font>
                 <image function="on" filename="text_button_on.png"></image>
                 <image function="off" filename="text_button_off.png"></image>
