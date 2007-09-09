@@ -69,21 +69,21 @@ sub text {
 
 	if ($inside{li}) {
 		if ($inside{'li-class'} eq "low") {
-			if ($inside{'div-id'} eq "f1") { $_[0] =~ /\w* (\d*)/; $results{'low-0'} = $1; }
-			if ($inside{'div-id'} eq "f2") { $_[0] =~ /\w* (\d*)/; $results{'low-1'} = $1; }
-			if ($inside{'div-id'} eq "f3") { $_[0] =~ /\w* (\d*)/; $results{'low-2'} = $1; }
-			if ($inside{'div-id'} eq "f4") { $_[0] =~ /\w* (\d*)/; $results{'low-3'} = $1; }
-			if ($inside{'div-id'} eq "f5") { $_[0] =~ /\w* (\d*)/; $results{'low-4'} = $1; }
-			if ($inside{'div-id'} eq "f6") { $_[0] =~ /\w* (\d*)/; $results{'low-5'} = $1; }
+			if ($inside{'div-id'} eq "f1") { $_[0] =~ /\w* (-?\d*)/; $results{'low-0'} = $1; }
+			if ($inside{'div-id'} eq "f2") { $_[0] =~ /\w* (-?\d*)/; $results{'low-1'} = $1; }
+			if ($inside{'div-id'} eq "f3") { $_[0] =~ /\w* (-?\d*)/; $results{'low-2'} = $1; }
+			if ($inside{'div-id'} eq "f4") { $_[0] =~ /\w* (-?\d*)/; $results{'low-3'} = $1; }
+			if ($inside{'div-id'} eq "f5") { $_[0] =~ /\w* (-?\d*)/; $results{'low-4'} = $1; }
+			if ($inside{'div-id'} eq "f6") { $_[0] =~ /\w* (-?\d*)/; $results{'low-5'} = $1; }
 		}
 
 		if ($inside{'li-class'} eq "high") {
-			if ($inside{'div-id'} eq "f1") { $_[0] =~ /\w* (\d*)/; $results{'high-0'} = $1; }
-			if ($inside{'div-id'} eq "f2") { $_[0] =~ /\w* (\d*)/; $results{'high-1'} = $1; }
-			if ($inside{'div-id'} eq "f3") { $_[0] =~ /\w* (\d*)/; $results{'high-2'} = $1; }
-			if ($inside{'div-id'} eq "f4") { $_[0] =~ /\w* (\d*)/; $results{'high-3'} = $1; }
-			if ($inside{'div-id'} eq "f5") { $_[0] =~ /\w* (\d*)/; $results{'high-4'} = $1; }
-			if ($inside{'div-id'} eq "f6") { $_[0] =~ /\w* (\d*)/; $results{'high-5'} = $1; }
+			if ($inside{'div-id'} eq "f1") { $_[0] =~ /\w* (-?\d*)/; $results{'high-0'} = $1; }
+			if ($inside{'div-id'} eq "f2") { $_[0] =~ /\w* (-?\d*)/; $results{'high-1'} = $1; }
+			if ($inside{'div-id'} eq "f3") { $_[0] =~ /\w* (-?\d*)/; $results{'high-2'} = $1; }
+			if ($inside{'div-id'} eq "f4") { $_[0] =~ /\w* (-?\d*)/; $results{'high-3'} = $1; }
+			if ($inside{'div-id'} eq "f5") { $_[0] =~ /\w* (-?\d*)/; $results{'high-4'} = $1; }
+			if ($inside{'div-id'} eq "f6") { $_[0] =~ /\w* (-?\d*)/; $results{'high-5'} = $1; }
 		}
 	}
 			
@@ -112,7 +112,7 @@ sub text {
 		if ($scratch == 2) { $_[0] =~ /(\d*\.\d+) kPa.*/; $results{'pressure'} = $1 * 10; }
 		if ($scratch == 3) { $_[0] =~ /(\d*) km/; $results{'visibility'} = $1; }
 		if ($scratch == 4) { $_[0] =~ /(\d*) \%/; $results{'relative_humidity'} = $1; }
-		if ($scratch == 5) { $_[0] =~ /(\d*).*/; $results{'dewpoint'} = $1; }
+		if ($scratch == 5) { $_[0] =~ /(-?\d*).*/; $results{'dewpoint'} = $1; }
 		if ($scratch == 6) { 
 			$_[0] =~ /.?(\w+) (\d+) km\/h/;
 			$results{'wind_dir'} = $directions{$1};
