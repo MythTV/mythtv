@@ -401,9 +401,9 @@ int main(int argc, char **argv)
         {
             extern const char *myth_source_version;
             extern const char *myth_source_path;
-            cout << "Library API version     : " << MYTH_BINARY_VERSION << endl;
             cout << "Source code version     : " << myth_source_version << endl;
             cout << "SVN branch              : " << myth_source_path << endl;
+            cout << "Library API version     : " << MYTH_BINARY_VERSION << endl;
             cout << "Network Protocol Version: " << MYTH_PROTO_VERSION << endl;
 #ifdef MYTH_BUILD_CONFIG
             cout << "Options compiled in:" <<endl;
