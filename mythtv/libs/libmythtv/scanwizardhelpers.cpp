@@ -78,43 +78,46 @@ static QString card_types(void)
     return QString("(%1)").arg(cardTypes);
 }
 
-ScanProgressPopup::ScanProgressPopup(
-    ScanWizardScanner *parent, bool signalmonitors) :
-    ConfigurationPopupDialog()
+ScanProgressPopup::ScanProgressPopup(bool lock, bool strength, bool snr) :
+    ConfigurationPopupDialog(),
+    done(false), ss(NULL), sn(NULL), progressBar(NULL), sl(NULL), sta(NULL)
 {
     setLabel(tr("Scan Progress"));
 
-    if (signalmonitors)
+    addChild(sta = new TransLabelSetting());
+    sta->setLabel(tr("Status"));
+    sta->setValue(tr("Tuning"));
+
+    if (lock)
     {
-        VerticalConfigurationGroup *box = new VerticalConfigurationGroup();
-        box->addChild(sta = new TransLabelSetting());
-        box->addChild(sl = new TransLabelSetting());
-        sta->setLabel(tr("Status"));
-        sta->setValue(tr("Tuning"));
+        addChild(sl = new TransLabelSetting());
         sl->setValue("                                  "
                      "                                  ");
-        box->setUseFrame(false);
-        addChild(box);
     }
 
-    addChild(progressBar = new ScanSignalMeter(PROGRESS_MAX));
+    if (strength)
+    {
+        addChild(ss = new ScanSignalMeter(65535));
+        ss->setLabel(tr("Signal Strength"));
+    }
+
+    if (snr)
+    {
+        addChild(sn = new ScanSignalMeter(65535));
+        sn->setLabel(tr("Signal/Noise"));
+    }
+
+    addChild(progressBar = new ScanSignalMeter(65535));
     progressBar->setValue(0);
     progressBar->setLabel(tr("Scan"));
 
-    if (signalmonitors)
-    {
-        addChild(ss = new ScanSignalMeter(65535));
-        addChild(sn = new ScanSignalMeter(65535));
-        ss->setLabel(tr("Signal Strength"));
-        sn->setLabel(tr("Signal/Noise"));
-    }
 
     TransButtonSetting *cancel = new TransButtonSetting();
     cancel->setLabel(tr("Cancel"));
     addChild(cancel);
 
     connect(cancel, SIGNAL(pressed(void)),
-            parent, SLOT(  CancelScan(void)));
+            this,   SLOT(  reject(void)));
 
     //Seem to need to do this as the constructor doesn't seem enough
     setUseLabel(false);
@@ -123,36 +126,68 @@ ScanProgressPopup::ScanProgressPopup(
 
 ScanProgressPopup::~ScanProgressPopup()
 {
-    VERBOSE(VB_IMPORTANT, "~ScanProgressPopup()");
+    VERBOSE(VB_SIPARSER, "~ScanProgressPopup()");
 }
 
-void ScanProgressPopup::signalToNoise(int value)
+void ScanProgressPopup::SetStatusSignalToNoise(int value)
 {
-    sn->setValue(value);
+    if (sn)
+        sn->setValue(value);
 }
 
-void ScanProgressPopup::signalStrength(int value)
+void ScanProgressPopup::SetStatusSignalStrength(int value)
 {
-    ss->setValue(value);
+    if (ss)
+        ss->setValue(value);
 }
 
-void ScanProgressPopup::dvbLock(int value)
+void ScanProgressPopup::SetStatusLock(int value)
 {
-    sl->setValue((value) ? tr("Locked") : tr("No Lock"));
+    if (sl)
+        sl->setValue((value) ? tr("Locked") : tr("No Lock"));
 }
 
-void ScanProgressPopup::status(const QString& value)
+void ScanProgressPopup::SetScanProgress(double value)
 {
-    sta->setValue(value);
+    if (progressBar)
+        progressBar->setValue((uint)(value * 65535));
 }
 
-void ScanProgressPopup::exec(ScanWizardScanner *parent)
+void ScanProgressPopup::SetStatusText(const QString &value)
 {
-    dialog = (ConfigPopupDialogWidget*)
-        dialogWidget(gContext->GetMainWindow(), "ScanProgressPopup");
-    connect(dialog, SIGNAL(popupDone(void)),
-            parent, SLOT(  CancelScan(void)));
-    dialog->ShowPopup(this);
+    if (sta)
+        sta->setValue(value);
+}
+
+void ScanProgressPopup::SetStatusTitleText(const QString &value)
+{
+    QString msg = tr("Scan Progress") + QString(" %1").arg(value);
+    setLabel(msg);
+}
+
+int ScanProgressPopup::exec(void)
+{
+    if (!dialog)
+    {
+        dialog = (ConfigPopupDialogWidget*)
+            dialogWidget(gContext->GetMainWindow(),
+                         "ConfigurationPopupDialog");
+    }
+    dialog->setResult(0);
+
+    done = false;
+    dialog->ShowPopup(this, SLOT(PopupDone(int)));
+
+    while (!done)
+        wait.wait(100);
+
+    return dialog->result();
+}
+
+void ScanProgressPopup::PopupDone(int)
+{
+    done = true;
+    wait.wakeAll();
 }
 
 void MultiplexSetting::load(void)

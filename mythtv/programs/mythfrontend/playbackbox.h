@@ -172,7 +172,7 @@ class PlaybackBox : public MythDialog
     void toggleAutoExpire(bool turnOn);
     void togglePreserveEpisode(bool turnOn);
 
-    void doCancel();
+    void PopupDone(int r);
     void toggleView(ViewMask itemMask, bool setOn);
     void toggleTitleView(bool setOn)     { toggleView(VIEW_TITLES, setOn); }
     void toggleCategoryView(bool setOn)  { toggleView(VIEW_CATEGORIES, setOn); }

@@ -56,9 +56,13 @@ class MPUBLIC MythDialog : public QFrame
   public:
     MythDialog(MythMainWindow *parent, const char *name = 0, 
                bool setsize = true);
-   ~MythDialog();
 
-    enum DialogCode { Rejected, Accepted };
+    enum DialogCode
+    {
+        Rejected  = 0,
+        Accepted  = 1,
+        ListStart = 0x10,
+    };
 
     int result(void) const { return rescode; }
 
@@ -70,7 +74,11 @@ class MPUBLIC MythDialog : public QFrame
    
     virtual bool onMediaEvent(MythMediaDevice * mediadevice); 
     
-  signals:
+    void setResult(int r) { rescode = r; }
+
+    virtual void deleteLater(void);
+
+ signals:
     void menuButtonPressed();
 
   public slots:
@@ -78,11 +86,14 @@ class MPUBLIC MythDialog : public QFrame
     virtual void done( int );
 
   protected slots:
+    virtual void AcceptItem(int);
     virtual void accept();
     virtual void reject();
 
   protected:
-    void setResult(int r) { rescode = r; }
+    ~MythDialog();
+    void TeardownAll(void);
+
     void keyPressEvent(QKeyEvent *e);
 
     float wmult, hmult;
@@ -139,8 +150,12 @@ class MPUBLIC MythPopupBox : public MythDialog
 
     static bool showGetTextPopup(MythMainWindow *parent, QString title,
                                  QString message, QString& text);
+
+    virtual void accept(void);
+    virtual void reject(void);
+
   signals:
-    void popupDone();
+    virtual void popupDone(int);
 
   protected:
     bool focusNextPrevChild(bool next);
@@ -148,7 +163,7 @@ class MPUBLIC MythPopupBox : public MythDialog
 
   protected slots:
     void defaultButtonPressedHandler(void);
-    void defaultExitHandler(void);
+    void defaultExitHandler(int);
 
   private:
     QVBoxLayout *vbox;

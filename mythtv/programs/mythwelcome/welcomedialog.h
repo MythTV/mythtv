@@ -34,6 +34,7 @@ class WelcomeDialog : public MythThemedDialog
     void closeDialog();
     void updateTime();  
     void showPopup();
+    void donePopup(int);
     void cancelPopup();
     void shutdownNow();
     void runEPGGrabber(void);

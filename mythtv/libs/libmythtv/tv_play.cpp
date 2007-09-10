@@ -719,7 +719,8 @@ TV::~TV(void)
         delete nvp;
     if (myWindow)
     {
-        delete myWindow;
+        myWindow->deleteLater();
+        myWindow = NULL;
         MythMainWindow* mwnd = gContext->GetMainWindow();
         mwnd->resize(saved_gui_bounds.size());
         mwnd->setFixedSize(saved_gui_bounds.size());

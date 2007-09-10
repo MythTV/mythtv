@@ -1296,7 +1296,7 @@ int RecordingProfile::exec(void)
     
     int ret = dialog->exec();
 
-    delete dialog;
+    dialog->deleteLater();
 
     return ret;
 }

@@ -1843,11 +1843,24 @@ void ConfigPopupDialogWidget::keyPressEvent(QKeyEvent* e) {
     switch(e->key()) {
     case Key_Escape:
         reject();
-        emit popupDone();
+        emit popupDone(MythDialog::Rejected);
         break;
     default:
         MythDialog::keyPressEvent(e);
     }
+}
+
+void ConfigurationPopupDialog::deleteLater(void)
+{
+    disconnect();
+    if (dialog)
+    {
+        dialog->disconnect();
+        dialog->deleteLater();
+        dialog = NULL;
+        label = NULL;
+    }
+    VerticalConfigurationGroup::deleteLater();
 }
 
 MythDialog* ConfigurationPopupDialog::dialogWidget(MythMainWindow* parent,
@@ -1862,7 +1875,7 @@ MythDialog* ConfigurationPopupDialog::dialogWidget(MythMainWindow* parent,
         box->setSizePolicy(QSizePolicy(QSizePolicy::Minimum, 
                                        QSizePolicy::Maximum));
 
-        QLabel* label = new QLabel(box);
+        label = new QLabel(box);
         label->setText(getLabel());
         label->setBackgroundOrigin(QWidget::WindowOrigin);
         label->setAlignment(Qt::AlignHCenter);
@@ -1877,6 +1890,13 @@ MythDialog* ConfigurationPopupDialog::dialogWidget(MythMainWindow* parent,
     widget->setFocus();
 
     return dialog;
+}
+
+void ConfigurationPopupDialog::setLabel(QString str)
+{
+    VerticalConfigurationGroup::setLabel(str);
+    if (label)
+        label->setText(str);
 }
 
 int ConfigurationPopupDialog::exec(bool saveOnAccept)

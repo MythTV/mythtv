@@ -1104,26 +1104,31 @@ class MPUBLIC ConfigurationPopupDialog : public VerticalConfigurationGroup
 
   public:
     ConfigurationPopupDialog() :
-        VerticalConfigurationGroup(), dialog(NULL) { }
+        VerticalConfigurationGroup(), dialog(NULL), label(NULL) { }
+
+    virtual void deleteLater(void);
 
     virtual MythDialog *dialogWidget(
         MythMainWindow *parent, const char* widgetName);
 
     int exec(bool saveOnAccept = true);
 
+    virtual void setLabel(QString str);
+
   public slots:
     void accept(void) { if (dialog) dialog->accept(); }
     void reject(void) { if (dialog) dialog->reject(); }
 
   signals:
-    void popupDone(void);
+    void popupDone(int);
 
   protected:
     /// You need to call deleteLater to delete QObject
-    virtual ~ConfigurationPopupDialog() { dialog->deleteLater(); }
+    virtual ~ConfigurationPopupDialog() { }
 
   protected:
-    ConfigPopupDialogWidget* dialog;
+    ConfigPopupDialogWidget *dialog;
+    QLabel                  *label;
 };
 
 ///////////////////////////////////////////////////////////////////////////////

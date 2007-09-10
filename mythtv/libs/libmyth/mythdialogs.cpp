@@ -77,7 +77,22 @@ MythDialog::MythDialog(MythMainWindow *parent, const char *name, bool setsize)
 
 MythDialog::~MythDialog()
 {
-    m_parent->detach(this);
+    TeardownAll();
+}
+
+void MythDialog::deleteLater(void)
+{
+    TeardownAll();
+    QFrame::deleteLater();
+}
+
+void MythDialog::TeardownAll(void)
+{
+    if (m_parent)
+    {
+        m_parent->detach(this);
+        m_parent = NULL;
+    }
 }
 
 void MythDialog::setNoErase(void)
@@ -109,6 +124,11 @@ void MythDialog::done(int r)
     close();
 }
 
+void MythDialog::AcceptItem(int i)
+{
+    done(ListStart + i);
+}
+
 void MythDialog::accept()
 {
     done(Accepted);
@@ -127,7 +147,7 @@ int MythDialog::exec()
         return -1;
     }
 
-    setResult(0);
+    setResult(Rejected);
 
     Show();
 
@@ -422,7 +442,7 @@ void MythPopupBox::ShowPopupAtXY(int destx, int desty,
     setGeometry(x, y, maxw, poph);
 
     if (target && slot)
-        connect(this, SIGNAL(popupDone()), target, slot);
+        connect(this, SIGNAL(popupDone(int)), target, slot);
 
     Show();
 }
@@ -438,7 +458,7 @@ void MythPopupBox::keyPressEvent(QKeyEvent *e)
 
         if ((action == "ESCAPE") || (arrowAccel && action == "LEFT"))
         {
-            emit popupDone();
+            reject();
             handled = true;
         }
     }
@@ -447,10 +467,22 @@ void MythPopupBox::keyPressEvent(QKeyEvent *e)
         MythDialog::keyPressEvent(e);
 }
 
+void MythPopupBox::accept(void)
+{
+    MythDialog::done(MythDialog::Accepted);
+    emit popupDone(MythDialog::Accepted);
+}
+
+void MythPopupBox::reject(void)
+{
+    MythDialog::done(MythDialog::Rejected);
+    emit popupDone(MythDialog::Rejected);
+}
+
 int MythPopupBox::ExecPopup(QObject *target, const char *slot)
 {
     if (!target)
-        ShowPopup(this, SLOT(defaultExitHandler()));
+        ShowPopup(this, SLOT(defaultExitHandler(int)));
     else
         ShowPopup(target, slot);
 
@@ -461,7 +493,7 @@ int MythPopupBox::ExecPopupAtXY(int destx, int desty,
                             QObject *target, const char *slot)
 {
     if (!target)
-        ShowPopupAtXY(destx, desty, this, SLOT(defaultExitHandler()));
+        ShowPopupAtXY(destx, desty, this, SLOT(defaultExitHandler(int)));
     else
         ShowPopupAtXY(destx, desty, target, slot);
 
@@ -491,9 +523,9 @@ void MythPopupBox::defaultButtonPressedHandler(void)
     done(i);
 }
 
-void MythPopupBox::defaultExitHandler()
+void MythPopupBox::defaultExitHandler(int r)
 {
-    done(-1);
+    done(r);
 }
 
 void MythPopupBox::showOkPopup(MythMainWindow *parent, QString title,
@@ -2353,7 +2385,7 @@ int MythScrollDialog::exec()
         return -1;
     }
 
-    setResult(0);
+    setResult(Rejected);
 
     show();
 

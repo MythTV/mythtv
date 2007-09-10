@@ -704,9 +704,15 @@ void WelcomeDialog::showPopup(void)
                          SLOT(closeDialog()));
     popup->addButton(tr("Cancel"), this, SLOT(cancelPopup()));
 
-    popup->ShowPopup(this, SLOT(cancelPopup()));
+    popup->ShowPopup(this, SLOT(donePopup(int)));
 
     topButton->setFocus();
+}
+
+void WelcomeDialog::donePopup(int r)
+{
+    if (MythDialog::Rejected == r)
+        cancelPopup();
 }
 
 void WelcomeDialog::cancelPopup(void)
@@ -715,8 +721,7 @@ void WelcomeDialog::cancelPopup(void)
       return;
 
   popup->hide();
-
-  delete popup;
+  popup->deleteLater();
   popup = NULL;
   setActiveWindow();
 }

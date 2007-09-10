@@ -2437,7 +2437,7 @@ void PlaybackBox::showMenu()
     popup->addButton(tr("Help (Status Icons)"), this,
                          SLOT(showIconHelp()));
 
-    popup->ShowPopup(this, SLOT(doCancel()));
+    popup->ShowPopup(this, SLOT(PopupDone(int)));
 
     topButton->setFocus();
 
@@ -2663,7 +2663,7 @@ void PlaybackBox::showDeletePopup(ProgramInfo *program, deletePopupType types)
             noButton->setFocus();
     }
  
-    popup->ShowPopup(this, SLOT(doCancel())); 
+    popup->ShowPopup(this, SLOT(PopupDone(int))); 
 
     expectingPopup = true;
 }
@@ -2774,7 +2774,7 @@ void PlaybackBox::showPlaylistPopup()
 
     playButton->setFocus();
 
-    popup->ShowPopup(this, SLOT(doCancel()));
+    popup->ShowPopup(this, SLOT(PopupDone(int)));
   
     expectingPopup = true;
 }
@@ -2899,7 +2899,7 @@ void PlaybackBox::showPlaylistJobPopup()
                              SLOT(stopPlaylistUserJob4()));
     }
     
-    popup->ShowPopup(this, SLOT(doCancel()));
+    popup->ShowPopup(this, SLOT(PopupDone(int)));
     jobButton->setFocus();
 
     expectingPopup = true;
@@ -2920,7 +2920,7 @@ void PlaybackBox::showPlayFromPopup()
             SLOT(doPlay()));
     popup->addButton(tr("Play from beginning"), this, SLOT(doPlayFromBeg()));
      
-    popup->ShowPopup(this, SLOT(doCancel()));
+    popup->ShowPopup(this, SLOT(PopupDone(int)));
     playButton->setFocus();
     
     expectingPopup = true;
@@ -2964,7 +2964,7 @@ void PlaybackBox::showStoragePopup()
         popup->addWidget(toggleButton, false);
     }
 
-    popup->ShowPopup(this, SLOT(doCancel()));
+    popup->ShowPopup(this, SLOT(PopupDone(int)));
     storageButton->setFocus();
 
     expectingPopup = true;
@@ -2990,7 +2990,7 @@ void PlaybackBox::showRecordingPopup()
     popup->addButton(tr("Change Recording Title"), this,
                      SLOT(showRecTitleChanger()));
     
-    popup->ShowPopup(this, SLOT(doCancel()));
+    popup->ShowPopup(this, SLOT(PopupDone(int)));
     editButton->setFocus();
     
     expectingPopup = true;
@@ -3082,7 +3082,7 @@ void PlaybackBox::showJobPopup()
                              SLOT(doBeginUserJob4()));
     }
 
-    popup->ShowPopup(this, SLOT(doCancel()));
+    popup->ShowPopup(this, SLOT(PopupDone(int)));
     jobButton->setFocus();
     
     expectingPopup = true;
@@ -3115,7 +3115,7 @@ void PlaybackBox::showTranscodingProfiles()
     popup->addButton(tr("Low Quality"), this,
                      SLOT(changeProfileAndTranscodeLow()));
 
-    popup->ShowPopup(this, SLOT(doCancel()));
+    popup->ShowPopup(this, SLOT(PopupDone(int)));
     defaultButton->setFocus();
     
     expectingPopup = true;
@@ -3186,7 +3186,7 @@ void PlaybackBox::showActionPopup(ProgramInfo *program)
     if (!(m_player && m_player->IsSameProgram(curitem)))
         popup->addButton(tr("Delete"), this, SLOT(askDelete()));
 
-    popup->ShowPopup(this, SLOT(doCancel()));
+    popup->ShowPopup(this, SLOT(PopupDone(int)));
 
     playButton->setFocus();
 
@@ -3214,7 +3214,7 @@ void PlaybackBox::showFileNotFoundActionPopup(ProgramInfo *program)
 
     popup->addButton(tr("Delete"), this, SLOT(askDelete()));
 
-    popup->ShowPopup(this, SLOT(doCancel()));
+    popup->ShowPopup(this, SLOT(PopupDone(int)));
 
     detailsButton->setFocus();
 
@@ -3753,14 +3753,13 @@ void PlaybackBox::togglePreserveEpisode(bool turnOn)
     }
 }
 
-void PlaybackBox::doCancel(void)
+void PlaybackBox::PopupDone(int r)
 {
-    if (!expectingPopup)
-        return;
-
-    cancelPopup();
-
-    previewVideoState = kChanging;
+    if ((MythDialog::Rejected == r) && expectingPopup)
+    {
+        cancelPopup();
+        previewVideoState = kChanging;
+    }
 }
 
 void PlaybackBox::toggleView(ViewMask itemMask, bool setOn)
@@ -4527,7 +4526,7 @@ void PlaybackBox::closeRecGroupPopup(bool refreshList)
         return;
 
     recGroupPopup->hide();
-    delete recGroupPopup;
+    recGroupPopup->deleteLater();
 
     recGroupPopup = NULL;
     recGroupLineEdit = NULL;
@@ -4621,7 +4620,7 @@ void PlaybackBox::showViewChanger(void)
 
     int result = recGroupPopup->ExecPopup();
 
-    if (result == MythDialog::Accepted)
+    if (result != MythDialog::Rejected)
     {
         if (viewMask == VIEW_NONE)
             viewMask = VIEW_TITLES;
@@ -4638,7 +4637,7 @@ void PlaybackBox::showViewChanger(void)
         update(drawTotalBounds);
     }
 
-    closeRecGroupPopup(result == MythDialog::Accepted);
+    closeRecGroupPopup(result != MythDialog::Rejected);
 }
 
 void PlaybackBox::showRecGroupChooser(void)
@@ -4780,19 +4779,19 @@ void PlaybackBox::showRecGroupChooser(void)
 
     recGroupLastItem = recGroupListBox->currentItem();
 
-    connect(recGroupListBox, SIGNAL(accepted(int)), recGroupPopup,
-            SLOT(accept()));
+    connect(recGroupListBox, SIGNAL(accepted(int)),
+            recGroupPopup,   SLOT(AcceptItem(int)));
     connect(recGroupListBox, SIGNAL(currentChanged(QListBoxItem *)), this,
             SLOT(recGroupChooserListBoxChanged()));
 
     int result = recGroupPopup->ExecPopup();
     
-    if (result == MythDialog::Accepted)
+    if (result != MythDialog::Rejected)
         setGroupFilter();
 
-    closeRecGroupPopup(result == MythDialog::Accepted);
+    closeRecGroupPopup(result != MythDialog::Rejected);
 
-    if (result == MythDialog::Accepted)
+    if (result != MythDialog::Rejected)
     {
         progIndex = 0;
         titleIndex = 0;
@@ -4981,18 +4980,18 @@ void PlaybackBox::showRecGroupChanger(void)
 
     recGroupListBox->setFocus();
 
-    connect(recGroupListBox, SIGNAL(accepted(int)), recGroupPopup,
-            SLOT(accept()));
+    connect(recGroupListBox, SIGNAL(accepted(int)),
+            recGroupPopup,   SLOT(AcceptItem(int)));
     connect(recGroupListBox, SIGNAL(currentChanged(QListBoxItem *)), this,
             SLOT(recGroupChangerListBoxChanged()));
     connect(recGroupOkButton, SIGNAL(clicked()), recGroupPopup, SLOT(accept()));
 
     int result = recGroupPopup->ExecPopup();
 
-    if (result == MythDialog::Accepted)
+    if (result != MythDialog::Rejected)
         setRecGroup();
 
-    closeRecGroupPopup(result == MythDialog::Accepted);
+    closeRecGroupPopup(result != MythDialog::Rejected);
 }
 
 void PlaybackBox::doPlaylistChangePlayGroup(void)
@@ -5035,15 +5034,15 @@ void PlaybackBox::showPlayGroupChanger(void)
     }
 
     recGroupListBox->setFocus();
-    connect(recGroupListBox, SIGNAL(accepted(int)), recGroupPopup,
-            SLOT(accept()));
+    connect(recGroupListBox, SIGNAL(accepted(int)),
+            recGroupPopup,   SLOT(AcceptItem(int)));
 
     int result = recGroupPopup->ExecPopup();
 
-    if (result == MythDialog::Accepted)
+    if (result != MythDialog::Rejected)
         setPlayGroup();
 
-    closeRecGroupPopup(result == MythDialog::Accepted);
+    closeRecGroupPopup(result != MythDialog::Rejected);
 }
 
 void PlaybackBox::showRecTitleChanger()
@@ -5257,12 +5256,9 @@ void PlaybackBox::showRecGroupPasswordChanger(void)
     recGroupOldPassword->setEchoMode(QLineEdit::Password);
     recGroupNewPassword->setEchoMode(QLineEdit::Password);
 
-    if (recGroupPassword == "" )
-        recGroupOkButton->setEnabled(true);
-    else
-        recGroupOkButton->setEnabled(false);
+    recGroupOkButton->setEnabled(recGroupPassword.isEmpty());
 
-    recGroupOldPassword->setFocus();
+    recGroupOldPasswordChanged(QString::null);
 
     connect(recGroupOldPassword, SIGNAL(textChanged(const QString &)), this,
             SLOT(recGroupOldPasswordChanged(const QString &)));
@@ -5310,10 +5306,11 @@ void PlaybackBox::setRecGroupPassword(void)
 
 void PlaybackBox::recGroupOldPasswordChanged(const QString &newText)
 {
-    if (newText == recGroupChooserPassword)
-        recGroupOkButton->setEnabled(true);
-    else
-        recGroupOkButton->setEnabled(false);
+    bool correct =
+        (newText == recGroupChooserPassword) ||
+        (newText.isEmpty() && recGroupChooserPassword.isEmpty());
+
+    recGroupOkButton->setEnabled(correct);
 }
 
 void PlaybackBox::clearProgramCache(void)
