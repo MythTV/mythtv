@@ -344,7 +344,7 @@ int main(int argc, char *argv[])
     }
     while (haveProblems);
 
-    if (gContext->IsMasterBackend())
+    if (gContext->IsMasterHost())
     {
         dia = new DialogBox(mainWindow,
                             QObject::tr("If this is the master backend server, "

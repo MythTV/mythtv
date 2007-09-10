@@ -581,7 +581,7 @@ int main(int argc, char **argv)
         return BACKEND_EXIT_NO_IP_ADDRESS;
     }
 
-    bool ismaster = gContext->IsMasterBackend();
+    bool ismaster = gContext->IsMasterHost();
 
 
     if (ismaster)

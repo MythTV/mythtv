@@ -261,14 +261,16 @@ class MPUBLIC MythContext : public QObject, public MythObservable,
                               bool blockingClient = false);
     bool IsConnectedToMaster(void);
     void SetBackend(bool backend);
-    bool IsBackend(void);
-    bool IsFrontendOnly(void);
-    bool IsMasterBackend(void);
-    bool BackendIsRunning(void);
+
+    bool IsBackend(void);         // is this process a backend process
+    bool IsFrontendOnly(void);    // is there there only a frontend running on this host
+    bool IsMasterHost(void);      // is this the same host as the master
+    bool IsMasterBackend(void);   // is this the actuall mbe process
+    bool BackendIsRunning(void);  // a backend process is running on this host
 
     void BlockShutdown(void);
     void AllowShutdown(void);
-    
+
     QString GetInstallPrefix(void);
     QString GetShareDir(void);
     QString GetLibraryDir(void);

@@ -1143,12 +1143,17 @@ bool MythContext::IsBackend(void)
     return d->m_backend;
 }
 
-bool MythContext::IsMasterBackend(void)
+bool MythContext::IsMasterHost(void)
 {
     QString myip = gContext->GetSetting("BackendServerIP");
     QString masterip = gContext->GetSetting("MasterServerIP");
 
     return (masterip == myip);
+}
+
+bool MythContext::IsMasterBackend(void)
+{
+    return (IsBackend() && IsMasterHost());
 }
 
 bool MythContext::BackendIsRunning(void)
