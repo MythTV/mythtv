@@ -27,6 +27,7 @@ enum OpenGLFilterType
     kGLFilterBobDeintDFR,
     kGLFilterLinearBlendDeintDFR,
     kGLFilterKernelDeintDFR,
+    kGLFilterFieldOrderDFR,
     kGLFilterOneFieldDeintDFR,
 
     // Frame scaling/resizing filters
@@ -55,10 +56,12 @@ class OpenGLVideo
 
     bool Init(OpenGLContext *glcontext, bool colour_control, bool onscreen,
               QSize video_size, QRect visible_rect,
-              QRect video_rect, bool viewport_control, bool osd = FALSE);
+              QRect video_rect, QRect frame_rect,
+              bool viewport_control, bool osd = FALSE);
     bool ReInit(OpenGLContext *gl, bool colour_control, bool onscreen,
               QSize video_size, QRect visible_rect,
-              QRect video_rect, bool viewport_control, bool osd = FALSE);
+              QRect video_rect, QRect frame_rect,
+              bool viewport_control, bool osd = FALSE);
 
     void UpdateInputFrame(const VideoFrame *frame);
     void UpdateInput(const unsigned char *buf, const int *offsets,
@@ -81,7 +84,8 @@ class OpenGLVideo
 
     void  SetMasterViewport(QSize size)   { masterViewportSize = size; }
     QSize GetViewPort(void)         const { return viewportSize; }
-    void  SetVideoRect(const QRect &rect) { videoRect = rect; }
+    void  SetVideoRect(const QRect &vidrect, const QRect &framerect)
+        { videoRect = vidrect; frameRect = framerect;}
     QSize GetVideoSize(void)        const { return videoSize; }
     void SetVideoResize(const QRect &rect);
     void DisableVideoResize(void);
@@ -118,6 +122,7 @@ class OpenGLVideo
     QSize          masterViewportSize;
     QRect          visibleRect;
     QRect          videoRect;
+    QRect          frameRect;
     QRect          frameBufferRect;
     bool           invertVideo;
     QString        softwareDeinterlacer;
@@ -150,10 +155,12 @@ class OpenGLVideo
     ~OpenGLVideo() { }
 
     bool Init(OpenGLContext*, bool, bool, QSize, QRect,
-              QRect, bool, bool osd = false) { (void) osd; return false; }
+              QRect, QRect, bool, bool osd = false)
+        { (void) osd; return false; }
 
     bool ReInit(OpenGLContext*, bool, bool, QSize, QRect,
-                QRect, bool, bool osd = false) { (void) osd; return false; }
+                QRect, QRect, bool, bool osd = false)
+        { (void) osd; return false; }
 
     void UpdateInputFrame(const VideoFrame*) { }
     void UpdateInput(const unsigned char*, const int*, uint, int, QSize) { }
@@ -170,7 +177,7 @@ class OpenGLVideo
 
     void  SetMasterViewport(QSize) { }
     QSize GetViewPort(void) const { return QSize(0,0); }
-    void  SetVideoRect(const QRect&) { }
+    void  SetVideoRect(const QRect&, const QRect&) { }
     QSize GetVideoSize(void) const { return QSize(0,0); }
     void SetVideoResize(const QRect&) { }
     void DisableVideoResize(void) { }

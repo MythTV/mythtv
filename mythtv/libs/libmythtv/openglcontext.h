@@ -65,6 +65,12 @@ class OpenGLContext
     static bool IsGLXSupported(Display *display, uint major, uint minor);
 
   private:
+    bool IsGLXSupported(uint major, uint minor) const
+    {
+        return (m_major_ver > major) ||
+            ((m_major_ver == major) && (m_minor_ver >= minor));
+    }
+
     void DeleteTextures(void);
     void DeletePrograms(void);
     void DeleteFrameBuffers(void);
@@ -73,6 +79,8 @@ class OpenGLContext
 
     Display        *m_display;
     uint            m_screen_num;
+    uint            m_major_ver;
+    uint            m_minor_ver;
     QString         m_extensions;
     uint            m_ext_supported;
     bool            m_visible;

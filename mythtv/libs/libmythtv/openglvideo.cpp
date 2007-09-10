@@ -38,6 +38,7 @@ OpenGLVideo::OpenGLVideo() :
     gl_context(NULL),         videoSize(0,0),
     viewportSize(0,0),        masterViewportSize(0,0),
     visibleRect(0,0,0,0),     videoRect(0,0,0,0),
+    frameRect(0,0,0,0),
     frameBufferRect(0,0,0,0), invertVideo(false),
     softwareDeinterlacer(QString::null),
     hardwareDeinterlacing(false),
@@ -97,12 +98,14 @@ void OpenGLVideo::Teardown(void)
 // locking ok
 bool OpenGLVideo::Init(OpenGLContext *glcontext, bool colour_control,
                        bool onscreen, QSize video_size, QRect visible_rect,
-                       QRect video_rect, bool viewport_control, bool osd)
+                       QRect video_rect, QRect frame_rect,
+                       bool viewport_control, bool osd)
 {
     gl_context            = glcontext;
     videoSize             = video_size;
     visibleRect           = visible_rect;
     videoRect             = video_rect;
+    frameRect             = frame_rect;
     masterViewportSize    = QSize(1920, 1080);
 
     QSize rect            = GetTextureSize(videoSize);
@@ -214,6 +217,9 @@ OpenGLFilterType OpenGLVideo::GetDeintFilter(void) const
         return kGLFilterLinearBlendDeintDFR;
     if (filters.count(kGLFilterKernelDeintDFR))
         return kGLFilterKernelDeintDFR;
+    if (filters.count(kGLFilterFieldOrderDFR))
+        return kGLFilterFieldOrderDFR;
+
     return kGLFilterNone;
 }
 
@@ -288,7 +294,9 @@ bool OpenGLVideo::OptimiseFilters(void)
                         it->first == kGLFilterLinearBlendDeint ||
                         it->first == kGLFilterOneFieldDeintDFR ||
                         it->first == kGLFilterLinearBlendDeintDFR ||
-                        it->first == kGLFilterKernelDeintDFR);
+                        it->first == kGLFilterKernelDeintDFR ||
+                        it->first == kGLFilterFieldOrderDFR);
+
     }
 
     bool deinterlacing = hardwareDeinterlacing;
@@ -346,7 +354,8 @@ void OpenGLVideo::SetFiltering(void)
 // locking ok
 bool OpenGLVideo::ReInit(OpenGLContext *glcontext, bool colour_control,
                          bool onscreen, QSize video_size, QRect visible_rect,
-                         QRect video_rect, bool viewport_control, bool osd)
+                         QRect video_rect, QRect frame_rect,
+                         bool viewport_control, bool osd)
 {
     VERBOSE(VB_PLAYBACK, LOC + "Reinit");
 
@@ -361,7 +370,8 @@ bool OpenGLVideo::ReInit(OpenGLContext *glcontext, bool colour_control,
     Teardown();
 
     bool success = Init(glcontext, colour_control, onscreen, video_size,
-                        visible_rect, video_rect, viewport_control, osd);
+                        visible_rect, video_rect, frame_rect,
+                        viewport_control, osd);
 
     if (harddeint != "")
         success &= AddDeinterlacer(harddeint);
@@ -391,7 +401,8 @@ bool OpenGLVideo::AddFilter(OpenGLFilterType filter)
     temp->numInputs = 1;
 
     if ((filter == kGLFilterLinearBlendDeint) ||
-        (filter == kGLFilterKernelDeint))
+        (filter == kGLFilterKernelDeint) ||
+        (filter == kGLFilterFieldOrderDFR))
     {
         temp->numInputs = 2;
     }
@@ -437,6 +448,9 @@ bool OpenGLVideo::RemoveFilter(OpenGLFilterType filter)
 {
     if (!filters.count(filter))
         return true;
+
+    VERBOSE(VB_PLAYBACK, QString("Removing %1 filter")
+            .arg(FilterToString(filter)));
 
     gl_context->MakeCurrent(true);
 
@@ -842,15 +856,29 @@ void OpenGLVideo::PrepareFrame(FrameScanType scan, bool softwareDeinterlacing,
         float t_right = (float)videoSize.width();
         float t_bottom  = (float)videoSize.height();
         float t_top = 0.0f;
+        float t_left = 0.0f;
+        float trueheight = (float)videoSize.height();
+
+        // only apply overscan on last filter
+        if (filter->outputBuffer == kDefaultBuffer)
+        {
+            t_left   = (float)frameRect.left();
+            t_right  = (float)frameRect.width() + t_left;
+            t_top    = (float)frameRect.top();
+            t_bottom = (float)frameRect.height() + t_top;
+        }
 
         if (!gl_context->IsFeatureSupported(kGLExtRect) &&
             (inputsize.width() > 0) && (inputsize.height() > 0))
         {
             t_right  /= inputsize.width();
+            t_left   /= inputsize.width();
             t_bottom /= inputsize.height();
+            t_top    /= inputsize.height();
+            trueheight /= inputsize.height();
         }
 
-        float line_height = (t_bottom / (float)videoSize.height());
+        float line_height = (trueheight / (float)videoSize.height());
         float bob = line_height / 2.0f;
 
         if (type == kGLFilterBobDeintDFR)
@@ -873,13 +901,15 @@ void OpenGLVideo::PrepareFrame(FrameScanType scan, bool softwareDeinterlacing,
             bob = line_height / 4.0f;
             if (scan == kScan_Interlaced)
             {
+                t_top /= 2;
                 t_bottom /= 2;
                 t_bottom += bob;
                 t_top    += bob;
             }
             if (scan == kScan_Intr2ndField)
             {
-                t_top = t_bottom / 2;
+                t_top = (trueheight / 2) + (t_top / 2);
+                t_bottom = (trueheight / 2) + (t_bottom / 2);
                 t_bottom -= bob;
                 t_top    -= bob;
             }
@@ -888,16 +918,19 @@ void OpenGLVideo::PrepareFrame(FrameScanType scan, bool softwareDeinterlacing,
         float t_right_uv = t_right;
         float t_top_uv   = t_top;
         float t_bottom_uv = t_bottom;
+        float t_left_uv  = t_left;
 
         if (gl_context->IsFeatureSupported(kGLExtRect))
         {
             t_right_uv  /= 2;
             t_top_uv    /= 2;
             t_bottom_uv /= 2;
+            t_left_uv   /= 2;
         }
 
         // vertex coordinates
-        QRect display = (filter->outputBuffer == kDefaultBuffer) ?
+        QRect display = (filter->frameBuffers.empty() || 
+                        filter->outputBuffer == kDefaultBuffer) ?
             videoRect : frameBufferRect;
 
         float vleft  = display.left();
@@ -939,8 +972,11 @@ void OpenGLVideo::PrepareFrame(FrameScanType scan, bool softwareDeinterlacing,
                 break;
 
             case kFrameBufferObject:
-                gl_context->BindFramebuffer(filter->frameBuffers[0]);
-                SetViewPortPrivate(frameBufferRect.size());
+                if (!filter->frameBuffers.empty())
+                {
+                    gl_context->BindFramebuffer(filter->frameBuffers[0]);
+                    SetViewPortPrivate(frameBufferRect.size());
+                }
                 break;
 
             case kNoBuffer:
@@ -981,6 +1017,7 @@ void OpenGLVideo::PrepareFrame(FrameScanType scan, bool softwareDeinterlacing,
                 case kGLFilterBobDeintDFR:
                 case kGLFilterOneFieldDeintDFR:
                 case kGLFilterKernelDeintDFR:
+                case kGLFilterFieldOrderDFR:
                 case kGLFilterLinearBlendDeintDFR:
                     if (scan == kScan_Intr2ndField)
                         field *= -1;
@@ -1004,13 +1041,13 @@ void OpenGLVideo::PrepareFrame(FrameScanType scan, bool softwareDeinterlacing,
 
         // draw quad
         glBegin(GL_QUADS);
-        glTexCoord2f(0.0f, t_top);
+        glTexCoord2f(t_left, t_top);
         if (type == kGLFilterYUV2RGB || type == kGLFilterYUV2RGBA)
         {
-            glMultiTexCoord2f(GL_TEXTURE1, 0.0f, t_top_uv);
-            glMultiTexCoord2f(GL_TEXTURE2, 0.0f, t_top_uv);
+            glMultiTexCoord2f(GL_TEXTURE1, t_left_uv, t_top_uv);
+            glMultiTexCoord2f(GL_TEXTURE2, t_left_uv, t_top_uv);
             if (type == kGLFilterYUV2RGBA)
-                glMultiTexCoord2f(GL_TEXTURE3, 0.0f, t_top_uv);
+                glMultiTexCoord2f(GL_TEXTURE3, t_left_uv, t_top_uv);
         }
         glVertex2f(vleft,  vtop);
 
@@ -1034,13 +1071,13 @@ void OpenGLVideo::PrepareFrame(FrameScanType scan, bool softwareDeinterlacing,
         }
         glVertex2f(vright, vbot);
 
-        glTexCoord2f(0.0f, t_bottom);
+        glTexCoord2f(t_left, t_bottom);
         if (type == kGLFilterYUV2RGB || type == kGLFilterYUV2RGBA)
         {
-            glMultiTexCoord2f(GL_TEXTURE1, 0.0f, t_bottom_uv);
-            glMultiTexCoord2f(GL_TEXTURE2, 0.0f, t_bottom_uv);
+            glMultiTexCoord2f(GL_TEXTURE1, t_left_uv, t_bottom_uv);
+            glMultiTexCoord2f(GL_TEXTURE2, t_left_uv, t_bottom_uv);
             if (type == kGLFilterYUV2RGBA)
-                glMultiTexCoord2f(GL_TEXTURE3, 0.0f, t_bottom);
+                glMultiTexCoord2f(GL_TEXTURE3, t_left_uv, t_bottom);
         }
         glVertex2f(vleft,  vbot);
         glEnd();
@@ -1119,6 +1156,8 @@ OpenGLFilterType OpenGLVideo::StringToFilter(const QString &filter)
         ret = kGLFilterKernelDeintDFR;
     else if (filter.contains("opengldoublerateonefield"))
         ret = kGLFilterOneFieldDeintDFR;
+    else if (filter.contains("opengldoubleratefieldorder"))
+        ret = kGLFilterFieldOrderDFR;
     else if (filter.contains("resize"))
         ret = kGLFilterResize;
 
@@ -1150,6 +1189,8 @@ QString OpenGLVideo::FilterToString(OpenGLFilterType filt)
             return "opengldoubleratekerneldeint";
         case kGLFilterOneFieldDeintDFR:
             return "opengldoublerateonefield";
+        case kGLFilterFieldOrderDFR:
+            return "opengldoubleratefieldorder";
         case kGLFilterResize:
             return "resize";
     }
@@ -1396,6 +1437,22 @@ QString OpenGLVideo::GetProgramString(OpenGLFilterType name)
                 "LRP pre, 0.5, pos, pre;"
                 "CMP pre, field, pre, cur;"
                 "CMP result.color, mov, cur, pre;";
+            break;
+
+        case kGLFilterFieldOrderDFR:
+            ret +=
+                "ATTRIB tex = fragment.texcoord[0];"
+                "PARAM  off  = program.env[0];"
+                "TEMP field, cur, pre, bot;"
+                "TEX cur, tex, texture[0], %1;"
+                "TEX pre, tex, texture[1], %1;"
+                "RCP field, off.x;"
+                "MUL field, tex.yyyy, field;"
+                "FRC field, field;"
+                "SUB field, field, 0.5;"
+                "CMP bot, off.y, pre, cur;"
+                "CMP result.color, field, bot, cur;";
+
             break;
 
         case kGLFilterNone:

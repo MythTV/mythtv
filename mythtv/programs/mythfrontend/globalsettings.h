@@ -84,7 +84,7 @@ class PlaybackProfileItemConfig : public QObject, public ConfigurationWizard
     TransCheckBoxSetting *osdfade;
     TransComboBoxSetting *deint0;
     TransComboBoxSetting *deint1;
-    TransComboBoxSetting *filters;
+    TransLineEditSetting *filters;
 };
 
 class PlaybackProfileConfig : public VerticalConfigurationGroup

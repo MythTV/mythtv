@@ -82,7 +82,7 @@ class QuartzData
   public:
     QuartzData() :
         srcWidth(0),                srcHeight(0),
-        srcAspect(1.3333f),         srcMode(kLetterbox_Off),
+        srcAspect(1.3333f),         srcMode(kAspect_Off),
 
         pixelData(0),               pixelSize(0),
         pixelLock(false),
@@ -369,21 +369,21 @@ void VideoOutputQuartzView::Transform(void)
     double hscale, vscale;
     switch (parentData->srcMode)
     {
-        case kLetterbox_4_3_Zoom:
+        case kAdjustFill_Full:
             // height only fills 3/4 of image, zoom up
-            hscale = vscale = h * 1.0 / (sh * 0.75);
-            break;
-        case kLetterbox_16_9_Zoom:
-            // width only fills 3/4 of image, zoom up
+            // (16:9 movie in 4:3 letterbox format on 16:9 screen)
             hscale = vscale = w * 1.0 / (sw * 0.75);
             break;
-        case kLetterbox_16_9_Stretch:
+        case kAdjustFill_Half:
+            // height only fills 3/4 of image, zoom up
+            // (4:3 movie on 16:9 screen - 14:9 zoom is a good compromise)
+            hscale = vscale = w * 7.0 / (sw * 6);
+            break;
+        case kAdjustFill_Stretch:
             // like 16 x 9 standard, but with a horizontal stretch applied
             hscale = vscale = fmin(h * 1.0 / sh, w * 1.0 / sw);
             hscale *= 4.0 / 3.0;
             break;
-        case kLetterbox_4_3:
-        case kLetterbox_16_9:
         default:
             // standard, fill viewport with scaled image
             hscale = vscale = fmin(h * 1.0 / sh, w * 1.0 / sw);
@@ -1226,7 +1226,7 @@ void VideoOutputQuartz::VideoAspectRatioChanged(float aspect)
     VideoOutput::VideoAspectRatioChanged(aspect);
 
     data->srcAspect = aspect;
-    data->srcMode   = db_letterbox;
+    data->srcMode   = db_aspectoverride;
 
     VideoOutputQuartzView *view = NULL;
     for (view = data->views.first(); view; view = data->views.next())
@@ -1298,7 +1298,7 @@ bool VideoOutputQuartz::InputChanged(const QSize &input_size,
     data->srcWidth  = input_size.width();
     data->srcHeight = input_size.height();
     data->srcAspect = aspect;
-    data->srcMode   = db_letterbox;
+    data->srcMode   = db_aspectoverride;
 
     CreateQuartzBuffers();
 
@@ -1354,7 +1354,7 @@ bool VideoOutputQuartz::Init(int width, int height, float aspect,
     data->srcWidth  = width;
     data->srcHeight = height;
     data->srcAspect = aspect;
-    data->srcMode   = db_letterbox;
+    data->srcMode   = db_aspectoverride;
     
     data->ZoomedIn = 0;
     data->ZoomedUp = 0;

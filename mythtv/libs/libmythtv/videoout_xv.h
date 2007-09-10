@@ -170,7 +170,7 @@ class VideoOutputXv : public VideoOutput
 
     bool CreateXvMCBuffers(void);
     bool CreateBuffers(VOSType subtype);
-    vector<void*> CreateXvMCSurfaces(uint num, bool create_xvmc_blocks);
+    vector<void*> CreateXvMCSurfaces(uint num, bool surface_has_vld);
     vector<unsigned char*> CreateShmImages(uint num, bool use_xv);
     void CreatePauseFrame(VOSType subtype);
     void CopyFrame(VideoFrame *to, const VideoFrame *from);
@@ -258,6 +258,7 @@ class VideoOutputXv : public VideoOutput
     bool                 xv_need_bobdeint_repaint;
 
     // OpenGL drawing info
+    QMutex               gl_context_lock;
     OpenGLContext       *gl_context;
     OpenGLVideo         *gl_videochain;
     OpenGLVideo         *gl_pipchain;

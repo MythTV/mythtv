@@ -236,7 +236,8 @@ class MPUBLIC TV : public QObject
     void PauseLiveTV(void);
     void UnpauseLiveTV(void);
 
-    void ToggleLetterbox(int letterboxMode = -1);
+    void ToggleAspectOverride(int aspectMode = -1);
+    void ToggleAdjustFill(int adjustfillMode = -1);
 
     bool FillMenuTracks(OSDGenericTree*, uint type);
     void ChangeTrack(uint type, int dir);

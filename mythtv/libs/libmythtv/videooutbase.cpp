@@ -241,7 +241,8 @@ VideoOutput::VideoOutput() :
     db_display_dim(0,0),                db_move(0,0),
     db_scale_horiz(0.0f),               db_scale_vert(0.0f),
     db_pip_location(0),                 db_pip_size(26),
-    db_letterbox(kLetterbox_Off),       db_deint_filtername(QString::null),
+    db_aspectoverride(kAspect_Off),     db_adjustfill(kAdjustFill_Off),
+    db_deint_filtername(QString::null),
     db_vdisp_profile(new VideoDisplayProfile()),
 
     // Manual Zoom
@@ -254,7 +255,10 @@ VideoOutput::VideoOutput() :
     video_dim(640,480),                 video_aspect(1.3333f),
 
     // Aspect override
-    letterboxed_video_aspect(1.3333f),  letterbox(kLetterbox_Off),
+    overriden_video_aspect(1.3333f),    aspectoverride(kAspect_Off),
+
+    // Adjust Fill
+    adjustfill(kAdjustFill_Off),
 
     // Screen settings
     video_rect(0,0,0,0),                display_video_rect(0,0,0,0),
@@ -299,7 +303,8 @@ VideoOutput::VideoOutput() :
     db_pict_attr[kPictureAttribute_Hue] =
         gContext->GetNumSetting("PlaybackHue",         0);
 
-    db_letterbox       = gContext->GetNumSetting("AspectOverride",     0);
+    db_aspectoverride  = gContext->GetNumSetting("AspectOverride",     0);
+    db_adjustfill      = gContext->GetNumSetting("AdjustFill",         0);
 }
 
 /**
@@ -342,7 +347,8 @@ bool VideoOutput::Init(int width, int height, float aspect, WId winid,
 
     db_vdisp_profile->SetInput(video_dim);
 
-    letterbox  = db_letterbox;
+    aspectoverride  = db_aspectoverride;
+    adjustfill      = db_adjustfill;
 
     VideoAspectRatioChanged(aspect); // apply aspect ratio and letterbox mode
 
@@ -503,25 +509,23 @@ bool VideoOutput::ApproveDeintFilter(const QString& filtername) const
 /**
  * \fn VideoOutput::SetVideoAspectRatio(float aspect)
  * \brief Sets VideoOutput::video_aspect to aspect, and sets 
- *        VideoOutput::letterboxed_video_aspect the letterbox type, unless
- *        the letterbox type is kLetterbox_Fill.
+ *        VideoOutput::overriden_video_aspect if aspectoverride
+ *        is set to either 4:3 or 16:9.
  * 
  * \param aspect video aspect ratio to use
  */
 void VideoOutput::SetVideoAspectRatio(float aspect)
 {
-    letterboxed_video_aspect = video_aspect = aspect;
-    
+    overriden_video_aspect = video_aspect = aspect;
+
     // Override video's aspect if configured to do so
-    if ((kLetterbox_4_3      == letterbox) ||
-        (kLetterbox_4_3_Zoom == letterbox))
+    if (kAspect_4_3 == aspectoverride)
     {
-        letterboxed_video_aspect = 4.0f / 3.0f;
+        overriden_video_aspect = 4.0f / 3.0f;
     }
-    else if ((kLetterbox_16_9      == letterbox) ||
-             (kLetterbox_16_9_Zoom == letterbox))
+    else if (kAspect_16_9 == aspectoverride)
     {
-        letterboxed_video_aspect = 16.0f / 9.0f;
+        overriden_video_aspect = 16.0f / 9.0f;
     }
 }
 
@@ -683,12 +687,12 @@ QRect VideoOutput::GetVisibleOSDBounds(
     float dispPixelAdj = (GetDisplayAspect() * display_visible_rect.height()) / display_visible_rect.width();
     // now adjust for scaling of the video on the aspect ratio
     float vs = ((float)vb.width())/vb.height();
-    visible_aspect = 1.3333f * (vs/letterboxed_video_aspect) * dispPixelAdj;
+    visible_aspect = 1.3333f * (vs/overriden_video_aspect) * dispPixelAdj;
 
     // now adjust for scaling of the video on the size
     font_scaling = 1.0f/sqrtf(2.0/(sq(visible_aspect / 1.3333f) + 1.0f));
     // now adjust for aspect ratio effect on font size (should be in osd.cpp?)
-    font_scaling *= sqrtf(letterboxed_video_aspect/1.3333f);
+    font_scaling *= sqrtf(overriden_video_aspect/1.3333f);
     return vb;
 }
 
@@ -852,16 +856,17 @@ void VideoOutput::ApplyDBScaleAndMove(void)
 void VideoOutput::ApplyLetterboxing(void)
 {
     float disp_aspect = fix_aspect(GetDisplayAspect());
-    float aspect_diff = disp_aspect - letterboxed_video_aspect;
+    float aspect_diff = disp_aspect - overriden_video_aspect;
     bool  aspects_match = abs(aspect_diff / disp_aspect) <= 0.1f;
-    bool  nomatch_with_fill = !aspects_match && (letterbox == kLetterbox_Fill);
+    bool  nomatch_with_fill = (!aspects_match &&
+                               (adjustfill == kAdjustFill_Stretch));
     bool  nomatch_without_fill = (!aspects_match) && !nomatch_with_fill;
 
     // Adjust for video/display aspect ratio mismatch
-    if (nomatch_with_fill && (disp_aspect > letterboxed_video_aspect))
+    if (nomatch_with_fill && (disp_aspect > overriden_video_aspect))
     {
         float pixNeeded =
-            ((disp_aspect / letterboxed_video_aspect) *
+            ((disp_aspect / overriden_video_aspect) *
              (float)display_video_rect.height()) + 0.5f;
 
         display_video_rect.moveTop(
@@ -872,7 +877,7 @@ void VideoOutput::ApplyLetterboxing(void)
     else if (nomatch_with_fill)
     {
         float pixNeeded =
-            ((letterboxed_video_aspect / disp_aspect) * 
+            ((overriden_video_aspect / disp_aspect) * 
              (float)display_video_rect.width()) + 0.5f;
 
         display_video_rect.moveLeft(
@@ -881,10 +886,10 @@ void VideoOutput::ApplyLetterboxing(void)
 
         display_video_rect.setWidth((int)pixNeeded);
     }
-    else if (nomatch_without_fill && (disp_aspect > letterboxed_video_aspect))
+    else if (nomatch_without_fill && (disp_aspect > overriden_video_aspect))
     {
         float pixNeeded =
-            ((letterboxed_video_aspect / disp_aspect) *
+            ((overriden_video_aspect / disp_aspect) *
              (float)display_video_rect.width()) + 0.5f;
 
         display_video_rect.moveLeft(
@@ -896,7 +901,7 @@ void VideoOutput::ApplyLetterboxing(void)
     else if (nomatch_without_fill)
     {
         float pixNeeded =
-            ((disp_aspect / letterboxed_video_aspect) *
+            ((disp_aspect / overriden_video_aspect) *
              (float)display_video_rect.height()) + 0.5f;
 
         display_video_rect.moveTop(
@@ -907,8 +912,7 @@ void VideoOutput::ApplyLetterboxing(void)
     }
 
     // Process letterbox zoom modes
-    if ((letterbox == kLetterbox_4_3_Zoom) ||
-        (letterbox == kLetterbox_16_9_Zoom))
+    if (adjustfill == kAdjustFill_Full)
     {
         // Zoom mode -- Expand by 4/3 and overscan.
         // 1/6 of original is 1/8 of new
@@ -918,7 +922,21 @@ void VideoOutput::ApplyLetterboxing(void)
             display_video_rect.width()  * 4 / 3,
             display_video_rect.height() * 4 / 3);
     }
-    else if (letterbox == kLetterbox_16_9_Stretch)
+    else if (adjustfill == kAdjustFill_Half)
+    {
+        // Zoom mode -- Expand by 7/6 and overscan.
+        // Intended for eliminating the top bars on 14:9 material.
+        // Also good compromise for 4:3 material on 16:9 screen.
+        // Expanding by 7/6, so remove 1/6 of original from overscan;
+        // take half from each side, so remove 1/12.
+        display_video_rect = QRect(
+            display_video_rect.left() - (display_video_rect.width()  / 12),
+            display_video_rect.top()  - (display_video_rect.height() / 12),
+            display_video_rect.width()  * 7 / 6,
+            display_video_rect.height() * 7 / 6);
+    }
+
+    else if (adjustfill == kAdjustFill_Stretch)
     {
         // Stretch mode -- intended to be used to eliminate side
         //                 bars on 4:3 material encoded to 16:9.
@@ -987,9 +1005,10 @@ void VideoOutput::PrintMoveResizeDebug(void)
     printf("Vscan(%f, %f)\n", db_scale_vert, db_scale_vert);
     printf("DisplayAspect: %f\n", GetDisplayAspect());
     printf("VideoAspect(%f)\n", video_aspect);
-    printf("letterboxed_video_aspect(%f)\n", letterboxed_video_aspect);
+    printf("overriden_video_aspect(%f)\n", overriden_video_aspect);
     printf("CDisplayAspect: %f\n", fix_aspect(GetDisplayAspect()));
-    printf("Letterbox: %d\n", letterbox);
+    printf("AspectOverride: %d\n", aspectoverride);
+    printf("AdjustFill: %d\n", adjustfill);
 #endif
 
     VERBOSE(VB_PLAYBACK,
@@ -1004,7 +1023,7 @@ void VideoOutput::PrintMoveResizeDebug(void)
                     "height: %4, aspect: %5")
             .arg(video_rect.left()).arg(video_rect.top())
             .arg(video_rect.width()).arg(video_rect.height())
-            .arg(letterboxed_video_aspect));
+            .arg(overriden_video_aspect));
 
 }
 
@@ -1016,7 +1035,7 @@ void VideoOutput::PrintMoveResizeDebug(void)
  * then we letterbox settings, and finally we apply manual
  * scale & move properties for "Zoom Mode".
  *
- * \sa Zoom(int), ToggleLetterbox(int)
+ * \sa Zoom(int), ToggleAdjustFill(int)
  */
 void VideoOutput::MoveResize(void)
 {
@@ -1039,7 +1058,7 @@ void VideoOutput::MoveResize(void)
  * \fn VideoOutput::Zoom(int)
  * \brief Sets up zooming into to different parts of the video, the zoom
  *        is actually applied in MoveResize().
- * \sa ToggleLetterbox(int), GetLetterbox()
+ * \sa ToggleAdjustFill(int)
  */
 void VideoOutput::Zoom(int direction)
 {
@@ -1073,25 +1092,47 @@ void VideoOutput::Zoom(int direction)
 }
 
 /**
- * \fn VideoOutput::ToggleLetterbox(int)
- * \brief Sets up letterboxing for various standard video frame and
- *        monitor dimensions, then calls VideoAspectRatioChanged(float)
+ * \fn VideoOutput::ToggleAspectOverride(int)
+ * \brief Enforce different aspect ration than detected,
+ *        then calls VideoAspectRatioChanged(float)
  *        to apply them.
- * \sa Zoom(int), 
+ * \sa Zoom(int), ToggleAdjustFill(int)
  */
-void VideoOutput::ToggleLetterbox(int letterboxMode)
+void VideoOutput::ToggleAspectOverride(int aspectMode)
 {
-    if (letterboxMode == kLetterbox_Toggle)
+    if (aspectMode == kAspect_Toggle)
     {
-        if (++letterbox >= kLetterbox_END)
-            letterbox = kLetterbox_Off;
+        if (++aspectoverride >= kAspect_END)
+            aspectoverride = kAspect_Off;
     }
     else
     {
-        letterbox = letterboxMode;
+        aspectoverride = aspectMode;
     }
 
     VideoAspectRatioChanged(video_aspect);
+}
+
+/**
+ * \fn VideoOutput::ToggleAdjustFill(int)
+ * \brief Sets up letterboxing for various standard video frame and
+ *        monitor dimensions, then calls MoveResize()
+ *        to apply them.
+ * \sa Zoom(int), ToggleAspectOverride(int)
+ */
+void VideoOutput::ToggleAdjustFill(int adjustfillMode)
+{
+    if (adjustfillMode == kAdjustFill_Toggle)
+    {
+        if (++adjustfill >= kAdjustFill_END)
+            adjustfill = kAdjustFill_Off;
+    }
+    else
+    {
+        adjustfill = adjustfillMode;
+    }
+
+    MoveResize();
 }
 
 int VideoOutput::ChangePictureAttribute(int attributeType, bool direction)
@@ -1278,7 +1319,7 @@ void VideoOutput::ShowPip(VideoFrame *frame, NuppelVideoPlayer *pipplayer)
     int letterXadj = 0;
     int letterYadj = 0;
     float letterAdj = 1.0f;
-    if (letterbox != kLetterbox_Off)
+    if (aspectoverride != kAspect_Off)
     {
         letterXadj = max(-display_video_rect.left(), 0);
         float xadj = (float) video_rect.width() / display_visible_rect.width();
@@ -1288,7 +1329,7 @@ void VideoOutput::ShowPip(VideoFrame *frame, NuppelVideoPlayer *pipplayer)
         letterYadj = max(-display_video_rect.top(), 0);
         letterYadj = (int) (letterYadj * yadj);
 
-        letterAdj  = video_aspect / letterboxed_video_aspect;
+        letterAdj  = video_aspect / overriden_video_aspect;
     }
 
     // adjust for non-square pixels on screen

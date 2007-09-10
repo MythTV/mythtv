@@ -13,7 +13,8 @@ class PrivateContext
     PrivateContext() :
         m_glx_fbconfig(0), m_gl_window(0), m_glx_window(0),
         m_glx_context(NULL),
-        m_texture_type(GL_TEXTURE_2D), m_textures_enabled(false)
+        m_texture_type(GL_TEXTURE_2D), m_textures_enabled(false),
+        m_vis_info(NULL), m_attr_list(NULL)
     {
     }
 
@@ -27,6 +28,8 @@ class PrivateContext
     GLXContext   m_glx_context;
     int          m_texture_type;
     bool         m_textures_enabled;
+    XVisualInfo *m_vis_info;
+    int const   *m_attr_list;
 
     vector<GLuint> m_textures;
     vector<GLuint> m_programs;
@@ -36,6 +39,7 @@ class PrivateContext
 OpenGLContext::OpenGLContext() :
     m_priv(new PrivateContext()),
     m_display(NULL), m_screen_num(0),
+    m_major_ver(1), m_minor_ver(2),
     m_extensions(QString::null), m_ext_supported(0),
     m_visible(true), m_max_tex_size(0)
 {
@@ -98,6 +102,8 @@ bool OpenGLContext::Create(
     Display *XJ_disp, Window XJ_curwin, uint screen_num,
     const QSize &display_visible_size, bool visible)
 {
+    static bool debugged = false;
+
     m_visible = visible;
     m_display = XJ_disp;
     m_screen_num = screen_num;
@@ -110,29 +116,55 @@ bool OpenGLContext::Create(
         return false;
     }
 
-    if ((1 == major) && (minor < 3))
+    m_major_ver = major;
+    m_minor_ver = minor;
+
+    if ((1 == major) && (minor < 2))
     {
         VERBOSE(VB_PLAYBACK, LOC_ERR + QString(
-                    "Need GLX 1.3 or better, have %1.%2")
+                    "Need GLX 1.2 or better, have %1.%2")
                 .arg(major).arg(minor));
 
         return false;
-    }
-
-    m_priv->m_glx_fbconfig = get_fbuffer_cfg(
-        XJ_disp, m_screen_num, kRenderRGBA);
-
-    if (!m_priv->m_glx_fbconfig)
+    } 
+    else if ((1 == major) && (minor == 2))
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "No framebuffer "
-                "with needed OpenGL attributes.");
-
-        return false;
+        m_priv->m_attr_list = get_attr_cfg(kRenderRGBA);
+        m_priv->m_vis_info = glXChooseVisual(
+            XJ_disp, m_screen_num, (int*) m_priv->m_attr_list);
+        if (!m_priv->m_vis_info)
+        {
+            m_priv->m_attr_list = get_attr_cfg(kSimpleRGBA);
+            m_priv->m_vis_info = glXChooseVisual(
+                XJ_disp, m_screen_num, (int*) m_priv->m_attr_list);
+        }
+        if (!m_priv->m_vis_info)
+        {
+            VERBOSE(VB_IMPORTANT, LOC_ERR + "No appropriate visual found");
+            return false;
+        }
+        X11S(m_priv->m_glx_context = glXCreateContext(
+                 XJ_disp, m_priv->m_vis_info, None, GL_TRUE));
     }
+    else
+    {
+        m_priv->m_attr_list = get_attr_cfg(kRenderRGBA);
+        m_priv->m_glx_fbconfig = get_fbuffer_cfg(
+            XJ_disp, m_screen_num, m_priv->m_attr_list);
 
-    X11S(m_priv->m_glx_context = glXCreateNewContext(
-             m_display, m_priv->m_glx_fbconfig,
-             GLX_RGBA_TYPE, NULL, GL_TRUE));
+        if (!m_priv->m_glx_fbconfig)
+        {
+            VERBOSE(VB_IMPORTANT, LOC_ERR + "No framebuffer "
+                    "with needed OpenGL attributes.");
+
+            return false;
+        }
+
+
+        X11S(m_priv->m_glx_context = glXCreateNewContext(
+                 m_display, m_priv->m_glx_fbconfig,
+                 GLX_RGBA_TYPE, NULL, GL_TRUE));
+    }
 
     if (!m_priv->m_glx_context)
     {
@@ -141,10 +173,15 @@ bool OpenGLContext::Create(
         return false;
     }
 
-    m_priv->m_gl_window = get_gl_window(
-        XJ_disp, XJ_curwin, m_priv->m_glx_fbconfig,
-        display_visible_size, visible);
+    if ((1 == major) && (minor > 2))
+    {
+        m_priv->m_vis_info = 
+            glXGetVisualFromFBConfig(XJ_disp, m_priv->m_glx_fbconfig);
+    }
 
+    m_priv->m_gl_window = get_gl_window(
+        XJ_disp, XJ_curwin, m_priv->m_vis_info, display_visible_size, visible);
+    
     if (!m_priv->m_gl_window)
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR + "Couldn't create OpenGL Window");
@@ -152,16 +189,19 @@ bool OpenGLContext::Create(
         return false;
     }
 
-    X11S(m_priv->m_glx_window = glXCreateWindow(
-             XJ_disp, m_priv->m_glx_fbconfig, m_priv->m_gl_window, NULL));
-
-    if (!m_priv->m_glx_window)
+    if ((1 == major) && (minor > 2))
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "Couldn't create GLX Window");
+        X11S(m_priv->m_glx_window = glXCreateWindow(
+                XJ_disp, m_priv->m_glx_fbconfig, m_priv->m_gl_window, NULL));
 
-        return false;
+        if (!m_priv->m_glx_window)
+        {
+            VERBOSE(VB_IMPORTANT, LOC_ERR + "Couldn't create GLX Window");
+
+            return false;
+        }
     }
-
+   
     VERBOSE(VB_PLAYBACK, LOC + QString("Created window%1 and context.")
             .arg(m_visible ? "" : " (Offscreen)"));
 
@@ -171,12 +211,28 @@ bool OpenGLContext::Create(
         GLint maxtexsz = 0;
         glGetIntegerv(GL_MAX_TEXTURE_SIZE, &maxtexsz);
         m_max_tex_size = (maxtexsz) ? maxtexsz : 512;
-
-        VERBOSE(VB_PLAYBACK, LOC +
-                QString("Maximum supported texture size: %1 x %2")
-                .arg(m_max_tex_size).arg(m_max_tex_size));
-
         m_extensions = (const char*) glGetString(GL_EXTENSIONS);
+
+        if (!debugged)
+        {
+            debugged = true;
+
+            bool direct = false; 
+            X11S(direct = glXIsDirect(XJ_disp, m_priv->m_glx_context));
+       
+            VERBOSE(VB_PLAYBACK, LOC + QString("GLX Version: %1.%2")
+                    .arg(major).arg(minor));
+            VERBOSE(VB_PLAYBACK, LOC + QString("Direct rendering: %1")
+                   .arg(direct ? "Yes" : "No"));
+            VERBOSE(VB_PLAYBACK, LOC + QString("OpenGL vendor  : %1")
+                   .arg((const char*) glGetString(GL_VENDOR)));
+            VERBOSE(VB_PLAYBACK, LOC + QString("OpenGL renderer: %1")
+                   .arg((const char*) glGetString(GL_RENDERER)));
+            VERBOSE(VB_PLAYBACK, LOC + QString("OpenGL version : %1")
+                   .arg((const char*) glGetString(GL_VERSION)));
+            VERBOSE(VB_PLAYBACK, LOC + QString("Max texture size: %1 x %2")
+                   .arg(m_max_tex_size).arg(m_max_tex_size));
+        }
 
         MakeCurrent(false);
     }
@@ -199,20 +255,25 @@ bool OpenGLContext::MakeCurrent(bool current)
 {
     bool ok;
 
-    X11L;
-
     if (current)
     {
-        ok = glXMakeCurrent(m_display,
-                            m_priv->m_glx_window,
-                            m_priv->m_glx_context);
+        if (IsGLXSupported(1,3))
+        {
+            X11S(ok = glXMakeCurrent(m_display,
+                                     m_priv->m_glx_window,
+                                     m_priv->m_glx_context));
+        }
+        else
+        {
+            X11S(ok = glXMakeCurrent(m_display,
+                                     m_priv->m_gl_window,
+                                     m_priv->m_glx_context));
+        }
     }
     else
     {
-        ok = glXMakeCurrent(m_display, None, NULL);
+        X11S(ok = glXMakeCurrent(m_display, None, NULL));
     }
-
-    X11U;
 
     if (!ok)
         VERBOSE(VB_PLAYBACK, LOC + "Could not make context current.");
@@ -228,7 +289,10 @@ void OpenGLContext::SwapBuffers(void)
         MakeCurrent(true);
 
         glFinish();
-        X11S(glXSwapBuffers(m_display, m_priv->m_glx_window));
+        if (IsGLXSupported(1,3))
+            X11S(glXSwapBuffers(m_display, m_priv->m_glx_window));
+        else
+            X11S(glXSwapBuffers(m_display, m_priv->m_gl_window));
 
         MakeCurrent(false);
     }
@@ -441,9 +505,9 @@ bool OpenGLContext::CreateFrameBuffer(uint &fb, uint tex, const QSize &size)
 {
     GLuint glfb;
 
-    SetupTextureFilters(tex, GL_LINEAR);
-
     MakeCurrent(true);
+
+    SetupTextureFilters(tex, GL_LINEAR);
 
     glPushAttrib(GL_VIEWPORT_BIT);
     glViewport(0, 0, size.width(), size.height());

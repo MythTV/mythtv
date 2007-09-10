@@ -752,7 +752,7 @@ PlaybackProfileItemConfig::PlaybackProfileItemConfig(ProfileItem &_item) :
     osdfade   = new TransCheckBoxSetting();
     deint0    = new TransComboBoxSetting();
     deint1    = new TransComboBoxSetting();
-    filters   = new TransComboBoxSetting(true);
+    filters   = new TransLineEditSetting(true);
 
     for (uint i = 0; i < 2; i++)
     {
@@ -792,6 +792,8 @@ PlaybackProfileItemConfig::PlaybackProfileItemConfig(ProfileItem &_item) :
     deint1->setHelpText(
         QObject::tr("HW means the deinterlacer uses specialized hardware."));
 
+    filters->setHelpText(
+        QObject::tr("Example Custom filter list: 'ivtc,denoise3d'"));
     vid_row->addChild(decoder);
     vid_row->addChild(vidrend);
 
@@ -895,7 +897,8 @@ void PlaybackProfileItemConfig::save(void)
     item.Set("pref_deint1",        deint1->getValue());
 
     QString tmp0 = filters->getValue();
-    QString tmp1 = VideoDisplayProfile::IsFilterAllowed(tmp0) ? tmp0 : "";
+    QString tmp1 = vidrend->getValue();
+    QString tmp3 = VideoDisplayProfile::IsFilterAllowed(tmp1) ? tmp0 : "";
     item.Set("pref_filters", tmp1);
 }
 
@@ -2116,19 +2119,28 @@ static HostComboBox *XineramaMonitorAspectRatio()
 static HostComboBox *AspectOverride()
 {
     HostComboBox *gc = new HostComboBox("AspectOverride");
-    gc->setLabel(QObject::tr("Aspect Override"));
-    gc->addSelection(QObject::tr("Off"), "0");
-    gc->addSelection(QObject::tr("4/3"), "1");
-    gc->addSelection(QObject::tr("16/9"), "2");
-    gc->addSelection(QObject::tr("4/3 Zoom"), "3");
-    gc->addSelection(QObject::tr("16/9 Zoom"), "4");
-    gc->addSelection(QObject::tr("16/9 Stretch"), "5");
-    gc->addSelection(QObject::tr("Fill"), "6");
-    gc->setHelpText(QObject::tr("This will override any aspect ratio in the "
-                    "recorded stream, the same as pressing the W Key during "
-                    "playback. Fill will \"fill\" the screen with the image "
-                    "clipping as required. Fill is useful when using 4:3 "
-                    "interlaced TV's for display."));
+    gc->setLabel(QObject::tr("Video Aspect Override"));
+    gc->addSelection(QObject::tr("Off"),  "0");
+    gc->addSelection(QObject::tr("4:3"),  "1");
+    gc->addSelection(QObject::tr("16:9"), "2");
+    gc->setHelpText(QObject::tr(
+                        "When enabled, these will override the aspect "
+                        "ratio specified by any braodcaster for all "
+                        "video streams."));
+    return gc;
+}
+
+static HostComboBox *AdjustFill()
+{
+    HostComboBox *gc = new HostComboBox("AdjustFill");
+    gc->setLabel(QObject::tr("Zoom"));
+    gc->addSelection(QObject::tr("Off"),     "0");
+    gc->addSelection(QObject::tr("Half"),    "1");
+    gc->addSelection(QObject::tr("Full"),    "2");
+    gc->addSelection(QObject::tr("Stretch"), "3");
+    gc->setHelpText(QObject::tr(
+                        "When enabled, these will apply a predefined "
+                        "zoom to all video playback in MythTV."));
     return gc;
 }
 
@@ -4339,6 +4351,7 @@ PlaybackSettings::PlaybackSettings()
 
     general2->addChild(oscan);
     general2->addChild(AspectOverride());
+    general2->addChild(AdjustFill());
     general2->addChild(PIPLocation());
     general2->addChild(PlaybackExitPrompt());
     general2->addChild(EndOfRecordingExitPrompt());

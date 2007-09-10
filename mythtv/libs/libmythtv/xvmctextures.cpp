@@ -73,7 +73,10 @@ bool XvMCTextures::Init(Display *disp, Window XJ_curwin,
     }
 
     if (!glx_fbconfig)
-        glx_fbconfig = get_fbuffer_cfg(XJ_disp, XJ_screen_num, kRenderRGBA);
+    {
+        glx_fbconfig = get_fbuffer_cfg(
+            XJ_disp, XJ_screen_num, get_attr_cfg(kRenderRGBA));
+    }
 
     if (glx_fbconfig)
         glx_pbuffer = get_pbuffer(XJ_disp, glx_fbconfig, video_dim);
@@ -82,7 +85,9 @@ bool XvMCTextures::Init(Display *disp, Window XJ_curwin,
         X11S(glx_context = glXCreateNewContext(XJ_disp, glx_fbconfig,
                                                GLX_RGBA_TYPE, NULL, 1));
 
-    gl_window = get_gl_window(XJ_disp, XJ_curwin, glx_fbconfig,
+    XVisualInfo *vis_info;
+    vis_info = glXGetVisualFromFBConfig(XJ_disp, glx_fbconfig);
+    gl_window = get_gl_window(XJ_disp, XJ_curwin, vis_info,
                               window_size, true);
 
     glx_window = get_glx_window(XJ_disp, glx_fbconfig, gl_window, glx_context,

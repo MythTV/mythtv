@@ -65,9 +65,25 @@ bool init_opengl(void)
 
 bool get_glx_version(Display *XJ_disp, uint &major, uint &minor)
 {
+    // Crashes Unichrome-based system if it is run more than once. -- Tegue
+    static bool has_run = false;
+    static int static_major = 0;
+    static int static_minor = 0;
+    static int static_ret = false;
+    static QMutex get_glx_version_lock;
+    QMutexLocker locker(&get_glx_version_lock);
+
     int ret, errbase, eventbase, gl_major, gl_minor;
 
+    if (has_run)
+    {
+        major = static_major;
+        minor = static_minor;
+        return static_ret;
+    }
+
     major = minor = 0;
+    has_run = true;
 
     X11S(ret = glXQueryExtension(XJ_disp, &errbase, &eventbase));
     if (!ret)
@@ -86,15 +102,14 @@ bool get_glx_version(Display *XJ_disp, uint &major, uint &minor)
     if (!ret)
         return false;
 
-    major = gl_major;
-    minor = gl_minor;
+    static_major = major = gl_major;
+    static_minor = minor = gl_minor;
+    static_ret = true;
 
     return true;
 }
 
-
-GLXFBConfig get_fbuffer_cfg(Display *XJ_disp, int XJ_screen_num,
-                            FrameBufferType type)
+int const *get_attr_cfg(FrameBufferType type)
 {
     static const int render_rgba_config[] =
     {
@@ -121,13 +136,22 @@ GLXFBConfig get_fbuffer_cfg(Display *XJ_disp, int XJ_screen_num,
         None
     };
  
-    int const * attr_fbconfig = simple_rgba_config;
+    int const * attr_config = simple_rgba_config;
 
     if (kRenderRGBA == type)
-        attr_fbconfig = render_rgba_config;
+        attr_config = render_rgba_config;
 
     if (kSimpleRGBA == type)
-        attr_fbconfig = simple_rgba_config;
+        attr_config = simple_rgba_config;
+    
+    return attr_config;   
+}
+
+
+GLXFBConfig get_fbuffer_cfg(Display *XJ_disp, int XJ_screen_num,
+                            const int *attr_fbconfig)
+{
+
 
     GLXFBConfig  cfg  = 0;
     GLXFBConfig *cfgs = NULL;
@@ -185,13 +209,11 @@ GLXPbuffer get_pbuffer(Display     *XJ_disp,
 
 Window get_gl_window(Display     *XJ_disp,
                      Window       XJ_curwin,
-                     GLXFBConfig  glx_fbconfig,
+                     XVisualInfo  *visInfo,
                      const QSize &window_size,
                      bool         map_window)
 {
     X11L;
-
-    XVisualInfo *visInfo = glXGetVisualFromFBConfig(XJ_disp, glx_fbconfig);
 
     XSetWindowAttributes attributes;
     attributes.colormap = XCreateColormap(

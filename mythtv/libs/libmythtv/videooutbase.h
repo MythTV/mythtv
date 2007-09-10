@@ -46,17 +46,23 @@ enum ZoomDirections
     kZoomRight
 };
 
-enum LetterboxModes
+enum AdjustFillModes
 {
-    kLetterbox_Toggle = -1,
-    kLetterbox_Off = 0,
-    kLetterbox_4_3,
-    kLetterbox_16_9,
-    kLetterbox_4_3_Zoom,
-    kLetterbox_16_9_Zoom,
-    kLetterbox_16_9_Stretch,
-    kLetterbox_Fill,
-    kLetterbox_END
+    kAdjustFill_Toggle = -1,
+    kAdjustFill_Off = 0,
+    kAdjustFill_Half,
+    kAdjustFill_Full,
+    kAdjustFill_Stretch,
+    kAdjustFill_END
+};
+
+enum AspectOverrideModes
+{
+    kAspect_Toggle = -1,
+    kAspect_Off = 0,
+    kAspect_4_3,
+    kAspect_16_9,
+    kAspect_END
 };
 
 enum FrameScanType
@@ -167,10 +173,15 @@ class VideoOutput
     /// \brief Returns current display aspect ratio.
     virtual float GetDisplayAspect(void) const { return display_aspect; }
 
-    /// \brief Returns current letterboxing mode
-    /// \sa ToggleLetterbox(int)
-    int GetLetterbox(void) { return letterbox; }
-    void ToggleLetterbox(int letterboxMode = kLetterbox_Toggle);
+    /// \brief Returns current aspect override mode
+    /// \sa ToggleAspectOverride(int)
+    int GetAspectOverride(void) { return aspectoverride; }
+    void ToggleAspectOverride(int aspectOverrideMode = kAspect_Toggle);
+
+    /// \brief Returns current adjust fill mode
+    /// \sa ToggleAdjustFill(int)
+    int GetAdjustFill(void) { return adjustfill; }
+    void ToggleAdjustFill(int adjustFillMode = kAdjustFill_Toggle);
 
     // pass in null to use the pause frame, if it exists.
     virtual void ProcessFrame(VideoFrame *frame, OSD *osd,
@@ -317,7 +328,8 @@ class VideoOutput
     int     db_pip_location;
     int     db_pip_size;      ///< percentage of full window to use for PiP
     QMap<int,int> db_pict_attr; ///< Picture settings
-    int     db_letterbox;
+    int     db_aspectoverride;
+    int     db_adjustfill;
     QString db_deint_filtername;
 
     VideoDisplayProfile *db_vdisp_profile;
@@ -335,10 +347,12 @@ class VideoOutput
     float   video_aspect;     ///< Physical aspect ratio of video
 
     /// Normally this is the same as videoAspect, but may not be
-    /// if the user has toggled to a different "letterbox" mode.
-    float   letterboxed_video_aspect;
-    /// LetterboxMode to use to modify letterboxed_video_aspect
-    int     letterbox;
+    /// if the user has toggled the aspect override mode.
+    float   overriden_video_aspect;
+    /// AspectOverrideMode to use to modify overriden_video_aspect
+    int     aspectoverride;
+    /// Zoom mode
+    int     adjustfill;
 
     /// Pixel rectangle in video frame to display
     QRect   video_rect;

@@ -609,6 +609,8 @@ QString VideoDisplayProfile::GetDeinterlacerName(const QString short_name)
         return QObject::tr("Kernel (2x, HW)");
     else if ("opengldoubleratelinearblend" == short_name)
         return QObject::tr("Linear blend (2x, HW)");
+    else if ("opengldoubleratefieldorder" == short_name)
+        return QObject::tr("Interlaced (2x, Hw)");
     return "";
 }
 
@@ -1030,6 +1032,8 @@ QString VideoDisplayProfile::toString(void) const
 "openglbobdeint"
 "opengldoubleratelinearblend"
 "opengldoublerateonefield"
+"opengldoubleratekerneldeint"
+"opengldoubleratefieldorder"
 */
 
 void VideoDisplayProfile::init_statics(void)
@@ -1080,6 +1084,7 @@ void VideoDisplayProfile::init_statics(void)
     safe_deint["opengl"] += "opengldoubleratelinearblend";
     safe_deint["opengl"] += "opengldoublerateonefield";
     safe_deint["opengl"] += "opengldoubleratekerneldeint";
+    safe_deint["opengl"] += "opengldoubleratefieldorder";
 
     safe_osd["xv-blit"]     += "softblend";
     safe_osd["xvmc-blit"]   += "chromakey";

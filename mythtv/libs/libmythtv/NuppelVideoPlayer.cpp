@@ -4651,10 +4651,17 @@ bool NuppelVideoPlayer::DoKeypress(QKeyEvent *e)
     return retval;
 }
 
-int NuppelVideoPlayer::GetLetterbox(void) const
+int NuppelVideoPlayer::GetAspectOverride(void) const
 {
     if (videoOutput)
-        return videoOutput->GetLetterbox();
+        return videoOutput->GetAspectOverride();
+    return false;
+}
+
+int NuppelVideoPlayer::GetAdjustFill(void) const
+{
+    if (videoOutput)
+        return videoOutput->GetAdjustFill();
     return false;
 }
 
@@ -4678,11 +4685,20 @@ void NuppelVideoPlayer::SetForcedAspectRatio(int mpeg2_aspect_value, int letterb
     }
 }
 
-void NuppelVideoPlayer::ToggleLetterbox(int letterboxMode)
+void NuppelVideoPlayer::ToggleAspectOverride(int aspectMode)
 {
     if (videoOutput)
     {
-        videoOutput->ToggleLetterbox(letterboxMode);
+        videoOutput->ToggleAspectOverride(aspectMode);
+        ReinitOSD();
+    }
+}
+
+void NuppelVideoPlayer::ToggleAdjustFill(int adjustfillMode)
+{
+    if (videoOutput)
+    {
+        videoOutput->ToggleAdjustFill(adjustfillMode);
         ReinitOSD();
     }
 }

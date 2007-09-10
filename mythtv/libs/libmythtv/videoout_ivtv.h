@@ -3,11 +3,11 @@
 
 #include <qstring.h>
 #include <qmutex.h>
-#include <cassert>
 
 #include "videooutbase.h"
 
 class NuppelVideoPlayer;
+class VideoOutputIvtvPriv;
 
 class VideoOutputIvtv: public VideoOutput
 {
@@ -79,6 +79,7 @@ class VideoOutputIvtv: public VideoOutput
 
     void ShowPip(VideoFrame *frame, NuppelVideoPlayer *pipplayer);
     void SetAlpha(eAlphaState newAlpha);
+    void SetColorKey(int state, int color);
     long long GetFirmwareFramesPlayed(void);
 
     int videofd;
@@ -113,6 +114,13 @@ class VideoOutputIvtv: public VideoOutput
     bool last_normal;
     int last_mask;
     eAlphaState alphaState;
+
+    bool old_fb_ioctl;
+    bool v4l2_api;
+    int  fb_dma_ioctl;
+    bool color_key;
+    bool decoder_flush;
+    VideoOutputIvtvPriv *priv;
 };
 
 #endif

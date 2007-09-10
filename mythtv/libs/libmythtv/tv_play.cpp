@@ -323,8 +323,9 @@ void TV::InitKeys(void)
             "V");
     REG_KEY("TV Playback", "TOGGLEPIPWINDOW", "Toggle active PiP window", "B");
     REG_KEY("TV Playback", "SWAPPIP", "Swap PiP/Main", "N");
-    REG_KEY("TV Playback", "TOGGLEASPECT", "Toggle the display aspect ratio",
-            "W");
+    REG_KEY("TV Playback", "TOGGLEASPECT",
+            "Toggle the video aspect ratio", "Ctrl+W");
+    REG_KEY("TV Playback", "TOGGLEFILL", "Next Preconfigured Zoom mode", "W");
 
     REG_KEY("TV Playback", "TOGGLECC",      "Toggle any captions",   "T");
     REG_KEY("TV Playback", "TOGGLETTC",     "Toggle Teletext Captions","");
@@ -2319,7 +2320,8 @@ void TV::ProcessKeypress(QKeyEvent *e)
                 ToggleRecord();
             else if (action == "VOLUMEDOWN" || action == "VOLUMEUP" ||
                      action == "STRETCHINC" || action == "STRETCHDEC" ||
-                     action == "MUTE" || action == "TOGGLEASPECT")
+                     action == "MUTE"       || action == "TOGGLEASPECT" ||
+                     action == "TOGGLEFILL" )
             {
                 passThru = 1;
                 handled = false;
@@ -2925,7 +2927,9 @@ void TV::ProcessKeypress(QKeyEvent *e)
         else if (action == "STRETCHDEC")
             ChangeTimeStretch(-1);
         else if (action == "TOGGLEASPECT")
-            ToggleLetterbox();
+            ToggleAspectOverride();
+        else if (action == "TOGGLEFILL")
+            ToggleAdjustFill();
         else if (action == "MENU")
             ShowOSDTreeMenu();
         else 
@@ -5524,20 +5528,34 @@ void TV::IdleDialog(void)
     idleTimer->changeInterval(timeuntil * 1000);
 }
 
-void TV::ToggleLetterbox(int letterboxMode)
+void TV::ToggleAspectOverride(int aspectMode)
 {
-    nvp->ToggleLetterbox(letterboxMode);
-    int letterbox = nvp->GetLetterbox();
+    nvp->ToggleAspectOverride(aspectMode);
+    int aspectoverride = nvp->GetAspectOverride();
     QString text;
 
-    switch (letterbox)
+    switch (aspectoverride)
     {
-        case kLetterbox_4_3:          text = tr("4:3"); break;
-        case kLetterbox_16_9:         text = tr("16:9"); break;
-        case kLetterbox_4_3_Zoom:     text = tr("4:3 Zoom"); break;
-        case kLetterbox_16_9_Zoom:    text = tr("16:9 Zoom"); break;
-        case kLetterbox_16_9_Stretch: text = tr("16:9 Stretch"); break;
-        case kLetterbox_Fill:         text = tr("Fill"); break;
+        case kAspect_4_3:             text = tr("4:3"); break;
+        case kAspect_16_9:            text = tr("16:9"); break;
+        default:                      text = tr("Off"); break;
+    }
+
+    if (GetOSD() && !browsemode && !GetOSD()->IsRunningTreeMenu())
+        GetOSD()->SetSettingsText(text, 3);
+}
+
+void TV::ToggleAdjustFill(int adjustfillMode)
+{
+    nvp->ToggleAdjustFill(adjustfillMode);
+    int adjustfill = nvp->GetAdjustFill();
+    QString text;
+
+    switch (adjustfill)
+    {
+        case kAdjustFill_Half:        text = tr("Half Zoom"); break;
+        case kAdjustFill_Full:        text = tr("Full Zoom"); break;
+        case kAdjustFill_Stretch:     text = tr("Zoom & Stretch"); break;
         default:                      text = tr("Off"); break;
     }
 
@@ -6578,7 +6596,11 @@ void TV::TreeMenuSelected(OSDListTreeType *tree, OSDGenericTree *item)
     }
     else if (action.left(12) == "TOGGLEASPECT")
     {
-        ToggleLetterbox(action.right(1).toInt());
+        ToggleAspectOverride(action.right(1).toInt());
+    }
+    else if (action.left(10) == "TOGGLEFILL")
+    {
+        ToggleAdjustFill(action.right(1).toInt());
     }
     else if (action == "GUIDE")
         EditSchedule(kScheduleProgramGuide);
@@ -6818,37 +6840,41 @@ void TV::BuildOSDTreeMenu(void)
         FillMenuTracks(treeMenu, kTrackTypeTeletextCaptions);
     }
 
-    int letterbox = nvp->GetLetterbox();
+    int aspectoverride = nvp->GetAspectOverride();
     item = new OSDGenericTree(treeMenu, tr("Change Aspect Ratio"));
     subitem = new OSDGenericTree(item, tr("Off"), "TOGGLEASPECT" +
-                                 QString("%1").arg(kLetterbox_Off),
-                                 ((letterbox <= kLetterbox_Off) ||
-                                  (letterbox >= kLetterbox_END)) ? 1 : 0,
+                                 QString("%1").arg(kAspect_Off),
+                                 ((aspectoverride <= kAspect_Off) ||
+                                  (aspectoverride >= kAspect_END)) ? 1 : 0,
                                  NULL, "ASPECTGROUP");
     subitem = new OSDGenericTree(item, tr("4:3"), "TOGGLEASPECT" +
-                                 QString("%1").arg(kLetterbox_4_3),
-                                 (letterbox == kLetterbox_4_3) ? 1 : 0,
+                                 QString("%1").arg(kAspect_4_3),
+                                 (aspectoverride == kAspect_4_3) ? 1 : 0,
                                  NULL, "ASPECTGROUP");
     subitem = new OSDGenericTree(item, tr("16:9"), "TOGGLEASPECT" +
-                                 QString("%1").arg(kLetterbox_16_9),
-                                 (letterbox == kLetterbox_16_9) ? 1 : 0,
+                                 QString("%1").arg(kAspect_16_9),
+                                 (aspectoverride == kAspect_16_9) ? 1 : 0,
                                  NULL, "ASPECTGROUP");
-    subitem = new OSDGenericTree(item, tr("4:3 Zoom"), "TOGGLEASPECT" +
-                                 QString("%1").arg(kLetterbox_4_3_Zoom),
-                                 (letterbox == kLetterbox_4_3_Zoom) ? 1 : 0,
-                                 NULL, "ASPECTGROUP");
-    subitem = new OSDGenericTree(item, tr("16:9 Zoom"), "TOGGLEASPECT" +
-                                 QString("%1").arg(kLetterbox_16_9_Zoom),
-                                 (letterbox == kLetterbox_16_9_Zoom) ? 1 : 0,
-                                 NULL, "ASPECTGROUP");
-    subitem = new OSDGenericTree(item, tr("16:9 Stretch"), "TOGGLEASPECT" +
-                                 QString("%1").arg(kLetterbox_16_9_Stretch),
-                                 (letterbox == kLetterbox_16_9_Stretch) ? 1 : 0,
-                                 NULL, "ASPECTGROUP");
-    subitem = new OSDGenericTree(item, tr("Fill"), "TOGGLEASPECT" +
-                                 QString("%1").arg(kLetterbox_Fill),
-                                 (letterbox == kLetterbox_Fill) ? 1 : 0,
-                                 NULL, "ASPECTGROUP");
+
+    int adjustfill = nvp->GetAdjustFill();
+    item = new OSDGenericTree(treeMenu, tr("Adjust Fill"));
+    subitem = new OSDGenericTree(item, tr("Off"), "TOGGLEFILL" +
+                                 QString("%1").arg(kAdjustFill_Off),
+                                 ((adjustfill <= kAdjustFill_Off) ||
+                                  (adjustfill >= kAdjustFill_END)) ? 1 : 0,
+                                 NULL, "ADJUSTFILLGROUP");
+    subitem = new OSDGenericTree(item, tr("Half"), "TOGGLEFILL" +
+                                 QString("%1").arg(kAdjustFill_Half),
+                                 (adjustfill == kAdjustFill_Half) ? 1 : 0,
+                                 NULL, "ADJUSTFILLGROUP");
+    subitem = new OSDGenericTree(item, tr("Full"), "TOGGLEFILL" +
+                                 QString("%1").arg(kAdjustFill_Full),
+                                 (adjustfill == kAdjustFill_Full) ? 1 : 0,
+                                 NULL, "ADJUSTFILLGROUP");
+    subitem = new OSDGenericTree(item, tr("Stretch"), "TOGGLEFILL" +
+                                 QString("%1").arg(kAdjustFill_Stretch),
+                                 (adjustfill == kAdjustFill_Stretch) ? 1 : 0,
+                                 NULL, "ADJUSTFILLGROUP");
 
     if (db_use_picture_attr)
     {

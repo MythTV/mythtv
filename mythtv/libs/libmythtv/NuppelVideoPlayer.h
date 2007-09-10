@@ -171,7 +171,8 @@ class MPUBLIC NuppelVideoPlayer : public CC608Reader, public CC708Reader
     void SetVideoResize(const QRect &videoRect);
 
     // Toggle Sets
-    void ToggleLetterbox(int letterboxMode = -1);
+    void ToggleAspectOverride(int aspectMode = -1);
+    void ToggleAdjustFill(int adjustfillMode = -1);
 
     // Gets
     int     GetVideoWidth(void) const         { return video_width; }
@@ -180,7 +181,8 @@ class MPUBLIC NuppelVideoPlayer : public CC608Reader, public CC708Reader
     float   GetFrameRate(void) const          { return video_frame_rate; }
 
     int     GetSecondsBehind(void) const;
-    int     GetLetterbox(void) const;
+    int     GetAspectOverride(void) const;
+    int     GetAdjustFill(void) const;
     int     GetFFRewSkip(void) const          { return ffrew_skip; }
     float   GetAudioStretchFactor(void) const { return audio_stretchfactor; }
     float   GetNextPlaySpeed(void) const      { return next_play_speed; }

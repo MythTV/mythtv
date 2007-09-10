@@ -88,17 +88,19 @@ bool get_glx_version(Display *XJ_disp, uint &major, uint &minor);
 bool init_opengl(void);
 
 typedef enum { kRenderRGBA, kSimpleRGBA } FrameBufferType;
-GLXFBConfig get_fbuffer_cfg(Display *XJ_disp, int XJ_screen_num,
-                            FrameBufferType);
+int const *get_attr_cfg(FrameBufferType type);
 
 // Requires GLX 1.3 or later
+GLXFBConfig get_fbuffer_cfg(Display *XJ_disp, int XJ_screen_num,
+                            const int*);
+
 GLXPbuffer get_pbuffer(Display     *XJ_disp,
                        GLXFBConfig  glx_fbconfig,
                        const QSize &video_dim);
 
 Window get_gl_window(Display     *XJ_disp,
                      Window       XJ_curwin,
-                     GLXFBConfig  glx_fbconfig,
+                     XVisualInfo  *visinfo,
                      const QSize &window_size,
                      bool         map_window);
 
