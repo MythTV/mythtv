@@ -164,6 +164,29 @@ bool RemoteDeleteRecording(ProgramInfo *pginfo, bool forgetHistory,
     return result;
 }
 
+bool RemoteUndeleteRecording(ProgramInfo *pginfo)
+{
+    bool result = false;
+
+    bool undelete_possible = 
+            gContext->GetNumSetting("AutoExpireInsteadOfDelete", 0);
+
+    if (!undelete_possible)
+        return result;
+
+    QStringList strlist;
+
+    strlist = QString("UNDELETE_RECORDING");
+    pginfo->ToStringList(strlist);
+
+    gContext->SendReceiveStringList(strlist);
+
+    if (strlist[0].toInt() == 0)
+        result = true;
+
+    return result;
+}
+
 void RemoteGetAllScheduledRecordings(vector<ProgramInfo *> &scheduledlist)
 {
     QStringList strList = QString("QUERY_GETALLSCHEDULED");

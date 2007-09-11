@@ -1664,6 +1664,7 @@ bool PlaybackBox::FillList(bool useCachedData)
             p = *i;
             if ((((p->recgroup == recGroup) ||
                   ((recGroup == "All Programs") &&
+                   (p->recgroup != "Deleted") &&
                    (p->recgroup != "LiveTV" || LiveTVInAllPrograms))) &&
                  (recGroupPassword == curGroupPassword)) ||
                 ((recGroupType[recGroup] == "category") &&
@@ -2311,7 +2312,12 @@ void PlaybackBox::deleteSelected()
     if (!curitem)
         return;
 
-    if ((curitem->availableStatus != asPendingDelete) &&
+    bool undelete_possible =
+            gContext->GetNumSetting("AutoExpireInsteadOfDelete", 0);
+
+    if (curitem->recgroup != "Deleted" && undelete_possible)
+        doRemove(curitem, false, false);
+    else if ((curitem->availableStatus != asPendingDelete) &&
         (REC_CAN_BE_DELETED(curitem)))
         remove(curitem);
     else
@@ -3184,7 +3190,20 @@ void PlaybackBox::showActionPopup(ProgramInfo *program)
     popup->addButton(tr("Job Options"), this, SLOT(showJobPopup()));
 
     if (!(m_player && m_player->IsSameProgram(curitem)))
-        popup->addButton(tr("Delete"), this, SLOT(askDelete()));
+    {
+        if (curitem->recgroup == "Deleted")
+        {
+            popup->addButton(tr("Undelete"), this,
+                        SLOT(doUndelete()));
+            popup->addButton(tr("Delete Forever"), this,
+                        SLOT(doDelete()));
+        }
+        else
+        {
+            popup->addButton(tr("Delete"), this,
+                        SLOT(askDelete()));
+        }
+    }
 
     popup->ShowPopup(this, SLOT(PopupDone(int)));
 
@@ -3530,6 +3549,18 @@ void PlaybackBox::doPlaylistDelete(void)
 
     connected = FillList();
     playList.clear();
+}
+
+void PlaybackBox::doUndelete(void)
+{
+    if (!expectingPopup)
+    {
+        previewSuspend = false;
+        return; 
+    }
+
+    cancelPopup();
+    RemoteUndeleteRecording(curitem);
 }
 
 void PlaybackBox::doDelete(void)

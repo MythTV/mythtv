@@ -562,6 +562,17 @@ static GlobalSpinBox *AutoExpireExtraSpace()
     return bs;
 };
 
+static GlobalCheckBox *AutoExpireInsteadOfDelete()
+{
+    GlobalCheckBox *cb = new GlobalCheckBox("AutoExpireInsteadOfDelete");
+    cb->setLabel(QObject::tr("Auto Expire Instead of Delete Recording"));
+    cb->setValue(false);
+    cb->setHelpText(QObject::tr("Instead of deleting a recording, "
+                                "move recording to the 'Deleted' recgroup "
+                                "and turn on autoexpire."));
+    return cb;
+}
+
 static GlobalComboBox *AutoExpireMethod()
 {
     GlobalComboBox *bc = new GlobalComboBox("AutoExpireMethod");
@@ -4496,6 +4507,7 @@ GeneralSettings::GeneralSettings()
     autoexp->addChild(AutoExpireLiveTVMaxAge());
     autoexp->addChild(RerecordWatched());
     autoexp->addChild(AutoExpireExtraSpace());
+    autoexp->addChild(AutoExpireInsteadOfDelete());
     addChild(autoexp);
 
     VerticalConfigurationGroup* jobs = new VerticalConfigurationGroup(false);

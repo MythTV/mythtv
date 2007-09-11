@@ -39,6 +39,8 @@ MPUBLIC
 bool RemoteDeleteRecording(ProgramInfo *pginfo, bool forgetHistory,
                            bool forceMetadataDelete = false);
 MPUBLIC
+bool RemoteUndeleteRecording(ProgramInfo *pginfo);
+MPUBLIC
 void RemoteGetAllScheduledRecordings(vector<ProgramInfo *> &scheduledlist);
 MPUBLIC
 void RemoteGetAllExpiringRecordings(vector<ProgramInfo *> &expiringlist);

@@ -118,6 +118,13 @@ enum WatchListStatus {
     wlExpireOff = -1
 };
 
+enum AutoExpireType {
+    kDisableAutoExpire = 0,
+    kNormalAutoExpire  = 1,
+    kDeletedAutoExpire = 9999,
+    kLiveTVAutoExpire = 10000
+};
+
 class ScheduledRecording;
 class QGridLayout;
 

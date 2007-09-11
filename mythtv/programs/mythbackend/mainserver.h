@@ -80,6 +80,8 @@ class MainServer : public QObject, public MythSocketCBs
                                bool forceMetadataDelete);
     void DoHandleDeleteRecording(ProgramInfo *pginfo, PlaybackSock *pbs,
                                  bool forceMetadataDelete);
+    void HandleUndeleteRecording(QStringList &slist, PlaybackSock *pbs);
+    void DoHandleUndeleteRecording(ProgramInfo *pginfo, PlaybackSock *pbs);
     void HandleForgetRecording(QStringList &slist, PlaybackSock *pbs);
     void HandleRescheduleRecordings(int recordid, PlaybackSock *pbs);
     void HandleQueryFreeSpace(PlaybackSock *pbs, bool allBackends);

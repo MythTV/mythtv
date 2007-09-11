@@ -224,7 +224,7 @@ class MPUBLIC MythPrivRequest
  *       mythtv/bindings/perl/MythTV.pm (version number)
  *       mythtv/bindings/perl/MythTV/Program.pm (layout)
  */
-#define MYTH_PROTO_VERSION "35"
+#define MYTH_PROTO_VERSION "36"
 
 /** \class MythContext
  *  \brief This class contains the runtime context for MythTV.

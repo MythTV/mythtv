@@ -50,8 +50,6 @@ typedef enum
     kState_ChangingState,
 } TVState;
 
-const int kLiveTVAutoExpire = 10000;
-
 QString StateToString(TVState state);
 
 typedef enum PictureAdjustType

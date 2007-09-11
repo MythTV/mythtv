@@ -396,6 +396,10 @@ void MainServer::ProcessRequestWork(MythSocket *sock)
     {
         HandleDeleteRecording(listline, pbs, true);
     }
+    else if (command == "UNDELETE_RECORDING")
+    {
+        HandleUndeleteRecording(listline, pbs);
+    }
     else if (command == "RESCHEDULE_RECORDINGS")
     {
         if (tokens.size() != 2)
@@ -1923,6 +1927,25 @@ void MainServer::DoHandleDeleteRecording(ProgramInfo *pginfo, PlaybackSock *pbs,
     if (pbs)
         pbssock = pbs->getSocket();
 
+    bool justexpire = 
+            (gContext->GetNumSetting("AutoExpireInsteadOfDelete") &&
+            (pginfo->recgroup != "Deleted") && (pginfo->recgroup != "LiveTV"));
+
+    if (justexpire && !forceMetadataDelete)
+    {
+        pginfo->ApplyRecordRecGroupChange("Deleted");
+        pginfo->SetAutoExpire(kDeletedAutoExpire);
+        if (pginfo->recstatus == rsRecording)
+            DoHandleStopRecording(pginfo, pbs);
+        else
+            delete pginfo;
+        QStringList outputlist = QString::number(0);
+        SendResponse(pbssock, outputlist);
+        MythEvent me("RECORDING_LIST_CHANGE");
+        gContext->dispatch(me);
+        return;
+    }
+
     QString filename = pginfo->GetPlaybackURL();
 
     // If this recording was made by a another recorder, and that
@@ -2043,6 +2066,38 @@ void MainServer::DoHandleDeleteRecording(ProgramInfo *pginfo, PlaybackSock *pbs,
     }
 
     delete pginfo;
+}
+
+void MainServer::HandleUndeleteRecording(QStringList &slist, PlaybackSock *pbs)
+{
+    ProgramInfo *pginfo  = new ProgramInfo();
+    pginfo->FromStringList(slist, 1);
+
+    DoHandleUndeleteRecording(pginfo, pbs);
+}
+
+void MainServer::DoHandleUndeleteRecording(ProgramInfo *pginfo, PlaybackSock *pbs)
+{
+    bool ret = -1;
+    bool undelete_possible = 
+            gContext->GetNumSetting("AutoExpireInsteadOfDelete", 0);
+    MythSocket *pbssock = NULL;
+    if (pbs)
+        pbssock = pbs->getSocket();
+
+    if (undelete_possible)
+    {
+        pginfo->ApplyRecordRecGroupChange("Default");
+        pginfo->UpdateLastDelete(false);
+        pginfo->SetAutoExpire(kDisableAutoExpire);
+        delete pginfo;
+        ret = 0;
+        MythEvent me("RECORDING_LIST_CHANGE");
+        gContext->dispatch(me);
+    }
+
+    QStringList outputlist = QString::number(ret);
+    SendResponse(pbssock, outputlist);
 }
 
 void MainServer::HandleRescheduleRecordings(int recordid, PlaybackSock *pbs)
