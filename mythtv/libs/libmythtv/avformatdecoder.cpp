@@ -1465,7 +1465,7 @@ int AvFormatDecoder::ScanStreams(bool novideo)
                     bool force_xv = false;
                     if (ringBuffer->isDVD())
                     {
-                        if (dec == "xvmc")
+                        if (dec.left(4) == "xvmc")
                             dvd_xvmc_enabled = true;
                                 
                         if (ringBuffer->InDVDMenuOrStillFrame() &&
