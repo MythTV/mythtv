@@ -223,6 +223,10 @@ class MPUBLIC MythPrivRequest
  *   MythTV Perl Bindings
  *       mythtv/bindings/perl/MythTV.pm (version number)
  *       mythtv/bindings/perl/MythTV/Program.pm (layout)
+ *
+ *   MythVideo 
+ *      mythplugins/mythvideo/mythvideo/scripts/MythTV.py (version number)
+ *      mythplugins/mythvideo/mythvideo/scripts/MythTV.py (layout)
  */
 #define MYTH_PROTO_VERSION "36"
 
