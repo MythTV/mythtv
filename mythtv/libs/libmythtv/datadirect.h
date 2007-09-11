@@ -215,7 +215,7 @@ class DDStructureParser: public QXmlDefaultHandler
 {
   public:
     DDStructureParser(DataDirectProcessor& _ddparent) :
-        parent(_ddparent), saw_repeat(false), saw_new(false) {}
+        parent(_ddparent) {}
 
     bool startElement(const QString &pnamespaceuri, const QString &plocalname,
                       const QString &pqname, const QXmlAttributes &pxmlatts);
@@ -240,8 +240,6 @@ class DDStructureParser: public QXmlDefaultHandler
     DataDirectProductionCrew curr_productioncrew;
     DataDirectGenre          curr_genre;
     QString                  lastprogramid;
-    bool                     saw_repeat;
-    bool                     saw_new;
 };
 
 
