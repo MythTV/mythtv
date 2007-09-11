@@ -168,14 +168,8 @@ bool DDStructureParser::startElement(const QString &pnamespaceuri,
         curr_schedule.duration = QTime(durstr.mid(2, 2).toInt(), 
                                        durstr.mid(5, 2).toInt(), 0, 0);
 
-        QString isrepeat = pxmlatts.value("repeat");
-        curr_schedule.repeat = (isrepeat == "true");
-        saw_repeat |= !isrepeat.isEmpty();
-
-        QString isnew = pxmlatts.value("new");
-        curr_schedule.isnew = (isnew == "true");
-        saw_new |= !isnew.isEmpty();
-
+        curr_schedule.repeat = (pxmlatts.value("repeat") == "true");
+        curr_schedule.isnew = (pxmlatts.value("new") == "true");
         curr_schedule.stereo = (pxmlatts.value("stereo") == "true");
         curr_schedule.subtitled = (pxmlatts.value("subtitled") == "true");
         curr_schedule.hdtv = (pxmlatts.value("hdtv") == "true");
@@ -420,16 +414,6 @@ bool DDStructureParser::startDocument()
 
 bool DDStructureParser::endDocument() 
 {
-    MSqlQuery query(MSqlQuery::DDCon());
-    query.prepare(
-        "INSERT INTO dd_state (sawrepeat, sawnew) "
-        "VALUES (:SAWREPEAT, :SAWNEW)");
-    query.bindValue(":SAWREPEAT", saw_repeat);
-    query.bindValue(":SAWNEW",    saw_new);
-
-    if (!query.exec())
-        MythContext::DBError("Inserting into dd_state", query);
-
     return true;
 }
  
@@ -617,28 +601,6 @@ void DataDirectProcessor::UpdateProgramViewTable(uint sourceid)
 {
     MSqlQuery query(MSqlQuery::DDCon());
 
-    query.prepare(
-        "SELECT sawrepeat, sawnew "
-        "FROM dd_state");
-
-    if (!query.exec())
-    {
-        MythContext::DBError("Querying into dd_state", query);
-        return;
-    }
-
-    if (!query.next())
-    {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "UpdateProgramViewTable no dd_state!");
-        return;
-    }
-
-    bool saw_repeat = query.value(0).toUInt(); (void) saw_repeat;
-    bool saw_new    = query.value(1).toUInt(); (void) saw_new;
-
-//    VERBOSE(VB_GENERAL, LOC + QString("Saw new: %1, saw repeat: %2")
-//            .arg(saw_new).arg(saw_repeat));
-
     if (!query.exec("TRUNCATE TABLE dd_v_program;"))
         MythContext::DBError("Truncating temporary table dd_v_program", query);
 
@@ -654,7 +616,7 @@ void DataDirectProcessor::UpdateProgramViewTable(uint sourceid)
         "       tvrating,       mpaarating,      programid )      "
         "SELECT chanid,         scheduletime,    endtime,         "
         "       title,          subtitle,        description,     "
-        "       year,           stars,           %1,              "
+        "       year,           stars,           isrepeat,        "
         "       stereo,         subtitled,       hdtv,            "
         "       closecaptioned, partnumber,      parttotal,       "
         "       seriesid,       originalairdate, showtype,        "
@@ -665,12 +627,7 @@ void DataDirectProcessor::UpdateProgramViewTable(uint sourceid)
         "       (channel.xmltvid       = dd_schedule.stationid) AND "
         "       (channel.sourceid      = :SOURCEID))";
 
-    QString repeat = (saw_new) ?
-        "(not isnew) AND "
-        "(SUBSTRING(dd_program.programid,1,2) IN ('EP', 'SH'))" :
-        "isrepeat";
-
-    query.prepare(qstr.arg(repeat));
+    query.prepare(qstr);
 
     query.bindValue(":SOURCEID", sourceid);
 
@@ -1315,9 +1272,6 @@ void DataDirectProcessor::CreateATempTable(const QString &ptablename,
 void DataDirectProcessor::CreateTempTables() 
 {
     QMap<QString,QString> dd_tables;
-
-    dd_tables["dd_state"] =
-        "( sawrepeat bool,               sawnew bool )";
 
     dd_tables["dd_station"] =
         "( stationid char(12),           callsign char(10),     "
