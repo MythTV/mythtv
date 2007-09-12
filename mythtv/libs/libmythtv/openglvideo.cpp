@@ -895,8 +895,9 @@ void OpenGLVideo::PrepareFrame(FrameScanType scan, bool softwareDeinterlacing,
             }
         }
 
-        if ((softwareDeinterlacer == "bobdeint") &&
-            softwareDeinterlacing && (type == kGLFilterYUV2RGB))
+        if (softwareDeinterlacer == "bobdeint" &&
+            softwareDeinterlacing && (type == kGLFilterYUV2RGB ||
+            (type == kGLFilterResize && numfilters == 1)))
         {
             bob = line_height / 4.0f;
             if (scan == kScan_Interlaced)
