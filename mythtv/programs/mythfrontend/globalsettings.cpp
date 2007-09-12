@@ -910,7 +910,7 @@ void PlaybackProfileItemConfig::save(void)
     QString tmp0 = filters->getValue();
     QString tmp1 = vidrend->getValue();
     QString tmp3 = VideoDisplayProfile::IsFilterAllowed(tmp1) ? tmp0 : "";
-    item.Set("pref_filters", tmp1);
+    item.Set("pref_filters", tmp3);
 }
 
 void PlaybackProfileItemConfig::decoderChanged(const QString &dec)
