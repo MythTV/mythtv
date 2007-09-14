@@ -2315,7 +2315,7 @@ void PlaybackBox::deleteSelected()
     bool undelete_possible =
             gContext->GetNumSetting("AutoExpireInsteadOfDelete", 0);
 
-    if (curitem->recgroup != "Deleted" && undelete_possible)
+    if (curitem->recgroup == "Deleted" && undelete_possible)
         doRemove(curitem, false, false);
     else if ((curitem->availableStatus != asPendingDelete) &&
         (REC_CAN_BE_DELETED(curitem)))
