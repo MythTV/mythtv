@@ -918,10 +918,8 @@ static void altivec_i420_2vuy(
     int y_extra   = y_stride   - (h_size);
     int u_extra   = u_stride   - (h_size>>1);
     int v_extra   = v_stride   - (h_size>>1);
-    bool any_extra = vuy_extra || y_extra || u_extra || v_extra ||
-        (u_extra != v_extra);
 
-    if (any_extra)
+    if (vuy_extra || y_extra || u_extra || v_extra)
     {
         // Fall back to C version
         non_vec_i420_2vuy(image, vuy_stride,
@@ -1115,10 +1113,8 @@ static void altivec_2vuy_i420(
     int y_extra   = y_stride   - (h_size);
     int u_extra   = u_stride   - (h_size>>1);
     int v_extra   = v_stride   - (h_size>>1);
-    bool any_extra = vuy_extra || y_extra || u_extra || v_extra ||
-        (u_extra != v_extra);
 
-    if (any_extra)
+    if (vuy_extra || y_extra || u_extra || v_extra)
     {
         // Fall back to C version
         non_vec_2vuy_i420(py, pu, pv,
