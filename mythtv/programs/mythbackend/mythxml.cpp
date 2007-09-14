@@ -1448,7 +1448,14 @@ void MythXML::GetConnectionInfo( HTTPRequest *pRequest )
     QString sPin         = pRequest->m_mapParams[ "Pin" ];
     QString sSecurityPin = gContext->GetSetting( "SecurityPin", "");
 
-    if (( sSecurityPin.length() != 0 ) && ( sPin != sSecurityPin )) 
+    if ( sSecurityPin.length() == 0 )
+    {
+        UPnp::FormatErrorResponse( pRequest, UPnPResult_ActionNotAuthorized, 
+              "No Security Pin assigned. Run mythtv-setup to set one." );
+        return;
+    }
+
+    if ((sSecurityPin != "0000" ) && ( sPin != sSecurityPin ))
     {
         UPnp::FormatErrorResponse( pRequest, UPnPResult_ActionNotAuthorized );
         return;

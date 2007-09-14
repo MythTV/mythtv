@@ -125,7 +125,7 @@ QString SOAPClient::GetNodeValue( QDomNode &node, const QString &sName, const QS
             sValue = oText.nodeValue();
 
         QUrl::decode( sValue );
-    
+
         return sValue;
     }
 
@@ -262,7 +262,7 @@ bool SOAPClient::SendSOAPRequest( const QString    &sMethod,
     // --------------------------------------------------------------
 
     nErrCode = GetNodeValue( doc, "Envelope/Body/Fault/detail/UPnPResult/errorCode"       , 500 );
-    sErrDesc = GetNodeValue( doc, "Envelope/Body/Fault/detail/UPnPResult/errorDescription", "Unknown" );
+    sErrDesc = GetNodeValue( doc, "Envelope/Body/Fault/detail/UPnPResult/errorDescription", QString( "Unknown" ));
 
     return false;
 }

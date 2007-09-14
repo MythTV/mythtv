@@ -195,7 +195,7 @@ class MythContextPrivate
     MythContextPrivate(MythContext *lparent);
    ~MythContextPrivate();
 
-    bool Init(bool gui);
+    bool Init(bool gui, DatabaseParams *pParams = NULL );
     bool IsWideMode() const {return (m_baseWidth == 1280);}
     void SetWideMode() {m_baseWidth = 1280; m_baseHeight = 720;}
     bool IsSquareMode() const {return (m_baseWidth == 800);}
@@ -205,7 +205,7 @@ class MythContextPrivate
     void StoreGUIsettings(void);
 
     void LoadLogSettings(void);
-    bool LoadDatabaseSettings(bool reload);
+    bool LoadDatabaseSettings(bool reload, DatabaseParams *pParams = NULL);
     
     bool FixSettingsFile(void);
     bool LoadSettingsFiles(const QString &filename);
@@ -410,7 +410,7 @@ void MythContextPrivate::GetScreenBounds()
     }
 }
 
-bool MythContextPrivate::Init(bool gui)
+bool MythContextPrivate::Init(bool gui, DatabaseParams *pParams)
 {
     m_gui = gui;
 
@@ -422,7 +422,7 @@ bool MythContextPrivate::Init(bool gui)
 
     // Attempts to read DB info from "mysql.txt" from the 
     // filesystem, or create it if it does not exist.
-    if (!LoadDatabaseSettings(false))
+    if (!LoadDatabaseSettings(false, pParams ))
         return false;
 
     // Attempt to connect to the database, get message for user if it failed.
@@ -546,7 +546,7 @@ void MythContextPrivate::LoadLogSettings(void)
     m_logprintlevel = parent->GetNumSetting("LogPrintLevel", LP_ERROR);
 }
 
-bool MythContextPrivate::LoadDatabaseSettings(bool reload)
+bool MythContextPrivate::LoadDatabaseSettings(bool reload, DatabaseParams *pParams)
 {
     if (reload)
     {
@@ -554,7 +554,9 @@ bool MythContextPrivate::LoadDatabaseSettings(bool reload)
             delete m_settings;
         m_settings = new Settings;
     }
-    
+
+    // Always load settings first from mysql.txt so LocalHostName can be used.
+
     if (!LoadSettingsFiles("mysql.txt"))
     {
         VERBOSE(VB_IMPORTANT, "Unable to read configuration file mysql.txt");
@@ -562,6 +564,22 @@ bool MythContextPrivate::LoadDatabaseSettings(bool reload)
             return false;
         else
             LoadSettingsFiles("mysql.txt");
+    }
+
+    // Overlay mysql.txt settings if we were passed a DatabaseParams
+
+    if (pParams != NULL)
+    {
+        m_settings->SetSetting( "DBHostName"             , pParams->dbHostName  );
+        m_settings->SetSetting( "DBPort"                 , pParams->dbPort      );
+        m_settings->SetSetting( "DBUserName"             , pParams->dbUserName  );
+        m_settings->SetSetting( "DBPassword"             , pParams->dbPassword  );
+        m_settings->SetSetting( "DBName"                 , pParams->dbName      );
+        m_settings->SetSetting( "DBType"                 , pParams->dbType      );
+      //m_settings->SetSetting( "wolEnabled"             , pParams->wolEnabled  );
+        m_settings->SetSetting( "WOLsqlReconnectWaitTime", pParams->wolReconnect);
+        m_settings->SetSetting( "WOLsqlConnectRetry"     , pParams->wolRetry    );
+        m_settings->SetSetting( "WOLsqlCommand"          , pParams->wolCommand  );
     }
 
     // Even if we have loaded the settings file, it may be incomplete,
@@ -909,9 +927,11 @@ MythContext::MythContext(const QString &binversion)
     : QObject(), d(NULL), app_binary_version(binversion)
 {
     qInitNetworkProtocols();
+
+    d = new MythContextPrivate(this);
 }
 
-bool MythContext::Init(bool gui)
+bool MythContext::Init(bool gui, DatabaseParams *pParams )
 {
     if (app_binary_version != MYTH_BINARY_VERSION)
     {
@@ -924,9 +944,7 @@ bool MythContext::Init(bool gui)
         return false;
     }
 
-    d = new MythContextPrivate(this);
-
-    if (!d->Init(gui))
+    if (!d->Init(gui, pParams))
         return false;
 
     ActivateSettingsCache(true);
@@ -2557,7 +2575,6 @@ void MythContext::OverrideSettingForSession(const QString &key,
 {
     d->overriddenSettings[key] = value;
 }
-
 
 bool MythContext::SendReceiveStringList(QStringList &strlist, bool quickTimeout, bool block)
 {

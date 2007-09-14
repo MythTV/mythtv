@@ -50,6 +50,8 @@ using namespace std;
 
 #include "libmythui/myththemedmenu.h"
 #include "libmythui/myththemebase.h"
+#include "mediarenderer.h"
+#include "masterselection.h"
 
 #define NO_EXIT  0
 #define QUIT     1
@@ -59,6 +61,8 @@ using namespace std;
 static MythThemedMenu *menu;
 static MythThemeBase *themeBase;
 XBox *xbox = NULL;
+
+MediaRenderer   *g_pUPnp       = NULL;
 
 void startGuide(void)
 {
@@ -859,6 +863,7 @@ void CleanupMyOldInUsePrograms(void)
 
 int main(int argc, char **argv)
 {
+    bool bPromptForBackend = false;
 
     QString geometry = QString::null;
     QString display  = QString::null;
@@ -932,6 +937,11 @@ int main(int argc, char **argv)
                 return FRONTEND_EXIT_INVALID_CMDLINE;
             }
         }
+        else if (!strcmp(a.argv()[argpos],"--prompt") ||
+                 !strcmp(a.argv()[argpos],"-p" ))
+        {
+            bPromptForBackend = true;
+        }
     }
 
     if (!display.isEmpty())
@@ -940,10 +950,41 @@ int main(int argc, char **argv)
     }
 
     gContext = new MythContext(MYTH_BINARY_VERSION);
-    if (!gContext->Init())
-    {   
+    g_pUPnp  = new MediaRenderer();
+
+    DatabaseParams *pParams = new DatabaseParams;
+
+    int nRetCode = MasterSelection::GetConnectionInfo( g_pUPnp,
+                                                       pParams, 
+                                                       bPromptForBackend );
+    switch( nRetCode )
+    {
+        case -1:    // Exit Application
+            return FRONTEND_EXIT_OK;
+
+        case  0:    // Continue with no Connection Infomation
+        {
+            delete pParams;
+            pParams = NULL;
+
+            break;
+        }
+
+        case 1:     // Connection Information found
+        default:
+            break;
+    }
+
+    if (!gContext->Init( true, pParams ))
+    {
         VERBOSE(VB_IMPORTANT, "Failed to init MythContext, exiting.");
         return FRONTEND_EXIT_NO_MYTHCONTEXT;
+    }
+
+    if (pParams != NULL)
+    {
+        delete pParams;
+        pParams = NULL;
     }
 
     for(int argpos = 1; argpos < a.argc(); ++argpos)
@@ -1081,6 +1122,10 @@ int main(int argc, char **argv)
                 return FRONTEND_EXIT_INVALID_CMDLINE;
             }
         }
+        else if (!strcmp(a.argv()[argpos],"--prompt") ||
+                 !strcmp(a.argv()[argpos],"-p" ))
+        {
+        }
         else if ((argpos + 1 == a.argc()) &&
                     !QString(a.argv()[argpos]).startsWith("-"))
         {
@@ -1109,6 +1154,7 @@ int main(int argc, char **argv)
                     "  --get-setting KEY[,KEY2,etc] Returns the current database setting for 'KEY'" << endl <<
                     "                               Use a comma seperated list to return multiple values" << endl <<
                     "-v or --verbose debug-level    Use '-v help' for level info" << endl <<
+                    "-p or --prompt                 Always prompt for Mythbackend selection." << endl <<
 
                     "--version                      Version information" << endl <<
                     "<plugin>                       Initialize and run this plugin" << endl <<
@@ -1366,6 +1412,8 @@ int main(int argc, char **argv)
     DestroyMythMainWindow();
     delete themeBase;
     delete gContext;
+    delete g_pUPnp;
+
     return FRONTEND_EXIT_OK;
 }
 

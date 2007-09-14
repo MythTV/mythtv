@@ -39,7 +39,7 @@ class MythXMLClient : public SOAPClient
                  MythXMLClient( const QUrl &url, bool bInQtThread = true );
         virtual ~MythXMLClient( );
         
-        UPnPResultCode GetConnectionInfo( const QString &sPin, DatabaseParams *pParams );
+        UPnPResultCode GetConnectionInfo( const QString &sPin, DatabaseParams *pParams, QString &sMsg );
 
         // GetServiceDescription
         // GetProgramGuide      

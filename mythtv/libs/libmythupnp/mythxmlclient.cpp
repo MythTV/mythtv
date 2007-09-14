@@ -34,7 +34,7 @@ MythXMLClient::~MythXMLClient()
 // 
 /////////////////////////////////////////////////////////////////////////////
 
-UPnPResultCode MythXMLClient::GetConnectionInfo( const QString &sPin, DatabaseParams *pParams )
+UPnPResultCode MythXMLClient::GetConnectionInfo( const QString &sPin, DatabaseParams *pParams, QString &sMsg )
 {
     if (pParams == NULL)
         return UPnPResult_InvalidArgs;
@@ -43,19 +43,25 @@ UPnPResultCode MythXMLClient::GetConnectionInfo( const QString &sPin, DatabasePa
     QString       sErrDesc;
     QStringMap    list;
 
+    sMsg = "";
+
     list.insert( "Pin", sPin );
 
     if (SendSOAPRequest( "GetConnectionInfo", list, nErrCode, sErrDesc, m_bInQtThread ))
     {
         QString sXml = "<Info>" + list[ "Info" ] + "</Info>";
 
+        sMsg = sErrDesc;
+
         QDomDocument doc;
 
         if ( !doc.setContent( sXml, false, &sErrDesc, &nErrCode ))
         {
-            VERBOSE( VB_UPNP, QString( "MythXMLClient::GetConnectionInfo : (%1) - %2" )
+            sMsg = QString( "Error Requesting Connection Info : (%1) - %2" )
                                  .arg( nErrCode )
-                                 .arg( sErrDesc ));
+                                 .arg( sErrDesc );
+
+            VERBOSE( VB_UPNP, sMsg );
 
             return UPnPResult_ActionFailed;
         }
@@ -88,15 +94,23 @@ UPnPResultCode MythXMLClient::GetConnectionInfo( const QString &sPin, DatabasePa
         }
         else
         {
+            if (sMsg.isEmpty())
+                sMsg = "Unexpected Response";
+
             VERBOSE( VB_IMPORTANT, QString( "MythXMLClient::GetConnectionInfo Failed : Unexpected Response - %1" )
                                       .arg( sXml   ));
         }
     }
     else
     {
-        VERBOSE( VB_IMPORTANT, QString( "MythXMLClient::GetConnectionInfo Failed -(%1) %2" )
-                             .arg( nErrCode   )
-                             .arg( sErrDesc   ));
+        sMsg = sErrDesc;
+
+        if (sMsg.isEmpty())
+            sMsg = "Access Denied";
+
+        VERBOSE( VB_IMPORTANT, QString( "MythXMLClient::GetConnectionInfo Failed - (%1) %2" )
+                             .arg( nErrCode )
+                             .arg( sErrDesc ));
 
         if (nErrCode == UPnPResult_ActionNotAuthorized)
             return UPnPResult_ActionNotAuthorized;

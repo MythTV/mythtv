@@ -77,6 +77,7 @@ class IPostProcess
 {
     public:
         virtual void ExecutePostProcess( ) = 0;
+        virtual ~IPostProcess() {};
 };
 
 /////////////////////////////////////////////////////////////////////////////

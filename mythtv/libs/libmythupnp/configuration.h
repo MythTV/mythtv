@@ -18,6 +18,8 @@ class Configuration
 {
     public:
 
+        virtual ~Configuration() {}
+
         virtual bool    Load    ( void ) = 0;
         virtual bool    Save    ( void ) = 0;
 
@@ -57,6 +59,8 @@ class XmlConfiguration : public Configuration
 
         XmlConfiguration( const QString &sFileName );
 
+        virtual ~XmlConfiguration() {}
+
         virtual bool    Load    ( void );
         virtual bool    Save    ( void );
 
@@ -77,6 +81,8 @@ class DBConfiguration : public Configuration
     public:
 
         DBConfiguration();
+
+        virtual ~DBConfiguration() {}
 
         virtual bool    Load    ( void );
         virtual bool    Save    ( void );

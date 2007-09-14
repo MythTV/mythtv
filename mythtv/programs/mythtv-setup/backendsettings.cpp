@@ -686,7 +686,7 @@ BackendSettings::BackendSettings() {
     localServer->addChild(LocalServerIP());
     localServer->addChild(LocalServerPort());
     localServer->addChild(LocalStatusPort());
-    //localServer->addChild(LocalSecurityPin());
+    localServer->addChild(LocalSecurityPin());
     VerticalConfigurationGroup* masterServer = new VerticalConfigurationGroup();
     masterServer->setLabel(QObject::tr("Master Backend"));
     masterServer->addChild(MasterServerIP());
