@@ -861,6 +861,37 @@ void CleanupMyOldInUsePrograms(void)
     query.exec();
 }
 
+void PrintHelp(void)
+{
+
+    cerr << "Valid options are: " << endl <<
+#ifdef USING_X11
+            "-display X-server              Create GUI on X-server, not localhost\n" <<
+#endif
+            "-geometry or --geometry WxH    Override window size settings\n" <<
+            "-geometry WxH+X+Y              Override window size and position\n" <<
+            "-l or --logfile filename       Writes STDERR and STDOUT messages to filename" << endl <<
+            "-r or --reset                  Resets frontend appearance settings and language" << endl <<
+            "-w or --windowed               Run in windowed mode" << endl <<
+            "-nw or --no-windowed           Run in non-windowed mode " << endl <<
+            "-O or " << endl <<
+            "  --override-setting KEY=VALUE Force the setting named 'KEY' to value 'VALUE'" << endl <<
+            "                               This option may be repeated multiple times" << endl <<
+            "-G or " << endl <<
+            "  --get-setting KEY[,KEY2,etc] Returns the current database setting for 'KEY'" << endl <<
+            "                               Use a comma seperated list to return multiple values" << endl <<
+            "-v or --verbose debug-level    Use '-v help' for level info" << endl <<
+            "-p or --prompt                 Always prompt for Mythbackend selection." << endl <<
+
+            "--version                      Version information" << endl <<
+            "<plugin>                       Initialize and run this plugin" << endl <<
+            endl <<
+            "Environment Variables:" << endl <<
+            "$MYTHTVDIR                     Set the installation prefix" << endl <<
+            "$MYTHCONFDIR                   Set the config dir (instead of ~/.mythtv)" << endl;
+
+}
+
 int main(int argc, char **argv)
 {
     bool bPromptForBackend = false;
@@ -936,6 +967,13 @@ int main(int argc, char **argv)
                 cerr << "Missing argument to -display option\n";
                 return FRONTEND_EXIT_INVALID_CMDLINE;
             }
+        }
+        else if (!strcmp(a.argv()[argpos],"-h") ||
+                !strcmp(a.argv()[argpos],"--help") ||
+                !strcmp(a.argv()[argpos],"--usage"))
+        {
+            PrintHelp();
+            return FRONTEND_EXIT_OK;
         }
         else if (!strcmp(a.argv()[argpos],"--prompt") ||
                  !strcmp(a.argv()[argpos],"-p" ))
@@ -1137,31 +1175,7 @@ int main(int argc, char **argv)
                 !strcmp(a.argv()[argpos],"--help") ||
                 !strcmp(a.argv()[argpos],"--usage")))
                 cerr << "Invalid argument: " << a.argv()[argpos] << endl;
-            cerr << "Valid options are: " << endl <<
-#ifdef USING_X11
-                    "-display X-server              Create GUI on X-server, not localhost\n" <<
-#endif
-                    "-geometry or --geometry WxH    Override window size settings\n" <<
-                    "-geometry WxH+X+Y              Override window size and position\n" <<
-                    "-l or --logfile filename       Writes STDERR and STDOUT messages to filename" << endl <<
-                    "-r or --reset                  Resets frontend appearance settings and language" << endl <<
-                    "-w or --windowed               Run in windowed mode" << endl <<
-                    "-nw or --no-windowed           Run in non-windowed mode " << endl <<
-                    "-O or " << endl <<
-                    "  --override-setting KEY=VALUE Force the setting named 'KEY' to value 'VALUE'" << endl <<
-                    "                               This option may be repeated multiple times" << endl <<
-                    "-G or " << endl <<
-                    "  --get-setting KEY[,KEY2,etc] Returns the current database setting for 'KEY'" << endl <<
-                    "                               Use a comma seperated list to return multiple values" << endl <<
-                    "-v or --verbose debug-level    Use '-v help' for level info" << endl <<
-                    "-p or --prompt                 Always prompt for Mythbackend selection." << endl <<
-
-                    "--version                      Version information" << endl <<
-                    "<plugin>                       Initialize and run this plugin" << endl <<
-                    endl <<
-                    "Environment Variables:" << endl <<
-                    "$MYTHTVDIR                     Set the installation prefix" << endl <<
-                    "$MYTHCONFDIR                   Set the config dir (instead of ~/.mythtv)" << endl;
+            PrintHelp();
             return FRONTEND_EXIT_INVALID_CMDLINE;
         }
     }
