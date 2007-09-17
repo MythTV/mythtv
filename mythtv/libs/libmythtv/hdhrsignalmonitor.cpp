@@ -47,7 +47,7 @@ HDHRSignalMonitor::HDHRSignalMonitor(int db_cardnum,
 
     _channel->DelAllPIDs();
 
-    signalStrength.SetThreshold(65);
+    signalStrength.SetThreshold(45);
 
     AddFlags(kDTVSigMon_WaitForSig);
 }
