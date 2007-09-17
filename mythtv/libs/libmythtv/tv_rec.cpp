@@ -2103,7 +2103,8 @@ bool TVRec::CheckChannelPrefix(const QString &prefix,
     {
         for (uint j = 0; j < kSpacerListSize; j++)
         {
-            QString qprefix = add_spacer(prefix, spacers[j]);
+	    QString qprefix = add_spacer(
+                prefix, (spacers[j] == "_") ? "\\_" : spacers[j]);
             query.prepare(basequery.arg(qprefix) + cardquery[i]);
 
             if (!query.exec() || !query.isActive())
@@ -2167,7 +2168,7 @@ bool TVRec::CheckChannelPrefix(const QString &prefix,
     // with a preference for our cardid.
     for (uint i = 0; i < fchannum.size(); i++)
     {
-        if (fchannum[i] == add_spacer(prefix, fspacer[0]))
+        if (fchannum[i] == prefix)
         {
             is_complete_valid_channel_on_rec = fcardid[i];
             if (fcardid[i] == (uint)cardid)
