@@ -637,7 +637,7 @@ void ZMEvents::showMenu()
                         QObject::tr("Deleting events. Please wait ..."));
                 for (int x = 0; x < 5; x++)
                 {
-                    usleep(100);
+                    usleep(1000);
                     qApp->processEvents();
                 }
 

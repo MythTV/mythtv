@@ -21,7 +21,7 @@
 #include "zmclient.h"
 
 // the protocol version we understand
-#define ZM_PROTOCOL_VERSION "4"
+#define ZM_PROTOCOL_VERSION "5"
 
 #define BUFFER_SIZE  (2048*1536*3)
 
@@ -140,7 +140,7 @@ bool ZMClient::sendReceiveStringList(QStringList &strList)
     if (m_bConnected)
     {
         m_socket->writeStringList(strList);
-        ok = m_socket->readStringList(strList, true);
+        ok = m_socket->readStringList(strList, false);
     }
 
     if (!ok)
@@ -155,7 +155,7 @@ bool ZMClient::sendReceiveStringList(QStringList &strList)
 
         // try to resend 
         m_socket->writeStringList(strList);
-        ok = m_socket->readStringList(strList, true);
+        ok = m_socket->readStringList(strList, false);
         if (!ok)
         {
             m_bConnected = false;
@@ -417,7 +417,7 @@ void ZMClient::deleteEvent(int eventID)
 
 void ZMClient::deleteEventList(vector<Event*> *eventList)
 {
-    // delete events in 250 event chunks
+    // delete events in 100 event chunks
     QStringList strList = "DELETE_EVENT_LIST";
     int count = 0;
     vector<Event*>::iterator it;
@@ -425,7 +425,7 @@ void ZMClient::deleteEventList(vector<Event*> *eventList)
     {
         strList << QString::number((*it)->eventID);
 
-        if (++count == 250)
+        if (++count == 100)
         {
             sendReceiveStringList(strList);
             strList = "DELETE_EVENT_LIST";
@@ -434,6 +434,10 @@ void ZMClient::deleteEventList(vector<Event*> *eventList)
     }
 
     // make sure the last chunk is deleted
+    sendReceiveStringList(strList);
+
+    // run zmaudit to clean up the orphaned db entries
+    strList = "RUN_ZMAUDIT";
     sendReceiveStringList(strList);
 }
 

@@ -39,7 +39,7 @@
 #include "zmserver.h"
 
 // the version of the protocol we understand
-#define ZM_PROTOCOL_VERSION "4"
+#define ZM_PROTOCOL_VERSION "5"
 
 // the maximum image size we are ever likely to get from ZM
 #define MAX_IMAGE_SIZE  (2048*1536*3)
@@ -299,6 +299,8 @@ void ZMServer::processRequest(char* buf, int nbytes)
         handleDeleteEvent(tokens);
     else if (tokens[0] == "DELETE_EVENT_LIST")
         handleDeleteEventList(tokens);
+    else if (tokens[0] == "RUN_ZMAUDIT")
+        handleRunZMAudit();
     else
         send("UNKNOWN_COMMAND");
 }
@@ -1178,8 +1180,20 @@ void ZMServer::handleDeleteEventList(vector<string> tokens)
         return;
     }
 
-    // run zmaudit.pl to clean everything up
+    ADD_STR(outStr, "OK")
+    send(outStr);
+}
+
+void ZMServer::handleRunZMAudit(void)
+{
+    string outStr("");
+
+    // run zmaudit.pl to clean up orphaned db entries etc
     string command(g_binPath + "/zmaudit.pl");
+
+    if (m_debug)
+        cout << "Running command: " << command << endl;
+
     system(command.c_str());
 
     ADD_STR(outStr, "OK")

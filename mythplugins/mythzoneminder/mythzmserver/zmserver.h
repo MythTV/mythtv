@@ -140,6 +140,7 @@ class ZMServer
     void handleDeleteEvent(vector<string> tokens);
     void handleDeleteEventList(vector<string> tokens);
     void handleGetEventDates(vector<string> tokens);
+    void handleRunZMAudit(void);
 
     bool                 m_debug;
     int                  m_sock;
