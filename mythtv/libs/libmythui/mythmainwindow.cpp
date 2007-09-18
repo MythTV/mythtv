@@ -1266,6 +1266,23 @@ void MythMainWindow::customEvent(QCustomEvent *ce)
 
         if (pDev)
         {
+            if (!pDev->isUsable())
+            {
+                // We don't want to jump to the main window, but should
+                // call each plugin's callback so it can track this change.
+                // Should also do MediaMonitor::ValidateAndLock(pDev) first
+
+                while (itr != d->mediaHandlerMap.end())
+                {
+                    if (itr.data().MediaType & (int)pDev->getMediaType())
+                        itr.data().callback(pDev);
+
+                    itr++;
+                }
+
+                return;
+            }
+
             /* FIXME, this needs rewritten */
             QWidget * activewidget = qApp->focusWidget();
             MythDialog * activedialog = NULL;
