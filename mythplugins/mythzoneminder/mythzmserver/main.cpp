@@ -102,7 +102,7 @@ int main(int argc, char **argv)
         else if (!strcmp(argv[argpos],"-l") ||
                   !strcmp(argv[argpos],"--logfile"))
         {
-            if (argc-1 > argpos)
+            if (argc > argpos)
             {
                 logfile = argv[argpos+1];
                 if (logfile[0] == '-')
@@ -122,10 +122,10 @@ int main(int argc, char **argv)
         else if (!strcmp(argv[argpos],"-c") ||
                   !strcmp(argv[argpos],"--zmconfig"))
         {
-            if (argc-1 > argpos)
+            if (argc > argpos)
             {
                 zmconfig = argv[argpos+1];
-                if (logfile[0] == '-')
+                if (zmconfig[0] == '-')
                 {
                     cerr << "Invalid or missing argument to -c/--zmconfig option\n";
                     return EXIT_INVALID_CMDLINE;
@@ -143,7 +143,6 @@ int main(int argc, char **argv)
                   !strcmp(argv[argpos],"--verbose"))
         {
             debug = true;
-            ++argpos;
         }
         else
         {
