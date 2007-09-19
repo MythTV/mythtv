@@ -882,6 +882,7 @@ void PrintHelp(void)
             "                               Use a comma seperated list to return multiple values" << endl <<
             "-v or --verbose debug-level    Use '-v help' for level info" << endl <<
             "-p or --prompt                 Always prompt for Mythbackend selection." << endl <<
+            "-d or --disable-autodiscovery  Never prompt for Mythbackend selection." << endl <<
 
             "--version                      Version information" << endl <<
             "<plugin>                       Initialize and run this plugin" << endl <<
@@ -894,7 +895,8 @@ void PrintHelp(void)
 
 int main(int argc, char **argv)
 {
-    bool bPromptForBackend = false;
+    bool bPromptForBackend    = false;
+    bool bBypassAutoDiscovery = false;
 
     QString geometry = QString::null;
     QString display  = QString::null;
@@ -980,6 +982,11 @@ int main(int argc, char **argv)
         {
             bPromptForBackend = true;
         }
+        else if (!strcmp(a.argv()[argpos],"--disable-autodiscovery") ||
+                 !strcmp(a.argv()[argpos],"-d" ))
+        {
+            bBypassAutoDiscovery = true;
+        }
     }
 
     if (!display.isEmpty())
@@ -990,27 +997,32 @@ int main(int argc, char **argv)
     gContext = new MythContext(MYTH_BINARY_VERSION);
     g_pUPnp  = new MediaRenderer();
 
-    DatabaseParams *pParams = new DatabaseParams;
+    DatabaseParams *pParams = NULL;
 
-    int nRetCode = MasterSelection::GetConnectionInfo( g_pUPnp,
-                                                       pParams, 
-                                                       bPromptForBackend );
-    switch( nRetCode )
+    if (!bBypassAutoDiscovery)
     {
-        case -1:    // Exit Application
-            return FRONTEND_EXIT_OK;
+        pParams = new DatabaseParams;
 
-        case  0:    // Continue with no Connection Infomation
+        int nRetCode = MasterSelection::GetConnectionInfo( g_pUPnp,
+                                                           pParams, 
+                                                           bPromptForBackend );
+        switch( nRetCode )
         {
-            delete pParams;
-            pParams = NULL;
+            case -1:    // Exit Application
+                return FRONTEND_EXIT_OK;
 
-            break;
+            case  0:    // Continue with no Connection Infomation
+            {
+                delete pParams;
+                pParams = NULL;
+
+                break;
+            }
+
+            case 1:     // Connection Information found
+            default:
+                break;
         }
-
-        case 1:     // Connection Information found
-        default:
-            break;
     }
 
     if (!gContext->Init( true, pParams ))
@@ -1162,6 +1174,10 @@ int main(int argc, char **argv)
         }
         else if (!strcmp(a.argv()[argpos],"--prompt") ||
                  !strcmp(a.argv()[argpos],"-p" ))
+        {
+        }
+        else if (!strcmp(a.argv()[argpos],"--disable-autodiscovery") ||
+                 !strcmp(a.argv()[argpos],"-d" ))
         {
         }
         else if ((argpos + 1 == a.argc()) &&
