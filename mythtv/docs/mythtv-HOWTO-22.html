@@ -215,6 +215,14 @@ $
 </P>
 <P>As you can see, in this example there are two <CODE>mysql.txt</CODE> files.  If
 they are not identical, then there may be unintended consequences.</P>
+<P>You may also see this error if you completely fill the <CODE>/var</CODE>
+partition. The most likely <EM>mythtv-related</EM> reason for this is an
+overly large mythbackend or mythfrontend log file in <CODE>/var/log</CODE>. If
+you have logging enabled for the backend, and myth runs for weeks at a time,
+this may creep up and surprise you. Note that many system processes also
+write to <CODE>/var</CODE> and the system may not boot if it is unable to write
+to <CODE>/var</CODE> due to a full partition.</P>
+
 <H3>MySQL not connecting correctly</H3>
 
 <P>Your <B>MySQL</B> installation may have networking turned off. 

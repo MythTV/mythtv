@@ -8,7 +8,7 @@
 <H1>Installing and using MythTV</H1>
 
 <H2>Robert Kulagowski, 
-<A HREF="mailto:rkulagow@rocketmail.com">mailto:rkulagow@rocketmail.com</A></H2>2007-08-27, v0.20.25
+<A HREF="mailto:rkulagow@rocketmail.com">mailto:rkulagow@rocketmail.com</A></H2>2007-09-04, v0.20.26
 <HR>
 <EM>Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -2820,9 +2820,9 @@ You may choose something easy to remember, like "Antenna" or "Cable".  Once
 you've chosen a name, press the down arrow to move to the next field.  </P>
 <P>If you're in North America, change the grabber to
 "SchedulesDirect.org(Internal)", then continue pressing the down arrow to
-move to the next field.  Fill in the username and password that you have
-established with Schedules Direct, then move to the "Retrieve Listings"
-button and press the space bar.</P>
+move to the next field.  Fill in the username (lowercase only) and password
+that you have established with Schedules Direct, then move to the "Retrieve
+Listings" button and press the space bar.</P>
 <P><B>NOTE</B>: You need <B>wget</B> version 1.9.1 or higher to use
 Schedules Direct.</P>
 <P>The mythtv-setup program will contact the Schedules Direct servers and get
@@ -6418,6 +6418,14 @@ $
 </P>
 <P>As you can see, in this example there are two <CODE>mysql.txt</CODE> files.  If
 they are not identical, then there may be unintended consequences.</P>
+<P>You may also see this error if you completely fill the <CODE>/var</CODE>
+partition. The most likely <EM>mythtv-related</EM> reason for this is an
+overly large mythbackend or mythfrontend log file in <CODE>/var/log</CODE>. If
+you have logging enabled for the backend, and myth runs for weeks at a time,
+this may creep up and surprise you. Note that many system processes also
+write to <CODE>/var</CODE> and the system may not boot if it is unable to write
+to <CODE>/var</CODE> due to a full partition.</P>
+
 <H3>MySQL not connecting correctly</H3>
 
 <P>Your <B>MySQL</B> installation may have networking turned off. 

@@ -3,7 +3,7 @@
 <title>Installing and using MythTV
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com"
 name="mailto:rkulagow@rocketmail.com">
-<date>2007-08-27, v0.20.25
+<date>2007-09-04, v0.20.26
 <abstract>
 Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -2399,9 +2399,9 @@ you've chosen a name, press the down arrow to move to the next field.
 
 If you're in North America, change the grabber to
 "SchedulesDirect.org(Internal)", then continue pressing the down arrow to
-move to the next field.  Fill in the username and password that you have
-established with Schedules Direct, then move to the "Retrieve Listings"
-button and press the space bar.
+move to the next field.  Fill in the username (lowercase only) and password
+that you have established with Schedules Direct, then move to the "Retrieve
+Listings" button and press the space bar.
 
 <bf>NOTE</bf>: You need <bf>wget</bf> version 1.9.1 or higher to use
 Schedules Direct.
@@ -5907,6 +5907,15 @@ $
 
 As you can see, in this example there are two <tt>mysql.txt</tt> files.  If
 they are not identical, then there may be unintended consequences.
+
+You may also see this error if you completely fill the <tt>/var</tt>
+partition. The most likely <em>mythtv-related</em> reason for this is an
+overly large mythbackend or mythfrontend log file in <tt>/var/log</tt>. If
+you have logging enabled for the backend, and myth runs for weeks at a time,
+this may creep up and surprise you. Note that many system processes also
+write to <tt>/var</tt> and the system may not boot if it is unable to write
+to <tt>/var</tt> due to a full partition.
+
 <sect2>MySQL not connecting correctly
 <p>Your <bf>MySQL</bf> installation may have networking turned off. 
 Check that <tt>/etc/mysql/my.cnf</tt> <em>does not</em> contain
@@ -7864,6 +7873,10 @@ that migration to Schedules Direct only requires updated user account
 information in the grabber, don't have to delete everything.  Added pointer
 to release notes on Wiki.
 v0.20.25, 2007-08-27.  Add information on caching support for SD.
+
+v0.20.26, 2007-09-04.  Add troubleshooting tip about log files. (R. G. Newbury)
+
+
 -->
 
 <!--

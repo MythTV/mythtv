@@ -1,7 +1,7 @@
   Installing and using MythTV
   Robert Kulagowski, mailto:rkulagow@rocketmail.com
   <mailto:rkulagow@rocketmail.com>
-  2007-08-27, v0.20.25
+  2007-09-04, v0.20.26
 
   Initially, installation of MythTV seems like a huge task.  There are
   lots of dependencies, and various distributions seem to do the same
@@ -3046,9 +3046,9 @@
 
   If you're in North America, change the grabber to
   "SchedulesDirect.org(Internal)", then continue pressing the down arrow
-  to move to the next field.  Fill in the username and password that you
-  have established with Schedules Direct, then move to the "Retrieve
-  Listings" button and press the space bar.
+  to move to the next field.  Fill in the username (lowercase only) and
+  password that you have established with Schedules Direct, then move to
+  the "Retrieve Listings" button and press the space bar.
 
   [1mNOTE[22m: You need [1mwget [22mversion 1.9.1 or higher to use Schedules Direct.
 
@@ -6907,6 +6907,15 @@
   As you can see, in this example there are two mysql.txt files.  If
   they are not identical, then there may be unintended consequences.
 
+  You may also see this error if you completely fill the /var partition.
+  The most likely [4mmythtv-related[24m reason for this is an overly large
+  mythbackend or mythfrontend log file in /var/log. If you have logging
+  enabled for the backend, and myth runs for weeks at a time, this may
+  creep up and surprise you. Note that many system processes also write
+  to /var and the system may not boot if it is unable to write to /var
+  due to a full partition.
+
+
   [1m22.4.2.  MySQL not connecting correctly[0m
 
   Your [1mMySQL [22minstallation may have networking turned off.  Check that
@@ -6941,7 +6950,6 @@
   default capture profiles may need to be edited for your setup.  Go to
   Settings->TV Settings->Recording Profiles and adjust the [1mDefault [22mand
   [1mLive TV [22moptions to 480 or 576 from their defaults.
-
 
 
   [1m22.4.6.  Screen goes blank but returns when mouse is moved or keyboard[0m

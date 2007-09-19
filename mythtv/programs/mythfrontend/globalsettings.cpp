@@ -2136,7 +2136,7 @@ static HostComboBox *AspectOverride()
     gc->addSelection(QObject::tr("16:9"), "2");
     gc->setHelpText(QObject::tr(
                         "When enabled, these will override the aspect "
-                        "ratio specified by any braodcaster for all "
+                        "ratio specified by any broadcaster for all "
                         "video streams."));
     return gc;
 }
