@@ -2761,9 +2761,9 @@ void TV::ProcessKeypress(QKeyEvent *e)
             }
             else if (!stickykeys)
             {
-                DoSeek(-rewtime, tr("Skip Back"));
                 if (smartForward)
                     doSmartForward = true;
+                DoSeek(-rewtime, tr("Skip Back"));
             }
             else
                 ChangeFFRew(-1);
