@@ -786,16 +786,6 @@ static void init_fixup(QMap<uint64_t,uint> &fix)
         fix[10008LL<<32 | 61441U << 16 | 53630] = // HSE24
         EITFixUp::kEFixForceISO8859_15;
 
-    // DVB-S Pro7 Swiss
-    fix[  1082LL << 32 | 1 << 16 | 20001] = EITFixUp::kEFixForceISO8859_15;
-    // DVB-S Pro7 Austria
-    fix[  1082LL << 32 | 1 << 16 | 20002] = EITFixUp::kEFixForceISO8859_15;
-    // DVB-S Kabel1 Swiss
-    fix[  1082LL << 32 | 1 << 16 | 20003] = EITFixUp::kEFixForceISO8859_15;
-    // DVB-S Kabel1 Austria
-    fix[  1082LL << 32 | 1 << 16 | 20004] = EITFixUp::kEFixForceISO8859_15;
-    // DVB-S Sat.1 Austria
-    fix[  1082LL << 32 | 1 << 16 | 20005] = EITFixUp::kEFixForceISO8859_15;
     // DVB-S Astra 19.2E DMAX Germany
     fix[  1113LL << 32 | 1 << 16 | 12602] = EITFixUp::kEFixForceISO8859_15;
 
