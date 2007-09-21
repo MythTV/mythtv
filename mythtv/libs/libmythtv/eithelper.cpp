@@ -579,11 +579,6 @@ static void init_fixup(QMap<uint64_t,uint> &fix)
     fix[ 774LL << 32 | 8468 << 16 | 16392] = EITFixUp::kEFixPro7Sat; //DVB-T Berlin dsf
     fix[ 772LL << 32 | 8468 << 16 | 16387] = EITFixUp::kEFixPro7Sat; //DVB-T Berlin HSE/MonA TV
     fix[8707LL << 32 | 8468 << 16 | 16413] = EITFixUp::kEFixPro7Sat; //DVB-T Ruhrgebiet Tele 5
-    fix[1082LL << 32 |    1 << 16 | 20001] = EITFixUp::kEFixPro7Sat; //DVB-S Pro7 Swiss
-    fix[1082LL << 32 |    1 << 16 | 20002] = EITFixUp::kEFixPro7Sat; //DVB-S Pro7 Austria
-    fix[1082LL << 32 |    1 << 16 | 20003] = EITFixUp::kEFixPro7Sat; //DVB-S Kabel1 Swiss
-    fix[1082LL << 32 |    1 << 16 | 20004] = EITFixUp::kEFixPro7Sat; //DVB-S Kabel1 Austria
-    fix[1082LL << 32 |    1 << 16 | 20005] = EITFixUp::kEFixPro7Sat; //DVB-S Sat.1 Austria
 
     fix[ 133 << 16] = EITFixUp::kEFixPro7Sat; // Premiere and Pro7/Sat.1
 }
