@@ -745,9 +745,13 @@ bool AvFormatDecoder::CanHandle(char testbuf[kDecoderProbeBufferSize],
 
 void AvFormatDecoder::InitByteContext(void)
 {
+    int streamed = 0;
+    if (ringBuffer->isDVD() || (ringBuffer->LiveMode() && recordingHasPositionMap))
+        streamed = 1;
+
     readcontext.prot = &AVF_RingBuffer_Protocol;
     readcontext.flags = 0;
-    readcontext.is_streamed = 0;
+    readcontext.is_streamed = streamed;
     readcontext.max_packet_size = 0;
     readcontext.priv_data = avfRingBuffer;
 
@@ -767,10 +771,7 @@ void AvFormatDecoder::InitByteContext(void)
     ic->pb.pos = 0;
     ic->pb.must_flush = 0;
     ic->pb.eof_reached = 0;
-    if (ringBuffer->isDVD())
-        ic->pb.is_streamed = 1;
-    else 
-        ic->pb.is_streamed = 0;
+    ic->pb.is_streamed = streamed;
     ic->pb.max_packet_size = 0;
 }
 
@@ -836,6 +837,22 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
         return -1;
     }
 
+    // Try to get a position map from the recorder if we don't have one yet.
+    // We need to do this before InitByteContext() because we enable
+    // is_streamed based on the presence of a posmap.
+    if (!recordingHasPositionMap)
+    {
+        if ((m_playbackinfo) || livetv || watchingrecording)
+        {
+            recordingHasPositionMap |= SyncPositionMap();
+            if (recordingHasPositionMap && !livetv && !watchingrecording)
+            {
+                hasFullPositionMap = true;
+                gopset = true;
+            }
+        }
+    }
+
     InitByteContext();
 
     int err = av_open_input_file(&ic, filename, fmt, 0, &params);
@@ -895,20 +912,6 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
             SetAudioByComponentTag(initialAudio);
         if (initialVideo >= 0)
             SetVideoByComponentTag(initialVideo);
-    }
-
-    // Try to get a position map from the recorder if we don't have one yet.
-    if (!recordingHasPositionMap)
-    {
-        if ((m_playbackinfo) || livetv || watchingrecording)
-        {
-            recordingHasPositionMap |= SyncPositionMap();
-            if (recordingHasPositionMap && !livetv && !watchingrecording)
-            {
-                hasFullPositionMap = true;
-                gopset = true;
-            }
-        }
     }
 
     // If we don't have a position map, set up ffmpeg for seeking
