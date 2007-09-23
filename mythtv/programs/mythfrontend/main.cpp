@@ -987,6 +987,22 @@ int main(int argc, char **argv)
         {
             bBypassAutoDiscovery = true;
         }
+        else if (!strcmp(a.argv()[argpos],"--verbose") ||
+                 !strcmp(a.argv()[argpos],"-v"))
+        {
+            if (a.argc()-1 > argpos)
+            {
+                if (parse_verbose_arg(a.argv()[argpos+1]) ==
+                        GENERIC_EXIT_INVALID_CMDLINE)
+                    return FRONTEND_EXIT_INVALID_CMDLINE;
+
+                ++argpos;
+            } else
+            {
+                cerr << "Missing argument to -v/--verbose option\n";
+                return FRONTEND_EXIT_INVALID_CMDLINE;
+            }
+        }
     }
 
     if (!display.isEmpty())
@@ -1061,20 +1077,10 @@ int main(int argc, char **argv)
                 return FRONTEND_EXIT_INVALID_CMDLINE;
             }
         } else if (!strcmp(a.argv()[argpos],"-v") ||
-            !strcmp(a.argv()[argpos],"--verbose"))
+                   !strcmp(a.argv()[argpos],"--verbose"))
         {
-            if (a.argc()-1 > argpos)
-            {
-                if (parse_verbose_arg(a.argv()[argpos+1]) ==
-                        GENERIC_EXIT_INVALID_CMDLINE)
-                    return FRONTEND_EXIT_INVALID_CMDLINE;
-
-                ++argpos;
-            } else
-            {
-                cerr << "Missing argument to -v/--verbose option\n";
-                return FRONTEND_EXIT_INVALID_CMDLINE;
-            }
+            // Arg processing for verbose already done (before MythContext)
+            ++argpos;
         }
         else if (!strcmp(a.argv()[argpos],"-r") ||
                  !strcmp(a.argv()[argpos],"--reset"))
