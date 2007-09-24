@@ -85,7 +85,14 @@ void UPnpNotifyTask::SendNotifyMsg( QSocketDevice *pSocket,
     for ( QStringList::Iterator it  = m_addressList.begin(); 
                                 it != m_addressList.end(); 
                               ++it ) 
-    {                                                   //239.255.255.250:1900\r\n"
+    {
+        if (!*it)
+        {
+            VERBOSE(VB_GENERAL,
+                    "UPnpNotifyTask::SendNotifyMsg - NULL in m_addressList");
+            continue;
+        }
+
         QString sHeader = QString( "NOTIFY * HTTP/1.1\r\n"
                                    "HOST: %1:%2\r\n"    
                                    "LOCATION: http://%3:%4/getDeviceDesc\r\n" )
