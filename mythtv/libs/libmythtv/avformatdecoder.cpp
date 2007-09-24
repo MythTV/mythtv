@@ -3072,7 +3072,7 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
                 {
                     bool dvd_xvmc_active = false;
                     if (video_codec_id > kCodec_NORMAL_END &&
-                        video_codec_id < kCodec_STD_XVMC_END)
+                        video_codec_id < kCodec_VLD_END)
                     {
                         dvd_xvmc_active = true;
                     }
