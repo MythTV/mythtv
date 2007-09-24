@@ -373,7 +373,8 @@ void TranscodeWriteText(void *ptr, unsigned char *buf, int len, int timecode, in
 int Transcode::TranscodeFile(char *inputname, char *outputname,
                               QString profileName,
                               bool honorCutList, bool framecontrol,
-                              int jobID, QString fifodir)
+                              int jobID, QString fifodir,
+                              QMap<long long, int> deleteMap)
 { 
     QDateTime curtime = QDateTime::currentDateTime();
     QDateTime statustime = curtime;
@@ -417,7 +418,10 @@ int Transcode::TranscodeFile(char *inputname, char *outputname,
         QString cutStr = "";
         long long lastStart = 0;
 
-        m_proginfo->GetCutList(delMap);
+        if (deleteMap.size() > 0)
+            delMap = deleteMap;
+        else
+            m_proginfo->GetCutList(delMap);
 
         for (it = delMap.begin(); it != delMap.end(); ++it)
         {
@@ -614,6 +618,9 @@ int Transcode::TranscodeFile(char *inputname, char *outputname,
         copyvideo = true;
         VERBOSE(VB_GENERAL, "Reencoding video in 'raw' mode");
     }
+
+    if (deleteMap.size() > 0)
+        nvp->SetCutList(deleteMap);
 
     keyframedist = 30;
     nvp->InitForTranscode(copyaudio, copyvideo);

@@ -17,7 +17,7 @@ class Transcode : public QObject
     ~Transcode();
     int TranscodeFile(char *inputname, char *outputname, QString profileName,
                       bool honorCutList, bool framecontrol, int jobID,
-                      QString fifodir);
+                      QString fifodir, QMap<long long, int> deleteMap);
     void ShowProgress(bool val) { showprogress = val; }
   private:
     bool GetProfile(QString profileName, QString encodingType, int height,

@@ -5559,6 +5559,16 @@ long NuppelVideoPlayer::UpdateStoredFrameNum(long curFrameNum)
 {
     return GetDecoder()->UpdateStoredFrameNum(curFrameNum);
 }
+
+void NuppelVideoPlayer::SetCutList(QMap<long long, int> newCutList)
+{
+    QMap<long long, int>::Iterator i;
+
+    deleteMap.clear();
+    for (i = newCutList.begin(); i != newCutList.end(); ++i)
+        deleteMap[i.key()] = i.data();
+}
+
 bool NuppelVideoPlayer::WriteStoredData(RingBuffer *outRingBuffer,
                                         bool writevideo, long timecodeOffset)
 {

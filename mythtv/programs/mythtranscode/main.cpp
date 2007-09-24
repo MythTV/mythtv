@@ -46,6 +46,11 @@ void usage(char *progname)
     cerr << "\t--profile        or -p: Takes a profile number or 'autodetect'\n";
     cerr << "\t                        recording profile. REQUIRED\n";
     cerr << "\t--honorcutlist   or -l: Specifies whether to use the cutlist.\n";
+    cerr << "                          Optionally takes a cutlist as an argument\n";
+    cerr << "\t                        when used with --infile.\n";
+    cerr << "\t--inversecut          : Specifies a list of frames to keep\n";
+    cerr << "\t                        while cutting everything else out.\n";
+    cerr << "\t                        Only works with --infile.\n";
     cerr << "\t--allkeys        or -k: Specifies that the output file\n";
     cerr << "\t                        should be made entirely of keyframes.\n";
     cerr << "\t--fifodir        or -f: Directory to write fifos to\n";
@@ -226,6 +231,34 @@ int main(int argc, char *argv[])
                         deleteMap[startend.last().toInt()] = 0;
                     }
                 }
+            }
+        }
+        else if (!strcmp(a.argv()[argpos],"--inversecut"))
+        {
+            useCutlist = true;
+            if (found_infile)
+            {
+                long long last = 0;
+                QStringList cutlist;
+                cutlist = QStringList::split( " ", a.argv()[argpos + 1]);
+                deleteMap[0] = 1;
+                for (QStringList::Iterator it = cutlist.begin(); 
+                     it != cutlist.end(); ++it )
+                {
+                    QStringList startend;
+                    startend = QStringList::split("-", *it);
+                    if (startend.count() == 2)
+                    {
+                        cerr << "Cutting from: " << last
+                             << " to: " << startend.first().toInt() <<"\n";
+                        deleteMap[startend.first().toInt()] = 0;
+                        deleteMap[startend.last().toInt()] = 1;
+                        last = startend.last().toInt();
+                    }
+                }
+                cerr << "Cutting from: " << last
+                     << " to the end\n";
+                deleteMap[999999999] = 0;
             }
         }
         else if (!strcmp(a.argv()[argpos],"-k") ||
@@ -490,7 +523,7 @@ int main(int argc, char *argv[])
                                           (char *)outfile.ascii(),
                                           profilename, useCutlist, 
                                           (fifosync || keyframesonly), jobID,
-                                          fifodir);
+                                          fifodir, deleteMap);
         if ((result == REENCODE_OK) && (jobID >= 0))
             JobQueue::ChangeJobArgs(jobID, "RENAME_TO_NUV");
     }

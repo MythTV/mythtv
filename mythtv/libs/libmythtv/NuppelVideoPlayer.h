@@ -258,6 +258,7 @@ class MPUBLIC NuppelVideoPlayer : public CC608Reader, public CC708Reader
     bool WriteStoredData(
         RingBuffer *outRingBuffer, bool writevideo, long timecodeOffset);
     long UpdateStoredFrameNum(long curFrameNum);
+    void SetCutList(QMap<long long, int> newCutList);
 
     // Edit mode stuff
     bool EnableEdit(void);
