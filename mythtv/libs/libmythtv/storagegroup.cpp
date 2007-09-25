@@ -348,8 +348,9 @@ void StorageGroupEditor::open(QString name)
 {
     lastValue = name;
 
-    if (name.isEmpty())
+    if (name == "__CREATE_NEW_STORAGE_DIRECTORY__")
     {
+        name = "";
         SGPopupResult result = StorageGroupPopup::showPopup(
             gContext->GetMainWindow(), 
             tr("Add Storage Group Directory"),
@@ -410,7 +411,7 @@ void StorageGroupEditor::open(QString name)
 void StorageGroupEditor::doDelete(void) 
 {
     QString name = listbox->getValue();
-    if (name.isEmpty())
+    if (name == "__CREATE_NEW_STORAGE_DIRECTORY__")
         return;
 
     QString message =
@@ -468,7 +469,8 @@ void StorageGroupEditor::load(void) {
         }
     }
 
-    listbox->addSelection(tr("(Add New Directory)"), "");
+    listbox->addSelection(tr("(Add New Directory)"),
+        "__CREATE_NEW_STORAGE_DIRECTORY__");
 
     listbox->setValue(lastValue);
 }
@@ -509,15 +511,23 @@ void StorageGroupListEditor::open(QString name)
 {
     lastValue = name;
 
-    if (name.isEmpty())
+    if (name.left(28) == "__CREATE_NEW_STORAGE_GROUP__")
     {
-        SGPopupResult result = StorageGroupPopup::showPopup(
-            gContext->GetMainWindow(), 
-            tr("Create New Storage Group"),
-            tr("Enter group name or press SELECT to enter text via the "
-               "On Screen Keyboard"), name);
-        if (result == SGPopup_CANCEL)
-            return;
+        if (name.length() > 28)
+        {
+            name = name.mid(28);
+        }
+        else
+        {
+            name = "";
+            SGPopupResult result = StorageGroupPopup::showPopup(
+                gContext->GetMainWindow(), 
+                tr("Create New Storage Group"),
+                tr("Enter group name or press SELECT to enter text via the "
+                   "On Screen Keyboard"), name);
+            if (result == SGPopup_CANCEL)
+                return;
+        }
     }
 
     if (name != "")
@@ -530,7 +540,7 @@ void StorageGroupListEditor::open(QString name)
 void StorageGroupListEditor::doDelete(void) 
 {
     QString name = listbox->getValue();
-    if (name.isEmpty())
+    if (name.left(28) == "__CREATE_NEW_STORAGE_GROUP__")
         return;
 
     if ((gContext->GetSetting("MasterServerIP","master") ==
@@ -638,10 +648,12 @@ void StorageGroupListEditor::load(void)
     }
 
     if (createAddLiveTVButton)
-        listbox->addSelection(tr("(Create %1 group)").arg("LiveTV"), "LiveTV");
+        listbox->addSelection(tr("(Create %1 group)").arg("LiveTV"),
+            "__CREATE_NEW_STORAGE_GROUP__LiveTV");
 
     if (isMaster)
-        listbox->addSelection(tr("(Create %1 group)").arg("new"), "");
+        listbox->addSelection(tr("(Create %1 group)").arg("new"),
+            "__CREATE_NEW_STORAGE_GROUP__");
     else
     {
         curName = 0;
@@ -652,7 +664,7 @@ void StorageGroupListEditor::load(void)
                 (!names.contains(masterNames[curName])))
                 listbox->addSelection(tr("(Create %1 group)")
                                          .arg(masterNames[curName]),
-                             masterNames[curName]);
+                    "__CREATE_NEW_STORAGE_GROUP__" + masterNames[curName]);
             curName++;
         }
     }
