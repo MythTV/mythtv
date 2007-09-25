@@ -376,7 +376,7 @@ void MythContextPrivate::EndTempWindow(void)
  * \brief Get screen size from Qt, respecting for user's multiple screen prefs
  *
  * If the windowing system environment has multiple screens
- * (e.g. Xinerama or Mac OS X), QApplication::desktop()->width() will span
+ * (%e.g. Xinerama or Mac OS X), QApplication::desktop()->%width() will span
  * all of them, so we usually need to get the geometry of a specific screen.
  */
 void MythContextPrivate::GetScreenBounds()
@@ -825,7 +825,8 @@ bool MythContextPrivate::PromptForDatabaseParams(QString error)
         TempMainWindow();
 
         // Tell the user what went wrong:
-        MythPopupBox::showOkPopup(mainWindow, "DB connect failure", error);
+        if (error.length())
+            MythPopupBox::showOkPopup(mainWindow, "DB connect failure", error);
         
         // ask user for database parameters
         DatabaseSettings settings;
@@ -954,12 +955,23 @@ bool MythContext::Init(bool gui, DatabaseParams *pParams )
 {
     if (app_binary_version != MYTH_BINARY_VERSION)
     {
-        VERBOSE(VB_IMPORTANT,
+        QString warning =
                 QString("This app was compiled against libmyth version: %1"
                 "\n\t\t\tbut the library is version: %2"
                 "\n\t\t\tYou probably want to recompile everything, and do a"
                 "\n\t\t\t'make distclean' first.")
-                .arg(app_binary_version).arg(MYTH_BINARY_VERSION));
+                .arg(app_binary_version).arg(MYTH_BINARY_VERSION);
+
+        if (gui)
+        {
+            d->TempMainWindow(false);
+            MythPopupBox::showOkPopup(d->mainWindow,
+                                      "Library version error", warning);
+            SetMainWindow(NULL);
+            DestroyMythMainWindow();
+        }
+        VERBOSE(VB_IMPORTANT, warning);
+
         return false;
     }
 
@@ -2730,7 +2742,7 @@ bool MythContext::CheckProtoVersion(MythSocket* socket)
                                  .arg(MYTH_PROTO_VERSION);
     socket->writeStringList(strlist);
     socket->readStringList(strlist, true);
-        
+
     if (strlist[0] == "REJECT")
     {
         VERBOSE(VB_GENERAL, QString("Protocol version mismatch (frontend=%1,"
