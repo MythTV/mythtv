@@ -15,9 +15,6 @@
 #ifdef QWS
 #include <qwindowsystem_qws.h>
 #endif
-#ifdef Q_WS_MACX
-#import <HIToolbox/Menus.h>   // For HideMenuBar()
-#endif
 
 #include <iostream>
 using namespace std;
