@@ -155,8 +155,9 @@ QString safe_eno_to_string(int errnum)
     return QString("%1 (%2)").arg(strerror(errnum)).arg(errnum);
 }
 
-// Global function to retrieve InstallPrefix path
-
+/**
+ * Global function to retrieve InstallPrefix path
+ */
 void GetInstallPrefixPath( QString &sInstallPrefix, QString &sInstallLibDir )
 {
     char *tmp_installprefix = getenv("MYTHTVDIR");
@@ -201,11 +202,14 @@ class MythContextPrivate
     bool IsSquareMode() const {return (m_baseWidth == 800);}
     void SetSquareMode() {m_baseWidth = 800; m_baseHeight = 600;}
 
+    void TempMainWindow(bool languagePrompt = true);
+    void EndTempWindow(void);
+
     void GetScreenBounds(void);
     void StoreGUIsettings(void);
 
     void LoadLogSettings(void);
-    bool LoadDatabaseSettings(bool reload, DatabaseParams *pParams = NULL);
+    bool LoadDatabaseSettings(DatabaseParams *pParams = NULL);
     
     bool FixSettingsFile(void);
     bool LoadSettingsFiles(const QString &filename);
@@ -333,11 +337,48 @@ MythContextPrivate::MythContextPrivate(MythContext *lparent)
             .arg(m_installprefix));
 }
 
-// Get screen size from Qt. If the windowing system environment
-// has multiple screens (e.g. Xinerama or Mac OS X),
-// QApplication::desktop()->width() will span all of them,
-// so we usually need to get the geometry of a specific screen.
+/**
+ * \brief Setup a minimal themed main window, and prompt for user's language.
+ *
+ * Used for warnings before the database is opened, or bootstrapping pages.
+ * After using the window, call EndTempWindow().
+ *
+ * \bug The console will spew out hundreds of database errors
+ */
+void MythContextPrivate::TempMainWindow(bool languagePrompt)
+{
+    m_settings->SetSetting("Theme", "blue");
+#ifdef Q_WS_MACX
+    // Myth looks horrible in default Mac style for Qt
+    m_settings->SetSetting("Style", "Windows");
+#endif
+    parent->LoadQtConfig();
 
+    MythMainWindow *mainWindow = GetMythMainWindow();
+    mainWindow->Init();
+    parent->SetMainWindow(mainWindow);
+
+    if (languagePrompt)
+    {
+        // ask user for language settings
+        LanguageSettings::prompt();
+        LanguageSettings::load("mythfrontend");
+    }
+}
+
+void MythContextPrivate::EndTempWindow(void)
+{
+    parent->SetMainWindow(NULL);
+    DestroyMythMainWindow();
+}
+
+/**
+ * \brief Get screen size from Qt, respecting for user's multiple screen prefs
+ *
+ * If the windowing system environment has multiple screens
+ * (e.g. Xinerama or Mac OS X), QApplication::desktop()->width() will span
+ * all of them, so we usually need to get the geometry of a specific screen.
+ */
 void MythContextPrivate::GetScreenBounds()
 {
     if (m_geometry_w)
@@ -422,7 +463,7 @@ bool MythContextPrivate::Init(bool gui, DatabaseParams *pParams)
 
     // Attempts to read DB info from "mysql.txt" from the 
     // filesystem, or create it if it does not exist.
-    if (!LoadDatabaseSettings(false, pParams ))
+    if (!LoadDatabaseSettings(pParams))
         return false;
 
     // Attempt to connect to the database, get message for user if it failed.
@@ -475,8 +516,9 @@ MythContextPrivate::~MythContextPrivate()
         delete screensaver;
 }
 
-// Apply any user overrides to the screen geometry
-
+/**
+ * Apply any user overrides to the screen geometry
+ */
 void MythContextPrivate::StoreGUIsettings()
 {
     if (m_geometry_w)
@@ -546,15 +588,8 @@ void MythContextPrivate::LoadLogSettings(void)
     m_logprintlevel = parent->GetNumSetting("LogPrintLevel", LP_ERROR);
 }
 
-bool MythContextPrivate::LoadDatabaseSettings(bool reload, DatabaseParams *pParams)
+bool MythContextPrivate::LoadDatabaseSettings(DatabaseParams *pParams)
 {
-    if (reload)
-    {
-        if (m_settings)
-            delete m_settings;
-        m_settings = new Settings;
-    }
-
     // Always load settings first from mysql.txt so LocalHostName can be used.
 
     if (!LoadSettingsFiles("mysql.txt"))
@@ -787,21 +822,7 @@ bool MythContextPrivate::PromptForDatabaseParams(QString error)
     bool accepted = false;
     if (m_gui)
     {
-        // construct minimal MythMainWindow
-        m_settings->SetSetting("Theme", "blue");
-#ifdef Q_WS_MACX
-        // Myth looks horrible in default Mac style for Qt
-        m_settings->SetSetting("Style", "Windows");
-#endif
-        parent->LoadQtConfig();
-   
-        MythMainWindow *mainWindow = GetMythMainWindow();
-        mainWindow->Init();
-        parent->SetMainWindow(mainWindow);
-
-        // ask user for language settings
-        LanguageSettings::prompt();
-        LanguageSettings::load("mythfrontend");
+        TempMainWindow();
 
         // Tell the user what went wrong:
         MythPopupBox::showOkPopup(mainWindow, "DB connect failure", error);
@@ -812,9 +833,7 @@ bool MythContextPrivate::PromptForDatabaseParams(QString error)
         if (!accepted)
             VERBOSE(VB_IMPORTANT, "User canceled database configuration");
 
-        // tear down temporary main window
-        parent->SetMainWindow(NULL);
-        DestroyMythMainWindow();
+        EndTempWindow();
     }
     else
     {
@@ -967,7 +986,8 @@ bool MythContext::ConnectToMasterServer(bool blockingClient)
         d->eventSock = new MythSocket();
 
     if (!d->serverSock)
-        d->serverSock = ConnectServer(d->eventSock, server, port, blockingClient);
+        d->serverSock = ConnectServer(d->eventSock, server,
+                                      port, blockingClient);
 
     if (d->eventSock)
         d->eventSock->setCallbacks(this);
@@ -1177,13 +1197,13 @@ bool MythContext::IsMasterBackend(void)
 bool MythContext::BackendIsRunning(void)
 {
 #if defined(CONFIG_DARWIN) || (__FreeBSD__) || defined(__OpenBSD__)
-    char    *command = "ps -ax | grep -i mythbackend | grep -v grep > /dev/null";
+    char *command = "ps -ax | grep -i mythbackend | grep -v grep > /dev/null";
 #else
-    char    *command = "ps -ae | grep mythbackend > /dev/null";
+    char *command = "ps -ae | grep mythbackend > /dev/null";
 #endif
     bool res = myth_system(command,
-                MYTH_SYSTEM_DONT_BLOCK_LIRC |
-                MYTH_SYSTEM_DONT_BLOCK_JOYSTICK_MENU);
+                           MYTH_SYSTEM_DONT_BLOCK_LIRC |
+                           MYTH_SYSTEM_DONT_BLOCK_JOYSTICK_MENU);
     return !res;
 }
 
@@ -1337,7 +1357,8 @@ QString MythContext::GetTranslationsNameFilter(void)
 
 QString MythContext::FindTranslation(const QString &translation) 
 { 
-    return GetTranslationsDir() + "mythfrontend_" + translation.lower() + ".qm"; 
+    return GetTranslationsDir()
+           + "mythfrontend_" + translation.lower() + ".qm"; 
 }
 
 QString MythContext::GetFontsDir(void) 
@@ -1397,12 +1418,14 @@ void MythContext::LoadQtConfig(void)
 
     if (themeinfo && themeinfo->IsWide())
     {
-        VERBOSE( VB_IMPORTANT, QString("Switching to wide mode (%1)").arg(themename));
+        VERBOSE(VB_IMPORTANT,
+                QString("Switching to wide mode (%1)").arg(themename));
         d->SetWideMode();
     }
     else
     {
-        VERBOSE( VB_IMPORTANT, QString("Switching to square mode (%1)").arg(themename));
+        VERBOSE(VB_IMPORTANT,
+                QString("Switching to square mode (%1)").arg(themename));
         d->SetSquareMode();
     }
 
@@ -1544,7 +1567,8 @@ void MythContext::RemoveCacheDir(const QString &dirname)
     
 void MythContext::CacheThemeImages(void)
 {
-    if (d->m_screenwidth == d->m_baseWidth && d->m_screenheight == d->m_baseHeight)
+    if (d->m_screenwidth == d->m_baseWidth &&
+            d->m_screenheight == d->m_baseHeight)
         return;
 
     CacheThemeImagesDirectory(d->m_themepathname);
@@ -1745,12 +1769,15 @@ void MythContext::GetResolutionSetting(const QString &t, int &w, int &h, int i)
     GetResolutionSetting(t, w, h, forced_aspect, refresh_rate, i);
 }
 
-// Parse an X11 style command line geometry string, like
-//  -geometry 800x600
-// or
-//  -geometry 800x600+112+22
-// and override the fullscreen and user default screen dimensions
-
+/**
+ * \brief Parse an X11 style command line geometry string
+ *
+ * Accepts strings like
+ *  -geometry 800x600
+ * or
+ *  -geometry 800x600+112+22
+ * to override the fullscreen and user default screen dimensions
+ */
 bool MythContext::ParseGeometryOverride(const QString geometry)
 {
     QRegExp     sre("^(\\d+)x(\\d+)$");
@@ -1979,7 +2006,8 @@ Settings *MythContext::qtconfig(void)
 
 void MythContext::SaveSetting(const QString &key, int newValue)
 {
-    (void) SaveSettingOnHost(key, QString::number(newValue), d->m_localhostname);
+    (void) SaveSettingOnHost(key,
+                             QString::number(newValue), d->m_localhostname);
 }
 
 void MythContext::SaveSetting(const QString &key, const QString &newValue)
@@ -1987,7 +2015,8 @@ void MythContext::SaveSetting(const QString &key, const QString &newValue)
     (void) SaveSettingOnHost(key, newValue, d->m_localhostname);
 }
 
-bool MythContext::SaveSettingOnHost(const QString &key, const QString &newValue,
+bool MythContext::SaveSettingOnHost(const QString &key,
+                                    const QString &newValue,
                                     const QString &host)
 {
     bool success = false;
@@ -2357,7 +2386,8 @@ QImage *MythContext::LoadScaleImage(QString filename, bool fromcache)
         // Is absolute path in theme directory.
         if (!bFound)
         {
-            if (!strcmp(filename.left(d->m_themepathname.length()),d->m_themepathname))
+            if (!strcmp(filename.left(d->m_themepathname.length()),
+                        d->m_themepathname))
             {
                 QString tmpfilename = filename;
                 tmpfilename.remove(0, d->m_themepathname.length());
@@ -2450,7 +2480,8 @@ QPixmap *MythContext::LoadScalePixmap(QString filename, bool fromcache)
         // Is absolute path in theme directory.
         if (!bFound)
         {
-            if (!strcmp(filename.left(d->m_themepathname.length()),d->m_themepathname))
+            if (!strcmp(filename.left(d->m_themepathname.length()),
+                        d->m_themepathname))
             {
                 QString tmpfilename = filename;
                 tmpfilename.remove(0, d->m_themepathname.length());
@@ -2576,7 +2607,8 @@ void MythContext::OverrideSettingForSession(const QString &key,
     d->overriddenSettings[key] = value;
 }
 
-bool MythContext::SendReceiveStringList(QStringList &strlist, bool quickTimeout, bool block)
+bool MythContext::SendReceiveStringList(QStringList &strlist,
+                                        bool quickTimeout, bool block)
 {
     d->serverSockLock.lock();
     
@@ -2634,7 +2666,8 @@ bool MythContext::SendReceiveStringList(QStringList &strlist, bool quickTimeout,
             qApp->lock();
             if (!block)
                 d->serverSockLock.unlock();
-            VERBOSE(VB_IMPORTANT, QString("Reconnection to backend server failed"));
+            VERBOSE(VB_IMPORTANT,
+                    QString("Reconnection to backend server failed"));
             if (d->m_height && d->m_width)
                 MythPopupBox::showOkPopup(d->mainWindow, "connection failure",
                              tr("The connection to the master backend "
@@ -3093,7 +3126,13 @@ bool MythContext::SaveDatabaseParams(const DatabaseParams &params)
     {
         ret = d->WriteSettingsFile(params, true);
         if (ret)
-            ret = d->LoadDatabaseSettings(true);
+        {
+            // Reload the new settings:
+            if (d->m_settings)
+                delete d->m_settings;
+            d->m_settings = new Settings;
+            ret = d->LoadDatabaseSettings();
+        }
     }
     return ret;
 }
