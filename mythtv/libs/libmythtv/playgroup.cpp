@@ -221,8 +221,9 @@ void PlayGroupEditor::open(QString name)
     lastValue = name;
     bool created = false;
 
-    if (name.isEmpty())
+    if (name == "__CREATE_NEW_GROUP__")
     {
+        name = "";
         bool ok = MythPopupBox::showGetTextPopup(gContext->GetMainWindow(), 
             tr("Create New Playback Group"),
             tr("Enter group name or press SELECT to enter text via the "
@@ -255,7 +256,7 @@ void PlayGroupEditor::open(QString name)
 void PlayGroupEditor::doDelete(void) 
 {
     QString name = listbox->getValue();
-    if (name.isEmpty() || name == "Default")
+    if (name == "__CREATE_NEW_GROUP__" || name == "Default")
         return;
 
     QString message = tr("Delete playback group:") +
@@ -296,7 +297,7 @@ void PlayGroupEditor::load(void)
         names.pop_front();
     }
 
-    listbox->addSelection(tr("(Create new group)"), "");
+    listbox->addSelection(tr("(Create new group)"), "__CREATE_NEW_GROUP__");
 
     listbox->setValue(lastValue);
 }
