@@ -16,16 +16,14 @@ DEFINES += HAVE_AV_CONFIG_H _LARGEFILE_SOURCE
 # libavcodec rev 7671 needs another register
 # -fomit-frame-pointer frees it. gcc-4 enables "location lists"
 # which allows debugging without frame pointer
-debug:contains(TARGET_ARCH_X86, yes) {
-    !contains(TARGET_ARCH_X86_64, yes) {
+debug:contains(TARGET_ARCH_X86_32, yes) {
         QMAKE_CFLAGS_SHLIB = 
         QMAKE_CFLAGS_DEBUG += -fomit-frame-pointer
-    }
 }
 
 cygwin:LIBS += -lz
 
-QMAKE_CFLAGS_DEBUG += -O
+!profile:QMAKE_CFLAGS_DEBUG += -O
 
 QMAKE_CLEAN += $(TARGET) $(TARGETA) $(TARGETD) $(TARGET0) $(TARGET1) $(TARGET2)
 

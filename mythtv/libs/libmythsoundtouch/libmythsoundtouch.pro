@@ -7,8 +7,8 @@ CONFIG += thread staticlib warn_off
 
 INCLUDEPATH += ../../libs/libavcodec ../..
 
-QMAKE_CXXFLAGS_RELEASE += -fPIC -DPIC
-QMAKE_CXXFLAGS_DEBUG   += -fPIC -DPIC
+#build position independent code since the library is linked into a shared library
+QMAKE_CXXFLAGS += -fPIC -DPIC
 
 QMAKE_CLEAN += $(TARGET) $(TARGETA) $(TARGETD) $(TARGET0) $(TARGET1) $(TARGET2)
 

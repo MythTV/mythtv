@@ -5,8 +5,8 @@ TEMPLATE = lib
 TARGET = mythmpeg2-$$LIBVERSION
 CONFIG += thread staticlib warn_off
 
-QMAKE_CFLAGS_RELEASE += -DPIC -fPIC -fno-common
-QMAKE_CFLAGS_DEBUG += -DPIC -fPIC -fno-common
+#build position independent code since the library is linked into a shared library
+QMAKE_CFLAGS += -fPIC -DPIC -fno-common
 
 QMAKE_CLEAN += $(TARGET) $(TARGETA) $(TARGETD) $(TARGET0) $(TARGET1) $(TARGET2)
 

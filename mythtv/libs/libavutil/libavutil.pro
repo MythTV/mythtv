@@ -12,15 +12,11 @@ INCLUDEPATH = ../ ../../
 
 DEFINES += HAVE_AV_CONFIG_H _LARGEFILE_SOURCE
 
-# Debug mode on x86 must compile without -fPIC and with -O, 
+# Debug mode on x86 must compile without -fPIC
 # otherwise gcc runs out of registers.
-debug:contains(TARGET_ARCH_X86, yes) {
-    !contains(TARGET_ARCH_X86_64, yes) {
+debug:contains(TARGET_ARCH_X86_32, yes) {
         QMAKE_CFLAGS_SHLIB = 
-    }
 }
-
-QMAKE_CFLAGS_DEBUG += -O
 
 QMAKE_CLEAN += $(TARGET) $(TARGETA) $(TARGETD) $(TARGET0) $(TARGET1) $(TARGET2)
 
@@ -56,4 +52,3 @@ macx {
     QMAKE_LFLAGS_SHLIB += -single_module
     QMAKE_LFLAGS_SHLIB += -seg1addr 0xC2000000
 }
-

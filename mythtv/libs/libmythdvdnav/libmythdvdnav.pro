@@ -6,14 +6,14 @@ TARGET = mythdvdnav-$$LIBVERSION
 CONFIG += thread staticlib warn_off
 target.path = $${LIBDIR}
 
-INCLUDEPATH += ../../
+INCLUDEPATH += ../ ../../
 
-QMAKE_CFLAGS_RELEASE = $$OPTFLAGS -DHAVE_AV_CONFIG_H -I.. -fPIC -DPIC -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_GNU_SOURCE
-QMAKE_CFLAGS_DEBUG = -g -DHAVE_AV_CONFIG_H -I.. -fPIC -DPIC -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_GNU_SOURCE
+#build position independent code since the library is linked into a shared library
+QMAKE_CFLAGS += -fPIC -DPIC
+
+DEFINES += HAVE_AV_CONFIG_H _LARGEFILE_SOURCE DVDNAV_COMPILE
 
 QMAKE_CLEAN += $(TARGET) $(TARGETA) $(TARGETD) $(TARGET0) $(TARGET1) $(TARGET2)
-
-DEFINES += DVDNAV_COMPILE
 
 # Input
 HEADERS += bswap.h decoder.h dvd_input.h dvdnav_events.h dvdnav.h 
