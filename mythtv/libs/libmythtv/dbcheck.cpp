@@ -402,15 +402,15 @@ static bool performActualUpdate(const QString updates[], QString version,
 }
 
 /** \fn UpgradeTVDatabaseSchema(void)
- *  \brief This is the function called from outside dbcheck.cpp to update the schema.
+ *  \brief Called from outside dbcheck.cpp to update the schema.
  *
- *   If the "DBSchemaVer" property equals the currentDatabase version this returns
- *   true immediately. If not we lock the schemalock table. If this fails we return
- *   false. If it succeeds we call doUpgradeTVDatabaseSchema() to do the actual
- *   update, and then we unlock the schemalock table.
+ *   If the "DBSchemaVer" property equals the currentDatabase version this
+ *   returns true immediately. If not we lock the schemalock table. If this
+ *   fails we return false. If it succeeds we call doUpgradeTVDatabaseSchema()
+ *   to do the actual update, and then we unlock the schemalock table.
  *
- *   If the program running this function is killed while this is running the schema
- *   may be corrupted.
+ *   If the program running this function is killed while
+ *   this is running then the schema may be corrupted.
  *
  *  \return true on success, false on failure.
  */
