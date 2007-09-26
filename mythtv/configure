@@ -1648,9 +1648,11 @@ has_header()
 
 CCONFIG="$CCONFIG $compile_type"
 if test x$compile_type = x"profile" ; then
-    PROFILEFLAGS="-g -DNDEBUG"
+    PROFILEFLAGS="-DNDEBUG"
+    enable debug
 elif test x$compile_type = x"debug"; then
     enable debug
+    disable optimize
 fi
 
 
@@ -2540,6 +2542,7 @@ add_extralibs -lX11 -lXext              ||
 disable x11_grab_device_demuxer
 
 enabled debug && add_cflags -g
+enabled debug && add_cppflags -g
 
 # add some useful compiler flags if supported
 #check_cflags -Wdeclaration-after-statement
@@ -3186,7 +3189,7 @@ fi
 
 echo "#define restrict $_restrict" >> $TMPH
 
-if test "$optimize" = "small"; then
+if test x"$optimize" = x"small"; then
   echo "#define always_inline"  >> $TMPH
   echo "#define CONFIG_SMALL 1" >> $TMPH
 fi

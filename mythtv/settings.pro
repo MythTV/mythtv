@@ -31,44 +31,41 @@ contains(CONFIG_DARWIN, yes) {
 # and we do that in their Makefiles if CONFIG has mac_bundle
 macx: CONFIG += console
 
-
 INCLUDEPATH += $${PREFIX}/include
 INCLUDEPATH += $$CONFIG_INCLUDEPATH
 
-# figure out compile flags based on qmake info
+# remove warn_{on|off} from CONFIG since we set it in our CFLAGS
+CONFIG -= warn_on warn_off
 
-QMAKE_CXXFLAGS += $$ARCHFLAGS
+# set empty RELEASE and DEBUG flags
+QMAKE_CFLAGS_DEBUG     =
+QMAKE_CFLAGS_RELEASE   =
+QMAKE_CXXFLAGS_DEBUG   =
+QMAKE_CXXFLAGS_RELEASE =
+
+# figure out compile flags based on qmake info
+QMAKE_CFLAGS   += $$ARCHFLAGS $$OPTFLAGS $$PROFILEFLAGS $$ECFLAGS
+QMAKE_CXXFLAGS += $$ARCHFLAGS $$OPTFLAGS $$PROFILEFLAGS $$ECXXFLAGS
+
+profile:CONFIG += debug
+
 QMAKE_CXXFLAGS += $$CONFIG_AUDIO_ARTS_CFLAGS
 QMAKE_CXXFLAGS += $$CONFIG_DIRECTFB_CXXFLAGS
+
+QMAKE_CFLAGS_SHLIB   = -DPIC -fPIC
 QMAKE_CXXFLAGS_SHLIB = -DPIC -fPIC
 
 # Allow compilation with Qt Embedded, if Qt is compiled without "-fno-rtti"
 QMAKE_CXXFLAGS -= -fno-exceptions -fno-rtti
 macx:QMAKE_CXXFLAGS += -Wno-long-double
 
-QMAKE_CXXFLAGS_RELEASE = $$OPTFLAGS $$ECXXFLAGS -fomit-frame-pointer
 release:contains( TARGET_ARCH_POWERPC, yes ) {
-    QMAKE_CXXFLAGS_RELEASE = $$OPTFLAGS $$ECXXFLAGS
     # Auto-inlining causes some Qt moc methods to go missing
     macx:QMAKE_CXXFLAGS_RELEASE += -fno-inline-functions
 }
 
-QMAKE_CFLAGS += $$ARCHFLAGS
-QMAKE_CFLAGS_SHLIB = -DPIC -fPIC
-QMAKE_CFLAGS_RELEASE = $$OPTFLAGS -fomit-frame-pointer
-QMAKE_CFLAGS += $$ECFLAGS
-
-profile {
-    QMAKE_CXXFLAGS_DEBUG = $${QMAKE_CXXFLAGS_RELEASE} $$PROFILEFLAGS
-    QMAKE_CFLAGS_DEBUG = $${QMAKE_CFLAGS_RELEASE} $$PROFILEFLAGS
-    CONFIG += debug    
-} else {
-    QMAKE_CXXFLAGS_DEBUG += $$ECXXFLAGS
-    QMAKE_CFLAGS_DEBUG += $$ECFLAGS
-}
 
 # figure out defines 
-
 DEFINES += $$CONFIG_DEFINES
 DEFINES += _GNU_SOURCE
 DEFINES += _FILE_OFFSET_BITS=64
@@ -76,7 +73,6 @@ DEFINES += PREFIX=\"$${PREFIX}\"
 DEFINES += LIBDIR=\"$${LIBDIR}\"
 
 # construct linking path
-
 LOCAL_LIBDIR_X11 =
 !isEmpty( QMAKE_LIBDIR_X11 ) {
     LOCAL_LIBDIR_X11 = -L$$QMAKE_LIBDIR_X11
