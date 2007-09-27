@@ -98,7 +98,7 @@ int main(int argc, char *argv[])
         if (!strcmp(a.argv()[argpos],"-s") ||
             !strcmp(a.argv()[argpos],"--starttime")) 
         {
-            if (a.argc() > argpos) 
+            if (a.argc()-1 > argpos && a.argv()[argpos+1][0] != '-') 
             {
                 starttime = a.argv()[argpos + 1];
                 found_starttime = 1;
@@ -114,7 +114,7 @@ int main(int argc, char *argv[])
         else if (!strcmp(a.argv()[argpos],"-c") ||
                  !strcmp(a.argv()[argpos],"--chanid")) 
         {
-            if (a.argc() > argpos) 
+            if (a.argc()-1 > argpos && a.argv()[argpos+1][0] != '-') 
             {
                 chanid = a.argv()[argpos + 1];
                 found_chanid = 1;
@@ -128,11 +128,22 @@ int main(int argc, char *argv[])
             }
         } 
         else if (!strcmp(a.argv()[argpos], "-j"))
-            jobID = QString(a.argv()[++argpos]).toInt();
+        {
+            if (a.argc()-1 > argpos && a.argv()[argpos+1][0] != '-') 
+            {
+                jobID = QString(a.argv()[++argpos]).toInt();
+            }
+            else 
+            {
+                cerr << "Missing argument to -j option\n";
+                usage(a.argv()[0]);
+                return TRANSCODE_EXIT_INVALID_CMDLINE;
+            }
+        }
         else if (!strcmp(a.argv()[argpos],"-i") ||
                  !strcmp(a.argv()[argpos],"--infile")) 
         {
-            if (a.argc() > argpos) 
+            if (a.argc()-1 > argpos && a.argv()[argpos+1][0] != '-') 
             {
                 infile = a.argv()[argpos + 1];
                 found_infile = 1;
@@ -153,7 +164,8 @@ int main(int argc, char *argv[])
         else if (!strcmp(a.argv()[argpos],"-o") ||
                  !strcmp(a.argv()[argpos],"--outfile"))
         {
-            if(a.argc() > argpos)
+            if ((a.argc()-1 > argpos) &&
+                (a.argv()[argpos+1][0] != '-' || a.argv()[argpos+1][1] == 0x0))
             {
                 outfile = a.argv()[argpos + 1];
                 update_index = 0;
@@ -168,7 +180,7 @@ int main(int argc, char *argv[])
         }
         else if (!strcmp(a.argv()[argpos],"-V"))
         {
-            if (a.argc() > argpos)
+            if (a.argc()-1 > argpos && a.argv()[argpos+1][0] != '-') 
             {
                 QString temp = a.argv()[++argpos];
                 print_verbose_messages = temp.toInt();
@@ -182,7 +194,7 @@ int main(int argc, char *argv[])
         else if (!strcmp(a.argv()[argpos],"-v") ||
                  !strcmp(a.argv()[argpos],"--verbose"))
         {
-            if (a.argc()-1 > argpos)
+            if (a.argc()-1 > argpos && a.argv()[argpos+1][0] != '-') 
             {
                 if (parse_verbose_arg(a.argv()[argpos+1]) ==
                         GENERIC_EXIT_INVALID_CMDLINE)
@@ -198,7 +210,7 @@ int main(int argc, char *argv[])
         else if (!strcmp(a.argv()[argpos],"-p") ||
                  !strcmp(a.argv()[argpos],"--profile")) 
         {
-            if (a.argc() > argpos) 
+            if (a.argc()-1 > argpos && a.argv()[argpos+1][0] != '-') 
             {
                 profilename = a.argv()[argpos + 1];
                 ++argpos;
@@ -215,9 +227,13 @@ int main(int argc, char *argv[])
         {
             useCutlist = true;
             if (found_infile)
+                continue;
+
+            if (a.argc()-1 > argpos && a.argv()[argpos+1][0] != '-') 
             {
                 QStringList cutlist;
                 cutlist = QStringList::split( " ", a.argv()[argpos + 1]);
+                ++argpos;
                 for (QStringList::Iterator it = cutlist.begin(); 
                      it != cutlist.end(); ++it )
                 {
@@ -232,11 +248,24 @@ int main(int argc, char *argv[])
                     }
                 }
             }
+            else
+            {
+                cerr << "Missing argument to -l/--honorcutlist option\n";
+                usage(a.argv()[0]);
+                return TRANSCODE_EXIT_INVALID_CMDLINE;
+            }
         }
         else if (!strcmp(a.argv()[argpos],"--inversecut"))
         {
             useCutlist = true;
-            if (found_infile)
+            if (!found_infile)
+            {
+                cerr << "--inversecut option can only be used with --infile\n";
+                usage(a.argv()[0]);
+                return TRANSCODE_EXIT_INVALID_CMDLINE;
+            }
+
+            if (a.argc()-1 > argpos && a.argv()[argpos+1][0] != '-') 
             {
                 long long last = 0;
                 QStringList cutlist;
@@ -260,6 +289,12 @@ int main(int argc, char *argv[])
                      << " to the end\n";
                 deleteMap[999999999] = 0;
             }
+            else
+            {
+                cerr << "Missing argument to --inversecut option\n";
+                usage(a.argv()[0]);
+                return TRANSCODE_EXIT_INVALID_CMDLINE;
+            }
         }
         else if (!strcmp(a.argv()[argpos],"-k") ||
                  !strcmp(a.argv()[argpos],"--allkeys")) 
@@ -274,7 +309,7 @@ int main(int argc, char *argv[])
         else if (!strcmp(a.argv()[argpos],"-f") ||
                  !strcmp(a.argv()[argpos],"--fifodir"))
         {
-            if (a.argc() > argpos)
+            if (a.argc()-1 > argpos && a.argv()[argpos+1][0] != '-') 
             {
                 fifodir = a.argv()[argpos + 1];
                 ++argpos;
@@ -302,7 +337,7 @@ int main(int argc, char *argv[])
         else if (!strcmp(a.argv()[argpos],"-e") ||
                  !strcmp(a.argv()[argpos],"--ostream")) 
         {
-            if (a.argc() > argpos)
+            if (a.argc()-1 > argpos && a.argv()[argpos+1][0] != '-') 
             {
                 if(!strcmp(a.argv()[argpos + 1], "dvd"))
                     otype = REPLEX_DVD;
@@ -321,17 +356,9 @@ int main(int argc, char *argv[])
         else if (!strcmp(a.argv()[argpos],"-O") ||
                  !strcmp(a.argv()[argpos],"--override-setting"))
         {
-            if ((a.argc() - 1) > argpos)
+            if (a.argc()-1 > argpos && a.argv()[argpos+1][0] != '-') 
             {
-                QString tmpArg = a.argv()[argpos+1];
-                if (tmpArg.startsWith("-"))
-                {
-                    cerr << "Invalid or missing argument to "
-                            "-O/--override-setting option\n";
-                    return BACKEND_EXIT_INVALID_CMDLINE;
-                } 
- 
-                QStringList pairs = QStringList::split(",", tmpArg);
+                QStringList pairs = QStringList::split(",", a.argv()[argpos+1]);
                 for (unsigned int index = 0; index < pairs.size(); ++index)
                 {
                     QStringList tokens = QStringList::split("=", pairs[index]);
@@ -346,7 +373,8 @@ int main(int argc, char *argv[])
             { 
                 cerr << "Invalid or missing argument to -O/--override-setting "
                         "option\n";
-                return GENERIC_EXIT_INVALID_CMDLINE;
+                usage(a.argv()[0]);
+                return TRANSCODE_EXIT_INVALID_CMDLINE;
             }
 
             ++argpos;
@@ -356,6 +384,12 @@ int main(int argc, char *argv[])
         {
             usage(a.argv()[0]);
             return TRANSCODE_EXIT_OK;
+        }
+        else
+        {
+            cerr << "Unknown option: " << a.argv()[argpos] << endl;
+            usage(a.argv()[0]);
+            return TRANSCODE_EXIT_INVALID_CMDLINE;
         }
     }
 
