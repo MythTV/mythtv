@@ -2638,7 +2638,7 @@ ThemeSelector::ThemeSelector():
         QImage* previewImage = new QImage(preview.absFilePath());
         if (previewImage->width() == 0 || previewImage->height() == 0) {
             VERBOSE(VB_IMPORTANT, QString("Problem reading theme preview image"
-                                          " %1").arg(preview));
+                                          " %1").arg(preview.filePath()));
             continue;
         }
 
