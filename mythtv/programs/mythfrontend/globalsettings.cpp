@@ -34,6 +34,7 @@
 #include "DisplayRes.h"
 #include "uitypes.h"
 #include "cardutil.h"
+#include "themeinfo.h"
 
 static HostComboBox *AudioOutputDevice()
 {
@@ -2593,22 +2594,46 @@ ThemeSelector::ThemeSelector():
 
     for( ; it.current() != 0 ; ++it ) {
         theme = it.current();
-        QFileInfo preview(theme->absFilePath() + "/preview.jpg");
-        QFileInfo xml(theme->absFilePath() + "/theme.xml");
 
-        if (theme->fileName()[0] == '.' || !preview.exists() || !xml.exists()) {
-            //cout << theme->absFilePath() << " doesn't look like a theme\n";
+        if (theme->fileName() == "." || theme->fileName() == ".."
+                || theme->fileName() == "default"
+                || theme->fileName() == "default-wide")
+            continue;
+
+        QFileInfo preview;
+        QString name;
+
+        ThemeInfo *themeinfo = new ThemeInfo(theme->absFilePath());
+
+        if (!themeinfo || (!(themeinfo->Type() & THEME_UI)))
+            continue;
+
+        name = themeinfo->Name();
+        preview = QFileInfo(themeinfo->PreviewPath());
+
+        if (name.isEmpty())
+            continue;
+
+        if (themeinfo->IsWide())
+            name += QString(" (%1)").arg(QObject::tr("Widescreen"));
+
+        delete themeinfo;
+
+        if (!preview.exists())
+        {
+            VERBOSE(VB_IMPORTANT, QString("UI Theme %1 missing preview image.")
+                                    .arg(theme->fileName()));
             continue;
         }
 
         QImage* previewImage = new QImage(preview.absFilePath());
         if (previewImage->width() == 0 || previewImage->height() == 0) {
-            cout << QObject::tr("Problem reading theme preview image ")
-                 << preview.dirPath() << endl;
+            VERBOSE(VB_IMPORTANT, QString("Problem reading theme preview image"
+                                          " %1").arg(preview.dirPath()));
             continue;
         }
 
-        addImageSelection(theme->fileName(), previewImage);
+        addImageSelection(name, previewImage, theme->fileName());
     }
 
     setValue("G.A.N.T.");
