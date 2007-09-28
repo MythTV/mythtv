@@ -4064,16 +4064,25 @@ void ProgramInfo::MarkAsInUse(bool inuse, QString usedFor)
         QFileInfo testFile(pathname);
         if (testFile.exists())
         {
-            if (testFile.isFile() || testFile.isSymLink())
-                recDir = pathname.section("/", 0, -2);
+            while (testFile.isSymLink()) 
+                testFile.setFile(testFile.readLink()); 
+
+            if (testFile.isFile())
+                recDir = testFile.dirPath();
             else if (testFile.isDir())
-                recDir = pathname;
+                recDir = testFile.filePath();
         }
         else
         {
-            testFile.setFile(pathname.section("/", 0, -2));
-            if (testFile.exists() && testFile.isDir())
-                recDir = testFile.filePath();
+            testFile.setFile(testFile.dirPath());
+            if (testFile.exists())
+            {
+                while(testFile.isSymLink())
+                    testFile.setFile(testFile.readLink()); 
+
+                if (testFile.isDir())
+                    recDir = testFile.filePath();
+            }
         }
     }
     else if (inUseForWhat == "preview_generator")
