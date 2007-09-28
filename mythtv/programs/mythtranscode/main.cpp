@@ -226,7 +226,7 @@ int main(int argc, char *argv[])
                  !strcmp(a.argv()[argpos],"--honorcutlist")) 
         {
             useCutlist = true;
-            if (found_infile)
+            if (!found_infile)
                 continue;
 
             if (a.argc()-1 > argpos && a.argv()[argpos+1][0] != '-') 
