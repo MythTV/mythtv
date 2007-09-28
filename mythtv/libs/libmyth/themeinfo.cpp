@@ -17,8 +17,7 @@ ThemeInfo::ThemeInfo(QString theme)
         // N.B. This is temporary to allow theme maintainers
         // to catch up and implement a themeinfo.xml
 
-        VERBOSE(VB_GENERAL, QString("The theme (%1) needs to be updated "
-                                    " to include a themeinfo.xml file")
+        VERBOSE(VB_GENERAL, QString("The theme (%1) is missing a themeinfo.xml file")
                                     .arg(m_theme->fileName()));
 
         m_name = m_theme->fileName();
@@ -136,9 +135,13 @@ bool ThemeInfo::parseThemeInfo()
                     {
                         if (ce.tagName() == "thumbnail")
                         {
-                            QString thumbnail = ce.firstChild().toText().data();
-                            m_previewpath = m_theme->absFilePath() + "/"
-                                                + thumbnail;
+                            if (ce.attribute("name") == "preview")
+                            {
+                                QString thumbnail = ce.firstChild().toText()
+                                                                    .data();
+                                m_previewpath = m_theme->absFilePath() + "/"
+                                                    + thumbnail;
+                            }
                         }
                     }
                 }
