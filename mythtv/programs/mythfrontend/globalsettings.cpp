@@ -2645,7 +2645,7 @@ ThemeSelector::ThemeSelector():
         addImageSelection(name, previewImage, theme->fileName());
     }
 
-    setValue("G.A.N.T.");
+    setValue("G.A.N.T");
 }
 
 class StyleSetting: public HostComboBox {
