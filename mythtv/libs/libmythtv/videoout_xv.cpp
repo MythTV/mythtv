@@ -622,6 +622,11 @@ int VideoOutputXv::GrabSuitableXvPort(Display* disp, Window root,
     }
 
     QString lastAdaptorName = QString::null;
+
+    VideoDisplayProfile vdp;
+    vdp.SetInput(QSize(width, height));
+    QString osdtype = vdp.GetOSDRenderer();
+    bool check_for_colorkey = (osdtype == "chromakey");
     for (uint j = begin; j < end; ++j)
     {
         VERBOSE(VB_PLAYBACK, LOC + QString("@ j=%1 Looking for flag[s]: %2")
@@ -640,6 +645,25 @@ int VideoOutputXv::GrabSuitableXvPort(Display* disp, Window root,
             const XvPortID firstPort = ai[i].base_id;
             const XvPortID lastPort = ai[i].base_id + ai[i].num_ports - 1;
             XvPortID p = 0;
+
+            if (check_for_colorkey)
+            {
+                int colorkey = 0;
+                X11S(colorkey = colorkey_supported(disp, firstPort));
+                if (!colorkey)
+                {
+                    if (i == (p_num_adaptors -1))
+                    {
+                        VERBOSE(VB_PLAYBACK, LOC +
+                            "Failed to find XV_COLORKEY support. "
+                                    "Disabling XV_COLORKEY check");
+                        check_for_colorkey = false;
+                        i = 0;
+                    }
+                    continue;
+                }
+            }
+
             if (useXVMC[j])
             {
 #ifdef USING_XVMC
@@ -1575,34 +1599,11 @@ void VideoOutputXv::InitColorKey(bool turnoffautopaint)
         return;
 
     QString msg = LOC + "Chromakeying not possible with this XVideo port.";
-    X11S(xv_atom = XInternAtom(XJ_disp, "XV_COLORKEY", False));
-    if (xv_atom == None)
+    X11S(xv_colorkey = colorkey_supported(XJ_disp, xv_port));
+    if (!xv_colorkey)
     {
         VERBOSE(VB_PLAYBACK, msg);
-        xv_colorkey = 0;
         return;
-    }
-
-    X11S(ret = XvGetPortAttribute(XJ_disp, xv_port, xv_atom, &xv_colorkey));
-    if (ret == Success && xv_colorkey == 0)
-    {
-        const int default_colorkey = 1;
-        X11S(ret = XvSetPortAttribute(XJ_disp, xv_port, xv_atom,
-                                      default_colorkey));
-        if (ret == Success)
-        {
-            VERBOSE(VB_PLAYBACK, LOC +
-                    "0,0,0 is the only bad color key for MythTV, "
-                    "using "<<default_colorkey<<" instead.");
-            xv_colorkey = default_colorkey;
-        }
-        ret = Success;
-    }
-
-    if (ret != Success)
-    {
-        VERBOSE(VB_PLAYBACK, msg);
-        xv_colorkey = 0;
     }
 }
 

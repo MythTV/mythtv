@@ -80,3 +80,18 @@ QString xvflags2str(int flags)
         str.append("XvImageMask ");
     return str;
 }
+
+int colorkey_supported(Display *disp, int port)
+{
+    Atom xv_atom;
+    int colorkey = 0;
+    int ret;
+    xv_atom = XInternAtom(disp, "XV_COLORKEY", true);
+    if (xv_atom != None)
+    {
+        ret = XvGetPortAttribute(disp, port, xv_atom, &colorkey);
+        if (ret != Success)
+            colorkey = 0;
+    }
+    return colorkey;
+}

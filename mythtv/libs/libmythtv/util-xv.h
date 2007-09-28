@@ -24,5 +24,6 @@ extern void del_open_xv_port(int port);
 extern bool has_open_xv_port(int port);
 extern uint cnt_open_xv_port(void);
 extern QString xvflags2str(int flags);
+extern int colorkey_supported(Display *disp, int port);
 
 #endif // _UTIL_XV_H_
