@@ -248,9 +248,14 @@
       </image>
 
       <textarea name="+observation_time" draworder="5">
-        <area>39,540,700,35</area>
+        <area>39,540,450,35</area>
         <font>footer</font>
       </textarea>
+
+      <!-- <textarea name="+copyright" draworder="5">
+        <area>450,540,700,35</area>
+        <font>footer</font>
+      </textarea> -->
     </container> 
 
     <container name="Three Day Forecast">

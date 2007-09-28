@@ -2617,19 +2617,28 @@ ThemeSelector::ThemeSelector():
         if (themeinfo->IsWide())
             name += QString(" (%1)").arg(QObject::tr("Widescreen"));
 
-        delete themeinfo;
-
         if (!preview.exists())
         {
             VERBOSE(VB_IMPORTANT, QString("UI Theme %1 missing preview image.")
                                     .arg(theme->fileName()));
-            continue;
+            QString defaultpreview = themes.absPath();
+            if (themeinfo->IsWide())
+            {
+                defaultpreview += "/default-wide/preview.png";
+            }
+            else
+            {
+                defaultpreview += "/default/preview.png";
+            }
+            preview = QFileInfo(defaultpreview);
         }
+
+        delete themeinfo;
 
         QImage* previewImage = new QImage(preview.absFilePath());
         if (previewImage->width() == 0 || previewImage->height() == 0) {
             VERBOSE(VB_IMPORTANT, QString("Problem reading theme preview image"
-                                          " %1").arg(preview.dirPath()));
+                                          " %1").arg(preview));
             continue;
         }
 
