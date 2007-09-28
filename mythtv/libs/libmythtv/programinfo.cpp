@@ -3172,7 +3172,7 @@ void ProgramInfo::showDetails(void) const
     if (record == NULL && recordid)
     {
         record = new ScheduledRecording();
-        record->loadByID(recordid);
+        record->loadByProgram(this);
     }
 
     if (filesize > 0)
