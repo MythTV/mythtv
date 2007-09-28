@@ -24,6 +24,7 @@
 // MythTV headers
 #include "mythconfig.h"
 #include "mythwidgets.h"
+#include "mythdialogs.h"
 #include "mythcontext.h"
 #include "mythdbcon.h"
 #include "videosource.h"
@@ -34,6 +35,7 @@
 #include "channelutil.h"
 #include "frequencies.h"
 #include "diseqcsettings.h"
+
 
 #ifdef USING_DVB
 #include <linux/dvb/frontend.h>
@@ -388,6 +390,11 @@ XMLTVConfig::XMLTVConfig(const VideoSource& parent) :
     if ( find_grabber_proc.start() )
     {
 
+        VERBOSE(VB_IMPORTANT, "Running tv_find_grabbers.");
+        MythBusyDialog *find_grabbers_dialog = new MythBusyDialog(
+            QObject::tr("Searching for installed XMLTV grabbers"));
+        find_grabbers_dialog->start();
+
         int i=0;
         // Assume it shouldn't take more than 25 seconds
         // Broken versions of QT cause QProcess::start
@@ -397,6 +404,8 @@ XMLTVConfig::XMLTVConfig(const VideoSource& parent) :
         {
             usleep(100000);
             ++i;
+            // Update the progress dialog without using the event loop
+            qApp->processEvents();
         }
 
         if (find_grabber_proc.normalExit())
@@ -417,6 +426,9 @@ XMLTVConfig::XMLTVConfig(const VideoSource& parent) :
         {
             VERBOSE(VB_IMPORTANT, "tv_find_grabbers exited early or we timed out waiting");
         }
+
+        find_grabbers_dialog->Close();
+        delete find_grabbers_dialog;
     }
     else
     {
