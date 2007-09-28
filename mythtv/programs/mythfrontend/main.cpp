@@ -616,10 +616,9 @@ QString RandTheme(QString &themename)
         if (theme->fileName() == "." || theme->fileName() =="..")
             continue;
 
-        QFileInfo preview(theme->absFilePath() + "/preview.jpg");
         QFileInfo xml(theme->absFilePath() + "/theme.xml");
 
-        if (!preview.exists() || !xml.exists())
+        if (!xml.exists())
             continue;
 
         // We don't want the same one as last time.
@@ -630,9 +629,7 @@ QString RandTheme(QString &themename)
     if (themelist.size()) 
         themename = themelist[rand() % themelist.size()];
 
-    ThemeSelector Theme;
-    Theme.setValue(themename);
-    Theme.save();
+    gContext->SaveSetting("Theme", themename);
 
     return themename;
 }

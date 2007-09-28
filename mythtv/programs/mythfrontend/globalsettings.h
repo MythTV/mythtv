@@ -4,11 +4,15 @@
 #include "libmyth/settings.h"
 #include "libmyth/mythcontext.h"
 #include "libmythtv/videodisplayprofile.h"
+#include "themeinfo.h"
 
 class ThemeSelector : public HostImageSelect
 {
   public:
-    ThemeSelector();
+    ThemeSelector(QString label);
+
+  private:
+    bool parseThemeInfo(QFileInfo *theme, QString &name, QFileInfo &preview);
 };
 
 class PlaybackSettings : public ConfigurationWizard

@@ -1480,33 +1480,6 @@ static HostComboBox *MenuTheme()
     return gc;
 }
 
-static HostComboBox *OSDTheme()
-{
-    HostComboBox *gc = new HostComboBox("OSDTheme");
-    gc->setLabel(QObject::tr("OSD theme"));
-
-    QDir themes(gContext->GetThemesParentDir());
-    themes.setFilter(QDir::Dirs);
-    themes.setSorting(QDir::Name | QDir::IgnoreCase);
-
-    const QFileInfoList *fil = themes.entryInfoList(QDir::Dirs);
-    if (!fil)
-        return gc;
-
-    QFileInfoListIterator it( *fil );
-    QFileInfo *theme;
-
-    for( ; it.current() != 0 ; ++it ) {
-        theme = it.current();
-        QFileInfo xml(theme->absFilePath() + "/osd.xml");
-
-        if (theme->fileName()[0] != '.' && xml.exists())
-            gc->addSelection(theme->fileName());
-    }
-
-    return gc;
-}
-
 static HostComboBox *OSDFont()
 {
     HostComboBox *gc = new HostComboBox("OSDFont");
@@ -2576,10 +2549,26 @@ static HostComboBox *ThemePainter()
     return gc;
 }
 
-ThemeSelector::ThemeSelector():
-    HostImageSelect("Theme") {
+ThemeSelector::ThemeSelector(QString label):
+    HostImageSelect(label) {
 
-    setLabel(QObject::tr("Theme"));
+    ThemeType themetype;
+
+    if (label == "Theme")
+    {
+        themetype = THEME_UI;
+        setLabel(QObject::tr("UI Theme"));
+    }
+    else if (label == "OSDTheme")
+    {
+        themetype = THEME_OSD;
+        setLabel(QObject::tr("OSD Theme"));
+    }
+    else if (label == "MenuTheme")
+    {
+        themetype = THEME_MENU;
+        setLabel(QObject::tr("Menu Theme"));
+    }
 
     QDir themes(gContext->GetThemesParentDir());
     themes.setFilter(QDir::Dirs);
@@ -2605,21 +2594,21 @@ ThemeSelector::ThemeSelector():
 
         ThemeInfo *themeinfo = new ThemeInfo(theme->absFilePath());
 
-        if (!themeinfo || (!(themeinfo->Type() & THEME_UI)))
+        if (!themeinfo)
             continue;
 
         name = themeinfo->Name();
         preview = QFileInfo(themeinfo->PreviewPath());
 
-        if (name.isEmpty())
+        if (name.isEmpty() || !(themeinfo->Type() & themetype))
             continue;
 
-        if (themeinfo->IsWide())
+        if ((themeinfo->Type() & THEME_UI) & themeinfo->IsWide())
             name += QString(" (%1)").arg(QObject::tr("Widescreen"));
 
         if (!preview.exists())
         {
-            VERBOSE(VB_IMPORTANT, QString("UI Theme %1 missing preview image.")
+            VERBOSE(VB_IMPORTANT, QString("Theme %1 missing preview image.")
                                     .arg(theme->fileName()));
             QString defaultpreview = themes.absPath();
             if (themeinfo->IsWide())
@@ -2645,7 +2634,8 @@ ThemeSelector::ThemeSelector():
         addImageSelection(name, previewImage, theme->fileName());
     }
 
-    setValue("G.A.N.T");
+    if (themetype & THEME_UI)
+        setValue("G.A.N.T");
 }
 
 class StyleSetting: public HostComboBox {
@@ -4486,7 +4476,7 @@ OSDSettings::OSDSettings()
 {
     VerticalConfigurationGroup* osd = new VerticalConfigurationGroup(false);
     osd->setLabel(QObject::tr("On-screen display"));
-    osd->addChild(OSDTheme());
+    osd->addChild(new ThemeSelector("OSDTheme"));
 
     HorizontalConfigurationGroup* osdhg =
         new HorizontalConfigurationGroup(false, false);
@@ -4643,7 +4633,7 @@ AppearanceSettings::AppearanceSettings()
     VerticalConfigurationGroup* theme = new VerticalConfigurationGroup(false);
     theme->setLabel(QObject::tr("Theme"));
 
-    theme->addChild(new ThemeSelector());
+    theme->addChild(new ThemeSelector("Theme"));
 
     HorizontalConfigurationGroup *grp1 =
         new HorizontalConfigurationGroup(false, false, false, false);
