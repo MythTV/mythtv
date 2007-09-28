@@ -36,7 +36,7 @@ class AutoExpire : public QObject
    ~AutoExpire();
 
     void CalcParams(void);
-    void PrintExpireList(void);
+    void PrintExpireList(QString expHost = "ALL");
 
     size_t GetDesiredSpace(void) const
         { return desired_space; }

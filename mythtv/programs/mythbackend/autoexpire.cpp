@@ -690,21 +690,28 @@ void AutoExpire::FillExpireList(pginfolist_t &expireList)
     }
 }
 
-/** \fn AutoExpire::PrintExpireList(void)
+/** \fn AutoExpire::PrintExpireList(QString)
  *  \brief Prints a summary of the files that can be deleted.
  */
-void AutoExpire::PrintExpireList(void)
+void AutoExpire::PrintExpireList(QString expHost)
 {
     pginfolist_t expireList;
 
     FillExpireList(expireList);
 
-    cout << "MythTV AutoExpire List (programs listed in order of expiration)\n";
+    cout << "MythTV AutoExpire List ";
+    if (expHost != "ALL")
+        cout << "for '" << expHost << "' ";
+    cout << "(programs listed in order of expiration)\n";
 
     pginfolist_t::iterator i = expireList.begin();
     for (; i != expireList.end(); i++)
     {
         ProgramInfo *first = (*i);
+
+        if (expHost != "ALL" && first->hostname != expHost)
+            continue;
+
         QString title = first->title;
 
         if (first->subtitle != "")

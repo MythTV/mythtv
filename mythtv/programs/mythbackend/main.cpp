@@ -264,7 +264,7 @@ int main(int argc, char **argv)
     bool nojobqueue = false;
     bool nohousekeeper = false;
     bool noexpirer = false;
-    bool printexpire = false;
+    QString printexpire = "";
     bool clearsettingscache = false;
 
     for (int argpos = 1; argpos < a.argc(); ++argpos)
@@ -391,7 +391,12 @@ int main(int argc, char **argv)
         } 
         else if (!strcmp(a.argv()[argpos],"--printexpire"))
         {
-            printexpire = true;
+            printexpire = "ALL";
+            if ((a.argc()-1 > argpos) && a.argv()[argpos+1][0] != '-')
+            {
+                printexpire = a.argv()[argpos+1];
+                ++argpos;
+            }
         } 
         else if (!strcmp(a.argv()[argpos],"--clearcache"))
         {
@@ -562,10 +567,10 @@ int main(int argc, char **argv)
         return (ok) ? BACKEND_EXIT_OK : BACKEND_EXIT_NO_CONNECT;
     }
 
-    if (printexpire)
+    if (printexpire != "")
     {
         expirer = new AutoExpire();
-        expirer->PrintExpireList();
+        expirer->PrintExpireList(printexpire);
         cleanup();
         return BACKEND_EXIT_OK;
     }
