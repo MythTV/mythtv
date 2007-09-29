@@ -788,7 +788,14 @@ QString MythContextPrivate::getResponse(const QString &query,
         cout << " [" << def << "]  ";
     else
         cout << "  ";
-    
+
+    if (!isatty(fileno(stdin)) || !isatty(fileno(stdout)))
+    {
+        cout << endl << "[console is not interactive, using default '"
+             << def  << "']" << endl;
+        return def;
+    }
+
     char response[80];
     cin.clear();
     cin.getline(response, 80);
