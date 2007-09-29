@@ -89,7 +89,7 @@ static void myth_av_log(void *ptr, int level, const char* fmt, va_list vl)
     static QMutex string_lock;
 
     // determine mythtv debug level from av log level
-    int verbose_level = (level < AV_LOG_WARNING) ? VB_IMPORTANT : VB_LIBAV;
+    uint verbose_level = (level < AV_LOG_WARNING) ? VB_IMPORTANT : VB_LIBAV;
 
     if (!(print_verbose_messages & verbose_level))
         return;
