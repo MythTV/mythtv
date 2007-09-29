@@ -1936,7 +1936,7 @@ void MainServer::DoHandleDeleteRecording(ProgramInfo *pginfo, PlaybackSock *pbs,
         pginfo->ApplyRecordRecGroupChange("Deleted");
         pginfo->SetAutoExpire(kDeletedAutoExpire);
         if (pginfo->recstatus == rsRecording)
-            DoHandleStopRecording(pginfo, pbs);
+            DoHandleStopRecording(pginfo, NULL);
         else
             delete pginfo;
         QStringList outputlist = QString::number(0);
