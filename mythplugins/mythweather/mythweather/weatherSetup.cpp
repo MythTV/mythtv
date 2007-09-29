@@ -160,6 +160,7 @@ ScreenSetup::ScreenSetup(MythMainWindow *parent, SourceManager *srcman) :
     wireUI();
     loadData();
     buildFocusList();
+
     assignFirstFocus();
 }
 
@@ -197,6 +198,9 @@ void ScreenSetup::wireUI()
                 SLOT(updateHelpText()));
         connect(m_active_list, SIGNAL(itemSelected(UIListBtnTypeItem *)),
                 this, SLOT(updateHelpText()));
+
+        if (!m_active_list->GetCount())
+            m_active_list->allowFocus(false);
     }
 
     m_inactive_list = getUIListBtnType("inactivelist");
@@ -697,7 +701,8 @@ void ScreenSetup::doListSelect(UIListBtnType *list, UIListBtnTypeItem *selected)
             UIListBtnTypeItem *itm = new UIListBtnTypeItem(m_active_list, txt);
             itm->setDrawArrow(multiLoc);
             itm->setData(newsi);
-            if (m_active_list->GetCount()) m_active_list->allowFocus(true);
+            if (m_active_list->GetCount())
+                m_active_list->allowFocus(true);
         }
         else
         {
