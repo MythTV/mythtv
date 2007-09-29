@@ -28,17 +28,13 @@ ThemeInfo::ThemeInfo(QString theme)
             m_aspect = "4:3";
 
         if (QFile::exists(m_theme->absFilePath() + "/theme.xml"))
-        {
-            m_type = THEME_UI;
-        }
-        else if (QFile::exists(m_theme->absFilePath() + "/osd.xml"))
-        {
-            m_type = THEME_OSD;
-        }
-        else if (QFile::exists(m_theme->absFilePath() + "/mainmenu.xml"))
-        {
-            m_type = THEME_MENU;
-        }
+            m_type |= THEME_UI;
+
+        if (QFile::exists(m_theme->absFilePath() + "/osd.xml"))
+            m_type |= THEME_OSD;
+
+        if (QFile::exists(m_theme->absFilePath() + "/mainmenu.xml"))
+            m_type |= THEME_MENU;
 
         m_previewpath = m_theme->absFilePath() + "/preview.jpg";
     }
