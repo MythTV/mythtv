@@ -8,8 +8,10 @@ ThemeInfo::ThemeInfo(QString theme)
 {
 
     m_theme = new QFileInfo (theme);
-    m_name = m_aspect = m_previewpath = "";
+    m_name = m_aspect = m_previewpath = m_description = m_errata = "";
     m_type = THEME_UNKN;
+    m_baseres = QSize(800, 600);
+    m_majorver = m_minorver = 0;
 
     if (!parseThemeInfo())
     {
@@ -28,10 +30,24 @@ ThemeInfo::ThemeInfo(QString theme)
             m_aspect = "4:3";
 
         if (QFile::exists(m_theme->absFilePath() + "/theme.xml"))
+        {
             m_type |= THEME_UI;
 
+            if (IsWide())
+            {
+                m_baseres = QSize(1280, 720);
+            }
+            else
+            {
+                m_baseres = QSize(800, 600);
+            }
+        }
+
         if (QFile::exists(m_theme->absFilePath() + "/osd.xml"))
+        {
             m_type |= THEME_OSD;
+            m_baseres = QSize(640, 480);
+        }
 
         if (QFile::exists(m_theme->absFilePath() + "/mainmenu.xml"))
             m_type |= THEME_MENU;
@@ -86,6 +102,12 @@ bool ThemeInfo::parseThemeInfo()
             {
                 m_aspect = e.firstChild().toText().data();
             }
+            else if (e.tagName() == "baseres")
+            {
+                    QString size = e.firstChild().toText().data();
+                    m_baseres = QSize(size.section('x', 0, 0).toInt(),
+                                            size.section('x', 1, 1).toInt());
+            }
             else if (e.tagName() == "types")
             {
                 for (QDomNode child = e.firstChild(); !child.isNull();
@@ -121,6 +143,27 @@ bool ThemeInfo::parseThemeInfo()
                     }
                 }
             }
+            else if (e.tagName() == "version")
+            {
+                for (QDomNode child = e.firstChild(); !child.isNull();
+                        child = child.nextSibling())
+                {
+                    QDomElement ce = child.toElement();
+                    if (!ce.isNull())
+                    {
+                        if (ce.tagName() == "major")
+                        {
+                            m_majorver = ce.firstChild().toText()
+                                                    .data().toInt();
+                        }
+                        else if (ce.tagName() == "minor")
+                        {
+                            m_minorver = ce.firstChild().toText()
+                                                    .data().toInt();
+                        }
+                    }
+                }
+            }
             else if (e.tagName() == "detail")
             {
                 for (QDomNode child = e.firstChild(); !child.isNull();
@@ -138,6 +181,14 @@ bool ThemeInfo::parseThemeInfo()
                                 m_previewpath = m_theme->absFilePath() + "/"
                                                     + thumbnail;
                             }
+                        }
+                        else if (ce.tagName() == "description")
+                        {
+                            m_description = ce.firstChild().toText().data();
+                        }
+                        else if (ce.tagName() == "errata")
+                        {
+                            m_errata = ce.firstChild().toText().data();
                         }
                     }
                 }
