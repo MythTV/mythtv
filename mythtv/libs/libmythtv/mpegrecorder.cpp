@@ -403,10 +403,27 @@ bool MpegRecorder::OpenV4L2DeviceAsInput(void)
         VERBOSE(VB_IMPORTANT, LOC_WARN + "Unable to set audio mode" + ENO);
     }
 
+    // Get volume min/max values
+    struct v4l2_queryctrl qctrl;
+    qctrl.id = V4L2_CID_AUDIO_VOLUME;
+    if (ioctl(chanfd, VIDIOC_QUERYCTRL, &qctrl) < 0)
+    {
+        VERBOSE(VB_IMPORTANT, LOC_WARN +
+                "Unable to get recording volume parameters(max/min)" + ENO +
+                "\n\t\t\tusing default range [0,65535].");
+        qctrl.maximum = 65535;
+        qctrl.minimum = 0;
+    }
+
+    // calculate volume in card units.
+    int range = qctrl.maximum - qctrl.minimum;
+    int value = (int) ((range * audvolume * 0.01f) + qctrl.minimum);
+    int ctrl_volume = min(qctrl.maximum, max(qctrl.minimum, value));
+
     // Set recording volume
     struct v4l2_control ctrl;
     ctrl.id = V4L2_CID_AUDIO_VOLUME;
-    ctrl.value = 65536 / 100 *audvolume;
+    ctrl.value = ctrl_volume;
 
     if (ioctl(chanfd, VIDIOC_S_CTRL, &ctrl) < 0)
     {
