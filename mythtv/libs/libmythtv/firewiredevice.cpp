@@ -209,7 +209,8 @@ bool FirewireDevice::SetChannel(const QString &panel_model,
         return true;
     }
 
-    bool is_mot = (panel_model.upper().left(4) == "DCT-");
+    bool is_mot = ((panel_model.upper().left(4) == "DCT-") ||
+                   (panel_model.upper().left(4) == "DCH-"));
 
     if (is_mot && !alt_method)
     {
@@ -397,6 +398,8 @@ static void fw_init(QMap<uint64_t,QString> &id_to_model)
 
     const uint64_t motorola_vendor_ids[] =
     {
+        /* DCH-3200 */
+        0x1c11,
         /* 3412 */
         0x159a,
         /* 6200, 3416 */
@@ -413,6 +416,7 @@ static void fw_init(QMap<uint64_t,QString> &id_to_model)
 
     for (uint i = 0; i < motorola_vendor_id_cnt; i++)
     {
+        id_to_model[motorola_vendor_ids[i] << 32 | 0xd330] = "DCH-3200";
         id_to_model[motorola_vendor_ids[i] << 32 | 0x34cb] = "DCT-3412";
         id_to_model[motorola_vendor_ids[i] << 32 | 0x346b] = "DCT-3416";
         id_to_model[motorola_vendor_ids[i] << 32 | 0x6200] = "DCT-6200";
@@ -426,7 +430,8 @@ static void fw_init(QMap<uint64_t,QString> &id_to_model)
 bool FirewireDevice::IsSTBSupported(const QString &panel_model)
 {
     QString model = panel_model.upper();
-    return ((model == "DCT-3412") ||
+    return ((model == "DCH-3200") ||
+            (model == "DCT-3412") ||
             (model == "DCT-3416") ||
             (model == "DCT-6200") ||
             (model == "DCT-6212") ||

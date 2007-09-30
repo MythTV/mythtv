@@ -33,6 +33,9 @@
 // NOTE: Some Models have more than one possible Vendor ID
 // WARNING: Please update firewiredevice.cpp when adding to this list.
 
+#define DCH3200_VENDOR_ID1 0x00001c11
+#define DCH3200_MODEL_ID1  0x0000d330
+
 #define DCT3412_VENDOR_ID1 0x0000159a
 #define DCT3412_MODEL_ID1  0x000034cb
 
@@ -211,7 +214,8 @@ int main (int argc, char *argv[])
                  i, dir.vendor_id, dir.model_id); 
 
       // WARNING: Please update firewiredevice.cpp when adding to this list.
-      if ( ((dir.vendor_id == DCT3412_VENDOR_ID1) || 
+      if ( ((dir.vendor_id == DCH3200_VENDOR_ID1) ||
+            (dir.vendor_id == DCT3412_VENDOR_ID1) || 
             (dir.vendor_id == DCT3416_VENDOR_ID1) || 
             (dir.vendor_id == DCT5100_VENDOR_ID1) ||
             (dir.vendor_id == DCT6200_VENDOR_ID1) ||
@@ -232,7 +236,8 @@ int main (int argc, char *argv[])
             (dir.vendor_id == DCT6412_VENDOR_ID2) ||
             (dir.vendor_id == DCT6416_VENDOR_ID1) || 
             (dir.vendor_id == DCT6416_VENDOR_ID2)) &&
-           ((dir.model_id == DCT3412_MODEL_ID1) ||
+           ((dir.model_id == DCH3200_MODEL_ID1) ||
+            (dir.model_id == DCT3412_MODEL_ID1) ||
             (dir.model_id == DCT3416_MODEL_ID1) ||
             (dir.model_id == DCT5100_MODEL_ID1) ||
             (dir.model_id == DCT6200_MODEL_ID1) ||
