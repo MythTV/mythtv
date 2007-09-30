@@ -23,7 +23,7 @@
 
 const uint ThreadedFileWriter::TFW_DEF_BUF_SIZE   = 2*1024*1024;
 const uint ThreadedFileWriter::TFW_MAX_WRITE_SIZE = TFW_DEF_BUF_SIZE / 4;
-const uint ThreadedFileWriter::TFW_MIN_WRITE_SIZE = TFW_DEF_BUF_SIZE / 8;
+const uint ThreadedFileWriter::TFW_MIN_WRITE_SIZE = TFW_DEF_BUF_SIZE / 32;
 
 /** \class ThreadedFileWriter
  *  \brief This class supports the writing of recordings to disk.
