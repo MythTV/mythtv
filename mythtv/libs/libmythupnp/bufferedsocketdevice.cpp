@@ -11,6 +11,7 @@
 #include "util.h"
 #include "bufferedsocketdevice.h"
 #include "upnputil.h"
+#include "mythcontext.h"  // for VERBOSE
 
 /////////////////////////////////////////////////////////////////////////////
 //

@@ -13,7 +13,7 @@
 
 #include "upnputil.h"
 #include "refcounted.h"
-#include "mythcontext.h"
+#include "mythcontext.h"  // for MYTH_BINARY_VERSION
 
 #include <qdom.h>
 #include <qurl.h>
@@ -254,7 +254,16 @@ class DeviceLocation : public RefCounted
             return "<Unknown>";
         }
 
+        QString GetNameAndIP( bool bInQtThread = TRUE )
+        {
+            UPnpDeviceDesc *pDevice = GetDeviceDesc( bInQtThread );
 
+            if ( pDevice == NULL)
+               return "<Unknown>";
+
+            return pDevice->m_rootDevice.m_sFriendlyName
+                   + " (" + pDevice->m_sHostName + ")";
+        }
 };
 
 #endif

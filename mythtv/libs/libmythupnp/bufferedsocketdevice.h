@@ -14,8 +14,6 @@
 #include <qsocketdevice.h>
 #include <sys/socket.h>
 
-#include "mythcontext.h"
-
 #include "private/qinternal_p.h"
 
 /////////////////////////////////////////////////////////////////////////////

@@ -14,7 +14,6 @@
 #include <qdom.h>
 #include <qbuffer.h>
 
-#include "mythcontext.h"
 #include "httpcomms.h"
 
 #include "upnp.h"

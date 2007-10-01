@@ -32,7 +32,7 @@
 #include <fcntl.h>
 
 #include "util.h"
-#include "mythcontext.h"
+#include "mythcontext.h"  // for VERBOSE
 #include "upnp.h"
 
 #ifndef O_LARGEFILE

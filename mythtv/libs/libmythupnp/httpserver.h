@@ -31,7 +31,7 @@
 #include "threadpool.h"
 #include "refcounted.h"
 
-#include "mythcontext.h"
+#include "mythcontext.h"  // for GetInstallPrefixPath()
 
 typedef struct timeval  TaskTime;
 

@@ -9,7 +9,6 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include "upnp.h"
-#include "mythcontext.h"
 #include "upnptasksearch.h"
 
 #include <unistd.h>

@@ -9,7 +9,7 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include "configuration.h"
-#include "mythcontext.h"
+#include "mythcontext.h"  // for VERBOSE and GetConfDir()
 
 #include <qfile.h>
 #include <qdir.h>
