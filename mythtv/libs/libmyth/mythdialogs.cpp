@@ -535,6 +535,16 @@ void MythPopupBox::showOkPopup(MythMainWindow *parent, QString title,
     popup.ExecPopup();
 }
 
+void MythPopupBox::showExitPopup(MythMainWindow *parent, QString title,
+                                 QString message)
+{
+    MythPopupBox popup(parent, title);
+    popup.addLabel(message, Medium, true);
+    QButton *okButton = popup.addButton(tr("Exit"));
+    okButton->setFocus();
+    popup.ExecPopup();
+}
+
 bool MythPopupBox::showOkCancelPopup(MythMainWindow *parent, QString title,
                                      QString message, bool focusOk)
 {
