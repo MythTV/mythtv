@@ -39,7 +39,7 @@ int MasterSelection::GetConnectionInfo( MediaRenderer  *pUPnp,
 {
     if ((pUPnp == NULL) || (pParams == NULL))
     {
-        VERBOSE( VB_UPNP, "MasterSelectionDialog::GetConnectionInfo - "
+        VERBOSE( VB_UPNP, "MasterSelection::GetConnectionInfo - "
                           "Invalid NULL parameters." );
         return -1;
     }
@@ -613,7 +613,10 @@ void MasterSelectionDialog::FillListBox( void )
 
         if (pEntry != NULL)
         {
-            AddItem( pEntry, pEntry->GetFriendlyName( true ));
+            if ( print_verbose_messages & VB_UPNP )
+                AddItem( pEntry, pEntry->GetNameAndIP( true ));
+            else
+                AddItem( pEntry, pEntry->GetFriendlyName( true ));
 
             pEntry->Release();
         }
@@ -647,7 +650,10 @@ void MasterSelectionDialog::customEvent(QCustomEvent *e)
                 {
                     pLoc->AddRef();
 
-                    AddItem( pLoc, pLoc->GetFriendlyName( true ));
+                    if ( print_verbose_messages & VB_UPNP )
+                        AddItem( pLoc, pLoc->GetNameAndIP( true ));
+                    else
+                        AddItem( pLoc, pLoc->GetFriendlyName( true ));
 
                     pLoc->Release();
                 }
