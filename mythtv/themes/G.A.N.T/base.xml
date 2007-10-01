@@ -12,20 +12,23 @@
       <alphapulse min="0" max="255" change="1"/>
     </imagetype>
 
-    <font name="clock" face="Arial"> 
-       <color>#FFFFFF</color> 
-       <size>16</size> 
-       <size:small>14</size:small> 
-       <size:big>18</size:big> 
-       <bold>yes</bold> 
-    </font> 
-  
-    <clock name="clock"> 
-       <area>340,32,415,50</area> 
-       <font>clock</font> 
-       <align>right</align> 
-       <format>%DATE% %TIME%</format> 
-     </clock> 
+    <font name="clock" face="Arial">
+       <color>#FFFFFF</color>
+       <size>16</size>
+       <size:small>14</size:small>
+       <size:big>18</size:big>
+       <bold>yes</bold>
+       <outlinesize>2</outlinesize>
+       <outlinecolor>black</outlinecolor>
+    </font>
+
+    <clock name="clock">
+       <area>340,32,415,50</area>
+       <font>clock</font>
+       <align>right</align>
+       <format>%DATE% %TIME%</format>
+       <alpha>200</alpha>
+    </clock>
   </window>
 
 </mythuitheme>
