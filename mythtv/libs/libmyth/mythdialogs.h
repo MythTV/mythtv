@@ -140,7 +140,7 @@ class MPUBLIC MythPopupBox : public MythDialog
     static void showOkPopup(MythMainWindow *parent, QString title,
                             QString message);
     static void showExitPopup(MythMainWindow *parent, QString title,
-                              QString message)
+                              QString message);
     static bool showOkCancelPopup(MythMainWindow *parent, QString title,
                                   QString message, bool focusOk);
     static int show2ButtonPopup(MythMainWindow *parent, QString title,
