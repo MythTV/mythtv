@@ -3062,6 +3062,12 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
         if (ringBuffer->isDVD() && 
             curstream->codec->codec_type == CODEC_TYPE_VIDEO)
         {
+            if (ringBuffer->DVD()->InStillFrame() &&
+                !indvdstill)
+            {
+                ringBuffer->DVD()->InStillFrame(false);
+            }
+            
             if (pkt->size == 4)
                 MpegPreProcessPkt(curstream, pkt);
             else if (!d->HasMPEG2Dec())
@@ -3391,13 +3397,6 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
                         continue;
                     }
                     
-                    if (ringBuffer->isDVD() && 
-                        ringBuffer->DVD()->InStillFrame() && 
-                        !indvdstill)
-                    {
-                        ringBuffer->DVD()->InStillFrame(false);
-                    }
-
                     if (firstloop && pts != (int64_t) AV_NOPTS_VALUE)
                     {
                         lastccptsu = (long long)
