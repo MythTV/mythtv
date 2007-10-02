@@ -683,10 +683,19 @@ BackendSettings::BackendSettings() {
     server->setLabel(QObject::tr("Host Address Backend Setup"));
     VerticalConfigurationGroup* localServer = new VerticalConfigurationGroup();
     localServer->setLabel(QObject::tr("Local Backend" + QString(" (") + gContext->GetHostName() + QString(")")));
-    localServer->addChild(LocalServerIP());
-    localServer->addChild(LocalServerPort());
-    localServer->addChild(LocalStatusPort());
-    localServer->addChild(LocalSecurityPin());
+    HorizontalConfigurationGroup* localIP =
+              new HorizontalConfigurationGroup(false, false, true, true);
+    localIP->addChild(LocalServerIP());
+    localServer->addChild(localIP);
+    HorizontalConfigurationGroup* localPorts =
+              new HorizontalConfigurationGroup(false, false, true, true);
+    localPorts->addChild(LocalServerPort());
+    localPorts->addChild(LocalStatusPort());
+    localServer->addChild(localPorts);
+    HorizontalConfigurationGroup* localPin =
+              new HorizontalConfigurationGroup(false, false, true, true);
+    localPin->addChild(LocalSecurityPin());
+    localServer->addChild(localPin);
     VerticalConfigurationGroup* masterServer = new VerticalConfigurationGroup();
     masterServer->setLabel(QObject::tr("Master Backend"));
     masterServer->addChild(MasterServerIP());
