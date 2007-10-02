@@ -118,6 +118,7 @@ VideoOutputIvtv::VideoOutputIvtv(void) :
     videofd(-1),              fbfd(-1),
     fps(30000.0f/1001.0f),    videoDevice("/dev/video16"),
     driver_version(0),
+    has_v4l2_api(false),      has_pause_bug(false),
 
     mapped_offset(0),         mapped_memlen(0),
     mapped_mem(NULL),         pixels(NULL),
@@ -135,8 +136,9 @@ VideoOutputIvtv::VideoOutputIvtv(void) :
     last_normal(true),        last_mask(0x2),
 
     alphaState(kAlpha_Solid), old_fb_ioctl(true),
-    v4l2_api(false),          fb_dma_ioctl(IVTVFB_IOCTL_PREP_FRAME),
-    color_key(false),         decoder_flush(true)
+    fb_dma_ioctl(IVTVFB_IOCTL_PREP_FRAME),
+    color_key(false),         decoder_flush(true),
+    paused(false)
 {
     priv = new VideoOutputIvtvPriv();
 }
@@ -212,7 +214,7 @@ void VideoOutputIvtv::ClearOSD(void)
 
 void VideoOutputIvtv::SetColorKey(int state, int color)
 {
-    if (v4l2_api)
+    if (has_v4l2_api)
     {
         struct v4l2_format alpha_state;
         struct v4l2_framebuffer framebuffer_state;
@@ -263,7 +265,7 @@ void VideoOutputIvtv::SetAlpha(eAlphaState newAlphaState)
     struct ivtvfb_ioctl_state_info fbstate;
     bzero(&fbstate, sizeof(fbstate));
 
-    if (v4l2_api)
+    if (has_v4l2_api)
     {
         struct v4l2_format alpha_state;
         struct v4l2_framebuffer framebuffer_state;
@@ -429,7 +431,7 @@ bool VideoOutputIvtv::Init(int width, int height, float aspect,
     {
         int fbno = 0;
 
-        if (v4l2_api)
+        if (has_v4l2_api)
         {
             struct v4l2_framebuffer fbuf;
 
@@ -658,8 +660,13 @@ void VideoOutputIvtv::Open(void)
             color_key = true;
         if (driver_version >= 0x000A00)
             decoder_flush = false;
-        if (driver_version >= 0x010000)
-            v4l2_api = true;
+        has_v4l2_api  = (driver_version >= 0x010000);
+        has_pause_bug = (driver_version == 0x010000);
+
+        VERBOSE(VB_GENERAL, LOC + QString("ivtv version %1.%2.%3")
+                .arg(driver_version >> 16)
+                .arg((driver_version >> 8) & 0xFF)
+                .arg(driver_version & 0xFF));
     }
     VERBOSE(VB_PLAYBACK, LOC + "Open() -- end");
 }
@@ -921,13 +928,14 @@ void VideoOutputIvtv::Start(int skip, int mute)
     start.gop_offset = skip;
     start.muted_audio_frames = mute;
 
-    if (v4l2_api)
+    if (has_v4l2_api)
     {
         struct video_command cmd;
         memset(&cmd, 0, sizeof(cmd));
         cmd.cmd = VIDEO_CMD_PLAY;
         cmd.play.speed = 1000;
         ioctl(videofd, VIDEO_COMMAND, &cmd);
+        paused = false;
     }
     else
     {
@@ -956,7 +964,7 @@ void VideoOutputIvtv::Stop(bool hide)
     bzero(&stop, sizeof(stop));
     stop.hide_last = hide;
 
-    if (v4l2_api)
+    if (has_v4l2_api)
     {
         struct video_command cmd;
         memset(&cmd, 0, sizeof(cmd));
@@ -991,12 +999,13 @@ void VideoOutputIvtv::Stop(bool hide)
 void VideoOutputIvtv::Pause(void)
 {
     VERBOSE(VB_PLAYBACK, LOC + "Pause() -- begin");
-    if (v4l2_api)
+    if (has_v4l2_api)
     {
         struct video_command cmd;
         memset(&cmd, 0, sizeof(cmd));
         cmd.cmd = VIDEO_CMD_FREEZE;
         ioctl(videofd, VIDEO_COMMAND, &cmd);
+        paused = true;
     }
     else
     {
@@ -1063,7 +1072,7 @@ uint VideoOutputIvtv::WriteBuffer(unsigned char *buf, int len)
  */
 long long VideoOutputIvtv::GetFirmwareFramesPlayed(void)
 {
-    if (v4l2_api)
+    if (has_v4l2_api)
     {
         long long frame;
         if (ioctl(videofd, VIDEO_GET_FRAME_COUNT, &frame) < 0)
@@ -1112,13 +1121,23 @@ bool VideoOutputIvtv::Play(float speed, bool normal, int mask)
     speed = (speed >= 2.0f)  ? 2.0f : speed;
     speed = (speed <= 0.05f) ? 1.0f : speed;
 
-    if (v4l2_api)
+    if (has_v4l2_api)
     {
         struct video_command cmd;
+        // Some ivtv versions can't resume playback properly from pause.
+        if (has_pause_bug && paused && speed == 1.0f)
+        {
+            // Work around the bug by stepping up to playback speed
+            memset(&cmd, 0, sizeof(cmd));
+            cmd.cmd = VIDEO_CMD_PLAY;
+            cmd.play.speed = 500;
+            ioctl(videofd, VIDEO_COMMAND, &cmd);
+        }
         memset(&cmd, 0, sizeof(cmd));
         cmd.cmd = VIDEO_CMD_PLAY;
         cmd.play.speed = (__u32)(1000.0f * speed);
         ioctl(videofd, VIDEO_COMMAND, &cmd);
+        paused = false;
     }
     else
     {
@@ -1175,7 +1194,7 @@ void VideoOutputIvtv::Step(void)
 {
     VERBOSE(VB_PLAYBACK, LOC + "Step()");
 
-    if (v4l2_api)
+    if (has_v4l2_api)
     {
         struct video_command cmd;
         memset(&cmd, 0, sizeof(cmd));

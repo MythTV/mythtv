@@ -87,7 +87,9 @@ class VideoOutputIvtv: public VideoOutput
 
     float fps;
     QString videoDevice;
-    unsigned driver_version;
+    unsigned int driver_version;
+    bool has_v4l2_api;
+    bool has_pause_bug;
 
     QMutex lock;
 
@@ -116,10 +118,12 @@ class VideoOutputIvtv: public VideoOutput
     eAlphaState alphaState;
 
     bool old_fb_ioctl;
-    bool v4l2_api;
     int  fb_dma_ioctl;
     bool color_key;
     bool decoder_flush;
+
+    bool paused;
+
     VideoOutputIvtvPriv *priv;
 };
 
